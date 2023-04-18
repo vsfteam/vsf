@@ -26,11 +26,17 @@
 #   include "../../include/unistd.h"
 #   include "../../include/errno.h"
 #   include "../../include/fcntl.h"
+#   include "../../include/spawn.h"
+// for waitpid
+#   include "../../include/sys/wait.h"
 #   include "../../include/simple_libc/stdlib.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
 #   include <fcntl.h>
+#   include <spawn.h>
+// for waitpid
+#   include <sys/wait.h>
 #   include <stdlib.h>
 #endif
 #include <limits.h>
@@ -247,14 +253,23 @@ void _Exit(int status)
 
 int system(const char * cmd)
 {
-    char *cmd_in_ram = strdup(cmd);
-    if (NULL == cmd_in_ram) {
+    if (NULL == cmd) {
+        // If command is NULL, then a nonzero value if a shell is
+        //    available, or 0 if no shell is available.
+        return 1;
+    }
+
+    pid_t pid;
+    const char *argv[] = { "sh", "-c", cmd, (const char *)NULL };
+    if (    (posix_spawn(&pid, "/bin/sh", NULL, NULL, (char * const *)argv, NULL) < 0)
+        ||  (pid < 0)) {
         return -1;
     }
 
-    extern int __vsh_run_cmd(char *cmd);
-    int result = __vsh_run_cmd(cmd_in_ram);
-    free(cmd_in_ram);
+    int result;
+    if (waitpid(pid, &result, 0) < 0) {
+        return -1;
+    }
     return result;
 }
 

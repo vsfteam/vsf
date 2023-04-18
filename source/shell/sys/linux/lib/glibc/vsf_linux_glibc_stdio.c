@@ -340,9 +340,56 @@ int fgetc(FILE *f)
 char * fgets(char *str, int n, FILE *f)
 {
     int fd = ((vsf_linux_fd_t *)f)->fd;
-    // use __vsh_fdgets because of fgets depends on shell configuration for line end and echo
-    extern char * __vsh_fdgets(int fd, char *str, int n);
-    return __vsh_fdgets(fd, str, n);
+    char ch, *result = str, *cur = NULL;
+    int rsize = 0;
+
+    while (true) {
+        if (read(fd, &ch, 1) != 1) {
+            break;
+        }
+        if (rsize < n - 1) {
+            *str = ch;
+            cur = str;
+        }
+
+        if (isatty(fd)) {
+            if ('\r' == ch) {
+               write(STDOUT_FILENO, "\n", 1);
+            } else if ('\n' == ch) {
+                continue;
+            }
+            if (('\b' == ch) || (0x7F == ch)) {
+                int back_cnt = vsf_min(rsize, 1);
+                rsize -= back_cnt;
+                str -= back_cnt;
+                continue;
+            }
+        }
+
+        rsize++;
+        str++;
+        if ('\r' == ch) {
+            // check next possible '\n'
+            if (rsize >= n - 1) {
+                break;
+            }
+            if (read(fd, &ch, 1) != 1) {
+                break;
+            }
+            if ('\n' == ch) {
+                *str = ch;
+                cur = str;
+            } else {
+                vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+                sfd->unget_buff = ch;
+            }
+            break;
+        }
+    }
+    if (cur != NULL) {
+        cur[1] = '\0';
+    }
+    return rsize > 0 ? result : NULL;
 }
 
 // insecure
@@ -718,32 +765,54 @@ FILE * popen(const char *command, const char *type)
         return NULL;
     }
 
-    extern vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out);
-    vsf_linux_process_t *process = NULL;
-    vsf_linux_fd_t *sfd;
+    vsf_linux_main_entry_t entry;
+    extern int __vsf_linux_get_exe_entry(char *cmd, vsf_linux_main_entry_t *entry, bool use_path);
+    if (__vsf_linux_get_exe_entry((char *)command, &entry, true) < 0) {
+        return NULL;
+    }
+
     int fd[2];
-    pipe(fd);
-
-    if (type[0] == 'w') {
-        process = __vsh_prepare_process((char *)command, fd[0], -1);
-        close(fd[0]);
-        sfd = vsf_linux_fd_get(fd[1]);
-    } else if (type[0] == 'r') {
-        process = __vsh_prepare_process((char *)command, -1, fd[1]);
-        close(fd[1]);
-        sfd = vsf_linux_fd_get(fd[0]);
-    } else {
-        VSF_LINUX_ASSERT(false);
+    if (pipe(fd) < 0) {
         return NULL;
     }
 
+    // avoid to use spawn for better performance, skip unnecessary fd operations
+
+    vsf_linux_process_t *process = vsf_linux_create_process(0, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE);
     if (NULL == process) {
-        close(sfd->fd);
-        return NULL;
+        goto close_pipe_and_fail;
     }
-    sfd->binding.pid = process->id.pid;
+    vsf_linux_process_ctx_t *ctx = &process->ctx;
+    ctx->entry = entry;
+
+    vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
+    process->shell_process = cur_process->shell_process;
+
+    const char *argv[] = { "sh", "-c", command, (const char *)NULL };
+    __vsf_linux_process_parse_arg(process, (char * const *)argv);
+
+    vsf_linux_fd_t *sfd;
+    extern int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
+        const vsf_linux_fd_op_t *op, int fd_desired, vsf_linux_fd_priv_t *priv);
+    if (type[0] == 'w') {
+        sfd = vsf_linux_fd_get(fd[0]);
+        __vsf_linux_fd_create_ex(process, NULL, sfd->op, STDIN_FILENO, sfd->priv);
+        close(sfd->fd);
+        sfd = vsf_linux_fd_get(fd[1]);
+    } else {
+        sfd = vsf_linux_fd_get(fd[1]);
+        __vsf_linux_fd_create_ex(process, NULL, sfd->op, STDOUT_FILENO, sfd->priv);
+        close(sfd->fd);
+        sfd = vsf_linux_fd_get(fd[0]);
+    }
+
     vsf_linux_start_process(process);
     return (FILE *)sfd;
+
+close_pipe_and_fail:
+    close(fd[0]);
+    close(fd[1]);
+    return NULL;
 }
 
 int pclose(FILE *stream)

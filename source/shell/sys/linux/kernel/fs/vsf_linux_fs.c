@@ -33,6 +33,7 @@
 #   include "../../include/sys/epoll.h"
 #   include "../../include/sys/statvfs.h"
 #   include "../../include/sys/sendfile.h"
+#   include "../../include/sys/statfs.h"
 #   include "../../include/poll.h"
 #   include "../../include/fcntl.h"
 #   include "../../include/errno.h"
@@ -48,6 +49,7 @@
 #   include <sys/epoll.h>
 #   include <sys/statvfs.h>
 #   include <sys/sendfile.h>
+#   include <sys/statfs.h>
 #   include <poll.h>
 #   include <fcntl.h>
 #   include <errno.h>
@@ -2255,6 +2257,18 @@ int umount(const char *target)
         return -1;
     }
     return 0;
+}
+
+int statfs(const char *path, struct statfs *buf)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int fstatfs(int fd, struct statfs *buf)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
 }
 
 int fstatvfs(int fd, struct statvfs *buf)

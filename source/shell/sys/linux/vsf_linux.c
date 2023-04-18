@@ -219,8 +219,6 @@ extern void vsf_linux_glibc_init(void);
 #endif
 
 static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb);
-extern int __vsh_get_exe(char *pathname, int path_out_lenlen, char *cmd, vsf_linux_main_entry_t *entry, bool use_path);
-extern int __vsh_get_exe_entry(char *cmd, vsf_linux_main_entry_t *entry, bool use_path);
 
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
 static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb);
@@ -1599,6 +1597,148 @@ int daemon(int nochdir, int noclose)
     return 0;
 }
 
+static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd, vsf_linux_main_entry_t *entry, char *path)
+{
+    char pathname_local[PATH_MAX], pathname_dir[PATH_MAX], *path_end;
+    int exefd = -1, pathlen;
+    uint_fast32_t feature;
+
+    if (NULL == path) {
+        pathname = cmd;
+        path = "";
+        goto try_open;
+    } else if (NULL == pathname) {
+        pathname = pathname_local;
+        pathname_len = sizeof(pathname_local);
+    }
+
+    while (*path != '\0') {
+        path_end = strchr(path, ':');
+        pathlen = (path_end != NULL) ?  path_end - path : strlen(path);
+        VSF_LINUX_ASSERT(pathlen < sizeof(pathname_dir) - 1);
+        memcpy(pathname_dir, path, pathlen);
+        pathname_dir[pathlen] = '\0';
+        path += pathlen;
+        if (*path == ':') {
+            path++;
+        }
+
+        if (!vsf_linux_generate_path(pathname, pathname_len, pathname_dir, cmd)) {
+        try_open:
+            exefd = open(pathname, 0);
+            if (exefd >= 0) {
+                if (!vsf_linux_fd_get_feature(exefd, &feature) && (feature & VSF_FILE_ATTR_EXECUTE)) {
+                    if (entry != NULL) {
+                        vsf_linux_fd_get_target(exefd, (void **)entry);
+                    }
+                    break;
+                } else {
+#if VSF_LINUX_USE_APPLET == ENABLED
+                    if (entry != NULL) {
+                        int __vsf_linux_dynloader_main(int argc, char **argv);
+                        *entry = __vsf_linux_dynloader_main;
+                    }
+                    break;
+#else
+                    close(exefd);
+                    exefd = -1;
+#endif
+                }
+            }
+        }
+    }
+    return exefd;
+}
+
+int __vsf_linux_get_exe(char *pathname, int pathname_len, char *cmd, vsf_linux_main_entry_t *entry, bool use_path)
+{
+    return __vsf_linux_get_exe_path(pathname, pathname_len, cmd, entry, use_path ? getenv("PATH") : NULL);
+}
+
+int __vsf_linux_get_exe_entry(char *cmd, vsf_linux_main_entry_t *entry, bool use_path)
+{
+    int exefd = __vsf_linux_get_exe(NULL, 0, cmd, entry, use_path);
+    if (exefd < 0) {
+        return -1;
+    }
+    close(exefd);
+    return 0;
+}
+
+const char * find_in_path(const char *progname)
+{
+    char fullpath[MAX_PATH];
+    int fd = __vsf_linux_get_exe(fullpath, sizeof(fullpath), (char *)progname, NULL, true);
+    if (fd < 0) {
+        return progname;
+    }
+    close(fd);
+    return strdup(fullpath);
+}
+
+const char * find_in_given_path(const char *progname, const char *path, const char *directory, bool optimize_for_exec)
+{
+    char fullpath[MAX_PATH];
+    int fd;
+
+    if (directory != NULL) {
+        if (vsf_linux_generate_path(fullpath, sizeof(fullpath), (char *)directory, (char *)progname)) {
+            return NULL;
+        }
+        fd = __vsf_linux_get_exe_path(NULL, 0, (char *)fullpath, NULL, (char *)path);
+    } else {
+        fd = __vsf_linux_get_exe_path(fullpath, sizeof(fullpath), (char *)progname, NULL, (char *)path);
+    }
+
+    if (fd < 0) {
+        return NULL;
+    }
+    close(fd);
+    return strdup(fullpath);
+}
+
+#if VSF_LINUX_USE_APPLET == ENABLED
+int __vsf_linux_dynloader_main(int argc, char **argv)
+{
+    char pathname_local[PATH_MAX];
+    vsf_linux_main_entry_t entry;
+
+    int exefd = __vsf_linux_get_exe(pathname_local, sizeof(pathname_local), argv[0], &entry, true);
+    if (exefd < 0) {
+        printf("fail to find %s\n", argv[0]);
+        return -1;
+    }
+    close(exefd);
+
+    vsf_linux_dynloader_t *loader = dlopen(pathname_local, 0);
+    if (NULL == loader) {
+        printf("fail to dlopen %s\n", pathname_local);
+        return -1;
+    }
+
+    int result = -1;
+    if (loader->loader.generic.entry != NULL) {
+        vsf_applet_ctx_t applet_ctx = {
+            .target     = &loader->loader.generic,
+            .fn_init    = NULL,     // fn_init has already been called in dlopen
+            .fn_fini    = NULL,     // fn_fini will be called in dlclose
+            .argc       = argc,
+            .argv       = argv,
+            .envp       = environ,
+            .vplt       = loader->loader.generic.vplt,
+        };
+
+        vsf_linux_set_process_reg((uintptr_t)loader->loader.generic.static_base);
+        result = ((int (*)(vsf_applet_ctx_t*))loader->loader.generic.entry)(&applet_ctx);
+    } else {
+        printf("no entry found for %s\n", pathname_local);
+    }
+
+    dlclose(loader);
+    return result;
+}
+#endif
+
 static exec_ret_t __vsf_linux_execvpe(vsf_linux_main_entry_t entry, char * const * argv, char  * const * envp)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
@@ -1620,7 +1760,7 @@ static exec_ret_t __vsf_linux_execvpe(vsf_linux_main_entry_t entry, char * const
 exec_ret_t execvpe(const char *file, char * const * argv, char  * const * envp)
 {
     vsf_linux_main_entry_t entry;
-    if (__vsh_get_exe_entry((char *)file, &entry, true) < 0) {
+    if (__vsf_linux_get_exe_entry((char *)file, &entry, true) < 0) {
         return -1;
     }
     return __vsf_linux_execvpe(entry, argv, envp);
@@ -1634,7 +1774,7 @@ exec_ret_t execvp(const char *file, char * const * argv)
 exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp)
 {
     vsf_linux_main_entry_t entry;
-    if (__vsh_get_exe_entry((char *)pathname, &entry, false) < 0) {
+    if (__vsf_linux_get_exe_entry((char *)pathname, &entry, false) < 0) {
         return -1;
     }
     return __vsf_linux_execvpe(entry, argv, envp);
@@ -1673,7 +1813,7 @@ exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, 
 exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
 {
     vsf_linux_main_entry_t entry;
-    if (__vsh_get_exe_entry((char *)pathname, &entry, true) < 0) {
+    if (__vsf_linux_get_exe_entry((char *)pathname, &entry, true) < 0) {
         return -1;
     }
     return __vsf_linux_execlp_va(entry, arg, ap);
@@ -1693,7 +1833,7 @@ exec_ret_t execlp(const char *pathname, const char *arg, ...)
 exec_ret_t __execl_va(const char *pathname, const char *arg, va_list ap)
 {
     vsf_linux_main_entry_t entry;
-    if (__vsh_get_exe_entry((char *)pathname, &entry, false) < 0) {
+    if (__vsf_linux_get_exe_entry((char *)pathname, &entry, false) < 0) {
         return -1;
     }
     return __vsf_linux_execlp_va(entry, arg, ap);
@@ -2886,7 +3026,7 @@ int posix_spawnp(pid_t *pid, const char *file,
                 char * const argv[], char * const env[])
 {
     vsf_linux_main_entry_t entry;
-    if (__vsh_get_exe_entry((char *)file, &entry, true) < 0) {
+    if (__vsf_linux_get_exe_entry((char *)file, &entry, true) < 0) {
         if (pid != NULL) {
             *pid = -1;
         }
@@ -2901,7 +3041,7 @@ int posix_spawn(pid_t *pid, const char *path,
                 char * const argv[], char * const env[])
 {
     vsf_linux_main_entry_t entry;
-    if (__vsh_get_exe_entry((char *)path, &entry, false) < 0) {
+    if (__vsf_linux_get_exe_entry((char *)path, &entry, false) < 0) {
         if (pid != NULL) {
             *pid = -1;
         }
