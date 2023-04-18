@@ -50,9 +50,11 @@ extern "C" {
 
 #define setgid              VSF_LINUX_WRAPPER(setgid)
 #define getgid              VSF_LINUX_WRAPPER(getgid)
+#define setegid             VSF_LINUX_WRAPPER(setegid)
 #define getegid             VSF_LINUX_WRAPPER(getegid)
 #define setuid              VSF_LINUX_WRAPPER(setuid)
 #define getuid              VSF_LINUX_WRAPPER(getuid)
+#define seteuid             VSF_LINUX_WRAPPER(seteuid)
 #define geteuid             VSF_LINUX_WRAPPER(geteuid)
 #define getpid              VSF_LINUX_WRAPPER(getpid)
 #define getppid             VSF_LINUX_WRAPPER(getppid)
@@ -123,6 +125,7 @@ extern "C" {
 #   define preadv           VSF_LINUX_WRAPPER(preadv)
 #   define pwritev          VSF_LINUX_WRAPPER(pwritev)
 #   define chdir            VSF_LINUX_WRAPPER(chdir)
+#   define fchdir           VSF_LINUX_WRAPPER(fchdir)
 #   define getcwd           VSF_LINUX_WRAPPER(getcwd)
 #   define fsync            VSF_LINUX_WRAPPER(fsync)
 #   define fdatasync        VSF_LINUX_WRAPPER(fdatasync)
@@ -247,9 +250,11 @@ typedef struct vsf_linux_unistd_vplt_t {
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setgid);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getgid);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setegid);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getegid);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setuid);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getuid);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(seteuid);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(geteuid);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getpid);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getppid);
@@ -294,6 +299,7 @@ typedef struct vsf_linux_unistd_vplt_t {
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(chroot);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(chdir);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fchdir);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getcwd);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(close);
@@ -410,6 +416,10 @@ VSF_LINUX_APPLET_UNISTD_IMP(getuid, uid_t, void) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(getuid)();
 }
+VSF_LINUX_APPLET_UNISTD_IMP(seteuid, int, uid_t euid) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(seteuid)(euid);
+}
 VSF_LINUX_APPLET_UNISTD_IMP(geteuid, uid_t, void) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(geteuid)();
@@ -421,6 +431,10 @@ VSF_LINUX_APPLET_UNISTD_IMP(setgid, int, gid_t gid) {
 VSF_LINUX_APPLET_UNISTD_IMP(getgid, gid_t, void) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(getgid)();
+}
+VSF_LINUX_APPLET_UNISTD_IMP(setegid, int, gid_t egid) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(setegid)(egid);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(getegid, gid_t, void) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -561,6 +575,10 @@ VSF_LINUX_APPLET_UNISTD_IMP(chroot, int, const char *path) {
 VSF_LINUX_APPLET_UNISTD_IMP(chdir, int, const char *pathname) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(chdir)(pathname);
+}
+VSF_LINUX_APPLET_UNISTD_IMP(fchdir, int, int fd) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(fchdir)(fd);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(getcwd, char *, char *buffer, size_t maxlen) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -755,15 +773,16 @@ useconds_t ualarm(useconds_t usecs, useconds_t interval);
 char * getlogin(void);
 int getlogin_r(char *buf, size_t bufsize);
 
-gid_t getegid(void);
-uid_t geteuid(void);
-
 pid_t gettid(void);
 pid_t getpid(void);
 pid_t getppid(void);
 
 int setuid(uid_t uid);
 uid_t getuid(void);
+int seteuid(uid_t euid);
+uid_t geteuid(void);
+int setegid(gid_t egid);
+gid_t getegid(void);
 int setgid(gid_t git);
 gid_t getgid(void);
 pid_t setsid(void);
@@ -806,6 +825,7 @@ int dup3(int oldfd, int newfd, int flags);
 
 int chroot(const char *path);
 int chdir(const char *pathname);
+int fchdir(int fd);
 char * getcwd(char *buffer, size_t maxlen);
 
 int close(int fd);

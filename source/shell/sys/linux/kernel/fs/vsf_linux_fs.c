@@ -1432,6 +1432,32 @@ int chdir(const char *pathname)
     return vsf_linux_chdir(process, (char *)pathname);
 }
 
+int fchdir(int fd)
+{
+    vk_file_t *file = __vsf_linux_get_fs_ex(NULL, fd);
+    if (NULL == file) {
+        return -1;
+    }
+
+    char pathname[MAX_PATH], *pos = pathname + MAX_PATH - 1;
+    size_t namelen;
+    pos[0] = '\0';
+    while ((file != NULL) && (file->name != NULL)) {
+        namelen = strlen(file->name);
+        pos -= namelen + 1;
+        if (pos < pathname) {
+            __vsf_linux_fs_close_do(file);
+            return -1;
+        }
+
+        pos[0] = '/';
+        memcpy(pos + 1, file->name, namelen);
+        file = file->parent;
+    }
+    __vsf_linux_fs_close_do(file);
+    return chdir((const char *)pos);
+}
+
 int creat(const char *pathname, mode_t mode)
 {
     return open(pathname, O_WRONLY | O_CREAT | O_TRUNC, mode);

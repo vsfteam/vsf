@@ -22,6 +22,7 @@ extern "C" {
 #define getitimer           VSF_LINUX_WRAPPER(getitimer)
 #define setitimer           VSF_LINUX_WRAPPER(setitimer)
 #define gettimeofday        VSF_LINUX_WRAPPER(gettimeofday)
+#define settimeofday        VSF_LINUX_WRAPPER(settimeofday)
 
 #define utimes              VSF_LINUX_WRAPPER(utimes)
 #endif
@@ -58,6 +59,7 @@ typedef struct vsf_linux_sys_time_vplt_t {
     vsf_vplt_info_t info;
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(gettimeofday);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(settimeofday);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getitimer);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setitimer);
 
@@ -90,6 +92,10 @@ VSF_LINUX_APPLET_SYS_TIME_IMP(gettimeofday, int, struct timeval *tv, struct time
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_TIME_ENTRY(gettimeofday)(tv, tz);
 }
+VSF_LINUX_APPLET_SYS_TIME_IMP(settimeofday, int, const struct timeval *tv, const struct timezone *tz) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_TIME_ENTRY(settimeofday)(tv, tz);
+}
 VSF_LINUX_APPLET_SYS_TIME_IMP(getitimer, int, int which, struct itimerval *curr_value) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_TIME_ENTRY(getitimer)(which, curr_value);
@@ -110,6 +116,7 @@ VSF_LINUX_APPLET_SYS_TIME_IMP(utimes, int, const char *filename, const struct ti
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_TIME
 
 int gettimeofday(struct timeval *tv, struct timezone *tz);
+int settimeofday(const struct timeval *tv, const struct timezone *tz);
 int getitimer(int which, struct itimerval *curr_value);
 int setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value);
 

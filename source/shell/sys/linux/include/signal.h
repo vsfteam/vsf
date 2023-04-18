@@ -185,6 +185,28 @@ static inline int sigtestsetmask(sigset_t *set, unsigned long mask)
     return (set->sig[0] & mask) != 0;
 }
 
+static inline int sigismember(const sigset_t *set, int signum)
+{
+    return sigtestsetmask((sigset_t *)set, 1ULL << signum);
+}
+
+static inline int sigisemptyset(sigset_t *set)
+{
+    return 0 == set->sig[0];
+}
+
+static inline int sigorset(sigset_t *dest, sigset_t *left, sigset_t *right)
+{
+    dest->sig[0] = left->sig[0] | right->sig[0];
+    return 0;
+}
+
+static inline int sigandset(sigset_t *dest, sigset_t *left, sigset_t *right)
+{
+    dest->sig[0] = left->sig[0] & right->sig[0];
+    return 0;
+}
+
 // ugly, but seems no choice, because:
 //  1. libc/time.h can not include timeval, so can not include sys/time.h,
 //      or it will conflict with timeval in winsock.h
@@ -206,6 +228,7 @@ typedef struct vsf_linux_signal_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_sigmask);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sigwaitinfo);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sigtimedwait);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sigsuspend);
 } vsf_linux_signal_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_signal_vplt_t vsf_linux_signal_vplt;
@@ -261,6 +284,10 @@ VSF_LINUX_APPLET_SIGNAL_IMP(sigtimedwait, int, const sigset_t *set, siginfo_t *i
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SIGNAL_ENTRY(sigtimedwait)(set, info, timeout);
 }
+VSF_LINUX_APPLET_SIGNAL_IMP(sigsuspend, int, const sigset_t *set) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SIGNAL_ENTRY(sigsuspend)(set);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SIGNAL
 
@@ -274,6 +301,7 @@ int pthread_sigmask(int how, const sigset_t *set, sigset_t *oldset);
 
 int sigwaitinfo(const sigset_t *set, siginfo_t *info);
 int sigtimedwait(const sigset_t *set, siginfo_t *info, const struct signal_timespec *timeout);
+int sigsuspend(const sigset_t *set);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SIGNAL
 

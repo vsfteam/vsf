@@ -224,6 +224,8 @@ typedef struct vsf_linux_libc_stdio_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsprintf);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(snprintf);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsnprintf);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(asprintf);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vasprintf);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsscanf);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsnscanf);
@@ -466,6 +468,10 @@ VSF_LINUX_APPLET_LIBC_STDIO_IMP(vsnprintf, int, char *str, size_t size, const ch
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vsnprintf)(str, size, format, ap);
 }
+VSF_LINUX_APPLET_LIBC_STDIO_IMP(vasprintf, int, char **strp, const char *format, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vasprintf)(strp, format, ap);
+}
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(vsscanf, int, const char *str, const char *format, va_list ap) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vsscanf)(str, format, ap);
@@ -540,6 +546,14 @@ static inline int snprintf(char *str, size_t size, const char *format, ...) {
     va_list ap;
     va_start(ap, format);
         result = vsnprintf(str, size, format, ap);
+    va_end(ap);
+    return result;
+}
+static inline int asprintf(char **strp, const char *format, ...) {
+    int result;
+    va_list ap;
+    va_start(ap, format);
+        result = vasprintf(strp, format, ap);
     va_end(ap);
     return result;
 }
@@ -631,6 +645,8 @@ int sprintf(char *str, const char *format, ...);
 int vsprintf(char *str, const char *format, va_list ap);
 int snprintf(char *str, size_t size, const char *format, ...);
 int vsnprintf(char *str, size_t size, const char* format, va_list ap);
+int asprintf(char **strp, const char *format, ...);
+int vasprintf(char **strp, const char *format, va_list ap);
 
 int vsscanf(const char *str, const char *format, va_list ap);
 int vsnscanf(const char *str, size_t size, const char *format, va_list ap);

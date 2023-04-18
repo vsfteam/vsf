@@ -43,6 +43,7 @@
 #   include "./include/sys/times.h"
 #   include "./include/sys/prctl.h"
 #   include "./include/sys/reboot.h"
+#   include "./include/sys/capability.h"
 #   include "./include/fcntl.h"
 #   include "./include/errno.h"
 #   include "./include/termios.h"
@@ -70,6 +71,7 @@
 #   include <sys/times.h>
 #   include <sys/prctl.h>
 #   include <sys/reboot.h>
+#   include <sys/capability.h>
 #   include <fcntl.h>
 #   include <errno.h>
 #   include <termios.h>
@@ -2045,11 +2047,19 @@ int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact)
 
 int sigwaitinfo(const sigset_t *set, siginfo_t *info)
 {
+    VSF_LINUX_ASSERT(false);
     return -1;
 }
 
 int sigtimedwait(const sigset_t *set, siginfo_t *info, const struct signal_timespec *timeout)
 {
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
+
+int sigsuspend(const sigset_t *set)
+{
+    VSF_LINUX_ASSERT(false);
     return -1;
 }
 
@@ -2194,6 +2204,10 @@ gid_t getgid(void)
 {
     return (gid_t)0;
 }
+int setegid(gid_t egid)
+{
+    return 0;
+}
 gid_t getegid(void)
 {
     return (gid_t)0;
@@ -2207,6 +2221,10 @@ int setuid(uid_t uid)
 uid_t getuid(void)
 {
     return (uid_t)0;
+}
+int seteuid(uid_t euid)
+{
+    return 0;
 }
 uid_t geteuid(void)
 {
@@ -2475,6 +2493,12 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 #endif
     return 0;
 }
+
+int settimeofday(const struct timeval *tv, const struct timezone *tz)
+{
+    VSF_LINUX_ASSERT(false);
+    return -1;
+}
 #endif
 
 clock_t times(struct tms *buf)
@@ -2503,6 +2527,20 @@ int reboot(int howto)
         vsf_arch_reset();
         break;
     }
+    return 0;
+}
+
+// sys/capability.h
+
+int capget(cap_user_header_t hdrp, cap_user_data_t datap)
+{
+    VSF_LINUX_ASSERT(false);
+    return 0;
+}
+
+int capset(cap_user_header_t hdrp, const cap_user_data_t datap)
+{
+    VSF_LINUX_ASSERT(false);
     return 0;
 }
 
@@ -3565,6 +3603,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_time_vplt_t vsf_linux_sys_time_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_time_vplt_t, 0, 0, true),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(gettimeofday),
+    VSF_APPLET_VPLT_ENTRY_FUNC(settimeofday),
     VSF_APPLET_VPLT_ENTRY_FUNC(getitimer),
     VSF_APPLET_VPLT_ENTRY_FUNC(setitimer),
     VSF_APPLET_VPLT_ENTRY_FUNC(futimes),
@@ -3603,6 +3642,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_signal_vplt_t vsf_linux_signal_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_sigmask),
     VSF_APPLET_VPLT_ENTRY_FUNC(sigwaitinfo),
     VSF_APPLET_VPLT_ENTRY_FUNC(sigtimedwait),
+    VSF_APPLET_VPLT_ENTRY_FUNC(sigsuspend),
 };
 #endif
 
@@ -3684,9 +3724,11 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(getlogin_r),
     VSF_APPLET_VPLT_ENTRY_FUNC(setgid),
     VSF_APPLET_VPLT_ENTRY_FUNC(getgid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setegid),
     VSF_APPLET_VPLT_ENTRY_FUNC(getegid),
     VSF_APPLET_VPLT_ENTRY_FUNC(setuid),
     VSF_APPLET_VPLT_ENTRY_FUNC(getuid),
+    VSF_APPLET_VPLT_ENTRY_FUNC(seteuid),
     VSF_APPLET_VPLT_ENTRY_FUNC(geteuid),
     VSF_APPLET_VPLT_ENTRY_FUNC(getpid),
     VSF_APPLET_VPLT_ENTRY_FUNC(getppid),
@@ -3726,6 +3768,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(dup3),
     VSF_APPLET_VPLT_ENTRY_FUNC(chroot),
     VSF_APPLET_VPLT_ENTRY_FUNC(chdir),
+    VSF_APPLET_VPLT_ENTRY_FUNC(fchdir),
     VSF_APPLET_VPLT_ENTRY_FUNC(getcwd),
     VSF_APPLET_VPLT_ENTRY_FUNC(close),
     VSF_APPLET_VPLT_ENTRY_FUNC(lseek),

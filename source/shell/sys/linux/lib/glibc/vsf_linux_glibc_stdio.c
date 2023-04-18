@@ -430,6 +430,27 @@ int putchar(int c)
     return putc(c, stdout);
 }
 
+int vasprintf(char **strp, const char *format, va_list ap)
+{
+    int size = vsnprintf(NULL, 0, format, ap);
+    char *buff = malloc(size + 1);
+    if (NULL == buff) {
+        return -1;
+    }
+
+    return vsnprintf(buff, size + 1, format, ap);
+}
+
+int asprintf(char **strp, const char *format, ...)
+{
+    int result;
+    va_list ap;
+    va_start(ap, format);
+        result = vasprintf(strp, format, ap);
+    va_end(ap);
+    return result;
+}
+
 int vfprintf(FILE *f, const char *format, va_list ap)
 {
     char buff[VSF_LINUX_CFG_PRINT_BUFF_SIZE];
@@ -974,6 +995,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdio_vplt_t vsf_linux_libc_stdio_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(vsprintf),
     VSF_APPLET_VPLT_ENTRY_FUNC(snprintf),
     VSF_APPLET_VPLT_ENTRY_FUNC(vsnprintf),
+    VSF_APPLET_VPLT_ENTRY_FUNC(asprintf),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vasprintf),
     VSF_APPLET_VPLT_ENTRY_FUNC(vsscanf),
     VSF_APPLET_VPLT_ENTRY_FUNC(vsnscanf),
     VSF_APPLET_VPLT_ENTRY_FUNC(snscanf),
