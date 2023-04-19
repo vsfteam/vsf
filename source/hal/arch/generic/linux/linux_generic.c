@@ -610,7 +610,7 @@ int vsf_arch_argu(char ***argv)
 
 void vsf_arch_shutdown(void)
 {
-    exit();
+    exit(0);
 }
 
 void vsf_arch_reset(void)
