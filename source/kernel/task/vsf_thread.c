@@ -88,6 +88,7 @@ void vsf_thread_exit(void)
 #endif
     vsf_eda_return();
 #ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+    __vsf_kernel_host_request_fini(&pthis->req);
     __vsf_kernel_host_request_send(pthis->rep);
     __vsf_kernel_host_thread_exit(&pthis->host_thread);
 #else
