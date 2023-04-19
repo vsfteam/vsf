@@ -86,7 +86,7 @@ void vsf_linux_telnetd_thread(vsf_linux_telnetd_t *telnetd)
         }
 
         // implement shell process manually to avoid posix_spawn
-        process = vsf_linux_create_process(0, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE);
+        process = vsf_linux_create_process(0, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE, 0);
         if (NULL == process) {
             vsf_trace_error("telnetd: fail to create child process\n");
             goto close_client;

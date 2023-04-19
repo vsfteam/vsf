@@ -478,7 +478,7 @@ extern vsf_linux_process_t * __vsf_linux_start_process_internal(
 extern vsf_linux_main_entry_t * vsf_linux_fd_get_executable(int fd);
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
 
-extern vsf_linux_process_t * vsf_linux_create_process(int stack_size, int heap_size);
+extern vsf_linux_process_t * vsf_linux_create_process(int stack_size, int heap_size, int priv_size);
 // delete unstarted/existed process
 extern void vsf_linux_delete_process(vsf_linux_process_t *process);
 extern int vsf_linux_start_process(vsf_linux_process_t *process);

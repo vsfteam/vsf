@@ -1020,10 +1020,11 @@ char * vsf_linux_process_heap_strdup(vsf_linux_process_t *process, char *str)
     return NULL;
 }
 
-static vsf_linux_process_t * __vsf_linux_create_process(int stack_size, int heap_size)
+static vsf_linux_process_t * __vsf_linux_create_process(int stack_size, int heap_size, int priv_size)
 {
     heap_size += heap_size > 0 ? sizeof(vsf_linux_process_heap_t) : 0;
-    vsf_linux_process_t *process = vsf_linux_malloc_res(sizeof(vsf_linux_process_t) + heap_size);
+    priv_size = (priv_size + 15) & ~15;
+    vsf_linux_process_t *process = vsf_linux_malloc_res(sizeof(vsf_linux_process_t) + priv_size + heap_size);
     if (process != NULL) {
         memset(process, 0, sizeof(*process));
         process->prio = vsf_prio_inherit;
@@ -1044,7 +1045,7 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size, int heap
         }
 
         if (heap_size > 0) {
-            vsf_linux_process_heap_t *process_heap = (vsf_linux_process_heap_t *)&process[1];
+            vsf_linux_process_heap_t *process_heap = (vsf_linux_process_heap_t *)((uintptr_t)&process[1] + priv_size);
             memset(process_heap, 0, sizeof(*process_heap));
             process_heap->heap.get_freelist = __vsf_linux_process_heap_get_freelist;
             process->heap = &process_heap->heap;
@@ -1054,9 +1055,19 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size, int heap
     return process;
 }
 
-vsf_linux_process_t * vsf_linux_create_process(int stack_size, int heap_size)
+void * __vsf_linux_get_process_priv(vsf_linux_process_t *process)
 {
-    vsf_linux_process_t *process = __vsf_linux_create_process(stack_size, heap_size);
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+        VSF_LINUX_ASSERT(process != NULL);
+    }
+
+    return &process[1];
+}
+
+vsf_linux_process_t * vsf_linux_create_process(int stack_size, int heap_size, int priv_size)
+{
+    vsf_linux_process_t *process = __vsf_linux_create_process(stack_size, heap_size, priv_size);
     if (process != NULL) {
         vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
         VSF_LINUX_ASSERT(cur_process != NULL);
@@ -1277,7 +1288,7 @@ vsf_linux_process_t * __vsf_linux_start_process_internal(
         vsf_linux_main_entry_t entry, char * const * argv, int stack_size, vsf_prio_t prio)
 {
     VSF_LINUX_ASSERT((prio >= VSF_LINUX_CFG_PRIO_LOWEST) && (prio <= VSF_LINUX_CFG_PRIO_HIGHEST));
-    vsf_linux_process_t *process = __vsf_linux_create_process(stack_size, 0);
+    vsf_linux_process_t *process = __vsf_linux_create_process(stack_size, 0, 0);
     if (process != NULL) {
         process->prio = prio;
         process->ctx.entry = entry;
@@ -2965,17 +2976,24 @@ unsigned int minor(dev_t dev)
 }
 
 // spawn.h
+
+// the last paramter, which is priv_size is used to capture necessary variables when
+//  use spawn to replace fork/vfork.
+// __vsf_linux_get_process_priv can be used to get the buffer in priv_size which is
+//  bounded to process.
 int __vsf_linux_spawn(pid_t *pid, vsf_linux_main_entry_t entry,
                 const posix_spawn_file_actions_t *actions,
                 const posix_spawnattr_t *attr,
-                char * const argv[], char * const env[])
+                char * const argv[], char * const env[], void *priv, int priv_size)
 {
-    vsf_linux_process_t *process = vsf_linux_create_process(0, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE);
+    vsf_linux_process_t *process = vsf_linux_create_process(0, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE, priv_size);
     if (NULL == process) { return -ENOMEM; }
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     ctx->entry = entry;
-    VSF_LINUX_ASSERT(argv != NULL);
-    __vsf_linux_process_parse_arg(process, argv);
+
+    if (argv != NULL) {
+        __vsf_linux_process_parse_arg(process, argv);
+    }
 
     vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
     process->shell_process = cur_process->shell_process;
@@ -3084,6 +3102,9 @@ int __vsf_linux_spawn(pid_t *pid, vsf_linux_main_entry_t entry,
     if (pid != NULL) {
         *pid = process->id.pid;
     }
+    if ((priv != NULL) && (priv_size > 0)) {
+        memcpy(__vsf_linux_get_process_priv(process), priv, priv_size);
+    }
     return vsf_linux_start_process(process);
 delete_process_and_fail:
     vsf_linux_delete_process(process);
@@ -3102,7 +3123,7 @@ int posix_spawnp(pid_t *pid, const char *file,
         }
         return -1;
     }
-    return __vsf_linux_spawn(pid, entry, actions, attr, argv, env);
+    return __vsf_linux_spawn(pid, entry, actions, attr, argv, env, NULL, 0);
 }
 
 int posix_spawn(pid_t *pid, const char *path,
@@ -3117,7 +3138,7 @@ int posix_spawn(pid_t *pid, const char *path,
         }
         return -1;
     }
-    return __vsf_linux_spawn(pid, entry, actions, attr, argv, env);
+    return __vsf_linux_spawn(pid, entry, actions, attr, argv, env, NULL, 0);
 }
 
 int posix_spawnattr_init(posix_spawnattr_t *attr)

@@ -802,7 +802,7 @@ FILE * popen(const char *command, const char *type)
 
     // avoid to use spawn for better performance, skip unnecessary fd operations
 
-    vsf_linux_process_t *process = vsf_linux_create_process(0, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE);
+    vsf_linux_process_t *process = vsf_linux_create_process(0, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE, 0);
     if (NULL == process) {
         goto close_pipe_and_fail;
     }
