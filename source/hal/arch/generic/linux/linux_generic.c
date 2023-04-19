@@ -446,8 +446,8 @@ bool vsf_arch_low_level_init(void)
     strcpy((char *)__vsf_arch_common.por_thread.name, "por");
 
     // create thread pool
-    vsf_bitmap_clear(&__vsf_arch.irq_request.bitmap, VSF_ARCH_CFG_IRQ_REQUEST_NUM);
-    vsf_bitmap_clear(&__vsf_arch.thread.bitmap, VSF_ARCH_CFG_THREAD_NUM);
+    vsf_bitmap_reset(&__vsf_arch.irq_request.bitmap, VSF_ARCH_CFG_IRQ_REQUEST_NUM);
+    vsf_bitmap_reset(&__vsf_arch.thread.bitmap, VSF_ARCH_CFG_THREAD_NUM);
 
     // __vsf_arch_low_level_init MUST be called before using __vsf_arch_common.lock
     __vsf_arch_low_level_init();
