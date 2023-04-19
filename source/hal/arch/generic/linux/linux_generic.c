@@ -608,4 +608,15 @@ int vsf_arch_argu(char ***argv)
     return vsf_arch_argu(argv);
 }
 
+void vsf_arch_shutdown(void)
+{
+    exit();
+}
+
+void vsf_arch_reset(void)
+{
+    // dedicated arch should implement this
+    VSF_ARCH_ASSERT(false);
+}
+
 /* EOF */

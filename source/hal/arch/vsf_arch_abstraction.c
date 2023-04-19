@@ -991,19 +991,4 @@ bool vsf_arch_init(void)
     return true;
 }
 
-WEAK(vsf_arch_shutdown)
-void vsf_arch_shutdown(void)
-{
-    // dedicated arch should implement this
-    VSF_ARCH_ASSERT(false);
-}
-
-WEAK(vsf_arch_reset)
-void vsf_arch_reset(void)
-{
-    // dedicated arch should implement this
-    VSF_ARCH_ASSERT(false);
-}
-
-
 /* EOF */
