@@ -976,7 +976,6 @@ uint32_t vsf_systimer_get_freq(void)
 #endif
 #endif      // VSF_SYSTIMER_CFG_IMPL_MODE
 
-#ifndef WEAK_VSF_ARCH_INIT
 /*! \note initialize architecture specific service
  *  \param none
  *  \retval true initialization succeeded.
@@ -991,6 +990,20 @@ bool vsf_arch_init(void)
 #   endif
     return true;
 }
-#endif
+
+WEAK(vsf_arch_shutdown)
+void vsf_arch_shutdown(void)
+{
+    // dedicated arch should implement this
+    VSF_ARCH_ASSERT(false);
+}
+
+WEAK(vsf_arch_reset)
+void vsf_arch_reset(void)
+{
+    // dedicated arch should implement this
+    VSF_ARCH_ASSERT(false);
+}
+
 
 /* EOF */
