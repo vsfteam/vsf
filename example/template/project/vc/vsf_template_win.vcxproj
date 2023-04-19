@@ -1478,6 +1478,10 @@
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\unix\vsf_linux_socket_unix.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\getopt\getopt_long.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\regex\regcomp.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\regex\regerror.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\regex\regexec.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\regex\regfree.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibc.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibcpp_stdio.cpp" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibcpp_string.cpp" />

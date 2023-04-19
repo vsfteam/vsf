@@ -3,9 +3,18 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
-// for __BEGIN_DECLS and __END_DECLS etc
-#if !defined(__linux__) && !defined(__LINUX__)
-#   include "./~cdefs.h"
+// for __BEGIN_DECLS, __END_DECLS, DEF_WEAK and etc
+// Not all platform have /sys/cdefs.h, but some application need this.
+//  so put some content of /sys/cdefs.h here
+#ifdef __cplusplus
+#   define __BEGIN_DECLS    extern "C" {
+#   define __END_DECLS      }
+#else
+#   define __BEGIN_DECLS
+#   define __END_DECLS
+#endif
+#ifndef DEF_WEAK
+#   define DEF_WEAK(x)
 #endif
 
 // do not include vsf_utilities.h, because type.h is actually belong to compiler layer,

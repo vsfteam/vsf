@@ -1165,6 +1165,9 @@
     <Filter Include="vsf\shell\sys\linux\lib\3rd-party\getopt">
       <UniqueIdentifier>{1bda77be-5d69-4a2a-a459-201b7a15da81}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\shell\sys\linux\lib\3rd-party\regex">
+      <UniqueIdentifier>{ceb612f7-f552-489b-9d22-865a1be7c4ea}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -5812,6 +5815,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\getopt\getopt_long.c">
       <Filter>vsf\shell\sys\linux\lib\3rd-party\getopt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\regex\regcomp.c">
+      <Filter>vsf\shell\sys\linux\lib\3rd-party\regex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\regex\regerror.c">
+      <Filter>vsf\shell\sys\linux\lib\3rd-party\regex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\regex\regexec.c">
+      <Filter>vsf\shell\sys\linux\lib\3rd-party\regex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\regex\regfree.c">
+      <Filter>vsf\shell\sys\linux\lib\3rd-party\regex</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

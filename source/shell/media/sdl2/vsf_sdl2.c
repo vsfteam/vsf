@@ -249,6 +249,9 @@ void vsf_sdl2_pixel_copy(   uint_fast16_t data_line_num, uint_fast32_t data_line
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
 #ifndef WEAK_SDL2_PIXEL_FILL
@@ -368,6 +371,8 @@ static void __SDL_BlendWithFormat(
 
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
 #endif
 
 const SDL_version * SDL_Linked_Version(void)

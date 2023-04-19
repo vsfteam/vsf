@@ -100,6 +100,14 @@ void setlinebuf(FILE *f)
 {
 }
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 int ungetc(int ch, FILE *f)
 {
     vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
@@ -847,6 +855,12 @@ int pclose(FILE *stream)
     close(sfd->fd);
     return result;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 // TODO: implement tmpnam and tmpfile
 FILE * tmpfile(void)

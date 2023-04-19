@@ -744,8 +744,17 @@ static void __vk_libusb_hcd_init_thread(void *arg)
 
 
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
+
 static bool __vk_libusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
 {
+    // LLCM "-Wcast-align"
     vk_libusb_hcd_urb_t *libusb_urb = (vk_libusb_hcd_urb_t *)urb->priv;
     if (libusb_urb->is_irq_enabled) {
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
@@ -869,6 +878,7 @@ static void __vk_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_EVT_MESSAGE: {
             vk_usbh_hcd_urb_t *urb = vsf_eda_get_cur_msg();
             VSF_USB_ASSERT((urb != NULL) && urb->pipe.is_pipe);
+            // LLCM "-Wcast-align"
             vk_libusb_hcd_urb_t *libusb_urb = (vk_libusb_hcd_urb_t *)urb->priv;
 
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
@@ -1006,6 +1016,7 @@ static vk_usbh_hcd_urb_t * __vk_libusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
     if (urb != NULL) {
         memset(urb, 0, size);
 
+        // LLCM "-Wcast-align"
         vk_libusb_hcd_urb_t *libusb_urb = (vk_libusb_hcd_urb_t *)urb->priv;
         vk_libusb_hcd_param_t *param = __vk_libusb_hcd.hcd->param;
         __vsf_arch_irq_request_init(&libusb_urb->irq_request);
@@ -1021,6 +1032,7 @@ static vk_usbh_hcd_urb_t * __vk_libusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
 
 static void __vk_libusb_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
+    // LLCM "-Wcast-align"
     vk_libusb_hcd_urb_t *libusb_urb = (vk_libusb_hcd_urb_t *)urb->priv;
     if (VSF_LIBUSB_HCD_URB_STATE_TO_FREE != libusb_urb->state) {
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
@@ -1039,6 +1051,7 @@ static void __vk_libusb_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 
 static vsf_err_t __vk_libusb_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
+    // LLCM "-Wcast-align"
     vk_libusb_hcd_urb_t *libusb_urb = (vk_libusb_hcd_urb_t *)urb->priv;
     vsf_dlist_init_node(vk_libusb_hcd_urb_t, urb_node, libusb_urb);
     vsf_dlist_init_node(vk_libusb_hcd_urb_t, urb_pending_node, libusb_urb);
@@ -1052,6 +1065,12 @@ static vsf_err_t __vk_libusb_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_
     vsf_eda_sem_post(&__vk_libusb_hcd.sem);
     return VSF_ERR_NONE;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 static vsf_err_t __vk_libusb_hcd_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
