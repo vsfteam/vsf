@@ -40,6 +40,8 @@ extern "C" {
 #define nanosleep           VSF_LINUX_LIBC_WRAPPER(nanosleep)
 #define clock               VSF_LINUX_LIBC_WRAPPER(clock)
 #define timespec_get        VSF_LINUX_LIBC_WRAPPER(timespec_get)
+#define strftime            VSF_LINUX_LIBC_WRAPPER(strftime)
+#define strptime            VSF_LINUX_LIBC_WRAPPER(strptime)
 #endif
 
 #define TIMER_ABSTIME       1

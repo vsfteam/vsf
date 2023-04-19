@@ -55,6 +55,7 @@
 #   include "./include/poll.h"
 #   include "./include/dlfcn.h"
 #   include "./include/grp.h"
+#   include "./include/fnmatch.h"
 #   include "./include/linux/limits.h"
 #   include "./include/linux/futex.h"
 #else
@@ -84,6 +85,7 @@
 #   include <poll.h>
 #   include <dlfcn.h>
 #   include <grp.h>
+#   include <fnmatch.h>
 // for MAX_PATH
 #   include <linux/limits.h>
 #   include <linux/futex.h>
@@ -3971,9 +3973,6 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_FINDPROG == ENABLED
 #       include "./include/findprog.h"
 #   endif
-#   if VSF_LINUX_APPLET_USE_FNMATCH == ENABLED
-#       include "./include/fnmatch.h"
-#   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
 #       define __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
 #       include "./include/simple_libc/setjmp/setjmp.h"
@@ -4027,9 +4026,6 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_FINDPROG == ENABLED
 #       include <findprog.h>
-#   endif
-#   if VSF_LINUX_APPLET_USE_FNMATCH == ENABLED
-#       include <fnmatch.h>
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
 #       define __SIMPLE_LIBC_SETJMP_VPLT_ONLY__

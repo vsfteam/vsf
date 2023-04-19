@@ -26,8 +26,8 @@ extern "C" {
 #define sigdelsetmask       VSF_LINUX_WRAPPER(sigdelsetmask)
 #define sigtestsetmask      VSF_LINUX_WRAPPER(sigtestsetmask)
 #define pthread_sigmask     VSF_LINUX_WRAPPER(pthread_sigmask)
-#define sigwaitinfo         VSF_LINUX_WRAPPER(sigwaitinfo);
-#define sigtimedwait        VSF_LINUX_WRAPPER(sigtimedwait);
+#define sigwaitinfo         VSF_LINUX_WRAPPER(sigwaitinfo)
+#define sigtimedwait        VSF_LINUX_WRAPPER(sigtimedwait)
 #endif
 
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
