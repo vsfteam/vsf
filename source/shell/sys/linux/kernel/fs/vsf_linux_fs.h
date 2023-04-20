@@ -59,6 +59,7 @@ enum {
     VSF_LINUX_FDOP_FEATURE_FS       = 1 << 0,
 };
 
+struct stat;
 typedef struct vsf_linux_fd_op_t {
     int priv_size;
     int feature;
@@ -69,6 +70,7 @@ typedef struct vsf_linux_fd_op_t {
     int (*fn_close)(vsf_linux_fd_t *sfd);
     int (*fn_eof)(vsf_linux_fd_t *sfd);
     int (*fn_setsize)(vsf_linux_fd_t *sfd, off64_t size);
+    int (*fn_stat)(vsf_linux_fd_t *sfd, struct stat *buf);
 
     void * (*fn_mmap)(vsf_linux_fd_t *sfd, off64_t offset, size_t len, uint_fast32_t feature);
     int (*fn_munmap)(vsf_linux_fd_t *sfd, void *buffer);

@@ -262,6 +262,7 @@ int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static ssize_t __vsf_linux_socket_inet_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static ssize_t __vsf_linux_socket_inet_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd);
+extern int __vsf_linux_socket_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 
 static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd);
 static int __vsf_linux_socket_inet_fini(vsf_linux_socket_priv_t *socket_priv, int how);
@@ -311,6 +312,7 @@ const vsf_linux_socket_op_t vsf_linux_socket_inet_op = {
         .fn_read        = __vsf_linux_socket_inet_read,
         .fn_write       = __vsf_linux_socket_inet_write,
         .fn_close       = __vsf_linux_socket_inet_close,
+        .fn_stat        = __vsf_linux_socket_stat,
     },
 
     .fn_init            = __vsf_linux_socket_inet_init,

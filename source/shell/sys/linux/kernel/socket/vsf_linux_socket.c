@@ -37,6 +37,7 @@
 #       include "../../include/ifaddrs.h"
 #   endif
 #   include "../../include/errno.h"
+#   include "../../include/sys/stat.h"
 #else
 #   include <unistd.h>
 #   include <stdio.h>
@@ -48,6 +49,7 @@
 #       include <ifaddrs.h>
 #   endif
 #   include <errno.h>
+#   include <sys/stat.h>
 #endif
 #include "./vsf_linux_socket.h"
 
@@ -68,6 +70,12 @@ const struct in6_addr in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
+
+int __vsf_linux_socket_stat(vsf_linux_fd_t *sfd, struct stat *buf)
+{
+    buf->st_mode = S_IFSOCK;
+    return 0;
+}
 
 #if VSF_LINUX_SOCKET_USE_INET == ENABLED
 // arpa/inet.h

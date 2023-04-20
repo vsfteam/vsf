@@ -150,6 +150,7 @@ static ssize_t __vsf_linux_fs_write(vsf_linux_fd_t *sfd, const void *buf, size_t
 static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd);
 static int __vsf_linux_fs_eof(vsf_linux_fd_t *sfd);
 static int __vsf_linux_fs_setsize(vsf_linux_fd_t *sfd, off64_t size);
+static int __vsf_linux_fs_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 
 static int __vsf_linux_eventfd_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static ssize_t __vsf_linux_eventfd_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
@@ -167,6 +168,7 @@ static int __vsf_linux_stream_rx_eof(vsf_linux_fd_t *sfd);
 static int __vsf_linux_stream_tx_eof(vsf_linux_fd_t *sfd);
 
 static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
+static int __vsf_linux_pipe_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd);
 
 static void __vsf_linux_term_init(vsf_linux_fd_t *sfd);
@@ -191,6 +193,7 @@ const vsf_linux_fd_op_t __vsf_linux_fs_fdop = {
     .fn_close           = __vsf_linux_fs_close,
     .fn_eof             = __vsf_linux_fs_eof,
     .fn_setsize         = __vsf_linux_fs_setsize,
+    .fn_stat            = __vsf_linux_fs_stat,
 };
 
 const vsf_linux_fd_op_t __vsf_linux_eventfd_fdop = {
@@ -227,6 +230,7 @@ const vsf_linux_fd_op_t vsf_linux_pipe_rx_fdop = {
     .fn_read            = __vsf_linux_stream_read,
     .fn_close           = __vsf_linux_pipe_close,
     .fn_eof             = __vsf_linux_stream_rx_eof,
+    .fn_stat            = __vsf_linux_pipe_stat,
 };
 
 const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop = {
@@ -236,6 +240,7 @@ const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop = {
     .fn_write           = __vsf_linux_stream_write,
     .fn_close           = __vsf_linux_pipe_close,
     .fn_eof             = __vsf_linux_stream_tx_eof,
+    .fn_stat            = __vsf_linux_pipe_stat,
 };
 
 const vsf_linux_fd_op_t vsf_linux_term_fdop = {
@@ -396,6 +401,25 @@ static int __vsf_linux_fs_setsize(vsf_linux_fd_t *sfd, off64_t size)
         vk_file_setsize(file, size);
         return vsf_eda_get_return_value();
     }
+    return 0;
+}
+
+static int __vsf_linux_fs_stat(vsf_linux_fd_t *sfd, struct stat *buf)
+{
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    vk_file_t *file = priv->file;
+
+    if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
+        buf->st_mode = S_IFDIR;
+    } else if (file->attr & VSF_FILE_ATTR_BLK) {
+        buf->st_mode = S_IFBLK;
+    } else if (file->attr & VSF_FILE_ATTR_SOCK) {
+        buf->st_mode = S_IFSOCK;
+    } else {
+        buf->st_mode = S_IFREG;
+    }
+    buf->st_mode |= 0777;
+    buf->st_size = file->size;
     return 0;
 }
 
@@ -1922,45 +1946,12 @@ int truncate64(const char *path, off64_t length)
 int fstat(int fd, struct stat *buf)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    if (NULL == sfd->op->fn_stat) {
+        return -1;
+    }
 
     memset(buf, 0, sizeof(*buf));
-    if (&__vsf_linux_fs_fdop == sfd->op) {
-        vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
-        vk_file_t *file = priv->file;
-
-        if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
-            buf->st_mode = S_IFDIR;
-        } else if (file->attr & VSF_FILE_ATTR_BLK) {
-            buf->st_mode = S_IFBLK;
-        } else if (file->attr & VSF_FILE_ATTR_SOCK) {
-            buf->st_mode = S_IFSOCK;
-        } else {
-            buf->st_mode = S_IFREG;
-        }
-        buf->st_mode |= 0777;
-        buf->st_size = file->size;
-        return 0;
-    } else if ( (&vsf_linux_pipe_rx_fdop == sfd->op)
-            ||  (&vsf_linux_pipe_tx_fdop == sfd->op)) {
-        buf->st_mode = S_IFIFO;
-        return 0;
-#if VSF_LINUX_USE_SOCKET == ENABLED
-    } else if (
-#   if VSF_LINUX_SOCKET_USE_UNIX == ENABLED
-                (&vsf_linux_socket_unix_op.fdop == sfd->op)
-#   endif
-#   if VSF_LINUX_SOCKET_USE_UNIX == ENABLED && VSF_LINUX_SOCKET_USE_INET == ENABLED
-            ||
-#   endif
-#   if VSF_LINUX_SOCKET_USE_INET == ENABLED
-                (&vsf_linux_socket_inet_op.fdop == sfd->op)
-#   endif
-        ) {
-        buf->st_mode = S_IFSOCK;
-        return 0;
-#endif
-    }
-    return -1;
+    return sfd->op->fn_stat(sfd, buf);
 }
 
 int stat(const char *pathname, struct stat *buf)
@@ -2807,6 +2798,12 @@ vsf_stream_t * vsf_linux_get_tx_stream(vsf_linux_fd_t *sfd)
 // pipe
 static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
+    return 0;
+}
+
+static int __vsf_linux_pipe_stat(vsf_linux_fd_t *sfd, struct stat *buf)
+{
+    buf->st_mode = S_IFIFO;
     return 0;
 }
 

@@ -906,6 +906,12 @@ static int __vsf_linux_input_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
     return 0;
 }
 
+static int __vsf_linux_input_stat(vsf_linux_fd_t *sfd, struct stat *buf)
+{
+    buf->st_mode = S_IFCHR;
+    return 0;
+}
+
 static ssize_t __vsf_linux_input_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
     VSF_LINUX_ASSERT(!(count % sizeof(struct input_event)));
@@ -970,10 +976,9 @@ static ssize_t __vsf_linux_input_write(vsf_linux_fd_t *sfd, const void *buf, siz
 static int __vsf_linux_input_close(vsf_linux_fd_t *sfd)
 {
     vsf_linux_input_priv_t *input_priv = (vsf_linux_input_priv_t *)sfd->priv;
-    vk_input_notifier_t *notifier = (vk_input_notifier_t *)(((vk_vfs_file_t *)(input_priv->file))->f.param);
 
-    if (notifier->mask != 0) {
-        vk_input_notifier_unregister(notifier);
+    if (input_priv->notifier.mask != 0) {
+        vk_input_notifier_unregister(&input_priv->notifier);
     }
     return 0;
 }
@@ -986,6 +991,7 @@ static const vsf_linux_fd_op_t __vsf_linux_input_fdop = {
     .fn_read            = __vsf_linux_input_read,
     .fn_write           = __vsf_linux_input_write,
     .fn_close           = __vsf_linux_input_close,
+    .fn_stat            = __vsf_linux_input_stat,
 };
 
 int vsf_linux_fs_bind_input(char *path, vk_input_notifier_t *notifier)
@@ -1177,6 +1183,12 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
     return 0;
 }
 
+static int __vsf_linux_fb_stat(vsf_linux_fd_t *sfd, struct stat *buf)
+{
+    buf->st_mode = S_IFBLK;
+    return 0;
+}
+
 static ssize_t __vsf_linux_fb_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
     vsf_linux_fb_priv_t *fb_priv = (vsf_linux_fb_priv_t *)sfd->priv;
@@ -1273,6 +1285,7 @@ static const vsf_linux_fd_op_t __vsf_linux_fb_fdop = {
     .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_init            = __vsf_linux_fb_init,
     .fn_fcntl           = __vsf_linux_fb_fcntl,
+    .fn_stat            = __vsf_linux_fb_stat,
     .fn_read            = __vsf_linux_fb_read,
     .fn_write           = __vsf_linux_fb_write,
     .fn_close           = __vsf_linux_fb_close,
