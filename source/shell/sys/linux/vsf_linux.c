@@ -2131,7 +2131,7 @@ unsigned int alarm(unsigned int seconds)
     return 0;
 }
 
-pid_t wait(int *status)
+static pid_t __vsf_linux_wait_any(int *status, int options)
 {
     vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(cur_process != NULL);
@@ -2140,6 +2140,10 @@ pid_t wait(int *status)
 
     VSF_LINUX_ASSERT(cur_process != NULL);
     vsf_protect_t orig = vsf_protect_sched();
+        if ((options & WNOHANG) && vsf_dlist_is_empty(&cur_process->child_list)) {
+            vsf_unprotect_sched(orig);
+            return (pid_t)0;
+        }
         if (cur_process->thread_pending_child != NULL) {
             vsf_unprotect_sched(orig);
             return (pid_t)-1;
@@ -2159,10 +2163,15 @@ pid_t wait(int *status)
     return cur_thread->pid_exited;
 }
 
+pid_t wait(int *status)
+{
+    return __vsf_linux_wait_any(status, 0);
+}
+
 pid_t waitpid(pid_t pid, int *status, int options)
 {
     if (pid <= 0) {
-        return wait(status);
+        return __vsf_linux_wait_any(status, options);
     }
     if (options != 0) {
         VSF_LINUX_ASSERT(false);
@@ -2180,6 +2189,11 @@ pid_t waitpid(pid_t pid, int *status, int options)
         return -1;
     }
     if (process->status & PID_STATUS_RUNNING) {
+        if (options & WNOHANG) {
+            vsf_unprotect_sched(orig);
+            return 0;
+        }
+
         process->thread_pending = cur_thread;
         vsf_unprotect_sched(orig);
         vsf_thread_wfe(VSF_EVT_USER);
