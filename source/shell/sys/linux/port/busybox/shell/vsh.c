@@ -974,8 +974,8 @@ int export_main(int argc, char *argv[])
     }
 
     // env_str not belong to us after putenv
-    extern int __putenv_ex(vsf_linux_process_t *process, char *string);
-    int ret = __putenv_ex(process->shell_process, env_str);
+    extern int __putenv_ex(vsf_linux_process_t *process, char *string, bool is_to_free_old);
+    int ret = __putenv_ex(process->shell_process, env_str, true);
     if (ret) {
         __free_ex(process->shell_process, env_str);
     }

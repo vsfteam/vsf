@@ -464,13 +464,13 @@ vsf_linux_localstorage_t * vsf_linux_tls_get(int idx)
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
 int vsf_linux_merge_env(vsf_linux_process_t *process, char **env)
 {
-    extern int __putenv_ex(vsf_linux_process_t *process, char *string);
+    extern int __putenv_ex(vsf_linux_process_t *process, char *string, bool is_to_free_old);
     char *cur_env;
     if (env != NULL) {
         while (*env != NULL) {
             cur_env = __strdup_ex(process, *env);
             if (cur_env != NULL) {
-                __putenv_ex(process, cur_env);
+                __putenv_ex(process, cur_env, true);
             } else {
                 vsf_trace_error("spawn: failed to dup env %s", VSF_TRACE_CFG_LINEEND, *env);
                 return -1;

@@ -656,7 +656,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
 }
 
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
-int __putenv_ex(vsf_linux_process_t *process, char *string)
+int __putenv_ex(vsf_linux_process_t *process, char *string, bool is_to_free_old)
 {
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
@@ -676,7 +676,9 @@ int __putenv_ex(vsf_linux_process_t *process, char *string)
             if (    !strncmp(string, *env_tmp, namelen)
                 &&  ((*env_tmp)[namelen] == '=')) {
                 is_match = true;
-                __free_ex(process, *env_tmp);
+                if (is_to_free_old) {
+                    __free_ex(process, *env_tmp);
+                }
                 if (is_to_set) {
                     *env_tmp = string;
                     VSF_LINUX_ASSERT(*env_tmp != NULL);
@@ -749,7 +751,7 @@ int __setenv_ex(vsf_linux_process_t *process, const char *name, const char *valu
     env_str[namelen] = '=';
     memcpy(env_str + namelen + 1, value, valuelen);
     env_str[namelen + valuelen + 1] = '\0';
-    return __putenv_ex(process, env_str);
+    return __putenv_ex(process, env_str, false);
 }
 
 int __clearenv_ex(vsf_linux_process_t *process)
@@ -774,7 +776,7 @@ int __clearenv_ex(vsf_linux_process_t *process)
 
 int putenv(char *string)
 {
-    return __putenv_ex(NULL, string);
+    return __putenv_ex(NULL, string, false);
 }
 
 char * getenv(const char *name)
