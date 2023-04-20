@@ -383,6 +383,9 @@ VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_trace_arg, void, vsf_trace_level_t level, co
 #if VSF_LINUX_CFG_PLS_NUM > 0
 extern void * vsf_linux_dynlib_ctx_get(const vsf_linux_dynlib_mod_t *mod);
 extern int vsf_linux_dynlib_ctx_set(const vsf_linux_dynlib_mod_t *mod, void *ctx);
+
+// for backward compatibility
+#define vsf_linux_dynlib_ctx        vsf_linux_dynlib_ctx_get
 #endif
 
 // open vsf_linux_get_cur_process for process-related variables like optarg, etc
