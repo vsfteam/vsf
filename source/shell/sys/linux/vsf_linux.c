@@ -367,7 +367,30 @@ vsf_err_t vsf_linux_dynlib_init(int *lib_idx, int module_num, int bss_size)
     return err;
 }
 
-void * vsf_linux_dynlib_ctx(const vsf_linux_dynlib_mod_t *mod)
+int vsf_linux_dynlib_ctx_set(const vsf_linux_dynlib_mod_t *mod, void *ctx)
+{
+    VSF_LINUX_ASSERT(mod != NULL);
+    vsf_linux_dynlib_t *dynlib = vsf_linux_library_ctx(*mod->lib_idx);
+
+    if (NULL == dynlib) {
+        if (vsf_linux_dynlib_init(mod->lib_idx, mod->module_num, mod->bss_size) < 0) {
+            vsf_trace_error("linux: fail to allocate dynlib" VSF_TRACE_CFG_LINEEND);
+            VSF_LINUX_ASSERT(false);
+            return -1;
+        }
+        dynlib = vsf_linux_library_ctx(*mod->lib_idx);
+        VSF_LINUX_ASSERT(dynlib != NULL);
+    }
+    VSF_LINUX_ASSERT(mod->mod_idx < dynlib->module_num);
+
+    uint32_t mod_size = (mod->mod_size + (sizeof(int) - 1)) & ~(sizeof(int) - 1);
+    VSF_LINUX_ASSERT(dynlib->bss_size >= dynlib->bss_brk + mod_size);
+    dynlib->modules[mod->mod_idx] = ctx;
+    dynlib->bss_brk += mod_size;
+    return 0;
+}
+
+void * vsf_linux_dynlib_ctx_get(const vsf_linux_dynlib_mod_t *mod)
 {
     VSF_LINUX_ASSERT(mod != NULL);
     vsf_linux_dynlib_t *dynlib = vsf_linux_library_ctx(*mod->lib_idx);
@@ -3676,7 +3699,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_fundmental_vplt_t, 0, 0, true),
 
 #if VSF_LINUX_CFG_PLS_NUM > 0
-    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_linux_dynlib_ctx),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_linux_dynlib_ctx_get),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_linux_dynlib_ctx_set),
 #endif
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_linux_get_cur_process),
 #if VSF_USE_TRACE == ENABLED

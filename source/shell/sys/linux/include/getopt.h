@@ -87,7 +87,7 @@ struct __getopt_lib_ctx_t {
     int __optopt;
     int __optreset;
 };
-#       define getopt_ctx       ((struct __getopt_lib_ctx_t *)vsf_linux_dynlib_ctx(&__getopt_long_mod))
+#       define getopt_ctx       ((struct __getopt_lib_ctx_t *)vsf_linux_dynlib_ctx_get(&__getopt_long_mod))
 #       define opterr           (getopt_ctx->__opterr)
 #       define optind           (getopt_ctx->__optind)
 #       define optopt           (getopt_ctx->__optopt)

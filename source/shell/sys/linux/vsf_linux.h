@@ -324,7 +324,8 @@ typedef struct vsf_linux_fundmental_vplt_t {
     vsf_vplt_info_t info;
 
 #if VSF_LINUX_CFG_PLS_NUM > 0
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_linux_dynlib_ctx);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_linux_dynlib_ctx_get);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_linux_dynlib_ctx_set);
 #endif
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_linux_get_cur_process);
@@ -356,9 +357,13 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_v
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_FUNDMENTAL_VPLT, __VA_ARGS__)
 
 #if VSF_LINUX_CFG_PLS_NUM > 0
-VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_linux_dynlib_ctx, void *, const vsf_linux_dynlib_mod_t *mod) {
+VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_linux_dynlib_ctx_get, void *, const vsf_linux_dynlib_mod_t *mod) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    return VSF_LINUX_APPLET_FUNDMENTAL_ENTRY(vsf_linux_dynlib_ctx)(mod);
+    return VSF_LINUX_APPLET_FUNDMENTAL_ENTRY(vsf_linux_dynlib_ctx_get)(mod);
+}
+VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_linux_dynlib_ctx_set, int, const vsf_linux_dynlib_mod_t *mod, void *ctx) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_FUNDMENTAL_ENTRY(vsf_linux_dynlib_ctx_set)(mod, ctx);
 }
 #endif
 
@@ -376,7 +381,8 @@ VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_trace_arg, void, vsf_trace_level_t level, co
 #else
 
 #if VSF_LINUX_CFG_PLS_NUM > 0
-extern void * vsf_linux_dynlib_ctx(const vsf_linux_dynlib_mod_t *mod);
+extern void * vsf_linux_dynlib_ctx_get(const vsf_linux_dynlib_mod_t *mod);
+extern int vsf_linux_dynlib_ctx_set(const vsf_linux_dynlib_mod_t *mod, void *ctx);
 #endif
 
 // open vsf_linux_get_cur_process for process-related variables like optarg, etc
