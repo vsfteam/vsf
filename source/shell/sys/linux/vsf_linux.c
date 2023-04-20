@@ -383,10 +383,7 @@ int vsf_linux_dynlib_ctx_set(const vsf_linux_dynlib_mod_t *mod, void *ctx)
     }
     VSF_LINUX_ASSERT(mod->mod_idx < dynlib->module_num);
 
-    uint32_t mod_size = (mod->mod_size + (sizeof(int) - 1)) & ~(sizeof(int) - 1);
-    VSF_LINUX_ASSERT(dynlib->bss_size >= dynlib->bss_brk + mod_size);
     dynlib->modules[mod->mod_idx] = ctx;
-    dynlib->bss_brk += mod_size;
     return 0;
 }
 
