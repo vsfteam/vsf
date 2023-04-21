@@ -953,7 +953,7 @@ static ssize_t __getdelim(char **lineptr, size_t *n, int delimiter, FILE *f)
         }
     }
     *cur_pos = '\0';
-    return cur_len;
+    return 0 == cur_len ? -1 : cur_len;
 }
 
 ssize_t getline(char **lineptr, size_t *n, FILE *f)
