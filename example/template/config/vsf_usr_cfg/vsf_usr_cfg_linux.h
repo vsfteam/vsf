@@ -155,7 +155,7 @@
 #   define VSF_LINUX_USE_LIBUSB                         VSF_USE_USB_HOST
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
 
-#ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
+#ifndef USRAPP_CFG_LINUX_TTY_DEBUG_STREAM
 #   define USRAPP_CFG_LINUX_TTY_DEBUG_STREAM            0
 #   define USRAPP_CFG_LINUX_TTY_UART                    1
 #   define USRAPP_CFG_LINUX_TTY_CDC                     2

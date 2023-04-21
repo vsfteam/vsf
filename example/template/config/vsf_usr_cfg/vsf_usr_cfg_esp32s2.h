@@ -150,7 +150,7 @@ extern void vsf_assert(int expression);
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
 #   define VSH_ENTER_CHAR                               '\n'
 
-#ifndef USRAPP_CFG_LINUX_TTY_DEBUT_STREAM
+#ifndef USRAPP_CFG_LINUX_TTY_DEBUG_STREAM
 #   define USRAPP_CFG_LINUX_TTY_DEBUG_STREAM            0
 #   define USRAPP_CFG_LINUX_TTY_UART                    1
 #   define USRAPP_CFG_LINUX_TTY_CDC                     2
