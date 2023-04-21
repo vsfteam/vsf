@@ -1841,8 +1841,26 @@ ssize_t pwritev(int fd, const struct iovec *iov, int iovcnt, off_t offset)
 
 ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
 {
-    VSF_LINUX_ASSERT(false);
-    return (ssize_t)-1;
+    char buffer[256];
+    ssize_t cur_size, total_size = 0;
+
+    if (offset != NULL) {
+        lseek(in_fd, *offset, SEEK_SET);
+    }
+    while (count > 0) {
+        cur_size = vsf_min(count, sizeof(buffer));
+        cur_size = read(in_fd, buffer, cur_size);
+        if (cur_size <= 0) {
+            break;
+        }
+        total_size += cur_size;
+        if (offset != NULL) {
+            *offset  += cur_size;
+        }
+        count -= cur_size;
+        write(out_fd, buffer, cur_size);
+    }
+    return total_size;
 }
 
 off64_t lseek64(int fd, off64_t offset, int whence)
