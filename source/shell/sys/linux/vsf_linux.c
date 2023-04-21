@@ -662,9 +662,12 @@ void __vsf_linux_process_free_arg(vsf_linux_process_t *process)
     }
 }
 
-int __vsf_linux_process_parse_arg(vsf_linux_process_t *process, char * const * argv)
+int __vsf_linux_process_parse_arg(vsf_linux_process_t *process, vsf_linux_process_arg_t *arg, char * const * argv)
 {
-    vsf_linux_process_arg_t *arg = &process->ctx.arg;
+    if (NULL == arg) {
+        arg = &process->ctx.arg;
+    }
+
     arg->is_dyn_argv = true;
     arg->argc = 0;
     while ((*argv != NULL) && (arg->argc <= VSF_LINUX_CFG_MAX_ARG_NUM)) {
@@ -1320,7 +1323,7 @@ vsf_linux_process_t * __vsf_linux_start_process_internal(
             return NULL;
         }
         if (argv != NULL) {
-            __vsf_linux_process_parse_arg(process, argv);
+            __vsf_linux_process_parse_arg(process, NULL, argv);
         }
         vsf_linux_start_process(process);
     }
@@ -1800,8 +1803,13 @@ static exec_ret_t __vsf_linux_execvpe(vsf_linux_main_entry_t entry, char * const
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     vsf_linux_thread_t *thread;
 
+    // MUST parse argument to arg first, then free arg.
+    //  Because maybe the argv is in process arg, so if free process arg first, argv will be invalid
+    vsf_linux_process_arg_t arg = { 0 };
+    __vsf_linux_process_parse_arg(process, &arg, argv);
     __vsf_linux_process_free_arg(process);
-    __vsf_linux_process_parse_arg(process, argv);
+    process->ctx.arg = arg;
+
     vsf_linux_merge_env(process, (char **)envp);
     ctx->entry = entry;
 
@@ -3028,7 +3036,7 @@ int __vsf_linux_spawn(pid_t *pid, vsf_linux_main_entry_t entry,
     ctx->entry = entry;
 
     if (argv != NULL) {
-        __vsf_linux_process_parse_arg(process, argv);
+        __vsf_linux_process_parse_arg(process, NULL, argv);
     }
 
     vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();

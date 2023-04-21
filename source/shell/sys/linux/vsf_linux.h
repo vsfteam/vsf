@@ -509,7 +509,7 @@ extern vsf_linux_thread_t * vsf_linux_get_thread(pid_t pid, int tid);
 extern vsf_linux_process_t * vsf_linux_get_process(pid_t pid);
 
 extern void __vsf_linux_process_free_arg(vsf_linux_process_t *process);
-extern int __vsf_linux_process_parse_arg(vsf_linux_process_t *process, char * const * argv);
+extern int __vsf_linux_process_parse_arg(vsf_linux_process_t *process, vsf_linux_process_arg_t *arg, char * const * argv);
 
 extern int vsf_linux_merge_env(vsf_linux_process_t *process, char **env);
 extern void vsf_linux_free_env(vsf_linux_process_t *process);

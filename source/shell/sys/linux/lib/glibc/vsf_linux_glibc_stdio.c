@@ -821,7 +821,7 @@ FILE * popen(const char *command, const char *type)
     process->shell_process = cur_process->shell_process;
 
     const char *argv[] = { "sh", "-c", command, (const char *)NULL };
-    __vsf_linux_process_parse_arg(process, (char * const *)argv);
+    __vsf_linux_process_parse_arg(process, NULL, (char * const *)argv);
 
     vsf_linux_fd_t *sfd;
     extern int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
