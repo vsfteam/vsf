@@ -917,10 +917,48 @@ int remove(const char * pathname)
     return 0;
 }
 
+static ssize_t __getdelim(char **lineptr, size_t *n, int delimiter, FILE *f)
+{
+    if ((NULL == lineptr) || (NULL == n)) {
+        return -1;
+    }
+
+    if ((NULL == *lineptr) || (0 == *n)) {
+        *n = 256;
+        *lineptr = (char *)malloc(*n);
+        if (NULL == *lineptr) {
+            return -1;
+        }
+    }
+
+    ssize_t cur_len = 0;
+    char *cur_pos = *lineptr;
+    while (true) {
+        if (cur_len >= *n - 1) {
+            char *new_lineptr = (char *)realloc(*lineptr, 2 * *n);
+            if (NULL == new_lineptr) {
+                return -1;
+            }
+            *lineptr = new_lineptr;
+            *n = 2 * *n;
+            cur_pos = &((*lineptr)[cur_len]);
+        }
+        if (fread(cur_pos, 1, 1, f) != 1) {
+            break;
+        }
+
+        cur_len++;
+        if (*cur_pos++ == delimiter) {
+            break;
+        }
+    }
+    *cur_pos = '\0';
+    return cur_len;
+}
+
 ssize_t getline(char **lineptr, size_t *n, FILE *f)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    return __getdelim(lineptr, n, '\n', f);
 }
 
 #ifdef __WIN__
