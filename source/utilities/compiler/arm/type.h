@@ -175,6 +175,11 @@ struct itimerspec {
 #   define fseeko64         fseek
 #endif      // !(VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC && VSF_LINUX_USE_SIMPLE_STDIO)
 
+#ifndef __APPLET__
+
+// gcc use __builtin_alloca
+#   define alloca           __builtin_alloca
+
 // gcc has no strcasestr
 #ifdef __cplusplus
 extern "C" {
@@ -183,5 +188,7 @@ extern char * strcasestr(const char *str, const char *substr);
 #ifdef __cplusplus
 }
 #endif
+
+#endif      // __APPLET__
 
 #endif      // __IS_COMPILER_XXX__
