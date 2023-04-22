@@ -37,9 +37,6 @@
 [submodule "lvgl"]
 	path = source/component/3rd-party/lvgl/raw/lvgl
 	url = ../lvgl
-[submodule "CMSIS"]
-	path = source/utilities/compiler/arm/3rd-party/CMSIS
-	url = ../CMSIS_5
 [submodule "source/utilities/3rd-party/PLOOC/raw"]
 	path = source/utilities/3rd-party/PLOOC/raw
 	url = ../PLOOC
