@@ -115,16 +115,17 @@ size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *
     VSF_LINUX_ASSERT(tm->tm_wday >= 0 && tm->tm_wday < 7);
     VSF_LINUX_ASSERT(tm->tm_mon >= 0 && tm->tm_mon < 12);
     char *str_end = str + maxsize - 1, *str_cur = str;
-    char *curfmt, *subfmt, ch;
+    char *curfmt, *subfmt, ch, *substr;
     ssize_t curlen;
     int value, valuelen;
 
     while ((ch = *format++) != '\0') {
         if (ch == '%') {
-            curfmt = subfmt = NULL;
+            curfmt = subfmt = substr = NULL;
             curlen = -1;
             valuelen = 2;
-            switch (*format++) {
+            ch = *format++;
+            switch (ch) {
             case '%':
                 curfmt = "%";
                 break;
@@ -195,11 +196,25 @@ size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *
                 value = tm->tm_year + 1900;
                 valuelen = 4;
                 break;
+            case 'z':
+                substr = "+0000";
+                break;
+            case 'Z':
+                substr = "CST";
+                break;
             default:
                 vsf_trace_error("invalid fmt %c in strftime" VSF_TRACE_CFG_LINEEND, ch);
                 return 0;
             }
-            if (subfmt != NULL) {
+            if (substr != NULL) {
+                int substr_size = strlen(substr), buf_size = str_end - str_cur;
+                int size = vsf_min(substr_size, buf_size);
+                memcpy(str_cur, substr, size);
+                str_cur += size;
+                if (str_cur >= str_end) {
+                    break;
+                }
+            } else if (subfmt != NULL) {
                 curlen = strftime(str_cur, str_end - str_cur, subfmt, tm);
                 if (!curlen) {
                     break;
