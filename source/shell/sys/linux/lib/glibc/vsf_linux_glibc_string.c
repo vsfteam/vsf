@@ -205,6 +205,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt =
     VSF_APPLET_VPLT_ENTRY_FUNC(strtok),
     VSF_APPLET_VPLT_ENTRY_FUNC(strxfrm),
     VSF_APPLET_VPLT_ENTRY_FUNC(strspn),
+    VSF_APPLET_VPLT_ENTRY_FUNC(strsep),
     VSF_APPLET_VPLT_ENTRY_FUNC(strcspn),
     VSF_APPLET_VPLT_ENTRY_FUNC(strpbrk),
     VSF_APPLET_VPLT_ENTRY_FUNC(strerror),

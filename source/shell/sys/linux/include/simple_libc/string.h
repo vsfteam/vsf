@@ -49,6 +49,7 @@ typedef struct vsf_linux_libc_string_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strtok);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strxfrm);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strspn);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strsep);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strcspn);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strpbrk);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strerror);
@@ -161,6 +162,10 @@ VSF_LINUX_APPLET_LIBC_STRING_IMP(strspn, size_t, const char *str1, const char *s
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strspn)(str1, str2);
 }
+VSF_LINUX_APPLET_LIBC_STRING_IMP(strsep, char *, char **strp, const char *delim) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strsep)(strp, delim);
+}
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strcspn, size_t, const char *str1, const char *str2) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strcspn)(str1, str2);
@@ -268,6 +273,7 @@ int strcoll(const char *str1, const char *str2);
 char * strtok(char *str, const char *delim);
 size_t strxfrm(char *dest, const char *src, size_t n);
 size_t strspn(const char *str1, const char *str2);
+char * strsep(char **strp, const char *delim);
 size_t strcspn(const char *str1, const char *str2);
 char * strpbrk(const char *str1, const char *str2);
 char * strerror(int errnum);
