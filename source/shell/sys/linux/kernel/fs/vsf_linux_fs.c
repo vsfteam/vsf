@@ -944,6 +944,27 @@ void vsf_linux_fd_delete(int fd)
     __vsf_linux_fd_delete_ex(NULL, fd);
 }
 
+int vsf_linux_statat(int dirfd, const char *pathname, struct stat *buf)
+{
+    int fd;
+    if (dirfd < 0) {
+        fd = open(pathname, 0);
+    } else {
+        fd = openat(dirfd, pathname, 0);
+    }    
+    if (fd < 0) {
+        errno = ENOENT;
+        return -1;
+    }
+
+    int result = 0;
+    if (buf != NULL) {
+        result = fstat(fd, buf);
+    }
+    close(fd);
+    return result;
+}
+
 bool vsf_linux_fd_is_block(vsf_linux_fd_t *sfd)
 {
     return !(sfd->priv->flags & O_NONBLOCK);
@@ -1992,12 +2013,7 @@ int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags)
         return -1;
     }
 
-    int fd = openat(dirfd, pathname, 0);
-    if (fd < 0) { return -1; }
-
-    int ret = fstat(fd, buf);
-    close(fd);
-    return ret;
+    return vsf_linux_statat(dirfd, pathname, buf);
 }
 
 int futimens(int fd, const struct timespec times[2])
@@ -2007,12 +2023,12 @@ int futimens(int fd, const struct timespec times[2])
 
 int utimensat(int dirfd, const char *pathname, const struct timespec times[2], int flags)
 {
-    return 0;
+    return vsf_linux_statat(dirfd, pathname, NULL);
 }
 
 int chmod(const char *pathname, mode_t mode)
 {
-    return 0;
+    return vsf_linux_statat(-1, pathname, NULL);
 }
 
 int fchmod(int fd, mode_t mode)
