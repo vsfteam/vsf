@@ -1101,8 +1101,6 @@ __vsf_component_peda_ifs_entry(__vk_vfs_unlink, vk_file_unlink)
     case VSF_EVT_RETURN:
         if (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
             err = (vsf_err_t)vsf_eda_get_return_value();
-        } else {
-            err = VSF_ERR_FAIL;
         }
         vsf_eda_return(err);
         break;
