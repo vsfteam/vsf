@@ -145,7 +145,7 @@ void vsf_board_init(void)
     vsf_linux_fs_bind_uart("/dev/ttyS0", (vsf_usart_t *)&vsf_hw_usart1);
 
     extern int tty_main(int argc, char *argv[]);
-    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/tty", tty_main);
+    vsf_linux_fs_bind_executable(VSF_LINUX_CFG_BIN_PATH "/tty", tty_main);
 #endif
 }
 
