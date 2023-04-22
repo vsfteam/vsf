@@ -66,6 +66,31 @@ size_t strlcpy(char *dst, const char *src, size_t dsize)
     return(src - osrc - 1);     /* count does not include NUL */
 }
 
+char * strsep(char **stringp, const char *delim)
+{
+    char *s;
+    const char *spanp;
+    int c, sc;
+    char *tok;
+    if ((s = *stringp) == NULL)
+        return (NULL);
+    for (tok = s;;) {
+        c = *s++;
+        spanp = delim;
+        do {
+            if ((sc = *spanp++) == c) {
+                if (c == 0)
+                    s = NULL;
+                else
+                    s[-1] = 0;
+                *stringp = s;
+                return (tok);
+            }
+        } while (sc != 0);
+    }
+    /* NOTREACHED */
+}
+
 // implement APIs not supported in time.h in IAR
 #   if !(VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_TIME == ENABLED)
 #       if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED && VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
