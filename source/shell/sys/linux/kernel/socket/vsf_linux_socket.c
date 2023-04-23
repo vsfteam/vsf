@@ -269,6 +269,7 @@ struct servent * getservent(void)
 
 struct hostent * gethostbyname(const char *name)
 {
+#if VSF_LINUX_SOCKET_USE_INET == ENABLED
     static struct hostent __hostent;
     static char * __h_addr_list[2];
     static in_addr_t __addr;
@@ -286,6 +287,9 @@ struct hostent * gethostbyname(const char *name)
     __hostent.h_length = 4;
     __hostent.h_addr_list = (char **)&__h_addr_list;
     return &__hostent;
+#else
+    return NULL;
+#endif
 }
 
 int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
@@ -719,7 +723,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_ifaddrs_vplt_t vsf_linux_ifaddrs_vplt = {
 #endif
 #endif
 
-#if VSF_LINUX_APPLET_USE_NETDB == ENABLED && !defined(__VSF_APPLET__)
+#if VSF_LINUX_SOCKET_USE_INET == ENABLED
+#   if VSF_LINUX_APPLET_USE_NETDB == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_netdb_vplt_t, 0, 0, true),
 
@@ -732,6 +737,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(herror),
     VSF_APPLET_VPLT_ENTRY_FUNC(hstrerror),
 };
+#   endif
 #endif
 
 #if VSF_LINUX_APPLET_USE_SYS_SOCKET == ENABLED && !defined(__VSF_APPLET__)
@@ -748,14 +754,17 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_socket_vplt_t vsf_linux_sys_socket_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(listen),
     VSF_APPLET_VPLT_ENTRY_FUNC(recv),
     VSF_APPLET_VPLT_ENTRY_FUNC(recvmsg),
-    VSF_APPLET_VPLT_ENTRY_FUNC(recvfrom),
     VSF_APPLET_VPLT_ENTRY_FUNC(send),
     VSF_APPLET_VPLT_ENTRY_FUNC(sendmsg),
-    VSF_APPLET_VPLT_ENTRY_FUNC(sendto),
     VSF_APPLET_VPLT_ENTRY_FUNC(shutdown),
     VSF_APPLET_VPLT_ENTRY_FUNC(socket),
     // TODO: add socketpair if supported
     VSF_APPLET_VPLT_ENTRY_FUNC(socketpair),
+
+#   if VSF_LINUX_SOCKET_USE_INET == ENABLED
+    VSF_APPLET_VPLT_ENTRY_FUNC(recvfrom),
+    VSF_APPLET_VPLT_ENTRY_FUNC(sendto),
+#   endif
 };
 #endif
 
