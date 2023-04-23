@@ -203,7 +203,6 @@ vsf_err_t vsf_drv_usr_swi_init( uint_fast8_t idx,
 void vsf_drv_usr_swi_trigger(   uint_fast8_t idx)
 {
     if (idx < VSF_DEV_SWI_NUM) {
-        __hpm_swi_t *swi = &__hpm_swi[VSF_ARCH_SWI_NUM + idx];
         __plic_set_irq_pending(HPM_PLIC_BASE, __hpm_swi_irq[idx]);
         return;
     }
