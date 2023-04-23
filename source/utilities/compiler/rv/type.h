@@ -93,3 +93,23 @@ typedef int_fast8_t         intalu_t;
 
 /*============================ Multiple-Entry ================================*/
 #include "../__common/__type.h"
+
+#if __IS_COMPILER_GCC__
+
+#ifndef __APPLET__
+
+// gcc use __builtin_alloca
+#   define alloca           __builtin_alloca
+
+// gcc has no strcasestr
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern char * strcasestr(const char *str, const char *substr);
+#ifdef __cplusplus
+}
+#endif
+
+#endif      // __APPLET__
+
+#endif
