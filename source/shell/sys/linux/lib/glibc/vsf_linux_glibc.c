@@ -182,6 +182,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(erfcf),
     VSF_APPLET_VPLT_ENTRY_FUNC(log2f),
     VSF_APPLET_VPLT_ENTRY_FUNC(hypotf),
+    VSF_APPLET_VPLT_ENTRY_FUNC(frexpf),
+
+#if VSF_LINUX_APPLET_LIBC_MATH_LONG_DOULBE == ENABLED
     VSF_APPLET_VPLT_ENTRY_FUNC(atanl),
     VSF_APPLET_VPLT_ENTRY_FUNC(cosl),
     VSF_APPLET_VPLT_ENTRY_FUNC(sinl),
@@ -234,8 +237,6 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(lgammal),
     VSF_APPLET_VPLT_ENTRY_FUNC(erfl),
     VSF_APPLET_VPLT_ENTRY_FUNC(erfcl),
-
-    VSF_APPLET_VPLT_ENTRY_FUNC(frexpf),
     VSF_APPLET_VPLT_ENTRY_FUNC(log10l),
     VSF_APPLET_VPLT_ENTRY_FUNC(tanhl),
     VSF_APPLET_VPLT_ENTRY_FUNC(modfl),
@@ -243,6 +244,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(floorl),
     VSF_APPLET_VPLT_ENTRY_FUNC(acosl),
     VSF_APPLET_VPLT_ENTRY_FUNC(asinl),
+#endif
 };
 #endif
 

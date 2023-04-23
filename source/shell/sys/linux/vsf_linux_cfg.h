@@ -316,6 +316,9 @@
 #       ifndef VSF_LINUX_APPLET_USE_LIBC_MATH
 #           define VSF_LINUX_APPLET_USE_LIBC_MATH   ENABLED
 #       endif
+#       if (VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED) && !defined(VSF_LINUX_APPLET_LIBC_MATH_LONG_DOULBE)
+#           define VSF_LINUX_APPLET_LIBC_MATH_LONG_DOULBE   ENABLED
+#       endif
 #   endif
 
 #   ifndef VSF_LINUX_APPLET_VPLT
