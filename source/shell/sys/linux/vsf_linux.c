@@ -658,12 +658,13 @@ int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char
 void __vsf_linux_process_free_arg(vsf_linux_process_t *process)
 {
     vsf_linux_process_arg_t *arg = &process->ctx.arg;
-    if (arg->is_dyn_argv) {
-        arg->is_dyn_argv = false;
+    if (arg->argv != NULL) {
         for (int i = 0; i < arg->argc; i++) {
             __free_ex(process, (void *)arg->argv[i]);
             arg->argv[i] = NULL;
         }
+        __free_ex(process, arg->argv);
+        arg->argv = NULL;
     }
 }
 
@@ -673,16 +674,26 @@ int __vsf_linux_process_parse_arg(vsf_linux_process_t *process, vsf_linux_proces
         arg = &process->ctx.arg;
     }
 
-    arg->is_dyn_argv = true;
     arg->argc = 0;
-    while ((*argv != NULL) && (arg->argc <= VSF_LINUX_CFG_MAX_ARG_NUM)) {
-        arg->argv[arg->argc] = __strdup_ex(process, *argv);
-        if (NULL == arg->argv[arg->argc]) {
-            vsf_trace_error("linux: fail to allocate space for %s" VSF_TRACE_CFG_LINEEND, *argv);
+    char * const * argv_tmp = argv;
+    while (*argv_tmp != NULL) {
+        arg->argc++;
+        argv_tmp++;
+    }
+    if (arg->argc > 0) {
+        arg->argv = __malloc_ex(process, (arg->argc + 1) * sizeof(argv[0]));
+        if (NULL == arg->argv) {
             return -1;
         }
-        arg->argc++;
-        argv++;
+
+        arg->argv[arg->argc] = NULL;
+        for (int i = 0; i < arg->argc; i++, argv++) {
+            arg->argv[i] = __strdup_ex(process, *argv);
+            if (NULL == arg->argv[i]) {
+                vsf_trace_error("linux: fail to allocate space for %s" VSF_TRACE_CFG_LINEEND, *argv);
+                return -1;
+            }
+        }
     }
     return 0;
 }
@@ -1540,9 +1551,15 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
         }
     }
 
-    vsf_linux_process_arg_t arg = ctx->arg;
+    char *argv[ctx->arg.argc + 1];
+    if (ctx->arg.argv != NULL) {
+        memcpy(argv, ctx->arg.argv, (ctx->arg.argc + 1) * sizeof(argv[0]));
+    } else {
+        argv[0] = NULL;
+    }
+
     VSF_LINUX_ASSERT(ctx->entry != NULL);
-    thread->retval = ((int (*)(int, char **, char **))ctx->entry)(arg.argc, (char **)arg.argv, process->__environ);
+    thread->retval = ((int (*)(int, char **, char **))ctx->entry)(ctx->arg.argc, argv, process->__environ);
 
     vsf_linux_exit_process(thread->retval, false);
 }
@@ -1909,15 +1926,29 @@ exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, 
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     vsf_linux_thread_t *thread;
     const char *args;
+    va_list ap2;
 
     __vsf_linux_process_free_arg(process);
 
-    ctx->arg.argc = 1;
-    ctx->arg.argv[0] = (const char *)__strdup_ex(process, arg);
+    va_copy(ap2, ap);
     args = va_arg(ap, const char *);
-    while ((args != NULL) && (ctx->arg.argc <= VSF_LINUX_CFG_MAX_ARG_NUM)) {
-        ctx->arg.argv[ctx->arg.argc++] = (const char *)__strdup_ex(process, args);
+    while (args != NULL) {
+        ctx->arg.argc++;
         args = va_arg(ap, const char *);
+    }
+    ctx->arg.argc += 1;
+
+    ctx->arg.argv = __malloc_ex(process, (ctx->arg.argc + 1) * sizeof(char *));
+    if (NULL == ctx->arg.argv) {
+        return -1;
+    }
+
+    ctx->arg.argv[0] = (const char *)__strdup_ex(process, arg);
+    ctx->arg.argv[ctx->arg.argc] = NULL;
+    args = va_arg(ap2, const char *);
+    for (int i = 1; i < ctx->arg.argc; i++) {
+        ctx->arg.argv[i] = (const char *)__strdup_ex(process, args);
+        args = va_arg(ap2, const char *);
     }
     ctx->entry = entry;
 

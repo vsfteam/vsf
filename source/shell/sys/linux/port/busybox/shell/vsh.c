@@ -346,7 +346,6 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
     }
     ctx->entry = entry;
     ctx->arg.argv[ctx->arg.argc++] = arg_expanded;
-    ctx->arg.is_dyn_argv = true;
 
     char *nextnext;
     bool is_out, is_append;

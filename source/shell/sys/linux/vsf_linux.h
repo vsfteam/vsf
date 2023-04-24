@@ -61,10 +61,6 @@ extern "C" {
 #   error VSF_USE_SIMPLE_STREAM MUST be enabled to use vsf_linux
 #endif
 
-#ifndef VSF_LINUX_CFG_MAX_ARG_NUM
-#   define VSF_LINUX_CFG_MAX_ARG_NUM        31
-#endif
-
 #ifndef VSF_LINUX_CFG_STACKSIZE
 #   if defined(VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE) && defined(VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE)
 #       if (VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE + VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE) < 1024
@@ -97,8 +93,7 @@ vsf_dcl_class(vsf_linux_thread_t)
 
 typedef struct vsf_linux_process_arg_t {
     int argc;
-    char const *argv[VSF_LINUX_CFG_MAX_ARG_NUM + 1];
-    bool is_dyn_argv;
+    char const **argv;
 } vsf_linux_process_arg_t;
 
 typedef int (*vsf_linux_main_entry_t)(int, char **);
