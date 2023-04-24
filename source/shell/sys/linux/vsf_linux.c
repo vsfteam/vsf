@@ -106,6 +106,11 @@
 #else
 #   include <stdio.h>
 #endif
+#if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_CTYPE == ENABLED
+#   include "./include/simple_libc/ctype.h"
+#else
+#   include <ctype.h>
+#endif
 
 #include "./kernel/fs/vsf_linux_fs.h"
 
@@ -1660,7 +1665,7 @@ static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd,
     int exefd = -1, pathlen;
     uint_fast32_t feature;
 
-    if (NULL == path) {
+    if ((NULL == path) || (strchr(cmd, '\\') || strchr(cmd, '/'))) {
         pathname = cmd;
         path = "";
         goto try_open;
@@ -1690,6 +1695,24 @@ static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd,
                     }
                     break;
                 } else {
+#if VSF_LINUX_USE_SCRIPT == ENABLED
+                    char head[2];
+                    ssize_t headlen = read(exefd, head, sizeof(head));
+                    if (headlen != sizeof(head)) {
+                        close(exefd);
+                        exefd = -1;
+                    }
+                    lseek(exefd, 0, SEEK_SET);
+
+                    if ((head[0] == '#') && (head[1] == '!')) {
+                        if (entry != NULL) {
+                            int __vsf_linux_script_main(int argc, char **argv);
+                            *entry = __vsf_linux_script_main;
+                        }
+                        break;
+                    }
+#endif
+
 #if VSF_LINUX_USE_APPLET == ENABLED
                     if (entry != NULL) {
                         int __vsf_linux_dynloader_main(int argc, char **argv);
@@ -1753,6 +1776,38 @@ const char * find_in_given_path(const char *progname, const char *path, const ch
     close(fd);
     return strdup(fullpath);
 }
+
+#if VSF_LINUX_USE_SCRIPT == ENABLED
+int __vsf_linux_script_main(int argc, char **argv)
+{
+    int fd = __vsf_linux_get_exe_path(NULL, 0, argv[0], NULL, getenv("PATH"));
+    VSF_LINUX_ASSERT(fd >= 0);
+
+    char head[32];
+    ssize_t headlen = read(fd, head, sizeof(head) - 1);
+    close(fd);
+
+    if ((headlen < 3) || (head[0] != '#') || (head[1] != '!') || isspace(head[2])) {
+        printf("invalid script file %s\n", argv[0]);
+        return -1;
+    }
+
+    head[headlen] = '\0';
+    for (int i = 3; i < headlen; i++) {
+        if (isspace(head[i])) {
+            head[i] = '\0';
+            break;
+        }
+    }
+
+    char *shell_argv[argc + 2];
+    shell_argv[0] = &head[2];
+    memcpy(&shell_argv[1], argv, (1 + argc) * sizeof(argv[0]));
+    execvp((const char *)shell_argv[0], (char * const *)shell_argv);
+    printf("failed to call %s\n", argv[0]);
+    return -1;
+}
+#endif
 
 #if VSF_LINUX_USE_APPLET == ENABLED
 int __vsf_linux_dynloader_main(int argc, char **argv)
