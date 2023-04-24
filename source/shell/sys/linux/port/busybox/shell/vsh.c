@@ -298,7 +298,7 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
     vsf_linux_main_entry_t entry;
     char *env[2], *arg_expanded;
     vsf_linux_process_ctx_t *ctx;
-    int redir_state = -1, redir_mask = 0, fd_err = -1;
+    int redir_state = -1, redir_mask = 0, fd_err = -1, argc_allocated = 16;
 
     // skip spaces
     while ((*cmd != '\0') && isspace((int)*cmd)) { cmd++; }
@@ -345,12 +345,16 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
         goto delete_process_and_fail;
     }
     ctx->entry = entry;
+    ctx->arg.argv = __malloc_ex(process, (argc_allocated + 1) * sizeof(ctx->arg.argv[0]));
+    if (NULL == ctx->arg.argv) {
+        goto delete_process_and_fail;
+    }
     ctx->arg.argv[ctx->arg.argc++] = arg_expanded;
 
     char *nextnext;
     bool is_out, is_append;
     int redir_fd, cur_redir_mask;
-    while ((*next != '\0') && (ctx->arg.argc < dimof(ctx->arg.argv))) {
+    while (*next != '\0') {
         nextnext = __vsh_get_next_arg(&next);
         arg_expanded = __vsh_expand_arg(process, next);
         if (arg_expanded == next) {
@@ -440,10 +444,18 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
             }
             __free_ex(process, arg_expanded);
         } else {
+            if (ctx->arg.argc == argc_allocated) {
+                argc_allocated <<= 1;
+                ctx->arg.argv = __realloc_ex(process, ctx->arg.argv, (argc_allocated + 1) * sizeof(ctx->arg.argv[0]));
+                if (NULL == ctx->arg.argv) {
+                    goto delete_process_and_fail;
+                }
+            }
             ctx->arg.argv[ctx->arg.argc++] = arg_expanded;
         }
         next = nextnext;
     }
+    ctx->arg.argv[ctx->arg.argc] = NULL;
 
     extern int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
                 const vsf_linux_fd_op_t *op, int fd_desired, vsf_linux_fd_priv_t *priv);
