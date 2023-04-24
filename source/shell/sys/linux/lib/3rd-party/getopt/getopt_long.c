@@ -70,6 +70,10 @@ static void __getopt_mod_init(void *ctx)
 	getopt_mod_ctx->__opterr = 1;
 	getopt_mod_ctx->__optind = 1;
 	getopt_mod_ctx->__optopt = '?';
+	getopt_mod_ctx->__place = "";
+	getopt_mod_ctx->__nonopt_start = -1;
+	getopt_mod_ctx->__nonopt_end = -1;
+	getopt_mod_ctx->getopt_internal.__posixly_correct = -1;
 }
 const vsf_linux_dynlib_mod_t __getopt_long_mod = {
 	.lib_idx			= &__getopt_lib_idx,
@@ -114,11 +118,17 @@ static int parse_long_options(char * const *, const char *,
 static int gcd(int, int);
 static void permute_args(int, int, int, char * const *);
 
+#if VSF_LINUX_USE_GETOPT == ENABLED
+#   define place (getopt_ctx->__place)
+#   define nonopt_start (getopt_ctx->__nonopt_start)
+#   define nonopt_end (getopt_ctx->__nonopt_end)
+#else
 static char *place = EMSG; /* option letter processing */
 
 /* XXX: set optreset to 1 rather than these two */
 static int nonopt_start = -1; /* first non option argument (for permute) */
 static int nonopt_end = -1;   /* first option after non options (for permute) */
+#endif
 
 /* Error messages */
 static const char recargchar[] = "option requires an argument -- %c";
@@ -317,7 +327,11 @@ getopt_internal(int nargc, char * const *nargv, const char *options,
 {
 	char *oli;				/* option letter list index */
 	int optchar, short_too;
+#if VSF_LINUX_USE_GETOPT == ENABLED
+#   define posixly_correct (getopt_ctx->getopt_internal.__posixly_correct)
+#else
 	static int posixly_correct = -1;
+#endif
 
 	if (options == NULL)
 		return (-1);
@@ -491,6 +505,9 @@ start:
 	}
 	/* dump back option letter */
 	return (optchar);
+#if VSF_LINUX_USE_GETOPT == ENABLED
+#   undef posixly_correct
+#endif
 }
 
 /*
