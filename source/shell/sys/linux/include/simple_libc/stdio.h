@@ -101,23 +101,6 @@ extern "C" {
 #define fprintf             VSF_LINUX_LIBC_WRAPPER(fprintf)
 #endif
 
-#define getc_unlocked       getc
-#define getchar_unlocked    getchar
-#define putc_unlocked       putc
-#define putchar_unlocked    putchar
-#define clearerr_unlocked   clearerr
-#define feof_unlocked       feof
-#define ferror_unlocked     ferror
-#define fileno_unlocked     fileno
-#define fflush_unlocked     fflush
-#define fgetc_unlocked      fgetc
-#define fputc_unlocked      fputc
-#define fread_unlocked      fread
-#define fwrite_unlocked     fwrite
-#define fgets_unlocked      fgets
-#define fputs_unlocked      fputs
-#define fopen64             fopen
-
 typedef off64_t             fpos_t;
 typedef off64_t             fpos64_t;
 
@@ -596,7 +579,7 @@ int putc(int ch, FILE *f);
 int ungetc(int c, FILE *f);
 int puts(const char *str);
 int fputs(const char *str, FILE *f);
-char *fgets(char *str, int n, FILE *f);
+char * fgets(char *str, int n, FILE *f);
 
 int scanf(const char *format, ...);
 int vscanf(const char *format, va_list ap);
@@ -658,6 +641,57 @@ int remove(const char *filename);
 FILE * tmpfile(void);
 char * tmpnam(char *str);
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STDIO
+
+// use static inline for unlocked APIs for better compatibility
+//  MACROs will have side effects
+static inline int getc_unlocked(FILE *f) {
+    return getc(f);
+}
+static inline int getchar_unlocked(void) {
+    return getchar();
+}
+static inline int putc_unlocked(int c, FILE *f){
+    return putc(c, f);
+}
+static inline int putchar_unlocked(int c) {
+    return putchar(c);
+}
+static inline void clearerr_unlocked(FILE *f) {
+    clearerr(f);
+}
+static inline int feof_unlocked(FILE *f) {
+    return feof(f);
+}
+static inline int ferror_unlocked(FILE *f) {
+    return ferror(f);
+}
+static inline int fileno_unlocked(FILE *f) {
+    return fileno(f);
+}
+static inline int fflush_unlocked(FILE *f) {
+    return fflush(f);
+}
+static inline int fgetc_unlocked(FILE *f) {
+    return fgetc(f);
+}
+static inline int fputc_unlocked(int ch, FILE *f) {
+    return fputc(ch, f);
+}
+static inline size_t fread_unlocked(void *ptr, size_t size, size_t nmemb, FILE *f) {
+    return fread(ptr, size, nmemb, f);
+}
+static inline size_t fwrite_unlocked(const void *ptr, size_t size, size_t nmemb, FILE *f) {
+    return fwrite(ptr, size, nmemb, f);
+}
+static inline int fputs_unlocked(const char *str, FILE *f) {
+    return fputs(str, f);
+}
+static inline char * fgets_unlocked(char *str, int n, FILE *f) {
+    return fgets(str, n, f);
+}
+static inline FILE *fopen64(const char *filename, const char *mode) {
+    return fopen(filename, mode);
+}
 
 #if defined(_GNU_SOURCE)
 ssize_t getline(char **lineptr, size_t *n, FILE *f);
