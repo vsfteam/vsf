@@ -193,7 +193,7 @@ VSF_LINUX_APPLET_LIBC_TIME_IMP(strftime, size_t, char *str, size_t maxsize, cons
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(strftime)(str, maxsize, format, tm);
 }
-VSF_LINUX_APPLET_LIBC_TIME_IMP(strptime, char *£¬ const char *str, const char *format, struct tm *tm) {
+VSF_LINUX_APPLET_LIBC_TIME_IMP(strptime, char *, const char *str, const char *format, struct tm *tm) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(strptime)(str, format, tm);
 }
