@@ -324,7 +324,7 @@
 #   ifndef VSF_LINUX_APPLET_VPLT
 #       if VSF_USE_APPLET == ENABLED
 #           define VSF_LINUX_APPLET_VPLT                                        \
-                ((vsf_linux_vplt_t *)(VSF_APPLET_VPLT->linux))
+                ((vsf_linux_vplt_t *)(VSF_APPLET_VPLT->linux_vplt))
 #       else
 #           define VSF_LINUX_APPLET_VPLT                                        \
                 ((vsf_linux_vplt_t *)vsf_vplt((void *)0))
