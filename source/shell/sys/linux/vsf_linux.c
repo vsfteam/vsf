@@ -1683,7 +1683,11 @@ static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd,
     uint_fast32_t feature;
 
     if ((NULL == path) || (strchr(cmd, '\\') || strchr(cmd, '/'))) {
-        pathname = cmd;
+        if (pathname != NULL) {
+            strncpy(pathname, cmd, pathname_len);
+        } else {
+            pathname = cmd;
+        }
         path = "";
         goto try_open;
     } else if (NULL == pathname) {
