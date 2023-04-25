@@ -1811,7 +1811,7 @@ int __vsf_linux_script_main(int argc, char **argv)
 
     head[headlen] = '\0';
     for (int i = 3; i < headlen; i++) {
-        if (isspace(head[i])) {
+        if ((head[i] == '\n') || (head[i] == '\r')) {
             head[i] = '\0';
             break;
         }
