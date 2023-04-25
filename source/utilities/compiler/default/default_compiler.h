@@ -22,7 +22,7 @@
 
 #include "./default_compiler_detect.h"
 
-#if !__IS_COMPILER_LLVM__ && !__IS_COMPILER_GCC__
+#if !__IS_COMPILER_LLVM__ && !__IS_COMPILER_GCC__ && !__IS_COMPILER_TCC__
 #   error compiler not supported
 #endif
 
