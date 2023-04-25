@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 #ifndef VSF_LINUX_SYSNAME
-#   define VSF_LINUX_SYSNAME    "vsf"
+#   define VSF_LINUX_SYSNAME    "Linux"
 #endif
 #ifndef VSF_LINUX_RELEASE
 #   define VSF_LINUX_RELEASE    "0.1.0"
