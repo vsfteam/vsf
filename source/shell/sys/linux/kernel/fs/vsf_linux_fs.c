@@ -3072,17 +3072,11 @@ struct mntent * getmntent_r(FILE *stream, struct mntent *mntbuf, char *buf, int 
     return (struct mntent *)NULL;
 }
 
-// fnmatch
-
-int fnmatch(const char *pattern, const char *string, int flags)
-{
-    return -1;
-}
-
 // glob
 
 int glob(const char *path, int flags, int (*errfunc)(const char *path, int err), glob_t *g)
 {
+    VSF_LINUX_ASSERT(false);
     return -1;
 }
 
