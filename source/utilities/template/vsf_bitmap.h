@@ -110,6 +110,12 @@ extern "C" {
 #define vsf_bitmap_clear(__bitmap_ptr, __bit)                                   \
             __vsf_bitmap_clear((uintalu_t *)(__bitmap_ptr), (__bit))
 
+#define vsf_bitmap_set_range(__bitmap_ptr, __begin_bit, __end_bit)              \
+            __vsf_bitmap_range_assign((uintalu_t *)(__bitmap_ptr), (__begin_bit), (__end_bit), 1)
+
+#define vsf_bitmap_clear_range(__bitmap_ptr, __begin_bit, __end_bit)            \
+            __vsf_bitmap_range_assign((uintalu_t *)(__bitmap_ptr), (__begin_bit), (__end_bit), 0)
+
 #define vsf_bitmap_reset(__bitmap_ptr, __bit_size)                              \
             memset(__bitmap_ptr, 0, ((uint_fast32_t)__bit_size + 7) >> 3);
 
@@ -124,8 +130,9 @@ extern "C" {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern int_fast32_t __vsf_bitmap_ffz(uintalu_t * bitmap_ptr, int_fast32_t bit_size);
-extern int_fast32_t __vsf_bitmap_ffs(uintalu_t * bitmap_ptr, int_fast32_t bit_size);
+extern void __vsf_bitmap_range_assign(uintalu_t *bitmap_ptr, int_fast32_t begin_bit, int_fast32_t end_bit, int_fast32_t value);
+extern int_fast32_t __vsf_bitmap_ffz(uintalu_t *bitmap_ptr, int_fast32_t bit_size);
+extern int_fast32_t __vsf_bitmap_ffs(uintalu_t *bitmap_ptr, int_fast32_t bit_size);
 
 #ifdef __cplusplus
 }

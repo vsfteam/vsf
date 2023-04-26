@@ -33,6 +33,25 @@ extern int_fast8_t __vsf_arch_ffs(uintalu_t);
 
 /*============================ IMPLEMENTATION ================================*/
 
+void __vsf_bitmap_range_assign(uintalu_t *bitmap_ptr, int_fast32_t begin_bit, int_fast32_t end_bit, int_fast32_t value)
+{
+    int_fast32_t bits = end_bit + 1 - begin_bit, maxbits_per_round = __optimal_bit_sz;
+    int_fast32_t offset = begin_bit & __optimal_bit_msk, curbits;
+    uintalu_t value_mask = value ? (uintalu_t)0 - 1 : 0, cur_mask;
+    uintalu_t *ptr = &bitmap_ptr[begin_bit / maxbits_per_round];
+
+    while (bits > 0) {
+        curbits = vsf_min(bits, maxbits_per_round - offset);
+        cur_mask = value_mask >> (maxbits_per_round - curbits);
+        cur_mask <<= offset;
+
+        *ptr &= ~cur_mask;
+        *ptr++ |= value_mask & cur_mask;
+        bits -= curbits;
+        offset = 0;
+    }
+}
+
 int_fast32_t __vsf_bitmap_ffz(uintalu_t *bitmap_ptr, int_fast32_t bit_size)
 {
     int_fast32_t word_size =    (bit_size + (int_fast32_t)__optimal_bit_sz - 1) 
