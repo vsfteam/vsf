@@ -843,25 +843,22 @@ int vsf_linux_fd_set_size(int fd, uint64_t size)
     return -1;
 }
 
-static int __vsf_linux_fd_add_ex(vsf_linux_process_t *process, vsf_linux_fd_t *sfd, int fd_desired)
+static int __vsf_linux_fd_add_ex(vsf_linux_process_t *process, vsf_linux_fd_t *sfd, int fd_min)
 {
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
     }
 
+    vsf_bitmap(vsf_linux_fd_bitmap) fd_bitmap, *bitmap_ptr = &process->fd_bitmap;
     vsf_protect_t orig = vsf_protect_sched();
-        if (fd_desired >= 0) {
-            if (vsf_bitmap_get(&process->fd_bitmap, fd_desired)) {
-                vsf_unprotect_sched(orig);
-                return -1;
-            }
-            vsf_bitmap_set(&process->fd_bitmap, fd_desired);
-            sfd->fd = fd_desired;
-        } else {
-            sfd->fd = vsf_bitmap_ffz(&process->fd_bitmap, VSF_LINUX_CFG_FD_BITMAP_SIZE);
-            VSF_LINUX_ASSERT(sfd->fd >= 0);
-            vsf_bitmap_set(&process->fd_bitmap, sfd->fd);
+        if (fd_min > 0) {
+            memcpy(&fd_bitmap, bitmap_ptr, sizeof(fd_bitmap));
+            vsf_bitmap_set_range(&fd_bitmap, 0, fd_min - 1);
+            bitmap_ptr = &fd_bitmap;
         }
+        sfd->fd = vsf_bitmap_ffz(bitmap_ptr, VSF_LINUX_CFG_FD_BITMAP_SIZE);
+        VSF_LINUX_ASSERT(sfd->fd >= 0);
+        vsf_bitmap_set(&process->fd_bitmap, sfd->fd);
         vsf_dlist_add_to_tail(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
     vsf_unprotect_sched(orig);
 
@@ -869,7 +866,7 @@ static int __vsf_linux_fd_add_ex(vsf_linux_process_t *process, vsf_linux_fd_t *s
 }
 
 int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
-        const vsf_linux_fd_op_t *op, int fd_desired, vsf_linux_fd_priv_t *priv)
+        const vsf_linux_fd_op_t *op, int fd_min, vsf_linux_fd_priv_t *priv)
 {
     int priv_size = ((op != NULL) && (op->priv_size > 0)) ? op->priv_size : sizeof(vsf_linux_fd_priv_t);
     int ret;
@@ -906,7 +903,7 @@ int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
         *sfd = new_sfd;
     }
 
-    ret = __vsf_linux_fd_add_ex(process, new_sfd, fd_desired);
+    ret = __vsf_linux_fd_add_ex(process, new_sfd, fd_min);
     if (ret < 0) {
 free_sfd_and_exit:
         __free_ex(process, new_sfd);
