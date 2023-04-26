@@ -1872,6 +1872,15 @@ int __vsf_linux_dynloader_main(int argc, char **argv)
 }
 #endif
 
+static void __vsf_linux_close_cloexec(vsf_linux_process_t *process)
+{
+    __vsf_dlist_foreach_next_unsafe(vsf_linux_fd_t, fd_node, &process->fd_list) {
+        if (_->fd_flags & FD_CLOEXEC) {
+            close(_->fd);
+        }
+    }
+}
+
 static exec_ret_t __vsf_linux_execvpe(vsf_linux_main_entry_t entry, char * const * argv, char  * const * envp)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
@@ -1884,6 +1893,7 @@ static exec_ret_t __vsf_linux_execvpe(vsf_linux_main_entry_t entry, char * const
     vsf_linux_process_arg_t arg = { 0 };
     __vsf_linux_process_parse_arg(process, &arg, argv);
     __vsf_linux_process_free_arg(process);
+    __vsf_linux_close_cloexec(process);
     process->ctx.arg = arg;
 
     vsf_linux_merge_env(process, (char **)envp);
@@ -1933,6 +1943,7 @@ exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, 
     va_list ap2;
 
     __vsf_linux_process_free_arg(process);
+    __vsf_linux_close_cloexec(process);
 
     va_copy(ap2, ap);
     args = va_arg(ap, const char *);
@@ -3136,11 +3147,9 @@ int __vsf_linux_spawn(pid_t *pid, vsf_linux_main_entry_t entry,
     vsf_linux_fd_t *sfd, *sfd_new;
     vsf_protect_t orig;
     __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &cur_process->fd_list) {
-        if (!(_->fd_flags & FD_CLOEXEC)) {
-            if (__vsf_linux_fd_create_ex(process, &sfd, _->op, _->fd, _->priv) != _->fd) {
-                vsf_trace_error("spawn: failed to dup fd %d", VSF_TRACE_CFG_LINEEND, _->fd);
-                goto delete_process_and_fail;
-            }
+        if (__vsf_linux_fd_create_ex(process, &sfd, _->op, _->fd, _->priv) != _->fd) {
+            vsf_trace_error("spawn: failed to dup fd %d", VSF_TRACE_CFG_LINEEND, _->fd);
+            goto delete_process_and_fail;
         }
     }
 
