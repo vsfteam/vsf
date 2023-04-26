@@ -2165,14 +2165,14 @@ struct dirent * readdir(DIR *dir)
 
 int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    *result = readdir(dirp);
+    return 0;
 }
 
 int readdir64_r(DIR *dirp, struct dirent64 *entry, struct dirent64 **result)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    *result = readdir64(dirp);
+    return 0;
 }
 
 int scandir(const char *dir, struct dirent ***namelist,
@@ -3067,19 +3067,6 @@ struct mntent * getmntent_r(FILE *stream, struct mntent *mntbuf, char *buf, int 
 {
     VSF_LINUX_ASSERT(false);
     return (struct mntent *)NULL;
-}
-
-// glob
-
-int glob(const char *path, int flags, int (*errfunc)(const char *path, int err), glob_t *g)
-{
-    VSF_LINUX_ASSERT(false);
-    return -1;
-}
-
-void globfree(glob_t *g)
-{
-    
 }
 
 #if __IS_COMPILER_GCC__

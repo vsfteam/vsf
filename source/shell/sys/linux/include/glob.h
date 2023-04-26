@@ -4,8 +4,10 @@
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
+#   include "../sys/stat.h"
 #   include "./stddef.h"
 #else
+#   include <sys/stat.h>
 #   include <stddef.h>
 #endif
 

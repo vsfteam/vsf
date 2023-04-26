@@ -132,9 +132,10 @@ VSF全称是Versaloon Software Framework，是一个基于Apache2.0协议的开�
 | AIC8800M_SDK      | source/hal/driver/AIC/AIC8800/vendor                          | aic        | http://www.aicsemi.com/                            |
 | awtk              |                                                               | LGPL 2.1   | https://www.zlg.cn/index/pub/awtk.html             |
 | littlefs          | source/component/3rd-party/littlefs/raw                       | BSD        | https://github.com/littlefs-project/littlefs       |
-| getopt_long       | source/shell/sys/linux/lib/glibc/3rd-party/getopt             | OpenBSD    | https://github.com/openbsd/src                     |
-| regex             | source/shell/sys/linux/lib/glibc/3rd-party/regex              | OpenBSD    | https://github.com/openbsd/src                     |
-| regex             | source/shell/sys/linux/lib/glibc/3rd-party/fnmatch            | BSD        | http://www.jbox.dk/sanos/source/lib/fnmatch.c.html |
+| getopt_long       | source/shell/sys/linux/lib/3rd-party/getopt                   | OpenBSD    | https://github.com/openbsd/src                     |
+| regex             | source/shell/sys/linux/lib/3rd-party/regex                    | OpenBSD    | https://github.com/openbsd/src                     |
+| fnmatch           | source/shell/sys/linux/lib/3rd-party/fnmatch                  | BSD        | http://www.jbox.dk/sanos/source/lib/fnmatch.c.html |
+| glob              | source/shell/sys/linux/lib/3rd-party/glob                     | BSD        | https://github.com/cloudius-systems/musl           |
 | setjmp            | source/hal/arch/x86/win                                       | BSD        |                                                    |
 | libtuv            | source/shell/sys/linux/lib/3rd-party/libtuv/raw               | Apache 2.0 | https://github.com/Samsung/libtuv                  |
 
