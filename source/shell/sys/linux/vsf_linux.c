@@ -1748,6 +1748,9 @@ static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd,
             }
         }
     }
+    if (exefd < 0) {
+        errno = ENOENT;
+    }
     return exefd;
 }
 
@@ -2273,6 +2276,14 @@ static pid_t __vsf_linux_wait_any(int *status, int options)
             vsf_unprotect_sched(orig);
             return (pid_t)0;
         }
+        __vsf_dlist_foreach_unsafe(vsf_linux_process_t, child_node, &cur_process->child_list) {
+            if (0 == _->status) {
+                vsf_unprotect_sched(orig);
+                cur_thread->retval = _->exit_status;
+                cur_thread->pid_exited = _->id.pid;
+                goto done;
+            }
+        }
         if (cur_process->thread_pending_child != NULL) {
             vsf_unprotect_sched(orig);
             return (pid_t)-1;
@@ -2282,6 +2293,7 @@ static pid_t __vsf_linux_wait_any(int *status, int options)
 
     vsf_thread_wfe(VSF_EVT_USER);
 
+done:
     if (status != NULL) {
         *status = cur_thread->retval;
     }
