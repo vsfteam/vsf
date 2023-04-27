@@ -210,12 +210,6 @@ extern void vsf_vplt_fini_array(void *target);
 #       endif
 #   endif
 
-#if VSF_APPLET_MAIN_HAS_ENVP == ENABLED
-extern int main(int, char **, char **);
-#else
-extern int main(int, char **);
-#endif
-
 extern void * vsf_vplt(void *vplt);
 #   define main(...)                                                            \
     applet_entry_with_ctx                                                       \
@@ -227,6 +221,7 @@ extern void * vsf_vplt(void *vplt);
                 return result;                                                  \
             }                                                                   \
         }                                                                       \
+        extern int main(__VA_ARGS__);                                           \
         result = ((int (*)(int, char **, char **))main)(ctx->argc, ctx->argv, ctx->envp);\
         if (applet_fini_array != NULL) {                                        \
             applet_fini_array(ctx->target);                                     \
