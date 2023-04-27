@@ -392,6 +392,10 @@ char * fgets(char *str, int n, FILE *f)
                 sfd->unget_buff = ch;
             }
             break;
+        } else if ('\n' == ch) {
+            *str = ch;
+            cur = str;
+            break;
         }
     }
     if (cur != NULL) {
