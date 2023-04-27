@@ -378,23 +378,15 @@ char * fgets(char *str, int n, FILE *f)
         str++;
         if ('\r' == ch) {
             // check next possible '\n'
-            if (rsize >= n - 1) {
-                break;
-            }
             if (read(fd, &ch, 1) != 1) {
                 break;
             }
-            if ('\n' == ch) {
-                *str = ch;
-                cur = str;
-            } else {
+            if (ch != '\n') {
                 vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
                 sfd->unget_buff = ch;
             }
             break;
         } else if ('\n' == ch) {
-            *str = ch;
-            cur = str;
             break;
         }
     }
