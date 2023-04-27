@@ -4127,6 +4127,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_FINDPROG == ENABLED
 #       include "./include/findprog.h"
 #   endif
+#   if VSF_LINUX_APPLET_USE_GLOB == ENABLED
+#       include "./include/glob.h"
+#   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
 #       define __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
 #       include "./include/simple_libc/setjmp/setjmp.h"
@@ -4181,6 +4184,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_FINDPROG == ENABLED
 #       include <findprog.h>
 #   endif
+#   if VSF_LINUX_APPLET_USE_GLOB == ENABLED
+#       include <glob.h>
+#   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
 #       define __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
 #       include <setjmp/setjmp.h>
@@ -4214,6 +4220,15 @@ __VSF_VPLT_DECORATOR__ vsf_linux_findprog_vplt_t vsf_linux_findprog_vplt = {
 
     VSF_APPLET_VPLT_ENTRY_FUNC(find_in_path),
     VSF_APPLET_VPLT_ENTRY_FUNC(find_in_given_path),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_GLOB == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_glob_vplt_t vsf_linux_glob_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_glob_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(glob),
+    VSF_APPLET_VPLT_ENTRY_FUNC(globfree),
 };
 #endif
 
@@ -4342,6 +4357,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_DLFCN == ENABLED
     .dlfcn_vplt         = (void *)&vsf_linux_dlfcn_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_GLOB == ENABLED
+    .glob_vplt          = (void *)&vsf_linux_glob_vplt,
 #   endif
 #   if VSF_LINUX_SOCKET_USE_INET == ENABLED && VSF_LINUX_APPLET_USE_NETDB == ENABLED
     .netdb_vplt         = (void *)&vsf_linux_netdb_vplt,
