@@ -185,12 +185,22 @@ typedef struct vsf_applet_ctx_t {
 #       define VSF_APPLET_VPLT              ((vsf_vplt_t *)vsf_vplt((void *)0))
 #   endif
 
-#   ifndef applet_entry
-#       ifdef __WIN__
-#           define applet_entry             _dllstart
+#   ifdef __WIN__
+#       if VSF_APPLET_CFG_ABI_PATCH == ENABLED
+#           define applet_raw_entry                                             \
+                void _dllstart(void)                                            \
+                {                                                               \
+                    _start();                                                   \
+                }
 #       else
-#           define applet_entry             _start
+#           define applet_raw_entry                                             \
+                void _dllstart(vsf_applet_ctx_t *ctx)                           \
+                {                                                               \
+                    _start(ctx);                                                \
+                }
 #       endif
+#   else
+#       define applet_raw_entry
 #   endif
 
 #   ifndef applet_entry_with_ctx
@@ -199,12 +209,12 @@ extern vsf_applet_ctx_t * vsf_applet_ctx(void);
 extern int vsf_vplt_init_array(void *target);
 extern void vsf_vplt_fini_array(void *target);
 #           define applet_entry_with_ctx                                        \
-                applet_entry(void) { vsf_applet_ctx_t *ctx = vsf_applet_ctx();
+                _start(void) { vsf_applet_ctx_t *ctx = vsf_applet_ctx();
 #           define applet_init_array        vsf_vplt_init_array
 #           define applet_fini_array        vsf_vplt_fini_array
 #       else
 #           define applet_entry_with_ctx                                        \
-                applet_entry(vsf_applet_ctx_t *ctx) {
+                _start(vsf_applet_ctx_t *ctx) {
 #           define applet_init_array        ctx->fn_init
 #           define applet_fini_array        ctx->fn_fini
 #       endif
@@ -237,6 +247,7 @@ extern void * vsf_vplt(void *vplt);
         }                                                                       \
         return __vplt;                                                          \
     }                                                                           \
+    applet_raw_entry                                                            \
     int main(__VA_ARGS__)
 #endif
 
