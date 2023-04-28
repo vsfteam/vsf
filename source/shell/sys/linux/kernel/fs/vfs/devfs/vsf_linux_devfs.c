@@ -1525,20 +1525,43 @@ int vsf_linux_fs_bind_gpio_hw(char *path)
 #endif      // VSF_HW_GPIO_COUNT > 0
 #endif      // VSF_HAL_USE_GPIO
 
-__vsf_component_peda_ifs_entry(__vk_devfs_null_write, vk_file_write)
+static ssize_t __vsf_linux_null_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
-    vsf_peda_begin();
-    vsf_eda_return(vsf_local.size);
-    vsf_peda_end();
+    return EOF;
 }
 
-__vsf_component_peda_ifs_entry(__vk_devfs_zero_read, vk_file_read)
+static ssize_t __vsf_linux_null_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
-    vsf_peda_begin();
-    memset(vsf_local.buff, 0, vsf_local.size);
-    vsf_eda_return(vsf_local.size);
-    vsf_peda_end();
+    return count;
 }
+
+static int __vsf_linux_null_stat(vsf_linux_fd_t *sfd, struct stat *buf)
+{
+    buf->st_mode = S_IFCHR;
+    return 0;
+}
+
+static const vsf_linux_fd_op_t __vsf_linux_null_fdop = {
+    .priv_size          = 0,
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
+    .fn_read            = __vsf_linux_null_read,
+    .fn_write           = __vsf_linux_null_write,
+    .fn_stat            = __vsf_linux_null_stat,
+};
+
+static ssize_t __vsf_linux_zero_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    memset(buf, 0, count);
+    return count;
+}
+
+static const vsf_linux_fd_op_t __vsf_linux_zero_fdop = {
+    .priv_size          = 0,
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
+    .fn_read            = __vsf_linux_zero_read,
+    .fn_write           = __vsf_linux_null_write,
+    .fn_stat            = __vsf_linux_null_stat,
+};
 
 int vsf_linux_devfs_init(void)
 {
@@ -1548,17 +1571,15 @@ int vsf_linux_devfs_init(void)
         return err;
     }
 
-    err = vsf_linux_fs_bind_target_ex("dev/null", NULL, NULL,
-                NULL, (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_null_write),
-                VSF_FILE_ATTR_WRITE, 0);
+    err = vsf_linux_fs_bind_target_ex("/dev/null", NULL, &__vsf_linux_null_fdop,
+                NULL, NULL, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
     if (err != 0) {
         fprintf(stderr, "fail to bind /dev/null\r\n");
         return err;
     }
 
-    err = vsf_linux_fs_bind_target_ex("dev/zero", NULL, NULL,
-                (vsf_peda_evthandler_t)vsf_peda_func(__vk_devfs_zero_read), NULL,
-                VSF_FILE_ATTR_READ, 0);
+    err = vsf_linux_fs_bind_target_ex("/dev/zero", NULL, &__vsf_linux_zero_fdop,
+                NULL, NULL, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
     if (err != 0) {
         fprintf(stderr, "fail to bind /dev/zero\r\n");
         return err;
