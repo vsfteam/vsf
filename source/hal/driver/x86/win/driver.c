@@ -158,6 +158,11 @@ static void __vsf_x86_debug_stream_rx_irqhandler(void *arg)
         do {
             ReadConsoleA(GetStdHandle(STD_INPUT_HANDLE), &ch, 1, &rsize, NULL);
         } while (!rsize);
+#if VSF_DEBUG_STREAM_CFG_CR2LF == ENABLED
+        if (ch == '\r') {
+            ch = '\n';
+        }
+#endif
 
         __vsf_arch_irq_start(thread);
             VSF_STREAM_WRITE(&VSF_DEBUG_STREAM_RX, (uint8_t *)&ch, 1);
