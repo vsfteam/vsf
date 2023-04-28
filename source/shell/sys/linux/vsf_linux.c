@@ -1807,25 +1807,31 @@ int __vsf_linux_script_main(int argc, char **argv)
     int fd = __vsf_linux_get_exe_path(NULL, 0, argv[0], NULL, getenv("PATH"));
     VSF_LINUX_ASSERT(fd >= 0);
 
-    char head[32];
+    char head[32], *cmdline;
     ssize_t headlen = read(fd, head, sizeof(head) - 1);
     close(fd);
 
-    if ((headlen < 3) || (head[0] != '#') || (head[1] != '!') || isspace(head[2])) {
+    if ((headlen < 3) || (head[0] != '#') || (head[1] != '!')) {
         printf("invalid script file %s\n", argv[0]);
         return -1;
     }
 
     head[headlen] = '\0';
-    for (int i = 3; i < headlen; i++) {
-        if ((head[i] == '\n') || (head[i] == '\r')) {
-            head[i] = '\0';
+    cmdline = &head[2];
+    for (int i = 2; i < headlen; i++, cmdline++) {
+        if (!isspace(*cmdline)) {
+            break;
+        }
+    }
+    for (char *i = cmdline; *i != '\0'; i++) {
+        if ((*i == '\n') || (*i == '\r')) {
+            *i = '\0';
             break;
         }
     }
 
     char *shell_argv[argc + 2];
-    shell_argv[0] = &head[2];
+    shell_argv[0] = cmdline;
     memcpy(&shell_argv[1], argv, (1 + argc) * sizeof(argv[0]));
     execvp((const char *)shell_argv[0], (char * const *)shell_argv);
     printf("failed to call %s\n", argv[0]);
