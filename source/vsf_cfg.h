@@ -223,6 +223,9 @@ extern void vsf_vplt_fini_array(void *target);
 #       endif
 #   endif
 
+#ifndef VSF_APPLET_VPLT_ENTRY_DECORATOR
+#   define VSF_APPLET_VPLT_ENTRY_DECORATOR
+#endif
 VSF_APPLET_VPLT_ENTRY_DECORATOR extern void * vsf_vplt(void *vplt);
 #   define main(...)                                                            \
     applet_entry_with_ctx                                                       \
