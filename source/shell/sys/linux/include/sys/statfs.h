@@ -47,7 +47,8 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_statfs_vplt_t vsf_linux_sys_statfs_v
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && defined(__VSF_APPLET_LIB__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SYS_STATFS == ENABLED
+#if     defined(__VSF_APPLET__) && (defined(__VSF_APPLET_LIB__) || defined(__VSF_APPLET_LINUX_SYS_STATFS_LIB__))\
+    &&  VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SYS_STATFS == ENABLED
 
 #ifndef VSF_LINUX_APPLET_SYS_STATFS_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED

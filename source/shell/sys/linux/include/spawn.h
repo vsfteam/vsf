@@ -92,7 +92,8 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_spawn_vplt_t vsf_linux_spawn_vplt;
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && defined(__VSF_APPLET_LIB__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SPAWN == ENABLED
+#if     defined(__VSF_APPLET__) && (defined(__VSF_APPLET_LIB__) || defined(__VSF_APPLET_LINUX_SPAWN_LIB__))\
+    &&  VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SPAWN == ENABLED
 
 #ifndef VSF_LINUX_APPLET_SPAWN_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED

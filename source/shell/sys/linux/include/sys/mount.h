@@ -37,7 +37,8 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_mount_vplt_t vsf_linux_sys_mount_vpl
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && defined(__VSF_APPLET_LIB__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SYS_MOUNT == ENABLED
+#if     defined(__VSF_APPLET__) && (defined(__VSF_APPLET_LIB__) || defined(__VSF_APPLET_LINUX_SYS_MOUNT_LIB__))\
+    &&  VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SYS_MOUNT == ENABLED
 
 #ifndef VSF_LINUX_APPLET_SYS_MOUNT_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED

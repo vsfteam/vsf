@@ -31,7 +31,8 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_capability_vplt_t vsf_linux_sys_capa
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && defined(__VSF_APPLET_LIB__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SYS_CAPABILITY == ENABLED
+#if     defined(__VSF_APPLET__) && (defined(__VSF_APPLET_LIB__) || defined(__VSF_APPLET_LINUX_SYS_CAPABILITY_LIB__))\
+    &&  VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SYS_CAPABILITY == ENABLED
 
 #ifndef VSF_LINUX_APPLET_SYS_CAPABILITY_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED

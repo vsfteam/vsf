@@ -47,7 +47,8 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_semaphore_vplt_t vsf_linux_semaphore_vpl
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && defined(__VSF_APPLET_LIB__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SEMAPHORE == ENABLED
+#if     defined(__VSF_APPLET__) && (defined(__VSF_APPLET_LIB__) || defined(__VSF_APPLET_LINUX_SEMAPHORE_LIB__))\
+    &&  VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SEMAPHORE == ENABLED
 
 #ifndef VSF_LINUX_APPLET_SEMAPHORE_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED

@@ -89,7 +89,7 @@ __VSF_HAL_SWI_NUM and its value must at least be 1.
 #endif
 
 // for vplt
-#ifndef __VSF_VPLT_DECORATE__
+#ifndef __VSF_VPLT_DECORATOR__
 #   define __VSF_VPLT_DECORATOR__               const
 #endif
 typedef union vsf_vplt_info_t {
@@ -223,7 +223,7 @@ extern void vsf_vplt_fini_array(void *target);
 #       endif
 #   endif
 
-extern void * vsf_vplt(void *vplt);
+VSF_APPLET_VPLT_ENTRY_DECORATOR extern void * vsf_vplt(void *vplt);
 #   define main(...)                                                            \
     applet_entry_with_ctx                                                       \
         int result;                                                             \
@@ -241,7 +241,7 @@ extern void * vsf_vplt(void *vplt);
         }                                                                       \
         return result;                                                          \
     }                                                                           \
-    void * vsf_vplt(void *vplt)                                                 \
+    VSF_APPLET_VPLT_ENTRY_DECORATOR void * vsf_vplt(void *vplt)                 \
     {                                                                           \
         static void *__vplt;                                                    \
         if (vplt != (void *)0) {                                                \
