@@ -225,7 +225,7 @@ extern void * vsf_vplt(void *vplt);
     applet_entry_with_ctx                                                       \
         int result;                                                             \
         vsf_vplt(ctx->vplt);                                                    \
-        if (applet_init_array != NULL) {                                        \
+        if (applet_init_array != (void *)0) {                                   \
             result = applet_init_array(ctx->target);                            \
             if (result) {                                                       \
                 return result;                                                  \
@@ -233,7 +233,7 @@ extern void * vsf_vplt(void *vplt);
         }                                                                       \
         extern int main(__VA_ARGS__);                                           \
         result = ((int (*)(int, char **, char **))main)(ctx->argc, ctx->argv, ctx->envp);\
-        if (applet_fini_array != NULL) {                                        \
+        if (applet_fini_array != (void *)0) {                                   \
             applet_fini_array(ctx->target);                                     \
         }                                                                       \
         return result;                                                          \
