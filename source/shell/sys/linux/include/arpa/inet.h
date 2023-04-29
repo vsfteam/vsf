@@ -42,7 +42,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_arpa_inet_vplt_t vsf_linux_arpa_inet_vpl
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
+#if defined(__VSF_APPLET__) && defined(__VSF_APPLET_LIB__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
 
 #ifndef VSF_LINUX_APPLET_ARPA_INET_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED

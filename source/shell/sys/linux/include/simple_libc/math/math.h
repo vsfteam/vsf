@@ -205,7 +205,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vpl
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED
+#if defined(__VSF_APPLET__) && defined(__VSF_APPLET_LIB__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED
 
 #ifndef VSF_LINUX_APPLET_LIBC_MATH_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED

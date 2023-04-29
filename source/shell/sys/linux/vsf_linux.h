@@ -334,7 +334,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_v
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_USE_APPLET == ENABLED
+#if defined(__VSF_APPLET__) && defined(__VSF_APPLET_LIB__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_USE_APPLET == ENABLED
 
 #ifndef VSF_LINUX_APPLET_FUNDMENTAL_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED

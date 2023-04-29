@@ -67,7 +67,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_dirent_vplt_t vsf_linux_dirent_vplt;
 #   endif
 #endif
 
-#if defined(__VSF_APPLET__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_DIRENT == ENABLED
+#if defined(__VSF_APPLET__) && defined(__VSF_APPLET_LIB__) && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_DIRENT == ENABLED
 
 #ifndef VSF_LINUX_APPLET_DIRENT_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
