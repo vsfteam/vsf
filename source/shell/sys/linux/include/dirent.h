@@ -33,14 +33,14 @@ struct dirent {
     off_t d_off;
     unsigned short d_reclen;
     unsigned char d_type;
-    char *d_name;
+    char d_name[256];
 };
 struct dirent64 {
     ino64_t d_ino;
     off64_t d_off;
     unsigned short d_reclen;
     unsigned char d_type;
-    char *d_name;
+    char d_name[256];
 };
 typedef struct vsf_linux_fd_t DIR;
 

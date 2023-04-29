@@ -1884,9 +1884,11 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
 off64_t lseek64(int fd, off64_t offset, int whence)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-    VSF_LINUX_ASSERT(sfd->op == &__vsf_linux_fs_fdop);
-    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    if (sfd->op != &__vsf_linux_fs_fdop) {
+        return (off64_t)-1;
+    }
 
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     vk_file_seek(priv->file, offset, whence);
     return vk_file_tell(priv->file);
 }
@@ -2117,23 +2119,18 @@ struct dirent64 * readdir64(DIR *dir)
     vk_file_t *file = priv->file, *child;
     off_t offset = vk_file_tell(file);
 
-    if (priv->child != NULL) {
-        vk_file_close(priv->child);
-        priv->child = NULL;
-    }
-
-    vk_file_open(file, NULL, &priv->child);
-    if (NULL == priv->child) {
+    vk_file_open(file, NULL, &child);
+    if (NULL == child) {
         return NULL;
     }
     priv->dir64.d_ino++;
 
-    child = priv->child;
-    priv->dir64.d_name = child->name;
+    strncpy(priv->dir64.d_name, child->name, sizeof(priv->dir.d_name));
     priv->dir64.d_off = offset;
     priv->dir64.d_reclen = sizeof(struct dirent);
     priv->dir64.d_type = child->attr & VSF_FILE_ATTR_DIRECTORY ? DT_DIR :
                 child->attr & VSF_FILE_ATTR_EXECUTE ? DT_EXE : DT_REG;
+    vk_file_close(child);
     return &priv->dir64;
 }
 
@@ -2143,23 +2140,18 @@ struct dirent * readdir(DIR *dir)
     vk_file_t *file = priv->file, *child;
     off_t offset = vk_file_tell(file);
 
-    if (priv->child != NULL) {
-        vk_file_close(priv->child);
-        priv->child = NULL;
-    }
-
-    vk_file_open(file, NULL, &priv->child);
-    if (NULL == priv->child) {
+    vk_file_open(file, NULL, &child);
+    if (NULL == child) {
         return NULL;
     }
     priv->dir.d_ino++;
 
-    child = priv->child;
-    priv->dir.d_name = child->name;
+    strncpy(priv->dir.d_name, child->name, sizeof(priv->dir.d_name));
     priv->dir.d_off = offset;
     priv->dir.d_reclen = sizeof(struct dirent);
     priv->dir.d_type = child->attr & VSF_FILE_ATTR_DIRECTORY ? DT_DIR :
                 child->attr & VSF_FILE_ATTR_EXECUTE ? DT_EXE : DT_REG;
+    vk_file_close(child);
     return &priv->dir;
 }
 
@@ -2196,13 +2188,11 @@ int scandir(const char *dir, struct dirent ***namelist,
             return -1;
         }
 
-        n = malloc(sizeof(struct dirent) + strlen(d->d_name) + 1);
+        n = malloc(sizeof(struct dirent));
         if (NULL == n) {
             break;
         }
         *n = *d;
-        n->d_name = (char *)&n[1];
-        strcpy(n->d_name, d->d_name);
 
         result[cnt - 1] = n;
     }
@@ -2247,12 +2237,6 @@ void rewinddir(DIR *dir)
 
 int closedir(DIR *dir)
 {
-    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)dir->priv;
-
-    if (priv->child != NULL) {
-        vk_file_close(priv->child);
-        priv->child = NULL;
-    }
     return close(dir->fd);
 }
 

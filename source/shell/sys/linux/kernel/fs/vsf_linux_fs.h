@@ -139,7 +139,6 @@ typedef struct vsf_linux_fs_priv_t {
         struct dirent dir;
         struct dirent64 dir64;
     };
-    vk_file_t *child;
 } vsf_linux_fs_priv_t;
 
 vsf_dcl_class(vsf_linux_stream_priv_t)
