@@ -477,7 +477,7 @@ VSF_LINUX_APPLET_LIBC_STDIO_IMP(tmpnam, char *, char *str) {
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(tmpnam)(str);
 }
 
-static inline int scanf(const char *format, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR int scanf(const char *format, ...) {
     int result;
     va_list ap;
     va_start(ap, format);
@@ -485,7 +485,7 @@ static inline int scanf(const char *format, ...) {
     va_end(ap);
     return result;
 }
-static inline int fscanf(FILE *f, const char *format, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR int fscanf(FILE *f, const char *format, ...) {
     int result;
     va_list ap;
     va_start(ap, format);
@@ -493,7 +493,7 @@ static inline int fscanf(FILE *f, const char *format, ...) {
     va_end(ap);
     return result;
 }
-static inline int printf(const char *format, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR int printf(const char *format, ...) {
     int result;
     va_list ap;
     va_start(ap, format);
@@ -501,7 +501,7 @@ static inline int printf(const char *format, ...) {
     va_end(ap);
     return result;
 }
-static inline int fprintf(FILE *f, const char *format, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR int fprintf(FILE *f, const char *format, ...) {
     int result;
     va_list ap;
     va_start(ap, format);
@@ -509,15 +509,15 @@ static inline int fprintf(FILE *f, const char *format, ...) {
     va_end(ap);
     return result;
 }
-static inline int dprintf(int fd, const char *format, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR int dprintf(int fd, const char *format, ...) {
     int result;
     va_list ap;
     va_start(ap, format);
-        result = vfprintf(fd, format, ap);
+        result = vdprintf(fd, format, ap);
     va_end(ap);
     return result;
 }
-static inline int sprintf(char *str, const char *format, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR int sprintf(char *str, const char *format, ...) {
     int result;
     va_list ap;
     va_start(ap, format);
@@ -525,7 +525,7 @@ static inline int sprintf(char *str, const char *format, ...) {
     va_end(ap);
     return result;
 }
-static inline int snprintf(char *str, size_t size, const char *format, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR int snprintf(char *str, size_t size, const char *format, ...) {
     int result;
     va_list ap;
     va_start(ap, format);
@@ -533,7 +533,7 @@ static inline int snprintf(char *str, size_t size, const char *format, ...) {
     va_end(ap);
     return result;
 }
-static inline int asprintf(char **strp, const char *format, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR int asprintf(char **strp, const char *format, ...) {
     int result;
     va_list ap;
     va_start(ap, format);
@@ -541,7 +541,7 @@ static inline int asprintf(char **strp, const char *format, ...) {
     va_end(ap);
     return result;
 }
-static inline int snscanf(const char *str, size_t size, const char *format, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR int snscanf(const char *str, size_t size, const char *format, ...) {
     int result;
     va_list ap;
     va_start(ap, format);
@@ -549,7 +549,7 @@ static inline int snscanf(const char *str, size_t size, const char *format, ...)
     va_end(ap);
     return result;
 }
-static inline int sscanf(const char *str, const char *format, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR int sscanf(const char *str, const char *format, ...) {
     int result;
     va_list ap;
     va_start(ap, format);

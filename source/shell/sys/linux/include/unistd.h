@@ -742,7 +742,7 @@ VSF_LINUX_APPLET_UNISTD_IMP(acct, int, const char *filename) {
     return VSF_LINUX_APPLET_UNISTD_ENTRY(acct)(filename);
 }
 
-static inline exec_ret_t execl(const char *pathname, const char *arg, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR exec_ret_t execl(const char *pathname, const char *arg, ...) {
     exec_ret_t ret;
 
     va_list ap;
@@ -751,7 +751,7 @@ static inline exec_ret_t execl(const char *pathname, const char *arg, ...) {
     va_end(ap);
     return ret;
 }
-static inline exec_ret_t execlp(const char *file, const char *arg, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR exec_ret_t execlp(const char *file, const char *arg, ...) {
     int ret;
 
     va_list ap;
