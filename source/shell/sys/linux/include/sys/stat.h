@@ -203,7 +203,7 @@ VSF_LINUX_APPLET_SYS_STAT_IMP(mkfifo, int, const char *pathname, mode_t mode) {
 }
 VSF_LINUX_APPLET_SYS_STAT_IMP(mkfifoat, int, int dirfd, const char *pathname, mode_t mode) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(mkfifo)(dirfd, pathname, mode);
+    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(mkfifoat)(dirfd, pathname, mode);
 }
 VSF_LINUX_APPLET_SYS_STAT_IMP(mknod, int, const char *pathname, mode_t mode, dev_t dev) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
