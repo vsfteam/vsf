@@ -1192,11 +1192,11 @@ void vsf_linux_cleanup_process(vsf_linux_process_t *process)
 #if VSF_LINUX_CFG_PLS_NUM > 0
     for (int i = 0; i < VSF_LINUX_CFG_PLS_NUM; i++) {
         if (vsf_bitmap_get(&__vsf_linux.pls.bitmap, i)) {
-            if (vsf_bitmap_get(&process->pls.dynlib_bitmap, i)) {
-                vsf_linux_dynlib_fini(i);
-            }
             if (process->pls.storage[i].destructor != NULL) {
                 process->pls.storage[i].destructor(process->pls.storage[i].data);
+            }
+            if (vsf_bitmap_get(&process->pls.dynlib_bitmap, i)) {
+                vsf_linux_dynlib_fini(i);
             }
         }
     }
