@@ -137,7 +137,7 @@ typedef struct vsf_vplt_entry_t {
     ((__##__NAME##_prototype_t)((__VPLT)->fn_##__NAME.ptr))
 #if VSF_APPLET_CFG_DEBUG_VPLT == ENABLED
 #   define VSF_APPLET_VPLT_ENTRY_FUNC_TRACE()                                   \
-    vsf_linux_trace(VSF_TRACE_DEBUG, "vplt invoke: %s\n", __FUNCTION__)
+    vsf_linux_trace(4, "vplt invoke: %s\n", __FUNCTION__)
 #else
 #   define VSF_APPLET_VPLT_ENTRY_FUNC_TRACE()
 #endif

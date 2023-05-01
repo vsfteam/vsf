@@ -428,13 +428,6 @@ extern void vsf_linux_process_heap_free(vsf_linux_process_t *process, void *buff
 extern char * vsf_linux_process_heap_strdup(vsf_linux_process_t *process, char *str);
 
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-// can not put in clib headers because of dependency, so put them here
-extern void * ____malloc_ex(vsf_linux_process_t *process, size_t size, const char *file, const char *func, int line);
-extern void * ____calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, const char *file, const char *func, int line);
-extern void __free_ex(vsf_linux_process_t *process, void *ptr);
-extern void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size, const char *file, const char *func, int line);
-extern char * ____strdup_ex(vsf_linux_process_t *process, const char *str, const char *file, const char *func, int line);
-
 #   define __malloc_ex(__process, __size)               ____malloc_ex((__process), (__size), __FILE__, __FUNCTION__, __LINE__)
 #   define __calloc_ex(__process, __n, __size)          ____calloc_ex((__process), (__n), (__size), __FILE__, __FUNCTION__, __LINE__)
 #   define __realloc_ex(__process, __ptr, __size)       ____realloc_ex((__process), (__ptr), (__size), __FILE__, __FUNCTION__, __LINE__)
