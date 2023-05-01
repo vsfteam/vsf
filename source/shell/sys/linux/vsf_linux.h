@@ -129,6 +129,7 @@ typedef struct vsf_linux_dynlib_t {
     uint16_t module_num;
     uint32_t bss_size;
     uint32_t bss_brk;
+    int * lib_idx;
     // just make iar happy, which does not support zla
     void * modules[1];
 } vsf_linux_dynlib_t;
@@ -146,6 +147,10 @@ vsf_class(vsf_linux_trigger_t) {
     )
 #endif
 };
+
+#if VSF_LINUX_CFG_PLS_NUM > 0
+dcl_vsf_bitmap(vsf_linux_pls_bitmap, VSF_LINUX_CFG_PLS_NUM);
+#endif
 
 #if VSF_LINUX_CFG_TLS_NUM > 0
 dcl_vsf_bitmap(vsf_linux_tls_bitmap, VSF_LINUX_CFG_TLS_NUM);
@@ -298,7 +303,10 @@ vsf_class(vsf_linux_process_t) {
         vsf_dlist_node_t child_node;
 
 #if VSF_LINUX_CFG_PLS_NUM > 0
-        vsf_linux_localstorage_t pls[VSF_LINUX_CFG_PLS_NUM];
+        struct {
+            vsf_bitmap(vsf_linux_pls_bitmap) dynlib_bitmap;
+            vsf_linux_localstorage_t storage[VSF_LINUX_CFG_PLS_NUM];
+        } pls;
 #endif
         vsf_heap_t *heap;
 

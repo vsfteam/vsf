@@ -157,10 +157,6 @@ typedef struct vsf_linux_shm_mem_t {
 } vsf_linux_shm_mem_t;
 #endif
 
-#if VSF_LINUX_CFG_PLS_NUM > 0
-dcl_vsf_bitmap(vsf_linux_pls_bitmap, VSF_LINUX_CFG_PLS_NUM);
-#endif
-
 #if VSF_LINUX_CFG_FUTEX_NUM > 0
 typedef struct vsf_linux_futex_t {
     vsf_dlist_node_t node;
@@ -190,6 +186,7 @@ typedef struct vsf_linux_t {
 #if VSF_LINUX_CFG_PLS_NUM > 0
     struct {
         vsf_bitmap(vsf_linux_pls_bitmap) bitmap;
+        uint16_t ref[VSF_LINUX_CFG_PLS_NUM];
     } pls;
 #endif
 
@@ -305,8 +302,25 @@ void vsf_linux_pls_free(int idx)
     vsf_protect_t orig = vsf_protect_sched();
         VSF_LINUX_ASSERT(vsf_bitmap_get(&__vsf_linux.pls.bitmap, idx));
         vsf_bitmap_clear(&__vsf_linux.pls.bitmap, idx);
-        process->pls[idx].data = NULL;
-        process->pls[idx].destructor = NULL;
+        process->pls.storage[idx].data = NULL;
+        process->pls.storage[idx].destructor = NULL;
+    vsf_unprotect_sched(orig);
+}
+
+void vsf_linux_pls_ref(int idx)
+{
+    vsf_protect_t orig = vsf_protect_sched();
+    __vsf_linux.pls.ref[idx]++;
+    vsf_unprotect_sched(orig);
+}
+
+void vsf_linux_pls_deref(int idx)
+{
+    vsf_protect_t orig = vsf_protect_sched();
+    VSF_LINUX_ASSERT(__vsf_linux.pls.ref[idx] > 0);
+    if (!--__vsf_linux.pls.ref[idx]) {
+        vsf_linux_pls_free(idx);
+    }
     vsf_unprotect_sched(orig);
 }
 
@@ -320,7 +334,7 @@ vsf_linux_localstorage_t * vsf_linux_pls_get(int idx)
 
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
-    return &process->pls[idx];
+    return &process->pls.storage[idx];
 }
 
 vsf_err_t vsf_linux_library_init(int *lib_idx, void *lib_ctx, void (*destructor)(void *))
@@ -360,7 +374,7 @@ void * vsf_linux_library_ctx(int lib_idx)
 
 vsf_err_t vsf_linux_dynlib_init(int *lib_idx, int module_num, int bss_size)
 {
-    vsf_linux_dynlib_t *dynlib = calloc(1, sizeof(vsf_linux_dynlib_t) + module_num * sizeof(void *) + bss_size);
+    vsf_linux_dynlib_t *dynlib = calloc(1, sizeof(vsf_linux_dynlib_t) + module_num * sizeof(dynlib->modules[0]) + bss_size);
     if (NULL == dynlib) { return -1; }
 
     dynlib->module_num = module_num;
@@ -369,27 +383,52 @@ vsf_err_t vsf_linux_dynlib_init(int *lib_idx, int module_num, int bss_size)
     if (err != VSF_ERR_NONE) {
         free(dynlib);
     }
+
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    if (process != NULL) {
+        vsf_bitmap_set(&process->pls.dynlib_bitmap, *lib_idx);
+    }
+    vsf_linux_pls_ref(*lib_idx);
     return err;
+}
+
+void vsf_linux_dynlib_fini(int lib_idx)
+{
+    vsf_linux_dynlib_t *dynlib = vsf_linux_library_ctx(lib_idx);
+    if (dynlib != NULL) {
+        if (dynlib->lib_idx != NULL) {
+            *dynlib->lib_idx = -1;
+        }
+        vsf_linux_pls_deref(lib_idx);
+    }
+}
+
+static vsf_linux_dynlib_t * __vsf_linux_dynlib_alloc(const vsf_linux_dynlib_mod_t *mod)
+{
+    int lib_idx = NULL == mod->lib_idx ? 0 : *mod->lib_idx;
+    vsf_linux_dynlib_t *result = vsf_linux_library_ctx(lib_idx);
+    if (result != NULL) {
+        return result;
+    }
+
+    if (vsf_linux_dynlib_init(&lib_idx, mod->module_num, mod->bss_size) < 0) {
+        vsf_trace_error("linux: fail to allocate dynlib" VSF_TRACE_CFG_LINEEND);
+        VSF_LINUX_ASSERT(false);
+        return NULL;
+    }
+    if (mod->lib_idx != NULL) {
+        *mod->lib_idx = lib_idx;
+    }
+    result = vsf_linux_library_ctx(lib_idx);
+    result->lib_idx = mod->lib_idx;
+    return result;
 }
 
 int vsf_linux_dynlib_ctx_set(const vsf_linux_dynlib_mod_t *mod, void *ctx)
 {
     VSF_LINUX_ASSERT(mod != NULL);
-    int lib_idx = NULL == mod->lib_idx ? 0 : *mod->lib_idx;
-    vsf_linux_dynlib_t *dynlib = vsf_linux_library_ctx(lib_idx);
-
-    if (NULL == dynlib) {
-        if (vsf_linux_dynlib_init(&lib_idx, mod->module_num, mod->bss_size) < 0) {
-            vsf_trace_error("linux: fail to allocate dynlib" VSF_TRACE_CFG_LINEEND);
-            VSF_LINUX_ASSERT(false);
-            return -1;
-        }
-        if (mod->lib_idx != NULL) {
-            *mod->lib_idx = lib_idx;
-        }
-        dynlib = vsf_linux_library_ctx(lib_idx);
-        VSF_LINUX_ASSERT(dynlib != NULL);
-    }
+    vsf_linux_dynlib_t *dynlib = __vsf_linux_dynlib_alloc(mod);
+    VSF_LINUX_ASSERT(dynlib != NULL);
     VSF_LINUX_ASSERT(mod->mod_idx < dynlib->module_num);
 
     dynlib->modules[mod->mod_idx] = ctx;
@@ -399,21 +438,8 @@ int vsf_linux_dynlib_ctx_set(const vsf_linux_dynlib_mod_t *mod, void *ctx)
 void * vsf_linux_dynlib_ctx_get(const vsf_linux_dynlib_mod_t *mod)
 {
     VSF_LINUX_ASSERT(mod != NULL);
-    int lib_idx = NULL == mod->lib_idx ? 0 : *mod->lib_idx;
-    vsf_linux_dynlib_t *dynlib = vsf_linux_library_ctx(lib_idx);
-
-    if (NULL == dynlib) {
-        if (vsf_linux_dynlib_init(&lib_idx, mod->module_num, mod->bss_size) < 0) {
-            vsf_trace_error("linux: fail to allocate dynlib" VSF_TRACE_CFG_LINEEND);
-            VSF_LINUX_ASSERT(false);
-            return NULL;
-        }
-        if (mod->lib_idx != NULL) {
-            *mod->lib_idx = lib_idx;
-        }
-        dynlib = vsf_linux_library_ctx(lib_idx);
-        VSF_LINUX_ASSERT(dynlib != NULL);
-    }
+    vsf_linux_dynlib_t *dynlib = __vsf_linux_dynlib_alloc(mod);
+    VSF_LINUX_ASSERT(dynlib != NULL);
     VSF_LINUX_ASSERT(mod->mod_idx < dynlib->module_num);
 
     void *ctx = dynlib->modules[mod->mod_idx];
@@ -1166,8 +1192,11 @@ void vsf_linux_cleanup_process(vsf_linux_process_t *process)
 #if VSF_LINUX_CFG_PLS_NUM > 0
     for (int i = 0; i < VSF_LINUX_CFG_PLS_NUM; i++) {
         if (vsf_bitmap_get(&__vsf_linux.pls.bitmap, i)) {
-            if (process->pls[i].destructor != NULL) {
-                process->pls[i].destructor(process->pls[i].data);
+            if (vsf_bitmap_get(&process->pls.dynlib_bitmap, i)) {
+                vsf_linux_dynlib_fini(i);
+            }
+            if (process->pls.storage[i].destructor != NULL) {
+                process->pls.storage[i].destructor(process->pls.storage[i].data);
             }
         }
     }
