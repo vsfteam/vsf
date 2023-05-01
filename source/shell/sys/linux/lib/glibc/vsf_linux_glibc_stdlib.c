@@ -123,6 +123,15 @@ static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, size_t i, 
     vsf_unprotect_sched(orig);
 }
 
+void __free_ex(vsf_linux_process_t *process, void *ptr)
+{
+    if (ptr != NULL) {
+        size_t *i = (size_t *)((char *)ptr - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN);
+        __vsf_linux_heap_trace_free(process, *i, ptr);
+        vsf_linux_process_heap_free(process, i);
+    }
+}
+
 void * ____malloc_ex(vsf_linux_process_t *process, size_t size, const char *file, const char *func, int line)
 {
     size += VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN;
@@ -162,15 +171,6 @@ void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size, const 
     }
 }
 
-void __free_ex(vsf_linux_process_t *process, void *ptr)
-{
-    if (ptr != NULL) {
-        size_t *i = (size_t *)((char *)ptr - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN);
-        __vsf_linux_heap_trace_free(process, *i, ptr);
-        vsf_linux_process_heap_free(process, i);
-    }
-}
-
 void * ____calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, const char *file, const char *func, int line)
 {
     size_t allsize = n * size;
@@ -179,6 +179,21 @@ void * ____calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, const 
         memset(buf, 0, allsize);
     }
     return buf;
+}
+#else
+void * ____malloc_ex(vsf_linux_process_t *process, size_t size, const char *file, const char *func, int line)
+{
+    return __malloc_ex(process, size);
+}
+
+void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size, const char *file, const char *func, int line)
+{
+    return __realloc_ex(process, p, size);
+}
+
+void * ____calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, const char *file, const char *func, int line)
+{
+    return __calloc_ex(process, n, size);
 }
 #endif
 
@@ -202,38 +217,6 @@ void * aligned_alloc(size_t alignment, size_t size)
     return vsf_linux_process_heap_malloc_aligned(NULL, size, alignment);
 #endif
 }
-
-#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-void * ____malloc(size_t size)
-{
-    return __malloc_ex(NULL, size);
-}
-
-void * ____realloc(void *p, size_t size)
-{
-    return __realloc_ex(NULL, p, size);
-}
-
-void * ____calloc(size_t n, size_t size)
-{
-    return __calloc_ex(NULL, n, size);
-}
-#   else
-void * malloc(size_t size)
-{
-    return __malloc_ex(NULL, size);
-}
-
-void * realloc(void *p, size_t size)
-{
-    return __realloc_ex(NULL, p, size);
-}
-
-void * calloc(size_t n, size_t size)
-{
-    return __calloc_ex(NULL, n, size);
-}
-#   endif
 
 void free(void *p)
 {
@@ -820,34 +803,35 @@ void abort(void)
     VSF_LINUX_ASSERT(false);
 }
 
+#undef malloc
+#undef realloc
+#undef calloc
+void * malloc(size_t size)
+{
+    return __malloc_ex(NULL, size);
+}
+
+void * realloc(void *p, size_t size)
+{
+    return __realloc_ex(NULL, p, size);
+}
+
+void * calloc(size_t n, size_t size)
+{
+    return __calloc_ex(NULL, n, size);
+}
+
 #if VSF_LINUX_APPLET_USE_LIBC_STDLIB == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_stdlib_vplt_t, 0, 0, true),
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     VSF_APPLET_VPLT_ENTRY_FUNC(____malloc_ex),
     VSF_APPLET_VPLT_ENTRY_FUNC(____realloc_ex),
     VSF_APPLET_VPLT_ENTRY_FUNC(____calloc_ex),
-#endif
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-    .fn_malloc = {
-        .name = "malloc",
-        .ptr = (void *)____malloc,
-    },
-    .fn_realloc = {
-        .name = "realloc",
-        .ptr = (void *)____realloc,
-    },
-    .fn_calloc = {
-        .name = "calloc",
-        .ptr = (void *)____calloc,
-    },
-#else
     VSF_APPLET_VPLT_ENTRY_FUNC(malloc),
     VSF_APPLET_VPLT_ENTRY_FUNC(realloc),
     VSF_APPLET_VPLT_ENTRY_FUNC(calloc),
-#endif
     VSF_APPLET_VPLT_ENTRY_FUNC(free),
     VSF_APPLET_VPLT_ENTRY_FUNC(aligned_alloc),
     VSF_APPLET_VPLT_ENTRY_FUNC(memalign),

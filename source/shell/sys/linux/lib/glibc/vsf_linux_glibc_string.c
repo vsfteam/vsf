@@ -58,6 +58,11 @@ char * ____strdup_ex(vsf_linux_process_t *process, const char *str, const char *
     }
     return NULL;
 }
+#else
+char * ____strdup_ex(vsf_linux_process_t *process, const char *str, const char *file, const char *func, int line)
+{
+    return __strdup_ex(process, str);
+}
 #endif
 
 void * mempcpy(void *dest, const void *src, size_t len)
@@ -73,18 +78,6 @@ size_t strscpy(char *dest, const char *src, size_t n)
     dest[copylen] = '\0';
     return copylen >= srclen ? copylen : -E2BIG;
 }
-
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-char * ____strdup(const char *str)
-{
-    return __strdup_ex(NULL, str);
-}
-#else
-char * strdup(const char *str)
-{
-    return __strdup_ex(NULL, str);
-}
-#endif
 
 char * strndup(const char *str, size_t n)
 {
@@ -190,27 +183,24 @@ const char * sigabbrev_np(int sig)
     return "unknown";
 }
 
+#undef strdup
+char * strdup(const char *str)
+{
+    return __strdup_ex(NULL, str);
+}
+
 #if VSF_LINUX_APPLET_USE_LIBC_STRING == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_string_vplt_t, 0, 0, true),
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     VSF_APPLET_VPLT_ENTRY_FUNC(____strdup_ex),
-#endif
     VSF_APPLET_VPLT_ENTRY_FUNC(ffs),
     VSF_APPLET_VPLT_ENTRY_FUNC(memset),
     VSF_APPLET_VPLT_ENTRY_FUNC(strlen),
     VSF_APPLET_VPLT_ENTRY_FUNC(strnlen),
     VSF_APPLET_VPLT_ENTRY_FUNC(strcmp),
     VSF_APPLET_VPLT_ENTRY_FUNC(strncmp),
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-    .fn_strdup = {
-        .name = "strdup",
-        .ptr = (void *)____strdup,
-    },
-#else
     VSF_APPLET_VPLT_ENTRY_FUNC(strdup),
-#endif
     VSF_APPLET_VPLT_ENTRY_FUNC(strndup),
     VSF_APPLET_VPLT_ENTRY_FUNC(strcpy),
     VSF_APPLET_VPLT_ENTRY_FUNC(strncpy),
