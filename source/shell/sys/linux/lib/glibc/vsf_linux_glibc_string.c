@@ -183,7 +183,9 @@ const char * sigabbrev_np(int sig)
     return "unknown";
 }
 
-#undef strdup
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+#   undef strdup
+#endif
 char * strdup(const char *str)
 {
     return __strdup_ex(NULL, str);

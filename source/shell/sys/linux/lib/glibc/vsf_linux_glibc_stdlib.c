@@ -803,9 +803,11 @@ void abort(void)
     VSF_LINUX_ASSERT(false);
 }
 
-#undef malloc
-#undef realloc
-#undef calloc
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+#   undef malloc
+#   undef realloc
+#   undef calloc
+#endif
 void * malloc(size_t size)
 {
     return __malloc_ex(NULL, size);
