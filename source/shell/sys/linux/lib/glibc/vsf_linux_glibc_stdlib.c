@@ -203,7 +203,22 @@ void * aligned_alloc(size_t alignment, size_t size)
 #endif
 }
 
-#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR != ENABLED
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+void * ____malloc(size_t size)
+{
+    return __malloc_ex(NULL, size);
+}
+
+void * ____realloc(void *p, size_t size)
+{
+    return __realloc_ex(NULL, p, size);
+}
+
+void * ____calloc(size_t n, size_t size)
+{
+    return __calloc_ex(NULL, n, size);
+}
+#   else
 void * malloc(size_t size)
 {
     return __malloc_ex(NULL, size);
@@ -815,9 +830,24 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt =
     VSF_APPLET_VPLT_ENTRY_FUNC(____calloc_ex),
 #endif
 
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+    .fn_malloc = {
+        .name = "malloc",
+        .ptr = (void *)____malloc,
+    },
+    .fn_realloc = {
+        .name = "realloc",
+        .ptr = (void *)____realloc,
+    },
+    .fn_calloc = {
+        .name = "calloc",
+        .ptr = (void *)____calloc,
+    },
+#else
     VSF_APPLET_VPLT_ENTRY_FUNC(malloc),
     VSF_APPLET_VPLT_ENTRY_FUNC(realloc),
     VSF_APPLET_VPLT_ENTRY_FUNC(calloc),
+#endif
     VSF_APPLET_VPLT_ENTRY_FUNC(free),
     VSF_APPLET_VPLT_ENTRY_FUNC(aligned_alloc),
     VSF_APPLET_VPLT_ENTRY_FUNC(memalign),
