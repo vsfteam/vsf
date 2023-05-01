@@ -96,6 +96,7 @@ static size_t __vsf_linux_heap_trace_alloc(vsf_linux_process_t *process, void *p
 #   endif
         process->heap_monitor.info.usage += size - sizeof(size_t);
         process->heap_monitor.info.balance++;
+//        vsf_trace_debug("0x%p: +%d 0x%p\n", process, i, ptr);
     vsf_unprotect_sched(orig);
     return (size_t)i;
 }
@@ -108,6 +109,7 @@ static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, size_t i, 
     VSF_LINUX_ASSERT(process != NULL);
 
     vsf_protect_t orig = vsf_protect_sched();
+//        vsf_trace_debug("0x%p: -%d 0x%p\n", process, i, ptr);
 #   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH > 0
         VSF_LINUX_ASSERT(i < VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH);
         VSF_LINUX_ASSERT(vsf_bitmap_get(&process->heap_monitor.bitmap, i));
@@ -811,12 +813,11 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt =
     VSF_APPLET_VPLT_ENTRY_FUNC(____malloc_ex),
     VSF_APPLET_VPLT_ENTRY_FUNC(____realloc_ex),
     VSF_APPLET_VPLT_ENTRY_FUNC(____calloc_ex),
-#else
+#endif
+
     VSF_APPLET_VPLT_ENTRY_FUNC(malloc),
     VSF_APPLET_VPLT_ENTRY_FUNC(realloc),
     VSF_APPLET_VPLT_ENTRY_FUNC(calloc),
-#endif
-
     VSF_APPLET_VPLT_ENTRY_FUNC(free),
     VSF_APPLET_VPLT_ENTRY_FUNC(aligned_alloc),
     VSF_APPLET_VPLT_ENTRY_FUNC(memalign),

@@ -32,19 +32,16 @@ extern "C" {
 typedef struct vsf_linux_libc_string_vplt_t {
     vsf_vplt_info_t info;
 
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____strdup_ex);
+#endif
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ffs);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(memset);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strlen);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strnlen);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strcmp);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strncmp);
-
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____strdup_ex);
-#else
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strdup);
-#endif
-
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strcpy);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strncpy);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(stpcpy);
@@ -101,6 +98,12 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string
 #define VSF_LINUX_APPLET_LIBC_STRING_IMP(...)                                   \
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_LIBC_STRING_VPLT, __VA_ARGS__)
 
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+VSF_LINUX_APPLET_LIBC_STRING_IMP(____strdup_ex, char *, vsf_linux_process_t *process, const char *str, const char *file, const char *func, int line) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(____strdup_ex)(process, str, file, func, line);
+}
+#endif
 VSF_LINUX_APPLET_LIBC_STRING_IMP(ffs, int, int i) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(ffs)(i);
@@ -125,17 +128,10 @@ VSF_LINUX_APPLET_LIBC_STRING_IMP(strncmp, int, const char *str1, const char *str
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strncmp)(str1, str2, n);
 }
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-VSF_LINUX_APPLET_LIBC_STRING_IMP(____strdup_ex, char *, vsf_linux_process_t *process, const char *str, const char *file, const char *func, int line) {
-    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(____strdup_ex)(process, str, file, func, line);
-}
-#else
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strdup, char *, const char *str) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strdup)(str);
 }
-#endif
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strcpy, char *, char *dest, const char *src) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strcpy)(dest, src);

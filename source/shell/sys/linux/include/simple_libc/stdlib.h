@@ -87,11 +87,11 @@ typedef struct vsf_linux_libc_stdlib_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____malloc_ex);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____realloc_ex);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____calloc_ex);
-#else
+#endif
+
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(malloc);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(realloc);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(calloc);
-#endif
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(free);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(aligned_alloc);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(memalign);
@@ -183,7 +183,7 @@ VSF_LINUX_APPLET_LIBC_STDLIB_IMP(____calloc_ex, void *, size_t n, size_t size, c
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(____calloc_ex)(n, size, file, func, line);
 }
-#else
+#endif
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(malloc, void *, size_t size) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(malloc)(size);
@@ -196,7 +196,6 @@ VSF_LINUX_APPLET_LIBC_STDLIB_IMP(calloc, void *, size_t n, size_t size) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(calloc)(n, size);
 }
-#endif
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(free, void, void *p) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(free)(p);

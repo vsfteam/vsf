@@ -189,17 +189,16 @@ const char * sigabbrev_np(int sig)
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_string_vplt_t, 0, 0, true),
 
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+    VSF_APPLET_VPLT_ENTRY_FUNC(____strdup_ex),
+#endif
     VSF_APPLET_VPLT_ENTRY_FUNC(ffs),
     VSF_APPLET_VPLT_ENTRY_FUNC(memset),
     VSF_APPLET_VPLT_ENTRY_FUNC(strlen),
     VSF_APPLET_VPLT_ENTRY_FUNC(strnlen),
     VSF_APPLET_VPLT_ENTRY_FUNC(strcmp),
     VSF_APPLET_VPLT_ENTRY_FUNC(strncmp),
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-    VSF_APPLET_VPLT_ENTRY_FUNC(____strdup_ex),
-#else
     VSF_APPLET_VPLT_ENTRY_FUNC(strdup),
-#endif
     VSF_APPLET_VPLT_ENTRY_FUNC(strndup),
     VSF_APPLET_VPLT_ENTRY_FUNC(strcpy),
     VSF_APPLET_VPLT_ENTRY_FUNC(strncpy),
