@@ -32,9 +32,7 @@ extern "C" {
 typedef struct vsf_linux_libc_string_vplt_t {
     vsf_vplt_info_t info;
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____strdup_ex);
-#endif
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ffs);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(memset);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strlen);

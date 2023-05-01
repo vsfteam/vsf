@@ -83,11 +83,9 @@ typedef struct {
 typedef struct vsf_linux_libc_stdlib_vplt_t {
     vsf_vplt_info_t info;
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____malloc_ex);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____realloc_ex);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____calloc_ex);
-#endif
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(malloc);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(realloc);
