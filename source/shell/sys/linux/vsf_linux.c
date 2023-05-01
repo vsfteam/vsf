@@ -375,15 +375,19 @@ vsf_err_t vsf_linux_dynlib_init(int *lib_idx, int module_num, int bss_size)
 int vsf_linux_dynlib_ctx_set(const vsf_linux_dynlib_mod_t *mod, void *ctx)
 {
     VSF_LINUX_ASSERT(mod != NULL);
-    vsf_linux_dynlib_t *dynlib = vsf_linux_library_ctx(*mod->lib_idx);
+    int lib_idx = NULL == mod->lib_idx ? 0 : *mod->lib_idx;
+    vsf_linux_dynlib_t *dynlib = vsf_linux_library_ctx(lib_idx);
 
     if (NULL == dynlib) {
-        if (vsf_linux_dynlib_init(mod->lib_idx, mod->module_num, mod->bss_size) < 0) {
+        if (vsf_linux_dynlib_init(&lib_idx, mod->module_num, mod->bss_size) < 0) {
             vsf_trace_error("linux: fail to allocate dynlib" VSF_TRACE_CFG_LINEEND);
             VSF_LINUX_ASSERT(false);
             return -1;
         }
-        dynlib = vsf_linux_library_ctx(*mod->lib_idx);
+        if (mod->lib_idx != NULL) {
+            *mod->lib_idx = lib_idx;
+        }
+        dynlib = vsf_linux_library_ctx(lib_idx);
         VSF_LINUX_ASSERT(dynlib != NULL);
     }
     VSF_LINUX_ASSERT(mod->mod_idx < dynlib->module_num);
@@ -395,15 +399,19 @@ int vsf_linux_dynlib_ctx_set(const vsf_linux_dynlib_mod_t *mod, void *ctx)
 void * vsf_linux_dynlib_ctx_get(const vsf_linux_dynlib_mod_t *mod)
 {
     VSF_LINUX_ASSERT(mod != NULL);
-    vsf_linux_dynlib_t *dynlib = vsf_linux_library_ctx(*mod->lib_idx);
+    int lib_idx = NULL == mod->lib_idx ? 0 : *mod->lib_idx;
+    vsf_linux_dynlib_t *dynlib = vsf_linux_library_ctx(lib_idx);
 
     if (NULL == dynlib) {
-        if (vsf_linux_dynlib_init(mod->lib_idx, mod->module_num, mod->bss_size) < 0) {
+        if (vsf_linux_dynlib_init(&lib_idx, mod->module_num, mod->bss_size) < 0) {
             vsf_trace_error("linux: fail to allocate dynlib" VSF_TRACE_CFG_LINEEND);
             VSF_LINUX_ASSERT(false);
             return NULL;
         }
-        dynlib = vsf_linux_library_ctx(*mod->lib_idx);
+        if (mod->lib_idx != NULL) {
+            *mod->lib_idx = lib_idx;
+        }
+        dynlib = vsf_linux_library_ctx(lib_idx);
         VSF_LINUX_ASSERT(dynlib != NULL);
     }
     VSF_LINUX_ASSERT(mod->mod_idx < dynlib->module_num);
@@ -785,6 +793,12 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
 {
     VSF_LINUX_ASSERT(stdio_stream != NULL);
     __vsf_linux.cur_pid = 0;
+#if VSF_LINUX_CFG_PLS_NUM > 0
+    {
+        int idx = vsf_linux_pls_alloc();
+        VSF_LINUX_ASSERT(0 == idx);
+    }
+#endif
     vk_fs_init();
 
 #if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
@@ -1148,6 +1162,8 @@ int vsf_linux_start_process(vsf_linux_process_t *process)
 void vsf_linux_cleanup_process(vsf_linux_process_t *process)
 {
     vsf_linux_fd_t *sfd;
+
+#if VSF_LINUX_CFG_PLS_NUM > 0
     for (int i = 0; i < VSF_LINUX_CFG_PLS_NUM; i++) {
         if (vsf_bitmap_get(&__vsf_linux.pls.bitmap, i)) {
             if (process->pls[i].destructor != NULL) {
@@ -1155,6 +1171,7 @@ void vsf_linux_cleanup_process(vsf_linux_process_t *process)
             }
         }
     }
+#endif
 
     do {
         vsf_dlist_peek_head(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
