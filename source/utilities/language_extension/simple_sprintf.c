@@ -46,10 +46,6 @@
 #   pragma clang diagnostic ignored "-Wpointer-to-int-cast"
 #endif
 
-#ifdef __WIN__
-// TODO: fixme. to avoid conflict with libvcruntime(undname.obj) in the latest Visual Studio 2022
-WEAK(vsnprintf)
-#endif
 int vsnprintf(char *str, size_t size, const char *format, va_list ap)
 {
     if (!format) {
@@ -544,10 +540,6 @@ end:
 #   pragma clang diagnostic pop
 #endif
 
-#ifdef __WIN__
-// TODO: fixme. to avoid conflict with libvcruntime(undname.obj) in the latest Visual Studio 2022
-WEAK(snprintf)
-#endif
 int snprintf(char *str, size_t size, const char *format, ...)
 {
     int real_size;

@@ -99,6 +99,8 @@ extern "C" {
 #define putchar             VSF_LINUX_LIBC_WRAPPER(putchar)
 #define fputc               VSF_LINUX_LIBC_WRAPPER(fputc)
 #define fprintf             VSF_LINUX_LIBC_WRAPPER(fprintf)
+#define vsnprintf           VSF_LINUX_LIBC_WRAPPER(vsnprintf)
+#define snprintf            VSF_LINUX_LIBC_WRAPPER(snprintf)
 #endif
 
 typedef off64_t             fpos_t;
