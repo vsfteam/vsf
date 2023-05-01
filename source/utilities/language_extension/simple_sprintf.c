@@ -67,7 +67,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
 #endif
     } arg;
 #if VSF_SIMPLE_SPRINTF_SUPPORT_FLOAT == ENABLED
-    double d_intpart, d_fractpart;
+    double d_intpart, d_fractpart, dtmp;
     signed long long i_intpart, i_fractpart, pow;
     int exp;
 #endif
@@ -94,6 +94,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         unsigned long_cnt       : 2;
                         unsigned float_state    : 2;
                         unsigned exp_state      : 2;
+                        unsigned is_g           : 1;
                     };
                     unsigned all;
                 } flags;
@@ -402,12 +403,28 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         if (0 == precision) {
                             goto print_float_end;
                         }
-                        width = precision;
+
+                        if (flags.is_g) {
+                            if (0LL == i_fractpart) {
+                                goto print_float_end;
+                            }
+
+                            signed long long tmp;
+                            while (1) {
+                                tmp = i_fractpart / 10;
+                                if (i_fractpart != tmp * 10) {
+                                    break;
+                                }
+                                i_fractpart = tmp;
+                                precision--;
+                            }
+                        }
 
                         if (++realsize <= size) {
                             *curpos++ = '.';
                         }
 
+                        width = precision;
                         arg.integer = i_fractpart;
                         flags.is_signed = 1;
                         flags.float_state = 2;
@@ -429,7 +446,8 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                 print_exp:
                     switch (flags.exp_state) {
                     case 0:
-                        arg.d = va_arg(ap, double);
+                        dtmp = arg.d = va_arg(ap, double);
+                    print_exp_do:
                         d_fractpart = modf(arg.d, &d_intpart);
 
                         exp = 0;
@@ -451,6 +469,17 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
 
                             arg.d = d_fractpart;
                         }
+
+                        if (flags.is_g) {
+                            if ((exp < -4) || (exp >= precision)) {
+                                precision -= 1;
+                            } else {
+                                arg.d = dtmp;
+                                precision -= exp + 1;
+                                goto print_float_do;
+                            }
+                        }
+
                         flags.exp_state = 1;
                         goto print_float_do;
                     case 1:
@@ -472,6 +501,17 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         break;
                     }
                     break;
+                case 'G':
+                    flags.is_upper = 1;
+                    // fall through
+                case 'g':
+                    if (precision < 0) {
+                        precision = 6;
+                    } else if (precision == 0) {
+                        precision = 1;
+                    }
+                    flags.is_g = 1;
+                    goto print_exp;
 #endif
                 case 'c':
                 case 'C':
