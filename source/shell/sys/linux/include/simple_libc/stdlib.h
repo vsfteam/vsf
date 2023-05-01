@@ -83,11 +83,17 @@ typedef struct {
 typedef struct vsf_linux_libc_stdlib_vplt_t {
     vsf_vplt_info_t info;
 
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____malloc_ex);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____realloc_ex);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____calloc_ex);
+#else
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(malloc);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(realloc);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(calloc);
+#endif
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(free);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(aligned_alloc);
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(calloc);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(memalign);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(posix_memalign);
     // malloc_usable_size should be in malloc.h
@@ -164,6 +170,20 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib
 #define VSF_LINUX_APPLET_LIBC_STDLIB_IMP(...)                                   \
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_LIBC_STDLIB_VPLT, __VA_ARGS__)
 
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(____malloc_ex, void *, size_t size, const char *file, const char *func, int line) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(____malloc_ex)(size, file, func, line);
+}
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(____realloc_ex, void *, void *p, size_t size, const char *file, const char *func, int line) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(____realloc_ex)(p, size, file, func, line);
+}
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(____calloc_ex, void *, size_t n, size_t size, const char *file, const char *func, int line) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(____calloc_ex)(n, size, file, func, line);
+}
+#else
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(malloc, void *, size_t size) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(malloc)(size);
@@ -172,6 +192,11 @@ VSF_LINUX_APPLET_LIBC_STDLIB_IMP(realloc, void *, void *p, size_t size) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(realloc)(p, size);
 }
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(calloc, void *, size_t n, size_t size) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(calloc)(n, size);
+}
+#endif
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(free, void, void *p) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(free)(p);
@@ -179,10 +204,6 @@ VSF_LINUX_APPLET_LIBC_STDLIB_IMP(free, void, void *p) {
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(aligned_alloc, void *, size_t alignment, size_t size) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(aligned_alloc)(alignment, size);
-}
-VSF_LINUX_APPLET_LIBC_STDLIB_IMP(calloc, void *, size_t n, size_t size) {
-    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(calloc)(n, size);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(memalign, void *, size_t alignment, size_t size) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -375,12 +396,23 @@ VSF_LINUX_APPLET_LIBC_STDLIB_IMP(getloadavg, int, double loadavg[], int nelem) {
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STDLIB
 
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+typedef struct vsf_linux_process_t vsf_linux_process_t;
+void * ____malloc_ex(vsf_linux_process_t *process, size_t size, const char *file, const char *func, int line);
+void * ____calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, const char *file, const char *func, int line);
+void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size, const char *file, const char *func, int line);
+#   define malloc(__size)               ____malloc_ex(NULL, (__size), __FILE__, __FUNCTION__, __LINE__)
+#   define calloc(__n, __size)          ____calloc_ex(NULL, (__n), (__size), __FILE__, __FUNCTION__, __LINE__)
+#   define realloc(__ptr, __size)       ____realloc_ex(NULL, (__ptr), (__size), __FILE__, __FUNCTION__, __LINE__)
+#else
 void * malloc(size_t size);
 void * realloc(void *p, size_t size);
+void * calloc(size_t n, size_t size);
+#endif
+
 void free(void *p);
 
 void * aligned_alloc(size_t alignment, size_t size);
-void * calloc(size_t n, size_t size);
 void * memalign(size_t alignment, size_t size);
 int posix_memalign(void **memptr, size_t alignment, size_t size);
 

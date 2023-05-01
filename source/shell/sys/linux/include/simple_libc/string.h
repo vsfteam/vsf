@@ -38,7 +38,13 @@ typedef struct vsf_linux_libc_string_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strnlen);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strcmp);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strncmp);
+
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(____strdup_ex);
+#else
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strdup);
+#endif
+
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strcpy);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(strncpy);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(stpcpy);
@@ -119,10 +125,17 @@ VSF_LINUX_APPLET_LIBC_STRING_IMP(strncmp, int, const char *str1, const char *str
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strncmp)(str1, str2, n);
 }
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+VSF_LINUX_APPLET_LIBC_STRING_IMP(____strdup_ex, char *, vsf_linux_process_t *process, const char *str, const char *file, const char *func, int line) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(____strdup_ex)(process, str, file, func, line);
+}
+#else
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strdup, char *, const char *str) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strdup)(str);
 }
+#endif
 VSF_LINUX_APPLET_LIBC_STRING_IMP(strcpy, char *, char *dest, const char *src) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STRING_ENTRY(strcpy)(dest, src);
@@ -261,7 +274,11 @@ size_t strnlen(const char *str, size_t maxlen);
 int strcmp(const char *str1, const char *str2);
 int strncmp(const char *str1, const char *str2, size_t n);
 int strverscmp(const char *str1, const char *str2);
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+#   define strdup(__str)                ____strdup_ex(NULL, (char *)(__str), __FILE__, __FUNCTION__, __LINE__)
+#else
 char * strdup(const char *str);
+#endif
 char * strndup(const char *str, size_t n);
 char * strcpy(char *dest, const char *src);
 char * strncpy(char *dest, const char *src, size_t n);

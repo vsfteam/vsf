@@ -1239,8 +1239,9 @@ void vsf_linux_cleanup_process(vsf_linux_process_t *process)
             if (idx < 0) { break; }
 
 #       if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_QUIET != ENABLED
-            vsf_trace_warning("    0x%p(%d)" VSF_TRACE_CFG_LINEEND,
-                process->heap_monitor.nodes[idx].ptr, process->heap_monitor.nodes[idx].size);
+            vsf_trace_warning("    0x%p(%d) %s %s %d" VSF_TRACE_CFG_LINEEND,
+                process->heap_monitor.nodes[idx].ptr, process->heap_monitor.nodes[idx].size,
+                process->heap_monitor.nodes[idx].file, process->heap_monitor.nodes[idx].func, process->heap_monitor.nodes[idx].line);
 #       endif
             free(process->heap_monitor.nodes[idx].ptr);
         }

@@ -165,7 +165,7 @@ namespace std {
         void reserve(size_t n = 0)
         {
             if (capacity() < n) {
-                __array = realloc(n);
+                __array = (T *)realloc(__array, n * sizeof(T));
             }
         }
         array_base<T> & append(const T *arr, size_t num)

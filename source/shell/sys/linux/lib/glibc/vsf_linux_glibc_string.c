@@ -47,10 +47,10 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-char * __strdup_ex(vsf_linux_process_t *process, const char *str)
+char * ____strdup_ex(vsf_linux_process_t *process, const char *str, const char *file, const char *func, int line)
 {
     if (str != NULL) {
-        char *newstr = __malloc_ex(process, strlen(str) + 1);
+        char *newstr = ____malloc_ex(process, strlen(str) + 1, file, func, line);
         if (newstr != NULL) {
             strcpy(newstr, str);
         }
@@ -74,10 +74,12 @@ size_t strscpy(char *dest, const char *src, size_t n)
     return copylen >= srclen ? copylen : -E2BIG;
 }
 
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR != ENABLED
 char * strdup(const char *str)
 {
     return __strdup_ex(NULL, str);
 }
+#endif
 
 char * strndup(const char *str, size_t n)
 {
@@ -193,7 +195,11 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt =
     VSF_APPLET_VPLT_ENTRY_FUNC(strnlen),
     VSF_APPLET_VPLT_ENTRY_FUNC(strcmp),
     VSF_APPLET_VPLT_ENTRY_FUNC(strncmp),
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+    VSF_APPLET_VPLT_ENTRY_FUNC(____strdup_ex),
+#else
     VSF_APPLET_VPLT_ENTRY_FUNC(strdup),
+#endif
     VSF_APPLET_VPLT_ENTRY_FUNC(strndup),
     VSF_APPLET_VPLT_ENTRY_FUNC(strcpy),
     VSF_APPLET_VPLT_ENTRY_FUNC(strncpy),
