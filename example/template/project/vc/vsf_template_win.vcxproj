@@ -1479,6 +1479,7 @@
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\kernel\socket\vsf_linux_socket.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\fnmatch\fnmatch.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\getopt\getopt_long.c" />
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\glob\glob.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\regex\regcomp.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\regex\regerror.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\regex\regexec.c" />
