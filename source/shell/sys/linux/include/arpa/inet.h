@@ -1,5 +1,5 @@
-#ifndef __VSF_LINUX_INET_H__
-#define __VSF_LINUX_INET_H__
+#ifndef __VSF_LINUX_ARPA_INET_H__
+#define __VSF_LINUX_ARPA_INET_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 

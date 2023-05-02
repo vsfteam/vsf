@@ -39,6 +39,15 @@ extern "C" {
 #define AF_INET6        PF_INET6
 #define AF_PACKET       PF_PACKET
 
+#define SOL_IP          IPPROTO_IP
+#define SOL_TCP         IPPROTO_TCP
+#define SOL_UDP         IPPROTO_UDP
+
+#define IP_TOS          1
+#define IP_TTL          2
+#define IP_HDRINCL      3
+#define IP_OPTIONS      4
+
 // socket types
 // refer: https://code.woboq.org/gtk/include/bits/socket_type.h.html
 #define SOCK_STREAM     1

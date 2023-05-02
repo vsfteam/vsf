@@ -59,6 +59,7 @@ typedef unsigned int speed_t;
 #define ONLRET      0000040
 #define OFILL       0000100
 #define OFDEL       0000200
+#define XTABS       0014000
 
 #define ISIG        0000001
 #define ICANON      0000002
