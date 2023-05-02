@@ -40,6 +40,9 @@
 
 #define EMIT(__C)       if (++realsize <= size) { *curpos++ = (__C); }
 
+#define __DROUND_DIGITS 16
+#define __DROUND_FACTOR 1E16
+
 /*============================ TYPES =========================================*/
 
 enum ranks {
@@ -85,9 +88,8 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
 #endif
     } arg;
 #if VSF_SIMPLE_SPRINTF_SUPPORT_FLOAT == ENABLED
-    double d_intpart, d_fractpart, dtmp;
-    signed long long i_intpart, i_fractpart, pow;
-    int exp;
+    double d_intpart, d_fractpart, dtmp, pow;
+    int exp, round;
 #endif
     union {
         struct {
@@ -387,68 +389,98 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         precision = 6;
                     }
                     d_fractpart = modf(arg.d, &d_intpart);
+                    flags.is_signed = d_intpart < 0;
 
                     pow = 10;
-                    for (int i = 0; i < precision; i++) {
-                        pow *= 10;
+                    for (int i = 0; i < precision;) {
+                        int remain = precision - i;
+                        if (remain >= 8) {
+                            pow *= 100000000;
+                            i += 8;
+                        } else if (remain >= 4) {
+                            pow *= 10000;
+                            i += 4;
+                        } else if (remain >= 2) {
+                            pow *= 100;
+                            i += 2;
+                        } else if (remain >= 1) {
+                            pow *= 10;
+                            i += 1;
+                        }
                     }
+                    d_fractpart += 5 / pow;
 
-                    i_intpart = (int)d_intpart;
-                    i_fractpart = (int)(d_fractpart * pow);
-                    flags.is_signed = i_fractpart < 0;
-                    if (flags.is_signed) {
-                        i_fractpart = -i_fractpart;
-                    }
-
-                    if ((i_fractpart % 10) >= 5) {
-                        i_fractpart += 10;
-                    }
-                    if (i_fractpart >= pow) {
+                    if (d_fractpart >= 1) {
+                        d_fractpart = modf(d_fractpart, &dtmp);
                         if (flags.is_signed) {
-                            i_intpart -= 1;
+                            d_intpart -= 1;
                         } else {
-                            i_intpart += 1;
+                            d_intpart += 1;
                         }
-                        i_fractpart = 0;
                     }
-                    i_fractpart /= 10;
-
-                    arg.val = (unsigned long long)i_intpart;
-                    flags.is_signed = 1;
-                    flags.float_state = 1;
-                    radix = 10;
-                    goto print_integer_do;
-                case 1:
-                    if (0 == precision) {
-                        goto print_float_end;
-                    }
-
-                    if (flags.is_g) {
-                        if (0LL == i_fractpart) {
-                            goto print_float_end;
-                        }
-
-                        signed long long tmp;
-                        while (1) {
-                            tmp = i_fractpart / 10;
-                            if (i_fractpart != tmp * 10) {
-                                break;
-                            }
-                            i_fractpart = tmp;
+                    d_fractpart *= pow / 10;
+                    if (flags.is_g && d_fractpart != 0) {
+                        while (precision && !(int)fmod(d_fractpart, 10)) {
+                            d_fractpart /= 10;
                             precision--;
                         }
                     }
 
+                    if (flags.is_signed) {
+                        EMIT('-');
+                        d_intpart *= -1;
+                    } else if (flags.has_plus_minus) {
+                        EMIT('+');
+                    }
+                    flags.has_plus_minus = 0;
+
+                    flags.float_state = 1;
+                    flags.is_signed = 0;
+                    round = 1;
+                    radix = 10;
+                    while (d_intpart > __DROUND_FACTOR) {
+                        round++;
+                        d_intpart = __DROUND_FACTOR;
+                    }
+                    // fall through
+                case 1:
+                    if (round-- > 0) {
+                        arg.val = (unsigned long long)d_intpart;
+                        d_intpart = modf(d_intpart, &dtmp);
+                        d_intpart *= __DROUND_FACTOR;
+                        goto print_integer_do;
+                    }
+
+                    if (0 == precision) {
+                        goto print_float_end;
+                    }
                     EMIT('.');
 
-                    width = precision;
-                    arg.val = (unsigned long long)i_fractpart;
-                    flags.is_signed = 1;
                     flags.float_state = 2;
-                    flags.has_plus_minus = 0;
                     flags.has_prefix0 = 1;
+                    round = 1;
+                    width = precision;
+                    while (d_fractpart > __DROUND_FACTOR) {
+                        round++;
+                        d_fractpart /= __DROUND_FACTOR;
+                        width -= __DROUND_DIGITS;
+                    }
+                    radix = 10;
+
+                    arg.val = (unsigned long long)d_fractpart;
+                    d_fractpart = modf(d_fractpart, &dtmp);
+                    d_fractpart *= __DROUND_FACTOR;
                     goto print_integer_do;
                 case 2:
+                    if (--round > 0) {
+                        arg.val = (unsigned long long)d_fractpart;
+                        d_fractpart = modf(d_fractpart, &dtmp);
+                        d_fractpart *= __DROUND_FACTOR;
+                        width = __DROUND_DIGITS;
+                        goto print_integer_do;
+                    }
+                    // fall through
+                case 3:
                 print_float_end:
                     if (flags.exp_state) {
                         goto print_exp;
@@ -468,17 +500,17 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     d_fractpart = modf(arg.d, &d_intpart);
 
                     exp = 0;
-                    if (d_intpart < 0.0) {
+                    if (d_intpart < 0) {
                         d_intpart = -d_intpart;
                     }
-                    if (d_intpart >= 10.0) {
-                        while (d_intpart >= 10.0) {
-                            d_intpart /= 10.0;
-                            arg.d /= 10.0;
+                    if (d_intpart >= 10) {
+                        while (d_intpart >= 10) {
+                            d_intpart /= 10;
+                            arg.d /= 10;
                             exp++;
                         }
-                    } else if (0.0 == d_fractpart) {
-                        arg.d = 0.0;
+                    } else if (0 == d_fractpart) {
+                        arg.d = 0;
                     } else if (0 == d_intpart) {
                         while (d_fractpart < 1) {
                             d_fractpart *= 10;
