@@ -44,6 +44,7 @@
 #   include "./include/sys/prctl.h"
 #   include "./include/sys/reboot.h"
 #   include "./include/sys/capability.h"
+#   include "./include/sys/timex.h"
 #   include "./include/fcntl.h"
 #   include "./include/errno.h"
 #   include "./include/termios.h"
@@ -74,6 +75,7 @@
 #   include <sys/prctl.h>
 #   include <sys/reboot.h>
 #   include <sys/capability.h>
+#   include <sys/timex.h>
 #   include <fcntl.h>
 #   include <errno.h>
 #   include <termios.h>
@@ -3824,6 +3826,11 @@ struct passwd * getpwnam(const char *name)
 
 // grp
 
+int initgroups(const char *user, gid_t group)
+{
+    return -1;
+}
+
 int getgroups(size_t size, gid_t list[])
 {
     return -1;
@@ -3858,6 +3865,48 @@ int getgrnam_r(const char *name, struct group *grp,
 
 int getgrgid_r(gid_t gid, struct group *grp,
           char *buf, size_t buflen, struct group **result)
+{
+    return -1;
+}
+
+struct group * getgrent(void)
+{
+    return NULL;
+}
+
+void setgrent(void)
+{
+}
+
+void endgrent(void)
+{
+}
+
+// resources
+
+int getpriority(int which, id_t who)
+{
+    return -1;
+}
+
+int setpriority(int which, id_t who, int prio)
+{
+    return -1;
+}
+
+// timex
+
+int adjtimex(struct timex *buf)
+{
+    return -1;
+}
+
+int clock_adjtime(clockid_t clk_id, struct timex *buf)
+{
+    return -1;
+}
+
+int ntp_adjtime(struct timex *buf)
 {
     return -1;
 }
@@ -3910,6 +3959,16 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_time_vplt_t vsf_linux_sys_time_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(utimes),
 };
 #endif
+#endif
+
+#if VSF_LINUX_APPLET_USE_SYS_TIMEX == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_timex_vplt_t vsf_linux_sys_timex_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_timex_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(adjtimex),
+    VSF_APPLET_VPLT_ENTRY_FUNC(clock_adjtime),
+    VSF_APPLET_VPLT_ENTRY_FUNC(ntp_adjtime),
+};
 #endif
 
 #if VSF_LINUX_APPLET_USE_SYS_UTSNAME == ENABLED && !defined(__VSF_APPLET__)
@@ -4373,6 +4432,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_SYS_CAPABILITY == ENABLED
     .sys_capability_vplt    = (void *)&vsf_linux_sys_capability_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_TIMEX == ENABLED
+    .sys_timex_vplt     = (void *)&vsf_linux_sys_timex_vplt,
 #   endif
 
 #   if VSF_LINUX_APPLET_USE_UNISTD == ENABLED

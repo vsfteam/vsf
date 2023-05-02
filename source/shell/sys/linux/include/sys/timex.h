@@ -68,6 +68,58 @@ struct timex {
     long                        tolerance;
 };
 
+#if VSF_LINUX_APPLET_USE_SYS_TIMEX == ENABLED
+typedef struct vsf_linux_sys_timex_vplt_t {
+    vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(adjtimex);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(clock_adjtime);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ntp_adjtime);
+} vsf_linux_sys_timex_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_timex_vplt_t vsf_linux_sys_timex_vplt;
+#   endif
+#endif
+
+#if     defined(__VSF_APPLET__) && (defined(__VSF_APPLET_LIB__) || defined(__VSF_APPLET_LINUX_SYS_TIMEX_LIB__))\
+    &&  VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SYS_TIMEX == ENABLED
+
+#ifndef VSF_LINUX_APPLET_SYS_TIMEX_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_SYS_TIMEX_VPLT                                   \
+            ((vsf_linux_sys_timex_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_timex_vplt))
+#   else
+#       define VSF_LINUX_APPLET_SYS_TIMEX_VPLT                                   \
+            ((vsf_linux_sys_timex_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#define VSF_LINUX_APPLET_SYS_TIMEX_ENTRY(__NAME)                                \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_TIMEX_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_TIMEX_IMP(...)                                     \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_TIMEX_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_TIMEX_IMP(adjtimex, int, struct timex *buf) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_TIMEX_ENTRY(adjtimex)(buf);
+}
+VSF_LINUX_APPLET_SYS_TIMEX_IMP(clock_adjtime, int, clockid_t clk_id, struct timex *buf) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_TIMEX_ENTRY(clock_adjtime)(clk_id, buf);
+}
+VSF_LINUX_APPLET_SYS_TIMEX_IMP(ntp_adjtime, int, struct timex *buf) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_TIMEX_ENTRY(ntp_adjtime)(buf);
+}
+
+#else
+
+int adjtimex(struct timex *buf);
+int clock_adjtime(clockid_t clk_id, struct timex *buf);
+int ntp_adjtime(struct timex *buf);
+
+#endif
+
 #ifdef __cplusplus
 }
 #endif

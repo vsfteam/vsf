@@ -14,12 +14,16 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
+#   define initgroups       VSF_LINUX_WRAPPER(initgroups)
 #   define getgroups        VSF_LINUX_WRAPPER(getgroups)
 #   define setgroups        VSF_LINUX_WRAPPER(setgroups)
 #   define getgrnam         VSF_LINUX_WRAPPER(getgrnam)
 #   define getgrgid         VSF_LINUX_WRAPPER(getgrgid)
 #   define getgrnam_r       VSF_LINUX_WRAPPER(getgrnam_r)
 #   define getgrgid_r       VSF_LINUX_WRAPPER(getgrgid_r)
+#   define getgrent         VSF_LINUX_WRAPPER(getgrent)
+#   define setgrent         VSF_LINUX_WRAPPER(setgrent)
+#   define endgrent         VSF_LINUX_WRAPPER(endgrent)
 #endif
 
 struct group {
@@ -33,12 +37,16 @@ struct group {
 typedef struct vsf_linux_grp_vplt_t {
     vsf_vplt_info_t info;
 
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(initgroups);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getgroups);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setgroups);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getgrnam);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getgrgid);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getgrnam_r);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getgrgid_r);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getgrent);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setgrent);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(endgrent);
 } vsf_linux_grp_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_grp_vplt_t vsf_linux_grp_vplt;
@@ -63,6 +71,10 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_grp_vplt_t vsf_linux_grp_vplt;
 #define VSF_LINUX_APPLET_GRP_IMP(...)                                           \
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_GRP_VPLT, __VA_ARGS__)
 
+VSF_LINUX_APPLET_GRP_IMP(initgroups, int, const char *user, gid_t group) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_GRP_ENTRY(initgroups)(user, group);
+}
 VSF_LINUX_APPLET_GRP_IMP(getgroups, int, size_t size, gid_t list[]) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_GRP_ENTRY(getgroups)(size, list);
@@ -87,9 +99,22 @@ VSF_LINUX_APPLET_GRP_IMP(getgrgid_r, int, gid_t gid, struct group *grp, char *bu
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_GRP_ENTRY(getgrgid_r)(gid, grp, buf, buflen, result);
 }
+VSF_LINUX_APPLET_GRP_IMP(getgrent, struct group *, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_GRP_ENTRY(getgrent)();
+}
+VSF_LINUX_APPLET_GRP_IMP(setgrent, void, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    VSF_LINUX_APPLET_GRP_ENTRY(getgrgid_r)();
+}
+VSF_LINUX_APPLET_GRP_IMP(endgrent, void, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    VSF_LINUX_APPLET_GRP_ENTRY(getgrgid_r)();
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_GRP
 
+int initgroups(const char *user, gid_t group);
 int getgroups(size_t size, gid_t list[]);
 int setgroups(size_t size, const gid_t *list);
 struct group * getgrnam(const char *name);
@@ -98,6 +123,10 @@ int getgrnam_r(const char *name, struct group *grp,
           char *buf, size_t buflen, struct group **result);
 int getgrgid_r(gid_t gid, struct group *grp,
           char *buf, size_t buflen, struct group **result);
+
+struct group * getgrent(void);
+void setgrent(void);
+void endgrent(void);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_GRP
 

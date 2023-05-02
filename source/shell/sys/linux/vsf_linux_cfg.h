@@ -210,6 +210,9 @@
 #   ifndef VSF_LINUX_APPLET_USE_SYS_TIME
 #       define VSF_LINUX_APPLET_USE_SYS_TIME    ENABLED
 #   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_TIMEX
+#       define VSF_LINUX_APPLET_USE_SYS_TIMEX   ENABLED
+#   endif
 #   ifndef VSF_LINUX_APPLET_USE_SYS_UTSNAME
 #       define VSF_LINUX_APPLET_USE_SYS_UTSNAME ENABLED
 #   endif
@@ -376,7 +379,7 @@ typedef struct vsf_linux_vplt_t {
     void *sys_event_vplt;
     void *sys_statfs_vplt;
     void *sys_capability_vplt;
-    void *sys_res2_vplt;
+    void *sys_timex_vplt;
 
     // unix
     void *unistd_vplt;
