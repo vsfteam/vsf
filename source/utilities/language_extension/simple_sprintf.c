@@ -451,17 +451,18 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         d_fractpart = modf(arg.d, &d_intpart);
 
                         exp = 0;
-                        i_intpart = (int)d_intpart;
-                        if (i_intpart < 0) {
-                            i_intpart = -i_intpart;
+                        if (d_intpart < 0.0) {
+                            d_intpart = -d_intpart;
                         }
-                        if (i_intpart >= 10) {
-                            while (i_intpart >= 10) {
-                                i_intpart /= 10;
-                                arg.d /= 10;
+                        if (d_intpart >= 10.0) {
+                            while (d_intpart >= 10.0) {
+                                d_intpart /= 10.0;
+                                arg.d /= 10.0;
                                 exp++;
                             }
-                        } else if (0 == i_intpart) {
+                        } else if (0.0 == d_fractpart) {
+                            arg.d = 0.0;
+                        } else if (0 == d_intpart) {
                             while (d_fractpart < 1) {
                                 d_fractpart *= 10;
                                 exp--;
