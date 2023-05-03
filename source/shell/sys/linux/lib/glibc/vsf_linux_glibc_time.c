@@ -443,6 +443,7 @@ static void __vsf_linux_itimerval2itimerspec(struct itimerval *val, struct itime
     __vsf_linux_timeval2timespec(&val->it_value, &spec->it_value);
 }
 
+static void __vsf_linux_on_timer(vsf_callback_timer_t *timer);
 static void __vsf_linux_prepare_timer(vsf_linux_timer_t *linux_timer)
 {
     vsf_systimer_tick_t ticks = linux_timer->value.it_value.tv_sec * 1000 * 1000
@@ -450,6 +451,7 @@ static void __vsf_linux_prepare_timer(vsf_linux_timer_t *linux_timer)
     ticks = vsf_systimer_us_to_tick(ticks);
     if (ticks != 0) {
         linux_timer->start = vsf_systimer_get_tick();
+        linux_timer->timer.on_timer = __vsf_linux_on_timer;
         vsf_callback_timer_add(&linux_timer->timer, ticks);
     }
 }
@@ -487,6 +489,7 @@ int setitimer(int which, const struct itimerval *new_value, struct itimerval *ol
     __vsf_linux_itimerval2itimerspec((struct itimerval *)new_value, &new_spec);
     linux_timer->evt.sigev_notify = SIGEV_SIGNAL;
     linux_timer->evt.sigev_signo = SIGALRM;
+    linux_timer->evt.sigev_notify_thread_id = process->id.pid;
     result = timer_settime((void *)linux_timer, 0, (const struct itimerspec *)&new_spec, &old_spec);
 
     if (old_value != NULL) {

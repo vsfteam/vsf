@@ -1501,11 +1501,9 @@ static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb)
                     sig = vsf_ffz32(~(sig_mask >> 32)) + 32;
                 }
                 process->sig.pending.sig[0] &= ~(1ULL << sig);
-                sig++;
 #else
                 sig = vsf_ffz32(~sig_mask);
                 process->sig.pending.sig[0] &= ~(1 << sig);
-                sig++;
 #endif
             }
         vsf_unprotect_sched(orig);
