@@ -1265,7 +1265,6 @@ void vsf_linux_delete_process(vsf_linux_process_t *process)
 void vsf_linux_exit_process(int status, bool _exit)
 {
     vsf_linux_thread_t *thread2wait;
-    vsf_linux_process_t *process2wait;
     vsf_linux_thread_t *cur_thread = vsf_linux_get_cur_thread();
     VSF_LINUX_ASSERT(cur_thread != NULL);
     vsf_linux_process_t *process = cur_thread->process;
@@ -1310,6 +1309,9 @@ void vsf_linux_exit_process(int status, bool _exit)
         vsf_linux_wait_thread(thread2wait->tid, NULL);
     }
 
+    // does it necessary to wait for child processes?
+#if 0
+    vsf_linux_process_t *process2wait;
     while (true) {
         orig = vsf_protect_sched();
             vsf_dlist_peek_head(vsf_linux_process_t, child_node, &process->child_list, process2wait);
@@ -1321,6 +1323,7 @@ void vsf_linux_exit_process(int status, bool _exit)
         vsf_trace_warning("linux: undetached process %d, need waitpid before exit\n", process2wait->id.pid);
         waitpid(process2wait->id.pid, NULL, 0);
     }
+#endif
 
     // 5. cleanup process
     vsf_linux_cleanup_process(process);
