@@ -371,7 +371,11 @@ int getaddrinfo(const char *name, const char *service, const struct addrinfo *hi
     // TODO: re-implement
     struct in_addr addr;
     if (!inet_aton(name, &addr)) {
-        return EAI_NONAME;
+        struct hostent *hostent = gethostbyname(name);
+        if (NULL == hostent) {
+            return EAI_NONAME;
+        }
+        addr = *(struct in_addr *)hostent->h_addr_list[0];
     }
 
     struct __addrinfo {
