@@ -111,8 +111,10 @@ typedef __CLOCK_T           clock_t;
 typedef __USECONDS_T        useconds_t;
 
 typedef enum {
-    CLOCK_MONOTONIC,
-    CLOCK_REALTIME,
+    CLOCK_REALTIME          = 0,
+#define CLOCK_REALTIME      CLOCK_REALTIME
+    CLOCK_MONOTONIC         = 1,
+#define CLOCK_MONOTONIC     CLOCK_MONOTONIC
 } clockid_t;
 
 #define CLOCKS_PER_SEC      ((clock_t)1000000)
