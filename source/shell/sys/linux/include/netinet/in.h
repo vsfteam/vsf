@@ -21,9 +21,19 @@ typedef uint32_t            in_addr_t;
 
 enum {
     IPPROTO_IP              = 0,
+#define IPPROTO_IP          IPPROTO_IP
+    IPPROTO_ICMP            = 1,
+#define IPPROTO_ICMP        IPPROTO_ICMP
+    IPPROTO_IGMP            = 2,
+#define IPPROTO_IGMP        IPPROTO_IGMP
     IPPROTO_TCP             = 6,
+#define IPPROTO_TCP         IPPROTO_TCP
     IPPROTO_UDP             = 17,
+#define IPPROTO_UDP         IPPROTO_UDP
     IPPROTO_IPV6            = 41,
+#define IPPROTO_IPV6        IPPROTO_IPV6
+    IPPROTO_RAW             = 255,
+#define IPPROTO_RAW         IPPROTO_RAW
 };
 
 #define INADDR_ANY          (in_addr_t)0x00000000

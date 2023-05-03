@@ -48,13 +48,19 @@ extern "C" {
 #define IP_HDRINCL      3
 #define IP_OPTIONS      4
 
-// socket types
-// refer: https://code.woboq.org/gtk/include/bits/socket_type.h.html
-#define SOCK_STREAM     1
-#define SOCK_DGRAM      2
-#define SOCK_SEQPACKET  3
-#define SOCK_RDM        4
-#define SOCK_RAW        5
+enum sock_type {
+    SOCK_STREAM         = 1,
+    SOCK_DGRAM          = 2,
+    SOCK_RAW            = 3,
+    SOCK_RDM            = 4,
+    SOCK_SEQPACKET      = 5,
+    SOCK_PACKET         = 10,
+};
+#define SOCK_MAX        (SOCK_PACKET + 1)
+
+// flags for socket/socketpair/accept4
+#define SOCK_CLOEXEC    O_CLOEXEC
+#define SOCK_NONBLOCK   O_NONBLOCK
 
 #define INVALID_SOCKET  -1
 #define SOCKET_ERROR    -1

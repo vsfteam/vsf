@@ -153,7 +153,9 @@ extern int VSF_LINUX_WRAPPER(poll)(struct vsf_linux_pollfd *fds, vsf_linux_nfds_
 #define VSF_LINUX_SOCKET_AF_INET        2
 #define VSF_LINUX_SOCKET_SOCK_STREAM    1
 #define VSF_LINUX_SOCKET_SOCK_DGRAM     2
+#define VSF_LINUX_SOCKET_SOCK_RAW       3
 enum {
+    VSF_LINUX_SOCKET_IPPROTO_ICMP       = 1,
     VSF_LINUX_SOCKET_IPPROTO_TCP        = 6,
     VSF_LINUX_SOCKET_IPPROTO_UDP        = 17,
 };
@@ -600,10 +602,12 @@ static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
     switch (socket_priv->type) {
     case VSF_LINUX_SOCKET_SOCK_STREAM:  priv->htype = SOCK_STREAM;      break;
     case VSF_LINUX_SOCKET_SOCK_DGRAM:   priv->htype = SOCK_DGRAM;       break;
+    case VSF_LINUX_SOCKET_SOCK_RAW:     priv->htype = SOCK_RAW;         break;
     default:                            goto assert_fail;
     }
     switch (socket_priv->protocol) {
     case 0:                             priv->hprotocol = 0;            break;
+    case VSF_LINUX_SOCKET_IPPROTO_ICMP: priv->hprotocol = IPPROTO_ICMP; break;
     case VSF_LINUX_SOCKET_IPPROTO_TCP:  priv->hprotocol = IPPROTO_TCP;  break;
     case VSF_LINUX_SOCKET_IPPROTO_UDP:  priv->hprotocol = IPPROTO_UDP;  break;
     default:                            goto assert_fail;
