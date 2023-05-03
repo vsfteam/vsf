@@ -71,6 +71,7 @@ extern "C" {
 #define AT_SYMLINK_NOFOLLOW 0x100
 
 #define FD_CLOEXEC      1
+#define __FD_OPENBYLINK 31
 // __FD_READALL is used internally to indicate to read all data
 #define __FD_READALL    2
 

@@ -1619,6 +1619,9 @@ __open_again_do:
         if (flags & O_CLOEXEC) {
             sfd->fd_flags |= FD_CLOEXEC;
         }
+        if (flags & (1 << __FD_OPENBYLINK)) {
+            sfd->fd_flags |= 1 << __FD_OPENBYLINK;
+        }
         if ((flags & O_TRUNC) && (flags & (O_RDWR | O_WRONLY))) {
             ftruncate(fd, 0);
         }
@@ -1637,6 +1640,7 @@ __open_again_do:
             }
             linkpath[linklen] = '\0';
             pathname = linkpath;
+            flags |= 1 << __FD_OPENBYLINK;
             goto __open_again;
         }
     }

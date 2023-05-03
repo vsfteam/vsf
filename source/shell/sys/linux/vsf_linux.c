@@ -1800,7 +1800,23 @@ static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd,
     }
 #if VSF_LINUX_CFG_LINK_FILE == ENABLED
     else if (pathname != pathname_local) {
-        
+        vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex(NULL, exefd);
+        VSF_LINUX_ASSERT((sfd != NULL) && (sfd->op->feature & VSF_LINUX_FDOP_FEATURE_FS));
+        if (sfd->fd_flags & (1 << __FD_OPENBYLINK)) {
+            vk_file_t *file = ((vsf_linux_fs_priv_t *)sfd->priv)->file;
+
+            char *tmp = &pathname[pathname_len - 1];
+            size_t len;
+            *tmp = '\0';
+            while ((file != NULL) && (file->name != NULL)) {
+                len = strlen(file->name);
+                tmp -= len;
+                memcpy(tmp, file->name, len);
+                *--tmp = '/';
+                file = file->parent;
+            }
+            strcpy(pathname, tmp);
+        }
     }
 #endif
     return exefd;
