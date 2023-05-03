@@ -793,23 +793,27 @@ FILE * popen(const char *command, const char *type)
         return NULL;
     }
 
-    vsf_linux_main_entry_t entry;
-    extern int __vsf_linux_get_exe_entry(char *cmd, vsf_linux_main_entry_t *entry, bool use_path);
-    if (__vsf_linux_get_exe_entry((char *)command, &entry, true) < 0) {
+    vsf_linux_process_t *process = vsf_linux_create_process(0, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE, 0);
+    if (NULL == process) {
         return NULL;
+    }
+
+    vsf_linux_main_entry_t entry;
+    extern int __vsf_linux_get_exe(char *pathname, int pathname_len, char *cmd, vsf_linux_main_entry_t *entry, bool use_path);
+#if VSF_LINUX_USE_PROCFS == ENABLED
+    if (__vsf_linux_get_exe(process->path, sizeof(process->path), (char *)command, &entry, true) < 0) {
+#else
+    if (__vsf_linux_get_exe(NULL, 0, (char *)command, &entry, true) < 0) {
+#endif
+        goto delete_process_and_fail;
     }
 
     int fd[2];
     if (pipe(fd) < 0) {
-        return NULL;
+        goto delete_process_and_fail;
     }
 
     // avoid to use spawn for better performance, skip unnecessary fd operations
-
-    vsf_linux_process_t *process = vsf_linux_create_process(0, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE, 0);
-    if (NULL == process) {
-        goto close_pipe_and_fail;
-    }
     vsf_linux_process_ctx_t *ctx = &process->ctx;
     ctx->entry = entry;
 
@@ -837,9 +841,8 @@ FILE * popen(const char *command, const char *type)
     vsf_linux_start_process(process);
     return (FILE *)sfd;
 
-close_pipe_and_fail:
-    close(fd[0]);
-    close(fd[1]);
+delete_process_and_fail:
+    vsf_linux_delete_process(process);
     return NULL;
 }
 

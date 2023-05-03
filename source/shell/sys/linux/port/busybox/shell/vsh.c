@@ -78,7 +78,7 @@ typedef enum vsh_shell_state_t {
     SHELL_STATE_ESC,
 } vsh_shell_state_t;
 
-extern int __vsf_linux_get_exe_entry(char *cmd, vsf_linux_main_entry_t *entry, bool use_path);
+extern int __vsf_linux_get_exe(char *pathname, int pathname_len, char *cmd, vsf_linux_main_entry_t *entry, bool use_path);
 
 #if VSF_LINUX_LIBC_USE_ENVIRON != ENABLED
 static char *__vsh_path;
@@ -333,7 +333,11 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
     }
 
     // search in path first if not absolute path
-    if (__vsf_linux_get_exe_entry(cmd, &entry, true) < 0) {
+#if VSF_LINUX_USE_PROCFS == ENABLED
+    if (__vsf_linux_get_exe(process->path, sizeof(process->path), cmd, &entry, true) < 0) {
+#else
+    if (__vsf_linux_get_exe(NULL, 0, cmd, &entry, true) < 0) {
+#endif
         printf("%s not found" VSH_LINEEND, cmd);
         errno = ENOENT;
         goto delete_process_and_fail;
@@ -916,7 +920,12 @@ int time_main(int argc, char *argv[])
     }
 
     vsf_linux_main_entry_t entry;
-    if (__vsf_linux_get_exe_entry(argv[1], &entry, true) < 0) {
+#if VSF_LINUX_USE_PROCFS == ENABLED
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    if (__vsf_linux_get_exe(process->path, sizeof(process->path), argv[1], &entry, true) < 0) {
+#else
+    if (__vsf_linux_get_exe(NULL, 0, argv[1], &entry, true) < 0) {
+#endif
         printf("command %s not found" VSH_LINEEND, argv[1]);
         return -1;
     }

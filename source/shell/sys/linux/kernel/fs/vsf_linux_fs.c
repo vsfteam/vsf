@@ -1511,20 +1511,27 @@ int vsf_linux_open(vk_file_t *dir, const char *pathname, int flags, mode_t mode)
     vsf_linux_fd_t *sfd;
     vsf_linux_fd_op_t *fdop;
     char fullpath[MAX_PATH];
+#if VSF_LINUX_CFG_LINK_FILE == ENABLED
+    char linkpath[MAX_PATH];
+#endif
     int fd;
 
     if ((NULL == pathname) || ('\0' == *pathname)) {
         return -1;
     }
+#if VSF_LINUX_CFG_LINK_FILE == ENABLED
+__open_again:
+#endif
     if (NULL == dir) {
         if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
             return -1;
         }
     } else {
+        // TODO: support relative path
         strcpy(fullpath, pathname);
     }
 
-__open_again:
+__open_again_do:
     file = __vsf_linux_fs_get_file_ex(dir, fullpath);
     if (!file) {
         if (flags & O_CREAT) {
@@ -1558,7 +1565,7 @@ __open_again:
             }
             flags &= ~O_CREAT;
             free(path_in_ram);
-            goto __open_again;
+            goto __open_again_do;
         __exit_failure:
             free(path_in_ram);
             return -1;
@@ -1617,6 +1624,23 @@ __open_again:
         }
         file->pos = 0;
     }
+
+#if VSF_LINUX_CFG_LINK_FILE == ENABLED
+    if (!(flags & O_NOFOLLOW)) {
+        struct stat s;
+        if (!fstat(fd, &s) && S_ISLNK(s.st_mode)) {
+            ssize_t linklen = read(fd, linkpath, sizeof(linkpath));
+            close(fd);
+
+            if (linklen < 0) {
+                return -1;
+            }
+            linkpath[linklen] = '\0';
+            pathname = linkpath;
+            goto __open_again;
+        }
+    }
+#endif
     return fd;
 }
 

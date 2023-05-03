@@ -26,8 +26,10 @@
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/termios.h"
+#   include "shell/sys/linux/include/sys/stat.h"
 #else
 #   include <termios.h>
+#   include <sys/stat.h>
 #endif
 
 #if     defined(__VSF_LINUX_FS_CLASS_IMPLEMENT)
@@ -59,7 +61,6 @@ enum {
     VSF_LINUX_FDOP_FEATURE_FS       = 1 << 0,
 };
 
-struct stat;
 typedef struct vsf_linux_fd_op_t {
     int priv_size;
     int feature;

@@ -45,11 +45,13 @@ extern "C" {
 #define __NR_utimensat          utimensat
 
 // TODO: assert extension attr is fit in vk_file_attr_t
-#define VSF_FILE_ATTR_BLK       (VSF_FILE_ATTR_USER << 0)
-#define VSF_FILE_ATTR_LNK       (VSF_FILE_ATTR_USER << 1)
-#define VSF_FILE_ATTR_EXCL      (VSF_FILE_ATTR_USER << 2)
-#define VSF_FILE_ATTR_SOCK      (VSF_FILE_ATTR_USER << 3)
-#define VSF_FILE_ATTR_TTY       (VSF_FILE_ATTR_USER << 4)
+#define VSF_FILE_ATTR_CHR       (VSF_FILE_ATTR_USER << 0)
+#define VSF_FILE_ATTR_BLK       (VSF_FILE_ATTR_USER << 1)
+#define VSF_FILE_ATTR_LNK       (VSF_FILE_ATTR_USER << 2)
+#define VSF_FILE_ATTR_EXCL      (VSF_FILE_ATTR_USER << 3)
+#define VSF_FILE_ATTR_SOCK      (VSF_FILE_ATTR_USER << 4)
+#define VSF_FILE_ATTR_TTY       (VSF_FILE_ATTR_USER << 5)
+#define VSF_FILE_ATTR_FIFO      (VSF_FILE_ATTR_USER << 6)
 
 #define UTIME_NOW	            ((1l << 30) - 1l)
 #define UTIME_OMIT	            ((1l << 30) - 2l)

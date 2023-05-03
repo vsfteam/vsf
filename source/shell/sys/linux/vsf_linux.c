@@ -1798,17 +1798,17 @@ static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd,
     if (exefd < 0) {
         errno = ENOENT;
     }
+#if VSF_LINUX_CFG_LINK_FILE == ENABLED
+    else if (pathname != pathname_local) {
+        
+    }
+#endif
     return exefd;
 }
 
 int __vsf_linux_get_exe(char *pathname, int pathname_len, char *cmd, vsf_linux_main_entry_t *entry, bool use_path)
 {
-    return __vsf_linux_get_exe_path(pathname, pathname_len, cmd, entry, use_path ? getenv("PATH") : NULL);
-}
-
-int __vsf_linux_get_exe_entry(char *cmd, vsf_linux_main_entry_t *entry, bool use_path)
-{
-    int exefd = __vsf_linux_get_exe(NULL, 0, cmd, entry, use_path);
+    int exefd = __vsf_linux_get_exe_path(pathname, pathname_len, cmd, entry, use_path ? getenv("PATH") : NULL);
     if (exefd < 0) {
         return -1;
     }
@@ -1964,9 +1964,24 @@ static exec_ret_t __vsf_linux_execvpe(vsf_linux_main_entry_t entry, char * const
 exec_ret_t execvpe(const char *file, char * const * argv, char  * const * envp)
 {
     vsf_linux_main_entry_t entry;
-    if (__vsf_linux_get_exe_entry((char *)file, &entry, true) < 0) {
+#if VSF_LINUX_USE_PROCFS == ENABLED
+#   if VSF_LINUX_CFG_LINK_FILE == ENABLED
+    char localpath[PATH_MAX];
+    if (__vsf_linux_get_exe(localpath, sizeof(localpath), (char *)file, &entry, true) < 0) {
+#   else
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    if (__vsf_linux_get_exe(process->path, sizeof(process->path), (char *)file, &entry, true) < 0) {
+#   endif
+#else
+    if (__vsf_linux_get_exe(NULL, 0, (char *)file, &entry, true) < 0) {
+#endif
         return -1;
     }
+#if VSF_LINUX_USE_PROCFS == ENABLED && VSF_LINUX_CFG_LINK_FILE == ENABLED
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    strcpy(process->path, localpath);
+#endif
     return __vsf_linux_execvpe(entry, argv, envp);
 }
 
@@ -1978,9 +1993,24 @@ exec_ret_t execvp(const char *file, char * const * argv)
 exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp)
 {
     vsf_linux_main_entry_t entry;
-    if (__vsf_linux_get_exe_entry((char *)pathname, &entry, false) < 0) {
+#if VSF_LINUX_USE_PROCFS == ENABLED
+#   if VSF_LINUX_CFG_LINK_FILE == ENABLED
+    char localpath[PATH_MAX];
+    if (__vsf_linux_get_exe(localpath, sizeof(localpath), (char *)pathname, &entry, false) < 0) {
+#   else
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    if (__vsf_linux_get_exe(process->path, sizeof(process->path), (char *)pathname, &entry, false) < 0) {
+#   endif
+#else
+    if (__vsf_linux_get_exe(NULL, 0, (char *)pathname, &entry, false) < 0) {
+#endif
         return -1;
     }
+#if VSF_LINUX_USE_PROCFS == ENABLED && VSF_LINUX_CFG_LINK_FILE == ENABLED
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    strcpy(process->path, localpath);
+#endif
     return __vsf_linux_execvpe(entry, argv, envp);
 }
 
@@ -2032,9 +2062,24 @@ exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, 
 exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
 {
     vsf_linux_main_entry_t entry;
-    if (__vsf_linux_get_exe_entry((char *)pathname, &entry, true) < 0) {
+#if VSF_LINUX_USE_PROCFS == ENABLED
+#   if VSF_LINUX_CFG_LINK_FILE == ENABLED
+    char localpath[PATH_MAX];
+    if (__vsf_linux_get_exe(localpath, sizeof(localpath), (char *)pathname, &entry, true) < 0) {
+#   else
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    if (__vsf_linux_get_exe(process->path, sizeof(process->path), (char *)pathname, &entry, true) < 0) {
+#   endif
+#else
+    if (__vsf_linux_get_exe(NULL, 0, (char *)pathname, &entry, true) < 0) {
+#endif
         return -1;
     }
+#if VSF_LINUX_USE_PROCFS == ENABLED && VSF_LINUX_CFG_LINK_FILE == ENABLED
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    strcpy(process->path, localpath);
+#endif
     return __vsf_linux_execlp_va(entry, arg, ap);
 }
 
@@ -2052,9 +2097,24 @@ exec_ret_t execlp(const char *pathname, const char *arg, ...)
 exec_ret_t __execl_va(const char *pathname, const char *arg, va_list ap)
 {
     vsf_linux_main_entry_t entry;
-    if (__vsf_linux_get_exe_entry((char *)pathname, &entry, false) < 0) {
+#if VSF_LINUX_USE_PROCFS == ENABLED
+#   if VSF_LINUX_CFG_LINK_FILE == ENABLED
+    char localpath[PATH_MAX];
+    if (__vsf_linux_get_exe(localpath, sizeof(localpath), (char *)pathname, &entry, false) < 0) {
+#   else
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    if (__vsf_linux_get_exe(process->path, sizeof(process->path), (char *)pathname, &entry, false) < 0) {
+#   endif
+#else
+    if (__vsf_linux_get_exe(NULL, 0, (char *)pathname, &entry, false) < 0) {
+#endif
         return -1;
     }
+#if VSF_LINUX_USE_PROCFS == ENABLED && VSF_LINUX_CFG_LINK_FILE == ENABLED
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    strcpy(process->path, localpath);
+#endif
     return __vsf_linux_execlp_va(entry, arg, ap);
 }
 
@@ -3187,25 +3247,38 @@ unsigned int minor(dev_t dev)
 
 // spawn.h
 
-// the last paramter, which is priv_size is used to capture necessary variables when
-//  use spawn to replace fork/vfork.
-// __vsf_linux_get_process_priv can be used to get the buffer in priv_size which is
-//  bounded to process.
-int __vsf_linux_spawn(pid_t *pid, vsf_linux_main_entry_t entry,
+static int __vsf_linux_spawn_ex(pid_t *pid, vsf_linux_main_entry_t entry,
                 const posix_spawn_file_actions_t *actions,
                 const posix_spawnattr_t *attr,
-                char * const argv[], char * const env[], void *priv, int priv_size)
+                char * const argv[], char * const env[], void *priv, int priv_size, const char *path, bool use_path)
 {
+    vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
     vsf_linux_process_t *process = vsf_linux_create_process(0, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE, priv_size);
     if (NULL == process) { return -ENOMEM; }
     vsf_linux_process_ctx_t *ctx = &process->ctx;
+
+    if (NULL == entry) {
+#if VSF_LINUX_USE_PROCFS == ENABLED
+        if (__vsf_linux_get_exe(process->path, sizeof(process->path), (char *)path, &entry, use_path) < 0) {
+#else
+        if (__vsf_linux_get_exe(NULL, 0, (char *)path, &entry, use_path) < 0) {
+#endif
+            if (pid != NULL) {
+                *pid = -1;
+            }
+            return -1;
+        }
+    } else {
+#if VSF_LINUX_USE_PROCFS == ENABLED
+        strcpy(process->path, cur_process->path);
+#endif
+    }
     ctx->entry = entry;
 
     if (argv != NULL) {
         __vsf_linux_process_parse_arg(process, NULL, argv);
     }
 
-    vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
     process->shell_process = cur_process->shell_process;
 
     // dup fds
@@ -3319,19 +3392,24 @@ delete_process_and_fail:
     return -1;
 }
 
+// the last paramter, which is priv_size is used to capture necessary variables when
+//  use spawn to replace fork/vfork.
+// __vsf_linux_get_process_priv can be used to get the buffer in priv_size which is
+//  bounded to process.
+int __vsf_linux_spawn(pid_t *pid, vsf_linux_main_entry_t entry,
+                const posix_spawn_file_actions_t *actions,
+                const posix_spawnattr_t *attr,
+                char * const argv[], char * const env[], void *priv, int priv_size)
+{
+    return __vsf_linux_spawn_ex(pid, entry, actions, attr, argv, env, priv, priv_size, NULL, false);
+}
+
 int posix_spawnp(pid_t *pid, const char *file,
                 const posix_spawn_file_actions_t *actions,
                 const posix_spawnattr_t *attr,
                 char * const argv[], char * const env[])
 {
-    vsf_linux_main_entry_t entry;
-    if (__vsf_linux_get_exe_entry((char *)file, &entry, true) < 0) {
-        if (pid != NULL) {
-            *pid = -1;
-        }
-        return -1;
-    }
-    return __vsf_linux_spawn(pid, entry, actions, attr, argv, env, NULL, 0);
+    return __vsf_linux_spawn_ex(pid, NULL, actions, attr, argv, env, NULL, 0, file, true);
 }
 
 int posix_spawn(pid_t *pid, const char *path,
@@ -3339,14 +3417,7 @@ int posix_spawn(pid_t *pid, const char *path,
                 const posix_spawnattr_t *attr,
                 char * const argv[], char * const env[])
 {
-    vsf_linux_main_entry_t entry;
-    if (__vsf_linux_get_exe_entry((char *)path, &entry, false) < 0) {
-        if (pid != NULL) {
-            *pid = -1;
-        }
-        return -1;
-    }
-    return __vsf_linux_spawn(pid, entry, actions, attr, argv, env, NULL, 0);
+    return __vsf_linux_spawn_ex(pid, NULL, actions, attr, argv, env, NULL, 0, path, false);
 }
 
 int posix_spawnattr_init(posix_spawnattr_t *attr)
