@@ -244,7 +244,7 @@ const char * gai_strerror(int errcode)
     return (const char *)"unknown error";
 }
 
-struct hostent * gethostbyaddr(const void *addr, size_t len, int type)
+struct hostent * gethostbyaddr(const void *addr, socklen_t len, int type)
 {
     return NULL;
 }
@@ -296,7 +296,41 @@ int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
                         char *host, socklen_t hostlen,
                         char *serv, socklen_t servlen, int flags)
 {
-    return -1;
+    union {
+        const struct sockaddr_in *addr_in;
+        const struct sockaddr *addr;
+    } uaddr;
+
+    if (flags & ~(NI_NUMERICHOST | NI_NUMERICSERV)) {
+        return EAI_BADFLAGS;
+    }
+
+    uaddr.addr = addr;
+    switch (addr->sa_family) {
+    case AF_INET:
+        if (addrlen < sizeof(*uaddr.addr_in)) {
+            return EAI_FAMILY;
+        }
+
+        if (host != NULL) {
+            if (flags & NI_NUMERICHOST) {
+                if (inet_ntop(AF_INET, &uaddr.addr_in->sin_addr, host, hostlen) == NULL) {
+                    return EAI_OVERFLOW;
+                }
+            }
+        }
+        if (serv != NULL) {
+            if (flags & NI_NUMERICSERV) {
+                if (snprintf(serv, servlen, "%d", ntohs(uaddr.addr_in->sin_port)) < 0) {
+                    return EAI_OVERFLOW;
+                }
+            }
+        }
+        return 0;
+    default:
+    case AF_INET6:
+        return EAI_FAMILY;
+    }
 }
 
 int getaddrinfo(const char *name, const char *service, const struct addrinfo *hints,
