@@ -173,6 +173,7 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd);
 
 static void __vsf_linux_term_init(vsf_linux_fd_t *sfd);
 static int __vsf_linux_term_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
+static int __vsf_linux_term_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 static ssize_t __vsf_linux_term_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static ssize_t __vsf_linux_term_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_term_close(vsf_linux_fd_t *sfd);
@@ -251,6 +252,7 @@ const vsf_linux_fd_op_t vsf_linux_term_fdop = {
     .fn_read            = __vsf_linux_term_read,
     .fn_write           = __vsf_linux_term_write,
     .fn_close           = __vsf_linux_term_close,
+    .fn_stat            = __vsf_linux_term_stat,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -3010,12 +3012,18 @@ static int __vsf_linux_term_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
     return ret;
 }
 
+int __vsf_linux_term_stat(vsf_linux_fd_t *sfd, struct stat *buf)
+{
+    buf->st_mode = S_IFCHR;
+    return 0;
+}
+
 static ssize_t __vsf_linux_term_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
     vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
     const vsf_linux_fd_op_t *subop = priv->subop;
 
-    if (subop->fn_read != NULL) {
+    if ((subop != NULL) && (subop->fn_read != NULL)) {
         return subop->fn_read(sfd, buf, count);
     }
     return 0;
@@ -3026,7 +3034,7 @@ static ssize_t __vsf_linux_term_write(vsf_linux_fd_t *sfd, const void *buf, size
     vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
     const vsf_linux_fd_op_t *subop = priv->subop;
 
-    if (subop->fn_write != NULL) {
+    if ((subop != NULL) && (subop->fn_write != NULL)) {
         return subop->fn_write(sfd, buf, count);
     }
     return 0;
@@ -3037,7 +3045,7 @@ static int __vsf_linux_term_close(vsf_linux_fd_t *sfd)
     vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
     const vsf_linux_fd_op_t *subop = priv->subop;
 
-    if (subop->fn_close != NULL) {
+    if ((subop != NULL) && (subop->fn_close != NULL)) {
         return subop->fn_close(sfd);
     }
     return 0;

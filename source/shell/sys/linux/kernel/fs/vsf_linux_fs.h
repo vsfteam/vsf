@@ -184,6 +184,7 @@ typedef struct vsf_linux_term_priv_t {
 
 #if defined(__VSF_LINUX_FS_CLASS_IMPLEMENT) || defined(__VSF_LINUX_FS_CLASS_INHERIT__)
 extern const vsf_linux_fd_op_t __vsf_linux_fs_fdop;
+extern const vsf_linux_fd_op_t __vsf_linux_stream_fdop;
 extern const vsf_linux_fd_op_t vsf_linux_pipe_rx_fdop;
 extern const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop;
 extern const vsf_linux_fd_op_t vsf_linux_term_fdop;
