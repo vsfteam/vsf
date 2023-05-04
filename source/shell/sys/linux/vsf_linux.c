@@ -1124,7 +1124,12 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size, int heap
             vsf_dlist_add_to_tail(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
         vsf_unprotect_sched(orig);
         if (process->id.pid) {
-            process->id.ppid = getpid();
+            process->id.ppid = process->id.pid;
+            if (process->parent_process != NULL) {
+                process->id.gid = process->parent_process->id.gid;
+            } else {
+                process->id.gid = process->id.pid;
+            }
         }
 
         if (heap_size > 0) {
@@ -1645,6 +1650,15 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
     }
 }
 
+void vsf_linux_attach_process(vsf_linux_process_t *process, vsf_linux_process_t *parent_process)
+{
+    vsf_protect_t orig = vsf_protect_sched();
+        vsf_dlist_add_to_tail(vsf_linux_process_t, child_node, &parent_process->child_list, process);
+    vsf_unprotect_sched(orig);
+    process->parent_process = parent_process;
+    process->id.gid = parent_process->id.gid;
+}
+
 void vsf_linux_detach_process(vsf_linux_process_t *process)
 {
     if (process->parent_process != NULL) {
@@ -1652,6 +1666,7 @@ void vsf_linux_detach_process(vsf_linux_process_t *process)
             vsf_dlist_remove(vsf_linux_process_t, child_node, &process->parent_process->child_list, process);
         vsf_unprotect_sched(orig);
         process->parent_process = NULL;
+        process->id.gid = process->id.pid;
     }
 }
 
@@ -2561,32 +2576,45 @@ pid_t getppid(void)
 
 pid_t setsid(void)
 {
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    vsf_linux_detach_process(process);
     return 0;
 }
 
 pid_t getsid(pid_t pid)
 {
-    return 0;
+    return -1;
 }
 
 int setpgid(pid_t pid, pid_t pgid)
 {
+    vsf_linux_process_t *process = 0 == pid ? vsf_linux_get_cur_process() : vsf_linux_get_process(pid);
+    if (0 == pgid) {
+        vsf_linux_detach_process(process);
+        process->id.gid = process->id.pid;
+    } else if (process->id.gid != pgid) {
+        vsf_linux_process_t *process_group = vsf_linux_get_process(pgid);
+        vsf_linux_detach_process(process);
+        vsf_linux_attach_process(process, process_group);
+    }
     return 0;
 }
 
 pid_t getpgid(pid_t pid)
 {
-    return 0;
+    vsf_linux_process_t *process = vsf_linux_get_process(pid);
+    return process->id.gid;
 }
 
 int setpgrp(void)
 {
-    return 0;
+    return setpgid(0, 0);
 }
 
 pid_t getpgrp(void)
 {
-   return 0;
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    return process->id.gid;
 }
 
 int setresuid(uid_t ruid, uid_t euid, uid_t suid)
@@ -3271,10 +3299,10 @@ static int __vsf_linux_spawn_ex(pid_t *pid, vsf_linux_main_entry_t entry,
                 const posix_spawnattr_t *attr,
                 char * const argv[], char * const env[], void *priv, int priv_size, const char *path, bool use_path)
 {
-    vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
     vsf_linux_process_t *process = vsf_linux_create_process(0, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE, priv_size);
     if (NULL == process) { return -ENOMEM; }
     vsf_linux_process_ctx_t *ctx = &process->ctx;
+    vsf_linux_process_t *cur_process = process->parent_process;
 
     if (NULL == entry) {
 #if VSF_LINUX_USE_PROCFS == ENABLED
@@ -3617,15 +3645,12 @@ int tcsetattr(int fd, int optional_actions, const struct termios *termios)
 
 pid_t tcgetpgrp(int fd)
 {
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    return process->id.gid;
+    return getpgrp();
 }
 
 int tcsetpgrp(int fd, pid_t pgrp)
 {
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    process->id.gid = pgrp;
-    return 0;
+    return setpgid(0, pgrp);
 }
 
 int tcsendbreak(int fd, int duration)
