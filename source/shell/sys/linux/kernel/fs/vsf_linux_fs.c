@@ -1716,7 +1716,9 @@ int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd)
             err = sfd->op->fn_close(sfd);
         }
         // priv of fd does not belong to the process
-        vsf_linux_free_res(sfd->priv);
+        if (!(sfd->fd_flags & __VSF_FILE_ATTR_SHARE_PRIV)) {
+            vsf_linux_free_res(sfd->priv);
+        }
     }
     __vsf_linux_fd_delete_ex(process, fd);
     return err;
@@ -2973,6 +2975,11 @@ int mknodat(int dirfd, const char *pathname, mode_t mode, dev_t dev)
 static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
 {
     vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
+    if (priv->file != NULL) {
+        // excl should be forced on terminals
+        priv->file->attr |= VSF_FILE_ATTR_EXCL | __VSF_FILE_ATTR_SHARE_PRIV;
+        sfd->fd_flags |= __VSF_FILE_ATTR_SHARE_PRIV;
+    }
     // default is 115200_8N1
     static const struct termios __default_term = {
         .c_cflag        = CS8,
@@ -3050,11 +3057,15 @@ static int __vsf_linux_term_close(vsf_linux_fd_t *sfd)
 {
     vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
     const vsf_linux_fd_op_t *subop = priv->subop;
+    int result = 0;
 
     if ((subop != NULL) && (subop->fn_close != NULL)) {
-        return subop->fn_close(sfd);
+        result = subop->fn_close(sfd);
     }
-    return 0;
+    if (priv->file != NULL) {
+        __vsf_linux_fs_close(sfd);
+    }
+    return result;
 }
 
 // mntent
