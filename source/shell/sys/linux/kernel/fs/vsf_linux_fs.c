@@ -1510,6 +1510,7 @@ int creat(const char *pathname, mode_t mode)
 int vsf_linux_open(vk_file_t *dir, const char *pathname, int flags, mode_t mode)
 {
     vk_file_t *file;
+    vk_vfs_file_t *vfs_file = NULL;
     vsf_linux_fd_t *sfd;
     vsf_linux_fd_op_t *fdop;
     char fullpath[MAX_PATH];
@@ -1584,8 +1585,8 @@ __open_again_do:
 
     if (    (file->fsop == &vk_vfs_op)
         &&  !(file->attr & VSF_FILE_ATTR_DIRECTORY)
-        &&  (((vk_vfs_file_t *)file)->f.op != NULL)) {
-        fdop = (vsf_linux_fd_op_t *)((vk_vfs_file_t *)file)->f.op;
+        &&  ((vfs_file = (vk_vfs_file_t *)file)->f.op != NULL)) {
+        fdop = (vsf_linux_fd_op_t *)vfs_file->f.op;
     } else {
         fdop = (vsf_linux_fd_op_t *)&__vsf_linux_fs_fdop;
         // check not supported flags here
@@ -1595,7 +1596,11 @@ __open_again_do:
         }
     }
 
-    fd = vsf_linux_fd_create(&sfd, (const vsf_linux_fd_op_t *)fdop);
+    if ((vfs_file != NULL) && (file->attr & __VSF_FILE_ATTR_SHARE_PRIV)) {
+        fd = __vsf_linux_fd_create_ex(NULL, &sfd, (const vsf_linux_fd_op_t *)fdop, -1, vfs_file->f.param);
+    } else {
+        fd = vsf_linux_fd_create(&sfd, (const vsf_linux_fd_op_t *)fdop);
+    }
     if (fd < 0) {
         __vsf_linux_fs_close_do(file);
     } else {
@@ -1643,6 +1648,7 @@ __open_again_do:
             linkpath[linklen] = '\0';
             pathname = linkpath;
             flags |= 1 << __FD_OPENBYLINK;
+            vfs_file = NULL;
             goto __open_again;
         }
     }

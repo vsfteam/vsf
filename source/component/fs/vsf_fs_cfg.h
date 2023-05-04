@@ -101,6 +101,8 @@ typedef enum vk_file_attr_t {
     VSF_FILE_ATTR_DYN           = 1 << 7,
     VSF_FILE_ATTR_EXT           = 1 << 8,
     VSF_FILE_ATTR_USER          = 1 << 9,
+    // make vk_file_attr_t 32bit
+    VSF_FILE_ATTR_MAX           = 1 << 31,
 } vk_file_attr_t;
 
 typedef enum vk_file_whence_t {
