@@ -1716,8 +1716,8 @@ int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd)
             err = sfd->op->fn_close(sfd);
         }
         // priv of fd does not belong to the process
-        if (!(sfd->fd_flags & __VSF_FILE_ATTR_SHARE_PRIV)) {
-            vsf_linux_free_res(sfd->priv);
+        if (!(priv->flags & __VSF_FILE_ATTR_SHARE_PRIV)) {
+            vsf_linux_free_res(priv);
         }
     }
     __vsf_linux_fd_delete_ex(process, fd);
@@ -3006,6 +3006,7 @@ int vsf_linux_fs_bind_pipe(const char *pathname1, const char *pathname2)
     vfs_file = __vsf_linux_get_vfs(fd);
     vfs_file->f.param = priv;
     close(fd);
+    return 0;
 }
 
 int mkfifo(const char *pathname, mode_t mode)
@@ -3035,7 +3036,7 @@ static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
     if (priv->file != NULL) {
         // excl should be forced on terminals
         priv->file->attr |= VSF_FILE_ATTR_EXCL | __VSF_FILE_ATTR_SHARE_PRIV;
-        sfd->fd_flags |= __VSF_FILE_ATTR_SHARE_PRIV;
+        priv->flags |= __VSF_FILE_ATTR_SHARE_PRIV;
     }
     // default is 115200_8N1
     static const struct termios __default_term = {
