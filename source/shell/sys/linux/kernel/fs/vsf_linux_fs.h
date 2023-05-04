@@ -210,6 +210,7 @@ extern int vsf_linux_fs_get_target(const char *pathname, void **target);
 extern int vsf_linux_fs_bind_target_relative(vk_vfs_file_t *dir, const char *pathname,
         void *target, const vsf_linux_fd_op_t *op,
         uint_fast32_t feature, uint64_t size);
+extern int vsf_linux_fs_bind_pipe(const char *pathname1, const char *pathname2);
 
 extern int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op);
 extern vsf_linux_fd_t * vsf_linux_fd_get(int fd);

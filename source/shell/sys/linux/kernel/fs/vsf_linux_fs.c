@@ -2951,6 +2951,63 @@ vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_pipe_rx_priv_t *priv_rx)
     return sfd_tx;
 }
 
+int vsf_linux_fs_bind_pipe(const char *pathname1, const char *pathname2)
+{
+    vsf_linux_term_priv_t *priv;
+    vsf_linux_fd_t *sfd;
+    vk_vfs_file_t *vfs_file;
+    int fd;
+
+    vsf_queue_stream_t *queue_stream0 = vsf_linux_malloc_res(sizeof(vsf_queue_stream_t) * 2);
+    if (NULL == queue_stream0) {
+        return -1;
+    }
+    vsf_queue_stream_t *queue_stream1 = &queue_stream0[1];
+
+    memset(queue_stream0, 0, sizeof(vsf_queue_stream_t) * 2);
+    queue_stream0->max_buffer_size = -1;
+    queue_stream0->max_entry_num = -1;
+    queue_stream0->op = &vsf_queue_stream_op;
+    VSF_STREAM_INIT(queue_stream0);
+
+    queue_stream1->max_buffer_size = -1;
+    queue_stream1->max_entry_num = -1;
+    queue_stream1->op = &vsf_queue_stream_op;
+    VSF_STREAM_INIT(queue_stream1);
+
+    vsf_linux_fs_bind_target_ex(pathname1, NULL, &vsf_linux_term_fdop,
+            NULL, NULL,
+            VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_TTY, 0);
+    fd = open(pathname1, 0);
+    sfd = vsf_linux_fd_get(fd);
+    priv = (vsf_linux_term_priv_t *)sfd->priv;
+    priv->subop = &__vsf_linux_stream_fdop;
+    priv->stream_rx = &queue_stream0->use_as__vsf_stream_t;
+    priv->stream_tx = &queue_stream1->use_as__vsf_stream_t;
+    __vsf_linux_rx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
+    __vsf_linux_tx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
+    vsf_linux_term_fdop.fn_init(sfd);
+    vfs_file = __vsf_linux_get_vfs(fd);
+    vfs_file->f.param = priv;
+    close(fd);
+
+    vsf_linux_fs_bind_target_ex(pathname2, NULL, &vsf_linux_term_fdop,
+            NULL, NULL,
+            VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_TTY, 0);
+    fd = open(pathname2, 0);
+    sfd = vsf_linux_fd_get(fd);
+    priv = (vsf_linux_term_priv_t *)sfd->priv;
+    priv->subop = &__vsf_linux_stream_fdop;
+    priv->stream_rx = &queue_stream1->use_as__vsf_stream_t;
+    priv->stream_tx = &queue_stream0->use_as__vsf_stream_t;
+    __vsf_linux_rx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
+    __vsf_linux_tx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
+    vsf_linux_term_fdop.fn_init(sfd);
+    vfs_file = __vsf_linux_get_vfs(fd);
+    vfs_file->f.param = priv;
+    close(fd);
+}
+
 int mkfifo(const char *pathname, mode_t mode)
 {
     return -1;
