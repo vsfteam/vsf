@@ -17,7 +17,7 @@
 #   include <stddef.h>
 // avoid to include <linux/xxx.h>, because it will introduce kernel structures,
 //  which will maybe conflict with user structures with the same name.
-//  include <linux/limits.h> in source file for MAX_PATH
+//  include <linux/limits.h> in source file for PATH_MAX
 //#   include <linux/limits.h>
 #   include <sys/types.h>
 #   include <sys/select.h>

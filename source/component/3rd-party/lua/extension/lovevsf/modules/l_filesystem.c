@@ -24,7 +24,7 @@
 #include "../lovevsf.h"
 
 #include <unistd.h>
-// for MAX_PATH
+// for PATH_MAX
 #include <linux/limits.h>
 #include <sys/stat.h>
 #include <stdio.h>
@@ -111,7 +111,7 @@ static int __l_filesystem_isDirectory(lua_State *L)
 
 static int __l_filesystem_getWorkingDirectory(lua_State *L)
 {
-    char path[MAX_PATH];
+    char path[PATH_MAX];
     getcwd(path, sizeof(path));
     lua_pushstring(L, path);
     return 1;

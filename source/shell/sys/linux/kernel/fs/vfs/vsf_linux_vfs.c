@@ -28,7 +28,7 @@
 #   include "shell/sys/linux/include/sys/stat.h"
 #else
 #   include <unistd.h>
-// for MAX_PATH
+// for PATH_MAX
 #   include <linux/limits.h>
 #   include <sys/stat.h>
 #endif
