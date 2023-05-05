@@ -2,6 +2,9 @@
 #define __SIMPLE_LIBC_LIMITS_H__
 
 #define CHAR_BIT                        (sizeof(char) * 8)
+#define LONG_BIT                        32
+#define WORD_BIT                        32
+
 #define SCHAR_MAX                       127
 #define SHRT_MAX                        32767
 #define USHRT_MAX                       65535
