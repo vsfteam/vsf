@@ -1481,7 +1481,7 @@ static const vsf_linux_fd_op_t __vsf_linux_gpio_fdop = {
 
 int vsf_linux_fs_bind_gpio(char *path, vsf_linux_gpio_chip_t *gpio_chip)
 {
-    char pathbuf[MAX_PATH];
+    char pathbuf[PATH_MAX];
     int pathlen = strlen(path), err;
     memcpy(pathbuf, path, pathlen + 1);
     pathbuf[pathlen++] = '/';

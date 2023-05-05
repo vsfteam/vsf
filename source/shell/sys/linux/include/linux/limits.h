@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-#ifndef MAX_PATH
-#   define MAX_PATH             260
+#ifndef PATH_MAX
+#   define PATH_MAX             260
 #endif
 
 #ifndef HOST_NAME_MAX

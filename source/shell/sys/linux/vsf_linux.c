@@ -88,7 +88,7 @@
 #   include <dlfcn.h>
 #   include <grp.h>
 #   include <fnmatch.h>
-// for MAX_PATH
+// for PATH_MAX
 #   include <linux/limits.h>
 #   include <linux/futex.h>
 #endif
@@ -647,7 +647,7 @@ int * __vsf_linux_errno(void)
 
 int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char *path_in)
 {
-    char working_dir[MAX_PATH];
+    char working_dir[PATH_MAX];
     if (NULL == dir) {
         getcwd(working_dir, sizeof(working_dir));
         dir = working_dir;
@@ -1860,7 +1860,7 @@ int __vsf_linux_get_exe(char *pathname, int pathname_len, char *cmd, vsf_linux_m
 
 const char * find_in_path(const char *progname)
 {
-    char fullpath[MAX_PATH];
+    char fullpath[PATH_MAX];
     int fd = __vsf_linux_get_exe(fullpath, sizeof(fullpath), (char *)progname, NULL, true);
     if (fd < 0) {
         return progname;
@@ -1871,7 +1871,7 @@ const char * find_in_path(const char *progname)
 
 const char * find_in_given_path(const char *progname, const char *path, const char *directory, bool optimize_for_exec)
 {
-    char fullpath[MAX_PATH];
+    char fullpath[PATH_MAX];
     int fd;
 
     if (directory != NULL) {
@@ -2175,7 +2175,7 @@ long sysconf(int name)
 long fpathconf(int fd, int name)
 {
     switch (name) {
-    case _PC_NAME_MAX:      return MAX_PATH;
+    case _PC_NAME_MAX:      return PATH_MAX;
     default:                return -1;
     }
 }
@@ -2198,13 +2198,13 @@ char *realpath(const char *path, char *resolved_path)
 {
     bool is_allocated = false;
     if (NULL == resolved_path) {
-        resolved_path = malloc(MAX_PATH);
+        resolved_path = malloc(PATH_MAX);
         if (NULL == resolved_path) {
             return NULL;
         }
         is_allocated = true;
     }
-    if (vsf_linux_generate_path(resolved_path, MAX_PATH, NULL, (char *)path)) {
+    if (vsf_linux_generate_path(resolved_path, PATH_MAX, NULL, (char *)path)) {
         if (is_allocated) {
             free(resolved_path);
         }
@@ -3346,7 +3346,7 @@ static int __vsf_linux_spawn_ex(pid_t *pid, vsf_linux_main_entry_t entry,
 
     // apply actions
     if (actions != NULL) {
-        char fullpath[MAX_PATH];
+        char fullpath[PATH_MAX];
         struct spawn_action *a = actions->actions;
         for (int i = 0; i < actions->used; i++, a++) {
             switch (a->tag) {

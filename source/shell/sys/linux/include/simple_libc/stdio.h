@@ -136,9 +136,6 @@ typedef int FILE;
 #define SEEK_CUR            1   // same value as VSF_FILE_SEEK_CUR
 #define SEEK_END            2   // same value as VSF_FILE_SEEK_END
 
-#ifndef PATH_MAX
-#   define PATH_MAX         255
-#endif
 #define EOF                 -1
 
 #define _IOFBF              0x0000

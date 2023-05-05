@@ -30,11 +30,13 @@
 #   include "./include/dirent.h"
 #   include "./include/termios.h"
 #   include "./include/sys/time.h"
+#   include "./include/linux/limits.h"
 #else
 #   include <signal.h>
 #   include <dirent.h>
 #   include <termios.h>
 #   include <sys/time.h>
+#   include <linux/limits.h>
 #endif
 
 #include "./kernel/fs/vsf_linux_fs.h"

@@ -19,7 +19,7 @@
 #   include <dirent.h>
 #   include <fcntl.h>
 #   include <findprog.h>
-// for MAX_PATH
+// for PATH_MAX
 #   include <linux/limits.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_CTYPE == ENABLED
@@ -754,7 +754,7 @@ int vsh_main(int argc, char *argv[])
 
 int pwd_main(int argc, char *argv[])
 {
-    char path[MAX_PATH];
+    char path[PATH_MAX];
     getcwd(path, sizeof(path));
     printf("%s" VSH_LINEEND, path);
     return 0;

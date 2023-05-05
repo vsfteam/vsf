@@ -57,7 +57,7 @@
 #   include <mntent.h>
 #   include <glob.h>
 #   include <fnmatch.h>
-// for MAX_PATH
+// for PATH_MAX
 #   include <linux/limits.h>
 #endif
 
@@ -1241,7 +1241,7 @@ int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts, co
 
 static int __vsf_linux_fs_create(const char *pathname, mode_t mode, vk_file_attr_t attr)
 {
-    char fullpath[MAX_PATH], *name_tmp;
+    char fullpath[PATH_MAX], *name_tmp;
     int err = 0;
     if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
         return -1;
@@ -1265,7 +1265,7 @@ static int __vsf_linux_fs_create(const char *pathname, mode_t mode, vk_file_attr
 
 static int __vsf_linux_fs_remove(const char *pathname, vk_file_attr_t attr)
 {
-    char fullpath[MAX_PATH];
+    char fullpath[PATH_MAX];
     if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
         return -1;
     }
@@ -1293,7 +1293,7 @@ static int __vsf_linux_fs_remove(const char *pathname, vk_file_attr_t attr)
 
 int __vsf_linux_fs_rename(const char *pathname_old, const char *pathname_new)
 {
-    char fullpath[MAX_PATH], *name_tmp;
+    char fullpath[PATH_MAX], *name_tmp;
     vk_file_t *olddir, *newdir, *newfile;
     int err = 0;
 
@@ -1430,14 +1430,14 @@ int dup3(int oldfd, int newfd, int flags)
 int vsf_linux_chdir(vsf_linux_process_t *process, char *pathname)
 {
     VSF_LINUX_ASSERT(process != NULL);
-    char fullpath[MAX_PATH];
+    char fullpath[PATH_MAX];
     if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
         return -1;
     }
 
     int len = strlen(fullpath);
     if (fullpath[len - 1] != '/') {
-        VSF_LINUX_ASSERT(len + 1 < MAX_PATH);
+        VSF_LINUX_ASSERT(len + 1 < PATH_MAX);
         fullpath[len] = '/';
         fullpath[len + 1] = '\0';
     }
@@ -1483,7 +1483,7 @@ int fchdir(int fd)
         return -1;
     }
 
-    char pathname[MAX_PATH], *pos = pathname + MAX_PATH - 1;
+    char pathname[PATH_MAX], *pos = pathname + PATH_MAX - 1;
     size_t namelen;
     pos[0] = '\0';
     while ((file != NULL) && (file->name != NULL)) {
@@ -1513,9 +1513,9 @@ int vsf_linux_open(vk_file_t *dir, const char *pathname, int flags, mode_t mode)
     vk_vfs_file_t *vfs_file = NULL;
     vsf_linux_fd_t *sfd;
     vsf_linux_fd_op_t *fdop;
-    char fullpath[MAX_PATH];
+    char fullpath[PATH_MAX];
 #if VSF_LINUX_CFG_LINK_FILE == ENABLED
-    char linkpath[MAX_PATH];
+    char linkpath[PATH_MAX];
 #endif
     int fd;
 
@@ -1977,7 +1977,7 @@ int ftruncate(int fd, off_t length)
 
 int truncate(const char *path, off_t length)
 {
-    char fullpath[MAX_PATH];
+    char fullpath[PATH_MAX];
     if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)path)) {
         return -1;
     }
@@ -2004,7 +2004,7 @@ int ftruncate64(int fd, off64_t length)
 
 int truncate64(const char *path, off64_t length)
 {
-    char fullpath[MAX_PATH];
+    char fullpath[PATH_MAX];
     if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)path)) {
         return -1;
     }
