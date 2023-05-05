@@ -1842,7 +1842,15 @@ static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd,
 
 int __vsf_linux_get_exe(char *pathname, int pathname_len, char *cmd, vsf_linux_main_entry_t *entry, bool use_path)
 {
-    int exefd = __vsf_linux_get_exe_path(pathname, pathname_len, cmd, entry, use_path ? getenv("PATH") : NULL);
+    char *path;
+    if (use_path) {
+        path = getenv("PATH");
+    } else {
+        vsf_linux_process_t *process = vsf_linux_get_cur_process();
+        VSF_LINUX_ASSERT(process != NULL);
+        path = process->working_dir;
+    }
+    int exefd = __vsf_linux_get_exe_path(pathname, pathname_len, cmd, entry, path);
     if (exefd < 0) {
         return -1;
     }
@@ -1923,19 +1931,19 @@ int __vsf_linux_script_main(int argc, char **argv)
 #if VSF_LINUX_USE_APPLET == ENABLED
 int __vsf_linux_dynloader_main(int argc, char **argv)
 {
-    char pathname_local[PATH_MAX];
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
     vsf_linux_main_entry_t entry;
 
-    int exefd = __vsf_linux_get_exe(pathname_local, sizeof(pathname_local), argv[0], &entry, true);
+    int exefd = __vsf_linux_get_exe(NULL, 0, process->path, &entry, true);
     if (exefd < 0) {
-        printf("fail to find %s\n", argv[0]);
+        printf("fail to find %s\n", process->path);
         return -1;
     }
     close(exefd);
 
-    vsf_linux_dynloader_t *loader = dlopen(pathname_local, 0);
+    vsf_linux_dynloader_t *loader = dlopen(process->path, 0);
     if (NULL == loader) {
-        printf("fail to dlopen %s\n", pathname_local);
+        printf("fail to dlopen %s\n", process->path);
         return -1;
     }
 
@@ -1954,7 +1962,7 @@ int __vsf_linux_dynloader_main(int argc, char **argv)
         vsf_linux_set_process_reg((uintptr_t)loader->loader.generic.static_base);
         result = ((int (*)(vsf_applet_ctx_t*))loader->loader.generic.entry)(&applet_ctx);
     } else {
-        printf("no entry found for %s\n", pathname_local);
+        printf("no entry found for %s\n", process->path);
     }
 
     dlclose(loader);
