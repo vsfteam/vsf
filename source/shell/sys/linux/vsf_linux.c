@@ -1932,15 +1932,6 @@ int __vsf_linux_script_main(int argc, char **argv)
 int __vsf_linux_dynloader_main(int argc, char **argv)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    vsf_linux_main_entry_t entry;
-
-    int exefd = __vsf_linux_get_exe(NULL, 0, process->path, &entry, true);
-    if (exefd < 0) {
-        printf("fail to find %s\n", process->path);
-        return -1;
-    }
-    close(exefd);
-
     vsf_linux_dynloader_t *loader = dlopen(process->path, 0);
     if (NULL == loader) {
         printf("fail to dlopen %s\n", process->path);
