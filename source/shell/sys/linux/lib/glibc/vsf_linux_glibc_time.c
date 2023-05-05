@@ -219,9 +219,7 @@ size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *
                 if (!curlen) {
                     break;
                 }
-                // remove '\n'
-                str_cur[curlen - 1] = '\0';
-                str_cur += curlen - 1;
+                str_cur += curlen;
             } else if (curfmt != NULL) {
                 while (((ch = *curfmt++) != '\0') && (curlen < 0 || (curlen-- > 0))) {
                     *str_cur++ = ch;
@@ -243,7 +241,6 @@ size_t strftime(char *str, size_t maxsize, const char *format, const struct tm *
             *str_cur++ = ch;
         }
     }
-    *str_cur++ = '\n';
     *str_cur = '\0';
     return str_cur - str;
 }
