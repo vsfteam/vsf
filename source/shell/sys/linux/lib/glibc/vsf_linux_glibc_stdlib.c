@@ -772,7 +772,11 @@ int __clearenv_ex(vsf_linux_process_t *process)
 
 int putenv(char *string)
 {
-    return __putenv_ex(NULL, __strdup_ex(NULL, string));
+    string = __strdup_ex(NULL, string);
+    if (NULL == string) {
+        return -1;
+    }
+    return __putenv_ex(NULL, string);
 }
 
 char * getenv(const char *name)
