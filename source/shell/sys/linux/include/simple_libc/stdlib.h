@@ -15,11 +15,13 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
 #define malloc              VSF_LINUX_LIBC_WRAPPER(malloc)
-#define aligned_alloc       VSF_LINUX_LIBC_WRAPPER(aligned_alloc)
-#define realloc             VSF_LINUX_LIBC_WRAPPER(realloc)
-#define free                VSF_LINUX_LIBC_WRAPPER(free)
 #define calloc              VSF_LINUX_LIBC_WRAPPER(calloc)
+#define realloc             VSF_LINUX_LIBC_WRAPPER(realloc)
+#   endif
+#define aligned_alloc       VSF_LINUX_LIBC_WRAPPER(aligned_alloc)
+#define free                VSF_LINUX_LIBC_WRAPPER(free)
 #define memalign            VSF_LINUX_LIBC_WRAPPER(memalign)
 #define posix_memalign      VSF_LINUX_LIBC_WRAPPER(posix_memalign)
 #define malloc_usable_size  VSF_LINUX_LIBC_WRAPPER(malloc_usable_size)
