@@ -24,7 +24,9 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR != ENABLED
 #define strdup              VSF_LINUX_LIBC_WRAPPER(strdup)
+#   endif
 #define strndup             VSF_LINUX_LIBC_WRAPPER(strndup)
 #endif
 
