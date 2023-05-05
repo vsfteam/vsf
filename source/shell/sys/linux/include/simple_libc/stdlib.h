@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
-#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR != ENABLED
 #define malloc              VSF_LINUX_LIBC_WRAPPER(malloc)
 #define calloc              VSF_LINUX_LIBC_WRAPPER(calloc)
 #define realloc             VSF_LINUX_LIBC_WRAPPER(realloc)
