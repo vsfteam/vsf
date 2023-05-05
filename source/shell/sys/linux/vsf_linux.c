@@ -2006,7 +2006,7 @@ static exec_ret_t __vsf_linux_execvpe(vsf_linux_main_entry_t entry, char * const
 exec_ret_t execvpe(const char *file, char * const * argv, char  * const * envp)
 {
     vsf_linux_main_entry_t entry;
-#if VSF_LINUX_USE_PROCFS == ENABLED
+#if VSF_LINUX_USE_PROCFS == ENABLED || VSF_LINUX_USE_APPLET == ENABLED
 #   if VSF_LINUX_CFG_LINK_FILE == ENABLED
     char localpath[PATH_MAX];
     if (__vsf_linux_get_exe(localpath, sizeof(localpath), (char *)file, &entry, true) < 0) {
@@ -2019,7 +2019,7 @@ exec_ret_t execvpe(const char *file, char * const * argv, char  * const * envp)
 #endif
         return -1;
     }
-#if VSF_LINUX_USE_PROCFS == ENABLED && VSF_LINUX_CFG_LINK_FILE == ENABLED
+#if (VSF_LINUX_USE_PROCFS == ENABLED || VSF_LINUX_USE_APPLET == ENABLED) && VSF_LINUX_CFG_LINK_FILE == ENABLED
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
     strcpy(process->path, localpath);
@@ -2035,7 +2035,7 @@ exec_ret_t execvp(const char *file, char * const * argv)
 exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp)
 {
     vsf_linux_main_entry_t entry;
-#if VSF_LINUX_USE_PROCFS == ENABLED
+#if VSF_LINUX_USE_PROCFS == ENABLED || VSF_LINUX_USE_APPLET == ENABLED
 #   if VSF_LINUX_CFG_LINK_FILE == ENABLED
     char localpath[PATH_MAX];
     if (__vsf_linux_get_exe(localpath, sizeof(localpath), (char *)pathname, &entry, false) < 0) {
@@ -2048,7 +2048,7 @@ exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp
 #endif
         return -1;
     }
-#if VSF_LINUX_USE_PROCFS == ENABLED && VSF_LINUX_CFG_LINK_FILE == ENABLED
+#if (VSF_LINUX_USE_PROCFS == ENABLED || VSF_LINUX_USE_APPLET == ENABLED) && VSF_LINUX_CFG_LINK_FILE == ENABLED
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
     strcpy(process->path, localpath);
@@ -2104,7 +2104,7 @@ exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, 
 exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
 {
     vsf_linux_main_entry_t entry;
-#if VSF_LINUX_USE_PROCFS == ENABLED
+#if VSF_LINUX_USE_PROCFS == ENABLED || VSF_LINUX_USE_APPLET == ENABLED
 #   if VSF_LINUX_CFG_LINK_FILE == ENABLED
     char localpath[PATH_MAX];
     if (__vsf_linux_get_exe(localpath, sizeof(localpath), (char *)pathname, &entry, true) < 0) {
@@ -2117,7 +2117,7 @@ exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
 #endif
         return -1;
     }
-#if VSF_LINUX_USE_PROCFS == ENABLED && VSF_LINUX_CFG_LINK_FILE == ENABLED
+#if (VSF_LINUX_USE_PROCFS == ENABLED || VSF_LINUX_USE_APPLET == ENABLED) && VSF_LINUX_CFG_LINK_FILE == ENABLED
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
     strcpy(process->path, localpath);
@@ -2139,7 +2139,7 @@ exec_ret_t execlp(const char *pathname, const char *arg, ...)
 exec_ret_t __execl_va(const char *pathname, const char *arg, va_list ap)
 {
     vsf_linux_main_entry_t entry;
-#if VSF_LINUX_USE_PROCFS == ENABLED
+#if VSF_LINUX_USE_PROCFS == ENABLED || VSF_LINUX_USE_APPLET == ENABLED
 #   if VSF_LINUX_CFG_LINK_FILE == ENABLED
     char localpath[PATH_MAX];
     if (__vsf_linux_get_exe(localpath, sizeof(localpath), (char *)pathname, &entry, false) < 0) {
@@ -2152,7 +2152,7 @@ exec_ret_t __execl_va(const char *pathname, const char *arg, va_list ap)
 #endif
         return -1;
     }
-#if VSF_LINUX_USE_PROCFS == ENABLED && VSF_LINUX_CFG_LINK_FILE == ENABLED
+#if (VSF_LINUX_USE_PROCFS == ENABLED || VSF_LINUX_USE_APPLET == ENABLED) && VSF_LINUX_CFG_LINK_FILE == ENABLED
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
     strcpy(process->path, localpath);
@@ -3313,7 +3313,7 @@ static int __vsf_linux_spawn_ex(pid_t *pid, vsf_linux_main_entry_t entry,
     vsf_linux_process_t *cur_process = process->parent_process;
 
     if (NULL == entry) {
-#if VSF_LINUX_USE_PROCFS == ENABLED
+#if VSF_LINUX_USE_PROCFS == ENABLED || VSF_LINUX_USE_APPLET == ENABLED
         if (__vsf_linux_get_exe(process->path, sizeof(process->path), (char *)path, &entry, use_path) < 0) {
 #else
         if (__vsf_linux_get_exe(NULL, 0, (char *)path, &entry, use_path) < 0) {
@@ -3324,7 +3324,7 @@ static int __vsf_linux_spawn_ex(pid_t *pid, vsf_linux_main_entry_t entry,
             return -1;
         }
     } else {
-#if VSF_LINUX_USE_PROCFS == ENABLED
+#if VSF_LINUX_USE_PROCFS == ENABLED || VSF_LINUX_USE_APPLET == ENABLED
         strcpy(process->path, cur_process->path);
 #endif
     }
