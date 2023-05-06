@@ -160,12 +160,12 @@ static int __vsf_linux_eventfd_eof(vsf_linux_fd_t *sfd);
 
 static int __vsf_linux_epollfd_close(vsf_linux_fd_t *sfd);
 
+static void __vsf_linux_stream_init(vsf_linux_fd_t *sfd);
 static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd);
-static int __vsf_linux_stream_rx_eof(vsf_linux_fd_t *sfd);
-static int __vsf_linux_stream_tx_eof(vsf_linux_fd_t *sfd);
+static int __vsf_linux_stream_eof(vsf_linux_fd_t *sfd);
 
 static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static int __vsf_linux_pipe_stat(vsf_linux_fd_t *sfd, struct stat *buf);
@@ -218,29 +218,21 @@ const vsf_linux_fd_op_t __vsf_linux_epollfd_fdop = {
 const vsf_linux_fd_op_t __vsf_linux_stream_fdop = {
     .priv_size          = sizeof(vsf_linux_stream_priv_t),
     .feature            = VSF_LINUX_FDOP_FEATURE_FS,
+    .fn_init            = __vsf_linux_stream_init,
     .fn_fcntl           = __vsf_linux_stream_fcntl,
     .fn_read            = __vsf_linux_stream_read,
     .fn_write           = __vsf_linux_stream_write,
     .fn_close           = __vsf_linux_stream_close,
 };
 
-const vsf_linux_fd_op_t vsf_linux_pipe_rx_fdop = {
-    .priv_size          = sizeof(vsf_linux_pipe_rx_priv_t),
+const vsf_linux_fd_op_t vsf_linux_pipe_fdop = {
+    .priv_size          = sizeof(vsf_linux_pipe_priv_t),
     .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_fcntl           = __vsf_linux_pipe_fcntl,
     .fn_read            = __vsf_linux_stream_read,
-    .fn_close           = __vsf_linux_pipe_close,
-    .fn_eof             = __vsf_linux_stream_rx_eof,
-    .fn_stat            = __vsf_linux_pipe_stat,
-};
-
-const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop = {
-    .priv_size          = sizeof(vsf_linux_pipe_tx_priv_t),
-    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
-    .fn_fcntl           = __vsf_linux_pipe_fcntl,
     .fn_write           = __vsf_linux_stream_write,
     .fn_close           = __vsf_linux_pipe_close,
-    .fn_eof             = __vsf_linux_stream_tx_eof,
+    .fn_eof             = __vsf_linux_stream_eof,
     .fn_stat            = __vsf_linux_pipe_stat,
 };
 
@@ -2470,6 +2462,12 @@ int vsf_linux_fs_bind_target(const char *pathname, void *target,
     return vsf_linux_fs_bind_target_ex(pathname, target, NULL, peda_read, peda_write, 0, 0);
 }
 
+int vsf_linux_fs_bind_fdpriv(const char *pathname, vsf_linux_fd_priv_t *priv,
+        const vsf_linux_fd_op_t *op, uint_fast32_t feature, uint64_t size)
+{
+    return vsf_linux_fs_bind_target_ex(pathname, priv, op, NULL, NULL, feature, size);
+}
+
 __vsf_component_peda_ifs_entry(__vk_vfs_buffer_write, vk_file_write)
 {
     vsf_peda_begin();
@@ -2528,6 +2526,7 @@ int vsf_linux_fs_bind_buffer(const char *pathname, void *buffer,
 }
 
 // stream
+
 static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     return 0;
@@ -2771,26 +2770,33 @@ void __vsf_linux_rx_stream_drop(vsf_linux_stream_priv_t *priv_rx)
     }
 }
 
+static void __vsf_linux_stream_init(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
+    if (priv->stream_rx != NULL) {
+        __vsf_linux_rx_stream_init(priv);
+    }
+    if (priv->stream_tx != NULL) {
+        __vsf_linux_tx_stream_init(priv);
+    }
+}
+
 static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd)
 {
-    if (!isatty(sfd->fd)) {
-        vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
-        __vsf_linux_rx_stream_fini(priv);
-        __vsf_linux_tx_stream_fini(priv);
+    vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
+    __vsf_linux_rx_stream_fini(priv);
+    __vsf_linux_tx_stream_fini(priv);
+    if (    !(priv->flags & __VSF_FILE_ATTR_SHARE_PRIV)
+        &&  priv->is_to_free_stream && (priv->stream_rx != NULL)) {
+        vsf_linux_free_res(priv->stream_rx);
     }
     return 0;
 }
 
-static int __vsf_linux_stream_rx_eof(vsf_linux_fd_t *sfd)
+static int __vsf_linux_stream_eof(vsf_linux_fd_t *sfd)
 {
     vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
     return !vsf_stream_is_tx_connected(priv->stream_rx);
-}
-
-static int __vsf_linux_stream_tx_eof(vsf_linux_fd_t *sfd)
-{
-    vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
-    return !vsf_stream_is_rx_connected(priv->stream_rx);
 }
 
 static vsf_linux_fd_t * __vsf_linux_stream(vsf_stream_t *stream_rx, vsf_stream_t *stream_tx)
@@ -2830,24 +2836,6 @@ vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream)
     return vsf_linux_stream(NULL, stream);
 }
 
-vsf_stream_t * vsf_linux_get_rx_stream(vsf_linux_fd_t *sfd)
-{
-    if (    (sfd->op == &__vsf_linux_stream_fdop)
-        ||  (sfd->op == &vsf_linux_pipe_rx_fdop)) {
-        return ((vsf_linux_stream_priv_t *)sfd->priv)->stream_rx;
-    }
-    return NULL;
-}
-
-vsf_stream_t * vsf_linux_get_tx_stream(vsf_linux_fd_t *sfd)
-{
-    if (    (sfd->op == &__vsf_linux_stream_fdop)
-        ||  (sfd->op == &vsf_linux_pipe_tx_fdop)) {
-        return ((vsf_linux_stream_priv_t *)sfd->priv)->stream_tx;
-    }
-    return NULL;
-}
-
 // pipe
 static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
@@ -2862,51 +2850,30 @@ static int __vsf_linux_pipe_stat(vsf_linux_fd_t *sfd, struct stat *buf)
 
 static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
 {
-    bool is_rx_pipe = &vsf_linux_pipe_rx_fdop == sfd->op;
-    if (is_rx_pipe) {
-        vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd->priv;
-        VSF_STREAM_READ(priv_rx->stream_rx, NULL, 0xFFFFFFFF);
+    vsf_linux_pipe_priv_t *priv = (vsf_linux_pipe_priv_t *)sfd->priv;
+    if (priv->stream_rx != NULL) {
+        VSF_STREAM_READ(priv->stream_rx, NULL, 0xFFFFFFFF);
     }
-    int ret = __vsf_linux_stream_close(sfd);
-    union {
-        vsf_linux_pipe_rx_priv_t *rx;
-        vsf_linux_pipe_tx_priv_t *tx;
-        void *ptr;
-    } priv;
-    priv.ptr = sfd->priv;
-    vsf_protect_t orig = vsf_protect_sched();
-    if (is_rx_pipe) {
-        if (priv.rx->is_to_free_stream) {
-            if (priv.rx->pipe_tx_priv != NULL) {
-                priv.rx->pipe_tx_priv->stream_tx = NULL;
-                priv.rx->pipe_tx_priv->pipe_rx_priv = NULL;
-            }
-            vsf_unprotect_sched(orig);
 
-            // pipe internals does not belong to process
-            vsf_linux_free_res(priv.rx->stream_rx);
-        } else {
-            if (priv.rx->pipe_tx_priv != NULL) {
-                priv.rx->pipe_tx_priv->pipe_rx_priv = NULL;
-            }
-            vsf_unprotect_sched(orig);
+    vsf_protect_t orig = vsf_protect_sched();
+    if (priv->pipe_remote != NULL) {
+        if (priv->is_to_free_stream) {
+            priv->pipe_remote->stream_tx = NULL;
         }
-    } else {
+
         // pipe_tx is closed, set stick_events in pipe_rx with POLLLIN
-        if (priv.tx->pipe_rx_priv != NULL) {
-            priv.tx->pipe_rx_priv->sticky_events = POLLIN;
-            priv.tx->pipe_rx_priv->pipe_tx_priv = NULL;
-        }
-        vsf_unprotect_sched(orig);
+        priv->pipe_remote->sticky_events = POLLIN;
+        priv->pipe_remote->pipe_remote = NULL;
     }
-    return ret;
+    vsf_unprotect_sched(orig);
+    return __vsf_linux_stream_close(sfd);
 }
 
-vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_queue_stream_t *queue_stream)
+static vsf_linux_fd_t * __vsf_linux_rx_pipe(vsf_queue_stream_t *queue_stream, const vsf_linux_fd_op_t *op)
 {
     vsf_linux_fd_t *sfd_rx = NULL;
-    if (vsf_linux_fd_create(&sfd_rx, &vsf_linux_pipe_rx_fdop) >= 0) {
-        vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
+    if (vsf_linux_fd_create(&sfd_rx, op) >= 0) {
+        vsf_linux_pipe_priv_t *priv_rx = (vsf_linux_pipe_priv_t *)sfd_rx->priv;
 
         if (NULL == queue_stream) {
             // pipe internals does not belong to process
@@ -2933,80 +2900,85 @@ vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_queue_stream_t *queue_stream)
     return sfd_rx;
 }
 
-vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_pipe_rx_priv_t *priv_rx)
+vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_queue_stream_t *queue_stream)
+{
+    return __vsf_linux_rx_pipe(queue_stream, &vsf_linux_pipe_fdop);
+}
+
+void __vsf_linux_tx_pipe_init(vsf_linux_fd_t *sfd_tx, vsf_linux_pipe_priv_t *priv_rx)
+{
+    VSF_LINUX_ASSERT(priv_rx->stream_rx != NULL);
+    vsf_linux_pipe_priv_t *priv_tx = (vsf_linux_pipe_priv_t *)sfd_tx->priv;
+    priv_tx->stream_tx = priv_rx->stream_rx;
+
+    __vsf_linux_tx_stream_init(&priv_tx->use_as__vsf_linux_stream_priv_t);
+
+    priv_rx->pipe_remote = priv_tx;
+    priv_tx->pipe_remote = priv_rx;
+}
+
+static vsf_linux_fd_t * __vsf_linux_tx_pipe(vsf_linux_pipe_priv_t *priv_rx, const vsf_linux_fd_op_t *op)
 {
     VSF_LINUX_ASSERT(priv_rx != NULL);
-    vsf_stream_t *stream_rx = priv_rx->stream_rx;
-    VSF_LINUX_ASSERT(stream_rx != NULL);
     vsf_linux_fd_t *sfd_tx = NULL;
-    if (vsf_linux_fd_create(&sfd_tx, &vsf_linux_pipe_tx_fdop) >= 0) {
-        vsf_linux_pipe_tx_priv_t *priv_tx = (vsf_linux_pipe_tx_priv_t *)sfd_tx->priv;
-        priv_tx->stream_tx = stream_rx;
-
-        __vsf_linux_tx_stream_init(&priv_tx->use_as__vsf_linux_stream_priv_t);
-
-        priv_rx->pipe_tx_priv = priv_tx;
-        priv_tx->pipe_rx_priv = priv_rx;
+    if (vsf_linux_fd_create(&sfd_tx, op) >= 0) {
+        __vsf_linux_tx_pipe_init(sfd_tx, priv_rx);
     }
     return sfd_tx;
 }
 
-int vsf_linux_fs_bind_pipe(const char *pathname1, const char *pathname2)
+vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_pipe_priv_t *priv_rx)
 {
-    vsf_linux_term_priv_t *priv;
-    vsf_linux_fd_t *sfd;
-    vk_vfs_file_t *vfs_file;
-    int fd;
+    return __vsf_linux_tx_pipe(priv_rx, &vsf_linux_pipe_fdop);
+}
 
-    vsf_queue_stream_t *queue_stream0 = vsf_linux_malloc_res(sizeof(vsf_queue_stream_t) * 2);
-    if (NULL == queue_stream0) {
+int vsf_linux_pipe(const vsf_linux_fd_op_t *op, vsf_queue_stream_t *queue_stream1, vsf_queue_stream_t *queue_stream2,
+                    vsf_linux_fd_t **sfd1, vsf_linux_fd_t **sfd2)
+{
+    VSF_LINUX_ASSERT((op != NULL) && (sfd1 != NULL) && (sfd2 != NULL));
+
+    *sfd1 = __vsf_linux_rx_pipe(queue_stream1, op);
+    if (NULL == *sfd1) {
         return -1;
     }
-    vsf_queue_stream_t *queue_stream1 = &queue_stream0[1];
+    *sfd2 = __vsf_linux_rx_pipe(queue_stream2, op);
+    if (NULL == *sfd2) {
+        vsf_linux_fd_delete((*sfd1)->fd);
+        return -1;
+    }
+    __vsf_linux_tx_pipe_init(*sfd1, (vsf_linux_pipe_priv_t *)(*sfd2)->priv);
+    __vsf_linux_tx_pipe_init(*sfd2, (vsf_linux_pipe_priv_t *)(*sfd1)->priv);
 
-    memset(queue_stream0, 0, sizeof(vsf_queue_stream_t) * 2);
-    queue_stream0->max_buffer_size = -1;
-    queue_stream0->max_entry_num = -1;
-    queue_stream0->op = &vsf_queue_stream_op;
-    VSF_STREAM_INIT(queue_stream0);
-
-    queue_stream1->max_buffer_size = -1;
-    queue_stream1->max_entry_num = -1;
-    queue_stream1->op = &vsf_queue_stream_op;
-    VSF_STREAM_INIT(queue_stream1);
-
-    vsf_linux_fs_bind_target_ex(pathname1, NULL, &vsf_linux_term_fdop,
-            NULL, NULL,
-            VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_TTY, 0);
-    fd = open(pathname1, 0);
-    sfd = vsf_linux_fd_get(fd);
-    priv = (vsf_linux_term_priv_t *)sfd->priv;
-    priv->subop = &__vsf_linux_stream_fdop;
-    priv->stream_rx = &queue_stream0->use_as__vsf_stream_t;
-    priv->stream_tx = &queue_stream1->use_as__vsf_stream_t;
-    __vsf_linux_rx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
-    __vsf_linux_tx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
-    vsf_linux_term_fdop.fn_init(sfd);
-    vfs_file = __vsf_linux_get_vfs(fd);
-    vfs_file->f.param = priv;
-    close(fd);
-
-    vsf_linux_fs_bind_target_ex(pathname2, NULL, &vsf_linux_term_fdop,
-            NULL, NULL,
-            VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_TTY, 0);
-    fd = open(pathname2, 0);
-    sfd = vsf_linux_fd_get(fd);
-    priv = (vsf_linux_term_priv_t *)sfd->priv;
-    priv->subop = &__vsf_linux_stream_fdop;
-    priv->stream_rx = &queue_stream1->use_as__vsf_stream_t;
-    priv->stream_tx = &queue_stream0->use_as__vsf_stream_t;
-    __vsf_linux_rx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
-    __vsf_linux_tx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
-    vsf_linux_term_fdop.fn_init(sfd);
-    vfs_file = __vsf_linux_get_vfs(fd);
-    vfs_file->f.param = priv;
-    close(fd);
     return 0;
+}
+
+int vsf_linux_fs_bind_pipe(const char *pathname1, const char *pathname2, bool exclusive)
+{
+    int ret = 0;
+    vsf_linux_fd_t *sfd1, *sfd2;
+
+    if (vsf_linux_pipe(&vsf_linux_term_fdop, NULL, NULL, &sfd1, &sfd2)) {
+        return -1;
+    }
+    vsf_linux_term_fdop.fn_init(sfd1);
+    vsf_linux_term_fdop.fn_init(sfd2);
+
+    uint_fast32_t feature = exclusive ? VSF_FILE_ATTR_EXCL : 0;
+    feature |= VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_TTY | __VSF_FILE_ATTR_SHARE_PRIV;
+
+    vsf_linux_term_priv_t *priv;
+    priv = (vsf_linux_term_priv_t *)sfd1->priv;
+    priv->subop = &__vsf_linux_stream_fdop;
+    priv->flags |= __VSF_FILE_ATTR_SHARE_PRIV;
+    ret |= vsf_linux_fs_bind_fdpriv(pathname1, &priv->use_as__vsf_linux_fd_priv_t, &vsf_linux_term_fdop, feature, 0);
+    priv = (vsf_linux_term_priv_t *)sfd2->priv;
+    priv->subop = &__vsf_linux_stream_fdop;
+    priv->flags |= __VSF_FILE_ATTR_SHARE_PRIV;
+    ret |= vsf_linux_fs_bind_fdpriv(pathname2, &priv->use_as__vsf_linux_fd_priv_t, &vsf_linux_term_fdop, feature, 0);
+
+    close(sfd1->fd);
+    close(sfd2->fd);
+    return ret;
 }
 
 int mkfifo(const char *pathname, mode_t mode)
@@ -3052,6 +3024,11 @@ static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
     };
     priv->termios = __default_term;
     sfd->fd_flags |= __FD_READALL;
+
+    const vsf_linux_fd_op_t *subop = priv->subop;
+    if ((subop != NULL) && (subop->fn_init != NULL)) {
+        return subop->fn_init(sfd);
+    }
 }
 
 static int __vsf_linux_term_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)

@@ -153,22 +153,15 @@ vsf_class(vsf_linux_stream_priv_t) {
         vsf_stream_t *stream_rx;
         vsf_stream_t *stream_tx;
         vsf_linux_stream_on_evt_t on_evt;
-    )
-};
-
-vsf_dcl_class(vsf_linux_pipe_tx_priv_t)
-vsf_class(vsf_linux_pipe_rx_priv_t) {
-    protected_member(
-        implement(vsf_linux_stream_priv_t)
+        // stream owns stream_rx only, if is_to_free_stream is set, stream_rx will be freed when close
         bool is_to_free_stream;
-        vsf_linux_pipe_tx_priv_t *pipe_tx_priv;
     )
 };
 
-vsf_class(vsf_linux_pipe_tx_priv_t) {
+vsf_class(vsf_linux_pipe_priv_t) {
     protected_member(
         implement(vsf_linux_stream_priv_t)
-        vsf_linux_pipe_rx_priv_t *pipe_rx_priv;
+        vsf_linux_pipe_priv_t *pipe_remote;
     )
 };
 
@@ -185,8 +178,7 @@ typedef struct vsf_linux_term_priv_t {
 #if defined(__VSF_LINUX_FS_CLASS_IMPLEMENT) || defined(__VSF_LINUX_FS_CLASS_INHERIT__)
 extern const vsf_linux_fd_op_t __vsf_linux_fs_fdop;
 extern const vsf_linux_fd_op_t __vsf_linux_stream_fdop;
-extern const vsf_linux_fd_op_t vsf_linux_pipe_rx_fdop;
-extern const vsf_linux_fd_op_t vsf_linux_pipe_tx_fdop;
+extern const vsf_linux_fd_op_t vsf_linux_pipe_fdop;
 extern const vsf_linux_fd_op_t vsf_linux_term_fdop;
 #endif
 
@@ -210,7 +202,7 @@ extern int vsf_linux_fs_get_target(const char *pathname, void **target);
 extern int vsf_linux_fs_bind_target_relative(vk_vfs_file_t *dir, const char *pathname,
         void *target, const vsf_linux_fd_op_t *op,
         uint_fast32_t feature, uint64_t size);
-extern int vsf_linux_fs_bind_pipe(const char *pathname1, const char *pathname2);
+extern int vsf_linux_fs_bind_pipe(const char *pathname1, const char *pathname2, bool exclusive);
 
 extern int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op);
 extern vsf_linux_fd_t * vsf_linux_fd_get(int fd);
@@ -235,12 +227,10 @@ extern short vsf_linux_fd_get_status(vsf_linux_fd_priv_t *priv, short status);
 extern vsf_linux_fd_t * vsf_linux_stream(vsf_stream_t *stream_rx, vsf_stream_t *stream_tx);
 extern vsf_linux_fd_t * vsf_linux_rx_stream(vsf_stream_t *stream);
 extern vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream);
-extern vsf_stream_t * vsf_linux_get_rx_stream(vsf_linux_fd_t *sfd);
-extern vsf_stream_t * vsf_linux_get_tx_stream(vsf_linux_fd_t *sfd);
 
 // pipe
 extern vsf_linux_fd_t * vsf_linux_rx_pipe(vsf_queue_stream_t *queue_stream);
-extern vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_pipe_rx_priv_t *priv_rx);
+extern vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_pipe_priv_t *priv_rx);
 #endif
 
 extern int vsf_linux_fs_bind_buffer(const char *pathname, void *buffer,

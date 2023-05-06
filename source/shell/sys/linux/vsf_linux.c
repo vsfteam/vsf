@@ -2237,7 +2237,7 @@ int pipe(int pipefd[2])
         return -1;
     }
 
-    sfd_tx = vsf_linux_tx_pipe((vsf_linux_pipe_rx_priv_t *)sfd_rx->priv);
+    sfd_tx = vsf_linux_tx_pipe((vsf_linux_pipe_priv_t *)sfd_rx->priv);
     if (NULL == sfd_tx) {
         close(sfd_rx->fd);
         return -1;

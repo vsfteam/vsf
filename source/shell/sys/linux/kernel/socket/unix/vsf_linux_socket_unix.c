@@ -210,7 +210,7 @@ static int __vsf_linux_socket_unix_fini(vsf_linux_socket_priv_t *socket_priv, in
 
 static void __vsf_linux_socket_unix_pipe_on_rx_evt(vsf_linux_stream_priv_t *priv_rx, vsf_protect_t orig, short event, bool is_ready)
 {
-    vsf_linux_fd_priv_t *priv = ((vsf_linux_pipe_rx_priv_t *)priv_rx)->target;
+    vsf_linux_fd_priv_t *priv = ((vsf_linux_pipe_priv_t *)priv_rx)->target;
     if (is_ready) {
         vsf_linux_fd_set_status(priv, event, orig);
     } else {
@@ -245,7 +245,7 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
         return -1;
     }
     fcntl(sfd_rx->fd, F_SETFL, priv->flags);
-    vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
+    vsf_linux_pipe_priv_t *priv_rx = (vsf_linux_pipe_priv_t *)sfd_rx->priv;
     priv_rx->on_evt = __vsf_linux_socket_unix_pipe_on_rx_evt;
     priv_rx->target = priv;
 
@@ -267,7 +267,7 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
     }
     VSF_LINUX_ASSERT(priv->remote->trig != NULL);
 
-    sfd_tx = vsf_linux_tx_pipe((vsf_linux_pipe_rx_priv_t *)priv->rw.sfd_tx->priv);
+    sfd_tx = vsf_linux_tx_pipe((vsf_linux_pipe_priv_t *)priv->rw.sfd_tx->priv);
     if (NULL == sfd_tx) {
         priv->remote->remote = NULL;
         vsf_linux_trigger_signal(priv->remote->trig, 0);
@@ -343,7 +343,7 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
             priv_remote->remote = priv_new;
 
             // 2. provide sfd_rx and trigger remote
-            vsf_linux_fd_t *sfd_tx = vsf_linux_tx_pipe((vsf_linux_pipe_rx_priv_t *)priv_remote->rw.sfd_rx->priv);
+            vsf_linux_fd_t *sfd_tx = vsf_linux_tx_pipe((vsf_linux_pipe_priv_t *)priv_remote->rw.sfd_rx->priv);
             if (NULL == sfd_tx) {
             close_sockfd_new_and_fail:
                 close(sockfd_new);
@@ -355,7 +355,7 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
                 vsf_linux_fd_delete(sfd_tx->fd);
                 goto close_sockfd_new_and_fail;
             }
-            vsf_linux_pipe_rx_priv_t *priv_rx = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
+            vsf_linux_pipe_priv_t *priv_rx = (vsf_linux_pipe_priv_t *)sfd_rx->priv;
             priv_rx->on_evt = __vsf_linux_socket_unix_pipe_on_rx_evt;
             priv_rx->target = sfd_new->priv;
 
@@ -426,11 +426,11 @@ static int __vsf_linux_socket_unix_socketpair(vsf_linux_fd_t *sfd1, vsf_linux_fd
         return -1;
     }
     fcntl(sfd_rx->fd, F_SETFL, priv1->flags);
-    vsf_linux_pipe_rx_priv_t *priv_rxpipe = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
+    vsf_linux_pipe_priv_t *priv_rxpipe = (vsf_linux_pipe_priv_t *)sfd_rx->priv;
     priv_rxpipe->on_evt = __vsf_linux_socket_unix_pipe_on_rx_evt;
     priv_rxpipe->target = priv1;
 
-    vsf_linux_fd_t *sfd_tx = vsf_linux_tx_pipe((vsf_linux_pipe_rx_priv_t *)sfd_rx->priv);
+    vsf_linux_fd_t *sfd_tx = vsf_linux_tx_pipe((vsf_linux_pipe_priv_t *)sfd_rx->priv);
     if (NULL == sfd_tx) {
         return -1;
     }
@@ -443,11 +443,11 @@ static int __vsf_linux_socket_unix_socketpair(vsf_linux_fd_t *sfd1, vsf_linux_fd
         return -1;
     }
     fcntl(sfd_rx->fd, F_SETFL, priv2->flags);
-    priv_rxpipe = (vsf_linux_pipe_rx_priv_t *)sfd_rx->priv;
+    priv_rxpipe = (vsf_linux_pipe_priv_t *)sfd_rx->priv;
     priv_rxpipe->on_evt = __vsf_linux_socket_unix_pipe_on_rx_evt;
     priv_rxpipe->target = priv2;
 
-    sfd_tx = vsf_linux_tx_pipe((vsf_linux_pipe_rx_priv_t *)sfd_rx->priv);
+    sfd_tx = vsf_linux_tx_pipe((vsf_linux_pipe_priv_t *)sfd_rx->priv);
     if (NULL == sfd_tx) {
         return -1;
     }
