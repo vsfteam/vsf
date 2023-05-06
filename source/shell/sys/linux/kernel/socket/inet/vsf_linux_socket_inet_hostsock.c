@@ -90,6 +90,9 @@ struct dirent64 {
 
 #   define errno                            WSAGetLastError()
 #   define ERRNO_WOULDBLOCK                 WSAEWOULDBLOCK
+
+#   define SHUT_RD                          SD_RECEIVE
+#   define SHUT_WR                          SD_SEND
 #   define SHUT_RDWR                        SD_BOTH
 #elif defined(__LINUX__) || defined(__linux__) || defined(__MACOS__)
 // uppercase for host type
@@ -177,6 +180,12 @@ enum {
     VSF_LINUX_SOCKET_MSG_WAITALL        = 1 << 2,
     VSF_LINUX_SOCKET_MSG_NOSIGNAL       = 1 << 3,
     VSF_LINUX_SOCKET_MSG_DONTWAIT       = 1 << 4,
+};
+
+enum {
+    VSF_LINUX_SOCKET_SHUT_RD            = 1 << 0,
+    VSF_LINUX_SOCKET_SHUT_WR            = 1 << 1,
+    VSF_LINUX_SOCKET_SHUT_RDWR          = VSF_LINUX_SOCKET_SHUT_RD | VSF_LINUX_SOCKET_SHUT_WR,
 };
 
 typedef uint32_t vsf_socklen_t;
@@ -635,7 +644,13 @@ assert_fail:
 static int __vsf_linux_socket_inet_fini(vsf_linux_socket_priv_t *socket_priv, int how)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
-    shutdown(priv->hostsock, SHUT_RDWR);
+    switch (how) {
+    case VSF_LINUX_SOCKET_SHUT_RD:      how = SHUT_RD;  break;
+    case VSF_LINUX_SOCKET_SHUT_WR:      how = SHUT_WR;  break;
+    case VSF_LINUX_SOCKET_SHUT_RDWR:    how = SHUT_RDWR;  break;
+    default:                            return -1;
+    }
+    shutdown(priv->hostsock, how);
     return 0;
 }
 
