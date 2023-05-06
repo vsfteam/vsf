@@ -701,7 +701,7 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
 
 int socketpair(int domain, int type, int protocol, int socket_vector[2])
 {
-    vsf_linux_fd_t *rsfd, *wsfd;
+    vsf_linux_fd_t *sfd[2];
 
     socket_vector[0] = socket(domain, type, protocol);
     socket_vector[1] = socket(domain, type, protocol);
@@ -709,13 +709,13 @@ int socketpair(int domain, int type, int protocol, int socket_vector[2])
         goto fail;
     }
 
-    rsfd = vsf_linux_fd_get(socket_vector[0]);
-    wsfd = vsf_linux_fd_get(socket_vector[1]);
-    if (NULL == ((vsf_linux_socket_op_t *)rsfd->op)->fn_socketpair) {
+    sfd[0] = vsf_linux_fd_get(socket_vector[0]);
+    sfd[1] = vsf_linux_fd_get(socket_vector[1]);
+    if (NULL == ((vsf_linux_socket_op_t *)sfd[0]->op)->fn_socketpair) {
         goto fail;
     }
 
-    return ((vsf_linux_socket_op_t *)rsfd->op)->fn_socketpair(rsfd, wsfd);
+    return ((vsf_linux_socket_op_t *)sfd[0]->op)->fn_socketpair(sfd[0], sfd[1]);
 
 fail:
     if (socket_vector[0] >= 0) {

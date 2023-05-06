@@ -1314,8 +1314,6 @@ void vsf_linux_exit_process(int status, bool _exit)
         vsf_linux_wait_thread(thread2wait->tid, NULL);
     }
 
-    // does it necessary to wait for child processes?
-#if 0
     vsf_linux_process_t *process2wait;
     while (true) {
         orig = vsf_protect_sched();
@@ -1325,10 +1323,14 @@ void vsf_linux_exit_process(int status, bool _exit)
             break;
         }
 
+        // does it necessary to wait for child processes?
+#if 1
+        vsf_linux_detach_process(process2wait);
+#else
         vsf_trace_warning("linux: undetached process %d, need waitpid before exit\n", process2wait->id.pid);
         waitpid(process2wait->id.pid, NULL, 0);
-    }
 #endif
+    }
 
     // 5. cleanup process
     vsf_linux_cleanup_process(process);
