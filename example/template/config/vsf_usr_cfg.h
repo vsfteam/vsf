@@ -52,6 +52,11 @@
 #   include "./vsf_usr_cfg/vsf_usr_cfg_stm32h743xi.h"
 #endif
 
+// kernel configurations
+#define VSF_KERNEL_CFG_EDA_SUPPORT_TASK                 ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_PT                   ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM           ENABLED
+
 // software independent components, if not used, compiler will optimize
 #define VSF_USE_FIFO                                    ENABLED
 #define VSF_USE_JSON                                    ENABLED
