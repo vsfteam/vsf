@@ -52,7 +52,7 @@ extern "C" {
 #define VSF_FILE_ATTR_SOCK      (VSF_FILE_ATTR_USER << 4)
 #define VSF_FILE_ATTR_TTY       (VSF_FILE_ATTR_USER << 5)
 #define VSF_FILE_ATTR_FIFO      (VSF_FILE_ATTR_USER << 6)
-// internal use, indicating file is referenced by a link
+// internal use, indicating priv of sfd is shared, do not free
 #define __VSF_FILE_ATTR_SHARE_PRIV      (VSF_FILE_ATTR_USER << 16)
 
 #define UTIME_NOW	            ((1l << 30) - 1l)
