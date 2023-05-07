@@ -1573,6 +1573,7 @@ __open_again_do:
         errno = EEXIST;
         return -1;
     } else if (file->attr & VSF_FILE_ATTR_EXCL) {
+        errno = EBUSY;
         return -1;
     }
 
