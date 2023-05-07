@@ -2589,6 +2589,7 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
                 }
             } else {
                 vsf_unprotect_sched(orig);
+                errno = EAGAIN;
                 goto do_return;
             }
         } else {
