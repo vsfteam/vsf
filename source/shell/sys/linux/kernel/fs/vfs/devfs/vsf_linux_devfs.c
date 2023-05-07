@@ -1542,7 +1542,7 @@ static int __vsf_linux_null_stat(vsf_linux_fd_t *sfd, struct stat *buf)
 }
 
 static const vsf_linux_fd_op_t __vsf_linux_null_fdop = {
-    .priv_size          = 0,
+    .priv_size          = sizeof(vsf_linux_fs_priv_t),
     .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_read            = __vsf_linux_null_read,
     .fn_write           = __vsf_linux_null_write,
@@ -1556,7 +1556,7 @@ static ssize_t __vsf_linux_zero_read(vsf_linux_fd_t *sfd, void *buf, size_t coun
 }
 
 static const vsf_linux_fd_op_t __vsf_linux_zero_fdop = {
-    .priv_size          = 0,
+    .priv_size          = sizeof(vsf_linux_fs_priv_t),
     .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_read            = __vsf_linux_zero_read,
     .fn_write           = __vsf_linux_null_write,
