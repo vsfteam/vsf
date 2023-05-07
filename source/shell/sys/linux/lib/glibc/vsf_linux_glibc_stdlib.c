@@ -772,6 +772,21 @@ int __clearenv_ex(vsf_linux_process_t *process)
 
 int putenv(char *string)
 {
+    const char *str = strchr(string, '=');
+    if (NULL == str) {
+        return __putenv_ex(NULL, string);
+    }
+
+    int namelen = str - string;
+    char name[namelen + 1];
+    memcpy(name, string, namelen);
+    name[namelen] = '\0';
+
+    char *target = __getenv_ex(NULL, name);
+    if (target == string + namelen + 1) {
+        return 0;
+    }
+
     string = __strdup_ex(NULL, string);
     if (NULL == string) {
         return -1;
