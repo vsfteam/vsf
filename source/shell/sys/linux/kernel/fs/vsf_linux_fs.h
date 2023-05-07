@@ -166,7 +166,7 @@ vsf_class(vsf_linux_pipe_priv_t) {
 };
 
 typedef struct vsf_linux_term_priv_t {
-    implement(vsf_linux_stream_priv_t)
+    implement(vsf_linux_pipe_priv_t)
     const vsf_linux_fd_op_t *subop;
     struct termios termios;
     char esc_type;
