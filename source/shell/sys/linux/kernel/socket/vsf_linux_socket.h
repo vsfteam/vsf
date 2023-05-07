@@ -69,7 +69,7 @@ typedef struct vsf_linux_socket_op_t {
 
 vsf_class(vsf_linux_socket_priv_t) {
     public_member(
-        implement(vsf_linux_fd_priv_t)
+        implement(vsf_linux_pipe_priv_t)
 
         int domain;
         int type;

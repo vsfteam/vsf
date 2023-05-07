@@ -37,11 +37,11 @@
 #include "utilities/ooc_class.h"
 
 struct dirent {
-    long d_ino;
+    ino_t d_ino;
     off_t d_off;
     unsigned short d_reclen;
     unsigned char d_type;
-    char *d_name;
+    char d_name[256];
 };
 
 struct dirent64 {
@@ -49,7 +49,7 @@ struct dirent64 {
     off64_t d_off;
     unsigned short d_reclen;
     unsigned char d_type;
-    char *d_name;
+    char d_name[256];
 };
 
 #define __VSF_HEADER_ONLY_SHOW_FS_INFO__
@@ -242,12 +242,15 @@ typedef struct vsf_linux_socket_op_t {
 
 vsf_class(vsf_linux_socket_priv_t) {
     public_member(
-        implement(vsf_linux_fd_priv_t)
+        implement(vsf_linux_pipe_priv_t)
 
         int domain;
         int type;
         int protocol;
         const vsf_linux_socket_op_t *sockop;
+    )
+    private_member(
+        void *sender_process;
     )
 };
 

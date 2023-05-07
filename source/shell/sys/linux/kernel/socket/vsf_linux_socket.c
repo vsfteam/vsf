@@ -436,7 +436,7 @@ int socket(int domain, int type, int protocol)
 
     fd = vsf_linux_fd_create(&sfd, &sockop->fdop);
     if (fd >= 0) {
-        vsf_linux_socket_priv_t *priv = (struct vsf_linux_socket_priv_t *)sfd->priv;
+        vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
         priv->sockop = sockop;
         priv->domain = domain;
         priv->type = type;
@@ -620,16 +620,16 @@ ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags)
 
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
     if ((msg->msg_control != NULL) && (msg->msg_controllen > 0)) {
-        VSF_LINUX_ASSERT(NULL == priv->msg);
+        VSF_LINUX_ASSERT(NULL == priv->target);
         struct msghdr *tx_msg = __malloc_ex(vsf_linux_resources_process(), sizeof(*msg) + msg->msg_controllen);
-        if (NULL == priv->msg) {
+        if (NULL == priv->target) {
             return -1;
         }
 
         *tx_msg = *msg;
         tx_msg->msg_control = (void *)&tx_msg[1];
         memcpy(tx_msg->msg_control, msg->msg_control, msg->msg_controllen);
-        priv->msg = tx_msg;
+        priv->target = tx_msg;
         priv->sender_process = vsf_linux_get_cur_process();
     }
 
@@ -648,9 +648,9 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
     ssize_t result = readv(sockfd, msg->msg_iov, msg->msg_iovlen);
 
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-    if (priv->msg != NULL) {
-        struct msghdr *rx_msg = priv->msg;
-        priv->msg = NULL;
+    if (priv->target != NULL) {
+        struct msghdr *rx_msg = priv->target;
+        priv->target = NULL;
         if (msg != NULL) {
             *msg = *rx_msg;
 

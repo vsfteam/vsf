@@ -167,7 +167,7 @@ ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t co
 static int __vsf_linux_stream_close(vsf_linux_fd_t *sfd);
 static int __vsf_linux_stream_eof(vsf_linux_fd_t *sfd);
 
-static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
+int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static int __vsf_linux_pipe_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd);
 
@@ -2839,7 +2839,7 @@ vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream)
 
 // pipe
 
-static int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
+int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     return __vsf_linux_stream_fcntl(sfd, cmd, arg);
 }
