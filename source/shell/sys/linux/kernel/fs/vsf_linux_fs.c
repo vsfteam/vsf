@@ -943,7 +943,7 @@ int vsf_linux_statat(int dirfd, const char *pathname, struct stat *buf)
         fd = open(pathname, 0);
     } else {
         fd = openat(dirfd, pathname, 0);
-    }    
+    }
     if (fd < 0) {
         errno = ENOENT;
         return -1;
@@ -3044,7 +3044,7 @@ static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
 
     const vsf_linux_fd_op_t *subop = priv->subop;
     if ((subop != NULL) && (subop->fn_init != NULL)) {
-        return subop->fn_init(sfd);
+        subop->fn_init(sfd);
     }
 }
 
