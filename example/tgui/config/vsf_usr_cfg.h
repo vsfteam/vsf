@@ -34,6 +34,9 @@
 #define VSF_DEBUG_STREAM_CFG_HW_PRIORITY                vsf_arch_prio_0
 #define __VSF_X86_WIN_SINGLE_PRIORITY
 
+#define VSF_KERNEL_CFG_EDA_SUPPORT_TASK                 ENABLED
+#define VSF_KERNEL_CFG_EDA_SUPPORT_PT                   ENABLED
+
 //#define __WIN7__
 
 #define VSF_SYSTIMER_FREQ                               (0ul)
