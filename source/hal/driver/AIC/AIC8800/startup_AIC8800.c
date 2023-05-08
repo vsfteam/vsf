@@ -27,6 +27,9 @@
 // for WEAK in compiler
 #include "utilities/vsf_utilities.h"
 
+// header which will include core_cm4.h
+#include "chip.h"
+
 #define __imp_unprocessed_weak_handler(__name)                                  \
             WEAK(__name)                                                        \
             void __name(void){}

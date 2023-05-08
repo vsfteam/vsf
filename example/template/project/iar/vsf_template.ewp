@@ -15839,6 +15839,12 @@
                                 </file>
                             </group>
                             <group>
+                                <name>glob</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\3rd-party\glob\glob.c</name>
+                                </file>
+                            </group>
+                            <group>
                                 <name>regex</name>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\lib\3rd-party\regex\regcomp.c</name>
