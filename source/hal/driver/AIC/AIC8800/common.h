@@ -23,9 +23,6 @@
 #include "hal/vsf_hal_cfg.h"
 #include "hal/arch/vsf_arch.h"
 
-// avoid to include target specified headers, remove code below after tested OK
-#include "chip.h"
-
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
