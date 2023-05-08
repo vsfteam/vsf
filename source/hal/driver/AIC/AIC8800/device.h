@@ -28,6 +28,7 @@
 #   define VSF_ARCH_PRI_NUM                         64
 #   define VSF_ARCH_PRI_BIT                         6
 
+// TODO: Dedicated header files will be provided for use at the high levels and arch
 // header which will include core_cm4.h
 #   include "chip.h"
 
