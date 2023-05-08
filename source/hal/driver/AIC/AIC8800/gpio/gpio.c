@@ -26,9 +26,9 @@
 
 #include "./i_reg_gpio.h"
 
+#include "../vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 #include "../vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_iomux.h"
 #include "../vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
-
 #include "../io/io.h"
 
 #define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY         ENABLED
