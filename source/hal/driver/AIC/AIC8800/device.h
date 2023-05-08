@@ -28,6 +28,8 @@
 #   define VSF_ARCH_PRI_NUM                         64
 #   define VSF_ARCH_PRI_BIT                         6
 
+// header which will include core_cm4.h
+#   include "chip.h"
 
 // aic8800 rtoa_al need this
 #   define VSF_KERNEL_CFG_QUEUE_HAS_RX_NOTIFIED     ENABLED
