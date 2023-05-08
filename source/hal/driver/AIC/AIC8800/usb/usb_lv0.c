@@ -22,6 +22,8 @@
 #if     (VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_DWCOTG == ENABLED)   \
     ||  (VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_DWCOTG == ENABLED)
 
+#include "../vendor/plf/aic8800/src/driver/chip.h"
+
 // for usb_device_speed_t
 #include "component/vsf_component.h"
 

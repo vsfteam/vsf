@@ -25,7 +25,6 @@
 #if VSF_HAL_USE_IO == ENABLED
 
 #include "../__device.h"
-#include "../vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 
 /*============================ MACROS ========================================*/
 
@@ -49,11 +48,14 @@
 /*============================ TYPES =========================================*/
 
 typedef enum vsf_io_feature_t {
-    VSF_IO_OPEN_DRAIN           = (0 << IOMUX_GPIO_CONFIG_PULL_FRC_LSB),
-    VSF_IO_PULL_UP              = ((1 << IOMUX_AGPIO_CONFIG_PULL_FRC_LSB) | (1 << IOMUX_AGPIO_CONFIG_PULL_UP_LSB)),
-    VSF_IO_PULL_DOWN            = ((1 << IOMUX_AGPIO_CONFIG_PULL_FRC_LSB) | (1 << IOMUX_AGPIO_CONFIG_PULL_DN_LSB)),
+    // bit 16 : IOMUX_GPIO_CONFIG_PULL_FRC_LSB
+    // bit 9  : IOMUX_AGPIO_CONFIG_PULL_UP_LSB
+    // bit 8  : IOMUX_AGPIO_CONFIG_PULL_DN_LSB
+    VSF_IO_OPEN_DRAIN           = (0 << 16),    // IOMUX_GPIO_CONFIG_PULL_FRC_LSB
+    VSF_IO_PULL_UP              = (1 << 16) | (1 << 9),
+    VSF_IO_PULL_DOWN            = (1 << 16) | (1 << 8),
 
-    __IO_PULL_MASK              = IOMUX_AGPIO_CONFIG_PULL_FRC_MASK | IOMUX_AGPIO_CONFIG_PULL_DN_MASK | IOMUX_AGPIO_CONFIG_PULL_UP_MASK,
+    __IO_PULL_MASK              = VSF_IO_OPEN_DRAIN | VSF_IO_PULL_UP | VSF_IO_PULL_DOWN,
 
     // not support in aic8800
     VSF_IO_DISABLE_INPUT        = 1 << 17,          //!< disable input

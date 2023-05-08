@@ -25,6 +25,7 @@
 #if VSF_HAL_USE_IO == ENABLED
 
 #   include "../vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
+#   include "../vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 #   include "../gpio/i_reg_gpio.h"
 
 /*============================ MACROS ========================================*/
