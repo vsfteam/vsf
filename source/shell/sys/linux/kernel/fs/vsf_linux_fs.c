@@ -859,6 +859,44 @@ static int __vsf_linux_fd_add_ex(vsf_linux_process_t *process, vsf_linux_fd_t *s
     return sfd->fd;
 }
 
+static int __vsf_linux_fd_ref_priv(vsf_linux_fd_priv_t *priv)
+{
+    vsf_protect_t orig = vsf_protect_sched();
+        priv->ref++;
+#if VSF_LINUX_CFG_FD_TRACE == ENABLED
+        vsf_trace_debug("%s: priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
+            __FUNCTION__, priv, priv->ref);
+#endif
+    vsf_unprotect_sched(orig);
+    return 0;
+}
+
+static int __vsf_linux_fd_deref_priv(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_fd_priv_t *priv = sfd->priv;
+    bool is_to_close;
+
+    vsf_protect_t orig = vsf_protect_sched();
+        is_to_close = --priv->ref == 0;
+#if VSF_LINUX_CFG_FD_TRACE == ENABLED
+        vsf_trace_debug("%s: process 0x%p fd %d 0x%p priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
+            __FUNCTION__, vsf_linux_get_cur_process(), sfd->fd, sfd, priv, priv->ref);
+#endif
+    vsf_unprotect_sched(orig);
+
+    int err = 0;
+    if (is_to_close) {
+        if (sfd->op->fn_close != NULL) {
+            err = sfd->op->fn_close(sfd);
+        }
+        // priv of fd does not belong to the process
+        if (!(priv->flags & __VSF_FILE_ATTR_SHARE_PRIV)) {
+            vsf_linux_free_res(priv);
+        }
+    }
+    return err;
+}
+
 int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
         const vsf_linux_fd_op_t *op, int fd_min, vsf_linux_fd_priv_t *priv)
 {
@@ -884,13 +922,7 @@ int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
         memset(new_sfd->priv, 0, priv_size);
         new_sfd->priv->ref = 1;
     } else {
-        vsf_protect_t orig = vsf_protect_sched();
-            priv->ref++;
-#if VSF_LINUX_CFG_FD_TRACE == ENABLED
-            vsf_trace_debug("%s: priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
-                __FUNCTION__, priv, priv->ref);
-#endif
-        vsf_unprotect_sched(orig);
+        __vsf_linux_fd_ref_priv(priv);
         new_sfd->priv = priv;
     }
 
@@ -904,9 +936,9 @@ free_sfd_and_exit:
         __free_ex(process, new_sfd);
     }
 #if VSF_LINUX_CFG_FD_TRACE == ENABLED
-    vsf_trace_debug("%s: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
+    vsf_trace_debug("%s: process 0x%p fd %d 0x%p priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
         __FUNCTION__, NULL == process ? vsf_linux_get_cur_process() : process,
-        new_sfd->fd, new_sfd->priv, NULL == new_sfd->priv ? 0 : new_sfd->priv->ref);
+        new_sfd->fd, new_sfd, new_sfd->priv, NULL == new_sfd->priv ? 0 : new_sfd->priv->ref);
 #endif
     return ret;
 }
@@ -1407,7 +1439,6 @@ int dup(int oldfd)
 
 int dup2(int oldfd, int newfd)
 {
-    close(newfd);
     return fcntl(oldfd, F_DUPFD, newfd);
 }
 
@@ -1696,24 +1727,8 @@ int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd)
     if (!sfd) { return -1; }
 
     vsf_linux_fd_priv_t *priv = sfd->priv;
-    vsf_protect_t orig = vsf_protect_sched();
-        bool is_to_close = --priv->ref == 0;
-#if VSF_LINUX_CFG_FD_TRACE == ENABLED
-        vsf_trace_debug("%s: process 0x%p fd %d priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
-            __FUNCTION__, vsf_linux_get_cur_process(), sfd->fd, priv, priv->ref);
-#endif
-    vsf_unprotect_sched(orig);
 
-    int err = 0;
-    if (is_to_close) {
-        if (sfd->op->fn_close != NULL) {
-            err = sfd->op->fn_close(sfd);
-        }
-        // priv of fd does not belong to the process
-        if (!(priv->flags & __VSF_FILE_ATTR_SHARE_PRIV)) {
-            vsf_linux_free_res(priv);
-        }
-    }
+    int err = __vsf_linux_fd_deref_priv(sfd);
     __vsf_linux_fd_delete_ex(process, fd);
     return err;
 }
@@ -1733,8 +1748,25 @@ int __fcntl_va(int fd, int cmd, va_list ap)
 
     // process generic commands
     switch (cmd) {
-    case F_DUPFD:
-        return __vsf_linux_fd_create_ex(NULL, NULL, sfd->op, arg, sfd->priv);
+    case F_DUPFD: {
+            vsf_linux_fd_t *sfd_target = vsf_linux_fd_get((int)arg);
+            if (sfd_target != NULL) {
+                // do not close original fd, because maybe the original fd is used as FILE
+                __vsf_linux_fd_deref_priv(sfd_target);
+                __vsf_linux_fd_ref_priv(sfd->priv);
+
+                vsf_dlist_node_t node;
+                vsf_protect_t orig = vsf_protect_sched();
+                    node = sfd_target->fd_node;
+                    *sfd_target = *sfd;
+                    sfd_target->fd = (int)arg;
+                    sfd_target->fd_node = node;
+                vsf_unprotect_sched(orig);
+                return sfd_target->fd;
+            } else {
+                return __vsf_linux_fd_create_ex(NULL, NULL, sfd->op, arg, sfd->priv);
+            }
+        }
     case F_GETFD:
         return sfd->fd_flags;
         break;
