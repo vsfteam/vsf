@@ -31,6 +31,7 @@
 
 #ifdef __AIC8800__
 
+#include "system.h"
 #include "rtos_al.h"
 #include "sysctrl_api.h"
 #include "psram_api.h"

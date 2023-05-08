@@ -23,16 +23,6 @@
 #include "hal/vsf_hal_cfg.h"
 #include "hal/arch/vsf_arch.h"
 
-// avoid to include target specified headers, remove code below after tested OK
-#if 0
-#   include "chip.h"
-#   include "plf.h"
-#   include "pmic_api.h"
-// CMSIS headers which will not be included in core_xxx.h
-//  and arm_math.h CAN ONLY be included after core_xxx.h
-#   include "arm_math.h"
-#endif
-
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

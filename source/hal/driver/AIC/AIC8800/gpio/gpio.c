@@ -26,7 +26,9 @@
 
 #include "./i_reg_gpio.h"
 
-#include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_iomux.h"
+#include "../vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_iomux.h"
+#include "../vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
+
 #include "../io/io.h"
 
 #define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY         ENABLED
@@ -98,7 +100,7 @@ void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_
     for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
         uint32_t current_pin_mask = 1 << i;
         if (pin_mask & current_pin_mask) {
-            __hw_io_reg_mask_write(hw_gpio_ptr->is_pmic, &hw_gpio_ptr->IOMUX->GPCFG[i],
+            aic8800_io_reg_mask_write(hw_gpio_ptr->is_pmic, &hw_gpio_ptr->IOMUX->GPCFG[i],
                                   feature, __AIC8800_IO_FEATURE_ALL_BITS);
             if (hw_gpio_ptr->is_pmic) {
                 PMIC_MEM_MASK_WRITE((unsigned int)&hw_gpio_ptr->GPIO->MR, current_pin_mask, current_pin_mask);
@@ -116,7 +118,7 @@ void vsf_hw_gpio_set_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t p
                    || ((pin_mask & VSF_PIN0_MASK) != VSF_PIN0_MASK)
                    || ((direction_mask & VSF_PIN0_MASK) != VSF_PIN0_MASK));
 
-    __hw_io_reg_mask_write(hw_gpio_ptr->is_pmic, &hw_gpio_ptr->GPIO->DR, direction_mask, pin_mask);
+    aic8800_io_reg_mask_write(hw_gpio_ptr->is_pmic, &hw_gpio_ptr->GPIO->DR, direction_mask, pin_mask);
 }
 
 vsf_gpio_pin_mask_t vsf_hw_gpio_get_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
@@ -124,7 +126,7 @@ vsf_gpio_pin_mask_t vsf_hw_gpio_get_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gp
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     VSF_HAL_ASSERT(__AIC8800_IO_IS_VAILID_PIN(pin_mask));
 
-    return __hw_io_reg_read(hw_gpio_ptr->is_pmic, &hw_gpio_ptr->GPIO->DR) & pin_mask;
+    return aic8800_io_reg_read(hw_gpio_ptr->is_pmic, &hw_gpio_ptr->GPIO->DR) & pin_mask;
 }
 
 vsf_gpio_pin_mask_t vsf_hw_gpio_read(vsf_hw_gpio_t *hw_gpio_ptr)

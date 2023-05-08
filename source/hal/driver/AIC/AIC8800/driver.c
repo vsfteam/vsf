@@ -21,6 +21,7 @@
 #include "./device.h"
 #include "./driver.h"
 
+#include "system.h"
 #include "time_api.h"
 #include "stdio_uart.h"
 #include "sysctrl_api.h"
