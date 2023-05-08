@@ -29,8 +29,6 @@
 #       include "hal/vsf_hal_cfg.h"
 #       include "./device.h"
 
-#       include "system.h"
-
 #       include "hal/driver/common/swi/vsf_swi_template.h"
 #       include "./io/io.h"
 #       include "./adc/adc.h"

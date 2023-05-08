@@ -22,6 +22,8 @@
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_DWCOTG == ENABLED
 
+#include "../vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
+
 // for vk_dwcotg_hc_ip_info_t and USB_SPEED_XXX
 #include "component/vsf_component.h"
 

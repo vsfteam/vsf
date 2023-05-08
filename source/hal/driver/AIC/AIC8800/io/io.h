@@ -90,26 +90,6 @@ typedef enum vsf_io_feature_t {
 
 } vsf_io_feature_t;
 
-
-static inline uint32_t __hw_io_reg_read(bool is_pmic, volatile uint32_t *reg)
-{
-    if (!is_pmic) {
-        return *reg;
-    } else {
-        return PMIC_MEM_READ((unsigned int)reg);
-    }
-}
-
-static inline void __hw_io_reg_mask_write(bool is_pmic, volatile uint32_t *reg,
-                                          uint32_t wdata, uint32_t wmask)
-{
-    if (!is_pmic) {
-        *reg = (*reg & ~wmask) | (wdata & wmask);
-    } else {
-        PMIC_MEM_MASK_WRITE((unsigned int)reg, wdata, wmask);
-    }
-}
-
 /*============================ INCLUDES ======================================*/
 
 #define VSF_IO_CFG_DEC_PREFIX              vsf_hw

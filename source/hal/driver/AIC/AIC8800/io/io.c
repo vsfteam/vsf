@@ -24,6 +24,7 @@
 
 #if VSF_HAL_USE_IO == ENABLED
 
+#   include "../vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
 #   include "../gpio/i_reg_gpio.h"
 
 /*============================ MACROS ========================================*/
@@ -57,6 +58,25 @@ typedef struct vsf_hw_io_t {
 } vsf_hw_io_t;
 
 /*============================ IMPLEMENTATION ================================*/
+
+uint32_t aic8800_io_reg_read(bool is_pmic, volatile uint32_t *reg)
+{
+    if (!is_pmic) {
+        return *reg;
+    } else {
+        return PMIC_MEM_READ((unsigned int)reg);
+    }
+}
+
+void aic8800_io_reg_mask_write(bool is_pmic, volatile uint32_t *reg,
+                                          uint32_t wdata, uint32_t wmask)
+{
+    if (!is_pmic) {
+        *reg = (*reg & ~wmask) | (wdata & wmask);
+    } else {
+        PMIC_MEM_MASK_WRITE((unsigned int)reg, wdata, wmask);
+    }
+}
 
 vsf_err_t vsf_hw_io_config_one_pin(vsf_hw_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr)
 {
