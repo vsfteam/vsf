@@ -1276,6 +1276,10 @@ void vsf_linux_exit_process(int status, bool _exit)
     VSF_LINUX_ASSERT(process != NULL);
     vsf_protect_t orig;
 
+    for (int i = 0; i < dimof(process->timers); i++) {
+        vsf_callback_timer_remove(&process->timers[i].timer);
+    }
+
     orig = vsf_protect_sched();
         if (process->thread_pending_exit != NULL) {
             vsf_unprotect_sched(orig);
