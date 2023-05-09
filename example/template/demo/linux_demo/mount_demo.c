@@ -277,7 +277,7 @@ int mount_main(int argc, char *argv[])
         goto cleanup;
     }
     if (mount(NULL, argv[optind + 1], fs_type->fsop, 0, fsdata) != 0) {
-        printf("fail to mount\r\n");
+        printf("fail to mount %s\r\n", argv[optind + 1]);
         goto cleanup;
     }
     return 0;

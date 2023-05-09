@@ -97,18 +97,6 @@ int vsf_linux_vfs_init(void)
 {
     int err;
 
-    err = mkdirs("/var/run", 0);
-    if (err != 0) {
-        fprintf(stderr, "fail to mkdir /var/run\r\n");
-        return err;
-    }
-
-    err = mkdir("/var/lib", 0);
-    if (err != 0) {
-        fprintf(stderr, "fail to mkdir /var/lib\r\n");
-        return err;
-    }
-
     err = mkdir("/run", 0);
     if (err != 0) {
         fprintf(stderr, "fail to mkdir /run\r\n");
