@@ -333,7 +333,7 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
     }
 
     // search in path first if not absolute path
-#if VSF_LINUX_USE_PROCFS == ENABLED || VSF_LINUX_USE_APPLET == ENABLED
+#if __VSF_LINUX_PROCESS_HAS_PATH
     if (__vsf_linux_get_exe(process->path, sizeof(process->path), cmd, &entry, true) < 0) {
 #else
     if (__vsf_linux_get_exe(NULL, 0, cmd, &entry, true) < 0) {
@@ -920,7 +920,7 @@ int time_main(int argc, char *argv[])
     }
 
     vsf_linux_main_entry_t entry;
-#if VSF_LINUX_USE_PROCFS == ENABLED || VSF_LINUX_USE_APPLET == ENABLED
+#if __VSF_LINUX_PROCESS_HAS_PATH
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     if (__vsf_linux_get_exe(process->path, sizeof(process->path), argv[1], &entry, true) < 0) {
 #else

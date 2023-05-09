@@ -278,7 +278,8 @@ vsf_class(vsf_linux_process_t) {
         int fn_atexit_num;
         void (*fn_atexit[VSF_LINUX_CFG_ATEXIT_NUM])(void);
 
-#if VSF_LINUX_USE_PROCFS == ENABLED || VSF_LINUX_USE_APPLET == ENABLED
+#define __VSF_LINUX_PROCESS_HAS_PATH        (VSF_LINUX_USE_PROCFS == ENABLED || VSF_LINUX_USE_APPLET == ENABLED || VSF_LINUX_USE_SCRIPT == ENABLED)
+#if __VSF_LINUX_PROCESS_HAS_PATH
         char path[PATH_MAX];
 #endif
     )

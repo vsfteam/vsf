@@ -800,7 +800,7 @@ FILE * popen(const char *command, const char *type)
 
     vsf_linux_main_entry_t entry;
     extern int __vsf_linux_get_exe(char *pathname, int pathname_len, char *cmd, vsf_linux_main_entry_t *entry, bool use_path);
-#if VSF_LINUX_USE_PROCFS == ENABLED || VSF_LINUX_USE_APPLET == ENABLED
+#if __VSF_LINUX_PROCESS_HAS_PATH
     if (__vsf_linux_get_exe(process->path, sizeof(process->path), (char *)command, &entry, true) < 0) {
 #else
     if (__vsf_linux_get_exe(NULL, 0, (char *)command, &entry, true) < 0) {
