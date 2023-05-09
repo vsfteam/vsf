@@ -391,6 +391,7 @@ char * fgets(char *str, int n, FILE *f)
         }
     }
     if (cur != NULL) {
+        cur[0] = '\n';
         cur[1] = '\0';
     }
     return rsize > 0 ? result : NULL;
