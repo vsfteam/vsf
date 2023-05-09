@@ -377,6 +377,7 @@ char * fgets(char *str, int n, FILE *f)
         rsize++;
         str++;
         if ('\r' == ch) {
+            str[-1] = '\n';
             // check next possible '\n'
             if (read(fd, &ch, 1) != 1) {
                 break;
@@ -391,7 +392,6 @@ char * fgets(char *str, int n, FILE *f)
         }
     }
     if (cur != NULL) {
-        cur[0] = '\n';
         cur[1] = '\0';
     }
     return rsize > 0 ? result : NULL;
