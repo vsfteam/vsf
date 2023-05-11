@@ -27,28 +27,49 @@
 // TODO: When the IO multiplexing function is in GPIO, we need a
 //       vsf_io_config_one_pin template based on the vsf_gpio_config_pin implementation
 
-#define vsf_real_io_t   VSF_MCONNECT(VSF_IO_CFG_IMP_PREFIX, _io_t)
+#define vsf_real_io_t                   VSF_MCONNECT(VSF_IO_CFG_IMP_PREFIX, _io_t)
+#define vsf_real_io_capability          VSF_MCONNECT(VSF_IO_CFG_IMP_PREFIX, _io_capability)
 
-/*============================ PROTOTYPES ====================================*/
+#ifndef VSF_IO_CFG_REIMPLEMENT_API_CAPABILITY
+#   define  VSF_IO_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#endif
+
+#if VSF_IO_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#   ifndef VSF_IO_CFG_CAPABILITY_PIN_COUNT
+#       define VSF_IO_CFG_CAPABILITY_PIN_COUNT              8
+#   endif
+#   ifndef VSF_IO_CFG_CAPABILITY_PIN_MASK
+#       define VSF_IO_CFG_CAPABILITY_PIN_MASK               8
+#   endif
+#endif
+
 /*============================ LOCAL VARIABLES ===============================*/
-/*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_IO_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+#if VSF_IO_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
 vsf_io_capability_t vsf_real_io_capability(vsf_real_io_t *io_ptr)
 {
     vsf_io_capability_t io_capability = {
-        0,
+        .pin_count    = VSF_IO_CFG_CAPABILITY_PIN_COUNT,
+        .pin_mask     = VSF_IO_CFG_CAPABILITY_PIN_MASK,
     };
 
     return io_capability;
 }
 #endif
 
+/*============================ MACROS ========================================*/
+
+#undef VSF_IO_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_IO_CFG_CAPABILITY_PIN_COUNT
+#undef VSF_IO_CFG_CAPABILITY_PIN_MASK
+#undef vsf_real_io_t
+#undef vsf_real_io_capability
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _io
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _IO
+#define VSF_HAL_TEMPLATE_IMP_NAME                     _io
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _IO
 
 #ifndef VSF_IO_CFG_IMP_PREFIX
 #   error "Please define VSF_IO_CFG_IMP_PREFIX in io driver"
@@ -58,10 +79,19 @@ vsf_io_capability_t vsf_real_io_capability(vsf_real_io_t *io_ptr)
 #   error "Please define VSF_IO_CFG_IMP_UPCASE_PREFIX in io driver"
 #endif
 
-#define __VSF_HAL_TEMPLATE_CFG_REMOVE_ARRAY
-#define __VSF_HAL_TEMPLATE_IMP_COUNT                1
-#define __VSF_HAL_TEMPLATE_IMP_MASK                 1
+#ifndef VSF_IO_CFG_IMP_INSTANCE_PREFIX
+#   define VSF_IO_CFG_IMP_INSTANCE_PREFIX         VSF_IO_CFG_IMP_PREFIX
+#endif
+
+#define VSF_HAL_TEMPLATE_IMP_REMOVE_ARRAY
+#define VSF_HAL_TEMPLATE_IMP_DEFINED_COUNT          1
+#define VSF_HAL_TEMPLATE_IMP_DEFINED_MASK           1
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
 
-#endif // VSF_HAL_USE_IO == ENABLED
+#undef VSF_IO_CFG_IMP_PREFIX
+#undef VSF_IO_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_IO_CFG_IMP_UPCASE_PREFIX
+#undef VSF_IO_CFG_IMP_LV0
+
+#endif  /* VSF_HAL_USE_IO */

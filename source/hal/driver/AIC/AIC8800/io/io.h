@@ -47,51 +47,46 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef enum vsf_io_feature_t {
+typedef enum vsf_io_mode_t {
     // bit 16 : IOMUX_GPIO_CONFIG_PULL_FRC_LSB
     // bit 9  : IOMUX_AGPIO_CONFIG_PULL_UP_LSB
     // bit 8  : IOMUX_AGPIO_CONFIG_PULL_DN_LSB
-    VSF_IO_OPEN_DRAIN           = (0 << 16),    // IOMUX_GPIO_CONFIG_PULL_FRC_LSB
-    VSF_IO_PULL_UP              = (1 << 16) | (1 << 9),
-    VSF_IO_PULL_DOWN            = (1 << 16) | (1 << 8),
+    VSF_IO_OPEN_DRAIN              = (0 << 16),    // IOMUX_GPIO_CONFIG_PULL_FRC_LSB
+    VSF_IO_PULL_UP                 = (1 << 16) | (1 << 9),
+    VSF_IO_PULL_DOWN               = (1 << 16) | (1 << 8),
 
-    __IO_PULL_MASK              = VSF_IO_OPEN_DRAIN | VSF_IO_PULL_UP | VSF_IO_PULL_DOWN,
+    __IO_PULL_MASK                 = VSF_IO_OPEN_DRAIN | VSF_IO_PULL_UP | VSF_IO_PULL_DOWN,
 
     // not support in aic8800
-    VSF_IO_DISABLE_INPUT        = 1 << 17,          //!< disable input
-    VSF_IO_INVERT_INPUT         = 1 << 18,          //!< invert the input pin level
+    VSF_IO_NORMAL_INPUT            = 0,
+    VSF_IO_DISABLE_INPUT           = 1 << 17,          //!< disable input
+    VSF_IO_INVERT_INPUT            = 1 << 18,          //!< invert the input pin level
 
-    VSF_IO_FILTER_BYPASS        = 0 << 19,          //!< filter is bypassed
-    VSF_IO_FILTER_2CLK          = 1 << 19,          //!< levels should keep 2 clks
-    VSF_IO_FILTER_4CLK          = 2 << 19,          //!< levels should keep 4 clks
-    VSF_IO_FILTER_8CLK          = 3 << 19,          //!< levels should keep 8 clks
+    VSF_IO_FILTER_BYPASS           = 0 << 19,          //!< filter is bypassed
+    VSF_IO_FILTER_2CLK             = 1 << 19,          //!< levels should keep 2 clks
+    VSF_IO_FILTER_4CLK             = 2 << 19,          //!< levels should keep 4 clks
+    VSF_IO_FILTER_8CLK             = 3 << 19,          //!< levels should keep 8 clks
 
-    VSF_IO_FILTER_CLK_SRC0      = 0 << 21,          //!< select clock src 0 for filter
-    VSF_IO_FILTER_CLK_SRC1      = 1 << 21,          //!< select clock src 1 for filter
-    VSF_IO_FILTER_CLK_SRC2      = 2 << 21,          //!< select clock src 2 for filter
-    VSF_IO_FILTER_CLK_SRC3      = 3 << 21,          //!< select clock src 3 for filter
-    VSF_IO_FILTER_CLK_SRC4      = 4 << 21,          //!< select clock src 4 for filter
-    VSF_IO_FILTER_CLK_SRC5      = 5 << 21,          //!< select clock src 5 for filter
-    VSF_IO_FILTER_CLK_SRC6      = 6 << 21,          //!< select clock src 6 for filter
-    VSF_IO_FILTER_CLK_SRC7      = 7 << 21,          //!< select clock src 7 for filter
+    VSF_IO_FILTER_CLK_SRC0         = 0 << 21,          //!< select clock src 0 for filter
+    VSF_IO_FILTER_CLK_SRC1         = 1 << 21,          //!< select clock src 1 for filter
+    VSF_IO_FILTER_CLK_SRC2         = 2 << 21,          //!< select clock src 2 for filter
+    VSF_IO_FILTER_CLK_SRC3         = 3 << 21,          //!< select clock src 3 for filter
+    VSF_IO_FILTER_CLK_SRC4         = 4 << 21,          //!< select clock src 4 for filter
+    VSF_IO_FILTER_CLK_SRC5         = 5 << 21,          //!< select clock src 5 for filter
+    VSF_IO_FILTER_CLK_SRC6         = 6 << 21,          //!< select clock src 6 for filter
+    VSF_IO_FILTER_CLK_SRC7         = 7 << 21,          //!< select clock src 7 for filter
 
-    VSF_IO_HIGH_DRV             = 1 << 24,          //!< enable high drive strength
-    VSF_IO_HIGH_DRIVE           = 1 << 24,          //!< enable high drive strength
-    VSF_IO_HIGH_DRIVE_STRENGTH  = 1 << 24,          //!< enable high drive strength
+    VSF_IO_HIGH_DRIVE_STRENGTH     = 1 << 24,          //!< enable high drive strength
+    VSF_IO_HIGH_DRIVE_NO_STRENGTH  = 0 << 24,          //!< enable high drive strength
 
-    VSF_IO_FEATURE_ALL_BITS     = VSF_IO_OPEN_DRAIN | VSF_IO_PULL_UP | VSF_IO_PULL_DOWN |
-                                  VSF_IO_DISABLE_INPUT | VSF_IO_INVERT_INPUT |
-                                  VSF_IO_FILTER_BYPASS | VSF_IO_FILTER_2CLK | VSF_IO_FILTER_4CLK | VSF_IO_FILTER_8CLK |
-                                  VSF_IO_FILTER_CLK_SRC0 | VSF_IO_FILTER_CLK_SRC1 | VSF_IO_FILTER_CLK_SRC2 |
-                                  VSF_IO_FILTER_CLK_SRC3 | VSF_IO_FILTER_CLK_SRC4 | VSF_IO_FILTER_CLK_SRC5 |
-                                  VSF_IO_FILTER_CLK_SRC6 | VSF_IO_FILTER_CLK_SRC7 |
-                                  VSF_IO_HIGH_DRV,
+    __AIC8800_IO_FEATURE_ALL_BITS  = VSF_IO_PULL_UP | VSF_IO_OPEN_DRAIN,
 
-    __AIC8800_IO_FEATURE_ALL_BITS
-                                = VSF_IO_PULL_UP | VSF_IO_OPEN_DRAIN,
+} vsf_io_mode_t;
 
-} vsf_io_feature_t;
 
+extern uint32_t aic8800_io_reg_read(bool is_pmic, volatile uint32_t *reg);
+extern void aic8800_io_reg_mask_write(bool is_pmic, volatile uint32_t *reg,
+                                      uint32_t wdata, uint32_t wmask);
 /*============================ INCLUDES ======================================*/
 
 #define VSF_IO_CFG_DEC_PREFIX              vsf_hw

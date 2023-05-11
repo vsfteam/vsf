@@ -57,5 +57,11 @@ vsf_err_t vsf_remapped_io_config_one_pin(vsf_remapped_io_t *io, vsf_io_cfg_t *cf
     return vsf_io_config_one_pin(io->target, cfg);
 }
 
+vsf_io_capability_t vsf_remapped_io_capability(vsf_remapped_io_t *io)
+{
+    VSF_HAL_ASSERT((io != NULL) && (io->target != NULL));
+    return vsf_io_capability(io->target);
+}
+
 #endif
 #endif

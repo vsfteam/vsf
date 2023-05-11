@@ -21,27 +21,32 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _io
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _IO
+#define VSF_HAL_TEMPLATE_DEC_NAME                     _io
+#define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _IO
 
 #ifndef VSF_IO_CFG_DEC_PREFIX
 #   error "Please define VSF_IO_CFG_DEC_PREFIX when using vsf_template_io.h"
 #endif
 
-#ifdef VSF_IO_CFG_DEC_UPCASE_PREFIX
-#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_IO_CFG_DEC_UPCASE_PREFIX
+// IO always is singl instance
+#define VSF_HAL_TEMPLATE_DEC_REMOVE_ARRAY
+#define VSF_HAL_TEMPLATE_DEC_COUNT                1
+#define VSF_HAL_TEMPLATE_DEC_MASK                 1
+#define VSF_HAL_TEMPLATE_DEC_LV0(__COUNT, __DONT_CARE)                            \
+    extern VSF_MCONNECT(VSF_HAL_TEMPLATE_DEC_PREFIX, VSF_HAL_TEMPLATE_DEC_NAME, _t) \
+        VSF_MCONNECT(VSF_HAL_TEMPLATE_DEC_PREFIX, VSF_HAL_TEMPLATE_DEC_NAME);
+
+#ifndef VSF_IO_CFG_DEC_INSTANCE_PREFIX
+#   define VSF_IO_CFG_DEC_INSTANCE_PREFIX         VSF_IO_CFG_DEC_PREFIX
 #endif
 
-// IO always is singl instance
-#define __VSF_HAL_TEMPLATE_DEC_COUNT                1
-#define __VSF_HAL_TEMPLATE_DEC_MASK                 1
-
-#define __VSF_HAL_TEMPLATE_DEC_LV0(__COUNT, __DONT_CARE)                        \
-    extern VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME, _t) \
-        VSF_MCONNECT(__VSF_HAL_TEMPLATE_PREFIX, __VSF_HAL_TEMPLATE_NAME);
+#ifdef VSF_IO_CFG_DEC_UPCASE_PREFIX
+#   define VSF_HAL_TEMPLATE_DEC_UPCASE_PREFIX       VSF_IO_CFG_DEC_UPCASE_PREFIX
+#endif
 
 #include "hal/driver/common/template/vsf_template_declaration.h"
 
 #undef VSF_IO_CFG_DEC_PREFIX
+#undef VSF_IO_CFG_DEC_INSTANCE_PREFIX
 #undef VSF_IO_CFG_DEC_UPCASE_PREFIX
 
