@@ -237,6 +237,19 @@ uint_fast32_t vsf_gpio_i2c_get_transferred_count(vsf_gpio_i2c_t *gpio_i2c_ptr)
     return gpio_i2c_ptr->transferred_count;
 }
 
+vsf_i2c_capability_t vsf_gpio_i2c_capability(vsf_gpio_i2c_t *gpio_i2c_ptr)
+{
+    vsf_i2c_capability_t capability = {
+        .irq_mask = VSF_I2C_IRQ_ALL_BITS_MASK,
+        .support_no_start = 1,
+        .support_no_stop_restart = 1,
+        .support_restart = 1,
+        .max_transfer_size = 0xFFFF,
+        .min_transfer_size = 0,
+    };
+    return capability;
+}
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

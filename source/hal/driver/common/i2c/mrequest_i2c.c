@@ -15,10 +15,6 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_I2C_CFG_IMP_PREFIX              vsf_mrequest
-#define VSF_I2C_CFG_IMP_UPCASE_PREFIX       VSF_MREQUEST
-#define VSF_I2C_CFG_IMP_EXTERN_OP           ENABLED
-
 #define __VSF_I2C_MERGER_REQUEST_CLASS_IMPLEMENT
 
 /*============================ INCLUDES ======================================*/
@@ -36,7 +32,7 @@
 #   define VSF_I2C_CFG_IMP_PREFIX                   VSF_MREQUEST_I2C_CFG_CALL_PREFIX
 #endif
 
-#define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
+#define VSF_I2C_CFG_IMP_EXTERN_OP                   ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -230,12 +226,15 @@ vsf_i2c_capability_t vsf_mrequest_i2c_capability(vsf_mrequest_i2c_t *m_i2c_ptr)
     VSF_HAL_ASSERT(NULL != real_i2c_ptr);
 
     vsf_i2c_capability_t i2c_capability = vsf_i2c_capability(real_i2c_ptr);
-    i2c_capability.is_support_manual_start_stop = 1;
+    i2c_capability.support_no_stop_restart = 1;
     return i2c_capability;
 }
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY  DISABLED
+#define VSF_I2C_CFG_IMP_PREFIX                  vsf_mrequest
+#define VSF_I2C_CFG_IMP_UPCASE_PREFIX           VSF_MREQUEST
 #include "hal/driver/common/i2c/i2c_template.inc"
 
 #endif //!VSF_HAL_I2C_IMP_MULTIPLEX_I2C

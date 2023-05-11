@@ -98,10 +98,10 @@ static void __vsf_hw_i2c_irq_handler_cb(vsf_hw_i2c_t *hw_i2c_ptr, vsf_i2c_irq_ma
 {
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
 
-    vsf_i2c_irq_mask_t real_irq_mask = irq_mask & hw_i2c_ptr->irq_mask;
+    vsf_i2c_irq_mask_t hw_irq_mask = irq_mask & hw_i2c_ptr->irq_mask;
     vsf_i2c_isr_t *isr_ptr = &hw_i2c_ptr->cfg.isr;
-    if ((real_irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_i2c_t *)hw_i2c_ptr, real_irq_mask);
+    if ((hw_irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_i2c_t *)hw_i2c_ptr, hw_irq_mask);
     }
 }
 
@@ -200,7 +200,7 @@ fsm_rt_t vsf_hw_i2c_disable(vsf_hw_i2c_t *hw_i2c_ptr)
 void vsf_hw_i2c_irq_enable(vsf_hw_i2c_t *hw_i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
-    VSF_HAL_ASSERT((irq_mask & ~VSF_I2C_IRQ_MASK_MASTER_ALL) == 0);
+    VSF_HAL_ASSERT((irq_mask & ~VSF_I2C_IRQ_ALL_BITS_MASK) == 0);
 
     hw_i2c_ptr->irq_mask |= irq_mask;
 }
@@ -210,7 +210,7 @@ void vsf_hw_i2c_irq_disable(vsf_hw_i2c_t *hw_i2c_ptr, vsf_i2c_irq_mask_t irq_mas
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
     const vsf_hw_i2c_const_t * hw_i2c_const = hw_i2c_ptr->i2c_const;
     VSF_HAL_ASSERT(NULL != hw_i2c_const);
-    VSF_HAL_ASSERT((irq_mask & ~VSF_I2C_IRQ_MASK_MASTER_ALL) == 0);
+    VSF_HAL_ASSERT((irq_mask & ~VSF_I2C_IRQ_ALL_BITS_MASK) == 0);
 
     hw_i2c_ptr->irq_mask &= ~irq_mask;
     if (hw_i2c_ptr->irq_mask == 0) {
@@ -353,6 +353,18 @@ uint_fast32_t vsf_hw_i2c_get_transferred_count(vsf_hw_i2c_t *hw_i2c_ptr)
 	// TODO
     VSF_HAL_ASSERT(0);
     return 0;
+}
+
+vsf_i2c_capability_t vsf_hw_i2c_capability(vsf_hw_i2c_t *i2c_ptr)
+{
+    vsf_i2c_capability_t i2c_capability = {
+        .irq_mask = 1,
+        .support_restart = 1,
+        .support_no_start = 0,
+        .support_no_stop_restart = 1,
+        .max_transfer_size = 0xFFFF,
+    };
+    return i2c_capability;
 }
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
