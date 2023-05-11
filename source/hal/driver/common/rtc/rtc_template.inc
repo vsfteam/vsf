@@ -20,13 +20,6 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define vsf_real_rtc_t          VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t)
-#define vsf_real_rtc_capability VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_capability)
-#define vsf_real_rtc_get        VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get)
-#define vsf_real_rtc_set        VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set)
-#define vsf_real_rtc_get_time   VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_time)
-#define vsf_real_rtc_set_time   VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set_time)
-
 #if VSF_RTC_CFG_GET_API_TEMPLATE == ENABLED && VSF_RTC_CFG_GET_TIME_API_TEMPLATE == ENABLED
 #   error "VSF_RTC_CFG_GET_API_TEMPLATE and  VSF_RTC_CFG_GET_TIME_API_TEMPLATE Only one can be defined at a time"
 #endif
@@ -35,33 +28,29 @@
 #   error "VSF_RTC_CFG_SET_API_TEMPLATE and  VSF_RTC_CFG_SET_TIME_API_TEMPLATE Only one can be defined at a time"
 #endif
 
+#ifndef VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY
+#   define  VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#endif
+
+#if VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#   ifndef VSF_RTC_CFG_CAPABILITY_T_IRQ_MASK
+#       define VSF_RTC_CFG_CAPABILITY_T_IRQ_MASK        VSF_RTC_IRQ_ALL_BITS_MASK
+#   endif
+#endif
+
+#define vsf_real_rtc_t          VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t)
+#define vsf_real_rtc_capability VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_capability)
+#define vsf_real_rtc_get        VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get)
+#define vsf_real_rtc_set        VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set)
+#define vsf_real_rtc_get_time   VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_time)
+#define vsf_real_rtc_set_time   VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set_time)
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
-
-#if VSF_RTC_CFG_IMP_PWM_SET == DISABLED
-vsf_err_t vsf_real_rtc_pwm_set(vsf_real_rtc_t *rtc_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
-{
-    VSF_HAL_ASSERT(NULL != rtc_ptr);
-
-    VSF_HAL_ASSERT(0);
-    return VSF_ERR_FAIL;
-}
-#endif
-
-#if VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
-vsf_rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
-{
-    vsf_rtc_capability_t rtc_capability = {
-        0,
-    };
-
-    return rtc_capability;
-}
-#endif
 
 #if VSF_RTC_CFG_GET_API_TEMPLATE == ENABLED
 vsf_err_t vsf_real_rtc_get(vsf_real_rtc_t *rtc_ptr, vsf_rtc_tm_t *rtc_tm)
@@ -169,19 +158,47 @@ vsf_err_t vsf_real_rtc_set_time(vsf_real_rtc_t *rtc_ptr, vsf_rtc_time_t second, 
 }
 #endif
 
+#if VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+vsf_rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
+{
+    vsf_rtc_capability_t rtc_capability = {
+        .irq_mask = VSF_RTC_CFG_CAPABILITY_T_IRQ_MASK,
+    };
+
+    return rtc_capability;
+}
+#endif
+
+/*============================ MACROS ========================================*/
+
+#undef VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_RTC_CFG_CAPABILITY_T_IRQ_MASK
+#undef vsf_real_rtc_t
+#undef vsf_real_rtc_capability
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _rtc
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _RTC
+#define VSF_HAL_TEMPLATE_IMP_NAME                     _rtc
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _RTC
 
 #ifndef VSF_RTC_CFG_IMP_PREFIX
 #   error "Please define VSF_RTC_CFG_IMP_PREFIX in rtc driver"
 #endif
 
 #ifndef VSF_RTC_CFG_IMP_UPCASE_PREFIX
-#   error "Please define VSF_RTC_CFG_IMP_UPCASE_PREFIX    in rtc driver"
+#   error "Please define VSF_RTC_CFG_IMP_UPCASE_PREFIX in rtc driver"
+#endif
+
+#ifndef VSF_RTC_CFG_IMP_INSTANCE_PREFIX
+#   define VSF_RTC_CFG_IMP_INSTANCE_PREFIX         VSF_RTC_CFG_IMP_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
 
+#undef VSF_RTC_CFG_IMP_PREFIX
+#undef VSF_RTC_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_RTC_CFG_IMP_UPCASE_PREFIX
+#undef VSF_RTC_CFG_IMP_LV0
+
 #endif  /* VSF_HAL_USE_RTC */
+
