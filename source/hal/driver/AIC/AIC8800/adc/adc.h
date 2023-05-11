@@ -33,41 +33,8 @@
 #   define VSF_HW_ADC_CFG_CHANNEL_COUNT                             8
 #endif
 
-#define VSF_ADC_CFG_REIMPLEMENT_TYPE_FEATURE                             ENABLED
-#define VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_FEATURE                     ENABLED
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-typedef enum vsf_adc_feature_t{
-    VSF_ADC_REF_VDD_1           = 0,                //ADC_TYPE_VBAT
-    VSF_ADC_REF_VDD_1_2,                            //Not activated
-    VSF_ADC_REF_VDD_1_3,                            //ADC_TYPE_TEMP0
-    ADC_REF_VDD             = VSF_ADC_REF_VDD_1 | VSF_ADC_REF_VDD_1_2 | VSF_ADC_REF_VDD_1_3,
-
-    VSF_DATA_ALIGN_RIGHT        = 0,                //Not activated
-    VSF_DATA_ALIGN_LEFT         = 0,                //Not activated
-    VSF_SCAN_CONV_SINGLE_MODE   = 0,                //Not activated
-    VSF_SCAN_CONV_SEQUENCE_MODE = 0,                //Not activated
-    VSF_EXTERN_TRIGGER_0        = 0,                //Not activated
-    VSF_EXTERN_TRIGGER_1        = 0,                //Not activated
-    VSF_EXTERN_TRIGGER_2        = 0,                //Not activated
-} vsf_adc_feature_t;
-
-typedef enum vsf_adc_channel_feature_t {
-    VSF_ADC_CHANNEL_GAIN_1_6    = (0 << 0),         //Not activated
-    VSF_ADC_CHANNEL_GAIN_1_5    = (1 << 0),         //Not activated
-    VSF_ADC_CHANNEL_GAIN_1_4    = (2 << 0),         //Not activated
-    VSF_ADC_CHANNEL_GAIN_1_3    = (3 << 0),         //Not activated
-    VSF_ADC_CHANNEL_GAIN_1_2    = (4 << 0),         //Not activated
-    VSF_ADC_CHANNEL_GAIN_1      = (5 << 0),         //Not activated
-
-    VSF_ADC_CHANNEL_REF_VDD_1   = (0 << 4),         //Not activated
-    VSF_ADC_CHANNEL_REF_VDD_1_2 = (1 << 4),         //Not activated
-    VSF_ADC_CHANNEL_REF_VDD_1_3 = (2 << 4),         //Not activated
-    VSF_ADC_CHANNEL_REF_VDD_1_4 = (3 << 4),         //Not activated
-} vsf_adc_channel_feature_t;
-
 /*============================ INCLUDES ======================================*/
 
 #define VSF_ADC_CFG_DEC_PREFIX                  vsf_hw

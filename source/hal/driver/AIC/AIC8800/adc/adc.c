@@ -105,7 +105,7 @@ typedef struct vsf_hw_adc_t {
 
 static uint_fast32_t __vsf_adc_get_callback_time_us(vsf_hw_adc_t *hw_adc_ptr)
 {
-    return 26000000 / hw_adc_ptr->cfg.clock_freq * 20 + 6 + VSF_HW_ADC_CFG_CALLBACK_TIME_POSTPONE_US;
+    return 26000000 / hw_adc_ptr->cfg.clock_hz * 20 + 6 + VSF_HW_ADC_CFG_CALLBACK_TIME_POSTPONE_US;
 }
 
 static void __vsf_adc_measure(int type)
@@ -175,8 +175,8 @@ static vsf_err_t __vsf_adc_channel_config(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_chan
             AIC1000LITE_RTC_CORE_RTC_RG_GPIO27_MUX0_EN(0x01 << (channel - 2)));
     }
 
-    vsf_hw_gpio_config_pin(&vsf_hw_gpio1, channel, 0);
-    vsf_hw_gpio_set_input(&vsf_hw_gpio1, channel);
+    vsf_hw_gpio_config_pin(&vsf_hw_gpio1, 1 << channel, 0);
+    vsf_hw_gpio_set_input(&vsf_hw_gpio1, 1 << channel);
 
     PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteIomux->GPCFG[channel]),
         (AIC1000LITE_IOMUX_PAD_GPIO_PULL_FRC),
@@ -243,7 +243,7 @@ static void __vk_adc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
         hw_adc_ptr->status.is_busy = false;
         if ((NULL != hw_adc_ptr->cfg.isr.handler_fn) && hw_adc_ptr->status.is_irq) {
-            hw_adc_ptr->cfg.isr.handler_fn(hw_adc_ptr->cfg.isr.target_ptr, (vsf_adc_t *)hw_adc_ptr);
+            hw_adc_ptr->cfg.isr.handler_fn(hw_adc_ptr->cfg.isr.target_ptr, (vsf_adc_t *)hw_adc_ptr, VSF_ADC_IRQ_MASK_CPL);
         }
         break;
     }
@@ -255,10 +255,10 @@ vsf_err_t vsf_hw_adc_init(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_cfg_t *cfg_ptr)
 
     hw_adc_ptr->cfg = *cfg_ptr;
 
-    hw_adc_ptr->cfg.clock_freq = vsf_max(hw_adc_ptr->cfg.clock_freq, 101960);
-    hw_adc_ptr->cfg.clock_freq = vsf_min(hw_adc_ptr->cfg.clock_freq, 13000000);
+    hw_adc_ptr->cfg.clock_hz = vsf_max(hw_adc_ptr->cfg.clock_hz, 101960);
+    hw_adc_ptr->cfg.clock_hz = vsf_min(hw_adc_ptr->cfg.clock_hz, 13000000);
 
-    uint32_t temp_clock_div = 26000000 / hw_adc_ptr->cfg.clock_freq;
+    uint32_t temp_clock_div = 26000000 / hw_adc_ptr->cfg.clock_hz;
     PMIC_MEM_WRITE((unsigned int)(&aic1000liteSysctrl->msadc_clk_div),
             AIC1000LITE_SYS_CTRL_CFG_CLK_MSADC_DIV_DENOM(temp_clock_div)
         |   AIC1000LITE_SYS_CTRL_CFG_CLK_MSADC_DIV_UPDATE);
@@ -293,18 +293,29 @@ fsm_rt_t vsf_hw_adc_disable(vsf_hw_adc_t *hw_adc_ptr)
     return fsm_rt_cpl;
 }
 
-void vsf_hw_adc_irq_enable(vsf_hw_adc_t *hw_adc_ptr)
+void vsf_hw_adc_irq_enable(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != hw_adc_ptr);
 
     hw_adc_ptr->status.is_irq = true;
 }
 
-void vsf_hw_adc_irq_disable(vsf_hw_adc_t *hw_adc_ptr)
+void vsf_hw_adc_irq_disable(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != hw_adc_ptr);
 
     hw_adc_ptr->status.is_irq = false;
+}
+
+vsf_adc_status_t vsf_hw_adc_status(vsf_hw_adc_t *hw_adc_ptr)
+{
+    VSF_HAL_ASSERT(NULL != hw_adc_ptr);
+
+    vsf_adc_status_t status = {
+        .is_busy = hw_adc_ptr->status.is_busy,
+    };
+
+    return status;
 }
 
 vsf_err_t vsf_hw_adc_channel_request_once(vsf_hw_adc_t *hw_adc_ptr,
@@ -353,7 +364,7 @@ vsf_err_t vsf_hw_adc_channel_config(vsf_hw_adc_t *hw_adc_ptr,
     return VSF_ERR_NONE;
 }
 
-static void __adc_request_isr_handler(void *target, vsf_adc_t *adc_ptr)
+static void __adc_request_isr_handler(void *target, vsf_adc_t *adc_ptr, vsf_adc_irq_mask_t irq_mask)
 {
     vsf_hw_adc_t *hw_adc_ptr = (vsf_hw_adc_t *)adc_ptr;
     VSF_HAL_ASSERT(NULL != hw_adc_ptr);
@@ -371,13 +382,13 @@ static void __adc_request_isr_handler(void *target, vsf_adc_t *adc_ptr)
         return;
     } else {
         hw_adc_ptr->status.is_busy = 0;
-        vsf_hw_adc_irq_disable(hw_adc_ptr);
+        vsf_hw_adc_irq_disable(hw_adc_ptr, VSF_ADC_IRQ_MASK_CPL);
         vsf_adc_isr_t *isr = &hw_adc_ptr->cfg.isr;
         hw_adc_ptr->buffer_ptr = hw_adc_ptr->request.buf;
         if (NULL != isr->handler_fn) {
-            isr->handler_fn(isr->target_ptr, adc_ptr);
+            isr->handler_fn(isr->target_ptr, adc_ptr, VSF_ADC_IRQ_MASK_CPL);
         }
-        vsf_hw_adc_irq_enable(hw_adc_ptr);
+        vsf_hw_adc_irq_enable(hw_adc_ptr, VSF_ADC_IRQ_MASK_CPL);
     }
 }
 
@@ -404,14 +415,28 @@ vsf_err_t vsf_hw_adc_channel_request(vsf_hw_adc_t *hw_adc_ptr, void *buffer_ptr,
     hw_adc_ptr->chns.index = 0;
 
     vsf_protect_t orig = vsf_protect(interrupt)();
-        __adc_request_isr_handler(NULL, (vsf_adc_t *)hw_adc_ptr);
+        __adc_request_isr_handler(NULL, (vsf_adc_t *)hw_adc_ptr, VSF_ADC_IRQ_MASK_CPL);
     vsf_unprotect(interrupt)(orig);
 
     return VSF_ERR_NONE;
 }
 
+vsf_adc_capability_t vsf_hw_adc_capability(vsf_hw_adc_t *adc_ptr)
+{
+    vsf_adc_capability_t adc_capability = {
+        .irq_mask = VSF_ADC_IRQ_MASK_CPL,
+        .max_data_bits = 8,         // TODO: check
+        .max_channel_count = VSF_HW_ADC_CFG_CHANNEL_COUNT,
+    };
+
+    return adc_capability;
+}
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY  DISABLED
+#define VSF_ADC_CFG_IMP_PREFIX                  vsf_hw
+#define VSF_ADC_CFG_IMP_UPCASE_PREFIX           VSF_HW
 #define VSF_ADC_CFG_IMP_LV0(__COUNT, __HAL_OP)                                  \
     vsf_hw_adc_t vsf_hw_adc ## __COUNT = {                                      \
         .buffer_ptr = NULL,                                                     \

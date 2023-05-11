@@ -20,36 +20,76 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define vsf_real_adc_t          VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t)
-#define vsf_real_adc_capability VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_capability)
+#define vsf_real_adc_t                                          VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t)
+#define vsf_real_adc_capability                                 VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_capability)
+
+#ifndef VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY
+#   define  VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#endif
+
+#if VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#   ifndef VSF_ADC_CFG_CAPABILITY_IRQ_MASK
+#       define VSF_ADC_CFG_CAPABILITY_IRQ_MASK                  VSF_ADC_IRQ_ALL_BITS_MASK
+#   endif
+#   ifndef VSF_ADC_CFG_CAPABILITY_MAX_DATA_BITS
+#       define VSF_ADC_CFG_CAPABILITY_MAX_DATA_BITS             12
+#   endif
+#   ifndef VSF_ADC_CFG_CAPABILITY_CHANNEL_COUNT
+#       define VSF_ADC_CFG_CAPABILITY_CHANNEL_COUNT             4
+#   endif
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+#if VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
 vsf_adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
 {
     vsf_adc_capability_t adc_capability = {
-        0,
+        .irq_mask       = VSF_ADC_CFG_CAPABILITY_IRQ_MASK,
+        .max_data_bits  = VSF_ADC_CFG_CAPABILITY_MAX_DATA_BITS,
+        .channel_count  = VSF_ADC_CFG_CAPABILITY_CHANNEL_COUNT,
     };
 
     return adc_capability;
 }
 #endif
 
+/*============================ MACROS ========================================*/
+
+#undef VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_ADC_CFG_CAPABILITY_IRQ_MASK
+#undef VSF_ADC_CFG_CAPABILITY_MAX_DATA_BITS
+#undef VSF_ADC_CFG_CAPABILITY_CHANNEL_COUNT
+
+#undef vsf_real_adc_t
+#undef vsf_real_adc_capability
+
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ IMPLEMENTATION ================================*/
+/*============================ MACROS ========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _adc
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _ADC
+#define VSF_HAL_TEMPLATE_IMP_NAME                     _adc
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _ADC
 
 #ifndef VSF_ADC_CFG_IMP_PREFIX
 #   error "Please define VSF_ADC_CFG_IMP_PREFIX in adc driver"
 #endif
 
 #ifndef VSF_ADC_CFG_IMP_UPCASE_PREFIX
-#   error "Please define VSF_ADC_CFG_IMP_UPCASE_PREFIX    in adc driver"
+#   error "Please define VSF_ADC_CFG_IMP_UPCASE_PREFIX in adc driver"
+#endif
+
+#ifndef VSF_ADC_CFG_IMP_INSTANCE_PREFIX
+#   define VSF_ADC_CFG_IMP_INSTANCE_PREFIX         VSF_ADC_CFG_IMP_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
 
-#endif
+#undef VSF_ADC_CFG_IMP_PREFIX
+#undef VSF_ADC_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_ADC_CFG_IMP_UPCASE_PREFIX
+#undef VSF_ADC_CFG_IMP_LV0
+
+#endif  /* VSF_HAL_USE_ADC */

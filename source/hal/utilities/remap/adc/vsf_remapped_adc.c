@@ -57,6 +57,12 @@ void vsf_remapped_adc_fini(vsf_remapped_adc_t *adc)
     vsf_adc_fini(adc->target);
 }
 
+vsf_adc_status_t vsf_remapped_adc_status(vsf_remapped_adc_t *adc)
+{
+    VSF_HAL_ASSERT((adc != NULL) && (adc->target != NULL));
+    return vsf_adc_status(adc->target);
+}
+
 vsf_adc_capability_t vsf_remapped_adc_capability(vsf_remapped_adc_t *adc)
 {
     VSF_HAL_ASSERT((adc != NULL) && (adc->target != NULL));
@@ -75,16 +81,16 @@ fsm_rt_t vsf_remapped_adc_disable(vsf_remapped_adc_t *adc)
     return vsf_adc_disable(adc->target);
 }
 
-void vsf_remapped_adc_irq_enable(vsf_remapped_adc_t *adc)
+void vsf_remapped_adc_irq_enable(vsf_remapped_adc_t *adc, vsf_adc_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT((adc != NULL) && (adc->target != NULL));
-    vsf_adc_irq_enable(adc->target);
+    vsf_adc_irq_enable(adc->target, irq_mask);
 }
 
-void vsf_remapped_adc_irq_disable(vsf_remapped_adc_t *adc)
+void vsf_remapped_adc_irq_disable(vsf_remapped_adc_t *adc, vsf_adc_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT((adc != NULL) && (adc->target != NULL));
-    vsf_adc_irq_disable(adc->target);
+    vsf_adc_irq_disable(adc->target, irq_mask);
 }
 
 vsf_err_t vsf_remapped_adc_channel_request_once(vsf_remapped_adc_t *adc,
