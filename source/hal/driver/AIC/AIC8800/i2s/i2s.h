@@ -29,51 +29,44 @@
 /*============================ MACROS ========================================*/
 
 #define VSF_I2S_CFG_REIMPLEMENT_TYPE_IRQ_MASK   ENABLED
-#define VSF_I2S_CFG_REIMPLEMENT_TYPE_FEATURE    ENABLED
+#define VSF_I2S_CFG_REIMPLEMENT_TYPE_MODE       ENABLED
 
 /*============================ TYPES =========================================*/
 
 typedef enum vsf_i2s_irq_mask_t {
-    I2S_IRQ_MASK_TX_TGL_BUFFER  = (0x1ul <<  0),
-    I2S_IRQ_MASK_RX_TGL_BUFFER  = (0x1ul <<  1),
-
-    I2S_IRQ_MASK_ALL            = I2S_IRQ_MASK_TX_TGL_BUFFER | I2S_IRQ_MASK_RX_TGL_BUFFER,
+    VSF_I2S_IRQ_MASK_TX_TGL_BUFFER  = (0x1ul <<  0),
+    VSF_I2S_IRQ_MASK_RX_TGL_BUFFER  = (0x1ul <<  1),
 } vsf_i2s_irq_mask_t;
 
-typedef enum vsf_i2s_feature_t {
-    I2S_MODE_MASTER             = (1 << 21),        // master mode not tested
-    I2S_MODE_SLAVE              = (0 << 21),
-    I2S_MODE_MASK               = (1 << 21),
+typedef enum vsf_i2s_mode_t {
+    VSF_I2S_MODE_MASTER             = (1 << 21),        // master mode not tested
+    VSF_I2S_MODE_SLAVE              = (0 << 21),
 
     // todo: how to support LSB mode?
-    I2S_STANDARD_MSB            = 0,
-    I2S_STANDARD_PHILIPS        = (1 << 20) | (1 << 17) | I2S_STANDARD_MSB,
-    I2S_STANDARD_MASK           = (1 << 17) | (1 << 18) | (1 << 20),
+    VSF_I2S_STANDARD_MSB            = 0,
+    VSF_I2S_STANDARD_PHILIPS        = (1 << 20) | (1 << 17) | VSF_I2S_STANDARD_MSB,
 
-    I2S_LRCK_POL                = (1 << 12),
-    I2S_BCK_POL                 = (1 << 13),
-    __I2S_HW_FEATURE_MASK       = I2S_MODE_MASK | I2S_STANDARD_MASK | I2S_LRCK_POL | I2S_BCK_POL,
+    VSF_I2S_LRCK_POL                = (1 << 12),
+    VSF_I2S_BCK_POL                 = (1 << 13),
+
+    __I2S_HW_FEATURE_MASK           = VSF_I2S_MODE_MASTER | VSF_I2S_MODE_SLAVE |
+                                      VSF_I2S_STANDARD_MSB | VSF_I2S_STANDARD_PHILIPS |
+                                      VSF_I2S_LRCK_POL | VSF_I2S_BCK_POL,
 
     // software bits below
+    __I2S_DATA_BITLEN_POS           = 24,
+    VSF_I2S_DATA_BITLEN_16          = (1 << __I2S_DATA_BITLEN_POS),
+    VSF_I2S_DATA_BITLEN_24          = (2 << __I2S_DATA_BITLEN_POS),
+    VSF_I2S_DATA_BITLEN_32          = (3 << __I2S_DATA_BITLEN_POS),     // not supported
 
-    __I2S_DATA_BITLEN_POS       = 24,
-    I2S_DATA_BITLEN_16          = (1 << __I2S_DATA_BITLEN_POS),
-    I2S_DATA_BITLEN_24          = (2 << __I2S_DATA_BITLEN_POS),
-    I2S_DATA_BITLEN_32          = (3 << __I2S_DATA_BITLEN_POS),     // not supported
-    I2S_DATA_BITLEN_MASK        = (3 << __I2S_DATA_BITLEN_POS),
+    __I2S_FRAME_BITLEN_POS          = 26,
+    VSF_I2S_FRAME_BITLEN_16         = (1 << __I2S_FRAME_BITLEN_POS),
+    VSF_I2S_FRAME_BITLEN_24         = (2 << __I2S_FRAME_BITLEN_POS),
+    VSF_I2S_FRAME_BITLEN_32         = (3 << __I2S_FRAME_BITLEN_POS),
 
-    __I2S_FRAME_BITLEN_POS      = 26,
-    I2S_FRAME_BITLEN_16         = (1 << __I2S_FRAME_BITLEN_POS),
-    I2S_FRAME_BITLEN_24         = (2 << __I2S_FRAME_BITLEN_POS),
-    I2S_FRAME_BITLEN_32         = (3 << __I2S_FRAME_BITLEN_POS),
-    I2S_FRAME_BITLEN_MASK       = (3 << __I2S_FRAME_BITLEN_POS),
-
-    I2S_MCLK_OUTPUT             = (1 << 28),
-
-    __I2S_SW_FEATURE_MASK       = I2S_MCLK_OUTPUT | I2S_DATA_BITLEN_MASK | I2S_FRAME_BITLEN_MASK,
-
-    I2S_FEATURE_MASK            = __I2S_HW_FEATURE_MASK | __I2S_SW_FEATURE_MASK,
-} vsf_i2s_feature_t;
+    VSF_I2S_MCLK_OUTPUT             = (1 << 28),
+    VSF_I2S_STANDARD_LSB            = (1 << 29),
+} vsf_i2s_mode_t;
 
 /*============================ INCLUDES ======================================*/
 
