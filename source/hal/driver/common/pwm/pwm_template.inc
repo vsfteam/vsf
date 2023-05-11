@@ -33,6 +33,19 @@
 #   define VSF_PWM_CFG_REIMPLEMENT_API_SET_NS       DISABLED
 #endif
 
+#ifndef VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY
+#   define  VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY  DISABLED
+#endif
+
+#if VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#   ifndef VSF_PWM_CFG_CAPABILITY_MIN_FREQ
+#       define VSF_PWM_CFG_CAPABILITY_MIN_FREQ      (1ul * 1000)
+#   endif
+#   ifndef VSF_PWM_CFG_CAPABILITY_MAX_FREQ
+#       define VSF_PWM_CFG_CAPABILITY_MAX_FREQ      (10ul * 1000 * 1000)
+#   endif
+#endif
+
 #define vsf_real_pwm_t          VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t)
 #define vsf_real_pwm_set        VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set)
 #define vsf_real_pwm_set_ms     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set_ms)
@@ -94,21 +107,30 @@ vsf_err_t vsf_real_pwm_set_ns(vsf_real_pwm_t *pwm_ptr, uint8_t channel, uint32_t
 }
 #endif
 
-#if VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+#if VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
 vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 {
     vsf_pwm_capability_t pwm_capability = {
-        0,
+        .max_freq = VSF_PWM_CFG_CAPABILITY_MAX_FREQ,
+        .min_freq = VSF_PWM_CFG_CAPABILITY_MIN_FREQ,
     };
 
     return pwm_capability;
 }
 #endif
 
+/*============================ MACROS ========================================*/
+
+#undef VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_PWM_CFG_CAPABILITY_MAX_FREQ
+#undef VSF_PWM_CFG_CAPABILITY_MIN_FREQ
+#undef vsf_real_pwm_t
+#undef vsf_real_pwm_capability
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _pwm
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _PWM
+#define VSF_HAL_TEMPLATE_IMP_NAME                     _pwm
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _PWM
 
 #ifndef VSF_PWM_CFG_IMP_PREFIX
 #   error "Please define VSF_PWM_CFG_IMP_PREFIX in pwm driver"
@@ -118,6 +140,15 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 #   error "Please define VSF_PWM_CFG_IMP_UPCASE_PREFIX in pwm driver"
 #endif
 
+#ifndef VSF_PWM_CFG_IMP_INSTANCE_PREFIX
+#   define VSF_PWM_CFG_IMP_INSTANCE_PREFIX         VSF_PWM_CFG_IMP_PREFIX
+#endif
+
 #include "hal/driver/common/template/vsf_template_implementation.h"
+
+#undef VSF_PWM_CFG_IMP_PREFIX
+#undef VSF_PWM_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_PWM_CFG_IMP_UPCASE_PREFIX
+#undef VSF_PWM_CFG_IMP_LV0
 
 #endif  /* VSF_HAL_USE_PWM */
