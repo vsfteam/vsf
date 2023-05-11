@@ -21,16 +21,20 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _pm
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _PM
+#define VSF_HAL_TEMPLATE_DEC_NAME                     _pm
+#define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _PM
 
 #ifndef VSF_PM_CFG_DEC_PREFIX
 #   error "Please define VSF_PM_CFG_DEC_PREFIX when using vsf_template_pm.h"
 #endif
 
 #ifdef VSF_PM_CFG_DEC_UPCASE_PREFIX
-#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_PM_CFG_DEC_UPCASE_PREFIX
+#   define VSF_HAL_TEMPLATE_DEC_UPCASE_PREFIX         VSF_PM_CFG_DEC_UPCASE_PREFIX
 #endif
+
+// PM always is singl instance
+#define VSF_HAL_TEMPLATE_DEC_COUNT                1
+#define VSF_HAL_TEMPLATE_DEC_MASK                 1
 
 #include "hal/driver/common/template/vsf_template_declaration.h"
 

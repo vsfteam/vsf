@@ -27,7 +27,10 @@
 #include "./vsf_template_i2c.h"
 #include "./vsf_template_i2s.h"
 #include "./vsf_template_mmc.h"
-#include "./vsf_template_pm.h"
+
+#if defined(VSF_HAL_USE_PM) && !defined(__VSF_TEMPLATE_PM_H__)
+#   include "./vsf_template_pm.h"
+#endif
 
 #if defined(VSF_HAL_USE_PWM) && !defined(__VSF_TEMPLATE_PWM_H__)
 #   include "./vsf_template_pwm.h"
