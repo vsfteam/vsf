@@ -41,6 +41,8 @@
 #   define VSF_MULTIPLEXER_SPI_PROTECT_LEVEL        interrupt
 #endif
 
+#define VSF_SPI_IMP_DEC_EXTERN_OP                   ENABLED
+
 #define vsf_multiplex_spi_protect                   vsf_protect(VSF_MULTIPLEXER_SPI_PROTECT_LEVEL)
 #define vsf_multiplex_spi_unprotect                 vsf_unprotect(VSF_MULTIPLEXER_SPI_PROTECT_LEVEL)
 
@@ -159,9 +161,7 @@ static vsf_err_t __spi_init_en_req(vsf_multiplex_spi_t *m_spi_ptr, bool need_rec
 
         multiplex_spi_request_t * request_ptr = &m_spi_ptr->request;
         result = vsf_spi_request_transfer(spi, request_ptr->out_buffer_ptr, request_ptr->in_buffer_ptr, request_ptr->count);
-        if (result != VSF_ERR_NONE) {
-            VSF_HAL_ASSERT(result == VSF_ERR_NONE);
-        }
+        VSF_HAL_ASSERT(result == VSF_ERR_NONE);
     }
 
     return result;
@@ -372,11 +372,10 @@ void vsf_multiplex_spi_cs_inactive(vsf_multiplex_spi_t *m_spi_ptr, uint_fast8_t 
 
 void vsf_multiplex_spi_fifo_transfer(vsf_multiplex_spi_t *m_spi_ptr,
                                      void *out_buffer_ptr,
-                                     uint_fast32_t out_cnt,
                                      uint_fast32_t* out_offset_ptr,
                                      void *in_buffer_ptr,
-                                     uint_fast32_t in_cnt,
-                                     uint_fast32_t* int_offset_ptr)
+                                     uint_fast32_t* int_offset_ptr,
+                                     uint_fast32_t cnt)
 {
     // TODO: support fifo transfer
     VSF_HAL_ASSERT(0);

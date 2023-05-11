@@ -106,12 +106,12 @@ vsf_spi_capability_t vsf_remapped_spi_capability(vsf_remapped_spi_t *spi)
 }
 
 void vsf_remapped_spi_fifo_transfer(vsf_remapped_spi_t *spi,
-        void *out_buffer, uint_fast32_t out_cnt, uint_fast32_t *out_offset,
-        void *in_buffer, uint_fast32_t in_cnt, uint_fast32_t *in_offset)
+        void *out_buffer, uint_fast32_t *out_offset,
+        void *in_buffer, uint_fast32_t *in_offset, uint_fast32_t cnt)
 {
     VSF_HAL_ASSERT((spi != NULL) && (spi->target != NULL));
-    vsf_spi_fifo_transfer(spi->target, out_buffer, out_cnt, out_offset,
-        in_buffer, in_cnt, in_offset);
+    vsf_spi_fifo_transfer(spi->target, out_buffer, out_offset,
+        in_buffer, in_offset, cnt);
 }
 
 vsf_err_t vsf_remapped_spi_request_transfer(vsf_remapped_spi_t *spi,

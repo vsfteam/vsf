@@ -48,7 +48,7 @@ void vsf_spi_fini(vsf_spi_t *spi_ptr)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->op != NULL);
-    VSF_HAL_ASSERT(spi_ptr->op->init != NULL);
+    VSF_HAL_ASSERT(spi_ptr->op->fini != NULL);
 
     spi_ptr->op->fini(spi_ptr);
 }
@@ -118,18 +118,19 @@ void vsf_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index)
 
 void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr,
                            void *out_buffer_ptr,
-                           uint_fast32_t  out_cnt,
                            uint_fast32_t* out_offset_ptr,
                            void *in_buffer_ptr,
-                           uint_fast32_t  in_cnt,
-                           uint_fast32_t* in_offset_ptr)
+                           uint_fast32_t* in_offset_ptr,
+                           uint_fast32_t cnt)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->op != NULL);
     VSF_HAL_ASSERT(spi_ptr->op->fifo_transfer != NULL);
 
-    spi_ptr->op->fifo_transfer(spi_ptr, out_buffer_ptr, out_cnt, out_offset_ptr,
-                                        in_buffer_ptr,  in_cnt, in_offset_ptr);
+    spi_ptr->op->fifo_transfer(spi_ptr,
+                               out_buffer_ptr, out_offset_ptr,
+                               in_buffer_ptr, in_offset_ptr,
+                               cnt);
 }
 
 vsf_err_t vsf_spi_request_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr,
