@@ -23,7 +23,10 @@
 #include "./vsf_template_io.h"
 #include "./vsf_template_gpio.h"
 #include "./vsf_template_adc.h"
-#include "./vsf_template_flash.h"
+
+#if defined(VSF_HAL_USE_FLASH) && !defined(__VSF_TEMPLATE_FLASH_H__)
+#   include "./vsf_template_flash.h"
+#endif
 
 #if defined(VSF_HAL_USE_I2C) && !defined(__VSF_TEMPLATE_I2C_H__)
 #   include "./vsf_template_i2c.h"

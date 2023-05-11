@@ -32,24 +32,30 @@
 #define vsf_real_flash_read_multi_sector    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)
 
 #ifndef VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY
-#   define VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY         DISABLED
+#   define  VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
 #endif
 
-#if VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
-#   ifndef VSF_FLASH_CFG_BASE_ADDRESS
-#       define VSF_FLASH_CFG_BASE_ADDRESS               0
+#if VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#   ifndef VSF_FLASH_CFG_CAPABILITY_IRQ_MASK
+#       define VSF_FLASH_CFG_CAPABILITY_IRQ_MASK                    VSF_FLASH_IRQ_ALL_BITS_MASK
 #   endif
-
-#   ifndef VSF_FLASH_CFG_MAX_SIZE
-#       //error "Please define flash size macro 'VSF_FLASH_CFG_MAX_SIZE' in source files"
+#   ifndef VSF_FLASH_CFG_CAPABILITY_BASE_ADDRESS
+#       define VSF_FLASH_CFG_CAPABILITY_BASE_ADDRESS                0
 #   endif
-
-#   ifndef VSF_FLASH_CFG_SECTORE_WRITE_ANY_ADDRESS
-#       define VSF_FLASH_CFG_SECTORE_WRITE_ANY_ADDRESS  0
+#   ifndef VSF_FLASH_CFG_CAPABILITY_MAX_SIZE
+#       error "Please define flash size macro 'VSF_FLASH_CFG_CAPABILITY_MAX_SIZE' in source files"
 #   endif
-
-#   ifndef VSF_FLASH_CFG_SECTORE_READ_ANY_ADDRESS
-#       define VSF_FLASH_CFG_SECTORE_READ_ANY_ADDRESS   1
+#   ifndef VSF_FLASH_CFG_CAPABILITY_ERASE_SECTORE_SIZE
+#       define VSF_FLASH_CFG_CAPABILITY_ERASE_SECTORE_SIZE          4096
+#   endif
+#   ifndef VSF_FLASH_CFG_CAPABILITY_WRITE_SECTORE_SIZE
+#       define VSF_FLASH_CFG_CAPABILITY_WRITE_SECTORE_SIZE          512
+#   endif
+#   ifndef VSF_FLASH_CFG_CAPABILITY_SECTORE_WRITE_ANY_ADDRESS
+#       define VSF_FLASH_CFG_CAPABILITY_SECTORE_WRITE_ANY_ADDRESS  0
+#   endif
+#   ifndef VSF_FLASH_CFG_CAPABILITY_SECTORE_READ_ANY_ADDRESS
+#       define VSF_FLASH_CFG_CAPABILITY_SECTORE_READ_ANY_ADDRESS   1
 #   endif
 #endif
 
@@ -179,16 +185,17 @@ vsf_err_t vsf_real_flash_read_multi_sector(vsf_real_flash_t *real_flash_ptr, vsf
 }
 #endif
 
-#if VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+#if VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
 vsf_flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
 {
     vsf_flash_capability_t flash_capability = {
-        .base_address               = VSF_FLASH_CFG_BASE_ADDRESS,
-        .max_size                   = VSF_FLASH_CFG_MAX_SIZE,
-        .erase_sector_size          = VSF_FLASH_CFG_ERASE_SECTORE_SIZE,
-        .write_sector_size          = VSF_FLASH_CFG_WRITE_SECTORE_SIZE,
-        .can_write_any_address      = VSF_FLASH_CFG_SECTORE_WRITE_ANY_ADDRESS,
-        .can_read_any_address       = VSF_FLASH_CFG_SECTORE_READ_ANY_ADDRESS,
+        .irq_mask                   = VSF_FLASH_CFG_CAPABILITY_IRQ_MASK,
+        .base_address               = VSF_FLASH_CFG_CAPABILITY_BASE_ADDRESS,
+        .max_size                   = VSF_FLASH_CFG_CAPABILITY_MAX_SIZE,
+        .erase_sector_size          = VSF_FLASH_CFG_CAPABILITY_ERASE_SECTORE_SIZE,
+        .write_sector_size          = VSF_FLASH_CFG_CAPABILITY_WRITE_SECTORE_SIZE,
+        .can_write_any_address      = VSF_FLASH_CFG_CAPABILITY_SECTORE_WRITE_ANY_ADDRESS,
+        .can_read_any_address       = VSF_FLASH_CFG_CAPABILITY_SECTORE_READ_ANY_ADDRESS,
     };
 
     VSF_ASSERT(flash_capability.erase_sector_size >= flash_capability.write_sector_size);
@@ -197,19 +204,49 @@ vsf_flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
 }
 #endif
 
+/*============================ MACROS ========================================*/
+
+#undef VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_FLASH_CFG_CAPABILITY_IRQ_MASK
+#undef VSF_FLASH_CFG_CAPABILITY_BASE_ADDRESS
+#undef VSF_FLASH_CFG_CAPABILITY_MAX_SIZE
+#undef VSF_FLASH_CFG_CAPABILITY_ERASE_SECTORE_SIZE
+#undef VSF_FLASH_CFG_CAPABILITY_WRITE_SECTORE_SIZE
+#undef VSF_FLASH_CFG_CAPABILITY_SECTORE_WRITE_ANY_ADDRESS
+#undef VSF_FLASH_CFG_CAPABILITY_SECTORE_READ_ANY_ADDRESS
+
+#undef vsf_real_flash_t
+#undef vsf_real_flash_erase_all
+#undef vsf_real_flash_erase_one_sector
+#undef vsf_real_flash_erase_multi_sector
+#undef vsf_real_flash_write_one_sector
+#undef vsf_real_flash_write_multi_sector
+#undef vsf_real_flash_read_one_sector
+#undef vsf_real_flash_read_multi_sector
+#undef vsf_real_flash_capability
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _flash
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _FLASH
+#define VSF_HAL_TEMPLATE_IMP_NAME                     _flash
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _FLASH
 
 #ifndef VSF_FLASH_CFG_IMP_PREFIX
 #   error "Please define VSF_FLASH_CFG_IMP_PREFIX in flash driver"
 #endif
 
 #ifndef VSF_FLASH_CFG_IMP_UPCASE_PREFIX
-#   error "Please define VSF_ADC_CFG_IMP_UPCASE_PREFIX    in flash driver"
+#   error "Please define VSF_FLASH_CFG_IMP_UPCASE_PREFIX in flash driver"
+#endif
+
+#ifndef VSF_FLASH_CFG_IMP_INSTANCE_PREFIX
+#   define VSF_FLASH_CFG_IMP_INSTANCE_PREFIX         VSF_FLASH_CFG_IMP_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
+
+#undef VSF_FLASH_CFG_IMP_PREFIX
+#undef VSF_FLASH_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_FLASH_CFG_IMP_UPCASE_PREFIX
+#undef VSF_FLASH_CFG_IMP_LV0
 
 #endif  /* VSF_HAL_USE_FLASH */

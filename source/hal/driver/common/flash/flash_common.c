@@ -71,6 +71,33 @@ fsm_rt_t vsf_flash_disable(vsf_flash_t *flash_ptr)
     return flash_ptr->op->disable(flash_ptr);
 }
 
+void vsf_flash_irq_enable(vsf_flash_t *flash_ptr, vsf_flash_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(flash_ptr != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op->irq_enable != NULL);
+
+    flash_ptr->op->irq_enable(flash_ptr, irq_mask);
+}
+
+void vsf_flash_irq_disable(vsf_flash_t *flash_ptr, vsf_flash_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(flash_ptr != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op->irq_disable != NULL);
+
+    flash_ptr->op->irq_disable(flash_ptr, irq_mask);
+}
+
+vsf_flash_status_t vsf_flash_status(vsf_flash_t *flash_ptr)
+{
+    VSF_HAL_ASSERT(flash_ptr != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op->status != NULL);
+
+    return flash_ptr->op->status(flash_ptr);
+}
+
 vsf_flash_capability_t vsf_flash_capability(vsf_flash_t *flash_ptr)
 {
     VSF_HAL_ASSERT(flash_ptr != NULL);
@@ -96,6 +123,15 @@ vsf_err_t vsf_flash_erase_multi_sector(vsf_flash_t *flash_ptr, uint_fast32_t off
     VSF_HAL_ASSERT(flash_ptr->op->erase_multi_sector != NULL);
 
     return flash_ptr->op->erase_multi_sector(flash_ptr, offset, size);
+}
+
+vsf_err_t vsf_flash_erase_all(vsf_flash_t *flash_ptr)
+{
+    VSF_HAL_ASSERT(flash_ptr != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op->erase_all != NULL);
+
+    return flash_ptr->op->erase_all(flash_ptr);
 }
 
 vsf_err_t vsf_flash_write_one_sector(vsf_flash_t *flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)
