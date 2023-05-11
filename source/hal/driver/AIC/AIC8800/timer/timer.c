@@ -128,6 +128,15 @@ vsf_err_t vsf_hw_timer_init(vsf_hw_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr)
     return VSF_ERR_NONE;
 }
 
+void vsf_hw_timer_fini(vsf_hw_timer_t *timer_ptr)
+{
+    VSF_HAL_ASSERT(timer_ptr != NULL);
+    const vsf_hw_timer_const_t *timer_const = timer_ptr->timer_const;
+    VSF_HAL_ASSERT(timer_const != NULL);
+
+    NVIC_DisableIRQ(timer_const->irqn);
+}
+
 fsm_rt_t vsf_hw_timer_enable(vsf_hw_timer_t *timer_ptr)
 {
     VSF_HAL_ASSERT(timer_ptr != NULL);
@@ -178,6 +187,13 @@ void vsf_hw_timer_irq_disable(vsf_hw_timer_t *timer_ptr, vsf_timer_irq_mask_t ir
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
+#   define VSF_TIMER_CFG_CAPABILITY_IRQ_MASK        VSF_TIMER_IRQ_ALL_BITS_MASK
+#   define VSF_TIMER_CFG_CAPABILITY_TIMER_BITLEN    32
+#   define VSF_TIMER_CFG_CAPABILITY_SUPPORT_PWM     0
+#   define VSF_TIMER_CFG_CAPABILITY_PWM_CHANNEL_CNT 0
+#define VSF_TIMER_CFG_IMP_PREFIX                    vsf_hw
+#define VSF_TIMER_CFG_IMP_UPCASE_PREFIX             VSF_HW
 #define VSF_TIMER_CFG_IMP_LV0(__COUNT, __hal_op)                                \
     static const vsf_hw_timer_const_t __vsf_hw_timer ## __COUNT ## _const = {   \
         .reg    = (AIC_TIM_REG_T *)VSF_HW_TIMER ## __COUNT ## _BASE_ADDRESS,    \

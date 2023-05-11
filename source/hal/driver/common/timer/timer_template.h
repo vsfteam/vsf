@@ -21,19 +21,24 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _timer
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _TIMER
+#define VSF_HAL_TEMPLATE_DEC_NAME                     _timer
+#define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _TIMER
 
 #ifndef VSF_TIMER_CFG_DEC_PREFIX
 #   error "Please define VSF_TIMER_CFG_DEC_PREFIX when using vsf_template_timer.h"
 #endif
 
+#ifndef VSF_TIMER_CFG_DEC_INSTANCE_PREFIX
+#   define VSF_TIMER_CFG_DEC_INSTANCE_PREFIX         VSF_TIMER_CFG_DEC_PREFIX
+#endif
+
 #ifdef VSF_TIMER_CFG_DEC_UPCASE_PREFIX
-#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_TIMER_CFG_DEC_UPCASE_PREFIX
+#   define VSF_HAL_TEMPLATE_DEC_UPCASE_PREFIX       VSF_TIMER_CFG_DEC_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_declaration.h"
 
 #undef VSF_TIMER_CFG_DEC_PREFIX
+#undef VSF_TIMER_CFG_DEC_INSTANCE_PREFIX
 #undef VSF_TIMER_CFG_DEC_UPCASE_PREFIX
 
