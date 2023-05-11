@@ -105,6 +105,9 @@ vsf_err_t vsf_hw_rng_generate_request(vsf_hw_rng_t *rng, uint32_t *buffer, uint3
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY  ENABLED
+#define VSF_RNG_CFG_IMP_PREFIX                  vsf_hw
+#define VSF_RNG_CFG_IMP_UPCASE_PREFIX           VSF_HW
 #define VSF_RNG_CFG_IMP_LV0(__COUNT, __HAL_OP)                                  \
     vsf_hw_rng_t VSF_MCONNECT(vsf_hw_rng, __COUNT) = {                          \
         VSF_MCONNECT(VSF_HW_RNG, __COUNT, _CONFIG)                              \

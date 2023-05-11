@@ -29,7 +29,10 @@
 #include "./vsf_template_mmc.h"
 #include "./vsf_template_pm.h"
 #include "./vsf_template_pwm.h"
-#include "./vsf_template_rng.h"
+
+#if defined(VSF_HAL_USE_RNG) && !defined(__VSF_TEMPLATE_RNG_H__)
+#   include "./vsf_template_rng.h"
+#endif
 
 #if defined(VSF_HAL_USE_RTC) && !defined(__VSF_TEMPLATE_RTC_H__)
 #   include "./vsf_template_rtc.h"

@@ -22,19 +22,24 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 
-#define __VSF_HAL_TEMPLATE_NAME                     _rng
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _RNG
+#define VSF_HAL_TEMPLATE_DEC_NAME                     _rng
+#define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _RNG
 
 #ifndef VSF_RNG_CFG_DEC_PREFIX
 #   error "Please define VSF_RNG_CFG_DEC_PREFIX when using vsf_template_rng.h"
 #endif
 
+#ifndef VSF_RNG_CFG_DEC_INSTANCE_PREFIX
+#   define VSF_RNG_CFG_DEC_INSTANCE_PREFIX         VSF_RNG_CFG_DEC_PREFIX
+#endif
+
 #ifdef VSF_RNG_CFG_DEC_UPCASE_PREFIX
-#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_RNG_CFG_DEC_UPCASE_PREFIX
+#   define VSF_HAL_TEMPLATE_DEC_UPCASE_PREFIX       VSF_RNG_CFG_DEC_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_declaration.h"
 
 #undef VSF_RNG_CFG_DEC_PREFIX
+#undef VSF_RNG_CFG_DEC_INSTANCE_PREFIX
 #undef VSF_RNG_CFG_DEC_UPCASE_PREFIX
 

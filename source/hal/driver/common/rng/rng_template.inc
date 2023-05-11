@@ -23,6 +23,10 @@
 #define vsf_real_rng_t          VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_t)
 #define vsf_real_rng_capability VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_capability)
 
+#ifndef VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY
+#   define  VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -30,7 +34,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+#if VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
 vsf_rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 {
     vsf_rng_capability_t rng_capability = {
@@ -41,19 +45,34 @@ vsf_rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 }
 #endif
 
+/*============================ MACROS ========================================*/
+
+#undef VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY
+#undef vsf_real_rng_t
+#undef vsf_real_rng_capability
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _rng
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _RNG
+#define VSF_HAL_TEMPLATE_IMP_NAME                     _rng
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _RNG
 
 #ifndef VSF_RNG_CFG_IMP_PREFIX
 #   error "Please define VSF_RNG_CFG_IMP_PREFIX in rng driver"
 #endif
 
-#ifndef VSF_RNG_CFG_IMP_UPCASE_PREFIX   
-#   error "Please define VSF_RNG_CFG_IMP_UPCASE_PREFIX    in rng driver"
+#ifndef VSF_RNG_CFG_IMP_UPCASE_PREFIX
+#   error "Please define VSF_RNG_CFG_IMP_UPCASE_PREFIX in rng driver"
+#endif
+
+#ifndef VSF_RNG_CFG_IMP_INSTANCE_PREFIX
+#   define VSF_RNG_CFG_IMP_INSTANCE_PREFIX         VSF_RNG_CFG_IMP_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
+
+#undef VSF_RNG_CFG_IMP_PREFIX
+#undef VSF_RNG_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_RNG_CFG_IMP_UPCASE_PREFIX
+#undef VSF_RNG_CFG_IMP_LV0
 
 #endif  /* VSF_HAL_USE_RNG */
