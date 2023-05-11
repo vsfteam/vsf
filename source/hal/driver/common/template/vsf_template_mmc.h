@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_MMC_INTERFACE_H__
-#define __HAL_DRIVER_MMC_INTERFACE_H__
+#ifndef __VSF_TEMPLATE_MMC_H__
+#define __VSF_TEMPLATE_MMC_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -34,6 +34,14 @@ extern "C" {
 #   define VSF_MMC_CFG_MULTI_CLASS                  ENABLED
 #endif
 
+#if defined(VSF_HW_MMC_COUNT) && !defined(VSF_HW_MMC_MASK)
+#   define VSF_HW_MMC_MASK                          VSF_HAL_COUNT_TO_MASK(VSF_HW_MMC_COUNT)
+#endif
+
+#if defined(VSF_HW_MMC_MASK) && !defined(VSF_HW_MMC_COUNT)
+#   define VSF_HW_MMC_COUNT                         VSF_HAL_MASK_TO_COUNT(VSF_HW_MMC_MASK)
+#endif
+
 // application code can redefine it
 #ifndef VSF_MMC_CFG_PREFIX
 #   if VSF_MMC_CFG_MULTI_CLASS == ENABLED
@@ -49,8 +57,8 @@ extern "C" {
 #   define VSF_MMC_CFG_FUNCTION_RENAME              ENABLED
 #endif
 
-#ifndef VSF_MMC_CFG_REIMPLEMENT_TYPE_FEATURE
-#   define VSF_MMC_CFG_REIMPLEMENT_TYPE_FEATURE     DISABLED
+#ifndef VSF_MMC_CFG_REIMPLEMENT_TYPE_MODE
+#   define VSF_MMC_CFG_REIMPLEMENT_TYPE_MODE     DISABLED
 #endif
 
 #ifndef VSF_MMC_CFG_REIMPLEMENT_TYPE_IRQ_MASK
@@ -59,6 +67,10 @@ extern "C" {
 
 #ifndef VSF_MMC_CFG_REIMPLEMENT_TYPE_STATUS
 #   define VSF_MMC_CFG_REIMPLEMENT_TYPE_STATUS      DISABLED
+#endif
+
+#ifndef VSF_MMC_CFG_INHERT_HAL_CAPABILITY
+#   define VSF_MMC_CFG_INHERT_HAL_CAPABILITY       ENABLED
 #endif
 
 /* SD commands                                  type  argument     response */
@@ -513,12 +525,12 @@ typedef struct vsf_mmc_cid_t {
     uint64_t MID                    : 8;        //  120 Manufacturer ID
 } PACKED vsf_mmc_cid_t;
 
-#if VSF_MMC_CFG_REIMPLEMENT_TYPE_FEATURE == DISABLED
-typedef enum vsf_mmc_feature_t {
+#if VSF_MMC_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
+typedef enum vsf_mmc_mode_t {
     MMC_MODE_HOST               = (0x1ul << 0), // select host mode
     MMC_MODE_SLAVE              = (0x0ul << 0), // select slave mode
     MMC_MODE_MASK               = (0x1ul << 0),
-} vsf_mmc_feature_t;
+} vsf_mmc_mode_t;
 #endif
 
 /**
@@ -587,7 +599,9 @@ typedef struct vsf_mmc_status_t {
 #endif
 
 typedef struct vsf_mmc_capability_t {
+#if VSF_MMC_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
+#endif
     struct {
         enum {
             MMC_CAP_BUS_WIDTH_1                 = (0x1ul <<  0),
@@ -663,8 +677,8 @@ typedef struct vsf_mmc_isr_t {
  @brief mmc 配置
  */
 typedef struct vsf_mmc_cfg_t {
-    vsf_mmc_feature_t mode;                     //!< \~english mmc mode \ref vsf_mmc_feature_t
-                                                //!< \~chinese mmc 模式 \ref vsf_mmc_feature_t
+    vsf_mmc_mode_t mode;                     //!< \~english mmc mode \ref vsf_mmc_mode_t
+                                                //!< \~chinese mmc 模式 \ref vsf_mmc_mode_t
     vsf_mmc_isr_t isr;                          //!< \~english mmc interrupt
                                                 //!< \~chinese mmc 中断
 } vsf_mmc_cfg_t;
@@ -692,11 +706,17 @@ struct vsf_mmc_t  {
  @param[in] cfg_ptr: a pointer to structure @ref vsf_mmc_cfg_t
  @return vsf_err_t: VSF_ERR_NONE if mmc was initialized, or a negative error code
 
+ @note It is not necessary to call vsf_mmc_fini() to deinitialization.
+       vsf_mmc_init() should be called before any other mmc API except vsf_mmc_capability().
+
  \~chinese
  @brief 初始化一个 mmc 实例
  @param[in] mmc_ptr: 结构体 vsf_mmc_t 的指针，参考 @ref vsf_mmc_t
  @param[in] cfg_ptr: 结构体 vsf_mmc_cfg_t 的指针，参考 @ref vsf_mmc_cfg_t
- @return vsf_err_t: 如果 mmc 初始化完成返回 VSF_ERR_NONE , 否则返回负数。
+ @return vsf_err_t: 如果 mmc 初始化成功返回 VSF_ERR_NONE , 失败返回负数。
+
+ @note 失败后不需要调用 vsf_mmc_fini() 反初始化。
+       vsf_mmc_init() 应该在除 vsf_mmc_capability() 之外的其他 mmc API 之前调用。
  */
 extern vsf_err_t vsf_mmc_init(vsf_mmc_t *mmc_ptr, vsf_mmc_cfg_t *cfg_ptr);
 
@@ -774,13 +794,13 @@ extern vsf_mmc_capability_t vsf_mmc_capability(vsf_mmc_t *mmc_ptr);
  @brief set the clock of mmc instance.
  @param[in] mmc_ptr: a pointer to structure @ref vsf_mmc_t
  @param[in] clock_hz: clock in Hz
- @return vsf_err_t: VSF_ERR_NONE if mmc was initialized, or a negative error code
+ @return vsf_err_t: VSF_ERR_NONE if mmc set clock was successfully, or a negative error code
 
  \~chinese
  @brief 设置 mmc 时钟
  @param[in] mmc_ptr: 结构体 vsf_mmc_t 的指针，参考 @ref vsf_mmc_t
  @param[in] clock_hz: 时钟速度 (单位：赫兹)
- @return vsf_err_t: 如果 mmc 初始化完成返回 VSF_ERR_NONE , 否则返回负数。
+ @return vsf_err_t: 如果 mmc 设置时钟成功返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_mmc_set_clock(vsf_mmc_t *mmc_ptr, uint32_t clock_hz);
 
@@ -789,13 +809,13 @@ extern vsf_err_t vsf_mmc_set_clock(vsf_mmc_t *mmc_ptr, uint32_t clock_hz);
  @brief set the bus width of mmc instance.
  @param[in] mmc_ptr: a pointer to structure @ref vsf_mmc_t
  @param[in] bus_width: bus width in 1, 4, 8
- @return vsf_err_t: VSF_ERR_NONE if mmc was initialized, or a negative error code
+ @return vsf_err_t: VSF_ERR_NONE if mmc was successfully, or a negative error code
 
  \~chinese
  @brief 设置 mmc 总线位宽
  @param[in] mmc_ptr: 结构体 vsf_mmc_t 的指针，参考 @ref vsf_mmc_t
  @param[in] bus_width: 总线位宽，范围：1, 4, 8
- @return vsf_err_t: 如果 mmc 初始化完成返回 VSF_ERR_NONE , 否则返回负数。
+ @return vsf_err_t: 如果 mmc 设置总线宽度成功返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_mmc_set_bus_width(vsf_mmc_t *mmc_ptr, uint8_t bus_width);
 
@@ -804,13 +824,13 @@ extern vsf_err_t vsf_mmc_set_bus_width(vsf_mmc_t *mmc_ptr, uint8_t bus_width);
  @brief start mmc transaction in host mode.
  @param[in] mmc_ptr: a pointer to structure @ref vsf_mmc_t
  @param[in] trans: a pointer to mmc transaction structure
- @return vsf_err_t: VSF_ERR_NONE if mmc was initialized, or a negative error code
+ @return vsf_err_t: VSF_ERR_NONE if mmc was successfully, or a negative error code
 
  \~chinese
  @brief 启动 mmc 传输
  @param[in] mmc_ptr: 结构体 vsf_mmc_t 的指针，参考 @ref vsf_mmc_t
  @param[in] trans: mmc 传输结构指针
- @return vsf_err_t: 如果 mmc 初始化完成返回 VSF_ERR_NONE , 否则返回负数。
+ @return vsf_err_t: 如果 mmc 主机传输开始返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_mmc_host_transact_start(vsf_mmc_t *mmc_ptr, vsf_mmc_trans_t *trans);
 
@@ -848,4 +868,4 @@ extern void vsf_mmc_host_transact_stop(vsf_mmc_t *mmc_ptr);
 }
 #endif
 
-#endif  /*__HAL_DRIVER_MMC_INTERFACE_H__*/
+#endif  /*__VSF_TEMPLATE_MMC_H__*/

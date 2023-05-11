@@ -15,30 +15,75 @@
  *                                                                           *
  ****************************************************************************/
 
-/*============================ INCLUDES ======================================*/
+#if VSF_HAL_USE_MMC == ENABLED
 
-#include "hal/driver/common/template/vsf_template_hal_driver.h"
+/*============================ INCLUDES ======================================*/
+/*============================ MACROS ========================================*/
+
+#define vsf_real_mmc_t                                VSF_MCONNECT(VSF_MMC_CFG_IMP_PREFIX, _mmc_t)
+#define vsf_real_mmc_capability                       VSF_MCONNECT(VSF_MMC_CFG_IMP_PREFIX, _mmc_capability)
+
+#ifndef VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY
+#   define  VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#endif
+
+#if VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#   ifndef VSF_MMC_CFG_CAPCBILITY_MAX_FREQ_HZ
+#       define VSF_MMC_CFG_CAPCBILITY_MAX_FREQ_HZ           (50 * 1000 * 1000)
+#   endif
+#   ifndef VSF_MMC_CFG_CAPCBILITY_BUS_WIDTH
+#       define VSF_MMC_CFG_CAPCBILITY_BUS_WIDTH             MMC_CAP_BUS_WIDTH_8
+#   endif
+#endif
+
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ IMPLEMENTATION ================================*/
+
+#if VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+vsf_mmc_capability_t vsf_real_mmc_capability(vsf_real_mmc_t *mmc_ptr)
+{
+    vsf_mmc_capability_t mmc_capability = {
+        .max_freq_hz = VSF_MMC_CFG_CAPCBILITY_MAX_FREQ_HZ,
+        .bus_width   = VSF_MMC_CFG_CAPCBILITY_BUS_WIDTH,
+    };
+
+    return mmc_capability;
+}
+#endif
 
 /*============================ MACROS ========================================*/
 
-#if VSF_HAL_USE_MMC == ENABLED
+#undef VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_MMC_CFG_CAPCBILITY_MAX_FREQ_HZ
+#undef VSF_MMC_CFG_CAPCBILITY_BUS_WIDTH
+#undef vsf_real_mmc_t
+#undef vsf_real_mmc_capability
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _mmc
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _MMC
+#define VSF_HAL_TEMPLATE_IMP_NAME                     _mmc
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _MMC
 
 #ifndef VSF_MMC_CFG_IMP_PREFIX
 #   error "Please define VSF_MMC_CFG_IMP_PREFIX in mmc driver"
 #endif
 
 #ifndef VSF_MMC_CFG_IMP_UPCASE_PREFIX
-#   error "Please define VSF_MMC_CFG_IMP_UPCASE_PREFIX    in mmc driver"
+#   error "Please define VSF_MMC_CFG_IMP_UPCASE_PREFIX in mmc driver"
+#endif
+
+#ifndef VSF_MMC_CFG_IMP_INSTANCE_PREFIX
+#   define VSF_MMC_CFG_IMP_INSTANCE_PREFIX         VSF_MMC_CFG_IMP_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
 
-#endif // VSF_HAL_USE_MMC == ENABLED
+#undef VSF_MMC_CFG_IMP_PREFIX
+#undef VSF_MMC_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_MMC_CFG_IMP_UPCASE_PREFIX
+#undef VSF_MMC_CFG_IMP_LV0
+
+#endif  /* VSF_HAL_USE_MMC */
