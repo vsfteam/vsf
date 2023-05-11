@@ -15,9 +15,6 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_USART_CFG_IMP_PREFIX                      vsf_fifo2req
-#define VSF_USART_CFG_IMP_UPCASE_PREFIX               VSF_FIFO2REQ
-#define VSF_USART_CFG_IMP_EXTERN_OP                   ENABLED
 
 #define __VSF_HAL_USE_FIFO2REQ_USART_CLASS_IMPLEMENT  ENABLED
 
@@ -36,6 +33,8 @@
 #   undef VSF_USART_CFG_IMP_PREFIX
 #   define VSF_USART_CFG_IMP_PREFIX     VSF_FIFO2REQ_USART_CFG_CALL_PREFIX
 #endif
+
+#define VSF_USART_IMP_DEC_EXTERN_OP     ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -127,7 +126,15 @@ vsf_err_t vsf_fifo2req_usart_init(vsf_fifo2req_usart_t * fifo2req_usart_ptr,
     request_cfg.isr.handler_fn = __vsf_fifo2req_usart_isr_handler;
     request_cfg.isr.target_ptr = (void *)fifo2req_usart_ptr;
 
-    return vsf_usart_init(fifo2req_usart_ptr->usart, &request_cfg);
+    vsf_err_t err = vsf_usart_init(fifo2req_usart_ptr->usart, &request_cfg);
+    if (err == VSF_ERR_NONE) {
+        vsf_usart_capability_t capability = vsf_usart_capability(fifo2req_usart_ptr->usart);
+        vsf_usart_irq_mask_t irq_mask = capability.irq_mask & (VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_TX);
+        if (irq_mask != (VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_TX)) {
+            return VSF_ERR_NOT_SUPPORT;
+        }
+    }
+    return err;
 }
 
 void vsf_fifo2req_usart_fini(vsf_fifo2req_usart_t *fifo2req_usart_ptr)
@@ -203,7 +210,11 @@ vsf_usart_capability_t vsf_fifo2req_usart_capability(vsf_fifo2req_usart_t *fifo2
     VSF_HAL_ASSERT(fifo2req_usart_ptr != NULL);
     VSF_HAL_ASSERT(fifo2req_usart_ptr->usart != NULL);
 
-    return vsf_usart_capability(fifo2req_usart_ptr->usart);
+    vsf_usart_capability_t capability = vsf_usart_capability(fifo2req_usart_ptr->usart);
+
+    capability.irq_mask |= (VSF_USART_IRQ_MASK_RX_CPL | VSF_USART_IRQ_MASK_TX_CPL);
+
+    return capability;
 }
 
 uint_fast16_t vsf_fifo2req_usart_rxfifo_get_data_count(vsf_fifo2req_usart_t *fifo2req_usart_ptr)
@@ -302,7 +313,10 @@ int_fast32_t vsf_fifo2req_usart_get_tx_count(vsf_fifo2req_usart_t *fifo2req_usar
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-#define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
+#define VSF_USART_CFG_IMP_PREFIX                      vsf_fifo2req
+#define VSF_USART_CFG_IMP_UPCASE_PREFIX               VSF_FIFO2REQ
+#define VSF_USART_CFG_IMP_EXTERN_OP                   ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY      DISABLED
 #include "hal/driver/common/usart/usart_template.inc"
 
-#endif      // VSF_USART_CFG_FIFO_TO_REQUEST && VSF_HAL_USE_USART
+#endif      // VSF_HAL_USE_USART

@@ -40,44 +40,53 @@
 /*============================ TYPES =========================================*/
 
 typedef enum vsf_usart_mode_t {
-    VSF_USART_8_BIT_LENGTH              = 0x0000ul,
-    VSF_USART_9_BIT_LENGTH              = 0x1000ul,
-    // not supported by hw, but necessary
-    VSF_USART_5_BIT_LENGTH              = 0x10000,
-    VSF_USART_6_BIT_LENGTH              = 0x20000,
-    VSF_USART_7_BIT_LENGTH              = 0x30000,
-    VSF_USART_BIT_LENGTH_MASK           = VSF_USART_8_BIT_LENGTH
-                                        | VSF_USART_9_BIT_LENGTH
-                                        | VSF_USART_5_BIT_LENGTH
-                                        | VSF_USART_6_BIT_LENGTH
-                                        | VSF_USART_7_BIT_LENGTH,
+    VSF_USART_8_BIT_LENGTH              = (0x00ul << 0),
+    VSF_USART_9_BIT_LENGTH              = (0x01ul << 0),
 
-    VSF_USART_1_STOPBIT                 = 0x0000ul,
-    VSF_USART_1_5_STOPBIT               = 0x1000ul,
-    VSF_USART_2_STOPBIT                 = 0x2000ul,
-    VSF_USART_STOPBIT_MASK              = VSF_USART_1_STOPBIT
-                                        | VSF_USART_1_5_STOPBIT
-                                        | VSF_USART_2_STOPBIT,
+    VSF_USART_1_STOPBIT                 = (0x00ul << 1),
+    VSF_USART_1_5_STOPBIT               = (0x01ul << 1),
+    VSF_USART_2_STOPBIT                 = (0x02ul << 1),
 
-    VSF_USART_NO_PARITY                 = 0x0000ul,
-    VSF_USART_EVEN_PARITY               = 0x0400ul,
-    VSF_USART_ODD_PARITY                = 0x0600ul,
-    VSF_USART_PARITY_MASK               = VSF_USART_NO_PARITY
-                                        | VSF_USART_EVEN_PARITY
-                                        | VSF_USART_ODD_PARITY,
+    VSF_USART_NO_PARITY                 = (0x00ul << 3),
+    VSF_USART_EVEN_PARITY               = (0x01ul << 3),
+    VSF_USART_ODD_PARITY                = (0x02ul << 3),
 
-    VSF_USART_NO_HWCONTROL              = 0x0000ul,
-    VSF_USART_RTS_HWCONTROL             = 0x0100ul,
-    VSF_USART_CTS_HWCONTROL             = 0x0200ul,
-    VSF_USART_RTS_CTS_HWCONTROL         = 0x0300ul,
-    VSF_USART_HWCONTROL_MASK            = VSF_USART_NO_HWCONTROL
-                                        | VSF_USART_RTS_HWCONTROL
-                                        | VSF_USART_CTS_HWCONTROL
-                                        | VSF_USART_RTS_CTS_HWCONTROL,
+    VSF_USART_NO_HWCONTROL              = (0x00ul << 5),
+    VSF_USART_RTS_HWCONTROL             = (0x01ul << 5),
+    VSF_USART_CTS_HWCONTROL             = (0x02ul << 5),
+    VSF_USART_RTS_CTS_HWCONTROL         = (0x03ul << 5),
 
-    VSF_USART_TX_ENABLE                 = 0x0010ul,
-    VSF_USART_RX_ENABLE                 = 0x0020ul,
-    VSF_USART_ENABLE_MASK               = VSF_USART_TX_ENABLE | VSF_USART_RX_ENABLE,
+    // unsupport for win
+    VSF_USART_6_BIT_LENGTH              = (0x01ul << 7),
+    VSF_USART_7_BIT_LENGTH              = (0x01ul << 8),
+    VSF_USART_5_BIT_LENGTH              = (0x01ul << 9),
+
+    VSF_USART_FORCE_0_PARITY            = (0x01ul << 10),
+    VSF_USART_FORCE_1_PARITY            = (0x01ul << 11),
+
+    VSF_USART_TX_ENABLE                 = (0x01ul << 12),
+    VSF_USART_TX_DISABLE                = (0x00ul << 12),
+
+    VSF_USART_RX_ENABLE                 = (0x01ul << 13),
+    VSF_USART_RX_DISABLE                = (0x00ul << 13),
+
+    WIN_USART_BIT_LENGTH_MASK           = VSF_USART_8_BIT_LENGTH |
+                                          VSF_USART_9_BIT_LENGTH,
+    WIN_USART_STOPBIT_MASK              = VSF_USART_1_STOPBIT |
+                                          VSF_USART_1_5_STOPBIT |
+                                          VSF_USART_2_STOPBIT,
+    WIN_USART_PARITY_MASK               = VSF_USART_NO_PARITY |
+                                          VSF_USART_EVEN_PARITY |
+                                          VSF_USART_ODD_PARITY,
+    WIN_USART_HWCONTROL_MASK            = VSF_USART_NO_HWCONTROL |
+                                          VSF_USART_RTS_HWCONTROL |
+                                          VSF_USART_CTS_HWCONTROL |
+                                          VSF_USART_RTS_CTS_HWCONTROL,
+
+    WIN_USART_MODE_ALL_BITS_MASK        = WIN_USART_BIT_LENGTH_MASK |
+                                          WIN_USART_STOPBIT_MASK |
+                                          WIN_USART_PARITY_MASK |
+                                          WIN_USART_HWCONTROL_MASK,
 } vsf_usart_mode_t;
 
 typedef enum vsf_usart_irq_mask_t {
@@ -85,43 +94,40 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_TX               = VSF_BIT(1),
     VSF_USART_IRQ_MASK_RX_TIMEOUT       = VSF_BIT(2),
 
+    // optional
     VSF_USART_IRQ_MASK_RX_CPL           = VSF_BIT(3),
     VSF_USART_IRQ_MASK_TX_CPL           = VSF_BIT(4),
 
-    // optional
-    VSF_USART_IRQ_MASK_RX_ERR           = VSF_BIT(5),
-    VSF_USART_IRQ_MASK_TX_ERR           = VSF_BIT(6),
-    VSF_USART_IRQ_MASK_ERR              = VSF_USART_IRQ_MASK_RX_ERR | VSF_USART_IRQ_MASK_TX_ERR,
+    VSF_USART_IRQ_MASK_FRAME_ERR        = VSF_BIT(5),
+    VSF_USART_IRQ_MASK_PARITY_ERR       = VSF_BIT(6),
+    VSF_USART_IRQ_MASK_BREAK_ERR        = VSF_BIT(7),
+    VSF_USART_IRQ_MASK_OVERFLOW_ERR     = VSF_BIT(8),
+    VSF_USART_IRQ_MASK_TX_ERR           = VSF_BIT(9),
 
-    VSF_USART_IRQ_ALL_BITS_MASK         = VSF_USART_IRQ_MASK_RX
-                                        | VSF_USART_IRQ_MASK_TX
-                                        | VSF_USART_IRQ_MASK_RX_CPL
-                                        | VSF_USART_IRQ_MASK_TX_CPL
-                                        | VSF_USART_IRQ_MASK_ERR,
+    WIN_USART_IRQ_ALL_BITS_MASK         = VSF_USART_IRQ_MASK_RX |
+                                          VSF_USART_IRQ_MASK_TX,
 } vsf_usart_irq_mask_t;
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/driver/common/usart/fifo2req_usart.h"
 
 #define VSF_USART_CFG_DEC_PREFIX                    vsf_win
 #define VSF_USART_CFG_DEC_UPCASE_PREFIX             VSF_WIN
-#define VSF_USART_CFG_DEC_FIFO_TO_REQUEST
 #include "hal/driver/common/usart/usart_template.h"
 
+#define VSF_USART_CFG_DEC_INSTANCE_PREFIX           vsf_win_fifo2req
+#define VSF_FIFO2REQ_USART_COUNT                    VSF_WIN_USART_COUNT
+#include "hal/driver/common/usart/fifo2req_usart.h"
+
+
 #if VSF_WIN_USART_CFG_USE_AS_HW_USART == ENABLED
-#   include "hal/utilities/remap/usart/vsf_remapped_usart.h"
-#   define VSF_HAL_HW_USART_DECLARE(__N, __VALUE)                               \
-        extern vsf_remapped_usart_t VSF_MCONNECT(vsf_hw_usart, __N);
-#   define VSF_HAL_HW_USART_DECLARE_MULTI()                                     \
-        VSF_MREPEAT(VSF_HW_USART_COUNT, VSF_HAL_HW_USART_DECLARE, NULL)
-
 #   ifndef VSF_HW_USART_COUNT
-#       define VSF_HW_USART_COUNT               32
+#       define VSF_HW_USART_COUNT                   32
 #   endif
-VSF_HAL_HW_USART_DECLARE_MULTI()
+#   define VSF_REMAPPED_USART_COUNT                 VSF_WIN_USART_COUNT
+#   define VSF_USART_CFG_DEC_INSTANCE_PREFIX        vsf_hw
+#include "hal/utilities/remap/usart/vsf_remapped_usart.h"
 #endif
-
 
 /*============================ TYPES =========================================*/
 

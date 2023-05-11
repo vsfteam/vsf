@@ -27,11 +27,6 @@
 #include "../vendor/plf/aic8800/src/driver/sysctrl/sysctrl_api.h"
 
 /*============================ MACROS ========================================*/
-
-#ifndef VSF_HW_USART_CFG_MULTI_CLASS
-#   define VSF_HW_USART_CFG_MULTI_CLASS           VSF_USART_CFG_MULTI_CLASS
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -70,7 +65,7 @@ vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart_ptr, vsf_usart_cfg_t *cfg_p
     reg->IRQCTL_REG = 0x0;                                                  // clean all interrupt
     reg->DBUFTH_REG = (1 << UART_RXTRIGTH) |  (0 << UART_TXTRIGTH);         // tx and rx data buffer trigger threshold
     reg->MDMCFG_REG |= UART_CLK_P_MSK;                                      // force 48M Clock
-    reg->DFMTCFG_REG = cfg_ptr->mode & __AIC8800_USART_MASK;
+    reg->DFMTCFG_REG = cfg_ptr->mode & AIC8800_USART_MODE_ALL_BITS_MASK;
 
     uint32_t div = sysctrl_clock_get(usart_const->perclk) / cfg_ptr->baudrate;
     reg->DFMTCFG_REG |= UART_DIVAE_MSK;                                     // div reg access enable
@@ -99,12 +94,33 @@ void vsf_hw_usart_fini(vsf_hw_usart_t *hw_usart_ptr)
     VSF_HAL_ASSERT(hw_usart_ptr != NULL);
 }
 
-fsm_rt_t vsf_hw_usart_enable(vsf_hw_usart_t *usart_ptr)
+vsf_usart_capability_t vsf_hw_usart_capability(vsf_hw_usart_t *hw_usart_ptr)
+{
+    VSF_HAL_ASSERT(NULL != hw_usart_ptr);
+    const vsf_hw_usart_const_t *usart_const = hw_usart_ptr->usart_const;
+    VSF_HAL_ASSERT(NULL != usart_const);
+
+    uint32_t pclk = sysctrl_clock_get(usart_const->perclk);
+    vsf_usart_capability_t usart_capability = {
+        .irq_mask = AIC8800_USART_MODE_ALL_BITS_MASK,
+        .max_baudrate = pclk / (16 * 1),
+        .min_baudrate = pclk / (16 * 1) / 65535,
+        .min_data_bits = 8,
+        .max_data_bits = 9,
+        .max_tx_fifo_counter = 64,
+        .max_rx_fifo_counter = 64,
+        .support_rx_timeout = 0,
+    };
+
+    return usart_capability;
+}
+
+fsm_rt_t vsf_hw_usart_enable(vsf_hw_usart_t *hw_usart_ptr)
 {
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_hw_usart_disable(vsf_hw_usart_t *usart_ptr)
+fsm_rt_t vsf_hw_usart_disable(vsf_hw_usart_t *hw_usart_ptr)
 {
     return fsm_rt_cpl;
 }
@@ -115,7 +131,7 @@ void vsf_hw_usart_irq_enable(vsf_hw_usart_t *hw_usart_ptr, vsf_usart_irq_mask_t 
     const vsf_hw_usart_const_t *usart_const = hw_usart_ptr->usart_const;
     VSF_HAL_ASSERT(NULL != usart_const);
     VSF_HAL_ASSERT(NULL != usart_const->reg);
-    VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_MASK_FIFO) == 0);
+    VSF_HAL_ASSERT((irq_mask & ~AIC8800_USART_IRQ_MASK) == 0);
 
     usart_const->reg->IRQCTL_REG |= irq_mask;
 }
@@ -126,7 +142,7 @@ void vsf_hw_usart_irq_disable(vsf_hw_usart_t *hw_usart_ptr, vsf_usart_irq_mask_t
     const vsf_hw_usart_const_t *usart_const = hw_usart_ptr->usart_const;
     VSF_HAL_ASSERT(NULL != usart_const);
     VSF_HAL_ASSERT(NULL != usart_const->reg);
-    VSF_HAL_ASSERT((irq_mask & ~USART_IRQ_MASK_FIFO) == 0);
+    VSF_HAL_ASSERT((irq_mask & ~AIC8800_USART_IRQ_MASK) == 0);
 
     usart_const->reg->IRQCTL_REG &= ~irq_mask;
 }
@@ -145,7 +161,7 @@ vsf_usart_status_t vsf_hw_usart_status(vsf_hw_usart_t *hw_usart_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
 
-    uint32_t idle_mask = UART_RX_DBUF_EMPTY | UART_TX_DBUF_EMPTY_MSK;
+    uint32_t idle_mask = UART_RX_DBUF_EMPTY_MSK | UART_TX_DBUF_EMPTY_MSK;
 
     vsf_usart_status_t status = {
         .is_busy = (hw_usart_ptr->usart_const->reg->DBUFSTS_REG & idle_mask) != idle_mask,
@@ -182,7 +198,7 @@ uint_fast16_t vsf_hw_usart_rxfifo_read(vsf_hw_usart_t *hw_usart_ptr, void *buffe
 
 uint_fast16_t vsf_hw_usart_txfifo_get_free_count(vsf_hw_usart_t *hw_usart_ptr)
 {
-    return 0xFF - ((hw_usart_ptr->usart_const->reg->DBUFSTS_REG & UART_TX_COUNT_MSK) >> UART_TX_COUNT);
+    return 64 - ((hw_usart_ptr->usart_const->reg->DBUFSTS_REG & UART_TX_COUNT_MSK) >> UART_TX_COUNT);
 }
 
 uint_fast16_t vsf_hw_usart_txfifo_write(vsf_hw_usart_t *hw_usart_ptr, void *buffer_ptr, uint_fast16_t count)
@@ -221,7 +237,7 @@ static vsf_usart_irq_mask_t __get_uart_irq_mask(vsf_hw_usart_t *hw_usart_ptr)
         case UART_IRQTYP_RX_ERROR_INT:
             value = reg->IRQSTS_REG;        // TODO: report more specific rx error
             (void)value;
-            return VSF_USART_IRQ_MASK_RX_ERROR;
+            return VSF_USART_IRQ_MASK_ERR;
 
         case UART_IRQTYP_RX_INT:
             return VSF_USART_IRQ_MASK_RX;
@@ -258,9 +274,10 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_USART_CFG_IMP_PREFIX                vsf_hw
-#define VSF_USART_CFG_IMP_UPCASE_PREFIX         VSF_HW
-#define VSF_USART_CFG_IMP_FIFO_TO_REQUEST       ENABLED
+#define VSF_USART_CFG_IMP_INSTANCE_PREFIX           __vsf_hw
+#define VSF_USART_CFG_IMP_PREFIX                    vsf_hw
+#define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_HW
+#define VSF_USART_CFG_IMP_FIFO_TO_REQUEST           ENABLED
 #define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                \
     static const vsf_hw_usart_const_t __vsf_hw_usart ## __COUNT ## _clock = {   \
         .reg    = UART ## __COUNT,                                              \
@@ -273,11 +290,19 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
         .usart_const  = &__vsf_hw_usart ## __COUNT ## _clock,                   \
         __HAL_OP                                                                \
     };                                                                          \
-    describe_fifo2req_usart(vsf_hw_usart ## __COUNT, __vsf_hw_usart ## __COUNT) \
     void UART ## __COUNT ## _IRQHandler(void)                                   \
     {                                                                           \
         __vsf_hw_usart_irq_handler(&__vsf_hw_usart ## __COUNT);                 \
     }
+#include "hal/driver/common/usart/usart_template.inc"
+
+#define VSF_USART_CFG_IMP_INSTANCE_PREFIX       vsf_hw
+#define VSF_USART_CFG_IMP_PREFIX                vsf_fifo2req
+#define VSF_USART_CFG_IMP_UPCASE_PREFIX         VSF_FIFO2REQ
+#define VSF_FIFO2REQ_USART_COUNT                VSF_HW_USART_COUNT
+#define VSF_FIFO2REQ_USART_MASK                 VSF_HW_USART_MASK
+#define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                \
+    describe_fifo2req_usart(vsf_hw_usart ## __COUNT, __vsf_hw_usart ## __COUNT)
 #include "hal/driver/common/usart/usart_template.inc"
 
 #endif      // VSF_HAL_USE_USART

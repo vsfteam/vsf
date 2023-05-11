@@ -393,6 +393,9 @@ uint_fast32_t vsf_multiplex_i2c_get_transferred_count(vsf_multiplex_i2c_t *m_i2c
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#define VSF_I2C_CFG_IMP_PREFIX              vsf_multiplex
+#define VSF_I2C_CFG_IMP_UPCASE_PREFIX       VSF_MULTIPLEX
+#define VSF_I2C_CFG_IMP_EXTERN_OP           ENABLED
 #include "hal/driver/common/i2c/i2c_template.inc"
 
 #endif //!VSF_HAL_I2C_IMP_MULTIPLEX_I2C
