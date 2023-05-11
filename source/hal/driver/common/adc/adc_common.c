@@ -71,22 +71,31 @@ fsm_rt_t vsf_adc_disable(vsf_adc_t *adc_ptr)
     return adc_ptr->op->disable(adc_ptr);
 }
 
-void vsf_adc_irq_enable(vsf_adc_t *adc_ptr)
+void vsf_adc_irq_enable(vsf_adc_t *adc_ptr, vsf_adc_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(adc_ptr != NULL);
     VSF_HAL_ASSERT(adc_ptr->op != NULL);
     VSF_HAL_ASSERT(adc_ptr->op->irq_enable != NULL);
 
-    adc_ptr->op->irq_enable(adc_ptr);
+    adc_ptr->op->irq_enable(adc_ptr, irq_mask);
 }
 
-void vsf_adc_irq_disable(vsf_adc_t *adc_ptr)
+void vsf_adc_irq_disable(vsf_adc_t *adc_ptr, vsf_adc_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(adc_ptr != NULL);
     VSF_HAL_ASSERT(adc_ptr->op != NULL);
     VSF_HAL_ASSERT(adc_ptr->op->irq_disable != NULL);
 
-    adc_ptr->op->irq_disable(adc_ptr);
+    adc_ptr->op->irq_disable(adc_ptr, irq_mask);
+}
+
+vsf_adc_status_t vsf_adc_status(vsf_adc_t *adc_ptr)
+{
+    VSF_HAL_ASSERT(adc_ptr != NULL);
+    VSF_HAL_ASSERT(adc_ptr->op != NULL);
+    VSF_HAL_ASSERT(adc_ptr->op->status != NULL);
+
+    return adc_ptr->op->status(adc_ptr);
 }
 
 vsf_adc_capability_t vsf_adc_capability(vsf_adc_t *adc_ptr)
