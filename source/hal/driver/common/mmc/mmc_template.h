@@ -22,19 +22,24 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _mmc
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _MMC
+#define VSF_HAL_TEMPLATE_DEC_NAME                     _mmc
+#define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _MMC
 
 #ifndef VSF_MMC_CFG_DEC_PREFIX
 #   error "Please define VSF_MMC_CFG_DEC_PREFIX when using mmc_template.h"
 #endif
 
+#ifndef VSF_MMC_CFG_DEC_INSTANCE_PREFIX
+#   define VSF_MMC_CFG_DEC_INSTANCE_PREFIX         VSF_MMC_CFG_DEC_PREFIX
+#endif
+
 #ifdef VSF_MMC_CFG_DEC_UPCASE_PREFIX
-#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_MMC_CFG_DEC_UPCASE_PREFIX
+#   define VSF_HAL_TEMPLATE_DEC_UPCASE_PREFIX       VSF_MMC_CFG_DEC_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_declaration.h"
 
 #undef VSF_MMC_CFG_DEC_PREFIX
+#undef VSF_MMC_CFG_DEC_INSTANCE_PREFIX
 #undef VSF_MMC_CFG_DEC_UPCASE_PREFIX
 
