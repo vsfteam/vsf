@@ -34,7 +34,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_PM_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+#if VSF_PM_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
 vsf_pm_capability_t vsf_real_pm_capability(vsf_real_pm_t *pm_ptr)
 {
     vsf_pm_capability_t pm_capability = {
@@ -47,8 +47,8 @@ vsf_pm_capability_t vsf_real_pm_capability(vsf_real_pm_t *pm_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _pm
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _PM
+#define VSF_HAL_TEMPLATE_IMP_NAME                     _pm
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _PM
 
 #ifndef VSF_PM_CFG_IMP_PREFIX
 #   error "Please define VSF_PM_CFG_IMP_PREFIX in pm driver"
@@ -59,5 +59,8 @@ vsf_pm_capability_t vsf_real_pm_capability(vsf_real_pm_t *pm_ptr)
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
+
+#undef VSF_PM_CFG_IMP_PREFIX
+#undef VSF_PM_CFG_IMP_UPCASE_PREFIX
 
 #endif // VSF_HAL_USE_PM == ENABLED

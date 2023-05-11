@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_PM_INTERFACE_H__
-#define __HAL_DRIVER_PM_INTERFACE_H__
+#ifndef __VSF_TEMPLATE_PM_H__
+#define __VSF_TEMPLATE_PM_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -132,6 +132,10 @@ extern "C" {
 
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_CLOCK_OUT_CFG
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_CLOCK_OUT_CFG     DISABLED
+#endif
+
+#ifndef VSF_PM_CFG_INHERT_HAL_CAPABILITY
+#   define VSF_PM_CFG_INHERT_HAL_CAPABILITY       ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -420,7 +424,9 @@ typedef struct vsf_pm_clock_out_cfg_t {
 #endif
 
 typedef struct vsf_pm_capability_t {
+#if VSF_PM_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
+#endif
 } vsf_pm_capability_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -431,5 +437,5 @@ typedef struct vsf_pm_capability_t {
 }
 #endif
 
-#endif /* __HAL_DRIVER_PM_INTERFACE_H__ */
+#endif /* __VSF_TEMPLATE_PM_H__ */
 /* EOF */
