@@ -71,17 +71,6 @@ fsm_rt_t vsf_hw_rtc_disable(vsf_hw_rtc_t *hw_rtc_ptr)
     return fsm_rt_cpl;
 }
 
-time_t vsf_hw_rtc_get_second(vsf_hw_rtc_t *hw_rtc_ptr)
-{
-    // TODO:
-    return 0;
-}
-
-vsf_err_t vsf_hw_rtc_set_second(vsf_hw_rtc_t *rtc_ptr, time_t second)
-{
-    return VSF_ERR_FAIL;
-}
-
 vsf_err_t vsf_hw_rtc_get(vsf_hw_rtc_t *hw_rtc_ptr, vsf_rtc_tm_t *rtc_tm)
 {
     if (!hw_rtc_ptr->is_enabled) {
@@ -115,6 +104,8 @@ vsf_err_t vsf_hw_rtc_set(vsf_hw_rtc_t *hw_rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
 #define VSF_RTC_CFG_IMP_UPCASE_PREFIX               VSF_HW
 #define VSF_RTC_CFG_GET_TIME_API_TEMPLATE           ENABLED
 #define VSF_RTC_CFG_SET_TIME_API_TEMPLATE           ENABLED
+#define VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
+#define VSF_RTC_CFG_CAPABILITY_T_IRQ_MASK           0
 
 #define VSF_RTC_CFG_IMP_LV0(__COUNT, __hal_op)                                  \
     vsf_hw_rtc_t vsf_hw_rtc##__COUNT  = {                                       \

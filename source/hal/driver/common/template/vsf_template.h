@@ -30,7 +30,10 @@
 #include "./vsf_template_pm.h"
 #include "./vsf_template_pwm.h"
 #include "./vsf_template_rng.h"
-#include "./vsf_template_rtc.h"
+
+#if defined(VSF_HAL_USE_RTC) && !defined(__VSF_TEMPLATE_RTC_H__)
+#   include "./vsf_template_rtc.h"
+#endif
 
 #if defined(VSF_HAL_USE_SPI) && !defined(__VSF_TEMPLATE_SPI_H__)
 #   include "./vsf_template_spi.h"

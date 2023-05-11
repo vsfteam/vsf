@@ -147,8 +147,11 @@ vsf_err_t vsf_hw_rtc_set(vsf_hw_rtc_t *hw_rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_RTC_CFG_IMP_PREFIX                  vsf_hw
-#define VSF_RTC_CFG_IMP_UPCASE_PREFIX           VSF_HW
+#define VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
+#   define VSF_RTC_CFG_CAPABILITY_T_IRQ_MASK        0
+#define VSF_RTC_CFG_REIMPLEMENT_API_SET_MS          ENABLED
+#define VSF_RTC_CFG_IMP_PREFIX                      vsf_hw
+#define VSF_RTC_CFG_IMP_UPCASE_PREFIX               VSF_HW
 #define VSF_RTC_CFG_IMP_LV0(__COUNT, __hal_op)                                  \
     vsf_hw_rtc_t vsf_hw_rtc##__COUNT = {                                        \
         .freq = 0,                                                              \
