@@ -110,7 +110,7 @@ static void __vk_audio_i2s_stream_evthandler(vsf_stream_t *stream, void *param, 
                     vsf_trace_error("stream for i2s_rx is not empty\n");
                     return;
                 }
-                i2s_cfg.feature = 16 == dev->capture.sample_bitlen ? I2S_DATA_BITLEN_16 : I2S_DATA_BITLEN_24;
+                i2s_cfg.mode = 16 == dev->capture.sample_bitlen ? VSF_I2S_DATA_BITLEN_16 : VSF_I2S_DATA_BITLEN_24;
                 i2s_cfg.data_sample_rate = dev->capture.sample_rate;
                 i2s_cfg.hw_sample_rate = dev->capture.hw_sample_rate != 0 ? dev->capture.hw_sample_rate : dev->capture.sample_rate;
                 i2s_cfg.channel_num = dev->capture.channel_num;
@@ -134,7 +134,7 @@ static void __vk_audio_i2s_stream_evthandler(vsf_stream_t *stream, void *param, 
                     vsf_stream_read(stream, NULL, 0);
                     return;
                 }
-                i2s_cfg.feature = 16 == dev->playback.sample_bitlen ? I2S_DATA_BITLEN_16 : I2S_DATA_BITLEN_24;
+                i2s_cfg.mode = 16 == dev->playback.sample_bitlen ? VSF_I2S_DATA_BITLEN_16 : VSF_I2S_DATA_BITLEN_24;
                 i2s_cfg.data_sample_rate = dev->playback.sample_rate;
                 i2s_cfg.hw_sample_rate = dev->playback.hw_sample_rate != 0 ? dev->playback.hw_sample_rate : dev->playback.sample_rate;
                 i2s_cfg.channel_num = dev->playback.channel_num;

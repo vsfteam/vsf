@@ -15,20 +15,60 @@
  *                                                                           *
  ****************************************************************************/
 
-/*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_hal_driver.h"
-
 #if VSF_HAL_USE_I2S == ENABLED
 
+/*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
+
+#define vsf_real_i2s_t                                      VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t)
+#define vsf_real_i2s_capability                             VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_capability)
+
+#ifndef VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY
+#   define  VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#endif
+
+#if VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#   ifndef VSF_I2S_CFG_CAPABILITY_IS_SRC_SUPPORTED
+#       define VSF_I2S_CFG_CAPABILITY_IS_SRC_SUPPORTED      1
+#   endif
+#   ifndef VSF_I2S_CFG_CAPABILITY_IS_DBUFFER_SUPPORTED
+#       define VSF_I2S_CFG_CAPABILITY_IS_DBUFFER_SUPPORTED  1
+#   endif
+#endif
+
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ IMPLEMENTATION ================================*/
+
+#if VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+vsf_i2s_capability_t vsf_real_i2s_capability(vsf_real_i2s_t *i2s_ptr)
+{
+    vsf_i2s_capability_t i2s_capability = {
+        .i2s_capability = {
+            .is_src_supported       = VSF_I2S_CFG_CAPABILITY_IS_SRC_SUPPORTED
+            .is_dbuffer_supported   = VSF_I2S_CFG_CAPABILITY_IS_DBUFFER_SUPPORTED
+        }
+    };
+
+    return i2s_capability;
+}
+#endif
+
+/*============================ MACROS ========================================*/
+
+#undef VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_I2S_CFG_CAPABILITY_IS_SRC_SUPPORTED
+#undef VSF_I2S_CFG_CAPABILITY_IS_DBUFFER_SUPPORTED
+
+#undef vsf_real_i2s_t
+#undef vsf_real_i2s_capability
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _i2s
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _I2S
+#define VSF_HAL_TEMPLATE_IMP_NAME                     _i2s
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _I2S
 
 #ifndef VSF_I2S_CFG_IMP_PREFIX
 #   error "Please define VSF_I2S_CFG_IMP_PREFIX in i2s driver"
@@ -38,6 +78,15 @@
 #   error "Please define VSF_I2S_CFG_IMP_UPCASE_PREFIX in i2s driver"
 #endif
 
+#ifndef VSF_I2S_CFG_IMP_INSTANCE_PREFIX
+#   define VSF_I2S_CFG_IMP_INSTANCE_PREFIX         VSF_I2S_CFG_IMP_PREFIX
+#endif
+
 #include "hal/driver/common/template/vsf_template_implementation.h"
+
+#undef VSF_I2S_CFG_IMP_PREFIX
+#undef VSF_I2S_CFG_IMP_UPCASE_PREFIX
+#undef VSF_I2S_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_I2S_CFG_IMP_LV0
 
 #endif // VSF_HAL_USE_I2S == ENABLED

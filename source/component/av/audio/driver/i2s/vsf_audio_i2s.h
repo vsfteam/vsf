@@ -50,7 +50,7 @@ vsf_class(vk_audio_i2s_dev_t) {
     public_member(
         implement(vk_audio_dev_t)
         vsf_i2s_t           *i2s;
-        vsf_i2s_feature_t   i2s_feature;
+        vsf_i2s_mode_t      i2s_mode;
         vsf_arch_prio_t     arch_prio;
     )
     protected_member(

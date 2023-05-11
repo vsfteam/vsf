@@ -25,7 +25,10 @@
 #include "./vsf_template_adc.h"
 #include "./vsf_template_flash.h"
 #include "./vsf_template_i2c.h"
-#include "./vsf_template_i2s.h"
+
+#if defined(VSF_HAL_USE_I2S) && !defined(__VSF_TEMPLATE_I2S_H__)
+#   include "./vsf_template_i2s.h"
+#endif
 
 #if defined(VSF_HAL_USE_MMC) && !defined(__VSF_TEMPLATE_MMC_H__)
 #   include "./vsf_template_mmc.h"

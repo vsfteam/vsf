@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_I2S_INTERFACE_H__
-#define __HAL_DRIVER_I2S_INTERFACE_H__
+#ifndef __VSF_TEMPLATE_I2S_H__
+#define __VSF_TEMPLATE_I2S_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -34,6 +34,14 @@ extern "C" {
 #   define VSF_I2S_CFG_MULTI_CLASS                  ENABLED
 #endif
 
+#if defined(VSF_HW_I2S_COUNT) && !defined(VSF_HW_I2S_MASK)
+#   define VSF_HW_I2S_MASK                          VSF_HAL_COUNT_TO_MASK(VSF_HW_I2S_COUNT)
+#endif
+
+#if defined(VSF_HW_I2S_MASK) && !defined(VSF_HW_I2S_COUNT)
+#   define VSF_HW_I2S_COUNT                         VSF_HAL_MASK_TO_COUNT(VSF_HW_I2S_MASK)
+#endif
+
 // application code can redefine it
 #ifndef VSF_I2S_CFG_PREFIX
 #   if VSF_I2S_CFG_MULTI_CLASS == ENABLED
@@ -49,8 +57,8 @@ extern "C" {
 #   define VSF_I2S_CFG_FUNCTION_RENAME              ENABLED
 #endif
 
-#ifndef VSF_I2S_CFG_REIMPLEMENT_TYPE_FEATURE
-#   define VSF_I2S_CFG_REIMPLEMENT_TYPE_FEATURE     DISABLED
+#ifndef VSF_I2S_CFG_REIMPLEMENT_TYPE_MODE
+#   define VSF_I2S_CFG_REIMPLEMENT_TYPE_MODE        DISABLED
 #endif
 
 #ifndef VSF_I2S_CFG_REIMPLEMENT_TYPE_IRQ_MASK
@@ -59,6 +67,10 @@ extern "C" {
 
 #ifndef VSF_I2S_CFG_REIMPLEMENT_TYPE_STATUS
 #   define VSF_I2S_CFG_REIMPLEMENT_TYPE_STATUS      DISABLED
+#endif
+
+#ifndef VSF_I2S_CFG_INHERT_HAL_CAPABILITY
+#   define VSF_I2S_CFG_INHERT_HAL_CAPABILITY       ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -78,45 +90,69 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-#if VSF_I2S_CFG_REIMPLEMENT_TYPE_FEATURE == DISABLED
-typedef enum vsf_i2s_feature_t {
-    I2S_MODE_MASTER             = (0x1ul << 0),     // select master mode
-    I2S_MODE_SLAVE              = (0x0ul << 0),     // select slave mode
-    I2S_MODE_MASK               = (0x1ul << 0),
+#if VSF_I2S_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
+typedef enum vsf_i2s_mode_t {
+    VSF_I2S_MODE_MASTER             = (0x01ul << 0),     // select master mode
+    VSF_I2S_MODE_SLAVE              = (0x00ul << 0),     // select slave mode
 
-    I2S_DATA_BITLEN_16          = (0x01ul << 1),
-    I2S_DATA_BITLEN_24          = (0x02ul << 1),
-    I2S_DATA_BITLEN_32          = (0x03ul << 1),
-    I2S_DATA_BITLEN_MASK        = (0x03ul << 1),
+    VSF_I2S_DATA_BITLEN_16          = (0x01ul << 1),
+    VSF_I2S_DATA_BITLEN_24          = (0x02ul << 1),
+    VSF_I2S_DATA_BITLEN_32          = (0x03ul << 1),
 
-    I2S_FRAME_BITLEN_16         = (0x01ul << 3),
-    I2S_FRAME_BITLEN_24         = (0x02ul << 3),
-    I2S_FRAME_BITLEN_32         = (0x03ul << 3),
-    I2S_FRAME_BITLEN_MASK       = (0x03ul << 3),
+    VSF_I2S_FRAME_BITLEN_16         = (0x01ul << 3),
+    VSF_I2S_FRAME_BITLEN_24         = (0x02ul << 3),
+    VSF_I2S_FRAME_BITLEN_32         = (0x03ul << 3),
 
-    I2S_STANDARD_PHILIPS        = (0x01ul << 5),
-    I2S_STANDARD_MSB            = (0x02ul << 5),
-    I2S_STANDARD_LSB            = (0x03ul << 5),
-    I2S_STANDARD_MASK           = (0x03ul << 5),
+    VSF_I2S_STANDARD_PHILIPS        = (0x01ul << 5),
+    VSF_I2S_STANDARD_MSB            = (0x02ul << 5),
+    VSF_I2S_STANDARD_LSB            = (0x03ul << 5),
 
-    I2S_LRCK_POL                = (0x01ul << 7),    // normally used to switch LR channel
-    I2S_BCK_POL                 = (0x01ul << 8),    // bck level while idle
-    I2S_MCLK_OUTPUT             = (0x01ul << 9),
-
-    I2S_FEATURE_MASK            = I2S_MODE_MASK | I2S_DATA_BITLEN_MASK
-                                | I2S_FRAME_BITLEN_MASK | I2S_STANDARD_MASK
-                                | I2S_LRCK_POL | I2S_BCK_POL | I2S_MCLK_OUTPUT,
-} vsf_i2s_feature_t;
+    VSF_I2S_LRCK_POL                = (0x01ul << 7),    // normally used to switch LR channel
+    VSF_I2S_BCK_POL                 = (0x01ul << 8),    // bck level while idle
+    VSF_I2S_MCLK_OUTPUT             = (0x01ul << 9),
+} vsf_i2s_mode_t;
 #endif
+
+enum {
+    VSF_I2S_MODE_COUNT              = 0,
+    VSF_I2S_MODE_MASK               = VSF_I2S_MODE_MASTER   |
+                                      VSF_I2S_MODE_SLAVE,
+
+    VSF_I2S_DATA_BITLEN_COUNT       = 0,
+    VSF_I2S_DATA_BITLEN_MASK        = VSF_I2S_DATA_BITLEN_16 |
+                                      VSF_I2S_DATA_BITLEN_24 |
+                                      VSF_I2S_DATA_BITLEN_32,
+
+    VSF_I2S_FRAME_BITLEN_COUNT      = 0,
+    VSF_I2S_FRAME_BITLEN_MASK       = VSF_I2S_FRAME_BITLEN_16 |
+                                      VSF_I2S_FRAME_BITLEN_24 |
+                                      VSF_I2S_FRAME_BITLEN_32,
+
+    VSF_I2S_STANDARD_COUNT          = 0,
+    VSF_I2S_STANDARD_MASK           = VSF_I2S_STANDARD_PHILIPS  |
+                                      VSF_I2S_STANDARD_MSB      |
+                                      VSF_I2S_STANDARD_LSB,
+
+    VSF_I2S_MODE_ALL_BITS_MASK      = VSF_I2S_MODE_MASK         |
+                                      VSF_I2S_DATA_BITLEN_MASK  |
+                                      VSF_I2S_FRAME_BITLEN_MASK |
+                                      VSF_I2S_STANDARD_MASK     |
+                                      VSF_I2S_LRCK_POL          |
+                                      VSF_I2S_BCK_POL           |
+                                      VSF_I2S_MCLK_OUTPUT,
+};
 
 #if VSF_I2S_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
 typedef enum vsf_i2s_irq_mask_t {
-    I2S_IRQ_MASK_TX_TGL_BUFFER  = (0x1ul <<  0),
-    I2S_IRQ_MASK_RX_TGL_BUFFER  = (0x1ul <<  1),
-
-    I2S_IRQ_MASK_ALL            =  I2S_IRQ_MASK_TX_TGL_BUFFER | I2S_IRQ_MASK_RX_TGL_BUFFER,
+    VSF_I2S_IRQ_MASK_TX_TGL_BUFFER  = (0x1ul <<  0),
+    VSF_I2S_IRQ_MASK_RX_TGL_BUFFER  = (0x1ul <<  1),
 } vsf_i2s_irq_mask_t;
 #endif
+
+enum {
+    VSF_I2S_IRQ_ALL_BITS_MASK       = VSF_I2S_IRQ_MASK_TX_TGL_BUFFER |
+                                      VSF_I2S_IRQ_MASK_RX_TGL_BUFFER,
+};
 
 #if VSF_I2S_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
 typedef struct vsf_i2s_status_t {
@@ -128,7 +164,9 @@ typedef struct vsf_i2s_status_t {
 #endif
 
 typedef struct vsf_i2s_capability_t {
+#if VSF_I2S_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
+#endif
     struct {
         // sample rate converter
         bool is_src_supported;
@@ -200,8 +238,8 @@ typedef struct vsf_i2s_isr_t {
  @brief i2s 配置
  */
 typedef struct vsf_i2s_cfg_t {
-    vsf_i2s_feature_t feature;              //!< \~english i2s feature \ref vsf_i2s_feature_t
-                                            //!< \~chinese i2s 模式 \ref vsf_i2s_feature_t
+    vsf_i2s_mode_t mode;                    //!< \~english i2s mode \ref vsf_i2s_mode_t
+                                            //!< \~chinese i2s 模式 \ref vsf_i2s_mode_t
     uint32_t data_sample_rate;              //!< \~english i2s sample rate of audio data (in Hz), valid only if is_src_supported capability is enabled, else ignored
                                             //!< \~chinese i2s 音频数据的时钟频率 (单位：Hz)，支持 is_src_supported 特性的时候可用，否则忽略
     uint32_t hw_sample_rate;                //!< \~english i2s sample rate of hw audio data to codec (in Hz)
@@ -237,13 +275,19 @@ struct vsf_i2s_t  {
  @brief initialize a i2s instance.
  @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
  @param[in] cfg_ptr: a pointer to structure @ref vsf_i2s_cfg_t
- @return vsf_err_t: VSF_ERR_NONE if i2s initialized successfully, or a negative error code
+ @return vsf_err_t: VSF_ERR_NONE if i2s was initialized, or a negative error code
+
+ @note It is not necessary to call vsf_i2s_fini() to deinitialization.
+       vsf_i2s_init() should be called before any other i2s API except vsf_i2s_capability().
 
  \~chinese
  @brief 初始化一个 i2s 实例
  @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
  @param[in] cfg_ptr: 结构体 vsf_i2s_cfg_t 的指针，参考 @ref vsf_i2s_cfg_t
- @return vsf_err_t: 如果 i2s 初始化完成返回 VSF_ERR_NONE , 否则返回负数。
+ @return vsf_err_t: 如果 i2s 初始化成功返回 VSF_ERR_NONE , 失败返回负数。
+
+ @note 失败后不需要调用 vsf_i2s_fini() 反初始化。
+       vsf_i2s_init() 应该在除 vsf_i2s_capability() 之外的其他 i2s API 之前调用。
  */
 extern vsf_err_t vsf_i2s_init(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *i2s_cfg);
 
@@ -417,4 +461,4 @@ extern vsf_i2s_capability_t vsf_i2s_capability(vsf_i2s_t *i2s_ptr);
 }
 #endif
 
-#endif  /*__HAL_DRIVER_I2S_INTERFACE_H__*/
+#endif  /*__VSF_TEMPLATE_I2S_H__*/

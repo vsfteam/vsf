@@ -66,7 +66,7 @@ typedef struct vsf_hw_i2s_t {
 #endif
 
     const vsf_hw_i2s_const_t    *i2s_const;
-    uint32_t feature;
+    uint32_t mode;
     struct {
         DMA_CX_DESC_T           dma_desc[2];
         bool                    path_opened;
@@ -194,11 +194,11 @@ static void __vsf_hw_i2s_dma_irqhandler(uint8_t dma_type, uint8_t ch, uint32_t i
 
     if (ch == hw_i2s_const->tx.dma_ch) {
         if (hw_i2s_ptr->tx.isrhandler != NULL) {
-            hw_i2s_ptr->tx.isrhandler(hw_i2s_ptr->tx.isr_param, (vsf_i2s_t *)hw_i2s_ptr, I2S_IRQ_MASK_TX_TGL_BUFFER);
+            hw_i2s_ptr->tx.isrhandler(hw_i2s_ptr->tx.isr_param, (vsf_i2s_t *)hw_i2s_ptr, VSF_I2S_IRQ_MASK_TX_TGL_BUFFER);
         }
     } else if (ch == hw_i2s_const->rx.dma_ch) {
         if (hw_i2s_ptr->rx.isrhandler != NULL) {
-            hw_i2s_ptr->rx.isrhandler(hw_i2s_ptr->rx.isr_param, (vsf_i2s_t *)hw_i2s_ptr, I2S_IRQ_MASK_RX_TGL_BUFFER);
+            hw_i2s_ptr->rx.isrhandler(hw_i2s_ptr->rx.isr_param, (vsf_i2s_t *)hw_i2s_ptr, VSF_I2S_IRQ_MASK_RX_TGL_BUFFER);
         }
     } else {
         VSF_HAL_ASSERT(false);
@@ -216,23 +216,23 @@ vsf_err_t vsf_hw_i2s_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
     // TODO: call pm
     cpusysctrl_hclkme_set(CSC_HCLKME_DMA_EN_BIT | CSC_HCLKME_VPC_EN_BIT);
     cpusysctrl_oclkme_set(hw_i2s_const->oclk);
-    hw_i2s_ptr->feature = 0;
+    hw_i2s_ptr->mode = 0;
 
     if (cfg_ptr != NULL) {
-        uint32_t feature = cfg_ptr->feature;
+        uint32_t mode = cfg_ptr->mode;
         uint8_t data_bitlen;
-        switch (feature & I2S_DATA_BITLEN_MASK) {
-        case I2S_DATA_BITLEN_16:    data_bitlen = 16;   break;
-        case I2S_DATA_BITLEN_24:    data_bitlen = 24;   break;
+        switch (mode & VSF_I2S_DATA_BITLEN_MASK) {
+        case VSF_I2S_DATA_BITLEN_16:    data_bitlen = 16;   break;
+        case VSF_I2S_DATA_BITLEN_24:    data_bitlen = 24;   break;
         default:
-        case I2S_DATA_BITLEN_32:    return VSF_ERR_NOT_SUPPORT;
+        case VSF_I2S_DATA_BITLEN_32:    return VSF_ERR_NOT_SUPPORT;
         }
         uint8_t frame_bitlen = 0;
-        switch (feature & I2S_FRAME_BITLEN_MASK) {
-        case I2S_FRAME_BITLEN_16:   return VSF_ERR_NOT_SUPPORT;
-        case I2S_FRAME_BITLEN_24:   frame_bitlen = 24;  break;
+        switch (mode & VSF_I2S_FRAME_BITLEN_MASK) {
+        case VSF_I2S_FRAME_BITLEN_16:   return VSF_ERR_NOT_SUPPORT;
+        case VSF_I2S_FRAME_BITLEN_24:   frame_bitlen = 24;  break;
         default:
-        case I2S_FRAME_BITLEN_32:   frame_bitlen = 32;  break;
+        case VSF_I2S_FRAME_BITLEN_32:   frame_bitlen = 32;  break;
         }
         uint8_t channel_num = cfg_ptr->channel_num;
         if (    (0 == channel_num) || (channel_num > 2)
@@ -241,31 +241,31 @@ vsf_err_t vsf_hw_i2s_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
             return VSF_ERR_INVALID_PARAMETER;
         }
 
-        uint32_t reg_i2s_cfg = feature & __I2S_HW_FEATURE_MASK;
+        uint32_t reg_i2s_cfg = mode & __I2S_HW_FEATURE_MASK;
 
-        if ((feature & I2S_MODE_MASK) == I2S_MODE_MASTER) {
+        if ((mode & VSF_I2S_MODE_MASK) == VSF_I2S_MODE_MASTER) {
             reg_i2s_cfg |= AUD_PROC_WLEN(2) | AUD_PROC_BCK_LRCK(frame_bitlen - data_bitlen);
-            if (feature & I2S_MCLK_OUTPUT) {
+            if (mode & VSF_I2S_MCLK_OUTPUT) {
                 // mclk_bck_div = mclk / bck = mclk / (frame_bitlen * channel_num) / hw_sample_rate
                 uint32_t mclk_div = I2S_MCLK / (frame_bitlen * channel_num) / cfg_ptr->hw_sample_rate;
                 AIC_CPUSYSCTRL->CMCLKDIV = mclk_div | (1 << 8);
             }
         } else {
-            feature &= ~I2S_MCLK_OUTPUT;
+            mode &= ~VSF_I2S_MCLK_OUTPUT;
         }
 
         if (0 == hw_i2s_const->idx) {
             reg->aud_intf_i2s_cfg0 = reg_i2s_cfg;
-            if (feature & I2S_MCLK_OUTPUT) {
+            if (mode & VSF_I2S_MCLK_OUTPUT) {
                 AIC_CPUSYSCTRL->CBCLKSEL |= 1 << 0;
             }
         } else {
             reg->aud_intf_i2s_cfg1 = reg_i2s_cfg;
-            if (feature & I2S_MCLK_OUTPUT) {
+            if (mode & VSF_I2S_MCLK_OUTPUT) {
                 AIC_CPUSYSCTRL->CBCLKSEL |= 1 << 2;
             }
         }
-        hw_i2s_ptr->feature = feature;
+        hw_i2s_ptr->mode = mode;
     }
 
     return VSF_ERR_NONE;
@@ -302,19 +302,19 @@ vsf_err_t vsf_hw_i2s_tx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
     HWP_AUD_PROC_T *reg = hw_i2s_const->reg;
     VSF_HAL_ASSERT(NULL != reg);
 
-    if (!hw_i2s_ptr->feature) {
+    if (!hw_i2s_ptr->mode) {
         vsf_hw_i2s_init(hw_i2s_ptr, cfg_ptr);
     }
 
     AUD_PATH_T path = hw_i2s_const->tx.path;
-    uint32_t feature = cfg_ptr->feature;
+    uint32_t mode = cfg_ptr->mode;
     uint8_t data_bitlen;
     uint8_t channel_num = cfg_ptr->channel_num;
-    switch (feature & I2S_DATA_BITLEN_MASK) {
-    case I2S_DATA_BITLEN_16:    data_bitlen = 16;   break;
-    case I2S_DATA_BITLEN_24:    data_bitlen = 24;   break;
+    switch (mode & VSF_I2S_DATA_BITLEN_MASK) {
+    case VSF_I2S_DATA_BITLEN_16:    data_bitlen = 16;   break;
+    case VSF_I2S_DATA_BITLEN_24:    data_bitlen = 24;   break;
     default:
-    case I2S_DATA_BITLEN_32:    return VSF_ERR_NOT_SUPPORT;
+    case VSF_I2S_DATA_BITLEN_32:    return VSF_ERR_NOT_SUPPORT;
     }
 //    bool src_en = cfg_ptr->data_sample_rate && (cfg_ptr->data_sample_rate != cfg_ptr->hw_sample_rate);
     bool src_en = true;     // src_en is always true for playback
@@ -556,19 +556,19 @@ vsf_err_t vsf_hw_i2s_rx_init(vsf_hw_i2s_t *hw_i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
     HWP_AUD_PROC_T *reg = hw_i2s_const->reg;
     VSF_HAL_ASSERT(NULL != reg);
 
-    if (!hw_i2s_ptr->feature) {
+    if (!hw_i2s_ptr->mode) {
         vsf_hw_i2s_init(hw_i2s_ptr, cfg_ptr);
     }
 
     AUD_PATH_T path = hw_i2s_const->rx.path;
-    uint32_t feature = cfg_ptr->feature;
+    uint32_t mode = cfg_ptr->mode;
     uint8_t data_bitlen;
     uint8_t channel_num = cfg_ptr->channel_num;
-    switch (feature & I2S_DATA_BITLEN_MASK) {
-    case I2S_DATA_BITLEN_16:    data_bitlen = 16;   break;
-    case I2S_DATA_BITLEN_24:    data_bitlen = 24;   break;
+    switch (mode & VSF_I2S_DATA_BITLEN_MASK) {
+    case VSF_I2S_DATA_BITLEN_16:    data_bitlen = 16;   break;
+    case VSF_I2S_DATA_BITLEN_24:    data_bitlen = 24;   break;
     default:
-    case I2S_DATA_BITLEN_32:    return VSF_ERR_NOT_SUPPORT;
+    case VSF_I2S_DATA_BITLEN_32:    return VSF_ERR_NOT_SUPPORT;
     }
     bool src_en = cfg_ptr->data_sample_rate && (cfg_ptr->data_sample_rate != cfg_ptr->hw_sample_rate);
 
