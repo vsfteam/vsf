@@ -12055,6 +12055,15 @@
                             </file>
                         </group>
                         <group>
+                            <name>i2s</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\i2s\i2s.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\i2s\i2s.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>io</name>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\io\io.c</name>
@@ -14004,6 +14013,18 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\multiplex_i2c.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>i2s</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2s\i2s_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2s\i2s_template.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2s\i2s_template.inc</name>
                         </file>
                     </group>
                     <group>
