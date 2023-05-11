@@ -382,6 +382,9 @@
     <Filter Include="vsf\hal\driver\common\pm">
       <UniqueIdentifier>{a6932a1e-974f-498f-b776-9510ee7bb58d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\hal\driver\common\dac">
+      <UniqueIdentifier>{37265530-4632-40ff-bd1d-bd2505c14c0c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -1317,6 +1320,9 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\common\adc\adc_template.h">
       <Filter>vsf\hal\driver\common\adc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\dac\dac_template.h">
+      <Filter>vsf\hal\driver\common\dac</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
@@ -1886,6 +1892,9 @@
     <ClCompile Include="..\..\..\..\source\hal\driver\common\adc\adc_interface.c">
       <Filter>vsf\hal\driver\common\adc</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\dac\dac_common.c">
+      <Filter>vsf\hal\driver\common\dac</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc">
@@ -1932,6 +1941,9 @@
     </None>
     <None Include="..\..\..\..\source\hal\driver\common\adc\adc_template.inc">
       <Filter>vsf\hal\driver\common\adc</Filter>
+    </None>
+    <None Include="..\..\..\..\source\hal\driver\common\dac\dac_template.inc">
+      <Filter>vsf\hal\driver\common\dac</Filter>
     </None>
   </ItemGroup>
 </Project>
