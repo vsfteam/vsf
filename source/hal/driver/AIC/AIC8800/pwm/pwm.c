@@ -15,9 +15,6 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_PWM_CFG_IMP_PREFIX                  vsf_hw
-#define VSF_PWM_CFG_IMP_UPCASE_PREFIX           VSF_HW
-
 /*============================ INCLUDES ======================================*/
 
 #include "./pwm.h"
@@ -36,7 +33,9 @@
 #   define VSF_HW_PWM_CFG_MULTI_CLASS           VSF_PWM_CFG_MULTI_CLASS
 #endif
 
-#define PWM_PWM_TMR_SEL(n)                              (((n) & 3) << 16)
+#define PWM_PWM_TMR_SEL(n)                      (((n) & 3) << 16)
+
+#define PWM_MAX_FREQ                            (26ul * 1000 * 1000)
 
 /*============================ TYPES =========================================*/
 
@@ -62,7 +61,7 @@ vsf_err_t vsf_hw_pwm_init(vsf_hw_pwm_t *hw_pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)
     VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);
 
-    uint32_t pwm_clock = 26ul * 1000 * 1000;
+    uint32_t pwm_clock = PWM_MAX_FREQ;
     uint32_t div = pwm_clock / cfg_ptr->freq;
     div = vsf_min(div, 0xFF);
     div = vsf_max(div, 0x01);
@@ -145,6 +144,11 @@ uint32_t vsf_hw_pwm_get_freq(vsf_hw_pwm_t *hw_pwm_ptr)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY          ENABLED
+#define VSF_PWM_CFG_CAPABILITY_MIN_FREQ                 (PWM_MAX_FREQ / 255)
+#define VSF_PWM_CFG_CAPABILITY_MAX_FREQ                 (PWM_MAX_FREQ)
+#define VSF_PWM_CFG_IMP_PREFIX                          vsf_hw
+#define VSF_PWM_CFG_IMP_UPCASE_PREFIX                   VSF_HW
 #define VSF_PWM_CFG_IMP_LV0(__COUNT, __hal_op)                                  \
     vsf_hw_pwm_t vsf_hw_pwm##__COUNT = {                                        \
         .reg = (PWM_REG_T *)VSF_HW_PWM ##__COUNT ##_BASE_ADDRESS,               \

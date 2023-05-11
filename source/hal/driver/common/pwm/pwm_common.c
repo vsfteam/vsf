@@ -89,34 +89,6 @@ vsf_err_t vsf_pwm_set(vsf_pwm_t *pwm_ptr, uint8_t channel, uint32_t period, uint
     return pwm_ptr->op->set(pwm_ptr, channel, period, pulse);
 }
 
-
-vsf_err_t vsf_pwm_set_ns(vsf_pwm_t *pwm_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
-{
-    VSF_HAL_ASSERT(pwm_ptr != NULL);
-    VSF_HAL_ASSERT(pwm_ptr->op != NULL);
-    VSF_HAL_ASSERT(pwm_ptr->op->set_ns != NULL);
-
-    return pwm_ptr->op->set_ns(pwm_ptr, channel, period, pulse);
-}
-
-vsf_err_t vsf_pwm_set_us(vsf_pwm_t *pwm_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
-{
-    VSF_HAL_ASSERT(pwm_ptr != NULL);
-    VSF_HAL_ASSERT(pwm_ptr->op != NULL);
-    VSF_HAL_ASSERT(pwm_ptr->op->set_us != NULL);
-
-    return pwm_ptr->op->set_us(pwm_ptr, channel, period, pulse);
-}
-
-vsf_err_t vsf_pwm_set_ms(vsf_pwm_t *pwm_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
-{
-    VSF_HAL_ASSERT(pwm_ptr != NULL);
-    VSF_HAL_ASSERT(pwm_ptr->op != NULL);
-    VSF_HAL_ASSERT(pwm_ptr->op->set_ms != NULL);
-
-    return pwm_ptr->op->set_ms(pwm_ptr, channel, period, pulse);
-}
-
 uint32_t vsf_pwm_get_freq(vsf_pwm_t *pwm_ptr)
 {
     VSF_HAL_ASSERT(pwm_ptr != NULL);
@@ -127,4 +99,33 @@ uint32_t vsf_pwm_get_freq(vsf_pwm_t *pwm_ptr)
 }
 
 #endif /* VSF_PWM_CFG_MULTI_CLASS == ENABLED */
+
+
+vsf_err_t vsf_pwm_set_ns(vsf_pwm_t *pwm_ptr, uint8_t channel, uint32_t period_ns, uint32_t pulse_ns)
+{
+    uint32_t freq = vsf_pwm_get_freq(pwm_ptr);
+    uint32_t period_tick = 1000000000ull * period_ns / freq;
+    uint32_t pulse_tick  = 1000000000ull * pulse_ns  / freq;
+
+    return vsf_pwm_set(pwm_ptr, channel, period_tick, pulse_tick);
+}
+
+vsf_err_t vsf_pwm_set_us(vsf_pwm_t *pwm_ptr, uint8_t channel, uint32_t period_us, uint32_t pulse_us)
+{
+    uint32_t freq = vsf_pwm_get_freq(pwm_ptr);
+    uint32_t period_tick = 1000000ull * period_us / freq;
+    uint32_t pulse_tick  = 1000000ull * pulse_us  / freq;
+
+    return vsf_pwm_set(pwm_ptr, channel, period_tick, pulse_tick);
+}
+
+vsf_err_t vsf_pwm_set_ms(vsf_pwm_t *pwm_ptr, uint8_t channel, uint32_t period_ms, uint32_t pulse_ms)
+{
+    uint32_t freq = vsf_pwm_get_freq(pwm_ptr);
+    uint32_t period_tick = 1000000ull * period_ms / freq;
+    uint32_t pulse_tick  = 1000000ull * pulse_ms  / freq;
+
+    return vsf_pwm_set(pwm_ptr, channel, period_tick, pulse_tick);
+}
+
 #endif /* VSF_HAL_USE_PWM == ENABLED */
