@@ -1174,6 +1174,9 @@
     <Filter Include="vsf\shell\sys\linux\lib\3rd-party\glob">
       <UniqueIdentifier>{a243e712-89df-4820-b201-f5f7886c52a6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\hal\driver\common\dac">
+      <UniqueIdentifier>{dd697b6c-f7a8-4efd-82a7-31f16a711868}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3353,6 +3356,87 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\service\loader\pe\vsf_peloader.h">
       <Filter>vsf\service\loader\pe</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\adc\adc_interface.h">
+      <Filter>vsf\hal\driver\common\adc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\adc\adc_template.h">
+      <Filter>vsf\hal\driver\common\adc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\dac\dac_template.h">
+      <Filter>vsf\hal\driver\common\dac</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\spi\fifo2req_spi.h">
+      <Filter>vsf\hal\driver\common\spi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\spi\spi_interface.h">
+      <Filter>vsf\hal\driver\common\spi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\spi\spi_template.h">
+      <Filter>vsf\hal\driver\common\spi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\spi\multiplex_spi.h">
+      <Filter>vsf\hal\driver\common\spi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\flash\flash_template.h">
+      <Filter>vsf\hal\driver\common\flash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\flash\flash_interface.h">
+      <Filter>vsf\hal\driver\common\flash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\gpio\gpio_template.h">
+      <Filter>vsf\hal\driver\common\gpio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_gpio.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_i2s.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_mmc.h">
+      <Filter>vsf\hal\driver\common\template</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\usart\usart_template.h">
+      <Filter>vsf\hal\driver\common\usart</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\usart\usart_interface.h">
+      <Filter>vsf\hal\driver\common\usart</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\timer\timer_template.h">
+      <Filter>vsf\hal\driver\common\timer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\rtc\rtc_template.h">
+      <Filter>vsf\hal\driver\common\rtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\rtc\rtc_common.h">
+      <Filter>vsf\hal\driver\common\rtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\pwm\pwm_template.h">
+      <Filter>vsf\hal\driver\common\pwm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\i2c\multiplex_i2c.h">
+      <Filter>vsf\hal\driver\common\i2c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\i2c\mrequest_i2c.h">
+      <Filter>vsf\hal\driver\common\i2c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\i2c\i2c_template.h">
+      <Filter>vsf\hal\driver\common\i2c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\i2c\i2c_request.h">
+      <Filter>vsf\hal\driver\common\i2c</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\i2s\i2s_template.h">
+      <Filter>vsf\hal\driver\common\i2s</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\mmc\mmc_probe.h">
+      <Filter>vsf\hal\driver\common\mmc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\mmc\mmc_template.h">
+      <Filter>vsf\hal\driver\common\mmc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\demo\hal_demo\hal_demo.h">
+      <Filter>usrapp\demo\hal_demo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5840,6 +5924,57 @@
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\3rd-party\glob\glob.c">
       <Filter>vsf\shell\sys\linux\lib\3rd-party\glob</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\adc\adc_interface.c">
+      <Filter>vsf\hal\driver\common\adc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\dac\dac_common.c">
+      <Filter>vsf\hal\driver\common\dac</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\spi\fifo2req_spi.c">
+      <Filter>vsf\hal\driver\common\spi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\spi\spi_interface.c">
+      <Filter>vsf\hal\driver\common\spi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\spi\multiplex_spi.c">
+      <Filter>vsf\hal\driver\common\spi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\flash\flash_interface.c">
+      <Filter>vsf\hal\driver\common\flash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\usart\usart_interface.c">
+      <Filter>vsf\hal\driver\common\usart</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\i2c\multiplex_i2c.c">
+      <Filter>vsf\hal\driver\common\i2c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\i2c\mrequest_i2c.c">
+      <Filter>vsf\hal\driver\common\i2c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\i2c\i2c_request.c">
+      <Filter>vsf\hal\driver\common\i2c</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\mmc\mmc_probe.c">
+      <Filter>vsf\hal\driver\common\mmc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\hal_demo\hal_demo.c">
+      <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\hal_demo\i2s_demo.c">
+      <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\hal_demo\io_demo.c">
+      <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\hal_demo\mmc_demo.c">
+      <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\hal_demo\pm_demo.c">
+      <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\demo\hal_demo\rng_demo.c">
+      <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc">
@@ -5877,6 +6012,39 @@
     </None>
     <None Include="..\..\..\..\source\hal\driver\common\io\io_template.inc">
       <Filter>vsf\hal\driver\common\io</Filter>
+    </None>
+    <None Include="..\..\..\..\source\hal\driver\common\adc\adc_template.inc">
+      <Filter>vsf\hal\driver\common\adc</Filter>
+    </None>
+    <None Include="..\..\..\..\source\hal\driver\common\dac\dac_template.inc">
+      <Filter>vsf\hal\driver\common\dac</Filter>
+    </None>
+    <None Include="..\..\..\..\source\hal\driver\common\spi\spi_template.inc">
+      <Filter>vsf\hal\driver\common\spi</Filter>
+    </None>
+    <None Include="..\..\..\..\source\hal\driver\common\flash\flash_template.inc">
+      <Filter>vsf\hal\driver\common\flash</Filter>
+    </None>
+    <None Include="..\..\..\..\source\hal\driver\common\gpio\gpio_template.inc">
+      <Filter>vsf\hal\driver\common\gpio</Filter>
+    </None>
+    <None Include="..\..\..\..\source\hal\driver\common\pwm\timer_to_pwm.inc">
+      <Filter>vsf\hal\driver\common\timer</Filter>
+    </None>
+    <None Include="..\..\..\..\source\hal\driver\common\timer\timer_template.inc">
+      <Filter>vsf\hal\driver\common\timer</Filter>
+    </None>
+    <None Include="..\..\..\..\source\hal\driver\common\pwm\pwm_template.inc">
+      <Filter>vsf\hal\driver\common\pwm</Filter>
+    </None>
+    <None Include="..\..\..\..\source\hal\driver\common\i2c\i2c_template.inc">
+      <Filter>vsf\hal\driver\common\i2c</Filter>
+    </None>
+    <None Include="..\..\..\..\source\hal\driver\common\i2s\i2s_template.inc">
+      <Filter>vsf\hal\driver\common\i2s</Filter>
+    </None>
+    <None Include="..\..\..\..\source\hal\driver\common\mmc\mmc_template.inc">
+      <Filter>vsf\hal\driver\common\mmc</Filter>
     </None>
   </ItemGroup>
 </Project>

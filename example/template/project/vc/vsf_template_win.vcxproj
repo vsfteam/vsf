@@ -11,7 +11,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\adc\adc_interface.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\adc\adc_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\dac\dac_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\flash\flash_interface.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\flash\flash_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\gpio\gpio_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\i2c\i2c_request.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\i2c\i2c_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\i2c\mrequest_i2c.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\i2c\multiplex_i2c.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\i2s\i2s_template.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\io\io_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\mmc\mmc_probe.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\mmc\mmc_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\pwm\pwm_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\rtc\rtc_common.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\rtc\rtc_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\spi\fifo2req_spi.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\spi\multiplex_spi.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\spi\spi_interface.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\spi\spi_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_gpio.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_i2s.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_mmc.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\timer\timer_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\usart\usart_interface.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\usart\usart_template.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rng\rng.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\adc\vsf_remapped_adc.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\dac\vsf_remapped_dac.h" />
@@ -729,6 +755,7 @@
     <ClInclude Include="..\..\demo\common\usrapp_usbd_common.h" />
     <ClInclude Include="..\..\demo\common\usrapp_usbh_common.h" />
     <ClInclude Include="..\..\demo\fakefat32.h" />
+    <ClInclude Include="..\..\demo\hal_demo\hal_demo.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images_data.h" />
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.h" />
@@ -739,7 +766,18 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\adc\adc_interface.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\dac\dac_common.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\flash\flash_interface.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\i2c\i2c_request.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\i2c\mrequest_i2c.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\i2c\multiplex_i2c.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\io\io_common.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\mmc\mmc_probe.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\spi\fifo2req_spi.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\spi\multiplex_spi.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\spi\spi_interface.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\usart\usart_interface.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rng\rng.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\adc\vsf_remapped_adc.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\dac\vsf_remapped_dac.c" />
@@ -1532,8 +1570,14 @@
     <ClCompile Include="..\..\demo\hal_demo\adc_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\flash_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\gpio_demo.c" />
+    <ClCompile Include="..\..\demo\hal_demo\hal_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\i2c_demo.c" />
+    <ClCompile Include="..\..\demo\hal_demo\i2s_demo.c" />
+    <ClCompile Include="..\..\demo\hal_demo\io_demo.c" />
+    <ClCompile Include="..\..\demo\hal_demo\mmc_demo.c" />
+    <ClCompile Include="..\..\demo\hal_demo\pm_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\pwm_demo.c" />
+    <ClCompile Include="..\..\demo\hal_demo\rng_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\rtc_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\spi_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\timer_demo.c" />
@@ -1579,9 +1623,20 @@
     <ClCompile Include="..\..\demo\vsfvm_demo\vsfvm_demo.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\..\source\hal\driver\common\adc\adc_template.inc" />
+    <None Include="..\..\..\..\source\hal\driver\common\dac\dac_template.inc" />
+    <None Include="..\..\..\..\source\hal\driver\common\flash\flash_template.inc" />
+    <None Include="..\..\..\..\source\hal\driver\common\gpio\gpio_template.inc" />
+    <None Include="..\..\..\..\source\hal\driver\common\i2c\i2c_template.inc" />
+    <None Include="..\..\..\..\source\hal\driver\common\i2s\i2s_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\io\io_template.inc" />
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc" />
+    <None Include="..\..\..\..\source\hal\driver\common\mmc\mmc_template.inc" />
+    <None Include="..\..\..\..\source\hal\driver\common\pwm\pwm_template.inc" />
+    <None Include="..\..\..\..\source\hal\driver\common\pwm\timer_to_pwm.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\rtc\rtc_template.inc" />
+    <None Include="..\..\..\..\source\hal\driver\common\spi\spi_template.inc" />
+    <None Include="..\..\..\..\source\hal\driver\common\timer\timer_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\usart\usart_template.inc" />
     <None Include="..\..\..\..\source\shell\sys\linux\app\httpd\urihandler\file\__vsf_linux_urihandler_file.inc" />
     <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\cmath" />

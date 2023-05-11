@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\hal\driver\common\adc\adc_interface.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\adc\adc_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\dac\dac_template.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\flash\flash_interface.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\flash\flash_template.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\gpio\gpio_template.h" />
@@ -326,6 +327,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\hal\driver\common\adc\adc_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\adc\adc_interface.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\dac\dac_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\flash\flash_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\flash\flash_interface.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\gpio\gpio_common.c" />
@@ -519,6 +521,7 @@
   <ItemGroup>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\adc\adc_template.inc" />
+    <None Include="..\..\..\..\source\hal\driver\common\dac\dac_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\flash\flash_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\gpio\gpio_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\i2c\i2c_template.inc" />
