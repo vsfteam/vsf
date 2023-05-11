@@ -41,7 +41,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef enum vsf_io_feature_t {
+typedef enum vsf_io_mode_t {
     VSF_IO_OPEN_DRAIN           = GPIO_FLOAT,
     VSF_IO_PULL_UP              = GPIO_PULLUP,
     VSF_IO_PULL_DOWN            = GPIO_PULLDOWN,
@@ -56,7 +56,7 @@ typedef enum vsf_io_feature_t {
 
     // for hw_io
     __VSF_HW_IO_FEATURE_ALL_BITS= VSF_IO_FEATURE_ALL_BITS,
-} vsf_io_feature_t;
+} vsf_io_mode_t;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ INCLUDES ======================================*/

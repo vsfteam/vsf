@@ -33,7 +33,7 @@
 /*============================ TYPES =========================================*/
 
 //! IO model
-typedef enum vsf_io_feature_t {
+typedef enum vsf_io_mode_t {
     IO_ANALOG_INPUT         = 0x00,
     IO_INPUT_FLOAT          = 0x00,
     IO_INPUT_PU             = 0x10,
@@ -73,7 +73,7 @@ typedef enum vsf_io_feature_t {
     VSF_IO_HIGH_DRIVE           = (1<<9),           //!< enable high drive strength
     VSF_IO_HIGH_DRIVE_STRENGTH  = (1<<9),           //!< enable high drive strength
 */
-} vsf_io_feature_t;
+} vsf_io_mode_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

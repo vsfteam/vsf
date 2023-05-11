@@ -54,4 +54,13 @@ vsf_err_t vsf_io_config(vsf_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr, uint_fast8_t co
     return io_ptr->op->config(io_ptr, cfg_ptr, count);
 }
 
+vsf_io_capability_t vsf_io_capability(vsf_io_t *io_ptr)
+{
+    VSF_HAL_ASSERT(io_ptr != NULL);
+    VSF_HAL_ASSERT(io_ptr->op != NULL);
+    VSF_HAL_ASSERT(io_ptr->op->config != NULL);
+
+    return io_ptr->op->capability(io_ptr);
+}
+
 #endif
