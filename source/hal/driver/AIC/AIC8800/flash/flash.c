@@ -30,12 +30,6 @@
 #   define VSF_HW_FLASH_CFG_MULTI_CLASS             VSF_FLASH_CFG_MULTI_CLASS
 #endif
 
-// only define in source file
-#define VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
-#define VSF_FLASH_CFG_ERASE_ALL_TEMPLATE            ENABLED
-#define VSF_FLASH_CFG_ERASE_ONE_SECTOR_TEMPLATE     ENABLED
-#define VSF_FLASH_CFG_WRITE_ONE_SECTOR_TEMPLATE     ENABLED
-#define VSF_FLASH_CFG_READ_ONE_SECTOR_TEMPLATE      ENABLED
 #define VSF_FLASH_CFG_BASE_ADDRESS                  0x08000000
 #define VSF_FLASH_CFG_ERASE_SECTORE_SIZE            0x1000
 #define VSF_FLASH_CFG_WRITE_SECTORE_SIZE            0x100
@@ -79,6 +73,7 @@ typedef struct vsf_hw_flash_t {
     vsf_flash_cfg_t cfg;
     vsf_flash_size_t flash_size;
     bool is_enabled;
+    vsf_flash_irq_mask_t irq_mask;
 } vsf_hw_flash_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -126,6 +121,22 @@ fsm_rt_t vsf_hw_flash_disable(vsf_hw_flash_t *hw_flash_ptr)
     return fsm_rt_cpl;
 }
 
+void vsf_hw_flash_irq_enable(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(hw_flash_ptr != NULL);
+    VSF_HAL_ASSERT((irq_mask & ~VSF_FLASH_IRQ_ALL_BITS_MASK) == 0);
+
+    hw_flash_ptr->irq_mask |= irq_mask;
+}
+
+void vsf_hw_flash_irq_disable(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(hw_flash_ptr != NULL);
+    VSF_HAL_ASSERT((irq_mask & ~VSF_FLASH_IRQ_ALL_BITS_MASK) == 0);
+
+    hw_flash_ptr->irq_mask &= ~irq_mask;
+}
+
 vsf_err_t vsf_hw_flash_erase_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offset, vsf_flash_size_t size)
 {
     vsf_flash_size_t ret;
@@ -144,7 +155,7 @@ vsf_err_t vsf_hw_flash_erase_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flas
 
     if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
         vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_ERASE_MASK : VSF_FLASH_IRQ_ERASE_ERROR_MASK;
-        hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, mask, (vsf_flash_t *)hw_flash_ptr);
+        hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, (vsf_flash_t *)hw_flash_ptr, mask);
     }
 
     return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
@@ -166,7 +177,7 @@ vsf_err_t vsf_hw_flash_write_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flas
 
     if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
         vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_WRITE_MASK : VSF_FLASH_IRQ_WRITE_ERROR_MASK;
-        hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, mask, (vsf_flash_t *)hw_flash_ptr);
+        hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, (vsf_flash_t *)hw_flash_ptr, mask);
     }
 
     return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
@@ -187,15 +198,25 @@ vsf_err_t vsf_hw_flash_read_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flash
 
     if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
         vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_READ_MASK : VSF_FLASH_IRQ_READ_ERROR_MASK;
-        hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, mask, (vsf_flash_t *)hw_flash_ptr);
+        hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, (vsf_flash_t *)hw_flash_ptr, mask);
     }
 
     return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
+vsf_flash_status_t vsf_hw_flash_status(vsf_hw_flash_t *hw_flash_ptr)
+{
+    vsf_flash_status_t flash_status = {
+        .is_busy          = 0,
+    };
+
+    return flash_status;
+}
+
 vsf_flash_capability_t vsf_hw_flash_capability(vsf_hw_flash_t *hw_flash_ptr)
 {
     vsf_flash_capability_t flash_capability = {
+        .irq_mask    = VSF_FLASH_IRQ_ALL_BITS_MASK,
         .base_address          = VSF_FLASH_CFG_BASE_ADDRESS,
         .max_size              = hw_flash_ptr->flash_size,
         .erase_sector_size     = VSF_FLASH_CFG_ERASE_SECTORE_SIZE,
@@ -209,6 +230,13 @@ vsf_flash_capability_t vsf_hw_flash_capability(vsf_hw_flash_t *hw_flash_ptr)
 
 /*============================ INCLUDES ======================================*/
 
+// only define in source file
+#define VSF_FLASH_CFG_ERASE_ALL_TEMPLATE            ENABLED
+#define VSF_FLASH_CFG_ERASE_ONE_SECTOR_TEMPLATE     ENABLED
+#define VSF_FLASH_CFG_WRITE_ONE_SECTOR_TEMPLATE     ENABLED
+#define VSF_FLASH_CFG_READ_ONE_SECTOR_TEMPLATE      ENABLED
+#define VSF_FLASH_CFG_IMP_PREFIX                    vsf_hw
+#define VSF_FLASH_CFG_IMP_UPCASE_PREFIX             VSF_HW
 #define VSF_FLASH_CFG_IMP_LV0(__COUNT, __HAL_OP)                                \
     vsf_hw_flash_t vsf_hw_flash ## __COUNT = {                                  \
         .cfg = {                                                                \
