@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_COMMON_INTERFACE_H__
-#define __HAL_DRIVER_COMMON_INTERFACE_H__
+#ifndef __VSF_TEMPLATE_COMMON_H__
+#define __VSF_TEMPLATE_COMMON_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -40,7 +40,150 @@ extern "C" {
 #define VSF_HAL_TEMPLATE_API_DEFINE(__prefix_name, __return, __module__, __name, __first_args, ...)       \
     __return VSF_MCONNECT(__prefix_name, _, __module__, _, __name)( __first_args, ##__VA_ARGS__ )
 
+#define __VSF_HAL_COUNT_TO_MASK(__CNT)                                          \
+    ((0x1ull << (__CNT > 0x00 ? 0x00 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x01 ? 0x01 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x02 ? 0x02 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x03 ? 0x03 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x04 ? 0x04 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x05 ? 0x05 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x06 ? 0x06 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x07 ? 0x07 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x08 ? 0x08 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x09 ? 0x09 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x0A ? 0x0A : 0)) |                                    \
+     (0x1ull << (__CNT > 0x0B ? 0x0B : 0)) |                                    \
+     (0x1ull << (__CNT > 0x0C ? 0x0C : 0)) |                                    \
+     (0x1ull << (__CNT > 0x0D ? 0x0D : 0)) |                                    \
+     (0x1ull << (__CNT > 0x0E ? 0x0E : 0)) |                                    \
+     (0x1ull << (__CNT > 0x0F ? 0x0F : 0)) |                                    \
+     (0x1ull << (__CNT > 0x10 ? 0x10 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x11 ? 0x11 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x12 ? 0x12 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x13 ? 0x13 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x14 ? 0x14 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x15 ? 0x15 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x16 ? 0x16 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x17 ? 0x17 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x18 ? 0x18 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x19 ? 0x19 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x1A ? 0x1A : 0)) |                                    \
+     (0x1ull << (__CNT > 0x1B ? 0x1B : 0)) |                                    \
+     (0x1ull << (__CNT > 0x1C ? 0x1C : 0)) |                                    \
+     (0x1ull << (__CNT > 0x1D ? 0x1D : 0)) |                                    \
+     (0x1ull << (__CNT > 0x1E ? 0x1E : 0)) |                                    \
+     (0x1ull << (__CNT > 0x1F ? 0x1F : 0)) |                                    \
+     (0x1ull << (__CNT > 0x20 ? 0x20 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x21 ? 0x21 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x22 ? 0x22 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x23 ? 0x23 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x24 ? 0x24 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x25 ? 0x25 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x26 ? 0x26 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x27 ? 0x27 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x28 ? 0x28 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x29 ? 0x29 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x2A ? 0x2A : 0)) |                                    \
+     (0x1ull << (__CNT > 0x2B ? 0x2B : 0)) |                                    \
+     (0x1ull << (__CNT > 0x2C ? 0x2C : 0)) |                                    \
+     (0x1ull << (__CNT > 0x2D ? 0x2D : 0)) |                                    \
+     (0x1ull << (__CNT > 0x2E ? 0x2E : 0)) |                                    \
+     (0x1ull << (__CNT > 0x2F ? 0x2F : 0)) |                                    \
+     (0x1ull << (__CNT > 0x30 ? 0x30 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x31 ? 0x31 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x32 ? 0x32 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x33 ? 0x33 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x34 ? 0x34 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x35 ? 0x35 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x36 ? 0x36 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x37 ? 0x37 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x38 ? 0x38 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x39 ? 0x39 : 0)) |                                    \
+     (0x1ull << (__CNT > 0x3A ? 0x3A : 0)) |                                    \
+     (0x1ull << (__CNT > 0x3B ? 0x3B : 0)) |                                    \
+     (0x1ull << (__CNT > 0x3C ? 0x3C : 0)) |                                    \
+     (0x1ull << (__CNT > 0x3D ? 0x3D : 0)) |                                    \
+     (0x1ull << (__CNT > 0x3E ? 0x3E : 0)) |                                    \
+     (0x1ull << (__CNT > 0x3F ? 0x3F : 0)))
+
+#define VSF_HAL_COUNT_TO_MASK(__CNT)                                            \
+    __VSF_HAL_COUNT_TO_MASK(__CNT)
+
+#define __VSF_HAL_MASK_TO_COUNT(__MASK)                                         \
+    ((__MASK & (0x01ull << 0x00) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x01) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x02) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x03) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x04) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x05) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x06) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x07) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x08) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x09) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x0A) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x0B) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x0C) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x0D) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x0E) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x0F) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x10) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x11) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x12) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x13) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x14) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x15) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x16) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x17) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x18) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x19) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x1A) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x1B) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x1C) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x1D) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x1E) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x1F) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x20) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x21) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x22) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x23) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x24) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x25) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x26) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x27) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x28) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x29) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x2A) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x2B) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x2C) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x2D) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x2E) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x2F) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x30) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x31) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x32) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x33) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x34) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x35) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x36) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x37) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x38) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x39) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x3A) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x3B) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x3C) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x3D) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x3E) ? 1 : 0) +                                     \
+     (__MASK & (0x01ull << 0x3F) ? 1 : 0))
+
+#define VSF_HAL_MASK_TO_COUNT(__MASK)                                           \
+    __VSF_HAL_MASK_TO_COUNT(__MASK)
+
 /*============================ TYPES =========================================*/
+
+typedef struct vsf_hal_device_t {
+    void *pointer;
+    char *name;
+} vsf_hal_device_t;
 
 /*
  *  if __VSF_HAL_XXXX_IS_REG_CLK_ASYNC__ is defined for some module, means
