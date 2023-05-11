@@ -27,7 +27,7 @@
 #include "bflb_gpio.h"
 #include "hardware/gpio_reg.h"
 
-#define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY         ENABLED
+#define VSF_GPIO_USE_DEFAULT_CAPABILITY_IMPLEMENT       ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_SET                ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_CLEAR              ENABLED
 #define VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_SET      1
@@ -71,7 +71,7 @@ void __vsf_hw_bl61x_gpio_init(void)
     }
 }
 
-void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_io_feature_t feature)
+void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_mode_t feature)
 {
     VSF_HAL_ASSERT((NULL != hw_gpio_ptr) && (hw_gpio_ptr->dev != NULL));
     VSF_HAL_ASSERT(__BL61X_IO_IS_VAILID_PIN(pin_mask));
@@ -167,10 +167,10 @@ void vsf_hw_gpio_toggle(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask
 vsf_gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
 {
     vsf_gpio_capability_t gpio_capability = {
-        .is_support_output_and_set = VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_SET,
-        .is_support_output_and_clear = VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_CLEAR,
+        .support_output_and_set = VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_SET,
+        .support_output_and_clear = VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_CLEAR,
         .pin_count = VSF_HW_GPIO_PIN_COUNT,
-        .avail_pin_mask = VSF_HW_GPIO_PIN_MASK,
+        .pin_mask = VSF_HW_GPIO_PIN_MASK,
     };
 
     return gpio_capability;
