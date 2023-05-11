@@ -7159,10 +7159,31 @@
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\gpio_demo.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\hal_demo.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\hal_demo.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\i2c_demo.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\i2s_demo.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\io_demo.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\mmc_demo.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\pm_demo.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\pwm_demo.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\rng_demo.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\rtc_demo.c</name>
@@ -7175,6 +7196,9 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\usart_demo.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\wdt_demo.c</name>
                 </file>
             </group>
             <group>
@@ -12692,6 +12716,9 @@
                                                 <name>gpio</name>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\gpio\gpio_api.c</name>
+                                                    <excluded>
+                                                        <configuration>vsf_template_aic8800</configuration>
+                                                    </excluded>
                                                 </file>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\gpio\gpio_api.h</name>
@@ -13614,6 +13641,9 @@
                                                 </file>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\wdt\wdt_api.c</name>
+                                                    <excluded>
+                                                        <configuration>vsf_template_aic8800</configuration>
+                                                    </excluded>
                                                 </file>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\wdt\wdt_api.h</name>
@@ -13683,6 +13713,15 @@
                                     </file>
                                 </group>
                             </group>
+                        </group>
+                        <group>
+                            <name>wdt</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\wdt\wdt.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\wdt\wdt.h</name>
+                            </file>
                         </group>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\__device.h</name>
@@ -13956,9 +13995,33 @@
                         </file>
                     </group>
                     <group>
+                        <name>dac</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\dac\dac_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\dac\dac_template.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\dac\dac_template.inc</name>
+                        </file>
+                    </group>
+                    <group>
                         <name>debug_stream</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\debug_stream\debug_stream_tx_blocked.inc</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>dma</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\dma\dma_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\dma\dma_template.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\dma\dma_template.inc</name>
                         </file>
                     </group>
                     <group>
@@ -14009,6 +14072,12 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\i2c_template.inc</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\mrequest_i2c.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\mrequest_i2c.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\i2c\multiplex_i2c.c</name>
                         </file>
                         <file>
@@ -14041,6 +14110,9 @@
                     </group>
                     <group>
                         <name>mmc</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\mmc\mmc_common.c</name>
+                        </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\mmc\mmc_probe.c</name>
                         </file>
@@ -14144,6 +14216,9 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_declaration.h</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_dma.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_flash.h</name>
                         </file>
                         <file>
@@ -14154,6 +14229,9 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_i2c.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_i2s.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_implementation.h</name>
@@ -14226,6 +14304,18 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\usart\vsf_drv_usart_poll_util.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>wdt</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\wdt\wdt_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\wdt\wdt_template.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\wdt\wdt_template.inc</name>
                         </file>
                     </group>
                     <file>
@@ -15136,6 +15226,117 @@
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\io_mapper\vsf_io_mapper.h</name>
                     </file>
+                </group>
+                <group>
+                    <name>remap</name>
+                    <group>
+                        <name>adc</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\adc\vsf_remapped_adc.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\adc\vsf_remapped_adc.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>dac</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\dac\vsf_remapped_dac.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\dac\vsf_remapped_dac.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>dma</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\dma\vsf_remapped_dma.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\dma\vsf_remapped_dma.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>gpio</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\gpio\vsf_remapped_gpio.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\gpio\vsf_remapped_gpio.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>i2c</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\i2c\vsf_remapped_i2c.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\i2c\vsf_remapped_i2c.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>i2s</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\i2s\vsf_remapped_i2s.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\i2s\vsf_remapped_i2s.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>io</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\io\vsf_remapped_io.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\io\vsf_remapped_io.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>mmc</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\mmc\vsf_remapped_mmc.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\mmc\vsf_remapped_mmc.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>pwm</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>spi</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\spi\vsf_remapped_spi.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\spi\vsf_remapped_spi.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>usart</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\usart\vsf_remapped_usart.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\usart\vsf_remapped_usart.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>wdt</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\wdt\vsf_remapped_wdt.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\wdt\vsf_remapped_wdt.h</name>
+                        </file>
+                    </group>
                 </group>
             </group>
             <file>
