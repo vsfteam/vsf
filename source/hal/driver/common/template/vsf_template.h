@@ -33,7 +33,10 @@
 #include "./vsf_template_rtc.h"
 #include "./vsf_template_spi.h"
 #include "./vsf_template_timer.h"
-#include "./vsf_template_usart.h"
+
+#if defined(VSF_HAL_USE_USART) && !defined(__VSF_TEMPLATE_USART_H__)
+#   include "./vsf_template_usart.h"
+#endif
 
 #if defined(VSF_HAL_USE_USB) && !defined(__VSF_TEMPLATE_USB_H__)
 #   include "./vsf_template_usb.h"

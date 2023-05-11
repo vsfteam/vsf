@@ -32,13 +32,6 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ INCLUDES ======================================*/
-
-#define VSF_USART_CFG_DEC_PREFIX              vsf_fifo2req
-#define VSF_USART_CFG_DEC_UPCASE_PREFIX       VSF_FIFO2REQ
-#define VSF_USART_CFG_DEC_EXTERN_OP           ENABLED
-#include "hal/driver/common/usart/usart_template.h"
-
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_FIFO2REQ_USART_CFG_MULTI_CLASS
@@ -87,6 +80,16 @@ vsf_class(vsf_fifo2req_usart_t) {
         vsf_usart_irq_mask_t irq_mask;
     )
 };
+
+/*============================ INCLUDES ======================================*/
+
+#define VSF_USART_CFG_DEC_PREFIX              vsf_fifo2req
+#define VSF_USART_CFG_DEC_UPCASE_PREFIX       VSF_FIFO2REQ
+#define VSF_USART_CFG_DEC_EXTERN_OP           ENABLED
+#include "hal/driver/common/usart/usart_template.h"
+
+#undef VSF_FIFO2REQ_USART_COUNT
+#undef VSF_FIFO2REQ_USART_MASK
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/

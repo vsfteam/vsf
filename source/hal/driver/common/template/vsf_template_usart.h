@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_USART_INTERFACE_H__
-#define __HAL_DRIVER_USART_INTERFACE_H__
+#ifndef __VSF_TEMPLATE_USART_H__
+#define __VSF_TEMPLATE_USART_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -31,6 +31,14 @@ extern "C" {
 // multi-class support enabled by default for maximum availability.
 #ifndef VSF_USART_CFG_MULTI_CLASS
 #   define VSF_USART_CFG_MULTI_CLASS                ENABLED
+#endif
+
+#if defined(VSF_HW_USART_COUNT) && !defined(VSF_HW_USART_MASK)
+#   define VSF_HW_USART_MASK                        VSF_HAL_COUNT_TO_MASK(VSF_HW_USART_COUNT)
+#endif
+
+#if defined(VSF_HW_USART_MASK) && !defined(VSF_HW_USART_COUNT)
+#   define VSF_HW_USART_COUNT                       VSF_HAL_MASK_TO_COUNT(VSF_HW_USART_MASK)
 #endif
 
 // application code can redefine it
@@ -58,6 +66,10 @@ extern "C" {
 
 #ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS
 #   define VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS    DISABLED
+#endif
+
+#ifndef VSF_USART_CFG_INHERT_HAL_CAPABILITY
+#   define VSF_USART_CFG_INHERT_HAL_CAPABILITY      ENABLED
 #endif
 
 #ifndef VSF_USART_CFG_REQUEST_API
@@ -116,51 +128,73 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_ODD_PARITY         = (0x2ul << 20),
     VSF_USART_FORCE_0_PARITY     = (0x3ul << 20),
     VSF_USART_FORCE_1_PARITY     = (0x4ul << 20),
-    VSF_USART_PARITY_MASK        = VSF_USART_NO_PARITY |
-                                   VSF_USART_EVEN_PARITY |
-                                   VSF_USART_ODD_PARITY |
-                                   VSF_USART_FORCE_0_PARITY |
-                                   VSF_USART_FORCE_1_PARITY,
 
     VSF_USART_1_STOPBIT          = (0x0ul << 23),
     VSF_USART_1_5_STOPBIT        = (0x1ul << 23),
     VSF_USART_2_STOPBIT          = (0x2ul << 23),
-    VSF_USART_STOPBIT_MASK       = VSF_USART_1_STOPBIT |
-                                   VSF_USART_1_5_STOPBIT |
-                                   VSF_USART_2_STOPBIT,
 
     VSF_USART_5_BIT_LENGTH       = (0x0ul << 25),
     VSF_USART_6_BIT_LENGTH       = (0x1ul << 25),
     VSF_USART_7_BIT_LENGTH       = (0x2ul << 25),
     VSF_USART_8_BIT_LENGTH       = (0x3ul << 25),
     VSF_USART_9_BIT_LENGTH       = (0x4ul << 25),
+
+    VSF_USART_NO_HWCONTROL       = (0x0ul << 28),
+    VSF_USART_RTS_HWCONTROL      = (0x1ul << 28),
+    VSF_USART_CTS_HWCONTROL      = (0x2ul << 28),
+    VSF_USART_RTS_CTS_HWCONTROL  = (0x3ul << 28),
+
+    VSF_USART_TX_ENABLE          = (0x1ul << 30),
+    VSF_USART_TX_DISABLE         = (0x1ul << 30),
+
+    VSF_USART_RX_ENABLE          = (0x1ul << 31),
+    VSF_USART_RX_DISABLE         = (0x0ul << 31),
+} vsf_usart_mode_t;
+#endif
+
+enum {
+    VSF_USART_PARITY_COUNT       = 5,
+    VSF_USART_PARITY_MASK        = VSF_USART_NO_PARITY |
+                                   VSF_USART_EVEN_PARITY |
+                                   VSF_USART_ODD_PARITY |
+                                   VSF_USART_FORCE_0_PARITY |
+                                   VSF_USART_FORCE_1_PARITY,
+
+    VSF_USART_STOPBIT_COUNT      = 3,
+    VSF_USART_STOPBIT_MASK       = VSF_USART_1_STOPBIT |
+                                   VSF_USART_1_5_STOPBIT |
+                                   VSF_USART_2_STOPBIT,
+
+    VSF_USART_BIT_LENGTH_COUNT   = 5,
     VSF_USART_BIT_LENGTH_MASK    = VSF_USART_5_BIT_LENGTH |
                                    VSF_USART_6_BIT_LENGTH |
                                    VSF_USART_7_BIT_LENGTH |
                                    VSF_USART_8_BIT_LENGTH |
                                    VSF_USART_9_BIT_LENGTH,
 
-    VSF_USART_NO_HWCONTROL       = (0x0ul << 28),
-    VSF_USART_RTS_HWCONTROL      = (0x1ul << 28),
-    VSF_USART_CTS_HWCONTROL      = (0x2ul << 28),
-    VSF_USART_RTS_CTS_HWCONTROL  = (0x3ul << 28),
+    VSF_USART_HWCONTROL_COUNT    = 4,
     VSF_USART_HWCONTROL_MASK     = VSF_USART_NO_HWCONTROL |
                                    VSF_USART_RTS_HWCONTROL |
                                    VSF_USART_CTS_HWCONTROL |
                                    VSF_USART_RTS_CTS_HWCONTROL,
 
-    VSF_USART_TX_ENABLE          = (0x1ul << 30),
-    VSF_USART_RX_ENABLE          = (0x1ul << 31),
-    VSF_USART_ENABLE_MASK        = VSF_USART_TX_ENABLE |
-                                   VSF_USART_RX_ENABLE,
+    VSF_USART_TX_ENABLE_COUNT    = 2,
+    VSF_USART_TX_ENABLE_MASK     = VSF_USART_TX_ENABLE |
+                                   VSF_USART_TX_DISABLE,
 
+    VSF_USART_RX_ENABLE_COUNT    = 2,
+    VSF_USART_RX_ENABLE_MASK     = VSF_USART_RX_ENABLE |
+                                   VSF_USART_RX_DISABLE,
+
+    VSF_USART_MODE_MASK_COUNT    = 5,
     VSF_USART_MODE_ALL_BITS_MASK = VSF_USART_PARITY_MASK |
                                    VSF_USART_STOPBIT_MASK |
                                    VSF_USART_BIT_LENGTH_MASK |
                                    VSF_USART_HWCONTROL_MASK |
-                                   VSF_USART_ENABLE_MASK,
-} vsf_usart_mode_t;
-#endif
+                                   VSF_USART_TX_ENABLE_MASK |
+                                   VSF_USART_RX_ENABLE_MASK,
+
+};
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
 typedef enum vsf_usart_irq_mask_t {
@@ -178,20 +212,26 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 29),
     VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 30),
     VSF_USART_IRQ_MASK_OVERFLOW_ERR     = (0x1ul << 31),
+
+
+} vsf_usart_irq_mask_t;
+#endif
+
+enum {
+    VSF_USART_IRQ_ERR_COUNT             = 4,
     VSF_USART_IRQ_MASK_ERR              = VSF_USART_IRQ_MASK_FRAME_ERR |
                                           VSF_USART_IRQ_MASK_PARITY_ERR |
                                           VSF_USART_IRQ_MASK_BREAK_ERR |
                                           VSF_USART_IRQ_MASK_OVERFLOW_ERR,
 
+    VSF_USART_IRQ_COUNT                 = 9,
     VSF_USART_IRQ_ALL_BITS_MASK         = VSF_USART_IRQ_MASK_TX |
                                           VSF_USART_IRQ_MASK_RX |
                                           VSF_USART_IRQ_MASK_RX_TIMEOUT |
                                           VSF_USART_IRQ_MASK_TX_CPL |
                                           VSF_USART_IRQ_MASK_RX_CPL |
                                           VSF_USART_IRQ_MASK_ERR,
-
-} vsf_usart_irq_mask_t;
-#endif
+};
 
 typedef struct vsf_usart_t vsf_usart_t;
 
@@ -217,14 +257,34 @@ typedef struct vsf_usart_status_t {
     union {
         inherit(vsf_peripheral_status_t)
         struct {
-            uint32_t is_busy : 1;
+            uint32_t is_busy    : 1;
+            uint32_t is_tx_busy : 1;
+            uint32_t is_rx_busy : 1;
         };
     };
 } vsf_usart_status_t;
 #endif
 
 typedef struct vsf_usart_capability_t {
+#if VSF_USART_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
+#endif
+    vsf_usart_irq_mask_t irq_mask;
+
+    uint32_t max_baudrate;
+    uint32_t min_baudrate;
+
+    uint8_t max_tx_fifo_counter;
+    uint8_t max_rx_fifo_counter;
+
+    uint8_t max_data_bits;
+    uint8_t min_data_bits;
+
+    uint8_t support_rx_timeout : 1;
+
+    // TODO : stopbits
+    // TODO : parity
+    // TODO : hwcontrol
 } vsf_usart_capability_t;
 
 typedef struct vsf_usart_op_t {
@@ -249,11 +309,17 @@ struct vsf_usart_t  {
  @param[in] cfg_ptr: a pointer to structure @ref vsf_usart_cfg_t
  @return vsf_err_t: VSF_ERR_NONE if usart was initialized, or a negative error code
 
+ @note It is not necessary to call vsf_usart_fini() to deinitialization.
+       vsf_usart_init() should be called before any other usart API except vsf_usart_capability().
+
  \~chinese
- @brief ³õÊ¼»¯Ò»¸ö usart ÊµÀı
- @param[in] usart_ptr: ½á¹¹Ìå vsf_usart_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_usart_t
- @param[in] cfg_ptr: ½á¹¹Ìå vsf_usart_cfg_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_usart_cfg_t
- @return vsf_err_t: Èç¹û usart ³õÊ¼»¯Íê³É·µ»Ø VSF_ERR_NONE , ·ñÔò·µ»Ø¸ºÊı¡£
+ @brief åˆå§‹åŒ–ä¸€ä¸ª usart å®ä¾‹
+ @param[in] usart_ptr: ç»“æ„ä½“ vsf_usart_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_usart_t
+ @param[in] cfg_ptr: ç»“æ„ä½“ vsf_usart_cfg_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_usart_cfg_t
+ @return vsf_err_t: å¦‚æœ usart åˆå§‹åŒ–æˆåŠŸè¿”å› VSF_ERR_NONE , å¤±è´¥è¿”å›è´Ÿæ•°ã€‚
+
+ @note å¤±è´¥åä¸éœ€è¦è°ƒç”¨ vsf_usart_fini() ååˆå§‹åŒ–ã€‚
+       vsf_usart_init() åº”è¯¥åœ¨é™¤ vsf_usart_capability() ä¹‹å¤–çš„å…¶ä»– usart API ä¹‹å‰è°ƒç”¨ã€‚
  */
 extern vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr);
 
@@ -279,10 +345,10 @@ extern void vsf_usart_fini(vsf_usart_t *usart_ptr);
  @return none.
 
  \~chinese
- @brief Ê¹ÄÜ usart ÊµÀıµÄÖĞ¶Ï
- @param[in] usart_ptr: ½á¹¹Ìå vsf_usart_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_usart_t
- @param[in] irq_mask: Ò»¸ö»òÕß¶à¸öÃ¶¾Ù vsf_usart_irq_mask_t µÄÖµµÄ°´Î»»ò£¬@ref vsf_usart_irq_mask_t
- @return ÎŞ¡£
+ @brief ä½¿èƒ½ usart å®ä¾‹çš„ä¸­æ–­
+ @param[in] usart_ptr: ç»“æ„ä½“ vsf_usart_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_usart_t
+ @param[in] irq_mask: ä¸€ä¸ªæˆ–è€…å¤šä¸ªæšä¸¾ vsf_usart_irq_mask_t çš„å€¼çš„æŒ‰ä½æˆ–ï¼Œ@ref vsf_usart_irq_mask_t
+ @return æ— ã€‚
  */
 extern fsm_rt_t vsf_usart_enable(vsf_usart_t *usart_ptr);
 
@@ -294,10 +360,10 @@ extern fsm_rt_t vsf_usart_enable(vsf_usart_t *usart_ptr);
  @return none.
 
  \~chinese
- @brief ½ûÄÜ usart ÊµÀıµÄÖĞ¶Ï
- @param[in] usart_ptr: ½á¹¹Ìå vsf_usart_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_usart_t
- @param[in] irq_mask: Ò»¸ö»òÕß¶à¸öÃ¶¾Ù vsf_usart_irq_mask_t µÄÖµµÄ°´Î»»ò£¬@ref vsf_usart_irq_mask_t
- @return ÎŞ¡£
+ @brief ç¦èƒ½ usart å®ä¾‹çš„ä¸­æ–­
+ @param[in] usart_ptr: ç»“æ„ä½“ vsf_usart_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_usart_t
+ @param[in] irq_mask: ä¸€ä¸ªæˆ–è€…å¤šä¸ªæšä¸¾ vsf_usart_irq_mask_t çš„å€¼çš„æŒ‰ä½æˆ–ï¼Œ@ref vsf_usart_irq_mask_t
+ @return æ— ã€‚
  */
 extern fsm_rt_t vsf_usart_disable(vsf_usart_t *usart_ptr);
 
@@ -309,10 +375,10 @@ extern fsm_rt_t vsf_usart_disable(vsf_usart_t *usart_ptr);
  @return none.
 
  \~chinese
- @brief Ê¹ÄÜ usart ÊµÀıµÄÖĞ¶Ï
- @param[in] usart_ptr: ½á¹¹Ìå vsf_usart_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_usart_t
- @param[in] irq_mask: Ò»¸ö»òÕß¶à¸öÃ¶¾Ù vsf_usart_irq_mask_t µÄÖµµÄ°´Î»»ò£¬@ref vsf_usart_irq_mask_t
- @return ÎŞ¡£
+ @brief ä½¿èƒ½ usart å®ä¾‹çš„ä¸­æ–­
+ @param[in] usart_ptr: ç»“æ„ä½“ vsf_usart_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_usart_t
+ @param[in] irq_mask: ä¸€ä¸ªæˆ–è€…å¤šä¸ªæšä¸¾ vsf_usart_irq_mask_t çš„å€¼çš„æŒ‰ä½æˆ–ï¼Œ@ref vsf_usart_irq_mask_t
+ @return æ— ã€‚
  */
 extern void vsf_usart_irq_enable(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask);
 
@@ -324,10 +390,10 @@ extern void vsf_usart_irq_enable(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t ir
  @return none.
 
  \~chinese
- @brief ½ûÄÜ usart ÊµÀıµÄÖĞ¶Ï
- @param[in] usart_ptr: ½á¹¹Ìå vsf_usart_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_usart_t
- @param[in] irq_mask: Ò»¸ö»òÕß¶à¸öÃ¶¾Ù vsf_usart_irq_mask_t µÄÖµµÄ°´Î»»ò£¬@ref vsf_usart_irq_mask_t
- @return ÎŞ¡£
+ @brief ç¦èƒ½ usart å®ä¾‹çš„ä¸­æ–­
+ @param[in] usart_ptr: ç»“æ„ä½“ vsf_usart_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_usart_t
+ @param[in] irq_mask: ä¸€ä¸ªæˆ–è€…å¤šä¸ªæšä¸¾ vsf_usart_irq_mask_t çš„å€¼çš„æŒ‰ä½æˆ–ï¼Œ@ref vsf_usart_irq_mask_t
+ @return æ— ã€‚
  */
 extern void vsf_usart_irq_disable(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask);
 
@@ -338,9 +404,9 @@ extern void vsf_usart_irq_disable(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t i
  @return vsf_usart_status_t: return all status of current usart
 
  \~chinese
- @brief »ñÈ¡ usart ÊµÀıµÄ×´Ì¬
- @param[in] usart_ptr: ½á¹¹Ìå vsf_usart_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_usart_t
- @return vsf_usart_status_t: ·µ»Øµ±Ç° usart µÄËùÓĞ×´Ì¬
+ @brief è·å– usart å®ä¾‹çš„çŠ¶æ€
+ @param[in] usart_ptr: ç»“æ„ä½“ vsf_usart_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_usart_t
+ @return vsf_usart_status_t: è¿”å›å½“å‰ usart çš„æ‰€æœ‰çŠ¶æ€
  */
 extern vsf_usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr);
 
@@ -351,9 +417,9 @@ extern vsf_usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr);
  @return vsf_usart_capability_t: return all capability of current usart @ref vsf_usart_capability_t
 
  \~chinese
- @brief »ñÈ¡ usart ÊµÀıµÄÄÜÁ¦
- @param[in] usart_ptr: ½á¹¹Ìå vsf_usart_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_usart_t
- @return vsf_usart_capability_t: ·µ»Øµ±Ç° usart µÄËùÓĞÄÜÁ¦ @ref vsf_usart_capability_t
+ @brief è·å– usart å®ä¾‹çš„èƒ½åŠ›
+ @param[in] usart_ptr: ç»“æ„ä½“ vsf_usart_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_usart_t
+ @return vsf_usart_capability_t: è¿”å›å½“å‰ usart çš„æ‰€æœ‰èƒ½åŠ› @ref vsf_usart_capability_t
  */
 extern vsf_usart_capability_t vsf_usart_capability(vsf_usart_t *usart_ptr);
 
@@ -364,9 +430,9 @@ extern vsf_usart_capability_t vsf_usart_capability(vsf_usart_t *usart_ptr);
  @return vsf_usart_capability_t: return all capability of current usart @ref vsf_usart_capability_t
 
  \~chinese
- @brief »ñÈ¡ usart ½ÓÊÕ¶ÓÁĞÀïµ±Ç°ÊÕµ½µÄÊı¾İµÄ¸öÊı
- @param[in] usart_ptr: ½á¹¹Ìå vsf_usart_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_usart_t
- @return uint_fast16_t: ·µ»Øµ±Ç° usart ½ÓÊÕ¶ÓÁĞµÄÊı¾İµÄ¸öÊı
+ @brief è·å– usart æ¥æ”¶é˜Ÿåˆ—é‡Œå½“å‰æ”¶åˆ°çš„æ•°æ®çš„ä¸ªæ•°
+ @param[in] usart_ptr: ç»“æ„ä½“ vsf_usart_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_usart_t
+ @return uint_fast16_t: è¿”å›å½“å‰ usart æ¥æ”¶é˜Ÿåˆ—çš„æ•°æ®çš„ä¸ªæ•°
  */
 extern uint_fast16_t vsf_usart_rxfifo_get_data_count(vsf_usart_t *usart_ptr);
 
@@ -379,11 +445,11 @@ extern uint_fast16_t vsf_usart_rxfifo_get_data_count(vsf_usart_t *usart_ptr);
  @return uint_fast16_t: return the actual number of reads from the current usart receive fifo
 
  \~chinese
- @brief ³¢ÊÔ´Ó usart ½ÓÊÕ¶ÓÁĞÀï¶ÁÈ¡Ö¸¶¨×î´ó³¤¶ÈµÄÊı¾İ
- @param[in] usart_ptr: ½á¹¹Ìå vsf_usart_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_usart_t
- @param[in] buffer_ptr: Êı¾İ»º³åÇø
- @param[in] count: ×î´ó¶ÁÈ¡ÊıÁ¿
- @return uint_fast16_t: ·µ»Øµ±Ç° usart ½ÓÊÕ¶ÓÁĞµÄÊµ¼Ê¶Áµ½µÄÊıÁ¿
+ @brief å°è¯•ä» usart æ¥æ”¶é˜Ÿåˆ—é‡Œè¯»å–æŒ‡å®šæœ€å¤§é•¿åº¦çš„æ•°æ®
+ @param[in] usart_ptr: ç»“æ„ä½“ vsf_usart_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_usart_t
+ @param[in] buffer_ptr: æ•°æ®ç¼“å†²åŒº
+ @param[in] count: æœ€å¤§è¯»å–æ•°é‡
+ @return uint_fast16_t: è¿”å›å½“å‰ usart æ¥æ”¶é˜Ÿåˆ—çš„å®é™…è¯»åˆ°çš„æ•°é‡
  */
 extern uint_fast16_t vsf_usart_rxfifo_read(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count);
 
@@ -397,12 +463,12 @@ extern uint_fast16_t vsf_usart_rxfifo_read(vsf_usart_t *usart_ptr, void *buffer_
         2. Both data register and shift register are empty
 
  \~chinese
- @brief »ñÈ¡ usart ·¢ËÍ¶ÓÁĞµÄ×î´ó¿É·¢ËÍÊı¾İµÄ¸öÊı
- @param[in] usart_ptr: ½á¹¹Ìå vsf_usart_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_usart_t
- @return uint_fast16_t: ·µ»Øµ±Ç° usart ·¢ËÍ¶ÓÁĞµÄ×î´ó¿É·¢ËÍÊı¾İµÄ¸öÊı
- @note ²¿·ÖusartÃ»ÓĞfifo£¬»òÕßÓĞfifoµ«ÊÇÎŞ·¨»ñÈ¡fifoµÄÊıÁ¿£¬¿ÉÒÔ·µ»Ø1~2<br>
-        1. Êı¾İ¼Ä´æÆ÷Îª¿Õ£¬µ«ÊÇÒÆÎ»¼Ä´æÆ÷²»Îª¿Õ<br>
-        2. Êı¾İ¼Ä´æÆ÷ºÍÒÆÎ»¼Ä´æÆ÷¶¼Îª¿Õ
+ @brief è·å– usart å‘é€é˜Ÿåˆ—çš„æœ€å¤§å¯å‘é€æ•°æ®çš„ä¸ªæ•°
+ @param[in] usart_ptr: ç»“æ„ä½“ vsf_usart_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_usart_t
+ @return uint_fast16_t: è¿”å›å½“å‰ usart å‘é€é˜Ÿåˆ—çš„æœ€å¤§å¯å‘é€æ•°æ®çš„ä¸ªæ•°
+ @note éƒ¨åˆ†usartæ²¡æœ‰fifoï¼Œæˆ–è€…æœ‰fifoä½†æ˜¯æ— æ³•è·å–fifoçš„æ•°é‡ï¼Œå¯ä»¥è¿”å›1~2<br>
+        1. æ•°æ®å¯„å­˜å™¨ä¸ºç©ºï¼Œä½†æ˜¯ç§»ä½å¯„å­˜å™¨ä¸ä¸ºç©º<br>
+        2. æ•°æ®å¯„å­˜å™¨å’Œç§»ä½å¯„å­˜å™¨éƒ½ä¸ºç©º
  */
 extern uint_fast16_t vsf_usart_txfifo_get_free_count(vsf_usart_t *usart_ptr);
 
@@ -415,11 +481,11 @@ extern uint_fast16_t vsf_usart_txfifo_get_free_count(vsf_usart_t *usart_ptr);
  @return uint_fast16_t: return the actual number of writes to the current usart send queue
 
  \~chinese
- @brief ³¢ÊÔ´Ó usart ·¢ËÍ¶ÓÁĞÀïĞ´ÈëÖ¸¶¨×î´ó³¤¶ÈµÄÊı¾İ
- @param[in] usart_ptr: ½á¹¹Ìå vsf_usart_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_usart_t
- @param[in] buffer_ptr: Êı¾İ»º³åÇø
- @param[in] count: ×î´ó¶ÁÈ¡ÊıÁ¿
- @return uint_fast16_t: ·µ»Øµ±Ç° usart ½ÓÊÕ¶ÓÁĞµÄÊµ¼Ê¶Áµ½µÄÊıÁ¿
+ @brief å°è¯•ä» usart å‘é€é˜Ÿåˆ—é‡Œå†™å…¥æŒ‡å®šæœ€å¤§é•¿åº¦çš„æ•°æ®
+ @param[in] usart_ptr: ç»“æ„ä½“ vsf_usart_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_usart_t
+ @param[in] buffer_ptr: æ•°æ®ç¼“å†²åŒº
+ @param[in] count: æœ€å¤§è¯»å–æ•°é‡
+ @return uint_fast16_t: è¿”å›å½“å‰ usart æ¥æ”¶é˜Ÿåˆ—çš„å®é™…è¯»åˆ°çš„æ•°é‡
  */
 extern uint_fast16_t vsf_usart_txfifo_write(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count);
 
@@ -432,11 +498,11 @@ extern uint_fast16_t vsf_usart_txfifo_write(vsf_usart_t *usart_ptr, void *buffer
  @return vsf_err_t: VSF_ERR_NONE if the usart request was successfully, or a negative error code
 
  \~chinese
- @brief usart ÇëÇó½ÓÊÕÖ¸¶¨³¤¶ÈµÄÊı¾İ
- @param[in] usart_ptr: ½á¹¹Ìå vsf_usart_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_usart_t
- @param[in] buffer_ptr: Êı¾İ»º³åÇø
- @param[in] count: ÇëÇóÊı¾İµÄÊıÁ¿
- @return vsf_err_t: Èç¹û usart ÇëÇó³É¹¦·µ»Ø VSF_ERR_NONE , ·ñÔò·µ»Ø¸ºÊı¡£
+ @brief usart è¯·æ±‚æ¥æ”¶æŒ‡å®šé•¿åº¦çš„æ•°æ®
+ @param[in] usart_ptr: ç»“æ„ä½“ vsf_usart_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_usart_t
+ @param[in] buffer_ptr: æ•°æ®ç¼“å†²åŒº
+ @param[in] count: è¯·æ±‚æ•°æ®çš„æ•°é‡
+ @return vsf_err_t: å¦‚æœ usart è¯·æ±‚æˆåŠŸè¿”å› VSF_ERR_NONE , å¦åˆ™è¿”å›è´Ÿæ•°ã€‚
  */
 extern vsf_err_t vsf_usart_request_rx(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count);
 
@@ -450,12 +516,12 @@ extern vsf_err_t vsf_usart_request_rx(vsf_usart_t *usart_ptr, void *buffer_ptr, 
  @note: The request interface is usually implemented via DMA.
 
  \~chinese
- @brief usart ÇëÇó·¢ËÍÖ¸¶¨³¤¶ÈµÄÊı¾İ
- @param[in] usart_ptr: ½á¹¹Ìå vsf_usart_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_usart_t
- @param[in] buffer_ptr: Êı¾İ»º³åÇø
- @param[in] count: ÇëÇóÊı¾İµÄÊıÁ¿
- @return vsf_err_t: Èç¹û usart ÇëÇó³É¹¦·µ»Ø VSF_ERR_NONE , ·ñÔò·µ»Ø¸ºÊı¡£
- @note: ÇëÇó½Ó¿ÚÍ¨³£ÊÇÍ¨¹ı DMA À´ÊµÏÖ¡£
+ @brief usart è¯·æ±‚å‘é€æŒ‡å®šé•¿åº¦çš„æ•°æ®
+ @param[in] usart_ptr: ç»“æ„ä½“ vsf_usart_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_usart_t
+ @param[in] buffer_ptr: æ•°æ®ç¼“å†²åŒº
+ @param[in] count: è¯·æ±‚æ•°æ®çš„æ•°é‡
+ @return vsf_err_t: å¦‚æœ usart è¯·æ±‚æˆåŠŸè¿”å› VSF_ERR_NONE , å¦åˆ™è¿”å›è´Ÿæ•°ã€‚
+ @note: è¯·æ±‚æ¥å£é€šå¸¸æ˜¯é€šè¿‡ DMA æ¥å®ç°ã€‚
  */
 extern vsf_err_t vsf_usart_request_tx(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count);
 
@@ -467,8 +533,8 @@ extern vsf_err_t vsf_usart_request_tx(vsf_usart_t *usart_ptr, void *buffer_ptr, 
  @note: The request interface is usually implemented via DMA.
 
  \~chinese
- @brief È¡Ïûµ±Ç°½ÓÊÕÇëÇó
- @return vsf_err_t: Èç¹û usart ÇëÇó³É¹¦·µ»Ø VSF_ERR_NONE , ·ñÔò·µ»Ø¸ºÊı¡£
+ @brief å–æ¶ˆå½“å‰æ¥æ”¶è¯·æ±‚
+ @return vsf_err_t: å¦‚æœ usart è¯·æ±‚æˆåŠŸè¿”å› VSF_ERR_NONE , å¦åˆ™è¿”å›è´Ÿæ•°ã€‚
  */
 extern vsf_err_t vsf_usart_cancel_rx(vsf_usart_t *usart_ptr);
 
@@ -479,8 +545,8 @@ extern vsf_err_t vsf_usart_cancel_rx(vsf_usart_t *usart_ptr);
  @return vsf_err_t: VSF_ERR_NONE if the usart request was successfully, or a negative error code
 
  \~chinese
- @brief È¡Ïûµ±Ç°·¢ËÍÇëÇó
- @return vsf_err_t: Èç¹û usart ÇëÇó³É¹¦·µ»Ø VSF_ERR_NONE , ·ñÔò·µ»Ø¸ºÊı¡£
+ @brief å–æ¶ˆå½“å‰å‘é€è¯·æ±‚
+ @return vsf_err_t: å¦‚æœ usart è¯·æ±‚æˆåŠŸè¿”å› VSF_ERR_NONE , å¦åˆ™è¿”å›è´Ÿæ•°ã€‚
  */
 extern vsf_err_t vsf_usart_cancel_tx(vsf_usart_t *usart_ptr);
 
@@ -492,9 +558,9 @@ extern vsf_err_t vsf_usart_cancel_tx(vsf_usart_t *usart_ptr);
  @note: only valid until the current receive request is completed.
 
  \~chinese
- @brief »ñÈ¡½ÓÊÕÇëÇóÒÑ¾­½ÓÊÕµ½µÄÊıÁ¿
- @return int_fast32_t: ÒÑ¾­½ÓÊÕµ½µÄÊıÁ¿
- @note: Ö»ÔÚµ±Ç°½ÓÊÕÇëÇóÃ»Íê³ÉÖ®Ç°ÊÇÓĞĞ§µÄ¡£
+ @brief è·å–æ¥æ”¶è¯·æ±‚å·²ç»æ¥æ”¶åˆ°çš„æ•°é‡
+ @return int_fast32_t: å·²ç»æ¥æ”¶åˆ°çš„æ•°é‡
+ @note: åªåœ¨å½“å‰æ¥æ”¶è¯·æ±‚æ²¡å®Œæˆä¹‹å‰æ˜¯æœ‰æ•ˆçš„ã€‚
  */
 extern int_fast32_t vsf_usart_get_rx_count(vsf_usart_t *usart_ptr);
 
@@ -506,11 +572,31 @@ extern int_fast32_t vsf_usart_get_rx_count(vsf_usart_t *usart_ptr);
  @note: only valid until the current send request is completed.
 
  \~chinese
- @brief »ñÈ¡·¢ËÍÇëÇóÒÑ¾­·¢ËÍµ½µÄÊıÁ¿
- @return int_fast32_t: ÒÑ¾­·¢ËÍµ½µÄÊıÁ¿
- @note: Ö»ÔÚµ±Ç°·¢ËÍÇëÇóÃ»Íê³ÉÖ®Ç°ÊÇÓĞĞ§µÄ¡£
+ @brief è·å–å‘é€è¯·æ±‚å·²ç»å‘é€åˆ°çš„æ•°é‡
+ @return int_fast32_t: å·²ç»å‘é€åˆ°çš„æ•°é‡
+ @note: åªåœ¨å½“å‰å‘é€è¯·æ±‚æ²¡å®Œæˆä¹‹å‰æ˜¯æœ‰æ•ˆçš„ã€‚
  */
 extern int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart_ptr);
+
+/*============================ INLINE FUNCTIONS ==============================*/
+
+static inline uint8_t vsf_usart_mode_to_data_bits(vsf_usart_mode_t mode)
+{
+    switch (mode & VSF_USART_BIT_LENGTH_MASK) {
+    case VSF_USART_5_BIT_LENGTH:
+        return 5;
+    case VSF_USART_6_BIT_LENGTH:
+        return 6;
+    case VSF_USART_7_BIT_LENGTH:
+        return 7;
+    case VSF_USART_8_BIT_LENGTH:
+        return 8;
+    case VSF_USART_9_BIT_LENGTH:
+        return 9;
+    default:
+        return 0;
+    }
+}
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -518,6 +604,7 @@ extern int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart_ptr);
 #   define __vsf_usart_t                                 VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t)
 #   define vsf_usart_init(__USART, ...)                  VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_init)                  ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
 #   define vsf_usart_fini(__USART)                       VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fini)                  ((__vsf_usart_t *)__USART)
+#   define vsf_usart_capability(__USART)                 VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_capability)            ((__vsf_usart_t *)__USART)
 #   define vsf_usart_enable(__USART)                     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_enable)                ((__vsf_usart_t *)__USART)
 #   define vsf_usart_disable(__USART)                    VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_disable)               ((__vsf_usart_t *)__USART)
 #   define vsf_usart_irq_enable(__USART, ...)            VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_enable)            ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
