@@ -24,7 +24,10 @@
 #include "./vsf_template_gpio.h"
 #include "./vsf_template_adc.h"
 #include "./vsf_template_flash.h"
-#include "./vsf_template_i2c.h"
+
+#if defined(VSF_HAL_USE_I2C) && !defined(__VSF_TEMPLATE_I2C_H__)
+#   include "./vsf_template_i2c.h"
+#endif
 
 #if defined(VSF_HAL_USE_I2S) && !defined(__VSF_TEMPLATE_I2S_H__)
 #   include "./vsf_template_i2s.h"

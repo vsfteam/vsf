@@ -22,25 +22,34 @@
 /*============================ MACROS ========================================*/
 #if VSF_HAL_USE_I2C == ENABLED
 
-#define vsf_real_i2c_t          VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t)
-#define vsf_real_master_request VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)
-#define vsf_real_i2c_capability VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)
-
 #ifndef VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY
-#   define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY       DISABLED
+#   define  VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
 #endif
 
-#if VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
-#   ifndef VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_RESTART
-#       define VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_RESTART                1
+#if VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#   ifndef VSF_I2C_CFG_CAPABILITY_IRQ_MASK
+#       define VSF_I2C_CFG_CAPABILITY_IRQ_MASK                  VSF_I2C_IRQ_ALL_BITS_MASK
 #   endif
-#   ifndef VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_MANUAL_START_STOP
-#       define VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_MANUAL_START_STOP      1
+#   ifndef VSF_I2C_CFG_CAPABILITY_SUPPORT_NO_START
+#       define VSF_I2C_CFG_CAPABILITY_SUPPORT_NO_START          1
+#   endif
+#   ifndef VSF_I2C_CFG_CAPABILITY_SUPPORT_NO_STOP_RESTART
+#       define VSF_I2C_CFG_CAPABILITY_SUPPORT_NO_STOP_RESTART   1
+#   endif
+#   ifndef VSF_I2C_CFG_CAPABILITY_SUPPORT_RESTART
+#       define VSF_I2C_CFG_CAPABILITY_SUPPORT_RESTART           1
 #   endif
 #   ifndef VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE
-#       define VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE                 0xFFFF
+#       define VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE         0xFFFF
+#   endif
+#   ifndef VSF_I2C_CFG_CAPABILITY_MIN_TRANSFER_SIZE
+#       define VSF_I2C_CFG_CAPABILITY_MIN_TRANSFER_SIZE         0
 #   endif
 #endif
+
+#define vsf_real_i2c_t              VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t)
+#define vsf_real_master_request     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)
+#define vsf_real_i2c_capability     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -54,31 +63,57 @@ vsf_err_t vsf_real_i2c_master_request(vsf_real_i2c_t *i2c_ptr, uint16_t address,
 }
 #endif
 
-#if VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+#if VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
 vsf_i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
 {
     vsf_i2c_capability_t i2c_capability = {
-        .is_support_restart = VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_RESTART,
-        .is_support_manual_start_stop = VSF_I2C_CFG_CAPABILITY_IS_SUPPORT_MANUAL_START_STOP,
-        .max_transfer_size = VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE,
+        .irq_mask                   = VSF_I2C_CFG_CAPABILITY_IRQ_MASK,
+        .support_no_start           = VSF_I2C_CFG_CAPABILITY_SUPPORT_NO_START,
+        .support_no_stop_restart    = VSF_I2C_CFG_CAPABILITY_SUPPORT_NO_STOP_RESTART,
+        .support_restart            = VSF_I2C_CFG_CAPABILITY_SUPPORT_RESTART,
+        .max_transfer_size          = VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE,
+        .min_transfer_size          = VSF_I2C_CFG_CAPABILITY_MIN_TRANSFER_SIZE,
     };
+
     return i2c_capability;
 }
 #endif
 
+/*============================ MACROS ========================================*/
+
+#undef VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_I2C_CFG_CAPABILITY_IRQ_MASK
+#undef VSF_I2C_CFG_CAPABILITY_SUPPORT_NO_START
+#undef VSF_I2C_CFG_CAPABILITY_SUPPORT_NO_STOP_RESTART
+#undef VSF_I2C_CFG_CAPABILITY_SUPPORT_RESTART
+#undef VSF_I2C_CFG_CAPABILITY_MAX_TRANSFER_SIZE
+#undef VSF_I2C_CFG_CAPABILITY_MIN_TRANSFER_SIZE
+
+#undef vsf_real_i2c_t
+#undef vsf_real_i2c_capability
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _i2c
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _I2C
+#define VSF_HAL_TEMPLATE_IMP_NAME                     _i2c
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _I2C
 
 #ifndef VSF_I2C_CFG_IMP_PREFIX
 #   error "Please define VSF_I2C_CFG_IMP_PREFIX in i2c driver"
 #endif
 
 #ifndef VSF_I2C_CFG_IMP_UPCASE_PREFIX
-#   error "Please define VSF_I2C_CFG_IMP_UPCASE_PREFIX    in i2c driver"
+#   error "Please define VSF_I2C_CFG_IMP_UPCASE_PREFIX in i2c driver"
+#endif
+
+#ifndef VSF_I2C_CFG_IMP_INSTANCE_PREFIX
+#   define VSF_I2C_CFG_IMP_INSTANCE_PREFIX         VSF_I2C_CFG_IMP_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
 
-#endif // VSF_HAL_USE_I2C == ENABLED
+#undef VSF_I2C_CFG_IMP_PREFIX
+#undef VSF_I2C_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_I2C_CFG_IMP_UPCASE_PREFIX
+#undef VSF_I2C_CFG_IMP_LV0
+
+#endif  /* VSF_HAL_USE_I2C */
