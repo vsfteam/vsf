@@ -31,7 +31,10 @@
 #include "./vsf_template_pwm.h"
 #include "./vsf_template_rng.h"
 #include "./vsf_template_rtc.h"
-#include "./vsf_template_spi.h"
+
+#if defined(VSF_HAL_USE_SPI) && !defined(__VSF_TEMPLATE_SPI_H__)
+#   include "./vsf_template_spi.h"
+#endif
 
 #if defined(VSF_HAL_USE_TIMER) && !defined(__VSF_TEMPLATE_TIMER_H__)
 #   include "./vsf_template_timer.h"

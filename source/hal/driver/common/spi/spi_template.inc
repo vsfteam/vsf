@@ -29,45 +29,81 @@
 #define vsf_real_spi_t          VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t)
 #define vsf_real_spi_capability VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_capability)
 
-#if VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
-#   ifndef VSF_SPI_CFG_CAPABILITY_IS_SUPPORT_AUTO_CS
-#       define VSF_SPI_CFG_CAPABILITY_IS_SUPPORT_AUTO_CS                1
+#ifndef VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY
+#   define  VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#endif
+
+#if VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#   ifndef VSF_SPI_CFG_CAPABILITY_SUPPORT_AUTO_CS
+#       define VSF_SPI_CFG_CAPABILITY_SUPPORT_AUTO_CS                   1
+#   endif
+#   ifndef VSF_SPI_CFG_CAPABILITY_SUPPORT_MANUAL_CS
+#       define VSF_SPI_CFG_CAPABILITY_SUPPORT_MANUAL_CS                 1
 #   endif
 #   ifndef VSF_SPI_CFG_CAPABILITY_CS_COUNT
 #       define VSF_SPI_CFG_CAPABILITY_CS_COUNT                          1
 #   endif
+#   ifndef VSF_SPI_CFG_CAPABILITY_MAX_CLOCK_HZ
+#       define VSF_SPI_CFG_CAPABILITY_MAX_CLOCK_HZ                      0xFFFFFFFF
+#   endif
+#   ifndef VSF_SPI_CFG_CAPABILITY_MIN_CLOCK_HZ
+#       define VSF_SPI_CFG_CAPABILITY_MIN_CLOCK_HZ                      1
+#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
-/*============================ PROTOTYPES ====================================*/
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ IMPLEMENTATION ================================*/
 
-#if VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+#if VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
 vsf_spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
 {
     vsf_spi_capability_t spi_capability = {
-        .is_auto_cs = VSF_SPI_CFG_CAPABILITY_IS_SUPPORT_AUTO_CS,
-        .cs_count = VSF_SPI_CFG_CAPABILITY_CS_COUNT,
+        .support_auto_cs    = VSF_SPI_CFG_CAPABILITY_SUPPORT_AUTO_CS,
+        .support_manual_cs  = VSF_SPI_CFG_CAPABILITY_SUPPORT_MANUAL_CS,
+        .cs_count           = VSF_SPI_CFG_CAPABILITY_CS_COUNT,
+        .max_clock_hz       = VSF_SPI_CFG_CAPABILITY_MAX_CLOCK_HZ,
+        .min_clock_hz       = VSF_SPI_CFG_CAPABILITY_MIN_CLOCK_HZ,
     };
 
     return spi_capability;
 }
 #endif
 
+/*============================ MACROS ========================================*/
+
+#undef VSF_SPI_CFG_CAPABILITY_SUPPORT_AUTO_CS
+#undef VSF_SPI_CFG_CAPABILITY_SUPPORT_MANUAL_CS
+#undef VSF_SPI_CFG_CAPABILITY_CS_COUNT
+#undef VSF_SPI_CFG_CAPABILITY_MAX_CLOCK_HZ
+#undef VSF_SPI_CFG_CAPABILITY_MIN_CLOCK_HZ
+#undef vsf_real_spi_t
+#undef vsf_real_spi_capability
+
+/*============================ PROTOTYPES ====================================*/
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ IMPLEMENTATION ================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _spi
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _SPI
+#define VSF_HAL_TEMPLATE_IMP_NAME                     _spi
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _SPI
 
 #ifndef VSF_SPI_CFG_IMP_PREFIX
 #   error "Please define VSF_SPI_CFG_IMP_PREFIX in spi driver"
 #endif
 
-#ifndef VSF_SPI_CFG_IMP_UPCASE_PREFIX   
-#   error "Please define VSF_SPI_CFG_IMP_UPCASE_PREFIX    in spi driver"
+#ifndef VSF_SPI_CFG_IMP_UPCASE_PREFIX
+#   error "Please define VSF_SPI_CFG_IMP_UPCASE_PREFIX in spi driver"
+#endif
+
+#ifndef VSF_SPI_CFG_IMP_INSTANCE_PREFIX
+#   define VSF_SPI_CFG_IMP_INSTANCE_PREFIX         VSF_SPI_CFG_IMP_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
 
-#endif // VSF_HAL_USE_SPI == ENABLED
+#undef VSF_SPI_CFG_IMP_PREFIX
+#undef VSF_SPI_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_SPI_CFG_IMP_UPCASE_PREFIX
+#undef VSF_SPI_CFG_IMP_LV0
+
+#endif  /* VSF_HAL_USE_SPI */
+

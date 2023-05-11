@@ -39,16 +39,11 @@
 typedef enum vsf_spi_mode_t {
     VSF_SPI_SLAVE                        = 0x00ul << 11,
     VSF_SPI_MASTER                       = 0x01ul << 11,
-    VSF_SPI_DIR_MODE_MASK                = VSF_SPI_SLAVE | VSF_SPI_MASTER,
 
     VSF_SPI_CLOCK_MODE_0                 = ((0x01ul << 0) |(0x01ul << 1) | (0x00ul << 13)),
     VSF_SPI_CLOCK_MODE_1                 = ((0x00ul << 0) |(0x00ul << 1) | (0x00ul << 13)),
     VSF_SPI_CLOCK_MODE_2                 = ((0x01ul << 0) |(0x01ul << 1) | (0x01ul << 13)),
     VSF_SPI_CLOCK_MODE_3                 = ((0x00ul << 0) |(0x00ul << 1) | (0x01ul << 13)),
-    VSF_SPI_CLOCK_MODE_MASK              = VSF_SPI_CLOCK_MODE_0 |
-                                           VSF_SPI_CLOCK_MODE_1 |
-                                           VSF_SPI_CLOCK_MODE_2 |
-                                           VSF_SPI_CLOCK_MODE_3,
 
     VSF_SPI_DATASIZE_BIT_OFFSET          = 2,
     VSF_SPI_DATASIZE_DIFF                = 0,
@@ -87,27 +82,29 @@ typedef enum vsf_spi_mode_t {
 
     VSF_SPI_AUTO_CS_DISABLE              = 0x01ul << 8,
     VSF_SPI_AUTO_CS_ENABLE               = 0x00ul << 8,
-    VSF_SPI_AUTO_CS_MASK                 = VSF_SPI_AUTO_CS_DISABLE | VSF_SPI_AUTO_CS_ENABLE,
 
     VSF_SPI_MSB_FIRST                    = 0x00ul << 9,
     VSF_SPI_LSB_FIRST                    = 0x01ul << 9,
-    VSF_SPI_BIT_ORDER_MASK               = VSF_SPI_MSB_FIRST | VSF_SPI_LSB_FIRST,
 
+    __SPI_HW_MODE_MASK                   = VSF_SPI_SLAVE |
+                                           VSF_SPI_MASTER |
+                                           VSF_SPI_CLOCK_MODE_0 |
+                                           VSF_SPI_CLOCK_MODE_1 |
+                                           VSF_SPI_CLOCK_MODE_2 |
+                                           VSF_SPI_CLOCK_MODE_3 |
+                                           VSF_SPI_AUTO_CS_DISABLE |
+                                           VSF_SPI_AUTO_CS_ENABLE |
+                                           VSF_SPI_MSB_FIRST |
+                                           VSF_SPI_LSB_FIRST |
+                                           __AIC8800_VSF_SPI_DATASIZE_MASK,
 
-    __SPI_HW_MODE_MASK                   = VSF_SPI_DIR_MODE_MASK |
-                                           VSF_SPI_CLOCK_MODE_MASK |
-                                           VSF_SPI_BIT_ORDER_MASK |
-                                           VSF_SPI_AUTO_CS_MASK,
-
+    // unsupporte mode
     VSF_SPI_DATASIZE_4                   = 0x04ul << 16,      //!< datasize is 8 bits
     VSF_SPI_DATASIZE_5                   = 0x05ul << 16,
     VSF_SPI_DATASIZE_6                   = 0x06ul << 16,
     VSF_SPI_DATASIZE_7                   = 0x07ul << 16,
 
-    VSF_SPI_DATASIZE_MASK                = VSF_SPI_DATASIZE_4  | VSF_SPI_DATASIZE_5  | VSF_SPI_DATASIZE_6  | VSF_SPI_DATASIZE_7 |
-                                           __AIC8800_VSF_SPI_DATASIZE_MASK,
-
-    VSF_SPI_MODE_ALL_BITS_MASK           = __SPI_HW_MODE_MASK | VSF_SPI_DATASIZE_MASK,
+    VSF_SPI_LOOP_BACK                    = 0x01ul << 19,
 } vsf_spi_mode_t;
 
 /*============================ INCLUDES ======================================*/

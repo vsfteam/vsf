@@ -15,14 +15,9 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_SPI_CFG_IMP_PREFIX                      vsf_fifo2req
-#define VSF_SPI_CFG_IMP_UPCASE_PREFIX               VSF_FIFO2REQ
-#define VSF_SPI_CFG_IMP_EXTERN_OP                   ENABLED
-
-#define __VSF_HAL_USE_FIFO2REQ_SPI_CLASS_IMPLEMENT  ENABLED
-
 /*============================ INCLUDES ======================================*/
 
+#define __VSF_HAL_USE_FIFO2REQ_SPI_CLASS_IMPLEMENT  ENABLED
 #include "hal/vsf_hal_cfg.h"
 
 #if VSF_HAL_USE_SPI == ENABLED
@@ -36,6 +31,8 @@
 #   undef VSF_SPI_CFG_IMP_PREFIX
 #   define VSF_SPI_CFG_IMP_PREFIX                   VSF_FIFO2REQ_SPI_CFG_CALL_PREFIX
 #endif
+
+#define VSF_SPI_IMP_DEC_EXTERN_OP                   ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -57,8 +54,9 @@ static void __vsf_fifo2req_spi_isr_handler(void * target_ptr, vsf_spi_t *spi_ptr
         irq_mask &= ~VSF_SPI_IRQ_MASK_RX;
         if (fifo2req_spi_ptr->in.offset < fifo2req_spi_ptr->in.cnt) {
             vsf_spi_fifo_transfer(fifo2req_spi_ptr->spi,
-                                  NULL, 0, NULL,
-                                  fifo2req_spi_ptr->in.buffer_ptr, fifo2req_spi_ptr->in.cnt, &fifo2req_spi_ptr->in.offset);
+                                  NULL, NULL,
+                                  fifo2req_spi_ptr->in.buffer_ptr, &fifo2req_spi_ptr->in.offset,
+                                  fifo2req_spi_ptr->in.cnt);
         }
 
         if (fifo2req_spi_ptr->in.offset >= fifo2req_spi_ptr->in.cnt) {
@@ -72,8 +70,9 @@ static void __vsf_fifo2req_spi_isr_handler(void * target_ptr, vsf_spi_t *spi_ptr
         irq_mask &= ~VSF_SPI_IRQ_MASK_TX;
         if (fifo2req_spi_ptr->out.offset < fifo2req_spi_ptr->out.cnt) {
             vsf_spi_fifo_transfer(fifo2req_spi_ptr->spi,
-                                  fifo2req_spi_ptr->out.buffer_ptr, fifo2req_spi_ptr->out.cnt, &fifo2req_spi_ptr->out.offset,
-                                  NULL, 0, NULL);
+                                  fifo2req_spi_ptr->out.buffer_ptr, &fifo2req_spi_ptr->out.offset,
+                                  NULL, NULL,
+                                  fifo2req_spi_ptr->out.cnt);
         }
 
         if (fifo2req_spi_ptr->out.offset >= fifo2req_spi_ptr->out.cnt) {
@@ -188,11 +187,10 @@ void vsf_fifo2req_spi_cs_inactive(vsf_fifo2req_spi_t *fifo2req_spi_ptr, uint_fas
 
 void vsf_fifo2req_spi_fifo_transfer(vsf_fifo2req_spi_t *fifo2req_spi_ptr,
                            void *out_buffer_ptr,
-                           uint_fast32_t  out_cnt,
                            uint_fast32_t* out_offset_ptr,
                            void *in_buffer_ptr,
-                           uint_fast32_t  in_cnt,
-                           uint_fast32_t* in_offset_ptr)
+                           uint_fast32_t* in_offset_ptr,
+                           uint_fast32_t  out_cnt)
 {
     VSF_HAL_ASSERT(fifo2req_spi_ptr != NULL);
     VSF_HAL_ASSERT(fifo2req_spi_ptr->spi != NULL);
@@ -257,7 +255,10 @@ vsf_spi_capability_t vsf_fifo2req_spi_capability(vsf_fifo2req_spi_t *fifo2req_sp
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-#define VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
+#define VSF_SPI_CFG_IMP_PREFIX                      vsf_fifo2req
+#define VSF_SPI_CFG_IMP_UPCASE_PREFIX               VSF_FIFO2REQ
+#define VSF_SPI_CFG_IMP_EXTERN_OP                   ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY      DISABLED
 #include "hal/driver/common/spi/spi_template.inc"
 
 

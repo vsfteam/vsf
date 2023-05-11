@@ -21,19 +21,24 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _spi
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _SPI
+#define VSF_HAL_TEMPLATE_DEC_NAME                     _spi
+#define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _SPI
 
 #ifndef VSF_SPI_CFG_DEC_PREFIX
 #   error "Please define VSF_SPI_CFG_DEC_PREFIX when using vsf_template_spi.h"
 #endif
 
+#ifndef VSF_SPI_CFG_DEC_INSTANCE_PREFIX
+#   define VSF_SPI_CFG_DEC_INSTANCE_PREFIX         VSF_SPI_CFG_DEC_PREFIX
+#endif
+
 #ifdef VSF_SPI_CFG_DEC_UPCASE_PREFIX
-#   define __VSF_HAL_TEMPLATE_UPCASE_PREFIX         VSF_SPI_CFG_DEC_UPCASE_PREFIX
+#   define VSF_HAL_TEMPLATE_DEC_UPCASE_PREFIX       VSF_SPI_CFG_DEC_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_declaration.h"
 
 #undef VSF_SPI_CFG_DEC_PREFIX
+#undef VSF_SPI_CFG_DEC_INSTANCE_PREFIX
 #undef VSF_SPI_CFG_DEC_UPCASE_PREFIX
 

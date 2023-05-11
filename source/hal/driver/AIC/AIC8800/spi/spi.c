@@ -235,11 +235,11 @@ static vsf_err_t __hw_spi_is_recv_emtpy(vsf_hw_spi_t *hw_spi_ptr)
 
 void vsf_hw_spi_fifo_transfer(vsf_hw_spi_t *hw_spi_ptr,
                               void *out_buffer_ptr,
-                              uint_fast32_t out_cnt,
                               uint_fast32_t* out_offset_ptr,
                               void *in_buffer_ptr,
-                              uint_fast32_t in_cnt,
-                              uint_fast32_t* in_offset_ptr)
+                              uint_fast32_t* in_offset_ptr,
+                              uint_fast32_t cnt)
+
 {
     VSF_HAL_ASSERT(0);
 
@@ -494,6 +494,21 @@ void vsf_hw_spi_get_transferred_count(vsf_hw_spi_t *hw_spi_ptr, uint_fast32_t * 
     if (rx_count != NULL) {
         *rx_count = hw_spi_ptr->request.recv.offset;
     }
+}
+
+vsf_spi_capability_t vsf_hw_spi_capability(vsf_hw_spi_t *spi_ptr)
+{
+    uint32_t pclk = sysctrl_clock_get(SYS_PCLK);
+
+    vsf_spi_capability_t spi_capability = {
+        .support_auto_cs = 1,
+        .support_manual_cs = 1,
+        .cs_count = 1,
+        .max_clock_hz = pclk / 2,
+        .min_clock_hz = pclk / 2 / 0x10000,
+    };
+
+    return spi_capability;
 }
 
 /*============================ INCLUDES ======================================*/
