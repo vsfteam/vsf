@@ -44,6 +44,16 @@ char * strcasestr(const char *str, const char *substr)
 }
 #endif
 
+#if __IS_COMPILER_ARM_COMPILER_5__ || __IS_COMPILER_ARM_COMPILER_6__
+size_t strnlen(const char *str, size_t maxlen)
+{
+	const char * sc;
+
+	for (sc = str; maxlen-- && *sc != '\0'; ++sc);
+	return sc - str;
+}
+#endif
+
 #if __IS_COMPILER_IAR__
 size_t strlcpy(char *dst, const char *src, size_t dsize)
 {
