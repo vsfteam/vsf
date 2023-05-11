@@ -55,23 +55,36 @@
 #   define VSF_GPIO_CFG_CHNAGE_DIR_FIRST                    ENABLED
 #endif
 
-#ifndef VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_SET
-#    define VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_SET        0
-#endif
-#ifndef VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_CLEAR
-#    define VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_CLEAR      0
+#ifndef VSF_GPIO_CFG_CAPABILITY_SUPPORT_CONFIG_PIN
+#    define VSF_GPIO_CFG_CAPABILITY_SUPPORT_CONFIG_PIN          1
 #endif
 
-#if VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+#ifndef VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET
+#    define VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET      0
+#endif
+
+#ifndef VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_CLEAR
+#    define VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_CLEAR    0
+#endif
+
+#ifndef VSF_GPIO_CFG_CAPABILITY_SUPPORT_INTERRUPT
+#    define VSF_GPIO_CFG_CAPABILITY_SUPPORT_INTERRUPT           1
+#endif
+
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY
+#   define  VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#endif
+
+#if VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
 #   ifndef VSF_GPIO_CFG_CAPABILITY_IS_ASYNC
-#       define VSF_GPIO_CFG_CAPABILITY_IS_ASYNC             0
+#       define VSF_GPIO_CFG_CAPABILITY_IS_ASYNC                 0
 #   endif
 
 #   ifndef VSF_GPIO_CFG_CAPABILITY_PIN_COUNT
-#       define VSF_GPIO_CFG_CAPABILITY_PIN_COUNT            32
+#       define VSF_GPIO_CFG_CAPABILITY_PIN_COUNT                32
 #   endif
-#   ifndef VSF_GPIO_CFG_CAPABILITY_AVAIL_PIN_MASK
-#       define VSF_GPIO_CFG_CAPABILITY_AVAIL_PIN_MASK       0xFFFFFFFF
+#   ifndef VSF_GPIO_CFG_CAPABILITY_PIN_MASK
+#       define VSF_GPIO_CFG_CAPABILITY_PIN_MASK                 0xFFFFFFFF
 #   endif
 #endif
 
@@ -151,7 +164,7 @@ void vsf_real_gpio_output_and_set(vsf_real_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     VSF_HAL_ASSERT(0 != pin_mask);
 
-#if VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_SET == 0
+#if VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET == 0
     VSF_HAL_ASSERT(0);
 #else
 #if VSF_GPIO_CFG_CHNAGE_DIR_FIRST == ENABLED
@@ -171,7 +184,7 @@ void vsf_real_gpio_output_and_clear(vsf_real_gpio_t *gpio_ptr, vsf_gpio_pin_mask
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     VSF_HAL_ASSERT(0 != pin_mask);
 
-#if VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_SET == 0
+#if VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET == 0
     VSF_HAL_ASSERT(0);
 #else
 #if VSF_GPIO_CFG_CHNAGE_DIR_FIRST == ENABLED
@@ -185,34 +198,78 @@ void vsf_real_gpio_output_and_clear(vsf_real_gpio_t *gpio_ptr, vsf_gpio_pin_mask
 }
 #endif
 
-#if VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+#if VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
 vsf_gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
 {
     vsf_gpio_capability_t gpio_capability = {
-        .is_async = VSF_GPIO_CFG_CAPABILITY_IS_ASYNC,
-        .is_support_output_and_set = VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_SET,
-        .is_support_output_and_clear = VSF_GPIO_CFG_CAPABILITY_IS_OUTPUT_AND_CLEAR,
-        .pin_count = VSF_GPIO_CFG_CAPABILITY_PIN_COUNT,
-        .avail_pin_mask = VSF_GPIO_CFG_CAPABILITY_AVAIL_PIN_MASK,
+        .is_async                   = VSF_GPIO_CFG_CAPABILITY_IS_ASYNC,
+        .support_config_pin         = VSF_GPIO_CFG_CAPABILITY_SUPPORT_CONFIG_PIN,
+        .support_output_and_set     = VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET,
+        .support_output_and_clear   = VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_CLEAR,
+        .support_interrupt          = VSF_GPIO_CFG_CAPABILITY_SUPPORT_INTERRUPT,
+        .pin_count                  = VSF_GPIO_CFG_CAPABILITY_PIN_COUNT,
+        .pin_mask                   = VSF_GPIO_CFG_CAPABILITY_PIN_MASK,
     };
 
     return gpio_capability;
 }
 #endif
 
+/*============================ MACROS ========================================*/
+
+#undef VSF_GPIO_CFG_REIMPLEMENT_API_SET_INPUT
+#undef VSF_GPIO_CFG_REIMPLEMENT_API_SET_OUTPUT
+#undef VSF_GPIO_CFG_REIMPLEMENT_API_SWITCH_DIRECTION
+#undef VSF_GPIO_CFG_REIMPLEMENT_API_SET
+#undef VSF_GPIO_CFG_REIMPLEMENT_API_CLEAR
+#undef VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET
+#undef VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR
+#undef VSF_GPIO_CFG_CHNAGE_DIR_FIRST
+#undef VSF_GPIO_CFG_CAPABILITY_SUPPORT_CONFIG_PIN
+#undef VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET
+#undef VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_CLEAR
+#undef VSF_GPIO_CFG_CAPABILITY_SUPPORT_INTERRUPT
+#undef VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_GPIO_CFG_CAPABILITY_IS_ASYNC
+#undef VSF_GPIO_CFG_CAPABILITY_PIN_COUNT
+#undef VSF_GPIO_CFG_CAPABILITY_PIN_MASK
+#undef vsf_real_gpio_t
+#undef vsf_real_gpio_set_input
+#undef vsf_real_gpio_set_output
+#undef vsf_real_gpio_get_direction
+#undef vsf_real_gpio_set_direction
+#undef vsf_real_gpio_switch_direction
+#undef vsf_real_gpio_write
+#undef vsf_real_gpio_set
+#undef vsf_real_gpio_clear
+#undef vsf_real_gpio_output_and_set
+#undef vsf_real_gpio_output_and_clear
+#undef vsf_real_gpio_capability
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _gpio
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _GPIO
+#define VSF_HAL_TEMPLATE_IMP_NAME                   _gpio
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _GPIO
+#define VSF_HAL_TEMPLATE_IMP_COUNT_SUFFIX           _PORT_COUNT
+#define VSF_HAL_TEMPLATE_IMP_MASK_SUFFIX            _PORT_MASK
 
 #ifndef VSF_GPIO_CFG_IMP_PREFIX
 #   error "Please define VSF_GPIO_CFG_IMP_PREFIX in gpio driver"
 #endif
 
 #ifndef VSF_GPIO_CFG_IMP_UPCASE_PREFIX
-#   error "Please define VSF_GPIO_CFG_IMP_UPCASE_PREFIX    in gpio driver"
+#   error "Please define VSF_GPIO_CFG_IMP_UPCASE_PREFIX in gpio driver"
+#endif
+
+#ifndef VSF_GPIO_CFG_IMP_INSTANCE_PREFIX
+#   define VSF_GPIO_CFG_IMP_INSTANCE_PREFIX         VSF_GPIO_CFG_IMP_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
 
-#endif // VSF_HAL_USE_GPIO == ENABLED
+#undef VSF_GPIO_CFG_IMP_PREFIX
+#undef VSF_GPIO_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_GPIO_CFG_IMP_UPCASE_PREFIX
+#undef VSF_GPIO_CFG_IMP_LV0
+
+#endif  /* VSF_HAL_USE_GPIO */

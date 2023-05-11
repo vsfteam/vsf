@@ -62,11 +62,11 @@ static const vsf_gpio_op_t __vsf_hal_distbus_gpio_op = {
 /*============================ IMPLEMENTATION ================================*/
 
 // TODO:
-vsf_io_feature_t vsf_hal_distbus_io_feature_to_generic_io_feature(uint32_t hal_distbus_io_feature)
+vsf_gpio_mode_t vsf_hal_distbus_io_feature_to_generic_io_feature(uint32_t hal_distbus_io_feature)
 {
-    return (vsf_io_feature_t)0;
+    return (vsf_gpio_mode_t)0;
 }
-uint32_t vsf_generic_io_feature_to_hal_distbus_io_feature(vsf_io_feature_t generic_io_feature)
+uint32_t vsf_generic_io_feature_to_hal_distbus_io_feature(vsf_gpio_mode_t generic_io_feature)
 {
     return 0;
 }
@@ -113,7 +113,7 @@ uint32_t vsf_hal_distbus_gpio_register_service(vsf_distbus_t *distbus, vsf_hal_d
     return sizeof(vsf_hal_distbus_gpio_info_t);
 }
 
-void vsf_hal_distbus_gpio_config_pin(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_io_feature_t feature)
+void vsf_hal_distbus_gpio_config_pin(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_mode_t feature)
 {
     VSF_HAL_ASSERT(NULL != gpio);
     VSF_HAL_ASSERT(0 != pin_mask);
@@ -270,12 +270,12 @@ void vsf_hal_distbus_gpio_output_and_clear(vsf_hal_distbus_gpio_t *gpio, vsf_gpi
 vsf_gpio_capability_t vsf_hal_distbus_gpio_capability(vsf_hal_distbus_gpio_t *gpio)
 {
     return (vsf_gpio_capability_t) {
-        .is_async                       = true,
-        .is_support_config_pin          = gpio->info.support_config_pin,
-        .is_support_output_and_set      = gpio->info.support_output_and_set,
-        .is_support_output_and_clear    = gpio->info.support_output_and_clear,
-        .pin_count                      = gpio->info.pin_count,
-        .avail_pin_mask                 = gpio->info.pin_mask,
+        .is_async                    = true,
+        .support_config_pin          = gpio->info.support_config_pin,
+        .support_output_and_set      = gpio->info.support_output_and_set,
+        .support_output_and_clear    = gpio->info.support_output_and_clear,
+        .pin_count                   = gpio->info.pin_count,
+        .pin_mask              = gpio->info.pin_mask,
     };
 }
 

@@ -45,7 +45,7 @@ const vsf_gpio_op_t vsf_remapped_gpio_op = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-void vsf_remapped_gpio_config_pin(vsf_remapped_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_io_feature_t feature)
+void vsf_remapped_gpio_config_pin(vsf_remapped_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_mode_t feature)
 {
     VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));
     vsf_gpio_config_pin(gpio->target, pin_mask, feature);
@@ -127,6 +127,18 @@ vsf_gpio_capability_t vsf_remapped_gpio_capability(vsf_remapped_gpio_t *gpio)
 {
     VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));
     return vsf_gpio_capability(gpio->target);
+}
+
+vsf_err_t vsf_remapped_gpio_pin_interrupt_init(vsf_remapped_gpio_t *gpio, vsf_arch_prio_t prio)
+{
+    VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));
+    return vsf_gpio_pin_interrupt_init(gpio->target, prio);
+}
+
+vsf_err_t vsf_remapped_gpio_pin_interrupt_config(vsf_remapped_gpio_t *gpio, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));
+    return vsf_gpio_pin_interrupt_config(gpio->target, cfg_ptr);
 }
 
 #endif

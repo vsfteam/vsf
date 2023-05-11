@@ -34,7 +34,7 @@
 /*============================ IMPLEMENTATION ================================*/
 
 
-void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_io_feature_t feature)
+void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_io_mode_t feature)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
@@ -49,7 +49,7 @@ void vsf_gpio_set_direction(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, 
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op->set_direction != NULL);
 
-    gpio_ptr->op->set_direction(gpio_ptr, direction_mask, pin_mask);
+    gpio_ptr->op->set_direction(gpio_ptr, pin_mask, direction_mask);
 }
 
 vsf_gpio_pin_mask_t vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
@@ -158,6 +158,25 @@ vsf_gpio_capability_t vsf_gpio_capability(vsf_gpio_t *gpio_ptr)
     VSF_HAL_ASSERT(gpio_ptr->op->capability != NULL);
 
     return gpio_ptr->op->capability(gpio_ptr);
+}
+
+
+vsf_err_t vsf_gpio_pin_interrupt_init(vsf_gpio_t *gpio_ptr, vsf_arch_prio_t prio)
+{
+    VSF_HAL_ASSERT(gpio_ptr != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op->pin_interrupt_init != NULL);
+
+    return gpio_ptr->op->pin_interrupt_init(gpio_ptr, prio);
+}
+
+vsf_err_t vsf_gpio_pin_interrupt_config(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg)
+{
+    VSF_HAL_ASSERT(gpio_ptr != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op->pin_interrupt_config != NULL);
+
+    return gpio_ptr->op->pin_interrupt_config(gpio_ptr, cfg);
 }
 
 #endif

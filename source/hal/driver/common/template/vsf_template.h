@@ -21,7 +21,10 @@
 /*============================ INCLUDES ======================================*/
 
 #include "./vsf_template_io.h"
-#include "./vsf_template_gpio.h"
+
+#if defined(VSF_HAL_USE_GPIO) && !defined(__VSF_TEMPLATE_GPIO_H__)
+#   include "./vsf_template_gpio.h"
+#endif
 
 #if defined(VSF_HAL_USE_ADC) && !defined(__VSF_TEMPLATE_ADC_H__)
 #   include "./vsf_template_adc.h"

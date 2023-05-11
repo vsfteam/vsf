@@ -99,7 +99,8 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     vendor/plf/aic8800/src/driver/bt/patch/mcu/fw_patch_u02.c
     vendor/plf/aic8800/src/driver/bt/patch/mcu/fw_patch_u03.c
     vendor/plf/aic8800/src/driver/flash/flash_api.c
-    vendor/plf/aic8800/src/driver/gpio/gpio_api.c
+    # disable gpio_api.c because GPIO_IRQHandler
+    #vendor/plf/aic8800/src/driver/gpio/gpio_api.c
     vendor/plf/aic8800/src/driver/pmic/pwrkey_api.c
     vendor/plf/aic8800/src/driver/sdmmc/sdmmc_api.c
     vendor/plf/aic8800/src/driver/stdio_uart/stdio_uart.c

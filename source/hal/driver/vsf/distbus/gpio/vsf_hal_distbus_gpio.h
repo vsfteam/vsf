@@ -126,8 +126,8 @@ vsf_class(vsf_hal_distbus_gpio_t) {
 extern uint32_t vsf_hal_distbus_gpio_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_gpio_t *gpio, void *info, uint32_t infolen);
 
 #if defined(__VSF_HAL_DISTBUS_GPIO_CLASS_IMPLEMENT) || defined(__VSF_HAL_DISTBUS_GPIO_CLASS_INHERIT__)
-extern vsf_io_feature_t vsf_hal_distbus_io_feature_to_generic_io_feature(uint32_t hal_distbus_io_feature);
-extern uint32_t vsf_generic_io_feature_to_hal_distbus_io_feature(vsf_io_feature_t generic_io_feature);
+extern vsf_gpio_mode_t vsf_hal_distbus_io_feature_to_generic_io_feature(uint32_t hal_distbus_io_feature);
+extern uint32_t vsf_generic_io_feature_to_hal_distbus_io_feature(vsf_gpio_mode_t generic_io_feature);
 #endif
 
 /*============================ INCLUDES ======================================*/
