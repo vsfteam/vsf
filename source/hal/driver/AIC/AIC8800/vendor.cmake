@@ -106,7 +106,7 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     vendor/plf/aic8800/src/driver/ticker/lp_ticker.c
     vendor/plf/aic8800/src/driver/ticker/lp_ticker_api.c
     vendor/plf/aic8800/src/driver/ticker/ticker_api.c
-    # disable us_ticker.c for vsf_hw_timer.c
+    # disable us_ticker.c because TIMERx_IRQHandler
     #vendor/plf/aic8800/src/driver/ticker/us_ticker.c
     #vendor/plf/aic8800/src/driver/ticker/us_ticker_api.c
     vendor/plf/aic8800/src/driver/time/time_api.c

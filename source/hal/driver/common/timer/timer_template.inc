@@ -19,6 +19,26 @@
 
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY
+#   define  VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#endif
+
+#if VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#   ifndef VSF_TIMER_CFG_CAPABILITY_IRQ_MASK
+#       define VSF_TIMER_CFG_CAPABILITY_IRQ_MASK        VSF_TIMER_IRQ_ALL_BITS_MASK
+#   endif
+#   ifndef VSF_TIMER_CFG_CAPABILITY_TIMER_BITLEN
+#       define VSF_TIMER_CFG_CAPABILITY_TIMER_BITLEN    32
+#   endif
+#   ifndef VSF_TIMER_CFG_CAPABILITY_SUPPORT_PWM
+#       define VSF_TIMER_CFG_CAPABILITY_SUPPORT_PWM     1
+#   endif
+#   ifndef VSF_TIMER_CFG_CAPABILITY_PWM_CHANNEL_CNT
+#       define VSF_TIMER_CFG_CAPABILITY_PWM_CHANNEL_CNT 32
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -41,30 +61,53 @@ vsf_err_t vsf_real_timer_pwm_set(vsf_real_timer_t *timer_ptr, uint8_t channel, u
 }
 #endif
 
-#if VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+#if VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
 vsf_timer_capability_t vsf_real_timer_capability(vsf_real_timer_t *timer_ptr)
 {
     vsf_timer_capability_t timer_capability = {
-        0,
+        .irq_mask           = VSF_TIMER_CFG_CAPABILITY_IRQ_MASK,
+        .timer_bitlen       = VSF_TIMER_CFG_CAPABILITY_TIMER_BITLEN,
+        .support_pwm        = VSF_TIMER_CFG_CAPABILITY_SUPPORT_PWM,
+        .pwm_channel_cnt    = VSF_TIMER_CFG_CAPABILITY_PWM_CHANNEL_CNT,
     };
 
     return timer_capability;
 }
 #endif
 
+/*============================ MACROS ========================================*/
+
+#undef VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_TIMER_CFG_CAPABILITY_IRQ_MASK,
+#undef VSF_TIMER_CFG_CAPABILITY_TIMER_BITLEN,
+#undef VSF_TIMER_CFG_CAPABILITY_SUPPORT_PWM,
+#undef VSF_TIMER_CFG_CAPABILITY_PWM_CHANNEL_CNT,
+#undef vsf_real_timer_t
+#undef vsf_real_timer_capability
+#undef vsf_real_timer_pwm_set
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define __VSF_HAL_TEMPLATE_NAME                     _timer
-#define __VSF_HAL_TEMPLATE_UPCASE_NAME              _TIMER
+#define VSF_HAL_TEMPLATE_IMP_NAME                     _timer
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _TIMER
 
 #ifndef VSF_TIMER_CFG_IMP_PREFIX
 #   error "Please define VSF_TIMER_CFG_IMP_PREFIX in timer driver"
 #endif
 
-#ifndef VSF_TIMER_CFG_IMP_UPCASE_PREFIX   
-#   error "Please define VSF_TIMER_CFG_IMP_UPCASE_PREFIX    in timer driver"
+#ifndef VSF_TIMER_CFG_IMP_UPCASE_PREFIX
+#   error "Please define VSF_TIMER_CFG_IMP_UPCASE_PREFIX in timer driver"
+#endif
+
+#ifndef VSF_TIMER_CFG_IMP_INSTANCE_PREFIX
+#   define VSF_TIMER_CFG_IMP_INSTANCE_PREFIX         VSF_TIMER_CFG_IMP_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_implementation.h"
 
-#endif  /* VSF_HAL_USE_PWM */
+#undef VSF_TIMER_CFG_IMP_PREFIX
+#undef VSF_TIMER_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_TIMER_CFG_IMP_UPCASE_PREFIX
+#undef VSF_TIMER_CFG_IMP_LV0
+
+#endif  /* VSF_HAL_USE_TIEMR */

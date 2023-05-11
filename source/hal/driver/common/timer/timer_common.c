@@ -43,6 +43,14 @@ vsf_err_t vsf_timer_init(vsf_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr)
 
     return timer_ptr->op->init(timer_ptr, cfg_ptr);
 }
+void vsf_timer_fini(vsf_timer_t *timer_ptr)
+{
+    VSF_HAL_ASSERT(timer_ptr != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->fini != NULL);
+
+    timer_ptr->op->fini(timer_ptr);
+}
 
 fsm_rt_t vsf_timer_enable(vsf_timer_t *timer_ptr)
 {
@@ -92,6 +100,8 @@ vsf_timer_capability_t vsf_timer_capability(vsf_timer_t *timer_ptr)
 vsf_err_t vsf_timer_pwm_set(vsf_timer_t *timer_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
 {
     VSF_HAL_ASSERT(NULL != timer_ptr);
+    VSF_HAL_ASSERT(timer_ptr->op != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->pwm_set != NULL);
 
     return timer_ptr->op->pwm_set(timer_ptr, channel, period, pulse);
 }

@@ -32,7 +32,10 @@
 #include "./vsf_template_rng.h"
 #include "./vsf_template_rtc.h"
 #include "./vsf_template_spi.h"
-#include "./vsf_template_timer.h"
+
+#if defined(VSF_HAL_USE_TIMER) && !defined(__VSF_TEMPLATE_TIMER_H__)
+#   include "./vsf_template_timer.h"
+#endif
 
 #if defined(VSF_HAL_USE_USART) && !defined(__VSF_TEMPLATE_USART_H__)
 #   include "./vsf_template_usart.h"
