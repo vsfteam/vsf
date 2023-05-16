@@ -33,6 +33,14 @@
 #include "./device.h"
 #include "./rtc/rtc.h"
 
+#if VSF_HAL_USE_RTC == ENABLED
+#include "hal/driver/common/template/vsf_template_rtc.h"
+
+#   define VSF_RTC_CFG_DEC_PREFIX              vsf_hw
+#   define VSF_RTC_CFG_DEC_UPCASE_PREFIX       VSF_HW
+#include "hal/driver/common/rtc/rtc_template.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
