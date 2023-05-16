@@ -24,8 +24,6 @@
 
 #if VSF_HAL_USE_DAC == ENABLED
 
-#include "hal/driver/common/template/vsf_template_dac.h"
-
 #if VSF_DAC_CFG_MULTI_CLASS == ENABLED
 
 #if     defined(__VSF_REMAPPED_DAC_CLASS_IMPLEMENT)

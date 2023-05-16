@@ -24,8 +24,6 @@
 
 #if VSF_HAL_USE_MMC == ENABLED
 
-#include "hal/driver/common/template/vsf_template_mmc.h"
-
 #if VSF_MMC_CFG_MULTI_CLASS == ENABLED
 
 #if     defined(__VSF_REMAPPED_MMC_CLASS_IMPLEMENT)

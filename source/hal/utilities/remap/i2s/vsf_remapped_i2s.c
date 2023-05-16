@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/vsf_hal_cfg.h"
+#include "hal/vsf_hal.h"
 
 #if VSF_HAL_USE_I2S == ENABLED
 

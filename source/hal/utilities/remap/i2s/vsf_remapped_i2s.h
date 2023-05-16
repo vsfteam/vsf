@@ -24,8 +24,6 @@
 
 #if VSF_HAL_USE_I2S == ENABLED
 
-#include "hal/driver/common/template/vsf_template_i2s.h"
-
 #if VSF_I2S_CFG_MULTI_CLASS == ENABLED
 
 #if     defined(__VSF_REMAPPED_I2S_CLASS_IMPLEMENT)
