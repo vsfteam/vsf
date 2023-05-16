@@ -24,8 +24,6 @@
 
 #if VSF_HAL_USE_PWM == ENABLED
 
-#include "hal/driver/common/template/vsf_template_pwm.h"
-
 #if VSF_PWM_CFG_MULTI_CLASS == ENABLED
 
 #if     defined(__VSF_REMAPPED_PWM_CLASS_IMPLEMENT)

@@ -24,8 +24,6 @@
 
 #if VSF_HAL_USE_USART == ENABLED
 
-#include "hal/driver/common/template/vsf_template_usart.h"
-
 #if VSF_USART_CFG_MULTI_CLASS == ENABLED
 
 #if     defined(__VSF_REMAPPED_USART_CLASS_IMPLEMENT)

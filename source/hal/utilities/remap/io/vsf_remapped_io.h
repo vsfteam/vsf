@@ -24,8 +24,6 @@
 
 #if VSF_HAL_USE_IO == ENABLED
 
-#include "hal/driver/common/template/vsf_template_io.h"
-
 #if VSF_IO_CFG_MULTI_CLASS == ENABLED
 
 #if     defined(__VSF_REMAPPED_IO_CLASS_IMPLEMENT)

@@ -24,8 +24,6 @@
 
 #if VSF_HAL_USE_SPI == ENABLED
 
-#include "hal/driver/common/template/vsf_template_spi.h"
-
 #if VSF_SPI_CFG_MULTI_CLASS == ENABLED
 
 #if     defined(__VSF_REMAPPED_SPI_CLASS_IMPLEMENT)

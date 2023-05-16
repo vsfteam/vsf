@@ -24,8 +24,6 @@
 
 #if VSF_HAL_USE_ADC == ENABLED
 
-#include "hal/driver/common/template/vsf_template_adc.h"
-
 #if VSF_ADC_CFG_MULTI_CLASS == ENABLED
 
 #if     defined(__VSF_REMAPPED_ADC_CLASS_IMPLEMENT)
