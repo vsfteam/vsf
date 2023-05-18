@@ -1747,6 +1747,19 @@ int daemon(int nochdir, int noclose)
     return 0;
 }
 
+static const vsf_loader_op_t * __vsf_linux_get_applet_loader(uint8_t *header, int size)
+{
+#if VSF_LOADER_USE_PE == ENABLED
+    if ((size >= 2) && (header[0] == 'M') && (header[1] == 'Z')) {
+        return &vsf_peloader_op;
+    } else
+#endif
+    if ((size >= 4) && (header[0] == 0x7F) && (header[1] == 'E') && (header[2] == 'L') && (header[3] == 'F')) {
+        return &vsf_elfloader_op;
+    }
+    return NULL;
+}
+
 static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd, vsf_linux_main_entry_t *entry, char *path)
 {
     char pathname_local[PATH_MAX], pathname_dir[PATH_MAX], *path_end;
@@ -1781,34 +1794,32 @@ static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd,
         try_open:
             exefd = open(pathname, 0);
             if (exefd >= 0) {
+                vsf_trace_debug("path: %s\n", pathname);
+                if (!strcmp(pathname, "./xenix"))
+                    __asm("nop");
                 if (!vsf_linux_fd_get_feature(exefd, &feature) && (feature & VSF_FILE_ATTR_EXECUTE)) {
                     if (entry != NULL) {
                         vsf_linux_fd_get_target(exefd, (void **)entry);
                     }
                     break;
                 } else {
-#if VSF_LINUX_USE_SCRIPT == ENABLED
-                    char head[2];
+#if VSF_LINUX_USE_APPLET == ENABLED
+                    uint8_t head[16];
                     ssize_t headlen = read(exefd, head, sizeof(head));
-                    if (headlen != sizeof(head)) {
-                        close(exefd);
-                        exefd = -1;
-                    }
                     lseek(exefd, 0, SEEK_SET);
-
-                    if ((head[0] == '#') && (head[1] == '!')) {
+                    if (__vsf_linux_get_applet_loader(head, headlen) != NULL) {
                         if (entry != NULL) {
-                            int __vsf_linux_script_main(int argc, char **argv);
-                            *entry = __vsf_linux_script_main;
+                            int __vsf_linux_dynloader_main(int argc, char **argv);
+                            *entry = __vsf_linux_dynloader_main;
                         }
                         break;
                     }
 #endif
-
-#if VSF_LINUX_USE_APPLET == ENABLED
+#if VSF_LINUX_USE_SCRIPT == ENABLED
+                    // do not check #!, because it's not a must
                     if (entry != NULL) {
-                        int __vsf_linux_dynloader_main(int argc, char **argv);
-                        *entry = __vsf_linux_dynloader_main;
+                        int __vsf_linux_script_main(int argc, char **argv);
+                        *entry = __vsf_linux_script_main;
                     }
                     break;
 #else
@@ -3863,15 +3874,9 @@ void * dlopen(const char *pathname, int mode)
 
     uint8_t header[16];
     uint32_t size = vsf_loader_read(&linux_loader->target, 0, header, sizeof(header));
-#if VSF_LOADER_USE_PE == ENABLED
-    if ((size >= 2) && (header[0] == 'M') && (header[1] == 'Z')) {
-        linux_loader->loader.generic.op     = &vsf_peloader_op;
-    } else
-#endif
-    if ((size >= 4) && (header[0] == 0x7F) && (header[1] == 'E') && (header[2] == 'L') && (header[3] == 'F')) {
-        linux_loader->loader.generic.op     = &vsf_elfloader_op;
-    } else {
-        printf("unsupported file format\n");
+    linux_loader->loader.generic.op = __vsf_linux_get_applet_loader(header, size);
+    if (NULL == linux_loader->loader.generic.op) {
+        printf("dlopen: unsupported file format\n");
         goto close_and_fail;
     }
 
