@@ -1794,9 +1794,6 @@ static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd,
         try_open:
             exefd = open(pathname, 0);
             if (exefd >= 0) {
-                vsf_trace_debug("path: %s\n", pathname);
-                if (!strcmp(pathname, "./xenix"))
-                    __asm("nop");
                 if (!vsf_linux_fd_get_feature(exefd, &feature) && (feature & VSF_FILE_ATTR_EXECUTE)) {
                     if (entry != NULL) {
                         vsf_linux_fd_get_target(exefd, (void **)entry);
@@ -2735,7 +2732,7 @@ int vsf_linux_fs_bind_executable(char *path, vsf_linux_main_entry_t entry)
 
 char * getpass(const char *prompt)
 {
-    fprintf(stdout, "%s", prompt);
+    printf("%s", prompt);
 
     struct termios orig, t;
     tcgetattr(STDIN_FILENO, &orig);
