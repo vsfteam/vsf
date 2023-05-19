@@ -18,7 +18,7 @@
 /*============================ INCLUDES ======================================*/
 
 #define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
-#include "./uart.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_USART == ENABLED
 

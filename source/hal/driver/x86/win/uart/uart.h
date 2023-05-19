@@ -109,27 +109,9 @@ typedef enum vsf_usart_irq_mask_t {
 } vsf_usart_irq_mask_t;
 
 /*============================ INCLUDES ======================================*/
-
-
-#define VSF_USART_CFG_DEC_PREFIX                    vsf_win
-#define VSF_USART_CFG_DEC_UPCASE_PREFIX             VSF_WIN
-#include "hal/driver/common/usart/usart_template.h"
-
-#define VSF_USART_CFG_DEC_INSTANCE_PREFIX           vsf_win_fifo2req
-#define VSF_FIFO2REQ_USART_COUNT                    VSF_WIN_USART_COUNT
-#include "hal/driver/common/usart/fifo2req_usart.h"
-
-
-#if VSF_WIN_USART_CFG_USE_AS_HW_USART == ENABLED
-#   ifndef VSF_HW_USART_COUNT
-#       define VSF_HW_USART_COUNT                   32
-#   endif
-#   define VSF_REMAPPED_USART_COUNT                 VSF_WIN_USART_COUNT
-#   define VSF_USART_CFG_DEC_INSTANCE_PREFIX        vsf_hw
-#include "hal/utilities/remap/usart/vsf_remapped_usart.h"
-#endif
-
 /*============================ TYPES =========================================*/
+
+typedef struct vsf_usart_t vsf_usart_t;
 
 typedef struct vsf_usart_win_device_t {
     vsf_usart_t                         *instance;
