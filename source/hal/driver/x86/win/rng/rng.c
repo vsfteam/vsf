@@ -20,7 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/vsf_hal_cfg.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_RNG == ENABLED
 
@@ -28,9 +28,6 @@
 #include "utilities/vsf_utilities.h"
 // for vsf_trace
 #include "service/vsf_service.h"
-
-#include "../device.h"
-#include "./rng.h"
 
 #include <Windows.h>
 

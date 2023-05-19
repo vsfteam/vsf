@@ -26,8 +26,7 @@
 #   endif
 #endif
 #include "hal/arch/vsf_arch.h"
-#include "./rtc/rtc.h"
-#include "./rng/rng.h"
+#include "./driver.h"
 
 #include <Windows.h>
 

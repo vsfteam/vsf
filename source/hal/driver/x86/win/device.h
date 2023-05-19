@@ -36,6 +36,10 @@
 #   define VSF_WIN_USART_COUNT                  32
 #endif
 
+#define VSF_HW_FLASH_COUNT                      1
+#define VSF_HW_SPI_COUNT                        3
+
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
