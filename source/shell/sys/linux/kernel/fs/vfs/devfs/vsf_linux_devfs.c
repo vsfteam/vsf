@@ -784,7 +784,7 @@ static ssize_t __vsf_linux_mal_read(vsf_linux_fd_t *sfd, void *buf, size_t count
     if (count % blksz) {
         return -1;
     }
-    vk_mal_write(mal, vfs_file->pos, count, (uint8_t *)buf);
+    vk_mal_read(mal, vfs_file->pos, count, (uint8_t *)buf);
     return vsf_eda_get_return_value();
 }
 
