@@ -16,16 +16,17 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_pwm.h"
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_HAL_TEMPLATE_DEC_NAME                     _pwm
 #define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _PWM
 
+#ifndef __VSF_TEMPLATE_PWM_H__
+#   error "Please include \"vsf_template_pwm.h\" before include pwm_template.h"
+#endif
+
 #ifndef VSF_PWM_CFG_DEC_PREFIX
-#   error "Please define VSF_PWM_CFG_DEC_PREFIX when using vsf_template_pwm.h"
+#   error "Please define VSF_PWM_CFG_DEC_PREFIX before include pwm_template.h"
 #endif
 
 #ifndef VSF_PWM_CFG_DEC_INSTANCE_PREFIX

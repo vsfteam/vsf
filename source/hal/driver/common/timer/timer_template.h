@@ -16,16 +16,17 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_timer.h"
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_HAL_TEMPLATE_DEC_NAME                     _timer
 #define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _TIMER
 
+#ifndef __VSF_TEMPLATE_TIMER_H__
+#   error "Please include \"vsf_template_timer.h\" before include timer_template.h"
+#endif
+
 #ifndef VSF_TIMER_CFG_DEC_PREFIX
-#   error "Please define VSF_TIMER_CFG_DEC_PREFIX when using vsf_template_timer.h"
+#   error "Please define VSF_TIMER_CFG_DEC_PREFIX before include timer_template.h"
 #endif
 
 #ifndef VSF_TIMER_CFG_DEC_INSTANCE_PREFIX

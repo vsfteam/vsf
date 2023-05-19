@@ -16,10 +16,9 @@
  ****************************************************************************/
 
 
-#define __VSF_HAL_USE_FIFO2REQ_USART_CLASS_IMPLEMENT  ENABLED
-
 /*============================ INCLUDES ======================================*/
 
+#define __VSF_HAL_USE_FIFO2REQ_USART_CLASS_IMPLEMENT  ENABLED
 #include "hal/vsf_hal_cfg.h"
 
 #if VSF_HAL_USE_USART == ENABLED

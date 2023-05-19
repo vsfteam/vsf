@@ -156,9 +156,9 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 #   error "Please define VSF_USART_CFG_IMP_PREFIX in usart driver"
 #endif
 
-#ifndef VSF_USART_CFG_IMP_UPCASE_PREFIX
-#   error "Please define VSF_USART_CFG_IMP_UPCASE_PREFIX in usart driver"
-#endif
+//#ifndef VSF_USART_CFG_IMP_UPCASE_PREFIX
+//#   error "Please define VSF_USART_CFG_IMP_UPCASE_PREFIX in usart driver"
+//#endif
 
 #ifndef VSF_USART_CFG_IMP_INSTANCE_PREFIX
 #   define VSF_USART_CFG_IMP_INSTANCE_PREFIX         VSF_USART_CFG_IMP_PREFIX

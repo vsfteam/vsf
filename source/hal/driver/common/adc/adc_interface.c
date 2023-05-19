@@ -18,7 +18,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/driver/driver.h"
+#include "./adc_interface.h"
 
 #if VSF_HAL_USE_ADC == ENABLED
 

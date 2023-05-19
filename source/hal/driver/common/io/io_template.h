@@ -17,16 +17,21 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/driver/common/template/vsf_template_io.h"
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_HAL_TEMPLATE_DEC_NAME                     _io
 #define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _IO
 
-#ifndef VSF_IO_CFG_DEC_PREFIX
-#   error "Please define VSF_IO_CFG_DEC_PREFIX when using vsf_template_io.h"
+
+#ifndef __VSF_TEMPLATE_IO_H__
+#   error "Please include \"vsf_template_io.h\" before include io_template.h"
 #endif
+
+#ifndef VSF_IO_CFG_DEC_PREFIX
+#   error "Please define VSF_IO_CFG_DEC_PREFIX before include io_template.h"
+#endif
+
 
 // IO always is singl instance
 #define VSF_HAL_TEMPLATE_DEC_REMOVE_ARRAY

@@ -28,8 +28,8 @@
 /*============================ MACROS ========================================*/
 
 #ifdef VSF_FIFO2REQ_SPI_CFG_CALL_PREFIX
-#   undef VSF_SPI_CFG_IMP_PREFIX
-#   define VSF_SPI_CFG_IMP_PREFIX                   VSF_FIFO2REQ_SPI_CFG_CALL_PREFIX
+#   undef VSF_SPI_CFG_PREFIX
+#   define VSF_SPI_CFG_PREFIX                       VSF_FIFO2REQ_SPI_CFG_CALL_PREFIX
 #endif
 
 #define VSF_SPI_IMP_DEC_EXTERN_OP                   ENABLED

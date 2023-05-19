@@ -20,7 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/vsf_hal_cfg.h"
+#include "hal/driver/driver.h"
 
 #if VSF_HAL_USE_ADC == ENABLED
 

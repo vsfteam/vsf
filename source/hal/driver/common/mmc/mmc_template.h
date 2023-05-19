@@ -17,7 +17,6 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/driver/common/template/vsf_template_mmc.h"
 #include "hal/driver/common/mmc/mmc_probe.h"
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -25,8 +24,12 @@
 #define VSF_HAL_TEMPLATE_DEC_NAME                     _mmc
 #define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _MMC
 
+#ifndef __VSF_TEMPLATE_MMC_H__
+#   error "Please include \"vsf_template_mmc.h\" before include mmc_template.h"
+#endif
+
 #ifndef VSF_MMC_CFG_DEC_PREFIX
-#   error "Please define VSF_MMC_CFG_DEC_PREFIX when using mmc_template.h"
+#   error "Please define VSF_MMC_CFG_DEC_PREFIX before include mmc_template.h"
 #endif
 
 #ifndef VSF_MMC_CFG_DEC_INSTANCE_PREFIX

@@ -28,13 +28,13 @@
 /*============================ MACROS ========================================*/
 
 #ifdef VSF_MULTIPLEXER_SPI_CFG_CALL_PREFIX
-#   define VSF_SPI_CFG_IMP_PREFIX                   VSF_MULTIPLEXER_SPI_CFG_CALL_PREFIX
+#   define VSF_SPI_CFG_PREFIX                       VSF_MULTIPLEXER_SPI_CFG_CALL_PREFIX
 #endif
 
 #define VSF_MULTIPLEXER_SPI_MAX_CS_COUNT            (sizeof(SPI_MULTIPLEXER_MASK_TYPE) * 8)
 
-#ifndef VSF_MULTIPLEXER_SPI_CFG_GPIO_FEATURE
-#   define VSF_MULTIPLEXER_SPI_CFG_GPIO_FEATURE     (VSF_IO_PULL_UP)
+#ifndef VSF_MULTIPLEXER_SPI_CFG_GPIO_MODE
+#   define VSF_MULTIPLEXER_SPI_CFG_GPIO_MODE        (VSF_GPIO_PULL_UP)
 #endif
 
 #ifndef VSF_MULTIPLEXER_SPI_PROTECT_LEVEL
@@ -109,7 +109,7 @@ static void __spi_cs_gpio_init(vsf_multiplex_spi_t *m_spi_ptr)
         VSF_HAL_ASSERT(m_spi_ptr->gpio != NULL);
         VSF_HAL_ASSERT(m_spi_ptr->pin_mask != 0);
 
-        vsf_gpio_config_pin(m_spi_ptr->gpio, m_spi_ptr->pin_mask, VSF_MULTIPLEXER_SPI_CFG_GPIO_FEATURE);
+        vsf_gpio_config_pin(m_spi_ptr->gpio, m_spi_ptr->pin_mask, VSF_MULTIPLEXER_SPI_CFG_GPIO_MODE);
         vsf_gpio_output_and_set(m_spi_ptr->gpio, m_spi_ptr->pin_mask);
 #else
         VSF_HAL_ASSERT(0);

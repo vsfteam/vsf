@@ -15,14 +15,9 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_I2C_CFG_IMP_PREFIX              vsf_multiplex
-#define VSF_I2C_CFG_IMP_UPCASE_PREFIX       VSF_MULTIPLEX
-#define VSF_I2C_CFG_IMP_EXTERN_OP           ENABLED
-
-#define __VSF_I2C_MULTIPLEX_CLASS_IMPLEMENT
-
 /*============================ INCLUDES ======================================*/
 
+#define __VSF_I2C_MULTIPLEX_CLASS_IMPLEMENT
 #include "hal/vsf_hal_cfg.h"
 
 #if (VSF_HAL_USE_I2C == ENABLED) && (VSF_HAL_USE_MULTIPLEX_I2C == ENABLED)
@@ -32,8 +27,8 @@
 /*============================ MACROS ========================================*/
 
 #ifdef VSF_MULTIPLEXER_I2C_CFG_CALL_PREFIX
-#   undef VSF_I2C_CFG_IMP_PREFIX
-#   define VSF_I2C_CFG_IMP_PREFIX               VSF_MULTIPLEXER_I2C_CFG_CALL_PREFIX
+#   undef VSF_I2C_CFG_PREFIX
+#   define VSF_I2C_CFG_PREFIX                   VSF_MULTIPLEXER_I2C_CFG_CALL_PREFIX
 #endif
 
 #ifndef VSF_MULTIPLEX_I2C_PROTECT_LEVEL

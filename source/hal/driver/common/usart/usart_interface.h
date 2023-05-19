@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_USART_INTERFACE_H__
-#define __HAL_DRIVER_USART_INTERFACE_H__
+#ifndef __VSF_TEMPLATE_USART_H__
+#define __VSF_TEMPLATE_USART_H__
 
 /*============================ INCLUDES ======================================*/
 
