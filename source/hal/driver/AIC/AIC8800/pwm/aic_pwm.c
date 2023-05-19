@@ -15,12 +15,9 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_PWM_CFG_IMP_PREFIX                  vsf_aic
-#define VSF_PWM_CFG_IMP_UPCASE_PREFIX           VSF_AIC
-
 /*============================ INCLUDES ======================================*/
 
-#include "./pwm.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_PWM == ENABLED
 
@@ -135,6 +132,9 @@ uint32_t vsf_aic_pwm_get_freq(vsf_aic_pwm_t *hw_pwm_ptr)
 }
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define VSF_PWM_CFG_IMP_PREFIX                  vsf_aic
+#define VSF_PWM_CFG_IMP_UPCASE_PREFIX           VSF_AIC
 #define VSF_PWM_CFG_IMP_LV0(__COUNT, __hal_op)                                  \
     static const vsf_aic_pwm_const_t vsf_aic_pwm ## __COUNT ## _const= {        \
         .max_chn_cnt = VSF_AIC_PWM ## __COUNT ## _CHANNAL_COUNT,                 \

@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "./uart.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_USART == ENABLED
 
@@ -27,6 +27,11 @@
 #include "../vendor/plf/aic8800/src/driver/sysctrl/sysctrl_api.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HW_USART_CFG_MULTI_CLASS
+#   define VSF_HW_USART_CFG_MULTI_CLASS             VSF_USART_CFG_MULTI_CLASS
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

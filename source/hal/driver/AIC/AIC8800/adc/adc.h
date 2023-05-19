@@ -37,10 +37,5 @@
 /*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
 
-#define VSF_ADC_CFG_DEC_PREFIX                  vsf_hw
-#define VSF_ADC_CFG_DEC_UPCASE_PREFIX           VSF_HW
-
-#include "hal/driver/common/adc/adc_template.h"
-
 #endif /* VSF_HAL_USE_AD */
 #endif /* EOF */

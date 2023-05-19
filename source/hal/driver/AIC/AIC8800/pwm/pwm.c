@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "./pwm.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_PWM == ENABLED
 

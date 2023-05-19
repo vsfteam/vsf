@@ -15,12 +15,9 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_TIMER_CFG_IMP_PREFIX                    vsf_hw
-#define VSF_TIMER_CFG_IMP_UPCASE_PREFIX             VSF_HW
-
 /*============================ INCLUDES ======================================*/
 
-#include "./timer.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_TIMER == ENABLED
 

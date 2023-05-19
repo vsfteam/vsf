@@ -15,12 +15,9 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_FLASH_CFG_IMP_PREFIX                vsf_hw
-#define VSF_FLASH_CFG_IMP_UPCASE_PREFIX         VSF_HW
-
 /*============================ INCLUDES ======================================*/
 
-#include "./flash.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_FLASH == ENABLED
 

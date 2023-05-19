@@ -66,9 +66,5 @@ typedef enum vsf_mmc_transact_status_t {
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_MMC_CFG_DEC_PREFIX          vsf_hw
-#define VSF_MMC_CFG_DEC_UPCASE_PREFIX   VSF_HW
-#include "hal/driver/common/mmc/mmc_template.h"
-
 #endif /* VSF_HAL_USE_MMC */
 #endif /* __HAL_DRIVER_AIC8800_HW_MMC_H__ */

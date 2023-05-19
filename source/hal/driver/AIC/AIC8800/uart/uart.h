@@ -116,17 +116,6 @@ typedef enum vsf_usart_irq_mask_t {
 } vsf_usart_irq_mask_t;
 
 /*============================ INCLUDES ======================================*/
-
-#define VSF_USART_CFG_DEC_INSTANCE_PREFIX       __vsf_hw
-#define VSF_USART_CFG_DEC_PREFIX                vsf_hw
-#define VSF_USART_CFG_DEC_UPCASE_PREFIX         VSF_HW
-#include "hal/driver/common/usart/usart_template.h"
-
-#define VSF_USART_CFG_DEC_INSTANCE_PREFIX       vsf_hw
-#define VSF_FIFO2REQ_USART_COUNT                VSF_HW_USART_COUNT
-#define VSF_FIFO2REQ_USART_MASK                 VSF_HW_USART_MASK
-#include "hal/driver/common/usart/fifo2req_usart.h"
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/

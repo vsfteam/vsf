@@ -26,9 +26,5 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_RNG_CFG_DEC_PREFIX          vsf_hw
-#define VSF_RNG_CFG_DEC_UPCASE_PREFIX   VSF_HW
-#include "hal/driver/common/rng/rng_template.h"
-
 #endif /* VSF_HAL_USE_RNG */
 #endif /* __HAL_DRIVER_AIC8800_TRNG_H__ */

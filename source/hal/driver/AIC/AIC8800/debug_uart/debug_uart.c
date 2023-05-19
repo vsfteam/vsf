@@ -25,7 +25,6 @@
 #   define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #   include "service/vsf_service.h"
 #endif
-#include "./debug_uart.h"
 
 #include "stdio_uart.h"
 #include "reg_ipc_mutex.h"

@@ -15,13 +15,9 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_ADC_CFG_IMP_PREFIX                  vsf_hw
-#define VSF_ADC_CFG_IMP_UPCASE_PREFIX           VSF_HW
-
-
 /*============================ INCLUDES ======================================*/
 
-#include "hal/vsf_hal_cfg.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_ADC == ENABLED
 
@@ -34,8 +30,6 @@
 #include "../vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_rtc_core.h"
 #include "../vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_sys_ctrl.h"
 #include "../vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
-#include "../gpio/gpio.h"
-#include "./adc.h"
 
 /*============================ MACROS ========================================*/
 

@@ -24,9 +24,6 @@
 
 #if VSF_HAL_USE_GPIO == ENABLED
 
-#   include "../__device.h"
-#   include "../io/io.h"
-
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -41,10 +38,6 @@
  @brief 为了确保 AIC8800 的 GPIO 工作正常，需要在 vsf_driver_init() 里调用这个 API
  */
 extern void __vsf_hw_aic8800_gpio_init(void);
-
-#define VSF_GPIO_CFG_DEC_PREFIX         vsf_hw
-#define VSF_GPIO_CFG_DEC_UPCASE_PREFIX  VSF_HW
-#include "hal/driver/common/gpio/gpio_template.h"
 
 #endif /* VSF_HAL_USE_GPIO */
 #endif /* __HAL_DRIVER_AIC8800_HW_GPIO_H__ */

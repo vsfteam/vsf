@@ -15,12 +15,9 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_I2C_CFG_IMP_PREFIX                  vsf_hw
-#define VSF_I2C_CFG_IMP_UPCASE_PREFIX           VSF_HW
-
 /*============================ INCLUDES ======================================*/
 
-#include "./i2c.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_I2C == ENABLED
 
@@ -369,6 +366,8 @@ vsf_i2c_capability_t vsf_hw_i2c_capability(vsf_hw_i2c_t *i2c_ptr)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define VSF_I2C_CFG_IMP_PREFIX                  vsf_hw
+#define VSF_I2C_CFG_IMP_UPCASE_PREFIX           VSF_HW
 #define VSF_I2C_CFG_IMP_LV0(__COUNT, __HAL_OP)                                  \
     static const vsf_hw_i2c_const_t __vsf_hw_i2c ## __COUNT ## _const = {       \
         .reg  = VSF_HW_I2C ## __COUNT ## _REG,                                  \

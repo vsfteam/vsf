@@ -15,23 +15,17 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_RNG_CFG_IMP_PREFIX                  vsf_hw
-#define VSF_RNG_CFG_IMP_UPCASE_PREFIX           VSF_HW
-
 /*============================ INCLUDES ======================================*/
 
-#include "hal/vsf_hal_cfg.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_RNG == ENABLED
 
 // for VSF_MCONNECT
 #include "utilities/vsf_utilities.h"
 
-#include "../device.h"
-
 #include "reg_trng.h"
 #include "reg_sysctrl.h"
-#include "./trng.h"
 
 /*============================ MACROS ========================================*/
 

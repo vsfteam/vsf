@@ -30,9 +30,5 @@
 /*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
 
-#define VSF_FLASH_CFG_DEC_PREFIX            vsf_hw
-#define VSF_FLASH_CFG_DEC_UPCASE_PREFIX     VSF_HW
-#include "hal/driver/common/flash/flash_template.h"
-
 #endif /* VSF_HAL_USE_FLASH */
 #endif /* EOF */

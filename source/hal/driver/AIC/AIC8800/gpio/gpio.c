@@ -15,12 +15,9 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_GPIO_CFG_IMP_PREFIX                 vsf_hw
-#define VSF_GPIO_CFG_IMP_UPCASE_PREFIX          VSF_HW
-
 /*============================ INCLUDES ======================================*/
 
-#include "./gpio.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_GPIO == ENABLED
 
@@ -29,7 +26,6 @@
 #include "../vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 #include "../vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_iomux.h"
 #include "../vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
-#include "../io/io.h"
 
 #define VSF_GPIO_CFG_CHNAGE_DIR_FIRST                   ENABLED
 #define VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_SET      1
@@ -51,6 +47,13 @@
 
 #define __vsf_gpio_protect                  vsf_protect(VSF_HW_GPIO_CFG_PROTECT_LEVEL)
 #define __vsf_gpio_unprotect                vsf_unprotect(VSF_HW_GPIO_CFG_PROTECT_LEVEL)
+
+#define __AIC8800_IO_IS_VAILID_PIN(__P)                                         \
+    (((__P &  VSF_HW_IO_PIN_MASK) != 0) &&                                      \
+     ((__P & ~VSF_HW_IO_PIN_MASK) == 0))
+
+#define __AIC8800_IO_IS_VAILID_FEATURE(__F)                                     \
+    ((__F & ~(uint32_t)__AIC8800_IO_FEATURE_ALL_BITS) == 0)
 
 /*============================ TYPES =========================================*/
 
@@ -90,7 +93,7 @@ void __vsf_hw_aic8800_gpio_init(void)
     }
 }
 
-void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_io_mode_t feature)
+void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_mode_t feature)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     VSF_HAL_ASSERT(__AIC8800_IO_IS_VAILID_PIN(pin_mask));
@@ -188,6 +191,9 @@ vsf_gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
 
 /*============================ INCLUDES ======================================*/
 
+
+#define VSF_GPIO_CFG_IMP_PREFIX                 vsf_hw
+#define VSF_GPIO_CFG_IMP_UPCASE_PREFIX          VSF_HW
 #define VSF_GPIO_CFG_IMP_LV0(__COUNT, __HAL_OP)                                         \
     vsf_hw_gpio_t vsf_hw_gpio ## __COUNT = {                                            \
         .GPIO = REG_GPIO ## __COUNT,                                                    \
