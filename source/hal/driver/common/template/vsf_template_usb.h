@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_USB_INTERFACE_H__
-#define __HAL_DRIVER_USB_INTERFACE_H__
+#ifndef __VSF_TEMPLATE_USB_H__
+#define __VSF_TEMPLATE_USB_H__
 
 /*============================ INCLUDES ======================================*/
 
