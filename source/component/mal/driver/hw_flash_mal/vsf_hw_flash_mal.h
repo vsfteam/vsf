@@ -48,6 +48,7 @@ vsf_class(vk_hw_flash_mal_t) {
     )
     private_member(
         vsf_flash_capability_t cap;
+        vsf_eda_t *cur;
     )
 };
 
