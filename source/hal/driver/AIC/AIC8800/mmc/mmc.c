@@ -15,12 +15,9 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_MMC_CFG_IMP_PREFIX                  vsf_hw
-#define VSF_MMC_CFG_IMP_UPCASE_PREFIX           VSF_HW
-
 /*============================ INCLUDES ======================================*/
 
-#include "./mmc.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_MMC == ENABLED
 
@@ -237,6 +234,8 @@ void vsf_hw_mmc_host_transact_stop(vsf_hw_mmc_t *mmc_ptr)
 
 /*============================ INCLUDES ======================================*/
 
+#define VSF_MMC_CFG_IMP_PREFIX                  vsf_hw
+#define VSF_MMC_CFG_IMP_UPCASE_PREFIX           VSF_HW
 #define VSF_MMC_CFG_IMP_LV0(__COUNT, __HAL_OP)                                  \
     static const vsf_hw_mmc_const_t __vsf_hw_mmc ## __COUNT ## _const = {       \
         .reg  = VSF_HW_MMC ## __COUNT ## _REG,                                  \

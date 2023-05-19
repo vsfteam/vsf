@@ -17,10 +17,9 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "./rtc.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_RTC == ENABLED
-
 
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/time/time_api.h"

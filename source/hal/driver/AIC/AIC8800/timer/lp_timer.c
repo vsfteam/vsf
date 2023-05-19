@@ -15,17 +15,13 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_TIMER_CFG_IMP_PREFIX                    vsf_hw_lp
-#define VSF_TIMER_CFG_IMP_UPCASE_PREFIX             VSF_HW_LP
-
 /*============================ INCLUDES ======================================*/
 
-#include "./timer.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_TIMER == ENABLED
 
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
-#include "../__device.h"
 
 /*============================ MACROS ========================================*/
 
@@ -81,6 +77,8 @@ void vsf_hw_lp_timer_irq_disable(vsf_hw_lp_timer_t *timer_ptr, vsf_timer_irq_mas
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define VSF_TIMER_CFG_IMP_PREFIX                    vsf_hw_lp
+#define VSF_TIMER_CFG_IMP_UPCASE_PREFIX             VSF_HW_LP
 #define VSF_TIMER_CFG_IMP_LV0(__COUNT, __hal_op)                                \
     vsf_hw_lp_timer_t vsf_hw_lp_timer##__COUNT = {                              \
         .freq = 0,                                                              \

@@ -15,12 +15,9 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_IO_CFG_IMP_PREFIX                 vsf_hw
-#define VSF_IO_CFG_IMP_UPCASE_PREFIX          VSF_HW
-
 /*============================ INCLUDES ======================================*/
 
-#include "./io.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_IO == ENABLED
 
@@ -31,10 +28,10 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_HW_IO_CFG_MULTI_CLASS
-#   define VSF_HW_IO_CFG_MULTI_CLASS           VSF_IO_CFG_MULTI_CLASS
+#   define VSF_HW_IO_CFG_MULTI_CLASS    VSF_IO_CFG_MULTI_CLASS
 #endif
 
-#define __VSF_HW_IO_FUNCTION_MASK       IOMUX_GPIO_CONFIG_SEL_MASK
+#define __AIC8800_IO_FUNCTION_MASK      IOMUX_GPIO_CONFIG_SEL_MASK
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
@@ -152,7 +149,8 @@ vsf_io_capability_t vsf_hw_io_capability(vsf_hw_io_t *io)
 
 /*============================ INCLUDES ======================================*/
 
-
+#define VSF_IO_CFG_IMP_PREFIX                 vsf_hw
+#define VSF_IO_CFG_IMP_UPCASE_PREFIX          VSF_HW
 #define __VSF_HW_IOMUX(__COUNT, __)                                                     \
     .ports[__COUNT] = {                                                                 \
         .is_pmic = VSF_HW_IO_PORT ## __COUNT ## _IS_PMIC,                               \

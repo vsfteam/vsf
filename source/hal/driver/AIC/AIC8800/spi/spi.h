@@ -30,9 +30,6 @@
 
 #define VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE            ENABLED
 
-#define SPI_DATASIZE_TO_BYTE(__S)               \
-    (((((__S) & VSF_SPI_DATASIZE_MASK) >> 2) + 7) / 8)
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -108,10 +105,6 @@ typedef enum vsf_spi_mode_t {
 } vsf_spi_mode_t;
 
 /*============================ INCLUDES ======================================*/
-
-#define VSF_SPI_CFG_DEC_PREFIX              vsf_hw
-#define VSF_SPI_CFG_DEC_UPCASE_PREFIX       VSF_HW
-#include "hal/driver/common/spi/spi_template.h"
 
 #endif  /*  VSF_HAL_USE_SPI */
 #endif  /* EOF */

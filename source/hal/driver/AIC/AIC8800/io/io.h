@@ -28,21 +28,7 @@
 
 /*============================ MACROS ========================================*/
 
-#define VSF_IO_REIMPLEMENT_FEATURE      ENABLED
-
-#define __AIC8800_IO_FUNCTION_MASK       IOMUX_GPIO_CONFIG_SEL_MASK
-
-#define __AIC8800_IO_IS_VAILID_PIN(__P)                                          \
-    (((__P &  VSF_HW_IO_PIN_MASK) != 0) &&                                      \
-     ((__P & ~VSF_HW_IO_PIN_MASK) == 0))
-
-#define __AIC8800_IO_IS_VAILID_FEATURE(__F)                                      \
-    ((__F & ~(uint32_t)__AIC8800_IO_FEATURE_ALL_BITS) == 0)
-
-
-// TODO: add io function mode tables
-//#define VSF_PA0_AS_GPIO                  0
-//#define VSF_PA0_AS_SWCLK                 1
+#define VSF_IO_REIMPLEMENT_TYPE_MODE      ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -83,15 +69,12 @@ typedef enum vsf_io_mode_t {
 
 } vsf_io_mode_t;
 
+/*============================ PROTOTYPES ====================================*/
 
 extern uint32_t aic8800_io_reg_read(bool is_pmic, volatile uint32_t *reg);
 extern void aic8800_io_reg_mask_write(bool is_pmic, volatile uint32_t *reg,
                                       uint32_t wdata, uint32_t wmask);
 /*============================ INCLUDES ======================================*/
-
-#define VSF_IO_CFG_DEC_PREFIX              vsf_hw
-#define VSF_IO_CFG_DEC_UPCASE_PREFIX       VSF_HW
-#include "hal/driver/common/io/io_template.h"
 
 #endif /* VSF_HAL_USE_IO */
 #endif /* __HAL_DRIVER_AIC8800_HW_IO_H__ */

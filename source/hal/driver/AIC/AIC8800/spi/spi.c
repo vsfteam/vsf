@@ -15,12 +15,9 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_SPI_CFG_IMP_PREFIX                  vsf_hw
-#define VSF_SPI_CFG_IMP_UPCASE_PREFIX           VSF_HW
-
 /*============================ INCLUDES ======================================*/
 
-#include "./spi.h"
+#include "../driver.h"
 
 #if VSF_HAL_USE_SPI == ENABLED
 
@@ -38,6 +35,9 @@
 #ifndef VSF_HW_SPI_CFG_MULTI_CLASS
 #   define VSF_HW_SPI_CFG_MULTI_CLASS           VSF_SPI_CFG_MULTI_CLASS
 #endif
+
+#define SPI_DATASIZE_TO_BYTE(__S)               \
+    (((((__S) & VSF_SPI_DATASIZE_MASK) >> 2) + 7) / 8)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -513,7 +513,8 @@ vsf_spi_capability_t vsf_hw_spi_capability(vsf_hw_spi_t *spi_ptr)
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_SPI_CFG_IMP_UPCASE_PREFIX               VSF_HW
+#define VSF_SPI_CFG_IMP_PREFIX                  vsf_hw
+#define VSF_SPI_CFG_IMP_UPCASE_PREFIX           VSF_HW
 #define VSF_SPI_CFG_IMP_LV0(__COUNT, __HAL_OP)                                  \
     static const vsf_hw_spi_const_t __vsf_hw_spi ## __COUNT ## _const = {       \
         .reg = REG_SPI ## __COUNT,                                              \

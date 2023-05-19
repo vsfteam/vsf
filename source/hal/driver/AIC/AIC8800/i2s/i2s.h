@@ -69,11 +69,6 @@ typedef enum vsf_i2s_mode_t {
 } vsf_i2s_mode_t;
 
 /*============================ INCLUDES ======================================*/
-
-#define VSF_I2S_CFG_DEC_PREFIX                  vsf_hw
-#define VSF_I2S_CFG_DEC_UPCASE_PREFIX           VSF_HW
-#include "hal/driver/common/i2s/i2s_template.h"
-
 /*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
