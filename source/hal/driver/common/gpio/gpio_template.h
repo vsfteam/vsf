@@ -16,9 +16,6 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_gpio.h"
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_HAL_TEMPLATE_DEC_NAME                   _gpio
@@ -26,8 +23,12 @@
 #define VSF_HAL_TEMPLATE_DEC_COUNT_SUFFIX           _PORT_COUNT
 #define VSF_HAL_TEMPLATE_DEC_MASK_SUFFIX            _PORT_MASK
 
+#ifndef __VSF_TEMPLATE_GPIO_H__
+#   error "Please include \"vsf_template_gpio.h\" before include gpio_template.h"
+#endif
+
 #ifndef VSF_GPIO_CFG_DEC_PREFIX
-#   error "Please define VSF_GPIO_CFG_DEC_PREFIX when using vsf_template_gpio.h"
+#   error "Please define VSF_GPIO_CFG_DEC_PREFIX before include gpio_template.h"
 #endif
 
 #ifndef VSF_GPIO_CFG_DEC_INSTANCE_PREFIX

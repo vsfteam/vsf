@@ -16,15 +16,9 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_hal_driver.h"
-
 /*============================ MACROS ========================================*/
-#if VSF_HAL_USE_SPI == ENABLED
 
-#ifndef VSF_SPI_CFG_CS_COUNT
-#   define VSF_SPI_CFG_CS_COUNT     1
-#endif
+#if VSF_HAL_USE_SPI == ENABLED
 
 #define vsf_real_spi_t          VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t)
 #define vsf_real_spi_capability VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_capability)

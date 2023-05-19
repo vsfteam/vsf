@@ -16,16 +16,17 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_i2c.h"
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_HAL_TEMPLATE_DEC_NAME                     _i2c
 #define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _I2C
 
+#ifndef __VSF_TEMPLATE_I2C_H__
+#   error "Please include \"vsf_template_i2c.h\" before include i2c_template.h"
+#endif
+
 #ifndef VSF_I2C_CFG_DEC_PREFIX
-#   error "Please define VSF_I2C_CFG_DEC_PREFIX when using vsf_template_i2c.h"
+#   error "Please define VSF_I2C_CFG_DEC_PREFIX before include i2c_template.h"
 #endif
 
 #ifndef VSF_I2C_CFG_DEC_INSTANCE_PREFIX

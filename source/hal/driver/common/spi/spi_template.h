@@ -16,16 +16,17 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_spi.h"
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_HAL_TEMPLATE_DEC_NAME                     _spi
 #define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _SPI
 
+#ifndef __VSF_TEMPLATE_SPI_H__
+#   error "Please include \"vsf_template_spi.h\" before include spi_template.h"
+#endif
+
 #ifndef VSF_SPI_CFG_DEC_PREFIX
-#   error "Please define VSF_SPI_CFG_DEC_PREFIX when using vsf_template_spi.h"
+#   error "Please define VSF_SPI_CFG_DEC_PREFIX before include spi_template.h"
 #endif
 
 #ifndef VSF_SPI_CFG_DEC_INSTANCE_PREFIX

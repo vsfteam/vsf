@@ -30,11 +30,9 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
 /*============================ IMPLEMENTATION ================================*/
 
-
-void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_io_mode_t feature)
+void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_mode_t feature)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);

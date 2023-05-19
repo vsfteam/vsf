@@ -16,16 +16,17 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_usart.h"
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_HAL_TEMPLATE_DEC_NAME                     _usart
 #define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _USART
 
+#ifndef __VSF_TEMPLATE_USART_H__
+#   error "Please include \"vsf_template_usart.h\" before include usart_template.h"
+#endif
+
 #ifndef VSF_USART_CFG_DEC_PREFIX
-#   error "Please define VSF_USART_CFG_DEC_PREFIX when using vsf_template_usart.h"
+#   error "Please define VSF_USART_CFG_DEC_PREFIX before include usart_template.h"
 #endif
 
 #ifndef VSF_USART_CFG_DEC_INSTANCE_PREFIX

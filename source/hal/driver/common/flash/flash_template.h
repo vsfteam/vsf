@@ -16,16 +16,17 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_flash.h"
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_HAL_TEMPLATE_DEC_NAME                     _flash
 #define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _FLASH
 
+#ifndef __VSF_TEMPLATE_FLASH_H__
+#   error "Please include \"vsf_template_flash.h\" before include flash_template.h"
+#endif
+
 #ifndef VSF_FLASH_CFG_DEC_PREFIX
-#   error "Please define VSF_FLASH_CFG_DEC_PREFIX when using vsf_template_flash.h"
+#   error "Please define VSF_FLASH_CFG_DEC_PREFIX before include flash_template.h"
 #endif
 
 #ifndef VSF_FLASH_CFG_DEC_INSTANCE_PREFIX

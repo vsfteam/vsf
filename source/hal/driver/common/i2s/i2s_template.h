@@ -16,16 +16,17 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
-#include "hal/driver/common/template/vsf_template_i2s.h"
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_HAL_TEMPLATE_DEC_NAME                     _i2s
 #define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _I2S
 
+#ifndef __VSF_TEMPLATE_I2S_H__
+#   error "Please include \"vsf_template_i2s.h\" before include i2s_template.h"
+#endif
+
 #ifndef VSF_I2S_CFG_DEC_PREFIX
-#   error "Please define VSF_I2S_CFG_DEC_PREFIX when using vsf_template_i2s.h"
+#   error "Please define VSF_I2S_CFG_DEC_PREFIX before include i2s_template.h"
 #endif
 
 #ifndef VSF_I2S_CFG_DEC_INSTANCE_PREFIX
@@ -33,7 +34,7 @@
 #endif
 
 #ifdef VSF_I2S_CFG_DEC_UPCASE_PREFIX
-#   define VSF_HAL_TEMPLATE_DEC_UPCASE_PREFIX     VSF_I2S_CFG_DEC_UPCASE_PREFIX
+#   define VSF_HAL_TEMPLATE_DEC_UPCASE_PREFIX       VSF_I2S_CFG_DEC_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_declaration.h"
