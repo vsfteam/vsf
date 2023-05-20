@@ -3,6 +3,9 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
+// for mal
+#include "component/vsf_component.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
