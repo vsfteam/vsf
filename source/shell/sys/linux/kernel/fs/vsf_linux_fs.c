@@ -948,19 +948,27 @@ int vsf_linux_fd_create(vsf_linux_fd_t **sfd, const vsf_linux_fd_op_t *op)
     return __vsf_linux_fd_create_ex(NULL, sfd, op, -1, NULL);
 }
 
-void __vsf_linux_fd_delete_ex(vsf_linux_process_t *process, int fd)
+void ____vsf_linux_fd_delete_ex(vsf_linux_process_t *process, vsf_linux_fd_t *sfd)
 {
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
     }
-    vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex(process, fd);
-
     vsf_protect_t orig = vsf_protect_sched();
         vsf_dlist_remove(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
         vsf_bitmap_clear(&process->fd_bitmap, sfd->fd);
     vsf_unprotect_sched(orig);
 
     __free_ex(process, sfd);
+}
+
+void __vsf_linux_fd_delete_ex(vsf_linux_process_t *process, int fd)
+{
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
+    vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex(process, fd);
+    VSF_LINUX_ASSERT(sfd != NULL);
+    return ____vsf_linux_fd_delete_ex(process, sfd);
 }
 
 void vsf_linux_fd_delete(int fd)
@@ -1721,16 +1729,19 @@ int openat(int dirfd, const char *pathname, int flags, ...)
     return ret;
 }
 
+int ____vsf_linux_fd_close_ex(vsf_linux_process_t *process, vsf_linux_fd_t *sfd)
+{
+    VSF_LINUX_ASSERT(sfd != NULL);
+    int err = __vsf_linux_fd_deref_priv(sfd);
+    ____vsf_linux_fd_delete_ex(process, sfd);
+    return err;
+}
+
 int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd)
 {
     vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex(process, fd);
     if (!sfd) { return -1; }
-
-    vsf_linux_fd_priv_t *priv = sfd->priv;
-
-    int err = __vsf_linux_fd_deref_priv(sfd);
-    __vsf_linux_fd_delete_ex(process, fd);
-    return err;
+    return ____vsf_linux_fd_close_ex(process, sfd);
 }
 
 int close(int fd)

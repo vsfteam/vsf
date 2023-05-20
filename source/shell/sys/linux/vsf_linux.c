@@ -249,7 +249,9 @@ extern int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t
             const vsf_linux_fd_op_t *op, int fd_desired, vsf_linux_fd_priv_t *priv);
 extern vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd);
 extern void __vsf_linux_fd_delete_ex(vsf_linux_process_t *process, int fd);
+extern void ____vsf_linux_fd_delete_ex(vsf_linux_process_t *process, vsf_linux_fd_t *sfd);
 extern int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd);
+extern int ____vsf_linux_fd_close_ex(vsf_linux_process_t *process, vsf_linux_fd_t *sfd);
 extern vk_file_t * __vsf_linux_get_fs_ex(vsf_linux_process_t *process, int fd);
 
 extern void __vsf_linux_rx_stream_init(vsf_linux_stream_priv_t *priv_tx);
@@ -1214,7 +1216,7 @@ void vsf_linux_cleanup_process(vsf_linux_process_t *process)
         if (sfd != NULL) {
             // do not use close because it depends on current process
             //  and vsf_linux_delete_process can be called in other processes
-            __vsf_linux_fd_close_ex(process, sfd->fd);
+            ____vsf_linux_fd_close_ex(process, sfd);
         }
     } while (sfd != NULL);
 
@@ -3385,7 +3387,7 @@ static int __vsf_linux_spawn_ex(pid_t *pid, vsf_linux_main_entry_t entry,
                             __FUNCTION__, process, sfd->fd, sfd->priv, sfd->priv->ref);
 #endif
                     vsf_unprotect_sched(orig);
-                    __vsf_linux_fd_delete_ex(process, sfd->fd);
+                    ____vsf_linux_fd_delete_ex(process, sfd);
                 }
 
                 sfd = __vsf_linux_fd_get_ex(process, a->action.dup2_action.fd);
