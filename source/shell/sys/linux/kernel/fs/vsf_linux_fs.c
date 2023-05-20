@@ -2759,6 +2759,16 @@ void __vsf_linux_tx_stream_fini(vsf_linux_stream_priv_t *priv_tx)
 {
     if (priv_tx->stream_tx != NULL) {
         vsf_stream_disconnect_tx(priv_tx->stream_tx);
+
+        // protect stream_tx_allocated which will maybe modified in __vsf_linux_pipe_close
+        vsf_protect_t orig = vsf_protect_sched();
+        if (    !(priv_tx->flags & __VSF_FILE_ATTR_SHARE_PRIV)
+            &&  priv_tx->stream_tx_allocated) {
+            vsf_unprotect_sched(orig);
+            vsf_linux_free_res(priv_tx->stream_tx);
+        } else {
+            vsf_unprotect_sched(orig);
+        }
     }
 }
 
@@ -2803,7 +2813,7 @@ void __vsf_linux_rx_stream_fini(vsf_linux_stream_priv_t *priv_rx)
     if (priv_rx->stream_rx != NULL) {
         vsf_stream_disconnect_rx(priv_rx->stream_rx);
         if (    !(priv_rx->flags & __VSF_FILE_ATTR_SHARE_PRIV)
-            &&  priv_rx->is_to_free_stream) {
+            &&  priv_rx->stream_rx_allocated) {
             vsf_linux_free_res(priv_rx->stream_rx);
         }
     }
@@ -2904,19 +2914,19 @@ static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd)
 
     int result = 0;
     if (!(priv->flags & __VSF_FILE_ATTR_SHARE_PRIV)) {
-        result = __vsf_linux_stream_close(sfd);
-
         vsf_protect_t orig = vsf_protect_sched();
         if (priv->pipe_remote != NULL) {
-            if (priv->is_to_free_stream) {
-                priv->pipe_remote->stream_tx = NULL;
-            }
+            // __vsf_linux_stream_close will free stream_rx if it is alloctead,
+            //  if prpe is connected(i.e. pipe_remote is not NULL), transfer stream_rx to stream_tx of remote pipe
+            priv->pipe_remote->stream_tx_allocated = priv->stream_rx_allocated;
+            priv->stream_rx_allocated = false;
 
             // pipe_tx is closed, set stick_events in pipe_rx with POLLLIN
             priv->pipe_remote->sticky_events = POLLIN;
             priv->pipe_remote->pipe_remote = NULL;
         }
         vsf_unprotect_sched(orig);
+        result = __vsf_linux_stream_close(sfd);
     }
     return result;
 }
@@ -2929,7 +2939,7 @@ int __vsf_linux_rx_pipe_init(vsf_linux_pipe_priv_t *priv_rx, vsf_queue_stream_t 
         if (NULL == queue_stream) {
             return -1;
         }
-        priv_rx->is_to_free_stream = true;
+        priv_rx->stream_rx_allocated = true;
     }
 
     queue_stream->max_buffer_size = -1;

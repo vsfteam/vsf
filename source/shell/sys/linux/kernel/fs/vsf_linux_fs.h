@@ -150,8 +150,8 @@ vsf_class(vsf_linux_stream_priv_t) {
         vsf_stream_t *stream_rx;
         vsf_stream_t *stream_tx;
         vsf_linux_stream_on_evt_t on_evt;
-        // stream owns stream_rx only, if is_to_free_stream is set, stream_rx will be freed when close
-        bool is_to_free_stream;
+        bool stream_rx_allocated;
+        bool stream_tx_allocated;
     )
 };
 
