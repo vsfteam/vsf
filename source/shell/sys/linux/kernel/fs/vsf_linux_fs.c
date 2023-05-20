@@ -2759,15 +2759,9 @@ void __vsf_linux_tx_stream_fini(vsf_linux_stream_priv_t *priv_tx)
 {
     if (priv_tx->stream_tx != NULL) {
         vsf_stream_disconnect_tx(priv_tx->stream_tx);
-
-        // protect stream_tx_allocated which will maybe modified in __vsf_linux_pipe_close
-        vsf_protect_t orig = vsf_protect_sched();
         if (    !(priv_tx->flags & __VSF_FILE_ATTR_SHARE_PRIV)
             &&  priv_tx->stream_tx_allocated) {
-            vsf_unprotect_sched(orig);
             vsf_linux_free_res(priv_tx->stream_tx);
-        } else {
-            vsf_unprotect_sched(orig);
         }
     }
 }
