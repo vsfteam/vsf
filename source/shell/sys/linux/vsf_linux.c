@@ -1328,6 +1328,9 @@ void vsf_linux_exit_process(int status, bool _exit)
         if (NULL == process2wait) {
             break;
         }
+        if (process2wait->id.gid != process->id.pid) {
+            continue;
+        }
 
         // does it necessary to wait for child processes?
 #if 1
@@ -2609,7 +2612,6 @@ int setpgid(pid_t pid, pid_t pgid)
 {
     vsf_linux_process_t *process = 0 == pid ? vsf_linux_get_cur_process() : vsf_linux_get_process(pid);
     if (0 == pgid) {
-        vsf_linux_detach_process(process);
         process->id.gid = process->id.pid;
     } else if (process->id.gid != pgid) {
         vsf_linux_process_t *process_group = vsf_linux_get_process(pgid);
