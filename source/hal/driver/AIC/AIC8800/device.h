@@ -28,10 +28,6 @@
 #   define VSF_ARCH_PRI_NUM                         64
 #   define VSF_ARCH_PRI_BIT                         6
 
-// TODO: Dedicated header files will be provided for use at the high levels and arch
-// header which will include core_cm4.h
-#   include "chip.h"
-
 // aic8800 rtoa_al need this
 #   define VSF_KERNEL_CFG_QUEUE_HAS_RX_NOTIFIED     ENABLED
 
@@ -47,6 +43,8 @@
 #include "common.h"
 
 /*============================ MACROS ========================================*/
+
+#define VSF_VENDOR_DRIVER_HEADER    "chip.h"
 
 #ifndef VSF_AIC8800_USB_CFG_SPEED
 #   define VSF_AIC8800_USB_CFG_SPEED                USB_SPEED_HIGH
