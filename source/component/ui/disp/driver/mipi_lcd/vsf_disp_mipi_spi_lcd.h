@@ -70,12 +70,106 @@ extern "C" {
 #   error "TODO: support 9bit spi mode"
 #endif
 
+// address
+#define MIPI_MODE_X_FLIP                                MIPI_DCS_COLUME_ADDRESS_RIGHT_TO_LEFT
+#define MIPI_MODE_Y_FLIP                                MIPI_DCS_PAGE_ADDRESS_BOTTOM_TO_TOP
+#define MIPI_MODE_RGB                                   MIPI_DCS_DEVICE_REFRESH_RGB
+#define MIPI_MODE_BGR                                   MIPI_DCS_DEVICE_REFRESH_BGR
+// pixel format
 // pixel bitlen in [3, 8, 12, 16, 18, 24]
 #define MIPI_PIXEL_FORMAT_BITLEN(__BITLEN)              MIPI_DCS_PIXEL_FORMAT_DBI_BITS(__BITLEN)
+// soft reset
+#define MIPI_SOFT_RESET                                 MIPI_DCS_CMD_SOFT_RESET
+// sleep sleep
+#define MIPI_ENTER_IDLE                                 MIPI_DCS_CMD_HEX_CODE_ENTER_IDLE_MODE
+// exit sleep
+#define MIPI_EXIT_IDLE                                  MIPI_DCS_CMD_HEX_CODE_EXIT_IDLE_MODE
+// sleep sleep
+#define MIPI_ENTER_SLEEP                                MIPI_DCS_CMD_ENTER_SLEEP_MODE
+// exit sleep
+#define MIPI_EXIT_SLEEP                                 MIPI_DCS_CMD_EXIT_SLEEP_MODE
+// the part of display
+#define MIPI_ENTER_PARTIAL_MODE                         MIPI_DCS_CMD_ENTER_PARTIAL_MODE
+// the whole of display
+#define MIPI_EXIT_PARTIAL_MODE                          MIPI_DCS_CMD_ENTER_NORMAL_MODE
+// inverted colors
+#define MIPI_ENTER_INVERT_MODE                          MIPI_DCS_CMD_HEX_CODE_ENTER_INVERT_MODE
+// normal colors
+#define MIPI_EXIT_INVERT_MODE                           MIPI_DCS_CMD_HEX_CODE_EXIT_INVERT_MODE
+// tearing effect output pin on
+#define MIPI_TEAR_PIN_ON                                MIPI_DCS_CMD_SET_TEAR_ON
+// tearing effect output off
+#define MIPI_TEAR_PIN_OFF                               MIPI_DCS_CMD_SET_TEAR_OFF
 
-#define MIPI_MODE_X_FLIP                                MIPI_DCS_COLUME_ADDRESS_RIGHT_TO_LEFT
-#define MIPI_MODE_RGB                                   MIPI_DCS_DEVICE_REFRESH_RGB
-#define MIPI_MODE_BGR                                   MIPI_DCS_DEVICE_REFRESH_BRT
+/**
+ \~chinese
+ @def VSF_DISP_MIPI_SPI_LCD_INIT(__LCD_SEQ, __PIXEL_BITLEN, __MODE, ...)
+ @brief 一个简化 LCD 配置的宏
+ @param[in] __LCD_SEQ: 包含一堆预定义命令的宏, 增加新的 LCD 支持应该定义类似的命令，部分现在提供的预定义命令：
+            VSF_DISP_MIPI_SPI_LCD_S6D05A1_BASE, VSF_DISP_MIPI_SPI_LCD_ILI9488_BASE, VSF_DISP_MIPI_SPI_LCD_ILI9341_BASE, ...
+
+ @param[in] __PIXEL_BITLEN: LCD 像素位宽，可选值包括： [3, 8, 12, 16, 18, 24]
+
+ @param[in] __MODE: LCD 的颜色和地址顺序，可以使用简化配置宏
+                        MIPI_MODE_X_FLIP, MIPI_MODE_Y_FLIP, MIPI_MODE_RGB, MIPI_MODE_BGR，
+                    也可以使用如下完整命令，需要注意，不是所有 LCD 都支持以下所有配置：
+                        MIPI_DCS_PAGE_ADDRESS_TOP_TO_BOTTOM
+                        MIPI_DCS_PAGE_ADDRESS_BOTTOM_TO_TOP
+                        MIPI_DCS_COLUME_ADDRESS_LEFT_TO_RIGHT
+                        MIPI_DCS_COLUME_ADDRESS_RIGHT_TO_LEFT
+                        MIPI_DCS_PAGE_COLUMN_NORMAL_ORDER
+                        MIPI_DCS_PAGE_COLUMN_REVERSE_ORDER
+                        MIPI_DCS_DEVICE_REFRESH_TOP_TO_BOTTOM
+                        MIPI_DCS_DEVICE_REFRESH_BOTTOM_TO_TOP
+                        MIPI_DCS_DEVICE_REFRESH_RGB
+                        MIPI_DCS_DEVICE_REFRESH_BGR
+                        MIPI_DCS_LCD_REFRESH_LEFT_TO_RIGHT
+                        MIPI_DCS_LCD_REFRESH_RIGHT_TO_LEFT
+                        MIPI_DCS_FLIP_HORIZONTAL_NORMAL
+                        MIPI_DCS_FLIP_HORIZONTAL_FLIPPED
+
+ @param[in] 可选参数，有三种方式填充可选参数
+    1. 使用简化命令配置通用寄存器，例如 MIPI_SOFT_RESET, MIPI_ENTER_IDLE, MIPI_EXIT_IDLE, MIPI_EXIT_IDLE, ...
+    2. 使用完整命令配置通用寄存器，每一个通用寄存器都有相应的宏，可以参考头文件 vsf_disp_mip_lcd_dcs.h，例子：
+         MIPI_DCS_CMD_SET_TEAR_SCANLINE(0x10),  // turns on the display module’s Tearing Effect output signal
+                                                // on the TE signal line when the displaymodule reaches line 16
+    3. 使用宏 VSF_DISP_MIPI_LCD_WRITE() to 配置部分 LCD 专有寄存器，例如
+       VSF_DISP_MIPI_LCD_WRITE(0xB1,  2, 0x00, 0x10),   //  for ST7796S, set 0x81 register with 2 byte parameter
+
+  以下是一些简单的例子：
+
+  // ST7789V with RGB565
+  VSF_DISP_MIPI_SPI_LCD_INITSEQ(
+    VSF_DISP_MIPI_SPI_LCD_ST7789V_BASE,
+    16,
+    MIPI_MODE_RGB
+  )
+
+  // ST7789V with RGB565, tearing effect line on
+  VSF_DISP_MIPI_SPI_LCD_INITSEQ(
+    VSF_DISP_MIPI_SPI_LCD_ST7789V_BASE,
+    16,
+    MIPI_MODE_RGB,
+    MIPI_TEAR_PIN_ON
+  )
+
+  // ST7796S with BGR888, X FLIP
+  VSF_DISP_MIPI_SPI_LCD_INITSEQ(
+    VSF_DISP_MIPI_SPI_LCD_ST7796S_BASE,
+    24,
+    MIPI_MODE_RGB | MIPI_MODE_X_FLIP,
+    // Blanking Porch Control
+    VSF_DISP_MIPI_LCD_WRITE(0xB1,  2, 0x00, 0x10),
+  )
+ */
+#define VSF_DISP_MIPI_SPI_LCD_INITSEQ(__LCD_SEQ, __PIXEL_BITLEN, __MODE, ...)   \
+    __LCD_SEQ,                                                                  \
+    MIPI_DCS_CMD_SET_ADDRESS_MODE(__MODE),                                      \
+    MIPI_DCS_CMD_SET_PIXEL_FORMAT(                                              \
+        MIPI_DCS_PIXEL_FORMAT_DBI_BITS(__PIXEL_BITLEN)                          \
+    ),                                                                          \
+    MIPI_DCS_CMD_SET_DISPLAY_ON,                                                \
+    __VA_ARGS__
 
 #define VSF_DISP_MIPI_SPI_LCD_INIT_MODE_AND_FORMAT(__MODE, __PIXEL_FORMAT)      \
     MIPI_DCS_CMD_SET_ADDRESS_MODE(__MODE),                                      \
