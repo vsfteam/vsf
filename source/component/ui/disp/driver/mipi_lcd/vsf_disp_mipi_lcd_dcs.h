@@ -198,7 +198,7 @@ extern "C" {
 #define MIPI_DCS_DEVICE_REFRESH_BOTTOM_TO_TOP           (1 << 4)
 // RGB/BGR Order, 0 = RGB, 1 = BGR
 #define MIPI_DCS_DEVICE_REFRESH_RGB                     (0 << 3)
-#define MIPI_DCS_DEVICE_REFRESH_BRT                     (1 << 3)
+#define MIPI_DCS_DEVICE_REFRESH_BGR                     (1 << 3)
 // Display Data Latch Data Order, 0 = left side to the right side, 1 = right side to the left side
 #define MIPI_DCS_LCD_REFRESH_LEFT_TO_RIGHT              (0 << 2)
 #define MIPI_DCS_LCD_REFRESH_RIGHT_TO_LEFT              (1 << 2)

@@ -31,8 +31,8 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef MIPI_LCD_SPI_PRIO
-#   define MIPI_LCD_SPI_PRIO                            vsf_prio_0
+#ifndef MIPI_LCD_SPI_ARCH_PRIO
+#   define MIPI_LCD_SPI_ARCH_PRIO                            vsf_arch_prio_1
 #endif
 
 #ifndef MIPI_LCD_SPI_CFG
@@ -138,12 +138,12 @@ void vsf_disp_mipi_spi_lcd_io_init(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
 {
 #if VSF_DISP_MIPI_SPI_LCD_USING_VSF_GPIO == ENABLED
     vsf_gpio_config_pin(disp_mipi_spi_lcd->reset.gpio,
-                        disp_mipi_spi_lcd->reset.pin_mask, VSF_IO_PULL_UP);
+                        disp_mipi_spi_lcd->reset.pin_mask, VSF_GPIO_PULL_UP);
     vsf_gpio_set_output(disp_mipi_spi_lcd->reset.gpio,
                         disp_mipi_spi_lcd->reset.pin_mask);
 
     vsf_gpio_config_pin(disp_mipi_spi_lcd->dcx.gpio,
-                        disp_mipi_spi_lcd->dcx.pin_mask, VSF_IO_PULL_UP);
+                        disp_mipi_spi_lcd->dcx.pin_mask, VSF_GPIO_PULL_UP);
     vsf_gpio_set_output(disp_mipi_spi_lcd->dcx.gpio,
                         disp_mipi_spi_lcd->dcx.pin_mask);
 #endif
@@ -180,7 +180,7 @@ static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_spi_lcd_t * disp_mipi_spi_lcd)
         .isr = {
             .handler_fn = __mipi_lcd_spi_req_cpl_handler,
             .target_ptr = disp_mipi_spi_lcd,
-            .prio = MIPI_LCD_SPI_PRIO,
+            .prio = MIPI_LCD_SPI_ARCH_PRIO,
         }
     };
 
@@ -241,7 +241,8 @@ static void __lcd_spi_request_cmd(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
 
     vsf_spi_cs_active(disp_mipi_spi_lcd->spi, 0);
     vsf_disp_mipi_spi_lcd_dcx_io_write(disp_mipi_spi_lcd, false);
-    vsf_spi_request_transfer(disp_mipi_spi_lcd->spi, &disp_mipi_spi_lcd->cmd.cmd, NULL, 1);
+    vsf_err_t err = vsf_spi_request_transfer(disp_mipi_spi_lcd->spi, &disp_mipi_spi_lcd->cmd.cmd, NULL, 1);
+    VSF_UI_ASSERT(err == VSF_ERR_NONE);
 }
 
 static void __lcd_spi_request_data(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
@@ -249,9 +250,10 @@ static void __lcd_spi_request_data(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
     VSF_UI_ASSERT(disp_mipi_spi_lcd->spi != NULL);
 
     vsf_disp_mipi_spi_lcd_dcx_io_write(disp_mipi_spi_lcd, true);
-    vsf_spi_request_transfer(disp_mipi_spi_lcd->spi,
-                             disp_mipi_spi_lcd->cmd.param_buffer,
-                             NULL, disp_mipi_spi_lcd->cmd.param_size);
+    vsf_err_t err = vsf_spi_request_transfer(disp_mipi_spi_lcd->spi,
+                                             disp_mipi_spi_lcd->cmd.param_buffer, NULL,
+                                             disp_mipi_spi_lcd->cmd.param_size);
+    VSF_UI_ASSERT(err == VSF_ERR_NONE);
 }
 
 static void __lcd_write_command_seq(vsf_eda_t *teda, vsf_evt_t evt)

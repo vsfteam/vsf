@@ -376,17 +376,13 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #      define APP_DISP_DEMO_HEIGHT                      240
 #      define APP_DISP_DEMO_WIDTH                       320
 #      define APP_DISP_DEMO_COLOR                       VSF_DISP_COLOR_RGB565
-#      define APP_DISP_DEMO_ADDRESS_MODE                                        \
-               (MIPI_DCS_PAGE_ADDRESS_TOP_TO_BOTTOM         |                   \
-                MIPI_DCS_COLUME_ADDRESS_LEFT_TO_RIGHT       |                   \
-                MIPI_DCS_PAGE_COLUMN_NORMAL_ORDER)
 #      define APP_DISP_DEMO_MIPI_SPI_LCD_SEQ            {                       \
-                VSF_DISP_MIPI_SPI_LCD_ST7789V_BASE,                             \
-                VSF_DISP_MIPI_SPI_LCD_INIT_MODE_AND_FORMAT(                     \
-                    APP_DISP_DEMO_ADDRESS_MODE,                                 \
-                    MIPI_DCS_PIXEL_FORMAT_BITS_16                               \
-                ),                                                              \
-        }
+                VSF_DISP_MIPI_SPI_LCD_INITSEQ(                                  \
+                    VSF_DISP_MIPI_SPI_LCD_ST7789V_BASE,                         \
+                    16,                                                         \
+                    MIPI_MODE_RGB,                                              \
+                )                                                               \
+              }
 #      define APP_DISP_DEMO_CLOCK_HZ                    (60ul * 1000ul * 1000ul)
 #endif
 
