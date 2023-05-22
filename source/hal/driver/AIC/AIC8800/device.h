@@ -33,6 +33,11 @@
 
 // aic8800 sdk defined dma_addr_t to uint32_t
 #   define VSF_ARCH_DMA_ADDR_T                      uint32_t
+#elif defined(__VSF_HAL_SHOW_VENDOR_INFO__)
+
+#   define __VSF_HEADER_ONLY_SHOW_VENDOR_INFO__
+#   include "chip.h"
+
 #else
 
 #ifndef __HAL_DEVICE_AIC_AIC8800_H__
@@ -43,8 +48,6 @@
 #include "common.h"
 
 /*============================ MACROS ========================================*/
-
-#define VSF_VENDOR_DRIVER_HEADER    "chip.h"
 
 #ifndef VSF_AIC8800_USB_CFG_SPEED
 #   define VSF_AIC8800_USB_CFG_SPEED                USB_SPEED_HIGH
