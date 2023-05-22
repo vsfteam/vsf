@@ -19,7 +19,7 @@
 
 #include "hal/vsf_hal_cfg.h"
 
-#ifndef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#if !defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__) && !defined(__VSF_HAL_SHOW_VENDOR_INFO__)
 #   include "utilities/vsf_utilities.h"
 #endif
 
@@ -97,7 +97,7 @@
 #   include    VSF_DRIVER_HEADER
 #endif
 
-#if !defined(__HAL_DRIVER_H__) && !defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
+#if !defined(__HAL_DRIVER_H__) && !defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__) && !defined(__VSF_HAL_SHOW_VENDOR_INFO__)
 #define __HAL_DRIVER_H__
 
 //! common hal drivers

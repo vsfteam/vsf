@@ -23,7 +23,14 @@
 /* include vendor specified device driver header file */
 #   include VSF_VENDOR_DRIVER_HEADER
 #else
-#   warning "The driver does not provide the header file of the vendor driver"
+#   define __VSF_HAL_SHOW_VENDOR_INFO__
+#   include "hal/driver/driver.h"
+#   undef __VSF_HAL_SHOW_VENDOR_INFO__
+
+#   ifndef __VSF_HEADER_ONLY_SHOW_VENDOR_INFO__
+#       warning "The driver does not provide a header file of the vendor driver, \
+nor does it provide vendor information"
+#   endif
 #endif
 
 /* EOF */
