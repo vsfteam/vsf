@@ -984,9 +984,9 @@ int vsf_linux_statat(int dirfd, const char *pathname, struct stat *buf)
 {
     int fd;
     if (dirfd < 0) {
-        fd = open(pathname, 0);
+        fd = open(pathname, O_NOFOLLOW);
     } else {
-        fd = openat(dirfd, pathname, 0);
+        fd = openat(dirfd, pathname, O_NOFOLLOW);
     }
     if (fd < 0) {
         errno = ENOENT;
@@ -2077,7 +2077,7 @@ int stat(const char *pathname, struct stat *buf)
         return -1;
     }
 
-    int fd = open(pathname, 0);
+    int fd = open(pathname, O_NOFOLLOW);
     if (fd < 0) { return -1; }
 
     int ret = fstat(fd, buf);
