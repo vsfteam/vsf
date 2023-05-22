@@ -2164,7 +2164,10 @@ int symlink(const char *target, const char *linkpath)
     if (fd < 0) {
         return -1;
     }
-    if (write(fd, target, strlen(target)) < 0) {
+
+    size_t targetlen = strlen(target);
+    ssize_t res = write(fd, target, targetlen);
+    if (res != targetlen) {
         close(fd);
         return -1;
     }
@@ -2174,6 +2177,7 @@ int symlink(const char *target, const char *linkpath)
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     vk_file_t *file = priv->file;
     file->attr |= VSF_FILE_ATTR_LNK;
+    close(fd);
     return 0;
 #else
     return -1;
