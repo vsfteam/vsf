@@ -98,7 +98,9 @@ typedef enum vk_file_attr_t {
     VSF_FILE_ATTR_EXECUTE       = 1 << 2,
     VSF_FILE_ATTR_HIDDEN        = 1 << 3,
     VSF_FILE_ATTR_DIRECTORY     = 1 << 4,
-    VSF_FILE_ATTR_DYN           = 1 << 7,
+    VSF_FILE_ATTR_LNK           = 1 << 5,
+    // __VSF_FILE_ATTR_DYN is for internal usage only, to indicated resources are dynamically allocated
+    __VSF_FILE_ATTR_DYN         = 1 << 7,
     VSF_FILE_ATTR_EXT           = 1 << 8,
     VSF_FILE_ATTR_USER          = 1 << 9,
     // make vk_file_attr_t 32bit

@@ -208,14 +208,14 @@ vk_file_t * vk_file_alloc(uint_fast16_t size)
 #endif
     if (file != NULL) {
         memset(file, 0, size);
-        file->attr |= VSF_FILE_ATTR_DYN;
+        file->attr |= __VSF_FILE_ATTR_DYN;
     }
     return file;
 }
 
 void vk_file_free(vk_file_t *file)
 {
-    if (file->attr & VSF_FILE_ATTR_DYN) {
+    if (file->attr & __VSF_FILE_ATTR_DYN) {
 #if VSF_FS_CFG_FILE_POOL == ENABLED
         VSF_POOL_FREE(__vk_fs_file_pool, &__vk_fs.file_pool, (__vk_fs_file_t *)file);
 #else
