@@ -405,10 +405,14 @@ static int __vsf_linux_fs_stat(vsf_linux_fd_t *sfd, struct stat *buf)
 
     if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
         buf->st_mode = S_IFDIR;
+    } else if (file->attr & VSF_FILE_ATTR_CHR) {
+        buf->st_mode = S_IFCHR;
     } else if (file->attr & VSF_FILE_ATTR_BLK) {
         buf->st_mode = S_IFBLK;
     } else if (file->attr & VSF_FILE_ATTR_SOCK) {
         buf->st_mode = S_IFSOCK;
+    } else if (file->attr & VSF_FILE_ATTR_LNK) {
+        buf->st_mode = S_IFLNK;
     } else {
         buf->st_mode = S_IFREG;
     }
@@ -2159,12 +2163,41 @@ int unlinkat(int dirfd, const char *pathname, int flags)
 
 int symlink(const char *target, const char *linkpath)
 {
+#if VSF_LINUX_CFG_LINK_FILE == ENABLED
+    int fd = creat(linkpath, 0);
+    if (fd < 0) {
+        return -1;
+    }
+    if (write(fd, target, strlen(target)) < 0) {
+        close(fd);
+        return -1;
+    }
+
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    VSF_LINUX_ASSERT(sfd->op == &__vsf_linux_fs_fdop);
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    vk_file_t *file = priv->file;
+    file->attr |= VSF_FILE_ATTR_LNK;
+    return 0;
+#else
     return -1;
+#endif
 }
 
 ssize_t readlink(const char *pathname, char *buf, size_t bufsiz)
 {
+#if VSF_LINUX_CFG_LINK_FILE == ENABLED
+    int fd = open(pathname, O_NOFOLLOW);
+    if (fd < 0) {
+        return -1;
+    }
+
+    ssize_t res = read(fd, buf, bufsiz);
+    close(fd);
+    return res;
+#else
     return -1;
+#endif
 }
 
 DIR *fdopendir(int fd)
