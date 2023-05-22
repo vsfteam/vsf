@@ -2165,18 +2165,24 @@ int symlink(const char *target, const char *linkpath)
         return -1;
     }
 
-    size_t targetlen = strlen(target);
-    ssize_t res = write(fd, target, targetlen);
-    if (res != targetlen) {
-        close(fd);
-        return -1;
-    }
-
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     VSF_LINUX_ASSERT(sfd->op == &__vsf_linux_fs_fdop);
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     vk_file_t *file = priv->file;
+    // currently only support link file in vfs
+    if (file->fsop != &vk_vfs_op) {
+        goto close_and_fail;
+    }
     file->attr |= VSF_FILE_ATTR_LNK;
+
+    size_t targetlen = strlen(target);
+    ssize_t res = write(fd, target, targetlen);
+    if (res != targetlen) {
+    close_and_fail:
+        close(fd);
+        return -1;
+    }
+
     close(fd);
     return 0;
 #else
