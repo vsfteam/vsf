@@ -980,13 +980,13 @@ void vsf_linux_fd_delete(int fd)
     __vsf_linux_fd_delete_ex(NULL, fd);
 }
 
-int vsf_linux_statat(int dirfd, const char *pathname, struct stat *buf)
+int vsf_linux_statat(int dirfd, const char *pathname, struct stat *buf, int flags)
 {
     int fd;
     if (dirfd < 0) {
-        fd = open(pathname, O_NOFOLLOW);
+        fd = open(pathname, flags);
     } else {
-        fd = openat(dirfd, pathname, O_NOFOLLOW);
+        fd = openat(dirfd, pathname, flags);
     }
     if (fd < 0) {
         errno = ENOENT;
@@ -2073,16 +2073,12 @@ int fstat(int fd, struct stat *buf)
 
 int stat(const char *pathname, struct stat *buf)
 {
-    if ((NULL == pathname) || ('\0' == *pathname)) {
-        return -1;
-    }
+    return vsf_linux_statat(-1, pathname, buf, 0);
+}
 
-    int fd = open(pathname, O_NOFOLLOW);
-    if (fd < 0) { return -1; }
-
-    int ret = fstat(fd, buf);
-    close(fd);
-    return ret;
+int lstat(const char *pathname, struct stat *buf)
+{
+    return vsf_linux_statat(-1, pathname, buf, O_NOFOLLOW);
 }
 
 int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags)
@@ -2091,7 +2087,7 @@ int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags)
         return -1;
     }
 
-    return vsf_linux_statat(dirfd, pathname, buf);
+    return vsf_linux_statat(dirfd, pathname, buf, 0);
 }
 
 int futimens(int fd, const struct timespec times[2])
@@ -2101,12 +2097,12 @@ int futimens(int fd, const struct timespec times[2])
 
 int utimensat(int dirfd, const char *pathname, const struct timespec times[2], int flags)
 {
-    return vsf_linux_statat(dirfd, pathname, NULL);
+    return vsf_linux_statat(dirfd, pathname, NULL, 0);
 }
 
 int chmod(const char *pathname, mode_t mode)
 {
-    return vsf_linux_statat(-1, pathname, NULL);
+    return vsf_linux_statat(-1, pathname, NULL, 0);
 }
 
 int fchmod(int fd, mode_t mode)
@@ -3339,6 +3335,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt = {
 
     VSF_APPLET_VPLT_ENTRY_FUNC(umask),
     VSF_APPLET_VPLT_ENTRY_FUNC(stat),
+    VSF_APPLET_VPLT_ENTRY_FUNC(lstat),
     VSF_APPLET_VPLT_ENTRY_FUNC(fstat),
     VSF_APPLET_VPLT_ENTRY_FUNC(fstatat),
     VSF_APPLET_VPLT_ENTRY_FUNC(chmod),

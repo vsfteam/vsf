@@ -20,6 +20,7 @@ extern "C" {
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define stat                    VSF_LINUX_WRAPPER(stat)
+#define lstat                   VSF_LINUX_WRAPPER(lstat)
 #define fstat                   VSF_LINUX_WRAPPER(fstat)
 #define fstatat                 VSF_LINUX_WRAPPER(fstatat)
 #define umask                   VSF_LINUX_WRAPPER(umask)
@@ -47,7 +48,6 @@ extern "C" {
 // TODO: assert extension attr is fit in vk_file_attr_t
 #define VSF_FILE_ATTR_CHR       (VSF_FILE_ATTR_USER << 0)
 #define VSF_FILE_ATTR_BLK       (VSF_FILE_ATTR_USER << 1)
-#define VSF_FILE_ATTR_LNK       (VSF_FILE_ATTR_USER << 2)
 #define VSF_FILE_ATTR_EXCL      (VSF_FILE_ATTR_USER << 3)
 #define VSF_FILE_ATTR_SOCK      (VSF_FILE_ATTR_USER << 4)
 #define VSF_FILE_ATTR_TTY       (VSF_FILE_ATTR_USER << 5)
@@ -153,6 +153,7 @@ typedef struct vsf_linux_sys_stat_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkfifoat);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mknod);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mknodat);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(lstat);
 } vsf_linux_sys_stat_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt;
@@ -184,6 +185,10 @@ VSF_LINUX_APPLET_SYS_STAT_IMP(umask, mode_t, mode_t mask) {
 VSF_LINUX_APPLET_SYS_STAT_IMP(stat, int, const char *pathname, struct stat *buf) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_STAT_ENTRY(stat)(pathname, buf);
+}
+VSF_LINUX_APPLET_SYS_STAT_IMP(lstat, int, const char *pathname, struct stat *buf) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(lstat)(pathname, buf);
 }
 VSF_LINUX_APPLET_SYS_STAT_IMP(fstat, int, int fd, struct stat *buf) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -222,6 +227,7 @@ VSF_LINUX_APPLET_SYS_STAT_IMP(mknodat, int, int dirfd, const char *pathname, mod
 
 mode_t umask(mode_t mask);
 int stat(const char *pathname, struct stat *buf);
+int lstat(const char *pathname, struct stat *buf);
 int fstat(int fd, struct stat *buf);
 int fstatat(int dirfd, const char *pathname, struct stat *buf, int flags);
 int futimens(int fd, const struct timespec times[2]);
@@ -239,13 +245,9 @@ static inline int stat64(const char *pathname, struct stat64 *buf)
 {
     return stat(pathname, (struct stat *)buf);
 }
-static inline int lstat(const char *pathname, struct stat *buf)
-{
-    return stat(pathname, buf);
-}
 static inline int lstat64(const char *pathname, struct stat64 *buf)
 {
-    return stat(pathname, (struct stat *)buf);
+    return lstat(pathname, (struct stat *)buf);
 }
 static inline int fstat64(int fd, struct stat64 *buf)
 {
