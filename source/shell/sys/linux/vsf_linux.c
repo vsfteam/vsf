@@ -2805,14 +2805,6 @@ size_t confstr(int name, char *buf, size_t len)
     return -1;
 }
 
-// malloc.h
-#if VSF_LINUX_SIMPLE_LIBC_CFG_NO_MM != ENABLED
-void * memalign(size_t alignment, size_t size)
-{
-    return aligned_alloc(alignment, size);
-}
-#endif
-
 // ipc.h
 key_t ftok(const char *pathname, int id)
 {

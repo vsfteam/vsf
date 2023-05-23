@@ -30,6 +30,7 @@
 // for waitpid
 #   include "../../include/sys/wait.h"
 #   include "../../include/simple_libc/stdlib.h"
+#   include "../../include/simple_libc/malloc.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
@@ -38,6 +39,7 @@
 // for waitpid
 #   include <sys/wait.h>
 #   include <stdlib.h>
+#   include <malloc.h>
 #endif
 #include <limits.h>
 
@@ -853,7 +855,6 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt =
     VSF_APPLET_VPLT_ENTRY_FUNC(calloc),
     VSF_APPLET_VPLT_ENTRY_FUNC(free),
     VSF_APPLET_VPLT_ENTRY_FUNC(aligned_alloc),
-    VSF_APPLET_VPLT_ENTRY_FUNC(memalign),
     VSF_APPLET_VPLT_ENTRY_FUNC(posix_memalign),
     // malloc_usable_size should be in malloc.h
     VSF_APPLET_VPLT_ENTRY_FUNC(malloc_usable_size),

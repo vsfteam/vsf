@@ -22,7 +22,6 @@ extern "C" {
 #   endif
 #define aligned_alloc       VSF_LINUX_LIBC_WRAPPER(aligned_alloc)
 #define free                VSF_LINUX_LIBC_WRAPPER(free)
-#define memalign            VSF_LINUX_LIBC_WRAPPER(memalign)
 #define posix_memalign      VSF_LINUX_LIBC_WRAPPER(posix_memalign)
 #define malloc_usable_size  VSF_LINUX_LIBC_WRAPPER(malloc_usable_size)
 #define exit                VSF_LINUX_LIBC_WRAPPER(exit)
@@ -94,7 +93,8 @@ typedef struct vsf_linux_libc_stdlib_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(calloc);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(free);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(aligned_alloc);
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(memalign);
+    // originally memalign, removed, so if add other API, put here first
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(empty_slot);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(posix_memalign);
     // malloc_usable_size should be in malloc.h
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(malloc_usable_size);
@@ -203,10 +203,6 @@ VSF_LINUX_APPLET_LIBC_STDLIB_IMP(free, void, void *p) {
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(aligned_alloc, void *, size_t alignment, size_t size) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(aligned_alloc)(alignment, size);
-}
-VSF_LINUX_APPLET_LIBC_STDLIB_IMP(memalign, void *, size_t alignment, size_t size) {
-    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(memalign)(alignment, size);
 }
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(posix_memalign, int, void **memptr, size_t alignment, size_t size) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -412,7 +408,6 @@ void * calloc(size_t n, size_t size);
 void free(void *p);
 
 void * aligned_alloc(size_t alignment, size_t size);
-void * memalign(size_t alignment, size_t size);
 int posix_memalign(void **memptr, size_t alignment, size_t size);
 
 // malloc_usable_size should be in malloc.h
