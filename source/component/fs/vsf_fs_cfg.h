@@ -93,18 +93,18 @@
 
 // for libc sorce codes which want types and consts below
 typedef enum vk_file_attr_t {
-    VSF_FILE_ATTR_READ          = 1 << 0,
-    VSF_FILE_ATTR_WRITE         = 1 << 1,
-    VSF_FILE_ATTR_EXECUTE       = 1 << 2,
-    VSF_FILE_ATTR_HIDDEN        = 1 << 3,
-    VSF_FILE_ATTR_DIRECTORY     = 1 << 4,
-    VSF_FILE_ATTR_LNK           = 1 << 5,
+    VSF_FILE_ATTR_READ          = 1UL << 0,
+    VSF_FILE_ATTR_WRITE         = 1UL << 1,
+    VSF_FILE_ATTR_EXECUTE       = 1UL << 2,
+    VSF_FILE_ATTR_HIDDEN        = 1UL << 3,
+    VSF_FILE_ATTR_DIRECTORY     = 1UL << 4,
+    VSF_FILE_ATTR_LNK           = 1UL << 5,
     // __VSF_FILE_ATTR_DYN is for internal usage only, to indicated resources are dynamically allocated
-    __VSF_FILE_ATTR_DYN         = 1 << 7,
-    VSF_FILE_ATTR_EXT           = 1 << 8,
-    VSF_FILE_ATTR_USER          = 1 << 9,
+    __VSF_FILE_ATTR_DYN         = 1UL << 7,
+    VSF_FILE_ATTR_EXT           = 1UL << 8,
+    VSF_FILE_ATTR_USER          = 1UL << 9,
     // make vk_file_attr_t 32bit
-    VSF_FILE_ATTR_MAX           = 1 << 31,
+    VSF_FILE_ATTR_MAX           = 1UL << 31,
 } vk_file_attr_t;
 
 typedef enum vk_file_whence_t {
