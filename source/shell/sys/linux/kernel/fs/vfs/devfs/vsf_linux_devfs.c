@@ -37,6 +37,7 @@
 #   include "shell/sys/linux/include/linux/input.h"
 #   include "shell/sys/linux/include/linux/fb.h"
 #   include "shell/sys/linux/include/linux/fs.h"
+#   include "shell/sys/linux/include/linux/hdreg.h"
 #   include "shell/sys/linux/include/linux/i2c.h"
 #   include "shell/sys/linux/include/linux/i2c-dev.h"
 #   include "shell/sys/linux/include/linux/spi/spidev.h"
@@ -51,6 +52,7 @@
 #   include <linux/input.h>
 #   include <linux/fb.h>
 #   include <linux/fs.h>
+#   include <linux/hdreg.h>
 #   include <linux/i2c.h>
 #   include <linux/i2c-dev.h>
 #   include <linux/spi/spidev.h>
@@ -755,6 +757,16 @@ static int __vsf_linux_mal_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
     vk_mal_t *mal = (vk_mal_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
 
     switch (cmd) {
+    case HDIO_GETGEO: {
+            struct hd_geometry *geo = (struct hd_geometry *)arg;
+            if (geo != NULL) {
+                geo->cylinders = 1;
+                geo->heads = 1;
+                geo->sectors = 8;
+                geo->start = 0;
+            }
+        }
+        break;
     case BLKGETSIZE64:
     case BLKBSZGET: {
             uint_fast32_t blksz = vk_mal_blksz(mal, 0, 0, VSF_MAL_OP_ERASE);
