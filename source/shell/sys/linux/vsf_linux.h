@@ -313,6 +313,7 @@ vsf_class(vsf_linux_process_t) {
 
         vsf_heap_t *heap;
 #if VSF_LINUX_USE_VFORK == ENABLED
+        jmp_buf exit_jmpbuf;
         jmp_buf start_jmpbuf;
         bool is_fork_child;
 #endif

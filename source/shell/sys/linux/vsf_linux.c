@@ -1282,6 +1282,12 @@ void vsf_linux_exit_process(int status, bool _exit)
     VSF_LINUX_ASSERT(process != NULL);
     vsf_protect_t orig;
 
+#if VSF_LINUX_USE_VFORK == ENABLED
+    if (process->is_fork_child) {
+        longjmp(process->exit_jmpbuf, 1);
+    }
+#endif
+
     for (int i = 0; i < dimof(process->timers); i++) {
         vsf_callback_timer_remove(&process->timers[i].timer);
     }
@@ -3286,7 +3292,10 @@ int sethostid(long hostid)
 static int __vsf_linux_vfork_child_entry(int argc, char **argv)
 {
     vsf_linux_process_t *child_process = vsf_linux_get_cur_process();
-    longjmp(child_process->start_jmpbuf, 1);
+    if (!setjmp(child_process->exit_jmpbuf)) {
+        longjmp(child_process->start_jmpbuf, 1);
+    }
+    child_process->is_fork_child = false;
     return 0;
 }
 #endif
@@ -3304,7 +3313,7 @@ pid_t vfork(void)
     }
 
     if (!setjmp(child_process->start_jmpbuf)) {
-        __vsf_linux_process_parse_arg(child_process, NULL, parent_process->ctx.arg.argv);
+        __vsf_linux_process_parse_arg(child_process, NULL, (char * const *)parent_process->ctx.arg.argv);
         child_process->ctx.entry = __vsf_linux_vfork_child_entry;
 
         vsf_linux_fd_t *sfd;
