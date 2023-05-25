@@ -1294,18 +1294,39 @@ static int __vsf_linux_fs_create(const char *pathname, mode_t mode, vk_file_attr
     if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
         return -1;
     }
+    if ((fullpath[0] == '/') && (fullpath[1] == '\0')) {
+        errno = EEXIST;
+        return -1;
+    }
+    size_t fullpath_len = strlen(fullpath);
+    if (fullpath[fullpath_len - 1] == '/') {
+        fullpath[fullpath_len - 1] = '\0';
+    }
 
     name_tmp = vk_file_getfilename((char *)fullpath);
+    if ('\0' == name_tmp[0]) {
+        errno = EINVAL;
+        return -1;
+    }
+    char filename[strlen(name_tmp) + 1];
+    strcpy(filename, name_tmp);
+
     fullpath[name_tmp - fullpath] = '\0';
     vk_file_t *dir = __vsf_linux_fs_get_file(fullpath);
     if (!dir) {
         return -1;
     }
 
-    name_tmp = vk_file_getfilename((char *)pathname);
-    vk_file_create(dir, name_tmp, attr);
-    if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
-        err = -1;
+    vk_file_t *file;
+    vk_file_open(dir, filename, &file);
+    if (VSF_ERR_NONE == (vsf_err_t)vsf_eda_get_return_value()) {
+        errno = EEXIST;
+        return -1;
+    } else {
+        vk_file_create(dir, filename, attr);
+        if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
+            err = -1;
+        }
     }
     __vsf_linux_fs_close_do(dir);
     return err;
