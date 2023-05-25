@@ -73,6 +73,9 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern int __vsf_linux_default_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -310,6 +313,8 @@ static int __vsf_linux_uart_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
     case TCSETS:
         __vsf_linux_uart_config(priv);
         break;
+    default:
+        return __vsf_linux_default_fcntl(sfd, cmd, arg);
     }
     return 0;
 }
@@ -471,6 +476,8 @@ static int __vsf_linux_i2c_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
         break;
     case I2C_PEC:
         return -ENOTSUPP;
+    default:
+        return __vsf_linux_default_fcntl(sfd, cmd, arg);
     }
     return 0;
 }
@@ -699,7 +706,8 @@ static int __vsf_linux_spi_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
         priv->speed = *arg_union.speed;
         break;
 
-    default: {
+    default:
+        if ((cmd & _IOC_TYPEMASK) == (SPI_IOC_MAGIC << _IOC_TYPESHIFT)) {
             uint8_t size = _IOC_SIZE(cmd);
             if (size >= 1) {
                 VSF_LINUX_ASSERT(priv->xfer_ptr == NULL);
@@ -719,6 +727,8 @@ static int __vsf_linux_spi_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
             } else {
                 return -1;
             }
+        } else {
+            return __vsf_linux_default_fcntl(sfd, cmd, arg);
         }
     }
 
@@ -782,6 +792,8 @@ static int __vsf_linux_mal_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
         break;
     case BLKBSZSET:
         return -1;
+    default:
+        return __vsf_linux_default_fcntl(sfd, cmd, arg);
     }
     return 0;
 }
@@ -915,7 +927,7 @@ static void __vsf_linux_input_init(vsf_linux_fd_t *sfd)
 
 static int __vsf_linux_input_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
-    return 0;
+    return __vsf_linux_default_fcntl(sfd, cmd, arg);
 }
 
 static int __vsf_linux_input_stat(vsf_linux_fd_t *sfd, struct stat *buf)
@@ -1191,6 +1203,8 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
     case FBIO_WAITFORVSYNC:
         // TODO
         break;
+    default:
+        return __vsf_linux_default_fcntl(sfd, cmd, arg);
     }
     return 0;
 }

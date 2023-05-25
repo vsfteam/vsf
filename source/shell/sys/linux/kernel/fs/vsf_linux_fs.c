@@ -304,6 +304,17 @@ ssize_t __vsf_linux_stdio_fallback_write(vsf_linux_fd_t *sfd, const void *buf, s
 }
 #endif
 
+int __vsf_linux_default_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
+{
+    switch (cmd) {
+    case F_SETFD:
+    case F_SETFL:
+        return 0;
+    default:
+        return -1;
+    }
+}
+
 vk_file_t * __vsf_linux_fs_get_file_ex(vk_file_t *dir, const char *pathname)
 {
     vk_file_t *file;
@@ -323,7 +334,7 @@ static void __vsf_linux_fs_close_do(vk_file_t *file)
 
 static int __vsf_linux_fs_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
-    return 0;
+    return __vsf_linux_default_fcntl(sfd, cmd, arg);
 }
 
 static ssize_t __vsf_linux_fs_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
@@ -449,7 +460,7 @@ int eventfd_write(int fd, eventfd_t value)
 
 static int __vsf_linux_eventfd_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
-    return 0;
+    return __vsf_linux_default_fcntl(sfd, cmd, arg);
 }
 
 static ssize_t __vsf_linux_eventfd_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
@@ -2607,7 +2618,7 @@ int vsf_linux_fs_bind_buffer(const char *pathname, void *buffer,
 
 static int __vsf_linux_stream_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
-    return 0;
+    return __vsf_linux_default_fcntl(sfd, cmd, arg);
 }
 
 void __vsf_linux_stream_evt(vsf_linux_stream_priv_t *priv, vsf_protect_t orig, short event, bool is_ready)
