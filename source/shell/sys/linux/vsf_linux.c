@@ -113,6 +113,10 @@
 #else
 #   include <ctype.h>
 #endif
+#if VSF_LINUX_USE_VFORK == ENABLED
+#   define __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
+#   include "./include/simple_libc/setjmp/setjmp.h"
+#endif
 
 #include "./kernel/fs/vsf_linux_fs.h"
 
@@ -2474,7 +2478,7 @@ pid_t wait(int *status)
     return __vsf_linux_wait_any(status, 0);
 }
 
-pid_t waitpid(pid_t pid, int *status, int options)
+pid_t vsf_linux_waitpid(pid_t pid, int *status, int options, bool cleanup)
 {
     if (pid <= 0) {
         return __vsf_linux_wait_any(status, options);
@@ -2516,11 +2520,16 @@ pid_t waitpid(pid_t pid, int *status, int options)
     if (status != NULL) {
         *status = cur_thread->retval;
     }
-    if (!is_daemon) {
+    if (!is_daemon && cleanup) {
         vsf_linux_detach_process(process);
         vsf_linux_free_res(process);
     }
     return pid;
+}
+
+pid_t waitpid(pid_t pid, int *status, int options)
+{
+    return vsf_linux_waitpid(pid, status, options, true);
 }
 
 int waitid(idtype_t idtype, id_t id, siginfo_t *infop, int options)
@@ -3273,10 +3282,80 @@ int sethostid(long hostid)
     return 0;
 }
 
+#if VSF_LINUX_USE_VFORK == ENABLED
+static int __vsf_linux_vfork_child_entry(int argc, char **argv)
+{
+    vsf_linux_process_t *child_process = vsf_linux_get_cur_process();
+    longjmp(child_process->start_jmpbuf, 1);
+    return 0;
+}
+#endif
+
 pid_t vfork(void)
 {
+#if VSF_LINUX_USE_VFORK == ENABLED
+    vsf_linux_process_t *parent_process = vsf_linux_get_cur_process();
+    // stack_size should be enough for the startup thread running __vsf_linux_vfork_child_entry,
+    //  which will simply jump to start_jmpbuf
+    vsf_linux_process_t *child_process = vsf_linux_create_process(1024, 0, 0);
+    pid_t child_pid = child_process->id.pid;
+    if (NULL == child_process) {
+        return -1;
+    }
+
+    if (!setjmp(child_process->start_jmpbuf)) {
+        __vsf_linux_process_parse_arg(child_process, NULL, parent_process->ctx.arg.argv);
+        child_process->ctx.entry = __vsf_linux_vfork_child_entry;
+
+        vsf_linux_fd_t *sfd;
+        __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &parent_process->fd_list) {
+            if (__vsf_linux_fd_create_ex(child_process, &sfd, _->op, _->fd, _->priv) != _->fd) {
+                goto delete_process_and_fail;
+            }
+        }
+
+#if VSF_LINUX_CFG_PLS_NUM > 0
+        for (int i = 0; i < VSF_LINUX_CFG_PLS_NUM; i++) {
+            if (vsf_bitmap_get(&__vsf_linux.pls.bitmap, i)) {
+                child_process->pls.storage[i].data = parent_process->pls.storage[i].data;
+            }
+        }
+#endif
+#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
+        if (vsf_linux_merge_env(child_process, parent_process->__environ) < 0) {
+            goto delete_process_and_fail;
+        }
+#endif
+
+#if VSF_ARCH_USE_THREAD_REG == ENABLED
+        child_process->reg = parent_process->reg;
+#endif
+        child_process->heap = parent_process->heap;
+#if __VSF_LINUX_PROCESS_HAS_PATH
+        strcpy(child_process->path, parent_process->path);
+#endif
+        child_process->is_fork_child = true;
+
+        vsf_linux_thread_t *child_thread, *cur_thread = vsf_linux_get_cur_thread();
+        vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &child_process->thread_list, child_thread);
+        child_thread->stack_size = cur_thread->stack_size;
+        child_thread->stack = cur_thread->stack;
+
+        vsf_linux_start_process(child_process);
+
+        vsf_linux_waitpid(child_pid, NULL, 0, false);
+        return child_pid;
+    } else {
+        return 0;
+    }
+
+delete_process_and_fail:
+    vsf_linux_delete_process(child_process);
+    return -1;
+#else
     VSF_LINUX_ASSERT(false);
     return -1;
+#endif
 }
 
 pid_t fork(void)
@@ -4305,6 +4384,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(ttyname_r),
     VSF_APPLET_VPLT_ENTRY_FUNC(_exit),
     VSF_APPLET_VPLT_ENTRY_FUNC(acct),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vfork),
 };
 #endif
 
@@ -4358,10 +4438,6 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_GLOB == ENABLED
 #       include "./include/glob.h"
 #   endif
-#   if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
-#       define __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
-#       include "./include/simple_libc/setjmp/setjmp.h"
-#   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED
 #       define __SIMPLE_LIBC_MATH_VPLT_ONLY__
 #       include "./include/simple_libc/math/math.h"
@@ -4414,10 +4490,6 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_GLOB == ENABLED
 #       include <glob.h>
-#   endif
-#   if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
-#       define __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
-#       include <setjmp/setjmp.h>
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED
 #       define __SIMPLE_LIBC_MATH_VPLT_ONLY__

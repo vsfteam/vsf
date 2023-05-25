@@ -311,13 +311,17 @@ vsf_class(vsf_linux_process_t) {
         vsf_dlist_t child_list;
         vsf_dlist_node_t child_node;
 
+        vsf_heap_t *heap;
+#if VSF_LINUX_USE_VFORK == ENABLED
+        jmp_buf start_jmpbuf;
+        bool is_fork_child;
+#endif
 #if VSF_LINUX_CFG_PLS_NUM > 0
         struct {
             vsf_bitmap(vsf_linux_pls_bitmap) dynlib_bitmap;
             vsf_linux_localstorage_t storage[VSF_LINUX_CFG_PLS_NUM];
         } pls;
 #endif
-        vsf_heap_t *heap;
 
 #if VSF_LINUX_CFG_TLS_NUM > 0
         struct {

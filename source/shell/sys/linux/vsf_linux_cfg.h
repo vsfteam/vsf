@@ -89,6 +89,10 @@
 #   define VSF_LINUX_USE_EPOLL                  ENABLED
 #endif
 
+#ifndef VSF_LINUX_USE_VFORK
+#   define VSF_LINUX_USE_VFORK                  ENABLED
+#endif
+
 #ifndef VSF_LINUX_CFG_BIN_PATH
 #   define VSF_LINUX_CFG_BIN_PATH               "/bin"
 #endif
