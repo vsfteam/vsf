@@ -45,7 +45,74 @@ const vsf_dac_op_t vsf_remapped_dac_op = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+vsf_err_t vsf_remapped_dac_init(vsf_remapped_dac_t *dac)
+{
+    VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));
+    return vsf_dac_init(dac->target);
+}
 
+void vsf_remapped_dac_fini(vsf_remapped_dac_t *dac)
+{
+    VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));
+    vsf_dac_fini(dac->target);
+}
+
+vsf_dac_status_t vsf_remapped_dac_status(vsf_remapped_dac_t *dac)
+{
+    VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));
+    return vsf_dac_status(dac->target);
+}
+
+vsf_dac_capability_t vsf_remapped_dac_capability(vsf_remapped_dac_t *dac)
+{
+    VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));
+    return vsf_dac_capability(dac->target);
+}
+
+fsm_rt_t vsf_remapped_dac_enable(vsf_remapped_dac_t *dac)
+{
+    VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));
+    return vsf_dac_enable(dac->target);
+}
+
+fsm_rt_t vsf_remapped_dac_disable(vsf_remapped_dac_t *dac)
+{
+    VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));
+    return vsf_dac_disable(dac->target);
+}
+
+void vsf_remapped_dac_irq_enable(vsf_remapped_dac_t *dac, vsf_dac_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));
+    vsf_dac_irq_enable(dac->target, irq_mask);
+}
+
+void vsf_remapped_dac_irq_disable(vsf_remapped_dac_t *dac, vsf_dac_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));
+    vsf_dac_irq_disable(dac->target, irq_mask);
+}
+
+vsf_err_t vsf_remapped_dac_channel_request_once(vsf_remapped_dac_t *dac,
+        vsf_dac_channel_cfg_t *channel_cfg, uint_fast16_t value)
+{
+    VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));
+    return vsf_dac_channel_request_once(dac->target, channel_cfg, value);
+}
+
+vsf_err_t vsf_remapped_dac_channel_config(vsf_remapped_dac_t *dac,
+        vsf_dac_channel_cfg_t *channel_cfgs, uint_fast8_t channel_cfgs_cnt)
+{
+    VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));
+    return vsf_dac_channel_config(dac->target, channel_cfgs, channel_cfgs_cnt);
+}
+
+vsf_err_t vsf_remapped_dac_channel_request(vsf_remapped_dac_t *dac,
+        void *buffer, uint_fast32_t count)
+{
+    VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));
+    return vsf_dac_channel_request(dac->target, buffer, count);
+}
 
 #endif
 #endif
