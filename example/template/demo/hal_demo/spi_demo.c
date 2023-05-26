@@ -21,6 +21,12 @@
 
 #if APP_USE_HAL_DEMO == ENABLED && APP_USE_HAL_SPI_DEMO == ENABLED && VSF_HAL_USE_SPI == ENABLED
 
+#if VSF_USE_LINUX == ENABLED
+#   include <getopt.h>
+#endif
+
+#include "hal_demo.h"
+
 /*============================ MACROS ========================================*/
 
 #ifdef APP_SPI_DEMO_CFG_SPI_PREFIX
@@ -28,348 +34,612 @@
 #   define VSF_SPI_CFG_PREFIX                           APP_SPI_DEMO_CFG_SPI_PREFIX
 #endif
 
-#ifndef APP_SPI_DEMO_CFG_SPI
-#   define APP_SPI_DEMO_CFG_SPI                         (vsf_spi_t *)&vsf_hw_spi0
+#ifndef APP_SPI_DEMO_CFG_DEVICES_COUNT
+#   define APP_SPI_DEMO_CFG_DEVICES_COUNT               1
 #endif
 
-#ifndef APP_SPI_DEMO_CFG_DATASIZE
-#   define APP_SPI_DEMO_CFG_DATASIZE                    VSF_SPI_DATASIZE_8
+#ifndef APP_SPI_DEMO_CFG_DEVICES_ARRAY_INIT
+#   define APP_SPI_DEMO_CFG_DEVICES_ARRAY_INIT          \
+        { .cnt = dimof(vsf_hw_spi_devices), .devices = vsf_hw_spi_devices},
 #endif
 
-#ifndef APP_SPI_DEMO_CFG_AUTO_CS_EN
-#   define APP_SPI_DEMO_CFG_AUTO_CS_EN                  DISABLED
+#ifndef APP_SPI_DEMO_CFG_DEFAULT_INSTANCE
+#   define APP_SPI_DEMO_CFG_DEFAULT_INSTANCE            vsf_hw_spi0
 #endif
 
-#define __APP_SPI_DEMO_MODE                             (VSF_SPI_MASTER | VSF_SPI_CLOCK_MODE_3 | VSF_SPI_MSB_FIRST | APP_SPI_DEMO_CFG_DATASIZE)
-#if APP_SPI_DEMO_CFG_AUTO_CS_EN == ENABLED
-#   define APP_SPI_DEMO_CFG_MODE                        (__APP_SPI_DEMO_MODE | VSF_SPI_AUTO_CS_ENABLE)
-#else
-#   define APP_SPI_DEMO_CFG_MODE                        (__APP_SPI_DEMO_MODE | VSF_SPI_AUTO_CS_DISABLE)
+#ifndef APP_SPI_DEMO_CFG_DEFAULT_MODE
+#   define APP_SPI_DEMO_CFG_DEFAULT_MODE                (VSF_SPI_MASTER | VSF_SPI_CLOCK_MODE_3 | VSF_SPI_MSB_FIRST | VSF_SPI_DATASIZE_8 | VSF_SPI_AUTO_CS_DISABLE)
 #endif
 
-#ifndef APP_SPI_DEMO_CFG_SPEED
-#   define APP_SPI_DEMO_CFG_SPEED                       (1ul * 1000ul * 1000ul)
+#ifndef APP_SPI_DEMO_CFG_DEFAULT_CLOCK
+#   define APP_SPI_DEMO_CFG_DEFAULT_CLOCK               (1ul * 1000ul * 1000ul)
 #endif
 
-#ifndef APP_SPI_DEMO_IRQ_PRIO
-#   define APP_SPI_DEMO_IRQ_PRIO                        vsf_arch_prio_2
-#endif
-
-#ifndef APP_SPI_DEMO_CFG_BUFFER_SIZE
-#   define APP_SPI_DEMO_CFG_BUFFER_SIZE                 (1024)
-#endif
-
-#ifndef APP_SPI_DEMO_CFG_FIFO_SEND_TEST
-#   define APP_SPI_DEMO_CFG_FIFO_SEND_TEST              DISABLED
-#endif
-
-#ifndef APP_SPI_DEMO_CFG_FIFO_RECV_TEST
-#   define APP_SPI_DEMO_CFG_FIFO_RECV_TEST              DISABLED
-#endif
-
-#ifndef APP_SPI_DEMO_CFG_FIFO_SEND_RECV_TEST
-#   define APP_SPI_DEMO_CFG_FIFO_SEND_RECV_TEST         DISABLED
-#endif
-
-#ifndef APP_SPI_DEMO_CFG_REQUEST_SEND_TEST
-#   define APP_SPI_DEMO_CFG_REQUEST_SEND_TEST           DISABLED
-#endif
-
-#ifndef APP_SPI_DEMO_CFG_REQUEST_RECV_TEST
-#   define APP_SPI_DEMO_CFG_REQUEST_RECV_TEST           DISABLED
-#endif
-
-#ifndef APP_SPI_DEMO_CFG_REQUEST_SEND_RECV_TEST
-#   define APP_SPI_DEMO_CFG_REQUEST_SEND_RECV_TEST      ENABLED
-#endif
-
-#if    (APP_SPI_DEMO_CFG_FIFO_SEND_TEST          == ENABLED) \
-    || (APP_SPI_DEMO_CFG_FIFO_RECV_TEST          == ENABLED) \
-    || (APP_SPI_DEMO_CFG_FIFO_SEND_RECV_TEST     == ENABLED)
-#   define APP_SPI_DEMO_CFG_FIFO                        ENABLED
-#endif
-
-#if    (APP_SPI_DEMO_CFG_REQUEST_SEND_TEST       == ENABLED) \
-    || (APP_SPI_DEMO_CFG_REQUEST_RECV_TEST       == ENABLED) \
-    || (APP_SPI_DEMO_CFG_REQUEST_SEND_RECV_TEST  == ENABLED)
-#   define APP_SPI_DEMO_CFG_REQUEST                     ENABLED
+#ifndef APP_SPI_DEMO_CFG_DEFAULT_BUFFER_CNT
+#   define APP_SPI_DEMO_CFG_DEFAULT_BUFFER_CNT         (1024)
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef struct app_spi_demo_t {
-    uint8_t * send_buff;
-    uint8_t * recv_buff;
-    size_t size;
-} app_spi_demo_t;
+typedef enum spi_method_t {
+    METHOD_FIFO            = 0x00 << 0,
+    METHOD_REQUEST         = 0x01 << 0,
+    METHOD_TRANSFER_MASK   = METHOD_FIFO | METHOD_REQUEST,
+
+    METHOD_SPI_POLL        = 0x00 << 1,
+    METHOD_SPI_ISR         = 0x01 << 1,
+    METHOD_IRQ_MASK        = METHOD_SPI_POLL | METHOD_SPI_ISR,
+
+    METHOD_SEND_ONLY       = 0x00 << 2,
+    METHOD_RECV_ONLY       = 0x01 << 2,
+    METHOD_SEND_RECV       = 0x02 << 2,
+    METHOD_SEND_RECV_MASK  = 0x03 << 2,
+} spi_method_t;
+
+typedef enum spi_demo_evt_t {
+    VSF_EVT_SPI_FIFO_POLL = __VSF_EVT_HAL_LAST,
+    VSF_EVT_SPI_TX_FIFO_WAIT_IDLE,
+
+    VSF_EVT_SPI_CHECK,
+} spi_demo_evt_t;
+
+typedef struct spi_test_t  {
+    implement(hal_test_t)
+    // for vsf_spi_init
+    vsf_spi_cfg_t cfg;
+    // for vsf_spi_cs_active() and vsf_spi_cs_inactive()
+    uint_fast8_t cs_index;
+    bool cs_less;
+    bool cs_manual;
+    // for vsf_spi_fifo_transfer()
+    uint_fast32_t fifo_send_cnt;
+    uint_fast32_t fifo_recv_cnt;
+    // for vsf_spi_fifo_transfer() and vsf_spi_request_transfer()
+    uint_fast32_t cnt;
+} spi_test_t;
+
+typedef struct spi_demo_const_t {
+    implement(hal_demo_const_t)
+    spi_test_t test;
+} spi_demo_const_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
+/*============================ PROTOTYPES ====================================*/
 
-#ifdef APP_SPI_DEMO_CFG_SPI_EXTERN
-    APP_SPI_DEMO_CFG_SPI_EXTERN
-#endif
+static void __spi_isr_handler(void *target_ptr, vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask);
+static bool __spi_fifo_transfer(spi_test_t *test);
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if APP_SPI_DEMO_CFG_USE_FIFO2REQ == ENABLED
-#ifndef APP_SPI_DEMO_CFG_USE_FIFO2REQ_NAME
-#   define APP_SPI_DEMO_CFG_USE_FIFO2REQ_NAME       vsf_fifo2req_spi0
-#endif
-static describe_fifo2req_spi(vsf_fifo2req_spi0, APP_SPI_DEMO_CFG_SPI);
-#undef APP_SPI_DEMO_CFG_SPI
-#define APP_SPI_DEMO_CFG_SPI                        (vsf_spi_t *)&APP_SPI_DEMO_CFG_USE_FIFO2REQ_NAME
-#endif
+static const hal_option_t __mode_options[] = {
+    HAL_DEMO_OPTION(VSF_SPI_MASTER, VSF_SPI_MASTER),
+    HAL_DEMO_OPTION(VSF_SPI_MASTER, VSF_SPI_SLAVE),
 
-#if APP_SPI_DEMO_CFG_USE_MULTIPLEX_CS == ENABLED
-#ifndef APP_SPI_DEMO_CFG_USE_MULTIPLEX_CS_NAME
-#   define APP_SPI_DEMO_CFG_USE_MULTIPLEX_CS_NAME   vsf_multiplex_cs_spi0
-#endif
-static describe_multiplex_cs_spi(vsf_multiplex_cs_spi0, APP_SPI_DEMO_CFG_SPI);
-#undef APP_SPI_DEMO_CFG_SPI
-#define APP_SPI_DEMO_CFG_SPI                        (vsf_spi_t *)&APP_SPI_DEMO_CFG_USE_MULTIPLEX_CS_NAME
-#endif
+    HAL_DEMO_OPTION(VSF_SPI_BIT_ORDER_MASK, VSF_SPI_MSB_FIRST),
+    HAL_DEMO_OPTION(VSF_SPI_BIT_ORDER_MASK, VSF_SPI_LSB_FIRST),
 
-static app_spi_demo_t __app_spi_demo;
+    HAL_DEMO_OPTION(VSF_SPI_CLOCK_MODE_MASK, VSF_SPI_CLOCK_MODE_0),
+    HAL_DEMO_OPTION(VSF_SPI_CLOCK_MODE_MASK, VSF_SPI_CLOCK_MODE_1),
+    HAL_DEMO_OPTION(VSF_SPI_CLOCK_MODE_MASK, VSF_SPI_CLOCK_MODE_2),
+    HAL_DEMO_OPTION(VSF_SPI_CLOCK_MODE_MASK, VSF_SPI_CLOCK_MODE_3),
+
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_4),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_4),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_5),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_6),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_7),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_8),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_9),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_10),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_11),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_12),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_13),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_14),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_15),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_16),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_17),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_18),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_19),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_20),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_21),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_22),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_23),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_24),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_25),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_26),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_27),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_28),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_29),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_30),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_31),
+    HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_32),
+
+    HAL_DEMO_OPTION(VSF_SPI_AUTO_CS_MASK, VSF_SPI_AUTO_CS_DISABLE),
+    HAL_DEMO_OPTION(VSF_SPI_AUTO_CS_MASK, VSF_SPI_AUTO_CS_ENABLE),
+};
+
+static const hal_option_t __irq_options[] = {
+    HAL_DEMO_OPTION(VSF_SPI_IRQ_MASK_TX, VSF_SPI_IRQ_MASK_TX),
+    HAL_DEMO_OPTION(VSF_SPI_IRQ_MASK_RX, VSF_SPI_IRQ_MASK_RX),
+    HAL_DEMO_OPTION(VSF_SPI_IRQ_MASK_TX_CPL, VSF_SPI_IRQ_MASK_TX_CPL),
+    HAL_DEMO_OPTION(VSF_SPI_IRQ_MASK_CPL, VSF_SPI_IRQ_MASK_CPL),
+    HAL_DEMO_OPTION(VSF_SPI_IRQ_MASK_ERROR, VSF_SPI_IRQ_MASK_ERROR),
+};
+
+static const hal_option_t __method_options[] = {
+    HAL_DEMO_OPTION_EX(METHOD_TRANSFER_MASK, METHOD_FIFO, "fifo"),
+    HAL_DEMO_OPTION_EX(METHOD_TRANSFER_MASK, METHOD_REQUEST, "req"),
+    HAL_DEMO_OPTION_EX(METHOD_IRQ_MASK, METHOD_SPI_POLL, "poll"),
+    HAL_DEMO_OPTION_EX(METHOD_IRQ_MASK, METHOD_SPI_ISR, "isr"),
+
+    HAL_DEMO_OPTION_EX(METHOD_SEND_RECV_MASK, METHOD_SEND_ONLY, "send-only"),
+    HAL_DEMO_OPTION_EX(METHOD_SEND_RECV_MASK, METHOD_RECV_ONLY, "recv-only"),
+    HAL_DEMO_OPTION_EX(METHOD_SEND_RECV_MASK, METHOD_SEND_RECV, "send-recv"),
+};
+
+HAL_DEMO_INIT(spi, APP_SPI,
+    "spi-test" VSF_TRACE_CFG_LINEEND
+    "  -h, --help                     show this screen and exit" VSF_TRACE_CFG_LINEEND
+    "  -v, --verbose [level]          verbose show parameters" VSF_TRACE_CFG_LINEEND
+    "  -l, --list-device              list device" VSF_TRACE_CFG_LINEEND
+    "  -m, --method [[fifo|req] [poll|isr] [send-only|recv-only|send-recv]]" VSF_TRACE_CFG_LINEEND
+    "  -d, --device DEVICE            i.e. vsf_hw_i2c0" VSF_TRACE_CFG_LINEEND
+    "  -r, --repeat REPEAT            repeat count" VSF_TRACE_CFG_LINEEND
+    "  -c, --mode MODE                @ref vsf_spi_mode_t" VSF_TRACE_CFG_LINEEND
+    "  -p, --prio vsf_prio_X          test task priority, @ref \"vsf_prio_t\"" VSF_TRACE_CFG_LINEEND
+    "  -i, --isr_prio vsf_arch_prio_X interrupt priority, @ref \"vsf_arch_prio_0\"" VSF_TRACE_CFG_LINEEND
+    "  -t, --timeout TIMEOUT          test timeout" VSF_TRACE_CFG_LINEEND
+    "  -f, --freq                     spi sample frequency" VSF_TRACE_CFG_LINEEND
+    "  -s, --cs-index                 chip select index" VSF_TRACE_CFG_LINEEND
+    "  -e, --cs-less                  only start/end change chip select" VSF_TRACE_CFG_LINEEND
+    "  -n, --buffer-len               buffer length in one direction" VSF_TRACE_CFG_LINEEND,
+
+    .test.cfg.mode          = APP_SPI_DEMO_CFG_DEFAULT_MODE,
+    .test.cfg.clock_hz      = APP_SPI_DEMO_CFG_DEFAULT_CLOCK,
+    .test.cnt               = APP_SPI_DEMO_CFG_DEFAULT_BUFFER_CNT,
+
+    .init_has_cfg           = true,
+    .device_init            = (hal_init_fn_t       )vsf_spi_init,
+    .device_fini            = (hal_fini_fn_t       )vsf_spi_fini,
+    .device_enable          = (hal_enable_fn_t     )vsf_spi_enable,
+    .device_disable         = (hal_disable_fn_t    )vsf_spi_disable,
+    .device_irq_enable      = (hal_irq_enable_fn_t )vsf_spi_irq_enable,
+    .device_irq_disable     = (hal_irq_disable_fn_t)vsf_spi_irq_disable,
+    .mode.options           = __mode_options,
+    .mode.cnt               = dimof(__mode_options),
+    .irq.options            = __irq_options,
+    .irq.cnt                = dimof(__irq_options),
+    .method.options         = __method_options,
+    .method.cnt             = dimof(__method_options),
+);
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static vsf_err_t __spi_demo_init(vsf_spi_t * spi,
-                                 vsf_spi_isr_handler_t * handler_fn,
-                                 void *target_ptr,
-                                 vsf_arch_prio_t prio,
-                                 vsf_spi_irq_mask_t mask)
+static bool __spi_demo_check(hal_test_t *hal_test)
 {
-    vsf_err_t init_result;
+    VSF_ASSERT(hal_test != NULL);
+    spi_test_t *test = container_of(hal_test, spi_test_t, use_as__hal_test_t);
 
-    vsf_spi_cfg_t spi_cfg = {
-        .mode           = APP_SPI_DEMO_CFG_MODE,
-        .clock_hz       = APP_SPI_DEMO_CFG_SPEED,
-        .isr            = {
-            .handler_fn = handler_fn,
-            .target_ptr = target_ptr,
-            .prio       = prio,
-        },
+    VSF_ASSERT(test->device != NULL);
+
+    if (test->verbose >= 2) {
+        hal_options_trace(VSF_TRACE_DEBUG, "vsf_spi_cfg_t cfg = { .mode = ", __mode_options, dimof(__mode_options), test->cfg.mode);
+        vsf_trace_debug(", .clock_hz = %d, .isr = { .prio = vsf_arch_prio_%u }};" VSF_TRACE_CFG_LINEEND, test->cfg.clock_hz, hal_demo_arch_prio_to_num(test->cfg.isr.prio));
+    }
+
+    vsf_spi_capability_t cap = vsf_spi_capability(test->device);
+
+    if (((test->cfg.mode & VSF_SPI_AUTO_CS_MASK) == VSF_SPI_AUTO_CS_ENABLE) && !cap.support_auto_cs) {
+        vsf_trace_error("use VSF_SPI_AUTO_CS_ENABLE but not support!" VSF_TRACE_CFG_LINEEND);
+        return false;
+    }
+    if (((test->cfg.mode & VSF_SPI_AUTO_CS_MASK) == VSF_SPI_AUTO_CS_DISABLE) && !cap.support_manual_cs) {
+        vsf_trace_error("use VSF_SPI_AUTO_CS_DISABLE but not support!" VSF_TRACE_CFG_LINEEND);
+        return false;
+    }
+    if (test->cs_index >= cap.cs_count) {
+        vsf_trace_error("use cs %u , over the range [0, %u) supported!" VSF_TRACE_CFG_LINEEND, test->cs_index, cap.cs_count);
+        return false;
+    }
+    if (test->cfg.clock_hz > cap.max_clock_hz) {
+        vsf_trace_error("clock freq(%uHz) cannot be grater then max_clock_hz(%uHz)" VSF_TRACE_CFG_LINEEND, test->cfg.clock_hz, cap.max_clock_hz);
+        return false;
+    }
+    if (test->cfg.clock_hz < cap.min_clock_hz) {
+        vsf_trace_error("clock freq(%uHz) cannot be less then min_clock_hz(%uHz)" VSF_TRACE_CFG_LINEEND, test->cfg.clock_hz, cap.min_clock_hz);
+        return false;
+    }
+
+    bool is_req = (test->method & METHOD_TRANSFER_MASK) == METHOD_REQUEST;
+    bool is_isr = (test->method & METHOD_IRQ_MASK) == METHOD_SPI_ISR;
+
+    size_t buf_size = vsf_spi_mode_to_data_bytes(test->cfg.mode) * test->cnt;
+    uint32_t method = (test->method & METHOD_SEND_RECV_MASK);
+    switch (method) {
+    case METHOD_SEND_RECV:
+        test->send.size = buf_size;
+        test->recv.size = buf_size;
+        if (is_req) {
+            test->expected_irq_mask = VSF_SPI_IRQ_MASK_TX_CPL | VSF_SPI_IRQ_MASK_CPL;
+            test->irq_mask          = VSF_SPI_IRQ_MASK_TX_CPL | VSF_SPI_IRQ_MASK_CPL | VSF_SPI_IRQ_MASK_ERROR;
+        } else {
+            test->expected_irq_mask = VSF_SPI_IRQ_MASK_TX | VSF_SPI_IRQ_MASK_RX;
+            test->irq_mask          = VSF_SPI_IRQ_MASK_RX | VSF_SPI_IRQ_MASK_ERROR;      // VSF_SPI_IRQ_MASK_TX is turned on after sending
+        }
+        break;
+    case METHOD_SEND_ONLY:
+        test->send.size = buf_size;
+        test->recv.size = 0;
+        if (is_req) {
+            test->expected_irq_mask = VSF_SPI_IRQ_MASK_TX_CPL | VSF_SPI_IRQ_MASK_CPL;
+            test->irq_mask          = VSF_SPI_IRQ_MASK_TX_CPL | VSF_SPI_IRQ_MASK_CPL | VSF_SPI_IRQ_MASK_ERROR;
+        } else {
+            test->expected_irq_mask = VSF_SPI_IRQ_MASK_TX;
+            test->irq_mask          = VSF_SPI_IRQ_MASK_ERROR;
+        }
+        break;
+    case METHOD_RECV_ONLY:
+        test->send.size = 0;
+        test->recv.size = buf_size;
+        if (is_req) {
+            test->expected_irq_mask = VSF_SPI_IRQ_MASK_CPL;
+            test->irq_mask          = VSF_SPI_IRQ_MASK_CPL | VSF_SPI_IRQ_MASK_ERROR;
+        } else {
+            test->expected_irq_mask = VSF_SPI_IRQ_MASK_RX;
+            test->irq_mask          = VSF_SPI_IRQ_MASK_RX | VSF_SPI_IRQ_MASK_ERROR;
+        }
+        break;
+    }
+
+    if (test->irq_mask) {
+        test->cfg.isr.handler_fn = __spi_isr_handler;
+        test->cfg.isr.target_ptr = test;
+        test->cfg.isr.prio = test->isr_arch_prio;
+    }
+
+    test->hal_cfg = (void *)&test->cfg;
+
+    return true;
+}
+
+
+static void __spi_isr_handler(void *target_ptr, vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
+{
+    spi_test_t *test = (spi_test_t *)target_ptr;
+    VSF_ASSERT(test != NULL);
+    VSF_ASSERT(spi_ptr != NULL);
+    vsf_eda_t *eda = &test->teda.use_as__vsf_eda_t;
+
+    if (!hal_test_irq_check(&test->use_as__hal_test_t, irq_mask)) {
+        return;
+    }
+
+    if (irq_mask & (VSF_SPI_IRQ_MASK_TX | VSF_SPI_IRQ_MASK_RX)) {
+        if (__spi_fifo_transfer(test)) {
+            vsf_eda_post_evt(eda, VSF_EVT_SPI_CHECK);
+        }
+    }
+
+    if (irq_mask & VSF_SPI_IRQ_MASK_TX_CPL) {
+        test->expected_irq_mask &= ~VSF_SPI_IRQ_MASK_TX_CPL;
+        test->fifo_send_cnt = test->cnt;
+    }
+
+    if (irq_mask & VSF_SPI_IRQ_MASK_CPL) {
+        test->expected_irq_mask &= ~VSF_SPI_IRQ_MASK_CPL;
+        test->fifo_recv_cnt = test->cnt;
+        vsf_eda_post_evt(eda, VSF_EVT_SPI_CHECK);
+    }
+}
+
+
+static bool __spi_fifo_is_cpl(spi_test_t *test)
+{
+    if (((test->send.buffer == NULL) || (test->fifo_send_cnt == test->cnt))        // not send or send complete
+        && ((test->recv.buffer == NULL) || (test->fifo_recv_cnt == test->cnt))) {     // not receive or receive complete
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static void __spi_cs_active(spi_test_t *test)
+{
+    VSF_ASSERT(test != NULL);
+    vsf_spi_t *spi_ptr = test->device;
+    VSF_ASSERT(spi_ptr != NULL);
+
+    if ((test->cfg.mode & VSF_SPI_AUTO_CS_MASK) == VSF_SPI_AUTO_CS_DISABLE) {
+        if (test->verbose >= 2) {
+            vsf_trace_debug("vsf_spi_cs_active(&%s, %u)" VSF_TRACE_CFG_LINEEND, test->device_name, test->cs_index);
+        }
+        vsf_spi_cs_active(spi_ptr, test->cs_index);
+    }
+}
+
+static void __spi_cs_inactive(spi_test_t *test)
+{
+    VSF_ASSERT(test != NULL);
+    vsf_spi_t *spi_ptr = test->device;
+    VSF_ASSERT(spi_ptr != NULL);
+
+    if ((test->cfg.mode & VSF_SPI_AUTO_CS_MASK) == VSF_SPI_AUTO_CS_DISABLE) {
+        if (test->verbose >= 2) {
+            vsf_trace_debug("vsf_spi_cs_inactive(&%s, %u)" VSF_TRACE_CFG_LINEEND, test->device_name, test->cs_index);
+        }
+        vsf_spi_cs_inactive(spi_ptr, test->cs_index);
+    }
+}
+
+static bool __spi_fifo_transfer(spi_test_t *test)
+{
+    VSF_ASSERT(test != NULL);
+    vsf_spi_t *spi_ptr = test->device;
+    VSF_ASSERT(spi_ptr != NULL);
+
+    vsf_spi_fifo_transfer(spi_ptr,
+                          test->send.buffer, &test->fifo_send_cnt,
+                          test->recv.buffer, &test->fifo_recv_cnt,
+                          test->cnt);
+
+    if (test->verbose >= 2) {
+        vsf_trace_debug("vsf_spi_fifo_transfer(&%s, %p/*sbuf*/, %p/*%u*/, %p/*rbuf*/, %p/*%u*/, %u)" VSF_TRACE_CFG_LINEEND, test->device_name,
+                        test->send.buffer, &test->fifo_send_cnt, test->fifo_send_cnt,
+                        test->recv.buffer, &test->fifo_recv_cnt, test->fifo_recv_cnt,
+                        test->cnt);
+    }
+
+    if (((test->send.buffer == NULL) || (test->fifo_send_cnt == test->cnt))        // not send or send complete
+        && ((test->recv.buffer == NULL) || (test->fifo_recv_cnt == test->cnt))) {     // not receive or receive complete
+        return true;
+    } else {
+        return false;
+    }
+}
+
+static bool __spi_is_idle(spi_test_t *test)
+{
+    VSF_ASSERT(test != NULL);
+    vsf_spi_t *spi_ptr = test->device;
+    VSF_ASSERT(spi_ptr != NULL);
+
+    vsf_spi_status_t status = vsf_spi_status(spi_ptr);
+    if (test->verbose >= 2) {
+        vsf_trace_debug("vsf_spi_status(&%s) = %s" VSF_TRACE_CFG_LINEEND, test->device_name, status.is_busy ? "busy" : "idle");
+    }
+
+    return !status.is_busy;
+}
+
+static vsf_err_t __spi_request_transfer(spi_test_t *test)
+{
+    VSF_ASSERT(test != NULL);
+    vsf_spi_t *spi_ptr = test->device;
+    VSF_ASSERT(spi_ptr != NULL);
+
+    vsf_err_t err = vsf_spi_request_transfer(spi_ptr, test->send.buffer,
+                                             test->recv.buffer, test->cnt);
+    if (test->verbose >= 2) {
+        vsf_trace_debug("vsf_spi_request_transfer(&%s, %p/*sbuf*/, %p/*rbuf*/, %u/*cnt*/) = %d" VSF_TRACE_CFG_LINEEND,
+                        test->device_name, test->send.buffer, test->recv.buffer,
+                        test->cnt, err);
+    }
+    if (VSF_ERR_NONE != err) {
+        vsf_trace_error("spi request faild: %d" VSF_TRACE_CFG_LINEEND, err);
+    }
+    return err;
+}
+
+static void __spi_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    VSF_ASSERT(NULL != eda);
+    spi_test_t *test = container_of(eda, spi_test_t, teda);
+    vsf_spi_t * spi_ptr = test->device;
+    VSF_ASSERT(spi_ptr != NULL);
+    bool is_send_done;
+    bool is_recv_done;
+
+    switch (evt) {
+    case VSF_EVT_HAL_TEST_END:
+        if (test->cs_less) {
+            __spi_cs_inactive(test);
+        }
+        vsf_eda_post_evt(eda, VSF_EVT_HAL_CALL_IRQ_DISABLE);
+        break;
+
+    case VSF_EVT_HAL_TEST_START:
+        if (test->cs_less) {
+            __spi_cs_active(test);
+        }
+
+    case VSF_EVT_HAL_TEST_RUN:
+        VSF_ASSERT((test->send.buffer != NULL) || (test->recv.buffer != NULL));
+
+        if (!test->cs_less) {
+            __spi_cs_active(test);
+        }
+
+        test->fifo_recv_cnt = 0;
+        test->fifo_send_cnt = 0;
+
+        if ((test->method & METHOD_TRANSFER_MASK) == METHOD_REQUEST) {
+            vsf_teda_set_timer_ms(test->timeout_ms.test);
+            VSF_ASSERT((test->method & METHOD_TRANSFER_MASK) == METHOD_REQUEST);
+            if (VSF_ERR_NONE != __spi_request_transfer(test)) {
+                vsf_eda_post_evt(eda, VSF_EVT_HAL_TEST_FAILED);
+            }
+            break;
+        } else /*if ((test->method & METHOD_TRANSFER_MASK) == METHOD_FIFO)*/ {
+            if ((test->method & METHOD_IRQ_MASK) == METHOD_IRQ_MASK) {
+                if ((test->method & METHOD_SEND_RECV_MASK) != VSF_SPI_IRQ_MASK_RX) {
+                    test->irq_mask |= VSF_SPI_IRQ_MASK_TX;
+                }
+                __spi_fifo_transfer(test);
+                hal_device_irq_enable(&test->use_as__hal_test_t);
+                break;
+            } else {
+
+            }
+        }
+
+    case VSF_EVT_SPI_FIFO_POLL:
+        VSF_ASSERT((test->method & METHOD_TRANSFER_MASK) == METHOD_FIFO);
+        if (!__spi_fifo_transfer(test)) {
+            if (hal_test_is_timeout(&test->use_as__hal_test_t, test->timeout_ms.test)) {
+                vsf_eda_post_evt(eda, VSF_EVT_HAL_TEST_FAILED);
+                break;
+            }
+            vsf_eda_post_evt(eda, VSF_EVT_SPI_FIFO_POLL);
+        } else {
+            if (test->recv.buffer == NULL) {
+                // The data is in the send fifo, wait for all data to be transferred
+                vsf_eda_post_evt(eda, VSF_EVT_SPI_TX_FIFO_WAIT_IDLE); // wait tx cpl
+            } else {
+                // receiving completed, assuming it is idle
+                if (!test->cs_less) {
+                    __spi_cs_inactive(test);
+                }
+                vsf_eda_post_evt(eda, VSF_EVT_HAL_TEST_NEXT);
+            }
+        }
+        break;
+
+    case VSF_EVT_SPI_TX_FIFO_WAIT_IDLE:
+        VSF_ASSERT((test->method & METHOD_TRANSFER_MASK) == METHOD_FIFO);
+        if (!__spi_is_idle(test)) {
+            if (hal_test_is_timeout(&test->use_as__hal_test_t, test->timeout_ms.test)) {
+                vsf_eda_post_evt(eda, VSF_EVT_HAL_TEST_FAILED);
+            }
+            break;
+        }
+
+        if (!test->cs_less) {
+            __spi_cs_inactive(test);
+        }
+        vsf_eda_post_evt(eda, VSF_EVT_HAL_TEST_NEXT);
+        break;
+
+    case VSF_EVT_SPI_CHECK:
+        VSF_ASSERT((test->method & METHOD_TRANSFER_MASK) == METHOD_REQUEST);
+        is_recv_done = true;
+        is_send_done = true;
+        switch (test->method & METHOD_SEND_RECV_MASK) {
+        case METHOD_SEND_ONLY:
+            is_send_done = test->fifo_send_cnt == test->cnt;
+            break;
+        case METHOD_RECV_ONLY:
+            is_recv_done = test->fifo_recv_cnt == test->cnt;
+            break;
+        case METHOD_SEND_RECV:
+            is_recv_done = test->fifo_recv_cnt == test->cnt;
+            is_send_done = test->fifo_send_cnt == test->cnt;
+            break;
+        }
+
+        if (!is_send_done || !is_recv_done) {
+            break;
+        }
+
+        if (!test->cs_less) {
+            __spi_cs_inactive(test);
+        }
+        vsf_teda_cancel_timer();
+        vsf_eda_post_evt(eda, VSF_EVT_HAL_TEST_NEXT);
+        break;
+
+    case VSF_EVT_TIMER:
+        if (test->verbose >= 1) {
+            vsf_trace_error("reqeust test timeout" VSF_TRACE_CFG_LINEEND);
+        }
+        vsf_eda_post_evt(eda, VSF_EVT_HAL_TEST_FAILED);
+        break;
+
+    default:
+        hal_evthandler(eda, evt);
+        break;
+    }
+}
+
+#if APP_USE_LINUX_DEMO == ENABLED
+static vsf_err_t __spi_parser_args(hal_test_t * hal_test, int argc, char *argv[])
+{
+    spi_test_t *test = (spi_test_t *)hal_test;
+    VSF_ASSERT(test != NULL);
+    hal_demo_t *demo = test->demo;
+    VSF_ASSERT(demo != NULL);
+
+    vsf_err_t err = VSF_ERR_NONE;
+
+    int c = 0;
+    int option_index = 0;
+    static const char *__short_options = "hlv::m:r:d:c:p:i:t:f:s:e:n:z:";
+    static const struct option __long_options[] = {
+        { "help",       no_argument,       NULL, 'h'  },
+        { "list-device",no_argument,       NULL, 'l'  },
+        { "verbose",    optional_argument, NULL, 'v'  },
+        { "method",     required_argument, NULL, 'm'  },
+        { "repeat",     required_argument, NULL, 'r'  },
+        { "device",     required_argument, NULL, 'd'  },
+        { "config",     required_argument, NULL, 'c'  },
+        { "prio",       required_argument, NULL, 'p'  },
+        { "isr_prio",   required_argument, NULL, 'i'  },
+        { "timeout",    required_argument, NULL, 't'  },
+        { "freq",       required_argument, NULL, 'f'  },
+        { "cs-index",   required_argument, NULL, 's' },
+        { "cs-less",    no_argument,       NULL, 'e' },
+        { "buffer-len", required_argument, NULL, 'n' },
+        { "clock-hz",   required_argument, NULL, 'z' },
+        { NULL,         0,                 NULL, '\0' },
     };
 
-    init_result = vsf_spi_init(spi, &spi_cfg);
-    if (init_result != VSF_ERR_NONE) {
-        return init_result;
-    }
-
-    while (fsm_rt_cpl != vsf_spi_enable(spi));
-
-    if (mask & VSF_SPI_IRQ_ALL_BITS_MASK) {
-        vsf_spi_irq_enable(spi, mask);
-    }
-
-    return VSF_ERR_NONE;
-}
-
-static void __spi_demo_deinit(vsf_spi_t * spi, vsf_spi_irq_mask_t mask)
-{
-    if (mask & VSF_SPI_IRQ_ALL_BITS_MASK) {
-        vsf_spi_irq_disable(spi, mask);
-    }
-
-    while (fsm_rt_cpl != vsf_spi_disable(spi));
-}
-
-#if APP_SPI_DEMO_CFG_FIFO == ENABLED
-static void __spi_demo_fifo_poll(vsf_spi_t *spi,
-                                       void             *send_buff,
-                                       void             *recv_buff,
-                                       uint_fast32_t     count)
-{
-    VSF_ASSERT(spi != NULL);
-
-    vsf_err_t err = __spi_demo_init(spi, NULL, NULL, APP_SPI_DEMO_IRQ_PRIO, 0);
-    VSF_ASSERT(err == VSF_ERR_NONE);
-
-    uint32_t send_count = 0;
-    uint32_t recv_count = 0;
-
-    while (1) {
-        vsf_spi_fifo_transfer(spi, send_buff, count, &send_count, recv_buff, count, &recv_count);
-        if ((send_count == count) && (recv_count == count)) {
+    optind = 1;
+    while(EOF != (c = getopt_long(argc, argv, __short_options, __long_options, &option_index))) {
+        switch(c) {
+        case 's':
+            test->cs_index = strtol(optarg, NULL, 0);
+            break;
+        case 'e':
+            test->cs_less = true;
+            break;
+        case 'n':
+            test->cnt = strtol(optarg, NULL, 0);
+            if (test->cnt == 0) {
+                vsf_trace_error("spi buffer length cannot be 0" VSF_TRACE_CFG_LINEEND);
+                return VSF_ERR_FAIL;
+            }
+            break;
+        case 'z':
+            test->cfg.clock_hz = strtol(optarg, NULL, 0);
+            if (test->cnt == 0) {
+                vsf_trace_error("spi clock cannot be 0" VSF_TRACE_CFG_LINEEND);
+                return VSF_ERR_FAIL;
+            }
+            break;
+        default:
+            err = hal_test_evthandler(hal_test, argc, argv, c);
+            if (err != VSF_ERR_NONE) {
+                return err;
+            }
             break;
         }
     }
 
-    __spi_demo_deinit(spi, 0);
-}
-#endif
+    test->cfg.mode = (test->cfg.mode & ~test->mode_mask) | test->mode_value;
 
-#if APP_SPI_DEMO_CFG_FIFO_SEND_TEST == ENABLED
-static void __spi_demo_fifo_send_only(vsf_spi_t *spi)
-{
-    VSF_ASSERT(spi != NULL);
-    app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
-
-    __spi_demo_fifo_poll(spi, demo->send_buf, NULL, demo->size);
-}
-#endif
-
-#if APP_SPI_DEMO_CFG_FIFO_RECV_TEST == ENABLED
-static void __spi_demo_fifo_recv_only(vsf_spi_t *spi)
-{
-    VSF_ASSERT(spi != NULL);
-    app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
-
-    __spi_demo_fifo_poll(spi, NULL, demo->recv_buf, demo->size);
-}
-#endif
-
-#if APP_SPI_DEMO_CFG_FIFO_SEND_RECV_TEST == ENABLED
-static void __spi_demo_fifo_send_recv(vsf_spi_t *spi)
-{
-    VSF_ASSERT(spi != NULL);
-    app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
-
-    __spi_demo_fifo_poll(spi, demo->send_buf, demo->recv_buf, demo->size);
-}
-#endif
-
-#if APP_SPI_DEMO_CFG_REQUEST == ENABLED
-static void __spi_request_isr_handler(void              *target,
-                                      vsf_spi_t         *spi_ptr,
-                                      vsf_spi_irq_mask_t  irq_mask)
-{
-    app_spi_demo_t * demo = (app_spi_demo_t *)target;
-    VSF_ASSERT(demo != NULL);
-
-    if (irq_mask & VSF_SPI_IRQ_MASK_CPL) {
-#if APP_SPI_DEMO_CFG_AUTO_CS_EN == DISABLED
-        vsf_spi_cs_inactive(spi_ptr, 0);
-#endif
-
-        __spi_demo_deinit(spi_ptr, 0);
-
-        vsf_trace_debug("spi request finished" VSF_TRACE_CFG_LINEEND, __DATE__, __TIME__);
-        vsf_trace_debug("send buff:" VSF_TRACE_CFG_LINEEND, __DATE__, __TIME__);
-        vsf_trace_buffer(VSF_TRACE_DEBUG, demo->send_buff, demo->size);
-        vsf_trace_debug("recv buff:" VSF_TRACE_CFG_LINEEND, __DATE__, __TIME__);
-        vsf_trace_buffer(VSF_TRACE_DEBUG, demo->recv_buff, demo->size);
-    }
+    return err;
 }
 
-static void __spi_demo_request(app_spi_demo_t   *demo,
-                               vsf_spi_t        *spi_ptr,
-                               void             *send_buff,
-                               void             *recv_buff,
-                               uint_fast32_t     count)
-{
-
-    vsf_err_t err = __spi_demo_init(spi_ptr, __spi_request_isr_handler,
-                          demo, APP_SPI_DEMO_IRQ_PRIO, VSF_SPI_IRQ_MASK_CPL);
-    VSF_ASSERT(err == VSF_ERR_NONE);
-
-#if APP_SPI_DEMO_CFG_AUTO_CS_EN == DISABLED
-    vsf_spi_cs_active(spi_ptr, 0);
-#endif
-
-    err = vsf_spi_request_transfer(spi_ptr, send_buff, recv_buff, count);
-    VSF_ASSERT(err == VSF_ERR_NONE);
-
-    (void)err;
-}
-#endif
-
-#if APP_SPI_DEMO_CFG_REQUEST_SEND_TEST == ENABLED
-static void __spi_demo_request_send_only(vsf_spi_t *spi_ptr)
-{
-    VSF_ASSERT(spi_ptr != NULL);
-
-    app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
-    for (int i = 0; i < demo->size; i++) {
-        demo->send_buf[i] = i;
-    }
-    __spi_demo_request(demo, spi_ptr, demo->send_buf, NULL, demo->size);
-}
-#endif
-
-#if APP_SPI_DEMO_CFG_REQUEST_RECV_TEST == ENABLED
-static void __spi_demo_request_recv_only(vsf_spi_t *spi_ptr)
-{
-    VSF_ASSERT(spi_ptr != NULL);
-
-    app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
-    __spi_demo_request(demo, spi_ptr, NULL, demo->recv_buf, demo->size);
-}
-#endif
-
-#if APP_SPI_DEMO_CFG_REQUEST_SEND_RECV_TEST == ENABLED
-static void __spi_demo_request_send_recv(vsf_spi_t *spi_ptr)
-{
-    VSF_ASSERT(spi_ptr != NULL);
-
-    app_spi_demo_t * demo = (app_spi_demo_t *)&__app_spi_demo;
-    for (int i = 0; i < demo->size; i++) {
-        demo->send_buff[i] = i;
-    }
-    __spi_demo_request(demo, spi_ptr, demo->send_buff, demo->recv_buff, demo->size);
-}
-#endif
-
-#if APP_USE_LINUX_DEMO == ENABLED
 int spi_main(int argc, char *argv[])
 {
-    size_t size;
-    if (argc >= 2) {
-        size = atoi(argv[1]);
-    } else {
-        size = APP_SPI_DEMO_CFG_BUFFER_SIZE;
-    }
+    return hal_main(&__spi_demo.use_as__hal_demo_t, argc, argv);
+}
 #else
 int VSF_USER_ENTRY(void)
 {
-#   if VSF_USE_TRACE == ENABLED
-    vsf_start_trace();
-#   endif
-#   if USRAPP_CFG_STDIO_EN == ENABLED
-    vsf_stdio_init();
-#   endif
-
-    size_t size = APP_SPI_DEMO_CFG_BUFFER_SIZE;
-#endif
-
-    size *= vsf_spi_mode_to_data_bytes(APP_SPI_DEMO_CFG_MODE);
-    __app_spi_demo.recv_buff = (uint8_t *)malloc(size);
-    if (__app_spi_demo.recv_buff == NULL) {
-        return -1;
-    }
-    __app_spi_demo.send_buff = (uint8_t *)malloc(size);
-    if (__app_spi_demo.send_buff == NULL) {
-        return -1;
-    }
-    __app_spi_demo.size = size;
-
-#if APP_SPI_DEMO_CFG_FIFO_SEND_TEST == ENABLED
-    __spi_demo_fifo_send_only(APP_SPI_DEMO_CFG_SPI);
-#endif
-
-#if APP_SPI_DEMO_CFG_FIFO_RECV_TEST == ENABLED
-    __spi_demo_fifo_recv_only(APP_SPI_DEMO_CFG_SPI);
-#endif
-
-#if APP_SPI_DEMO_CFG_FIFO_SEND_RECV_TEST == ENABLED
-    __spi_demo_fifo_send_recv(APP_SPI_DEMO_CFG_SPI);
-#endif
-
-#if APP_SPI_DEMO_CFG_REQUEST_SEND_TEST == ENABLED
-    __spi_demo_request_send_only(APP_SPI_DEMO_CFG_SPI);
-#endif
-
-#if APP_SPI_DEMO_CFG_REQUEST_RECV_TEST == ENABLED
-    __spi_demo_request_recv_only(APP_SPI_DEMO_CFG_SPI);
-#endif
-
-#if APP_SPI_DEMO_CFG_REQUEST_SEND_RECV_TEST == ENABLED
-    __spi_demo_request_send_recv(APP_SPI_DEMO_CFG_SPI);
-#endif
-
-    return 0;
+    return hal_main(&__spi_demo.use_as__hal_demo_t);
 }
+#endif
 
 #endif
