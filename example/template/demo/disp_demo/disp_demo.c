@@ -26,16 +26,16 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef APP_DISP_DEMO_CFG_WIDTH
-#   define APP_DISP_DEMO_CFG_WIDTH          320
+#ifndef APP_DISP_DEMO_WIDTH
+#   define APP_DISP_DEMO_WIDTH          320
 #endif
 
-#ifndef APP_DISP_DEMO_CFG_HEIGHT
-#   define APP_DISP_DEMO_CFG_HEIGHT         100
+#ifndef APP_DISP_DEMO_HEIGHT
+#   define APP_DISP_DEMO_HEIGHT         100
 #endif
 
 #ifndef APP_DISP_DEMO_CFG_PIXEL_COUTNER
-#   define APP_DISP_DEMO_CFG_PIXEL_COUTNER    (APP_DISP_DEMO_CFG_WIDTH * APP_DISP_DEMO_CFG_HEIGHT)
+#   define APP_DISP_DEMO_CFG_PIXEL_COUTNER    (APP_DISP_DEMO_WIDTH * APP_DISP_DEMO_HEIGHT)
 #endif
 
 #ifndef APP_DISP_DEMO_CFG_PIXEL_SIZE
@@ -119,8 +119,8 @@ static void __disp_demo_evthandler(vsf_eda_t* eda, vsf_evt_t evt)
             .y = 0,
         },
         .size = {
-            .x = APP_DISP_DEMO_CFG_WIDTH,
-            .y = APP_DISP_DEMO_CFG_HEIGHT,
+            .x = APP_DISP_DEMO_WIDTH,
+            .y = APP_DISP_DEMO_HEIGHT,
         },
     };
 
