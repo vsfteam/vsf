@@ -91,7 +91,7 @@ vsf_err_t vsf_hw_io_config_one_pin(vsf_hw_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr)
         VSF_ASSERT(0);
         return VSF_ERR_INVALID_RANGE;
     }
-    if (cfg_ptr->mode & ~__AIC8800_IO_FEATURE_ALL_BITS) {
+    if (cfg_ptr->mode & ~__AIC8800_IO_MODE_ALL_BITS) {
         VSF_ASSERT(0);
         return VSF_ERR_NOT_SUPPORT;
     }
@@ -104,10 +104,10 @@ vsf_err_t vsf_hw_io_config_one_pin(vsf_hw_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr)
     bool is_pmic = io_ptr->ports[port_index].is_pmic;
     volatile uint32_t *reg = &io_ptr->ports[port_index].IOMUX->GPCFG[pin_index];
     uint32_t wdata = cfg_ptr->mode | cfg_ptr->function;
-    uint32_t wmask = __AIC8800_IO_FEATURE_ALL_BITS | __AIC8800_IO_FUNCTION_MASK;
+    uint32_t wmask = __AIC8800_IO_MODE_ALL_BITS | __AIC8800_IO_FUNCTION_MASK;
     if (is_pmic) {
         PMIC_MEM_MASK_WRITE((unsigned int)reg, wdata, wmask);
-        if (   io_ptr->ports[port_index].gpio_map != NULL) {
+        if (io_ptr->ports[port_index].gpio_map != NULL) {
             uint8_t * funs = io_ptr->ports[port_index].gpio_map->funs;
             if (funs[pin_index] == cfg_ptr->function) {
                 // MR register need to be set 1 when pmic port configured as GPIO

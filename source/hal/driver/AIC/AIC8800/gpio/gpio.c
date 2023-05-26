@@ -21,8 +21,8 @@
 
 #if VSF_HAL_USE_GPIO == ENABLED
 
+#include "hal/vsf_hal.h"
 #include "./i_reg_gpio.h"
-
 #include "../vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 #include "../vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_iomux.h"
 #include "../vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
@@ -52,9 +52,6 @@
     (((__P &  VSF_HW_IO_PIN_MASK) != 0) &&                                      \
      ((__P & ~VSF_HW_IO_PIN_MASK) == 0))
 
-#define __AIC8800_IO_IS_VAILID_FEATURE(__F)                                     \
-    ((__F & ~(uint32_t)__AIC8800_IO_FEATURE_ALL_BITS) == 0)
-
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_hw_gpio_t {
@@ -68,6 +65,10 @@ typedef struct vsf_hw_gpio_t {
     uint16_t gpio_pin_mask; // in pmic port, must set bit to 1 in MR register
 
     AIC_IOMUX_TypeDef *IOMUX;
+
+    IRQn_Type irqn;
+
+    VSF_GPIO_INT_MODE_isr_t *isrs;
 } vsf_hw_gpio_t;
 
 /*============================ IMPLEMENTATION ================================*/
@@ -93,17 +94,17 @@ void __vsf_hw_aic8800_gpio_init(void)
     }
 }
 
-void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_mode_t feature)
+void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_mode_t mode)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     VSF_HAL_ASSERT(__AIC8800_IO_IS_VAILID_PIN(pin_mask));
-    VSF_HAL_ASSERT(__AIC8800_IO_IS_VAILID_FEATURE(feature));
+    mode = mode & __AIC8800_IO_MODE_ALL_BITS;
 
     for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
         uint32_t current_pin_mask = 1 << i;
         if (pin_mask & current_pin_mask) {
             aic8800_io_reg_mask_write(hw_gpio_ptr->is_pmic, &hw_gpio_ptr->IOMUX->GPCFG[i],
-                                  feature, __AIC8800_IO_FEATURE_ALL_BITS);
+                                  mode, __AIC8800_IO_MODE_ALL_BITS);
             if (hw_gpio_ptr->is_pmic) {
                 PMIC_MEM_MASK_WRITE((unsigned int)&hw_gpio_ptr->GPIO->MR, current_pin_mask, current_pin_mask);
             }
@@ -182,6 +183,7 @@ vsf_gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
         .is_async = hw_gpio_ptr->is_pmic,
         .support_output_and_set = VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_SET,
         .support_output_and_clear = VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_CLEAR,
+        .support_interrupt = 1,
         .pin_count = VSF_HW_GPIO_PIN_COUNT,
         .pin_mask = VSF_HW_GPIO_PIN_MASK,
     };
@@ -189,20 +191,149 @@ vsf_gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
     return gpio_capability;
 }
 
-/*============================ INCLUDES ======================================*/
+vsf_err_t vsf_hw_gpio_pin_interrupt_init(vsf_hw_gpio_t *hw_gpio_ptr, vsf_arch_prio_t prio)
+{
+    VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
 
+    if (hw_gpio_ptr->is_pmic) {
+        return VSF_ERR_NOT_SUPPORT;
+    }
+
+    if (prio == vsf_arch_prio_invalid) {
+        NVIC_EnableIRQ(hw_gpio_ptr->irqn);
+    } else {
+        NVIC_SetPriority(hw_gpio_ptr->irqn, prio);
+        NVIC_EnableIRQ(hw_gpio_ptr->irqn);
+    }
+
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_hw_gpio_pin_interrupt_config(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    if (hw_gpio_ptr->is_pmic) {
+        return VSF_ERR_NOT_SUPPORT;
+    }
+    VSF_HAL_ASSERT(NULL != hw_gpio_ptr->isrs);
+
+    uint32_t pin_mask = cfg_ptr->pin_mask;
+
+    if (cfg_ptr->mode == VSF_GPIO_INT_MODE_NONE) {
+        hw_gpio_ptr->GPIO->TIR &= ~pin_mask;
+        hw_gpio_ptr->GPIO->ICR &= ~pin_mask;
+        for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
+            if (pin_mask & (1 << i)) {
+                hw_gpio_ptr->isrs[i].handler_fn = NULL;
+                hw_gpio_ptr->isrs[i].target_ptr = NULL;
+            }
+        }
+        return VSF_ERR_NONE;
+    } else {
+        for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
+            if (pin_mask & (1 << i)) {
+                hw_gpio_ptr->isrs[i] = cfg_ptr->isr;
+            }
+        }
+
+        hw_gpio_ptr->GPIO->DR  &= ~pin_mask;
+        hw_gpio_ptr->GPIO->TIR |=  pin_mask;
+
+        switch (cfg_ptr->mode) {
+        case VSF_GPIO_INT_MODE_LOW_LEVEL:
+            hw_gpio_ptr->GPIO->TELR |=  pin_mask;
+            hw_gpio_ptr->GPIO->TER  &= ~pin_mask;
+            hw_gpio_ptr->GPIO->TLR  &= ~pin_mask;
+            break;
+
+        case VSF_GPIO_INT_MODE_HIGH_LEVEL:
+            hw_gpio_ptr->GPIO->TELR |=  pin_mask;
+            hw_gpio_ptr->GPIO->TER  &= ~pin_mask;
+            hw_gpio_ptr->GPIO->TLR  |=  pin_mask;
+            break;
+
+        case VSF_GPIO_INT_MODE_RISING:
+            hw_gpio_ptr->GPIO->TELR &= ~pin_mask;
+            hw_gpio_ptr->GPIO->TER  &= ~pin_mask;
+            hw_gpio_ptr->GPIO->TLR  |=  pin_mask;
+            break;
+
+        case VSF_GPIO_INT_MODE_FALLING:
+            hw_gpio_ptr->GPIO->TELR &= ~pin_mask;
+            hw_gpio_ptr->GPIO->TER  &= ~pin_mask;
+            hw_gpio_ptr->GPIO->TLR  &= ~pin_mask;
+            break;
+
+        case VSF_GPIO_INT_MODE_RISING_FALLING:
+            hw_gpio_ptr->GPIO->TELR &= ~pin_mask;
+            hw_gpio_ptr->GPIO->TER  |= pin_mask;
+            break;
+        }
+
+        uint32_t fr_mask = 0;
+        for (int i = 0; i < VSF_HW_IO_PIN_COUNT / 4; i++) {
+            if (pin_mask & (0x03 << i)) {
+                fr_mask |= (0x07 << i);
+            }
+        }
+        hw_gpio_ptr->GPIO->FR  |= fr_mask;
+        hw_gpio_ptr->GPIO->ICR |= pin_mask;
+    }
+
+    return VSF_ERR_NONE;
+}
+
+void __vsf_hw_gpio_irq_handler(vsf_hw_gpio_t *hw_gpio_ptr)
+{
+    VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
+    GPIO_REG_T *GPIOx = hw_gpio_ptr->GPIO;
+    VSF_HAL_ASSERT(NULL != GPIOx);
+    VSF_HAL_ASSERT(NULL != hw_gpio_ptr->isrs);
+
+    uint32_t irq_pin_mask = GPIOx->ISR;
+    while (irq_pin_mask) {
+        uint32_t pin = 31 - __CLZ(irq_pin_mask);
+        uint32_t pin_mask = 0x01UL << pin;
+        VSF_HAL_ASSERT(pin < VSF_HW_IO_PIN_COUNT);
+        GPIOx->IRR = pin_mask;
+
+        //copy from gpio_api.c
+        // I don't know why the ISB is called here.
+        __ISB();
+
+        irq_pin_mask = GPIOx->ISR;
+
+        VSF_HAL_ASSERT(NULL != hw_gpio_ptr->isrs[pin].handler_fn);
+        hw_gpio_ptr->isrs[pin].handler_fn(hw_gpio_ptr->isrs[pin].target_ptr,
+                                         (vsf_gpio_t *)hw_gpio_ptr, pin_mask);
+    }
+}
+
+/*============================ INCLUDES ======================================*/
 
 #define VSF_GPIO_CFG_IMP_PREFIX                 vsf_hw
 #define VSF_GPIO_CFG_IMP_UPCASE_PREFIX          VSF_HW
 #define VSF_GPIO_CFG_IMP_LV0(__COUNT, __HAL_OP)                                         \
+    static VSF_GPIO_INT_MODE_isr_t __vsf_hw_gpio ## __COUNT ## isr[VSF_HW_IO_PIN_COUNT];\
     vsf_hw_gpio_t vsf_hw_gpio ## __COUNT = {                                            \
         .GPIO = REG_GPIO ## __COUNT,                                                    \
+        .irqn = VSF_HW_GPIO ## __COUNT ##_IRQ_IDX,                                      \
         .IOMUX = ((AIC_IOMUX_TypeDef *)VSF_HW_IO_PORT ## __COUNT ## _IOMUX_REG_BASE),   \
         .is_pmic = VSF_HW_IO_PORT ## __COUNT ## _IS_PMIC,                               \
         .gpio_pin_mask = VSF_HW_IO_PORT ## __COUNT ## _GPIO_PIN_MASK,                   \
         .output_reg = 0,                                                                \
+        .isrs = VSF_HW_IO_PORT ## __COUNT ## _IS_PMIC ?                                 \
+                NULL : __vsf_hw_gpio ## __COUNT ## isr,                                 \
         __HAL_OP                                                                        \
-    };
+    };                                                                                  \
+    void VSF_HW_GPIO ## __COUNT ## _IRQ(void)                                           \
+    {                                                                                   \
+        uintptr_t ctx = vsf_hal_irq_enter();                                            \
+        __vsf_hw_gpio_irq_handler(&vsf_hw_gpio ## __COUNT);                             \
+        vsf_hal_irq_leave(ctx);                                                         \
+    }
 
 #include "hal/driver/common/gpio/gpio_template.inc"
 

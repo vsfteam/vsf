@@ -24,7 +24,6 @@
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/sysctrl/sysctrl_api.h"
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/pwm/reg_pwm.h"
-#include "../__device.h"
 #include "./i_reg_pwm.h"
 
 /*============================ MACROS ========================================*/

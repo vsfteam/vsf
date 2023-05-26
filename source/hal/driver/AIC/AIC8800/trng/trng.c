@@ -21,6 +21,7 @@
 
 #if VSF_HAL_USE_RNG == ENABLED
 
+#include "hal/vsf_hal.h"
 // for VSF_MCONNECT
 #include "utilities/vsf_utilities.h"
 
@@ -109,6 +110,7 @@ vsf_err_t vsf_hw_rng_generate_request(vsf_hw_rng_t *rng, uint32_t *buffer, uint3
     };                                                                          \
     void VSF_MCONNECT(VSF_HW_RNG, __COUNT, _IRQHandler)(void)                   \
     {                                                                           \
+        uintptr_t ctx = vsf_hal_irq_enter();                                    \
         vsf_hw_rng_t *rng = &VSF_MCONNECT(vsf_hw_rng, __COUNT);                 \
         AIC_TRNG_TypeDef *reg = rng->reg;                                       \
         uint32_t data = reg->trng_data;                                         \
@@ -130,6 +132,7 @@ vsf_err_t vsf_hw_rng_generate_request(vsf_hw_rng_t *rng, uint32_t *buffer, uint3
         } else {                                                                \
             reg->trng_en = TRNG_STRNGENQ | TRNG_STRNGIEQ;                       \
         }                                                                       \
+        vsf_hal_irq_leave(ctx);                                                 \
     }
 #include "hal/driver/common/rng/rng_template.inc"
 

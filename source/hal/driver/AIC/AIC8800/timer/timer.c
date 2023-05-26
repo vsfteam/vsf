@@ -21,10 +21,10 @@
 
 #if VSF_HAL_USE_TIMER == ENABLED
 
+#include "hal/vsf_hal.h"
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/sysctrl/sysctrl_api.h"
 #include "hal/driver/AIC/AIC8800/vendor/plf/aic8800/src/driver/ticker/reg_timer.h"
-#include "../__device.h"
 
 /*============================ MACROS ========================================*/
 
@@ -204,7 +204,9 @@ void vsf_hw_timer_irq_disable(vsf_hw_timer_t *timer_ptr, vsf_timer_irq_mask_t ir
     };                                                                          \
     void VSF_HW_TIMER ## __COUNT ## _IRQHandler(void)                           \
     {                                                                           \
+        uintptr_t ctx = vsf_hal_irq_enter();                                    \
         __vsf_hw_timer_irq_handler(&vsf_hw_timer ## __COUNT);                   \
+        vsf_hal_irq_leave(ctx);                                                 \
     }
 #include "hal/driver/common/timer/timer_template.inc"
 

@@ -41,8 +41,6 @@ typedef enum vsf_io_mode_t {
     VSF_IO_PULL_UP                 = (1 << 16) | (1 << 9),
     VSF_IO_PULL_DOWN               = (1 << 16) | (1 << 8),
 
-    __IO_PULL_MASK                 = VSF_IO_OPEN_DRAIN | VSF_IO_PULL_UP | VSF_IO_PULL_DOWN,
-
     // not support in aic8800
     VSF_IO_NORMAL_INPUT            = 0,
     VSF_IO_DISABLE_INPUT           = 1 << 17,          //!< disable input
@@ -65,7 +63,10 @@ typedef enum vsf_io_mode_t {
     VSF_IO_HIGH_DRIVE_STRENGTH     = 1 << 24,          //!< enable high drive strength
     VSF_IO_HIGH_DRIVE_NO_STRENGTH  = 0 << 24,          //!< enable high drive strength
 
-    __AIC8800_IO_FEATURE_ALL_BITS  = VSF_IO_PULL_UP | VSF_IO_OPEN_DRAIN,
+    VSF_IO_INTERRUPT_DISABLED      = 0 << 25,
+    VSF_IO_INTERRUPT_ENABLED       = 1 << 25,
+
+    __AIC8800_IO_MODE_ALL_BITS     = VSF_IO_OPEN_DRAIN | VSF_IO_PULL_UP | VSF_IO_PULL_DOWN,
 
 } vsf_io_mode_t;
 

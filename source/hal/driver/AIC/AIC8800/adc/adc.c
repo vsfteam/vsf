@@ -420,7 +420,7 @@ vsf_adc_capability_t vsf_hw_adc_capability(vsf_hw_adc_t *adc_ptr)
     vsf_adc_capability_t adc_capability = {
         .irq_mask = VSF_ADC_IRQ_MASK_CPL,
         .max_data_bits = 8,         // TODO: check
-        .max_channel_count = VSF_HW_ADC_CFG_CHANNEL_COUNT,
+        .channel_count = VSF_HW_ADC_CFG_CHANNEL_COUNT,
     };
 
     return adc_capability;

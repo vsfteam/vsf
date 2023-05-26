@@ -45,6 +45,7 @@
 #       include "./usb/usb.h"
 #       include "./mmc/mmc.h"
 #       include "./i2s/i2s.h"
+#       include "./wdt/wdt.h"
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -62,6 +63,7 @@
 #endif
 
 #if VSF_HAL_USE_GPIO == ENABLED
+#   define VSF_GPIO_USE_IO_MODE_TYPE                        ENABLED
 #   include "hal/driver/common/template/vsf_template_gpio.h"
 
 #   define VSF_GPIO_CFG_DEC_PREFIX                          vsf_hw
@@ -174,6 +176,15 @@
 #   define VSF_FIFO2REQ_USART_COUNT                         VSF_HW_USART_COUNT
 #   define VSF_FIFO2REQ_USART_MASK                          VSF_HW_USART_MASK
 #   include "hal/driver/common/usart/fifo2req_usart.h"
+#endif
+
+#if VSF_HAL_USE_WDT == ENABLED
+#   define VSF_WDT_CFG_REIMPLEMENT_TYPE_MODE              ENABLED
+#   include "hal/driver/common/template/vsf_template_wdt.h"
+
+#   define VSF_WDT_CFG_DEC_PREFIX                           vsf_hw
+#   define VSF_WDT_CFG_DEC_UPCASE_PREFIX                    VSF_HW
+#   include "hal/driver/common/wdt/wdt_template.h"
 #endif
 
 /*============================ MACROS ========================================*/

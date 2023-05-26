@@ -43,6 +43,17 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define VSF_HAL_IRQ(__IRQHANDLER, ...)                                          \
+    void __IRQHANDLER(void)                                                     \
+    {                                                                           \
+        uintptr_t ctx = vsf_hal_irq_enter();                                    \
+        do {                                                                    \
+            __VA_ARGS__                                                         \
+        } while (0);                                                            \
+        vsf_hal_irq_leave(ctx);                                                 \
+    }
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -54,6 +65,10 @@ extern "C" {
  *  \retval false initialization failed
  */
 extern bool vsf_hal_init(void);
+
+extern uintptr_t vsf_hal_irq_enter(void);
+
+extern void vsf_hal_irq_leave(uintptr_t ctx);
 
 /*! \note initialize level 2 hardware abstract layer
  *  \param none
