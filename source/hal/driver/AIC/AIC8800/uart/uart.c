@@ -21,6 +21,7 @@
 
 #if VSF_HAL_USE_USART == ENABLED
 
+#include "hal/vsf_hal.h"
 #include "../vendor/plf/aic8800/src/driver/uart/reg_uart1.h"
 #include "../vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
 #include "../vendor/plf/aic8800/src/driver/ipc/reg_ipc_comreg.h"
@@ -297,7 +298,9 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
     };                                                                          \
     void UART ## __COUNT ## _IRQHandler(void)                                   \
     {                                                                           \
+        uintptr_t ctx = vsf_hal_irq_enter();                                    \
         __vsf_hw_usart_irq_handler(&__vsf_hw_usart ## __COUNT);                 \
+        vsf_hal_irq_leave(ctx);                                                 \
     }
 #include "hal/driver/common/usart/usart_template.inc"
 

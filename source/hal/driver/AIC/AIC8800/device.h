@@ -88,6 +88,10 @@
 
 #define VSF_HW_GPIO_PORT_COUNT          VSF_HW_IO_PORT_COUNT
 #define VSF_HW_GPIO_PIN_COUNT           VSF_HW_IO_PIN_COUNT
+#define VSF_HW_GPIO0_IRQ_IDX            GPIO_IRQn
+#define VSF_HW_GPIO0_IRQ                GPIO_IRQHandler
+#define VSF_HW_GPIO1_IRQ_IDX            0                   // TODO
+#define VSF_HW_GPIO1_IRQ                GPIOB_IRQHandler
 
 #define VSF_HW_RNG_COUNT            1
 #define VSF_HW_RNG_BITLEN           32
@@ -214,6 +218,13 @@
 #define VSF_HW_TIMER5_OCLK_EN_BIT   CSC_OCLKME_TIMER12_EN_BIT
 #define VSF_HW_TIMER5_PCLK_EN_BIT   CSC_PCLKME_TIMER1_EN_BIT
 #define VSF_HW_TIMER5_IRQHandler    TIMER12_IRQHandler
+
+#define VSF_HW_WDT_COUNT            1
+#define VSF_HW_WDT0_BASE_ADDRESS    AIC_WDT0_BASE
+#define VSF_HW_WDT0_IRQN            WDT0_IRQn
+#define VSF_HW_WDT0_OCLK_EN_BIT     (CSC_OCLKME_RTC_WDG0_EN_BIT | CSC_OCLKMD_RTC_ALWAYS_DIS_BIT)
+#define VSF_HW_WDT0_PCLK_EN_BIT     CSC_PCLKME_WDG0_EN_BIT
+#define VSF_HW_WDT0_IRQHandler      WDT0_IRQHandler
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

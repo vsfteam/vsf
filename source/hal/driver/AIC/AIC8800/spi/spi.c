@@ -545,11 +545,11 @@ vsf_spi_capability_t vsf_hw_spi_capability(vsf_hw_spi_t *spi_ptr)
     };                                                                          \
     void VSF_HW_SPI ## __COUNT ## _RXDMA_IRQ(void)                              \
     {                                                                           \
-        __irq_handler(&vsf_hw_spi ## __COUNT, VSF_SPI_IRQ_MASK_CPL);                \
+        __irq_handler(&vsf_hw_spi ## __COUNT, VSF_SPI_IRQ_MASK_CPL);            \
     }                                                                           \
     void VSF_HW_SPI ## __COUNT ## _TXDMA_IRQ(void)                              \
     {                                                                           \
-        __irq_handler(&vsf_hw_spi ## __COUNT, VSF_SPI_IRQ_MASK_TX_CPL);             \
+        __irq_handler(&vsf_hw_spi ## __COUNT, VSF_SPI_IRQ_MASK_TX_CPL);         \
     }
 
 #include "hal/driver/common/spi/spi_template.inc"

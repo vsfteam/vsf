@@ -21,6 +21,7 @@
 
 #if VSF_HAL_USE_MMC == ENABLED
 
+#include "hal/vsf_hal.h"
 #include "../vendor/plf/aic8800/src/driver/sysctrl/reg_sysctrl.h"
 #include "../vendor/plf/aic8800/src/driver/sysctrl/sysctrl_api.h"
 #include "../vendor/plf/aic8800/src/driver/iomux/reg_iomux.h"
@@ -247,7 +248,9 @@ void vsf_hw_mmc_host_transact_stop(vsf_hw_mmc_t *mmc_ptr)
     };                                                                          \
     void VSF_HW_MMC ## __COUNT ## _IRQ(void)                                    \
     {                                                                           \
+        uintptr_t ctx = vsf_hal_irq_enter();                                    \
         __vsf_hw_mmc_irq_handler(&vsf_hw_mmc ## __COUNT);                       \
+        vsf_hal_irq_leave(ctx);                                                 \
     }
 #include "hal/driver/common/mmc/mmc_template.inc"
 

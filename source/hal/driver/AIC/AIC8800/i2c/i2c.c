@@ -21,6 +21,7 @@
 
 #if VSF_HAL_USE_I2C == ENABLED
 
+#include "hal/vsf_hal.h"
 #include "../vendor/plf/aic8800/src/driver/sysctrl/reg_sysctrl.h"
 #include "../vendor/plf/aic8800/src/driver/sysctrl/sysctrl_api.h"
 #include "../vendor/plf/aic8800/src/driver/i2cm/reg_i2cm.h"
@@ -380,7 +381,9 @@ vsf_i2c_capability_t vsf_hw_i2c_capability(vsf_hw_i2c_t *i2c_ptr)
     };                                                                          \
     void VSF_HW_I2C ## __COUNT ## _IRQ(void)                                    \
     {                                                                           \
+        uintptr_t ctx = vsf_hal_irq_enter();                                    \
         __vsf_hw_i2c_irq_handler(&vsf_hw_i2c ## __COUNT);                       \
+        vsf_hal_irq_leave(ctx);                                                 \
     }
 #include "hal/driver/common/i2c/i2c_template.inc"
 

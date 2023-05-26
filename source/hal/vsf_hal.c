@@ -20,9 +20,17 @@
 
 #include "./arch/vsf_arch.h"
 #include "./driver/driver.h"
+#include "kernel/vsf_eda.h"
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_HAL_USE_DEFAULT_IRQ_ENTER
+#   define VSF_HAL_USE_DEFAULT_IRQ_ENTER            ENABLED
+#endif
+
+#ifndef VSF_HAL_USE_DEFAULT_IRQ_LEVEL
+#   define VSF_HAL_USE_DEFAULT_IRQ_LEVEL            ENABLED
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -44,6 +52,27 @@ WEAK(vsf_driver_poll)
 bool vsf_driver_poll(void)
 {
     return true;
+}
+
+WEAK(vsf_hal_irq_enter)
+uintptr_t vsf_hal_irq_enter(void)
+{
+#if VSF_HAL_USE_DEFAULT_IRQ_ENTER == ENABLED
+    return vsf_irq_enter();
+#else
+    VSF_HAL_ASSERT(0);
+    return 0;
+#endif
+}
+
+WEAK(vsf_hal_irq_leave)
+void vsf_hal_irq_leave(uintptr_t ctx)
+{
+#if VSF_HAL_USE_DEFAULT_IRQ_LEVEL == ENABLED
+    vsf_irq_leave(ctx);
+#else
+    VSF_HAL_ASSERT(0);
+#endif
 }
 
 /*! \note initialize level 0/1 hardware abstract layer
