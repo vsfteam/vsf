@@ -102,6 +102,10 @@ extern "C" {
 #   define VSF_HAL_USE_DAC                  DISABLED
 #endif
 
+#ifndef VSF_HAL_USE_WDT
+#   define VSF_HAL_USE_WDT                  ENABLED
+#endif
+
 #ifndef VSF_HAL_USE_RTC
 #   define VSF_HAL_USE_RTC                  ENABLED
 #endif

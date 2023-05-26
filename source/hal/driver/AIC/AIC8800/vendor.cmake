@@ -115,5 +115,6 @@ target_sources(${VSF_LIB_NAME} INTERFACE
     vendor/plf/aic8800/src/driver/trans/arm_cfft_q15.c
     vendor/plf/aic8800/src/driver/trans/arm_cfft_radix4_q15.c
     vendor/plf/aic8800/src/driver/trng/trng_api.c
-    vendor/plf/aic8800/src/driver/wdt/wdt_api.c
+    # disable wdt_api.c because WDT0_IRQHandler
+    #vendor/plf/aic8800/src/driver/wdt/wdt_api.c
 )
