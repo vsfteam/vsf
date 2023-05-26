@@ -32,6 +32,10 @@
 #   include "./vsf_template_adc.h"
 #endif
 
+#if defined(VSF_HAL_USE_DMA) && !defined(__VSF_TEMPLATE_DMA_H__)
+#   include "./vsf_template_dma.h"
+#endif
+
 #if defined(VSF_HAL_USE_WDT) && !defined(__VSF_TEMPLATE_WDT_H__)
 #   include "./vsf_template_wdt.h"
 #endif
