@@ -32,6 +32,10 @@
 #   include "./vsf_template_adc.h"
 #endif
 
+#if defined(VSF_HAL_USE_WDT) && !defined(__VSF_TEMPLATE_WDT_H__)
+#   include "./vsf_template_wdt.h"
+#endif
+
 #if defined(VSF_HAL_USE_FLASH) && !defined(__VSF_TEMPLATE_FLASH_H__)
 #   include "./vsf_template_flash.h"
 #endif

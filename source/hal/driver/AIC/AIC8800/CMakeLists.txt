@@ -21,5 +21,6 @@ add_subdirectory(uart)
 add_subdirectory(usb)
 add_subdirectory(mmc)
 add_subdirectory(i2s)
+add_subdirectory(wdt)
 
 include(vendor.cmake)
