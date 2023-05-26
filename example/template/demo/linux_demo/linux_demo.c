@@ -292,6 +292,10 @@ int vsf_linux_create_fhs(void)
     extern int usart_main(int argc, char *argv[]);
     busybox_bind(VSF_LINUX_CFG_BIN_PATH "/usart", usart_main);
 #   endif
+#   if APP_USE_HAL_WDT_DEMO == ENABLED && VSF_HAL_USE_WDT == ENABLED
+    extern int wdt_main(int argc, char *argv[]);
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/wdt-test", wdt_main);
+#   endif
 
 #endif
 #if APP_USE_STREAM_HAL_DEMO == ENABLED
