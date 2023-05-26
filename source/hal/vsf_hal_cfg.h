@@ -102,6 +102,10 @@ extern "C" {
 #   define VSF_HAL_USE_DAC                  DISABLED
 #endif
 
+#ifndef VSF_HAL_USE_DMA
+#   define VSF_HAL_USE_DMA                  ENABLED
+#endif
+
 #ifndef VSF_HAL_USE_WDT
 #   define VSF_HAL_USE_WDT                  ENABLED
 #endif
