@@ -116,11 +116,7 @@
 #   define APP_USE_HAL_SPI_DEMO                         ENABLED
 #   define APP_USE_HAL_TIMER_DEMO                       ENABLED
 #   define APP_USE_HAL_USART_DEMO                       ENABLED
-#       define APP_USART_DEMO_CFG_REQUEST_TEST              DISABLED
-#       define APP_USART_DEMO_CFG_FIFO_WRITE_WITH_ISR_TEST  DISABLED
-#       define APP_USART_DEMO_CFG_FIFO_READ_WITH_ISR_TEST   DISABLED
-#       define APP_USART_DEMO_CFG_FIFO_ECHO_TEST            ENABLED
-#       define APP_USART_DEMO_CFG_USART                     (vsf_usart_t *)&vsf_hw_usart1
+#       define APP_USART_DEMO_CFG_DEFAULT_INSTANCE       vsf_hw_usart1
 
 // 3rd-party demos
 #define APP_USE_NNOM_DEMO                               DISABLED
