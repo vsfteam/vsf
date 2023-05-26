@@ -1,6 +1,7 @@
 # CMakeLists head
 
 add_subdirectory(adc)
+add_subdirectory(dac)
 add_subdirectory(dma)
 add_subdirectory(flash)
 add_subdirectory(gpio)

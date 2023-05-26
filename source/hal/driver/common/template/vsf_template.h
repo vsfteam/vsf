@@ -32,6 +32,10 @@
 #   include "./vsf_template_adc.h"
 #endif
 
+#if defined(VSF_HAL_USE_DAC) && !defined(__VSF_TEMPLATE_DAC_H__)
+#   include "./vsf_template_dac.h"
+#endif
+
 #if defined(VSF_HAL_USE_DMA) && !defined(__VSF_TEMPLATE_DMA_H__)
 #   include "./vsf_template_dma.h"
 #endif
