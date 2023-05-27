@@ -409,6 +409,9 @@ static void __vk_dwcotg_dcd_ep_write(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t e
             VSF_USB_ASSERT(buffer != NULL);
         }
 
+        // as test, protection should include the data copy
+        // to optimize it, please use dma or find out the reason why the data copy should be protected
+        vsf_protect_t orig = vsf_protect_int();
         for (uint_fast16_t i = 0; i < size; i += 4, buffer += 4) {
 #ifndef UNALIGNED
             data = get_unaligned_cpu32(buffer);
@@ -424,6 +427,7 @@ static void __vk_dwcotg_dcd_ep_write(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t e
         } else {
             dev_global_regs->dtknqr4_fifoemptymsk &= ~(1 << ep_idx);
         }
+        vsf_unprotect_int(orig);
     }
 }
 
