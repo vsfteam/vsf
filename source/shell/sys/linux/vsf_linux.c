@@ -1282,12 +1282,6 @@ void vsf_linux_exit_process(int status, bool _exit)
     VSF_LINUX_ASSERT(process != NULL);
     vsf_protect_t orig;
 
-#if VSF_LINUX_USE_VFORK == ENABLED
-    if (process->is_fork_child) {
-        longjmp(process->exit_jmpbuf, 1);
-    }
-#endif
-
     for (int i = 0; i < dimof(process->timers); i++) {
         vsf_callback_timer_remove(&process->timers[i].timer);
     }
@@ -3292,10 +3286,7 @@ int sethostid(long hostid)
 static int __vsf_linux_vfork_child_entry(int argc, char **argv)
 {
     vsf_linux_process_t *child_process = vsf_linux_get_cur_process();
-    if (!setjmp(child_process->exit_jmpbuf)) {
-        longjmp(child_process->start_jmpbuf, 1);
-    }
-    child_process->is_fork_child = false;
+    longjmp(child_process->start_jmpbuf, 1);
     return 0;
 }
 #endif
@@ -3304,9 +3295,9 @@ pid_t vfork(void)
 {
 #if VSF_LINUX_USE_VFORK == ENABLED
     vsf_linux_process_t *parent_process = vsf_linux_get_cur_process();
-    // stack_size should be enough for the startup thread running __vsf_linux_vfork_child_entry,
-    //  which will simply jump to start_jmpbuf
-    vsf_linux_process_t *child_process = vsf_linux_create_process(1024, 0, 0);
+    vsf_linux_thread_t *cur_thread = vsf_linux_get_cur_thread();
+    // stack of child_process is used not only for __vsf_linux_vfork_child_entry but also for exec APIs
+    vsf_linux_process_t *child_process = vsf_linux_create_process(cur_thread->stack_size, 0, 0);
     pid_t child_pid = child_process->id.pid;
     if (NULL == child_process) {
         return -1;
@@ -3343,12 +3334,6 @@ pid_t vfork(void)
 #if __VSF_LINUX_PROCESS_HAS_PATH
         strcpy(child_process->path, parent_process->path);
 #endif
-        child_process->is_fork_child = true;
-
-        vsf_linux_thread_t *child_thread, *cur_thread = vsf_linux_get_cur_thread();
-        vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &child_process->thread_list, child_thread);
-        child_thread->stack_size = cur_thread->stack_size;
-        child_thread->stack = cur_thread->stack;
 
         vsf_linux_start_process(child_process);
 
