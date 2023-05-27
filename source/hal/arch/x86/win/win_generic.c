@@ -566,7 +566,7 @@ static void __vsf_arch_preempt(vsf_arch_irq_pp_t pp)
 }
 
 #if VSF_ARCH_CFG_NO_UNLOCKED_SUSPEND_EN == ENABLED
-// __vsf_arch_irq_pend MUST be called with arch_unlocked
+// __vsf_arch_irq_pend MUST be called with arch_locked
 static void __vsf_arch_irq_pend(vsf_arch_irq_thread_t *irq_thread)
 {
     while (1) {

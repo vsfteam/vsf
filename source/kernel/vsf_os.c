@@ -485,9 +485,11 @@ void __vsf_sleep(int level)
 #endif
 
 #if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED && __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
+#   ifndef VSF_ARCH_NO_DISABLE_INTERRUPT_BEFORE_SLEEP
     vsf_disable_interrupt();
+#   endif
     if (vsf_evtq_is_empty(&__vsf_os.res_ptr->evt_queue.queue_array[0])) {
-#elif VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+#elif (VSF_KERNEL_CFG_CPU_USAGE == ENABLED) && !defined(VSF_ARCH_NO_DISABLE_INTERRUPT_BEFORE_SLEEP)
         vsf_disable_interrupt();
 #endif
 
@@ -512,8 +514,10 @@ void __vsf_sleep(int level)
 
 #if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED && __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
     }
+#   ifndef VSF_ARCH_NO_DISABLE_INTERRUPT_BEFORE_SLEEP
     vsf_enable_interrupt();
-#elif VSF_KERNEL_CFG_CPU_USAGE == ENABLED
+#   endif
+#elif (VSF_KERNEL_CFG_CPU_USAGE == ENABLED) && !defined(VSF_ARCH_NO_DISABLE_INTERRUPT_BEFORE_SLEEP)
         vsf_enable_interrupt();
 #endif
 }

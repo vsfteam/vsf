@@ -176,6 +176,8 @@ typedef volatile bool vsf_gint_state_t;
 
 #if VSF_ARCH_PRI_NUM == 1 && VSF_ARCH_SWI_NUM == 0
 #   include "hal/arch/common/arch_without_thread_suspend/vsf_arch_without_thread_suspend_template.h"
+#else
+#   define VSF_ARCH_NO_DISABLE_INTERRUPT_BEFORE_SLEEP
 #endif
 
 /*============================ TYPES =========================================*/
