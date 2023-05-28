@@ -348,6 +348,7 @@ typedef struct vsf_linux_unistd_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ttyname_r);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(_exit);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(acct);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_linux_vfork_prepare);
 } vsf_linux_unistd_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt;
@@ -743,6 +744,10 @@ VSF_LINUX_APPLET_UNISTD_IMP(_exit, void, int status) {
 VSF_LINUX_APPLET_UNISTD_IMP(acct, int, const char *filename) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(acct)(filename);
+}
+VSF_LINUX_APPLET_UNISTD_IMP(__vsf_linux_vfork_prepare, vsf_linux_process_t *, vsf_linux_process_t *parent_process) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(__vsf_linux_vfork_prepare)(parent_process);
 }
 
 VSF_APPLET_VPLT_FUNC_DECORATOR exec_ret_t execl(const char *pathname, const char *arg, ...) {
