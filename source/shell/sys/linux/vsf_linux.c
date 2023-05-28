@@ -2010,7 +2010,7 @@ static int __vsf_linux_exec_start(vsf_linux_process_t *process)
         // clone necessary resources for vfork child process
         vsf_linux_fd_t *sfd;
         __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &parent_process->fd_list) {
-            if (__vsf_linux_fd_create_ex(process, &sfd, _->op, _->fd, _->priv) != _->fd) {
+            if (!(_->fd_flags & FD_CLOEXEC) && __vsf_linux_fd_create_ex(process, &sfd, _->op, _->fd, _->priv) != _->fd) {
                 vsf_trace_error("vfork_exec: failed to dup fd %d", VSF_TRACE_CFG_LINEEND, _->fd);
                 return -1;
             }
