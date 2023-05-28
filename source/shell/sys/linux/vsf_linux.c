@@ -1991,15 +1991,6 @@ int __vsf_linux_dynloader_main(int argc, char **argv)
 }
 #endif
 
-static void __vsf_linux_close_cloexec(vsf_linux_process_t *process)
-{
-    __vsf_dlist_foreach_next_unsafe(vsf_linux_fd_t, fd_node, &process->fd_list) {
-        if (_->fd_flags & FD_CLOEXEC) {
-            close(_->fd);
-        }
-    }
-}
-
 #if VSF_LINUX_USE_VFORK == ENABLED
 static int __vsf_linux_exec_start(vsf_linux_process_t *parent_process, vsf_linux_process_t *process)
 #else
@@ -2023,6 +2014,12 @@ static int __vsf_linux_exec_start(vsf_linux_process_t *process)
     } else
 #endif
     {
+        __vsf_dlist_foreach_next_unsafe(vsf_linux_fd_t, fd_node, &process->fd_list) {
+            if (_->fd_flags & FD_CLOEXEC) {
+                close(_->fd);
+            }
+        }
+
         vsf_linux_thread_t *thread;
         vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
         vsf_eda_post_evt(&thread->use_as__vsf_eda_t, VSF_EVT_INIT);
@@ -2049,7 +2046,6 @@ static exec_ret_t __vsf_linux_execvpe(vsf_linux_main_entry_t entry, char * const
     vsf_linux_process_arg_t arg = { 0 };
     __vsf_linux_process_parse_arg(process, &arg, argv);
     __vsf_linux_process_free_arg(process);
-    __vsf_linux_close_cloexec(process);
     process->ctx.arg = arg;
 
     vsf_linux_merge_env(process, (char **)envp);
@@ -2146,7 +2142,6 @@ exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, 
     va_list ap2;
 
     __vsf_linux_process_free_arg(process);
-    __vsf_linux_close_cloexec(process);
 
     va_copy(ap2, ap);
     args = va_arg(ap, const char *);
