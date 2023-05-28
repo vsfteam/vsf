@@ -1284,6 +1284,8 @@ void vsf_linux_exit_process(int status, bool _exit)
 
 #if VSF_LINUX_USE_VFORK == ENABLED
     if (process->is_vforking) {
+        vsf_linux_delete_process(process->vfork_child);
+        process->vfork_child = NULL;
         process->is_vforking = false;
         longjmp(process->__vfork_jmpbuf, 1);
     }
