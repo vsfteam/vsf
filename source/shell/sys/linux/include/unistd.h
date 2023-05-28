@@ -879,17 +879,19 @@ int sethostid(long hostid);
 
 int acct(const char *filename);
 
+#if VSF_LINUX_USE_VFORK == ENABLED
+vsf_linux_process_t * __vsf_linux_vfork_prepare(vsf_linux_process_t *parent_process);
+#endif
+
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_UNISTD
 
 #if VSF_LINUX_USE_VFORK == ENABLED
 #   define vfork()          ({                                                  \
     vsf_linux_process_t *parent_process = vsf_linux_get_cur_process();          \
-    vsf_linux_process_t *child_process = vsf_linux_create_process(0, 0, 0);     \
+    vsf_linux_process_t *child_process = __vsf_linux_vfork_prepare(parent_process);\
     pid_t child_pid = (pid_t)-1;                                                \
     if (child_process != NULL) {                                                \
-        parent_process->is_vforking = true;                                     \
-        parent_process->vfork_child = child_process;                            \
-        if (!setjmp(parent_process->vfork_jmpbuf)) {                            \
+        if (!setjmp(parent_process->__vfork_jmpbuf)) {                          \
             child_pid = (pid_t)0;                                               \
         } else {                                                                \
             child_pid = child_process->id.pid;                                  \

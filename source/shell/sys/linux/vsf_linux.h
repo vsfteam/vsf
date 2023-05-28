@@ -251,6 +251,14 @@ vsf_class(vsf_linux_process_t) {
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
         char **__environ;
 #endif
+#if VSF_LINUX_USE_VFORK == ENABLED
+        jmp_buf __vfork_jmpbuf;
+#endif
+        struct {
+            pid_t pid;
+            pid_t ppid;
+            pid_t gid;
+        } id;
     )
 
     protected_member(
@@ -262,11 +270,6 @@ vsf_class(vsf_linux_process_t) {
         vsf_linux_process_t *shell_process;
         // thread pending child process
         vsf_linux_thread_t *thread_pending_child;
-        struct {
-            pid_t pid;
-            pid_t ppid;
-            pid_t gid;
-        } id;
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         vsf_linux_timer_t timers[ITIMER_NUM];
 #endif
@@ -313,7 +316,6 @@ vsf_class(vsf_linux_process_t) {
 
         vsf_heap_t *heap;
 #if VSF_LINUX_USE_VFORK == ENABLED
-        jmp_buf vfork_jmpbuf;
         vsf_linux_process_t *vfork_child;
         bool is_vforking;
 #endif
@@ -504,6 +506,7 @@ extern vsf_linux_main_entry_t * vsf_linux_fd_get_executable(int fd);
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
 
 // delete unstarted/existed process
+extern vsf_linux_process_t * vsf_linux_create_process(int stack_size, int heap_size, int priv_size);
 extern void vsf_linux_delete_process(vsf_linux_process_t *process);
 extern int vsf_linux_start_process(vsf_linux_process_t *process);
 extern void vsf_linux_exit_process(int status, bool _exit);
@@ -540,8 +543,6 @@ extern int vsf_linux_trigger_signal(vsf_linux_trigger_t *trig, int sig);
 
 // open vsf_linux_get_cur_thread for thread-related variables like errno, etc
 extern vsf_linux_thread_t * vsf_linux_get_cur_thread(void);
-// vsf_linux_create_process is necessary for the vfork MACRO
-extern vsf_linux_process_t * vsf_linux_create_process(int stack_size, int heap_size, int priv_size);
 
 extern int vsf_linux_get_errno(void);
 extern void vsf_linux_set_errno(int err);

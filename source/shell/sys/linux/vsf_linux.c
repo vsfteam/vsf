@@ -1284,7 +1284,7 @@ void vsf_linux_exit_process(int status, bool _exit)
 
 #if VSF_LINUX_USE_VFORK == ENABLED
     if (process->is_vforking) {
-        longjmp(process->vfork_jmpbuf, 1);
+        longjmp(process->__vfork_jmpbuf, 1);
     }
 #endif
 
@@ -2007,9 +2007,18 @@ static int __vsf_linux_exec_start(vsf_linux_process_t *process)
 {
 #if VSF_LINUX_USE_VFORK == ENABLED
     if (parent_process->is_vforking) {
+        // clone necessary resources for vfork child process
+        vsf_linux_fd_t *sfd;
+        __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &parent_process->fd_list) {
+            if (__vsf_linux_fd_create_ex(process, &sfd, _->op, _->fd, _->priv) != _->fd) {
+                vsf_trace_error("vfork_exec: failed to dup fd %d", VSF_TRACE_CFG_LINEEND, _->fd);
+                return -1;
+            }
+        }
+
         vsf_linux_start_process(process);
         parent_process->is_vforking = false;
-        longjmp(parent_process->vfork_jmpbuf, 1);
+        longjmp(parent_process->__vfork_jmpbuf, 1);
     } else
 #endif
     {
@@ -3343,6 +3352,26 @@ int sethostid(long hostid)
     __vsf_linux.hostid = hostid;
     return 0;
 }
+
+#if VSF_LINUX_USE_VFORK == ENABLED
+vsf_linux_process_t * __vsf_linux_vfork_prepare(vsf_linux_process_t *parent_process)
+{
+    vsf_linux_process_t *child_process = vsf_linux_create_process(0, 0, 0);
+    if (NULL == child_process) {
+        return NULL;
+    }
+
+    // clone necessary resources from parent_process, goto delete_process_and_fail on failure
+
+    parent_process->is_vforking = true;
+    parent_process->vfork_child = child_process;
+    return child_process;
+
+//delete_process_and_fail:
+//    vsf_linux_delete_process(child_process);
+//    return NULL;
+}
+#endif
 
 pid_t fork(void)
 {
