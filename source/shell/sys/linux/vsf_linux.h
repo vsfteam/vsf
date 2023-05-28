@@ -313,7 +313,9 @@ vsf_class(vsf_linux_process_t) {
 
         vsf_heap_t *heap;
 #if VSF_LINUX_USE_VFORK == ENABLED
-        jmp_buf start_jmpbuf;
+        jmp_buf vfork_jmpbuf;
+        vsf_linux_process_t *vfork_child;
+        bool is_vforking;
 #endif
 #if VSF_LINUX_CFG_PLS_NUM > 0
         struct {
@@ -501,7 +503,6 @@ extern vsf_linux_process_t * __vsf_linux_start_process_internal(
 extern vsf_linux_main_entry_t * vsf_linux_fd_get_executable(int fd);
 extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entry_t *entry);
 
-extern vsf_linux_process_t * vsf_linux_create_process(int stack_size, int heap_size, int priv_size);
 // delete unstarted/existed process
 extern void vsf_linux_delete_process(vsf_linux_process_t *process);
 extern int vsf_linux_start_process(vsf_linux_process_t *process);
@@ -539,6 +540,8 @@ extern int vsf_linux_trigger_signal(vsf_linux_trigger_t *trig, int sig);
 
 // open vsf_linux_get_cur_thread for thread-related variables like errno, etc
 extern vsf_linux_thread_t * vsf_linux_get_cur_thread(void);
+// vsf_linux_create_process is necessary for the vfork MACRO
+extern vsf_linux_process_t * vsf_linux_create_process(int stack_size, int heap_size, int priv_size);
 
 extern int vsf_linux_get_errno(void);
 extern void vsf_linux_set_errno(int err);

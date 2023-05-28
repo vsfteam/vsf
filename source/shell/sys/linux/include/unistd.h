@@ -24,6 +24,9 @@
 #   include <pwd.h>
 #endif
 
+#define __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
+#include <setjmp/setjmp.h>
+
 #include "vsf.h"
 #include "../vsf_linux.h"
 #include "../port/busybox/busybox.h"
@@ -83,7 +86,6 @@ extern "C" {
 #define alarm               VSF_LINUX_WRAPPER(alarm)
 #define ualarm              VSF_LINUX_WRAPPER(ualarm)
 #define fork                VSF_LINUX_WRAPPER(fork)
-#define vfork               VSF_LINUX_WRAPPER(vfork)
 #define _exit               VSF_LINUX_WRAPPER(_exit)
 #define acct                VSF_LINUX_WRAPPER(acct)
 
@@ -346,7 +348,6 @@ typedef struct vsf_linux_unistd_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ttyname_r);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(_exit);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(acct);
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vfork);
 } vsf_linux_unistd_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt;
@@ -743,10 +744,6 @@ VSF_LINUX_APPLET_UNISTD_IMP(acct, int, const char *filename) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(acct)(filename);
 }
-VSF_LINUX_APPLET_UNISTD_IMP(vfork, pid_t, void) {
-    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    return VSF_LINUX_APPLET_UNISTD_ENTRY(vfork)();
-}
 
 VSF_APPLET_VPLT_FUNC_DECORATOR exec_ret_t execl(const char *pathname, const char *arg, ...) {
     exec_ret_t ret;
@@ -810,7 +807,6 @@ exec_ret_t execvpe(const char *file, char * const * argv, char * const * envp);
 int daemon(int nochdir, int noclose);
 
 pid_t fork(void);
-pid_t vfork(void);
 void _exit(int status);
 long sysconf(int name);
 long pathconf(const char *path, int name);
@@ -884,6 +880,26 @@ int sethostid(long hostid);
 int acct(const char *filename);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_UNISTD
+
+#if VSF_LINUX_USE_VFORK == ENABLED
+#   define vfork()          ({                                                  \
+    vsf_linux_process_t *parent_process = vsf_linux_get_cur_process();          \
+    vsf_linux_process_t *child_process = vsf_linux_create_process(0, 0, 0);     \
+    pid_t child_pid = (pid_t)-1;                                                \
+    if (child_process != NULL) {                                                \
+        parent_process->is_vforking = true;                                     \
+        parent_process->vfork_child = child_process;                            \
+        if (!setjmp(parent_process->vfork_jmpbuf)) {                            \
+            child_pid = (pid_t)0;                                               \
+        } else {                                                                \
+            child_pid = child_process->id.pid;                                  \
+        }                                                                       \
+    }                                                                           \
+    child_pid;                                                                  \
+})
+#else
+#   define vfork()          -1
+#endif
 
 #ifdef __cplusplus
 }

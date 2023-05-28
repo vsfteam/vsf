@@ -1282,6 +1282,12 @@ void vsf_linux_exit_process(int status, bool _exit)
     VSF_LINUX_ASSERT(process != NULL);
     vsf_protect_t orig;
 
+#if VSF_LINUX_USE_VFORK == ENABLED
+    if (process->is_vforking) {
+        longjmp(process->vfork_jmpbuf, 1);
+    }
+#endif
+
     for (int i = 0; i < dimof(process->timers); i++) {
         vsf_callback_timer_remove(&process->timers[i].timer);
     }
@@ -1993,12 +1999,40 @@ static void __vsf_linux_close_cloexec(vsf_linux_process_t *process)
     }
 }
 
+#if VSF_LINUX_USE_VFORK == ENABLED
+static int __vsf_linux_exec_start(vsf_linux_process_t *parent_process, vsf_linux_process_t *process)
+#else
+static int __vsf_linux_exec_start(vsf_linux_process_t *process)
+#endif
+{
+#if VSF_LINUX_USE_VFORK == ENABLED
+    if (parent_process->is_vforking) {
+        vsf_linux_start_process(process);
+        parent_process->is_vforking = false;
+        longjmp(parent_process->vfork_jmpbuf, 1);
+    } else
+#endif
+    {
+        vsf_linux_thread_t *thread;
+        vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
+        vsf_eda_post_evt(&thread->use_as__vsf_eda_t, VSF_EVT_INIT);
+        vsf_thread_wfe(VSF_EVT_INVALID);
+    }
+    return 0;
+}
+
 static exec_ret_t __vsf_linux_execvpe(vsf_linux_main_entry_t entry, char * const * argv, char  * const * envp)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
+#if VSF_LINUX_USE_VFORK == ENABLED
+    vsf_linux_process_t *parent_process = process;
+    if (parent_process->is_vforking) {
+        process = process->vfork_child;
+    }
+#endif
+
     vsf_linux_process_ctx_t *ctx = &process->ctx;
-    vsf_linux_thread_t *thread;
 
     // MUST parse argument to arg first, then free arg.
     //  Because maybe the argv is in process arg, so if free process arg first, argv will be invalid
@@ -2011,10 +2045,11 @@ static exec_ret_t __vsf_linux_execvpe(vsf_linux_main_entry_t entry, char * const
     vsf_linux_merge_env(process, (char **)envp);
     ctx->entry = entry;
 
-    vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
-    vsf_eda_post_evt(&thread->use_as__vsf_eda_t, VSF_EVT_INIT);
-    vsf_thread_wfe(VSF_EVT_INVALID);
-    return 0;
+    return __vsf_linux_exec_start(
+#if VSF_LINUX_USE_VFORK == ENABLED
+        parent_process,
+#endif
+        process);
 }
 
 exec_ret_t execvpe(const char *file, char * const * argv, char  * const * envp)
@@ -2036,6 +2071,11 @@ exec_ret_t execvpe(const char *file, char * const * argv, char  * const * envp)
 #if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
+#if VSF_LINUX_USE_VFORK == ENABLED
+    if (process->is_vforking) {
+        process = process->vfork_child;
+    }
+#endif
     strcpy(process->path, localpath);
 #endif
     return __vsf_linux_execvpe(entry, argv, envp);
@@ -2065,6 +2105,11 @@ exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp
 #if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
+#if VSF_LINUX_USE_VFORK == ENABLED
+    if (process->is_vforking) {
+        process = process->vfork_child;
+    }
+#endif
     strcpy(process->path, localpath);
 #endif
     return __vsf_linux_execvpe(entry, argv, envp);
@@ -2079,8 +2124,14 @@ exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, 
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
+#if VSF_LINUX_USE_VFORK == ENABLED
+    vsf_linux_process_t *parent_process = process;
+    if (parent_process->is_vforking) {
+        process = process->vfork_child;
+    }
+#endif
+
     vsf_linux_process_ctx_t *ctx = &process->ctx;
-    vsf_linux_thread_t *thread;
     const char *args;
     va_list ap2;
 
@@ -2109,10 +2160,11 @@ exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, 
     }
     ctx->entry = entry;
 
-    vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
-    vsf_eda_post_evt(&thread->use_as__vsf_eda_t, VSF_EVT_INIT);
-    vsf_thread_wfe(VSF_EVT_INVALID);
-    return 0;
+    return __vsf_linux_exec_start(
+#if VSF_LINUX_USE_VFORK == ENABLED
+        parent_process,
+#endif
+        process);
 }
 
 exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
@@ -2134,6 +2186,11 @@ exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
 #if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
+#if VSF_LINUX_USE_VFORK == ENABLED
+    if (process->is_vforking) {
+        process = process->vfork_child;
+    }
+#endif
     strcpy(process->path, localpath);
 #endif
     return __vsf_linux_execlp_va(entry, arg, ap);
@@ -2169,6 +2226,11 @@ exec_ret_t __execl_va(const char *pathname, const char *arg, va_list ap)
 #if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
+#if VSF_LINUX_USE_VFORK == ENABLED
+    if (process->is_vforking) {
+        process = process->vfork_child;
+    }
+#endif
     strcpy(process->path, localpath);
 #endif
     return __vsf_linux_execlp_va(entry, arg, ap);
@@ -3282,76 +3344,6 @@ int sethostid(long hostid)
     return 0;
 }
 
-#if VSF_LINUX_USE_VFORK == ENABLED
-static int __vsf_linux_vfork_child_entry(int argc, char **argv)
-{
-    vsf_linux_process_t *child_process = vsf_linux_get_cur_process();
-    longjmp(child_process->start_jmpbuf, 1);
-    return 0;
-}
-#endif
-
-pid_t vfork(void)
-{
-#if VSF_LINUX_USE_VFORK == ENABLED
-    vsf_linux_process_t *parent_process = vsf_linux_get_cur_process();
-    vsf_linux_thread_t *cur_thread = vsf_linux_get_cur_thread();
-    // stack of child_process is used not only for __vsf_linux_vfork_child_entry but also for exec APIs
-    vsf_linux_process_t *child_process = vsf_linux_create_process(cur_thread->stack_size, 0, 0);
-    pid_t child_pid = child_process->id.pid;
-    if (NULL == child_process) {
-        return -1;
-    }
-
-    if (!setjmp(child_process->start_jmpbuf)) {
-        __vsf_linux_process_parse_arg(child_process, NULL, (char * const *)parent_process->ctx.arg.argv);
-        child_process->ctx.entry = __vsf_linux_vfork_child_entry;
-
-        vsf_linux_fd_t *sfd;
-        __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &parent_process->fd_list) {
-            if (__vsf_linux_fd_create_ex(child_process, &sfd, _->op, _->fd, _->priv) != _->fd) {
-                goto delete_process_and_fail;
-            }
-        }
-
-#if VSF_LINUX_CFG_PLS_NUM > 0
-        for (int i = 0; i < VSF_LINUX_CFG_PLS_NUM; i++) {
-            if (vsf_bitmap_get(&__vsf_linux.pls.bitmap, i)) {
-                child_process->pls.storage[i].data = parent_process->pls.storage[i].data;
-            }
-        }
-#endif
-#if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
-        if (vsf_linux_merge_env(child_process, parent_process->__environ) < 0) {
-            goto delete_process_and_fail;
-        }
-#endif
-
-#if VSF_ARCH_USE_THREAD_REG == ENABLED
-        child_process->reg = parent_process->reg;
-#endif
-        child_process->heap = parent_process->heap;
-#if __VSF_LINUX_PROCESS_HAS_PATH
-        strcpy(child_process->path, parent_process->path);
-#endif
-
-        vsf_linux_start_process(child_process);
-
-        vsf_linux_waitpid(child_pid, NULL, 0, false);
-        return child_pid;
-    } else {
-        return 0;
-    }
-
-delete_process_and_fail:
-    vsf_linux_delete_process(child_process);
-    return -1;
-#else
-    VSF_LINUX_ASSERT(false);
-    return -1;
-#endif
-}
-
 pid_t fork(void)
 {
     VSF_LINUX_ASSERT(false);
@@ -4378,7 +4370,6 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(ttyname_r),
     VSF_APPLET_VPLT_ENTRY_FUNC(_exit),
     VSF_APPLET_VPLT_ENTRY_FUNC(acct),
-    VSF_APPLET_VPLT_ENTRY_FUNC(vfork),
 };
 #endif
 
