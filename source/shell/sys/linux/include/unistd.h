@@ -745,7 +745,7 @@ VSF_LINUX_APPLET_UNISTD_IMP(acct, int, const char *filename) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(acct)(filename);
 }
-VSF_LINUX_APPLET_UNISTD_IMP(__vsf_linux_vfork_prepare, vsf_linux_process_t *, vsf_linux_process_t *parent_process) {
+VSF_LINUX_APPLET_UNISTD_IMP(__vsf_linux_vfork_prepare, pid_t, vsf_linux_process_t *parent_process) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(__vsf_linux_vfork_prepare)(parent_process);
 }
@@ -885,7 +885,7 @@ int sethostid(long hostid);
 int acct(const char *filename);
 
 #if VSF_LINUX_USE_VFORK == ENABLED
-vsf_linux_process_t * __vsf_linux_vfork_prepare(vsf_linux_process_t *parent_process);
+pid_t __vsf_linux_vfork_prepare(vsf_linux_process_t *parent_process);
 #endif
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_UNISTD
@@ -893,16 +893,11 @@ vsf_linux_process_t * __vsf_linux_vfork_prepare(vsf_linux_process_t *parent_proc
 #if VSF_LINUX_USE_VFORK == ENABLED
 #   define vfork()          ({                                                  \
     vsf_linux_process_t *parent_process = vsf_linux_get_cur_process();          \
-    vsf_linux_process_t *child_process = __vsf_linux_vfork_prepare(parent_process);\
-    pid_t child_pid = (pid_t)-1;                                                \
-    if (child_process != NULL) {                                                \
-        if (!setjmp(parent_process->__vfork_jmpbuf)) {                          \
-            child_pid = (pid_t)0;                                               \
-        } else {                                                                \
-            child_pid = child_process->id.pid;                                  \
-        }                                                                       \
+    pid_t result = (pid_t)-1, child_pid = __vsf_linux_vfork_prepare(parent_process);\
+    if (child_pid >= 0) {                                                       \
+        result = !setjmp(parent_process->__vfork_jmpbuf)? (pid_t)0 : child_pid; \
     }                                                                           \
-    child_pid;                                                                  \
+    result;                                                                     \
 })
 #else
 #   define vfork()          -1

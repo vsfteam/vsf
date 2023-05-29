@@ -3352,22 +3352,22 @@ int sethostid(long hostid)
 }
 
 #if VSF_LINUX_USE_VFORK == ENABLED
-vsf_linux_process_t * __vsf_linux_vfork_prepare(vsf_linux_process_t *parent_process)
+pid_t __vsf_linux_vfork_prepare(vsf_linux_process_t *parent_process)
 {
     vsf_linux_process_t *child_process = vsf_linux_create_process(0, 0, 0);
     if (NULL == child_process) {
-        return NULL;
+        return (pid_t)-1;
     }
 
     // clone necessary resources from parent_process, goto delete_process_and_fail on failure
 
     parent_process->is_vforking = true;
     parent_process->vfork_child = child_process;
-    return child_process;
+    return child_process->id.pid;
 
 //delete_process_and_fail:
 //    vsf_linux_delete_process(child_process);
-//    return NULL;
+//    return (pid_t)-1;
 }
 #endif
 

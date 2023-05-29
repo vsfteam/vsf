@@ -254,11 +254,6 @@ vsf_class(vsf_linux_process_t) {
 #if VSF_LINUX_USE_VFORK == ENABLED
         jmp_buf __vfork_jmpbuf;
 #endif
-        struct {
-            pid_t pid;
-            pid_t ppid;
-            pid_t gid;
-        } id;
     )
 
     protected_member(
@@ -270,6 +265,11 @@ vsf_class(vsf_linux_process_t) {
         vsf_linux_process_t *shell_process;
         // thread pending child process
         vsf_linux_thread_t *thread_pending_child;
+        struct {
+            pid_t pid;
+            pid_t ppid;
+            pid_t gid;
+        } id;
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         vsf_linux_timer_t timers[ITIMER_NUM];
 #endif
