@@ -24,6 +24,9 @@
 // for vk_dwcotg_dc_ip_info_t
 #include "component/vsf_component.h"
 
+#include "../vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_analog_reg.h"
+#include "../vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
