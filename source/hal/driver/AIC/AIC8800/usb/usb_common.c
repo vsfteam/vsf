@@ -26,6 +26,7 @@
 #if PLF_PMIC_VER_LITE
 #   include "aic1000Lite_analog_reg.h"
 #endif
+#include "pmic_api.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
