@@ -1761,18 +1761,20 @@ int daemon(int nochdir, int noclose)
     return 0;
 }
 
+#if VSF_LINUX_USE_APPLET == ENABLED
 static const vsf_loader_op_t * __vsf_linux_get_applet_loader(uint8_t *header, int size)
 {
-#if VSF_LOADER_USE_PE == ENABLED
+#   if VSF_LOADER_USE_PE == ENABLED
     if ((size >= 2) && (header[0] == 'M') && (header[1] == 'Z')) {
         return &vsf_peloader_op;
     } else
-#endif
+#   endif
     if ((size >= 4) && (header[0] == 0x7F) && (header[1] == 'E') && (header[2] == 'L') && (header[3] == 'F')) {
         return &vsf_elfloader_op;
     }
     return NULL;
 }
+#endif
 
 static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd, vsf_linux_main_entry_t *entry, char *path)
 {
