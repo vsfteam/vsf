@@ -983,7 +983,7 @@ void __vsf_linux_fd_delete_ex(vsf_linux_process_t *process, int fd)
     }
     vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex(process, fd);
     VSF_LINUX_ASSERT(sfd != NULL);
-    return ____vsf_linux_fd_delete_ex(process, sfd);
+    ____vsf_linux_fd_delete_ex(process, sfd);
 }
 
 void vsf_linux_fd_delete(int fd)
