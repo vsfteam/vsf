@@ -2128,7 +2128,7 @@ exec_ret_t execv(const char *pathname, char * const * argv)
     return execve(pathname, argv, NULL);
 }
 
-exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, va_list ap, char *path)
+static exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, va_list ap, char *path)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
@@ -2136,6 +2136,12 @@ exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, 
     vsf_linux_process_t *parent_process = process;
     if (parent_process->is_vforking) {
         process = process->vfork_child;
+    }
+#endif
+
+#if __VSF_LINUX_PROCESS_HAS_PATH
+    if (path != NULL) {
+        strcpy(process->path, path);
     }
 #endif
 
