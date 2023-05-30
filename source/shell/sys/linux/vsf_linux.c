@@ -2032,7 +2032,7 @@ static int __vsf_linux_exec_start(vsf_linux_process_t *process)
     return 0;
 }
 
-static exec_ret_t __vsf_linux_execvpe(vsf_linux_main_entry_t entry, char * const * argv, char  * const * envp)
+static exec_ret_t __vsf_linux_execvpe(vsf_linux_main_entry_t entry, char * const * argv, char  * const * envp, char *path)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
@@ -2040,6 +2040,12 @@ static exec_ret_t __vsf_linux_execvpe(vsf_linux_main_entry_t entry, char * const
     vsf_linux_process_t *parent_process = process;
     if (parent_process->is_vforking) {
         process = process->vfork_child;
+    }
+#endif
+
+#if __VSF_LINUX_PROCESS_HAS_PATH
+    if (path != NULL) {
+        strcpy(process->path, path);
     }
 #endif
 
@@ -2066,7 +2072,7 @@ exec_ret_t execvpe(const char *file, char * const * argv, char  * const * envp)
 {
     vsf_linux_main_entry_t entry;
 #if __VSF_LINUX_PROCESS_HAS_PATH
-#   if VSF_LINUX_CFG_LINK_FILE == ENABLED
+#   if VSF_LINUX_CFG_LINK_FILE == ENABLED || VSF_LINUX_USE_VFORK == ENABLED
     char localpath[PATH_MAX];
     if (__vsf_linux_get_exe(localpath, sizeof(localpath), (char *)file, &entry, true) < 0) {
 #   else
@@ -2078,17 +2084,13 @@ exec_ret_t execvpe(const char *file, char * const * argv, char  * const * envp)
 #endif
         return -1;
     }
+    return __vsf_linux_execvpe(entry, argv, envp,
 #if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-#if VSF_LINUX_USE_VFORK == ENABLED
-    if (process->is_vforking) {
-        process = process->vfork_child;
-    }
+            localpath
+#else
+            NULL
 #endif
-    strcpy(process->path, localpath);
-#endif
-    return __vsf_linux_execvpe(entry, argv, envp);
+        );
 }
 
 exec_ret_t execvp(const char *file, char * const * argv)
@@ -2100,7 +2102,7 @@ exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp
 {
     vsf_linux_main_entry_t entry;
 #if __VSF_LINUX_PROCESS_HAS_PATH
-#   if VSF_LINUX_CFG_LINK_FILE == ENABLED
+#   if VSF_LINUX_CFG_LINK_FILE == ENABLED || VSF_LINUX_USE_VFORK == ENABLED
     char localpath[PATH_MAX];
     if (__vsf_linux_get_exe(localpath, sizeof(localpath), (char *)pathname, &entry, false) < 0) {
 #   else
@@ -2112,17 +2114,13 @@ exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp
 #endif
         return -1;
     }
+    return __vsf_linux_execvpe(entry, argv, envp,
 #if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-#if VSF_LINUX_USE_VFORK == ENABLED
-    if (process->is_vforking) {
-        process = process->vfork_child;
-    }
+            localpath
+#else
+            NULL
 #endif
-    strcpy(process->path, localpath);
-#endif
-    return __vsf_linux_execvpe(entry, argv, envp);
+        );
 }
 
 exec_ret_t execv(const char *pathname, char * const * argv)
@@ -2130,7 +2128,7 @@ exec_ret_t execv(const char *pathname, char * const * argv)
     return execve(pathname, argv, NULL);
 }
 
-exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, va_list ap)
+exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, va_list ap, char *path)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
@@ -2180,7 +2178,7 @@ exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
 {
     vsf_linux_main_entry_t entry;
 #if __VSF_LINUX_PROCESS_HAS_PATH
-#   if VSF_LINUX_CFG_LINK_FILE == ENABLED
+#   if VSF_LINUX_CFG_LINK_FILE == ENABLED || VSF_LINUX_USE_VFORK == ENABLED
     char localpath[PATH_MAX];
     if (__vsf_linux_get_exe(localpath, sizeof(localpath), (char *)pathname, &entry, true) < 0) {
 #   else
@@ -2192,17 +2190,13 @@ exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
 #endif
         return -1;
     }
+    return __vsf_linux_execlp_va(entry, arg, ap,
 #if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-#if VSF_LINUX_USE_VFORK == ENABLED
-    if (process->is_vforking) {
-        process = process->vfork_child;
-    }
+            localpath
+#else
+            NULL
 #endif
-    strcpy(process->path, localpath);
-#endif
-    return __vsf_linux_execlp_va(entry, arg, ap);
+        );
 }
 
 exec_ret_t execlp(const char *pathname, const char *arg, ...)
@@ -2220,7 +2214,7 @@ exec_ret_t __execl_va(const char *pathname, const char *arg, va_list ap)
 {
     vsf_linux_main_entry_t entry;
 #if __VSF_LINUX_PROCESS_HAS_PATH
-#   if VSF_LINUX_CFG_LINK_FILE == ENABLED
+#   if VSF_LINUX_CFG_LINK_FILE == ENABLED || VSF_LINUX_USE_VFORK == ENABLED
     char localpath[PATH_MAX];
     if (__vsf_linux_get_exe(localpath, sizeof(localpath), (char *)pathname, &entry, false) < 0) {
 #   else
@@ -2232,17 +2226,13 @@ exec_ret_t __execl_va(const char *pathname, const char *arg, va_list ap)
 #endif
         return -1;
     }
+    return __vsf_linux_execlp_va(entry, arg, ap,
 #if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-#if VSF_LINUX_USE_VFORK == ENABLED
-    if (process->is_vforking) {
-        process = process->vfork_child;
-    }
+            localpath
+#else
+            NULL
 #endif
-    strcpy(process->path, localpath);
-#endif
-    return __vsf_linux_execlp_va(entry, arg, ap);
+        );
 }
 
 exec_ret_t execl(const char *pathname, const char *arg, ...)
