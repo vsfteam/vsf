@@ -2001,16 +2001,15 @@ static int __vsf_linux_exec_start(vsf_linux_process_t *parent_process, vsf_linux
 static int __vsf_linux_exec_start(vsf_linux_process_t *process)
 #endif
 {
+    __vsf_dlist_foreach_next_unsafe(vsf_linux_fd_t, fd_node, &process->fd_list) {
+        if (_->fd_flags & FD_CLOEXEC) {
+            __vsf_linux_fd_close_ex(process, _->fd);
+        }
+    }
+
 #if VSF_LINUX_USE_VFORK == ENABLED
     if (parent_process->is_vforking) {
         // clone necessary resources for vfork child process
-        vsf_linux_fd_t *sfd;
-        __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &parent_process->fd_list) {
-            if (!(_->fd_flags & FD_CLOEXEC) && __vsf_linux_fd_create_ex(process, &sfd, _->op, _->fd, _->priv) != _->fd) {
-                vsf_trace_error("vfork_exec: failed to dup fd %d", VSF_TRACE_CFG_LINEEND, _->fd);
-                return -1;
-            }
-        }
 
         vsf_linux_start_process(process);
         parent_process->is_vforking = false;
@@ -2018,12 +2017,6 @@ static int __vsf_linux_exec_start(vsf_linux_process_t *process)
     } else
 #endif
     {
-        __vsf_dlist_foreach_next_unsafe(vsf_linux_fd_t, fd_node, &process->fd_list) {
-            if (_->fd_flags & FD_CLOEXEC) {
-                close(_->fd);
-            }
-        }
-
         vsf_linux_thread_t *thread;
         vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
         vsf_eda_post_evt(&thread->use_as__vsf_eda_t, VSF_EVT_INIT);
@@ -3358,14 +3351,21 @@ pid_t __vsf_linux_vfork_prepare(vsf_linux_process_t *parent_process)
     }
 
     // clone necessary resources from parent_process, goto delete_process_and_fail on failure
+    vsf_linux_fd_t *sfd;
+    __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &parent_process->fd_list) {
+        if (__vsf_linux_fd_create_ex(child_process, &sfd, _->op, _->fd, _->priv) != _->fd) {
+            vsf_trace_error("vfork_exec: failed to dup fd %d", VSF_TRACE_CFG_LINEEND, _->fd);
+            goto delete_process_and_fail;
+        }
+    }
 
     parent_process->is_vforking = true;
     parent_process->vfork_child = child_process;
     return child_process->id.pid;
 
-//delete_process_and_fail:
-//    vsf_linux_delete_process(child_process);
-//    return (pid_t)-1;
+delete_process_and_fail:
+    vsf_linux_delete_process(child_process);
+    return (pid_t)-1;
 }
 #endif
 

@@ -765,6 +765,11 @@ vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd)
 {
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
+#if VSF_LINUX_USE_VFORK == ENABLED
+        if (process->is_vforking) {
+            process = process->vfork_child;
+        }
+#endif
     }
 #if VSF_LINUX_CFG_STDIO_FALLBACK == ENABLED
     if (NULL == process) {
@@ -856,6 +861,11 @@ static int __vsf_linux_fd_add_ex(vsf_linux_process_t *process, vsf_linux_fd_t *s
 {
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
+#if VSF_LINUX_USE_VFORK == ENABLED
+        if (process->is_vforking) {
+            process = process->vfork_child;
+        }
+#endif
     }
 
     vsf_bitmap(vsf_linux_fd_bitmap) fd_bitmap, *bitmap_ptr = &process->fd_bitmap;
@@ -967,6 +977,11 @@ void ____vsf_linux_fd_delete_ex(vsf_linux_process_t *process, vsf_linux_fd_t *sf
 {
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
+#if VSF_LINUX_USE_VFORK == ENABLED
+        if (process->is_vforking) {
+            process = process->vfork_child;
+        }
+#endif
     }
     vsf_protect_t orig = vsf_protect_sched();
         vsf_dlist_remove(vsf_linux_fd_t, fd_node, &process->fd_list, sfd);
@@ -980,6 +995,11 @@ void __vsf_linux_fd_delete_ex(vsf_linux_process_t *process, int fd)
 {
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
+#if VSF_LINUX_USE_VFORK == ENABLED
+        if (process->is_vforking) {
+            process = process->vfork_child;
+        }
+#endif
     }
     vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex(process, fd);
     VSF_LINUX_ASSERT(sfd != NULL);
