@@ -23,7 +23,7 @@
 
 #define __VSF_DISTBUS_CLASS_INHERIT__
 #define __VSF_HAL_DISTBUS_ADC_CLASS_IMPLEMENT
-#include "../driver.h"
+#include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

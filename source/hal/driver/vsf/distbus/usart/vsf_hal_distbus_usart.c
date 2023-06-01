@@ -24,7 +24,7 @@
 #define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #define __VSF_DISTBUS_CLASS_INHERIT__
 #define __VSF_HAL_DISTBUS_USART_CLASS_IMPLEMENT
-#include "../driver.h"
+#include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
 

@@ -26,7 +26,7 @@
 #define __VSF_HAL_DISTBUS_USBD_CLASS_IMPLEMENT
 
 #include "component/usb/common/usb_common.h"
-#include "../driver.h"
+#include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
