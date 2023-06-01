@@ -24,8 +24,6 @@
 
 #if VSF_HAL_USE_MMC == ENABLED && VSF_HAL_DISTBUS_USE_MMC == ENABLED
 
-#include "hal/driver/common/template/vsf_template_mmc.h"
-
 #if     defined(__VSF_HAL_DISTBUS_MMC_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_HAL_DISTBUS_MMC_CLASS_INHERIT__)

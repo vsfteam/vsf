@@ -24,7 +24,6 @@
 
 #if VSF_HAL_USE_USART == ENABLED && VSF_HAL_DISTBUS_USE_USART == ENABLED
 
-#include "hal/driver/common/template/vsf_template_usart.h"
 // for stream
 #include "service/vsf_service.h"
 

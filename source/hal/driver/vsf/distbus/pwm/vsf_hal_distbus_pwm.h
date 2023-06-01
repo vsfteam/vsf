@@ -24,8 +24,6 @@
 
 #if VSF_HAL_USE_PWM == ENABLED && VSF_HAL_DISTBUS_USE_PWM == ENABLED
 
-#include "hal/driver/common/template/vsf_template_pwm.h"
-
 #if     defined(__VSF_HAL_DISTBUS_PWM_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_HAL_DISTBUS_PWM_CLASS_INHERIT__)

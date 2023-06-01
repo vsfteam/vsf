@@ -24,8 +24,6 @@
 
 #if VSF_HAL_USE_GPIO == ENABLED && VSF_HAL_DISTBUS_USE_GPIO == ENABLED
 
-#include "hal/driver/common/template/vsf_template_gpio.h"
-
 #if     defined(__VSF_HAL_DISTBUS_GPIO_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_HAL_DISTBUS_GPIO_CLASS_INHERIT__)

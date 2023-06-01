@@ -24,8 +24,6 @@
 
 #if VSF_HAL_USE_IO == ENABLED && VSF_HAL_DISTBUS_USE_IO == ENABLED
 
-#include "hal/driver/common/template/vsf_template_io.h"
-
 #if     defined(__VSF_HAL_DISTBUS_IO_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_HAL_DISTBUS_IO_CLASS_INHERIT__)

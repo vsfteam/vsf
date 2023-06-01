@@ -24,8 +24,6 @@
 
 #if VSF_HAL_USE_I2C == ENABLED && VSF_HAL_DISTBUS_USE_I2C == ENABLED
 
-#include "hal/driver/common/template/vsf_template_i2c.h"
-
 #if     defined(__VSF_HAL_DISTBUS_I2C_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_HAL_DISTBUS_I2C_CLASS_INHERIT__)

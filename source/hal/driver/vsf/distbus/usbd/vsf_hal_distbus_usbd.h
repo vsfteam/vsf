@@ -25,8 +25,6 @@
 
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_HAL_USE_USBD == ENABLED &&VSF_HAL_DISTBUS_USE_USBD == ENABLED
 
-#include "hal/driver/common/template/vsf_template_usb.h"
-
 #if     defined(__VSF_HAL_DISTBUS_USBD_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_HAL_DISTBUS_USBD_CLASS_INHERIT__)

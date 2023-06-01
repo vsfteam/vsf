@@ -24,8 +24,6 @@
 
 #if VSF_HAL_USE_ADC == ENABLED && VSF_HAL_DISTBUS_USE_ADC == ENABLED
 
-#include "hal/driver/common/template/vsf_template_adc.h"
-
 #if     defined(__VSF_HAL_DISTBUS_ADC_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_HAL_DISTBUS_ADC_CLASS_INHERIT__)
