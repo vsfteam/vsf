@@ -58,3 +58,6 @@
 [submodule "source/shell/sys/linux/lib/3rd-party/libtuv/raw"]
 	path = source/shell/sys/linux/lib/3rd-party/libtuv/raw
 	url = ../libtuv
+[submodule "source/shell/sys/luatos/raw"]
+	path = source/shell/sys/luatos/raw
+	url = ../LuatOS
