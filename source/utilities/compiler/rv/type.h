@@ -25,12 +25,12 @@ typedef unsigned char       uint8_t;
 typedef signed char         int8_t;
 typedef unsigned int        uint_fast8_t;
 typedef signed int          int_fast8_t;
-    
+
 typedef unsigned short      uint16_t;
 typedef signed short        int16_t;
 typedef unsigned int        uint_fast16_t;
 typedef signed int          int_fast16_t;
-    
+
 typedef unsigned int        uint32_t;
 typedef signed int          int32_t;
 typedef unsigned int        uint_fast32_t;
@@ -42,7 +42,7 @@ typedef unsigned long long  uint_fast64_t;
 typedef signed long long    int_fast64_t;
 
 #ifndef UINT64_MAX
-#   define UINT64_MAX          ((uint64_t)(-1))
+#   define UINT64_MAX       ((uint64_t)(-1))
 #endif
 
 typedef uint32_t            uintptr_t;
@@ -71,8 +71,8 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#define __optimal_bit_sz        (sizeof(uintalu_t) * 8)
-#define __optimal_bit_msk       (__optimal_bit_sz - 1)
+#define __optimal_bit_sz    (sizeof(uintalu_t) * 8)
+#define __optimal_bit_msk   (__optimal_bit_sz - 1)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -99,7 +99,9 @@ typedef int_fast8_t         intalu_t;
 #ifndef __APPLET__
 
 // gcc use __builtin_alloca
-#   define alloca           __builtin_alloca
+#   ifndef alloca
+#       define alloca       __builtin_alloca
+#   endif
 
 // gcc has no strcasestr
 #ifdef __cplusplus
