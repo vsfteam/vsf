@@ -63,6 +63,10 @@ The VSF_USE_HEAP will be forced to ENABLED here to provide required services
 #   define VSF_USE_HEAP                         ENABLED
 #endif
 
+#if VSF_USE_POOL == ENABLED && !defined(VSF_POOL_CFG_FEED_ON_HEAP)
+#   define VSF_POOL_CFG_FEED_ON_HEAP            VSF_USE_HEAP
+#endif
+
 #if VSF_POOL_CFG_FEED_ON_HEAP == ENABLED && VSF_USE_HEAP != ENABLED
 #   warning [DEPENDENCY WARNING]\
 The Feature VSF_POOL_CFG_FEED_ON_HEAP is enabled but VSF_USE_HEAP is disabled.\
