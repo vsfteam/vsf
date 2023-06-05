@@ -164,7 +164,7 @@ vsf_systimer_tick_t vsf_systimer_get_tick(void)
 SECTION(".text.vsf.kernel.teda")
 static void __vsf_systimer_start(void)
 {
-    // in tick timer mode, user will initialize timer and
+    // in tick timer mode, user will initialize timer and call vsf_systimer_on_tick
 }
 
 SECTION(".text.vsf.kernel.teda")
