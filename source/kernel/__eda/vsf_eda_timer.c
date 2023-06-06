@@ -211,6 +211,10 @@ static void __vsf_systimer_init(void)
     vsf_callback_timq_init(&__vsf_eda.timer.callback_timq);
     vsf_callback_timq_init(&__vsf_eda.timer.callback_timq_done);
 #endif
+
+#ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+    vsf_systimer_init();
+#endif
 }
 
 SECTION(".text.vsf.kernel.teda")

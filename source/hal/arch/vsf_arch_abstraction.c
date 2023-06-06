@@ -985,9 +985,12 @@ WEAK(vsf_arch_init)
 bool vsf_arch_init(void)
 {
     vsf_arch_low_level_init();
-#   ifdef VSF_SYSTIMER_CFG_IMPL_MODE
-    vsf_systimer_init();
-#   endif
+
+    // do not initialize systimer here, because kernel is not ready to accept systimer interrupt now
+    //  vsf_systimer_init will be called in __vsf_systimer_init
+#ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+//    vsf_systimer_init();
+#endif
     return true;
 }
 
