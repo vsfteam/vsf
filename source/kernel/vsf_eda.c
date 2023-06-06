@@ -69,8 +69,6 @@ typedef struct vsf_local_t {
 //        vsf_atomic_t        processing;
         bool                processing;
         vsf_arch_prio_t     arch_prio;
-#   else
-        vsf_systimer_tick_t cur_tick;
 #   endif
 
 #   if VSF_KERNEL_CFG_TRACE == ENABLED

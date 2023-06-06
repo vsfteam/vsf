@@ -860,9 +860,12 @@ vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
  */
 void vsf_systimer_ovf_evt_handler(void)
 {
-    __systimer.tick ++;
+    vsf_protect_t orig = vsf_protect_int();
+    __systimer.tick++;
+    vsf_unprotect_int(orig);
+
     if (on_arch_systimer_tick_evt(__systimer.tick)) {
-        vsf_systimer_evthandler(__systimer.tick);
+        vsf_systimer_on_tick();
     }
 }
 
@@ -913,7 +916,10 @@ void vsf_systimer_set_idle(void)
 WEAK(vsf_systimer_get)
 vsf_systimer_tick_t vsf_systimer_get(void)
 {
-    return __systimer.tick;
+    vsf_protect_t orig = vsf_protect_int();
+    vsf_systimer_tick_t cur_tick = __systimer.tick;
+    vsf_unprotect_int(orig);
+    return cur_tick;
 }
 
 WEAK(vsf_systimer_start)

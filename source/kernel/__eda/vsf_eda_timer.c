@@ -176,9 +176,6 @@ static bool __vsf_systimer_is_due(vsf_systimer_tick_t due)
 SECTION(".text.vsf.kernel.teda")
 void vsf_systimer_on_tick(void)
 {
-    vsf_protect_t orig = vsf_protect_int();
-        __vsf_eda.timer.cur_tick++;
-    vsf_unprotect_int(orig);
     vsf_eda_post_evt((vsf_eda_t *)&__vsf_eda.task, VSF_EVT_TIMER);
 }
 
@@ -192,11 +189,7 @@ static vsf_err_t __vsf_teda_set_timer_imp(vsf_teda_t *this_ptr, vsf_systimer_tic
 SECTION(".text.vsf.kernel.teda")
 vsf_systimer_tick_t vsf_systimer_get_tick(void)
 {
-    vsf_systimer_tick_t tick;
-    vsf_protect_t orig = vsf_protect_int();
-        tick = __vsf_eda.timer.cur_tick;
-    vsf_unprotect_int(orig);
-    return tick;
+    return vsf_systimer_get();
 }
 #endif      // VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 
