@@ -521,7 +521,7 @@ bool on_arch_systimer_tick_evt(vsf_systimer_tick_t tick)
 
 
 #if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
-    ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER         
+    ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
 
 #   ifndef WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR
 WEAK(vsf_arch_req___systimer_freq___from_usr)
@@ -826,7 +826,7 @@ vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
                              *  __systimer.cycle_per_us;
     tick /= __systimer.cycle_per_tick;
     tick = vsf_max(1, tick);
-    
+
     return tick;
 }
 
@@ -837,7 +837,7 @@ vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
                              *  __systimer.cycle_per_us * 1000ul;
     tick /= __systimer.cycle_per_tick;
     tick = vsf_max(1, tick);
-    
+
     return tick;
 }
 
@@ -873,23 +873,23 @@ void vsf_systimer_ovf_evt_handler(void)
 WEAK(vsf_systimer_init)
 vsf_err_t vsf_systimer_init(void)
 {
-    
+
     //! calculate the cycle count of 1 tick
-    vsf_systimer_tick_t clock_src_freq 
+    vsf_systimer_tick_t clock_src_freq
         = vsf_arch_req___systimer_freq___from_usr();
-    vsf_systimer_tick_t tick_freq 
+    vsf_systimer_tick_t tick_freq
         = vsf_arch_req___systimer_resolution___from_usr();
-    
+
     VSF_ARCH_ASSERT( clock_src_freq > 0 );
     VSF_ARCH_ASSERT( tick_freq > 0 );
-    
+
     __systimer.cycle_per_tick = clock_src_freq / tick_freq;
 
-    
+
     if (0 == __systimer.cycle_per_tick) {
         __systimer.cycle_per_tick = 1;
     }
-    
+
     __systimer.cycle_per_us = clock_src_freq / 1000000ul;
     if (0 == __systimer.cycle_per_us) {
         __systimer.cycle_per_us = 1;
