@@ -193,9 +193,9 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
 void vsf_arch_sleep(uint_fast32_t mode)
 {
     VSF_UNUSED_PARAM(mode);
-    vsf_enable_interrupt();
+    vsf_enable_interrupt orig = vsf_enable_interrupt();
     __vsf_arch_irq_request_pend(&__vsf_rtos.wakeup.request);
-    vsf_disable_interrupt();
+    vsf_set_interrupt(orig);
 }
 
 void vsf_arch_wakeup(void)
