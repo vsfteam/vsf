@@ -57,6 +57,8 @@ extern "C" {
  */
 extern bool vsf_arch_init(void);
 
+extern vsf_err_t vsf_systimer_init(void);
+
 #   ifdef __cplusplus
 }
 #   endif
