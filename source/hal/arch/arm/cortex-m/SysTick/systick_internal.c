@@ -117,8 +117,10 @@ bool vsf_systick_is_match(void);
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static volatile uint32_t s_wCSRBuffer = 0;
+static volatile uint32_t __systick_csr_buffer = 0;
+
 /*============================ IMPLEMENTATION ================================*/
+
 /*!\brief init SysTick Timer
  *! \param void
  *! \retval true : succeed
@@ -129,11 +131,11 @@ bool vsf_systick_init(systick_cfg_t *cfg_ptr)
     //! \brief check the input
     VSF_HAL_ASSERT(cfg_ptr != NULL);
 
-    vsf_systick_set_reload(cfg_ptr->reload_value);
+    vsf_systick_set_reload(0);
     vsf_systick_clear_count();
 
     __SYSTICK_ATOM_CODE(
-        s_wCSRBuffer = cfg_ptr->mode;
+        __systick_csr_buffer = cfg_ptr->mode;
         SYSTICK_CSR = cfg_ptr->mode;
     )
 
@@ -147,8 +149,8 @@ bool vsf_systick_init(systick_cfg_t *cfg_ptr)
 void vsf_systick_enable(void)
 {
     __SYSTICK_ATOM_CODE(
-        s_wCSRBuffer |= ENABLE_SYSTICK;
-        SYSTICK_CSR = s_wCSRBuffer;
+        __systick_csr_buffer |= ENABLE_SYSTICK;
+        SYSTICK_CSR = __systick_csr_buffer;
     )
 }
 /*!\brief enable
@@ -157,13 +159,13 @@ void vsf_systick_enable(void)
  */
 bool vsf_systick_disable(void)
 {
-    uint_fast32_t wTemp;
+    uint_fast32_t temp;
     __SYSTICK_ATOM_CODE(
-        s_wCSRBuffer &= ~ENABLE_SYSTICK;
-        SYSTICK_CSR = s_wCSRBuffer;
-        wTemp = SYSTICK_CSR;            //! read to clear COUNTFLAG
+        __systick_csr_buffer &= ~ENABLE_SYSTICK;
+        SYSTICK_CSR = __systick_csr_buffer;
+        temp = SYSTICK_CSR;             //! read to clear COUNTFLAG
     )
-    return wTemp & SYSTICK_CSR_COUNTFLAG_MSK;
+    return temp & SYSTICK_CSR_COUNTFLAG_MSK;
 }
 
 
@@ -175,8 +177,8 @@ bool vsf_systick_disable(void)
 void vsf_systick_int_enable(void)
 {
     __SYSTICK_ATOM_CODE(
-        s_wCSRBuffer |= ENABLE_SYSTICK_INTERRUPT;
-        SYSTICK_CSR = s_wCSRBuffer;
+        __systick_csr_buffer |= ENABLE_SYSTICK_INTERRUPT;
+        SYSTICK_CSR = __systick_csr_buffer;
     )
 }
 /*!\brief enable
@@ -186,8 +188,8 @@ void vsf_systick_int_enable(void)
 void vsf_systick_int_disable(void)
 {
     __SYSTICK_ATOM_CODE(
-        s_wCSRBuffer &= ~ENABLE_SYSTICK_INTERRUPT;
-        SYSTICK_CSR = s_wCSRBuffer;
+        __systick_csr_buffer &= ~ENABLE_SYSTICK_INTERRUPT;
+        SYSTICK_CSR = __systick_csr_buffer;
     )
 }
 
