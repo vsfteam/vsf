@@ -142,7 +142,11 @@ typedef struct __systimer_t {
 /*============================ PROTOTYPES ====================================*/
 
 #ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+#   if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_TICK_MODE
 extern void vsf_systimer_evthandler(vsf_systimer_tick_t tick);
+#   else
+extern void vsf_systimer_on_tick(void);
+#   endif
 extern bool on_arch_systimer_tick_evt(vsf_systimer_tick_t tick);
 
 #   if  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
@@ -504,12 +508,20 @@ vsf_err_t vsf_swi_init(     uint_fast8_t idx,
  *----------------------------------------------------------------------------*/
 
 #ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+#   if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_TICK_MODE
 WEAK(vsf_systimer_evthandler)
 void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
 {
     VSF_UNUSED_PARAM(tick);
     VSF_ARCH_ASSERT(false);
 }
+#   else
+WEAK(vsf_systimer_on_tick)
+void vsf_systimer_on_tick(void)
+{
+    VSF_ARCH_ASSERT(false);
+}
+#   endif
 
 WEAK(on_arch_systimer_tick_evt)
 bool on_arch_systimer_tick_evt(vsf_systimer_tick_t tick)
