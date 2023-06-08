@@ -717,8 +717,7 @@ vsf_systimer_tick_t vsf_systimer_get(void)
                 /* This patch is used to prevent the output result is not 
                  * monotonically increasing.
                  */
-                ticks = __ticks_prev + elapsed;
-                __systimer.base = (ticks / __systimer.reload) * __systimer.reload;
+                ticks = __ticks_prev + 1;
             }
             __ticks_prev = ticks;
 
