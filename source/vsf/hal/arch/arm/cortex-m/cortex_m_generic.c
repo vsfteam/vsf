@@ -88,7 +88,13 @@ void vsf_systimer_reset_counter_value(void)
  */
 bool vsf_systimer_low_level_disable(void)
 {
-    return vsf_systick_disable();
+    bool result = false;
+    vsf_gint_state_t orig = vsf_disable_interrupt();
+        vsf_systick_disable();
+        result = !!(SCB->ICSR & SCB_ICSR_PENDSTCLR_Msk);
+    vsf_set_interrupt(orig);
+    
+    return result;
 }
 
 /*! \brief only enable systimer without clearing any flags
