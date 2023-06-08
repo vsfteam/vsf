@@ -113,7 +113,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
     int width;
     int precision = -1;
     int actual_width;
-    int rank = 0;
+    int rank;
 
     if (NULL == str) { size = 0; }
     if (0 == size) { curpos = NULL; }
@@ -125,6 +125,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
         switch (ch) {
         case '%':
             flags.all = 0;
+            rank = 0;
             switch (*format) {
             case '0':   flags.has_prefix0 = 1;      format++;   break;
             case '-':   flags.align_left = 1;       format++;   break;
