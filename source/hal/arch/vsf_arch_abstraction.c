@@ -697,7 +697,7 @@ vsf_systimer_tick_t vsf_systimer_get(void)
     {
         vsf_arch_prio_t gint_state = vsf_disable_interrupt();
             ticks = __systimer.base;
-            /* compensate a pending systimer over flow event as the global interrupt
+            /* compensate a pending systimer overflow event as the global interrupt
              * handling is masked
              */
             if (vsf_systimer_low_level_disable()) {
