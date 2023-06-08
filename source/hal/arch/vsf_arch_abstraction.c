@@ -126,6 +126,7 @@ typedef struct __systimer_t {
 #elif   VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 typedef struct __systimer_t {
     vsf_systimer_tick_t tick;
+    vsf_systimer_tick_t base;
     vsf_systimer_tick_t unit;
     vsf_systimer_tick_t max_tick_per_round;
     vsf_systimer_tick_t reload;
@@ -583,8 +584,11 @@ static vsf_systimer_tick_t __vsf_systimer_update(void)
 {
     vsf_systimer_tick_t tick;
 
-    tick = vsf_systimer_get();
-    __systimer.tick = tick;
+    vsf_gint_state_t gint_state = vsf_disable_interrupt();
+        tick = vsf_systimer_get();
+        __systimer.tick = tick;
+    vsf_set_interrupt(gint_state);
+
     return tick;
 }
 
@@ -594,16 +598,26 @@ static bool __vsf_systimer_set_target(vsf_systimer_tick_t tick_cnt)
         return false;
     }
 
-    vsf_systimer_low_level_disable();
+    {
+        vsf_gint_state_t gint_state = vsf_disable_interrupt();
+            if (vsf_systimer_low_level_disable()) {
+                /* since we are about to clear the pending bit, we have to update 
+                 * base if the systick pending bit is set.
+                 */
+                __systimer.base += __systimer.reload;
+            }
 
-    __systimer.reload = tick_cnt;
-    vsf_systimer_set_reload_value(tick_cnt);
+            __systimer.reload = tick_cnt;
+            vsf_systimer_set_reload_value(tick_cnt);
 
-    vsf_systimer_reset_counter_value();
-    vsf_systimer_clear_int_pending_bit();
+            vsf_systimer_reset_counter_value();
+            vsf_systimer_clear_int_pending_bit();   /* clear pending bit */
 
-    vsf_systimer_low_level_int_enable();
-    vsf_systimer_low_level_enable();
+            vsf_systimer_low_level_int_enable();
+            vsf_systimer_low_level_enable();
+        vsf_set_interrupt(gint_state);
+    }
+
     return true;
 }
 
@@ -613,9 +627,22 @@ static bool __vsf_systimer_set_target(vsf_systimer_tick_t tick_cnt)
 void vsf_systimer_ovf_evt_handler(void)
 {
     vsf_systimer_tick_t tick;
-    vsf_systimer_low_level_int_disable();
-    __vsf_systimer_update();
-    tick = __systimer.tick;
+
+    {
+        vsf_gint_state_t gint_state = vsf_disable_interrupt();
+            vsf_systimer_low_level_int_disable();
+
+            /* clear pending bit just in case the normal timer doesn't clear the pending
+             * bit automatically on entering this overflow event handler
+             */
+            vsf_systimer_clear_int_pending_bit();   
+
+            /* update base as the systick pending bit is cleared by interrupt handling*/
+            __systimer.base += __systimer.reload;
+        vsf_set_interrupt(gint_state);
+    }
+
+    tick = __vsf_systimer_update();
     vsf_systimer_low_level_disable();
 
     if (on_arch_systimer_tick_evt(tick)) {
@@ -655,44 +682,50 @@ WEAK(vsf_systimer_set_idle)
 void vsf_systimer_set_idle(void)
 {
 //    vsf_trace_debug("systimer_idle\r\n");
-    {
-        vsf_arch_prio_t gint_state = vsf_disable_interrupt();
-        __vsf_systimer_update();
-        __vsf_systimer_set_target(__systimer.max_tick_per_round);
-        vsf_set_interrupt(gint_state);
-    }
+    vsf_arch_prio_t gint_state = vsf_disable_interrupt();
+    __vsf_systimer_update();
+    __vsf_systimer_set_target(__systimer.max_tick_per_round);
+    vsf_set_interrupt(gint_state);
 }
 
 WEAK(vsf_systimer_get)
 vsf_systimer_tick_t vsf_systimer_get(void)
 {
     vsf_systimer_tick_t ticks = 0;
-    bool auto_update = false;
+
     {
         vsf_arch_prio_t gint_state = vsf_disable_interrupt();
-        if (vsf_systimer_low_level_disable()) {       //!< the match bit will be cleared
-            ticks += __systimer.reload;
-            auto_update = true;
-        }
-        ticks += vsf_systimer_get_tick_elapsed();
-        vsf_systimer_low_level_enable();
-        ticks += __systimer.tick;
-        if (auto_update) {
-            __systimer.tick = ticks;
-        }
+            ticks = __systimer.base;
+            /* compensate a pending systimer over flow event as the global interrupt
+             * handling is masked
+             */
+            if (vsf_systimer_low_level_disable()) {
+                ticks += __systimer.reload;
+            }
+
+            /* get the elapsed tick count in the current counting loop */
+            ticks += vsf_systimer_get_tick_elapsed();
+            vsf_systimer_low_level_enable();
+
         vsf_set_interrupt(gint_state);
     }
+
+    static vsf_systimer_tick_t __ticks_prev = 0;
+    if (ticks < __ticks_prev) {
+        VSF_HAL_ASSERT(false);
+    }
+    __ticks_prev = ticks;
+
     return ticks;
 }
 
 WEAK(vsf_systimer_start)
 vsf_err_t vsf_systimer_start(void)
 {
-    {
-        vsf_arch_prio_t gint_state = vsf_disable_interrupt();
+    vsf_arch_prio_t gint_state = vsf_disable_interrupt();
         __vsf_systimer_set_target(__systimer.max_tick_per_round);
-        vsf_set_interrupt(gint_state);
-    }
+    vsf_set_interrupt(gint_state);
+
     return VSF_ERR_NONE;
 }
 
