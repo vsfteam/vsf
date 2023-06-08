@@ -130,6 +130,7 @@ typedef struct __systimer_t {
     vsf_systimer_tick_t unit;
     vsf_systimer_tick_t max_tick_per_round;
     vsf_systimer_tick_t reload;
+    bool enabled;
     //uint32_t           tick_freq;
 } __systimer_t;
 #elif  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE
@@ -580,6 +581,41 @@ vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
  *                Count up)                                                   *
  *----------------------------------------------------------------------------*/
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+
+
+static void __vsf_systimer_enabled(void)
+{
+    vsf_gint_state_t gint_state = vsf_disable_interrupt();
+        vsf_systimer_low_level_enable();
+        __systimer.enabled = true;
+    vsf_set_interrupt(gint_state);
+}
+
+static bool __vsf_systimer_disabled(void)
+{
+    vsf_gint_state_t gint_state = vsf_disable_interrupt();
+         bool pending = vsf_systimer_low_level_disable();
+        __systimer.enabled = false;
+    vsf_set_interrupt(gint_state);
+    return pending;
+}
+
+static void __vsf_systimer_set_status(bool status)
+{
+    if (status) {
+        __vsf_systimer_enabled();
+    } else {
+        __vsf_systimer_disabled();
+    }
+}
+
+static bool __vsf_systimer_get_status(void)
+{
+    return __systimer.enabled;
+}
+
+
+
 static vsf_systimer_tick_t __vsf_systimer_update(void)
 {
     vsf_systimer_tick_t tick;
@@ -600,12 +636,8 @@ static bool __vsf_systimer_set_target(vsf_systimer_tick_t tick_cnt)
 
     {
         vsf_gint_state_t gint_state = vsf_disable_interrupt();
-            if (vsf_systimer_low_level_disable()) {
-                /* since we are about to clear the pending bit, we have to update 
-                 * base if the systick pending bit is set.
-                 */
-                __systimer.base += __systimer.reload;
-            }
+            __vsf_systimer_disabled();
+            __systimer.base = __systimer.tick;
 
             __systimer.reload = tick_cnt;
             vsf_systimer_set_reload_value(tick_cnt);
@@ -614,7 +646,7 @@ static bool __vsf_systimer_set_target(vsf_systimer_tick_t tick_cnt)
             vsf_systimer_clear_int_pending_bit();   /* clear pending bit */
 
             vsf_systimer_low_level_int_enable();
-            vsf_systimer_low_level_enable();
+            __vsf_systimer_enabled();
         vsf_set_interrupt(gint_state);
     }
 
@@ -643,7 +675,7 @@ void vsf_systimer_ovf_evt_handler(void)
     }
 
     tick = __vsf_systimer_update();
-    vsf_systimer_low_level_disable();
+    __vsf_systimer_disabled();
 
     if (on_arch_systimer_tick_evt(tick)) {
         vsf_systimer_evthandler(tick);
@@ -700,14 +732,15 @@ vsf_systimer_tick_t vsf_systimer_get(void)
             /* compensate a pending systimer overflow event as the global interrupt
              * handling is masked
              */
-            if (vsf_systimer_low_level_disable()) {
+            bool status = __vsf_systimer_get_status();
+            if (__vsf_systimer_disabled()) {
                 ticks += __systimer.reload;
             }
 
             /* get the elapsed tick count in the current counting loop */
             elapsed = vsf_systimer_get_tick_elapsed();
             ticks += elapsed;
-            vsf_systimer_low_level_enable();
+            __vsf_systimer_set_status(status);
 
             /* in some corner case where the systimer overflow event handler
              * cannot be handled while the timer keeps running for more than one
