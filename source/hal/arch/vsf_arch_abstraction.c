@@ -594,7 +594,7 @@ static vsf_systimer_tick_t __vsf_systimer_update(void)
 
 static bool __vsf_systimer_set_target(vsf_systimer_tick_t tick_cnt)
 {
-    if (0 == tick_cnt) {
+    if (tick_cnt < 5000) {
         return false;
     }
 
@@ -775,7 +775,8 @@ bool vsf_systimer_set(vsf_systimer_tick_t due)
 WEAK(vsf_systimer_is_due)
 bool vsf_systimer_is_due(vsf_systimer_tick_t due)
 {
-    return (__systimer.tick >= due);
+    vsf_systimer_tick_t tick = __vsf_systimer_update();
+    return (tick >= due);
 }
 
 #endif
