@@ -691,8 +691,9 @@ void vsf_systimer_set_idle(void)
 WEAK(vsf_systimer_get)
 vsf_systimer_tick_t vsf_systimer_get(void)
 {
+    static vsf_systimer_tick_t __ticks_prev = 0;
     vsf_systimer_tick_t ticks = 0;
-
+    vsf_systimer_tick_t elapsed = 0;
     {
         vsf_arch_prio_t gint_state = vsf_disable_interrupt();
             ticks = __systimer.base;
@@ -704,17 +705,20 @@ vsf_systimer_tick_t vsf_systimer_get(void)
             }
 
             /* get the elapsed tick count in the current counting loop */
-            ticks += vsf_systimer_get_tick_elapsed();
+            elapsed = vsf_systimer_get_tick_elapsed();
+            ticks += elapsed;
             vsf_systimer_low_level_enable();
+
+            if (ticks < __ticks_prev) {
+                /* This patch is used to prevent the output result is not 
+                 * monotonically increasing.
+                 */
+                ticks = __ticks_prev + elapsed;
+            }
+            __ticks_prev = ticks;
 
         vsf_set_interrupt(gint_state);
     }
-
-    static vsf_systimer_tick_t __ticks_prev = 0;
-    if (ticks < __ticks_prev) {
-        VSF_HAL_ASSERT(false);
-    }
-    __ticks_prev = ticks;
 
     return ticks;
 }
