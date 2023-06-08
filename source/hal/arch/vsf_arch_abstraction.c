@@ -709,6 +709,10 @@ vsf_systimer_tick_t vsf_systimer_get(void)
             ticks += elapsed;
             vsf_systimer_low_level_enable();
 
+            /* in some corner case where the systimer overflow event handler
+             * cannot be handled while the timer keeps running for more than one
+             * rounds, the ticks might be smaller than then previous value
+             */
             if (ticks < __ticks_prev) {
                 /* This patch is used to prevent the output result is not 
                  * monotonically increasing.
@@ -749,13 +753,7 @@ bool vsf_systimer_set(vsf_systimer_tick_t due)
         vsf_systimer_tick_t tick_cnt;
 //        vsf_trace_debug("systimer_set: %lld %lld %c\r\n",
 //                    current, due, due > current ? '*' : ' ');
-        /*
-        if (due < current) {
-            tick_cnt = 0xFFFFFFFF - current + due + 1;
-        } else {
-            tick_cnt = due - current;
-        }
-        */
+
         if (due > current) {
 
             tick_cnt = due - current;
