@@ -31,3 +31,5 @@ CmakeCache.txt
 # for vscode
 .cortex-debug.registers.state.json
 .cortex-debug.peripherals.state.json
+example/template/project/mdk/mps2_build/.build_log.htm
+example/template/project/mdk/vsf_template.uvguix.gabriel
