@@ -757,9 +757,17 @@ bool vsf_systimer_set(vsf_systimer_tick_t due)
         }
         */
         if (due > current) {
+
             tick_cnt = due - current;
-            tick_cnt = vsf_min(max_tick_per_round, tick_cnt);
+
+            /* avoid using small load value */
+            if (tick_cnt > max_tick_per_round) {
+                tick_cnt >>= 1;
+                tick_cnt = vsf_min(max_tick_per_round, tick_cnt);
+            }
+
             result = __vsf_systimer_set_target(tick_cnt);
+
         }
         vsf_set_interrupt(gint_state);
     }
