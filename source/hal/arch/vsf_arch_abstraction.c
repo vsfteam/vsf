@@ -714,6 +714,7 @@ vsf_systimer_tick_t vsf_systimer_get(void)
                  * monotonically increasing.
                  */
                 ticks = __ticks_prev + elapsed;
+                __systimer.base = (ticks / __systimer.reload) * __systimer.reload;
             }
             __ticks_prev = ticks;
 
