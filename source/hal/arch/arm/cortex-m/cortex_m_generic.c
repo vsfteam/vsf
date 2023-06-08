@@ -103,7 +103,7 @@ bool vsf_systimer_low_level_disable(void)
     bool result = false;
     vsf_gint_state_t orig = vsf_disable_interrupt();
         vsf_systick_disable();
-        result = !!(SCB->ICSR & SCB_ICSR_PENDSTCLR_Msk);
+        result = !!(SCB->ICSR & SCB_ICSR_PENDSTSET_Msk);
     vsf_set_interrupt(orig);
 
     return result;
