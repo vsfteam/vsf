@@ -20,6 +20,9 @@
 #include "service/vsf_service_cfg.h"
 
 #if VSF_USE_TRACE == ENABLED
+
+#define __VSF_TRACE_CLASS_IMPLEMENT
+
 #include "hal/vsf_hal.h"
 
 //! todo: remove this dependency
@@ -336,6 +339,38 @@ void vsf_trace(vsf_trace_level_t level, const char *format, ...)
 void vsf_trace_assert(const char *file, int line, const char *func)
 {
     vsf_trace_error("%s:%d %s -- assertion failed\n", file, line, func);
+}
+
+// backtrace
+
+void vsf_bgtrace_append(vsf_bgtrace_t *bgtrace, void *element)
+{
+    vsf_protect_t origlevel = vsf_trace_protect();
+        void *ptr = (void *)((uint8_t *)bgtrace->elements + bgtrace->pos * bgtrace->ele_size);
+        memcpy(ptr, element, bgtrace->ele_size);
+        if (++bgtrace->pos >= bgtrace->ele_num) {
+            bgtrace->pos = 0;
+        }
+        bgtrace->total++;
+        if (bgtrace->num < bgtrace->ele_num) {
+            bgtrace->num++;
+        }
+    vsf_trace_unprotect(origlevel);
+}
+
+void vsf_bgtrace_print(vsf_bgtrace_t *bgtrace, int cnt)
+{
+    if (bgtrace->print_element != NULL) {
+        uint16_t pos = bgtrace->pos;
+        void *ptr;
+        cnt = vsf_min(cnt, bgtrace->num);
+
+        while (cnt-- > 0) {
+            pos = (pos == 0 ? bgtrace->num : pos) - 1;
+            ptr = (void *)((uint8_t *)bgtrace->elements + pos * bgtrace->ele_size);
+            bgtrace->print_element(pos, ptr);
+        }
+    }
 }
 
 // default retarget to vsf_trace

@@ -27,6 +27,14 @@
 #   include "../stream/vsf_stream.h"
 #endif
 
+#if     defined(__VSF_TRACE_CLASS_IMPLEMENT)
+#   define __VSF_CLASS_IMPLEMENT__
+#elif   defined(__VSF_TRACE_CLASS_INHERIT__)
+#   define __VSF_CLASS_INHERIT__
+#endif
+
+#include "utilities/ooc_class.h"
+
 #if VSF_USE_TRACE == ENABLED
 #   include <stdarg.h>
 #endif
@@ -83,6 +91,46 @@ extern "C" {
 #define vsf_trace_error(...)        vsf_trace(VSF_TRACE_ERROR, __VA_ARGS__)
 #define vsf_trace_debug(...)        vsf_trace(VSF_TRACE_DEBUG, __VA_ARGS__)
 
+// background trace
+
+#define __vsf_bgtrace_type(__name)  __name##_bgtrace_t
+#define vsf_bgtrace_type(__name)    __vsf_bgtrace_type(__name)
+#define __vsf_bgtrace_etype(__name) __name##_bgtrace_ele_t
+#define vsf_bgtrace_etype(__name)   __vsf_bgtrace_etype(__name)
+
+#define __declare_bgtrace(__name)   vsf_dcl_class(vsf_bgtrace_type(__name))
+#define __define_bgtrace(__name, __ele_num, ...)                                \
+            typedef struct vsf_bgtrace_etype(__name) {                          \
+                __VA_ARGS__                                                     \
+            } vsf_bgtrace_etype(__name);                                        \
+            vsf_class(vsf_bgtrace_type(__name)) {                               \
+                public_member(                                                  \
+                    implement(vsf_bgtrace_t)                                    \
+                    vsf_bgtrace_etype(__name) __elements[__ele_num];            \
+                )                                                               \
+            };
+
+#define declare_bgtrace(__name)     __declare_bgtrace(__name)
+#define dcl_bgtrace(__name)         declare_bgtrace(__name)
+
+#define define_bgtrace(__name, __ele_num, ...)                                  \
+            __define_bgtrace(__name, (__ele_num), __VA_ARGS__)
+#define def_bgtrace(__name, __ele_num, ...)                                     \
+            define_bgtrace(__name, (__ele_num), __VA_ARGS__)
+
+#define __describe_bgtrace(__name, __ele_num, __print_element, ...)             \
+            declare_bgtrace(__name)                                             \
+            define_bgtrace(__name, (__ele_num), __VA_ARGS__)                    \
+            vsf_bgtrace_type(__name) __name = {                                 \
+                .ele_num = (__ele_num),                                         \
+                .ele_size = sizeof(vsf_bgtrace_etype(__name)),                  \
+                .elements = (void *)__name.__elements,                          \
+                .print_element = (void (*)(uint16_t pos, void *element))(__print_element),\
+            };
+
+#define describe_bgtrace(__name, __ele_num, __print_element, ...)               \
+            __describe_bgtrace(__name, (__ele_num), (__print_element), __VA_ARGS__)
+
 /*============================ TYPES =========================================*/
 
 typedef enum vsf_trace_level_t {
@@ -93,6 +141,19 @@ typedef enum vsf_trace_level_t {
     VSF_TRACE_DEBUG,
     VSF_TRACE_LEVEL_NUM,
 } vsf_trace_level_t;
+
+vsf_class(vsf_bgtrace_t) {
+    public_member(
+        uint16_t ele_num, ele_size;
+        void *elements;
+        void (*print_element)(uint16_t pos, void *element);
+    )
+
+    private_member(
+        uint16_t pos, num;
+        uint32_t total;
+    )
+};
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -130,6 +191,9 @@ extern void vsf_trace(vsf_trace_level_t level, const char *format, ...);
 extern uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size);
 extern void vsf_trace_assert(const char *file, int line, const char *func);
 
+extern void vsf_bgtrace_append(vsf_bgtrace_t *bgtrace, void *element);
+extern void vsf_bgtrace_print(vsf_bgtrace_t *bgtrace, int cnt);
+
 #else
 #   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #       define vsf_trace_init(__arg)
@@ -137,12 +201,16 @@ extern void vsf_trace_assert(const char *file, int line, const char *func);
 #       define vsf_trace(__arg)
 #       define vsf_trace_buffer(__arg)
 #       define vsf_trace_string(__arg)
+#       define vsf_bgtrace_append(__arg)
+#       define vsf_bgtrace_print(__arg)
 #   else
 #       define vsf_trace_init(...)
 #       define vsf_trace_fini(...)
 #       define vsf_trace(...)
 #       define vsf_trace_buffer(...)
 #       define vsf_trace_string(...)
+#       define vsf_bgtrace_append(...)
+#       define vsf_bgtrace_print(...)
 #   endif
 #endif
 
