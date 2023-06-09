@@ -582,6 +582,38 @@ vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
  *----------------------------------------------------------------------------*/
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 
+#   ifdef VSF_SYSTIMER_CFG_BGTRACE_NUM
+//      for bgtrace
+#       include "service/vsf_service.h"
+
+#       define __vsf_systimer_bgtrace_append(...)                               \
+            vsf_bgtrace_append((vsf_bgtrace_t *)&__vsf_systimer_bgtrace,        \
+                &(vsf_bgtrace_etype(__vsf_systimer_bgtrace)) {                  \
+                    __VA_ARGS__                                                 \
+                });
+#       define __vsf_systimer_bgtrace_print(__cnt)                              \
+            vsf_bgtrace_print((vsf_bgtrace_t *)&__vsf_systimer_bgtrace, __cnt)
+
+static void __vsf_systimer_print(uint16_t pos, void *element);
+describe_bgtrace(__vsf_systimer_bgtrace, VSF_SYSTIMER_CFG_BGTRACE_NUM, __vsf_systimer_print,
+    const char *func;
+    vsf_systimer_tick_t elapsed_ticks;
+    vsf_systimer_tick_t ticks;
+    vsf_systimer_tick_t systimer_base;
+    vsf_systimer_tick_t systimer_ticks;
+    uint32_t load;
+)
+
+static void __vsf_systimer_print(uint16_t pos, void *element)
+{
+    vsf_bgtrace_etype(__vsf_systimer_bgtrace) *e = element;
+    vsf_trace_error("[%d]: func=%s, elapsed=%lld, ticks=%lld, systimer_ticks=%lld, systimer_base=%lld, load=%d\n",
+            pos, e->func, e->elapsed_ticks, e->ticks, e->systimer_ticks, e->systimer_base, e->load);
+}
+
+#   else
+#       define __vsf_systimer_trace(...)
+#   endif
 
 static void __vsf_systimer_enabled(void)
 {
@@ -667,7 +699,7 @@ void vsf_systimer_ovf_evt_handler(void)
             /* clear pending bit just in case the normal timer doesn't clear the pending
              * bit automatically on entering this overflow event handler
              */
-            vsf_systimer_clear_int_pending_bit();   
+            vsf_systimer_clear_int_pending_bit();
 
             /* update base as the systick pending bit is cleared by interrupt handling*/
             __systimer.base += __systimer.reload;
@@ -717,6 +749,7 @@ void vsf_systimer_set_idle(void)
     vsf_arch_prio_t gint_state = vsf_disable_interrupt();
     __vsf_systimer_update();
     __vsf_systimer_set_target(__systimer.max_tick_per_round);
+    __vsf_systimer_bgtrace_append(__FUNCTION__, 0, 0, __systimer.tick, __systimer.base, __systimer.reload);
     vsf_set_interrupt(gint_state);
 }
 
@@ -742,12 +775,19 @@ vsf_systimer_tick_t vsf_systimer_get(void)
             ticks += elapsed;
             __vsf_systimer_set_status(status);
 
+            __vsf_systimer_bgtrace_append(__FUNCTION__, elapsed, ticks, __systimer.tick, __systimer.base, __systimer.reload);
+
             /* in some corner case where the systimer overflow event handler
              * cannot be handled while the timer keeps running for more than one
              * rounds, the ticks might be smaller than then previous value
              */
             if (ticks < __ticks_prev) {
-                /* This patch is used to prevent the output result is not 
+#ifdef VSF_SYSTIMER_CFG_BGTRACE_NUM
+                vsf_trace_debug("%s: cur=%lld, prev=%lld\n", __FUNCTION__, ticks, __ticks_prev);
+                __vsf_systimer_bgtrace_print(8);
+                VSF_ARCH_ASSERT(false);
+#endif
+                /* This patch is used to prevent the output result is not
                  * monotonically increasing.
                  */
                 ticks = __ticks_prev + 1;
