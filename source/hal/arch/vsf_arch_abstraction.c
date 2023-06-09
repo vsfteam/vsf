@@ -703,11 +703,13 @@ void vsf_systimer_ovf_evt_handler(void)
 
             /* update base as the systick pending bit is cleared by interrupt handling*/
             __systimer.base += __systimer.reload;
+            
+            tick = __vsf_systimer_update();
+            __vsf_systimer_disabled();
         vsf_set_interrupt(gint_state);
     }
 
-    tick = __vsf_systimer_update();
-    __vsf_systimer_disabled();
+
 
     if (on_arch_systimer_tick_evt(tick)) {
         vsf_systimer_evthandler(tick);
