@@ -245,6 +245,7 @@ vsf_sync_reason_t vsf_eda_queue_recv_get_reason(vsf_eda_queue_t *pthis, vsf_evt_
             __vsf_eda_queue_notify(pthis, true, origlevel);
             return reason;
         }
+        vsf_unprotect_sched(origlevel);
         // this happens when queue is read by other task with 0 timeout after VSF_SYNC_GET is sent to here
         // TODO: re-recv again?
         reason = VSF_SYNC_PENDING;
