@@ -272,7 +272,7 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
         ENABLE_GLOBAL_INTERRUPT();
     } else {
         __set_BASEPRI(priority << (8 - VSF_ARCH_PRI_BIT));
-        __vsf_cm.basepri = __get_BASEPRI();
+        __vsf_cm.basepri = priority;
         ENABLE_GLOBAL_INTERRUPT();
     }
 
