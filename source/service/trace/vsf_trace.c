@@ -343,19 +343,22 @@ void vsf_trace_assert(const char *file, int line, const char *func)
 
 // backtrace
 
+void vsf_bgtrace_clear(vsf_bgtrace_t *bgtrace)
+{
+    bgtrace->pos = bgtrace->num = 0;
+}
+
 void vsf_bgtrace_append(vsf_bgtrace_t *bgtrace, void *element)
 {
-    vsf_protect_t origlevel = vsf_trace_protect();
-        void *ptr = (void *)((uint8_t *)bgtrace->elements + bgtrace->pos * bgtrace->ele_size);
-        memcpy(ptr, element, bgtrace->ele_size);
-        if (++bgtrace->pos >= bgtrace->ele_num) {
-            bgtrace->pos = 0;
-        }
-        bgtrace->total++;
-        if (bgtrace->num < bgtrace->ele_num) {
-            bgtrace->num++;
-        }
-    vsf_trace_unprotect(origlevel);
+    void *ptr = (void *)((uint8_t *)bgtrace->elements + bgtrace->pos * bgtrace->ele_size);
+    memcpy(ptr, element, bgtrace->ele_size);
+    if (++bgtrace->pos >= bgtrace->ele_num) {
+        bgtrace->pos = 0;
+    }
+    bgtrace->total++;
+    if (bgtrace->num < bgtrace->ele_num) {
+        bgtrace->num++;
+    }
 }
 
 void vsf_bgtrace_print(vsf_bgtrace_t *bgtrace, int cnt)
