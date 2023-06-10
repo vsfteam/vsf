@@ -629,7 +629,7 @@ static vsf_systimer_tick_t __vsf_systimer_update(void)
 
 static bool __vsf_systimer_set_target(vsf_systimer_tick_t tick_cnt)
 {
-    if (tick_cnt < 5000) {
+    if (0 == tick_cnt) {
         return false;
     }
 
@@ -750,6 +750,19 @@ vsf_systimer_tick_t vsf_systimer_get(void)
             if (ticks < __ticks_prev) {
                 /* This patch is used to prevent the output result is not
                  * monotonically increasing.
+                 *
+                 * Normally, this condition should not occur. But in some rare 
+                 * cases, two or more unrelated tasks may submit the same 
+                 * delayed request within a very short period of time. It has 
+                 * nothing to do with the length of the delayed request 
+                 * submitted. The interval between their submitted requests will
+                 * directly determine the Load value of SysTick. When the 
+                 * interval is extremely small, it may actually occur that the 
+                 * system has overflowed many times before the system responds 
+                 * to the Overflow interrupt. In this case circumstances, the 
+                 * current Tick (i.e. ticks) value may be smaller than the 
+                 * previous Tick (i.e __ticks_prev) value. 
+                 * This patch is a workaround for this situation.
                  */
                 ticks = __ticks_prev + 1;
             }
