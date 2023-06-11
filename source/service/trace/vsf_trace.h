@@ -192,6 +192,7 @@ extern uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size);
 extern void vsf_trace_assert(const char *file, int line, const char *func);
 
 extern void vsf_bgtrace_clear(vsf_bgtrace_t *bgtrace);
+extern uint32_t vsf_bgtrace_total(vsf_bgtrace_t *bgtrace);
 extern void vsf_bgtrace_append(vsf_bgtrace_t *bgtrace, void *element);
 extern void vsf_bgtrace_print(vsf_bgtrace_t *bgtrace, int cnt);
 
@@ -203,6 +204,7 @@ extern void vsf_bgtrace_print(vsf_bgtrace_t *bgtrace, int cnt);
 #       define vsf_trace_buffer(__arg)
 #       define vsf_trace_string(__arg)
 #       define vsf_bgtrace_clear(__arg)
+#       define vsf_bgtrace_total(__arg)
 #       define vsf_bgtrace_append(__arg)
 #       define vsf_bgtrace_print(__arg)
 #   else
@@ -212,6 +214,7 @@ extern void vsf_bgtrace_print(vsf_bgtrace_t *bgtrace, int cnt);
 #       define vsf_trace_buffer(...)
 #       define vsf_trace_string(...)
 #       define vsf_bgtrace_clear(...)
+#       define vsf_bgtrace_total(...)
 #       define vsf_bgtrace_append(...)
 #       define vsf_bgtrace_print(...)
 #   endif
