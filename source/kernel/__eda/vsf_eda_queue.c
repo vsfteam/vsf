@@ -56,7 +56,12 @@ static bool __vsf_eda_queue_dequeue(vsf_eda_queue_t *pthis, void **node)
 {
     bool is_dequeued = false;
     vsf_protect_t origlevel = __vsf_eda_queue_protect();
+#if VSF_EDA_QUEUE_CFG_SUPPORT_ISR == ENABLED
+    if (pthis->readable_cnt > 0) {
+        pthis->readable_cnt--;
+#else
     if (pthis->cur_union.cur_value > 0) {
+#endif
         pthis->cur_union.cur_value--;
         pthis->op.dequeue(pthis, node);
         is_dequeued = true;
@@ -65,13 +70,37 @@ static bool __vsf_eda_queue_dequeue(vsf_eda_queue_t *pthis, void **node)
     return is_dequeued;
 }
 
+#if VSF_EDA_QUEUE_CFG_SUPPORT_ISR == ENABLED
+#   define __vsf_eda_queue_enqueue(__queue, __node, __readable)                 \
+            ____vsf_eda_queue_enqueue((__queue), (__node), (__readable))
+
 SECTION(".text.vsf.kernel.vsf_eda_queue")
-static bool __vsf_eda_queue_enqueue(vsf_eda_queue_t *pthis, void *node)
+void __vsf_eda_queue_increase_readable_cnt(vsf_eda_queue_t *pthis)
+{
+    vsf_protect_t origlevel = __vsf_eda_queue_protect();
+    pthis->readable_cnt++;
+    __vsf_eda_queue_unprotect(origlevel);
+}
+
+SECTION(".text.vsf.kernel.vsf_eda_queue")
+static bool ____vsf_eda_queue_enqueue(vsf_eda_queue_t *pthis, void *node, bool readable)
+#else
+#   define __vsf_eda_queue_enqueue(__queue, __node, __readable)                 \
+            ____vsf_eda_queue_enqueue((__queue), (__node))
+
+SECTION(".text.vsf.kernel.vsf_eda_queue")
+static bool ____vsf_eda_queue_enqueue(vsf_eda_queue_t *pthis, void *node)
+#endif
 {
     bool is_enqueued = false;
     vsf_protect_t origlevel = __vsf_eda_queue_protect();
     if (pthis->cur_union.cur_value < pthis->max_union.max_value) {
         pthis->cur_union.cur_value++;
+#if VSF_EDA_QUEUE_CFG_SUPPORT_ISR == ENABLED
+        if (readable) {
+            pthis->readable_cnt++;
+        }
+#endif
         pthis->op.enqueue(pthis, node);
         is_enqueued = true;
     }
@@ -134,6 +163,9 @@ vsf_err_t vsf_eda_queue_init(vsf_eda_queue_t *pthis, uint_fast16_t max)
 #if VSF_KERNEL_CFG_QUEUE_HAS_RX_NOTIFIED == ENABLED
     pthis->rx_notified = false;
 #endif
+#if VSF_EDA_QUEUE_CFG_SUPPORT_ISR == ENABLED
+    pthis->readable_cnt = 0;
+#endif
     return vsf_eda_sync_init(&pthis->use_as__vsf_sync_t, 0, max);
 }
 
@@ -142,7 +174,7 @@ vsf_err_t vsf_eda_queue_send_ex(vsf_eda_queue_t *pthis, void *node, vsf_timeout_
 {
     VSF_KERNEL_ASSERT((pthis != NULL) && (node != NULL));
 
-    bool is_enqueued = __vsf_eda_queue_enqueue(pthis, node);
+    bool is_enqueued = __vsf_eda_queue_enqueue(pthis, node, true);
     vsf_protect_t origlevel = vsf_protect_sched();
     if (is_enqueued) {
         __vsf_eda_queue_notify(pthis, false, origlevel);
@@ -169,7 +201,7 @@ vsf_sync_reason_t vsf_eda_queue_send_get_reason(vsf_eda_queue_t *pthis, vsf_evt_
     vsf_sync_t *sync = &pthis->use_as__vsf_sync_t;
     vsf_sync_reason_t reason = vsf_eda_sync_get_reason(sync, evt);
     if (VSF_SYNC_GET == reason) {
-        bool is_enqueued = __vsf_eda_queue_enqueue(pthis, node);
+        bool is_enqueued = __vsf_eda_queue_enqueue(pthis, node, true);
         vsf_protect_t origlevel = vsf_protect_sched();
         if (is_enqueued) {
             __vsf_eda_queue_notify(pthis, false, origlevel);
@@ -282,7 +314,8 @@ vsf_err_t vsf_eda_queue_send_isr(vsf_eda_queue_t *pthis, void *node)
 {
     VSF_KERNEL_ASSERT((pthis != NULL) && (node != NULL));
 
-    if (!__vsf_eda_queue_enqueue(pthis, node)) {
+    // send non-readable data to queue, will be readable before notification in kernel_task
+    if (!__vsf_eda_queue_enqueue(pthis, node, false)) {
         return VSF_ERR_NOT_READY;
     }
     return vsf_eda_post_evt_msg((vsf_eda_t *)&__vsf_eda.task, VSF_KERNEL_EVT_QUEUE_SEND_NOTIFY, pthis);

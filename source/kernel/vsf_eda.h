@@ -1010,6 +1010,7 @@ vsf_class(vsf_eda_queue_t) {
         vsf_protect_region_t    *region;
 #endif
         vsf_eda_queue_op_t      op;
+        uint16_t                readable_cnt;
     )
 
     protected_member(
