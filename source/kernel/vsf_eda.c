@@ -1120,15 +1120,9 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_eda_queue_t *queue = vsf_eda_get_cur_msg();
             VSF_KERNEL_ASSERT(queue != NULL);
 
-#   if VSF_EDA_QUEUE_CFG_SUPPORT_ISR == ENABLED
             SECTION(".text.vsf.kernel.vsf_eda_queue")
-            void __vsf_eda_queue_increase_readable_cnt(vsf_eda_queue_t *pthis);
-            __vsf_eda_queue_increase_readable_cnt(queue);
-#   endif
-
-            SECTION(".text.vsf.kernel.vsf_eda_queue")
-            void __vsf_eda_queue_notify(vsf_eda_queue_t *pthis, bool tx, vsf_protect_t orig);
-            __vsf_eda_queue_notify(queue, false, vsf_protect_sched());
+            void __vsf_eda_queue_notify_for_isr(vsf_eda_queue_t *pthis, bool tx);
+            __vsf_eda_queue_notify_for_isr(queue, false);
         }
         break;
     case VSF_KERNEL_EVT_QUEUE_RECV_NOTIFY: {
@@ -1136,8 +1130,8 @@ static void __vsf_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             VSF_KERNEL_ASSERT(queue != NULL);
 
             SECTION(".text.vsf.kernel.vsf_eda_queue")
-            void __vsf_eda_queue_notify(vsf_eda_queue_t *pthis, bool tx, vsf_protect_t orig);
-            __vsf_eda_queue_notify(queue, true, vsf_protect_sched());
+            void __vsf_eda_queue_notify_for_isr(vsf_eda_queue_t *pthis, bool tx);
+            __vsf_eda_queue_notify_for_isr(queue, true);
         }
         break;
 #endif

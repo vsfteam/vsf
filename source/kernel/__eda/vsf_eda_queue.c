@@ -75,14 +75,6 @@ static bool __vsf_eda_queue_dequeue(vsf_eda_queue_t *pthis, void **node)
             ____vsf_eda_queue_enqueue((__queue), (__node), (__readable))
 
 SECTION(".text.vsf.kernel.vsf_eda_queue")
-void __vsf_eda_queue_increase_readable_cnt(vsf_eda_queue_t *pthis)
-{
-    vsf_protect_t origlevel = __vsf_eda_queue_protect();
-    pthis->readable_cnt++;
-    __vsf_eda_queue_unprotect(origlevel);
-}
-
-SECTION(".text.vsf.kernel.vsf_eda_queue")
 static bool ____vsf_eda_queue_enqueue(vsf_eda_queue_t *pthis, void *node, bool readable)
 #else
 #   define __vsf_eda_queue_enqueue(__queue, __node, __readable)                 \
@@ -309,6 +301,18 @@ void vsf_eda_queue_cancel(vsf_eda_queue_t *pthis)
 }
 
 #if VSF_EDA_QUEUE_CFG_SUPPORT_ISR == ENABLED
+
+SECTION(".text.vsf.kernel.vsf_eda_queue")
+void __vsf_eda_queue_notify_for_isr(vsf_eda_queue_t *pthis, bool tx)
+{
+    if (!tx) {
+        vsf_protect_t origlevel = __vsf_eda_queue_protect();
+            pthis->readable_cnt++;
+        __vsf_eda_queue_unprotect(origlevel);
+    }
+    __vsf_eda_queue_notify(pthis, tx, vsf_protect_sched());
+}
+
 SECTION(".text.vsf.kernel.vsf_eda_queue_send_isr")
 vsf_err_t vsf_eda_queue_send_isr(vsf_eda_queue_t *pthis, void *node)
 {
