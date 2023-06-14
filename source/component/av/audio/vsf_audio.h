@@ -18,6 +18,8 @@
 #ifndef __VSF_AUDIO_H__
 #define __VSF_AUDIO_H__
 
+/*============================ INCLUDES ======================================*/
+
 #include "../vsf_av_cfg.h"
 
 #if VSF_USE_AUDIO == ENABLED
@@ -45,8 +47,11 @@
 extern "C" {
 #endif
 
-/*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL != ENABLED
+#   error VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL is needed to use audio
+#endif
 
 #define __describe_audio_ticktock_stream_adapter(__name, __stream_tx, __stream_rx, __frame_size)\
             vsf_audio_ticktock_stream_adapter_t __name = {                      \
