@@ -61,7 +61,7 @@ typedef enum {
 #   include <stdbool.h>
 #endif
 
-#if !__IS_COMPILER_GCC__
+#if !__IS_COMPILER_GCC__ && !__IS_COMPILER_LLVM__
 #   include <uchar.h>
 #endif
 
@@ -78,7 +78,7 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 typedef uint_fast8_t        uintalu_t;
-typedef int_fast8_t         intalu_t; 
+typedef int_fast8_t         intalu_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
