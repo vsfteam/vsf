@@ -41,9 +41,15 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#ifdef __VSF64__
+#if     defined(__VSF64__)
 typedef uint64_t                uintalu_t;
 typedef int64_t                 intalu_t;
+#elif   defined(__VSF16__)
+typedef uint16_t                uintalu_t;
+typedef int16_t                 intalu_t;
+#elif   defined(__VSF8__)
+typedef uint8_t                 uintalu_t;
+typedef int8_t                  intalu_t;
 #else
 typedef uint32_t                uintalu_t;
 typedef int32_t                 intalu_t;
