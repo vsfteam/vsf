@@ -100,11 +100,13 @@ extern "C" {
 #else
 #   define __vsf_thread_def_stack(__name, __bytesize)
 #   define __vsf_thread_def_stack_member(__name, __bytesize)                    \
+            uint32_t canary;                                                    \
             uint64_t stack_arr[(__VSF_THREAD_STACK_SAFE_SIZE(__bytesize) + 7) / 8]\
                         ALIGN(1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT);
 #   define __vsf_thread_imp_stack(__name, __thread, __task)                     \
             __thread->use_as__vsf_thread_cb_t.stack = (__task)->param.stack_arr;\
-            __thread->use_as__vsf_thread_cb_t.stack_size = sizeof((__task)->param.stack_arr);;
+            __thread->use_as__vsf_thread_cb_t.stack_size = sizeof((__task)->param.stack_arr);\
+            __thread->canary = 0xDEADBEEF;
 #   define __vsf_eda_call_thread_prepare_stack(__name, __thread)                \
             .stack = (__thread)->stack_arr,                                     \
             .stack_size = sizeof((__thread)->stack_arr),
@@ -116,7 +118,6 @@ extern "C" {
             struct thread_cb_##__name##_t {                                     \
                 implement(vsf_thread_cb_t)                                      \
                 __VA_ARGS__                                                     \
-                uint32_t canary;                                                \
                 __vsf_thread_def_stack_member(__name, (__stack_bytesize))       \
             };                                                                  \
             struct __name {                                                     \
@@ -139,9 +140,8 @@ extern "C" {
                 __vsf_pthis->use_as__vsf_thread_cb_t.entry = (vsf_thread_entry_t *)\
                                     &vsf_thread_##__name##_entry;               \
                 __vsf_thread_imp_stack(__name, __vsf_pthis, task)               \
-                __vsf_pthis->canary = 0xDEADBEEF;                               \
                 vsf_thread_start(   &(task->use_as__vsf_thread_t),              \
-                                    &(task->param.use_as__vsf_thread_cb_t),     \
+                                    &(__vsf_pthis->use_as__vsf_thread_cb_t),    \
                                     priority);                                  \
             }                                                                   \
             void vsf_thread_##__name##_entry(                                   \
