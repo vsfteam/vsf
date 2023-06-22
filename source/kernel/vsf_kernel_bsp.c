@@ -259,7 +259,14 @@ ROOT void __post_vsf_kernel_init(void)
 {
 #if     VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD                     \
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+
+#   ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+    // no set stack, host_thread is used, remove NO_INIT because host_thread need to be initialized to 0
+    static app_main_thread_t __app_main;
+#   else
     static NO_INIT app_main_thread_t __app_main;
+#   endif
+
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     __app_main  .use_as__vsf_thread_t
 #       if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
