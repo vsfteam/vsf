@@ -88,7 +88,7 @@ extern "C" {
 //! \brief none standard memory types
 #if __IS_COMPILER_LLVM__
 #   ifdef __APPLE__
-#       define NO_INIT          
+#       define NO_INIT
 #   else
 #       define NO_INIT          __attribute__((__section__(".bss.noinit")))
 #   endif
@@ -190,7 +190,10 @@ extern "C" {
                                 __WEAK_ALIAS(__ORIGIN, __ALIAS)
 #define AT_ADDR(__ADDR)         __AT_ADDR(__ADDR)
 #define ALIGN(__N)              __ALIGN(__N)
-#define SECTION(__SEC)          __SECTION(__SEC)
+
+#ifndef SECTION
+#   define SECTION(__SEC)          __SECTION(__SEC)
+#endif
 
 #ifdef __COMPILER_WRAPPER
 #   define COMPILER_WRAPPER(__API)      __COMPILER_WRAPPER(__API)
