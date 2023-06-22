@@ -88,7 +88,7 @@ extern "C" {
 #if VSF_KERNEL_THREAD_DYNAMIC_STACK == ENABLED
 #   define __vsf_thread_def_stack(__name, __bytesize)                           \
             typedef enum {                                                      \
-                vsf_thread##__name##_stack_bytesize = __bytesize,               \
+                vsf_thread##__name##_stack_bytesize = (__bytesize),             \
             };
 #   define __vsf_thread_imp_stack(__name, __thread, __task)                     \
             __thread->use_as__vsf_thread_cb_t.stack = NULL;                     \
@@ -98,8 +98,8 @@ extern "C" {
             .stack_size = (vsf_thread##__name##_stack_bytesize),
 #else
 #   define __vsf_thread_def_stack(__name, __bytesize)                           \
-            uint64_t stack_arr[(__VSF_THREAD_STACK_SAFE_SIZE(__stack_bytesize) + 7) / 8]\
-                        ALIGN(1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT);      \
+            uint64_t stack_arr[(__VSF_THREAD_STACK_SAFE_SIZE(__bytesize) + 7) / 8]\
+                        ALIGN(1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT);
 #   define __vsf_thread_imp_stack(__name, __thread, __task)                     \
             __thread->use_as__vsf_thread_cb_t.stack = (__task)->param.stack_arr;\
             __thread->use_as__vsf_thread_cb_t.stack_size = sizeof((__task)->param.stack_arr);;
@@ -114,7 +114,7 @@ extern "C" {
                 implement(vsf_thread_cb_t)                                      \
                 __VA_ARGS__                                                     \
                 uint32_t canary;                                                \
-                __vsf_thread_def_stack(__name, __stack_bytesize)                \
+                __vsf_thread_def_stack(__name, (__stack_bytesize))              \
             };                                                                  \
             struct __name {                                                     \
                 implement(vsf_thread_t)                                         \
@@ -238,7 +238,7 @@ extern "C" {
                 __VA_ARGS__                                                     \
             };                                                                  \
             struct __name {                                                     \
-                __vsf_thread_def_stack(__name, __stack_bytesize)                \
+                __vsf_thread_def_stack(__name, (__stack_bytesize))              \
                 implement_ex(thread_cb_##__name##_t, param);                    \
             } ALIGN(8);                                                         \
             extern void vsf_thread_##__name##_start(struct __name *task,        \
@@ -301,10 +301,10 @@ extern "C" {
 
 
 #define def_vsf_thread(__name, __stack_bytesize, ...)                           \
-            __def_vsf_thread(__name, __stack_bytesize, __VA_ARGS__)
+            __def_vsf_thread(__name, (__stack_bytesize), __VA_ARGS__)
 
 #define define_vsf_thread(__name, __stack_bytesize, ...)                        \
-            def_vsf_thread(__name, __stack_bytesize, __VA_ARGS__)
+            def_vsf_thread(__name, (__stack_bytesize), __VA_ARGS__)
 
 #define def_vsf_thread_ex(__name, ...)                                          \
             __def_vsf_thread_ex(__name, __VA_ARGS__)
