@@ -114,7 +114,7 @@ extern "C" {
                 implement(vsf_thread_cb_t)                                      \
                 __VA_ARGS__                                                     \
                 uint32_t canary;                                                \
-                __vsf_thread_def_stack(__stack_bytesize)                        \
+                __vsf_thread_def_stack(__name, __stack_bytesize)                \
             };                                                                  \
             struct __name {                                                     \
                 implement(vsf_thread_t)                                         \
@@ -238,7 +238,7 @@ extern "C" {
                 __VA_ARGS__                                                     \
             };                                                                  \
             struct __name {                                                     \
-                __vsf_thread_def_stack(__stack_bytesize)                        \
+                __vsf_thread_def_stack(__name, __stack_bytesize)                \
                 implement_ex(thread_cb_##__name##_t, param);                    \
             } ALIGN(8);                                                         \
             extern void vsf_thread_##__name##_start(struct __name *task,        \
