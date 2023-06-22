@@ -87,7 +87,7 @@ void vsf_thread_exit(void)
     vsf_thread_stack_check();
 #endif
     vsf_eda_return();
-#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+#if VSF_KERNEL_THREAD_USE_HOST == ENABLED
     __vsf_kernel_host_request_fini(&pthis->req);
     __vsf_kernel_host_request_send(pthis->rep);
     __vsf_kernel_host_thread_exit(&pthis->host_thread);
@@ -119,7 +119,7 @@ static vsf_evt_t __vsf_thread_wait(vsf_thread_cb_t *pthis)
 
     VSF_KERNEL_ASSERT(pthis != NULL);
 
-#   ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+#   if VSF_KERNEL_THREAD_USE_HOST == ENABLED
     __vsf_kernel_host_request_send(pthis->rep);
     __vsf_kernel_host_request_pend(&pthis->req);
     curevt = pthis->evt;
@@ -152,7 +152,7 @@ vsf_evt_t vsf_thread_wait(void)
     VSF_KERNEL_ASSERT(NULL != thread_obj->fn.frame);
     curevt = __vsf_thread_wait((vsf_thread_cb_t *)thread_obj->fn.frame->ptr.param);
 #else
-#    ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+#   if VSF_KERNEL_THREAD_USE_HOST == ENABLED
     __vsf_kernel_host_request_send(thread_obj->rep);
     __vsf_kernel_host_request_pend(&thread_obj->req);
     curevt = thread_obj->evt;
@@ -234,14 +234,14 @@ static void __vsf_thread_entry(void)
     vsf_thread_stack_check();
 #endif
     vsf_eda_return();
-#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+#if VSF_KERNEL_THREAD_USE_HOST == ENABLED
     __vsf_kernel_host_request_send(pthis->rep);
 #else
     longjmp(*(pthis->ret), -1);
 #endif
 }
 
-#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+#if VSF_KERNEL_THREAD_USE_HOST == ENABLED
 SECTION(".text.vsf.kernel.vsf_thread")
 void __vsf_thread_host_thread(void *arg)
 {
@@ -276,7 +276,7 @@ static void __vsf_thread_stack_check(uintptr_t stack)
                     &&  (stack >= (uintptr_t)&pthis->stack[0]));
 }
 
-#   ifndef VSF_ARCH_LIMIT_NO_SET_STACK
+#   if VSF_KERNEL_THREAD_USE_HOST != ENABLED
 SECTION(".text.vsf.kernel.vsf_thread_stack_check")
 void vsf_thread_stack_check(void)
 {
@@ -360,7 +360,7 @@ static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     vsf_thread_t *pthis = (vsf_thread_t *)eda;
     VSF_KERNEL_ASSERT(pthis != NULL);
 
-#   ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+#   if VSF_KERNEL_THREAD_USE_HOST == ENABLED
     vsf_arch_irq_request_t rep = { 0 };
 
     pthis->rep = &rep;
@@ -450,7 +450,7 @@ vsf_err_t vsf_thread_start( vsf_thread_t *pthis,
         return VSF_ERR_PROVIDED_RESOURCE_NOT_ALIGNED;
     }
 
-#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+#if VSF_KERNEL_THREAD_USE_HOST == ENABLED
     thread_cb->is_inited = false;
 #endif
 
@@ -522,7 +522,7 @@ static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler,
 
     vsf_err_t err;
 
-#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+#if VSF_KERNEL_THREAD_USE_HOST == ENABLED
     err = __vsf_eda_call_eda_ex_prepare(eda_handler, param, state, true);
     VSF_KERNEL_ASSERT(VSF_ERR_NONE == err);
     if ((uintptr_t)NULL != local_buff) {

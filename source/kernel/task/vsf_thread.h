@@ -66,6 +66,10 @@ extern "C" {
                 * VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE)                        \
             + VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE)
 
+#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+// arch does not support set stack, use host_thread mode
+#   define VSF_KERNEL_THREAD_USE_HOST   ENABLED
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -397,7 +401,7 @@ def_class(vsf_thread_cb_t,
     )
 
     private_member(
-#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+#if VSF_KERNEL_THREAD_USE_HOST == ENABLED
         vsf_arch_irq_thread_t   host_thread;
         vsf_arch_irq_request_t  req, *rep;
         vsf_evt_t               evt;
@@ -442,7 +446,7 @@ def_class(vsf_thread_t,
     )
 
     private_member(
-#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+#if VSF_KERNEL_THREAD_USE_HOST == ENABLED
         vsf_arch_irq_thread_t   host_thread;
         vsf_arch_irq_request_t  req, *rep;
         vsf_evt_t               evt;

@@ -260,7 +260,7 @@ ROOT void __post_vsf_kernel_init(void)
 #if     VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD                     \
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 
-#   ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+#   if VSF_KERNEL_THREAD_USE_HOST == ENABLED
     // no set stack, host_thread is used, remove NO_INIT because host_thread need to be initialized to 0
     static app_main_thread_t __app_main;
 #   else

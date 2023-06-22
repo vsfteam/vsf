@@ -37,8 +37,8 @@
 /*============================ MACROS ========================================*/
 
 #ifdef VSF_ARCH_ENTRY_NO_PENDING
-#   ifndef VSF_ARCH_LIMIT_NO_SET_STACK
-#       error VSF_ARCH_ENTRY_NO_PENDING depends on VSF_ARCH_LIMIT_NO_SET_STACK
+#   if VSF_KERNEL_THREAD_USE_HOST != ENABLED
+#       error VSF_ARCH_ENTRY_NO_PENDING depends on VSF_KERNEL_THREAD_USE_HOST
 #   endif
 #   ifdef VSF_ARCH_IRQ_SUPPORT_STACK
 #       error TODO: add configuration to set stack of main_thread

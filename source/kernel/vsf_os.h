@@ -89,7 +89,7 @@ extern "C" {
 #define vsf_unprotect_sched(__prot)         vsf_unprotect_scheduler(__prot)
 
 // kernel wrapper for host_request and host_thread
-#ifdef VSF_ARCH_LIMIT_NO_SET_STACK
+#if VSF_KERNEL_THREAD_USE_HOST == ENABLED
 #   ifdef VSF_ARCH_IRQ_REQUEST_SUPPORT_MANUAL_RESET
 #       define __vsf_kernel_host_request_init(__req)    __vsf_arch_irq_request_init((__req), true)
 #   else
