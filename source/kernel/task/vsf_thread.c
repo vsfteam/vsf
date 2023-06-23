@@ -426,8 +426,10 @@ vsf_err_t vsf_thread_start( vsf_thread_t *pthis,
 {
     VSF_KERNEL_ASSERT(pthis != NULL && NULL != thread_cb);
     VSF_KERNEL_ASSERT(      (0 != thread_cb->stack_size)
-                        &&  (NULL != thread_cb->stack)
                         &&  (NULL != thread_cb->entry));
+#if VSF_KERNEL_THREAD_DYNAMIC_STACK != ENABLED
+    VSF_KERNEL_ASSERT(NULL != thread_cb->stack);
+#endif
 
     vsf_eda_cfg_t cfg = {
         .fn.param_evthandler    = (vsf_param_eda_evthandler_t)__vsf_thread_evthandler,
@@ -479,8 +481,10 @@ vsf_err_t vk_eda_call_thread_prepare(vsf_thread_cb_t *pthis,
 {
     VSF_KERNEL_ASSERT(NULL != cfg && NULL != pthis);
     VSF_KERNEL_ASSERT(    (NULL != cfg->entry)
-                    &&    (NULL != cfg->stack)
                     &&    (cfg->stack_size >= 8));
+#if VSF_KERNEL_THREAD_DYNAMIC_STACK != ENABLED
+    VSF_KERNEL_ASSERT(NULL != cfg->stack);
+#endif
 
     pthis->entry = cfg->entry;
     pthis->stack = cfg->stack;
@@ -609,8 +613,10 @@ vsf_err_t vk_thread_call_thread(vsf_thread_cb_t *pthis,
         },
     };
     VSF_KERNEL_ASSERT(    (NULL != cfg->entry)
-                    &&    (NULL != cfg->stack)
                     &&    (cfg->stack_size >= 8));
+#if VSF_KERNEL_THREAD_DYNAMIC_STACK != ENABLED
+    VSF_KERNEL_ASSERT(NULL != cfg->stack);
+#endif
 
     pthis->entry = cfg->entry;
     pthis->stack = cfg->stack;
@@ -650,8 +656,10 @@ vsf_err_t vsf_thread_start(vsf_thread_t *pthis, vsf_prio_t priority)
 {
     VSF_KERNEL_ASSERT(pthis != NULL);
     VSF_KERNEL_ASSERT(      (NULL != pthis->entry)
-                        &&  (NULL != pthis->stack)
                         &&  (0 != pthis->stack_size));
+#if VSF_KERNEL_THREAD_DYNAMIC_STACK != ENABLED
+    VSF_KERNEL_ASSERT(NULL != pthis->stack);
+#endif
     pthis->fn.evthandler = __vsf_thread_evthandler;
 
     if (pthis->stack_size < (VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE + VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE)) {

@@ -71,6 +71,11 @@ extern "C" {
 #   define VSF_KERNEL_THREAD_USE_HOST                   ENABLED
 #   ifdef VSF_ARCH_RTOS_DYNAMIC_STACK
 #       define VSF_KERNEL_THREAD_DYNAMIC_STACK          ENABLED
+#       if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
+#           warning VSF_KERNEL_CFG_THREAD_STACK_CHECK is not usable for dynamic stack
+#           undef VSF_KERNEL_CFG_THREAD_STACK_CHECK
+#           define VSF_KERNEL_CFG_THREAD_STACK_CHECK    DISABLED
+#       endif
 #   endif
 #endif
 
