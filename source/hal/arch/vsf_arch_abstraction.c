@@ -138,6 +138,7 @@ typedef struct __systimer_t {
     vsf_systimer_tick_t tick;
     vsf_systimer_tick_t cycle_per_tick;
     vsf_systimer_tick_t cycle_per_us;
+    vsf_systimer_tick_t cycle_per_ms;
 } __systimer_t;
 #endif
 
@@ -537,13 +538,11 @@ bool on_arch_systimer_tick_evt(vsf_systimer_tick_t tick)
 #if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
     ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
 
-#   ifndef WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR
 WEAK(vsf_arch_req___systimer_freq___from_usr)
 uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void)
 {
     return VSF_GET_MAIN_CLK();
 }
-#   endif
 
 
 WEAK(vsf_systimer_us_to_tick)
@@ -751,17 +750,17 @@ vsf_systimer_tick_t vsf_systimer_get(void)
                 /* This patch is used to prevent the output result is not
                  * monotonically increasing.
                  *
-                 * Normally, this condition should not occur. But in some rare 
-                 * cases, two or more unrelated tasks may submit the same 
-                 * delay-request within a very short period of time. It has 
+                 * Normally, this condition should not occur. But in some rare
+                 * cases, two or more unrelated tasks may submit the same
+                 * delay-request within a very short period of time. It has
                  * nothing to do with the length of the delay-request, but
                  * the interval between their submitted requests will the
                  * SystTick Reload value. When the interval is determine
-                 * extremely small, it may actually occur that the system has 
-                 * overflowed many times before the processor responds to the 
-                 * SysTick Exception. In this case circumstances, the current 
+                 * extremely small, it may actually occur that the system has
+                 * overflowed many times before the processor responds to the
+                 * SysTick Exception. In this case circumstances, the current
                  * Tick (i.e. ticks) value may be smaller than the previous
-                 * Tick (i.e __ticks_prev) value. 
+                 * Tick (i.e __ticks_prev) value.
                  * This patch is a workaround for this situation.
                  */
                 ticks = __ticks_prev + 1;
@@ -902,25 +901,17 @@ bool vsf_systimer_is_due(vsf_systimer_tick_t due)
  *----------------------------------------------------------------------------*/
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE
 
-
-#   ifndef WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR
 WEAK(vsf_arch_req___systimer_freq___from_usr)
 uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void)
 {
     return VSF_GET_MAIN_CLK();
 }
-#   endif
 
-
-
-#   ifndef WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR
 WEAK(vsf_arch_req___systimer_resolution___from_usr)
 uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
 {
     return 1000ul;          //!< 1ms (1KHz)
 }
-#   endif
-
 
 WEAK(vsf_systimer_us_to_tick)
 vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
@@ -937,7 +928,7 @@ WEAK(vsf_systimer_ms_to_tick)
 vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 {
     vsf_systimer_tick_t tick = (vsf_systimer_tick_t)time_ms
-                             *  __systimer.cycle_per_us * 1000ul;
+                             *  __systimer.cycle_per_ms;
     tick /= __systimer.cycle_per_tick;
     tick = vsf_max(1, tick);
 
@@ -955,7 +946,9 @@ vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
 WEAK(vsf_systimer_tick_to_ms)
 vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
 {
-    return vsf_systimer_tick_to_us(tick) / 1000;
+    tick *= __systimer.cycle_per_tick;
+    tick /= __systimer.cycle_per_ms;
+    return tick;
 }
 
 /*! \brief systimer overflow event handler which is called by target timer
@@ -1001,13 +994,18 @@ vsf_err_t vsf_systimer_init(void)
         __systimer.cycle_per_us = 1;
     }
 
+    __systimer.cycle_per_ms = clock_src_freq / 1000ul;
+    if (0 == __systimer.cycle_per_ms) {
+        __systimer.cycle_per_ms = 1;
+    }
+
     return vsf_systimer_low_level_init(__systimer.cycle_per_tick);
 }
 
 WEAK(vsf_systimer_get_freq)
 uint32_t vsf_systimer_get_freq(void)
 {
-    return vsf_arch_req___systimer_resolution___from_usr();
+    return vsf_arch_req___systimer_freq___from_usr();
 }
 
 WEAK(vsf_systimer_set_idle)
