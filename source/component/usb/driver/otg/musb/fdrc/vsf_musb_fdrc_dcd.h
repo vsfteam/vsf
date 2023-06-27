@@ -25,6 +25,7 @@
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED
 
 #include "hal/vsf_hal.h"
+#include "./vsf_musb_fdrc_hw.h"
 
 #if     defined(__VSF_MUSB_FDRC_DCD_CLASS_IMPLEMENT)
 #   undef __VSF_MUSB_FDRC_DCD_CLASS_IMPLEMENT
@@ -64,7 +65,11 @@ vsf_class(vk_musb_fdrc_dcd_t) {
     )
 
     private_member(
-        void *reg;
+        vk_musb_fdrc_reg_t *reg;
+#if defined(VSF_MUSB_FDRC_NO_EP_IDX) || defined(VSF_MUSB_FDRC_NO_HWFIFO)
+        vk_musb_fdrc_reg_t __reg;
+#endif
+
         struct {
             usb_dc_evthandler_t evthandler;
             void *param;
