@@ -87,7 +87,7 @@ uint_fast16_t vk_musb_fdrc_rx_fifo_size(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep
 void vk_musb_fdrc_fifo_init(vk_musb_fdrc_reg_t *reg)
 {
 #if defined(VSF_MUSB_FDRC_NO_HWFIFO)
-    memset(reg->FIFO, 0, sizeof(reg->FIFO));
+    memset(reg->__fifo, 0, sizeof(reg->__fifo));
 #endif
 }
 
