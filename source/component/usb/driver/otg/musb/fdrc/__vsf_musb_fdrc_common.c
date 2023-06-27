@@ -95,7 +95,7 @@ void vk_musb_fdrc_set_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint16_t po
 {
     uint_fast8_t ep_no = ep & 0x0F, ep_dir = !!(ep & 0x80);
 #if defined(VSF_MUSB_FDRC_NO_HWFIFO)
-    VSF_USB_ASSERT(ep < simof(reg->FIFO->FIFO));
+    VSF_USB_ASSERT(ep < dimof(reg->FIFO->FIFO));
     void *fifo = (void *)&reg->__fifo[pos];
     reg->FIFO[ep_dir].FIFO[ep_no] = fifo;
     reg->set_ep_fifo(reg->param, ep, fifo, size);
@@ -115,7 +115,7 @@ void vk_musb_fdrc_read_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *b
     uint8_t *fifo;
 
     VSF_USB_ASSERT(size <= vk_musb_fdrc_rx_fifo_size(reg, ep));
-    VSF_USB_ASSERT(ep < simof(reg->FIFO->FIFO));
+    VSF_USB_ASSERT(ep < dimof(reg->FIFO->FIFO));
 
 #if defined(VSF_MUSB_FDRC_NO_HWFIFO)
     fifo = (uint8_t *)((uint32_t)&reg->FIFO[0].FIFO[ep]);
@@ -132,7 +132,7 @@ void vk_musb_fdrc_write_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *
 {
     uint8_t *fifo;
 
-    VSF_USB_ASSERT(ep < simof(reg->FIFO->FIFO));
+    VSF_USB_ASSERT(ep < dimof(reg->FIFO->FIFO));
 
     ep &= 0x0F;
 #if defined(VSF_MUSB_FDRC_NO_HWFIFO)
