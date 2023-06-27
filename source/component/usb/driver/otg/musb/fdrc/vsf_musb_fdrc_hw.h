@@ -236,7 +236,7 @@ typedef struct vk_musb_fdrc_reg_t {
 #       define VSF_MUSB_FDRC_FIFO_SIZE          (1024)
 #   endif
     // some musb instance have no hw fifo, so need fifos from user(driver)
-    uint8_t __fifo[VSF_MUSB_FDRC_FIFO_SIZE];
+    uint64_t __fifo[VSF_MUSB_FDRC_FIFO_SIZE >> 3] ALIGN(8);
     vk_musb_fdrc_fifo_reg_t __fifo_reg[2];
     void (*set_ep_fifo)(void *param, uint8_t ep, void *buffer, uint_fast16_t size);
 #endif
