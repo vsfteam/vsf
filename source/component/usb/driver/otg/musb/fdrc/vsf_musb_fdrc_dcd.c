@@ -64,7 +64,6 @@ vsf_err_t vk_musb_fdrc_usbd_init(vk_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg)
 #if defined(VSF_MUSB_FDRC_NO_EP_IDX) || defined(VSF_MUSB_FDRC_NO_HWFIFO)
     usbd->__reg = info.use_as__vk_musb_fdrc_reg_t;
     usbd->__reg.__cur_ep = 0;
-    usbd->__reg.FIFO = usbd->__reg.__fifo_reg;
     usbd->reg = &usbd->__reg;
 #else
     usbd->reg = info.regbase;

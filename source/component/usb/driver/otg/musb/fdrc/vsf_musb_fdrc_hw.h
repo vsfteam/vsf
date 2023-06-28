@@ -33,9 +33,6 @@ extern "C" {
 
 // Common.Power
 #define MUSB_POWER_ISOUPDATE            ((uint8_t)(1 << 7))
-#define MUSB_POWER_SOFTCONN             ((uint8_t)(1 << 6))
-#define MUSB_POWER_HSENAB               ((uint8_t)(1 << 5))
-#define MUSB_POWER_HSMODE               ((uint8_t)(1 << 4))
 #define MUSB_POWER_RESET                ((uint8_t)(1 << 3))
 #define MSUB_POWER_RESUME               ((uint8_t)(1 << 2))
 #define MSUB_POWER_SUSPENDM             ((uint8_t)(1 << 1))
@@ -192,10 +189,6 @@ typedef struct vk_musb_fdrc_epn_reg_t {
     volatile vk_musb_reg_t TxInterval;    // for host only
     volatile vk_musb_reg_t RxType;        // for host only
     volatile vk_musb_reg_t RxInterval;    // for host only
-    volatile vk_musb_reg_t TxFIFO1;
-    volatile vk_musb_reg_t TxFIFO2;
-    volatile vk_musb_reg_t RxFIFO1;
-    volatile vk_musb_reg_t RxFIFO2;
 } vk_musb_fdrc_epn_reg_t;
 
 typedef union vk_musb_fdrc_fifo_reg_t {
