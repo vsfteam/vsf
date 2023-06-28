@@ -138,12 +138,13 @@ void vk_musb_fdrc_write_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *
 {
     uint8_t *fifo;
 
+    ep &= 0x0F;
     VSF_USB_ASSERT(ep < dimof(reg->FIFO->FIFO));
 
-    ep &= 0x0F;
 #if defined(VSF_MUSB_FDRC_NO_HWFIFO)
     fifo = (uint8_t *)reg->FIFO[1].FIFO[ep];
     memcpy(fifo, buffer, size);
+    reg->write_ep_fifo(reg->param, ep, size);
 #else
     fifo = (uint8_t *)&reg->FIFO->FIFO[ep];
     while (size--) {

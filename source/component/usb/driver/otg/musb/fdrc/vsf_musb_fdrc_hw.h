@@ -232,6 +232,7 @@ typedef struct vk_musb_fdrc_reg_t {
     uint64_t __fifo[VSF_MUSB_FDRC_FIFO_SIZE >> 3] ALIGN(8);
     vk_musb_fdrc_fifo_reg_t __fifo_reg[2];
     void (*set_ep_fifo)(void *param, uint8_t ep, void *buffer, uint_fast16_t size);
+    void (*write_ep_fifo)(void *param, uint8_t ep, uint_fast16_t size);
 #endif
 } vk_musb_fdrc_reg_t;
 
