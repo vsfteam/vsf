@@ -32,10 +32,10 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __CONNECT_H__
-#define __CONNECT_H__
+#ifndef __VSF_CONNECT_H__
+#define __VSF_CONNECT_H__
 
-#include "../ooc_class.h"
+#include "./vsf_eval_macro.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -95,7 +95,7 @@ extern "C" {
 
 #if defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
 //! overload VSF_MCONNECT
-#   define VSF_MCONNECT(...)     __PLOOC_EVAL(VSF_MCONNECT, __VA_ARGS__)(__VA_ARGS__)
+#   define VSF_MCONNECT(...)     VSF_EVAL_MACRO(VSF_MCONNECT, __VA_ARGS__)(__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus
