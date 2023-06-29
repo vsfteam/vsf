@@ -19,7 +19,9 @@
 #if     !defined(__cplusplus)
 // wchar_t MSUT match the real wchar_t in the compiler, if not, fix here
 //  eg: for GCC, wchar_t is int
-#   ifdef __WIN__
+#   if      defined(__WCHAR_TYPE__)
+typedef __WCHAR_TYPE__              wchar_t;
+#   elif    defined(__WIN__)
 typedef unsigned short              wchar_t;
 #   elif __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
 typedef int                         wchar_t;
@@ -28,7 +30,11 @@ typedef int                         wchar_t;
 typedef unsigned short              wchar_t;
 #   endif
 #endif
+#ifdef __WINT_TYPE__
+typedef __WINT_TYPE__               wint_t;
+#else
 typedef unsigned short              wint_t;
+#endif
 
 // include compiler detect only, do not include compiler.h
 #include "utilities/compiler/compiler_detect.h"
@@ -85,7 +91,7 @@ typedef struct {
 #else
 #endif
 
-#if defined(__IS_COMPILER_ARM_COMPILER_6__) && defined(__PTRDIFF_TYPE__)
+#if defined(__PTRDIFF_TYPE__)
 typedef __PTRDIFF_TYPE__            ptrdiff_t;
 #elif defined(__WIN__)
 #   if defined(__CPU_X86__)

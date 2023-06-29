@@ -36,7 +36,14 @@ extern "C" {
 #   pragma diag_suppress=pe301
 #endif
 
-#if defined(__CPU_X64__) || defined(__CPU_WEBASSEMBLY__)
+#if     defined(__SIZE_TYPE__)
+typedef __SIZE_TYPE__       size_t;
+#   ifdef __VSF64__
+typedef long long           ssize_t;
+#   else
+typedef long                ssize_t;
+#   endif
+#elif   defined(__CPU_X64__) || defined(__CPU_WEBASSEMBLY__)
 #   ifdef __WIN__
 typedef long long           ssize_t;
 typedef unsigned long long  size_t;
