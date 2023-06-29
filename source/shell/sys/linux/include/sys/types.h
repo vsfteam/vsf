@@ -38,29 +38,34 @@ extern "C" {
 
 #if     defined(__SIZE_TYPE__)
 typedef __SIZE_TYPE__       size_t;
-#   ifdef __VSF64__
-typedef long long           ssize_t;
-#   else
-typedef long                ssize_t;
-#   endif
 #elif   defined(__CPU_X64__) || defined(__CPU_WEBASSEMBLY__)
 #   ifdef __WIN__
-typedef long long           ssize_t;
 typedef unsigned long long  size_t;
 #   else
-typedef long                ssize_t;
 typedef unsigned long int   size_t;
 #   endif
 #else
 #   ifdef __VSF64__
-typedef long long           ssize_t;
 typedef unsigned long long  size_t;
+#   else
+typedef unsigned int        size_t;
+#   endif
+#endif
+
+#if   defined(__CPU_X64__) || defined(__CPU_WEBASSEMBLY__)
+#   ifdef __WIN__
+typedef long long           ssize_t;
+#   else
+typedef long                ssize_t;
+#   endif
+#else
+#   ifdef __VSF64__
+typedef long long           ssize_t;
 #   ifndef SSIZE_MAX
 #       define SSIZE_MAX    LLONG_MAX
 #   endif
 #   else
 typedef int                 ssize_t;
-typedef unsigned int        size_t;
 #   ifndef SSIZE_MAX
 #       define SSIZE_MAX    INT_MAX
 #   endif
