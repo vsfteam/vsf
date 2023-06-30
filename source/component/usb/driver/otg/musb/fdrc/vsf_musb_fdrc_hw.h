@@ -189,13 +189,16 @@ typedef struct vk_musb_fdrc_epn_reg_t {
     volatile vk_musb_reg_t TxInterval;    // for host only
     volatile vk_musb_reg_t RxType;        // for host only
     volatile vk_musb_reg_t RxInterval;    // for host only
+} vk_musb_fdrc_epn_reg_t;
+
 #ifdef VSF_MUSB_FDRC_DYNAMIC_FIFO
+typedef struct vk_musb_fdrc_epn_dynfifo_reg_t {
     volatile vk_musb_reg_t TxFIFO1;
     volatile vk_musb_reg_t TxFIFO2;
     volatile vk_musb_reg_t RxFIFO1;
     volatile vk_musb_reg_t RxFIFO2;
+} typedef struct vk_musb_fdrc_epn_dynfifo_reg_t;
 #endif
-} vk_musb_fdrc_epn_reg_t;
 
 typedef union vk_musb_fdrc_fifo_reg_t {
     struct {
@@ -220,6 +223,9 @@ typedef struct vk_musb_fdrc_reg_t {
     vk_musb_fdrc_common_reg_t *Common;
     vk_musb_fdrc_ep_reg_t *EP;
     vk_musb_fdrc_fifo_reg_t *FIFO;
+#ifdef VSF_MUSB_FDRC_DYNAMIC_FIFO
+    vk_musb_fdrc_epn_dynfifo_reg_t *DynFIFO;
+#endif
 
 #if defined(VSF_MUSB_FDRC_NO_EP_IDX) || defined(VSF_MUSB_FDRC_NO_HWFIFO)
     void *param;
@@ -235,6 +241,7 @@ typedef struct vk_musb_fdrc_reg_t {
 #       define VSF_MUSB_FDRC_FIFO_SIZE          (1024)
 #   endif
     // some musb instance have no hw fifo, so need fifos from user(driver)
+    // granularity of musb fifo is 8-byte
     uint64_t __fifo[VSF_MUSB_FDRC_FIFO_SIZE >> 3] ALIGN(8);
     vk_musb_fdrc_fifo_reg_t __fifo_reg[2];
     void (*set_ep_fifo)(void *param, uint8_t ep, void *buffer, uint_fast16_t size);

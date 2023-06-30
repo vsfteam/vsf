@@ -107,11 +107,11 @@ void vk_musb_fdrc_set_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint16_t po
     reg->set_ep_fifo(reg->param, ep, fifo, size);
 #elif   defined(VSF_MUSB_FDRC_DYNAMIC_FIFO)
     if (ep_dir) {
-        reg->EP->EPN.TxFIFO1 = pos & 0xFF;
-        reg->EP->EPN.TxFIFO2 = ((pos >> 8) & 0x0F) | (size_msk << 5);
+        reg->DynFIFO->TxFIFO1 = pos & 0xFF;
+        reg->DynFIFO->TxFIFO2 = ((pos >> 8) & 0x0F) | (size_msk << 5);
     } else {
-        reg->EP->EPN.RxFIFO1 = pos & 0xFF;
-        reg->EP->EPN.RxFIFO2 = ((pos >> 8) & 0x0F) | (size_msk << 5);
+        reg->DynFIFO->RxFIFO1 = pos & 0xFF;
+        reg->DynFIFO->RxFIFO2 = ((pos >> 8) & 0x0F) | (size_msk << 5);
     }
 #else
     #error unknown fifo
