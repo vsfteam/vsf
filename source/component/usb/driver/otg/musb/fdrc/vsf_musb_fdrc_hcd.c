@@ -514,6 +514,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
             musb->reg = info.regbase;
 #endif
             reg = musb->reg;
+            vk_musb_fdrc_fifo_init(reg);
             musb->epnum = info.ep_num;
             // ep0 is reserved for control transfer
             musb->ep_out_mask = musb->ep_in_mask = (0xFFFF & ~((1 << musb->epnum) - 1)) | 1;
