@@ -189,6 +189,12 @@ typedef struct vk_musb_fdrc_epn_reg_t {
     volatile vk_musb_reg_t TxInterval;    // for host only
     volatile vk_musb_reg_t RxType;        // for host only
     volatile vk_musb_reg_t RxInterval;    // for host only
+#ifdef VSF_MUSB_FDRC_DYNAMIC_FIFO
+    volatile vk_musb_reg_t TxFIFO1;
+    volatile vk_musb_reg_t TxFIFO2;
+    volatile vk_musb_reg_t RxFIFO1;
+    volatile vk_musb_reg_t RxFIFO2;
+#endif
 } vk_musb_fdrc_epn_reg_t;
 
 typedef union vk_musb_fdrc_fifo_reg_t {
