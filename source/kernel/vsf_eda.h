@@ -1240,7 +1240,6 @@ extern vsf_err_t vsf_teda_set_timer(vsf_systimer_tick_t tick);
 SECTION(".text.vsf.kernel.vsf_teda_set_timer_ex")
 extern vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *pthis, vsf_systimer_tick_t tick);
 
-#   if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 static inline vsf_err_t vsf_teda_set_timer_ms(uint_fast32_t ms)
 {
     return vsf_teda_set_timer(vsf_systimer_ms_to_tick(ms));
@@ -1250,7 +1249,6 @@ static inline vsf_err_t vsf_teda_set_timer_us(uint_fast32_t us)
 {
     return vsf_teda_set_timer(vsf_systimer_us_to_tick(us));
 }
-#   endif
 
 SECTION(".text.vsf.kernel.vsf_teda_cancel_timer")
 extern vsf_err_t vsf_teda_cancel_timer(void);
