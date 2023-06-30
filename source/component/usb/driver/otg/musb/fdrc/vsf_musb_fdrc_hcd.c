@@ -36,6 +36,10 @@
 
 typedef struct vk_musb_fdrc_hcd_t {
     vk_musb_fdrc_reg_t *reg;
+#if defined(VSF_MUSB_FDRC_NO_EP_IDX) || defined(VSF_MUSB_FDRC_NO_HWFIFO)
+    vk_musb_fdrc_reg_t __reg;
+#endif
+
     enum vk_musb_fdrc_hcd_state_t {
         MUSB_FDRC_HCD_STATE_WAIT_HOSTMODE,
         MUSB_FDRC_HCD_STATE_WAIE_CONNECT,
@@ -500,9 +504,16 @@ static vsf_err_t __vk_musb_fdrc_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
             param->op->Init(&cfg);
         }
         {
-            usb_hc_ip_info_t info;
-            param->op->GetInfo(&info);
-            reg = musb->reg = info.regbase;
+            vk_musb_fdrc_hc_ip_info_t info;
+            param->op->GetInfo(&info.use_as__usb_hc_ip_info_t);
+#if defined(VSF_MUSB_FDRC_NO_EP_IDX) || defined(VSF_MUSB_FDRC_NO_HWFIFO)
+            musb->__reg = info.use_as__vk_musb_fdrc_reg_t;
+            musb->__reg.__cur_ep = 0;
+            musb->reg = &musb->__reg;
+#else
+            musb->reg = info.regbase;
+#endif
+            reg = musb->reg;
             musb->epnum = info.ep_num;
             // ep0 is reserved for control transfer
             musb->ep_out_mask = musb->ep_in_mask = (0xFFFF & ~((1 << musb->epnum) - 1)) | 1;

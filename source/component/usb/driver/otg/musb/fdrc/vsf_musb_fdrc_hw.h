@@ -249,10 +249,19 @@ typedef struct vk_musb_fdrc_reg_t {
 #endif
 } vk_musb_fdrc_reg_t;
 
+#if (VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED)
 typedef struct vk_musb_fdrc_dc_ip_info_t {
     implement(usb_dc_ip_info_t)
     implement(vk_musb_fdrc_reg_t)
 } vk_musb_fdrc_dc_ip_info_t;
+#endif
+
+#if (VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_MUSB_FDRC == ENABLED)
+typedef struct vk_musb_fdrc_hc_ip_info_t {
+    implement(usb_hc_ip_info_t)
+    implement(vk_musb_fdrc_reg_t)
+} vk_musb_fdrc_hc_ip_info_t;
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ INCLUDES ======================================*/
