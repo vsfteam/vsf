@@ -31,7 +31,7 @@
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
-#   include "../../include/libusb.h"
+#   include "../../include/libusb/libusb.h"
 
 #   include "../../include/poll.h"
 #   include "../../include/pthread.h"
