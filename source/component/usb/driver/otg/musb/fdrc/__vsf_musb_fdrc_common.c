@@ -106,6 +106,9 @@ void vk_musb_fdrc_set_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint16_t po
     }
     reg->set_ep_fifo(reg->param, ep, fifo, size);
 #elif   defined(VSF_MUSB_FDRC_DYNAMIC_FIFO)
+    if (0 == ep_no) {
+        // EP0 fifo should be at position 0
+        VSF_USB_ASSERT(0 == pos);
     if (ep_dir) {
         reg->DynFIFO->TxFIFO1 = pos & 0xFF;
         reg->DynFIFO->TxFIFO2 = ((pos >> 8) & 0x0F) | (size_msk << 5);

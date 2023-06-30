@@ -87,6 +87,7 @@ typedef enum vk_musb_fdrc_hcd_evt_t {
 
 /*============================ PROTOTYPES ====================================*/
 
+// Note that the first 64-byte in fifo is reserved for EP0, DO NOT use
 extern uint_fast16_t vsf_musb_fdrc_hcd_alloc_fifo(vk_usbh_hcd_t *hcd, vk_usbh_pipe_t pipe);
 extern void vsf_musb_fdrc_hcd_free_fifo(vk_usbh_hcd_t *hcd, uint_fast16_t fifo);
 
@@ -119,22 +120,18 @@ const vk_usbh_hcd_drv_t vk_musb_fdrc_hcd_drv = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_DWCOTG_HCD_ALLOC_FIFO
 WEAK(vsf_musb_fdrc_hcd_alloc_fifo)
 uint_fast16_t vsf_musb_fdrc_hcd_alloc_fifo(vk_usbh_hcd_t *hcd, vk_usbh_pipe_t pipe)
 {
     VSF_USB_ASSERT(false);
     return 0;
 }
-#endif
 
-#ifndef WEAK_VSF_DWCOTG_HCD_FREE_FIFO
 WEAK(vsf_musb_fdrc_hcd_free_fifo)
 void vsf_musb_fdrc_hcd_free_fifo(vk_usbh_hcd_t *hcd, uint_fast16_t fifo)
 {
     VSF_USB_ASSERT(false);
 }
-#endif
 
 vk_usbh_hcd_urb_t *__vk_musb_fdrc_hcd_get_urb(vk_musb_fdrc_hcd_t *musb, uint_fast8_t epidx)
 {
@@ -155,8 +152,8 @@ static void __vk_musb_fdrc_hcd_interrupt(void *param)
     vk_musb_fdrc_hcd_t *musb = param;
     vk_musb_fdrc_reg_t *reg = musb->reg;
 
-    uint_fast32_t status = reg->Common.IntrUSB;
-    status &= reg->Common.IntrUSBE;
+    uint_fast32_t status = reg->Common->IntrUSB;
+    status &= reg->Common->IntrUSBE;
 
     if (status & MUSB_INTRUSB_RESUME) {
     }
@@ -181,10 +178,10 @@ static void __vk_musb_fdrc_hcd_interrupt(void *param)
     // EP interrupt
     // lower 16-bit is ep_out, higher 16-bit is ep_in
     status = 0;
-    status =    (vk_musb_fdrc_get_mask(&reg->Common.IntrTx1) << 0)
-            |   (vk_musb_fdrc_get_mask(&reg->Common.IntrRx1) << 16);
-    status &=   (vk_musb_fdrc_get_mask(&reg->Common.IntrTx1E) << 0)
-            |   (vk_musb_fdrc_get_mask(&reg->Common.IntrRx1E) << 16);
+    status =    (vk_musb_fdrc_get_mask(&reg->Common->IntrTx1) << 0)
+            |   (vk_musb_fdrc_get_mask(&reg->Common->IntrRx1) << 16);
+    status &=   (vk_musb_fdrc_get_mask(&reg->Common->IntrTx1E) << 0)
+            |   (vk_musb_fdrc_get_mask(&reg->Common->IntrRx1E) << 16);
 
     while (status > 0) {
         uint_fast8_t ep = vsf_ffs32(status);
@@ -237,42 +234,41 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
 
         if (0 == pipe.endpoint) {
             musb_urb->ep0_state = MUSB_FDRC_USBH_EP0_SETUP;
+            vk_musb_fdrc_set_fifo(reg, 0, 0, epsize, 0);
             vk_musb_fdrc_write_fifo(reg, 0, (uint8_t *)&urb->setup_packet, sizeof(urb->setup_packet));
-            reg->EP0.CSR0 &= ~(MUSBH_CSR0_SETUPPKT | MUSBH_CSR0_STATUSPKT);
-            reg->EP0.CSR0 |= MUSBH_CSR0_TXPKTRDY | MUSBH_CSR0_SETUPPKT;
+            reg->EP->EP0.CSR0 &= ~(MUSBH_CSR0_SETUPPKT | MUSBH_CSR0_STATUSPKT);
+            reg->EP->EP0.CSR0 |= MUSBH_CSR0_TXPKTRDY | MUSBH_CSR0_SETUPPKT;
             break;
         } else {
             if (is_in) {
-                reg->EPN.RxType = (pipe.type << 4) | pipe.endpoint;
-                reg->EPN.RxMAXP = epsize >> 3;
+                reg->EP->EPN.RxType = (pipe.type << 4) | pipe.endpoint;
+                reg->EP->EPN.RxMAXP = epsize >> 3;
                 if (is_iso) {
-                    reg->EPN.RxInterval = 1;
+                    reg->EP->EPN.RxInterval = 1;
                 } else {
-                    reg->EPN.RxInterval = 0;
+                    reg->EP->EPN.RxInterval = 0;
                 }
 
-                reg->EPN.RxFIFO1 = (musb_urb->fifo >> 0) & 0xFF;
-                reg->EPN.RxFIFO2 = (musb_urb->fifo >> 8) & 0xFF;
-                reg->EPN.RxCSR1 |= MUSBH_RXCSR1_FLUSHFIFO;
+                vk_musb_fdrc_set_fifo(reg, pipe.endpoint | 0x80, musb_urb->fifo, epsize, 0);
+                reg->EP->EPN.RxCSR1 |= MUSBH_RXCSR1_FLUSHFIFO;
             } else {
-                reg->EPN.TxType = (pipe.type << 4) | pipe.endpoint;
-                reg->EPN.TxMAXP = epsize >> 3;
+                reg->EP->EPN.TxType = (pipe.type << 4) | pipe.endpoint;
+                reg->EP->EPN.TxMAXP = epsize >> 3;
                 if (is_iso) {
-                    reg->EPN.TxInterval = 1;
+                    reg->EP->EPN.TxInterval = 1;
                 } else {
-                    reg->EPN.TxInterval = 0;
+                    reg->EP->EPN.TxInterval = 0;
                 }
 
-                reg->EPN.TxFIFO1 = (musb_urb->fifo >> 0) & 0xFF;
-                reg->EPN.TxFIFO2 = (musb_urb->fifo >> 8) & 0xFF;
+                vk_musb_fdrc_set_fifo(reg, pipe.endpoint, musb_urb->fifo, epsize, 0);
             }
             goto do_tx_rx;
         }
         // fall through
     case MUSB_FDRC_URB_STATE_SUBMITTING:
         if (0 == pipe.endpoint) {
-            errcode = reg->EP0.CSR0 & MUSBH_CSR0_ERRMASK;
-            reg->EP0.CSR0 &= ~MUSBH_CSR0_ERRMASK;
+            errcode = reg->EP->EP0.CSR0 & MUSBH_CSR0_ERRMASK;
+            reg->EP->EP0.CSR0 &= ~MUSBH_CSR0_ERRMASK;
             if (errcode) {
                 return VSF_ERR_FAIL;
             }
@@ -287,7 +283,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
                     if (musb_urb->cur_size > 0) {
                         vk_musb_fdrc_read_fifo(reg, 0, &buffer[urb->actual_length], musb_urb->cur_size);
                     }
-                    reg->EP0.CSR0 &= ~MUSBH_CSR0_RXPKTRDY;
+                    reg->EP->EP0.CSR0 &= ~MUSBH_CSR0_RXPKTRDY;
                 }
                 urb->actual_length += musb_urb->cur_size;
                 if (is_in && (musb_urb->cur_size < epsize)) {
@@ -301,19 +297,19 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
                 if (urb->actual_length >= urb->transfer_length) {
                 status_stage:
                     musb_urb->ep0_state = MUSB_FDRC_USBH_EP0_STATUS;
-                    reg->EP0.CSR0 &= ~(MUSBH_CSR0_SETUPPKT | MUSBH_CSR0_STATUSPKT);
+                    reg->EP->EP0.CSR0 &= ~(MUSBH_CSR0_SETUPPKT | MUSBH_CSR0_STATUSPKT);
                     if (is_in) {
-                        reg->EP0.CSR0 |= MUSBH_CSR0_TXPKTRDY | MUSBH_CSR0_STATUSPKT;
+                        reg->EP->EP0.CSR0 |= MUSBH_CSR0_TXPKTRDY | MUSBH_CSR0_STATUSPKT;
                     } else {
-                        reg->EP0.CSR0 |= MUSBH_CSR0_REQPKT | MUSBH_CSR0_STATUSPKT;
+                        reg->EP->EP0.CSR0 |= MUSBH_CSR0_REQPKT | MUSBH_CSR0_STATUSPKT;
                     }
                 } else {
                     if (is_in) {
-                        reg->EP0.CSR0 |= MUSBH_CSR0_REQPKT;
+                        reg->EP->EP0.CSR0 |= MUSBH_CSR0_REQPKT;
                     } else {
                         vk_musb_fdrc_write_fifo(reg, 0, &buffer[urb->actual_length], musb_urb->cur_size);
-                        reg->EP0.CSR0 &= ~(MUSBH_CSR0_SETUPPKT | MUSBH_CSR0_TXPKTRDY);
-                        reg->EP0.CSR0 |= MUSBH_CSR0_TXPKTRDY;
+                        reg->EP->EP0.CSR0 &= ~(MUSBH_CSR0_SETUPPKT | MUSBH_CSR0_TXPKTRDY);
+                        reg->EP->EP0.CSR0 |= MUSBH_CSR0_TXPKTRDY;
                     }
                 }
                 break;
@@ -322,11 +318,11 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
             }
         } else {
             if (is_in) {
-                errcode = reg->EPN.RxCSR1 & MUSBH_RXCSR1_ERRMASK;
-                reg->EPN.RxCSR1 &= ~MUSBH_RXCSR1_ERRMASK;
+                errcode = reg->EP->EPN.RxCSR1 & MUSBH_RXCSR1_ERRMASK;
+                reg->EP->EPN.RxCSR1 &= ~MUSBH_RXCSR1_ERRMASK;
             } else {
-                errcode = reg->EPN.TxCSR1 & MUSBH_TXCSR1_ERRMASK;
-                reg->EPN.TxCSR1 &= ~MUSBH_TXCSR1_ERRMASK;
+                errcode = reg->EP->EPN.TxCSR1 & MUSBH_TXCSR1_ERRMASK;
+                reg->EP->EPN.TxCSR1 &= ~MUSBH_TXCSR1_ERRMASK;
             }
             if (errcode) {
                 return VSF_ERR_FAIL;
@@ -337,7 +333,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
                 if (musb_urb->cur_size > 0) {
                     vk_musb_fdrc_read_fifo(reg, musb_urb->epidx & 0x0F, &buffer[urb->actual_length], musb_urb->cur_size);
                 }
-                reg->EPN.RxCSR1 &= ~MUSBH_RXCSR1_RXPKTRDY;
+                reg->EP->EPN.RxCSR1 &= ~MUSBH_RXCSR1_RXPKTRDY;
             }
             urb->actual_length += musb_urb->cur_size;
             if (is_in) {
@@ -353,10 +349,10 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
             do_tx_rx:
                 musb_urb->cur_size = vsf_min(epsize, (urb->transfer_length - urb->actual_length));
                 if (is_in) {
-                    reg->EPN.RxCSR1 |= MUSBH_RXCSR1_REQPKT;
+                    reg->EP->EPN.RxCSR1 |= MUSBH_RXCSR1_REQPKT;
                 } else {
                     vk_musb_fdrc_write_fifo(reg, musb_urb->epidx & 0x0F, &buffer[urb->actual_length], musb_urb->cur_size);
-                    reg->EPN.TxCSR1 |= MUSBH_TXCSR1_TXPKTRDY;
+                    reg->EP->EPN.TxCSR1 |= MUSBH_TXCSR1_TXPKTRDY;
                 }
             }
         }
@@ -367,7 +363,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
 urb_finished:
     // for set address request, set FAddr
     if ((0 == pipe.endpoint) && (0 == urb->setup_packet.bRequestType) && (0x05 == urb->setup_packet.bRequest)) {
-        reg->Common.FAddr = urb->setup_packet.wValue & 0xFF;
+        reg->Common->FAddr = urb->setup_packet.wValue & 0xFF;
     }
     return VSF_ERR_NONE;
 }
@@ -382,8 +378,8 @@ static void __vk_musb_fdrc_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         break;
     case VSF_MUSB_FDRC_HCD_EVT_CONN:
         if (MUSB_FDRC_HCD_STATE_WAIE_CONNECT == musb->state) {
-            reg->Common.FAddr = 0;
-            reg->Common.Power |= MUSB_POWER_RESET;
+            reg->Common->FAddr = 0;
+            reg->Common->Power |= MUSB_POWER_RESET;
             vsf_teda_set_timer_ms(100);
             musb->state = MUSB_FDRC_HCD_STATE_WAIT_RESET;
         }
@@ -391,24 +387,24 @@ static void __vk_musb_fdrc_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_MUSB_FDRC_HCD_EVT_DISCONN:
         if (MUSB_FDRC_HCD_STATE_CONNECTED == musb->state) {
             vk_usbh_disconnect_device((vk_usbh_t *)musb->hcd, musb->dev);
-            reg->Common.FAddr = 0;
+            reg->Common->FAddr = 0;
             musb->dev = NULL;
             musb->state = MUSB_FDRC_HCD_STATE_WAIE_CONNECT;
         }
-        reg->Common.IntrUSBE = MUSB_INTRUSBE_CONN;
+        reg->Common->IntrUSBE = MUSB_INTRUSBE_CONN;
         break;
     case VSF_EVT_TIMER:
         switch (musb->state) {
         case MUSB_FDRC_HCD_STATE_WAIT_RESET:
-            reg->Common.Power &= ~MUSB_POWER_RESET;
+            reg->Common->Power &= ~MUSB_POWER_RESET;
         delay_another_100ms:
             vsf_teda_set_timer_ms(100);
             musb->state = MUSB_FDRC_HCD_STATE_WAIT_RESET_CLEAR;
             break;
         case MUSB_FDRC_HCD_STATE_WAIT_RESET_CLEAR:
-            if (reg->Common.DevCtl & MUSB_DEVCTL_LSDEV) {
+            if (reg->Common->DevCtl & MUSB_DEVCTL_LSDEV) {
                 musb->speed = USB_SPEED_LOW;
-            } else if (reg->Common.DevCtl & MUSB_DEVCTL_FSDEV) {
+            } else if (reg->Common->DevCtl & MUSB_DEVCTL_FSDEV) {
                 musb->speed = USB_SPEED_FULL;
             } else {
                 // some device need a really long delay
@@ -417,7 +413,7 @@ static void __vk_musb_fdrc_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
             musb->state = MUSB_FDRC_HCD_STATE_CONNECTED;
             musb->dev = vk_usbh_new_device((vk_usbh_t *)musb->hcd, musb->speed, NULL, 0);
-            reg->Common.IntrUSBE = MUSB_INTRUSBE_DISCON;
+            reg->Common->IntrUSBE = MUSB_INTRUSBE_DISCON;
             break;
         }
         break;
@@ -513,16 +509,16 @@ static vsf_err_t __vk_musb_fdrc_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
         }
 
         // POWER MUST be cleared in param->op->Init
-//        reg->Common.Power = 0;
+//        reg->Common->Power = 0;
         vk_musb_fdrc_interrupt_init(reg);
-        reg->Common.IntrUSBE = MUSB_INTRUSBE_CONN;
-        reg->Common.IntrTx1E = 1 << 0;      // enable ep0 interrupt
-        reg->Common.DevCtl = MUSB_DEVCTL_SESSION;
+        reg->Common->IntrUSBE = MUSB_INTRUSBE_CONN;
+        reg->Common->IntrTx1E = 1 << 0;      // enable ep0 interrupt
+        reg->Common->DevCtl = MUSB_DEVCTL_SESSION;
         musb->state = MUSB_FDRC_HCD_STATE_WAIT_HOSTMODE;
         // fall through
     case VSF_EVT_TIMER:
         VSF_USB_ASSERT(MUSB_FDRC_HCD_STATE_WAIT_HOSTMODE == musb->state);
-        if (!(reg->Common.DevCtl & MUSB_DEVCTL_HOSTMODE)) {
+        if (!(reg->Common->DevCtl & MUSB_DEVCTL_HOSTMODE)) {
             vsf_teda_set_timer_ms(1);
         } else {
             musb->state = MUSB_FDRC_HCD_STATE_WAIE_CONNECT;
@@ -554,7 +550,7 @@ static uint_fast16_t __vk_musb_fdrc_hcd_get_frame_number(vk_usbh_hcd_t *hcd)
 {
     vk_musb_fdrc_hcd_t *musb = hcd->priv;
     vk_musb_fdrc_reg_t *reg = musb->reg;
-    return reg->Common.Frame1 + (reg->Common.Frame2 << 8);
+    return reg->Common->Frame1 + (reg->Common->Frame2 << 8);
 }
 
 static void __vk_musb_fdrc_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
@@ -567,12 +563,12 @@ static void __vk_musb_fdrc_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t
     vsf_protect_t orig = vsf_protect_sched();
         while ((musb->ep_in_mask & epmask) != 0) {
             idx = vsf_ffs32(musb->ep_in_mask);
-            vk_musb_fdrc_clear_mask(&reg->Common.IntrRx1E, idx);
+            vk_musb_fdrc_clear_mask(&reg->Common->IntrRx1E, idx);
             musb->ep_in_mask &= ~(1 << idx);
         }
         while ((musb->ep_out_mask & epmask) != 0) {
             idx = vsf_ffs32(musb->ep_out_mask);
-            vk_musb_fdrc_clear_mask(&reg->Common.IntrTx1E, idx);
+            vk_musb_fdrc_clear_mask(&reg->Common->IntrTx1E, idx);
             musb->ep_out_mask &= ~(1 << idx);
         }
     vsf_unprotect_sched(orig);
@@ -633,11 +629,11 @@ static vsf_err_t __vk_musb_fdrc_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_u
     if (pipe.dir_in1out0) {
         dir_mask = 0x10;
         ep_mask = &musb->ep_in_mask;
-        ep_inten = (uint8_t *)&musb->reg->Common.IntrRx1E;
+        ep_inten = (uint8_t *)&musb->reg->Common->IntrRx1E;
     } else {
         dir_mask = 0x00;
         ep_mask = &musb->ep_out_mask;
-        ep_inten = (uint8_t *)&musb->reg->Common.IntrTx1E;
+        ep_inten = (uint8_t *)&musb->reg->Common->IntrTx1E;
     }
 
     if (0 == pipe.endpoint) {
