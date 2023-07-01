@@ -219,7 +219,7 @@ typedef union vk_musb_fdrc_ep_reg_t {
     vk_musb_fdrc_epn_reg_t EPN;
 } vk_musb_fdrc_ep_reg_t;
 
-typedef struct vk_musb_fdrc_reg_t {
+typedef struct vk_musb_fdrc_reg_info_t {
     vk_musb_fdrc_common_reg_t *Common;
     vk_musb_fdrc_ep_reg_t *EP;
     vk_musb_fdrc_fifo_reg_t *FIFO;
@@ -231,9 +231,23 @@ typedef struct vk_musb_fdrc_reg_t {
     void *param;
 #endif
 #if defined(VSF_MUSB_FDRC_NO_EP_IDX)
-    uint8_t __cur_ep;
     // some musb instance does not support COMMON->Index register, so need get_ep_reg to get ep registers
     void * (*get_ep_reg)(void *param, uint8_t ep);
+#endif
+#if defined(VSF_MUSB_FDRC_NO_HWFIFO)
+    void (*set_ep_fifo)(void *param, uint8_t ep, void *buffer, uint_fast16_t size);
+    void (*write_ep_fifo)(void *param, uint8_t ep, uint_fast16_t size);
+#endif
+} vk_musb_fdrc_reg_info_t;
+
+typedef struct vk_musb_fdrc_reg_t {
+    union {
+        vk_musb_fdrc_reg_info_t;
+        vk_musb_fdrc_reg_info_t info;
+    };
+
+#if defined(VSF_MUSB_FDRC_NO_EP_IDX)
+    uint8_t __cur_ep;
 #endif
 #if defined(VSF_MUSB_FDRC_NO_HWFIFO)
 #   ifndef VSF_MUSB_FDRC_FIFO_SIZE
@@ -244,22 +258,20 @@ typedef struct vk_musb_fdrc_reg_t {
     // granularity of musb fifo is 8-byte
     uint64_t __fifo[VSF_MUSB_FDRC_FIFO_SIZE >> 3] ALIGN(8);
     vk_musb_fdrc_fifo_reg_t __fifo_reg[2];
-    void (*set_ep_fifo)(void *param, uint8_t ep, void *buffer, uint_fast16_t size);
-    void (*write_ep_fifo)(void *param, uint8_t ep, uint_fast16_t size);
 #endif
 } vk_musb_fdrc_reg_t;
 
 #if (VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_MUSB_FDRC == ENABLED)
 typedef struct vk_musb_fdrc_dc_ip_info_t {
     implement(usb_dc_ip_info_t)
-    implement(vk_musb_fdrc_reg_t)
+    implement(vk_musb_fdrc_reg_info_t)
 } vk_musb_fdrc_dc_ip_info_t;
 #endif
 
 #if (VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_MUSB_FDRC == ENABLED)
 typedef struct vk_musb_fdrc_hc_ip_info_t {
     implement(usb_hc_ip_info_t)
-    implement(vk_musb_fdrc_reg_t)
+    implement(vk_musb_fdrc_reg_info_t)
 } vk_musb_fdrc_hc_ip_info_t;
 #endif
 

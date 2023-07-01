@@ -507,7 +507,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
             vk_musb_fdrc_hc_ip_info_t info;
             param->op->GetInfo(&info.use_as__usb_hc_ip_info_t);
 #if defined(VSF_MUSB_FDRC_NO_EP_IDX) || defined(VSF_MUSB_FDRC_NO_HWFIFO)
-            musb->__reg = info.use_as__vk_musb_fdrc_reg_t;
+            musb->__reg.info = info.use_as__vk_musb_fdrc_reg_info_t;
             musb->__reg.__cur_ep = 0;
             musb->reg = &musb->__reg;
 #else

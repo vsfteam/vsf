@@ -62,7 +62,7 @@ vsf_err_t vk_musb_fdrc_usbd_init(vk_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg)
     vk_musb_fdrc_dc_ip_info_t info;
     usbd->param->op->GetInfo(&info.use_as__usb_dc_ip_info_t);
 #if defined(VSF_MUSB_FDRC_NO_EP_IDX) || defined(VSF_MUSB_FDRC_NO_HWFIFO)
-    usbd->__reg = info.use_as__vk_musb_fdrc_reg_t;
+    usbd->__reg.info = info.use_as__vk_musb_fdrc_reg_info_t;
     usbd->__reg.__cur_ep = 0;
     usbd->reg = &usbd->__reg;
 #else
