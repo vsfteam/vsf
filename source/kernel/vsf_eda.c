@@ -34,11 +34,7 @@
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_local_t {
-#if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
-    struct {
-        vsf_evtq_t          *cur;
-    } evtq;
-#else
+#if __VSF_KERNEL_CFG_EVTQ_EN != ENABLED
     vsf_evtq_ctx_t          cur;
 #endif
 
@@ -82,6 +78,11 @@ typedef struct vsf_local_t {
 /*============================ LOCAL VARIABLES ===============================*/
 
 static NO_INIT vsf_local_t __vsf_eda;
+#if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
+// __vsf_eda_evtq_cur MUST initialized to NULL,
+//  so vsf_eda_get_cur can be used to check whether in vsf context or not
+static vsf_evtq_t *__vsf_eda_evtq_cur = NULL;
+#endif
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -132,15 +133,15 @@ static vsf_evtq_ctx_t * __vsf_evtq_get_cur_ctx(void);
 SECTION(".text.vsf.kernel.vsf_irq_enter")
 uintptr_t vsf_irq_enter(void)
 {
-    uintptr_t ctx = (uintptr_t)__vsf_eda.evtq.cur;
-    __vsf_eda.evtq.cur = NULL;
+    uintptr_t ctx = (uintptr_t)__vsf_eda_evtq_cur;
+    __vsf_eda_evtq_cur = NULL;
     return ctx;
 }
 
 SECTION(".text.vsf.kernel.vsf_irq_leave")
 void vsf_irq_leave(uintptr_t ctx)
 {
-    __vsf_eda.evtq.cur = (vsf_evtq_t *)ctx;
+    __vsf_eda_evtq_cur = (vsf_evtq_t *)ctx;
 }
 
 SECTION(".text.vsf.kernel.eda")
@@ -298,14 +299,14 @@ void __vsf_dispatch_evt(vsf_eda_t *pthis, vsf_evt_t evt)
 SECTION(".text.vsf.kernel.__vsf_get_cur_evtq")
 vsf_evtq_t * __vsf_get_cur_evtq(void)
 {
-    return __vsf_eda.evtq.cur;
+    return __vsf_eda_evtq_cur;
 }
 
 SECTION(".text.vsf.kernel.__vsf_set_cur_evtq")
 vsf_evtq_t * __vsf_set_cur_evtq(vsf_evtq_t *evtq)
 {
     vsf_evtq_t *evtq_old = __vsf_get_cur_evtq();
-    __vsf_eda.evtq.cur = evtq;
+    __vsf_eda_evtq_cur = evtq;
     return evtq_old;
 }
 
