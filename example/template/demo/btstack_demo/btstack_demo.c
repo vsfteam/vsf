@@ -45,15 +45,11 @@ void btstack_assert_failed(const char * file, uint16_t line_nr){
 }
 #endif
 
-#ifndef WEAK_BTSTACK_INSTALL
 WEAK(btstack_install)
 void btstack_install(void) {}
-#endif
 
-#ifndef WEAK_BTSTACK_MAIN
 WEAK(btstack_main)
 int btstack_main(int argc, const char * argv[]) { return 0; }
-#endif
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_BTHCI == ENABLED
 vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vk_usbh_dev_id_t *id)
