@@ -173,20 +173,14 @@ extern void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, u
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_USBH_BTHCI_ON_NEW
 WEAK(vsf_usbh_bthci_on_new)
 void vsf_usbh_bthci_on_new(void *dev, vk_usbh_dev_id_t *id) {}
-#endif
 
-#ifndef WEAK_VSF_USBH_BTHCI_ON_DEL
 WEAK(vsf_usbh_bthci_on_del)
 void vsf_usbh_bthci_on_del(void *dev) {}
-#endif
 
-#ifndef WEAK_VSF_USBH_BTHCI_ON_PACKET
 WEAK(vsf_usbh_bthci_on_packet)
 void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t size) {}
-#endif
 
 static vk_usbh_bthci_iocb_t * __vk_usbh_bthci_get_iocb(vk_usbh_bthci_t *bthci, vk_usbh_hcd_urb_t *urb_hcd)
 {
