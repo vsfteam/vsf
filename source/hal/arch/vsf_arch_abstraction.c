@@ -939,7 +939,7 @@ vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
     if (tick > 0) {
         uint64_t tmp = tick * __systimer.cycle_per_tick * 1000000;
         tmp /= vsf_arch_req___systimer_freq___from_usr();
-        tick = vsf_min(1, tmp);
+        tick = vsf_max(1, tmp);
     }
     return tick;
 }
@@ -950,7 +950,7 @@ vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
     if (tick > 0) {
         uint64_t tmp = tick * __systimer.cycle_per_tick * 1000;
         tmp /= vsf_arch_req___systimer_freq___from_usr();
-        tick = vsf_min(1, tmp);
+        tick = vsf_max(1, tmp);
     }
     return tick;
 }
