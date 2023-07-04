@@ -92,7 +92,7 @@ void vk_musb_fdrc_fifo_init(vk_musb_fdrc_reg_t *reg)
 #endif
 }
 
-void vk_musb_fdrc_set_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint16_t pos, uint_fast16_t size, uint_fast8_t size_msk)
+uint16_t vk_musb_fdrc_set_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, usb_ep_type_t type, uint16_t pos, uint_fast16_t size, uint_fast8_t size_msk)
 {
     uint_fast8_t ep_no = ep & 0x0F, ep_dir = !!(ep & 0x80);
 #if     defined(VSF_MUSB_FDRC_NO_HWFIFO)
@@ -106,6 +106,7 @@ void vk_musb_fdrc_set_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint16_t po
         reg->FIFO[ep_dir].FIFO[ep_no] = fifo;
     }
     reg->set_ep_fifo(reg->param, ep, fifo, size);
+    return 1 << size_msk;
 #elif   defined(VSF_MUSB_FDRC_DYNAMIC_FIFO)
     if (0 == ep_no) {
         // EP0 fifo should be at position 0
@@ -117,6 +118,7 @@ void vk_musb_fdrc_set_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint16_t po
         reg->DynFIFO->RxFIFO1 = pos & 0xFF;
         reg->DynFIFO->RxFIFO2 = ((pos >> 8) & 0x0F) | (size_msk << 5);
     }
+    return 1 << size_msk;
 #else
     #error unknown fifo
 #endif

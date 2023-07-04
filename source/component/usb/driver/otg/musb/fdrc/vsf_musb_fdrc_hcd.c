@@ -238,7 +238,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
 
         if (0 == pipe.endpoint) {
             musb_urb->ep0_state = MUSB_FDRC_USBH_EP0_SETUP;
-            vk_musb_fdrc_set_fifo(reg, 0, 0, epsize, 0);
+            vk_musb_fdrc_set_fifo(reg, 0, pipe.type, 0, epsize, 0);
             vk_musb_fdrc_write_fifo(reg, 0, (uint8_t *)&urb->setup_packet, sizeof(urb->setup_packet));
             reg->EP->EP0.CSR0 &= ~(MUSBH_CSR0_SETUPPKT | MUSBH_CSR0_STATUSPKT);
             reg->EP->EP0.CSR0 |= MUSBH_CSR0_TXPKTRDY | MUSBH_CSR0_SETUPPKT;
@@ -253,7 +253,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
                     reg->EP->EPN.RxInterval = 0;
                 }
 
-                vk_musb_fdrc_set_fifo(reg, pipe.endpoint | 0x80, musb_urb->fifo, epsize, 0);
+                vk_musb_fdrc_set_fifo(reg, pipe.endpoint | 0x80, pipe.type, musb_urb->fifo, epsize, 0);
                 reg->EP->EPN.RxCSR1 |= MUSBH_RXCSR1_FLUSHFIFO;
             } else {
                 reg->EP->EPN.TxType = (pipe.type << 4) | pipe.endpoint;
@@ -264,7 +264,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
                     reg->EP->EPN.TxInterval = 0;
                 }
 
-                vk_musb_fdrc_set_fifo(reg, pipe.endpoint, musb_urb->fifo, epsize, 0);
+                vk_musb_fdrc_set_fifo(reg, pipe.endpoint, pipe.type, musb_urb->fifo, epsize, 0);
             }
             goto do_tx_rx;
         }

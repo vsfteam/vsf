@@ -50,7 +50,7 @@ extern uint16_t vk_musb_fdrc_get_mask(volatile uint8_t *reg);
 extern void vk_musb_fdrc_interrupt_init(vk_musb_fdrc_reg_t *reg);
 extern void vk_musb_fdrc_fifo_init(vk_musb_fdrc_reg_t *reg);
 extern uint_fast16_t vk_musb_fdrc_rx_fifo_size(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep);
-extern void vk_musb_fdrc_set_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint16_t pos, uint_fast16_t size, uint_fast8_t size_msk);
+extern uint16_t vk_musb_fdrc_set_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, usb_ep_type_t type, uint16_t pos, uint_fast16_t size, uint_fast8_t size_msk);
 extern void vk_musb_fdrc_read_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
 extern void vk_musb_fdrc_write_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, uint8_t *buffer, uint_fast16_t size);
 
