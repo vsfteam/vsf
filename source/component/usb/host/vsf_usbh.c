@@ -123,15 +123,12 @@ extern void vsf_usbh_on_remove_interface(vk_usbh_ifs_t *ifs);
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_USBH_ON_DEV_PARSED
 WEAK(vsf_usbh_on_dev_parsed)
 void vsf_usbh_on_dev_parsed(vk_usbh_dev_t *dev, vk_usbh_dev_parser_t *parser)
 {
 
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_ON_MATCH_INTERFACE
 WEAK(vsf_usbh_on_match_interface)
 vsf_err_t vsf_usbh_on_match_interface(
         vk_usbh_dev_parser_t *parser, vk_usbh_ifs_parser_t *parser_ifs)
@@ -142,15 +139,12 @@ vsf_err_t vsf_usbh_on_match_interface(
                 parser_ifs->parser_alt[parser_ifs->ifs->cur_alt].desc_ifs->bInterfaceNumber);
     return VSF_ERR_NONE;
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_ON_REMOVE_INTERFACE
 WEAK(vsf_usbh_on_remove_interface)
 void vsf_usbh_on_remove_interface(vk_usbh_ifs_t *ifs)
 {
     vsf_trace_info("%s: remove interface" VSF_TRACE_CFG_LINEEND, ifs->drv->name);
 }
-#endif
 
 uint32_t __vk_usbh_get_pipe_value(vk_usbh_dev_t *dev,
         uint8_t endpoint, uint8_t type, uint16_t size)

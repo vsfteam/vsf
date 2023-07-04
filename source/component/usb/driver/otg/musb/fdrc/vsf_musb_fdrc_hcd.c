@@ -23,7 +23,7 @@
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_USBH_CLASS_IMPLEMENT_HCD__
-// musbfdrc has no roothub, so need VSF_USBH_IMPLEMENT_HUB for
+// musbfdrc has no roothub, so need __VSF_USBH_CLASS_IMPLEMENT_HUB__ for
 //  vsf_usbh_new_device and vsf_usbh_disconnect_device
 #define __VSF_USBH_CLASS_IMPLEMENT_HUB__
 
@@ -42,7 +42,7 @@ typedef struct vk_musb_fdrc_hcd_t {
 
     enum vk_musb_fdrc_hcd_state_t {
         MUSB_FDRC_HCD_STATE_WAIT_HOSTMODE,
-        MUSB_FDRC_HCD_STATE_WAIE_CONNECT,
+        MUSB_FDRC_HCD_STATE_WAIT_CONNECT,
         MUSB_FDRC_HCD_STATE_WAIT_RESET,
         MUSB_FDRC_HCD_STATE_WAIT_RESET_CLEAR,
         MUSB_FDRC_HCD_STATE_CONNECTED,
@@ -87,6 +87,7 @@ typedef enum vk_musb_fdrc_hcd_evt_t {
     VSF_MUSB_FDRC_HCD_EVT_EP        = VSF_EVT_USER + 0x000,
     VSF_MUSB_FDRC_HCD_EVT_CONN      = VSF_EVT_USER + 0x100,
     VSF_MUSB_FDRC_HCD_EVT_DISCONN   = VSF_EVT_USER + 0x200,
+    VSF_MUSB_FDRC_HCD_EVT_RESET     = VSF_EVT_USER + 0x300,
 } vk_musb_fdrc_hcd_evt_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -105,6 +106,8 @@ static vk_usbh_hcd_urb_t * __vk_musb_fdrc_hcd_alloc_urb(vk_usbh_hcd_t *hcd);
 static void __vk_musb_fdrc_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
 static vsf_err_t __vk_musb_fdrc_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
 static vsf_err_t __vk_musb_fdrc_hcd_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
+static vsf_err_t __vk_musb_fdrc_hcd_reset_dev(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
+static bool __vk_musb_fdrc_hcd_is_dev_reset(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -119,6 +122,8 @@ const vk_usbh_hcd_drv_t vk_musb_fdrc_hcd_drv = {
     .free_urb           = __vk_musb_fdrc_hcd_free_urb,
     .submit_urb         = __vk_musb_fdrc_hcd_submit_urb,
     .relink_urb         = __vk_musb_fdrc_hcd_relink_urb,
+    .reset_dev          = __vk_musb_fdrc_hcd_reset_dev,
+    .is_dev_reset       = __vk_musb_fdrc_hcd_is_dev_reset,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -381,11 +386,8 @@ static void __vk_musb_fdrc_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_EVT_INIT:
         break;
     case VSF_MUSB_FDRC_HCD_EVT_CONN:
-        if (MUSB_FDRC_HCD_STATE_WAIE_CONNECT == musb->state) {
-            reg->Common->FAddr = 0;
-            reg->Common->Power |= MUSB_POWER_RESET;
-            vsf_teda_set_timer_ms(100);
-            musb->state = MUSB_FDRC_HCD_STATE_WAIT_RESET;
+        if (MUSB_FDRC_HCD_STATE_WAIT_CONNECT == musb->state) {
+            goto do_reset;
         }
         break;
     case VSF_MUSB_FDRC_HCD_EVT_DISCONN:
@@ -393,17 +395,24 @@ static void __vk_musb_fdrc_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vk_usbh_disconnect_device((vk_usbh_t *)musb->hcd, musb->dev);
             reg->Common->FAddr = 0;
             musb->dev = NULL;
-            musb->state = MUSB_FDRC_HCD_STATE_WAIE_CONNECT;
+            musb->state = MUSB_FDRC_HCD_STATE_WAIT_CONNECT;
         }
         reg->Common->IntrUSBE = MUSB_INTRUSBE_CONN;
+        break;
+    case VSF_MUSB_FDRC_HCD_EVT_RESET:
+    do_reset:
+        reg->Common->FAddr = 0;
+        reg->Common->Power |= MUSB_POWER_RESET;
+        vsf_teda_set_timer_ms(100);
+        musb->state = MUSB_FDRC_HCD_STATE_WAIT_RESET;
         break;
     case VSF_EVT_TIMER:
         switch (musb->state) {
         case MUSB_FDRC_HCD_STATE_WAIT_RESET:
             reg->Common->Power &= ~MUSB_POWER_RESET;
+            musb->state = MUSB_FDRC_HCD_STATE_WAIT_RESET_CLEAR;
         delay_another_100ms:
             vsf_teda_set_timer_ms(100);
-            musb->state = MUSB_FDRC_HCD_STATE_WAIT_RESET_CLEAR;
             break;
         case MUSB_FDRC_HCD_STATE_WAIT_RESET_CLEAR:
             if (reg->Common->DevCtl & MUSB_DEVCTL_LSDEV) {
@@ -412,11 +421,14 @@ static void __vk_musb_fdrc_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 musb->speed = USB_SPEED_FULL;
             } else {
                 // some device need a really long delay
+                // TODO: add a timeout here
                 goto delay_another_100ms;
             }
 
             musb->state = MUSB_FDRC_HCD_STATE_CONNECTED;
-            musb->dev = vk_usbh_new_device((vk_usbh_t *)musb->hcd, musb->speed, NULL, 0);
+            if (NULL == musb->dev) {
+                musb->dev = vk_usbh_new_device((vk_usbh_t *)musb->hcd, musb->speed, NULL, 0);
+            }
             reg->Common->IntrUSBE = MUSB_INTRUSBE_DISCON;
             break;
         }
@@ -525,7 +537,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
         vk_musb_fdrc_interrupt_init(reg);
         reg->Common->IntrUSBE = MUSB_INTRUSBE_CONN;
         reg->Common->IntrTx1E = 1 << 0;      // enable ep0 interrupt
-        reg->Common->DevCtl = MUSB_DEVCTL_SESSION;
+        reg->Common->DevCtl = MUSB_DEVCTL_SESSION | MUSB_DEVCTL_HOSTREQ;
         musb->state = MUSB_FDRC_HCD_STATE_WAIT_HOSTMODE;
         // fall through
     case VSF_EVT_TIMER:
@@ -533,7 +545,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
         if (!(reg->Common->DevCtl & MUSB_DEVCTL_HOSTMODE)) {
             vsf_teda_set_timer_ms(1);
         } else {
-            musb->state = MUSB_FDRC_HCD_STATE_WAIE_CONNECT;
+            musb->state = MUSB_FDRC_HCD_STATE_WAIT_CONNECT;
             musb->teda.fn.evthandler = __vk_musb_fdrc_hcd_evthandler;
             vsf_teda_init(&musb->teda);
             return VSF_ERR_NONE;
@@ -673,6 +685,20 @@ static vsf_err_t __vk_musb_fdrc_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_u
     }
 
     return __vk_musb_fdrc_hcd_relink_urb(hcd, urb);
+}
+
+static vsf_err_t __vk_musb_fdrc_hcd_reset_dev(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
+{
+    vk_musb_fdrc_hcd_t *musb = hcd->priv;
+    musb->state = MUSB_FDRC_HCD_STATE_WAIT_RESET;
+    vsf_eda_post_evt(&musb->teda.use_as__vsf_eda_t, VSF_MUSB_FDRC_HCD_EVT_RESET);
+    return VSF_ERR_NONE;
+}
+
+static bool __vk_musb_fdrc_hcd_is_dev_reset(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
+{
+    vk_musb_fdrc_hcd_t *musb = hcd->priv;
+    return musb->state != MUSB_FDRC_HCD_STATE_CONNECTED;
 }
 
 #endif
