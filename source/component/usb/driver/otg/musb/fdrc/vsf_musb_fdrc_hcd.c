@@ -231,8 +231,9 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
     VSF_USB_ASSERT(!(epsize & 7));
     uint8_t *buffer = urb->buffer;
     uint_fast8_t errcode = 0;
+    uint_fast8_t ep = musb_urb->epidx & 0x0F;
 
-    vk_musb_fdrc_set_ep(reg, musb_urb->epidx & 0x0F);
+    vk_musb_fdrc_set_ep(reg, ep);
 
     switch (musb_urb->state) {
     case MUSB_FDRC_URB_STATE_START_SUBMITTING:
@@ -258,7 +259,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
                     reg->EP->EPN.RxInterval = 0;
                 }
 
-                vk_musb_fdrc_set_fifo(reg, pipe.endpoint | 0x80, pipe.type, musb_urb->fifo, epsize, 0);
+                vk_musb_fdrc_set_fifo(reg, ep | 0x80, pipe.type, musb_urb->fifo, epsize, 0);
                 reg->EP->EPN.RxCSR1 |= MUSBH_RXCSR1_FLUSHFIFO;
             } else {
                 reg->EP->EPN.TxType = (pipe.type << 4) | pipe.endpoint;
@@ -269,7 +270,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
                     reg->EP->EPN.TxInterval = 0;
                 }
 
-                vk_musb_fdrc_set_fifo(reg, pipe.endpoint, pipe.type, musb_urb->fifo, epsize, 0);
+                vk_musb_fdrc_set_fifo(reg, ep, pipe.type, musb_urb->fifo, epsize, 0);
             }
             goto do_tx_rx;
         }
@@ -341,10 +342,12 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
                 return VSF_ERR_FAIL;
             }
 
-            if ((musb_urb->cur_size > 0) && is_in) {
-                musb_urb->cur_size = vk_musb_fdrc_rx_fifo_size(reg, musb_urb->epidx & 0x0F);
+            if (is_in) {
                 if (musb_urb->cur_size > 0) {
-                    vk_musb_fdrc_read_fifo(reg, musb_urb->epidx & 0x0F, &buffer[urb->actual_length], musb_urb->cur_size);
+                    musb_urb->cur_size = vk_musb_fdrc_rx_fifo_size(reg, ep);
+                    if (musb_urb->cur_size > 0) {
+                        vk_musb_fdrc_read_fifo(reg, ep, &buffer[urb->actual_length], musb_urb->cur_size);
+                    }
                 }
                 reg->EP->EPN.RxCSR1 &= ~MUSBH_RXCSR1_RXPKTRDY;
             }
@@ -364,7 +367,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
                 if (is_in) {
                     reg->EP->EPN.RxCSR1 |= MUSBH_RXCSR1_REQPKT;
                 } else {
-                    vk_musb_fdrc_write_fifo(reg, musb_urb->epidx & 0x0F, &buffer[urb->actual_length], musb_urb->cur_size);
+                    vk_musb_fdrc_write_fifo(reg, ep, &buffer[urb->actual_length], musb_urb->cur_size);
                     reg->EP->EPN.TxCSR1 |= MUSBH_TXCSR1_TXPKTRDY;
                 }
             }

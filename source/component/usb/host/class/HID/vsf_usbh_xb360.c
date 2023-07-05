@@ -169,7 +169,6 @@ void vk_xb360_process_input(vk_input_xb360_t *dev, vsf_usb_xb360_gamepad_in_repo
 }
 #endif
 
-#ifndef WEAK_VSF_USBH_XB360_ON_REPORT_INPUT
 WEAK(vsf_usbh_xb360_on_report_input)
 void vsf_usbh_xb360_on_report_input(vk_usbh_xb360_t *xb360, vsf_usb_xb360_gamepad_in_report_t *report)
 {
@@ -177,16 +176,12 @@ void vsf_usbh_xb360_on_report_input(vk_usbh_xb360_t *xb360, vsf_usb_xb360_gamepa
     vk_xb360_process_input(&xb360->use_as__vk_input_xb360_t, report);
 #   endif
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_XB360_ON_REPORT_OUTPUT
 WEAK(vsf_usbh_xb360_on_report_output)
 void vsf_usbh_xb360_on_report_output(vk_usbh_xb360_t *xb360)
 {
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_XB360_ON_NEW
 WEAK(vsf_usbh_xb360_on_new)
 void vsf_usbh_xb360_on_new(vk_usbh_xb360_t *xb360)
 {
@@ -194,9 +189,7 @@ void vsf_usbh_xb360_on_new(vk_usbh_xb360_t *xb360)
     vk_xb360_new_dev(&xb360->use_as__vk_input_xb360_t);
 #   endif
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_XB360_ON_FREE
 WEAK(vsf_usbh_xb360_on_free)
 void vsf_usbh_xb360_on_free(vk_usbh_xb360_t *xb360)
 {
@@ -204,7 +197,6 @@ void vsf_usbh_xb360_on_free(vk_usbh_xb360_t *xb360)
     vk_xb360_free_dev(&xb360->use_as__vk_input_xb360_t);
 #   endif
 }
-#endif
 
 static void __vk_usbh_xb360_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {

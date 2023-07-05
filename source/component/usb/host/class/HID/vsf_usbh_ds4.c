@@ -242,7 +242,6 @@ void vk_ds4u_process_input(vk_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report_t
 }
 #endif
 
-#ifndef WEAK_VSF_USBH_DS4_ON_REPORT_INPUT
 WEAK(vsf_usbh_ds4_on_report_input)
 void vsf_usbh_ds4_on_report_input(vk_usbh_ds4_t *ds4, vsf_usb_ds4_gamepad_in_report_t *report)
 {
@@ -250,16 +249,12 @@ void vsf_usbh_ds4_on_report_input(vk_usbh_ds4_t *ds4, vsf_usb_ds4_gamepad_in_rep
     vk_ds4u_process_input(&ds4->use_as__vk_input_ds4u_t, report);
 #   endif
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_DS4_ON_REPORT_OUTPUT
 WEAK(vsf_usbh_ds4_on_report_output)
 void vsf_usbh_ds4_on_report_output(vk_usbh_ds4_t *ds4)
 {
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_DS4_ON_NEW
 WEAK(vsf_usbh_ds4_on_new)
 void vsf_usbh_ds4_on_new(vk_usbh_ds4_t *ds4)
 {
@@ -267,9 +262,7 @@ void vsf_usbh_ds4_on_new(vk_usbh_ds4_t *ds4)
     vk_ds4u_new_dev(&ds4->use_as__vk_input_ds4u_t);
 #   endif
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_DS4_ON_FREE
 WEAK(vsf_usbh_ds4_on_free)
 void vsf_usbh_ds4_on_free(vk_usbh_ds4_t *ds4)
 {
@@ -277,7 +270,6 @@ void vsf_usbh_ds4_on_free(vk_usbh_ds4_t *ds4)
     vk_ds4u_free_dev(&ds4->use_as__vk_input_ds4u_t);
 #   endif
 }
-#endif
 
 static void __vk_usbh_ds4_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {

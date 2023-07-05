@@ -159,7 +159,6 @@ vsf_err_t vk_musb_fdrc_usbd_ep_add(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, us
 {
     vk_musb_fdrc_reg_t *reg = usbd->reg;
     uint_fast8_t is_in = ep & 0x80;
-    uint_fast16_t addr = usbd->ep_buf_ptr >> 3;
     uint_fast8_t size_msk;
     uint_fast8_t ep_orig;
 
@@ -173,7 +172,7 @@ vsf_err_t vk_musb_fdrc_usbd_ep_add(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t ep, us
     size_msk -= 3;
     ep_orig = vk_musb_fdrc_set_ep(reg, ep & 0x0F);
     if (ep != 0) {  // skip EP0_OUT(0x00), should share same fifo as EP0_IN(0x80)
-        usbd->ep_buf_ptr += vk_musb_fdrc_set_fifo(reg, ep, type, addr, size, size_msk) << 3;
+        usbd->ep_buf_ptr += vk_musb_fdrc_set_fifo(reg, ep, type, usbd->ep_buf_ptr, size, size_msk);
     }
     ep &= 0x0F;
 
