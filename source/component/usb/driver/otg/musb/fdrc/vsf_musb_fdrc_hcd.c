@@ -227,8 +227,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
     vk_usbh_pipe_t pipe = urb->pipe;
     bool is_iso = pipe.type == USB_ENDPOINT_XFER_ISOC;
     bool is_in = pipe.dir_in1out0 > 0;
-    uint_fast16_t epsize = pipe.size;
-    VSF_USB_ASSERT(!(epsize & 7));
+    uint_fast16_t epsize = (pipe.size + 7) & ~7;
     uint8_t *buffer = urb->buffer;
     uint_fast8_t errcode = 0;
     uint_fast8_t ep = musb_urb->epidx & 0x0F;
