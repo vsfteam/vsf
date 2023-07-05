@@ -285,12 +285,15 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
             switch (musb_urb->ep0_state) {
             case MUSB_FDRC_USBH_EP0_SETUP:
                 musb_urb->ep0_state = MUSB_FDRC_USBH_EP0_DATA;
+                reg->EP->EP0.CSR0 &= ~MUSBH_CSR0_SETUPPKT;
                 goto do_ep0_data_stage;
             case MUSB_FDRC_USBH_EP0_DATA:
-                if ((musb_urb->cur_size > 0) && is_in) {
-                    musb_urb->cur_size = vk_musb_fdrc_rx_fifo_size(reg, 0);
+                if (is_in) {
                     if (musb_urb->cur_size > 0) {
-                        vk_musb_fdrc_read_fifo(reg, 0, &buffer[urb->actual_length], musb_urb->cur_size);
+                        musb_urb->cur_size = vk_musb_fdrc_rx_fifo_size(reg, 0);
+                        if (musb_urb->cur_size > 0) {
+                            vk_musb_fdrc_read_fifo(reg, 0, &buffer[urb->actual_length], musb_urb->cur_size);
+                        }
                     }
                     reg->EP->EP0.CSR0 &= ~MUSBH_CSR0_RXPKTRDY;
                 }
@@ -323,6 +326,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
                 }
                 break;
             case MUSB_FDRC_USBH_EP0_STATUS:
+                reg->EP->EP0.CSR0 &= ~(MUSBH_CSR0_STATUSPKT | MUSBH_CSR0_RXPKTRDY);
                 goto urb_finished;
             }
         } else {
