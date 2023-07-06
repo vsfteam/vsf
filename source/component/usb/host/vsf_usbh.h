@@ -392,6 +392,8 @@ vsf_class(vk_usbh_hcd_dev_t) {
     )
 };
 
+typedef void (*vsf_usbh_urb_complete_t)(void *param, vk_usbh_hcd_urb_t *);
+
 vsf_class(vk_usbh_hcd_urb_t) {
 
     private_member(
@@ -419,7 +421,11 @@ vsf_class(vk_usbh_hcd_urb_t) {
     )
 
     private_member(
-        vsf_eda_t *eda_caller;
+        vsf_usbh_urb_complete_t complete;
+        union {
+            void *param;
+            vsf_eda_t *eda_caller;
+        };
         uint32_t priv[0];
     )
 };
@@ -548,7 +554,8 @@ extern void vk_usbh_unregister_class(vk_usbh_t *usbh, vk_usbh_class_t *c);
 
 #if defined(__VSF_USBH_CLASS_IMPLEMENT) || defined(__VSF_USBH_CLASS_IMPLEMENT_HCD__)
 // APIs to be called by hcd drivers
-void vk_usbh_hcd_urb_free_buffer(vk_usbh_hcd_urb_t *urb_hcd);
+extern void vk_usbh_hcd_urb_free_buffer(vk_usbh_hcd_urb_t *urb_hcd);
+extern void vk_usbh_hcd_urb_complete(vk_usbh_hcd_urb_t *hcd_urb);
 #endif
 
 #if defined(__VSF_USBH_CLASS_IMPLEMENT_HUB__)
@@ -588,6 +595,7 @@ extern void vk_usbh_urb_set_buffer(vk_usbh_urb_t *urb, void *buffer,
             uint_fast32_t size);
 extern int_fast16_t vk_usbh_urb_get_status(vk_usbh_urb_t *urb);
 extern uint_fast32_t vk_usbh_urb_get_actual_length(vk_usbh_urb_t *urb);
+extern void vk_usbh_urb_set_complete(vk_usbh_urb_t *urb, vsf_usbh_urb_complete_t complete, void *param);
 
 extern enum usb_device_speed_t vk_usbh_get_dev_speed(vk_usbh_dev_t *dev);
 extern void vk_usbh_reset_dev(vk_usbh_t *usbh, vk_usbh_dev_t *dev);

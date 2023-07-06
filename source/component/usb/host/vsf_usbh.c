@@ -244,6 +244,21 @@ void vk_usbh_hcd_urb_free_buffer(vk_usbh_hcd_urb_t *urb_hcd)
     __vk_usbh_urb_reset_buffer(urb_hcd);
 }
 
+void vk_usbh_hcd_urb_complete(vk_usbh_hcd_urb_t *hcd_urb)
+{
+    // check complete first because eda_caller uses same ram space as param for complete
+    vsf_usbh_urb_complete_t complete = hcd_urb->complete;
+    if (complete != NULL) {
+        complete(hcd_urb->param, hcd_urb);
+        return;
+    }
+
+    vsf_eda_t *eda_caller = hcd_urb->eda_caller;
+    if (eda_caller != NULL) {
+        vsf_eda_post_msg(eda_caller, hcd_urb);
+    }
+}
+
 static void __vk_usbh_free_buffer(void *buffer)
 {
     vsf_usbh_free(buffer);
@@ -475,6 +490,13 @@ uint_fast32_t vk_usbh_urb_get_actual_length(vk_usbh_urb_t *urb)
     return urb->urb_hcd->actual_length;
 }
 
+void vk_usbh_urb_set_complete(vk_usbh_urb_t *urb, vsf_usbh_urb_complete_t complete, void *param)
+{
+    VSF_USB_ASSERT((urb != NULL) && !urb->pipe.is_pipe);
+    urb->urb_hcd->param = param;
+    urb->urb_hcd->complete = complete;
+}
+
 void vk_usbh_remove_interface(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
             vk_usbh_ifs_t *ifs)
 {
@@ -656,7 +678,8 @@ static vsf_err_t __vk_usbh_rh_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *
 
 complete:
     urb_hcd->status = URB_OK;
-    return vsf_eda_post_msg(urb_hcd->eda_caller, urb_hcd);
+    vk_usbh_hcd_urb_complete(urb_hcd);
+    return VSF_ERR_NONE;
 
 error:
     urb_hcd->status = URB_FAIL;
@@ -672,11 +695,13 @@ static vsf_err_t __vk_usbh_submit_urb_imp(vk_usbh_t *usbh, vk_usbh_urb_t *urb, v
             &&  !urb->pipe.is_pipe);
 
     urb_hcd = urb->urb_hcd;
-    if (NULL == eda) {
-        urb_hcd->eda_caller = vsf_eda_get_cur();
-        VSF_USB_ASSERT(urb_hcd->eda_caller != NULL);
-    } else {
-        urb_hcd->eda_caller = eda;
+    if (NULL == urb_hcd->complete) {
+        if (NULL == eda) {
+            urb_hcd->eda_caller = vsf_eda_get_cur();
+            VSF_USB_ASSERT(urb_hcd->eda_caller != NULL);
+        } else {
+            urb_hcd->eda_caller = eda;
+        }
     }
 
     urb_hcd->actual_length = 0;
