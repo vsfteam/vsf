@@ -115,6 +115,8 @@ static void __vk_usbh_uac_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *
 extern void vsf_usbh_uac_on_new(void *uac, usb_uac_ac_interface_header_desc_t *ac_header);
 extern void vsf_usbh_uac_on_del(void *uac);
 
+static bool __vk_usbh_uac_submit_urb_iso(vk_usbh_uac_t *uac, vk_usbh_uac_stream_t *uac_stream, uint_fast8_t urb_idx);
+
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const vk_usbh_dev_id_t __vk_usbh_uac_dev_id[] = {
@@ -179,21 +181,17 @@ void vsf_usbh_uac_disconnect_stream(void *param, uint_fast8_t stream_idx)
     vsf_eda_post_evt((vsf_eda_t *)&uac->task, VSF_USBH_UAC_EVT_DISCONNECT + stream_idx);
 }
 
-#ifndef WEAK_VSF_USBH_UAC_ON_NEW
 WEAK(vsf_usbh_uac_on_new)
 void vsf_usbh_uac_on_new(void *uac, usb_uac_ac_interface_header_desc_t *ac_header)
 {
     // TODO: call av layer as default processor
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_UAC_ON_DEL
 WEAK(vsf_usbh_uac_on_del)
 void vsf_usbh_uac_on_del(void *uac)
 {
     // TODO: call av layer as default processor
 }
-#endif
 
 static void __vk_usbh_uac_free_urb(vk_usbh_uac_t *uac)
 {
@@ -214,6 +212,50 @@ static void __vk_usbh_uac_on_eda_terminate(vsf_eda_t *eda)
 {
     vk_usbh_uac_t *uac = container_of(eda, vk_usbh_uac_t, task);
     vsf_usbh_free(uac);
+}
+
+static void __vk_usbh_uac_iso_complete(void *param, vk_usbh_hcd_urb_t *urb_hcd)
+{
+    vk_usbh_urb_t urb = { .urb_hcd = urb_hcd };
+    vk_usbh_uac_t *uac = param;
+    vk_usbh_uac_stream_t *uac_stream = &uac->streams[0];
+
+#if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 1
+    vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
+    int_fast8_t urb_idx = -1;
+    for (uint_fast8_t i = 0; i < uac->stream_num; i++, uac_stream++) {
+        if (vk_usbh_urb_get_pipe(&uac_stream->urb[0]).value == pipe.value) {
+            for (uint_fast8_t j = 0; j < VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM; j++) {
+                if (uac_stream->urb[j].urb_hcd == urb.urb_hcd) {
+                    urb_idx = j;
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    VSF_USB_ASSERT((urb_idx >= 0) && (urb_idx < VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM));
+#else
+    int_fast8_t urb_idx = 0;
+#endif
+
+    vsf_stream_t *stream = uac_stream->stream;
+    uint_fast32_t actual_length = vk_usbh_urb_get_actual_length(&urb);
+    // TODO: make sure actual_length is good
+    if (uac_stream->is_in) {
+#if VSF_USBH_UAC_CFG_URB_WITH_BUFFER == ENABLED
+        vsf_stream_write(stream, vk_usbh_urb_peek_buffer(&urb), actual_length);
+#else
+        vsf_stream_write(stream, NULL, actual_length);
+#endif
+    } else {
+#if VSF_USBH_UAC_CFG_URB_WITH_BUFFER == ENABLED
+#else
+        vsf_stream_read(stream, NULL, actual_length);
+#endif
+    }
+
+    __vk_usbh_uac_submit_urb_iso(uac, uac_stream, urb_idx);
 }
 
 static bool __vk_usbh_uac_submit_urb_iso(vk_usbh_uac_t *uac, vk_usbh_uac_stream_t *uac_stream, uint_fast8_t urb_idx)
@@ -268,6 +310,7 @@ static bool __vk_usbh_uac_submit_urb_iso(vk_usbh_uac_t *uac, vk_usbh_uac_stream_
             start_frame = 0;
         }
         uac_stream->urb_mask |= 1 << urb_idx;
+        vk_usbh_urb_set_complete(urb, __vk_usbh_uac_iso_complete, uac);
         vk_usbh_submit_urb_iso(uac->usbh, urb, start_frame);
         return true;
     }
@@ -366,42 +409,7 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 }
                 goto check_next_ctrl_transfer;
             } else {
-                int_fast8_t urb_idx = -1;
-                uac_stream = &uac->streams[0];
-                for (uint_fast8_t i = 0; i < uac->stream_num; i++, uac_stream++) {
-                    if (vk_usbh_urb_get_pipe(&uac_stream->urb[0]).value == pipe.value) {
-#if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 1
-                        for (uint_fast8_t j = 0; j < VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM; j++) {
-                            if (uac_stream->urb[j].urb_hcd == urb.urb_hcd) {
-                                urb_idx = j;
-                                break;
-                            }
-                        }
-#else
-                        urb_idx = 0;
-#endif
-                        break;
-                    }
-                }
-
-                VSF_USB_ASSERT((urb_idx >= 0) && (urb_idx < VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM));
-                stream = uac_stream->stream;
-                uint_fast32_t actual_length = vk_usbh_urb_get_actual_length(&urb);
-                // TODO: make sure actual_length is good
-                if (uac_stream->is_in) {
-#if VSF_USBH_UAC_CFG_URB_WITH_BUFFER == ENABLED
-                    vsf_stream_write(stream, vk_usbh_urb_peek_buffer(&urb), actual_length);
-#else
-                    vsf_stream_write(stream, NULL, actual_length);
-#endif
-                } else {
-#if VSF_USBH_UAC_CFG_URB_WITH_BUFFER == ENABLED
-#else
-                    vsf_stream_read(stream, NULL, actual_length);
-#endif
-                }
-
-                __vk_usbh_uac_submit_urb_iso(uac, uac_stream, urb_idx);
+                VSF_USB_ASSERT(false);
             }
         }
         break;
