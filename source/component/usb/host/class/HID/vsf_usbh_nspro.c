@@ -222,8 +222,7 @@ static void __vk_usbh_nspro_send_cmd(vk_usbh_nspro_t *nspro, uint_fast8_t cmd)
 {
     nspro->gamepad_out_buf.buffer[0] = 0x80;
     nspro->gamepad_out_buf.buffer[1] = cmd;
-    vk_usbh_urb_set_complete(&nspro->urb_out, __vk_usbh_nspro_int_complete, nspro);
-    vk_usbh_hid_send_report(&nspro->use_as__vk_usbh_hid_teda_t, (uint8_t *)&nspro->gamepad_out_buf, 2);
+    vk_usbh_hid_send_report(&nspro->use_as__vk_usbh_hid_teda_t, (uint8_t *)&nspro->gamepad_out_buf, 2, __vk_usbh_nspro_int_complete);
 }
 
 static void __vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
@@ -247,8 +246,7 @@ static void __vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             if (USB_ENDPOINT_XFER_CONTROL == pipe.type) {
                 nspro->start_state = VSF_USBH_NSPRO_GET_INFO;
                 __vsf_eda_crit_npb_leave(&nspro->dev->ep0.crit);
-                vk_usbh_urb_set_complete(&nspro->urb_in, __vk_usbh_nspro_int_complete, nspro);
-                vk_usbh_hid_recv_report(&nspro->use_as__vk_usbh_hid_teda_t, NULL, 64);
+                vk_usbh_hid_recv_report(&nspro->use_as__vk_usbh_hid_teda_t, NULL, 64, __vk_usbh_nspro_int_complete);
 // no need to send GET_CONNECTION_STATUS command now, controller will send it on startup
 //                __vk_usbh_nspro_send_cmd(nspro, 1);
             }

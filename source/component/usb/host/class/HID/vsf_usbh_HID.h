@@ -40,29 +40,41 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define vk_usbh_hid_send_report(__hid, __buffer, __size)                       \
-            __vk_usbh_hid_send_report_imp(                                     \
-                (vk_usbh_hid_teda_t *)(__hid), (__buffer), (__size))
+#define vk_usbh_hid_send_report1(__hid, __buffer, __size, __complete)           \
+            __vk_usbh_hid_send_report_imp(                                      \
+                (vk_usbh_hid_teda_t *)(__hid), (__buffer), (__size), (__complete))
+#define vk_usbh_hid_send_report0(__hid, __buffer, __size)                       \
+            __vk_usbh_hid_send_report_imp(                                      \
+                (vk_usbh_hid_teda_t *)(__hid), (__buffer), (__size), NULL)
+// prototype: vsf_err_t vk_usbh_hid_send_report(vk_usbh_hid_teda_t *hid, uint8_t *buffer, int_fast32_t size, vsf_usbh_urb_complete_t complete = NULL);
+#define vk_usbh_hid_send_report(__hid, __buffer, __size, ...)                   \
+            __PLOOC_EVAL(vk_usbh_hid_send_report, __VA_ARGS__)((__hid), (__buffer), (__size), ##__VA_ARGS__)
 
-#define vk_usbh_hid_recv_report(__hid, __buffer, __size)                       \
-            __vk_usbh_hid_recv_report_imp(                                     \
-                (vk_usbh_hid_teda_t *)(__hid), (__buffer), (__size))
+#define vk_usbh_hid_recv_report1(__hid, __buffer, __size, __complete)           \
+            __vk_usbh_hid_send_report_imp(                                      \
+                (vk_usbh_hid_teda_t *)(__hid), (__buffer), (__size), (__complete))
+#define vk_usbh_hid_recv_report0(__hid, __buffer, __size)                       \
+            vk_usbh_hid_recv_report1(                                           \
+                (vk_usbh_hid_teda_t *)(__hid), (__buffer), (__size), NULL)
+// prototype: vsf_err_t vk_usbh_hid_recv_report(vk_usbh_hid_teda_t *hid, uint8_t *buffer, int_fast32_t size, vsf_usbh_urb_complete_t complete = NULL);
+#define vk_usbh_hid_recv_report(__hid, __buffer, __size, ...)                   \
+            __PLOOC_EVAL(vk_usbh_hid_recv_report, __VA_ARGS__)((__hid), (__buffer), (__size), ##__VA_ARGS__)
 
-#define vk_usbh_hid_get_rx_report(__hid)                                       \
+#define vk_usbh_hid_get_rx_report(__hid)                                        \
             __vk_usbh_hid_get_rx_report_imp((vk_usbh_hid_teda_t *)(__hid))
-#define vk_usbh_hid_get_tx_report(__hid)                                       \
+#define vk_usbh_hid_get_tx_report(__hid)                                        \
             __vk_usbh_hid_get_tx_report_imp((vk_usbh_hid_teda_t *)(__hid))
 
-#define vk_usbh_hid_set_idle(__hid, __id, __duration)                          \
-            __vk_usbh_hid_set_idle_imp(                                        \
+#define vk_usbh_hid_set_idle(__hid, __id, __duration)                           \
+            __vk_usbh_hid_set_idle_imp(                                         \
                 (vk_usbh_hid_base_t *)(__hid), (__id), (__duration))
 
-#define vk_usbh_hid_send_report_req(__hid, __type_id, __report, __report_len)  \
-            __vk_usbh_hid_send_report_req_imp(                                 \
+#define vk_usbh_hid_send_report_req(__hid, __type_id, __report, __report_len)   \
+            __vk_usbh_hid_send_report_req_imp(                                  \
                 (vk_usbh_hid_base_t *)(__hid), (__type_id), (__report), (__report_len))
 
-#define vk_usbh_hid_recv_report_req(__hid, __type_id, __report, __report_len)  \
-            __vk_usbh_hid_recv_report_req_imp(                                 \
+#define vk_usbh_hid_recv_report_req(__hid, __type_id, __report, __report_len)   \
+            __vk_usbh_hid_recv_report_req_imp(                                  \
                 (vk_usbh_hid_base_t *)(__hid), (__type_id), (__report), (__report_len))
 
 /*============================ TYPES =========================================*/
@@ -114,7 +126,7 @@ extern void vk_usbh_hid_disconnect(vk_usbh_hid_teda_t *hid);
 extern uint8_t * __vk_usbh_hid_get_tx_report_imp(vk_usbh_hid_teda_t *hid);
 extern uint8_t * __vk_usbh_hid_get_rx_report_imp(vk_usbh_hid_teda_t *hid);
 
-extern vsf_err_t __vk_usbh_hid_recv_report_imp(vk_usbh_hid_teda_t *hid, uint8_t *buffer, int_fast32_t size);
+extern vsf_err_t __vk_usbh_hid_recv_report_imp(vk_usbh_hid_teda_t *hid, uint8_t *buffer, int_fast32_t size, vsf_usbh_urb_complete_t complete);
 extern vsf_err_t __vk_usbh_hid_recv_report_req_imp(vk_usbh_hid_base_t *hid, uint_fast16_t type_id, uint8_t *report, uint_fast16_t report_len);
 extern vsf_err_t __vk_usbh_hid_send_report_req_imp(vk_usbh_hid_base_t *hid, uint_fast16_t type_id, uint8_t *report, uint_fast16_t report_len);
 
@@ -122,7 +134,7 @@ extern vsf_err_t __vk_usbh_hid_set_idle_imp(vk_usbh_hid_base_t *hid, uint_fast8_
 #endif
 
 // user can call vk_usbh_hid_send_report in callbacks
-extern vsf_err_t __vk_usbh_hid_send_report_imp(vk_usbh_hid_teda_t *hid, uint8_t *buffer, int_fast32_t size);
+extern vsf_err_t __vk_usbh_hid_send_report_imp(vk_usbh_hid_teda_t *hid, uint8_t *buffer, int_fast32_t size, vsf_usbh_urb_complete_t complete);
 
 #ifdef __cplusplus
 }

@@ -223,11 +223,9 @@ static void __vk_usbh_xb360_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     switch (evt) {
     case VSF_EVT_INIT:
         __vsf_eda_crit_npb_leave(&xb360->dev->ep0.crit);
-        vk_usbh_urb_set_complete(&xb360->urb_in, __vk_usbh_xb360_int_complete, xb360);
-        vk_usbh_hid_recv_report(&xb360->use_as__vk_usbh_hid_teda_t, NULL, sizeof(vsf_usb_xb360_gamepad_in_report_t));
+        vk_usbh_hid_recv_report(&xb360->use_as__vk_usbh_hid_teda_t, NULL, sizeof(vsf_usb_xb360_gamepad_in_report_t), __vk_usbh_xb360_int_complete);
         xb360->gamepad_out_buf.buffer[1] = 0x08;
-        vk_usbh_urb_set_complete(&xb360->urb_out, __vk_usbh_xb360_int_complete, xb360);
-        vk_usbh_hid_send_report(&xb360->use_as__vk_usbh_hid_teda_t, (uint8_t *)&xb360->gamepad_out_buf, 8);
+        vk_usbh_hid_send_report(&xb360->use_as__vk_usbh_hid_teda_t, (uint8_t *)&xb360->gamepad_out_buf, 8, __vk_usbh_xb360_int_complete);
 
         // TODO: use timer?
         break;

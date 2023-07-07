@@ -201,7 +201,7 @@ void vk_usbh_hid_disconnect(vk_usbh_hid_teda_t *hid)
     vsf_eda_fini(&hid->use_as__vsf_eda_t);
 }
 
-static vsf_err_t __vk_usbh_hid_submit_urb(vk_usbh_hid_teda_t *hid, uint8_t *buffer, int_fast32_t size, vk_usbh_urb_t *urb)
+static vsf_err_t __vk_usbh_hid_submit_urb(vk_usbh_hid_teda_t *hid, uint8_t *buffer, int_fast32_t size, vk_usbh_urb_t *urb, vsf_usbh_urb_complete_t complete)
 {
     vsf_err_t err;
 
@@ -218,6 +218,9 @@ static vsf_err_t __vk_usbh_hid_submit_urb(vk_usbh_hid_teda_t *hid, uint8_t *buff
         }
     }
 
+    if (complete != NULL) {
+        vk_usbh_urb_set_complete(urb, complete, hid);
+    }
     return vk_usbh_submit_urb_ex(hid->usbh, urb, 0, &hid->use_as__vsf_eda_t);
 }
 
@@ -277,14 +280,14 @@ uint8_t * __vk_usbh_hid_get_rx_report_imp(vk_usbh_hid_teda_t *hid)
     return vk_usbh_urb_peek_buffer(&hid->urb_in);
 }
 
-vsf_err_t __vk_usbh_hid_send_report_imp(vk_usbh_hid_teda_t *hid, uint8_t *buffer, int_fast32_t size)
+vsf_err_t __vk_usbh_hid_send_report_imp(vk_usbh_hid_teda_t *hid, uint8_t *buffer, int_fast32_t size, vsf_usbh_urb_complete_t complete)
 {
-    return __vk_usbh_hid_submit_urb(hid, buffer, size, &hid->urb_out);
+    return __vk_usbh_hid_submit_urb(hid, buffer, size, &hid->urb_out, complete);
 }
 
-vsf_err_t __vk_usbh_hid_recv_report_imp(vk_usbh_hid_teda_t *hid, uint8_t *buffer, int_fast32_t size)
+vsf_err_t __vk_usbh_hid_recv_report_imp(vk_usbh_hid_teda_t *hid, uint8_t *buffer, int_fast32_t size, vsf_usbh_urb_complete_t complete)
 {
-    return __vk_usbh_hid_submit_urb(hid, buffer, size, &hid->urb_in);
+    return __vk_usbh_hid_submit_urb(hid, buffer, size, &hid->urb_in, complete);
 }
 
 
@@ -385,9 +388,8 @@ static void __vk_usbh_hid_input_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
             hid->auto_mode = vsf_usbh_hid_input_on_new(hid);
             if (hid->auto_mode) {
-                vk_usbh_urb_set_complete(&hid->urb_in, __vk_usbh_hid_int_complete, hid);
                 vk_usbh_hid_recv_report(&hid->use_as__vk_usbh_hid_teda_t, NULL,
-                    max_report_size);
+                    max_report_size, __vk_usbh_hid_int_complete);
             }
         }
         break;
