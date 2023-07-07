@@ -217,28 +217,27 @@ static void __vk_usbh_uac_on_eda_terminate(vsf_eda_t *eda)
 static void __vk_usbh_uac_iso_complete(void *param, vk_usbh_hcd_urb_t *urb_hcd)
 {
     vk_usbh_urb_t urb = { .urb_hcd = urb_hcd };
-    vk_usbh_uac_t *uac = param;
-    vk_usbh_uac_stream_t *uac_stream = &uac->streams[0];
-
-#if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 1
     vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
+    vk_usbh_uac_t *uac = param;
     int_fast8_t urb_idx = -1;
+    vk_usbh_uac_stream_t *uac_stream = &uac->streams[0];
     for (uint_fast8_t i = 0; i < uac->stream_num; i++, uac_stream++) {
         if (vk_usbh_urb_get_pipe(&uac_stream->urb[0]).value == pipe.value) {
+#if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 1
             for (uint_fast8_t j = 0; j < VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM; j++) {
                 if (uac_stream->urb[j].urb_hcd == urb.urb_hcd) {
                     urb_idx = j;
                     break;
                 }
             }
+#else
+            urb_idx = 0;
+#endif
             break;
         }
     }
-    VSF_USB_ASSERT((urb_idx >= 0) && (urb_idx < VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM));
-#else
-    int_fast8_t urb_idx = 0;
-#endif
 
+    VSF_USB_ASSERT((urb_idx >= 0) && (urb_idx < VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM));
     vsf_stream_t *stream = uac_stream->stream;
     uint_fast32_t actual_length = vk_usbh_urb_get_actual_length(&urb);
     // TODO: make sure actual_length is good
