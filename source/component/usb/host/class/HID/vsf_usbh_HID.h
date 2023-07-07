@@ -51,7 +51,7 @@ extern "C" {
             __PLOOC_EVAL(vk_usbh_hid_send_report, __VA_ARGS__)((__hid), (__buffer), (__size), ##__VA_ARGS__)
 
 #define vk_usbh_hid_recv_report1(__hid, __buffer, __size, __complete)           \
-            __vk_usbh_hid_send_report_imp(                                      \
+            __vk_usbh_hid_recv_report_imp(                                      \
                 (vk_usbh_hid_teda_t *)(__hid), (__buffer), (__size), (__complete))
 #define vk_usbh_hid_recv_report0(__hid, __buffer, __size)                       \
             vk_usbh_hid_recv_report1(                                           \
