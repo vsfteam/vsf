@@ -172,9 +172,9 @@ void vk_xb360_process_input(vk_input_xb360_t *dev, vsf_usb_xb360_gamepad_in_repo
 WEAK(vsf_usbh_xb360_on_report_input)
 void vsf_usbh_xb360_on_report_input(vk_usbh_xb360_t *xb360, vsf_usb_xb360_gamepad_in_report_t *report)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB360 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB360 == ENABLED
     vk_xb360_process_input(&xb360->use_as__vk_input_xb360_t, report);
-#   endif
+#endif
 }
 
 WEAK(vsf_usbh_xb360_on_report_output)
@@ -185,17 +185,35 @@ void vsf_usbh_xb360_on_report_output(vk_usbh_xb360_t *xb360)
 WEAK(vsf_usbh_xb360_on_new)
 void vsf_usbh_xb360_on_new(vk_usbh_xb360_t *xb360)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB360 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB360 == ENABLED
     vk_xb360_new_dev(&xb360->use_as__vk_input_xb360_t);
-#   endif
+#endif
 }
 
 WEAK(vsf_usbh_xb360_on_free)
 void vsf_usbh_xb360_on_free(vk_usbh_xb360_t *xb360)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB360 == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_XB360 == ENABLED
     vk_xb360_free_dev(&xb360->use_as__vk_input_xb360_t);
-#   endif
+#endif
+}
+
+static void __vk_usbh_xb360_int_complete(void *param, vk_usbh_hcd_urb_t *urb_hcd)
+{
+    vk_usbh_xb360_t *xb360 = param;
+    vk_usbh_urb_t urb = { .urb_hcd = urb_hcd };
+    vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
+
+    if (pipe.dir_in1out0) {
+        if (    (URB_OK == vk_usbh_urb_get_status(&urb))
+            &&  (sizeof(vsf_usb_xb360_gamepad_in_report_t) == vk_usbh_urb_get_actual_length(&urb))) {
+            vsf_usbh_xb360_on_report_input(xb360, (vsf_usb_xb360_gamepad_in_report_t *)vk_usbh_urb_peek_buffer(&urb));
+        }
+        vk_usbh_hid_recv_report(&xb360->use_as__vk_usbh_hid_teda_t, NULL, sizeof(vsf_usb_xb360_gamepad_in_report_t));
+    } else {
+        xb360->out_idle = true;
+        vsf_usbh_xb360_on_report_output(xb360);
+    }
 }
 
 static void __vk_usbh_xb360_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
@@ -205,28 +223,13 @@ static void __vk_usbh_xb360_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     switch (evt) {
     case VSF_EVT_INIT:
         __vsf_eda_crit_npb_leave(&xb360->dev->ep0.crit);
+        vk_usbh_urb_set_complete(&xb360->urb_in, __vk_usbh_xb360_int_complete, xb360);
         vk_usbh_hid_recv_report(&xb360->use_as__vk_usbh_hid_teda_t, NULL, sizeof(vsf_usb_xb360_gamepad_in_report_t));
         xb360->gamepad_out_buf.buffer[1] = 0x08;
+        vk_usbh_urb_set_complete(&xb360->urb_out, __vk_usbh_xb360_int_complete, xb360);
         vk_usbh_hid_send_report(&xb360->use_as__vk_usbh_hid_teda_t, (uint8_t *)&xb360->gamepad_out_buf, 8);
 
         // TODO: use timer?
-        break;
-    case VSF_EVT_MESSAGE: {
-            vk_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
-            vk_usbh_pipe_t pipe;
-
-            pipe = vk_usbh_urb_get_pipe(&urb);
-            if (pipe.dir_in1out0) {
-                if (    (URB_OK == vk_usbh_urb_get_status(&urb))
-                    &&  (sizeof(vsf_usb_xb360_gamepad_in_report_t) == vk_usbh_urb_get_actual_length(&urb))) {
-                    vsf_usbh_xb360_on_report_input(xb360, (vsf_usb_xb360_gamepad_in_report_t *)vk_usbh_urb_peek_buffer(&urb));
-                }
-                vk_usbh_hid_recv_report(&xb360->use_as__vk_usbh_hid_teda_t, NULL, sizeof(vsf_usb_xb360_gamepad_in_report_t));
-            } else {
-                xb360->out_idle = true;
-                vsf_usbh_xb360_on_report_output(xb360);
-            }
-        }
         break;
     }
     return;

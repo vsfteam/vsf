@@ -294,19 +294,19 @@ vsf_err_t __vk_usbh_hid_recv_report_imp(vk_usbh_hid_teda_t *hid, uint8_t *buffer
 WEAK(vsf_usbh_hid_input_on_desc)
 uint_fast8_t vsf_usbh_hid_input_on_desc(vk_usbh_hid_input_t *hid, uint8_t *desc_buf, uint_fast32_t desc_len)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
     return vk_hid_parse_desc(&hid->use_as__vk_input_hid_t, desc_buf, desc_len);
-#   else
+#else
     return 64;
-#   endif
+#endif
 }
 
 WEAK(vsf_usbh_hid_input_on_report_input)
 void vsf_usbh_hid_input_on_report_input(vk_usbh_hid_input_t *hid, uint8_t *report, uint_fast32_t len)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
     vk_hid_process_input(&hid->use_as__vk_input_hid_t, report, len);
-#   endif
+#endif
 }
 
 WEAK(vsf_usbh_hid_input_on_report_output)
@@ -317,18 +317,39 @@ void vsf_usbh_hid_input_on_report_output(vk_usbh_hid_input_t *hid, int_fast16_t 
 WEAK(vsf_usbh_hid_input_on_new)
 bool vsf_usbh_hid_input_on_new(vk_usbh_hid_input_t *hid)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
     vk_hid_new_dev(&hid->use_as__vk_input_hid_t);
-#   endif
+#endif
     return true;
 }
 
 WEAK(vsf_usbh_hid_input_on_free)
 void vsf_usbh_hid_input_on_free(vk_usbh_hid_input_t *hid)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
     vk_hid_free_dev(&hid->use_as__vk_input_hid_t);
-#   endif
+#endif
+}
+
+static void __vk_usbh_hid_int_complete(void *param, vk_usbh_hcd_urb_t *urb_hcd)
+{
+    vk_usbh_hid_input_t *hid = param;
+    vk_usbh_urb_t urb = { .urb_hcd = urb_hcd };
+    vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
+
+    if (pipe.dir_in1out0) {
+        if (URB_OK == vk_usbh_urb_get_status(&urb)) {
+            uint_fast32_t len = vk_usbh_urb_get_actual_length(&urb);
+            uint8_t *report = vk_usbh_urb_peek_buffer(&urb);
+            vsf_usbh_hid_input_on_report_input(hid, report, len);
+        }
+
+        if (hid->auto_mode) {
+            vk_usbh_hid_recv_report(&hid->use_as__vk_usbh_hid_teda_t, NULL, 0);
+        }
+    } else {
+        vsf_usbh_hid_input_on_report_output(hid, vk_usbh_urb_get_status(&urb));
+    }
 }
 
 static void __vk_usbh_hid_input_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
@@ -364,27 +385,9 @@ static void __vk_usbh_hid_input_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
             hid->auto_mode = vsf_usbh_hid_input_on_new(hid);
             if (hid->auto_mode) {
+                vk_usbh_urb_set_complete(&hid->urb_in, __vk_usbh_hid_int_complete, hid);
                 vk_usbh_hid_recv_report(&hid->use_as__vk_usbh_hid_teda_t, NULL,
                     max_report_size);
-            }
-        }
-        break;
-    case VSF_EVT_MESSAGE: {
-            vk_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
-            vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
-
-            if (pipe.dir_in1out0) {
-                if (URB_OK == vk_usbh_urb_get_status(&urb)) {
-                    uint_fast32_t len = vk_usbh_urb_get_actual_length(&urb);
-                    uint8_t *report = vk_usbh_urb_peek_buffer(&urb);
-                    vsf_usbh_hid_input_on_report_input(hid, report, len);
-                }
-
-                if (hid->auto_mode) {
-                    vk_usbh_hid_recv_report(&hid->use_as__vk_usbh_hid_teda_t, NULL, 0);
-                }
-            } else {
-                vsf_usbh_hid_input_on_report_output(hid, vk_usbh_urb_get_status(&urb));
             }
         }
         break;

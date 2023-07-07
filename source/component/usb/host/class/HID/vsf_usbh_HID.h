@@ -80,12 +80,12 @@ vsf_class(vk_usbh_hid_base_t) {
         vk_usbh_t *usbh;
         vk_usbh_dev_t *dev;
         vk_usbh_ifs_t *ifs;
+
+        vk_usbh_urb_t urb_in;
+        vk_usbh_urb_t urb_out;
     )
 
     private_member(
-        vk_usbh_urb_t urb_in;
-        vk_usbh_urb_t urb_out;
-
         uint16_t desc_len;
     )
 };

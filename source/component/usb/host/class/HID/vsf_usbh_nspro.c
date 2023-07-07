@@ -90,6 +90,8 @@ const vk_usbh_class_drv_t vk_usbh_nspro_drv = {
 extern void vsf_nspro_on_report_parsed(vk_input_evt_t *evt);
 #endif
 
+static void __vk_usbh_nspro_send_cmd(vk_usbh_nspro_t *nspro, uint_fast8_t cmd);
+
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
@@ -144,9 +146,9 @@ static void __vk_usbh_nspro_process_input(vk_usbh_nspro_t *dev, vsf_usb_nspro_ga
 WEAK(vsf_usbh_nspro_on_report_input)
 void vsf_usbh_nspro_on_report_input(vk_usbh_nspro_t *nspro, vsf_usb_nspro_gamepad_in_report_t *report)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
     __vk_usbh_nspro_process_input(nspro, report);
-#   endif
+#endif
 }
 
 WEAK(vsf_usbh_nspro_on_report_output)
@@ -157,23 +159,70 @@ void vsf_usbh_nspro_on_report_output(vk_usbh_nspro_t *nspro)
 WEAK(vsf_usbh_nspro_on_new)
 void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
     vsf_nspro_on_new_dev(nspro);
-#   endif
+#endif
 }
 
 WEAK(vsf_usbh_nspro_on_free)
 void vsf_usbh_nspro_on_free(vk_usbh_nspro_t *nspro)
 {
-#   if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
     vsf_nspro_on_free_dev(nspro);
-#   endif
+#endif
+}
+
+static void __vk_usbh_nspro_int_complete(void *param, vk_usbh_hcd_urb_t *urb_hcd)
+{
+    vk_usbh_nspro_t *nspro = param;
+    vk_usbh_urb_t urb = { .urb_hcd = urb_hcd };
+    vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
+
+    if (pipe.dir_in1out0) {
+        uint8_t *buffer = vk_usbh_urb_peek_buffer(&urb);
+        if (buffer != NULL) {
+            switch (nspro->start_state) {
+            case VSF_USBH_NSPRO_GET_INFO:
+                if (    (URB_OK != vk_usbh_urb_get_status(&urb))
+                    ||  (buffer[0] != 0x81) || (buffer[1] != 0x01)) {
+                    break;
+                }
+
+                nspro->type = buffer[3];
+                memcpy(nspro->mac, &buffer[4], 6);
+
+                nspro->start_state++;
+                __vk_usbh_nspro_send_cmd(nspro, 2);
+                break;
+            case VSF_USBH_NSPRO_HANDSHAKE:
+                if (    (URB_OK != vk_usbh_urb_get_status(&urb))
+                    ||  (buffer[0] != 0x81) || (buffer[1] != 0x02)) {
+                    break;
+                }
+                nspro->start_state++;
+                __vk_usbh_nspro_send_cmd(nspro, 4);
+                break;
+            case VSF_USBH_NSPRO_RUNNING:
+                if (URB_OK == vk_usbh_urb_get_status(&urb)) {
+                    vsf_usbh_nspro_on_report_input(nspro, (vsf_usb_nspro_gamepad_in_report_t *)buffer);
+                }
+                break;
+            }
+            vk_usbh_hid_recv_report(&nspro->use_as__vk_usbh_hid_teda_t, NULL, 64);
+        }
+    } else {
+        if (VSF_USBH_NSPRO_RUNNING == nspro->start_state) {
+            nspro->out_idle = true;
+            vsf_usbh_nspro_on_report_output(nspro);
+        }
+    }
 }
 
 static void __vk_usbh_nspro_send_cmd(vk_usbh_nspro_t *nspro, uint_fast8_t cmd)
 {
     nspro->gamepad_out_buf.buffer[0] = 0x80;
     nspro->gamepad_out_buf.buffer[1] = cmd;
+    vk_usbh_urb_set_complete(&nspro->urb_out, __vk_usbh_nspro_int_complete, nspro);
     vk_usbh_hid_send_report(&nspro->use_as__vk_usbh_hid_teda_t, (uint8_t *)&nspro->gamepad_out_buf, 2);
 }
 
@@ -198,48 +247,10 @@ static void __vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             if (USB_ENDPOINT_XFER_CONTROL == pipe.type) {
                 nspro->start_state = VSF_USBH_NSPRO_GET_INFO;
                 __vsf_eda_crit_npb_leave(&nspro->dev->ep0.crit);
+                vk_usbh_urb_set_complete(&nspro->urb_in, __vk_usbh_nspro_int_complete, nspro);
                 vk_usbh_hid_recv_report(&nspro->use_as__vk_usbh_hid_teda_t, NULL, 64);
 // no need to send GET_CONNECTION_STATUS command now, controller will send it on startup
 //                __vk_usbh_nspro_send_cmd(nspro, 1);
-            } else /* if (USB_ENDPOINT_XFER_INT == pipe.type) */ {
-                if (pipe.dir_in1out0) {
-                    uint8_t *buffer = vk_usbh_urb_peek_buffer(&urb);
-                    if (buffer != NULL) {
-                        switch (nspro->start_state) {
-                        case VSF_USBH_NSPRO_GET_INFO:
-                            if (    (URB_OK != vk_usbh_urb_get_status(&urb))
-                                ||  (buffer[0] != 0x81) || (buffer[1] != 0x01)) {
-                                break;
-                            }
-
-                            nspro->type = buffer[3];
-                            memcpy(nspro->mac, &buffer[4], 6);
-
-                            nspro->start_state++;
-                            __vk_usbh_nspro_send_cmd(nspro, 2);
-                            break;
-                        case VSF_USBH_NSPRO_HANDSHAKE:
-                            if (    (URB_OK != vk_usbh_urb_get_status(&urb))
-                                ||  (buffer[0] != 0x81) || (buffer[1] != 0x02)) {
-                                break;
-                            }
-                            nspro->start_state++;
-                            __vk_usbh_nspro_send_cmd(nspro, 4);
-                            break;
-                        case VSF_USBH_NSPRO_RUNNING:
-                            if (URB_OK == vk_usbh_urb_get_status(&urb)) {
-                                vsf_usbh_nspro_on_report_input(nspro, (vsf_usb_nspro_gamepad_in_report_t *)buffer);
-                            }
-                            break;
-                        }
-                        vk_usbh_hid_recv_report(&nspro->use_as__vk_usbh_hid_teda_t, NULL, 64);
-                    }
-                } else {
-                    if (VSF_USBH_NSPRO_RUNNING == nspro->start_state) {
-                        nspro->out_idle = true;
-                        vsf_usbh_nspro_on_report_output(nspro);
-                    }
-                }
             }
         }
         break;
