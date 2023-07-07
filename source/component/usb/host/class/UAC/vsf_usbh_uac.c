@@ -42,9 +42,9 @@
 #   error "VSF_USE_SIMPLE_STREAM is required"
 #endif
 
-#ifndef VSF_USBD_UAC_CFG_STREAM_NUM
+#ifndef VSF_USBH_UAC_CFG_STREAM_NUM
 //  default stream number is 2, one for IN and one for OUT
-#   define VSF_USBD_UAC_CFG_STREAM_NUM          2
+#   define VSF_USBH_UAC_CFG_STREAM_NUM          2
 #endif
 
 #ifndef VSF_USBH_UAC_CFG_URB_WITH_BUFFER
@@ -99,7 +99,7 @@ typedef struct vk_usbh_uac_t {
     void *req_data;
 
     vsf_usbh_uac_task_t task;
-    vk_usbh_uac_stream_t streams[VSF_USBD_UAC_CFG_STREAM_NUM];
+    vk_usbh_uac_stream_t streams[VSF_USBH_UAC_CFG_STREAM_NUM];
     union {
         usb_uac_ac_interface_header_desc_t ac_header;
         // seems IAR does not support zero-length array
@@ -552,7 +552,7 @@ static void * __vk_usbh_uac_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_i
         vk_usbh_ifs_parser_t *parser_vs_ifs;
         vk_usbh_ifs_alt_parser_t *parser_vs_alt;
         vk_usbh_uac_stream_t *uac_stream;
-        uac->stream_num = vsf_min(VSF_USBD_UAC_CFG_STREAM_NUM, ac_header->bInCollection);
+        uac->stream_num = vsf_min(VSF_USBH_UAC_CFG_STREAM_NUM, ac_header->bInCollection);
         for (uint_fast8_t i = 0; i < uac->stream_num; i++) {
             if (ac_header->baInterfaceNr[i] >= usbh->parser->num_of_ifs) {
                 goto free_all;
