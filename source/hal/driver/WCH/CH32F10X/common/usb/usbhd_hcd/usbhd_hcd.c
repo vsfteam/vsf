@@ -419,7 +419,7 @@ static void __hc32f10x_usbhd_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     urb->status = err;
                     vsf_dlist_peek_next(hc32f10x_usbhd_urb_t, urb_node, urb, usbhd_hcd->urb_cur);
                     vsf_dlist_remove(hc32f10x_usbhd_urb_t, urb_node, &usbhd_hcd->urb_list, urb);
-                    vsf_eda_post_msg(urb->eda_caller, urb);
+                    vk_usbh_hcd_urb_complete(urb);
                 }
             }
             if (usbhd_hcd->urb_cur != NULL) {

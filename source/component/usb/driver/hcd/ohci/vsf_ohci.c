@@ -852,7 +852,7 @@ static void __ohci_finish_unlinks(vk_ohci_t *ohci)
                 __ohci_ed_fini(urb_ohci);
                 urb_ohci->state &= ~(URB_PRIV_EDSKIP | URB_PRIV_WAIT_COMPLETE);
 
-                vsf_eda_post_msg(urb->eda_caller, urb);
+                vk_usbh_hcd_urb_complete(urb);
             }
         } else {
             // TODO: no vsf_slist API to get &ed->node.next
@@ -986,7 +986,7 @@ static void ohci_td_takeback(vk_ohci_t *ohci, ohci_td_t *td)
             urb_ohci->state |= URB_PRIV_WAIT_COMPLETE;
             __ohci_ed_start_unlink(ohci, urb_ohci);
         } else {
-            vsf_eda_post_msg(urb->eda_caller, urb);
+            vk_usbh_hcd_urb_complete(urb);
         }
     }
 }
@@ -1209,7 +1209,7 @@ static void __ohci_free_urb_do(vk_usbh_hcd_urb_t *urb)
         vsf_usbh_free(urb);
     } else {
         urb->status = URB_CANCELED;
-        vsf_eda_post_msg(urb->eda_caller, urb);
+        vk_usbh_hcd_urb_complete(urb);
     }
 }
 

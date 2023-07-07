@@ -258,7 +258,7 @@ static void __vk_dwcotg_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
         vsf_usbh_free(urb);
     } else {
         urb->status = URB_CANCELED;
-        vsf_eda_post_msg(urb->eda_caller, urb);
+        vk_usbh_hcd_urb_complete(urb);
     }
 }
 
@@ -1153,7 +1153,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
             if (is_discarded) {
                 vsf_eda_post_msg((vsf_eda_t *)&dwcotg_hcd->task, urb_orig);
             } else if (is_to_notify) {
-                vsf_eda_post_msg(urb_orig->eda_caller, urb_orig);
+                vk_usbh_hcd_urb_complete(urb_orig);
             }
             if (dwcotg_urb != NULL) {
                 if (dwcotg_urb->is_discarded) {

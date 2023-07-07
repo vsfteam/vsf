@@ -779,7 +779,7 @@ static bool __vk_winusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
         return true;
     } else {
         urb->status = URB_CANCELED;
-        vsf_eda_post_msg(urb->eda_caller, urb);
+        vk_usbh_hcd_urb_complete(urb);
         return true;
     }
 }
@@ -907,7 +907,7 @@ static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     winusb_urb->is_msg_processed = true;
                 }
             } else {
-                vsf_eda_post_msg(urb->eda_caller, urb);
+                vk_usbh_hcd_urb_complete(urb);
                 winusb_urb->state = VSF_WINUSB_HCD_URB_STATE_IDLE;
                 winusb_urb->is_msg_processed = true;
             }

@@ -428,7 +428,7 @@ urb_finished:
 #   endif
 #endif
     musb_urb->state = URB_STATE_IDLE;
-    vsf_eda_post_msg(urb->eda_caller, urb);
+    vk_usbh_hcd_urb_complete(urb);
     return VSF_ERR_NONE;
 }
 
@@ -524,7 +524,7 @@ static void __f1cx00s_usbh_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 #if F1CX00S_USBH_TRACE_EN == ENABLED
                     vsf_trace_debug("urb failed: %08X\r\n", urb);
 #endif
-                    vsf_eda_post_msg(urb->eda_caller, urb);
+                    vk_usbh_hcd_urb_complete(urb);
                 }
                 if (is_in_queue) {
                     goto wait_next_urb;

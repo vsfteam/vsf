@@ -772,7 +772,7 @@ static bool __vk_libusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
             vsf_usbh_free(urb);
         } else {
             urb->status = URB_CANCELED;
-            vsf_eda_post_msg(urb->eda_caller, urb);
+            vk_usbh_hcd_urb_complete(urb);
         }
         return true;
     }
@@ -917,7 +917,7 @@ static void __vk_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 __vk_libusb_hcd_trace_urb(urb, "notify");
 #endif
 
-                vsf_eda_post_msg(urb->eda_caller, urb);
+                vk_usbh_hcd_urb_complete(urb);
                 libusb_urb->state = VSF_LIBUSB_HCD_URB_STATE_IDLE;
                 libusb_urb->is_msg_processed = true;
             }
