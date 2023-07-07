@@ -181,7 +181,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
     vk_musb_fdrc_urb_t *musb_urb = (vk_musb_fdrc_urb_t *)urb->priv;
 
     vk_usbh_pipe_t pipe = urb->pipe;
-    bool is_iso = pipe.type == USB_ENDPOINT_XFER_ISOC;
+    bool is_periodic = (pipe.type == USB_ENDPOINT_XFER_ISOC) || (pipe.type == USB_ENDPOINT_XFER_INT);
     bool is_in = pipe.dir_in1out0 > 0;
     uint_fast16_t epsize = (pipe.size + 7) & ~7;
     uint8_t *buffer = urb->buffer;
@@ -208,9 +208,10 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
             if (is_in) {
                 reg->EP->EPN.RxType = (pipe.type << 4) | pipe.endpoint;
                 reg->EP->EPN.RxMAXP = epsize >> 3;
-                if (is_iso) {
-                    reg->EP->EPN.RxInterval = 1;
+                if (is_periodic) {
+                    reg->EP->EPN.RxInterval = pipe.interval;
                 } else {
+                    // NAK Timeout for BULK
                     reg->EP->EPN.RxInterval = 0;
                 }
 
@@ -219,9 +220,10 @@ static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hc
             } else {
                 reg->EP->EPN.TxType = (pipe.type << 4) | pipe.endpoint;
                 reg->EP->EPN.TxMAXP = epsize >> 3;
-                if (is_iso) {
-                    reg->EP->EPN.TxInterval = 1;
+                if (is_periodic) {
+                    reg->EP->EPN.TxInterval = pipe.interval;
                 } else {
+                    // NAK Timeout for BULK
                     reg->EP->EPN.TxInterval = 0;
                 }
 
