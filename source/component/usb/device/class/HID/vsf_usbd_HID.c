@@ -19,7 +19,7 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_HID == ENABLED
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_HID == ENABLED && VSF_USBD_CFG_RAW_MODE != ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_USBD_CLASS_INHERIT__
