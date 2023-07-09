@@ -167,6 +167,9 @@ extern "C" {
             .str                = __str,                                        \
         };
 
+#define usbd_str_desc(__name, __type, __str)                                    \
+        __usbd_str_desc(__name, __type, __str)
+
 #define __usbd_str_product_desc(__name, __str_product)                          \
         __usbd_str_desc(__name, product, __str_product)
 #define usbd_str_product_desc(__name, __str_product)                            \
@@ -289,7 +292,11 @@ extern "C" {
             VSF_USBD_DESC_STRING(__##__name##_langid, 2, &__##__name##_str_product, sizeof(__##__name##_str_product)),\
             VSF_USBD_DESC_STRING(__##__name##_langid, 3, &__##__name##_str_serial, sizeof(__##__name##_str_serial)),
 
-#define __usbd_func_str_desc_table_langid(__name, __func_id, __lang_id)          \
+// __type is the same in usbd_str_desc
+#define usbd_str_desc_table(__name, __index, __type)                            \
+            VSF_USBD_DESC_STRING(__##__name##_langid, (__index), &__##__name##_str_##__type, sizeof(__##__name##_str_##__type)),
+
+#define __usbd_func_str_desc_table_langid(__name, __func_id, __lang_id)         \
             VSF_USBD_DESC_STRING((__lang_id), 4 + __func_id, &__##__name##_str_func##__func_id, sizeof(__##__name##_str_func##__func_id)),
 #define __usbd_func_str_desc_table(__name, __func_id)                           \
         __usbd_func_str_desc_table_langid(__name, __func_id, __##__name##_langid)
@@ -305,7 +312,7 @@ extern "C" {
 #define __usbd_ifs(__name)                                                      \
         vk_usbd_ifs_t __##__name##_ifs[__##__name##_ifsnum] = {
 
-#define __end_describe_usbd(__name, __drv)                                      \
+#define __end_describe_usbd(__name, __drv, ...)                                 \
         };                                                                      \
         vk_usbd_cfg_t __##__name##_cfg[1] = {                                   \
             {                                                                   \
@@ -320,6 +327,7 @@ extern "C" {
             .desc               = (vk_usbd_desc_t *)__##__name##_std_descs,     \
             .speed              = (usb_dc_speed_t)__##__name##_speed,           \
             .drv                = &(__drv),                                     \
+            __VA_ARGS__                                                         \
         };
 
 
@@ -350,8 +358,8 @@ extern "C" {
         __usbd_func(__name)
 #define usbd_ifs(__name)                                                        \
         __usbd_ifs(__name)
-#define end_describe_usbd(__name, __drv)                                        \
-        __end_describe_usbd(__name, (__drv))
+#define end_describe_usbd(__name, __drv, ...)                                   \
+        __end_describe_usbd(__name, (__drv), ##__VA_ARGS__)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -623,6 +631,9 @@ void vk_usbd_ep_stream_connect_dev(vk_usbd_ep_stream_t *obj,
 #endif
 #if VSF_USBD_USE_MSC == ENABLED
 #   include "./class/MSC/vsf_usbd_MSC.h"
+#endif
+#if VSF_USBD_USE_DFU == ENABLED
+#   include "./class/DFU/vsf_usbd_DFU.h"
 #endif
 
 #if defined(VSF_USBD_CFG_DRV_LV0_OO) && defined(VSF_USBD_CFG_DRV_LV0_OO_OBJ_HEADER)

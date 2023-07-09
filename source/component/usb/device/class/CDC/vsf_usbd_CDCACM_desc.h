@@ -64,8 +64,7 @@ extern "C" {
 #define USB_DESC_CDC_ACM_IAD(__IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL)\
             USB_DESC_IAD((__IFS_START), 2, USB_CLASS_COMM, 0x02, 0x01, (__I_FUNC))\
             USB_DESC_CDC_ACM((__IFS_START), (__I_FUNC), (__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE), (__INT_EP_INTERVAL))
-#define USB_DESC_CDC_ACM_IAD_LEN                                                \
-            (USB_DT_INTERFACE_ASSOCIATION_SIZE + USB_DESC_CDC_ACM_LEN)
+#define USB_DESC_CDC_ACM_IAD_LEN                (USB_DESC_IAD_LEN + USB_DESC_CDC_ACM_LEN)
 
 #define USB_DESC_CDC_UART_HS(__IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP)\
             USB_DESC_CDC_ACM((__IFS_START), (__I_FUNC), (__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), 512, 0x10)

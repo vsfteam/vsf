@@ -37,15 +37,13 @@ extern "C" {
             USB_DESC_MSC((__IFS), 0x06, 0x50, (__I_FUNC))                       \
             USB_DESC_EP(USB_DIR_IN | (__BULK_IN_EP), USB_ENDPOINT_XFER_BULK, __BULK_EP_SIZE, 0x00)\
             USB_DESC_EP(USB_DIR_OUT | (__BULK_OUT_EP), USB_ENDPOINT_XFER_BULK, __BULK_EP_SIZE, 0x00)
-#define USB_DESC_MSCBOT_LEN                                                     \
-            (USB_DT_INTERFACE_SIZE + 2 * USB_DT_ENDPOINT_SIZE)
+#define USB_DESC_MSCBOT_LEN                 (USB_DT_INTERFACE_SIZE + 2 * USB_DT_ENDPOINT_SIZE)
 
 #define USB_DESC_MSCBOT_IAD(__IFS, __I_FUNC, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE)\
             USB_DESC_MSC_IAD((__IFS), 0x06, 0x50, (__I_FUNC))                   \
             USB_DESC_EP(USB_DIR_IN | (__BULK_IN_EP), USB_ENDPOINT_XFER_BULK, __BULK_EP_SIZE, 0x00)\
             USB_DESC_EP(USB_DIR_OUT | (__BULK_OUT_EP), USB_ENDPOINT_XFER_BULK, __BULK_EP_SIZE, 0x00)
-#define USB_DESC_MSCBOT_IAD_LEN                                                 \
-            (USB_DT_INTERFACE_ASSOCIATION_SIZE + USB_DESC_MSCBOT_LEN)
+#define USB_DESC_MSCBOT_IAD_LEN             (USB_DESC_IAD_LEN + USB_DESC_MSCBOT_LEN)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

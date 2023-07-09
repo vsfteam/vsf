@@ -77,14 +77,14 @@ extern "C" {
 #define usbd_webusb_url_desc(__name, __landing_page, __prefix, __url_len, __url)\
         __usbd_webusb_url_desc(__name, __landing_page, (__prefix), (__url_len), (__url))
 
-#define __usbd_webusb_url_desc_buffer(__name, __index)                          \
-        &__##__name##_webusb_url##__index##_desc
-#define __usbd_webusb_url_desc_len(__name, __index)                             \
-        sizeof(__##__name##_webusb_url##__index##_desc)
-#define usbd_webusb_url_desc_buffer(__name, __index)                            \
-        __usbd_webusb_url_desc_buffer(__name, __index)
-#define usbd_webusb_url_desc_len(__name, __index)                               \
-        __usbd_webusb_url_desc_len(__name, __index)
+#define __usbd_webusb_url_desc_buffer(__name, __landing_page)                   \
+        &__##__name##_webusb_url##__landing_page##_desc
+#define __usbd_webusb_url_desc_len(__name, __landing_page)                      \
+        sizeof(__##__name##_webusb_url##__landing_page##_desc)
+#define usbd_webusb_url_desc_buffer(__name, __landing_page)                     \
+        __usbd_webusb_url_desc_buffer(__name, __landing_page)
+#define usbd_webusb_url_desc_len(__name, __landing_page)                        \
+        __usbd_webusb_url_desc_len(__name, __landing_page)
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

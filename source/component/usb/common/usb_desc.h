@@ -79,7 +79,7 @@ extern "C" {
 
 #define USB_DESC_IAD_LEN                        USB_DT_INTERFACE_ASSOCIATION_SIZE
 #define USB_DESC_IAD(__IFS_START, __IFS_NUM, __CLASS, __SUBCLASS, __PROTOCOL, __I_FUNC)\
-            USB_DESC_IAD_LEN                 ,  /* IDA */                       \
+            USB_DESC_IAD_LEN,                   /* IDA */                       \
             USB_DT_INTERFACE_ASSOCIATION,                                       \
             (__IFS_START),                      /* bFirstInterface */           \
             (__IFS_NUM),                        /* bInterfaceCount */           \
