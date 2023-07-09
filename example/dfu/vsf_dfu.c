@@ -187,7 +187,7 @@ static vk_usbd_dev_t __usbd_dev = {
 };
 
 #if VSF_DFU_CFG_DEBUG_EN == ENABLED
-#define USBD_EVT_STRING(__EVT)      [__EVT] = STR(__EVT)
+#define USBD_EVT_STRING(__EVT)      [__EVT] = VSF_STR(__EVT)
 static const char * __usbd_dev_debug_info[] = {
     USBD_EVT_STRING(USB_ON_ATTACH),
     USBD_EVT_STRING(USB_ON_DETACH),
@@ -288,6 +288,11 @@ vsf_err_t vsf_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *param)
                                 break;
                             }
                         }
+                        break;
+                    case USB_DT_DEVICE_QUALIFIER:
+                    default:
+                        vk_usbd_drv_ep_set_stall(0 | USB_DIR_OUT);
+                        vk_usbd_drv_ep_set_stall(0 | USB_DIR_IN);
                         break;
                     }
                     break;

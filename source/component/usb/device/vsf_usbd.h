@@ -45,7 +45,7 @@
 #endif
 
 #if VSF_USBD_CFG_RAW_MODE == ENABLED
-// user want to do every thing, expose driver interface
+// user want to do everything, expose driver interface
 #   include "./vsf_usbd_drv_ifs.h"
 #endif
 
