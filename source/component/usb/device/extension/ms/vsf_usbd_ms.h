@@ -38,13 +38,18 @@ extern "C" {
 #define USB_MSOS10_EXT_COMPATID_FUNC_LEN    24
 
 #define __usbd_msos10_compatid_func_desc(__first_ifs, ...)                      \
+        {                                                                       \
             (__first_ifs),                  /* bFirstInterfaceNumber */         \
             1,                              /* Reserved */                      \
-            __VA_ARGS__
+            __VA_ARGS__                                                         \
+        },
 
 #define __usbd_msos10_compatid_desc(__name, __section_cnt, ...)                 \
-        const uint8_t __##__name##_msos10_compatid_desc[                        \
-                USB_MSOS10_EXT_COMPATID_HEADER_LEN + ((__section_cnt) * USB_MSOS10_EXT_COMPATID_FUNC_LEN)] = {\
+        typedef struct __##__name##_msos10_compatid_desc_t {                    \
+            uint8_t header[USB_MSOS10_EXT_COMPATID_HEADER_LEN];                 \
+            uint8_t func[__section_cnt][USB_MSOS10_EXT_COMPATID_FUNC_LEN];      \
+        } __##__name##_msos10_compatid_desc_t;                                  \
+        const __##__name##_msos10_compatid_desc_t __##__name##_msos10_compatid_desc = {\
             USB_DESC_DWORD(40),             /* dwLength */                      \
             USB_DESC_WORD(0x0100),          /* bcdVersion: 1.0 */               \
             USB_DESC_WORD(4),               /* wIndex: Extended compat ID descriptor index */\
