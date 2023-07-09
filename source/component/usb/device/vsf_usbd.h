@@ -31,6 +31,7 @@
 #include "./extension/bos/vsf_usbd_bos.h"
 #include "./extension/winusb/vsf_usbd_winusb.h"
 #include "./extension/webusb/vsf_usbd_webusb.h"
+#include "./extension/ms/vsf_usbd_ms.h"
 
 // dcd driver layer
 #include "hal/vsf_hal.h"

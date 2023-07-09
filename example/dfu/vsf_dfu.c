@@ -130,9 +130,10 @@ const uint8_t __usbd_bos_desc[USB_DT_BOS_SIZE + USB_BOS_CAP_WEBUSB_LEN] = {
     USB_DESC_WORD(USB_DT_BOS_SIZE + USB_BOS_CAP_WEBUSB_LEN),
     1,
 
+    // vendor_code of webusb is 1
     bos_desc_webusb(1, 1)
 };
-#define USB_BOS_STR     u"MSFT100!"
+#define USB_BOS_STR     u"MSFT100!"     // vendor_code of winusb will be '!'
 struct {
     uint8_t bLength;
     uint8_t bDescriptorType;
@@ -324,12 +325,16 @@ vsf_err_t vsf_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *param)
                 break;
             case USB_TYPE_VENDOR:
                 switch (request->bRequest) {
-                    case 0x21:
+                case 0x01:  // vendor_code of webusb
                     switch (request->wIndex) {
                     case 0x02:
                         buffer = (uint8_t *)&__usbd_webusb_url_desc;
                         size = sizeof(__usbd_webusb_url_desc);
                         break;
+                    }
+                    break;
+                case '!':   // vendor_code of winusb
+                    switch (request->wIndex) {
                     case 0x04:
                         buffer = (uint8_t *)&__usbd_winusb_desc;
                         size = sizeof(__usbd_winusb_desc);
