@@ -1274,7 +1274,6 @@ SECTION(".text.vsf.kernel.vsf_callback_timer_remove_isr")
 extern vsf_err_t vsf_callback_timer_remove_isr(vsf_callback_timer_t *timer);
 #       endif
 
-#       if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
 static inline vsf_err_t vsf_callback_timer_add_ms(vsf_callback_timer_t *timer, uint_fast32_t ms)
 {
     return vsf_callback_timer_add(timer, vsf_systimer_ms_to_tick(ms));
@@ -1284,7 +1283,6 @@ static inline vsf_err_t vsf_callback_timer_add_us(vsf_callback_timer_t *timer, u
 {
     return vsf_callback_timer_add(timer, vsf_systimer_us_to_tick(us));
 }
-#       endif
 #   endif
 #endif
 

@@ -49,16 +49,22 @@ extern "C" {
 #define __usbd_dfu_desc(__name, __ifs_start, __i_func, __protocol, __dfu_attr, __detach_timeout, __transfer_size)\
             USB_DESC_DFU((__ifs_start), (__i_func), (__protocol), (__dfu_attr), (__detach_timeout), (__transfer_size))
 
-#define USB_DFU_PARAM(__PROTOCOL, __DFU_ATTR, __TRANSFER_BUFFER)                \
+#define USB_DFU_PARAM(__PROTOCOL, __DFU_ATTR, __TRANSFER_SIZE, __TRANSFER_BUFFER)\
             .protocol = (__PROTOCOL),                                           \
             .attribute = (__DFU_ATTR),                                          \
+            .transfer_size = (__TRANSFER_SIZE),                                 \
             .transfer_buffer = (__TRANSFER_BUFFER),
 
-#define __usbd_dfu_func(__name, __func_id, __protocol, __dfu_attr, __transfer_size)\
-            static uint8_t __##__name##_DFU##__transfer_buffer[__transfer_size];\
+#define __usbd_dfu_func1(__name, __func_id, __protocol, __dfu_attr, __transfer_size, __transfer_buffer)\
             vk_usbd_dfu_t __##__name##_DFU##__func_id = {                       \
-                USB_DFU_PARAM((__protocol), (__dfu_attr), __##__name##_DFU##__transfer_buffer)\
+                USB_DFU_PARAM((__protocol), (__dfu_attr), (__transfer_size), (__transfer_buffer))\
             };
+#define __usbd_dfu_func0(__name, __func_id, __protocol, __dfu_attr, __transfer_size)\
+            static uint8_t __##__name##_DFU##__transfer_buffer[__transfer_size];\
+            __usbd_dfu_func1(__name, __func_id, (__protocol), (__dfu_attr), (__transfer_size), &__##__name##_DFU##__transfer_buffer[__transfer_size])
+
+#define __usbd_dfu_func(__name, __func_id, __protocol, __dfu_attr, __transfer_size, ...)\
+            __PLOOC_EVAL(__usbd_dfu_func, __VA_ARGS__)(__name, __func_id, (__protocol), (__dfu_attr), (__transfer_size), ##__VA_ARGS__)
 
 #define __usbd_dfu_ifs(__name, __func_id)                                       \
             USB_IFS(&vk_usbd_dfu, &__##__name##_DFU##__func_id)
@@ -67,8 +73,8 @@ extern "C" {
             __usbd_dfu_desc(__name, (__ifs_start), __i_func, (__protocol), (__dfu_attr), (__detach_timeout), (__transfer_size))
 #define usbd_dfu_desc_iad(__name, __ifs_start, __i_func, __protocol, __dfu_attr, __detach_timeout, __transfer_size)\
             __usbd_dfu_desc_iad(__name, (__ifs_start), __i_func, (__protocol), (__dfu_attr), (__transfer_size))
-#define usbd_dfu_func(__name, __func_id, __protocol, __dfu_attr, __transfer_size)\
-            __usbd_dfu_func(__name, __func_id, (__protocol), (__dfu_attr), (__transfer_size))
+#define usbd_dfu_func(__name, __func_id, __protocol, __dfu_attr, __transfer_size, ...)\
+            __usbd_dfu_func(__name, __func_id, (__protocol), (__dfu_attr), (__transfer_size), ##__VA_ARGS__)
 #define usbd_dfu_ifs(__name, __func_id)                                         \
             __usbd_dfu_ifs(__name, __func_id)
 
@@ -79,12 +85,15 @@ vsf_class(vk_usbd_dfu_t) {
     public_member(
         uint8_t protocol;
         uint8_t attribute;
+        uint16_t transfer_size;
         uint8_t *transfer_buffer;
     )
     private_member(
         usb_dfu_status_t status;
+        uint16_t block_idx;
+        uint16_t addr;
+        uint16_t cur_size;
 
-        vsf_eda_t eda;
         vk_usbd_dev_t *dev;
         vk_usbd_ifs_t *ifs;
     )
@@ -95,6 +104,8 @@ vsf_class(vk_usbd_dfu_t) {
 extern const vk_usbd_class_op_t vk_usbd_dfu;
 
 /*============================ PROTOTYPES ====================================*/
+
+extern void vk_usbd_dfu_downloaded(vk_usbd_dfu_t *dfu, vsf_err_t result);
 
 #ifdef __cplusplus
 }

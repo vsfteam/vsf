@@ -50,6 +50,39 @@ typedef enum usb_dfu_desc_t {
     USB_DT_DFU_FUNCTIONAL   = (USB_TYPE_CLASS | 0x01),
 } usb_dfu_desc_t;
 
+typedef enum usb_dfu_state_t {
+    DFU_appIDLE             = 0,
+    DFU_appDETACH           = 1,
+    DFU_dfuIDLE             = 2,
+    DFU_dfuDNLOAD_SYNC      = 3,
+    DFU_dfuDNBUSY           = 4,
+    DFU_dfuDNLOAD_IDLE      = 5,
+    DFU_dfuMANIFEST_SYNC    = 6,
+    DFU_dfuMANIFEST         = 7,
+    DFU_dfuMANIFEST_WAIT_RESET  = 8,
+    DFU_dfuUPLOAD_IDLE      = 9,
+    DFU_dfuERROR            = 10,
+} usb_dfu_state_t;
+
+enum {
+    DFU_OK                      = 0,
+    DFU_errTARGET               = 1,
+    DFU_errFILE                 = 2,
+    DFU_errWRITE                = 3,
+    DFU_errERASE                = 4,
+    DFU_errCHECK_ERASED         = 5,
+    DFU_errPROG                 = 6,
+    DFU_erVERIFY                = 7,
+    DFU_errADDRESS              = 8,
+    DFU_errNOTDONE              = 9,
+    DFU_errFIRMWARE             = 10,
+    DFU_errVENDOR               = 11,
+    DFU_errUSBR                 = 12,
+    DFU_errPOR                  = 13,
+    DFU_errUNKNOWN              = 14,
+    DFU_errSTALLEDPKT           = 15,
+};
+
 typedef struct usb_dfu_functional_descriptor_t usb_dfu_functional_descriptor_t;
 struct usb_dfu_functional_descriptor_t {
     uint8_t bLength;
