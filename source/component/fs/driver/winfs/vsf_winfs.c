@@ -200,6 +200,7 @@ __vsf_component_peda_ifs_entry(__vk_winfs_lookup, vk_file_lookup)
 
         idx = 0;
         do {
+            extern int wcscmp(const wchar_t *wcs1, const wchar_t *wcs2);
             if (    !wcscmp(FindFileData.cFileName, L".")
                 ||  !wcscmp(FindFileData.cFileName, L"..")) {
                 idx++;

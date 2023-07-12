@@ -95,9 +95,9 @@ typedef struct vsf_win_usart_t {
 } vsf_win_usart_t;
 
 typedef struct vsf_win_usart_port_t {
-    uint32_t                        ports_mask;
-    vsf_win_usart_t               * const (*ports)[VSF_WIN_USART_COUNT];
-    vsf_fifo2req_usart_t          * const(*fifo2req_ports)[VSF_WIN_USART_COUNT];
+    uint32_t                            ports_mask;
+    vsf_win_usart_t                     * const (*ports)[VSF_WIN_USART_COUNT];
+    vsf_fifo2req_usart_t                * const (*fifo2req_ports)[VSF_WIN_USART_COUNT];
 } vsf_win_usart_port_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -129,7 +129,7 @@ typedef struct vsf_win_usart_port_t {
 static vsf_win_usart_port_t __vsf_win_usart_port = {
     .ports_mask = 0,
     .ports = &vsf_win_usarts,
-    .fifo2req_ports = &vsf_win_usarts,
+    .fifo2req_ports = (vsf_fifo2req_usart_t * const (*)[32])&vsf_win_usarts,
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/

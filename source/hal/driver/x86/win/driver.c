@@ -181,6 +181,7 @@ static void __vsf_x86_debug_stream_init(void)
     // TODO: in raw 'system' API, calloc will be called,
     //  if linux/linux.stdlib/VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR are enabled,
     //  calloc will trigger assert because calloc is not called in linux environment.
+    extern int system(const char *command);
     system("chcp 65001");
 
     GetConsoleMode(hIn, &mode);

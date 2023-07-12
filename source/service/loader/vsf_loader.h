@@ -40,6 +40,7 @@
 
 #if VSF_USE_LOADER == ENABLED
 
+#undef PUBLIC_CONST
 #if     defined(__VSF_LOADER_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #   define PUBLIC_CONST
