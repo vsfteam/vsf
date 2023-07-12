@@ -25,6 +25,7 @@
 #include "time_api.h"
 #include "stdio_uart.h"
 #include "sysctrl_api.h"
+#include "pmic_api.h"
 
 #include "dbg.h"
 
