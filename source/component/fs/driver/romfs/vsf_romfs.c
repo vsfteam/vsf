@@ -129,9 +129,14 @@ __vsf_component_peda_ifs_entry(__vk_romfs_lookup, vk_file_lookup)
         nextfh = be32_to_cpu(header->nextfh);
     }
 
+    if (NULL == name) {
+        if (found) {
+            dir->pos++;
+        } else {
+            dir->pos = 0;
+        }
+    }
     if (found) {
-        dir->pos++;
-
         vk_romfs_file_t *new_file = (vk_romfs_file_t *)vk_file_alloc(sizeof(vk_romfs_file_t));
         if (NULL == new_file) {
             *vsf_local.result = NULL;
