@@ -96,6 +96,14 @@ __vsf_component_peda_ifs_entry(__vk_romfs_mount, vk_fs_mount)
     vk_vfs_file_t *dir = (vk_vfs_file_t *)&vsf_this;
     vk_romfs_info_t *fsinfo = dir->subfs.data;
     VSF_FS_ASSERT((fsinfo != NULL) && (fsinfo->root.header != NULL));
+
+    // basic check for romfs
+    if (    (fsinfo->root.header->nextfh != be32_to_cpu(0x2d726f6d))
+        ||  (fsinfo->root.header->spec != be32_to_cpu(0x3166732d))) {
+        vsf_eda_return(VSF_ERR_FAIL);
+        return;
+    }
+
     fsinfo->root.attr = VSF_FILE_ATTR_DIRECTORY;
     dir->subfs.root = &fsinfo->root.use_as__vk_file_t;
     vsf_eda_return(VSF_ERR_NONE);
