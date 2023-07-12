@@ -22,6 +22,8 @@
 
 #include "rtos_al.h"
 
+#if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -83,5 +85,6 @@ enum {
 }
 #endif
 
+#endif
 #endif
 /* EOF */
