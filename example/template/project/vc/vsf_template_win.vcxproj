@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\source\component\fs\driver\romfs\vsf_romfs.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\adc\adc_interface.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\adc\adc_template.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\dac\dac_template.h" />
@@ -766,6 +767,7 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\source\component\fs\driver\romfs\vsf_romfs.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\adc\adc_interface.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\dac\dac_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\flash\flash_interface.c" />

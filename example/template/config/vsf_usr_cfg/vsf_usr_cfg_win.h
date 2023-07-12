@@ -178,6 +178,7 @@
 #   define VSF_FS_USE_FATFS                             ENABLED
 #   define VSF_USE_LITTLEFS                             ENABLED
 #       define VSF_FS_USE_LITTLEFS                      ENABLED
+#   define VSF_FS_USE_ROMFS                             ENABLED
 
 #define VSF_USE_TRACE                                   ENABLED
 #define USRAPP_CFG_STDIO_EN                             ENABLED

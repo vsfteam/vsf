@@ -1177,6 +1177,9 @@
     <Filter Include="vsf\hal\driver\common\dac">
       <UniqueIdentifier>{dd697b6c-f7a8-4efd-82a7-31f16a711868}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\fs\driver\romfs">
+      <UniqueIdentifier>{181d9d3f-65d6-4872-8c1f-c7b399ad8478}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3437,6 +3440,9 @@
     </ClInclude>
     <ClInclude Include="..\..\demo\hal_demo\hal_demo.h">
       <Filter>usrapp\demo\hal_demo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\fs\driver\romfs\vsf_romfs.h">
+      <Filter>vsf\component\fs\driver\romfs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5974,6 +5980,9 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\hal_demo\rng_demo.c">
       <Filter>usrapp\demo\hal_demo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\fs\driver\romfs\vsf_romfs.c">
+      <Filter>vsf\component\fs\driver\romfs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

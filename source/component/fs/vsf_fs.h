@@ -305,6 +305,9 @@ extern vsf_err_t vk_file_write_stream(vk_file_stream_t *pthis, vsf_stream_t *str
 #   if VSF_FS_USE_LINFS == ENABLED
 #       include "./driver/linfs/vsf_linfs.h"
 #   endif
+#   if VSF_FS_USE_ROMFS == ENABLED
+#       include "./driver/romfs/vsf_romfs.h"
+#   endif
 #endif
 
 #undef __VSF_FS_CLASS_IMPLEMENT
