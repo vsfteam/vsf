@@ -2212,7 +2212,25 @@ int unlinkat(int dirfd, const char *pathname, int flags)
 int symlink(const char *target, const char *linkpath)
 {
 #if VSF_LINUX_CFG_LINK_FILE == ENABLED
-    if (__vsf_linux_fs_create(linkpath, 0, VSF_FILE_ATTR_LNK | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE) < 0) {
+    vk_file_attr_t attr = VSF_FILE_ATTR_LNK | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE;
+
+    struct stat s;
+    if (stat(target, &s) < 0) {
+        return -1;
+    }
+
+    switch (s.st_mode & S_IFMT) {
+    // link to a directory is not currently supported
+    case S_IFDIR:       attr |= VSF_FILE_ATTR_DIRECTORY;    return -1;
+    case S_IFLNK:
+    case S_IFREG:                                           break;
+    case S_IFIFO:       attr |= VSF_FILE_ATTR_FIFO;         break;
+    case S_IFCHR:       attr |= VSF_FILE_ATTR_CHR;          break;
+    case S_IFBLK:       attr |= VSF_FILE_ATTR_BLK;          break;
+    case S_IFSOCK:      attr |= VSF_FILE_ATTR_SOCK;         break;
+    }
+
+    if (__vsf_linux_fs_create(linkpath, 0, attr) < 0) {
         return -1;
     }
 

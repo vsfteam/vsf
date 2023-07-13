@@ -711,7 +711,7 @@ vsf_err_t vk_file_read(vk_file_t *file, uint8_t *buff, uint_fast32_t size)
 {
     vsf_err_t err;
     VSF_FS_ASSERT(file != NULL);
-    VSF_FS_ASSERT(!(file->attr & VSF_FILE_ATTR_DIRECTORY));
+    VSF_FS_ASSERT((file->attr & VSF_FILE_ATTR_LNK) || !(file->attr & VSF_FILE_ATTR_DIRECTORY));
     VSF_FS_ASSERT(file->attr & VSF_FILE_ATTR_READ);
     VSF_FS_ASSERT(file->fsop != NULL);
     VSF_FS_ASSERT(file->fsop->fop.fn_read != NULL);
@@ -727,7 +727,7 @@ vsf_err_t vk_file_write(vk_file_t *file, uint8_t *buff, uint_fast32_t size)
 {
     vsf_err_t err;
     VSF_FS_ASSERT(file != NULL);
-    VSF_FS_ASSERT(!(file->attr & VSF_FILE_ATTR_DIRECTORY));
+    VSF_FS_ASSERT((file->attr & VSF_FILE_ATTR_LNK) || !(file->attr & VSF_FILE_ATTR_DIRECTORY));
     VSF_FS_ASSERT(file->attr & VSF_FILE_ATTR_WRITE);
     VSF_FS_ASSERT(file->fsop != NULL);
     VSF_FS_ASSERT(file->fsop->fop.fn_write != NULL);
