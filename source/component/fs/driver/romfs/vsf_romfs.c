@@ -204,7 +204,7 @@ __vsf_component_peda_ifs_entry(__vk_romfs_read, vk_file_read)
     }
     int_fast32_t rsize = file->size - file->pos;
     rsize = vsf_min(size, rsize);
-    memcpy(buff, &header[1], rsize);
+    memcpy(buff, (uint8_t *)&header[1] + file->pos, rsize);
     vsf_eda_return(rsize);
     vsf_peda_end();
 }
