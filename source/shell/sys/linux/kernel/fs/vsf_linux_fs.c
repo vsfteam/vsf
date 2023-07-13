@@ -2224,7 +2224,6 @@ int symlink(const char *target, const char *linkpath)
     size_t targetlen = strlen(target);
     ssize_t res = write(fd, target, targetlen);
     if (res != targetlen) {
-    close_and_fail:
         close(fd);
         return -1;
     }
