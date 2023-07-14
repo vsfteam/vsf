@@ -286,16 +286,11 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
         }
 
         if (elfloader->ram_base != NULL) {
-#if VSF_ELFLOADER_CFG_DYNAMIC_CAN_XIP == ENABLED
-            bool is_xip = target->support_xip;
-#else
-            bool is_xip = target->support_xip && !linfo->has_dynamic;
-#endif
-            if ((0 == header->p_filesz) || (is_xip && (0 == (header->p_flags & PF_W)))) {
+            if ((0 == header->p_filesz) || (linfo->is_xip && (0 == (header->p_flags & PF_W)))) {
                 return VSF_ELFLOADER_CB_GOON;
             }
 
-            Elf_Word memstart = is_xip ? linfo->memstart_xip : linfo->memstart;
+            Elf_Word memstart = linfo->is_xip ? linfo->memstart_xip : linfo->memstart;
             if (vsf_loader_read(target, header->p_offset, (uint8_t *)elfloader->ram_base + header->p_vaddr - memstart, header->p_filesz) != header->p_filesz) {
                 return VSF_ELFLOADER_CB_FAIL;
             }
