@@ -35,6 +35,7 @@ dcl_vsf_peda_methods(static, __vk_memfs_lookup)
 dcl_vsf_peda_methods(static, __vk_memfs_read)
 dcl_vsf_peda_methods(static, __vk_memfs_write)
 dcl_vsf_peda_methods(static, __vk_memfs_setpos)
+static void * __vk_memfs_direct_access(vk_file_t *file);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -56,6 +57,7 @@ const vk_fs_op_t vk_memfs_op = {
         .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_succeed),
         .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
         .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_setpos),
+        .fn_direct_access = __vk_memfs_direct_access,
     },
     .dop            = {
         .fn_lookup  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_memfs_lookup),
@@ -230,6 +232,12 @@ __vsf_component_peda_ifs_entry(__vk_memfs_setpos, vk_file_setpos)
     vsf_eda_return(VSF_ERR_NONE);
 
     vsf_peda_end();
+}
+
+static void * __vk_memfs_direct_access(vk_file_t *file)
+{
+    vk_memfs_file_t *mem_file = (vk_memfs_file_t *)file;
+    return mem_file->f.buff;
 }
 
 #if     __IS_COMPILER_GCC__
