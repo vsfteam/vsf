@@ -617,16 +617,20 @@ static void __vk_musb_fdrc_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t
     int_fast8_t idx;
 
     vsf_protect_t orig = vsf_protect_sched();
+        musb->ep_in_mask &= ~1;
         while ((musb->ep_in_mask & epmask) != 0) {
             idx = vsf_ffs32(musb->ep_in_mask);
             vk_musb_fdrc_clear_mask(&reg->Common->IntrRx1E, idx);
             musb->ep_in_mask &= ~(1 << idx);
         }
+        musb->ep_in_mask |= 1;
+        musb->ep_out_mask &= ~1;
         while ((musb->ep_out_mask & epmask) != 0) {
             idx = vsf_ffs32(musb->ep_out_mask);
             vk_musb_fdrc_clear_mask(&reg->Common->IntrTx1E, idx);
             musb->ep_out_mask &= ~(1 << idx);
         }
+        musb->ep_out_mask |= 1;
     vsf_unprotect_sched(orig);
 
     __vsf_slist_foreach_next_unsafe(vk_musb_fdrc_urb_t, urb_node, &musb->dev_priv.urb_list) {
