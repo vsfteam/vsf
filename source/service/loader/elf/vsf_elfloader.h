@@ -107,9 +107,10 @@ extern int vsf_elfloader_foreach_program_header(vsf_elfloader_t *elfloader, vsf_
         int (*callback)(vsf_elfloader_t *, vsf_loader_target_t *, Elf_Phdr *header, int index, void *param));
 extern int vsf_elfloader_foreach_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, void *param,
         int (*callback)(vsf_elfloader_t *, vsf_loader_target_t *, Elf_Shdr *header, char *name, int index, void *param));
-#endif
 // vsf_elfloader_get_section returns size of the section if found, returns 0 if not found
-extern uint32_t vsf_elfloader_get_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, const char *name, uint32_t *offset);
+extern uint32_t vsf_elfloader_get_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
+        const char *name, Elf_Shdr *header);
+#endif
 
 // CAN NOT be called before vsf_elfloader_load
 extern void * vsf_elfloader_get_symbol(vsf_elfloader_t *elfloader,

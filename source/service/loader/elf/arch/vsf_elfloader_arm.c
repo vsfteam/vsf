@@ -154,8 +154,10 @@ int vsf_elfloader_arch_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtvalu
 {
     switch (type) {
     case R_ARM_JUMP_SLOT:
-    case R_ARM_RELATIVE:
         *(uint32_t *)tgtaddr = tgtvalue;
+        return 0;
+    case R_ARM_RELATIVE:
+        *(uint32_t *)tgtaddr += tgtvalue;
         return 0;
     }
     return -1;

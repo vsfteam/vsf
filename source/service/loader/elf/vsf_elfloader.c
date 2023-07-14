@@ -31,7 +31,13 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_ELFLOADER_CFG_MAX_SYM_LEN
-#   define VSF_ELFLOADER_CFG_MAX_SYM_LEN        (32 + 1)
+#   define VSF_ELFLOADER_CFG_MAX_SYM_LEN            (32 + 1)
+#endif
+
+#ifndef VSF_ELFLOADER_CFG_DYNAMIC_CAN_XIP
+#   ifdef __CPU_ARM__
+#       define VSF_ELFLOADER_CFG_DYNAMIC_CAN_XIP    ENABLED
+#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -48,9 +54,12 @@
 
 typedef struct vsf_elfloader_info_t {
     Elf_Hdr elf_hdr;
+    Elf_Word memstart;
     Elf_Word memsz;
     Elf_Word memstart_xip;
     Elf_Word memsz_xip;
+    Elf_Addr ram_base_vaddr;
+    Elf_Word ram_base_size;
 
     // for .dynamic
     struct {
@@ -76,11 +85,14 @@ typedef struct vsf_elfloader_info_t {
     } export;
 
     uintptr_t entry_offset_in_file;
-    bool load_zero_addr;
     bool has_dynamic;
+    bool is_xip;
 } vsf_elfloader_info_t;
 
 /*============================ PROTOTYPES ====================================*/
+
+static Elf_Off __vsf_elfloader_vaddr2off(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Addr vaddr);
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -272,17 +284,18 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
             &&  (linfo->elf_hdr.e_entry < (header->p_vaddr + header->p_memsz))) {
             linfo->entry_offset_in_file = header->p_offset + linfo->elf_hdr.e_entry;
         }
-        if (0 == header->p_vaddr) {
-            linfo->load_zero_addr = true;
-        }
 
         if (elfloader->ram_base != NULL) {
+#if VSF_ELFLOADER_CFG_DYNAMIC_CAN_XIP == ENABLED
+            bool is_xip = target->support_xip;
+#else
             bool is_xip = target->support_xip && !linfo->has_dynamic;
+#endif
             if ((0 == header->p_filesz) || (is_xip && (0 == (header->p_flags & PF_W)))) {
                 return VSF_ELFLOADER_CB_GOON;
             }
 
-            Elf_Word memstart = is_xip ? linfo->memstart_xip : 0;
+            Elf_Word memstart = is_xip ? linfo->memstart_xip : linfo->memstart;
             if (vsf_loader_read(target, header->p_offset, (uint8_t *)elfloader->ram_base + header->p_vaddr - memstart, header->p_filesz) != header->p_filesz) {
                 return VSF_ELFLOADER_CB_FAIL;
             }
@@ -291,7 +304,14 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
             if (linfo->memsz < mem_max) {
                 linfo->memsz = mem_max;
             }
+            if (linfo->memstart > header->p_vaddr) {
+                linfo->memstart = header->p_vaddr;
+            }
             if (target->support_xip && ((header->p_flags & PF_W) != 0)) {
+                if (    (linfo->memstart_xip != (Elf_Word)-1)
+                    &&  ((linfo->memstart_xip + linfo->memsz_xip) != header->p_vaddr)) {
+                    vsf_trace_warning("load memory not consequent in space, assume good" VSF_TRACE_CFG_LINEEND);
+                }
                 linfo->memsz_xip += header->p_memsz;
                 if (linfo->memstart_xip > header->p_vaddr) {
                     linfo->memstart_xip = header->p_vaddr;
@@ -324,7 +344,13 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
     return VSF_ELFLOADER_CB_GOON;
 }
 
-static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_elfloader_info_t *linfo, int type, void *rel_rela, Elf_Addr size, bool parse_only)
+static bool __vsf_elfloader_is_vaddr_loaded(vsf_elfloader_info_t *linfo, Elf_Addr vaddr)
+{
+    return (vaddr >= linfo->ram_base_vaddr) && (vaddr < linfo->ram_base_vaddr + linfo->ram_base_size);
+}
+
+static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
+        vsf_elfloader_info_t *linfo, int type, Elf_Addr rel_rela, Elf_Addr size, bool parse_only)
 {
     Elf_Word relsym, reltype;
     Elf_Sym sym;
@@ -336,7 +362,15 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_elfloader_in
         uint8_t *ptr;
     } u;
     int ent = (type == DT_REL) ? sizeof(Elf_Rel) : sizeof(Elf_Rela);
-    u.ptr = rel_rela;
+
+    if (linfo->is_xip) {
+        u.ptr = (uint8_t *)target->object + __vsf_elfloader_vaddr2off(elfloader, target, rel_rela);
+    } else if (__vsf_elfloader_is_vaddr_loaded(linfo, rel_rela)) {
+        u.ptr = (uint8_t *)elfloader->ram_base + rel_rela - linfo->ram_base_vaddr;
+    } else {
+        vsf_trace_error("rel/rela not in ram" VSF_TRACE_CFG_LINEEND);
+        return -1;
+    }
 
     for (Elf_Addr i = 0; i < size; i += sizeof(Elf_Rela), u.ptr += ent) {
         relsym = ELF_R_SYM(u.rel->r_info);
@@ -344,28 +378,53 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_elfloader_in
         sym = ((Elf_Sym *)linfo->dynamic.symtbl)[relsym];
         symname = (char *)(linfo->dynamic.strtbl + sym.st_name);
 
-        if (0 == sym.st_shndx) {
-            if (STT_FUNC != ELF_ST_TYPE(sym.st_info)) {
-                vsf_trace_error("only support relocate external functions" VSF_TRACE_CFG_LINEEND);
-                return -1;
-            }
-            linfo->dynamic.external_fn_num++;
-            if (parse_only) { continue; }
+        if (0 == sym.st_value) {
+            if (symname[0] != '\0') {
+                // load from symbol
+                if (STT_FUNC != ELF_ST_TYPE(sym.st_info)) {
+                    vsf_trace_error("only support relocate external functions" VSF_TRACE_CFG_LINEEND);
+                    return -1;
+                }
+                linfo->dynamic.external_fn_num++;
+                if (parse_only) { continue; }
 
-            if (vsf_elfloader_arch_link(elfloader, symname, &tgtvalue) < 0) {
-                vsf_trace_error("fail to locate %s" VSF_TRACE_CFG_LINEEND, symname);
-                return -1;
+                if (vsf_elfloader_arch_link(elfloader, symname, &tgtvalue) < 0) {
+                    vsf_trace_error("fail to locate %s" VSF_TRACE_CFG_LINEEND, symname);
+                    return -1;
+                }
+            } else if (__vsf_elfloader_is_vaddr_loaded(linfo, u.rel->r_offset)) {
+                tgtvalue = (Elf_Addr)elfloader->ram_base - linfo->ram_base_vaddr;
+            } else {
+                goto no_tgtvalue;
             }
-        } else {
-            tgtvalue = (Elf_Addr)elfloader->ram_base + sym.st_value;
+        } else if (__vsf_elfloader_is_vaddr_loaded(linfo, sym.st_value)) {
+            tgtvalue = (Elf_Addr)elfloader->ram_base + sym.st_value - linfo->ram_base_vaddr;
             if (parse_only) { continue; }
+        } else if (linfo->is_xip) {
+            tgtvalue = target->object + (Elf_Addr)__vsf_elfloader_vaddr2off(elfloader, target, sym.st_value);
+            if (parse_only) { continue; }
+        } else {
+        no_tgtvalue:
+            vsf_trace_error("unable to calculate target value" VSF_TRACE_CFG_LINEEND);
+            return -1;
         }
 
         if (type == DT_RELA) {
             tgtvalue += u.rela->r_addend;
         }
-        vsf_elfloader_debug("relocate %s to 0x%X" VSF_TRACE_CFG_LINEEND, symname, tgtvalue);
-        if (vsf_elfloader_arch_relocate_sym((Elf_Addr)elfloader->ram_base + u.rel->r_offset, reltype, tgtvalue) < 0) {
+
+        if (!__vsf_elfloader_is_vaddr_loaded(linfo, u.rel->r_offset)) {
+            vsf_trace_error("rel/rela offset not loaded" VSF_TRACE_CFG_LINEEND);
+            return -1;
+        }
+
+        if (relsym != 0) {
+            vsf_elfloader_debug("relocate %s to 0x%X" VSF_TRACE_CFG_LINEEND, symname, tgtvalue);
+        } else {
+            vsf_elfloader_debug("relocate value at 0x%X to 0x%X" VSF_TRACE_CFG_LINEEND, u.rel->r_offset, tgtvalue);
+        }
+
+        if (vsf_elfloader_arch_relocate_sym((Elf_Addr)elfloader->ram_base + u.rel->r_offset - linfo->ram_base_vaddr, reltype, tgtvalue) < 0) {
             vsf_trace_error("fail to relocate %s" VSF_TRACE_CFG_LINEEND, symname);
             return -1;
         }
@@ -379,6 +438,7 @@ int vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *target)
     VSF_SERVICE_ASSERT(NULL == elfloader->target);
     VSF_SERVICE_ASSERT(target->fn_read != NULL);
 
+    uintptr_t base;
     vsf_elfloader_info_t linfo;
     if (VSF_ERR_NONE != __vsf_elfloader_load_elfhdr(target, &linfo.elf_hdr)) {
         return -1;
@@ -387,62 +447,69 @@ int vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *target)
     linfo.memsz = 0;
     linfo.memsz_xip = 0;
     linfo.memstart_xip = (Elf_Word)-1;
+    linfo.memstart = (Elf_Word)-1;
     memset(&linfo.dynamic, 0, sizeof(linfo.dynamic));
     memset(&linfo.export, 0, sizeof(linfo.export));
-    linfo.load_zero_addr = false;
     linfo.has_dynamic = false;
 
 second_round_for_ram_base:
     if (vsf_elfloader_foreach_program_header(elfloader, target, &linfo, __vsf_elfloader_load_cb) < 0) {
         goto cleanup_and_fail;
     }
-    if (!linfo.load_zero_addr) {
-        vsf_trace_error("is the image position independent?" VSF_TRACE_CFG_LINEEND);
-        goto cleanup_and_fail;
+    if (linfo.memstart != 0) {
+        vsf_trace_warning("is the image position independent? assume good" VSF_TRACE_CFG_LINEEND);
     }
 
-    Elf_Word memsz;
-    vsf_loader_mem_attr_t memattr;
-    bool is_xip = target->support_xip && !linfo.has_dynamic;
-    if (is_xip) {
-        memsz = linfo.memsz_xip;
-        memattr = VSF_LOADER_MEM_RW;
+#if VSF_ELFLOADER_CFG_DYNAMIC_CAN_XIP == ENABLED
+    linfo.is_xip = target->support_xip;
+#else
+    linfo.is_xip = target->support_xip && !linfo.has_dynamic;
+#endif
+
+    if (linfo.is_xip) {
+        linfo.ram_base_size = linfo.memsz_xip;
+        linfo.ram_base_vaddr = linfo.memstart_xip;
     } else {
-        memsz = linfo.memsz;
-        memattr = VSF_LOADER_MEM_RWX;
+        linfo.ram_base_size = linfo.memsz;
+        linfo.ram_base_vaddr = linfo.memstart;
     }
 
-    if ((memsz > 0) && (NULL == elfloader->ram_base)) {
-        elfloader->ram_base = vsf_loader_malloc(elfloader, memattr, memsz, 0);
+    if ((linfo.ram_base_size > 0) && (NULL == elfloader->ram_base)) {
+        elfloader->ram_base = vsf_loader_malloc(elfloader, linfo.is_xip ? VSF_LOADER_MEM_RW : VSF_LOADER_MEM_RWX, linfo.ram_base_size, 0);
         if (NULL == elfloader->ram_base) {
             vsf_trace_error("fail to allocate ram_base" VSF_TRACE_CFG_LINEEND);
             goto cleanup_and_fail;
         }
-        memset(elfloader->ram_base, 0, memsz);
+        memset(elfloader->ram_base, 0, linfo.ram_base_size);
         goto second_round_for_ram_base;
     }
 
     // relocating
     if (linfo.has_dynamic) {
-        linfo.dynamic.symtbl += (Elf_Addr)elfloader->ram_base;
-        linfo.dynamic.strtbl += (Elf_Addr)elfloader->ram_base;
-        if (linfo.dynamic.pltrelsz > 0) {
-            linfo.dynamic.jmprel += (Elf_Addr)elfloader->ram_base;
-            if (__vsf_elfloader_rel_rela(elfloader, &linfo, linfo.dynamic.pltrel, (void *)linfo.dynamic.jmprel, linfo.dynamic.pltrelsz, true) < 0) {
-                goto cleanup_and_fail;
-            }
+        if (__vsf_elfloader_is_vaddr_loaded(&linfo, linfo.dynamic.symtbl)) {
+            linfo.dynamic.symtbl += (Elf_Addr)elfloader->ram_base - linfo.ram_base_vaddr;
+        } else if (linfo.is_xip) {
+            linfo.dynamic.symtbl = (Elf_Addr)target->object + __vsf_elfloader_vaddr2off(elfloader, target, linfo.dynamic.symtbl);
+        } else {
+            vsf_trace_error("symtbl not accessable" VSF_TRACE_CFG_LINEEND);
+            goto cleanup_and_fail;
         }
-        if (linfo.dynamic.relasz > 0) {
-            linfo.dynamic.rela += (Elf_Addr)elfloader->ram_base;
-            if (__vsf_elfloader_rel_rela(elfloader, &linfo, DT_RELA, (void *)linfo.dynamic.rela, linfo.dynamic.relasz, true) < 0) {
-                goto cleanup_and_fail;
-            }
+        if (__vsf_elfloader_is_vaddr_loaded(&linfo, linfo.dynamic.strtbl)) {
+            linfo.dynamic.strtbl += (Elf_Addr)elfloader->ram_base - linfo.ram_base_vaddr;
+        } else if (linfo.is_xip) {
+            linfo.dynamic.strtbl = (Elf_Addr)target->object + __vsf_elfloader_vaddr2off(elfloader, target, linfo.dynamic.strtbl);
+        } else {
+            vsf_trace_error("strtbl not accessable" VSF_TRACE_CFG_LINEEND);
+            goto cleanup_and_fail;
         }
-        if (linfo.dynamic.relsz > 0) {
-            linfo.dynamic.rel += (Elf_Addr)elfloader->ram_base;
-            if (__vsf_elfloader_rel_rela(elfloader, &linfo, DT_REL, (void *)linfo.dynamic.rel, linfo.dynamic.relsz, true) < 0) {
-                goto cleanup_and_fail;
-            }
+
+        if (    (   (linfo.dynamic.pltrelsz > 0)
+                &&  (__vsf_elfloader_rel_rela(elfloader, target, &linfo, linfo.dynamic.pltrel, linfo.dynamic.jmprel, linfo.dynamic.pltrelsz, true) < 0))
+            ||  (   (linfo.dynamic.relasz > 0)
+                &&  (__vsf_elfloader_rel_rela(elfloader, target, &linfo, DT_RELA, linfo.dynamic.rela, linfo.dynamic.relasz, true) < 0))
+            ||  (   (linfo.dynamic.relsz > 0)
+                &&  (__vsf_elfloader_rel_rela(elfloader, target, &linfo, DT_REL, linfo.dynamic.rel, linfo.dynamic.relsz, true) < 0))) {
+            goto cleanup_and_fail;
         }
 
         if (vsf_elfloader_arch_init_plt(elfloader, linfo.dynamic.external_fn_num) < 0) {
@@ -450,29 +517,23 @@ second_round_for_ram_base:
         }
         linfo.dynamic.external_fn_num = 0;
 
-        if (linfo.dynamic.pltrelsz > 0) {
-            if (__vsf_elfloader_rel_rela(elfloader, &linfo, linfo.dynamic.pltrel, (void *)linfo.dynamic.jmprel, linfo.dynamic.pltrelsz, false) < 0) {
-                goto cleanup_and_fail;
-            }
-        }
-        if (linfo.dynamic.relasz > 0) {
-            if (__vsf_elfloader_rel_rela(elfloader, &linfo, DT_RELA, (void *)linfo.dynamic.rela, linfo.dynamic.relasz, false) < 0) {
-                goto cleanup_and_fail;
-            }
-        }
-        if (linfo.dynamic.relsz > 0) {
-            if (__vsf_elfloader_rel_rela(elfloader, &linfo, DT_REL, (void *)linfo.dynamic.rel, linfo.dynamic.relsz, false) < 0) {
-                goto cleanup_and_fail;
-            }
+        if (    (   (linfo.dynamic.pltrelsz > 0)
+                &&  (__vsf_elfloader_rel_rela(elfloader, target, &linfo, linfo.dynamic.pltrel, linfo.dynamic.jmprel, linfo.dynamic.pltrelsz, false) < 0))
+            ||  (   (linfo.dynamic.relasz > 0)
+                &&  (__vsf_elfloader_rel_rela(elfloader, target, &linfo, DT_RELA, linfo.dynamic.rela, linfo.dynamic.relasz, false) < 0))
+            ||  (   (linfo.dynamic.relsz > 0)
+                &&  (__vsf_elfloader_rel_rela(elfloader, target, &linfo, DT_REL, linfo.dynamic.rel, linfo.dynamic.relsz, false) < 0))) {
+            goto cleanup_and_fail;
         }
     }
 
-    uintptr_t base = is_xip ? (uintptr_t)target->object : (uintptr_t)elfloader->ram_base;
+    base = linfo.is_xip ? (uintptr_t)target->object : (uintptr_t)elfloader->ram_base;
     if (elfloader->alloc_vplt != NULL) {
-        uint32_t dynstr_offset;
-        uint32_t dynstr_size = vsf_elfloader_get_section(elfloader, target, ".dynstr", &dynstr_offset);
-        uint32_t dynsym_offset;
-        uint32_t dynsym_size = vsf_elfloader_get_section(elfloader, target, ".dynsym", &dynsym_offset);
+        Elf_Shdr header;
+        uint32_t dynstr_size = vsf_elfloader_get_section(elfloader, target, ".dynstr", &header);
+        uint32_t dynstr_offset = header.sh_offset;
+        uint32_t dynsym_size = vsf_elfloader_get_section(elfloader, target, ".dynsym", &header);
+        uint32_t dynsym_offset = header.sh_offset;
 
         if ((dynsym_size > 0) && (dynstr_size > 0)) {
             char symbol_name[VSF_ELFLOADER_CFG_MAX_SYM_LEN];
@@ -528,9 +589,15 @@ second_round_for_ram_base:
 
     // todo: when should static_base be set to got base?
     elfloader->static_base = elfloader->ram_base;
+    Elf_Shdr header;
+    if (vsf_elfloader_get_section(elfloader, target, ".got", &header) > 0) {
+        elfloader->static_base = (uint8_t *)elfloader->static_base + header.sh_addr - linfo.ram_base_vaddr;
+    }
+
     elfloader->target = target;
-    elfloader->entry = is_xip ? (void *)(target->object + linfo.entry_offset_in_file)
-                            :   (void *)((uintptr_t)elfloader->ram_base + linfo.elf_hdr.e_entry);
+    elfloader->entry = linfo.is_xip ?
+                        (void *)(target->object + linfo.entry_offset_in_file)
+                    :   (void *)((uintptr_t)elfloader->ram_base + linfo.elf_hdr.e_entry - linfo.ram_base_vaddr);
     return 0;
 
 cleanup_and_fail:
@@ -542,7 +609,6 @@ cleanup_and_fail:
 typedef struct __vsf_elfloader_get_section_t {
     const char *name;
     Elf_Shdr *header;
-    uint32_t offset;
     uint32_t size;
 } __vsf_elfloader_get_section_t;
 
@@ -554,7 +620,6 @@ static int __vsf_elfloader_get_section_cb(vsf_elfloader_t *elfloader, vsf_loader
         if (p->header != NULL) {
             *(p->header) = *header;
         }
-        p->offset = header->sh_offset;
         p->size = header->sh_size;
         return VSF_ELFLOADER_CB_DONE;
     }
@@ -562,16 +627,40 @@ static int __vsf_elfloader_get_section_cb(vsf_elfloader_t *elfloader, vsf_loader
 }
 
 uint32_t vsf_elfloader_get_section(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
-        const char *name, uint32_t *offset)
+        const char *name, Elf_Shdr *header)
 {
     __vsf_elfloader_get_section_t param = {
         .name = name,
+        .header = header,
     };
     vsf_elfloader_foreach_section(elfloader, target, &param, __vsf_elfloader_get_section_cb);
-    if (offset != NULL) {
-        *offset = param.offset;
-    }
     return param.size;
+}
+
+typedef struct __vsf_elfloader_vaddr2off_t {
+    Elf_Addr vaddr;
+    Elf_Off offset;
+} __vsf_elfloader_vaddr2off_t;
+
+static int __vsf_elfloader_vaddr2off_cb(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
+        Elf_Shdr *header, char *name, int index, void *param)
+{
+    __vsf_elfloader_vaddr2off_t *p = (__vsf_elfloader_vaddr2off_t *)param;
+    if ((p->vaddr >= header->sh_addr) && (p->vaddr < header->sh_addr + header->sh_size)) {
+        p->offset = header->sh_offset + p->vaddr - header->sh_addr;
+        return VSF_ELFLOADER_CB_DONE;
+    }
+    return VSF_ELFLOADER_CB_GOON;
+}
+
+static Elf_Off __vsf_elfloader_vaddr2off(vsf_elfloader_t *elfloader, vsf_loader_target_t *target, Elf_Addr vaddr)
+{
+    __vsf_elfloader_vaddr2off_t param = {
+        .vaddr = vaddr,
+        .offset = (Elf_Off)-1,
+    };
+    vsf_elfloader_foreach_section(elfloader, target, &param, __vsf_elfloader_vaddr2off_cb);
+    return param.offset;
 }
 
 #endif      // VSF_USE_LOADER && VSF_LOADER_USE_ELF
