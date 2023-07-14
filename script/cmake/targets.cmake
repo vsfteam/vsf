@@ -1,3 +1,7 @@
+if(NOT DEFINED VSF_CMAKE_ROOT)
+    set(VSF_CMAKE_ROOT $ENV{VSF_PATH}/script/cmake)
+endif()
+
 if(VSF_TARGET)
     file(GLOB_RECURSE __targets_cmake ${VSF_CMAKE_ROOT}/targets*/${VSF_TARGET}.cmake)
     list(LENGTH __targets_cmake __targets_number)
