@@ -70,6 +70,8 @@ vsf_class(vk_fs_fop_t) {
         vsf_peda_evthandler_t fn_write;
         vsf_peda_evthandler_t fn_setsize;
         vsf_peda_evthandler_t fn_setpos;
+
+        void * (*fn_direct_access)(vk_file_t *file);
     )
 };
 
@@ -271,6 +273,7 @@ extern bool vk_file_is_div(char ch);
 
 extern vk_file_t * vk_file_alloc(uint_fast16_t size);
 extern void vk_file_free(vk_file_t *file);
+extern void * vk_file_direct_access(vk_file_t *file);
 
 extern void vk_fs_return(vk_file_t *file, vsf_err_t err);
 

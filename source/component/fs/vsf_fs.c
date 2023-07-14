@@ -89,6 +89,7 @@ dcl_vsf_peda_methods(static, __vk_vfs_read)
 dcl_vsf_peda_methods(static, __vk_vfs_write)
 dcl_vsf_peda_methods(static, __vk_vfs_setpos)
 dcl_vsf_peda_methods(static, __vk_vfs_setsize)
+static void * __vk_vfs_direct_access(vk_file_t *file);
 
 static vsf_err_t __vk_file_lookup(vk_file_t *dir, const char *name, vk_file_t **file);
 
@@ -115,6 +116,7 @@ vk_fs_op_t vk_vfs_op = {
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_write),
         .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_setsize),
         .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_setpos),
+        .fn_direct_access = __vk_vfs_direct_access,
     },
     .dop            = {
         .fn_lookup  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_vfs_lookup),
@@ -222,6 +224,14 @@ void vk_file_free(vk_file_t *file)
         VSF_FS_CFG_FREE(file);
 #endif
     }
+}
+
+void * vk_file_direct_access(vk_file_t *file)
+{
+    if ((file->attr & VSF_FILE_ATTR_DIRECTORY) || (NULL == file->fsop->fop.fn_direct_access)) {
+        return NULL;
+    }
+    return file->fsop->fop.fn_direct_access(file);
 }
 
 char * vk_file_getfileext(char *fname)
@@ -1360,6 +1370,15 @@ __vsf_component_peda_ifs_entry(__vk_vfs_write, vk_file_write)
         break;
     }
     vsf_peda_end();
+}
+
+static void * __vk_vfs_direct_access(vk_file_t *file)
+{
+    vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)file;
+    if ((NULL == vfs_file->f.callback.fn_write) && (NULL == vfs_file->f.callback.fn_read)) {
+        return vfs_file->f.param;
+    }
+    return NULL;
 }
 
 #if     __IS_COMPILER_GCC__
