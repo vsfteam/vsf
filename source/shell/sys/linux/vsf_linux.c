@@ -3930,11 +3930,22 @@ static void * __dlmalloc(int size)
     return malloc((size_t)size);
 }
 
+#if VSF_USE_LOADER == ENABLED
+static uint32_t __vsf_linux_loader_fd_read(vsf_loader_target_t *target, uint32_t offset, void *buffer, uint32_t size)
+{
+    int fd = (int)target->object;
+    if (lseek(fd, offset, SEEK_SET) == (off_t)-1) {
+        return 0;
+    }
+    return read(fd, buffer, size);
+}
+#endif
+
 void * dlopen(const char *pathname, int mode)
 {
 #if VSF_USE_LOADER == ENABLED
-    FILE *f = fopen(pathname, "r");
-    if (NULL == f) {
+    int fd = open(pathname, 0);
+    if (fd < 0) {
         return NULL;
     }
 
@@ -3943,13 +3954,22 @@ void * dlopen(const char *pathname, int mode)
         goto close_and_fail;
     }
 
+    vk_file_t *file = __vsf_linux_get_fs_ex(NULL, fd);
+    void *file_direct_access;
+    if ((file != NULL) && ((file_direct_access = vk_file_direct_access(file)) != NULL)) {
+        linux_loader->target.object             = (uintptr_t)file_direct_access;
+        linux_loader->target.support_xip        = true;
+        linux_loader->target.fn_read            = vsf_loader_xip_read;
+    } else {
+        linux_loader->target.object             = (uintptr_t)fd;
+        linux_loader->target.support_xip        = false;
+        linux_loader->target.fn_read            = __vsf_linux_loader_fd_read;
+    }
+
     linux_loader->loader.generic.heap_op    = &vsf_loader_default_heap_op;
     linux_loader->loader.generic.vplt       = (void *)&vsf_linux_vplt;
     linux_loader->loader.generic.alloc_vplt = __dlmalloc;
     linux_loader->loader.generic.free_vplt  = free;
-    linux_loader->target.object             = (uintptr_t)f;
-    linux_loader->target.support_xip        = false;
-    linux_loader->target.fn_read            = vsf_loader_stdio_read;
 
     uint8_t header[16];
     uint32_t size = vsf_loader_read(&linux_loader->target, 0, header, sizeof(header));
@@ -3968,7 +3988,7 @@ void * dlopen(const char *pathname, int mode)
     free(linux_loader);
 
 close_and_fail:
-    fclose(f);
+    close(fd);
     return NULL;
 #else
     return NULL;
