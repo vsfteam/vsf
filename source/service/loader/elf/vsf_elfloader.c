@@ -587,7 +587,6 @@ second_round_for_ram_base:
         }
     }
 
-    // todo: when should static_base be set to got base?
     elfloader->static_base = elfloader->ram_base;
     Elf_Shdr header;
     if (vsf_elfloader_get_section(elfloader, target, ".got", &header) > 0) {
