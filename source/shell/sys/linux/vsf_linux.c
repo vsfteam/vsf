@@ -4224,6 +4224,20 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_capability_vplt_t vsf_linux_sys_capability_
 };
 #endif
 
+#if VSF_LINUX_APPLET_USE_SYS_MMAN == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_mman_vplt_t vsf_linux_sys_mman_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_mman_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(shm_open),
+    VSF_APPLET_VPLT_ENTRY_FUNC(shm_unlink),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mmap),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mmap64),
+    VSF_APPLET_VPLT_ENTRY_FUNC(munmap),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mprotect),
+    VSF_APPLET_VPLT_ENTRY_FUNC(msync),
+};
+#endif
+
 #if VSF_LINUX_APPLET_USE_SIGNAL == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_signal_vplt_t vsf_linux_signal_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_signal_vplt_t, 0, 0, true),
@@ -4663,6 +4677,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_SYS_STAT == ENABLED
     .sys_stat_vplt      = (void *)&vsf_linux_sys_stat_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_MMAN == ENABLED
+    .sys_mman_vplt      = (void *)&vsf_linux_sys_mman_vplt,
 #   endif
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED && VSF_LINUX_APPLET_USE_SYS_TIME == ENABLED
     .sys_time_vplt      = (void *)&vsf_linux_sys_time_vplt,
