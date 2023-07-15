@@ -26,6 +26,7 @@ extern "C" {
 #define umask                   VSF_LINUX_WRAPPER(umask)
 #define chmod                   VSF_LINUX_WRAPPER(chmod)
 #define fchmod                  VSF_LINUX_WRAPPER(fchmod)
+#define futimens                VSF_LINUX_WRAPPER(futimens)
 #define utimensat               VSF_LINUX_WRAPPER(utimensat)
 #define mkfifo                  VSF_LINUX_WRAPPER(mkfifo)
 #define mkfifoat                VSF_LINUX_WRAPPER(mkfifoat)
@@ -154,6 +155,8 @@ typedef struct vsf_linux_sys_stat_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mknod);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mknodat);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(lstat);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(futimens);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(utimensat);
 } vsf_linux_sys_stat_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt;
@@ -221,6 +224,14 @@ VSF_LINUX_APPLET_SYS_STAT_IMP(mknod, int, const char *pathname, mode_t mode, dev
 VSF_LINUX_APPLET_SYS_STAT_IMP(mknodat, int, int dirfd, const char *pathname, mode_t mode, dev_t dev) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_STAT_ENTRY(mknodat)(dirfd, pathname, mode, dev);
+}
+VSF_LINUX_APPLET_SYS_STAT_IMP(futimens, int, int fd, const struct timespec times[2]) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(futimens)(fd, times);
+}
+VSF_LINUX_APPLET_SYS_STAT_IMP(utimensat, int, int dirfd, const char *pathname, const struct timespec times[2], int flags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(utimensat)(dirfd, pathname, times, flags);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_STAT

@@ -1063,6 +1063,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdio_vplt_t vsf_linux_libc_stdio_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(setvbuf),
     VSF_APPLET_VPLT_ENTRY_FUNC(tmpfile),
     VSF_APPLET_VPLT_ENTRY_FUNC(tmpnam),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getline),
 };
 #endif
 

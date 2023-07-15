@@ -226,6 +226,8 @@ typedef struct vsf_linux_libc_stdio_vplt_t {
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(tmpfile);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(tmpnam);
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getline);
 } vsf_linux_libc_stdio_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdio_vplt_t vsf_linux_libc_stdio_vplt;
@@ -477,6 +479,10 @@ VSF_LINUX_APPLET_LIBC_STDIO_IMP(tmpfile, FILE *, void) {
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(tmpnam, char *, char *str) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(tmpnam)(str);
+}
+VSF_LINUX_APPLET_LIBC_STDIO_IMP(getline, ssize_t, char **lineptr, size_t *n, FILE *f) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(getline)(lineptr, n, f);
 }
 
 VSF_APPLET_VPLT_FUNC_DECORATOR int scanf(const char *format, ...) {

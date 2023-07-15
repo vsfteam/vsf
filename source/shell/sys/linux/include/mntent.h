@@ -91,7 +91,7 @@ VSF_LINUX_APPLET_MNTENT_IMP(hasmntopt, char *, const struct mntent *mnt, const c
 }
 VSF_LINUX_APPLET_MNTENT_IMP(getmntent_r, struct mntent *, FILE *stream, struct mntent *mntbuf, char *buf, int buflen) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    return VSF_LINUX_APPLET_MNTENT_ENTRY(getmntent_r)(stream, mntbuf, buflen);
+    return VSF_LINUX_APPLET_MNTENT_ENTRY(getmntent_r)(stream, mntbuf, buf, buflen);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_MNTENT

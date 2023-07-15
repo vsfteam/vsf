@@ -105,11 +105,11 @@ VSF_LINUX_APPLET_GRP_IMP(getgrent, struct group *, void) {
 }
 VSF_LINUX_APPLET_GRP_IMP(setgrent, void, void) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    VSF_LINUX_APPLET_GRP_ENTRY(getgrgid_r)();
+    VSF_LINUX_APPLET_GRP_ENTRY(setgrent)();
 }
 VSF_LINUX_APPLET_GRP_IMP(endgrent, void, void) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    VSF_LINUX_APPLET_GRP_ENTRY(getgrgid_r)();
+    VSF_LINUX_APPLET_GRP_ENTRY(endgrent)();
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_GRP

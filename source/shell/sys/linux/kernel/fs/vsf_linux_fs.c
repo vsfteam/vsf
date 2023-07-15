@@ -3417,6 +3417,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(mkfifoat),
     VSF_APPLET_VPLT_ENTRY_FUNC(mknod),
     VSF_APPLET_VPLT_ENTRY_FUNC(mknodat),
+    VSF_APPLET_VPLT_ENTRY_FUNC(lstat),
+    VSF_APPLET_VPLT_ENTRY_FUNC(futimens),
+    VSF_APPLET_VPLT_ENTRY_FUNC(utimensat),
 };
 #endif
 

@@ -171,7 +171,7 @@ VSF_LINUX_APPLET_NETDB_IMP(herror, void, const char *s) {
 }
 VSF_LINUX_APPLET_NETDB_IMP(hstrerror, const char *, int err) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    VSF_LINUX_APPLET_NETDB_ENTRY(hstrerror)(err);
+    return VSF_LINUX_APPLET_NETDB_ENTRY(hstrerror)(err);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_NETDB
