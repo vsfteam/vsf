@@ -31,7 +31,10 @@ add_executable(${CMAKE_PROJECT_NAME} "")
 target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC
     ${VSF_LIB_NAME}
 )
-get_filename_component(VSF_CONFIG_PATH ${VSF_CONFIG_PATH} ABSOLUTE)
+
+if(DEFINED VSF_CONFIG_PATH)
+    get_filename_component(VSF_CONFIG_PATH ${VSF_CONFIG_PATH} ABSOLUTE)
+endif()
 
 include(${VSF_CMAKE_ROOT}/targets.cmake)
 
@@ -50,7 +53,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
 )
 set(VSF_TARGET_NAME ${CMAKE_PROJECT_NAME})
 
-if(VSF_HOST_SYSTEM)
+if(NOT VSF_APPLET AND VSF_HOST_SYSTEM)
     set(VSF_HOST_SYSTEM_LIB_NAME vsf_host_${VSF_HOST_SYSTEM})
     add_library(${VSF_HOST_SYSTEM_LIB_NAME} STATIC)
     target_include_directories(${VSF_HOST_SYSTEM_LIB_NAME} PRIVATE
@@ -68,11 +71,14 @@ endif()
 
 include(${VSF_CMAKE_ROOT}/compilers.cmake)
 
-add_subdirectory(${VSF_SRC_PATH} ${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
-link_directories(${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
+if(NOT VSF_APPLET)
+    add_subdirectory(${VSF_SRC_PATH} ${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
+    link_directories(${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
+endif()
 
 # libraries MUST be placed at the end
-vsf_add_libraries(
-#   -lm
-    m
-)
+if(NOT VSF_APPLET)
+    vsf_add_libraries(
+        m
+    )
+endif()

@@ -1,4 +1,4 @@
-# CMakeLists head
+# define LLVM_TOOLCHAIN_PATH and LLVM_TOOLCHAIN_EXE_SUFIX and include this file
 
 set(CMAKE_SYSTEM_NAME           Generic)
 set(CMAKE_SYSTEM_PROCESSOR      ${VSF_HAL_ARCH_SERIES})
