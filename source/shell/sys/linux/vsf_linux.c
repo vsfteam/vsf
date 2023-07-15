@@ -3807,36 +3807,36 @@ int tcflow(int fd, int action)
     return -1;
 }
 
-void cfmakeraw(struct termios *termios_p)
+void cfmakeraw(struct termios *termios)
 {
 }
 
-speed_t cfgetispeed(const struct termios *termios_p)
+speed_t cfgetispeed(const struct termios *termios)
 {
-    return termios_p->c_ispeed;
+    return termios->c_ispeed;
 }
 
-speed_t cfgetospeed(const struct termios *termios_p)
+speed_t cfgetospeed(const struct termios *termios)
 {
-    return termios_p->c_ospeed;
+    return termios->c_ospeed;
 }
 
-int cfsetispeed(struct termios *termios_p, speed_t speed)
+int cfsetispeed(struct termios *termios, speed_t speed)
 {
-    termios_p->c_ispeed = speed;
+    termios->c_ispeed = speed;
     return 0;
 }
 
-int cfsetospeed(struct termios *termios_p, speed_t speed)
+int cfsetospeed(struct termios *termios, speed_t speed)
 {
-    termios_p->c_ospeed = speed;
+    termios->c_ospeed = speed;
     return 0;
 }
 
-int cfsetspeed(struct termios *termios_p, speed_t speed)
+int cfsetspeed(struct termios *termios, speed_t speed)
 {
-    termios_p->c_ispeed = speed;
-    termios_p->c_ospeed = speed;
+    termios->c_ispeed = speed;
+    termios->c_ospeed = speed;
     return 0;
 }
 
@@ -4317,6 +4317,25 @@ __VSF_VPLT_DECORATOR__ vsf_linux_pwd_vplt_t vsf_linux_pwd_vplt = {
 };
 #endif
 
+#if VSF_LINUX_APPLET_USE_TERMIOS == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_termios_vplt_t vsf_linux_termios_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_termios_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(tcgetattr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(tcsetattr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(tcsendbreak),
+    VSF_APPLET_VPLT_ENTRY_FUNC(tcdrain),
+    VSF_APPLET_VPLT_ENTRY_FUNC(tcflush),
+    VSF_APPLET_VPLT_ENTRY_FUNC(tcflow),
+    VSF_APPLET_VPLT_ENTRY_FUNC(cfmakeraw),
+    VSF_APPLET_VPLT_ENTRY_FUNC(cfgetispeed),
+    VSF_APPLET_VPLT_ENTRY_FUNC(cfgetospeed),
+    VSF_APPLET_VPLT_ENTRY_FUNC(cfsetispeed),
+    VSF_APPLET_VPLT_ENTRY_FUNC(cfsetospeed),
+    VSF_APPLET_VPLT_ENTRY_FUNC(cfsetspeed),
+};
+#endif
+
 #if VSF_LINUX_APPLET_USE_UNISTD == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_unistd_vplt_t, 0, 0, true),
@@ -4445,6 +4464,12 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_SYS_STATFS == ENABLED
 #       include "./include/sys/statfs.h"
 #   endif
+#   if VSF_LINUX_APPLET_USE_SYS_SYSMACROS == ENABLED
+#       include "./include/sys/sysmacros.h"
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_STATVFS == ENABLED
+#       include "./include/sys/statvfs.h"
+#   endif
 #   if VSF_LINUX_APPLET_USE_NETDB == ENABLED
 #       include "./include/netdb.h"
 #   endif
@@ -4498,6 +4523,12 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_SYS_STATFS == ENABLED
 #       include <sys/statfs.h>
 #   endif
+#   if VSF_LINUX_APPLET_USE_SYS_SYSMACROS == ENABLED
+#       include <sys/sysmacros.h>
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_STATVFS == ENABLED
+#       include <sys/statvfs.h>
+#   endif
 #   if VSF_LINUX_APPLET_USE_NETDB == ENABLED
 #       include <netdb.h>
 #   endif
@@ -4542,6 +4573,16 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_statfs_vplt_t vsf_linux_sys_statfs_vplt = {
 
     VSF_APPLET_VPLT_ENTRY_FUNC(statfs),
     VSF_APPLET_VPLT_ENTRY_FUNC(fstatfs),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_SYS_SYSMACROS == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_sysmacros_vplt_t vsf_linux_sys_sysmacros_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_sysmacros_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(makedev),
+    VSF_APPLET_VPLT_ENTRY_FUNC(major),
+    VSF_APPLET_VPLT_ENTRY_FUNC(minor),
 };
 #endif
 
@@ -4655,6 +4696,12 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   if VSF_LINUX_APPLET_USE_SYS_TIMEX == ENABLED
     .sys_timex_vplt     = (void *)&vsf_linux_sys_timex_vplt,
 #   endif
+#   if VSF_LINUX_APPLET_USE_SYS_SYSMACROS == ENABLED
+    .sys_sysmacros_vplt = (void *)&vsf_linux_sys_sysmacros_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_STATVFS == ENABLED
+    .sys_statvfs_vplt = (void *)&vsf_linux_sys_statvfs_vplt,
+#   endif
 
 #   if VSF_LINUX_APPLET_USE_UNISTD == ENABLED
     .unistd_vplt        = (void *)&vsf_linux_unistd_vplt,
@@ -4677,6 +4724,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   if VSF_LINUX_APPLET_USE_SPAWN == ENABLED
     .spawn_vplt         = (void *)&vsf_linux_spawn_vplt,
 #   endif
+#if VSF_LINUX_APPLET_USE_TERMIOS == ENABLED
+    .termios_vplt       = (void *)&vsf_linux_termios_vplt,
+#endif
 #   if VSF_LINUX_APPLET_USE_FCNTL == ENABLED
     .fcntl_vplt         = (void *)&vsf_linux_fcntl_vplt,
 #   endif

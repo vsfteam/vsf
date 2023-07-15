@@ -34,6 +34,7 @@
 #   include "../../include/sys/statvfs.h"
 #   include "../../include/sys/sendfile.h"
 #   include "../../include/sys/statfs.h"
+#   include "../../include/sys/file.h"
 #   include "../../include/poll.h"
 #   include "../../include/fcntl.h"
 #   include "../../include/errno.h"
@@ -50,6 +51,7 @@
 #   include <sys/statvfs.h>
 #   include <sys/sendfile.h>
 #   include <sys/statfs.h>
+#   include <sys/file.h>
 #   include <poll.h>
 #   include <fcntl.h>
 #   include <errno.h>
@@ -3428,6 +3430,25 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_sendfile_vplt_t vsf_linux_sys_sendfile_vplt
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_sendfile_vplt_t, 0, 0, true),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(sendfile),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_SYS_STATVFS == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_statvfs_vplt_t vsf_linux_sys_statvfs_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_statvfs_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(fstatvfs),
+    VSF_APPLET_VPLT_ENTRY_FUNC(statvfs),
+    VSF_APPLET_VPLT_ENTRY_FUNC(fstatvfs64),
+    VSF_APPLET_VPLT_ENTRY_FUNC(statvfs64),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_SYS_FILE == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_file_vplt_t vsf_linux_sys_file_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_file_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(flock),
 };
 #endif
 

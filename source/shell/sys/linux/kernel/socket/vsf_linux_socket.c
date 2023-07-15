@@ -261,6 +261,16 @@ struct servent * getservbyport(int port, const char *proto)
     return NULL;
 }
 
+void setservent(int stayopen)
+{
+    VSF_LINUX_ASSERT(false);
+}
+
+void endservent(void)
+{
+    VSF_LINUX_ASSERT(false);
+}
+
 struct servent * getservent(void)
 {
     VSF_LINUX_ASSERT(false);
@@ -779,6 +789,22 @@ __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(getservent),
     VSF_APPLET_VPLT_ENTRY_FUNC(getservbyname),
     VSF_APPLET_VPLT_ENTRY_FUNC(getservbyport),
+};
+#   endif
+
+#   if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_arpa_inet_vplt_t vsf_linux_arpa_inet_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_arpa_inet_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(inet_addr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(inet_lnaof),
+    VSF_APPLET_VPLT_ENTRY_FUNC(inet_makeaddr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(inet_netof),
+    VSF_APPLET_VPLT_ENTRY_FUNC(inet_network),
+    VSF_APPLET_VPLT_ENTRY_FUNC(inet_aton),
+    VSF_APPLET_VPLT_ENTRY_FUNC(inet_ntoa),
+    VSF_APPLET_VPLT_ENTRY_FUNC(inet_pton),
+    VSF_APPLET_VPLT_ENTRY_FUNC(inet_ntop),
 };
 #   endif
 #endif

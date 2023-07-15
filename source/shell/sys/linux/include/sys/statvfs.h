@@ -53,11 +53,64 @@ struct statvfs64 {
     unsigned long   f_namemax;
 };
 
+#if VSF_LINUX_APPLET_USE_SYS_STATVFS == ENABLED
+typedef struct vsf_linux_sys_statvfs_vplt_t {
+    vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fstatvfs);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(statvfs);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fstatvfs64);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(statvfs64);
+} vsf_linux_sys_statvfs_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_statvfs_vplt_t vsf_linux_sys_statvfs_vplt;
+#   endif
+#endif
+
+#if     defined(__VSF_APPLET__) && (defined(__VSF_APPLET_LIB__) || defined(__VSF_APPLET_LINUX_SYS_STATVFS_LIB__))\
+    &&  VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SYS_STATVFS == ENABLED
+
+#ifndef VSF_LINUX_APPLET_SYS_STATVFS_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_SYS_STATVFS_VPLT                                \
+            ((vsf_linux_sys_statvfs_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_statvfs_vplt))
+#   else
+#       define VSF_LINUX_APPLET_SYS_STATVFS_VPLT                                \
+            ((vsf_linux_sys_statvfs_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#define VSF_LINUX_APPLET_SYS_STATVFS_ENTRY(__NAME)                              \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_STATVFS_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_STATVFS_IMP(...)                                   \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_STATVFS_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_STATVFS_IMP(fstatvfs, int, int fd, struct statvfs *buf) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_STATVFS_ENTRY(fstatvfs)(fd, buf);
+}
+VSF_LINUX_APPLET_SYS_STATVFS_IMP(statvfs, int, const char *path, struct statvfs *buf) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_STATVFS_ENTRY(statvfs)(path, buf);
+}
+VSF_LINUX_APPLET_SYS_STATVFS_IMP(fstatvfs64, int, int fd, struct statvfs64 *buf) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_STATVFS_ENTRY(fstatvfs64)(fd, buf);
+}
+VSF_LINUX_APPLET_SYS_STATVFS_IMP(statvfs64, int, const char *path, struct statvfs64 *buf) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_STATVFS_ENTRY(statvfs64)(path, buf);
+}
+
+#else
+
 int fstatvfs(int fd, struct statvfs *buf);
 int statvfs(const char *path, struct statvfs *buf);
 
 int fstatvfs64(int fd, struct statvfs64 *buf);
 int statvfs64(const char *path, struct statvfs64 *buf);
+
+#endif
 
 #ifdef __cplusplus
 }

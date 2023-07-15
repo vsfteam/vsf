@@ -36,6 +36,16 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
 typedef struct vsf_linux_arpa_inet_vplt_t {
     vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(inet_addr);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(inet_lnaof);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(inet_makeaddr);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(inet_netof);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(inet_network);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(inet_aton);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(inet_ntoa);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(inet_pton);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(inet_ntop);
 } vsf_linux_arpa_inet_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_arpa_inet_vplt_t vsf_linux_arpa_inet_vplt;
@@ -48,10 +58,10 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_arpa_inet_vplt_t vsf_linux_arpa_inet_vpl
 #ifndef VSF_LINUX_APPLET_ARPA_INET_VPLT
 #   if VSF_LINUX_USE_APPLET == ENABLED
 #       define VSF_LINUX_APPLET_ARPA_INET_VPLT                                  \
-            ((vsf_linux_termios_vplt_t *)(VSF_LINUX_APPLET_VPLT->arpa_inet))
+            ((vsf_linux_arpa_inet_vplt_t *)(VSF_LINUX_APPLET_VPLT->arpa_inet_vplt))
 #   else
 #       define VSF_LINUX_APPLET_ARPA_INET_VPLT                                  \
-            ((vsf_linux_termios_vplt_t *)vsf_vplt((void *)0))
+            ((vsf_linux_arpa_inet_vplt_t *)vsf_vplt((void *)0))
 #   endif
 #endif
 
@@ -59,6 +69,43 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_arpa_inet_vplt_t vsf_linux_arpa_inet_vpl
             VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_ARPA_INET_VPLT, __NAME)
 #define VSF_LINUX_APPLET_ARPA_INET_IMP(...)                                     \
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_ARPA_INET_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_ARPA_INET_IMP(inet_addr, in_addr_t, const char *cp) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_ARPA_INET_ENTRY(inet_addr)(cp);
+}
+VSF_LINUX_APPLET_ARPA_INET_IMP(inet_lnaof, in_addr_t, struct in_addr in) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_ARPA_INET_ENTRY(inet_lnaof)(in);
+}
+VSF_LINUX_APPLET_ARPA_INET_IMP(inet_makeaddr, struct in_addr, in_addr_t net, in_addr_t lna) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_ARPA_INET_ENTRY(inet_makeaddr)(net, lna);
+}
+VSF_LINUX_APPLET_ARPA_INET_IMP(inet_netof, in_addr_t, struct in_addr in) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_ARPA_INET_ENTRY(inet_netof)(in);
+}
+VSF_LINUX_APPLET_ARPA_INET_IMP(inet_network, in_addr_t, const char *cp) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_ARPA_INET_ENTRY(inet_network)(cp);
+}
+VSF_LINUX_APPLET_ARPA_INET_IMP(inet_aton, int, const char *cp, struct in_addr *addr) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_ARPA_INET_ENTRY(inet_aton)(cp, addr);
+}
+VSF_LINUX_APPLET_ARPA_INET_IMP(inet_ntoa, char *, struct in_addr in) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_ARPA_INET_ENTRY(inet_ntoa)(in);
+}
+VSF_LINUX_APPLET_ARPA_INET_IMP(inet_pton, int, int af, const char *src, void *dst) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_ARPA_INET_ENTRY(inet_pton)(af, src, dst);
+}
+VSF_LINUX_APPLET_ARPA_INET_IMP(inet_ntop, const char *, int af, const void *src, char *dst, socklen_t size) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_ARPA_INET_ENTRY(inet_ntop)(af, src, dst, size);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_ARPA_INET
 

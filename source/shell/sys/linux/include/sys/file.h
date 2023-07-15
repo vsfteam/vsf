@@ -51,6 +51,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_file_vplt_t vsf_linux_sys_file_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_FILE_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SYS_FILE_IMP(flock, int, int fd, int operation) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_FILE_ENTRY(flock)(fd, operation);
 }
 

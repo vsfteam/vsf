@@ -256,6 +256,12 @@
 #   ifndef VSF_LINUX_APPLET_USE_SYS_CAPABILITY
 #       define VSF_LINUX_APPLET_USE_SYS_CAPABILITY  ENABLED
 #   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_SYSMACROS
+#       define VSF_LINUX_APPLET_USE_SYS_SYSMACROS   ENABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_STATVFS
+#       define VSF_LINUX_APPLET_USE_SYS_STATVFS ENABLED
+#   endif
 
 #   ifndef VSF_LINUX_APPLET_USE_UNISTD
 #       define VSF_LINUX_APPLET_USE_UNISTD      ENABLED
@@ -279,13 +285,16 @@
 #       define VSF_LINUX_APPLET_USE_IFADDRS     ENABLED
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_ARPA_INET
-#       define VSF_LINUX_APPLET_USE_ARPA_INET   DISABLED
+#       define VSF_LINUX_APPLET_USE_ARPA_INET   ENABLED
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_NETDB
 #       define VSF_LINUX_APPLET_USE_NETDB       ENABLED
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_GRP
 #       define VSF_LINUX_APPLET_USE_GRP         ENABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_TERMIOS
+#       define VSF_LINUX_APPLET_USE_TERMIOS     ENABLED
 #   endif
 
 #   if !defined(VSF_LINUX_APPLET_USE_LIBUSB) && VSF_LINUX_USE_LIBUSB == ENABLED
@@ -384,6 +393,8 @@ typedef struct vsf_linux_vplt_t {
     void *sys_statfs_vplt;
     void *sys_capability_vplt;
     void *sys_timex_vplt;
+    void *sys_sysmacros_vplt;
+    void *sys_statvfs_vplt;
 
     // unix
     void *unistd_vplt;

@@ -208,6 +208,19 @@ struct termios {
 #if VSF_LINUX_APPLET_USE_TERMIOS == ENABLED
 typedef struct vsf_linux_termios_vplt_t {
     vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(tcgetattr);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(tcsetattr);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(tcsendbreak);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(tcdrain);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(tcflush);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(tcflow);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(cfmakeraw);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(cfgetispeed);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(cfgetospeed);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(cfsetispeed);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(cfsetospeed);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(cfsetspeed);
 } vsf_linux_termios_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_termios_vplt_t vsf_linux_termios_vplt;
@@ -232,6 +245,55 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_termios_vplt_t vsf_linux_termios_vplt;
 #define VSF_LINUX_APPLET_TERMIOS_IMP(...)                                       \
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_TERMIOS_VPLT, __VA_ARGS__)
 
+VSF_LINUX_APPLET_TERMIOS_IMP(tcgetattr, int, int fd, struct termios *termios) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_TERMIOS_ENTRY(tcgetattr)(fd, termios);
+}
+VSF_LINUX_APPLET_TERMIOS_IMP(tcsetattr, int, int fd, int optional_actions, const struct termios *termios) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_TERMIOS_ENTRY(tcsetattr)(fd, optional_actions, termios);
+}
+VSF_LINUX_APPLET_TERMIOS_IMP(tcsendbreak, int, int fd, int duration) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_TERMIOS_ENTRY(tcsendbreak)(fd, duration);
+}
+VSF_LINUX_APPLET_TERMIOS_IMP(tcdrain, int, int fd) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_TERMIOS_ENTRY(tcdrain)(fd);
+}
+VSF_LINUX_APPLET_TERMIOS_IMP(tcflush, int, int fd, int queue_selector) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_TERMIOS_ENTRY(tcflush)(fd, queue_selector);
+}
+VSF_LINUX_APPLET_TERMIOS_IMP(tcflow, int, int fd, int action) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_TERMIOS_ENTRY(tcflow)(fd, action);
+}
+VSF_LINUX_APPLET_TERMIOS_IMP(cfmakeraw, void, struct termios *termios) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    VSF_LINUX_APPLET_TERMIOS_ENTRY(cfmakeraw)(termios);
+}
+VSF_LINUX_APPLET_TERMIOS_IMP(cfgetispeed, speed_t, const struct termios *termios) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_TERMIOS_ENTRY(cfgetispeed)(termios);
+}
+VSF_LINUX_APPLET_TERMIOS_IMP(cfgetospeed, speed_t, const struct termios *termios) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_TERMIOS_ENTRY(cfgetospeed)(termios);
+}
+VSF_LINUX_APPLET_TERMIOS_IMP(cfsetispeed, int, struct termios *termios, speed_t speed) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_TERMIOS_ENTRY(cfsetispeed)(termios, speed);
+}
+VSF_LINUX_APPLET_TERMIOS_IMP(cfsetospeed, int, struct termios *termios, speed_t speed) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_TERMIOS_ENTRY(cfsetospeed)(termios, speed);
+}
+VSF_LINUX_APPLET_TERMIOS_IMP(cfsetspeed, int, struct termios *termios, speed_t speed) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_TERMIOS_ENTRY(cfsetspeed)(termios, speed);
+}
+
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_TERMIOS
 
 int tcgetattr(int fd, struct termios *termios);
@@ -240,12 +302,12 @@ int tcsendbreak(int fd, int duration);
 int tcdrain(int fd);
 int tcflush(int fd, int queue_selector);
 int tcflow(int fd, int action);
-void cfmakeraw(struct termios *termios_p);
-speed_t cfgetispeed(const struct termios *termios_p);
-speed_t cfgetospeed(const struct termios *termios_p);
-int cfsetispeed(struct termios *termios_p, speed_t speed);
-int cfsetospeed(struct termios *termios_p, speed_t speed);
-int cfsetspeed(struct termios *termios_p, speed_t speed);
+void cfmakeraw(struct termios *termios);
+speed_t cfgetispeed(const struct termios *termios);
+speed_t cfgetospeed(const struct termios *termios);
+int cfsetispeed(struct termios *termios, speed_t speed);
+int cfsetospeed(struct termios *termios, speed_t speed);
+int cfsetspeed(struct termios *termios, speed_t speed);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_TERMIOS
 
