@@ -74,8 +74,51 @@ static inline int setrlimit(int resource, struct rlimit *rlptr)
 #define PRIO_PGRP           1
 #define PRIO_USER           2
 
+#if VSF_LINUX_APPLET_USE_SYS_RESOURCE == ENABLED
+typedef struct vsf_linux_sys_resource_vplt_t {
+    vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getpriority);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setpriority);
+} vsf_linux_sys_resource_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_resource_vplt_t vsf_linux_sys_resource_vplt;
+#   endif
+#endif
+
+#if     defined(__VSF_APPLET__) && (defined(__VSF_APPLET_LIB__) || defined(__VSF_APPLET_LINUX_SYS_RESOURCE_LIB__))\
+    &&  VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SYS_RESOURCE == ENABLED
+
+#ifndef VSF_LINUX_APPLET_SYS_RESOURCE_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_SYS_RESOURCE_VPLT                               \
+            ((vsf_linux_sys_resource_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_resource_vplt))
+#   else
+#       define VSF_LINUX_APPLET_SYS_RESOURCE_VPLT                               \
+            ((vsf_linux_sys_resource_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#define VSF_LINUX_APPLET_SYS_RESOURCE_ENTRY(__NAME)                             \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_RESOURCE_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_RESOURCE_IMP(...)                                  \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_RESOURCE_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_RESOURCE_IMP(getpriority, int, int which, id_t who) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_RESOURCE_ENTRY(getpriority)(which, who);
+}
+VSF_LINUX_APPLET_SYS_RESOURCE_IMP(setpriority, int, int which, id_t who, int prio) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_RESOURCE_ENTRY(setpriority)(which, who, prio);
+}
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_RESOURCE
+
 int getpriority(int which, id_t who);
 int setpriority(int which, id_t who, int prio);
+
+#endif
 
 #ifdef __cplusplus
 }

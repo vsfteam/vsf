@@ -35,6 +35,7 @@
 #       include "../../include/arpa/inet.h"
 #       include "../../include/netdb.h"
 #       include "../../include/ifaddrs.h"
+#       include "../../include/net/if.h"
 #   endif
 #   include "../../include/errno.h"
 #   include "../../include/sys/stat.h"
@@ -47,6 +48,7 @@
 #       include <arpa/inet.h>
 #       include <netdb.h>
 #       include <ifaddrs.h>
+#       include <net/if.h>
 #   endif
 #   include <errno.h>
 #   include <sys/stat.h>
@@ -806,6 +808,15 @@ __VSF_VPLT_DECORATOR__ vsf_linux_arpa_inet_vplt_t vsf_linux_arpa_inet_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(inet_ntoa),
     VSF_APPLET_VPLT_ENTRY_FUNC(inet_pton),
     VSF_APPLET_VPLT_ENTRY_FUNC(inet_ntop),
+};
+#   endif
+
+#   if VSF_LINUX_APPLET_USE_NET_IF == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_net_if_vplt_t vsf_linux_net_if_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_net_if_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(if_nametoindex),
+    VSF_APPLET_VPLT_ENTRY_FUNC(if_indextoname),
 };
 #   endif
 #endif

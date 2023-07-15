@@ -45,6 +45,7 @@
 #   include "./include/sys/reboot.h"
 #   include "./include/sys/capability.h"
 #   include "./include/sys/timex.h"
+#   include "./include/sys/resource.h"
 #   include "./include/fcntl.h"
 #   include "./include/errno.h"
 #   include "./include/termios.h"
@@ -76,6 +77,7 @@
 #   include <sys/reboot.h>
 #   include <sys/capability.h>
 #   include <sys/timex.h>
+#   include <sys/resource.h>
 #   include <fcntl.h>
 #   include <errno.h>
 #   include <termios.h>
@@ -4185,6 +4187,14 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_time_vplt_t vsf_linux_sys_time_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(utimes),
 };
 #endif
+
+#if VSF_LINUX_APPLET_USE_SYS_TIMES == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_times_vplt_t vsf_linux_sys_times_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_times_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(times),
+};
+#endif
 #endif
 
 #if VSF_LINUX_APPLET_USE_SYS_TIMEX == ENABLED && !defined(__VSF_APPLET__)
@@ -4235,6 +4245,15 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_mman_vplt_t vsf_linux_sys_mman_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(munmap),
     VSF_APPLET_VPLT_ENTRY_FUNC(mprotect),
     VSF_APPLET_VPLT_ENTRY_FUNC(msync),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_SYS_RESOURCE == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_resource_vplt_t vsf_linux_sys_resource_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_resource_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(getpriority),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setpriority),
 };
 #endif
 
@@ -4681,8 +4700,13 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   if VSF_LINUX_APPLET_USE_SYS_MMAN == ENABLED
     .sys_mman_vplt      = (void *)&vsf_linux_sys_mman_vplt,
 #   endif
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED && VSF_LINUX_APPLET_USE_SYS_TIME == ENABLED
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#       if VSF_LINUX_APPLET_USE_SYS_TIME == ENABLED
     .sys_time_vplt      = (void *)&vsf_linux_sys_time_vplt,
+#       endif
+#       if VSF_LINUX_APPLET_USE_SYS_TIMES == ENABLED
+    .sys_times_vplt     = (void *)&vsf_linux_sys_times_vplt,
+#       endif
 #   endif
 #   if VSF_LINUX_APPLET_USE_SYS_WAIT == ENABLED
     .sys_wait_vplt      = (void *)&vsf_linux_sys_wait_vplt,
@@ -4721,7 +4745,10 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
     .sys_sysmacros_vplt = (void *)&vsf_linux_sys_sysmacros_vplt,
 #   endif
 #   if VSF_LINUX_APPLET_USE_SYS_STATVFS == ENABLED
-    .sys_statvfs_vplt = (void *)&vsf_linux_sys_statvfs_vplt,
+    .sys_statvfs_vplt   = (void *)&vsf_linux_sys_statvfs_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_RESOURCE == ENABLED
+    .sys_resource_vplt  = (void *)&vsf_linux_sys_resource_vplt,
 #   endif
 
 #   if VSF_LINUX_APPLET_USE_UNISTD == ENABLED

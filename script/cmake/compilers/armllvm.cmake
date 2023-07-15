@@ -11,11 +11,11 @@ set(CMAKE_OBJDUMP ${LLVM_TOOLCHAIN_PATH}/bin/llvm-objdump${LLVM_TOOLCHAIN_EXE_SU
 set(CMAKE_SIZE ${LLVM_TOOLCHAIN_PATH}/bin/llvm-size${LLVM_TOOLCHAIN_EXE_SUFIX})
 
 set(CMAKE_C_FLAGS 
-    "${CMAKE_C_FLAGS} -fdata-sections -ffunction-sections -fms-extensions"
+    "${CMAKE_C_FLAGS} -fdata-sections -ffunction-sections -fms-extensions --target=armv7m-none-eabi"
     CACHE INTERNAL "C compiler common flags"
 )
 set(CMAKE_CXX_FLAGS 
-    "${CMAKE_CXX_FLAGS} -fdata-sections -ffunction-sections -fms-extensions"
+    "${CMAKE_CXX_FLAGS} -fdata-sections -ffunction-sections -fms-extensions --target=armv7m-none-eabi"
     CACHE INTERNAL "C++ compiler common flags"
 )
 
@@ -33,6 +33,11 @@ set(CMAKE_ASM_FLAGS_DEBUG "-g" CACHE INTERNAL "asm debug compiler flags")
 
 #set(CMAKE_EXE_LINKER_FLAGS "-Wl,--gc-sections --specs=nosys.specs"
 #  CACHE INTERNAL "exe link flags")
+if(DEFINED LLVM_TOOLCHAIN_SYSROOT)
+  set(CMAKE_EXE_LINKER_FLAGS
+      "${CMAKE_EXE_LINKER_FLAGS} --sysroot ${LLVM_TOOLCHAIN_SYSROOT}"
+      CACHE STRING "exe link flags")
+endif()
 set(CMAKE_EXE_LINKER_FLAGS
   "${CMAKE_EXE_LINKER_FLAGS} -Wl,--gc-sections -flto"
   CACHE STRING "exe link flags")

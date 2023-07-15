@@ -54,6 +54,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_reboot_vplt_t vsf_linux_sys_reboot_v
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_REBOOT_VPLT, __VA_ARGS__)
 
 VSF_LINUX_APPLET_SYS_REBOOT_IMP(reboot, int, int howto) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_REBOOT_ENTRY(reboot)(howto);
 }
 

@@ -248,7 +248,7 @@
 #       define VSF_LINUX_APPLET_USE_SYS_SIGNALFD    DISABLED
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_SYS_TIMES
-#       define VSF_LINUX_APPLET_USE_SYS_TIMES   DISABLED
+#       define VSF_LINUX_APPLET_USE_SYS_TIMES   ENABLED
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_SYS_STATFS
 #       define VSF_LINUX_APPLET_USE_SYS_STATFS  ENABLED
@@ -264,6 +264,9 @@
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_SYS_MMAN
 #       define VSF_LINUX_APPLET_USE_SYS_MMAN    ENABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_RESOURCE
+#       define VSF_LINUX_APPLET_USE_SYS_RESOURCE    ENABLED
 #   endif
 
 #   ifndef VSF_LINUX_APPLET_USE_UNISTD
@@ -292,6 +295,9 @@
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_NETDB
 #       define VSF_LINUX_APPLET_USE_NETDB       ENABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_NET_IF
+#       define VSF_LINUX_APPLET_USE_NET_IF      ENABLED
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_GRP
 #       define VSF_LINUX_APPLET_USE_GRP         ENABLED
@@ -406,6 +412,8 @@ typedef struct vsf_linux_vplt_t {
     void *sys_timex_vplt;
     void *sys_sysmacros_vplt;
     void *sys_statvfs_vplt;
+    void *sys_resource_vplt;
+    void *sys_times_vplt;
 
     // unix
     void *unistd_vplt;
@@ -430,7 +438,7 @@ typedef struct vsf_linux_vplt_t {
     void *findprog_vplt;
     void *fnmatch_vplt;
     void *grp_vplt;
-    void *res6_vplt;
+    void *net_if_vplt;
     void *res7_vplt;
 
     // libraries
