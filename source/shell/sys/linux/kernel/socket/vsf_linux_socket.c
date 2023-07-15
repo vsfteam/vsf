@@ -776,6 +776,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_ifaddrs_vplt_t vsf_linux_ifaddrs_vplt = {
 __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_netdb_vplt_t, 0, 0, true),
 
+    VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_h_errno),
     VSF_APPLET_VPLT_ENTRY_FUNC(gethostbyaddr),
     VSF_APPLET_VPLT_ENTRY_FUNC(gethostbyname),
     VSF_APPLET_VPLT_ENTRY_FUNC(gai_strerror),
