@@ -4149,9 +4149,6 @@ __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_linux_dynlib_ctx_set),
 #endif
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_linux_get_cur_process),
-#if VSF_USE_TRACE == ENABLED
-    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_trace_arg),
-#endif
 };
 #endif
 
@@ -4650,6 +4647,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 
 #   if VSF_APPLET_USE_ARCH == ENABLED
     .arch_vplt          = (void *)&vsf_arch_vplt,
+#   endif
+#   if VSF_APPLET_USE_SERVICE == ENABLED
+    .service_vplt       = (void *)&vsf_service_vplt,
 #   endif
 
     .fundmental_vplt    = (void *)&vsf_linux_fundmental_vplt,

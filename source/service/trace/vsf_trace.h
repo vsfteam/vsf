@@ -167,12 +167,6 @@ extern void __vsf_trace_init(vsf_stream_tx_t *ptTX);
 #   endif
 extern void vsf_trace_fini(void);
 
-SECTION(".text.vsf.trace.__vsf_trace_buffer")
-extern void __vsf_trace_buffer( vsf_trace_level_t level,
-                                void *buffer,
-                                uint_fast16_t len,
-                                uint_fast32_t flag);
-
 #define __vsf_trace_buffer3(__level, __buffer, __len)                           \
         __vsf_trace_buffer((__level), (__buffer), (__len), VSF_TRACE_DF_DEFAULT)
 #define __vsf_trace_buffer4(__level, __buffer, __len, __flag)                   \
@@ -184,12 +178,80 @@ extern void __vsf_trace_buffer( vsf_trace_level_t level,
         __PLOOC_EVAL(__vsf_trace_buffer, (__level), (__buffer), (__len), ##__VA_ARGS__)\
             ((__level), (__buffer), (__len), ##__VA_ARGS__)
 
+#if VSF_APPLET_USE_TRACE == ENABLED
+typedef struct vsf_trace_vplt_t {
+    vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_trace_buffer);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_trace_output);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_trace_string);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_trace_arg);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_trace_assert);
+} vsf_trace_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_trace_vplt_t vsf_trace_vplt;
+#   endif
+#endif
+
+#if     defined(__VSF_APPLET__) && (defined(__VSF_APPLET_LIB__) || defined(__VSF_APPLET_TRACE_LIB__))\
+    && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_APPLET_USE_TRACE == ENABLED
+
+#   define VSF_APPLET_TRACE_VPLT                                                 \
+            ((vsf_trace_vplt_t *)(VSF_SERVICE_APPLET_VPLT->trace_vplt))
+
+#define VSF_APPLET_TRACE_ENTRY(__NAME)                                           \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_APPLET_TRACE_VPLT, __NAME)
+#define VSF_APPLET_TRACE_IMP(...)                                                \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_APPLET_TRACE_VPLT, __VA_ARGS__)
+
+VSF_APPLET_TRACE_IMP(__vsf_trace_buffer, void, vsf_trace_level_t level, void *buffer, uint_fast16_t len, uint_fast32_t flag) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    VSF_APPLET_TRACE_ENTRY(__vsf_trace_buffer)(level, buffer, len, flag);
+}
+VSF_APPLET_TRACE_IMP(vsf_trace_string, void, vsf_trace_level_t level, const char *str) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    VSF_APPLET_TRACE_ENTRY(vsf_trace_string)(level, str);
+}
+VSF_APPLET_TRACE_IMP(vsf_trace_arg, void, vsf_trace_level_t level, const char *format, va_list arg) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    VSF_APPLET_TRACE_ENTRY(vsf_trace_arg)(level, format, arg);
+}
+VSF_APPLET_TRACE_IMP(__vsf_trace_output, uint_fast32_t, const char *buff, uint_fast32_t size) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_APPLET_TRACE_ENTRY(__vsf_trace_output)(buff, size);
+}
+VSF_APPLET_TRACE_IMP(vsf_trace_assert, void, const char *file, int line, const char *func) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    VSF_APPLET_TRACE_ENTRY(vsf_trace_assert)(file, line, func);
+}
+
+VSF_APPLET_VPLT_FUNC_DECORATOR void vsf_trace(vsf_trace_level_t level, const char *format, ...) {
+    va_list ap;
+
+    va_start(ap, format);
+    vsf_trace_arg(level, format, ap);
+    va_end(ap);
+}
+
+#else
+
+SECTION(".text.vsf.trace.__vsf_trace_buffer")
+extern void __vsf_trace_buffer( vsf_trace_level_t level,
+                                void *buffer,
+                                uint_fast16_t len,
+                                uint_fast32_t flag);
+extern void __vsf_trace_set_level(vsf_trace_level_t level);
+
 extern void vsf_trace_string(vsf_trace_level_t level, const char *str);
 extern void vsf_trace_arg(vsf_trace_level_t level, const char *format, va_list arg);
 extern void vsf_trace(vsf_trace_level_t level, const char *format, ...);
 
 extern uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size);
 extern void vsf_trace_assert(const char *file, int line, const char *func);
+
+#endif
+
+// bgtrace
 
 extern void vsf_bgtrace_clear(vsf_bgtrace_t *bgtrace);
 extern uint32_t vsf_bgtrace_total(vsf_bgtrace_t *bgtrace);

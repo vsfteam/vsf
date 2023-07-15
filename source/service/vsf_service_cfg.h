@@ -75,8 +75,31 @@ The VSF_USE_HEAP will be forced to ENABLED here to provide required services
 #   define VSF_USE_HEAP                         ENABLED
 #endif
 
+#if VSF_APPLET_USE_SERVICE == ENABLED
+#   ifndef VSF_APPLET_USE_TRACE
+#       define VSF_APPLET_USE_TRACE             ENABLED
+#   endif
+
+#   ifndef VSF_SERVICE_APPLET_VPLT
+#       define VSF_SERVICE_APPLET_VPLT                                          \
+            ((vsf_service_vplt_t *)(((vsf_vplt_t *)vsf_vplt((void *)0))->service_vplt))
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+#if VSF_APPLET_USE_SERVICE == ENABLED
+typedef struct vsf_service_vplt_t {
+    vsf_vplt_info_t info;
+
+    void *trace_vplt;
+} vsf_service_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_service_vplt_t vsf_service_vplt;
+#   endif
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/

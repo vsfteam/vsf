@@ -268,6 +268,9 @@ VSF_APPLET_VPLT_ENTRY_DECORATOR extern void * vsf_vplt(void *vplt);
 #   ifndef VSF_APPLET_USE_ARCH
 #       define VSF_APPLET_USE_ARCH          ENABLED
 #   endif
+#   ifndef VSF_APPLET_USE_SERVICE
+#       define VSF_APPLET_USE_SERVICE       ENABLED
+#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

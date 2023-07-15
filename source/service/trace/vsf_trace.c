@@ -341,6 +341,18 @@ void vsf_trace_assert(const char *file, int line, const char *func)
     vsf_trace_error("%s:%d %s -- assertion failed\n", file, line, func);
 }
 
+#if VSF_APPLET_USE_TRACE == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_trace_vplt_t vsf_trace_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_trace_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_trace_buffer),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_trace_output),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_trace_string),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_trace_arg),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_trace_assert),
+};
+#endif
+
 // backtrace
 
 void vsf_bgtrace_clear(vsf_bgtrace_t *bgtrace)

@@ -88,5 +88,14 @@ void vsf_service_init(void)
 }
 #endif
 
+#if VSF_APPLET_USE_SERVICE == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_service_vplt_t vsf_service_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_service_vplt_t, 0, 0, false),
+
+#   if VSF_USE_TRACE == ENABLED && VSF_APPLET_USE_TRACE == ENABLED
+    .trace_vplt         = (void *)&vsf_trace_vplt,
+#   endif
+};
+#endif
 
 /* EOF */

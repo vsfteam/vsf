@@ -377,7 +377,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_arch_vplt_t vsf_arch_vplt;
 
 #ifndef VSF_APPLET_ARCH_VPLT
 #   define VSF_APPLET_ARCH_VPLT                                                 \
-            ((vsf_arch_vplt_t *)((vsf_vplt_t *)vsf_vplt((void *)0))->arch_vplt)
+            ((vsf_arch_vplt_t *)(((vsf_vplt_t *)vsf_vplt((void *)0))->arch_vplt))
 #endif
 
 #define VSF_APPLET_ARCH_ENTRY(__NAME)                                           \

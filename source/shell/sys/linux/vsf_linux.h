@@ -348,10 +348,6 @@ typedef struct vsf_linux_fundmental_vplt_t {
 #endif
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_linux_get_cur_process);
-
-#if VSF_USE_TRACE == ENABLED
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_trace_arg);
-#endif
 } vsf_linux_fundmental_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_vplt;
@@ -391,12 +387,6 @@ VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_linux_get_cur_process, vsf_linux_process_t *
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_FUNDMENTAL_ENTRY(vsf_linux_get_cur_process)();
 }
-
-#if VSF_USE_TRACE == ENABLED
-VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_trace_arg, void, vsf_trace_level_t level, const char *format, va_list arg) {
-    VSF_LINUX_APPLET_FUNDMENTAL_ENTRY(vsf_trace_arg)(level, format, arg);
-}
-#endif
 
 #else
 
