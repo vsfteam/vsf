@@ -44,6 +44,7 @@ extern "C" {
 #define timespec_get        VSF_LINUX_LIBC_WRAPPER(timespec_get)
 #define strftime            VSF_LINUX_LIBC_WRAPPER(strftime)
 #define strptime            VSF_LINUX_LIBC_WRAPPER(strptime)
+#define tzset               VSF_LINUX_LIBC_WRAPPER(tzset)
 #endif
 
 #define TIMER_ABSTIME       1
@@ -103,7 +104,7 @@ typedef struct vsf_linux_libc_time_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(timer_getoverrun);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(timespec_get);
-
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(tzset);
 } vsf_linux_libc_time_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_time_vplt_t vsf_linux_libc_time_vplt;
@@ -223,6 +224,10 @@ VSF_LINUX_APPLET_LIBC_TIME_IMP(timer_gettime, int, timer_t timerid, struct itime
 VSF_LINUX_APPLET_LIBC_TIME_IMP(timespec_get, int, struct timespec *ts, int base) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(timespec_get)(ts, base);
+}
+VSF_LINUX_APPLET_LIBC_TIME_IMP(tzset, void, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    VSF_LINUX_APPLET_LIBC_TIME_ENTRY(tzset)();
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_TIME

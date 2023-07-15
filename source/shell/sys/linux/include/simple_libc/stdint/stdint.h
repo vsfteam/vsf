@@ -31,6 +31,14 @@ typedef unsigned long long      uint_fast64_t;
 typedef long long               intmax_t;
 typedef unsigned long long      uintmax_t;
 
+#ifdef __VSF64__
+typedef uint64_t                uintptr_t;
+typedef int64_t                 intptr_t;
+#else
+typedef uint32_t                uintptr_t;
+typedef int32_t                 intptr_t;
+#endif
+
 //#if !defined(__cplusplus) 
 
 #define INT8_MIN                (-128)

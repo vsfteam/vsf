@@ -617,6 +617,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_time_vplt_t vsf_linux_libc_time_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(timer_delete),
     VSF_APPLET_VPLT_ENTRY_FUNC(timer_getoverrun),
     VSF_APPLET_VPLT_ENTRY_FUNC(timespec_get),
+    VSF_APPLET_VPLT_ENTRY_FUNC(tzset),
 };
 #endif
 

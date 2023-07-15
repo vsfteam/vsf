@@ -774,6 +774,11 @@ __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(freeaddrinfo),
     VSF_APPLET_VPLT_ENTRY_FUNC(herror),
     VSF_APPLET_VPLT_ENTRY_FUNC(hstrerror),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setservent),
+    VSF_APPLET_VPLT_ENTRY_FUNC(endservent),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getservent),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getservbyname),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getservbyport),
 };
 #   endif
 #endif

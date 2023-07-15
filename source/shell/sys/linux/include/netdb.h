@@ -74,6 +74,11 @@ struct servent {
 #define freeaddrinfo        VSF_LINUX_SOCKET_WRAPPER(freeaddrinfo)
 #define herror              VSF_LINUX_SOCKET_WRAPPER(herror)
 #define hstrerror           VSF_LINUX_SOCKET_WRAPPER(hstrerror)
+#define setservent          VSF_LINUX_SOCKET_WRAPPER(setservent)
+#define endservent          VSF_LINUX_SOCKET_WRAPPER(endservent)
+#define getservent          VSF_LINUX_SOCKET_WRAPPER(getservent)
+#define getservbyname       VSF_LINUX_SOCKET_WRAPPER(getservbyname)
+#define getservbyport       VSF_LINUX_SOCKET_WRAPPER(getservbyport)
 #endif
 
 extern int * __vsf_linux_h_errno(void);
@@ -117,6 +122,11 @@ typedef struct vsf_linux_netdb_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(freeaddrinfo);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(herror);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(hstrerror);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(setservent);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(endservent);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getservent);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getservbyname);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getservbyport);
 } vsf_linux_netdb_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_netdb_vplt_t vsf_linux_netdb_vplt;
@@ -172,6 +182,26 @@ VSF_LINUX_APPLET_NETDB_IMP(herror, void, const char *s) {
 VSF_LINUX_APPLET_NETDB_IMP(hstrerror, const char *, int err) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_NETDB_ENTRY(hstrerror)(err);
+}
+VSF_LINUX_APPLET_NETDB_IMP(setservent, void, int stayopen) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_NETDB_ENTRY(setservent)(stayopen);
+}
+VSF_LINUX_APPLET_NETDB_IMP(endservent, void, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    VSF_LINUX_APPLET_NETDB_ENTRY(endservent)();
+}
+VSF_LINUX_APPLET_NETDB_IMP(getservent, struct servent *, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_NETDB_ENTRY(getservent)();
+}
+VSF_LINUX_APPLET_NETDB_IMP(getservbyname, struct servent *, const char *name, const char *proto) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_NETDB_ENTRY(getservbyname)(name, proto);
+}
+VSF_LINUX_APPLET_NETDB_IMP(getservbyport, struct servent *, int port, const char *proto) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_NETDB_ENTRY(getservbyport)(port, proto);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_NETDB

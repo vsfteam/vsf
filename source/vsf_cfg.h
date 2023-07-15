@@ -105,6 +105,13 @@ typedef union vsf_vplt_info_t {
 typedef struct vsf_vplt_t {
     vsf_vplt_info_t info;
 
+    void *utilities_vplt;
+    void *arch_vplt;
+    void *hal_vplt;
+    void *service_vplt;
+    void *kernel_vplt;
+    void *component_vplt;
+
     void *linux_vplt;
 } vsf_vplt_t;
 

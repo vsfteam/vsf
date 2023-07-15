@@ -118,7 +118,6 @@ extern VSF_CFG_DEBUG_STREAM_RX_T VSF_DEBUG_STREAM_RX;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
 /*============================ INCLUDES ======================================*/
 
 /*!\note If you have one or more private header files with which you want to
