@@ -341,12 +341,6 @@ extern void vsf_arch_heap_statistics(vsf_arch_heap_statistics_t *statistics);
  * Architecture Infrastructure                                                *
  *----------------------------------------------------------------------------*/
 
-extern uint_fast16_t bswap_16(uint_fast16_t);
-extern uint_fast32_t bswap_32(uint_fast32_t);
-#ifdef UINT64_MAX
-extern uint_fast64_t bswap_64(uint_fast64_t);
-#endif
-
 #ifndef VSF_FFS32
 // returns the first bits(start from 0) which is '1'
 //  if all bits are 0s, -1 is returned
@@ -365,12 +359,60 @@ extern int_fast8_t vsf_msb32(uint_fast32_t);
 extern uint_fast8_t vsf_clz32(uint_fast32_t);
 #endif
 
+#if VSF_APPLET_USE_ARCH == ENABLED
+typedef struct vsf_arch_vplt_t {
+    vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(bswap_16);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(bswap_32);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(bswap_64);
+} vsf_arch_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_arch_vplt_t vsf_arch_vplt;
+#   endif
+#endif
+
+#if     defined(__VSF_APPLET__) && (defined(__VSF_APPLET_LIB__) || defined(__VSF_APPLET_ARCH_LIB__))\
+    && VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_APPLET_USE_ARCH == ENABLED
+
+#ifndef VSF_APPLET_ARCH_VPLT
+#   define VSF_APPLET_ARCH_VPLT                                                 \
+            ((vsf_arch_vplt_t *)((vsf_vplt_t *)vsf_vplt((void *)0))->arch_vplt)
+#endif
+
+#define VSF_APPLET_ARCH_ENTRY(__NAME)                                           \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_APPLET_ARCH_VPLT, __NAME)
+#define VSF_APPLET_ARCH_IMP(...)                                                \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_APPLET_ARCH_VPLT, __VA_ARGS__)
+
+VSF_APPLET_ARCH_IMP(bswap_16, uint_fast16_t, uint_fast16_t value) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_APPLET_ARCH_ENTRY(bswap_16)(value);
+}
+VSF_APPLET_ARCH_IMP(bswap_32, uint_fast32_t, uint_fast32_t value) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_APPLET_ARCH_ENTRY(bswap_32)(value);
+}
+VSF_APPLET_ARCH_IMP(bswap_64, uint_fast64_t, uint_fast64_t value) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_APPLET_ARCH_ENTRY(bswap_64)(value);
+}
+
+#else
+
+extern uint_fast16_t bswap_16(uint_fast16_t);
+extern uint_fast32_t bswap_32(uint_fast32_t);
+#ifdef UINT64_MAX
+extern uint_fast64_t bswap_64(uint_fast64_t);
+#endif
+
 DECLARE_ENDIAN_FUNC(16)
 DECLARE_ENDIAN_FUNC(32)
 #ifdef UINT64_MAX
 DECLARE_ENDIAN_FUNC(64)
 #endif
 
+#endif
 
 /*----------------------------------------------------------------------------*
  * SWI                                                                        *

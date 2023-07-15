@@ -4615,6 +4615,10 @@ __VSF_VPLT_DECORATOR__ vsf_linux_fnmatch_vplt_t vsf_linux_fnmatch_vplt = {
 __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_vplt_t, 0, 0, false),
 
+#   if VSF_APPLET_USE_ARCH == ENABLED
+    .arch_vplt          = (void *)&vsf_arch_vplt,
+#   endif
+
     .fundmental_vplt    = (void *)&vsf_linux_fundmental_vplt,
 
 #   if VSF_LINUX_APPLET_USE_LIBC_STDIO == ENABLED

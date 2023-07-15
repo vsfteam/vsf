@@ -31,9 +31,13 @@ WEAK(vsf_vplt)
 __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_vplt_t, 0, 0, false),
 
-#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_APPLET == ENABLED
+#   if VSF_APPLET_USE_ARCH == ENABLED
+    .arch_vplt          = (void *)&vsf_arch_vplt,
+#   endif
+
+#   if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_APPLET == ENABLED
     .linux_vplt     = (void *)&vsf_linux_vplt,
-#endif
+#   endif
 };
 #endif
 

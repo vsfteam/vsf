@@ -264,6 +264,12 @@ VSF_APPLET_VPLT_ENTRY_DECORATOR extern void * vsf_vplt(void *vplt);
     int main(__VA_ARGS__)
 #endif
 
+#if VSF_USE_APPLET == ENABLED || VSF_LINUX_USE_APPLET == ENABLED
+#   ifndef VSF_APPLET_USE_ARCH
+#       define VSF_APPLET_USE_ARCH          ENABLED
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
