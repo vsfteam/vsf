@@ -4565,11 +4565,13 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_LIBUSB == ENABLED
 #       include <libusb/libusb.h>
 #   endif
-#   if VSF_LINUX_SOCKET_USE_INET == ENABLED && VSF_LINUX_APPLET_USE_IFADDRS == ENABLED
-#       include <ifaddrs.h>
-#   endif
-#   if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
-#       include <arpa/inet.h>
+#   if VSF_LINUX_SOCKET_USE_INET == ENABLED
+#       if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED
+#           include <ifaddrs.h>
+#       endif
+#       if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
+#           include <arpa/inet.h>
+#       endif
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
 #       include <libgen.h>
@@ -4781,11 +4783,13 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   if VSF_LINUX_APPLET_USE_SCHED == ENABLED
     .sched_vplt         = (void *)&vsf_linux_sched_vplt,
 #   endif
-#   if VSF_LINUX_SOCKET_USE_INET == ENABLED && VSF_LINUX_APPLET_USE_IFADDRS == ENABLED
+#   if VSF_LINUX_SOCKET_USE_INET == ENABLED
+#       if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED
     .ifaddrs_vplt       = (void *)&vsf_linux_ifaddrs_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
+#       endif
+#       if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
     .arpa_inet_vplt     = (void *)&vsf_linux_arpa_inet_vplt,
+#       endif
 #   endif
 #   if VSF_LINUX_APPLET_USE_DLFCN == ENABLED
     .dlfcn_vplt         = (void *)&vsf_linux_dlfcn_vplt,
