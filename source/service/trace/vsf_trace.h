@@ -240,7 +240,6 @@ extern void __vsf_trace_buffer( vsf_trace_level_t level,
                                 void *buffer,
                                 uint_fast16_t len,
                                 uint_fast32_t flag);
-extern void __vsf_trace_set_level(vsf_trace_level_t level);
 
 extern void vsf_trace_string(vsf_trace_level_t level, const char *str);
 extern void vsf_trace_arg(vsf_trace_level_t level, const char *format, va_list arg);
