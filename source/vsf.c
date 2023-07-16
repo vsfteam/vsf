@@ -49,7 +49,7 @@ __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USE_APPLET == ENABLED
+#if VSF_USE_APPLET == ENABLED || (VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_APPLET == ENABLED)
 #   if VSF_APPLET_CFG_LINKABLE == ENABLED
 
 static void * __vsf_vplt_link(void *vplt, char *symname)

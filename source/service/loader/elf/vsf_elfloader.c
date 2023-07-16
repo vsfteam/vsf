@@ -126,7 +126,7 @@ void vsf_elfloader_arch_fini_plt(vsf_elfloader_t *elfloader) { }
 WEAK(vsf_elfloader_link)
 int vsf_elfloader_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *target)
 {
-#if VSF_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
+#if (VSF_USE_APPLET == ENABLED || (VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_APPLET == ENABLED)) && VSF_APPLET_CFG_LINKABLE == ENABLED
     if (NULL == elfloader->vplt) {
         return -1;
     }
@@ -318,7 +318,9 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
             }
             if (target->support_xip && ((header->p_flags & PF_W) != 0)) {
                 if (    (linfo->memstart_xip != (Elf_Word)-1)
-                    &&  ((linfo->memstart_xip + linfo->memsz_xip) != header->p_vaddr)) {
+                    &&  ((linfo->memstart_xip + linfo->memsz_xip) != header->p_vaddr)
+                    // aligned to 8-byte?
+                    &&  ((linfo->memstart_xip + linfo->memsz_xip) + 4 != header->p_vaddr)) {
                     vsf_trace_warning("load memory not consequent in space, assume good" VSF_TRACE_CFG_LINEEND);
                 }
                 linfo->memsz_xip += header->p_memsz;
@@ -385,11 +387,9 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_loader_targe
         if (0 == sym.st_value) {
             if (symname[0] != '\0') {
                 // load from symbol
-                if (STT_FUNC != ELF_ST_TYPE(sym.st_info)) {
-                    vsf_trace_error("only support relocate external functions" VSF_TRACE_CFG_LINEEND);
-                    return -1;
+                if (STT_FUNC == ELF_ST_TYPE(sym.st_info)) {
+                    linfo->dynamic.external_fn_num++;
                 }
-                linfo->dynamic.external_fn_num++;
                 if (parse_only) { continue; }
 
                 if (vsf_elfloader_arch_link(elfloader, symname, &tgtvalue) < 0) {
