@@ -1603,7 +1603,7 @@ int vsf_linux_open(vk_file_t *dir, const char *pathname, int flags, mode_t mode)
     vk_vfs_file_t *vfs_file = NULL;
     vsf_linux_fd_t *sfd;
     vsf_linux_fd_op_t *fdop;
-    char fullpath[PATH_MAX];
+    char fullpath[PATH_MAX], *dir_path = NULL;
 #if VSF_LINUX_CFG_LINK_FILE == ENABLED
     char linkpath[PATH_MAX];
 #endif
@@ -1616,7 +1616,7 @@ int vsf_linux_open(vk_file_t *dir, const char *pathname, int flags, mode_t mode)
 __open_again:
 #endif
     if (NULL == dir) {
-        if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+        if (vsf_linux_generate_path(fullpath, sizeof(fullpath), dir_path, (char *)pathname)) {
             return -1;
         }
     } else {
@@ -1732,12 +1732,24 @@ __open_again_do:
         if (!fstat(fd, &s) && S_ISLNK(s.st_mode)) {
             ssize_t linklen = read(fd, linkpath, sizeof(linkpath));
             close(fd);
-
             if (linklen < 0) {
                 return -1;
             }
             linkpath[linklen] = '\0';
-            pathname = linkpath;
+
+            if (linkpath[0] == '/') {
+                pathname = linkpath;
+                dir_path = NULL;
+            } else {
+                char *filename = (char *)strrchr((const char *)fullpath, '/');
+                VSF_LINUX_ASSERT(filename != NULL);
+                filename[0] = '\0';
+
+                pathname = linkpath;
+                dir_path = fullpath;
+            }
+            close(fd);
+
             flags |= 1 << __FD_OPENBYLINK;
             vfs_file = NULL;
             goto __open_again;
