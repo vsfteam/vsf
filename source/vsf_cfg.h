@@ -237,12 +237,11 @@ extern void vsf_vplt_fini_array(void *target);
 #   define VSF_APPLET_VPLT_ENTRY_DECORATOR
 #endif
 VSF_APPLET_VPLT_ENTRY_DECORATOR extern void * vsf_vplt(void *vplt);
-VSF_APPLET_VPLT_ENTRY_DECORATOR extern void * vsf_applet_remap(void *vaddr);
-static vsf_applet_ctx_t* __vsf_applet_ctx = (vsf_applet_ctx_t *)0;
+VSF_APPLET_VPLT_ENTRY_DECORATOR extern void * vsf_applet_remap(vsf_applet_ctx_t *applet_ctx, void *vaddr);
 #   define main(...)                                                            \
     applet_entry_with_ctx                                                       \
         int result;                                                             \
-        __vsf_applet_ctx = ctx;                                                 \
+        vsf_applet_remap(ctx, (void *)0);                                       \
         vsf_vplt(ctx->vplt);                                                    \
         if (applet_init_array != (void *)0) {                                   \
             result = applet_init_array(ctx->target);                            \
@@ -259,17 +258,21 @@ static vsf_applet_ctx_t* __vsf_applet_ctx = (vsf_applet_ctx_t *)0;
     }                                                                           \
     VSF_APPLET_VPLT_ENTRY_DECORATOR void * vsf_vplt(void *vplt)                 \
     {                                                                           \
-        static void *__vplt;                                                    \
+        static void *__vplt = (void *)0;                                        \
         if (vplt != (void *)0) {                                                \
             __vplt = vplt;                                                      \
             VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();                                 \
         }                                                                       \
         return __vplt;                                                          \
     }                                                                           \
-    VSF_APPLET_VPLT_ENTRY_DECORATOR void * vsf_applet_remap(void *vaddr)        \
+    VSF_APPLET_VPLT_ENTRY_DECORATOR void * vsf_applet_remap(vsf_applet_ctx_t *applet_ctx, void *vaddr)\
     {                                                                           \
-        void * realptr = NULL;                                                  \
-        if (    (__vsf_applet_ctx != (vsf_applet_ctx_t *)0)                     \
+        static vsf_applet_ctx_t *__vsf_applet_ctx = (vsf_applet_ctx_t *)0;      \
+        void *realptr = NULL;                                                   \
+        if (applet_ctx != NULL) {                                               \
+            __vsf_applet_ctx = applet_ctx;                                      \
+        } else if (                                                             \
+                (__vsf_applet_ctx != (vsf_applet_ctx_t *)0)                     \
             &&  (__vsf_applet_ctx->fn_remap != (void * (*)(vsf_applet_ctx_t *, void *))0)) {\
             realptr = __vsf_applet_ctx->fn_remap(__vsf_applet_ctx, vaddr);      \
         }                                                                       \

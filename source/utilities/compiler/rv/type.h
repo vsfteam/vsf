@@ -96,7 +96,7 @@ typedef int_fast8_t         intalu_t;
 
 #if __IS_COMPILER_GCC__
 
-#ifndef __APPLET__
+#ifndef __VSF_APPLET__
 
 // gcc use __builtin_alloca
 #   ifndef alloca
@@ -112,6 +112,6 @@ extern char * strcasestr(const char *str, const char *substr);
 }
 #endif
 
-#endif      // __APPLET__
+#endif      // __VSF_APPLET__
 
 #endif

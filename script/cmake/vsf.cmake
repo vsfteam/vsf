@@ -48,6 +48,11 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC
     ${VSF_TARGET_DEFINITIONS}
     __VSF__
 )
+if(VSF_APPLET)
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC
+        __VSF_APPLET__
+    )
+endif()
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     ${VSF_COMMON_INCLUDE_DIRECTORIES}
 )

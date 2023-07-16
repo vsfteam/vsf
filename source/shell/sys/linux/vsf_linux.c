@@ -4355,6 +4355,14 @@ __VSF_VPLT_DECORATOR__ vsf_linux_pwd_vplt_t vsf_linux_pwd_vplt = {
 };
 #endif
 
+#if VSF_LINUX_APPLET_USE_ERRNO == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_errno_vplt_t vsf_linux_errno_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_errno_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_errno),
+};
+#endif
+
 #if VSF_LINUX_APPLET_USE_TERMIOS == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_termios_vplt_t vsf_linux_termios_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_termios_vplt_t, 0, 0, true),
@@ -4378,7 +4386,6 @@ __VSF_VPLT_DECORATOR__ vsf_linux_termios_vplt_t vsf_linux_termios_vplt = {
 __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_unistd_vplt_t, 0, 0, true),
 
-    VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_errno),
     VSF_APPLET_VPLT_ENTRY_FUNC(confstr),
     VSF_APPLET_VPLT_ENTRY_FUNC(usleep),
     VSF_APPLET_VPLT_ENTRY_FUNC(sleep),
@@ -4764,6 +4771,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 
 #   if VSF_LINUX_APPLET_USE_UNISTD == ENABLED
     .unistd_vplt        = (void *)&vsf_linux_unistd_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_ERRNO == ENABLED
+    .errno_vplt         = (void *)&vsf_linux_errno_vplt,
 #   endif
 #   if VSF_LINUX_APPLET_USE_SIGNAL == ENABLED
     .signal_vplt        = (void *)&vsf_linux_signal_vplt,

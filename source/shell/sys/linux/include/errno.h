@@ -1,6 +1,8 @@
 #ifndef __VSF_LINUX_ERRNO_H__
 #define __VSF_LINUX_ERRNO_H__
 
+#include "shell/sys/linux/vsf_linux_cfg.h"
+
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Winconsistent-dllimport"
@@ -145,11 +147,47 @@ extern "C" {
 /* Linux has no ENOTSUP error code. */
 #define ENOTSUP         EOPNOTSUPP
 
-#ifndef __VSF_APPLET__
-extern int * __vsf_linux_errno(void);
+#define errno           (*__vsf_linux_errno())
+
+#if VSF_LINUX_APPLET_USE_ERRNO == ENABLED
+typedef struct vsf_linux_errno_vplt_t {
+    vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_linux_errno);
+} vsf_linux_errno_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_errno_vplt_t vsf_linux_errno_vplt;
+#   endif
 #endif
 
-#define errno           (*__vsf_linux_errno())
+#if     defined(__VSF_APPLET__) && (defined(__VSF_APPLET_LIB__) || defined(__VSF_APPLET_LINUX_ERRNO_LIB__))\
+    &&  VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_ERRNO == ENABLED
+
+#ifndef VSF_LINUX_APPLET_ERRNO_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_ERRNO_VPLT                                      \
+            ((vsf_linux_errno_vplt_t *)(VSF_LINUX_APPLET_VPLT->errno_vplt))
+#   else
+#       define VSF_LINUX_APPLET_ERRNO_VPLT                                      \
+            ((vsf_linux_errno_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#define VSF_LINUX_APPLET_ERRNO_ENTRY(__NAME)                                    \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_ERRNO_VPLT, __NAME)
+#define VSF_LINUX_APPLET_ERRNO_IMP(...)                                         \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_ERRNO_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_ERRNO_IMP(__vsf_linux_errno, int *, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_ERRNO_ENTRY(__vsf_linux_errno)();
+}
+
+#else
+
+extern int * __vsf_linux_errno(void);
+
+#endif
 
 #ifdef __cplusplus
 }

@@ -240,8 +240,6 @@ struct iovec {
 typedef struct vsf_linux_unistd_vplt_t {
     vsf_vplt_info_t info;
 
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_linux_errno);
-
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(confstr);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(usleep);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sleep);
@@ -380,10 +378,6 @@ VSF_LINUX_APPLET_UNISTD_IMP(__execl_va, exec_ret_t, const char *pathname, const 
 VSF_LINUX_APPLET_UNISTD_IMP(__execlp_va, exec_ret_t, const char *pathname, const char *arg, va_list ap) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(__execlp_va)(pathname, arg, ap);
-}
-VSF_LINUX_APPLET_UNISTD_IMP(__vsf_linux_errno, int *, void) {
-    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    return VSF_LINUX_APPLET_UNISTD_ENTRY(__vsf_linux_errno)();
 }
 VSF_LINUX_APPLET_UNISTD_IMP(confstr, size_t, int name, char *buf, size_t len) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
