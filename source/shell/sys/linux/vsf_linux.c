@@ -763,7 +763,10 @@ static int __vsf_linux_init_thread(int argc, char *argv[])
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     process->id.pid = 1;
     __vsf_linux.cur_pid = 2;
-    return execlp(VSF_LINUX_CFG_BIN_PATH "/init", "init", NULL);
+    execlp(VSF_LINUX_CFG_BIN_PATH "/init", "init", NULL);
+
+    printf("linux: missing init?\n");
+    return -1;
 }
 
 static int __vsf_linux_kernel_thread(int argc, char *argv[])
