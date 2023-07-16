@@ -470,8 +470,6 @@ int getloadavg(double loadavg[], int nelem);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STDLIB
 
-void * alloca(size_t size);
-
 static inline void * reallocarray(void *p, size_t nmemb, size_t size) {
     return realloc(p, nmemb * size);
 }
