@@ -169,7 +169,7 @@ typedef struct vsf_loader_op_t {
     void (*fn_cleanup)(vsf_loader_t *loader);
     int (*fn_call_init_array)(vsf_loader_t *loader);
     void (*fn_call_fini_array)(vsf_loader_t *loader);
-    void * (*fn_xip_remap)(vsf_loader_t *loader, void *vaddr);
+    void * (*fn_remap)(vsf_loader_t *loader, void *vaddr);
 } vsf_loader_op_t;
 
 
@@ -248,7 +248,7 @@ extern int vsf_loader_load(vsf_loader_t *loader, vsf_loader_target_t *target);
 extern void vsf_loader_cleanup(vsf_loader_t *loader);
 extern int vsf_loader_call_init_array(vsf_loader_t *loader);
 extern void vsf_loader_call_fini_array(vsf_loader_t *loader);
-extern void * vsf_loader_xip_remap(vsf_loader_t *loader, void *vaddr);
+extern void * vsf_loader_remap(vsf_loader_t *loader, void *vaddr);
 
 #ifdef __cplusplus
 }

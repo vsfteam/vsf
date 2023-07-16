@@ -101,8 +101,8 @@ vsf_applet_ctx_t * vsf_applet_ctx(void)
     return NULL;
 }
 
-WEAK(vsf_applet_xip_remap)
-void * vsf_applet_xip_remap(vsf_applet_ctx_t *ctx, void *vaddr)
+WEAK(vsf_applet_remap)
+void * vsf_applet_remap(vsf_applet_ctx_t *ctx, void *vaddr)
 {
     return vaddr;
 }
@@ -113,7 +113,7 @@ __VSF_VPLT_DECORATOR__ vsf_applet_vplt_t vsf_applet_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_applet_ctx),
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_vplt_init_array),
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_vplt_fini_array),
-    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_applet_xip_remap),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_applet_remap),
 };
 #endif
 

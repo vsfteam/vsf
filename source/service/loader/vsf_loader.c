@@ -129,13 +129,13 @@ void vsf_loader_call_fini_array(vsf_loader_t *loader)
     loader->op->fn_call_fini_array(loader);
 }
 
-void * vsf_loader_xip_remap(vsf_loader_t *loader, void *vaddr)
+void * vsf_loader_remap(vsf_loader_t *loader, void *vaddr)
 {
     VSF_SERVICE_ASSERT((loader != NULL) && (loader->op != NULL));
-    if (NULL == loader->op->fn_xip_remap) {
-        return vaddr;
+    if (NULL == loader->op->fn_remap) {
+        return NULL;
     }
-    return loader->op->fn_xip_remap(loader, vaddr);
+    return loader->op->fn_remap(loader, vaddr);
 }
 
 #endif      // VSF_USE_LOADER

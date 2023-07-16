@@ -98,7 +98,7 @@ const struct vsf_loader_op_t vsf_elfloader_op = {
     .fn_cleanup             = (void (*)(vsf_loader_t *))vsf_elfloader_cleanup,
     .fn_call_init_array     = (int (*)(vsf_loader_t *))vsf_elfloader_call_init_array,
     .fn_call_fini_array     = (void (*)(vsf_loader_t *))vsf_elfloader_call_fini_array,
-    .fn_xip_remap           = (void * (*)(vsf_loader_t *, void *))vsf_elfloader_xip_remap,
+    .fn_remap               = (void * (*)(vsf_loader_t *, void *))vsf_elfloader_remap,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -274,9 +274,9 @@ static bool __vsf_elfloader_is_vaddr_loaded(vsf_elfloader_t *elfloader, Elf_Addr
     return (vaddr >= elfloader->ram_base_vaddr) && (vaddr < elfloader->ram_base_vaddr + elfloader->ram_base_size);
 }
 
-void * vsf_elfloader_xip_remap(vsf_elfloader_t *elfloader, void *vaddr)
+void * vsf_elfloader_remap(vsf_elfloader_t *elfloader, void *vaddr)
 {
-    void * realptr = vaddr;
+    void * realptr = NULL;
     if (__vsf_elfloader_is_vaddr_loaded(elfloader, (Elf_Addr)vaddr)) {
         realptr = (void *)((uintptr_t)elfloader->ram_base + (uintptr_t)vaddr - elfloader->ram_base_vaddr);
     } else if (elfloader->is_xip) {
