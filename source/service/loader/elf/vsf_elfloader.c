@@ -58,8 +58,6 @@ typedef struct vsf_elfloader_info_t {
     Elf_Word memsz;
     Elf_Word memstart_xip;
     Elf_Word memsz_xip;
-    Elf_Addr ram_base_vaddr;
-    Elf_Word ram_base_size;
 
     // for .dynamic
     struct {
@@ -86,7 +84,6 @@ typedef struct vsf_elfloader_info_t {
 
     uintptr_t entry_offset_in_file;
     bool has_dynamic;
-    bool is_xip;
 } vsf_elfloader_info_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -101,6 +98,7 @@ const struct vsf_loader_op_t vsf_elfloader_op = {
     .fn_cleanup             = (void (*)(vsf_loader_t *))vsf_elfloader_cleanup,
     .fn_call_init_array     = (int (*)(vsf_loader_t *))vsf_elfloader_call_init_array,
     .fn_call_fini_array     = (void (*)(vsf_loader_t *))vsf_elfloader_call_fini_array,
+    .fn_xip_remap           = (void * (*)(vsf_loader_t *, void *))vsf_elfloader_xip_remap,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -124,7 +122,7 @@ int vsf_elfloader_arch_init_plt(vsf_elfloader_t *elfloader, int num)
 WEAK(vsf_elfloader_arch_fini_plt)
 void vsf_elfloader_arch_fini_plt(vsf_elfloader_t *elfloader) { }
 
-// vsf_elfloader_link should be over-written by user to do syjmbol linking
+// vsf_elfloader_link should be over-written by user to do symbol linking
 WEAK(vsf_elfloader_link)
 int vsf_elfloader_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *target)
 {
@@ -271,6 +269,22 @@ void vsf_elfloader_call_fini_array(vsf_elfloader_t *elfloader)
     }
 }
 
+static bool __vsf_elfloader_is_vaddr_loaded(vsf_elfloader_t *elfloader, Elf_Addr vaddr)
+{
+    return (vaddr >= elfloader->ram_base_vaddr) && (vaddr < elfloader->ram_base_vaddr + elfloader->ram_base_size);
+}
+
+void * vsf_elfloader_xip_remap(vsf_elfloader_t *elfloader, void *vaddr)
+{
+    void * realptr = vaddr;
+    if (__vsf_elfloader_is_vaddr_loaded(elfloader, (Elf_Addr)vaddr)) {
+        realptr = elfloader->ram_base + (uintptr_t)vaddr - elfloader->ram_base_vaddr;
+    } else if (elfloader->is_xip) {
+        realptr = (void *)(elfloader->target->object + __vsf_elfloader_vaddr2off(elfloader, elfloader->target, (Elf_Addr)vaddr));
+    }
+    return realptr;
+}
+
 static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
         Elf_Phdr *header, int index, void *param)
 {
@@ -286,11 +300,11 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
         }
 
         if (elfloader->ram_base != NULL) {
-            if ((0 == header->p_filesz) || (linfo->is_xip && (0 == (header->p_flags & PF_W)))) {
+            if ((0 == header->p_filesz) || (elfloader->is_xip && (0 == (header->p_flags & PF_W)))) {
                 return VSF_ELFLOADER_CB_GOON;
             }
 
-            Elf_Word memstart = linfo->is_xip ? linfo->memstart_xip : linfo->memstart;
+            Elf_Word memstart = elfloader->is_xip ? linfo->memstart_xip : linfo->memstart;
             if (vsf_loader_read(target, header->p_offset, (uint8_t *)elfloader->ram_base + header->p_vaddr - memstart, header->p_filesz) != header->p_filesz) {
                 return VSF_ELFLOADER_CB_FAIL;
             }
@@ -339,11 +353,6 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
     return VSF_ELFLOADER_CB_GOON;
 }
 
-static bool __vsf_elfloader_is_vaddr_loaded(vsf_elfloader_info_t *linfo, Elf_Addr vaddr)
-{
-    return (vaddr >= linfo->ram_base_vaddr) && (vaddr < linfo->ram_base_vaddr + linfo->ram_base_size);
-}
-
 static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_loader_target_t *target,
         vsf_elfloader_info_t *linfo, int type, Elf_Addr rel_rela, Elf_Addr size, bool parse_only)
 {
@@ -358,10 +367,10 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_loader_targe
     } u;
     int ent = (type == DT_REL) ? sizeof(Elf_Rel) : sizeof(Elf_Rela);
 
-    if (linfo->is_xip) {
+    if (elfloader->is_xip) {
         u.ptr = (uint8_t *)target->object + __vsf_elfloader_vaddr2off(elfloader, target, rel_rela);
     } else if (__vsf_elfloader_is_vaddr_loaded(linfo, rel_rela)) {
-        u.ptr = (uint8_t *)elfloader->ram_base + rel_rela - linfo->ram_base_vaddr;
+        u.ptr = (uint8_t *)elfloader->ram_base + rel_rela - elfloader->ram_base_vaddr;
     } else {
         vsf_trace_error("rel/rela not in ram" VSF_TRACE_CFG_LINEEND);
         return -1;
@@ -388,14 +397,14 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_loader_targe
                     return -1;
                 }
             } else if (__vsf_elfloader_is_vaddr_loaded(linfo, u.rel->r_offset)) {
-                tgtvalue = (Elf_Addr)elfloader->ram_base - linfo->ram_base_vaddr;
+                tgtvalue = (Elf_Addr)elfloader->ram_base - elfloader->ram_base_vaddr;
             } else {
                 goto no_tgtvalue;
             }
         } else if (__vsf_elfloader_is_vaddr_loaded(linfo, sym.st_value)) {
-            tgtvalue = (Elf_Addr)elfloader->ram_base + sym.st_value - linfo->ram_base_vaddr;
+            tgtvalue = (Elf_Addr)elfloader->ram_base + sym.st_value - elfloader->ram_base_vaddr;
             if (parse_only) { continue; }
-        } else if (linfo->is_xip) {
+        } else if (elfloader->is_xip) {
             tgtvalue = target->object + (Elf_Addr)__vsf_elfloader_vaddr2off(elfloader, target, sym.st_value);
             if (parse_only) { continue; }
         } else {
@@ -419,7 +428,7 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_loader_targe
             vsf_elfloader_debug("relocate value at 0x%X to 0x%X" VSF_TRACE_CFG_LINEEND, u.rel->r_offset, tgtvalue);
         }
 
-        if (vsf_elfloader_arch_relocate_sym((Elf_Addr)elfloader->ram_base + u.rel->r_offset - linfo->ram_base_vaddr, reltype, tgtvalue) < 0) {
+        if (vsf_elfloader_arch_relocate_sym((Elf_Addr)elfloader->ram_base + u.rel->r_offset - elfloader->ram_base_vaddr, reltype, tgtvalue) < 0) {
             vsf_trace_error("fail to relocate %s" VSF_TRACE_CFG_LINEEND, symname);
             return -1;
         }
@@ -456,42 +465,42 @@ second_round_for_ram_base:
     }
 
 #if VSF_ELFLOADER_CFG_DYNAMIC_CAN_XIP == ENABLED
-    linfo.is_xip = target->support_xip;
+    elfloader->is_xip = target->support_xip;
 #else
-    linfo.is_xip = target->support_xip && !linfo.has_dynamic;
+    elfloader->is_xip = target->support_xip && !linfo.has_dynamic;
 #endif
 
-    if (linfo.is_xip) {
-        linfo.ram_base_size = linfo.memsz_xip;
-        linfo.ram_base_vaddr = linfo.memstart_xip;
+    if (elfloader->is_xip) {
+        elfloader->ram_base_size = linfo.memsz_xip;
+        elfloader->ram_base_vaddr = linfo.memstart_xip;
     } else {
-        linfo.ram_base_size = linfo.memsz;
-        linfo.ram_base_vaddr = linfo.memstart;
+        elfloader->ram_base_size = linfo.memsz;
+        elfloader->ram_base_vaddr = linfo.memstart;
     }
 
-    if ((linfo.ram_base_size > 0) && (NULL == elfloader->ram_base)) {
-        elfloader->ram_base = vsf_loader_malloc(elfloader, linfo.is_xip ? VSF_LOADER_MEM_RW : VSF_LOADER_MEM_RWX, linfo.ram_base_size, 0);
+    if ((elfloader->ram_base_size > 0) && (NULL == elfloader->ram_base)) {
+        elfloader->ram_base = vsf_loader_malloc(elfloader, elfloader->is_xip ? VSF_LOADER_MEM_RW : VSF_LOADER_MEM_RWX, elfloader->ram_base_size, 0);
         if (NULL == elfloader->ram_base) {
             vsf_trace_error("fail to allocate ram_base" VSF_TRACE_CFG_LINEEND);
             goto cleanup_and_fail;
         }
-        memset(elfloader->ram_base, 0, linfo.ram_base_size);
+        memset(elfloader->ram_base, 0, elfloader->ram_base_size);
         goto second_round_for_ram_base;
     }
 
     // relocating
     if (linfo.has_dynamic) {
         if (__vsf_elfloader_is_vaddr_loaded(&linfo, linfo.dynamic.symtbl)) {
-            linfo.dynamic.symtbl += (Elf_Addr)elfloader->ram_base - linfo.ram_base_vaddr;
-        } else if (linfo.is_xip) {
+            linfo.dynamic.symtbl += (Elf_Addr)elfloader->ram_base - elfloader->ram_base_vaddr;
+        } else if (elfloader->is_xip) {
             linfo.dynamic.symtbl = (Elf_Addr)target->object + __vsf_elfloader_vaddr2off(elfloader, target, linfo.dynamic.symtbl);
         } else {
             vsf_trace_error("symtbl not accessable" VSF_TRACE_CFG_LINEEND);
             goto cleanup_and_fail;
         }
         if (__vsf_elfloader_is_vaddr_loaded(&linfo, linfo.dynamic.strtbl)) {
-            linfo.dynamic.strtbl += (Elf_Addr)elfloader->ram_base - linfo.ram_base_vaddr;
-        } else if (linfo.is_xip) {
+            linfo.dynamic.strtbl += (Elf_Addr)elfloader->ram_base - elfloader->ram_base_vaddr;
+        } else if (elfloader->is_xip) {
             linfo.dynamic.strtbl = (Elf_Addr)target->object + __vsf_elfloader_vaddr2off(elfloader, target, linfo.dynamic.strtbl);
         } else {
             vsf_trace_error("strtbl not accessable" VSF_TRACE_CFG_LINEEND);
@@ -522,7 +531,7 @@ second_round_for_ram_base:
         }
     }
 
-    base = linfo.is_xip ? (uintptr_t)target->object : (uintptr_t)elfloader->ram_base;
+    base = elfloader->is_xip ? (uintptr_t)target->object : (uintptr_t)elfloader->ram_base;
     if (elfloader->alloc_vplt != NULL) {
         Elf_Shdr header;
         uint32_t dynstr_size = vsf_elfloader_get_section(elfloader, target, ".dynstr", &header);
@@ -585,13 +594,13 @@ second_round_for_ram_base:
     elfloader->static_base = elfloader->ram_base;
     Elf_Shdr header;
     if (vsf_elfloader_get_section(elfloader, target, ".got", &header) > 0) {
-        elfloader->static_base = (uint8_t *)elfloader->static_base + header.sh_addr - linfo.ram_base_vaddr;
+        elfloader->static_base = (uint8_t *)elfloader->static_base + header.sh_addr - elfloader->ram_base_vaddr;
     }
 
     elfloader->target = target;
-    elfloader->entry = linfo.is_xip ?
+    elfloader->entry = elfloader->is_xip ?
                         (void *)(target->object + linfo.entry_offset_in_file)
-                    :   (void *)((uintptr_t)elfloader->ram_base + linfo.elf_hdr.e_entry - linfo.ram_base_vaddr);
+                    :   (void *)((uintptr_t)elfloader->ram_base + linfo.elf_hdr.e_entry - elfloader->ram_base_vaddr);
     return 0;
 
 cleanup_and_fail:

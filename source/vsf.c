@@ -31,12 +31,16 @@ WEAK(vsf_vplt)
 __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_vplt_t, 0, 0, false),
 
+    .applet_vplt        = (void *)&vsf_applet_vplt,
 #   if VSF_APPLET_USE_ARCH == ENABLED
     .arch_vplt          = (void *)&vsf_arch_vplt,
 #   endif
+#   if VSF_APPLET_USE_SERVICE == ENABLED
+    .service_vplt       = (void *)&vsf_service_vplt,
+#   endif
 
 #   if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_APPLET == ENABLED
-    .linux_vplt     = (void *)&vsf_linux_vplt,
+    .linux_vplt         = (void *)&vsf_linux_vplt,
 #   endif
 };
 #endif
@@ -46,18 +50,6 @@ __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt = {
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_USE_APPLET == ENABLED
-
-WEAK(vsf_vplt_init_array)
-int vsf_vplt_init_array(void *target) { return -1; }
-WEAK(vsf_vplt_fini_array)
-void vsf_vplt_fini_array(void *target) { }
-
-WEAK(vsf_applet_ctx)
-vsf_applet_ctx_t * vsf_applet_ctx(void)
-{
-    return NULL;
-}
-
 #   if VSF_APPLET_CFG_LINKABLE == ENABLED
 
 static void * __vsf_vplt_link(void *vplt, char *symname)
@@ -90,17 +82,39 @@ static void * __vsf_vplt_link(void *vplt, char *symname)
 WEAK(vsf_vplt_link)
 void * vsf_vplt_link(void *vplt, char *symname)
 {
-    if (!strcmp(symname, "vsf_applet_ctx")) {
-        return (void *)vsf_applet_ctx;
-    } else if (!strcmp(symname, "vsf_vplt_init_array")) {
-        return (void *)vsf_vplt_init_array;
-    } else if (!strcmp(symname, "vsf_vplt_fini_array")) {
-        return (void *)vsf_vplt_fini_array;
-    }
     return __vsf_vplt_link(vplt, symname);
 }
 #   endif
 
+#endif
+
+#if (VSF_USE_APPLET == ENABLED || VSF_LINUX_USE_APPLET == ENABLED) && !defined(__VSF_APPLET__)
+
+WEAK(vsf_vplt_init_array)
+int vsf_vplt_init_array(void *target) { return -1; }
+WEAK(vsf_vplt_fini_array)
+void vsf_vplt_fini_array(void *target) { }
+
+WEAK(vsf_applet_ctx)
+vsf_applet_ctx_t * vsf_applet_ctx(void)
+{
+    return NULL;
+}
+
+WEAK(vsf_applet_xip_remap)
+void * vsf_applet_xip_remap(vsf_applet_ctx_t *ctx, void *vaddr)
+{
+    return vaddr;
+}
+
+__VSF_VPLT_DECORATOR__ vsf_applet_vplt_t vsf_applet_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_applet_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_applet_ctx),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_vplt_init_array),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_vplt_fini_array),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_applet_xip_remap),
+};
 #endif
 
 /* EOF */

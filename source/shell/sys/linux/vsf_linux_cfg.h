@@ -360,6 +360,7 @@ typedef struct vsf_linux_vplt_t {
     vsf_vplt_info_t info;
 
     // vsf APIs, MUST be compatible with vsf_vplt_t
+    void *applet_vplt;
     void *utilities_vplt;
     void *arch_vplt;
     void *hal_vplt;

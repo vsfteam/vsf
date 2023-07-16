@@ -1968,6 +1968,10 @@ int __vsf_linux_script_main(int argc, char **argv)
 #endif
 
 #if VSF_LINUX_USE_APPLET == ENABLED
+static void * __vsf_linux_dynloader_xip_remap(vsf_applet_ctx_t *ctx, void *vaddr)
+{
+    return vsf_loader_xip_remap((vsf_loader_t *)ctx->target, vaddr);
+}
 int __vsf_linux_dynloader_main(int argc, char **argv)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
@@ -1980,13 +1984,14 @@ int __vsf_linux_dynloader_main(int argc, char **argv)
     int result = -1;
     if (loader->loader.generic.entry != NULL) {
         vsf_applet_ctx_t applet_ctx = {
-            .target     = &loader->loader.generic,
-            .fn_init    = NULL,     // fn_init has already been called in dlopen
-            .fn_fini    = NULL,     // fn_fini will be called in dlclose
-            .argc       = argc,
-            .argv       = argv,
-            .envp       = environ,
-            .vplt       = loader->loader.generic.vplt,
+            .target         = &loader->loader.generic,
+            .fn_init        = NULL,     // fn_init has already been called in dlopen
+            .fn_fini        = NULL,     // fn_fini will be called in dlclose
+            .fn_xip_remap   = __vsf_linux_dynloader_xip_remap,
+            .argc           = argc,
+            .argv           = argv,
+            .envp           = environ,
+            .vplt           = loader->loader.generic.vplt,
         };
 
         vsf_linux_set_process_reg((uintptr_t)loader->loader.generic.static_base);
@@ -4650,6 +4655,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_fnmatch_vplt_t vsf_linux_fnmatch_vplt = {
 __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_vplt_t, 0, 0, false),
 
+    .applet_vplt        = (void *)&vsf_applet_vplt,
 #   if VSF_APPLET_USE_ARCH == ENABLED
     .arch_vplt          = (void *)&vsf_arch_vplt,
 #   endif

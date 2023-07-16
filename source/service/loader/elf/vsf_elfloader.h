@@ -73,6 +73,10 @@ vsf_class(vsf_elfloader_t) {
         void *finiarr;
         uint32_t initarr_sz;
         uint32_t finiarr_sz;
+
+        uintptr_t ram_base_vaddr;
+        uintptr_t ram_base_size;
+        bool is_xip;
     )
 };
 
@@ -100,6 +104,7 @@ extern int vsf_elfloader_load(vsf_elfloader_t *elfloader, vsf_loader_target_t *t
 extern void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader);
 extern int vsf_elfloader_call_init_array(vsf_elfloader_t *elfloader);
 extern void vsf_elfloader_call_fini_array(vsf_elfloader_t *elfloader);
+extern void * vsf_elfloader_xip_remap(vsf_elfloader_t *elfloader, void *vaddr);
 
 // can be called before vsf_elfloader_load
 #if defined(__VSF_ELFLOADER_CLASS_INHERIT__) || defined(__VSF_ELFLOADER_CLASS_IMPLEMENT)
