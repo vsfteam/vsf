@@ -145,7 +145,7 @@ typedef struct vsf_vplt_entry_t {
     ((__##__NAME##_prototype_t)((__VPLT)->fn_##__NAME.ptr))
 #if VSF_APPLET_CFG_DEBUG_VPLT == ENABLED
 #   define VSF_APPLET_VPLT_ENTRY_FUNC_TRACE()                                   \
-    vsf_linux_trace(4, "vplt invoke: %s\n", __FUNCTION__)
+    vsf_vplt_trace("vplt invoke: %s\n", __FUNCTION__)
 #else
 #   define VSF_APPLET_VPLT_ENTRY_FUNC_TRACE()
 #endif
@@ -288,11 +288,37 @@ typedef struct vsf_applet_vplt_t {
     vsf_vplt_info_t info;
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_applet_ctx);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_vplt_trace_arg);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_vplt_init_array);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_vplt_fini_array);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_applet_remap);
 } vsf_applet_vplt_t;
 __VSF_VPLT_DECORATOR__ extern vsf_applet_vplt_t vsf_applet_vplt;
+
+#   if defined(__VSF_APPLET__) && defined(__VSF_APPLET_LIB__)
+#       include <stdarg.h>
+#       define VSF_APPLET_VPLT                                                  \
+            ((vsf_applet_vplt_t *)(((vsf_vplt_t *)vsf_vplt((void *)0))->applet_vplt))
+
+#define VSF_VPLT_APPLET_ENTRY(__NAME)                                           \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_APPLET_VPLT, __NAME)
+#define VSF_VPLT_APPLET_IMP(...)                                                \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_APPLET_VPLT, __VA_ARGS__)
+
+VSF_VPLT_APPLET_IMP(vsf_vplt_trace_arg, void, const char *fmt, va_list arg) {
+    VSF_VPLT_APPLET_ENTRY(vsf_vplt_trace_arg)(fmt, arg);
+}
+
+static void vsf_vplt_trace(const char *format, ...)
+{
+    va_list ap;
+
+    va_start(ap, format);
+    vsf_vplt_trace_arg(format, ap);
+    va_end(ap);
+}
+
+#   endif
 
 #   ifndef VSF_APPLET_USE_ARCH
 #       define VSF_APPLET_USE_ARCH          ENABLED

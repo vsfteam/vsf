@@ -107,10 +107,19 @@ void * vsf_applet_remap(vsf_applet_ctx_t *ctx, void *vaddr)
     return vaddr;
 }
 
+WEAK(vsf_vplt_trace_arg)
+void vsf_vplt_trace_arg(const char* fmt, va_list arg)
+{
+#   if VSF_USE_TRACE == ENABLED
+    vsf_trace_arg(VSF_TRACE_DEBUG, fmt, arg);
+#   endif
+}
+
 __VSF_VPLT_DECORATOR__ vsf_applet_vplt_t vsf_applet_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_applet_vplt_t, 0, 0, true),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_applet_ctx),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_vplt_trace_arg),
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_vplt_init_array),
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_vplt_fini_array),
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_applet_remap),

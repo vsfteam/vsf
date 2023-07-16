@@ -403,18 +403,6 @@ extern vsf_linux_process_t * vsf_linux_get_cur_process(void);
 
 #endif
 
-// linux trace
-#if VSF_USE_TRACE == ENABLED
-static void vsf_linux_trace(vsf_trace_level_t level, const char *format, ...)
-{
-    va_list ap;
-
-    va_start(ap, format);
-    vsf_trace_arg(level, format, ap);
-    va_end(ap);
-}
-#endif
-
 // IMPORTANT: priority of stdio_stream MUST be within scheduler priorities
 extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
 
