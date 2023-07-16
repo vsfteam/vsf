@@ -317,11 +317,13 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
                 linfo->memstart = header->p_vaddr;
             }
             if (target->support_xip && ((header->p_flags & PF_W) != 0)) {
-                if (    (linfo->memstart_xip != (Elf_Word)-1)
-                    &&  ((linfo->memstart_xip + linfo->memsz_xip) != header->p_vaddr)
-                    // aligned to 8-byte?
-                    &&  ((linfo->memstart_xip + linfo->memsz_xip) + 4 != header->p_vaddr)) {
-                    vsf_trace_warning("load memory not consequent in space, assume good" VSF_TRACE_CFG_LINEEND);
+                if (linfo->memstart_xip != (Elf_Word)-1) {
+                    uintptr_t offset = header->p_vaddr - (linfo->memstart_xip + linfo->memsz_xip);
+                    if (offset > 4) {
+                        vsf_trace_error("load memory not consequent in space" VSF_TRACE_CFG_LINEEND);
+                        return VSF_ELFLOADER_CB_FAIL;
+                    }
+                    linfo->memsz_xip += offset;
                 }
                 linfo->memsz_xip += header->p_memsz;
                 if (linfo->memstart_xip > header->p_vaddr) {
