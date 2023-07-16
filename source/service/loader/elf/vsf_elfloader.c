@@ -278,7 +278,7 @@ void * vsf_elfloader_xip_remap(vsf_elfloader_t *elfloader, void *vaddr)
 {
     void * realptr = vaddr;
     if (__vsf_elfloader_is_vaddr_loaded(elfloader, (Elf_Addr)vaddr)) {
-        realptr = elfloader->ram_base + (uintptr_t)vaddr - elfloader->ram_base_vaddr;
+        realptr = (void *)((uintptr_t)elfloader->ram_base + (uintptr_t)vaddr - elfloader->ram_base_vaddr);
     } else if (elfloader->is_xip) {
         realptr = (void *)(elfloader->target->object + __vsf_elfloader_vaddr2off(elfloader, elfloader->target, (Elf_Addr)vaddr));
     }
@@ -369,7 +369,7 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_loader_targe
 
     if (elfloader->is_xip) {
         u.ptr = (uint8_t *)target->object + __vsf_elfloader_vaddr2off(elfloader, target, rel_rela);
-    } else if (__vsf_elfloader_is_vaddr_loaded(linfo, rel_rela)) {
+    } else if (__vsf_elfloader_is_vaddr_loaded(elfloader, rel_rela)) {
         u.ptr = (uint8_t *)elfloader->ram_base + rel_rela - elfloader->ram_base_vaddr;
     } else {
         vsf_trace_error("rel/rela not in ram" VSF_TRACE_CFG_LINEEND);
@@ -396,12 +396,12 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_loader_targe
                     vsf_trace_error("fail to locate %s" VSF_TRACE_CFG_LINEEND, symname);
                     return -1;
                 }
-            } else if (__vsf_elfloader_is_vaddr_loaded(linfo, u.rel->r_offset)) {
+            } else if (__vsf_elfloader_is_vaddr_loaded(elfloader, u.rel->r_offset)) {
                 tgtvalue = (Elf_Addr)elfloader->ram_base - elfloader->ram_base_vaddr;
             } else {
                 goto no_tgtvalue;
             }
-        } else if (__vsf_elfloader_is_vaddr_loaded(linfo, sym.st_value)) {
+        } else if (__vsf_elfloader_is_vaddr_loaded(elfloader, sym.st_value)) {
             tgtvalue = (Elf_Addr)elfloader->ram_base + sym.st_value - elfloader->ram_base_vaddr;
             if (parse_only) { continue; }
         } else if (elfloader->is_xip) {
@@ -417,7 +417,7 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_loader_targe
             tgtvalue += u.rela->r_addend;
         }
 
-        if (!__vsf_elfloader_is_vaddr_loaded(linfo, u.rel->r_offset)) {
+        if (!__vsf_elfloader_is_vaddr_loaded(elfloader, u.rel->r_offset)) {
             vsf_trace_error("rel/rela offset not loaded" VSF_TRACE_CFG_LINEEND);
             return -1;
         }
@@ -490,7 +490,7 @@ second_round_for_ram_base:
 
     // relocating
     if (linfo.has_dynamic) {
-        if (__vsf_elfloader_is_vaddr_loaded(&linfo, linfo.dynamic.symtbl)) {
+        if (__vsf_elfloader_is_vaddr_loaded(elfloader, linfo.dynamic.symtbl)) {
             linfo.dynamic.symtbl += (Elf_Addr)elfloader->ram_base - elfloader->ram_base_vaddr;
         } else if (elfloader->is_xip) {
             linfo.dynamic.symtbl = (Elf_Addr)target->object + __vsf_elfloader_vaddr2off(elfloader, target, linfo.dynamic.symtbl);
@@ -498,7 +498,7 @@ second_round_for_ram_base:
             vsf_trace_error("symtbl not accessable" VSF_TRACE_CFG_LINEEND);
             goto cleanup_and_fail;
         }
-        if (__vsf_elfloader_is_vaddr_loaded(&linfo, linfo.dynamic.strtbl)) {
+        if (__vsf_elfloader_is_vaddr_loaded(elfloader, linfo.dynamic.strtbl)) {
             linfo.dynamic.strtbl += (Elf_Addr)elfloader->ram_base - elfloader->ram_base_vaddr;
         } else if (elfloader->is_xip) {
             linfo.dynamic.strtbl = (Elf_Addr)target->object + __vsf_elfloader_vaddr2off(elfloader, target, linfo.dynamic.strtbl);
