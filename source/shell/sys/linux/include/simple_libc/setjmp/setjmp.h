@@ -9,13 +9,15 @@
 #include "utilities/compiler/compiler.h"
 
 #ifndef __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
-#   if  defined(__CPU_X64__)
+#   if      defined(__CPU_X64__)
 
 typedef struct {
     uint64_t part[2];
 } ALIGN(16) setjmp_float128;
 typedef setjmp_float128 jmp_buf[16];
 
+#   elif    defined(__CPU_ARM__)
+typedef unsigned long long int jmp_buf[16];
 #   else
 #   error not supported, do not add to path, use setjmp from libc instead
 #   endif
