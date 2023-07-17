@@ -889,7 +889,7 @@ pid_t __vsf_linux_vfork_prepare(vsf_linux_process_t *parent_process);
     vsf_linux_process_t *parent_process = vsf_linux_get_cur_process();          \
     pid_t result = (pid_t)-1, child_pid = __vsf_linux_vfork_prepare(parent_process);\
     if (child_pid >= 0) {                                                       \
-        result = !setjmp(parent_process->__vfork_jmpbuf)? (pid_t)0 : child_pid; \
+        result = !setjmp(parent_process->__vfork_jmpbuf) ? (pid_t)0 : child_pid;\
     }                                                                           \
     result;                                                                     \
 })
