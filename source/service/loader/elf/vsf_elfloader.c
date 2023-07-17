@@ -276,6 +276,11 @@ static bool __vsf_elfloader_is_vaddr_loaded(vsf_elfloader_t *elfloader, Elf_Addr
 
 void * vsf_elfloader_remap(vsf_elfloader_t *elfloader, void *vaddr)
 {
+    if (elfloader->is_got) {
+        // got need no remap
+        return vaddr;
+    }
+
     void * realptr = NULL;
     if (__vsf_elfloader_is_vaddr_loaded(elfloader, (Elf_Addr)vaddr)) {
         realptr = (void *)((uintptr_t)elfloader->ram_base + (uintptr_t)vaddr - elfloader->ram_base_vaddr);
@@ -596,9 +601,11 @@ second_round_for_ram_base:
     }
 
     elfloader->static_base = elfloader->ram_base;
+    elfloader->is_got = false;
     Elf_Shdr header;
     if (vsf_elfloader_get_section(elfloader, target, ".got", &header) > 0) {
         elfloader->static_base = (uint8_t *)elfloader->static_base + header.sh_addr - elfloader->ram_base_vaddr;
+        elfloader->is_got = true;
     }
 
     elfloader->entry = elfloader->is_xip ?

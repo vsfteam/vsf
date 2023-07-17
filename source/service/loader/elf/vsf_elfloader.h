@@ -77,6 +77,7 @@ vsf_class(vsf_elfloader_t) {
         uintptr_t ram_base_vaddr;
         uintptr_t ram_base_size;
         bool is_xip;
+        bool is_got;
     )
 };
 
