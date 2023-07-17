@@ -150,14 +150,17 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-int vsf_elfloader_arch_relocate_sym(Elf_Addr tgtaddr, int type, Elf_Addr tgtvalue)
+int vsf_elfloader_arch_relocate_sym(vsf_elfloader_t *elfloader, Elf_Addr tgtaddr, int type, Elf_Addr tgtvalue)
 {
     switch (type) {
+    // (S + A) | T
+    case R_ARM_ABS32:
+    case R_ARM_GLOB_DAT:
     case R_ARM_JUMP_SLOT:
         *(uint32_t *)tgtaddr = tgtvalue;
         return 0;
     case R_ARM_RELATIVE:
-        *(uint32_t *)tgtaddr += tgtvalue;
+        *(uint32_t *)tgtaddr = (uint32_t)vsf_elfloader_remap(elfloader, (void *)*(uint32_t *)tgtaddr);
         return 0;
     }
     return -1;
