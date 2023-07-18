@@ -75,7 +75,7 @@ int getopt(int, char * const *, const char *);
 #ifndef _GETOPT_DEFINED_
 #define _GETOPT_DEFINED_
 
-#   if VSF_LINUX_USE_GETOPT == ENABLED
+#   if VSF_LINUX_USE_GETOPT == ENABLED && !defined(__VSF_APPLET__)
 // for vsf linux, put these variable in process context and implement them as macro
 #       include "shell/sys/linux/vsf_linux.h"
 extern const vsf_linux_dynlib_mod_t __getopt_long_mod;

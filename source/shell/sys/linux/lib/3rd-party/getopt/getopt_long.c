@@ -59,7 +59,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if VSF_LINUX_USE_GETOPT == ENABLED
+#if VSF_LINUX_USE_GETOPT == ENABLED && !defined(__VSF_APPLET__)
 #	if VSF_LINUX_CFG_PLS_NUM <= 0
 #		error VSF_LINUX_CFG_PLS_NUM MUST be configured > 0 for getopt library
 #	endif
@@ -118,7 +118,7 @@ static int parse_long_options(char * const *, const char *,
 static int gcd(int, int);
 static void permute_args(int, int, int, char * const *);
 
-#if VSF_LINUX_USE_GETOPT == ENABLED
+#if VSF_LINUX_USE_GETOPT == ENABLED && !defined(__VSF_APPLET__)
 #   define place (getopt_ctx->__place)
 #   define nonopt_start (getopt_ctx->__nonopt_start)
 #   define nonopt_end (getopt_ctx->__nonopt_end)
@@ -327,7 +327,7 @@ getopt_internal(int nargc, char * const *nargv, const char *options,
 {
 	char *oli;				/* option letter list index */
 	int optchar, short_too;
-#if VSF_LINUX_USE_GETOPT == ENABLED
+#if VSF_LINUX_USE_GETOPT == ENABLED && !defined(__VSF_APPLET__)
 #   define posixly_correct (getopt_ctx->getopt_internal.__posixly_correct)
 #else
 	static int posixly_correct = -1;
@@ -505,7 +505,7 @@ start:
 	}
 	/* dump back option letter */
 	return (optchar);
-#if VSF_LINUX_USE_GETOPT == ENABLED
+#if VSF_LINUX_USE_GETOPT == ENABLED && !defined(__VSF_APPLET__)
 #   undef posixly_correct
 #endif
 }
