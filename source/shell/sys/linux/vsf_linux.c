@@ -1322,7 +1322,7 @@ void vsf_linux_exit_process(int status, bool _exit)
         }
     }
 
-    // 3. wait child threads and processes
+    // 3. wait child threads
     while (true) {
         orig = vsf_protect_sched();
             vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread2wait);
@@ -1338,6 +1338,10 @@ void vsf_linux_exit_process(int status, bool _exit)
         vsf_linux_wait_thread(thread2wait->tid, NULL);
     }
 
+    // 5. cleanup process
+    vsf_linux_cleanup_process(process);
+
+    // 6. wait child process
     vsf_linux_process_t *process2wait;
     while (true) {
         orig = vsf_protect_sched();
@@ -1355,10 +1359,7 @@ void vsf_linux_exit_process(int status, bool _exit)
         waitpid(process2wait->id.pid, NULL, 0);
     }
 
-    // 5. cleanup process
-    vsf_linux_cleanup_process(process);
-
-    // 6. notify pending thread, MUST be the last before exiting current thread
+    // 7. notify pending thread, MUST be the last before exiting current thread
     process->status &= ~PID_STATUS_RUNNING;
     if (process->thread_pending != NULL) {
         vsf_unprotect_sched(orig);
@@ -1378,7 +1379,7 @@ void vsf_linux_exit_process(int status, bool _exit)
         }
     }
 
-    // 7. exit current thread
+    // 8. exit current thread
     if (PID_STATUS_DAEMON == process->status) {
         vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
     }
@@ -2661,6 +2662,9 @@ pid_t getpid(void)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
+    if (process->is_vforking) {
+        process = process->vfork_child;
+    }
     return process->id.pid;
 }
 
@@ -2668,12 +2672,19 @@ pid_t getppid(void)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
+    if (process->is_vforking) {
+        process = process->vfork_child;
+    }
     return process->id.ppid;
 }
 
 pid_t setsid(void)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    if (process->is_vforking) {
+        process = process->vfork_child;
+    }
     vsf_linux_detach_process(process);
     return 0;
 }
@@ -2686,6 +2697,10 @@ pid_t getsid(pid_t pid)
 int setpgid(pid_t pid, pid_t pgid)
 {
     vsf_linux_process_t *process = 0 == pid ? vsf_linux_get_cur_process() : vsf_linux_get_process(pid);
+    VSF_LINUX_ASSERT(process != NULL);
+    if (process->is_vforking) {
+        process = process->vfork_child;
+    }
     if (0 == pgid) {
         process->id.gid = process->id.pid;
     } else if (process->id.gid != pgid) {
@@ -2710,6 +2725,10 @@ int setpgrp(void)
 pid_t getpgrp(void)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    if (process->is_vforking) {
+        process = process->vfork_child;
+    }
     return process->id.gid;
 }
 
@@ -2733,6 +2752,7 @@ pid_t gettid(void)
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
 
     if (oldset != NULL) {
         *oldset = process->sig.mask;
