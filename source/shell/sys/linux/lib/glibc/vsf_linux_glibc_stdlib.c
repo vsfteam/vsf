@@ -843,6 +843,45 @@ void * calloc(size_t n, size_t size)
 }
 
 #if VSF_LINUX_APPLET_USE_LIBC_STDLIB == ENABLED && !defined(__VSF_APPLET__)
+
+#if VSF_ARCH_USE_THREAD_REG == ENABLED
+// workaround for bsearch and qsort, which will modify process_reg can call user callback
+static int __compar(const void *a, const void *b)
+{
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    VSF_LINUX_ASSERT((thread != NULL) && (thread->process_reg_backup.tmp_ptr != NULL));
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+
+    uintptr_t orig = vsf_linux_set_process_reg(process->reg);
+    int result = ((int (*)(const void *, const void *))thread->process_reg_backup.tmp_ptr)(a, b);
+    vsf_linux_set_process_reg(orig);
+    return result;
+}
+
+// re-implement bsearch and qsort to avoid calling compar with arch_thread_reg modified
+static void * __bsearch(const void *key, const void *base, size_t nitems, size_t size, int (*compar)(const void *, const void *))
+{
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    VSF_LINUX_ASSERT(thread != NULL);
+
+    thread->process_reg_backup.tmp_ptr = (void *)compar;
+    void *result = bsearch(key, base, nitems, size, __compar);
+    thread->process_reg_backup.tmp_ptr = NULL;
+
+    return result;
+}
+
+static void __qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*))
+{
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    VSF_LINUX_ASSERT(thread != NULL);
+    thread->process_reg_backup.tmp_ptr = (void *)compar;
+    qsort(base, nitems, size, __compar);
+    thread->process_reg_backup.tmp_ptr = NULL;
+}
+#endif
+
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_stdlib_vplt_t, 0, 0, true),
 
@@ -890,8 +929,19 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt =
     VSF_APPLET_VPLT_ENTRY_FUNC(strtod),
 //    VSF_APPLET_VPLT_ENTRY_FUNC(strtold),
 
+#if VSF_ARCH_USE_THREAD_REG == ENABLED
+    .fn_bsearch = {
+        .name = "bsearch",
+        .ptr = (void *)__bsearch,
+    },
+    .fn_qsort = {
+        .name = "qsort",
+        .ptr = (void *)__qsort,
+    },
+#else
     VSF_APPLET_VPLT_ENTRY_FUNC(bsearch),
     VSF_APPLET_VPLT_ENTRY_FUNC(qsort),
+#endif
 
     VSF_APPLET_VPLT_ENTRY_FUNC(rand),
     VSF_APPLET_VPLT_ENTRY_FUNC(srand),

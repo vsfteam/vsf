@@ -177,6 +177,14 @@ vsf_class(vsf_linux_thread_t) {
 #if VSF_LINUX_CFG_TLS_NUM > 0
         vsf_linux_localstorage_t tls[VSF_LINUX_CFG_TLS_NUM];
 #endif
+#if     VSF_ARCH_USE_THREAD_REG == ENABLED                                      \
+    &&  VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
+    &&  VSF_LINUX_APPLET_USE_LIBC_STDLIB == ENABLED && !defined(__VSF_APPLET__)
+        union {
+            // used to save compar parameter for bsearch and qsort
+            void *tmp_ptr;
+        } process_reg_backup;
+#endif
     )
 
     private_member(
@@ -488,7 +496,9 @@ extern vsf_linux_process_t * vsf_linux_create_process(int stack_size, int heap_s
 extern void vsf_linux_delete_process(vsf_linux_process_t *process);
 extern int vsf_linux_start_process(vsf_linux_process_t *process);
 extern void vsf_linux_exit_process(int status, bool _exit);
-extern void vsf_linux_set_process_reg(uintptr_t reg);
+#if VSF_ARCH_USE_THREAD_REG == ENABLED
+extern uintptr_t vsf_linux_set_process_reg(uintptr_t reg);
+#endif
 
 extern void vsf_linux_cleanup_process(vsf_linux_process_t *process);
 extern void vsf_linux_detach_process(vsf_linux_process_t *process);

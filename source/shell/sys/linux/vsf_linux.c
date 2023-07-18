@@ -1398,15 +1398,12 @@ int acct(const char *filename)
     return -1;
 }
 
-void vsf_linux_set_process_reg(uintptr_t reg)
-{
 #if VSF_ARCH_USE_THREAD_REG == ENABLED
-    vsf_linux_process_t *process = vsf_linux_get_cur_process();
-    VSF_LINUX_ASSERT(process != NULL);
-    process->reg = reg;
-    vsf_arch_set_thread_reg(reg);
-#endif
+uintptr_t vsf_linux_set_process_reg(uintptr_t reg)
+{
+    return vsf_arch_set_thread_reg(reg);
 }
+#endif
 
 vsf_linux_process_t * __vsf_linux_start_process_internal(
         vsf_linux_main_entry_t entry, char * const * argv, int stack_size, vsf_prio_t prio)
@@ -1995,7 +1992,10 @@ int __vsf_linux_dynloader_main(int argc, char **argv)
             .vplt       = loader->loader.generic.vplt,
         };
 
-        vsf_linux_set_process_reg((uintptr_t)loader->loader.generic.static_base);
+#   if VSF_ARCH_USE_THREAD_REG == ENABLED
+        process->reg = (uintptr_t)loader->loader.generic.static_base;
+        vsf_linux_set_process_reg(process->reg);
+#   endif
         result = ((int (*)(vsf_applet_ctx_t*))loader->loader.generic.entry)(&applet_ctx);
     } else {
         printf("no entry found for %s\n", process->path);
