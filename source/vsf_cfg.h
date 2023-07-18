@@ -233,9 +233,9 @@ extern void vsf_vplt_fini_array(void *target);
 #       endif
 #   endif
 
-#ifndef VSF_APPLET_VPLT_ENTRY_DECORATOR
-#   define VSF_APPLET_VPLT_ENTRY_DECORATOR
-#endif
+#   ifndef VSF_APPLET_VPLT_ENTRY_DECORATOR
+#       define VSF_APPLET_VPLT_ENTRY_DECORATOR
+#   endif
 VSF_APPLET_VPLT_ENTRY_DECORATOR extern void * vsf_vplt(void *vplt);
 VSF_APPLET_VPLT_ENTRY_DECORATOR extern void * vsf_applet_remap(vsf_applet_ctx_t *applet_ctx, void *vaddr);
 #   define main(...)                                                            \
@@ -295,7 +295,7 @@ typedef struct vsf_applet_vplt_t {
 } vsf_applet_vplt_t;
 __VSF_VPLT_DECORATOR__ extern vsf_applet_vplt_t vsf_applet_vplt;
 
-#   if defined(__VSF_APPLET__) && defined(__VSF_APPLET_LIB__)
+#   if defined(__VSF_APPLET__) && defined(__VSF_APPLET_LIB__) && VSF_APPLET_CFG_DEBUG_VPLT == ENABLED
 #       include <stdarg.h>
 #       define VSF_APPLET_VPLT                                                  \
             ((vsf_applet_vplt_t *)(((vsf_vplt_t *)vsf_vplt((void *)0))->applet_vplt))
