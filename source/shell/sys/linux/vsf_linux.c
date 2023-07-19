@@ -4189,6 +4189,7 @@ int sysinfo(struct sysinfo *info)
     info->totalram = heap_statistics.all_size;
     info->freeram = heap_statistics.all_size - heap_statistics.used_size;
 #endif
+    info->mem_unit = 1;
     return 0;
 }
 

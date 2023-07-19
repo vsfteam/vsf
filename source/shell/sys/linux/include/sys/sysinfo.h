@@ -27,6 +27,7 @@ struct sysinfo {
     unsigned long totalswap;
     unsigned long freeswap;
     unsigned short procs;
+    unsigned int mem_unit;
     char _f[22];
 };
 

@@ -117,9 +117,11 @@ static void __vsf_linux_proc_meminfo_show_value(__vsf_linux_proc_meminfo_ctx_t *
     size_t cur_pos_min = ctx->pos, cur_pos_max = cur_pos_min + cnt;
 
     if ((cur_pos_max > cur_pos_range_min) && (cur_pos_min < cur_pos_range_max)) {
-        cur_size = vsf_min(cur_pos_max, cur_pos_range_max) - cur_pos_min;
+        cur_size = vsf_min(cur_pos_max, cur_pos_range_max) - vsf_max(cur_pos_min, cur_pos_range_min);
         memcpy(ctx->buf, &linebuf[cur_pos_range_min > cur_pos_min ? (cur_pos_range_min - cur_pos_min) : 0], cur_size);
         ctx->buf += cur_size;
+        ctx->file->pos += cur_size;
+        ctx->count -= cur_size;
     } else if (cur_pos_max <= cur_pos_range_min) {
         cur_size = cnt;
     }
@@ -129,6 +131,7 @@ static void __vsf_linux_proc_meminfo_show_value(__vsf_linux_proc_meminfo_ctx_t *
 static ssize_t __vsf_linux_proc_meminfo_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    uint64_t pos_orig = priv->file->pos;
     __vsf_linux_proc_meminfo_ctx_t ctx = {
         .file   = priv->file,
         .buf    = (uint8_t *)buf,
@@ -150,8 +153,7 @@ static ssize_t __vsf_linux_proc_meminfo_read(vsf_linux_fd_t *sfd, void *buf, siz
     __vsf_linux_proc_meminfo_show_value(&ctx, "SwapTotal:      %d kB\n", 0);
     __vsf_linux_proc_meminfo_show_value(&ctx, "SwapFree:       %d kB\n", 0);
 
-    ssize_t result =  ctx.pos - ctx.file->pos;
-    ctx.file->pos = ctx.pos;
+    ssize_t result =  ctx.file->pos - pos_orig;
     return result > 0 ? result : -1;
 }
 
