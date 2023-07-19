@@ -97,6 +97,9 @@ int dynloader_main(int argc, char **argv)
             .vplt       = loader.generic.vplt,
         };
 
+#if VSF_ARCH_USE_THREAD_REG == ENABLED
+        vsf_linux_process_t *process = vsf_linux_get_cur_process();
+#endif
 #if VSF_APPLET_CFG_ABI_PATCH == ENABLED
         if (pls_applet_ctx < 0) {
             pls_applet_ctx = vsf_linux_pls_alloc();
@@ -106,10 +109,16 @@ int dynloader_main(int argc, char **argv)
         VSF_LINUX_ASSERT(pls != NULL);
         pls->data = &applet_ctx;
 
-        vsf_linux_set_process_reg((uintptr_t)loader.generic.static_base);
+#   if VSF_ARCH_USE_THREAD_REG == ENABLED
+        process->reg = (uintptr_t)loader.generic.static_base;
+        vsf_linux_set_process_reg(process->reg);
+#   endif
         result = ((int (*)(void))loader.generic.entry)();
 #else
-        vsf_linux_set_process_reg((uintptr_t)loader.generic.static_base);
+#   if VSF_ARCH_USE_THREAD_REG == ENABLED
+        process->reg = (uintptr_t)loader.generic.static_base;
+        vsf_linux_set_process_reg(process->reg);
+#   endif
         result = ((int (*)(vsf_applet_ctx_t*))loader.generic.entry)(&applet_ctx);
 #endif
         vsf_loader_cleanup(&loader.generic);
