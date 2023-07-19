@@ -27,11 +27,13 @@
 #   include "../../../include/unistd.h"
 #   include "../../../include/linux/limits.h"
 #   include "shell/sys/linux/include/sys/stat.h"
+#   include "shell/sys/linux/include/sys/sysinfo.h"
 #else
 #   include <unistd.h>
 // for PATH_MAX
 #   include <linux/limits.h>
 #   include <sys/stat.h>
+#   include <sys/sysinfo.h>
 #endif
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
@@ -51,6 +53,9 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_LINUX_USE_PROCFS == ENABLED
+
+// /proc/self/exe
+
 typedef struct vsf_linux_proc_self_exe_priv_t {
     implement(vsf_linux_fs_priv_t)
     char linkpath[PATH_MAX];
@@ -92,6 +97,51 @@ static const vsf_linux_fd_op_t __vsf_linux_proc_self_exe_fdop = {
     .fn_write           = __vsf_linux_proc_self_exe_write,
     .fn_stat            = __vsf_linux_proc_self_exe_stat,
 };
+
+// /proc/meminfo
+
+static ssize_t __vsf_linux_proc_meminfo_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    size_t count_wanted = count;
+    uint8_t *byte_ptr = buf;
+    int cnt;
+    struct sysinfo info;
+    sysinfo(&info);
+    info.totalram >>= 10;
+    info.freeram >>= 10;
+
+    cnt = snprintf((char *)byte_ptr, count, "MemTotal:       %d kB\n", info.totalram);
+    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
+    cnt = snprintf((char *)byte_ptr, count, "MemFree:        %d kB\n", info.freeram);
+    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
+    cnt = snprintf((char *)byte_ptr, count, "MemAvailable:   %d kB\n", info.freeram);
+    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
+    cnt = snprintf((char *)byte_ptr, count, "Buffers:        0 kB\n");
+    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
+    cnt = snprintf((char *)byte_ptr, count, "Cached:         0 kB\n");
+    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
+    cnt = snprintf((char *)byte_ptr, count, "SwapCached:     0 kB\n");
+    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
+    cnt = snprintf((char *)byte_ptr, count, "SwapTotal:      0 kB\n");
+    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
+    cnt = snprintf((char *)byte_ptr, count, "SwapFree:       0 kB\n");
+    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
+
+    return count_wanted - count;
+}
+
+static int __vsf_linux_proc_meminfo_stat(vsf_linux_fd_t *sfd, struct stat *buf)
+{
+    buf->st_mode = S_IFREG;
+    return 0;
+}
+
+static const vsf_linux_fd_op_t __vsf_linux_proc_meminfo_fdop = {
+    .priv_size          = sizeof(vsf_linux_fs_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
+    .fn_read            = __vsf_linux_proc_meminfo_read,
+    .fn_stat            = __vsf_linux_proc_meminfo_stat,
+};
 #endif
 
 int vsf_linux_vfs_init(void)
@@ -100,20 +150,26 @@ int vsf_linux_vfs_init(void)
 
     err = mkdir("/run", 0);
     if (err != 0) {
-        fprintf(stderr, "fail to mkdir /run\r\n");
+        fprintf(stderr, "fail to mkdir /run\n");
         return err;
     }
 
 #if VSF_LINUX_USE_PROCFS == ENABLED
     err = mkdirs("/proc/self", 0);
     if (err != 0) {
-        fprintf(stderr, "fail to mkdir /proc/self\r\n");
+        fprintf(stderr, "fail to mkdir /proc/self\n");
         return err;
     }
     err = vsf_linux_fs_bind_target_ex("/proc/self/exe", NULL, &__vsf_linux_proc_self_exe_fdop,
         NULL, NULL, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
     if (err != 0) {
-        fprintf(stderr, "fail to create /proc/self/exe\r\n");
+        fprintf(stderr, "fail to create /proc/self/exe\n");
+        return err;
+    }
+    err = vsf_linux_fs_bind_target_ex("/proc/meminfo", NULL, &__vsf_linux_proc_meminfo_fdop,
+        NULL, NULL, VSF_FILE_ATTR_READ, 0);
+    if (err != 0) {
+        fprintf(stderr, "fail to create /proc/meminfo\n");
         return err;
     }
 #endif

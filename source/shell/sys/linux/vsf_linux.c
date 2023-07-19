@@ -4186,8 +4186,8 @@ int sysinfo(struct sysinfo *info)
 
     vsf_heap_statistics_t heap_statistics;
     vsf_heap_statistics(&heap_statistics);
-    sysinfo->totalram = heap_statistics.all_size;
-    sysinfo->freeram = heap_statistics.all_size - heap_statistics.used_size;
+    info->totalram = heap_statistics.all_size;
+    info->freeram = heap_statistics.all_size - heap_statistics.used_size;
 #endif
     return 0;
 }
