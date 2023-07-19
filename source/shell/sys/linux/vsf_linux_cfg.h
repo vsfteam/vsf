@@ -268,6 +268,9 @@
 #   ifndef VSF_LINUX_APPLET_USE_SYS_RESOURCE
 #       define VSF_LINUX_APPLET_USE_SYS_RESOURCE    ENABLED
 #   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_INFO
+#       define VSF_LINUX_APPLET_USE_SYS_INFO    ENABLED
+#   endif
 
 #   ifndef VSF_LINUX_APPLET_USE_UNISTD
 #       define VSF_LINUX_APPLET_USE_UNISTD      ENABLED
@@ -418,6 +421,7 @@ typedef struct vsf_linux_vplt_t {
     void *sys_statvfs_vplt;
     void *sys_resource_vplt;
     void *sys_times_vplt;
+    void *sys_info_vplt;
 
     // unix
     void *unistd_vplt;

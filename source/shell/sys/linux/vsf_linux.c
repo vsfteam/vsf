@@ -46,6 +46,7 @@
 #   include "./include/sys/capability.h"
 #   include "./include/sys/timex.h"
 #   include "./include/sys/resource.h"
+#   include "./include/sys/sysinfo.h"
 #   include "./include/fcntl.h"
 #   include "./include/errno.h"
 #   include "./include/termios.h"
@@ -78,6 +79,7 @@
 #   include <sys/capability.h>
 #   include <sys/timex.h>
 #   include <sys/resource.h>
+#   include <sys/sysinfo.h>
 #   include <fcntl.h>
 #   include <errno.h>
 #   include <termios.h>
@@ -4167,6 +4169,29 @@ int ntp_adjtime(struct timex *buf)
     return -1;
 }
 
+// sysinfo
+
+int sysinfo(struct sysinfo *info)
+{
+    VSF_LINUX_ASSERT(info != NULL);
+    memset(info, 0, sizeof(*info));
+
+    info->uptime = vsf_systimer_get_ms() / 1000;
+    vsf_protect_t orig = vsf_protect_sched();
+        info->procs = vsf_dlist_get_length(&__vsf_linux.process_list);
+    vsf_unprotect_sched(orig);
+
+#if     VSF_USE_HEAP == ENABLED && VSF_HEAP_CFG_STATISTICS == ENABLED           \
+    &&  (VSF_ARCH_PROVIDE_HEAP != ENABLED || VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED)
+
+    vsf_heap_statistics_t heap_statistics;
+    vsf_heap_statistics(&heap_statistics);
+    sysinfo->totalram = heap_statistics.all_size;
+    sysinfo->freeram = heap_statistics.all_size - heap_statistics.used_size;
+#endif
+    return 0;
+}
+
 // vplt
 #if VSF_LINUX_USE_APPLET == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_vplt = {
@@ -4279,6 +4304,14 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_resource_vplt_t vsf_linux_sys_resource_vplt
 
     VSF_APPLET_VPLT_ENTRY_FUNC(getpriority),
     VSF_APPLET_VPLT_ENTRY_FUNC(setpriority),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_SYS_INFO == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_info_vplt_t vsf_linux_sys_info_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_info_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(sysinfo),
 };
 #endif
 
@@ -4787,6 +4820,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_SYS_RESOURCE == ENABLED
     .sys_resource_vplt  = (void *)&vsf_linux_sys_resource_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_INFO == ENABLED
+    .sys_info_vplt      = (void *)&vsf_linux_sys_info_vplt,
 #   endif
 
 #   if VSF_LINUX_APPLET_USE_UNISTD == ENABLED
