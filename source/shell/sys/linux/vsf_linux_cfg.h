@@ -392,6 +392,7 @@ typedef struct vsf_linux_vplt_t {
     void *libc_res4_vplt;
     void *libc_res5_vplt;
     void *libc_res6_vplt;
+    void *libc_res7_vplt;
 
     // sys
     void *sys_epoll_vplt;
@@ -422,6 +423,14 @@ typedef struct vsf_linux_vplt_t {
     void *sys_resource_vplt;
     void *sys_times_vplt;
     void *sys_info_vplt;
+    void *sys_res0_vplt;
+    void *sys_res1_vplt;
+    void *sys_res2_vplt;
+    void *sys_res3_vplt;
+    void *sys_res4_vplt;
+    void *sys_res5_vplt;
+    void *sys_res6_vplt;
+    void *sys_res7_vplt;
 
     // unix
     void *unistd_vplt;
@@ -448,7 +457,14 @@ typedef struct vsf_linux_vplt_t {
     void *fnmatch_vplt;
     void *grp_vplt;
     void *net_if_vplt;
-    void *res7_vplt;
+    void *unix_res0_vplt;
+    void *unix_res1_vplt;
+    void *unix_res2_vplt;
+    void *unix_res3_vplt;
+    void *unix_res4_vplt;
+    void *unix_res5_vplt;
+    void *unix_res6_vplt;
+    void *unix_res7_vplt;
 
     // libraries
     void *libusb_vplt;
