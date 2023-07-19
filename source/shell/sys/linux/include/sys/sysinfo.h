@@ -13,6 +13,10 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_CFG_WRAPPER == ENABLED
+#define sysinfo             VSF_LINUX_WRAPPER(sysinfo)
+#endif
+
 struct sysinfo {
     long uptime;
     unsigned long loads[3];
@@ -25,10 +29,6 @@ struct sysinfo {
     unsigned short procs;
     char _f[22];
 };
-
-#if VSF_LINUX_CFG_WRAPPER == ENABLED
-#define sysinfo             VSF_LINUX_WRAPPER(sysinfo)
-#endif
 
 #if VSF_LINUX_APPLET_USE_SYS_INFO == ENABLED
 typedef struct vsf_linux_sys_info_vplt_t {

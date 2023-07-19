@@ -64,7 +64,6 @@ enum ranks {
 #   pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
 #elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wmaybe-uninitialized"
 #   pragma clang diagnostic ignored "-Wpointer-to-int-cast"
 #endif
 
