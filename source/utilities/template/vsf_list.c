@@ -174,6 +174,19 @@ void * __vsf_slist_remove_tail_imp(vsf_slist_t *this_ptr, size_t list_offset)
     return item;
 }
 
+uint_fast16_t __vsf_dlist_get_length_imp(vsf_dlist_t *this_ptr)
+{
+    uint_fast16_t length = 0;
+    VSF_ASSERT(NULL != this_ptr);
+
+    while (NULL != this_ptr->head) {
+        length++;
+        this_ptr = (vsf_dlist_t *)this_ptr->head->next;
+    }
+
+    return length;
+}
+
 bool __vsf_dlist_is_in_imp(vsf_dlist_t *this_ptr, vsf_dlist_node_t *node)
 {
     return (node->next != NULL) || (node->prev != NULL) || (this_ptr->head == node);

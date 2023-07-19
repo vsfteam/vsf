@@ -705,6 +705,9 @@ NULL<---|backward|<-----|backward|<----------
 #define vsf_dlist_is_empty(__list_ptr)      /* the address of the list */       \
             __vsf_dlist_is_empty(__list_ptr)
 
+#define vsf_dlist_get_length(   __list_ptr) /* the address of the list */       \
+            __vsf_dlist_get_length_imp(__list_ptr)
+
 #define vsf_dlist_is_in(        __host_type,/* the type of the host type */     \
                                 __member,   /* the member name of the list */   \
                                 __list_ptr, /* the address of the list */       \
@@ -954,6 +957,8 @@ extern void * __vsf_slist_append_imp(   vsf_slist_t *this_ptr,
 
 extern void * __vsf_slist_remove_tail_imp(  vsf_slist_t *this_ptr,
                                             size_t list_offset);
+
+extern uint_fast16_t __vsf_dlist_get_length_imp(vsf_dlist_t *this_ptr);
 
 extern bool __vsf_dlist_is_in_imp(  vsf_dlist_t *this_ptr,
                                     vsf_dlist_node_t *node);
