@@ -176,12 +176,13 @@ void * __vsf_slist_remove_tail_imp(vsf_slist_t *this_ptr, size_t list_offset)
 
 uint_fast16_t __vsf_dlist_get_length_imp(vsf_dlist_t *this_ptr)
 {
-    uint_fast16_t length = 0;
     VSF_ASSERT(NULL != this_ptr);
+    vsf_dlist_node_t *node = this_ptr->head;
+    uint_fast16_t length = 0;
 
-    while (NULL != this_ptr->head) {
+    while (NULL != node) {
         length++;
-        this_ptr = (vsf_dlist_t *)this_ptr->head->next;
+        node = node->next;
     }
 
     return length;

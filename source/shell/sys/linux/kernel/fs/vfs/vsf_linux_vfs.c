@@ -100,34 +100,58 @@ static const vsf_linux_fd_op_t __vsf_linux_proc_self_exe_fdop = {
 
 // /proc/meminfo
 
+typedef struct __vsf_linux_proc_meminfo_ctx_t {
+    vk_file_t *file;
+    uint8_t *buf;
+    size_t count;
+    size_t pos;
+} __vsf_linux_proc_meminfo_ctx_t;
+
+static void __vsf_linux_proc_meminfo_show_value(__vsf_linux_proc_meminfo_ctx_t *ctx, const char *fmt, unsigned long value)
+{
+    uint8_t linebuf[64];
+    int cnt = snprintf((char *)linebuf, sizeof(linebuf), fmt, value);
+    VSF_LINUX_ASSERT(cnt < sizeof(linebuf));
+    size_t cur_size = 0, cur_pos_range_min = ctx->file->pos, cur_pos_range_max = cur_pos_range_min + ctx->count;
+    size_t cur_pos_min = ctx->pos, cur_pos_max = cur_pos_min + cnt;
+
+    if ((cur_pos_max > cur_pos_range_min) && (cur_pos_min < cur_pos_range_max)) {
+        cur_size = vsf_min(cur_pos_max, cur_pos_range_max) - cur_pos_min;
+        memcpy(ctx->buf, &linebuf[cur_pos_range_min > cur_pos_min ? (cur_pos_range_min - cur_pos_min) : 0], cur_size);
+        ctx->buf += cur_size;
+    } else if (cur_pos_max <= cur_pos_range_min) {
+        cur_size = cnt;
+    }
+    ctx->pos += cur_size;
+}
+
 static ssize_t __vsf_linux_proc_meminfo_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
-    size_t count_wanted = count;
-    uint8_t *byte_ptr = buf;
-    int cnt;
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    __vsf_linux_proc_meminfo_ctx_t ctx = {
+        .file   = priv->file,
+        .buf    = (uint8_t *)buf,
+        .count  = count,
+        .pos    = 0,
+    };
+
     struct sysinfo info;
     sysinfo(&info);
     info.totalram >>= 10;
     info.freeram >>= 10;
 
-    cnt = snprintf((char *)byte_ptr, count, "MemTotal:       %d kB\n", info.totalram);
-    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
-    cnt = snprintf((char *)byte_ptr, count, "MemFree:        %d kB\n", info.freeram);
-    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
-    cnt = snprintf((char *)byte_ptr, count, "MemAvailable:   %d kB\n", info.freeram);
-    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
-    cnt = snprintf((char *)byte_ptr, count, "Buffers:        0 kB\n");
-    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
-    cnt = snprintf((char *)byte_ptr, count, "Cached:         0 kB\n");
-    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
-    cnt = snprintf((char *)byte_ptr, count, "SwapCached:     0 kB\n");
-    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
-    cnt = snprintf((char *)byte_ptr, count, "SwapTotal:      0 kB\n");
-    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
-    cnt = snprintf((char *)byte_ptr, count, "SwapFree:       0 kB\n");
-    cnt = vsf_min(cnt, count); count -= cnt; byte_ptr += cnt;
+    __vsf_linux_proc_meminfo_show_value(&ctx, "MemTotal:       %d kB\n", info.totalram);
+    __vsf_linux_proc_meminfo_show_value(&ctx, "MemFree:        %d kB\n", info.freeram);
+    __vsf_linux_proc_meminfo_show_value(&ctx, "MemAvailable:   %d kB\n", info.freeram);
+    __vsf_linux_proc_meminfo_show_value(&ctx, "Buffers:        %d kB\n", 0);
+    __vsf_linux_proc_meminfo_show_value(&ctx, "Cached:         %d kB\n", 0);
+    __vsf_linux_proc_meminfo_show_value(&ctx, "SwapCached:     %d kB\n", 0);
+    __vsf_linux_proc_meminfo_show_value(&ctx, "SwapTotal:      %d kB\n", 0);
+    __vsf_linux_proc_meminfo_show_value(&ctx, "SwapFree:       %d kB\n", 0);
 
-    return count_wanted - count;
+    ssize_t result =  ctx.pos - ctx.file->pos;
+    ctx.file->pos = ctx.pos;
+    return result > 0 ? result : -1;
 }
 
 static int __vsf_linux_proc_meminfo_stat(vsf_linux_fd_t *sfd, struct stat *buf)
