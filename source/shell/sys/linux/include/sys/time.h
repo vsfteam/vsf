@@ -54,6 +54,29 @@ struct itimerval {
     struct timeval  it_interval;
 };
 
+#define timerisset(__tvp)           ((__tvp)->tv_sec || (tvp__tvp->tv_usec)
+#define timerclear(__tvp)           ((__tvp)->tv_sec = (__tvp)->tv_usec = 0)
+#define timercmp(__a, __b, __op)    (((__a)->tv_sec == (__b)->tv_sec) ?         \
+        ((__a)->tv_usec __op (__b)->tv_usec) : ((__a)->tv_sec __op (__b)->tv_sec))
+#define timeradd(__a, __b, __result)                                            \
+    do {                                                                        \
+        (__result)->tv_sec = (__a)->tv_sec + (__b)->tv_sec;                     \
+        (__result)->tv_usec = (__a)->tv_usec + (__b)->tv_usec;                  \
+        if ((__result)->tv_usec >= 1000000) {                                   \
+            ++(__result)->tv_sec;                                               \
+            (__result)->tv_usec -= 1000000;                                     \
+        }                                                                       \
+    } while (0)
+#define timersub(__a, __b, __result)                                            \
+    do {                                                                        \
+        (__result)->tv_sec = (__a)->tv_sec - (__b)->tv_sec;                     \
+        (__result)->tv_usec = (__a)->tv_usec - (__b)->tv_usec;                  \
+        if ((__result)->tv_usec < 0) {                                          \
+            --(__result)->tv_sec;                                               \
+            (__result)->tv_usec += 1000000;                                     \
+        }                                                                       \
+    } while (0)
+
 #if VSF_LINUX_APPLET_USE_SYS_TIME == ENABLED
 typedef struct vsf_linux_sys_time_vplt_t {
     vsf_vplt_info_t info;
