@@ -114,7 +114,7 @@ extern "C" {
                                             .use_as__vsf_mutex_t.use_as__vsf_sync_t.cur_union.bits.cur = 1 | VSF_SYNC_HAS_OWNER,\
                                         }
 #define PTHREAD_COND_INITIALIZER        {                                       \
-                                             .use_as__vsf_mutex_t.use_as__vsf_sync_t.max_union.max_value = 1 | VSF_SYNC_AUTO_RST,\
+                                             .max_union.max_value = 1 | VSF_SYNC_AUTO_RST,\
                                         }
 #else
 #define PTHREAD_MUTEX_INITIALIZER       (pthread_mutex_t) {                     \
@@ -122,7 +122,7 @@ extern "C" {
                                             .use_as__vsf_mutex_t.use_as__vsf_sync_t.cur_union.bits.cur = 1 | VSF_SYNC_HAS_OWNER,\
                                         }
 #define PTHREAD_COND_INITIALIZER        (pthread_cond_t) {                      \
-                                             .use_as__vsf_mutex_t.use_as__vsf_sync_t.max_union.max_value = 1 | VSF_SYNC_AUTO_RST,\
+                                             .max_union.max_value = 1 | VSF_SYNC_AUTO_RST,\
                                         }
 #endif
 
