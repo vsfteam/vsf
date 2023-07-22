@@ -24,6 +24,7 @@
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 #define __VSF_FS_CLASS_INHERIT__
+#define __VSF_FS_CLASS_INHERIT__
 #define __VSF_HEAP_CLASS_INHERIT__
 #define __VSF_LINUX_FS_CLASS_IMPLEMENT
 #define __VSF_LINUX_CLASS_IMPLEMENT
@@ -3097,10 +3098,18 @@ long sys_futex(uint32_t *futex, int futex_op, uint32_t val, uintptr_t val2, uint
 
 // prctl.h
 
-int prctl(int option, unsigned long arg2, unsigned long arg3, unsigned long arg4, unsigned long arg5)
+int prctl(int option, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4, uintptr_t arg5)
 {
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    VSF_LINUX_ASSERT(thread != NULL);
+
     switch (option) {
     case PR_SET_NAME:
+        strncpy(thread->name, (const char *)arg2, sizeof(thread->name) - 1);
+        thread->name[sizeof(thread->name) - 1] = '\0';
+        return 0;
+    case PR_GET_NAME:
+        strncpy((char *)arg2, (const char *)thread->name, sizeof(thread->name));
         return 0;
     }
     VSF_LINUX_ASSERT(false);
@@ -4314,6 +4323,14 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_info_vplt_t vsf_linux_sys_info_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_info_vplt_t, 0, 0, true),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(sysinfo),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_SYS_PRCTL == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_prctl_vplt_t vsf_linux_sys_prctl_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_prctl_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(prctl),
 };
 #endif
 

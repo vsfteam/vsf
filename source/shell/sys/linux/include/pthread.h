@@ -105,6 +105,9 @@ extern "C" {
 #define pthread_barrierattr_destroy     VSF_LINUX_WRAPPER(pthread_barrierattr_destroy)
 #define pthread_barrierattr_getpshared  VSF_LINUX_WRAPPER(pthread_barrierattr_getpshared)
 #define pthread_barrierattr_setpshared  VSF_LINUX_WRAPPER(pthread_barrierattr_setpshared)
+
+#define pthread_setname_np              VSF_LINUX_WRAPPER(pthread_setname_np)
+#define pthread_getname_np              VSF_LINUX_WRAPPER(pthread_getname_np)
 #endif
 
 // to use PTHREAD_MUTEX_INITIALIZER, __VSF_EDA_CLASS_INHERIT__ is needed or ooc is disabled
@@ -323,6 +326,9 @@ typedef struct vsf_linux_pthread_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_barrierattr_destroy);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_barrierattr_getpshared);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_barrierattr_setpshared);
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_setname_np);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_getname_np);
 } vsf_linux_pthread_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt;
@@ -667,6 +673,14 @@ VSF_LINUX_APPLET_PTHREAD_IMP(pthread_barrierattr_setpshared, int, pthread_barrie
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_barrierattr_setpshared)(attr, pshared);
 }
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_setname_np, int, pthread_t thread, const char *name) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_setname_np)(thread, name);
+}
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_getname_np, int, pthread_t thread, char *name, size_t size) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_getname_np)(thread, name);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_PTHREAD
 
@@ -759,6 +773,9 @@ int pthread_barrierattr_init(pthread_barrierattr_t *battr);
 int pthread_barrierattr_destroy(pthread_barrierattr_t *battr);
 int pthread_barrierattr_getpshared(const pthread_barrierattr_t *battr, int *pshared);
 int pthread_barrierattr_setpshared(pthread_barrierattr_t *battr, int pshared);
+
+int pthread_setname_np(pthread_t thread, const char *name);
+int pthread_getname_np(pthread_t thread, char *name, size_t size);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_PTHREAD
 

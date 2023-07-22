@@ -185,6 +185,7 @@ vsf_class(vsf_linux_thread_t) {
             void *tmp_ptr;
         } process_reg_backup;
 #endif
+        char name[16];
     )
 
     private_member(

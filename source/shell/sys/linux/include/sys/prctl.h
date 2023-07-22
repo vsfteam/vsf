@@ -17,6 +17,7 @@ extern "C" {
 #if VSF_LINUX_APPLET_USE_SYS_PRCTL == ENABLED
 typedef struct vsf_linux_sys_prctl_vplt_t {
     vsf_vplt_info_t info;
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(prctl);
 } vsf_linux_sys_prctl_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_prctl_vplt_t vsf_linux_sys_prctl_vplt;
@@ -41,9 +42,14 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_prctl_vplt_t vsf_linux_sys_prctl_vpl
 #define VSF_LINUX_APPLET_SYS_PRCTL_IMP(...)                                     \
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_PRCTL_VPLT, __VA_ARGS__)
 
+VSF_LINUX_APPLET_SYS_PRCTL_IMP(prctl, int, int option, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4, uintptr_t arg5) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_APPLET_VPLT_ENTRY_FUNC_IMP(prctl)(option, arg2, arg3, arg4, arg5);
+}
+
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_PRCTL
 
-int prctl(int option, unsigned long arg2, unsigned long arg3, unsigned long arg4, unsigned long arg5);
+int prctl(int option, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4, uintptr_t arg5);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_PRCTL
 

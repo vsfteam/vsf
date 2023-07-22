@@ -29,12 +29,14 @@
 #   include "../../include/pthread.h"
 #   include "../../include/signal.h"
 #   include "../../include/errno.h"
+#   include "../../include/sys/prctl.h"
 #else
 #   include <unistd.h>
 #   include <time.h>
 #   include <pthread.h>
 #   include <signal.h>
 #   include <errno.h>
+#   include <sys/prctl.h>
 #endif
 
 #if __IS_COMPILER_IAR__
@@ -1103,6 +1105,23 @@ int pthread_barrierattr_setpshared(pthread_barrierattr_t *battr, int pshared)
     return EINVAL;
 }
 
+int pthread_setname_np(pthread_t thread, const char *name)
+{
+    return prctl(PR_SET_NAME, (uintptr_t)name, 0, 0, 0);
+}
+
+int pthread_getname_np(pthread_t thread, char *name, size_t size)
+{
+    char thread_name[16];
+    int ret = prctl(PR_GET_NAME, (uintptr_t)thread_name, 0, 0, 0);
+    if (ret != 0) {
+        return ret;
+    }
+
+    strncpy(name, thread_name, size);
+    return 0;
+}
+
 #if VSF_LINUX_APPLET_USE_PTHREAD == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_pthread_vplt_t, 0, 0, true),
@@ -1187,6 +1206,8 @@ __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_barrierattr_destroy),
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_barrierattr_getpshared),
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_barrierattr_setpshared),
+    VSF_APPLET_VPLT_ENTRY_FUNC(pthread_setname_np),
+    VSF_APPLET_VPLT_ENTRY_FUNC(pthread_getname_np),
 };
 #endif
 
