@@ -242,6 +242,7 @@ static void __vsf_linux_uart_config(vsf_linux_uart_priv_t *priv)
     } else {
         mode |= VSF_USART_1_STOPBIT;
     }
+    term->c_line = (cc_t)'\n';
 
     vsf_usart_irq_disable(uart, VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_TX_CPL);
     vsf_usart_disable(uart);

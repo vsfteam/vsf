@@ -3239,6 +3239,7 @@ int uname(struct utsname *name)
         .release    = VSF_LINUX_RELEASE,
         .version    = VSF_LINUX_VERSION,
         .machine    = VSF_LINUX_MACHINE,
+        .domainname = VSF_LINUX_DOMAINNAME,
     };
     if (name != NULL) {
         *name = __name;

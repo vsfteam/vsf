@@ -24,6 +24,9 @@ extern "C" {
 #ifndef VSF_LINUX_NODENAME
 #   define VSF_LINUX_NODENAME   "unknown"
 #endif
+#ifndef VSF_LINUX_DOMAINNAME
+#   define VSF_LINUX_DOMAINNAME "unknown"
+#endif
 
 #define SYS_NMLN                65
 struct utsname {
@@ -32,6 +35,7 @@ struct utsname {
     char release[SYS_NMLN];
     char version[SYS_NMLN];
     char machine[SYS_NMLN];
+    char domainname[SYS_NMLN];
 };
 
 #if VSF_LINUX_APPLET_USE_SYS_UTSNAME == ENABLED
