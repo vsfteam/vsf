@@ -29,14 +29,12 @@
 #   include "../../include/pthread.h"
 #   include "../../include/signal.h"
 #   include "../../include/errno.h"
-#   include "../../include/sys/prctl.h"
 #else
 #   include <unistd.h>
 #   include <time.h>
 #   include <pthread.h>
 #   include <signal.h>
 #   include <errno.h>
-#   include <sys/prctl.h>
 #endif
 
 #if __IS_COMPILER_IAR__
@@ -1105,20 +1103,20 @@ int pthread_barrierattr_setpshared(pthread_barrierattr_t *battr, int pshared)
     return EINVAL;
 }
 
-int pthread_setname_np(pthread_t thread, const char *name)
+int pthread_setname_np(pthread_t tid, const char *name)
 {
-    return prctl(PR_SET_NAME, (uintptr_t)name, 0, 0, 0);
+    vsf_linux_thread_t *thread = vsf_linux_get_thread(-1, tid);
+    if (NULL == thread) { return -1; }
+    strncpy(thread->name, name, sizeof(thread->name) - 1);
+    thread->name[sizeof(thread->name) - 1] = '\0';
+    return 0;
 }
 
-int pthread_getname_np(pthread_t thread, char *name, size_t size)
+int pthread_getname_np(pthread_t tid, char *name, size_t size)
 {
-    char thread_name[16];
-    int ret = prctl(PR_GET_NAME, (uintptr_t)thread_name, 0, 0, 0);
-    if (ret != 0) {
-        return ret;
-    }
-
-    strncpy(name, thread_name, size);
+    vsf_linux_thread_t *thread = vsf_linux_get_thread(-1, tid);
+    if (NULL == thread) { return -1; }
+    strncpy(name, (const char *)thread->name, size);
     return 0;
 }
 
