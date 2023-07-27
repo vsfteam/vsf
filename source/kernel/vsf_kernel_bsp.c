@@ -415,8 +415,10 @@ void __cmain(void)
     ||  __IS_COMPILER_ARM_COMPILER_5__                                          \
     ||  __IS_COMPILER_ARM_COMPILER_6__
 
-#if defined(__VSF_CPP__) && __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
+#if defined(__VSF_CPP__) && VSF_USE_HEAP == ENABLED && VSF_ARCH_PROVIDE_HEAP != ENABLED
+#   if __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
 __attribute__((constructor(0)))
+#   endif
 void __vsf_heap_init(void)
 {
     vsf_heap_init();
