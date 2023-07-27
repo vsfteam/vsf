@@ -89,6 +89,10 @@ __imp_unprocessed_weak_handler(SWI6_Handler)
 __imp_unprocessed_weak_handler(SWI7_Handler)
 __imp_unprocessed_weak_handler(SWI8_Handler)
 __imp_unprocessed_weak_handler(USB_OTG0_Handler)
+__imp_unprocessed_weak_handler(UART0_Handler)
+__imp_unprocessed_weak_handler(UART1_Handler)
+__imp_unprocessed_weak_handler(UART2_Handler)
+__imp_unprocessed_weak_handler(UART3_Handler)
 
 /*----------------------------------------------------------------------------
   Exception / Interrupt Vector table
@@ -123,8 +127,8 @@ ROOT const pFunc __VECTOR_TABLE[] ALIGN(512) = {
     ISR_GlobalHandler,
     ISR_GlobalHandler,
     ISR_GlobalHandler,
-    ISR_GlobalHandler,
-    ISR_GlobalHandler,
+    UART0_Handler,
+    UART1_Handler,
     ISR_GlobalHandler,
     ISR_GlobalHandler,
     ISR_GlobalHandler,
@@ -150,8 +154,8 @@ ROOT const pFunc __VECTOR_TABLE[] ALIGN(512) = {
     ISR_GlobalHandler,
     SWI1_Handler,
     SWI2_Handler,
-    ISR_GlobalHandler,
-    ISR_GlobalHandler,
+    UART2_Handler,
+    UART3_Handler,
     SWI3_Handler,
     ISR_GlobalHandler,
     ISR_GlobalHandler,
