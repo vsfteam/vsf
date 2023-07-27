@@ -102,8 +102,8 @@
 #define APP_USE_TGUI_DEMO                               DISABLED
 //  TODO: CPP support is not ready in hal
 #define APP_USE_CPP_DEMO                                DISABLED
-#   if __IS_COMPILER_IAR__
-#       define __VSF_WORKAROUND_IAR_CPP__
+#   if APP_USE_CPP_DEMO == ENABLED
+#       define __VSF_CPP__
 #   endif
 #define APP_USE_HAL_DEMO                                ENABLED
 #   define APP_USE_HAL_ADC_DEMO                         ENABLED

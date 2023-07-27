@@ -54,7 +54,8 @@ WEAK(vsf_service_init)
 void vsf_service_init(void)
 {
 #if VSF_USE_HEAP == ENABLED && VSF_ARCH_PROVIDE_HEAP != ENABLED
-#   if !__IS_COMPILER_IAR__ || !defined(__VSF_WORKAROUND_IAR_CPP__)
+// if cpp is supported, vsf_heap_init should be called before static c++ instances are created
+#   ifndef __VSF_CPP__
     vsf_heap_init();
     vsf_heap_add_memory(vsf_service_req___heap_memory_buffer___from_usr());
 #   endif

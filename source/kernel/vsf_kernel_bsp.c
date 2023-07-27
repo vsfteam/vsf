@@ -379,7 +379,7 @@ __stackless void __cmain(void)
 
 __root
 __noreturn
-#ifndef __VSF_WORKAROUND_IAR_CPP__
+#ifndef __VSF_CPP__
 __stackless
 #endif
 void __cmain(void)
@@ -389,9 +389,9 @@ void __cmain(void)
         // __IAR_STARTUP_DATA_INIT will call __iar_cstart_call_ctors to create
         //  some cpp instances if eg. file stream(including stdout/stdin/stderr)
         //  is used, this will need malloc.
-        // So if malloc is implemented in VSF simple libc, define __VSF_WORKAROUND_IAR_CPP__
+        // So if malloc is implemented in VSF simple libc, define __VSF_CPP__
         // Note that if headers of simple libc is used, malloc is actually __vsf_linux_malloc
-#ifdef __VSF_WORKAROUND_IAR_CPP__
+#ifdef __VSF_CPP__
         vsf_disable_interrupt();
         vsf_heap_init();
 
@@ -414,6 +414,22 @@ void __cmain(void)
     ||  __IS_COMPILER_LLVM__                                                    \
     ||  __IS_COMPILER_ARM_COMPILER_5__                                          \
     ||  __IS_COMPILER_ARM_COMPILER_6__
+
+#if defined(__VSF_CPP__) && __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
+__attribute__((constructor(0)))
+void __vsf_heap_init(void)
+{
+    vsf_heap_init();
+
+    // vsf_heap_add_memory will need scheduler protection, which is not available here
+    //  call __vsf_kernel_os_raw_init to disable scheduler protection before DATA_INIT
+    void __vsf_kernel_os_raw_init(void);
+    __vsf_kernel_os_raw_init();
+
+    extern vsf_mem_t vsf_service_req___heap_memory_buffer___from_usr(void);
+    vsf_heap_add_memory(vsf_service_req___heap_memory_buffer___from_usr());
+}
+#endif
 
 #if __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
 __attribute__((constructor(MAX_CONSTRUCTOR_PRIORITY)))

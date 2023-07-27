@@ -60,7 +60,7 @@
 //  TODO: need test for c++ support
 //#define APP_USE_CPP_DEMO                                ENABLED
 #if APP_USE_CPP_DEMO == ENABLED
-#   define __VSF_WORKAROUND_IAR_CPP__
+#   define __VSF_CPP__
 #endif
 
 #define APP_USE_HAL_DEMO                                DISABLED

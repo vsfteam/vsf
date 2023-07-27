@@ -574,8 +574,8 @@ void __vsf_kernel_os_run_priority(vsf_prio_t priority)
 #endif
 }
 
-#ifdef __VSF_WORKAROUND_IAR_CPP__
-// if __VSF_WORKAROUND_IAR_CPP__ is defined,
+#ifdef __VSF_CPP__
+// if __VSF_CPP__ is defined,
 //  vsf_heap_add will be called before __vsf_os_is_inited is initlailized,
 //  and vsf_heap_add will call scheduler_protect, which need __vsf_os_is_inited
 void __vsf_kernel_os_raw_init(void)

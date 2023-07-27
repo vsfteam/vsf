@@ -29,6 +29,10 @@
 #   define __PLOOC_CLASS_INHERIT
 #endif
 
+#ifdef __VSF_CPP__
+#   define __OOC_CPP__
+#endif
+
 #include "./3rd-party/PLOOC/raw/plooc_class.h"
 
 #ifdef __cplusplus

@@ -79,8 +79,8 @@
 #define APP_USE_TGUI_DEMO                               DISABLED
 //  TODO: CPP support is not ready in hal
 #define APP_USE_CPP_DEMO                                DISABLED
-#   if __IS_COMPILER_IAR__
-#       define __VSF_WORKAROUND_IAR_CPP__
+#   if APP_USE_CPP_DEMO == ENABLED
+#       define __VSF_CPP__
 #   endif
 #define APP_USE_HAL_DEMO                                DISABLED
 #   define APP_USE_HAL_ADC_DEMO                         ENABLED
@@ -192,7 +192,7 @@
 #   define VSF_LINUX_USE_SIMPLE_LIBC                    ENABLED
 #       if __IS_COMPILER_IAR__
 // IAR: to support CPP in linux-subsystem, define MACFOs below, and don't include the simple_libc path
-//  Note that __VSF_WORKAROUND_IAR_CPP__ MUST also be defined to support CPP
+//  Note that __VSF_CPP__ MUST also be defined to support CPP
 #           define VSF_LINUX_LIBC_CFG_CPP               ENABLED
 #           define VSF_LINUX_USE_SIMPLE_STDIO           DISABLED
 #           define VSF_LINUX_USE_SIMPLE_STRING          DISABLED
