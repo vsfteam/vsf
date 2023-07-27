@@ -64,7 +64,8 @@ bool vsf_driver_init(void)
 {
     //SystemInit();
     SYSCTRL->CG_CTRL1 = SYSCTRL_APBPeriph_ALL;
-	SYSCTRL->SOFT_RST1 = SYSCTRL_APBPeriph_ALL;
+    // GPIO reset will halt debug
+    SYSCTRL->SOFT_RST1 = SYSCTRL_APBPeriph_ALL & ~SYSCTRL_APBPeriph_GPIO;
     SYSCTRL->SOFT_RST2 &= ~SYSCTRL_USB_RESET;
     SYSCTRL->LOCK_R |= SYSCTRL_USB_RESET;
     SYSCTRL->LDO25_CR &= ~(VSF_BIT(4) | VSF_BIT(5));

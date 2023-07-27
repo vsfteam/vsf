@@ -99,7 +99,7 @@ __imp_unprocessed_weak_handler(USB_OTG0_Handler)
 #pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
-ROOT const pFunc __VECTOR_TABLE[] = {
+ROOT const pFunc __VECTOR_TABLE[] ALIGN(512) = {
     (pFunc)(&__INITIAL_SP),                             /*     Initial Stack Pointer */
     Reset_Handler,                                      /*     Reset Handler */
     NMI_Handler,                                        /* -14 NMI Handler */
