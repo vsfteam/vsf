@@ -376,6 +376,12 @@ void vsf_arch_reset(void)
     NVIC_SystemReset();
 }
 
+WEAK(vsf_arch_shutdown)
+void vsf_arch_shutdown(void)
+{
+    VSF_ARCH_ASSERT(false);
+}
+
 /*----------------------------------------------------------------------------*
  * arch enhancement                                                           *
  *----------------------------------------------------------------------------*/
