@@ -40,7 +40,7 @@ endfunction()
 
 vsf_add_compile_definitions(
     __BouffaloLab__ __BL616__
-    __OOC_CPP__
+    __VSF_CPP__
     __VSF__
     __linux__
 )

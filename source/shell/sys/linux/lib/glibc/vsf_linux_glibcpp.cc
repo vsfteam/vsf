@@ -1,8 +1,8 @@
 #include <unistd.h>
 #include <thread>
 
-#ifndef __OOC_CPP__
-#   error Please define __OOC_CPP__ to support cpp
+#ifndef __VSF_CPP__
+#   error Please define __VSF_CPP__ to support cpp
 #endif
 
 namespace std {

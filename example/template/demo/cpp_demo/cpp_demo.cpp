@@ -1,11 +1,11 @@
 // include configuration only before include any other headers
-// so maybe compilation will be OK even without __OOC_CPP__
+// so maybe compilation will be OK even without __VSF_CPP__
 #include "vsf_cfg.h"
 
 #if APP_USE_CPP_DEMO == ENABLED
 
-#ifndef __OOC_CPP__
-#   error __OOC_CPP__ MUST be defined, so that LPOOC is compatible with c++
+#ifndef __VSF_CPP__
+#   error __VSF_CPP__ MUST be defined, so that LPOOC is compatible with c++
 #endif
 
 #include <unistd.h>
