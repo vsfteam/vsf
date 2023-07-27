@@ -114,12 +114,24 @@ uint16_t vk_musb_fdrc_set_fifo(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep, usb_ep_
     if (0 == ep_no) {
         // EP0 fifo should be at position 0
         VSF_USB_ASSERT(0 == pos);
-    if (ep_dir) {
+    } else if (ep_dir) {
         reg->DynFIFO->TxFIFO1 = pos & 0xFF;
         reg->DynFIFO->TxFIFO2 = ((pos >> 8) & 0x0F) | (size_msk << 5);
     } else {
         reg->DynFIFO->RxFIFO1 = pos & 0xFF;
         reg->DynFIFO->RxFIFO2 = ((pos >> 8) & 0x0F) | (size_msk << 5);
+    }
+    return 1 << size_msk;
+#elif   defined(VSF_MUSB_FDRC_DYNAMIC_FIFO2)
+    if (0 == ep_no) {
+        // EP0 fifo should be at position 0
+        VSF_USB_ASSERT(0 == pos);
+    } else if (ep_dir) {
+        reg->DynFIFO->TxFIFOAdd = pos;
+        reg->DynFIFO->TxFIFOSz = size_msk & 0x0F;
+    } else {
+        reg->DynFIFO->RxFIFOAdd = pos;
+        reg->DynFIFO->RxFIFOSz = size_msk & 0x0F;
     }
     return 1 << size_msk;
 #else

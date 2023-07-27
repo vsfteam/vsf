@@ -149,6 +149,7 @@ typedef uint16_t                        vk_musb_reg_t;
 typedef uint8_t                         vk_musb_reg_t;
 #endif
 
+#ifndef VSF_MUSB_FDRC_PRIV_REG_T
 typedef struct vk_musb_fdrc_common_reg_t {
     volatile vk_musb_reg_t FAddr;
     volatile vk_musb_reg_t Power;
@@ -167,6 +168,7 @@ typedef struct vk_musb_fdrc_common_reg_t {
     volatile vk_musb_reg_t Index;
     volatile vk_musb_reg_t DevCtl;
 } vk_musb_fdrc_common_reg_t;
+#endif
 
 typedef struct vk_musb_fdrc_ep0_reg_t {
     volatile vk_musb_reg_t Reserved0;
@@ -191,13 +193,23 @@ typedef struct vk_musb_fdrc_epn_reg_t {
     volatile vk_musb_reg_t RxInterval;    // for host only
 } vk_musb_fdrc_epn_reg_t;
 
-#ifdef VSF_MUSB_FDRC_DYNAMIC_FIFO
+#if     defined(VSF_MUSB_FDRC_DYNAMIC_FIFO)
+// Indexed area,    TxFIFO1, TxFIFO2, RxFIFO1, RxFIFO2 with vk_musb_reg_t width
 typedef struct vk_musb_fdrc_epn_dynfifo_reg_t {
     volatile vk_musb_reg_t TxFIFO1;
     volatile vk_musb_reg_t TxFIFO2;
     volatile vk_musb_reg_t RxFIFO1;
     volatile vk_musb_reg_t RxFIFO2;
-} typedef struct vk_musb_fdrc_epn_dynfifo_reg_t;
+} vk_musb_fdrc_epn_dynfifo_reg_t;
+#elif   defined(VSF_MUSB_FDRC_DYNAMIC_FIFO2)
+// Indexed area,    TxFIFOSz, RxFIFOSz with vk_musb_reg_t width
+//                  TxFIFOAdd, RxFIFOAdd with 16-bit width
+typedef struct vk_musb_fdrc_epn_dynfifo_reg_t {
+    volatile vk_musb_reg_t TxFIFOSz;
+    volatile vk_musb_reg_t RxFIFOSz;
+    volatile uint16_t TxFIFOAdd;
+    volatile uint16_t RxFIFOAdd;
+} PACKED vk_musb_fdrc_epn_dynfifo_reg_t;
 #endif
 
 typedef union vk_musb_fdrc_fifo_reg_t {
@@ -223,7 +235,7 @@ typedef struct vk_musb_fdrc_reg_info_t {
     vk_musb_fdrc_common_reg_t *Common;
     vk_musb_fdrc_ep_reg_t *EP;
     vk_musb_fdrc_fifo_reg_t *FIFO;
-#ifdef VSF_MUSB_FDRC_DYNAMIC_FIFO
+#if defined(VSF_MUSB_FDRC_DYNAMIC_FIFO) || defined(VSF_MUSB_FDRC_DYNAMIC_FIFO2)
     vk_musb_fdrc_epn_dynfifo_reg_t *DynFIFO;
 #endif
 
