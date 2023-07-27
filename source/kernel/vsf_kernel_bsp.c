@@ -395,10 +395,12 @@ void __cmain(void)
         vsf_disable_interrupt();
         vsf_heap_init();
 
+#   if __VSF_OS_SWI_NUM > 0
         // vsf_heap_add_memory will need scheduler protection, which is not available here
         //  call __vsf_kernel_os_raw_init to disable scheduler protection before DATA_INIT
         void __vsf_kernel_os_raw_init(void);
         __vsf_kernel_os_raw_init();
+#   endif
 
         extern vsf_mem_t vsf_service_req___heap_memory_buffer___from_usr(void);
         vsf_heap_add_memory(vsf_service_req___heap_memory_buffer___from_usr());
@@ -423,10 +425,12 @@ void __vsf_heap_init(void)
 {
     vsf_heap_init();
 
+#   if __VSF_OS_SWI_NUM > 0
     // vsf_heap_add_memory will need scheduler protection, which is not available here
     //  call __vsf_kernel_os_raw_init to disable scheduler protection before DATA_INIT
     void __vsf_kernel_os_raw_init(void);
     __vsf_kernel_os_raw_init();
+#   endif
 
     extern vsf_mem_t vsf_service_req___heap_memory_buffer___from_usr(void);
     vsf_heap_add_memory(vsf_service_req___heap_memory_buffer___from_usr());
