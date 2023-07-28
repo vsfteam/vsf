@@ -78,6 +78,10 @@ vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart_ptr, vsf_usart_cfg_t *cfg_p
     }
 
     reg->LCR = cfg_ptr->mode & AIR105_USART_MODE_ALL_BITS_MASK;
+
+    reg->SFE = 0;
+    reg->SRT = 2;
+    reg->STET = 0;
     reg->SFE |= UART_SFE_SFE;
 
     vsf_usart_isr_t *isr_ptr = &cfg_ptr->isr;
@@ -236,26 +240,28 @@ static vsf_usart_irq_mask_t __get_uart_irq_mask(vsf_hw_usart_t *hw_usart_ptr)
     uint32_t irq_type = reg->OFFSET_8.IIR & UART_IIR_IID;
 
     switch (irq_type) {
-    case 0x0000:    // Modem Status Interrupt
+    case 0x0:       // Modem Status Interrupt
         value = reg->MSR;
         (void)value;
         return 0;
 
-    case 0x0001:    // No interrupt
+    case 0x1:       // No interrupt
         return 0;
 
-    case 0x0010:    // Tx FIFO Empty
+    case 0x2:       // Tx FIFO Empty
         return VSF_USART_IRQ_MASK_TX;
 
-    case 0x0100:    // Rx FIFO valid
+    case 0x4:       // Rx FIFO valid
         return VSF_USART_IRQ_MASK_RX;
 
-    case 0x0110:    // Line status interrupt
+    case 0x6:       // Line status interrupt
         value = reg->LSR;
         (void)value;
         return 0;
 
-    case 0x1100:    // Rx timeout interrupt
+    case 0xC:       // Rx timeout interrupt
+        value = reg->OFFSET_0.RBR;
+        (void)value;
         return VSF_USART_IRQ_MASK_RX_TIMEOUT;
 
     default:
