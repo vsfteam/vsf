@@ -79,15 +79,15 @@ __imp_unprocessed_weak_handler(SysTick_Handler)
 
 /* External interrupts */
 __imp_unprocessed_weak_handler(ISR_GlobalHandler)
-__imp_unprocessed_weak_handler(SWI0_Handler)
-__imp_unprocessed_weak_handler(SWI1_Handler)
-__imp_unprocessed_weak_handler(SWI2_Handler)
-__imp_unprocessed_weak_handler(SWI3_Handler)
-__imp_unprocessed_weak_handler(SWI4_Handler)
-__imp_unprocessed_weak_handler(SWI5_Handler)
-__imp_unprocessed_weak_handler(SWI6_Handler)
-__imp_unprocessed_weak_handler(SWI7_Handler)
-__imp_unprocessed_weak_handler(SWI8_Handler)
+__imp_unprocessed_weak_handler(SWI0_IRQHandler)
+__imp_unprocessed_weak_handler(SWI1_IRQHandler)
+__imp_unprocessed_weak_handler(SWI2_IRQHandler)
+__imp_unprocessed_weak_handler(SWI3_IRQHandler)
+__imp_unprocessed_weak_handler(SWI4_IRQHandler)
+__imp_unprocessed_weak_handler(SWI5_IRQHandler)
+__imp_unprocessed_weak_handler(SWI6_IRQHandler)
+__imp_unprocessed_weak_handler(SWI7_IRQHandler)
+__imp_unprocessed_weak_handler(SWI8_IRQHandler)
 __imp_unprocessed_weak_handler(USB_OTG0_Handler)
 __imp_unprocessed_weak_handler(UART0_Handler)
 __imp_unprocessed_weak_handler(UART1_Handler)
@@ -150,27 +150,27 @@ ROOT const pFunc __VECTOR_TABLE[] ALIGN(512) = {
     ISR_GlobalHandler,
     ISR_GlobalHandler,
     ISR_GlobalHandler,
-    SWI0_Handler,
+    SWI0_IRQHandler,
     ISR_GlobalHandler,
-    SWI1_Handler,
-    SWI2_Handler,
+    SWI1_IRQHandler,
+    SWI2_IRQHandler,
     UART2_Handler,
     UART3_Handler,
-    SWI3_Handler,
+    SWI3_IRQHandler,
     ISR_GlobalHandler,
     ISR_GlobalHandler,
     ISR_GlobalHandler,
     ISR_GlobalHandler,
     ISR_GlobalHandler,
     ISR_GlobalHandler,
-    SWI4_Handler,
+    SWI4_IRQHandler,
     ISR_GlobalHandler,
-    SWI5_Handler,
-    SWI6_Handler,
-    SWI7_Handler,
+    SWI5_IRQHandler,
+    SWI6_IRQHandler,
+    SWI7_IRQHandler,
     ISR_GlobalHandler,
     ISR_GlobalHandler,
-    SWI8_Handler,
+    SWI8_IRQHandler,
     ISR_GlobalHandler,
     ISR_GlobalHandler,
     ISR_GlobalHandler,
