@@ -29,6 +29,10 @@
 #include <setjmp.h>
 #include <sys/mman.h>
 
+#ifdef __CPU_WEBASSEMBLY__
+#   include <emscripten/eventloop.h>
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_ARCH_PRI_NUM != 1 || VSF_ARCH_SWI_NUM != 0
@@ -57,7 +61,9 @@
 #   define VSF_ARCH_CFG_REQUEST_TRACE_EN    DISABLED
 #endif
 
-#define __VSF_ARCH_LINUX_CFG_SYSTIMER_SIGNAL    ENABLED
+#ifndef __CPU_WEBASSEMBLY__
+#   define __VSF_ARCH_LINUX_CFG_SYSTIMER_SIGNAL     ENABLED
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -102,7 +108,9 @@ static vsf_err_t __vsf_arch_create_irq_thread(vsf_arch_irq_thread_t *irq_thread,
 typedef struct vsf_arch_systimer_ctx_t {
     implement(vsf_arch_irq_thread_t);
     vsf_arch_irq_request_t due_request;
-    timer_t timer;
+#ifndef __CPU_WEBASSEMBLY__
+    long timer;
+#endif
 } vsf_arch_systimer_ctx_t;
 
 dcl_vsf_bitmap(vsf_arch_thread_bitmap, VSF_ARCH_CFG_THREAD_NUM)
@@ -321,6 +329,8 @@ void __vsf_arch_irq_sleep(uint32_t ms)
 
 #if __VSF_ARCH_LINUX_CFG_SYSTIMER_SIGNAL == ENABLED
 static void __vsf_systimer_on_notify(int signal)
+#elif defined(__CPU_WEBASSEMBLY__)
+static void __vsf_systimer_on_notify(void *param)
 #else
 static void __vsf_systimer_on_notify(union sigval s)
 #endif
@@ -353,22 +363,24 @@ static void __vsf_systimer_thread(void *arg)
 vsf_err_t vsf_systimer_init(void)
 {
     vsf_arch_systimer_ctx_t *ctx = &__vsf_arch.systimer;
+#ifndef __CPU_WEBASSEMBLY__
     struct sigevent evp = {
-#if __VSF_ARCH_LINUX_CFG_SYSTIMER_SIGNAL == ENABLED
+#   if __VSF_ARCH_LINUX_CFG_SYSTIMER_SIGNAL == ENABLED
         .sigev_notify = SIGEV_SIGNAL,
         .sigev_signo = SIGUSR1,
-#else
+#   else
         .sigev_notify = SIGEV_THREAD,
         .sigev_notify_function = __vsf_systimer_on_notify,
-#endif
+#   endif
     };
-#if __VSF_ARCH_LINUX_CFG_SYSTIMER_SIGNAL == ENABLED
+#   if __VSF_ARCH_LINUX_CFG_SYSTIMER_SIGNAL == ENABLED
     signal(SIGUSR1, __vsf_systimer_on_notify);
-#endif
+#   endif
     if (timer_create(CLOCK_MONOTONIC, &evp, &ctx->timer)) {
         VSF_HAL_ASSERT(false);
         return VSF_ERR_FAIL;
     }
+#endif
     __vsf_arch_irq_request_init(&__vsf_arch.systimer.due_request);
     return VSF_ERR_NONE;
 }
@@ -394,6 +406,15 @@ vsf_systimer_tick_t vsf_systimer_get(void)
 
 bool vsf_systimer_set(vsf_systimer_tick_t due)
 {
+#ifdef __CPU_WEBASSEMBLY__
+    vsf_systimer_tick_t cur = vsf_systimer_get();
+    if (due > cur) {
+        vsf_systimer_tick_t diff = due - cur;
+        emscripten_set_timeout(__vsf_systimer_on_notify, diff / 1000.0, NULL);
+        return true;
+    }
+    return false;
+#else
     struct itimerspec its = { 0 };
     struct timespec ts;
     ts.tv_sec = due / 1000000;
@@ -401,6 +422,7 @@ bool vsf_systimer_set(vsf_systimer_tick_t due)
     its.it_value = ts;
     timer_settime(__vsf_arch.systimer.timer, TIMER_ABSTIME, &its, NULL);
     return true;
+#endif
 }
 
 bool vsf_systimer_is_due(vsf_systimer_tick_t due)

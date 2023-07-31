@@ -1,10 +1,11 @@
 # use fake x86/linux with __CPU_EMSCRIPTEN__ defined
-set(VSF_HAL_CHIP_VENDOR     x86)
-set(VSF_ARCH_SERIES         x86)
+set(VSF_HAL_CHIP_VENDOR     generic)
+set(VSF_ARCH_SERIES         generic)
 
 set(VSF_HOST_SYSTEM         linux)
 set(VSF_HOST_SYSTEM32       1)
 set(VSF_HOST_HAS_LIBUSB     0)
+set(VSF_HOST_HAS_LIBBSD     0)
 
 set(VSF_TARGET_DEFINITIONS
     "__LINUX__"

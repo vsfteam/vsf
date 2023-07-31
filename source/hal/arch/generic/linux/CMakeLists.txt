@@ -7,5 +7,10 @@ target_sources(${VSF_HOST_SYSTEM_LIB_NAME} PUBLIC
 vsf_add_libraries(
     pthread
     rt
-    bsd
 )
+
+if(VSF_HOST_HAS_LIBBSD)
+    vsf_add_libraries(
+        bsd
+    )
+endif()
