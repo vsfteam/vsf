@@ -63,6 +63,7 @@ uint32_t vsf_hal_distbus_io_register_service(vsf_distbus_t *distbus, vsf_hal_dis
     io->distbus = distbus;
     io->service.info = &__vsf_hal_distbus_io_info;
     vsf_distbus_register_service(distbus, &io->service);
+    return 0;
 }
 
 #endif
