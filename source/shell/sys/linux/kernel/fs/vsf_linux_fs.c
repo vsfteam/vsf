@@ -767,9 +767,8 @@ vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd)
 {
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
-        VSF_LINUX_ASSERT(process != NULL);
 #if VSF_LINUX_USE_VFORK == ENABLED
-        if (process->is_vforking) {
+        if ((process != NULL) && (process->is_vforking)) {
             process = process->vfork_child;
         }
 #endif
