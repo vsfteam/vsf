@@ -1640,7 +1640,15 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
     }
 
     VSF_LINUX_ASSERT(ctx->entry != NULL);
+#ifdef __CPU_WEBASSEMBLY__
+    // One of the rough edges with wasm and C.
+    //  Can not add the 3rd argument as env,
+    //  or runtime error function signature mismatch will be issued.
+    // Refer to: https://github.com/emscripten-core/emscripten/issues/19942
+    thread->retval = ctx->entry(ctx->arg.argc, argv);
+#else
     thread->retval = ((int (*)(int, char **, char **))ctx->entry)(ctx->arg.argc, argv, process->__environ);
+#endif
 
     vsf_linux_exit_process(thread->retval, false);
 }
