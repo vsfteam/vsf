@@ -33,6 +33,15 @@
 #include "./device.h"
 #include "./rtc/rtc.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*============================ MACROS ========================================*/
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
+/*============================ INCLUDES ======================================*/
+
 #if VSF_HAL_USE_RTC == ENABLED
 #include "hal/driver/common/template/vsf_template_rtc.h"
 
@@ -41,13 +50,10 @@
 #include "hal/driver/common/rtc/rtc_template.h"
 #endif
 
-#ifdef __cplusplus
-extern "C" {
+#if VSF_HAL_USE_USBD == ENABLED || VSF_HAL_USE_USBH == ENABLED
+#   include "hal/driver/common/template/vsf_template_usb.h"
 #endif
 
-/*============================ MACROS ========================================*/
-/*============================ MACROFIED FUNCTIONS ===========================*/
-/*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_USE_SIMPLE_STREAM == ENABLED

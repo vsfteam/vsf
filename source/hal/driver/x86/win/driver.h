@@ -83,6 +83,10 @@ extern "C" {
 #   include "hal/driver/common/rng/rng_template.h"
 #endif
 
+#if VSF_HAL_USE_USBD == ENABLED || VSF_HAL_USE_USBH == ENABLED
+#   include "hal/driver/common/template/vsf_template_usb.h"
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_USE_SIMPLE_STREAM == ENABLED

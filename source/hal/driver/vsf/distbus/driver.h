@@ -27,18 +27,42 @@
 // for distbus
 #include "service/vsf_service.h"
 
-#include "./io/vsf_hal_distbus_io.h"
-#include "./gpio/vsf_hal_distbus_gpio.h"
-#include "./i2c/vsf_hal_distbus_i2c.h"
+#if VSF_HAL_DISTBUS_USE_IO == ENABLED && VSF_HAL_USE_IO == ENABLED
+#   include "./io/vsf_hal_distbus_io.h"
+#endif
+#if VSF_HAL_DISTBUS_USE_GPIO == ENABLED && VSF_HAL_USE_GPIO == ENABLED
+#   include "./gpio/vsf_hal_distbus_gpio.h"
+#endif
+#if VSF_HAL_DISTBUS_USE_I2C == ENABLED && VSF_HAL_USE_I2C == ENABLED
+#   include "./i2c/vsf_hal_distbus_i2c.h"
+#endif
+#if VSF_HAL_DISTBUS_USE_SPI == ENABLED && VSF_HAL_USE_SPI == ENABLED
 #include "./spi/vsf_hal_distbus_spi.h"
-#include "./usart/vsf_hal_distbus_usart.h"
-#include "./mmc/vsf_hal_distbus_mmc.h"
-#include "./adc/vsf_hal_distbus_adc.h"
-#include "./dac/vsf_hal_distbus_dac.h"
-#include "./pwm/vsf_hal_distbus_pwm.h"
-#include "./i2s/vsf_hal_distbus_i2s.h"
-#include "./usbd/vsf_hal_distbus_usbd.h"
+#endif
+#if VSF_HAL_DISTBUS_USE_USART == ENABLED && VSF_HAL_USE_USART == ENABLED
+#   include "./usart/vsf_hal_distbus_usart.h"
+#endif
+#if VSF_HAL_DISTBUS_USE_MMC == ENABLED && VSF_HAL_USE_MMC == ENABLED
+#   include "./mmc/vsf_hal_distbus_mmc.h"
+#endif
+#if VSF_HAL_DISTBUS_USE_ADC == ENABLED && VSF_HAL_USE_ADC == ENABLED
+#   include "./adc/vsf_hal_distbus_adc.h"
+#endif
+#if VSF_HAL_DISTBUS_USE_DAC == ENABLED && VSF_HAL_USE_DAC == ENABLED
+#   include "./dac/vsf_hal_distbus_dac.h"
+#endif
+#if VSF_HAL_DISTBUS_USE_PWM == ENABLED && VSF_HAL_USE_PWM == ENABLED
+#   include "./pwm/vsf_hal_distbus_pwm.h"
+#endif
+#if VSF_HAL_DISTBUS_USE_I2S == ENABLED && VSF_HAL_USE_I2S == ENABLED
+#   include "./i2s/vsf_hal_distbus_i2s.h"
+#endif
+#if VSF_HAL_DISTBUS_USE_USBD == ENABLED && VSF_HAL_USE_USBD == ENABLED
+#   include "./usbd/vsf_hal_distbus_usbd.h"
+#endif
+#if VSF_HAL_DISTBUS_USE_USBH == ENABLED && VSF_HAL_USE_USBH == ENABLED
 #include "./usbh/vsf_hal_distbus_usbh.h"
+#endif
 
 #undef PUBLIC_CONST
 #if     defined(__VSF_HAL_DISTBUS_CLASS_IMPLEMENT)
