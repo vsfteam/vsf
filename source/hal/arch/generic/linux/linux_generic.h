@@ -75,6 +75,10 @@ extern "C" {
 //! vsf_systimer_get implementation has 1us resolution, which is 1MHz
 #define VSF_ARCH_SYSTIMER_FREQ          (1 * 1000 * 1000)
 
+#ifdef __CPU_WEBASSEMBLY__
+#   define VSF_USER_ENTRY               user_main
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_ARCH_PRI(__N, __BIT)                                              \

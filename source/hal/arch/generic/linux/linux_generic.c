@@ -641,4 +641,12 @@ void vsf_arch_reset(void)
     VSF_ARCH_ASSERT(false);
 }
 
+#ifdef __CPU_WEBASSEMBLY__
+int main(int argc, char *argv[])
+{
+    extern void __vsf_main_entry(void);
+    __vsf_main_entry();
+}
+#endif
+
 /* EOF */
