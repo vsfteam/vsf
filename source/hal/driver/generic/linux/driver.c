@@ -37,6 +37,11 @@
 #   endif
 #endif
 
+#ifdef __CPU_WEBASSEMBLY__
+#   warning read stdin in wasm-emscripten will block other threads, and raw-mode\
+        of tty also has no effect. Remove this warning after the problem fixed.
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
