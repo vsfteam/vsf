@@ -126,7 +126,7 @@ static void __vsf_linux_debug_stream_at_exit(void)
     tcsetattr(STDIN_FILENO, TCSANOW, &__vsf_linux_original_term);
 }
 
-#       ifndef __CPU_WEBASSEMBLY__
+#       if !defined(__CPU_WEBASSEMBLY__) || VSF_WASM_CFG_USE_INPUT == ENABLED
 static void __vsf_linux_debug_stream_rx_irqhandler(void *arg)
 {
     vsf_arch_irq_thread_t *thread = arg;
@@ -170,7 +170,7 @@ static void __vsf_linux_debug_stream_rx_irqhandler(void *arg)
 static void __vsf_linux_debug_stream_init(void)
 {
     VSF_STREAM_CONNECT_TX(&VSF_DEBUG_STREAM_RX);
-#       ifndef __CPU_WEBASSEMBLY__
+#       if !defined(__CPU_WEBASSEMBLY__) || VSF_WASM_CFG_USE_INPUT == ENABLED
     __vsf_arch_irq_init(&__vsf_linux_debug_stream_rx_irq, "debug_stream_rx",
         __vsf_linux_debug_stream_rx_irqhandler, vsf_arch_prio_0);
 #       endif
