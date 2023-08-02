@@ -84,7 +84,9 @@ extern "C" {
 #define tmpfile             VSF_LINUX_LIBC_WRAPPER(tmpfile)
 #define tmpnam              VSF_LINUX_LIBC_WRAPPER(tmpnam)
 
-#ifndef __CPU_WEBASSEMBLY__
+// usually there is no need to wrap snprintf/vsnprintf.
+// __VSF_LINUX_LIBC_STDIO_WRAPPER_SNPRINTF will be enabled on some platform like windows.
+#if __VSF_LINUX_LIBC_STDIO_WRAPPER_SNPRINTF == ENABLED
 #   define vsnprintf        VSF_LINUX_LIBC_WRAPPER(vsnprintf)
 #   define snprintf         VSF_LINUX_LIBC_WRAPPER(snprintf)
 #endif

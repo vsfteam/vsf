@@ -126,6 +126,11 @@
 #   endif
 #endif
 
+#ifdef __WIN__
+// __VSF_LINUX_LIBC_STDIO_WRAPPER_SNPRINTF MUST be enabled on windows to avoid confliction
+#   define __VSF_LINUX_LIBC_STDIO_WRAPPER_SNPRINTF    ENABLED
+#endif
+
 // VSF_LINUX_CFG_STDIO_FALLBACK is used while user want to access stdio outside linux environment
 #ifndef VSF_LINUX_CFG_STDIO_FALLBACK
 #   define VSF_LINUX_CFG_STDIO_FALLBACK         ENABLED
