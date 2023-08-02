@@ -84,8 +84,10 @@ extern "C" {
 #define tmpfile             VSF_LINUX_LIBC_WRAPPER(tmpfile)
 #define tmpnam              VSF_LINUX_LIBC_WRAPPER(tmpnam)
 
-#define vsnprintf           VSF_LINUX_LIBC_WRAPPER(vsnprintf)
-#define snprintf            VSF_LINUX_LIBC_WRAPPER(snprintf)
+#ifndef __CPU_WEBASSEMBLY__
+#   define vsnprintf        VSF_LINUX_LIBC_WRAPPER(vsnprintf)
+#   define snprintf         VSF_LINUX_LIBC_WRAPPER(snprintf)
+#endif
 
 #if defined(_GNU_SOURCE)
 #define getline             VSF_LINUX_LIBC_WRAPPER(getline)
