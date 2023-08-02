@@ -23,5 +23,6 @@ target_link_options(${CMAKE_PROJECT_NAME} PUBLIC
     -sPROXY_TO_PTHREAD
     -sFORCE_FILESYSTEM=1
     -sUSE_SDL=2
+    -sASYNCIFY
 )
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")

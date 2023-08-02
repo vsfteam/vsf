@@ -30,6 +30,8 @@
 #include <sys/mman.h>
 
 #ifdef __CPU_WEBASSEMBLY__
+#   include <emscripten/emscripten.h>
+#   include <emscripten/html5.h>
 #   include <emscripten/eventloop.h>
 #endif
 
@@ -484,6 +486,23 @@ bool vsf_arch_low_level_init(void)
     return true;
 }
 
+#ifdef __CPU_WEBASSEMBLY__
+static EM_BOOL __vsf_arch_one_iter(double time, void* userData)
+{
+    return EM_TRUE;
+}
+
+void vsf_arch_poll(void)
+{
+    while (true) {
+        emscripten_sleep((unsigned int)-1);
+
+        // emscripten_request_animation_frame_loop not available in node
+//        emscripten_request_animation_frame_loop(__vsf_arch_one_iter, 0);
+    }
+}
+#endif
+
 /*----------------------------------------------------------------------------*
  * Heap Implementation                                                        *
  *----------------------------------------------------------------------------*/
@@ -640,13 +659,5 @@ void vsf_arch_reset(void)
     // dedicated arch should implement this
     VSF_ARCH_ASSERT(false);
 }
-
-#ifdef __CPU_WEBASSEMBLY__
-int main(int argc, char *argv[])
-{
-    extern void __vsf_main_entry(void);
-    __vsf_main_entry();
-}
-#endif
 
 /* EOF */

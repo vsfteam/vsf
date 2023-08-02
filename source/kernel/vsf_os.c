@@ -661,6 +661,7 @@ void __vsf_kernel_os_start(void)
 // dummy main
 int main(void)
 {
+    vsf_arch_poll();
     return 0;
 }
 

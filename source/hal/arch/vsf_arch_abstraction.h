@@ -465,6 +465,9 @@ extern vsf_gint_state_t vsf_enable_interrupt(void);
 extern void vsf_arch_sleep(uint_fast32_t mode);
 extern void vsf_arch_reset(void);
 extern void vsf_arch_shutdown(void);
+// vsf_arch_poll is only used in some special arch, eg: wasm
+//  and normally used with VSF_ARCH_ENTRY_NO_PENDING
+extern void vsf_arch_poll(void);
 
 #ifdef __cplusplus
 }
