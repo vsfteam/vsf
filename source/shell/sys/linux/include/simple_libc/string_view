@@ -113,7 +113,7 @@ namespace std {
         {
             size_t lsize = length(), rsize = right.length();
             size_t len = vsf_min(lsize, rsize) + 1;
-            return Traits::compare(c_str(), right.c_str(), len);
+            return Traits::compare(__str, right.c_str(), len);
         }
         constexpr basic_string_view<T, Traits> & substr(size_t start = 0, size_t count = npos) const
         {
