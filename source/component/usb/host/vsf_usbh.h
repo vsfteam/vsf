@@ -708,6 +708,9 @@ extern usb_endpoint_desc_t * vk_usbh_get_next_ep_descriptor(
 #if VSF_USBH_USE_HCD_WINUSB == ENABLED
 #   include "../driver/hcd/winusb_hcd/vsf_winusb_hcd.h"
 #endif
+#if VSF_USBH_USE_HCD_WEBUSB == ENABLED
+#   include "../driver/hcd/webusb_hcd/vsf_webusb_hcd.h"
+#endif
 
 #undef __VSF_USBH_CLASS_IMPLEMENT
 #undef __VSF_USBH_CLASS_IMPLEMENT_CLASS__
