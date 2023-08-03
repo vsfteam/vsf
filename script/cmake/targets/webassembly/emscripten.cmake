@@ -6,6 +6,7 @@ set(VSF_HOST_SYSTEM         linux)
 set(VSF_HOST_SYSTEM32       1)
 set(VSF_HOST_HAS_LIBUSB     0)
 set(VSF_HOST_HAS_LIBBSD     0)
+set(VSF_HOST_HAS_WEBUSB     1)
 
 set(VSF_TARGET_DEFINITIONS
     "__LINUX__"
