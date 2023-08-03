@@ -25,6 +25,7 @@ target_link_options(${CMAKE_PROJECT_NAME} PUBLIC
     -sFORCE_FILESYSTEM=1
     -sUSE_SDL=2
     -sASYNCIFY
+    --bind
 )
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
