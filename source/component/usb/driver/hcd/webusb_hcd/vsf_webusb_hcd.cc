@@ -33,6 +33,7 @@
 
 #include <emscripten.h>
 #include <emscripten/val.h>
+#include <emscripten/threading.h>
 
 extern "C" {
 
@@ -227,8 +228,7 @@ static void __vk_webusb_hcd_on_arrived(vk_webusb_hcd_dev_t *webusb_dev)
     __vsf_arch_irq_request_send(&webusb_dev->irq_request);
 }
 
-// return 0 on success, < 0 otherwise
-static int __vk_webusb_hcd_init(void)
+static int __vk_webusb_init(vk_webusb_hcd_t *hcd)
 {
     emscripten::val navigator = emscripten::val::global("navigator");
     if (!navigator["usb"].as<bool>()) {
@@ -291,6 +291,11 @@ static int __vk_webusb_claim_interface(vk_webusb_hcd_dev_t *webusb_dev, int inte
 {
     webusb_dev->handle.call<emscripten::val>("claimInterface", interface_number).await();
     return 0;
+}
+
+static int vk_webusb_init(void)
+{
+    return emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_II, __vk_webusb_init, nullptr, &__vk_webusb_hcd);
 }
 
 // TODO: call webusb_claim_interface for non-control transfer
@@ -479,7 +484,7 @@ static void __vk_webusb_hcd_init_thread(void *arg)
     vsf_arch_irq_thread_t *irq_thread = (vsf_arch_irq_thread_t *)arg;
 
     __vsf_arch_irq_set_background(irq_thread);
-        if (__vk_webusb_hcd_init() < 0) {
+        if (vk_webusb_init() < 0) {
             VSF_USB_ASSERT(false);
         }
     __vsf_arch_irq_start(irq_thread);
