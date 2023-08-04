@@ -469,6 +469,10 @@ static int __vk_webusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
             } else if ( ((USB_RECIP_INTERFACE | USB_DIR_OUT) == setup->bRequestType)
                     &&  (USB_REQ_SET_INTERFACE == setup->bRequest)) {
                 return vsf_webusb_set_interface_alt_setting(webusb_dev, setup->wIndex, setup->wValue);
+            } else if ( ((USB_RECIP_ENDPOINT | USB_DIR_OUT) == setup->bRequestType)
+                    &&  (USB_REQ_CLEAR_FEATURE == setup->bRequest)
+                    &&  (USB_ENDPOINT_HALT == setup->wValue)) {
+                return vsf_webusb_clear_halt(webusb_dev, setup->wValue);
             } else {
                 return vsf_webusb_control_transfer(webusb_dev, setup->bRequestType,
                         setup->bRequest, setup->wValue, setup->wIndex, (unsigned char *)urb->buffer,
