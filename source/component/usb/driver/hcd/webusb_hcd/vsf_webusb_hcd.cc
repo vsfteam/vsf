@@ -15,6 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
+// reference: https://github.com/luigifcruz/webusb-libusb
+
 /*============================ INCLUDES ======================================*/
 
 #include "component/usb/vsf_usb_cfg.h"
@@ -36,8 +38,6 @@
 #include <emscripten/threading.h>
 
 using namespace emscripten;
-
-extern "C" {
 
 /*============================ MACROS ========================================*/
 
@@ -146,21 +146,21 @@ typedef enum vk_webusb_hcd_evt_t {
 
 /*============================ PROTOTYPES ====================================*/
 
-static vsf_err_t __vk_webusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd);
-static vsf_err_t __vk_webusb_hcd_fini(vk_usbh_hcd_t *hcd);
-static vsf_err_t __vk_webusb_hcd_suspend(vk_usbh_hcd_t *hcd);
-static vsf_err_t __vk_webusb_hcd_resume(vk_usbh_hcd_t *hcd);
-static uint_fast16_t __vk_webusb_hcd_get_frame_number(vk_usbh_hcd_t *hcd);
-static vsf_err_t __vk_webusb_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
-static void __vk_webusb_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
-static vk_usbh_hcd_urb_t * __vk_webusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd);
-static void __vk_webusb_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
-static vsf_err_t __vk_webusb_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
-static vsf_err_t __vk_webusb_hcd_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
-static vsf_err_t __vk_webusb_hcd_reset_dev(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
-static bool __vk_webusb_hcd_is_dev_reset(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
+extern "C" vsf_err_t __vk_webusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd);
+extern "C" vsf_err_t __vk_webusb_hcd_fini(vk_usbh_hcd_t *hcd);
+extern "C" vsf_err_t __vk_webusb_hcd_suspend(vk_usbh_hcd_t *hcd);
+extern "C" vsf_err_t __vk_webusb_hcd_resume(vk_usbh_hcd_t *hcd);
+extern "C" uint_fast16_t __vk_webusb_hcd_get_frame_number(vk_usbh_hcd_t *hcd);
+extern "C" vsf_err_t __vk_webusb_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
+extern "C" void __vk_webusb_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
+extern "C" vk_usbh_hcd_urb_t * __vk_webusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd);
+extern "C" void __vk_webusb_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
+extern "C" vsf_err_t __vk_webusb_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
+extern "C" vsf_err_t __vk_webusb_hcd_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb);
+extern "C" vsf_err_t __vk_webusb_hcd_reset_dev(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
+extern "C" bool __vk_webusb_hcd_is_dev_reset(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev);
 
-static void __vk_webusb_hcd_dev_thread(void *arg);
+extern "C" void __vk_webusb_hcd_dev_thread(void *arg);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -224,38 +224,109 @@ static void __vk_webusb_hcd_on_arrived(vk_webusb_hcd_dev_t *webusb_dev)
 
 static int __vk_webusb_set_configuration(vk_webusb_hcd_dev_t *webusb_dev, int configuration)
 {
-    webusb_dev->handle.call<val>("selectConfiguration", configuration).await();
-    return 0;
+    val dev = webusb_dev->handle;
+    if (!dev.as<bool>()) {
+        return WEBUSB_ERROR_NO_DEVICE;
+    }
+
+    dev.call<val>("selectConfiguration", configuration).await();
+    return WEBUSB_SUCCESS;
 }
 
 static int __vk_webusb_set_interface_alt_setting(vk_webusb_hcd_dev_t *webusb_dev, int interface_number, int alternate_setting)
 {
-    webusb_dev->handle.call<val>("selectAlternateInterface", interface_number, alternate_setting).await();
-    return 0;
+    val dev = webusb_dev->handle;
+    if (!dev.as<bool>()) {
+        return WEBUSB_ERROR_NO_DEVICE;
+    }
+
+    dev.call<val>("selectAlternateInterface", interface_number, alternate_setting).await();
+    return WEBUSB_SUCCESS;
+}
+
+val create_out_buffer(uint8_t* buffer, size_t size)
+{
+    val buf = val::global("Uint8Array").new_(size);
+    val tmp = val(typed_memory_view(size, buffer));
+    buf.call<val>("set", val(tmp));
+    return buf;
 }
 
 static int __vk_webusb_control_transfer(vk_webusb_hcd_dev_t *webusb_dev, uint8_t bmRequestType, uint8_t bRequest,
     uint16_t wValue, uint16_t wIndex, unsigned char *data, uint16_t wLength, unsigned int timeout)
 {
-    return 0;
+    val dev = webusb_dev->handle;
+    if (!dev.as<bool>()) {
+        return WEBUSB_ERROR_NO_DEVICE;
+    }
+
+    val setup = val::object();
+    setup.set("request", bRequest);
+    setup.set("value", wValue);
+    setup.set("index", wIndex);
+    switch (bmRequestType & USB_RECIP_MASK) {
+    case USB_RECIP_DEVICE:          setup.set("recipient", std::string("device"));      break;
+    case USB_RECIP_INTERFACE:       setup.set("recipient", std::string("interface"));   break;
+    case USB_RECIP_ENDPOINT:        setup.set("recipient", std::string("endpoint"));    break;
+    case USB_RECIP_OTHER:           setup.set("recipient", std::string("other"));       break;
+    default:                        return WEBUSB_ERROR_INVALID_PARAM;
+    }
+    switch (bmRequestType & USB_TYPE_MASK) {
+    case USB_TYPE_STANDARD:         setup.set("requestType", std::string("standard"));  break;
+    case USB_TYPE_CLASS:            setup.set("requestType", std::string("class"));     break;
+    case USB_TYPE_VENDOR:           setup.set("requestType", std::string("vendor"));    break;
+    default:                        return WEBUSB_ERROR_INVALID_PARAM;
+    }
+
+    if ((bmRequestType & USB_DIR_MASK) == USB_DIR_IN) {
+        val res = dev.call<val>("controlTransferIn", setup, wLength).await();
+        if (res["status"].as<std::string>().compare("ok")) {
+            return WEBUSB_ERROR_IO;
+        }
+        auto buf = res["data"]["buffer"].as<std::string>();
+        std::copy(buf.begin(), buf.end(), data);
+        return res["data"]["buffer"]["byteLength"].as<int>();
+    } else {
+        auto buf = create_out_buffer(data, wLength);
+        val res = dev.call<val>("controlTransferOut", setup, buf).await();
+        if (res["status"].as<std::string>().compare("ok")) {
+            return WEBUSB_ERROR_IO;
+        }
+        return res["bytesWritten"].as<int>();
+    }
 }
 
-static int __vk_webusb_bulk_transfer(vk_webusb_hcd_dev_t *webusb_dev, unsigned char endpoint, unsigned char *data,
+static int __vk_webusb_bulk_interrupt_transfer(vk_webusb_hcd_dev_t *webusb_dev, unsigned char endpoint, unsigned char *data,
     int length, int *transferred, unsigned int timeout)
 {
-    return 0;
-}
+    val dev = webusb_dev->handle, res;
+    if (!dev.as<bool>()) {
+        return WEBUSB_ERROR_NO_DEVICE;
+    }
 
-static int __vk_webusb_interrupt_transfer(vk_webusb_hcd_dev_t *webusb_dev, unsigned char endpoint, unsigned char *data,
-    int length, int *transferred, unsigned int timeout)
-{
-    return 0;
-}
+    if ((endpoint & USB_DIR_MASK) == USB_DIR_IN) {
+        res = dev.call<val>("transferIn", endpoint & ~USB_DIR_MASK, length).await();
+        if (res["status"].as<std::string>().compare("ok")) {
+            return WEBUSB_ERROR_IO;
+        }
+        auto buf = res["data"]["buffer"].as<std::string>();
+        std::copy(buf.begin(), buf.end(), data);
 
-static int __vk_webusb_open(vk_webusb_hcd_dev_t *webusb_dev)
-{
-    webusb_dev->handle.call<val>("open").await();
-    return 0;
+        if (transferred != NULL) {
+            *transferred = res["data"]["buffer"]["byteLength"].as<int>();
+        }
+    } else {
+        auto buf = create_out_buffer(data, length);
+        val res = dev.call<val>("transferOut", endpoint & ~USB_DIR_MASK, buf).await();
+        if (res["status"].as<std::string>().compare("ok")) {
+            return WEBUSB_ERROR_IO;
+        }
+
+        if (transferred != NULL) {
+            *transferred = res["bytesWritten"].as<int>();
+        }
+    }
+    return WEBUSB_SUCCESS;
 }
 
 static void __vk_webusb_close(vk_webusb_hcd_dev_t *webusb_dev)
@@ -264,16 +335,38 @@ static void __vk_webusb_close(vk_webusb_hcd_dev_t *webusb_dev)
 //    webusb_dev->handle = NULL;
 }
 
+static int __vk_webusb_clear_halt(vk_webusb_hcd_dev_t *webusb_dev, unsigned char endpoint)
+{
+    val dev = webusb_dev->handle;
+    if (!dev.as<bool>()) {
+        return WEBUSB_ERROR_NO_DEVICE;
+    }
+
+    std::string direction = ((endpoint & USB_DIR_MASK) == USB_DIR_OUT) ? "out" : "in";
+    dev.call<val>("clearHalt", direction, endpoint & ~USB_DIR_MASK).await();
+    return WEBUSB_SUCCESS;
+}
+
 static int __vk_webusb_reset_device(vk_webusb_hcd_dev_t *webusb_dev)
 {
-    webusb_dev->handle.call<val>("reset").await();
-    return 0;
+    val dev = webusb_dev->handle;
+    if (!dev.as<bool>()) {
+        return WEBUSB_ERROR_NO_DEVICE;
+    }
+
+    dev.call<val>("reset").await();
+    return WEBUSB_SUCCESS;
 }
 
 static int __vk_webusb_claim_interface(vk_webusb_hcd_dev_t *webusb_dev, int interface_number)
 {
-    webusb_dev->handle.call<val>("claimInterface", interface_number).await();
-    return 0;
+    val dev = webusb_dev->handle;
+    if (!dev.as<bool>()) {
+        return WEBUSB_ERROR_NO_DEVICE;
+    }
+
+    dev.call<val>("claimInterface", interface_number).await();
+    return WEBUSB_SUCCESS;
 }
 
 static int __vk_webusb_init(vk_webusb_hcd_t *hcd)
@@ -294,10 +387,7 @@ static int __vk_webusb_init(vk_webusb_hcd_t *hcd)
             vk_webusb_hcd_dev_t *webusb_dev = &hcd->devs[i];
 
             webusb_dev->handle = devices[i];
-            __vk_webusb_open(webusb_dev);
-
-            __vk_webusb_hcd_on_arrived(webusb_dev);
-            // TODO: wait idle for next dev
+            webusb_dev->handle.call<val>("open").await();
         }
     }
     return 0;
@@ -306,6 +396,57 @@ static int __vk_webusb_init(vk_webusb_hcd_t *hcd)
 static int vsf_webusb_init(void)
 {
     return emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_II, __vk_webusb_init, &__vk_webusb_hcd);
+}
+
+static int vsf_webusb_claim_interface(vk_webusb_hcd_dev_t *webusb_dev, int interface_number)
+{
+    return emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_III, __vk_webusb_claim_interface, webusb_dev, interface_number);
+}
+
+static void vsf_webusb_close(vk_webusb_hcd_dev_t *webusb_dev)
+{
+    emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_II, __vk_webusb_close, webusb_dev);
+}
+
+static int vsf_webusb_clear_halt(vk_webusb_hcd_dev_t *webusb_dev, unsigned char endpoint)
+{
+    return emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_III, __vk_webusb_clear_halt, webusb_dev, endpoint);
+}
+
+static int vsf_webusb_set_configuration(vk_webusb_hcd_dev_t *webusb_dev, int configuration)
+{
+    return emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_III, __vk_webusb_set_configuration, webusb_dev, configuration);
+}
+
+static int vsf_webusb_set_interface_alt_setting(vk_webusb_hcd_dev_t *webusb_dev, int interface_number, int alternate_setting)
+{
+    return emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_IIII, __vk_webusb_set_interface_alt_setting, webusb_dev, interface_number, alternate_setting);
+}
+
+static int vsf_webusb_reset_device(vk_webusb_hcd_dev_t *webusb_dev)
+{
+    return emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_II, __vk_webusb_reset_device, webusb_dev);
+}
+
+static int vsf_webusb_control_transfer(vk_webusb_hcd_dev_t *webusb_dev, uint8_t bmRequestType, uint8_t bRequest,
+    uint16_t wValue, uint16_t wIndex, unsigned char *data, uint16_t wLength, unsigned int timeout)
+{
+    return emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_IIIIIIIII, __vk_webusb_control_transfer, webusb_dev, bmRequestType, bRequest,
+                wValue, wIndex, data, wLength, timeout);
+}
+
+static int vsf_webusb_bulk_transfer(vk_webusb_hcd_dev_t *webusb_dev, unsigned char endpoint, unsigned char *data,
+    int length, int *transferred, unsigned int timeout)
+{
+    return emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_IIIIIII, __vk_webusb_bulk_interrupt_transfer, webusb_dev, endpoint, data,
+                length, transferred, timeout);
+}
+
+static int vsf_webusb_interrupt_transfer(vk_webusb_hcd_dev_t *webusb_dev, unsigned char endpoint, unsigned char *data,
+    int length, int *transferred, unsigned int timeout)
+{
+    return emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_IIIIIII, __vk_webusb_bulk_interrupt_transfer, webusb_dev, endpoint, data,
+                length, transferred, timeout);
 }
 
 // TODO: call webusb_claim_interface for non-control transfer
@@ -324,12 +465,12 @@ static int __vk_webusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
 
             if (    ((USB_RECIP_DEVICE | USB_DIR_OUT) == setup->bRequestType)
                 &&  (USB_REQ_SET_CONFIGURATION == setup->bRequest)) {
-                return __vk_webusb_set_configuration(webusb_dev, setup->wValue);
+                return vsf_webusb_set_configuration(webusb_dev, setup->wValue);
             } else if ( ((USB_RECIP_INTERFACE | USB_DIR_OUT) == setup->bRequestType)
                     &&  (USB_REQ_SET_INTERFACE == setup->bRequest)) {
-                return __vk_webusb_set_interface_alt_setting(webusb_dev, setup->wIndex, setup->wValue);
+                return vsf_webusb_set_interface_alt_setting(webusb_dev, setup->wIndex, setup->wValue);
             } else {
-                return __vk_webusb_control_transfer(webusb_dev, setup->bRequestType,
+                return vsf_webusb_control_transfer(webusb_dev, setup->bRequestType,
                         setup->bRequest, setup->wValue, setup->wIndex, (unsigned char *)urb->buffer,
                         setup->wLength, urb->timeout);
             }
@@ -339,8 +480,8 @@ static int __vk_webusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
         return WEBUSB_ERROR_NOT_SUPPORTED;
     case USB_ENDPOINT_XFER_BULK: {
             int actual_length;
-            int err = __vk_webusb_bulk_transfer(webusb_dev,
-                        (pipe.use_as__vk_usbh_pipe_flag_t.dir_in1out0 ? 0x80 : 0x00) | pipe.use_as__vk_usbh_pipe_flag_t.endpoint,
+            int err = vsf_webusb_bulk_transfer(webusb_dev,
+                        (pipe.use_as__vk_usbh_pipe_flag_t.dir_in1out0 ? USB_DIR_IN : USB_DIR_OUT) | pipe.use_as__vk_usbh_pipe_flag_t.endpoint,
                         (unsigned char *)urb->buffer, urb->transfer_length, &actual_length, urb->timeout);
             if (err < 0) {
                 return err;
@@ -350,8 +491,8 @@ static int __vk_webusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
         }
     case USB_ENDPOINT_XFER_INT: {
             int actual_length;
-            int err = __vk_webusb_interrupt_transfer(webusb_dev,
-                        (pipe.use_as__vk_usbh_pipe_flag_t.dir_in1out0 ? 0x80 : 0x00) | pipe.use_as__vk_usbh_pipe_flag_t.endpoint,
+            int err = vsf_webusb_interrupt_transfer(webusb_dev,
+                        (pipe.use_as__vk_usbh_pipe_flag_t.dir_in1out0 ? USB_DIR_IN : USB_DIR_OUT) | pipe.use_as__vk_usbh_pipe_flag_t.endpoint,
                         (unsigned char *)urb->buffer, urb->transfer_length, &actual_length, urb->timeout);
             if (err < 0) {
                 return err;
@@ -364,7 +505,7 @@ static int __vk_webusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
     return WEBUSB_ERROR_INVALID_PARAM;
 }
 
-static void __vk_webusb_hcd_dev_thread(void *arg)
+extern "C" void __vk_webusb_hcd_dev_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = (vsf_arch_irq_thread_t *)arg;
     vk_webusb_hcd_dev_t *webusb_dev = container_of(irq_thread, vk_webusb_hcd_dev_t, irq_thread);
@@ -387,11 +528,11 @@ static void __vk_webusb_hcd_dev_thread(void *arg)
             __vsf_arch_irq_end(irq_thread, false);
         }
         if (webusb_dev->evt_mask.is_detached) {
-            __vk_webusb_close(webusb_dev);
+            vsf_webusb_close(webusb_dev);
             webusb_dev->evt_mask.is_detached = false;
         }
         if (webusb_dev->evt_mask.is_resetting) {
-            __vk_webusb_reset_device(webusb_dev);
+            vsf_webusb_reset_device(webusb_dev);
             webusb_dev->evt_mask.is_resetting = false;
         }
     }
@@ -445,7 +586,7 @@ static void __vk_webusb_hcd_urb_thread(void *arg)
 
                         usb_config_desc_t *config_desc = (usb_config_desc_t *)urb->buffer;
                         for (uint8_t i = 0; i < config_desc->bNumInterfaces; i++) {
-                            __vk_webusb_claim_interface(webusb_dev, i);
+                            vsf_webusb_claim_interface(webusb_dev, i);
                         }
                     }
                 }
@@ -701,7 +842,7 @@ static void __vk_webusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     }
 }
 
-static vsf_err_t __vk_webusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd)
+extern "C" vsf_err_t __vk_webusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, vk_usbh_hcd_t *hcd)
 {
     vk_webusb_hcd_param_t *param = (vk_webusb_hcd_param_t *)hcd->param;
 
@@ -717,44 +858,58 @@ static vsf_err_t __vk_webusb_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
         if (vsf_webusb_init() < 0) {
             VSF_USB_ASSERT(false);
         }
+
+        vk_webusb_hcd_dev_t *webusb_dev;
+        for (int i = 0; i < __vk_webusb_hcd.dev_num; i++) {
+            webusb_dev = &__vk_webusb_hcd.devs[i];
+            webusb_dev->state = VSF_WEBUSB_HCD_DEV_STATE_DETACHED;
+            webusb_dev->evt_mask.value = 0;
+            webusb_dev->addr = -1;
+
+            __vsf_arch_irq_request_init(&webusb_dev->irq_request);
+#if VSF_WEBUSB_HCD_CFG_TRACE_IRQ_EN == ENABLED
+            __vk_webusb_hcd_trace_dev_irq(webusb_dev, "init");
+#endif
+            __vsf_arch_irq_init(&webusb_dev->irq_thread, (char *)"webusb_hcd_dev", __vk_webusb_hcd_dev_thread, param->priority);
+        }
         return VSF_ERR_NONE;
     }
     return VSF_ERR_NOT_READY;
 }
 
-static vsf_err_t __vk_webusb_hcd_fini(vk_usbh_hcd_t *hcd)
+extern "C" vsf_err_t __vk_webusb_hcd_fini(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t __vk_webusb_hcd_suspend(vk_usbh_hcd_t *hcd)
+extern "C" vsf_err_t __vk_webusb_hcd_suspend(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t __vk_webusb_hcd_resume(vk_usbh_hcd_t *hcd)
+extern "C" vsf_err_t __vk_webusb_hcd_resume(vk_usbh_hcd_t *hcd)
 {
     return VSF_ERR_NONE;
 }
 
-static uint_fast16_t __vk_webusb_hcd_get_frame_number(vk_usbh_hcd_t *hcd)
+extern "C" uint_fast16_t __vk_webusb_hcd_get_frame_number(vk_usbh_hcd_t *hcd)
 {
     return 0;
 }
 
-static vsf_err_t __vk_webusb_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
+extern "C" vsf_err_t __vk_webusb_hcd_alloc_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
     VSF_USB_ASSERT(__vk_webusb_hcd.cur_dev_idx < __vk_webusb_hcd.dev_num);
     dev->dev_priv = &__vk_webusb_hcd.devs[__vk_webusb_hcd.cur_dev_idx];
     return VSF_ERR_NONE;
 }
 
-static void __vk_webusb_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
+extern "C" void __vk_webusb_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
     dev->dev_priv = NULL;
 }
 
-static vk_usbh_hcd_urb_t * __vk_webusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
+extern "C" vk_usbh_hcd_urb_t * __vk_webusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
 {
     uint_fast32_t size = sizeof(vk_usbh_hcd_urb_t) + sizeof(vk_webusb_hcd_urb_t);
     vk_usbh_hcd_urb_t *urb = (vk_usbh_hcd_urb_t *)vsf_usbh_malloc(size);
@@ -776,7 +931,7 @@ static vk_usbh_hcd_urb_t * __vk_webusb_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
     return urb;
 }
 
-static void __vk_webusb_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
+extern "C" void __vk_webusb_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
     // LLCM "-Wcast-align"
     vk_webusb_hcd_urb_t *webusb_urb = (vk_webusb_hcd_urb_t *)urb->priv;
@@ -795,7 +950,7 @@ static void __vk_webusb_hcd_free_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
     }
 }
 
-static vsf_err_t __vk_webusb_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
+extern "C" vsf_err_t __vk_webusb_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
     // LLCM "-Wcast-align"
     vk_webusb_hcd_urb_t *webusb_urb = (vk_webusb_hcd_urb_t *)urb->priv;
@@ -818,12 +973,12 @@ static vsf_err_t __vk_webusb_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_
 #   pragma clang diagnostic pop
 #endif
 
-static vsf_err_t __vk_webusb_hcd_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
+extern "C" vsf_err_t __vk_webusb_hcd_relink_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_urb_t *urb)
 {
     return __vk_webusb_hcd_submit_urb(hcd, urb);
 }
 
-static vsf_err_t __vk_webusb_hcd_reset_dev(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
+extern "C" vsf_err_t __vk_webusb_hcd_reset_dev(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
     vk_webusb_hcd_dev_t *webusb_dev = (vk_webusb_hcd_dev_t *)dev->dev_priv;
     webusb_dev->evt_mask.is_resetting = true;
@@ -831,13 +986,10 @@ static vsf_err_t __vk_webusb_hcd_reset_dev(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t
     return VSF_ERR_NONE;
 }
 
-static bool __vk_webusb_hcd_is_dev_reset(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
+extern "C" bool __vk_webusb_hcd_is_dev_reset(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
     vk_webusb_hcd_dev_t *webusb_dev = (vk_webusb_hcd_dev_t *)dev->dev_priv;
     return webusb_dev->evt_mask.is_resetting;
-}
-
-// end of extern "C"
 }
 
 #endif
