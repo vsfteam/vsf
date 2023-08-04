@@ -15,7 +15,10 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
+#define dlopen              VSF_LINUX_WRAPPER(dlopen)
+#define dlclose             VSF_LINUX_WRAPPER(dlclose)
 #define dlsym               VSF_LINUX_WRAPPER(dlsym)
+#define dlerror             VSF_LINUX_WRAPPER(dlerror)
 #endif
 
 #define RTLD_LAZY           0

@@ -13,6 +13,11 @@
 extern "C" {
 #endif
 
+#if VSF_LINUX_CFG_WRAPPER == ENABLED
+#define getpwuid            VSF_LINUX_WRAPPER(getpwuid)
+#define getpwnam            VSF_LINUX_WRAPPER(getpwnam)
+#endif
+
 struct passwd {
     char *pw_name;
     char *pw_passwd;
