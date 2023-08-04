@@ -658,13 +658,6 @@ void __vsf_kernel_os_start(void)
 }
 
 #ifdef VSF_ARCH_ENTRY_NO_PENDING
-// dummy main
-int main(void)
-{
-    vsf_arch_poll();
-    return 0;
-}
-
 static void __vsf_main_thread(void *arg)
 {
     while (1) {

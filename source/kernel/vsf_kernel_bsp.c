@@ -437,13 +437,22 @@ void __vsf_heap_init(void)
 }
 #endif
 
-#if __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
+#ifdef VSF_ARCH_ENTRY_NO_PENDING
+int main(void)
+{
+    __vsf_main_entry();
+    vsf_arch_main();
+    return 0;
+}
+#else
+#   if __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
 __attribute__((constructor(MAX_CONSTRUCTOR_PRIORITY)))
-#endif
+#   endif
 void vsf_main_entry(void)
 {
     __vsf_main_entry();
 }
+#endif
 
 
 #else

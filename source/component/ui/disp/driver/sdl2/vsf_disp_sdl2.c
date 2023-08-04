@@ -35,6 +35,10 @@
 #   include "SDL.h"
 #endif
 
+#ifdef __CPU_WEBASSEMBLY__
+#   include <emscripten/threading.h>
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_DISP_SDL2_CFG_HW_PRIORITY
@@ -45,7 +49,23 @@
 #   define VSF_DISP_SDL2_USE_CONTROLLER                 ENABLED
 #endif
 
+#ifndef VSF_DISP_SDL2_RENDERER_FLAG
+#   define VSF_DISP_SDL2_RENDERER_FLAG                  0
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#ifdef __CPU_WEBASSEMBLY__
+#   define SDL_CreateWindow(...)                                                \
+        (SDL_Window *)emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_IIIIIII, SDL_CreateWindow, ##__VA_ARGS__)
+#   define SDL_CreateRenderer(...)                                              \
+        (SDL_Renderer *)emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_IIII, SDL_CreateRenderer, ##__VA_ARGS__)
+#   define SDL_CreateTexture(...)                                               \
+        (SDL_Texture *)emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_IIIIII, SDL_CreateTexture, ##__VA_ARGS__)
+#   define SDL_SetTextureBlendMode(...)                                         \
+        emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_III, SDL_SetTextureBlendMode, ##__VA_ARGS__)
+#endif
+
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_disp_sdl2_t {
@@ -113,7 +133,7 @@ static void __vk_disp_sdl2_screen_init(vk_disp_sdl2_t *disp_sdl2)
                             disp_sdl2->param.width * disp_sdl2->amplifier,
                             disp_sdl2->param.height * disp_sdl2->amplifier,
                             0);
-    disp_sdl2->renderer = SDL_CreateRenderer(disp_sdl2->window, -1, 0);
+    disp_sdl2->renderer = SDL_CreateRenderer(disp_sdl2->window, -1, VSF_DISP_SDL2_RENDERER_FLAG);
     disp_sdl2->texture = SDL_CreateTexture(disp_sdl2->renderer,
                             __vk_disp_sdl2_get_format(disp_sdl2),
                             SDL_TEXTUREACCESS_STATIC,

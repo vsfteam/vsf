@@ -19,7 +19,8 @@ target_link_options(${CMAKE_PROJECT_NAME} PUBLIC
     -sLLD_REPORT_UNDEFINED
     -sTOTAL_MEMORY=536870912
     -sPTHREAD_POOL_SIZE_STRICT=0
-    -sPROXY_TO_PTHREAD
+# do not add PROXY_TO_PTHREAD, or emscripten_set_main_loop will not be valid
+#    -sPROXY_TO_PTHREAD
     -sFORCE_FILESYSTEM=1
     -sUSE_SDL=2
     -sASYNCIFY

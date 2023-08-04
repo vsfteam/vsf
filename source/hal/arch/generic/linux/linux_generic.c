@@ -492,14 +492,15 @@ static EM_BOOL __vsf_arch_one_iter(double time, void* userData)
     return EM_TRUE;
 }
 
-void vsf_arch_poll(void)
+static void __vsf_arch_main_loop(void)
 {
-    while (true) {
-        emscripten_sleep((unsigned int)-1);
 
-        // emscripten_request_animation_frame_loop not available in node
-//        emscripten_request_animation_frame_loop(__vsf_arch_one_iter, 0);
-    }
+}
+
+void vsf_arch_main(void)
+{
+    emscripten_set_main_loop(__vsf_arch_main_loop, 0, 0);
+    emscripten_exit_with_live_runtime();
 }
 #endif
 
