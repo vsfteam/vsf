@@ -56,14 +56,18 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #ifdef __CPU_WEBASSEMBLY__
-#   define SDL_CreateWindow(...)                                                \
+//#   define SDL_CreateWindow(...)                                                \
         (SDL_Window *)emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_IIIIIII, SDL_CreateWindow, ##__VA_ARGS__)
 #   define SDL_CreateRenderer(...)                                              \
         (SDL_Renderer *)emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_IIII, SDL_CreateRenderer, ##__VA_ARGS__)
 #   define SDL_CreateTexture(...)                                               \
         (SDL_Texture *)emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_IIIIII, SDL_CreateTexture, ##__VA_ARGS__)
-#   define SDL_SetTextureBlendMode(...)                                         \
+//#   define SDL_SetTextureBlendMode(...)                                         \
         emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_III, SDL_SetTextureBlendMode, ##__VA_ARGS__)
+#   define SDL_UpdateTexture(...)                                               \
+        emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_IIIII, SDL_UpdateTexture, ##__VA_ARGS__)
+#   define SDL_RenderPresent(...)                                               \
+        emscripten_sync_run_in_main_runtime_thread(EM_FUNC_SIG_VI, SDL_RenderPresent, ##__VA_ARGS__)
 #endif
 
 /*============================ TYPES =========================================*/
