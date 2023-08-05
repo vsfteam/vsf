@@ -42,8 +42,105 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
+
+#define USB_HID_PARAM(__IN_EP, __OUT_EP,                                        \
+                    __REPORT_NUM, __REPORTS, __HAS_REPORT_ID,                   \
+                    __DESC_NUM, __DESC,                                         \
+                    __RX_BUFF, __RX_BUFF_SIZE,                                  \
+                    __NOTIFY_EDA, __NOTIFIER)                                   \
+            .ep_out             = (__OUT_EP),                                   \
+            .ep_in              = (__IN_EP),                                    \
+            .num_of_report      = (__REPORT_NUM),                               \
+            .reports            = (__REPORTS),                                  \
+            .has_report_id      = (__HAS_REPORT_ID),                            \
+            .desc_num           = (__DESC_NUM),                                 \
+            .desc               = (__DESC),                                     \
+            .rx_buffer.buffer   = (__RX_BUFF),                                  \
+            .rx_buffer.size     = (__RX_BUFF_SIZE),                             \
+            .notify_eda         = (__NOTIFY_EDA),                               \
+            .notifier           = (__NOTIFIER),
+
+#define USB_HID_IFS_NUM             1
+#define USB_HID_IFS(__HID_PARAM)    USB_IFS(&vk_usbd_hid, &(__HID_PARAM))
+
+
+#define __usbd_hid_desc(__name, __ifs, __i_func, __subclass, __protocol,        \
+                    __version_bcd, __country_code, __report_desc_len,           \
+                    __ep_in, __ep_in_size, __ep_in_interval,                    \
+                    __ep_out, __ep_out_size, __ep_out_interval)                 \
+            USB_DESC_HID((__ifs), 4 + (__i_func), (__subclass), (__protocol),   \
+                    (__version_bcd), (__country_code), (__report_desc_len),     \
+                    (__ep_in), (__ep_in_size), (__ep_in_interval),              \
+                    (__ep_out), (__ep_out_size), (__ep_out_interval)            \
+            )
+#define __usbd_hid_desc_iad(__name, __ifs, __i_func, __subclass, __protocol,    \
+                    __version_bcd, __country_code, __report_desc_len,           \
+                    __ep_in, __ep_in_size, __ep_in_interval,                    \
+                    __ep_out, __ep_out_size, __ep_out_interval)                 \
+            USB_DESC_HID_IAD((__ifs), 4 + (__i_func), (__subclass), (__protocol),\
+                    (__version_bcd), (__country_code), (__report_desc_len),     \
+                    (__ep_in), (__ep_in_size), (__ep_in_interval),              \
+                    (__ep_out), (__ep_out_size), (__ep_out_interval)            \
+            )
+
+#define __usbd_hid_func(__name, __func_id,                                      \
+                    __in_ep, __out_ep, __out_ep_size,                           \
+                    __report_num, __reports, __has_report_id,                   \
+                    __report_desc, __report_desc_len,                           \
+                    __notify_eda, __notifier)                                   \
+            uint8_t __##__name##_HID##_rx_buffer[__out_ep_size];                \
+            vk_usbd_desc_t __##__name##_HID##__desc[1] = {                      \
+                VSF_USBD_DESC_HID_REPORT((__report_desc), (__report_desc_len)), \
+            };                                                                  \
+            vk_usbd_hid_t __##__name##_HID##__func_id = {                       \
+                USB_HID_PARAM((__in_ep), (__out_ep),                            \
+                    (__report_num), (__reports), (__has_report_id),             \
+                    dimof(__##__name##_HID##__desc), (__##__name##_HID##__desc),\
+                    __##__name##_HID##_rx_buffer, __out_ep_size,                \
+                    __notify_eda, __notifier)                                   \
+            };
+
+#define __usbd_hid_ifs(__name, __func_id)                                       \
+            USB_HID_IFS(__##__name##_HID##__func_id)
+
+#define usbd_hid_desc(__name, __ifs, __i_func,                                  \
+                    __subclass, __protocol,                                     \
+                    __version_bcd, __country_code, __report_desc_len,           \
+                    __ep_in, __ep_in_size, __ep_in_interval,                    \
+                    __ep_out, __ep_out_size, __ep_out_interval)                 \
+            __usbd_hid_desc(__name, (__ifs), (__i_func),                        \
+                    (__subclass), (__protocol),                                 \
+                    (__version_bcd), (__country_code), (__report_desc_len),     \
+                    (__ep_in), (__ep_in_size), (__ep_in_interval),              \
+                    (__ep_out), (__ep_out_size), (__ep_out_interval))
+#define usbd_hid_desc_iad(__name, __ifs, __i_func,                              \
+                    __subclass, __protocol,                                     \
+                    __version_bcd, __country_code, __report_desc_len,           \
+                    __ep_in, __ep_in_size, __ep_in_interval,                    \
+                    __ep_out, __ep_out_size, __ep_out_interval)                 \
+            __usbd_hid_desc_iad(__name, (__ifs), (__i_func),                    \
+                    (__subclass), (__protocol),                                 \
+                    (__version_bcd), (__country_code), (__report_desc_len),     \
+                    (__ep_in), (__ep_in_size), (__ep_in_interval),              \
+                    (__ep_out), (__ep_out_size), (__ep_out_interval))
+
+#define usbd_hid_func(__name, __func_id,                                        \
+                    __in_ep, __out_ep, __out_ep_size,                           \
+                    __report_num, __reports, __has_report_id,                   \
+                    __report_desc, __report_desc_size,                          \
+                    __notify_eda, __notifier)                                   \
+            __usbd_hid_func(__name, __func_id,                                  \
+                    (__in_ep), (__out_ep), (__out_ep_size),                     \
+                    (__report_num), (__reports), (__has_report_id),             \
+                    (__report_desc), (__report_desc_size),                      \
+                    (__notify_eda), (__notifier))
+#define usbd_hid_ifs(__name, __func_id)                                         \
+            __usbd_hid_ifs(__name, __func_id)
+
 #define VSF_USBD_DESC_HID_REPORT(__PTR, __SIZE)                                 \
     {USB_HID_DT_REPORT, 0, 0, (__SIZE), (uint8_t*)(__PTR)}
+#define VSF_USBD_HID_REPORT(__TYPE, __ID, __BUFFER, __SIZE, __IDLE)             \
+    {(__TYPE), {(__BUFFER), (__SIZE)}, (__ID), (__IDLE)}
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -81,6 +178,7 @@ vsf_class(vk_usbd_hid_t) {
         union {
             vsf_err_t (*on_report)(vk_usbd_hid_t *hid, vk_usbd_hid_report_t *report);
             vsf_eda_t *eda;
+            void *notifier;
         };
     )
 

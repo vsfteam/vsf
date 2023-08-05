@@ -33,7 +33,8 @@ extern "C" {
 #define USB_HID_PROTOCOL_MOUSE                  2
 
 #define USB_DT_HID_SIZE                         9
-#define USB_DESC_HID(__IFS, __I_FUNC, __SUBCLASS, __PROTOCOL, __VERSION_BCD, __COUNTRY_CODE, __REPORT_DESC_LEN,\
+#define USB_DESC_HID(__IFS, __I_FUNC, __SUBCLASS, __PROTOCOL,                   \
+                    __VERSION_BCD, __COUNTRY_CODE, __REPORT_DESC_LEN,           \
                     __EP_IN, __EP_IN_SIZE, __EP_IN_INTERVAL,                    \
                     __EP_OUT, __EP_OUT_SIZE, __EP_OUT_INTERVAL)                 \
             USB_DESC_IFS((__IFS), 0, 2, USB_CLASS_HID, (__SUBCLASS), (__PROTOCOL), (__I_FUNC))\
@@ -44,8 +45,8 @@ extern "C" {
             (1),                                /* bNumDescriptor: number of class descriptors */\
             USB_DT_REPORT,                      /* bDescriptorType */           \
             USB_DESC_WORD(__REPORT_DESC_LEN),   /* wDescriptorLen */            \
-            USB_DESC_EP(USB_DIR_IN | (__EP_IN), USB_ENDPOINT_XFER_INT, 64, __EP_IN_INTERVAL)\
-            USB_DESC_EP(USB_DIR_OUT | (__EP_OUT), USB_ENDPOINT_XFER_INT, 64, __EP_OUT_INTERVAL)
+            USB_DESC_EP(USB_DIR_IN | (__EP_IN), USB_ENDPOINT_XFER_INT, __EP_IN_SIZE, __EP_IN_INTERVAL)\
+            USB_DESC_EP(USB_DIR_OUT | (__EP_OUT), USB_ENDPOINT_XFER_INT, __EP_OUT_SIZE, __EP_OUT_INTERVAL)
 #define USB_DESC_HID_LEN                        (USB_DESC_IFS_LEN + USB_DT_HID_SIZE + 2 * USB_DESC_EP_LEN)
 
 #define USB_DESC_HID_IAD(__IFS, __I_FUNC, __SUBCLASS, __PROTOCOL, __VERSION_BCD, __COUNTRY_CODE, __REPORT_DESC_LEN,\
