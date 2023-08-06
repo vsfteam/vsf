@@ -25,6 +25,10 @@
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_MSC == ENABLED
 
 #include "component/usb/common/class/MSC/vsf_usb_MSC.h"
+// for mschid which can be accessed via webusb
+#if VSF_USBD_USE_HID == ENABLED
+#   include "component/usb/common/class/HID/vsf_usb_HID.h"
+#endif
 #include "./vsf_usbd_MSC_desc.h"
 #include "component/scsi/vsf_scsi.h"
 
@@ -83,6 +87,21 @@ extern "C" {
 #define usbd_mscbot_ifs(__name, __func_id)                                      \
             __usbd_msc_ifs(__name, __func_id)
 
+#if VSF_USBD_USE_HID == ENABLED
+#define USB_MSCHID_IFS_NUM          USB_HID_IFS_NUM
+#define USB_DESC_MSCHID_LEN         USB_DESC_HID_LEN
+#define USB_DESC_MSCHID_IAD_LEN     USB_DESC_HID_IAD_LEN
+
+#define usbd_mschid_desc(__name, __ifs, __i_func, __int_in_ep, __int_out_ep)    \
+            usbd_hid_desc(__name, (__ifs), (__i_func), 0, 0, 0x0111, 0, sizeof(__vk_usbd_mschid_report_desc), (__int_in_ep), 512, 1, (__int_out_ep), 512, 1)
+#define usbd_mschid_desc_iad(__name, __ifs, __i_func, __int_in_ep, __int_out_ep)\
+            usbd_hid_desc_iad(__name, (__ifs), (__i_func), 0, 0, 0x0111, 0, sizeof(__vk_usbd_mschid_report_desc), (__int_in_ep), 512, 1, (__int_out_ep), 512, 1)
+#define usbd_mschid_func(__name, __func_id, __int_in_ep, __int_out_ep, __max_lun, __scsi_dev, __stream)\
+            __usbd_mscbot_func(__name, __func_id, (__int_in_ep), (__int_out_ep), (__max_lun), (__scsi_dev), (__stream))
+#define usbd_mschid_ifs(__name, __func_id)                                      \
+            __usbd_msc_ifs(__name, __func_id)
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -121,6 +140,8 @@ vsf_class(vk_usbd_msc_t) {
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+extern const uint8_t __vk_usbd_mschid_report_desc[29];
 
 extern const vk_usbd_class_op_t vk_usbd_msc;
 
