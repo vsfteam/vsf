@@ -222,6 +222,70 @@ static void __vk_webusb_hcd_on_arrived(vk_webusb_hcd_dev_t *webusb_dev)
     __vsf_arch_irq_request_send(&webusb_dev->irq_request);
 }
 
+// refer to: https://github.com/libusb/libusb/blob/master/libusb/os/emscripten_webusb.cpp
+EM_JS(EM_VAL, __vk_webusb_empromise_catch_imp, (EM_VAL handle), {
+    let promise = Emval.toValue(handle);
+    promise = promise.then(
+        value => ({error : 0, value}),
+        error => {
+            const ERROR_CODES = {
+                // WEBUSB_ERROR_IO
+                NetworkError : -1,
+                // WEBUSB_ERROR_INVALID_PARAM
+                DataError : -2,
+                TypeMismatchError : -2,
+                IndexSizeError : -2,
+                // WEBUSB_ERROR_ACCESS
+                SecurityError : -3,
+                // WEBUSB_ERROR_NOT_FOUND
+                NotFoundError : -5,
+                // WEBUSB_ERROR_BUSY
+                InvalidStateError : -6,
+                // WEBUSB_ERROR_TIMEOUT
+                TimeoutError : -7,
+                // WEBUSB_ERROR_INTERRUPTED
+                AbortError : -10,
+                // WEBUSB_ERROR_NOT_SUPPORTED
+                NotSupportedError : -12,
+            };
+            let errorCode = -99;
+            if (error instanceof DOMException) {
+                errorCode = ERROR_CODES[error.name] ?? errorCode;
+            } else if ((error instanceof RangeError) || (error instanceof TypeError)) {
+                errorCode = -2; // WEBUSB_ERROR_INVALID_PARAM
+            }
+            return {error: errorCode, value: undefined};
+        }
+    );
+    return Emval.toHandle(promise);
+});
+
+static val __vk_webusb_emprmoise_catch(val &&promise)
+{
+    EM_VAL handle = promise.as_handle();
+    handle = __vk_webusb_empromise_catch_imp(handle);
+    return val::take_ownership(handle);
+}
+
+// C++ struct representation for {value, error} object from above
+// (performs conversion in the constructor).
+struct promise_result {
+    webusb_error error;
+    val value;
+
+    promise_result(val &&result)
+        :   error(static_cast<webusb_error>(result["error"].as<int>())),
+            value(result["value"]) {}
+
+    // C++ counterpart of the promise helper above that takes a promise, catches
+    // its error, converts to a libusb status and returns the whole thing as
+    // `promise_result` struct for easier handling.
+    static promise_result await(val &&promise) {
+        promise = __vk_webusb_emprmoise_catch(std::move(promise));
+        return {promise.await()};
+    }
+};
+
 static int __vk_webusb_set_configuration(vk_webusb_hcd_dev_t *webusb_dev, int configuration)
 {
     val dev = webusb_dev->handle;
@@ -229,8 +293,8 @@ static int __vk_webusb_set_configuration(vk_webusb_hcd_dev_t *webusb_dev, int co
         return WEBUSB_ERROR_NO_DEVICE;
     }
 
-    dev.call<val>("selectConfiguration", configuration).await();
-    return WEBUSB_SUCCESS;
+    auto result = promise_result::await(dev.call<val>("selectConfiguration", configuration));
+    return result.error;
 }
 
 static int __vk_webusb_set_interface_alt_setting(vk_webusb_hcd_dev_t *webusb_dev, int interface_number, int alternate_setting)
@@ -240,8 +304,8 @@ static int __vk_webusb_set_interface_alt_setting(vk_webusb_hcd_dev_t *webusb_dev
         return WEBUSB_ERROR_NO_DEVICE;
     }
 
-    dev.call<val>("selectAlternateInterface", interface_number, alternate_setting).await();
-    return WEBUSB_SUCCESS;
+    auto result = promise_result::await(dev.call<val>("selectAlternateInterface", interface_number, alternate_setting));
+    return result.error;
 }
 
 val create_out_buffer(uint8_t* buffer, size_t size)
@@ -343,8 +407,8 @@ static int __vk_webusb_clear_halt(vk_webusb_hcd_dev_t *webusb_dev, unsigned char
     }
 
     std::string direction = ((endpoint & USB_DIR_MASK) == USB_DIR_OUT) ? "out" : "in";
-    dev.call<val>("clearHalt", direction, endpoint & ~USB_DIR_MASK).await();
-    return WEBUSB_SUCCESS;
+    auto result = promise_result::await(dev.call<val>("clearHalt", direction, endpoint & ~USB_DIR_MASK));
+    return result.error;
 }
 
 static int __vk_webusb_reset_device(vk_webusb_hcd_dev_t *webusb_dev)
@@ -354,8 +418,8 @@ static int __vk_webusb_reset_device(vk_webusb_hcd_dev_t *webusb_dev)
         return WEBUSB_ERROR_NO_DEVICE;
     }
 
-    dev.call<val>("reset").await();
-    return WEBUSB_SUCCESS;
+    auto result = promise_result::await(dev.call<val>("reset"));
+    return result.error;
 }
 
 static int __vk_webusb_claim_interface(vk_webusb_hcd_dev_t *webusb_dev, int interface_number)
@@ -365,8 +429,8 @@ static int __vk_webusb_claim_interface(vk_webusb_hcd_dev_t *webusb_dev, int inte
         return WEBUSB_ERROR_NO_DEVICE;
     }
 
-    dev.call<val>("claimInterface", interface_number).await();
-    return WEBUSB_SUCCESS;
+    auto result = promise_result::await(dev.call<val>("claimInterface", interface_number));
+    return result.error;
 }
 
 static int __vk_webusb_init(vk_webusb_hcd_t *hcd)
@@ -388,7 +452,10 @@ static int __vk_webusb_init(vk_webusb_hcd_t *hcd)
             vk_webusb_hcd_dev_t *webusb_dev = &hcd->devs[i];
 
             webusb_dev->handle = devices[i];
-            webusb_dev->handle.call<val>("open").await();
+            auto result = promise_result::await(webusb_dev->handle.call<val>("open"));
+            if (result.error != WEBUSB_SUCCESS) {
+                vsf_trace_error("fail to open usb device, %d" VSF_TRACE_CFG_LINEEND, result.error);
+            }
         }
     }
     return 0;
