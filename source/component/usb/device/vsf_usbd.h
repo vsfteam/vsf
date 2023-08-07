@@ -270,7 +270,7 @@ extern "C" {
                                         __attribute,        /* mask attributes, eg: USB_CONFIG_ATT_[SELFPOWER/WAKEUP/BATTERY] */\
                                         __max_power_ma      /* power consumption from USB host in mA, eg: 500 */\
                                         )                                       \
-        __usbd_common_desc(__name, (__str_product), (__str_vendor), (__str_serial), USB_CLASS_MISC, 0x02, 0x02, (__ep0_size), (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))
+        __usbd_common_desc(__name, (__str_product), (__str_vendor), (__str_serial), USB_CLASS_MISC, 0x02, 0x01, (__ep0_size), (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))
 
 
 #define __usbd_func_desc(__name)                                                \
