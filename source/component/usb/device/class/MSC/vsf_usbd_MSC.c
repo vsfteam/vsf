@@ -49,26 +49,6 @@ const vk_usbd_class_op_t vk_usbd_msc = {
     .init = __vk_usbd_msc_init,
 };
 
-#if VSF_USBD_USE_HID == ENABLED
-const uint8_t __vk_usbd_mschid_report_desc[] = {
-    0x06, 0x00, 0xFF,   // Usage Page (Vendor)
-    0x09, 0x01,         // Usage (0x01)
-    0xA1, 0x01,         // Collection (Application)
-    0x15, 0x00,         //   Logical Minimum (0)
-    0x26, 0xFF, 0x00,   //   Logical Maximum (255)
-    0x75, 0x08,         //   Report Size (8)
-    0x96, (512 >> 0) & 0xFF, (512 >> 8) & 0xFF,
-                        //   Report Count (512)
-    0x09, 0x01,         //   Usage (0x01)
-    0x81, 0x02,         //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
-    0x96, (512 >> 0) & 0xFF, (512 >> 8) & 0xFF,
-                        //   Report Count (512)
-    0x09, 0x01,         //   Usage (0x01)
-    0x91, 0x02,         //   Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
-    0xC0,               // End Collection
-};
-#endif
-
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 

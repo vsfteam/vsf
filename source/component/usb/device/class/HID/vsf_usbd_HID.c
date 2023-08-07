@@ -212,7 +212,9 @@ static vsf_err_t __vk_usbd_hid_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_hid_t *hid = ifs->class_param;
 
-    VSF_USB_ASSERT((hid->rx_buffer.buffer != NULL) && (hid->rx_buffer.size > 0));
+    if (hid->ep_out != 0) {
+        VSF_USB_ASSERT((hid->rx_buffer.buffer != NULL) && (hid->rx_buffer.size > 0));
+    }
     hid->ifs = ifs;
     hid->dev = dev;
 

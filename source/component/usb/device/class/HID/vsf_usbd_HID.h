@@ -42,7 +42,6 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-
 #define USB_HID_PARAM(__IN_EP, __OUT_EP,                                        \
                     __REPORT_NUM, __REPORTS, __HAS_REPORT_ID,                   \
                     __DESC_NUM, __DESC,                                         \
@@ -54,7 +53,7 @@ extern "C" {
             .reports            = (__REPORTS),                                  \
             .has_report_id      = (__HAS_REPORT_ID),                            \
             .desc_num           = (__DESC_NUM),                                 \
-            .desc               = (__DESC),                                     \
+            .desc               = (vk_usbd_desc_t *)(__DESC),                   \
             .rx_buffer.buffer   = (__RX_BUFF),                                  \
             .rx_buffer.size     = (__RX_BUFF_SIZE),                             \
             .notify_eda         = (__NOTIFY_EDA),                               \
@@ -89,7 +88,7 @@ extern "C" {
                     __report_desc, __report_desc_len,                           \
                     __notify_eda, __notifier)                                   \
             uint8_t __##__name##_HID##_rx_buffer[__out_ep_size];                \
-            vk_usbd_desc_t __##__name##_HID##__desc[1] = {                      \
+            const vk_usbd_desc_t __##__name##_HID##__desc[1] = {                \
                 VSF_USBD_DESC_HID_REPORT((__report_desc), (__report_desc_len)), \
             };                                                                  \
             vk_usbd_hid_t __##__name##_HID##__func_id = {                       \
@@ -212,6 +211,10 @@ extern void vk_usbd_hid_out_report_processed(vk_usbd_hid_t *hid, vk_usbd_hid_rep
 #ifdef __cplusplus
 }
 #endif
+
+/*============================ INCLUDES ======================================*/
+
+#include "./vsf_usbd_hidmsc.h"
 
 #endif      // VSF_USE_USB_DEVICE && VSF_USBD_USE_HID
 #endif      // __VSF_USBD_HID_H__
