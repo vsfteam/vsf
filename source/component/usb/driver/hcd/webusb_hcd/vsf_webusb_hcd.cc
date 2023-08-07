@@ -382,6 +382,7 @@ static int __vk_webusb_init(vk_webusb_hcd_t *hcd)
     if (hcd->dev_num > 0) {
         hcd->devs = (vk_webusb_hcd_dev_t *)vsf_usbh_malloc(sizeof(vk_webusb_hcd_dev_t) * hcd->dev_num);
         VSF_USB_ASSERT(hcd->devs != NULL);
+        memset(hcd->devs, 0, sizeof(vk_webusb_hcd_dev_t) * hcd->dev_num);
 
         for (int i = 0; i < hcd->dev_num; i++) {
             vk_webusb_hcd_dev_t *webusb_dev = &hcd->devs[i];
