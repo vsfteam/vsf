@@ -51,6 +51,8 @@ typedef enum vk_romfs_file_attr_t {
     ROMFS_FILEATTR_FIF      = 7,
     ROMFS_FILEATTR_MSK      = 0x07,
     ROMFS_FILEATTR_EXEC_MSK = 8,
+
+    ROMFS_FILEATTR_HIDE     = ROMFS_FILEATTR_EXEC_MSK | ROMFS_FILEATTR_CHR,
 } vk_romfs_file_attr_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -185,7 +187,9 @@ __vsf_component_peda_ifs_entry(__vk_romfs_lookup, vk_file_lookup)
 lookup_next_image:
     nextfh = be32_to_cpu(header->nextfh);
     while (true) {
-        if (strcmp((const char *)header->name, ".") && strcmp((const char *)header->name, "..")) {
+        if (    strcmp((const char *)header->name, ".")
+            &&  strcmp((const char *)header->name, "..")
+            &&  ((nextfh & 0x0F) != ROMFS_FILEATTR_HIDE)) {
             if (    (name && vk_file_is_match((char *)name, (char *)header->name))
                 ||  (!name && !idx)) {
                 found = true;
@@ -259,7 +263,9 @@ lookup_next_image:
                 header = image + 1;
             } else {
                 header = __vsf_romfs_lookup_in_image(image, dir);
-                header++;
+                if (header != NULL) {
+                    header++;
+                }
             }
             if(header != NULL) {
                 goto lookup_next_image;
