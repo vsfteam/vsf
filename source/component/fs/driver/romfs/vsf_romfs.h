@@ -59,14 +59,24 @@ typedef struct vk_romfs_header_t vk_romfs_header_t;
 vsf_class(vk_romfs_file_t) {
     public_member(
         implement(vk_file_t)
+    )
+    private_member(
 #if VSF_ROMFS_CFG_DIRECT_ACCESS == ENABLED
+        vk_romfs_header_t *image;
         vk_romfs_header_t *header;
 #endif
+        uint8_t level;
     )
 };
 
 vsf_class(vk_romfs_info_t) {
     vk_romfs_file_t root;
+
+    vk_romfs_header_t *image;
+    // image_size is necessary only if is_chained is true
+    uint32_t image_size;
+    // used to chian multiple romfs
+    bool is_chained;
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/

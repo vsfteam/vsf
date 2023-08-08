@@ -31,6 +31,12 @@
 #   error currently only VSF_ROMFS_CFG_DIRECT_ACCESS mode is supported
 #endif
 
+#if __IS_COMPILER_IAR__
+#   ifndef VSF_ROMFS_CFG_MAX_DEPTH
+#       define VSF_ROMFS_CFG_MAX_DEPTH      16
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -92,21 +98,72 @@ const vk_fs_op_t vk_romfs_op = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+static bool __vsf_romfs_is_image_valid(vk_romfs_header_t *image)
+{
+    return (image->nextfh == be32_to_cpu(0x2d726f6d)) && (image->spec == be32_to_cpu(0x3166732d));
+}
+
+static vk_romfs_header_t * __vsf_romfs_lookup_in_dir(vk_romfs_header_t *image, vk_romfs_header_t *dir, char *name)
+{
+    vk_romfs_header_t *header = dir + 1;
+    uint32_t nextfh = be32_to_cpu(header->nextfh);
+
+    while (true) {
+        if (vk_file_is_match((char *)name, (char *)header->name)) {
+            return header;
+        }
+
+        nextfh &= ~(ROMFS_FILEATTR_MSK | ROMFS_FILEATTR_EXEC_MSK);
+        if (0 == nextfh) {
+            break;
+        }
+        header = (vk_romfs_header_t*)((uint8_t *)image + nextfh);
+        nextfh = be32_to_cpu(header->nextfh);
+    }
+    return NULL;
+}
+
+static vk_romfs_header_t * __vsf_romfs_lookup_in_image(vk_romfs_header_t *image, vk_romfs_file_t *dir)
+{
+#if __IS_COMPILER_IAR__
+    vk_romfs_file_t *search_path[VSF_ROMFS_CFG_MAX_DEPTH];
+    VSF_FS_ASSERT(VSF_ROMFS_CFG_MAX_DEPTH >= dir->level);
+#else
+    vk_romfs_file_t *search_path[dir->level];
+#endif
+    vk_romfs_file_t *dir_tmp = dir;
+    uint8_t i;
+    for (i = 0; i < dir->level; i++) {
+        search_path[i] = dir_tmp;
+        dir_tmp = (vk_romfs_file_t *)dir_tmp->parent;
+    }
+
+    vk_romfs_header_t *header = image;
+    for (i = dir->level; i > 0; i--) {
+        header = __vsf_romfs_lookup_in_dir(image, header, search_path[i - 1]->name);
+        if (NULL == header) {
+            return NULL;
+        }
+    }
+    return header;
+}
+
 __vsf_component_peda_ifs_entry(__vk_romfs_mount, vk_fs_mount)
 {
     vsf_peda_begin();
     vk_vfs_file_t *dir = (vk_vfs_file_t *)&vsf_this;
     vk_romfs_info_t *fsinfo = dir->subfs.data;
-    VSF_FS_ASSERT((fsinfo != NULL) && (fsinfo->root.header != NULL));
+    VSF_FS_ASSERT((fsinfo != NULL) && (fsinfo->image != NULL));
 
+    fsinfo->root.header = fsinfo->root.image = fsinfo->image;
     // basic check for romfs
-    if (    (fsinfo->root.header->nextfh != be32_to_cpu(0x2d726f6d))
-        ||  (fsinfo->root.header->spec != be32_to_cpu(0x3166732d))) {
+    if (!__vsf_romfs_is_image_valid(fsinfo->image)) {
         vsf_eda_return(VSF_ERR_FAIL);
         return;
     }
 
     fsinfo->root.attr = VSF_FILE_ATTR_DIRECTORY;
+    fsinfo->root.level = 0;
     dir->subfs.root = &fsinfo->root.use_as__vk_file_t;
     vsf_eda_return(VSF_ERR_NONE);
     vsf_peda_end();
@@ -117,33 +174,38 @@ __vsf_component_peda_ifs_entry(__vk_romfs_lookup, vk_file_lookup)
     vsf_peda_begin();
     vk_romfs_file_t *dir = (vk_romfs_file_t *)&vsf_this;
     vk_romfs_info_t *fsinfo = (vk_romfs_info_t *)dir->fsinfo;
+    vk_romfs_header_t *image = dir->image;
     vk_romfs_header_t *header = (vk_romfs_header_t *)&dir->header[1];
-    uint32_t nextfh = be32_to_cpu(header->nextfh);
 
     const char *name = vsf_local.name;
-    uint_fast32_t idx = dir->pos;
     bool found = false;
+    uint_fast32_t idx = dir->pos;
+    uint32_t nextfh;
 
+lookup_next_image:
+    nextfh = be32_to_cpu(header->nextfh);
     while (true) {
-        if (    (name && vk_file_is_match((char *)name, (char *)header->name))
-            ||  (!name && !idx)) {
-            found = true;
-            break;
+        if (strcmp((const char *)header->name, ".") && strcmp((const char *)header->name, "..")) {
+            if (    (name && vk_file_is_match((char *)name, (char *)header->name))
+                ||  (!name && !idx)) {
+                found = true;
+                break;
+            }
+
+            idx--;
         }
-        idx--;
+
         nextfh &= ~(ROMFS_FILEATTR_MSK | ROMFS_FILEATTR_EXEC_MSK);
         if (0 == nextfh) {
             break;
         }
-        header = (vk_romfs_header_t*)((uint8_t *)fsinfo->root.header + nextfh);
+        header = (vk_romfs_header_t*)((uint8_t *)image + nextfh);
         nextfh = be32_to_cpu(header->nextfh);
     }
 
     if (NULL == name) {
         if (found) {
             dir->pos++;
-        } else {
-            dir->pos = 0;
         }
     }
     if (found) {
@@ -152,13 +214,15 @@ __vsf_component_peda_ifs_entry(__vk_romfs_lookup, vk_file_lookup)
             *vsf_local.result = NULL;
             vsf_eda_return(VSF_ERR_NOT_ENOUGH_RESOURCES);
         } else {
+            new_file->level = dir->level + 1;
+            new_file->image = image;
             new_file->header = header;
             new_file->name = (char *)header->name;
             new_file->attr = VSF_FILE_ATTR_READ;
 
             uint32_t romfs_attr = nextfh & ROMFS_FILEATTR_MSK;
             while (ROMFS_FILEATTR_HRD == romfs_attr) {
-                header = (vk_romfs_header_t *)((uint8_t *)fsinfo->root.header + be32_to_cpu(header->spec));
+                header = (vk_romfs_header_t *)((uint8_t *)image + be32_to_cpu(header->spec));
                 nextfh = be32_to_cpu(header->nextfh);
                 romfs_attr = nextfh & ROMFS_FILEATTR_MSK;
             }
@@ -182,7 +246,28 @@ __vsf_component_peda_ifs_entry(__vk_romfs_lookup, vk_file_lookup)
             *vsf_local.result = &new_file->use_as__vk_file_t;
             vsf_eda_return(VSF_ERR_NONE);
         }
+    } else if (fsinfo->is_chained) {
+        while (true) {
+            image = (vk_romfs_header_t *)((uint8_t *)image + be32_to_cpu(image->size));
+
+            if (    ((uint8_t *)image >= ((uint8_t *)fsinfo->image + fsinfo->image_size))
+                ||  !__vsf_romfs_is_image_valid(image)) {
+                goto not_found;
+            }
+
+            if (!dir->level) {
+                header = image + 1;
+            } else {
+                header = __vsf_romfs_lookup_in_image(image, dir);
+                header++;
+            }
+            if(header != NULL) {
+                goto lookup_next_image;
+            }
+        }
     } else {
+    not_found:
+        dir->pos = 0;
         *vsf_local.result = NULL;
         vsf_eda_return(VSF_ERR_NOT_AVAILABLE);
     }
@@ -193,7 +278,6 @@ __vsf_component_peda_ifs_entry(__vk_romfs_read, vk_file_read)
 {
     vsf_peda_begin();
     vk_romfs_file_t *file = (vk_romfs_file_t *)&vsf_this;
-    vk_romfs_info_t *fsinfo = (vk_romfs_info_t *)file->fsinfo;
     vk_romfs_header_t *header = file->header;
     uint32_t nextfh = be32_to_cpu(header->nextfh);
     uint32_t romfs_attr = nextfh & ROMFS_FILEATTR_MSK;
@@ -202,7 +286,7 @@ __vsf_component_peda_ifs_entry(__vk_romfs_read, vk_file_read)
     uint8_t *buff = vsf_local.buff;
 
     if (ROMFS_FILEATTR_HRD == romfs_attr) {
-        header = (vk_romfs_header_t *)((uint8_t *)fsinfo->root.header + be32_to_cpu(header->spec));
+        header = (vk_romfs_header_t *)((uint8_t *)file->image + be32_to_cpu(header->spec));
     }
     int_fast32_t rsize = file->size - file->pos;
     rsize = vsf_min(size, rsize);
