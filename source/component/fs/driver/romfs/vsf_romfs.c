@@ -154,14 +154,10 @@ static bool __vsf_romfs_should_hide(vk_romfs_header_t *image_head, vk_romfs_head
     vk_romfs_header_t *header;
     while (image_head != image_cur) {
         header = __vsf_romfs_lookup_in_image(image_head, dir);
-        image_head = (vk_romfs_header_t *)((uint8_t *)image_head + be32_to_cpu(image_head->size));
-        if (NULL == header) {
-            continue;
-        }
-
-        if (__vsf_romfs_lookup_in_dir(image_head, header, name) != NULL) {
+        if ((header != NULL) && (__vsf_romfs_lookup_in_dir(image_head, header, name) != NULL)) {
             return true;
         }
+        image_head = (vk_romfs_header_t *)((uint8_t *)image_head + be32_to_cpu(image_head->size));
     }
     return false;
 }
@@ -276,13 +272,10 @@ lookup_next_image:
 
             if (!dir->level) {
                 header = image + 1;
-            } else {
-                header = __vsf_romfs_lookup_in_image(image, dir);
-                if (header != NULL) {
-                    header++;
-                }
+            } else if ((header = __vsf_romfs_lookup_in_image(image, dir)) != NULL) {
+                header++;
             }
-            if(header != NULL) {
+            if (header != NULL) {
                 goto lookup_next_image;
             }
         }
