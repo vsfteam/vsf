@@ -51,8 +51,6 @@ typedef enum vk_romfs_file_attr_t {
     ROMFS_FILEATTR_FIF      = 7,
     ROMFS_FILEATTR_MSK      = 0x07,
     ROMFS_FILEATTR_EXEC_MSK = 8,
-
-    ROMFS_FILEATTR_HIDE     = ROMFS_FILEATTR_EXEC_MSK | ROMFS_FILEATTR_CHR,
 } vk_romfs_file_attr_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -150,6 +148,24 @@ static vk_romfs_header_t * __vsf_romfs_lookup_in_image(vk_romfs_header_t *image,
     return header;
 }
 
+static bool __vsf_romfs_should_hide(vk_romfs_header_t *image_head, vk_romfs_header_t *image_cur,
+                vk_romfs_file_t *dir, char *name)
+{
+    vk_romfs_header_t *header;
+    while (image_head != image_cur) {
+        header = __vsf_romfs_lookup_in_image(image_head, dir);
+        image_head = (vk_romfs_header_t *)((uint8_t *)image_head + be32_to_cpu(image_head->size));
+        if (NULL == header) {
+            continue;
+        }
+
+        if (__vsf_romfs_lookup_in_dir(image_head, header, name) != NULL) {
+            return true;
+        }
+    }
+    return false;
+}
+
 __vsf_component_peda_ifs_entry(__vk_romfs_mount, vk_fs_mount)
 {
     vsf_peda_begin();
@@ -187,9 +203,8 @@ __vsf_component_peda_ifs_entry(__vk_romfs_lookup, vk_file_lookup)
 lookup_next_image:
     nextfh = be32_to_cpu(header->nextfh);
     while (true) {
-        if (    strcmp((const char *)header->name, ".")
-            &&  strcmp((const char *)header->name, "..")
-            &&  ((nextfh & 0x0F) != ROMFS_FILEATTR_HIDE)) {
+        if (    strcmp((const char *)header->name, ".") && strcmp((const char *)header->name, "..")
+            &&  (!fsinfo->is_chained || !__vsf_romfs_should_hide(dir->image, image, dir, (char *)header->name))) {
             if (    (name && vk_file_is_match((char *)name, (char *)header->name))
                 ||  (!name && !idx)) {
                 found = true;
