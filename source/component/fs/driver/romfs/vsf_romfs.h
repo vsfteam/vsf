@@ -25,10 +25,8 @@
 #if VSF_USE_FS == ENABLED && VSF_FS_USE_ROMFS == ENABLED
 
 #if     defined(__VSF_ROMFS_CLASS_IMPLEMENT)
-#   undef __VSF_ROMFS_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_ROMFS_CLASS_INHERIT__)
-#   undef __VSF_ROMFS_CLASS_INHERIT__
 #   define __VSF_CLASS_INHERIT__
 #endif
 
@@ -85,9 +83,17 @@ extern const vk_fs_op_t vk_romfs_op;
 
 /*============================ PROTOTYPES ====================================*/
 
+#if defined(__VSF_ROMFS_CLASS_INHERIT__) || defined(__VSF_ROMFS_CLASS_IMPLEMENT)
+extern bool vsf_romfs_is_image_valid(vk_romfs_header_t *image);
+extern vk_romfs_header_t * vsf_romfs_chain_get_next(vk_romfs_header_t *image);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
+
+#undef __VSF_ROMFS_CLASS_IMPLEMENT
+#undef __VSF_ROMFS_CLASS_INHERIT__
 
 #endif      // VSF_USE_FS && VSF_FS_USE_ROMFS
 #endif      // __VSF_ROMFS_H__

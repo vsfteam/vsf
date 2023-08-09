@@ -98,9 +98,15 @@ const vk_fs_op_t vk_romfs_op = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static bool __vsf_romfs_is_image_valid(vk_romfs_header_t *image)
+bool vsf_romfs_is_image_valid(vk_romfs_header_t *image)
 {
     return (image->nextfh == be32_to_cpu(0x2d726f6d)) && (image->spec == be32_to_cpu(0x3166732d));
+}
+
+vk_romfs_header_t * vsf_romfs_chain_get_next(vk_romfs_header_t *image)
+{
+    image = (vk_romfs_header_t *)((uint8_t *)image + be32_to_cpu(image->size));
+    return vsf_romfs_is_image_valid(image) ? image : NULL;
 }
 
 static vk_romfs_header_t * __vsf_romfs_lookup_in_dir(vk_romfs_header_t *image, vk_romfs_header_t *dir, char *name)
@@ -171,7 +177,7 @@ __vsf_component_peda_ifs_entry(__vk_romfs_mount, vk_fs_mount)
 
     fsinfo->root.header = fsinfo->root.image = fsinfo->image;
     // basic check for romfs
-    if (!__vsf_romfs_is_image_valid(fsinfo->image)) {
+    if (!vsf_romfs_is_image_valid(fsinfo->image)) {
         vsf_eda_return(VSF_ERR_FAIL);
         return;
     }
@@ -263,10 +269,8 @@ lookup_next_image:
         }
     } else if (fsinfo->is_chained) {
         while (true) {
-            image = (vk_romfs_header_t *)((uint8_t *)image + be32_to_cpu(image->size));
-
-            if (    ((uint8_t *)image >= ((uint8_t *)fsinfo->image + fsinfo->image_size))
-                ||  !__vsf_romfs_is_image_valid(image)) {
+            image = vsf_romfs_chain_get_next(image);
+            if ((NULL == image) || ((uint8_t *)image >= ((uint8_t *)fsinfo->image + fsinfo->image_size))) {
                 goto not_found;
             }
 
