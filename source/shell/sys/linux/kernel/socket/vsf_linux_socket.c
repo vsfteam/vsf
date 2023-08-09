@@ -380,6 +380,9 @@ int getaddrinfo(const char *name, const char *service, const struct addrinfo *hi
         return EAI_BADFLAGS;
     }
 
+    uint16_t port = strtoul(service, NULL, 10);
+    // TODO: is port is 0, check service name to get real port
+
     // TODO: re-implement
     struct in_addr addr;
     if (!inet_aton(name, &addr)) {
@@ -410,6 +413,7 @@ int getaddrinfo(const char *name, const char *service, const struct addrinfo *hi
     ai->info.ai_addr        = &ai->sa;
     ai->sa_in.sin_family    = AF_INET;
     ai->sa_in.sin_addr      = addr;
+    ai->sa_in.sin_port      = htons(port);
     ai->info.ai_addrlen     = sizeof(ai->sa_in);
     *pai = &ai->info;
     return 0;
