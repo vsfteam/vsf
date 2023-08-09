@@ -405,6 +405,8 @@ int getaddrinfo(const char *name, const char *service, const struct addrinfo *hi
     memset(ai, 0, sizeof(struct __addrinfo));
 
     ai->info.ai_family      = AF_INET;
+    ai->info.ai_socktype    = hints->ai_socktype;
+    ai->info.ai_protocol    = hints->ai_protocol;
     ai->info.ai_addr        = &ai->sa;
     ai->sa_in.sin_family    = AF_INET;
     ai->sa_in.sin_addr      = addr;
