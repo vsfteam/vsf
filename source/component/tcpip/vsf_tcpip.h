@@ -25,6 +25,8 @@
 #include "./netdrv/vsf_netdrv.h"
 #include "./socket/vsf_socket.h"
 
+#include "./protocol/http/client/vsf_http_client.h"
+
 /*============================ MACROS ========================================*/
 
 // tcpip common, used for all tcpip stack porting
