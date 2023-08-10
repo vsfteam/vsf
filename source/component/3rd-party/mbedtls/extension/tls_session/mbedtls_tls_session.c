@@ -99,10 +99,10 @@ void mbedtls_session_close(mbedtls_session_t *session)
     mbedtls_session_cleanup(session);
 }
 
-int mbedtls_session_start_client(mbedtls_session_t *session,
-        const unsigned char *cert, size_t cert_len,
-        const char *host, const char *port)
+int mbedtls_session_connect(mbedtls_session_t *session, const char *host, const char *port)
 {
+    const unsigned char *cert = session->cert != NULL ? session->cert : (const unsigned char *)mbedtls_test_cas_pem;
+    size_t cert_len = session->cert != NULL ? session->cert_len : mbedtls_test_cas_pem_len;
     int ret;
 
     mbedtls_ctr_drbg_init(&session->ctr_drbg);

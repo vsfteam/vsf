@@ -48,6 +48,10 @@ vsf_class(mbedtls_session_t) {
         mbedtls_net_context server_fd;
         mbedtls_x509_crt cacert;
     )
+    public_member(
+        const unsigned char *cert;
+        size_t cert_len;
+    )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -57,8 +61,6 @@ extern void mbedtls_session_cleanup(mbedtls_session_t *session);
 extern int mbedtls_session_write(mbedtls_session_t *session, uint8_t *buf, uint16_t len);
 extern int mbedtls_session_read(mbedtls_session_t *session, uint8_t *buf, uint16_t len);
 extern void mbedtls_session_close(mbedtls_session_t *session);
-extern int mbedtls_session_start_client(mbedtls_session_t *session,
-        const unsigned char *cert, size_t cert_len,
-        const char *host, const char *port);
+extern int mbedtls_session_connect(mbedtls_session_t *session, const char *host, const char *port);
 
 #endif
