@@ -177,6 +177,10 @@ again:
                 cur_size = ++tmp - (char *)http->cur_buffer;
                 http->cur_buffer += cur_size;
                 http->cur_size -= cur_size;
+                if (0 == http->cur_chunk_size) {
+                    http->cur_chunk_size = -2;
+                    return result;
+                }
             }
             cur_size = vsf_min(len, http->cur_size);
             cur_size = vsf_min(cur_size, http->cur_chunk_size);
