@@ -24,6 +24,10 @@
 #define __VSF_HTTP_CLIENT_CLASS_IMPLEMENT
 #include "./vsf_http_client.h"
 
+#if VSF_USE_MBEDTLS == ENABLED
+#   include "component/3rd-party/mbedtls/extension/tls_session/mbedtls_tls_session.h"
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
