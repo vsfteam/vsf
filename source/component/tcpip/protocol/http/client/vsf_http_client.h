@@ -22,10 +22,6 @@
 
 #include "component/vsf_component_cfg.h"
 
-#if VSF_USE_MBEDTLS == ENABLED
-#   include "component/3rd-party/mbedtls/extension/tls_session/mbedtls_tls_session.h"
-#endif
-
 #if     defined(__VSF_HTTP_CLIENT_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_HTTP_CLIENT_CLASS_INHERIT__)
@@ -66,6 +62,9 @@ vsf_class(vsf_http_client_t) {
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_USE_MBEDTLS == ENABLED
+// to use mbedtls_http_op, user source code(.c) MUST include
+//  "component/3rd-party/mbedtls/extension/tls_session/mbedtls_tls_session.h",
+//  and set mbedtls_session_t instance to param of vsf_http_client_t.
 extern const vsf_http_op_t vsf_mbedtls_http_op;
 #endif
 
