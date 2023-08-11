@@ -679,7 +679,7 @@ VSF_LINUX_APPLET_PTHREAD_IMP(pthread_setname_np, int, pthread_t thread, const ch
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_getname_np, int, pthread_t thread, char *name, size_t size) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_getname_np)(thread, name);
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_getname_np)(thread, name, size);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_PTHREAD
