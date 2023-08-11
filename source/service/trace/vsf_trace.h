@@ -187,6 +187,7 @@ typedef struct vsf_trace_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_trace_string);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_trace_arg);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_trace_assert);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_trace);
 } vsf_trace_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_trace_vplt_t vsf_trace_vplt;

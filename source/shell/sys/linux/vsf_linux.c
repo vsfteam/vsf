@@ -4417,12 +4417,16 @@ __VSF_VPLT_DECORATOR__ vsf_linux_dlfcn_vplt_t vsf_linux_dlfcn_vplt = {
 __VSF_VPLT_DECORATOR__ vsf_linux_grp_vplt_t vsf_linux_grp_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_grp_vplt_t, 0, 0, true),
 
+    VSF_APPLET_VPLT_ENTRY_FUNC(initgroups),
     VSF_APPLET_VPLT_ENTRY_FUNC(getgroups),
     VSF_APPLET_VPLT_ENTRY_FUNC(setgroups),
     VSF_APPLET_VPLT_ENTRY_FUNC(getgrnam),
     VSF_APPLET_VPLT_ENTRY_FUNC(getgrgid),
     VSF_APPLET_VPLT_ENTRY_FUNC(getgrnam_r),
     VSF_APPLET_VPLT_ENTRY_FUNC(getgrgid_r),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getgrent),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setgrent),
+    VSF_APPLET_VPLT_ENTRY_FUNC(endgrent),
 };
 #endif
 
@@ -4601,11 +4605,16 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_LIBUSB == ENABLED
 #       include "./include/libusb/libusb.h"
 #   endif
-#   if VSF_LINUX_SOCKET_USE_INET == ENABLED && VSF_LINUX_APPLET_USE_IFADDRS == ENABLED
-#       include "./include/ifaddrs.h"
-#   endif
-#   if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
-#       include "./include/arpa/inet.h"
+#   if VSF_LINUX_SOCKET_USE_INET == ENABLED
+#       if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED
+#           include "./include/ifaddrs.h"
+#       endif
+#       if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
+#           include "./include/arpa/inet.h"
+#       endif
+#       if VSF_LINUX_APPLET_USE_NET_IF == ENABLED
+#           include "./include/net/if.h"
+#       endif
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
 #       include "./include/libgen.h"
@@ -4666,6 +4675,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #       endif
 #       if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
 #           include <arpa/inet.h>
+#       endif
+#       if VSF_LINUX_APPLET_USE_NET_IF == ENABLED
+#           include <net/if.h>
 #       endif
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
@@ -4891,6 +4903,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #       endif
 #       if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
     .arpa_inet_vplt     = (void *)&vsf_linux_arpa_inet_vplt,
+#       endif
+#       if VSF_LINUX_APPLET_USE_NET_IF == ENABLED
+    .net_if_vplt        = (void *)&vsf_linux_net_if_vplt,
 #       endif
 #   endif
 #   if VSF_LINUX_APPLET_USE_DLFCN == ENABLED
