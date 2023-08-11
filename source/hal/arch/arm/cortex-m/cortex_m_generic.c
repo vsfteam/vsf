@@ -406,4 +406,172 @@ int_fast8_t __vsf_arch_msb(uintalu_t a)
     return 31 - (int_fast8_t)__CLZ(a);
 }
 
+/*----------------------------------------------------------------------------*
+ * arch abi for applet                                                        *
+ *----------------------------------------------------------------------------*/
+
+#if VSF_APPLET_USE_ARCH_ABI == ENABLED && !defined(__VSF_APPLET__)
+//typedef struct {
+//    long long quot;
+//    long long rem;
+//} lldiv_t;
+typedef struct {
+    unsigned long long quot;
+    unsigned long long rem;
+} ulldiv_t;
+typedef struct {
+    int quot;
+    int rem;
+} idiv_return;
+typedef struct {
+    unsigned quot;
+    unsigned rem;
+} uidiv_return;
+
+extern double __aeabi_dadd(double, double);
+extern double __aeabi_ddiv(double, double);
+extern double __aeabi_dmul(double, double);
+extern double __aeabi_drsub(double, double);
+extern double __aeabi_dsub(double, double);
+extern void __aeabi_cdcmpeq(double, double);
+extern void __aeabi_cdcmple(double, double);
+extern void __aeabi_cdrcmple(double, double);
+extern int __aeabi_dcmpeq(double, double);
+extern int __aeabi_dcmplt(double, double);
+extern int __aeabi_dcmple(double, double);
+extern int __aeabi_dcmpge(double, double);
+extern int __aeabi_dcmpgt(double, double);
+extern int __aeabi_dcmpun(double, double);
+extern float __aeabi_fadd(float, float);
+extern float __aeabi_fdiv(float, float);
+extern float __aeabi_fmul(float, float);
+extern float __aeabi_frsub(float, float);
+extern float __aeabi_fsub(float, float);
+extern void __aeabi_cfcmpeq(float, float);
+extern void __aeabi_cfcmple(float, float);
+extern void __aeabi_cfrcmple(float, float);
+extern int __aeabi_fcmpeq(float, float);
+extern int __aeabi_fcmplt(float, float);
+extern int __aeabi_fcmple(float, float);
+extern int __aeabi_fcmpge(float, float);
+extern int __aeabi_fcmpgt(float, float);
+extern int __aeabi_fcmpun(float, float);
+extern int __aeabi_d2iz(double);
+extern unsigned __aeabi_d2uiz(double);
+extern long long __aeabi_d2lz(double);
+extern unsigned long long __aeabi_d2ulz(double);
+extern int __aeabi_f2iz(float);
+extern unsigned __aeabi_f2uiz(float);
+extern long long __aeabi_f2lz(float);
+extern unsigned long long __aeabi_f2ulz(float);
+extern float __aeabi_d2f(double);
+extern double __aeabi_f2d(float);
+extern double __aeabi_i2d(int);
+extern double __aeabi_ui2d(unsigned);
+extern double __aeabi_l2d(long long);
+extern double __aeabi_ul2d(unsigned long long);
+extern float __aeabi_i2f(int);
+extern float __aeabi_ui2f(unsigned);
+extern float __aeabi_l2f(long long);
+extern float __aeabi_ul2f(unsigned long long);
+extern long long __aeabi_lmul(long long, long long);
+extern lldiv_t __aeabi_ldivmod(long long, long long);
+extern ulldiv_t __aeabi_uldivmod(unsigned long long, unsigned long long);
+extern long long __aeabi_llsl(long long, int);
+extern long long __aeabi_llsr(long long, int);
+extern long long __aeabi_lasr(long long, int);
+extern int __aeabi_lcmp(long long, long long);
+extern int __aeabi_ulcmp(unsigned long long, unsigned long long);
+extern int __aeabi_idiv(int, int);
+extern unsigned __aeabi_uidiv(unsigned, unsigned);
+extern idiv_return __aeabi_idivmod(int, int);
+extern uidiv_return __aeabi_uidivmod(unsigned, unsigned);
+extern int __aeabi_idiv0(int);
+extern long long __aeabi_ldiv0(long long);
+extern int __aeabi_uread4(void *);
+extern int __aeabi_uwrite4(int, void *);
+extern long long __aeabi_uread8(void *);
+extern long long __aeabi_uwrite8(long long, void *);
+extern void __aeabi_memcpy8(void *, const void *, size_t);
+extern void __aeabi_memcpy4(void *, const void *, size_t);
+extern void __aeabi_memcpy(void *, const void *, size_t);
+extern void __aeabi_memmove8(void *, const void *, size_t);
+extern void __aeabi_memmove4(void *, const void *, size_t);
+extern void __aeabi_memmove(void *, const void *, size_t);
+extern void __aeabi_memset8(void *, size_t, int);
+extern void __aeabi_memset4(void *, size_t, int);
+extern void __aeabi_memset(void *, size_t, int);
+extern void __aeabi_memclr8(void *, size_t);
+extern void __aeabi_memclr4(void *, size_t);
+extern void __aeabi_memclr(void *, size_t);
+extern void *__aeabi_read_tp(void);
+
+__VSF_VPLT_DECORATOR__ vsf_arch_abi_vplt_t vsf_arch_abi_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_arch_abi_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_cdcmpeq),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_cdcmple),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_cdrcmple),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_cfcmpeq),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_cfcmple),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_cfrcmple),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_ldivmod),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_uldivmod),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_idivmod),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_uidivmod),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_d2f),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_f2d),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_lmul),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_llsl),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_llsr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_lasr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_lcmp),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_ulcmp),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_idiv),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_uidiv),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_uread4),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_uwrite4),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_uread8),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_uwrite8),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_dadd),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_ddiv),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_dmul),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_drsub),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_dsub),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_dcmpeq),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_dcmplt),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_dcmple),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_dcmpge),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_dcmpgt),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_dcmpun),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_fadd),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_fdiv),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_fmul),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_frsub),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_fsub),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_fcmpeq),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_fcmplt),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_fcmple),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_fcmpge),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_fcmpgt),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_fcmpun),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_d2iz),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_d2uiz),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_d2lz),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_d2ulz),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_f2iz),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_f2uiz),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_f2lz),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_f2ulz),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_i2d),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_ui2d),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_l2d),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_ul2d),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_i2f),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_ui2f),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_l2f),
+    VSF_APPLET_VPLT_ENTRY_FUNC(__aeabi_ul2f),
+};
+#endif
+
 /* EOF */

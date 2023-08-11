@@ -112,6 +112,7 @@ typedef struct vsf_vplt_t {
     void *service_vplt;
     void *kernel_vplt;
     void *component_vplt;
+    void *arch_abi_vplt;
 
     void *linux_vplt;
 } vsf_vplt_t;

@@ -19,6 +19,7 @@
 #define __CORTEX_M_GENERIC_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 
 #define __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
@@ -30,6 +31,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef __LITTLE_ENDIAN
@@ -109,6 +111,83 @@ typedef enum vsf_arch_prio_t {
 
     vsf_arch_prio_highest           = ((VSF_ARCH_PRI_NUM - 1 - (__vsf_arch_prio_index_number - 1))) & 0xFF ,
 } vsf_arch_prio_t;
+
+#ifndef VSF_APPLET_USE_ARCH_ABI
+#   define VSF_APPLET_USE_ARCH_ABI                  ENABLED
+#endif
+#if VSF_APPLET_USE_ARCH_ABI == ENABLED
+// functions in section 4 of "Run-Time ABI for the ARM Architecture"
+//  refer to: https://github.com/ARM-software/abi-aa/releases/download/2023Q1/rtabi32.pdf
+typedef struct vsf_arch_abi_vplt_t {
+    vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_cdcmpeq);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_cdcmple);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_cdrcmple);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_cfcmpeq);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_cfcmple);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_cfrcmple);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_ldivmod);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_uldivmod);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_idivmod);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_uidivmod);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_d2f);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_f2d);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_lmul);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_llsl);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_llsr);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_lasr);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_lcmp);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_ulcmp);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_idiv);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_uidiv);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_uread4);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_uwrite4);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_uread8);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_uwrite8);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_dadd);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_ddiv);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_dmul);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_drsub);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_dsub);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_dcmpeq);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_dcmplt);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_dcmple);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_dcmpge);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_dcmpgt);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_dcmpun);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_fadd);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_fdiv);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_fmul);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_frsub);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_fsub);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_fcmpeq);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_fcmplt);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_fcmple);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_fcmpge);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_fcmpgt);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_fcmpun);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_d2iz);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_d2uiz);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_d2lz);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_d2ulz);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_f2iz);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_f2uiz);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_f2lz);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_f2ulz);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_i2d);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_ui2d);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_l2d);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_ul2d);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_i2f);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_ui2f);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_l2f);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__aeabi_ul2f);
+} vsf_arch_abi_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_arch_abi_vplt_t vsf_arch_abi_vplt;
+#   endif
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

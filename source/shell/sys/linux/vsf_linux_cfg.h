@@ -381,7 +381,7 @@ typedef struct vsf_linux_vplt_t {
     void *service_vplt;
     void *kernel_vplt;
     void *component_vplt;
-    void *libc_arch_vplt;
+    void *arch_abi_vplt;
 
     // fundmental, vsf APIs for linux
     void *fundmental_vplt;

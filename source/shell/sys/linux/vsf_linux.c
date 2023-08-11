@@ -4755,191 +4755,193 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_vplt_t, 0, 0, false),
 
     .applet_vplt        = (void *)&vsf_applet_vplt,
-#   if VSF_APPLET_USE_ARCH == ENABLED
+#if VSF_APPLET_USE_ARCH == ENABLED
     .arch_vplt          = (void *)&vsf_arch_vplt,
-#   endif
-#   if VSF_APPLET_USE_SERVICE == ENABLED
+#endif
+#if VSF_APPLET_USE_SERVICE == ENABLED
     .service_vplt       = (void *)&vsf_service_vplt,
-#   endif
-//    libc_arch_vplt      = (void *)&vsf_libc_arch_vplt,
+#endif
+#if VSF_APPLET_USE_ARCH_ABI == ENABLED
+    .arch_abi_vplt      = (void *)&vsf_arch_abi_vplt,
+#endif
 
     .fundmental_vplt    = (void *)&vsf_linux_fundmental_vplt,
 
-#   if VSF_LINUX_APPLET_USE_LIBC_STDIO == ENABLED
+#if VSF_LINUX_APPLET_USE_LIBC_STDIO == ENABLED
     .libc_stdio_vplt    = (void *)&vsf_linux_libc_stdio_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_LIBC_STDLIB == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_LIBC_STDLIB == ENABLED
     .libc_stdlib_vplt   = (void *)&vsf_linux_libc_stdlib_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_LIBC_STRING == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_LIBC_STRING == ENABLED
     .libc_string_vplt   = (void *)&vsf_linux_libc_string_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_LIBC_CTYPE == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_LIBC_CTYPE == ENABLED
     .libc_ctype_vplt    = (void *)&vsf_linux_libc_ctype_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_LIBC_TIME == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_LIBC_TIME == ENABLED
     .libc_time_vplt     = (void *)&vsf_linux_libc_time_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED
     .libc_setjmp_vplt   = (void *)&vsf_linux_libc_setjmp_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_LIBC_ASSERT == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_LIBC_ASSERT == ENABLED
     .libc_assert_vplt   = (void *)&vsf_linux_libc_assert_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED
     .libc_math_vplt     = (void *)&vsf_linux_libc_math_vplt,
-#   endif
+#endif
 
-#   if VSF_LINUX_APPLET_USE_MNTENT == ENABLED
+#if VSF_LINUX_APPLET_USE_MNTENT == ENABLED
     .mntent_vplt        = (void *)&vsf_linux_mntent_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_EPOLL == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_EPOLL == ENABLED
     .sys_epoll_vplt     = (void *)&vsf_linux_sys_epoll_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_EVENTFD == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_EVENTFD == ENABLED
     .sys_eventfd_vplt   = (void *)&vsf_linux_sys_eventfd_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_RANDOM == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_RANDOM == ENABLED
     .sys_random_vplt    = (void *)&vsf_linux_sys_random_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_SELECT == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_SELECT == ENABLED
     .sys_select_vplt    = (void *)&vsf_linux_sys_select_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_SHM == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_SHM == ENABLED
     .sys_shm_vplt       = (void *)&vsf_linux_sys_shm_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_STAT == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_STAT == ENABLED
     .sys_stat_vplt      = (void *)&vsf_linux_sys_stat_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_MMAN == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_MMAN == ENABLED
     .sys_mman_vplt      = (void *)&vsf_linux_sys_mman_vplt,
-#   endif
-#   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-#       if VSF_LINUX_APPLET_USE_SYS_TIME == ENABLED
+#endif
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+#   if VSF_LINUX_APPLET_USE_SYS_TIME == ENABLED
     .sys_time_vplt      = (void *)&vsf_linux_sys_time_vplt,
-#       endif
-#       if VSF_LINUX_APPLET_USE_SYS_TIMES == ENABLED
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_TIMES == ENABLED
     .sys_times_vplt     = (void *)&vsf_linux_sys_times_vplt,
-#       endif
 #   endif
-#   if VSF_LINUX_APPLET_USE_SYS_WAIT == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_WAIT == ENABLED
     .sys_wait_vplt      = (void *)&vsf_linux_sys_wait_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_UTSNAME == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_UTSNAME == ENABLED
     .sys_utsname_vplt   = (void *)&vsf_linux_sys_utsname_vplt,
-#   endif
-#   if VSF_LINUX_USE_SOCKET == ENABLED && VSF_LINUX_APPLET_USE_SYS_SOCKET == ENABLED
+#endif
+#if VSF_LINUX_USE_SOCKET == ENABLED && VSF_LINUX_APPLET_USE_SYS_SOCKET == ENABLED
     .sys_socket_vplt    = (void *)&vsf_linux_sys_socket_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_SENDFILE == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_SENDFILE == ENABLED
     .sys_sendfile_vplt  = (void *)&vsf_linux_sys_sendfile_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_REBOOT == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_REBOOT == ENABLED
     .sys_reboot_vplt    = (void *)&vsf_linux_sys_reboot_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_FILE == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_FILE == ENABLED
     .sys_file_vplt      = (void *)&vsf_linux_sys_file_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_PRCTL == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_PRCTL == ENABLED
     .sys_prctl_vplt     = (void *)&vsf_linux_sys_prctl_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_EVENT == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_EVENT == ENABLED
     .sys_event_vplt     = (void *)&vsf_linux_sys_event_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_STATFS == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_STATFS == ENABLED
     .sys_statfs_vplt    = (void *)&vsf_linux_sys_statfs_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_CAPABILITY == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_CAPABILITY == ENABLED
     .sys_capability_vplt    = (void *)&vsf_linux_sys_capability_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_TIMEX == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_TIMEX == ENABLED
     .sys_timex_vplt     = (void *)&vsf_linux_sys_timex_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_SYSMACROS == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_SYSMACROS == ENABLED
     .sys_sysmacros_vplt = (void *)&vsf_linux_sys_sysmacros_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_STATVFS == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_STATVFS == ENABLED
     .sys_statvfs_vplt   = (void *)&vsf_linux_sys_statvfs_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_RESOURCE == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_RESOURCE == ENABLED
     .sys_resource_vplt  = (void *)&vsf_linux_sys_resource_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SYS_INFO == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_INFO == ENABLED
     .sys_info_vplt      = (void *)&vsf_linux_sys_info_vplt,
-#   endif
+#endif
 
-#   if VSF_LINUX_APPLET_USE_UNISTD == ENABLED
+#if VSF_LINUX_APPLET_USE_UNISTD == ENABLED
     .unistd_vplt        = (void *)&vsf_linux_unistd_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_ERRNO == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_ERRNO == ENABLED
     .errno_vplt         = (void *)&vsf_linux_errno_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SIGNAL == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SIGNAL == ENABLED
     .signal_vplt        = (void *)&vsf_linux_signal_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_PTHREAD == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_PTHREAD == ENABLED
     .pthread_vplt       = (void *)&vsf_linux_pthread_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_POLL == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_POLL == ENABLED
     .poll_vplt          = (void *)&vsf_linux_poll_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SEMAPHORE == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SEMAPHORE == ENABLED
     .semaphore_vplt     = (void *)&vsf_linux_semaphore_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_DIRENT == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_DIRENT == ENABLED
     .dirent_vplt        = (void *)&vsf_linux_dirent_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SPAWN == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SPAWN == ENABLED
     .spawn_vplt         = (void *)&vsf_linux_spawn_vplt,
-#   endif
+#endif
 #if VSF_LINUX_APPLET_USE_TERMIOS == ENABLED
     .termios_vplt       = (void *)&vsf_linux_termios_vplt,
 #endif
-#   if VSF_LINUX_APPLET_USE_FCNTL == ENABLED
+#if VSF_LINUX_APPLET_USE_FCNTL == ENABLED
     .fcntl_vplt         = (void *)&vsf_linux_fcntl_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_SCHED == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_SCHED == ENABLED
     .sched_vplt         = (void *)&vsf_linux_sched_vplt,
-#   endif
-#   if VSF_LINUX_SOCKET_USE_INET == ENABLED
-#       if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED
+#endif
+#if VSF_LINUX_SOCKET_USE_INET == ENABLED
+#   if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED
     .ifaddrs_vplt       = (void *)&vsf_linux_ifaddrs_vplt,
-#       endif
-#       if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
+#   endif
+#   if VSF_LINUX_APPLET_USE_ARPA_INET == ENABLED
     .arpa_inet_vplt     = (void *)&vsf_linux_arpa_inet_vplt,
-#       endif
-#       if VSF_LINUX_APPLET_USE_NET_IF == ENABLED
+#   endif
+#   if VSF_LINUX_APPLET_USE_NET_IF == ENABLED
     .net_if_vplt        = (void *)&vsf_linux_net_if_vplt,
-#       endif
 #   endif
-#   if VSF_LINUX_APPLET_USE_DLFCN == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_DLFCN == ENABLED
     .dlfcn_vplt         = (void *)&vsf_linux_dlfcn_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_GLOB == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_GLOB == ENABLED
     .glob_vplt          = (void *)&vsf_linux_glob_vplt,
-#   endif
-#   if VSF_LINUX_SOCKET_USE_INET == ENABLED && VSF_LINUX_APPLET_USE_NETDB == ENABLED
+#endif
+#if VSF_LINUX_SOCKET_USE_INET == ENABLED && VSF_LINUX_APPLET_USE_NETDB == ENABLED
     .netdb_vplt         = (void *)&vsf_linux_netdb_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_PWD == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_PWD == ENABLED
     .pwd_vplt           = (void *)&vsf_linux_pwd_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_FINDPROG == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_FINDPROG == ENABLED
     .findprog_vplt      = (void *)&vsf_linux_findprog_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_FNMATCH == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_FNMATCH == ENABLED
     .fnmatch_vplt       = (void *)&vsf_linux_fnmatch_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_GRP == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_GRP == ENABLED
     .grp_vplt           = (void *)&vsf_linux_grp_vplt,
-#   endif
+#endif
 
-#   if VSF_LINUX_USE_LIBUSB == ENABLED && VSF_LINUX_APPLET_USE_LIBUSB == ENABLED
+#if VSF_LINUX_USE_LIBUSB == ENABLED && VSF_LINUX_APPLET_USE_LIBUSB == ENABLED
     .libusb_vplt        = (void *)&vsf_linux_libusb_vplt,
-#   endif
-#   if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
+#endif
+#if VSF_LINUX_APPLET_USE_LIBGEN == ENABLED
     .libgen_vplt        = (void *)&vsf_linux_libgen_vplt,
-#   endif
+#endif
 };
 #endif
 
