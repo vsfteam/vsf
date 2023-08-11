@@ -4761,6 +4761,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   if VSF_APPLET_USE_SERVICE == ENABLED
     .service_vplt       = (void *)&vsf_service_vplt,
 #   endif
+//    libc_arch_vplt      = (void *)&vsf_libc_arch_vplt,
 
     .fundmental_vplt    = (void *)&vsf_linux_fundmental_vplt,
 
@@ -4772,6 +4773,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_STRING == ENABLED
     .libc_string_vplt   = (void *)&vsf_linux_libc_string_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBC_CTYPE == ENABLED
+    .libc_ctype_vplt    = (void *)&vsf_linux_libc_ctype_vplt,
 #   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_TIME == ENABLED
     .libc_time_vplt     = (void *)&vsf_linux_libc_time_vplt,

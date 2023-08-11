@@ -21,6 +21,17 @@ extern "C" {
 #define CTYPE_B             0x80        // space
 #define CTYPE_SP            (CTYPE_S | CTYPE_P)
 
+#if VSF_LINUX_APPLET_USE_LIBC_CTYPE == ENABLED
+typedef struct vsf_linux_libc_ctype_vplt_t {
+    vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_linux_ctype);
+} vsf_linux_libc_ctype_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_ctype_vplt_t vsf_linux_libc_ctype_vplt;
+#   endif
+#endif
+
 extern const char __vsf_linux_ctype[1 + 256];
 #define __ismask(__x)       (__vsf_linux_ctype[(int)(unsigned char)(__x) + 1])
 

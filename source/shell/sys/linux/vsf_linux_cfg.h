@@ -343,6 +343,9 @@
 #       if !defined(VSF_LINUX_APPLET_USE_LIBC_STRING) && VSF_LINUX_USE_SIMPLE_STRING == ENABLED
 #           define VSF_LINUX_APPLET_USE_LIBC_STRING ENABLED
 #       endif
+#       if !defined(VSF_LINUX_APPLET_USE_LIBC_CTYPE) && VSF_LINUX_USE_SIMPLE_CTYPE == ENABLED
+#           define VSF_LINUX_APPLET_USE_LIBC_CTYPE  ENABLED
+#       endif
 #       if !defined(VSF_LINUX_APPLET_USE_LIBC_TIME) && VSF_LINUX_USE_SIMPLE_TIME == ENABLED
 #           define VSF_LINUX_APPLET_USE_LIBC_TIME   ENABLED
 #       endif
@@ -378,6 +381,7 @@ typedef struct vsf_linux_vplt_t {
     void *service_vplt;
     void *kernel_vplt;
     void *component_vplt;
+    void *libc_arch_vplt;
 
     // fundmental, vsf APIs for linux
     void *fundmental_vplt;
@@ -386,6 +390,7 @@ typedef struct vsf_linux_vplt_t {
     void *libc_stdio_vplt;
     void *libc_stdlib_vplt;
     void *libc_string_vplt;
+    void *libc_ctype_vplt;
     void *libc_time_vplt;
     void *libc_setjmp_vplt;
     void *libc_assert_vplt;
