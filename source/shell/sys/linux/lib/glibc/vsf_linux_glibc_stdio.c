@@ -361,11 +361,14 @@ char * fgets(char *str, int n, FILE *f)
         }
 
         if (isatty(fd)) {
-            if ('\r' == ch) {
-               write(STDOUT_FILENO, "\n", 1);
-            } else if ('\n' == ch) {
-                continue;
-            }
+// remove code below, which intends to append '\n' after '\r'????
+// code below will fail if enter is \n
+// message vendor if any problem related to fgets
+//            if ('\r' == ch) {
+//               write(STDOUT_FILENO, "\n", 1);
+//            } else if ('\n' == ch) {
+//                continue;
+//            }
             if (('\b' == ch) || (0x7F == ch)) {
                 int back_cnt = vsf_min(rsize, 1);
                 rsize -= back_cnt;
