@@ -21,6 +21,9 @@
 
 #if VSF_USE_TCPIP == ENABLED
 
+// for vsf_min
+#include "utilities/vsf_utilities.h"
+
 #define __VSF_HTTP_CLIENT_CLASS_IMPLEMENT
 #include "./vsf_http_client.h"
 
