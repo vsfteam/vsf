@@ -31,10 +31,10 @@ extern "C" {
 typedef int nfds_t;
 
 #define POLLIN          (1 << 0)
-#define POLLOUT         (1 << 1)
-#define POLLPRI         (1 << 2)
-#define POLLHUP         (1 << 3)
-#define POLLERR         (1 << 4)
+#define POLLPRI         (1 << 1)
+#define POLLOUT         (1 << 2)
+#define POLLERR         (1 << 3)
+#define POLLHUP         (1 << 4)
 #define POLLNVAL        (1 << 5)
 
 #define POLLRDNORM      (1 << 6)

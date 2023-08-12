@@ -1,7 +1,7 @@
 #ifndef __SIMPLE_LIBC_LIMITS_H__
 #define __SIMPLE_LIBC_LIMITS_H__
 
-#define CHAR_BIT                        (sizeof(char) * 8)
+#define CHAR_BIT                        8
 #define LONG_BIT                        32
 #define WORD_BIT                        32
 

@@ -172,14 +172,16 @@ enum {
 #define MSG_OOB         MSG_OOB
     MSG_PEEK            = 1 << 1,
 #define MSG_PEEK        MSG_PEEK
-    MSG_WAITALL         = 1 << 2,
-#define MSG_WAITALL     MSG_WAITALL
-    MSG_NOSIGNAL        = 1 << 3,
-#define MSG_NOSIGNAL    MSG_NOSIGNAL
-    MSG_DONTWAIT        = 1 << 4,
-#define MSG_DONTWAIT    MSG_DONTWAIT
-    MSG_TRUNC           = 1 << 5
+    MSG_DONTROUTE       = 1 << 2,
+#define MSG_DONTROUTE   MSG_DONTROUTE
+    MSG_TRUNC           = 1 << 5,
 #define MSG_TRUNC       MSG_TRUNC
+    MSG_DONTWAIT        = 1 << 6,
+#define MSG_DONTWAIT    MSG_DONTWAIT
+    MSG_WAITALL         = 1 << 8,
+#define MSG_WAITALL     MSG_WAITALL
+    MSG_NOSIGNAL        = 1 << 14,
+#define MSG_NOSIGNAL    MSG_NOSIGNAL
 };
 
 struct msghdr {
