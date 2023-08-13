@@ -4,6 +4,8 @@
 
 #define __VSF_LINUX_CLASS_INHERIT__
 #define __VSF_LINUX_FS_CLASS_IMPLEMENT
+// for process->working_dir
+#define __VSF_LINUX_CLASS_IMPLEMENT
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../../include/unistd.h"
 #   include "../../../include/errno.h"
@@ -46,7 +48,7 @@
 #   include <dlfcn.h>
 #endif
 
-#define VSH_PROMPT                  ">>>"
+#define VSH_PROMPT                  "# "
 
 #ifndef PATH_MAX
 #   define PATH_MAX                 256
@@ -661,15 +663,20 @@ int vsh_main(int argc, char *argv[])
 #endif
     );
 
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(STDIN_FILENO);
+    vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)sfd->priv;
+
     while (1) {
     input_cmd:
         memset(ctx.cmd, 0, sizeof(ctx.cmd));
         ctx.pos = 0;
 
         state = SHELL_STATE_NORMAL;
-        printf(VSH_PROMPT);
+        printf("%s "VSH_PROMPT, process->working_dir);
         fflush(stdout);
         while (1) {
+            term_priv->line_start = !ctx.pos;
             while (read(STDIN_FILENO, &ch, 1) != 1) {
                 if ((errno != EINTR) && isatty(STDIN_FILENO)) {
                     fprintf(stderr, "fail to read from stdin, is stdin disconnected?" VSH_LINEEND);

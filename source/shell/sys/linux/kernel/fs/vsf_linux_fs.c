@@ -2789,9 +2789,15 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
                     case '\0':
                     char_input:
                         switch (ch) {
-                        case '\033':term_priv->esc_type = '\033';       break;
+                        case '\033':
+                            term_priv->esc_type = '\033';
+                            break;
                         case 0x7F:
-                        case '\b':  write(STDOUT_FILENO, "\b \b", 3);   break;
+                        case '\b':
+                            if (!term_priv->line_start) {
+                                write(STDOUT_FILENO, "\b \b", 3);
+                            }
+                            break;
                         default:
                             write(STDOUT_FILENO, &ch, 1);
                             break;

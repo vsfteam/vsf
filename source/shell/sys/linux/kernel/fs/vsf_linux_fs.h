@@ -167,6 +167,7 @@ typedef struct vsf_linux_term_priv_t {
     const vsf_linux_fd_op_t *subop;
     struct termios termios;
     char esc_type;
+    bool line_start;
 } vsf_linux_term_priv_t;
 #endif
 
