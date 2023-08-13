@@ -120,20 +120,11 @@ typedef enum {
 //! \brief system macros
 #ifndef VSF_ASSERT
 #   if VSF_USE_TRACE == ENABLED
-#       ifdef __VSF_APPLET__
-#           define VSF_ASSERT(...)                                              \
-    if (!(__VA_ARGS__)) {                                                       \
-        printf("%s:%d %s -- assertion failed\n", __FILE__, __LINE__, __FUNCTION__);\
-        while(1);                                                               \
-    }
-#       else
-#           define VSF_ASSERT(...)                                              \
-    if (!(__VA_ARGS__)) {                                                       \
-        extern void vsf_trace_assert(const char *file, int line, const char *func);\
-        vsf_trace_assert(__FILE__, __LINE__, __FUNCTION__);                     \
-        while(1);                                                               \
-    }
-#       endif
+extern void vsf_trace_assert(const char *expr, const char *file, int line, const char *func);
+#       define VSF_ASSERT(__EXPR)                                               \
+    ((__EXPR)                                                                   \
+    ? (void)0                                                                   \
+    : vsf_trace_assert(#__EXPR, __FILE__, __LINE__, __FUNCTION__))
 #   else
 #       define VSF_ASSERT                   assert
 #   endif

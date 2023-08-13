@@ -336,9 +336,10 @@ void vsf_trace(vsf_trace_level_t level, const char *format, ...)
     __vsf_trace_set_level(VSF_TRACE_CFG_DEFAULT_LEVEL);
 }
 
-void vsf_trace_assert(const char *file, int line, const char *func)
+void vsf_trace_assert(const char *expr, const char *file, int line, const char *func)
 {
-    vsf_trace_error("%s:%d %s -- assertion failed\n", file, line, func);
+    vsf_trace_error("%s:%d %s -- assertion failed on %s\n", file, line, func, expr);
+    while (true);
 }
 
 #if VSF_APPLET_USE_TRACE == ENABLED && !defined(__VSF_APPLET__)

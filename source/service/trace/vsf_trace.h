@@ -217,8 +217,8 @@ VSF_APPLET_TRACE_IMP(vsf_trace_arg, void, vsf_trace_level_t level, const char *f
 VSF_APPLET_TRACE_IMP(__vsf_trace_output, uint_fast32_t, const char *buff, uint_fast32_t size) {
     return VSF_APPLET_TRACE_ENTRY(__vsf_trace_output)(buff, size);
 }
-VSF_APPLET_TRACE_IMP(vsf_trace_assert, void, const char *file, int line, const char *func) {
-    VSF_APPLET_TRACE_ENTRY(vsf_trace_assert)(file, line, func);
+VSF_APPLET_TRACE_IMP(vsf_trace_assert, void, const char *expr, const char *file, int line, const char *func) {
+    VSF_APPLET_TRACE_ENTRY(vsf_trace_assert)(expr, file, line, func);
 }
 
 VSF_APPLET_VPLT_FUNC_DECORATOR void vsf_trace(vsf_trace_level_t level, const char *format, ...) {
@@ -242,7 +242,7 @@ extern void vsf_trace_arg(vsf_trace_level_t level, const char *format, va_list a
 extern void vsf_trace(vsf_trace_level_t level, const char *format, ...);
 
 extern uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size);
-extern void vsf_trace_assert(const char *file, int line, const char *func);
+extern void vsf_trace_assert(const char *expr, const char *file, int line, const char *func);
 
 #endif
 
