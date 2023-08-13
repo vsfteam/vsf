@@ -350,6 +350,14 @@ char * fgets(char *str, int n, FILE *f)
     int fd = ((vsf_linux_fd_t *)f)->fd;
     char ch, *result = str, *cur = NULL;
     int rsize = 0;
+    bool is_tty = isatty(fd), is_to_echo = false;
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    vsf_linux_fd_priv_t *priv = sfd->priv;
+
+    if (is_tty) {
+        vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)priv;
+        is_to_echo = !(priv->flags & O_NOCTTY) && (term_priv->termios.c_lflag & ECHO);
+    }
 
     while (true) {
         if (read(fd, &ch, 1) != 1) {
@@ -360,15 +368,12 @@ char * fgets(char *str, int n, FILE *f)
             cur = str;
         }
 
-        if (isatty(fd)) {
-// remove code below, which intends to append '\n' after '\r'????
-// code below will fail if enter is \n
-// message vendor if any problem related to fgets
-//            if ('\r' == ch) {
-//               write(STDOUT_FILENO, "\n", 1);
-//            } else if ('\n' == ch) {
-//                continue;
-//            }
+        if (is_tty) {
+            // some terminal uses \r as enter, if echo is enabled,
+            //  add and \n, so the output will be \r\n
+            if (('\r' == ch) && is_to_echo) {
+               write(STDOUT_FILENO, "\n", 1);
+            }
             if (('\b' == ch) || (0x7F == ch)) {
                 int back_cnt = vsf_min(rsize, 1);
                 rsize -= back_cnt;
@@ -381,12 +386,17 @@ char * fgets(char *str, int n, FILE *f)
         str++;
         if ('\r' == ch) {
             str[-1] = '\n';
+
             // check next possible '\n'
-            if (read(fd, &ch, 1) != 1) {
+            int old_flags = sfd->priv->flags;
+            priv->flags |= O_NONBLOCK;
+            ssize_t len = read(fd, &ch, 1);
+            priv->flags = old_flags;
+
+            if (len != 1) {
                 break;
             }
             if (ch != '\n') {
-                vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
                 sfd->unget_buff = ch;
             }
             break;
@@ -802,6 +812,9 @@ FILE * popen(const char *command, const char *type)
         return NULL;
     }
 
+    const char *argv[] = { "sh", "-c", command, (const char *)NULL };
+    vsf_linux_process_ctx_t *ctx;
+    vsf_linux_process_t *cur_process;
     vsf_linux_main_entry_t entry;
     extern int __vsf_linux_get_exe(char *pathname, int pathname_len, char *cmd, vsf_linux_main_entry_t *entry, bool use_path);
 #if __VSF_LINUX_PROCESS_HAS_PATH
@@ -818,13 +831,12 @@ FILE * popen(const char *command, const char *type)
     }
 
     // avoid to use spawn for better performance, skip unnecessary fd operations
-    vsf_linux_process_ctx_t *ctx = &process->ctx;
+    ctx = &process->ctx;
     ctx->entry = entry;
 
-    vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
+    cur_process = vsf_linux_get_cur_process();
     process->shell_process = cur_process->shell_process;
 
-    const char *argv[] = { "sh", "-c", command, (const char *)NULL };
     __vsf_linux_process_parse_arg(process, NULL, (char * const *)argv);
 
     vsf_linux_fd_t *sfd;
