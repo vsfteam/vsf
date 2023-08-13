@@ -22,6 +22,11 @@
 #include "./shell/sys/linux/vsf_linux_cfg.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_DYNAMIC_VPLT_INCREASE_SIZE
+#   define VSF_DYNAMIC_VPLT_INCREASE_SIZE       8
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -43,6 +48,14 @@ __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt = {
     .linux_vplt         = (void *)&vsf_linux_vplt,
 #   endif
 };
+#endif
+
+#if VSF_USE_APPLET == ENABLED || (VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_APPLET == ENABLED)
+#   if VSF_APPLET_CFG_LINKABLE == ENABLED
+vsf_dynamic_vplt_t vsf_dynamic_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_dynamic_vplt, 0, 0, false),
+};
+#   endif
 #endif
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -83,6 +96,60 @@ WEAK(vsf_vplt_link)
 void * vsf_vplt_link(void *vplt, char *symname)
 {
     return __vsf_vplt_link(vplt, symname);
+}
+
+int vsf_vplt_load_dyn(vsf_vplt_info_t *info)
+{
+    vsf_vplt_info_t *vplt_entry = (vsf_vplt_info_t *)vsf_dynamic_vplt.ram_vplt;
+    int entry_num = (NULL == vplt_entry) ? 0 : vplt_entry->entry_num;
+    vsf_protect_t orig;
+
+    if (NULL == vplt_entry) {
+    increate_entry:
+        vsf_vplt_info_t * vplt_entry_new = vsf_heap_malloc(
+            sizeof(vsf_vplt_info_t) + sizeof(void *) * (entry_num + VSF_DYNAMIC_VPLT_INCREASE_SIZE));
+        if (NULL == vplt_entry_new) {
+            return VSF_ERR_NOT_ENOUGH_RESOURCES;
+        }
+
+        int old_size = sizeof(vsf_vplt_info_t) + sizeof(void *) * entry_num;
+        if (NULL == vplt_entry) {
+            vplt_entry_new->__make_vplt_info_aligned = NULL;
+        } else {
+            memcpy(vplt_entry_new, vplt_entry, old_size);
+        }
+        memset((uint8_t *)vplt_entry_new + old_size, 0, sizeof(void *) * VSF_DYNAMIC_VPLT_INCREASE_SIZE);
+        vplt_entry_new->entry_num += VSF_DYNAMIC_VPLT_INCREASE_SIZE;
+
+        orig = vsf_protect_int();
+        vsf_dynamic_vplt.ram_vplt = (void *)vplt_entry_new;
+        vsf_unprotect_int(orig);
+
+        if (vplt_entry != NULL) {
+            vsf_heap_free(vplt_entry);
+        }
+        vplt_entry = vplt_entry_new;
+        entry_num += VSF_DYNAMIC_VPLT_INCREASE_SIZE;
+    }
+
+    vsf_vplt_info_t **vplt_entry_sub = (vsf_vplt_info_t **)&vplt_entry[1], **vplt_entry_empty = NULL;
+    for (int i = 0; i < entry_num; i++, vplt_entry_sub++) {
+        if (NULL == *vplt_entry_sub) {
+            if (NULL == vplt_entry_empty) {
+                vplt_entry_empty = vplt_entry_sub;
+            }
+        } else if (*vplt_entry_sub == info) {
+            // already installed
+            return VSF_ERR_NONE;
+        }
+    }
+
+    if (NULL == vplt_entry_empty) {
+        goto increate_entry;
+    }
+
+    *vplt_entry_empty = info;
+    return VSF_ERR_NONE;
 }
 #   endif
 

@@ -4764,6 +4764,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #if VSF_APPLET_USE_ARCH_ABI == ENABLED
     .arch_abi_vplt      = (void *)&vsf_arch_abi_vplt,
 #endif
+    .dynamic_vplt       = (void *)&vsf_dynamic_vplt,
 
     .fundmental_vplt    = (void *)&vsf_linux_fundmental_vplt,
 

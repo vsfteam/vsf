@@ -382,6 +382,7 @@ typedef struct vsf_linux_vplt_t {
     void *kernel_vplt;
     void *component_vplt;
     void *arch_abi_vplt;
+    void *dynamic_vplt;
 
     // fundmental, vsf APIs for linux
     void *fundmental_vplt;
@@ -476,12 +477,9 @@ typedef struct vsf_linux_vplt_t {
     void *unix_res6_vplt;
     void *unix_res7_vplt;
 
-    // libraries
+    // built-in libraries
     void *libusb_vplt;
     void *libgen_vplt;
-    void *libsdl2_vplt;
-    void *libncurses_vplt;
-    void *libcurl_vplt;
 
     // for compatibility, new entries added below
 } vsf_linux_vplt_t;

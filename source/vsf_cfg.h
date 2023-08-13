@@ -113,9 +113,19 @@ typedef struct vsf_vplt_t {
     void *kernel_vplt;
     void *component_vplt;
     void *arch_abi_vplt;
+    void *dynamic_vplt;
 
     void *linux_vplt;
 } vsf_vplt_t;
+
+typedef struct vsf_dynamic_vplt_t {
+    vsf_vplt_info_t info;
+    void *ram_vplt;
+} vsf_dynamic_vplt_t;
+#ifndef __VSF_APPLET__
+extern vsf_dynamic_vplt_t vsf_dynamic_vplt;
+extern int vsf_vplt_load_dyn(vsf_vplt_info_t *info);
+#endif
 
 #ifndef VSF_APPLET_CFG_LINKABLE
 #   define VSF_APPLET_CFG_LINKABLE              ENABLED
