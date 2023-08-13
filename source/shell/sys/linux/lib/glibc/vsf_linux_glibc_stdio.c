@@ -353,13 +353,17 @@ char * fgets(char *str, int n, FILE *f)
     bool is_tty = isatty(fd), is_to_echo = false;
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
     vsf_linux_fd_priv_t *priv = sfd->priv;
+    vsf_linux_term_priv_t *term_priv = NULL;
 
     if (is_tty) {
-        vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)priv;
+        term_priv = (vsf_linux_term_priv_t *)priv;
         is_to_echo = !(priv->flags & O_NOCTTY) && (term_priv->termios.c_lflag & ECHO);
     }
 
     while (true) {
+        if (term_priv != NULL) {
+            term_priv->line_start = !rsize;
+        }
         if (read(fd, &ch, 1) != 1) {
             break;
         }
