@@ -84,6 +84,7 @@ typedef struct vsf_elfloader_info_t {
 
     uintptr_t entry_offset_in_file;
     bool has_dynamic;
+    bool link_fail;
 } vsf_elfloader_info_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -401,7 +402,8 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_loader_targe
 
                 if (vsf_elfloader_arch_link(elfloader, symname, &tgtvalue) < 0) {
                     vsf_trace_error("fail to locate %s" VSF_TRACE_CFG_LINEEND, symname);
-                    return -1;
+                    linfo->link_fail = true;
+                    continue;
                 }
             } else if (__vsf_elfloader_is_vaddr_loaded(elfloader, u.rel->r_offset)) {
                 tgtvalue = (Elf_Addr)0;
@@ -516,6 +518,7 @@ second_round_for_ram_base:
             goto cleanup_and_fail;
         }
 
+        linfo.link_fail = false;
         if (    (   (linfo.dynamic.pltrelsz > 0)
                 &&  (__vsf_elfloader_rel_rela(elfloader, target, &linfo, linfo.dynamic.pltrel, linfo.dynamic.jmprel, linfo.dynamic.pltrelsz, true) < 0))
             ||  (   (linfo.dynamic.relasz > 0)
@@ -536,6 +539,9 @@ second_round_for_ram_base:
                 &&  (__vsf_elfloader_rel_rela(elfloader, target, &linfo, DT_RELA, linfo.dynamic.rela, linfo.dynamic.relasz, false) < 0))
             ||  (   (linfo.dynamic.relsz > 0)
                 &&  (__vsf_elfloader_rel_rela(elfloader, target, &linfo, DT_REL, linfo.dynamic.rel, linfo.dynamic.relsz, false) < 0))) {
+            goto cleanup_and_fail;
+        }
+        if (linfo.link_fail) {
             goto cleanup_and_fail;
         }
     }
