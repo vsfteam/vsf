@@ -41,9 +41,9 @@ def vsh(pytestconfig):
 
     vsf_vsh_started = pytestconfig.getoption("vsf_vsh_started")
     if not vsf_vsh_started:
-        vsh_subprocess.expect('>>>', timeout=pytestconfig.getoption("vsf_timeout"))
-        printh("expect >>> before", vsh_subprocess.before)
-        printh("expect >>> after ", vsh_subprocess.after)
+        vsh_subprocess.expect('/.* # ', timeout=pytestconfig.getoption("vsf_timeout"))
+        printh("expect prompt before", vsh_subprocess.before)
+        printh("expect prompt after ", vsh_subprocess.after)
 
     yield  { "subprocess": vsh_subprocess, "input": None, "output": None, "config": pytestconfig }
     #yield vsh_subprocess
