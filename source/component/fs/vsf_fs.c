@@ -983,9 +983,9 @@ __vsf_component_peda_ifs_entry(__vk_vfs_lookup, vk_file_lookup)
             err = VSF_ERR_NOT_ENOUGH_RESOURCES;
         } else {
             vk_vfs_file_t *result = __vk_vfs_lookup_imp(dir, vsf_local.name);
-            *vsf_local.result = &result->use_as__vk_file_t;
 
             if (result != NULL) {
+                *vsf_local.result = &result->use_as__vk_file_t;
                 err = VSF_ERR_NONE;
                 if (result->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
                     VSF_FS_ASSERT(result->subfs.root != NULL);

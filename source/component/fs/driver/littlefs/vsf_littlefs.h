@@ -93,6 +93,15 @@ vsf_class(vk_lfs_info_t) {
                 const char *name;
             } open;
             struct {
+                vk_lfs_file_t *dir;
+                const char *name;
+                vk_file_attr_t attr;
+            } create;
+            struct {
+                vk_lfs_file_t *dir;
+                const char *name;
+            } unlink;
+            struct {
                 lfs_file_t *file;
             } close_file;
             struct {
@@ -109,6 +118,7 @@ vsf_class(vk_lfs_info_t) {
                 lfs_size_t size;
             } write_file;
             struct {
+                lfs_file_t *file;
                 uint64_t offset;
             } setpos;
         } param;

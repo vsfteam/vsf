@@ -33,10 +33,13 @@ typedef enum vk_lfs_operation_t {
     VK_LFS_MOUNT,
     VK_LFS_UNMOUNT,
     VK_LFS_LOOKUP,
+    VK_LFS_CREATE,
+    VK_LFS_UNLINK,
     VK_LFS_CLOSE_FILE,
     VK_LFS_CLOSE_DIR,
     VK_LFS_READ_FILE,
     VK_LFS_WRITE_FILE,
+    VK_LFS_SEEK_FILE,
 } vk_lfs_operation_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -44,9 +47,12 @@ typedef enum vk_lfs_operation_t {
 dcl_vsf_peda_methods(static, __vk_lfs_mount)
 dcl_vsf_peda_methods(static, __vk_lfs_unmount)
 dcl_vsf_peda_methods(static, __vk_lfs_lookup)
+dcl_vsf_peda_methods(static, __vk_lfs_create)
+dcl_vsf_peda_methods(static, __vk_lfs_unlink)
 dcl_vsf_peda_methods(static, __vk_lfs_read)
 dcl_vsf_peda_methods(static, __vk_lfs_write)
 dcl_vsf_peda_methods(static, __vk_lfs_close)
+dcl_vsf_peda_methods(static, __vk_lfs_setpos)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -67,12 +73,12 @@ const vk_fs_op_t vk_lfs_op = {
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_write),
         .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_close),
         .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
-        .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_setpos),
     },
     .dop            = {
         .fn_lookup  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_lookup),
-        .fn_create  = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
-        .fn_unlink  = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_create  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_create),
+        .fn_unlink  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_unlink),
         .fn_chmod   = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
     },
 };
@@ -89,6 +95,7 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
     vk_lfs_info_t *fsinfo = container_of(thread, vk_lfs_info_t, thread_cb);
     lfs_t *lfs = &fsinfo->lfs;
     int ret;
+    char path[LFS_NAME_MAX];
 
     ret = lfs_mount(lfs, &fsinfo->config);
     if (ret < 0) {
@@ -120,7 +127,6 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
                 const char *name = fsinfo->param.open.name;
                 struct lfs_info lfsinfo;
 
-                char path[LFS_NAME_MAX];
                 path[0] = '\0';
                 while (dir->name != NULL) {
                     VSF_FS_ASSERT(strlen(path) + strlen(dir->name) <= sizeof(path) - 1);
@@ -132,6 +138,10 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
                     // by name
                     VSF_FS_ASSERT(strlen(path) + strlen(name) <= sizeof(path) - 1);
                     strcat(path, name);
+                    if (lfs_stat(lfs, path, &lfsinfo) < 0) {
+                        ret = -1;
+                        break;
+                    }
                 } else {
                 scan_next:
                     lfs_dir_read(lfs, &dir->lfs_dir, &lfsinfo);
@@ -184,6 +194,44 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
                 }
             }
             break;
+        case VK_LFS_CREATE: {
+                vk_lfs_file_t *dir = fsinfo->param.create.dir;
+                const char *name = fsinfo->param.create.name;
+
+                path[0] = '\0';
+                while (dir->name != NULL) {
+                    VSF_FS_ASSERT(strlen(path) + strlen(dir->name) <= sizeof(path) - 1);
+                    strcat(path, dir->name);
+                }
+                VSF_FS_ASSERT(strlen(path) + strlen(name) <= sizeof(path) - 1);
+                strcat(path, name);
+
+                if (fsinfo->param.create.attr & VSF_FILE_ATTR_DIRECTORY) {
+                    ret = lfs_mkdir(lfs, path);
+                } else {
+                    lfs_file_t lfs_file;
+                    ret = lfs_file_open(lfs, &lfs_file, path, LFS_O_CREAT);
+                    if (LFS_ERR_OK == ret) {
+                        lfs_file_close(lfs, &lfs_file);
+                    }
+                }
+            }
+            break;
+        case VK_LFS_UNLINK: {
+                vk_lfs_file_t *dir = fsinfo->param.unlink.dir;
+                const char *name = fsinfo->param.unlink.name;
+
+                path[0] = '\0';
+                while (dir->name != NULL) {
+                    VSF_FS_ASSERT(strlen(path) + strlen(dir->name) <= sizeof(path) - 1);
+                    strcat(path, dir->name);
+                }
+                VSF_FS_ASSERT(strlen(path) + strlen(name) <= sizeof(path) - 1);
+                strcat(path, name);
+
+                ret = lfs_remove(lfs, path);
+            }
+            break;
         case VK_LFS_CLOSE_FILE:
             ret = lfs_file_close(lfs, fsinfo->param.close_file.file);
             break;
@@ -203,6 +251,9 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
                 lfs_size_t size = fsinfo->param.read_file.size;
                 fsinfo->result.read_file.size = lfs_file_write(lfs, file, buffer, size);
             }
+            break;
+        case VK_LFS_SEEK_FILE:
+            ret = lfs_file_seek(lfs, fsinfo->param.setpos.file, fsinfo->param.setpos.offset, LFS_SEEK_SET);
             break;
         }
     }
@@ -319,6 +370,68 @@ __vsf_component_peda_ifs_entry(__vk_lfs_lookup, vk_file_lookup)
     vsf_peda_end();
 }
 
+__vsf_component_peda_ifs_entry(__vk_lfs_create, vk_file_create)
+{
+    vsf_peda_begin();
+    vk_lfs_file_t *dir = (vk_lfs_file_t *)&vsf_this;
+    vk_lfs_info_t *fsinfo = dir->info;
+    const char *name = vsf_local.name;
+    vk_file_attr_t attr = vsf_local.attr;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        if (VSF_ERR_NONE != vsf_eda_crit_enter(&fsinfo->crit)) {
+            break;
+        }
+        // fall through
+    case VSF_EVT_SYNC:
+        fsinfo->caller = vsf_eda_get_cur();
+        VSF_FS_ASSERT(fsinfo->caller != NULL);
+
+        fsinfo->param.create.dir = dir;
+        fsinfo->param.create.name = name;
+        fsinfo->param.create.attr = attr;
+        fsinfo->op = VK_LFS_CREATE;
+        vsf_eda_sem_post(&fsinfo->sem);
+        break;
+    case VSF_EVT_RETURN:
+        vsf_eda_crit_leave(&fsinfo->crit);
+        vsf_eda_return(fsinfo->result.ret < 0 ? VSF_ERR_FAIL : VSF_ERR_NONE);
+        break;
+    }
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_lfs_unlink, vk_file_unlink)
+{
+    vsf_peda_begin();
+    vk_lfs_file_t *dir = (vk_lfs_file_t *)&vsf_this;
+    vk_lfs_info_t *fsinfo = dir->info;
+    const char *name = vsf_local.name;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        if (VSF_ERR_NONE != vsf_eda_crit_enter(&fsinfo->crit)) {
+            break;
+        }
+        // fall through
+    case VSF_EVT_SYNC:
+        fsinfo->caller = vsf_eda_get_cur();
+        VSF_FS_ASSERT(fsinfo->caller != NULL);
+
+        fsinfo->param.unlink.dir = dir;
+        fsinfo->param.unlink.name = name;
+        fsinfo->op = VK_LFS_UNLINK;
+        vsf_eda_sem_post(&fsinfo->sem);
+        break;
+    case VSF_EVT_RETURN:
+        vsf_eda_crit_leave(&fsinfo->crit);
+        vsf_eda_return(fsinfo->result.ret < 0 ? VSF_ERR_FAIL : VSF_ERR_NONE);
+        break;
+    }
+    vsf_peda_end();
+}
+
 __vsf_component_peda_ifs_entry(__vk_lfs_close, vk_file_close)
 {
     vsf_peda_begin();
@@ -350,6 +463,41 @@ __vsf_component_peda_ifs_entry(__vk_lfs_close, vk_file_close)
 
             if (file->name != NULL) {
                 vsf_heap_free(file->name);
+            }
+            vsf_eda_return(ret < 0 ? VSF_ERR_FAIL : VSF_ERR_NONE);
+        }
+        break;
+    }
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_lfs_setpos, vk_file_setpos)
+{
+    vsf_peda_begin();
+    vk_lfs_file_t *file = (vk_lfs_file_t *)&vsf_this;
+    vk_lfs_info_t *fsinfo = file->info;
+    uint64_t offset = vsf_local.offset;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        if (VSF_ERR_NONE != vsf_eda_crit_enter(&fsinfo->crit)) {
+            break;
+        }
+        // fall through
+    case VSF_EVT_SYNC:
+        fsinfo->caller = vsf_eda_get_cur();
+        VSF_FS_ASSERT(fsinfo->caller != NULL);
+
+        fsinfo->param.setpos.file = &file->lfs_file;
+        fsinfo->param.setpos.offset = offset;
+        fsinfo->op = VK_LFS_SEEK_FILE;
+        vsf_eda_sem_post(&fsinfo->sem);
+        break;
+    case VSF_EVT_RETURN: {
+            int ret = fsinfo->result.ret;
+            vsf_eda_crit_leave(&fsinfo->crit);
+            if (ret >= 0) {
+                *vsf_local.result = ret;
             }
             vsf_eda_return(ret < 0 ? VSF_ERR_FAIL : VSF_ERR_NONE);
         }
