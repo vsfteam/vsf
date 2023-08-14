@@ -300,7 +300,7 @@ static inline void usb_fill_int_urb(struct urb *urb,
     urb->context                = context;
 
     if (dev->speed == USB_SPEED_HIGH || dev->speed >= USB_SPEED_SUPER) {
-        interval = clamp(interval, 1, 16);
+        interval = vsf_min(vsf_max(interval, 1), 16);
         urb->interval = 1 << (interval - 1);
     } else {
         urb->interval = interval;
