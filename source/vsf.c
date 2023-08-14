@@ -101,12 +101,13 @@ void * vsf_vplt_link(void *vplt, char *symname)
 int vsf_vplt_load_dyn(vsf_vplt_info_t *info)
 {
     vsf_vplt_info_t *vplt_entry = (vsf_vplt_info_t *)vsf_dynamic_vplt.ram_vplt;
+    vsf_vplt_info_t * vplt_entry_new;
     int entry_num = (NULL == vplt_entry) ? 0 : vplt_entry->entry_num;
     vsf_protect_t orig;
 
     if (NULL == vplt_entry) {
     increate_entry:
-        vsf_vplt_info_t * vplt_entry_new = vsf_heap_malloc(
+        vplt_entry_new = vsf_heap_malloc(
             sizeof(vsf_vplt_info_t) + sizeof(void *) * (entry_num + VSF_DYNAMIC_VPLT_INCREASE_SIZE));
         if (NULL == vplt_entry_new) {
             return VSF_ERR_NOT_ENOUGH_RESOURCES;
