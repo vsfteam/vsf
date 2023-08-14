@@ -38,6 +38,7 @@ dcl_vsf_peda_methods(static, __vk_mim_mal_init)
 dcl_vsf_peda_methods(static, __vk_mim_mal_fini)
 dcl_vsf_peda_methods(static, __vk_mim_mal_read)
 dcl_vsf_peda_methods(static, __vk_mim_mal_write)
+dcl_vsf_peda_methods(static, __vk_mim_mal_erase)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -53,6 +54,7 @@ const vk_mal_drv_t vk_mim_mal_drv = {
     .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mim_mal_fini),
     .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mim_mal_read),
     .write          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mim_mal_write),
+    .erase          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mim_mal_erase),
 };
 
 #if     __IS_COMPILER_GCC__
@@ -120,6 +122,22 @@ __vsf_component_peda_ifs_entry(__vk_mim_mal_write, vk_mal_write)
     switch (evt) {
     case VSF_EVT_INIT:
         vk_mal_write(pthis->host_mal, vsf_local.addr + pthis->offset, vsf_local.size, vsf_local.buff);
+        break;
+    case VSF_EVT_RETURN:
+        vsf_eda_return(vsf_eda_get_return_value());
+        break;
+    }
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_mim_mal_erase, vk_mal_erase)
+{
+    vsf_peda_begin();
+    vk_mim_mal_t *pthis = (vk_mim_mal_t *)&vsf_this;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        vk_mal_erase(pthis->host_mal, vsf_local.addr + pthis->offset, vsf_local.size);
         break;
     case VSF_EVT_RETURN:
         vsf_eda_return(vsf_eda_get_return_value());

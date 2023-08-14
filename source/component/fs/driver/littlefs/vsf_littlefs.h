@@ -68,6 +68,10 @@ vsf_class(vk_lfs_file_t) {
 };
 
 vsf_class(vk_lfs_info_t) {
+    private_member(
+        vk_lfs_file_t root;
+    )
+
     public_member(
         struct lfs_config config;
     )
@@ -123,8 +127,6 @@ vsf_class(vk_lfs_info_t) {
             };
         } result;
         vsf_eda_t *caller;
-
-        vk_lfs_file_t root;
     )
 };
 

@@ -60,10 +60,9 @@ int vsf_lfs_mal_read(const struct lfs_config *c, lfs_block_t block,
     VSF_FS_ASSERT(vsf_eda_is_stack_owner(vsf_eda_get_cur()));
     VSF_FS_ASSERT(c != NULL);
     VSF_FS_ASSERT(c->context != NULL);
-    VSF_FS_ASSERT(0 == off);
 
     vk_mal_t *mal = (vk_mal_t *)c->context;
-    vk_mal_read(mal, block * c->block_size, size, (uint8_t *)buffer);
+    vk_mal_read(mal, block * c->block_size + off, size, (uint8_t *)buffer);
     int ret = (int)vsf_eda_get_return_value();
     ret = (ret == size) ? 0 : -1;
     return ret;
@@ -75,10 +74,9 @@ int vsf_lfs_mal_prog(const struct lfs_config *c, lfs_block_t block,
     VSF_FS_ASSERT(vsf_eda_is_stack_owner(vsf_eda_get_cur()));
     VSF_FS_ASSERT(c != NULL);
     VSF_FS_ASSERT(c->context != NULL);
-    VSF_FS_ASSERT(0 == off);
 
     vk_mal_t *mal = (vk_mal_t *)c->context;
-    vk_mal_write(mal, block * c->block_size, size, (uint8_t *)buffer);
+    vk_mal_write(mal, block * c->block_size + off, size, (uint8_t *)buffer);
     int ret = (int)vsf_eda_get_return_value();
     ret = (ret == size) ? 0 : -1;
     return ret;

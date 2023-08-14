@@ -142,6 +142,9 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_init, vk_mal_init)
     switch (evt) {
     case VSF_EVT_INIT:
         pthis->cap = vsf_hw_flash_capability(pthis->flash);
+        if (0 == pthis->size) {
+            pthis->size = pthis->cap.max_size;
+        }
         irq_mask = VSF_FLASH_IRQ_ERASE_MASK | VSF_FLASH_IRQ_WRITE_MASK | VSF_FLASH_IRQ_READ_MASK;
         if ((pthis->cap.irq_mask & irq_mask) != irq_mask) {
             err = VSF_ERR_NOT_SUPPORT;
@@ -205,11 +208,11 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_erase, vk_mal_erase)
         // fall through
 
     case VSF_EVT_FLASH_ERASE_ERR:
-        vsf_eda_return(-1);
+        vsf_eda_return(VSF_ERR_FAIL);
         break;
 
     case VSF_EVT_FLASH_ERASE_CPL:
-        vsf_eda_return(vsf_local.size);
+        vsf_eda_return(VSF_ERR_NONE);
         break;
 
     default:
@@ -236,7 +239,7 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_read, vk_mal_read)
         // fall through
 
     case VSF_EVT_FLASH_READ_ERR:
-        vsf_eda_return(-1);
+        vsf_eda_return(VSF_ERR_FAIL);
         break;
 
     case VSF_EVT_FLASH_READ_CPL:
@@ -261,23 +264,13 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_write, vk_mal_write)
     case VSF_EVT_INIT:
         pthis->cur = vsf_eda_get_cur();
         VSF_MAL_ASSERT((vsf_local.size > 0) && ((vsf_local.addr + vsf_local.size) <= pthis->cap.max_size));
-        if (VSF_ERR_NONE == vsf_hw_flash_erase_multi_sector(pthis->flash, vsf_local.addr, vsf_local.size)) {
-            break;
-        }
-        // fall through
-
-    case VSF_EVT_FLASH_ERASE_ERR:
-        vsf_eda_return(-1);
-        break;
-
-    case VSF_EVT_FLASH_ERASE_CPL:
         if (VSF_ERR_NONE == vsf_hw_flash_write_multi_sector(pthis->flash, vsf_local.addr, vsf_local.buff, vsf_local.size)) {
             break;
         }
         // fall through
 
     case VSF_EVT_FLASH_WRITE_ERR:
-        vsf_eda_return(-1);
+        vsf_eda_return(VSF_ERR_FAIL);
         break;
 
     case VSF_EVT_FLASH_WRITE_CPL:
