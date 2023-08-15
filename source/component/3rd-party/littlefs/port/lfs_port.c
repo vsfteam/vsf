@@ -54,7 +54,7 @@ uint32_t lfs_crc(uint32_t crc, const void *buffer, size_t size) {
 }
 #endif
 
-int vsf_lfs_mal_read(const struct lfs_config *c, lfs_block_t block,
+static int __vsf_lfs_mal_read(const struct lfs_config *c, lfs_block_t block,
             lfs_off_t off, void *buffer, lfs_size_t size)
 {
     VSF_FS_ASSERT(vsf_eda_is_stack_owner(vsf_eda_get_cur()));
@@ -68,7 +68,7 @@ int vsf_lfs_mal_read(const struct lfs_config *c, lfs_block_t block,
     return ret;
 }
 
-int vsf_lfs_mal_prog(const struct lfs_config *c, lfs_block_t block,
+static int __vsf_lfs_mal_prog(const struct lfs_config *c, lfs_block_t block,
             lfs_off_t off, const void *buffer, lfs_size_t size)
 {
     VSF_FS_ASSERT(vsf_eda_is_stack_owner(vsf_eda_get_cur()));
@@ -82,7 +82,7 @@ int vsf_lfs_mal_prog(const struct lfs_config *c, lfs_block_t block,
     return ret;
 }
 
-int vsf_lfs_mal_erase(const struct lfs_config *c, lfs_block_t block)
+static int __vsf_lfs_mal_erase(const struct lfs_config *c, lfs_block_t block)
 {
     VSF_FS_ASSERT(vsf_eda_is_stack_owner(vsf_eda_get_cur()));
     VSF_FS_ASSERT(c != NULL);
@@ -96,12 +96,34 @@ int vsf_lfs_mal_erase(const struct lfs_config *c, lfs_block_t block)
     return 0;
 }
 
-int vsf_lfs_mal_sync(const struct lfs_config *c)
+static int __vsf_lfs_mal_sync(const struct lfs_config *c)
 {
     VSF_FS_ASSERT(vsf_eda_is_stack_owner(vsf_eda_get_cur()));
     VSF_FS_ASSERT(c != NULL);
     VSF_FS_ASSERT(c->context != NULL);
 
+    return 0;
+}
+
+int vsf_lfs_bind_mal(struct lfs_config *c, vk_mal_t *mal)
+{
+    c->context = mal;
+    c->read = __vsf_lfs_mal_read;
+    c->prog = __vsf_lfs_mal_prog;
+    c->erase = __vsf_lfs_mal_erase;
+    c->sync = __vsf_lfs_mal_sync;
+    c->lookahead_size = 8;
+    c->block_cycles = 500;
+
+    uint_fast32_t mal_blksz_erase = vk_mal_blksz(mal, 0, 0, VSF_MAL_OP_ERASE);
+    uint_fast32_t mal_blksz_write = vk_mal_blksz(mal, 0, 0, VSF_MAL_OP_WRITE);
+    uint_fast32_t mal_blksz_read = vk_mal_blksz(mal, 0, 0, VSF_MAL_OP_READ);
+
+    c->read_size = mal_blksz_read;
+    c->prog_size = mal_blksz_write;
+    c->block_size = mal_blksz_erase;
+    c->block_count = mal->size / mal_blksz_erase;
+    c->cache_size = mal_blksz_erase;
     return 0;
 }
 

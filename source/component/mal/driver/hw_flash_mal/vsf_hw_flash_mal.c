@@ -84,7 +84,16 @@ static uint_fast32_t __vk_hw_flash_mal_blksz(vk_mal_t *mal, uint_fast64_t addr,
                 uint_fast32_t size, vsf_mal_op_t op)
 {
     vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)mal;
-    return pthis->cap.erase_sector_size;
+    switch (op) {
+    case VSF_MAL_OP_ERASE:
+        return pthis->cap.erase_sector_size;
+    case VSF_MAL_OP_READ:
+    case VSF_MAL_OP_WRITE:
+        return pthis->cap.write_sector_size;
+    default:
+        VSF_MAL_ASSERT(false);
+        return 0;
+    }
 }
 
 static bool __vk_hw_flash_mal_buffer(vk_mal_t *mal, uint_fast64_t addr,
