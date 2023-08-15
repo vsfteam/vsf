@@ -415,14 +415,14 @@ int_fast8_t __vsf_arch_msb(uintalu_t a)
 //    long long quot;
 //    long long rem;
 //} lldiv_t;
+//typedef struct {
+//    int quot;
+//    int rem;
+//} div_t;
 typedef struct {
     unsigned long long quot;
     unsigned long long rem;
 } ulldiv_t;
-typedef struct {
-    int quot;
-    int rem;
-} idiv_return;
 typedef struct {
     unsigned quot;
     unsigned rem;
@@ -484,7 +484,7 @@ extern int __aeabi_lcmp(long long, long long);
 extern int __aeabi_ulcmp(unsigned long long, unsigned long long);
 extern int __aeabi_idiv(int, int);
 extern unsigned __aeabi_uidiv(unsigned, unsigned);
-extern idiv_return __aeabi_idivmod(int, int);
+extern div_t __aeabi_idivmod(int, int);
 extern uidiv_return __aeabi_uidivmod(unsigned, unsigned);
 extern int __aeabi_idiv0(int);
 extern long long __aeabi_ldiv0(long long);
