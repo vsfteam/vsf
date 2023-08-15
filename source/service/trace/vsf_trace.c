@@ -338,7 +338,7 @@ void vsf_trace(vsf_trace_level_t level, const char *format, ...)
 
 void vsf_trace_assert(const char *expr, const char *file, int line, const char *func)
 {
-    vsf_trace_error("%s:%d %s -- assertion failed on %s\n", file, line, func, expr);
+    vsf_trace_error("%s:%d %s -- assertion failed on %s\n", file, line, func, NULL == expr ? "unknown" : expr);
     while (true);
 }
 
