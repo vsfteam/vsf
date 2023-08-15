@@ -104,9 +104,9 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
         lfs_format(lfs, &fsinfo->config);
         ret = lfs_mount(lfs, &fsinfo->config);
         VSF_FS_ASSERT(LFS_ERR_OK == ret);
-        ret = lfs_dir_open(lfs, &fsinfo->root.lfs_dir, "/");
-        VSF_FS_ASSERT(LFS_ERR_OK == ret);
     }
+    ret = lfs_dir_open(lfs, &fsinfo->root.lfs_dir, "/");
+    VSF_FS_ASSERT(LFS_ERR_OK == ret);
 
     while (true) {
         fsinfo->result.ret = ret;
