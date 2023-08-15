@@ -60,21 +60,7 @@ static void * __prepare_lfs_fsdata(const __fs_type_t *fstype, __fs_param_t *para
         return NULL;
     }
 
-    fsinfo->config.context = file_mal;
-// maybe read is a macro from linux subsystem in vsf
-#undef read
-    fsinfo->config.read = vsf_lfs_mal_read;
-    fsinfo->config.prog = vsf_lfs_mal_prog;
-    fsinfo->config.erase = vsf_lfs_mal_erase;
-    fsinfo->config.sync = vsf_lfs_mal_sync;
-    fsinfo->config.lookahead_size = 8;
-    fsinfo->config.block_cycles = 500;
-
-    fsinfo->config.read_size = file_mal->block_size;
-    fsinfo->config.prog_size = file_mal->block_size;
-    fsinfo->config.block_size = file_mal->block_size;
-    fsinfo->config.block_count = file_mal->size / file_mal->block_size;
-    fsinfo->config.cache_size = file_mal->block_size;
+    vsf_lfs_bind_mal(&fsinfo->config, &file_mal->use_as__vk_mal_t);
     return fsinfo;
 }
 
