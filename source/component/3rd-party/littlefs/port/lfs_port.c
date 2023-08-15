@@ -112,7 +112,6 @@ int vsf_lfs_bind_mal(struct lfs_config *c, vk_mal_t *mal)
     c->prog = __vsf_lfs_mal_prog;
     c->erase = __vsf_lfs_mal_erase;
     c->sync = __vsf_lfs_mal_sync;
-    c->lookahead_size = 8;
     c->block_cycles = 500;
 
     uint_fast32_t mal_blksz_erase = vk_mal_blksz(mal, 0, 0, VSF_MAL_OP_ERASE);
@@ -124,6 +123,8 @@ int vsf_lfs_bind_mal(struct lfs_config *c, vk_mal_t *mal)
     c->block_size = mal_blksz_erase;
     c->block_count = mal->size / mal_blksz_erase;
     c->cache_size = mal_blksz_erase;
+
+    c->lookahead_size = vsf_min(c->block_count, 32);
     return 0;
 }
 

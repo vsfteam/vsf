@@ -252,7 +252,6 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
                 void *buffer = fsinfo->param.read_file.buffer;
                 lfs_size_t size = fsinfo->param.read_file.size;
                 fsinfo->result.read_file.size = lfs_file_write(lfs, file, buffer, size);
-                lfs_file_sync(lfs, file);
             }
             break;
         case VK_LFS_SEEK_FILE:
