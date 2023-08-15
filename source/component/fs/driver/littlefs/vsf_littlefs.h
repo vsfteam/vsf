@@ -121,6 +121,10 @@ vsf_class(vk_lfs_info_t) {
                 lfs_file_t *file;
                 uint64_t offset;
             } setpos;
+            struct {
+                lfs_file_t *file;
+                uint64_t size;
+            } setsize;
         } param;
         struct {
             int ret;

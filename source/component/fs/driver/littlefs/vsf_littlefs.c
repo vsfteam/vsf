@@ -40,6 +40,7 @@ typedef enum vk_lfs_operation_t {
     VK_LFS_READ_FILE,
     VK_LFS_WRITE_FILE,
     VK_LFS_SEEK_FILE,
+    VK_LFS_TRUNC_FILE,
 } vk_lfs_operation_t;
 
 /*============================ PROTOTYPES ====================================*/
@@ -53,6 +54,7 @@ dcl_vsf_peda_methods(static, __vk_lfs_read)
 dcl_vsf_peda_methods(static, __vk_lfs_write)
 dcl_vsf_peda_methods(static, __vk_lfs_close)
 dcl_vsf_peda_methods(static, __vk_lfs_setpos)
+dcl_vsf_peda_methods(static, __vk_lfs_setsize)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -72,7 +74,7 @@ const vk_fs_op_t vk_lfs_op = {
         .fn_read    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_read),
         .fn_write   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_write),
         .fn_close   = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_close),
-        .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(vk_fsop_not_support),
+        .fn_setsize = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_setsize),
         .fn_setpos  = (vsf_peda_evthandler_t)vsf_peda_func(__vk_lfs_setpos),
     },
     .dop            = {
@@ -250,10 +252,15 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
                 void *buffer = fsinfo->param.read_file.buffer;
                 lfs_size_t size = fsinfo->param.read_file.size;
                 fsinfo->result.read_file.size = lfs_file_write(lfs, file, buffer, size);
+                lfs_file_sync(lfs, file);
             }
             break;
         case VK_LFS_SEEK_FILE:
             ret = lfs_file_seek(lfs, fsinfo->param.setpos.file, fsinfo->param.setpos.offset, LFS_SEEK_SET);
+            break;
+        case VK_LFS_TRUNC_FILE:
+            VSF_FS_ASSERT(lfs_file_size(lfs, fsinfo->param.setsize.file) >= fsinfo->param.setsize.size);
+            ret = lfs_file_truncate(lfs, fsinfo->param.setsize.file, fsinfo->param.setsize.size);
             break;
         }
     }
@@ -464,6 +471,38 @@ __vsf_component_peda_ifs_entry(__vk_lfs_close, vk_file_close)
             if (file->name != NULL) {
                 vsf_heap_free(file->name);
             }
+            vsf_eda_return(ret < 0 ? VSF_ERR_FAIL : VSF_ERR_NONE);
+        }
+        break;
+    }
+    vsf_peda_end();
+}
+
+__vsf_component_peda_ifs_entry(__vk_lfs_setsize, vk_file_setsize)
+{
+    vsf_peda_begin();
+    vk_lfs_file_t *file = (vk_lfs_file_t *)&vsf_this;
+    vk_lfs_info_t *fsinfo = file->info;
+    uint64_t size = vsf_local.size;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        if (VSF_ERR_NONE != vsf_eda_crit_enter(&fsinfo->crit)) {
+            break;
+        }
+        // fall through
+    case VSF_EVT_SYNC:
+        fsinfo->caller = vsf_eda_get_cur();
+        VSF_FS_ASSERT(fsinfo->caller != NULL);
+
+        fsinfo->param.setsize.file = &file->lfs_file;
+        fsinfo->param.setsize.size = size;
+        fsinfo->op = VK_LFS_TRUNC_FILE;
+        vsf_eda_sem_post(&fsinfo->sem);
+        break;
+    case VSF_EVT_RETURN: {
+            int ret = fsinfo->result.ret;
+            vsf_eda_crit_leave(&fsinfo->crit);
             vsf_eda_return(ret < 0 ? VSF_ERR_FAIL : VSF_ERR_NONE);
         }
         break;
