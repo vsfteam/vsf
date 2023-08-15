@@ -253,6 +253,7 @@ static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct netconn *conn;
     enum netconn_type conn_type;
+    bool use_protocol = false;
 
     switch (socket_priv->type) {
     case SOCK_DGRAM:
@@ -260,6 +261,10 @@ static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
             return INVALID_SOCKET;
         }
         conn_type = NETCONN_UDP;
+        break;
+    case SOCK_RAW:
+        conn_type = NETCONN_RAW;
+        use_protocol = true;
         break;
     case SOCK_STREAM:
         if (socket_priv->protocol != IPPROTO_TCP) {
@@ -271,7 +276,13 @@ static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
     default:
         return INVALID_SOCKET;
     }
-    conn = netconn_new_with_callback(conn_type, __vsf_linux_socket_inet_lwip_evthandler);
+
+    if (use_protocol) {
+        conn = netconn_new_with_proto_and_callback(conn_type, (u8_t)socket_priv->protocol,
+                __vsf_linux_socket_inet_lwip_evthandler);
+    } else {
+        conn = netconn_new_with_callback(conn_type, __vsf_linux_socket_inet_lwip_evthandler);
+    }
     if (NULL == conn) {
         return INVALID_SOCKET;
     }
@@ -313,7 +324,7 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
     case SOL_SOCKET:
         switch (optname) {
         case SO_BROADCAST:
-            if (NETCONNTYPE_GROUP(conn->type) != NETCONN_UDP) {
+            if (NETCONNTYPE_GROUP(netconn_type(conn)) != NETCONN_UDP) {
                 return ENOPROTOOPT;
             }
             // fall through
@@ -333,7 +344,7 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
             break;
         case SO_REUSEADDR:
             if (    (optname == SO_BROADCAST)
-                &&  (NETCONNTYPE_GROUP(conn->type) != NETCONN_UDP)) {
+                &&  (NETCONNTYPE_GROUP(netconn_type(conn)) != NETCONN_UDP)) {
                 return ENOPROTOOPT;
             }
 
@@ -422,7 +433,7 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
     case SOL_SOCKET:
         switch (optname) {
         case SO_BROADCAST:
-            if (NETCONNTYPE_GROUP(conn->type) != NETCONN_UDP) {
+            if (NETCONNTYPE_GROUP(netconn_type(conn)) != NETCONN_UDP) {
                 return ENOPROTOOPT;
             }
             // fall through
@@ -430,12 +441,20 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
             optname = lwip_sockopt_to_ipopt(optname);
             *(int *)optval = ip_get_option(conn->pcb.ip, optname);
             break;
+        case SO_TYPE:
+            switch (NETCONNTYPE_GROUP(netconn_type(conn))) {
+            case NETCONN_RAW:   *(int *)optval = SOCK_RAW;      break;
+            case NETCONN_TCP:   *(int *)optval = SOCK_STREAM;   break;
+            case NETCONN_UDP:   *(int *)optval = SOCK_DGRAM;    break;
+            default:            VSF_LINUX_ASSERT(false);        break;
+            }
+            break;
         case SO_RCVBUF:
             *(int *)optval = netconn_get_recvbufsize(conn);
             break;
         case SO_REUSEADDR:
             if (    (optname == SO_BROADCAST)
-                &&  (NETCONNTYPE_GROUP(conn->type) != NETCONN_UDP)) {
+                &&  (NETCONNTYPE_GROUP(netconn_type(conn)) != NETCONN_UDP)) {
                 return ENOPROTOOPT;
             }
 
@@ -632,13 +651,14 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
                     const struct sockaddr *dst_addr, socklen_t addrlen)
 {
     struct netconn *conn = priv->conn;
+    enum netconn_type type = NETCONNTYPE_GROUP(netconn_type(conn));
 
-    if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP) {
+    if (type == NETCONN_TCP) {
         size_t written = 0;
         err_t err = netconn_write_partly(conn, buffer, size, NETCONN_COPY, &written);
         int sockerr = __netconn_return(err);
         return sockerr ? sockerr : written;
-    } else if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
+    } else if ((type == NETCONN_UDP) || (type == NETCONN_RAW)) {
         if (size > LWIP_MIN(0xFFFF, SSIZE_MAX)) {
             return SOCKET_ERROR;
         }
@@ -658,7 +678,7 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
             return SOCKET_ERROR;
         }
 #   if LWIP_CHECKSUM_ON_COPY
-        if (NETCONNTYPE_GROUP(netconn_type(conn)) != NETCONN_RAW) {
+        if (type != NETCONN_RAW) {
             uint16_t chksum = LWIP_CHKSUM_COPY(buf.p->payload, buffer, size);
             netbuf_set_chksum(&buf, chksum);
         } else
@@ -700,6 +720,7 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
                     struct sockaddr *src_addr, socklen_t *addrlen)
 {
     struct netconn *conn = priv->conn;
+    enum netconn_type type = NETCONNTYPE_GROUP(netconn_type(conn));
     u16_t len = 0, pos = 0;
 
     struct pbuf *pbuf = priv->last.pbuf;
@@ -707,7 +728,7 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
         err_t err = ERR_OK;
 
     recv_next:
-        if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
+        if ((type == NETCONN_UDP) || (type == NETCONN_RAW)) {
             struct netbuf *netbuf;
             err = netconn_recv(conn, &netbuf);
             // for the latest lwip, use netconn_recv_udp_raw_netbuf_flags
@@ -719,7 +740,7 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
                     priv->last.netbuf = netbuf;
                 }
             }
-        } else if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP) {
+        } else if (type == NETCONN_TCP) {
             struct pbuf *pbuf;
             err = netconn_recv_tcp_pbuf(conn, &pbuf);
             // for the latest lwip, use netconn_recv_tcp_pbuf_flags
@@ -776,7 +797,7 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
         goto recv_next;
     }
 
-    if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
+    if ((type == NETCONN_UDP) || (type == NETCONN_RAW)) {
         vsf_linux_sockaddr_t addr;
         socklen_t src_addrlen;
         __ipaddr_port_to_sockaddr(&addr.sa, netbuf_fromaddr(priv->last.netbuf), netbuf_fromport(priv->last.netbuf));
