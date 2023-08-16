@@ -907,8 +907,12 @@ static int __vsf_linux_fd_deref_priv(vsf_linux_fd_t *sfd)
     vsf_protect_t orig = vsf_protect_sched();
         is_to_close = --priv->ref == 0;
 #if VSF_LINUX_CFG_FD_TRACE == ENABLED
+        vsf_linux_process_t *process = vsf_linux_get_cur_process();
+        if (process->is_vforking) {
+            process = process->vfork_child;
+        }
         vsf_trace_debug("%s: process 0x%p fd %d 0x%p priv 0x%p ref %d" VSF_TRACE_CFG_LINEEND,
-            __FUNCTION__, vsf_linux_get_cur_process(), sfd->fd, sfd, priv, priv->ref);
+            __FUNCTION__, process, sfd->fd, sfd, priv, priv->ref);
 #endif
     vsf_unprotect_sched(orig);
 
@@ -931,6 +935,16 @@ int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
     int priv_size = ((op != NULL) && (op->priv_size > 0)) ? op->priv_size : sizeof(vsf_linux_fd_priv_t);
     int ret;
     vsf_linux_fd_t *new_sfd;
+
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+        VSF_LINUX_ASSERT(process != NULL);
+#if VSF_LINUX_USE_VFORK == ENABLED
+        if (process->is_vforking) {
+            process = process->vfork_child;
+        }
+#endif
+    }
 
     new_sfd = __calloc_ex(process, 1, sizeof(vsf_linux_fd_t));
     if (!new_sfd) {
@@ -1523,6 +1537,10 @@ int dup3(int oldfd, int newfd, int flags)
 int vsf_linux_chdir(vsf_linux_process_t *process, char *pathname)
 {
     VSF_LINUX_ASSERT(process != NULL);
+    if (process->is_vforking) {
+        process = process->vfork_child;
+    }
+
     char fullpath[PATH_MAX];
     if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
         return -1;
