@@ -295,6 +295,10 @@ vsf_class(vsf_linux_process_t) {
 #if __VSF_LINUX_PROCESS_HAS_PATH
         char path[PATH_MAX];
 #endif
+
+#if VSF_USE_LOADER == ENABLED
+        void *loader;
+#endif
     )
 
     private_member(
@@ -428,6 +432,7 @@ extern void vsf_linux_process_heap_free(vsf_linux_process_t *process, void *buff
 extern char * vsf_linux_process_heap_strdup(vsf_linux_process_t *process, char *str);
 
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+extern void __free_ex(vsf_linux_process_t *process, void *ptr);
 #   define __malloc_ex(__process, __size)               ____malloc_ex((__process), (__size), __FILE__, __FUNCTION__, __LINE__)
 #   define __calloc_ex(__process, __n, __size)          ____calloc_ex((__process), (__n), (__size), __FILE__, __FUNCTION__, __LINE__)
 #   define __realloc_ex(__process, __ptr, __size)       ____realloc_ex((__process), (__ptr), (__size), __FILE__, __FUNCTION__, __LINE__)
@@ -472,6 +477,8 @@ extern vsf_linux_localstorage_t * vsf_linux_tls_get(int idx);
 #   endif
 
 extern bool vsf_linux_is_inited(void);
+// will get vfork_child is current process is vforking
+extern vsf_linux_process_t * vsf_linux_get_real_process(vsf_linux_process_t *process);
 
 #define __vsf_linux_start_process_internal3(__entry, __argv, __stack_size, __prio)\
             __vsf_linux_start_process_internal((__entry), (__argv), (__stack_size), (__prio))

@@ -235,7 +235,7 @@ int atexit(void (*func)(void))
 {
     // atexit maybe called by c-startup in newlib, ignore if linux is not initialized
     if (vsf_linux_is_inited()) {
-        vsf_linux_process_t *process = vsf_linux_get_cur_process();
+        vsf_linux_process_t *process = vsf_linux_get_real_process(NULL);
         VSF_LINUX_ASSERT(process != NULL);
 
         if (process->fn_atexit_num >= dimof(process->fn_atexit)) {

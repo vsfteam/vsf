@@ -293,6 +293,23 @@ static const vsf_linux_thread_op_t __vsf_linux_sighandler_op = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+vsf_linux_process_t * vsf_linux_get_real_process(vsf_linux_process_t *process)
+{
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+        if (NULL == process) {
+            return NULL;
+        }
+    }
+
+#if VSF_LINUX_USE_VFORK == ENABLED
+    if (process->is_vforking) {
+        process = process->vfork_child;
+    }
+#endif
+    return process;
+}
+
 #if VSF_LINUX_CFG_PLS_NUM > 0
 int vsf_linux_pls_alloc(void)
 {
@@ -1019,9 +1036,7 @@ static vsf_dlist_t * __vsf_linux_process_heap_get_freelist(vsf_heap_t *heap, uin
 
 size_t vsf_linux_process_heap_size(vsf_linux_process_t *process, void *buffer)
 {
-    if (NULL == process) {
-        process = vsf_linux_get_cur_process();
-    }
+    process = vsf_linux_get_real_process(process);
     if (NULL == process->heap) {
         return vsf_heap_size(buffer);
     } else {
@@ -1031,9 +1046,7 @@ size_t vsf_linux_process_heap_size(vsf_linux_process_t *process, void *buffer)
 
 void * vsf_linux_process_heap_realloc(vsf_linux_process_t *process, void *buffer, uint_fast32_t size)
 {
-    if (NULL == process) {
-        process = vsf_linux_get_cur_process();
-    }
+    process = vsf_linux_get_real_process(process);
     if (NULL == process->heap) {
         return vsf_heap_realloc(buffer, size);
     } else {
@@ -1053,9 +1066,7 @@ void * vsf_linux_process_heap_realloc(vsf_linux_process_t *process, void *buffer
 
 void * vsf_linux_process_heap_malloc_aligned(vsf_linux_process_t *process, uint_fast32_t size, uint_fast32_t alignment)
 {
-    if (NULL == process) {
-        process = vsf_linux_get_cur_process();
-    }
+    process = vsf_linux_get_real_process(process);
     if (NULL == process->heap) {
         return vsf_heap_malloc_aligned(size, alignment);
     } else {
@@ -1065,9 +1076,7 @@ void * vsf_linux_process_heap_malloc_aligned(vsf_linux_process_t *process, uint_
 
 void * vsf_linux_process_heap_malloc(vsf_linux_process_t *process, size_t size)
 {
-    if (NULL == process) {
-        process = vsf_linux_get_cur_process();
-    }
+    process = vsf_linux_get_real_process(process);
     if (NULL == process->heap) {
         return vsf_heap_malloc(size);
     } else {
@@ -1077,9 +1086,7 @@ void * vsf_linux_process_heap_malloc(vsf_linux_process_t *process, size_t size)
 
 void * vsf_linux_process_heap_calloc(vsf_linux_process_t *process, size_t n, size_t size)
 {
-    if (NULL == process) {
-        process = vsf_linux_get_cur_process();
-    }
+    process = vsf_linux_get_real_process(process);
     size *= n;
 
     void *buffer = vsf_linux_process_heap_malloc(process, size);
@@ -1092,9 +1099,7 @@ void * vsf_linux_process_heap_calloc(vsf_linux_process_t *process, size_t n, siz
 void vsf_linux_process_heap_free(vsf_linux_process_t *process, void *buffer)
 {
     if (buffer != NULL) {
-        if (NULL == process) {
-            process = vsf_linux_get_cur_process();
-        }
+        process = vsf_linux_get_real_process(process);
         if (NULL == process->heap) {
             vsf_heap_free(buffer);
         } else {
@@ -1632,6 +1637,8 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
         }
     }
 
+    //!   Possible memory leakage for IAR, because IAR will use malloc for VLA,
+    //! so if main thread is exited by APIs like exit, the argv will not be freed.
     char *argv[ctx->arg.argc + 1];
     if (ctx->arg.argv != NULL) {
         memcpy(argv, ctx->arg.argv, (ctx->arg.argc + 1) * sizeof(argv[0]));
@@ -1964,6 +1971,8 @@ int __vsf_linux_script_main(int argc, char **argv)
         }
     }
 
+    //!   Possible memory leakage for IAR, because IAR will use malloc for VLA,
+    //! so if main thread is exited by APIs like exit, the argv will not be freed.
     char *shell_argv[argc + 2];
     shell_argv[0] = cmdline;
     char script_path[strlen(process->path) + 1];
@@ -3989,6 +3998,17 @@ static uint32_t __vsf_linux_loader_fd_read(vsf_loader_target_t *target, uint32_t
     }
     return read(fd, buffer, size);
 }
+
+static void __vsf_linux_loader_atexit(void)
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    vsf_linux_dynloader_t *linux_loader = process->loader;
+    VSF_LINUX_ASSERT(linux_loader != NULL);
+
+    vsf_loader_cleanup(&linux_loader->loader.generic);
+    free(linux_loader);
+}
 #endif
 
 void * dlopen(const char *pathname, int mode)
@@ -4029,13 +4049,14 @@ void * dlopen(const char *pathname, int mode)
         goto close_and_fail;
     }
 
+    vsf_linux_process_t *process = vsf_linux_get_real_process(NULL);
+    VSF_LINUX_ASSERT(process != NULL);
+    process->loader = linux_loader;
+    atexit(__vsf_linux_loader_atexit);
     if (!vsf_loader_load(&linux_loader->loader.generic, &linux_loader->target)) {
         vsf_loader_call_init_array(&linux_loader->loader.generic);
         return linux_loader;
     }
-
-    vsf_loader_cleanup(&linux_loader->loader.generic);
-    free(linux_loader);
 
 close_and_fail:
     close(fd);
