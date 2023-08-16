@@ -239,7 +239,7 @@ lookup_next_image:
             new_file->image = image;
             new_file->header = header;
             new_file->name = (char *)header->name;
-            new_file->attr = VSF_FILE_ATTR_READ;
+            new_file->attr |= VSF_FILE_ATTR_READ;
 
             uint32_t romfs_attr = nextfh & ROMFS_FILEATTR_MSK;
             while (ROMFS_FILEATTR_HRD == romfs_attr) {
