@@ -592,7 +592,7 @@ static void __hci_transport_aic8800_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     (hci_transport_aic8800_buffer_t *)msg);
         }
         break;
-    case VSF_EVT_USER + 0: {    // EVT_RX
+    case VSF_EVT_USER + 0: {    // EVT_TX
             const uint8_t event[] = { HCI_EVENT_TRANSPORT_PACKET_SENT, 0 };
             VSF_HAL_ASSERT(__hci_transport_aic8800_param.packet_handler != NULL);
             __hci_transport_aic8800_param.packet_handler(HCI_EVENT_PACKET, (uint8_t *)event, sizeof(event));
