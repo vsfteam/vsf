@@ -1261,7 +1261,7 @@ static int __vsf_linux_fb_close(vsf_linux_fd_t *sfd)
     vsf_eda_fini(&fb_priv->fresh_task.use_as__vsf_eda_t);
     if (    (fb_priv->front_buffer != NULL)
 #if VSF_DISP_USE_FB == ENABLED
-        &&  (fb_priv->is_disp_fb)
+        &&  !fb_priv->is_disp_fb
 #endif
         ) {
         free(fb_priv->front_buffer);
