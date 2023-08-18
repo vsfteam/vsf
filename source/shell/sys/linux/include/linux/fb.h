@@ -15,8 +15,15 @@ extern "C" {
 #define FBIOGETCMAP             (('F' << 8) | 4)
 #define FBIOPUTCMAP             (('F' << 8) | 5)
 #define FBIOPAN_DISPLAY         (('F' << 8) | 6)
-#define FBIOBLANK               (('F' << 8) | 11)
-#define FBIO_WAITFORVSYNC       (('F' << 8) | 20)
+#define FBIOBLANK               (('F' << 8) | 17)
+#define FBIO_WAITFORVSYNC       (('F' << 8) | 32)
+
+// supported only by VSF for displays without framebuffer,
+//  take an argument as pointer to vk_disp_area_t.
+// Usage:
+// No need to mmap the frame buffer, just set the area to update,
+//  and then write the buffer of the area.
+#define FBIOSET_AREA            (('F' << 8) | 64)
 
 #define VESA_NO_BLANKING        0
 #define VESA_VSYNC_SUSPEND      1

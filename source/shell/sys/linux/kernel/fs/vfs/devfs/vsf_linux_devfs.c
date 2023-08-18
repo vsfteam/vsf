@@ -1034,6 +1034,8 @@ typedef struct vsf_linux_fb_priv_t {
 #if VSF_DISP_USE_FB == ENABLED
     bool is_disp_fb;
 #endif
+    bool is_area_set;
+    vk_disp_area_t area;
     vsf_trig_t fresh_trigger;
     vsf_teda_t fresh_task;
     vsf_eda_t *eda_pending;
@@ -1089,18 +1091,8 @@ static void __vsf_linux_fb_init(vsf_linux_fd_t *sfd)
     if (fb_priv->is_disp_fb) {
         fb_priv->front_buffer = vk_disp_fb_get_front_buffer(disp);
         return;
-    } else
-#endif
-    {
-        vsf_eda_trig_init(&fb_priv->fresh_trigger, false, true);
-        fb_priv->fresh_task.fn.evthandler = __vsf_linux_disp_fresh_task;
-        disp->ui_data = &fb_priv->fresh_task;
-        vsf_teda_init(&fb_priv->fresh_task);
     }
-
-    uint_fast32_t frame_size = disp->param.height * disp->param.width * vsf_disp_get_pixel_bytesize(disp);
-    fb_priv->front_buffer = malloc(frame_size);
-    VSF_LINUX_ASSERT(fb_priv->front_buffer != NULL);
+#endif
 }
 
 static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
@@ -1193,7 +1185,7 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
                 vk_disp_fb_set_front_buffer(disp, frame_idx);
             } else
 #endif
-            {
+            if (fb_priv->front_buffer != NULL) {
                 VSF_LINUX_ASSERT(NULL == fb_priv->eda_pending);
                 fb_priv->eda_pending = vsf_eda_get_cur();
                 VSF_LINUX_ASSERT(fb_priv->eda_pending != NULL);
@@ -1203,6 +1195,10 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
         break;
     case FBIO_WAITFORVSYNC:
         // TODO
+        break;
+    case FBIOSET_AREA:
+        fb_priv->area = *(vk_disp_area_t *)arg;
+        fb_priv->is_area_set = true;
         break;
     default:
         return __vsf_linux_default_fcntl(sfd, cmd, arg);
@@ -1227,8 +1223,11 @@ static ssize_t __vsf_linux_fb_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
         count = frame_size - vfs_file->pos;
     }
 
-    memcpy(buf, (void *)((uint8_t *)fb_priv->front_buffer + vfs_file->pos), count);
-    return count;
+    if (fb_priv->front_buffer != NULL) {
+        memcpy(buf, (void *)((uint8_t *)fb_priv->front_buffer + vfs_file->pos), count);
+        return count;
+    }
+    return -1;
 }
 
 static ssize_t __vsf_linux_fb_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
@@ -1242,15 +1241,24 @@ static ssize_t __vsf_linux_fb_write(vsf_linux_fd_t *sfd, const void *buf, size_t
         count = frame_size - vfs_file->pos;
     }
 
-    memcpy((void *)((uint8_t *)fb_priv->front_buffer + vfs_file->pos), buf, count);
+    if (fb_priv->front_buffer != NULL) {
+        memcpy((void *)((uint8_t *)fb_priv->front_buffer + vfs_file->pos), buf, count);
 #if VSF_DISP_USE_FB == ENABLED
-    if (!fb_priv->is_disp_fb)
+        if (!fb_priv->is_disp_fb)
 #endif
-    {
+        {
+            VSF_LINUX_ASSERT(NULL == fb_priv->eda_pending);
+            fb_priv->eda_pending = vsf_eda_get_cur();
+            VSF_LINUX_ASSERT(fb_priv->eda_pending != NULL);
+            vsf_thread_wfe(VSF_EVT_USER);
+        }
+    } else if (fb_priv->is_area_set) {
         VSF_LINUX_ASSERT(NULL == fb_priv->eda_pending);
-        fb_priv->eda_pending = vsf_eda_get_cur();
-        VSF_LINUX_ASSERT(fb_priv->eda_pending != NULL);
+        disp->ui_data = vsf_eda_get_cur();
+        vk_disp_refresh(disp, &fb_priv->area, (void *)buf);
         vsf_thread_wfe(VSF_EVT_USER);
+    } else {
+        return -1;
     }
     return count;
 }
@@ -1264,6 +1272,7 @@ static int __vsf_linux_fb_close(vsf_linux_fd_t *sfd)
         &&  !fb_priv->is_disp_fb
 #endif
         ) {
+        vsf_eda_fini(&fb_priv->fresh_task.use_as__vsf_eda_t);
         free(fb_priv->front_buffer);
     }
     fb_priv->front_buffer = NULL;
@@ -1278,14 +1287,28 @@ static void * __vsf_linux_fb_mmap(vsf_linux_fd_t *sfd, off64_t offset, size_t le
 #if VSF_DISP_USE_FB == ENABLED
     if (fb_priv->is_disp_fb) {
         fb_priv->front_buffer = vk_disp_fb_set_front_buffer(disp, 0);
-        return (void *)((uintptr_t)fb_priv->front_buffer + offset);
-    }
+        return (void *)((uint8_t *)fb_priv->front_buffer + offset);
+    } else
 #endif
+    if (NULL == fb_priv->front_buffer) {
+        uint_fast32_t frame_size = disp->param.height * disp->param.width * vsf_disp_get_pixel_bytesize(disp);
+        fb_priv->front_buffer = malloc(frame_size);
+        if (fb_priv->front_buffer != NULL) {
+            vsf_eda_trig_init(&fb_priv->fresh_trigger, false, true);
+            fb_priv->fresh_task.fn.evthandler = __vsf_linux_disp_fresh_task;
+            disp->ui_data = &fb_priv->fresh_task;
+            vsf_teda_init(&fb_priv->fresh_task);
+        }
+    }
+    if (NULL == fb_priv->front_buffer) {
+        return NULL;
+    }
+
     uint_fast32_t frame_size = disp->param.height * disp->param.width * vsf_disp_get_pixel_bytesize(disp);
     if ((offset + len) > frame_size) {
         return NULL;
     }
-    return (void *)((uintptr_t)fb_priv->front_buffer + offset);
+    return (void *)((uint8_t *)fb_priv->front_buffer + offset);
 }
 
 static int __vsf_linux_fb_msync(vsf_linux_fd_t *sfd, void *buffer)
@@ -1297,8 +1320,7 @@ static int __vsf_linux_fb_msync(vsf_linux_fd_t *sfd, void *buffer)
         return 0;
     } else
 #endif
-    {
-        VSF_LINUX_ASSERT(buffer == fb_priv->front_buffer);
+    if (fb_priv->front_buffer != NULL) {
         VSF_LINUX_ASSERT(NULL == fb_priv->eda_pending);
         fb_priv->eda_pending = vsf_eda_get_cur();
         VSF_LINUX_ASSERT(fb_priv->eda_pending != NULL);
