@@ -2432,7 +2432,9 @@ int mount(const char *source, const char *target,
     } else {
 #if VSF_FS_USE_MALFS == ENABLED
         vsf_linux_fsdata_auto_t *fsdata = (vsf_linux_fsdata_auto_t *)data;
-        vk_malfs_mounter_t mounter;
+        vk_malfs_mounter_t mounter = {
+            .err    = VSF_ERR_NONE,
+        };
         mounter.dir = dir;
         mounter.mal = fsdata->mal;
         mounter.mutex = &fsdata->mutex;
