@@ -103,10 +103,23 @@ bool vsf_romfs_is_image_valid(vk_romfs_header_t *image)
     return (image->nextfh == be32_to_cpu(0x2d726f6d)) && (image->spec == be32_to_cpu(0x3166732d));
 }
 
-vk_romfs_header_t * vsf_romfs_chain_get_next(vk_romfs_header_t *image)
+vk_romfs_header_t * vsf_romfs_chain_get_next(vk_romfs_info_t *fsinfo, vk_romfs_header_t *image, bool force)
 {
-    image = (vk_romfs_header_t *)((uint8_t *)image + be32_to_cpu(image->size));
-    return vsf_romfs_is_image_valid(image) ? image : NULL;
+    if (fsinfo->is_chained && vsf_romfs_is_image_valid(image)) {
+        uint8_t *ptr = (uint8_t *)image + be32_to_cpu(image->size);
+        uint32_t alignment = fsinfo->alignment;
+        if (alignment > 16) {
+            ptr = (uint8_t *)((uintptr_t)(ptr + alignment - 1) & ~(alignment - 1));
+        }
+
+        int diff = ptr - (uint8_t *)(fsinfo->image);
+        if ((diff < 0) || (diff >= fsinfo->image_size)) {
+            return NULL;
+        }
+        image = (vk_romfs_header_t *)ptr;
+        return (force || vsf_romfs_is_image_valid(image)) ? image : NULL;
+    }
+    return NULL;
 }
 
 static vk_romfs_header_t * __vsf_romfs_lookup_in_dir(vk_romfs_header_t *image, vk_romfs_header_t *dir, char *name)
@@ -163,7 +176,7 @@ static bool __vsf_romfs_should_hide(vk_romfs_header_t *image_head, vk_romfs_head
         if ((header != NULL) && (__vsf_romfs_lookup_in_dir(image_head, header, name) != NULL)) {
             return true;
         }
-        image_head = (vk_romfs_header_t *)((uint8_t *)image_head + be32_to_cpu(image_head->size));
+        image_head = vsf_romfs_chain_get_next((vk_romfs_info_t *)dir->fsinfo, image_head, false);
     }
     return false;
 }
@@ -269,8 +282,8 @@ lookup_next_image:
         }
     } else if (fsinfo->is_chained) {
         while (true) {
-            image = vsf_romfs_chain_get_next(image);
-            if ((NULL == image) || ((uint8_t *)image >= ((uint8_t *)fsinfo->image + fsinfo->image_size))) {
+            image = vsf_romfs_chain_get_next(fsinfo, image, false);
+            if (NULL == image) {
                 goto not_found;
             }
 

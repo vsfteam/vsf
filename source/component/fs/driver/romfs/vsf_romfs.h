@@ -71,8 +71,9 @@ vsf_class(vk_romfs_info_t) {
     vk_romfs_file_t root;
 
     vk_romfs_header_t *image;
-    // image_size is necessary only if is_chained is true
+    // image_size/alignment is necessary only if is_chained is true
     uint32_t image_size;
+    uint32_t alignment;
     // used to chian multiple romfs
     bool is_chained;
 };
@@ -85,7 +86,7 @@ extern const vk_fs_op_t vk_romfs_op;
 
 #if defined(__VSF_ROMFS_CLASS_INHERIT__) || defined(__VSF_ROMFS_CLASS_IMPLEMENT)
 extern bool vsf_romfs_is_image_valid(vk_romfs_header_t *image);
-extern vk_romfs_header_t * vsf_romfs_chain_get_next(vk_romfs_header_t *image);
+extern vk_romfs_header_t * vsf_romfs_chain_get_next(vk_romfs_info_t *info, vk_romfs_header_t *image, bool force);
 #endif
 
 #ifdef __cplusplus
