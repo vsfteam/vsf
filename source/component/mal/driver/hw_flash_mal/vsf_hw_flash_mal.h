@@ -29,6 +29,9 @@
 #if     defined(__VSF_HW_FLASH_MAL_CLASS_IMPLEMENT)
 #   undef __VSF_HW_FLASH_MAL_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
+#elif   defined(__VSF_HW_FLASH_MAL_CLASS_INHERIT__)
+#   undef __VSF_HW_FLASH_MAL_CLASS_INHERIT__
+#   define __VSF_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -46,8 +49,10 @@ vsf_class(vk_hw_flash_mal_t) {
         implement(vk_mal_t)
         vsf_hw_flash_t *flash;
     )
-    private_member(
+    protected_member(
         vsf_flash_capability_t cap;
+    )
+    private_member(
         vsf_eda_t *cur;
     )
 };
