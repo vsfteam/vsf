@@ -35,7 +35,7 @@
 static uint_fast32_t __vk_cached_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
 static bool __vk_cached_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
 dcl_vsf_peda_methods(static, __vk_cached_mal_init)
-dcl_vsf_peda_methods(static, __vk_cached_mal_close)
+dcl_vsf_peda_methods(static, __vk_cached_mal_fini)
 dcl_vsf_peda_methods(static, __vk_cached_mal_read)
 dcl_vsf_peda_methods(static, __vk_cached_mal_write)
 dcl_vsf_peda_methods(static, __vk_cached_mal_erase)
@@ -51,7 +51,7 @@ const vk_mal_drv_t vk_cached_mal_drv = {
     .blksz          = __vk_cached_mal_blksz,
     .buffer         = __vk_cached_mal_buffer,
     .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_init),
-    .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_close),
+    .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_fini),
     .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_read),
     .write          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_write),
     .erase          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_erase),
@@ -102,7 +102,9 @@ __vsf_component_peda_ifs_entry(__vk_cached_mal_init, vk_mal_init)
     vsf_peda_end();
 }
 
-__vsf_component_peda_ifs_entry(__vk_cached_mal_close, vk_mal_fini)
+__vsf_component_peda_ifs_entry(__vk_cached_mal_fini, vk_mal_fini,
+    bool is_sync_erasing;
+)
 {
     vsf_peda_begin();
     vk_cached_mal_t *pthis = (vk_cached_mal_t *)&vsf_this;
@@ -110,14 +112,19 @@ __vsf_component_peda_ifs_entry(__vk_cached_mal_close, vk_mal_fini)
     switch (evt) {
     case VSF_EVT_INIT:
         if (pthis->cache_valid) {
-            vk_mal_write(pthis->host_mal, pthis->cache_addr, pthis->cache_size, pthis->cache);
-            break;
+            vsf_local.is_sync_erasing = true;
+            vk_mal_erase(pthis->host_mal, pthis->cache_addr, pthis->cache_size);
         } else {
             vsf_eda_return(VSF_ERR_NONE);
+        }
+        break;
+    case VSF_EVT_RETURN:
+        if (vsf_local.is_sync_erasing) {
+            vsf_local.is_sync_erasing = false;
+            vk_mal_write(pthis->host_mal, pthis->cache_addr, pthis->cache_size, pthis->cache);
             break;
         }
-        // fall through
-    case VSF_EVT_RETURN:
+
         vsf_heap_free(pthis->cache);
         pthis->cache = NULL;
         vsf_eda_return(vsf_eda_get_return_value());
@@ -240,11 +247,14 @@ __vsf_component_peda_ifs_entry(__vk_cached_mal_write, vk_mal_write,
                 goto sync_cache;
             }
         } else if (!(cur_addr % pthis->cache_size) && (cur_size > pthis->cache_size)) {
-            cur_size &= ~(pthis->cache_size - 1);
+            cur_size = pthis->cache_size;
             vsf_local.addr += cur_size;
             vsf_local.buff += cur_size;
             vsf_local.remain_size -= cur_size;
-            vk_mal_write(pthis->host_mal, cur_addr, cur_size, cur_buff);
+            vsf_local.is_sync_erasing = true;
+            pthis->cache_addr = cur_addr;
+            memcpy(pthis->cache, cur_buff, pthis->cache_size);
+            vk_mal_erase(pthis->host_mal, pthis->cache_addr, pthis->cache_size);
             break;
         } else {
             cur_addr = cur_addr & ~(pthis->cache_size - 1);
