@@ -203,7 +203,7 @@ __vsf_component_peda_ifs(vk_mal_write,
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 /**
  \~english reentrant mal class
- @note Normally, a mal instance is not reentrant. Follow the steps to get multiple 
+ @note Normally, a mal instance is not reentrant. Follow the steps to get multiple
         mal instance which is protect with a common mutex.
         1. prepare a common mutex instance for malA
         2. in each task which will asscess malA, implement a vk_reentrant_mal_t instance.
@@ -471,6 +471,7 @@ extern vsf_err_t vk_mal_write_stream(vk_mal_stream_t *pthis, uint_fast64_t addr,
 #include "./driver/file_mal/vsf_file_mal.h"
 #include "./driver/hw_flash_mal/vsf_hw_flash_mal.h"
 #include "./driver/mmc_mal/vsf_mmc_mal.h"
+#include "./driver/cached_mal/vsf_cached_mal.h"
 
 #undef __VSF_MAL_CLASS_IMPLEMENT
 #undef __VSF_MAL_CLASS_INHERIT__

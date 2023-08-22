@@ -15,35 +15,53 @@
  *                                                                           *
  ****************************************************************************/
 
+#ifndef __VSF_CACHED_MAL_H__
+#define __VSF_CACHED_MAL_H__
+
 /*============================ INCLUDES ======================================*/
 
-//! \note do not move this pre-processor statement to other places
-#include "component/vsf_component_cfg.h"
+#include "../../vsf_mal_cfg.h"
 
-#ifndef __VSF_MAL_CFG_H__
-#define __VSF_MAL_CFG_H__
+#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_CACHED_MAL == ENABLED
+
+#if     defined(__VSF_CACHED_MAL_CLASS_IMPLEMENT)
+#   undef __VSF_CACHED_MAL_CLASS_IMPLEMENT
+#   define __VSF_CLASS_IMPLEMENT__
+#endif
+
+#include "utilities/ooc_class.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
-
-#ifndef VSF_MAL_ASSERT
-#   define VSF_MAL_ASSERT               VSF_ASSERT
-#endif
-
-#ifndef VSF_MAL_USE_MIM_MAL
-#   define VSF_MAL_USE_MIM_MAL          ENABLED
-#endif
-
-#ifndef VSF_MAL_USE_CACHED_MAL
-#   define VSF_MAL_USE_CACHED_MAL       ENABLED
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+vsf_class(vk_cached_mal_t) {
+    public_member(
+        implement(vk_mal_t)
+        vk_mal_t *host_mal;
+    )
+    private_member(
+        uint8_t *cache;
+        uint32_t cache_size;
+        uint32_t cache_pos;
+        uint64_t cache_addr;
+        bool cache_valid;
+    )
+};
+
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
+
+extern const vk_mal_drv_t vk_cached_mal_drv;
+
 /*============================ PROTOTYPES ====================================*/
 
-
-
+#ifdef __cplusplus
+}
 #endif
-/* EOF */
+
+#endif      // VSF_USE_MAL && VSF_MAL_USE_CACHED_MAL
+#endif      // __VSF_CACHED_MAL_H__
