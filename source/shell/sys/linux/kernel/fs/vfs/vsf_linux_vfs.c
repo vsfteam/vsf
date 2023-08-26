@@ -154,7 +154,7 @@ static ssize_t __vsf_linux_proc_meminfo_read(vsf_linux_fd_t *sfd, void *buf, siz
     __vsf_linux_proc_meminfo_show_value(&ctx, "SwapFree:       %d kB\n", 0);
 
     ssize_t result =  ctx.file->pos - pos_orig;
-    return result > 0 ? result : -1;
+    return result > 0 ? result : 0;
 }
 
 static int __vsf_linux_proc_meminfo_stat(vsf_linux_fd_t *sfd, struct stat *buf)
