@@ -278,16 +278,16 @@ typedef struct vsf_gpio_t vsf_gpio_t;
 
 typedef void vsf_gpio_isr_handler_t(void *target_ptr, vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 
-typedef struct VSF_GPIO_INT_MODE_isr_t {
-    vsf_gpio_isr_handler_t   *handler_fn;
-    void                     *target_ptr;
-} VSF_GPIO_INT_MODE_isr_t;
+typedef struct vsf_gpio_isr_t {
+    vsf_gpio_isr_handler_t              *handler_fn;
+    void                                *target_ptr;
+} vsf_gpio_isr_t;
 
 //! gpio channel configuration
 typedef struct vsf_gpio_pin_irq_cfg_t {
-    vsf_gpio_pin_mask_t       pin_mask;
-    vsf_gpio_interrupt_mode_t mode;
-    VSF_GPIO_INT_MODE_isr_t        isr;
+    vsf_gpio_pin_mask_t                 pin_mask;
+    vsf_gpio_interrupt_mode_t           mode;
+    vsf_gpio_isr_t                      isr;
 } vsf_gpio_pin_irq_cfg_t;
 
 typedef struct vsf_gpio_capability_t {
