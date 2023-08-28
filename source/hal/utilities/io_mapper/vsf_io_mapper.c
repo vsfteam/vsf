@@ -19,7 +19,7 @@
 
 #include "hal/vsf_hal.h"
 
-#if VSF_HW_GPIO_COUNT > 0
+#if VSF_HAL_USE_GPIO == ENABLED && VSF_HW_GPIO_COUNT > 0
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -41,4 +41,4 @@ const vsf_io_mapper_type(vsf_hw) vsf_hw_io_mapper = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#endif      // VSF_HW_GPIO_COUNT > 0
+#endif      // VSF_HAL_USE_GPIO && VSF_HW_GPIO_COUNT > 0
