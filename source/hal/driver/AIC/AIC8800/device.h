@@ -49,6 +49,22 @@
 
 /*============================ MACROS ========================================*/
 
+#define VSF_HW_FLASH_CFG_BASE_ADDRESS               0x08000000
+#define VSF_HW_FLASH_CFG_ERASE_SECTORE_SIZE         0x1000
+#define VSF_HW_FLASH_CFG_WRITE_SECTORE_SIZE         0x100
+#define __ROM_APITBL_BASE                           ((unsigned int *)0x00000180UL)
+#define __ROM_FlashChipSizeGet                                                  \
+    ((unsigned int (*)(void))__ROM_APITBL_BASE[2])
+#define __ROM_FlashErase                                                        \
+    ((int (*)(unsigned int a4k, unsigned int len))__ROM_APITBL_BASE[4])
+#define __ROM_FlashWrite                                                        \
+    ((int (*)(unsigned int adr, unsigned int len, unsigned int buf))__ROM_APITBL_BASE[5])
+#define __ROM_FlashRead                                                         \
+    ((int (*)(unsigned int adr, unsigned int len, unsigned int buf))__ROM_APITBL_BASE[6])
+#define __ROM_FlashCacheInvalidRange                                            \
+    ((void (*)(unsigned int adr, unsigned int len))__ROM_APITBL_BASE[8])
+
+
 #ifndef VSF_AIC8800_USB_CFG_SPEED
 #   define VSF_AIC8800_USB_CFG_SPEED                USB_SPEED_HIGH
 // AIC8800 has problem with usbh disconnect detecting level in high speed mode,
