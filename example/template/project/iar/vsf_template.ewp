@@ -10564,6 +10564,15 @@
                 <group>
                     <name>driver</name>
                     <group>
+                        <name>cached_mal</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\cached_mal\vsf_cached_mal.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\cached_mal\vsf_cached_mal.h</name>
+                        </file>
+                    </group>
+                    <group>
                         <name>fakefat32_mal</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\fakefat32_mal\vsf_fakefat32_mal.c</name>
