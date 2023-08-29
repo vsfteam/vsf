@@ -60,15 +60,14 @@ typedef struct vsf_hw_gpio_t {
 #endif
 
     GPIO_REG_T *GPIO;
-    uint32_t output_reg;
-    uint8_t is_pmic;
-    uint16_t gpio_pin_mask; // in pmic port, must set bit to 1 in MR register
-
     AIC_IOMUX_TypeDef *IOMUX;
-
-    IRQn_Type irqn;
-
     vsf_gpio_isr_t *isrs;
+
+    uint16_t output_reg;
+    uint8_t is_pmic;
+    IRQn_Type irqn;
+    uint16_t gpio_pin_mask; // in pmic port, must set bit to 1 in MR register
+    uint16_t gpio_pin_isr_mask;
 } vsf_hw_gpio_t;
 
 /*============================ IMPLEMENTATION ================================*/
@@ -191,19 +190,35 @@ vsf_gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
     return gpio_capability;
 }
 
-vsf_err_t vsf_hw_gpio_pin_interrupt_init(vsf_hw_gpio_t *hw_gpio_ptr, vsf_arch_prio_t prio)
+vsf_err_t vsf_hw_gpio_pin_interrupt_enable(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
+    uint16_t pin_mask_orig;
+    vsf_protect_t orig;
 
     if (hw_gpio_ptr->is_pmic) {
         return VSF_ERR_NOT_SUPPORT;
     }
 
     if (prio == vsf_arch_prio_invalid) {
-        NVIC_DisableIRQ(hw_gpio_ptr->irqn);
+        orig = __vsf_gpio_protect();
+        hw_gpio_ptr->gpio_pin_isr_mask &= ~pin_mask;
+        pin_mask_orig = hw_gpio_ptr->gpio_pin_isr_mask;
+        __vsf_gpio_unprotect(orig);
+
+        if (!pin_mask_orig) {
+            NVIC_DisableIRQ(hw_gpio_ptr->irqn);
+        }
     } else {
-        NVIC_SetPriority(hw_gpio_ptr->irqn, prio);
-        NVIC_EnableIRQ(hw_gpio_ptr->irqn);
+        orig = __vsf_gpio_protect();
+        pin_mask_orig = hw_gpio_ptr->gpio_pin_isr_mask;
+        hw_gpio_ptr->gpio_pin_isr_mask |= pin_mask;
+        __vsf_gpio_unprotect(orig);
+
+        if (!pin_mask_orig) {
+            NVIC_SetPriority(hw_gpio_ptr->irqn, prio);
+            NVIC_EnableIRQ(hw_gpio_ptr->irqn);
+        }
     }
 
     return VSF_ERR_NONE;
@@ -323,7 +338,6 @@ void __vsf_hw_gpio_irq_handler(vsf_hw_gpio_t *hw_gpio_ptr)
         .IOMUX = ((AIC_IOMUX_TypeDef *)VSF_HW_IO_PORT ## __COUNT ## _IOMUX_REG_BASE),\
         .is_pmic = VSF_HW_IO_PORT ## __COUNT ## _IS_PMIC,                       \
         .gpio_pin_mask = VSF_HW_IO_PORT ## __COUNT ## _GPIO_PIN_MASK,           \
-        .output_reg = 0,                                                        \
         .isrs = VSF_HW_IO_PORT ## __COUNT ## _IS_PMIC ?                         \
                 NULL : __vsf_hw_gpio ## __COUNT ## isr,                         \
         __HAL_OP                                                                \

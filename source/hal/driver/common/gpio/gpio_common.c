@@ -159,13 +159,13 @@ vsf_gpio_capability_t vsf_gpio_capability(vsf_gpio_t *gpio_ptr)
 }
 
 
-vsf_err_t vsf_gpio_pin_interrupt_init(vsf_gpio_t *gpio_ptr, vsf_arch_prio_t prio)
+vsf_err_t vsf_gpio_pin_interrupt_enable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
-    VSF_HAL_ASSERT(gpio_ptr->op->pin_interrupt_init != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op->pin_interrupt_enable != NULL);
 
-    return gpio_ptr->op->pin_interrupt_init(gpio_ptr, prio);
+    return gpio_ptr->op->pin_interrupt_enable(gpio_ptr, pin_mask, prio);
 }
 
 vsf_err_t vsf_gpio_pin_interrupt_config(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg)

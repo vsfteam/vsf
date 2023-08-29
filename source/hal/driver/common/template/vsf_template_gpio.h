@@ -136,7 +136,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, toggle,                  VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_set,          VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_clear,        VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, pin_interrupt_init,      VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_arch_prio_t prio)                                              \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, pin_interrupt_enable,    VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)                \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, pin_interrupt_config,    VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
 
 /*============================ TYPES =========================================*/
@@ -575,20 +575,24 @@ extern vsf_gpio_capability_t vsf_gpio_capability(vsf_gpio_t *gpio_ptr);
 
 /**
  \~english
- @brief Configure one or more pins of the gpio instance
+ @brief Enable interrupt of a pin
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
- @param[in] cfg: a pointer to structure @ref vsf_gpio_pin_irq_cfg_t
+ @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the bit
+ @param[in] prio: priority of the interrupt or vsf_arch_prio_invalid for disable
+ @note For some devices, prio parameter maybe shared between pins on the gpio.
 
  \~chinese
- @brief 配置 gpio 实例的一个或者多个引脚
+ @brief 使能指定引脚的中断
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
- @param[in] cfg: 结构体 vsf_gpio_pin_irq_cfg_t 的指针，参考 @ref vsf_gpio_pin_irq_cfg_t
+ @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，1表示该位需要使能，0表示该位不需要使能
+ @param[in] prio: 中断优先级，或者用 vsf_arch_prio_invalid 表示关闭中断
+ @note 对于一些芯片, 中断优先级可能是 gpio 上所有引脚公用的.
  */
-extern vsf_err_t vsf_gpio_pin_interrupt_init(vsf_gpio_t *gpio_ptr, vsf_arch_prio_t prio);
+extern vsf_err_t vsf_gpio_pin_interrupt_enable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio);
 
 /**
  \~english
- @brief Configure one or more pins of the gpio instance
+ @brief Configure interrupt of one or more pins of the gpio instance
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
  @param[in] cfg: a pointer to structure @ref vsf_gpio_pin_irq_cfg_t
 
@@ -618,7 +622,7 @@ extern vsf_err_t vsf_gpio_pin_interrupt_config(vsf_gpio_t *gpio_ptr, vsf_gpio_pi
 #   define vsf_gpio_output_and_set(__GPIO, ...)         VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_set)         ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
 #   define vsf_gpio_output_and_clear(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_clear)       ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
 #   define vsf_gpio_toggle(__GPIO, ...)                 VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_toggle)                 ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_pin_interrupt_init(__GPIO, ...)     VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_pin_interrupt_init)     ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_pin_interrupt_enable(__GPIO, ...)   VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_pin_interrupt_enable)   ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
 #   define vsf_gpio_pin_interrupt_config(__GPIO, ...)   VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_pin_interrupt_config)   ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
 #endif
 

@@ -467,10 +467,10 @@ static vsf_err_t __gpio_demo_pin_interrupt_init(gpio_test_t *test, vsf_arch_prio
     VSF_ASSERT(NULL != test);
     vsf_gpio_t *gpio_ptr = test->in.gpio;
 
-    vsf_err_t err = vsf_gpio_pin_interrupt_init(gpio_ptr, arch_prio);
+    vsf_err_t err = vsf_gpio_pin_interrupt_enable(gpio_ptr, test->in.pin_mask, arch_prio);
     if (test->verbose >= 2) {
-        vsf_trace_debug("vsf_gpio_pin_interrupt_init(&%s, vsf_arch_prio_%d) = %d/*vsf_err_t*/" VSF_TRACE_CFG_LINEEND,
-                        test->in.name, hal_demo_arch_prio_to_num(arch_prio), err);
+        vsf_trace_debug("vsf_gpio_pin_interrupt_enable(&%s, %d, vsf_arch_prio_%d) = %d/*vsf_err_t*/" VSF_TRACE_CFG_LINEEND,
+                        test->in.name, test->in.pin_mask, hal_demo_arch_prio_to_num(arch_prio), err);
     }
     return err;
 }
