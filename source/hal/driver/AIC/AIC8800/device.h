@@ -104,8 +104,10 @@
 
 #define VSF_HW_GPIO_PORT_COUNT          VSF_HW_IO_PORT_COUNT
 #define VSF_HW_GPIO_PIN_COUNT           VSF_HW_IO_PIN_COUNT
+#define VSF_HW_GPIO0_BASE_ADDRESS       (0x40504000UL)
 #define VSF_HW_GPIO0_IRQ_IDX            GPIO_IRQn
 #define VSF_HW_GPIO0_IRQ                GPIO_IRQHandler
+#define VSF_HW_GPIO1_BASE_ADDRESS       (0x50011000UL)
 #define VSF_HW_GPIO1_IRQ_IDX            0                   // TODO
 #define VSF_HW_GPIO1_IRQ                GPIOB_IRQHandler
 

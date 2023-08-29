@@ -333,8 +333,8 @@ void __vsf_hw_gpio_irq_handler(vsf_hw_gpio_t *hw_gpio_ptr)
 #define VSF_GPIO_CFG_IMP_LV0(__COUNT, __HAL_OP)                                 \
     static vsf_gpio_isr_t __vsf_hw_gpio ## __COUNT ## isr[VSF_HW_IO_PIN_COUNT]; \
     vsf_hw_gpio_t vsf_hw_gpio ## __COUNT = {                                    \
-        .GPIO = REG_GPIO ## __COUNT,                                            \
-        .irqn = VSF_HW_GPIO ## __COUNT ##_IRQ_IDX,                              \
+        .GPIO = (GPIO_REG_T *)VSF_HW_GPIO ## __COUNT ## _BASE_ADDRESS,          \
+        .irqn = VSF_HW_GPIO ## __COUNT ## _IRQ_IDX,                             \
         .IOMUX = ((AIC_IOMUX_TypeDef *)VSF_HW_IO_PORT ## __COUNT ## _IOMUX_REG_BASE),\
         .is_pmic = VSF_HW_IO_PORT ## __COUNT ## _IS_PMIC,                       \
         .gpio_pin_mask = VSF_HW_IO_PORT ## __COUNT ## _GPIO_PIN_MASK,           \

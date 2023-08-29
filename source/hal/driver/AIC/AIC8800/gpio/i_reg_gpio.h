@@ -37,12 +37,6 @@ extern "C" {
 #   define __AIC8800_GPIO_USE_BIT_FIELD             DISABLED
 #endif
 
-#define GPIO0_BASE_ADDRESS                          (0X40504000UL)
-#define REG_GPIO0                                   ((GPIO_REG_T *)GPIO0_BASE_ADDRESS)
-
-#define GPIO1_BASE_ADDRESS                          (0x50011000UL)
-#define REG_GPIO1                                   ((GPIO_REG_T *)GPIO1_BASE_ADDRESS)
-
 /* Define structure member permissions : 'read only' */
 #ifndef __IM
 #   define __IM                                     const
