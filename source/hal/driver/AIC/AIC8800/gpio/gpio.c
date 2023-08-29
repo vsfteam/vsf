@@ -200,7 +200,7 @@ vsf_err_t vsf_hw_gpio_pin_interrupt_init(vsf_hw_gpio_t *hw_gpio_ptr, vsf_arch_pr
     }
 
     if (prio == vsf_arch_prio_invalid) {
-        NVIC_EnableIRQ(hw_gpio_ptr->irqn);
+        NVIC_DisableIRQ(hw_gpio_ptr->irqn);
     } else {
         NVIC_SetPriority(hw_gpio_ptr->irqn, prio);
         NVIC_EnableIRQ(hw_gpio_ptr->irqn);
