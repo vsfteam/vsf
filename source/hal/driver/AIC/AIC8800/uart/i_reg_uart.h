@@ -51,14 +51,6 @@ extern "C" {
 #   define __IOM
 #endif
 
-#define UART0_BASE_ADDRESS                          (0x40041000ul)
-#define UART1_BASE_ADDRESS                          (0x40042000ul)
-#define UART2_BASE_ADDRESS                          (0x40043000ul)
-
-#define UART0                                       ((uart_reg_t *)UART0_BASE_ADDRESS)
-#define UART1                                       ((uart_reg_t *)UART1_BASE_ADDRESS)
-#define UART2                                       ((uart_reg_t *)UART2_BASE_ADDRESS)
-
 #define TXRXD_REG                                   TXRXD.VALUE
 #define DIV0_REG                                    DIV0.VALUE
 #define IRQCTL_REG                                  IRQCTL.VALUE

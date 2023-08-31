@@ -121,6 +121,8 @@
 // uart0 is already used in the library(include interrupt) and debug_uart
 #define VSF_HW_USART_COUNT          2
 #define VSF_HW_USART_MASK           ((1 << 1) | (1 << 2))
+#define VSF_HW_USART1_REG           AIC_UART1_BASE
+#define VSF_HW_USART2_REG           AIC_UART2_BASE
 
 #define VSF_HW_I2C_COUNT            1
 #define VSF_HW_I2C0_IRQ_IDX         I2CM_IRQn
