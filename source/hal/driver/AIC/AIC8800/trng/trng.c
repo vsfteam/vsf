@@ -79,7 +79,7 @@ void vsf_hw_rng_fini(vsf_hw_rng_t *rng)
     AIC_TRNG_TypeDef *reg = rng->reg;
     reg->trng_en = 0;
 
-    cpusysctrl_hclkmd_set(rng->pclk);
+    cpusysctrl_pclkmd_set(rng->pclk);
 }
 
 vsf_err_t vsf_hw_rng_generate_request(vsf_hw_rng_t *rng, uint32_t *buffer, uint32_t num,
