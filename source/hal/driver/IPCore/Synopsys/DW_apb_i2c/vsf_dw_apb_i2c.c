@@ -43,11 +43,17 @@
 #define I2C_IC_CON_TX_EMPTY_CTRL_POS            8
 #define I2C_IC_CON_RX_FIFO_FULL_HLD_CTRL_POS    9
 
+// IC_TAR
+
+#define I2C_IC_TAR_POS                          12
+
 // IC_INTR_XXXX
+
 #define I2C_IC_INTR_RD_REQ_POS                  5
 #define I2C_IC_INTR_TX_ABRT_POS                 6
 
 // IC_TX_ABRT
+
 #define I2C_IC_TX_ABRT_ARBLOST                  12
 #define I2C_IC_TX_ABRT_SLV_ARBLOST              14
 #define I2C_IC_TX_ABRT_SLVRD_INTX               15
@@ -84,6 +90,7 @@ vsf_err_t vsf_dw_apb_i2c_init(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr, vsf_i2c_cfg_t *c
                     |   (1 << I2C_IC_CON_IC_RESTART_EN_POS)
                     |   (1 << I2C_IC_CON_TX_EMPTY_CTRL_POS)
                     |   (1 << I2C_IC_CON_RX_FIFO_FULL_HLD_CTRL_POS);
+    reg->IC_RX_TL.RX_TL = 0;
     reg->IC_TX_TL.TX_TL = 0;
 
     dw_apb_i2c_ptr->isr = cfg_ptr->isr;
@@ -112,8 +119,8 @@ vsf_err_t vsf_dw_apb_i2c_init(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr, vsf_i2c_cfg_t *c
             spklen = (uint32_t *)&reg->IC_FS_SPKLEN;
             break;
         case I2C_IC_CON_SPEED_VALUE_HIGH:
-            hcnt = (uint32_t *)&reg->IC_FS_SCL_HCNT;
-            lcnt = (uint32_t *)&reg->IC_FS_SCL_LCNT;
+            hcnt = (uint32_t *)&reg->IC_HS_SCL_HCNT;
+            lcnt = (uint32_t *)&reg->IC_HS_SCL_LCNT;
             spklen = (uint32_t *)&reg->IC_HS_SPKLEN;
             break;
         }
@@ -179,7 +186,7 @@ vsf_i2c_status_t vsf_dw_apb_i2c_status(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr)
     VSF_HAL_ASSERT(NULL != dw_apb_i2c_ptr);
     vsf_dw_apb_i2c_reg_t *reg = dw_apb_i2c_ptr->reg;
     return (vsf_i2c_status_t){
-        .use_as__vsf_peripheral_status_t.is_busy = reg->IC_STATUS.ACTIVITY,
+        .use_as__vsf_peripheral_status_t.is_busy = reg->IC_STATUS.IC_STATUS_ACTIVITY,
     };
 }
 
@@ -279,7 +286,7 @@ vsf_err_t vsf_dw_apb_i2c_master_request(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr,
     cmd &= ~VSF_I2C_CMD_STOP;
     if (cmd & VSF_I2C_CMD_10_BITS) {
         reg->IC_CON.IC_10BITADDR_MASTER = 1;
-        reg->IC_TAR.IC_TAR = address & 0x3FF;
+        reg->IC_TAR.IC_TAR = (address & 0x3FF) | (1 << I2C_IC_TAR_POS);
     } else {
         reg->IC_CON.IC_10BITADDR_MASTER = 0;
         reg->IC_TAR.IC_TAR = address & 0x7F;

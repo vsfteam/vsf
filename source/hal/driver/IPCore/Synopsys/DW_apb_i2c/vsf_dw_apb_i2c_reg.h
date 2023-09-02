@@ -58,6 +58,7 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
+// refer to: https://www.intel.com/content/www/us/en/programmable/hps/stratix-10/index.html#uvh1505405814792.html
 typedef struct vsf_dw_apb_i2c_reg_t {
     VSF_DEF_REG(IC_CON, 32,
         __IOM       reg32_t         MASTER_MODE                 : 1;
@@ -75,6 +76,7 @@ typedef struct vsf_dw_apb_i2c_reg_t {
         __IOM       reg32_t         IC_TAR                      : 10;
         __IOM       reg32_t         GC_OR_START                 : 1;
         __IOM       reg32_t         SPECIAL                     : 1;
+        __IOM       reg32_t         IC_10BITADDR_MASTER         : 1;
     );
     VSF_DEF_REG(IC_SAR, 32,
         __IOM       reg32_t         IC_SAR                      : 10;
@@ -114,13 +116,14 @@ typedef struct vsf_dw_apb_i2c_reg_t {
         __IM        reg32_t         R_TX_OVER                   : 1;
         __IM        reg32_t         R_TX_EMPTY                  : 1;
         __IM        reg32_t         R_RD_REQ                    : 1;
-        __IM        reg32_t         R_TX_ABORT                  : 1;
+        __IM        reg32_t         R_TX_ABRT                   : 1;
         __IM        reg32_t         R_RX_DONE                   : 1;
         __IM        reg32_t         R_ACTIVITY                  : 1;
         __IM        reg32_t         R_STOP_DET                  : 1;
         __IM        reg32_t         R_START_DET                 : 1;
         __IM        reg32_t         R_GEN_CALL                  : 1;
         __IM        reg32_t         R_RESTART_DET               : 1;
+        __IM        reg32_t         R_MASTER_ON_HOLD            : 1;
     );
     VSF_DEF_REG(IC_INTR_MASK, 32,
         __IOM       reg32_t         M_RX_UNDER                  : 1;
@@ -129,13 +132,14 @@ typedef struct vsf_dw_apb_i2c_reg_t {
         __IOM       reg32_t         M_TX_OVER                   : 1;
         __IOM       reg32_t         M_TX_EMPTY                  : 1;
         __IOM       reg32_t         M_RD_REQ                    : 1;
-        __IOM       reg32_t         M_TX_ABORT                  : 1;
+        __IOM       reg32_t         M_TX_ABRT                   : 1;
         __IOM       reg32_t         M_RX_DONE                   : 1;
         __IOM       reg32_t         M_ACTIVITY                  : 1;
         __IOM       reg32_t         M_STOP_DET                  : 1;
         __IOM       reg32_t         M_START_DET                 : 1;
         __IOM       reg32_t         M_GEN_CALL                  : 1;
         __IOM       reg32_t         M_RESTART_DET               : 1;
+        __IOM       reg32_t         M_MASTER_ON_HOLD            : 1;
     );
     VSF_DEF_REG(IC_RAW_INTR_STAT, 32,
         __IM        reg32_t         RX_UNDER                    : 1;
@@ -144,13 +148,14 @@ typedef struct vsf_dw_apb_i2c_reg_t {
         __IM        reg32_t         TX_OVER                     : 1;
         __IM        reg32_t         TX_EMPTY                    : 1;
         __IM        reg32_t         RD_REQ                      : 1;
-        __IM        reg32_t         TX_ABORT                    : 1;
+        __IM        reg32_t         TX_ABRT                     : 1;
         __IM        reg32_t         RX_DONE                     : 1;
         __IM        reg32_t         ACTIVITY                    : 1;
         __IM        reg32_t         STOP_DET                    : 1;
         __IM        reg32_t         START_DET                   : 1;
         __IM        reg32_t         GEN_CALL                    : 1;
         __IM        reg32_t         RESTART_DET                 : 1;
+        __IOM       reg32_t         MASTER_ON_HOLD              : 1;
     );
     VSF_DEF_REG(IC_RX_TL, 32,
         __IOM       reg32_t         RX_TL                       : 8;
@@ -197,7 +202,7 @@ typedef struct vsf_dw_apb_i2c_reg_t {
         __IOM       reg32_t         TX_CMD_BLOCK                : 1;
     );
     VSF_DEF_REG(IC_STATUS, 32,
-        __IM        reg32_t         ACTIVITY                    : 1;
+        __IM        reg32_t         IC_STATUS_ACTIVITY          : 1;
         __IM        reg32_t         TFNF                        : 1;
         __IM        reg32_t         TFE                         : 1;
         __IM        reg32_t         RFNE                        : 1;
@@ -206,10 +211,10 @@ typedef struct vsf_dw_apb_i2c_reg_t {
         __IM        reg32_t         SLV_ACTIVITY                : 1;
     );
     VSF_DEF_REG(IC_TXFLR, 32,
-        __IM        reg32_t         TXFLR                       : 4;
+        __IM        reg32_t         TXFLR                       : 7;
     );
     VSF_DEF_REG(IC_RXFLR, 32,
-        __IM        reg32_t         RXFLR                       : 4;
+        __IM        reg32_t         RXFLR                       : 7;
     );
     VSF_DEF_REG(IC_SDA_HOLD, 32,
         __IOM       reg32_t         IC_SDA_TX_HOLD              : 16;
@@ -244,10 +249,10 @@ typedef struct vsf_dw_apb_i2c_reg_t {
         __IOM       reg32_t         TDMAE                       : 1;
     );
     VSF_DEF_REG(IC_DMA_TDLR, 32,
-        __IOM       reg32_t         DMATDL                      : 4;
+        __IOM       reg32_t         DMATDL                      : 6;
     );
     VSF_DEF_REG(IC_DMA_RDLR, 32,
-        __IOM       reg32_t         DMARDL                      : 4;
+        __IOM       reg32_t         DMARDL                      : 6;
     );
     VSF_DEF_REG(IC_SDA_SETUP, 32,
         __IOM       reg32_t         SDA_SETUP                   : 8;
@@ -279,6 +284,9 @@ typedef struct vsf_dw_apb_i2c_reg_t {
         __IM        reg32_t         ADD_ENCODED_PARAMS          : 1;
         __IM        reg32_t         RX_BUFFER_DEPTH             : 8;
         __IM        reg32_t         TX_BUFFER_DEPTH             : 8;
+    );
+    VSF_DEF_REG(IC_COMP_VERSION, 32,
+        __IM        reg32_t         IC_COMP_VERSION             : 32;
     );
     VSF_DEF_REG(IC_COMP_TYPE, 32,
         __IM        reg32_t         IC_COMP_TYPE                : 32;
