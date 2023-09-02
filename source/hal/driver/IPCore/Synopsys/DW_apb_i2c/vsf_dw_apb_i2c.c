@@ -291,7 +291,7 @@ vsf_i2c_capability_t vsf_dw_apb_i2c_capability(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != dw_apb_i2c_ptr);
     vsf_i2c_capability_t capability = {
-        .irq_mask = __VSF_DW_APB_I2C_IRQ_MASK,
+        .irq_mask = VSF_DW_APB_I2C_IRQ_MASK_ALL,
         .support_restart = true,
     };
     return capability;

@@ -90,6 +90,7 @@ typedef enum vsf_i2c_cmd_t {
 } vsf_i2c_cmd_t;
 
 typedef enum vsf_i2c_irq_mask_t {
+    // 0..15 are hardware IRQs, 16..23 are virtually supported IRQs, 24.. are unsupported IRQs
     VSF_I2C_IRQ_MASK_MASTER_STARTED             = (0x01ul << 16),   // virtual, issued in vsf_dw_apb_i2c_master_request if VSF_I2C_CMD_START is set in cmd
     VSF_I2C_IRQ_MASK_MASTER_STOPPED             = (0x01ul << 17),   // virtual, issued in vsf_dw_apb_i2c_irqhandler if VSF_I2C_CMD_STOP is set in cmd
     VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT         = (0x01ul << 9),    // INTR.STOP_DET
@@ -97,12 +98,20 @@ typedef enum vsf_i2c_irq_mask_t {
     VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY            = (0x01ul << 4),    // INTR.TX_EMPTY
 
     VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST    = (0x01ul << 12),   // TX_ABRT.ARB_LOST
-    VSF_I2C_IRQ_MASK_MASTER_ERROR               = 0,
+    VSF_I2C_IRQ_MASK_MASTER_ERROR               = (0x01ul << 24),   // virtual, not supported
 
     VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE   = (0x01ul << 18),   // virtual
     VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK        = ((0x01ul << 0) | (0x01ul << 1) | (0x01ul << 2)),
                                                                     // TX_ABRT.ABRT_7B_ADDR_NOACK | TX_ABRT.ABRT_10ADDR1_NOACK | TX_ABRT.ABRT_10ADDR2_NOACK
 
+    VSF_DW_APB_I2C_IRQ_MASK_ALL                 = VSF_I2C_IRQ_MASK_MASTER_STARTED
+                                                | VSF_I2C_IRQ_MASK_MASTER_STOPPED
+                                                | VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT
+                                                | VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT
+                                                | VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY
+                                                | VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
+                                                | VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE
+                                                | VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK,
     __VSF_DW_APB_I2C_IRQ_MASK                   = VSF_I2C_IRQ_MASK_MASTER_STARTED
                                                 | VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT
                                                 | VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY,
