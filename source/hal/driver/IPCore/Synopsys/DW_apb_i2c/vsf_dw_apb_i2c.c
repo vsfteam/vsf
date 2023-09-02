@@ -33,11 +33,6 @@
 
 // IC_CON
 
-#define I2C_IC_CON_SPEED_POS                    1
-#define I2C_IC_CON_SPEED_VALUE_STANDARD         0x1
-#define I2C_IC_CON_SPEED_VALUE_FAST             0x2
-#define I2C_IC_CON_SPEED_VALUE_HIGH             0x3
-
 #define I2C_IC_CON_IC_RESTART_EN_POS            5
 #define I2C_IC_CON_IC_STOP_DET_IFADDRESSED_POS  7
 #define I2C_IC_CON_TX_EMPTY_CTRL_POS            8
@@ -76,17 +71,8 @@ vsf_err_t vsf_dw_apb_i2c_init(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr, vsf_i2c_cfg_t *c
     reg->IC_CON.VALUE = 0;
     reg->IC_INTR_MASK.VALUE = 0;
 
-    unsigned int ic_speed_mode;
-    if (cfg_ptr->clock_hz <= 100 * 1000) {
-        ic_speed_mode = I2C_IC_CON_SPEED_VALUE_STANDARD;
-    } else if (cfg_ptr->clock_hz <= 400 * 1000) {
-        ic_speed_mode = I2C_IC_CON_SPEED_VALUE_FAST;
-    } else {
-        ic_speed_mode = I2C_IC_CON_SPEED_VALUE_HIGH;
-    }
-
     reg->IC_CON.VALUE = (reg->IC_CON.VALUE & ~__VSF_DW_APB_I2C_MODE_MASK)
-                    |   cfg_ptr->mode | (ic_speed_mode << I2C_IC_CON_SPEED_POS)
+                    |   cfg_ptr->mode
                     |   (1 << I2C_IC_CON_IC_RESTART_EN_POS)
                     |   (1 << I2C_IC_CON_TX_EMPTY_CTRL_POS)
                     |   (1 << I2C_IC_CON_RX_FIFO_FULL_HLD_CTRL_POS);
@@ -107,18 +93,18 @@ vsf_err_t vsf_dw_apb_i2c_init(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr, vsf_i2c_cfg_t *c
     } else {
         uint32_t cycles_per_bit = (ic_clk_hz / cfg_ptr->clock_hz) >> 1;
         uint32_t *hcnt = NULL, *lcnt = NULL, *spklen;
-        switch (ic_speed_mode) {
-        case I2C_IC_CON_SPEED_VALUE_STANDARD:
+        switch (cfg_ptr->mode & VSF_I2C_SPEED_HIGH_SPEED_MODE) {
+        case VSF_I2C_SPEED_STANDARD_MODE:
             hcnt = (uint32_t *)&reg->IC_SS_SCL_HCNT;
             lcnt = (uint32_t *)&reg->IC_SS_SCL_LCNT;
             spklen = (uint32_t *)&reg->IC_FS_SPKLEN;
             break;
-        case I2C_IC_CON_SPEED_VALUE_FAST:
+        case VSF_I2C_SPEED_FAST_MODE:
             hcnt = (uint32_t *)&reg->IC_FS_SCL_HCNT;
             lcnt = (uint32_t *)&reg->IC_FS_SCL_LCNT;
             spklen = (uint32_t *)&reg->IC_FS_SPKLEN;
             break;
-        case I2C_IC_CON_SPEED_VALUE_HIGH:
+        case VSF_I2C_SPEED_HIGH_SPEED_MODE:
             hcnt = (uint32_t *)&reg->IC_HS_SCL_HCNT;
             lcnt = (uint32_t *)&reg->IC_HS_SCL_LCNT;
             spklen = (uint32_t *)&reg->IC_HS_SPKLEN;
