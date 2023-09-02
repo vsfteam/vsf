@@ -112,8 +112,7 @@ typedef enum vsf_i2c_irq_mask_t {
                                                 | VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
                                                 | VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE
                                                 | VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK,
-    __VSF_DW_APB_I2C_IRQ_MASK                   = VSF_I2C_IRQ_MASK_MASTER_STARTED
-                                                | VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT
+    __VSF_DW_APB_I2C_IRQ_MASK                   = VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT
                                                 | VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY,
     __VSF_DW_APB_I2C_ABRT_MASK                  = VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT
                                                 | VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
