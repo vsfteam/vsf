@@ -194,19 +194,20 @@ static void __vsf_dw_apb_i2c_continue(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != dw_apb_i2c_ptr);
     vsf_dw_apb_i2c_reg_t *reg = dw_apb_i2c_ptr->reg;
+    uint32_t stop = dw_apb_i2c_ptr->need_stop && (1 == dw_apb_i2c_ptr->count) ?
+                        VSF_I2C_CMD_STOP : 0;
 
     if (dw_apb_i2c_ptr->is_read) {
-        while (reg->IC_STATUS.RFNE && (dw_apb_i2c_ptr->count > 0)) {
+        if (reg->IC_STATUS.RFNE) {
             *dw_apb_i2c_ptr->ptr++ = reg->IC_DATA_CMD.DAT;
             dw_apb_i2c_ptr->count--;
         }
+        if (dw_apb_i2c_ptr->count) {
+            reg->IC_DATA_CMD.VALUE = VSF_I2C_CMD_READ | stop;
+        }
     } else {
-        while (reg->IC_STATUS.TFNF && (dw_apb_i2c_ptr->count > 0)) {
-            if (dw_apb_i2c_ptr->need_stop && (1 == dw_apb_i2c_ptr->count)) {
-                reg->IC_DATA_CMD.VALUE = *dw_apb_i2c_ptr->ptr++ | VSF_I2C_CMD_STOP;
-            } else {
-                reg->IC_DATA_CMD.VALUE = *dw_apb_i2c_ptr->ptr++;
-            }
+        if (reg->IC_STATUS.TFE) {
+            reg->IC_DATA_CMD.VALUE = *dw_apb_i2c_ptr->ptr++ | stop;
             dw_apb_i2c_ptr->count--;
         }
     }
@@ -255,6 +256,12 @@ void vsf_dw_apb_i2c_irqhandler(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr)
         mask_notify &= ~VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY;
         if (!(mask_notify & __VSF_DW_APB_I2C_ERROR_MASK)) {
             __vsf_dw_apb_i2c_continue(dw_apb_i2c_ptr);
+            if (dw_apb_i2c_ptr->is_read && !dw_apb_i2c_ptr->count) {
+                if (dw_apb_i2c_ptr->need_stop) {
+                    mask_notify |= VSF_I2C_IRQ_MASK_MASTER_STOPPED;
+                }
+                mask_notify |= VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
+            }
         }
     } else {
         if (!(mask_notify & __VSF_DW_APB_I2C_ERROR_MASK)) {
@@ -294,9 +301,9 @@ vsf_err_t vsf_dw_apb_i2c_master_request(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr,
     reg->IC_ENABLE.ENABLE = 1;
 
     if (count > 0) {
-        dw_apb_i2c_ptr->ptr = ++buffer;
-        dw_apb_i2c_ptr->count = --count;
-        reg->IC_DATA_CMD.VALUE = (cmd & __VSF_DW_APB_I2C_CMD_MASK) | buffer[0];
+        dw_apb_i2c_ptr->ptr = buffer;
+        dw_apb_i2c_ptr->count = count;
+        __vsf_dw_apb_i2c_continue(dw_apb_i2c_ptr);
     }
 
     if (cmd & VSF_I2C_CMD_START) {
