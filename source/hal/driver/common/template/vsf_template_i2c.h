@@ -159,22 +159,23 @@ enum {
     VSF_I2C_CMD_START_MASK          = VSF_I2C_CMD_START | VSF_I2C_CMD_NO_START,
 
     VSF_I2C_CMD_STOP_RESTART_COUNT  = 3,
-    VSF_I2C_CMD_STOP_RESTART_MASK   = VSF_I2C_CMD_STOP |
-                                      VSF_I2C_CMD_RESTART |
-                                      VSF_I2C_CMD_NO_STOP_RESTART,
+    VSF_I2C_CMD_STOP_RESTART_MASK   = VSF_I2C_CMD_STOP
+                                    | VSF_I2C_CMD_RESTART
+                                    | VSF_I2C_CMD_NO_STOP_RESTART,
 
     VSF_I2C_CMD_MASK_COUNT          = 5,
-    VSF_I2C_CMD_ALL_BITS_MASK       = VSF_I2C_CMD_RW_MASK |
-                                      VSF_I2C_CMD_START |
-                                      VSF_I2C_CMD_STOP |
-                                      VSF_I2C_CMD_RESTART |
-                                      VSF_I2C_CMD_BITS_MASK,
+    VSF_I2C_CMD_ALL_BITS_MASK       = VSF_I2C_CMD_RW_MASK
+                                    | VSF_I2C_CMD_START
+                                    | VSF_I2C_CMD_STOP
+                                    | VSF_I2C_CMD_RESTART
+                                    | VSF_I2C_CMD_BITS_MASK,
 };
 
 #if VSF_I2C_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
 typedef enum vsf_i2c_irq_mask_t {
     VSF_I2C_IRQ_MASK_MASTER_STARTED                 = (0x1ul <<  0),
-    VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT             = (0x1ul <<  3),
+    VSF_I2C_IRQ_MASK_MASTER_STOPPED                 = (0x1ul <<  1),
+    VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT             = (0x1ul <<  2),    // for multi master
     VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT             = (0x1ul <<  4),
     VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST        = (0x1ul <<  5),
     VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY                = (0x1ul <<  6),
@@ -187,14 +188,15 @@ typedef enum vsf_i2c_irq_mask_t {
 
 enum {
     VSF_I2C_IRQ_COUNT                               = 8,
-    VSF_I2C_IRQ_ALL_BITS_MASK                       = VSF_I2C_IRQ_MASK_MASTER_STARTED |
-                                                      VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT |
-                                                      VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT |
-                                                      VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST |
-                                                      VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY |
-                                                      VSF_I2C_IRQ_MASK_MASTER_ERROR |
-                                                      VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE |
-                                                      VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK,
+    VSF_I2C_IRQ_ALL_BITS_MASK                       = VSF_I2C_IRQ_MASK_MASTER_STARTED
+                                                    | VSF_I2C_IRQ_MASK_MASTER_STOPPED
+                                                    | VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT
+                                                    | VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT
+                                                    | VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
+                                                    | VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY
+                                                    | VSF_I2C_IRQ_MASK_MASTER_ERROR
+                                                    | VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE
+                                                    | VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK,
 };
 
 #if VSF_I2C_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
@@ -254,7 +256,7 @@ typedef struct vsf_i2c_t vsf_i2c_t;
             // do something
         }
 
-        if (irq_mask & I2C_IRQ_MASK_MASTER_STOP) {
+        if (irq_mask & VSF_I2C_IRQ_MASK_MASTER_STOPPED) {
             // do something
         }
     }

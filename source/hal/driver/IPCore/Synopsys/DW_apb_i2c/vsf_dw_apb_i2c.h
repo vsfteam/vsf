@@ -91,6 +91,7 @@ typedef enum vsf_i2c_cmd_t {
 
 typedef enum vsf_i2c_irq_mask_t {
     VSF_I2C_IRQ_MASK_MASTER_STARTED             = (0x01ul << 16),   // virtual, issued in vsf_dw_apb_i2c_master_request if VSF_I2C_CMD_START is set in cmd
+    VSF_I2C_IRQ_MASK_MASTER_STOPPED             = (0x01ul << 17),   // virtual, issued in vsf_dw_apb_i2c_irqhandler if VSF_I2C_CMD_STOP is set in cmd
     VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT         = (0x01ul << 9),    // INTR.STOP_DET
     VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT         = (0x01ul << 3),    // TX_ABRT.ABRT_TXDATA_NOACK
     VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY            = (0x01ul << 4),    // INTR.TX_EMPTY
@@ -98,7 +99,7 @@ typedef enum vsf_i2c_irq_mask_t {
     VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST    = (0x01ul << 12),   // TX_ABRT.ARB_LOST
     VSF_I2C_IRQ_MASK_MASTER_ERROR               = 0,
 
-    VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE   = (0x01ul << 17),   // virtual
+    VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE   = (0x01ul << 18),   // virtual
     VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK        = ((0x01ul << 0) | (0x01ul << 1) | (0x01ul << 2)),
                                                                     // TX_ABRT.ABRT_7B_ADDR_NOACK | TX_ABRT.ABRT_10ADDR1_NOACK | TX_ABRT.ABRT_10ADDR2_NOACK
 

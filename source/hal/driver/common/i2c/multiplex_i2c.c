@@ -108,7 +108,7 @@ static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_
     //
     // The current request may end without generating a STOP when the NAK is received.
     // So the next request must have START.
-    vsf_i2c_irq_mask_t cpl_irq_mask = VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT
+    vsf_i2c_irq_mask_t cpl_irq_mask = VSF_I2C_IRQ_MASK_MASTER_STOPPED
                                     | VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT
                                     | VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK
                                     | VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
