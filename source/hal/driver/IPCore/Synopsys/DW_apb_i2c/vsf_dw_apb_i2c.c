@@ -250,8 +250,13 @@ void vsf_dw_apb_i2c_irqhandler(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr)
             __vsf_dw_apb_i2c_continue(dw_apb_i2c_ptr);
         }
     } else {
-        if (!(mask_notify & __VSF_DW_APB_I2C_ERROR_MASK) && dw_apb_i2c_ptr->need_stop) {
-            mask_notify |= VSF_I2C_IRQ_MASK_MASTER_STOPPED;
+        if (!(mask_notify & __VSF_DW_APB_I2C_ERROR_MASK)) {
+            if (!dw_apb_i2c_ptr->is_read) {
+                mask_notify |= VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY;
+            }
+            if (dw_apb_i2c_ptr->need_stop) {
+                mask_notify |= VSF_I2C_IRQ_MASK_MASTER_STOPPED;
+            }
         }
         mask_notify |= VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
     }
