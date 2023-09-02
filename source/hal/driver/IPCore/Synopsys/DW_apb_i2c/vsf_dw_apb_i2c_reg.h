@@ -200,7 +200,7 @@ typedef struct vsf_dw_apb_i2c_reg_t {
         __IM        reg32_t         ACTIVITY                    : 1;
         __IM        reg32_t         TFNF                        : 1;
         __IM        reg32_t         TFE                         : 1;
-        __IM        reg32_t         TFNE                        : 1;
+        __IM        reg32_t         RFNE                        : 1;
         __IM        reg32_t         RFF                         : 1;
         __IM        reg32_t         MST_AVTIVITY                : 1;
         __IM        reg32_t         SLV_ACTIVITY                : 1;

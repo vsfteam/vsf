@@ -216,7 +216,7 @@ typedef struct vsf_i2c_capability_t {
     // then every transmission will generate a start/stop
     uint8_t support_no_start        : 1;
     uint8_t support_no_stop_restart : 1;
-    uint8_t support_restart : 1;
+    uint8_t support_restart         : 1;
 
     // maximum transfer size
     // specifically, 0 is not a legal value
@@ -294,6 +294,8 @@ typedef struct vsf_i2c_cfg_t {
                                             //!< \~chinese i2c 时钟频率 (单位：Hz)
     vsf_i2c_isr_t isr;                      //!< \~english i2c interrupt
                                             //!< \~chinese i2c 中断
+    uint16_t slave_addr;                    //!< \~english i2c slave address, only valid in slave mode
+                                            //!< \~chinese i2c 从机地址，仅在从机模式下有效
 } vsf_i2c_cfg_t;
 
 typedef struct vsf_i2c_op_t {

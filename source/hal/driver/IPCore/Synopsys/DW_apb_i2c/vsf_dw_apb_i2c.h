@@ -41,36 +41,79 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_DW_APB_I2C_CFG_MULTI_CLASS
-#   define VSF_DW_APB_I2C_CFG_MULTI_CLASS   VSF_I2C_CFG_MULTI_CLASS
+#   define VSF_DW_APB_I2C_CFG_MULTI_CLASS       VSF_I2C_CFG_MULTI_CLASS
 #endif
+
+#define VSF_I2C_CFG_REIMPLEMENT_TYPE_MODE       ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD        ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_TYPE_IRQ_MASK   ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-// if VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD is already defined, means chip driver implement
-//  it's own vsf_i2c_cmd_t, skip the vsf_i2c_cmd_t here.
-#if !defined(VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD)
-#   define VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD ENABLED
+typedef enum vsf_i2c_mode_t {
+    VSF_I2C_MODE_MASTER                         = (0x1ul << 0) | (0x1ul << 6),
+    VSF_I2C_MODE_SLAVE                          = (0x0ul << 0),
+
+    // TODO: Ultra Fast-mode I2C-bus protocol
+    VSF_I2C_SPEED_STANDARD_MODE                 = (0x1ul << 1), // up to 100 kbit/s
+    VSF_I2C_SPEED_FAST_MODE                     = (0x2ul << 1), // up to 400 kbit/s
+    VSF_I2C_SPEED_FAST_MODE_PLUS                = (0x2ul << 1), // up to 1 Mbit/s
+    VSF_I2C_SPEED_HIGH_SPEED_MODE               = (0x3ul << 1), // up to 3.4 Mbit/s
+
+    VSF_I2C_ADDR_7_BITS                         = (0x0ul << 3),
+    VSF_I2C_ADDR_10_BITS                        = (0x3ul << 3),
+
+    __VSF_DW_APB_I2C_MODE_MASK                  = VSF_I2C_MODE_MASTER
+                                                | VSF_I2C_SPEED_HIGH_SPEED_MODE
+                                                | VSF_I2C_ADDR_10_BITS,
+} vsf_i2c_mode_t;
+
 typedef enum vsf_i2c_cmd_t {
-    VSF_I2C_CMD_WRITE           = (0x00ul << 3),
-    VSF_I2C_CMD_READ            = (0x01ul << 3),
+    VSF_I2C_CMD_WRITE                           = (0x00ul << 8),
+    VSF_I2C_CMD_READ                            = (0x01ul << 8),
 
-    VSF_I2C_CMD_START           = (0x01ul << 0),
-    VSF_I2C_CMD_RESTART         = (0x01ul << 21),
+    VSF_I2C_CMD_START                           = (0x01ul << 16),   // virtual
+    VSF_I2C_CMD_RESTART                         = (0x01ul << 10),
+    VSF_I2C_CMD_STOP                            = (0x01ul << 9),
 
-    VSF_I2C_CMD_7_BITS          = (0x00ul << 23),
-    VSF_I2C_CMD_10_BITS         = (0x01ul << 23),
+    VSF_I2C_CMD_7_BITS                          = (0x00ul << 17),
+    VSF_I2C_CMD_10_BITS                         = (0x01ul << 17),
 
-    __I2C_CMD_HW_MASK           = VSF_I2C_CMD_WRITE |
-                                  VSF_I2C_CMD_READ |
-                                  VSF_I2C_CMD_START |
-                                  VSF_I2C_CMD_RESTART,
+    __VSF_DW_APB_I2C_CMD_MASK                   = VSF_I2C_CMD_WRITE
+                                                | VSF_I2C_CMD_READ
+                                                | VSF_I2C_CMD_RESTART
+                                                | VSF_I2C_CMD_STOP,
 
-    VSF_I2C_CMD_NO_START        = (0x01ul << 24),
-    VSF_I2C_CMD_STOP            = (0x01ul << 25),
-    VSF_I2C_CMD_NO_STOP_RESTART = (0x01ul << 26),
+    VSF_I2C_CMD_NO_START                        = (0x01ul << 24),
+    VSF_I2C_CMD_NO_STOP_RESTART                 = (0x01ul << 25),
 } vsf_i2c_cmd_t;
-#endif
+
+typedef enum vsf_i2c_irq_mask_t {
+    VSF_I2C_IRQ_MASK_MASTER_STARTED             = (0x01ul << 16),   // virtual, issued in vsf_dw_apb_i2c_master_request if VSF_I2C_CMD_START is set in cmd
+    VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT         = (0x01ul << 9),    // INTR.STOP_DET
+    VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT         = (0x01ul << 3),    // TX_ABRT.ABRT_TXDATA_NOACK
+    VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY            = (0x01ul << 4),    // INTR.TX_EMPTY
+
+    VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST    = (0x01ul << 12),   // TX_ABRT.ARB_LOST
+    VSF_I2C_IRQ_MASK_MASTER_ERROR               = 0,
+
+    VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE   = (0x01ul << 17),   // virtual
+    VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK        = ((0x01ul << 0) | (0x01ul << 1) | (0x01ul << 2)),
+                                                                    // TX_ABRT.ABRT_7B_ADDR_NOACK | TX_ABRT.ABRT_10ADDR1_NOACK | TX_ABRT.ABRT_10ADDR2_NOACK
+
+    __VSF_DW_APB_I2C_IRQ_MASK                   = VSF_I2C_IRQ_MASK_MASTER_STARTED
+                                                | VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT
+                                                | VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY,
+    __VSF_DW_APB_I2C_ABRT_MASK                  = VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT
+                                                | VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
+                                                | VSF_I2C_IRQ_MASK_MASTER_ERROR
+                                                | VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK,
+    __VSF_DW_APB_I2C_ERROR_MASK                 = VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT
+                                                | VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
+                                                | VSF_I2C_IRQ_MASK_MASTER_ERROR
+                                                | VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK,
+} vsf_i2c_irq_mask_t;
 
 /*============================ INCLUDES ======================================*/
 
@@ -91,12 +134,19 @@ vsf_class(vsf_dw_apb_i2c_t) {
     )
     private_member(
         vsf_i2c_isr_t           isr;
+        vsf_i2c_irq_mask_t      irq_mask;
+        uint8_t                 *ptr;
+        uint16_t                count;
+        uint16_t                is_master   : 1;
+        uint16_t                is_read     : 1;
+        uint16_t                need_stop   : 1;
     )
 };
 
 /*============================ INCLUDES ======================================*/
 
-extern vsf_err_t vsf_dw_apb_i2c_init(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr, vsf_i2c_cfg_t *cfg_ptr);
+extern vsf_err_t vsf_dw_apb_i2c_init(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr,
+        vsf_i2c_cfg_t *cfg_ptr, uint_fast32_t ic_clk_hz);
 extern void vsf_dw_apb_i2c_fini(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr);
 extern fsm_rt_t vsf_dw_apb_i2c_enable(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr);
 extern fsm_rt_t vsf_dw_apb_i2c_disable(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr);
