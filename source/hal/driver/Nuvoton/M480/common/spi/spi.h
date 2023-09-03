@@ -49,11 +49,11 @@ typedef enum vsf_spi_mode_t {
     VSF_SPI_SLAVE                       = SPI_CTL_SLAVE_Msk,
     VSF_SPI_DIR_MODE_MASK               = VSF_SPI_SLAVE | VSF_SPI_MASTER,
 
-    SPI_MODE_0                          = SPI_CTL_TXNEG_Msk,
-    SPI_MODE_1                          = SPI_CTL_RXNEG_Msk,
-    SPI_MODE_2                          = SPI_CTL_CLKPOL_Msk | SPI_CTL_RXNEG_Msk,
-    SPI_MODE_3                          = SPI_CTL_CLKPOL_Msk | SPI_CTL_TXNEG_Msk,
-    VSF_SPI_CLOCK_MODE_MASK             = SPI_MODE_0 | SPI_MODE_1 | SPI_MODE_2 | SPI_MODE_3,
+    VSF_SPI_MODE_0                      = SPI_CTL_TXNEG_Msk,
+    VSF_SPI_MODE_1                      = SPI_CTL_RXNEG_Msk,
+    VSF_SPI_MODE_2                      = SPI_CTL_CLKPOL_Msk | SPI_CTL_RXNEG_Msk,
+    VSF_SPI_MODE_3                      = SPI_CTL_CLKPOL_Msk | SPI_CTL_TXNEG_Msk,
+    VSF_SPI_MODE_MASK                   = VSF_SPI_MODE_0 | VSF_SPI_MODE_1 | VSF_SPI_MODE_2 | VSF_SPI_MODE_3,
 
     VSF_SPI_MSB_FIRST                   = 0,
     VSF_SPI_LSB_FIRST                   = SPI_CTL_LSB_Msk,

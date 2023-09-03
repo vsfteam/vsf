@@ -184,8 +184,8 @@ enum {
     VSF_SPI_BIT_ORDER_MASK          = VSF_SPI_MSB_FIRST |
                                       VSF_SPI_LSB_FIRST,
 
-    VSF_SPI_CLOCK_MODE_COUNT        = 4,
-    VSF_SPI_CLOCK_MODE_MASK         = VSF_SPI_MODE_0 |
+    VSF_SPI_MODE_COUNT              = 4,
+    VSF_SPI_MODE_MASK               = VSF_SPI_MODE_0 |
                                       VSF_SPI_MODE_1 |
                                       VSF_SPI_MODE_2 |
                                       VSF_SPI_MODE_3,
@@ -207,7 +207,7 @@ enum {
     VSF_SPI_MODE_MASK_COUNT         = 5,
     VSF_SPI_MODE_ALL_BITS_MASK      = VSF_SPI_DIR_MODE_MASK |
                                       VSF_SPI_BIT_ORDER_MASK |
-                                      VSF_SPI_CLOCK_MODE_MASK |
+                                      VSF_SPI_MODE_MASK |
                                       VSF_SPI_DIR_MODE_MASK |
                                       VSF_SPI_AUTO_CS_MASK |
                                       VSF_SPI_LOOP_BACK,
