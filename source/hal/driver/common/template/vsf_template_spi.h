@@ -185,10 +185,10 @@ enum {
                                       VSF_SPI_LSB_FIRST,
 
     VSF_SPI_CLOCK_MODE_COUNT        = 4,
-    VSF_SPI_CLOCK_MODE_MASK         = VSF_SPI_CLOCK_MODE_0 |
-                                      VSF_SPI_CLOCK_MODE_1 |
-                                      VSF_SPI_CLOCK_MODE_2 |
-                                      VSF_SPI_CLOCK_MODE_3,
+    VSF_SPI_CLOCK_MODE_MASK         = VSF_SPI_MODE_0 |
+                                      VSF_SPI_MODE_1 |
+                                      VSF_SPI_MODE_2 |
+                                      VSF_SPI_MODE_3,
 
     VSF_SPI_DATASIZE_COUNT          = 29,
     VSF_SPI_DATASIZE_MASK           = VSF_SPI_DATASIZE_4  | VSF_SPI_DATASIZE_5  | VSF_SPI_DATASIZE_6  | VSF_SPI_DATASIZE_7  |
