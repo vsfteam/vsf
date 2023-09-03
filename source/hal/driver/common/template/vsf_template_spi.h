@@ -122,14 +122,16 @@ typedef enum vsf_spi_mode_t {
     VSF_SPI_MSB_FIRST               = 0x00ul << 22,      //!< default enable MSB
     VSF_SPI_LSB_FIRST               = 0x01ul << 22,      //!< transfer LSB first
 
+    // CPOL and CPHA are not recommended to use, not every SPI driver provide this
     VSF_SPI_CPOL_LOW                = 0x00ul << 23,      //!< SCK clock polarity is low
     VSF_SPI_CPOL_HIGH               = 0x01ul << 23,      //!< SCK clock polarity is high
     VSF_SPI_CPHA_LOW                = 0x00ul << 24,      //!< SCK clock phase is low
     VSF_SPI_CPHA_HIGH               = 0x01ul << 24,      //!< SCK clock phase is high
-    VSF_SPI_CLOCK_MODE_0            = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_LOW,
-    VSF_SPI_CLOCK_MODE_1            = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_HIGH,
-    VSF_SPI_CLOCK_MODE_2            = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_LOW,
-    VSF_SPI_CLOCK_MODE_3            = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_HIGH,
+    // SPI_MODE is recommended
+    VSF_SPI_MODE_0                  = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_LOW,
+    VSF_SPI_MODE_1                  = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_HIGH,
+    VSF_SPI_MODE_2                  = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_LOW,
+    VSF_SPI_MODE_3                  = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_HIGH,
 
     //!< datasize is 8 bits
     VSF_SPI_DATASIZE_BIT_OFFSET     = 25,

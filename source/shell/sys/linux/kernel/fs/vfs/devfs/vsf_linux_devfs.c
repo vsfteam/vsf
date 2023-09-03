@@ -588,16 +588,16 @@ static vsf_err_t __vsf_linux_spi_config(vsf_linux_spi_priv_t *priv)
     vsf_spi_mode_t mode = 0;
     switch (priv->mode & (SPI_CPOL | SPI_CPHA)) {
     case SPI_MODE_0:
-        mode |= VSF_SPI_CLOCK_MODE_0;
+        mode |= VSF_SPI_MODE_0;
         break;
     case SPI_MODE_1:
-        mode |= VSF_SPI_CLOCK_MODE_1;
+        mode |= VSF_SPI_MODE_1;
         break;
     case SPI_MODE_2:
-        mode |= VSF_SPI_CLOCK_MODE_2;
+        mode |= VSF_SPI_MODE_2;
         break;
     case SPI_MODE_3:
-        mode |= VSF_SPI_CLOCK_MODE_3;
+        mode |= VSF_SPI_MODE_3;
         break;
     }
     mode |= vsf_spi_data_bits_to_mode(priv->bits_per_word);
