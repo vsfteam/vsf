@@ -85,10 +85,10 @@ typedef enum vsf_spi_mode_t {
 
     __SPI_HW_MODE_MASK                  = VSF_SPI_SLAVE |
                                           VSF_SPI_MASTER |
-                                          VSF_SPI_CLOCK_MODE_0 |
-                                          VSF_SPI_CLOCK_MODE_1 |
-                                          VSF_SPI_CLOCK_MODE_2 |
-                                          VSF_SPI_CLOCK_MODE_3 |
+                                          VSF_SPI_MODE_0 |
+                                          VSF_SPI_MODE_1 |
+                                          VSF_SPI_MODE_2 |
+                                          VSF_SPI_MODE_3 |
                                           VSF_SPI_AUTO_CS_DISABLE |
                                           VSF_SPI_AUTO_CS_ENABLE |
                                           VSF_SPI_MSB_FIRST |
