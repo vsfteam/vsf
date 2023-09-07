@@ -51,7 +51,8 @@ typedef mp_obj_t                                    vsf_pyal_obj_t;
 // list
 
 #define vsf_pyal_newlist(__num, __args_ptr)         mp_obj_new_list((__num), (__args_ptr))
-#define vsf_pyal_listobj_append(__listobj, __arg)   mp_obj_list_append((__listobj), (__arg))
+#define vsf_pyal_listobj_append(__listobj, __arg, __free_arg)                   \
+                                                    mp_obj_list_append((__listobj), (__arg))
 
 // str
 
@@ -83,12 +84,12 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
         .on_update = (__on_update),                                             \
     }
 #define vsf_pyal_static_dict(__name)                vsf_pyal_static_dict_cb(__name, NULL)
-#define vsf_pyal_dict_set_on_update(__dict_obj, __on_update)                    \
+#define vsf_pyal_dictobj_set_on_update(__dict_obj, __on_update)                 \
     ({                                                                          \
         mp_obj_dict_t *self = MP_OBJ_TO_PTR(__dict_obj);                        \
         self->on_update = (__on_update);                                        \
     })
-#define vsf_pyal_dict_set(__dict_obj, __key_str, __value_arg)                   \
+#define vsf_pyal_dictobj_set(__dict_obj, __key_str, __value_arg, __free_arg)    \
     mp_obj_dict_store((__dict_obj), vsf_pyal_newarg_str(__key_str), (__value_arg))
 
 // module

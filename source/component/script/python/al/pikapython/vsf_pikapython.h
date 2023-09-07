@@ -44,6 +44,7 @@ typedef Arg *                                       vsf_pyal_arg_t;
 #define vsf_pyal_strarg_get_str(__str_arg)          arg_getStr(__str_arg)
 #define vsf_pyal_newarg_bytes(__data, __len)        arg_setBytes((uint8_t *)(__data), __len)
 #define vsf_pyal_newarg_obj(__obj)                  arg_newObj(__obj)
+#define vsf_pyal_arg_free(__arg)                    arg_deinit(__arg)
 
 // object
 
@@ -60,13 +61,14 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
         }                                                                       \
         list;                                                                   \
     })
-#define vsf_pyal_listobj_append(__listobj, __arg)   pikaList_append((__listobj), (__arg))
+#define vsf_pyal_listobj_append(__listobj, __arg, __free_arg)                   \
+                                                    pikaList_append((__listobj), (__arg))
 
 // str
 
 #define vsf_pyal_strobj_get_str(__strojb)           arg_getStr(__strojb)
 
-// typle
+// tuple
 
 #define vsf_pyal_newtuple(__size, __args)                                       \
     ({                                                                          \
@@ -88,11 +90,11 @@ typedef char *                                      vsf_pyal_dict_key_t;
 
 #define vsf_pyal_newdict()                          New_PikaDict()
 
-#define vsf_pyal_dict_set_on_update(__dict_obj, __on_update)                    \
+#define vsf_pyal_dictobj_set_on_update(__dict_obj, __on_update)                 \
     ({                                                                          \
         __dict_obj->on_update = (__on_update);                                  \
     })
-#define vsf_pyal_dict_set(__dict_obj, __key_str, __value_arg)                   \
+#define vsf_pyal_dictobj_set(__dict_obj, __key_str, __value_arg, __free_arg)    \
     pikaDict_set((__dict_obj), __key_str, (__value_arg))
 
 // module

@@ -35,8 +35,6 @@ vsf_pyal_static_dict(__os_environ);
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if 1
-
 void __vsf_pyal_os_environ_on_update(vsf_pyal_obj_t self, vsf_pyal_dict_evt_t evt,
         vsf_pyal_dict_key_t key, vsf_pyal_arg_t value)
 {
@@ -64,7 +62,7 @@ vsf_pyal_module_func_init_imp(os)
     environ_dict = &__os_environ;
 #endif
 
-    vsf_pyal_dict_set_on_update(environ_dict, NULL);
+    vsf_pyal_dictobj_set_on_update(environ_dict, NULL);
     while (*__env != NULL) {
         key = strdup(*__env);
         value = strstr(key, "=");
@@ -74,12 +72,12 @@ vsf_pyal_module_func_init_imp(os)
         }
 
         vsf_pyal_arg_t arg = vsf_pyal_newarg_str(value);
-        vsf_pyal_dict_set(environ_dict, key, arg);
+        vsf_pyal_dictobj_set(environ_dict, key, arg, true);
         free(key);
 
         __env++;
     }
-    vsf_pyal_dict_set_on_update(environ_dict, __vsf_pyal_os_environ_on_update);
+    vsf_pyal_dictobj_set_on_update(environ_dict, __vsf_pyal_os_environ_on_update);
 
     vsf_pyal_module_func_init_return();
 }
@@ -104,7 +102,7 @@ vsf_pyal_module_func_var_imp(os, listdir, vsf_pyal_obj_t, 0, 1, vsf_pyal_func_ar
         while ((dp = readdir(dir)) != NULL) {
             if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0) {
                 vsf_pyal_arg_t arg = vsf_pyal_newarg_str(dp->d_name);
-                vsf_pyal_listobj_append(list, arg);
+                vsf_pyal_listobj_append(list, arg, true);
             }
         }
 
@@ -125,5 +123,3 @@ vsf_pyal_module(os,
     vsf_pyal_module_dict(os, environ, __os_environ),
 #endif
 )
-
-#endif
