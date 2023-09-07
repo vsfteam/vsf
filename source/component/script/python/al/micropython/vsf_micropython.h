@@ -28,8 +28,8 @@
 
 // features
 
-#undef VSF_PYAL_FEATURE_FUNC_ARG_NUM_CHECK
-#define VSF_PYAL_FEATURE_FUNC_ARG_NUM_CHECK         0
+#undef VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
+#define VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK          0
 #define VSF_PYAL_FEATURE_MODULE_IS_DYN              0
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -57,6 +57,7 @@ typedef mp_obj_t                                    vsf_pyal_obj_t;
 // str
 
 #define vsf_pyal_strobj_get_str(__strojb)           mp_obj_str_get_str(__strojb)
+#define vsf_pyal_intobj_get_int(__intobj)           mp_obj_get_int(__intobj)
 
 // typle
 
@@ -98,34 +99,37 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #   define vsf_pyal_module_add_obj(__mod, __name, __obj)
 #endif
 
-#define vsf_pyal_func_arg_strobj(__name)            vsf_pyal_arg_t __name
-#define vsf_pyal_func_arg_var(__name)               size_t __name ## _num, const mp_obj_t *__name ## _arr
-#define vsf_pyal_func_arg_var_num(__name)           __name ## _num
-#define vsf_pyal_func_arg_var_get(__name, __idx)    (__name ## _arr)[__idx]
+#define vsf_pyal_funcarg_strobj(__name)             vsf_pyal_arg_t __name
+#define vsf_pyal_funcarg_strobj_get_str(__arg)      vsf_pyal_strarg_get_str(__arg)
+#define vsf_pyal_funcarg_var(__name)                size_t __name ## _num, const mp_obj_t *__name ## _arr
+#define vsf_pyal_funcarg_var_num(__name)            __name ## _num
+#define vsf_pyal_funcarg_var_get_str(__name, __idx) vsf_pyal_strobj_get_str((__name ## _arr)[__idx])
+#define vsf_pyal_funcarg_var_get_int(__name, __idx) vsf_pyal_intobj_get_int((__name ## _arr)[__idx])
+
+#define vsf_pyal_func_void_return_t                 mp_obj_t
+#define vsf_pyal_func_void_return()                 return mp_const_none
 
 #define vsf_pyal_module_func_var_imp(__name, __func, __ret_type, min_arg, max_arg, ...)\
     static __ret_type __name ## _ ## __func(__VA_ARGS__);                       \
-    MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(mp_vfs_ ## __func ## _obj, 0, 1, __name ## _ ## __func);\
+    MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(mp_vfs_ ## __func ## _obj, min_arg, max_arg, __name ## _ ## __func);\
     static __ret_type __name ## _ ## __func(__VA_ARGS__)
-#define VSF_PYAL_MODULE_FUNC_ARG_OBJ_0              MP_DEFINE_CONST_FUN_OBJ_0
-#define VSF_PYAL_MODULE_FUNC_ARG_OBJ_1              MP_DEFINE_CONST_FUN_OBJ_1
+#define VSF_PYAL_MODULE_FUNCARG_OBJ_0               MP_DEFINE_CONST_FUN_OBJ_0
+#define VSF_PYAL_MODULE_FUNCARG_OBJ_1               MP_DEFINE_CONST_FUN_OBJ_1
 #define vsf_pyal_module_func_fix_imp(__name, __func, __func_type, __ret_type, ...)\
     static __ret_type __name ## _ ## __func(__VA_ARGS__);                       \
     __func_type(mp_vfs_ ## __func ## _obj, __name ## _ ## __func);              \
     static __ret_type __name ## _ ## __func(__VA_ARGS__)
 #define vsf_pyal_module_func_init_imp(__name)                                   \
-    vsf_pyal_module_func_fix_imp(__name, __init__, VSF_PYAL_MODULE_FUNC_ARG_OBJ_0, vsf_pyal_obj_t, void)
+    vsf_pyal_module_func_fix_imp(__name, __init__, VSF_PYAL_MODULE_FUNCARG_OBJ_0, vsf_pyal_obj_t, void)
 #define vsf_pyal_module_func_init_return()
 
-#define __vsf_pyal_str(__str)                       MP_ROM_QSTR(MP_QSTR_ ## __str)
-
-#define vsf_pyal_module_int(__mod, __name, __value) { __vsf_pyal_str(__name), MP_ROM_INT(__value) }
-#define vsf_pyal_module_str(__mod, __name, __str)   { __vsf_pyal_str(__name), __vsf_pyal_str(__str) }
-#define vsf_pyal_module_func(__mod, __name)         { __vsf_pyal_str(__name), MP_ROM_PTR(&mp_vfs_ ## __name ## _obj) }
-#define vsf_pyal_module_dict(__mod, __name, __dict) { __vsf_pyal_str(__name), MP_ROM_PTR(&__dict) }
+#define vsf_pyal_module_int(__mod, __name, __value) { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_INT(__value) }
+#define vsf_pyal_module_str(__mod, __name, __str)   { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_QSTR(MP_QSTR_ ## __str) }
+#define vsf_pyal_module_func(__mod, __name)         { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&mp_vfs_ ## __name ## _obj) }
+#define vsf_pyal_module_dict(__mod, __name, __dict) { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&__dict) }
 #define vsf_pyal_module(__name, ...)                                            \
     STATIC const mp_rom_map_elem_t __name ## _module_globals_table[] = {        \
-        { __vsf_pyal_str(__name__), __vsf_pyal_str(__name) },                   \
+        { MP_ROM_QSTR(MP_QSTR_ ## __name__), MP_ROM_QSTR(MP_QSTR_ ## __name) }, \
         __VA_ARGS__                                                             \
     };                                                                          \
     STATIC MP_DEFINE_CONST_DICT(__name ## _module_globals, __name ## _module_globals_table);\

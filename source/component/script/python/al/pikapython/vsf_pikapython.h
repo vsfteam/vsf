@@ -29,8 +29,8 @@
 
 // features
 
-#ifndef VSF_PYAL_FEATURE_FUNC_ARG_NUM_CHECK
-#   define VSF_PYAL_FEATURE_FUNC_ARG_NUM_CHECK      1
+#ifndef VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
+#   define VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK      1
 #endif
 #define VSF_PYAL_FEATURE_MODULE_IS_DYN              1
 
@@ -95,7 +95,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
         __dict_obj->on_update = (__on_update);                                  \
     })
 #define vsf_pyal_dictobj_set(__dict_obj, __key_str, __value_arg, __free_arg)    \
-    pikaDict_set((__dict_obj), __key_str, (__value_arg))
+                                                    pikaDict_set((__dict_obj), __key_str, (__value_arg))
 
 // module
 
@@ -105,27 +105,30 @@ typedef char *                                      vsf_pyal_dict_key_t;
         obj_setArg(self, (__name), arg);                                        \
         arg_deinit(arg);                                                        \
     })
+#define vsf_pyal_module_add_str(__mod, __name, __str)                           \
+                                                    obj_setStr(self, (__name), (__str))
+#define vsf_pyal_module_add_int(__mod, __name, __value)                         \
+                                                    obj_setInt(self, (__name), (__value))
 
-#define vsf_pyal_func_arg_strobj(__name)            vsf_pyal_arg_t __name
-#define vsf_pyal_func_arg_var(__name)               PikaTuple *__name
-#define vsf_pyal_func_arg_var_num(__name)           pikaTuple_getSize(__name)
-#define vsf_pyal_func_arg_var_get(__name, __idx)    pikaTuple_getArg(__name, __idx)
+#define vsf_pyal_func_void_return_t                 void
+#define vsf_pyal_func_void_return()                 return
+
+#define vsf_pyal_funcarg_strobj(__name)             char *__name
+#define vsf_pyal_funcarg_strobj_get_str(__arg)      __arg
+#define vsf_pyal_funcarg_var(__name)                PikaTuple *__name
+#define vsf_pyal_funcarg_var_num(__name)            pikaTuple_getSize(__name)
+#define vsf_pyal_funcarg_var_get_str(__name, __idx) pikaTuple_getStr(__name, __idx)
+#define vsf_pyal_funcarg_var_get_int(__name, __idx) pikaTuple_getInt(__name, __idx)
 
 #define vsf_pyal_module_func_var_imp(__name, __func, __ret_type, min_arg, max_arg, ...)\
     __ret_type __name ## _ ## __func(PikaObj *self, ##__VA_ARGS__)
-#define VSF_PYAL_MODULE_FUNC_ARG_OBJ_0              0
-#define VSF_PYAL_MODULE_FUNC_ARG_OBJ_1              1
+#define VSF_PYAL_MODULE_FUNCARG_OBJ_0               0
+#define VSF_PYAL_MODULE_FUNCARG_OBJ_1               1
 #define vsf_pyal_module_func_fix_imp(__name, __func, __func_type, __ret_type, ...)\
     __ret_type __name ## _ ## __func(PikaObj *self, ##__VA_ARGS__)
 #define vsf_pyal_module_func_init_imp(__name)                                   \
-    vsf_pyal_module_func_fix_imp(__name, __init__, VSF_PYAL_MODULE_FUNC_ARG_OBJ_0, void)
+    vsf_pyal_module_func_fix_imp(__name, __init__, VSF_PYAL_MODULE_FUNCARG_OBJ_0, void)
 #define vsf_pyal_module_func_init_return()
-
-#define vsf_pyal_module_int(__mod, __name, __value)
-#define vsf_pyal_module_str(__mod, __name, __str)
-#define vsf_pyal_module_func(__mod, __name)
-#define vsf_pyal_module_dict(__mod, __name, __dict)
-#define vsf_pyal_module(__name, ...)
 
 // APIs
 

@@ -21,6 +21,7 @@
 
 #include <unistd.h>
 #include <dirent.h>
+#include <fcntl.h>
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -53,9 +54,16 @@ void __vsf_pyal_os_environ_on_update(vsf_pyal_obj_t self, vsf_pyal_dict_evt_t ev
 vsf_pyal_module_func_init_imp(os)
 {
     char **__env = environ, *key, *value;
-
     vsf_pyal_obj_t environ_dict;
+
 #if VSF_PYAL_FEATURE_MODULE_IS_DYN
+    vsf_pyal_module_add_str(os, "sep", "/");
+    vsf_pyal_module_add_int(os, "O_RDONLY", O_RDONLY);
+    vsf_pyal_module_add_int(os, "O_WRONLY", O_WRONLY);
+    vsf_pyal_module_add_int(os, "O_RDWR", O_RDWR);
+    vsf_pyal_module_add_int(os, "O_APPEND", O_APPEND);
+    vsf_pyal_module_add_int(os, "O_CREAT", O_CREAT);
+
     environ_dict = vsf_pyal_newdict();
     vsf_pyal_module_add_obj(os, "environ", environ_dict);
 #else
@@ -82,17 +90,17 @@ vsf_pyal_module_func_init_imp(os)
     vsf_pyal_module_func_init_return();
 }
 
-vsf_pyal_module_func_var_imp(os, listdir, vsf_pyal_obj_t, 0, 1, vsf_pyal_func_arg_var(path))
+vsf_pyal_module_func_var_imp(os, listdir, vsf_pyal_obj_t, 0, 1, vsf_pyal_funcarg_var(arg))
 {
-    int argc = vsf_pyal_func_arg_var_num(path);
-#if VSF_PYAL_FEATURE_FUNC_ARG_NUM_CHECK
+    int argc = vsf_pyal_funcarg_var_num(arg);
+#if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
     if (argc > 1) {
-        vsf_pyal_raise("invalid argument, should be between 0 and 1\n");
+        vsf_pyal_raise("invalid argument, format: lisdir(*path)\n");
         return VSF_PYAL_OBJ_NULL;
     }
 #endif
     char __path[PATH_MAX];
-    char *str_path = argc == 0 ? getcwd(__path, sizeof(__path)) : vsf_pyal_strobj_get_str(vsf_pyal_func_arg_var_get(path, 0));
+    char *str_path = argc == 0 ? getcwd(__path, sizeof(__path)) : vsf_pyal_funcarg_var_get_str(arg, 0);
     struct dirent* dp;
     DIR* dir = opendir(str_path);
 
@@ -112,14 +120,33 @@ vsf_pyal_module_func_var_imp(os, listdir, vsf_pyal_obj_t, 0, 1, vsf_pyal_func_ar
     return list;
 }
 
-// if environ is a macro, it will conflict with os.environ
-#undef environ
+vsf_pyal_module_func_var_imp(os, mkdir, vsf_pyal_func_void_return_t, 1, 2, vsf_pyal_funcarg_var(arg))
+{
+    int argc = vsf_pyal_funcarg_var_num(arg);
+#if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
+    if ((argc < 1) || (argc > 2)) {
+        vsf_pyal_raise("invalid argument, format: mkdir(path, *mode)\n");
+        return;
+    }
+#endif
 
+    char *path_str = vsf_pyal_funcarg_var_get_str(arg, 0);
+    int mode_int = 1 == argc ? 0511 : vsf_pyal_funcarg_var_get_int(arg, 1);
+    mkdir((const char *)path_str, mode_int);
+    vsf_pyal_func_void_return();
+}
+
+#ifdef vsf_pyal_module
 vsf_pyal_module(os,
     vsf_pyal_module_func(os, __init__),
-    vsf_pyal_module_str(os, sep, _slash_),
     vsf_pyal_module_func(os, listdir),
-#if !VSF_PYAL_FEATURE_MODULE_IS_DYN
+    vsf_pyal_module_func(os, mkdir),
+    vsf_pyal_module_int(os, O_RDONLY, O_RDONLY),
+    vsf_pyal_module_int(os, O_WRONLY, O_WRONLY),
+    vsf_pyal_module_int(os, O_RDWR, O_RDWR),
+    vsf_pyal_module_int(os, O_APPEND, O_APPEND),
+    vsf_pyal_module_int(os, O_CREAT, O_CREAT),
+    vsf_pyal_module_str(os, sep, _slash_),
     vsf_pyal_module_dict(os, environ, __os_environ),
-#endif
 )
+#endif
