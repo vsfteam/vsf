@@ -11,6 +11,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\constant_time_internal.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\constant_time_invasive.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\ecp_invasive.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\mps_common.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\mps_error.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\mps_reader.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\mps_trace.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_aead.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_cipher.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_hash.h" />
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_mac.h" />
     <ClInclude Include="..\..\..\..\source\component\fs\driver\romfs\vsf_romfs.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\adc\adc_interface.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\adc\adc_template.h" />
@@ -767,6 +778,13 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\constant_time.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\mps_reader.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\mps_trace.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_aead.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_cipher.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_hash.c" />
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_mac.c" />
     <ClCompile Include="..\..\..\..\source\component\fs\driver\romfs\vsf_romfs.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\adc\adc_interface.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\dac\dac_common.c" />
