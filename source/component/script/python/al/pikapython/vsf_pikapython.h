@@ -43,6 +43,7 @@ typedef Arg *                                       vsf_pyal_arg_t;
 #define vsf_pyal_newarg_str(__str)                  arg_setStr(NULL, "", __str)
 #define vsf_pyal_strarg_get_str(__str_arg)          arg_getStr(__str_arg)
 #define vsf_pyal_newarg_bytes(__data, __len)        arg_setBytes((uint8_t *)(__data), __len)
+#define vsf_pyal_newarg_obj(__obj)                  arg_newObj(__obj)
 
 // object
 
@@ -96,14 +97,12 @@ typedef char *                                      vsf_pyal_dict_key_t;
 
 // module
 
-#if VSF_PYAL_FEATURE_MODULE_IS_DYN
-#   define vsf_pyal_module_add_dict(__mod, __name)                              \
+#define vsf_pyal_module_add_obj(__mod, __name, __obj)                           \
     ({                                                                          \
-        PikaDict *dict = vsf_pyal_newdict();                                    \
-        arg_setObj(self->list, (__name), dict);                                 \
-        dict;                                                                   \
-    })    
-#endif
+        vsf_pyal_arg_t arg = vsf_pyal_newarg_obj(__obj);                        \
+        obj_setArg(self, (__name), arg);                                        \
+        arg_deinit(arg);                                                        \
+    })
 
 #define vsf_pyal_func_arg_strobj(__name)            vsf_pyal_arg_t __name
 #define vsf_pyal_func_arg_var(__name)               PikaTuple *__name

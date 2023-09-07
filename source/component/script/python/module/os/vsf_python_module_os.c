@@ -58,7 +58,8 @@ vsf_pyal_module_func_init_imp(os)
 
     vsf_pyal_obj_t environ_dict;
 #if VSF_PYAL_FEATURE_MODULE_IS_DYN
-    environ_dict = vsf_pyal_module_add_dict(os, "environ");
+    environ_dict = vsf_pyal_newdict();
+    vsf_pyal_module_add_obj(os, "environ", environ_dict);
 #else
     environ_dict = &__os_environ;
 #endif

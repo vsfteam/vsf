@@ -94,7 +94,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 // module
 
 #if VSF_PYAL_FEATURE_MODULE_IS_DYN
-#   define vsf_pyal_module_add_dict(__mod, __name)
+#   define vsf_pyal_module_add_obj(__mod, __name, __obj)
 #endif
 
 #define vsf_pyal_func_arg_strobj(__name)            vsf_pyal_arg_t __name
