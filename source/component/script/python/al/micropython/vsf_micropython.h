@@ -54,10 +54,26 @@ typedef mp_obj_t                                    vsf_pyal_obj_t;
 #define vsf_pyal_listobj_append(__listobj, __arg, __free_arg)                   \
                                                     mp_obj_list_append((__listobj), (__arg))
 
-// str
+// intobj/strobj...
 
-#define vsf_pyal_strobj_get_str(__strojb)           mp_obj_str_get_str(__strojb)
+#define vsf_pyal_newobj_int(__value)                mp_obj_new_int(__value)
 #define vsf_pyal_intobj_get_int(__intobj)           mp_obj_get_int(__intobj)
+#define vsf_pyal_newobj_str(__str)                  mp_obj_new_str((const char *)(__str), strlen(__str))
+#define vsf_pyal_strobj_get_str(__strojb)           mp_obj_str_get_str(__strojb)
+
+typedef struct _mp_obj_file_t {
+    mp_obj_base_t base;
+    FILE *f;
+} mp_obj_file_t;
+extern const mp_obj_type_t mp_type_fileio;
+extern const mp_obj_type_t mp_type_textio;
+#define vsf_pyal_newobj_file(__file, __is_text)                                 \
+    ({                                                                          \
+        mp_obj_file_t *fileobj = m_new_obj_with_finaliser(mp_obj_file_t);       \
+        fileobj->base.type = (__is_text) ? &mp_type_textio : & mp_type_fileio;  \
+        fileobj->f = (__file);                                                  \
+        MP_OBJ_FROM_PTR(fileobj);                                               \
+    })
 
 // typle
 
@@ -99,10 +115,12 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #   define vsf_pyal_module_add_obj(__mod, __name, __obj)
 #endif
 
-#define vsf_pyal_funcarg_strobj(__name)             vsf_pyal_arg_t __name
+#define vsf_pyal_funcarg_strobj                     vsf_pyal_arg_t
 #define vsf_pyal_funcarg_strobj_get_str(__arg)      vsf_pyal_strarg_get_str(__arg)
 #define vsf_pyal_funcarg_var(__name)                size_t __name ## _num, const mp_obj_t *__name ## _arr
 #define vsf_pyal_funcarg_var_num(__name)            __name ## _num
+#define vsf_pyal_funcarg_var_is_int(__name, __idx)  mp_obj_is_int((__name ## _arr)[__idx])
+#define vsf_pyal_funcarg_var_is_str(__name, __idx)  mp_obj_is_str((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_get_str(__name, __idx) vsf_pyal_strobj_get_str((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_get_int(__name, __idx) vsf_pyal_intobj_get_int((__name ## _arr)[__idx])
 
@@ -115,6 +133,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     static __ret_type __name ## _ ## __func(__VA_ARGS__)
 #define VSF_PYAL_MODULE_FUNCARG_OBJ_0               MP_DEFINE_CONST_FUN_OBJ_0
 #define VSF_PYAL_MODULE_FUNCARG_OBJ_1               MP_DEFINE_CONST_FUN_OBJ_1
+#define VSF_PYAL_MODULE_FUNCARG_OBJ_2               MP_DEFINE_CONST_FUN_OBJ_2
 #define vsf_pyal_module_func_fix_imp(__name, __func, __func_type, __ret_type, ...)\
     static __ret_type __name ## _ ## __func(__VA_ARGS__);                       \
     __func_type(mp_vfs_ ## __func ## _obj, __name ## _ ## __func);              \

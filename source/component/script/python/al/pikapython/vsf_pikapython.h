@@ -64,8 +64,11 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
 #define vsf_pyal_listobj_append(__listobj, __arg, __free_arg)                   \
                                                     pikaList_append((__listobj), (__arg))
 
-// str
+// intobj/strobj...
 
+#define vsf_pyal_newobj_int(__value)                
+#define vsf_pyal_intobj_get_int(__intobj)           mp_obj_get_int(__intobj)
+#define vsf_pyal_newobj_str(__str)                  
 #define vsf_pyal_strobj_get_str(__strojb)           arg_getStr(__strojb)
 
 // tuple
@@ -113,7 +116,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_func_void_return_t                 void
 #define vsf_pyal_func_void_return()                 return
 
-#define vsf_pyal_funcarg_strobj(__name)             char *__name
+#define vsf_pyal_funcarg_strobj                     char *
 #define vsf_pyal_funcarg_strobj_get_str(__arg)      __arg
 #define vsf_pyal_funcarg_var(__name)                PikaTuple *__name
 #define vsf_pyal_funcarg_var_num(__name)            pikaTuple_getSize(__name)
@@ -124,6 +127,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
     __ret_type __name ## _ ## __func(PikaObj *self, ##__VA_ARGS__)
 #define VSF_PYAL_MODULE_FUNCARG_OBJ_0               0
 #define VSF_PYAL_MODULE_FUNCARG_OBJ_1               1
+#define VSF_PYAL_MODULE_FUNCARG_OBJ_2               2
 #define vsf_pyal_module_func_fix_imp(__name, __func, __func_type, __ret_type, ...)\
     __ret_type __name ## _ ## __func(PikaObj *self, ##__VA_ARGS__)
 #define vsf_pyal_module_func_init_imp(__name)                                   \
