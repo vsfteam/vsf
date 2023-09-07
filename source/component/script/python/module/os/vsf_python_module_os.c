@@ -220,6 +220,66 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_obj_t, 2, 3, vsf_pyal_funcarg_va
     }
 }
 
+vsf_pyal_module_func_var_imp(os, read, vsf_pyal_obj_t, 2, 2, vsf_pyal_funcarg_var(arg))
+{
+    // the 2nd arg is length
+    ssize_t length = vsf_pyal_funcarg_var_get_int(arg, 1);
+    int fd;
+
+    // if the first arg is int, it's fd of read
+    // if the first arg if file_obj, it's FILE of fread
+    if (vsf_pyal_funcarg_var_is_int(arg, 0)) {
+        fd = vsf_pyal_funcarg_var_get_int(arg, 0);
+    } else {
+        vsf_pyal_obj_t fileobj = vsf_pyal_funcarg_var_get_obj(arg, 0);
+        FILE *f = vsf_pyal_fileobj_get_file(fileobj);
+        fd = ((vsf_linux_fd_t *)f)->fd;
+    }
+
+    uint8_t *buffer = malloc(length);
+    if (NULL == buffer) {
+        vsf_pyal_raise("not enough memory\n");
+        return VSF_PYAL_OBJ_NULL;
+    }
+
+    length = read(fd, buffer, length);
+    if (length <= 0) {
+        vsf_pyal_raise("fail to read fd %d\n", fd);
+        free(buffer);
+        return VSF_PYAL_OBJ_NULL;
+    }
+
+    vsf_pyal_obj_t result = vsf_pyal_newobj_bytes(buffer, length);
+    free(buffer);
+    return result;
+}
+
+vsf_pyal_module_func_var_imp(os, write, vsf_pyal_func_void_return_t, 2, 2, vsf_pyal_funcarg_var(arg))
+{
+    // the 2nd arg is bytesobj
+    vsf_pyal_obj_t bytesobj = vsf_pyal_funcarg_var_get_obj(arg, 1);
+    size_t length;
+    uint8_t *buffer = vsf_pyal_bytesobj_get_data(bytesobj, &length);
+    int fd;
+
+    // if the first arg is int, it's fd of read
+    // if the first arg if file_obj, it's FILE of fread
+    if (vsf_pyal_funcarg_var_is_int(arg, 0)) {
+        fd = vsf_pyal_funcarg_var_get_int(arg, 0);
+    } else {
+        vsf_pyal_obj_t fileobj = vsf_pyal_funcarg_var_get_obj(arg, 0);
+        FILE *f = vsf_pyal_fileobj_get_file(fileobj);
+        fd = ((vsf_linux_fd_t *)f)->fd;
+    }
+
+    length = write(fd, buffer, length);
+    if (length <= 0) {
+        vsf_pyal_raise("fail to write fd %d\n", fd);
+    }
+
+    vsf_pyal_func_void_return();
+}
+
 #ifdef vsf_pyal_module
 vsf_pyal_module(os,
     vsf_pyal_module_func(os, __init__),
@@ -230,6 +290,8 @@ vsf_pyal_module(os,
     vsf_pyal_module_func(os, rename),
     vsf_pyal_module_func(os, remove),
     vsf_pyal_module_func(os, open),
+    vsf_pyal_module_func(os, read),
+    vsf_pyal_module_func(os, write),
     vsf_pyal_module_int(os, O_RDONLY, O_RDONLY),
     vsf_pyal_module_int(os, O_WRONLY, O_WRONLY),
     vsf_pyal_module_int(os, O_RDWR, O_RDWR),

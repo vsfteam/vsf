@@ -60,6 +60,9 @@ typedef mp_obj_t                                    vsf_pyal_obj_t;
 #define vsf_pyal_intobj_get_int(__intobj)           mp_obj_get_int(__intobj)
 #define vsf_pyal_newobj_str(__str)                  mp_obj_new_str((const char *)(__str), strlen(__str))
 #define vsf_pyal_strobj_get_str(__strojb)           mp_obj_str_get_str(__strojb)
+#define vsf_pyal_newobj_bytes(__data, __len)        mp_obj_new_bytes((const byte *)(__data), __len)
+#define vsf_pyal_bytesobj_get_data(__bytesobj, __len_ptr)                       \
+                                                    (uint8_t *)mp_obj_str_get_data((__bytesobj), (__len_ptr))
 
 typedef struct _mp_obj_file_t {
     mp_obj_base_t base;
@@ -74,6 +77,7 @@ extern const mp_obj_type_t mp_type_textio;
         fileobj->f = (__file);                                                  \
         MP_OBJ_FROM_PTR(fileobj);                                               \
     })
+#define vsf_pyal_fileobj_get_file(__fileobj)        ((mp_obj_file_t *)(__fileobj))->f
 
 // typle
 
@@ -123,6 +127,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_funcarg_var_is_str(__name, __idx)  mp_obj_is_str((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_get_str(__name, __idx) vsf_pyal_strobj_get_str((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_get_int(__name, __idx) vsf_pyal_intobj_get_int((__name ## _arr)[__idx])
+#define vsf_pyal_funcarg_var_get_obj(__name, __idx) ((__name ## _arr)[__idx])
 
 #define vsf_pyal_func_void_return_t                 mp_obj_t
 #define vsf_pyal_func_void_return()                 return mp_const_none
