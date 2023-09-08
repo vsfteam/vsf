@@ -234,7 +234,7 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_arg_t, 1, 3, vsf_pyal_funcarg_va
 
     // if the first arg is int, it's fd_int
     // if the first arg is str, it's path_str
-    if (vsf_pyal_funcarg_var_is_int(arg, 0)) {
+    if ((1 == argc) && vsf_pyal_funcarg_var_is_int(arg, 0)) {
         int fd = vsf_pyal_funcarg_var_get_int(arg, 0);
         vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
         if (NULL == sfd) {
