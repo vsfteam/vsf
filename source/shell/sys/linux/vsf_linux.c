@@ -714,6 +714,10 @@ int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char
     // fix surfix "/."
     size_t len = strlen(path_out);
     if ((len >= 2) && ('.' == path_out[len - 1]) && ('/' == path_out[len - 2])) {
+        // for "/.", don't remove /, or it will be empty
+        if (len == 2) {
+            len++;
+        }
         path_out[len - 2] = '\0';
     }
     return 0;
