@@ -17,6 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
+#define __VSF_LINUX_FS_CLASS_INHERIT__
 #include "component/script/python/vsf_python.h"
 
 #include <unistd.h>
@@ -36,6 +37,11 @@ vsf_pyal_static_dict(__os_environ);
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
+
+#if   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
+#endif
 
 void __vsf_pyal_os_environ_on_update(vsf_pyal_obj_t self, vsf_pyal_dict_evt_t evt,
         vsf_pyal_dict_key_t key, vsf_pyal_arg_t value)
@@ -223,7 +229,18 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_obj_t, 2, 3, vsf_pyal_funcarg_va
     }
 #endif
 
-    // the first arg is path as string
+    // if the first arg is int, it's fd_int
+    // if the first arg is str, it's path_str
+    if (vsf_pyal_funcarg_var_is_int(arg, 0)) {
+        int fd = vsf_pyal_funcarg_var_get_int(arg, 0);
+        vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+        if (NULL == sfd) {
+            vsf_pyal_raise("invalid fd %d\n", fd);
+            return VSF_PYAL_OBJ_NULL;
+        }
+        return vsf_pyal_newobj_file((FILE *)sfd, true);
+    }
+
     char *path_str = vsf_pyal_funcarg_var_get_str(arg, 0);
     // if the 2nd arg is int, it's flags of open
     // if the 2nd arg is str, it's mode of fopen
@@ -233,7 +250,6 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_obj_t, 2, 3, vsf_pyal_funcarg_va
         int mode_int = 2 == argc ? 0777 : vsf_pyal_funcarg_var_get_int(arg, 2);
         int fd = open((const char *)path_str, flags_int, mode_int);
         if (fd < 0) {
-        open_fail:
             vsf_pyal_raise("fail to open(%s, %d)\n", path_str, mode_int);
             return VSF_PYAL_OBJ_NULL;
         }
@@ -242,7 +258,8 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_obj_t, 2, 3, vsf_pyal_funcarg_va
         char *mode_str = vsf_pyal_funcarg_var_get_str(arg, 1);
         FILE *f = fopen(path_str, mode_str);
         if (NULL == f) {
-            goto open_fail;
+            vsf_pyal_raise("fail to open(%s, %s)\n", path_str, mode_str);
+            return VSF_PYAL_OBJ_NULL;
         }
         bool is_text = NULL == strchr(mode_str, 'b');
         return vsf_pyal_newobj_file(f, is_text);
@@ -254,8 +271,8 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_obj_t, 2, 3, vsf_pyal_funcarg_va
 
 vsf_pyal_module_func_var_imp(os, read, vsf_pyal_obj_t, 2, 2, vsf_pyal_funcarg_var(arg))
 {
-    int argc = vsf_pyal_funcarg_var_num(arg);
 #if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
+    int argc = vsf_pyal_funcarg_var_num(arg);
     if (argc != 2) {
         vsf_pyal_raise("invalid argument, format: bytes read(fd/file, length)\n");
         return VSF_PYAL_OBJ_NULL;
@@ -289,8 +306,8 @@ vsf_pyal_module_func_var_imp(os, read, vsf_pyal_obj_t, 2, 2, vsf_pyal_funcarg_va
 
 vsf_pyal_module_func_var_imp(os, write, vsf_pyal_func_void_return_t, 2, 2, vsf_pyal_funcarg_var(arg))
 {
-    int argc = vsf_pyal_funcarg_var_num(arg);
 #if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
+    int argc = vsf_pyal_funcarg_var_num(arg);
     if (argc != 2) {
         vsf_pyal_raise("invalid argument, format: write(fd/file, bytes)\n");
         return VSF_PYAL_OBJ_NULL;
@@ -356,8 +373,8 @@ vsf_pyal_module_func_var_imp(os, ioctl, vsf_pyal_obj_t, 2, 2, vsf_pyal_funcarg_v
 
 vsf_pyal_module_func_var_imp(os, close, vsf_pyal_func_void_return_t, 1, 1, vsf_pyal_funcarg_var(arg))
 {
-    int argc = vsf_pyal_funcarg_var_num(arg);
 #if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
+    int argc = vsf_pyal_funcarg_var_num(arg);
     if (argc != 2) {
         vsf_pyal_raise("invalid argument, format: close(fd/file)\n");
         return VSF_PYAL_OBJ_NULL;
@@ -387,6 +404,10 @@ vsf_pyal_module_func_fix_imp(os, system, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal
     }
     vsf_pyal_func_void_return();
 }
+
+#if   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 #ifdef vsf_pyal_module
 vsf_pyal_module(os,

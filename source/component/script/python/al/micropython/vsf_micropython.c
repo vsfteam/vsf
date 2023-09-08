@@ -22,6 +22,7 @@
 #if VSF_USE_MICROPYTHON == ENABLED
 
 #include "py/stream.h"
+#include "py/builtin.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -35,10 +36,18 @@ STATIC void __check_fd_is_open(const mp_obj_file_t *self) {
     }
 }
 
+STATIC int __file_get_fd(const mp_obj_file_t *self)
+{
+    if (self->fd < 3) {
+        return self->fd;
+    }
+    return ((vsf_linux_fd_t *)self->f)->fd;
+}
+
 STATIC void __file_print(const mp_print_t *print, mp_obj_t self_in, mp_print_kind_t kind)
 {
     mp_obj_file_t *self = MP_OBJ_TO_PTR(self_in);
-    int fd = ((vsf_linux_fd_t *)self->f)->fd;
+    int fd = __file_get_fd(self);
     mp_printf(print, "<io.%s %d>", mp_obj_get_type_str(self_in), fd);
 }
 
@@ -46,7 +55,7 @@ STATIC mp_uint_t __file_read(mp_obj_t self_in, void *buf, mp_uint_t size, int *e
 {
     mp_obj_file_t *self = MP_OBJ_TO_PTR(self_in);
     __check_fd_is_open(self);
-    int fd = ((vsf_linux_fd_t *)self->f)->fd;
+    int fd = __file_get_fd(self);
     ssize_t r = read(fd, buf, size);
     if (r < 0) {
         *errcode = errno;
@@ -59,7 +68,7 @@ STATIC mp_uint_t __file_write(mp_obj_t self_in, const void *buf, mp_uint_t size,
 {
     mp_obj_file_t *self = MP_OBJ_TO_PTR(self_in);
     __check_fd_is_open(self);
-    int fd = ((vsf_linux_fd_t *)self->f)->fd;
+    int fd = __file_get_fd(self);
     ssize_t r = write(fd, buf, size);
     if (r < 0) {
         *errcode = errno;
@@ -72,7 +81,7 @@ STATIC mp_obj_t __file_fileno(mp_obj_t self_in)
 {
     mp_obj_file_t *self = MP_OBJ_TO_PTR(self_in);
     __check_fd_is_open(self);
-    int fd = ((vsf_linux_fd_t *)self->f)->fd;
+    int fd = __file_get_fd(self);
     return MP_OBJ_NEW_SMALL_INT(fd);
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(__file_fileno_obj, __file_fileno);
@@ -84,7 +93,7 @@ STATIC mp_uint_t __file_ioctl(mp_obj_t self_in, mp_uint_t request, uintptr_t arg
 
     if (request != MP_STREAM_CLOSE) {
         __check_fd_is_open(self);
-        fd = ((vsf_linux_fd_t *)self->f)->fd;
+        fd = __file_get_fd(self);
     }
 
     switch (request) {
@@ -206,6 +215,59 @@ MP_DEFINE_CONST_OBJ_TYPE(
     protocol, &__textio_stream_p,
     locals_dict, &__file_locals_dict
 );
+
+#if !MICROPY_VFS
+mp_import_stat_t mp_import_stat(const char *path)
+{
+    struct stat st;
+    int result = stat(path, &st);
+    if (result < 0) {
+        return MP_IMPORT_STAT_NO_EXIST;
+    }
+    return ((st.st_mode & S_IFMT) == S_IFDIR) ? MP_IMPORT_STAT_DIR : MP_IMPORT_STAT_FILE;
+}
+
+mp_obj_t mp_builtin_open(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
+    enum { ARG_file, ARG_mode, ARG_encoding };
+    static const mp_arg_t allowed_args[] = {
+        { MP_QSTR_file, MP_ARG_OBJ | MP_ARG_REQUIRED, {.u_rom_obj = MP_ROM_NONE} },
+        { MP_QSTR_mode, MP_ARG_OBJ, {.u_rom_obj = MP_ROM_QSTR(MP_QSTR_r)} },
+        { MP_QSTR_buffering, MP_ARG_INT, {.u_int = -1} },
+        { MP_QSTR_encoding, MP_ARG_OBJ, {.u_rom_obj = MP_ROM_NONE} },
+    };
+
+    // parse args
+    mp_arg_val_t args[MP_ARRAY_SIZE(allowed_args)];
+    mp_arg_parse_all(n_args, pos_args, kw_args, MP_ARRAY_SIZE(allowed_args), allowed_args, args);
+
+    const mp_obj_t open_args[2] = {
+        args[ARG_file].u_obj,
+        args[ARG_mode].u_obj,
+    };
+    extern vsf_pyal_obj_t os_open(size_t num, const mp_obj_t *args);
+    return os_open(dimof(open_args), open_args);
+}
+MP_DEFINE_CONST_FUN_OBJ_KW(mp_builtin_open_obj, 0, mp_builtin_open);
+
+mp_obj_t mp_vfs_open(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args)
+{
+    return mp_builtin_open(n_args, pos_args, kw_args);
+}
+
+const mp_obj_file_t mp_sys_stdin_obj = {
+    .base.type = &mp_type_textio,
+    .fd = STDIN_FILENO,
+};
+const mp_obj_file_t mp_sys_stdout_obj = {
+    .base.type = &mp_type_textio,
+    .fd = STDOUT_FILENO,
+};
+const mp_obj_file_t mp_sys_stderr_obj = {
+    .base.type = &mp_type_textio,
+    .fd = STDERR_FILENO,
+};
+
+#endif
 
 #endif
 /* EOF */
