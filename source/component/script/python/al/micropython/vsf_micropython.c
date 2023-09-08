@@ -224,7 +224,7 @@ mp_import_stat_t mp_import_stat(const char *path)
     if (result < 0) {
         return MP_IMPORT_STAT_NO_EXIST;
     }
-    return ((st.st_mode & S_IFMT) == S_IFDIR) ? MP_IMPORT_STAT_DIR : MP_IMPORT_STAT_FILE;
+    return S_ISDIR(st.st_mode) ? MP_IMPORT_STAT_DIR : MP_IMPORT_STAT_FILE;
 }
 
 mp_obj_t mp_builtin_open(size_t n_args, const mp_obj_t *pos_args, mp_map_t *kw_args) {
