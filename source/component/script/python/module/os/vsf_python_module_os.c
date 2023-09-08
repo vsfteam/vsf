@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <sys/ioctl.h>
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -222,12 +223,19 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_obj_t, 2, 3, vsf_pyal_funcarg_va
 
 vsf_pyal_module_func_var_imp(os, read, vsf_pyal_obj_t, 2, 2, vsf_pyal_funcarg_var(arg))
 {
+    int argc = vsf_pyal_funcarg_var_num(arg);
+#if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
+    if (argc != 2) {
+        vsf_pyal_raise("invalid argument, format: bytes read(fd/file, length)\n");
+        return VSF_PYAL_OBJ_NULL;
+    }
+#endif
+
     // the 2nd arg is length
     ssize_t length = vsf_pyal_funcarg_var_get_int(arg, 1);
     int fd;
 
-    // if the first arg is int, it's fd of read
-    // if the first arg if file_obj, it's FILE of fread
+    // the first arg is fd_int/file_obj
     if (vsf_pyal_funcarg_var_is_int(arg, 0)) {
         fd = vsf_pyal_funcarg_var_get_int(arg, 0);
     } else {
@@ -250,14 +258,21 @@ vsf_pyal_module_func_var_imp(os, read, vsf_pyal_obj_t, 2, 2, vsf_pyal_funcarg_va
 
 vsf_pyal_module_func_var_imp(os, write, vsf_pyal_func_void_return_t, 2, 2, vsf_pyal_funcarg_var(arg))
 {
+    int argc = vsf_pyal_funcarg_var_num(arg);
+#if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
+    if (argc != 2) {
+        vsf_pyal_raise("invalid argument, format: write(fd/file, bytes)\n");
+        return VSF_PYAL_OBJ_NULL;
+    }
+#endif
+
     // the 2nd arg is bytesobj
     vsf_pyal_obj_t bytesobj = vsf_pyal_funcarg_var_get_obj(arg, 1);
     size_t length;
     uint8_t *buffer = vsf_pyal_bytesobj_get_data(bytesobj, &length);
     int fd;
 
-    // if the first arg is int, it's fd of read
-    // if the first arg if file_obj, it's FILE of fread
+    // the first arg is fd_int/file_obj
     if (vsf_pyal_funcarg_var_is_int(arg, 0)) {
         fd = vsf_pyal_funcarg_var_get_int(arg, 0);
     } else {
@@ -274,6 +289,40 @@ vsf_pyal_module_func_var_imp(os, write, vsf_pyal_func_void_return_t, 2, 2, vsf_p
     vsf_pyal_func_void_return();
 }
 
+vsf_pyal_module_func_var_imp(os, ioctl, vsf_pyal_obj_t, 2, 2, vsf_pyal_funcarg_var(arg))
+{
+    int argc = vsf_pyal_funcarg_var_num(arg);
+#if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
+    if ((argc < 2) || (argc > 3)) {
+        vsf_pyal_raise("invalid argument, format: int ioctl(fd/file, request, *arg)\n");
+        return VSF_PYAL_OBJ_NULL;
+    }
+#endif
+
+    // the 2nd arg is request of ioctl
+    unsigned long request = (unsigned long)vsf_pyal_intobj_get_int(vsf_pyal_funcarg_var_get_obj(arg, 1));
+    int fd, result;
+
+    // the first arg is fd_int/file_obj
+    if (vsf_pyal_funcarg_var_is_int(arg, 0)) {
+        fd = vsf_pyal_funcarg_var_get_int(arg, 0);
+    } else {
+        vsf_pyal_obj_t fileobj = vsf_pyal_funcarg_var_get_obj(arg, 0);
+        FILE *f = vsf_pyal_fileobj_get_file(fileobj);
+        fd = ((vsf_linux_fd_t *)f)->fd;
+    }
+
+    // the possible 3rd arg is arg of ioctl
+    if (3 == argc) {
+        uintptr_t arg = (uintptr_t)vsf_pyal_intobj_get_int(vsf_pyal_funcarg_var_get_obj(arg, 3));
+        result = ioctl(fd, request, arg);
+    } else {
+        result = ioctl(fd, request);
+    }
+
+    return vsf_pyal_newobj_int(result);
+}
+
 #ifdef vsf_pyal_module
 vsf_pyal_module(os,
     vsf_pyal_module_func(os, __init__),
@@ -286,6 +335,7 @@ vsf_pyal_module(os,
     vsf_pyal_module_func(os, open),
     vsf_pyal_module_func(os, read),
     vsf_pyal_module_func(os, write),
+    vsf_pyal_module_func(os, ioctl),
     vsf_pyal_module_int(os, O_RDONLY, O_RDONLY),
     vsf_pyal_module_int(os, O_WRONLY, O_WRONLY),
     vsf_pyal_module_int(os, O_RDWR, O_RDWR),
