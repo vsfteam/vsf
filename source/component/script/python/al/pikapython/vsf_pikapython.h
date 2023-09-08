@@ -25,6 +25,7 @@
 #include "PikaStdData_List.h"
 #include "PikaStdData_Dict.h"
 #include "PikaStdData_Tuple.h"
+#include "PikaStdData_FILEIO.h"
 
 /*============================ MACROS ========================================*/
 
@@ -104,8 +105,9 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
 #define vsf_pyal_newobj_file(__file, __is_text)                                 \
     ({                                                                          \
         (void)(__is_text);                                                      \
-        vsf_pyal_obj_t fileobj = newNormalObj(New_TinyObj);                     \
-        obj_setPtr(fileobj, "fd", (__file));                                    \
+        vsf_pyal_obj_t fileobj = newNormalObj(New_PikaStdData_FILEIO);          \
+        obj_setPtr(fileobj, "_f", (__file));                                    \
+        obj_setStr(fileobj, "_mode", (__is_text) ? "t" : "b");                  \
         fileobj;                                                                \
     })
 #define vsf_pyal_fileobj_get_file(__fileobj)        
@@ -117,7 +119,7 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
         arg_newObj(fileobj);                                                    \
     })   
 #define vsf_pyal_filearg_get_file(__filearg)        arg_getPtr(__filearg)
-#define vsf_pyal_filearg_clear(__filearg)           arg_setPtr(__filearg, "fd", ARG_TYPE_POINTER, NULL)
+#define vsf_pyal_filearg_clear(__filearg)           arg_setPtr(__filearg, "_d", ARG_TYPE_POINTER, NULL)
 
 // tuple
 

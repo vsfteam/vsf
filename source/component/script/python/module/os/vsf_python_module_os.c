@@ -222,11 +222,11 @@ vsf_pyal_module_func_fix_imp(os, remove, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal
     vsf_pyal_func_void_return();
 }
 
-vsf_pyal_module_func_var_imp(os, open, vsf_pyal_arg_t, 2, 3, vsf_pyal_funcarg_var(arg))
+vsf_pyal_module_func_var_imp(os, open, vsf_pyal_arg_t, 1, 3, vsf_pyal_funcarg_var(arg))
 {
     int argc = vsf_pyal_funcarg_var_num(arg);
 #if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
-    if ((argc < 2) || (argc > 3)) {
+    if ((argc < 1) || (argc > 3)) {
         vsf_pyal_raise("invalid argument, format: fd_int open(path, flags_int, *mode) | file_obj open(path, mode_str)\n");
         return VSF_PYAL_ARG_NULL;
     }
