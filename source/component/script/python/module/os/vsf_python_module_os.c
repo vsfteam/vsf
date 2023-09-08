@@ -147,9 +147,27 @@ vsf_pyal_module_func_var_imp(os, mkdir, vsf_pyal_func_void_return_t, 1, 2, vsf_p
 #endif
 
     char *path_str = vsf_pyal_funcarg_var_get_str(arg, 0);
-    int mode_int = 1 == argc ? 0511 : vsf_pyal_funcarg_var_get_int(arg, 1);
+    int mode_int = 1 == argc ? 0777 : vsf_pyal_funcarg_var_get_int(arg, 1);
     if (mkdir((const char *)path_str, mode_int) < 0) {
         vsf_pyal_raise("fail to mkdir(%s, %d)\n", path_str, mode_int);
+    }
+    vsf_pyal_func_void_return();
+}
+
+vsf_pyal_module_func_var_imp(os, makedirs, vsf_pyal_func_void_return_t, 1, 2, vsf_pyal_funcarg_var(arg))
+{
+    int argc = vsf_pyal_funcarg_var_num(arg);
+#if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
+    if ((argc < 1) || (argc > 2)) {
+        vsf_pyal_raise("invalid argument, format: makedirs(path, *mode)\n");
+        return;
+    }
+#endif
+
+    char *path_str = vsf_pyal_funcarg_var_get_str(arg, 0);
+    int mode_int = 1 == argc ? 0777 : vsf_pyal_funcarg_var_get_int(arg, 1);
+    if (mkdirs((const char *)path_str, mode_int) < 0) {
+        vsf_pyal_raise("fail to mkdirs(%s, %d)\n", path_str, mode_int);
     }
     vsf_pyal_func_void_return();
 }
@@ -187,7 +205,7 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_obj_t, 2, 3, vsf_pyal_funcarg_va
     int argc = vsf_pyal_funcarg_var_num(arg);
 #if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
     if ((argc < 2) || (argc > 3)) {
-        vsf_pyal_raise("invalid argument, format: open(path, flags_int, *mode) | open(path, mode_str)\n");
+        vsf_pyal_raise("invalid argument, format: fd_int open(path, flags_int, *mode) | file_obj open(path, mode_str)\n");
         return VSF_PYAL_OBJ_NULL;
     }
 #endif
@@ -198,8 +216,8 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_obj_t, 2, 3, vsf_pyal_funcarg_va
     // if the 2nd arg is str, it's mode of fopen
     if (vsf_pyal_funcarg_var_is_int(arg, 1)) {
         int flags_int = vsf_pyal_funcarg_var_get_int(arg, 1);
-        // the possible 3rd arg as mode of open, default is 0511
-        int mode_int = 2 == argc ? 0511 : vsf_pyal_funcarg_var_get_int(arg, 2);
+        // the possible 3rd arg as mode of open, default is 0777
+        int mode_int = 2 == argc ? 0777 : vsf_pyal_funcarg_var_get_int(arg, 2);
         int fd = open((const char *)path_str, flags_int, mode_int);
         if (fd < 0) {
         open_fail:
@@ -323,12 +341,24 @@ vsf_pyal_module_func_var_imp(os, ioctl, vsf_pyal_obj_t, 2, 2, vsf_pyal_funcarg_v
     return vsf_pyal_newobj_int(result);
 }
 
+vsf_pyal_module_func_fix_imp(os, system, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_strobj cmd)
+{
+    char *cmd_str = vsf_pyal_funcarg_strobj_get_str(cmd);
+    int result = system((const char *)cmd_str);
+    if (result < 0) {
+        vsf_pyal_raise("fail to call system(%s)\n", cmd_str);
+        vsf_pyal_func_void_return();
+    }
+    vsf_pyal_func_void_return();
+}
+
 #ifdef vsf_pyal_module
 vsf_pyal_module(os,
     vsf_pyal_module_func(os, __init__),
     vsf_pyal_module_func(os, listdir),
     vsf_pyal_module_func(os, getcwd),
     vsf_pyal_module_func(os, mkdir),
+    vsf_pyal_module_func(os, makedirs),
     vsf_pyal_module_func(os, rmdir),
     vsf_pyal_module_func(os, rename),
     vsf_pyal_module_func(os, remove),
@@ -336,6 +366,7 @@ vsf_pyal_module(os,
     vsf_pyal_module_func(os, read),
     vsf_pyal_module_func(os, write),
     vsf_pyal_module_func(os, ioctl),
+    vsf_pyal_module_func(os, system),
     vsf_pyal_module_int(os, O_RDONLY, O_RDONLY),
     vsf_pyal_module_int(os, O_WRONLY, O_WRONLY),
     vsf_pyal_module_int(os, O_RDWR, O_RDWR),
