@@ -65,6 +65,10 @@ vsf_pyal_module_func_init_imp(os)
     vsf_pyal_module_add_int(os, "O_APPEND", O_APPEND);
     vsf_pyal_module_add_int(os, "O_CREAT", O_CREAT);
 
+    struct utsname name;
+    uname(&utsname);
+    vsf_pyal_module_add_str(os, "name", name.sysname);
+
     environ_dict = vsf_pyal_newdict();
     vsf_pyal_module_add_obj(os, "environ", environ_dict);
 #else
@@ -177,6 +181,15 @@ vsf_pyal_module_func_fix_imp(os, rmdir, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_
     char *path_str = vsf_pyal_funcarg_strobj_get_str(path);
     if (rmdir((const char *)path_str) < 0) {
         vsf_pyal_raise("fail to rmdir(%s)\n", path_str);
+    }
+    vsf_pyal_func_void_return();
+}
+
+vsf_pyal_module_func_fix_imp(os, chdir, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_strobj path)
+{
+    char *path_str = vsf_pyal_funcarg_strobj_get_str(path);
+    if (chdir((const char *)path_str) < 0) {
+        vsf_pyal_raise("fail to chdir(%s)\n", path_str);
     }
     vsf_pyal_func_void_return();
 }
@@ -360,6 +373,7 @@ vsf_pyal_module(os,
     vsf_pyal_module_func(os, mkdir),
     vsf_pyal_module_func(os, makedirs),
     vsf_pyal_module_func(os, rmdir),
+    vsf_pyal_module_func(os, chdir),
     vsf_pyal_module_func(os, rename),
     vsf_pyal_module_func(os, remove),
     vsf_pyal_module_func(os, open),
