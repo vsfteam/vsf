@@ -389,6 +389,7 @@ vsf_pyal_module_func_var_imp(os, close, vsf_pyal_func_void_return_t, 1, 1, vsf_p
         vsf_pyal_obj_t fileobj = vsf_pyal_funcarg_var_get_obj(arg, 0);
         FILE *f = vsf_pyal_fileobj_get_file(fileobj);
         fclose(f);
+        vsf_pyal_fileobj_clear(fileobj);
     }
 
     vsf_pyal_func_void_return();

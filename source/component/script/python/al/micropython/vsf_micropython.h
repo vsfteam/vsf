@@ -96,6 +96,7 @@ extern const mp_obj_type_t mp_type_textio;
         MP_OBJ_FROM_PTR(fileobj);                                               \
     })
 #define vsf_pyal_fileobj_get_file(__fileobj)        ((mp_obj_file_t *)(__fileobj))->f
+#define vsf_pyal_fileobj_clear(__fileobj)           ((mp_obj_file_t *)(__fileobj))->f = NULL
 
 // typle
 
