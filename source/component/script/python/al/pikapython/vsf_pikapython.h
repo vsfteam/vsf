@@ -118,8 +118,16 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
         vsf_pyal_obj_t fileobj = vsf_pyal_newobj_file((__file), (__is_text));   \
         arg_newObj(fileobj);                                                    \
     })   
-#define vsf_pyal_filearg_get_file(__filearg)        arg_getPtr(__filearg)
-#define vsf_pyal_filearg_clear(__filearg)           arg_setPtr(__filearg, "_d", ARG_TYPE_POINTER, NULL)
+#define vsf_pyal_filearg_get_file(__filearg)                                    \
+    ({                                                                          \
+        vsf_pyal_obj_t fileobj = arg_getObj(__filearg);                         \
+        (FILE *)obj_getPtr(fileobj, "_f");                                      \
+    })
+#define vsf_pyal_filearg_clear(__filearg)                                       \
+    ({                                                                          \
+        vsf_pyal_obj_t fileobj = arg_getObj(__filearg);                         \
+        obj_setPtr(fileobj, "_f", NULL);                                        \
+    })
 
 // tuple
 
