@@ -222,13 +222,13 @@ vsf_pyal_module_func_fix_imp(os, remove, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal
     vsf_pyal_func_void_return();
 }
 
-vsf_pyal_module_func_var_imp(os, open, vsf_pyal_obj_t, 2, 3, vsf_pyal_funcarg_var(arg))
+vsf_pyal_module_func_var_imp(os, open, vsf_pyal_arg_t, 2, 3, vsf_pyal_funcarg_var(arg))
 {
     int argc = vsf_pyal_funcarg_var_num(arg);
 #if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
     if ((argc < 2) || (argc > 3)) {
         vsf_pyal_raise("invalid argument, format: fd_int open(path, flags_int, *mode) | file_obj open(path, mode_str)\n");
-        return VSF_PYAL_OBJ_NULL;
+        return VSF_PYAL_ARG_NULL;
     }
 #endif
 
@@ -239,9 +239,9 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_obj_t, 2, 3, vsf_pyal_funcarg_va
         vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
         if (NULL == sfd) {
             vsf_pyal_raise("invalid fd %d\n", fd);
-            return VSF_PYAL_OBJ_NULL;
+            return VSF_PYAL_ARG_NULL;
         }
-        return vsf_pyal_newobj_file((FILE *)sfd, true);
+        return vsf_pyal_newarg_file((FILE *)sfd, true);
     }
 
     char *path_str = vsf_pyal_funcarg_var_get_str(arg, 0);
@@ -254,21 +254,21 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_obj_t, 2, 3, vsf_pyal_funcarg_va
         int fd = open((const char *)path_str, flags_int, mode_int);
         if (fd < 0) {
             vsf_pyal_raise("fail to open(%s, %d)\n", path_str, mode_int);
-            return VSF_PYAL_OBJ_NULL;
+            return VSF_PYAL_ARG_NULL;
         }
-        return vsf_pyal_newobj_int(fd);
+        return vsf_pyal_newarg_int(fd);
     } else if (vsf_pyal_funcarg_var_is_str(arg, 1)) {
         char *mode_str = vsf_pyal_funcarg_var_get_str(arg, 1);
         FILE *f = fopen(path_str, mode_str);
         if (NULL == f) {
             vsf_pyal_raise("fail to open(%s, %s)\n", path_str, mode_str);
-            return VSF_PYAL_OBJ_NULL;
+            return VSF_PYAL_ARG_NULL;
         }
         bool is_text = NULL == strchr(mode_str, 'b');
-        return vsf_pyal_newobj_file(f, is_text);
+        return vsf_pyal_newarg_file(f, is_text);
     } else {
         vsf_pyal_raise("invalid argument, format: open(path, *mode)\n");
-        return VSF_PYAL_OBJ_NULL;
+        return VSF_PYAL_ARG_NULL;
     }
 }
 

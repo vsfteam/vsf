@@ -40,15 +40,9 @@
 // arg, used as element of list/dict etc
 
 typedef Arg *                                       vsf_pyal_arg_t;
+#define VSF_PYAL_ARG_NULL                           NULL
 
-#define vsf_pyal_newarg_str(__str)                  arg_setStr(NULL, "", __str)
-#define vsf_pyal_newarg_str_ret(__str, __need_free)                             \
-    ({                                                                          \
-        obj_setStr(self, __FUNCTION__, (__str));                                \
-        if (__need_free) { free(__str); }                                       \
-        obj_getStr(self, __FUNCTION__);                                         \
-    })
-#define vsf_pyal_strarg_get_str(__str_arg)          arg_getStr(__str_arg)
+
 #define vsf_pyal_newarg_obj(__obj)                  arg_newObj(__obj)
 #define vsf_pyal_arg_free(__arg)                    arg_deinit(__arg)
 
@@ -72,13 +66,18 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
 
 // int
 
-#define vsf_pyal_newobj_int(__value)                
-#define vsf_pyal_intobj_get_int(__intobj)
+#define vsf_pyal_newarg_int(__value)                arg_newInt(__value)
 
 // str
 
-#define vsf_pyal_newobj_str(__str)                  
-#define vsf_pyal_strobj_get_str(__strojb)           arg_getStr(__strojb)
+#define vsf_pyal_newarg_str(__str)                  arg_newStr(__str)
+#define vsf_pyal_newarg_str_ret(__str, __need_free)                             \
+    ({                                                                          \
+        obj_setStr(self, __FUNCTION__, (__str));                                \
+        if (__need_free) { free(__str); }                                       \
+        obj_getStr(self, __FUNCTION__);                                         \
+    })
+#define vsf_pyal_strarg_get_str(__str_arg)          arg_getStr(__str_arg)
 
 // bytes
 
@@ -112,6 +111,11 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
 #define vsf_pyal_fileobj_get_file(__fileobj)        
 #define vsf_pyal_fileobj_clear(__fileobj)           
 
+#define vsf_pyal_newarg_file(__file, __is_text)                                 \
+    ({                                                                          \
+        vsf_pyal_obj_t fileobj = vsf_pyal_newobj_file((__file), (__is_text));   \
+        arg_newObj(fileobj);                                                    \
+    })   
 #define vsf_pyal_filearg_get_file(__filearg)        arg_getPtr(__filearg)
 #define vsf_pyal_filearg_clear(__filearg)           arg_setPtr(__filearg, "fd", ARG_TYPE_POINTER, NULL)
 
