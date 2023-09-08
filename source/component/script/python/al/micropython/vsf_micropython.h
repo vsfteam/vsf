@@ -140,6 +140,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 
 #define vsf_pyal_funcarg_strobj                     vsf_pyal_arg_t
 #define vsf_pyal_funcarg_strobj_get_str(__arg)      vsf_pyal_strarg_get_str(__arg)
+#define vsf_pyal_funcarg_newstr(__str)              vsf_pyal_newarg_str(__str)
 #define vsf_pyal_funcarg_var(__name)                size_t __name ## _num, const mp_obj_t *__name ## _arr
 #define vsf_pyal_funcarg_var_num(__name)            __name ## _num
 #define vsf_pyal_funcarg_var_is_int(__name, __idx)  mp_obj_is_int((__name ## _arr)[__idx])
@@ -170,6 +171,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_module_str(__mod, __name, __str)   { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_QSTR(MP_QSTR_ ## __str) }
 #define vsf_pyal_module_func(__mod, __name)         { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&mp_vfs_ ## __name ## _obj) }
 #define vsf_pyal_module_dict(__mod, __name, __dict) { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&__dict) }
+#define vsf_pyal_module_submod(__mod, __name)       { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&(mp_module_ ## __name)) }
 #define vsf_pyal_module(__name, ...)                                            \
     STATIC const mp_rom_map_elem_t __name ## _module_globals_table[] = {        \
         { MP_ROM_QSTR(MP_QSTR_ ## __name__), MP_ROM_QSTR(MP_QSTR_ ## __name) }, \

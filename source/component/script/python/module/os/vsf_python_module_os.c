@@ -406,11 +406,27 @@ vsf_pyal_module_func_fix_imp(os, system, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal
     vsf_pyal_func_void_return();
 }
 
+// os.path
+vsf_pyal_module_func_fix_imp(os_path, abspath, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_strobj, vsf_pyal_funcarg_strobj path)
+{
+    char *path_str = vsf_pyal_funcarg_strobj_get_str(path);
+    char abspath_buffer[PATH_MAX];
+    
+    if (NULL == realpath((const char *)path_str, (char *)abspath_buffer)) {
+        return VSF_PYAL_OBJ_NULL;
+    }
+
+    return vsf_pyal_funcarg_newstr(abspath_buffer);
+}
+
 #if   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic pop
 #endif
 
 #ifdef vsf_pyal_module
+vsf_pyal_module(path,
+    vsf_pyal_module_func(os_path, abspath),
+)
 vsf_pyal_module(os,
     vsf_pyal_module_func(os, __init__),
     vsf_pyal_module_func(os, listdir),
@@ -434,5 +450,6 @@ vsf_pyal_module(os,
     vsf_pyal_module_int(os, O_CREAT, O_CREAT),
     vsf_pyal_module_str(os, sep, _slash_),
     vsf_pyal_module_dict(os, environ, __os_environ),
+    vsf_pyal_module_submod(os, path),
 )
 #endif
