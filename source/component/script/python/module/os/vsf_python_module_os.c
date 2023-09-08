@@ -236,22 +236,16 @@ vsf_pyal_module_func_var_imp(os, read, vsf_pyal_obj_t, 2, 2, vsf_pyal_funcarg_va
         fd = ((vsf_linux_fd_t *)f)->fd;
     }
 
-    uint8_t *buffer = malloc(length);
-    if (NULL == buffer) {
-        vsf_pyal_raise("not enough memory\n");
-        return VSF_PYAL_OBJ_NULL;
-    }
-
-    length = read(fd, buffer, length);
+    vsf_pyal_buffer_t buffer = vsf_pyal_new_buffer(length);
+    length = read(fd, vsf_pyal_buffer_get_buffer(buffer), vsf_pyal_buffer_get_len(buffer));
     if (length <= 0) {
         vsf_pyal_raise("fail to read fd %d\n", fd);
-        free(buffer);
+        vsf_pyal_buffer_free(buffer);
         return VSF_PYAL_OBJ_NULL;
     }
 
-    vsf_pyal_obj_t result = vsf_pyal_newobj_bytes(buffer, length);
-    free(buffer);
-    return result;
+    vsf_pyal_buffer_set_len(buffer, length);
+    return vsf_pyal_newobj_bytes_from_buffer(buffer);
 }
 
 vsf_pyal_module_func_var_imp(os, write, vsf_pyal_func_void_return_t, 2, 2, vsf_pyal_funcarg_var(arg))

@@ -34,6 +34,20 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+// buffer
+
+#define vsf_pyal_buffer_t                           vstr_t
+#define vsf_pyal_new_buffer(__size)                                             \
+    ({                                                                          \
+        vstr_t vstr;                                                            \
+        vstr_init_len(&vstr, (__size));                                         \
+        vstr;                                                                   \
+    })
+#define vsf_pyal_buffer_get_buffer(__buffer)        (__buffer).buf
+#define vsf_pyal_buffer_get_len(__buffer)           (__buffer).len
+#define vsf_pyal_buffer_set_len(__buffer, __len)    ((__buffer).len = (__len))
+#define vsf_pyal_buffer_free(__buffer)              vstr_clear(&(__buffer))
+
 // arg, used as element of list/dict etc
 
 typedef mp_obj_t                                    vsf_pyal_arg_t;
@@ -61,6 +75,7 @@ typedef mp_obj_t                                    vsf_pyal_obj_t;
 #define vsf_pyal_newobj_str(__str)                  mp_obj_new_str((const char *)(__str), strlen(__str))
 #define vsf_pyal_strobj_get_str(__strojb)           mp_obj_str_get_str(__strojb)
 #define vsf_pyal_newobj_bytes(__data, __len)        mp_obj_new_bytes((const byte *)(__data), __len)
+#define vsf_pyal_newobj_bytes_from_buffer(__buffer) mp_obj_new_bytes_from_vstr(&(__buffer))
 #define vsf_pyal_bytesobj_get_data(__bytesobj, __len_ptr)                       \
                                                     (uint8_t *)mp_obj_str_get_data((__bytesobj), (__len_ptr))
 
