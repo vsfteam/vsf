@@ -354,6 +354,29 @@ vsf_pyal_module_func_var_imp(os, ioctl, vsf_pyal_obj_t, 2, 2, vsf_pyal_funcarg_v
     return vsf_pyal_newobj_int(result);
 }
 
+vsf_pyal_module_func_var_imp(os, close, vsf_pyal_func_void_return_t, 1, 1, vsf_pyal_funcarg_var(arg))
+{
+    int argc = vsf_pyal_funcarg_var_num(arg);
+#if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
+    if (argc != 2) {
+        vsf_pyal_raise("invalid argument, format: close(fd/file)\n");
+        return VSF_PYAL_OBJ_NULL;
+    }
+#endif
+
+    // the first arg is fd_int/file_obj
+    if (vsf_pyal_funcarg_var_is_int(arg, 0)) {
+        int fd = vsf_pyal_funcarg_var_get_int(arg, 0);
+        close(fd);
+    } else {
+        vsf_pyal_obj_t fileobj = vsf_pyal_funcarg_var_get_obj(arg, 0);
+        FILE *f = vsf_pyal_fileobj_get_file(fileobj);
+        fclose(f);
+    }
+
+    vsf_pyal_func_void_return();
+}
+
 vsf_pyal_module_func_fix_imp(os, system, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_strobj cmd)
 {
     char *cmd_str = vsf_pyal_funcarg_strobj_get_str(cmd);
@@ -380,6 +403,7 @@ vsf_pyal_module(os,
     vsf_pyal_module_func(os, read),
     vsf_pyal_module_func(os, write),
     vsf_pyal_module_func(os, ioctl),
+    vsf_pyal_module_func(os, close),
     vsf_pyal_module_func(os, system),
     vsf_pyal_module_int(os, O_RDONLY, O_RDONLY),
     vsf_pyal_module_int(os, O_WRONLY, O_WRONLY),
