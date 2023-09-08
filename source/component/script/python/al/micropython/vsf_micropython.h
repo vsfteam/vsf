@@ -53,11 +53,16 @@
 typedef mp_obj_t                                    vsf_pyal_arg_t;
 
 #define vsf_pyal_newarg_str(__str)                  mp_obj_new_str((const char *)(__str), strlen(__str))
+#define vsf_pyal_newarg_str_ret(__str, __need_free)                             \
+    ({                                                                          \
+        vsf_pyal_arg_t arg = vsf_pyal_newarg_str(__str);                        \
+        if (__need_free) { free(__str); }                                       \
+        arg;                                                                    \
+    })
 #define vsf_pyal_strarg_get_str(__str_arg)          vsf_pyal_strobj_get_str(__str_arg)
 #define vsf_pyal_newarg_int(__value)                mp_obj_new_int(__value)
 #define vsf_pyal_intarg_get_int(__int_arg)          vsf_pyal_intobj_get_int(__int_arg)
 #define vsf_pyal_newarg_bool(__bool)                ({ (__bool) ? mp_const_true : mp_const_false; })
-#define vsf_pyal_newarg_bytes(__data, __len)        mp_obj_new_bytes((const byte *)(__data), __len)
 #define vsf_pyal_free_arg(__arg)
 
 // object
@@ -71,16 +76,38 @@ typedef mp_obj_t                                    vsf_pyal_obj_t;
 #define vsf_pyal_listobj_append(__listobj, __arg, __free_arg)                   \
                                                     mp_obj_list_append((__listobj), (__arg))
 
-// intobj/strobj...
+// int
 
 #define vsf_pyal_newobj_int(__value)                mp_obj_new_int(__value)
 #define vsf_pyal_intobj_get_int(__intobj)           mp_obj_get_int(__intobj)
+
+// str
+
 #define vsf_pyal_newobj_str(__str)                  mp_obj_new_str((const char *)(__str), strlen(__str))
 #define vsf_pyal_strobj_get_str(__strojb)           mp_obj_str_get_str(__strojb)
+
+// bytes
+
 #define vsf_pyal_newobj_bytes(__data, __len)        mp_obj_new_bytes((const byte *)(__data), __len)
-#define vsf_pyal_newobj_bytes_from_buffer(__buffer) mp_obj_new_bytes_from_vstr(&(__buffer))
+#define vsf_pyal_newobj_bytes_from_buffer(__buffer, __len)                      \
+    ({                                                                          \
+        vsf_pyal_buffer_set_len((__buffer), (__len));                           \
+        mp_obj_new_bytes_from_vstr(&(__buffer));                                \
+    })
 #define vsf_pyal_bytesobj_get_data(__bytesobj, __len_ptr)                       \
                                                     (uint8_t *)mp_obj_str_get_data((__bytesobj), (__len_ptr))
+
+#define vsf_pyal_newarg_bytes(__data, __len)        mp_obj_new_bytes((const byte *)(__data), __len)
+#define vsf_pyal_newarg_bytes_ret(__data, __len, __need_free)                   \
+    ({                                                                          \
+        vsf_pyal_arg_t arg = vsf_pyal_newarg_bytes((__data), (__len));          \
+        if (__need_free) { free(__data); }                                      \
+        arg;                                                                    \
+    })
+#define vsf_pyal_bytesarg_get_data(__bytesarg, __len_ptr)                       \
+                                                    vsf_pyal_bytesobj_get_data((__bytesarg), (__len_ptr))
+
+// file
 
 typedef struct _mp_obj_file_t {
     mp_obj_base_t base;
@@ -101,9 +128,12 @@ extern const mp_obj_type_t mp_type_textio;
 #define vsf_pyal_fileobj_get_file(__fileobj)        ((mp_obj_file_t *)(__fileobj))->f
 #define vsf_pyal_fileobj_clear(__fileobj)           ((mp_obj_file_t *)(__fileobj))->f = NULL
 
+#define vsf_pyal_filearg_get_file(__filearg)        vsf_pyal_fileobj_get_file(__filearg)
+#define vsf_pyal_filearg_clear(__filearg)           vsf_pyal_fileobj_clear(__filearg)
+
 // typle
 
-#define vsf_pyal_newobj_tuple(__size, __args)       mp_obj_new_tuple((__size), (__args))
+#define vsf_pyal_newobj_tuple(__num, __args)        mp_obj_new_tuple((__num), (__args))
 
 // dict
 
@@ -145,17 +175,23 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_funcarg_strobj_get_str(__arg)      vsf_pyal_strarg_get_str(__arg)
 #define vsf_pyal_funcarg_newstr(__str)              vsf_pyal_newarg_str(__str)
 #define vsf_pyal_funcarg_intobj                     vsf_pyal_arg_t
-#define vsf_pyal_funcarg_intobj_get_int(__arg)      vsf_pyal_strarg_get_str(__arg)
+#define vsf_pyal_funcarg_intobj_get_int(__arg)      vsf_pyal_intarg_get_int(__arg)
 #define vsf_pyal_funcarg_newint(__value)            vsf_pyal_newarg_int(__value)
 #define vsf_pyal_funcarg_boolobj                    vsf_pyal_arg_t
 #define vsf_pyal_funcarg_newbool(__bool)            vsf_pyal_newarg_bool(__bool)
+#define vsf_pyal_funcarg_bytesobj                   vsf_pyal_funcarg_strobj
+#define vsf_pyal_newarg_bytes_ret_from_buffer(__buffer, __length)               \
+    ({                                                                          \
+        vsf_pyal_buffer_set_len((__buffer), (__length));                        \
+        vsf_pyal_newobj_bytes_from_buffer((__buffer), (__length));              \
+    })    
 #define vsf_pyal_funcarg_var(__name)                size_t __name ## _num, const mp_obj_t *__name ## _arr
 #define vsf_pyal_funcarg_var_num(__name)            __name ## _num
-#define vsf_pyal_funcarg_var_is_int(__name, __idx)  mp_obj_is_int((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_is_str(__name, __idx)  mp_obj_is_str((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_get_str(__name, __idx) vsf_pyal_strobj_get_str((__name ## _arr)[__idx])
+#define vsf_pyal_funcarg_var_is_int(__name, __idx)  mp_obj_is_int((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_get_int(__name, __idx) vsf_pyal_intobj_get_int((__name ## _arr)[__idx])
-#define vsf_pyal_funcarg_var_get_obj(__name, __idx) ((__name ## _arr)[__idx])
+#define vsf_pyal_funcarg_var_get_arg(__name, __idx) ((__name ## _arr)[__idx])
 
 #define vsf_pyal_func_void_return_t                 mp_obj_t
 #define vsf_pyal_func_void_return()                 return mp_const_none
@@ -174,7 +210,8 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_module_func_init_imp(__mod)                                    \
     vsf_pyal_module_func_fix_imp(__mod, __init__, VSF_PYAL_MODULE_FUNCARG_OBJ_0, vsf_pyal_obj_t, void)
 #define vsf_pyal_module_func_init_return()          vsf_pyal_func_void_return()
-#define vsf_pyal_module_func_name(__mod, __func)    __mod ## _ ## __func
+#define vsf_pyal_module_func_call(__mod, __func, ...)                           \
+    __mod ## _ ## __func(__VA_ARGS__)
 
 #define vsf_pyal_module_int(__mod, __name, __value) { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_INT(__value) }
 #define vsf_pyal_module_str(__mod, __name, __str)   { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_QSTR(MP_QSTR_ ## __str) }
