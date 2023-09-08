@@ -128,7 +128,7 @@ STATIC mp_uint_t __file_ioctl(mp_obj_t self_in, mp_uint_t request, uintptr_t arg
         if (arg & MP_STREAM_POLL_WR) {
             pollevents |= POLLOUT;
         }
-        struct pollfd pfd = { .fd = o->fd, .events = pollevents };
+        struct pollfd pfd = { .fd = fd, .events = pollevents };
         if (poll(&pfd, 1, 0) > 0) {
             if (pfd.revents & POLLIN) {
                 ret |= MP_STREAM_POLL_RD;
