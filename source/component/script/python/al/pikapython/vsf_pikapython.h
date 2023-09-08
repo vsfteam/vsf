@@ -47,24 +47,6 @@ typedef Arg *                                       vsf_pyal_arg_t;
 #define vsf_pyal_newarg_obj(__obj)                  arg_newObj(__obj)
 #define vsf_pyal_arg_free(__arg)                    arg_deinit(__arg)
 
-// object
-
-typedef PikaObj *                                   vsf_pyal_obj_t;
-#define VSF_PYAL_OBJ_NULL                           NULL
-
-// list
-
-#define vsf_pyal_newlist(__num, __args)                                         \
-    ({                                                                          \
-        PikaObj *list = New_PikaList();                                         \
-        for (int i = 0; i < (__num); i++) {                                     \
-            PikaStdData_List_append(list, ((vsf_pyal_arg_t *)(__args))[i]);     \
-        }                                                                       \
-        list;                                                                   \
-    })
-#define vsf_pyal_listobj_append(__listobj, __arg, __free_arg)                   \
-                                                    pikaList_append((__listobj), (__arg))
-
 // int
 
 #define vsf_pyal_newarg_int(__value)                arg_newInt(__value)
@@ -82,9 +64,6 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
 
 // bytes
 
-#define vsf_pyal_newobj_bytes(__data, __len)
-#define vsf_pyal_bytesobj_get_data(__bytesobj, __len_ptr)
-
 #define vsf_pyal_newarg_bytes(__data, __len)        arg_setBytes((uint8_t *)(__data), __len)
 #define vsf_pyal_newarg_bytes_ret(__data, __len, __need_free)                   \
     ({                                                                          \
@@ -99,6 +78,24 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
         }                                                                       \
         arg_getBytes(__bytesarg);                                               \
     })
+
+// object
+
+typedef PikaObj *                                   vsf_pyal_obj_t;
+#define VSF_PYAL_OBJ_NULL                           NULL
+
+// list
+
+#define vsf_pyal_newlist(__num, __args)                                         \
+    ({                                                                          \
+        PikaObj *list = New_PikaList();                                         \
+        for (int i = 0; i < (__num); i++) {                                     \
+            PikaStdData_List_append(list, ((vsf_pyal_arg_t *)(__args))[i]);     \
+        }                                                                       \
+        list;                                                                   \
+    })
+#define vsf_pyal_listobj_append(__listobj, __arg, __free_arg)                   \
+                                                    pikaList_append((__listobj), (__arg))
 
 // file
 
