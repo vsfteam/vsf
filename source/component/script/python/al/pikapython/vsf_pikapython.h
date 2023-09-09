@@ -86,7 +86,7 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
 
 // list
 
-#define vsf_pyal_newlist(__num, __args)                                         \
+#define vsf_pyal_newobj_list(__num, __args)                                     \
     ({                                                                          \
         PikaObj *list = New_PikaList();                                         \
         for (int i = 0; i < (__num); i++) {                                     \
@@ -192,18 +192,30 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_funcarg_var_get_int(__name, __idx) pikaTuple_getInt((__name), (__idx))
 #define vsf_pyal_funcarg_var_get_arg(__name, __idx) pikaTuple_getArg((__name), (__idx))
 
-#define vsf_pyal_module_func_var_imp(__mod, __func, __ret_type, min_arg, max_arg, ...)\
-    __ret_type __mod ## _ ## __func(PikaObj *self, ##__VA_ARGS__)
+#define vsf_pyal_module_func_var_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
+    __ret_type __mod ## _ ## __func(PikaObj *self, PikaTuple *__arg_name)
 #define VSF_PYAL_MODULE_FUNCARG_OBJ_0               0
 #define VSF_PYAL_MODULE_FUNCARG_OBJ_1               1
 #define VSF_PYAL_MODULE_FUNCARG_OBJ_2               2
 #define vsf_pyal_module_func_fix_imp(__mod, __func, __func_type, __ret_type, ...)\
     __ret_type __mod ## _ ## __func(PikaObj *self, ##__VA_ARGS__)
+#define vsf_pyal_module_func_init_prototype(__mod)                              \
+    extern void __mod ## _ ## __init__(PikaObj *self)
+#define vsf_pyal_module_func_init_declare(__mod)                                \
+    extern void __mod ## _ ## __init__(PikaObj *self)
 #define vsf_pyal_module_func_init_imp(__mod)                                    \
     vsf_pyal_module_func_fix_imp(__mod, __init__, VSF_PYAL_MODULE_FUNCARG_OBJ_0, void)
 #define vsf_pyal_module_func_init_return()
-#define vsf_pyal_module_func_call(__mod, __func, ...)                           \
-    __mod ## _ ## __func(self, ##__VA_ARGS__)
+#define vsf_pyal_module_func_type(__mod, __func, __ret_type, ...)               \
+    typedef __ret_type (*__mod ## _ ## __func ## _t)(PikaObj *self, ##__VA_ARGS__)
+#define vsf_pyal_module_func_prototype(__mod, __func, __ret_type, ...)          \
+    extern __ret_type __mod ## _ ## __func(PikaObj *self, ##__VA_ARGS__)
+#define vsf_pyal_module_func_name(__mod, __func)                                \
+    __mod ## _ ## __func
+#define vsf_pyal_module_func_call(__func_full_name, ...)                        \
+    __func_full_name(self, ##__VA_ARGS__)
+#define vsf_pyal_module_func_declare(__mod, __func, __ret_type, ...)            \
+    extern __ret_type __mod ## _ ## __func(PikaObj *self, ##__VA_ARGS__)
 
 // APIs
 
