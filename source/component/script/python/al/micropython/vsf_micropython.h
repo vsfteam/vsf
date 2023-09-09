@@ -142,11 +142,12 @@ typedef mp_obj_t                                    vsf_pyal_obj_t;
         inst->type = (&mp_type_ ## __class);                                    \
         MP_OBJ_FROM_PTR(inst);                                                  \
     })
+#define vsf_pyal_instance_base()                    mp_obj_base_t base;
 
 // file
 
 typedef struct _mp_obj_file_t {
-    mp_obj_base_t base;
+    vsf_pyal_instance_base()
     union {
         FILE *f;
         int fd;
@@ -325,9 +326,10 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     STATIC const mp_rom_map_elem_t __ ## __class ## _locals_dict_table[] = {    \
         __VA_ARGS__                                                             \
     };                                                                          \
+    STATIC MP_DEFINE_CONST_DICT(__ ## __class ## _locals_dict, __ ## __class ## _locals_dict_table);\
     MP_DEFINE_CONST_OBJ_TYPE(                                                   \
         mp_type_ ## __class, MP_QSTR_ ## __class_name, MP_TYPE_FLAG_NONE,       \
-        locals_dict, &__ ## __class ## _locals_dict_table                       \
+        locals_dict, &__ ## __class ## _locals_dict                             \
     );
 #define vsf_pyal_class_declare(__class)                                         \
     extern const mp_obj_type_t mp_type_ ## __class
