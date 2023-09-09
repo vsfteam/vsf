@@ -110,6 +110,7 @@ typedef mp_obj_t                                    vsf_pyal_arg_t;
 
 typedef mp_obj_t                                    vsf_pyal_obj_t;
 #define VSF_PYAL_OBJ_NULL                           MP_OBJ_NULL
+#define vsf_pyal_obj_get_ptr(__obj)                 MP_OBJ_TO_PTR(__obj)
 
 // list
 
@@ -131,6 +132,15 @@ typedef mp_obj_t                                    vsf_pyal_obj_t;
         vsf_pyal_arg_t *items;                                                  \
         mp_obj_list_get((__listobj), &len, &items);                             \
         (__idx) >= len ? VSF_PYAL_ARG_NULL : items[(__idx)];                    \
+    })
+
+// instance of class
+
+#define vsf_pyal_newobj_instance(__size, __class)                               \
+    ({                                                                          \
+        mp_obj_base_t *inst = m_malloc_with_finaliser(__size);                  \
+        inst->type = (&mp_type_ ## __class);                                    \
+        MP_OBJ_FROM_PTR(inst);                                                  \
     })
 
 // file
@@ -305,6 +315,22 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
         .base = { &mp_type_module },                                            \
         .globals = (mp_obj_dict_t *)&(__name ## _module_globals),               \
     };
+
+// class
+
+#define vsf_pyal_class_int(__class, __name, __value){ MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_INT(__value) }
+#define vsf_pyal_class_str(__class, __name, __str)  { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_QSTR(MP_QSTR_ ## __str) }
+#define vsf_pyal_class_func(__class, __name)        { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&mp_ ## __class ## _ ## __name ## _obj) }
+#define vsf_pyal_class(__class, __class_name, ...)                              \
+    STATIC const mp_rom_map_elem_t __ ## __class ## _locals_dict_table[] = {    \
+        __VA_ARGS__                                                             \
+    };                                                                          \
+    MP_DEFINE_CONST_OBJ_TYPE(                                                   \
+        mp_type_ ## __class, MP_QSTR_ ## __class_name, MP_TYPE_FLAG_NONE,       \
+        locals_dict, &__ ## __class ## _locals_dict_table                       \
+    );
+#define vsf_pyal_class_declare(__class)                                         \
+    extern const mp_obj_type_t mp_type_ ## __class
 
 // APIs
 
