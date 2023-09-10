@@ -119,20 +119,11 @@ typedef mp_obj_t                                    vsf_pyal_obj_t;
                                                     mp_obj_list_append((__listobj), (__arg))
 #define vsf_pyal_listobj_append(__listobj, __arg, __free_arg)                   \
                                                     mp_obj_list_append((__listobj), (__arg))
-#define vsf_pyal_listobj_get_num(__listobj)                                     \
-    ({                                                                          \
-        size_t len;                                                             \
-        vsf_pyal_arg_t *items;                                                  \
-        mp_obj_list_get((__listobj), &len, &items);                             \
-        len;                                                                    \
-    })
-#define vsf_pyal_listobj_get_arg(__listobj, __idx)                              \
-    ({                                                                          \
-        size_t len;                                                             \
-        vsf_pyal_arg_t *items;                                                  \
-        mp_obj_list_get((__listobj), &len, &items);                             \
-        (__idx) >= len ? VSF_PYAL_ARG_NULL : items[(__idx)];                    \
-    })
+extern size_t vsf_pyal_listobj_get_num(vsf_pyal_obj_t self_in);
+extern vsf_pyal_arg_t vsf_pyal_listobj_get_arg(vsf_pyal_obj_t self_in, int idx);
+
+#define vsf_pyal_listarg_get_num                    vsf_pyal_listobj_get_num
+#define vsf_pyal_listarg_get_arg                    vsf_pyal_listobj_get_arg
 
 // instance of class
 
@@ -172,13 +163,9 @@ extern const mp_obj_type_t mp_type_textio;
 // tuple
 
 #define vsf_pyal_newobj_tuple(__num, __args)        mp_obj_new_tuple((__num), (__args))
-#define vsf_pyal_tuplearg_get_arg(__turplearg, __idx)                           \
-    ({                                                                          \
-        size_t len;                                                             \
-        vsf_pyal_arg_t *items;                                                  \
-        mp_obj_tuple_get((__turplearg), &len, &items);                          \
-        (__idx) >= len ? VSF_PYAL_ARG_NULL : items[(__idx)];                    \
-    })
+extern vsf_pyal_arg_t vsf_pyal_tuplearg_get_arg(vsf_pyal_arg_t self_in, int idx);
+
+#define vsf_pyal_newarg_tuple(__num, __args)        mp_obj_new_tuple((__num), (__args))
 
 // dict
 
@@ -293,7 +280,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     typedef __ret_type (*__mod ## _ ## __func ## _t)(__VA_ARGS__)
 #define vsf_pyal_module_func_prototype(__mod, __func, __ret_type, ...)          \
     extern __ret_type __mod ## _ ## __func(__VA_ARGS__)
-#define vsf_pyal_module_func_name(__mod, __func, ...)                           \
+#define vsf_pyal_module_func_name(__mod, __func)                                \
     __mod ## _ ## __func
 #define vsf_pyal_module_func_call(__func_full_name, ...)                        \
     __func_full_name(__VA_ARGS__)
