@@ -61,8 +61,8 @@ void __vsf_pyal_os_environ_on_update(vsf_pyal_obj_t self, vsf_pyal_dict_evt_t ev
 
 //static void print_hash(char * str)
 //{
-//    size_t hash = qstr_compute_hash(str, strlen(str));
-//    printf("hash of %s is %d\n", str, hash);
+//    size_t hash = qstr_compute_hash((const byte *)str, strlen(str));
+//    printf("hash of %s is %d\n", str, (int)hash);
 //}
 
 vsf_pyal_module_func_init_imp(os)
@@ -146,7 +146,7 @@ vsf_pyal_module_func_fix_imp(os, getcwd, VSF_PYAL_MODULE_FUNCARG_OBJ_0, vsf_pyal
         return VSF_PYAL_OBJ_NULL;
     }
 
-    return vsf_pyal_newarg_str_ret(path, false);
+    return vsf_pyal_newarg_str_ret(path);
 }
 
 vsf_pyal_module_func_var_imp(os, mkdir, vsf_pyal_func_void_return_t, 1, 2, arg)
@@ -319,7 +319,7 @@ vsf_pyal_module_func_var_imp(os, read, vsf_pyal_funcarg_bytesobj, 2, 2, arg)
         return VSF_PYAL_OBJ_NULL;
     }
 
-    return vsf_pyal_newarg_bytes_ret(buffer, length, true);
+    return vsf_pyal_newarg_bytes_ret_and_free(buffer, length);
 #endif
 }
 
