@@ -1081,6 +1081,7 @@ static void __vsf_linux_fb_init(vsf_linux_fd_t *sfd)
     vsf_linux_fb_priv_t *fb_priv = (vsf_linux_fb_priv_t *)sfd->priv;
     vk_disp_t *disp = (vk_disp_t *)(((vk_vfs_file_t *)(fb_priv->file))->f.param);
 
+    fb_priv->frame_interval_ms = 1000 / 60;
     disp->ui_on_ready = __vsf_linux_disp_on_ready;
     disp->ui_data = vsf_eda_get_cur();
     VSF_LINUX_ASSERT(disp->ui_data != NULL);
