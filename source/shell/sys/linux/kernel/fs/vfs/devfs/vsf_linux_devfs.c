@@ -1306,6 +1306,7 @@ static void * __vsf_linux_fb_mmap(vsf_linux_fd_t *sfd, off64_t offset, size_t le
         uint_fast32_t frame_size = disp->param.height * disp->param.width * vsf_disp_get_pixel_bytesize(disp);
         fb_priv->front_buffer = malloc(frame_size);
         if (fb_priv->front_buffer != NULL) {
+            memset(fb_priv->front_buffer, 0, frame_size);
             vsf_eda_trig_init(&fb_priv->fresh_trigger, false, true);
             fb_priv->fresh_task.fn.evthandler = __vsf_linux_disp_fresh_task;
             disp->ui_data = &fb_priv->fresh_task;
