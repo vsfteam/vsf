@@ -128,12 +128,8 @@ extern vsf_pyal_arg_t vsf_pyal_listobj_get_arg(vsf_pyal_obj_t self_in, int idx);
 
 // instance
 
-#define vsf_pyal_newobj_inst(__size, __mod, __class)                            \
-    ({                                                                          \
-        mp_obj_base_t *inst = m_malloc_with_finaliser(__size);                  \
-        inst->type = (&mp_type_ ## __mod ## _ ## __class);                      \
-        MP_OBJ_FROM_PTR(inst);                                                  \
-    })
+#define vsf_pyal_newobj_from_inst(__mod, __class, __inst)                       \
+                                                    MP_OBJ_FROM_PTR(__inst)
 #define vsf_pyal_inst_base()                        mp_obj_base_t base;
 #define vsf_pyal_instobj_get(__instobj)             MP_OBJ_TO_PTR(__instobj)
 #define vsf_pyal_instarg_get(__instarg)             MP_OBJ_TO_PTR(__instarg)
@@ -318,25 +314,34 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_class_arg_get_self_from(__mod, __class, __name, __instobj)     \
     __mod ## _ ## __class ## _t *__name = vsf_pyal_instobj_get(__instobj)
 
+#define vsf_pyal_class_create(__mod, __class, __exsize)                         \
+    ({                                                                          \
+        __mod ## _ ## __class ## _t *inst = (__mod ## _ ## __class ## _t *)m_malloc(sizeof(__mod ## _ ## __class ## _t) + (__exsize));\
+        inst->base.type = &mp_type_ ## __mod ## _ ## __class;                   \
+        inst;                                                                   \
+    })
+
 #define vsf_pyal_class_new_keyword_func(__mod, __class, __arg_name, ...)        \
     vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t __arg_name ## _arg_num, size_t n_kw, const mp_obj_t *__arg_name ## _args) {\
         enum { VSF_MFOREACH_ARG1(__vsf_pyal_module_func_keyword_enum, __arg_name, __VA_ARGS__) };\
         mp_arg_val_t __arg_name ## _val[VSF_VA_NUM_ARGS(__VA_ARGS__)];          \
-        __mod ## _ ## __class ## _t *self = m_new_obj(__mod ## _ ## __class ## _t);\
-        self->base.type = &mp_type_ ## __mod ## _ ## __class;
-        
+        __mod ## _ ## __class ## _t *self;
+
 #define vsf_pyal_class_new_func(__mod, __class, __arg_name)                     \
     vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t __arg_name ## _arg_num, size_t n_kw, const mp_obj_t *__arg_name ## _args) {\
-        __mod ## _ ## __class ## _t *self = m_new_obj(__mod ## _ ## __class ## _t);\
-        self->base.type = &mp_type_ ## __mod ## _ ## __class;
+        __mod ## _ ## __class ## _t *self;
 
-#define vsf_pyal_class_new_fail(__mod, __class, __fmt, ...)                     \
+#define vsf_pyal_class_new_free_and_fail(__mod, __class, __fmt, ...)            \
         m_del_obj(__mod ## _ ## __class ## _t, self);                           \
         vsf_pyal_raise((__fmt), ##__VA_ARGS__);                                 \
         return VSF_PYAL_OBJ_NULL;
+#define vsf_pyal_class_new_fail(__mod, __class, __fmt, ...)                     \
+        vsf_pyal_raise((__fmt), ##__VA_ARGS__);                                 \
+        return VSF_PYAL_OBJ_NULL;
 #define vsf_pyal_class_new_arg_num(__name)          __name ## _arg_num
+#define vsf_pyal_class_new_is_int(__name, __idx)    vsf_pyal_arg_is_int((__name ## _args)[__idx])
 #define vsf_pyal_class_new_get_int(__name, __idx)   vsf_pyal_intarg_get_int((__name ## _args)[__idx])
-#define vsf_pyal_class_new_get_arg(__name, __idx)   (__name ## _args)[__idx])
+#define vsf_pyal_class_new_get_arg(__name, __idx)   ((__name ## _args)[__idx])
 #define vsf_pyal_class_new_func_end()                                           \
         return MP_OBJ_FROM_PTR(self);                                           \
     }
