@@ -1144,7 +1144,11 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
             }
 #endif
             info->bits_per_pixel = vsf_disp_get_pixel_bitsize(disp);
-            info->frame_interval_ms = fb_priv->frame_interval_ms;
+            if (0 == fb_priv->frame_interval_ms) {
+                info->fps = 0;
+            } else {
+                info->fps = 1000 / fb_priv->frame_interval_ms;
+            }
             // todo: parse fb_bitfield red/green/blue/transp
 //            switch (disp->param.color) {
 //            }
@@ -1152,7 +1156,11 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
         break;
     case FBIOPUT_VSCREENINFO: {
             struct fb_var_screeninfo *info = (struct fb_var_screeninfo *)arg;
-            fb_priv->frame_interval_ms = info->frame_interval_ms;
+            if (0 == info->fps) {
+                fb_priv->frame_interval_ms = -1;
+            } else {
+                fb_priv->frame_interval_ms = 1000 / info->fps;
+            }
         }
         break;
     case FBIOGET_FSCREENINFO: {
