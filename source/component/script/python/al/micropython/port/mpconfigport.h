@@ -39,7 +39,9 @@
 #define MICROPY_GCREGS_SETJMP 1
 #define MICROPY_NLR_SETJMP 1
 #ifndef __APPLET__
+#if __IS_COMPILER_IAR__
 #define MICROPY_NO_ALLOCA 1
+#endif
 #endif
 #endif
 
@@ -106,7 +108,7 @@ typedef long mp_off_t;
 #if defined(__FreeBSD__) || defined(__NetBSD__)
 #include <stdlib.h>
 #else
-#include <alloca.h>
+//#include <alloca.h>
 #endif
 #endif
 
