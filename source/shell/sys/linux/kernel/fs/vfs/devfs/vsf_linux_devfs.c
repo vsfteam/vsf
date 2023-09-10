@@ -1071,7 +1071,12 @@ static void __vsf_linux_disp_fresh_task(vsf_eda_t *eda, vsf_evt_t evt)
             break;
         }
 
-        vk_disp_refresh(disp, NULL, fb_priv->front_buffer);
+        if (fb_priv->is_area_set) {
+            fb_priv->is_area_set = false;
+            vk_disp_refresh(disp, &fb_priv->area, fb_priv->front_buffer);
+        } else {
+            vk_disp_refresh(disp, NULL, fb_priv->front_buffer);
+        }
         break;
     }
 }
@@ -1265,6 +1270,7 @@ static ssize_t __vsf_linux_fb_write(vsf_linux_fd_t *sfd, const void *buf, size_t
             vsf_thread_wfe(VSF_EVT_USER);
         }
     } else if (fb_priv->is_area_set) {
+        fb_priv->is_area_set = false;
         VSF_LINUX_ASSERT(NULL == fb_priv->eda_pending);
         disp->ui_data = vsf_eda_get_cur();
         vk_disp_refresh(disp, &fb_priv->area, (void *)buf);
