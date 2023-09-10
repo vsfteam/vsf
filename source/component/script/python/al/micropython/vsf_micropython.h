@@ -313,6 +313,11 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 
 // class
 
+#define vsf_pyal_class_arg_get_self(__mod, __class, __name)                     \
+    __mod ## _ ## __class ## _t *__name = vsf_pyal_instobj_get(selfobj)
+#define vsf_pyal_class_arg_get_self_from(__mod, __class, __name, __instobj)     \
+    __mod ## _ ## __class ## _t *__name = vsf_pyal_instobj_get(__instobj)
+
 #define vsf_pyal_class_new_keyword_func(__mod, __class, __arg_name, ...)        \
     vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t __arg_name ## _arg_num, size_t n_kw, const mp_obj_t *__arg_name ## _args) {\
         enum { VSF_MFOREACH_ARG1(__vsf_pyal_module_func_keyword_enum, __arg_name, __VA_ARGS__) };\
@@ -336,8 +341,15 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
         return MP_OBJ_FROM_PTR(self);                                           \
     }
 
-#define vsf_pyal_class_arg_get_self(__mod, __class, __arg, __name)              \
-        __mod ## _ ## __class ## _t *__name = vsf_pyal_instarg_get(__arg)
+#define vsf_pyal_class_func_var_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
+    __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_var(__arg_name));          \
+    MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(mp_ ## __mod ## _ ## __func ## _obj, __min_arg, __max_arg, __mod ## _ ## __func);\
+    __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_var(__arg_name))
+#define vsf_pyal_class_func_fix_imp(__mod, __func, __func_type, __ret_type, ...)\
+    __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__);     \
+    __func_type(mp_ ## __mod ## _ ## __func ## _obj, __mod ## _ ## __func);     \
+    __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__)
+
 #define vsf_pyal_class_int(__class, __name, __value){ MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_INT(__value) }
 #define vsf_pyal_class_str(__class, __name, __str)  { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_QSTR(MP_QSTR_ ## __str) }
 #define vsf_pyal_class_func(__class, __name)        { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&mp_ ## __class ## _ ## __name ## _obj) }
