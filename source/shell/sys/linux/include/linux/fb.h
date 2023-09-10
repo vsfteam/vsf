@@ -60,6 +60,7 @@ struct fb_var_screeninfo {
 
     __u32 height;
     __u32 width;
+    __s32 frame_interval_ms;
 };
 
 struct fb_cmap {

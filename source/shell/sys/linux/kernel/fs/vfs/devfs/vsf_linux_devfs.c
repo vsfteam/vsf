@@ -1035,6 +1035,7 @@ typedef struct vsf_linux_fb_priv_t {
     bool is_disp_fb;
 #endif
     bool is_area_set;
+    int16_t frame_interval_ms;
     vk_disp_area_t area;
     vsf_trig_t fresh_trigger;
     vsf_teda_t fresh_task;
@@ -1052,7 +1053,7 @@ static void __vsf_linux_disp_fresh_task(vsf_eda_t *eda, vsf_evt_t evt)
     vk_disp_t *disp = (vk_disp_t *)(((vk_vfs_file_t *)(fb_priv->file))->f.param);
 
     switch (evt) {
-    case VSF_EVT_RETURN:
+    case VSF_EVT_USER:
         if (fb_priv->eda_pending != NULL) {
             vsf_eda_t *eda_pending = fb_priv->eda_pending;
             fb_priv->eda_pending = NULL;
@@ -1060,7 +1061,7 @@ static void __vsf_linux_disp_fresh_task(vsf_eda_t *eda, vsf_evt_t evt)
         }
         // fall through
     case VSF_EVT_INIT:
-        if (VSF_ERR_NONE != vsf_eda_trig_wait(&fb_priv->fresh_trigger, vsf_systimer_ms_to_tick(33))) {
+        if (VSF_ERR_NONE != vsf_eda_trig_wait(&fb_priv->fresh_trigger, vsf_systimer_ms_to_tick(fb_priv->frame_interval_ms))) {
             break;
         }
         // fall through
@@ -1142,6 +1143,7 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
             }
 #endif
             info->bits_per_pixel = vsf_disp_get_pixel_bitsize(disp);
+            info->frame_interval_ms = fb_priv->frame_interval_ms;
             // todo: parse fb_bitfield red/green/blue/transp
 //            switch (disp->param.color) {
 //            }
@@ -1149,7 +1151,7 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
         break;
     case FBIOPUT_VSCREENINFO: {
             struct fb_var_screeninfo *info = (struct fb_var_screeninfo *)arg;
-            VSF_UNUSED_PARAM(info);
+            fb_priv->frame_interval_ms = info->frame_interval_ms;
         }
         break;
     case FBIOGET_FSCREENINFO: {
@@ -1189,6 +1191,7 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
                 VSF_LINUX_ASSERT(NULL == fb_priv->eda_pending);
                 fb_priv->eda_pending = vsf_eda_get_cur();
                 VSF_LINUX_ASSERT(fb_priv->eda_pending != NULL);
+                vsf_eda_trig_set(&fb_priv->fresh_trigger);
                 vsf_thread_wfe(VSF_EVT_USER);
             }
         }
