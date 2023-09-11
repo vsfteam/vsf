@@ -76,6 +76,13 @@ typedef mp_obj_t                                    vsf_pyal_arg_t;
 #define vsf_pyal_newarg_int(__value)                mp_obj_new_int(__value)
 #define vsf_pyal_intarg_get_int(__intarg)           mp_obj_get_int(__intarg)
 
+// float
+
+#define vsf_pyal_newobj_float(__value)              mp_obj_new_float(__value)
+#define vsf_pyal_floatobj_get_float(__floatobj)     mp_obj_get_float(__floatobj)
+#define vsf_pyal_newarg_float(__value)              mp_obj_new_float(__value)
+#define vsf_pyal_floatarg_get_float(__floatarg)     mp_obj_get_float(__floatarg)
+
 // str
 
 #define vsf_pyal_newarg_str(__str)                  mp_obj_new_str((const char *)(__str), strlen(__str))

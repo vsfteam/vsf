@@ -56,6 +56,11 @@ typedef Arg *                                       vsf_pyal_arg_t;
 #define vsf_pyal_newarg_int(__value)                arg_newInt(__value)
 #define vsf_pyal_intarg_get_int(__intarg)           arg_getInt(__intarg)
 
+// float
+
+#define vsf_pyal_newarg_float(__value)              arg_newFloat(__value)
+#define vsf_pyal_floatarg_get_float(__floatarg)     arg_getFloat(__floatarg)
+
 // str
 
 #define vsf_pyal_newarg_str(__str)                  arg_newStr(__str)
