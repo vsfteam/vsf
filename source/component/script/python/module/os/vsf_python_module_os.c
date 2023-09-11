@@ -44,21 +44,6 @@ vsf_pyal_static_dict(__os_environ);
 #   pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
 #endif
 
-void __vsf_pyal_os_environ_on_update(vsf_pyal_obj_t self, vsf_pyal_dict_evt_t evt,
-        vsf_pyal_dict_key_t key, vsf_pyal_arg_t value)
-{
-    char *key_str = vsf_pyal_dictkey_get_str(key);
-    char *value_str = vsf_pyal_strarg_get_str(value);
-    switch (evt) {
-    case VSF_PYAL_DICT_EVT_ON_UPDATE:
-        setenv(key_str, value_str, true);
-        break;
-    case VSF_PYAL_DICT_EVT_ON_DELETE:
-        unsetenv(key_str);
-        break;
-    }
-}
-
 //static void print_hash(char * str)
 //{
 //    size_t hash = qstr_compute_hash((const byte *)str, strlen(str));
@@ -88,7 +73,6 @@ vsf_pyal_module_func_init_imp(os)
     environ_dict = &__os_environ;
 #endif
 
-    vsf_pyal_dictobj_set_on_update(environ_dict, NULL);
     while (*__env != NULL) {
         key = strdup(*__env);
         value = strstr(key, "=");
@@ -103,7 +87,6 @@ vsf_pyal_module_func_init_imp(os)
 
         __env++;
     }
-    vsf_pyal_dictobj_set_on_update(environ_dict, __vsf_pyal_os_environ_on_update);
 
     vsf_pyal_module_func_init_return();
 }
