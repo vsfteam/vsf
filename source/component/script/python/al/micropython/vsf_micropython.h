@@ -71,6 +71,8 @@ typedef mp_obj_t                                    vsf_pyal_arg_t;
 
 // int
 
+#define vsf_pyal_newobj_int(__value)                mp_obj_new_int(__value)
+#define vsf_pyal_intobj_get_int(__intobj)           mp_obj_get_int(__intobj)
 #define vsf_pyal_newarg_int(__value)                mp_obj_new_int(__value)
 #define vsf_pyal_intarg_get_int(__intarg)           mp_obj_get_int(__intarg)
 
@@ -351,6 +353,25 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
         return MP_OBJ_FROM_PTR(self);                                           \
     }
 
+#define vsf_pyal_class_attr_func(__mod, __class, __arg_name)                    \
+    void __mod ## _ ## __class ## _attr(vsf_pyal_obj_t selfobj, qstr __target_attr, vsf_pyal_obj_t *__arg_name ## _args)
+#define vsf_pyal_class_attr_get_attr()              (__target_attr)
+#define vsf_pyal_class_attr_const_attr(__attr)      (MP_QSTR_ ## __attr)
+#define vsf_pyal_class_attr_is_load(__arg_name)     (MP_OBJ_NULL == __arg_name ## _args[0])
+#define vsf_pyal_class_attr_is_store(__arg_name)    ((MP_OBJ_SENTINEL == __arg_name ## _args[0]) && (__arg_name ## _args[1] != MP_OBJ_NULL))
+#define vsf_pyal_class_attr_is_delete(__arg_name)   ((MP_OBJ_SENTINEL == __arg_name ## _args[0]) && (__arg_name ## _args[1] == MP_OBJ_NULL))
+#define vsf_pyal_class_attr_get_obj(__arg_name)     (__arg_name ## _args[1])
+#define vsf_pyal_class_attr_ret_load_fail(__arg_name)                           \
+    __arg_name ## _args[1] = MP_OBJ_SENTINEL; return
+#define vsf_pyal_class_attr_ret_load_obj(__arg_name, __obj)                     \
+    __arg_name ## _args[0] = (__obj); return
+#define vsf_pyal_class_attr_ret_load_method(__arg_name, __method)               \
+    __arg_name ## _args[0] = (__method); __arg_name ## _args[1] = (selfobj); return
+#define vsf_pyal_class_attr_ret_fail(__arg_name)                                \
+    return
+#define vsf_pyal_class_attr_ret_success(__arg_name)                             \
+    __arg_name ## _args[0] = MP_OBJ_NULL; return
+
 #define vsf_pyal_class_func_var_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
     __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_var(__arg_name));          \
     MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(mp_ ## __mod ## _ ## __func ## _obj, __min_arg, __max_arg, __mod ## _ ## __func);\
@@ -368,6 +389,8 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
         __feature, __mod ## _ ## __class ## _ ## __feature
 #define vsf_pyal_class_feature_new(__mod, __class)                              \
         vsf_pyal_class_feature(__mod, __class, make_new)
+#define vsf_pyal_class_feature_attr(__mod, __class)                              \
+        vsf_pyal_class_feature(__mod, __class, attr)
 #define vsf_pyal_class_begin(__mod, __class, ...)                               \
     STATIC const mp_rom_map_elem_t __ ## __class ## _locals_dict_table[] = {    \
         __VA_ARGS__                                                             \
