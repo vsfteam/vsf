@@ -363,16 +363,24 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_class_int(__class, __name, __value){ MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_INT(__value) }
 #define vsf_pyal_class_str(__class, __name, __str)  { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_QSTR(MP_QSTR_ ## __str) }
 #define vsf_pyal_class_func(__class, __name)        { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&mp_ ## __class ## _ ## __name ## _obj) }
-#define vsf_pyal_class(__mod, __class, ...)                                     \
+
+#define vsf_pyal_class_feature(__mod, __class, __feature)                       \
+        __feature, __mod ## _ ## __class ## _ ## __feature
+#define vsf_pyal_class_feature_new(__mod, __class)                              \
+        vsf_pyal_class_feature(__mod, __class, make_new)
+#define vsf_pyal_class_begin(__mod, __class, ...)                               \
     STATIC const mp_rom_map_elem_t __ ## __class ## _locals_dict_table[] = {    \
         __VA_ARGS__                                                             \
     };                                                                          \
-    STATIC MP_DEFINE_CONST_DICT(__ ## __class ## _locals_dict, __ ## __class ## _locals_dict_table);\
+    STATIC MP_DEFINE_CONST_DICT(__ ## __class ## _locals_dict, __ ## __class ## _locals_dict_table);
+
+#define vsf_pyal_class_end(__mod, __class, ...)                                 \
     MP_DEFINE_CONST_OBJ_TYPE(                                                   \
         mp_type_ ## __mod ## _ ## __class, MP_QSTR_ ## __class, MP_TYPE_FLAG_NONE,\
-        make_new, __mod ## _ ## __class ## _make_new,                           \
+        __VA_ARGS__                                                             \
         locals_dict, &__ ## __class ## _locals_dict                             \
     );
+
 #define vsf_pyal_class_declare(__mod, __class)                                  \
     extern const mp_obj_type_t mp_type_ ## __mod ## _ ## __class;               \
     extern vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t arg_num, size_t n_kw, const mp_obj_t *args)
