@@ -331,10 +331,6 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t __arg_name ## _arg_num, size_t n_kw, const mp_obj_t *__arg_name ## _args) {\
         __mod ## _ ## __class ## _t *self;
 
-#define vsf_pyal_class_new_free_and_fail(__mod, __class, __fmt, ...)            \
-        m_del_obj(__mod ## _ ## __class ## _t, self);                           \
-        vsf_pyal_raise((__fmt), ##__VA_ARGS__);                                 \
-        return VSF_PYAL_OBJ_NULL;
 #define vsf_pyal_class_new_fail(__mod, __class, __fmt, ...)                     \
         vsf_pyal_raise((__fmt), ##__VA_ARGS__);                                 \
         return VSF_PYAL_OBJ_NULL;
@@ -372,7 +368,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     extern const mp_obj_type_t mp_type_ ## __mod ## _ ## __class;               \
     extern vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t arg_num, size_t n_kw, const mp_obj_t *args)
 
-#define vsf_pyal_class_new(__mod, __class, __args_num, __args)                  \
+#define vsf_pyal_class_new_call(__mod, __class, __args_num, __args)             \
     __mod ## _ ## __class ## _make_new(NULL, (__args_num), 0, (__args))
 
 // APIs
