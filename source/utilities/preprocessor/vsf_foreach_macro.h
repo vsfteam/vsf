@@ -67,6 +67,30 @@ extern "C" {
 #define VSF_MFOREACH_ARG1(__MACRO, __ARG0, ...) VSF_MFOREACH_ARG1_EX(__MACRO, __MACRO, __ARG0, __VA_ARGS__)
 
 
+#define __VSF_MFOREACH_ARG2(__MACRO, __MACRO_LAST, __ARG0, __ARG1, __X, ...)    \
+            VSF_MCAT2(__VSF_MFOREACH_ARG2_, VSF_MISEMPTY(__VA_ARGS__))(__MACRO, __MACRO_LAST, __ARG0, __ARG1, __X, __VA_ARGS__)
+#define __VSF_MFOREACH_ARG2_0(__MACRO, __MACRO_LAST, __ARG0, __ARG1, __X, ...)  \
+            __MACRO(__ARG0, __ARG1, __X) __VSF_MOBSTRUCT(__VSF_MFOREACH_ARG2_I)()(__MACRO, __MACRO_LAST, __ARG0, __ARG1, __VA_ARGS__)
+#define __VSF_MFOREACH_ARG2_1(__MACRO, __MACRO_LAST, __ARG0, __ARG1, __X, ...)  \
+            __MACRO_LAST(__ARG0, __ARG1, __X)
+#define __VSF_MFOREACH_ARG2_I()                 __VSF_MFOREACH_ARG2
+#define VSF_MFOREACH_ARG2_EX(__MACRO, __MACRO_LAST, __ARG0, __ARG1, ...)        \
+            __VSF_MEXPAND(__VSF_MFOREACH_ARG2(__MACRO, __MACRO_LAST, __ARG0, __ARG1, __VA_ARGS__))
+#define VSF_MFOREACH_ARG2(__MACRO, __ARG0, __ARG1, ...) VSF_MFOREACH_ARG2_EX(__MACRO, __MACRO, __ARG0, __ARG1, __VA_ARGS__)
+
+
+#define __VSF_MFOREACH_ARG3(__MACRO, __MACRO_LAST, __ARG0, __ARG1, __ARG2, __X, ...)\
+            VSF_MCAT2(__VSF_MFOREACH_ARG3_, VSF_MISEMPTY(__VA_ARGS__))(__MACRO, __MACRO_LAST, __ARG0, __ARG1, __ARG2, __X, __VA_ARGS__)
+#define __VSF_MFOREACH_ARG3_0(__MACRO, __MACRO_LAST, __ARG0, __ARG1, __ARG2, __X, ...)\
+            __MACRO(__ARG0, __ARG1, __ARG2, __X) __VSF_MOBSTRUCT(__VSF_MFOREACH_ARG3_I)()(__MACRO, __MACRO_LAST, __ARG0, __ARG1, __ARG2, __VA_ARGS__)
+#define __VSF_MFOREACH_ARG3_1(__MACRO, __MACRO_LAST, __ARG0, __ARG1, __ARG2, __X, ...)\
+            __MACRO_LAST(__ARG0, __ARG1, __ARG2, __X)
+#define __VSF_MFOREACH_ARG3_I()                 __VSF_MFOREACH_ARG3
+#define VSF_MFOREACH_ARG3_EX(__MACRO, __MACRO_LAST, __ARG0, __ARG1, __ARG2, ...)\
+            __VSF_MEXPAND(__VSF_MFOREACH_ARG3(__MACRO, __MACRO_LAST, __ARG0, __ARG1, __ARG2, __VA_ARGS__))
+#define VSF_MFOREACH_ARG3(__MACRO, __ARG0, __ARG1, __ARG2, ...) VSF_MFOREACH_ARG3_EX(__MACRO, __MACRO, __ARG0, __ARG1, __ARG2, __VA_ARGS__)
+
+
 
 
 /*   elegant but toooooo slow

@@ -30,23 +30,14 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-vsf_pyal_class_declare(os, environ);
-
-#ifdef vsf_pyal_static_dict_t
-typedef struct os_environ_t {
-    vsf_pyal_inst_base_def()
-    vsf_pyal_static_dict_t dict;
-} os_environ_t;
-#endif
+vsf_pyal_class_declare_for_inherit(os, environ, dict);
+vsf_pyal_builtinclass_declare(dict);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
 #ifdef vsf_pyal_static_dict_t
-static os_environ_t __os_environ = {
-    vsf_pyal_inst_base_init(os, environ)
-    .dict = vsf_pyal_static_dict_init(),
-};
+vsf_pyal_static_dict_type(__os_environ, vsf_pyal_class_type(os, environ));
 #endif
 
 /*============================ PROTOTYPES ====================================*/
@@ -66,7 +57,11 @@ static os_environ_t __os_environ = {
 vsf_pyal_module_func_init_imp(os)
 {
     char **__env = environ, *key, *value;
-    vsf_pyal_obj_t environ_dict;
+    vsf_pyal_obj_t environ_dictobj;
+
+#if defined(vsf_pyal_class_begin) && defined(vsf_pyal_class_end)
+    vsf_pyal_class_inherit_func_call(os, environ, dict);
+#endif
 
 #if VSF_PYAL_FEATURE_MODULE_IS_DYN
     vsf_pyal_module_add_str(os, "sep", "/");
@@ -80,10 +75,10 @@ vsf_pyal_module_func_init_imp(os)
     uname(&name);
     vsf_pyal_module_add_str(os, "name", name.sysname);
 
-    environ_dict = vsf_pyal_newdict();
-    vsf_pyal_module_add_obj(os, "environ", environ_dict);
+    environ_dictobj = vsf_pyal_newdict();
+    vsf_pyal_module_add_obj(os, "environ", environ_dictobj);
 #else
-    environ_dict = &__os_environ;
+    environ_dictobj = &__os_environ;
 #endif
 
     while (*__env != NULL) {
@@ -95,7 +90,7 @@ vsf_pyal_module_func_init_imp(os)
         }
 
         vsf_pyal_arg_t arg = vsf_pyal_newarg_str(value);
-        vsf_pyal_dictobj_set(environ_dict, key, arg, true);
+        vsf_pyal_dictobj_set(environ_dictobj, key, arg, true);
         free(key);
 
         __env++;
@@ -549,15 +544,37 @@ vsf_pyal_module_func_fix_imp(os_path, splitext, VSF_PYAL_MODULE_FUNCARG_OBJ_1, v
 #       ifdef vsf_pyal_static_dict_t
 vsf_pyal_class_subscript_func(os, environ, arg)
 {
-    vsf_pyal_obj_t indexobj = vsf_pyal_class_subscript_idxobj(arg);
-    vsf_pyal_obj_t valuexobj = vsf_pyal_class_subscript_valueobj(arg);
+    vsf_pyal_arg_t indexarg = vsf_pyal_class_subscript_idxarg(arg);
+    vsf_pyal_arg_t valuearg = vsf_pyal_class_subscript_valuearg(arg);
+    char *key_str = (char *)vsf_pyal_strarg_get_str(indexarg);
 
+    if (vsf_pyal_class_subscript_is_delete(arg)) {
+        setenv(key_str, NULL, true);
+    } else if (vsf_pyal_class_subscript_is_store(arg)) {
+        char *value_str = (char *)vsf_pyal_strarg_get_str(valuearg);
+        setenv(key_str, value_str, true);
+    }
 
+    return vsf_pyal_class_call_builtin_feature_subscript(dict, arg);
 }
 
-vsf_pyal_class_begin(os, environ)
-vsf_pyal_class_end(os, environ,
-    vsf_pyal_class_feature_subscript(os, environ)
+// placeholders
+vsf_pyal_class_print_func(os, environ) {  }
+vsf_pyal_class_iterator_func(os, environ) { return VSF_PYAL_OBJ_NULL; }
+vsf_pyal_class_binary_func(os, environ) { return VSF_PYAL_OBJ_NULL; }
+vsf_pyal_class_unary_func(os, environ) { return VSF_PYAL_OBJ_NULL; }
+vsf_pyal_class_entry(os, environ)
+
+// inherit from builtin dict features
+vsf_pyal_class_inherit_func(os, environ, dict, print, unary, binary, iterator, entry)
+vsf_pyal_class_begin_for_inherit(os, environ, dict)
+vsf_pyal_class_end_for_inherit(os, environ, dict,
+    vsf_pyal_class_feature_subscript(os, environ),
+    vsf_pyal_class_feature_print(os, environ),
+    vsf_pyal_class_feature_entry(os, environ),
+    vsf_pyal_class_feature_iterator(os, environ),
+    vsf_pyal_class_feature_unary(os, environ),
+    vsf_pyal_class_feature_binary(os, environ)
 )
 #       endif
 #   endif

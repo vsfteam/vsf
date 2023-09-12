@@ -182,18 +182,21 @@ extern vsf_pyal_arg_t vsf_pyal_tuplearg_get_arg(vsf_pyal_arg_t self_in, int idx)
 
 // dict
 
+#define vsf_pyal_dict_type                          mp_type_dict
 #define vsf_pyal_static_dict_t                      mp_obj_dict_t
-#define vsf_pyal_static_dict_init()                                             \
+#define vsf_pyal_static_dict_init(__type)                                       \
     {                                                                           \
         .base = {                                                               \
-            .type = &mp_type_dict,                                              \
+            .type = &(__type),                                                  \
         },                                                                      \
         .map = {                                                                \
             .all_keys_are_qstrs = 1,                                            \
         },                                                                      \
     }
 #define vsf_pyal_static_dict(__name)                                            \
-     vsf_pyal_static_dict_t __name MICROPY_OBJ_BASE_ALIGNMENT = vsf_pyal_static_dict_init(__name)
+     vsf_pyal_static_dict_t __name MICROPY_OBJ_BASE_ALIGNMENT = vsf_pyal_static_dict_init(vsf_pyal_dict_type)
+#define vsf_pyal_static_dict_type(__name, __type)                               \
+     vsf_pyal_static_dict_t __name MICROPY_OBJ_BASE_ALIGNMENT = vsf_pyal_static_dict_init(__type)
 
 typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_dictkey_get_str(__dictkey)         vsf_pyal_strarg_get_str(__dictkey)
@@ -201,10 +204,14 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_newobj_dict()                      mp_obj_new_dict(0)
 #define vsf_pyal_dictobj_set(__dictobj, __key_str, __value_arg, __free_arg)     \
     mp_obj_dict_store((__dictobj), vsf_pyal_newarg_str(__key_str), (__value_arg))
+#define vsf_pyal_dictobj_get(__dictobj, __key_str)  mp_obj_dict_get((__dictobj), vsf_pyal_newarg_str(__key_str))
+#define vsf_pyal_dictobj_del(__dictobj, __key_str)  mp_obj_dict_delete((__dictobj), vsf_pyal_newarg_str(__key_str))
 
 #define vsf_pyal_newarg_dict()                      mp_obj_new_dict(0)
 #define vsf_pyal_dictarg_set(__dictarg, __key_str, __value_arg, __free_arg)     \
     mp_obj_dict_store((__dictarg), vsf_pyal_newarg_str(__key_str), (__value_arg))
+#define vsf_pyal_dictarg_get(__dictarg, __key_str)  mp_obj_dict_get((__dictarg), vsf_pyal_newarg_str(__key_str))
+#define vsf_pyal_dictarg_del(__dictarg, __key_str)  mp_obj_dict_delete((__dictarg), vsf_pyal_newarg_str(__key_str))
 
 // module
 
@@ -330,6 +337,9 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 
 // class
 
+#define vsf_pyal_builtinclass_declare(__class)                                  \
+    extern const mp_obj_type_t mp_type_ ## __class;
+
 #define vsf_pyal_class_arg_get_self(__mod, __class, __name)                     \
     __mod ## _ ## __class ## _t *__name = vsf_pyal_instobj_get(selfobj)
 #define vsf_pyal_class_arg_get_self_from(__mod, __class, __name, __instobj)     \
@@ -370,12 +380,22 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
         return MP_OBJ_FROM_PTR(self);                                           \
     }
 
+#define vsf_pyal_class_print_func(__mod, __class)                               \
+    void __mod ## _ ## __class ## _print(const mp_print_t *print, vsf_pyal_obj_t selfobj, mp_print_kind_t kind)
 #define vsf_pyal_class_print_func_fmt(__mod, __class, __fmt, ...)               \
     void __mod ## _ ## __class ## _print(const mp_print_t *VSF_MACRO_SAFE_NAME(print), vsf_pyal_obj_t selfobj, mp_print_kind_t VSF_MACRO_SAFE_NAME(kind)) {\
         VSF_UNUSED_PARAM(VSF_MACRO_SAFE_NAME(kind));                            \
         vsf_pyal_class_arg_get_self(__mod, __class, self);                      \
         mp_printf(VSF_MACRO_SAFE_NAME(print), (__fmt), ##__VA_ARGS__);          \
     }
+
+#define vsf_pyal_class_iterator_func(__mod, __class)                            \
+    vsf_pyal_obj_t __mod ## _ ## __class ## _iter(vsf_pyal_obj_t selfobj, mp_obj_iter_buf_t *iter_buf)
+
+#define vsf_pyal_class_unary_func(__mod, __class)                               \
+    vsf_pyal_obj_t __mod ## _ ## __class ## _unary_op(mp_unary_op_t op, vsf_pyal_obj_t selfobj)
+#define vsf_pyal_class_binary_func(__mod, __class)                              \
+    vsf_pyal_obj_t __mod ## _ ## __class ## _binary_op(mp_binary_op_t op, vsf_pyal_obj_t selfobj, vsf_pyal_obj_t valueobj)
 
 #define vsf_pyal_class_attr_func(__mod, __class, __arg_name)                    \
     void __mod ## _ ## __class ## _attr(vsf_pyal_obj_t selfobj, qstr __target_attr, vsf_pyal_obj_t *__arg_name ## _args)
@@ -396,12 +416,15 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_class_attr_ret_success(__arg_name)                             \
     __arg_name ## _args[0] = MP_OBJ_NULL; return
 
-#define vsf_pyal_class_subscript_idxobj(__arg_name)     __arg_name ## _idxobj
-#define vsf_pyal_class_subscript_valueobj(__arg_name)   __arg_name ## _valueobj
+#define vsf_pyal_class_subscript_is_load(__arg_name)     (MP_OBJ_SENTINEL == vsf_pyal_class_subscript_valuearg(__arg_name))
+#define vsf_pyal_class_subscript_is_store(__arg_name)    ((vsf_pyal_class_subscript_valuearg(__arg_name) != MP_OBJ_SENTINEL) && (vsf_pyal_class_subscript_valuearg(__arg_name) != MP_OBJ_NULL))
+#define vsf_pyal_class_subscript_is_delete(__arg_name)   (MP_OBJ_NULL == vsf_pyal_class_subscript_valuearg(__arg_name))
+#define vsf_pyal_class_subscript_idxarg(__arg_name)     __arg_name ## _idxarg
+#define vsf_pyal_class_subscript_valuearg(__arg_name)   __arg_name ## _valuearg
 #define vsf_pyal_class_subscript_func(__mod, __class, __arg_name)               \
     vsf_pyal_obj_t __mod ## _ ## __class ## _subscr(vsf_pyal_obj_t selfobj,     \
-        vsf_pyal_obj_t vsf_pyal_class_subscript_idxobj(__arg_name),             \
-        vsf_pyal_obj_t vsf_pyal_class_subscript_valueobj(__arg_name))
+        vsf_pyal_arg_t vsf_pyal_class_subscript_idxarg(__arg_name),             \
+        vsf_pyal_arg_t vsf_pyal_class_subscript_valuearg(__arg_name))
 
 #define vsf_pyal_class_func_var_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
     __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_var(__arg_name));          \
@@ -416,18 +439,79 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_class_str(__class, __name, __str)  { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_QSTR(MP_QSTR_ ## __str) }
 #define vsf_pyal_class_func(__class, __name)        { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&mp_ ## __class ## _ ## __name ## _obj) }
 
-#define vsf_pyal_class_feature(__mod, __class, __feature)                       \
+#define __vsf_pyal_class_feature(__mod, __class, __feature)                     \
         __feature, &__mod ## _ ## __class ## _ ## __feature
 #define vsf_pyal_class_feature_new(__mod, __class)                              \
-        vsf_pyal_class_feature(__mod, __class, make_new)
+        __vsf_pyal_class_feature(__mod, __class, make_new)
 #define vsf_pyal_class_feature_attr(__mod, __class)                             \
-        vsf_pyal_class_feature(__mod, __class, attr)
+        __vsf_pyal_class_feature(__mod, __class, attr)
 #define vsf_pyal_class_feature_entry(__mod, __class)                            \
-        vsf_pyal_class_feature(__mod, __class, locals_dict)
+        __vsf_pyal_class_feature(__mod, __class, locals_dict)
 #define vsf_pyal_class_feature_subscript(__mod, __class)                        \
-        vsf_pyal_class_feature(__mod, __class, subscr)
+        __vsf_pyal_class_feature(__mod, __class, subscr)
 #define vsf_pyal_class_feature_print(__mod, __class)                            \
-        vsf_pyal_class_feature(__mod, __class, print)
+        __vsf_pyal_class_feature(__mod, __class, print)
+#define vsf_pyal_class_feature_unary(__mod, __class)                            \
+        __vsf_pyal_class_feature(__mod, __class, unary_op)
+#define vsf_pyal_class_feature_binary(__mod, __class)                           \
+        __vsf_pyal_class_feature(__mod, __class, binary_op)
+#define vsf_pyal_class_feature_iterator(__mod, __class)                         \
+        __vsf_pyal_class_feature(__mod, __class, iter)
+
+#define vsf_pyal_class_inherit_func_call(__mod, __class, __builtinclass)        \
+    __mod ## _ ## __class ## _inherit_from_ ## __builtinclass()
+
+#define __vsf_pyal_class_call_builtin_feature(__builtinclass, __feature)        \
+    mp_type_ ## __builtinclass.slots[mp_type_ ## __builtinclass.slot_index_ ## __feature - 1]
+#define vsf_pyal_class_call_builtin_feathre_new(__builtinclass, __arg_name)     \
+        ((mp_make_new_fun_t)__vsf_pyal_class_call_builtin_feature(__builtinclass, make_new))(type, __arg_name ## _arg_num, n_kw, __arg_name ## _args)
+#define vsf_pyal_class_call_builtin_feature_attr(__builtinclass, __arg_name)    \
+        ((mp_attr_fun_t)__vsf_pyal_class_call_builtin_feature(__builtinclass, attr))(selfobj, __target_attr, __arg_name ## _args)
+#define vsf_pyal_class_call_builtin_feature_subscript(__builtinclass, __arg_name)\
+        ((mp_subscr_fun_t)__vsf_pyal_class_call_builtin_feature(__builtinclass, subscr))(selfobj, __arg_name ## _idxarg, __arg_name ## _valuearg)
+#define vsf_pyal_class_call_builtin_feature_unary(__builtinclass, __arg_name)   \
+        ((mp_unary_op_fun_t)__vsf_pyal_class_call_builtin_feature(__builtinclass, unary_op))(op, selfobj)
+#define vsf_pyal_class_call_builtin_feature_binary(__builtinclass, __arg_name)  \
+        ((mp_binary_op_fun_t)__vsf_pyal_class_call_builtin_feature(__builtinclass, binary_op))(op, selfobj, valueobj)
+
+#define vsf_pyal_class_inherit_builtin_feature(__mod, __class, __builtinclass, __feature)\
+    vsf_pyal_class_inherit_builtin_feature_ ## __feature(__mod, __class, __builtinclass);
+#define vsf_pyal_class_inherit_func(__mod, __class, __builtinclass, ...)        \
+    void __mod ## _ ## __class ## _inherit_from_ ## __builtinclass(void) {      \
+        vsf_pyal_class_inherit_builtin(__mod, __class, __builtinclass);         \
+        VSF_MFOREACH_ARG3(vsf_pyal_class_inherit_builtin_feature, __mod, __class, __builtinclass, __VA_ARGS__)\
+    }
+#define vsf_pyal_class_inherit_builtin(__mod, __class, __builtinclass)          \
+        vsf_pyal_class_type(__mod, __class).flags = mp_type_ ## __builtinclass.flags
+#define __vsf_pyal_class_inherit_builtin_feature(__mod, __class, __builtinclass, __feature)\
+        vsf_pyal_class_type(__mod, __class).slots[vsf_pyal_class_type(__mod, __class).slot_index_ ## __feature - 1] =\
+            mp_type_ ## __builtinclass.slots[mp_type_ ## __builtinclass.slot_index_ ## __feature - 1]
+#define vsf_pyal_class_inherit_builtin_feathre_new(__mod, __class, __builtinclass)\
+        __vsf_pyal_class_inherit_builtin_feature(__mod, __class, __builtinclass, make_new)
+#define vsf_pyal_class_inherit_builtin_feature_attr(__mod, __class, __builtinclass)\
+        __vsf_pyal_class_inherit_builtin_feature(__mod, __class, __builtinclass, attr)
+#define vsf_pyal_class_inherit_builtin_feature_entry(__mod, __class, __builtinclass)\
+        __vsf_pyal_class_inherit_builtin_feature(__mod, __class, __builtinclass, locals_dict)
+#define vsf_pyal_class_inherit_builtin_feature_subscript(__mod, __class, __builtinclass)\
+        __vsf_pyal_class_inherit_builtin_feature(__mod, __class, __builtinclass, subscr)
+#define vsf_pyal_class_inherit_builtin_feature_print(__mod, __class, __builtinclass)\
+        __vsf_pyal_class_inherit_builtin_feature(__mod, __class, __builtinclass, print)
+#define vsf_pyal_class_inherit_builtin_feature_unary(__mod, __class, __builtinclass)\
+        __vsf_pyal_class_inherit_builtin_feature(__mod, __class, __builtinclass, unary_op)
+#define vsf_pyal_class_inherit_builtin_feature_binary(__mod, __class, __builtinclass)\
+        __vsf_pyal_class_inherit_builtin_feature(__mod, __class, __builtinclass, binary_op)
+#define vsf_pyal_class_inherit_builtin_feature_iterator(__mod, __class, __builtinclass)\
+        __vsf_pyal_class_inherit_builtin_feature(__mod, __class, __builtinclass, iter)
+#define vsf_pyal_class_begin_for_inherit(__mod, __class, __builtinclass)
+#define vsf_pyal_class_declare_for_inherit(__mod, __class, __builtinclass)      \
+    extern mp_obj_type_t mp_type_ ## __mod ## _ ## __class;                     \
+    extern vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t arg_num, size_t n_kw, const mp_obj_t *args);\
+    extern void __mod ## _ ## __class ## _inherit_from_ ## __builtinclass(void)
+#define vsf_pyal_class_end_for_inherit(__mod, __class, __builtinclass, ...)     \
+    MP_DEFINE_OBJ_TYPE(                                                         \
+        mp_type_ ## __mod ## _ ## __class, MP_QSTR_ ## __class, MP_TYPE_FLAG_NONE,\
+        __VA_ARGS__                                                             \
+    );
 
 #define vsf_pyal_class_begin(__mod, __class)
 #define vsf_pyal_class_entry(__mod, __class, ...)                               \
@@ -444,6 +528,8 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_class_declare(__mod, __class)                                  \
     extern const mp_obj_type_t mp_type_ ## __mod ## _ ## __class;               \
     extern vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t arg_num, size_t n_kw, const mp_obj_t *args)
+#define vsf_pyal_class_type(__mod, __class)                                     \
+    mp_type_ ## __mod ## _ ## __class
 
 #define vsf_pyal_class_new_call(__mod, __class, __args_num, __args)             \
     __mod ## _ ## __class ## _make_new(NULL, (__args_num), 0, (__args))
@@ -451,6 +537,28 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 // APIs
 
 #define vsf_pyal_raise(__fmt, ...)                  mp_raise_msg_varg(&mp_type_TypeError, MP_ERROR_TEXT(__fmt), ##__VA_ARGS__)
+
+// enhancement to original implementation
+
+// for non-const object type, can be used to inherit from builtin class
+#define MP_DEFINE_OBJ_TYPE_EXPAND(x) x
+
+#define MP_DEFINE_OBJ_TYPE_NARGS_0(_struct_type, _typename, _name, _flags) _struct_type _typename = { .base = { &mp_type_type }, .name = _name, .flags = _flags }
+#define MP_DEFINE_OBJ_TYPE_NARGS_1(_struct_type, _typename, _name, _flags, f1, v1) _struct_type _typename = { .base = { &mp_type_type }, .name = _name, .flags = _flags, .slot_index_##f1 = 1, .slots = { v1, } }
+#define MP_DEFINE_OBJ_TYPE_NARGS_2(_struct_type, _typename, _name, _flags, f1, v1, f2, v2) _struct_type _typename = { .base = { &mp_type_type }, .name = _name, .flags = _flags, .slot_index_##f1 = 1, .slot_index_##f2 = 2, .slots = { v1, v2, } }
+#define MP_DEFINE_OBJ_TYPE_NARGS_3(_struct_type, _typename, _name, _flags, f1, v1, f2, v2, f3, v3) _struct_type _typename = { .base = { &mp_type_type }, .name = _name, .flags = _flags, .slot_index_##f1 = 1, .slot_index_##f2 = 2, .slot_index_##f3 = 3, .slots = { v1, v2, v3, } }
+#define MP_DEFINE_OBJ_TYPE_NARGS_4(_struct_type, _typename, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4) _struct_type _typename = { .base = { &mp_type_type }, .name = _name, .flags = _flags, .slot_index_##f1 = 1, .slot_index_##f2 = 2, .slot_index_##f3 = 3, .slot_index_##f4 = 4, .slots = { v1, v2, v3, v4, } }
+#define MP_DEFINE_OBJ_TYPE_NARGS_5(_struct_type, _typename, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5) _struct_type _typename = { .base = { &mp_type_type }, .name = _name, .flags = _flags, .slot_index_##f1 = 1, .slot_index_##f2 = 2, .slot_index_##f3 = 3, .slot_index_##f4 = 4, .slot_index_##f5 = 5, .slots = { v1, v2, v3, v4, v5, } }
+#define MP_DEFINE_OBJ_TYPE_NARGS_6(_struct_type, _typename, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6) _struct_type _typename = { .base = { &mp_type_type }, .name = _name, .flags = _flags, .slot_index_##f1 = 1, .slot_index_##f2 = 2, .slot_index_##f3 = 3, .slot_index_##f4 = 4, .slot_index_##f5 = 5, .slot_index_##f6 = 6, .slots = { v1, v2, v3, v4, v5, v6, } }
+#define MP_DEFINE_OBJ_TYPE_NARGS_7(_struct_type, _typename, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7) _struct_type _typename = { .base = { &mp_type_type }, .name = _name, .flags = _flags, .slot_index_##f1 = 1, .slot_index_##f2 = 2, .slot_index_##f3 = 3, .slot_index_##f4 = 4, .slot_index_##f5 = 5, .slot_index_##f6 = 6, .slot_index_##f7 = 7, .slots = { v1, v2, v3, v4, v5, v6, v7, } }
+#define MP_DEFINE_OBJ_TYPE_NARGS_8(_struct_type, _typename, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8) _struct_type _typename = { .base = { &mp_type_type }, .name = _name, .flags = _flags, .slot_index_##f1 = 1, .slot_index_##f2 = 2, .slot_index_##f3 = 3, .slot_index_##f4 = 4, .slot_index_##f5 = 5, .slot_index_##f6 = 6, .slot_index_##f7 = 7, .slot_index_##f8 = 8, .slots = { v1, v2, v3, v4, v5, v6, v7, v8, } }
+#define MP_DEFINE_OBJ_TYPE_NARGS_9(_struct_type, _typename, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9) _struct_type _typename = { .base = { &mp_type_type }, .name = _name, .flags = _flags, .slot_index_##f1 = 1, .slot_index_##f2 = 2, .slot_index_##f3 = 3, .slot_index_##f4 = 4, .slot_index_##f5 = 5, .slot_index_##f6 = 6, .slot_index_##f7 = 7, .slot_index_##f8 = 8, .slot_index_##f9 = 9, .slots = { v1, v2, v3, v4, v5, v6, v7, v8, v9, } }
+#define MP_DEFINE_OBJ_TYPE_NARGS_10(_struct_type, _typename, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9, f10, v10) _struct_type _typename = { .base = { &mp_type_type }, .name = _name, .flags = _flags, .slot_index_##f1 = 1, .slot_index_##f2 = 2, .slot_index_##f3 = 3, .slot_index_##f4 = 4, .slot_index_##f5 = 5, .slot_index_##f6 = 6, .slot_index_##f7 = 7, .slot_index_##f8 = 8, .slot_index_##f9 = 9, .slot_index_##f10 = 10, .slots = { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, } }
+#define MP_DEFINE_OBJ_TYPE_NARGS_11(_struct_type, _typename, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9, f10, v10, f11, v11) _struct_type _typename = { .base = { &mp_type_type }, .name = _name, .flags = _flags, .slot_index_##f1 = 1, .slot_index_##f2 = 2, .slot_index_##f3 = 3, .slot_index_##f4 = 4, .slot_index_##f5 = 5, .slot_index_##f6 = 6, .slot_index_##f7 = 7, .slot_index_##f8 = 8, .slot_index_##f9 = 9, .slot_index_##f10 = 10, .slot_index_##f11 = 11, .slots = { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, } }
+#define MP_DEFINE_OBJ_TYPE_NARGS_12(_struct_type, _typename, _name, _flags, f1, v1, f2, v2, f3, v3, f4, v4, f5, v5, f6, v6, f7, v7, f8, v8, f9, v9, f10, v10, f11, v11, f12, v12) _struct_type _typename = { .base = { &mp_type_type }, .name = _name, .flags = _flags, .slot_index_##f1 = 1, .slot_index_##f2 = 2, .slot_index_##f3 = 3, .slot_index_##f4 = 4, .slot_index_##f5 = 5, .slot_index_##f6 = 6, .slot_index_##f7 = 7, .slot_index_##f8 = 8, .slot_index_##f9 = 9, .slot_index_##f10 = 10, .slot_index_##f11 = 11, .slot_index_##f12 = 12, .slots = { v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, } }
+
+#define MP_DEFINE_OBJ_TYPE_NARGS(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, N, ...) MP_DEFINE_OBJ_TYPE_NARGS_##N
+#define MP_DEFINE_OBJ_TYPE(...) MP_DEFINE_OBJ_TYPE_EXPAND(MP_DEFINE_OBJ_TYPE_NARGS(__VA_ARGS__, _INV, 12, _INV, 11, _INV, 10, _INV, 9, _INV, 8, _INV, 7, _INV, 6, _INV, 5, _INV, 4, _INV, 3, _INV, 2, _INV, 1, _INV, 0)(mp_obj_type_t, __VA_ARGS__))
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
