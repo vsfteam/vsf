@@ -29,11 +29,24 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+vsf_pyal_class_declare(os, environ);
+
+#ifdef vsf_pyal_static_dict_t
+typedef struct os_environ_t {
+    vsf_pyal_inst_base_def()
+    vsf_pyal_static_dict_t dict;
+} os_environ_t;
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if !VSF_PYAL_FEATURE_MODULE_IS_DYN
-vsf_pyal_static_dict(__os_environ);
+#ifdef vsf_pyal_static_dict_t
+static os_environ_t __os_environ = {
+    vsf_pyal_inst_base_init(os, environ)
+    .dict = vsf_pyal_static_dict_init(),
+};
 #endif
 
 /*============================ PROTOTYPES ====================================*/
@@ -525,6 +538,30 @@ vsf_pyal_module_func_fix_imp(os_path, splitext, VSF_PYAL_MODULE_FUNCARG_OBJ_1, v
 #endif
 
 #ifdef vsf_pyal_module
+
+// avoid conflict with environ MACRO
+#ifdef environ
+#   undef environ
+#endif
+
+#   if defined(vsf_pyal_class_begin) && defined(vsf_pyal_class_end)
+
+#       ifdef vsf_pyal_static_dict_t
+vsf_pyal_class_subscript_func(os, environ, arg)
+{
+    vsf_pyal_obj_t indexobj = vsf_pyal_class_subscript_idxobj(arg);
+    vsf_pyal_obj_t valuexobj = vsf_pyal_class_subscript_valueobj(arg);
+
+
+}
+
+vsf_pyal_class_begin(os, environ)
+vsf_pyal_class_end(os, environ,
+    vsf_pyal_class_feature_subscript(os, environ)
+)
+#       endif
+#   endif
+
 vsf_pyal_module(path,
     vsf_pyal_module_func(os_path, abspath),
     vsf_pyal_module_func(os_path, exists),
@@ -560,7 +597,7 @@ vsf_pyal_module(os,
     vsf_pyal_module_int(os, O_CREAT, O_CREAT),
     vsf_pyal_module_str(os, name, linux),
     vsf_pyal_module_str(os, sep, _slash_),
-    vsf_pyal_module_dict(os, environ, __os_environ),
+    vsf_pyal_module_inst(os, environ, __os_environ),
     vsf_pyal_module_submod(os, path),
 )
 #endif

@@ -137,14 +137,16 @@ extern vsf_pyal_arg_t vsf_pyal_listobj_get_arg(vsf_pyal_obj_t self_in, int idx);
 
 // instance
 
-#define vsf_pyal_inst_base()                        mp_obj_base_t base;
+#define vsf_pyal_inst_base_init(__mod, __class)                                 \
+        .base = &mp_type_ ## __mod ## _ ## __class,
+#define vsf_pyal_inst_base_def()                    mp_obj_base_t base;
 #define vsf_pyal_instobj_get(__instobj)             MP_OBJ_TO_PTR(__instobj)
 #define vsf_pyal_instarg_get(__instarg)             MP_OBJ_TO_PTR(__instarg)
 
 // file
 
 typedef struct _mp_obj_file_t {
-    vsf_pyal_inst_base()
+    vsf_pyal_inst_base_def()
     union {
         FILE *f;
         int fd;
@@ -180,13 +182,9 @@ extern vsf_pyal_arg_t vsf_pyal_tuplearg_get_arg(vsf_pyal_arg_t self_in, int idx)
 
 // dict
 
-typedef mp_obj_t                                    vsf_pyal_dict_key_t;
-#define vsf_pyal_dictkey_get_str(__dict_key)        vsf_pyal_strarg_get_str(__dict_key)
-
-#define vsf_pyal_newdict()                          mp_obj_new_dict(0)
-
-#define vsf_pyal_static_dict(__name)                                            \
-    mp_obj_dict_t __name MICROPY_OBJ_BASE_ALIGNMENT = {                         \
+#define vsf_pyal_static_dict_t                      mp_obj_dict_t
+#define vsf_pyal_static_dict_init()                                             \
+    {                                                                           \
         .base = {                                                               \
             .type = &mp_type_dict,                                              \
         },                                                                      \
@@ -194,8 +192,19 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
             .all_keys_are_qstrs = 1,                                            \
         },                                                                      \
     }
-#define vsf_pyal_dictobj_set(__dict_obj, __key_str, __value_arg, __free_arg)    \
-    mp_obj_dict_store((__dict_obj), vsf_pyal_newarg_str(__key_str), (__value_arg))
+#define vsf_pyal_static_dict(__name)                                            \
+     vsf_pyal_static_dict_t __name MICROPY_OBJ_BASE_ALIGNMENT = vsf_pyal_static_dict_init(__name)
+
+typedef mp_obj_t                                    vsf_pyal_dict_key_t;
+#define vsf_pyal_dictkey_get_str(__dictkey)         vsf_pyal_strarg_get_str(__dictkey)
+
+#define vsf_pyal_newobj_dict()                      mp_obj_new_dict(0)
+#define vsf_pyal_dictobj_set(__dictobj, __key_str, __value_arg, __free_arg)     \
+    mp_obj_dict_store((__dictobj), vsf_pyal_newarg_str(__key_str), (__value_arg))
+
+#define vsf_pyal_newarg_dict()                      mp_obj_new_dict(0)
+#define vsf_pyal_dictarg_set(__dictarg, __key_str, __value_arg, __free_arg)     \
+    mp_obj_dict_store((__dictarg), vsf_pyal_newarg_str(__key_str), (__value_arg))
 
 // module
 
@@ -252,7 +261,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_module_func_keyword_arg(__key_name, __key_feature, __default)  \
     [ARG_ ## __key_name] = { MP_QSTR_ ## __key_name, (__key_feature) | MP_ARG_OBJ, {.u_rom_obj = (__default)} }
 #define vsf_pyal_module_func_keyword_prepare(__arg_name, ...)                   \
-    static const mp_arg_t __arg_name ## _args[] = { __VA_ARGS__ };              \
+    STATIC const mp_arg_t __arg_name ## _args[] = { __VA_ARGS__ };              \
     mp_arg_parse_all(__arg_name ## _num, __arg_name ## _arr, __arg_name ## _map,\
         MP_ARRAY_SIZE(__arg_name ## _args), __arg_name ## _args, __arg_name ## _val)
 #define vsf_pyal_module_func_keyword_get_int(__arg_name, __key_name)            \
@@ -304,6 +313,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_module_int(__mod, __name, __value) { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_INT(__value) }
 #define vsf_pyal_module_str(__mod, __name, __str)   { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_QSTR(MP_QSTR_ ## __str) }
 #define vsf_pyal_module_func(__mod, __name)         { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&mp_ ## __mod ## _ ## __name ## _obj) }
+#define vsf_pyal_module_inst(__mod, __name, __inst) { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&__inst) }
 #define vsf_pyal_module_dict(__mod, __name, __dict) { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&__dict) }
 #define vsf_pyal_module_class(__mod, __name)        { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&mp_type_ ## __mod ## _ ## __name) }
 #define vsf_pyal_module_submod(__mod, __name)       { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&(mp_module_ ## __name)) }
@@ -385,6 +395,13 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     return
 #define vsf_pyal_class_attr_ret_success(__arg_name)                             \
     __arg_name ## _args[0] = MP_OBJ_NULL; return
+
+#define vsf_pyal_class_subscript_idxobj(__arg_name)     __arg_name ## _idxobj
+#define vsf_pyal_class_subscript_valueobj(__arg_name)   __arg_name ## _valueobj
+#define vsf_pyal_class_subscript_func(__mod, __class, __arg_name)               \
+    vsf_pyal_obj_t __mod ## _ ## __class ## _subscr(vsf_pyal_obj_t selfobj,     \
+        vsf_pyal_obj_t vsf_pyal_class_subscript_idxobj(__arg_name),             \
+        vsf_pyal_obj_t vsf_pyal_class_subscript_valueobj(__arg_name))
 
 #define vsf_pyal_class_func_var_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
     __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_var(__arg_name));          \
