@@ -30,8 +30,10 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+#ifdef vsf_pyal_class_declare_for_inherit
 vsf_pyal_class_declare_for_inherit(os, environ, dict);
 vsf_pyal_builtinclass_declare(dict);
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

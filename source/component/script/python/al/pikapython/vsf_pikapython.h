@@ -129,7 +129,7 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
 
 // instance
 
-#define vsf_pyal_inst_base()
+#define vsf_pyal_inst_base_def()
 #define vsf_pyal_instobj_get(__instobj)             arg_getBytes(obj_getArg((__instobj), "_self"))
 
 // file
