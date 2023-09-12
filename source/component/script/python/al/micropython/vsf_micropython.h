@@ -360,6 +360,13 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
         return MP_OBJ_FROM_PTR(self);                                           \
     }
 
+#define vsf_pyal_class_print_func_fmt(__mod, __class, __fmt, ...)               \
+    void __mod ## _ ## __class ## _print(const mp_print_t *VSF_MACRO_SAFE_NAME(print), vsf_pyal_obj_t selfobj, mp_print_kind_t VSF_MACRO_SAFE_NAME(kind)) {\
+        VSF_UNUSED_PARAM(VSF_MACRO_SAFE_NAME(kind));                            \
+        vsf_pyal_class_arg_get_self(__mod, __class, self);                      \
+        mp_printf(VSF_MACRO_SAFE_NAME(print), (__fmt), ##__VA_ARGS__);          \
+    }
+
 #define vsf_pyal_class_attr_func(__mod, __class, __arg_name)                    \
     void __mod ## _ ## __class ## _attr(vsf_pyal_obj_t selfobj, qstr __target_attr, vsf_pyal_obj_t *__arg_name ## _args)
 #define vsf_pyal_class_attr_get_attr()              (__target_attr)
@@ -393,22 +400,28 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_class_func(__class, __name)        { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&mp_ ## __class ## _ ## __name ## _obj) }
 
 #define vsf_pyal_class_feature(__mod, __class, __feature)                       \
-        __feature, __mod ## _ ## __class ## _ ## __feature
+        __feature, &__mod ## _ ## __class ## _ ## __feature
 #define vsf_pyal_class_feature_new(__mod, __class)                              \
         vsf_pyal_class_feature(__mod, __class, make_new)
-#define vsf_pyal_class_feature_attr(__mod, __class)                              \
+#define vsf_pyal_class_feature_attr(__mod, __class)                             \
         vsf_pyal_class_feature(__mod, __class, attr)
-#define vsf_pyal_class_begin(__mod, __class, ...)                               \
+#define vsf_pyal_class_feature_entry(__mod, __class)                            \
+        vsf_pyal_class_feature(__mod, __class, locals_dict)
+#define vsf_pyal_class_feature_subscript(__mod, __class)                        \
+        vsf_pyal_class_feature(__mod, __class, subscr)
+#define vsf_pyal_class_feature_print(__mod, __class)                            \
+        vsf_pyal_class_feature(__mod, __class, print)
+
+#define vsf_pyal_class_begin(__mod, __class)
+#define vsf_pyal_class_entry(__mod, __class, ...)                               \
     STATIC const mp_rom_map_elem_t __ ## __class ## _locals_dict_table[] = {    \
         __VA_ARGS__                                                             \
     };                                                                          \
-    STATIC MP_DEFINE_CONST_DICT(__ ## __class ## _locals_dict, __ ## __class ## _locals_dict_table);
-
+    STATIC MP_DEFINE_CONST_DICT(__mod ## _ ## __class ## _locals_dict, __ ## __class ## _locals_dict_table);
 #define vsf_pyal_class_end(__mod, __class, ...)                                 \
     MP_DEFINE_CONST_OBJ_TYPE(                                                   \
         mp_type_ ## __mod ## _ ## __class, MP_QSTR_ ## __class, MP_TYPE_FLAG_NONE,\
         __VA_ARGS__                                                             \
-        locals_dict, &__ ## __class ## _locals_dict                             \
     );
 
 #define vsf_pyal_class_declare(__mod, __class)                                  \
