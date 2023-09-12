@@ -60,7 +60,9 @@ vsf_pyal_module_func_init_imp(os)
     vsf_pyal_obj_t environ_dictobj;
 
 #if defined(vsf_pyal_class_begin) && defined(vsf_pyal_class_end)
+#   ifdef vsf_pyal_static_dict_t
     vsf_pyal_class_inherit_func_call(os, environ, dict);
+#   endif
 #endif
 
 #if VSF_PYAL_FEATURE_MODULE_IS_DYN
