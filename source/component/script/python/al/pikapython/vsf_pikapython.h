@@ -326,6 +326,47 @@ typedef char *                                      vsf_pyal_dict_key_t;
         return;                                                                 \
     }
 
+#define vsf_pyal_class_attr_func(__mod, __class, __arg_name)                    \
+    extern vsf_pyal_arg_t __mod ## _ ## __class ## _attr(vsf_pyal_obj_t selfobj,\
+        vsf_pyal_funcarg_strobj __arg_name ## keyobj, vsf_pyal_arg_t __arg_name ## valuearg,\
+        bool __arg_name ## is_del);                                             \
+    vsf_pyal_class_func_fix_imp(pygame_Color, __getattr__, VSF_PYAL_MODULE_FUNCARG_OBJ_2,\
+        vsf_pyal_arg_t, vsf_pyal_funcarg_strobj keyobj)                         \
+    {                                                                           \
+        return __mod ## _ ## __class ## _attr(selfobj, keyobj, VSF_PYAL_ARG_NULL, false);\
+    }                                                                           \
+    vsf_pyal_class_func_fix_imp(pygame_Color, __delattr__, VSF_PYAL_MODULE_FUNCARG_OBJ_2,\
+        vsf_pyal_arg_t, vsf_pyal_funcarg_strobj keyobj)                         \
+    {                                                                           \
+        return __mod ## _ ## __class ## _attr(selfobj, keyobj, VSF_PYAL_ARG_NULL, true);\
+    }                                                                           \
+    vsf_pyal_class_func_fix_imp(pygame_Color, __setattr__, VSF_PYAL_MODULE_FUNCARG_OBJ_3,\
+        vsf_pyal_func_void_return_t, vsf_pyal_funcarg_strobj keyobj, vsf_pyal_arg_t arg)\
+    {                                                                           \
+        __mod ## _ ## __class ## _attr(selfobj, keyobj, arg, false);            \
+        vsf_pyal_func_void_return();                                            \
+    }                                                                           \
+    vsf_pyal_arg_t __mod ## _ ## __class ## _attr(vsf_pyal_obj_t selfobj,       \
+        vsf_pyal_funcarg_strobj __arg_name ## keyobj, vsf_pyal_arg_t __arg_name ## valuearg,\
+        bool __arg_name ## is_del)
+
+#define vsf_pyal_class_attr_get_attr(__arg_name)    vsf_pyal_hash_string(__arg_name ## keyobj)
+#define vsf_pyal_class_attr_const_attr(__attr)      constexpr vsf_pyal_hash_string(VSF_STR(__attr))
+#define vsf_pyal_class_attr_is_load(__arg_name)     ((VSF_PYAL_ARG_NULL == __arg_name ## valuearg) && !__arg_name ## is_del)
+#define vsf_pyal_class_attr_is_store(__arg_name)    (__arg_name ## valuearg != VSF_PYAL_ARG_NULL)
+#define vsf_pyal_class_attr_is_delete(__arg_name)   (__arg_name ## is_del)
+#define vsf_pyal_class_attr_get_valuearg(__arg_name)(__arg_name ## valuearg)
+#define vsf_pyal_class_attr_ret_load_fail(__arg_name)                           \
+    return VSF_PYAL_OBJ_NULL
+#define vsf_pyal_class_attr_ret_load_obj(__arg_name, __obj)                     \
+    return (__obj)
+#define vsf_pyal_class_attr_ret_load_method(__arg_name, __method)               \
+    return (__method)
+#define vsf_pyal_class_attr_ret_fail(__arg_name)                                \
+    return VSF_PYAL_OBJ_NULL
+#define vsf_pyal_class_attr_ret_success(__arg_name)                             \
+    return VSF_PYAL_OBJ_NULL
+
 #define vsf_pyal_class_func_var_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_var(__arg_name))
 #define vsf_pyal_class_func_fix_imp(__mod, __func, __func_type, __ret_type, ...)\
@@ -345,6 +386,8 @@ typedef char *                                      vsf_pyal_dict_key_t;
     })
 
 // APIs
+
+#define vsf_pyal_hash_string(__str)                 hash_time33(__str)
 
 #define vsf_pyal_raise(__fmt, ...)                                              \
     ({                                                                          \

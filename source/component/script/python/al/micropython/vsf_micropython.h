@@ -399,13 +399,13 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     vsf_pyal_obj_t __mod ## _ ## __class ## _binary_op(mp_binary_op_t op, vsf_pyal_obj_t selfobj, vsf_pyal_obj_t valueobj)
 
 #define vsf_pyal_class_attr_func(__mod, __class, __arg_name)                    \
-    void __mod ## _ ## __class ## _attr(vsf_pyal_obj_t selfobj, qstr __target_attr, vsf_pyal_obj_t *__arg_name ## _args)
-#define vsf_pyal_class_attr_get_attr()              (__target_attr)
+    void __mod ## _ ## __class ## _attr(vsf_pyal_obj_t selfobj, qstr __arg_name ## _attr, vsf_pyal_obj_t *__arg_name ## _args)
+#define vsf_pyal_class_attr_get_attr(__arg_name)    (__arg_name ## _attr)
 #define vsf_pyal_class_attr_const_attr(__attr)      (MP_QSTR_ ## __attr)
 #define vsf_pyal_class_attr_is_load(__arg_name)     (MP_OBJ_NULL == __arg_name ## _args[0])
 #define vsf_pyal_class_attr_is_store(__arg_name)    ((MP_OBJ_SENTINEL == __arg_name ## _args[0]) && (__arg_name ## _args[1] != MP_OBJ_NULL))
 #define vsf_pyal_class_attr_is_delete(__arg_name)   ((MP_OBJ_SENTINEL == __arg_name ## _args[0]) && (__arg_name ## _args[1] == MP_OBJ_NULL))
-#define vsf_pyal_class_attr_get_obj(__arg_name)     (__arg_name ## _args[1])
+#define vsf_pyal_class_attr_get_valuearg(__arg_name)(__arg_name ## _args[1])
 #define vsf_pyal_class_attr_ret_load_fail(__arg_name)                           \
     __arg_name ## _args[1] = MP_OBJ_SENTINEL; return
 #define vsf_pyal_class_attr_ret_load_obj(__arg_name, __obj)                     \
