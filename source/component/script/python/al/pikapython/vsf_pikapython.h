@@ -328,6 +328,22 @@ typedef char *                                      vsf_pyal_dict_key_t;
         return;                                                                 \
     }
 
+#define vsf_pyal_class_print_func(__mod, __class)                               \
+    vsf_pyal_funcarg_strobj __mod ## _ ## __class ## ___str__(vsf_pyal_obj_t selfobj)
+#define vsf_pyal_class_print_func_fmt(__mod, __class, __fmt, ...)               \
+    vsf_pyal_funcarg_strobj __mod ## _ ## __class ## ___str__(vsf_pyal_obj_t selfobj) {\
+        vsf_pyal_class_arg_get_self(__mod, __class, self);                      \
+        int len = snprintf(NULL, 0, (__fmt), ##__VA_ARGS__);                    \
+        extern vsf_pyal_arg_t arg_set(vsf_pyal_arg_t selfarg, char *name,       \
+             ArgType type, uint8_t *content, uint32_t size);                    \
+        vsf_pyal_arg_t strarg = arg_set(NULL, "", ARG_TYPE_STRING, NULL, len + 1);\
+        obj_setStr(selfobj, "_buf", arg_getStr(strarg));                        \
+        arg_deinit(strarg);                                                     \
+        char *result = obj_getStr(selfobj, "_buf");                             \
+        snprintf(result, len + 1, (__fmt), ##__VA_ARGS__);                      \
+        return result;                                                          \
+    }
+
 #define vsf_pyal_class_attr_func(__mod, __class, __arg_name)                    \
     extern vsf_pyal_arg_t __mod ## _ ## __class ## _attr(vsf_pyal_obj_t selfobj,\
         vsf_pyal_funcarg_strobj __arg_name ## keyobj, vsf_pyal_arg_t __arg_name ## valuearg,\
