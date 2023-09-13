@@ -49,6 +49,7 @@ typedef Arg *                                       vsf_pyal_arg_t;
 #define vsf_pyal_arg_is_list(__arg)                 arg_isList(__arg)
 #define vsf_pyal_arg_is_tuple(__arg)                arg_isTuple(__arg)
 #define vsf_pyal_arg_is_callable(__arg)             arg_isCallable(__arg)
+#define vsf_pyal_arg_get_obj(__arg)                 arg_getObj(__arg)
 #define vsf_pyal_arg_free(__arg)                    arg_deinit(__arg)
 
 // int
@@ -66,14 +67,14 @@ typedef Arg *                                       vsf_pyal_arg_t;
 #define vsf_pyal_newarg_str(__str)                  arg_newStr(__str)
 #define vsf_pyal_newarg_str_ret(__str)                                          \
     ({                                                                          \
-        obj_setStr(self, __FUNCTION__, (__str));                                \
-        obj_getStr(self, __FUNCTION__);                                         \
+        obj_setStr(selfobj, __FUNCTION__, (__str));                             \
+        obj_getStr(selfobj, __FUNCTION__);                                      \
     })
 #define vsf_pyal_newarg_str_and_free(__str)                                     \
     ({                                                                          \
-        obj_setStr(self, __FUNCTION__, (__str));                                \
+        obj_setStr(selfobj, __FUNCTION__, (__str));                             \
         free(__str);                                                            \
-        obj_getStr(self, __FUNCTION__);                                         \
+        obj_getStr(selfobj, __FUNCTION__);                                      \
     })
 #define vsf_pyal_strarg_get_str(__str_arg)          arg_getStr(__str_arg)
 
@@ -82,14 +83,14 @@ typedef Arg *                                       vsf_pyal_arg_t;
 #define vsf_pyal_newarg_bytes(__data, __len)        arg_setBytes((uint8_t *)(__data), __len)
 #define vsf_pyal_newarg_bytes_ret(__data, __len)                                \
     ({                                                                          \
-        obj_setBytes(self, __FUNCTION__, (uint8_t *)(__data), (__len));         \
-        obj_getBytes(self, __FUNCTION__);                                       \
+        obj_setBytes(selfobj, __FUNCTION__, (uint8_t *)(__data), (__len));      \
+        obj_getBytes(selfobj, __FUNCTION__);                                    \
     })
 #define vsf_pyal_newarg_bytes_ret_and_free(__data, __len)                       \
     ({                                                                          \
-        obj_setBytes(self, __FUNCTION__, (uint8_t *)(__data), (__len));         \
+        obj_setBytes(selfobj, __FUNCTION__, (uint8_t *)(__data), (__len));      \
         free(__data);                                                           \
-        obj_getBytes(self, __FUNCTION__);                                       \
+        obj_getBytes(selfobj, __FUNCTION__);                                    \
     })
 #define vsf_pyal_bytesarg_get_data(__bytesarg, __len_ptr)                       \
     ({                                                                          \
@@ -130,7 +131,9 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
 // instance
 
 #define vsf_pyal_inst_base_def()
+#define vsf_pyal_newobj_inst(__mod, __class)        newNormalObj(New_ ## __mod ## _ ## __class)
 #define vsf_pyal_instobj_get(__instobj)             arg_getBytes(obj_getArg((__instobj), "_self"))
+#define vsf_pyal_instarg_get(__instarg)             arg_getBytes(__instarg)
 
 // file
 
@@ -189,7 +192,7 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
 typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_dictkey_get_str(__dict_key)        (__dict_key)
 
-#define vsf_pyal_newdict()                          New_PikaDict()
+#define vsf_pyal_newobj_dict()                      New_PikaDict()
 
 #define vsf_pyal_dictobj_set(__dict_obj, __key_str, __value_arg, __free_arg)    \
                                                     pikaDict_set((__dict_obj), __key_str, (__value_arg))
@@ -199,16 +202,16 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_module_add_obj(__mod, __name, __obj)                           \
     ({                                                                          \
         vsf_pyal_arg_t VSF_MACRO_SAFE_NAME(arg) = vsf_pyal_newarg_obj(__obj);   \
-        obj_setArg_noCopy(self, (__name), VSF_MACRO_SAFE_NAME(arg));            \
+        obj_setArg_noCopy(selfobj, (__name), VSF_MACRO_SAFE_NAME(arg));         \
     })
 #define vsf_pyal_module_add_str(__mod, __name, __str)                           \
-                                                    obj_setStr(self, (__name), (__str))
+                                                    obj_setStr(selfobj, (__name), (__str))
 #define vsf_pyal_module_add_int(__mod, __name, __value)                         \
-                                                    obj_setInt(self, (__name), (__value))
+                                                    obj_setInt(selfobj, (__name), (__value))
 
 #define vsf_pyal_funcarg_strobj                     char *
 #define vsf_pyal_funcarg_strobj_get_str(__arg)      (__arg)
-#define vsf_pyal_funcarg_newstr(__str)              obj_cacheStr(self, (__str))
+#define vsf_pyal_funcarg_newstr(__str)              obj_cacheStr(selfobj, (__str))
 
 #define vsf_pyal_funcarg_intobj                     int
 #define vsf_pyal_funcarg_intobj_get_int(__arg)      (__arg)
@@ -235,16 +238,16 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_func_void_return()                 return
 
 #define vsf_pyal_module_func_var_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
-    __ret_type __mod ## _ ## __func(vsf_pyal_obj_t self, vsf_pyal_funcarg_var(__arg_name))
+    __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_var(__arg_name))
 
 #define VSF_PYAL_MODULE_FUNCARG_OBJ_0               0
 #define VSF_PYAL_MODULE_FUNCARG_OBJ_1               1
 #define VSF_PYAL_MODULE_FUNCARG_OBJ_2               2
 #define vsf_pyal_module_func_fix_imp(__mod, __func, __func_type, __ret_type, ...)\
-    __ret_type __mod ## _ ## __func(vsf_pyal_obj_t self, ##__VA_ARGS__)
+    __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__)
 
 #define vsf_pyal_module_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name, ...)\
-    __ret_type __mod ## _ ## __func(vsf_pyal_obj_t self, vsf_pyal_funcarg_keyword(__arg_name)) {
+    __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_keyword(__arg_name)) {
 #define vsf_pyal_module_func_keyword_get_int(__arg_name, __key_name)            \
     pikaDict_getInt(__arg_name, #__key_name)
 #define vsf_pyal_module_func_keyword_get_bool(__arg_name, __key_name)           \
@@ -254,42 +257,42 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_module_func_keyword_imp_end()      }
 
 #define vsf_pyal_module_func_init_prototype(__mod)                              \
-    extern void __mod ## _ ## __init__(vsf_pyal_obj_t self)
+    extern void __mod ## _ ## __init__(vsf_pyal_obj_t selfobj)
 #define vsf_pyal_module_func_init_declare(__mod)                                \
-    extern void __mod ## _ ## __init__(vsf_pyal_obj_t self)
+    extern void __mod ## _ ## __init__(vsf_pyal_obj_t selfobj)
 #define vsf_pyal_module_func_init_imp(__mod)                                    \
     vsf_pyal_module_func_fix_imp(__mod, __init__, VSF_PYAL_MODULE_FUNCARG_OBJ_0, void)
 #define vsf_pyal_module_func_init_return()
 
 #define vsf_pyal_module_func_type(__mod, __func, __ret_type, ...)               \
-    typedef __ret_type (*__mod ## _ ## __func ## _t)(vsf_pyal_obj_t self, ##__VA_ARGS__)
+    typedef __ret_type (*__mod ## _ ## __func ## _t)(vsf_pyal_obj_t selfobj, ##__VA_ARGS__)
 #define vsf_pyal_module_func_prototype(__mod, __func, __ret_type, ...)          \
-    extern __ret_type __mod ## _ ## __func(vsf_pyal_obj_t self, ##__VA_ARGS__)
+    extern __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__)
 #define vsf_pyal_module_func_name(__mod, __func)                                \
     __mod ## _ ## __func
 #define vsf_pyal_module_func_call(__func_full_name, ...)                        \
-    __func_full_name(self, ##__VA_ARGS__)
+    __func_full_name(selfobj, ##__VA_ARGS__)
 #define vsf_pyal_module_func_declare(__mod, __func, __ret_type, ...)            \
-    extern __ret_type __mod ## _ ## __func(vsf_pyal_obj_t self, ##__VA_ARGS__)
+    extern __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__)
 
 #define vsf_pyal_module_func_type_noarg(__mod, __func, __ret_type)              \
-    typedef __ret_type (*__mod ## _ ## __func ## _t)(vsf_pyal_obj_t self)
+    typedef __ret_type (*__mod ## _ ## __func ## _t)(vsf_pyal_obj_t selfobj)
 #define vsf_pyal_module_func_prototype_noarg(__mod, __func, __ret_type)         \
-    extern __ret_type __mod ## _ ## __func(vsf_pyal_obj_t self)
+    extern __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj)
 #define vsf_pyal_module_func_declare_noarg(__mod, __func, __ret_type)           \
-    extern __ret_type __mod ## _ ## __func(vsf_pyal_obj_t self)
+    extern __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj)
 
 // class
 
 #define vsf_pyal_class_arg_get_self(__mod, __class, __name)                     \
-        __mod ## _ ## __class ## _t *__name = vsf_pyal_instobj_get(selfobj)
+        __mod ## _ ## __class ## _t *__name = (__mod ## _ ## __class ## _t *)vsf_pyal_instobj_get(selfobj)
 #define vsf_pyal_class_arg_get_self_from(__mod, __class, __name, __instobj)     \
-        __mod ## _ ## __class ## _t *__name = vsf_pyal_instobj_get(__instobj)
+        __mod ## _ ## __class ## _t *__name = (__mod ## _ ## __class ## _t *)vsf_pyal_instarg_get(__instobj)
 
 #define vsf_pyal_class_create(__mod, __class, __exsize, __obj_ptr)              \
     ({                                                                          \
         vsf_pyal_arg_t VSF_MACRO_SAFE_NAME(instarg) = arg_newBytes(NULL, sizeof(__mod ## _ ## __class ## _t) + (__exsize));\
-        vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(selfobj) = newNormalObj(New_ ## __mod ## _ ## __class);\
+        vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(selfobj) = vsf_pyal_newobj_inst(__mod, __class);\
         obj_setArg_noCopy(VSF_MACRO_SAFE_NAME(selfobj), "_self", VSF_MACRO_SAFE_NAME(instarg));\
         *(__obj_ptr) = VSF_MACRO_SAFE_NAME(selfobj);                            \
         (__mod ## _ ## __class ## _t *)arg_getBytes(VSF_MACRO_SAFE_NAME(instarg));\
@@ -330,13 +333,12 @@ typedef char *                                      vsf_pyal_dict_key_t;
     extern vsf_pyal_obj_t New_ ## __mod ## _ ## __class(Args *args);            \
     extern const NativeProperty __mod ## _ ## __class ## NativeProp
 
-#define vsf_pyal_class_new_call(__mod, __class, __args_num, __args)             \
+#define vsf_pyal_class_new(__mod, __class, __args_num, __args)                  \
     ({                                                                          \
         vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(tupleobj) = vsf_pyal_newobj_tuple(__args_num, __args);\
-        vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(selfobj) = New_pygame_Color(NULL);   \
+        vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(selfobj) = vsf_pyal_newobj_inst(__mod, __class);\
         __mod ## _ ## __class ## ___init__(VSF_MACRO_SAFE_NAME(selfobj), VSF_MACRO_SAFE_NAME(tupleobj));\
-        vsf_pyal_arg_t selfarg = obj_getArg(VSF_MACRO_SAFE_NAME(selfobj), "_self");\
-        (__mod ## _ ## __class ## _t *)arg_getBytes(selfarg);                   \
+        VSF_MACRO_SAFE_NAME(selfobj);                                           \
     })
 
 // APIs
@@ -344,7 +346,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_raise(__fmt, ...)                                              \
     ({                                                                          \
         pika_platform_printf((__fmt), ##__VA_ARGS__);                           \
-        obj_setErrorCode(self, -1);                                             \
+        obj_setErrorCode(selfobj, -1);                                          \
     })
 
 /*============================ TYPES =========================================*/

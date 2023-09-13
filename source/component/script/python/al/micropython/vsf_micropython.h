@@ -62,6 +62,7 @@ typedef mp_obj_t                                    vsf_pyal_arg_t;
 #define vsf_pyal_arg_is_list(__arg)                 (mp_obj_get_type(__arg) == &mp_type_list)
 #define vsf_pyal_arg_is_tuple(__arg)                (mp_obj_get_type(__arg) == &mp_type_tuple)
 #define vsf_pyal_arg_is_callable(__arg)             mp_obj_is_callable(__arg)
+#define vsf_pyal_arg_get_obj(__arg)                 (__arg)
 #define vsf_pyal_arg_free(__arg)
 
 // callable
@@ -531,7 +532,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_class_type(__mod, __class)                                     \
     mp_type_ ## __mod ## _ ## __class
 
-#define vsf_pyal_class_new_call(__mod, __class, __args_num, __args)             \
+#define vsf_pyal_class_new(__mod, __class, __args_num, __args)                  \
     __mod ## _ ## __class ## _make_new(NULL, (__args_num), 0, (__args))
 
 // APIs
