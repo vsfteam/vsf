@@ -706,9 +706,7 @@ static inline FILE *fopen64(const char *filename, const char *mode) {
     return fopen(filename, mode);
 }
 
-#if defined(_GNU_SOURCE)
 ssize_t getline(char **lineptr, size_t *n, FILE *f);
-#endif
 
 #if defined(__WIN__) && !defined(__VSF_APPLET__)
 // wrapper for original _lock_file/_unlock_file called in win c++ libs

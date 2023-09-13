@@ -73,6 +73,19 @@ struct itimerspec {
     struct timespec it_value;
 };
 
+struct timespec64 {
+    time64_t        tv_sec;
+    long            tv_nsec;
+};
+#ifdef __WIN__
+typedef struct timespec64 _timespec64;
+#endif
+
+struct itimerspec64 {
+    struct timespec64 it_interval;
+    struct timespec64 it_value;
+};
+
 #if VSF_LINUX_APPLET_USE_LIBC_TIME == ENABLED
 typedef struct vsf_linux_libc_time_vplt_t {
     vsf_vplt_info_t info;

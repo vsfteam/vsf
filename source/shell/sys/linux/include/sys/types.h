@@ -117,6 +117,11 @@ typedef enum {
 #endif
 typedef __TIME_T            time_t;
 
+#ifndef __TIME64_T
+#   define __TIME64_T       long long
+#endif
+typedef __TIME64_T          time64_t;
+
 #ifndef __CLOCK_T
 #   define __CLOCK_T        long
 #endif
