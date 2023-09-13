@@ -131,7 +131,10 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
 // instance
 
 #define vsf_pyal_inst_base_def()
-#define vsf_pyal_newobj_inst(__mod, __class)        newNormalObj(New_ ## __mod ## _ ## __class)
+// do not use __vsf_pyal_newobj_inst directly, because users MUST find all parents class 
+//  and call init for all these parent classes
+#define __vsf_pyal_newobj_inst(__mod, __class)      newNormalObj(New_ ## __mod ## _ ## __class)
+#define vsf_pyal_newobj_inst(__mod, __class)        not supported
 #define vsf_pyal_instobj_get(__instobj)             arg_getBytes(obj_getArg((__instobj), "_self"))
 #define vsf_pyal_instarg_get(__instarg)             arg_getBytes(__instarg)
 
@@ -292,7 +295,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_class_create(__mod, __class, __exsize, __obj_ptr)              \
     ({                                                                          \
         vsf_pyal_arg_t VSF_MACRO_SAFE_NAME(instarg) = arg_newBytes(NULL, sizeof(__mod ## _ ## __class ## _t) + (__exsize));\
-        vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(selfobj) = vsf_pyal_newobj_inst(__mod, __class);\
+        vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(selfobj) = __vsf_pyal_newobj_inst(__mod, __class);\
         obj_setArg_noCopy(VSF_MACRO_SAFE_NAME(selfobj), "_self", VSF_MACRO_SAFE_NAME(instarg));\
         *(__obj_ptr) = VSF_MACRO_SAFE_NAME(selfobj);                            \
         (__mod ## _ ## __class ## _t *)arg_getBytes(VSF_MACRO_SAFE_NAME(instarg));\
@@ -336,7 +339,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_class_new(__mod, __class, __args_num, __args)                  \
     ({                                                                          \
         vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(tupleobj) = vsf_pyal_newobj_tuple(__args_num, __args);\
-        vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(selfobj) = vsf_pyal_newobj_inst(__mod, __class);\
+        vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(selfobj) = __vsf_pyal_newobj_inst(__mod, __class);\
         __mod ## _ ## __class ## ___init__(VSF_MACRO_SAFE_NAME(selfobj), VSF_MACRO_SAFE_NAME(tupleobj));\
         VSF_MACRO_SAFE_NAME(selfobj);                                           \
     })
