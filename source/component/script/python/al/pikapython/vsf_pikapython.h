@@ -180,6 +180,7 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
 #define vsf_pyal_tupleobj_get_int(__tupleobj, __idx)pikaTuple_getInt((__tupleobj), (__idx))
 #define vsf_pyal_tupleobj_get_str(__tupleobj, __idx)pikaTuple_getStr((__tupleobj), (__idx))
 #define vsf_pyal_tupleobj_get_arg(__tupleobj, __idx)pikaTuple_getArg((__tupleobj), (__idx))
+#define vsf_pyal_tupleobj_get_num(__tupleobj)       pikaTuple_getSize(__tupleobj)
 
 #define vsf_pyal_newarg_tuple(__num, __args)                                    \
     ({                                                                          \
@@ -190,6 +191,7 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
 #define vsf_pyal_tuplearg_get_str(__tuplearg, __idx)    pikaTuple_getStr(arg_getObj(__tuplearg), (__idx))
 #define vsf_pyal_tuplearg_get_float(__tuplearg, __idx)  pikaTuple_getFloat(arg_getObj(__tuplearg), (__idx))
 #define vsf_pyal_tuplearg_get_arg(__tuplearg, __idx)    pikaTuple_getArg(arg_getObj(__tuplearg), (__idx))
+#define vsf_pyal_tuplearg_get_num(__tupleobj)           pikaTuple_getSize(arg_getObj(__tuplearg))
 
 // dict
 

@@ -269,12 +269,20 @@ const mp_obj_file_t mp_sys_stderr_obj = {
 
 #endif
 
-vsf_pyal_arg_t vsf_pyal_tuplearg_get_arg(vsf_pyal_arg_t self_in, int idx)
+vsf_pyal_arg_t vsf_pyal_tupleobj_get_arg(vsf_pyal_obj_t self_in, int idx)
 {
     size_t len;
     vsf_pyal_arg_t *items;
     mp_obj_tuple_get(self_in, &len, &items);
     return idx >= len ? VSF_PYAL_ARG_NULL : items[idx];
+}
+
+int vsf_pyal_tupleobj_get_num(vsf_pyal_obj_t self_in)
+{
+    size_t len;
+    vsf_pyal_arg_t *items;
+    mp_obj_tuple_get(self_in, &len, &items);
+    return len;
 }
 
 size_t vsf_pyal_listobj_get_num(vsf_pyal_obj_t self_in)

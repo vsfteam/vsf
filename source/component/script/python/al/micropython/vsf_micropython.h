@@ -22,6 +22,7 @@
 
 #include "py/runtime.h"
 #include "py/objstr.h"
+#include "py/objtype.h"
 #include "py/mperrno.h"
 #include "py/runtime.h"
 
@@ -122,6 +123,17 @@ typedef mp_obj_t                                    vsf_pyal_arg_t;
 
 typedef mp_obj_t                                    vsf_pyal_obj_t;
 #define VSF_PYAL_OBJ_NULL                           MP_OBJ_NULL
+#define vsf_pyal_obj_is_class(__obj, __mod, __class)mp_obj_is_exact_type((__obj), &mp_type_ ## __mod ## _ ## __class)
+#define vsf_pyal_obj_lookup(__obj, __name)                                      \
+    ({                                                                          \
+        mp_map_elem_t *elem = NULL;                                             \
+        size_t qstr = MP_QSTR_ ## __name;                                       \
+        if (mp_obj_is_instance_type(mp_obj_get_type(__obj))) {                  \
+            mp_obj_instance_t *self = vsf_pyal_instobj_get(__obj);              \
+            elem = mp_map_lookup(&self->members, MP_OBJ_NEW_QSTR(qstr), MP_MAP_LOOKUP);\
+        }                                                                       \
+        elem != NULL ? elem->value : mp_load_attr(__obj, qstr);                 \
+    })
 
 // list
 
@@ -174,13 +186,15 @@ extern const mp_obj_type_t mp_type_textio;
 #define vsf_pyal_newobj_tuple(__num, __args)        mp_obj_new_tuple((__num), (__args))
 #define vsf_pyal_tupleobj_get_int(__tupleobj, __idx)vsf_pyal_intarg_get_int(vsf_pyal_tupleobj_get_arg((__tupleobj), (__idx)))
 #define vsf_pyal_tupleobj_get_str(__tupleobj, __idx)vsf_pyal_strarg_get_str(vsf_pyal_tupleobj_get_arg((__tupleobj), (__idx)))
-#define vsf_pyal_tupleobj_get_arg                   vsf_pyal_tuplearg_get_arg
+extern vsf_pyal_arg_t vsf_pyal_tupleobj_get_arg(vsf_pyal_obj_t self_in, int idx);
+extern int vsf_pyal_tupleobj_get_num(vsf_pyal_obj_t self_in);
 
 #define vsf_pyal_newarg_tuple(__num, __args)        mp_obj_new_tuple((__num), (__args))
+#define vsf_pyal_tuplearg_get_num                   vsf_pyal_tupleobj_get_num
 #define vsf_pyal_tuplearg_get_int(__tuplearg, __idx)    vsf_pyal_intarg_get_int(vsf_pyal_tuplearg_get_arg((__tuplearg), (__idx)))
 #define vsf_pyal_tuplearg_get_str(__tuplearg, __idx)    vsf_pyal_strarg_get_str(vsf_pyal_tuplearg_get_arg((__tuplearg), (__idx)))
 #define vsf_pyal_tuplearg_get_float(__tuplearg, __idx)  vsf_pyal_floatarg_get_float(vsf_pyal_tuplearg_get_arg((__tuplearg), (__idx)))
-extern vsf_pyal_arg_t vsf_pyal_tuplearg_get_arg(vsf_pyal_arg_t self_in, int idx);
+#define vsf_pyal_tuplearg_get_arg                   vsf_pyal_tupleobj_get_arg
 
 // dict
 
@@ -240,6 +254,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_funcarg_var_is_str(__name, __idx)  vsf_pyal_arg_is_str((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_get_str(__name, __idx) vsf_pyal_strarg_get_str((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_is_int(__name, __idx)  vsf_pyal_arg_is_int((__name ## _arr)[__idx])
+#define vsf_pyal_funcarg_var_is_tuple(__name, __idx)vsf_pyal_arg_is_tuple((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_get_int(__name, __idx) vsf_pyal_intarg_get_int((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_get_arg(__name, __idx) ((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_keyword(__name)            size_t __name ## _num, const vsf_pyal_arg_t *__name ## _arr, mp_map_t *__name ## _map
@@ -346,6 +361,8 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_builtinclass_declare(__class)                                  \
     extern const mp_obj_type_t mp_type_ ## __class;
 
+#define vsf_pyal_class_get_self_from_obj(__mod, __class, __obj, __name)         \
+    __mod ## _ ## __class ## _t *__name = vsf_pyal_instobj_get(__obj)
 #define vsf_pyal_class_arg_get_self(__mod, __class, __name)                     \
     __mod ## _ ## __class ## _t *__name = vsf_pyal_instobj_get(selfobj)
 #define vsf_pyal_class_arg_get_self_from(__mod, __class, __name, __instobj)     \
