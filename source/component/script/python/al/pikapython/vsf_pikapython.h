@@ -186,9 +186,10 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
         vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(tupleobj) = vsf_pyal_newobj_tuple((__num), (__args));\
         arg_newObj(VSF_MACRO_SAFE_NAME(tupleobj));                              \
     })
-#define vsf_pyal_tuplearg_get_int(__tuplearg, __idx)pikaTuple_getInt(arg_getObj(__tuplearg), (__idx))
-#define vsf_pyal_tuplearg_get_str(__tuplearg, __idx)pikaTuple_getStr(arg_getObj(__tuplearg), (__idx))
-#define vsf_pyal_tuplearg_get_arg(__tuplearg, __idx)pikaTuple_getArg(arg_getObj(__tuplearg), (__idx))
+#define vsf_pyal_tuplearg_get_int(__tuplearg, __idx)    pikaTuple_getInt(arg_getObj(__tuplearg), (__idx))
+#define vsf_pyal_tuplearg_get_str(__tuplearg, __idx)    pikaTuple_getStr(arg_getObj(__tuplearg), (__idx))
+#define vsf_pyal_tuplearg_get_float(__tuplearg, __idx)  pikaTuple_getFloat(arg_getObj(__tuplearg), (__idx))
+#define vsf_pyal_tuplearg_get_arg(__tuplearg, __idx)    pikaTuple_getArg(arg_getObj(__tuplearg), (__idx))
 
 // dict
 
@@ -236,6 +237,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_funcarg_var_get_arg(__name, __idx) pikaTuple_getArg((__name), (__idx))
 #define vsf_pyal_funcarg_keyword(__name)            vsf_pyal_obj_t __name
 #define vsf_pyal_funcarg_void
+#define vsf_pyal_class_func_var_prepare_arg(__mod, __func, __arg_name)
 
 #define vsf_pyal_func_void_return_t                 void
 #define vsf_pyal_func_void_return()                 return

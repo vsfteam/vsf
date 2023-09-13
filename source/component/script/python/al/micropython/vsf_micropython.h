@@ -177,8 +177,9 @@ extern const mp_obj_type_t mp_type_textio;
 #define vsf_pyal_tupleobj_get_arg                   vsf_pyal_tuplearg_get_arg
 
 #define vsf_pyal_newarg_tuple(__num, __args)        mp_obj_new_tuple((__num), (__args))
-#define vsf_pyal_tuplearg_get_int(__tuplearg, __idx)vsf_pyal_intarg_get_int(vsf_pyal_tuplearg_get_arg((__tuplearg), (__idx)))
-#define vsf_pyal_tuplearg_get_str(__tuplearg, __idx)vsf_pyal_strarg_get_str(vsf_pyal_tuplearg_get_arg((__tuplearg), (__idx)))
+#define vsf_pyal_tuplearg_get_int(__tuplearg, __idx)    vsf_pyal_intarg_get_int(vsf_pyal_tuplearg_get_arg((__tuplearg), (__idx)))
+#define vsf_pyal_tuplearg_get_str(__tuplearg, __idx)    vsf_pyal_strarg_get_str(vsf_pyal_tuplearg_get_arg((__tuplearg), (__idx)))
+#define vsf_pyal_tuplearg_get_float(__tuplearg, __idx)  vsf_pyal_floatarg_get_float(vsf_pyal_tuplearg_get_arg((__tuplearg), (__idx)))
 extern vsf_pyal_arg_t vsf_pyal_tuplearg_get_arg(vsf_pyal_arg_t self_in, int idx);
 
 // dict
@@ -234,17 +235,21 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_funcarg_tuple_get_int(__tuplearg, __idx)   vsf_pyal_tuplearg_get_int((__tuplearg), (__idx))
 #define vsf_pyal_funcarg_tuple_get_str(__tuplearg, __idx)   vsf_pyal_tuplearg_get_str((__tuplearg), (__idx))
 #define vsf_pyal_funcarg_tuple_get_arg(__tuplearg, __idx)   vsf_pyal_tuplearg_get_arg((__tuplearg), (__idx))
-#define vsf_pyal_funcarg_var(__name)                size_t __name ## _num, const mp_obj_t *__name ## _arr
+#define vsf_pyal_funcarg_var(__name)                size_t __name ## _num, const vsf_pyal_arg_t *__name ## _arr
 #define vsf_pyal_funcarg_var_num(__name)            __name ## _num
 #define vsf_pyal_funcarg_var_is_str(__name, __idx)  vsf_pyal_arg_is_str((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_get_str(__name, __idx) vsf_pyal_strarg_get_str((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_is_int(__name, __idx)  vsf_pyal_arg_is_int((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_get_int(__name, __idx) vsf_pyal_intarg_get_int((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_get_arg(__name, __idx) ((__name ## _arr)[__idx])
-#define vsf_pyal_funcarg_keyword(__name)            size_t __name ## _num, const mp_obj_t *__name ## _arr, mp_map_t *__name ## _map
+#define vsf_pyal_funcarg_keyword(__name)            size_t __name ## _num, const vsf_pyal_arg_t *__name ## _arr, mp_map_t *__name ## _map
 #define vsf_pyal_funcarg_void                       void
+#define vsf_pyal_class_func_var_prepare_arg(__mod, __func, __arg_name)          \
+    vsf_pyal_obj_t selfobj = ((__arg_name ## _arr)[0]);                         \
+    __arg_name ## _arr++;                                                       \
+    __arg_name ## _num--
 
-#define vsf_pyal_func_void_return_t                 mp_obj_t
+#define vsf_pyal_func_void_return_t                 vsf_pyal_arg_t
 #define vsf_pyal_func_void_return()                 return mp_const_none
 
 #define vsf_pyal_module_func_var_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
@@ -355,13 +360,13 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     })
 
 #define vsf_pyal_class_new_keyword_func(__mod, __class, __arg_name, ...)        \
-    vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t __arg_name ## _arg_num, size_t n_kw, const mp_obj_t *__arg_name ## _args) {\
+    vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t __arg_name ## _arg_num, size_t n_kw, const vsf_pyal_arg_t *__arg_name ## _args) {\
         enum { VSF_MFOREACH_ARG1(__vsf_pyal_module_func_keyword_enum, __arg_name, __VA_ARGS__) };\
         mp_arg_val_t __arg_name ## _val[VSF_VA_NUM_ARGS(__VA_ARGS__)];          \
         __mod ## _ ## __class ## _t *self;
 
 #define vsf_pyal_class_new_func(__mod, __class, __arg_name)                     \
-    vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t __arg_name ## _arg_num, size_t n_kw, const mp_obj_t *__arg_name ## _args) {\
+    vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t __arg_name ## _arg_num, size_t n_kw, const vsf_pyal_arg_t *__arg_name ## _args) {\
         __mod ## _ ## __class ## _t *self;
 
 #define vsf_pyal_class_new_create(__mod, __class, __exsize)                     \
@@ -506,7 +511,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_class_begin_for_inherit(__mod, __class, __builtinclass)
 #define vsf_pyal_class_declare_for_inherit(__mod, __class, __builtinclass)      \
     extern mp_obj_type_t mp_type_ ## __mod ## _ ## __class;                     \
-    extern vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t arg_num, size_t n_kw, const mp_obj_t *args);\
+    extern vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t arg_num, size_t n_kw, const vsf_pyal_arg_t *args);\
     extern void __mod ## _ ## __class ## _inherit_from_ ## __builtinclass(void)
 #define vsf_pyal_class_end_for_inherit(__mod, __class, __builtinclass, ...)     \
     MP_DEFINE_OBJ_TYPE(                                                         \
@@ -528,7 +533,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 
 #define vsf_pyal_class_declare(__mod, __class)                                  \
     extern const mp_obj_type_t mp_type_ ## __mod ## _ ## __class;               \
-    extern vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t arg_num, size_t n_kw, const mp_obj_t *args)
+    extern vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t arg_num, size_t n_kw, const vsf_pyal_arg_t *args)
 #define vsf_pyal_class_type(__mod, __class)                                     \
     mp_type_ ## __mod ## _ ## __class
 
