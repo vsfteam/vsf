@@ -72,16 +72,14 @@ vsf_pyal_module_func_fix_imp(os, __init_environ, VSF_PYAL_MODULE_FUNCARG_OBJ_1, 
     }
 }
 
-static void print_hash(char * str)
-{
-    size_t hash = qstr_compute_hash((const byte *)str, strlen(str));
-    printf("hash of %s is %d\n", str, (int)hash);
-}
+//static void print_hash(char * str)
+//{
+//    size_t hash = qstr_compute_hash((const byte *)str, strlen(str));
+//    printf("hash of %s is %d\n", str, (int)hash);
+//}
 
 vsf_pyal_module_func_init_imp(os)
 {
-    print_hash("environ_dict");
-    print_hash("__init_environ");
 #if defined(vsf_pyal_class_begin) && defined(vsf_pyal_class_end)
 #   ifdef vsf_pyal_static_dict_t
     vsf_pyal_class_inherit_func_call(os, environ_dict, dict);
@@ -424,17 +422,18 @@ vsf_pyal_module_func_fix_imp(os, system, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal
 
 // os.environ_dict
 
-vsf_pyal_class_func_fix_imp(os_environ_dict, __getattr__, VSF_PYAL_MODULE_FUNCARG_OBJ_2, vsf_pyal_arg_t, vsf_pyal_funcarg_strobj keyobj)
+vsf_pyal_class_func_fix_imp(os_environ_dict, __setitem__, VSF_PYAL_MODULE_FUNCARG_OBJ_3, vsf_pyal_func_void_return_t, vsf_pyal_arg_t keyarg, vsf_pyal_arg_t valuearg)
 {
-    char *key = vsf_pyal_funcarg_strobj_get_str(keyobj);
-    printf("__getattr__: %s\n", key);
-    return VSF_PYAL_ARG_NULL;
+    char *key_str = vsf_pyal_strarg_get_str(keyarg);
+    char *value_str = vsf_pyal_strarg_get_str(valuearg);
+    setenv(key_str, value_str, true);
+    vsf_pyal_func_void_return();
 }
 
-vsf_pyal_class_func_fix_imp(os_environ_dict, __setattr__, VSF_PYAL_MODULE_FUNCARG_OBJ_3, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_strobj keyobj, vsf_pyal_arg_t arg)
+vsf_pyal_class_func_fix_imp(os_environ_dict, __delitem__, VSF_PYAL_MODULE_FUNCARG_OBJ_2, vsf_pyal_func_void_return_t, vsf_pyal_arg_t keyarg)
 {
-    char *key = vsf_pyal_funcarg_strobj_get_str(keyobj);
-    printf("__setattr__: %s\n", key);
+    char *key_str = vsf_pyal_strarg_get_str(keyarg);
+    unsetenv(key_str);
     vsf_pyal_func_void_return();
 }
 
@@ -575,7 +574,7 @@ vsf_pyal_class_subscript_func(os, environ_dict, arg)
     char *key_str = (char *)vsf_pyal_strarg_get_str(indexarg);
 
     if (vsf_pyal_class_subscript_is_delete(arg)) {
-        setenv(key_str, NULL, true);
+        unsetenv(key_str);
     } else if (vsf_pyal_class_subscript_is_store(arg)) {
         char *value_str = (char *)vsf_pyal_strarg_get_str(valuearg);
         setenv(key_str, value_str, true);
