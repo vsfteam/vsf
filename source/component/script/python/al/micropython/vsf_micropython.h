@@ -123,6 +123,11 @@ typedef mp_obj_t                                    vsf_pyal_arg_t;
 
 typedef mp_obj_t                                    vsf_pyal_obj_t;
 #define VSF_PYAL_OBJ_NULL                           MP_OBJ_NULL
+#define vsf_pyal_obj_is_int(__obj)                  mp_obj_is_int(__obj)
+#define vsf_pyal_obj_is_str(__obj)                  mp_obj_is_str(__obj)
+#define vsf_pyal_obj_is_list(__obj)                 (mp_obj_get_type(__obj) == &mp_type_list)
+#define vsf_pyal_obj_is_tuple(__obj)                (mp_obj_get_type(__obj) == &mp_type_tuple)
+#define vsf_pyal_obj_is_callable(__obj)             mp_obj_is_callable(__arg)
 #define vsf_pyal_obj_is_class(__obj, __mod, __class)mp_obj_is_exact_type((__obj), &mp_type_ ## __mod ## _ ## __class)
 #define vsf_pyal_obj_lookup(__obj, __name)                                      \
     ({                                                                          \
