@@ -250,6 +250,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_funcarg_tuple_get_str(__tuplearg, __idx)   vsf_pyal_tuplearg_get_str((__tuplearg), (__idx))
 #define vsf_pyal_funcarg_tuple_get_arg(__tuplearg, __idx)   vsf_pyal_tuplearg_get_arg((__tuplearg), (__idx))
 #define vsf_pyal_funcarg_var(__name)                size_t __name ## _num, const vsf_pyal_arg_t *__name ## _arr
+#define vsf_pyal_funcarg_var_for_call(__name)       __name ## _num, __name ## _arr
 #define vsf_pyal_funcarg_var_num(__name)            __name ## _num
 #define vsf_pyal_funcarg_var_is_str(__name, __idx)  vsf_pyal_arg_is_str((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_var_get_str(__name, __idx) vsf_pyal_strarg_get_str((__name ## _arr)[__idx])
@@ -259,10 +260,13 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_funcarg_var_get_arg(__name, __idx) ((__name ## _arr)[__idx])
 #define vsf_pyal_funcarg_keyword(__name)            size_t __name ## _num, const vsf_pyal_arg_t *__name ## _arr, mp_map_t *__name ## _map
 #define vsf_pyal_funcarg_void                       void
-#define vsf_pyal_class_func_var_prepare_arg(__mod, __func, __arg_name)          \
+#define vsf_pyal_class_func_var_arg_skip_self(__arg_name)                       \
     vsf_pyal_obj_t selfobj = ((__arg_name ## _arr)[0]);                         \
     __arg_name ## _arr++;                                                       \
     __arg_name ## _num--
+#define vsf_pyal_class_func_var_arg_restore_self(__arg_name)                    \
+    __arg_name ## _arr--;                                                       \
+    __arg_name ## _num++
 
 #define vsf_pyal_func_void_return_t                 vsf_pyal_arg_t
 #define vsf_pyal_func_void_return()                 return mp_const_none
@@ -449,6 +453,8 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
         vsf_pyal_arg_t vsf_pyal_class_subscript_idxarg(__arg_name),             \
         vsf_pyal_arg_t vsf_pyal_class_subscript_valuearg(__arg_name))
 
+#define vsf_pyal_class_func_var_private_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
+    __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_var(__arg_name))
 #define vsf_pyal_class_func_var_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
     __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_var(__arg_name));          \
     MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(mp_ ## __mod ## _ ## __func ## _obj, __min_arg, __max_arg, __mod ## _ ## __func);\
@@ -457,6 +463,9 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__);     \
     __func_type(mp_ ## __mod ## _ ## __func ## _obj, __mod ## _ ## __func);     \
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__)
+
+#define vsf_pyal_class_func_call(__mod, __func, ...)                            \
+    __mod ## _ ## __func(__VA_ARGS__)
 
 #define vsf_pyal_class_int(__class, __name, __value){ MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_INT(__value) }
 #define vsf_pyal_class_str(__class, __name, __str)  { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_QSTR(MP_QSTR_ ## __str) }

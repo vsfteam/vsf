@@ -231,6 +231,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_funcarg_tuple_get_str(__tupleobj, __idx)   vsf_pyal_tupleobj_get_str((__tupleobj), (__idx))
 #define vsf_pyal_funcarg_tuple_get_arg(__tupleobj, __idx)   vsf_pyal_tupleobj_get_arg((__tupleobj), (__idx))
 #define vsf_pyal_funcarg_var(__name)                vsf_pyal_obj_t __name
+#define vsf_pyal_funcarg_var_for_call(__name)       __name
 #define vsf_pyal_funcarg_var_num(__name)            pikaTuple_getSize(__name)
 #define vsf_pyal_funcarg_var_is_str(__name, __idx)  (pikaTuple_getType((__name), (__idx)) == ARG_TYPE_STRING)
 #define vsf_pyal_funcarg_var_get_str(__name, __idx) pikaTuple_getStr((__name), (__idx))
@@ -239,7 +240,8 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_funcarg_var_get_arg(__name, __idx) pikaTuple_getArg((__name), (__idx))
 #define vsf_pyal_funcarg_keyword(__name)            vsf_pyal_obj_t __name
 #define vsf_pyal_funcarg_void
-#define vsf_pyal_class_func_var_prepare_arg(__mod, __func, __arg_name)
+#define vsf_pyal_class_func_var_arg_skip_self(__arg_name)
+#define vsf_pyal_class_func_var_arg_restore_self(__arg_name)
 
 #define vsf_pyal_func_void_return_t                 void
 #define vsf_pyal_func_void_return()                 return
@@ -387,10 +389,15 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_class_attr_ret_success(__arg_name)                             \
     return VSF_PYAL_OBJ_NULL
 
+#define vsf_pyal_class_func_var_private_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
+    __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_var(__arg_name))
 #define vsf_pyal_class_func_var_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_var(__arg_name))
 #define vsf_pyal_class_func_fix_imp(__mod, __func, __func_type, __ret_type, ...)\
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__)
+
+#define vsf_pyal_class_func_call(__mod, __func, ...)                            \
+    __mod ## _ ## __func(__VA_ARGS__)
 
 #define vsf_pyal_class_declare(__mod, __class)                                  \
     extern void __mod ## _ ## __class ## ___init__(vsf_pyal_obj_t unused, vsf_pyal_funcarg_var(__arg_name ## _args));\
