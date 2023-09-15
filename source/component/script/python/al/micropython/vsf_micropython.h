@@ -379,7 +379,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 
 #define vsf_pyal_class_create(__mod, __class, __exsize, __obj_ptr)              \
     ({                                                                          \
-        __mod ## _ ## __class ## _t *VSF_MACRO_SAFE_NAME(inst) = (__mod ## _ ## __class ## _t *)m_malloc(sizeof(__mod ## _ ## __class ## _t) + (__exsize));\
+        __mod ## _ ## __class ## _t *VSF_MACRO_SAFE_NAME(inst) = (__mod ## _ ## __class ## _t *)m_malloc_with_finaliser(sizeof(__mod ## _ ## __class ## _t) + (__exsize));\
         VSF_MACRO_SAFE_NAME(inst)->base.type = &mp_type_ ## __mod ## _ ## __class;\
         *(__obj_ptr) = MP_OBJ_FROM_PTR(VSF_MACRO_SAFE_NAME(inst));              \
         VSF_MACRO_SAFE_NAME(inst);                                              \
@@ -397,7 +397,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 
 #define vsf_pyal_class_new_create(__mod, __class, __exsize)                     \
     ({                                                                          \
-        __mod ## _ ## __class ## _t *VSF_MACRO_SAFE_NAME(inst) = (__mod ## _ ## __class ## _t *)m_malloc(sizeof(__mod ## _ ## __class ## _t) + (__exsize));\
+        __mod ## _ ## __class ## _t *VSF_MACRO_SAFE_NAME(inst) = (__mod ## _ ## __class ## _t *)m_malloc_with_finaliser(sizeof(__mod ## _ ## __class ## _t) + (__exsize));\
         VSF_MACRO_SAFE_NAME(inst)->base.type = &mp_type_ ## __mod ## _ ## __class;\
         VSF_MACRO_SAFE_NAME(inst);                                              \
     })
@@ -410,6 +410,15 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_class_new_get_arg(__name, __idx)   ((__name ## _args)[__idx])
 #define vsf_pyal_class_new_func_end()                                           \
         return MP_OBJ_FROM_PTR(self);                                           \
+    }
+
+#define vsf_pyal_class_del_func(__mod, __class)                                 \
+    vsf_pyal_obj_t __mod ## _ ## __class ## ___del__(vsf_pyal_obj_t selfobj);   \
+    VSF_PYAL_MODULE_FUNCARG_OBJ_1(mp_ ## __mod ## _ ## __class ## ___del___obj, __mod ## _ ## __class ## ___del__);\
+    vsf_pyal_obj_t __mod ## _ ## __class ## ___del__(vsf_pyal_obj_t selfobj) {  \
+        __mod ## _ ## __class ## _t *self = (__mod ## _ ## __class ## _t *)vsf_pyal_instobj_get(selfobj);
+#define vsf_pyal_class_del_func_end()                                           \
+        vsf_pyal_func_void_return();                                            \
     }
 
 #define vsf_pyal_class_print_func(__mod, __class)                               \

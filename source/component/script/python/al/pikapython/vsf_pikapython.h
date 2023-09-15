@@ -332,6 +332,13 @@ typedef char *                                      vsf_pyal_dict_key_t;
         return;                                                                 \
     }
 
+#define vsf_pyal_class_del_func(__mod, __class)                                 \
+    void __mod ## _ ## __class ## ___del__(vsf_pyal_obj_t selfobj) {            \
+        __mod ## _ ## __class ## _t *self = (__mod ## _ ## __class ## _t *)vsf_pyal_instobj_get(selfobj);
+#define vsf_pyal_class_del_func_end()                                           \
+        vsf_pyal_func_void_return();                                            \
+    }
+
 #define vsf_pyal_class_print_func(__mod, __class)                               \
     vsf_pyal_funcarg_strobj __mod ## _ ## __class ## ___str__(vsf_pyal_obj_t selfobj)
 #define vsf_pyal_class_print_func_fmt(__mod, __class, __fmt, ...)               \
