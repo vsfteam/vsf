@@ -59,6 +59,7 @@ typedef mp_obj_t                                    vsf_pyal_arg_t;
 #define VSF_PYAL_ARG_NULL                           MP_OBJ_NULL
 
 #define vsf_pyal_arg_is_int(__arg)                  mp_obj_is_int(__arg)
+#define vsf_pyal_arg_is_float(__arg)                mp_obj_is_float(__arg)
 #define vsf_pyal_arg_is_str(__arg)                  mp_obj_is_str(__arg)
 #define vsf_pyal_arg_is_list(__arg)                 (mp_obj_get_type(__arg) == &mp_type_list)
 #define vsf_pyal_arg_is_tuple(__arg)                (mp_obj_get_type(__arg) == &mp_type_tuple)
@@ -118,6 +119,7 @@ typedef mp_obj_t                                    vsf_pyal_arg_t;
 // bool
 
 #define vsf_pyal_newarg_bool(__bool)                ({ (__bool) ? mp_const_true : mp_const_false; })
+#define vsf_pyal_boolarg_get_bool(__boolarg)        mp_obj_is_true(__boolarg)
 
 // object
 

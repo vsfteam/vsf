@@ -45,6 +45,7 @@ typedef Arg *                                       vsf_pyal_arg_t;
 
 #define vsf_pyal_newarg_obj(__obj)                  arg_newObj(__obj)
 #define vsf_pyal_arg_is_int(__arg)                  (arg_getType(__arg) == ARG_TYPE_INT)
+#define vsf_pyal_arg_is_float(__arg)                (arg_getType(__arg) == ARG_TYPE_FLOAT)
 #define vsf_pyal_arg_is_str(__arg)                  (arg_getType(__arg) == ARG_TYPE_STRING)
 #define vsf_pyal_arg_is_list(__arg)                 arg_isList(__arg)
 #define vsf_pyal_arg_is_tuple(__arg)                arg_isTuple(__arg)
@@ -103,6 +104,7 @@ typedef Arg *                                       vsf_pyal_arg_t;
 // bool
 
 #define vsf_pyal_newarg_bool(__bool)                arg_newBool(__bool)
+#define vsf_pyal_boolarg_get_bool(__boolarg)        arg_getBool(__boolarg)
 
 // object
 
