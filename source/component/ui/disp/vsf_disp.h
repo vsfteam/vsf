@@ -82,7 +82,8 @@ extern "C" {
             ((__disp)->param.height * vsf_disp_get_pitch(__disp))
 
 #ifndef vk_disp_coord_t
-#   define vk_disp_coord_t          uint16_t
+// use signed value so that in some coord calculations, value < 0 is acceptable
+#   define vk_disp_coord_t          int16_t
 #endif
 #ifndef vk_disp_fast_coord_t
 #   define vk_disp_fast_coord_t     uint_fast16_t
