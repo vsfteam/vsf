@@ -1064,6 +1064,7 @@ static void __vsf_linux_disp_fresh_task(vsf_eda_t *eda, vsf_evt_t evt)
         if (VSF_ERR_NONE != vsf_eda_trig_wait(&fb_priv->fresh_trigger, vsf_systimer_ms_to_tick(fb_priv->frame_interval_ms))) {
             break;
         }
+        evt = VSF_EVT_SYNC;
         // fall through
     case VSF_EVT_TIMER:
     case VSF_EVT_SYNC:
