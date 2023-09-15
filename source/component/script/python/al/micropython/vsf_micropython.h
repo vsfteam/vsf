@@ -389,11 +389,11 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t __arg_name ## _arg_num, size_t n_kw, const vsf_pyal_arg_t *__arg_name ## _args) {\
         enum { VSF_MFOREACH_ARG1(__vsf_pyal_module_func_keyword_enum, __arg_name, __VA_ARGS__) };\
         mp_arg_val_t __arg_name ## _val[VSF_VA_NUM_ARGS(__VA_ARGS__)];          \
-        __mod ## _ ## __class ## _t *self;
+        __mod ## _ ## __class ## _t *self = NULL;
 
 #define vsf_pyal_class_new_func(__mod, __class, __arg_name)                     \
     vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t __arg_name ## _arg_num, size_t n_kw, const vsf_pyal_arg_t *__arg_name ## _args) {\
-        __mod ## _ ## __class ## _t *self;
+        __mod ## _ ## __class ## _t *self = NULL;
 
 #define vsf_pyal_class_new_create(__mod, __class, __exsize)                     \
     ({                                                                          \
@@ -401,6 +401,8 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
         VSF_MACRO_SAFE_NAME(inst)->base.type = &mp_type_ ## __mod ## _ ## __class;\
         VSF_MACRO_SAFE_NAME(inst);                                              \
     })
+#define vsf_pyal_class_new_del(__mod, __class, __exsize, __ptr)                 \
+        m_free((__ptr), sizeof(__mod ## _ ## __class ## _t) + (__exsize))
 #define vsf_pyal_class_new_fail(__mod, __class, __fmt, ...)                     \
         vsf_pyal_raise((__fmt), ##__VA_ARGS__);                                 \
         return VSF_PYAL_OBJ_NULL;

@@ -309,11 +309,11 @@ typedef char *                                      vsf_pyal_dict_key_t;
 
 #define vsf_pyal_class_new_keyword_func(__mod, __class, __arg_name, ...)        \
     void __mod ## _ ## __class ## ___init__(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_keyword(__arg_name ## _args)) {\
-        __mod ## _ ## __class ## _t *self;
+        __mod ## _ ## __class ## _t *self = NULL;
 
 #define vsf_pyal_class_new_func(__mod, __class, __arg_name)                     \
     void __mod ## _ ## __class ## ___init__(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_var(__arg_name ## _args)) {\
-        __mod ## _ ## __class ## _t *self;
+        __mod ## _ ## __class ## _t *self = NULL;
 
 #define vsf_pyal_class_new_create(__mod, __class, __exsize)                     \
     ({                                                                          \
@@ -321,6 +321,8 @@ typedef char *                                      vsf_pyal_dict_key_t;
         obj_setArg_noCopy(selfobj, "_self", VSF_MACRO_SAFE_NAME(instarg));      \
         (__mod ## _ ## __class ## _t *)arg_getBytes(VSF_MACRO_SAFE_NAME(instarg));\
     })
+#define vsf_pyal_class_new_del(__mod, __class, __exsize, __ptr)                 \
+        obj_removeArg(selfobj, "_self")
 #define vsf_pyal_class_new_fail(__mod, __class, __fmt, ...)                     \
         vsf_pyal_raise((__fmt), ##__VA_ARGS__);                                 \
         return;

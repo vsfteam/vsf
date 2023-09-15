@@ -70,6 +70,7 @@ vsf_pyal_module_func_fix_imp(os, __init_environ, VSF_PYAL_MODULE_FUNCARG_OBJ_1, 
 
         __env++;
     }
+    vsf_pyal_func_void_return();
 }
 
 //static void print_hash(char * str)
