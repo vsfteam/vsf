@@ -217,18 +217,19 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_module_add_int(__mod, __name, __value)                         \
                                                     obj_setInt(selfobj, (__name), (__value))
 
-#define vsf_pyal_funcarg_strobj                     char *
-#define vsf_pyal_funcarg_strobj_get_str(__arg)      (__arg)
+#define vsf_pyal_funcarg_str_t                      char *
+#define vsf_pyal_funcarg_get_str(__arg)             (__arg)
 #define vsf_pyal_funcarg_newstr(__str)              obj_cacheStr(selfobj, (__str))
 
-#define vsf_pyal_funcarg_intobj                     int
-#define vsf_pyal_funcarg_intobj_get_int(__arg)      (__arg)
+#define vsf_pyal_funcarg_int_t                      int
+#define vsf_pyal_funcarg_get_int(__arg)             (__arg)
 #define vsf_pyal_funcarg_newint(__value)            (__value)
-#define vsf_pyal_funcarg_boolobj                    bool
+#define vsf_pyal_funcarg_bool_t                     bool
+#define vsf_pyal_funcarg_get_bool(__arg)            (__arg)
 #define vsf_pyal_funcarg_newbool(__bool)            (__bool)
 #define vsf_pyal_funcarg_bytesobj                   uint8_t *
-#define vsf_pyal_funcarg_callable                   vsf_pyal_arg_t
-#define vsf_pyal_funcarg_tuple                      vsf_pyal_obj_t
+#define vsf_pyal_funcarg_callable_t                 vsf_pyal_arg_t
+#define vsf_pyal_funcarg_tuple_t                    vsf_pyal_obj_t
 #define vsf_pyal_funcarg_tuple_get_int(__tupleobj, __idx)   vsf_pyal_tupleobj_get_int((__tupleobj), (__idx))
 #define vsf_pyal_funcarg_tuple_get_str(__tupleobj, __idx)   vsf_pyal_tupleobj_get_str((__tupleobj), (__idx))
 #define vsf_pyal_funcarg_tuple_get_arg(__tupleobj, __idx)   vsf_pyal_tupleobj_get_arg((__tupleobj), (__idx))

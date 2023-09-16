@@ -138,7 +138,7 @@ vsf_pyal_module_func_var_imp(os, listdir, vsf_pyal_obj_t, 0, 1, arg)
     return list;
 }
 
-vsf_pyal_module_func_fix_imp(os, getcwd, VSF_PYAL_MODULE_FUNCARG_OBJ_0, vsf_pyal_funcarg_strobj)
+vsf_pyal_module_func_fix_imp(os, getcwd, VSF_PYAL_MODULE_FUNCARG_OBJ_0, vsf_pyal_funcarg_str_t)
 {
     char path[PATH_MAX];
     if (NULL == getcwd(path, sizeof(path))) {
@@ -146,7 +146,7 @@ vsf_pyal_module_func_fix_imp(os, getcwd, VSF_PYAL_MODULE_FUNCARG_OBJ_0, vsf_pyal
         return VSF_PYAL_OBJ_NULL;
     }
 
-    return vsf_pyal_newarg_str_ret(path);
+    return vsf_pyal_funcarg_newstr(path);
 }
 
 vsf_pyal_module_func_var_imp(os, mkdir, vsf_pyal_func_void_return_t, 1, 2, arg)
@@ -185,37 +185,37 @@ vsf_pyal_module_func_var_imp(os, makedirs, vsf_pyal_func_void_return_t, 1, 2, ar
     vsf_pyal_func_void_return();
 }
 
-vsf_pyal_module_func_fix_imp(os, rmdir, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_strobj path)
+vsf_pyal_module_func_fix_imp(os, rmdir, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_strobj_get_str(path);
+    char *path_str = vsf_pyal_funcarg_get_str(path);
     if (rmdir((const char *)path_str) < 0) {
         vsf_pyal_raise("fail to rmdir(%s)\n", path_str);
     }
     vsf_pyal_func_void_return();
 }
 
-vsf_pyal_module_func_fix_imp(os, chdir, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_strobj path)
+vsf_pyal_module_func_fix_imp(os, chdir, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_strobj_get_str(path);
+    char *path_str = vsf_pyal_funcarg_get_str(path);
     if (chdir((const char *)path_str) < 0) {
         vsf_pyal_raise("fail to chdir(%s)\n", path_str);
     }
     vsf_pyal_func_void_return();
 }
 
-vsf_pyal_module_func_fix_imp(os, rename, VSF_PYAL_MODULE_FUNCARG_OBJ_2, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_strobj old, vsf_pyal_funcarg_strobj new)
+vsf_pyal_module_func_fix_imp(os, rename, VSF_PYAL_MODULE_FUNCARG_OBJ_2, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_str_t old, vsf_pyal_funcarg_str_t new)
 {
-    char *path_old_str = vsf_pyal_funcarg_strobj_get_str(old);
-    char *path_new_str = vsf_pyal_funcarg_strobj_get_str(new);
+    char *path_old_str = vsf_pyal_funcarg_get_str(old);
+    char *path_new_str = vsf_pyal_funcarg_get_str(new);
     if (rename((const char *)path_old_str, (const char *)path_new_str) < 0) {
         vsf_pyal_raise("fail to rename(%s, %s)\n", path_old_str, path_new_str);
     }
     vsf_pyal_func_void_return();
 }
 
-vsf_pyal_module_func_fix_imp(os, remove, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_strobj path)
+vsf_pyal_module_func_fix_imp(os, remove, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_strobj_get_str(path);
+    char *path_str = vsf_pyal_funcarg_get_str(path);
     if (remove((const char *)path_str) < 0) {
         vsf_pyal_raise("fail to remove(%s)\n", path_str);
     }
@@ -272,7 +272,7 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_arg_t, 1, 3, arg)
     }
 }
 
-vsf_pyal_module_func_var_imp(os, read, vsf_pyal_funcarg_bytesobj, 2, 2, arg)
+vsf_pyal_module_func_var_imp(os, read, vsf_pyal_funcarg_bytes_t, 2, 2, arg)
 {
 #if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
     int argc = vsf_pyal_funcarg_var_num(arg);
@@ -323,7 +323,7 @@ vsf_pyal_module_func_var_imp(os, read, vsf_pyal_funcarg_bytesobj, 2, 2, arg)
 #endif
 }
 
-vsf_pyal_module_func_var_imp(os, write, vsf_pyal_funcarg_intobj, 2, 2, arg)
+vsf_pyal_module_func_var_imp(os, write, vsf_pyal_funcarg_int_t, 2, 2, arg)
 {
 #if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
     int argc = vsf_pyal_funcarg_var_num(arg);
@@ -352,7 +352,7 @@ vsf_pyal_module_func_var_imp(os, write, vsf_pyal_funcarg_intobj, 2, 2, arg)
     return vsf_pyal_funcarg_newint(length);
 }
 
-vsf_pyal_module_func_var_imp(os, ioctl, vsf_pyal_funcarg_intobj, 2, 2, arg)
+vsf_pyal_module_func_var_imp(os, ioctl, vsf_pyal_funcarg_int_t, 2, 2, arg)
 {
     int argc = vsf_pyal_funcarg_var_num(arg);
 #if VSF_PYAL_FEATURE_FUNCARG_NUM_CHECK
@@ -410,9 +410,9 @@ vsf_pyal_module_func_var_imp(os, close, vsf_pyal_func_void_return_t, 1, 1, arg)
     vsf_pyal_func_void_return();
 }
 
-vsf_pyal_module_func_fix_imp(os, system, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_strobj cmd)
+vsf_pyal_module_func_fix_imp(os, system, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_str_t cmd)
 {
-    char *cmd_str = vsf_pyal_funcarg_strobj_get_str(cmd);
+    char *cmd_str = vsf_pyal_funcarg_get_str(cmd);
     int result = system((const char *)cmd_str);
     if (result < 0) {
         vsf_pyal_raise("fail to call system(%s)\n", cmd_str);
@@ -440,9 +440,9 @@ vsf_pyal_class_func_fix_imp(os_environ_dict, __delitem__, VSF_PYAL_MODULE_FUNCAR
 
 // os.path
 
-vsf_pyal_module_func_fix_imp(os_path, abspath, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_strobj, vsf_pyal_funcarg_strobj path)
+vsf_pyal_module_func_fix_imp(os_path, abspath, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_str_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_strobj_get_str(path);
+    char *path_str = vsf_pyal_funcarg_get_str(path);
     char abspath_buffer[PATH_MAX];
     
     if (NULL == realpath((const char *)path_str, (char *)abspath_buffer)) {
@@ -452,34 +452,34 @@ vsf_pyal_module_func_fix_imp(os_path, abspath, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vs
     return vsf_pyal_funcarg_newstr(abspath_buffer);
 }
 
-vsf_pyal_module_func_fix_imp(os_path, exists, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_boolobj, vsf_pyal_funcarg_strobj path)
+vsf_pyal_module_func_fix_imp(os_path, exists, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_bool_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_strobj_get_str(path);
+    char *path_str = vsf_pyal_funcarg_get_str(path);
     struct stat st;
     return vsf_pyal_funcarg_newbool(stat(path_str, &st) == 0);
 }
 
-vsf_pyal_module_func_fix_imp(os_path, isabs, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_boolobj, vsf_pyal_funcarg_strobj path)
+vsf_pyal_module_func_fix_imp(os_path, isabs, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_bool_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_strobj_get_str(path);
+    char *path_str = vsf_pyal_funcarg_get_str(path);
     return vsf_pyal_funcarg_newbool(path_str[0] == '/');
 }
 
-vsf_pyal_module_func_fix_imp(os_path, isdir, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_boolobj, vsf_pyal_funcarg_strobj path)
+vsf_pyal_module_func_fix_imp(os_path, isdir, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_bool_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_strobj_get_str(path);
+    char *path_str = vsf_pyal_funcarg_get_str(path);
     struct stat st;
     return vsf_pyal_funcarg_newbool((stat(path_str, &st) == 0) && S_ISDIR(st.st_mode));
 }
 
-vsf_pyal_module_func_fix_imp(os_path, isfile, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_boolobj, vsf_pyal_funcarg_strobj path)
+vsf_pyal_module_func_fix_imp(os_path, isfile, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_bool_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_strobj_get_str(path);
+    char *path_str = vsf_pyal_funcarg_get_str(path);
     struct stat st;
     return vsf_pyal_funcarg_newbool((stat(path_str, &st) == 0) && S_ISREG(st.st_mode));
 }
 
-vsf_pyal_module_func_var_imp(os_path, join, vsf_pyal_funcarg_strobj, 0, 255, arg)
+vsf_pyal_module_func_var_imp(os_path, join, vsf_pyal_funcarg_str_t, 0, 255, arg)
 {
     char path_str[PATH_MAX], *path_ptr = path_str, *path_cur;
     int argc = vsf_pyal_funcarg_var_num(arg);
@@ -495,9 +495,9 @@ vsf_pyal_module_func_var_imp(os_path, join, vsf_pyal_funcarg_strobj, 0, 255, arg
     return vsf_pyal_funcarg_newstr(path_str);
 }
 
-vsf_pyal_module_func_fix_imp(os_path, basename, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_boolobj, vsf_pyal_funcarg_strobj path)
+vsf_pyal_module_func_fix_imp(os_path, basename, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_str_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_strobj_get_str(path);
+    char *path_str = vsf_pyal_funcarg_get_str(path);
     char *basename_str = strrchr(path_str, '/');
     if (NULL == basename_str) {
         return vsf_pyal_funcarg_newstr(path_str);
@@ -506,9 +506,9 @@ vsf_pyal_module_func_fix_imp(os_path, basename, VSF_PYAL_MODULE_FUNCARG_OBJ_1, v
     }
 }
 
-vsf_pyal_module_func_fix_imp(os_path, dirname, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_strobj, vsf_pyal_funcarg_strobj path)
+vsf_pyal_module_func_fix_imp(os_path, dirname, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_str_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_strobj_get_str(path);
+    char *path_str = vsf_pyal_funcarg_get_str(path);
     char *basename_str = strrchr(path_str, '/');
     if (NULL == basename_str) {
         return vsf_pyal_funcarg_newstr("");
@@ -521,10 +521,10 @@ vsf_pyal_module_func_fix_imp(os_path, dirname, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vs
     }
 }
 
-vsf_pyal_module_func_fix_imp(os_path, __split_by_char, VSF_PYAL_MODULE_FUNCARG_OBJ_2, vsf_pyal_obj_t, vsf_pyal_funcarg_strobj path, vsf_pyal_funcarg_intobj ch)
+vsf_pyal_module_func_fix_imp(os_path, __split_by_char, VSF_PYAL_MODULE_FUNCARG_OBJ_2, vsf_pyal_obj_t, vsf_pyal_funcarg_str_t path, vsf_pyal_funcarg_int_t ch)
 {
-    char *path_str = vsf_pyal_funcarg_strobj_get_str(path);
-    int ch_int = vsf_pyal_funcarg_intobj_get_int(ch);
+    char *path_str = vsf_pyal_funcarg_get_str(path);
+    int ch_int = vsf_pyal_funcarg_get_int(ch);
     char *basename_str = strrchr(path_str, ch_int);
     vsf_pyal_arg_t args[2];
 
@@ -544,12 +544,12 @@ vsf_pyal_module_func_fix_imp(os_path, __split_by_char, VSF_PYAL_MODULE_FUNCARG_O
     }
 }
 
-vsf_pyal_module_func_fix_imp(os_path, split, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_obj_t, vsf_pyal_funcarg_strobj path)
+vsf_pyal_module_func_fix_imp(os_path, split, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_obj_t, vsf_pyal_funcarg_str_t path)
 {
     return vsf_pyal_module_func_call(vsf_pyal_module_func_name(os_path, __split_by_char), path, vsf_pyal_funcarg_newint('/'));
 }
 
-vsf_pyal_module_func_fix_imp(os_path, splitext, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_obj_t, vsf_pyal_funcarg_strobj path)
+vsf_pyal_module_func_fix_imp(os_path, splitext, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_obj_t, vsf_pyal_funcarg_str_t path)
 {
     return vsf_pyal_module_func_call(vsf_pyal_module_func_name(os_path, __split_by_char), path, vsf_pyal_funcarg_newint('.'));
 }

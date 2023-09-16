@@ -242,17 +242,18 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #   define vsf_pyal_module_add_obj(__mod, __name, __obj)
 #endif
 
-#define vsf_pyal_funcarg_strobj                     vsf_pyal_arg_t
-#define vsf_pyal_funcarg_strobj_get_str(__arg)      vsf_pyal_strarg_get_str(__arg)
+#define vsf_pyal_funcarg_str_t                      vsf_pyal_arg_t
+#define vsf_pyal_funcarg_get_str(__arg)             vsf_pyal_strarg_get_str(__arg)
 #define vsf_pyal_funcarg_newstr(__str)              vsf_pyal_newarg_str(__str)
-#define vsf_pyal_funcarg_intobj                     vsf_pyal_arg_t
-#define vsf_pyal_funcarg_intobj_get_int(__arg)      vsf_pyal_intarg_get_int(__arg)
+#define vsf_pyal_funcarg_int_t                      vsf_pyal_arg_t
+#define vsf_pyal_funcarg_get_int(__arg)             vsf_pyal_intarg_get_int(__arg)
 #define vsf_pyal_funcarg_newint(__value)            vsf_pyal_newarg_int(__value)
-#define vsf_pyal_funcarg_boolobj                    vsf_pyal_arg_t
+#define vsf_pyal_funcarg_bool_t                     vsf_pyal_arg_t
+#define vsf_pyal_funcarg_get_bool(__arg)            vsf_pyal_boolarg_get_bool(__arg)
 #define vsf_pyal_funcarg_newbool(__bool)            vsf_pyal_newarg_bool(__bool)
-#define vsf_pyal_funcarg_bytesobj                   vsf_pyal_arg_t
+#define vsf_pyal_funcarg_bytes_t                    vsf_pyal_arg_t
 #define vsf_pyal_funcarg_callable                   vsf_pyal_arg_t
-#define vsf_pyal_funcarg_tuple                      vsf_pyal_arg_t
+#define vsf_pyal_funcarg_tuple_t                    vsf_pyal_arg_t
 #define vsf_pyal_funcarg_tuple_get_int(__tuplearg, __idx)   vsf_pyal_tuplearg_get_int((__tuplearg), (__idx))
 #define vsf_pyal_funcarg_tuple_get_str(__tuplearg, __idx)   vsf_pyal_tuplearg_get_str((__tuplearg), (__idx))
 #define vsf_pyal_funcarg_tuple_get_arg(__tuplearg, __idx)   vsf_pyal_tuplearg_get_arg((__tuplearg), (__idx))
