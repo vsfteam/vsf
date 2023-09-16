@@ -355,7 +355,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_module_inst(__mod, __name, __inst) { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&__inst) }
 #define vsf_pyal_module_dict(__mod, __name, __dict) { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&__dict) }
 #define vsf_pyal_module_class(__mod, __name)        { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&mp_type_ ## __mod ## _ ## __name) }
-#define vsf_pyal_module_submod(__mod, __name)       { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&(mp_module_ ## __name)) }
+#define vsf_pyal_module_submod(__mod, __name)       { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_PTR(&(mp_module_ ## __mod ## _ ## __name)) }
 #define vsf_pyal_module(__name, ...)                                            \
     STATIC const mp_rom_map_elem_t __name ## _module_globals_table[] = {        \
         { MP_ROM_QSTR(MP_QSTR_ ## __name__), MP_ROM_QSTR(MP_QSTR_ ## __name) }, \
@@ -365,6 +365,16 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     const mp_obj_module_t mp_module_ ## __name = {                              \
         .base = { &mp_type_module },                                            \
         .globals = (mp_obj_dict_t *)&(__name ## _module_globals),               \
+    };
+#define vsf_pyal_submodule(__mod, __name, ...)                                  \
+    STATIC const mp_rom_map_elem_t __mod ## _ ## __name ## _module_globals_table[] = {\
+        { MP_ROM_QSTR(MP_QSTR_ ## __name__), MP_ROM_QSTR(MP_QSTR_ ## __name) }, \
+        __VA_ARGS__                                                             \
+    };                                                                          \
+    STATIC MP_DEFINE_CONST_DICT(__mod ## _ ## __name ## _module_globals, __mod ## _ ## __name ## _module_globals_table);\
+    const mp_obj_module_t mp_module_ ## __mod ## _ ## __name = {                \
+        .base = { &mp_type_module },                                            \
+        .globals = (mp_obj_dict_t *)&(__mod ## _ ## __name ## _module_globals), \
     };
 
 // class

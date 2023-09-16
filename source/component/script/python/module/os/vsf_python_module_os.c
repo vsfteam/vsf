@@ -605,7 +605,7 @@ vsf_pyal_class_end_for_inherit(os, environ_dict, dict,
 #       endif
 #   endif
 
-vsf_pyal_module(path,
+vsf_pyal_submodule(os, path,
     vsf_pyal_module_func(os_path, abspath),
     vsf_pyal_module_func(os_path, exists),
     vsf_pyal_module_func(os_path, isabs),
