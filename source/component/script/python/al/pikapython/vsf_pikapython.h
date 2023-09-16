@@ -227,6 +227,9 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_funcarg_bool_t                     bool
 #define vsf_pyal_funcarg_get_bool(__arg)            (__arg)
 #define vsf_pyal_funcarg_newbool(__bool)            (__bool)
+#define vsf_pyal_funcarg_float_t                    float
+#define vsf_pyal_funcarg_get_float(__arg)           (__arg)
+#define vsf_pyal_funcarg_newfloat(__value)          (__value)
 #define vsf_pyal_funcarg_bytesobj                   uint8_t *
 #define vsf_pyal_funcarg_callable_t                 vsf_pyal_arg_t
 #define vsf_pyal_funcarg_tuple_t                    vsf_pyal_obj_t

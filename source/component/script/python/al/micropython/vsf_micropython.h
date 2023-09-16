@@ -251,6 +251,9 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_funcarg_bool_t                     vsf_pyal_arg_t
 #define vsf_pyal_funcarg_get_bool(__arg)            vsf_pyal_boolarg_get_bool(__arg)
 #define vsf_pyal_funcarg_newbool(__bool)            vsf_pyal_newarg_bool(__bool)
+#define vsf_pyal_funcarg_float_t                    vsf_pyal_arg_t
+#define vsf_pyal_funcarg_get_float(__arg)           vsf_pyal_floatarg_get_float(__arg)
+#define vsf_pyal_funcarg_newfloat(__value)          vsf_pyal_newarg_float(__value)
 #define vsf_pyal_funcarg_bytes_t                    vsf_pyal_arg_t
 #define vsf_pyal_funcarg_callable                   vsf_pyal_arg_t
 #define vsf_pyal_funcarg_tuple_t                    vsf_pyal_arg_t
