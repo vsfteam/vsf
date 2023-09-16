@@ -289,7 +289,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 
 #define __vsf_pyal_module_func_keyword_enum(__arg_name, __key_name)             \
     ARG_ ## __key_name,
-#define vsf_pyal_module_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name, ...)\
+#define vsf_pyal_module_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
     __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_keyword(__arg_name));      \
     MP_DEFINE_CONST_FUN_OBJ_KW(mp_ ## __mod ## _ ## __func ## _obj, __min_arg, __mod ## _ ## __func);\
     __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_keyword(__arg_name)) {     \
@@ -495,6 +495,13 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__);     \
     __func_type(mp_ ## __mod ## _ ## __func ## _obj, __mod ## _ ## __func);     \
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__)
+#define vsf_pyal_class_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
+    __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_keyword(__arg_name));      \
+    MP_DEFINE_CONST_FUN_OBJ_KW(mp_ ## __mod ## _ ## __func ## _obj, __min_arg, __mod ## _ ## __func);\
+    __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_keyword(__arg_name)) {     \
+        enum { VSF_MFOREACH_ARG1(__vsf_pyal_module_func_keyword_enum, __arg_name, __VA_ARGS__) };\
+        mp_arg_val_t __arg_name ## _val[VSF_VA_NUM_ARGS(__VA_ARGS__)];
+#define vsf_pyal_class_func_keyword_imp_end()       }
 
 #define vsf_pyal_class_func_call(__mod, __func, ...)                            \
     __mod ## _ ## __func(__VA_ARGS__)

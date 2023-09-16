@@ -261,7 +261,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_module_func_fix_imp(__mod, __func, __func_type, __ret_type, ...)\
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__)
 
-#define vsf_pyal_module_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name, ...)\
+#define vsf_pyal_module_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_keyword(__arg_name)) {
 #define vsf_pyal_module_func_keyword_get_int(__arg_name, __key_name)            \
     pikaDict_getInt(__arg_name, #__key_name)
@@ -410,6 +410,9 @@ typedef char *                                      vsf_pyal_dict_key_t;
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_var(__arg_name))
 #define vsf_pyal_class_func_fix_imp(__mod, __func, __func_type, __ret_type, ...)\
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__)
+#define vsf_pyal_class_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
+    __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_keyword(__arg_name)) {
+#define vsf_pyal_class_func_keyword_imp_end()       }
 
 #define vsf_pyal_class_func_call(__mod, __func, ...)                            \
     __mod ## _ ## __func(__VA_ARGS__)
