@@ -50,8 +50,12 @@ typedef Arg *                                       vsf_pyal_arg_t;
 #define vsf_pyal_arg_is_list(__arg)                 arg_isList(__arg)
 #define vsf_pyal_arg_is_tuple(__arg)                arg_isTuple(__arg)
 #define vsf_pyal_arg_is_callable(__arg)             arg_isCallable(__arg)
+#define vsf_pyal_arg_is_iterable(__arg)             arg_isIterable(__arg)
 #define vsf_pyal_arg_get_obj(__arg)                 arg_getObj(__arg)
 #define vsf_pyal_arg_free(__arg)                    arg_deinit(__arg)
+
+// TODO:
+#define vsf_pyal_arg_iter(__arg, ...)
 
 // int
 
@@ -169,6 +173,12 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
         obj_setPtr(VSF_MACRO_SAFE_NAME(fileobj), "_f", NULL);                   \
     })
 
+#define vsf_pyal_arg_is_file(__arg)                                             \
+    ({                                                                          \
+        vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(fileobj) = arg_getObj(__filearg);    \
+        VSF_MACRO_SAFE_NAME(fileobj)->constructor == New_PikaStdData_FILEIO;    \
+    })
+
 // tuple
 
 #define vsf_pyal_newobj_tuple(__num, __args)                                    \
@@ -243,6 +253,8 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_funcarg_var_get_str(__name, __idx) pikaTuple_getStr((__name), (__idx))
 #define vsf_pyal_funcarg_var_is_int(__name, __idx)  (pikaTuple_getType((__name), (__idx)) == ARG_TYPE_INT)
 #define vsf_pyal_funcarg_var_get_int(__name, __idx) pikaTuple_getInt((__name), (__idx))
+#define vsf_pyal_funcarg_var_get_bool(__name, __idx)pikaTuple_getBool((__name), (__idx))
+#define vsf_pyal_funcarg_var_is_tuple(__name, __idx)(pikaTuple_getType((__name), (__idx)) == ARG_TYPE_TUPLE)
 #define vsf_pyal_funcarg_var_get_arg(__name, __idx) pikaTuple_getArg((__name), (__idx))
 #define vsf_pyal_funcarg_keyword(__name)            vsf_pyal_obj_t __name
 #define vsf_pyal_funcarg_void
@@ -261,7 +273,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_module_func_fix_imp(__mod, __func, __func_type, __ret_type, ...)\
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__)
 
-#define vsf_pyal_module_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
+#define vsf_pyal_module_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name, ...)\
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_keyword(__arg_name)) {
 #define vsf_pyal_module_func_keyword_get_int(__arg_name, __key_name)            \
     pikaDict_getInt(__arg_name, #__key_name)
@@ -335,6 +347,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_class_new_arg_num(__name)          vsf_pyal_funcarg_var_num(__name ## _args)
 #define vsf_pyal_class_new_is_int(__name, __idx)    vsf_pyal_funcarg_var_is_int(__name ## _args, __idx)
 #define vsf_pyal_class_new_get_int(__name, __idx)   vsf_pyal_funcarg_var_get_int(__name ## _args, __idx)
+#define vsf_pyal_class_new_get_str(__name, __idx)   vsf_pyal_funcarg_var_get_str(__name ## _args, __idx)
 #define vsf_pyal_class_new_get_arg(__name, __idx)   vsf_pyal_funcarg_var_get_arg(__name ## _args, __idx)
 #define vsf_pyal_class_new_func_end()                                           \
         return;                                                                 \
@@ -410,7 +423,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_var(__arg_name))
 #define vsf_pyal_class_func_fix_imp(__mod, __func, __func_type, __ret_type, ...)\
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__)
-#define vsf_pyal_class_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
+#define vsf_pyal_class_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name, ...)\
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_keyword(__arg_name)) {
 #define vsf_pyal_class_func_keyword_imp_end()       }
 
