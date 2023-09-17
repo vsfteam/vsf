@@ -31,16 +31,22 @@
 #if __IS_COMPILER_IAR__ || __IS_COMILER_GCC__
 char * strcasestr(const char *str, const char *substr)
 {
-    do {
-        for (int i = 0; ; i++) {
-            if (!substr[i]) {
-                return (char *)str;
-            } else if (tolower(substr[i]) != tolower(str[i])) {
-                break;
-            }
-        }
-    } while (*str++);
-    return NULL;
+    char c, sc;
+    size_t len;
+
+    if ((c = *substr++) != 0) {
+        c = (char)tolower((unsigned char)c);
+        len = strlen(substr);
+        do {
+            do {
+                if ((sc = *str++) == 0) {
+                    return NULL;
+                }
+            } while ((char)tolower((unsigned char)sc) != c);
+        } while (strncasecmp(str, substr, len) != 0);
+        str--;
+    }
+    return ((char *)str);
 }
 #endif
 
