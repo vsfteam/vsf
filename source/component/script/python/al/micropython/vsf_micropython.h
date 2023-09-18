@@ -173,6 +173,8 @@ extern vsf_pyal_arg_t vsf_pyal_listobj_get_arg(vsf_pyal_obj_t self_in, int idx);
 #define vsf_pyal_inst_base_def()                    mp_obj_base_t base;
 #define vsf_pyal_instobj_get(__instobj)             MP_OBJ_TO_PTR(__instobj)
 #define vsf_pyal_instarg_get(__instarg)             MP_OBJ_TO_PTR(__instarg)
+#define vsf_pyal_inst_to_obj(__inst)                MP_OBJ_FROM_PTR(__inst)
+#define vsf_pyal_inst_to_arg(__inst)                MP_OBJ_FROM_PTR(__inst)
 
 // file
 
@@ -190,7 +192,7 @@ extern const mp_obj_type_t mp_type_textio;
         mp_obj_file_t *VSF_MACRO_SAFE_NAME(fileobj) = m_new_obj_with_finaliser(mp_obj_file_t);\
         VSF_MACRO_SAFE_NAME(fileobj)->base.type = (__is_text) ? &mp_type_textio : & mp_type_fileio;\
         VSF_MACRO_SAFE_NAME(fileobj)->f = (__file);                             \
-        MP_OBJ_FROM_PTR(VSF_MACRO_SAFE_NAME(fileobj));                          \
+        vsf_pyal_inst_to_obj(VSF_MACRO_SAFE_NAME(fileobj));                     \
     })
 #define vsf_pyal_fileobj_get_file(__fileobj)        ((mp_obj_file_t *)(__fileobj))->f
 #define vsf_pyal_fileobj_clear(__fileobj)           ((mp_obj_file_t *)(__fileobj))->f = NULL
@@ -413,7 +415,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     ({                                                                          \
         __mod ## _ ## __class ## _t *VSF_MACRO_SAFE_NAME(inst) = (__mod ## _ ## __class ## _t *)m_malloc_with_finaliser(sizeof(__mod ## _ ## __class ## _t) + (__exsize));\
         VSF_MACRO_SAFE_NAME(inst)->base.type = &mp_type_ ## __mod ## _ ## __class;\
-        *(__obj_ptr) = MP_OBJ_FROM_PTR(VSF_MACRO_SAFE_NAME(inst));              \
+        *(__obj_ptr) = vsf_pyal_inst_to_obj(VSF_MACRO_SAFE_NAME(inst));         \
         VSF_MACRO_SAFE_NAME(inst);                                              \
     })
 
@@ -448,7 +450,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_class_new_get_str(__name, __idx)   vsf_pyal_strarg_get_str((__name ## _args)[__idx])
 #define vsf_pyal_class_new_get_arg(__name, __idx)   ((__name ## _args)[__idx])
 #define vsf_pyal_class_new_func_end()                                           \
-        return MP_OBJ_FROM_PTR(self);                                           \
+        return vsf_pyal_inst_to_obj(self);                                      \
     }
 
 #define vsf_pyal_class_del_func(__mod, __class)                                 \
@@ -468,6 +470,11 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
         vsf_pyal_class_arg_get_self(__mod, __class, self);                      \
         mp_printf(VSF_MACRO_SAFE_NAME(print), (__fmt), ##__VA_ARGS__);          \
     }
+#define vsf_pyal_class_print_declare(__mod, __class)                            \
+    void __mod ## _ ## __class ## _print(const mp_print_t *VSF_MACRO_SAFE_NAME(print), vsf_pyal_obj_t selfobj, mp_print_kind_t VSF_MACRO_SAFE_NAME(kind))
+// vsf_pyal_class_print_call can only be used in vsf_pyal_class_print_func
+#define vsf_pyal_class_print_call(__mod, __class)                               \
+    __mod ## _ ## __class ## _print(print, selfobj, kind)
 
 #define vsf_pyal_class_iterator_func(__mod, __class)                            \
     vsf_pyal_obj_t __mod ## _ ## __class ## _iter(vsf_pyal_obj_t selfobj, mp_obj_iter_buf_t *iter_buf)
