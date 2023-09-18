@@ -155,6 +155,7 @@ typedef mp_obj_t                                    vsf_pyal_obj_t;
 
 // list
 
+#define vsf_pyal_newarg_list(__num, __args_ptr)     mp_obj_new_list((__num), (__args_ptr))
 #define vsf_pyal_newobj_list(__num, __args_ptr)     mp_obj_new_list((__num), (__args_ptr))
 #define vsf_pyal_listobj_append(__listobj, __arg, __free_arg)                   \
                                                     mp_obj_list_append((__listobj), (__arg))
@@ -485,7 +486,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     vsf_pyal_obj_t __mod ## _ ## __class ## _binary_op(mp_binary_op_t op, vsf_pyal_obj_t selfobj, vsf_pyal_obj_t valueobj)
 
 #define vsf_pyal_class_attr_func(__mod, __class, __arg_name)                    \
-    void __mod ## _ ## __class ## _attr(vsf_pyal_obj_t selfobj, qstr __arg_name ## _attr, vsf_pyal_obj_t *__arg_name ## _args)
+    void __mod ## _ ## __class ## _attr(vsf_pyal_obj_t selfobj, qstr __arg_name ## _attr, vsf_pyal_arg_t *__arg_name ## _args)
 #define vsf_pyal_class_attr_get_attr(__arg_name)    (__arg_name ## _attr)
 #define vsf_pyal_class_attr_const_attr(__attr)      (MP_QSTR_ ## __attr)
 #define vsf_pyal_class_attr_is_load(__arg_name)     (MP_OBJ_NULL == __arg_name ## _args[0])
@@ -494,8 +495,8 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_class_attr_get_valuearg(__arg_name)(__arg_name ## _args[1])
 #define vsf_pyal_class_attr_ret_load_fail(__arg_name)                           \
     __arg_name ## _args[1] = MP_OBJ_SENTINEL; return
-#define vsf_pyal_class_attr_ret_load_obj(__arg_name, __obj)                     \
-    __arg_name ## _args[0] = (__obj); return
+#define vsf_pyal_class_attr_ret_load_obj(__arg_name, __arg)                     \
+    __arg_name ## _args[0] = (__arg); return
 #define vsf_pyal_class_attr_ret_load_method(__arg_name, __method)               \
     __arg_name ## _args[0] = (__method); __arg_name ## _args[1] = (selfobj); return
 #define vsf_pyal_class_attr_ret_fail(__arg_name)                                \

@@ -125,6 +125,11 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
         }                                                                       \
         VSF_MACRO_SAFE_NAME(listobj);                                           \
     })
+#define vsf_pyal_newarg_list(__num, __args_ptr)                                 \
+    ({                                                                          \
+        vsf_pyal_obj_t listobj = vsf_pyal_newobj_list((__num), (__args_ptr));   \
+        vsf_pyal_newarg_obj(listobj);                                           \
+    })
 #define vsf_pyal_listobj_append(__listobj, __arg, __free_arg)                   \
                                                     pikaList_append((__listobj), (__arg))
 
@@ -361,9 +366,9 @@ typedef char *                                      vsf_pyal_dict_key_t;
     }
 
 #define vsf_pyal_class_print_func(__mod, __class)                               \
-    vsf_pyal_funcarg_strobj __mod ## _ ## __class ## ___str__(vsf_pyal_obj_t selfobj)
+    vsf_pyal_funcarg_str_t __mod ## _ ## __class ## ___str__(vsf_pyal_obj_t selfobj)
 #define vsf_pyal_class_print_func_fmt(__mod, __class, __fmt, ...)               \
-    vsf_pyal_funcarg_strobj __mod ## _ ## __class ## ___str__(vsf_pyal_obj_t selfobj) {\
+    vsf_pyal_funcarg_str_t __mod ## _ ## __class ## ___str__(vsf_pyal_obj_t selfobj) {\
         vsf_pyal_class_arg_get_self(__mod, __class, self);                      \
         int len = snprintf(NULL, 0, (__fmt), ##__VA_ARGS__);                    \
         extern vsf_pyal_arg_t arg_set(vsf_pyal_arg_t selfarg, char *name,       \
@@ -378,26 +383,26 @@ typedef char *                                      vsf_pyal_dict_key_t;
 
 #define vsf_pyal_class_attr_func(__mod, __class, __arg_name)                    \
     extern vsf_pyal_arg_t __mod ## _ ## __class ## _attr(vsf_pyal_obj_t selfobj,\
-        vsf_pyal_funcarg_strobj __arg_name ## keyobj, vsf_pyal_arg_t __arg_name ## valuearg,\
+        vsf_pyal_funcarg_str_t __arg_name ## keyobj, vsf_pyal_arg_t __arg_name ## valuearg,\
         bool __arg_name ## is_del);                                             \
     vsf_pyal_class_func_fix_imp(pygame_Color, __getattr__, VSF_PYAL_MODULE_FUNCARG_OBJ_2,\
-        vsf_pyal_arg_t, vsf_pyal_funcarg_strobj keyobj)                         \
+        vsf_pyal_arg_t, vsf_pyal_funcarg_str_t keyobj)                          \
     {                                                                           \
         return __mod ## _ ## __class ## _attr(selfobj, keyobj, VSF_PYAL_ARG_NULL, false);\
     }                                                                           \
     vsf_pyal_class_func_fix_imp(pygame_Color, __delattr__, VSF_PYAL_MODULE_FUNCARG_OBJ_2,\
-        vsf_pyal_arg_t, vsf_pyal_funcarg_strobj keyobj)                         \
+        vsf_pyal_arg_t, vsf_pyal_funcarg_str_t keyobj)                          \
     {                                                                           \
         return __mod ## _ ## __class ## _attr(selfobj, keyobj, VSF_PYAL_ARG_NULL, true);\
     }                                                                           \
     vsf_pyal_class_func_fix_imp(pygame_Color, __setattr__, VSF_PYAL_MODULE_FUNCARG_OBJ_3,\
-        vsf_pyal_func_void_return_t, vsf_pyal_funcarg_strobj keyobj, vsf_pyal_arg_t arg)\
+        vsf_pyal_func_void_return_t, vsf_pyal_funcarg_str_t keyobj, vsf_pyal_arg_t arg)\
     {                                                                           \
         __mod ## _ ## __class ## _attr(selfobj, keyobj, arg, false);            \
         vsf_pyal_func_void_return();                                            \
     }                                                                           \
     vsf_pyal_arg_t __mod ## _ ## __class ## _attr(vsf_pyal_obj_t selfobj,       \
-        vsf_pyal_funcarg_strobj __arg_name ## keyobj, vsf_pyal_arg_t __arg_name ## valuearg,\
+        vsf_pyal_funcarg_str_t __arg_name ## keyobj, vsf_pyal_arg_t __arg_name ## valuearg,\
         bool __arg_name ## is_del)
 
 #define vsf_pyal_class_attr_get_attr(__arg_name)    vsf_pyal_hash_string(__arg_name ## keyobj)
