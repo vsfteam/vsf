@@ -65,6 +65,7 @@ typedef mp_obj_t                                    vsf_pyal_arg_t;
 #define vsf_pyal_arg_is_tuple(__arg)                (mp_obj_get_type(__arg) == &mp_type_tuple)
 #define vsf_pyal_arg_is_callable(__arg)             mp_obj_is_callable(__arg)
 #define vsf_pyal_arg_is_iterable(__arg)             mp_obj_is_iterable(__arg)
+#define vsf_pyal_arg_is_class(__arg, __mod, __class)mp_obj_is_exact_type((__arg), &mp_type_ ## __mod ## _ ## __class)
 #define vsf_pyal_arg_get_obj(__arg)                 (__arg)
 #define vsf_pyal_arg_free(__arg)
 
@@ -272,7 +273,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_funcarg_get_float(__arg)           vsf_pyal_floatarg_get_float(__arg)
 #define vsf_pyal_funcarg_newfloat(__value)          vsf_pyal_newarg_float(__value)
 #define vsf_pyal_funcarg_bytes_t                    vsf_pyal_arg_t
-#define vsf_pyal_funcarg_callable                   vsf_pyal_arg_t
+#define vsf_pyal_funcarg_callable_t                 vsf_pyal_arg_t
 #define vsf_pyal_funcarg_tuple_t                    vsf_pyal_arg_t
 #define vsf_pyal_funcarg_tuple_get_int(__tuplearg, __idx)   vsf_pyal_tuplearg_get_int((__tuplearg), (__idx))
 #define vsf_pyal_funcarg_tuple_get_str(__tuplearg, __idx)   vsf_pyal_tuplearg_get_str((__tuplearg), (__idx))
@@ -533,8 +534,10 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
         mp_arg_val_t __arg_name ## _val[VSF_VA_NUM_ARGS(__VA_ARGS__)];
 #define vsf_pyal_class_func_keyword_imp_end()       }
 
-#define vsf_pyal_class_func_call(__mod, __func, ...)                            \
-    __mod ## _ ## __func(__VA_ARGS__)
+#define vsf_pyal_class_func_call_var(__mod, __func, __instobj, arg)             \
+    __mod ## _ ## __func(vsf_pyal_funcarg_var_for_call(arg))
+#define vsf_pyal_class_func_call_fix(__mod, __func, __instobj, ...)             \
+    __mod ## _ ## __func(__instobj, ##__VA_ARGS__)
 
 #define vsf_pyal_class_int(__class, __name, __value){ MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_INT(__value) }
 #define vsf_pyal_class_str(__class, __name, __str)  { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_QSTR(MP_QSTR_ ## __str) }
