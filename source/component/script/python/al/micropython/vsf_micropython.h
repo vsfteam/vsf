@@ -84,6 +84,7 @@ typedef mp_obj_t                                    vsf_pyal_arg_t;
 
 // int
 
+#define vsf_pyal_intvalue_t                         mp_int_t
 #define vsf_pyal_newobj_int(__value)                mp_obj_new_int(__value)
 #define vsf_pyal_intobj_get_int(__intobj)           mp_obj_get_int(__intobj)
 #define vsf_pyal_newarg_int(__value)                mp_obj_new_int(__value)

@@ -59,6 +59,7 @@ typedef Arg *                                       vsf_pyal_arg_t;
 
 // int
 
+#define vsf_pyal_intvalue_t                         int64_t
 #define vsf_pyal_newarg_int(__value)                arg_newInt(__value)
 #define vsf_pyal_intarg_get_int(__intarg)           arg_getInt(__intarg)
 
