@@ -61,6 +61,7 @@ typedef mp_obj_t                                    vsf_pyal_arg_t;
 #define vsf_pyal_arg_is_int(__arg)                  mp_obj_is_int(__arg)
 #define vsf_pyal_arg_is_float(__arg)                mp_obj_is_float(__arg)
 #define vsf_pyal_arg_is_str(__arg)                  mp_obj_is_str(__arg)
+#define vsf_pyal_arg_is_bool(__arg)                 mp_obj_is_bool(__arg)
 #define vsf_pyal_arg_is_list(__arg)                 (mp_obj_get_type(__arg) == &mp_type_list)
 #define vsf_pyal_arg_is_tuple(__arg)                (mp_obj_get_type(__arg) == &mp_type_tuple)
 #define vsf_pyal_arg_is_callable(__arg)             mp_obj_is_callable(__arg)
@@ -126,7 +127,7 @@ typedef mp_obj_t                                    vsf_pyal_arg_t;
         mp_obj_new_bytes_from_vstr(&(__buffer));                                \
     })    
 #define vsf_pyal_bytesarg_get_data(__bytesarg, __len_ptr)                       \
-                                                    (uint8_t *)mp_obj_str_get_data((__bytesarg), (__len_ptr))
+                                                    (uint8_t *)mp_obj_str_get_data((__bytesarg), (size_t *)(__len_ptr))
 
 // bool
 

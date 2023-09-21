@@ -47,6 +47,7 @@ typedef Arg *                                       vsf_pyal_arg_t;
 #define vsf_pyal_arg_is_int(__arg)                  (arg_getType(__arg) == ARG_TYPE_INT)
 #define vsf_pyal_arg_is_float(__arg)                (arg_getType(__arg) == ARG_TYPE_FLOAT)
 #define vsf_pyal_arg_is_str(__arg)                  (arg_getType(__arg) == ARG_TYPE_STRING)
+#define vsf_pyal_arg_is_bool(__arg)                 (arg_getType(__arg) == ARG_TYPE_BOOL)
 #define vsf_pyal_arg_is_list(__arg)                 arg_isList(__arg)
 #define vsf_pyal_arg_is_tuple(__arg)                arg_isTuple(__arg)
 #define vsf_pyal_arg_is_callable(__arg)             arg_isCallable(__arg)
@@ -103,7 +104,7 @@ typedef Arg *                                       vsf_pyal_arg_t;
 #define vsf_pyal_bytesarg_get_data(__bytesarg, __len_ptr)                       \
     ({                                                                          \
         if ((__len_ptr) != NULL) {                                              \
-            *(__len_ptr) = arg_getSize(__bytesarg) - sizeof(size_t) - 1;        \
+            *((uint32_t *)(__len_ptr)) = arg_getSize(__bytesarg) - sizeof(size_t) - 1;\
         }                                                                       \
         arg_getBytes(__bytesarg);                                               \
     })
