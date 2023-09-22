@@ -136,14 +136,14 @@ typedef enum vk_disp_color_type_t {
     VSF_DISP_COLOR_DEF(BGR888_24, 24, 3, 0),
 } vk_disp_color_type_t;
 
-typedef struct vk_disp_point {
+typedef struct vk_disp_point_t {
     vk_disp_coord_t x;
     vk_disp_coord_t y;
-} vk_disp_point;
+} vk_disp_point_t;
 
 typedef struct vk_disp_area_t {
-    vk_disp_point pos;
-    vk_disp_point size;
+    vk_disp_point_t pos;
+    vk_disp_point_t size;
 } vk_disp_area_t;
 
 vsf_class(vk_disp_drv_t) {
@@ -191,7 +191,7 @@ vsf_class(vk_reentrant_disp_t) {
         vk_disp_t *disp;
         // same initialized mutex MUST be used for the same disp above
         vsf_mutex_t *mutex;
-        vk_disp_point pos;
+        vk_disp_point_t pos;
     )
     private_member(
         vsf_eda_t eda;

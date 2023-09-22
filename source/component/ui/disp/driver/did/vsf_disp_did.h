@@ -46,7 +46,7 @@ vsf_class(vk_disp_did_t) {
     public_member(
         implement(vk_disp_t)
         vk_disp_t *disp;
-        vk_disp_point pos;
+        vk_disp_point_t pos;
     )
 };
 
