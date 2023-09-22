@@ -288,12 +288,47 @@ typedef char *                                      vsf_pyal_dict_key_t;
 
 #define vsf_pyal_module_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name, ...)\
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_keyword(__arg_name)) {
-#define vsf_pyal_module_func_keyword_get_int(__arg_name, __key_name)            \
-    pikaDict_getInt(__arg_name ## _args, #__key_name)
-#define vsf_pyal_module_func_keyword_get_bool(__arg_name, __key_name)           \
-    pikaDict_getInt(__arg_name ## _args, #__key_name)
-#define vsf_pyal_module_func_keyword_get_arg(__arg_name, __key_name)            \
-    pikaDict_getArg(__arg_name ## _args, #__key_name)
+
+#define vsf_pyal_module_func_keyword_get_int_forced(__arg_name, __key_name, __key_idx)\
+    ({                                                                          \
+        int result = 0;                                                         \
+        if (pikaDict_getSize(__arg_name ## _args) <= (__key_idx)) {             \
+            vsf_pyal_raise("invalie argument");                                 \
+        } else {                                                                \
+            result = vsf_pyal_intarg_get_int(pikaDict_getArgByidex(__arg_name ## _args, (__key_idx)));\
+        }                                                                       \
+        result;                                                                 \
+    })
+#define vsf_pyal_module_func_keyword_get_bool_forced(__arg_name, __key_name, __key_idx)\
+    ({                                                                          \
+        bool result = false;                                                    \
+        if (pikaDict_getSize(__arg_name ## _args) <= (__key_idx)) {             \
+            vsf_pyal_raise("invalie argument");                                 \
+        } else {                                                                \
+            result = vsf_pyal_boolarg_get_bool(pikaDict_getArgByidex(__arg_name ## _args, (__key_idx)));\
+        }                                                                       \
+        result;                                                                 \
+    })
+#define vsf_pyal_module_func_keyword_get_arg_forced(__arg_name, __key_name, __key_idx)\
+    ({                                                                          \
+        vsf_pyal_arg_t result = VSF_PYAL_ARG_NULL;                              \
+        if (pikaDict_getSize(__arg_name ## _args) <= (__key_idx)) {             \
+            vsf_pyal_raise("invalie argument");                                 \
+        } else {                                                                \
+            result = pikaDict_getArgByidex(__arg_name ## _args, (__key_idx));   \
+        }                                                                       \
+        result;                                                                 \
+    })
+
+#define vsf_pyal_module_func_keyword_get_int(__arg_name, __key_name, __key_idx, __default)\
+    (pikaDict_getSize(__arg_name ## _args) <= (__key_idx)) ? (__default) :      \
+            vsf_pyal_intarg_get_int(pikaDict_getArgByidex(__arg_name ## _args, (__key_idx)))
+#define vsf_pyal_module_func_keyword_get_bool(__arg_name, __key_name, __key_idx, __default)\
+    (pikaDict_getSize(__arg_name ## _args) <= (__key_idx)) ? (__default) :      \
+            vsf_pyal_boolarg_get_bool(pikaDict_getArgByidex(__arg_name ## _args, (__key_idx)))
+#define vsf_pyal_module_func_keyword_get_arg(__arg_name, __key_name, __key_idx, __default)\
+    (pikaDict_getSize(__arg_name ## _args) <= (__key_idx)) ? (__default) :      \
+            pikaDict_getArgByidex(__arg_name ## _args, (__key_idx))
 #define vsf_pyal_module_func_keyword_imp_end()      }
 
 #define vsf_pyal_module_func_init_prototype(__mod)                              \

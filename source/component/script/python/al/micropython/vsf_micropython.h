@@ -329,12 +329,20 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     STATIC const mp_arg_t __arg_name ## _args[] = { __VA_ARGS__ };              \
     mp_arg_parse_all(__arg_name ## _num, __arg_name ## _arr, __arg_name ## _map,\
         MP_ARRAY_SIZE(__arg_name ## _args), __arg_name ## _args, __arg_name ## _val)
-#define vsf_pyal_module_func_keyword_get_int(__arg_name, __key_name)            \
+
+#define vsf_pyal_module_func_keyword_get_int_forced(__arg_name, __key_name, __key_idx)\
     __arg_name ## _val[ARG_ ## __key_name].u_int
-#define vsf_pyal_module_func_keyword_get_bool(__arg_name, __key_name)           \
+#define vsf_pyal_module_func_keyword_get_bool_forced(__arg_name, __key_name, __key_idx)\
     __arg_name ## _val[ARG_ ## __key_name].u_bool
-#define vsf_pyal_module_func_keyword_get_arg(__arg_name, __key_name)            \
+#define vsf_pyal_module_func_keyword_get_arg_forced(__arg_name, __key_name, __key_idx)\
     __arg_name ## _val[ARG_ ## __key_name].u_obj
+#define vsf_pyal_module_func_keyword_get_int(__arg_name, __key_name, __key_idx, __default)\
+    __arg_name ## _val[ARG_ ## __key_name].u_int
+#define vsf_pyal_module_func_keyword_get_bool(__arg_name, __key_name, __key_idx, __default)\
+    __arg_name ## _val[ARG_ ## __key_name].u_bool
+#define vsf_pyal_module_func_keyword_get_arg(__arg_name, __key_name, __key_idx, __default)\
+    __arg_name ## _val[ARG_ ## __key_name].u_obj
+
 #define vsf_pyal_module_func_keyword_imp_end()      }
 
 #define VSF_PYAL_MODULE_FUNCARG_OBJ_0               MP_DEFINE_CONST_FUN_OBJ_0
