@@ -115,19 +115,36 @@ typedef mp_obj_t                                    vsf_pyal_arg_t;
 
 #define vsf_pyal_newarg_bytes(__data, __len)        mp_obj_new_bytes((const byte *)(__data), __len)
 #define vsf_pyal_newarg_bytes_ret(__data, __len)    vsf_pyal_newarg_bytes((__data), (__len))
+#define vsf_pyal_newarg_bytes_ret_from_buffer(__buffer, __length)               \
+    ({                                                                          \
+        vsf_pyal_buffer_set_len((__buffer), (__length));                        \
+        mp_obj_new_bytes_from_vstr(&(__buffer));                                \
+    })
+#define vsf_pyal_bytesarg_get_data(__bytesarg, __len_ptr)                       \
+                                                    (uint8_t *)mp_obj_str_get_data((__bytesarg), (size_t *)(__len_ptr))
+
 #define vsf_pyal_newarg_bytes_ret_and_free(__data, __len)                       \
     ({                                                                          \
         vsf_pyal_arg_t VSF_MACRO_SAFE_NAME(arg) = vsf_pyal_newarg_bytes((__data), (__len));\
         free(__data);                                                           \
         VSF_MACRO_SAFE_NAME(arg);                                               \
     })
-#define vsf_pyal_newarg_bytes_ret_from_buffer(__buffer, __length)               \
+#define vsf_pyal_newobj_bytes_ret_and_free(__data, __len)                       \
+    ({                                                                          \
+        vsf_pyal_arg_t VSF_MACRO_SAFE_NAME(arg) = vsf_pyal_newarg_bytes_ret_and_free((__data), (__len));\
+        vsf_pyal_arg_get_obj(VSF_MACRO_SAFE_NAME(arg));                         \
+    })
+#define vsf_pyal_newfuncarg_bytes_ret_and_free(__data, __len)                   \
+    ({                                                                          \
+        vsf_pyal_arg_t VSF_MACRO_SAFE_NAME(arg) = vsf_pyal_newarg_bytes((__data), (__len));\
+        free(__data);                                                           \
+        VSF_MACRO_SAFE_NAME(arg);                                               \
+    })
+#define vsf_pyal_newobj_bytes_ret_from_buffer(__buffer, __length)               \
     ({                                                                          \
         vsf_pyal_buffer_set_len((__buffer), (__length));                        \
         mp_obj_new_bytes_from_vstr(&(__buffer));                                \
-    })    
-#define vsf_pyal_bytesarg_get_data(__bytesarg, __len_ptr)                       \
-                                                    (uint8_t *)mp_obj_str_get_data((__bytesarg), (size_t *)(__len_ptr))
+    })
 
 // bool
 
@@ -416,13 +433,18 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_builtinclass_declare(__class)                                  \
     extern const mp_obj_type_t mp_type_ ## __class;
 
-#define vsf_pyal_class_get_self_from_obj(__mod, __class, __obj, __name)         \
-    __mod ## _ ## __class ## _t *__name = vsf_pyal_instobj_get(__obj)
+#define vsf_pyal_class_get_self_from_obj(__mod, __class, __name, __instobj)     \
+    __mod ## _ ## __class ## _t *__name = vsf_pyal_instobj_get(__instobj)
+#define vsf_pyal_class_get_self_from_arg(__mod, __class, __name, __instarg)     \
+    __mod ## _ ## __class ## _t *__name = vsf_pyal_instobj_get(__instarg)
 #define vsf_pyal_class_arg_get_self(__mod, __class, __name)                     \
     __mod ## _ ## __class ## _t *__name = vsf_pyal_instobj_get(selfobj)
-#define vsf_pyal_class_arg_get_self_from(__mod, __class, __name, __instobj)     \
-    __mod ## _ ## __class ## _t *__name = vsf_pyal_instobj_get(__instobj)
 
+// vsf_pyal_class_new will create class as normal python class
+#define vsf_pyal_class_new(__mod, __class, __args_num, __args)                  \
+    __mod ## _ ## __class ## _make_new(NULL, (__args_num), 0, (__args))
+
+// vsf_pyal_class_create will create class in C, user can set a exsize and get a C pinter
 #define vsf_pyal_class_create(__mod, __class, __exsize, __obj_ptr)              \
     ({                                                                          \
         __mod ## _ ## __class ## _t *VSF_MACRO_SAFE_NAME(inst) = (__mod ## _ ## __class ## _t *)m_malloc_with_finaliser(sizeof(__mod ## _ ## __class ## _t) + (__exsize));\
@@ -644,9 +666,6 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     extern vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t arg_num, size_t n_kw, const vsf_pyal_arg_t *args)
 #define vsf_pyal_class_type(__mod, __class)                                     \
     mp_type_ ## __mod ## _ ## __class
-
-#define vsf_pyal_class_new(__mod, __class, __args_num, __args)                  \
-    __mod ## _ ## __class ## _make_new(NULL, (__args_num), 0, (__args))
 
 // APIs
 

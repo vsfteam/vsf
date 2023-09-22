@@ -52,8 +52,8 @@ typedef Arg *                                       vsf_pyal_arg_t;
 #define vsf_pyal_arg_is_tuple(__arg)                arg_isTuple(__arg)
 #define vsf_pyal_arg_is_callable(__arg)             arg_isCallable(__arg)
 #define vsf_pyal_arg_is_iterable(__arg)             arg_isIterable(__arg)
-// TODO: how to implement vsf_pyal_arg_is_class in pikascript
-#define vsf_pyal_arg_is_class(__arg, __mod, __class)false
+#define vsf_pyal_arg_is_class(__arg, __mod, __class)                            \
+    (vsf_pyal_arg_get_obj(__arg)->constructor == New_ ## __mod ## _ ## __class)
 #define vsf_pyal_arg_get_obj(__arg)                 arg_getObj(__arg)
 #define vsf_pyal_arg_free(__arg)                    arg_deinit(__arg)
 
@@ -89,16 +89,10 @@ typedef Arg *                                       vsf_pyal_arg_t;
 
 // bytes
 
-#define vsf_pyal_newarg_bytes(__data, __len)        arg_setBytes((uint8_t *)(__data), __len)
+#define vsf_pyal_newarg_bytes(__data, __len)        arg_newBytes((uint8_t *)(__data), (__len))
 #define vsf_pyal_newarg_bytes_ret(__data, __len)                                \
     ({                                                                          \
         obj_setBytes(selfobj, __FUNCTION__, (uint8_t *)(__data), (__len));      \
-        obj_getBytes(selfobj, __FUNCTION__);                                    \
-    })
-#define vsf_pyal_newarg_bytes_ret_and_free(__data, __len)                       \
-    ({                                                                          \
-        obj_setBytes(selfobj, __FUNCTION__, (uint8_t *)(__data), (__len));      \
-        free(__data);                                                           \
         obj_getBytes(selfobj, __FUNCTION__);                                    \
     })
 #define vsf_pyal_bytesarg_get_data(__bytesarg, __len_ptr)                       \
@@ -107,6 +101,25 @@ typedef Arg *                                       vsf_pyal_arg_t;
             *((uint32_t *)(__len_ptr)) = arg_getSize(__bytesarg) - sizeof(size_t) - 1;\
         }                                                                       \
         arg_getBytes(__bytesarg);                                               \
+    })
+
+#define vsf_pyal_newarg_bytes_ret_and_free(__data, __len)                       \
+    ({                                                                          \
+        vsf_pyal_arg_t VSF_MACRO_SAFE_NAME(arg) = vsf_pyal_newarg_bytes((__data), (__len));\
+        free(__data);                                                           \
+        VSF_MACRO_SAFE_NAME(arg);                                               \
+    })
+#define vsf_pyal_newfuncarg_bytes_ret_and_free(__data, __len)                   \
+    ({                                                                          \
+        obj_setBytes(selfobj, __FUNCTION__, (uint8_t *)(__data), (__len));      \
+        free(__data);                                                           \
+        obj_getBytes(selfobj, __FUNCTION__);                                    \
+    })
+#define vsf_pyal_newobj_bytes_ret_and_free(__data, __len)                       \
+    ({                                                                          \
+        vsf_pyal_arg_t VSF_MACRO_SAFE_NAME(arg) = vsf_pyal_newarg_bytes((__data), (__len));\
+        free(__data);                                                           \
+        vsf_pyal_arg_get_obj(VSF_MACRO_SAFE_NAME(arg));                         \
     })
 
 // bool
@@ -153,7 +166,7 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
 #define __vsf_pyal_newobj_inst(__mod, __class)      newNormalObj(New_ ## __mod ## _ ## __class)
 #define vsf_pyal_newobj_inst(__mod, __class)        not supported
 #define vsf_pyal_instobj_get(__instobj)             arg_getBytes(obj_getArg((__instobj), "_self"))
-#define vsf_pyal_instarg_get(__instarg)             arg_getBytes(__instarg)
+#define vsf_pyal_instarg_get(__instarg)             vsf_pyal_instobj_get(vsf_pyal_arg_get_obj(__instarg))
 
 // file
 
@@ -359,13 +372,23 @@ typedef char *                                      vsf_pyal_dict_key_t;
 
 // class
 
-#define vsf_pyal_class_get_self_from_obj(__mod, __class, __obj, __name)         \
-        __mod ## _ ## __class ## _t *__name = (__mod ## _ ## __class ## _t *)vsf_pyal_instobj_get(__obj)
+#define vsf_pyal_class_get_self_from_obj(__mod, __class, __name, __instobj)     \
+        __mod ## _ ## __class ## _t *__name = (__mod ## _ ## __class ## _t *)vsf_pyal_instobj_get(__instobj)
+#define vsf_pyal_class_get_self_from_arg(__mod, __class, __name, __instarg)     \
+        __mod ## _ ## __class ## _t *__name = (__mod ## _ ## __class ## _t *)vsf_pyal_instarg_get(__instarg)
 #define vsf_pyal_class_arg_get_self(__mod, __class, __name)                     \
         __mod ## _ ## __class ## _t *__name = (__mod ## _ ## __class ## _t *)vsf_pyal_instobj_get(selfobj)
-#define vsf_pyal_class_arg_get_self_from(__mod, __class, __name, __instobj)     \
-        __mod ## _ ## __class ## _t *__name = (__mod ## _ ## __class ## _t *)vsf_pyal_instarg_get(__instobj)
 
+// vsf_pyal_class_new will create class as in python
+#define vsf_pyal_class_new(__mod, __class, __args_num, __args)                  \
+    ({                                                                          \
+        vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(tupleobj) = vsf_pyal_newobj_tuple(__args_num, __args);\
+        vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(selfobj) = __vsf_pyal_newobj_inst(__mod, __class);\
+        __mod ## _ ## __class ## ___init__(VSF_MACRO_SAFE_NAME(selfobj), VSF_MACRO_SAFE_NAME(tupleobj));\
+        VSF_MACRO_SAFE_NAME(selfobj);                                           \
+    })
+
+// vsf_pyal_class_create will create class in C, user can set a exsize and get a C pinter
 #define vsf_pyal_class_create(__mod, __class, __exsize, __obj_ptr)              \
     ({                                                                          \
         vsf_pyal_arg_t VSF_MACRO_SAFE_NAME(instarg) = arg_newBytes(NULL, sizeof(__mod ## _ ## __class ## _t) + (__exsize));\
@@ -486,14 +509,6 @@ typedef char *                                      vsf_pyal_dict_key_t;
     extern void __mod ## _ ## __class ## ___init__(vsf_pyal_obj_t unused, vsf_pyal_funcarg_var(__arg_name ## _args));\
     extern vsf_pyal_obj_t New_ ## __mod ## _ ## __class(Args *args);            \
     extern const NativeProperty __mod ## _ ## __class ## NativeProp
-
-#define vsf_pyal_class_new(__mod, __class, __args_num, __args)                  \
-    ({                                                                          \
-        vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(tupleobj) = vsf_pyal_newobj_tuple(__args_num, __args);\
-        vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(selfobj) = __vsf_pyal_newobj_inst(__mod, __class);\
-        __mod ## _ ## __class ## ___init__(VSF_MACRO_SAFE_NAME(selfobj), VSF_MACRO_SAFE_NAME(tupleobj));\
-        VSF_MACRO_SAFE_NAME(selfobj);                                           \
-    })
 
 // APIs
 

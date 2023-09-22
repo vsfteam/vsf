@@ -319,7 +319,7 @@ vsf_pyal_module_func_var_imp(os, read, vsf_pyal_funcarg_bytes_t, 2, 2, arg)
         return VSF_PYAL_OBJ_NULL;
     }
 
-    return vsf_pyal_newarg_bytes_ret_and_free(buffer, length);
+    return vsf_pyal_newfuncarg_bytes_ret_and_free(buffer, length);
 #endif
 }
 
