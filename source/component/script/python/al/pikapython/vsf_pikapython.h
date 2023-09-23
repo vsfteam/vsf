@@ -389,8 +389,8 @@ typedef char *                                      vsf_pyal_dict_key_t;
         VSF_MACRO_SAFE_NAME(selfobj);                                           \
     })
 
-// vsf_pyal_class_create will create class in C, user can set a exsize and get a C pinter
-#define vsf_pyal_class_create(__mod, __class, __exsize, __obj_ptr)              \
+// vsf_pyal_class_newc will create class in C, user can set a exsize and get a C pinter
+#define vsf_pyal_class_newc(__mod, __class, __exsize, __obj_ptr)                \
     ({                                                                          \
         vsf_pyal_arg_t VSF_MACRO_SAFE_NAME(instarg) = arg_newBytes(NULL, sizeof(__mod ## _ ## __class ## _t) + (__exsize));\
         vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(selfobj) = __vsf_pyal_newobj_inst(__mod, __class);\

@@ -444,8 +444,8 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_class_new(__mod, __class, __args_num, __args)                  \
     __mod ## _ ## __class ## _make_new(NULL, (__args_num), 0, (__args))
 
-// vsf_pyal_class_create will create class in C, user can set a exsize and get a C pinter
-#define vsf_pyal_class_create(__mod, __class, __exsize, __obj_ptr)              \
+// vsf_pyal_class_newc will create class in C, user can set a exsize and get a C pinter
+#define vsf_pyal_class_newc(__mod, __class, __exsize, __obj_ptr)                \
     ({                                                                          \
         __mod ## _ ## __class ## _t *VSF_MACRO_SAFE_NAME(inst) = (__mod ## _ ## __class ## _t *)m_malloc_with_finaliser(sizeof(__mod ## _ ## __class ## _t) + (__exsize));\
         VSF_MACRO_SAFE_NAME(inst)->base.type = &mp_type_ ## __mod ## _ ## __class;\
