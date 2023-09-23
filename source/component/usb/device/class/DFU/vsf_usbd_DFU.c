@@ -78,6 +78,7 @@ static vsf_err_t __vk_usbd_dfu_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
     dfu->dev = dev;
     dfu->block_idx = 0;
     dfu->addr = 0;
+    dfu->status.bState = DFU_dfuIDLE;
     return VSF_ERR_NONE;
 }
 
@@ -115,7 +116,7 @@ static vsf_err_t __vk_usbd_dfu_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
         result = VSF_ERR_NONE;
         break;
     case USB_DFUREQ_GETSTATE:
-        buffer = dfu->status.bState;
+        buffer = (uint8_t *)&dfu->status.bState;
         size = sizeof(dfu->status.bState);
         result = VSF_ERR_NONE;
         break;

@@ -91,8 +91,8 @@ vsf_class(vk_usbd_dfu_t) {
     private_member(
         usb_dfu_status_t status;
         uint16_t block_idx;
-        uint16_t addr;
         uint16_t cur_size;
+        uint32_t addr;
 
         vk_usbd_dev_t *dev;
         vk_usbd_ifs_t *ifs;
