@@ -300,12 +300,13 @@ typedef char *                                      vsf_pyal_dict_key_t;
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__)
 
 #define vsf_pyal_module_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name, ...)\
-    __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_keyword(__arg_name)) {
+    __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_keyword(__arg_name)) {\
+        int __arg_name ## _args_num = pikaDict_getSize(__arg_name ## _args);
 
 #define vsf_pyal_module_func_keyword_get_int_forced(__arg_name, __key_name, __key_idx)\
     ({                                                                          \
         int result = 0;                                                         \
-        if (pikaDict_getSize(__arg_name ## _args) <= (__key_idx)) {             \
+        if (__arg_name ## _args_num <= (__key_idx)) {                           \
             vsf_pyal_raise("invalie argument");                                 \
         } else {                                                                \
             result = vsf_pyal_intarg_get_int(pikaDict_getArgByidex(__arg_name ## _args, (__key_idx)));\
@@ -315,7 +316,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_module_func_keyword_get_bool_forced(__arg_name, __key_name, __key_idx)\
     ({                                                                          \
         bool result = false;                                                    \
-        if (pikaDict_getSize(__arg_name ## _args) <= (__key_idx)) {             \
+        if (__arg_name ## _args_num <= (__key_idx)) {                           \
             vsf_pyal_raise("invalie argument");                                 \
         } else {                                                                \
             result = vsf_pyal_boolarg_get_bool(pikaDict_getArgByidex(__arg_name ## _args, (__key_idx)));\
@@ -325,7 +326,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_module_func_keyword_get_arg_forced(__arg_name, __key_name, __key_idx)\
     ({                                                                          \
         vsf_pyal_arg_t result = VSF_PYAL_ARG_NULL;                              \
-        if (pikaDict_getSize(__arg_name ## _args) <= (__key_idx)) {             \
+        if (__arg_name ## _args_num <= (__key_idx)) {                           \
             vsf_pyal_raise("invalie argument");                                 \
         } else {                                                                \
             result = pikaDict_getArgByidex(__arg_name ## _args, (__key_idx));   \
@@ -334,13 +335,13 @@ typedef char *                                      vsf_pyal_dict_key_t;
     })
 
 #define vsf_pyal_module_func_keyword_get_int(__arg_name, __key_name, __key_idx, __default)\
-    (pikaDict_getSize(__arg_name ## _args) <= (__key_idx)) ? (__default) :      \
+    (__arg_name ## _args_num <= (__key_idx)) ? (__default) :                    \
             vsf_pyal_intarg_get_int(pikaDict_getArgByidex(__arg_name ## _args, (__key_idx)))
 #define vsf_pyal_module_func_keyword_get_bool(__arg_name, __key_name, __key_idx, __default)\
-    (pikaDict_getSize(__arg_name ## _args) <= (__key_idx)) ? (__default) :      \
+    (__arg_name ## _args_num <= (__key_idx)) ? (__default) :                    \
             vsf_pyal_boolarg_get_bool(pikaDict_getArgByidex(__arg_name ## _args, (__key_idx)))
 #define vsf_pyal_module_func_keyword_get_arg(__arg_name, __key_name, __key_idx, __default)\
-    (pikaDict_getSize(__arg_name ## _args) <= (__key_idx)) ? (__default) :      \
+    (__arg_name ## _args_num <= (__key_idx)) ? (__default) :                    \
             pikaDict_getArgByidex(__arg_name ## _args, (__key_idx))
 #define vsf_pyal_module_func_keyword_imp_end()      }
 
@@ -400,6 +401,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
 
 #define vsf_pyal_class_new_keyword_func(__mod, __class, __arg_name, ...)        \
     void __mod ## _ ## __class ## ___init__(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_keyword(__arg_name)) {\
+        int __arg_name ## _args_num = pikaDict_getSize(__arg_name ## _args);    \
         __mod ## _ ## __class ## _t *self = NULL;
 
 #define vsf_pyal_class_new_func(__mod, __class, __arg_name)                     \
@@ -497,7 +499,8 @@ typedef char *                                      vsf_pyal_dict_key_t;
 #define vsf_pyal_class_func_fix_imp(__mod, __func, __func_type, __ret_type, ...)\
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__)
 #define vsf_pyal_class_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name, ...)\
-    __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_keyword(__arg_name)) {
+    __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, vsf_pyal_funcarg_keyword(__arg_name)) {\
+        int __arg_name ## _args_num = pikaDict_getSize(__arg_name ## _args);
 #define vsf_pyal_class_func_keyword_imp_end()       }
 
 #define vsf_pyal_class_func_call_var(__mod, __func, __instobj, arg)             \
