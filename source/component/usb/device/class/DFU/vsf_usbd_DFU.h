@@ -61,7 +61,7 @@ extern "C" {
             };
 #define __usbd_dfu_func0(__name, __func_id, __protocol, __dfu_attr, __transfer_size)\
             static uint8_t __##__name##_DFU##__transfer_buffer[__transfer_size];\
-            __usbd_dfu_func1(__name, __func_id, (__protocol), (__dfu_attr), (__transfer_size), &__##__name##_DFU##__transfer_buffer[__transfer_size])
+            __usbd_dfu_func1(__name, __func_id, (__protocol), (__dfu_attr), (__transfer_size), __##__name##_DFU##__transfer_buffer)
 
 #define __usbd_dfu_func(__name, __func_id, __protocol, __dfu_attr, __transfer_size, ...)\
             __PLOOC_EVAL(__usbd_dfu_func, __VA_ARGS__)(__name, __func_id, (__protocol), (__dfu_attr), (__transfer_size), ##__VA_ARGS__)
