@@ -326,40 +326,49 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(mp_ ## __mod ## _ ## __func ## _obj, __min_arg, __max_arg, __mod ## _ ## __func);\
     __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_var(__arg_name))
 
-#define __vsf_pyal_module_func_keyword_enum(__arg_name, __key_name)             \
+#define vsf_pyal_keyword_is_int
+#define vsf_pyal_keyword(__key_name)                ARG_ ## __key_name
+// called in __vsf_pyal_parse_tuple_keyword only
+#define __vsf_pyal_keyword_get_int(__arg_name, __key, __idx)    __arg_name ## _val[__key].u_int
+#define __vsf_pyal_keyword_get_bool(__arg_name, __key, __idx)   __arg_name ## _val[__key].u_bool
+#define __vsf_pyal_keyword_get_arg(__arg_name, __key, __idx)    __arg_name ## _val[__key].u_obj
+#define vsf_pyal_keyword_parser_arg(__arg_name)     mp_arg_val_t *__arg_name ## _val
+extern int __vsf_pyal_parse_tuple_keyword(vsf_pyal_keyword_parser_arg(arg), const char *format, ...);
+#define vsf_pyal_parse_tuple_keyword(__arg_name, ...)   __vsf_pyal_parse_tuple_keyword(__arg_name ## _val, ##__VA_ARGS__)
+
+#define __vsf_pyal_keyword_enum(__arg_name, __key_name)                         \
     ARG_ ## __key_name,
+#define VSF_PYAL_KEYWORD_ONLY                       MP_ARG_KW_ONLY
+#define VSF_PYAL_KEYWORD_REQUIRED                   MP_ARG_REQUIRED
+#define vsf_pyal_keyword_prepare_int(__key_name, __key_feature, __default)      \
+    [ARG_ ## __key_name] = { MP_QSTR_ ## __key_name, (__key_feature) | MP_ARG_INT, {.u_int = (__default)} }
+#define vsf_pyal_keyword_prepare_bool(__key_name, __key_feature, __default)     \
+    [ARG_ ## __key_name] = { MP_QSTR_ ## __key_name, (__key_feature) | MP_ARG_BOOL, {.u_bool = (__default)} }
+#define vsf_pyal_keyword_prepare_arg(__key_name, __key_feature, __default)      \
+    [ARG_ ## __key_name] = { MP_QSTR_ ## __key_name, (__key_feature) | MP_ARG_OBJ, {.u_rom_obj = (__default)} }
+#define vsf_pyal_keyword_prepare(__arg_name, ...)                               \
+    STATIC const mp_arg_t __arg_name ## _args[] = { __VA_ARGS__ };              \
+    mp_arg_parse_all(__arg_name ## _num, __arg_name ## _arr, __arg_name ## _map,\
+        MP_ARRAY_SIZE(__arg_name ## _args), __arg_name ## _args, __arg_name ## _val)
+#define vsf_pyal_keyword_get_int_forced(__arg_name, __key_name, __key_idx)      \
+    __arg_name ## _val[ARG_ ## __key_name].u_int
+#define vsf_pyal_func_keyword_get_bool_forced(__arg_name, __key_name, __key_idx)\
+    __arg_name ## _val[ARG_ ## __key_name].u_bool
+#define vsf_pyal_keyword_get_arg_forced(__arg_name, __key_name, __key_idx)      \
+    __arg_name ## _val[ARG_ ## __key_name].u_obj
+#define vsf_pyal_keyword_get_int(__arg_name, __key_name, __key_idx, __default)  \
+    __arg_name ## _val[ARG_ ## __key_name].u_int
+#define vsf_pyal_keyword_get_bool(__arg_name, __key_name, __key_idx, __default) \
+    __arg_name ## _val[ARG_ ## __key_name].u_bool
+#define vsf_pyal_keyword_get_arg(__arg_name, __key_name, __key_idx, __default)  \
+    __arg_name ## _val[ARG_ ## __key_name].u_obj
+
 #define vsf_pyal_module_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name, ...)\
     __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_keyword(__arg_name));      \
     MP_DEFINE_CONST_FUN_OBJ_KW(mp_ ## __mod ## _ ## __func ## _obj, 0, __mod ## _ ## __func);\
     __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_keyword(__arg_name)) {     \
-        enum { VSF_MFOREACH_ARG1(__vsf_pyal_module_func_keyword_enum, __arg_name, __VA_ARGS__) };\
+        enum { VSF_MFOREACH_ARG1(__vsf_pyal_keyword_enum, __arg_name, __VA_ARGS__) };\
         mp_arg_val_t __arg_name ## _val[VSF_VA_NUM_ARGS(__VA_ARGS__)];
-#define VSF_PYAL_MODULE_FUNC_KEYWORD_ONLY           MP_ARG_KW_ONLY
-#define VSF_PYAL_MODULE_FUNC_KEYWORD_REQUIRED       MP_ARG_REQUIRED
-#define vsf_pyal_module_func_keyword_int(__key_name, __key_feature, __default)  \
-    [ARG_ ## __key_name] = { MP_QSTR_ ## __key_name, (__key_feature) | MP_ARG_INT, {.u_int = (__default)} }
-#define vsf_pyal_module_func_keyword_bool(__key_name, __key_feature, __default) \
-    [ARG_ ## __key_name] = { MP_QSTR_ ## __key_name, (__key_feature) | MP_ARG_BOOL, {.u_bool = (__default)} }
-#define vsf_pyal_module_func_keyword_arg(__key_name, __key_feature, __default)  \
-    [ARG_ ## __key_name] = { MP_QSTR_ ## __key_name, (__key_feature) | MP_ARG_OBJ, {.u_rom_obj = (__default)} }
-#define vsf_pyal_module_func_keyword_prepare(__arg_name, ...)                   \
-    STATIC const mp_arg_t __arg_name ## _args[] = { __VA_ARGS__ };              \
-    mp_arg_parse_all(__arg_name ## _num, __arg_name ## _arr, __arg_name ## _map,\
-        MP_ARRAY_SIZE(__arg_name ## _args), __arg_name ## _args, __arg_name ## _val)
-
-#define vsf_pyal_module_func_keyword_get_int_forced(__arg_name, __key_name, __key_idx)\
-    __arg_name ## _val[ARG_ ## __key_name].u_int
-#define vsf_pyal_module_func_keyword_get_bool_forced(__arg_name, __key_name, __key_idx)\
-    __arg_name ## _val[ARG_ ## __key_name].u_bool
-#define vsf_pyal_module_func_keyword_get_arg_forced(__arg_name, __key_name, __key_idx)\
-    __arg_name ## _val[ARG_ ## __key_name].u_obj
-#define vsf_pyal_module_func_keyword_get_int(__arg_name, __key_name, __key_idx, __default)\
-    __arg_name ## _val[ARG_ ## __key_name].u_int
-#define vsf_pyal_module_func_keyword_get_bool(__arg_name, __key_name, __key_idx, __default)\
-    __arg_name ## _val[ARG_ ## __key_name].u_bool
-#define vsf_pyal_module_func_keyword_get_arg(__arg_name, __key_name, __key_idx, __default)\
-    __arg_name ## _val[ARG_ ## __key_name].u_obj
-
 #define vsf_pyal_module_func_keyword_imp_end()      }
 
 #define VSF_PYAL_MODULE_FUNCARG_OBJ_0               MP_DEFINE_CONST_FUN_OBJ_0
@@ -455,7 +464,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 
 #define vsf_pyal_class_new_keyword_func(__mod, __class, __arg_name, ...)        \
     vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t __arg_name ## _arg_num, size_t __arg_name ## _kw_num, const vsf_pyal_arg_t *__arg_name ## _arr) {\
-        enum { VSF_MFOREACH_ARG1(__vsf_pyal_module_func_keyword_enum, __arg_name, __VA_ARGS__) };\
+        enum { VSF_MFOREACH_ARG1(__vsf_pyal_keyword_enum, __arg_name, __VA_ARGS__) };\
         mp_arg_val_t __arg_name ## _val[VSF_VA_NUM_ARGS(__VA_ARGS__)];          \
         __mod ## _ ## __class ## _t *self = NULL;
 #define vsf_pyal_class_new_func_keyword_prepare(__arg_name, ...)                \
@@ -561,7 +570,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
     __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_keyword(__arg_name));      \
     MP_DEFINE_CONST_FUN_OBJ_KW(mp_ ## __mod ## _ ## __func ## _obj, 0, __mod ## _ ## __func);\
     __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_keyword(__arg_name)) {     \
-        enum { VSF_MFOREACH_ARG1(__vsf_pyal_module_func_keyword_enum, __arg_name, __VA_ARGS__) };\
+        enum { VSF_MFOREACH_ARG1(__vsf_pyal_keyword_enum, __arg_name, __VA_ARGS__) };\
         mp_arg_val_t __arg_name ## _val[VSF_VA_NUM_ARGS(__VA_ARGS__)];
 #define vsf_pyal_class_func_keyword_imp_end()       }
 
