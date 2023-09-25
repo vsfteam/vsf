@@ -571,7 +571,8 @@ extern int __vsf_pyal_parse_tuple_keyword(vsf_pyal_keyword_parser_arg(arg), cons
     MP_DEFINE_CONST_FUN_OBJ_KW(mp_ ## __mod ## _ ## __func ## _obj, 0, __mod ## _ ## __func);\
     __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_keyword(__arg_name)) {     \
         enum { VSF_MFOREACH_ARG1(__vsf_pyal_keyword_enum, __arg_name, __VA_ARGS__) };\
-        mp_arg_val_t __arg_name ## _val[VSF_VA_NUM_ARGS(__VA_ARGS__)];
+        mp_arg_val_t __arg_name ## _val[VSF_VA_NUM_ARGS(__VA_ARGS__)];          \
+        VSF_UNUSED_PARAM(__arg_name ## _val);
 #define vsf_pyal_class_func_keyword_imp_end()       }
 
 #define vsf_pyal_class_func_call_var(__mod, __func, __instobj, arg)             \
