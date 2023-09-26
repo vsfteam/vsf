@@ -156,21 +156,16 @@ vk_input_item_info_t * vk_input_parse(vk_input_parser_t *parser, uint8_t *pre, u
     return NULL;
 }
 
-#ifndef WEAK_VSF_INPUT_ON_NEW_DEV
 WEAK(vsf_input_on_new_dev)
 void vsf_input_on_new_dev(vk_input_type_t type, void *dev)
 {
 }
-#endif
 
-#ifndef WEAK_VSF_INPUT_ON_FREE_DEV
 WEAK(vsf_input_on_free_dev)
 void vsf_input_on_free_dev(vk_input_type_t type, void *dev)
 {
 }
-#endif
 
-#ifndef WEAK_VSF_INPUT_ON_EVT
 WEAK(vsf_input_on_evt)
 void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt)
 {
@@ -187,7 +182,6 @@ void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt)
     vsf_input_unprotect(orig);
 #endif
 }
-#endif
 
 uint_fast32_t vk_input_update_timestamp(vk_input_timestamp_t *timestamp)
 {
