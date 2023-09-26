@@ -149,8 +149,7 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
         vsf_pyal_obj_t listobj = vsf_pyal_newobj_list((__num), (__args_ptr));   \
         vsf_pyal_newarg_obj(listobj);                                           \
     })
-#define vsf_pyal_listobj_append(__listobj, __arg, __free_arg)                   \
-                                                    pikaList_append((__listobj), (__arg))
+#define vsf_pyal_listobj_append(__listobj, __arg)   pikaList_append((__listobj), (__arg))
 
 #define vsf_pyal_listobj_get_num(__listobj)         pikaList_getSize(__listobj)
 #define vsf_pyal_listobj_get_arg(__listobj, __idx)  pikaList_getArg((__listobj), (__idx))
@@ -236,7 +235,7 @@ typedef char *                                      vsf_pyal_dict_key_t;
 
 #define vsf_pyal_newobj_dict()                      New_PikaDict()
 
-#define vsf_pyal_dictobj_set(__dict_obj, __key_str, __value_arg, __free_arg)    \
+#define vsf_pyal_dictobj_set(__dict_obj, __key_str, __value_arg)                \
                                                     pikaDict_set((__dict_obj), __key_str, (__value_arg))
 
 // module

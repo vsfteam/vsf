@@ -177,10 +177,8 @@ typedef mp_obj_t                                    vsf_pyal_obj_t;
 
 #define vsf_pyal_newarg_list(__num, __args_ptr)     mp_obj_new_list((__num), (__args_ptr))
 #define vsf_pyal_newobj_list(__num, __args_ptr)     mp_obj_new_list((__num), (__args_ptr))
-#define vsf_pyal_listobj_append(__listobj, __arg, __free_arg)                   \
-                                                    mp_obj_list_append((__listobj), (__arg))
-#define vsf_pyal_listobj_append(__listobj, __arg, __free_arg)                   \
-                                                    mp_obj_list_append((__listobj), (__arg))
+#define vsf_pyal_listobj_append(__listobj, __arg)   mp_obj_list_append((__listobj), (__arg))
+
 extern size_t vsf_pyal_listobj_get_num(vsf_pyal_obj_t self_in);
 extern vsf_pyal_arg_t vsf_pyal_listobj_get_arg(vsf_pyal_obj_t self_in, int idx);
 
@@ -261,13 +259,13 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_dictkey_get_str(__dictkey)         vsf_pyal_strarg_get_str(__dictkey)
 
 #define vsf_pyal_newobj_dict()                      mp_obj_new_dict(0)
-#define vsf_pyal_dictobj_set(__dictobj, __key_str, __value_arg, __free_arg)     \
+#define vsf_pyal_dictobj_set(__dictobj, __key_str, __value_arg)                 \
     mp_obj_dict_store((__dictobj), vsf_pyal_newarg_str(__key_str), (__value_arg))
 #define vsf_pyal_dictobj_get(__dictobj, __key_str)  mp_obj_dict_get((__dictobj), vsf_pyal_newarg_str(__key_str))
 #define vsf_pyal_dictobj_del(__dictobj, __key_str)  mp_obj_dict_delete((__dictobj), vsf_pyal_newarg_str(__key_str))
 
 #define vsf_pyal_newarg_dict()                      mp_obj_new_dict(0)
-#define vsf_pyal_dictarg_set(__dictarg, __key_str, __value_arg, __free_arg)     \
+#define vsf_pyal_dictarg_set(__dictarg, __key_str, __value_arg)                 \
     mp_obj_dict_store((__dictarg), vsf_pyal_newarg_str(__key_str), (__value_arg))
 #define vsf_pyal_dictarg_get(__dictarg, __key_str)  mp_obj_dict_get((__dictarg), vsf_pyal_newarg_str(__key_str))
 #define vsf_pyal_dictarg_del(__dictarg, __key_str)  mp_obj_dict_delete((__dictarg), vsf_pyal_newarg_str(__key_str))

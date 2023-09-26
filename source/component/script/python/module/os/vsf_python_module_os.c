@@ -65,7 +65,7 @@ vsf_pyal_module_func_fix_imp(os, __init_environ, VSF_PYAL_MODULE_FUNCARG_OBJ_1, 
         }
 
         vsf_pyal_arg_t arg = vsf_pyal_newarg_str(value);
-        vsf_pyal_dictobj_set(environobj, key, arg, true);
+        vsf_pyal_dictobj_set(environobj, key, arg);
         free(key);
 
         __env++;
@@ -128,7 +128,7 @@ vsf_pyal_module_func_var_imp(os, listdir, vsf_pyal_obj_t, 0, 1, arg)
         while ((dp = readdir(dir)) != NULL) {
             if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0) {
                 vsf_pyal_arg_t arg = vsf_pyal_newarg_str(dp->d_name);
-                vsf_pyal_listobj_append(list, arg, true);
+                vsf_pyal_listobj_append(list, arg);
             }
         }
 
