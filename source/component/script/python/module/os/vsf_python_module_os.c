@@ -73,12 +73,6 @@ vsf_pyal_module_func_fix_imp(os, __init_environ, VSF_PYAL_MODULE_FUNCARG_OBJ_1, 
     vsf_pyal_func_void_return();
 }
 
-//static void print_hash(char * str)
-//{
-//    size_t hash = qstr_compute_hash((const byte *)str, strlen(str));
-//    printf("hash of %s is %d\n", str, (int)hash);
-//}
-
 vsf_pyal_module_func_init_imp(os)
 {
 #if defined(vsf_pyal_class_begin) && defined(vsf_pyal_class_end)
@@ -106,6 +100,30 @@ vsf_pyal_module_func_init_imp(os)
 #endif
 
     vsf_pyal_module_func_init_return();
+}
+
+vsf_pyal_module_func_fix_imp(os, stat, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_obj_t, vsf_pyal_funcarg_str_t patharg)
+{
+    const char *path = vsf_pyal_funcarg_get_str(patharg);
+    struct stat st;
+    if (stat(path, &st) < 0) {
+        vsf_pyal_raise("fail to stat()\n");
+        return VSF_PYAL_OBJ_NULL;
+    }
+
+    vsf_pyal_arg_t args[10] = {
+        vsf_pyal_newarg_int(st.st_mode),
+        vsf_pyal_newarg_int(st.st_ino),
+        vsf_pyal_newarg_int(st.st_dev),
+        vsf_pyal_newarg_int(st.st_nlink),
+        vsf_pyal_newarg_int(st.st_uid),
+        vsf_pyal_newarg_int(st.st_gid),
+        vsf_pyal_newarg_int(st.st_size),
+        vsf_pyal_newarg_int(st.st_atime),
+        vsf_pyal_newarg_int(st.st_mtime),
+        vsf_pyal_newarg_int(st.st_ctime),
+    };
+    return vsf_pyal_newobj_tuple(dimof(args), args);
 }
 
 vsf_pyal_module_func_var_imp(os, listdir, vsf_pyal_obj_t, 0, 1, arg)
@@ -620,6 +638,7 @@ vsf_pyal_submodule(os, path,
 vsf_pyal_module(os,
     vsf_pyal_module_func(os, __init__),
     vsf_pyal_module_func(os, __init_environ),
+    vsf_pyal_module_func(os, stat),
     vsf_pyal_module_func(os, listdir),
     vsf_pyal_module_func(os, getcwd),
     vsf_pyal_module_func(os, mkdir),
