@@ -177,7 +177,9 @@ typedef mp_obj_t                                    vsf_pyal_obj_t;
 
 #define vsf_pyal_newarg_list(__num, __args_ptr)     mp_obj_new_list((__num), (__args_ptr))
 #define vsf_pyal_newobj_list(__num, __args_ptr)     mp_obj_new_list((__num), (__args_ptr))
+#define vsf_pyal_listobj_contain(__listobj, __arg)  false
 #define vsf_pyal_listobj_append(__listobj, __arg)   mp_obj_list_append((__listobj), (__arg))
+#define vsf_pyal_listobj_remove(__listobj, __arg)   mp_obj_list_remove((__listobj), (__arg))
 
 extern size_t vsf_pyal_listobj_get_num(vsf_pyal_obj_t self_in);
 extern vsf_pyal_arg_t vsf_pyal_listobj_get_arg(vsf_pyal_obj_t self_in, int idx);
@@ -564,6 +566,10 @@ extern int __vsf_pyal_parse_tuple_keyword(vsf_pyal_keyword_parser_arg(arg), cons
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__);     \
     __func_type(mp_ ## __mod ## _ ## __func ## _obj, __mod ## _ ## __func);     \
     __ret_type __mod ## _ ## __func(vsf_pyal_obj_t selfobj, ##__VA_ARGS__)
+#define vsf_pyal_class_func_keyword_imp_noarg(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name)\
+    __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_keyword(__arg_name));      \
+    MP_DEFINE_CONST_FUN_OBJ_KW(mp_ ## __mod ## _ ## __func ## _obj, 0, __mod ## _ ## __func);\
+    __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_keyword(__arg_name))
 #define vsf_pyal_class_func_keyword_imp(__mod, __func, __ret_type, __min_arg, __max_arg, __arg_name, ...)\
     __ret_type __mod ## _ ## __func(vsf_pyal_funcarg_keyword(__arg_name));      \
     MP_DEFINE_CONST_FUN_OBJ_KW(mp_ ## __mod ## _ ## __func ## _obj, 0, __mod ## _ ## __func);\
