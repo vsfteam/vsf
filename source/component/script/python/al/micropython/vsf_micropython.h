@@ -70,6 +70,11 @@ typedef mp_obj_t                                    vsf_pyal_arg_t;
 #define vsf_pyal_arg_get_obj(__arg)                 (__arg)
 #define vsf_pyal_arg_free(__arg)
 
+#define vsf_pyal_arg_is_child_of(__arg, __mod, __class)                         \
+    mp_obj_is_subclass_fast((__arg), &mp_type_ ## __mod ## _ ## __class)
+#define vsf_pyal_arg_get_parent_obj(__arg, __parent_mod, __parent_class)        \
+    mp_obj_cast_to_native_base((__arg), (mp_const_obj_t)&mp_type_ ## __parent_mod ## _ ## __parent_class)
+
 #define vsf_pyal_arg_iter(__arg, ...)                                           \
     {                                                                           \
         mp_obj_iter_buf_t iter_buf;                                             \
@@ -606,6 +611,8 @@ extern int __vsf_pyal_parse_tuple_keyword(vsf_pyal_keyword_parser_arg(arg), cons
         __vsf_pyal_class_feature(__mod, __class, binary_op)
 #define vsf_pyal_class_feature_iterator(__mod, __class)                         \
         __vsf_pyal_class_feature(__mod, __class, iter)
+#define vsf_pyal_class_feature_parent(__mod, __class, __parent_mod, __parent_class)\
+        parent, &mp_type_ ## __parent_mod ## _ ## __parent_class
 
 #define vsf_pyal_class_inherit_func_call(__mod, __class, __builtinclass)        \
     __mod ## _ ## __class ## _inherit_from_ ## __builtinclass()
