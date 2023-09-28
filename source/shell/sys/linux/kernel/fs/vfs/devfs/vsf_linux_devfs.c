@@ -869,40 +869,72 @@ typedef struct vsf_linux_input_priv_t {
     vsf_slist_queue_t event_queue;
 } vsf_linux_input_priv_t;
 
-static void __linux_input_from_vsf_input(struct input_event *input_event, vk_input_type_t type, vk_input_evt_t *evt)
+static int __vsf_linux_input_push(vsf_linux_input_priv_t *input_priv, struct input_event *input_event)
 {
-    vsf_systimer_tick_t us = vsf_systimer_get_us();
-    input_event->time.tv_usec = us % 1000;
-    input_event->time.tv_sec = us / 1000;
-    input_event->type = type;
-
-    switch (type) {
-    case VSF_INPUT_TYPE_KEYBOARD:
-        input_event->code = vsf_input_keyboard_get_keycode(evt);
-        input_event->value = vsf_input_keyboard_is_down(evt) ? 1 : 0;
-        break;
+    vsf_linux_input_event_t *event = VSF_POOL_ALLOC(vsf_linux_input_event_pool, &input_priv->event_pool);
+    if (NULL == event) {
+        vsf_trace_warning("fail to allocate linux_event\n");
+        return - 1;
     }
-}
+    event->evt = *input_event;
 
-static void __vsf_input_from_linux_input(vk_input_type_t *type, vk_input_evt_t *evt, struct input_event *input_event)
-{
-    // TODO:
+    vsf_protect_t orig = vsf_protect_int();
+        vsf_slist_queue_enqueue(vsf_linux_input_event_t, node, &input_priv->event_queue, event);
+    vsf_unprotect_int(orig);
+    return 0;
 }
 
 static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_type_t type, vk_input_evt_t *evt)
 {
     vsf_linux_input_priv_t *input_priv = container_of(notifier, vsf_linux_input_priv_t, notifier);
-    vsf_linux_input_event_t *event = VSF_POOL_ALLOC(vsf_linux_input_event_pool, &input_priv->event_pool);
-    if (NULL == event) {
-        vsf_trace_warning("fail to allocate linux_event\n");
-        return;
+    vsf_systimer_tick_t us = vsf_systimer_get_us();
+    struct input_event input_event = {
+        .time.tv_usec   = us % 1000,
+        .time.tv_sec    = us / 1000,
+    };
+
+    switch (type) {
+    case VSF_INPUT_TYPE_SYNC:
+        input_event.code = SYN_REPORT;
+        input_event.value = 0;
+        input_event.type = EV_SYN;
+        __vsf_linux_input_push(input_priv, &input_event);
+        break;
+    case VSF_INPUT_TYPE_KEYBOARD:
+        input_event.code = vsf_input_keyboard_get_keycode(evt);
+        input_event.value = vsf_input_keyboard_is_down(evt) ? 1 : 0;
+        input_event.type = EV_KEY;
+        __vsf_linux_input_push(input_priv, &input_event);
+        break;
+    case VSF_INPUT_TYPE_MOUSE:
+        switch (vk_input_mouse_evt_get(evt)) {
+        case VSF_INPUT_MOUSE_EVT_BUTTON:
+            input_event.code = BTN_MOUSE + vk_input_mouse_evt_button_get(evt);
+            input_event.value = vk_input_mouse_evt_button_is_down(evt) ? 1 : 0;
+            input_event.type = EV_KEY;
+            __vsf_linux_input_push(input_priv, &input_event);
+            // fall through
+        case VSF_INPUT_MOUSE_EVT_MOVE:
+            input_event.code = ABS_X;
+            input_event.value = vk_input_mouse_evt_get_x(evt);
+            input_event.type = EV_ABS;
+            __vsf_linux_input_push(input_priv, &input_event);
+
+            input_event.code = ABS_Y;
+            input_event.value = vk_input_mouse_evt_get_y(evt);
+            input_event.type = EV_ABS;
+            __vsf_linux_input_push(input_priv, &input_event);
+            break;
+        case VSF_INPUT_MOUSE_EVT_WHEEL:
+            input_event.code = REL_WHEEL;
+            input_event.value = vk_input_mouse_evt_get_y(evt);
+            input_event.type = EV_REL;
+            __vsf_linux_input_push(input_priv, &input_event);
+            break;
+        }
+        break;
     }
 
-    __linux_input_from_vsf_input(&event->evt, type, evt);
-
-    vsf_protect_t orig = vsf_protect_int();
-        vsf_slist_queue_enqueue(vsf_linux_input_event_t, node, &input_priv->event_queue, event);
-    vsf_unprotect_int(orig);
     vsf_linux_fd_set_status(&input_priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
 }
 
@@ -990,7 +1022,7 @@ static ssize_t __vsf_linux_input_write(vsf_linux_fd_t *sfd, const void *buf, siz
     vk_input_evt_t vsf_input_event;
 
     while (written_count < count) {
-        __vsf_input_from_linux_input(&vsf_input_type, &vsf_input_event, linux_input_event++);
+        // generate vsf_input_type/vsf_input_event from linux_input_event;
         vsf_input_on_evt(vsf_input_type, &vsf_input_event);
         written_count += sizeof(struct input_event);
     }

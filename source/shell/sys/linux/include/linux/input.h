@@ -81,6 +81,10 @@ extern "C" {
 #define SYN_CNT                     (SYN_MAX + 1)
 
 // event codes
+// VSF_INPUT_TYPE_SYNC
+
+#define SYN_REPORT                  0
+
 // VSF_INPUT_TYPE_KEYBOARD
 
 #define KEY_RESERVED                VSF_KB_UNKNOWN
@@ -282,19 +286,19 @@ extern "C" {
 #define BTN_TRIGGER_HAPPY9          (GAMEPAD_ID_USER + 10)
 #define BTN_TRIGGER_HAPPY10         (GAMEPAD_ID_USER + 11)
 
-#define BTN_MOUSE                   0x110
+#define BTN_MOUSE                   0x410
 #define BTN_LEFT                    (BTN_MOUSE + VSF_INPUT_MOUSE_BUTTON_LEFT)
 #define BTN_RIGHT                   (BTN_MOUSE + VSF_INPUT_MOUSE_BUTTON_RIGHT)
 #define BTN_MIDDLE                  (BTN_MOUSE + VSF_INPUT_MOUSE_BUTTON_MIDDLE)
 
-#define BTN_JOYSTICK                0x120
+#define BTN_JOYSTICK                0x420
 #define BTN_TRIGGER                 BTN_JOYSTICK
 
-#define BTN_DIGI                    0x140
-#define BTN_TOOL_PEN                0x140
-#define BTN_TOOL_FINGER             0x145
-#define BTN_TOUCH                   0x14a
-#define BTN_STYLUS                  0x14b
+#define BTN_DIGI                    0x440
+#define BTN_TOOL_PEN                0x440
+#define BTN_TOOL_FINGER             0x445
+#define BTN_TOUCH                   0x44a
+#define BTN_STYLUS                  0x44b
 
 // abs
 
