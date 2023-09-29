@@ -317,6 +317,7 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_funcarg_void                       void
 #define vsf_pyal_class_func_var_arg_skip_self(__arg_name)                       \
     vsf_pyal_obj_t selfobj = ((__arg_name ## _arr)[0]);                         \
+    VSF_UNUSED_PARAM(selfobj);                                                  \
     __arg_name ## _arr++;                                                       \
     __arg_name ## _num--
 #define vsf_pyal_class_func_var_arg_restore_self(__arg_name)                    \
@@ -413,6 +414,9 @@ extern int __vsf_pyal_parse_tuple_keyword(vsf_pyal_keyword_parser_arg(arg), cons
 #define vsf_pyal_module_func_declare_noarg(__mod, __func, __ret_type)           \
     extern mp_rom_obj_t mp_ ## __mod ## _ ## __func ## _obj;                    \
     extern __ret_type __mod ## _ ## __func(void)
+
+#define vsf_pyal_module_selfobj(__mod)              &mp_module_ ## __mod
+#define vsf_pyal_module_declare(__mod)              extern const mp_obj_module_t mp_module_ ## __mod
 
 #define vsf_pyal_module_int(__mod, __name, __value) { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_INT(__value) }
 #define vsf_pyal_module_str(__mod, __name, __str)   { MP_ROM_QSTR(MP_QSTR_ ## __name), MP_ROM_QSTR(MP_QSTR_ ## __str) }
