@@ -182,9 +182,17 @@ typedef mp_obj_t                                    vsf_pyal_obj_t;
 
 #define vsf_pyal_newarg_list(__num, __args_ptr)     mp_obj_new_list((__num), (__args_ptr))
 #define vsf_pyal_newobj_list(__num, __args_ptr)     mp_obj_new_list((__num), (__args_ptr))
-#define vsf_pyal_listobj_contain(__listobj, __arg)  false
+#define vsf_pyal_listobj_contain(__listobj, __arg)                              \
+    ({                                                                          \
+        bool result = false;                                                    \
+        vsf_pyal_arg_iter((__listobj), if (_ == (__arg)) { result = true; break; })\
+        result;                                                                 \
+    })
 #define vsf_pyal_listobj_append(__listobj, __arg)   mp_obj_list_append((__listobj), (__arg))
 #define vsf_pyal_listobj_remove(__listobj, __arg)   mp_obj_list_remove((__listobj), (__arg))
+#define vsf_pyal_listobj_contain_obj(__listobj, __obj)  vsf_pyal_listobj_contain((__listobj), (__obj))
+#define vsf_pyal_listobj_append_obj(__listobj, __obj)   mp_obj_list_append((__listobj), (__obj))
+#define vsf_pyal_listobj_remove_obj(__listobj, __obj)   mp_obj_list_remove((__listobj), (__obj))
 
 extern size_t vsf_pyal_listobj_get_num(vsf_pyal_obj_t self_in);
 extern vsf_pyal_arg_t vsf_pyal_listobj_get_arg(vsf_pyal_obj_t self_in, int idx);
