@@ -112,8 +112,8 @@ int __vsf_pyal_parse_tuple_keyword(vsf_pyal_keyword_parser_arg(arg), const char 
                 int size = *format == '#' ? 0 : -1;
                 if (size >= 0) {
                     format++;
-                    fn_u.fn_parser_sized = va_arg(ap, vsf_pyal_arg_sized_parser_t);
                     size = va_arg(ap, int);
+                    fn_u.fn_parser_sized = va_arg(ap, vsf_pyal_arg_sized_parser_t);
                 } else {
                     fn_u.fn_parser = va_arg(ap, vsf_pyal_arg_parser_t);
                 }
