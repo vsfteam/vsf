@@ -274,10 +274,13 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_dictkey_get_str(__dictkey)         vsf_pyal_strarg_get_str(__dictkey)
 
 #define vsf_pyal_newobj_dict()                      mp_obj_new_dict(0)
-#define vsf_pyal_dictobj_set(__dictobj, __key_str, __value_arg)                 \
+#define vsf_pyal_dictobj_strkey_set(__dictobj, __key_str, __value_arg)          \
     mp_obj_dict_store((__dictobj), vsf_pyal_newarg_str(__key_str), (__value_arg))
-#define vsf_pyal_dictobj_get(__dictobj, __key_str)  mp_obj_dict_get((__dictobj), vsf_pyal_newarg_str(__key_str))
-#define vsf_pyal_dictobj_del(__dictobj, __key_str)  mp_obj_dict_delete((__dictobj), vsf_pyal_newarg_str(__key_str))
+#define vsf_pyal_dictobj_strkey_get(__dictobj, __key_str)   mp_obj_dict_get((__dictobj), vsf_pyal_newarg_str(__key_str))
+#define vsf_pyal_dictobj_strkey_del(__dictobj, __key_str)   mp_obj_dict_delete((__dictobj), vsf_pyal_newarg_str(__key_str))
+#define vsf_pyal_dictobj_objkey_set(__dictobj, __keyobj, __value_arg)  mp_obj_dict_store((__dictobj), (__keyobj), (__value_arg))
+#define vsf_pyal_dictobj_objkey_get(__dictobj, __keyobj)    mp_obj_dict_get((__dictobj), (__keyobj))
+#define vsf_pyal_dictobj_objkey_del(__dictobj, __keyobj)    mp_obj_dict_delete((__dictobj), (__keyobj))
 
 #define vsf_pyal_newarg_dict()                      mp_obj_new_dict(0)
 #define vsf_pyal_dictarg_set(__dictarg, __key_str, __value_arg)                 \
@@ -286,10 +289,6 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 #define vsf_pyal_dictarg_del(__dictarg, __key_str)  mp_obj_dict_delete((__dictarg), vsf_pyal_newarg_str(__key_str))
 
 // module
-
-#if VSF_PYAL_FEATURE_MODULE_IS_DYN
-#   define vsf_pyal_module_add_obj(__mod, __name, __obj)
-#endif
 
 #define vsf_pyal_funcarg_str_t                      vsf_pyal_arg_t
 #define vsf_pyal_funcarg_get_str(__arg)             vsf_pyal_strarg_get_str(__arg)
@@ -736,9 +735,13 @@ extern int __vsf_pyal_parse_tuple_keyword(vsf_pyal_keyword_parser_arg(arg), cons
 #define MP_DEFINE_OBJ_TYPE_NARGS(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, N, ...) MP_DEFINE_OBJ_TYPE_NARGS_##N
 #define MP_DEFINE_OBJ_TYPE(...) MP_DEFINE_OBJ_TYPE_EXPAND(MP_DEFINE_OBJ_TYPE_NARGS(__VA_ARGS__, _INV, 12, _INV, 11, _INV, 10, _INV, 9, _INV, 8, _INV, 7, _INV, 6, _INV, 5, _INV, 4, _INV, 3, _INV, 2, _INV, 1, _INV, 0)(mp_obj_type_t, __VA_ARGS__))
 
-#define vsf_pyal_root_add_obj(__key_str, __obj)     vsf_pyal_dictobj_set(&MP_STATE_VM(dict_main), (__key_str), (__obj))
-#define vsf_pyal_root_get_obj(__key_str)            vsf_pyal_dictobj_get(&MP_STATE_VM(dict_main), (__key_str))
-#define vsf_pyal_root_del(__key_str)                vsf_pyal_dictobj_del(&MP_STATE_VM(dict_main), (__key_str))
+#define vsf_pyal_root_strkey_addobj(__key_str, __obj)   vsf_pyal_dictobj_strkey_set(&MP_STATE_VM(dict_main), (__key_str), (__obj))
+#define vsf_pyal_root_strkey_getobj(__key_str)      vsf_pyal_dictobj_strkey_get(&MP_STATE_VM(dict_main), (__key_str))
+#define vsf_pyal_root_strkey_del(__key_str)         vsf_pyal_dictobj_strkey_del(&MP_STATE_VM(dict_main), (__key_str))
+
+#define vsf_pyal_root_objkey_addobj(__keyobj, __obj)    vsf_pyal_dictobj_objkey_set(&MP_STATE_VM(dict_main), (__keyobj), (__obj))
+#define vsf_pyal_root_objkey_getobj(__keyobj)       vsf_pyal_dictobj_objkey_get(&MP_STATE_VM(dict_main), (__keyobj))
+#define vsf_pyal_root_objkey_del(__keyobj)          vsf_pyal_dictobj_objkey_del(&MP_STATE_VM(dict_main), (__keyobj))
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

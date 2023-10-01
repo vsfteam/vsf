@@ -166,6 +166,11 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
 #define vsf_pyal_newobj_inst(__mod, __class)        not supported
 #define vsf_pyal_instobj_get(__instobj)             arg_getBytes(obj_getArg((__instobj), "_self"))
 #define vsf_pyal_instarg_get(__instarg)             vsf_pyal_instobj_get(vsf_pyal_arg_get_obj(__instarg))
+#define vsf_pyal_instobj_strkey_addobj(__instobj, __key_str, __obj)             \
+    ({                                                                          \
+        vsf_pyal_arg_t VSF_MACRO_SAFE_NAME(arg) = vsf_pyal_newarg_obj(__obj);   \
+        obj_setArg_noCopy((__instobj), (__key_str), VSF_MACRO_SAFE_NAME(arg));  \
+    })
 
 // file
 
@@ -235,19 +240,19 @@ typedef char *                                      vsf_pyal_dict_key_t;
 
 #define vsf_pyal_newobj_dict()                      New_PikaDict()
 
-#define vsf_pyal_dictobj_set(__dict_obj, __key_str, __value_arg)                \
+#define vsf_pyal_dictobj_strkey_set(__dict_obj, __key_str, __value_arg)         \
                                                     pikaDict_set((__dict_obj), __key_str, (__value_arg))
 
 // module
 
-#define vsf_pyal_module_add_obj(__mod, __name, __obj)                           \
+#define vsf_pyal_module_addobj(__mod, __key_str, __obj)                         \
     ({                                                                          \
         vsf_pyal_arg_t VSF_MACRO_SAFE_NAME(arg) = vsf_pyal_newarg_obj(__obj);   \
-        obj_setArg_noCopy(selfobj, (__name), VSF_MACRO_SAFE_NAME(arg));         \
+        obj_setArg_noCopy(selfobj, (__key_str), VSF_MACRO_SAFE_NAME(arg));      \
     })
-#define vsf_pyal_module_add_str(__mod, __name, __str)                           \
+#define vsf_pyal_module_addstr(__mod, __name, __str)                            \
                                                     obj_setStr(selfobj, (__name), (__str))
-#define vsf_pyal_module_add_int(__mod, __name, __value)                         \
+#define vsf_pyal_module_addint(__mod, __name, __value)                          \
                                                     obj_setInt(selfobj, (__name), (__value))
 
 #define vsf_pyal_funcarg_str_t                      char *

@@ -65,7 +65,7 @@ vsf_pyal_module_func_fix_imp(os, __init_environ, VSF_PYAL_MODULE_FUNCARG_OBJ_1, 
         }
 
         vsf_pyal_arg_t arg = vsf_pyal_newarg_str(value);
-        vsf_pyal_dictobj_set(environobj, key, arg);
+        vsf_pyal_dictobj_strkey_set(environobj, key, arg);
         free(key);
 
         __env++;
@@ -82,22 +82,22 @@ vsf_pyal_module_func_init_imp(os)
 #endif
 
 #if VSF_PYAL_FEATURE_MODULE_IS_DYN
-    vsf_pyal_module_add_str(os, "sep", "/");
-    vsf_pyal_module_add_int(os, "O_RDONLY", O_RDONLY);
-    vsf_pyal_module_add_int(os, "O_WRONLY", O_WRONLY);
-    vsf_pyal_module_add_int(os, "O_RDWR", O_RDWR);
-    vsf_pyal_module_add_int(os, "O_APPEND", O_APPEND);
-    vsf_pyal_module_add_int(os, "O_CREAT", O_CREAT);
+    vsf_pyal_module_addstr(os, "sep", "/");
+    vsf_pyal_module_addint(os, "O_RDONLY", O_RDONLY);
+    vsf_pyal_module_addint(os, "O_WRONLY", O_WRONLY);
+    vsf_pyal_module_addint(os, "O_RDWR", O_RDWR);
+    vsf_pyal_module_addint(os, "O_APPEND", O_APPEND);
+    vsf_pyal_module_addint(os, "O_CREAT", O_CREAT);
 
     struct utsname name;
     uname(&name);
-    vsf_pyal_module_add_str(os, "name", name.sysname);
+    vsf_pyal_module_addstr(os, "name", name.sysname);
 
     // for dynamic implementation, __init_environ should be called in python code
 #else
     vsf_pyal_obj_t environobj = &__os_environ;
     vsf_pyal_module_func_call(vsf_pyal_module_func_name(os, __init_environ), environobj);
-    vsf_pyal_root_add_obj("_os_environ", environobj);
+    vsf_pyal_root_strkey_addobj("_os_environ", environobj);
 #endif
 
     vsf_pyal_module_func_init_return();
