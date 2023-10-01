@@ -736,9 +736,9 @@ extern int __vsf_pyal_parse_tuple_keyword(vsf_pyal_keyword_parser_arg(arg), cons
 #define MP_DEFINE_OBJ_TYPE_NARGS(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, _23, _24, _25, _26, _27, _28, N, ...) MP_DEFINE_OBJ_TYPE_NARGS_##N
 #define MP_DEFINE_OBJ_TYPE(...) MP_DEFINE_OBJ_TYPE_EXPAND(MP_DEFINE_OBJ_TYPE_NARGS(__VA_ARGS__, _INV, 12, _INV, 11, _INV, 10, _INV, 9, _INV, 8, _INV, 7, _INV, 6, _INV, 5, _INV, 4, _INV, 3, _INV, 2, _INV, 1, _INV, 0)(mp_obj_type_t, __VA_ARGS__))
 
-#define vsf_pyal_root_add_obj(__key_str, __obj)     vsf_pyal_dictobj_set(&mp_state_ctx.vm.dict_main, (__key_str), (__obj))
-#define vsf_pyal_root_get_obj(__key_str)            vsf_pyal_dictobj_get(&mp_state_ctx.vm.dict_main, (__key_str))
-#define vsf_pyal_root_del(__key_str)                vsf_pyal_dictobj_del(&mp_state_ctx.vm.dict_main, (__key_str))
+#define vsf_pyal_root_add_obj(__key_str, __obj)     vsf_pyal_dictobj_set(&MP_STATE_VM(dict_main), (__key_str), (__obj))
+#define vsf_pyal_root_get_obj(__key_str)            vsf_pyal_dictobj_get(&MP_STATE_VM(dict_main), (__key_str))
+#define vsf_pyal_root_del(__key_str)                vsf_pyal_dictobj_del(&MP_STATE_VM(dict_main), (__key_str))
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
