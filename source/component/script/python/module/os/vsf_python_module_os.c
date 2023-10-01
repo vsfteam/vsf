@@ -95,8 +95,9 @@ vsf_pyal_module_func_init_imp(os)
 
     // for dynamic implementation, __init_environ should be called in python code
 #else
-    vsf_pyal_arg_t environobj = &__os_environ;
+    vsf_pyal_obj_t environobj = &__os_environ;
     vsf_pyal_module_func_call(vsf_pyal_module_func_name(os, __init_environ), environobj);
+    vsf_pyal_root_add_obj("_os_environ", environobj);
 #endif
 
     vsf_pyal_module_func_init_return();
