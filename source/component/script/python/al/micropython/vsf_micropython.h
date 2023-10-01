@@ -483,7 +483,9 @@ extern int __vsf_pyal_parse_tuple_keyword(vsf_pyal_keyword_parser_arg(arg), cons
     vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t __arg_name ## _arg_num, size_t __arg_name ## _kw_num, const vsf_pyal_arg_t *__arg_name ## _arr) {\
         enum { VSF_MFOREACH_ARG1(__vsf_pyal_keyword_enum, __arg_name, __VA_ARGS__) };\
         mp_arg_val_t __arg_name ## _val[VSF_VA_NUM_ARGS(__VA_ARGS__)];          \
-        __mod ## _ ## __class ## _t *self = NULL;
+        __mod ## _ ## __class ## _t *self = NULL;                               \
+        VSF_UNUSED_PARAM(__arg_name ## _val);                                   \
+        VSF_UNUSED_PARAM(self);
 #define vsf_pyal_class_new_func_keyword_prepare(__arg_name, ...)                \
     STATIC const mp_arg_t __arg_name ## _args[] = { __VA_ARGS__ };              \
     mp_arg_parse_all_kw_array(__arg_name ## _arg_num, __arg_name ## _kw_num, __arg_name ## _arr,\
@@ -491,7 +493,8 @@ extern int __vsf_pyal_parse_tuple_keyword(vsf_pyal_keyword_parser_arg(arg), cons
 
 #define vsf_pyal_class_new_func(__mod, __class, __arg_name)                     \
     vsf_pyal_obj_t __mod ## _ ## __class ## _make_new(const mp_obj_type_t *type, size_t __arg_name ## _arg_num, size_t n_kw, const vsf_pyal_arg_t *__arg_name ## _args) {\
-        __mod ## _ ## __class ## _t *self = NULL;
+        __mod ## _ ## __class ## _t *self = NULL;                               \
+        VSF_UNUSED_PARAM(self);
 
 #define vsf_pyal_class_new_create(__mod, __class, __exsize)                     \
     ({                                                                          \
