@@ -513,11 +513,16 @@ extern int __vsf_pyal_parse_tuple_keyword(vsf_pyal_keyword_parser_arg(arg), cons
         return vsf_pyal_inst_to_obj(self);                                      \
     }
 
+#define vsf_pyal_class_del_func_declare(__mod, __class)                         \
+    extern vsf_pyal_obj_t __mod ## _ ## __class ## ___del__(vsf_pyal_obj_t selfobj)
+#define vsf_pyal_class_del_func_call(__mod, __class, __selfobj)                 \
+    __mod ## _ ## __class ## ___del__(selfobj)
 #define vsf_pyal_class_del_func(__mod, __class)                                 \
     vsf_pyal_obj_t __mod ## _ ## __class ## ___del__(vsf_pyal_obj_t selfobj);   \
     VSF_PYAL_MODULE_FUNCARG_OBJ_1(mp_ ## __mod ## _ ## __class ## ___del___obj, __mod ## _ ## __class ## ___del__);\
     vsf_pyal_obj_t __mod ## _ ## __class ## ___del__(vsf_pyal_obj_t selfobj) {  \
-        __mod ## _ ## __class ## _t *self = (__mod ## _ ## __class ## _t *)vsf_pyal_instobj_get(selfobj);
+        __mod ## _ ## __class ## _t *self = (__mod ## _ ## __class ## _t *)vsf_pyal_instobj_get(selfobj);\
+        VSF_UNUSED_PARAM(self);
 #define vsf_pyal_class_del_func_end()                                           \
         vsf_pyal_func_void_return();                                            \
     }
