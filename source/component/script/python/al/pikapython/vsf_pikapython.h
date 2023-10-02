@@ -255,17 +255,17 @@ typedef char *                                      vsf_pyal_dict_key_t;
 
 #define vsf_pyal_funcarg_str_t                      char *
 #define vsf_pyal_funcarg_getstr(__arg)              (__arg)
-#define vsf_pyal_funcarg_newstr(__str)              obj_cacheStr(selfobj, (__str))
+#define vsf_pyal_newfuncarg_str(__str)              obj_cacheStr(selfobj, (__str))
 
 #define vsf_pyal_funcarg_int_t                      int
 #define vsf_pyal_funcarg_getint(__arg)              (__arg)
-#define vsf_pyal_funcarg_newint(__value)            (__value)
+#define vsf_pyal_newfuncarg_int(__value)            (__value)
 #define vsf_pyal_funcarg_bool_t                     bool
 #define vsf_pyal_funcarg_getbool(__arg)             (__arg)
-#define vsf_pyal_funcarg_newbool(__bool)            (__bool)
+#define vsf_pyal_newfuncarg_bool(__bool)            (__bool)
 #define vsf_pyal_funcarg_float_t                    float
 #define vsf_pyal_funcarg_getfloat(__arg)            (__arg)
-#define vsf_pyal_funcarg_newfloat(__value)          (__value)
+#define vsf_pyal_newfuncarg_float(__value)          (__value)
 #define vsf_pyal_funcarg_bytes_t                    uint8_t *
 #define vsf_pyal_funcarg_callable_t                 vsf_pyal_arg_t
 #define vsf_pyal_funcarg_tuple_t                    vsf_pyal_obj_t

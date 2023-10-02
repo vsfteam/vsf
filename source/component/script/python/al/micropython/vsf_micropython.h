@@ -281,16 +281,16 @@ typedef mp_obj_t                                    vsf_pyal_dict_key_t;
 
 #define vsf_pyal_funcarg_str_t                      vsf_pyal_arg_t
 #define vsf_pyal_funcarg_getstr(__arg)              vsf_pyal_arg_getstr(__arg)
-#define vsf_pyal_funcarg_newstr(__str)              vsf_pyal_newarg_str(__str)
+#define vsf_pyal_newfuncarg_str(__str)              vsf_pyal_newarg_str(__str)
 #define vsf_pyal_funcarg_int_t                      vsf_pyal_arg_t
 #define vsf_pyal_funcarg_getint(__arg)              vsf_pyal_arg_getint(__arg)
-#define vsf_pyal_funcarg_newint(__value)            vsf_pyal_newarg_int(__value)
+#define vsf_pyal_newfuncarg_int(__value)            vsf_pyal_newarg_int(__value)
 #define vsf_pyal_funcarg_bool_t                     vsf_pyal_arg_t
 #define vsf_pyal_funcarg_getbool(__arg)             vsf_pyal_arg_getbool(__arg)
-#define vsf_pyal_funcarg_newbool(__bool)            vsf_pyal_newarg_bool(__bool)
+#define vsf_pyal_newfuncarg_bool(__bool)            vsf_pyal_newarg_bool(__bool)
 #define vsf_pyal_funcarg_float_t                    vsf_pyal_arg_t
 #define vsf_pyal_funcarg_getfloat(__arg)            vsf_pyal_arg_getfloat(__arg)
-#define vsf_pyal_funcarg_newfloat(__value)          vsf_pyal_newarg_float(__value)
+#define vsf_pyal_newfuncarg_float(__value)          vsf_pyal_newarg_float(__value)
 #define vsf_pyal_funcarg_bytes_t                    vsf_pyal_arg_t
 #define vsf_pyal_funcarg_callable_t                 vsf_pyal_arg_t
 #define vsf_pyal_funcarg_tuple_t                    vsf_pyal_arg_t
