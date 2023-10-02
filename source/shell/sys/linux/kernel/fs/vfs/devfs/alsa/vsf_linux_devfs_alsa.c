@@ -44,8 +44,8 @@
 #   define __bitwise
 #endif
 
-#include <sound/type_compat.h>
-#include <sound/uapi/asound.h>
+#include <alsa/sound/type_compat.h>
+#include <alsa/sound/uapi/asound.h>
 
 /*============================ MACROS ========================================*/
 
