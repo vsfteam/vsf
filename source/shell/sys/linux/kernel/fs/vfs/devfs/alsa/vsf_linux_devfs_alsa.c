@@ -23,6 +23,7 @@
 
 #define __VSF_FS_CLASS_INHERIT__
 #define __VSF_LINUX_FS_CLASS_INHERIT__
+#define __VSF_AUDIO_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "shell/sys/linux/include/unistd.h"
 #   include "shell/sys/linux/include/errno.h"
@@ -43,8 +44,8 @@
 #   define __bitwise
 #endif
 
-#include <alsa/sound/type_compat.h>
-#include <alsa/sound/uapi/asound.h>
+#include <sound/type_compat.h>
+#include <sound/uapi/asound.h>
 
 /*============================ MACROS ========================================*/
 
@@ -1248,6 +1249,8 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         }
         break;
     case SNDRV_PCM_IOCTL_DROP:
+        extern void __vsf_linux_rx_stream_drop(vsf_linux_stream_priv_t *priv_rx);
+        extern void __vsf_linux_tx_stream_drop(vsf_linux_stream_priv_t *priv_tx);
         if (is_playback) {
             __vsf_linux_tx_stream_drop(&priv->use_as__vsf_linux_stream_priv_t);
         } else {
