@@ -33,7 +33,7 @@ typedef int (*vsf_pyal_arg_sized_parser_t)(vsf_pyal_arg_t arg, int size, void *p
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-int __vsf_pyal_parse_tuple_keyword(vsf_pyal_keyword_parser_arg(arg), const char *format, ...)
+int __vsf_pyal_parse_tuple_keyword(__vsf_pyal_keyword_parser_arg(arg), const char *format, ...)
 {
     bool is_forced = true, is_done = false;
     vsf_pyal_arg_t arg;
@@ -69,7 +69,7 @@ int __vsf_pyal_parse_tuple_keyword(vsf_pyal_keyword_parser_arg(arg), const char 
                 return -1;
             }
 
-            arg = __vsf_pyal_keyword_get_arg(arg, key, parsed);
+            arg = __vsf_pyal_keyword_getarg(arg, key, parsed);
         }
 
         switch (*format++) {
@@ -86,7 +86,7 @@ int __vsf_pyal_parse_tuple_keyword(vsf_pyal_keyword_parser_arg(arg), const char 
                     return -1;
                 }
             } else {
-                *u.value_str = (char *)vsf_pyal_strarg_get_str(arg);
+                *u.value_str = (char *)vsf_pyal_arg_getstr(arg);
             }
             break;
         case 'f':
@@ -95,14 +95,14 @@ int __vsf_pyal_parse_tuple_keyword(vsf_pyal_keyword_parser_arg(arg), const char 
                     return -1;
                 }
             } else {
-                *u.value_float = vsf_pyal_floatarg_get_float(arg);
+                *u.value_float = vsf_pyal_arg_getfloat(arg);
             }
             break;
         case 'i':
-            *u.value_int = __vsf_pyal_keyword_get_int(arg, key, parsed);
+            *u.value_int = __vsf_pyal_keyword_getint(arg, key, parsed);
             break;
         case 'p':
-            *u.value_bool = __vsf_pyal_keyword_get_bool(arg, key, parsed);
+            *u.value_bool = __vsf_pyal_keyword_getbool(arg, key, parsed);
             break;
         case 'O': {
                 union {

@@ -105,7 +105,7 @@ vsf_pyal_module_func_init_imp(os)
 
 vsf_pyal_module_func_fix_imp(os, stat, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_obj_t, vsf_pyal_funcarg_str_t patharg)
 {
-    const char *path = vsf_pyal_funcarg_get_str(patharg);
+    const char *path = vsf_pyal_funcarg_getstr(patharg);
     struct stat st;
     if (stat(path, &st) < 0) {
         vsf_pyal_raise("fail to stat()\n");
@@ -137,7 +137,7 @@ vsf_pyal_module_func_var_imp(os, listdir, vsf_pyal_obj_t, 0, 1, arg)
     }
 #endif
     char __path[PATH_MAX];
-    char *str_path = argc == 0 ? getcwd(__path, sizeof(__path)) : vsf_pyal_funcarg_var_get_str(arg, 0);
+    char *str_path = argc == 0 ? getcwd(__path, sizeof(__path)) : vsf_pyal_funcarg_var_getstr(arg, 0);
     struct dirent* dp;
     DIR* dir = opendir(str_path);
 
@@ -178,8 +178,8 @@ vsf_pyal_module_func_var_imp(os, mkdir, vsf_pyal_func_void_return_t, 1, 2, arg)
     }
 #endif
 
-    char *path_str = vsf_pyal_funcarg_var_get_str(arg, 0);
-    int mode_int = 1 == argc ? 0777 : vsf_pyal_funcarg_var_get_int(arg, 1);
+    char *path_str = vsf_pyal_funcarg_var_getstr(arg, 0);
+    int mode_int = 1 == argc ? 0777 : vsf_pyal_funcarg_var_getint(arg, 1);
     if (mkdir((const char *)path_str, mode_int) < 0) {
         vsf_pyal_raise("fail to mkdir(%s, %d)\n", path_str, mode_int);
     }
@@ -196,8 +196,8 @@ vsf_pyal_module_func_var_imp(os, makedirs, vsf_pyal_func_void_return_t, 1, 2, ar
     }
 #endif
 
-    char *path_str = vsf_pyal_funcarg_var_get_str(arg, 0);
-    int mode_int = 1 == argc ? 0777 : vsf_pyal_funcarg_var_get_int(arg, 1);
+    char *path_str = vsf_pyal_funcarg_var_getstr(arg, 0);
+    int mode_int = 1 == argc ? 0777 : vsf_pyal_funcarg_var_getint(arg, 1);
     if (mkdirs((const char *)path_str, mode_int) < 0) {
         vsf_pyal_raise("fail to mkdirs(%s, %d)\n", path_str, mode_int);
     }
@@ -206,7 +206,7 @@ vsf_pyal_module_func_var_imp(os, makedirs, vsf_pyal_func_void_return_t, 1, 2, ar
 
 vsf_pyal_module_func_fix_imp(os, rmdir, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_get_str(path);
+    char *path_str = vsf_pyal_funcarg_getstr(path);
     if (rmdir((const char *)path_str) < 0) {
         vsf_pyal_raise("fail to rmdir(%s)\n", path_str);
     }
@@ -215,7 +215,7 @@ vsf_pyal_module_func_fix_imp(os, rmdir, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_
 
 vsf_pyal_module_func_fix_imp(os, chdir, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_get_str(path);
+    char *path_str = vsf_pyal_funcarg_getstr(path);
     if (chdir((const char *)path_str) < 0) {
         vsf_pyal_raise("fail to chdir(%s)\n", path_str);
     }
@@ -224,8 +224,8 @@ vsf_pyal_module_func_fix_imp(os, chdir, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_
 
 vsf_pyal_module_func_fix_imp(os, rename, VSF_PYAL_MODULE_FUNCARG_OBJ_2, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_str_t old, vsf_pyal_funcarg_str_t new)
 {
-    char *path_old_str = vsf_pyal_funcarg_get_str(old);
-    char *path_new_str = vsf_pyal_funcarg_get_str(new);
+    char *path_old_str = vsf_pyal_funcarg_getstr(old);
+    char *path_new_str = vsf_pyal_funcarg_getstr(new);
     if (rename((const char *)path_old_str, (const char *)path_new_str) < 0) {
         vsf_pyal_raise("fail to rename(%s, %s)\n", path_old_str, path_new_str);
     }
@@ -234,7 +234,7 @@ vsf_pyal_module_func_fix_imp(os, rename, VSF_PYAL_MODULE_FUNCARG_OBJ_2, vsf_pyal
 
 vsf_pyal_module_func_fix_imp(os, remove, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_get_str(path);
+    char *path_str = vsf_pyal_funcarg_getstr(path);
     if (remove((const char *)path_str) < 0) {
         vsf_pyal_raise("fail to remove(%s)\n", path_str);
     }
@@ -254,7 +254,7 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_arg_t, 1, 3, arg)
     // if the first arg is int, it's fd_int
     // if the first arg is str, it's path_str
     if ((1 == argc) && vsf_pyal_funcarg_var_is_int(arg, 0)) {
-        int fd = vsf_pyal_funcarg_var_get_int(arg, 0);
+        int fd = vsf_pyal_funcarg_var_getint(arg, 0);
         vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
         if (NULL == sfd) {
             vsf_pyal_raise("invalid fd %d\n", fd);
@@ -263,13 +263,13 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_arg_t, 1, 3, arg)
         return vsf_pyal_newarg_file((FILE *)sfd, true);
     }
 
-    char *path_str = vsf_pyal_funcarg_var_get_str(arg, 0);
+    char *path_str = vsf_pyal_funcarg_var_getstr(arg, 0);
     // if the 2nd arg is int, it's flags of open
     // if the 2nd arg is str, it's mode of fopen
     if (vsf_pyal_funcarg_var_is_int(arg, 1)) {
-        int flags_int = vsf_pyal_funcarg_var_get_int(arg, 1);
+        int flags_int = vsf_pyal_funcarg_var_getint(arg, 1);
         // the possible 3rd arg as mode of open, default is 0777
-        int mode_int = 2 == argc ? 0777 : vsf_pyal_funcarg_var_get_int(arg, 2);
+        int mode_int = 2 == argc ? 0777 : vsf_pyal_funcarg_var_getint(arg, 2);
         int fd = open((const char *)path_str, flags_int, mode_int);
         if (fd < 0) {
             vsf_pyal_raise("fail to open(%s, %d)\n", path_str, mode_int);
@@ -277,7 +277,7 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_arg_t, 1, 3, arg)
         }
         return vsf_pyal_newarg_int(fd);
     } else if (vsf_pyal_funcarg_var_is_str(arg, 1)) {
-        char *mode_str = vsf_pyal_funcarg_var_get_str(arg, 1);
+        char *mode_str = vsf_pyal_funcarg_var_getstr(arg, 1);
         FILE *f = fopen(path_str, mode_str);
         if (NULL == f) {
             vsf_pyal_raise("fail to open(%s, %s)\n", path_str, mode_str);
@@ -302,21 +302,21 @@ vsf_pyal_module_func_var_imp(os, read, vsf_pyal_funcarg_bytes_t, 2, 2, arg)
 #endif
 
     // the 2nd arg is length
-    ssize_t length = vsf_pyal_funcarg_var_get_int(arg, 1);
+    ssize_t length = vsf_pyal_funcarg_var_getint(arg, 1);
     int fd;
 
     // the first arg is fd_int/file_obj
     if (vsf_pyal_funcarg_var_is_int(arg, 0)) {
-        fd = vsf_pyal_funcarg_var_get_int(arg, 0);
+        fd = vsf_pyal_funcarg_var_getint(arg, 0);
     } else {
-        vsf_pyal_arg_t filearg = vsf_pyal_funcarg_var_get_arg(arg, 0);
-        FILE *f = vsf_pyal_filearg_get_file(filearg);
+        vsf_pyal_arg_t filearg = vsf_pyal_funcarg_var_getarg(arg, 0);
+        FILE *f = vsf_pyal_filearg_getfile(filearg);
         fd = ((vsf_linux_fd_t *)f)->fd;
     }
 
 #ifdef vsf_pyal_buffer_t
     vsf_pyal_buffer_t buffer = vsf_pyal_new_buffer(length);
-    length = read(fd, vsf_pyal_buffer_get_buffer(buffer), vsf_pyal_buffer_get_len(buffer));
+    length = read(fd, vsf_pyal_buffer_getptr(buffer), vsf_pyal_buffer_getlen(buffer));
     if (length <= 0) {
         vsf_pyal_raise("fail to read fd %d\n", fd);
         vsf_pyal_buffer_free(buffer);
@@ -353,17 +353,17 @@ vsf_pyal_module_func_var_imp(os, write, vsf_pyal_funcarg_int_t, 2, 2, arg)
 #endif
 
     // the 2nd arg is bytesobj
-    vsf_pyal_arg_t bytesarg = vsf_pyal_funcarg_var_get_arg(arg, 1);
+    vsf_pyal_arg_t bytesarg = vsf_pyal_funcarg_var_getarg(arg, 1);
     size_t length;
-    uint8_t *buffer = vsf_pyal_bytesarg_get_data(bytesarg, &length);
+    uint8_t *buffer = vsf_pyal_arg_getbytes(bytesarg, &length);
     int fd;
 
     // the first arg is fd_int/file_obj
     if (vsf_pyal_funcarg_var_is_int(arg, 0)) {
-        fd = vsf_pyal_funcarg_var_get_int(arg, 0);
+        fd = vsf_pyal_funcarg_var_getint(arg, 0);
     } else {
-        vsf_pyal_arg_t filearg = vsf_pyal_funcarg_var_get_arg(arg, 0);
-        FILE *f = vsf_pyal_filearg_get_file(filearg);
+        vsf_pyal_arg_t filearg = vsf_pyal_funcarg_var_getarg(arg, 0);
+        FILE *f = vsf_pyal_filearg_getfile(filearg);
         fd = ((vsf_linux_fd_t *)f)->fd;
     }
 
@@ -382,21 +382,21 @@ vsf_pyal_module_func_var_imp(os, ioctl, vsf_pyal_funcarg_int_t, 2, 2, arg)
 #endif
 
     // the 2nd arg is request of ioctl
-    unsigned long request = (unsigned long)vsf_pyal_funcarg_var_get_int(arg, 1);
+    unsigned long request = (unsigned long)vsf_pyal_funcarg_var_getint(arg, 1);
     int fd, result;
 
     // the first arg is fd_int/file_obj
     if (vsf_pyal_funcarg_var_is_int(arg, 0)) {
-        fd = vsf_pyal_funcarg_var_get_int(arg, 0);
+        fd = vsf_pyal_funcarg_var_getint(arg, 0);
     } else {
-        vsf_pyal_arg_t filearg = vsf_pyal_funcarg_var_get_arg(arg, 0);
-        FILE *f = vsf_pyal_filearg_get_file(filearg);
+        vsf_pyal_arg_t filearg = vsf_pyal_funcarg_var_getarg(arg, 0);
+        FILE *f = vsf_pyal_filearg_getfile(filearg);
         fd = ((vsf_linux_fd_t *)f)->fd;
     }
 
     // the possible 3rd arg is arg of ioctl
     if (3 == argc) {
-        uintptr_t ioctl_arg = (uintptr_t)vsf_pyal_funcarg_var_get_int(arg, 3);
+        uintptr_t ioctl_arg = (uintptr_t)vsf_pyal_funcarg_var_getint(arg, 3);
         result = ioctl(fd, request, ioctl_arg);
     } else {
         result = ioctl(fd, request);
@@ -417,11 +417,11 @@ vsf_pyal_module_func_var_imp(os, close, vsf_pyal_func_void_return_t, 1, 1, arg)
 
     // the first arg is fd_int/file_obj
     if (vsf_pyal_funcarg_var_is_int(arg, 0)) {
-        int fd = vsf_pyal_funcarg_var_get_int(arg, 0);
+        int fd = vsf_pyal_funcarg_var_getint(arg, 0);
         close(fd);
     } else {
-        vsf_pyal_arg_t filearg = vsf_pyal_funcarg_var_get_arg(arg, 0);
-        FILE *f = vsf_pyal_filearg_get_file(filearg);
+        vsf_pyal_arg_t filearg = vsf_pyal_funcarg_var_getarg(arg, 0);
+        FILE *f = vsf_pyal_filearg_getfile(filearg);
         fclose(f);
         vsf_pyal_filearg_clear(filearg);
     }
@@ -431,7 +431,7 @@ vsf_pyal_module_func_var_imp(os, close, vsf_pyal_func_void_return_t, 1, 1, arg)
 
 vsf_pyal_module_func_fix_imp(os, system, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_str_t cmd)
 {
-    char *cmd_str = vsf_pyal_funcarg_get_str(cmd);
+    char *cmd_str = vsf_pyal_funcarg_getstr(cmd);
     int result = system((const char *)cmd_str);
     if (result < 0) {
         vsf_pyal_raise("fail to call system(%s)\n", cmd_str);
@@ -444,15 +444,15 @@ vsf_pyal_module_func_fix_imp(os, system, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal
 
 vsf_pyal_class_func_fix_imp(os_environ_dict, __setitem__, VSF_PYAL_MODULE_FUNCARG_OBJ_3, vsf_pyal_func_void_return_t, vsf_pyal_arg_t keyarg, vsf_pyal_arg_t valuearg)
 {
-    char *key_str = vsf_pyal_strarg_get_str(keyarg);
-    char *value_str = vsf_pyal_strarg_get_str(valuearg);
+    char *key_str = vsf_pyal_arg_getstr(keyarg);
+    char *value_str = vsf_pyal_arg_getstr(valuearg);
     setenv(key_str, value_str, true);
     vsf_pyal_func_void_return();
 }
 
 vsf_pyal_class_func_fix_imp(os_environ_dict, __delitem__, VSF_PYAL_MODULE_FUNCARG_OBJ_2, vsf_pyal_func_void_return_t, vsf_pyal_arg_t keyarg)
 {
-    char *key_str = vsf_pyal_strarg_get_str(keyarg);
+    char *key_str = vsf_pyal_arg_getstr(keyarg);
     unsetenv(key_str);
     vsf_pyal_func_void_return();
 }
@@ -461,7 +461,7 @@ vsf_pyal_class_func_fix_imp(os_environ_dict, __delitem__, VSF_PYAL_MODULE_FUNCAR
 
 vsf_pyal_module_func_fix_imp(os_path, abspath, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_str_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_get_str(path);
+    char *path_str = vsf_pyal_funcarg_getstr(path);
     char abspath_buffer[PATH_MAX];
     
     if (NULL == realpath((const char *)path_str, (char *)abspath_buffer)) {
@@ -473,27 +473,27 @@ vsf_pyal_module_func_fix_imp(os_path, abspath, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vs
 
 vsf_pyal_module_func_fix_imp(os_path, exists, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_bool_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_get_str(path);
+    char *path_str = vsf_pyal_funcarg_getstr(path);
     struct stat st;
     return vsf_pyal_funcarg_newbool(stat(path_str, &st) == 0);
 }
 
 vsf_pyal_module_func_fix_imp(os_path, isabs, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_bool_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_get_str(path);
+    char *path_str = vsf_pyal_funcarg_getstr(path);
     return vsf_pyal_funcarg_newbool(path_str[0] == '/');
 }
 
 vsf_pyal_module_func_fix_imp(os_path, isdir, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_bool_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_get_str(path);
+    char *path_str = vsf_pyal_funcarg_getstr(path);
     struct stat st;
     return vsf_pyal_funcarg_newbool((stat(path_str, &st) == 0) && S_ISDIR(st.st_mode));
 }
 
 vsf_pyal_module_func_fix_imp(os_path, isfile, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_bool_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_get_str(path);
+    char *path_str = vsf_pyal_funcarg_getstr(path);
     struct stat st;
     return vsf_pyal_funcarg_newbool((stat(path_str, &st) == 0) && S_ISREG(st.st_mode));
 }
@@ -503,7 +503,7 @@ vsf_pyal_module_func_var_imp(os_path, join, vsf_pyal_funcarg_str_t, 0, 255, arg)
     char path_str[PATH_MAX], *path_ptr = path_str, *path_cur;
     int argc = vsf_pyal_funcarg_var_num(arg);
     for (int i = 0; i < argc; i++) {
-        path_cur = vsf_pyal_funcarg_var_get_str(arg, i);
+        path_cur = vsf_pyal_funcarg_var_getstr(arg, i);
         if (path_ptr - path_str + strlen(path_cur) >= sizeof(path_str)) {
             vsf_pyal_raise("path too long\n");
             return VSF_PYAL_OBJ_NULL;
@@ -516,7 +516,7 @@ vsf_pyal_module_func_var_imp(os_path, join, vsf_pyal_funcarg_str_t, 0, 255, arg)
 
 vsf_pyal_module_func_fix_imp(os_path, basename, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_str_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_get_str(path);
+    char *path_str = vsf_pyal_funcarg_getstr(path);
     char *basename_str = strrchr(path_str, '/');
     if (NULL == basename_str) {
         return vsf_pyal_funcarg_newstr(path_str);
@@ -527,7 +527,7 @@ vsf_pyal_module_func_fix_imp(os_path, basename, VSF_PYAL_MODULE_FUNCARG_OBJ_1, v
 
 vsf_pyal_module_func_fix_imp(os_path, dirname, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_funcarg_str_t, vsf_pyal_funcarg_str_t path)
 {
-    char *path_str = vsf_pyal_funcarg_get_str(path);
+    char *path_str = vsf_pyal_funcarg_getstr(path);
     char *basename_str = strrchr(path_str, '/');
     if (NULL == basename_str) {
         return vsf_pyal_funcarg_newstr("");
@@ -542,8 +542,8 @@ vsf_pyal_module_func_fix_imp(os_path, dirname, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vs
 
 vsf_pyal_module_func_fix_imp(os_path, __split_by_char, VSF_PYAL_MODULE_FUNCARG_OBJ_2, vsf_pyal_obj_t, vsf_pyal_funcarg_str_t path, vsf_pyal_funcarg_int_t ch)
 {
-    char *path_str = vsf_pyal_funcarg_get_str(path);
-    int ch_int = vsf_pyal_funcarg_get_int(ch);
+    char *path_str = vsf_pyal_funcarg_getstr(path);
+    int ch_int = vsf_pyal_funcarg_getint(ch);
     char *basename_str = strrchr(path_str, ch_int);
     vsf_pyal_arg_t args[2];
 
@@ -591,12 +591,12 @@ vsf_pyal_class_subscript_func(os, environ_dict, arg)
 {
     vsf_pyal_arg_t indexarg = vsf_pyal_class_subscript_idxarg(arg);
     vsf_pyal_arg_t valuearg = vsf_pyal_class_subscript_valuearg(arg);
-    char *key_str = (char *)vsf_pyal_strarg_get_str(indexarg);
+    char *key_str = (char *)vsf_pyal_arg_getstr(indexarg);
 
     if (vsf_pyal_class_subscript_is_delete(arg)) {
         unsetenv(key_str);
     } else if (vsf_pyal_class_subscript_is_store(arg)) {
-        char *value_str = (char *)vsf_pyal_strarg_get_str(valuearg);
+        char *value_str = (char *)vsf_pyal_arg_getstr(valuearg);
         setenv(key_str, value_str, true);
     }
 

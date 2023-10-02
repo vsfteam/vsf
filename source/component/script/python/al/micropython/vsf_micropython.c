@@ -36,7 +36,7 @@ STATIC void __check_fd_is_open(const mp_obj_file_t *self) {
     }
 }
 
-STATIC int __file_get_fd(const mp_obj_file_t *self)
+STATIC int __file_getfd(const mp_obj_file_t *self)
 {
     if (self->fd < 3) {
         return self->fd;
@@ -47,7 +47,7 @@ STATIC int __file_get_fd(const mp_obj_file_t *self)
 STATIC void __file_print(const mp_print_t *print, mp_obj_t self_in, mp_print_kind_t kind)
 {
     mp_obj_file_t *self = MP_OBJ_TO_PTR(self_in);
-    int fd = __file_get_fd(self);
+    int fd = __file_getfd(self);
     mp_printf(print, "<io.%s %d>", mp_obj_get_type_str(self_in), fd);
 }
 
@@ -55,7 +55,7 @@ STATIC mp_uint_t __file_read(mp_obj_t self_in, void *buf, mp_uint_t size, int *e
 {
     mp_obj_file_t *self = MP_OBJ_TO_PTR(self_in);
     __check_fd_is_open(self);
-    int fd = __file_get_fd(self);
+    int fd = __file_getfd(self);
     ssize_t r = read(fd, buf, size);
     if (r < 0) {
         *errcode = errno;
@@ -68,7 +68,7 @@ STATIC mp_uint_t __file_write(mp_obj_t self_in, const void *buf, mp_uint_t size,
 {
     mp_obj_file_t *self = MP_OBJ_TO_PTR(self_in);
     __check_fd_is_open(self);
-    int fd = __file_get_fd(self);
+    int fd = __file_getfd(self);
     ssize_t r = write(fd, buf, size);
     if (r < 0) {
         *errcode = errno;
@@ -81,7 +81,7 @@ STATIC mp_obj_t __file_fileno(mp_obj_t self_in)
 {
     mp_obj_file_t *self = MP_OBJ_TO_PTR(self_in);
     __check_fd_is_open(self);
-    int fd = __file_get_fd(self);
+    int fd = __file_getfd(self);
     return MP_OBJ_NEW_SMALL_INT(fd);
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(__file_fileno_obj, __file_fileno);
@@ -93,7 +93,7 @@ STATIC mp_uint_t __file_ioctl(mp_obj_t self_in, mp_uint_t request, uintptr_t arg
 
     if (request != MP_STREAM_CLOSE) {
         __check_fd_is_open(self);
-        fd = __file_get_fd(self);
+        fd = __file_getfd(self);
     }
 
     switch (request) {
@@ -269,7 +269,7 @@ const mp_obj_file_t mp_sys_stderr_obj = {
 
 #endif
 
-vsf_pyal_arg_t vsf_pyal_tupleobj_get_arg(vsf_pyal_obj_t self_in, int idx)
+vsf_pyal_arg_t vsf_pyal_tupleobj_getarg(vsf_pyal_obj_t self_in, int idx)
 {
     size_t len;
     vsf_pyal_arg_t *items;
@@ -277,7 +277,7 @@ vsf_pyal_arg_t vsf_pyal_tupleobj_get_arg(vsf_pyal_obj_t self_in, int idx)
     return idx >= len ? VSF_PYAL_ARG_NULL : items[idx];
 }
 
-int vsf_pyal_tupleobj_get_num(vsf_pyal_obj_t self_in)
+int vsf_pyal_tupleobj_getnum(vsf_pyal_obj_t self_in)
 {
     size_t len;
     vsf_pyal_arg_t *items;
@@ -285,7 +285,7 @@ int vsf_pyal_tupleobj_get_num(vsf_pyal_obj_t self_in)
     return len;
 }
 
-size_t vsf_pyal_listobj_get_num(vsf_pyal_obj_t self_in)
+size_t vsf_pyal_listobj_getnum(vsf_pyal_obj_t self_in)
 {
     size_t len;
     vsf_pyal_obj_t *items;
@@ -293,7 +293,7 @@ size_t vsf_pyal_listobj_get_num(vsf_pyal_obj_t self_in)
     return len;
 }
 
-vsf_pyal_obj_t vsf_pyal_listobj_get_arg(vsf_pyal_obj_t self_in, int idx)
+vsf_pyal_obj_t vsf_pyal_listobj_getarg(vsf_pyal_obj_t self_in, int idx)
 {
     size_t len;
     vsf_pyal_obj_t *items;
