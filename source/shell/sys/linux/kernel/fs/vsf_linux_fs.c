@@ -2390,6 +2390,54 @@ int versionsort(const struct dirent **a, const struct dirent **b)
     return strverscmp((*a)->d_name, (*b)->d_name);
 }
 
+int scandir64(const char *dir, struct dirent64 ***namelist,
+              int (*filter)(const struct dirent64 *),
+              int (*compare)(const struct dirent64 **, const struct dirent64 **))
+{
+    DIR *dp = opendir(dir);
+    if (NULL == dp) {
+        return -1;
+    }
+
+    int cnt = 0;
+    struct dirent64 *d, *n, **result = NULL;
+    while ((d = readdir64(dp)) != NULL) {
+        if ((filter != NULL) && !filter(d)) {
+            continue;
+        }
+
+        result = realloc(result, (++cnt) * sizeof(struct dirent *));
+        if (NULL == result) {
+            return -1;
+        }
+
+        n = malloc(sizeof(struct dirent));
+        if (NULL == n) {
+            break;
+        }
+        *n = *d;
+
+        result[cnt - 1] = n;
+    }
+
+    if ((cnt > 0) && (compare != NULL)) {
+        qsort(result, cnt, sizeof(struct dirent *),
+                (int (*)(const void *, const void*))compare);
+    }
+    *namelist = result;
+    return cnt;
+}
+
+int alphasort64(const struct dirent64 **a, const struct dirent64 **b)
+{
+    return strcmp((*a)->d_name, (*b)->d_name);
+}
+
+int versionsort64(const struct dirent64 **a, const struct dirent64 **b)
+{
+    return strverscmp((*a)->d_name, (*b)->d_name);
+}
+
 long telldir(DIR *dir)
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)dir->priv;

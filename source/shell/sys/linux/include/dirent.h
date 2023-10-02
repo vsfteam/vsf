@@ -26,6 +26,10 @@ extern "C" {
 #define closedir        VSF_LINUX_WRAPPER(closedir)
 #define scandir         VSF_LINUX_WRAPPER(scandir)
 #define alphasort       VSF_LINUX_WRAPPER(alphasort)
+#define versionsort     VSF_LINUX_WRAPPER(versionsort)
+#define scandir64       VSF_LINUX_WRAPPER(scandir64)
+#define alphasort64     VSF_LINUX_WRAPPER(alphasort64)
+#define versionsort64   VSF_LINUX_WRAPPER(versionsort64)
 #endif
 
 struct dirent {
@@ -155,6 +159,12 @@ int scandir(const char *dir, struct dirent ***namelist,
               int (*compare)(const struct dirent **, const struct dirent **));
 int alphasort(const struct dirent **a, const struct dirent **b);
 int versionsort(const struct dirent **a, const struct dirent **b);
+
+int scandir64(const char *dir, struct dirent64 ***namelist,
+              int (*filter)(const struct dirent64 *),
+              int (*compare)(const struct dirent64 **, const struct dirent64 **));
+int alphasort64(const struct dirent64 **a, const struct dirent64 **b);
+int versionsort64(const struct dirent64 **a, const struct dirent64 **b);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_DIRENT
 
