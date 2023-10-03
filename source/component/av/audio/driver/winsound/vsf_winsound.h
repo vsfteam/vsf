@@ -76,6 +76,10 @@ typedef struct vk_winsound_playback_ctx_t {
     bool play_ticktock;
     uint8_t buffer_taken;
     uint8_t frame_size;
+    uint32_t sps;
+    uint32_t last_datasize_valid;
+    uint32_t last_datasize;
+    vsf_eda_t *eda_pending;
 } vk_winsound_playback_ctx_t;
 
 #undef HWAVEOUT

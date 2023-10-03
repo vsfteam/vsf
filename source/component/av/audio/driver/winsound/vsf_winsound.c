@@ -144,27 +144,33 @@ static int __vk_winsound_playback_buffer(vk_winsound_dev_t *dev, vsf_stream_t *s
         vk_winsound_playback_buffer_t *winsound_buffer =
             playback_ctx->fill_ticktock ? &playback_ctx->buffer[0] : &playback_ctx->buffer[1];
 
-        uint_fast32_t datasize = vsf_stream_get_data_size(stream);
+        playback_ctx->last_datasize = vsf_stream_get_data_size(stream);
         uint_fast32_t half_buffer_size = vsf_stream_get_buff_size(stream) / 2;
-        if (datasize > half_buffer_size) {
-            datasize = half_buffer_size;
+        if (playback_ctx->last_datasize > half_buffer_size) {
+            playback_ctx->last_datasize = half_buffer_size;
         }
-        datasize = (datasize / playback_ctx->frame_size) * playback_ctx->frame_size;
+        playback_ctx->last_datasize /= playback_ctx->frame_size;
+        playback_ctx->last_datasize *= playback_ctx->frame_size;
+        if (!playback_ctx->last_datasize) {
+            return 0;
+        }
 
         vsf_protect_t orig = vsf_protect_int();
             playback_ctx->buffer_taken++;
         vsf_unprotect_int(orig);
 
         playback_ctx->fill_ticktock = !playback_ctx->fill_ticktock;
-        vsf_stream_read(stream, winsound_buffer->buffer, datasize);
+        vsf_stream_read(stream, winsound_buffer->buffer, playback_ctx->last_datasize);
         winsound_buffer->header.lpData = (LPSTR)winsound_buffer->buffer;
-        winsound_buffer->header.dwBufferLength = datasize;
+        winsound_buffer->header.dwBufferLength = playback_ctx->last_datasize;
         winsound_buffer->header.dwFlags = 0;
         waveOutPrepareHeader(playback_ctx->hwo, (LPWAVEHDR)&winsound_buffer->header, sizeof(WAVEHDR));
         if (MMSYSERR_NOERROR == waveOutWrite(playback_ctx->hwo, (LPWAVEHDR)&winsound_buffer->header, sizeof(WAVEHDR))) {
-            __vsf_winsound_trace(VSF_TRACE_DEBUG, "%d [winsound]: play stream: %d bytes %08X\r\n", vsf_systimer_get_ms(), datasize, winsound_buffer->buffer);
+            __vsf_winsound_trace(VSF_TRACE_DEBUG, "%d [winsound]: play stream: %d bytes %08X %d\r\n",
+                vsf_systimer_get_ms(), playback_ctx->last_datasize, &winsound_buffer->header, playback_ctx->buffer_taken);
         }
-        return datasize;
+        playback_ctx->last_datasize_valid = playback_ctx->last_datasize;
+        return playback_ctx->last_datasize;
     }
     return 0;
 }
@@ -181,6 +187,8 @@ static void __vk_winsound_playback_evthandler(vsf_stream_t *stream, void *param,
         while (playback_ctx->is_playing && (playback_ctx->buffer_taken < dimof(playback_ctx->buffer))) {
             __vsf_winsound_trace(VSF_TRACE_DEBUG, "%d [winsound]: play stream evthandler\r\n", vsf_systimer_get_ms());
             if (__vk_winsound_playback_buffer(dev, stream) <= 0) {
+                // clear current stream event
+                vsf_stream_read(stream, NULL, 0);
                 break;
             }
         }
@@ -205,11 +213,22 @@ static void __vk_winsound_playback_irq_thread(void *arg)
                 VSF_UNUSED_PARAM(header);
                 playback_ctx->play_ticktock = !playback_ctx->play_ticktock;
 
-                __vsf_winsound_trace(VSF_TRACE_DEBUG, "%d [winsound]: playback evt %d\r\n", vsf_systimer_get_ms(), header->dwFlags);
                 vsf_protect_t orig = vsf_protect_int();
                     playback_ctx->buffer_taken--;
                 vsf_unprotect_int(orig);
+                __vsf_winsound_trace(VSF_TRACE_DEBUG, "%d [winsound]: playback evt %d %p %d\r\n",
+                    vsf_systimer_get_ms(), header->dwFlags, header, playback_ctx->buffer_taken);
                 __vk_winsound_playback_evthandler(playback_ctx->audio_stream->stream, playback_ctx->audio_stream, VSF_STREAM_ON_IN);
+
+                vsf_eda_t *eda_pending = NULL;
+                orig = vsf_protect_int();
+                if (!playback_ctx->last_datasize) {
+                    eda_pending = playback_ctx->eda_pending;
+                }
+                vsf_unprotect_int(orig);
+                if (eda_pending) {
+                    vsf_eda_post_evt(eda_pending, VSF_EVT_USER);
+                }
             }
         __vsf_arch_irq_end(irq_thread, false);
     }
@@ -257,7 +276,9 @@ __vsf_component_peda_ifs_entry(__vk_winsound_playback_start, vk_audio_start)
                 goto do_return_fail;
             }
 
+            playback_ctx->eda_pending = NULL;
             playback_ctx->frame_size = wfx.nBlockAlign;
+            playback_ctx->sps = wfx.nSamplesPerSec;
             playback_ctx->audio_stream = audio_stream;
             playback_ctx->is_playing = true;
             playback_ctx->fill_ticktock = false;
@@ -283,9 +304,30 @@ __vsf_component_peda_ifs_entry(__vk_winsound_playback_stop, vk_audio_stop)
     vk_winsound_dev_t *dev = container_of(&vsf_this, vk_winsound_dev_t, use_as__vk_audio_dev_t);
     vk_winsound_playback_ctx_t *playback_ctx = &dev->playback_ctx;
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
+    vsf_protect_t orig;
+    bool is_playing;
 
     switch (evt) {
     case VSF_EVT_INIT:
+        orig = vsf_protect_int();
+        is_playing = playback_ctx->last_datasize > 0;
+        if (is_playing) {
+            playback_ctx->eda_pending = vsf_eda_get_cur();
+        }
+        vsf_unprotect_int(orig);
+        if (is_playing) {
+            break;
+        }
+        // fall through
+    case VSF_EVT_USER:
+        if (playback_ctx->buffer_taken > 0) {
+            // bug fix for winsound, the last buffer will have no complete event
+            uint_fast32_t delay_ms = playback_ctx->last_datasize_valid * 1000 / (playback_ctx->sps * playback_ctx->frame_size);
+            vsf_teda_set_timer_ms(delay_ms + 10);
+            break;
+        }
+        // fall through
+    case VSF_EVT_TIMER:
         playback_ctx->is_playing = false;
         waveOutClose(playback_ctx->hwo);
         // TODO: make sure play.stream will not be used
