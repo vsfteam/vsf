@@ -84,6 +84,10 @@ extern "C" {
 #define S_IXUSR                 (__S_IX << 6)
 #define S_IRWXU                 (S_IRUSR | S_IWUSR | S_IXUSR)
 
+#define S_IREAD                 S_IRUSR
+#define S_IWRITE                S_IWUSR
+#define S_IEXEC                 S_IXUSR
+
 // protection bits
 #define S_ISUID                 0004000
 #define S_ISGID                 0002000

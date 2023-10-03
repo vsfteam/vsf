@@ -124,8 +124,10 @@ extern ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
 
 static void __vsf_linux_audio_play_init(vsf_linux_fd_t *sfd);
 static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
+static int __vsf_linux_audio_play_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 
 static int __vsf_linux_audio_control_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
+static int __vsf_linux_audio_control_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 
 static int snd_pcm_hw_rule_format(struct snd_mask *masks, struct snd_interval *intervals,
             unsigned int cmask, struct __snd_pcm_hw_rule *rule);
@@ -157,6 +159,7 @@ static int snd_pcm_hw_rule_buffer_bytes(struct snd_mask *masks, struct snd_inter
 static const vsf_linux_fd_op_t __vsf_linux_audio_control_fdop = {
     .priv_size          = sizeof(vsf_linux_audio_control_priv_t),
     .fn_fcntl           = __vsf_linux_audio_control_fcntl,
+    .fn_stat            = __vsf_linux_audio_control_stat,
 };
 
 static const vsf_linux_fd_op_t __vsf_linux_audio_play_fdop = {
@@ -164,6 +167,7 @@ static const vsf_linux_fd_op_t __vsf_linux_audio_play_fdop = {
     .fn_init            = __vsf_linux_audio_play_init,
     .fn_write           = __vsf_linux_stream_write,
     .fn_fcntl           = __vsf_linux_audio_play_fcntl,
+    .fn_stat            = __vsf_linux_audio_play_stat,
 };
 
 static const vsf_linux_fd_op_t __vsf_linux_audio_capture_fdop = {
@@ -1044,8 +1048,8 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         u.info->device = device_idx;
         u.info->subdevice = 0;
         u.info->card = card_idx;
-        strcpy((char *)u.info->id, "0001");
-        strcpy((char *)u.info->subname, "subdevice #0");
+        strncpy((char *)u.info->id, "vsf_audio_pcm", sizeof(u.info->id));
+        strncpy((char *)u.info->subname, "subdevice #0", sizeof(u.info->subname));
         switch (stream) {
         case 'p':
             u.info->stream = SNDRV_PCM_STREAM_PLAYBACK;
@@ -1293,6 +1297,12 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
     return 0;
 }
 
+static int __vsf_linux_audio_play_stat(vsf_linux_fd_t *sfd, struct stat *buf)
+{
+    buf->st_mode = S_IFCHR;
+    return 0;
+}
+
 static int __vsf_linux_audio_control_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     vsf_linux_audio_control_priv_t *priv = (vsf_linux_audio_control_priv_t *)sfd->priv;
@@ -1309,6 +1319,8 @@ static int __vsf_linux_audio_control_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr
     union {
         int *version;                           // SNDRV_CTL_IOCTL_PVERSION
         struct snd_ctl_card_info *card_info;    // SNDRV_CTL_IOCTL_CARD_INFO
+        struct snd_ctl_elem_list *elem_list;    // SNDRV_CTL_IOCTL_ELEM_LIST
+        struct snd_ctl_elem_info *elem_info;    // SNDRV_CTL_IOCTL_ELEM_INFO
         int *device;                            // SNDRV_CTL_IOCTL_PCM_NEXT_DEVICE
         struct snd_pcm_info *pcm_info;          // SNDRV_CTL_IOCTL_PCM_INFO
         int *subdevice;                         // SNDRV_CTL_IOCTL_PCM_PREFER_SUBDEVICE
@@ -1318,13 +1330,62 @@ static int __vsf_linux_audio_control_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr
     u.arg = arg;
 
     switch (cmd) {
+    case F_SETFL:
+        return 0;
+        break;
     case SNDRV_CTL_IOCTL_PVERSION:
         *u.version = SNDRV_CTL_VERSION;
         break;
     case SNDRV_CTL_IOCTL_CARD_INFO:
         u.card_info->card = card_idx;
-        strncpy((char *)u.card_info->id, "0001", sizeof(u.card_info->id));
+        strncpy((char *)u.card_info->id, "vsf_audio", sizeof(u.card_info->id));
         strncpy((char *)u.card_info->name, "vsf_audio_card", sizeof(u.card_info->name));
+        strncpy((char *)u.card_info->driver, "vsf_audio", sizeof(u.card_info->driver));
+        strncpy((char *)u.card_info->longname, "audio_card implemented by vsf_audio_dev", sizeof(u.card_info->driver));
+        break;
+    case SNDRV_CTL_IOCTL_ELEM_LIST:
+        u.elem_list->count = 2;
+        u.elem_list->used = 0;
+        if (u.elem_list->space > u.elem_list->used) {
+            struct snd_ctl_elem_id *elem_id = &u.elem_list->pids[u.elem_list->offset + u.elem_list->used];
+            elem_id->numid = 1;
+            elem_id->iface = SNDRV_CTL_ELEM_IFACE_CARD;
+            elem_id->device = 0;
+            elem_id->subdevice = 0;
+            strcpy((char *)elem_id->name, "Master vsf_audio_card");
+            elem_id->index = u.elem_list->offset + u.elem_list->used;
+            u.elem_list->used++;
+        }
+        if (u.elem_list->space > u.elem_list->used) {
+            struct snd_ctl_elem_id *elem_id = &u.elem_list->pids[u.elem_list->offset + u.elem_list->used];
+            elem_id->numid = 2;
+            elem_id->iface = SNDRV_CTL_ELEM_IFACE_PCM;
+            elem_id->device = 0;
+            elem_id->subdevice = 0;
+            strcpy((char *)elem_id->name, "Playback vsf_audio_card_pcm_playback");
+            elem_id->index = u.elem_list->offset + u.elem_list->used;
+            u.elem_list->used++;
+        }
+        break;
+    case SNDRV_CTL_IOCTL_ELEM_INFO:
+        switch (u.elem_info->id.numid) {
+        case 1:
+            u.elem_info->type = SNDRV_CTL_ELEM_TYPE_BOOLEAN;
+            u.elem_info->access = SNDRV_CTL_ELEM_ACCESS_READ;
+            u.elem_info->count = 1;
+            u.elem_info->value.integer.min = 1;
+            break;
+        case 2:
+            u.elem_info->type = SNDRV_CTL_ELEM_TYPE_INTEGER;
+            u.elem_info->access = SNDRV_CTL_ELEM_ACCESS_READ;
+            u.elem_info->count = 1;
+            u.elem_info->value.integer.min = 0;
+            u.elem_info->value.integer.max = 100;
+            u.elem_info->value.integer.step = 1;
+            break;
+        }
+        break;
+    case SNDRV_CTL_IOCTL_SUBSCRIBE_EVENTS:
         break;
     case SNDRV_CTL_IOCTL_PCM_NEXT_DEVICE:
         if (*u.device < 0) {
@@ -1335,13 +1396,26 @@ static int __vsf_linux_audio_control_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr
         break;
     case SNDRV_CTL_IOCTL_PCM_INFO:
         u.pcm_info->card = card_idx;
-        strcpy((char *)u.pcm_info->id, "0001");
+        u.pcm_info->dev_class = SNDRV_PCM_CLASS_GENERIC;
+        u.pcm_info->dev_subclass = SNDRV_PCM_SUBCLASS_GENERIC_MIX;
+        u.pcm_info->subdevices_count = 1;
+        u.pcm_info->subdevices_avail = 1;
         switch (u.pcm_info->stream) {
         case SNDRV_PCM_STREAM_PLAYBACK:
+            u.pcm_info->device = 0;
+            u.pcm_info->subdevice = 0;
+            u.pcm_info->stream = 0;
+            strncpy((char *)u.pcm_info->id, "vsf_audio_pcm", sizeof(u.pcm_info->id));
             strncpy((char *)u.pcm_info->name, "vsf_audio_card_pcm_playback", sizeof(u.pcm_info->name));
+            strncpy((char *)u.pcm_info->subname, "subdevice #0", sizeof(u.pcm_info->subname));
             break;
         case SNDRV_PCM_STREAM_CAPTURE:
+            u.pcm_info->device = 1;
+            u.pcm_info->subdevice = 0;
+            u.pcm_info->stream = 1;
+            strncpy((char *)u.pcm_info->id, "vsf_audio_pcm", sizeof(u.pcm_info->id));
             strncpy((char *)u.pcm_info->name, "vsf_audio_card_pcm_capture", sizeof(u.pcm_info->name));
+            strncpy((char *)u.pcm_info->subname, "subdevice #0", sizeof(u.pcm_info->subname));
             break;
         }
         break;
@@ -1355,6 +1429,12 @@ static int __vsf_linux_audio_control_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr
         errno = EOPNOTSUPP;
         return -1;
     }
+    return 0;
+}
+
+static int __vsf_linux_audio_control_stat(vsf_linux_fd_t *sfd, struct stat *buf)
+{
+    buf->st_mode = S_IFCHR;
     return 0;
 }
 

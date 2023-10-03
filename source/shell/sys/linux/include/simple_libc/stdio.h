@@ -146,6 +146,10 @@ typedef int FILE;
 #define _IOLBF              0x0040
 #define _IONBF              0x0004
 
+#ifndef FILENAME_MAX
+#   define FILENAME_MAX     128
+#endif
+
 #if VSF_LINUX_APPLET_USE_LIBC_STDIO == ENABLED
 typedef struct vsf_linux_libc_stdio_vplt_t {
     vsf_vplt_info_t info;
