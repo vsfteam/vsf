@@ -118,8 +118,8 @@ static void __vk_wav_playback_stream_evthandler(vsf_stream_t *stream, void *para
                         goto failed;
                     }
                     wav->format.channel_num = header.format.channel_number;
-                    wav->format.datatype.value = VSF_AUDIO_DATA_TYPE_LEUL(header.format.bit_width);
-                    wav->format.sample_rate = header.format.sample_rate;
+                    wav->format.datatype.value = VSF_AUDIO_DATA_TYPE_LESL(header.format.bit_width);
+                    wav->format.sample_rate = header.format.sample_rate / 100;
                     wav->state = VSF_WAV_STATE_SEARCH_DATA_TRUNK;
                     break;
                 }
@@ -175,6 +175,8 @@ static void __vk_wav_playback_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     case VSF_EVT_PARSE_DONE:
         vsf_stream_disconnect_rx(wav->stream);
         vk_audio_start(wav->audio_dev, wav->audio_stream, wav->stream, &wav->format);
+        break;
+    case VSF_EVT_RETURN:
         break;
     }
 }
