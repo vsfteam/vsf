@@ -96,8 +96,9 @@ uint_fast32_t vsf_byte_fifo_write(vsf_byte_fifo_t *fifo, uint8_t *buf, uint_fast
     uint_fast32_t tmp32;
 
     VSF_SERVICE_ASSERT(fifo != NULL);
-    if (size > vsf_byte_fifo_get_avail_length(fifo)) {
-        return 0;
+    tmp32 = vsf_byte_fifo_get_avail_length(fifo);
+    if (size > tmp32) {
+        size = tmp32;
     }
 
     tmp32 = fifo->size - fifo->head;
