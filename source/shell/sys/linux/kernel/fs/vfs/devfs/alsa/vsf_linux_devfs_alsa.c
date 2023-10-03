@@ -1279,7 +1279,7 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         }
         {
             uint8_t frame_size = VSF_AUDIO_DATA_TYPE_BITLEN(audio_stream->format.datatype.value) >> 3;
-            u.xferi->result = vsf_stream_write(priv->stream_tx, u.xferi->buf, u.xferi->frames * frame_size) / frame_size;
+            u.xferi->result = __vsf_linux_stream_write(sfd, u.xferi->buf, u.xferi->frames * frame_size) / frame_size;
         }
         break;
     case SNDRV_PCM_IOCTL_READI_FRAMES:
@@ -1288,7 +1288,7 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         }
         {
             uint8_t frame_size = VSF_AUDIO_DATA_TYPE_BITLEN(audio_stream->format.datatype.value) >> 3;
-            u.xferi->result = vsf_stream_read(priv->stream_rx, u.xferi->buf, u.xferi->frames * frame_size) / frame_size;
+            u.xferi->result = __vsf_linux_stream_read(sfd, u.xferi->buf, u.xferi->frames * frame_size) / frame_size;
         }
         break;
     default:
