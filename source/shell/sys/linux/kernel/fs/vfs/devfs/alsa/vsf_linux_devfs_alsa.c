@@ -1062,6 +1062,7 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         }
         break;
     case SNDRV_PCM_IOCTL_TSTAMP:
+    case SNDRV_PCM_IOCTL_TTSTAMP:
         break;
     case SNDRV_PCM_IOCTL_USER_PVERSION:
         break;
@@ -1420,6 +1421,9 @@ static int __vsf_linux_audio_control_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr
         }
         break;
     case SNDRV_CTL_IOCTL_PCM_PREFER_SUBDEVICE:
+        if (*u.subdevice < 0) {
+            *u.subdevice = 0;
+        }
         if (*u.subdevice != 0) {
             errno = EINVAL;
             return -1;
