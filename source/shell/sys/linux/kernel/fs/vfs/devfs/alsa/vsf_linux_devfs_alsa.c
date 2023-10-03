@@ -1322,6 +1322,7 @@ static int __vsf_linux_audio_control_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr
         struct snd_ctl_card_info *card_info;    // SNDRV_CTL_IOCTL_CARD_INFO
         struct snd_ctl_elem_list *elem_list;    // SNDRV_CTL_IOCTL_ELEM_LIST
         struct snd_ctl_elem_info *elem_info;    // SNDRV_CTL_IOCTL_ELEM_INFO
+        struct snd_ctl_elem_value *elem_value;  // SNDRV_CTL_IOCTL_ELEM_READ && SNDRV_CTL_IOCTL_ELEM_WRITE
         int *device;                            // SNDRV_CTL_IOCTL_PCM_NEXT_DEVICE
         struct snd_pcm_info *pcm_info;          // SNDRV_CTL_IOCTL_PCM_INFO
         int *subdevice;                         // SNDRV_CTL_IOCTL_PCM_PREFER_SUBDEVICE
@@ -1385,6 +1386,18 @@ static int __vsf_linux_audio_control_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr
             u.elem_info->value.integer.step = 1;
             break;
         }
+        break;
+    case SNDRV_CTL_IOCTL_ELEM_READ:
+        switch (u.elem_value->id.numid) {
+        case 1:
+            u.elem_value->value.integer.value[0] = 1;
+            break;
+        case 2:
+            u.elem_value->value.integer.value[0] = 0;
+            break;
+        }
+        break;
+    case SNDRV_CTL_IOCTL_ELEM_WRITE:
         break;
     case SNDRV_CTL_IOCTL_SUBSCRIBE_EVENTS:
         break;
