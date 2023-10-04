@@ -250,7 +250,7 @@
 #       define VSF_LINUX_APPLET_USE_SYS_EVENT   DISABLED
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_SYS_SEM
-#       define VSF_LINUX_APPLET_USE_SYS_SEM     DISABLED
+#       define VSF_LINUX_APPLET_USE_SYS_SEM     ENABLED
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_SYS_SIGNALFD
 #       define VSF_LINUX_APPLET_USE_SYS_SIGNALFD    DISABLED
@@ -437,6 +437,7 @@ typedef struct vsf_linux_vplt_t {
     void *sys_resource_vplt;
     void *sys_times_vplt;
     void *sys_info_vplt;
+    void *sys_sem_vplt;
     void *sys_res0_vplt;
     void *sys_res1_vplt;
     void *sys_res2_vplt;

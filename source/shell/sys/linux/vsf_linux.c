@@ -3017,7 +3017,7 @@ static int __semfree(vsf_linux_fd_t *sfd)
     return 0;
 }
 
-int semctl(int semid, int semnum, int cmd, ...)
+int __semctl_va(int semid, int semnum, int cmd, va_list ap)
 {
     union semun {
         int              val;
@@ -3033,11 +3033,7 @@ int semctl(int semid, int semnum, int cmd, ...)
     VSF_LINUX_ASSERT(semset->nsems > semnum);
     vsf_linux_sem_t *sem = &semset->sem[semnum];
 
-    va_list ap;
-    va_start(ap, cmd);
     u.buf = va_arg(ap, void *);
-    va_end(ap);
-
     switch (cmd) {
     case IPC_STAT:
         u.buf->sem_perm.uid = -1;
@@ -3073,6 +3069,16 @@ int semctl(int semid, int semnum, int cmd, ...)
         return -1;
     }
     return 0;
+}
+
+int semctl(int semid, int semnum, int cmd, ...)
+{
+    int result;
+    va_list ap;
+    va_start(ap, cmd);
+        result = __semctl_va(semid, semnum, cmd, ap);
+    va_end(ap);
+    return result;
 }
 
 int semget(key_t key, int nsems, int semflg)
@@ -4634,6 +4640,18 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_prctl_vplt_t vsf_linux_sys_prctl_vplt = {
 };
 #endif
 
+#if VSF_LINUX_APPLET_USE_SYS_SEM == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_sem_vplt_t vsf_linux_sys_sem_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_sem_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(__semctl_va),
+    VSF_APPLET_VPLT_ENTRY_FUNC(semctl),
+    VSF_APPLET_VPLT_ENTRY_FUNC(semget),
+    VSF_APPLET_VPLT_ENTRY_FUNC(semop),
+    VSF_APPLET_VPLT_ENTRY_FUNC(semtimedop),
+};
+#endif
+
 #if VSF_LINUX_APPLET_USE_SIGNAL == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_signal_vplt_t vsf_linux_signal_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_signal_vplt_t, 0, 0, true),
@@ -5161,6 +5179,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #endif
 #if VSF_LINUX_APPLET_USE_SYS_INFO == ENABLED
     .sys_info_vplt      = (void *)&vsf_linux_sys_info_vplt,
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_SEM == ENABLED
+    .sys_sem_vplt       = (void *)&vsf_linux_sys_sem_vplt,
 #endif
 
 #if VSF_LINUX_APPLET_USE_UNISTD == ENABLED

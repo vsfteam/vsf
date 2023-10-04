@@ -47,6 +47,12 @@ struct sembuf {
 #if VSF_LINUX_APPLET_USE_SYS_SEM == ENABLED
 typedef struct vsf_linux_sys_sem_vplt_t {
     vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__semctl_va);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(semctl);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(semget);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(semop);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(semtimedop);
 } vsf_linux_sys_sem_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_sem_vplt_t vsf_linux_sys_sem_vplt;
@@ -70,6 +76,32 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_sem_vplt_t vsf_linux_sys_sem_vplt;
             VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_SEM_VPLT, __NAME)
 #define VSF_LINUX_APPLET_SYS_SEM_IMP(...)                                       \
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_SEM_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_SYS_SEM_IMP(__semctl_va, int, int semid, int semnum, int cmd, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_SEM_ENTRY(__semctl_va)(semid, semnum, cmd, ap);
+}
+VSF_LINUX_APPLET_SYS_SEM_IMP(semget, int, key_t key, int nsems, int semflg) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_SEM_ENTRY(semget)(key, nsems, semflg);
+}
+VSF_LINUX_APPLET_SYS_SEM_IMP(semop, int, int semid, struct sembuf *sops, size_t nsops) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_SEM_ENTRY(semop)(semid, sops, nsops);
+}
+VSF_LINUX_APPLET_SYS_SEM_IMP(semtimedop, int, int semid, struct sembuf *sops, size_t nsops, const struct timespec *timeout) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_SEM_ENTRY(semtimedop)(semid, sops, nsops, timeout);
+}
+
+VSF_APPLET_VPLT_FUNC_DECORATOR int semctl(int semid, int semnum, int cmd, ...) {
+    int result;
+    va_list ap;
+    va_start(ap, cmd);
+        result = __semctl_va(semid, semnum, cmd, ap);
+    va_end(ap);
+    return result;
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_SEM
 
