@@ -3181,22 +3181,23 @@ int semtimedop(int semid, struct sembuf *sops, size_t nsops,
     }
     return 0;
 
-wait_event:
-    vsf_sync_reason_t reason = vsf_eda_sync_get_reason(&sem->sync, vsf_thread_wait());
-    switch (reason) {
-    case VSF_SYNC_TIMEOUT:
-        errno = EAGAIN;
-        return -1;
-    case VSF_SYNC_PENDING:
-        goto wait_event;
-    case VSF_SYNC_GET:
-        return 0;
-    case VSF_SYNC_CANCEL:
-        errno = EIDRM;
-        return -1;
-    default:
-        VSF_LINUX_ASSERT(false);
-        return -1;
+wait_event: {
+        vsf_sync_reason_t reason = vsf_eda_sync_get_reason(&sem->sync, vsf_thread_wait());
+        switch (reason) {
+        case VSF_SYNC_TIMEOUT:
+            errno = EAGAIN;
+            return -1;
+        case VSF_SYNC_PENDING:
+            goto wait_event;
+        case VSF_SYNC_GET:
+            return 0;
+        case VSF_SYNC_CANCEL:
+            errno = EIDRM;
+            return -1;
+        default:
+            VSF_LINUX_ASSERT(false);
+            return -1;
+        }
     }
 }
 
