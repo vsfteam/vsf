@@ -180,6 +180,10 @@ static ssize_t __vsf_linux_term_read(vsf_linux_fd_t *sfd, void *buf, size_t coun
 static ssize_t __vsf_linux_term_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_term_close(vsf_linux_fd_t *sfd);
 
+static void __vsf_linux_key_fini(vsf_linux_fd_t *sfd);
+static int __vsf_linux_key_close(vsf_linux_fd_t *sfd);
+static int __vsf_linux_key_stat(vsf_linux_fd_t *sfd, struct stat *buf);
+
 #if VSF_LINUX_CFG_STDIO_FALLBACK == ENABLED
 ssize_t __vsf_linux_stdio_fallback_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 ssize_t __vsf_linux_stdio_fallback_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
@@ -247,6 +251,13 @@ const vsf_linux_fd_op_t vsf_linux_term_fdop = {
     .fn_write           = __vsf_linux_term_write,
     .fn_close           = __vsf_linux_term_close,
     .fn_stat            = __vsf_linux_term_stat,
+};
+
+const vsf_linux_fd_op_t vsf_linux_key_fdop = {
+    .priv_size          = sizeof(vsf_linux_key_priv_t),
+    .fn_fini            = __vsf_linux_key_fini,
+    .fn_close           = __vsf_linux_key_close,
+    .fn_stat            = __vsf_linux_key_stat,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -898,6 +909,10 @@ static int __vsf_linux_fd_deref_priv(vsf_linux_fd_t *sfd)
             __FUNCTION__, process, sfd->fd, sfd, priv, priv->ref);
 #endif
     vsf_unprotect_sched(orig);
+
+    if (sfd->op->fn_fini != NULL) {
+        sfd->op->fn_fini(sfd);
+    }
 
     int err = 0;
     if (is_to_close) {
@@ -3224,6 +3239,7 @@ int mknodat(int dirfd, const char *pathname, mode_t mode, dev_t dev)
 }
 
 // term
+
 static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
 {
     vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
@@ -3323,6 +3339,31 @@ static int __vsf_linux_term_close(vsf_linux_fd_t *sfd)
         __vsf_linux_fs_close(sfd);
     }
     return result;
+}
+
+// key
+
+static void __vsf_linux_key_fini(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_key_priv_t *priv = (vsf_linux_key_priv_t *)sfd->priv;
+    if (priv->fn_fini != NULL) {
+        return priv->fn_fini(sfd);
+    }
+}
+
+static int __vsf_linux_key_close(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_key_priv_t *priv = (vsf_linux_key_priv_t *)sfd->priv;
+    if (priv->fn_close != NULL) {
+        return priv->fn_close(sfd);
+    }
+    return 0;
+}
+
+static int __vsf_linux_key_stat(vsf_linux_fd_t *sfd, struct stat *buf)
+{
+    buf->st_mode = S_IFCHR;
+    return 0;
 }
 
 // mntent

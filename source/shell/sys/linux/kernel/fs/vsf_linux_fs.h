@@ -65,6 +65,7 @@ typedef struct vsf_linux_fd_op_t {
     int priv_size;
     int feature;
     void (*fn_init)(vsf_linux_fd_t *sfd);
+    void (*fn_fini)(vsf_linux_fd_t *sfd);
     int (*fn_fcntl)(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
     ssize_t (*fn_read)(vsf_linux_fd_t *sfd, void *buf, size_t count);
     ssize_t (*fn_write)(vsf_linux_fd_t *sfd, const void *buf, size_t count);
@@ -169,6 +170,23 @@ typedef struct vsf_linux_term_priv_t {
     char esc_type;
     bool line_start;
 } vsf_linux_term_priv_t;
+
+typedef struct vsf_linux_key_t vsf_linux_key_t;
+vsf_class(vsf_linux_key_priv_t) {
+    public_member(
+        implement(vsf_linux_fd_priv_t)
+    )
+    protected_member(
+        union {
+            struct {
+                unsigned short *semadj_arr;
+            } sem;
+        } u;
+        vsf_linux_key_t *key;
+        void (*fn_fini)(vsf_linux_fd_t *sfd);
+        int (*fn_close)(vsf_linux_fd_t *sfd);
+    )
+};
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -178,6 +196,7 @@ extern const vsf_linux_fd_op_t __vsf_linux_fs_fdop;
 extern const vsf_linux_fd_op_t __vsf_linux_stream_fdop;
 extern const vsf_linux_fd_op_t vsf_linux_pipe_fdop;
 extern const vsf_linux_fd_op_t vsf_linux_term_fdop;
+extern const vsf_linux_fd_op_t vsf_linux_key_fdop;
 #endif
 
 /*============================ LOCAL VARIABLES ===============================*/

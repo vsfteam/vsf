@@ -3,7 +3,7 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
-#if VSF_LINUX_CFG_SHM_NUM > 0
+#if VSF_LINUX_CFG_SUPPORT_SHM == ENABLED
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../sys/types.h"
@@ -99,5 +99,5 @@ int shmctl(int shmid, int cmd, struct shmid_ds *buf);
 }
 #endif
 
-#endif      // VSF_LINUX_CFG_SHM_NUM
+#endif      // VSF_LINUX_CFG_SUPPORT_SHM
 #endif      // __VSF_LINUX_SYS_SHM_H__

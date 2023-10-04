@@ -23,6 +23,7 @@ enum {
     IPC_RMID,
     IPC_SET,
     IPC_STAT,
+    IPC_INFO,
 };
 
 struct ipc_perm {

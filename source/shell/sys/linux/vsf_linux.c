@@ -159,14 +159,22 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if VSF_LINUX_CFG_SHM_NUM > 0
-dcl_vsf_bitmap(vsf_linux_shm_bitmap, VSF_LINUX_CFG_SHM_NUM);
+#if VSF_LINUX_CFG_SUPPORT_SHM == ENABLED
 typedef struct vsf_linux_shm_mem_t {
-    key_t key;
+    implement(vsf_linux_key_t)
     void *buffer;
     uint32_t size;
 } vsf_linux_shm_mem_t;
 #endif
+
+typedef struct vsf_linux_sem_t {
+    vsf_sync_t sync;
+} vsf_linux_sem_t;
+typedef struct vsf_linux_sem_set_t {
+    implement(vsf_linux_key_t)
+    int nsems;
+    vsf_linux_sem_t sem[1];
+} vsf_linux_sem_set_t;
 
 #if VSF_LINUX_CFG_FUTEX_NUM > 0
 typedef struct vsf_linux_futex_t {
@@ -187,12 +195,9 @@ typedef struct vsf_linux_t {
     vsf_linux_process_t process_for_resources;
     vsf_linux_process_t *kernel_process;
 
-#if VSF_LINUX_CFG_SHM_NUM > 0
     struct {
-        vsf_bitmap(vsf_linux_shm_bitmap) bitmap;
-        vsf_linux_shm_mem_t mem[VSF_LINUX_CFG_SHM_NUM];
-    } shm;
-#endif
+        vsf_dlist_t list;
+    } key;
 
 #if VSF_LINUX_CFG_PLS_NUM > 0
     struct {
@@ -270,6 +275,8 @@ extern void __vsf_linux_rx_stream_drop(vsf_linux_stream_priv_t *priv_rx);
 extern void __vsf_linux_tx_stream_drain(vsf_linux_stream_priv_t *priv_tx);
 extern void __vsf_linux_stream_evt(vsf_linux_stream_priv_t *priv, vsf_protect_t orig, short event, bool is_ready);
 extern const vsf_linux_fd_op_t __vsf_linux_stream_fdop;
+
+extern void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, vsf_timeout_tick_t timeout);
 
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -542,6 +549,43 @@ vsf_linux_localstorage_t * vsf_linux_tls_get(int idx)
     return &thread->tls[idx];
 }
 #endif
+
+static void __vsf_linux_keyfree(vsf_linux_key_t *key)
+{
+    vsf_protect_t orig = vsf_protect_sched();
+    vsf_dlist_remove(vsf_linux_key_t, node, &__vsf_linux.key.list, key);
+    vsf_unprotect_sched(orig);
+    vsf_linux_free_res(key);
+}
+
+static vsf_linux_key_t * __vsf_linux_keyget(key_t key, size_t size, int flags)
+{
+    vsf_linux_key_t *result = NULL;
+    vsf_protect_t orig = vsf_protect_sched();
+    __vsf_dlist_foreach_unsafe(vsf_linux_key_t, node, &__vsf_linux.key.list) {
+        if (_->key == key) {
+            result = _;
+        }
+    }
+    vsf_unprotect_sched(orig);
+    if ((result != NULL) && (flags & IPC_EXCL)) {
+        return NULL;
+    }
+
+    if ((NULL == result) && (flags & IPC_CREAT)) {
+        result = vsf_linux_malloc_res(size);
+        if (result != NULL) {
+            result->key = key;
+            vsf_dlist_init_node(vsf_linux_key_t, node, result);
+            if (key != IPC_PRIVATE) {
+                orig = vsf_protect_sched();
+                vsf_dlist_add_to_head(vsf_linux_key_t, node, &__vsf_linux.key.list, result);
+                vsf_unprotect_sched(orig);
+            }
+        }
+    }
+    return result;
+}
 
 #if VSF_LINUX_CFG_FUTEX_NUM > 0
 //implement_vsf_pool(vsf_linux_futex_pool, vsf_linux_futex_t)
@@ -2925,6 +2969,7 @@ size_t confstr(int name, char *buf, size_t len)
 }
 
 // ipc.h
+
 key_t ftok(const char *pathname, int id)
 {
     VSF_LINUX_ASSERT(false);
@@ -2932,29 +2977,232 @@ key_t ftok(const char *pathname, int id)
 }
 
 // sys/sem.h
+// TODO: use vsf_linux_trigger_t, so that sleeping thred can be wakened by signal
+
+static void __semfini(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_key_priv_t *priv = (vsf_linux_key_priv_t *)sfd->priv;
+    unsigned short *semadj = priv->u.sem.semadj_arr;
+    vsf_linux_sem_set_t *semset = (vsf_linux_sem_set_t *)priv->key;
+
+    // TODO: recover semadj here?
+}
+
+static int __semfree(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_key_priv_t *priv = (vsf_linux_key_priv_t *)sfd->priv;
+    __vsf_linux_keyfree(priv->key);
+    return 0;
+}
+
 int semctl(int semid, int semnum, int cmd, ...)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    union semun {
+        int              val;
+        struct semid_ds *buf;
+        unsigned short  *array;
+        struct seminfo  *__buf;
+    } u;
+
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(semid);
+    VSF_LINUX_ASSERT(sfd != NULL);
+    vsf_linux_key_priv_t *priv = (vsf_linux_key_priv_t *)sfd->priv;
+    vsf_linux_sem_set_t *semset = (vsf_linux_sem_set_t *)priv->key;
+    VSF_LINUX_ASSERT(semset->nsems > semnum);
+    vsf_linux_sem_t *sem = &semset->sem[semnum];
+
+    va_list ap;
+    va_start(ap, cmd);
+    u.buf = va_arg(ap, void *);
+    va_end(ap);
+
+    switch (cmd) {
+    case IPC_STAT:
+        u.buf->sem_perm.uid = -1;
+        u.buf->sem_perm.gid = -1;
+        u.buf->sem_perm.cuid = -1;
+        u.buf->sem_perm.cgid = -1;
+        u.buf->sem_perm.mode = 0666;
+        break;
+    case IPC_SET:
+        break;
+    case IPC_RMID:
+        vsf_eda_sync_cancel(&sem->sync);
+        close(semid);
+        break;
+    case GETVAL:
+        u.val = sem->sync.cur_union.cur_value;
+        break;
+    case GETALL:
+        sem = semset->sem;
+        for (int i = 0; i < semset->nsems; i++, sem++) {
+            u.array[i] = sem->sync.cur_union.cur_value;
+        }
+        break;
+    case SETVAL:
+        return u.val;
+    case SETALL:
+        sem = semset->sem;
+        for (int i = 0; i < semset->nsems; i++, sem++) {
+            sem->sync.cur_union.cur_value = u.array[i];
+        }
+    default:
+        VSF_LINUX_ASSERT(false);
+        return -1;
+    }
+    return 0;
 }
 
 int semget(key_t key, int nsems, int semflg)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    VSF_LINUX_ASSERT(nsems >= 1);
+    vsf_linux_sem_set_t *semset = (vsf_linux_sem_set_t *)__vsf_linux_keyget(key,
+        sizeof(vsf_linux_sem_set_t) + sizeof(vsf_linux_sem_t) * (nsems - 1), semflg);
+    if ((NULL == semset) || ((semset->nsems != 0) && (semset->nsems  != nsems))) {
+        return -1;
+    }
+
+    if (!semset->nsems) {
+        semset->nsems = nsems;
+        for (int i = 0; i < nsems; i++) {
+            vsf_eda_sync_init(&semset->sem[i].sync, 0, VSF_SYNC_AUTO_RST);
+        }
+    }
+
+    vsf_linux_fd_t *sfd;
+    vsf_linux_fd_op_t tempop = vsf_linux_key_fdop;
+    tempop.priv_size += semset->nsems * sizeof(unsigned short);
+    int fd = vsf_linux_fd_create(&sfd, (const vsf_linux_fd_op_t *)&tempop);
+    if (fd >= 0) {
+        vsf_linux_key_priv_t *priv = (vsf_linux_key_priv_t *)sfd->priv;
+        sfd->op = &vsf_linux_key_fdop;
+
+        priv->u.sem.semadj_arr = (unsigned short *)&priv[1];
+        priv->key = &semset->use_as__vsf_linux_key_t;
+        priv->fn_fini = __semfini;
+        priv->fn_close = __semfree;
+    }
+
+    return fd;
 }
 
-int semop(int semid, struct sembuf *sops, size_t nsops)
+static vsf_timeout_tick_t __vsf_linux_timespec_to_timeout(const struct timespec *spec)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    vsf_timeout_tick_t timeout = -1;
+    if (spec != NULL) {
+        return  vsf_systimer_ms_to_tick(spec->tv_sec * 1000)
+            +   vsf_systimer_us_to_tick(spec->tv_nsec / 1000);
+    }
+    return timeout;
 }
 
 int semtimedop(int semid, struct sembuf *sops, size_t nsops,
                     const struct timespec *timeout)
 {
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(semid);
+    VSF_LINUX_ASSERT(sfd != NULL);
+    vsf_linux_key_priv_t *priv = (vsf_linux_key_priv_t *)sfd->priv;
+    vsf_linux_sem_set_t *semset = (vsf_linux_sem_set_t *)priv->key;
+    vsf_linux_sem_t *sem;
+    unsigned short *semadj;
+    short adjvalue, tgtvalue;
+    vsf_protect_t orig;
+    vsf_timeout_tick_t timeout_tick = __vsf_linux_timespec_to_timeout(timeout);
+    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+
+    for (size_t i = 0; i < nsops; i++) {
+        VSF_LINUX_ASSERT(sops[i].sem_num < semset->nsems);
+        sem = &semset->sem[sops[i].sem_num];
+        semadj = &priv->u.sem.semadj_arr[sops[i].sem_num];
+        adjvalue = sops[i].sem_op;
+
+        if (adjvalue != 0) {
+            if (sops[i].sem_flg & SEM_UNDO) {
+                *semadj -= adjvalue;
+            } else if (adjvalue > 0) {
+                orig = vsf_protect_sched();
+                sem->sync.cur_union.cur_value += adjvalue;
+
+                thread = NULL;
+                __vsf_dlist_foreach_unsafe(vsf_linux_thread_t, pending_node, &sem->sync.pending_list) {
+                    if (0 == _->func_priv.sem.wantval && 0 == sem->sync.cur_union.cur_value) {
+                        _->flag.state.is_sync_got = true;
+                        vsf_unprotect_sched(orig);
+                        thread = _;
+                        break;
+                    } else if (sem->sync.cur_union.cur_value >= _->func_priv.sem.wantval) {
+                        sem->sync.cur_union.cur_value -= _->func_priv.sem.wantval;
+                        _->flag.state.is_sync_got = true;
+                        vsf_unprotect_sched(orig);
+                        thread = _;
+                        break;
+                    }
+                }
+                if (thread != NULL) {
+                    __vsf_eda_post_evt_ex(&thread->use_as__vsf_eda_t, VSF_EVT_SYNC, true);
+                } else {
+                    vsf_unprotect_sched(orig);
+                }
+            } else {
+                orig = vsf_protect_sched();
+                tgtvalue = sem->sync.cur_union.cur_value + adjvalue;
+                if ((adjvalue < 0) && (tgtvalue < 0)) {
+                    if (sops[i].sem_flg & IPC_NOWAIT) {
+                        vsf_unprotect_sched(orig);
+                        errno = EAGAIN;
+                        return -1;
+                    }
+
+                    thread->func_priv.sem.wantval = -adjvalue;
+                    __vsf_eda_sync_pend(&sem->sync, &thread->use_as__vsf_eda_t, timeout_tick);
+                    vsf_unprotect_sched(orig);
+                    goto wait_event;
+                } else {
+                    sem->sync.cur_union.cur_value = tgtvalue;
+                    vsf_unprotect_sched(orig);
+                }
+            }
+        } else {
+            orig = vsf_protect_sched();
+            if (!sem->sync.cur_union.cur_value) {
+                vsf_unprotect_sched(orig);
+                return 0;
+            } else if (sops[i].sem_flg & IPC_NOWAIT) {
+                vsf_unprotect_sched(orig);
+                errno = EAGAIN;
+                return -1;
+            } else {
+                thread->func_priv.sem.wantval = 0;
+                __vsf_eda_sync_pend(&sem->sync, vsf_eda_get_cur(), timeout_tick);
+                vsf_unprotect_sched(orig);
+                goto wait_event;
+            }
+        }
+    }
+    return 0;
+
+wait_event:
+    vsf_sync_reason_t reason = vsf_eda_sync_get_reason(&sem->sync, vsf_thread_wait());
+    switch (reason) {
+    case VSF_SYNC_TIMEOUT:
+        errno = EAGAIN;
+        return -1;
+    case VSF_SYNC_PENDING:
+        goto wait_event;
+    case VSF_SYNC_GET:
+        return 0;
+    case VSF_SYNC_CANCEL:
+        errno = EIDRM;
+        return -1;
+    default:
+        VSF_LINUX_ASSERT(false);
+        return -1;
+    }
+}
+
+int semop(int semid, struct sembuf *sops, size_t nsops)
+{
+    return semtimedop(semid, sops, nsops, NULL);
 }
 
 // sys/time.h
@@ -3082,7 +3330,6 @@ long sys_futex(uint32_t *futex, int futex_op, uint32_t val, uintptr_t val2, uint
         linux_futex = __vsf_linux_futex_get(futex, true);
         VSF_LINUX_ASSERT(linux_futex != NULL);
 
-        extern void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, vsf_timeout_tick_t timeout);
         __vsf_eda_sync_pend(&linux_futex->trig, NULL, timeout_ticks);
         vsf_unprotect_sched(orig);
 
@@ -3137,39 +3384,42 @@ int prctl(int option, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4, uintptr_t 
     return -1;
 }
 
-#if VSF_LINUX_CFG_SHM_NUM > 0
+#if VSF_LINUX_CFG_SUPPORT_SHM == ENABLED
 // shm.h
+
+static int __shmfree(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_key_priv_t *priv = (vsf_linux_key_priv_t *)sfd->priv;
+    __vsf_linux_keyfree(priv->key);
+    return 0;
+}
 
 int shmget(key_t key, size_t size, int shmflg)
 {
-    VSF_LINUX_ASSERT((IPC_PRIVATE == key) || (shmflg & IPC_CREAT));
-
-    vsf_protect_t orig = vsf_protect_sched();
-        key = vsf_bitmap_ffz(&__vsf_linux.shm.bitmap, VSF_LINUX_CFG_SHM_NUM);
-        if (key >= 0) {
-            vsf_bitmap_set(&__vsf_linux.shm.bitmap, key);
-        }
-    vsf_unprotect_sched(orig);
-
-    if (key < 0) {
-        return key;
-    }
-
-    vsf_linux_shm_mem_t *mem = &__vsf_linux.shm.mem[key++];
-    mem->size = size;
-    mem->key = key;
-    mem->buffer = malloc(size);
-    if (NULL == mem->buffer) {
-        shmctl(key, IPC_RMID, NULL);
+    vsf_linux_shm_mem_t *mem = (vsf_linux_shm_mem_t *)__vsf_linux_keyget(key, sizeof(vsf_linux_shm_mem_t) + size, shmflg);
+    if (NULL == mem) {
         return -1;
     }
 
-    return key;
+    mem->size = size;
+    mem->buffer = &mem[1];
+
+    vsf_linux_fd_t *sfd;
+    int fd = vsf_linux_fd_create(&sfd, &vsf_linux_key_fdop);
+    if (fd >= 0) {
+        vsf_linux_key_priv_t *priv = (vsf_linux_key_priv_t *)sfd->priv;
+        priv->key = &mem->use_as__vsf_linux_key_t;
+        priv->fn_close = __shmfree;
+    }
+
+    return fd;
 }
 
 void * shmat(int shmid, const void *shmaddr, int shmflg)
 {
-    vsf_linux_shm_mem_t *mem = &__vsf_linux.shm.mem[shmid];
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(shmid);
+    vsf_linux_key_priv_t *priv = (vsf_linux_key_priv_t *)sfd->priv;
+    vsf_linux_shm_mem_t *mem = (vsf_linux_shm_mem_t *)priv->key;
     return mem->buffer;
 }
 
@@ -3180,10 +3430,9 @@ int shmdt(const void *shmaddr)
 
 int shmctl(int shmid, int cmd, struct shmid_ds *buf)
 {
-    shmid--;
-    VSF_LINUX_ASSERT(shmid < VSF_LINUX_CFG_SHM_NUM);
-
-    vsf_linux_shm_mem_t *mem = &__vsf_linux.shm.mem[shmid];
+    vsf_linux_fd_t *sfd = vsf_linux_fd_get(shmid);
+    vsf_linux_key_priv_t *priv = (vsf_linux_key_priv_t *)sfd->priv;
+    vsf_linux_shm_mem_t *mem = (vsf_linux_shm_mem_t *)priv->key;
     switch (cmd) {
     case IPC_STAT:
         memset(buf, 0, sizeof(*buf));
@@ -3193,21 +3442,13 @@ int shmctl(int shmid, int cmd, struct shmid_ds *buf)
     case IPC_SET:
         VSF_LINUX_ASSERT(false);
         break;
-    case IPC_RMID: {
-            if (mem->buffer != NULL) {
-                free(mem->buffer);
-                mem->buffer = NULL;
-            }
-
-            vsf_protect_t orig = vsf_protect_sched();
-                vsf_bitmap_clear(&__vsf_linux.shm.bitmap, shmid);
-            vsf_unprotect_sched(orig);
-        }
+    case IPC_RMID:
+        close(shmid);
         break;
     }
     return 0;
 }
-#endif      // VSF_LINUX_CFG_SHM_NUM
+#endif      // VSF_LINUX_CFG_SUPPORT_SHM
 
 // sched
 

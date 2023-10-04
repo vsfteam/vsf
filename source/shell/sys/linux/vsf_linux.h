@@ -112,6 +112,11 @@ typedef struct vsf_linux_process_ctx_t {
     vsf_linux_main_entry_t entry;
 } vsf_linux_process_ctx_t;
 
+typedef struct vsf_linux_key_t {
+    vsf_dlist_node_t node;
+    key_t key;
+} vsf_linux_key_t;
+
 #if VSF_LINUX_CFG_PLS_NUM > 0 || VSF_LINUX_CFG_TLS_NUM > 0
 typedef struct vsf_linux_localstorage_t {
     void *data;
@@ -191,6 +196,11 @@ vsf_class(vsf_linux_thread_t) {
     private_member(
         vsf_linux_process_t *process;
         vsf_dlist_node_t thread_node;
+        union {
+            struct {
+                unsigned short wantval;
+            } sem;
+        } func_priv;
     )
 };
 

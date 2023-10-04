@@ -102,11 +102,6 @@ extern void __vsf_eda_task_evthandler_process_return_value(vsf_eda_t *eda, vsf_e
 SECTION(".text.vsf.kernel.__vsf_eda_get_valid_eda")
 static vsf_eda_t * __vsf_eda_get_valid_eda(vsf_eda_t *pthis);
 
-#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
-SECTION(".text.vsf.kernel.eda")
-static vsf_err_t __vsf_eda_post_evt_ex(vsf_eda_t *pthis, vsf_evt_t evt, bool force);
-#endif
-
 //! should be provided by user
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 SECTION(".text.vsf.kernel.vsf_eda_new_frame")
@@ -945,7 +940,7 @@ vsf_err_t vsf_eda_post_evt(vsf_eda_t *pthis, vsf_evt_t evt)
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 SECTION(".text.vsf.kernel.eda")
-static vsf_err_t __vsf_eda_post_evt_ex(vsf_eda_t *pthis, vsf_evt_t evt, bool force)
+vsf_err_t __vsf_eda_post_evt_ex(vsf_eda_t *pthis, vsf_evt_t evt, bool force)
 {
     VSF_KERNEL_ASSERT(pthis != NULL);
     return vsf_evtq_post_evt_ex(pthis, evt, force);

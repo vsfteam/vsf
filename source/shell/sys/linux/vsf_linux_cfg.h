@@ -38,8 +38,8 @@
 #   define VSF_LINUX_CFG_FD_BITMAP_SIZE         32
 #endif
 
-#ifndef VSF_LINUX_CFG_SHM_NUM
-#   define VSF_LINUX_CFG_SHM_NUM                32
+#ifndef VSF_LINUX_CFG_SUPPORT_SHM
+#   define VSF_LINUX_CFG_SUPPORT_SHM            ENABLED
 #endif
 
 #ifndef VSF_LINUX_CFG_PLS_NUM

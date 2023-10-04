@@ -1107,6 +1107,11 @@ extern vsf_err_t vsf_eda_set_evthandler(vsf_eda_t *pthis, vsf_eda_evthandler_t e
 SECTION(".text.vsf.kernel.eda")
 extern void vsf_kernel_init( const vsf_kernel_cfg_t *cfg_ptr);
 
+#   if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
+SECTION(".text.vsf.kernel.eda")
+vsf_err_t __vsf_eda_post_evt_ex(vsf_eda_t *pthis, vsf_evt_t evt, bool force);
+#   endif
+
 #   if VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
 
 SECTION(".text.vsf.kernel.vsf_eda_polling_state_get")
