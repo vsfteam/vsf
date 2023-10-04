@@ -2998,8 +2998,16 @@ static void __semfini(vsf_linux_fd_t *sfd)
     vsf_linux_key_priv_t *priv = (vsf_linux_key_priv_t *)sfd->priv;
     unsigned short *semadj = priv->u.sem.semadj_arr;
     vsf_linux_sem_set_t *semset = (vsf_linux_sem_set_t *)priv->key;
+    struct sembuf sops;
 
-    // TODO: recover semadj here?
+    sops.sem_flg = 0;
+    for (int i = 0; i < semset->nsems; i++) {
+        if (*semadj != 0) {
+            sops.sem_num = i;
+            sops.sem_op = *semadj;
+            semop(sfd->fd, &sops, 1);
+        }
+    }
 }
 
 static int __semfree(vsf_linux_fd_t *sfd)
@@ -3133,7 +3141,8 @@ int semtimedop(int semid, struct sembuf *sops, size_t nsops,
         if (adjvalue != 0) {
             if (sops[i].sem_flg & SEM_UNDO) {
                 *semadj -= adjvalue;
-            } else if (adjvalue > 0) {
+            }
+            if (adjvalue > 0) {
                 orig = vsf_protect_sched();
                 sem->sync.cur_union.cur_value += adjvalue;
 
