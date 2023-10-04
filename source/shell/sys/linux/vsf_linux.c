@@ -3140,19 +3140,19 @@ int semtimedop(int semid, struct sembuf *sops, size_t nsops,
                 thread = NULL;
                 __vsf_dlist_foreach_unsafe(vsf_linux_thread_t, pending_node, &sem->sync.pending_list) {
                     if (0 == _->func_priv.sem.wantval && 0 == sem->sync.cur_union.cur_value) {
-                        _->flag.state.is_sync_got = true;
-                        vsf_unprotect_sched(orig);
                         thread = _;
                         break;
                     } else if (sem->sync.cur_union.cur_value >= _->func_priv.sem.wantval) {
                         sem->sync.cur_union.cur_value -= _->func_priv.sem.wantval;
-                        _->flag.state.is_sync_got = true;
-                        vsf_unprotect_sched(orig);
                         thread = _;
                         break;
                     }
                 }
                 if (thread != NULL) {
+                    thread->flag.state.is_sync_got = true;
+                    vsf_dlist_remove(vsf_linux_thread_t, pending_node, &sem->sync.pending_list, thread);
+                    vsf_unprotect_sched(orig);
+
                     __vsf_eda_post_evt_ex(&thread->use_as__vsf_eda_t, VSF_EVT_SYNC, true);
                 } else {
                     vsf_unprotect_sched(orig);
