@@ -195,9 +195,16 @@ typedef struct vsf_linux_t {
     vsf_linux_process_t process_for_resources;
     vsf_linux_process_t *kernel_process;
 
+#if VSF_LINUX_CFG_SUPPORT_SHM == ENABLED
     struct {
         vsf_dlist_t list;
-    } key;
+    } shm;
+#endif
+#if VSF_LINUX_CFG_SUPPORT_SEM == ENABLED
+    struct {
+        vsf_dlist_t list;
+    } sem;
+#endif
 
 #if VSF_LINUX_CFG_PLS_NUM > 0
     struct {
@@ -550,19 +557,20 @@ vsf_linux_localstorage_t * vsf_linux_tls_get(int idx)
 }
 #endif
 
-static void __vsf_linux_keyfree(vsf_linux_key_t *key)
+#if VSF_LINUX_CFG_SUPPORT_SEM == ENABLED || VSF_LINUX_CFG_SUPPORT_SHM == ENABLED
+static void __vsf_linux_keyfree(vsf_dlist_t *list, vsf_linux_key_t *key)
 {
     vsf_protect_t orig = vsf_protect_sched();
-    vsf_dlist_remove(vsf_linux_key_t, node, &__vsf_linux.key.list, key);
+    vsf_dlist_remove(vsf_linux_key_t, node, list, key);
     vsf_unprotect_sched(orig);
     vsf_linux_free_res(key);
 }
 
-static vsf_linux_key_t * __vsf_linux_keyget(key_t key, size_t size, int flags)
+static vsf_linux_key_t * __vsf_linux_keyget(vsf_dlist_t *list, key_t key, size_t size, int flags)
 {
     vsf_linux_key_t *result = NULL;
     vsf_protect_t orig = vsf_protect_sched();
-    __vsf_dlist_foreach_unsafe(vsf_linux_key_t, node, &__vsf_linux.key.list) {
+    __vsf_dlist_foreach_unsafe(vsf_linux_key_t, node, list) {
         if (_->key == key) {
             result = _;
         }
@@ -572,20 +580,25 @@ static vsf_linux_key_t * __vsf_linux_keyget(key_t key, size_t size, int flags)
         return NULL;
     }
 
-    if ((NULL == result) && (flags & IPC_CREAT)) {
-        result = vsf_linux_malloc_res(size);
-        if (result != NULL) {
-            result->key = key;
-            vsf_dlist_init_node(vsf_linux_key_t, node, result);
-            if (key != IPC_PRIVATE) {
-                orig = vsf_protect_sched();
-                vsf_dlist_add_to_head(vsf_linux_key_t, node, &__vsf_linux.key.list, result);
-                vsf_unprotect_sched(orig);
+    if (NULL == result) {
+        if (flags & IPC_CREAT) {
+            result = vsf_linux_malloc_res(size);
+            if (result != NULL) {
+                result->key = key;
+                vsf_dlist_init_node(vsf_linux_key_t, node, result);
+                if (key != IPC_PRIVATE) {
+                    orig = vsf_protect_sched();
+                    vsf_dlist_add_to_head(vsf_linux_key_t, node, list, result);
+                    vsf_unprotect_sched(orig);
+                }
             }
+        } else {
+            errno = ENOENT;
         }
     }
     return result;
 }
+#endif
 
 #if VSF_LINUX_CFG_FUTEX_NUM > 0
 //implement_vsf_pool(vsf_linux_futex_pool, vsf_linux_futex_t)
@@ -2976,6 +2989,7 @@ key_t ftok(const char *pathname, int id)
     return -1;
 }
 
+#if VSF_LINUX_CFG_SUPPORT_SEM == ENABLED
 // sys/sem.h
 // TODO: use vsf_linux_trigger_t, so that sleeping thred can be wakened by signal
 
@@ -2991,7 +3005,7 @@ static void __semfini(vsf_linux_fd_t *sfd)
 static int __semfree(vsf_linux_fd_t *sfd)
 {
     vsf_linux_key_priv_t *priv = (vsf_linux_key_priv_t *)sfd->priv;
-    __vsf_linux_keyfree(priv->key);
+    __vsf_linux_keyfree(&__vsf_linux.sem.list, priv->key);
     return 0;
 }
 
@@ -3056,8 +3070,8 @@ int semctl(int semid, int semnum, int cmd, ...)
 int semget(key_t key, int nsems, int semflg)
 {
     VSF_LINUX_ASSERT(nsems >= 1);
-    vsf_linux_sem_set_t *semset = (vsf_linux_sem_set_t *)__vsf_linux_keyget(key,
-        sizeof(vsf_linux_sem_set_t) + sizeof(vsf_linux_sem_t) * (nsems - 1), semflg);
+    vsf_linux_sem_set_t *semset = (vsf_linux_sem_set_t *)__vsf_linux_keyget(
+        &__vsf_linux.sem.list, key, sizeof(vsf_linux_sem_set_t) + sizeof(vsf_linux_sem_t) * (nsems - 1), semflg);
     if ((NULL == semset) || ((semset->nsems != 0) && (semset->nsems  != nsems))) {
         return -1;
     }
@@ -3205,6 +3219,7 @@ int semop(int semid, struct sembuf *sops, size_t nsops)
 {
     return semtimedop(semid, sops, nsops, NULL);
 }
+#endif
 
 // sys/time.h
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
@@ -3391,13 +3406,14 @@ int prctl(int option, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4, uintptr_t 
 static int __shmfree(vsf_linux_fd_t *sfd)
 {
     vsf_linux_key_priv_t *priv = (vsf_linux_key_priv_t *)sfd->priv;
-    __vsf_linux_keyfree(priv->key);
+    __vsf_linux_keyfree(&__vsf_linux.shm.list, priv->key);
     return 0;
 }
 
 int shmget(key_t key, size_t size, int shmflg)
 {
-    vsf_linux_shm_mem_t *mem = (vsf_linux_shm_mem_t *)__vsf_linux_keyget(key, sizeof(vsf_linux_shm_mem_t) + size, shmflg);
+    vsf_linux_shm_mem_t *mem = (vsf_linux_shm_mem_t *)__vsf_linux_keyget(&__vsf_linux.shm.list,
+            key, sizeof(vsf_linux_shm_mem_t) + size, shmflg);
     if (NULL == mem) {
         return -1;
     }

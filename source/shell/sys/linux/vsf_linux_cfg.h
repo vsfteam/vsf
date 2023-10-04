@@ -41,6 +41,9 @@
 #ifndef VSF_LINUX_CFG_SUPPORT_SHM
 #   define VSF_LINUX_CFG_SUPPORT_SHM            ENABLED
 #endif
+#ifndef VSF_LINUX_CFG_SUPPORT_SEM
+#   define VSF_LINUX_CFG_SUPPORT_SEM            ENABLED
+#endif
 
 #ifndef VSF_LINUX_CFG_PLS_NUM
 #   define VSF_LINUX_CFG_PLS_NUM                8
