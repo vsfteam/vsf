@@ -93,9 +93,13 @@ typedef struct vsf_linux_audio_control_priv_t {
     implement(vsf_linux_fs_priv_t)
 } vsf_linux_audio_control_priv_t;
 
+typedef struct vsf_linux_audio_timer_priv_t {
+    implement(vsf_linux_fs_priv_t)
+} vsf_linux_audio_timer_priv_t;
+
 typedef struct vsf_linux_audio_play_priv_t {
     implement(vsf_linux_stream_priv_t)
-    implement(vsf_fifo_stream_t)
+    implement(vsf_mem_stream_t)
 
     struct snd_pcm_hw_constraints hw_constraints;
     struct snd_pcm_hw_params hw_params;
@@ -128,6 +132,9 @@ static int __vsf_linux_audio_play_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 
 static int __vsf_linux_audio_control_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static int __vsf_linux_audio_control_stat(vsf_linux_fd_t *sfd, struct stat *buf);
+
+static int __vsf_linux_audio_timer_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
+static int __vsf_linux_audio_timer_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 
 static int snd_pcm_hw_rule_format(struct snd_mask *masks, struct snd_interval *intervals,
             unsigned int cmask, struct __snd_pcm_hw_rule *rule);
@@ -168,6 +175,12 @@ static const vsf_linux_fd_op_t __vsf_linux_audio_play_fdop = {
     .fn_write           = __vsf_linux_stream_write,
     .fn_fcntl           = __vsf_linux_audio_play_fcntl,
     .fn_stat            = __vsf_linux_audio_play_stat,
+};
+
+static const vsf_linux_fd_op_t __vsf_linux_audio_timer_fdop = {
+    .priv_size          = sizeof(vsf_linux_audio_timer_priv_t),
+    .fn_fcntl           = __vsf_linux_audio_timer_fcntl,
+    .fn_stat            = __vsf_linux_audio_timer_stat,
 };
 
 static const vsf_linux_fd_op_t __vsf_linux_audio_capture_fdop = {
@@ -1231,7 +1244,7 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
                 return -1;
             }
 
-            priv->op = &vsf_fifo_stream_op;
+            priv->op = &vsf_mem_stream_op;
             priv->size = interval->min;
             priv->buffer = vsf_linux_malloc_res(interval->min);
 
@@ -1279,6 +1292,7 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         }
         {
             uint8_t frame_size = VSF_AUDIO_DATA_TYPE_BITLEN(audio_stream->format.datatype.value) >> 3;
+            frame_size *= audio_stream->format.channel_num;
             u.xferi->result = __vsf_linux_stream_write(sfd, u.xferi->buf, u.xferi->frames * frame_size) / frame_size;
         }
         break;
@@ -1288,6 +1302,7 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         }
         {
             uint8_t frame_size = VSF_AUDIO_DATA_TYPE_BITLEN(audio_stream->format.datatype.value) >> 3;
+            frame_size *= audio_stream->format.channel_num;
             u.xferi->result = __vsf_linux_stream_read(sfd, u.xferi->buf, u.xferi->frames * frame_size) / frame_size;
         }
         break;
@@ -1453,6 +1468,45 @@ static int __vsf_linux_audio_control_stat(vsf_linux_fd_t *sfd, struct stat *buf)
 {
     buf->st_mode = S_IFCHR;
     return 0;
+}
+
+static int __vsf_linux_audio_timer_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
+{
+    vsf_linux_audio_timer_priv_t *priv = (vsf_linux_audio_timer_priv_t *)sfd->priv;
+
+    union {
+        int *version;                           // SNDRV_TIMER_IOCTL_PVERSION
+
+        uintptr_t arg;
+    } u;
+    u.arg = arg;
+
+    switch (cmd) {
+    case SNDRV_TIMER_IOCTL_PVERSION:
+        *u.version = SNDRV_TIMER_VERSION;
+        break;
+    case SNDRV_TIMER_IOCTL_TREAD:
+        break;
+    case SNDRV_TIMER_IOCTL_SELECT:
+        break;
+    default:
+        errno = EOPNOTSUPP;
+        return -1;
+    }
+    return 0;
+}
+
+static int __vsf_linux_audio_timer_stat(vsf_linux_fd_t *sfd, struct stat *buf)
+{
+    buf->st_mode = S_IFCHR;
+    return 0;
+}
+
+int vsf_linux_fs_bind_audio_timer(char *path)
+{
+    int result = vsf_linux_fs_bind_target_ex(path, NULL, &__vsf_linux_audio_timer_fdop,
+                NULL, NULL, 0, 0);
+    return result;
 }
 
 int vsf_linux_fs_bind_audio(char *path, int card_idx, vk_audio_dev_t *audio_dev)

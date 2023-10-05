@@ -41,6 +41,7 @@ extern "C" {
 /*============================ PROTOTYPES ====================================*/
 
 extern int vsf_linux_fs_bind_audio(char *path, int card_idx, vk_audio_dev_t *audio_dev);
+extern int vsf_linux_fs_bind_audio_timer(char *path);
 
 #ifdef __cplusplus
 }
