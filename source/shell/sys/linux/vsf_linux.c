@@ -584,6 +584,7 @@ static vsf_linux_key_t * __vsf_linux_keyget(vsf_dlist_t *list, key_t key, size_t
         if (flags & IPC_CREAT) {
             result = vsf_linux_malloc_res(size);
             if (result != NULL) {
+                memset(result, 0, size);
                 result->key = key;
                 vsf_dlist_init_node(vsf_linux_key_t, node, result);
                 if (key != IPC_PRIVATE) {
