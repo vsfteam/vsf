@@ -1000,6 +1000,7 @@ static void __vsf_linux_audio_play_init(vsf_linux_fd_t *sfd)
                         |   (1 << SNDRV_PCM_HW_PARAM_RATE) | (1 << SNDRV_PCM_HW_PARAM_PERIOD_TIME)
                         |   (1 << SNDRV_PCM_HW_PARAM_PERIODS);
     params_update(priv->hw_constraints.masks, priv->hw_constraints.intervals, &cmask, 0, false);
+    priv->mmap.status.state = SNDRV_PCM_STATE_OPEN;
 }
 
 static int __vsf_linux_audio_play_start(vk_audio_dev_t *audio_dev, vk_audio_stream_t *audio_stream,
@@ -1194,6 +1195,7 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
                 return -1;
             }
             audio_stream->format.sample_rate = interval->min / 100;
+            priv->mmap.status.state = SNDRV_PCM_STATE_SETUP;
         }
         break;
     case SNDRV_PCM_IOCTL_HW_FREE:
@@ -1257,6 +1259,7 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
                 vsf_stream_init(priv->stream_rx);
                 __vsf_linux_rx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
             }
+            priv->mmap.status.state = SNDRV_PCM_STATE_PREPARED;
         }
         break;
     case SNDRV_PCM_IOCTL_RESET:
@@ -1476,6 +1479,7 @@ static int __vsf_linux_audio_timer_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t
 
     union {
         int *version;                           // SNDRV_TIMER_IOCTL_PVERSION
+        struct snd_timer_params *timer_params;  // SNDRV_TIMER_IOCTL_PARAMS
 
         uintptr_t arg;
     } u;
@@ -1488,6 +1492,8 @@ static int __vsf_linux_audio_timer_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t
     case SNDRV_TIMER_IOCTL_TREAD:
         break;
     case SNDRV_TIMER_IOCTL_SELECT:
+        break;
+    case SNDRV_TIMER_IOCTL_PARAMS:
         break;
     default:
         errno = EOPNOTSUPP;
