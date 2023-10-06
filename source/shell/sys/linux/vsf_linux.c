@@ -173,7 +173,7 @@ typedef struct vsf_linux_sem_t {
 typedef struct vsf_linux_sem_set_t {
     implement(vsf_linux_key_t)
     int nsems;
-    vsf_linux_sem_t sem[1];
+    vsf_linux_sem_t sem[0];
 } vsf_linux_sem_set_t;
 
 #if VSF_LINUX_CFG_FUTEX_NUM > 0
@@ -3086,7 +3086,7 @@ int semget(key_t key, int nsems, int semflg)
 {
     VSF_LINUX_ASSERT(nsems >= 1);
     vsf_linux_sem_set_t *semset = (vsf_linux_sem_set_t *)__vsf_linux_keyget(
-        &__vsf_linux.sem.list, key, sizeof(vsf_linux_sem_set_t) + sizeof(vsf_linux_sem_t) * (nsems - 1), semflg);
+        &__vsf_linux.sem.list, key, sizeof(vsf_linux_sem_set_t) + sizeof(vsf_linux_sem_t) * nsems, semflg);
     if ((NULL == semset) || ((semset->nsems != 0) && (semset->nsems  != nsems))) {
         return -1;
     }

@@ -22,14 +22,18 @@
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_DEVFS == ENABLED && VSF_LINUX_DEVFS_USE_ALSA == ENABLED
 
 #define __VSF_FS_CLASS_INHERIT__
-#define __VSF_LINUX_FS_CLASS_INHERIT__
 #define __VSF_AUDIO_CLASS_INHERIT__
+#define __VSF_MEM_STREAM_CLASS_IMPLEMENT
+#define __VSF_LINUX_FS_CLASS_INHERIT__
+#define __VSF_LINUX_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "shell/sys/linux/include/unistd.h"
 #   include "shell/sys/linux/include/errno.h"
+#   include "shell/sys/linux/include/poll.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
+#   include <poll.h>
 #endif
 #include <limits.h>
 #include <stdint.h>
@@ -95,6 +99,22 @@ typedef struct vsf_linux_audio_control_priv_t {
 
 typedef struct vsf_linux_audio_timer_priv_t {
     implement(vsf_linux_fs_priv_t)
+    struct snd_timer_id sellected_id;
+    struct {
+        unsigned int flags;
+        unsigned int ticks;
+        unsigned int filter;
+    } timer_param;
+
+    vsf_systimer_tick_t cur_tick;
+    vsf_systimer_tick_t start_tick;
+    bool is_running;
+    bool is_tread;
+
+    uint16_t queue_datalen;
+    uint16_t queue_rpos;
+    uint16_t queue_wpos;
+    struct snd_timer_tread queue[32];
 } vsf_linux_audio_timer_priv_t;
 
 typedef struct vsf_linux_audio_play_priv_t {
@@ -120,6 +140,8 @@ typedef struct vsf_linux_audio_capture_priv_t {
 extern void __vsf_linux_rx_stream_init(vsf_linux_stream_priv_t *priv_tx);
 extern void __vsf_linux_tx_stream_init(vsf_linux_stream_priv_t *priv_rx);
 extern void __vsf_linux_tx_stream_drain(vsf_linux_stream_priv_t *priv_tx);
+extern void __vsf_linux_rx_stream_drop(vsf_linux_stream_priv_t *priv_rx);
+extern void __vsf_linux_tx_stream_drop(vsf_linux_stream_priv_t *priv_tx);
 extern void __vsf_linux_tx_stream_fini(vsf_linux_stream_priv_t *priv_tx);
 extern void __vsf_linux_rx_stream_fini(vsf_linux_stream_priv_t *priv_rx);
 
@@ -133,6 +155,7 @@ static int __vsf_linux_audio_play_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 static int __vsf_linux_audio_control_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static int __vsf_linux_audio_control_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 
+static ssize_t __vsf_linux_audio_timer_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static int __vsf_linux_audio_timer_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static int __vsf_linux_audio_timer_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 
@@ -179,6 +202,7 @@ static const vsf_linux_fd_op_t __vsf_linux_audio_play_fdop = {
 
 static const vsf_linux_fd_op_t __vsf_linux_audio_timer_fdop = {
     .priv_size          = sizeof(vsf_linux_audio_timer_priv_t),
+    .fn_read            = __vsf_linux_audio_timer_read,
     .fn_fcntl           = __vsf_linux_audio_timer_fcntl,
     .fn_stat            = __vsf_linux_audio_timer_stat,
 };
@@ -1270,8 +1294,6 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         }
         break;
     case SNDRV_PCM_IOCTL_DROP:
-        extern void __vsf_linux_rx_stream_drop(vsf_linux_stream_priv_t *priv_rx);
-        extern void __vsf_linux_tx_stream_drop(vsf_linux_stream_priv_t *priv_tx);
         if (is_playback) {
             __vsf_linux_tx_stream_drop(&priv->use_as__vsf_linux_stream_priv_t);
         } else {
@@ -1310,6 +1332,7 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         }
         break;
     default:
+        VSF_LINUX_ASSERT(false);
         errno = EOPNOTSUPP;
         return -1;
     }
@@ -1461,6 +1484,7 @@ static int __vsf_linux_audio_control_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr
         }
         break;
     default:
+        VSF_LINUX_ASSERT(false);
         errno = EOPNOTSUPP;
         return -1;
     }
@@ -1473,12 +1497,62 @@ static int __vsf_linux_audio_control_stat(vsf_linux_fd_t *sfd, struct stat *buf)
     return 0;
 }
 
+static int __vsf_linux_audio_timer_write_tread(vsf_linux_audio_timer_priv_t *priv, struct snd_timer_tread *tread)
+{
+    vsf_protect_t orig = vsf_protect_sched();
+    if (priv->queue_datalen < dimof(priv->queue)) {
+        priv->queue_datalen++;
+        priv->queue[priv->queue_wpos++] = *tread;
+        if (priv->queue_wpos >= dimof(priv->queue)) {
+            priv->queue_wpos = 0;
+        }
+        vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
+        return 0;
+    }
+    vsf_unprotect_sched(orig);
+    return -1;
+}
+
+static ssize_t __vsf_linux_audio_timer_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    if (count != sizeof(struct snd_timer_tread)) {
+        VSF_LINUX_ASSERT(false);
+        return -1;
+    }
+
+    vsf_linux_audio_timer_priv_t *priv = (vsf_linux_audio_timer_priv_t *)sfd->priv;
+    vsf_protect_t orig = vsf_protect_sched();
+    if (!vsf_linux_fd_get_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN)) {
+        vsf_linux_trigger_t trig;
+        vsf_linux_trigger_init(&trig);
+
+        if (!vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, &trig, orig)) {
+            // triggered by signal
+            return -1;
+        }
+        orig = vsf_protect_sched();
+    }
+
+    *(struct snd_timer_tread *)buf = priv->queue[priv->queue_rpos++];
+    if (priv->queue_rpos >= dimof(priv->queue)) {
+        priv->queue_rpos = 0;
+    }
+    if (!--priv->queue_datalen) {
+        vsf_linux_fd_clear_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
+    } else {
+        vsf_unprotect_sched(orig);
+    }
+    return count;
+}
+
 static int __vsf_linux_audio_timer_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     vsf_linux_audio_timer_priv_t *priv = (vsf_linux_audio_timer_priv_t *)sfd->priv;
 
     union {
         int *version;                           // SNDRV_TIMER_IOCTL_PVERSION
+        int *tread;                             // SNDRV_TIMER_IOCTL_TREAD
+        struct snd_timer_select *timer_select;  // SNDRV_TIMER_IOCTL_SELECT
         struct snd_timer_params *timer_params;  // SNDRV_TIMER_IOCTL_PARAMS
 
         uintptr_t arg;
@@ -1490,12 +1564,42 @@ static int __vsf_linux_audio_timer_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t
         *u.version = SNDRV_TIMER_VERSION;
         break;
     case SNDRV_TIMER_IOCTL_TREAD:
+        priv->is_tread = *u.tread > 0;
         break;
     case SNDRV_TIMER_IOCTL_SELECT:
+        priv->sellected_id = u.timer_select->id;
         break;
     case SNDRV_TIMER_IOCTL_PARAMS:
+        priv->timer_param.flags = u.timer_params->flags;
+        priv->timer_param.ticks = u.timer_params->ticks;
+        priv->timer_param.filter = u.timer_params->filter;
+        u.timer_params->queue_size = dimof(priv->queue);
+        if (priv->timer_param.flags & SNDRV_TIMER_PSFLG_EARLY_EVENT) {
+            struct snd_timer_tread tread = {
+                .event = SNDRV_TIMER_EVENT_EARLY,
+                .tstamp.tv_sec = 0,
+                .tstamp.tv_nsec = 0,
+                .val = 0,
+            };
+            __vsf_linux_audio_timer_write_tread(priv, &tread);
+        }
+        break;
+    case SNDRV_TIMER_IOCTL_START:
+    case SNDRV_TIMER_IOCTL_CONTINUE:
+        if (!priv->is_running) {
+            priv->is_running = true;
+            priv->start_tick = vsf_systimer_get_tick();
+        }
+        break;
+    case SNDRV_TIMER_IOCTL_STOP:
+    case SNDRV_TIMER_IOCTL_PAUSE:
+        if (priv->is_running) {
+            priv->is_running = false;
+            priv->cur_tick += vsf_systimer_get_tick() - priv->start_tick;
+        }
         break;
     default:
+        VSF_LINUX_ASSERT(false);
         errno = EOPNOTSUPP;
         return -1;
     }
