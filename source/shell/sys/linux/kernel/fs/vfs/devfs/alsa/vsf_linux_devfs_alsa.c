@@ -1551,7 +1551,7 @@ static ssize_t __vsf_linux_audio_timer_read(vsf_linux_fd_t *sfd, void *buf, size
     count /= sizeof(struct snd_timer_tread);
 
     ssize_t done = 0;
-    while (count > 0) {
+    while (count > done) {
         vsf_protect_t orig = vsf_protect_sched();
         if (!vsf_linux_fd_get_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN)) {
             vsf_linux_trigger_t trig;
@@ -1565,6 +1565,7 @@ static ssize_t __vsf_linux_audio_timer_read(vsf_linux_fd_t *sfd, void *buf, size
         }
 
         *(struct snd_timer_tread *)buf = priv->queue[priv->queue_rpos++];
+        buf = (void *)((uint8_t *)buf + sizeof(struct snd_timer_tread));
         if (priv->queue_rpos >= dimof(priv->queue)) {
             priv->queue_rpos = 0;
         }

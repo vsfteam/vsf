@@ -3138,6 +3138,7 @@ int semtimedop(int semid, struct sembuf *sops, size_t nsops,
     vsf_protect_t orig;
     vsf_timeout_tick_t timeout_tick = __vsf_linux_timespec_to_timeout(timeout);
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
+    vsf_sync_reason_t reason;
 
     for (size_t i = 0; i < nsops; i++) {
         VSF_LINUX_ASSERT(sops[i].sem_num < semset->nsems);
@@ -3146,11 +3147,11 @@ int semtimedop(int semid, struct sembuf *sops, size_t nsops,
         adjvalue = sops[i].sem_op;
 
         if (adjvalue != 0) {
+            orig = vsf_protect_sched();
             if (sops[i].sem_flg & SEM_UNDO) {
                 *semadj -= adjvalue;
             }
             if (adjvalue > 0) {
-                orig = vsf_protect_sched();
                 sem->sync.cur_union.cur_value += adjvalue;
 
                 thread = NULL;
@@ -3174,9 +3175,8 @@ int semtimedop(int semid, struct sembuf *sops, size_t nsops,
                     vsf_unprotect_sched(orig);
                 }
             } else {
-                orig = vsf_protect_sched();
                 tgtvalue = sem->sync.cur_union.cur_value + adjvalue;
-                if ((adjvalue < 0) && (tgtvalue < 0)) {
+                if (tgtvalue < 0) {
                     if (sops[i].sem_flg & IPC_NOWAIT) {
                         vsf_unprotect_sched(orig);
                         errno = EAGAIN;
@@ -3186,7 +3186,7 @@ int semtimedop(int semid, struct sembuf *sops, size_t nsops,
                     thread->func_priv.sem.wantval = -adjvalue;
                     __vsf_eda_sync_pend(&sem->sync, &thread->use_as__vsf_eda_t, timeout_tick);
                     vsf_unprotect_sched(orig);
-                    goto wait_event;
+                    goto wait_event_and_continue;
                 } else {
                     sem->sync.cur_union.cur_value = tgtvalue;
                     vsf_unprotect_sched(orig);
@@ -3196,7 +3196,7 @@ int semtimedop(int semid, struct sembuf *sops, size_t nsops,
             orig = vsf_protect_sched();
             if (!sem->sync.cur_union.cur_value) {
                 vsf_unprotect_sched(orig);
-                return 0;
+                continue;
             } else if (sops[i].sem_flg & IPC_NOWAIT) {
                 vsf_unprotect_sched(orig);
                 errno = EAGAIN;
@@ -3205,30 +3205,28 @@ int semtimedop(int semid, struct sembuf *sops, size_t nsops,
                 thread->func_priv.sem.wantval = 0;
                 __vsf_eda_sync_pend(&sem->sync, vsf_eda_get_cur(), timeout_tick);
                 vsf_unprotect_sched(orig);
-                goto wait_event;
+
+            wait_event_and_continue:
+                reason = vsf_eda_sync_get_reason(&sem->sync, vsf_thread_wait());
+                switch (reason) {
+                case VSF_SYNC_TIMEOUT:
+                    errno = EAGAIN;
+                    return -1;
+                case VSF_SYNC_PENDING:
+                    goto wait_event_and_continue;
+                case VSF_SYNC_GET:
+                    break;
+                case VSF_SYNC_CANCEL:
+                    errno = EIDRM;
+                    return -1;
+                default:
+                    VSF_LINUX_ASSERT(false);
+                    return -1;
+                }
             }
         }
     }
     return 0;
-
-wait_event: {
-        vsf_sync_reason_t reason = vsf_eda_sync_get_reason(&sem->sync, vsf_thread_wait());
-        switch (reason) {
-        case VSF_SYNC_TIMEOUT:
-            errno = EAGAIN;
-            return -1;
-        case VSF_SYNC_PENDING:
-            goto wait_event;
-        case VSF_SYNC_GET:
-            return 0;
-        case VSF_SYNC_CANCEL:
-            errno = EIDRM;
-            return -1;
-        default:
-            VSF_LINUX_ASSERT(false);
-            return -1;
-        }
-    }
 }
 
 int semop(int semid, struct sembuf *sops, size_t nsops)
