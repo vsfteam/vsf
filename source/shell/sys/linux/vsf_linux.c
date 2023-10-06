@@ -3578,10 +3578,10 @@ void * mmap64(void *addr, size_t len, int prot, int flags, int fd, off64_t off)
     if (fd >= 0) {
         vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
         if ((NULL == sfd) || (NULL == sfd->op) || (NULL == sfd->op->fn_mmap)) {
-            return NULL;
+            return MAP_FAILED;
         }
-        if (sfd->mmapped_buffer != NULL) {
-            return NULL;
+        if ((sfd->mmapped_buffer != NULL) && (sfd->mmapped_buffer != MAP_FAILED)) {
+            return MAP_FAILED;
         }
 
         sfd->mmapped_buffer = sfd->op->fn_mmap(sfd, off, len, prot);

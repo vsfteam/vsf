@@ -33,6 +33,7 @@
 #   include "shell/sys/linux/include/termios.h"
 #   include "shell/sys/linux/include/sys/ioctl.h"
 #   include "shell/sys/linux/include/sys/stat.h"
+#   include "shell/sys/linux/include/sys/mman.h"
 #   include "shell/sys/linux/include/linux/serial.h"
 #   include "shell/sys/linux/include/linux/input.h"
 #   include "shell/sys/linux/include/linux/fb.h"
@@ -48,6 +49,7 @@
 #   include <termios.h>
 #   include <sys/ioctl.h>
 #   include <sys/stat.h>
+#   include <sys/mman.h>
 #   include <linux/serial.h>
 #   include <linux/input.h>
 #   include <linux/fb.h>
@@ -1353,12 +1355,12 @@ static void * __vsf_linux_fb_mmap(vsf_linux_fd_t *sfd, off64_t offset, size_t le
         }
     }
     if (NULL == fb_priv->front_buffer) {
-        return NULL;
+        return MAP_FAILED;
     }
 
     uint_fast32_t frame_size = disp->param.height * disp->param.width * vsf_disp_get_pixel_bytesize(disp);
     if ((offset + len) > frame_size) {
-        return NULL;
+        return MAP_FAILED;
     }
     return (void *)((uint8_t *)fb_priv->front_buffer + offset);
 }
