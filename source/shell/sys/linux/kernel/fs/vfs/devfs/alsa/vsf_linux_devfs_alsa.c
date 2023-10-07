@@ -1237,6 +1237,14 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
                 vsf_linux_free_res(priv->buffer);
             }
             priv->buffer = vsf_linux_malloc_res(interval->min);
+
+            interval = param_interval(priv->hw_params.intervals, SNDRV_PCM_HW_PARAM_PERIODS);
+            if (!snd_interval_single(interval)) {
+                errno = EINVAL;
+                return -1;
+            }
+            uint8_t frame_bytesize = (pcm_formats[format].phys * audio_stream->format.channel_num) >> 3;
+            priv->mmap.control.avail_min = priv->size / (interval->min * frame_bytesize);
             priv->mmap.status.state = SNDRV_PCM_STATE_SETUP;
         }
         break;
@@ -1268,6 +1276,9 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         priv->sw_params = *u.sw_params;
         break;
     case SNDRV_PCM_IOCTL_SYNC_PTR:
+//        vsf_trace_debug("pcm_sync: %x %x %x %x %x\n", u.sync_ptr->flags,
+//            u.sync_ptr->c.control.appl_ptr, u.sync_ptr->c.control.avail_min,
+//            priv->mmap.control.appl_ptr, priv->mmap.control.avail_min);
         if (u.sync_ptr->flags & SNDRV_PCM_SYNC_PTR_HWSYNC) {
             __asm("nop");
         }
