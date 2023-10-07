@@ -125,6 +125,7 @@ typedef struct vsf_linux_audio_play_priv_t {
 
     struct snd_pcm_hw_constraints hw_constraints;
     struct snd_pcm_hw_params hw_params;
+    struct snd_pcm_sw_params sw_params;
     struct {
         struct snd_pcm_mmap_control control;
         struct snd_pcm_mmap_status status;
@@ -1225,6 +1226,11 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
             }
             audio_stream->format.sample_rate = interval->min / 100;
 
+            interval = param_interval(priv->hw_params.intervals, SNDRV_PCM_HW_PARAM_BUFFER_BYTES);
+            if (!snd_interval_single(interval)) {
+                errno = EINVAL;
+                return -1;
+            }
             priv->op = &vsf_mem_stream_op;
             priv->size = interval->min;
             if (priv->buffer != NULL) {
@@ -1259,6 +1265,7 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         }
         break;
     case SNDRV_PCM_IOCTL_SW_PARAMS:
+        priv->sw_params = *u.sw_params;
         break;
     case SNDRV_PCM_IOCTL_SYNC_PTR:
         if (u.sync_ptr->flags & SNDRV_PCM_SYNC_PTR_HWSYNC) {
@@ -1286,24 +1293,17 @@ static int __vsf_linux_audio_play_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t 
         u.chinfo->offset = 0;
         u.chinfo->step = sample_size_bits * audio_stream->format.channel_num;
         break;
-    case SNDRV_PCM_IOCTL_PREPARE: {
-            struct snd_interval *interval = param_interval(priv->hw_params.intervals, SNDRV_PCM_HW_PARAM_BUFFER_BYTES);
-            if (!snd_interval_single(interval)) {
-                errno = EINVAL;
-                return -1;
-            }
-
-            if (is_playback) {
-                priv->stream_tx = &priv->use_as__vsf_stream_t;
-                vsf_stream_init(priv->stream_tx);
-                __vsf_linux_tx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
-            } else {
-                priv->stream_rx = &priv->use_as__vsf_stream_t;
-                vsf_stream_init(priv->stream_rx);
-                __vsf_linux_rx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
-            }
-            priv->mmap.status.state = SNDRV_PCM_STATE_PREPARED;
+    case SNDRV_PCM_IOCTL_PREPARE:
+        if (is_playback) {
+            priv->stream_tx = &priv->use_as__vsf_stream_t;
+            vsf_stream_init(priv->stream_tx);
+            __vsf_linux_tx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
+        } else {
+            priv->stream_rx = &priv->use_as__vsf_stream_t;
+            vsf_stream_init(priv->stream_rx);
+            __vsf_linux_rx_stream_init(&priv->use_as__vsf_linux_stream_priv_t);
         }
+        priv->mmap.status.state = SNDRV_PCM_STATE_PREPARED;
         break;
     case SNDRV_PCM_IOCTL_RESET:
         break;
