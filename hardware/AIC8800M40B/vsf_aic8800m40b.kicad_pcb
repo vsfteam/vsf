@@ -693,6 +693,11 @@
       (net 1 "GND") (pinfunction "1") (pintype "passive") (tstamp 04a5199b-72cb-47d2-9f7f-51b6af4f84ca))
     (pad "2" smd rect (at 1.7 0 270) (size 0.6 1.2) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 65 "Net-(R21-Pad2)") (pinfunction "2") (pintype "passive") (tstamp 141f5f64-64f1-44d9-b11f-2d1198525aa8))
+    (model "D:/vsf/hardware/share/kicad/3dmodels/C492941_SW-SMD_TS-1073A-A2B3-D4.step"
+      (offset (xyz 0 0 1.905))
+      (scale (xyz 1 1 1))
+      (rotate (xyz 0 0 0))
+    )
   )
 
   (footprint "Package_SO:HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm_ThermalVias" (layer "F.Cu")
@@ -2523,10 +2528,10 @@
       (net 77 "/GPIOA1") (pinfunction "Pin_4") (pintype "passive") (tstamp be8dae95-0a6e-460f-9857-90e9addcf964))
     (pad "5" smd rect (at -5.525 5.08) (size 2.5 1) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 5 "/PWR_3V3") (pinfunction "Pin_5") (pintype "passive") (tstamp ed8a2b47-ac94-4c6c-b26d-15c0847e872d))
-    (model ":KICAD7_3DMODEL_DIR:Connector_PinHeader_2.54mm.3dshapes/PinHeader_1x05_P2.54mm_Vertical.wrl"
-      (offset (xyz -2.54 -5.08 0))
+    (model "D:/vsf/hardware/share/kicad/3dmodels/C668123_CONN-SMD_MH254RS-11-05-100.step"
+      (offset (xyz 0 5.08 -0.762))
       (scale (xyz 1 1 1))
-      (rotate (xyz 0 90 180))
+      (rotate (xyz 0 180 -90))
     )
   )
 
@@ -2912,6 +2917,11 @@
       (net 1 "GND") (pinfunction "1") (pintype "passive") (tstamp b0b8523f-be11-4b5f-a0d7-89898d752b44))
     (pad "2" smd rect (at 1.7 0 90) (size 0.6 1.2) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 68 "/GPIOB1") (pinfunction "2") (pintype "passive") (tstamp 4695131a-12ea-4aad-b878-afa1578f390f))
+    (model "D:/vsf/hardware/share/kicad/3dmodels/C492941_SW-SMD_TS-1073A-A2B3-D4.step"
+      (offset (xyz 0 0 1.905))
+      (scale (xyz 1 1 1))
+      (rotate (xyz 0 0 0))
+    )
   )
 
   (footprint "Capacitor_SMD:C_0402_1005Metric" (layer "F.Cu")
@@ -3540,6 +3550,11 @@
       (net 67 "/GPIOB0") (pinfunction "1") (pintype "passive") (tstamp d4bbade1-16bf-4d28-9b6d-d2c21741ffbc))
     (pad "2" smd rect (at 1.7 0 90) (size 0.6 1.2) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 1 "GND") (pinfunction "2") (pintype "passive") (tstamp 9ba2321c-1b75-4309-8a96-5237a4dd1045))
+    (model "D:/vsf/hardware/share/kicad/3dmodels/C492941_SW-SMD_TS-1073A-A2B3-D4.step"
+      (offset (xyz 0 0 1.905))
+      (scale (xyz 1 1 1))
+      (rotate (xyz 0 0 0))
+    )
   )
 
   (footprint "Capacitor_SMD:C_0402_1005Metric" (layer "F.Cu")
@@ -4473,10 +4488,10 @@
       (net 45 "unconnected-(J4-SHIELD-Pad10)") (pinfunction "SHIELD") (pintype "passive") (thermal_bridge_angle 45) (tstamp 96b10c57-5310-4d92-8113-a076d8ffcb01))
     (pad "10" smd rect (at 5.5 -1.75 90) (size 0.95 1.2) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 45 "unconnected-(J4-SHIELD-Pad10)") (pinfunction "SHIELD") (pintype "passive") (thermal_bridge_angle 45) (tstamp 0cde78c4-e66f-4ff3-818d-a8ca3c640c62))
-    (model ":KICAD7_3DMODEL_DIR:Connector_Card.3dshapes/microSD_HC_Hirose_DM3D-SF.wrl"
-      (offset (xyz 0 0 0))
+    (model "D:/vsf/hardware/share/kicad/3dmodels/TF-SOCKET - short.stp"
+      (offset (xyz 0 3.81 0))
       (scale (xyz 1 1 1))
-      (rotate (xyz 0 0 0))
+      (rotate (xyz 0 0 180))
     )
   )
 
@@ -5049,8 +5064,8 @@
       (net 29 "/Shield") (pinfunction "SHIELD") (pintype "passive") (tstamp 027fc216-aad6-4790-bd1d-556d0d139f40))
     (pad "S1" thru_hole oval (at 5.575 2.475) (size 1.8 0.9) (drill oval 1.4 0.6) (layers "*.Cu" "*.Mask")
       (net 29 "/Shield") (pinfunction "SHIELD") (pintype "passive") (tstamp 8393f876-58ea-41dc-a964-99807f694257))
-    (model ":KICAD7_3DMODEL_DIR:Connector_USB.3dshapes/USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal.wrl"
-      (offset (xyz 0 0 0))
+    (model "D:/vsf/hardware/share/kicad/3dmodels/C2906290_USB-C-SMD_SHOU_TYPE-C-16P-CB1.6.step"
+      (offset (xyz 0 -1.27 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
     )
@@ -5492,6 +5507,11 @@
       (net 51 "Net-(JP1-C)") (pinfunction "1") (pintype "passive") (tstamp 0396b0f8-d896-4c37-b08e-f9cb92646b4c))
     (pad "2" smd rect (at 1.7 0 180) (size 0.6 1.2) (layers "F.Cu" "F.Paste" "F.Mask")
       (net 52 "Net-(R20-Pad2)") (pinfunction "2") (pintype "passive") (tstamp 902b6cd6-86ff-47a3-84fa-171761413118))
+    (model "D:/vsf/hardware/share/kicad/3dmodels/C492941_SW-SMD_TS-1073A-A2B3-D4.step"
+      (offset (xyz 0 0 1.905))
+      (scale (xyz 1 1 1))
+      (rotate (xyz 0 0 0))
+    )
   )
 
   (footprint "VSF:USB_C_Receptacle_Palconn_UTC16-G_DOWN1.6" (layer "F.Cu")
@@ -5561,8 +5581,8 @@
       (net 29 "/Shield") (pinfunction "SHIELD") (pintype "passive") (tstamp 68a29fdc-88c4-43fe-a74d-2478fc70a22d))
     (pad "S1" thru_hole oval (at 5.575 2.475) (size 1.8 0.9) (drill oval 1.4 0.6) (layers "*.Cu" "*.Mask")
       (net 29 "/Shield") (pinfunction "SHIELD") (pintype "passive") (tstamp a483fc63-a919-4b9a-b92b-182d7eff7a19))
-    (model ":KICAD7_3DMODEL_DIR:Connector_USB.3dshapes/USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal.wrl"
-      (offset (xyz 0 0 0))
+    (model "D:/vsf/hardware/share/kicad/3dmodels/C2906290_USB-C-SMD_SHOU_TYPE-C-16P-CB1.6.step"
+      (offset (xyz 0 -1.27 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
     )
@@ -5615,8 +5635,8 @@
       (net 29 "/Shield") (pinfunction "Shield") (pintype "passive") (tstamp 3049eaa4-eb9d-4586-b40f-14a394e21181))
     (pad "5" thru_hole oval (at 7.775 0.8) (size 1.2 2.3) (drill oval 0.6 1.7) (layers "*.Cu" "*.Mask")
       (net 29 "/Shield") (pinfunction "Shield") (pintype "passive") (tstamp 583dac44-d2ca-48a3-9e35-456a1599857c))
-    (model ":KICAD7_3DMODEL_DIR:Connector_USB.3dshapes/USB_A_TE_292303-7_Horizontal.wrl"
-      (offset (xyz 0 6.35 0.508))
+    (model "D:/vsf/hardware/share/kicad/3dmodels/C530629_USB-A-SMD_U-A-24SS-W-2.step"
+      (offset (xyz 0 10.16 -3.175))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 180 180))
     )
