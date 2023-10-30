@@ -3351,7 +3351,7 @@ static void __vsf_linux_key_fini(vsf_linux_fd_t *sfd)
 {
     vsf_linux_key_priv_t *priv = (vsf_linux_key_priv_t *)sfd->priv;
     if (priv->fn_fini != NULL) {
-        return priv->fn_fini(sfd);
+        priv->fn_fini(sfd);
     }
 }
 
