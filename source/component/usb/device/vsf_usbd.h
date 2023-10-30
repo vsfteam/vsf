@@ -293,9 +293,14 @@ extern "C" {
             VSF_USBD_DESC_STRING(__##__name##_langid, 2, &__##__name##_str_product, sizeof(__##__name##_str_product)),\
             VSF_USBD_DESC_STRING(__##__name##_langid, 3, &__##__name##_str_serial, sizeof(__##__name##_str_serial)),
 
-// __type is the same in usbd_str_desc
-#define usbd_str_desc_table(__name, __index, __type)                            \
+#define __usbd_str_desc_table4(__name, __index, __type, __langid)               \
+            VSF_USBD_DESC_STRING((__langid), (__index), &__##__name##_str_##__type, sizeof(__##__name##_str_##__type)),
+#define __usbd_str_desc_table3(__name, __index, __type)                         \
             VSF_USBD_DESC_STRING(__##__name##_langid, (__index), &__##__name##_str_##__type, sizeof(__##__name##_str_##__type)),
+// usbd_str_desc_table(name, index, type, langid=default)
+// __type is the same in usbd_str_desc
+#define usbd_str_desc_table(__name, __index, __type, ...)                       \
+            __PLOOC_EVAL(__usbd_str_desc_table, __name, __index, __type, ##__VA_ARGS__)(__name, (__index), __type, ##__VA_ARGS__)
 
 #define __usbd_func_str_desc_table_langid(__name, __func_id, __lang_id)         \
             VSF_USBD_DESC_STRING((__lang_id), 4 + __func_id, &__##__name##_str_func##__func_id, sizeof(__##__name##_str_func##__func_id)),
