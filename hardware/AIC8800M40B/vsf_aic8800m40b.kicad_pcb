@@ -4484,7 +4484,7 @@
       (net 1 "GND") (pinfunction "GND") (pintype "power_in") (tstamp 12c7ac0d-8ba2-4b93-a8f7-450a426a3fb2))
     (model "${KICAD6_3DMODEL_DIR}/Filter.3dshapes/Filter_Mini-Circuits_FV1206-1.wrl"
       (offset (xyz 0 0 0))
-      (scale (xyz 1 1 1))
+      (scale (xyz 0.5 0.5 0.5))
       (rotate (xyz 0 0 0))
     )
   )
@@ -4720,7 +4720,7 @@
       (net 1 "GND") (pinfunction "GND") (pintype "power_in") (tstamp 1097eed8-0d59-467e-b075-3a593a02631e))
     (model "${KICAD6_3DMODEL_DIR}/Filter.3dshapes/Filter_Mini-Circuits_FV1206-1.wrl"
       (offset (xyz 0 0 0))
-      (scale (xyz 1 1 1))
+      (scale (xyz 0.5 0.5 0.5))
       (rotate (xyz 0 0 0))
     )
   )
