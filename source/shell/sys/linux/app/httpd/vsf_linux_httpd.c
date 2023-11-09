@@ -474,7 +474,7 @@ static vsf_linux_httpd_urihandler_t * __vsf_linux_httpd_parse_uri(vsf_linux_http
 }
 
 // session
-#if defined(VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE > 0)
+#if defined(VSF_LINUX_HTTPD_CFG_SESSION_POOL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POOL_SIZE > 0)
 imp_vsf_pool(vsf_linux_httpd_session_pool, vsf_linux_httpd_session_t)
 #endif
 
@@ -493,7 +493,7 @@ static void __vsf_linux_httpd_session_delete(vsf_linux_httpd_session_t *session)
     }
 
     vsf_dlist_remove(vsf_linux_httpd_session_t, session_node, &httpd->session_list, session);
-#if defined(VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE > 0)
+#if defined(VSF_LINUX_HTTPD_CFG_SESSION_POOL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POOL_SIZE > 0)
     VSF_POOL_FREE(vsf_linux_httpd_session_pool, &httpd->session_pool, session);
 #else
     free(session);
@@ -706,7 +706,7 @@ static void __vsf_linux_httpd_session_reset_reuqest(vsf_linux_httpd_session_t *s
 static vsf_linux_httpd_session_t * __vsf_linux_httpd_session_new(vsf_linux_httpd_t *httpd)
 {
     vsf_linux_httpd_session_t *session;
-#if defined(VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE > 0)
+#if defined(VSF_LINUX_HTTPD_CFG_SESSION_POOL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POOL_SIZE > 0)
     session = VSF_POOL_ALLOC(vsf_linux_httpd_session_pool, &httpd->session_pool);
 #else
     session = malloc(sizeof(vsf_linux_httpd_session_t));
@@ -767,7 +767,7 @@ static void * __vsf_linux_httpd_thread(void *param)
     struct sockaddr_in host_addr;
     vsf_stream_t *stream;
 
-#if defined(VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE > 0)
+#if defined(VSF_LINUX_HTTPD_CFG_SESSION_POOL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POOL_SIZE > 0)
     VSF_POOL_PREPARE(vsf_linux_httpd_session_pool, &httpd->session_pool);
     VSF_POOL_ADD_BUFFER(vsf_linux_httpd_session_pool, &httpd->session_pool, &httpd->sessions, sizeof(httpd->sessions));
 #endif

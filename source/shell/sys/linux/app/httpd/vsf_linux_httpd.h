@@ -268,7 +268,7 @@ vsf_class(vsf_linux_httpd_session_t) {
     )
 };
 
-#if defined(VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE > 0)
+#if defined(VSF_LINUX_HTTPD_CFG_SESSION_POOL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POOL_SIZE > 0)
 dcl_vsf_pool(vsf_linux_httpd_session_pool)
 def_vsf_pool(vsf_linux_httpd_session_pool, vsf_linux_httpd_session_t)
 #endif
@@ -284,9 +284,9 @@ vsf_class(vsf_linux_httpd_t) {
     )
     private_member(
         vsf_dlist_t session_list;
-#if defined(VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE > 0)
+#if defined(VSF_LINUX_HTTPD_CFG_SESSION_POOL_SIZE) && (VSF_LINUX_HTTPD_CFG_SESSION_POOL_SIZE > 0)
         vsf_pool(vsf_linux_httpd_session_pool) session_pool;
-        vsf_pool_item(vsf_linux_httpd_session_pool) sessions[VSF_LINUX_HTTPD_CFG_SESSION_POLL_SIZE];
+        vsf_pool_item(vsf_linux_httpd_session_pool) sessions[VSF_LINUX_HTTPD_CFG_SESSION_POOL_SIZE];
 #endif
     )
 };
