@@ -412,6 +412,7 @@ vsf_err_t vk_musb_fdrc_usbd_ep_transfer_send(vk_musb_fdrc_dcd_t *usbd, uint_fast
 
 static void __vk_musb_fdrc_usbd_notify_status(vk_musb_fdrc_dcd_t *usbd)
 {
+    usbd->is_to_notify_status_in_next_isr = false;
     if (!usbd->is_status_notified) {
         usbd->is_status_notified = true;
         __vk_musb_fdrc_usbd_notify(usbd, USB_ON_STATUS, 0);
@@ -468,11 +469,32 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
             __vk_musb_fdrc_usbd_notify_status(usbd);
         }
         if (usbd->is_to_notify_status_in_next_isr) {
-            usbd->is_to_notify_status_in_next_isr = false;
             __vk_musb_fdrc_usbd_notify_status(usbd);
         }
 
         vk_musb_fdrc_set_ep(reg, ep_orig);
+
+        // IMPORTANT:
+        //         the IN/STATUS_OUT/SETUP of musb has no flow control, so the order of
+        //         checking the interrupt flag MUST be as follows:
+        //         IN0 -->> STATUS -->> SETUP
+        // consider this:
+        //         SETUP -->> IN0 -->> STATUS -->> SETUP
+        //                    --------------------------
+        //        in some condition, the under line interrupt MAYBE in one routine
+
+        // MUSBD_CSR0_TXPKTRDY is cleared by hardware
+        if (    (MUSB_FDRC_USBD_EP0_DATA_IN == usbd->ep0_state)
+            &&  !(csr1 & MUSBD_CSR0_TXPKTRDY)) {
+
+            __vk_musb_fdrc_usbd_notify(usbd, USB_ON_IN, 0);
+            if (usbd->is_last_control_in) {
+                // interrupt will be generated to indicate status got
+                usbd->is_to_notify_status_in_next_isr = true;
+            } else {
+                usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
+            }
+        }
 
         if (csr1 & MUSBD_CSR0_RXPKTRDY) {
             switch (usbd->ep0_state) {
@@ -498,29 +520,13 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
                     vsf_unprotect_int(orig);
                 }
                 break;
+            // if RxPktRdy in DataIn/Status state, means that next setup is arrived
+            case MUSB_FDRC_USBD_EP0_DATA_IN:
             case MUSB_FDRC_USBD_EP0_STATUS:
                 __vk_musb_fdrc_usbd_notify_status(usbd);
                 goto on_setup;
             default:
                 VSF_USB_ASSERT(false);
-            }
-        }
-
-#if VSF_USBD_CFG_USE_EDA != ENABLED
-        // read csr1 again if eda is not used(events will be processed in isr),
-        //  in case CSR0 is updated by hardware after previous events handler called in isr.
-        csr1 = reg->EP->EP0.CSR0;
-#endif
-        // MUSBD_CSR0_TXPKTRDY is cleared by hardware
-        if (    (MUSB_FDRC_USBD_EP0_DATA_IN == usbd->ep0_state)
-            &&  !(csr1 & MUSBD_CSR0_TXPKTRDY)) {
-
-            __vk_musb_fdrc_usbd_notify(usbd, USB_ON_IN, 0);
-            if (usbd->is_last_control_in) {
-                // interrupt will be generated to indicate status got
-                usbd->is_to_notify_status_in_next_isr = true;
-            } else {
-                usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
             }
         }
     }
