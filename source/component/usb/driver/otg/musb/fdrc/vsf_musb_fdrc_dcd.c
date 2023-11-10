@@ -499,6 +499,12 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
                 VSF_USB_ASSERT(false);
             }
         }
+
+#if VSF_USBD_CFG_USE_EDA != ENABLED
+        // read csr1 again if eda is not used(events will be processed in isr),
+        //  in case CSR0 is updated by hardware after previous events handler called in isr.
+        csr1 = reg->EP->EP0.CSR0;
+#endif
         // MUSBD_CSR0_TXPKTRDY is cleared by hardware
         if (    (MUSB_FDRC_USBD_EP0_DATA_IN == usbd->ep0_state)
             &&  !(csr1 & MUSBD_CSR0_TXPKTRDY)) {
