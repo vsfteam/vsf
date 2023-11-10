@@ -83,6 +83,7 @@ vsf_class(vk_musb_fdrc_dcd_t) {
         uint8_t ep_num;
         bool is_dma;
         bool is_status_notified;
+        bool is_to_notify_status_in_next_isr;
     )
 };
 

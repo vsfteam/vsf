@@ -51,6 +51,7 @@ static void __vk_musb_fdrc_usbd_reset_do(vk_musb_fdrc_dcd_t *usbd)
     usbd->ep_buf_ptr = 0;
     usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
     usbd->is_status_notified = true;
+    usbd->is_to_notify_status_in_next_isr = false;
     vk_musb_fdrc_fifo_init(reg);
 }
 
@@ -466,6 +467,11 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
             reg->EP->EP0.CSR0 |= MUSBD_CSR0_SERVICEDSETUPEND;
             __vk_musb_fdrc_usbd_notify_status(usbd);
         }
+        if (usbd->is_to_notify_status_in_next_isr) {
+            usbd->is_to_notify_status_in_next_isr = false;
+            __vk_musb_fdrc_usbd_notify_status(usbd);
+        }
+
         vk_musb_fdrc_set_ep(reg, ep_orig);
 
         if (csr1 & MUSBD_CSR0_RXPKTRDY) {
@@ -511,7 +517,8 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
 
             __vk_musb_fdrc_usbd_notify(usbd, USB_ON_IN, 0);
             if (usbd->is_last_control_in) {
-                __vk_musb_fdrc_usbd_notify_status(usbd);
+                // interrupt will be generated to indicate status got
+                usbd->is_to_notify_status_in_next_isr = true;
             } else {
                 usbd->ep0_state = MUSB_FDRC_USBD_EP0_IDLE;
             }
