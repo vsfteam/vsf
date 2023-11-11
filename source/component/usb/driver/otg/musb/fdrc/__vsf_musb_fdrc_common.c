@@ -76,8 +76,18 @@ uint_fast16_t vk_musb_fdrc_rx_fifo_size(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep
     uint_fast8_t ep_orig = vk_musb_fdrc_set_ep(reg, ep);
         uint_fast16_t result;
         if (!ep) {
+#if VSF_MUSB_FDRC_WORKAROUND_WAIT_RXPKTRDY_BEFORE_READ_RX_COUNT == ENABLED
+            while (!(reg->EP->EP0.CSR0 & MUSBD_CSR0_RXPKTRDY));
+#else
+            VSF_USB_ASSERT(reg->EP->EP0.CSR0 & MUSBD_CSR0_RXPKTRDY);
+#endif
             result = reg->EP->EP0.Count0;
         } else {
+#if VSF_MUSB_FDRC_WORKAROUND_WAIT_RXPKTRDY_BEFORE_READ_RX_COUNT == ENABLED
+            while (!(reg->EP->EPN.RxCSR1 & MUSBD_RXCSR1_RXPKTRDY));
+#else
+            VSF_USB_ASSERT(reg->EP->EPN.RxCSR1 & MUSBD_RXCSR1_RXPKTRDY);
+#endif
             result = ((reg->EP->EPN.RxCount2 & 7) << 8) | reg->EP->EPN.RxCount1;
         }
     vk_musb_fdrc_set_ep(reg, ep_orig);

@@ -268,6 +268,7 @@ uint_fast8_t vk_musb_fdrc_usbd_get_mframe_number(vk_musb_fdrc_dcd_t *usbd)
 void vk_musb_fdrc_usbd_get_setup(vk_musb_fdrc_dcd_t *usbd, uint8_t *buffer)
 {
     vk_musb_fdrc_reg_t *reg = usbd->reg;
+    VSF_USB_ASSERT(8 == vk_musb_fdrc_usbd_ep_get_data_size(usbd, 0));
     vk_musb_fdrc_read_fifo(reg, 0, buffer, 8);
     reg->EP->EP0.CSR0 |= MUSBD_CSR0_SERVICEDRXPKGRDY;
     usbd->control_size = buffer[6] + (buffer[7] << 8);
