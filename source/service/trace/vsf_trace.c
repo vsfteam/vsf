@@ -369,7 +369,10 @@ uint32_t vsf_bgtrace_total(vsf_bgtrace_t *bgtrace)
 
 void vsf_bgtrace_append(vsf_bgtrace_t *bgtrace, void *element)
 {
-    void *ptr = (void *)((uint8_t *)bgtrace->elements + bgtrace->pos * bgtrace->ele_size);
+    void *ptr;
+
+    vsf_protect_t origlevel = vsf_trace_protect();
+    ptr = (void *)((uint8_t *)bgtrace->elements + bgtrace->pos * bgtrace->ele_size);
     memcpy(ptr, element, bgtrace->ele_size);
     if (++bgtrace->pos >= bgtrace->ele_num) {
         bgtrace->pos = 0;
@@ -378,6 +381,7 @@ void vsf_bgtrace_append(vsf_bgtrace_t *bgtrace, void *element)
     if (bgtrace->num < bgtrace->ele_num) {
         bgtrace->num++;
     }
+    vsf_trace_unprotect(origlevel);
 }
 
 void vsf_bgtrace_print(vsf_bgtrace_t *bgtrace, int cnt)
