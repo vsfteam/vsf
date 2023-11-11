@@ -26,16 +26,141 @@
 #include "./vsf_musb_fdrc_dcd.h"
 #include "./__vsf_musb_fdrc_common.h"
 
+#if VSF_MUSB_FDRC_DCD_CFG_BGTRACE_SIZE > 0
+//  for vsf_trace.h
+#   include "service/vsf_service.h"
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#if VSF_MUSB_FDRC_DCD_CFG_BGTRACE_SIZE > 0
+#   define __vsf_musb_fdrc_bgtrace_ep0_isr_enter(__csr, __state)                \
+        do {                                                                    \
+            __vsf_musb_fdrc_bgtrace_ele_t ele = {                               \
+                .type       = __MUSBFDRC_BGTRACE_EP0_ISR_ENTER,                 \
+                .isr.csr    = (__csr),                                          \
+                .isr.state  = (__state),                                        \
+            };                                                                  \
+            vsf_bgtrace_append(&__vsf_musb_fdrc_bgtrace, &ele);                 \
+        } while (0)
+#   define __vsf_musb_fdrc_bgtrace_ep0_isr_leave()                              \
+        do {                                                                    \
+            __vsf_musb_fdrc_bgtrace_ele_t ele = {                               \
+                .type       = __MUSBFDRC_BGTRACE_EP0_ISR_LEAVE,                 \
+            };                                                                  \
+            vsf_bgtrace_append(&__vsf_musb_fdrc_bgtrace, &ele);                 \
+        } while (0)
+#   define __vsf_musb_fdrc_bgtrace_setup(__ptr)                                 \
+        do {                                                                    \
+            __vsf_musb_fdrc_bgtrace_ele_t ele = {                               \
+                .type       = __MUSBFDRC_BGTRACE_SETUP,                         \
+            };                                                                  \
+            memcpy(ele.setup, (__ptr), 8);                                      \
+            vsf_bgtrace_append(&__vsf_musb_fdrc_bgtrace, &ele);                 \
+        } while (0)
+#   define __vsf_musb_fdrc_bgtrace_evt(__evt, __value)                          \
+        do {                                                                    \
+            __vsf_musb_fdrc_bgtrace_ele_t ele = {                               \
+                .type       = __MUSBFDRC_BGTRACE_EVT,                           \
+                .evt.evt    = (__evt),                                          \
+                .evt.value  = (__value),                                        \
+            };                                                                  \
+            vsf_bgtrace_append(&__vsf_musb_fdrc_bgtrace, &ele);                 \
+        } while (0)
+#else
+#   define __vsf_musb_fdrc_bgtrace_ep0_isr_enter(__csr, __state)
+#   define __vsf_musb_fdrc_bgtrace_ep0_isr_leave()
+#   define __vsf_musb_fdrc_bgtrace_setup(__ptr)
+#   define __vsf_musb_fdrc_bgtrace_evt(__evt, __value)
+#endif
+
+// define VSF_USB_ASSERT as below to print trace when asserted
+//#define VSF_USB_ASSERT(...)                                                     \
+        if (!(__VA_ARGS__)) {                                                   \
+            vsf_trace_error("assert failed in %s, %s %d\n", __FILE__, __FUNCTION__, __LINE__);\
+            extern void __vsf_musb_fdrc_bgtrace_print(void);                    \
+            __vsf_musb_fdrc_bgtrace_print();                                    \
+            while(1);                                                           \
+        }
+
 /*============================ TYPES =========================================*/
+
+#if VSF_MUSB_FDRC_DCD_CFG_BGTRACE_SIZE > 0
+typedef enum __vsf_musb_fdrc_bgtrace_type_t {
+    __MUSBFDRC_BGTRACE_EP0_ISR_ENTER,
+    __MUSBFDRC_BGTRACE_EP0_ISR_LEAVE,
+    __MUSBFDRC_BGTRACE_EVT,
+    __MUSBFDRC_BGTRACE_SETUP,
+} __vsf_musb_fdrc_bgtrace_type_t;
+
+typedef struct __vsf_musb_fdrc_bgtrace_ele_t {
+    __vsf_musb_fdrc_bgtrace_type_t type;
+    union {
+        struct {
+            uint8_t csr;
+            uint8_t state;
+        } isr;
+        struct {
+            uint8_t evt;
+            uint8_t value;
+        } evt;
+        uint8_t setup[8];
+    };
+} __vsf_musb_fdrc_bgtrace_ele_t;
+#endif
+
 /*============================ PROTOTYPES ====================================*/
+
+#if VSF_MUSB_FDRC_DCD_CFG_BGTRACE_SIZE > 0
+static void __vsf_musb_fdrc_bgtrace_print_ele(uint16_t pos, void *element);
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+#if VSF_MUSB_FDRC_DCD_CFG_BGTRACE_SIZE > 0
+static __vsf_musb_fdrc_bgtrace_ele_t __vsf_musb_fdrc_bgtrace_ele[VSF_MUSB_FDRC_DCD_CFG_BGTRACE_SIZE];
+static vsf_bgtrace_t __vsf_musb_fdrc_bgtrace = {
+    .ele_num        = dimof(__vsf_musb_fdrc_bgtrace_ele),
+    .ele_size       = sizeof(__vsf_musb_fdrc_bgtrace_ele[0]),
+    .elements       = __vsf_musb_fdrc_bgtrace_ele,
+    .print_element  = __vsf_musb_fdrc_bgtrace_print_ele,
+};
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
+
+#if VSF_MUSB_FDRC_DCD_CFG_BGTRACE_SIZE > 0
+static void __vsf_musb_fdrc_bgtrace_print_ele(uint16_t pos, void *element)
+{
+    __vsf_musb_fdrc_bgtrace_ele_t *ele = element;
+    switch (ele->type) {
+    case __MUSBFDRC_BGTRACE_EP0_ISR_ENTER:
+        vsf_trace_debug("I0: %02X %d\n", ele->isr.csr, ele->isr.state);
+        break;
+    case __MUSBFDRC_BGTRACE_EP0_ISR_LEAVE:
+        vsf_trace_debug("\n");
+        break;
+    case __MUSBFDRC_BGTRACE_EVT:
+        vsf_trace_debug("E: %d %02X\n", ele->evt.evt, ele->evt.value);
+        break;
+    case __MUSBFDRC_BGTRACE_SETUP:
+        vsf_trace_debug("S: ");
+        vsf_trace_buffer(VSF_TRACE_DEBUG, ele->setup, 8, VSF_TRACE_DF_NEWLINE);
+        break;
+    }
+}
+
+void __vsf_musb_fdrc_bgtrace_print(void)
+{
+    vsf_bgtrace_print(&__vsf_musb_fdrc_bgtrace, 0);
+}
+#endif
 
 static void __vk_musb_fdrc_usbd_notify(vk_musb_fdrc_dcd_t *usbd, usb_evt_t evt, uint_fast8_t value)
 {
+    __vsf_musb_fdrc_bgtrace_evt(evt, value);
     if (usbd->callback.evthandler != NULL) {
         usbd->callback.evthandler(usbd->callback.param, evt, value);
     }
@@ -53,6 +178,9 @@ static void __vk_musb_fdrc_usbd_reset_do(vk_musb_fdrc_dcd_t *usbd)
     usbd->is_status_notified = true;
     usbd->is_to_notify_status_in_next_isr = false;
     vk_musb_fdrc_fifo_init(reg);
+#if VSF_MUSB_FDRC_DCD_CFG_BGTRACE_SIZE > 0
+    vsf_bgtrace_clear(&__vsf_musb_fdrc_bgtrace);
+#endif
 }
 
 vsf_err_t vk_musb_fdrc_usbd_init(vk_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg)
@@ -145,6 +273,7 @@ void vk_musb_fdrc_usbd_get_setup(vk_musb_fdrc_dcd_t *usbd, uint8_t *buffer)
     usbd->control_size = buffer[6] + (buffer[7] << 8);
     usbd->is_control_in = !!(buffer[0] & 0x80);
     usbd->is_last_control_in = false;
+    __vsf_musb_fdrc_bgtrace_setup(buffer);
 }
 
 void vk_musb_fdrc_usbd_status_stage(vk_musb_fdrc_dcd_t *usbd, bool is_in)
@@ -458,6 +587,7 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
         ep_orig = vk_musb_fdrc_set_ep(reg, 0);
         csr1 = reg->EP->EP0.CSR0;
 
+        __vsf_musb_fdrc_bgtrace_ep0_isr_enter(csr1, usbd->ep0_state);
         if (csr1 & MUSBD_CSR0_SENTSTALL) {
             reg->EP->EP0.CSR0 &= ~MUSBD_CSR0_SENTSTALL;
             usbd->is_status_notified = true;
@@ -529,6 +659,7 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
                 VSF_USB_ASSERT(false);
             }
         }
+        __vsf_musb_fdrc_bgtrace_ep0_isr_leave();
     }
 
     // EPN interrupt
