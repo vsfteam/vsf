@@ -379,6 +379,10 @@ vsf_err_t vk_musb_fdrc_usbd_ep_set_stall(vk_musb_fdrc_dcd_t *usbd, uint_fast8_t 
     ep &= 0x0F;
     ep_orig = vk_musb_fdrc_set_ep(reg, ep);
         if (!ep) {
+            // there seems to be cases that MUSBD_CSR0_SENTSTALL will not be triggered,
+            //  so reset status here for next setup
+            usbd->is_status_notified = true;
+            usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
             reg->EP->EP0.CSR0 |= MUSBD_CSR0_SENDSTALL | MUSBD_CSR0_SERVICEDRXPKGRDY;
         } else {
             if (is_in) {
