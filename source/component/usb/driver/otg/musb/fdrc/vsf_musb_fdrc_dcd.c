@@ -465,6 +465,7 @@ vsf_err_t vk_musb_fdrc_usbd_ep_transaction_read_buffer(vk_musb_fdrc_dcd_t *usbd,
 
             if (!usbd->control_size || (size < 64)) {
                 usbd->ep0_state = MUSB_FDRC_USBD_EP0_STATUS;
+                usbd->is_to_notify_status_in_next_isr = true;
                 reg->EP->EP0.CSR0 |= MUSBD_CSR0_SERVICEDRXPKGRDY | MUSBD_CSR0_DATAEND;
             } else {
                 reg->EP->EP0.CSR0 |= MUSBD_CSR0_SERVICEDRXPKGRDY;
