@@ -6371,7 +6371,7 @@
     (property "Value" "4.7uH, 0805, Isat>=250mA, Rdc<=300mOhm" (at 110.49 157.48 90)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Footprint" "Inductor_SMD:L_0603_1608Metric" (at 107.95 153.67 0)
+    (property "Footprint" "Inductor_SMD:L_0805_2012Metric" (at 107.95 153.67 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 107.95 153.67 0)
