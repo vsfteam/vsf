@@ -62,17 +62,17 @@ extern "C" {
  \~english
  VSF_GPIO_CFG_PREFIX is used to set the actual API call when calling the vsf_gpio_*().
  For example, if you configure VSF_GPIO_CFG_PREFIX to be vsf_hw, then call
- vsf_gpio_init(), which is actually vsf_hw_gpio_init()
+ vsf_gpio_set_output(), which is actually vsf_hw_gpio_set_output()
 
- If we want the call to vsf_gpio_init in xxxx.c to actually call vsf_extern_gpio_init,
+ If we want the call to vsf_gpio_set_output in xxxx.c to actually call vsf_example_gpio_set_output,
  then it can be configured in front of the .c:
 
  \~chinese
  VSF_GPIO_CFG_PREFIX 是用来配置调用 vsf_gpio_*() 的时候实际调用的API。
- 例如，当 VSF_GPIO_CFG_PREFIX 配置成 vsf_hw 的时候，调用 vsf_gpio_init()
- 实际调用的是 vsf_hw_gpio_init()
+ 例如，当 VSF_GPIO_CFG_PREFIX 配置成 vsf_hw 的时候，调用 vsf_gpio_set_output()
+ 实际调用的是 vsf_hw_gpio_set_output()
 
- 如果我们想要 xxxx.c 里调用 vsf_gpio_init() 实际调用的是 vsf_example_gpio_init()，
+ 如果我们想要 xxxx.c 里调用 vsf_gpio_set_output() 实际调用的是 vsf_example_gpio_set_output()，
  那么可以在 xxxx.c 源码前面配置：
 
  \~
