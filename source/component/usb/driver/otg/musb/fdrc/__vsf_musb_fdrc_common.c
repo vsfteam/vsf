@@ -193,8 +193,8 @@ uint_fast8_t vk_musb_fdrc_set_ep(vk_musb_fdrc_reg_t *reg, uint_fast8_t ep)
 {
 #ifdef VSF_MUSB_FDRC_NO_EP_IDX
     uint_fast8_t ep_orig = reg->__cur_ep;
-    reg->EP = reg->get_ep_reg(reg->param, ep);
     reg->__cur_ep = ep;
+    reg->EP = reg->get_ep_reg(reg->param, ep);
     return ep_orig;
 #else
     uint_fast8_t ep_orig = reg->Common->Index;
