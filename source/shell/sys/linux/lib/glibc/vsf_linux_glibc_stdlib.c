@@ -119,7 +119,7 @@ static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, size_t i, 
         process->heap_monitor.info.usage -= process->heap_monitor.nodes[i].size;
         vsf_bitmap_clear(&process->heap_monitor.bitmap, i);
 #   else
-        process->heap_monitor.info.usage -= i;
+        process->heap_monitor.info.usage -= i - sizeof(size_t);
 #   endif
         process->heap_monitor.info.balance--;
     vsf_unprotect_sched(orig);
