@@ -92,6 +92,8 @@ void vsf_board_init(void)
             PeripheralClock / 1000000, sysctrl_clock_get(PER_FLASH) / 1000000);
 
 // ONLY AIC8800MBWP need codes below to initialize SDRAM
+//  For AIC8800MBWP chips, memory between 0x001C8000 - 0x001CFFFF is used as dcache.
+//  psram starts at 0x06000000.
 //    psram_init();
 //    uint32_t ram_size = psram_size_get();
 //    if (ram_size > 0) {
