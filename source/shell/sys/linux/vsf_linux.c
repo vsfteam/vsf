@@ -1701,7 +1701,12 @@ static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
 
     //!   Possible memory leakage for IAR, because IAR will use malloc for VLA,
     //! so if main thread is exited by APIs like exit, the argv will not be freed.
+#if __IS_COMPILER_IAR__
+    char *argv[65];
+    VSF_LINUX_ASSERT(dimof(argv) > ctx->arg.argc);
+#else
     char *argv[ctx->arg.argc + 1];
+#endif
     if (ctx->arg.argv != NULL) {
         memcpy(argv, ctx->arg.argv, (ctx->arg.argc + 1) * sizeof(argv[0]));
     } else {
