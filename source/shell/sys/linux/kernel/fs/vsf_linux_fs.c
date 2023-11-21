@@ -2542,6 +2542,12 @@ int umount(const char *target)
     return 0;
 }
 
+int umount2(const char *target, int flags)
+{
+    // TODO: process flags
+    return umount(target);
+}
+
 int statfs(const char *path, struct statfs *buf)
 {
     VSF_LINUX_ASSERT(false);

@@ -30,12 +30,16 @@
 #   include "shell/sys/linux/include/unistd.h"
 #   include "shell/sys/linux/include/errno.h"
 #   include "shell/sys/linux/include/poll.h"
+#   include "shell/sys/linux/include/fcntl.h"
 #   include "shell/sys/linux/include/sys/mman.h"
+#   include "shell/sys/linux/include/sys/ioctl.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
 #   include <poll.h>
+#   include <fcntl.h>
 #   include <sys/mman.h>
+#   include <sys/ioctl.h>
 #endif
 #include <limits.h>
 #include <stdint.h>

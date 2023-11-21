@@ -66,6 +66,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_mount_vplt_t vsf_linux_sys_mount_vpl
 int mount(const char *source, const char *target,
    const vk_fs_op_t *filesystem, unsigned long mountflags, const void *data);
 int umount(const char *target);
+int umount2(const char *target, int flags);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_MOUNT
 
