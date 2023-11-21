@@ -22,17 +22,6 @@
 
 #include "./arm_compiler_detect.h"
 
-/*----------------------------------------------------------------------------*
- * Overwrite MAX_CONSTRUCTOR_PRIORITY if necessary                            *
- *----------------------------------------------------------------------------*/
-#if     __IS_COMPILER_ARM_COMPILER_5__                                          \
-    ||  __IS_COMPILER_ARM_COMPILER_6__
-// TODO: what is the real MAX_CONSTRUCTOR_PRIORITY for arm-compiler 5/6?
-#   ifndef MAX_CONSTRUCTOR_PRIORITY
-#       define MAX_CONSTRUCTOR_PRIORITY        65535
-#   endif
-#endif
-
 #endif  /* end of __USE_ARM_COMPILER_H_PART_1__ */
 
 /*========================== Multiple-Entry Start ============================*/
@@ -45,6 +34,23 @@
 #   include "./type.h"
 #endif
 #include "../__common/__compiler.h"
+
+/*----------------------------------------------------------------------------*
+ * Overwrite MAX_CONSTRUCTOR_PRIORITY if necessary                            *
+ *----------------------------------------------------------------------------*/
+#if     __IS_COMPILER_ARM_COMPILER_5__                                          \
+    ||  __IS_COMPILER_ARM_COMPILER_6__
+// TODO: what is the real MAX_CONSTRUCTOR_PRIORITY for arm-compiler 5/6?
+#   ifndef MAX_CONSTRUCTOR_PRIORITY
+#       define MAX_CONSTRUCTOR_PRIORITY        65535
+#   endif
+#elif __IS_COMPILER_GCC__
+// there is BUG in armgcc 11.3.1, MAX_CONSTRUCTOR_PRIORITY should be 65534
+#   if (__GNUC__ == 11) && (__GNUC_MINOR__ == 3) && (__GNUC_PATCHLEVEL__ == 1)
+#       undef MAX_CONSTRUCTOR_PRIORITY
+#       define MAX_CONSTRUCTOR_PRIORITY        65534
+#   endif
+#endif
 
 #ifndef VSF_UTILITIES_REQ___CMSIS_HEADER_FILE__FROM_USR
 #include "cmsis_compiler.h"
