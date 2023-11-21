@@ -111,7 +111,7 @@ typedef struct vsf_arch_systimer_ctx_t {
     implement(vsf_arch_irq_thread_t);
     vsf_arch_irq_request_t due_request;
 #ifndef __CPU_WEBASSEMBLY__
-    long timer;
+    timer_t timer;
 #endif
 } vsf_arch_systimer_ctx_t;
 
