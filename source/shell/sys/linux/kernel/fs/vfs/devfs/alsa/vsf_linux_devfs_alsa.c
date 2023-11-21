@@ -40,16 +40,6 @@
 #include <limits.h>
 #include <stdint.h>
 
-#ifndef __kernel_off_t
-#   define __kernel_off_t           off_t
-#endif
-#ifndef __kernel_pid_t
-#   define __kernel_pid_t           pid_t
-#endif
-#ifndef __bitwise
-#   define __bitwise
-#endif
-
 #include <alsa/sound/type_compat.h>
 #include <alsa/sound/uapi/asound.h>
 

@@ -26,6 +26,9 @@ extern "C" {
 #ifndef __user
 #   define __user
 #endif
+#ifndef __bitwise
+#   define __bitwise
+#endif
 
 #define EXPORT_SYMBOL_GPL(__SYMBOL)
 
@@ -71,6 +74,9 @@ typedef __u32 u32;
 typedef __s32 s32;
 typedef __u64 u64;
 typedef __s64 s64;
+
+typedef off_t __kernel_off_t;
+typedef pid_t __kernel_pid_t;
 
 typedef unsigned int slab_flags_t;
 typedef unsigned int fmode_t;

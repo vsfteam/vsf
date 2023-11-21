@@ -1881,6 +1881,17 @@ int fcntl(int fd, int cmd, ...)
     return ret;
 }
 
+int ioctl(int fd, unsigned long request, ...)
+{
+    int ret;
+
+    va_list ap;
+    va_start(ap, request);
+        ret = __fcntl_va(fd, request, ap);
+    va_end(ap);
+    return ret;
+}
+
 ssize_t read(int fd, void *buf, size_t count)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);

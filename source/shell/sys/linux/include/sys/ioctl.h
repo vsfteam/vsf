@@ -68,8 +68,7 @@ enum {
     TIOCSWINSZ      = F_IO + 6,
 };
 
-//int ioctl(int fd, unsigned long request, ...);
-#define ioctl       fcntl
+int ioctl(int fd, unsigned long request, ...);
 
 #ifdef __cplusplus
 }

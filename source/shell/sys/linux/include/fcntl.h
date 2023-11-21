@@ -166,6 +166,7 @@ VSF_APPLET_VPLT_FUNC_DECORATOR int openat(int dirfd, const char *pathname, int f
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_FCNTL
 
+int __fcntl_va(int fd, int cmd, va_list ap);
 int fcntl(int fd, int cmd, ...);
 int creat(const char *pathname, mode_t mode);
 int __open_va(const char *pathname, int flags, va_list ap);
