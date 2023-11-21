@@ -214,6 +214,11 @@ vsf_err_t vsf_hal_distbus_usart_init(vsf_hal_distbus_usart_t *usart, vsf_usart_c
     return VSF_ERR_NONE;
 }
 
+void vsf_hal_distbus_usart_fini(vsf_hal_distbus_usart_t *usart)
+{
+    
+}
+
 fsm_rt_t vsf_hal_distbus_usart_enable(vsf_hal_distbus_usart_t *usart)
 {
     VSF_HAL_ASSERT(NULL != usart);
@@ -266,6 +271,11 @@ void vsf_hal_distbus_usart_irq_disable(vsf_hal_distbus_usart_t *usart, vsf_usart
     msg->header.addr = VSF_HAL_DISTBUS_USART_CMD_IRQ_DISABLE;
     param->irq_mask = cpu_to_le32(irq_mask);
     vsf_distbus_send_msg(usart->distbus, &usart->service, msg);
+}
+
+vsf_usart_capability_t vsf_hal_distbus_usart_capability(vsf_hal_distbus_usart_t *usart)
+{
+    return (vsf_usart_capability_t){ 0 };
 }
 
 vsf_usart_status_t vsf_hal_distbus_usart_status(vsf_hal_distbus_usart_t *usart)
