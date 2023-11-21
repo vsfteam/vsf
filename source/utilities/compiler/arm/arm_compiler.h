@@ -42,14 +42,12 @@
     ||  __IS_COMPILER_ARM_COMPILER_6__
 // TODO: what is the real MAX_CONSTRUCTOR_PRIORITY for arm-compiler 5/6?
 #   ifndef MAX_CONSTRUCTOR_PRIORITY
-#       define MAX_CONSTRUCTOR_PRIORITY        65535
+#       define MAX_CONSTRUCTOR_PRIORITY         65535
 #   endif
 #elif __IS_COMPILER_GCC__
-// there is BUG in armgcc 11.3.1, MAX_CONSTRUCTOR_PRIORITY should be 65534
-#   if (__GNUC__ == 11) && (__GNUC_MINOR__ == 3) && (__GNUC_PATCHLEVEL__ == 1)
-#       undef MAX_CONSTRUCTOR_PRIORITY
-#       define MAX_CONSTRUCTOR_PRIORITY        65534
-#   endif
+// TODO: as test, priority of 65535 is lower than 0, 65534 is the max priority
+#   undef MAX_CONSTRUCTOR_PRIORITY
+#   define MAX_CONSTRUCTOR_PRIORITY             65534
 #endif
 
 #ifndef VSF_UTILITIES_REQ___CMSIS_HEADER_FILE__FROM_USR
