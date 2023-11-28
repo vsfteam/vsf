@@ -654,6 +654,19 @@ typedef void (*vsf_eda_evthandler_t)(vsf_eda_t *eda, vsf_evt_t evt);
 typedef void (*vsf_eda_on_terminate_t)(vsf_eda_t *eda);
 typedef void (*vsf_param_eda_evthandler_t)(uintptr_t target, vsf_evt_t evt);
 
+#if VSF_KERNEL_CFG_EDA_USER_BITLEN <= 8 - 3
+typedef uint8_t __vsf_eda_feature_word;
+typedef uint16_t __vsf_eda_flag_word;
+#elif VSF_KERNEL_CFG_EDA_USER_BITLEN <= 16 - 3
+typedef uint16_t __vsf_eda_feature_word;
+typedef uint32_t __vsf_eda_flag_word;
+#elif VSF_KERNEL_CFG_EDA_USER_BITLEN <= 32 - 3
+typedef uint32_t __vsf_eda_feature_word;
+typedef uint64_t __vsf_eda_flag_word;
+#else
+#    error VSF_KERNEL_CFG_EDA_USER_BITLEN not supported yet
+#endif
+
 typedef union vsf_eda_feature_t {
     struct {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
@@ -665,17 +678,17 @@ typedef union vsf_eda_feature_t {
      *!        enable or disable the is_use_frame bit and frame related
      *!        functions.
      */
-        uint8_t                 is_use_frame : 1;
+        __vsf_eda_feature_word  is_use_frame : 1;
 #endif
 #if VSF_KERNEL_USE_SIMPLE_SHELL == ENABLED
-        uint8_t                 is_stack_owner : 1;
+        __vsf_eda_feature_word  is_stack_owner : 1;
 #endif
 #if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-        uint8_t                 is_subcall_has_return_value : 1;
+        __vsf_eda_feature_word  is_subcall_has_return_value : 1;
 #endif
-        uint8_t                 user_bits : VSF_KERNEL_CFG_EDA_USER_BITLEN;
+        __vsf_eda_feature_word  user_bits : VSF_KERNEL_CFG_EDA_USER_BITLEN;
     };
-    uint8_t                     value;
+    __vsf_eda_feature_word      value;
 } vsf_eda_feature_t;
 
 typedef union __vsf_eda_state_t {
@@ -708,7 +721,7 @@ typedef union __vsf_eda_flag_t {
         __vsf_eda_state_t       state;
         vsf_eda_feature_t       feature;
     };
-    uint16_t                    value;
+    __vsf_eda_flag_word         value;
 } __vsf_eda_flag_t;
 
 typedef union __vsf_eda_fn_t {
