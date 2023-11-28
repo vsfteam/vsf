@@ -6495,7 +6495,7 @@
   (gr_text "VCC" (at 227.203 128.143 90) (layer "F.SilkS") (tstamp 5ce15e61-99f6-445d-86fe-e14e098223f1)
     (effects (font (size 0.762 0.762) (thickness 0.1524) bold) (justify left bottom))
   )
-  (gr_text "CHIP_BOOT\nUSB_BOOT\nLINUX_BOOT\nLINUX/APP" (at 211.074 112.268 90) (layer "F.SilkS") (tstamp 6c0d22d1-888a-4c58-9538-a2e0e92efe16)
+  (gr_text "CHIP_BOOT\nLINUX_BOOT\nUSB_WIFI\nLINUX/APP" (at 211.074 112.268 90) (layer "F.SilkS") (tstamp 6c0d22d1-888a-4c58-9538-a2e0e92efe16)
     (effects (font (size 0.762 0.762) (thickness 0.1524) bold) (justify left bottom))
   )
   (gr_text "DIO" (at 227.203 125.476 90) (layer "F.SilkS") (tstamp 850913ca-3432-490b-a4bb-537299618edb)
