@@ -1187,7 +1187,9 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
         }
         vsf_local.cur_sector += dir->cur.sector_offset_in_cluster;
         vsf_local.dparser.lfn = 0;
-        vsf_local.fatfs_file_pos_save = dir->cur;
+        if (name != NULL) {
+            vsf_local.fatfs_file_pos_save = dir->cur;
+        }
         vsf_eda_set_user_value(LOOKUP_STATE_READ_SECTOR);
 
         // fall through
@@ -1319,11 +1321,12 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                 ||  !__vk_fatfs_fat_entry_is_valid(fsinfo, dir->cur.cluster)
                 ||  __vk_fatfs_fat_entry_is_eof(fsinfo, dir->cur.cluster)) {
             __not_available:
-                dir->cur.cluster = dir->first_cluster;
-                dir->cur.sector_offset_in_cluster = 0;
-                dir->cur.offset_in_sector = 0;
-                vsf_local.fatfs_file_pos_save = dir->cur;
-                dir->pos = 0;
+                if (NULL == name) {
+                    dir->cur.cluster = dir->first_cluster;
+                    dir->cur.sector_offset_in_cluster = 0;
+                    dir->cur.offset_in_sector = 0;
+                    dir->pos = 0;
+                }
                 err = VSF_ERR_NOT_AVAILABLE;
                 goto __fail_and_exit;
             }
