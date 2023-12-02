@@ -24,6 +24,7 @@
 
 #if VSF_HAL_USE_MMC == ENABLED
 
+#undef public_const
 #if     defined(__VSF_MMC_PROBE_CLASS_IMPLEMENT)
 #   undef __VSF_MMC_PROBE_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
