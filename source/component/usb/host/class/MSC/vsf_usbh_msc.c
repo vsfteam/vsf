@@ -229,7 +229,7 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
                     VSF_USB_ASSERT(msc->remain_size >= actual_length);
                     msc->remain_size -= actual_length;
                     actual_length %= pipe.size;
-                    if (!msc->remain_size || ((actual_length > 0) && (actual_length < pipe.size))) {
+                    if (!msc->remain_size || (actual_length < pipe.size)) {
                     reply_stage:
                         msc->state = VSF_USBH_MSC_STATE_REPLY;
                         vk_usbh_urb_set_buffer(&msc->urb_in, &msc->buffer.csw, sizeof(msc->buffer.csw));
