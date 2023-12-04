@@ -1157,7 +1157,7 @@ __vsf_component_peda_ifs_entry(__vk_vfs_rename, vk_file_rename)
             if (newfile != NULL) {
                 err = VSF_ERR_ALREADY_EXISTS;
                 goto do_exit;
-            } else if (oldfile != NULL) {
+            } else if (NULL == oldfile) {
                 err = VSF_ERR_NOT_AVAILABLE;
                 goto do_exit;
             }
@@ -1170,13 +1170,13 @@ __vsf_component_peda_ifs_entry(__vk_vfs_rename, vk_file_rename)
                 }
                 strcpy(newname, vsf_local.newname);
 
-                free(oldfile->name);
+                vsf_heap_free(oldfile->name);
                 oldfile->name = newname;
             } else {
                 newname = (char *)vsf_local.oldname;
             }
 
-            if (newdir != NULL) {
+            if ((newdir != NULL) && (newdir != olddir)) {
                 vsf_protect_t orig = vsf_protect_sched();
                     vsf_dlist_remove(vk_vfs_file_t, use_as__vsf_dlist_node_t, &olddir->d.child_list, oldfile);
                     vsf_dlist_add_to_tail(vk_vfs_file_t, use_as__vsf_dlist_node_t, &newdir->d.child_list, oldfile);

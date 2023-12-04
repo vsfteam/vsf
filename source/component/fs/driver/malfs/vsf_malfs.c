@@ -396,11 +396,14 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
                 goto return_failed;
             }
             if (partition->malfs_info->volume_name != NULL) {
-                partition->root->name = partition->malfs_info->volume_name;
-            } else {
-                // TODO: rename root
+                mounter->mount_state = VSF_MOUNT_STATE_RENAME_ROOT;
+                vk_file_rename(mounter->dir, partition->root->name, NULL, partition->malfs_info->volume_name);
+                break;
             }
+            // fall through
+        case VSF_MOUNT_STATE_RENAME_ROOT:
             goto next_partition;
+            break;
         }
         break;
     }

@@ -115,6 +115,7 @@ typedef enum vk_malfs_mount_state_t {
     VSF_MOUNT_STATE_CREATE_ROOT,
     VSF_MOUNT_STATE_OPEN_ROOT,
     VSF_MOUNT_STATE_MOUNT,
+    VSF_MOUNT_STATE_RENAME_ROOT,
 } vk_malfs_mount_state_t;
 
 typedef struct vk_malfs_mount_partition_t {
