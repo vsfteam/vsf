@@ -75,8 +75,9 @@ vsf_class(vk_musb_fdrc_dcd_t) {
             void *param;
         } callback;
         uint16_t ep_buf_ptr;
-        uint16_t out_mask;
         uint16_t control_size;
+        uint16_t out_mask;
+        uint16_t in_mask;
         bool is_control_in;
         bool is_last_control_in;
         vk_musb_fdrc_dcd_ep0state_t ep0_state;

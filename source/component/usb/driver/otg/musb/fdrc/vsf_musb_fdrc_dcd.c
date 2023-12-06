@@ -174,6 +174,7 @@ static void __vk_musb_fdrc_usbd_reset_do(vk_musb_fdrc_dcd_t *usbd)
     vk_musb_fdrc_interrupt_init(reg);
     reg->Common->IntrUSBE = MUSB_INTRUSBE_RESET;
     usbd->ep_buf_ptr = 0;
+    usbd->out_mask = usbd->in_mask = 0;
     usbd->ep0_state = MUSB_FDRC_USBD_EP0_WAIT_SETUP;
     usbd->is_status_notified = true;
     usbd->is_to_notify_status_in_next_isr = false;
@@ -516,7 +517,10 @@ vsf_err_t vk_musb_fdrc_usbd_ep_transaction_set_data_size(vk_musb_fdrc_dcd_t *usb
                 reg->EP->EP0.CSR0 |= MUSBD_CSR0_TXPKTRDY;
             }
         } else {
-            reg->EP->EPN.TxCSR1 |= MUSBD_TXCSR1_TXPKTRDY;
+            vsf_protect_t orig = vsf_protect_int();
+                reg->EP->EPN.TxCSR1 |= MUSBD_TXCSR1_TXPKTRDY;
+                usbd->in_mask |= 1 << ep;
+            vsf_unprotect_int(orig);
         }
     vk_musb_fdrc_set_ep(reg, ep_orig);
     return VSF_ERR_NONE;
@@ -713,7 +717,14 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
             }
         vk_musb_fdrc_set_ep(reg, ep_orig);
 
-        __vk_musb_fdrc_usbd_notify(usbd, USB_ON_IN, ep);
+        orig = vsf_protect_int();
+        if ((usbd->in_mask & (1 << ep)) && !(csr1 & MUSBD_TXCSR1_TXPKTRDY)) {
+            usbd->in_mask &= ~(1 << ep);
+            vsf_unprotect_int(orig);
+            __vk_musb_fdrc_usbd_notify(usbd, USB_ON_IN, ep);
+        } else {
+            vsf_unprotect_int(orig);
+        }
     }
 }
 
