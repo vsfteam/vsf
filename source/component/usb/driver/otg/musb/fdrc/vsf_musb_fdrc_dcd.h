@@ -85,6 +85,7 @@ vsf_class(vk_musb_fdrc_dcd_t) {
         bool is_dma;
         bool is_status_notified;
         bool is_to_notify_status_in_next_isr;
+        bool is_resetting;
     )
 };
 

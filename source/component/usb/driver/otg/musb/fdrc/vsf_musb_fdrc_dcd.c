@@ -213,6 +213,7 @@ vsf_err_t vk_musb_fdrc_usbd_init(vk_musb_fdrc_dcd_t *usbd, usb_dc_cfg_t *cfg)
         usbd->param->op->Init(&ip_cfg);
     }
 
+    usbd->is_resetting = false;
     __vk_musb_fdrc_usbd_reset_do(usbd);
     return VSF_ERR_NONE;
 }
@@ -571,10 +572,20 @@ void vk_musb_fdrc_usbd_irq(vk_musb_fdrc_dcd_t *usbd)
     status &= reg->Common->IntrUSBE;
 
     // USB interrupt
+
+    // Some musb device will trigger reset event many times while D+ and D- are low.
+    //  If the last reset event is too close to the first setup event, there maybe hw related problem.
+    //  Add is_ressetting so that reset event is only triggered once.
     if (status & MUSB_INTRUSB_RESET) {
-        __vk_musb_fdrc_usbd_notify(usbd, USB_ON_RESET, 0);
+        if (!usbd->is_resetting) {
+            usbd->is_resetting = true;
+            __vk_musb_fdrc_usbd_notify(usbd, USB_ON_RESET, 0);
+        }
         reg->Common->Power |= MUSB_POWER_ENABLESUSPEND;
+    } else if (status) {
+        usbd->is_resetting = false;
     }
+
     if (status & MUSB_INTRUSB_SOF) {
         __vk_musb_fdrc_usbd_notify(usbd, USB_ON_SOF, 0);
     }
