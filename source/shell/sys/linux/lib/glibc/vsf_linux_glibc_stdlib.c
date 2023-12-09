@@ -52,17 +52,10 @@
 
 #if defined(__WIN__) && !defined(_DEBUG) && VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
 #   warning ********windows: In release mode, malloc will be called in some system APIs,\
-                and heap monitor will make it failed if not called in vsf_linux environment ********
+                and heap monitor will fail if malloc not called in vsf_linux environment ********
 #endif
 
 /*============================ MACROS ========================================*/
-
-#if VSF_ARCH_PROVIDE_HEAP == ENABLED
-#   define VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN           vsf_arch_heap_alignment()
-#else
-#   define VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN           VSF_HEAP_ALIGN
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -71,39 +64,30 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-static size_t __vsf_linux_heap_trace_alloc(vsf_linux_process_t *process, void *ptr, size_t size, const char *file, const char *func, int line)
+static void __vsf_linux_heap_trace_alloc(vsf_linux_process_t *process, vsf_liunx_heap_node_t *node,
+    void *ptr, size_t size, const char *file, const char *func, int line)
 {
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
     }
     VSF_LINUX_ASSERT(process != NULL);
 
-    ssize_t i;
-    vsf_protect_t orig = vsf_protect_sched();
-#   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH > 0
-        i = vsf_bitmap_ffz(&process->heap_monitor.bitmap, VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH);
-        // if assert here, please increate VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH
-        VSF_LINUX_ASSERT(i >= 0);
-        // can not go on, stalls here even if assert is not enabled
-        if (i < 0) { while(1); }
+    node->ptr = ptr;
+    node->size = size;
+    node->file = file;
+    node->func = func;
+    node->line = line;
+    vsf_dlist_init_node(vsf_liunx_heap_node_t, node, node);
 
-        process->heap_monitor.nodes[i].ptr = ptr;
-        process->heap_monitor.nodes[i].size = size - sizeof(size_t);
-        process->heap_monitor.nodes[i].file = file;
-        process->heap_monitor.nodes[i].func = func;
-        process->heap_monitor.nodes[i].line = line;
-        vsf_bitmap_set(&process->heap_monitor.bitmap, i);
-#   else
-        i = size;
-#   endif
-        process->heap_monitor.info.usage += size - sizeof(size_t);
-        process->heap_monitor.info.balance++;
+    vsf_protect_t orig = vsf_protect_sched();
+        vsf_dlist_add_to_tail(vsf_liunx_heap_node_t, node, &process->heap_monitor.list, node);
+        process->heap_monitor.usage += size;
+        process->heap_monitor.balance++;
 //        vsf_trace_debug("0x%p: +%d 0x%p\n", process, i, ptr);
     vsf_unprotect_sched(orig);
-    return (size_t)i;
 }
 
-static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, size_t i, void *ptr)
+static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, vsf_liunx_heap_node_t *node, void *ptr)
 {
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
@@ -112,35 +96,27 @@ static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, size_t i, 
 
     vsf_protect_t orig = vsf_protect_sched();
 //        vsf_trace_debug("0x%p: -%d 0x%p\n", process, i, ptr);
-#   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH > 0
-        VSF_LINUX_ASSERT(i < VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH);
-        VSF_LINUX_ASSERT(vsf_bitmap_get(&process->heap_monitor.bitmap, i));
-        VSF_LINUX_ASSERT(process->heap_monitor.nodes[i].ptr == ptr);
-        process->heap_monitor.info.usage -= process->heap_monitor.nodes[i].size;
-        vsf_bitmap_clear(&process->heap_monitor.bitmap, i);
-#   else
-        process->heap_monitor.info.usage -= i - sizeof(size_t);
-#   endif
-        process->heap_monitor.info.balance--;
+        process->heap_monitor.usage -= node->size;
+        process->heap_monitor.balance--;
+        vsf_dlist_remove(vsf_liunx_heap_node_t, node, &process->heap_monitor.list, node);
     vsf_unprotect_sched(orig);
 }
 
 void __free_ex(vsf_linux_process_t *process, void *ptr)
 {
     if (ptr != NULL) {
-        size_t *i = (size_t *)((char *)ptr - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN);
-        __vsf_linux_heap_trace_free(process, *i, ptr);
-        vsf_linux_process_heap_free(process, i);
+        vsf_liunx_heap_node_t *node = (vsf_liunx_heap_node_t *)((char *)ptr - sizeof(vsf_liunx_heap_node_t));
+        __vsf_linux_heap_trace_free(process, node, ptr);
+        vsf_linux_process_heap_free(process, (void *)node);
     }
 }
 
 void * ____malloc_ex(vsf_linux_process_t *process, size_t size, const char *file, const char *func, int line)
 {
-    size += VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN;
-    size_t *i = vsf_linux_process_heap_malloc(process, size);
-    if (i != NULL) {
-        void *buffer = (void *)((char *)i + VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN);
-        *i = __vsf_linux_heap_trace_alloc(process, buffer, size, file, func, line);
+    vsf_liunx_heap_node_t *node = vsf_linux_process_heap_malloc(process, size + sizeof(vsf_liunx_heap_node_t));
+    if (node != NULL) {
+        void *buffer = (void *)((char *)node + sizeof(vsf_liunx_heap_node_t));
+        __vsf_linux_heap_trace_alloc(process, node, buffer, size, file, func, line);
         return buffer;
     } else {
         errno = ENOMEM;
@@ -163,8 +139,8 @@ void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size, const 
     } else {
         void *new_buff = __malloc_ex(process, size);
         if (new_buff != NULL) {
-            size_t copy_size = vsf_linux_process_heap_size(process, (uint8_t *)p - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN)
-                                    - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN;
+            size_t copy_size = vsf_linux_process_heap_size(process, (uint8_t *)p - sizeof(vsf_liunx_heap_node_t))
+                                    - sizeof(vsf_liunx_heap_node_t);
             copy_size = vsf_min(size, copy_size);
             memcpy(new_buff, p, copy_size);
         }
@@ -203,8 +179,8 @@ void * ____calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, const 
 size_t malloc_usable_size(void *p)
 {
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-    return vsf_linux_process_heap_size(NULL, (uint8_t *)p - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN)
-        - VSF_LINUX_SIMPLE_STDLIB_HEAP_ALIGN;
+    return vsf_linux_process_heap_size(NULL, (uint8_t *)p - sizeof(vsf_liunx_heap_node_t))
+        - sizeof(vsf_liunx_heap_node_t);
 #else
     return vsf_linux_process_heap_size(NULL, p);
 #endif

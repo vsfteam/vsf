@@ -235,31 +235,22 @@ dcl_vsf_bitmap(vsf_linux_fd_bitmap, VSF_LINUX_CFG_FD_BITMAP_SIZE);
 
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
     &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-typedef struct vsf_linux_heap_info_t {
-    size_t usage;
-    int balance;
-} vsf_linux_heap_info_t;
 
 typedef struct vsf_liunx_heap_node_t {
+    vsf_dlist_node_t node;
+
     void *ptr;
     size_t size;
 
+    int line;
     const char *file;
     const char *func;
-    int line;
 } vsf_liunx_heap_node_t;
 
-#   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH > 0
-dcl_vsf_bitmap(vsf_linux_heap_nodes_bitmap, VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH);
-#   endif
-
 typedef struct vsf_linux_heap_monitor_t {
-    vsf_linux_heap_info_t info;
-
-#   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH > 0
-    vsf_bitmap(vsf_linux_heap_nodes_bitmap) bitmap;
-    vsf_liunx_heap_node_t nodes[VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH];
-#   endif
+    size_t usage;
+    int balance;
+    vsf_dlist_t list;
 } vsf_linux_heap_monitor_t;
 #endif
 

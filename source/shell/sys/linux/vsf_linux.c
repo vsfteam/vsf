@@ -1315,23 +1315,14 @@ void vsf_linux_cleanup_process(vsf_linux_process_t *process)
 
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
     &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-    if (process->heap_monitor.info.usage != 0) {
+    if (process->heap_monitor.usage != 0) {
 #   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_QUIET != ENABLED
         vsf_trace_warning("memory leak %d bytes detected in process 0x%p, balance = %d" VSF_TRACE_CFG_LINEEND,
-                process->heap_monitor.info.usage, process, process->heap_monitor.info.balance);
-#   endif
-#   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH > 0
-        int idx;
-        while (true) {
-            idx = vsf_bitmap_ffs(&process->heap_monitor.bitmap, VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_TRACE_DEPTH);
-            if (idx < 0) { break; }
-
-#       if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_QUIET != ENABLED
-            vsf_trace_warning("    0x%p(%d) %s %s %d" VSF_TRACE_CFG_LINEEND,
-                process->heap_monitor.nodes[idx].ptr, process->heap_monitor.nodes[idx].size,
-                process->heap_monitor.nodes[idx].file, process->heap_monitor.nodes[idx].func, process->heap_monitor.nodes[idx].line);
-#       endif
-            free(process->heap_monitor.nodes[idx].ptr);
+                process->heap_monitor.usage, process, process->heap_monitor.balance);
+        __vsf_dlist_foreach_next_unsafe(vsf_liunx_heap_node_t, node, &process->heap_monitor.list) {
+            vsf_trace_warning("    cleanup 0x%p(%d) %s %s %d" VSF_TRACE_CFG_LINEEND,
+                _->ptr, _->size, _->file, _->func, _->line);
+            free(_->ptr);
         }
 #   endif
     }
