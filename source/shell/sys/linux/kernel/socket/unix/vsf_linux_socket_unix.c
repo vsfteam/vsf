@@ -286,7 +286,6 @@ static int __vsf_linux_socket_unix_accept(vsf_linux_socket_priv_t *socket_priv, 
                 goto fail;
             }
             if (__vsf_linux_rx_pipe_init(&priv_new->use_as__vsf_linux_pipe_priv_t, NULL)) {
-            free_sfd_tx_and_close_sockfd_new_and_fail:
                 goto close_sockfd_new_and_fail;
             }
 

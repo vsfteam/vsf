@@ -70,10 +70,10 @@ void * mempcpy(void *dest, const void *src, size_t len)
     return (void *)((char *)memcpy(dest, src, len) + len);
 }
 
-size_t strscpy(char *dest, const char *src, size_t n)
+ssize_t strscpy(char *dest, const char *src, size_t n)
 {
-    size_t srclen = strlen(src);
-    size_t copylen = srclen >= n ? n - 1 : srclen;
+    ssize_t srclen = strlen(src);
+    ssize_t copylen = srclen >= n ? n - 1 : srclen;
     memcpy(dest, src, copylen);
     dest[copylen] = '\0';
     return copylen >= srclen ? copylen : -E2BIG;
