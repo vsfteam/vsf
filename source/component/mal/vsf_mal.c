@@ -113,6 +113,8 @@ bool vk_mal_prepare_buffer(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t si
     if (pthis->drv->buffer != NULL) {
         return pthis->drv->buffer(pthis, addr, size, op, mem);
     }
+    mem->buffer = NULL;
+    mem->size = 0;
     return false;
 }
 

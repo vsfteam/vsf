@@ -64,6 +64,8 @@ bool vk_scsi_prepare_buffer(vk_scsi_t *pthis, uint8_t *cbd, vsf_mem_t *mem)
     if (pthis->drv->buffer != NULL) {
         return pthis->drv->buffer(pthis, cbd, mem);
     }
+    mem->buffer = NULL;
+    mem->size = 0;
     return false;
 }
 

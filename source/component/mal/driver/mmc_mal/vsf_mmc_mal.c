@@ -157,6 +157,7 @@ __vsf_component_peda_ifs_entry(__vk_mmc_mal_init, vk_mal_init)
         vsf_eda_return(VSF_ERR_FAIL);
         break;
     case VSF_EVT_MMC_DONE:
+        pthis->size = pthis->capacity * (1 << pthis->csd.sd_v2.READ_BL_LEN);
         vsf_mmc_irq_enable(pthis->mmc, MMC_IRQ_MASK_HOST_RESP_DONE | MMC_IRQ_MASK_HOST_DATA_DONE);
         vsf_eda_return(VSF_ERR_NONE);
         break;

@@ -59,7 +59,6 @@
 /*============================ PROTOTYPES ====================================*/
 
 static uint_fast32_t __vk_fakefat32_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
-static bool __vk_fakefat32_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
 dcl_vsf_peda_methods(static, __vk_fakefat32_mal_init)
 dcl_vsf_peda_methods(static, __vk_fakefat32_mal_fini)
 dcl_vsf_peda_methods(static, __vk_fakefat32_mal_read)
@@ -77,7 +76,6 @@ dcl_vsf_peda_methods(static, __vk_fakefat32_dir_write)
 
 const vk_mal_drv_t vk_fakefat32_mal_drv = {
     .blksz          = __vk_fakefat32_mal_blksz,
-    .buffer         = __vk_fakefat32_mal_buffer,
     .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_mal_init),
     .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_mal_fini),
     .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_mal_read),
@@ -830,13 +828,6 @@ static uint_fast32_t __vk_fakefat32_mal_blksz(vk_mal_t *mal, uint_fast64_t addr,
 {
     vk_fakefat32_mal_t *pthis = (vk_fakefat32_mal_t *)mal;
     return pthis->sector_size;
-}
-
-static bool __vk_fakefat32_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem)
-{
-    mem->buffer = NULL;
-    mem->size = 0;
-    return false;
 }
 
 #if     __IS_COMPILER_GCC__

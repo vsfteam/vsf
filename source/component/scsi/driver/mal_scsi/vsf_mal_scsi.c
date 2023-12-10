@@ -83,6 +83,7 @@ __vsf_component_peda_ifs_entry(__vk_mal_scsi_init, vk_virtual_scsi_init)
 {
     vsf_peda_begin();
     vk_mal_scsi_t *mal_scsi = (vk_mal_scsi_t *)&vsf_this;
+    vk_virtual_scsi_param_t *param = mal_scsi->param;
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -92,6 +93,8 @@ __vsf_component_peda_ifs_entry(__vk_mal_scsi_init, vk_virtual_scsi_init)
         vk_mal_init(mal_scsi->mal);
         break;
     case VSF_EVT_RETURN:
+        param->block_size = vk_mal_blksz(mal_scsi->mal, 0, 0, VSF_MAL_OP_ERASE);
+        param->block_num = mal_scsi->mal->size / param->block_size;
         vsf_eda_return(vsf_eda_get_return_value());
         break;
     }
