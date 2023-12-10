@@ -248,12 +248,26 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                         // When the EVPD bit is set to one,
                         // the PAGE CODE field specifies which page of
                         // vital product data information the device server shall return
-                        if (scsi_cmd[2] != 0) {
+                        // refer to: https://www.seagate.com/files/staticfiles/support/docs/manual/Interface%20manuals/100293068j.pdf
+
+                        reply[0] = param->type;
+                        reply[1] = scsi_cmd[2];
+                        switch (scsi_cmd[2]) {
+                        case 0:         // Vital Product Page
+                            VSF_SCSI_ASSERT(reply_len >= 5);
+                            reply_len = 5;
+                            break;
+                        case 0x80:      // Unit Serial Number
+                            reply[3] = strlen(param->serial) + 1;
+                            if (reply_len > (reply[3] + 4)) {
+                                reply_len = reply[3] + 4;
+                            }
+                            strncpy((char *)&reply[4], param->serial, reply_len - 4);
+                            break;
+                        default:
                             goto exit_invalid_field_in_cmd;
                         }
 
-                        VSF_SCSI_ASSERT(reply_len >= 5);
-                        reply_len = 5;
                         break;
                     } else {
                         if (scsi_cmd[2] != 0) {

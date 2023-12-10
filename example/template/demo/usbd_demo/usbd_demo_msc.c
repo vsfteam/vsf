@@ -90,12 +90,10 @@ describe_usbd(__user_usbd_msc, APP_CFG_USBD_VID, APP_CFG_USBD_PID, USRAPP_CFG_US
                         0,
                         // bulk in ep, bulk out ep
                         1, 1,
-                        // max lun(logic unit number)
-                        0,
-                        // scsi_dev
-                        &__usrapp_mal_scsi.use_as__vk_scsi_t,
                         // stream
-                        &__user_usbd_msc_stream.use_as__vsf_stream_t
+                        &__user_usbd_msc_stream.use_as__vsf_stream_t,
+                        // scsi_dev(s)
+                        &__usrapp_mal_scsi.use_as__vk_scsi_t
         )
     usbd_ifs(__user_usbd_msc)
         usbd_mscbot_ifs(__user_usbd_msc, 0)
@@ -118,6 +116,7 @@ int VSF_USER_ENTRY(void)
 #   endif
 #endif
 
+    usbd_mscbot_scsi_config(__user_usbd_msc, 0, 0, false);
     vk_usbd_init(&__user_usbd_msc);
     vk_usbd_connect(&__user_usbd_msc);
     return 0;

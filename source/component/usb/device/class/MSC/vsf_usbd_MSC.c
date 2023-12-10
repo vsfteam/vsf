@@ -34,7 +34,8 @@
 /*============================ TYPES =========================================*/
 
 enum {
-    VSF_EVT_EXECUTE = VSF_EVT_USER + 0,
+    VSF_EVT_EXECUTE     = VSF_EVT_USER + 0,
+    VSF_EVT_INIT_SCSI   = VSF_EVT_USER + 0x100,
 };
 
 /*============================ PROTOTYPES ====================================*/
@@ -122,6 +123,12 @@ static void __vk_usbd_msc_on_cbw(void *p)
     vk_usbd_msc_t *msc = p;
     usb_msc_cbw_t *cbw = &msc->ctx.cbw;
     vk_usbd_trans_t *trans = &msc->ep_stream.use_as__vk_usbd_trans_t;
+    vk_scsi_t *scsi_dev;
+
+    if (!(msc->scsi_inited_mask & (1 << cbw->bCBWLUN))) {
+        vsf_eda_post_evt(&msc->eda, VSF_EVT_INIT_SCSI | cbw->bCBWLUN);
+        return;
+    }
 
     if (    (trans->size > 0)
         ||  (cbw->dCBWSignature != cpu_to_le32(USB_MSC_CBW_SIGNATURE))
@@ -134,7 +141,8 @@ static void __vk_usbd_msc_on_cbw(void *p)
         return;
     }
 
-    if (    vk_scsi_prepare_buffer(msc->scsi, msc->ctx.cbw.CBWCB, &trans->use_as__vsf_mem_t)
+    scsi_dev = msc->scsi_devs[cbw->bCBWLUN];
+    if (    vk_scsi_prepare_buffer(scsi_dev, msc->ctx.cbw.CBWCB, &trans->use_as__vsf_mem_t)
         &&  ((cbw->bmCBWFlags & USB_DIR_MASK) == USB_DIR_OUT)
         &&  (cbw->dCBWDataTransferLength > 0)) {
 
@@ -175,19 +183,18 @@ static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        msc->is_inited = false;
-        vk_scsi_init(msc->scsi);
+        __vk_usbd_msc_on_idle(msc);
         break;
     case VSF_EVT_RETURN:
         reply_len = vsf_eda_get_return_value();
-        if (!msc->is_inited) {
+        if (msc->is_scsi_init) {
+            msc->is_scsi_init = false;
             if (reply_len < 0) {
-                // fail to initialize scsi
-                VSF_USB_ASSERT(false);
+                __vk_usbd_msc_error(msc, USB_MSC_CSW_FAIL);
                 return;
             }
-            msc->is_inited = true;
-            __vk_usbd_msc_on_idle(msc);
+            msc->scsi_inited_mask |= 1 << cbw->bCBWLUN;
+            __vk_usbd_msc_on_cbw(msc);
         } else {
             if (reply_len < 0) {
                 __vk_usbd_msc_error(msc, USB_MSC_CSW_FAIL);
@@ -223,7 +230,7 @@ static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         if (cbw->dCBWDataTransferLength > 0) {
             if (trans->buffer != NULL) {
                 msc->is_stream = false;
-                vk_scsi_execute(msc->scsi, cbw->CBWCB, &trans->use_as__vsf_mem_t);
+                vk_scsi_execute(msc->scsi_devs[cbw->bCBWLUN], cbw->CBWCB, &trans->use_as__vsf_mem_t);
             } else if (msc->stream != NULL) {
                 msc->is_stream = true;
                 msc->ep_stream.stream = msc->stream;
@@ -238,14 +245,25 @@ static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     msc->ep_stream.callback.on_finish = NULL;
                     vk_usbd_ep_recv_stream(&msc->ep_stream, cbw->dCBWDataTransferLength);
                 }
-                vk_scsi_execute_stream(msc->scsi, cbw->CBWCB, msc->stream);
+                vk_scsi_execute_stream(msc->scsi_devs[cbw->bCBWLUN], cbw->CBWCB, msc->stream);
             } else {
                 // how to get the buffer?
                 VSF_USB_ASSERT(false);
             }
         } else {
             msc->is_data_done = 1;
-            vk_scsi_execute(msc->scsi, cbw->CBWCB, NULL);
+            vk_scsi_execute(msc->scsi_devs[cbw->bCBWLUN], cbw->CBWCB, NULL);
+        }
+        break;
+    default: {
+            uint8_t scsi_idx;
+            evt -= VSF_EVT_USER;
+            scsi_idx = evt & 0xFF;
+            evt &= ~0xFF;
+
+            VSF_USB_ASSERT(evt == 0x100);
+            msc->is_scsi_init = true;
+            vk_scsi_init(msc->scsi_devs[scsi_idx]);
         }
         break;
     }
@@ -297,6 +315,18 @@ static vsf_err_t __vk_usbd_msc_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t
     ctrl_handler->trans.buffer = buffer;
     ctrl_handler->trans.size = size;
     return VSF_ERR_NONE;
+}
+
+void vk_usbd_mscbot_scsi_config(vk_usbd_msc_t *msc, uint8_t idx, bool is_inited)
+{
+    VSF_USB_ASSERT(idx <= msc->max_lun);
+    VSF_USB_ASSERT(idx <= 7);
+
+    if (is_inited) {
+        msc->scsi_inited_mask |= 1 << idx;
+    } else {
+        msc->scsi_inited_mask &= ~(1 << idx);
+    }
 }
 
 #endif      // VSF_USE_USB_DEVICE && VSF_USBD_USE_MSC

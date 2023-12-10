@@ -86,6 +86,7 @@ typedef struct vk_virtual_scsi_param_t {
     char vendor[8];
     char product[16];
     char revision[4];
+    char *serial;
     bool removable;
     scsi_pdt_t type;
 } vk_virtual_scsi_param_t;

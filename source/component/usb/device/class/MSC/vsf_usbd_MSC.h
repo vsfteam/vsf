@@ -49,12 +49,12 @@ extern "C" {
 
 
 
-#define USB_MSC_PARAM(__BULK_IN_EP, __BULK_OUT_EP, __MAX_LUN, __SCSI_DEV, __STREAM)\
+#define USB_MSC_PARAM(__BULK_IN_EP, __BULK_OUT_EP, __STREAM, __MAX_LUN, __SCSI_PDEVS)\
             .ep_out             = (__BULK_OUT_EP),                              \
             .ep_in              = (__BULK_IN_EP),                               \
+            .stream             = (__STREAM),                                   \
             .max_lun            = (__MAX_LUN),                                  \
-            .scsi               = (__SCSI_DEV),                                 \
-            .stream             = (__STREAM),
+            .scsi_devs          = (__SCSI_PDEVS),
 
 #define USB_MSC_IFS_NUM             1
 #define USB_MSCBOT_IFS_NUM          USB_MSC_IFS_NUM
@@ -66,9 +66,14 @@ extern "C" {
 #define __usbd_mscbot_desc_iad(__name, __ifs, __i_func, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size)\
             USB_DESC_MSCBOT_IAD((__ifs), 4 + (__i_func), (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size))
 
-#define __usbd_mscbot_func(__name, __func_id, __bulk_in_ep, __bulk_out_ep, __max_lun, __scsi_dev, __stream)\
+#define __usbd_mscbot_func(__name, __func_id, __bulk_in_ep, __bulk_out_ep, __stream, ...)\
+            vk_scsi_t * __##__name##_MSC##__scsi_devs[] = {                     \
+                __VA_ARGS__                                                     \
+            };                                                                  \
             vk_usbd_msc_t __##__name##_MSC##__func_id = {                       \
-                USB_MSC_PARAM((__bulk_in_ep), (__bulk_out_ep), (__max_lun), (__scsi_dev), (__stream))\
+                USB_MSC_PARAM((__bulk_in_ep), (__bulk_out_ep), (__stream),      \
+                    dimof(__##__name##_MSC##__scsi_devs) - 1,                   \
+                    __##__name##_MSC##__scsi_devs)                              \
             };
 
 #define __usbd_msc_ifs(__name, __func_id)                                       \
@@ -78,10 +83,15 @@ extern "C" {
             __usbd_mscbot_desc(__name, (__ifs), (__i_func), (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size))
 #define usbd_mscbot_desc_iad(__name, __ifs, __i_func, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size)\
             __usbd_mscbot_desc_iad(__name, (__ifs), (__i_func), (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size))
-#define usbd_mscbot_func(__name, __func_id, __bulk_in_ep, __bulk_out_ep, __max_lun, __scsi_dev, __stream)\
-            __usbd_mscbot_func(__name, __func_id, (__bulk_in_ep), (__bulk_out_ep), (__max_lun), (__scsi_dev), (__stream))
+#define usbd_mscbot_func(__name, __func_id, __bulk_in_ep, __bulk_out_ep, __stream, ...)\
+            __usbd_mscbot_func(__name, __func_id, (__bulk_in_ep), (__bulk_out_ep), (__stream), __VA_ARGS__)
 #define usbd_mscbot_ifs(__name, __func_id)                                      \
             __usbd_msc_ifs(__name, __func_id)
+
+// usbd_mscbot_scsi_config MUST be called for each scsi device before usbd startup.
+#define usbd_mscbot_scsi_config(__name, __func_id, __scsi_idx, __is_inited)\
+            extern vk_usbd_msc_t __##__name##_MSC##__func_id;                   \
+            vk_usbd_mscbot_scsi_config(&__##__name##_MSC##__func_id, (__scsi_idx), (__is_inited))
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -105,18 +115,19 @@ vsf_class(vk_usbd_msc_t) {
         uint32_t reply_len;
         vk_usbd_dev_t *dev;
         vk_usbd_ep_stream_t ep_stream;
-        uint8_t is_inited   : 1;
-        uint8_t is_stream   : 1;
-        uint8_t is_scsi_done: 1;
-        uint8_t is_data_done: 1;
+        uint8_t scsi_inited_mask;
+        uint8_t is_scsi_init    : 1;
+        uint8_t is_stream       : 1;
+        uint8_t is_scsi_done    : 1;
+        uint8_t is_data_done    : 1;
     )
 
     public_member(
         const uint8_t ep_out;
         const uint8_t ep_in;
         const uint8_t max_lun;
-        vk_scsi_t *scsi;
         vsf_stream_t *stream;
+        vk_scsi_t **scsi_devs;
     )
 };
 
@@ -125,6 +136,9 @@ vsf_class(vk_usbd_msc_t) {
 extern const vk_usbd_class_op_t vk_usbd_msc;
 
 /*============================ PROTOTYPES ====================================*/
+
+// vk_usbd_mscbot_scsi_config MUST be called for each scsi device before usbd startup.
+void vk_usbd_mscbot_scsi_config(vk_usbd_msc_t *msc, uint8_t idx, bool is_inited);
 
 #ifdef __cplusplus
 }
