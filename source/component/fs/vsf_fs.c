@@ -838,15 +838,18 @@ vsf_err_t vk_file_rename(vk_file_t *olddir, const char *oldname, vk_file_t *newd
     if (NULL == olddir) {
         olddir = &__vk_fs.rootfs.use_as__vk_file_t;
     }
+    if (NULL == newdir) {
+        newdir = olddir;
+    }
 
     VSF_FS_ASSERT(olddir != NULL);
     VSF_FS_ASSERT(olddir->attr & VSF_FILE_ATTR_DIRECTORY);
-    VSF_FS_ASSERT((NULL == newdir) || (newdir->attr & VSF_FILE_ATTR_DIRECTORY));
+    VSF_FS_ASSERT(newdir->attr & VSF_FILE_ATTR_DIRECTORY);
     VSF_FS_ASSERT((oldname != NULL) && (*oldname != '\0'));
 
     vk_file_t *root = &olddir->fsinfo->root;
     VSF_FS_ASSERT(root != NULL);
-    vk_file_t *newroot = (newdir != NULL) ? &newdir->fsinfo->root : root;
+    vk_file_t *newroot = &newdir->fsinfo->root;
     VSF_FS_ASSERT(newroot != NULL);
     if (root != newroot) {
         return VSF_ERR_INVALID_PARAMETER;
