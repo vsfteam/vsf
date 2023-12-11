@@ -269,17 +269,25 @@ static void __vk_mal_stream_tx_evthandler(vsf_stream_t *stream, void *param, vsf
 {
     vk_mal_stream_t *pthis = (vk_mal_stream_t *)param;
     vk_mal_t *mal = pthis->mal;
+    uint32_t block_size, bufsize;
+    vsf_protect_t orig;
+    uint8_t *buffer;
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
     case VSF_STREAM_ON_OUT:
-        if (pthis->size > 0) {
-            pthis->cur_size = vsf_stream_get_wbuf(stream, &pthis->cur_buff);
-            if (pthis->cur_size < vk_mal_blksz(mal, pthis->addr, 0, VSF_MAL_OP_READ)) {
-                break;
-            }
-
+        block_size = vk_mal_blksz(mal, pthis->addr, 0, VSF_MAL_OP_READ);
+        orig = vsf_protect_int();
+        bufsize = vsf_stream_get_wbuf(stream, &buffer);
+        if (pthis->size && !pthis->cur_size && (bufsize >= block_size)) {
+            bufsize = vsf_min(bufsize, pthis->size);
+            bufsize &= ~(block_size - 1);
+            pthis->cur_size = bufsize;
+            vsf_unprotect_int(orig);
+            pthis->cur_buff = buffer;
             vsf_eda_post_evt(pthis->cur_eda, VSF_EVT_MAL_READ);
+        } else {
+            vsf_unprotect_int(orig);
         }
         break;
     }
@@ -289,17 +297,25 @@ static void __vk_mal_stream_rx_evthandler(vsf_stream_t *stream, void *param, vsf
 {
     vk_mal_stream_t *pthis = (vk_mal_stream_t *)param;
     vk_mal_t *mal = pthis->mal;
+    uint32_t block_size, bufsize;
+    vsf_protect_t orig;
+    uint8_t *buffer;
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
     case VSF_STREAM_ON_IN:
-        if (pthis->size > 0) {
-            pthis->cur_size = vsf_stream_get_rbuf(stream, &pthis->cur_buff);
-            if (pthis->cur_size < vk_mal_blksz(mal, pthis->addr, 0, VSF_MAL_OP_WRITE)) {
-                break;
-            }
-
+        block_size = vk_mal_blksz(mal, pthis->addr, 0, VSF_MAL_OP_WRITE);
+        orig = vsf_protect_int();
+        bufsize = vsf_stream_get_rbuf(stream, &buffer);
+        if (pthis->size && !pthis->cur_size && (bufsize >= block_size)) {
+            bufsize = vsf_min(bufsize, pthis->size);
+            bufsize &= ~(block_size - 1);
+            pthis->cur_size = bufsize;
+            vsf_unprotect_int(orig);
+            pthis->cur_buff = buffer;
             vsf_eda_post_evt(pthis->cur_eda, VSF_EVT_MAL_WRITE);
+        } else {
+            vsf_unprotect_int(orig);
         }
         break;
     }
@@ -322,6 +338,7 @@ __vsf_component_peda_private_entry(__vk_mal_read_stream)
 
     switch (evt) {
     case VSF_EVT_INIT:
+        pthis->cur_size = 0;
         pthis->rw_size = 0;
         pthis->cur_eda = vsf_eda_get_cur();
         VSF_MAL_ASSERT(pthis->cur_eda != NULL);
@@ -334,17 +351,34 @@ __vsf_component_peda_private_entry(__vk_mal_read_stream)
             if (result > 0) {
                 pthis->size -= result;
                 pthis->addr += result;
+                pthis->cur_buff += result;
                 pthis->rw_size += result;
                 vsf_stream_write(stream, NULL, result);
             }
             if ((result <= 0) || !pthis->size) {
                 vsf_stream_disconnect_tx(stream);
                 vsf_eda_return(pthis->rw_size);
+                break;
+            }
+            // avoid cur_size to be 0
+            if (pthis->cur_size > result) {
+                pthis->cur_size -= result;
+            } else /* if (result == pthis->cur_size) */ {
+                uint32_t block_size_mask = ~(vk_mal_blksz(mal, pthis->addr, 0, VSF_MAL_OP_READ) - 1);
+                bool is_cur_size_zero;
+                vsf_protect_t orig = vsf_protect_int();
+                    pthis->cur_size = vsf_stream_get_wbuf(stream, &pthis->cur_buff);
+                    pthis->cur_size = vsf_min(pthis->cur_size, pthis->size);
+                    pthis->cur_size &= block_size_mask;
+                    is_cur_size_zero = 0 == pthis->cur_size;
+                vsf_unprotect_int(orig);
+                if (is_cur_size_zero) {
+                    break;
+                }
             }
         }
-        break;
+        // fall through
     case VSF_EVT_MAL_READ:
-        pthis->cur_size = vsf_min(pthis->cur_size, pthis->size);
         vk_mal_read(mal, pthis->addr, pthis->cur_size, pthis->cur_buff);
         break;
     }
@@ -360,6 +394,7 @@ __vsf_component_peda_private_entry(__vk_mal_write_stream)
 
     switch (evt) {
     case VSF_EVT_INIT:
+        pthis->cur_size = 0;
         pthis->rw_size = 0;
         pthis->cur_eda = vsf_eda_get_cur();
         VSF_MAL_ASSERT(pthis->cur_eda != NULL);
@@ -372,17 +407,34 @@ __vsf_component_peda_private_entry(__vk_mal_write_stream)
             if (result > 0) {
                 pthis->size -= result;
                 pthis->addr += result;
+                pthis->cur_buff += result;
                 pthis->rw_size += result;
                 vsf_stream_read(stream, NULL, result);
             }
             if ((result <= 0) || !pthis->size) {
                 vsf_stream_disconnect_rx(stream);
                 vsf_eda_return(pthis->rw_size);
+                break;
+            }
+            // avoid cur_size to be 0
+            if (pthis->cur_size > result) {
+                pthis->cur_size -= result;
+            } else /* if (result == pthis->cur_size) */ {
+                uint32_t block_size_mask = ~(vk_mal_blksz(mal, pthis->addr, 0, VSF_MAL_OP_WRITE) - 1);
+                bool is_cur_size_zero;
+                vsf_protect_t orig = vsf_protect_int();
+                    pthis->cur_size = vsf_stream_get_rbuf(stream, &pthis->cur_buff);
+                    pthis->cur_size = vsf_min(pthis->cur_size, pthis->size);
+                    pthis->cur_size &= block_size_mask;
+                    is_cur_size_zero = 0 == pthis->cur_size;
+                vsf_unprotect_int(orig);
+                if (is_cur_size_zero) {
+                    break;
+                }
             }
         }
-        break;
+        // fall through
     case VSF_EVT_MAL_WRITE:
-        pthis->cur_size = vsf_min(pthis->cur_size, pthis->size);
         vk_mal_write(mal, pthis->addr, pthis->cur_size, pthis->cur_buff);
         break;
     }
