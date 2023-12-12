@@ -83,9 +83,9 @@ static void __vsf_hw_mmc_irq_handler(vsf_hw_mmc_t *mmc_ptr)
             dma_ch_icsr_set(ch, (dma_ch_icsr_get(ch) | DMA_CH_TBL0_ICLR_BIT |
                          DMA_CH_TBL1_ICLR_BIT | DMA_CH_TBL2_ICLR_BIT));
 
-            AIC_SDMMC->CTLR = (SDMMC_ENDIAN_TYPE(1) | SDMMC_DATARD_TRIGEN | SDMMC_DATAWR_TRIGEN |
+            reg->CTLR = (SDMMC_ENDIAN_TYPE(1) | SDMMC_DATARD_TRIGEN | SDMMC_DATAWR_TRIGEN |
                                SDMMC_DATARD_TRIGTH(DATARD_TRIG_TH) | SDMMC_DATAWR_TRIGTH(DATAWR_TRIG_TH));
-            AIC_SDMMC->CTLR = (SDMMC_RESET_N | SDMMC_ENDIAN_TYPE(1) | SDMMC_DATARD_TRIGEN | SDMMC_DATAWR_TRIGEN |
+            reg->CTLR = (SDMMC_RESET_N | SDMMC_ENDIAN_TYPE(1) | SDMMC_DATARD_TRIGEN | SDMMC_DATAWR_TRIGEN |
                                SDMMC_DATARD_TRIGTH(DATARD_TRIG_TH) | SDMMC_DATAWR_TRIGTH(DATAWR_TRIG_TH));
         }
         mmc_ptr->cfg.isr.handler_fn(mmc_ptr->cfg.isr.target_ptr, &mmc_ptr->vsf_mmc, irq, reg->GSR, resp);
@@ -189,7 +189,7 @@ vsf_err_t vsf_hw_mmc_host_transact_start(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_trans_t 
             ch = DMA_CHANNEL_SDMMC_TX;
             dma_erqcsr_set(REQ_CID_SDMMC_TX, ch);
             dma_ch_rqr_erql_setb(ch);
-            dma_ch_dar_set(ch, (unsigned int)(&AIC_SDMMC->DWRR));
+            dma_ch_dar_set(ch, (unsigned int)(&reg->DWRR));
             dma_ch_sar_set(ch, (unsigned int)trans->buffer);
             dma_ch_tbl0cr_set(ch, ((4 * DATAWR_TRIG_TH) | (REQ_FRAG << DMA_CH_RQTYP_LSB) | (AHB_WORD << DMA_CH_DBUSU_LSB) |
                              (AHB_WORD << DMA_CH_SBUSU_LSB) | DMA_CH_CONSTDA_BIT));
@@ -198,7 +198,7 @@ vsf_err_t vsf_hw_mmc_host_transact_start(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_trans_t 
             dma_erqcsr_set(REQ_CID_SDMMC_RX, ch);
             dma_ch_rqr_erql_setb(ch);
             dma_ch_dar_set(ch, (unsigned int)trans->buffer);
-            dma_ch_sar_set(ch, (unsigned int)(&AIC_SDMMC->DRDR));
+            dma_ch_sar_set(ch, (unsigned int)(&reg->DRDR));
             dma_ch_tbl0cr_set(ch, ((4 * DATARD_TRIG_TH) | (REQ_FRAG << DMA_CH_RQTYP_LSB) | (AHB_WORD << DMA_CH_DBUSU_LSB) |
                              (AHB_WORD << DMA_CH_SBUSU_LSB) | DMA_CH_CONSTSA_BIT));
         }
