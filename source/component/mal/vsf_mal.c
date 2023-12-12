@@ -360,21 +360,17 @@ __vsf_component_peda_private_entry(__vk_mal_read_stream)
                 vsf_eda_return(pthis->rw_size);
                 break;
             }
-            // avoid cur_size to be 0
-            if (pthis->cur_size > result) {
-                pthis->cur_size -= result;
-            } else /* if (result == pthis->cur_size) */ {
-                uint32_t block_size_mask = ~(vk_mal_blksz(mal, pthis->addr, 0, VSF_MAL_OP_READ) - 1);
-                bool is_cur_size_zero;
-                vsf_protect_t orig = vsf_protect_int();
-                    pthis->cur_size = vsf_stream_get_wbuf(stream, &pthis->cur_buff);
-                    pthis->cur_size = vsf_min(pthis->cur_size, pthis->size);
-                    pthis->cur_size &= block_size_mask;
-                    is_cur_size_zero = 0 == pthis->cur_size;
-                vsf_unprotect_int(orig);
-                if (is_cur_size_zero) {
-                    break;
-                }
+
+            uint32_t block_size_mask = ~(vk_mal_blksz(mal, pthis->addr, 0, VSF_MAL_OP_READ) - 1);
+            bool is_cur_size_zero;
+            vsf_protect_t orig = vsf_protect_int();
+                pthis->cur_size = vsf_stream_get_wbuf(stream, &pthis->cur_buff);
+                pthis->cur_size = vsf_min(pthis->cur_size, pthis->size);
+                pthis->cur_size &= block_size_mask;
+                is_cur_size_zero = 0 == pthis->cur_size;
+            vsf_unprotect_int(orig);
+            if (is_cur_size_zero) {
+                break;
             }
         }
         // fall through
@@ -416,21 +412,17 @@ __vsf_component_peda_private_entry(__vk_mal_write_stream)
                 vsf_eda_return(pthis->rw_size);
                 break;
             }
-            // avoid cur_size to be 0
-            if (pthis->cur_size > result) {
-                pthis->cur_size -= result;
-            } else /* if (result == pthis->cur_size) */ {
-                uint32_t block_size_mask = ~(vk_mal_blksz(mal, pthis->addr, 0, VSF_MAL_OP_WRITE) - 1);
-                bool is_cur_size_zero;
-                vsf_protect_t orig = vsf_protect_int();
-                    pthis->cur_size = vsf_stream_get_rbuf(stream, &pthis->cur_buff);
-                    pthis->cur_size = vsf_min(pthis->cur_size, pthis->size);
-                    pthis->cur_size &= block_size_mask;
-                    is_cur_size_zero = 0 == pthis->cur_size;
-                vsf_unprotect_int(orig);
-                if (is_cur_size_zero) {
-                    break;
-                }
+
+            uint32_t block_size_mask = ~(vk_mal_blksz(mal, pthis->addr, 0, VSF_MAL_OP_WRITE) - 1);
+            bool is_cur_size_zero;
+            vsf_protect_t orig = vsf_protect_int();
+                pthis->cur_size = vsf_stream_get_rbuf(stream, &pthis->cur_buff);
+                pthis->cur_size = vsf_min(pthis->cur_size, pthis->size);
+                pthis->cur_size &= block_size_mask;
+                is_cur_size_zero = 0 == pthis->cur_size;
+            vsf_unprotect_int(orig);
+            if (is_cur_size_zero) {
+                break;
             }
         }
         // fall through
