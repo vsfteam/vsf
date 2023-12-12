@@ -174,7 +174,9 @@ vsf_err_t vsf_hw_mmc_host_transact_start(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_trans_t 
 
     AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
     bool has_data = ((trans->buffer != NULL) && (trans->count > 0));
+    bool is_write = trans->op & MMC_CMDOP_WRITE;
     int ch;
+
     if (has_data) {
         VSF_HAL_ASSERT(trans->block_size_bits != 0);
         reg->DBLR = trans->block_size_bits;
@@ -183,7 +185,7 @@ vsf_err_t vsf_hw_mmc_host_transact_start(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_trans_t 
         reg->CTLR = (SDMMC_RESET_N | SDMMC_ENDIAN_TYPE(1) | SDMMC_DATARD_TRIGEN | SDMMC_DATAWR_TRIGEN |
                        SDMMC_DATARD_TRIGTH(DATARD_TRIG_TH) | SDMMC_DATAWR_TRIGTH(DATAWR_TRIG_TH));
 
-        if (trans->op & MMC_CMDOP_WRITE) {
+        if (is_write) {
             ch = DMA_CHANNEL_SDMMC_TX;
             dma_erqcsr_set(REQ_CID_SDMMC_TX, ch);
             dma_ch_rqr_erql_setb(ch);
@@ -209,7 +211,9 @@ vsf_err_t vsf_hw_mmc_host_transact_start(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_trans_t 
         dma_ch_tbl0sr_set(ch, ((0 << DMA_CH_STBL0SZ_LSB) | (0 << DMA_CH_DTBL0SZ_LSB)));
         dma_ch_tbl1ssr_set(ch, 0);
         dma_ch_tbl1dsr_set(ch, 0);
-        dma_ch_ctlr_set(ch, (DMA_CH_CHENA_BIT | (0x01UL << DMA_CH_BUSBU_LSB)));
+        if (is_write) {
+            dma_ch_ctlr_set(ch, (DMA_CH_CHENA_BIT | (0x01UL << DMA_CH_BUSBU_LSB)));
+        }
     }
 
     mmc_ptr->is_resp_long = !!((trans->op & (3 << 5)) == MMC_CMDOP_RESP_LONG_CRC);
@@ -217,6 +221,10 @@ vsf_err_t vsf_hw_mmc_host_transact_start(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_trans_t 
     reg->CMDR = trans->cmd;
     reg->ARGR = trans->arg;
     reg->CFGR = trans->op | SDMMC_COMMAND_START;
+
+    if (has_data && !is_write) {
+        dma_ch_ctlr_set(ch, (DMA_CH_CHENA_BIT | (0x01UL << DMA_CH_BUSBU_LSB)));
+    }
 
     return VSF_ERR_NONE;
 }
