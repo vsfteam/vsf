@@ -88,6 +88,12 @@ static void __vsf_hw_mmc_irq_handler(vsf_hw_mmc_t *mmc_ptr)
             reg->CTLR = (SDMMC_RESET_N | SDMMC_ENDIAN_TYPE(1) | SDMMC_DATARD_TRIGEN | SDMMC_DATAWR_TRIGEN |
                                SDMMC_DATARD_TRIGTH(DATARD_TRIG_TH) | SDMMC_DATAWR_TRIGTH(DATAWR_TRIG_TH));
         }
+
+        // if autocmd12 is enabled, resp is processed by hardware,
+        //  and the valud in RxR register are invalid, so remove resp_done flag
+        if (reg->CFGR & SDMMC_AUTOCMD12_ENABLE) {
+            irq &= ~MMC_IRQ_MASK_HOST_RESP_DONE;
+        }
         mmc_ptr->cfg.isr.handler_fn(mmc_ptr->cfg.isr.target_ptr, &mmc_ptr->vsf_mmc, irq, reg->GSR, resp);
     }
 }
