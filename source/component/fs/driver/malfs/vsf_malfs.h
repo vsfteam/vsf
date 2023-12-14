@@ -47,6 +47,9 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
+// for deprecated API compatiblity
+#define vk_malfs_mount_mbr                  vk_malfs_mount
+
 #define __implement_malfs_cache(__size, __number)                               \
     __vk_malfs_cache_node_t __cache_nodes[__number];                            \
     uint8_t __buffer[__size * __number];
@@ -136,8 +139,9 @@ extern vsf_err_t __vk_malfs_write(__vk_malfs_info_t *info, uint_fast64_t block_a
 extern void __vk_malfs_unmount(__vk_malfs_info_t *info);
 
 #if VSF_USE_HEAP == ENABLED
-// user should set the mal and root in mounter, then call vk_malfs_mount and wait VSF_EVT_RETURN
-extern vsf_err_t vk_malfs_mount_mbr(vk_malfs_mounter_t *mounter);
+// user should set the mal and root in mounter, then call vk_malfs_mount and wait VSF_EVT_RETURN,
+//  then check err and partition_mounted in mounter
+extern vsf_err_t vk_malfs_mount(vk_malfs_mounter_t *mounter);
 #endif
 
 #ifdef __cplusplus
