@@ -459,7 +459,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
 #else
                         vk_mim_mal_t fat_mal;
 #endif
-                        char root_name[6];
+                        char root_name[8];          // "rootxxx\0"
                         implement_fatfs_info(512, 1);
                     } vk_malfs_fat_t;
 
@@ -489,8 +489,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
 
                     vsf_local.mount_state = VSF_MOUNT_STATE_CREATE_ROOT;
                     strcpy(malfs_fat->root_name, "root");
-                    malfs_fat->root_name[4] = '0' + vsf_local.partition_idx;
-                    malfs_fat->root_name[5] = '\0';
+                    itoa(vsf_local.partition_idx, &malfs_fat->root_name[4], 10);
                     vsf_local.cur_root_name = malfs_fat->root_name;
                     if (VSF_ERR_NONE != vk_file_create(mounter->dir, vsf_local.cur_root_name, VSF_FILE_ATTR_DIRECTORY)) {
                         goto return_mount_failed;
