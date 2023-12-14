@@ -401,6 +401,10 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
             }
             goto next_partition;
         case VSF_MOUNT_STATE_PROBE_FS:
+            if (result != mal_block_size) {
+                vsf_heap_free(vsf_local.sectbuf_probe);
+                goto return_failed;
+            }
 #if VSF_FS_USE_FATFS == ENABLED
             for (int i = 0; i < dimof(__vk_malfs_ops); i++) {
                 if (VSF_ERR_NONE == __vk_malfs_ops[i].fsop->fn_probe(vsf_local.sectbuf_probe, mal_block_size)) {
@@ -506,10 +510,12 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
                         vk_mim_mal_t fat_mal;
 #endif
                         char root_name[8];          // "rootxxx\0"
-                        implement_fatfs_info(512, 1);
+                        implement(__vk_fatfs_info_t)
+                        __vk_malfs_cache_node_t __cache_nodes[1];
+                         uint8_t __buffer[0];
                     } vk_malfs_fat_t;
 
-                    vk_malfs_fat_t *malfs_fat = (vk_malfs_fat_t *)vsf_heap_malloc(sizeof(vk_malfs_fat_t));
+                    vk_malfs_fat_t *malfs_fat = (vk_malfs_fat_t *)vsf_heap_malloc(sizeof(vk_malfs_fat_t) + mal_block_size);
                     if (NULL == malfs_fat) {
                         goto return_not_enough_resources;
                     }
@@ -528,10 +534,10 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
                     malfs_fat->fat_mal.host_mal = mal;
                     malfs_fat->fat_mal.drv = &vk_mim_mal_drv;
 #endif
-                    malfs_fat->fat_mal.offset = vsf_local.start_sector * 512;
-                    malfs_fat->fat_mal.size = vsf_local.sector_count * 512;
+                    malfs_fat->fat_mal.offset = vsf_local.start_sector * mal_block_size;
+                    malfs_fat->fat_mal.size = vsf_local.sector_count * mal_block_size;
                     malfs_fat->mal = &malfs_fat->fat_mal.use_as__vk_mal_t;
-                    init_fatfs_info_ex(malfs_fat, 512, 1, malfs_fat);
+                    init_fatfs_info_ex(malfs_fat, mal_block_size, 1, malfs_fat);
 
                     vsf_local.mount_state = VSF_MOUNT_STATE_CREATE_ROOT;
                     strcpy(malfs_fat->root_name, "root");
