@@ -367,7 +367,8 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
                     ||  strncmp(gpt->signature, "EFI PART", sizeof(gpt->signature))
                     ||  (le32_to_cpu(gpt->header_size) != 92)
                     ||  (le64_to_cpu(gpt->current_lba) != 1)
-                    ||  (le32_to_cpu(gpt->partition_entry_size) != sizeof(vk_mal_gpt_entry_t))) {
+                    ||  (le32_to_cpu(gpt->partition_entry_size) != sizeof(vk_mal_gpt_entry_t))
+                    ||  (le32_to_cpu(gpt->partition_entry_num) >= 256)) {
                     goto return_failed;
                 }
                 vsf_local.partition_entry_lba = le64_to_cpu(gpt->partition_entry_lba);
