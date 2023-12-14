@@ -98,6 +98,7 @@ vsf_class(vk_fs_op_t) {
         uint8_t sync_local_size;
 #endif
         uint8_t rename_local_size;
+        vsf_err_t (*fn_probe)(uint8_t *sector0_buf, uint_fast32_t sector_size);
         vsf_peda_evthandler_t fn_mount;
         vsf_peda_evthandler_t fn_unmount;
         vsf_peda_evthandler_t fn_rename;

@@ -44,6 +44,7 @@ typedef enum vk_malfs_mount_state_t {
     VSF_MOUNT_STATE_READ_MBR,
     VSF_MOUNT_STATE_READ_GPT_HEADER,
     VSF_MOUNT_STATE_READ_GPT_PARTITION_ENTRY,
+    VSF_MOUNT_STATE_PROBE_FS,
     VSF_MOUNT_STATE_PARSE_GPT_PARTITION_ENTRY,
     VSF_MOUNT_STATE_CREATE_ROOT,
     VSF_MOUNT_STATE_OPEN_ROOT,
@@ -76,7 +77,7 @@ typedef struct vk_malfs_dpt_t {
     uint8_t start_head_number;
     uint8_t start_sector_number;
     uint8_t start_cylinder_number;
-    uint8_t paritition_type;
+    uint8_t partition_type;
     uint8_t end_head_number;
     uint8_t end_sector_number;
     uint8_t end_cylinder_number;
@@ -121,6 +122,19 @@ typedef struct vk_mal_gpt_entry_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+#if VSF_FS_USE_FATFS == ENABLED
+struct {
+    const vk_fs_op_t *fsop;
+    uint8_t partition_type;
+} static const __vk_malfs_ops[] = {
+    // fn_probe of supported fsop MUST not be zero
+#   if VSF_FS_USE_FATFS == ENABLED
+    { &vk_fatfs_op, VSF_MBR_PARTITION_TYPE_FAT32_LBA },
+#   endif
+};
+#endif
+
 /*============================ IMPLEMENTATION ================================*/
 
 void __vk_malfs_init(__vk_malfs_info_t *info)
@@ -307,6 +321,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
     uint64_t partition_entry_lba;
     vk_malfs_mount_partition_t cur_partition;
     uint8_t *sectbuf;
+    uint8_t *sectbuf_probe;
     char *cur_root_name;
     uint32_t start_sector;
     uint32_t sector_count;
@@ -385,6 +400,18 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
                 goto return_failed;
             }
             goto next_partition;
+        case VSF_MOUNT_STATE_PROBE_FS:
+#if VSF_FS_USE_FATFS == ENABLED
+            for (int i = 0; i < dimof(__vk_malfs_ops); i++) {
+                if (VSF_ERR_NONE == __vk_malfs_ops[i].fsop->fn_probe(vsf_local.sectbuf_probe, mal_block_size)) {
+                    vsf_heap_free(vsf_local.sectbuf_probe);
+                    vsf_local.partition_type = __vk_malfs_ops[i].partition_type;
+                    goto mount_partition;
+                }
+            }
+#endif
+            vsf_heap_free(vsf_local.sectbuf_probe);
+            goto next_partition;
         case VSF_MOUNT_STATE_READ_MBR:
             if (    (result != mal_block_size)
                 ||  (0xAA55 != le16_to_cpu(mbr->magic))) {
@@ -392,7 +419,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
             }
             vsf_local.partition_idx = -1;
             mounter->partition_mounted = 0;
-            if (mbr->dpt[0].paritition_type == 0xEE) {
+            if (mbr->dpt[0].partition_type == 0xEE) {
                 vsf_local.mount_state = VSF_MOUNT_STATE_READ_GPT_HEADER;
                 // lba1 is gpt header
                 if (VSF_ERR_NONE != vk_mal_read(mal, 1 * mal_block_size,
@@ -429,19 +456,37 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
                 vsf_local.mount_state = VSF_MOUNT_STATE_PARSE_GPT_PARTITION_ENTRY;
                 vk_mal_gpt_entry_t *entry = (vk_mal_gpt_entry_t *)(vsf_local.sectbuf
                         + partition_idx_in_block * sizeof(vk_mal_gpt_entry_t));
-                // TODO: parse partition entry
-                goto next_partition;
+                if (!(((uint64_t *)entry)[0] + ((uint64_t *)entry)[1])) {
+                    mounter->err = VSF_ERR_NONE;
+                    goto do_return;
+                }
+
+                vsf_local.start_sector = le32_to_cpu(entry->first_lba);
+                vsf_local.sector_count = le32_to_cpu(entry->last_lba - entry->first_lba);
+                vsf_local.mount_state = VSF_MOUNT_STATE_PROBE_FS;
+                vsf_local.sectbuf_probe = vsf_heap_malloc(mal_block_size);
+                if (NULL == vsf_local.sectbuf_probe) {
+                    mounter->err = VSF_ERR_NOT_ENOUGH_RESOURCES;
+                    goto do_return;
+                }
+                if (VSF_ERR_NONE != vk_mal_read(mal,
+                        vsf_local.start_sector * mal_block_size,
+                        mal_block_size, vsf_local.sectbuf_probe)) {
+                    goto return_failed;
+                }
+                break;
             } else {
                 if (++vsf_local.partition_idx >= dimof(mbr->dpt)) {
                     mounter->err = VSF_ERR_NONE;
                     goto do_return;
                 }
                 dpt = &mbr->dpt[vsf_local.partition_idx];
-                vsf_local.partition_type = dpt->paritition_type;
+                vsf_local.partition_type = dpt->partition_type;
                 vsf_local.start_sector = le32_to_cpu(dpt->sectors_preceding);
                 vsf_local.sector_count = le32_to_cpu(dpt->sectors_in_partition);
             }
 
+        mount_partition:
             switch (vsf_local.partition_type) {
             default:
                 // not supported

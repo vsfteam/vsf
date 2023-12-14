@@ -179,6 +179,7 @@ typedef struct vk_fatfs_setpos_local {
 
 /*============================ PROTOTYPES ====================================*/
 
+static vsf_err_t __vk_fatfs_probe(uint8_t *sector0_buf, uint_fast32_t sector_size);
 dcl_vsf_peda_methods(static, __vk_fatfs_mount)
 dcl_vsf_peda_methods(static, __vk_fatfs_unmount)
 dcl_vsf_peda_methods(static, __vk_fatfs_lookup)
@@ -196,6 +197,7 @@ dcl_vsf_peda_methods(static, __vk_fatfs_setsize)
 #endif
 
 const vk_fs_op_t vk_fatfs_op = {
+    .fn_probe               = __vk_fatfs_probe,
     .fn_mount               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_mount),
     .fn_unmount             = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_unmount),
 #if VSF_FS_CFG_USE_CACHE == ENABLED
@@ -373,6 +375,14 @@ static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
     info->root.cur.cluster = info->root.first_cluster;
 
     return VSF_ERR_NONE;
+}
+
+static vsf_err_t __vk_fatfs_probe(uint8_t *sector0_buf, uint_fast32_t sector_size)
+{
+    __vk_fatfs_info_t info = {
+        .block_size = sector_size,
+    };
+    return __vk_fatfs_parse_dbr(&info, sector0_buf);
 }
 
 static uint_fast32_t __vk_fatfs_clus2sec(__vk_fatfs_info_t *fsinfo, uint_fast32_t cluster)
@@ -560,9 +570,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_mount, vk_fs_mount)
         break;
     case VSF_EVT_RETURN: {
             uint8_t *buff = (uint8_t *)vsf_eda_get_return_value();
-
             if (NULL == buff) {
-                VSF_FS_ASSERT(false);
                 vsf_eda_return(VSF_ERR_FAIL);
                 return;
             }
@@ -571,7 +579,6 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_mount, vk_fs_mount)
             case MOUNT_STATE_PARSE_DBR:
                 if (VSF_ERR_NONE != __vk_fatfs_parse_dbr(fsinfo, buff)) {
                 return_fail:
-                    VSF_FS_ASSERT(false);
                     vsf_eda_return(VSF_ERR_FAIL);
                     return;
                 }
@@ -648,7 +655,6 @@ __vsf_component_peda_private_entry(__vk_fatfs_get_fat_entry,,
         case LOOKUP_FAT_STATE_PARSE: {
                 uint8_t *buff = (uint8_t *)vsf_eda_get_return_value();
                 if (NULL == buff) {
-                    VSF_FS_ASSERT(false);
                     vsf_eda_return(VSF_ERR_FAIL);
                     break;
                 }
