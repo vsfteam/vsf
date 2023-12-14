@@ -36,7 +36,15 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-enum vk_malfs_partition_type_t {
+typedef enum vk_malfs_mount_state_t {
+    VSF_MOUNT_STATE_READ_MBR,
+    VSF_MOUNT_STATE_CREATE_ROOT,
+    VSF_MOUNT_STATE_OPEN_ROOT,
+    VSF_MOUNT_STATE_MOUNT,
+    VSF_MOUNT_STATE_RENAME_ROOT,
+} vk_malfs_mount_state_t;
+
+typedef enum vk_malfs_partition_type_t {
     VSF_MBR_PARTITION_TYPE_NONE             = 0x00,
     VSF_MBR_PARTITION_TYPE_FAT12_CHS        = 0x01,
     VSF_MBR_PARTITION_TYPE_FAT16_16_32_CHS  = 0x04,
@@ -47,8 +55,14 @@ enum vk_malfs_partition_type_t {
     VSF_MBR_PARTITION_TYPE_FAT32_LBA        = 0x0C,
     VSF_MBR_PARTITION_TYPE_FAT16_32_2G_LBA  = 0x0E,
     VSF_MBR_PARTITION_TYPE_MS_EXT_LBA       = 0x0F,
-};
-typedef enum vk_malfs_partition_type_t vk_malfs_partition_type_t;
+} vk_malfs_partition_type_t;
+
+typedef struct vk_malfs_mount_partition_t {
+    void *fsinfo;
+    __vk_malfs_info_t *malfs_info;
+    const vk_fs_op_t *fsop;
+    vk_file_t *root;
+} vk_malfs_mount_partition_t;
 
 struct vk_malfs_dpt_t {
     uint8_t boot_signature;
@@ -258,14 +272,23 @@ void __vk_malfs_unmount(__vk_malfs_info_t *info)
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
-__vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
+__vsf_component_peda_private_entry(__vk_malfs_mount_mbr,
+    vk_malfs_mount_partition_t cur_partition;
+    uint8_t *mbr;
+    char *cur_root_name;
+    uint32_t start_sector;
+    uint32_t sector_count;
+    vk_malfs_mount_state_t mount_state;
+    uint8_t partition_idx;
+    uint8_t partition_type;
+)
 {
     vsf_peda_begin();
     vk_malfs_mounter_t *mounter = (vk_malfs_mounter_t *)&vsf_this;
-    vk_malfs_mbr_t *mbr = (vk_malfs_mbr_t *)mounter->mbr;
+    vk_malfs_mbr_t *mbr = (vk_malfs_mbr_t *)vsf_local.mbr;
     vk_malfs_dpt_t *dpt;
 
-    vk_malfs_mount_partition_t *partition = &mounter->cur_partition;
+    vk_malfs_mount_partition_t *partition = &vsf_local.cur_partition;
     vk_mal_t *mal = mounter->mal;
     int32_t result;
 
@@ -276,20 +299,20 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
             vsf_eda_mutex_init(mounter->mutex);
         }
 #endif
-        mounter->mbr = vsf_heap_malloc(512);
-        if (NULL == mounter->mbr) {
+        vsf_local.mbr = vsf_heap_malloc(512);
+        if (NULL == vsf_local.mbr) {
         return_not_enough_resources:
             mounter->err = VSF_ERR_NOT_ENOUGH_RESOURCES;
         do_return:
-            if (mounter->mbr != NULL) {
-                vsf_heap_free(mounter->mbr);
+            if (vsf_local.mbr != NULL) {
+                vsf_heap_free(vsf_local.mbr);
             }
             vsf_eda_return();
             break;
         }
 
-        mounter->mount_state = VSF_MOUNT_STATE_READ_MBR;
-        if (VSF_ERR_NONE != vk_mal_read(mal, 0, 512, mounter->mbr)) {
+        vsf_local.mount_state = VSF_MOUNT_STATE_READ_MBR;
+        if (VSF_ERR_NONE != vk_mal_read(mal, 0, 512, vsf_local.mbr)) {
         return_failed:
             mounter->err = VSF_ERR_FAIL;
             goto do_return;
@@ -297,20 +320,25 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
         break;
     case VSF_EVT_RETURN:
         result = (int32_t)vsf_eda_get_return_value();
-        switch (mounter->mount_state) {
+        switch (vsf_local.mount_state) {
         case VSF_MOUNT_STATE_READ_MBR:
             if (    (result < 0)
                 ||  (0xAA55 != le16_to_cpu(mbr->magic))) {
                 goto return_failed;
             }
-            mounter->partition_idx = -1;
+            vsf_local.partition_idx = -1;
+            mounter->partition_mounted = 0;
         next_partition:
-            if (++mounter->partition_idx >= dimof(mbr->dpt)) {
+            if (++vsf_local.partition_idx >= dimof(mbr->dpt)) {
                 mounter->err = VSF_ERR_NONE;
                 goto do_return;
             }
-            dpt = &mbr->dpt[mounter->partition_idx];
-            switch (dpt->paritition_type) {
+            dpt = &mbr->dpt[vsf_local.partition_idx];
+            vsf_local.partition_type = dpt->paritition_type;
+            vsf_local.start_sector = le32_to_cpu(dpt->sectors_preceding);
+            vsf_local.sector_count = le32_to_cpu(dpt->sectors_in_partition);
+
+            switch (vsf_local.partition_type) {
             default:
                 // not supported
             case VSF_MBR_PARTITION_TYPE_NONE:
@@ -351,17 +379,17 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
                     malfs_fat->fat_mal.host_mal = mal;
                     malfs_fat->fat_mal.drv = &vk_mim_mal_drv;
 #endif
-                    malfs_fat->fat_mal.offset = le32_to_cpu(dpt->sectors_preceding) * 512;
-                    malfs_fat->fat_mal.size = le32_to_cpu(dpt->sectors_in_partition) * 512;
+                    malfs_fat->fat_mal.offset = vsf_local.start_sector * 512;
+                    malfs_fat->fat_mal.size = vsf_local.sector_count * 512;
                     malfs_fat->mal = &malfs_fat->fat_mal.use_as__vk_mal_t;
                     init_fatfs_info_ex(malfs_fat, 512, 1, malfs_fat);
 
-                    mounter->mount_state = VSF_MOUNT_STATE_CREATE_ROOT;
+                    vsf_local.mount_state = VSF_MOUNT_STATE_CREATE_ROOT;
                     strcpy(malfs_fat->root_name, "root");
-                    malfs_fat->root_name[4] = '0' + mounter->partition_idx;
+                    malfs_fat->root_name[4] = '0' + vsf_local.partition_idx;
                     malfs_fat->root_name[5] = '\0';
-                    mounter->cur_root_name = malfs_fat->root_name;
-                    if (VSF_ERR_NONE != vk_file_create(mounter->dir, mounter->cur_root_name, VSF_FILE_ATTR_DIRECTORY)) {
+                    vsf_local.cur_root_name = malfs_fat->root_name;
+                    if (VSF_ERR_NONE != vk_file_create(mounter->dir, vsf_local.cur_root_name, VSF_FILE_ATTR_DIRECTORY)) {
                         goto return_mount_failed;
                     }
                 }
@@ -373,8 +401,8 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
             if (result < 0) {
                 goto return_mount_failed;
             }
-            mounter->mount_state = VSF_MOUNT_STATE_OPEN_ROOT;
-            if (VSF_ERR_NONE != vk_file_open(mounter->dir, mounter->cur_root_name, &partition->root)) {
+            vsf_local.mount_state = VSF_MOUNT_STATE_OPEN_ROOT;
+            if (VSF_ERR_NONE != vk_file_open(mounter->dir, vsf_local.cur_root_name, &partition->root)) {
                 goto return_mount_failed;
             }
             break;
@@ -382,7 +410,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
             if (result < 0) {
                 goto return_mount_failed;
             }
-            mounter->mount_state = VSF_MOUNT_STATE_MOUNT;
+            vsf_local.mount_state = VSF_MOUNT_STATE_MOUNT;
             if (VSF_ERR_NONE != vk_fs_mount(partition->root, partition->fsop, partition->fsinfo)) {
                 goto return_mount_failed;
             }
@@ -396,12 +424,13 @@ __vsf_component_peda_private_entry(__vk_malfs_mount_mbr)
                 goto return_failed;
             }
             if (partition->malfs_info->volume_name != NULL) {
-                mounter->mount_state = VSF_MOUNT_STATE_RENAME_ROOT;
+                vsf_local.mount_state = VSF_MOUNT_STATE_RENAME_ROOT;
                 vk_file_rename(mounter->dir, partition->root->name, NULL, partition->malfs_info->volume_name);
                 break;
             }
             // fall through
         case VSF_MOUNT_STATE_RENAME_ROOT:
+            mounter->partition_mounted++;
             goto next_partition;
             break;
         }

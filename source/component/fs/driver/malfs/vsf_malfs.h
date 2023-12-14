@@ -110,21 +110,6 @@ vsf_class(__vk_malfs_info_t) {
 };
 
 #if VSF_USE_HEAP == ENABLED
-typedef enum vk_malfs_mount_state_t {
-    VSF_MOUNT_STATE_READ_MBR,
-    VSF_MOUNT_STATE_CREATE_ROOT,
-    VSF_MOUNT_STATE_OPEN_ROOT,
-    VSF_MOUNT_STATE_MOUNT,
-    VSF_MOUNT_STATE_RENAME_ROOT,
-} vk_malfs_mount_state_t;
-
-typedef struct vk_malfs_mount_partition_t {
-    void *fsinfo;
-    __vk_malfs_info_t *malfs_info;
-    const vk_fs_op_t *fsop;
-    vk_file_t *root;
-} vk_malfs_mount_partition_t;
-
 vsf_class(vk_malfs_mounter_t) {
     public_member(
         vk_mal_t *mal;
@@ -134,13 +119,7 @@ vsf_class(vk_malfs_mounter_t) {
 #endif
         vk_file_t *dir;
         public_const vsf_err_t err;
-    )
-    private_member(
-        uint8_t *mbr;
-        vk_malfs_mount_partition_t cur_partition;
-        vk_malfs_mount_state_t mount_state;
-        char *cur_root_name;
-        uint8_t partition_idx;
+        public_const uint8_t partition_mounted;
     )
 };
 #endif
