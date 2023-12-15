@@ -510,9 +510,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
                         vk_mim_mal_t fat_mal;
 #endif
                         char root_name[8];          // "rootxxx\0"
-                        implement(__vk_fatfs_info_t)
-                        __vk_malfs_cache_node_t __cache_nodes[1];
-                         uint8_t __buffer[0];
+                        implement_fatfs_info(0, 1);
                     } vk_malfs_fat_t;
 
                     vk_malfs_fat_t *malfs_fat = (vk_malfs_fat_t *)vsf_heap_malloc(sizeof(vk_malfs_fat_t) + mal_block_size);
