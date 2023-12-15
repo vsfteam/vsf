@@ -33,7 +33,7 @@
             non-reentrant.
 #endif
 
-#if VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE < 64
+#if defined(VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE) && VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE < 64
 #   error VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE MUST be >= 64
 #endif
 
