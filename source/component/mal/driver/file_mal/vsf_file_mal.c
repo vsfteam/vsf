@@ -98,7 +98,9 @@ __vsf_component_peda_ifs_entry(__vk_file_mal_fini, vk_mal_fini)
     vsf_peda_end();
 }
 
-__vsf_component_peda_ifs_entry(__vk_file_mal_read, vk_mal_read)
+__vsf_component_peda_ifs_entry(__vk_file_mal_read, vk_mal_read,
+    uint8_t state;
+)
 {
     vsf_peda_begin();
     enum {
@@ -110,7 +112,7 @@ __vsf_component_peda_ifs_entry(__vk_file_mal_read, vk_mal_read)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        vsf_eda_set_user_value(STATE_SET_POS);
+        vsf_local.state = STATE_SET_POS;
         err = vk_file_seek(pthis->file, vsf_local.addr, VSF_FILE_SEEK_SET);
     __check_result:
         if (err != VSF_ERR_NONE) {
@@ -119,9 +121,9 @@ __vsf_component_peda_ifs_entry(__vk_file_mal_read, vk_mal_read)
         }
         break;
     case VSF_EVT_RETURN:
-        switch (vsf_eda_get_user_value()) {
+        switch (vsf_local.state) {
         case STATE_SET_POS:
-            vsf_eda_set_user_value(STATE_READ);
+            vsf_local.state = STATE_READ;
             err = vk_file_read(pthis->file, vsf_local.buff, vsf_local.size);
             goto __check_result;
         case STATE_READ:
@@ -133,7 +135,9 @@ __vsf_component_peda_ifs_entry(__vk_file_mal_read, vk_mal_read)
     vsf_peda_end();
 }
 
-__vsf_component_peda_ifs_entry(__vk_file_mal_write, vk_mal_write)
+__vsf_component_peda_ifs_entry(__vk_file_mal_write, vk_mal_write,
+    uint8_t state;
+)
 {
     vsf_peda_begin();
     enum {
@@ -145,7 +149,7 @@ __vsf_component_peda_ifs_entry(__vk_file_mal_write, vk_mal_write)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        vsf_eda_set_user_value(STATE_SET_POS);
+        vsf_local.state = STATE_SET_POS;
         err = vk_file_seek(pthis->file, vsf_local.addr, VSF_FILE_SEEK_SET);
     __check_result:
         if (err != VSF_ERR_NONE) {
@@ -154,9 +158,9 @@ __vsf_component_peda_ifs_entry(__vk_file_mal_write, vk_mal_write)
         }
         break;
     case VSF_EVT_RETURN:
-        switch (vsf_eda_get_user_value()) {
+        switch (vsf_local.state) {
         case STATE_SET_POS:
-            vsf_eda_set_user_value(STATE_WRITE);
+            vsf_local.state = STATE_WRITE;
             err = vk_file_write(pthis->file, vsf_local.buff, vsf_local.size);
             goto __check_result;
         case STATE_WRITE:

@@ -222,6 +222,7 @@ __vsf_component_peda_private_entry(__vk_malfs_read,
     uint64_t block_addr;
     uint32_t block_num;
     uint8_t *buff;
+    uint8_t state;
 ) {
     vsf_peda_begin();
     __vk_malfs_info_t *info = (__vk_malfs_info_t *)&vsf_this;
@@ -235,13 +236,13 @@ __vsf_component_peda_private_entry(__vk_malfs_read,
     case VSF_EVT_INIT:
         if (NULL == vsf_local.buff) {
             VSF_FS_ASSERT(1 == vsf_local.block_num);
-            vsf_eda_set_user_value(STATE_GET_CACHE);
+            vsf_local.state = STATE_GET_CACHE;
             __vk_malfs_alloc_cache(info, &info->cache, vsf_local.block_addr);
             return;
         }
-        vsf_eda_set_user_value(STATE_COMMIT_READ);
+        vsf_local.state = STATE_COMMIT_READ;
     case VSF_EVT_RETURN:
-        switch (vsf_eda_get_user_value()) {
+        switch (vsf_local.state) {
         case STATE_GET_CACHE: {
                 __vk_malfs_cache_node_t *node = (__vk_malfs_cache_node_t *)vsf_eda_get_return_value();
                 VSF_FS_ASSERT(node != NULL);
@@ -255,7 +256,7 @@ __vsf_component_peda_private_entry(__vk_malfs_read,
             }
             // fall through
         case STATE_COMMIT_READ:
-            vsf_eda_set_user_value(STATE_FINISH_READ);
+            vsf_local.state = STATE_FINISH_READ;
             vk_mal_read(info->mal, info->block_size * vsf_local.block_addr,
                         info->block_size * vsf_local.block_num, vsf_local.buff);
             break;

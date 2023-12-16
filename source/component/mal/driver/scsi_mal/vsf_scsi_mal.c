@@ -93,7 +93,9 @@ static bool __vk_scsi_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
-__vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init)
+__vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init,
+    uint8_t state;
+)
 {
     vsf_peda_begin();
     enum {
@@ -107,13 +109,13 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init)
     switch (evt) {
     case VSF_EVT_INIT:
         VSF_MAL_ASSERT((pthis != NULL) && (pthis->scsi != NULL));
-        vsf_eda_set_user_value(STATE_INIT);
+        vsf_local.state = STATE_INIT;
         vk_scsi_init(pthis->scsi);
         break;
     case VSF_EVT_RETURN:
         err = vsf_eda_get_return_value();
         memset(pthis->cbd, 0, sizeof(pthis->cbd));
-        switch (vsf_eda_get_user_value()) {
+        switch (vsf_local.state) {
         case STATE_INIT:
             if (err < 0){
             __return:
@@ -125,7 +127,7 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init)
             pthis->cbd[4] = 0x24;
             pthis->mem.buffer = (uint8_t *)&pthis->buffer.inquiry;
             pthis->mem.size = sizeof(pthis->buffer.inquiry);
-            vsf_eda_set_user_value(STATE_INQUIRY);
+            vsf_local.state = STATE_INQUIRY;
             vk_scsi_execute(pthis->scsi, pthis->cbd, &pthis->mem);
             break;
         case STATE_INQUIRY:
@@ -140,7 +142,7 @@ __vsf_component_peda_ifs_entry(__vk_scsi_mal_init, vk_mal_init)
             pthis->cbd[0] = 0x25;
             pthis->mem.buffer = (uint8_t *)&pthis->buffer.capacity;
             pthis->mem.size = sizeof(pthis->buffer.capacity);
-            vsf_eda_set_user_value(STATE_CAPACITY);
+            vsf_local.state = STATE_CAPACITY;
             vk_scsi_execute(pthis->scsi, pthis->cbd, &pthis->mem);
             break;
         case STATE_CAPACITY:
