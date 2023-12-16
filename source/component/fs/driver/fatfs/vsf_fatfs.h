@@ -22,7 +22,7 @@
 
 #include "../../vsf_fs_cfg.h"
 
-#if VSF_USE_FS == ENABLED && VSF_FS_USE_FATFS == ENABLED
+#if VSF_USE_FS == ENABLED && (VSF_FS_USE_FATFS == ENABLED || VSF_FS_USE_EXFATFS == ENABLED)
 
 #include "../malfs/vsf_malfs.h"
 
@@ -129,7 +129,11 @@ vsf_class(__vk_fatfs_info_t) {
     private_member(
         vk_fatfs_file_t root;
         vk_fat_type_t type;
+#if VSF_FS_USE_EXFATFS == ENABLED
+        char fat_volume_name[24];
+#else
         char fat_volume_name[12];
+#endif
 
         // fat parameters, will not change after mount
         uint32_t root_sector;

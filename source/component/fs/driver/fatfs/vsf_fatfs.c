@@ -43,6 +43,15 @@
 #define FAT_ATTR_DIRECTORY              0x10
 #define FAT_ATTR_ARCHIVE                0x20
 
+// exFAT Directory Entry Type
+
+#define EXFAT_ET_BITMAP                 0x81
+#define EXFAT_ET_UPCASE                 0x82
+#define EXFAT_ET_VOLUME_LABEL           0x83
+#define EXFAT_ET_FILE_DIR               0x85
+#define EXFAT_ET_STREAM                 0xC0
+#define EXFAT_ET_FILENAME               0xC1
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -138,6 +147,13 @@ typedef struct fatfs_dentry_t {
             uint16_t FstClusLo;
             uint32_t FileSize;
         } PACKED fat;
+        struct {
+            uint8_t EntryType;
+            uint8_t Count;
+            union {
+                uint8_t Buffer[30];
+            };
+        } PACKED exfat;
     } PACKED;
 } PACKED fatfs_dentry_t;
 
@@ -269,6 +285,12 @@ bool vk_fatfs_is_lfn(char *name)
     return has_lower && has_upper;
 }
 
+static uint_fast32_t __vk_fatfs_clus2sec(__vk_fatfs_info_t *fsinfo, uint_fast32_t cluster)
+{
+    cluster -= fsinfo->root.first_cluster ? fsinfo->root.first_cluster : 2;
+    return fsinfo->data_sector + (cluster << fsinfo->cluster_size_bits);
+}
+
 static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
 {
     fatfs_dbr_t *dbr = (fatfs_dbr_t *)buff;
@@ -279,7 +301,8 @@ static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
         return VSF_ERR_FAIL;
     }
 
-    for (tmp32 = 0; (tmp32 < 53) && *buff; tmp32++, buff++);
+    buff += 3 + 8;      // skip jmp and oem
+    for (tmp32 = 0; (tmp32 < 53) && !*buff; tmp32++, buff++);
     if (tmp32 < 53) {
         // normal FAT12, FAT16, FAT32
         uint_fast32_t sector_num, cluster_num;
@@ -351,7 +374,8 @@ static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
             info->root.first_cluster = 0;
             info->cluster_num = cluster_num + 2;
         }
-    } else {
+#if VSF_FS_USE_EXFATFS == ENABLED
+    } else if (!strncmp((char const *)dbr->oem, "EXFAT   ", sizeof(dbr->oem))) {
         // bpb all 0, exFAT
         info->type = VSF_FAT_EX;
 
@@ -361,16 +385,19 @@ static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
         info->fat_size = le32_to_cpu(dbr->exfat.bpb.FATSecCount);
         info->root_size = 0;
         info->fat_sector = le32_to_cpu(dbr->exfat.bpb.FATSecStart);
-        info->root_sector = le32_to_cpu(dbr->exfat.bpb.ClusSecStart);
-        info->data_sector = info->root_sector;
-        info->root.first_cluster = le32_to_cpu(dbr->exfat.bpb.RootClus);
+        info->data_sector = le32_to_cpu(dbr->exfat.bpb.ClusSecStart);
+        info->root.first_cluster = 2;
         info->cluster_num = le32_to_cpu(dbr->exfat.bpb.ClusSecCount) + 2;
+        info->root_sector = __vk_fatfs_clus2sec(info, le32_to_cpu(dbr->exfat.bpb.RootClus));
 
         // SecBits CANNOT be smaller than 9, which is 512 byte
         // RootClus CANNOT be less than 2
         if ((info->sector_size_bits < 9) || (info->root.first_cluster < 2)) {
             return VSF_ERR_FAIL;
         }
+#endif
+    } else {
+        return VSF_ERR_FAIL;
     }
     info->root.cur.cluster = info->root.first_cluster;
 
@@ -383,12 +410,6 @@ static vsf_err_t __vk_fatfs_probe(uint8_t *sector0_buf, uint_fast32_t sector_siz
         .block_size = sector_size,
     };
     return __vk_fatfs_parse_dbr(&info, sector0_buf);
-}
-
-static uint_fast32_t __vk_fatfs_clus2sec(__vk_fatfs_info_t *fsinfo, uint_fast32_t cluster)
-{
-    cluster -= fsinfo->root.first_cluster ? fsinfo->root.first_cluster : 2;
-    return fsinfo->data_sector + (cluster << fsinfo->cluster_size_bits);
 }
 
 static bool __vk_fatfs_fat_entry_is_valid(__vk_fatfs_info_t *fsinfo, uint_fast32_t cluster)
@@ -589,8 +610,32 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_mount, vk_fs_mount)
                     fatfs_dentry_t *dentry = (fatfs_dentry_t *)buff;
                     malfs_info->volume_name = NULL;
                     if (VSF_FAT_EX == fsinfo->type) {
-                        // TODO: parse VolID for exfat
+#if VSF_FS_USE_EXFATFS == ENABLED
+                        if (EXFAT_ET_VOLUME_LABEL == dentry->exfat.EntryType) {
+                            if (dentry->exfat.Count > 11) {
+                                goto return_fail;
+                            }
+                            *(uint16_t *)&fsinfo->fat_volume_name[22] = 0;
+                            memcpy(fsinfo->fat_volume_name, dentry->exfat.Buffer, 2 * dentry->exfat.Count);
+
+                            bool is_ascii = true;
+                            for (uint_fast8_t i = 0; i < dentry->exfat.Count; i++) {
+                                if (fsinfo->fat_volume_name[(i << 1) + 1] != '\0') {
+                                    is_ascii = false;
+                                    break;
+                                }
+                            }
+                            if (is_ascii) {
+                                for (uint_fast8_t i = 0; i < dentry->exfat.Count; i++) {
+                                    fsinfo->fat_volume_name[i] = fsinfo->fat_volume_name[i << 1];
+                                }
+                                fsinfo->fat_volume_name[dentry->exfat.Count] = '\0';
+                            }
+                            malfs_info->volume_name = fsinfo->fat_volume_name;
+                        }
+#else
                         goto return_fail;
+#endif
                     } else if (FAT_ATTR_VOLUME_ID == dentry->fat.Attr) {
                         fsinfo->fat_volume_name[11] = '\0';
                         memcpy(fsinfo->fat_volume_name, dentry->fat.Name, 11);

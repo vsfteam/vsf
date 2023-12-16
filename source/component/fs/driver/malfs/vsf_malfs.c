@@ -58,7 +58,7 @@ typedef enum vk_malfs_partition_type_t {
     VSF_MBR_PARTITION_TYPE_FAT16_16_32_CHS  = 0x04,
     VSF_MBR_PARTITION_TYPE_MS_EXT           = 0x05,
     VSF_MBR_PARTITION_TYPE_FAT16_32_CHS     = 0x06,
-    VSF_MBR_PARTITION_TYPE_NTFS             = 0x07,
+    VSF_MBR_PARTITION_TYPE_NTFS_EXFAT       = 0x07,
     VSF_MBR_PARTITION_TYPE_FAT32_CHS        = 0x0B,
     VSF_MBR_PARTITION_TYPE_FAT32_LBA        = 0x0C,
     VSF_MBR_PARTITION_TYPE_FAT16_32_2G_LBA  = 0x0E,
@@ -500,6 +500,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
             case VSF_MBR_PARTITION_TYPE_FAT12_CHS:
             case VSF_MBR_PARTITION_TYPE_FAT16_16_32_CHS:
             case VSF_MBR_PARTITION_TYPE_FAT16_32_CHS:
+            case VSF_MBR_PARTITION_TYPE_NTFS_EXFAT:     // for exfat only, ntfs is not supported
             case VSF_MBR_PARTITION_TYPE_FAT32_CHS:
             case VSF_MBR_PARTITION_TYPE_FAT32_LBA:
             case VSF_MBR_PARTITION_TYPE_FAT16_32_2G_LBA: {
