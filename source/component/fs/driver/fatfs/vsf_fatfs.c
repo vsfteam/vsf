@@ -291,6 +291,28 @@ static uint_fast32_t __vk_fatfs_clus2sec(__vk_fatfs_info_t *fsinfo, uint_fast32_
     return fsinfo->data_sector + (cluster << fsinfo->cluster_size_bits);
 }
 
+static bool __vk_fatfs_try_unicode2ascii(uint16_t *uchar)
+{
+    bool is_unicode = false;
+    uint16_t *uchar_tmp = uchar;
+
+    while (*uchar_tmp != 0) {
+        if (*uchar_tmp++ >= 128) {
+            is_unicode = true;
+            break;
+        }
+    }
+    if (!is_unicode) {
+        char *ptr = (char *)uchar;
+        uchar_tmp = (uint16_t *)uchar;
+        while (*uchar_tmp != 0) {
+            *ptr++ = *uchar_tmp++;
+        }
+        *ptr++ = '\0';
+    }
+    return is_unicode;
+}
+
 static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
 {
     fatfs_dbr_t *dbr = (fatfs_dbr_t *)buff;
@@ -374,6 +396,7 @@ static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
             info->root.first_cluster = 0;
             info->cluster_num = cluster_num + 2;
         }
+        info->root.cur.cluster = info->root.first_cluster;
 #if VSF_FS_USE_EXFATFS == ENABLED
     } else if (!strncmp((char const *)dbr->oem, "EXFAT   ", sizeof(dbr->oem))) {
         // bpb all 0, exFAT
@@ -388,7 +411,8 @@ static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
         info->data_sector = le32_to_cpu(dbr->exfat.bpb.ClusSecStart);
         info->root.first_cluster = 2;
         info->cluster_num = le32_to_cpu(dbr->exfat.bpb.ClusSecCount) + 2;
-        info->root_sector = __vk_fatfs_clus2sec(info, le32_to_cpu(dbr->exfat.bpb.RootClus));
+        info->root.cur.cluster = le32_to_cpu(dbr->exfat.bpb.RootClus);
+        info->root_sector = __vk_fatfs_clus2sec(info, info->root.cur.cluster);
 
         // SecBits CANNOT be smaller than 9, which is 512 byte
         // RootClus CANNOT be less than 2
@@ -399,7 +423,6 @@ static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
     } else {
         return VSF_ERR_FAIL;
     }
-    info->root.cur.cluster = info->root.first_cluster;
 
     return VSF_ERR_NONE;
 }
@@ -455,8 +478,8 @@ static bool __vk_fatfs_fat_entry_is_eof(__vk_fatfs_info_t *fsinfo, uint_fast32_t
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
-// entry_num is the number of entry remain in buffer,
-//     and the entry_num of entry for current filename parsed
+// entry_num is the number of entries remained in buffer,
+//     after return, entry_num will be counted down by number of parsed entries
 // lfn is unicode encoded, but we just support ascii
 // if a filename parsed, parser->entry will point to the sfn
 bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser)
@@ -498,24 +521,7 @@ bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser)
             } else if (entry->fat.Attr != FAT_ATTR_VOLUME_ID) {
                 bool lower;
                 if (parser->lfn == 1) {
-                    // previous lfn parsed, igure sfn and return
-                    uint16_t *uchar = (uint16_t *)parser->filename;
-                    parser->is_unicode = false;
-                    while (*uchar != 0) {
-                        if (*uchar++ >= 128) {
-                            parser->is_unicode = true;
-                            break;
-                        }
-                    }
-                    if (!parser->is_unicode) {
-                        char *ptr = parser->filename;
-                        uchar = (uint16_t *)parser->filename;
-                        while (*uchar != 0) {
-                            *ptr++ = *uchar++;
-                        }
-                        *ptr++ = '\0';
-                    }
-
+                    parser->is_unicode = __vk_fatfs_try_unicode2ascii((uint16_t *)parser->filename);
                     parser->lfn = 0;
                     parsed = true;
                     break;
@@ -619,20 +625,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_mount, vk_fs_mount,
                             }
                             *(uint16_t *)&fsinfo->fat_volume_name[22] = 0;
                             memcpy(fsinfo->fat_volume_name, dentry->exfat.Buffer, 2 * dentry->exfat.Count);
-
-                            bool is_ascii = true;
-                            for (uint_fast8_t i = 0; i < dentry->exfat.Count; i++) {
-                                if (fsinfo->fat_volume_name[(i << 1) + 1] != '\0') {
-                                    is_ascii = false;
-                                    break;
-                                }
-                            }
-                            if (is_ascii) {
-                                for (uint_fast8_t i = 0; i < dentry->exfat.Count; i++) {
-                                    fsinfo->fat_volume_name[i] = fsinfo->fat_volume_name[i << 1];
-                                }
-                                fsinfo->fat_volume_name[dentry->exfat.Count] = '\0';
-                            }
+                            __vk_fatfs_try_unicode2ascii((uint16_t *)fsinfo->fat_volume_name);
                             malfs_info->volume_name = fsinfo->fat_volume_name;
                         }
 #else
