@@ -89,7 +89,7 @@ vsf_err_t vk_mal_init(vk_mal_t *pthis)
 {
     vsf_err_t err;
     VSF_MAL_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->init != NULL));
-    __vsf_component_call_peda_ifs(vk_mal_init, err, pthis->drv->init, 0, pthis);
+    __vsf_component_call_peda_ifs(vk_mal_init, err, pthis->drv->init, pthis->drv->init_local_size, pthis);
     return err;
 }
 
@@ -97,7 +97,7 @@ vsf_err_t vk_mal_fini(vk_mal_t *pthis)
 {
     vsf_err_t err;
     VSF_MAL_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->fini != NULL));
-    __vsf_component_call_peda_ifs(vk_mal_fini, err, pthis->drv->fini, 0, pthis);
+    __vsf_component_call_peda_ifs(vk_mal_fini, err, pthis->drv->fini, pthis->drv->fini_local_size, pthis);
     return err;
 }
 
@@ -123,7 +123,7 @@ vsf_err_t vk_mal_erase(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size)
 {
     vsf_err_t err;
     VSF_MAL_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->erase != NULL));
-    __vsf_component_call_peda_ifs(vk_mal_erase, err, pthis->drv->erase, 0, pthis,
+    __vsf_component_call_peda_ifs(vk_mal_erase, err, pthis->drv->erase, pthis->drv->erase_local_size, pthis,
         .addr       = addr,
         .size       = size,
     );
@@ -134,7 +134,7 @@ vsf_err_t vk_mal_read(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, u
 {
     vsf_err_t err;
     VSF_MAL_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->read != NULL));
-    __vsf_component_call_peda_ifs(vk_mal_read, err, pthis->drv->read, 0, pthis,
+    __vsf_component_call_peda_ifs(vk_mal_read, err, pthis->drv->read, pthis->drv->read_local_size, pthis,
         .addr       = addr,
         .size       = size,
         .buff       = buff,
@@ -146,7 +146,7 @@ vsf_err_t vk_mal_write(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, 
 {
     vsf_err_t err;
     VSF_MAL_ASSERT((pthis != NULL) && (pthis->drv != NULL) && (pthis->drv->write != NULL));
-    __vsf_component_call_peda_ifs(vk_mal_write, err, pthis->drv->write, 0, pthis,
+    __vsf_component_call_peda_ifs(vk_mal_write, err, pthis->drv->write, pthis->drv->write_local_size, pthis,
         .addr       = addr,
         .size       = size,
         .buff       = buff,

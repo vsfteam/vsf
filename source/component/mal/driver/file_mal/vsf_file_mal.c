@@ -54,11 +54,13 @@ dcl_vsf_peda_methods(static, __vk_file_mal_write)
 #endif
 
 const vk_mal_drv_t vk_file_mal_drv = {
-    .blksz          = __vk_file_mal_blksz,
-    .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_file_mal_init),
-    .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_file_mal_fini),
-    .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_file_mal_read),
-    .write          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_file_mal_write),
+    .blksz              = __vk_file_mal_blksz,
+    .read_local_size    = 1,
+    .write_local_size   = 1,
+    .init               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_file_mal_init),
+    .fini               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_file_mal_fini),
+    .read               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_file_mal_read),
+    .write              = (vsf_peda_evthandler_t)vsf_peda_func(__vk_file_mal_write),
 };
 
 #if     __IS_COMPILER_GCC__

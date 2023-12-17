@@ -55,12 +55,13 @@ dcl_vsf_peda_methods(static, __vk_scsi_mal_write)
 #endif
 
 const vk_mal_drv_t vk_scsi_mal_drv = {
-    .blksz          = __vk_scsi_mal_blksz,
-    .buffer         = __vk_scsi_mal_buffer,
-    .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_scsi_mal_init),
-    .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_scsi_mal_fini),
-    .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_scsi_mal_read),
-    .write          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_scsi_mal_write),
+    .blksz              = __vk_scsi_mal_blksz,
+    .buffer             = __vk_scsi_mal_buffer,
+    .init_local_size    = 1,
+    .init               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_scsi_mal_init),
+    .fini               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_scsi_mal_fini),
+    .read               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_scsi_mal_read),
+    .write              = (vsf_peda_evthandler_t)vsf_peda_func(__vk_scsi_mal_write),
 };
 
 #if     __IS_COMPILER_GCC__

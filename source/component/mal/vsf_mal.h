@@ -91,6 +91,11 @@ vsf_class(vk_mal_drv_t) {
          @note 必须在正常初始化之后，才能调用
         */
         bool (*buffer)(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
+        uint8_t init_local_size;
+        uint8_t fini_local_size;
+        uint8_t erase_local_size;
+        uint8_t read_local_size;
+        uint8_t write_local_size;
         /**
          \~english initialilze mal
          \~chinese 执行初始化操作

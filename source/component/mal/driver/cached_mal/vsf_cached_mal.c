@@ -48,13 +48,16 @@ dcl_vsf_peda_methods(static, __vk_cached_mal_erase)
 #endif
 
 const vk_mal_drv_t vk_cached_mal_drv = {
-    .blksz          = __vk_cached_mal_blksz,
-    .buffer         = __vk_cached_mal_buffer,
-    .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_init),
-    .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_fini),
-    .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_read),
-    .write          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_write),
-    .erase          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_erase),
+    .blksz              = __vk_cached_mal_blksz,
+    .buffer             = __vk_cached_mal_buffer,
+    .fini_local_size    = 4,
+    .read_local_size    = 4,
+    .write_local_size   = 8,
+    .init               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_init),
+    .fini               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_fini),
+    .read               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_read),
+    .write              = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_write),
+    .erase              = (vsf_peda_evthandler_t)vsf_peda_func(__vk_cached_mal_erase),
 };
 
 #if     __IS_COMPILER_GCC__
