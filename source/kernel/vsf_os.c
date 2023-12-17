@@ -123,6 +123,7 @@ __vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size)
     local_size = (local_size + sizeof(uintalu_t) - 1) & ~ (sizeof(uintalu_t) - 1);
     /* todo: add smart pool support in the future */
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
+    VSF_KERNEL_ASSERT(local_size <= VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE - sizeof(uintalu_t));
     __vsf_eda_frame_t *frame = (__vsf_eda_frame_t *)
             VSF_POOL_ALLOC(vsf_eda_frame_pool, &__vsf_os.eda_frame_pool);
 #else
