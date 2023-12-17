@@ -344,7 +344,7 @@ bool vk_fatfs_is_lfn(char *name)
 
 static uint_fast32_t __vk_fatfs_clus2sec(__vk_fatfs_info_t *fsinfo, uint_fast32_t cluster)
 {
-    cluster -= fsinfo->root.first_cluster ? fsinfo->root.first_cluster : 2;
+    cluster -= 2;
     return fsinfo->data_sector + (cluster << fsinfo->cluster_size_bits);
 }
 
@@ -466,10 +466,10 @@ static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
         info->root_size = 0;
         info->fat_sector = le32_to_cpu(dbr->exfat.bpb.FATSecStart);
         info->data_sector = le32_to_cpu(dbr->exfat.bpb.ClusSecStart);
-        info->root.first_cluster = 2;
         info->cluster_num = le32_to_cpu(dbr->exfat.bpb.ClusSecCount) + 2;
-        info->root.cur.cluster = le32_to_cpu(dbr->exfat.bpb.RootClus);
-        info->root_sector = __vk_fatfs_clus2sec(info, info->root.cur.cluster);
+        info->root.first_cluster = le32_to_cpu(dbr->exfat.bpb.RootClus);
+        info->root.cur.cluster = info->root.first_cluster;
+        info->root_sector = __vk_fatfs_clus2sec(info, info->root.first_cluster);
 
         // sector_size_bits size MUST be between [9, 12] which is [512, 4096] bytes
         // cluster_size_bits size MUST be between [1, 25]
