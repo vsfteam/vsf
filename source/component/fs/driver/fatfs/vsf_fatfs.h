@@ -79,10 +79,14 @@ typedef enum vk_fat_file_attr_t {
 
 typedef struct vk_fatfs_dentry_parser_t {
     uint8_t *entry;
-    int16_t entry_num;
-    uint8_t lfn;
-    bool is_unicode;
     char *filename;
+    int16_t entry_num;
+    bool is_unicode;
+    uint8_t attr;
+    uint32_t first_cluster;
+    uint64_t size;
+
+    uint8_t lfn;
 } vk_fatfs_dentry_parser_t;
 
 typedef struct vk_fatfs_file_pos_t {

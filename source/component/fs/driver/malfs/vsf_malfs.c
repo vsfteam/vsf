@@ -33,8 +33,14 @@
             non-reentrant.
 #endif
 
-#if defined(VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE) && VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE < 64
-#   error VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE MUST be >= 64
+#ifdef __VSF64__
+#   if defined(VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE) && VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE < 128
+#       error VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE MUST be >= 128
+#   endif
+#else
+#   if defined(VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE) && VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE < 64
+#       error VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE MUST be >= 64
+#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -451,7 +457,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
                     uint8_t cur_partition_entry_lba = (vsf_local.partition_idx + entry_number_in_block - 1) / entry_number_in_block;
                     vsf_local.mount_state = VSF_MOUNT_STATE_READ_GPT_PARTITION_ENTRY;
                     if (VSF_ERR_NONE != vk_mal_read(mal,
-                            (le64_to_cpu(vsf_local.partition_entry_lba) + cur_partition_entry_lba) * mal_block_size,
+                            (vsf_local.partition_entry_lba + cur_partition_entry_lba) * mal_block_size,
                             mal_block_size, vsf_local.sectbuf)) {
                         goto return_failed;
                     }

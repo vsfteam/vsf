@@ -31,6 +31,16 @@
 
 /*============================ MACROS ========================================*/
 
+#ifdef __VSF64__
+#   if defined(VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE) && VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE < 128
+#       error VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE MUST be >= 128
+#   endif
+#else
+#   if defined(VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE) && VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE < 64
+#       error VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE MUST be >= 64
+#   endif
+#endif
+
 #ifndef VSF_FATFS_CFG_MAX_FILENAME
 #   define VSF_FATFS_CFG_MAX_FILENAME   (31 * 13 + 1)
 #endif
@@ -164,6 +174,7 @@ typedef struct vk_fatfs_rw_local {
     uint32_t cur_run_size;
     uint32_t cur_run_sector;
     uint16_t offset_in_sector;
+    uint8_t state;
 } vk_fatfs_rw_local;
 
 typedef struct vk_fatfs_setsize_local {
@@ -172,19 +183,18 @@ typedef struct vk_fatfs_setsize_local {
     uint32_t next_cluster;
     vk_fatfs_file_pos_t orig_fatfs_pos;
     uint64_t orig_pos;
+    uint8_t state;
 } vk_fatfs_setsize_local;
 
 typedef struct vk_fatfs_lookup_local {
     uint32_t cur_sector;
-    char *filename;
-    uint32_t cur_offset_in_sector;
     vk_fatfs_file_pos_t fatfs_file_pos_save;
-    vk_fatfs_dentry_parser_t dparser;
-    struct {
-        uint32_t sector;
-        uint8_t entry_offset_in_sector;
-        uint8_t entry_num;
-    } dentry;
+    vk_fatfs_dentry_parser_t *dparser;
+
+    uint32_t sector;
+    uint8_t entry_offset_in_sector;
+    uint8_t entry_num;
+    uint8_t state;
 } vk_fatfs_lookup_local;
 
 typedef struct vk_fatfs_setpos_local {
@@ -214,6 +224,7 @@ dcl_vsf_peda_methods(static, __vk_fatfs_setsize)
 
 const vk_fs_op_t vk_fatfs_op = {
     .fn_probe               = __vk_fatfs_probe,
+    .mount_local_size       = 1,
     .fn_mount               = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_mount),
     .fn_unmount             = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fatfs_unmount),
 #if VSF_FS_CFG_USE_CACHE == ENABLED
@@ -414,9 +425,12 @@ static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
         info->root.cur.cluster = le32_to_cpu(dbr->exfat.bpb.RootClus);
         info->root_sector = __vk_fatfs_clus2sec(info, info->root.cur.cluster);
 
-        // SecBits CANNOT be smaller than 9, which is 512 byte
+        // sector_size_bits size MUST be between [9, 12] which is [512, 4096] bytes
+        // cluster_size_bits size MUST be between [1, 25]
         // RootClus CANNOT be less than 2
-        if ((info->sector_size_bits < 9) || (info->root.first_cluster < 2)) {
+        if (    (info->sector_size_bits < 9) || (info->sector_size_bits > 12)
+            ||  (info->cluster_size_bits < 1) || (info->cluster_size_bits > 25)
+            ||  (info->root.first_cluster < 2)) {
             return VSF_ERR_FAIL;
         }
 #endif
@@ -1066,7 +1080,6 @@ __fail_and_exit:
 
 __vsf_component_peda_ifs_entry(__vk_fatfs_setsize, vk_file_setsize,
     implement(vk_fatfs_setsize_local)
-    uint8_t state;
 ) {
     vsf_peda_begin();
     enum {
@@ -1202,7 +1215,6 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_setsize, vk_file_setsize,
 
 __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
     implement(vk_fatfs_lookup_local)
-    uint8_t state;
 ) {
     vsf_peda_begin();
 #if VSF_USE_HEAP != ENABLED
@@ -1222,11 +1234,12 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
 
     switch (evt) {
     case VSF_EVT_INIT:
-        vsf_local.filename = vsf_heap_malloc(VSF_FATFS_CFG_MAX_FILENAME);
-        if (NULL == vsf_local.filename) {
+        vsf_local.dparser = vsf_heap_malloc(sizeof(*vsf_local.dparser) + VSF_FATFS_CFG_MAX_FILENAME);
+        if (NULL == vsf_local.dparser) {
             err = VSF_ERR_NOT_ENOUGH_RESOURCES;
             goto __fail_and_exit;
         }
+        vsf_local.dparser->filename = (char *)&vsf_local.dparser[1];
         if (!dir->cur.cluster) {
             if ((fsinfo->type != VSF_FAT_12) && (fsinfo->type != VSF_FAT_16)) {
                 VSF_FS_ASSERT(false);
@@ -1238,7 +1251,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
             vsf_local.cur_sector = __vk_fatfs_clus2sec(fsinfo, dir->cur.cluster);
         }
         vsf_local.cur_sector += dir->cur.sector_offset_in_cluster;
-        vsf_local.dparser.lfn = 0;
+        vsf_local.dparser->lfn = 0;
         if (name != NULL) {
             vsf_local.fatfs_file_pos_save = dir->cur;
         }
@@ -1254,7 +1267,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
             break;
         case LOOKUP_STATE_PARSE_SECTOR: {
                 fatfs_dentry_t *dentry = (fatfs_dentry_t *)vsf_eda_get_return_value();
-                vk_fatfs_dentry_parser_t *dparser = &vsf_local.dparser;
+                vk_fatfs_dentry_parser_t *dparser = vsf_local.dparser;
 
                 if (NULL == dentry) {
                     goto __fail_and_exit;
@@ -1268,7 +1281,6 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                 dparser->entry = (uint8_t *)dentry + dir->cur.offset_in_sector;
                 dparser->entry_num = 1 << (fsinfo->sector_size_bits - 5);
                 dparser->entry_num -= dir->cur.offset_in_sector >> 5;
-                dparser->filename = vsf_local.filename;
                 while (dparser->entry_num) {
                     uint16_t entry_num = dparser->entry_num;
                     bool parsed = vk_fatfs_parse_dentry_fat(dparser);
@@ -1320,10 +1332,10 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                             fatfs_file->cur.sector_offset_in_cluster = 0;
                             fatfs_file->cur.offset_in_sector = 0;
 
-                            if (vsf_local.dentry.entry_num) {
-                                fatfs_file->dentry.sector0 = vsf_local.dentry.sector;
-                                fatfs_file->dentry.entry_offset_in_sector0 = vsf_local.dentry.entry_offset_in_sector;
-                                fatfs_file->dentry.entry_num0 = vsf_local.dentry.entry_num;
+                            if (vsf_local.entry_num) {
+                                fatfs_file->dentry.sector0 = vsf_local.sector;
+                                fatfs_file->dentry.entry_offset_in_sector0 = vsf_local.entry_offset_in_sector;
+                                fatfs_file->dentry.entry_num0 = vsf_local.entry_num;
                                 fatfs_file->dentry.sector1 = vsf_local.cur_sector;
                                 fatfs_file->dentry.entry_offset_in_sector1 = (1 << (fsinfo->sector_size_bits - 5)) - entry_num;
                                 fatfs_file->dentry.entry_num1 = parsed_entry;
@@ -1336,15 +1348,15 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                             *vsf_local.result = &fatfs_file->use_as__vk_file_t;
                             goto __fail_and_exit;
                         } else {
-                            vsf_local.dentry.entry_num = 0;
+                            vsf_local.entry_num = 0;
                         }
                         dparser->entry += 32;
                     } else if (dparser->entry_num > 0) {
                         goto __not_available;
                     } else {
-                        vsf_local.dentry.sector = vsf_local.cur_sector;
-                        vsf_local.dentry.entry_offset_in_sector = entry_num;
-                        vsf_local.dentry.entry_num = parsed_entry;
+                        vsf_local.sector = vsf_local.cur_sector;
+                        vsf_local.entry_offset_in_sector = entry_num;
+                        vsf_local.entry_num = parsed_entry;
                         break;
                     }
                 }
@@ -1397,8 +1409,8 @@ __fail_and_exit:
     if (name != NULL) {
         dir->cur = vsf_local.fatfs_file_pos_save;
     }
-    if (vsf_local.filename != NULL) {
-        vsf_heap_free(vsf_local.filename);
+    if (vsf_local.dparser != NULL) {
+        vsf_heap_free(vsf_local.dparser);
     }
     vsf_eda_return(err);
 #endif
@@ -1430,7 +1442,6 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_close, vk_file_close)
 
 __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
     implement(vk_fatfs_rw_local)
-    uint8_t state;
 ) {
     vsf_peda_begin();
     enum {
@@ -1561,7 +1572,6 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
 
 __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
     implement(vk_fatfs_rw_local)
-    uint8_t state;
 ) {
     vsf_peda_begin();
     enum {
