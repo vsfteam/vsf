@@ -574,7 +574,7 @@ vsf_component_peda_ifs_entry(__vk_fakefat32_dir_write, vk_memfs_callback_write)
     file = (vk_fakefat32_file_t *)file->d.child;
     dparser.entry = buff;
     dparser.entry_num = page_size >> 5;
-    dparser.lfn = 0;
+    dparser.zero_before_first_call = 0;
     dparser.filename = (char *)buff;
     while (dparser.entry_num) {
         if (vk_fatfs_parse_dentry_fat(&dparser)) {
