@@ -86,7 +86,17 @@ typedef struct vk_fatfs_dentry_parser_t {
     uint32_t first_cluster;
     uint64_t size;
 
-    uint8_t lfn;
+    union {
+        struct {
+            uint8_t lfn;
+        } fat;
+        struct {
+            bool fildir_parsed;
+            uint8_t namelen;
+            uint8_t namepos;
+        } exfat;
+        uint32_t zero_before_first_call;
+    };
 } vk_fatfs_dentry_parser_t;
 
 typedef struct vk_fatfs_file_pos_t {

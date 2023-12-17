@@ -159,10 +159,56 @@ typedef struct fatfs_dentry_t {
         } PACKED fat;
         struct {
             uint8_t EntryType;
-            uint8_t Count;
             union {
-                uint8_t Buffer[30];
-            };
+                struct {
+                    uint8_t CharacterCount;
+                    uint16_t VolumeLabel[11];
+                } PACKED VolumeLabel;
+                struct {
+                    uint8_t BitmapFlags;
+                    uint8_t Reserved[18];
+                    uint32_t FirstCluster;
+                    uint64_t DataLength;
+                } PACKED Bitmap;
+                struct {
+                    uint8_t Reserved1[3];
+                    uint32_t TableChecksum;
+                    uint8_t Reserved[12];
+                    uint32_t FirstCluster;
+                    uint64_t DataLength;
+                } PACKED UpCase;
+                struct {
+                    uint8_t SecondaryCount;
+                    uint16_t SetChecksum;
+                    uint16_t FileAttributes;
+                    uint16_t Reserved1;
+                    uint32_t CreateTimestamp;
+                    uint32_t LastModifiedTimestamp;
+                    uint32_t LastAccessedTimestamp;
+                    uint8_t Create10msIncrement;
+                    uint8_t LastModified10msIncrement;
+                    uint8_t CreateUtcOffset;
+                    uint8_t LastModifiedUtcOffset;
+                    uint8_t LaseAccessedUtcOffset;
+                    uint8_t Reserved2[7];
+                } PACKED FilDir;
+                struct {
+                    uint8_t GeneralSecondaryFlags;
+                    uint8_t Reserved1;
+                    uint8_t NameLength;
+                    uint16_t NameHash;
+                    uint16_t Reserved2;
+                    uint64_t ValidDataLength;
+                    uint32_t Reserved3;
+                    uint32_t FirstCluster;
+                    uint64_t DataLength;
+                } PACKED Stream;
+                struct {
+                    uint8_t GeneralSecondaryFlags;
+                    uint16_t FileName[15];
+                } PACKED FileName;
+                uint8_t Buffer[31];
+            } PACKED;
         } PACKED exfat;
     } PACKED;
 } PACKED fatfs_dentry_t;
@@ -492,6 +538,66 @@ static bool __vk_fatfs_fat_entry_is_eof(__vk_fatfs_info_t *fsinfo, uint_fast32_t
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
+#if VSF_FS_USE_EXFATFS == ENABLED
+bool vk_fatfs_parse_dentry_exfat(vk_fatfs_dentry_parser_t *parser)
+{
+    fatfs_dentry_t *entry = (fatfs_dentry_t *)parser->entry;
+    bool parsed = false;
+
+    while (parser->entry_num-- > 0) {
+        switch (entry->exfat.EntryType) {
+        case 0:
+            parser->entry_num++;
+            return false;
+        case EXFAT_ET_FILE_DIR:
+            parser->attr = le16_to_cpu(entry->exfat.FilDir.FileAttributes) & 0xFF;
+            parser->exfat.fildir_parsed = true;
+            parser->exfat.namelen = 0;
+            break;
+        case EXFAT_ET_STREAM:
+            if (parser->exfat.fildir_parsed) {
+                if (parser->exfat.namelen > 0) {
+                    goto done_found;
+                }
+
+                parser->first_cluster = le16_to_cpu(entry->exfat.Stream.FirstCluster);
+                parser->size = le32_to_cpu(entry->exfat.Stream.ValidDataLength);
+                parser->exfat.namelen = entry->exfat.Stream.NameLength;
+                parser->exfat.namepos = 0;
+            }
+            break;
+        case EXFAT_ET_FILENAME:
+            if (parser->exfat.fildir_parsed && (parser->exfat.namelen > 0)) {
+                uint8_t copy_size = parser->exfat.namelen - parser->exfat.namepos;
+                copy_size = vsf_min(copy_size, 15);
+                memcpy(&parser->filename[parser->exfat.namepos << 1], entry->exfat.FileName.FileName, copy_size << 1);
+                parser->exfat.namepos += copy_size;
+                parser->is_unicode = true;
+                if (parser->exfat.namepos == parser->exfat.namelen) {
+                    *(uint16_t *)&parser->filename[parser->exfat.namepos << 1] = 0;
+                    parser->is_unicode = __vk_fatfs_try_unicode2ascii((uint16_t *)parser->filename);
+                    parsed = true;
+                    goto done;
+                }
+            }
+            break;
+        default:
+            if (parser->exfat.fildir_parsed) {
+            done_found:
+                parser->exfat.fildir_parsed = false;
+                goto done;
+            }
+        }
+
+        entry++;
+    }
+
+done:
+    parser->entry = (uint8_t *)entry;
+    return parsed;
+}
+#endif
+
 // entry_num is the number of entries remained in buffer,
 //     after return, entry_num will be counted down by number of parsed entries
 // lfn is unicode encoded, but we just support ascii
@@ -515,7 +621,7 @@ bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser)
                 uint_fast16_t uchar;
                 uint8_t *buf = (uint8_t *)entry;
 
-                parser->lfn = index & 0x0F;
+                parser->fat.lfn = index & 0x0F;
                 ptr = parser->filename + (pos << 1);
 
                 for (uint_fast8_t i = 0; i < dimof(lfn_offsets); i++) {
@@ -534,14 +640,19 @@ bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser)
                 }
             } else if (entry->fat.Attr != FAT_ATTR_VOLUME_ID) {
                 bool lower;
-                if (parser->lfn == 1) {
+
+                parser->attr = entry->fat.Attr;
+                parser->size = le32_to_cpu(entry->fat.FileSize);
+                parser->first_cluster = entry->fat.FstClusLo + (entry->fat.FstClusHi << 16);
+
+                if (parser->fat.lfn == 1) {
                     parser->is_unicode = __vk_fatfs_try_unicode2ascii((uint16_t *)parser->filename);
-                    parser->lfn = 0;
+                    parser->fat.lfn = 0;
                     parsed = true;
                     break;
                 }
 
-                parser->lfn = 0;
+                parser->fat.lfn = 0;
                 ptr = parser->filename;
                 lower = (entry->fat.LCase & 0x08) > 0;
                 for (i = 0; (i < 8) && (entry->fat.Name[i] != ' '); i++) {
@@ -563,9 +674,9 @@ bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser)
                 parsed = true;
                 break;
             }
-        } else if (parser->lfn > 0) {
+        } else if (parser->fat.lfn > 0) {
             // an erased entry with previous parsed lfn entry?
-            parser->lfn = 0;
+            parser->fat.lfn = 0;
         }
 
         entry++;
@@ -634,11 +745,12 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_mount, vk_fs_mount,
                     if (VSF_FAT_EX == fsinfo->type) {
 #if VSF_FS_USE_EXFATFS == ENABLED
                         if (EXFAT_ET_VOLUME_LABEL == dentry->exfat.EntryType) {
-                            if (dentry->exfat.Count > 11) {
+                            if (dentry->exfat.VolumeLabel.CharacterCount > 11) {
                                 goto return_fail;
                             }
                             *(uint16_t *)&fsinfo->fat_volume_name[22] = 0;
-                            memcpy(fsinfo->fat_volume_name, dentry->exfat.Buffer, 2 * dentry->exfat.Count);
+                            memcpy(fsinfo->fat_volume_name, dentry->exfat.VolumeLabel.VolumeLabel,
+                                        2 * dentry->exfat.VolumeLabel.CharacterCount);
                             __vk_fatfs_try_unicode2ascii((uint16_t *)fsinfo->fat_volume_name);
                             malfs_info->volume_name = fsinfo->fat_volume_name;
                         }
@@ -1251,7 +1363,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
             vsf_local.cur_sector = __vk_fatfs_clus2sec(fsinfo, dir->cur.cluster);
         }
         vsf_local.cur_sector += dir->cur.sector_offset_in_cluster;
-        vsf_local.dparser->lfn = 0;
+        vsf_local.dparser->zero_before_first_call = 0;
         if (name != NULL) {
             vsf_local.fatfs_file_pos_save = dir->cur;
         }
@@ -1273,17 +1385,16 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                     goto __fail_and_exit;
                 }
 
-                if (fsinfo->type == VSF_FAT_EX) {
-                    err = VSF_ERR_NOT_SUPPORT;
-                    goto __fail_and_exit;
-                }
-
                 dparser->entry = (uint8_t *)dentry + dir->cur.offset_in_sector;
                 dparser->entry_num = 1 << (fsinfo->sector_size_bits - 5);
                 dparser->entry_num -= dir->cur.offset_in_sector >> 5;
                 while (dparser->entry_num) {
                     uint16_t entry_num = dparser->entry_num;
-                    bool parsed = vk_fatfs_parse_dentry_fat(dparser);
+                    bool parsed =
+#if VSF_FS_USE_EXFATFS == ENABLED
+                        (fsinfo->type == VSF_FAT_EX) ? vk_fatfs_parse_dentry_exfat(dparser) :
+#endif
+                        vk_fatfs_parse_dentry_fat(dparser);
                     uint32_t parsed_entry = entry_num - dparser->entry_num;
                     uint32_t parsed_size = parsed_entry << 5;
                     dir->cur.offset_in_sector += parsed_size;
@@ -1322,12 +1433,11 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                             // TODO: convert to utf8
                             memcpy(fatfs_file->name, dparser->filename, filename_len);
 
-                            dentry = (fatfs_dentry_t *)dparser->entry;
-                            fatfs_file->attr |= (vk_file_attr_t)__vk_fatfs_parse_file_attr(dentry->fat.Attr);
+                            fatfs_file->attr |= (vk_file_attr_t)__vk_fatfs_parse_file_attr(dparser->attr);
                             fatfs_file->fsop = &vk_fatfs_op;
-                            fatfs_file->size = dentry->fat.FileSize;
+                            fatfs_file->size = dparser->size;
                             fatfs_file->info = fsinfo;
-                            fatfs_file->first_cluster = dentry->fat.FstClusLo + (dentry->fat.FstClusHi << 16);
+                            fatfs_file->first_cluster = dparser->first_cluster;
                             fatfs_file->cur.cluster = fatfs_file->first_cluster;
                             fatfs_file->cur.sector_offset_in_cluster = 0;
                             fatfs_file->cur.offset_in_sector = 0;
