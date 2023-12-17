@@ -248,7 +248,7 @@ extern "C" {
                         __buff)                                                 \
             __vsf_call_eda((uintptr_t)__entry,                                  \
                 (uintptr_t)(__peda_param_addr),                                 \
-                sizeof(vsf_peda_local(__peda_name)) + (__private_local_size),   \
+                ((sizeof(vsf_peda_local(__peda_name)) + 7) & ~0x07) + (__private_local_size),\
                 sizeof(vsf_peda_arg(__peda_name)),                              \
                 (uintptr_t)(__buff))
 
@@ -258,7 +258,7 @@ extern "C" {
                         __peda_param_addr)                                      \
             __vsf_call_eda((uintptr_t)__entry,                                  \
                 (uintptr_t)(__peda_param_addr),                                 \
-                sizeof(vsf_peda_local(__peda_name)) + (__private_local_size),   \
+                ((sizeof(vsf_peda_local(__peda_name)) + 7) & ~0x07) + (__private_local_size),\
                 sizeof(vsf_peda_arg(__peda_name)),                              \
                 0)
 
