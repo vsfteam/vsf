@@ -577,7 +577,7 @@ bool vk_fatfs_parse_dentry_exfat(vk_fatfs_dentry_parser_t *parser)
                     *(uint16_t *)&parser->filename[parser->exfat.namepos << 1] = 0;
                     parser->is_unicode = __vk_fatfs_try_unicode2ascii((uint16_t *)parser->filename);
                     parsed = true;
-                    goto done;
+                    goto done_found;
                 }
             }
             break;
