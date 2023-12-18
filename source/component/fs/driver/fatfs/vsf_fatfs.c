@@ -784,6 +784,7 @@ __vsf_component_peda_private_entry(__vk_fatfs_get_fat_entry,,
     uint32_t cluster;
     uint32_t *entry;
     ,
+    uint32_t entry_tmp;
     uint32_t cur_fat_bit;
     uint8_t state;
 ) {
@@ -827,15 +828,27 @@ __vsf_component_peda_private_entry(__vk_fatfs_get_fat_entry,,
                 }
 
                 if (vsf_local.cur_fat_bit) {
-                    *vsf_local.entry |= get_unaligned_le32(buff) << vsf_local.cur_fat_bit;
-                    *vsf_local.entry &= (1 << fat_bit) - 1;
+                    vsf_local.entry_tmp |= get_unaligned_le32(buff) << vsf_local.cur_fat_bit;
+                    vsf_local.entry_tmp &= (1 << fat_bit) - 1;
                     vsf_eda_return(VSF_ERR_NONE);
                     break;
                 }
 
                 vsf_local.cur_fat_bit += vsf_min(fat_bit, sector_bit - start_bit_sec);
-                *vsf_local.entry = get_unaligned_le32(&buff[start_bit_sec >> 3]);
-                *vsf_local.entry = (*vsf_local.entry >> (start_bit & 7)) & ((1ULL << vsf_local.cur_fat_bit) - 1);
+                vsf_local.entry_tmp = get_unaligned_le32(&buff[start_bit_sec >> 3]);
+                vsf_local.entry_tmp = (vsf_local.entry_tmp >> (start_bit & 7)) & ((1ULL << vsf_local.cur_fat_bit) - 1);
+#if VSF_FS_USE_EXFATFS == ENABLED
+                if (VSF_FAT_EX == fsinfo->type) {
+                    if (!vsf_local.entry_tmp) {
+                        (*vsf_local.entry)++;
+                    } else {
+                        *vsf_local.entry = vsf_local.entry_tmp;
+                    }
+                } else
+#endif
+                {
+                    *vsf_local.entry = vsf_local.entry_tmp;
+                }
                 goto read_fat_sector;
             }
         }
