@@ -311,11 +311,11 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     }
                 } else {
                     switch (rank) {
-                    case rank_char:     arg.val = (unsigned long long)(signed char)va_arg(ap, signed int);                      break;
-                    case rank_short:    arg.val = (unsigned long long)(signed short)va_arg(ap, signed int);                     break;
-                    case rank_int:      arg.val = (unsigned long long)va_arg(ap, signed int);                                   break;
-                    case rank_long:     arg.val = (unsigned long long)va_arg(ap, signed long);                                  break;
-                    case rank_longlong: arg.val = (unsigned long long)va_arg(ap, signed long long);                             break;
+                    case rank_char:     arg.val = (unsigned long long)(unsigned char)va_arg(ap, unsigned int);                  break;
+                    case rank_short:    arg.val = (unsigned long long)(unsigned short)va_arg(ap, unsigned int);                 break;
+                    case rank_int:      arg.val = (unsigned long long)va_arg(ap, unsigned int);                                 break;
+                    case rank_long:     arg.val = (unsigned long long)va_arg(ap, unsigned long);                                break;
+                    case rank_longlong: arg.val = (unsigned long long)va_arg(ap, unsigned long long);                           break;
                     }
                 }
 
