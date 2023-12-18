@@ -150,6 +150,10 @@ vsf_class(__vk_fatfs_info_t) {
 #endif
 
         // fat parameters, will not change after mount
+#if VSF_FS_USE_EXFATFS == ENABLED
+        uint32_t bitmap_sector;
+        uint32_t bitmap_size;
+#endif
         uint32_t root_sector;
         uint32_t root_size;
         uint32_t fat_sector;

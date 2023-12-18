@@ -744,15 +744,24 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_mount, vk_fs_mount,
                     malfs_info->volume_name = NULL;
                     if (VSF_FAT_EX == fsinfo->type) {
 #if VSF_FS_USE_EXFATFS == ENABLED
-                        if (EXFAT_ET_VOLUME_LABEL == dentry->exfat.EntryType) {
-                            if (dentry->exfat.VolumeLabel.CharacterCount > 11) {
-                                goto return_fail;
-                            }
-                            *(uint16_t *)&fsinfo->fat_volume_name[22] = 0;
-                            memcpy(fsinfo->fat_volume_name, dentry->exfat.VolumeLabel.VolumeLabel,
+                        for (int i = 0; i < 3; i++, dentry++) {
+                            switch (dentry->exfat.EntryType) {
+                            case EXFAT_ET_VOLUME_LABEL:
+                                if (dentry->exfat.VolumeLabel.CharacterCount > 11) {
+                                    goto return_fail;
+                                }
+                                *(uint16_t *)&fsinfo->fat_volume_name[22] = 0;
+                                memcpy(fsinfo->fat_volume_name, dentry->exfat.VolumeLabel.VolumeLabel,
                                         2 * dentry->exfat.VolumeLabel.CharacterCount);
-                            __vk_fatfs_try_unicode2ascii((uint16_t *)fsinfo->fat_volume_name);
-                            malfs_info->volume_name = fsinfo->fat_volume_name;
+                                __vk_fatfs_try_unicode2ascii((uint16_t *)fsinfo->fat_volume_name);
+                                malfs_info->volume_name = fsinfo->fat_volume_name;
+                                break;
+                            case EXFAT_ET_BITMAP:
+                                fsinfo->bitmap_sector = le64_to_cpu(dentry->exfat.Bitmap.FirstCluster);
+                                fsinfo->bitmap_sector = __vk_fatfs_clus2sec(fsinfo, fsinfo->bitmap_sector);
+                                fsinfo->bitmap_size = le32_to_cpu(dentry->exfat.Bitmap.DataLength);
+                                break;
+                            }
                         }
 #else
                         goto return_fail;
