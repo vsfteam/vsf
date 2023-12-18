@@ -895,7 +895,14 @@ __vsf_component_peda_private_entry(__vk_fatfs_set_fat_entry,,
         vsf_local.cur_fat_sector_offset = (uint32_t)(sector_bit_offset >> sector_bit_size_bits);
         vsf_local.cur_fat_bit_offset_in_sector = sector_bit_offset & (sector_bit - 1);
         vsf_local.cur_fat_bit = 0;
-        vsf_local.cur_next_cluster = vsf_local.next_cluster;
+#if VSF_FS_USE_EXFATFS == ENABLED
+        if ((VSF_FAT_EX == fsinfo->type) && (vsf_local.cluster + 1 == vsf_local.next_cluster)) {
+            vsf_local.cur_next_cluster = 0;
+        } else
+#endif
+        {
+            vsf_local.cur_next_cluster = vsf_local.next_cluster;
+        }
 
     read_next_fat_sector:
         vsf_local.state = APPEND_FAT_STATE_READ_FAT_DONE;
@@ -1035,11 +1042,16 @@ __vsf_component_peda_private_entry(__vk_fatfs_append_fat_entry,,
                         if (vsf_local.cur_fat_bit == fat_bit) {
                             if (0 == vsf_local.entry_tmp) {
                                 vsf_err_t err;
+#if VSF_FS_USE_EXFATFS == ENABLED
+                                uint32_t last_cluster = (VSF_FAT_EX == fsinfo->type) ? 0xFFFFFFFF : 0x0FFFFFFF;
+#else
+                                uint32_t last_cluster = 0x0FFFFFFF;
+#endif
                                 *vsf_local.entry = vsf_local.cur_cluster;
                                 vsf_local.state = APPEND_FAT_STATE_WRITE_EOF_FAT_DONE;
                                 __vsf_component_call_peda(__vk_fatfs_set_fat_entry, err, fsinfo,
                                     .cluster = vsf_local.cur_cluster,
-                                    .next_cluster = 0x0FFFFFFF,
+                                    .next_cluster = last_cluster,
                                 );
                                 if (err != VSF_ERR_NONE) {
                                     goto fail;
@@ -1242,7 +1254,11 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_setsize, vk_file_setsize,
                         fatfs_file->first_cluster = 0;
                         vsf_local.next_cluster = 0;
                     } else {
-                        vsf_local.next_cluster = 0x0FFFFFFF;
+#if VSF_FS_USE_EXFATFS == ENABLED
+                        vsf_local.next_cluster = (VSF_FAT_EX == fsinfo->type) ? 0xFFFFFFFF : 0x0FFFFFFF;;
+#else
+                        vsf_local.next_cluster = 0x0FFFFFFF;;
+#endif
                     }
                     vsf_local.state = SETSIZE_STATE_FREE_PREPARE;
                     pos = size;
