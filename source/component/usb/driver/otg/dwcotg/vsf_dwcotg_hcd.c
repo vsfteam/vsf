@@ -629,7 +629,9 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
             __vk_dwcotg_hcd_init_regs(dwcotg_hcd, info.regbase, dwcotg_hcd->ep_num);
             reg = &dwcotg_hcd->reg;
 
-            if (dwcotg_hcd->ulpi_en) {
+            if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->init_phy != NULL)) {
+                dwcotg_hcd->workaround->init_phy(dwcotg_hcd->workaround_param);
+            } else if (dwcotg_hcd->ulpi_en) {
                 // TODO: test ulpi support
 //                reg->global_regs->gusbcfg |= USB_OTG_GUSBCFG_ULPIAR | USB_OTG_GUSBCFG_ULPI_UTMI_SEL;
 //                reg->global_regs->gusbcfg &= ~(USB_OTG_GUSBCFG_PHYIF | USB_OTG_GUSBCFG_TRDT);

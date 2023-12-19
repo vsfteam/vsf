@@ -49,11 +49,11 @@ typedef struct vk_dwcotg_hcd_param_t {
 } vk_dwcotg_hcd_param_t;
 
 typedef struct vk_dwcotg_hcd_workaround_t {
-    // reset_port_prepare returns delay in ms before doing reset port
+    // reset_port_prepare/reset_port/enable_port return delay in ms before next step
     uint_fast32_t (*reset_port_prepare)(void *param);
-    // reset_port_prepare returns delay in ms before doing reset port
     uint_fast32_t (*reset_port)(void *param);
     uint_fast32_t (*enable_port)(void *param, uint8_t speed);
+    void (*init_phy)(void *param);
     bool (*check_dma_addr)(void *param, uintptr_t addr);
 } vk_dwcotg_hcd_workaround_t;
 
