@@ -63,6 +63,12 @@ extern "C" {
 vsf_dcl_class(vk_fatfs_file_t)
 vsf_dcl_class(__vk_fatfs_info_t)
 
+#if VSF_FS_USE_EXFATFS == ENABLED
+typedef uint64_t vk_fat_sector_type_t;
+#else
+typedef uint32_t vk_fat_sector_type_t;
+#endif
+
 typedef enum vk_fat_type_t {
     VSF_FAT_NONE,
     VSF_FAT_12,
@@ -81,6 +87,10 @@ typedef struct vk_fatfs_dentry_parser_t {
     uint8_t *entry;
     char *filename;
     int16_t entry_num;
+    uint16_t node_parsed_num;
+    int16_t vital_entry_num;
+
+    // private
     bool is_unicode;
     uint8_t attr;
     uint32_t first_cluster;
@@ -90,11 +100,13 @@ typedef struct vk_fatfs_dentry_parser_t {
         struct {
             uint8_t lfn;
         } fat;
+#if VSF_FS_USE_EXFATFS == ENABLED
         struct {
             bool fildir_parsed;
             uint8_t namelen;
             uint8_t namepos;
         } exfat;
+#endif
         uint32_t zero_before_first_call;
     };
 } vk_fatfs_dentry_parser_t;
@@ -114,12 +126,16 @@ vsf_class(vk_fatfs_file_t) {
         uint32_t first_cluster;
         vk_fatfs_file_pos_t cur;
         struct {
-            uint32_t sector0;
-            uint32_t sector1;
+            vk_fat_sector_type_t sector0;
+            vk_fat_sector_type_t sector1;
+            uint8_t entry_num;
             uint8_t entry_offset_in_sector0;
-            uint8_t entry_num0;
-            uint8_t entry_offset_in_sector1;
-            uint8_t entry_num1;
+
+            // vital sector/entry_offset is the entry containing first_cluster/size
+            //  for fat, should be the last entry
+            //  for exfat, should be the stream entry
+            uint8_t vital_sector;
+            uint8_t vital_entry_offset;
         } dentry;
     )
 };

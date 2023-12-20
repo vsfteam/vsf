@@ -215,7 +215,7 @@ typedef struct fatfs_dentry_t {
 
 typedef struct vk_fatfs_rw_local {
     uint64_t offset;
-    uint32_t cur_sector;
+    vk_fat_sector_type_t cur_sector;
     uint32_t cur_size;
     uint32_t cur_run_size;
     uint32_t cur_run_sector;
@@ -233,12 +233,13 @@ typedef struct vk_fatfs_setsize_local {
 } vk_fatfs_setsize_local;
 
 typedef struct vk_fatfs_lookup_local {
-    uint32_t cur_sector;
+    vk_fat_sector_type_t cur_sector;
     vk_fatfs_file_pos_t fatfs_file_pos_save;
     vk_fatfs_dentry_parser_t *dparser;
 
-    uint32_t sector;
-    uint8_t entry_offset_in_sector;
+    vk_fat_sector_type_t sector;
+    uint16_t node_parsed_num;
+    int16_t vital_entry_num;
     uint8_t entry_num;
     uint8_t state;
 } vk_fatfs_lookup_local;
@@ -246,7 +247,7 @@ typedef struct vk_fatfs_lookup_local {
 typedef struct vk_fatfs_setpos_local {
     uint64_t cur_offset;
     uint32_t cur_cluster;
-    uint32_t cur_sector;
+    vk_fat_sector_type_t cur_sector;
 } vk_fatfs_setpos_local;
 
 /*============================ PROTOTYPES ====================================*/
@@ -342,7 +343,7 @@ bool vk_fatfs_is_lfn(char *name)
     return has_lower && has_upper;
 }
 
-static uint_fast32_t __vk_fatfs_clus2sec(__vk_fatfs_info_t *fsinfo, uint_fast32_t cluster)
+static vk_fat_sector_type_t __vk_fatfs_clus2sec(__vk_fatfs_info_t *fsinfo, uint_fast32_t cluster)
 {
     cluster -= 2;
     return fsinfo->data_sector + (cluster << fsinfo->cluster_size_bits);
@@ -544,6 +545,8 @@ bool vk_fatfs_parse_dentry_exfat(vk_fatfs_dentry_parser_t *parser)
     fatfs_dentry_t *entry = (fatfs_dentry_t *)parser->entry;
     bool parsed = false;
 
+    parser->node_parsed_num = 0;
+    parser->vital_entry_num = -1;
     while (parser->entry_num-- > 0) {
         switch (entry->exfat.EntryType) {
         case 0:
@@ -560,6 +563,7 @@ bool vk_fatfs_parse_dentry_exfat(vk_fatfs_dentry_parser_t *parser)
                     goto done_found;
                 }
 
+                parser->vital_entry_num = parser->entry_num + 1;
                 parser->first_cluster = le16_to_cpu(entry->exfat.Stream.FirstCluster);
                 parser->size = le32_to_cpu(entry->exfat.Stream.ValidDataLength);
                 parser->exfat.namelen = entry->exfat.Stream.NameLength;
@@ -572,15 +576,16 @@ bool vk_fatfs_parse_dentry_exfat(vk_fatfs_dentry_parser_t *parser)
                 copy_size = vsf_min(copy_size, 15);
                 memcpy(&parser->filename[parser->exfat.namepos << 1], entry->exfat.FileName.FileName, copy_size << 1);
                 parser->exfat.namepos += copy_size;
-                parser->is_unicode = true;
                 if (parser->exfat.namepos == parser->exfat.namelen) {
                     *(uint16_t *)&parser->filename[parser->exfat.namepos << 1] = 0;
                     parser->is_unicode = __vk_fatfs_try_unicode2ascii((uint16_t *)parser->filename);
+                    parser->node_parsed_num++;
                     parsed = true;
                     goto done_found;
                 }
             }
             break;
+        // TODO: add other possible entry type for fildir, so they will be calculated in node_parsed_num
         default:
             if (parser->exfat.fildir_parsed) {
             done_found:
@@ -589,6 +594,9 @@ bool vk_fatfs_parse_dentry_exfat(vk_fatfs_dentry_parser_t *parser)
             }
         }
 
+        if (parser->exfat.fildir_parsed) {
+            parser->node_parsed_num++;
+        }
         entry++;
     }
 
@@ -607,6 +615,8 @@ bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser)
     fatfs_dentry_t *entry = (fatfs_dentry_t *)parser->entry;
     bool parsed = false;
 
+    parser->node_parsed_num = 0;
+    parser->vital_entry_num = -1;
     while (parser->entry_num-- > 0) {
         if (!entry->fat.Name[0]) {
             break;
@@ -621,6 +631,7 @@ bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser)
                 uint_fast16_t uchar;
                 uint8_t *buf = (uint8_t *)entry;
 
+                parser->node_parsed_num++;
                 parser->fat.lfn = index & 0x0F;
                 ptr = parser->filename + (pos << 1);
 
@@ -641,6 +652,8 @@ bool vk_fatfs_parse_dentry_fat(vk_fatfs_dentry_parser_t *parser)
             } else if (entry->fat.Attr != FAT_ATTR_VOLUME_ID) {
                 bool lower;
 
+                parser->node_parsed_num++;
+                parser->vital_entry_num = parser->entry_num + 1;
                 parser->attr = entry->fat.Attr;
                 parser->size = le32_to_cpu(entry->fat.FileSize);
                 parser->first_cluster = entry->fat.FstClusLo + (entry->fat.FstClusHi << 16);
@@ -985,9 +998,17 @@ __vsf_component_peda_private_entry(__vk_fatfs_append_fat_entry,,
     uint32_t *entry;
     ,
     uint32_t cur_fat_bit;
-    uint32_t cur_fat_sector;
     uint32_t cur_cluster;
-    uint32_t entry_tmp;
+    union {
+        struct {
+            uint32_t cur_fat_sector;
+            uint32_t entry_tmp;
+        };
+        struct {
+            uint32_t cur_bitmap_sector;
+            uint32_t bitmap_remain_size;
+        };
+    };
     uint8_t state;
 ) {
     vsf_peda_begin();
@@ -995,6 +1016,8 @@ __vsf_component_peda_private_entry(__vk_fatfs_append_fat_entry,,
         APPEND_FAT_STATE_READ_FAT_DONE,
         APPEND_FAT_STATE_WRITE_EOF_FAT_DONE,
         APPEND_FAT_STATE_WRITE_PREV_FAT_DONE,
+        APPEND_FAT_STATE_READ_BITMAP_DONE,
+        APPEND_FAT_STATE_WRITE_BITMAP_DONE,
     };
     __vk_fatfs_info_t *fsinfo = (__vk_fatfs_info_t *)&vsf_this;
     __vk_malfs_info_t *malfs_info = &fsinfo->use_as____vk_malfs_info_t;
@@ -1003,24 +1026,65 @@ __vsf_component_peda_private_entry(__vk_fatfs_append_fat_entry,,
 
     switch (evt) {
     case VSF_EVT_INIT:
-        vsf_local.entry_tmp = 0;
         vsf_local.cur_cluster = 0;
-        vsf_local.cur_fat_bit = 0;
-        vsf_local.cur_fat_sector = fsinfo->fat_sector;
-
-        vsf_local.state = APPEND_FAT_STATE_READ_FAT_DONE;
-    read_next_fat_sector:
-        __vk_malfs_read(malfs_info, vsf_local.cur_fat_sector, 1, NULL);
+#if VSF_FS_USE_EXFATFS == ENABLED
+        if (VSF_FAT_EX == fsinfo->type) {
+            vsf_local.cur_bitmap_sector = fsinfo->bitmap_sector;
+            vsf_local.bitmap_remain_size = fsinfo->bitmap_size;
+            vsf_local.state = APPEND_FAT_STATE_READ_BITMAP_DONE;
+        read_next_bitmap_sector:
+            __vk_malfs_read(malfs_info, vsf_local.cur_bitmap_sector, 1, NULL);
+        } else
+#endif
+        {
+            vsf_local.entry_tmp = 0;
+            vsf_local.cur_fat_bit = 0;
+            vsf_local.cur_fat_sector = fsinfo->fat_sector;
+            vsf_local.state = APPEND_FAT_STATE_READ_FAT_DONE;
+        read_next_fat_sector:
+            __vk_malfs_read(malfs_info, vsf_local.cur_fat_sector, 1, NULL);
+        }
         break;
     case VSF_EVT_RETURN: {
             union {
                 uintptr_t value;
                 vsf_err_t err;
+                int32_t written_size;
                 uint8_t *buffer;
             } result;
             result.value = vsf_eda_get_return_value();
 
             switch (vsf_local.state) {
+#if VSF_FS_USE_EXFATFS == ENABLED
+            case APPEND_FAT_STATE_READ_BITMAP_DONE:
+                if (NULL == result.buffer) {
+                    goto fail;
+                }
+
+                uint32_t curlen = 1 << fsinfo->sector_size_bits;
+                curlen = vsf_min(curlen, vsf_local.bitmap_remain_size);
+                int_fast32_t bit = vsf_bitmap_ffz(result.buffer, curlen << 3);
+                if (bit < 0) {
+                    vsf_local.bitmap_remain_size -= curlen;
+                    if (vsf_local.bitmap_remain_size > 0) {
+                        vsf_local.cur_bitmap_sector++;
+                        goto read_next_bitmap_sector;
+                    } else {
+                        goto fail;
+                    }
+                }
+
+                vsf_bitmap_set(result.buffer, bit);
+                vsf_local.cur_cluster = ((fsinfo->bitmap_size - vsf_local.bitmap_remain_size) << 3) + bit + 2;
+                vsf_local.state = APPEND_FAT_STATE_WRITE_BITMAP_DONE;
+                __vk_malfs_write(malfs_info, vsf_local.cur_bitmap_sector, 1, result.buffer);
+                break;
+            case APPEND_FAT_STATE_WRITE_BITMAP_DONE:
+                if (result.written_size != (1 << fsinfo->sector_size_bits)) {
+                    goto fail;
+                }
+                goto cluster_found;
+#endif
             case APPEND_FAT_STATE_READ_FAT_DONE: {
                     uint32_t pos = 0, cur_bit_size;
 
@@ -1050,6 +1114,7 @@ __vsf_component_peda_private_entry(__vk_fatfs_append_fat_entry,,
                         vsf_local.cur_fat_bit += cur_bit_size;
                         if (vsf_local.cur_fat_bit == fat_bit) {
                             if (0 == vsf_local.entry_tmp) {
+                            cluster_found: {
                                 vsf_err_t err;
 #if VSF_FS_USE_EXFATFS == ENABLED
                                 uint32_t last_cluster = (VSF_FAT_EX == fsinfo->type) ? 0xFFFFFFFF : 0x0FFFFFFF;
@@ -1066,7 +1131,7 @@ __vsf_component_peda_private_entry(__vk_fatfs_append_fat_entry,,
                                     goto fail;
                                 }
                                 return;
-                            }
+                            }}
                             vsf_local.cur_fat_bit = 0;
                             vsf_local.entry_tmp = 0;
                             pos += fat_bit;
@@ -1127,17 +1192,8 @@ __vsf_component_peda_private_entry(__vk_fatfs_dentry_setsize,,
     vk_fatfs_file_t *file = (vk_fatfs_file_t *)&vsf_this;
     __vk_fatfs_info_t *fsinfo = (__vk_fatfs_info_t *)file->info;
     __vk_malfs_info_t *malfs_info = &fsinfo->use_as____vk_malfs_info_t;
-    uint32_t sector;
-    uint16_t offset;
-    if (file->dentry.entry_num1) {
-        sector = file->dentry.sector1;
-        offset = file->dentry.entry_offset_in_sector1 << 5;
-        offset += 0x20 * (file->dentry.entry_num1 - 1);
-    } else {
-        sector = file->dentry.sector0;
-        offset = file->dentry.entry_offset_in_sector0 << 5;
-        offset += 0x20 * (file->dentry.entry_num0 - 1);
-    }
+    uint32_t sector = file->dentry.vital_sector ? file->dentry.sector1 : file->dentry.sector0;
+    uint16_t offset = file->dentry.vital_entry_offset << 5;
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -1155,11 +1211,19 @@ __vsf_component_peda_private_entry(__vk_fatfs_dentry_setsize,,
             switch (vsf_local.state) {
             case DENTRY_SETSIZE_STATE_READ: {
                     fatfs_dentry_t *dentry = (fatfs_dentry_t *)(result.buffer + offset);
-                    dentry->fat.FileSize = (uint32_t)vsf_local.size;
-                    dentry->fat.FstClusHi = file->first_cluster >> 16;
-                    dentry->fat.FstClusLo = file->first_cluster;
-                    vsf_local.state = DENTRY_SETSIZE_STATE_WRITE;
-                    __vk_malfs_write(malfs_info, sector, 1, result.buffer);
+#if VSF_FS_USE_EXFATFS == ENABLED
+                    if (VSF_FAT_EX == fsinfo->type) {
+                        dentry->exfat.Stream.DataLength = cpu_to_le64(vsf_local.size);
+                        dentry->exfat.Stream.FirstCluster = cpu_to_le32(file->first_cluster);
+                    } else
+#endif
+                    {
+                        dentry->fat.FileSize = (uint32_t)cpu_to_le32(vsf_local.size);
+                        dentry->fat.FstClusHi = cpu_to_le16(file->first_cluster >> 16);
+                        dentry->fat.FstClusLo = cpu_to_le16(file->first_cluster);
+                        vsf_local.state = DENTRY_SETSIZE_STATE_WRITE;
+                        __vk_malfs_write(malfs_info, sector, 1, result.buffer);
+                    }
                 }
                 break;
             case DENTRY_SETSIZE_STATE_WRITE:
@@ -1418,13 +1482,14 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
         case LOOKUP_STATE_PARSE_SECTOR: {
                 fatfs_dentry_t *dentry = (fatfs_dentry_t *)vsf_eda_get_return_value();
                 vk_fatfs_dentry_parser_t *dparser = vsf_local.dparser;
+                uint32_t entry_num_in_sector = 1 << (fsinfo->sector_size_bits - 5);
 
                 if (NULL == dentry) {
                     goto __fail_and_exit;
                 }
 
                 dparser->entry = (uint8_t *)dentry + dir->cur.offset_in_sector;
-                dparser->entry_num = 1 << (fsinfo->sector_size_bits - 5);
+                dparser->entry_num = entry_num_in_sector;
                 dparser->entry_num -= dir->cur.offset_in_sector >> 5;
                 while (dparser->entry_num) {
                     uint16_t entry_num = dparser->entry_num;
@@ -1433,8 +1498,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                         (fsinfo->type == VSF_FAT_EX) ? vk_fatfs_parse_dentry_exfat(dparser) :
 #endif
                         vk_fatfs_parse_dentry_fat(dparser);
-                    uint32_t parsed_entry = entry_num - dparser->entry_num;
-                    uint32_t parsed_size = parsed_entry << 5;
+                    uint32_t parsed_size = (entry_num - dparser->entry_num) << 5;
                     dir->cur.offset_in_sector += parsed_size;
                     if (NULL == name) {
                         dir->pos += parsed_size;
@@ -1482,15 +1546,24 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
 
                             if (vsf_local.entry_num) {
                                 fatfs_file->dentry.sector0 = vsf_local.sector;
-                                fatfs_file->dentry.entry_offset_in_sector0 = vsf_local.entry_offset_in_sector;
-                                fatfs_file->dentry.entry_num0 = vsf_local.entry_num;
+                                fatfs_file->dentry.entry_offset_in_sector0 = entry_num_in_sector - vsf_local.entry_num;
+                                fatfs_file->dentry.entry_num = vsf_local.entry_num + dparser->node_parsed_num;
                                 fatfs_file->dentry.sector1 = vsf_local.cur_sector;
-                                fatfs_file->dentry.entry_offset_in_sector1 = (1 << (fsinfo->sector_size_bits - 5)) - entry_num;
-                                fatfs_file->dentry.entry_num1 = parsed_entry;
+                                if (vsf_local.vital_entry_num >= 0) {
+                                    fatfs_file->dentry.vital_sector = 0;
+                                    fatfs_file->dentry.vital_entry_offset = entry_num_in_sector - vsf_local.vital_entry_num;
+                                } else {
+                                    fatfs_file->dentry.vital_sector = 1;
+                                    VSF_FS_ASSERT(dparser->vital_entry_num >= 0);
+                                    fatfs_file->dentry.vital_entry_offset = entry_num_in_sector - dparser->vital_entry_num;
+                                }
                             } else {
                                 fatfs_file->dentry.sector0 = vsf_local.cur_sector;
-                                fatfs_file->dentry.entry_offset_in_sector0 = (1 << (fsinfo->sector_size_bits - 5)) - entry_num;
-                                fatfs_file->dentry.entry_num0 = parsed_entry;
+                                fatfs_file->dentry.entry_offset_in_sector0 = entry_num_in_sector - dparser->entry_num - dparser->node_parsed_num;
+                                fatfs_file->dentry.entry_num = dparser->node_parsed_num;
+                                fatfs_file->dentry.vital_sector = 0;
+                                VSF_FS_ASSERT(dparser->vital_entry_num >= 0);
+                                fatfs_file->dentry.vital_entry_offset = entry_num_in_sector - dparser->vital_entry_num;
                             }
 
                             *vsf_local.result = &fatfs_file->use_as__vk_file_t;
@@ -1503,8 +1576,8 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                         goto __not_available;
                     } else {
                         vsf_local.sector = vsf_local.cur_sector;
-                        vsf_local.entry_offset_in_sector = entry_num;
-                        vsf_local.entry_num = parsed_entry;
+                        vsf_local.entry_num = dparser->node_parsed_num;
+                        vsf_local.vital_entry_num = dparser->vital_entry_num;
                         break;
                     }
                 }
