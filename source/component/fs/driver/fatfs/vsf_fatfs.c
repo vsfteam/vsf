@@ -1213,6 +1213,8 @@ __vsf_component_peda_private_entry(__vk_fatfs_dentry_setsize,,
                     fatfs_dentry_t *dentry = (fatfs_dentry_t *)(result.buffer + offset);
 #if VSF_FS_USE_EXFATFS == ENABLED
                     if (VSF_FAT_EX == fsinfo->type) {
+                        dentry->exfat.Stream.GeneralSecondaryFlags = 1; // AllocationPossible, !NoFatChain
+                        dentry->exfat.Stream.ValidDataLength = cpu_to_le64(vsf_local.size);
                         dentry->exfat.Stream.DataLength = cpu_to_le64(vsf_local.size);
                         dentry->exfat.Stream.FirstCluster = cpu_to_le32(file->first_cluster);
                     } else
@@ -1221,9 +1223,9 @@ __vsf_component_peda_private_entry(__vk_fatfs_dentry_setsize,,
                         dentry->fat.FileSize = (uint32_t)cpu_to_le32(vsf_local.size);
                         dentry->fat.FstClusHi = cpu_to_le16(file->first_cluster >> 16);
                         dentry->fat.FstClusLo = cpu_to_le16(file->first_cluster);
-                        vsf_local.state = DENTRY_SETSIZE_STATE_WRITE;
-                        __vk_malfs_write(malfs_info, sector, 1, result.buffer);
                     }
+                    vsf_local.state = DENTRY_SETSIZE_STATE_WRITE;
+                    __vk_malfs_write(malfs_info, sector, 1, result.buffer);
                 }
                 break;
             case DENTRY_SETSIZE_STATE_WRITE:
