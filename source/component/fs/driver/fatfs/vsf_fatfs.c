@@ -1176,23 +1176,54 @@ __vsf_component_peda_private_entry(__vk_fatfs_append_fat_entry,,
     vsf_peda_end();
 }
 
+#if VSF_FS_USE_EXFATFS == ENABLED
+static uint16_t __vk_exfatfs_entry_checksum(uint16_t checksum, uint8_t *buffer, uint_fast16_t size, bool skip_checksum)
+{
+    for (uint_fast16_t i = 0; i < size; i++) {
+        if (skip_checksum && ((2 == i) || (3 == i))) {
+            continue;
+        }
+        checksum = ((checksum & 1) ? 0x8000 : 0) + (checksum >> 1) + (uint16_t)buffer[i];
+    }
+    return checksum;
+}
+
+__vsf_component_peda_private_entry(__vk_exfatfs_update_entry_checksum,,
+    uint8_t entry_num;
+    uint8_t state;
+    uint16_t checksum;
+) {
+    vsf_peda_begin();
+    // TODO: implement
+    vsf_eda_return(VSF_ERR_FAIL);
+    vsf_peda_end();
+}
+
+#endif
+
 __vsf_component_peda_private_entry(__vk_fatfs_dentry_setsize,,
     uint64_t size;
+#if VSF_FS_USE_EXFATFS == ENABLED
+    bool need_update_checksum;
+#endif
     uint8_t state;
 ) {
     vsf_peda_begin();
     enum {
         DENTRY_SETSIZE_STATE_READ,
         DENTRY_SETSIZE_STATE_WRITE,
+#if VSF_FS_USE_EXFATFS == ENABLED
+        DENTRY_SETSIZE_STATE_UPDATE_CHECKSUM,
+#endif
     };
     vk_fatfs_file_t *file = (vk_fatfs_file_t *)&vsf_this;
     __vk_fatfs_info_t *fsinfo = (__vk_fatfs_info_t *)file->info;
     __vk_malfs_info_t *malfs_info = &fsinfo->use_as____vk_malfs_info_t;
     uint32_t sector = file->dentry.vital_sector ? file->dentry.sector1 : file->dentry.sector0;
-    uint16_t offset = file->dentry.vital_entry_offset << 5;
 
     switch (evt) {
     case VSF_EVT_INIT:
+        vsf_local.need_update_checksum = false;
         vsf_local.state = DENTRY_SETSIZE_STATE_READ;
         __vk_malfs_read(malfs_info, sector, 1, NULL);
         break;
@@ -1206,13 +1237,22 @@ __vsf_component_peda_private_entry(__vk_fatfs_dentry_setsize,,
             result.value = vsf_eda_get_return_value();
             switch (vsf_local.state) {
             case DENTRY_SETSIZE_STATE_READ: {
-                    fatfs_dentry_t *dentry = (fatfs_dentry_t *)(result.buffer + offset);
+                    fatfs_dentry_t *dentry = (fatfs_dentry_t *)result.buffer + file->dentry.vital_entry_offset;
 #if VSF_FS_USE_EXFATFS == ENABLED
                     if (VSF_FAT_EX == fsinfo->type) {
                         dentry->exfat.Stream.GeneralSecondaryFlags = 1; // AllocationPossible, !NoFatChain
                         dentry->exfat.Stream.ValidDataLength = cpu_to_le64(vsf_local.size);
                         dentry->exfat.Stream.DataLength = cpu_to_le64(vsf_local.size);
                         dentry->exfat.Stream.FirstCluster = cpu_to_le32(file->first_cluster);
+
+                        uint32_t entry_num_in_sector = 1 << (fsinfo->sector_size_bits - 5);
+                        if ((file->dentry.root_entry_offset + file->dentry.entry_num) < entry_num_in_sector) {
+                            dentry = (fatfs_dentry_t *)result.buffer + file->dentry.root_entry_offset;
+                            uint16_t checksum = __vk_exfatfs_entry_checksum(0, (uint8_t *)dentry, file->dentry.entry_num << 5, true);
+                            dentry->exfat.FilDir.SetChecksum = cpu_to_le16(checksum);
+                        } else {
+                            vsf_local.need_update_checksum = true;
+                        }
                     } else
 #endif
                     {
@@ -1225,8 +1265,26 @@ __vsf_component_peda_private_entry(__vk_fatfs_dentry_setsize,,
                 }
                 break;
             case DENTRY_SETSIZE_STATE_WRITE:
-                vsf_eda_return(VSF_ERR_NONE);
+#if VSF_FS_USE_EXFATFS == ENABLED
+                if (vsf_local.need_update_checksum) {
+                    vsf_err_t err;
+                    vsf_local.state = DENTRY_SETSIZE_STATE_UPDATE_CHECKSUM;
+                    __vsf_component_call_peda(__vk_exfatfs_update_entry_checksum, err, file);
+                    if (err != VSF_ERR_NONE) {
+                        VSF_FS_ASSERT(false);
+                        vsf_eda_return(VSF_ERR_FAIL);
+                    }
+                } else
+#endif
+                {
+                    vsf_eda_return(VSF_ERR_NONE);
+                }
                 break;
+#if VSF_FS_USE_EXFATFS == ENABLED
+            case DENTRY_SETSIZE_STATE_UPDATE_CHECKSUM:
+                vsf_eda_return(result.err);
+                break;
+#endif
             }
         }
         break;
