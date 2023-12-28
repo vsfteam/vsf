@@ -1189,13 +1189,97 @@ static uint16_t __vk_exfatfs_entry_checksum(uint16_t checksum, uint8_t *buffer, 
 }
 
 __vsf_component_peda_private_entry(__vk_exfatfs_update_entry_checksum,,
+    vk_fat_sector_type_t sector;
     uint8_t entry_num;
     uint8_t state;
     uint16_t checksum;
 ) {
     vsf_peda_begin();
-    // TODO: implement
-    vsf_eda_return(VSF_ERR_FAIL);
+    enum {
+        EXFAT_UPDATE_ENTRY_CHECKSUM_READ_ROOT,
+        EXFAT_UPDATE_ENTRY_CHECKSUM_READ_ENTRIES,
+        EXFAT_UPDATE_ENTRY_CHECKSUM_READ_ROOT_FOR_WRITE,
+        EXFAT_UPDATE_ENTRY_CHECKSUM_WRITE_ROOT,
+    };
+    vk_fatfs_file_t *file = (vk_fatfs_file_t *)&vsf_this;
+    __vk_fatfs_info_t *fsinfo = (__vk_fatfs_info_t *)file->info;
+    __vk_malfs_info_t *malfs_info = &fsinfo->use_as____vk_malfs_info_t;
+    uint32_t entry_num_in_sector = 1 << (fsinfo->sector_size_bits - 5);
+    fatfs_dentry_t *dentry;
+    uint_fast16_t cur_entry_num;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        vsf_local.state = EXFAT_UPDATE_ENTRY_CHECKSUM_READ_ROOT;
+        vsf_local.sector = file->dentry.sector0;
+    read_next_sector:
+        __vk_malfs_read(malfs_info, vsf_local.sector, 1, NULL);
+        break;
+    case VSF_EVT_RETURN: {
+            union {
+                uintptr_t value;
+                vsf_err_t err;
+                uint8_t *buffer;
+                int32_t written_size;
+            } result;
+
+            result.value = vsf_eda_get_return_value();
+            switch (vsf_local.state) {
+            case EXFAT_UPDATE_ENTRY_CHECKSUM_READ_ROOT:
+                if (NULL == result.buffer) {
+                    vsf_eda_return(VSF_ERR_FAIL);
+                } else {
+                    dentry = (fatfs_dentry_t *)result.buffer + file->dentry.root_entry_offset;
+                    cur_entry_num = entry_num_in_sector - file->dentry.root_entry_offset;
+                    cur_entry_num = vsf_min(cur_entry_num, file->dentry.entry_num);
+                    vsf_local.checksum = __vk_exfatfs_entry_checksum(0, (uint8_t *)dentry, cur_entry_num << 5, true);
+                    if (cur_entry_num == file->dentry.entry_num) {
+                        dentry->exfat.FilDir.SetChecksum = cpu_to_le16(vsf_local.checksum);
+                        goto write_root;
+                    } else {
+                        vsf_local.entry_num = file->dentry.entry_num - cur_entry_num;
+                        vsf_local.sector++;
+                        vsf_local.state = EXFAT_UPDATE_ENTRY_CHECKSUM_READ_ENTRIES;
+                        goto read_next_sector;
+                    }
+                }
+                break;
+            case EXFAT_UPDATE_ENTRY_CHECKSUM_READ_ENTRIES:
+                if (NULL == result.buffer) {
+                    vsf_eda_return(VSF_ERR_FAIL);
+                } else {
+                    cur_entry_num = vsf_min(entry_num_in_sector, vsf_local.entry_num);
+                    vsf_local.checksum = __vk_exfatfs_entry_checksum(vsf_local.checksum, result.buffer, cur_entry_num << 5, false);
+                    vsf_local.entry_num -= cur_entry_num;
+                    if (0 == vsf_local.entry_num) {
+                        vsf_local.sector = file->dentry.sector0;
+                        vsf_local.state = EXFAT_UPDATE_ENTRY_CHECKSUM_READ_ROOT_FOR_WRITE;
+                    } else {
+                        vsf_local.sector++;
+                    }
+                    goto read_next_sector;
+                }
+                break;
+            case EXFAT_UPDATE_ENTRY_CHECKSUM_READ_ROOT_FOR_WRITE:
+                if (NULL == result.buffer) {
+                    vsf_eda_return(VSF_ERR_FAIL);
+                } else {
+                write_root:
+                    vsf_local.state = EXFAT_UPDATE_ENTRY_CHECKSUM_WRITE_ROOT;
+                    __vk_malfs_write(malfs_info, file->dentry.sector0, 1, result.buffer);
+                }
+                break;
+            case EXFAT_UPDATE_ENTRY_CHECKSUM_WRITE_ROOT:
+                if (result.written_size != (1 << fsinfo->sector_size_bits)) {
+                    vsf_eda_return(VSF_ERR_FAIL);
+                } else {
+                    vsf_eda_return(VSF_ERR_NONE);
+                }
+                break;
+            }
+        }
+        break;
+    }
     vsf_peda_end();
 }
 
@@ -1236,7 +1320,10 @@ __vsf_component_peda_private_entry(__vk_fatfs_dentry_setsize,,
 
             result.value = vsf_eda_get_return_value();
             switch (vsf_local.state) {
-            case DENTRY_SETSIZE_STATE_READ: {
+            case DENTRY_SETSIZE_STATE_READ:
+                if (NULL == result.buffer) {
+                    vsf_eda_return(VSF_ERR_FAIL);
+                } else {
                     fatfs_dentry_t *dentry = (fatfs_dentry_t *)result.buffer + file->dentry.vital_entry_offset;
 #if VSF_FS_USE_EXFATFS == ENABLED
                     if (VSF_FAT_EX == fsinfo->type) {
