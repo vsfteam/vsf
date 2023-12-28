@@ -220,8 +220,14 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
             switch (group_code) {
             case SCSI_GROUPCODE6:
                 switch (cmd_code) {
-                case SCSI_CMDCODE_MODE_SELECT:
                 case SCSI_CMDCODE_TEST_UNIT_READY:
+                    if (0 == param->block_num) {
+                        pthis->sense_key = SCSI_SENSEKEY_NOT_READY;
+                        reply_len = -1;
+                        break;
+                    }
+                    // fall through
+                case SCSI_CMDCODE_MODE_SELECT:
                 case SCSI_CMDCODE_VERIFY:
                 case SCSI_CMDCODE_FORMAT_UNIT:
                 case SCSI_CMDCODE_START_STOP_UNIT:
@@ -315,8 +321,17 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                 case SCSI_CMDCODE_READ_CAPACITY:
                     VSF_SCSI_ASSERT(reply_len >= 8);
                     reply_len = 8;
-                    put_unaligned_be32(param->block_num - 1, &reply[0]);
-                    put_unaligned_be32(param->block_size, &reply[4]);
+                    // if block_num is 0, avoid to return 0xFFFFFFFF because this means
+                    //  that host should use READ_CAPACITY16 instead of READ_CAPACITY10
+                    if (0 == param->block_num) {
+                        put_unaligned_be32(0, &reply[0]);
+                        put_unaligned_be32(0, &reply[4]);
+                        pthis->sense_key = SCSI_SENSEKEY_NOT_READY;
+                    } else {
+                        put_unaligned_be32(param->block_num - 1, &reply[0]);
+                        put_unaligned_be32(param->block_size, &reply[4]);
+                        pthis->sense_key = SCSI_SENSEKEY_NO_SENSE;
+                    }
                     break;
                 case SCSI_CMDCODE_READ:
                 case SCSI_CMDCODE_WRITE:

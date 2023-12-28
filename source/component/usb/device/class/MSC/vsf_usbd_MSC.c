@@ -77,7 +77,10 @@ static void __vk_usbd_msc_error(vk_usbd_msc_t *msc, uint_fast8_t error)
             return;
         }
     } else {
-        vk_usbd_ep_stall(msc->dev, msc->ep_out);
+        if (cbw->dCBWDataTransferLength > 0) {
+            vk_usbd_ep_stall(msc->dev, msc->ep_out);
+            return;
+        }
     }
     __vk_usbd_msc_send_csw(msc);
 }
@@ -89,7 +92,9 @@ static void __vk_usbd_msc_send_csw(void *p)
     vk_usbd_trans_t *trans = &msc->ep_stream.use_as__vk_usbd_trans_t;
 
     csw->dCSWSignature = cpu_to_le32(USB_MSC_CSW_SIGNATURE);
-    csw->dCSWDataResidue -= msc->reply_len;
+    if ((csw->dCSWDataResidue > 0) && (msc->reply_len > 0)) {
+        csw->dCSWDataResidue -= msc->reply_len;
+    }
     trans->ep = msc->ep_in;
     trans->buffer = (uint8_t *)&msc->ctx.csw;
     trans->size = sizeof(msc->ctx.csw);
@@ -196,12 +201,12 @@ static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             msc->scsi_inited_mask |= 1 << cbw->bCBWLUN;
             __vk_usbd_msc_on_cbw(msc);
         } else {
+            msc->reply_len = reply_len;
             if (reply_len < 0) {
                 __vk_usbd_msc_error(msc, USB_MSC_CSW_FAIL);
                 break;
             }
 
-            msc->reply_len = reply_len;
             if (is_in && (cbw->dCBWDataTransferLength > 0)) {
                 if (!msc->is_stream) {
                     trans->size = reply_len;
