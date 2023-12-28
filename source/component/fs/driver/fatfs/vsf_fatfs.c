@@ -240,6 +240,9 @@ typedef struct vk_fatfs_lookup_local {
     vk_fat_sector_type_t sector;
     uint16_t node_parsed_num;
     int16_t vital_entry_num;
+#if VSF_FS_USE_EXFATFS == ENABLED
+    int16_t root_entry_num;
+#endif
     uint8_t entry_num;
     uint8_t state;
 } vk_fatfs_lookup_local;
@@ -547,22 +550,20 @@ bool vk_fatfs_parse_dentry_exfat(vk_fatfs_dentry_parser_t *parser)
 
     parser->node_parsed_num = 0;
     parser->vital_entry_num = -1;
+    parser->exfat.root_entry_num = -1;
     while (parser->entry_num-- > 0) {
         switch (entry->exfat.EntryType) {
         case 0:
             parser->entry_num++;
             return false;
         case EXFAT_ET_FILE_DIR:
+            parser->exfat.root_entry_num = parser->entry_num + 1;
             parser->attr = le16_to_cpu(entry->exfat.FilDir.FileAttributes) & 0xFF;
-            parser->exfat.fildir_parsed = true;
             parser->exfat.namelen = 0;
+            parser->exfat.entry_num = entry->exfat.FilDir.SecondaryCount + 1;
             break;
         case EXFAT_ET_STREAM:
-            if (parser->exfat.fildir_parsed) {
-                if (parser->exfat.namelen > 0) {
-                    goto done_found;
-                }
-
+            if (parser->exfat.entry_num > 0) {
                 parser->vital_entry_num = parser->entry_num + 1;
                 parser->first_cluster = le16_to_cpu(entry->exfat.Stream.FirstCluster);
                 parser->size = le32_to_cpu(entry->exfat.Stream.ValidDataLength);
@@ -571,7 +572,7 @@ bool vk_fatfs_parse_dentry_exfat(vk_fatfs_dentry_parser_t *parser)
             }
             break;
         case EXFAT_ET_FILENAME:
-            if (parser->exfat.fildir_parsed && (parser->exfat.namelen > 0)) {
+            if ((parser->exfat.entry_num > 0) && (parser->exfat.namelen > 0)) {
                 uint8_t copy_size = parser->exfat.namelen - parser->exfat.namepos;
                 copy_size = vsf_min(copy_size, 15);
                 memcpy(&parser->filename[parser->exfat.namepos << 1], entry->exfat.FileName.FileName, copy_size << 1);
@@ -579,23 +580,18 @@ bool vk_fatfs_parse_dentry_exfat(vk_fatfs_dentry_parser_t *parser)
                 if (parser->exfat.namepos == parser->exfat.namelen) {
                     *(uint16_t *)&parser->filename[parser->exfat.namepos << 1] = 0;
                     parser->is_unicode = __vk_fatfs_try_unicode2ascii((uint16_t *)parser->filename);
-                    parser->node_parsed_num++;
-                    parsed = true;
-                    goto done_found;
                 }
             }
             break;
-        // TODO: add other possible entry type for fildir, so they will be calculated in node_parsed_num
-        default:
-            if (parser->exfat.fildir_parsed) {
-            done_found:
-                parser->exfat.fildir_parsed = false;
-                goto done;
-            }
         }
 
-        if (parser->exfat.fildir_parsed) {
+        if (parser->exfat.entry_num > 0) {
             parser->node_parsed_num++;
+            parser->exfat.entry_num--;
+            if (0 == parser->exfat.entry_num) {
+                parsed = true;
+                goto done;
+            }
         }
         entry++;
     }
@@ -1559,6 +1555,11 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                                     VSF_FS_ASSERT(dparser->vital_entry_num >= 0);
                                     fatfs_file->dentry.vital_entry_offset = entry_num_in_sector - dparser->vital_entry_num;
                                 }
+#if VSF_FS_USE_EXFATFS == ENABLED
+                                if (fsinfo->type == VSF_FAT_EX) {
+                                    fatfs_file->dentry.root_entry_offset = entry_num_in_sector - vsf_local.root_entry_num;
+                                }
+#endif
                             } else {
                                 fatfs_file->dentry.sector0 = vsf_local.cur_sector;
                                 fatfs_file->dentry.entry_offset_in_sector0 = entry_num_in_sector - dparser->entry_num - dparser->node_parsed_num;
@@ -1566,6 +1567,11 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                                 fatfs_file->dentry.vital_sector = 0;
                                 VSF_FS_ASSERT(dparser->vital_entry_num >= 0);
                                 fatfs_file->dentry.vital_entry_offset = entry_num_in_sector - dparser->vital_entry_num;
+#if VSF_FS_USE_EXFATFS == ENABLED
+                                if (fsinfo->type == VSF_FAT_EX) {
+                                    fatfs_file->dentry.root_entry_offset = entry_num_in_sector - dparser->exfat.root_entry_num;
+                                }
+#endif
                             }
 
                             *vsf_local.result = &fatfs_file->use_as__vk_file_t;
@@ -1580,6 +1586,9 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                         vsf_local.sector = vsf_local.cur_sector;
                         vsf_local.entry_num = dparser->node_parsed_num;
                         vsf_local.vital_entry_num = dparser->vital_entry_num;
+#if VSF_FS_USE_EXFATFS == ENABLED
+                        vsf_local.root_entry_num = dparser->exfat.root_entry_num;
+#endif
                         break;
                     }
                 }

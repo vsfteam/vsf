@@ -102,9 +102,10 @@ typedef struct vk_fatfs_dentry_parser_t {
         } fat;
 #if VSF_FS_USE_EXFATFS == ENABLED
         struct {
-            bool fildir_parsed;
             uint8_t namelen;
             uint8_t namepos;
+            uint8_t entry_num;
+            int16_t root_entry_num;
         } exfat;
 #endif
         uint32_t zero_before_first_call;
@@ -136,6 +137,10 @@ vsf_class(vk_fatfs_file_t) {
             //  for exfat, should be the stream entry
             uint8_t vital_sector;
             uint8_t vital_entry_offset;
+#if VSF_FS_USE_EXFATFS == ENABLED
+            // root 0/entry_offset is the entry for Critical Primary Directory Entries of exfat
+            uint8_t root_entry_offset;
+#endif
         } dentry;
     )
 };
