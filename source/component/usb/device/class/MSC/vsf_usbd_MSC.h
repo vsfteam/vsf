@@ -112,7 +112,7 @@ vsf_class(vk_usbd_msc_t) {
     private_member(
         vsf_eda_t eda;
         vk_usbd_msc_scsi_ctx_t ctx;
-        uint32_t reply_len;
+        int32_t reply_len;
         vk_usbd_dev_t *dev;
         vk_usbd_ep_stream_t ep_stream;
         uint8_t scsi_inited_mask;

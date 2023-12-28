@@ -223,8 +223,12 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                 case SCSI_CMDCODE_TEST_UNIT_READY:
                     if (0 == param->block_num) {
                         pthis->sense_key = SCSI_SENSEKEY_NOT_READY;
+                        pthis->asc = SCSI_ASC_MEDIUM_NOT_PRESENT;
                         reply_len = -1;
                         break;
+                    } else {
+                        pthis->sense_key = SCSI_SENSEKEY_NO_SENSE;
+                        pthis->asc = SCSI_ASC_NONE;
                     }
                     // fall through
                 case SCSI_CMDCODE_MODE_SELECT:
@@ -324,13 +328,14 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                     // if block_num is 0, avoid to return 0xFFFFFFFF because this means
                     //  that host should use READ_CAPACITY16 instead of READ_CAPACITY10
                     if (0 == param->block_num) {
-                        put_unaligned_be32(0, &reply[0]);
-                        put_unaligned_be32(0, &reply[4]);
                         pthis->sense_key = SCSI_SENSEKEY_NOT_READY;
+                        pthis->asc = SCSI_ASC_MEDIUM_NOT_PRESENT;
+                        reply_len = -1;
                     } else {
                         put_unaligned_be32(param->block_num - 1, &reply[0]);
                         put_unaligned_be32(param->block_size, &reply[4]);
                         pthis->sense_key = SCSI_SENSEKEY_NO_SENSE;
+                        pthis->asc = SCSI_ASC_NONE;
                     }
                     break;
                 case SCSI_CMDCODE_READ:
