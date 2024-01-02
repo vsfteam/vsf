@@ -355,6 +355,9 @@ __vsf_component_peda_ifs_entry(__vk_virtual_scsi_execute, vk_scsi_execute)
                 case SCSI_CMDCODE_MODE_SELECT:
                     break;
                 case SCSI_CMDCODE_MODE_SENSE:
+                    VSF_SCSI_ASSERT(reply_len >= 8);
+                    reply_len = 8;
+                    reply[1] = 6;
                     break;
                 default:
                     goto exit_invalid_cmd;
