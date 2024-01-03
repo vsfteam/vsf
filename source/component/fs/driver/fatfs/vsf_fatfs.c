@@ -1830,6 +1830,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
     vk_fatfs_file_t *fatfs_file = (vk_fatfs_file_t *)&vsf_this;
     __vk_fatfs_info_t *fsinfo = (__vk_fatfs_info_t *)fatfs_file->info;
     __vk_malfs_info_t *malfs_info = &fsinfo->use_as____vk_malfs_info_t;
+    uint32_t sector_size_bytes = 1 << fsinfo->sector_size_bits;
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -1840,7 +1841,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
         vsf_local.cur_size = 0;
         vsf_local.cur_sector = __vk_fatfs_clus2sec(fsinfo, fatfs_file->cur.cluster);
         vsf_local.cur_sector += fatfs_file->cur.sector_offset_in_cluster;
-        vsf_local.offset_in_sector = vsf_local.offset & ((1 << fsinfo->sector_size_bits) - 1);
+        vsf_local.offset_in_sector = vsf_local.offset & (sector_size_bytes - 1);
         vsf_local.state = READ_STATE_READ;
         // fall through
     case VSF_EVT_RETURN: {
@@ -1860,11 +1861,11 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
 
                     if (vsf_local.offset_in_sector != 0) {
                         // read first non-page-aligned data
-                        vsf_local.cur_run_size = (1 << fsinfo->sector_size_bits) - vsf_local.offset_in_sector;
+                        vsf_local.cur_run_size = sector_size_bytes - vsf_local.offset_in_sector;
                         vsf_local.cur_run_size = vsf_min(vsf_local.cur_run_size, vsf_local.size);
                         vsf_local.cur_run_sector = 1;
                         buffer = NULL;
-                    } else if (vsf_local.size < (1 << fsinfo->sector_size_bits)) {
+                    } else if (vsf_local.size < sector_size_bytes) {
                         // read last non-page-aligned data
                         vsf_local.cur_run_size = vsf_local.size;
                         vsf_local.cur_run_sector = 1;
@@ -1896,7 +1897,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
                     uint8_t *src = result.buffer + vsf_local.offset_in_sector;
                     memcpy(vsf_local.buff, src, vsf_local.cur_run_size);
                     vsf_local.offset_in_sector = 0;
-                } else if (vsf_local.size < (1 << fsinfo->sector_size_bits)) {
+                } else if (vsf_local.size < sector_size_bytes) {
                     uint8_t *dst = vsf_local.buff + vsf_local.cur_size;
                     memcpy(dst, result.buffer, vsf_local.cur_run_size);
                 }
@@ -1904,10 +1905,10 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_read, vk_file_read,
                 vsf_local.offset += vsf_local.cur_run_size;
                 vsf_local.size -= vsf_local.cur_run_size;
 
-                fatfs_file->cur.offset_in_sector += vsf_local.cur_run_size;
-                if (fatfs_file->cur.offset_in_sector == (1 << fsinfo->sector_size_bits)) {
-                    fatfs_file->cur.offset_in_sector = 0;
-                    fatfs_file->cur.sector_offset_in_cluster++;
+                {
+                    uint32_t new_pos = fatfs_file->cur.offset_in_sector + vsf_local.cur_run_size;
+                    fatfs_file->cur.offset_in_sector = new_pos % sector_size_bytes;
+                    fatfs_file->cur.sector_offset_in_cluster += new_pos / sector_size_bytes;
                 }
 
                 // get next cluster if necessary
@@ -1962,6 +1963,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
     vk_fatfs_file_t *fatfs_file = (vk_fatfs_file_t *)&vsf_this;
     __vk_fatfs_info_t *fsinfo = (__vk_fatfs_info_t *)fatfs_file->info;
     __vk_malfs_info_t *malfs_info = &fsinfo->use_as____vk_malfs_info_t;
+    uint32_t sector_size_bytes = 1 << fsinfo->sector_size_bits;
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -1969,7 +1971,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
         vsf_local.cur_size = 0;
         vsf_local.cur_sector = __vk_fatfs_clus2sec(fsinfo, fatfs_file->cur.cluster);
         vsf_local.cur_sector += fatfs_file->cur.sector_offset_in_cluster;
-        vsf_local.offset_in_sector = vsf_local.offset & ((1 << fsinfo->sector_size_bits) - 1);
+        vsf_local.offset_in_sector = vsf_local.offset & (sector_size_bytes - 1);
 
         if (0 == fatfs_file->size) {
             uint32_t clustersize = 1 << (fsinfo->cluster_size_bits + fsinfo->sector_size_bits);
@@ -2000,7 +2002,7 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
                     uint8_t *dst = result.buffer + vsf_local.offset_in_sector;
                     memcpy(dst, vsf_local.buff, vsf_local.cur_run_size);
                     vsf_local.offset_in_sector = 0;
-                } else if (vsf_local.size < (1 << fsinfo->sector_size_bits)) {
+                } else if (vsf_local.size < sector_size_bytes) {
                     uint8_t *src = vsf_local.buff + vsf_local.cur_size;
                     memcpy(result.buffer, src, vsf_local.cur_run_size);
                 }
@@ -2014,11 +2016,11 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
                 if (vsf_local.size) {
                     if (vsf_local.offset_in_sector != 0) {
                         // read first non-page-aligned data
-                        vsf_local.cur_run_size = (1 << fsinfo->sector_size_bits) - vsf_local.offset_in_sector;
+                        vsf_local.cur_run_size = sector_size_bytes - vsf_local.offset_in_sector;
                         vsf_local.cur_run_size = vsf_min(vsf_local.cur_run_size, vsf_local.size);
                         vsf_local.cur_run_sector = 1;
                         goto read_page;
-                    } else if (vsf_local.size < (1 << fsinfo->sector_size_bits)) {
+                    } else if (vsf_local.size < sector_size_bytes) {
                         // read last non-page-aligned data
                         vsf_local.cur_run_size = vsf_local.size;
                         vsf_local.cur_run_sector = 1;
@@ -2060,10 +2062,10 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_write, vk_file_write,
                 vsf_local.offset += vsf_local.cur_run_size;
                 vsf_local.size -= vsf_local.cur_run_size;
 
-                fatfs_file->cur.offset_in_sector += vsf_local.cur_run_size;
-                if (fatfs_file->cur.offset_in_sector == (1 << fsinfo->sector_size_bits)) {
-                    fatfs_file->cur.offset_in_sector = 0;
-                    fatfs_file->cur.sector_offset_in_cluster++;
+                {
+                    uint32_t new_pos = fatfs_file->cur.offset_in_sector + vsf_local.cur_run_size;
+                    fatfs_file->cur.offset_in_sector = new_pos % sector_size_bytes;
+                    fatfs_file->cur.sector_offset_in_cluster += new_pos / sector_size_bytes;
                 }
 
                 // get/append next cluster if necessary
