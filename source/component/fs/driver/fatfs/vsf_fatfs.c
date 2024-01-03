@@ -1728,12 +1728,14 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                     } else if (dparser->entry_num > 0) {
                         goto __not_available;
                     } else {
-                        vsf_local.sector = vsf_local.cur_sector;
-                        vsf_local.entry_num = dparser->node_parsed_num;
-                        vsf_local.vital_entry_num = dparser->vital_entry_num;
+                        if (parsed) {
+                            vsf_local.sector = vsf_local.cur_sector;
+                            vsf_local.entry_num = dparser->node_parsed_num;
+                            vsf_local.vital_entry_num = dparser->vital_entry_num;
 #if VSF_FS_USE_EXFATFS == ENABLED
-                        vsf_local.root_entry_num = dparser->exfat.root_entry_num;
+                            vsf_local.root_entry_num = dparser->exfat.root_entry_num;
 #endif
+                        }
                         break;
                     }
                 }

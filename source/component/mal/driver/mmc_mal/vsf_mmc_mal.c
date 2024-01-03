@@ -98,7 +98,7 @@ static void __vk_mmc_mal_irqhandler(void *target, vsf_mmc_t *mmc,
     } else {
         if (    (status & MMC_TRANSACT_STATUS_ERR_MASK)
             ||  (   (irq_mask & MMC_IRQ_MASK_HOST_RESP_DONE)
-                 && ((resp[0] & (R1_READY_FOR_DATA | R1_CUR_STATE(R1_STATE_MASK))) != (R1_READY_FOR_DATA | R1_CUR_STATE(R1_STATE_TRAN)))
+                 && !(resp[0] & R1_READY_FOR_DATA)
                 )
            ) {
             vsf_mmc_host_transact_stop(pthis->mmc);
