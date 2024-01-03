@@ -1307,7 +1307,9 @@ __vsf_component_peda_private_entry(__vk_fatfs_dentry_setsize,,
 
     switch (evt) {
     case VSF_EVT_INIT:
+#if VSF_FS_USE_EXFATFS == ENABLED
         vsf_local.need_update_checksum = false;
+#endif
         vsf_local.state = DENTRY_SETSIZE_STATE_READ;
         __vk_malfs_read(malfs_info, sector, 1, NULL);
         break;
@@ -1728,14 +1730,12 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
                     } else if (dparser->entry_num > 0) {
                         goto __not_available;
                     } else {
-                        if (parsed) {
-                            vsf_local.sector = vsf_local.cur_sector;
-                            vsf_local.entry_num = dparser->node_parsed_num;
-                            vsf_local.vital_entry_num = dparser->vital_entry_num;
+                        vsf_local.sector = vsf_local.cur_sector;
+                        vsf_local.entry_num = dparser->node_parsed_num;
+                        vsf_local.vital_entry_num = dparser->vital_entry_num;
 #if VSF_FS_USE_EXFATFS == ENABLED
-                            vsf_local.root_entry_num = dparser->exfat.root_entry_num;
+                        vsf_local.root_entry_num = dparser->exfat.root_entry_num;
 #endif
-                        }
                         break;
                     }
                 }
