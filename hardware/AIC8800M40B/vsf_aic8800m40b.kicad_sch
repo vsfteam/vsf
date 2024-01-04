@@ -1343,11 +1343,11 @@
         )
       )
     )
-    (symbol "Jumper:Jumper_3_Bridged12" (pin_names (offset 0) hide) (in_bom yes) (on_board yes)
+    (symbol "Jumper:Jumper_3_Open" (pin_names (offset 0) hide) (in_bom yes) (on_board yes)
       (property "Reference" "JP" (at -2.54 -2.54 0)
         (effects (font (size 1.27 1.27)))
       )
-      (property "Value" "Jumper_3_Bridged12" (at 0 2.794 0)
+      (property "Value" "Jumper_3_Open" (at 0 2.794 0)
         (effects (font (size 1.27 1.27)))
       )
       (property "Footprint" "" (at 0 0 0)
@@ -1359,13 +1359,13 @@
       (property "ki_keywords" "Jumper SPDT" (at 0 0 0)
         (effects (font (size 1.27 1.27)) hide)
       )
-      (property "ki_description" "Jumper, 3-pole, pins 1+2 closed/bridged" (at 0 0 0)
+      (property "ki_description" "Jumper, 3-pole, both open" (at 0 0 0)
         (effects (font (size 1.27 1.27)) hide)
       )
       (property "ki_fp_filters" "Jumper* TestPoint*3Pads* TestPoint*Bridge*" (at 0 0 0)
         (effects (font (size 1.27 1.27)) hide)
       )
-      (symbol "Jumper_3_Bridged12_0_0"
+      (symbol "Jumper_3_Open_0_0"
         (circle (center -3.302 0) (radius 0.508)
           (stroke (width 0) (type default))
           (fill (type none))
@@ -1379,21 +1379,25 @@
           (fill (type none))
         )
       )
-      (symbol "Jumper_3_Bridged12_0_1"
-        (arc (start -0.254 0.508) (mid -1.651 0.9912) (end -3.048 0.508)
+      (symbol "Jumper_3_Open_0_1"
+        (arc (start -0.254 1.016) (mid -1.651 1.4992) (end -3.048 1.016)
           (stroke (width 0) (type default))
           (fill (type none))
         )
         (polyline
           (pts
-            (xy 0 -1.27)
             (xy 0 -0.508)
+            (xy 0 -1.27)
           )
           (stroke (width 0) (type default))
           (fill (type none))
         )
+        (arc (start 3.048 1.016) (mid 1.651 1.4992) (end 0.254 1.016)
+          (stroke (width 0) (type default))
+          (fill (type none))
+        )
       )
-      (symbol "Jumper_3_Bridged12_1_1"
+      (symbol "Jumper_3_Open_1_1"
         (pin passive line (at -6.35 0 0) (length 2.54)
           (name "A" (effects (font (size 1.27 1.27))))
           (number "1" (effects (font (size 1.27 1.27))))
@@ -3868,6 +3872,33 @@
   (label "LCD_TE" (at 139.7 180.34 0) (fields_autoplaced)
     (effects (font (size 1.27 1.27)) (justify left bottom))
     (uuid ff8b3ec5-66db-4e2a-bbea-c314c836d1d2)
+  )
+
+  (symbol (lib_id "Jumper:Jumper_3_Open") (at 158.75 80.01 90) (unit 1)
+    (in_bom yes) (on_board yes) (dnp no)
+    (uuid 036490ec-07a8-408d-82e5-9758ef9c7470)
+    (property "Reference" "JP1" (at 156.21 81.915 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Value" "Jumper_3_Open" (at 153.67 87.63 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Footprint" "Jumper:SolderJumper-3_P1.3mm_Open_RoundedPad1.0x1.5mm_NumberLabels" (at 158.75 80.01 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Datasheet" "~" (at 158.75 80.01 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 05a0d89c-36d2-48f2-a237-b91e0c85bddf))
+    (pin "2" (uuid 1cb4af16-da47-48f4-84bd-0d3f0a65d3ad))
+    (pin "3" (uuid a3a6ffe0-b95f-4c2a-85c0-3cb4053308b2))
+    (instances
+      (project "vsf_aic8800m40b"
+        (path "/7ff897c7-5676-47e3-800e-188ea4d80e23"
+          (reference "JP1") (unit 1)
+        )
+      )
+    )
   )
 
   (symbol (lib_id "Device:C") (at 100.33 82.55 0) (unit 1)
@@ -6718,38 +6749,6 @@
       (project "MCULinux"
         (path "/b0717bb8-5e5d-44de-b48f-ff278896fb50"
           (reference "C5") (unit 1)
-        )
-      )
-    )
-  )
-
-  (symbol (lib_id "Jumper:Jumper_3_Bridged12") (at 158.75 80.01 90) (unit 1)
-    (in_bom yes) (on_board yes) (dnp no)
-    (uuid a570d341-2e25-4c62-9c0e-c6dc233ed053)
-    (property "Reference" "JP1" (at 162.56 78.74 90)
-      (effects (font (size 1.27 1.27)) (justify left))
-    )
-    (property "Value" "Jumper_3_Bridged12" (at 154.94 90.17 0)
-      (effects (font (size 1.27 1.27)) (justify left))
-    )
-    (property "Footprint" "Jumper:SolderJumper-3_P1.3mm_Bridged12_RoundedPad1.0x1.5mm_NumberLabels" (at 158.75 80.01 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (property "Datasheet" "~" (at 158.75 80.01 0)
-      (effects (font (size 1.27 1.27)) hide)
-    )
-    (pin "1" (uuid 9f242dc6-5690-40f3-987a-aecdf30a1b2e))
-    (pin "2" (uuid 8751d061-3125-428d-a2be-f87a926445a8))
-    (pin "3" (uuid 16937e8a-b4cc-4e8f-a4c6-f7db17f536c6))
-    (instances
-      (project "vsf_aic8800m40b"
-        (path "/7ff897c7-5676-47e3-800e-188ea4d80e23"
-          (reference "JP1") (unit 1)
-        )
-      )
-      (project "MCULinux"
-        (path "/b0717bb8-5e5d-44de-b48f-ff278896fb50"
-          (reference "JP1") (unit 1)
         )
       )
     )
