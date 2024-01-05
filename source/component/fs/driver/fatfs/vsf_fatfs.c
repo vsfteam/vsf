@@ -1613,6 +1613,9 @@ __vsf_component_peda_ifs_entry(__vk_fatfs_lookup, vk_file_lookup,
         vsf_local.dparser->zero_before_first_call = 0;
         if (name != NULL) {
             vsf_local.fatfs_file_pos_save = dir->cur;
+            dir->cur.cluster = dir->first_cluster;
+            dir->cur.sector_offset_in_cluster = 0;
+            dir->cur.offset_in_sector = 0;
         }
         vsf_local.state = LOOKUP_STATE_READ_SECTOR;
 
