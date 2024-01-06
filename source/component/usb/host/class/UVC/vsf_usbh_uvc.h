@@ -15,21 +15,21 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_USBH_UAC_H__
-#define __VSF_USBH_UAC_H__
+#ifndef __VSF_USBH_UVC_H__
+#define __VSF_USBH_UVC_H__
 
 
 /*============================ INCLUDES ======================================*/
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_UAC == ENABLED
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_UVC == ENABLED
 
-#include "component/usb/common/class/UAC/vsf_usb_UAC.h"
+#include "component/usb/common/class/UVC/vsf_usb_UVC.h"
 
 #undef PUBLIC_CONST
-#if     defined(__VSF_USBH_UAC_CLASS_IMPLEMENT)
-#   undef __VSF_USBH_UAC_CLASS_IMPLEMENT
+#if     defined(__VSF_USBH_UVC_CLASS_IMPLEMENT)
+#   undef __VSF_USBH_UVC_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
 #   define PUBLIC_CONST
 #else
@@ -44,52 +44,30 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 // for some hcd, one urb will take 2ms(eg. ohci), so need 2 urbs to implement 1ms interval transaction
-#ifndef VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM
-#   define VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM  1
+#ifndef VSF_USBH_UVC_CFG_URB_NUM_PER_STREAM
+#   define VSF_USBH_UVC_CFG_URB_NUM_PER_STREAM  1
 #endif
-#if VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM > 8
-#   error VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM MUST be <= 8
+#if VSF_USBH_UVC_CFG_URB_NUM_PER_STREAM > 8
+#   error VSF_USBH_UVC_CFG_URB_NUM_PER_STREAM MUST be <= 8
 #endif
 
 #if VSF_USE_SIMPLE_STREAM != ENABLED
-#   error VSF_USE_SIMPLE_STREAM is needed for USBH UAC driver
+#   error VSF_USE_SIMPLE_STREAM is needed for USBH UVC driver
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-vsf_class(vk_usbh_uac_stream_t) {
-    public_member(
-        PUBLIC_CONST uint8_t is_in          : 1;
-        PUBLIC_CONST uint8_t sample_size    : 3;
-        PUBLIC_CONST uint8_t channel_num;
-        PUBLIC_CONST uint16_t format;
-        PUBLIC_CONST uint32_t sample_rate;
-    )
-
-    private_member(
-        uint8_t idx                         : 6;
-        uint8_t is_connected                : 1;
-        uint8_t is_to_disconnect            : 1;
-        uint8_t urb_mask;
-        uint16_t next_frame;
-
-        vk_usbh_urb_t urb[VSF_USBH_UAC_CFG_URB_NUM_PER_STREAM];
-        vsf_stream_t *stream;
-        void *param;
-    )
-};
-
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vk_usbh_class_drv_t vk_usbh_uac_drv;
+extern const vk_usbh_class_drv_t vk_usbh_uvc_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern vk_usbh_uac_stream_t * vsf_usbh_uac_get_stream_info(void *param, uint_fast8_t stream_idx);
-extern vsf_err_t vsf_usbh_uac_connect_stream(void *param, uint_fast8_t stream_idx, vsf_stream_t *stream);
-extern void vsf_usbh_uac_disconnect_stream(void *param, uint_fast8_t stream_idx);
-extern vsf_err_t __vsf_usbh_uac_submit_req(void *uac_ptr, void *data, struct usb_ctrlrequest_t *req);
+extern int16_t vsf_usbh_uvc_get_desc(uint8_t *buf, uint_fast16_t size, uint_fast8_t subtype, void **ptr);
+extern usb_uvc_format_desc_t * vsf_usbh_uvc_get_format(void *param, uint_fast8_t format_idx);
+extern vsf_err_t vsf_usbh_uvc_connect_stream(void *param, uint_fast8_t format_idx, uint_fast8_t frame_idx, vsf_stream_t *stream);
+extern void vsf_usbh_uvc_disconnect_stream(void *param);
+extern vsf_err_t __vsf_usbh_uvc_submit_req(void *uvc_ptr, void *data, struct usb_ctrlrequest_t *req);
 
 #ifdef __cplusplus
 }

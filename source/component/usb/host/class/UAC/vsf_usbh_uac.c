@@ -621,10 +621,12 @@ static void __vk_usbh_uac_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *
 
     for (uint_fast8_t i = 0; i < uac->stream_num; i++) {
         uac_stream = vsf_usbh_uac_get_stream_info(uac, i);
-        if (uac_stream->is_in) {
-            vsf_stream_disconnect_tx(uac_stream->stream);
-        } else {
-            vsf_stream_disconnect_rx(uac_stream->stream);
+        if (uac_stream->is_connected) {
+            if (uac_stream->is_in) {
+                vsf_stream_disconnect_tx(uac_stream->stream);
+            } else {
+                vsf_stream_disconnect_rx(uac_stream->stream);
+            }
         }
     }
     vsf_eda_fini((vsf_eda_t *)&uac->task);

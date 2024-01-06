@@ -1360,32 +1360,29 @@ void vk_usbh_register_class(vk_usbh_t *usbh, vk_usbh_class_t *c)
     vsf_slist_add_to_head(vk_usbh_class_t, node, &usbh->class_list, c);
 }
 
-vsf_err_t vk_usbh_get_extra_descriptor(uint8_t *buf, uint_fast16_t size,
+int16_t vk_usbh_get_extra_descriptor(uint8_t *buf, uint_fast16_t size,
         uint_fast8_t type, void **ptr)
 {
     struct usb_descriptor_header_t *header;
+    uint8_t *buf_orig = buf;
 
     VSF_USB_ASSERT((buf != NULL) && (ptr != NULL));
 
     while (size >= sizeof(struct usb_descriptor_header_t)) {
         header = (struct usb_descriptor_header_t *)buf;
-        if (header->bLength < 2) {
+        if ((header->bLength < 2) || (size < header->bLength)) {
             break;
         }
 
         if (header->bDescriptorType == type) {
             *ptr = header;
-            return VSF_ERR_NONE;
-        }
-
-        if (size < header->bLength) {
-            break;
+            return (uint8_t *)header - buf_orig;
         }
 
         buf += header->bLength;
         size -= header->bLength;
     }
-    return VSF_ERR_FAIL;
+    return -1;
 }
 
 usb_endpoint_desc_t * vk_usbh_get_next_ep_descriptor(usb_endpoint_desc_t *desc_ep, uint_fast16_t size)

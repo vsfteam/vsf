@@ -22,7 +22,8 @@
 
 #include "component/usb/vsf_usb_cfg.h"
 
-#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_UVC == ENABLED
+#if     ((VSF_USE_USB_DEVICE == ENABLED) && (VSF_USBD_USE_UVC == ENABLED))      \
+    ||  ((VSF_USE_USB_HOST == ENABLED) && (VSF_USBH_USE_UVC == ENABLED))
 
 #include "utilities/vsf_utilities.h"
 
@@ -46,6 +47,89 @@ typedef enum usb_uvc_req_t {
     USB_UVC_REQ_SET     = 0x00,
     USB_UVC_REQ_GET     = 0x80,
 } usb_uvc_req_t;
+
+// descriptors
+
+typedef struct usb_uvc_desc_header_t usb_uvc_desc_header_t;
+struct usb_uvc_desc_header_t {
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    uint8_t bDescriptorSubtype;
+};
+
+typedef struct usb_uvc_vc_interface_header_desc_t usb_uvc_vc_interface_header_desc_t;
+struct usb_uvc_vc_interface_header_desc_t {
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    uint8_t bDescriptorSubtype;
+    uint16_t bcdVDC;
+    uint16_t wTotalLength;
+    uint32_t dwClockFrequency;
+    uint8_t bInCollection;
+    uint8_t baInterfaceNr[1];
+} PACKED;
+
+typedef struct usb_uvc_vs_interface_header_desc_t usb_uvc_vs_interface_header_desc_t;
+struct usb_uvc_vs_interface_header_desc_t {
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    uint8_t bDescriptorSubtype;
+    uint8_t bNumFormats;
+    uint16_t wTotalLength;
+    uint8_t bEndpointAddress;
+    uint8_t bmInfo;
+    uint8_t bTerminalLink;
+    uint8_t bStillCaptureMethod;
+    uint8_t bTriggerSupport;
+    uint8_t bTriggerUsage;
+    uint8_t bControlSize;
+    uint8_t bmControls[0];
+} PACKED;
+
+typedef struct usb_uvc_format_desc_t usb_uvc_format_desc_t;
+struct usb_uvc_format_desc_t {
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    uint8_t bDescriptorSubtype;
+    uint8_t bFormatIndex;
+    uint8_t bNumFrameDescriptors;
+    union {
+        struct {
+            uint32_t guidFormat;
+            uint8_t bBitsPerPixel;
+            uint8_t bDefaultFrameIndex;
+            uint8_t bAspectRatioX;
+            uint8_t bAspectRatioY;
+            uint8_t bmInterlaceFlags;
+            uint8_t bCopyProtect;
+        } PACKED uncompressed;
+        struct {
+            uint8_t bmFlags;
+            uint8_t bDefaultFrameIndex;
+            uint8_t bAspectRatioX;
+            uint8_t bAspectRatioY;
+            uint8_t bmInterlaceFlags;
+            uint8_t bCopyProtect;
+        } PACKED mjpeg;
+    } PACKQED;
+} PACKED;
+
+typedef struct usb_uvc_frame_desc_t usb_uvc_frame_desc_t;
+struct usb_uvc_frame_desc_t {
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    uint8_t bDescriptorSubtype;
+    uint8_t bFrameIndex;
+    uint8_t bmCapabilities;
+    uint16_t wWidth;
+    uint16_t wHeight;
+    uint32_t dwMinBitRate;
+    uint32_t dwMaxBitRate;
+    uint32_t dwMaxVideoFrameBufferSize;
+    uint32_t dwDefaultFrameInterval;
+    uint8_t bFrameIntervalType;
+    uint32_t dwFrameInterval[0];
+} PACKED;
 
 // Stream Controls
 typedef struct usb_uvc_vs_t usb_uvc_vs_t;
@@ -91,5 +175,5 @@ struct usb_uvc_ct_roi_t {
 }
 #endif
 
-#endif      // VSF_USE_USB_DEVICE && VSF_USBD_USE_UVC
+#endif      // (VSF_USE_USB_DEVICE && VSF_USBD_USE_UVC) || (VSF_USE_USB_HOST && VSF_USBH_USE_UVC)
 #endif      // __VSFUSB_UVC_H__

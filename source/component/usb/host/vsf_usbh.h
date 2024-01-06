@@ -635,7 +635,7 @@ extern vsf_err_t vk_usbh_clear_endpoint_feature(vk_usbh_t *usbh, vk_usbh_dev_t *
 extern vsf_err_t vk_usbh_clear_endpoint_halt(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
             uint_fast8_t endpoint);
 
-extern vsf_err_t vk_usbh_get_extra_descriptor(uint8_t *buf, uint_fast16_t size,
+extern int16_t vk_usbh_get_extra_descriptor(uint8_t *buf, uint_fast16_t size,
         uint_fast8_t type, void **ptr);
 
 extern usb_endpoint_desc_t * vk_usbh_get_next_ep_descriptor(
@@ -684,6 +684,9 @@ extern usb_endpoint_desc_t * vk_usbh_get_next_ep_descriptor(
 #endif
 #if VSF_USBH_USE_UAC == ENABLED
 #   include "./class/UAC/vsf_usbh_uac.h"
+#endif
+#if VSF_USBH_USE_UVC == ENABLED
+#   include "./class/UVC/vsf_usbh_uvc.h"
 #endif
 #if VSF_USBH_USE_DFU == ENABLED
 #   include "./class/DFU/vsf_usbh_dfu.h"
