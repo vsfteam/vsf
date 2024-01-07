@@ -14,6 +14,11 @@
 extern "C" {
 #endif
 
+// itoa is non-standard APIs in stdlib, define VSF_LINUX_LIBC_HAS_ITOA to 0 if any confliction
+#ifndef VSF_LINUX_LIBC_HAS_ITOA
+#   define VSF_LINUX_LIBC_HAS_ITOA          1
+#endif
+
 #if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
 #   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR != ENABLED
 #define malloc              VSF_LINUX_LIBC_WRAPPER(malloc)
@@ -276,10 +281,12 @@ VSF_LINUX_APPLET_LIBC_STDLIB_IMP(lldiv, lldiv_t, long long int numer, long long 
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(lldiv)(numer, denom);
 }
+#if VSF_LINUX_LIBC_HAS_ITOA
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(itoa, char *, int num, char *str, int radix) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(itoa)(num, str, radix);
 }
+#endif
 VSF_LINUX_APPLET_LIBC_STDLIB_IMP(atoi, int, const char * str) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(atoi)(str);
@@ -432,7 +439,9 @@ div_t div(int numer, int denom);
 ldiv_t ldiv(long int numer, long int denom);
 lldiv_t lldiv(long long int numer, long long int denom);
 
+#if VSF_LINUX_LIBC_HAS_ITOA
 char * itoa(int num, char *str, int radix);
+#endif
 int atoi(const char * str);
 long int atol(const char *str);
 long long int atoll(const char *str);
