@@ -11,6 +11,10 @@ list(APPEND VSF_TARGET_INCLUDE_DIRECTORIES
     ${ARM_CMSIS_PATH}/CMSIS/NN/Include
 )
 
+vsf_add_compile_definitions(
+    __CPU_ARM__
+)
+
 set(CMAKE_C_FLAGS 
     "-mcpu=cortex-m4 -mthumb ${CMAKE_C_FLAGS}"
     CACHE INTERNAL "C compiler common flags"

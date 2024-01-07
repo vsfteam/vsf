@@ -51,6 +51,7 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC
 if(VSF_APPLET)
     target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC
         __VSF_APPLET__
+        __OOC_CPP__
     )
 endif()
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
@@ -79,11 +80,44 @@ include(${VSF_CMAKE_ROOT}/compilers.cmake)
 if(NOT VSF_APPLET)
     add_subdirectory(${VSF_SRC_PATH} ${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
     link_directories(${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
-endif()
 
-# libraries MUST be placed at the end
-if(NOT VSF_APPLET)
+    # libraries MUST be placed at the end
     vsf_add_libraries(
         m
+    )
+else()
+    if(NOT VSF_USE_LINUX)
+        message(WARNING "VSF_APPLET is for vsf.linux, so VSF_USE_LINUX MUST be enabled")
+        set(VSF_USE_LINUX 1)
+        set(VSF_LINUX_USE_SIMPLE_LIBC 1)
+    endif()
+
+    vsf_add_compile_definitions(
+        # itoa is non-standard API, so remove it for applet
+        VSF_LINUX_LIBC_HAS_ITOA=0
+    )
+    vsf_add_include_directories(
+        # linux include directories
+        ${VSF_SRC_PATH}/shell/sys/linux/include
+        ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc
+        ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/inttypes
+        ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/math
+        ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/stdint
+        ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/assert
+        ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/setjmp
+    )
+    vsf_add_sources(
+        ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/getopt/getopt_long.c
+        ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regcomp.c
+        ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regerror.c
+        ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regexec.c
+        ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regfree.c
+    )
+
+    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+        SUFFIX ".elf"
+    )
+    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
     )
 endif()

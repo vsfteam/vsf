@@ -12,6 +12,10 @@ set(VSF_TARGET_DEFINITIONS
     ${VSF_TARGET_DEFINITIONS}
 )
 
+vsf_add_compile_definitions(
+    __CPU_ARM__
+)
+
 set(CMAKE_C_FLAGS 
     "-mtune=arm926ej-s -mfloat-abi=soft -marm -mno-thumb-interwork -mno-unaligned-access ${CMAKE_C_FLAGS}"
     CACHE INTERNAL "C compiler common flags"
