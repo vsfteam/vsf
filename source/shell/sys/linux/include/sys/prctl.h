@@ -44,7 +44,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_prctl_vplt_t vsf_linux_sys_prctl_vpl
 
 VSF_LINUX_APPLET_SYS_PRCTL_IMP(prctl, int, int option, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4, uintptr_t arg5) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    return VSF_APPLET_VPLT_ENTRY_FUNC_IMP(prctl)(option, arg2, arg3, arg4, arg5);
+    return VSF_LINUX_APPLET_SYS_PRCTL_ENTRY(prctl)(option, arg2, arg3, arg4, arg5);
 }
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_PRCTL

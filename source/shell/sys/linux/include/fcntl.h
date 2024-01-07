@@ -136,7 +136,7 @@ VSF_LINUX_APPLET_FCNTL_IMP(creat, int, const char *pathname, mode_t mode) {
     return VSF_LINUX_APPLET_FCNTL_ENTRY(creat)(pathname, mode);
 }
 
-VSF_APPLET_VPLT_FUNC_DECORATOR int fcntl(int fd, int cmd, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR(fcntl) int fcntl(int fd, int cmd, ...) {
     int ret;
 
     va_list ap;
@@ -145,7 +145,7 @@ VSF_APPLET_VPLT_FUNC_DECORATOR int fcntl(int fd, int cmd, ...) {
     va_end(ap);
     return ret;
 }
-VSF_APPLET_VPLT_FUNC_DECORATOR int open(const char *pathname, int flags, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR(open) int open(const char *pathname, int flags, ...) {
     int ret;
 
     va_list ap;
@@ -154,7 +154,7 @@ VSF_APPLET_VPLT_FUNC_DECORATOR int open(const char *pathname, int flags, ...) {
     va_end(ap);
     return ret;
 }
-VSF_APPLET_VPLT_FUNC_DECORATOR int openat(int dirfd, const char *pathname, int flags, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR(openat) int openat(int dirfd, const char *pathname, int flags, ...) {
     int ret;
 
     va_list ap;

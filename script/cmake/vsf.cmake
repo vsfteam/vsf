@@ -107,6 +107,7 @@ else()
         ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/setjmp
     )
     vsf_add_sources(
+#        ${VSF_SRC_PATH}/shell/sys/linux/lib/vsf_linux_applet_lib.c
         ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/getopt/getopt_long.c
         ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regcomp.c
         ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regerror.c

@@ -744,7 +744,7 @@ VSF_LINUX_APPLET_UNISTD_IMP(__vsf_linux_vfork_prepare, pid_t, vsf_linux_process_
     return VSF_LINUX_APPLET_UNISTD_ENTRY(__vsf_linux_vfork_prepare)(parent_process);
 }
 
-VSF_APPLET_VPLT_FUNC_DECORATOR exec_ret_t execl(const char *pathname, const char *arg, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR(execl) exec_ret_t execl(const char *pathname, const char *arg, ...) {
     exec_ret_t ret;
 
     va_list ap;
@@ -753,7 +753,7 @@ VSF_APPLET_VPLT_FUNC_DECORATOR exec_ret_t execl(const char *pathname, const char
     va_end(ap);
     return ret;
 }
-VSF_APPLET_VPLT_FUNC_DECORATOR exec_ret_t execlp(const char *file, const char *arg, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR(execlp) exec_ret_t execlp(const char *file, const char *arg, ...) {
     int ret;
 
     va_list ap;

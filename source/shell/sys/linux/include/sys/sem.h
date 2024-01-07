@@ -94,7 +94,7 @@ VSF_LINUX_APPLET_SYS_SEM_IMP(semtimedop, int, int semid, struct sembuf *sops, si
     return VSF_LINUX_APPLET_SYS_SEM_ENTRY(semtimedop)(semid, sops, nsops, timeout);
 }
 
-VSF_APPLET_VPLT_FUNC_DECORATOR int semctl(int semid, int semnum, int cmd, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR(semctl) int semctl(int semid, int semnum, int cmd, ...) {
     int result;
     va_list ap;
     va_start(ap, cmd);

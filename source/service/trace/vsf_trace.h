@@ -221,7 +221,7 @@ VSF_APPLET_TRACE_IMP(vsf_trace_assert, void, const char *expr, const char *file,
     VSF_APPLET_TRACE_ENTRY(vsf_trace_assert)(expr, file, line, func);
 }
 
-VSF_APPLET_VPLT_FUNC_DECORATOR void vsf_trace(vsf_trace_level_t level, const char *format, ...) {
+VSF_APPLET_VPLT_FUNC_DECORATOR(vsf_trace) void vsf_trace(vsf_trace_level_t level, const char *format, ...) {
     va_list ap;
 
     va_start(ap, format);
