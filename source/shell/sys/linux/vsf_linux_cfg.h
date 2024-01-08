@@ -274,6 +274,9 @@
 #   ifndef VSF_LINUX_APPLET_USE_SYS_INFO
 #       define VSF_LINUX_APPLET_USE_SYS_INFO    ENABLED
 #   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_IOCTL
+#       define VSF_LINUX_APPLET_USE_SYS_IOCTL   ENABLED
+#   endif
 
 #   ifndef VSF_LINUX_APPLET_USE_UNISTD
 #       define VSF_LINUX_APPLET_USE_UNISTD      ENABLED
@@ -433,6 +436,7 @@ typedef struct vsf_linux_vplt_t {
     void *sys_times_vplt;
     void *sys_info_vplt;
     void *sys_sem_vplt;
+    void *sys_ioctl_vplt;
     void *sys_res0_vplt;
     void *sys_res1_vplt;
     void *sys_res2_vplt;
@@ -440,7 +444,6 @@ typedef struct vsf_linux_vplt_t {
     void *sys_res4_vplt;
     void *sys_res5_vplt;
     void *sys_res6_vplt;
-    void *sys_res7_vplt;
 
     // unix
     void *unistd_vplt;

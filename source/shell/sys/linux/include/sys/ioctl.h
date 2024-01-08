@@ -68,7 +68,49 @@ enum {
     TIOCSWINSZ      = F_IO + 6,
 };
 
+#if VSF_LINUX_APPLET_USE_SYS_IOCTL == ENABLED
+typedef struct vsf_linux_sys_ioctl_vplt_t {
+    vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ioctl);
+} vsf_linux_sys_ioctl_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_ioctl_vplt_t vsf_linux_sys_ioctl_vplt;
+#   endif
+#endif
+
+#if     defined(__VSF_APPLET__) && (defined(__VSF_APPLET_LIB__) || defined(__VSF_APPLET_LINUX_SYS_IOCTL_LIB__))\
+    &&  VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_SYS_IOCTL == ENABLED
+
+#ifndef VSF_LINUX_APPLET_SYS_IOCTL_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_SYS_IOCTL_VPLT                                  \
+            ((vsf_linux_sys_ioctl_vplt_t *)(VSF_LINUX_APPLET_VPLT->sys_ioctl_vplt))
+#   else
+#       define VSF_LINUX_APPLET_SYS_IOCTL_VPLT                                  \
+            ((vsf_linux_sys_ioctl_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#define VSF_LINUX_APPLET_SYS_IOCTL_ENTRY(__NAME)                                \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_SYS_IOCTL_VPLT, __NAME)
+#define VSF_LINUX_APPLET_SYS_IOCTL_IMP(...)                                     \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_SYS_IOCTL_VPLT, __VA_ARGS__)
+
+VSF_APPLET_VPLT_FUNC_DECORATOR(ioctl) int ioctl(int fd, unsigned long request, ...) {
+    int result;
+    va_list ap;
+    va_start(ap, request);
+        result = __fcntl_va(fd, request, ap);
+    va_end(ap);
+    return result;
+}
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_SEM
+
 int ioctl(int fd, unsigned long request, ...);
+
+#endif
 
 #ifdef __cplusplus
 }

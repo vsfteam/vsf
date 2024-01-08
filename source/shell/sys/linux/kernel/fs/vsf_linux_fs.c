@@ -35,6 +35,7 @@
 #   include "../../include/sys/sendfile.h"
 #   include "../../include/sys/statfs.h"
 #   include "../../include/sys/file.h"
+#   include "../../include/sys/ioctl.h"
 #   include "../../include/poll.h"
 #   include "../../include/fcntl.h"
 #   include "../../include/errno.h"
@@ -52,6 +53,7 @@
 #   include <sys/sendfile.h>
 #   include <sys/statfs.h>
 #   include <sys/file.h>
+#   include <sys/ioctl.h>
 #   include <poll.h>
 #   include <fcntl.h>
 #   include <errno.h>
@@ -3563,6 +3565,14 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_file_vplt_t vsf_linux_sys_file_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_file_vplt_t, 0, 0, true),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(flock),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_SYS_IOCTL == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_ioctl_vplt_t vsf_linux_sys_ioctl_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_ioctl_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(ioctl),
 };
 #endif
 

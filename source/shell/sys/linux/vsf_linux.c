@@ -5178,6 +5178,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #if VSF_LINUX_APPLET_USE_SYS_SEM == ENABLED
     .sys_sem_vplt       = (void *)&vsf_linux_sys_sem_vplt,
 #endif
+#if VSF_LINUX_APPLET_USE_SYS_IOCTL == ENABLED
+    .sys_ioctl_vplt     = (void *)&vsf_linux_sys_ioctl_vplt,
+#endif
 
 #if VSF_LINUX_APPLET_USE_UNISTD == ENABLED
     .unistd_vplt        = (void *)&vsf_linux_unistd_vplt,
