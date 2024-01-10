@@ -107,7 +107,7 @@ vsf_pyal_module_func_fix_imp(os, qstr_hash, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_p
 {
     const char *str = vsf_pyal_funcarg_getstr(strarg);
     size_t hash = qstr_compute_hash(str, strlen(str));
-    vsf_trace_info("hash of %s is %04X" VSF_TRACE_CFG_LINEEND, str, hash);
+    vsf_trace_info("hash of %s is %d" VSF_TRACE_CFG_LINEEND, str, hash);
     vsf_pyal_func_void_return();
 }
 
