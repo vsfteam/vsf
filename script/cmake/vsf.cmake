@@ -101,7 +101,8 @@ else()
         ${VSF_SRC_PATH}/shell/sys/linux/include
         ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc
         ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/inttypes
-        ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/math
+        # use original math.h for better compatibility
+        #${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/math
         ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/stdint
         ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/assert
         ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/setjmp
