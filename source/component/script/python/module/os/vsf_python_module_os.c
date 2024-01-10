@@ -103,6 +103,14 @@ vsf_pyal_module_func_init_imp(os)
     vsf_pyal_module_func_init_return();
 }
 
+vsf_pyal_module_func_fix_imp(os, qstr_hash, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_str_t strarg)
+{
+    const char *str = vsf_pyal_funcarg_getstr(strarg);
+    size_t hash = qstr_compute_hash(str, strlen(str));
+    vsf_trace_info("hash of %s is %04X" VSF_TRACE_CFG_LINEEND, str, hash);
+    vsf_pyal_func_void_return();
+}
+
 vsf_pyal_module_func_fix_imp(os, stat, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_obj_t, vsf_pyal_funcarg_str_t patharg)
 {
     const char *path = vsf_pyal_funcarg_getstr(patharg);
@@ -653,6 +661,7 @@ vsf_pyal_module(os,
     vsf_pyal_module_func(os, write),
     vsf_pyal_module_func(os, ioctl),
     vsf_pyal_module_func(os, close),
+    vsf_pyal_module_func(os, qstr_hash),
     vsf_pyal_module_func(os, system),
     vsf_pyal_module_int(os, O_RDONLY, O_RDONLY),
     vsf_pyal_module_int(os, O_WRONLY, O_WRONLY),
