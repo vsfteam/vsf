@@ -263,12 +263,12 @@ vsf_pyal_module_func_var_imp(os, open, vsf_pyal_arg_t, 1, 3, arg)
     // if the first arg is str, it's path_str
     if ((1 == argc) && vsf_pyal_funcarg_var_is_int(arg, 0)) {
         int fd = vsf_pyal_funcarg_var_getint(arg, 0);
-        vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-        if (NULL == sfd) {
+        FILE *f = fdopen(fd, "r+");
+        if (NULL == f) {
             vsf_pyal_raise("invalid fd %d\n", fd);
             return VSF_PYAL_ARG_NULL;
         }
-        return vsf_pyal_newarg_file((FILE *)sfd, true);
+        return vsf_pyal_newarg_file(f, true);
     }
 
     char *path_str = vsf_pyal_funcarg_var_getstr(arg, 0);
