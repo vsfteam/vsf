@@ -4869,6 +4869,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(_exit),
     VSF_APPLET_VPLT_ENTRY_FUNC(acct),
     VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_vfork_prepare),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mkdirs),
 };
 #endif
 
