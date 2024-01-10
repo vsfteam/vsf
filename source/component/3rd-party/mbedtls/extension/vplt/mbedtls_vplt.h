@@ -334,6 +334,22 @@ typedef struct vsf_mbedtls_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_entropy_update_seed_file);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_entropy_self_test);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_entropy_source_self_test);
+
+    // <mbedtls/ssl_ciphersuites.h>
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_list_ciphersuites);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_ciphersuite_from_string);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_ciphersuite_from_id);
+#if defined(MBEDTLS_PK_C)
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_get_ciphersuite_sig_pk_alg);
+#   if defined(MBEDTLS_USE_PSA_CRYPTO)
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_get_ciphersuite_sig_pk_psa_alg);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_get_ciphersuite_sig_pk_psa_usage);
+#   endif
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_get_ciphersuite_sig_alg);
+#endif
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_ciphersuite_uses_ec);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_ciphersuite_uses_psk);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_ciphersuite_get_cipher_key_bitlen);
 } vsf_mbedtls_vplt_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/

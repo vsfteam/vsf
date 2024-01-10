@@ -490,6 +490,24 @@ __VSF_VPLT_DECORATOR__ vsf_mbedtls_vplt_t vsf_mbedtls_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_entropy_source_self_test),
 #   endif
 #endif
+
+    // <mbedtls/ssl_ciphersuites.h>
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_list_ciphersuites),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_ciphersuite_from_string),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_ciphersuite_from_id),
+#if defined(MBEDTLS_PK_C)
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_get_ciphersuite_sig_pk_alg),
+#   if defined(MBEDTLS_USE_PSA_CRYPTO)
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_get_ciphersuite_sig_pk_psa_alg),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_get_ciphersuite_sig_pk_psa_usage),
+#   endif
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_get_ciphersuite_sig_alg),
+#endif
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_ciphersuite_uses_ec),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_ciphersuite_uses_psk),
+#if MBEDTLS_VERSION_NUMBER >= 0x03020000
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_ciphersuite_get_cipher_key_bitlen),
+#endif
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
