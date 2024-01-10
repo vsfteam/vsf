@@ -304,7 +304,7 @@ typedef struct vsf_applet_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_vplt_fini_array);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_applet_remap);
 } vsf_applet_vplt_t;
-__VSF_VPLT_DECORATOR__ extern vsf_applet_vplt_t vsf_applet_vplt;
+extern __VSF_VPLT_DECORATOR__ vsf_applet_vplt_t vsf_applet_vplt;
 
 #   if defined(__VSF_APPLET__) && defined(__VSF_APPLET_LIB__) && VSF_APPLET_CFG_DEBUG_VPLT == ENABLED
 #       include <stdarg.h>
