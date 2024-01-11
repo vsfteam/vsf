@@ -331,7 +331,7 @@ static vsf_err_t __vk_fakefat32_init_recursion(vk_fakefat32_mal_t *pthis, vk_fak
             clusters = 0;
         } else {
             clusters = __vk_fakefat32_calc_dir_clusters(pthis, file);
-            file->size = clusters * cluster_size;
+            file->size = (uint64_t)clusters * cluster_size;
         }
         file->callback.fn_read = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_dir_read);
         file->callback.fn_write = (vsf_peda_evthandler_t)vsf_peda_func(__vk_fakefat32_dir_write);
@@ -725,9 +725,8 @@ static vsf_err_t __vk_fakefat32_read(vk_fakefat32_mal_t *pthis, uint_fast64_t ad
             file = __vk_fakefat32_get_file_by_cluster(pthis, &pthis->root, 1, cluster_index);
             if (NULL == file) {
                 // file not found
-                *buff32++ = 0;
-                remain_size -= 4;
-                cluster_index++;
+                memset(buff32, 0, remain_size);
+                break;
             } else {
                 // file found
                 uint_fast32_t cluster_offset = cluster_index - file->first_cluster;
@@ -844,7 +843,7 @@ __vsf_component_peda_ifs_entry(__vk_fakefat32_mal_init, vk_mal_init)
     vk_fakefat32_mal_t *pthis = (vk_fakefat32_mal_t *)&vsf_this;
 
     VSF_MAL_ASSERT(pthis != NULL);
-    pthis->size = pthis->sector_size * pthis->sector_number;
+    pthis->size = (uint64_t)pthis->sector_size * pthis->sector_number;
     vsf_eda_return(__vk_fakefat32_init(pthis));
     vsf_peda_end();
 }
