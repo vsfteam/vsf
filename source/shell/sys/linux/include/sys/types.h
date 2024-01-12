@@ -76,6 +76,10 @@ typedef unsigned char       u_char;
 typedef unsigned short      u_short;
 typedef unsigned long       u_long;
 typedef unsigned int        u_int;
+typedef unsigned char       unchar;
+typedef	unsigned short      ushort;
+typedef	unsigned int        uint;
+typedef unsigned long       ulong;
 
 typedef int                 key_t;
 typedef int                 pid_t;
