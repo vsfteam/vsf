@@ -179,7 +179,7 @@ struct itimerspec {
 #ifndef __VSF_APPLET__
 
 // gcc use __builtin_alloca
-#   define alloca           __builtin_alloca
+#   define alloca(__size)   __builtin_alloca(__size)
 
 // gcc has no strcasestr
 #ifdef __cplusplus

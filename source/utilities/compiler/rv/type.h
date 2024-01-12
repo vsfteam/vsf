@@ -100,7 +100,7 @@ typedef int_fast8_t         intalu_t;
 
 // gcc use __builtin_alloca
 #   ifndef alloca
-#       define alloca       __builtin_alloca
+#       define alloca(__size)       __builtin_alloca(__size)
 #   endif
 
 // gcc has no strcasestr
