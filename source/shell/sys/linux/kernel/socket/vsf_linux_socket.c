@@ -384,13 +384,15 @@ int getaddrinfo(const char *name, const char *service, const struct addrinfo *hi
     // TODO: is port is 0, check service name to get real port
 
     // TODO: re-implement
-    struct in_addr addr;
-    if (!inet_aton(name, &addr)) {
-        struct hostent *hostent = gethostbyname(name);
-        if (NULL == hostent) {
-            return EAI_NONAME;
+    struct in_addr addr = { 0 };
+    if (name != NULL) {
+        if (!inet_aton(name, &addr)) {
+            struct hostent *hostent = gethostbyname(name);
+            if (NULL == hostent) {
+                return EAI_NONAME;
+            }
+            addr = *(struct in_addr *)hostent->h_addr_list[0];
         }
-        addr = *(struct in_addr *)hostent->h_addr_list[0];
     }
 
     struct __addrinfo {
