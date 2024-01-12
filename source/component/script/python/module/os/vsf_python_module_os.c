@@ -103,6 +103,7 @@ vsf_pyal_module_func_init_imp(os)
     vsf_pyal_module_func_init_return();
 }
 
+#if VSF_USE_MICROPYTHON == ENABLED
 vsf_pyal_module_func_fix_imp(os, qstr_hash, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_func_void_return_t, vsf_pyal_funcarg_str_t strarg)
 {
     const char *str = vsf_pyal_funcarg_getstr(strarg);
@@ -110,6 +111,7 @@ vsf_pyal_module_func_fix_imp(os, qstr_hash, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_p
     vsf_trace_info("hash of %s is %d" VSF_TRACE_CFG_LINEEND, str, hash);
     vsf_pyal_func_void_return();
 }
+#endif
 
 vsf_pyal_module_func_fix_imp(os, stat, VSF_PYAL_MODULE_FUNCARG_OBJ_1, vsf_pyal_obj_t, vsf_pyal_funcarg_str_t patharg)
 {
@@ -661,7 +663,9 @@ vsf_pyal_module(os,
     vsf_pyal_module_func(os, write),
     vsf_pyal_module_func(os, ioctl),
     vsf_pyal_module_func(os, close),
+#if VSF_USE_MICROPYTHON == ENABLED
     vsf_pyal_module_func(os, qstr_hash),
+#endif
     vsf_pyal_module_func(os, system),
     vsf_pyal_module_int(os, O_RDONLY, O_RDONLY),
     vsf_pyal_module_int(os, O_WRONLY, O_WRONLY),
