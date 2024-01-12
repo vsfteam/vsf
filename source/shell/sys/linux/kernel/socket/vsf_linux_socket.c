@@ -852,6 +852,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_socket_vplt_t vsf_linux_sys_socket_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(recvfrom),
     VSF_APPLET_VPLT_ENTRY_FUNC(sendto),
 #   endif
+
+    VSF_APPLET_VPLT_ENTRY_VAR(in6addr_any),
+    VSF_APPLET_VPLT_ENTRY_VAR(in6addr_loopback),
 };
 #endif
 

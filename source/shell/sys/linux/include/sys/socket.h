@@ -267,6 +267,10 @@ typedef struct vsf_linux_sys_socket_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(shutdown);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(socket);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(socketpair);
+
+    // in6addr_any and in6addr_loopback belongs to <netinet/in.h>, which has no vplt, so add to socket vplt
+    VSF_APPLET_VPLT_ENTRY_VAR_DEF(in6addr_any);
+    VSF_APPLET_VPLT_ENTRY_VAR_DEF(in6addr_loopback);
 } vsf_linux_sys_socket_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sys_socket_vplt_t vsf_linux_sys_socket_vplt;

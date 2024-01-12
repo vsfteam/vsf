@@ -152,6 +152,8 @@ typedef struct vsf_vplt_entry_t {
     }
 #define VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__NAME)                                  \
     vsf_vplt_entry_t fn_##__NAME
+#define VSF_APPLET_VPLT_ENTRY_VAR_DEF(__NAME)                                   \
+    vsf_vplt_entry_t var_##__NAME
 #define VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(__VPLT, __NAME)                        \
     ((__##__NAME##_prototype_t)((__VPLT)->fn_##__NAME.ptr))
 #if VSF_APPLET_CFG_DEBUG_VPLT == ENABLED
@@ -177,6 +179,11 @@ typedef struct vsf_vplt_entry_t {
         .name = VSF_STR(__NAME),                                                \
         .ptr = (void *)(__NAME),                                                \
     }
+#   define VSF_APPLET_VPLT_ENTRY_VAR(__NAME)                                    \
+    .var_##__NAME = {                                                           \
+        .name = VSF_STR(__NAME),                                                \
+        .ptr = (void *)&(__NAME),                                               \
+    }
 #else
 #   define VSF_APPLET_VPLT_ENTRY_FUNC_EX(__ENTRY, __NAME, __PTR)                \
     .__ENTRY = {                                                                \
@@ -185,6 +192,10 @@ typedef struct vsf_vplt_entry_t {
 #   define VSF_APPLET_VPLT_ENTRY_FUNC(__NAME)                                   \
     .fn_##__NAME = {                                                            \
         .ptr = (void *)(__NAME),                                                \
+    }
+#   define VSF_APPLET_VPLT_ENTRY_VAR(__NAME)                                    \
+    .var_##__NAME = {                                                           \
+        .ptr = (void *)&(__NAME),                                               \
     }
 #endif
 
