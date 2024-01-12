@@ -123,7 +123,23 @@ extern "C" {
 
 #define VSF_SWI_NUM                         (VSF_ARCH_SWI_NUM + VSF_DEV_SWI_NUM)
 
+#define bswap16                             bswap_16
+#define bswap32                             bswap_32
+#define bswap64                             bswap_64
 #if __BYTE_ORDER == __BIG_ENDIAN
+#   define htobe16
+#   define htole16                          bswap_16
+#   define be16toh
+#   define le16toh                          bswap_16
+#   define htobe32
+#   define htole32                          bswap_32
+#   define be32toh
+#   define le32toh                          bswap_32
+#   define htobe64
+#   define htole64                          bswap_64
+#   define be64toh
+#   define le64toh                          bswap_64
+
 #   define cpu_to_le16                      bswap_16
 #   define cpu_to_le32                      bswap_32
 #   define cpu_to_le64                      bswap_64
@@ -137,6 +153,19 @@ extern "C" {
 #   define be32_to_cpu
 #   define be64_to_cpu
 #else
+#   define htobe16                          bswap_16
+#   define htole16
+#   define be16toh                          bswap_16
+#   define le16toh
+#   define htobe32                          bswap_32
+#   define htole32
+#   define be32toh                          bswap_32
+#   define le32toh
+#   define htobe64                          bswap_64
+#   define htole64
+#   define be64toh                          bswap_64
+#   define le64toh
+
 #   define cpu_to_le16
 #   define cpu_to_le32
 #   define cpu_to_le64
