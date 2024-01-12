@@ -3,6 +3,9 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
+#define IFNAMSIZ                16
+#define	IFALIASZ                256
+
 #if VSF_LINUX_APPLET_USE_NET_IF == ENABLED
 typedef struct vsf_linux_net_if_vplt_t {
     vsf_vplt_info_t info;

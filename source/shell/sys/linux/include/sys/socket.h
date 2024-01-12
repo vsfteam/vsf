@@ -15,140 +15,142 @@
 extern "C" {
 #endif
 
-#define SOMAXCONN       256
+#define SOMAXCONN               256
 
-#define SCM_RIGHTS      0x01
-#define SCM_CREDENTIALS 0x02
-#define SCM_SECURITY    0x03
+#define SCM_RIGHTS              0x01
+#define SCM_CREDENTIALS         0x02
+#define SCM_SECURITY            0x03
 
 // protocol families
 // refer: https://code.woboq.org/gtk/include/bits/socket.h.html
-#define PF_UNSPEC       0
-#define PF_LOCAL        1
-#define PF_UNIX         PF_LOCAL
-#define PF_INET         2
-#define PF_INET6        10
-#define PF_PACKET       17
+#define PF_UNSPEC               0
+#define PF_LOCAL                1
+#define PF_UNIX                 PF_LOCAL
+#define PF_INET                 2
+#define PF_INET6                10
+#define PF_PACKET               17
 
 // standard address families
-#define AF_UNSPEC       PF_UNSPEC
-#define AF_LOCAL        PF_LOCAL
-#define AF_UNIX         PF_UNIX
-#define AF_FILE         PF_FILE
-#define AF_INET         PF_INET
-#define AF_INET6        PF_INET6
-#define AF_PACKET       PF_PACKET
+#define AF_UNSPEC               PF_UNSPEC
+#define AF_LOCAL                PF_LOCAL
+#define AF_UNIX                 PF_UNIX
+#define AF_FILE                 PF_FILE
+#define AF_INET                 PF_INET
+#define AF_INET6                PF_INET6
+#define AF_PACKET               PF_PACKET
 
-#define SOL_IP          IPPROTO_IP
-#define SOL_TCP         IPPROTO_TCP
-#define SOL_UDP         IPPROTO_UDP
+#define SOL_IP                  IPPROTO_IP
+#define SOL_TCP                 IPPROTO_TCP
+#define SOL_UDP                 IPPROTO_UDP
 
-#define IP_TOS          1
-#define IP_TTL          2
-#define IP_HDRINCL      3
-#define IP_OPTIONS      4
+#define IP_TOS                  1
+#define IP_TTL                  2
+#define IP_HDRINCL              3
+#define IP_OPTIONS              4
 
 enum sock_type {
-    SOCK_STREAM         = 1,
-    SOCK_DGRAM          = 2,
-    SOCK_RAW            = 3,
-    SOCK_RDM            = 4,
-    SOCK_SEQPACKET      = 5,
-    SOCK_PACKET         = 10,
+    SOCK_STREAM                 = 1,
+    SOCK_DGRAM                  = 2,
+    SOCK_RAW                    = 3,
+    SOCK_RDM                    = 4,
+    SOCK_SEQPACKET              = 5,
+    SOCK_PACKET                 = 10,
 };
-#define SOCK_MAX        (SOCK_PACKET + 1)
+#define SOCK_MAX                (SOCK_PACKET + 1)
 
 // flags for socket/socketpair/accept4
-#define SOCK_CLOEXEC    O_CLOEXEC
-#define SOCK_NONBLOCK   O_NONBLOCK
+#define SOCK_CLOEXEC            O_CLOEXEC
+#define SOCK_NONBLOCK           O_NONBLOCK
 
-#define INVALID_SOCKET  -1
-#define SOCKET_ERROR    -1
+#define INVALID_SOCKET          -1
+#define SOCKET_ERROR            -1
 
-typedef uint32_t        socklen_t;
+typedef uint32_t                socklen_t;
 #define __socklen_t_defined
 
-typedef uint16_t        sa_family_t;
+typedef uint16_t                sa_family_t;
 struct sockaddr {
-    sa_family_t         sa_family;
-    char                sa_data[14];
+    sa_family_t                 sa_family;
+    char                        sa_data[14];
 };
 struct sockaddr_storage {
-    sa_family_t         ss_family;
+    sa_family_t                 ss_family;
     // TODO: need to be larger?
-    char                sa_data[14];
+    char                        sa_data[14];
 };
 
 struct linger {
-    int                 l_onoff;
-    int                 l_linger;
+    int                         l_onoff;
+    int                         l_linger;
 };
 
 #if VSF_LINUX_SOCKET_CFG_WRAPPER == ENABLED
 #define VSF_LINUX_SOCKET_WRAPPER(__api)     VSF_SHELL_WRAPPER(vsf_linux_socket, __api)
 
-#define setsockopt      VSF_LINUX_SOCKET_WRAPPER(setsockopt)
-#define getsockopt      VSF_LINUX_SOCKET_WRAPPER(getsockopt)
+#define setsockopt              VSF_LINUX_SOCKET_WRAPPER(setsockopt)
+#define getsockopt              VSF_LINUX_SOCKET_WRAPPER(getsockopt)
 
-#define getpeername     VSF_LINUX_SOCKET_WRAPPER(getpeername)
-#define getsockname     VSF_LINUX_SOCKET_WRAPPER(getsockname)
+#define getpeername             VSF_LINUX_SOCKET_WRAPPER(getpeername)
+#define getsockname             VSF_LINUX_SOCKET_WRAPPER(getsockname)
 
-#define accept          VSF_LINUX_SOCKET_WRAPPER(accept)
-#define accept4         VSF_LINUX_SOCKET_WRAPPER(accept4)
-#define bind            VSF_LINUX_SOCKET_WRAPPER(bind)
-#define connect         VSF_LINUX_SOCKET_WRAPPER(connect)
-#define listen          VSF_LINUX_SOCKET_WRAPPER(listen)
-#define recv            VSF_LINUX_SOCKET_WRAPPER(recv)
-#define recvmsg         VSF_LINUX_SOCKET_WRAPPER(recvmsg)
-#define recvfrom        VSF_LINUX_SOCKET_WRAPPER(recvfrom)
-#define send            VSF_LINUX_SOCKET_WRAPPER(send)
-#define sendmsg         VSF_LINUX_SOCKET_WRAPPER(sendmsg)
-#define sendto          VSF_LINUX_SOCKET_WRAPPER(sendto)
-#define shutdown        VSF_LINUX_SOCKET_WRAPPER(shutdown)
-#define socket          VSF_LINUX_SOCKET_WRAPPER(socket)
-#define socketpair      VSF_LINUX_SOCKET_WRAPPER(socketpair)
+#define accept                  VSF_LINUX_SOCKET_WRAPPER(accept)
+#define accept4                 VSF_LINUX_SOCKET_WRAPPER(accept4)
+#define bind                    VSF_LINUX_SOCKET_WRAPPER(bind)
+#define connect                 VSF_LINUX_SOCKET_WRAPPER(connect)
+#define listen                  VSF_LINUX_SOCKET_WRAPPER(listen)
+#define recv                    VSF_LINUX_SOCKET_WRAPPER(recv)
+#define recvmsg                 VSF_LINUX_SOCKET_WRAPPER(recvmsg)
+#define recvfrom                VSF_LINUX_SOCKET_WRAPPER(recvfrom)
+#define send                    VSF_LINUX_SOCKET_WRAPPER(send)
+#define sendmsg                 VSF_LINUX_SOCKET_WRAPPER(sendmsg)
+#define sendto                  VSF_LINUX_SOCKET_WRAPPER(sendto)
+#define shutdown                VSF_LINUX_SOCKET_WRAPPER(shutdown)
+#define socket                  VSF_LINUX_SOCKET_WRAPPER(socket)
+#define socketpair              VSF_LINUX_SOCKET_WRAPPER(socketpair)
 #endif
 
 // syscalls
 
-#define __NR_connect    connect
-#define __NR_accept     accept
-#define __NR_accept4    accept4
-#define __NR_bind       bind
+#define __NR_connect            connect
+#define __NR_accept             accept
+#define __NR_accept4            accept4
+#define __NR_bind               bind
 
 // level for sockopt
-#define SOL_SOCKET      0xFFFF
+#define SOL_SOCKET              0xFFFF
 // sock options
 // refer: https://code.woboq.org/gtk/include/asm-generic/socket.h.html
-#define SO_DEBUG        1
-#define SO_REUSEADDR    2
-#define SO_TYPE         3
-#define SO_ERROR        4
-#define SO_DONTROUTE    5
-#define SO_BROADCAST    6
-#define SO_SNDBUF       7
-#define SO_RCVBUF       8
-#define SO_KEEPALIVE    9
-#define SO_OOBINLINE    10
-#define SO_NO_CHECK     11
-#define SO_PRIORITY     12
-#define SO_LINGER       13
-#define SO_BSDCOMPAT    14
-#define SO_REUSEPORT    15
+#define SO_DEBUG                1
+#define SO_REUSEADDR            2
+#define SO_TYPE                 3
+#define SO_ERROR                4
+#define SO_DONTROUTE            5
+#define SO_BROADCAST            6
+#define SO_SNDBUF               7
+#define SO_RCVBUF               8
+#define SO_KEEPALIVE            9
+#define SO_OOBINLINE            10
+#define SO_NO_CHECK             11
+#define SO_PRIORITY             12
+#define SO_LINGER               13
+#define SO_BSDCOMPAT            14
+#define SO_REUSEPORT            15
 // struct ucred is not implemented
-//#define SO_PASSCRED     16
-//#define SO_PEERCRED     17
-#define SO_RCVLOWAT     18
-#define SO_SNDLOWAT     19
-#define SO_RCVTIMEO     20
-#define SO_SNDTIMEO     21
-#define SO_NONBLOCK     100
+//#define SO_PASSCRED             16
+//#define SO_PEERCRED             17
+#define SO_RCVLOWAT             18
+#define SO_SNDLOWAT             19
+#define SO_RCVTIMEO             20
+#define SO_SNDTIMEO             21
+#define SO_BINDTODEVICE         25
+#define SO_MAX_PACING_RATE      47
+#define SO_NONBLOCK             100
 
 // IP options
-#define IP_TOS              1
-#define IP_TTL              2
-#define IP_HDRINCL          3
-#define IP_OPTIONS          4
+#define IP_TOS                  1
+#define IP_TTL                  2
+#define IP_HDRINCL              3
+#define IP_OPTIONS              4
 
 // multicast
 // in.h
@@ -168,44 +170,44 @@ struct linger {
 
 // flags for send/recv
 enum {
-    MSG_OOB             = 1 << 0,
-#define MSG_OOB         MSG_OOB
-    MSG_PEEK            = 1 << 1,
-#define MSG_PEEK        MSG_PEEK
-    MSG_DONTROUTE       = 1 << 2,
-#define MSG_DONTROUTE   MSG_DONTROUTE
-    MSG_TRUNC           = 1 << 5,
-#define MSG_TRUNC       MSG_TRUNC
-    MSG_DONTWAIT        = 1 << 6,
-#define MSG_DONTWAIT    MSG_DONTWAIT
-    MSG_WAITALL         = 1 << 8,
-#define MSG_WAITALL     MSG_WAITALL
-    MSG_NOSIGNAL        = 1 << 14,
-#define MSG_NOSIGNAL    MSG_NOSIGNAL
+    MSG_OOB                     = 1 << 0,
+#define MSG_OOB                 MSG_OOB
+    MSG_PEEK                    = 1 << 1,
+#define MSG_PEEK                MSG_PEEK
+    MSG_DONTROUTE               = 1 << 2,
+#define MSG_DONTROUTE           MSG_DONTROUTE
+    MSG_TRUNC                   = 1 << 5,
+#define MSG_TRUNC               MSG_TRUNC
+    MSG_DONTWAIT                = 1 << 6,
+#define MSG_DONTWAIT            MSG_DONTWAIT
+    MSG_WAITALL                 = 1 << 8,
+#define MSG_WAITALL             MSG_WAITALL
+    MSG_NOSIGNAL                = 1 << 14,
+#define MSG_NOSIGNAL            MSG_NOSIGNAL
 };
 
 struct msghdr {
-    void                *msg_name;
-    socklen_t           msg_namelen;
-    struct iovec        *msg_iov;
-    size_t              msg_iovlen;
-    void                *msg_control;
-    size_t              msg_controllen;
-    int                 msg_flags;
+    void                        *msg_name;
+    socklen_t                   msg_namelen;
+    struct iovec                *msg_iov;
+    size_t                      msg_iovlen;
+    void                        *msg_control;
+    size_t                      msg_controllen;
+    int                         msg_flags;
 };
 
-#define CMSG_ALIGN(len) (((len)+sizeof(long)-1) & ~(sizeof(long)-1))
-#define CMSG_SPACE(len) (sizeof(struct cmsghdr) + CMSG_ALIGN(len))
-#define CMSG_LEN(len)   (sizeof(struct cmsghdr) + (len))
-#define CMSG_DATA(cmsg) (void *)((uint8_t *)(cmsg) + sizeof(struct cmsghdr))
+#define CMSG_ALIGN(len)         (((len)+sizeof(long)-1) & ~(sizeof(long)-1))
+#define CMSG_SPACE(len)         (sizeof(struct cmsghdr) + CMSG_ALIGN(len))
+#define CMSG_LEN(len)           (sizeof(struct cmsghdr) + (len))
+#define CMSG_DATA(cmsg)         (void *)((uint8_t *)(cmsg) + sizeof(struct cmsghdr))
 #define CMSG_FIRSTHDR(msg)                                                      \
             ((msg)->msg_controllen >= sizeof(struct cmsghdr) ?                  \
                 (struct cmsghdr *)(msg)->msg_control                            \
             :   (struct cmsghdr *)NULL)
 struct cmsghdr {
-    size_t              cmsg_len;
-    int                 cmsg_level;
-    int                 cmsg_type;
+    size_t                      cmsg_len;
+    int                         cmsg_level;
+    int                         cmsg_type;
 };
 
 #if __IS_COMPILER_GCC__
@@ -235,9 +237,9 @@ static inline struct cmsghdr * CMSG_NXTHDR(struct msghdr *__msg, struct cmsghdr 
 
 // how for shutdown
 enum {
-    SHUT_RD             = 1 << 0,
-    SHUT_WR             = 1 << 1,
-    SHUT_RDWR           = SHUT_RD | SHUT_WR,
+    SHUT_RD                     = 1 << 0,
+    SHUT_WR                     = 1 << 1,
+    SHUT_RDWR                   = SHUT_RD | SHUT_WR,
 };
 
 #if VSF_LINUX_APPLET_USE_SYS_SOCKET == ENABLED

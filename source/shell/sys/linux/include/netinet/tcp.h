@@ -34,12 +34,12 @@ extern "C" {
 //#define TCP_WINDOW_CLAMP            10
 //#define TCP_INFO                    11
 //#define TCP_QUICKACK                12
-//#define TCP_CONGESTION              13
+#define TCP_CONGESTION              13
 //#define TCP_MD5SIG                  14
 //#define TCP_COOKIE_TRANSACTIONS     15
 //#define TCP_THIN_LINEAR_TIMEOUTS    16
 //#define TCP_THIN_DUPACK             17
-//#define TCP_USER_TIMEOUT            18
+#define TCP_USER_TIMEOUT            18
 //#define TCP_REPAIR                  19
 //#define TCP_REPAIR_QUEUE            20
 //#define TCP_QUEUE_SEQ               21
