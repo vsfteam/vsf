@@ -110,7 +110,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
     char *format_tmp;
     int radix;
     int width;
-    int precision = -1;
+    int precision;
     int actual_width;
     int rank;
 
@@ -157,6 +157,8 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     precision = strtoull(format, &format_tmp, 0);
                     format = format_tmp;
                 }
+            } else {
+                precision = -1;
             }
 
         next:
