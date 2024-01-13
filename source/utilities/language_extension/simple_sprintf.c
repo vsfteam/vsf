@@ -88,7 +88,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
     } arg;
 #if VSF_SIMPLE_SPRINTF_SUPPORT_FLOAT == ENABLED
     double d_intpart, d_fractpart, dtmp, pow;
-    int exp, round;
+    int exp, round, fwidth, intpart_pos;
 #endif
     union {
         struct {
@@ -444,6 +444,17 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         round++;
                         d_intpart = __DROUND_FACTOR;
                     }
+
+                    if ((width > 0) && (precision > 0)) {
+                        if (width < precision + 1) {
+                            width = 0;
+                        } else {
+                            width -= precision + 1;
+                        }
+                    }
+                    fwidth = width;
+                    intpart_pos = realsize;
+                    width = 0;
                     // fall through
                 case 1:
                     if (round-- > 0) {
@@ -451,6 +462,27 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         d_intpart = modf(d_intpart, &dtmp);
                         d_intpart *= __DROUND_FACTOR;
                         goto print_integer_do;
+                    }
+
+                    {
+                        int intpart_width_actual = realsize - intpart_pos;
+                        int remain = size - intpart_pos;
+                        fwidth -= intpart_width_actual;
+                        if (!flags.align_left && (fwidth > 0)) {
+                            realsize += fwidth;
+
+                            if (remain > fwidth) {
+                                int move_size = remain - fwidth;
+                                move_size = vsf_min(move_size, intpart_width_actual);
+                                memmove(&str[intpart_pos + fwidth], &str[intpart_pos], move_size);
+                            }
+                            if (remain > 0) {
+                                int space_size = vsf_min(remain, fwidth);
+                                memset(&str[intpart_pos], ' ', space_size);
+                                curpos += space_size;
+                            }
+                            fwidth = 0;
+                        }
                     }
 
                     if (0 == precision) {
@@ -472,6 +504,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     arg.val = (unsigned long long)d_fractpart;
                     d_fractpart = modf(d_fractpart, &dtmp);
                     d_fractpart *= __DROUND_FACTOR;
+                    flags.align_left = 0;
                     goto print_integer_do;
                 case 2:
                     if (--round > 0) {
@@ -480,6 +513,9 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         d_fractpart *= __DROUND_FACTOR;
                         width = __DROUND_DIGITS;
                         goto print_integer_do;
+                    }
+                    while (fwidth-- > 0) {
+                        EMIT(' ');
                     }
                     // fall through
                 case 3:
