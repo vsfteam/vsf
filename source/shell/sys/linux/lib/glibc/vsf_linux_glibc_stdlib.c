@@ -102,6 +102,7 @@ static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, vsf_liunx_
     vsf_unprotect_sched(orig);
 }
 
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
 void __free_ex(vsf_linux_process_t *process, void *ptr)
 {
     if (ptr != NULL) {
@@ -158,6 +159,7 @@ void * ____calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, const 
     }
     return buf;
 }
+#   endif
 #else
 void * ____malloc_ex(vsf_linux_process_t *process, size_t size, const char *file, const char *func, int line)
 {
@@ -798,7 +800,8 @@ void abort(void)
     VSF_LINUX_ASSERT(false);
 }
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED                     \
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
 #   undef malloc
 #   undef realloc
 #   undef calloc
@@ -861,9 +864,12 @@ static void __qsort(void *base, size_t nitems, size_t size, int (*compar)(const 
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_stdlib_vplt_t, 0, 0, true),
 
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED                     \
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
     VSF_APPLET_VPLT_ENTRY_FUNC(____malloc_ex),
     VSF_APPLET_VPLT_ENTRY_FUNC(____realloc_ex),
     VSF_APPLET_VPLT_ENTRY_FUNC(____calloc_ex),
+#endif
 
     VSF_APPLET_VPLT_ENTRY_FUNC(malloc),
     VSF_APPLET_VPLT_ENTRY_FUNC(realloc),

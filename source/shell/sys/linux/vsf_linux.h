@@ -432,7 +432,7 @@ extern void * vsf_linux_process_heap_calloc(vsf_linux_process_t *process, size_t
 extern void vsf_linux_process_heap_free(vsf_linux_process_t *process, void *buffer);
 extern char * vsf_linux_process_heap_strdup(vsf_linux_process_t *process, char *str);
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED && VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
 extern void __free_ex(vsf_linux_process_t *process, void *ptr);
 #   define __malloc_ex(__process, __size)               ____malloc_ex((__process), (__size), __FILE__, __FUNCTION__, __LINE__)
 #   define __calloc_ex(__process, __n, __size)          ____calloc_ex((__process), (__n), (__size), __FILE__, __FUNCTION__, __LINE__)
