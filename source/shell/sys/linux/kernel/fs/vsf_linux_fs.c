@@ -36,6 +36,7 @@
 #   include "../../include/sys/statfs.h"
 #   include "../../include/sys/file.h"
 #   include "../../include/sys/ioctl.h"
+#   include "../../include/sys/mman.h"
 #   include "../../include/poll.h"
 #   include "../../include/fcntl.h"
 #   include "../../include/errno.h"
@@ -54,6 +55,7 @@
 #   include <sys/statfs.h>
 #   include <sys/file.h>
 #   include <sys/ioctl.h>
+#   include <sys/mman.h>
 #   include <poll.h>
 #   include <fcntl.h>
 #   include <errno.h>
@@ -155,6 +157,7 @@ static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd);
 static int __vsf_linux_fs_eof(vsf_linux_fd_t *sfd);
 static int __vsf_linux_fs_setsize(vsf_linux_fd_t *sfd, off64_t size);
 static int __vsf_linux_fs_stat(vsf_linux_fd_t *sfd, struct stat *buf);
+static void * __vsf_linux_fs_mmap(vsf_linux_fd_t *sfd, off64_t offset, size_t len, uint_fast32_t feature);
 
 static int __vsf_linux_eventfd_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static ssize_t __vsf_linux_eventfd_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
@@ -203,6 +206,7 @@ const vsf_linux_fd_op_t __vsf_linux_fs_fdop = {
     .fn_eof             = __vsf_linux_fs_eof,
     .fn_setsize         = __vsf_linux_fs_setsize,
     .fn_stat            = __vsf_linux_fs_stat,
+    .fn_mmap            = __vsf_linux_fs_mmap,
 };
 
 const vsf_linux_fd_op_t __vsf_linux_eventfd_fdop = {
@@ -445,6 +449,30 @@ static int __vsf_linux_fs_stat(vsf_linux_fd_t *sfd, struct stat *buf)
     buf->st_mode |= 0777;
     buf->st_size = file->size;
     return 0;
+}
+
+static void * __vsf_linux_fs_mmap(vsf_linux_fd_t *sfd, off64_t offset, size_t len, uint_fast32_t feature)
+{
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    vk_file_t *file = priv->file;
+
+    if (!(file->attr & VSF_FILE_ATTR_DIRECTORY)) {
+        if ((feature & PROT_WRITE) && !(file->attr & VSF_FILE_ATTR_WRITE)) {
+            return MAP_FAILED;
+        }
+
+        if (file->fsop == &vk_vfs_op) {
+            vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)file;
+            return vfs_file->f.param;
+        }
+#if VSF_FS_USE_MEMFS == ENABLED
+        else if (file->fsop == &vk_vfs_op) {
+            vk_memfs_file_t *mem_file = (vk_memfs_file_t *)file;
+            return mem_file->f.buff;
+        }
+#endif
+    }
+    return MAP_FAILED;
 }
 
 // eventfd
