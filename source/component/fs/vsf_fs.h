@@ -153,6 +153,7 @@ vsf_class(vk_vfs_file_t) {
     implement(vsf_dlist_node_t)
 
     protected_member(
+        bool is_to_unlink;
         union {
             struct {
                 void *param;

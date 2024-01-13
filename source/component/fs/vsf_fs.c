@@ -1098,16 +1098,27 @@ __vsf_component_peda_ifs_entry(__vk_vfs_unlink, vk_file_unlink)
         } else {
             vk_vfs_file_t *child = __vk_vfs_lookup_imp(dir, vsf_local.name);
             if (child != NULL) {
-                VSF_FS_ASSERT(1 == child->ref);
+                if (child->ref > 1) {
+                    if (!child->is_to_unlink) {
+                        // deref the ref referenced in __vk_vfs_create,
+                        //  so that __vk_vfs_close will be called when close the file
+                        __vk_file_deref(&child->use_as__vk_file_t);
+                        child->is_to_unlink = true;
+                    }
+                } else {
 #if VSF_FS_REF_TRACE == ENABLED
-                vsf_trace_debug("unlink vfs %s" VSF_TRACE_CFG_LINEEND, child->name);
+                    vsf_trace_debug("unlink vfs %s" VSF_TRACE_CFG_LINEEND, child->name);
 #endif
-                // deref the ref referenced in __vk_vfs_create
-                __vk_file_deref(&child->use_as__vk_file_t);
-                vsf_protect_t orig = vsf_protect_sched();
-                    vsf_dlist_remove(vk_vfs_file_t, use_as__vsf_dlist_node_t, &dir->d.child_list, child);
-                vsf_unprotect_sched(orig);
-                vk_file_free(&child->use_as__vk_file_t);
+                    // deref the ref referenced in __vk_vfs_create
+                    __vk_file_deref(&child->use_as__vk_file_t);
+                    vsf_protect_t orig = vsf_protect_sched();
+                        vsf_dlist_remove(vk_vfs_file_t, use_as__vsf_dlist_node_t, &dir->d.child_list, child);
+                    vsf_unprotect_sched(orig);
+#if VSF_USE_HEAP == ENABLED
+                    vsf_heap_free(child->name);
+#endif
+                    vk_file_free(&child->use_as__vk_file_t);
+                }
             }
             err = (NULL == child) ? VSF_ERR_NOT_AVAILABLE : VSF_ERR_NONE;
         }
@@ -1266,9 +1277,24 @@ __vsf_component_peda_ifs_entry(__vk_vfs_close, vk_file_close)
 {
     vsf_peda_begin();
 
-#if VSF_USE_HEAP == ENABLED
+    // Normally if vfs_file is closed, ref will be 1 and __vk_vfs_close will not be called.
+    //  If unlink the file with file opened, ref will be 0, and __vk_vfs_close will be called.
     vk_vfs_file_t *file = (vk_vfs_file_t *)&vsf_this;
-    if (    (NULL == file->f.callback.fn_read)
+    vk_vfs_file_t *dir = (vk_vfs_file_t *)file->parent;
+
+    VSF_FS_ASSERT(file->is_to_unlink);
+    vsf_protect_t orig = vsf_protect_sched();
+        vsf_dlist_remove(vk_vfs_file_t, use_as__vsf_dlist_node_t, &dir->d.child_list, file);
+    vsf_unprotect_sched(orig);
+
+    bool is_dir = file->attr & VSF_FILE_ATTR_DIRECTORY;
+    if (is_dir) {
+        VSF_FS_ASSERT(vsf_dlist_is_empty(&file->d.child_list));
+    }
+
+#if VSF_USE_HEAP == ENABLED
+    if (    !is_dir
+        &&  (NULL == file->f.callback.fn_read)
         &&  (NULL== file->f.callback.fn_write)
         &&  (NULL != file->f.param)) {
         vsf_heap_free(file->f.param);
