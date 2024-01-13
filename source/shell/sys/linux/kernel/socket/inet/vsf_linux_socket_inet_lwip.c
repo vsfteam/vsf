@@ -452,6 +452,12 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
         case SO_RCVBUF:
             *(int *)optval = netconn_get_recvbufsize(conn);
             break;
+        case SO_SNDBUF:
+            switch (NETCONNTYPE_GROUP(netconn_type(conn))) {
+            case NETCONN_TCP:   *(int *)optval = TCP_SND_BUF;   break;
+            default:            VSF_LINUX_ASSERT(false);        break;
+            }
+            break;
         case SO_REUSEADDR:
             if (    (optname == SO_BROADCAST)
                 &&  (NETCONNTYPE_GROUP(netconn_type(conn)) != NETCONN_UDP)) {

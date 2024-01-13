@@ -25,8 +25,7 @@ typedef __WCHAR_TYPE__              wchar_t;
 typedef unsigned short              wchar_t;
 #   elif __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
 typedef int                         wchar_t;
-#   elif !__IS_COMPILER_IAR__
-// TODO: it seems that IAR does not support wchar_t even if it's defined here
+#   else
 typedef unsigned short              wchar_t;
 #   endif
 #endif
