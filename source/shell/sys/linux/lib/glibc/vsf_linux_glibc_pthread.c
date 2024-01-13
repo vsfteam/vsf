@@ -776,8 +776,14 @@ int pthread_cancel(pthread_t tid)
     priv->is_cancelled = true;
     if (    (PTHREAD_CANCEL_ENABLE == priv->cancel_state)
         &&  (PTHREAD_CANCEL_ASYNCHRONOUS == priv->cancel_type)) {
-        // TODO: when to call __vsf_linux_pthread_do_cancel in thread?
-        VSF_LINUX_ASSERT(false);
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+        if (thread->trigger_pending != NULL) {
+            vsf_linux_trigger_signal(thread->trigger_pending, SIGABRT);
+        } else
+#endif
+        {
+            VSF_LINUX_ASSERT(false);
+        }
     }
     return 0;
 }

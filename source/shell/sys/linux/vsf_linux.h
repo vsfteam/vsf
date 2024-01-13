@@ -191,6 +191,7 @@ vsf_class(vsf_linux_thread_t) {
         } process_reg_backup;
 #endif
         char name[16];
+        vsf_linux_trigger_t *trigger_pending;
     )
 
     private_member(
