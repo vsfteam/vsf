@@ -665,9 +665,6 @@ int vsf_linux_trigger_signal(vsf_linux_trigger_t *trig, int sig)
     trig->pending_process = NULL;
     vsf_dlist_remove(vsf_linux_trigger_t, node, &pending_process->sig.trigger_list, trig);
     vsf_unprotect_sched(orig);
-
-    vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
-    thread->trigger_pending = NULL;
 #endif
     vsf_eda_trig_set_isr(&trig->use_as__vsf_trig_t);
     return 0;
@@ -692,6 +689,9 @@ int vsf_linux_trigger_pend(vsf_linux_trigger_t *trig, vsf_timeout_tick_t timeout
 #endif
 
     vsf_sync_reason_t r = vsf_thread_trig_pend(&trig->use_as__vsf_trig_t, timeout);
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+    thread->trigger_pending = NULL;
+#endif
     orig = vsf_protect_sched();
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
     trig->pending_process = NULL;

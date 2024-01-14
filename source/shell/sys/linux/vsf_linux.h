@@ -179,6 +179,9 @@ vsf_class(vsf_linux_thread_t) {
         int retval;
         pid_t tid;
         vsf_linux_thread_t *thread_pending;
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+        vsf_linux_trigger_t *trigger_pending;
+#endif
 #if VSF_LINUX_CFG_TLS_NUM > 0
         vsf_linux_localstorage_t tls[VSF_LINUX_CFG_TLS_NUM];
 #endif
@@ -191,7 +194,6 @@ vsf_class(vsf_linux_thread_t) {
         } process_reg_backup;
 #endif
         char name[16];
-        vsf_linux_trigger_t *trigger_pending;
     )
 
     private_member(
