@@ -144,10 +144,6 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                 width = strtoull(format, &format_tmp, 0);
                 format = format_tmp;
             }
-            if (width < 0) {
-                width = -width;
-                flags.align_left = 1;
-            }
             if ('.' == *format) {
                 format++;
                 if ('*' == *format) {
