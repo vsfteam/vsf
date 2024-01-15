@@ -38,8 +38,8 @@
 
 /*============================ MACROS ========================================*/
 
-#if __VSF_HAL_SWI_NUM > 0
-#   define MFUNC_IN_U8_DEC_VALUE            (__VSF_HAL_SWI_NUM)
+#if __VSF_OS_SWI_NUM > 0
+#   define MFUNC_IN_U8_DEC_VALUE            (__VSF_OS_SWI_NUM)
 #   include "utilities/preprocessor/mf_u8_dec2str.h"
 #   define __FHOST_IPC_IRQ_PRIO             MFUNC_OUT_DEC_STR
 #else
