@@ -6415,7 +6415,7 @@
   (gr_text "BAT" (at 212.2424 149.9108) (layer "F.SilkS") (tstamp f6cdb9e2-8842-4329-a234-76f54ac2518c)
     (effects (font (size 0.762 0.762) (thickness 0.1524) bold) (justify left bottom))
   )
-  (gr_text "USB_PWR" (at 216.662 126.1364) (layer "F.SilkS") (tstamp f77821c5-a7c2-400b-9bca-9d60ae96ea2d)
+  (gr_text "USB_PWR" (at 216.9668 126.1364) (layer "F.SilkS") (tstamp f77821c5-a7c2-400b-9bca-9d60ae96ea2d)
     (effects (font (size 0.635 0.635) (thickness 0.1524) bold) (justify left bottom))
   )
 
