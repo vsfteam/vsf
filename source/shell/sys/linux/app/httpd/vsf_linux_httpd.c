@@ -576,6 +576,7 @@ static void __vsf_linux_httpd_stream_evthandler(vsf_stream_t *no_used, void *par
             session->request.stream_out = &stream->use_as__vsf_stream_t;
             session->fd_stream_out = sfd->fd;
             __vsf_linux_httpd_send_response(session);
+            session->wait_stream_out = true;
             session->request.is_stream_out_started = true;
         } else if (VSF_ERR_NONE == err) {
             // request parsed, close stream_in(note that there maybe data in stream_in)
