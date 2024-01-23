@@ -141,7 +141,7 @@ struct vsf_linux_timeval {
 
 // from poll.h
 #define VSF_LINUX_POLLIN                (1 << 0)
-#define VSF_LINUX_POLLOUT               (1 << 1)
+#define VSF_LINUX_POLLOUT               (1 << 2)
 typedef int vsf_linux_nfds_t;
 struct vsf_linux_pollfd {
     int fd;
