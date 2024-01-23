@@ -32,6 +32,7 @@
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "./include/unistd.h"
 #   include "./include/sched.h"
+#   include "./include/pty.h"
 #   include "./include/semaphore.h"
 #   include "./include/signal.h"
 #   include "./include/sys/wait.h"
@@ -65,6 +66,7 @@
 #else
 #   include <unistd.h>
 #   include <sched.h>
+#   include <pty.h>
 #   include <semaphore.h>
 #   include <signal.h>
 #   include <sys/wait.h>
@@ -3535,6 +3537,90 @@ int sched_yield(void)
     return 0;
 }
 
+// pty
+
+int openpty(int *amaster, int *aslave, char *name,
+                const struct termios *termp,
+                const struct winsize *winp)
+{
+    char ptyp[11] = "/dev/ptyp0", ttyp[11] = "/dev/ttyp0";
+    bool found = false;
+    int master, slave;
+
+    for (int i = 0; i < VSF_LINUX_CFG_MAX_PTY; i++) {
+        ptyp[9] = ttyp[9] = '0' + i;
+        master = open(ptyp, O_RDWR | O_NOCTTY);
+        if (*amaster < 0) {
+            continue;
+        }
+        slave = open(ttyp, O_RDWR | O_NOCTTY);
+        if (slave < 0) {
+            close(master);
+            continue;
+        }
+        found = true;
+        break;
+    }
+
+    if (!found) {
+        errno = ENOENT;
+        return -1;
+    }
+
+    if (termp) {
+        tcsetattr(slave, TCSAFLUSH, termp);
+    }
+    if (winp) {
+        ioctl(slave, TIOCSWINSZ, winp);
+    }
+
+    *amaster = master;
+    *aslave = slave;
+    if (name != NULL) {
+        strcpy(name, ttyp);
+    }
+    return 0;
+}
+
+int login_tty(int fd)
+{
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+    dup2(fd, STDIN_FILENO);
+    dup2(fd, STDOUT_FILENO);
+    dup2(fd, STDERR_FILENO);
+    close(fd);
+    return 0;
+}
+
+int forkpty(int *amaster, char *name,
+                const struct termios *termp,
+                const struct winsize *winp)
+{
+    int master, slave, pid;
+
+    if (!openpty(&master, &slave, name, termp, winp)) {
+        switch (pid = vfork()) {
+        case -1:
+            close(master);
+            close(slave);
+            break;
+        case 0:
+            close(master);
+            if (login_tty(slave)) {
+                _exit(1);
+            }
+            return 0;
+        default:
+            *amaster = master;
+            close(slave);
+            return pid;
+        }
+    }
+    return -1;
+}
+
 int uname(struct utsname *name)
 {
     static const struct utsname __name = {
@@ -4713,6 +4799,15 @@ __VSF_VPLT_DECORATOR__ vsf_linux_spawn_vplt_t vsf_linux_spawn_vplt = {
 };
 #endif
 
+#if VSF_LINUX_APPLET_USE_PTY == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_pty_vplt_t vsf_linux_pty_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_pty_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(openpty),
+    VSF_APPLET_VPLT_ENTRY_FUNC(forkpty),
+};
+#endif
+
 #if VSF_LINUX_APPLET_USE_DLFCN == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_dlfcn_vplt_t vsf_linux_dlfcn_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_dlfcn_vplt_t, 0, 0, true),
@@ -5221,6 +5316,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #endif
 #if VSF_LINUX_APPLET_USE_SCHED == ENABLED
     .sched_vplt         = (void *)&vsf_linux_sched_vplt,
+#endif
+#if VSF_LINUX_APPLET_USE_PTY == ENABLED
+    .pty_vplt           = (void *)&vsf_linux_pty_vplt,
 #endif
 #if VSF_LINUX_SOCKET_USE_INET == ENABLED
 #   if VSF_LINUX_APPLET_USE_IFADDRS == ENABLED

@@ -115,6 +115,13 @@
 #   define VSF_LINUX_USE_SOCKET                 ENABLED
 #endif
 
+#ifndef VSF_LINUX_CFG_MAX_PTY
+#   define VSF_LINUX_CFG_MAX_PTY                9
+#endif
+#if VSF_LINUX_CFG_MAX_PTY > 9
+#   error currently max for VSF_LINUX_CFG_MAX_PTY is 9
+#endif
+
 #if VSF_LINUX_USE_SOCKET == ENABLED
 #   ifndef VSF_LINUX_SOCKET_USE_UNIX
 #       define VSF_LINUX_SOCKET_USE_UNIX        ENABLED
@@ -163,6 +170,9 @@
 #   endif
 #   ifndef VSF_LINUX_APPLET_USE_SPAWN
 #       define VSF_LINUX_APPLET_USE_SPAWN       ENABLED
+#   endif
+#   ifndef VSF_LINUX_APPLET_USE_PTY
+#       define VSF_LINUX_APPLET_USE_PTY         ENABLED
 #   endif
 
 #   if VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
@@ -476,7 +486,7 @@ typedef struct vsf_linux_vplt_t {
     void *fnmatch_vplt;
     void *grp_vplt;
     void *net_if_vplt;
-    void *unix_res0_vplt;
+    void *pty_vplt;
     void *unix_res1_vplt;
     void *unix_res2_vplt;
     void *unix_res3_vplt;

@@ -3269,6 +3269,20 @@ int vsf_linux_fs_bind_pipe(const char *pathname1, const char *pathname2, bool ex
     return ret;
 }
 
+int vsf_linux_create_pty(int num)
+{
+    VSF_LINUX_ASSERT(num <= VSF_LINUX_CFG_MAX_PTY);
+
+    char ptyp[11] = "/dev/ptyp0", ttyp[11] = "/dev/ttyp0";
+    for (int i = 0; i < num; i++) {
+        ptyp[9] = ttyp[9] = '0' + i;
+        if (vsf_linux_fs_bind_pipe(ptyp, ttyp, true) < 0) {
+            return i;
+        }
+    }
+    return num;
+}
+
 int mkfifo(const char *pathname, mode_t mode)
 {
     return -1;
