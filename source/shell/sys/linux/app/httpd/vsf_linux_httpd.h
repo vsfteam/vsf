@@ -285,6 +285,7 @@ vsf_class(vsf_linux_httpd_request_t) {
             vsf_linux_httpd_urihandler_header_t header;
             uint8_t priv[VSF_LINUX_HTTPD_CFG_PRIV_SIZE];
         } urihandler_ctx;
+        void *target;
     )
 };
 
