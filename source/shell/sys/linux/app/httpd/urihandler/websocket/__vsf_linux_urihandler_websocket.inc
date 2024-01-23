@@ -16,7 +16,16 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
+
+#include <mbedtls/sha1.h>
+#include <mbedtls/base64.h>
+
 /*============================ MACROS ========================================*/
+
+#if VSF_USE_MBEDTLS != ENABLED
+#   error sha1 in mbedtls is used as handshake algo, please enable VSF_USE_MBEDTLS
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
@@ -26,6 +35,9 @@ static vsf_err_t __vsf_linux_httpd_urihandler_websocket_fini(vsf_linux_httpd_req
 static vsf_err_t __vsf_linux_httpd_urihandler_websocket_serve(vsf_linux_httpd_request_t *req);
 
 /*============================ LOCAL VARIABLES ===============================*/
+
+static char __websocket_magic[] = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vsf_linux_httpd_urihandler_op_t vsf_linux_httpd_urihandler_websocket_op = {
@@ -36,17 +48,25 @@ const vsf_linux_httpd_urihandler_op_t vsf_linux_httpd_urihandler_websocket_op = 
 
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vsf_linux_httpd_urihandler_websocket_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+static void __vsf_linux_httpd_urihandler_socket_stream_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
-    vsf_linux_httpd_urihandler_websocket_t *urihandler_websocket = container_of(eda, vsf_linux_httpd_urihandler_websocket_t, eda);
-    vsf_linux_httpd_request_t *request = container_of(urihandler_websocket, vsf_linux_httpd_request_t, urihandler_ctx);
-    vsf_stream_t *stream = &urihandler_websocket->stream.use_as__vsf_stream_t;
+    vsf_mem_stream_t *memstream = (vsf_mem_stream_t *)stream;
+    vsf_linux_httpd_request_t *req = param;
+    const vsf_linux_httpd_urihandler_t *urihandler = req->urihandler;
+    vsf_linux_httpd_urihandler_websocket_t *urihandler_websocket = &req->urihandler_ctx.websocket;
 
     switch (evt) {
-    case VSF_EVT_INIT:
-        request->is_stream_out_started = true;
+    case VSF_STREAM_ON_IN:
         break;
-    case VSF_EVT_RETURN:
+    case VSF_STREAM_ON_OUT:
+        if (urihandler_websocket->connected) {
+
+        } else if (!vsf_stream_get_data_size(stream)) {
+            memstream->buffer = urihandler->buffer.ptr;
+            memstream->size = urihandler->buffer.size;
+            vsf_stream_write(stream, NULL, memstream->size);
+            vsf_stream_disconnect_tx(stream);
+        }
         break;
     }
 }
@@ -54,13 +74,61 @@ static void __vsf_linux_httpd_urihandler_websocket_evthandler(vsf_eda_t *eda, vs
 static vsf_err_t __vsf_linux_httpd_urihandler_websocket_init(vsf_linux_httpd_request_t *req, uint8_t *data, uint_fast32_t size)
 {
     VSF_LINUX_ASSERT((req != NULL) && (req->uri != NULL));
+    if (!req->websocket || (NULL == req->websocket_key)) {
+        req->response = VSF_LINUX_HTTPD_BAD_REQUEST;
+        return VSF_ERR_FAIL;
+    }
 
-    vsf_linux_httpd_session_t *session = container_of(req, vsf_linux_httpd_session_t, request);
     vsf_linux_httpd_urihandler_websocket_t *urihandler_websocket = &req->urihandler_ctx.websocket;
-    char *uri = req->uri;
+    vsf_fifo_stream_t *stream;
+    int bufsize = sizeof(req->buffer) / 2;
+
+    urihandler_websocket->connected = false;
+
+    stream = &urihandler_websocket->stream_out;
+    stream->op = &vsf_fifo_stream_op;
+    stream->buffer = req->buffer;
+    stream->size = bufsize;
+    VSF_STREAM_INIT(stream);
+    stream->tx.param = req;
+    stream->tx.evthandler = __vsf_linux_httpd_urihandler_socket_stream_evthandler;
+    VSF_STREAM_CONNECT_TX(stream);
+    req->is_stream_out_started = true;
+    req->stream_out = &stream->use_as__vsf_stream_t;
+
+    stream = &urihandler_websocket->stream_in;
+    stream->op = &vsf_fifo_stream_op;
+    stream->buffer = req->buffer + bufsize;
+    stream->size = bufsize;
+    VSF_STREAM_INIT(stream);
+    stream->rx.param = req;
+    stream->rx.evthandler = __vsf_linux_httpd_urihandler_socket_stream_evthandler;
+    VSF_STREAM_CONNECT_RX(stream);
+    req->stream_in = &stream->use_as__vsf_stream_t;
+
+    vsf_stream_write_str(req->stream_out, "HTTP/1.1 101 Switching Protocols\r\nConnection: Upgrade\r\nUpgrade: websocket\r\nSec-WebSocket-Accept: ");
+
+    char secbuf[32 + sizeof(__websocket_magic)];
+    strcpy(secbuf, req->websocket_key);
+    strcat(secbuf, __websocket_magic);
+    free(req->websocket_key);
+    req->websocket_key = NULL;
+
+    mbedtls_sha1_context ctx;
+    uint8_t sha1_output[20];
+    mbedtls_sha1_init(&ctx);
+    mbedtls_sha1_starts(&ctx);
+    mbedtls_sha1_update(&ctx, (const unsigned char *)secbuf, strlen(secbuf));
+    mbedtls_sha1_finish(&ctx, sha1_output);
+    mbedtls_sha1_free(&ctx);
+
+    size_t olen;
+    mbedtls_base64_encode((unsigned char *)secbuf, sizeof(secbuf), &olen,
+            (const unsigned char *)sha1_output, sizeof(sha1_output));
+    vsf_stream_write_str(req->stream_out, secbuf);
+    vsf_stream_write_str(req->stream_out, "\r\n\r\n");
 
     req->response = VSF_LINUX_HTTPD_OK;
-
     return VSF_ERR_NONE;
 }
 
@@ -71,10 +139,5 @@ static vsf_err_t __vsf_linux_httpd_urihandler_websocket_fini(vsf_linux_httpd_req
 
 static vsf_err_t __vsf_linux_httpd_urihandler_websocket_serve(vsf_linux_httpd_request_t *req)
 {
-    vsf_linux_httpd_urihandler_websocket_t *urihandler_websocket = &req->urihandler_ctx.websocket;
-#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
-    urihandler_websocket->eda.on_terminate = NULL;
-#endif
-    urihandler_websocket->eda.fn.evthandler = __vsf_linux_httpd_urihandler_websocket_evthandler;
-    return vsf_eda_init(&urihandler_websocket->eda);
+    return VSF_ERR_NONE;
 }

@@ -72,6 +72,19 @@
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define vsf_stream_write_str(__stream, __str)                                   \
+            do {                                                                \
+                vsf_stream_write((__stream), (uint8_t *)(__str), strlen(__str));\
+            } while (false)
+#define vsf_stream_write_int(__stream, __int)                                   \
+            do {                                                                \
+                char __int_buffer[16];                                          \
+                itoa((__int), __int_buffer, 10);                                \
+                vsf_stream_write((__stream), (uint8_t *)(__int_buffer),         \
+                    strlen(__int_buffer));                                      \
+            } while (false)
+
 /*============================ TYPES =========================================*/
 
 typedef struct __vsf_linux_httpd_strmapper_t {
@@ -194,13 +207,14 @@ static const vsf_linux_httpd_urihandler_t __vsf_linux_httpd_urihandler[] = {
 };
 #endif
 
-static void __vsf_linux_httpd_urihandler_buffer_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
+static void __vsf_linux_httpd_urihandler_buffer_stream_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     switch (evt) {
     case VSF_STREAM_ON_OUT:
         if (!vsf_stream_get_data_size(stream)) {
             vsf_mem_stream_t *memstream = (vsf_mem_stream_t *)stream;
-            vsf_linux_httpd_urihandler_t *urihandler = param;
+            vsf_linux_httpd_request_t *req = param;
+            const vsf_linux_httpd_urihandler_t *urihandler = req->urihandler;
 
             memstream->buffer = urihandler->buffer.ptr;
             memstream->size = urihandler->buffer.size;
@@ -215,9 +229,8 @@ static vsf_err_t __vsf_linux_httpd_urihandler_buffer_init(vsf_linux_httpd_reques
 {
     VSF_LINUX_ASSERT((req != NULL) && (req->uri != NULL));
 
-    vsf_linux_httpd_session_t *session = container_of(req, vsf_linux_httpd_session_t, request);
     vsf_linux_httpd_urihandler_buffer_t *urihandler_buffer = &req->urihandler_ctx.buffer;
-    vsf_linux_httpd_urihandler_t *urihandler = req->urihandler;
+    const vsf_linux_httpd_urihandler_t *urihandler = req->urihandler;
     vsf_mem_stream_t *stream = &urihandler_buffer->stream;
 
     req->content_length = urihandler->buffer.size;
@@ -225,8 +238,8 @@ static vsf_err_t __vsf_linux_httpd_urihandler_buffer_init(vsf_linux_httpd_reques
     stream->buffer = req->buffer;
     stream->size = sizeof(req->buffer);
     VSF_STREAM_INIT(stream);
-    stream->tx.param = urihandler;
-    stream->tx.evthandler = __vsf_linux_httpd_urihandler_buffer_evthandler;
+    stream->tx.param = req;
+    stream->tx.evthandler = __vsf_linux_httpd_urihandler_buffer_stream_evthandler;
     VSF_STREAM_CONNECT_TX(stream);
 
     req->is_stream_out_started = true;
@@ -463,6 +476,8 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
                 // no need to set to false, because it's default value
             } else if (!strcasecmp((const char *)cur_ptr, "Keep-Alive")) {
                 request->keep_alive = true;
+            } else if (!strcasecmp((const char *)cur_ptr, "Upgrade")) {
+                request->upgrade = true;
             } else {
                 goto __bad_request;
             }
@@ -474,6 +489,25 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
             __vsf_linux_httpd_parse_header_item(cur_ptr,
                         request->encoding_map, VSF_LINUX_HTTPD_ENCODING_NUM,
                         __vsf_linux_httpd_encoding, dimof(__vsf_linux_httpd_encoding));
+        } else if (!strcasecmp((const char *)tmp_ptr, "Upgrade")) {
+            if (!request->upgrade) {
+                goto __bad_request;
+            }
+#if VSF_LINUX_HTTPD_CFG_WEBSOCKET == ENABLED
+            if (!strcasecmp((const char *)cur_ptr, "websocket")) {
+                request->websocket = true;
+            } else
+#endif
+            {
+                goto __bad_request;
+            }
+#if VSF_LINUX_HTTPD_CFG_WEBSOCKET == ENABLED
+        } else if (!strcasecmp((const char *)tmp_ptr, "Sec-WebSocket-Key")) {
+            if (!request->websocket) {
+                goto __bad_request;
+            }
+            request->websocket_key = strdup(cur_ptr);
+#endif
         } else if (!strcasecmp((const char *)tmp_ptr, "Host")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "User-Agent")) {
         } else if (!strcasecmp((const char *)tmp_ptr, "Cookie")) {
@@ -555,18 +589,6 @@ static void __vsf_linux_httpd_session_delete(vsf_linux_httpd_session_t *session)
 static void __vsf_linux_httpd_send_response(vsf_linux_httpd_session_t *session)
 {
     vsf_stream_t *stream = session->request.stream_out;
-
-#define vsf_stream_write_str(__stream, __str)                                   \
-            do {                                                                \
-                vsf_stream_write((__stream), (uint8_t *)(__str), strlen(__str));\
-            } while (false)
-#define vsf_stream_write_int(__stream, __int)                                   \
-            do {                                                                \
-                char __int_buffer[16];                                          \
-                itoa((__int), __int_buffer, 10);                                \
-                vsf_stream_write((__stream), (uint8_t *)(__int_buffer),         \
-                    strlen(__int_buffer));                                      \
-            } while (false)
 
     vsf_stream_write_str(stream, "HTTP/1.1 ");
     vsf_stream_write_int(stream, session->request.response);
@@ -715,7 +737,10 @@ static void __vsf_linux_httpd_stream_evthandler(vsf_stream_t *no_used, void *par
             session->fd_stream_out = sfd->fd;
 
             // write response header to stream_out
-            __vsf_linux_httpd_send_response(session);
+            // for upgraded sessions, urihandler should generate the response
+            if (!session->request.upgrade) {
+                __vsf_linux_httpd_send_response(session);
+            }
 
             if (VSF_ERR_NONE != urihandler->op->serve_fn(&session->request)) {
                 vsf_trace_error(MODULE_NAME ": fail to serve urihandler." VSF_TRACE_CFG_LINEEND);

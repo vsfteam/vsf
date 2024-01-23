@@ -255,6 +255,12 @@ vsf_class(vsf_linux_httpd_request_t) {
         char *query;
         bool keep_alive;
         bool is_stream_out_started;
+        bool upgrade;
+
+#if VSF_LINUX_HTTPD_CFG_WEBSOCKET == ENABLED
+        bool websocket;
+        char *websocket_key;
+#endif
 
         const vsf_linux_httpd_urihandler_t *urihandler;
         vsf_stream_t *stream_in, *stream_out;
@@ -281,16 +287,18 @@ vsf_class(vsf_linux_httpd_request_t) {
 vsf_class(vsf_linux_httpd_session_t) {
     private_member(
         vsf_dlist_node_t session_node;
-        vsf_linux_httpd_request_t request;
 
         int fd_socket;
-        int fd_stream_out, fd_stream_in;
 
         bool wait_stream_out, wait_stream_in;
         bool fatal_error;
 
         struct sockaddr_in client_addr;
         vsf_linux_httpd_t *httpd;
+    )
+    protected_member(
+        vsf_linux_httpd_request_t request;
+        int fd_stream_out, fd_stream_in;
     )
 };
 

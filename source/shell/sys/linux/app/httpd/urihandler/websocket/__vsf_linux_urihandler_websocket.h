@@ -33,11 +33,12 @@ extern "C" {
 typedef int (*vsf_linux_httpd_websocket_onopen_t)(vsf_linux_httpd_request_t *req);
 typedef void (*vsf_linux_httpd_websocket_onclose_t)(vsf_linux_httpd_request_t *req);
 typedef void (*vsf_linux_httpd_websocket_onerror_t)(vsf_linux_httpd_request_t *req);
-typedef void (*vsf_linux_httpd_websocket_onmessage_t)(vsf_linux_httpd_request_t *req);
+typedef void (*vsf_linux_httpd_websocket_onmessage_t)(vsf_linux_httpd_request_t *req, uint8_t *buf, uint32_t len);
 
 typedef struct vsf_linux_httpd_urihandler_websocket_t {
-    vsf_eda_t eda;
-    vsf_fifo_stream_t stream;
+    vsf_fifo_stream_t stream_in;
+    vsf_fifo_stream_t stream_out;
+    bool connected;
 } vsf_linux_httpd_urihandler_websocket_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
