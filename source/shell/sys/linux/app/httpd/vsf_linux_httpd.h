@@ -168,6 +168,8 @@ typedef struct vsf_linux_httpd_urihandler_op_t {
     vsf_err_t (*init_fn)(vsf_linux_httpd_request_t *req, uint8_t *data, uint_fast32_t size);
     vsf_err_t (*fini_fn)(vsf_linux_httpd_request_t *req);
     vsf_err_t (*serve_fn)(vsf_linux_httpd_request_t *req);
+
+    void (*stream_evthandler_fn)(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt);
 } vsf_linux_httpd_urihandler_op_t;
 
 typedef enum vsf_linux_httpd_urihandler_match_t {

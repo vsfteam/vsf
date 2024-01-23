@@ -38,7 +38,8 @@ typedef void (*vsf_linux_httpd_websocket_onmessage_t)(vsf_linux_httpd_request_t 
 typedef struct vsf_linux_httpd_urihandler_websocket_t {
     vsf_fifo_stream_t stream_in;
     vsf_fifo_stream_t stream_out;
-    bool connected;
+    uint64_t payload_len;
+    uint8_t state;
 } vsf_linux_httpd_urihandler_websocket_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
