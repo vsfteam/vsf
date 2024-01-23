@@ -832,6 +832,13 @@ static int __vsf_linux_httpd_set_fds(vsf_linux_httpd_t *httpd, fd_set *rset, fd_
                 FD_SET(_->fd_stream_in, wset);
             }
         }
+        if (    (_->request.urihandler != NULL)
+            &&  (_->request.urihandler->poll_fn != NULL)) {
+            int fd_max_urihandler = _->request.urihandler->poll_fn(&_->request, rset, wset, true);
+            if (fd_max_urihandler > fd_max) {
+                fd_max = fd_max_urihandler;
+            }
+        }
     }
     return fd_max;
 }
@@ -906,6 +913,14 @@ static void * __vsf_linux_httpd_thread(void *param)
 
         __vsf_dlist_foreach_next_unsafe(vsf_linux_httpd_session_t, session_node, &httpd->session_list) {
             VSF_LINUX_ASSERT(fd_num >= 0);
+            if (0 == fd_num) {
+                break;
+            }
+
+            if (    (_->request.urihandler != NULL)
+                &&  (_->request.urihandler->poll_fn != NULL)) {
+                fd_num -= _->request.urihandler->poll_fn(&_->request, &rfds, &wfds, false);
+            }
             if (0 == fd_num) {
                 break;
             }

@@ -235,6 +235,8 @@ typedef struct vsf_linux_httpd_urihandler_t {
         } websocket;
 #endif
     };
+
+    int (*poll_fn)(vsf_linux_httpd_request_t *req, fd_set *rset, fd_set *wset, bool prepare);
 } vsf_linux_httpd_urihandler_t;
 
 typedef struct vsf_linux_httpd_urihandler_header_t {
