@@ -3550,7 +3550,7 @@ int openpty(int *amaster, int *aslave, char *name,
     for (int i = 0; i < VSF_LINUX_CFG_MAX_PTY; i++) {
         ptyp[9] = ttyp[9] = '0' + i;
         master = open(ptyp, O_RDWR | O_NOCTTY);
-        if (*amaster < 0) {
+        if (master < 0) {
             continue;
         }
         slave = open(ttyp, O_RDWR | O_NOCTTY);
@@ -3592,33 +3592,6 @@ int login_tty(int fd)
     dup2(fd, STDERR_FILENO);
     close(fd);
     return 0;
-}
-
-int forkpty(int *amaster, char *name,
-                const struct termios *termp,
-                const struct winsize *winp)
-{
-    int master, slave, pid;
-
-    if (!openpty(&master, &slave, name, termp, winp)) {
-        switch (pid = vfork()) {
-        case -1:
-            close(master);
-            close(slave);
-            break;
-        case 0:
-            close(master);
-            if (login_tty(slave)) {
-                _exit(1);
-            }
-            return 0;
-        default:
-            *amaster = master;
-            close(slave);
-            return pid;
-        }
-    }
-    return -1;
 }
 
 int uname(struct utsname *name)
@@ -4804,7 +4777,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_pty_vplt_t vsf_linux_pty_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_pty_vplt_t, 0, 0, true),
 
     VSF_APPLET_VPLT_ENTRY_FUNC(openpty),
-    VSF_APPLET_VPLT_ENTRY_FUNC(forkpty),
+    VSF_APPLET_VPLT_ENTRY_FUNC(login_tty),
 };
 #endif
 
