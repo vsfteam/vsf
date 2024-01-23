@@ -60,6 +60,9 @@ extern "C" {
 #ifndef VSF_LINUX_HTTPD_CFG_FILESYSTEM
 #   define VSF_LINUX_HTTPD_CFG_FILESYSTEM               ENABLED
 #endif
+#ifndef VSF_LINUX_HTTPD_CFG_WEBSOCKET
+#   define VSF_LINUX_HTTPD_CFG_WEBSOCKET                ENABLED
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -178,6 +181,25 @@ typedef enum vsf_linux_httpd_urihandler_type_t {
     VSF_LINUX_HTTPD_URI_REMAP,
 } vsf_linux_httpd_urihandler_type_t;
 
+/*============================ INCLUDES ======================================*/
+
+#ifdef __cplusplus
+}
+#endif
+
+#if VSF_LINUX_HTTPD_CFG_FILESYSTEM == ENABLED
+#   include "./urihandler/file/__vsf_linux_urihandler_file.h"
+#endif
+#if VSF_LINUX_HTTPD_CFG_WEBSOCKET == ENABLED
+#   include "./urihandler/websocket/__vsf_linux_urihandler_websocket.h"
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*============================ TYPES =========================================*/
+
 typedef struct vsf_linux_httpd_urihandler_t {
     // ored value of vsf_linux_httpd_urihandler_match_t
     vsf_linux_httpd_urihandler_match_t match;
@@ -193,31 +215,31 @@ typedef struct vsf_linux_httpd_urihandler_t {
     };
 
     union {
-        // something only author of specified urihandler knows
-        void *priv_ptr;
-        int priv_int;
+        // parameters for specified urihandler_op
+
+        // for buffer_urihandler
+        struct {
+            uint8_t *ptr;
+            uint32_t size;
+        } buffer;
+
+#if VSF_LINUX_HTTPD_CFG_WEBSOCKET == ENABLED
+        struct {
+            void *param;
+            vsf_linux_httpd_websocket_onopen_t on_open;
+            vsf_linux_httpd_websocket_onclose_t on_close;
+            vsf_linux_httpd_websocket_onerror_t on_error;
+            vsf_linux_httpd_websocket_onmessage_t on_message;
+        } websocket;
+#endif
     };
 } vsf_linux_httpd_urihandler_t;
-
-/*============================ INCLUDES ======================================*/
-
-#ifdef __cplusplus
-}
-#endif
-
-#if VSF_LINUX_HTTPD_CFG_FILESYSTEM == ENABLED
-#   include "./urihandler/file/__vsf_linux_urihandler_file.h"
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/*============================ TYPES =========================================*/
 
 typedef struct vsf_linux_httpd_urihandler_header_t {
     vsf_mem_stream_t stream;
 } vsf_linux_httpd_urihandler_header_t;
+
+typedef struct vsf_linux_httpd_urihandler_header_t vsf_linux_httpd_urihandler_buffer_t;
 
 vsf_class(vsf_linux_httpd_request_t) {
     protected_member(
@@ -246,6 +268,10 @@ vsf_class(vsf_linux_httpd_request_t) {
 #if VSF_LINUX_HTTPD_CFG_FILESYSTEM == ENABLED
             vsf_linux_httpd_urihandler_file_t file;
 #endif
+#if VSF_LINUX_HTTPD_CFG_WEBSOCKET == ENABLED
+            vsf_linux_httpd_urihandler_websocket_t websocket;
+#endif
+            vsf_linux_httpd_urihandler_buffer_t buffer;
             vsf_linux_httpd_urihandler_header_t header;
             uint8_t priv[VSF_LINUX_HTTPD_CFG_PRIV_SIZE];
         } urihandler_ctx;
@@ -294,6 +320,9 @@ vsf_class(vsf_linux_httpd_t) {
 #undef PUBLIC_CONST
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+extern const vsf_linux_httpd_urihandler_op_t vsf_linux_httpd_urihandler_buffer_op;
+
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vsf_linux_httpd_start(vsf_linux_httpd_t *httpd);

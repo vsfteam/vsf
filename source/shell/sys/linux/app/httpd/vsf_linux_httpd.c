@@ -174,30 +174,82 @@ static const char * __vsf_linux_httpd_charset[VSF_LINUX_HTTPD_CHARSET_NUM] = {
 
 // urihandler
 #if VSF_LINUX_HTTPD_CFG_FILESYSTEM == ENABLED
-
-/*============================ MACROS ========================================*/
-
-#if VSF_LINUX_HTTPD_CFG_FILESYSTEM == ENABLED
 #   include "./urihandler/file/__vsf_linux_urihandler_file.inc"
 #endif
+#if VSF_LINUX_HTTPD_CFG_WEBSOCKET == ENABLED
+#   include "./urihandler/websocket/__vsf_linux_urihandler_websocket.inc"
+#endif
 
-/*============================ MACROS ========================================*/
-
-#define __VSF_LINUX_HTTPD_USE_DEFAULT_URIHANDLER
-
-/*============================ LOCAL VARIABLES ===============================*/
+#if VSF_LINUX_HTTPD_CFG_FILESYSTEM == ENABLED
+#   define __VSF_LINUX_HTTPD_USE_DEFAULT_URIHANDLER
 
 static const vsf_linux_httpd_urihandler_t __vsf_linux_httpd_urihandler[] = {
-#if VSF_LINUX_HTTPD_CFG_FILESYSTEM == ENABLED
+#   if VSF_LINUX_HTTPD_CFG_FILESYSTEM == ENABLED
     {
         .match          = VSF_LINUX_HTTPD_URI_MATCH_ANY,
         .type           = VSF_LINUX_HTTPD_URI_OP,
         .op             = &__vsf_linux_httpd_urihandler_file_op,
     },
-#endif
+#   endif
 };
-
 #endif
+
+static void __vsf_linux_httpd_urihandler_buffer_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
+{
+    switch (evt) {
+    case VSF_STREAM_ON_OUT:
+        if (!vsf_stream_get_data_size(stream)) {
+            vsf_mem_stream_t *memstream = (vsf_mem_stream_t *)stream;
+            vsf_linux_httpd_urihandler_t *urihandler = param;
+
+            memstream->buffer = urihandler->buffer.ptr;
+            memstream->size = urihandler->buffer.size;
+            vsf_stream_write(stream, NULL, memstream->size);
+            vsf_stream_disconnect_tx(stream);
+        }
+        break;
+    }
+}
+
+static vsf_err_t __vsf_linux_httpd_urihandler_buffer_init(vsf_linux_httpd_request_t *req, uint8_t *data, uint_fast32_t size)
+{
+    VSF_LINUX_ASSERT((req != NULL) && (req->uri != NULL));
+
+    vsf_linux_httpd_session_t *session = container_of(req, vsf_linux_httpd_session_t, request);
+    vsf_linux_httpd_urihandler_buffer_t *urihandler_buffer = &req->urihandler_ctx.buffer;
+    vsf_linux_httpd_urihandler_t *urihandler = req->urihandler;
+    vsf_mem_stream_t *stream = &urihandler_buffer->stream;
+
+    req->content_length = urihandler->buffer.size;
+    stream->op = &vsf_mem_stream_op;
+    stream->buffer = req->buffer;
+    stream->size = sizeof(req->buffer);
+    VSF_STREAM_INIT(stream);
+    stream->tx.param = urihandler;
+    stream->tx.evthandler = __vsf_linux_httpd_urihandler_buffer_evthandler;
+    VSF_STREAM_CONNECT_TX(stream);
+
+    req->is_stream_out_started = true;
+    req->stream_out = &stream->use_as__vsf_stream_t;
+    req->response = VSF_LINUX_HTTPD_OK;
+    return VSF_ERR_NONE;
+}
+
+static vsf_err_t __vsf_linux_httpd_urihandler_buffer_fini(vsf_linux_httpd_request_t *req)
+{
+    return VSF_ERR_NONE;
+}
+
+static vsf_err_t __vsf_linux_httpd_urihandler_buffer_serve(vsf_linux_httpd_request_t *req)
+{
+    return VSF_ERR_NONE;
+}
+
+const vsf_linux_httpd_urihandler_op_t vsf_linux_httpd_urihandler_buffer_op = {
+    .init_fn        = __vsf_linux_httpd_urihandler_buffer_init,
+    .fini_fn        = __vsf_linux_httpd_urihandler_buffer_fini,
+    .serve_fn       = __vsf_linux_httpd_urihandler_buffer_serve,
+};
 
 // response
 #if __IS_COMPILER_IAR__
@@ -576,7 +628,6 @@ static void __vsf_linux_httpd_stream_evthandler(vsf_stream_t *no_used, void *par
             session->request.stream_out = &stream->use_as__vsf_stream_t;
             session->fd_stream_out = sfd->fd;
             __vsf_linux_httpd_send_response(session);
-            session->wait_stream_out = true;
             session->request.is_stream_out_started = true;
         } else if (VSF_ERR_NONE == err) {
             // request parsed, close stream_in(note that there maybe data in stream_in)
@@ -627,6 +678,7 @@ static void __vsf_linux_httpd_stream_evthandler(vsf_stream_t *no_used, void *par
                 break;
             }
             session->request.uri = uri;
+            session->request.urihandler = urihandler;
 
             if (VSF_ERR_NONE != urihandler->op->init_fn(&session->request, ptr, size)) {
                 vsf_trace_error(MODULE_NAME ": fail to initialize request for %s, %s" VSF_TRACE_CFG_LINEEND,
@@ -637,7 +689,6 @@ static void __vsf_linux_httpd_stream_evthandler(vsf_stream_t *no_used, void *par
                 &&  !vsf_bitmap_get(session->request.mime_map, session->request.mime)) {
                 session->request.response = VSF_LINUX_HTTPD_NOT_ACCEPTABLE;
             }
-            session->request.urihandler = urihandler;
 
             vsf_linux_fd_t *sfd;
             vsf_stream_t *stream;
@@ -822,6 +873,8 @@ static void * __vsf_linux_httpd_thread(void *param)
                 } else {
                     session->client_addr = client_addr;
                     session->fd_socket = fd_socket;
+                    int value = 1;
+                    setsockopt(fd_socket, SOL_SOCKET, SO_NONBLOCK, &value, sizeof(value));
                 }
             }
         }
