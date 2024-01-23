@@ -51,13 +51,6 @@ extern "C" {
 #define _IOC_NR(nr)             (((nr) >> _IOC_NRSHIFT) & _IOC_NRMASK)
 #define _IOC_SIZE(nr)           (((nr) >> _IOC_SIZESHIFT) & _IOC_SIZEMASK)
 
-struct winsize {
-    unsigned short ws_row;
-    unsigned short ws_col;
-    unsigned short ws_xpixel;
-    unsigned short ws_ypixel;
-};
-
 enum {
     TIOCGWINSZ      = F_IO,
     TIOCGSERIAL     = F_IO + 1,
