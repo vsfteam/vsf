@@ -465,38 +465,41 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
                 const vsf_linux_fd_op_t *op, int fd_desired, vsf_linux_fd_priv_t *priv);
     extern vsf_linux_fd_t * vsf_linux_fd_get(int fd);
     vsf_linux_fd_t *sfd, *sfd_from;
-    if (fd_in >= 0) {
-        sfd_from = vsf_linux_fd_get(fd_in);
-        VSF_LINUX_ASSERT(sfd_from != NULL);
 
-        if (STDIN_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDIN_FILENO, sfd_from->priv)) {
-            goto delete_process_and_fail;
-        }
-        if (redir_mask & (1 << STDIN_FILENO)) {
-            close(fd_in);
-        }
+    if (fd_in < 0) {
+        fd_in = STDIN_FILENO;
     }
-    if (fd_out >= 0) {
-        sfd_from = vsf_linux_fd_get(fd_out);
-        VSF_LINUX_ASSERT(sfd_from != NULL);
-
-        if (STDOUT_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDOUT_FILENO, sfd_from->priv)) {
-            goto delete_process_and_fail;
-        }
-        if (redir_mask & (1 << STDOUT_FILENO)) {
-            close(fd_out);
-        }
+    sfd_from = vsf_linux_fd_get(fd_in);
+    VSF_LINUX_ASSERT(sfd_from != NULL);
+    if (STDIN_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDIN_FILENO, sfd_from->priv)) {
+        goto delete_process_and_fail;
     }
-    if (fd_err >= 0) {
-        sfd_from = vsf_linux_fd_get(fd_err);
-        VSF_LINUX_ASSERT(sfd_from != NULL);
+    if (redir_mask & (1 << STDIN_FILENO)) {
+        close(fd_in);
+    }
 
-        if (STDERR_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDERR_FILENO, sfd_from->priv)) {
-            goto delete_process_and_fail;
-        }
-        if (redir_mask & (1 << STDERR_FILENO)) {
-            close(fd_err);
-        }
+    if (fd_out < 0) {
+        fd_out = STDOUT_FILENO;
+    }
+    sfd_from = vsf_linux_fd_get(fd_out);
+    VSF_LINUX_ASSERT(sfd_from != NULL);
+    if (STDOUT_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDOUT_FILENO, sfd_from->priv)) {
+        goto delete_process_and_fail;
+    }
+    if (redir_mask & (1 << STDOUT_FILENO)) {
+        close(fd_out);
+    }
+
+    if (fd_err < 0) {
+        fd_err = STDOUT_FILENO;
+    }
+    sfd_from = vsf_linux_fd_get(fd_err);
+    VSF_LINUX_ASSERT(sfd_from != NULL);
+    if (STDERR_FILENO != __vsf_linux_fd_create_ex(process, &sfd, sfd_from->op, STDERR_FILENO, sfd_from->priv)) {
+        goto delete_process_and_fail;
+    }
+    if (redir_mask & (1 << STDERR_FILENO)) {
+        close(fd_err);
     }
 
     VSF_LINUX_ASSERT(ctx->entry != NULL);
