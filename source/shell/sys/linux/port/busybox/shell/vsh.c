@@ -668,6 +668,7 @@ int vsh_main(int argc, char *argv[])
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(STDIN_FILENO);
     vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)sfd->priv;
 
+    process->shell_process = process;
     while (1) {
     input_cmd:
         memset(ctx.cmd, 0, sizeof(ctx.cmd));
