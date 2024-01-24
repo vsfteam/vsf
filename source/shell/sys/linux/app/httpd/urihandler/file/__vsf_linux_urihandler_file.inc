@@ -118,8 +118,9 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_init(vsf_linux_httpd_request_
 static vsf_err_t __vsf_linux_httpd_urihandler_file_fini(vsf_linux_httpd_request_t *req)
 {
     vsf_linux_httpd_urihandler_file_t *urihandler_file = &req->urihandler_ctx.file;
-    VSF_LINUX_ASSERT(urihandler_file->file_stream.file != NULL);
-    vk_file_close(urihandler_file->file_stream.file);
+    if (urihandler_file->file_stream.file != NULL) {
+        vk_file_close(urihandler_file->file_stream.file);
+    }
     return VSF_ERR_NONE;
 }
 

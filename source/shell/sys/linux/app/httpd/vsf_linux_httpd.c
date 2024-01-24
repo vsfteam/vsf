@@ -650,6 +650,7 @@ static void __vsf_linux_httpd_stream_evthandler(vsf_stream_t *no_used, void *par
             session->request.stream_out = &stream->use_as__vsf_stream_t;
             session->fd_stream_out = sfd->fd;
             __vsf_linux_httpd_send_response(session);
+            session->request.uri = NULL;
             session->request.is_stream_out_started = true;
         } else if (VSF_ERR_NONE == err) {
             // request parsed, close stream_in(note that there maybe data in stream_in)
@@ -711,6 +712,7 @@ static void __vsf_linux_httpd_stream_evthandler(vsf_stream_t *no_used, void *par
                 &&  !vsf_bitmap_get(session->request.mime_map, session->request.mime)) {
                 session->request.response = VSF_LINUX_HTTPD_NOT_ACCEPTABLE;
             }
+            session->request.uri = NULL;
 
             vsf_linux_fd_t *sfd;
             vsf_stream_t *stream;

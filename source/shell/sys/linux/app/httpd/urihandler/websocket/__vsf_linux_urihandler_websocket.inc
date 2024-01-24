@@ -32,6 +32,10 @@
 enum {
     WEBSOCKET_STATE_CONNECTING,
     WEBSOCKET_STATE_CONNECTTED,
+    WEBSOCKET_STATE_PARSE_HEADER = WEBSOCKET_STATE_CONNECTTED,
+    WEBSOCKET_STATE_PARSE_REALLEN,
+    WEBSOCKET_STATE_PARSE_MASKING,
+    WEBSOCKET_STATE_PARSE_DATA,
 };
 
 /*============================ PROTOTYPES ====================================*/
@@ -61,14 +65,116 @@ static void __vsf_linux_httpd_urihandler_socket_stream_evthandler(vsf_stream_t *
     vsf_linux_httpd_request_t *req = param;
     const vsf_linux_httpd_urihandler_t *urihandler = req->urihandler;
     vsf_linux_httpd_urihandler_websocket_t *urihandler_websocket = &req->urihandler_ctx.websocket;
+    uint_fast32_t size;
 
     switch (evt) {
     case VSF_STREAM_ON_IN:
+        size = vsf_stream_get_data_size(stream);
         switch (urihandler_websocket->state) {
-        case WEBSOCKET_STATE_CONNECTTED:
-            if (vsf_stream_get_data_size(stream) > 2) {
-                uint16_t header;
-                vsf_stream_read(stream, (uint8_t *)&header, 2);
+        case WEBSOCKET_STATE_PARSE_HEADER:
+        parse_header:
+            if (size >= 2) {
+                uint8_t header[2];
+                size -= vsf_stream_read(stream, header, 2);
+                urihandler_websocket->is_fin = !!(header[0] * 0x80);
+                switch (header[0] & 0x0F) {
+                case 0:
+                    urihandler_websocket->is_start = false;
+                parse_len:
+                    urihandler_websocket->is_masking = !!(header[1] & 0x80);
+                    header[1] &= ~0x80;
+                    switch (header[1]) {
+                    case 126:
+                        urihandler_websocket->len_size = 2;
+                        urihandler_websocket->state = WEBSOCKET_STATE_PARSE_REALLEN;
+                        goto parse_reallen;
+                    case 127:
+                        urihandler_websocket->len_size = 8;
+                        urihandler_websocket->state = WEBSOCKET_STATE_PARSE_REALLEN;
+                        goto parse_reallen;
+                    default:
+                        urihandler_websocket->len_size = 0;
+                        urihandler_websocket->payload_len = header[1];
+                        goto parsed_reallen;
+                    }
+                    break;
+                case 1:
+                    urihandler_websocket->is_string = true;
+                    urihandler_websocket->is_start = true;
+                    goto parse_len;
+                case 2:
+                    urihandler_websocket->is_string = false;
+                    urihandler_websocket->is_start = true;
+                    goto parse_len;
+                }
+            }
+            break;
+        case WEBSOCKET_STATE_PARSE_REALLEN:
+        parse_reallen:
+            if (size >= urihandler_websocket->len_size) {
+                uint8_t header[8];
+                size -= vsf_stream_read(stream, header, urihandler_websocket->len_size);
+                switch (urihandler_websocket->len_size) {
+                case 2: urihandler_websocket->payload_len = get_unaligned_be16(header); break;
+                case 8: urihandler_websocket->payload_len = get_unaligned_be64(header); break;
+                }
+            parsed_reallen:
+                if (urihandler_websocket->is_masking) {
+                    urihandler_websocket->state = WEBSOCKET_STATE_PARSE_MASKING;
+                    goto parse_masking;
+                } else if (urihandler_websocket->payload_len > 0) {
+                    urihandler_websocket->state = WEBSOCKET_STATE_PARSE_DATA;
+                    goto parse_data;
+                } else {
+                    urihandler_websocket->state = WEBSOCKET_STATE_PARSE_HEADER;
+                    goto parse_header;
+                }
+            }
+            break;
+        case WEBSOCKET_STATE_PARSE_MASKING:
+        parse_masking:
+            if (size < 4) {
+                break;
+            }
+            size -= vsf_stream_read(stream, urihandler_websocket->masking_key, 4);
+            urihandler_websocket->masking_pos = 0;
+            urihandler_websocket->state = WEBSOCKET_STATE_PARSE_DATA;
+            if (0 == urihandler_websocket->payload_len) {
+                urihandler_websocket->state = WEBSOCKET_STATE_PARSE_HEADER;
+                goto parse_header;
+            }
+            // fallthrough
+        case WEBSOCKET_STATE_PARSE_DATA:
+        parse_data:
+            while (size > 0) {
+                uint8_t *buf;
+                uint_fast32_t cur_size = vsf_stream_get_rbuf(stream, &buf);
+                cur_size = vsf_min(cur_size, size);
+
+                uint_fast32_t realsize = vsf_min(cur_size, urihandler_websocket->payload_len);
+                urihandler_websocket->payload_len -= realsize;
+                size -= realsize;
+
+                if (urihandler_websocket->is_masking) {
+                    uint8_t masking_pos = urihandler_websocket->masking_pos;
+                    for (uint_fast32_t i = 0; i < realsize; i++) {
+                        buf[i] ^= urihandler_websocket->masking_key[masking_pos];
+                        masking_pos++;
+                        masking_pos &= 3;
+                    }
+                    urihandler_websocket->masking_pos = masking_pos;
+                }
+
+                if (urihandler->websocket.on_message != NULL) {
+                    urihandler->websocket.on_message(req,
+                        (const vsf_linux_httpd_urihandler_websocket_t *)urihandler_websocket,
+                        buf, realsize);
+                }
+
+                if ((0 == urihandler_websocket->payload_len) && (size > 0)) {
+                    urihandler_websocket->state = WEBSOCKET_STATE_PARSE_HEADER;
+                    goto parse_header;
+                }
             }
             break;
         }
@@ -103,6 +209,7 @@ static vsf_err_t __vsf_linux_httpd_urihandler_websocket_init(vsf_linux_httpd_req
     urihandler_websocket->state = WEBSOCKET_STATE_CONNECTING;
 
     stream = &urihandler_websocket->stream_out;
+    memset(stream, 0, sizeof(*stream));
     stream->op = &vsf_fifo_stream_op;
     stream->buffer = req->buffer;
     stream->size = bufsize;
@@ -113,6 +220,7 @@ static vsf_err_t __vsf_linux_httpd_urihandler_websocket_init(vsf_linux_httpd_req
     req->stream_out = &stream->use_as__vsf_stream_t;
 
     stream = &urihandler_websocket->stream_in;
+    memset(stream, 0, sizeof(*stream));
     stream->op = &vsf_fifo_stream_op;
     stream->buffer = req->buffer + bufsize;
     stream->size = bufsize;
@@ -155,4 +263,51 @@ static vsf_err_t __vsf_linux_httpd_urihandler_websocket_fini(vsf_linux_httpd_req
 static vsf_err_t __vsf_linux_httpd_urihandler_websocket_serve(vsf_linux_httpd_request_t *req)
 {
     return VSF_ERR_NONE;
+}
+
+int vsf_linux_httpd_websocket_write(vsf_linux_httpd_request_t *req, uint8_t *buf, int len, bool is_string)
+{
+    vsf_stream_t *stream = req->stream_out;
+    if (NULL == stream) {
+        return -1;
+    }
+
+    uint8_t len_size = len < 126 ? 1 : len < 65535 ? 2 : 8;
+    int size_dst = vsf_stream_get_free_size(stream);
+    if (size_dst < 2) {
+        return 0;
+    }
+
+    uint8_t header[8];
+    header[0] = is_string ? 0x81 : 0x82;
+__again:
+    switch (len_size) {
+    case 1:
+        len = vsf_min(len, size_dst - 2);
+        header[1] = len;
+        break;
+    case 2:
+        if (size_dst < 4) {
+            len = 125;
+            goto __again;
+        }
+        len = vsf_min(len, size_dst - 4);
+        header[1] = 126;
+        put_unaligned_be16(len, &header[2]);
+        len_size++;
+        break;
+    case 8:
+        if (size_dst < 10) {
+            len = 65535;
+            goto __again;
+        }
+        len = vsf_min(len, size_dst - 10);
+        header[1] = 127;
+        put_unaligned_be64(len, &header[2]);
+        len_size++;
+        break;
+    }
+    vsf_stream_write(stream, header, 1 + len_size);
+    vsf_stream_write(stream, buf, len);
+    return len;
 }

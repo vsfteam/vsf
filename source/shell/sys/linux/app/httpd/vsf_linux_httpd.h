@@ -61,7 +61,8 @@ extern "C" {
 #   define VSF_LINUX_HTTPD_CFG_FILESYSTEM               ENABLED
 #endif
 #ifndef VSF_LINUX_HTTPD_CFG_WEBSOCKET
-#   define VSF_LINUX_HTTPD_CFG_WEBSOCKET                ENABLED
+// websocket depends on mbedtls for sha1 and base64
+#   define VSF_LINUX_HTTPD_CFG_WEBSOCKET                VSF_USE_MBEDTLS
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -292,18 +293,16 @@ vsf_class(vsf_linux_httpd_request_t) {
 vsf_class(vsf_linux_httpd_session_t) {
     private_member(
         vsf_dlist_node_t session_node;
+        vsf_linux_httpd_request_t request;
 
         int fd_socket;
+        int fd_stream_out, fd_stream_in;
 
         bool wait_stream_out, wait_stream_in;
         bool fatal_error;
 
         struct sockaddr_in client_addr;
         vsf_linux_httpd_t *httpd;
-    )
-    protected_member(
-        vsf_linux_httpd_request_t request;
-        int fd_stream_out, fd_stream_in;
     )
 };
 

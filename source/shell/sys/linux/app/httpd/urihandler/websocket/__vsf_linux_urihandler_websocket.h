@@ -30,23 +30,33 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef int (*vsf_linux_httpd_websocket_onopen_t)(vsf_linux_httpd_request_t *req);
-typedef void (*vsf_linux_httpd_websocket_onclose_t)(vsf_linux_httpd_request_t *req);
-typedef void (*vsf_linux_httpd_websocket_onerror_t)(vsf_linux_httpd_request_t *req);
-typedef void (*vsf_linux_httpd_websocket_onmessage_t)(vsf_linux_httpd_request_t *req, uint8_t *buf, uint32_t len);
-
 typedef struct vsf_linux_httpd_urihandler_websocket_t {
     vsf_fifo_stream_t stream_in;
     vsf_fifo_stream_t stream_out;
     uint64_t payload_len;
+    uint8_t masking_key[4];
+    uint8_t len_size;
     uint8_t state;
+    uint8_t is_start : 1;
+    uint8_t is_fin : 1;
+    uint8_t is_string : 1;
+    uint8_t is_masking : 1;
+    uint8_t masking_pos : 2;
 } vsf_linux_httpd_urihandler_websocket_t;
+
+typedef int (*vsf_linux_httpd_websocket_onopen_t)(vsf_linux_httpd_request_t *req);
+typedef void (*vsf_linux_httpd_websocket_onclose_t)(vsf_linux_httpd_request_t *req);
+typedef void (*vsf_linux_httpd_websocket_onerror_t)(vsf_linux_httpd_request_t *req);
+typedef void (*vsf_linux_httpd_websocket_onmessage_t)(vsf_linux_httpd_request_t *req,
+    const vsf_linux_httpd_urihandler_websocket_t *websocket_ctx, uint8_t *buf, uint32_t len);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 extern const vsf_linux_httpd_urihandler_op_t vsf_linux_httpd_urihandler_websocket_op;
 
 /*============================ PROTOTYPES ====================================*/
+
+int vsf_linux_httpd_websocket_write(vsf_linux_httpd_request_t *req, uint8_t *buf, int len, bool is_string);
 
 #ifdef __cplusplus
 }
