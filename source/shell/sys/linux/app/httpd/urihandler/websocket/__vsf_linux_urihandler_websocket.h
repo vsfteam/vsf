@@ -37,6 +37,7 @@ typedef struct vsf_linux_httpd_urihandler_websocket_t {
     uint8_t masking_key[4];
     uint8_t len_size;
     uint8_t state;
+    uint8_t opcode;
     uint8_t is_start : 1;
     uint8_t is_fin : 1;
     uint8_t is_string : 1;

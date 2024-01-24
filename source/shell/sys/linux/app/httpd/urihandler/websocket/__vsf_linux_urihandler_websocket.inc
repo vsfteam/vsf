@@ -36,6 +36,8 @@ enum {
     WEBSOCKET_STATE_PARSE_REALLEN,
     WEBSOCKET_STATE_PARSE_MASKING,
     WEBSOCKET_STATE_PARSE_DATA,
+    WEBSOCKET_STATE_CLOSING,
+    WEBSOCKET_STATE_CLOSED,
 };
 
 /*============================ PROTOTYPES ====================================*/
@@ -66,6 +68,7 @@ static void __vsf_linux_httpd_urihandler_socket_stream_evthandler(vsf_stream_t *
     const vsf_linux_httpd_urihandler_t *urihandler = req->urihandler;
     vsf_linux_httpd_urihandler_websocket_t *urihandler_websocket = &req->urihandler_ctx.websocket;
     uint_fast32_t size;
+    uint8_t header[8];
 
     switch (evt) {
     case VSF_STREAM_ON_IN:
@@ -74,10 +77,10 @@ static void __vsf_linux_httpd_urihandler_socket_stream_evthandler(vsf_stream_t *
         case WEBSOCKET_STATE_PARSE_HEADER:
         parse_header:
             if (size >= 2) {
-                uint8_t header[2];
                 size -= vsf_stream_read(stream, header, 2);
                 urihandler_websocket->is_fin = !!(header[0] * 0x80);
-                switch (header[0] & 0x0F) {
+                urihandler_websocket->opcode = header[0] & 0x0F;
+                switch (urihandler_websocket->opcode) {
                 case 0:
                     urihandler_websocket->is_start = false;
                 parse_len:
@@ -106,13 +109,16 @@ static void __vsf_linux_httpd_urihandler_socket_stream_evthandler(vsf_stream_t *
                     urihandler_websocket->is_string = false;
                     urihandler_websocket->is_start = true;
                     goto parse_len;
+                case 8:
+                case 9:
+                case 10:
+                    goto parse_len;
                 }
             }
             break;
         case WEBSOCKET_STATE_PARSE_REALLEN:
         parse_reallen:
             if (size >= urihandler_websocket->len_size) {
-                uint8_t header[8];
                 size -= vsf_stream_read(stream, header, urihandler_websocket->len_size);
                 switch (urihandler_websocket->len_size) {
                 case 2: urihandler_websocket->payload_len = get_unaligned_be16(header); break;
@@ -165,10 +171,23 @@ static void __vsf_linux_httpd_urihandler_socket_stream_evthandler(vsf_stream_t *
                     urihandler_websocket->masking_pos = masking_pos;
                 }
 
-                if (urihandler->websocket.on_message != NULL) {
-                    urihandler->websocket.on_message(req,
-                        (const vsf_linux_httpd_urihandler_websocket_t *)urihandler_websocket,
-                        buf, realsize);
+                switch (urihandler_websocket->opcode) {
+                case 0:
+                case 1:
+                case 2:
+                    if (urihandler->websocket.on_message != NULL) {
+                        urihandler->websocket.on_message(req,
+                            (const vsf_linux_httpd_urihandler_websocket_t *)urihandler_websocket,
+                            buf, realsize);
+                    }
+                    break;
+                case 8:
+                    header[0] = 0x88;
+                    header[1] = 0x02;
+                    vsf_stream_write(req->stream_out, header, 2);
+                    vsf_stream_write(req->stream_out, buf, realsize);
+                    urihandler_websocket->state = WEBSOCKET_STATE_CLOSING;
+                    break;
                 }
                 vsf_stream_read(stream, NULL, realsize);
 
@@ -189,6 +208,16 @@ static void __vsf_linux_httpd_urihandler_socket_stream_evthandler(vsf_stream_t *
                 urihandler_websocket->state = WEBSOCKET_STATE_CONNECTTED;
                 if (urihandler->websocket.on_open != NULL) {
                     urihandler->websocket.on_open(req);
+                }
+            }
+            break;
+        case WEBSOCKET_STATE_CLOSING:
+            if (!vsf_stream_get_data_size(stream)) {
+                vsf_stream_disconnect_rx(req->stream_in);
+                vsf_stream_disconnect_tx(stream);
+                urihandler_websocket->state = WEBSOCKET_STATE_CLOSED;
+                if (urihandler->websocket.on_close != NULL) {
+                    urihandler->websocket.on_close(req);
                 }
             }
             break;
