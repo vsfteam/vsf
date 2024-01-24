@@ -170,10 +170,13 @@ static void __vsf_linux_httpd_urihandler_socket_stream_evthandler(vsf_stream_t *
                         (const vsf_linux_httpd_urihandler_websocket_t *)urihandler_websocket,
                         buf, realsize);
                 }
+                vsf_stream_read(stream, NULL, realsize);
 
-                if ((0 == urihandler_websocket->payload_len) && (size > 0)) {
+                if (0 == urihandler_websocket->payload_len) {
                     urihandler_websocket->state = WEBSOCKET_STATE_PARSE_HEADER;
-                    goto parse_header;
+                    if (size > 0) {
+                        goto parse_header;
+                    }
                 }
             }
             break;
