@@ -503,9 +503,7 @@ static vsf_err_t __vsf_linux_httpd_parse_request(vsf_linux_httpd_request_t *requ
             }
 #if VSF_LINUX_HTTPD_CFG_WEBSOCKET == ENABLED
         } else if (!strcasecmp((const char *)tmp_ptr, "Sec-WebSocket-Key")) {
-            if (!request->websocket) {
-                goto __bad_request;
-            }
+            VSF_LINUX_ASSERT(NULL == request->websocket_key);
             request->websocket_key = strdup(cur_ptr);
 #endif
         } else if (!strcasecmp((const char *)tmp_ptr, "Host")) {
@@ -713,6 +711,12 @@ static void __vsf_linux_httpd_stream_evthandler(vsf_stream_t *no_used, void *par
                 session->request.response = VSF_LINUX_HTTPD_NOT_ACCEPTABLE;
             }
             session->request.uri = NULL;
+#if VSF_LINUX_HTTPD_CFG_WEBSOCKET == ENABLED
+            if (session->request.websocket_key != NULL) {
+                free(session->request.websocket_key);
+                session->request.websocket_key = NULL;
+            }
+#endif
 
             vsf_linux_fd_t *sfd;
             vsf_stream_t *stream;
