@@ -979,7 +979,8 @@ static void * __vsf_linux_httpd_thread(void *param)
                     } else {
                         write(_->fd_stream_in, ptr, realsize);
                     }
-                    if (_->request.urihandler->op->stream_evthandler_fn != NULL) {
+                    if (    (_->request.urihandler != NULL)
+                        &&  (_->request.urihandler->op->stream_evthandler_fn != NULL)) {
                         _->request.urihandler->op->stream_evthandler_fn(stream, &_->request, VSF_STREAM_ON_IN);
                     }
                     _->wait_stream_in = false;
@@ -1018,7 +1019,8 @@ static void * __vsf_linux_httpd_thread(void *param)
 #endif
                     VSF_LINUX_ASSERT(_->fd_stream_out >= 0);
                     read(_->fd_stream_out, ptr, realsize);
-                    if (_->request.urihandler->op->stream_evthandler_fn != NULL) {
+                    if (    (_->request.urihandler != NULL)
+                        &&  (_->request.urihandler->op->stream_evthandler_fn != NULL)) {
                         _->request.urihandler->op->stream_evthandler_fn(stream, &_->request, VSF_STREAM_ON_OUT);
                     }
                     _->wait_stream_out = false;
