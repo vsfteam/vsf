@@ -40,6 +40,7 @@ extern "C" {
 #define unsetenv            VSF_LINUX_LIBC_WRAPPER(unsetenv)
 #define clearenv            VSF_LINUX_LIBC_WRAPPER(clearenv)
 #   endif
+#define realpath            VSF_LINUX_LIBC_WRAPPER(realpath)
 #define mktemps             VSF_LINUX_LIBC_WRAPPER(mktemps)
 #define mktemp              VSF_LINUX_LIBC_WRAPPER(mktemp)
 #define mkstemp             VSF_LINUX_LIBC_WRAPPER(mkstemp)
@@ -151,6 +152,7 @@ typedef struct vsf_linux_libc_stdlib_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(llabs);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(imaxabs);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getloadavg);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(realpath);
 } vsf_linux_libc_stdlib_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt;
@@ -395,6 +397,10 @@ VSF_LINUX_APPLET_LIBC_STDLIB_IMP(getloadavg, int, double loadavg[], int nelem) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(getloadavg)(loadavg, nelem);
 }
+VSF_LINUX_APPLET_LIBC_STDLIB_IMP(realpath, char *, const char *path, char *resolved_path) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_STDLIB_ENTRY(realpath)(path, resolved_path);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STDLIB
 
@@ -477,6 +483,7 @@ long long llabs(long long j);
 intmax_t imaxabs(intmax_t j);
 
 int getloadavg(double loadavg[], int nelem);
+char *realpath(const char *path, char *resolved_path);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STDLIB
 

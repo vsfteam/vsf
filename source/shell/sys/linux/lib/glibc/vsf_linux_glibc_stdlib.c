@@ -800,6 +800,25 @@ void abort(void)
     VSF_LINUX_ASSERT(false);
 }
 
+char *realpath(const char *path, char *resolved_path)
+{
+    bool is_allocated = false;
+    if (NULL == resolved_path) {
+        resolved_path = malloc(PATH_MAX);
+        if (NULL == resolved_path) {
+            return NULL;
+        }
+        is_allocated = true;
+    }
+    if (vsf_linux_generate_path(resolved_path, PATH_MAX, NULL, (char *)path)) {
+        if (is_allocated) {
+            free(resolved_path);
+        }
+        return NULL;
+    }
+    return resolved_path;
+}
+
 #if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED                     \
     &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
 #   undef malloc
@@ -940,6 +959,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt =
     VSF_APPLET_VPLT_ENTRY_FUNC(llabs),
     VSF_APPLET_VPLT_ENTRY_FUNC(imaxabs),
     VSF_APPLET_VPLT_ENTRY_FUNC(getloadavg),
+    VSF_APPLET_VPLT_ENTRY_FUNC(realpath),
 };
 #endif
 

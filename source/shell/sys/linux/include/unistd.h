@@ -77,7 +77,6 @@ extern "C" {
 #define execve              VSF_LINUX_WRAPPER(execve)
 #define execvp              VSF_LINUX_WRAPPER(execvp)
 #define execvpe             VSF_LINUX_WRAPPER(execvpe)
-#define realpath            VSF_LINUX_WRAPPER(realpath)
 #define sysconf             VSF_LINUX_WRAPPER(sysconf)
 #define pathconf            VSF_LINUX_WRAPPER(pathconf)
 #define fpathconf           VSF_LINUX_WRAPPER(fpathconf)
@@ -283,6 +282,7 @@ typedef struct vsf_linux_unistd_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sysconf);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pathconf);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fpathconf);
+    // realpath belongs to stdlib.h, but do not remove realpath here for compatibility
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(realpath);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pipe);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pipe2);
@@ -516,10 +516,6 @@ VSF_LINUX_APPLET_UNISTD_IMP(pathconf, long, const char *path, int name) {
 VSF_LINUX_APPLET_UNISTD_IMP(fpathconf, long, int fd, int name) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(fpathconf)(fd, name);
-}
-VSF_LINUX_APPLET_UNISTD_IMP(realpath, char *, const char *path, char *resolved_path) {
-    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    return VSF_LINUX_APPLET_UNISTD_ENTRY(realpath)(path, resolved_path);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(pipe, int, int pipefd[2]) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -816,7 +812,6 @@ void _exit(int status);
 long sysconf(int name);
 long pathconf(const char *path, int name);
 long fpathconf(int fd, int name);
-char *realpath(const char *path, char *resolved_path);
 int pipe(int pipefd[2]);
 int pipe2(int pipefd[2], int flags);
 

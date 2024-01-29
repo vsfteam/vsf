@@ -2374,25 +2374,6 @@ long pathconf(const char *path, int name)
     return res;
 }
 
-char *realpath(const char *path, char *resolved_path)
-{
-    bool is_allocated = false;
-    if (NULL == resolved_path) {
-        resolved_path = malloc(PATH_MAX);
-        if (NULL == resolved_path) {
-            return NULL;
-        }
-        is_allocated = true;
-    }
-    if (vsf_linux_generate_path(resolved_path, PATH_MAX, NULL, (char *)path)) {
-        if (is_allocated) {
-            free(resolved_path);
-        }
-        return NULL;
-    }
-    return resolved_path;
-}
-
 #if __IS_COMPILER_IAR__
 //! transfer of control bypasses initialization
 #   pragma diag_suppress=pe546
