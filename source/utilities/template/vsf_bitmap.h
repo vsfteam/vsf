@@ -117,7 +117,7 @@ extern "C" {
             __vsf_bitmap_range_assign((uintalu_t *)(__bitmap_ptr), (__begin_bit), (__end_bit), 0)
 
 #define vsf_bitmap_reset(__bitmap_ptr, __bit_size)                              \
-            memset(__bitmap_ptr, 0, ((uint_fast32_t)__bit_size + 7) >> 3);
+            memset(__bitmap_ptr, 0, ((uint_fast32_t)__bit_size + 7) >> 3)
 
 #define vsf_bitmap_ffz(__bitmap_ptr, __bit_size)                                \
             __vsf_bitmap_ffz((uintalu_t *)(__bitmap_ptr), (__bit_size))
