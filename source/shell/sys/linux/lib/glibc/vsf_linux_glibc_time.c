@@ -455,7 +455,7 @@ static void __vsf_linux_prepare_timer(vsf_linux_timer_t *linux_timer)
 
 static void __vsf_linux_on_timer(vsf_callback_timer_t *timer)
 {
-    vsf_linux_timer_t *linux_timer = container_of(timer, vsf_linux_timer_t, timer);
+    vsf_linux_timer_t *linux_timer = vsf_container_of(timer, vsf_linux_timer_t, timer);
     linux_timer->overrun++;
 
     switch (linux_timer->evt.sigev_notify) {

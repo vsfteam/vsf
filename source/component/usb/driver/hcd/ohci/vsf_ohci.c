@@ -839,7 +839,7 @@ static void __ohci_finish_unlinks(vk_ohci_t *ohci)
     for (ed_last = (ohci_ed_t **)&ohci->ed_rm_list.head, ed = *ed_last; ed != NULL; ed = *ed_last) {
         if (ed->rm_frame == frame) {
             urb_ohci = ed->td_dummy->urb_ohci;
-            urb = container_of(urb_ohci, vk_usbh_hcd_urb_t, priv);
+            urb = vsf_container_of(urb_ohci, vk_usbh_hcd_urb_t, priv);
 
             urb->pipe.toggle = (ed->hwHeadP & ED_C) >> 1;
             if (urb_ohci->state & URB_PRIV_WAIT_DELETE) {
@@ -969,7 +969,7 @@ static void ohci_td_takeback(vk_ohci_t *ohci, ohci_td_t *td)
 {
     vsf_err_t err;
     ohci_urb_t *urb_ohci = td->urb_ohci;
-    vk_usbh_hcd_urb_t *urb = container_of(urb_ohci, vk_usbh_hcd_urb_t, priv);
+    vk_usbh_hcd_urb_t *urb = vsf_container_of(urb_ohci, vk_usbh_hcd_urb_t, priv);
 
     err = __ohci_td_done(urb, td);
     urb_ohci->td_num_served++;
@@ -1086,7 +1086,7 @@ static void __ohci_ed_free_evthanlder(vsf_eda_t *eda, vsf_evt_t evt)
                 vsf_slist_peek_next(ohci_ed_t, node, &ed->node, ed_dellist);
 
                 urb_ohci = ed->td_dummy->urb_ohci;
-                urb = container_of(urb_ohci, vk_usbh_hcd_urb_t, priv);
+                urb = vsf_container_of(urb_ohci, vk_usbh_hcd_urb_t, priv);
                 __ohci_ed_fini(urb_ohci);
                 __ohci_free_urb_do(urb);
             }

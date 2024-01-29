@@ -10,7 +10,7 @@ extern "C" {
 #define LIST_HEAD_INIT(__NAME)                  { &(__NAME), &(__NAME) }
 #define LIST_HEAD(__NAME)                       struct list_head __NAME = LIST_HEAD_INIT(__NAME)
 
-#define list_entry(ptr, type, member)           container_of(ptr, type, member)
+#define list_entry(ptr, type, member)           vsf_container_of(ptr, type, member)
 #define list_first_entry(ptr, type, member)     list_entry((ptr)->next, type, member)
 #define list_last_entry(ptr, type, member)      list_entry((ptr)->prev, type, member)
 #define list_next_entry(pos, member)            list_entry((pos)->member.next, typeof(*(pos)), member)

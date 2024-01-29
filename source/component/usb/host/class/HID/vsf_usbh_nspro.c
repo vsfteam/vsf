@@ -227,7 +227,7 @@ static void __vk_usbh_nspro_send_cmd(vk_usbh_nspro_t *nspro, uint_fast8_t cmd)
 
 static void __vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_nspro_t *nspro = (vk_usbh_nspro_t *)container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
+    vk_usbh_nspro_t *nspro = (vk_usbh_nspro_t *)vsf_container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
 
     switch (evt) {
     case VSF_EVT_INIT: {

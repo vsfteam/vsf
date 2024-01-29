@@ -140,7 +140,7 @@ static void __vk_netdrv_wpcap_netlink_irqthread(void *arg)
     const uint8_t ipv6mcast_addr[] = {0x33, 0x33};
 
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vk_netdrv_wpcap_t *wpcap_netdrv = container_of(irq_thread, vk_netdrv_wpcap_t, irq_thread);
+    vk_netdrv_wpcap_t *wpcap_netdrv = vsf_container_of(irq_thread, vk_netdrv_wpcap_t, irq_thread);
     struct pcap_pkthdr pkt_header;
     const u_char *pkt_data;
 

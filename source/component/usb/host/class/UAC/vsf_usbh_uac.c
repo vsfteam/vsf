@@ -210,7 +210,7 @@ static void __vk_usbh_uac_free_urb(vk_usbh_uac_t *uac)
 
 static void __vk_usbh_uac_on_eda_terminate(vsf_eda_t *eda)
 {
-    vk_usbh_uac_t *uac = container_of(eda, vk_usbh_uac_t, task);
+    vk_usbh_uac_t *uac = vsf_container_of(eda, vk_usbh_uac_t, task);
     vsf_usbh_free(uac);
 }
 
@@ -321,7 +321,7 @@ void __vk_usbh_uac_stream_evthandler(vsf_stream_t *stream, void *param, vsf_stre
     vk_usbh_uac_stream_t *uac_stream = param;
 
     vk_usbh_uac_stream_t *uac_stream_base = uac_stream - uac_stream->idx;
-    vk_usbh_uac_t *uac = container_of(uac_stream_base, vk_usbh_uac_t, streams);
+    vk_usbh_uac_t *uac = vsf_container_of(uac_stream_base, vk_usbh_uac_t, streams);
 
     if (    (VSF_STREAM_ON_CONNECT == evt)
         ||  ((VSF_STREAM_ON_TX == evt) && uac_stream->is_in)
@@ -332,7 +332,7 @@ void __vk_usbh_uac_stream_evthandler(vsf_stream_t *stream, void *param, vsf_stre
 
 static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_uac_t *uac = container_of(eda, vk_usbh_uac_t, task);
+    vk_usbh_uac_t *uac = vsf_container_of(eda, vk_usbh_uac_t, task);
     vk_usbh_dev_t *dev = uac->dev;
     vk_usbh_uac_stream_t *uac_stream;
     vsf_stream_t *stream;

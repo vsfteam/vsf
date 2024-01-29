@@ -248,7 +248,7 @@ HAL_DEMO_INIT(gpio, APP_GPIO,
 static bool __gpio_demo_check(hal_test_t *hal_test)
 {
     VSF_ASSERT(hal_test != NULL);
-    gpio_test_t *test = container_of(hal_test, gpio_test_t, use_as__hal_test_t);
+    gpio_test_t *test = vsf_container_of(hal_test, gpio_test_t, use_as__hal_test_t);
     VSF_ASSERT(test->device != NULL);
 
     vsf_gpio_capability_t in_cap;
@@ -499,7 +499,7 @@ static vsf_err_t __gpio_demo_pin_interrupt_config(gpio_test_t *test, vsf_gpio_in
 static void __gpio_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     VSF_ASSERT(NULL != eda);
-    gpio_test_t *test = container_of(eda, gpio_test_t, teda);
+    gpio_test_t *test = vsf_container_of(eda, gpio_test_t, teda);
     vsf_gpio_t * gpio_ptr = test->device;
     VSF_ASSERT(gpio_ptr != NULL);
 

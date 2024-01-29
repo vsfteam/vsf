@@ -558,7 +558,7 @@ static int __vk_libusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
 static void __vk_libusb_hcd_dev_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vk_libusb_hcd_dev_t *libusb_dev = container_of(irq_thread, vk_libusb_hcd_dev_t, irq_thread);
+    vk_libusb_hcd_dev_t *libusb_dev = vsf_container_of(irq_thread, vk_libusb_hcd_dev_t, irq_thread);
     vsf_arch_irq_request_t *irq_request = &libusb_dev->irq_request;
     int idx = libusb_dev - &__vk_libusb_hcd.devs[0];
 
@@ -592,8 +592,8 @@ static void __vk_libusb_hcd_dev_thread(void *arg)
 static void __vk_libusb_hcd_urb_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vk_libusb_hcd_urb_t *libusb_urb = container_of(irq_thread, vk_libusb_hcd_urb_t, irq_thread);
-    vk_usbh_hcd_urb_t *urb = container_of(libusb_urb, vk_usbh_hcd_urb_t, priv);
+    vk_libusb_hcd_urb_t *libusb_urb = vsf_container_of(irq_thread, vk_libusb_hcd_urb_t, irq_thread);
+    vk_usbh_hcd_urb_t *urb = vsf_container_of(libusb_urb, vk_usbh_hcd_urb_t, priv);
     vsf_arch_irq_request_t *irq_request = &libusb_urb->irq_request;
     bool is_to_free;
     int actual_length;
@@ -780,7 +780,7 @@ static bool __vk_libusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
 
 static void __vk_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_libusb_hcd_t *libusb = container_of(eda, vk_libusb_hcd_t, teda);
+    vk_libusb_hcd_t *libusb = vsf_container_of(eda, vk_libusb_hcd_t, teda);
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -799,13 +799,13 @@ static void __vk_libusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 vsf_dlist_remove_head(vk_libusb_hcd_urb_t, urb_node,
                         &__vk_libusb_hcd.urb_list, libusb_urb);
 #if VSF_LIBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
-                vk_usbh_hcd_urb_t *urb = container_of(libusb_urb, vk_usbh_hcd_urb_t, priv);
+                vk_usbh_hcd_urb_t *urb = vsf_container_of(libusb_urb, vk_usbh_hcd_urb_t, priv);
                 __vk_libusb_hcd_trace_urb(urb, "dequeued-");
 #endif
             vsf_unprotect_sched(orig);
 
             if (libusb_urb != NULL) {
-                vk_usbh_hcd_urb_t *urb = container_of(libusb_urb, vk_usbh_hcd_urb_t, priv);
+                vk_usbh_hcd_urb_t *urb = vsf_container_of(libusb_urb, vk_usbh_hcd_urb_t, priv);
 
                 if (VSF_LIBUSB_HCD_URB_STATE_TO_FREE == libusb_urb->state) {
                     __vk_libusb_hcd_free_urb_do(urb);

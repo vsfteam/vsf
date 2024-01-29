@@ -106,7 +106,7 @@ void vk_usbd_hid_out_report_processed(vk_usbd_hid_t *hid, vk_usbd_hid_report_t *
 
 static void __vk_usbd_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbd_hid_t *hid = container_of(eda, vk_usbd_hid_t, teda);
+    vk_usbd_hid_t *hid = vsf_container_of(eda, vk_usbd_hid_t, teda);
     vk_usbd_dev_t *dev = hid->dev;
     vk_usbd_hid_report_t *report;
     vk_usbd_trans_t *trans;

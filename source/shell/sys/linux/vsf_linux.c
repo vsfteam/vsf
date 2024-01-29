@@ -835,7 +835,7 @@ int __vsf_linux_process_parse_arg(vsf_linux_process_t *process, vsf_linux_proces
 #if VSF_ARCH_USE_THREAD_REG == ENABLED
 static void __vsf_linux_thread_on_run(vsf_thread_cb_t *cb)
 {
-    vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
+    vsf_linux_thread_t *thread = vsf_container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
     vsf_linux_process_t *process = thread->process;
 
     VSF_LINUX_ASSERT(process != NULL);
@@ -1100,7 +1100,7 @@ int vsf_linux_start_thread(vsf_linux_thread_t *thread, vsf_prio_t priority)
 
 static vsf_dlist_t * __vsf_linux_process_heap_get_freelist(vsf_heap_t *heap, uint_fast32_t size)
 {
-    vsf_linux_process_heap_t *process_heap = container_of(heap, vsf_linux_process_heap_t, heap);
+    vsf_linux_process_heap_t *process_heap = vsf_container_of(heap, vsf_linux_process_heap_t, heap);
     return &process_heap->freelist[0];
 }
 
@@ -1575,7 +1575,7 @@ static vsf_linux_sig_handler_t * __vsf_linux_get_sighandler_ex(vsf_linux_process
 
 static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb)
 {
-    vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
+    vsf_linux_thread_t *thread = vsf_container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
     vsf_linux_process_t *process = thread->process;
     vsf_linux_sig_handler_t *handler;
     sighandler_t sighandler;
@@ -1653,7 +1653,7 @@ static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb)
 
 static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb)
 {
-    vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
+    vsf_linux_thread_t *thread = vsf_container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
     vsf_linux_process_t *process = thread->process;
     vsf_linux_process_t *shell_process = process->shell_process;
     vsf_linux_process_ctx_t *ctx = &process->ctx;

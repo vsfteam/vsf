@@ -435,7 +435,7 @@ static void __vk_disp_vga_m480_hw_init(void)
 
 static void __vk_disp_vga_m480_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_disp_vga_m480_t *disp_vga = container_of(eda, vk_disp_vga_m480_t, eda);
+    vk_disp_vga_m480_t *disp_vga = vsf_container_of(eda, vk_disp_vga_m480_t, eda);
 
     switch (evt) {
     case VSF_EVT_REFRESH:

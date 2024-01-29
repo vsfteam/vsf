@@ -46,7 +46,7 @@ static const vsf_distbus_service_info_t __vsf_hal_distbus_dac_info = {
 
 static bool __vsf_hal_distbus_dac_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
-    vsf_hal_distbus_dac_t *dac = container_of(service, vsf_hal_distbus_dac_t, service);
+    vsf_hal_distbus_dac_t *dac = vsf_container_of(service, vsf_hal_distbus_dac_t, service);
     uint8_t *data = (uint8_t *)&msg->header + sizeof(msg->header);
     bool retain_msg = false;
 

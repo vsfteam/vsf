@@ -88,7 +88,7 @@ bool vsf_arch_low_level_init(void)
 
 static void __vsf_arch_swi_thread(void *arg)
 {
-    vsf_arch_swi_ctx_t *ctx = container_of(arg, vsf_arch_swi_ctx_t, thread);
+    vsf_arch_swi_ctx_t *ctx = vsf_container_of(arg, vsf_arch_swi_ctx_t, thread);
 
     while (1) {
         __vsf_arch_irq_request_pend(&ctx->use_as__vsf_arch_irq_request_t);

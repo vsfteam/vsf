@@ -218,7 +218,7 @@ static void __vk_usbh_xb360_int_complete(void *param, vk_usbh_hcd_urb_t *urb_hcd
 
 static void __vk_usbh_xb360_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_xb360_t *xb360 = (vk_usbh_xb360_t *)container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
+    vk_usbh_xb360_t *xb360 = (vk_usbh_xb360_t *)vsf_container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
 
     switch (evt) {
     case VSF_EVT_INIT:

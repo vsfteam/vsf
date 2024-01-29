@@ -610,7 +610,7 @@ static int __vk_winusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
 static void __vk_winusb_hcd_dev_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vk_winusb_hcd_dev_t *winusb_dev = container_of(irq_thread, vk_winusb_hcd_dev_t, irq_thread);
+    vk_winusb_hcd_dev_t *winusb_dev = vsf_container_of(irq_thread, vk_winusb_hcd_dev_t, irq_thread);
     vsf_arch_irq_request_t *irq_request = &winusb_dev->irq_request;
     int idx = winusb_dev - &__vk_winusb_hcd.devs[0];
 
@@ -649,8 +649,8 @@ static void __vk_winusb_hcd_dev_thread(void *arg)
 static void __vk_winusb_hcd_urb_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vk_winusb_hcd_urb_t *winusb_urb = container_of(irq_thread, vk_winusb_hcd_urb_t, irq_thread);
-    vk_usbh_hcd_urb_t *urb = container_of(winusb_urb, vk_usbh_hcd_urb_t, priv);
+    vk_winusb_hcd_urb_t *winusb_urb = vsf_container_of(irq_thread, vk_winusb_hcd_urb_t, irq_thread);
+    vk_usbh_hcd_urb_t *urb = vsf_container_of(winusb_urb, vk_usbh_hcd_urb_t, priv);
     vsf_arch_irq_request_t *irq_request = &winusb_urb->irq_request;
     bool is_to_free;
     int actual_length;
@@ -786,7 +786,7 @@ static bool __vk_winusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
 
 static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_winusb_hcd_t *winusb = container_of(eda, vk_winusb_hcd_t, eda);
+    vk_winusb_hcd_t *winusb = vsf_container_of(eda, vk_winusb_hcd_t, eda);
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -806,7 +806,7 @@ static void __vk_winusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             vsf_unprotect_sched(orig);
 
             if (winusb_urb != NULL) {
-                vk_usbh_hcd_urb_t *urb = container_of(winusb_urb, vk_usbh_hcd_urb_t, priv);
+                vk_usbh_hcd_urb_t *urb = vsf_container_of(winusb_urb, vk_usbh_hcd_urb_t, priv);
 
                 if (winusb_urb->is_to_free) {
                     __vk_winusb_hcd_free_urb_do(urb);

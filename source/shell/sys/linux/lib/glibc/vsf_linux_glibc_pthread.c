@@ -106,7 +106,7 @@ static vsf_timeout_tick_t __vsf_linux_abstimespec_to_timeout(const struct timesp
 
 static void __vsf_linux_pthread_on_run(vsf_thread_cb_t *cb)
 {
-    vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
+    vsf_linux_thread_t *thread = vsf_container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
     vsf_linux_pthread_priv_t *priv = vsf_linux_thread_get_priv(thread);
     thread->retval = (int)(uintptr_t)priv->entry(priv->param);
 }

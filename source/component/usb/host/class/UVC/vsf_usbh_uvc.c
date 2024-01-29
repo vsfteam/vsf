@@ -227,7 +227,7 @@ static void __vk_usbh_uvc_free_urb(vk_usbh_uvc_t *uvc)
 
 static void __vk_usbh_uvc_on_eda_terminate(vsf_eda_t *eda)
 {
-    vk_usbh_uvc_t *uvc = container_of(eda, vk_usbh_uvc_t, task);
+    vk_usbh_uvc_t *uvc = vsf_container_of(eda, vk_usbh_uvc_t, task);
     vsf_usbh_free(uvc);
 }
 
@@ -322,7 +322,7 @@ void __vk_usbh_uvc_stream_evthandler(vsf_stream_t *stream, void *param, vsf_stre
 
 static void __vk_usbh_uvc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_uvc_t *uvc = container_of(eda, vk_usbh_uvc_t, task);
+    vk_usbh_uvc_t *uvc = vsf_container_of(eda, vk_usbh_uvc_t, task);
     vk_usbh_dev_t *dev = uvc->dev;
     vsf_stream_t *stream = uvc->stream;
 

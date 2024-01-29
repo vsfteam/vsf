@@ -23,7 +23,7 @@ static inline void init_llist_head(struct llist_head *list)
     list->first = NULL;
 }
 
-#define llist_entry(p, t, m)            container_of(p, t, m)
+#define llist_entry(p, t, m)            vsf_container_of(p, t, m)
 #define llist_for_each(pos, node)                                               \
     for ((pos) = (node); pos; (pos) = (pos)->next)
 #define llist_for_each_safe(pos, n, node)                                       \

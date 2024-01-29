@@ -60,7 +60,7 @@ static void __vsf_eda_bmpevt_adapter_sync_evthander(vsf_eda_t *eda, vsf_evt_t ev
 {
     VSF_KERNEL_ASSERT(eda != NULL);
     vsf_bmpevt_adapter_sync_t *adapter_sync = (vsf_bmpevt_adapter_sync_t *)
-            container_of(eda, vsf_bmpevt_adapter_eda_t, eda);
+            vsf_container_of(eda, vsf_bmpevt_adapter_eda_t, eda);
 
     switch (evt) {
         case VSF_EVT_INIT:
@@ -118,7 +118,7 @@ static void __vsf_eda_bmpevt_adapter_bmpevt_evthander(vsf_eda_t *eda, vsf_evt_t 
     vsf_bmpevt_adapter_bmpevt_t *adapter_bmpevt;
     VSF_KERNEL_ASSERT(eda != NULL);
     adapter_bmpevt = (vsf_bmpevt_adapter_bmpevt_t *)
-            container_of(eda, vsf_bmpevt_adapter_eda_t, eda);
+            vsf_container_of(eda, vsf_bmpevt_adapter_eda_t, eda);
 
     switch (evt) {
         case VSF_EVT_INIT:

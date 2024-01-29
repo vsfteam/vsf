@@ -134,7 +134,7 @@ HAL_DEMO_INIT(pwm, APP_PWM,
 static bool __pwm_demo_check(hal_test_t *hal_test)
 {
     VSF_ASSERT(hal_test != NULL);
-    pwm_test_t *test = container_of(hal_test, pwm_test_t, use_as__hal_test_t);
+    pwm_test_t *test = vsf_container_of(hal_test, pwm_test_t, use_as__hal_test_t);
 
     VSF_ASSERT(test->device != NULL);
 
@@ -224,7 +224,7 @@ static vsf_err_t __pwm_set_ns(pwm_test_t *test)
 static void __pwm_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     VSF_ASSERT(NULL != eda);
-    pwm_test_t *test = container_of(eda, pwm_test_t, teda);
+    pwm_test_t *test = vsf_container_of(eda, pwm_test_t, teda);
     vsf_pwm_t * pwm_ptr = test->device;
     VSF_ASSERT(pwm_ptr != NULL);
     vsf_err_t err;
@@ -261,7 +261,7 @@ static void __pwm_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 static vsf_err_t __pwm_parser_args(hal_test_t *hal_test, int argc, char *argv[])
 {
     VSF_ASSERT(hal_test != NULL);
-    pwm_test_t *test = container_of(hal_test, pwm_test_t, use_as__hal_test_t);
+    pwm_test_t *test = vsf_container_of(hal_test, pwm_test_t, use_as__hal_test_t);
 
     int c = 0;
     int option_index = 0;

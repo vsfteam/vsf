@@ -322,7 +322,7 @@ static vsf_err_t __vk_usbh_dl1x5_set_channel(vk_usbh_dl1x5_t *dl1x5, const char 
 
 static void __vk_usbh_dl1x5_on_eda_terminate(vsf_eda_t *eda)
 {
-    vk_usbh_dl1x5_t *dl1x5 = container_of(eda, vk_usbh_dl1x5_t, task);
+    vk_usbh_dl1x5_t *dl1x5 = vsf_container_of(eda, vk_usbh_dl1x5_t, task);
     vsf_usbh_free(dl1x5);
 }
 
@@ -418,7 +418,7 @@ static uint16_t __dl1x5_lfsr16(uint16_t val)
 
 static void __vk_usbh_dl1x5_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_dl1x5_t *dl1x5 = container_of(eda, vk_usbh_dl1x5_t, task);
+    vk_usbh_dl1x5_t *dl1x5 = vsf_container_of(eda, vk_usbh_dl1x5_t, task);
     vk_usbh_dev_t *dev = dl1x5->dev;
 
     switch (evt) {
@@ -784,7 +784,7 @@ static void __vk_disp_dl1x5_refresh_callback(void *dev, vsf_err_t err)
 
 static vsf_err_t __vk_disp_dl1x5_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff)
 {
-    vk_usbh_dl1x5_t *dl1x5 = container_of(pthis, vk_usbh_dl1x5_t, use_as__vk_disp_t);
+    vk_usbh_dl1x5_t *dl1x5 = vsf_container_of(pthis, vk_usbh_dl1x5_t, use_as__vk_disp_t);
 
     dl1x5->disp_area = *area;
     dl1x5->disp_buff_rgb565 = (uint16_t *)disp_buff;

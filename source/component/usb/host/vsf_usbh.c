@@ -1139,7 +1139,7 @@ static vsf_err_t __vk_usbh_parse_config(vk_usbh_t *usbh, vk_usbh_dev_parser_t *p
 
 static void __vk_usbh_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_t *usbh = container_of(eda, vk_usbh_t, teda);
+    vk_usbh_t *usbh = vsf_container_of(eda, vk_usbh_t, teda);
     vk_usbh_dev_parser_t *parser = NULL;
     vk_usbh_dev_t *dev;
     vk_usbh_urb_t *urb;
@@ -1297,7 +1297,7 @@ parse_ok:
 
 static void __vk_usbh_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_t *usbh = container_of(eda, vk_usbh_t, teda);
+    vk_usbh_t *usbh = vsf_container_of(eda, vk_usbh_t, teda);
     vsf_err_t err = usbh->drv->init_evthandler(eda, evt, &usbh->use_as__vk_usbh_hcd_t);
 
     VSF_USB_ASSERT(err >= 0);

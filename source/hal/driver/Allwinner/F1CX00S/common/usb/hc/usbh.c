@@ -434,7 +434,7 @@ urb_finished:
 
 static void __f1cx00s_usbh_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    f1cx00s_usbh_hcd_t *musb_hcd = container_of(eda, f1cx00s_usbh_hcd_t, teda);
+    f1cx00s_usbh_hcd_t *musb_hcd = vsf_container_of(eda, f1cx00s_usbh_hcd_t, teda);
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -454,7 +454,7 @@ static void __f1cx00s_usbh_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 musb_urb->state = URB_STATE_START_SUBMITTING;
             }
 
-            vk_usbh_hcd_urb_t *urb = container_of(musb_urb, vk_usbh_hcd_urb_t, priv);
+            vk_usbh_hcd_urb_t *urb = vsf_container_of(musb_urb, vk_usbh_hcd_urb_t, priv);
             musb_hcd->urb_cur[0] = urb;
         }
         // chained urb, use EP0

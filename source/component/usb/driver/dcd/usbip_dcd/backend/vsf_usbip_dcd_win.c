@@ -64,7 +64,7 @@ static void __vk_usbip_server_backend_thread_rx(void *arg)
     vk_usbip_server_backend_irq_thread_t *irq_thread = (vk_usbip_server_backend_irq_thread_t *)arg;
     vsf_arch_irq_request_t *irq_request = &irq_thread->irq_request;
 
-    vk_usbip_server_backend_t *backend = container_of(irq_thread, vk_usbip_server_backend_t, rx);
+    vk_usbip_server_backend_t *backend = vsf_container_of(irq_thread, vk_usbip_server_backend_t, rx);
     vk_usbip_server_t *server = backend->server;
 
     __vsf_arch_irq_set_background(&irq_thread->use_as__vsf_arch_irq_thread_t);
@@ -153,7 +153,7 @@ static void __vk_usbip_server_backend_thread_tx(void *arg)
     vk_usbip_server_backend_irq_thread_t *irq_thread = (vk_usbip_server_backend_irq_thread_t *)arg;
     vsf_arch_irq_request_t *irq_request = &irq_thread->irq_request;
 
-    vk_usbip_server_backend_t *backend = container_of(irq_thread, vk_usbip_server_backend_t, tx);
+    vk_usbip_server_backend_t *backend = vsf_container_of(irq_thread, vk_usbip_server_backend_t, tx);
     vk_usbip_server_t *server = backend->server;
 
     __vsf_arch_irq_set_background(&irq_thread->use_as__vsf_arch_irq_thread_t);

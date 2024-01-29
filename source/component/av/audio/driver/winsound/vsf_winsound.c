@@ -94,7 +94,7 @@ static const vk_audio_stream_drv_t __vk_winsound_stream_drv_capture = {
 __vsf_component_peda_ifs_entry(__vk_winsound_init, vk_audio_init)
 {
     vsf_peda_begin();
-    vk_winsound_dev_t *dev = container_of(&vsf_this, vk_winsound_dev_t, use_as__vk_audio_dev_t);
+    vk_winsound_dev_t *dev = vsf_container_of(&vsf_this, vk_winsound_dev_t, use_as__vk_audio_dev_t);
     uint_fast8_t stream_idx = 0;
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
     vk_winsound_playback_ctx_t *playback_ctx = &dev->playback_ctx;
@@ -178,7 +178,7 @@ static int __vk_winsound_playback_buffer(vk_winsound_dev_t *dev, vsf_stream_t *s
 static void __vk_winsound_playback_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
     vk_audio_stream_t *audio_stream = param;
-    vk_winsound_dev_t *dev = container_of(audio_stream->dev, vk_winsound_dev_t, use_as__vk_audio_dev_t);
+    vk_winsound_dev_t *dev = vsf_container_of(audio_stream->dev, vk_winsound_dev_t, use_as__vk_audio_dev_t);
     vk_winsound_playback_ctx_t *playback_ctx = &dev->playback_ctx;
 
     switch (evt) {
@@ -199,7 +199,7 @@ static void __vk_winsound_playback_evthandler(vsf_stream_t *stream, void *param,
 static void __vk_winsound_playback_irq_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vk_winsound_playback_ctx_t *playback_ctx = container_of(irq_thread, vk_winsound_playback_ctx_t, irq_thread);
+    vk_winsound_playback_ctx_t *playback_ctx = vsf_container_of(irq_thread, vk_winsound_playback_ctx_t, irq_thread);
 
     __vsf_arch_irq_set_background(irq_thread);
     while (1) {
@@ -237,7 +237,7 @@ static void __vk_winsound_playback_irq_thread(void *arg)
 __vsf_component_peda_ifs_entry(__vk_winsound_playback_start, vk_audio_start)
 {
     vsf_peda_begin();
-    vk_winsound_dev_t *dev = container_of(&vsf_this, vk_winsound_dev_t, use_as__vk_audio_dev_t);
+    vk_winsound_dev_t *dev = vsf_container_of(&vsf_this, vk_winsound_dev_t, use_as__vk_audio_dev_t);
     vk_winsound_playback_ctx_t *playback_ctx = &dev->playback_ctx;
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
 
@@ -301,7 +301,7 @@ __vsf_component_peda_ifs_entry(__vk_winsound_playback_start, vk_audio_start)
 __vsf_component_peda_ifs_entry(__vk_winsound_playback_stop, vk_audio_stop)
 {
     vsf_peda_begin();
-    vk_winsound_dev_t *dev = container_of(&vsf_this, vk_winsound_dev_t, use_as__vk_audio_dev_t);
+    vk_winsound_dev_t *dev = vsf_container_of(&vsf_this, vk_winsound_dev_t, use_as__vk_audio_dev_t);
     vk_winsound_playback_ctx_t *playback_ctx = &dev->playback_ctx;
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
     vsf_protect_t orig;

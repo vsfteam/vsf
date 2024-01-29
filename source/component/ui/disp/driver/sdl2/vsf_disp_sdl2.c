@@ -180,7 +180,7 @@ static void __vk_disp_sdl2_init_thread(void *arg)
 static void __vk_disp_sdl2_flush_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vk_disp_sdl2_t *disp_sdl2 = container_of(irq_thread, vk_disp_sdl2_t, flush_thread);
+    vk_disp_sdl2_t *disp_sdl2 = vsf_container_of(irq_thread, vk_disp_sdl2_t, flush_thread);
 
     __vsf_arch_irq_set_background(irq_thread);
 
@@ -257,7 +257,7 @@ static uint_fast16_t __vk_disp_sdl2_keymod_remap(uint16_t keymod)
 static void __vk_disp_sdl2_event_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vk_disp_sdl2_t *disp_sdl2 = container_of(irq_thread, vk_disp_sdl2_t, event_thread);
+    vk_disp_sdl2_t *disp_sdl2 = vsf_container_of(irq_thread, vk_disp_sdl2_t, event_thread);
 
     SDL_Event event;
 #if VSF_USE_INPUT == ENABLED

@@ -53,7 +53,7 @@ void vsf_hal_distbus_on_new(vsf_hal_distbus_t *hal_distbus, vsf_hal_distbus_type
 static bool __vsf_hal_distbus_msghandler(vsf_distbus_t *distbus,
                         vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
-    vsf_hal_distbus_t *hal_distbus = container_of(service, vsf_hal_distbus_t, service);
+    vsf_hal_distbus_t *hal_distbus = vsf_container_of(service, vsf_hal_distbus_t, service);
     uint8_t *data = (uint8_t *)&msg->header + sizeof(msg->header);
     uint32_t datalen = msg->header.datalen, tmplen;
     union {

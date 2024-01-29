@@ -164,7 +164,7 @@ static void __rtc_isr_handler(void *target_ptr, vsf_rtc_t *rtc_ptr, vsf_rtc_irq_
 static bool __rtc_demo_check(hal_test_t *hal_test)
 {
     VSF_ASSERT(hal_test != NULL);
-    rtc_test_t *test = container_of(hal_test, rtc_test_t, use_as__hal_test_t);
+    rtc_test_t *test = vsf_container_of(hal_test, rtc_test_t, use_as__hal_test_t);
     VSF_ASSERT(test->device != NULL);
 
     vsf_rtc_capability_t cap = vsf_rtc_capability(test->device);
@@ -262,7 +262,7 @@ static vsf_err_t __rtc_demo_get_time(rtc_test_t *test)
 static void __rtc_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     VSF_ASSERT(NULL != eda);
-    rtc_test_t *test = container_of(eda, rtc_test_t, teda);
+    rtc_test_t *test = vsf_container_of(eda, rtc_test_t, teda);
     vsf_rtc_t *rtc_ptr        = test->device;
     VSF_ASSERT(rtc_ptr != NULL);
 

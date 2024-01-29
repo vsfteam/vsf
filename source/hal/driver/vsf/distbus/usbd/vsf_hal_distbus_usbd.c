@@ -69,7 +69,7 @@ static vsf_hal_distbus_usbd_ep_t * __vsf_hal_distbus_usbd_get_ep(vsf_hal_distbus
 
 static bool __vsf_hal_distbus_usbd_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
-    vsf_hal_distbus_usbd_t *usbd = container_of(service, vsf_hal_distbus_usbd_t, service);
+    vsf_hal_distbus_usbd_t *usbd = vsf_container_of(service, vsf_hal_distbus_usbd_t, service);
     uint8_t *data = (uint8_t *)&msg->header + sizeof(msg->header);
     bool retain_msg = false;
 

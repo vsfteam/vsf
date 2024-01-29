@@ -55,7 +55,7 @@ static vsf_scsi_mounter_t __usr_scsi_mounter;
 
 void __user_scsi_mounter(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsf_scsi_mounter_t *mounter = container_of(eda, vsf_scsi_mounter_t, eda);
+    vsf_scsi_mounter_t *mounter = vsf_container_of(eda, vsf_scsi_mounter_t, eda);
 
     switch (evt) {
     case VSF_EVT_INIT:

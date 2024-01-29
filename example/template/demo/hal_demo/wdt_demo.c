@@ -187,7 +187,7 @@ static void __wdt_isr_handler(void *target_ptr, vsf_wdt_t *wdt_ptr)
 static bool __wdt_demo_check(hal_test_t *hal_test)
 {
     VSF_ASSERT(hal_test != NULL);
-    wdt_test_t *test = container_of(hal_test, wdt_test_t, use_as__hal_test_t);
+    wdt_test_t *test = vsf_container_of(hal_test, wdt_test_t, use_as__hal_test_t);
 
     VSF_ASSERT(test->device != NULL);
 
@@ -228,7 +228,7 @@ static bool __wdt_demo_check(hal_test_t *hal_test)
 static void __wdt_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     VSF_ASSERT(NULL != eda);
-    wdt_test_t *test = container_of(eda, wdt_test_t, teda);
+    wdt_test_t *test = vsf_container_of(eda, wdt_test_t, teda);
     vsf_wdt_t * wdt_ptr = test->device;
     VSF_ASSERT(wdt_ptr != NULL);
 

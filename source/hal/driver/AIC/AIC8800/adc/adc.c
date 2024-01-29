@@ -214,7 +214,7 @@ static vsf_err_t __vsf_adc_channel_request(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_cha
 
 static void __vk_adc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsf_hw_adc_t *hw_adc_ptr = container_of(eda, vsf_hw_adc_t, teda);
+    vsf_hw_adc_t *hw_adc_ptr = vsf_container_of(eda, vsf_hw_adc_t, teda);
 
     switch (evt) {
     case VSF_EVT_TIMER:

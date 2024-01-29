@@ -266,7 +266,7 @@ static void __vk_usbh_msc_scsi_execute_do(vk_usbh_msc_t *msc, vsf_evt_t evt, uin
 __vsf_component_peda_ifs_entry(__vk_usbh_msc_scsi_execute, vk_scsi_execute)
 {
     vsf_peda_begin();
-    vk_usbh_msc_t *msc = container_of(&vsf_this, vk_usbh_msc_t, scsi);
+    vk_usbh_msc_t *msc = vsf_container_of(&vsf_this, vk_usbh_msc_t, scsi);
     __vk_usbh_msc_scsi_execute_do(msc, evt, vsf_local.cbd, false, &vsf_local.mem);
     vsf_peda_end();
 }
@@ -277,7 +277,7 @@ __vsf_component_peda_ifs_entry(__vk_usbh_msc_scsi_execute_stream, vk_scsi_execut
     vsf_peda_begin();
     VSF_USB_ASSERT(false);
     // not supported yet
-//    vk_usbh_msc_t *msc = container_of(&vsf_this, vk_usbh_msc_t, scsi);
+//    vk_usbh_msc_t *msc = vsf_container_of(&vsf_this, vk_usbh_msc_t, scsi);
 //    __vk_usbh_msc_scsi_execute_do(msc, evt, vsf_local.cbd, true, &vsf_local.stream);
     vsf_peda_end();
 }
@@ -307,7 +307,7 @@ static vsf_err_t __vk_usbh_msc_get_max_lun(vk_usbh_msc_t *msc)
 
 static void __vk_usbh_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_msc_t *msc = container_of(eda, vk_usbh_msc_t, eda);
+    vk_usbh_msc_t *msc = vsf_container_of(eda, vk_usbh_msc_t, eda);
     vk_usbh_dev_t *dev = msc->dev;
 
     switch (evt) {
@@ -333,7 +333,7 @@ static void __vk_usbh_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
 static void __vk_usbh_msc_on_eda_terminate(vsf_eda_t *eda)
 {
-    vk_usbh_msc_t *msc = container_of(eda, vk_usbh_msc_t, eda);
+    vk_usbh_msc_t *msc = vsf_container_of(eda, vk_usbh_msc_t, eda);
     vsf_usbh_free(msc);
 }
 

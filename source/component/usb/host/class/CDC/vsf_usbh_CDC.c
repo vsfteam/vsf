@@ -37,7 +37,7 @@
 
 void vk_usbh_cdc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_cdc_t *pthis = container_of(eda, vk_usbh_cdc_t, eda);
+    vk_usbh_cdc_t *pthis = vsf_container_of(eda, vk_usbh_cdc_t, eda);
     vk_usbh_t *usbh = pthis->usbh;
     vk_usbh_urb_t *urb;
 

@@ -468,7 +468,7 @@ static void __spl_ddr_entry(boot_head_t *boothead)
             __debug_uart_puts("\r\n");
 #endif
 
-            uint32_t target_addr = image_head.link_address + offset_of(image_head_t, jmp_instruction);
+            uint32_t target_addr = image_head.link_address + vsf_offset_of(image_head_t, jmp_instruction);
             __asm__ __volatile__ ("BX %0" : : "r" (target_addr) : "memory");
         } else {
 #if VSF_HAL_SPL_CFG_DEBUG_UART == ENABLED

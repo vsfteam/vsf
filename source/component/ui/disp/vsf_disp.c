@@ -111,7 +111,7 @@ static void __vk_reentrant_disp_on_ready(vk_disp_t *disp)
 
 static void __vk_reentrant_disp_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_reentrant_disp_t *pthis = container_of(eda, vk_reentrant_disp_t, eda);
+    vk_reentrant_disp_t *pthis = vsf_container_of(eda, vk_reentrant_disp_t, eda);
     vsf_err_t err;
 
     switch (evt) {

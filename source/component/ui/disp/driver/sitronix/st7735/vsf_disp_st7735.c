@@ -55,7 +55,7 @@ const vk_disp_drv_t vk_disp_drv_st7735 = {
 
 static void __vk_disp_st3375_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_disp_st7735_t *disp_st7735 = container_of(eda, vk_disp_st7735_t, teda);
+    vk_disp_st7735_t *disp_st7735 = vsf_container_of(eda, vk_disp_st7735_t, teda);
 
     switch (evt) {
     case VSF_EVT_INIT:

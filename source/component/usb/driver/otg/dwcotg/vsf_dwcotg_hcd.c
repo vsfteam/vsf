@@ -454,7 +454,7 @@ static enum usb_device_speed_t __vk_dwcotg_hcd_get_port_speed(uint32_t hprt0)
 static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
 #if VSF_DWCOTG_HCD_CFG_ENABLE_ROOT_HUB != ENABLED
-    vk_dwcotg_hcd_t *dwcotg_hcd = container_of(eda, vk_dwcotg_hcd_t, task);
+    vk_dwcotg_hcd_t *dwcotg_hcd = vsf_container_of(eda, vk_dwcotg_hcd_t, task);
     vk_dwcotg_reg_t *reg = &dwcotg_hcd->reg;
     uint32_t hprt0 = *reg->host.hprt0 & ~USB_OTG_HPRT_W1C_MASK;
 #endif
@@ -1143,7 +1143,7 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                 if (NULL == dwcotg_urb) {
                     dwcotg_hcd->ep_mask &= ~(1UL << channel_idx);
                 } else {
-                    urb = container_of(dwcotg_urb, vk_usbh_hcd_urb_t, priv);
+                    urb = vsf_container_of(dwcotg_urb, vk_usbh_hcd_urb_t, priv);
                     dwcotg_hcd->urb[channel_idx] = urb;
                     dwcotg_urb->channel_idx = channel_idx;
                 }
@@ -1278,7 +1278,7 @@ static void __vk_dwcotg_hcd_interrupt(void *param)
             vsf_slist_queue_init(&dwcotg_hcd->pending_queue);
         vsf_unprotect_int(orig);
         __vsf_slist_foreach_next_unsafe(vk_dwcotg_hcd_urb_t, node, &queue) {
-            urb = container_of(_, vk_usbh_hcd_urb_t, priv);
+            urb = vsf_container_of(_, vk_usbh_hcd_urb_t, priv);
             dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
 
             vsf_slist_init_node(vk_dwcotg_hcd_urb_t, node, _);

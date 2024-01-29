@@ -73,7 +73,7 @@ uint32_t vsf_generic_io_feature_to_hal_distbus_io_feature(vsf_gpio_mode_t generi
 
 static bool __vsf_hal_distbus_gpio_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
-    vsf_hal_distbus_gpio_t *gpio = container_of(service, vsf_hal_distbus_gpio_t, service);
+    vsf_hal_distbus_gpio_t *gpio = vsf_container_of(service, vsf_hal_distbus_gpio_t, service);
     uint32_t datalen = msg->header.datalen;
     bool retain_msg = false;
 

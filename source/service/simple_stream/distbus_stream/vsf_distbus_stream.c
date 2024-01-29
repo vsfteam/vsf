@@ -67,7 +67,7 @@ bool __vsf_distbus_stream_msghandler(vsf_distbus_t *bus,
                         vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
     vsf_distbus_stream_t *distbus_stream =
-        container_of(service, vsf_distbus_stream_t, use_as__vsf_distbus_service_t);
+        vsf_container_of(service, vsf_distbus_stream_t, use_as__vsf_distbus_service_t);
     bool retain_msg = false;
     uint8_t *data = (uint8_t *)&msg->header + sizeof(msg->header);
 

@@ -275,7 +275,7 @@ HAL_DEMO_INIT(i2c, APP_I2C,
 static bool __i2c_demo_check(hal_test_t *hal_test)
 {
     VSF_ASSERT(hal_test != NULL);
-    i2c_test_t *test = container_of(hal_test, i2c_test_t, use_as__hal_test_t);
+    i2c_test_t *test = vsf_container_of(hal_test, i2c_test_t, use_as__hal_test_t);
     i2c_demo_t *demo = (i2c_demo_t *)test->demo;
     VSF_ASSERT(demo != NULL);
     const i2c_demo_const_t *demo_const_ptr = (const i2c_demo_const_t *)demo->demo_const_ptr;
@@ -387,7 +387,7 @@ static vsf_err_t __i2c_demo_request(i2c_test_t *test)
 static void __i2c_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     VSF_ASSERT(NULL != eda);
-    i2c_test_t *test = container_of(eda, i2c_test_t, teda);
+    i2c_test_t *test = vsf_container_of(eda, i2c_test_t, teda);
     vsf_i2c_t * i2c_ptr = test->device;
     VSF_ASSERT(i2c_ptr != NULL);
     i2c_demo_t *demo = (i2c_demo_t *)test->demo;

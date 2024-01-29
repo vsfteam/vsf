@@ -824,8 +824,8 @@ static vsf_err_t __vsfvm_parse_stmt(vsfvm_compiler_t *compiler, vsfvm_pt_t *pt,
 
 vsf_err_t vsfvm_on_stmt(vsfvm_lexer_t *lexer, uint_fast32_t token, vsfvm_token_data_t *data)
 {
-    vsfvm_compiler_script_t *script = container_of(lexer, vsfvm_compiler_script_t, lexer);
-    vsfvm_compiler_t *compiler = container_of(script, vsfvm_compiler_t, script);
+    vsfvm_compiler_script_t *script = vsf_container_of(lexer, vsfvm_compiler_script_t, lexer);
+    vsfvm_compiler_t *compiler = vsf_container_of(script, vsfvm_compiler_t, script);
     return __vsfvm_parse_stmt(compiler, &script->pt_stmt, VSFVM_EVT_ON_STMT, token, data);
 }
 

@@ -269,10 +269,10 @@ extern "C" {
     } while (0)
 
 #define __vsf_dlist_get_host(__host_type, __member, __node_ptr)                 \
-            container_of((__node_ptr), __host_type, __member)
+            vsf_container_of((__node_ptr), __host_type, __member)
 
 #define __vsf_dlist_get_host_safe(__host_type, __member, __node_ptr)            \
-            safe_container_of((__node_ptr), __host_type, __member)
+            vsf_safe_container_of((__node_ptr), __host_type, __member)
 
 #define __vsf_dlist_is_empty(__list_ptr)       ((__list_ptr)->head == NULL)
 
@@ -478,13 +478,13 @@ extern "C" {
                                 __member,   /* the member name of the list */   \
                                 __list_ptr) /* the address of the list */       \
             __vsf_slist_get_length_imp(                                         \
-                (__list_ptr), offset_of(__host_type, __member))
+                (__list_ptr), vsf_offset_of(__host_type, __member))
 
 #define vsf_slist_remove_tail(  __host_type,/* the type of the host type */     \
                                 __member,   /* the member name of the list */   \
                                 __list_ptr) /* the address of the list */       \
             __vsf_slist_remove_tail_imp(                                        \
-                (__list_ptr), offset_of(__host_type, __member))
+                (__list_ptr), vsf_offset_of(__host_type, __member))
 
 #define vsf_slist_get_item_by_index(                                            \
                                 __host_type,/* the type of the host type */     \
@@ -492,21 +492,21 @@ extern "C" {
                                 __list_ptr, /* the address of the list */       \
                                 __index)    /* index of the item in list */     \
             __vsf_slist_get_item_by_index_imp(                                  \
-                (__list_ptr), (__index), offset_of(__host_type, __member))
+                (__list_ptr), (__index), vsf_offset_of(__host_type, __member))
 
 #define vsf_slist_get_index(    __host_type,/* the type of the host type */     \
                                 __member,   /* the member name of the list */   \
                                 __list_ptr, /* the address of the list */       \
                                 __item_ptr) /* the address of the target item */\
             __vsf_slist_get_index_imp(                                          \
-                (__list_ptr), (__item_ptr), offset_of(__host_type, __member))
+                (__list_ptr), (__item_ptr), vsf_offset_of(__host_type, __member))
 
 #define vsf_slist_append(   __host_type,    /* the type of the host type */     \
                             __member,       /* the member name of the list */   \
                             __list_ptr,     /* the address of the list */       \
                             __item_ptr)     /* the address of the target item */\
             __vsf_slist_append_imp(                                             \
-                (__list_ptr), (__item_ptr), offset_of(__host_type, __member))
+                (__list_ptr), (__item_ptr), vsf_offset_of(__host_type, __member))
 
 #define vsf_slist_is_in(    __host_type,    /* the type of the host type */     \
                             __member,       /* the member name of the list */   \
@@ -526,7 +526,7 @@ extern "C" {
                             __list_ptr,     /* the address of the list */       \
                             __item_ptr)     /* the address of the target item */\
             __vsf_slist_remove_imp(                                             \
-                (__list_ptr), (__item_ptr), offset_of(__host_type, __member))
+                (__list_ptr), (__item_ptr), vsf_offset_of(__host_type, __member))
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
 #   define vsf_slist_insert(__host_type,    /* the type of the host type */     \

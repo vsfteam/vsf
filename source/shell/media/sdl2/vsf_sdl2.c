@@ -1339,7 +1339,7 @@ typedef struct SDL_Timer {
 } SDL_Timer;
 static void __SDL_OnTimer(vsf_callback_timer_t *cbtimer)
 {
-    SDL_Timer *timer = container_of(cbtimer, SDL_Timer, timer);
+    SDL_Timer *timer = vsf_container_of(cbtimer, SDL_Timer, timer);
     uint32_t interval = timer->callback(timer->interval, timer->param);
     if (interval != 0) {
         vsf_callback_timer_add(&timer->timer, vsf_systimer_ms_to_tick(interval));

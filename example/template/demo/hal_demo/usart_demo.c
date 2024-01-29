@@ -234,7 +234,7 @@ static void __usart_scan(hal_demo_t *demo)
 {
     static vsf_hal_device_t __vsf_hw_usart_devices[VSF_HW_USART_COUNT];
 
-    usart_demo_t *usart_demo = container_of(demo, usart_demo_t, use_as__hal_demo_t);
+    usart_demo_t *usart_demo = vsf_container_of(demo, usart_demo_t, use_as__hal_demo_t);
     VSF_ASSERT(usart_demo->array_cnt == 1);
 
     vsf_usart_win_device_t com_vsf_usart[VSF_HW_USART_COUNT] = {0};
@@ -254,7 +254,7 @@ static void __usart_scan(hal_demo_t *demo)
 static bool __usart_demo_check(hal_test_t *hal_test)
 {
     VSF_ASSERT(hal_test != NULL);
-    usart_test_t *test = container_of(hal_test, usart_test_t, use_as__hal_test_t);
+    usart_test_t *test = vsf_container_of(hal_test, usart_test_t, use_as__hal_test_t);
 
     VSF_ASSERT(test != NULL);
     VSF_ASSERT(test->device != NULL);
@@ -568,7 +568,7 @@ static vsf_err_t __usart_rx_cancel_and_get(usart_test_t *test)
 static void __usart_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     VSF_ASSERT(NULL != eda);
-    usart_test_t *test = container_of(eda, usart_test_t , teda);
+    usart_test_t *test = vsf_container_of(eda, usart_test_t , teda);
     vsf_usart_t * usart_ptr = test->device;
     VSF_ASSERT(usart_ptr != NULL);
 

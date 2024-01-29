@@ -274,7 +274,7 @@ static void __vk_usbh_xb1_start(vk_usbh_xb1_t *xb1)
 
 static void __vk_usbh_xb1_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_xb1_t *xb1 = (vk_usbh_xb1_t *)container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
+    vk_usbh_xb1_t *xb1 = (vk_usbh_xb1_t *)vsf_container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
 
     switch (evt) {
     case VSF_EVT_INIT:

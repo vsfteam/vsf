@@ -189,7 +189,7 @@ static void __vsf_linux_uart_isrhandler(void *target, vsf_usart_t *uart,
 static void __vsf_linux_uart_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     if (VSF_EVT_USER == evt) {
-        vsf_linux_uart_priv_t *priv = container_of(eda, vsf_linux_uart_priv_t, use_as__vsf_eda_t);
+        vsf_linux_uart_priv_t *priv = vsf_container_of(eda, vsf_linux_uart_priv_t, use_as__vsf_eda_t);
         vsf_protect_t orig = vsf_protect_sched();
         if (vsf_stream_get_data_size(priv->stream_rx)) {
             vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
@@ -888,7 +888,7 @@ static int __vsf_linux_input_push(vsf_linux_input_priv_t *input_priv, struct inp
 
 static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_type_t type, vk_input_evt_t *evt)
 {
-    vsf_linux_input_priv_t *input_priv = container_of(notifier, vsf_linux_input_priv_t, notifier);
+    vsf_linux_input_priv_t *input_priv = vsf_container_of(notifier, vsf_linux_input_priv_t, notifier);
     vsf_systimer_tick_t us = vsf_systimer_get_us();
     struct input_event input_event = {
         .time.tv_usec   = us % 1000,
@@ -1083,7 +1083,7 @@ static void __vsf_linux_disp_on_ready(vk_disp_t *disp)
 
 static void __vsf_linux_disp_fresh_task(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsf_linux_fb_priv_t *fb_priv = container_of(eda, vsf_linux_fb_priv_t, fresh_task);
+    vsf_linux_fb_priv_t *fb_priv = vsf_container_of(eda, vsf_linux_fb_priv_t, fresh_task);
     vk_disp_t *disp = (vk_disp_t *)(((vk_vfs_file_t *)(fb_priv->file))->f.param);
 
     switch (evt) {

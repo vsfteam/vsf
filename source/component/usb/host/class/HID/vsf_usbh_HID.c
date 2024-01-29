@@ -93,7 +93,7 @@ const vk_usbh_class_drv_t vk_usbh_hid_drv = {
 
 static void __vk_usbh_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_hid_teda_t *hid = container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
+    vk_usbh_hid_teda_t *hid = vsf_container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
     vk_usbh_dev_t *dev = hid->dev;
 
     switch (evt) {
@@ -125,7 +125,7 @@ static void __vk_usbh_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
 static void __vk_usbh_hid_on_eda_terminate(vsf_eda_t *eda)
 {
-    vk_usbh_hid_teda_t *hid = container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
+    vk_usbh_hid_teda_t *hid = vsf_container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
     vsf_usbh_free(hid);
 }
 
@@ -357,7 +357,7 @@ static void __vk_usbh_hid_int_complete(void *param, vk_usbh_hcd_urb_t *urb_hcd)
 
 static void __vk_usbh_hid_input_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_hid_input_t *hid = container_of(eda, vk_usbh_hid_input_t, use_as__vsf_eda_t);
+    vk_usbh_hid_input_t *hid = vsf_container_of(eda, vk_usbh_hid_input_t, use_as__vsf_eda_t);
 
     switch (evt) {
     case VSF_EVT_INIT: {

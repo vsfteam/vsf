@@ -179,7 +179,7 @@ static void __vsfip_dhcpc_input(void *param, vsfip_netbuf_t *netbuf)
 
 static void __vsfip_dhcpc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsfip_dhcpc_t *dhcpc = container_of(eda, vsfip_dhcpc_t, teda);
+    vsfip_dhcpc_t *dhcpc = vsf_container_of(eda, vsfip_dhcpc_t, teda);
     vsfip_netif_t *netif = dhcpc->netif;
 
     switch (evt) {
@@ -281,7 +281,7 @@ void vsfip_dhcpc_stop(vsfip_dhcpc_t *dhcpc)
 
 static void __vsfip_dhcpc_on_eda_terminate(vsf_eda_t *eda)
 {
-    vsfip_dhcpc_t *dhcpc = container_of(eda, vsfip_dhcpc_t, teda);
+    vsfip_dhcpc_t *dhcpc = vsf_container_of(eda, vsfip_dhcpc_t, teda);
 #ifdef VSFIP_TRACE_NETIF
     vsf_trace_debug("vsfip_dhcpc deref");
 #endif

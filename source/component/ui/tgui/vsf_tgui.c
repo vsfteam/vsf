@@ -532,7 +532,7 @@ static bool __vk_tgui_decide_refresh_region(vsf_pt(__vsf_tgui_evt_shooter_t) *th
 /*! \brief tgui msg queue consumer */
 implement_vsf_pt(__vsf_tgui_evt_shooter_t)
 {
-    vsf_tgui_t* gui_ptr = container_of(&vsf_this, vsf_tgui_t, consumer.param);
+    vsf_tgui_t* gui_ptr = vsf_container_of(&vsf_this, vsf_tgui_t, consumer.param);
     bool result = false;
     vsf_evt_t   msg;
     vsf_pt_begin();

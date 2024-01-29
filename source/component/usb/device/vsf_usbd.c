@@ -815,7 +815,7 @@ static void __vk_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt_eda)
     }
     evt_eda -= VSF_EVT_USER;
 
-    dev = container_of(eda, vk_usbd_dev_t, eda);
+    dev = vsf_container_of(eda, vk_usbd_dev_t, eda);
     value = evt_eda >> 8;
     evt = (usb_evt_t)(evt_eda & 0xFF);
 #else

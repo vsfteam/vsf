@@ -43,7 +43,7 @@ struct device {
 
 static inline struct device * kobj_to_dev(struct kobject *kobj)
 {
-    return container_of(kobj, struct device, kobj);
+    return vsf_container_of(kobj, struct device, kobj);
 }
 
 static inline const char * dev_bus_name(const struct device *dev)

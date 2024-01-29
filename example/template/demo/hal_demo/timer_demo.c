@@ -163,7 +163,7 @@ static void __timer_isr_handler(void *target_ptr, vsf_timer_t *timer_ptr, vsf_ti
 static bool __timer_demo_check(hal_test_t *hal_test)
 {
     VSF_ASSERT(hal_test != NULL);
-    timer_test_t *test = container_of(hal_test, timer_test_t, use_as__hal_test_t);
+    timer_test_t *test = vsf_container_of(hal_test, timer_test_t, use_as__hal_test_t);
 
     VSF_ASSERT(test->device != NULL);
 
@@ -211,7 +211,7 @@ static vsf_err_t __timer_pwm_set(timer_test_t *test)
 static void __timer_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     VSF_ASSERT(NULL != eda);
-    timer_test_t *test = container_of(eda, timer_test_t, teda);
+    timer_test_t *test = vsf_container_of(eda, timer_test_t, teda);
     vsf_timer_t * timer_ptr = test->device;
     VSF_ASSERT(timer_ptr != NULL);
 

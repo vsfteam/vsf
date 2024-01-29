@@ -98,7 +98,7 @@ vsf_err_t vsf_dynarr_set_size(vsf_dynarr_t *dynarr, uint_fast32_t size)
     table = __vsf_dynarr_get_table(dynarr, buf_idx);
     if (buf_idx < 0) {
         buf_idx = buf_num_per_table - 1;
-        table = container_of(&dynarr->table_list, vsf_dynarr_table_t, table_node);
+        table = vsf_container_of(&dynarr->table_list, vsf_dynarr_table_t, table_node);
     } else {
         buf_idx &= buf_num_per_table - 1;
     }

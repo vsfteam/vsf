@@ -206,7 +206,7 @@ static vsf_err_t __vk_usbh_hub_get_descriptor(vk_usbh_t *usbh, vk_usbh_dev_t *de
 
 static void __vk_usbh_hub_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_hub_t *hub = container_of(eda, vk_usbh_hub_t, teda);
+    vk_usbh_hub_t *hub = vsf_container_of(eda, vk_usbh_hub_t, teda);
     vk_usbh_dev_t *dev = hub->dev;
     vk_usbh_urb_t *urb = &dev->ep0.urb;
     vsf_err_t err = VSF_ERR_NONE;
@@ -459,7 +459,7 @@ fail:
 
 static void __vk_usbh_hub_on_eda_terminate(vsf_eda_t *eda)
 {
-    vk_usbh_hub_t *hub = container_of(eda, vk_usbh_hub_t, teda);
+    vk_usbh_hub_t *hub = vsf_container_of(eda, vk_usbh_hub_t, teda);
     vsf_usbh_free(hub);
 }
 

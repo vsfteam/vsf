@@ -153,21 +153,27 @@ extern void vsf_trace_assert(const char *expr, const char *file, int line, const
 #   define dimof(__arr)                     (sizeof(__arr) / sizeof((__arr)[0]))
 #endif
 
-#ifndef offset_of
 // use offsetof from compiler if available for constexpr feature in cpp
-#   if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
-#       define offset_of(__type, __member)  __builtin_offsetof(__type, __member)
-#   else
-#       define offset_of(__type, __member)  (uintptr_t)(&(((__type *)0)->__member))
+#if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
+#   define vsf_offset_of(__type, __member)  __builtin_offsetof(__type, __member)
+#else
+#   define vsf_offset_of(__type, __member)  (uintptr_t)(&(((__type *)0)->__member))
+#endif
+#define vsf_container_of(__ptr, __type, __member)                               \
+        ((__type *)((uintptr_t)(__ptr) - vsf_offset_of(__type, __member)))
+#define vsf_safe_container_of(__ptr, __type, __member)                          \
+        (__ptr ? vsf_container_of(__ptr, __type, __member) : NULL)
+
+#ifndef VSF_COMPATIBILITY
+#   define VSF_COMPATIBILITY                ENABLED
+#endif
+#if VSF_COMPATIBILITY == ENABLED
+#   ifndef container_of
+#       define container_of                 vsf_container_of
 #   endif
-#endif
-#ifndef container_of
-#   define container_of(__ptr, __type, __member)                                \
-        ((__type *)((uintptr_t)(__ptr) - offset_of(__type, __member)))
-#endif
-#ifndef safe_container_of
-#   define safe_container_of(__ptr, __type, __member)                           \
-        (__ptr ? container_of(__ptr, __type, __member) : NULL)
+#   ifndef safe_container_of
+#       define safe_container_of            vsf_safe_container_of
+#   endif
 #endif
 
 static inline int vsf_sign(int x)

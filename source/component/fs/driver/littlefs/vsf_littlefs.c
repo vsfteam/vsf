@@ -94,7 +94,7 @@ const vk_fs_op_t vk_lfs_op = {
 
 static void __vk_lfs_thread(vsf_thread_cb_t *thread)
 {
-    vk_lfs_info_t *fsinfo = container_of(thread, vk_lfs_info_t, thread_cb);
+    vk_lfs_info_t *fsinfo = vsf_container_of(thread, vk_lfs_info_t, thread_cb);
     lfs_t *lfs = &fsinfo->lfs;
     int ret;
     char path[LFS_NAME_MAX];

@@ -212,7 +212,7 @@ static void __vsf_win_usart_evthandler(vsf_stream_t *stream, void *param, vsf_st
 static void __vsf_win_usart_rx_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vsf_win_usart_t *win_usart = container_of(irq_thread, vsf_win_usart_t, rx.irq_thread);
+    vsf_win_usart_t *win_usart = vsf_container_of(irq_thread, vsf_win_usart_t, rx.irq_thread);
 
     OVERLAPPED overlapped = {
         .hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL),
@@ -316,7 +316,7 @@ exit_rx:
 static void __vsf_win_usart_tx_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vsf_win_usart_t *win_usart = container_of(irq_thread, vsf_win_usart_t, tx.irq_thread);
+    vsf_win_usart_t *win_usart = vsf_container_of(irq_thread, vsf_win_usart_t, tx.irq_thread);
 
     OVERLAPPED overlapped = {
         .hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL),

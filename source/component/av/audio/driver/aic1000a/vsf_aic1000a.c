@@ -495,7 +495,7 @@ static void __vk_aic1000a_reg_seq(vk_aic1000a_dev_t *dev, const vk_aic1000a_reg_
 __vsf_component_peda_ifs_entry(__vk_aic1000a_init, vk_audio_init)
 {
     vsf_peda_begin();
-    vk_aic1000a_dev_t *dev = container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
+    vk_aic1000a_dev_t *dev = vsf_container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -737,7 +737,7 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_control, vk_audio_control)
 {
     vsf_peda_begin();
 
-    vk_aic1000a_dev_t *dev = container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
+    vk_aic1000a_dev_t *dev = vsf_container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
     uint16_t gain;
 
     switch (vsf_local.type) {
@@ -773,7 +773,7 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_control, vk_audio_control)
 __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_start, vk_audio_start)
 {
     vsf_peda_begin();
-    vk_aic1000a_dev_t *dev = container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
+    vk_aic1000a_dev_t *dev = vsf_container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
     uint8_t channel_num = audio_stream->format.channel_num;
     uint16_t sample_rate = audio_stream->format.sample_rate;
@@ -825,7 +825,7 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_start, vk_audio_start)
 __vsf_component_peda_ifs_entry(__vk_aic1000a_playback_stop, vk_audio_stop)
 {
     vsf_peda_begin();
-    vk_aic1000a_dev_t *dev = container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
+    vk_aic1000a_dev_t *dev = vsf_container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
     uint8_t channel_num = audio_stream->format.channel_num;
 
@@ -1245,7 +1245,7 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_capture_control, vk_audio_control)
 {
     vsf_peda_begin();
 
-    vk_aic1000a_dev_t *dev = container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
+    vk_aic1000a_dev_t *dev = vsf_container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
     uint8_t gain;
 
     switch (vsf_local.type) {
@@ -1284,7 +1284,7 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_capture_control, vk_audio_control)
 __vsf_component_peda_ifs_entry(__vk_aic1000a_capture_start, vk_audio_start)
 {
     vsf_peda_begin();
-    vk_aic1000a_dev_t *dev = container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
+    vk_aic1000a_dev_t *dev = vsf_container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
     uint8_t channel_num = audio_stream->format.channel_num;
     uint16_t sample_rate = audio_stream->format.sample_rate;
@@ -1336,7 +1336,7 @@ __vsf_component_peda_ifs_entry(__vk_aic1000a_capture_start, vk_audio_start)
 __vsf_component_peda_ifs_entry(__vk_aic1000a_capture_stop, vk_audio_stop)
 {
     vsf_peda_begin();
-    vk_aic1000a_dev_t *dev = container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
+    vk_aic1000a_dev_t *dev = vsf_container_of(&vsf_this, vk_aic1000a_dev_t, use_as__vk_audio_dev_t);
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
     uint8_t channel_num = audio_stream->format.channel_num;
 

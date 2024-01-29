@@ -260,7 +260,7 @@ static void __vk_usbip_server_get_descriptor(vk_usbip_server_t *server,
 
 static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbip_server_t *server = container_of(eda, vk_usbip_server_t, teda);
+    vk_usbip_server_t *server = vsf_container_of(eda, vk_usbip_server_t, teda);
     vk_usbip_dcd_t *usbd = server->usbd;
     vk_usbip_urb_t *urb;
     vsf_protect_t orig;

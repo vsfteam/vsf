@@ -180,7 +180,7 @@ static void __vk_audio_i2s_stream_evthandler(vsf_stream_t *stream, void *param, 
 __vsf_component_peda_ifs_entry(__vk_audio_i2s_init, vk_audio_init)
 {
     vsf_peda_begin();
-    vk_audio_i2s_dev_t *dev = container_of(&vsf_this, vk_audio_i2s_dev_t, use_as__vk_audio_dev_t);
+    vk_audio_i2s_dev_t *dev = vsf_container_of(&vsf_this, vk_audio_i2s_dev_t, use_as__vk_audio_dev_t);
 
     if (0 == dev->stream_num) {
         dev->stream_num = 0;
@@ -211,7 +211,7 @@ __vsf_component_peda_ifs_entry(__vk_audio_i2s_init, vk_audio_init)
 __vsf_component_peda_ifs_entry(__vk_audio_i2s_playback_start, vk_audio_start)
 {
     vsf_peda_begin();
-    vk_audio_i2s_dev_t *dev = container_of(&vsf_this, vk_audio_i2s_dev_t, use_as__vk_audio_dev_t);
+    vk_audio_i2s_dev_t *dev = vsf_container_of(&vsf_this, vk_audio_i2s_dev_t, use_as__vk_audio_dev_t);
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
     uint8_t channel_num = audio_stream->format.channel_num;
     uint16_t sample_rate = audio_stream->format.sample_rate;
@@ -244,7 +244,7 @@ __vsf_component_peda_ifs_entry(__vk_audio_i2s_playback_stop, vk_audio_stop)
 __vsf_component_peda_ifs_entry(__vk_audio_i2s_capture_start, vk_audio_start)
 {
     vsf_peda_begin();
-    vk_audio_i2s_dev_t *dev = container_of(&vsf_this, vk_audio_i2s_dev_t, use_as__vk_audio_dev_t);
+    vk_audio_i2s_dev_t *dev = vsf_container_of(&vsf_this, vk_audio_i2s_dev_t, use_as__vk_audio_dev_t);
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
     uint8_t channel_num = audio_stream->format.channel_num;
     uint16_t sample_rate = audio_stream->format.sample_rate;

@@ -188,7 +188,7 @@ static vsf_err_t __vk_usbh_dfu_abort(vk_usbh_dfu_t *dfu)
 
 static void __vk_usbh_dfu_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_dfu_t *dfu = container_of(eda, vk_usbh_dfu_t, teda);
+    vk_usbh_dfu_t *dfu = vsf_container_of(eda, vk_usbh_dfu_t, teda);
     vsf_err_t err;
 
     switch (evt) {
@@ -271,7 +271,7 @@ vsf_err_t __vk_usbh_dfu_operate(void *dfu_ptr, uint8_t *buffer, uint_fast32_t si
 
 static void __vk_usbh_dfu_on_eda_terminate(vsf_eda_t *eda)
 {
-    vk_usbh_dfu_t *dfu = container_of(eda, vk_usbh_dfu_t, teda);
+    vk_usbh_dfu_t *dfu = vsf_container_of(eda, vk_usbh_dfu_t, teda);
     vsf_usbh_free(dfu);
 }
 

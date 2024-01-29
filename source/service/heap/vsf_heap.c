@@ -552,7 +552,7 @@ vsf_dlist_t * vsf_heap_get_freelist(vsf_dlist_t *freelist, uint_fast8_t freelist
 // MUST NOT return NULL;
 static vsf_dlist_t * __vsf_heap_get_freelist(vsf_heap_t *heap, uint_fast32_t size)
 {
-    vsf_default_heap_t *defheap = container_of(heap, vsf_default_heap_t, use_as__vsf_heap_t);
+    vsf_default_heap_t *defheap = vsf_container_of(heap, vsf_default_heap_t, use_as__vsf_heap_t);
     return vsf_heap_get_freelist(&defheap->freelist[0], VSF_HEAP_CFG_FREELIST_NUM, size);
 }
 

@@ -246,9 +246,9 @@ SECTION(".text.vsf.kernel.vsf_thread")
 void __vsf_thread_host_thread(void *arg)
 {
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-    class(vsf_thread_cb_t) *thread = container_of(arg, class(vsf_thread_cb_t), host_thread);
+    class(vsf_thread_cb_t) *thread = vsf_container_of(arg, class(vsf_thread_cb_t), host_thread);
 #   else
-    class(vsf_thread_t) *thread = container_of(arg, class(vsf_thread_t), host_thread);
+    class(vsf_thread_t) *thread = vsf_container_of(arg, class(vsf_thread_t), host_thread);
 #   endif
 
     VSF_KERNEL_ASSERT(VSF_EVT_INIT == thread->evt);

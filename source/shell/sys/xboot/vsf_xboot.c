@@ -330,7 +330,7 @@ static const vsf_linux_thread_op_t __vsf_linux_xboot_task_op = {
 
 static void __xboot_task_on_run(vsf_thread_cb_t *cb)
 {
-    vsf_linux_thread_t *thread = container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
+    vsf_linux_thread_t *thread = vsf_container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
     xboot_task_priv_t *priv = vsf_linux_thread_get_priv(thread);
     priv->func((struct task_t *)thread, priv->data);
     thread->retval = 0;

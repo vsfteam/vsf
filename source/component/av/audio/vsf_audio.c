@@ -132,7 +132,7 @@ static void __vsf_audio_ticktock_stream_adapter_evthandler(vsf_stream_t *stream,
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
 static void __vsf_audio_playback_ticktock_stream_adapter_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsf_audio_ticktock_stream_adapter_t *adapter = container_of(eda, vsf_audio_ticktock_stream_adapter_t, eda);
+    vsf_audio_ticktock_stream_adapter_t *adapter = vsf_container_of(eda, vsf_audio_ticktock_stream_adapter_t, eda);
 
     if (evt >= VSF_EVT_USER) {
         evt -= VSF_EVT_USER;
@@ -183,7 +183,7 @@ void vsf_audio_playback_ticktock_stream_adapter_init(vsf_audio_ticktock_stream_a
 #if VSF_AUDIO_USE_CAPTURE == ENABLED
 static void __vsf_audio_capture_ticktock_stream_adapter_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsf_audio_ticktock_stream_adapter_t *adapter = container_of(eda, vsf_audio_ticktock_stream_adapter_t, eda);
+    vsf_audio_ticktock_stream_adapter_t *adapter = vsf_container_of(eda, vsf_audio_ticktock_stream_adapter_t, eda);
 
     if (evt >= VSF_EVT_USER) {
         evt -= VSF_EVT_USER;

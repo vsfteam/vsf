@@ -103,7 +103,7 @@ static vsf_err_t __vsfip_netif_construct(vsfip_netif_t *netif)
 
 static void __vsfip_netif_output_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-	vsfip_netif_t *netif = container_of(eda, vsfip_netif_t, output_eda);
+	vsfip_netif_t *netif = vsf_container_of(eda, vsfip_netif_t, output_eda);
 	vsfip_netbuf_t *netbuf;
 
 	switch (evt) {
@@ -418,8 +418,8 @@ static vsfip_netbuf_t * __vsfip_netif_prepare_arp_request(
 
 static void __vsfip_netif_arpc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsfip_netif_arpc_t *arpc = container_of(eda, vsfip_netif_arpc_t, teda);
-    vsfip_netif_t *netif = container_of(arpc, vsfip_netif_t, arpc);
+    vsfip_netif_arpc_t *arpc = vsf_container_of(eda, vsfip_netif_arpc_t, teda);
+    vsfip_netif_t *netif = vsf_container_of(arpc, vsfip_netif_t, arpc);
     vsfip_macaddr_t mac;
     vsfip_ipaddr_t dest;
 

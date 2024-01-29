@@ -102,7 +102,7 @@ static vk_socket_win_local_t __vk_socket_win;
 static void __vk_socket_win_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vk_socket_win_local_t *socket_win_local = container_of(irq_thread, vk_socket_win_local_t, irq_thread);
+    vk_socket_win_local_t *socket_win_local = vsf_container_of(irq_thread, vk_socket_win_local_t, irq_thread);
     WSADATA wsaData;
 
     __vsf_arch_irq_set_background(irq_thread);
@@ -188,7 +188,7 @@ vsf_err_t vk_socket_win_fini(void)
 static void __vk_socket_win_socket_tx_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vk_socket_win_t *socket_win = container_of(irq_thread, vk_socket_win_t, tx);
+    vk_socket_win_t *socket_win = vsf_container_of(irq_thread, vk_socket_win_t, tx);
 
     __vsf_arch_irq_set_background(irq_thread);
 
@@ -300,7 +300,7 @@ static void __vk_socket_win_socket_tx_thread(void *arg)
 static void __vk_socket_win_socket_rx_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vk_socket_win_t *socket_win = container_of(irq_thread, vk_socket_win_t, rx);
+    vk_socket_win_t *socket_win = vsf_container_of(irq_thread, vk_socket_win_t, rx);
 
     __vsf_arch_irq_set_background(irq_thread);
 

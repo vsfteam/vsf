@@ -393,7 +393,7 @@ struct input_dev {
 
     struct device                   dev;
 };
-#define to_input_dev(__dev)         container_of((__dev), struct input_dev, dev)
+#define to_input_dev(__dev)         vsf_container_of((__dev), struct input_dev, dev)
 
 struct input_value {
     __u16                           type;

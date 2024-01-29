@@ -115,7 +115,7 @@ static void kobject_cleanup(struct kobject *kobj)
 
 static void kobject_release(struct kref *kref)
 {
-    struct kobject *kobj = container_of(kref, struct kobject, kref);
+    struct kobject *kobj = vsf_container_of(kref, struct kobject, kref);
     kobject_cleanup(kobj);
 }
 
@@ -956,7 +956,7 @@ void kfree_skb(struct sk_buff *skb)
 {
     if (skb_unref(skb)) {
 #if __VSF_LINUX_CFG_SKB_POOL == ENABLED
-        vsf_ieee80211_skb_t *ieee80211_skb = container_of(skb, vsf_ieee80211_skb_t, skb);
+        vsf_ieee80211_skb_t *ieee80211_skb = vsf_container_of(skb, vsf_ieee80211_skb_t, skb);
         vsf_protect_t orig = vsf_protect_int();
             VSF_POOL_FREE(vsf_ieee80211_skb_pool, &__vsf_ieee80211_skb_pool, ieee80211_skb);
         vsf_unprotect_int(orig);

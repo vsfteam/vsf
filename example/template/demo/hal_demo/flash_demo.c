@@ -232,7 +232,7 @@ static void __flash_isr_handler(void *target_ptr, vsf_flash_t *flash_ptr, vsf_fl
 static bool __flash_demo_check(hal_test_t *hal_test)
 {
     VSF_ASSERT(hal_test != NULL);
-    flash_test_t *test = container_of(hal_test, flash_test_t, use_as__hal_test_t);
+    flash_test_t *test = vsf_container_of(hal_test, flash_test_t, use_as__hal_test_t);
 
     VSF_ASSERT(test->device != NULL);
 
@@ -429,7 +429,7 @@ static bool __flash_wait_idle(flash_test_t *test)
 static void __flash_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     VSF_ASSERT(NULL != eda);
-    flash_test_t *test = container_of(eda, flash_test_t, teda);
+    flash_test_t *test = vsf_container_of(eda, flash_test_t, teda);
     vsf_flash_t * flash_ptr = test->device;
     VSF_ASSERT(flash_ptr != NULL);
 

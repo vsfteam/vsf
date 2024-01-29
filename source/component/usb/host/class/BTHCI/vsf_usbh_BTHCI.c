@@ -220,7 +220,7 @@ static vk_usbh_bthci_iocb_t * __vk_usbh_bthci_get_ocb(vk_usbh_bthci_t *bthci, ui
 
 static void __vk_usbh_bthci_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_bthci_t *bthci = container_of(eda, vk_usbh_bthci_t, eda);
+    vk_usbh_bthci_t *bthci = vsf_container_of(eda, vk_usbh_bthci_t, eda);
     vk_usbh_dev_t *dev = bthci->dev;
     vk_usbh_t *usbh = bthci->usbh;
     vsf_err_t err = VSF_ERR_NONE;
@@ -328,7 +328,7 @@ static void __vk_usbh_bthci_free_all(vk_usbh_bthci_t *bthci)
 
 static void __vk_usbh_bthci_on_eda_terminate(vsf_eda_t *eda)
 {
-    vk_usbh_bthci_t *bthci = container_of(eda, vk_usbh_bthci_t, eda);
+    vk_usbh_bthci_t *bthci = vsf_container_of(eda, vk_usbh_bthci_t, eda);
     vsf_usbh_free(bthci);
 }
 

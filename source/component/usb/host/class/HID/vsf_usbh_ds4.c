@@ -291,8 +291,8 @@ static void __vk_usbh_ds4_int_complete(void *param, vk_usbh_hcd_urb_t *urb_hcd)
 
 static void __vk_usbh_ds4_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_hid_teda_t *hid = container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
-    vk_usbh_ds4_t *ds4 = container_of(hid, vk_usbh_ds4_t, use_as__vk_usbh_hid_teda_t);
+    vk_usbh_hid_teda_t *hid = vsf_container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
+    vk_usbh_ds4_t *ds4 = vsf_container_of(hid, vk_usbh_ds4_t, use_as__vk_usbh_hid_teda_t);
 
     switch (evt) {
     case VSF_EVT_INIT: {

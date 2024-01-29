@@ -1081,7 +1081,7 @@ try_next:
 
 static void __vsf_libusb_transfer_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsf_linux_libusb_transfer_t *ltransfer = container_of(eda, vsf_linux_libusb_transfer_t, eda);
+    vsf_linux_libusb_transfer_t *ltransfer = vsf_container_of(eda, vsf_linux_libusb_transfer_t, eda);
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)ltransfer->transfer.dev_handle;
     vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, ltransfer->transfer.endpoint);
     vk_usbh_urb_t *urb = &pipe->urb;
@@ -1106,7 +1106,7 @@ static void __vsf_libusb_transfer_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
 int libusb_submit_transfer(struct libusb_transfer *transfer)
 {
-    vsf_linux_libusb_transfer_t *ltransfer = container_of(transfer, vsf_linux_libusb_transfer_t, transfer);
+    vsf_linux_libusb_transfer_t *ltransfer = vsf_container_of(transfer, vsf_linux_libusb_transfer_t, transfer);
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)transfer->dev_handle;
     vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, ltransfer->transfer.endpoint);
     vk_usbh_urb_t *urb = &pipe->urb;
@@ -1158,7 +1158,7 @@ int libusb_submit_transfer(struct libusb_transfer *transfer)
 
 int libusb_cancel_transfer(struct libusb_transfer *transfer)
 {
-    vsf_linux_libusb_transfer_t *ltransfer = container_of(transfer, vsf_linux_libusb_transfer_t, transfer);
+    vsf_linux_libusb_transfer_t *ltransfer = vsf_container_of(transfer, vsf_linux_libusb_transfer_t, transfer);
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)transfer->dev_handle;
     vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, ltransfer->transfer.endpoint);
     vk_usbh_urb_t *urb = &pipe->urb;
@@ -1186,7 +1186,7 @@ int libusb_cancel_transfer(struct libusb_transfer *transfer)
 void libusb_free_transfer(struct libusb_transfer *transfer)
 {
     if (transfer != NULL) {
-        vsf_linux_libusb_transfer_t *ltransfer = container_of(transfer, vsf_linux_libusb_transfer_t, transfer);
+        vsf_linux_libusb_transfer_t *ltransfer = vsf_container_of(transfer, vsf_linux_libusb_transfer_t, transfer);
         vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)transfer->dev_handle;
         vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, ltransfer->transfer.endpoint);
         VSF_LINUX_ASSERT(!vk_usbh_urb_is_alloced(&pipe->urb));

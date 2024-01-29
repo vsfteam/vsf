@@ -86,7 +86,7 @@ static const vk_audio_stream_drv_t __vk_audio_dummy_stream_drv_capture = {
 __vsf_component_peda_ifs_entry(__vk_audio_dummy_init, vk_audio_init)
 {
     vsf_peda_begin();
-    vk_audio_dummy_dev_t *dev = container_of(&vsf_this, vk_audio_dummy_dev_t, use_as__vk_audio_dev_t);
+    vk_audio_dummy_dev_t *dev = vsf_container_of(&vsf_this, vk_audio_dummy_dev_t, use_as__vk_audio_dev_t);
     uint_fast8_t stream_idx = 0;
 
     switch (evt) {
@@ -125,7 +125,7 @@ __vsf_component_peda_ifs_entry(__vk_audio_dummy_playback_control, vk_audio_contr
 
 static void __vk_audio_dummy_ontimer(vsf_callback_timer_t *timer)
 {
-    vk_audio_dummy_playback_buffer_t *audio_dummy_buffer = container_of(timer, vk_audio_dummy_playback_buffer_t, timer);
+    vk_audio_dummy_playback_buffer_t *audio_dummy_buffer = vsf_container_of(timer, vk_audio_dummy_playback_buffer_t, timer);
     vk_audio_dummy_playback_ctx_t *playback_ctx = audio_dummy_buffer->param;
 
     if (playback_ctx->buffer_taken > 0) {
@@ -166,7 +166,7 @@ static void __vk_audio_dummy_playback_evthandler(vsf_stream_t *stream, void *par
 {
     vk_audio_stream_t *audio_stream = param;
     vk_audio_stream_t *audio_stream_base = audio_stream - audio_stream->stream_index;
-    vk_audio_dummy_dev_t *dev = container_of(audio_stream_base, vk_audio_dummy_dev_t, stream);
+    vk_audio_dummy_dev_t *dev = vsf_container_of(audio_stream_base, vk_audio_dummy_dev_t, stream);
     vk_audio_dummy_playback_ctx_t *playback_ctx = &dev->playback_ctx;
     uint_fast32_t datasize;
     uint8_t *buff;
@@ -190,7 +190,7 @@ static void __vk_audio_dummy_playback_evthandler(vsf_stream_t *stream, void *par
 __vsf_component_peda_ifs_entry(__vk_audio_dummy_playback_start, vk_audio_start)
 {
     vsf_peda_begin();
-    vk_audio_dummy_dev_t *dev = container_of(&vsf_this, vk_audio_dummy_dev_t, use_as__vk_audio_dev_t);
+    vk_audio_dummy_dev_t *dev = vsf_container_of(&vsf_this, vk_audio_dummy_dev_t, use_as__vk_audio_dev_t);
     vk_audio_dummy_playback_ctx_t *playback_ctx = &dev->playback_ctx;
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
 
@@ -223,7 +223,7 @@ __vsf_component_peda_ifs_entry(__vk_audio_dummy_playback_start, vk_audio_start)
 __vsf_component_peda_ifs_entry(__vk_audio_dummy_playback_stop, vk_audio_stop)
 {
     vsf_peda_begin();
-    vk_audio_dummy_dev_t *dev = container_of(&vsf_this, vk_audio_dummy_dev_t, use_as__vk_audio_dev_t);
+    vk_audio_dummy_dev_t *dev = vsf_container_of(&vsf_this, vk_audio_dummy_dev_t, use_as__vk_audio_dev_t);
     vk_audio_dummy_playback_ctx_t *playback_ctx = &dev->playback_ctx;
     vk_audio_stream_t *audio_stream = vsf_local.audio_stream;
 

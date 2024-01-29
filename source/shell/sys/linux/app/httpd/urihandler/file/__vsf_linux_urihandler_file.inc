@@ -38,8 +38,8 @@ static const vsf_linux_httpd_urihandler_op_t __vsf_linux_httpd_urihandler_file_o
 
 static void __vsf_linux_httpd_urihandler_file_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsf_linux_httpd_urihandler_file_t *urihandler_file = container_of(eda, vsf_linux_httpd_urihandler_file_t, eda);
-    vsf_linux_httpd_request_t *request = container_of(urihandler_file, vsf_linux_httpd_request_t, urihandler_ctx);
+    vsf_linux_httpd_urihandler_file_t *urihandler_file = vsf_container_of(eda, vsf_linux_httpd_urihandler_file_t, eda);
+    vsf_linux_httpd_request_t *request = vsf_container_of(urihandler_file, vsf_linux_httpd_request_t, urihandler_ctx);
     vk_file_stream_t *file_stream = &urihandler_file->file_stream;
     vsf_stream_t *stream = &urihandler_file->stream.use_as__vsf_stream_t;
 
@@ -57,7 +57,7 @@ static vsf_err_t __vsf_linux_httpd_urihandler_file_init(vsf_linux_httpd_request_
 {
     VSF_LINUX_ASSERT((req != NULL) && (req->uri != NULL));
 
-    vsf_linux_httpd_session_t *session = container_of(req, vsf_linux_httpd_session_t, request);
+    vsf_linux_httpd_session_t *session = vsf_container_of(req, vsf_linux_httpd_session_t, request);
     vsf_linux_httpd_urihandler_file_t *urihandler_file = &req->urihandler_ctx.file;
     char *uri = req->uri, *root_path = session->httpd->root_path;
 

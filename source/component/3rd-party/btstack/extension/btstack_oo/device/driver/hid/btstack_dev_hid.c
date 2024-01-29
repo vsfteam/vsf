@@ -7,7 +7,7 @@
 
 static void btstack_device_hid_delayed_connected(btstack_timer_source_t *timer)
 {
-    btstack_device_hid_t *dev_hid = container_of(timer, btstack_device_hid_t, timer);
+    btstack_device_hid_t *dev_hid = vsf_container_of(timer, btstack_device_hid_t, timer);
     if ((dev_hid->callback != NULL) && (dev_hid->callback->on_connected != NULL)) {
         dev_hid->callback->on_connected(&dev_hid->use_as__btstack_dev_t);
     }
@@ -15,7 +15,7 @@ static void btstack_device_hid_delayed_connected(btstack_timer_source_t *timer)
 
 static void btstack_device_hid_timer(btstack_timer_source_t *timer)
 {
-    btstack_device_hid_t *dev_hid = container_of(timer, btstack_device_hid_t, timer);
+    btstack_device_hid_t *dev_hid = vsf_container_of(timer, btstack_device_hid_t, timer);
     if (dev_hid->on_timer != NULL) {
         dev_hid->on_timer(dev_hid);
     }

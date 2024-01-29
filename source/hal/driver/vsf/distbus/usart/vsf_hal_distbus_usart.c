@@ -118,7 +118,7 @@ static void __vsf_hal_distbus_usart_txfifo(vsf_hal_distbus_usart_t *usart, vsf_p
 
 static bool __vsf_hal_distbus_usart_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
-    vsf_hal_distbus_usart_t *usart = container_of(service, vsf_hal_distbus_usart_t, service);
+    vsf_hal_distbus_usart_t *usart = vsf_container_of(service, vsf_hal_distbus_usart_t, service);
     uint8_t *data = (uint8_t *)&msg->header + sizeof(msg->header);
     uint32_t datalen = msg->header.datalen;
     bool retain_msg = false;

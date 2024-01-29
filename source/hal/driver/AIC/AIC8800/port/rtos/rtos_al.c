@@ -285,7 +285,7 @@ int rtos_task_create(   rtos_task_fct func,
 rtos_task_handle rtos_get_task_handle(void)
 {
     vsf_thread_t *thread = vsf_thread_get_cur();
-    return container_of(thread, vsf_rtos_thread_t, use_as__vsf_thread_t);
+    return vsf_container_of(thread, vsf_rtos_thread_t, use_as__vsf_thread_t);
 }
 
 char * rtos_get_task_name(void)

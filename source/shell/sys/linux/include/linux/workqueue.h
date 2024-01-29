@@ -50,7 +50,7 @@ extern void flush_workqueue(struct workqueue_struct *wq);
 
 static inline struct delayed_work *to_delayed_work(struct work_struct *work)
 {
-    return container_of(work, struct delayed_work, work);
+    return vsf_container_of(work, struct delayed_work, work);
 }
 static inline bool schedule_work(struct work_struct *work)
 {

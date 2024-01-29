@@ -259,7 +259,7 @@ static void __lcd_spi_request_data(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
 static void __lcd_write_command_seq(vsf_eda_t *teda, vsf_evt_t evt)
 {
     VSF_UI_ASSERT(teda != NULL);
-    vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = container_of(teda, vk_disp_mipi_spi_lcd_t, teda);
+    vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = vsf_container_of(teda, vk_disp_mipi_spi_lcd_t, teda);
     VSF_UI_ASSERT(disp_mipi_spi_lcd->spi != NULL);
     VSF_UI_ASSERT(disp_mipi_spi_lcd->seq.buf != NULL);
     VSF_UI_ASSERT(disp_mipi_spi_lcd->seq.max_cnt != 0);
@@ -304,7 +304,7 @@ static void __lcd_write_command_seq_start(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_
 static void __lcd_hardware_reset_pin(vsf_eda_t *teda, vsf_evt_t evt)
 {
     VSF_UI_ASSERT(teda != NULL);
-    vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = container_of(teda, vk_disp_mipi_spi_lcd_t, teda);
+    vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = vsf_container_of(teda, vk_disp_mipi_spi_lcd_t, teda);
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -335,7 +335,7 @@ static void __lcd_exit_sleep_mode(vsf_eda_t *teda, vsf_evt_t evt)
         MIPI_DCS_CMD_EXIT_SLEEP_MODE
     };
     VSF_UI_ASSERT(teda != NULL);
-    vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = container_of(teda, vk_disp_mipi_spi_lcd_t, teda);
+    vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = vsf_container_of(teda, vk_disp_mipi_spi_lcd_t, teda);
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -359,7 +359,7 @@ static void __lcd_exit_sleep_mode(vsf_eda_t *teda, vsf_evt_t evt)
 static void __lcd_init_param_seq(vsf_eda_t *teda, vsf_evt_t evt)
 {
     VSF_UI_ASSERT(teda != NULL);
-    vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = container_of(teda, vk_disp_mipi_spi_lcd_t, teda);
+    vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = vsf_container_of(teda, vk_disp_mipi_spi_lcd_t, teda);
     VSF_UI_ASSERT(disp_mipi_spi_lcd->init_seq != NULL);
     VSF_UI_ASSERT(disp_mipi_spi_lcd->init_seq_len != 0);
 
@@ -381,7 +381,7 @@ static void __lcd_init_param_seq(vsf_eda_t *teda, vsf_evt_t evt)
 static void __lcd_refresh_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
 {
     VSF_UI_ASSERT(teda != NULL);
-    vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = container_of(teda, vk_disp_mipi_spi_lcd_t, teda);
+    vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = vsf_container_of(teda, vk_disp_mipi_spi_lcd_t, teda);
 
     switch (evt) {
     case VSF_EVT_INIT:

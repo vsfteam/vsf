@@ -170,7 +170,7 @@ static int __get_port_from_char(char ch)
 static bool __io_demo_check(hal_test_t *hal_test)
 {
     VSF_ASSERT(hal_test != NULL);
-    io_test_t *test = container_of(hal_test, io_test_t, use_as__hal_test_t);
+    io_test_t *test = vsf_container_of(hal_test, io_test_t, use_as__hal_test_t);
     VSF_ASSERT(test->device != NULL);
 
     vsf_io_capability_t cap = vsf_io_capability(test->device);
@@ -248,7 +248,7 @@ static vsf_err_t __io_config_one_pin(io_test_t *test)
 static void __io_demo_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     VSF_ASSERT(NULL != eda);
-    io_test_t *test = container_of(eda, io_test_t, teda);
+    io_test_t *test = vsf_container_of(eda, io_test_t, teda);
     vsf_io_t *io_ptr = test->device;
     VSF_ASSERT(io_ptr != NULL);
     vsf_err_t err;

@@ -77,7 +77,7 @@ struct usb_interface {
 
     unsigned needs_remote_wakeup    : 1;
 };
-#define    to_usb_interface(__d)       container_of(__d, struct usb_interface, dev)
+#define    to_usb_interface(__d)       vsf_container_of(__d, struct usb_interface, dev)
 static inline void *usb_get_intfdata(struct usb_interface *intf)
 {
     return dev_get_drvdata(&intf->dev);
@@ -142,7 +142,7 @@ struct usb_device {
 
     struct device                   dev;
 };
-#define to_usb_device(__d)          container_of(__d, struct usb_device, dev)
+#define to_usb_device(__d)          vsf_container_of(__d, struct usb_device, dev)
 static inline struct usb_device * interface_to_usbdev(struct usb_interface *intf)
 {
     return to_usb_device(intf->dev.parent);

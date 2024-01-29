@@ -164,7 +164,7 @@ failed:
 
 static void __vk_wav_playback_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_wav_t *wav = container_of(eda, vk_wav_t, eda);
+    vk_wav_t *wav = vsf_container_of(eda, vk_wav_t, eda);
 
     switch (evt) {
     case VSF_EVT_INIT:

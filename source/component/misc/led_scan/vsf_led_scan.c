@@ -39,7 +39,7 @@
 
 static void __vsf_led_scan_on_timer(vsf_callback_timer_t *timer)
 {
-    vsf_led_scan_t *scan = container_of(timer, vsf_led_scan_t, timer);
+    vsf_led_scan_t *scan = vsf_container_of(timer, vsf_led_scan_t, timer);
     const vsf_io_mapper_t *io_mapper = scan->hw->io_mapper;
     const vsf_led_scan_pin_t *pin = &scan->hw->pins[scan->cur_pin];
     vsf_protect_t orig;

@@ -71,7 +71,7 @@ extern int usb_urb_dir_in(struct urb *urb)
 
 static void __vsf_linux_usb_done_work(struct work_struct *work)
 {
-    struct urb *urb = container_of(work, struct urb, done_work);
+    struct urb *urb = vsf_container_of(work, struct urb, done_work);
     vsf_protect_t orig = vsf_protect_int();
         if (urb->anchor != NULL) {
             usb_unanchor_urb(urb);
@@ -211,7 +211,7 @@ int usb_wait_anchor_empty_timeout(struct usb_anchor *anchor, unsigned int timeou
 
 static void __vsf_linux_usb_probe_work(struct work_struct *work)
 {
-    vsf_usbh_adapter_linux_t *usbh_linux = container_of(work, vsf_usbh_adapter_linux_t, probe_work);
+    vsf_usbh_adapter_linux_t *usbh_linux = vsf_container_of(work, vsf_usbh_adapter_linux_t, probe_work);
     if (usbh_linux->linux_drv->probe != NULL) {
         usbh_linux->linux_drv->probe(&usbh_linux->ifs, usbh_linux->id);
     }
@@ -219,7 +219,7 @@ static void __vsf_linux_usb_probe_work(struct work_struct *work)
 
 static void __vsf_linux_usb_disconnect_work(struct work_struct *work)
 {
-    vsf_usbh_adapter_linux_t *usbh_linux = container_of(work, vsf_usbh_adapter_linux_t, disconnect_work);
+    vsf_usbh_adapter_linux_t *usbh_linux = vsf_container_of(work, vsf_usbh_adapter_linux_t, disconnect_work);
     if (usbh_linux->linux_drv->disconnect != NULL) {
         usbh_linux->linux_drv->disconnect(&usbh_linux->ifs);
     }
@@ -235,7 +235,7 @@ static void * __vsf_linux_usb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh
     struct usb_interface_desc_t *desc_ifs = parser_alt->desc_ifs;
     struct usb_endpoint_desc_t *desc_ep = parser_alt->desc_ep;
 
-    struct usb_driver_adapter_vsf *adapter = container_of(ifs->drv, struct usb_driver_adapter_vsf, vsf_drv);
+    struct usb_driver_adapter_vsf *adapter = vsf_container_of(ifs->drv, struct usb_driver_adapter_vsf, vsf_drv);
     vsf_usbh_adapter_linux_t *usbh_linux = vsf_usbh_malloc(sizeof(*usbh_linux));
     if (NULL == usbh_linux) {
         return NULL;
@@ -441,7 +441,7 @@ struct urb * usb_alloc_urb(int iso_packets, gfp_t flags)
 
 static void urb_destroy(struct kref *kref)
 {
-    struct urb *urb = container_of(kref, struct urb, kref);
+    struct urb *urb = vsf_container_of(kref, struct urb, kref);
     if (urb->transfer_flags & URB_FREE_BUFFER) {
         kfree(urb->transfer_buffer);
     }

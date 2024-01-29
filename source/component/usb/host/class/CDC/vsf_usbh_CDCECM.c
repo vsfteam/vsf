@@ -245,7 +245,7 @@ static void __vk_usbh_ecm_recv(vk_usbh_ecm_t *ecm, vk_usbh_ecm_icb_t *icb)
 
 static vsf_err_t __vk_usbh_ecm_netlink_init(vk_netdrv_t *netdrv)
 {
-    vk_usbh_ecm_t *ecm = container_of(netdrv, vk_usbh_ecm_t, netdrv);
+    vk_usbh_ecm_t *ecm = vsf_container_of(netdrv, vk_usbh_ecm_t, netdrv);
 
     netdrv->mtu = ecm->max_segment_size - TCPIP_ETH_HEADSIZE;
     netdrv->mac_header_size = TCPIP_ETH_HEADSIZE;
@@ -256,7 +256,7 @@ static vsf_err_t __vk_usbh_ecm_netlink_init(vk_netdrv_t *netdrv)
 static vsf_err_t __vk_usbh_ecm_netlink_fini(vk_netdrv_t *netdrv)
 {
     if (netdrv->is_to_free) {
-        vk_usbh_ecm_t *ecm = container_of(netdrv, vk_usbh_ecm_t, netdrv);
+        vk_usbh_ecm_t *ecm = vsf_container_of(netdrv, vk_usbh_ecm_t, netdrv);
         vsf_pnp_on_netdrv_del(&ecm->netdrv);
         vsf_usbh_free(ecm);
     }
@@ -265,7 +265,7 @@ static vsf_err_t __vk_usbh_ecm_netlink_fini(vk_netdrv_t *netdrv)
 
 static void * __vk_usbh_ecm_netlink_can_output(vk_netdrv_t *netdrv)
 {
-    vk_usbh_ecm_t *ecm = container_of(netdrv, vk_usbh_ecm_t, netdrv);
+    vk_usbh_ecm_t *ecm = vsf_container_of(netdrv, vk_usbh_ecm_t, netdrv);
     vk_usbh_ecm_ocb_t *ocb = __vk_usbh_ecm_get_idle_ocb(ecm);
     if (ocb != NULL) {
         ocb->netbuf = (void *)1;
@@ -275,7 +275,7 @@ static void * __vk_usbh_ecm_netlink_can_output(vk_netdrv_t *netdrv)
 
 static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *slot, void *netbuf)
 {
-    vk_usbh_ecm_t *ecm = container_of(netdrv, vk_usbh_ecm_t, netdrv);
+    vk_usbh_ecm_t *ecm = vsf_container_of(netdrv, vk_usbh_ecm_t, netdrv);
     vk_usbh_ecm_ocb_t *ocb = slot;
     vsf_err_t err = VSF_ERR_FAIL;
 #if VSF_USBH_CDCECM_SUPPORT_PBUF == ENABLED
@@ -561,8 +561,8 @@ static vsf_err_t __vk_usbh_ecm_set_filter(vk_usbh_ecm_t *ecm, uint_fast16_t filt
 
 static void __vk_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_cdc_t *cdc = container_of(eda, vk_usbh_cdc_t, eda);
-    vk_usbh_ecm_t *ecm = container_of(cdc, vk_usbh_ecm_t, use_as__vk_usbh_cdc_t);
+    vk_usbh_cdc_t *cdc = vsf_container_of(eda, vk_usbh_cdc_t, eda);
+    vk_usbh_ecm_t *ecm = vsf_container_of(cdc, vk_usbh_ecm_t, use_as__vk_usbh_cdc_t);
     vk_usbh_dev_t *dev = cdc->dev;
     vk_usbh_t *usbh = cdc->usbh;
     vk_usbh_urb_t *urb = &dev->ep0.urb;
@@ -641,7 +641,7 @@ static void __vk_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
 static void __vk_usbh_ecm_on_eda_terminate(vsf_eda_t *eda)
 {
-    vk_usbh_ecm_t *ecm = container_of(eda, vk_usbh_ecm_t, eda);
+    vk_usbh_ecm_t *ecm = vsf_container_of(eda, vk_usbh_ecm_t, eda);
     vk_netdrv_t *netdrv = &ecm->netdrv;
 
     netdrv->is_to_free = true;

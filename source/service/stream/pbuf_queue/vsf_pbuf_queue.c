@@ -265,7 +265,7 @@ vsf_err_t vsf_pbuf_queue_data_drain_event_register(
 static 
 vsf_pbuf_t * __vsf_stream_pbuf_rx_fecch(vsf_stream_rx_t *obj_ptr)
 {
-    class_internal( container_of(obj_ptr, vsf_stream_fifo_t, RX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, RX), 
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
     
@@ -276,7 +276,7 @@ vsf_pbuf_t * __vsf_stream_pbuf_rx_fecch(vsf_stream_rx_t *obj_ptr)
 static 
 void  __vsf_stream_pbuf_rx_open(vsf_stream_rx_t *obj_ptr)
 {
-    class_internal( container_of(obj_ptr, vsf_stream_fifo_t, RX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, RX), 
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
     VSF_PBUF_QUEUE_CFG_ATOM_ACCESS(
@@ -287,7 +287,7 @@ void  __vsf_stream_pbuf_rx_open(vsf_stream_rx_t *obj_ptr)
 static 
 void  __vsf_stream_pbuf_rx_close(vsf_stream_rx_t *obj_ptr)
 {
-    class_internal( container_of(obj_ptr, vsf_stream_fifo_t, RX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, RX), 
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
     VSF_PBUF_QUEUE_CFG_ATOM_ACCESS(
@@ -299,7 +299,7 @@ void  __vsf_stream_pbuf_rx_close(vsf_stream_rx_t *obj_ptr)
 static 
 vsf_stream_status_t __vsf_stream_pbuf_rx_get_status(vsf_stream_rx_t *obj_ptr)
 {
-    class_internal( container_of(obj_ptr, vsf_stream_fifo_t, RX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, RX), 
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
 
@@ -309,7 +309,7 @@ vsf_stream_status_t __vsf_stream_pbuf_rx_get_status(vsf_stream_rx_t *obj_ptr)
 static vsf_err_t __vsf_stream_pbuf_rx_register_notification(
     vsf_stream_rx_t *obj_ptr, vsf_stream_dat_rdy_evt_t tEventHandling)
 {
-    class_internal( container_of(obj_ptr, vsf_stream_fifo_t, RX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, RX), 
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
 
@@ -319,7 +319,7 @@ static vsf_err_t __vsf_stream_pbuf_rx_register_notification(
 
 static vsf_err_t __vsf_stream_pbuf_tx_send(vsf_stream_tx_t *obj_ptr, vsf_pbuf_t *pbuf)
 {
-    class_internal( container_of(obj_ptr, vsf_stream_fifo_t, TX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, TX), 
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
     
@@ -329,7 +329,7 @@ static vsf_err_t __vsf_stream_pbuf_tx_send(vsf_stream_tx_t *obj_ptr, vsf_pbuf_t 
 static vsf_err_t __vsf_stream_pbuf_tx_register_notification(
     vsf_stream_tx_t *obj_ptr, vsf_stream_dat_drn_evt_t tEventHandling)
 {
-    class_internal( container_of(obj_ptr, vsf_stream_fifo_t, TX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, TX), 
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
 
@@ -340,7 +340,7 @@ static vsf_err_t __vsf_stream_pbuf_tx_register_notification(
 static 
 vsf_stream_status_t __vsf_stream_pbuf_tx_get_status(vsf_stream_tx_t *obj_ptr)
 {
-    class_internal( container_of(obj_ptr, vsf_stream_fifo_t, TX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, TX), 
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
 

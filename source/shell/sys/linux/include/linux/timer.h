@@ -16,7 +16,7 @@ struct timer_list {
 };
 
 #define from_timer(var, callback_timer, timer_fieldname)                        \
-        container_of(callback_timer, typeof(*var), timer_fieldname)
+        vsf_container_of(callback_timer, typeof(*var), timer_fieldname)
 
 extern void add_timer(struct timer_list *timer);
 extern int del_timer(struct timer_list *timer);

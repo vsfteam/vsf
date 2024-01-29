@@ -348,7 +348,7 @@ static void __hc32f10x_usbhd_hcd_execute_urb(hc32f10x_usbhd_hcd_t *usbhd, hc32f1
 
 static void __hc32f10x_usbhd_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    hc32f10x_usbhd_hcd_t *usbhd_hcd = container_of(eda, hc32f10x_usbhd_hcd_t, teda);
+    hc32f10x_usbhd_hcd_t *usbhd_hcd = vsf_container_of(eda, hc32f10x_usbhd_hcd_t, teda);
     hc32f10x_usbhd_reg_t *reg = __hc32f10x_usbhd_get_reg(usbhd_hcd->param);
 
     switch (evt) {

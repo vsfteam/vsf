@@ -580,7 +580,7 @@ static int __vk_webusb_hcd_submit_urb_do(vk_usbh_hcd_urb_t *urb)
 extern "C" void __vk_webusb_hcd_dev_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = (vsf_arch_irq_thread_t *)arg;
-    vk_webusb_hcd_dev_t *webusb_dev = container_of(irq_thread, vk_webusb_hcd_dev_t, irq_thread);
+    vk_webusb_hcd_dev_t *webusb_dev = vsf_container_of(irq_thread, vk_webusb_hcd_dev_t, irq_thread);
     vsf_arch_irq_request_t *irq_request = &webusb_dev->irq_request;
     int idx = webusb_dev - __vk_webusb_hcd.devs;
 
@@ -613,8 +613,8 @@ extern "C" void __vk_webusb_hcd_dev_thread(void *arg)
 static void __vk_webusb_hcd_urb_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = (vsf_arch_irq_thread_t *)arg;
-    vk_webusb_hcd_urb_t *webusb_urb = container_of(irq_thread, vk_webusb_hcd_urb_t, irq_thread);
-    vk_usbh_hcd_urb_t *urb = container_of(webusb_urb, vk_usbh_hcd_urb_t, priv);
+    vk_webusb_hcd_urb_t *webusb_urb = vsf_container_of(irq_thread, vk_webusb_hcd_urb_t, irq_thread);
+    vk_usbh_hcd_urb_t *urb = vsf_container_of(webusb_urb, vk_usbh_hcd_urb_t, priv);
     vsf_arch_irq_request_t *irq_request = &webusb_urb->irq_request;
     bool is_to_free;
     int actual_length;
@@ -743,7 +743,7 @@ static bool __vk_webusb_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
 
 static void __vk_webusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_webusb_hcd_t *webusb = container_of(eda, vk_webusb_hcd_t, teda);
+    vk_webusb_hcd_t *webusb = vsf_container_of(eda, vk_webusb_hcd_t, teda);
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -762,13 +762,13 @@ static void __vk_webusb_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 vsf_dlist_remove_head(vk_webusb_hcd_urb_t, urb_node,
                         &__vk_webusb_hcd.urb_list, webusb_urb);
 #if VSF_WEBUSB_HCD_CFG_TRACE_URB_EN == ENABLED
-                vk_usbh_hcd_urb_t *urb = container_of(webusb_urb, vk_usbh_hcd_urb_t, priv);
+                vk_usbh_hcd_urb_t *urb = vsf_container_of(webusb_urb, vk_usbh_hcd_urb_t, priv);
                 __vk_webusb_hcd_trace_urb(urb, "dequeued-");
 #endif
             vsf_unprotect_sched(orig);
 
             if (webusb_urb != NULL) {
-                vk_usbh_hcd_urb_t *urb = container_of(webusb_urb, vk_usbh_hcd_urb_t, priv);
+                vk_usbh_hcd_urb_t *urb = vsf_container_of(webusb_urb, vk_usbh_hcd_urb_t, priv);
 
                 if (VSF_WEBUSB_HCD_URB_STATE_TO_FREE == webusb_urb->state) {
                     __vk_webusb_hcd_free_urb_do(urb);

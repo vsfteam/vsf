@@ -66,7 +66,7 @@ const vk_mal_drv_t vk_mmc_mal_drv = {
 
 static void __vk_mmc_mal_on_timer(vsf_callback_timer_t *timer)
 {
-    vk_mmc_mal_t *pthis = container_of(timer, vk_mmc_mal_t, timer);
+    vk_mmc_mal_t *pthis = vsf_container_of(timer, vk_mmc_mal_t, timer);
     if (pthis->is_probing) {
         vsf_err_t err = vsf_mmc_probe_irqhandler(pthis->mmc, &pthis->use_as__vsf_mmc_probe_t, 0, 0, NULL);
         if (err <= 0) {

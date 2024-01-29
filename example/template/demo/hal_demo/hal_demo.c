@@ -467,7 +467,7 @@ static void __hal_device_irq_disable(hal_test_t *test)
 void hal_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     VSF_ASSERT(NULL != eda);
-    hal_test_t *test = container_of(eda, hal_test_t, teda);
+    hal_test_t *test = vsf_container_of(eda, hal_test_t, teda);
     hal_demo_t *demo = test->demo;
     VSF_ASSERT(demo != NULL);
 

@@ -54,7 +54,7 @@ const vk_disp_drv_t vk_disp_drv_usbd_uvc = {
 
 static void __vk_disp_usbd_uvc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_disp_usbd_uvc_t *disp_uvc = container_of(eda, vk_disp_usbd_uvc_t, eda);
+    vk_disp_usbd_uvc_t *disp_uvc = vsf_container_of(eda, vk_disp_usbd_uvc_t, eda);
 
     switch (evt) {
     case VSF_EVT_INIT:

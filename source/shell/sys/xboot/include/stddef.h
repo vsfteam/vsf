@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 #ifndef offsetof
-#   define offsetof     offset_of
+#   define offsetof     vsf_offset_of
 #endif
 
 #define clamp(v, a, b)	min(max(a, v), b)

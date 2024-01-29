@@ -54,7 +54,7 @@ const vk_disp_drv_t vk_disp_drv_ssd1306 = {
 
 static void __vk_disp_ssd1306_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_disp_ssd1306_t *disp_ssd1306 = container_of(eda, vk_disp_ssd1306_t, eda);
+    vk_disp_ssd1306_t *disp_ssd1306 = vsf_container_of(eda, vk_disp_ssd1306_t, eda);
 
     switch (evt) {
     case VSF_EVT_INIT:

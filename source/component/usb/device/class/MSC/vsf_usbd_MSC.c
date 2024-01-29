@@ -180,7 +180,7 @@ static void __vk_usbd_msc_on_idle(void *p)
 
 static void __vk_usbd_msc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbd_msc_t *msc = container_of(eda, vk_usbd_msc_t, eda);
+    vk_usbd_msc_t *msc = vsf_container_of(eda, vk_usbd_msc_t, eda);
     usb_msc_cbw_t *cbw = &msc->ctx.cbw;
     bool is_in = (cbw->bmCBWFlags & USB_DIR_MASK) == USB_DIR_IN;
     vk_usbd_trans_t *trans = &msc->ep_stream.use_as__vk_usbd_trans_t;

@@ -149,7 +149,7 @@ static vk_usbh_hcd_urb_t *__vk_musb_fdrc_hcd_get_urb(vk_musb_fdrc_hcd_t *musb, u
 
     __vsf_slist_foreach_unsafe(vk_musb_fdrc_urb_t, urb_node, &musb->dev_priv.urb_list) {
         if (_->epidx == epidx) {
-            return container_of(_, vk_usbh_hcd_urb_t, priv);
+            return vsf_container_of(_, vk_usbh_hcd_urb_t, priv);
         }
     }
     return NULL;
@@ -387,7 +387,7 @@ static void __vsf_musb_fdrc_hcd_process_ep(vk_musb_fdrc_hcd_t *musb, uint_fast8_
 
 static void __vk_musb_fdrc_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_musb_fdrc_hcd_t *musb = container_of(eda, vk_musb_fdrc_hcd_t, teda);
+    vk_musb_fdrc_hcd_t *musb = vsf_container_of(eda, vk_musb_fdrc_hcd_t, teda);
     vk_musb_fdrc_reg_t *reg = musb->reg;
 
     switch (evt) {
@@ -634,7 +634,7 @@ static void __vk_musb_fdrc_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t
     vsf_unprotect_sched(orig);
 
     __vsf_slist_foreach_next_unsafe(vk_musb_fdrc_urb_t, urb_node, &musb->dev_priv.urb_list) {
-        __vk_musb_fdrc_hcd_free_urb_do(musb, container_of(_, vk_usbh_hcd_urb_t, priv));
+        __vk_musb_fdrc_hcd_free_urb_do(musb, vsf_container_of(_, vk_usbh_hcd_urb_t, priv));
     }
     vsf_slist_init(&musb->dev_priv.urb_list);
 }
