@@ -83,7 +83,7 @@ static void __vsf_linux_heap_trace_alloc(vsf_linux_process_t *process, vsf_liunx
         vsf_dlist_add_to_tail(vsf_liunx_heap_node_t, node, &process->heap_monitor.list, node);
         process->heap_monitor.usage += size;
         process->heap_monitor.balance++;
-//        vsf_trace_debug("0x%p: +%d 0x%p\n", process, i, ptr);
+//        vsf_trace_debug("0x%p: +%d 0x%p\n", process, node->size, ptr);
     vsf_unprotect_sched(orig);
 }
 
@@ -95,7 +95,7 @@ static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, vsf_liunx_
     VSF_LINUX_ASSERT(process != NULL);
 
     vsf_protect_t orig = vsf_protect_sched();
-//        vsf_trace_debug("0x%p: -%d 0x%p\n", process, i, ptr);
+//        vsf_trace_debug("0x%p: -%d 0x%p\n", process, node->size, ptr);
         process->heap_monitor.usage -= node->size;
         process->heap_monitor.balance--;
         vsf_dlist_remove(vsf_liunx_heap_node_t, node, &process->heap_monitor.list, node);
