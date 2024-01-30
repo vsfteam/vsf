@@ -192,9 +192,19 @@ in_addr_t inet_network(const char *cp)
 
 int inet_pton(int af, const char *src, void *dst)
 {
-    // TODO: add implementation
-    VSF_LINUX_ASSERT(false);
-    return -1;
+    switch (af) {
+    case AF_INET: {
+            int addr = inet_addr(src);
+            if (INADDR_NONE == addr) {
+                return 0;
+            }
+            memcpy(dst, &addr, 4);
+            return 1;
+        }
+    case AF_INET6:
+        VSF_LINUX_ASSERT(false);
+        return -1;
+    }
 }
 
 const char * inet_ntop(int af, const void *src, char *dst, socklen_t size)
