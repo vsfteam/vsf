@@ -1,5 +1,6 @@
 #include "utilities/compiler/compiler.h"
 
+#if VSF_APPLET_USE_COMPILER == ENABLED
 WEAK(__paritysi2)
 int __paritysi2(unsigned int a)
 {
@@ -15,3 +16,4 @@ __VSF_VPLT_DECORATOR__ vsf_compiler_vplt_t vsf_compiler_vplt = {
 
     VSF_APPLET_VPLT_ENTRY_FUNC(__paritysi2),
 };
+#endif

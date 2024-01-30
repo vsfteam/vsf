@@ -6038,6 +6038,9 @@
     <ClCompile Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_mac.c">
       <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\source\utilities\compiler\vsf_compiler.c">
+      <Filter>vsf\utilities\compiler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\source\hal\arch\common\arch_without_thread_suspend\vsf_arch_without_thread_suspend_template.inc">

@@ -1558,6 +1558,7 @@
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\port\busybox\shell\vsh.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\vsf_linux.c" />
     <ClCompile Include="..\..\..\..\source\shell\sys\xboot\vsf_xboot.c" />
+    <ClCompile Include="..\..\..\..\source\utilities\compiler\vsf_compiler.c" />
     <ClCompile Include="..\..\..\..\source\utilities\compiler\x86\x86_compiler.c" />
     <ClCompile Include="..\..\..\..\source\utilities\compiler\__common\__retarget_io.c" />
     <ClCompile Include="..\..\..\..\source\utilities\language_extension\code_region.c" />
