@@ -21,6 +21,7 @@
 
 #if VSF_USE_MBEDTLS == ENABLED
 
+#include <mbedtls/version.h>
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/net_sockets.h>
 #include <mbedtls/ssl.h>
@@ -44,6 +45,12 @@
 
 __VSF_VPLT_DECORATOR__ vsf_mbedtls_vplt_t vsf_mbedtls_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_mbedtls_vplt_t, 0, 0, true),
+
+    // <mbedtls/version.h>
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_version_get_number),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_version_get_string),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_version_get_string_full),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_version_check_feature),
 
     // <mbedtls/error.h>
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_strerror),
@@ -241,6 +248,16 @@ __VSF_VPLT_DECORATOR__ vsf_mbedtls_vplt_t vsf_mbedtls_vplt = {
 #if defined(MBEDTLS_PEM_WRITE_C)
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_x509write_crt_pem),
 #endif
+
+    // <mbedtls/x509_crl.h>
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_x509_crl_parse_der),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_x509_crl_parse),
+#if defined(MBEDTLS_FS_IO)
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_x509_crl_parse_file),
+#endif
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_x509_crl_info),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_x509_crl_init),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_x509_crl_free),
 
     // <mbedtls/ctr_drgb.h>
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ctr_drbg_init),

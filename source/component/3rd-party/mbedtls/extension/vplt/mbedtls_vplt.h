@@ -37,6 +37,12 @@ extern "C" {
 typedef struct vsf_mbedtls_vplt_t {
     vsf_vplt_info_t info;
 
+    // <mbedtls/version.h>
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_version_get_number);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_version_get_string);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_version_get_string_full);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_version_check_feature);
+
     // <mbedtls/error.h>
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_strerror);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_high_level_strerr);
@@ -179,6 +185,14 @@ typedef struct vsf_mbedtls_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_x509write_crt_free);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_x509write_crt_der);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_x509write_crt_pem);
+
+    // <mbedtls/x509_crl.h>
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_x509_crl_parse_der);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_x509_crl_parse);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_x509_crl_parse_file);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_x509_crl_info);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_x509_crl_init);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_x509_crl_free);
 
     // <mbedtls/ctr_drgb.h>
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ctr_drbg_init);
