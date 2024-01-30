@@ -2087,7 +2087,8 @@ int __vsf_linux_dynloader_main(int argc, char **argv)
         printf("no entry found for %s\n", process->path);
     }
 
-    dlclose(loader);
+    // will be called in __vsf_linux_loader_atexit
+//    dlclose(loader);
     return result;
 }
 #endif
@@ -4324,8 +4325,7 @@ static void __vsf_linux_loader_atexit(void)
     vsf_linux_dynloader_t *linux_loader = process->loader;
     VSF_LINUX_ASSERT(linux_loader != NULL);
 
-    vsf_loader_cleanup(&linux_loader->loader.generic);
-    free(linux_loader);
+    dlclose(linux_loader);
 }
 #endif
 

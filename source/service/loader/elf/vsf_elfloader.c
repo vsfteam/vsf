@@ -157,6 +157,7 @@ void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader)
     }
     if ((elfloader->vplt_out != NULL) && (elfloader->free_vplt != NULL)) {
         elfloader->free_vplt(elfloader->vplt_out);
+        elfloader->vplt_out = NULL;
     }
 }
 
