@@ -400,6 +400,7 @@ typedef struct vsf_linux_vplt_t {
     void *component_vplt;
     void *arch_abi_vplt;
     void *dynamic_vplt;
+    void *compiler_vplt;
 
     // fundmental, vsf APIs for linux
     void *fundmental_vplt;

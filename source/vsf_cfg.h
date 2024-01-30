@@ -114,6 +114,7 @@ typedef struct vsf_vplt_t {
     void *component_vplt;
     void *arch_abi_vplt;
     void *dynamic_vplt;
+    void *compiler_vplt;
 
     void *linux_vplt;
 } vsf_vplt_t;

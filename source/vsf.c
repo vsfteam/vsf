@@ -43,6 +43,12 @@ __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt = {
 #   if VSF_APPLET_USE_SERVICE == ENABLED
     .service_vplt       = (void *)&vsf_service_vplt,
 #   endif
+#   if VSF_APPLET_USE_ARCH_ABI == ENABLED
+    .arch_abi_vplt      = (void *)&vsf_arch_abi_vplt,
+#   endif
+#   if VSF_APPLET_USE_COMPILER == ENABLED
+    .compiler_vplt      = (void *)&vsf_compiler_vplt,
+#   endif
 
 #   if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_APPLET == ENABLED
     .linux_vplt         = (void *)&vsf_linux_vplt,
