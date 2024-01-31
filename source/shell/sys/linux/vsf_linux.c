@@ -1429,6 +1429,7 @@ void vsf_linux_exit_process(int status, bool _exit)
     }
 
     // 7. notify pending thread, MUST be the last before exiting current thread
+    orig = vsf_protect_sched();
     process->status &= ~PID_STATUS_RUNNING;
     if (process->thread_pending != NULL) {
         vsf_unprotect_sched(orig);
@@ -1818,6 +1819,7 @@ int daemon(int nochdir, int noclose)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
+    vsf_linux_process_t *parent_process = process->parent_process;
 
     if (!nochdir) {
         free(process->working_dir);
@@ -1839,7 +1841,14 @@ int daemon(int nochdir, int noclose)
     vsf_protect_t orig = vsf_protect_sched();
         process->status = PID_STATUS_DAEMON;
         thread_pending = process->thread_pending;
-        process->thread_pending = NULL;
+        if (thread_pending != NULL) {
+            process->thread_pending = NULL;
+        } else if ((parent_process != NULL) && (parent_process->thread_pending_child != NULL)) {
+            thread_pending = parent_process->thread_pending_child;
+            parent_process->thread_pending_child = NULL;
+            thread_pending->retval = 0;
+            thread_pending->pid_exited = process->id.pid;
+        }
     vsf_unprotect_sched(orig);
     if (thread_pending != NULL) {
         thread_pending->retval = process->exit_status;
@@ -2606,9 +2615,11 @@ done:
         *status = cur_thread->retval;
     }
     vsf_linux_process_t *process = vsf_linux_get_process(cur_thread->pid_exited);
-    vsf_linux_detach_process(process);
-    vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
-    vsf_linux_free_res(process);
+    if (process->status != PID_STATUS_DAEMON) {
+        vsf_linux_detach_process(process);
+        vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
+        vsf_linux_free_res(process);
+    }
     return cur_thread->pid_exited;
 }
 
