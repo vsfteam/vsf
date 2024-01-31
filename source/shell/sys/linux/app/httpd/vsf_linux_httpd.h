@@ -339,6 +339,9 @@ extern const vsf_linux_httpd_urihandler_op_t vsf_linux_httpd_urihandler_buffer_o
 
 /*============================ PROTOTYPES ====================================*/
 
+// httpd thread
+extern void * vsf_linux_httpd_thread(void *param);
+// vsf_linux_httpd_start will call pthread_create to run vsf_linux_httpd_thread
 extern vsf_err_t vsf_linux_httpd_start(vsf_linux_httpd_t *httpd);
 
 #ifdef __cplusplus

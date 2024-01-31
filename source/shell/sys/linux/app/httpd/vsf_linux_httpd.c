@@ -849,7 +849,7 @@ static int __vsf_linux_httpd_set_fds(vsf_linux_httpd_t *httpd, fd_set *rset, fd_
     return fd_max;
 }
 
-static void * __vsf_linux_httpd_thread(void *param)
+void * vsf_linux_httpd_thread(void *param)
 {
     vsf_linux_httpd_t *httpd = param;
     int fd_listen, fd_num, fd_socket;
@@ -1064,7 +1064,7 @@ __exit_fail:
 
 vsf_err_t vsf_linux_httpd_start(vsf_linux_httpd_t *httpd)
 {
-    return 0 == pthread_create(NULL, NULL, __vsf_linux_httpd_thread, httpd) ?
+    return 0 == pthread_create(NULL, NULL, vsf_linux_httpd_thread, httpd) ?
                 VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
