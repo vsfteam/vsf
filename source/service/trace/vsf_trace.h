@@ -19,6 +19,7 @@
 #define __VSF_TRACE_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "service/vsf_service_cfg.h"
 
 #if VSF_USE_SIMPLE_STREAM == ENABLED

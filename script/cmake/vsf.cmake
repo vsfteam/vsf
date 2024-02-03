@@ -114,6 +114,8 @@ else()
         ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regerror.c
         ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regexec.c
         ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regfree.c
+        # for __vsf_linux_ctype used in ctype.h
+        ${VSF_SRC_PATH}/shell/sys/linux/lib/glibc/vsf_linux_glibc_ctype.c
     )
 
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES

@@ -120,7 +120,8 @@ typedef enum {
 //! \brief system macros
 #ifndef VSF_ASSERT
 #   if VSF_USE_TRACE == ENABLED
-extern void vsf_trace_assert(const char *expr, const char *file, int line, const char *func);
+// do not extern vsf_trace_assert as a normal function, maybe it's a static inline function
+//extern void vsf_trace_assert(const char *expr, const char *file, int line, const char *func);
 #       define VSF_ASSERT(__EXPR)                                               \
     ((__EXPR)                                                                   \
     ? (void)0                                                                   \
