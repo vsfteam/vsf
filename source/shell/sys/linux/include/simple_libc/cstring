@@ -12,7 +12,10 @@ namespace std {
     using ::____strdup_ex;
 #endif
 
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR != ENABLED                     \
+    ||  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER != ENABLED
     using ::strdup;
+#endif
     using ::strndup;
     using ::strscpy;
     using ::strcat;

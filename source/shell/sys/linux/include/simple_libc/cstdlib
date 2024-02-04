@@ -24,9 +24,12 @@ namespace std {
     using ::____realloc_ex;
 #endif
 
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR != ENABLED                     \
+    ||  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER != ENABLED
     using ::malloc;
     using ::calloc;
     using ::realloc;
+#endif
     using ::free;
 
     using ::getenv;
