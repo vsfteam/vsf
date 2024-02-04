@@ -186,7 +186,8 @@ const char * sigabbrev_np(int sig)
     return "unknown";
 }
 
-#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED                     \
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
 #   undef strdup
 #endif
 char * strdup(const char *str)

@@ -18,7 +18,7 @@ namespace std {
     using ::exit;
     using ::atexit;
 
-#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     using ::____malloc_ex;
     using ::____calloc_ex;
     using ::____realloc_ex;

@@ -281,18 +281,19 @@ size_t strnlen(const char *str, size_t maxlen);
 int strcmp(const char *str1, const char *str2);
 int strncmp(const char *str1, const char *str2, size_t n);
 int strverscmp(const char *str1, const char *str2);
-#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
 typedef struct vsf_linux_process_t vsf_linux_process_t;
-char * ____strdup_ex(vsf_linux_process_t *process, const char *str
 #   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
-    , const char *file, const char *func, int line
-#   endif
-);
-#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
-#       define strdup(__str)            ____strdup_ex(NULL, (char *)(__str), __FILE__, __FUNCTION__, __LINE__)
+char * ____strdup_ex(vsf_linux_process_t *process, const char *str, const char *file, const char *func, int line);
 #   else
-#       define strdup(__str)            ____strdup_ex(NULL, (char *)(__str))
+char * ____strdup_ex(vsf_linux_process_t *process, const char *str);
 #   endif
+#endif
+
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED                     \
+    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+#   define strdup(__str)            ____strdup_ex(NULL, (char *)(__str), __FILE__, __FUNCTION__, __LINE__)
 #else
 char * strdup(const char *str);
 #endif

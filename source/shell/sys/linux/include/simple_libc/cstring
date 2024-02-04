@@ -8,11 +8,11 @@ namespace std {
     using ::strcmp;
     using ::strncmp;
     using ::strverscmp;
-#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     using ::____strdup_ex;
-#else
-    using ::strdup;
 #endif
+
+    using ::strdup;
     using ::strndup;
     using ::strscpy;
     using ::strcat;
