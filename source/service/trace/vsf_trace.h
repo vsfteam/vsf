@@ -22,12 +22,6 @@
 
 #include "service/vsf_service_cfg.h"
 
-#if VSF_USE_SIMPLE_STREAM == ENABLED
-#   include "../simple_stream/vsf_simple_stream.h"
-#elif VSF_USE_STREAM == ENABLED
-#   include "../stream/vsf_stream.h"
-#endif
-
 #if     defined(__VSF_TRACE_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_TRACE_CLASS_INHERIT__)
@@ -81,8 +75,10 @@ extern "C" {
 
 #if VSF_USE_TRACE == ENABLED
 #   if VSF_USE_SIMPLE_STREAM == ENABLED
+typedef struct vsf_stream_t vsf_stream_t;
 #       define vsf_trace_init(__stream) __vsf_trace_init((vsf_stream_t *)(__stream))
 #   elif VSF_USE_STREAM == ENABLED
+typedef struct vsf_stream_tx_t vsf_stream_tx_t;
 #       define vsf_trace_init(__stream) __vsf_trace_init((vsf_stream_tx_t *)(__stream))
 #   endif
 #endif
