@@ -22,11 +22,11 @@ namespace std {
     using ::____malloc_ex;
     using ::____calloc_ex;
     using ::____realloc_ex;
-#else
+#endif
+
     using ::malloc;
     using ::calloc;
     using ::realloc;
-#endif
     using ::free;
 
     using ::getenv;
