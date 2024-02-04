@@ -82,6 +82,11 @@ static void __vsf_linux_heap_trace_alloc(vsf_linux_process_t *process, vsf_liunx
     vsf_protect_t orig = vsf_protect_sched();
         vsf_dlist_add_to_tail(vsf_liunx_heap_node_t, node, &process->heap_monitor.list, node);
         process->heap_monitor.usage += size;
+#   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_MAX == ENABLED
+        if (process->heap_monitor.usage > process->heap_monitor.max_usage) {
+            process->heap_monitor.max_usage = process->heap_monitor.usage;
+        }
+#   endif
         process->heap_monitor.balance++;
 //        vsf_trace_debug("0x%p: +%d 0x%p\n", process, node->size, ptr);
     vsf_unprotect_sched(orig);

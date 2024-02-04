@@ -1323,6 +1323,10 @@ void vsf_linux_cleanup_process(vsf_linux_process_t *process)
 
 #if     VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED\
     &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+#   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_MAX == ENABLED
+    vsf_trace_info("max heap usage for process exited is %d" VSF_TRACE_CFG_LINEEND,
+                process->heap_monitor.max_usage);
+#   endif
     if (process->heap_monitor.usage != 0) {
 #   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_QUIET != ENABLED
         vsf_trace_warning("memory leak %d bytes detected in process 0x%p, balance = %d" VSF_TRACE_CFG_LINEEND,

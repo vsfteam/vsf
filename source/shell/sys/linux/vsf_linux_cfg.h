@@ -188,6 +188,9 @@
 #       ifndef VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_QUIET
 #           define VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_QUIET               ENABLED
 #       endif
+#       ifndef VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_MAX
+#           define VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_MAX                 DISABLED
+#       endif
 #   endif
 #   ifndef VSF_LINUX_USE_GETOPT
 #       define VSF_LINUX_USE_GETOPT             ENABLED

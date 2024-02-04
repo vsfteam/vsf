@@ -250,6 +250,9 @@ typedef struct vsf_liunx_heap_node_t {
 
 typedef struct vsf_linux_heap_monitor_t {
     size_t usage;
+#   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_MAX == ENABLED
+    size_t max_usage;
+#   endif
     int balance;
     vsf_dlist_t list;
 } vsf_linux_heap_monitor_t;
