@@ -46,23 +46,25 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED                     \
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
-char * ____strdup_ex(vsf_linux_process_t *process, const char *str, const char *file, const char *func, int line)
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+char * ____strdup_ex(vsf_linux_process_t *process, const char *str
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+    , const char *file, const char *func, int line
+#   endif
+)
 {
     if (str != NULL) {
-        char *newstr = ____malloc_ex(process, strlen(str) + 1, file, func, line);
+        char *newstr = ____malloc_ex(process, strlen(str) + 1
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+            , file, func, line
+#   endif
+        );
         if (newstr != NULL) {
             strcpy(newstr, str);
         }
         return newstr;
     }
     return NULL;
-}
-#else
-char * ____strdup_ex(vsf_linux_process_t *process, const char *str, const char *file, const char *func, int line)
-{
-    return __strdup_ex(process, str);
 }
 #endif
 
@@ -184,8 +186,7 @@ const char * sigabbrev_np(int sig)
     return "unknown";
 }
 
-#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED                     \
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
 #   undef strdup
 #endif
 char * strdup(const char *str)
@@ -197,7 +198,9 @@ char * strdup(const char *str)
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_string_vplt_t, 0, 0, true),
 
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     VSF_APPLET_VPLT_ENTRY_FUNC(____strdup_ex),
+#endif
     VSF_APPLET_VPLT_ENTRY_FUNC(ffs),
     VSF_APPLET_VPLT_ENTRY_FUNC(memset),
     VSF_APPLET_VPLT_ENTRY_FUNC(strlen),

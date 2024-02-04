@@ -404,15 +404,23 @@ VSF_LINUX_APPLET_LIBC_STDLIB_IMP(realpath, char *, const char *path, char *resol
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STDLIB
 
-#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED                     \
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
 typedef struct vsf_linux_process_t vsf_linux_process_t;
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
 void * ____malloc_ex(vsf_linux_process_t *process, size_t size, const char *file, const char *func, int line);
 void * ____calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, const char *file, const char *func, int line);
 void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size, const char *file, const char *func, int line);
-#   define malloc(__size)               ____malloc_ex(NULL, (__size), __FILE__, __FUNCTION__, __LINE__)
-#   define calloc(__n, __size)          ____calloc_ex(NULL, (__n), (__size), __FILE__, __FUNCTION__, __LINE__)
-#   define realloc(__ptr, __size)       ____realloc_ex(NULL, (__ptr), (__size), __FILE__, __FUNCTION__, __LINE__)
+#       define malloc(__size)               ____malloc_ex(NULL, (__size), __FILE__, __FUNCTION__, __LINE__)
+#       define calloc(__n, __size)          ____calloc_ex(NULL, (__n), (__size), __FILE__, __FUNCTION__, __LINE__)
+#       define realloc(__ptr, __size)       ____realloc_ex(NULL, (__ptr), (__size), __FILE__, __FUNCTION__, __LINE__)
+#   else
+void * ____malloc_ex(vsf_linux_process_t *process, size_t size);
+void * ____calloc_ex(vsf_linux_process_t *process, size_t n, size_t size);
+void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size);
+#       define malloc(__size)               ____malloc_ex(NULL, (__size))
+#       define calloc(__n, __size)          ____calloc_ex(NULL, (__n), (__size))
+#       define realloc(__ptr, __size)       ____realloc_ex(NULL, (__ptr), (__size))
+#   endif
 #else
 void * malloc(size_t size);
 void * realloc(void *p, size_t size);

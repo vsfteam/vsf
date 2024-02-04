@@ -24,8 +24,7 @@ extern "C" {
 #endif
 
 #if VSF_LINUX_LIBC_CFG_WRAPPER == ENABLED
-#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR != ENABLED                     \
-    ||  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER != ENABLED
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR != ENABLED
 #define strdup              VSF_LINUX_LIBC_WRAPPER(strdup)
 #   endif
 #define strndup             VSF_LINUX_LIBC_WRAPPER(strndup)
@@ -101,8 +100,7 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string
 #define VSF_LINUX_APPLET_LIBC_STRING_IMP(...)                                   \
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_LIBC_STRING_VPLT, __VA_ARGS__)
 
-#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED                     \
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
 typedef struct vsf_linux_process_t vsf_linux_process_t;
 VSF_LINUX_APPLET_LIBC_STRING_IMP(____strdup_ex, char *, vsf_linux_process_t *process, const char *str, const char *file, const char *func, int line) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -283,11 +281,18 @@ size_t strnlen(const char *str, size_t maxlen);
 int strcmp(const char *str1, const char *str2);
 int strncmp(const char *str1, const char *str2, size_t n);
 int strverscmp(const char *str1, const char *str2);
-#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED                     \
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
 typedef struct vsf_linux_process_t vsf_linux_process_t;
-char * ____strdup_ex(vsf_linux_process_t *process, const char *str, const char *file, const char *func, int line);
-#   define strdup(__str)                ____strdup_ex(NULL, (char *)(__str), __FILE__, __FUNCTION__, __LINE__)
+char * ____strdup_ex(vsf_linux_process_t *process, const char *str
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+    , const char *file, const char *func, int line
+#   endif
+);
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+#       define strdup(__str)            ____strdup_ex(NULL, (char *)(__str), __FILE__, __FUNCTION__, __LINE__)
+#   else
+#       define strdup(__str)            ____strdup_ex(NULL, (char *)(__str))
+#   endif
 #else
 char * strdup(const char *str);
 #endif

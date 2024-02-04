@@ -243,9 +243,11 @@ typedef struct vsf_liunx_heap_node_t {
     void *ptr;
     size_t size;
 
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
     int line;
     const char *file;
     const char *func;
+#endif
 } vsf_liunx_heap_node_t;
 
 typedef struct vsf_linux_heap_monitor_t {
@@ -436,12 +438,19 @@ extern void * vsf_linux_process_heap_calloc(vsf_linux_process_t *process, size_t
 extern void vsf_linux_process_heap_free(vsf_linux_process_t *process, void *buffer);
 extern char * vsf_linux_process_heap_strdup(vsf_linux_process_t *process, char *str);
 
-#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED && VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
 extern void __free_ex(vsf_linux_process_t *process, void *ptr);
-#   define __malloc_ex(__process, __size)               ____malloc_ex((__process), (__size), __FILE__, __FUNCTION__, __LINE__)
-#   define __calloc_ex(__process, __n, __size)          ____calloc_ex((__process), (__n), (__size), __FILE__, __FUNCTION__, __LINE__)
-#   define __realloc_ex(__process, __ptr, __size)       ____realloc_ex((__process), (__ptr), (__size), __FILE__, __FUNCTION__, __LINE__)
-#   define __strdup_ex(__process, __str)                ____strdup_ex((__process), (char *)(__str), __FILE__, __FUNCTION__, __LINE__)
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+#       define __malloc_ex(__process, __size)           ____malloc_ex((__process), (__size), __FILE__, __FUNCTION__, __LINE__)
+#       define __calloc_ex(__process, __n, __size)      ____calloc_ex((__process), (__n), (__size), __FILE__, __FUNCTION__, __LINE__)
+#       define __realloc_ex(__process, __ptr, __size)   ____realloc_ex((__process), (__ptr), (__size), __FILE__, __FUNCTION__, __LINE__)
+#       define __strdup_ex(__process, __str)            ____strdup_ex((__process), (char *)(__str), __FILE__, __FUNCTION__, __LINE__)
+#   else
+#       define __malloc_ex(__process, __size)           ____malloc_ex((__process), (__size))
+#       define __calloc_ex(__process, __n, __size)      ____calloc_ex((__process), (__n), (__size))
+#       define __realloc_ex(__process, __ptr, __size)   ____realloc_ex((__process), (__ptr), (__size))
+#       define __strdup_ex(__process, __str)            ____strdup_ex((__process), (char *)(__str))
+#   endif
 #else
 #   define __malloc_ex(__process, __size)               vsf_linux_process_heap_malloc((__process), (__size))
 #   define __calloc_ex(__process, __n, __size)          vsf_linux_process_heap_calloc((__process), (__n), (__size))

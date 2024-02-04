@@ -64,8 +64,11 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-static void __vsf_linux_heap_trace_alloc(vsf_linux_process_t *process, vsf_liunx_heap_node_t *node,
-    void *ptr, size_t size, const char *file, const char *func, int line)
+static void __vsf_linux_heap_trace_alloc(vsf_linux_process_t *process, vsf_liunx_heap_node_t *node, void *ptr, size_t size
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+    , const char *file, const char *func, int line
+#   endif
+)
 {
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
@@ -74,9 +77,11 @@ static void __vsf_linux_heap_trace_alloc(vsf_linux_process_t *process, vsf_liunx
 
     node->ptr = ptr;
     node->size = size;
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
     node->file = file;
     node->func = func;
     node->line = line;
+#   endif
     vsf_dlist_init_node(vsf_liunx_heap_node_t, node, node);
 
     vsf_protect_t orig = vsf_protect_sched();
@@ -107,7 +112,6 @@ static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, vsf_liunx_
     vsf_unprotect_sched(orig);
 }
 
-#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
 void __free_ex(vsf_linux_process_t *process, void *ptr)
 {
     if (ptr != NULL) {
@@ -117,12 +121,20 @@ void __free_ex(vsf_linux_process_t *process, void *ptr)
     }
 }
 
-void * ____malloc_ex(vsf_linux_process_t *process, size_t size, const char *file, const char *func, int line)
+void * ____malloc_ex(vsf_linux_process_t *process, size_t size
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+    , const char *file, const char *func, int line
+#endif
+)
 {
     vsf_liunx_heap_node_t *node = vsf_linux_process_heap_malloc(process, size + sizeof(vsf_liunx_heap_node_t));
     if (node != NULL) {
         void *buffer = (void *)((char *)node + sizeof(vsf_liunx_heap_node_t));
-        __vsf_linux_heap_trace_alloc(process, node, buffer, size, file, func, line);
+        __vsf_linux_heap_trace_alloc(process, node, buffer, size
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+            , file, func, line
+#   endif
+        );
         return buffer;
     } else {
         errno = ENOMEM;
@@ -130,11 +142,19 @@ void * ____malloc_ex(vsf_linux_process_t *process, size_t size, const char *file
     return NULL;
 }
 
-void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size, const char *file, const char *func, int line)
+void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+    , const char *file, const char *func, int line
+#   endif
+)
 {
     if (NULL == p) {
         if (size > 0) {
-            return ____malloc_ex(process, size, file, func, line);
+            return ____malloc_ex(process, size
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+                , file, func, line
+#   endif
+            );
         }
         return NULL;
     } else if (0 == size) {
@@ -155,30 +175,22 @@ void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size, const 
     }
 }
 
-void * ____calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, const char *file, const char *func, int line)
+void * ____calloc_ex(vsf_linux_process_t *process, size_t n, size_t size
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+    , const char *file, const char *func, int line
+#   endif
+)
 {
     size_t allsize = n * size;
-    void *buf = ____malloc_ex(process, allsize, file, func, line);
+    void *buf = ____malloc_ex(process, allsize
+#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+        , file, func, line
+#   endif
+    );
     if (buf != NULL) {
         memset(buf, 0, allsize);
     }
     return buf;
-}
-#   endif
-#else
-void * ____malloc_ex(vsf_linux_process_t *process, size_t size, const char *file, const char *func, int line)
-{
-    return __malloc_ex(process, size);
-}
-
-void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size, const char *file, const char *func, int line)
-{
-    return __realloc_ex(process, p, size);
-}
-
-void * ____calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, const char *file, const char *func, int line)
-{
-    return __calloc_ex(process, n, size);
 }
 #endif
 
@@ -824,8 +836,7 @@ char *realpath(const char *path, char *resolved_path)
     return resolved_path;
 }
 
-#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED                     \
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
 #   undef malloc
 #   undef realloc
 #   undef calloc
@@ -888,8 +899,7 @@ static void __qsort(void *base, size_t nitems, size_t size, int (*compar)(const 
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_stdlib_vplt_t vsf_linux_libc_stdlib_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_stdlib_vplt_t, 0, 0, true),
 
-#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED                     \
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
+#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     VSF_APPLET_VPLT_ENTRY_FUNC(____malloc_ex),
     VSF_APPLET_VPLT_ENTRY_FUNC(____realloc_ex),
     VSF_APPLET_VPLT_ENTRY_FUNC(____calloc_ex),
