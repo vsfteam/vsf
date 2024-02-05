@@ -731,7 +731,7 @@ VSF_LINUX_APPLET_UNISTD_IMP(ttyname_r, int, int fd, char *buf, size_t buflen) {
 }
 VSF_LINUX_APPLET_UNISTD_IMP(_exit, void, int status) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    return VSF_LINUX_APPLET_UNISTD_ENTRY(_exit)(status);
+    VSF_LINUX_APPLET_UNISTD_ENTRY(_exit)(status);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(acct, int, const char *filename) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();

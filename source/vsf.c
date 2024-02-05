@@ -197,6 +197,7 @@ __VSF_VPLT_DECORATOR__ vsf_applet_vplt_t vsf_applet_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_vplt_init_array),
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_vplt_fini_array),
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_applet_remap),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_vplt_link),
 };
 #endif
 

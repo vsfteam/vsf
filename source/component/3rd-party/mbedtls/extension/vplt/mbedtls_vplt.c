@@ -45,6 +45,7 @@
 
 __VSF_VPLT_DECORATOR__ vsf_mbedtls_vplt_t vsf_mbedtls_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_mbedtls_vplt_t, 0, 0, true),
+    VSF_APPLET_VPLT_ENTRY_MOD(mbedtls, vsf_mbedtls_vplt),
 
     // <mbedtls/version.h>
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_version_get_number),
