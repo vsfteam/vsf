@@ -446,10 +446,10 @@ extern void __free_ex(vsf_linux_process_t *process, void *ptr);
 #       define __realloc_ex(__process, __ptr, __size)   ____realloc_ex((__process), (__ptr), (__size), __FILE__, __FUNCTION__, __LINE__)
 #       define __strdup_ex(__process, __str)            ____strdup_ex((__process), (char *)(__str), __FILE__, __FUNCTION__, __LINE__)
 #   else
-#       define __malloc_ex(__process, __size)           ____malloc_ex((__process), (__size))
-#       define __calloc_ex(__process, __n, __size)      ____calloc_ex((__process), (__n), (__size))
-#       define __realloc_ex(__process, __ptr, __size)   ____realloc_ex((__process), (__ptr), (__size))
-#       define __strdup_ex(__process, __str)            ____strdup_ex((__process), (char *)(__str))
+#       define __malloc_ex(__process, __size)           ____malloc_ex((__process), (__size), NULL, NULL, 0)
+#       define __calloc_ex(__process, __n, __size)      ____calloc_ex((__process), (__n), (__size), NULL, NULL, 0)
+#       define __realloc_ex(__process, __ptr, __size)   ____realloc_ex((__process), (__ptr), (__size), NULL, NULL, 0)
+#       define __strdup_ex(__process, __str)            ____strdup_ex((__process), (char *)(__str), NULL, NULL, 0)
 #   endif
 #else
 #   define __malloc_ex(__process, __size)               vsf_linux_process_heap_malloc((__process), (__size))

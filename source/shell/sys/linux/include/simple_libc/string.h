@@ -284,11 +284,7 @@ int strverscmp(const char *str1, const char *str2);
 
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
 typedef struct vsf_linux_process_t vsf_linux_process_t;
-#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
 char * ____strdup_ex(vsf_linux_process_t *process, const char *str, const char *file, const char *func, int line);
-#   else
-char * ____strdup_ex(vsf_linux_process_t *process, const char *str);
-#   endif
 #endif
 
 #if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED                     \

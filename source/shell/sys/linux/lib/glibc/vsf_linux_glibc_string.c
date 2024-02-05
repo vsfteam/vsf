@@ -47,18 +47,12 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-char * ____strdup_ex(vsf_linux_process_t *process, const char *str
-#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
-    , const char *file, const char *func, int line
-#   endif
+char * ____strdup_ex(vsf_linux_process_t *process, const char *str,
+            const char *file, const char *func, int line
 )
 {
     if (str != NULL) {
-        char *newstr = ____malloc_ex(process, strlen(str) + 1
-#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
-            , file, func, line
-#   endif
-        );
+        char *newstr = ____malloc_ex(process, strlen(str) + 1, file, func, line);
         if (newstr != NULL) {
             strcpy(newstr, str);
         }

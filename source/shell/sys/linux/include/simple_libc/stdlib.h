@@ -407,15 +407,9 @@ VSF_LINUX_APPLET_LIBC_STDLIB_IMP(realpath, char *, const char *path, char *resol
 
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
 typedef struct vsf_linux_process_t vsf_linux_process_t;
-#   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
 void * ____malloc_ex(vsf_linux_process_t *process, size_t size, const char *file, const char *func, int line);
 void * ____calloc_ex(vsf_linux_process_t *process, size_t n, size_t size, const char *file, const char *func, int line);
 void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size, const char *file, const char *func, int line);
-#   else
-void * ____malloc_ex(vsf_linux_process_t *process, size_t size);
-void * ____calloc_ex(vsf_linux_process_t *process, size_t n, size_t size);
-void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size);
-#   endif
 #endif
 
 #if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED                     \
