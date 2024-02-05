@@ -19,6 +19,11 @@
 #include <semaphore.h>
 #include <signal.h>
 #include <syslog.h>
+#include <mntent.h>
+#include <grp.h>
+#include <netdb.h>
+#include <glob.h>
+#include <errno.h>
 
 #include <sys/epoll.h>
 #include <sys/eventfd.h>
@@ -43,3 +48,12 @@
 #include <sys/times.h>
 #include <sys/utsname.h>
 #include <sys/wait.h>
+#include <sys/sysmacros.h>
+#include <sys/statfs.h>
+#include <sys/timex.h>
+#include <sys/sysinfo.h>
+#include <sys/resource.h>
+
+#include <net/if.h>
+
+#include <arpa/inet.h>
