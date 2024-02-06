@@ -249,6 +249,7 @@ typedef struct vsf_mbedtls_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_conf_session_cache);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_set_session);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_session_load);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_session_save);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_get_session_pointer);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_conf_ciphersuites);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_conf_cid);
@@ -358,10 +359,6 @@ typedef struct vsf_mbedtls_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_ciphersuite_from_id);
 #if defined(MBEDTLS_PK_C)
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_get_ciphersuite_sig_pk_alg);
-#   if defined(MBEDTLS_USE_PSA_CRYPTO)
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_get_ciphersuite_sig_pk_psa_alg);
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_get_ciphersuite_sig_pk_psa_usage);
-#   endif
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_get_ciphersuite_sig_alg);
 #endif
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mbedtls_ssl_ciphersuite_uses_ec);

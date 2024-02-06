@@ -22,6 +22,7 @@
 #if VSF_USE_MBEDTLS == ENABLED
 
 #include <mbedtls/version.h>
+#include <mbedtls/error.h>
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/net_sockets.h>
 #include <mbedtls/ssl.h>
@@ -85,7 +86,9 @@ __VSF_VPLT_DECORATOR__ vsf_mbedtls_vplt_t vsf_mbedtls_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_md5_finish_ret),
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_internal_md5_process),
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_md5_ret),
+#if defined(MBEDTLS_SELF_TEST)
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_md5_self_test),
+#endif
 
     // <mbedtls/sha1.h>
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_sha1_init),
@@ -96,7 +99,9 @@ __VSF_VPLT_DECORATOR__ vsf_mbedtls_vplt_t vsf_mbedtls_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_sha1_finish_ret),
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_internal_sha1_process),
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_sha1_ret),
+#if defined(MBEDTLS_SELF_TEST)
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_sha1_self_test),
+#endif
 
     // <mbedtls/sha256.h>
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_sha256_init),
@@ -188,6 +193,9 @@ __VSF_VPLT_DECORATOR__ vsf_mbedtls_vplt_t vsf_mbedtls_vplt = {
 #endif
 #if defined(MBEDTLS_FS_IO)
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_pk_load_file),
+#endif
+#if defined(MBEDTLS_USE_PSA_CRYPTO)
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_pk_wrap_as_opaque),
 #endif
 
     // <mbedtls/x509_crt.h>
@@ -344,6 +352,7 @@ __VSF_VPLT_DECORATOR__ vsf_mbedtls_vplt_t vsf_mbedtls_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_set_session),
 #endif
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_session_load),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_session_save),
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_get_session_pointer),
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_conf_ciphersuites),
 #if defined(MBEDTLS_SSL_DTLS_CONNECTION_ID)
@@ -515,10 +524,6 @@ __VSF_VPLT_DECORATOR__ vsf_mbedtls_vplt_t vsf_mbedtls_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_ciphersuite_from_id),
 #if defined(MBEDTLS_PK_C)
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_get_ciphersuite_sig_pk_alg),
-#   if defined(MBEDTLS_USE_PSA_CRYPTO)
-    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_get_ciphersuite_sig_pk_psa_alg),
-    VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_get_ciphersuite_sig_pk_psa_usage),
-#   endif
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_get_ciphersuite_sig_alg),
 #endif
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_ssl_ciphersuite_uses_ec),
