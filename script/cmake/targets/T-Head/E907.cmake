@@ -7,7 +7,6 @@ set(VSF_ARCH_NAME           rv64)
 
 vsf_add_compile_definitions(
     __CPU_RV__
-    __VSF64__
 )
 
 set(CMAKE_C_FLAGS 

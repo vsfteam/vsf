@@ -58,6 +58,9 @@
 
 #include <arpa/inet.h>
 
+#include <fnmatch.h>
+#include <glob.h>
+
 #if VSF_USE_MBEDTLS == ENABLED
 #   include "component/3rd-party/mbedtls/extension/vplt/mbedtls_applet_lib.inc"
 #endif

@@ -5,12 +5,16 @@
 #define LONG_BIT                        32
 #define WORD_BIT                        32
 
-#define SCHAR_MAX                       127
-#define SHRT_MAX                        32767
-#define USHRT_MAX                       65535
-#define INT_MAX                         2147483647
-#define LONG_MAX                        2147483647L
-#define LLONG_MAX                       9223372036854775807LL
+#define UCHAR_MAX                       ((unsigned char)(~0U))
+#define SCHAR_MAX                       ((signed char)(UCHAR_MAX >> 1))
+#define USHRT_MAX                       ((unsigned short)(~0U))
+#define SHRT_MAX                        ((short)(USHRT_MAX >> 1))
+#define UINT_MAX                        (~0U)
+#define INT_MAX                         ((int)(~0U >> 1))
+#define ULONG_MAX                       (~0UL)
+#define LONG_MAX                        ((long)(~0UL >> 1))
+#define ULLONG_MAX                      (~0ULL)
+#define LLONG_MAX                       ((long long)(~0ULL >> 1))
 
 #define CHAR_MIN                        SCHAR_MIN
 #define CHAR_MAX                        SCHAR_MAX
@@ -20,11 +24,6 @@
 #define INT_MIN                         (-INT_MAX - 1)
 #define LONG_MIN                        (-LONG_MAX - 1)
 #define LLONG_MIN                       (-LLONG_MAX - 1)
-
-#define UCHAR_MAX                       (SCHAR_MAX * 2 + 1)
-#define UINT_MAX                        (INT_MAX * 2U + 1U)
-#define ULONG_MAX                       (LONG_MAX * 2UL + 1UL)
-#define ULLONG_MAX                      (LLONG_MAX * 2ULL + 1ULL)
 
 #define LONG_LONG_MAX                   LLONG_MAX
 #define LONG_LONG_MIN                   LLONG_MIN
