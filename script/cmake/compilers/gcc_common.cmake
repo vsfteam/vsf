@@ -52,10 +52,6 @@ if (DEFINED GCC_SPEC)
     set(CMAKE_EXE_LINKER_FLAGS
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,--gc-sections -flto --specs=${GCC_SPEC}.specs"
         CACHE STRING "exe link flags")
-else()
-    set(CMAKE_EXE_LINKER_FLAGS
-        "${CMAKE_EXE_LINKER_FLAGS} -Wl,--gc-sections -flto"
-        CACHE STRING "exe link flags")
 endif()
 
 set(CMAKE_C_COMPILER_WORKS ON)
