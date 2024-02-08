@@ -57,6 +57,10 @@ extern "C" {
 typedef uint64_t vsf_systimer_tick_t;
 typedef uint32_t vsf_gint_state_t;
 
+#if !VSF_ARCH_SWI_NUM
+typedef int vsf_arch_prio_t;
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/

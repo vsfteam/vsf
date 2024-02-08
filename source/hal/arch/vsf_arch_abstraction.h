@@ -93,7 +93,7 @@ extern const vsf_protect_region_t vsf_protect_region_none;
 #   define  VSF_ARCH_HEADER     "./generic/linux/linux_generic.h"
 # elif  defined(__CPU_MCS51__)
 #   define  VSF_ARCH_HEADER     "./mcs51/mcs51_generic.h"
-# elif  defined(__CPU_RV__)
+# elif  defined(__CPU_RV__) || defined(__CPU_RISCV__)
 #   define  VSF_ARCH_HEADER     "./rv/rv_generic.h"
 # elif  defined(__CPU_ARM9__)
 #   define  VSF_ARCH_HEADER     "./arm/arm9/arm9_generic.h"

@@ -105,8 +105,13 @@ else()
         #${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/math
         ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/stdint
         ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/assert
-        ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/setjmp
     )
+    if((${VSF_ARCH_SERIES} STREQUAL "arm") OR (${VSF_ARCH_SERIES} STREQUAL "x64"))
+        # setjmp implementation only supports arm and x64
+        vsf_add_include_directories(
+            ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/setjmp
+        )
+    endif()
     vsf_add_sources(
 #        ${VSF_SRC_PATH}/shell/sys/linux/lib/vsf_linux_applet_lib.c
         ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/getopt/getopt_long.c

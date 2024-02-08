@@ -1,4 +1,6 @@
+# arch specified
 if(${VSF_ARCH_SERIES} STREQUAL "arm")
+elseif(${VSF_ARCH_SERIES} STREQUAL "rv")
 elseif(${VSF_ARCH_SERIES} STREQUAL "x86")
 elseif(${VSF_ARCH_SERIES} STREQUAL "x64")
 elseif(${VSF_ARCH_SERIES} STREQUAL "generic")

@@ -188,6 +188,13 @@ not what you want, please disable VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE."
 #   else
 #       define __VSF_OS_SWI_NUM                             (VSF_SWI_NUM + VSF_USR_SWI_NUM)
 #   endif
+#   ifndef VSF_OS_CFG_ADD_EVTQ_TO_IDLE
+#       if __VSF_OS_SWI_NUM > 0
+#           define VSF_OS_CFG_ADD_EVTQ_TO_IDLE              DISABLED
+#       else
+#           define VSF_OS_CFG_ADD_EVTQ_TO_IDLE              ENABLED
+#       endif
+#   endif
 #   if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
 #       define VSF_OS_CFG_PRIORITY_NUM                      (__VSF_OS_SWI_NUM + 1)
 #   else
@@ -197,6 +204,9 @@ not what you want, please disable VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE."
 #   warning "VSF_OS_CFG_PRIORITY_NUM is defined while __VSF_OS_SWI_NUM is not \
 automatically calculated based on VSF_OS_CFG_PRIORITY_NUM in vsf_cfg.h. This \
 should not happen."
+#   ifndef VSF_OS_CFG_ADD_EVTQ_TO_IDLE
+#       define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                  DISABLED
+#   endif
 #   if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
 #       define __VSF_OS_SWI_NUM                             (VSF_OS_CFG_PRIORITY_NUM - 1)
 #   else
@@ -207,6 +217,9 @@ should not happen."
 calculated from macro VSF_OS_CFG_PRIORITY_NUM. Please define \
 VSF_OS_CFG_PRIORITY_NUM in your vsf_usr_cfg.h (or any configuration header file \
 included by vsf_usr_cfg.h)"
+#   ifndef VSF_OS_CFG_ADD_EVTQ_TO_IDLE
+#       define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                  DISABLED
+#   endif
 #   if VSF_OS_CFG_ADD_EVTQ_TO_IDLE == ENABLED
 #       define VSF_OS_CFG_PRIORITY_NUM                      (__VSF_OS_SWI_NUM + 1)
 #   else
@@ -217,12 +230,6 @@ included by vsf_usr_cfg.h)"
 
 #ifndef VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED
 #   define VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED      ENABLED
-#endif
-#ifndef VSF_OS_CFG_ADD_EVTQ_TO_IDLE
-/*! \note VSF_OS_CFG_ADD_EVTQ_TO_IDLE is disabled by default, because
-          tasks in idle evtq does not support dynamic priority feature
-*/
-#   define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                      DISABLED
 #endif
 
 #if     __VSF_OS_SWI_NUM > (VSF_USR_SWI_NUM + VSF_SWI_NUM)                      \

@@ -30,7 +30,7 @@
 #   include "./mcs51/mcs51_compiler.h"
 #elif   defined(__CPU_X86__) || defined(__CPU_X64__) || defined(__CPU_WEBASSEMBLY__)
 #   include "./x86/x86_compiler.h"
-#elif   defined(__CPU_RV__)
+#elif   defined(__CPU_RV__) || defined(__CPU_RISCV__)
 #   include "./rv/rv_compiler.h"
 #else
 //#warning No specified MCU type! use default which support gcc/clang only
