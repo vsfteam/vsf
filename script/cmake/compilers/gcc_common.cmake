@@ -32,21 +32,9 @@ set(CMAKE_CXX_FLAGS
 #   -O3       Optimize most
 #   -Og       Optimize for debug
 #   -Ofast    Optimize for speed
-if (DEFINED GCC_C_OPTIMIZATION)
-    set(CMAKE_C_FLAGS_DEBUG ${GCC_C_OPTIMIZATION} CACHE STRING "c debug compiler flags")
-else()
-    set(CMAKE_C_FLAGS_DEBUG "-Og -g3" CACHE STRING "c debug compiler flags")
-endif()
-if (DEFINED GCC_CXX_OPTIMIZATION)
-    set(CMAKE_CXX_FLAGS_DEBUG ${GCC_CXX_OPTIMIZATION} CACHE STRING "cxx debug compiler flags")
-else()
-    set(CMAKE_CXX_FLAGS_DEBUG "-Og -g3" CACHE STRING "cxx debug compiler flags")
-endif()
-if (DEFINED GCC_ASM_OPTIMIZATION)
-    set(CMAKE_ASM_FLAGS_DEBUG ${GCC_ASM_OPTIMIZATION} CACHE STRING "asm debug compiler flags")
-else()
-    set(CMAKE_ASM_FLAGS_DEBUG "-g" CACHE INTERNAL "asm debug compiler flags")
-endif()
+set(CMAKE_C_FLAGS_DEBUG "-Og -g3" CACHE STRING "c debug compiler flags")
+set(CMAKE_CXX_FLAGS_DEBUG "-Og -g3" CACHE STRING "cxx debug compiler flags")
+set(CMAKE_ASM_FLAGS_DEBUG "-g" CACHE INTERNAL "asm debug compiler flags")
 
 if (DEFINED GCC_SPEC)
     set(CMAKE_EXE_LINKER_FLAGS
