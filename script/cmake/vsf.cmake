@@ -127,6 +127,6 @@ else()
 endif()
 
 # libraries MUST be placed at the end
-#vsf_add_libraries(
-#    m
-#)
+vsf_add_libraries(
+    m
+)
