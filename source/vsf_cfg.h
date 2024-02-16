@@ -334,6 +334,7 @@ typedef struct vsf_applet_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_vplt_fini_array);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_applet_remap);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_vplt_link);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_vplt_load_dyn);
 } vsf_applet_vplt_t;
 extern __VSF_VPLT_DECORATOR__ vsf_applet_vplt_t vsf_applet_vplt;
 
