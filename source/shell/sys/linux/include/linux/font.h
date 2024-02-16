@@ -25,6 +25,16 @@ struct font_data {
     const unsigned char data[];
 } PACKED;
 
+typedef struct vsf_linux_font_vplt_t {
+    vsf_vplt_info_t info;
+
+    // self
+    VSF_APPLET_VPLT_ENTRY_MOD_DEF(linux_font);
+
+    VSF_APPLET_VPLT_ENTRY_VAR_DEF(font_vga_8x8);
+    VSF_APPLET_VPLT_ENTRY_VAR_DEF(font_vga_8x16);
+} vsf_linux_font_vplt_t;
+
 #ifdef __cplusplus
 }
 #endif

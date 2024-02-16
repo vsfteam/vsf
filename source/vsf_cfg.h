@@ -159,6 +159,8 @@ typedef struct vsf_vplt_entry_t {
     vsf_vplt_entry_t var_##__NAME
 #define VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(__VPLT, __NAME)                        \
     ((__##__NAME##_prototype_t)((__VPLT)->fn_##__NAME.ptr))
+#define VSF_APPLET_VPLT_ENTRY_VAR_ENTRY(__VPLT, __NAME)                         \
+    ((__VPLT)->var_##__NAME.ptr)
 #if VSF_APPLET_CFG_DEBUG_VPLT == ENABLED
 #   define VSF_APPLET_VPLT_ENTRY_FUNC_TRACE()                                   \
     vsf_vplt_trace("vplt invoke: %s\n", __FUNCTION__)

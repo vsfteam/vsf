@@ -101,6 +101,13 @@ static void * __vsf_vplt_link(void *vplt, char *symname)
 WEAK(vsf_vplt_link)
 void * vsf_vplt_link(void *vplt, char *symname)
 {
+    if (NULL == vplt) {
+#if VSF_USE_LINUX == ENABLED
+        vplt = (void *)&vsf_linux_vplt;
+#else
+        vplt = (void *)&vsf_vplt;
+#endif
+    }
     return __vsf_vplt_link(vplt, symname);
 }
 
