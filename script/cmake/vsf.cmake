@@ -107,16 +107,28 @@ else()
             ${VSF_SRC_PATH}/shell/sys/linux/include/simple_libc/setjmp
         )
     endif()
-    vsf_add_sources(
+    if(VSF_APPLET_USE_GETOPT)
+        vsf_add_sources(
+            ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/getopt/getopt_long.c
+        )
+    endif()
+    if(VSF_APPLET_USE_REGEX)
+        vsf_add_sources(
+            ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regcomp.c
+            ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regerror.c
+            ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regexec.c
+            ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regfree.c
+        )
+    endif()
+    if(VSF_APPLET_USE_CTYPE)
+        vsf_add_sources(
+            # for __vsf_linux_ctype used in ctype.h
+            ${VSF_SRC_PATH}/shell/sys/linux/lib/glibc/vsf_linux_glibc_ctype.c
+        )
+    endif()
+#    vsf_add_sources(
 #        ${VSF_SRC_PATH}/shell/sys/linux/lib/vsf_linux_applet_lib.c
-        ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/getopt/getopt_long.c
-        ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regcomp.c
-        ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regerror.c
-        ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regexec.c
-        ${VSF_SRC_PATH}/shell/sys/linux/lib/3rd-party/regex/regfree.c
-        # for __vsf_linux_ctype used in ctype.h
-        ${VSF_SRC_PATH}/shell/sys/linux/lib/glibc/vsf_linux_glibc_ctype.c
-    )
+#    )
 
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
         SUFFIX ".elf"
