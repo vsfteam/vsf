@@ -16,6 +16,9 @@ extern "C" {
 #define getrandom               VSF_LINUX_WRAPPER(getrandom)
 #endif
 
+#define GRND_NONBLOCK           0x0001
+#define GRND_RANDOM             0x0002
+
 #if VSF_LINUX_APPLET_USE_SYS_RANDOM == ENABLED
 typedef struct vsf_linux_sys_random_vplt_t {
     vsf_vplt_info_t info;
