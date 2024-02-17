@@ -367,6 +367,7 @@ typedef struct vsf_linux_fundmental_vplt_t {
 #endif
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_linux_get_cur_process);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_linux_loader_keep_ram);
 } vsf_linux_fundmental_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_vplt;
@@ -406,6 +407,12 @@ VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_linux_get_cur_process, vsf_linux_process_t *
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_FUNDMENTAL_ENTRY(vsf_linux_get_cur_process)();
 }
+#   if VSF_USE_LOADER == ENABLED
+VSF_LINUX_APPLET_FUNDMENTAL_IMP(vsf_linux_loader_keep_ram, void, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    VSF_LINUX_APPLET_FUNDMENTAL_ENTRY(vsf_linux_loader_keep_ram)();
+}
+#   endif
 
 #else
 
@@ -419,6 +426,9 @@ extern int vsf_linux_dynlib_ctx_set(const vsf_linux_dynlib_mod_t *mod, void *ctx
 
 // open vsf_linux_get_cur_process for process-related variables like optarg, etc
 extern vsf_linux_process_t * vsf_linux_get_cur_process(void);
+#   if VSF_USE_LOADER == ENABLED
+extern void vsf_linux_loader_keep_ram(void);
+#   endif
 
 #endif
 

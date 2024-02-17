@@ -4347,6 +4347,16 @@ static void __vsf_linux_loader_atexit(void)
 
     dlclose(linux_loader);
 }
+
+void vsf_linux_loader_keep_ram(void)
+{
+    vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    VSF_LINUX_ASSERT(process != NULL);
+    vsf_linux_dynloader_t *linux_loader = process->loader;
+    VSF_LINUX_ASSERT(linux_loader != NULL);
+
+    linux_loader->loader.generic.static_base = NULL;
+}
 #endif
 
 void * dlopen(const char *pathname, int mode)
@@ -4580,6 +4590,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_fundmental_vplt_t vsf_linux_fundmental_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_linux_dynlib_ctx_set),
 #endif
     VSF_APPLET_VPLT_ENTRY_FUNC(vsf_linux_get_cur_process),
+#if VSF_USE_LOADER == ENABLED
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_linux_loader_keep_ram),
+#endif
 };
 #endif
 
