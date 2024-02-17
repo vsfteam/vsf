@@ -61,3 +61,6 @@
 [submodule "source/shell/sys/luatos/raw"]
 	path = source/shell/sys/luatos/raw
 	url = ../LuatOS
+[submodule "source/component/3rd-party/qrcode/raw"]
+	path = source/component/3rd-party/qrcode/raw
+	url = ../QRCode
