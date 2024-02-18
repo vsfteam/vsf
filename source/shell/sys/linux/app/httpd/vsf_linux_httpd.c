@@ -935,10 +935,10 @@ void * vsf_linux_httpd_thread(void *param)
 
             uint8_t *ptr;
             uint_fast32_t size;
-            bool is_socket_accessable, is_stream_accessable;
+            bool is_socket_accessable, is_stream_accessable, socket_readable;
 
             // can write to stream_in or can read from socket, mutual exclusive events
-            is_socket_accessable = FD_ISSET(_->fd_socket, &rfds);
+            socket_readable = is_socket_accessable = FD_ISSET(_->fd_socket, &rfds);
             is_stream_accessable = (_->fd_stream_in >= 0) && FD_ISSET(_->fd_stream_in, &wfds);
             if (is_socket_accessable || is_stream_accessable) {
                 VSF_LINUX_ASSERT(   (is_socket_accessable && !is_stream_accessable)
@@ -998,10 +998,13 @@ void * vsf_linux_httpd_thread(void *param)
                                 ||  (!is_socket_accessable && is_stream_accessable));
                 if (is_socket_accessable) {
                     vsf_linux_httpd_trace_event(MODULE_NAME ": socket tx event." VSF_TRACE_CFG_LINEEND);
+                    if (!socket_readable) {
+                        fd_num--;
+                    }
                 } else {
                     vsf_linux_httpd_trace_event(MODULE_NAME ": stream rx event." VSF_TRACE_CFG_LINEEND);
+                    fd_num--;
                 }
-                fd_num--;
 
                 stream = _->request.stream_out;
                 VSF_LINUX_ASSERT(stream != NULL);
