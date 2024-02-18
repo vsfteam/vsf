@@ -662,6 +662,13 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
     if (type == NETCONN_TCP) {
         size_t written = 0;
         err_t err = netconn_write_partly(conn, buffer, size, NETCONN_COPY, &written);
+        if (ERR_WOULDBLOCK == err) {
+            // ERR_WOULDBLOCK because of too much data in non-block mode,
+            //  send again in block mode as a workaround
+            netconn_set_nonblocking(conn, 0);
+            err = netconn_write_partly(conn, buffer, size, 0, &written);
+            netconn_set_nonblocking(conn, 1);
+        }
         int sockerr = __netconn_return(err);
         return sockerr ? sockerr : written;
     } else if ((type == NETCONN_UDP) || (type == NETCONN_RAW)) {
