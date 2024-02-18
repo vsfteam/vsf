@@ -106,7 +106,8 @@ typedef enum vsf_linux_httpd_mime_t {
     VSF_LINUX_HTTPD_MIME_APP_TAR,
     VSF_LINUX_HTTPD_MIME_APP_ZIP,
     VSF_LINUX_HTTPD_MIME_APP_JSON,
-    VSF_LINUX_HTTPD_MIME_NUM = VSF_LINUX_HTTPD_MIME_APP_JSON,
+    VSF_LINUX_HTTPD_MIME_ANY,
+    VSF_LINUX_HTTPD_MIME_NUM = VSF_LINUX_HTTPD_MIME_ANY,
 } vsf_linux_httpd_mime_t;
 
 dcl_vsf_bitmap(vsf_linux_httpd_mime_map_t, VSF_LINUX_HTTPD_MIME_NUM)

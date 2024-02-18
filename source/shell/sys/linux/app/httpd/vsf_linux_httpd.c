@@ -176,6 +176,7 @@ static const char * __vsf_linux_httpd_mime[VSF_LINUX_HTTPD_MIME_NUM] = {
     [VSF_LINUX_HTTPD_MIME_APP_TAR - 1]      = "application/x-tar",
     [VSF_LINUX_HTTPD_MIME_APP_ZIP - 1]      = "application/zip",
     [VSF_LINUX_HTTPD_MIME_APP_JSON - 1]     = "application/json",
+    [VSF_LINUX_HTTPD_MIME_ANY - 1]          = "*/*",
 };
 
 // valid vsf_linux_httpd_charset_t starts from 1, so minus 1 as index
@@ -707,6 +708,7 @@ static void __vsf_linux_httpd_stream_evthandler(vsf_stream_t *no_used, void *par
                 goto __error;
             }
             if (    (session->request.mime != VSF_LINUX_HTTPD_MIME_INVALID)
+                &&  !vsf_bitmap_get(session->request.mime_map, VSF_LINUX_HTTPD_MIME_ANY)
                 &&  !vsf_bitmap_get(session->request.mime_map, session->request.mime)) {
                 session->request.response = VSF_LINUX_HTTPD_NOT_ACCEPTABLE;
             }
