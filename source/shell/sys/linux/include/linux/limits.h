@@ -17,7 +17,9 @@ extern "C" {
 
 #define NAME_MAX                255
 #define PHYS_ADDR_MAX           (~(phys_addr_t)0)
-#define PIPE_BUF                4096
+#ifndef PIPE_BUF
+#   define PIPE_BUF             4096
+#endif
 
 #define U8_MAX                  ((u8)~0U)
 #define S8_MAX                  ((s8)(U8_MAX >> 1))
