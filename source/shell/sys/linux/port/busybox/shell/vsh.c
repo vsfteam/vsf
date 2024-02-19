@@ -880,10 +880,22 @@ int echo_main(int argc, char *argv[])
 {
     argv++;
     argc--;
+
+    bool skip_tail_new_line = false;
+    while ((argc > 0) && ('-' == argv[0][0])) {
+        if (('n' == argv[0][1]) && ('\0' == argv[0][2])) {
+            skip_tail_new_line = true;
+        } else {
+            break;
+        }
+        argv++;
+        argc--;
+    }
+
     while (argc-- > 0) {
         printf("%s%s", *argv++, argc > 0 ? " " : "");
     }
-    if (isatty(STDOUT_FILENO)) {
+    if (!skip_tail_new_line) {
         printf(VSH_LINEEND);
     }
     return 0;

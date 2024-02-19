@@ -1475,6 +1475,11 @@ static ssize_t __vsf_linux_gpio_write(vsf_linux_fd_t *sfd, const void *buf, size
     vsf_linux_gpio_priv_t *gpio_priv = (vsf_linux_gpio_priv_t *)sfd->priv;
     vk_file_t *file = gpio_priv->file;
 
+    // remove \n from echo
+    if ('\n' == ((char *)buf)[count - 1]) {
+        count--;
+    }
+
     if (!strcmp(file->name, "export")) {
         char path[4 + 3 + 1];
         vk_file_t *dir = vk_file_get_parent(file), *gpio_dir;
@@ -1546,14 +1551,14 @@ static ssize_t __vsf_linux_gpio_write(vsf_linux_fd_t *sfd, const void *buf, size
         vk_file_close(dir);
         rmdir(path);
     } else if (!strcmp(file->name, "direction")) {
-        if (!strcmp((char *)buf, "in")) {
+        if (!strncmp((char *)buf, "in", count)) {
             vsf_gpio_set_input(gpio_priv->port, 1 << gpio_priv->pin);
-        } else if (!strcmp((char *)buf, "out")) {
+        } else if (!strncmp((char *)buf, "out", count)) {
             vsf_gpio_set_output(gpio_priv->port, 1 << gpio_priv->pin);
-        } else if (!strcmp((char *)buf, "high")) {
+        } else if (!strncmp((char *)buf, "high", count)) {
             vsf_gpio_set(gpio_priv->port, 1 << gpio_priv->pin);
             vsf_gpio_set_output(gpio_priv->port, 1 << gpio_priv->pin);
-        } else if (!strcmp((char *)buf, "low")) {
+        } else if (!strncmp((char *)buf, "low", count)) {
             vsf_gpio_clear(gpio_priv->port, 1 << gpio_priv->pin);
             vsf_gpio_set_output(gpio_priv->port, 1 << gpio_priv->pin);
         }
