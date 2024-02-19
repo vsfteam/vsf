@@ -80,6 +80,13 @@ include(${VSF_CMAKE_ROOT}/compilers.cmake)
 if(NOT VSF_APPLET)
     add_subdirectory(${VSF_SRC_PATH} ${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
     link_directories(${CMAKE_CURRENT_BINARY_DIR}/vsf_bin)
+
+    # libraries are not always suitable for xip elfloader, because relocate to .text sections will maybe generated.
+    #   So do not use libraries in applet mode.
+    # libraries MUST be placed at the end
+    vsf_add_libraries(
+        m
+    )
 else()
     if(NOT VSF_USE_LINUX)
         message(WARNING "VSF_APPLET is for vsf.linux, so VSF_USE_LINUX MUST be enabled")
@@ -137,8 +144,3 @@ else()
         COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
     )
 endif()
-
-# libraries MUST be placed at the end
-vsf_add_libraries(
-    m
-)
