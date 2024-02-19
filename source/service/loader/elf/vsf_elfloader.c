@@ -420,7 +420,11 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_loader_targe
             if (parse_only) { continue; }
         } else {
         no_tgtvalue:
-            vsf_trace_error("unable to calculate target value" VSF_TRACE_CFG_LINEEND);
+            if (relsym != 0) {
+                vsf_trace_error("unable to calculate target value for %s" VSF_TRACE_CFG_LINEEND, symname);
+            } else {
+                vsf_trace_error("unable to calculate target value at 0x%X" VSF_TRACE_CFG_LINEEND, u.rel->r_offset);
+            }
             return -1;
         }
 
@@ -440,7 +444,11 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_loader_targe
         }
 
         if (vsf_elfloader_arch_relocate_sym(elfloader, (Elf_Addr)elfloader->ram_base + u.rel->r_offset - elfloader->ram_base_vaddr, reltype, tgtvalue) < 0) {
-            vsf_trace_error("fail to relocate %s" VSF_TRACE_CFG_LINEEND, symname);
+            if (relsym != 0) {
+                vsf_trace_error("fail to relocate %s" VSF_TRACE_CFG_LINEEND, symname);
+            } else {
+                vsf_trace_error("fail to relocate at 0x%X" VSF_TRACE_CFG_LINEEND, u.rel->r_offset);
+            }
             return -1;
         }
     }
