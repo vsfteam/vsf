@@ -5022,6 +5022,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_GLOB == ENABLED
 #       include "./include/glob.h"
 #   endif
+#   if VSF_LINUX_APPLET_USE_REGEX == ENABLED
+#       include "./include/regex.h"
+#   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED
 #       define __SIMPLE_LIBC_MATH_VPLT_ONLY__
 #       include "./include/simple_libc/math/math.h"
@@ -5086,6 +5089,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_GLOB == ENABLED
 #       include <glob.h>
 #   endif
+#   if VSF_LINUX_APPLET_USE_REGEX == ENABLED
+#       include <regex.h>
+#   endif
 #   if VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED
 #       define __SIMPLE_LIBC_MATH_VPLT_ONLY__
 #       include <math/math.h>
@@ -5134,6 +5140,17 @@ __VSF_VPLT_DECORATOR__ vsf_linux_glob_vplt_t vsf_linux_glob_vplt = {
 
     VSF_APPLET_VPLT_ENTRY_FUNC(glob),
     VSF_APPLET_VPLT_ENTRY_FUNC(globfree),
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_REGEX == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_regex_vplt_t vsf_linux_regex_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_regex_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(regcomp),
+    VSF_APPLET_VPLT_ENTRY_FUNC(regerror),
+    VSF_APPLET_VPLT_ENTRY_FUNC(regexec),
+    VSF_APPLET_VPLT_ENTRY_FUNC(regfree),
 };
 #endif
 
@@ -5326,6 +5343,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #endif
 #if VSF_LINUX_APPLET_USE_GLOB == ENABLED
     .glob_vplt          = (void *)&vsf_linux_glob_vplt,
+#endif
+#if VSF_LINUX_APPLET_USE_REGEX == ENABLED
+    .regex_vplt         = (void *)&vsf_linux_regex_vplt,
 #endif
 #if VSF_LINUX_SOCKET_USE_INET == ENABLED && VSF_LINUX_APPLET_USE_NETDB == ENABLED
     .netdb_vplt         = (void *)&vsf_linux_netdb_vplt,

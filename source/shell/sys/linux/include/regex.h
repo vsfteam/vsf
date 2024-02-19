@@ -94,11 +94,64 @@ typedef struct {
 #define	REG_LARGE	01000	/* force large representation */
 #define	REG_BACKR	02000	/* force use of backref code */
 
+#if VSF_LINUX_APPLET_USE_REGEX == ENABLED
+typedef struct vsf_linux_regex_vplt_t {
+    vsf_vplt_info_t info;
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(regcomp);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(regerror);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(regexec);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(regfree);
+} vsf_linux_regex_vplt_t;
+#   ifndef __VSF_APPLET__
+extern __VSF_VPLT_DECORATOR__ vsf_linux_regex_vplt_t vsf_linux_regex_vplt;
+#   endif
+#endif
+
+#if     defined(__VSF_APPLET__) && (defined(__VSF_APPLET_LIB__) || defined(__VSF_APPLET_LINUX_REGEX_LIB__))\
+    &&  VSF_APPLET_CFG_ABI_PATCH != ENABLED && VSF_LINUX_APPLET_USE_REGEX == ENABLED
+
+#ifndef VSF_LINUX_APPLET_REGEX_VPLT
+#   if VSF_LINUX_USE_APPLET == ENABLED
+#       define VSF_LINUX_APPLET_REGEX_VPLT                                      \
+            ((vsf_linux_regex_vplt_t *)(VSF_LINUX_APPLET_VPLT->regex_vplt))
+#   else
+#       define VSF_LINUX_APPLET_REGEX_VPLT                                      \
+            ((vsf_linux_regex_vplt_t *)vsf_vplt((void *)0))
+#   endif
+#endif
+
+#define VSF_LINUX_APPLET_REGEX_ENTRY(__NAME)                                    \
+            VSF_APPLET_VPLT_ENTRY_FUNC_ENTRY(VSF_LINUX_APPLET_REGEX_VPLT, __NAME)
+#define VSF_LINUX_APPLET_REGEX_IMP(...)                                         \
+            VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_REGEX_VPLT, __VA_ARGS__)
+
+VSF_LINUX_APPLET_REGEX_IMP(regcomp, int, regex_t *preg, const char *regex, int cflags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_REGEX_ENTRY(regcomp)(preg, regex, cflags);
+}
+VSF_LINUX_APPLET_REGEX_IMP(regerror, size_t, int errcode, const regex_t *preg, char *errbuf, size_t errbuf_size) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_REGEX_ENTRY(regerror)(errcode, preg, errbuf, errbuf_size);
+}
+VSF_LINUX_APPLET_REGEX_IMP(regexec, int, const regex_t *preg, const char *string, size_t nmatch, regmatch_t pmatch[], int eflags) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_REGEX_ENTRY(regexec)(preg, string, nmatch, pmatch, eflags);
+}
+VSF_LINUX_APPLET_REGEX_IMP(regfree, void, regex_t *preg) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    VSF_LINUX_APPLET_REGEX_ENTRY(regfree)(preg);
+}
+
+#else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_GLOB
+
 __BEGIN_DECLS
 int	regcomp(regex_t *, const char *, int);
 size_t	regerror(int, const regex_t *, char *, size_t);
 int	regexec(const regex_t *, const char *, size_t, regmatch_t [], int);
 void	regfree(regex_t *);
 __END_DECLS
+
+#endif
 
 #endif /* !_REGEX_H_ */

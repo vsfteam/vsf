@@ -205,6 +205,9 @@
 #   ifndef VSF_LINUX_APPLET_USE_GLOB
 #       define VSF_LINUX_APPLET_USE_GLOB        ENABLED
 #   endif
+#   ifndef VSF_LINUX_APPLET_USE_REGEX
+#       define VSF_LINUX_APPLET_USE_REGEX       ENABLED
+#   endif
 #   ifndef VSF_LINUX_APPLET_USE_MNTENT
 #       define VSF_LINUX_APPLET_USE_MNTENT      ENABLED
 #   endif
@@ -491,7 +494,7 @@ typedef struct vsf_linux_vplt_t {
     void *grp_vplt;
     void *net_if_vplt;
     void *pty_vplt;
-    void *unix_res1_vplt;
+    void *regex_vplt;
     void *unix_res2_vplt;
     void *unix_res3_vplt;
     void *unix_res4_vplt;
