@@ -143,6 +143,7 @@ static const __vsf_linux_httpd_strmapper_t __vsf_linux_httpd_mime_mapper[] = {
     __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_APP_TAR,        "tar"),
     __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_APP_ZIP,        "zip"),
     __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_APP_JSON,       "json"),
+    __vsf_linux_httpd_def_mime(VSF_LINUX_HTTPD_MIME_APP_WASM,       "wasm"),
 };
 
 static const __vsf_linux_httpd_strmapper_t __vsf_linux_httpd_encoding_mapper[] = {
@@ -176,6 +177,7 @@ static const char * __vsf_linux_httpd_mime[VSF_LINUX_HTTPD_MIME_NUM] = {
     [VSF_LINUX_HTTPD_MIME_APP_TAR - 1]      = "application/x-tar",
     [VSF_LINUX_HTTPD_MIME_APP_ZIP - 1]      = "application/zip",
     [VSF_LINUX_HTTPD_MIME_APP_JSON - 1]     = "application/json",
+    [VSF_LINUX_HTTPD_MIME_APP_WASM - 1]     = "application/wasm",
     [VSF_LINUX_HTTPD_MIME_ANY - 1]          = "*/*",
 };
 
