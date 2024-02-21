@@ -21,6 +21,12 @@
 
 #if VSF_USE_BTSTACK == ENABLED
 
+#define __VSF_EDA_CLASS_INHERIT__
+
+#include "hal/vsf_hal.h"
+#include "kernel/vsf_kernel.h"
+#include "service/vsf_service.h"
+
 // TODO: check dependency
 
 #include "btstack_config.h"
@@ -38,22 +44,20 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-struct hci_transport_h4_param_t {
+typedef struct hci_transport_h4_param_t {
     bool opened;
     void (*packet_handler)(uint8_t packet_type, uint8_t *packet, uint16_t size);
 
     struct {
-        struct vsf_bufstream_t stream;
-        struct vsf_buffer_t buffer;
+        vsf_mem_stream_t stream;
+        vsf_mem_t buffer;
         uint32_t type;        // 32-bit aligned 8-bit data
         bool sending;
     } tx;
-    struct
-    {
-        struct vsf_bufstream_t stream;
+    struct {
+        vsf_mem_stream_t stream;
         uint8_t buffer[HCI_INCOMING_PRE_SIZE + HCI_INCOMING_PACKET_BUFFER_SIZE];
-        enum
-        {
+        enum {
             HCI_RX_IDLE = 0,
             HCI_RX_TYPE,
             HCI_RX_HEADER,
@@ -61,28 +65,33 @@ struct hci_transport_h4_param_t {
             HCI_RX_RECEIVED,
         } state;
     } rx;
-    struct vsf_usart_stream_t *usart_stream;
-    struct vsfsm_t sm;
-} static hci_transport_h4_param;
 
-#define HCI_EVT_IN                        (VSFSM_EVT_USER + 0)
-#define HCI_EVT_OUT                        (VSFSM_EVT_USER + 1)
+    vsf_usart_cfg_t usart_cfg;
+    vsf_usart_stream_t *usart_stream;
 
-static void hci_transport_h4_on_in(void *param)
+    vsf_eda_t eda;
+} hci_transport_h4_param_t;
+static hci_transport_h4_param_t __hci_transport_h4_param;
+
+#define HCI_EVT_IN                          (VSF_EVT_USER + 0)
+#define HCI_EVT_OUT                         (VSF_EVT_USER + 1)
+
+static void __hci_transport_h4_on_in(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
-    struct hci_transport_h4_param_t *h4param =
-            (struct hci_transport_h4_param_t *)param;
-    struct vsf_bufstream_t *bufstream = &h4param->rx.stream;
+    hci_transport_h4_param_t *h4param = (hci_transport_h4_param_t *)param;
     uint8_t *ptr = &h4param->rx.buffer[HCI_INCOMING_PRE_SIZE];
-    struct vsf_buffer_t buffer;
+    vsf_mem_t buffer;
 
-    if (h4param->opened)
-    {
-        if (VSF_STREAM_GET_FREE_SIZE(bufstream))
+    if (evt != VSF_STREAM_ON_IN) {
+        return;
+    }
+
+    if (h4param->opened) {
+        if (VSF_STREAM_GET_FREE_SIZE(stream)) {
             return;
+        }
 
-        switch (h4param->rx.state)
-        {
+        switch (h4param->rx.state) {
         case HCI_RX_IDLE:
         hci_transport_h4_idle:
             h4param->rx.state++;
@@ -110,10 +119,9 @@ static void hci_transport_h4_on_in(void *param)
             }
             break;
         case HCI_RX_HEADER:
-            switch (ptr[0])
-            {
+            switch (ptr[0]) {
             case HCI_ACL_DATA_PACKET:
-                buffer.size = GET_LE_U16(&ptr[3]);
+                buffer.size = get_unaligned_le16(&ptr[3]);
                 buffer.buffer = &ptr[1 + HCI_ACL_HEADER_SIZE];
                 if (HCI_ACL_HEADER_SIZE + buffer.size > HCI_INCOMING_PACKET_BUFFER_SIZE)
                     goto hci_transport_h4_reset;
@@ -129,169 +137,166 @@ static void hci_transport_h4_on_in(void *param)
             }
 
             h4param->rx.state++;
-            if (buffer.size)
+            if (buffer.size) {
                 break;
+            }
         case HCI_RX_DATA:
             h4param->rx.state++;
-            vsfsm_post_evt_pending(&h4param->sm, HCI_EVT_IN);
+            vsf_eda_post_evt(&h4param->eda, HCI_EVT_IN);
         case HCI_RX_RECEIVED:
             return;
         }
-        VSF_STREAM_READ(bufstream, &buffer);
+        VSF_STREAM_READ(stream, buffer.buffer, buffer.size);
     }
 }
 
-static void hci_transport_h4_on_out(void *param)
+static void __hci_transport_h4_on_out(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
-    struct hci_transport_h4_param_t *h4param =
-            (struct hci_transport_h4_param_t *)param;
-    struct vsf_bufstream_t *bufstream = &h4param->tx.stream;
+    hci_transport_h4_param_t *h4param = (hci_transport_h4_param_t *)param;
 
-    if (h4param->opened)
-    {
-        if (VSF_STREAM_GET_DATA_SIZE(bufstream))
+    if (evt != VSF_STREAM_ON_OUT) {
+        return;
+    }
+
+    if (h4param->opened) {
+        if (VSF_STREAM_GET_DATA_SIZE(stream)) {
             return;
-        vsfsm_post_evt_pending(&h4param->sm, HCI_EVT_OUT);
+        }
+        vsf_eda_post_evt(&h4param->eda, HCI_EVT_OUT);
     }
 }
 
-static struct vsfsm_state_t *hci_transport_h4_evt_handler(struct vsfsm_t *sm,
-        vsfsm_evt_t evt)
+static void __hci_transport_h4_evt_handler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    struct hci_transport_h4_param_t *h4param =
-            (struct hci_transport_h4_param_t *)sm->user_data;
-    struct vsf_bufstream_t *bufstream;
+    hci_transport_h4_param_t *h4param = container_of(eda, hci_transport_h4_param_t, eda);
+    vsf_mem_stream_t *stream;
     uint8_t *ptr;
 
-    switch (evt)
-    {
-    case VSFSM_EVT_INIT:
-        {
-            struct vsf_usart_stream_t *usart_stream = h4param->usart_stream;
-            struct vsf_stream_t *stream;
+    switch (evt) {
+    case VSF_EVT_INIT: {
+            vsf_usart_stream_t *usart_stream = h4param->usart_stream;
+            vsf_stream_t *stream;
 
-            h4param->tx.stream.mem.read = true;
-            stream = usart_stream->stream_tx = &h4param->tx.stream.stream;
-            stream->op = &vsf_bufstream_op;
-            stream->callback_tx.param = &hci_transport_h4_param;
-            stream->callback_tx.on_inout = hci_transport_h4_on_out;
+            stream = usart_stream->stream_tx = (vsf_stream_t *)&h4param->tx.stream;
+            stream->op = &vsf_mem_stream_op;
+            stream->tx.param = &__hci_transport_h4_param;
+            stream->tx.evthandler = __hci_transport_h4_on_out;
 
-            h4param->rx.stream.mem.read = false;
-            stream = usart_stream->stream_rx = &h4param->rx.stream.stream;
-            stream->op = &vsf_bufstream_op;
-            stream->callback_rx.param = h4param;
-            stream->callback_rx.on_inout = hci_transport_h4_on_in;
+            stream = usart_stream->stream_rx = (vsf_stream_t *)&h4param->rx.stream;
+            stream->op = &vsf_mem_stream_op;
+            stream->rx.param = h4param;
+            stream->rx.evthandler = __hci_transport_h4_on_in;
 
-            vsf_usart_stream_init(usart_stream);
+            h4param->usart_cfg.baudrate = 115200;
+            vsf_usart_stream_init(usart_stream, &h4param->usart_cfg);
             vsf_stream_connect_tx(usart_stream->stream_tx);
             vsf_stream_connect_rx(usart_stream->stream_rx);
         }
         break;
     case HCI_EVT_IN:
-        if (h4param->rx.state == HCI_RX_RECEIVED)
-        {
-            bufstream = &h4param->rx.stream;
+        if (h4param->rx.state == HCI_RX_RECEIVED) {
+            stream = &h4param->rx.stream;
             ptr = &h4param->rx.buffer[HCI_INCOMING_PRE_SIZE];
-            h4param->packet_handler(ptr[0], &ptr[1],
-                (bufstream->mem.buffer.buffer - ptr) + bufstream->mem.buffer.size - 1);
+            h4param->packet_handler(ptr[0], &ptr[1], (stream->buffer - ptr) + stream->size - 1);
 
             h4param->rx.state = HCI_RX_IDLE;
-            hci_transport_h4_on_in(h4param);
+            __hci_transport_h4_on_in((vsf_stream_t *)stream, h4param, VSF_STREAM_ON_IN);
         }
         break;
     case HCI_EVT_OUT:
-        bufstream = &h4param->tx.stream;
-        if (bufstream->mem.buffer.size == 1)
-            VSF_STREAM_WRITE(bufstream, &h4param->tx.buffer);
-        else
-        {
+        stream = &h4param->tx.stream;
+        if (stream->size == 1) {
+            VSF_STREAM_WRITE(stream, h4param->tx.buffer.buffer, h4param->tx.buffer.size);
+        } else {
             const uint8_t event[] = {HCI_EVENT_TRANSPORT_PACKET_SENT, 0};
-            hci_transport_h4_param.tx.sending = false;
+            __hci_transport_h4_param.tx.sending = false;
             h4param->packet_handler(HCI_EVENT_PACKET, (uint8_t *)event, 2);
         }
         break;
     }
-    return NULL;
 }
 
-static int hci_transport_h4_open(void)
+static int __hci_transport_h4_open(void)
 {
-    hci_transport_h4_param.opened = true;
-    hci_transport_h4_on_in(&hci_transport_h4_param);
+    __hci_transport_h4_param.opened = true;
+    __hci_transport_h4_on_in((vsf_stream_t *)&__hci_transport_h4_param.rx.stream,
+                                &__hci_transport_h4_param, VSF_STREAM_ON_IN);
     return 0;
 }
 
-static int hci_transport_h4_close(void)
+static int __hci_transport_h4_close(void)
 {
-    hci_transport_h4_param.opened = false;
+    __hci_transport_h4_param.opened = false;
     return 0;
 }
 
-static void hci_transport_h4_register_packet_handler(
+static void __hci_transport_h4_register_packet_handler(
         void (*handler)(uint8_t packet_type, uint8_t *packet, uint16_t size))
 {
-    hci_transport_h4_param.packet_handler = handler;
+    __hci_transport_h4_param.packet_handler = handler;
 }
 
-static int hci_transport_h4_can_send_packet_now(uint8_t packet_type)
+static int __hci_transport_h4_can_send_packet_now(uint8_t packet_type)
 {
-    return !hci_transport_h4_param.tx.sending;
+    return !__hci_transport_h4_param.tx.sending;
 }
 
-static int hci_transport_h4_send_packet(uint8_t packet_type, uint8_t *packet,
+static int __hci_transport_h4_send_packet(uint8_t packet_type, uint8_t *packet,
         int size)
 {
-    if (hci_transport_h4_param.opened && !hci_transport_h4_param.tx.sending)
-    {
-        struct vsf_bufstream_t *stream = &hci_transport_h4_param.tx.stream;
-        struct vsf_buffer_t buffer;
+    if (__hci_transport_h4_param.opened && !__hci_transport_h4_param.tx.sending) {
+        vsf_mem_stream_t *stream = &__hci_transport_h4_param.tx.stream;
+        vsf_mem_t buffer;
 
-        hci_transport_h4_param.tx.sending = true;
-        hci_transport_h4_param.tx.buffer.buffer = packet;
-        hci_transport_h4_param.tx.buffer.size = size;
-        hci_transport_h4_param.tx.type = packet_type;
+        __hci_transport_h4_param.tx.sending = true;
+        __hci_transport_h4_param.tx.buffer.buffer = packet;
+        __hci_transport_h4_param.tx.buffer.size = size;
+        __hci_transport_h4_param.tx.type = packet_type;
 
-        buffer.buffer = (uint8_t *)&hci_transport_h4_param.tx.type;
+        buffer.buffer = (uint8_t *)&__hci_transport_h4_param.tx.type;
         buffer.size = 1;
-        VSF_STREAM_WRITE(stream, &buffer);
+        VSF_STREAM_WRITE(stream, buffer.buffer, buffer.size);
         return 0;
     }
     return -1;
 }
 
-static int hci_transport_h4_set_baudrate(uint32_t baudrate)
+static int __hci_transport_h4_set_baudrate(uint32_t baudrate)
 {
-    hci_transport_h4_param.usart_stream->baudrate = baudrate;
-    vsf_usart_stream_config(hci_transport_h4_param.usart_stream);
+    __hci_transport_h4_param.usart_cfg.baudrate = baudrate;
+    vsf_usart_stream_init(__hci_transport_h4_param.usart_stream, &__hci_transport_h4_param.usart_cfg);
     return 0;
 }
 
-static void hci_transport_h4_init(const void *transport_config)
+static void __hci_transport_h4_init(const void *transport_config)
 {
-    hci_transport_h4_param.usart_stream =
-            (struct vsf_usart_stream_t *)transport_config;
-    hci_transport_h4_param.sm.user_data = &hci_transport_h4_param;
-    hci_transport_h4_param.sm.init_state.evt_handler =
-            hci_transport_h4_evt_handler;
-    vsfsm_init(&hci_transport_h4_param.sm);
+    __hci_transport_h4_param.usart_stream = (vsf_usart_stream_t *)transport_config;
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    __hci_transport_h4_param.eda.on_terminate = NULL;
+#   endif
+    __hci_transport_h4_param.eda.fn.evthandler = __hci_transport_h4_evt_handler;
+    vsf_eda_init(&__hci_transport_h4_param.eda);
+#   if VSF_KERNEL_CFG_TRACE == ENABLED
+    vsf_kernel_trace_eda_info(&__hci_transport_h4_param.eda, "bthci_h4", NULL, 0);
+#   endif
 }
 
-static const hci_transport_t hci_transport_h4 =
+static const hci_transport_t __hci_transport_h4 =
 {
     .name = "H4_VSF",
-    .init = hci_transport_h4_init,
-    .open = hci_transport_h4_open,
-    .close = hci_transport_h4_close,
-    .register_packet_handler = hci_transport_h4_register_packet_handler,
-    .can_send_packet_now = hci_transport_h4_can_send_packet_now,
-    .send_packet = hci_transport_h4_send_packet,
-    .set_baudrate = hci_transport_h4_set_baudrate,
+    .init = __hci_transport_h4_init,
+    .open = __hci_transport_h4_open,
+    .close = __hci_transport_h4_close,
+    .register_packet_handler = __hci_transport_h4_register_packet_handler,
+    .can_send_packet_now = __hci_transport_h4_can_send_packet_now,
+    .send_packet = __hci_transport_h4_send_packet,
+    .set_baudrate = __hci_transport_h4_set_baudrate,
 };
 
 const hci_transport_t * hci_transport_h4_instance(
         const btstack_uart_block_t *uart_driver)
 {
-    return &hci_transport_h4;
+    return &__hci_transport_h4;
 }
 
 #endif      // VSF_USE_BTSTACK
