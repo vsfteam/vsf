@@ -13,6 +13,7 @@ if(VSF_BTSTACK_USE_BCM20702)
     vsf_add_sources(
         firmware/bcm/bcm20702/bt_firmware_image.c
         port/hci_transport_h2_vsf.c
+        port/hci_transport_h4_vsf.c
 
         ${VSF_BTSTACK_PATH}/chipset/bcm/btstack_chipset_bcm.c
         ${VSF_BTSTACK_PATH}/chipset/bcm/btstack_chipset_bcm_download_firmware.c

@@ -7487,6 +7487,9 @@
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\port\hci_transport_h2_vsf.c</name>
                         </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\port\hci_transport_h4_vsf.c</name>
+                        </file>
                     </group>
                     <group>
                         <name>raw</name>
