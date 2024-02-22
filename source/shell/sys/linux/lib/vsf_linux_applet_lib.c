@@ -60,6 +60,7 @@
 
 #include <fnmatch.h>
 #include <glob.h>
+#include <regex.h>
 
 #if VSF_USE_MBEDTLS == ENABLED
 #   include "component/3rd-party/mbedtls/extension/vplt/mbedtls_applet_lib.inc"
