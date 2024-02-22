@@ -15,6 +15,12 @@
  *                                                                           *
  ****************************************************************************/
 
+/*
+    Use this template only if the STOP condition can not be controlled, ie hw will
+      automatically generate STOP condition by force. This template will merge all
+      requests before STOP and issue once as a workaround.
+*/
+
 #ifndef __HAL_DRIVER_COMMON_I2C_MERGER_REQUEST_H__
 #define __HAL_DRIVER_COMMON_I2C_MERGER_REQUEST_H__
 
