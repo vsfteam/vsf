@@ -18,6 +18,26 @@
 #ifndef __VSF_MAL_H__
 #define __VSF_MAL_H__
 
+/*! \brief  This module provides MAL(Memory Abstraction Layser) device class.
+ *! \author SimonQian
+ *! \note   Supports read/write/erase operation in block granularity.
+ *!         Enabled by VSF_USE_MAL. Drivers:
+ *!         mim_mal(mim: mal in mal) by VSF_MAL_USE_MIM_MAL:
+ *!             Used to derive a mal device from partial of another mal device.
+ *!         fakefat32_mal by VSF_MAL_USE_FAKEFAT32_MAL, depends on VSF_USE_FS/VSF_FS_USE_MEMFS/VSF_FS_USE_FATFS:
+ *!             Generate a vitual fat32 mal device.
+ *!         file_mal by VSF_MAL_USE_FILE_MAL, depends on VSF_USE_FS:
+ *!             Generate a mal device from a file.
+ *!         hw_flash_mal by VSF_MAL_USE_HW_FLASH_MAL, depends on VSF_HAL_USE_FLASH:
+ *!             Generate a mal device from partial of the FLASH in HAL.
+ *!         mem_mal by VSF_MAL_USE_MEM_MAL:
+ *!             Generate a mal device from io-accessable memory.
+ *!         mmc_mal by VSF_MAL_USE_MMC_MAL:
+ *!             Mal device from a MMC card.
+ *!         scsi_mal by VSF_MAL_USE_SCSI_MAL, depnends on VSF_USE_SCSI:
+ *!             Mal device from a SCSI device.
+ */
+
 /*============================ INCLUDES ======================================*/
 
 #include "./vsf_mal_cfg.h"

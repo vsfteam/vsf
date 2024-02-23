@@ -18,6 +18,15 @@
 #ifndef __VSF_SCSI_H__
 #define __VSF_SCSI_H__
 
+/*! \brief  This module provides SCSI device class which can execute SCSI commands.
+ *! \author SimonQian
+ *! \note   Enabled by VSF_USE_SCSI. Drivers:
+ *!         virtual_scsi by VSF_SCSI_USE_VIRTUAL_SCSI:
+ *!             Used to convert other devices to SCSI devices.
+ *!         mal_scsi by VSF_SCSI_USE_MAL_SCSI, depends on VSF_SCSI_USE_VIRTUAL_SCSI:
+ *!             Convert a mal(memory abstraction layer) device to SCSI device.
+ */
+
 /*============================ INCLUDES ======================================*/
 
 #include "./vsf_scsi_cfg.h"
