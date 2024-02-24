@@ -288,9 +288,9 @@ vsf_err_t vsf_hw_gpio_config(vsf_io_cfg_t *cfg, uint_fast8_t count)
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_GPIO_CFG_IMP_LV0(__COUNT, __HAL_OP)                                 \
-    vsf_hw_gpio_t vsf_hw_gpio##__COUNT = {                                      \
-        .reg = (GPIO_T *)VSF_HW_GPIO ## __COUNT ##_ADDRESS,                     \
+#define VSF_GPIO_CFG_IMP_LV0(__IDX, __HAL_OP)                                   \
+    vsf_hw_gpio_t vsf_hw_gpio ## __IDX = {                                      \
+        .reg = (GPIO_T *)VSF_HW_GPIO ## __IDX ##_ADDRESS,                       \
         __HAL_OP                                                                \
     };
 

@@ -289,16 +289,17 @@ vsf_err_t vsf_hw_usart_request_tx(vsf_hw_usart_t *usart_ptr, void *buffer_ptr, u
 
 /*============================ IMPLEMENTATION ================================*/
 
-#define VSF_USART_CFG_IMP_LV0(__count, __hal_op)                                                \
-    static const vsf_hw_usart_const_t vsf_hw_usart ## __count ## _const = {                     \
-        .usart = (UART ## __count),                                                             \
-        .irq = (UART ## __count##_IRQn),                                                        \
-        .module = (VSF_HW_USART ## __count##_MODULE),                                           \
-        .uartx_rst = VSF_HW_USART ## __count##_RST,                                             \
-        .clock_source = VSF_MCONNECT(VSF_HW_USART, __count, SEL_, VSF_CFG_USART_CLOCK_SOURCE),  \
+#define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                                  \
+    static const vsf_hw_usart_const_t vsf_hw_usart ## __IDX ## _const = {                       \
+        .usart = (UART ## __IDX),                                                               \
+        .irq = (UART ## __IDX ##_IRQn),                                                         \
+        .module = (VSF_HW_USART ## __IDX ##_MODULE),                                            \
+        .uartx_rst = VSF_HW_USART ## __IDX ##_RST,                                              \
+        .clock_source = VSF_MCONNECT(VSF_HW_USART, __IDX, SEL_, VSF_CFG_USART_CLOCK_SOURCE),    \
     };                                                                                          \
-    vsf_hw_usart_t vsf_hw_usart ## __count = {                                                  \
-        .usart_const = &vsf_hw_usart ## __count ## _const,                                      \
+    vsf_hw_usart_t vsf_hw_usart ## __IDX = {                                                    \
+        .usart_const = &vsf_hw_usart ## __IDX ## _const,                                        \
+        __HAL_OP                                                                                \
     };
 #include "hal/driver/common/usart/usart_template.inc"
 

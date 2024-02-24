@@ -107,9 +107,9 @@ vsf_err_t vsf_hw_rtc_set(vsf_hw_rtc_t *hw_rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
 #define VSF_RTC_CFG_IMP_PREFIX              vsf_hw
 #define VSF_RTC_CFG_IMP_UPCASE_PREFIX       VSF_HW
 
-#define VSF_RTC_CFG_IMP_LV0(__COUNT, __hal_op)                                  \
-    vsf_hw_rtc_t vsf_hw_rtc##__COUNT = {                                        \
-        __hal_op                                                                \
+#define VSF_RTC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
+    vsf_hw_rtc_t vsf_hw_rtc ## __IDX = {                                        \
+        __HAL_OP                                                                \
     };
 #include "hal/driver/common/rtc/rtc_template.inc"
 

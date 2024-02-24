@@ -251,19 +251,19 @@ void vsf_hw_mmc_host_transact_stop(vsf_hw_mmc_t *mmc_ptr)
 
 #define VSF_MMC_CFG_IMP_PREFIX                  vsf_hw
 #define VSF_MMC_CFG_IMP_UPCASE_PREFIX           VSF_HW
-#define VSF_MMC_CFG_IMP_LV0(__COUNT, __HAL_OP)                                  \
-    static const vsf_hw_mmc_const_t __vsf_hw_mmc ## __COUNT ## _const = {       \
-        .reg  = VSF_HW_MMC ## __COUNT ## _REG,                                  \
-        .irqn = VSF_HW_MMC ## __COUNT ## _IRQ_IDX,                              \
+#define VSF_MMC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
+    static const vsf_hw_mmc_const_t __vsf_hw_mmc ## __IDX ## _const = {         \
+        .reg  = VSF_HW_MMC ## __IDX ## _REG,                                    \
+        .irqn = VSF_HW_MMC ## __IDX ## _IRQ_IDX,                                \
     };                                                                          \
-    vsf_hw_mmc_t vsf_hw_mmc ## __COUNT = {                                      \
-        .mmc_const = &__vsf_hw_mmc ## __COUNT ## _const,                        \
+    vsf_hw_mmc_t vsf_hw_mmc ## __IDX = {                                        \
+        .mmc_const = &__vsf_hw_mmc ## __IDX ## _const,                          \
         __HAL_OP                                                                \
     };                                                                          \
-    void VSF_HW_MMC ## __COUNT ## _IRQ(void)                                    \
+    void VSF_HW_MMC ## __IDX ## _IRQ(void)                                      \
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
-        __vsf_hw_mmc_irq_handler(&vsf_hw_mmc ## __COUNT);                       \
+        __vsf_hw_mmc_irq_handler(&vsf_hw_mmc ## __IDX);                         \
         vsf_hal_irq_leave(ctx);                                                 \
     }
 #include "hal/driver/common/mmc/mmc_template.inc"

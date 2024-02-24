@@ -178,9 +178,9 @@ vsf_gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_GPIO_CFG_IMP_LV0(__COUNT, __HAL_OP)                                 \
-    vsf_hw_gpio_t vsf_hw_gpio ## __COUNT = {                                    \
-        .dev_name       = VSF_HW_IO_PORT ## __COUNT ## _DEVNAME,                \
+#define VSF_GPIO_CFG_IMP_LV0(__IDX, __HAL_OP)                                   \
+    vsf_hw_gpio_t vsf_hw_gpio ## __IDX = {                                      \
+        .dev_name       = VSF_HW_IO_PORT ## __IDX ## _DEVNAME,                  \
         __HAL_OP                                                                \
     };
 

@@ -330,22 +330,22 @@ void __vsf_hw_gpio_irq_handler(vsf_hw_gpio_t *hw_gpio_ptr)
 
 #define VSF_GPIO_CFG_IMP_PREFIX                 vsf_hw
 #define VSF_GPIO_CFG_IMP_UPCASE_PREFIX          VSF_HW
-#define VSF_GPIO_CFG_IMP_LV0(__COUNT, __HAL_OP)                                 \
-    static vsf_gpio_isr_t __vsf_hw_gpio ## __COUNT ## isr[VSF_HW_IO_PIN_COUNT]; \
-    vsf_hw_gpio_t vsf_hw_gpio ## __COUNT = {                                    \
-        .GPIO = (GPIO_REG_T *)VSF_HW_GPIO ## __COUNT ## _BASE_ADDRESS,          \
-        .irqn = VSF_HW_GPIO ## __COUNT ## _IRQ_IDX,                             \
-        .IOMUX = ((AIC_IOMUX_TypeDef *)VSF_HW_IO_PORT ## __COUNT ## _IOMUX_REG_BASE),\
-        .is_pmic = VSF_HW_IO_PORT ## __COUNT ## _IS_PMIC,                       \
-        .gpio_pin_mask = VSF_HW_IO_PORT ## __COUNT ## _GPIO_PIN_MASK,           \
-        .isrs = VSF_HW_IO_PORT ## __COUNT ## _IS_PMIC ?                         \
-                NULL : __vsf_hw_gpio ## __COUNT ## isr,                         \
+#define VSF_GPIO_CFG_IMP_LV0(__IDX, __HAL_OP)                                   \
+    static vsf_gpio_isr_t __vsf_hw_gpio ## __IDX ## isr[VSF_HW_IO_PIN_COUNT];   \
+    vsf_hw_gpio_t vsf_hw_gpio ## __IDX = {                                      \
+        .GPIO = (GPIO_REG_T *)VSF_HW_GPIO ## __IDX ## _BASE_ADDRESS,            \
+        .irqn = VSF_HW_GPIO ## __IDX ## _IRQ_IDX,                               \
+        .IOMUX = ((AIC_IOMUX_TypeDef *)VSF_HW_IO_PORT ## __IDX ## _IOMUX_REG_BASE),\
+        .is_pmic = VSF_HW_IO_PORT ## __IDX ## _IS_PMIC,                         \
+        .gpio_pin_mask = VSF_HW_IO_PORT ## __IDX ## _GPIO_PIN_MASK,             \
+        .isrs = VSF_HW_IO_PORT ## __IDX ## _IS_PMIC ?                           \
+                NULL : __vsf_hw_gpio ## __IDX ## isr,                           \
         __HAL_OP                                                                \
     };                                                                          \
-    void VSF_HW_GPIO ## __COUNT ## _IRQ(void)                                   \
+    void VSF_HW_GPIO ## __IDX ## _IRQ(void)                                     \
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
-        __vsf_hw_gpio_irq_handler(&vsf_hw_gpio ## __COUNT);                     \
+        __vsf_hw_gpio_irq_handler(&vsf_hw_gpio ## __IDX);                       \
         vsf_hal_irq_leave(ctx);                                                 \
     }
 

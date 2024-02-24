@@ -160,21 +160,21 @@ void __vsf_hw_wdt_irq_handler(vsf_hw_wdt_t *wdt_ptr)
 
 #define VSF_WDT_CFG_IMP_PREFIX                      vsf_hw
 #define VSF_WDT_CFG_IMP_UPCASE_PREFIX               VSF_HW
-#define VSF_WDT_CFG_IMP_LV0(__COUNT, __hal_op)                                  \
-    static const vsf_hw_wdt_const_t __vsf_hw_wdt ## __COUNT ## _const = {       \
-        .reg    = (AIC_WDT_TypeDef *)VSF_HW_WDT ## __COUNT ## _BASE_ADDRESS,    \
-        .irqn   = VSF_HW_WDT ## __COUNT ## _IRQN,                               \
-        .pclk   = VSF_HW_WDT ## __COUNT ## _PCLK_EN_BIT,                        \
-        .oclk   = VSF_HW_WDT ## __COUNT ## _OCLK_EN_BIT,                        \
+#define VSF_WDT_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
+    static const vsf_hw_wdt_const_t __vsf_hw_wdt ## __IDX ## _const = {         \
+        .reg    = (AIC_WDT_TypeDef *)VSF_HW_WDT ## __IDX ## _BASE_ADDRESS,      \
+        .irqn   = VSF_HW_WDT ## __IDX ## _IRQN,                                 \
+        .pclk   = VSF_HW_WDT ## __IDX ## _PCLK_EN_BIT,                          \
+        .oclk   = VSF_HW_WDT ## __IDX ## _OCLK_EN_BIT,                          \
     };                                                                          \
-    vsf_hw_wdt_t vsf_hw_wdt ## __COUNT = {                                      \
-        .wdt_const  = &__vsf_hw_wdt ## __COUNT ## _const,                       \
-        __hal_op                                                                \
+    vsf_hw_wdt_t vsf_hw_wdt ## __IDX = {                                        \
+        .wdt_const  = &__vsf_hw_wdt ## __IDX ## _const,                         \
+        __HAL_OP                                                                \
     };                                                                          \
-    void VSF_HW_WDT ## __COUNT ## _IRQHandler(void)                             \
+    void VSF_HW_WDT ## __IDX ## _IRQHandler(void)                               \
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
-        __vsf_hw_wdt_irq_handler(&vsf_hw_wdt ## __COUNT);                       \
+        __vsf_hw_wdt_irq_handler(&vsf_hw_wdt ## __IDX);                         \
         vsf_hal_irq_leave(ctx);                                                 \
     }
 #include "hal/driver/common/wdt/wdt_template.inc"

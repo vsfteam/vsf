@@ -32,8 +32,8 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HW_RNG_INIT(__COUNT, __DONT_CARE)                                 \
-    vsf_hw_rng_init(&VSF_MCONNECT(vsf_hw_rng, __COUNT));
+#define __VSF_HW_RNG_INIT(__IDX, __DONT_CARE)                                   \
+    vsf_hw_rng_init(&VSF_MCONNECT(vsf_hw_rng, __IDX));
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

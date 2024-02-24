@@ -107,10 +107,10 @@ typedef struct vsf_win_usart_port_t {
 #define VSF_USART_CFG_IMP_PREFIX                    vsf_win
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_WIN
 #define VSF_USART_CFG_IMP_FIFO_TO_REQUEST           ENABLED
-#define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                    \
-    vsf_win_usart_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __COUNT) = {     \
-        .handle                            = INVALID_HANDLE_VALUE,                  \
-        __HAL_OP                                                                    \
+#define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
+    vsf_win_usart_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __IDX) = {   \
+        .handle                            = INVALID_HANDLE_VALUE,              \
+        __HAL_OP                                                                \
     };
 #include "hal/driver/common/usart/usart_template.inc"
 
@@ -118,10 +118,10 @@ typedef struct vsf_win_usart_port_t {
 #define VSF_USART_CFG_IMP_PREFIX                    vsf_fifo2req
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_FIFO2REQ
 #define VSF_FIFO2REQ_USART_COUNT                    VSF_WIN_USART_COUNT
-#define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                    \
-    describe_fifo2req_usart(                                                        \
-        VSF_MCONNECT(VSF_USART_CFG_IMP_INSTANCE_PREFIX, _usart, __COUNT),           \
-        VSF_MCONNECT(vsf_win_usart, __COUNT))
+#define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
+    describe_fifo2req_usart(                                                    \
+        VSF_MCONNECT(VSF_USART_CFG_IMP_INSTANCE_PREFIX, _usart, __IDX),         \
+        VSF_MCONNECT(vsf_win_usart, __IDX))
 #include "hal/driver/common/usart/usart_template.inc"
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -674,8 +674,8 @@ uint_fast16_t vsf_win_usart_txfifo_write(vsf_win_usart_t *win_usart, void *buffe
 #define VSF_USART_CFG_IMP_PREFIX                    vsf_remapped
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_REMAPPED
 #define VSF_REMAPPED_USART_COUNT                    VSF_WIN_USART_COUNT
-#define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                    \
-    describe_remapped_usart(VSF_MCONNECT(vsf_hw_usart, __COUNT), VSF_MCONNECT(vsf_win_fifo2req_usart, __COUNT))
+#define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
+    describe_remapped_usart(VSF_MCONNECT(vsf_hw_usart, __IDX), VSF_MCONNECT(vsf_win_fifo2req_usart, __IDX))
 #include "hal/driver/common/usart/usart_template.inc"
 #endif
 

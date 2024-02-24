@@ -95,7 +95,7 @@ vsf_err_t vsf_hw_io_config(vsf_hw_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr, uint_fast
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_IO_CFG_IMP_LV0(__COUNT, __HAL_OP)                                   \
+#define VSF_IO_CFG_IMP_LV0(__IDX, __HAL_OP)                                     \
     vsf_hw_io_t vsf_hw_io = {                                                   \
         __HAL_OP                                                                \
     };

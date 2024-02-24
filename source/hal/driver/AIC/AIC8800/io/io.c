@@ -151,15 +151,15 @@ vsf_io_capability_t vsf_hw_io_capability(vsf_hw_io_t *io)
 
 #define VSF_IO_CFG_IMP_PREFIX                 vsf_hw
 #define VSF_IO_CFG_IMP_UPCASE_PREFIX          VSF_HW
-#define __VSF_HW_IOMUX(__COUNT, __)                                             \
-    .ports[__COUNT] = {                                                         \
-        .is_pmic = VSF_HW_IO_PORT ## __COUNT ## _IS_PMIC,                       \
-        .IOMUX = ((AIC_IOMUX_TypeDef *) VSF_HW_IO_PORT ## __COUNT ## _IOMUX_REG_BASE),\
-        .GPIO = (GPIO_REG_T *)VSF_HW_GPIO ## __COUNT ## _BASE_ADDRESS,          \
-        .gpio_map = VSF_HW_IO_PORT ## __COUNT ## _MAP,                     		\
+#define __VSF_HW_IOMUX(__IDX, __)                                               \
+    .ports[__IDX] = {                                                           \
+        .is_pmic = VSF_HW_IO_PORT ## __IDX ## _IS_PMIC,                         \
+        .IOMUX = ((AIC_IOMUX_TypeDef *) VSF_HW_IO_PORT ## __IDX ## _IOMUX_REG_BASE),\
+        .GPIO = (GPIO_REG_T *)VSF_HW_GPIO ## __IDX ## _BASE_ADDRESS,            \
+        .gpio_map = VSF_HW_IO_PORT ## __IDX ## _MAP,                     		\
     },
 
-#define VSF_IO_CFG_IMP_LV0(__COUNT, __HAL_OP)                                   \
+#define VSF_IO_CFG_IMP_LV0(__IDX, __HAL_OP)                                     \
     vsf_hw_io_t vsf_hw_io = {                                                   \
         VSF_MREPEAT(VSF_HW_IO_PORT_COUNT, __VSF_HW_IOMUX, NULL)                 \
         __HAL_OP                                                                \

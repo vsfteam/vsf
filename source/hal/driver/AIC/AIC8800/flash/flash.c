@@ -213,8 +213,8 @@ vsf_flash_capability_t vsf_hw_flash_capability(vsf_hw_flash_t *hw_flash_ptr)
 #define VSF_FLASH_CFG_READ_ONE_SECTOR_TEMPLATE      ENABLED
 #define VSF_FLASH_CFG_IMP_PREFIX                    vsf_hw
 #define VSF_FLASH_CFG_IMP_UPCASE_PREFIX             VSF_HW
-#define VSF_FLASH_CFG_IMP_LV0(__COUNT, __HAL_OP)                                \
-    vsf_hw_flash_t vsf_hw_flash ## __COUNT = {                                  \
+#define VSF_FLASH_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
+    vsf_hw_flash_t vsf_hw_flash ## __IDX = {                                    \
         .cfg = {                                                                \
             .isr = {                                                            \
                 .handler_fn = NULL,                                             \

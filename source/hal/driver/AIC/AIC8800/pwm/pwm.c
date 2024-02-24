@@ -148,10 +148,10 @@ uint32_t vsf_hw_pwm_get_freq(vsf_hw_pwm_t *hw_pwm_ptr)
 #define VSF_PWM_CFG_CAPABILITY_MAX_FREQ                 (PWM_MAX_FREQ)
 #define VSF_PWM_CFG_IMP_PREFIX                          vsf_hw
 #define VSF_PWM_CFG_IMP_UPCASE_PREFIX                   VSF_HW
-#define VSF_PWM_CFG_IMP_LV0(__COUNT, __hal_op)                                  \
-    vsf_hw_pwm_t vsf_hw_pwm##__COUNT = {                                        \
-        .reg = (PWM_REG_T *)VSF_HW_PWM ##__COUNT ##_BASE_ADDRESS,               \
-        __hal_op                                                                \
+#define VSF_PWM_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
+    vsf_hw_pwm_t vsf_hw_pwm ## __IDX = {                                        \
+        .reg = (PWM_REG_T *)VSF_HW_PWM ##__IDX ##_BASE_ADDRESS,                 \
+        __HAL_OP                                                                \
     };
 #include "hal/driver/common/pwm/pwm_template.inc"
 

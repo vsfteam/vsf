@@ -369,20 +369,20 @@ vsf_i2c_capability_t vsf_hw_i2c_capability(vsf_hw_i2c_t *i2c_ptr)
 
 #define VSF_I2C_CFG_IMP_PREFIX                  vsf_hw
 #define VSF_I2C_CFG_IMP_UPCASE_PREFIX           VSF_HW
-#define VSF_I2C_CFG_IMP_LV0(__COUNT, __HAL_OP)                                  \
-    static const vsf_hw_i2c_const_t __vsf_hw_i2c ## __COUNT ## _const = {       \
-        .reg  = VSF_HW_I2C ## __COUNT ## _REG,                                  \
-        .irqn = VSF_HW_I2C ## __COUNT ## _IRQ_IDX,                              \
-        .pclk = VSF_HW_I2C ## __COUNT ## _PCLKME_EN_BIT,                        \
+#define VSF_I2C_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
+    static const vsf_hw_i2c_const_t __vsf_hw_i2c ## __IDX ## _const = {         \
+        .reg  = VSF_HW_I2C ## __IDX ## _REG,                                    \
+        .irqn = VSF_HW_I2C ## __IDX ## _IRQ_IDX,                                \
+        .pclk = VSF_HW_I2C ## __IDX ## _PCLKME_EN_BIT,                          \
     };                                                                          \
-    vsf_hw_i2c_t vsf_hw_i2c ## __COUNT = {                                      \
-        .i2c_const = &__vsf_hw_i2c ## __COUNT ## _const,                        \
+    vsf_hw_i2c_t vsf_hw_i2c ## __IDX = {                                        \
+        .i2c_const = &__vsf_hw_i2c ## __IDX ## _const,                          \
         __HAL_OP                                                                \
     };                                                                          \
-    void VSF_HW_I2C ## __COUNT ## _IRQ(void)                                    \
+    void VSF_HW_I2C ## __IDX ## _IRQ(void)                                      \
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
-        __vsf_hw_i2c_irq_handler(&vsf_hw_i2c ## __COUNT);                       \
+        __vsf_hw_i2c_irq_handler(&vsf_hw_i2c ## __IDX);                         \
         vsf_hal_irq_leave(ctx);                                                 \
     }
 #include "hal/driver/common/i2c/i2c_template.inc"

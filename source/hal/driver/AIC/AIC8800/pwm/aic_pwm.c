@@ -134,16 +134,16 @@ uint32_t vsf_aic_pwm_get_freq(vsf_aic_pwm_t *hw_pwm_ptr)
 
 #define VSF_PWM_CFG_IMP_PREFIX                  vsf_aic
 #define VSF_PWM_CFG_IMP_UPCASE_PREFIX           VSF_AIC
-#define VSF_PWM_CFG_IMP_LV0(__COUNT, __hal_op)                                  \
-    static const vsf_aic_pwm_const_t vsf_aic_pwm ## __COUNT ## _const= {        \
-        .max_chn_cnt = VSF_AIC_PWM ## __COUNT ## _CHANNAL_COUNT,                 \
+#define VSF_PWM_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
+    static const vsf_aic_pwm_const_t vsf_aic_pwm ## __IDX ## _const= {          \
+        .max_chn_cnt = VSF_AIC_PWM ## __IDX ## _CHANNAL_COUNT,                  \
         .pclk_mask   = CSC_PCLKME_PWM_EN_BIT,                                   \
         .oclk_mask   = CSC_OCLKME_PWM_EN_BIT,                                   \
     };                                                                          \
-    vsf_aic_pwm_t vsf_aic_pwm ## __COUNT = {                                    \
-        .index        = __COUNT,                                                \
-        .pwm_const    = &vsf_aic_pwm ## __COUNT ## _const,                      \
-        __hal_op                                                                \
+    vsf_aic_pwm_t vsf_aic_pwm ## __IDX = {                                      \
+        .index        = __IDX,                                                  \
+        .pwm_const    = &vsf_aic_pwm ## __IDX ## _const,                        \
+        __HAL_OP                                                                \
     };
 #include "hal/driver/common/pwm/pwm_template.inc"
 

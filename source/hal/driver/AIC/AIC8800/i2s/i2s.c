@@ -794,20 +794,20 @@ vsf_i2s_status_t vsf_hw_i2s_status(vsf_hw_i2s_t *hw_i2s_ptr)
 
 #define VSF_I2S_CFG_IMP_PREFIX                  vsf_hw
 #define VSF_I2S_CFG_IMP_UPCASE_PREFIX           VSF_HW
-#define VSF_I2S_CFG_IMP_LV0(__COUNT, __HAL_OP)                                  \
-    static const vsf_hw_i2s_const_t __vsf_hw_i2s ## __COUNT ## _const = {       \
-        .reg            = VSF_HW_I2S ## __COUNT ## _REG,                        \
-        .idx            = VSF_HW_I2S ## __COUNT ## _IDX,                        \
-        .tx.path        = VSF_HW_I2S ## __COUNT ## _TXPATH,                     \
-        .tx.dma_ch      = VSF_HW_I2S ## __COUNT ## _TXDMA_CH,                   \
-        .tx.dma_irqn    = VSF_HW_I2S ## __COUNT ## _TXDMA_IRQN,                 \
-        .rx.path        = VSF_HW_I2S ## __COUNT ## _RXPATH,                     \
-        .rx.dma_ch      = VSF_HW_I2S ## __COUNT ## _RXDMA_CH,                   \
-        .rx.dma_irqn    = VSF_HW_I2S ## __COUNT ## _RXDMA_IRQN,                 \
-        .oclk           = VSF_HW_I2S ## __COUNT ## _OCLK,                       \
+#define VSF_I2S_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
+    static const vsf_hw_i2s_const_t __vsf_hw_i2s ## __IDX ## _const = {         \
+        .reg            = VSF_HW_I2S ## __IDX ## _REG,                          \
+        .idx            = VSF_HW_I2S ## __IDX ## _IDX,                          \
+        .tx.path        = VSF_HW_I2S ## __IDX ## _TXPATH,                       \
+        .tx.dma_ch      = VSF_HW_I2S ## __IDX ## _TXDMA_CH,                     \
+        .tx.dma_irqn    = VSF_HW_I2S ## __IDX ## _TXDMA_IRQN,                   \
+        .rx.path        = VSF_HW_I2S ## __IDX ## _RXPATH,                       \
+        .rx.dma_ch      = VSF_HW_I2S ## __IDX ## _RXDMA_CH,                     \
+        .rx.dma_irqn    = VSF_HW_I2S ## __IDX ## _RXDMA_IRQN,                   \
+        .oclk           = VSF_HW_I2S ## __IDX ## _OCLK,                         \
     };                                                                          \
-    vsf_hw_i2s_t vsf_hw_i2s ## __COUNT = {                                      \
-        .i2s_const      = &__vsf_hw_i2s ## __COUNT ## _const,                   \
+    vsf_hw_i2s_t vsf_hw_i2s ## __IDX = {                                        \
+        .i2s_const      = &__vsf_hw_i2s ## __IDX ## _const,                     \
         __HAL_OP                                                                \
     };
 #include "hal/driver/common/i2s/i2s_template.inc"

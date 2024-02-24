@@ -471,18 +471,19 @@ int_fast32_t vsf_hw_spi_get_transferred_count(vsf_hw_spi_t *spi_ptr)
 #define VSF_SPI_CFG_IMP_PREFIX                  vsf_hw
 #define VSF_SPI_CFG_IMP_UPCASE_PREFIX           VSF_HW
 
-#define VSF_SPI_CFG_IMP_LV0(__count, __hal_op)                                  \
-    vsf_hw_spi_t vsf_hw_spi ## __count = {                                      \
-        .reg = SPI ## __count,                                                  \
-        .irq = SPI ## __count##_IRQn,                                           \
+#define VSF_SPI_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
+    vsf_hw_spi_t vsf_hw_spi ## __IDX = {                                        \
+        .reg = SPI ## __IDX,                                                    \
+        .irq = SPI ## __IDX ## _IRQn,                                           \
         .tx_dma = {                                                             \
-            .per_index = M484_DMA_SPI ## __count##_TX,                          \
-            .channel = VSF_HW_SPI ## __count##_DMA_TX_CHANNEL,                  \
+            .per_index = M484_DMA_SPI ## __IDX ## _TX,                          \
+            .channel = VSF_HW_SPI ## __IDX ## _DMA_TX_CHANNEL,                  \
         },                                                                      \
         .rx_dma = {                                                             \
-            .per_index = M484_DMA_SPI ## __count##_RX,                          \
-            .channel = VSF_HW_SPI ## __count##_DMA_RX_CHANNEL,                  \
+            .per_index = M484_DMA_SPI ## __IDX ## _RX,                          \
+            .channel = VSF_HW_SPI ## __IDX ## _DMA_RX_CHANNEL,                  \
         },                                                                      \
+        __HAL_OP                                                                \
     };
 
 #include "hal/driver/common/spi/spi_template.inc"

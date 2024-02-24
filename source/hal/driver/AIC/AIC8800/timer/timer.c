@@ -191,21 +191,21 @@ void vsf_hw_timer_irq_disable(vsf_hw_timer_t *timer_ptr, vsf_timer_irq_mask_t ir
 #   define VSF_TIMER_CFG_CAPABILITY_PWM_CHANNEL_CNT 0
 #define VSF_TIMER_CFG_IMP_PREFIX                    vsf_hw
 #define VSF_TIMER_CFG_IMP_UPCASE_PREFIX             VSF_HW
-#define VSF_TIMER_CFG_IMP_LV0(__COUNT, __hal_op)                                \
-    static const vsf_hw_timer_const_t __vsf_hw_timer ## __COUNT ## _const = {   \
-        .reg    = (AIC_TIM_REG_T *)VSF_HW_TIMER ## __COUNT ## _BASE_ADDRESS,    \
-        .irqn   = VSF_HW_TIMER ## __COUNT ## _IRQN,                             \
-        .pclk   = VSF_HW_TIMER ## __COUNT ## _PCLK_EN_BIT,                      \
-        .oclk   = VSF_HW_TIMER ## __COUNT ## _OCLK_EN_BIT,                      \
+#define VSF_TIMER_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
+    static const vsf_hw_timer_const_t __vsf_hw_timer ## __IDX ## _const = {     \
+        .reg    = (AIC_TIM_REG_T *)VSF_HW_TIMER ## __IDX ## _BASE_ADDRESS,      \
+        .irqn   = VSF_HW_TIMER ## __IDX ## _IRQN,                               \
+        .pclk   = VSF_HW_TIMER ## __IDX ## _PCLK_EN_BIT,                        \
+        .oclk   = VSF_HW_TIMER ## __IDX ## _OCLK_EN_BIT,                        \
     };                                                                          \
-    vsf_hw_timer_t vsf_hw_timer ## __COUNT = {                                  \
-        .timer_const  = &__vsf_hw_timer ## __COUNT ## _const,                   \
-        __hal_op                                                                \
+    vsf_hw_timer_t vsf_hw_timer ## __IDX = {                                    \
+        .timer_const  = &__vsf_hw_timer ## __IDX ## _const,                     \
+        __HAL_OP                                                                \
     };                                                                          \
-    void VSF_HW_TIMER ## __COUNT ## _IRQHandler(void)                           \
+    void VSF_HW_TIMER ## __IDX ## _IRQHandler(void)                             \
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
-        __vsf_hw_timer_irq_handler(&vsf_hw_timer ## __COUNT);                   \
+        __vsf_hw_timer_irq_handler(&vsf_hw_timer ## __IDX);                     \
         vsf_hal_irq_leave(ctx);                                                 \
     }
 #include "hal/driver/common/timer/timer_template.inc"

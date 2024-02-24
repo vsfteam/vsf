@@ -79,10 +79,10 @@ void vsf_hw_lp_timer_irq_disable(vsf_hw_lp_timer_t *timer_ptr, vsf_timer_irq_mas
 
 #define VSF_TIMER_CFG_IMP_PREFIX                    vsf_hw_lp
 #define VSF_TIMER_CFG_IMP_UPCASE_PREFIX             VSF_HW_LP
-#define VSF_TIMER_CFG_IMP_LV0(__COUNT, __hal_op)                                \
-    vsf_hw_lp_timer_t vsf_hw_lp_timer##__COUNT = {                              \
+#define VSF_TIMER_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
+    vsf_hw_lp_timer_t vsf_hw_lp_timer ## __IDX = {                              \
         .freq = 0,                                                              \
-        __hal_op                                                                \
+        __HAL_OP                                                                \
     };
 #include "hal/driver/common/timer/timer_template.inc"
 

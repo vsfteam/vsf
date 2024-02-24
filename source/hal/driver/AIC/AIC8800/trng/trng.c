@@ -103,15 +103,15 @@ vsf_err_t vsf_hw_rng_generate_request(vsf_hw_rng_t *rng, uint32_t *buffer, uint3
 #define VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY  ENABLED
 #define VSF_RNG_CFG_IMP_PREFIX                  vsf_hw
 #define VSF_RNG_CFG_IMP_UPCASE_PREFIX           VSF_HW
-#define VSF_RNG_CFG_IMP_LV0(__COUNT, __HAL_OP)                                  \
-    vsf_hw_rng_t VSF_MCONNECT(vsf_hw_rng, __COUNT) = {                          \
-        VSF_MCONNECT(VSF_HW_RNG, __COUNT, _CONFIG)                              \
+#define VSF_RNG_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
+    vsf_hw_rng_t VSF_MCONNECT(vsf_hw_rng, __IDX) = {                            \
+        VSF_MCONNECT(VSF_HW_RNG, __IDX, _CONFIG)                                \
         __HAL_OP                                                                \
     };                                                                          \
-    void VSF_MCONNECT(VSF_HW_RNG, __COUNT, _IRQHandler)(void)                   \
+    void VSF_MCONNECT(VSF_HW_RNG, __IDX, _IRQHandler)(void)                     \
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
-        vsf_hw_rng_t *rng = &VSF_MCONNECT(vsf_hw_rng, __COUNT);                 \
+        vsf_hw_rng_t *rng = &VSF_MCONNECT(vsf_hw_rng, __IDX);                   \
         AIC_TRNG_TypeDef *reg = rng->reg;                                       \
         uint32_t data = reg->trng_data;                                         \
                                                                                 \
