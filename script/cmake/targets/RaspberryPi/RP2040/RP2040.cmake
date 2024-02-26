@@ -9,6 +9,8 @@ set(VSF_TARGET_DEFINITIONS
     ${VSF_TARGET_DEFINITIONS}
 )
 
-include(${VSF_CMAKE_ROOT}/targets/arm/__cortex_m0.cmake)
+include(${VSF_CMAKE_ROOT}/targets/arm/__cortex_m0plus.cmake)
 
-set(VSF_TARGET_PATH ${VSF_SRC_PATH}/hal/driver/${VSF_HAL_CHIP_VENDOR}/${VSF_HAL_CHIP_SERIES})
+list(APPEND VSF_TARGET_INCLUDE_DIRECTORIES
+    ${PICO_SDK_PATH}/src/rp2_common/cmsis/stub/CMSIS/Device/RaspberryPi/RP2040/Include
+)
