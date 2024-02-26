@@ -72,6 +72,8 @@
 #       define  VSF_DRIVER_HEADER       "./BouffaloLab/driver.h"
 #   elif    defined(__Luat__)
 #       define  VSF_DRIVER_HEADER       "./Luat/driver.h"
+#   elif    defined(__RaspberryPi__)
+#       define  VSF_DRIVER_HEADER       "./RaspberryPi/driver.h"
 /* example
 #   elif    defined(__COMPANY_NAME_A__)
 #       define  VSF_DRIVER_HEADER       "./company_name_a/driver.h"
