@@ -28,11 +28,6 @@
 #ifdef __HAL_DRIVER_PL011_UART_H__
 
 /*============================ MACROS ========================================*/
-
-#ifndef VSF_PL011_USART_CFG_MULTI_CLASS
-#   define VSF_PL011_USART_CFG_MULTI_CLASS          VSF_USART_CFG_MULTI_CLASS
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ IMPLEMENTATION ================================*/
