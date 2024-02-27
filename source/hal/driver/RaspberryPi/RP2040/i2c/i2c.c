@@ -51,7 +51,7 @@ vsf_err_t vsf_hw_i2c_init(vsf_hw_i2c_t *hw_i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);
 
-    vsf_err_t err = vsf_dw_apb_i2c_init(&hw_i2c_ptr->use_as__vsf_dw_apb_i2c_t, cfg_ptr, 0);
+    vsf_err_t err = vsf_dw_apb_i2c_init(&hw_i2c_ptr->use_as__vsf_dw_apb_i2c_t, cfg_ptr, clock_get_hz(clk_sys));
     if ((VSF_ERR_NONE == err) && (cfg_ptr->isr.handler_fn != NULL)) {
         NVIC_SetPriority(hw_i2c_ptr->irqn, (uint32_t)cfg_ptr->isr.prio);
         NVIC_EnableIRQ(hw_i2c_ptr->irqn);

@@ -29,7 +29,6 @@
 #include "hardware/structs/clocks.h"
 #include "hardware/structs/pll.h"
 #include "hardware/structs/resets.h"
-#include "hardware/structs/clocks.h"
 
 /*============================ MACROS ========================================*/
 
@@ -330,6 +329,12 @@ bool clock_configure(enum clock_index clk_index, uint32_t src, uint32_t auxsrc, 
     return true;
 }
 /// \end::clock_configure[]
+
+/// \tag::clock_get_hz[]
+uint32_t clock_get_hz(enum clock_index clk_index) {
+    return configured_freq[clk_index];
+}
+/// \end::clock_get_hz[]
 
 /*******************************************************************************
 *            code from src/rp2_common/pico_runtime/runtime.c                   *
