@@ -6,6 +6,7 @@ vsf_add_sources(
 )
 
 add_subdirectory(i2c)
+add_subdirectory(uart)
 
 vsf_add_include_directories(
     vendor/generated/pico_base

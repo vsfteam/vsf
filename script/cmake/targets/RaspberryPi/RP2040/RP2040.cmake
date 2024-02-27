@@ -12,6 +12,7 @@ set(VSF_TARGET_DEFINITIONS
 include(${VSF_CMAKE_ROOT}/targets/arm/__cortex_m0plus.cmake)
 
 set(VSF_I2C_USE_DW_APB_I2C 1)
+set(VSF_USART_USE_PL011_UART 1)
 
 list(APPEND VSF_TARGET_INCLUDE_DIRECTORIES
     ${PICO_SDK_PATH}/src/boards/include

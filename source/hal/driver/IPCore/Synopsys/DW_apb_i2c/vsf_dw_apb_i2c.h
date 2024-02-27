@@ -152,7 +152,7 @@ vsf_class(vsf_dw_apb_i2c_t) {
     )
 };
 
-/*============================ INCLUDES ======================================*/
+/*============================ PROTOTYPES ======================================*/
 
 extern vsf_err_t vsf_dw_apb_i2c_init(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr,
         vsf_i2c_cfg_t *cfg_ptr, uint_fast32_t ic_clk_hz);
