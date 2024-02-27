@@ -30,6 +30,8 @@
 #   include "hal/driver/common/swi/vsf_swi_template.h"
 #   include "./device.h"
 
+#   include "i2c/i2c.h"
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
@@ -71,7 +73,7 @@
 #endif
 
 #if VSF_HAL_USE_I2C == ENABLED
-//#   define VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD                 ENABLED
+#   define VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD                 ENABLED
 #   include "hal/driver/common/template/vsf_template_i2c.h"
 
 #   define VSF_I2C_CFG_DEC_PREFIX                           vsf_hw

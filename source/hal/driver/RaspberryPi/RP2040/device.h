@@ -40,6 +40,9 @@
 
 /*============================ INCLUDES ======================================*/
 
+// for XXXX_BASE
+#include "hardware/regs/addressmap.h"
+
 //#include "common.h"
 
 /*============================ MACROS ========================================*/
@@ -60,6 +63,14 @@
                 .ulpi_en            = true,                                     \
                 .utmi_en            = false,                                    \
                 .vbus_en            = false,
+
+#define VSF_HW_I2C_COUNT            2
+#define VSF_HW_I2C0_IRQN            I2C0_IRQ_IRQn
+#define VSF_HW_I2C0_IRQHandler      I2C0_IRQHandler
+#define VSF_HW_I2C0_REG             I2C0_BASE
+#define VSF_HW_I2C1_IRQN            I2C1_IRQ_IRQn
+#define VSF_HW_I2C1_IRQHandler      I2C1_IRQHandler
+#define VSF_HW_I2C1_REG             I2C1_BASE
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
