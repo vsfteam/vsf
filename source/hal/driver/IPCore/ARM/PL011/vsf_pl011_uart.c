@@ -27,6 +27,8 @@
 // if __HAL_DRIVER_PL011_UART_H__ is defined, means chip driver include "vsf_pl011_uart.h".
 #ifdef __HAL_DRIVER_PL011_UART_H__
 
+#include "vsf_pl011_uart_reg.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
