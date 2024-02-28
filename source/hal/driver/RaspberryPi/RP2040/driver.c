@@ -401,6 +401,14 @@ bool vsf_driver_init(void)
                     SYS_CLK_KHZ * KHZ);
     /// \end::configure_clk_sys[]
 
+    // CLK PERI = clk_sys. Used as reference clock for Peripherals. No dividers so just select and enable
+    // Normally choose clk_sys or clk_usb
+    clock_configure(clk_peri,
+                    0,
+                    CLOCKS_CLK_PERI_CTRL_AUXSRC_VALUE_CLK_SYS,
+                    SYS_CLK_KHZ * KHZ,
+                    SYS_CLK_KHZ * KHZ);
+
     unreset_block_wait(RESETS_RESET_BITS);
     return true;
 }

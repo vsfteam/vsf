@@ -72,6 +72,14 @@
 #define VSF_HW_I2C1_IRQHandler      I2C1_IRQHandler
 #define VSF_HW_I2C1_REG             I2C1_BASE
 
+#define VSF_HW_USART_COUNT          2
+#define VSF_HW_USART0_IRQN          UART0_IRQ_IRQn
+#define VSF_HW_USART0_IRQHandler    UART0_IRQHandler
+#define VSF_HW_USART0_REG           UART0_BASE
+#define VSF_HW_USART1_IRQN          UART1_IRQ_IRQn
+#define VSF_HW_USART1_IRQHandler    UART1_IRQHandler
+#define VSF_HW_USART1_REG           UART1_BASE
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

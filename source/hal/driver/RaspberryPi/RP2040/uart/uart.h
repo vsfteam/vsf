@@ -17,6 +17,7 @@
 
 #ifndef __HAL_DRIVER_RP2040_UART_H__
 #define __HAL_DRIVER_RP2040_UART_H__
+
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
@@ -24,6 +25,19 @@
 #if VSF_HAL_USE_USART == ENABLED
 
 #include "../__device.h"
+
+/*============================ TYPES =========================================*/
+
+// PL011 does not embed a dma controller, so dma irq should be defined here,
+//  before including vsf_pl011_uart.h
+enum {
+    // irq of pl011_usart is 11-bit in size, so implement dma related request irq from bit16
+    VSF_USART_IRQ_MASK_TX_CPL       = (0x1ul << 16),
+    VSF_USART_IRQ_MASK_RX_CPL       = (0x1ul << 17),
+};
+
+/*============================ INCLUDES ======================================*/
+
 #include "hal/driver/IPCore/ARM/PL011/vsf_pl011_uart.h"
 
 /*============================ MACROS ========================================*/

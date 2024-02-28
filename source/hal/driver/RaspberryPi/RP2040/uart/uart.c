@@ -21,9 +21,11 @@
 
 #if VSF_HAL_USE_USART == ENABLED
 
+#define __VSF_HAL_PL011_UART_CLASS_INHERIT__
+
 #include "hal/vsf_hal.h"
 
-// for I2C IRQn
+// for UART IRQn
 #include "RP2040.h"
 
 /*============================ MACROS ========================================*/
@@ -47,7 +49,7 @@ vsf_err_t vsf_hw_usart_init(vsf_hw_usart_t *hw_usart_ptr, vsf_usart_cfg_t *cfg_p
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);
 
-    vsf_err_t err = vsf_pl011_usart_init(&hw_usart_ptr->use_as__vsf_pl011_usart_t, cfg_ptr, clock_get_hz(clk_sys));
+    vsf_err_t err = vsf_pl011_usart_init(&hw_usart_ptr->use_as__vsf_pl011_usart_t, cfg_ptr, clock_get_hz(clk_peri));
 
     vsf_usart_isr_t *isr_ptr = &cfg_ptr->isr;
     if (isr_ptr->handler_fn != NULL) {
@@ -69,7 +71,9 @@ void vsf_hw_usart_fini(vsf_hw_usart_t *hw_usart_ptr)
 vsf_usart_capability_t vsf_hw_usart_capability(vsf_hw_usart_t *hw_usart_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
-    return vsf_pl011_usart_capability(&hw_usart_ptr->use_as__vsf_pl011_usart_t);
+    vsf_usart_capability_t cap = vsf_pl011_usart_capability(&hw_usart_ptr->use_as__vsf_pl011_usart_t, clock_get_hz(clk_peri));
+    cap.irq_mask |= VSF_USART_IRQ_MASK_TX_CPL | VSF_USART_IRQ_MASK_RX_CPL;
+    return cap;
 }
 
 fsm_rt_t vsf_hw_usart_enable(vsf_hw_usart_t *hw_usart_ptr)
@@ -129,37 +133,41 @@ uint_fast16_t vsf_hw_usart_txfifo_write(vsf_hw_usart_t *hw_usart_ptr, void *buff
 vsf_err_t vsf_hw_usart_request_rx(vsf_hw_usart_t *hw_usart_ptr, void *buffer_ptr, uint_fast32_t count)
 {
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
-    return vsf_pl011_usart_request_rx(&hw_usart_ptr->use_as__vsf_pl011_usart_t, buffer_ptr, count);
+    uintptr_t srcaddr = vsf_pl011_usart_rxdma_config(&hw_usart_ptr->use_as__vsf_pl011_usart_t, true);
+    // TODO: setup DMA
+    return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_hw_usart_request_tx(vsf_hw_usart_t *hw_usart_ptr, void *buffer_ptr, uint_fast32_t count)
 {
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
-    return vsf_pl011_usart_request_tx(&hw_usart_ptr->use_as__vsf_pl011_usart_t, buffer_ptr, count);
+    uintptr_t dstaddr = vsf_pl011_usart_txdma_config(&hw_usart_ptr->use_as__vsf_pl011_usart_t, true);
+    // TODO: setup DMA
+    return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_hw_usart_cancel_rx(vsf_hw_usart_t *hw_usart_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
-    return vsf_pl011_usart_cancel_rx(&hw_usart_ptr->use_as__vsf_pl011_usart_t);
+    return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_hw_usart_cancel_tx(vsf_hw_usart_t *hw_usart_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
-    return vsf_pl011_usart_cancel_tx(&hw_usart_ptr->use_as__vsf_pl011_usart_t);
+    return VSF_ERR_NONE;
 }
 
 int_fast32_t vsf_hw_usart_get_rx_count(vsf_hw_usart_t *hw_usart_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
-    return vsf_pl011_usart_get_rx_count(&hw_usart_ptr->use_as__vsf_pl011_usart_t);
+    return 0;
 }
 
 int_fast32_t vsf_hw_usart_get_tx_count(vsf_hw_usart_t *hw_usart_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_usart_ptr);
-    return vsf_pl011_usart_get_tx_count(&hw_usart_ptr->use_as__vsf_pl011_usart_t);
+    return 0;
 }
 
 /*============================ INCLUDES ======================================*/
@@ -168,7 +176,7 @@ int_fast32_t vsf_hw_usart_get_tx_count(vsf_hw_usart_t *hw_usart_ptr)
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX         VSF_HW
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     vsf_hw_usart_t vsf_hw_usart ## __IDX = {                                    \
-        .reg  = (vsf_pl011_usart_reg_t *)VSF_HW_USART ## __IDX ## _REG,         \
+        .reg  = (void *)VSF_HW_USART ## __IDX ## _REG,                          \
         .irqn = VSF_HW_USART ## __IDX ## _IRQN,                                 \
         __HAL_OP                                                                \
     };                                                                          \

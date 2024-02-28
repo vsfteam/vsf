@@ -77,7 +77,6 @@
 #endif
 
 #if VSF_HAL_USE_I2C == ENABLED
-#   define VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD                 ENABLED
 #   include "hal/driver/common/template/vsf_template_i2c.h"
 
 #   define VSF_I2C_CFG_DEC_PREFIX                           vsf_hw
@@ -131,8 +130,6 @@
 #endif
 
 #if VSF_HAL_USE_USART == ENABLED
-//#   define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE              ENABLED
-//#   define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK          ENABLED
 #   include "hal/driver/common/template/vsf_template_usart.h"
 
 #   define VSF_USART_CFG_DEC_PREFIX                         vsf_hw
