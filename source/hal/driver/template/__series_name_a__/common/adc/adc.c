@@ -34,7 +34,6 @@
 
 /*\note VSF_HW_ADC_CFG_MULTI_CLASS is only for drivers for specified device(hw drivers).
  *      For other drivers, plase define VSF_${ADC_IP}_ADC_CFG_MULTI_CLASS in header file.
- *      Codes between "HW" and "HW end" are for hw drivers only.
  */
 
 // HW
@@ -48,8 +47,8 @@
 #define VSF_ADC_CFG_IMP_UPCASE_PREFIX           VSF_HW
 // HW end
 // IPCore
-#define VSF_ADC_CFG_IMP_PREFIX                  vsf_$(adc_ip)
-#define VSF_ADC_CFG_IMP_UPCASE_PREFIX           VSF_$(adc_ip)
+#define VSF_ADC_CFG_IMP_PREFIX                  vsf_${adc_ip}
+#define VSF_ADC_CFG_IMP_UPCASE_PREFIX           VSF_${adc_ip}
 // IPCore end
 
 /*============================ TYPES =========================================*/
@@ -60,7 +59,6 @@ typedef struct vsf_hw_adc_t {
     vsf_adc_t               vsf_adc;
 #endif
     void                    *reg;
-    IRQn_Type               irqn;
     vsf_adc_isr_t           isr;
 } vsf_hw_adc_t;
 // HW end
@@ -84,6 +82,8 @@ vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_init)(
 ) {
     VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != cfg_ptr));
     // configure according to cfg_ptr
+    adc_ptr->isr = cfg_ptr->isr;
+    // configure interrupt according to cfg_ptr->isr
     return VSF_ERR_NONE;
 }
 
@@ -167,6 +167,18 @@ vsf_adc_capability_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_capability)(
         .channel_count      = VSF_HW_ADC_CFG_CHANNEL_COUNT,
     };
 }
+
+static void __vsf_hw_adc_irq_handler(
+    VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr
+) {
+    VSF_HAL_ASSERT(NULL != adc_ptr);
+
+    vsf_adc_irq_mask_t irq_mask = GET_IRQ_MASK(adc_ptr);
+    vsf_adc_isr_t *isr_ptr = &adc_ptr->isr;
+    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_adc_t *)adc_ptr, irq_mask);
+    }
+}
 // HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -179,9 +191,14 @@ vsf_adc_capability_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_capability)(
 #define VSF_ADC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     vsf_hw_adc_t VSF_MCONNECT(vsf_hw_adc, __IDX) = {                            \
         .reg                = VSF_MCONNECT(VSF_HW_ADC, __IDX,_REG_),            \
-        .irqn               = VSF_MCONNECT(VSF_HW_ADC, __IDX, _IRQ_IDX),        \
         __HAL_OP                                                                \
-    };
+    };                                                                          \
+    void VSF_MCONNECT(VSF_HW_ADC, __IDX, _IRQHandler)(void)                     \
+    {                                                                           \
+        uintptr_t ctx = vsf_hal_irq_enter();                                    \
+        __vsf_hw_adc_irq_handler(&VSF_MCONNECT(vsf_hw_adc, __IDX));             \
+        vsf_hal_irq_leave(ctx);                                                 \
+    }
 #include "hal/driver/common/adc/adc_template.inc"
 // HW end
 

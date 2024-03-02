@@ -10,32 +10,33 @@
  *  Unless required by applicable law or agreed to in writing, software      *
  *  distributed under the License is distributed on an "AS IS" BASIS,        *
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
- *  See the License for the specific language governing permissions and      *
+ *  See the License for the flashecific language governing permissions and   *
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_${DEVICE}_ADC_H__
-#define __HAL_DRIVER_${DEVICE}_ADC_H__
+#ifndef __HAL_DRIVER_${DEVICE/FLASH_IP}_FLASH_H__
+#define __HAL_DRIVER_${DEVICE/FLASH_IP}_FLASH_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_ADC == ENABLED
+#if VSF_HAL_USE_FLASH == ENABLED
+
+#include "../__device.h"
 
 /*\note Incudes CAN ONLY be put here. */
 
-/*\note ADC can be a driver to a actual device, or to a IPCore driver/emulated driver.
- *      If current driver is for a device, instance structure is not open to user.
- *      Otherwise instance structure should be open to user,
- *          in this case include the code between "IPCore" and "IPCore end" comments.
+/*\note Refer to template/README.md for usage cases.
+ *      It's recommended to use blackbox mode for peripherial drivers, leave only reimplementation part open.
+ *      Otherwise class structure, MULTI_CLASS configuration and class APIs should be open to user, and no reimplementation part.
  */
 
 // IPCore
-#if     defined(__VSF_HAL_${ADC_IP}_ADC_CLASS_IMPLEMENT)
+#if     defined(__VSF_HAL_${FLASH_IP}_FLASH_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
-#elif   defined(__VSF_HAL_${ADC_IP}_ADC_CLASS_INHERIT__)
+#elif   defined(__VSF_HAL_${FLASH_IP}_FLASH_CLASS_INHERIT__)
 #   define __VSF_CLASS_INHERIT__
 #endif
 
@@ -48,39 +49,19 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-/*\note VSF_${ADC_IP}_ADC_CFG_MULTI_CLASS should be implemented for IP drives and open to user,
- *          while VSF_HW_ADC_CFG_MULTI_CLASS should be in adc.c.
+/*\note VSF_${FLASH_IP}_FLASH_CFG_MULTI_CLASS should be implemented for IP drives and open to user,
+ *          while VSF_HW_FLASH_CFG_MULTI_CLASS should be in flash.c.
  */
 
 // IPCore
-#ifndef VSF_${ADC_IP}_ADC_CFG_MULTI_CLASS
-#   define VSF_${ADC_IP}_ADC_CFG_MULTI_CLASS    VSF_ADC_CFG_MULTI_CLASS
+#ifndef VSF_${FLASH_IP}_FLASH_CFG_MULTI_CLASS
+#   define VSF_${FLASH_IP}_FLASH_CFG_MULTI_CLASS    VSF_FLASH_CFG_MULTI_CLASS
 #endif
 // IPCore end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-// IPCore
-vsf_class(vsf_${adc_ip}_adc_t) {
-#if VSF_${ADC_IP}_CFG_MULTI_CLASS == ENABLED
-    public_member(
-        vsf_adc_t               vsf_adc;
-    )
-#endif
-
-/*\note You can add more memmber in vsf_${adc_ip}_adc_t instance.
- *      For members accessable from child, put in protected_member.
- *      Else, put in private_member.
- */
-
-    protected_member(
-        vsf_${adc_ip}_adc_reg_t *reg;
-        vsf_adc_isr_t           isr;
-    )
-};
-// IPCore end
-
+/*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
 
 // IPCore
@@ -94,6 +75,6 @@ vsf_class(vsf_${adc_ip}_adc_t) {
 }
 #endif
 
-#endif /* VSF_HAL_USE_ADC */
+#endif /* VSF_HAL_USE_FLASH */
 #endif
 /* EOF */
