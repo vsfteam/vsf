@@ -50,9 +50,10 @@
 // HW
 typedef struct vsf_hw_adc_t {
 #if VSF_HW_ADC_CFG_MULTI_CLASS == ENABLED
-    vsf_adc_t vsf_adc;
+    vsf_adc_t               vsf_adc;
 #endif
-    void *reg;
+    void                    *reg;
+    IRQn_Type               irqn;
     vsf_adc_isr_t           isr;
 } vsf_hw_adc_t;
 // HW end
@@ -75,7 +76,7 @@ vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_init)(
     vsf_adc_cfg_t *cfg_ptr
 ) {
     VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != cfg_ptr));
-    // configure clock to cfg_ptr->clock_ha
+    // configure according to cfg_ptr
     return VSF_ERR_NONE;
 }
 
@@ -154,9 +155,9 @@ vsf_adc_capability_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_capability)(
     VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr
 ) {
     return (vsf_adc_capability_t) {
-        .irq_mask               = VSF_ADC_IRQ_MASK_CPL,
-        .max_data_bits          = 8,
-        .channel_count          = VSF_HW_ADC_CFG_CHANNEL_COUNT,
+        .irq_mask           = VSF_ADC_IRQ_MASK_CPL,
+        .max_data_bits      = 8,
+        .channel_count      = VSF_HW_ADC_CFG_CHANNEL_COUNT,
     };
 }
 // HW end
@@ -170,7 +171,8 @@ vsf_adc_capability_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_capability)(
 // HW
 #define VSF_ADC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     vsf_hw_adc_t VSF_MCONNECT(vsf_hw_adc, __IDX) = {                            \
-        .reg            = VSF_MCONNECT(VSF_HW_I2C, __IDX,_REG_),                \
+        .reg                = VSF_MCONNECT(VSF_HW_ADC, __IDX,_REG_),            \
+        .irqn               = VSF_MCONNECT(VSF_HW_ADC, __IDX, _IRQ_IDX),        \
         __HAL_OP                                                                \
     };
 #include "hal/driver/common/adc/adc_template.inc"
