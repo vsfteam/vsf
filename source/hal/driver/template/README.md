@@ -8,6 +8,7 @@ Here ${VENDOR}/${SERIES}/${DEVICE} will be referenced in the source code of the 
 
 2. Implement an IPCore driver ${XXX_IP} from ${VENDOR}.
 codes between "IPCore" - "IPCore end" comments sections in the source code of the template are for these drivers.
+IPCore drivers are actually provided to peripherial drivers, so information in IPCore drivers should be open.
 Here ${VENDOR}/${XXX_IP} will be referenced in the source code of the template, please replace them with the actual name.
 
 3. Implement a emulated driver as if it's an specified peripherial.
@@ -26,6 +27,7 @@ ${VENDOR}/${SERIES}/${DEVICE} 会出现在模板代码中，请替换为实际�
 
 2. 实现一个 ${VENDOR} 厂家的 ${XXX_IP} 的 IP 核驱动。
 在 "IPCore" 到 "IPCore end" 注释段之间的代码，就是用于这种驱动的。
+IP 核驱动实际上是提供给具体芯片外设驱动使用，所以相关的信息都需要对高层可见。
 ${VENDOR}/${XXX_IP} 会出现在模板代码中，请替换为实际的名字。
 
 3. 实现一个模拟某种芯片外设接口的驱动。

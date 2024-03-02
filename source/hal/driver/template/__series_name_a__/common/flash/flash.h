@@ -29,8 +29,9 @@
 /*\note Incudes CAN ONLY be put here. */
 
 /*\note Refer to template/README.md for usage cases.
- *      It's recommended to use blackbox mode for peripherial drivers, leave only reimplementation part open.
- *      Otherwise class structure, MULTI_CLASS configuration and class APIs should be open to user, and no reimplementation part.
+ *      For peripherial drivers, blackbox mode is recommended but not required, reimplementation part MUST be open.
+ *      For IPCore drivers, class structure, MULTI_CLASS configuration, reimplementation and class APIs should be open to user.
+ *      For emulated drivers, **** No reimplementation ****.
  */
 
 // IPCore
@@ -59,10 +60,30 @@ extern "C" {
 #endif
 // IPCore end
 
-/*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ TYPES =========================================*/
-/*============================ INCLUDES ======================================*/
+
+// IPCore
+vsf_class(vsf_${flash_ip}_flash_t) {
+#if VSF_${FLASH_IP}_CFG_MULTI_CLASS == ENABLED
+    public_member(
+        vsf_flash_t                 vsf_flash;
+    )
+#endif
+
+/*\note You can add more memmber in vsf_${flash_ip}_flash_t instance.
+ *      For members accessable from child, put in protected_member.
+ *      Else, put in private_member.
+ */
+
+    protected_member(
+        vsf_${flash_ip}_flash_reg_t *reg;
+        vsf_flash_isr_t             isr;
+    )
+};
+// IPCore end
+
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ PROTOTYPES ====================================*/
 
 // IPCore
 /*\note Extern APIs for ip core diriver.
@@ -75,6 +96,6 @@ extern "C" {
 }
 #endif
 
-#endif /* VSF_HAL_USE_FLASH */
-#endif
+#endif      // VSF_HAL_USE_FLASH
+#endif      // __HAL_DRIVER_${DEVICE/FLASH_IP}_FLASH_H__
 /* EOF */

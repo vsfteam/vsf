@@ -29,8 +29,9 @@
 /*\note Incudes CAN ONLY be put here. */
 
 /*\note Refer to template/README.md for usage cases.
- *      It's recommended to use blackbox mode for peripherial drivers, leave only reimplementation part open.
- *      Otherwise class structure, MULTI_CLASS configuration and class APIs should be open to user, and no reimplementation part.
+ *      For peripherial drivers, blackbox mode is recommended but not required, reimplementation part MUST be open.
+ *      For IPCore drivers, class structure, MULTI_CLASS configuration, reimplementation and class APIs should be open to user.
+ *      For emulated drivers, **** No reimplementation ****.
  */
 
 // IPCore
@@ -78,7 +79,27 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-// HW
+// IPCore
+vsf_class(vsf_${i2c_ip}_i2c_t) {
+#if VSF_${I2C_IP}_CFG_MULTI_CLASS == ENABLED
+    public_member(
+        vsf_i2c_t               vsf_i2c;
+    )
+#endif
+
+/*\note You can add more memmber in vsf_${i2c_ip}_i2c_t instance.
+ *      For members accessable from child, put in protected_member.
+ *      Else, put in private_member.
+ */
+
+    protected_member(
+        vsf_${i2c_ip}_iwc_reg_t *reg;
+        vsf_i2c_isr_t           isr;
+    )
+};
+// IPCore end
+
+// HW/IPCore, not for emulated drivers
 typedef enum vsf_i2c_mode_t {
     VSF_I2C_MODE_MASTER                         = (0x1ul << 28),
     VSF_I2C_MODE_SLAVE                          = (0x0ul << 28),
@@ -130,15 +151,10 @@ typedef struct vsf_i2c_status_t {
         uint32_t value;
     };
 } vsf_i2c_status_t;
-// HW end
+// HW/IPCore end
 
-/*============================ INCLUDES ======================================*/
-/*============================ TYPES =========================================*/
-/*============================ INCLUDES ======================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-/*============================ IMPLEMENTATION ================================*/
 
 // IPCore
 /*\note Extern APIs for ip core diriver.

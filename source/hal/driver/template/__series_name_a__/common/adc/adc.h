@@ -29,8 +29,9 @@
 /*\note Incudes CAN ONLY be put here. */
 
 /*\note Refer to template/README.md for usage cases.
- *      It's recommended to use blackbox mode for peripherial drivers, leave only reimplementation part open.
- *      Otherwise class structure, MULTI_CLASS configuration and class APIs should be open to user, and no reimplementation part.
+ *      For peripherial drivers, blackbox mode is recommended but not required, reimplementation part MUST be open.
+ *      For IPCore drivers, class structure, MULTI_CLASS configuration, reimplementation and class APIs should be open to user.
+ *      For emulated drivers, **** No reimplementation ****.
  */
 
 // IPCore
