@@ -15,25 +15,180 @@
  *                                                                           *
  ****************************************************************************/
 
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-#   include "hal/vsf_hal_cfg.h"
-#   include "./device.h"
-#   undef   __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+/*============================ INCLUDES ======================================*/
+
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__) || defined(__VSF_HAL_SHOW_VENDOR_INFO__)
+
+#   include "./__device.h"
+
 #else
 
-#   ifndef __HAL_DRIVER_TEMPLATE_H__
-#       define __HAL_DRIVER_TEMPLATE_H__
+#ifndef __VSF_HAL_DRIVER_${VENDOR}_${DEVICE}_H__
+#define __VSF_HAL_DRIVER_${VENDOR}_${DEVICE}_H__
 
 /*============================ INCLUDES ======================================*/
-#       include "hal/vsf_hal_cfg.h"
-#       include "./device.h"
+
+#   include "hal/vsf_hal_cfg.h"
+#   include "./device.h"
+
+// For SWI
+#   include "hal/driver/common/swi/vsf_swi_template.h"
+
+/*\note You can also put dirvers under ../common/xxxx, it's up to user to decide. */
+
+#   if VSF_HAL_USE_IO == ENABLED
+#       include "../io/io.h"
+#   endif
+#   if VSF_HAL_USE_ADC == ENABLED
+#       include "../adc/adc.h"
+#   endif
+#   if VSF_HAL_USE_FLASH == ENABLED
+#       include "../flash/flash.h"
+#   endif
+#   if VSF_HAL_USE_GPIO == ENABLED
+#       include "../gpio/gpio.h"
+#   endif
+#   if VSF_HAL_USE_I2C == ENABLED
+#       include "../i2c/i2c.h"
+#   endif
+#   if VSF_HAL_USE_PWM == ENABLED
+#       include "../pwm/pwm.h"
+#   endif
+#   if VSF_HAL_USE_RTC == ENABLED
+#       include "../rtc/rtc.h"
+#   endif
+#   if VSF_HAL_USE_SPI == ENABLED
+#       include "../spi/spi.h"
+#   endif
+#   if VSF_HAL_USE_TIMER == ENABLED
+#       include "../timer/timer.h"
+#   endif
+#   if VSF_HAL_USE_TRNG == ENABLED
+#       include "../trng/trng.h"
+#   endif
+#   if VSF_HAL_USE_USART == ENABLED
+#       include "../uart/uart.h"
+#   endif
+#   if VSF_HAL_USE_USB == ENABLED
+#       include "../usb/usb.h"
+#   endif
+#   if VSF_HAL_USE_MMC == ENABLED
+#       include "../mmc/mmc.h"
+#   endif
+#   if VSF_HAL_USE_I2S == ENABLED
+#       include "../i2s/i2s.h"
+#   endif
+#   if VSF_HAL_USE_WDT == ENABLED
+#       include "../wdt/wdt.h"
+#   endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-#   endif
 
+
+
+/*============================ INCLUDES ======================================*/
+
+#if VSF_HAL_USE_IO == ENABLED
+#   include "hal/driver/common/template/vsf_template_io.h"
+
+#   define VSF_IO_CFG_DEC_PREFIX                            vsf_hw
+#   define VSF_IO_CFG_DEC_UPCASE_PREFIX                     VSF_HW
+#   include "hal/driver/common/io/io_template.h"
 #endif
+
+#if VSF_HAL_USE_GPIO == ENABLED
+#   include "hal/driver/common/template/vsf_template_gpio.h"
+
+#   define VSF_GPIO_CFG_DEC_PREFIX                          vsf_hw
+#   define VSF_GPIO_CFG_DEC_UPCASE_PREFIX                   VSF_HW
+#   include "hal/driver/common/gpio/gpio_template.h"
+#endif
+
+#if VSF_HAL_USE_ADC == ENABLED
+#   include "hal/driver/common/template/vsf_template_adc.h"
+
+#   define VSF_ADC_CFG_DEC_PREFIX                           vsf_hw
+#   define VSF_ADC_CFG_DEC_UPCASE_PREFIX                    VSF_HW
+#   include "hal/driver/common/adc/adc_template.h"
+#endif
+
+#if VSF_HAL_USE_FLASH == ENABLED
+#   include "hal/driver/common/template/vsf_template_flash.h"
+
+#   define VSF_FLASH_CFG_DEC_PREFIX                         vsf_hw
+#   define VSF_FLASH_CFG_DEC_UPCASE_PREFIX                  VSF_HW
+#   include "hal/driver/common/flash/flash_template.h"
+#endif
+
+#if VSF_HAL_USE_I2C == ENABLED
+#   include "hal/driver/common/template/vsf_template_i2c.h"
+
+#   define VSF_I2C_CFG_DEC_PREFIX                           vsf_hw
+#   define VSF_I2C_CFG_DEC_UPCASE_PREFIX                    VSF_HW
+#   include "hal/driver/common/i2c/i2c_template.h"
+#endif
+
+#if VSF_HAL_USE_PWM == ENABLED
+#   include "hal/driver/common/template/vsf_template_pwm.h"
+
+#   define VSF_PWM_CFG_DEC_PREFIX                           vsf_hw
+#   define VSF_PWM_CFG_DEC_UPCASE_PREFIX                    VSF_HW
+#   include "hal/driver/common/pwm/pwm_template.h"
+#endif
+
+#if VSF_HAL_USE_RTC == ENABLED
+#   include "hal/driver/common/template/vsf_template_rtc.h"
+
+#   define VSF_RTC_CFG_DEC_PREFIX                           vsf_hw
+#   define VSF_RTC_CFG_DEC_UPCASE_PREFIX                    VSF_HW
+#   include "hal/driver/common/rtc/rtc_template.h"
+#endif
+
+#if VSF_HAL_USE_SPI == ENABLED
+#   include "hal/driver/common/template/vsf_template_spi.h"
+
+#   define VSF_SPI_CFG_DEC_PREFIX                           vsf_hw
+#   define VSF_SPI_CFG_DEC_UPCASE_PREFIX                    VSF_HW
+#   include "hal/driver/common/spi/spi_template.h"
+#endif
+
+#if VSF_HAL_USE_TIMER == ENABLED
+#   include "hal/driver/common/template/vsf_template_timer.h"
+
+#   define VSF_TIMER_CFG_DEC_PREFIX                         vsf_hw
+#   define VSF_TIMER_CFG_DEC_UPCASE_PREFIX                  VSF_HW
+#   include "hal/driver/common/timer/timer_template.h"
+#endif
+
+#if VSF_HAL_USE_RNG == ENABLED
+#   include "hal/driver/common/template/vsf_template_rng.h"
+
+#   define VSF_RNG_CFG_DEC_PREFIX                           vsf_hw
+#   define VSF_RNG_CFG_DEC_UPCASE_PREFIX                    VSF_HW
+#   include "hal/driver/common/rng/rng_template.h"
+#endif
+
+#if VSF_HAL_USE_USART == ENABLED
+#   include "hal/driver/common/template/vsf_template_usart.h"
+
+#   define VSF_USART_CFG_DEC_PREFIX                         vsf_hw
+#   define VSF_USART_CFG_DEC_UPCASE_PREFIX                  VSF_HW
+#   include "hal/driver/common/usart/usart_template.h"
+#endif
+
+#if VSF_HAL_USE_WDT == ENABLED
+#   include "hal/driver/common/template/vsf_template_wdt.h"
+
+#   define VSF_WDT_CFG_DEC_PREFIX                           vsf_hw
+#   define VSF_WDT_CFG_DEC_UPCASE_PREFIX                    VSF_HW
+#   include "hal/driver/common/wdt/wdt_template.h"
+#endif
+
+#endif      // __VSF_HAL_DRIVER_${VENDOR}_${DEVICE}_H__
+#endif      // !__VSF_HEADER_ONLY_SHOW_ARCH_INFO__ && !__VSF_HAL_SHOW_VENDOR_INFO__
 /* EOF */

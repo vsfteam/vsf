@@ -97,12 +97,12 @@ typedef struct vsf_hw_adc_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static uint_fast32_t __vsf_adc_get_callback_time_us(vsf_hw_adc_t *hw_adc_ptr)
+static uint_fast32_t __vsf_hw_adc_get_callback_time_us(vsf_hw_adc_t *hw_adc_ptr)
 {
     return 26000000 / hw_adc_ptr->cfg.clock_hz * 20 + 6 + VSF_HW_ADC_CFG_CALLBACK_TIME_POSTPONE_US;
 }
 
-static void __vsf_adc_measure(int type)
+static void __vsf_hw_adc_measure(int type)
 {
     if (type == VSF_ADC_REF_VDD_1) {
         PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteRtcCore->rtc_rg_por_ctrl_cfg1),
@@ -151,7 +151,7 @@ static void __vsf_adc_measure(int type)
     }
 }
 
-static vsf_err_t __vsf_adc_channel_config(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_channel_cfg_t *channel_cfgs_ptr)
+static vsf_err_t __vsf_hw_adc_channel_config(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_channel_cfg_t *channel_cfgs_ptr)
 {
     uint8_t channel = channel_cfgs_ptr->channel;
     if (channel > 7) {
@@ -179,7 +179,7 @@ static vsf_err_t __vsf_adc_channel_config(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_chan
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t __vsf_adc_channel_request(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_channel_cfg_t *channel_cfg_ptr)
+static vsf_err_t __vsf_hw_adc_channel_request(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_channel_cfg_t *channel_cfg_ptr)
 {
     uint8_t channel = channel_cfg_ptr->channel;
     if (channel > 7) {              // TODO:
@@ -209,17 +209,17 @@ static vsf_err_t __vsf_adc_channel_request(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_cha
     PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_sw_ctrl0),
         AIC1000LITE_MSADC_CFG_MSADC_SW_START_PULSE);
 
-    return vsf_teda_set_timer_ex(&hw_adc_ptr->teda, vsf_systimer_us_to_tick(__vsf_adc_get_callback_time_us(hw_adc_ptr)));
+    return vsf_teda_set_timer_ex(&hw_adc_ptr->teda, vsf_systimer_us_to_tick(__vsf_hw_adc_get_callback_time_us(hw_adc_ptr)));
 }
 
-static void __vk_adc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+static void __vsf_hw_adc_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vsf_hw_adc_t *hw_adc_ptr = vsf_container_of(eda, vsf_hw_adc_t, teda);
 
     switch (evt) {
     case VSF_EVT_TIMER:
         if (0x1 != PMIC_MEM_READ((unsigned int)(&aic1000liteMsadc->cfg_msadc_int_raw))) {
-            vsf_teda_set_timer_ex(&hw_adc_ptr->teda, vsf_systimer_us_to_tick(__vsf_adc_get_callback_time_us(hw_adc_ptr)));
+            vsf_teda_set_timer_ex(&hw_adc_ptr->teda, vsf_systimer_us_to_tick(__vsf_hw_adc_get_callback_time_us(hw_adc_ptr)));
             return;
         }
         PMIC_MEM_WRITE((unsigned int)(&aic1000liteMsadc->cfg_msadc_int_raw), 0x1);
@@ -257,7 +257,7 @@ vsf_err_t vsf_hw_adc_init(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_cfg_t *cfg_ptr)
             AIC1000LITE_SYS_CTRL_CFG_CLK_MSADC_DIV_DENOM(temp_clock_div)
         |   AIC1000LITE_SYS_CTRL_CFG_CLK_MSADC_DIV_UPDATE);
 
-    hw_adc_ptr->teda.fn.evthandler = __vk_adc_evthandler;
+    hw_adc_ptr->teda.fn.evthandler = __vsf_hw_adc_evthandler;
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     hw_adc_ptr->teda.on_terminate = NULL;
 #endif
@@ -323,12 +323,12 @@ vsf_err_t vsf_hw_adc_channel_request_once(vsf_hw_adc_t *hw_adc_ptr,
 
     hw_adc_ptr->status.is_busy = true;
 
-    vsf_err_t result = __vsf_adc_channel_config(hw_adc_ptr, channel_cfg_ptr);
+    vsf_err_t result = __vsf_hw_adc_channel_config(hw_adc_ptr, channel_cfg_ptr);
     if (result == VSF_ERR_NONE) {
         hw_adc_ptr->current_channel = channel_cfg_ptr;
         hw_adc_ptr->buffer_ptr = buffer_ptr;
 
-        result = __vsf_adc_channel_request(hw_adc_ptr, hw_adc_ptr->current_channel);
+        result = __vsf_hw_adc_channel_request(hw_adc_ptr, hw_adc_ptr->current_channel);
     }
 
     return result;
@@ -347,7 +347,7 @@ vsf_err_t vsf_hw_adc_channel_config(vsf_hw_adc_t *hw_adc_ptr,
     for (int i = 0; i < channel_cfgs_cnt; i++) {
         hw_adc_ptr->chns.cfgs[i] = channel_cfgs_ptr[i];
 
-        result = __vsf_adc_channel_config(hw_adc_ptr, channel_cfgs_ptr + i);
+        result = __vsf_hw_adc_channel_config(hw_adc_ptr, channel_cfgs_ptr + i);
         if (VSF_ERR_NONE != result) {
             return result;
         }
@@ -358,7 +358,7 @@ vsf_err_t vsf_hw_adc_channel_config(vsf_hw_adc_t *hw_adc_ptr,
     return VSF_ERR_NONE;
 }
 
-static void __adc_request_isr_handler(void *target, vsf_adc_t *adc_ptr, vsf_adc_irq_mask_t irq_mask)
+static void __vsf_hw_adc_request_isr_handler(void *target, vsf_adc_t *adc_ptr, vsf_adc_irq_mask_t irq_mask)
 {
     vsf_hw_adc_t *hw_adc_ptr = (vsf_hw_adc_t *)adc_ptr;
     VSF_HAL_ASSERT(NULL != hw_adc_ptr);
@@ -386,15 +386,15 @@ static void __adc_request_isr_handler(void *target, vsf_adc_t *adc_ptr, vsf_adc_
     }
 }
 
-static void __adc_req_init(vsf_hw_adc_t *hw_adc_ptr, void *buffer_ptr, uint_fast32_t count)
+static void __vsf_hw_adc_req_init(vsf_hw_adc_t *hw_adc_ptr, void *buffer_ptr, uint_fast32_t count)
 {
     hw_adc_ptr->request.buf = buffer_ptr;
     hw_adc_ptr->request.cnt = count;
     hw_adc_ptr->request.idx = 0;
 
     if (    (hw_adc_ptr->cfg.isr.handler_fn != NULL)
-        &&  (hw_adc_ptr->cfg.isr.handler_fn != __adc_request_isr_handler)) {
-        hw_adc_ptr->cfg.isr.handler_fn = __adc_request_isr_handler;
+        &&  (hw_adc_ptr->cfg.isr.handler_fn != __vsf_hw_adc_request_isr_handler)) {
+        hw_adc_ptr->cfg.isr.handler_fn = __vsf_hw_adc_request_isr_handler;
     }
 }
 
@@ -405,11 +405,11 @@ vsf_err_t vsf_hw_adc_channel_request(vsf_hw_adc_t *hw_adc_ptr, void *buffer_ptr,
     VSF_HAL_ASSERT(hw_adc_ptr->status.is_enable);
     VSF_HAL_ASSERT(!hw_adc_ptr->status.is_busy);
 
-    __adc_req_init(hw_adc_ptr, buffer_ptr, count);
+    __vsf_hw_adc_req_init(hw_adc_ptr, buffer_ptr, count);
     hw_adc_ptr->chns.index = 0;
 
     vsf_protect_t orig = vsf_protect(interrupt)();
-        __adc_request_isr_handler(NULL, (vsf_adc_t *)hw_adc_ptr, VSF_ADC_IRQ_MASK_CPL);
+        __vsf_hw_adc_request_isr_handler(NULL, (vsf_adc_t *)hw_adc_ptr, VSF_ADC_IRQ_MASK_CPL);
     vsf_unprotect(interrupt)(orig);
 
     return VSF_ERR_NONE;
