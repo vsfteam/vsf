@@ -34,52 +34,52 @@
 // For SWI
 #   include "hal/driver/common/swi/vsf_swi_template.h"
 
-/*\note You can also put dirvers under ../common/xxxx, it's up to user to decide. */
+/*\note It's up to developper to decide the actual path of the driver headers. */
 
 #   if VSF_HAL_USE_IO == ENABLED
-#       include "../io/io.h"
+#       include "../common/io/io.h"
 #   endif
 #   if VSF_HAL_USE_ADC == ENABLED
-#       include "../adc/adc.h"
+#       include "../common/adc/adc.h"
 #   endif
 #   if VSF_HAL_USE_FLASH == ENABLED
-#       include "../flash/flash.h"
+#       include "../common/flash/flash.h"
 #   endif
 #   if VSF_HAL_USE_GPIO == ENABLED
-#       include "../gpio/gpio.h"
+#       include "../common/gpio/gpio.h"
 #   endif
 #   if VSF_HAL_USE_I2C == ENABLED
-#       include "../i2c/i2c.h"
+#       include "../common/i2c/i2c.h"
 #   endif
 #   if VSF_HAL_USE_PWM == ENABLED
-#       include "../pwm/pwm.h"
+#       include "../common/pwm/pwm.h"
 #   endif
 #   if VSF_HAL_USE_RTC == ENABLED
-#       include "../rtc/rtc.h"
+#       include "../common/rtc/rtc.h"
 #   endif
 #   if VSF_HAL_USE_SPI == ENABLED
-#       include "../spi/spi.h"
+#       include "../common/spi/spi.h"
 #   endif
 #   if VSF_HAL_USE_TIMER == ENABLED
-#       include "../timer/timer.h"
+#       include "../common/timer/timer.h"
 #   endif
 #   if VSF_HAL_USE_TRNG == ENABLED
-#       include "../trng/trng.h"
+#       include "../common/trng/trng.h"
 #   endif
 #   if VSF_HAL_USE_USART == ENABLED
-#       include "../uart/uart.h"
+#       include "../common/uart/uart.h"
 #   endif
 #   if VSF_HAL_USE_USB == ENABLED
-#       include "../usb/usb.h"
+#       include "../common/usb/usb.h"
 #   endif
 #   if VSF_HAL_USE_MMC == ENABLED
-#       include "../mmc/mmc.h"
+#       include "../common/mmc/mmc.h"
 #   endif
 #   if VSF_HAL_USE_I2S == ENABLED
-#       include "../i2s/i2s.h"
+#       include "../common/i2s/i2s.h"
 #   endif
 #   if VSF_HAL_USE_WDT == ENABLED
-#       include "../wdt/wdt.h"
+#       include "../common/wdt/wdt.h"
 #   endif
 
 /*============================ MACROS ========================================*/

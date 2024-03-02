@@ -54,9 +54,9 @@
 /*============================ INCLUDES ======================================*/
 
 /*\note this is should be the only place where __common.h is included if implemented.
-        You can also put __common.h in ../common directory, it's up to user to decide.
+        The path of __common.h is up to developper to decide.
 */
-//#include "../__common.h"
+//#include "../common/__common.h"
 
 /*============================ MACROS ========================================*/
 
