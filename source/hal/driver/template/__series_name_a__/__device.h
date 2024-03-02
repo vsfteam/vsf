@@ -15,26 +15,41 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DEVICE_TEMPLATE_H__
-#define __HAL_DEVICE_TEMPLATE_H__
-
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 
-/*============================ MACROS ========================================*/
+#undef VSF_HAL_DEVICE_HEADER
 
-/*\note first define basic info for arch. */
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
-#   undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#if     defined(__DEVICE_NAME_A__)
+#   define  VSF_HAL_DEVICE_HEADER               "./__SERIES_NAME_A__/__DEVICE_NAME_A__/device.h"
+#elif   defined(__DEVICE_NAME_B__)
+#   define  VSF_HAL_DEVICE_HEADER               "./__SERIES_NAME_A__/__DEVICE_NAME_B__/device.h"
+#elif   defined(__DEVICE_NAME_C__)
+#   define  VSF_HAL_DEVICE_HEADER               "./__SERIES_NAME_B__/__DEVICE_NAME_C__/device.h"
+#elif   defined(__DEVICE_NAME_D__)
+#   define  VSF_HAL_DEVICE_HEADER               "./__SERIES_NAME_C__/__DEVICE_NAME_D__/device.h"
+#else
+#   error No supported device found.
 #endif
 
-// software interrupt provided by a dedicated device
-#define VSF_DEV_SWI_NUM             0
+/* include specified device header file */
+#include VSF_HAL_DEVICE_HEADER
 
-/*============================ INCLUDES ======================================*/
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+// define arch information
+//  ARM:        __CPU_ARM__
+//  Riscv:      __CPU_RV__
+//  ......
+#   ifndef __CPU_ARM__
+#       define __CPU_ARM__
+#   endif
+#else      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
-/*\note this is should be the only place where __common.h is included.*/
-//#include "../common/__common.h"
+/* below is vendor specified device part, put vendor-specified code(not vsf specified) here */
+
+#ifndef __VSF_HAL_DEVICE_${VENDOR}_${SERIES}_H__
+#define __VSF_HAL_DEVICE_${VENDOR}_${SERIES}_H__
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -43,6 +58,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif
+#endif      // __VSF_HAL_DEVICE_${VENDOR}_${SERIES}_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

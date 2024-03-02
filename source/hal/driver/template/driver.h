@@ -15,33 +15,42 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_TEMPLATE_H__
-#define __HAL_DRIVER_TEMPLATE_H__
-
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 
-#undef VSF_DRIVER_HEADER
+#undef VSF_HAL_DRIVER_HEADER
+
+/* note: MACRO is UPPER-CASE, directory name is not case-sensitive.
+    __SERIES_NAME_A__
+        __DEVICE_NAME_A__
+        __DEVICE_NAME_B__
+    __SERIES_NAME_B__
+        __DEVICE_NAME_C__
+    __SERIES_NAME_C__
+        __DEVICE_NAME_D__
+*/
 
 #if     defined(__DEVICE_NAME_A__)
-#   define  VSF_TEMPLATE_DRIVER_HEADER      "./__series_name__/__device_name_1__/driver.h"
-/* example
-#elif   defined(__DEVICE_NAME_B__)  
-#   define  VSF_TEMPLATE_DRIVER_HEADER      "./__series_name__/__device_name_2__/driver.h"
-#elif   defined(__DEVICE_NAME_C__)  
-#   define  VSF_TEMPLATE_DRIVER_HEADER      "./__series_name__/__device_name_3__/driver.h"
-#elif   defined(__DEVICE_NAME_X__)
-#   define  VSF_TEMPLATE_DRIVER_HEADER      "./__series_name__/__device_name_n__/driver.h"
-*/
+#   define  VSF_HAL_DRIVER_HEADER               "./__SERIES_NAME_A__/__DEVICE_NAME_A__/driver.h"
+#elif   defined(__DEVICE_NAME_B__)
+#   define  VSF_HAL_DRIVER_HEADER               "./__SERIES_NAME_A__/__DEVICE_NAME_B__/driver.h"
+#elif   defined(__DEVICE_NAME_C__)
+#   define  VSF_HAL_DRIVER_HEADER               "./__SERIES_NAME_B__/__DEVICE_NAME_C__/driver.h"
+#elif   defined(__DEVICE_NAME_D__)
+#   define  VSF_HAL_DRIVER_HEADER               "./__SERIES_NAME_C__/__DEVICE_NAME_D__/driver.h"
 #else
-#   warning No supported device found, use template
-#   define  VSF_TEMPLATE_DRIVER_HEADER      "./__series_template__/__device_template__/driver.h"
+#   error No supported device found.
 #endif
 
-#ifdef VSF_TEMPLATE_DRIVER_HEADER
-/* include specified device driver header file */
-#   include VSF_TEMPLATE_DRIVER_HEADER
-#endif
+/* include specified driver header file */
+#include VSF_HAL_DRIVER_HEADER
+
+/* below is vendor specified driver part, put vendor-specified code(not vsf specified) here */
+
+#ifndef __VSF_HAL_DRIVER_${VENDOR}_H__
+#define __VSF_HAL_DRIVER_${VENDOR}_H__
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

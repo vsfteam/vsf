@@ -19,6 +19,9 @@
 
 #include "hal/vsf_hal_cfg.h"
 #include "./device.h"
+#include "./driver.h"
+
+/*\note Vendor specified code can be added here. */
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -35,6 +38,7 @@
  */
 bool vsf_driver_init(void)
 {
+    /* Basic initializations including clock, etc. */
     return true;
 }
 
