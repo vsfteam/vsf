@@ -21,6 +21,13 @@
 
 #if VSF_HAL_USE_ADC == ENABLED
 
+/*\note For IPCore drivers, define __VSF_HAL_${ADC_IP}_ADC_CLASS_IMPLEMENT before include vsf_hal.h.
+ */
+
+// IPCore
+#define __VSF_HAL_${ADC_IP}_ADC_CLASS_IMPLEMENT
+// IPCore end
+
 #include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/

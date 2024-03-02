@@ -33,9 +33,9 @@
  */
 
 // IPCore
-#if     defined(__VSF_HAL_${ADC_IP}_I2C_CLASS_IMPLEMENT)
+#if     defined(__VSF_HAL_${ADC_IP}_ADC_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
-#elif   defined(__VSF_HAL_${ADC_IP}_I2C_CLASS_INHERIT__)
+#elif   defined(__VSF_HAL_${ADC_IP}_ADC_CLASS_INHERIT__)
 #   define __VSF_CLASS_INHERIT__
 #endif
 
@@ -48,13 +48,13 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-/*\note VSF_${ADC_IP}_I2C_CFG_MULTI_CLASS should be implemented for IP drives and open to user,
+/*\note VSF_${ADC_IP}_ADC_CFG_MULTI_CLASS should be implemented for IP drives and open to user,
  *          while VSF_HW_ADC_CFG_MULTI_CLASS should be in adc.c.
  */
 
 // IPCore
-#ifndef VSF_${ADC_IP}_I2C_CFG_MULTI_CLASS
-#   define VSF_${ADC_IP}_I2C_CFG_MULTI_CLASS    VSF_ADC_CFG_MULTI_CLASS
+#ifndef VSF_${ADC_IP}_ADC_CFG_MULTI_CLASS
+#   define VSF_${ADC_IP}_ADC_CFG_MULTI_CLASS    VSF_ADC_CFG_MULTI_CLASS
 #endif
 // IPCore end
 
@@ -62,14 +62,14 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 // IPCore
-vsf_class(vsf_${adc_ip}_i2c_t) {
+vsf_class(vsf_${adc_ip}_adc_t) {
 #if VSF_${ADC_IP}_CFG_MULTI_CLASS == ENABLED
     public_member(
         vsf_adc_t               vsf_adc;
     )
 #endif
 
-/*\note You can add more memmber in vsf_${adc_ip}_i2c_t instance.
+/*\note You can add more memmber in vsf_${adc_ip}_adc_t instance.
  *      For members accessable from child, put in protected_member.
  *      Else, put in private_member.
  */

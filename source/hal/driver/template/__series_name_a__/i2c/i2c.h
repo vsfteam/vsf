@@ -135,6 +135,13 @@ typedef struct vsf_i2c_status_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+// IPCore
+/*\note Extern APIs for ip core diriver.
+ *      There is no requirement about how APIs of IPCore drivers should be implemented.
+ *      Just consider the simplicity for drivers of actual device.
+ */
+// IPCore end
+
 #endif /* __HAL_DRIVER_${DEVICE}_I2C_H__ */
 #endif
 /* EOF */

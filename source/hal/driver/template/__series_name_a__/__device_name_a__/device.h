@@ -79,9 +79,9 @@
 #define VSF_HW_I2C0_IRQN                            I2C0_IRQn
 #define VSF_HW_I2C0_IRQHandler                      I2C0_IRQHandler
 #define VSF_HW_I2C0_REG                             I2C0_BASE
-#define VSF_HW_I2C1_IRQN                            I2C1_IRQn
-#define VSF_HW_I2C1_IRQHandler                      I2C1_IRQHandler
-#define VSF_HW_I2C1_REG                             I2C1_BASE
+#define VSF_HW_I2C2_IRQN                            I2C2_IRQn
+#define VSF_HW_I2C2_IRQHandler                      I2C2_IRQHandler
+#define VSF_HW_I2C2_REG                             I2C2_BASE
 
 // SPI0, SPI1
 
