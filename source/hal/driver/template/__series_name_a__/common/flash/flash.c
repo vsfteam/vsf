@@ -21,12 +21,16 @@
 
 #if VSF_HAL_USE_FLASH == ENABLED
 
-/*\note For IPCore drivers, define __VSF_HAL_${FLASH_IP}_FLASH_CLASS_IMPLEMENT before include vsf_hal.h.
+/*\note For IPCore drivers, define __VSF_HAL_${FLASH_IP}_FLASH_CLASS_IMPLEMENT before including vsf_hal.h.
+ *      For peripherial drivers, if IPCore driver is used, define __VSF_HAL_${FLASH_IP}_FLASH_CLASS_INHERIT__ before including vsf_hal.h
  */
 
 // IPCore
 #define __VSF_HAL_${FLASH_IP}_FLASH_CLASS_IMPLEMENT
 // IPCore end
+// HW using ${FLASH_IP} IPCore driver
+#define __VSF_HAL_${FLASH_IP}_FLASH_CLASS_INHERIT__
+// HW end
 
 #include "hal/vsf_hal.h"
 
@@ -171,7 +175,7 @@ vsf_flash_capability_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
     };
 }
 
-static void __vsf_hw_flash_irq_handler(
+static void __vsf_hw_flash_irqhandler(
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr
 ) {
     VSF_HAL_ASSERT(NULL != flash_ptr);
@@ -207,7 +211,7 @@ static void __vsf_hw_flash_irq_handler(
     void VSF_MCONNECT(VSF_HW_FLASH, __IDX, _IRQHandler)(void)                   \
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
-        __vsf_hw_flash_irq_handler(&VSF_MCONNECT(vsf_hw_flash, __IDX));         \
+        __vsf_hw_flash_irqhandler(&VSF_MCONNECT(vsf_hw_flash, __IDX));          \
         vsf_hal_irq_leave(ctx);                                                 \
     }
 #include "hal/driver/common/flash/flash_template.inc"

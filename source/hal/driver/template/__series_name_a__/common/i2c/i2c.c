@@ -21,12 +21,16 @@
 
 #if VSF_HAL_USE_I2C == ENABLED
 
-/*\note For IPCore drivers, define __VSF_HAL_${I2C_IP}_I2C_CLASS_IMPLEMENT before include vsf_hal.h.
+/*\note For IPCore drivers, define __VSF_HAL_${I2C_IP}_I2C_CLASS_IMPLEMENT before including vsf_hal.h.
+ *      For peripherial drivers, if IPCore driver is used, define __VSF_HAL_${I2C_IP}_I2C_CLASS_INHERIT__ before including vsf_hal.h
  */
 
 // IPCore
 #define __VSF_HAL_${I2C_IP}_I2C_CLASS_IMPLEMENT
 // IPCore end
+// HW using ${I2C_IP} IPCore driver
+#define __VSF_HAL_${I2C_IP}_I2C_CLASS_INHERIT__
+// HW end
 
 #include "hal/vsf_hal.h"
 
@@ -164,7 +168,7 @@ vsf_i2c_capability_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)(
     };
 }
 
-static void __vsf_hw_i2c_irq_handler(
+static void __vsf_hw_i2c_irqhandler(
     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
 ) {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
@@ -192,7 +196,7 @@ static void __vsf_hw_i2c_irq_handler(
     void VSF_MCONNECT(VSF_HW_I2C, __IDX, _IRQHandler)(void)                     \
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
-        __vsf_hw_i2c_irq_handler(&VSF_MCONNECT(vsf_hw_i2c, __IDX));             \
+        __vsf_hw_i2c_irqhandler(&VSF_MCONNECT(vsf_hw_i2c, __IDX));              \
         vsf_hal_irq_leave(ctx);                                                 \
     }
 #include "hal/driver/common/i2c/i2c_template.inc"

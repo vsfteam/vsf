@@ -26,13 +26,14 @@
 
 #include "../__device.h"
 
-/*\note Incudes CAN ONLY be put here. */
-
 /*\note Refer to template/README.md for usage cases.
  *      For peripherial drivers, blackbox mode is recommended but not required, reimplementation part MUST be open.
  *      For IPCore drivers, class structure, MULTI_CLASS configuration, reimplementation and class APIs should be open to user.
  *      For emulated drivers, **** No reimplementation ****.
  */
+
+/*\note Incudes CAN ONLY be put here. */
+/*\note If current header is for a peripherial driver(hw driver), and inherit from an IPCore driver, include IPCore header here. */
 
 // IPCore
 #if     defined(__VSF_HAL_${I2C_IP}_I2C_CLASS_IMPLEMENT)
@@ -67,8 +68,8 @@ extern "C" {
  *          VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD for vsf_i2c_cmd_t
  *          VSF_I2C_CFG_REIMPLEMENT_TYPE_STATUS for vsf_i2c_status_t
  *          VSF_I2C_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_i2c_irq_mask_t
- *      Reimplementation is used for optimization hw drivers, reimplement the bit mask according to hw registers.
- *      DO NOT reimplement these in non-hw drivers.
+ *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
+ *      *** DO NOT reimplement these in emulated drivers. ***
  */
 
 #define VSF_I2C_CFG_REIMPLEMENT_TYPE_MODE       ENABLED
