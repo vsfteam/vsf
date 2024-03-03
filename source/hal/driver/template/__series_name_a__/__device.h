@@ -22,13 +22,9 @@
 #undef VSF_HAL_DEVICE_HEADER
 
 #if     defined(__DEVICE_NAME_A__)
-#   define  VSF_HAL_DEVICE_HEADER               "./__SERIES_NAME_A__/__DEVICE_NAME_A__/device.h"
+#   define  VSF_HAL_DEVICE_HEADER               "./__DEVICE_NAME_A__/device.h"
 #elif   defined(__DEVICE_NAME_B__)
-#   define  VSF_HAL_DEVICE_HEADER               "./__SERIES_NAME_A__/__DEVICE_NAME_B__/device.h"
-#elif   defined(__DEVICE_NAME_C__)
-#   define  VSF_HAL_DEVICE_HEADER               "./__SERIES_NAME_B__/__DEVICE_NAME_C__/device.h"
-#elif   defined(__DEVICE_NAME_D__)
-#   define  VSF_HAL_DEVICE_HEADER               "./__SERIES_NAME_C__/__DEVICE_NAME_D__/device.h"
+#   define  VSF_HAL_DEVICE_HEADER               "./__DEVICE_NAME_B__/device.h"
 #else
 #   error No supported device found.
 #endif
