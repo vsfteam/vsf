@@ -244,14 +244,14 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
                 lfs_file_t *file = fsinfo->param.read_file.file;
                 void *buffer = fsinfo->param.read_file.buffer;
                 lfs_size_t size = fsinfo->param.read_file.size;
-                fsinfo->result.read_file.size = lfs_file_read(lfs, file, buffer, size);
+                ret = fsinfo->result.read_file.size = lfs_file_read(lfs, file, buffer, size);
             }
             break;
         case VK_LFS_WRITE_FILE: {
                 lfs_file_t *file = fsinfo->param.read_file.file;
                 void *buffer = fsinfo->param.read_file.buffer;
                 lfs_size_t size = fsinfo->param.read_file.size;
-                fsinfo->result.read_file.size = lfs_file_write(lfs, file, buffer, size);
+                ret = fsinfo->result.read_file.size = lfs_file_write(lfs, file, buffer, size);
             }
             break;
         case VK_LFS_SEEK_FILE:
