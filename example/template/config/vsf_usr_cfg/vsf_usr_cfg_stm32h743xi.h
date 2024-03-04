@@ -47,7 +47,6 @@
 //#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
 // configure pool and heap to avoid heap allocating in interrupt
 #define VSF_OS_CFG_EVTQ_POOL_SIZE                       128
-#define VSF_OS_CFG_DEFAULT_TASK_FRAME_POOL_SIZE         32
 #define VSF_POOL_CFG_FEED_ON_HEAP                       DISABLED
 // enable VSF_EDA_QUEUE_CFG_REGION and VSF_EDA_QUEUE_CFG_SUPPORT_ISR
 #define VSF_EDA_QUEUE_CFG_REGION                        ENABLED

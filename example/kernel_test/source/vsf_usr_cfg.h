@@ -16,7 +16,7 @@
  ****************************************************************************/
 
 
-//! \note Top Level Application Configuration 
+//! \note Top Level Application Configuration
 
 #ifndef __TOP_APP_CFG_H__
 #define __TOP_APP_CFG_H__
@@ -52,9 +52,6 @@
 
 //#define VSF_OS_CFG_ADD_EVTQ_TO_IDLE                     ENABLED
 
-//      <o>The default eda stack frame pool size <1-65535>
-//      <i>The default eda stack frame pool is shared among all eda tasks. 
-//#define VSF_OS_CFG_DEFAULT_TASK_FRAME_POOL_SIZE       16
 //  </h>
 
 //! @}
@@ -68,7 +65,7 @@
 #define VSF_OS_CFG_MAIN_STACK_SIZE              2048
 
 //          <c1>Run main as a thread
-//          <i>This feature will run main function as a thread. RTOS thread support must be enabled. 
+//          <i>This feature will run main function as a thread. RTOS thread support must be enabled.
 #define VSF_OS_CFG_MAIN_MODE                    VSF_OS_CFG_MAIN_MODE_THREAD
 //          </c>
 //      </h>
@@ -78,7 +75,7 @@
 #define VSF_USE_TRACE                               DISABLED
 #define VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM       ENABLED
 //#define VSF_KERNEL_CFG_EDA_SUPPORT_TASK             DISABLED
-//#define VSF_POOL_LOCK()             
+//#define VSF_POOL_LOCK()
 //#define VSF_POOL_UNLOCK()
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
