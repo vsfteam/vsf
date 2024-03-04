@@ -103,12 +103,12 @@ extern "C" {
 
 /**
  \~chinese
- @def VSF_DISP_MIPI_SPI_LCD_INIT(__LCD_SEQ, __PIXEL_BITLEN, __MODE, ...)
+ @def VSF_DISP_MIPI_SPI_LCD_INIT(__LCD_SEQ, __PIXEL_FORMAT, __MODE, ...)
  @brief 一个简化 LCD 配置的宏
  @param[in] __LCD_SEQ: 包含一堆预定义命令的宏, 增加新的 LCD 支持应该定义类似的命令，部分现在提供的预定义命令：
             VSF_DISP_MIPI_SPI_LCD_S6D05A1_BASE, VSF_DISP_MIPI_SPI_LCD_ILI9488_BASE, VSF_DISP_MIPI_SPI_LCD_ILI9341_BASE, ...
 
- @param[in] __PIXEL_BITLEN: LCD 像素位宽，可选值包括： [3, 8, 12, 16, 18, 24]
+ @param[in] __PIXEL_FORMAT: LCD 像素位宽，可选值包括： MIPI_PIXEL_FORMAT_BITLEN([3, 8, 12, 16, 18, 24])
 
  @param[in] __MODE: LCD 的颜色和地址顺序，可以使用简化配置宏
                         MIPI_MODE_X_FLIP, MIPI_MODE_Y_FLIP, MIPI_MODE_RGB, MIPI_MODE_BGR，
@@ -141,14 +141,14 @@ extern "C" {
   // ST7789V with RGB565
   VSF_DISP_MIPI_SPI_LCD_INITSEQ(
     VSF_DISP_MIPI_SPI_LCD_ST7789V_BASE,
-    16,
+    MIPI_PIXEL_FORMAT_BITLEN(16),
     MIPI_MODE_RGB
   )
 
   // ST7789V with RGB565, tearing effect line on
   VSF_DISP_MIPI_SPI_LCD_INITSEQ(
     VSF_DISP_MIPI_SPI_LCD_ST7789V_BASE,
-    16,
+    MIPI_PIXEL_FORMAT_BITLEN(16),
     MIPI_MODE_RGB,
     MIPI_TEAR_PIN_ON
   )
@@ -156,26 +156,18 @@ extern "C" {
   // ST7796S with BGR888, X FLIP
   VSF_DISP_MIPI_SPI_LCD_INITSEQ(
     VSF_DISP_MIPI_SPI_LCD_ST7796S_BASE,
-    24,
+    MIPI_PIXEL_FORMAT_BITLEN(24),
     MIPI_MODE_RGB | MIPI_MODE_X_FLIP,
     // Blanking Porch Control
     VSF_DISP_MIPI_LCD_WRITE(0xB1,  2, 0x00, 0x10),
   )
  */
-#define VSF_DISP_MIPI_SPI_LCD_INITSEQ(__LCD_SEQ, __PIXEL_BITLEN, __MODE, ...)   \
+#define VSF_DISP_MIPI_SPI_LCD_INITSEQ(__LCD_SEQ, __PIXEL_FORMAT, __MODE, ...)   \
     __LCD_SEQ,                                                                  \
     MIPI_DCS_CMD_SET_ADDRESS_MODE(__MODE),                                      \
-    MIPI_DCS_CMD_SET_PIXEL_FORMAT(                                              \
-        MIPI_DCS_PIXEL_FORMAT_DBI_BITS(__PIXEL_BITLEN)                          \
-    ),                                                                          \
-    MIPI_DCS_CMD_SET_DISPLAY_ON,                                                \
-    __VA_ARGS__
-
-#define VSF_DISP_MIPI_SPI_LCD_INIT_MODE_AND_FORMAT(__MODE, __PIXEL_FORMAT)      \
-    MIPI_DCS_CMD_SET_ADDRESS_MODE(__MODE),                                      \
     MIPI_DCS_CMD_SET_PIXEL_FORMAT(__PIXEL_FORMAT),                              \
-    MIPI_DCS_CMD_SET_DISPLAY_ON                                                 \
-    //MIPI_DCS_CMD_SET_TEAR_ON /* Tearing Effect Line ON, for V-Blanking information only */
+    MIPI_DCS_CMD_SET_DISPLAY_ON,                                                \
+    ##__VA_ARGS__
 
 #define VSF_DISP_MIPI_SPI_LCD_S6D05A1_BASE                                      \
     VSF_DISP_MIPI_LCD_WRITE(0xF0,  2, 0x5A, 0x5A), /*PASSWD1*/                  \
@@ -236,9 +228,12 @@ extern "C" {
     VSF_DISP_MIPI_LCD_WRITE(0xE0, 14, 0xD0, 0x03, 0x09, 0x0E, 0x11, 0x3D, 0x47, 0x55, 0x53, 0x1A, 0x16, 0x14, 0x1F, 0x22), /* Positive Voltage Gamma Control */ \
     VSF_DISP_MIPI_LCD_WRITE(0xE1, 14, 0xD0, 0x02, 0x08, 0x0D, 0x12, 0x2C, 0x43, 0x55, 0x53, 0x1E, 0x1B, 0x19, 0x20, 0x22)  /* Negative Voltage Gamma Control */
 
-#define VSF_DISP_ST7789V_SPI_INITSEQ(__MODE, __PIXEL_FORMAT)                    \
+#define VSF_DISP_ST7789V_SPI_INITSEQ(__MODE, __PIXEL_FORMAT, ...)               \
     VSF_DISP_MIPI_SPI_LCD_ST7789V_BASE,                                         \
-    VSF_DISP_MIPI_SPI_LCD_INIT_MODE_AND_FORMAT(__MODE, __PIXEL_FORMAT)
+    MIPI_DCS_CMD_SET_ADDRESS_MODE(__MODE),                                      \
+    MIPI_DCS_CMD_SET_PIXEL_FORMAT(__PIXEL_FORMAT),                              \
+    MIPI_DCS_CMD_SET_DISPLAY_ON,                                                \
+    __VA_ARGS__
 
 #define VSF_DISP_MIPI_SPI_LCD_ST7796S_BASE                                      \
     VSF_DISP_MIPI_LCD_WRITE(0xF0,  1, 0xC3), /* Command Set Control, C3h enable command 2 part I */ \
