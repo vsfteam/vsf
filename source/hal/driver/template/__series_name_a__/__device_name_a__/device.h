@@ -48,8 +48,8 @@
  *      Define device information here.
  */
 
-#ifndef __VSF_HAL_DEVICE_&{VENDOR}_${DEVICE}_H__
-#define __VSF_HAL_DEVICE_&{VENDOR}_${DEVICE}_H__
+#ifndef __VSF_HAL_DEVICE_${VENDOR}_${DEVICE}_H__
+#define __VSF_HAL_DEVICE_${VENDOR}_${DEVICE}_H__
 
 /*============================ INCLUDES ======================================*/
 
