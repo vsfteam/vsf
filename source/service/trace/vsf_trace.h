@@ -22,6 +22,9 @@
 
 #include "service/vsf_service_cfg.h"
 
+// for SECTION
+#include "utilities/vsf_utilities.h"
+
 #if     defined(__VSF_TRACE_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_TRACE_CLASS_INHERIT__)
