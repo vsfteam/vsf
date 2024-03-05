@@ -126,10 +126,12 @@ __vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size)
     VSF_KERNEL_ASSERT(local_size <= VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE - sizeof(uintalu_t));
     __vsf_eda_frame_t *frame = (__vsf_eda_frame_t *)
             VSF_POOL_ALLOC(vsf_eda_frame_pool, &__vsf_os.eda_frame_pool);
-#else
+#elif VSF_USE_HEAP == ENABLED
     __vsf_eda_frame_t *frame =
             vsf_heap_malloc_aligned(sizeof(__vsf_eda_frame_t) + local_size + sizeof(uintalu_t),
                                     sizeof(uintalu_t));
+#else
+#   error either VSF_USE_HEAP or __VSF_KERNEL_CFG_EDA_FRAME_POOL MUST be enabled
 #endif
 
     if (frame != NULL) {
@@ -156,8 +158,10 @@ void vsf_eda_free_frame(__vsf_eda_frame_t *frame)
     /* todo: add smart pool support in the future */
 #if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
     VSF_POOL_FREE(vsf_eda_frame_pool, &__vsf_os.eda_frame_pool, (__vsf_eda_frame_buffer_t *)frame);
-#else
+#elif VSF_USE_HEAP == ENABLED
     vsf_heap_free(frame);
+#else
+#   error either VSF_USE_HEAP or __VSF_KERNEL_CFG_EDA_FRAME_POOL MUST be enabled
 #endif
 }
 #endif      // VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL

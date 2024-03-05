@@ -91,14 +91,33 @@ extern "C" {
 #define dcl_vsf_thread_ex(__name)       declare_vsf_thread(__name)
 
 #if VSF_KERNEL_THREAD_DYNAMIC_STACK == ENABLED
+#   define __vsf_thread_set_stack_canery(__thread, __task)                      \
+            (__thread)->canary = 0xDEADBEEF;
+#else
+#   define __vsf_thread_set_stack_canery(__thread, __task)                      \
+            (__task)->canary = 0xDEADBEEF;
+#endif
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+#   define __vsf_thread_set_stack(__thread, __task, __stack_ptr, __stack_bytesize)\
+            (__thread)->use_as__vsf_thread_cb_t.stack = (__stack_ptr);          \
+            (__thread)->use_as__vsf_thread_cb_t.stack_size = (__stack_bytesize);\
+            __vsf_thread_set_stack_canery(__thread, __task)
+#else
+#   define __vsf_thread_set_stack(__thread, __task, __stack_ptr, __stack_bytesize)\
+            (__thread)->stack = (__stack_ptr);                                  \
+            (__thread)->stack_size = (__stack_bytesize);                        \
+            __vsf_thread_set_stack_canery(__thread, __task)
+#endif
+
+#if VSF_KERNEL_THREAD_DYNAMIC_STACK == ENABLED
 #   define __vsf_thread_def_stack(__name, __bytesize)                           \
             typedef enum {                                                      \
                 vsf_thread##__name##_stack_bytesize = (__bytesize),             \
             };
 #   define __vsf_thread_def_stack_member(__name, __bytesize)
 #   define __vsf_thread_imp_stack(__name, __thread, __task)                     \
-            __thread->use_as__vsf_thread_cb_t.stack = NULL;                     \
-            __thread->use_as__vsf_thread_cb_t.stack_size = (vsf_thread##__name##_stack_bytesize);
+            __vsf_thread_set_stack((__thread), (__task), NULL, (vsf_thread##__name##_stack_bytesize))
 #   define __vsf_eda_call_thread_prepare_stack(__name, __thread)                \
             .stack = NULL,                                                      \
             .stack_size = (vsf_thread##__name##_stack_bytesize),
@@ -109,9 +128,7 @@ extern "C" {
             uint64_t stack_arr[(__VSF_THREAD_STACK_SAFE_SIZE(__bytesize) + 7) / 8]\
                         ALIGN(1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT);
 #   define __vsf_thread_imp_stack(__name, __thread, __task)                     \
-            __thread->use_as__vsf_thread_cb_t.stack = (__task)->param.stack_arr;\
-            __thread->use_as__vsf_thread_cb_t.stack_size = sizeof((__task)->param.stack_arr);\
-            __thread->canary = 0xDEADBEEF;
+            __vsf_thread_set_stack((__thread), (__task), (__task)->stack_arr, sizeof((__task)->stack_arr))
 #   define __vsf_eda_call_thread_prepare_stack(__name, __thread)                \
             .stack = (__thread)->stack_arr,                                     \
             .stack_size = sizeof((__thread)->stack_arr),
