@@ -224,20 +224,32 @@ static void __vsf_protect_region_none_leave(vsf_protect_t orig)
 WEAK(bswap_16)
 uint_fast16_t bswap_16(uint_fast16_t value16)
 {
+#if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
+    return __builtin_bswap16(value16);
+#else
     return ((uint_fast16_t)(value16 & 0x00FF) << 8) | ((uint_fast16_t)(value16 & 0xFF00) >> 8);
+#endif
 }
 
 WEAK(bswap_32)
 uint_fast32_t bswap_32(uint_fast32_t value32)
 {
+#if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
+    return __builtin_bswap32(value32);
+#else
     return ((uint_fast32_t)bswap_16((uint_fast16_t)value32) << 16) | (uint_fast32_t)bswap_16((uint_fast16_t)(value32 >> 16));
+#endif
 }
 
 #ifdef UINT64_MAX
 WEAK(bswap_64)
 uint_fast64_t bswap_64(uint_fast64_t value64)
 {
+#if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
+    return __builtin_bswap64(value64);
+#else
     return ((uint_fast64_t)bswap_32((uint_fast32_t)value64) << 32) | (uint_fast64_t)bswap_32((uint_fast32_t)(value64 >> 32));
+#endif
 }
 #endif
 
@@ -250,9 +262,15 @@ IMPLEMENT_ENDIAN_FUNC(64)
 
 
 #ifndef __VSF_ARCH_CLZ
+// __vsf_arch_clz(0) = 32
 WEAK(__vsf_arch_clz)
 uint_fast8_t __vsf_arch_clz(uintalu_t a)
 {
+#if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
+    // TODO: result of __builtin_clz(0) is undefined, if it's not 32,
+    //  __vsf_arch_clz MUST be re-implemented in arch driver
+    return __builtin_clz(a);
+#else
     uint_fast8_t num = __optimal_bit_sz;
     uintalu_t bitmask = ((uintalu_t)1 << (__optimal_bit_sz - 1));
     do {
@@ -263,6 +281,7 @@ uint_fast8_t __vsf_arch_clz(uintalu_t a)
     } while(--num);
 
     return __optimal_bit_sz - num;
+#endif
 }
 #endif
 
@@ -284,10 +303,14 @@ int_fast8_t __vsf_arch_msb(uintalu_t a)
 WEAK(__vsf_arch_ffs)
 int_fast8_t __vsf_arch_ffs(uintalu_t a)
 {
+#if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
+    return __builtin_ffs(a) - 1;
+#else
 #   ifndef __VSF_ARCH_MSB
     return __vsf_arch_msb(a & -(uintalu_t)a);
-#else
+#   else
     return __VSF_ARCH_MSB(a & -(uintalu_t)a);
+#   endif
 #endif
 }
 #endif
@@ -298,9 +321,9 @@ int_fast8_t __vsf_arch_ffz(uintalu_t a)
 {
 #   ifndef __VSF_ARCH_FFS
     return __vsf_arch_ffs(~a);
-#else
+#   else
     return __VSF_ARCH_FFS(~a);
-#endif
+#   endif
 }
 #endif
 

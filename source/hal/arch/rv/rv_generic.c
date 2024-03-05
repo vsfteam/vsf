@@ -29,10 +29,24 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#if (__IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__) && !defined(__VSF_ARCH_CLZ)
+// __vsf_arch_clz(0) = 32
+uint_fast8_t __vsf_arch_clz(uintalu_t a)
+{
+    // __builtin_clz(0) for riscv is -1
+    int result = __builtin_clz(a);
+    if (result < 0) {
+        return sizeof(a) << 3;
+    } else {
+        return result;
+    }
+}
+#endif
+
 /*----------------------------------------------------------------------------*
  * Infrastructure                                                             *
  *----------------------------------------------------------------------------*/
-/*! \note initialize architecture specific service 
+/*! \note initialize architecture specific service
  *  \param none
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
