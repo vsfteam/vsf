@@ -36,7 +36,7 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_USER_ENTRY
-#   ifdef VSF_ARCH_ENTRY_NO_PENDING
+#   if VSF_KERNEL_CFG_ENTRY_IS_MAIN == ENABLED
 #       define VSF_USER_ENTRY               user_main
 #   else
 #       define VSF_USER_ENTRY               main

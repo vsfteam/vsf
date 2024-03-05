@@ -32,6 +32,15 @@
 #   define VSF_KERNEL_ASSERT                                VSF_ASSERT
 #endif
 
+#ifdef VSF_ARCH_ENTRY_NO_PENDING
+#   ifdef VSF_KERNEL_CFG_ENTRY_IS_MAIN
+#       if VSF_KERNEL_CFG_ENTRY_IS_MAIN != ENABLED
+#           error VSF_KERNEL_CFG_ENTRY_IS_MAIN MUST be enabled for VSF_ARCH_ENTRY_NO_PENDING
+#       endif
+#   else
+#       define VSF_KERNEL_CFG_ENTRY_IS_MAIN                 ENABLED
+#   endif
+#endif
 
 #ifndef VSF_KERNEL_CFG_SUPPORT_SYNC
 #   define VSF_KERNEL_CFG_SUPPORT_SYNC                      ENABLED

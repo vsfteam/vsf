@@ -437,11 +437,13 @@ void __vsf_heap_init(void)
 }
 #endif
 
-#ifdef VSF_ARCH_ENTRY_NO_PENDING
+#if VSF_KERNEL_CFG_ENTRY_IS_MAIN == ENABLED
 int main(void)
 {
     __vsf_main_entry();
+#   ifdef VSF_ARCH_ENTRY_NO_PENDING
     vsf_arch_main();
+#   endif
     return 0;
 }
 #else
