@@ -138,7 +138,7 @@ typedef struct vsf_arch_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT vsf_arch_t __vsf_arch;
+static VSF_CAL_NO_INIT vsf_arch_t __vsf_arch;
 
 /*============================ IMPLEMENTATION ================================*/
 

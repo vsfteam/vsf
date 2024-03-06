@@ -101,7 +101,7 @@ struct {
     uint8_t bLength;
     uint8_t bDescriptorType;
     usb_unicode_t str[dimof(APP_CFG_USBD_VENDOR_STR) - 1];
-} PACKED static const __usbd_vendor_str_desc = {
+} VSF_CAL_PACKED static const __usbd_vendor_str_desc = {
     .bLength            = sizeof(__usbd_vendor_str_desc),
     .bDescriptorType    = USB_DT_STRING,
     .str                = APP_CFG_USBD_VENDOR_STR,
@@ -110,7 +110,7 @@ struct {
     uint8_t bLength;
     uint8_t bDescriptorType;
     usb_unicode_t str[dimof(APP_CFG_USBD_PRODUCT_STR) - 1];
-} PACKED static const __usbd_product_str_desc = {
+} VSF_CAL_PACKED static const __usbd_product_str_desc = {
     .bLength            = sizeof(__usbd_product_str_desc),
     .bDescriptorType    = USB_DT_STRING,
     .str                = APP_CFG_USBD_PRODUCT_STR,
@@ -119,7 +119,7 @@ struct {
     uint8_t bLength;
     uint8_t bDescriptorType;
     usb_unicode_t str[dimof(APP_CFG_USBD_SERIAL_STR) - 1];
-} PACKED static const __usbd_serial_str_desc = {
+} VSF_CAL_PACKED static const __usbd_serial_str_desc = {
     .bLength            = sizeof(__usbd_serial_str_desc),
     .bDescriptorType    = USB_DT_STRING,
     .str                = APP_CFG_USBD_SERIAL_STR,
@@ -138,7 +138,7 @@ struct {
     uint8_t bLength;
     uint8_t bDescriptorType;
     usb_unicode_t str[dimof(USB_BOS_STR) - 1];
-} PACKED static const __usbd_bos_str_desc = {
+} VSF_CAL_PACKED static const __usbd_bos_str_desc = {
     .bLength            = sizeof(__usbd_bos_str_desc),
     .bDescriptorType    = USB_DT_STRING,
     .str                = USB_BOS_STR,
@@ -162,7 +162,7 @@ struct {
     uint8_t bDescriptorType;
     uint8_t prefix;
     uint8_t url[dimof(APP_CFG_USBD_WEBUSB_URL) - 1];
-} PACKED static const __usbd_webusb_url_desc = {
+} VSF_CAL_PACKED static const __usbd_webusb_url_desc = {
     .bLength            = sizeof(__usbd_webusb_url_desc),
     .bDescriptorType    = USB_DT_STRING,
     .prefix             = WEBUSB_URL_PREFIX_HTTPS,
@@ -175,7 +175,7 @@ struct {
     uint8_t bwPollTimeout[3];
     uint8_t bState;
     uint8_t iString;
-} PACKED static __usbd_dfu_status;
+} VSF_CAL_PACKED static __usbd_dfu_status;
 uint16_t __usbd_dfu_block_idx;
 uint16_t __usbd_dfu_buffer_size;
 uint32_t __usbd_dfu_addr;

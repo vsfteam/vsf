@@ -60,61 +60,58 @@ extern "C" {
 //! \brief none standard memory types
 #if __IS_COMPILER_IAR__
 #   define LOW_LEVEL_INIT_RET_T char
-#   define ROM_FLASH            _Pragma(__VSF_STR(location=".rom.flash")) const
-#   define ROM_EEPROM           _Pragma(__VSF_STR(location=".rom.eeprom")) const
-#   define NO_INIT              __no_init
-#   define ROOT                 __root
-#   define INLINE               inline
-#   define NO_INLINE            _Pragma("optimisze=no_inline")
-#   define ALWAYS_INLINE        _Pragma("inline=forced")
-#   define WEAK(...)            _Pragma(__VSF_STR(weak __VA_ARGS__))
-#   define RAMFUNC              __ramfunc
-#   define __asm__              __asm
-#   define __ALIGN(__N)         //_Pragma("data_alignment=" __VSF_STR(__N))         //!< 8051 does not have any alignment restrictions
-#   define __AT_ADDR(__ADDR)    @ __ADDR
-#   define __SECTION(__SEC)     _Pragma(__VSF_STR(section=__SEC))
-#   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
-                                _Pragma(__VSF_STR(weak __ORIGIN=__ALIAS))
-#   define PACKED               
-#   define UNALIGNED            
-#   define TRANSPARENT_UNION    
-#   define __ALIGN_OF(...)      __ALIGNOF__(__VA_ARGS__)
+#   define VSF_CAL_NO_INIT              __no_init
+#   define VSF_CAL_ROOT                 __root
+#   define VSF_CAL_INLINE               inline
+#   define VSF_CAL_NO_INLINE            _Pragma("optimisze=no_inline")
+#   define VSF_CAL_ALWAYS_INLINE        _Pragma("inline=forced")
+#   define VSF_CAL_WEAK(...)            _Pragma(__VSF_STR(weak __VA_ARGS__))
+#   define VSF_CAL_RAMFUNC              __ramfunc
+#   define __asm__                      __asm
+#   define __VSF_CAL_ALIGN(__N)         //_Pragma("data_alignment=" __VSF_STR(__N))         //!< 8051 does not have any alignment restrictions
+#   define __VSF_CAL_AT_ADDR(__ADDR)    @ __ADDR
+#   define __VSF_CAL_SECTION(__SEC)     _Pragma(__VSF_STR(section=__SEC))
+#   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS) \
+                                        _Pragma(__VSF_STR(weak __ORIGIN=__ALIAS))
+#   define VSF_CAL_PACKED
+#   define VSF_CAL_UNALIGNED
+#   define VSF_CAL_TRANSPARENT_UNION
+#   define __VSF_CAL_ALIGN_OF(...)      __ALIGNOF__(__VA_ARGS__)
 
-#define __ISR(__VEC)                                                            \
-        _Pragma(__VSF_STR(vector=__VEC))                                            \
-        __interrupt void vect_##__VEC##_handler(void)  
+#define __VSF_CAL_ISR(__VEC)                                                    \
+        _Pragma(__VSF_STR(vector=__VEC))                                        \
+        __interrupt void vect_##__VEC##_handler(void)
 
 //! TODO: Need further investigation about the negative effect
 #   define __stackless
 
-#   define __IAR_STARTUP_DATA_INIT  __INIT_XDATA_Z
-          
+#   define __IAR_STARTUP_DATA_INIT      __INIT_XDATA_Z
+
 //! \brief 1 cycle nop operation
 #ifndef NOP
     #define NOP()                       __no_operation()
-#endif          
-          
-#elif __IS_COMPILER_51_KEIL__
-#   define ROM_FLASH            const
-#   define ROM_EEPROM           const
-#   define NO_INIT              
-#   define ROOT                 
-#   define INLINE               
-#   define NO_INLINE            
-#   define ALWAYS_INLINE        
-#   define WEAK(__ANYTHING)            
-#   define RAMFUNC              
-#   define __asm__              __asm
-#   define __ALIGN(__N)         //_Pragma("data_alignment=" __STR(__N))         //!< 8051 does not have any alignment restrictions
-#   define __AT_ADDR(__ADDR)    
-#   define __SECTION(__SEC)     
-#   define __WEAK_ALIAS(__ORIGIN, __ALIAS) 
-#   define PACKED               
-#   define UNALIGNED            
-#   define TRANSPARENT_UNION    
-#   define __ALIGN_OF(__ANYTHING)      
+#endif
 
-#   define __ISR(__VEC)                                                         \
+#elif __IS_COMPILER_51_KEIL__
+
+#   define VSF_CAL_NO_INIT
+#   define VSF_CAL_ROOT
+#   define VSF_CAL_INLINE
+#   define VSF_CAL_NO_INLINE
+#   define VSF_CAL_ALWAYS_INLINE
+#   define VSF_CAL_WEAK(__ANYTHING)
+#   define VSF_CAL_RAMFUNC
+#   define __asm__              __asm
+#   define __VSF_CAL_ALIGN(__N)         //_Pragma("data_alignment=" __STR(__N))         //!< 8051 does not have any alignment restrictions
+#   define __VSF_CAL_AT_ADDR(__ADDR)
+#   define __VSF_CAL_SECTION(__SEC)
+#   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS)
+#   define VSF_CAL_PACKED
+#   define VSF_CAL_UNALIGNED
+#   define VSF_CAL_TRANSPARENT_UNION
+#   define __VSF_CAL_ALIGN_OF(__ANYTHING)
+
+#   define __VSF_CAL_ISR(__VEC)                                                 \
         void vect_##__VEC##_handler(void) interrupt __VEC
 
 //! TODO: Need further investigation about the negative effect
@@ -123,17 +120,17 @@ extern "C" {
 #   define __IAR_STARTUP_DATA_INIT  __INIT_XDATA_I
 #endif
 
-        
+
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#define ALIGN_OF(__TYPE)       __ALIGN_OF(__TYPE)
-#define ALIGN_WITH(__TYPE)     ALIGN(ALIGN_OF(__TYPE))
-#define ISR(__VECT)            __ISR(__VECT)    
+#define VSF_CAL_ALIGN_OF(__TYPE)        __VSF_CAL_ALIGN_OF(__TYPE)
+#define VSF_CAL_ALIGN_WITH(__TYPE)      VSF_CAL_ALIGN(VSF_CAL_ALIGN_OF(__TYPE))
+#define VSF_CAL_ISR(__VECT)             __VSF_CAL_ISR(__VECT)
 #else
-#define ALIGN_OF(...)       __ALIGN_OF(__VA_ARGS__)
-#define ALIGN_WITH(...)     ALIGN(ALIGN_OF(__VA_ARGS__))
-#define ISR(...)            __ISR(__VA_ARGS__)
+#define VSF_CAL_ALIGN_OF(...)           __VSF_CAL_ALIGN_OF(__VA_ARGS__)
+#define VSF_CAL_ALIGN_WITH(...)         VSF_CAL_ALIGN(VSF_CAL_ALIGN_OF(__VA_ARGS__))
+#define VSF_CAL_ISR(...)                __VSF_CAL_ISR(__VA_ARGS__)
 #endif
-        
+
 /*----------------------------------------------------------------------------*
  * Signal & Interrupt Definition                                              *
  *----------------------------------------------------------------------------*/
@@ -150,7 +147,7 @@ extern "C" {
 #   define DISABLE_GLOBAL_INTERRUPT()           ____disable_irq()
 
 INLINE
-static uint32_t ____disable_irq(void) 
+static uint32_t ____disable_irq(void)
 {
     __istate_t s = __get_interrupt_state();
     __disable_interrupt();

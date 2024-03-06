@@ -66,12 +66,12 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ LOCAL VARIABLES ===============================*/
-static NO_INIT vsf_tgui_t s_tTGUIDemo;
+static VSF_CAL_NO_INIT vsf_tgui_t s_tTGUIDemo;
 
 #if APP_USE_TGUI_DESIGNER_DEMO == ENABLED
-static NO_INIT tgui_designer_t s_tDesigner;
+static VSF_CAL_NO_INIT tgui_designer_t s_tDesigner;
 #else
-static NO_INIT stopwatch_t s_tMyStopwatch;
+static VSF_CAL_NO_INIT stopwatch_t s_tMyStopwatch;
 #endif
 /*============================ PROTOTYPES ====================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -84,10 +84,10 @@ void vsf_tgui_low_level_on_ready_to_refresh(void)
 
 vsf_err_t tgui_demo_init(void)
 {
-    NO_INIT static vsf_tgui_evt_t s_tEvtQueueBuffer[APP_TGUI_DEMO_CFG_QUEUE_MAX];
+    VSF_CAL_NO_INIT static vsf_tgui_evt_t s_tEvtQueueBuffer[APP_TGUI_DEMO_CFG_QUEUE_MAX];
 
 #if VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_BREADTH_FIRST_TRAVERSAL
-    NO_INIT static uint16_t s_tBFSBuffer[APP_TGUI_DEMO_CFG_QUEUE_MAX];
+    VSF_CAL_NO_INIT static uint16_t s_tBFSBuffer[APP_TGUI_DEMO_CFG_QUEUE_MAX];
 #endif
 
     const vsf_tgui_cfg_t cfg = {

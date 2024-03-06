@@ -128,12 +128,12 @@ const vk_usbh_class_drv_t vk_usbh_msc_drv = {
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_USE_SCSI == ENABLED
-WEAK(vsf_scsi_on_new)
+VSF_CAL_WEAK(vsf_scsi_on_new)
 void vsf_scsi_on_new(vk_scsi_t *scsi)
 {
 }
 
-WEAK(vsf_scsi_on_delete)
+VSF_CAL_WEAK(vsf_scsi_on_delete)
 void vsf_scsi_on_delete(vk_scsi_t *scsi)
 {
 }

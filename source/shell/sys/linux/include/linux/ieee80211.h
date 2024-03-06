@@ -110,7 +110,7 @@ struct ieee80211_hdr {
     );
     __le16 seq_ctrl;
     u8 addr4[ETH_ALEN];
-} __packed __aligned(2);
+} VSF_CAL_PACKED VSF_CAL_ALIGN(2);
 
 struct ieee80211_hdr_3addr {
     __le16 frame_control;
@@ -119,7 +119,7 @@ struct ieee80211_hdr_3addr {
     u8 addr2[ETH_ALEN];
     u8 addr3[ETH_ALEN];
     __le16 seq_ctrl;
-} __packed __aligned(2);
+} VSF_CAL_PACKED VSF_CAL_ALIGN(2);
 
 struct ieee80211_qos_hdr {
     __le16 frame_control;
@@ -129,7 +129,7 @@ struct ieee80211_qos_hdr {
     u8 addr3[ETH_ALEN];
     __le16 seq_ctrl;
     __le16 qos_ctrl;
-} __packed __aligned(2);
+} VSF_CAL_PACKED VSF_CAL_ALIGN(2);
 
 #define WLAN_SA_QUERY_TR_ID_LEN         2
 #define WLAN_MEMBERSHIP_LEN             8
@@ -140,43 +140,43 @@ struct ieee80211_quiet_ie {
     u8 period;
     __le16 duration;
     __le16 offset;
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_msrment_ie {
     u8 token;
     u8 mode;
     u8 type;
     u8 request[0];
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_channel_sw_ie {
     u8 mode;
     u8 new_ch_num;
     u8 count;
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_ext_chansw_ie {
     u8 mode;
     u8 new_operating_class;
     u8 new_ch_num;
     u8 count;
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_sec_chan_offs_ie {
     u8 sec_chan_offs;
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_mesh_chansw_params_ie {
     u8 mesh_ttl;
     u8 mesh_flags;
     __le16 mesh_reason;
     __le16 mesh_pre_value;
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_wide_bw_chansw_ie {
     u8 new_channel_width;
     u8 new_center_freq_seg0, new_center_freq_seg1;
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_tim_ie {
     u8 dtim_count;
@@ -184,7 +184,7 @@ struct ieee80211_tim_ie {
     u8 bitmap_ctrl;
     /* variable size: 1 - 251 bytes */
     u8 virtual_map[1];
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_meshconf_ie {
     u8 meshconf_psel;
@@ -194,22 +194,22 @@ struct ieee80211_meshconf_ie {
     u8 meshconf_auth;
     u8 meshconf_form;
     u8 meshconf_cap;
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_tpc_report_ie {
     u8 tx_power;
     u8 link_margin;
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_addba_ext_ie {
     u8 data;
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_s1g_bcn_compat_ie {
     __le16 compat_info;
     __le16 beacon_int;
     __le32 tsf_completion;
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_s1g_oper_ie {
     u8 ch_width;
@@ -217,13 +217,13 @@ struct ieee80211_s1g_oper_ie {
     u8 primary_ch;
     u8 oper_ch;
     __le16 basic_mcs_nss;
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_aid_response_ie {
     __le16 aid;
     u8 switch_count;
     __le16 response_int;
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_mmie {
     u8 element_id;
@@ -231,7 +231,7 @@ struct ieee80211_mmie {
     __le16 key_id;
     u8 sequence_number[6];
     u8 mic[8];
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_mmie_16 {
     u8 element_id;
@@ -239,20 +239,20 @@ struct ieee80211_mmie_16 {
     __le16 key_id;
     u8 sequence_number[6];
     u8 mic[16];
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_vendor_ie {
     u8 element_id;
     u8 len;
     u8 oui[3];
     u8 oui_type;
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_wmm_ac_param {
     u8 aci_aifsn;
     u8 cw;
     __le16 txop_limit;
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_wmm_param_ie {
     u8 element_id;
@@ -264,27 +264,27 @@ struct ieee80211_wmm_param_ie {
     u8 qos_info;
     u8 reserved;
     struct ieee80211_wmm_ac_param ac[4];
-} __packed;
+} VSF_CAL_PACKED;
 
 struct ieee80211_rts {
     __le16 frame_control;
     __le16 duration;
     u8 ra[ETH_ALEN];
     u8 ta[ETH_ALEN];
-} __packed __aligned(2);
+} VSF_CAL_PACKED VSF_CAL_ALIGN(2);
 
 struct ieee80211_cts {
     __le16 frame_control;
     __le16 duration;
     u8 ra[ETH_ALEN];
-} __packed __aligned(2);
+} VSF_CAL_PACKED VSF_CAL_ALIGN(2);
 
 struct ieee80211_pspoll {
     __le16 frame_control;
     __le16 aid;
     u8 bssid[ETH_ALEN];
     u8 ta[ETH_ALEN];
-} __packed __aligned(2);
+} VSF_CAL_PACKED VSF_CAL_ALIGN(2);
 
 /* Information Element IDs */
 enum ieee80211_eid {
@@ -546,38 +546,38 @@ struct ieee80211_mgmt {
             __le16 status_code;
             /* possibly followed by Challenge text */
             u8 variable[0];
-        } __packed auth;
+        } VSF_CAL_PACKED auth;
         struct {
             __le16 reason_code;
-        } __packed deauth;
+        } VSF_CAL_PACKED deauth;
         struct {
             __le16 capab_info;
             __le16 listen_interval;
             /* followed by SSID and Supported rates */
             u8 variable[0];
-        } __packed assoc_req;
+        } VSF_CAL_PACKED assoc_req;
         struct {
             __le16 capab_info;
             __le16 status_code;
             __le16 aid;
             /* followed by Supported rates */
             u8 variable[0];
-        } __packed assoc_resp, reassoc_resp;
+        } VSF_CAL_PACKED assoc_resp, reassoc_resp;
         struct {
             __le16 capab_info;
             __le16 status_code;
             u8 variable[0];
-        } __packed s1g_assoc_resp, s1g_reassoc_resp;
+        } VSF_CAL_PACKED s1g_assoc_resp, s1g_reassoc_resp;
         struct {
             __le16 capab_info;
             __le16 listen_interval;
             u8 current_ap[ETH_ALEN];
             /* followed by SSID and Supported rates */
             u8 variable[0];
-        } __packed reassoc_req;
+        } VSF_CAL_PACKED reassoc_req;
         struct {
             __le16 reason_code;
-        } __packed disassoc;
+        } VSF_CAL_PACKED disassoc;
         struct {
             __le64 timestamp;
             __le16 beacon_int;
@@ -585,11 +585,11 @@ struct ieee80211_mgmt {
             /* followed by some of SSID, Supported rates,
              * FH Params, DS Params, CF Params, IBSS Params, TIM */
             u8 variable[0];
-        } __packed beacon;
+        } VSF_CAL_PACKED beacon;
         struct {
             /* only variable items: SSID, Supported rates */
             u8 variable[1];
-        } __packed probe_req;
+        } VSF_CAL_PACKED probe_req;
         struct {
             __le64 timestamp;
             __le16 beacon_int;
@@ -597,7 +597,7 @@ struct ieee80211_mgmt {
             /* followed by some of SSID, Supported rates,
              * FH Params, DS Params, CF Params, IBSS Params */
             u8 variable[0];
-        } __packed probe_resp;
+        } VSF_CAL_PACKED probe_resp;
         struct {
             u8 category;
             union {
@@ -606,23 +606,23 @@ struct ieee80211_mgmt {
                     u8 dialog_token;
                     u8 status_code;
                     u8 variable[0];
-                } __packed wme_action;
+                } VSF_CAL_PACKED wme_action;
                 struct{
                     u8 action_code;
                     u8 variable[0];
-                } __packed chan_switch;
+                } VSF_CAL_PACKED chan_switch;
                 struct{
                     u8 action_code;
                     struct ieee80211_ext_chansw_ie data;
                     u8 variable[0];
-                } __packed ext_chan_switch;
+                } VSF_CAL_PACKED ext_chan_switch;
                 struct{
                     u8 action_code;
                     u8 dialog_token;
                     u8 element_id;
                     u8 length;
                     struct ieee80211_msrment_ie msr_elem;
-                } __packed measurement;
+                } VSF_CAL_PACKED measurement;
                 struct{
                     u8 action_code;
                     u8 dialog_token;
@@ -631,61 +631,61 @@ struct ieee80211_mgmt {
                     __le16 start_seq_num;
                     /* followed by BA Extension */
                     u8 variable[0];
-                } __packed addba_req;
+                } VSF_CAL_PACKED addba_req;
                 struct{
                     u8 action_code;
                     u8 dialog_token;
                     __le16 status;
                     __le16 capab;
                     __le16 timeout;
-                } __packed addba_resp;
+                } VSF_CAL_PACKED addba_resp;
                 struct{
                     u8 action_code;
                     __le16 params;
                     __le16 reason_code;
-                } __packed delba;
+                } VSF_CAL_PACKED delba;
                 struct {
                     u8 action_code;
                     u8 variable[0];
-                } __packed self_prot;
+                } VSF_CAL_PACKED self_prot;
                 struct{
                     u8 action_code;
                     u8 variable[0];
-                } __packed mesh_action;
+                } VSF_CAL_PACKED mesh_action;
                 struct {
                     u8 action;
                     u8 trans_id[WLAN_SA_QUERY_TR_ID_LEN];
-                } __packed sa_query;
+                } VSF_CAL_PACKED sa_query;
                 struct {
                     u8 action;
                     u8 smps_control;
-                } __packed ht_smps;
+                } VSF_CAL_PACKED ht_smps;
                 struct {
                     u8 action_code;
                     u8 chanwidth;
-                } __packed ht_notify_cw;
+                } VSF_CAL_PACKED ht_notify_cw;
                 struct {
                     u8 action_code;
                     u8 dialog_token;
                     __le16 capability;
                     u8 variable[0];
-                } __packed tdls_discover_resp;
+                } VSF_CAL_PACKED tdls_discover_resp;
                 struct {
                     u8 action_code;
                     u8 operating_mode;
-                } __packed vht_opmode_notif;
+                } VSF_CAL_PACKED vht_opmode_notif;
                 struct {
                     u8 action_code;
                     u8 membership[WLAN_MEMBERSHIP_LEN];
                     u8 position[WLAN_USER_POSITION_LEN];
-                } __packed vht_group_notif;
+                } VSF_CAL_PACKED vht_group_notif;
                 struct {
                     u8 action_code;
                     u8 dialog_token;
                     u8 tpc_elem_id;
                     u8 tpc_elem_length;
                     struct ieee80211_tpc_report_ie tpc;
-                } __packed tpc_report;
+                } VSF_CAL_PACKED tpc_report;
                 struct {
                     u8 action_code;
                     u8 dialog_token;
@@ -695,11 +695,11 @@ struct ieee80211_mgmt {
                     __le16 tod_error;
                     __le16 toa_error;
                     u8 variable[0];
-                } __packed ftm;
+                } VSF_CAL_PACKED ftm;
                 struct {
                     u8 action_code;
                     u8 variable[0];
-                } __packed s1g;
+                } VSF_CAL_PACKED s1g;
                 struct {
                     u8 action_code;
                     u8 dialog_token;
@@ -708,11 +708,11 @@ struct ieee80211_mgmt {
                     u32 toa;
                     u8 max_tod_error;
                     u8 max_toa_error;
-                } __packed wnm_timing_msr;
+                } VSF_CAL_PACKED wnm_timing_msr;
             } u;
-        } __packed action;
+        } VSF_CAL_PACKED action;
     } u;
-} __packed __aligned(2);
+} VSF_CAL_PACKED VSF_CAL_ALIGN(2);
 
 static inline bool ieee80211_has_tods(__le16 fc)
 {

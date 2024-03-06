@@ -52,7 +52,7 @@
 
 #include <linux/atomic.h>
 
-WEAK(atomic_inc)
+VSF_CAL_WEAK(atomic_inc)
 void atomic_inc(atomic_t *a)
 {
     vsf_protect_t orig = vsf_protect_int();
@@ -60,7 +60,7 @@ void atomic_inc(atomic_t *a)
     vsf_unprotect_int(orig);
 }
 
-WEAK(atomic_dec_and_test)
+VSF_CAL_WEAK(atomic_dec_and_test)
 int atomic_dec_and_test(atomic_t *a)
 {
     int value;
@@ -644,7 +644,7 @@ int bus_rescan_devices(struct bus_type *bus)
 
 #include <linux/firmware.h>
 
-WEAK(vsf_linux_firmware_read)
+VSF_CAL_WEAK(vsf_linux_firmware_read)
 int vsf_linux_firmware_read(struct firmware *fw, const char *name)
 {
     int dirfd = open(VSF_LINUX_CFG_FW_PATH, 0);
@@ -675,7 +675,7 @@ close_and_fail:
     return -1;
 }
 
-WEAK(vsf_linux_firmware_release)
+VSF_CAL_WEAK(vsf_linux_firmware_release)
 void vsf_linux_firmware_release(struct firmware *fw)
 {
     if (fw->data != NULL) {

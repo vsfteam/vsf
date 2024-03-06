@@ -31,8 +31,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_INPUT_ON_TOUCHSCREEN
-WEAK(vsf_input_on_touchscreen)
+VSF_CAL_WEAK(vsf_input_on_touchscreen)
 void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 {
 #if VSF_INPUT_TOUCH_SCREEN_CFG_TRACE == ENABLED
@@ -47,6 +46,5 @@ void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt)
 #endif
     vsf_input_on_evt(VSF_INPUT_TYPE_TOUCHSCREEN, &ts_evt->use_as__vk_input_evt_t);
 }
-#endif
 
 #endif      // VSF_USE_INPUT

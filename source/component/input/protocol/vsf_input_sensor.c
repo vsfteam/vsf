@@ -31,12 +31,10 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_INPUT_ON_SENSOR
-WEAK(vsf_input_on_sensor)
+VSF_CAL_WEAK(vsf_input_on_sensor)
 void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt)
 {
     vsf_input_on_evt(VSF_INPUT_TYPE_SENSOR, &sensor_evt->use_as__vk_input_evt_t);
 }
-#endif
 
 #endif      // VSF_USE_INPUT

@@ -43,7 +43,7 @@ def_vsf_task(user_task_t,
         vsf_task(user_sub_task_t) print_task;
     #endif
     ));
-                                                       
+
 
 
 #if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
@@ -62,7 +62,7 @@ def_vsf_thread(user_thread_a_t, 1024,
         mem_sharable( )
         mem_nonsharable( )
     )
-    
+
     def_params(
         vsf_sem_t *sem_ptr;
     ));
@@ -70,11 +70,11 @@ def_vsf_thread(user_thread_a_t, 1024,
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-static NO_INIT vsf_sem_t __user_sem;
+static VSF_CAL_NO_INIT vsf_sem_t __user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 #if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-implement_vsf_task(user_sub_task_t) 
+implement_vsf_task(user_sub_task_t)
 {
     vsf_task_begin();
     printf("receive semaphore...[%08x]\r\n", vsf_this.cnt++);
@@ -85,32 +85,32 @@ implement_vsf_task(user_sub_task_t)
 
 #define USER_TASK_RESET_FSM()   do { vsf_task_state = 0;} while(0)
 
-implement_vsf_task(user_task_t) 
+implement_vsf_task(user_task_t)
 {
     vsf_task_begin();
     enum {
         WAIT_FOR_SEM = 0,
         CALL_SUB_TO_PRINT,
     };
-    
+
     on_vsf_task_init() {
         vsf_this.cnt = 0;
     }
 
     switch (vsf_task_state) {
-        case WAIT_FOR_SEM:    
-            
-            vsf_task_wait_until(vsf_sem_pend(vsf_this.sem_ptr));                       //!< wait for semaphore forever  
+        case WAIT_FOR_SEM:
+
+            vsf_task_wait_until(vsf_sem_pend(vsf_this.sem_ptr));                       //!< wait for semaphore forever
         #if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
             prepare_vsf_task(user_sub_task_t, &vsf_this.print_task);
             vsf_this.print_task.cnt = vsf_this.cnt;                                     //!< passing parameter
         #endif
             vsf_task_state = CALL_SUB_TO_PRINT;                                 //!< transfer to next state
             break;
-            
+
         case CALL_SUB_TO_PRINT:
         #if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-            if (fsm_rt_cpl == vsf_task_call_task(user_sub_task_t, 
+            if (fsm_rt_cpl == vsf_task_call_task(user_sub_task_t,
                                             &vsf_this.print_task)) {
                 //! task complete
                 vsf_this.cnt = vsf_this.print_task.cnt;                                 //!< read param value
@@ -126,32 +126,32 @@ implement_vsf_task(user_task_t)
 }
 
 #if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
-implement_vsf_task(user_task_b_t) 
+implement_vsf_task(user_task_b_t)
 {
     vsf_task_begin();
     enum {
         DELAY = 0,
         PRINT = 1,
     };
-    
+
     switch(vsf_task_state) {
         case DELAY:
-            vsf_task_wait_until(vsf_delay_ms(3000));                           //!< wait 10s 
+            vsf_task_wait_until(vsf_delay_ms(3000));                           //!< wait 10s
             vsf_task_state = PRINT;
             break;
-            
+
         case PRINT:
             printf("post semaphore...   [%08x]\r\n", vsf_this.cnt++);
             vsf_sem_post(vsf_this.sem_ptr);                                            //!< post a semaphore
             USER_TASK_RESET_FSM();                                              //!< reset fsm
             break;
-        
+
     }
-    
+
     vsf_task_end();
 }
 #else
-implement_vsf_thread(user_thread_a_t) 
+implement_vsf_thread(user_thread_a_t)
 {
     uint32_t cnt = 0;
     while (1) {
@@ -164,13 +164,13 @@ implement_vsf_thread(user_thread_a_t)
 #endif
 
 void vsf_kernel_task_simple_demo(void)
-{   
+{
     //! initialise semaphore
-    vsf_sem_init(&__user_sem, 0); 
-    
+    vsf_sem_init(&__user_sem, 0);
+
     //! start a user task
     {
-        static NO_INIT user_task_t __user_task;
+        static VSF_CAL_NO_INIT user_task_t __user_task;
         __user_task.param.sem_ptr = &__user_sem;
         init_vsf_task(user_task_t, &__user_task, vsf_prio_0);
     }
@@ -178,7 +178,7 @@ void vsf_kernel_task_simple_demo(void)
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     //! start the user task a
     {
-        static NO_INIT user_thread_a_t __user_task_a;
+        static VSF_CAL_NO_INIT user_thread_a_t __user_task_a;
         __user_task_a.param.sem_ptr = &__user_sem;
         init_vsf_thread(user_thread_a_t, &__user_task_a, vsf_prio_0);
     }
@@ -187,7 +187,7 @@ void vsf_kernel_task_simple_demo(void)
 
     //! start a user task b
     {
-        static NO_INIT user_task_b_t __user_task_b;
+        static VSF_CAL_NO_INIT user_task_b_t __user_task_b;
         __user_task_b.param.sem_ptr = &__user_sem;
         __user_task_b.param.cnt = 0;
         init_vsf_task(user_task_b_t, &__user_task_b, vsf_prio_0);
@@ -208,9 +208,9 @@ int main(void)
     )
 
     vsf_stdio_init();
-    
+
     vsf_kernel_task_simple_demo();
-    
+
     while(1) {
         printf("hello world! \r\n");
         vsf_delay_ms(1000);
@@ -234,9 +234,9 @@ void main(void)
     vsf_pt_begin()
 
     vsf_stdio_init();
-    
+
     vsf_kernel_task_simple_demo();
-    
+
     vsf_this.cnt = 0;
     while(1) {
         printf("hello world! \r\n");
@@ -244,13 +244,13 @@ void main(void)
     }
     vsf_pt_end()
 }
-#else 
+#else
 int main(void)
 {
     vsf_stdio_init();
-    
+
     vsf_kernel_task_simple_demo();
-    
+
     return 0;
 }
 

@@ -44,7 +44,7 @@ extern int vsf_linux_init_main(int argc, char *argv[]);
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
-WEAK(vsf_linux_init_main)
+VSF_CAL_WEAK(vsf_linux_init_main)
 int vsf_linux_init_main(int argc, char *argv[])
 {
 #ifndef VSF_LINUX_CFG_PATH

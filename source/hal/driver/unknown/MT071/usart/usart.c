@@ -39,7 +39,7 @@ vsf_usart_t vsf_usart##__N = {                                                  
         .rx_dma     = USART##__N##_RX_DMA,                                      \
     },                                                                          \
 };                                                                              \
-ROOT void USART##__N##_IRQHandler(void)                                         \
+VSF_CAL_ROOT void USART##__N##_IRQHandler(void)                                 \
 {                                                                               \
     __vsf_usart_irqhandler(&vsf_usart##__N);                                    \
 }

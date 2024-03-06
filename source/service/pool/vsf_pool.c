@@ -205,7 +205,7 @@ bool vsf_pool_add_buffer(   vsf_pool_t *this_ptr,
 #   pragma diag_suppress=pe111
 #endif
 
-WEAK(vsf_plug_in_on_failed_to_feed_pool_on_heap)
+VSF_CAL_WEAK(vsf_plug_in_on_failed_to_feed_pool_on_heap)
 bool vsf_plug_in_on_failed_to_feed_pool_on_heap(vsf_pool_t *obj_ptr)
 {
     VSF_UNUSED_PARAM(obj_ptr);
@@ -363,7 +363,7 @@ void vsf_pool_free(vsf_pool_t *obj_ptr, uintptr_t pItem)
 
 }
 
-SECTION(".text.vsf.utilities.vsf_pool_get_count")
+VSF_CAL_SECTION(".text.vsf.utilities.vsf_pool_get_count")
 /*! \brief get the number of memory blocks available in the target pool
  *! \param this_ptr    address of the target pool
  *! \return the number of memory blocks
@@ -377,7 +377,7 @@ uint_fast16_t vsf_pool_get_count(vsf_pool_t *obj_ptr)
 }
 
 #if VSF_POOL_CFG_SUPPORT_USER_OBJECT == ENABLED
-SECTION(".text.vsf.utilities.vsf_pool_get_tag")
+VSF_CAL_SECTION(".text.vsf.utilities.vsf_pool_get_tag")
 /*! \brief get the address of the object which is attached to the pool
  *! \param this_ptr    address of the target pool
  *! \return the address of the object
@@ -390,7 +390,7 @@ uintptr_t vsf_pool_get_tag(vsf_pool_t *obj_ptr)
     return vsf_this.target_ptr;
 }
 
-SECTION(".text.vsf.utilities.vsf_pool_set_tag")
+VSF_CAL_SECTION(".text.vsf.utilities.vsf_pool_set_tag")
 /*! \brief set the address of the object which is attached to the pool
  *! \param this_ptr    address of the target pool
  *! \return the address of the object
@@ -405,7 +405,7 @@ uintptr_t vsf_pool_set_tag(vsf_pool_t *obj_ptr, uintptr_t target_ptr)
 }
 #endif
 
-SECTION(".text.vsf.utilities.vsf_pool_get_region")
+VSF_CAL_SECTION(".text.vsf.utilities.vsf_pool_get_region")
 /*! \brief get the address of the code region used by this pool
  *! \param this_ptr    address of the target pool
  *! \return the address of the code region

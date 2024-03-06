@@ -40,7 +40,7 @@ struct usb_msc_cbw_t {
     uint8_t bCBWLUN;
     uint8_t bCBWCBLength;
     uint8_t CBWCB[16];
-} PACKED;
+} VSF_CAL_PACKED;
 
 typedef struct usb_msc_csw_t usb_msc_csw_t;
 struct usb_msc_csw_t {
@@ -48,7 +48,7 @@ struct usb_msc_csw_t {
     uint32_t dCSWTag;
     uint32_t dCSWDataResidue;
     uint8_t dCSWStatus;
-} PACKED;
+} VSF_CAL_PACKED;
 
 typedef enum usb_msc_req_t {
     USB_MSC_REQ_GET_MAX_LUN = 0xFE,

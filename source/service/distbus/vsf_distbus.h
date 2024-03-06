@@ -64,7 +64,7 @@ typedef struct vsf_distbus_msgheader_t {
     uint32_t                                hash_data;
     uint16_t                                addr;
     uint16_t                                flag;
-} PACKED vsf_distbus_msgheader_t;
+} VSF_CAL_PACKED vsf_distbus_msgheader_t;
 vsf_class(vsf_distbus_msg_t) {
     protected_member(
         uint32_t                            pos;

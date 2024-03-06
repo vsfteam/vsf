@@ -31,7 +31,7 @@
 
 
 #define VSF_USE_UI                                      ENABLED
-#define VSF_USE_MBEDTLS                                 ENABLED 
+#define VSF_USE_MBEDTLS                                 ENABLED
 
 // Application configure
 #define APP_USE_LINUX_DEMO                              ENABLED

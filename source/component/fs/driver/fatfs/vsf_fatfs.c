@@ -78,7 +78,7 @@ typedef struct fatfs_bpb_t {
     uint16_t NumHeads;
     uint32_t HiddSec;
     uint32_t TotSec32;
-} PACKED fatfs_bpb_t;
+} VSF_CAL_PACKED fatfs_bpb_t;
 
 typedef struct fatfs_ebpb_t {
     uint8_t DrvNo;
@@ -87,7 +87,7 @@ typedef struct fatfs_ebpb_t {
     uint32_t VolID;
     uint8_t VolLab[11];
     uint8_t FilSysType[8];
-} PACKED fatfs_ebpb_t;
+} VSF_CAL_PACKED fatfs_ebpb_t;
 
 typedef struct fatfs_dbr_t {
     uint8_t jmp[3];
@@ -104,14 +104,14 @@ typedef struct fatfs_dbr_t {
                 uint16_t FSInfo;
                 uint16_t BkBootSec;
                 uint8_t Reserved[12];
-            } PACKED bpb;
+            } VSF_CAL_PACKED bpb;
             fatfs_ebpb_t ebpb;
             uint8_t Bootstrap[420];
-        } PACKED fat32;
+        } VSF_CAL_PACKED fat32;
         struct {
             fatfs_ebpb_t ebpb;
             uint8_t Bootstrap[448];
-        } PACKED fat1216;
+        } VSF_CAL_PACKED fat1216;
         struct {
             uint8_t Reserved_All0[28];
             struct {
@@ -126,7 +126,7 @@ typedef struct fatfs_dbr_t {
                 struct {
                     uint8_t Minor;
                     uint8_t Major;
-                } PACKED Ver;
+                } VSF_CAL_PACKED Ver;
                 uint16_t VolState;
                 uint8_t SecBits;
                 uint8_t SPCBits;
@@ -134,11 +134,11 @@ typedef struct fatfs_dbr_t {
                 uint8_t DrvNo;
                 uint8_t AllocPercnet;
                 uint8_t Reserved_All0[397];
-            } PACKED bpb;
-        } PACKED exfat;
-    } PACKED;
+            } VSF_CAL_PACKED bpb;
+        } VSF_CAL_PACKED exfat;
+    } VSF_CAL_PACKED;
     uint16_t Magic;
-} PACKED fatfs_dbr_t;
+} VSF_CAL_PACKED fatfs_dbr_t;
 
 typedef struct fatfs_dentry_t {
     union {
@@ -156,27 +156,27 @@ typedef struct fatfs_dentry_t {
             uint16_t WrtData;
             uint16_t FstClusLo;
             uint32_t FileSize;
-        } PACKED fat;
+        } VSF_CAL_PACKED fat;
         struct {
             uint8_t EntryType;
             union {
                 struct {
                     uint8_t CharacterCount;
                     uint16_t VolumeLabel[11];
-                } PACKED VolumeLabel;
+                } VSF_CAL_PACKED VolumeLabel;
                 struct {
                     uint8_t BitmapFlags;
                     uint8_t Reserved[18];
                     uint32_t FirstCluster;
                     uint64_t DataLength;
-                } PACKED Bitmap;
+                } VSF_CAL_PACKED Bitmap;
                 struct {
                     uint8_t Reserved1[3];
                     uint32_t TableChecksum;
                     uint8_t Reserved[12];
                     uint32_t FirstCluster;
                     uint64_t DataLength;
-                } PACKED UpCase;
+                } VSF_CAL_PACKED UpCase;
                 struct {
                     uint8_t SecondaryCount;
                     uint16_t SetChecksum;
@@ -191,7 +191,7 @@ typedef struct fatfs_dentry_t {
                     uint8_t LastModifiedUtcOffset;
                     uint8_t LaseAccessedUtcOffset;
                     uint8_t Reserved2[7];
-                } PACKED FilDir;
+                } VSF_CAL_PACKED FilDir;
                 struct {
                     uint8_t GeneralSecondaryFlags;
                     uint8_t Reserved1;
@@ -202,16 +202,16 @@ typedef struct fatfs_dentry_t {
                     uint32_t Reserved3;
                     uint32_t FirstCluster;
                     uint64_t DataLength;
-                } PACKED Stream;
+                } VSF_CAL_PACKED Stream;
                 struct {
                     uint8_t GeneralSecondaryFlags;
                     uint16_t FileName[15];
-                } PACKED FileName;
+                } VSF_CAL_PACKED FileName;
                 uint8_t Buffer[31];
-            } PACKED;
-        } PACKED exfat;
-    } PACKED;
-} PACKED fatfs_dentry_t;
+            } VSF_CAL_PACKED;
+        } VSF_CAL_PACKED exfat;
+    } VSF_CAL_PACKED;
+} VSF_CAL_PACKED fatfs_dentry_t;
 
 typedef struct vk_fatfs_rw_local {
     uint64_t offset;

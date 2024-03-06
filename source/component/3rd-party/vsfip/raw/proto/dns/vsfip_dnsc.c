@@ -58,19 +58,19 @@ typedef struct vsfip_dns_head_t {
     uint16_t answ;
     uint16_t auth;
     uint16_t addrrs;
-} PACKED vsfip_dns_head_t;
+} VSF_CAL_PACKED vsfip_dns_head_t;
 
 typedef struct vsfip_dns_query_type_t {
     uint16_t type;
     uint16_t classtype;
-} PACKED vsfip_dns_query_type_t;
+} VSF_CAL_PACKED vsfip_dns_query_type_t;
 
 typedef struct vsfip_dns_response_t {
     uint16_t type;
     uint16_t classtype;
     uint32_t ttl;
     uint16_t len;
-} PACKED vsfip_dns_response_t;
+} VSF_CAL_PACKED vsfip_dns_response_t;
 
 typedef struct vsfip_dnsc_local_t {
     uint16_t id;
@@ -80,7 +80,7 @@ typedef struct vsfip_dnsc_local_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT vsfip_dnsc_local_t __vsfip_dnsc;
+static VSF_CAL_NO_INIT vsfip_dnsc_local_t __vsfip_dnsc;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/

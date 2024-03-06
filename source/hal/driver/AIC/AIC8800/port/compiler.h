@@ -16,7 +16,7 @@
 
 #define __MODULE__              __BASE_FILE__
 
-#define __ALIGN4                ALIGN(4)
+#define __ALIGN4                VSF_CAL_ALIGN(4)
 
 #define __PRIVATE_HOST_N(m,n)
 
@@ -33,7 +33,7 @@
 #define PRIVATE_HOST_ARRAY2_EXT_STATEMENT(type, count1, count2, name)           \
     extern type backup_ ## name[count1][count2]
 
-#define __SHAREDRAM             SECTION("SHAREDRAM")
+#define __SHAREDRAM             VSF_CAL_SECTION("SHAREDRAM")
 
 #define MCAT(a,b)               a##b
 #define VAR_WITH_VERx(name,v)   VSF_MCONNECT3(name, _U0, v)

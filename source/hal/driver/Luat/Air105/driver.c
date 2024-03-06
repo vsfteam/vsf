@@ -59,7 +59,7 @@ int vsf_hal_pre_startup_init(void)
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
  */
-WEAK(vsf_driver_init)
+VSF_CAL_WEAK(vsf_driver_init)
 bool vsf_driver_init(void)
 {
     //SystemInit();

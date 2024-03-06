@@ -9,15 +9,15 @@ typedef struct btstack_host_t {
     btstack_linked_list_t drv_list;
 } btstack_host_t;
 
-static NO_INIT btstack_host_t btstack_host;
+static VSF_CAL_NO_INIT btstack_host_t btstack_host;
 
-WEAK(btstack_host_malloc_dev)
+VSF_CAL_WEAK(btstack_host_malloc_dev)
 btstack_host_dev_t * btstack_host_malloc_dev(void)
 {
     return vsf_heap_malloc(sizeof(btstack_host_dev_t));
 }
 
-WEAK(btstack_host_free_dev)
+VSF_CAL_WEAK(btstack_host_free_dev)
 void btstack_host_free_dev(btstack_host_dev_t *dev)
 {
     vsf_heap_free(dev);

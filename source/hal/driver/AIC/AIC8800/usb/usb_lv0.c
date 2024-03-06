@@ -37,7 +37,7 @@ static const aic8800_usb_const_t __USB_OTG##__N##_const = {                     
 aic8800_usb_t USB_OTG##__N##_IP = {                                             \
     .param = &__USB_OTG##__N##_const,                                           \
 };                                                                              \
-ROOT ISR(USB_OTG##__N##_IRQHandler)                                             \
+VSF_CAL_ROOT VSF_CAL_ISR(USB_OTG##__N##_IRQHandler)                             \
 {                                                                               \
     aic8800_usb_t *usb = &USB_OTG##__N##_IP;                                    \
     if (usb->callback.irqhandler != NULL) {                                     \

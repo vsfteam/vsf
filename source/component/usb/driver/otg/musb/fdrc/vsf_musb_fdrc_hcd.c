@@ -128,14 +128,14 @@ const vk_usbh_hcd_drv_t vk_musb_fdrc_hcd_drv = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK(vsf_musb_fdrc_hcd_alloc_fifo)
+VSF_CAL_WEAK(vsf_musb_fdrc_hcd_alloc_fifo)
 uint_fast16_t vsf_musb_fdrc_hcd_alloc_fifo(vk_usbh_hcd_t *hcd, vk_usbh_pipe_t pipe)
 {
     VSF_USB_ASSERT(false);
     return 0;
 }
 
-WEAK(vsf_musb_fdrc_hcd_free_fifo)
+VSF_CAL_WEAK(vsf_musb_fdrc_hcd_free_fifo)
 void vsf_musb_fdrc_hcd_free_fifo(vk_usbh_hcd_t *hcd, uint_fast16_t fifo)
 {
     VSF_USB_ASSERT(false);

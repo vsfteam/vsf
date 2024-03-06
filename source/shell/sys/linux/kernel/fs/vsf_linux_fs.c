@@ -308,14 +308,14 @@ static vsf_linux_fd_t __vsf_linux_stdio_fallback[3] = {
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_LINUX_CFG_STDIO_FALLBACK == ENABLED
-WEAK(__vsf_linux_stdio_fallback_read)
+VSF_CAL_WEAK(__vsf_linux_stdio_fallback_read)
 ssize_t __vsf_linux_stdio_fallback_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
     VSF_LINUX_ASSERT(false);
     return -1;
 }
 
-WEAK(__vsf_linux_stdio_fallback_write)
+VSF_CAL_WEAK(__vsf_linux_stdio_fallback_write)
 ssize_t __vsf_linux_stdio_fallback_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
     extern uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size);

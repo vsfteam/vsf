@@ -31,7 +31,7 @@
 /*----------------------------------------------------------------------------*
  * Infrastructure                                                             *
  *----------------------------------------------------------------------------*/
-/*! \note initialize architecture specific service 
+/*! \note initialize architecture specific service
  *  \param none
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
@@ -45,7 +45,7 @@ bool vsf_arch_low_level_init(void)
  * System Timer Implementation                                                *
  *----------------------------------------------------------------------------*/
 
-//#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       
+//#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 
 vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void)
 {
@@ -54,12 +54,12 @@ vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void)
 
 void vsf_systimer_clear_int_pending_bit(void)
 {
-    
+
 }
 
 void vsf_systimer_reset_counter_value(void)
 {
-    
+
 }
 
 /*! \brief disable systimer and return over-flow flag status
@@ -76,31 +76,31 @@ bool vsf_systimer_low_level_disable(void)
  */
 void vsf_systimer_low_level_enable(void)
 {
-    
+
 }
 
 void vsf_systimer_low_level_int_disable(void)
 {
-    
+
 }
 
 void vsf_systimer_low_level_int_enable(void)
 {
-    
+
 }
 
 void vsf_systimer_set_reload_value(vsf_systimer_tick_t tick_cnt)
 {
-    
+
 }
 
-ROOT ISR(SysTick_Handler)
-{   
+VSF_CAL_ROOT VSF_CAL_ISR(SysTick_Handler)
+{
     vsf_systimer_ovf_evt_handler();
 }
 
 
-/*! \brief initialise systimer without enable it 
+/*! \brief initialise systimer without enable it
  */
 vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
 {

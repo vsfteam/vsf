@@ -76,7 +76,7 @@ struct SDL_Window {
     uint32_t flags;
     vk_disp_color_type_t format;
     SDL_Surface surface;
-    uint32_t pixels[0] ALIGN(4);
+    uint32_t pixels[0] VSF_CAL_ALIGN(4);
 };
 
 struct SDL_Renderer {
@@ -98,7 +98,7 @@ struct SDL_Texture {
     SDL_PixelFormat *format;
     void *pixels;
 
-    uint32_t __pixels[0] ALIGN(4);
+    uint32_t __pixels[0] VSF_CAL_ALIGN(4);
 };
 
 typedef struct vsf_sdl2_t {
@@ -144,7 +144,7 @@ extern void __SDL_FiniEvent(void);
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-NO_INIT vsf_sdl2_t __vsf_sdl2;
+VSF_CAL_NO_INIT vsf_sdl2_t __vsf_sdl2;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -232,8 +232,7 @@ void SDL_memset4(void *dst, int val, size_t dwords)
     __vsf_sdl2_fast_memset32(dst, (uint32_t)val, dwords);
 }
 
-#ifndef WEAK_SDL2_PIXEL_COPY
-WEAK(vsf_sdl2_pixel_copy)
+VSF_CAL_WEAK(vsf_sdl2_pixel_copy)
 void vsf_sdl2_pixel_copy(   uint_fast16_t data_line_num, uint_fast32_t data_line_size,
                             uint8_t *pdst, uint_fast32_t dst_pitch,
                             uint8_t *psrc, uint_fast32_t src_pitch)
@@ -244,7 +243,6 @@ void vsf_sdl2_pixel_copy(   uint_fast16_t data_line_num, uint_fast32_t data_line
         psrc += src_pitch;
     }
 }
-#endif
 
 #if __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push
@@ -254,8 +252,7 @@ void vsf_sdl2_pixel_copy(   uint_fast16_t data_line_num, uint_fast32_t data_line
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
-#ifndef WEAK_SDL2_PIXEL_FILL
-WEAK(vsf_sdl2_pixel_fill)
+VSF_CAL_WEAK(vsf_sdl2_pixel_fill)
 void vsf_sdl2_pixel_fill(   uint_fast16_t data_line_num, uint_fast32_t pixel_line_size,
                             uint8_t *pbuf, uint_fast32_t dst_pitch,
                             uint32_t color, uint_fast8_t color_byte_size)
@@ -269,7 +266,6 @@ void vsf_sdl2_pixel_fill(   uint_fast16_t data_line_num, uint_fast32_t pixel_lin
         pbuf += dst_pitch;
     }
 }
-#endif
 
 static void __SDL_BlendWithFormat(
                             uint_fast16_t h, uint_fast32_t w,

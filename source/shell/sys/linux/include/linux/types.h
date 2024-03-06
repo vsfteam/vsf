@@ -18,10 +18,10 @@ extern "C" {
 #endif
 
 #ifndef __packed
-#   define __packed             PACKED
+#   define __packed             VSF_CAL_PACKED
 #endif
 #ifndef __aligned
-#   define __aligned(n)         ALIGN(n)
+#   define __aligned(n)         VSF_CAL_ALIGN(n)
 #endif
 #ifndef __user
 #   define __user

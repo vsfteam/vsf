@@ -45,7 +45,7 @@ typedef union epoll_data {
 struct epoll_event {
     uint32_t     events;
     epoll_data_t data;
-} PACKED;
+} VSF_CAL_PACKED;
 
 #if VSF_LINUX_CFG_WRAPPER == ENABLED
 #define epoll_create        VSF_LINUX_WRAPPER(epoll_create)

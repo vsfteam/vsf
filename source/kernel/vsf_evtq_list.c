@@ -71,14 +71,14 @@ static vsf_err_t __vsf_eda_update_priotiry(vsf_eda_t *pthis, vsf_prio_t priority
     return VSF_ERR_NONE;
 }
 
-SECTION(".text.vsf.kernel.__vsf_eda_get_cur_priority")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_eda_get_cur_priority")
 vsf_prio_t __vsf_eda_get_cur_priority(vsf_eda_t *pthis)
 {
     VSF_KERNEL_ASSERT(pthis != NULL);
     return (vsf_prio_t)(pthis->flag.state.is_new_prio ? pthis->new_priority : pthis->cur_priority);
 }
 
-SECTION(".text.vsf.kernel.__vsf_eda_set_priority")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_eda_set_priority")
 vsf_err_t __vsf_eda_set_priority(vsf_eda_t *pthis, vsf_prio_t priority)
 {
     VSF_KERNEL_ASSERT(pthis != NULL);

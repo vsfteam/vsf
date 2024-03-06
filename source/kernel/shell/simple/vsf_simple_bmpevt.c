@@ -75,7 +75,7 @@ static vsf_sync_reason_t __vsf_bmpevt_pend(  vsf_bmpevt_t *bmpevt_ptr,
     return reason;
 }
 
-SECTION(".text.vsf.kernel.__vsf_bmpevt_wait_for")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_bmpevt_wait_for")
 vsf_sync_reason_t __vsf_bmpevt_wait_for(  vsf_bmpevt_t *bmpevt_ptr,
                                         const vsf_bmpevt_pender_t *pender_ptr,
                                         int_fast32_t time_out)
@@ -120,7 +120,7 @@ vsf_sync_reason_t __vsf_bmpevt_wait_for(  vsf_bmpevt_t *bmpevt_ptr,
     return result;
 }
 
-SECTION(".text.vsf.kernel.__vsf_grouped_evts_init")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_grouped_evts_init")
 void __vsf_grouped_evts_init(vsf_bmpevt_t *this_ptr,
                     vsf_bmpevt_adapter_t **adapters_pptr,
                     uint_fast8_t adapter_count,

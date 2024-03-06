@@ -33,7 +33,7 @@ static const mt071_usb_const_t __USB_OTG##__N##_const = {                       
 mt071_usb_t USB_OTG##__N##_IP = {                                               \
     .param = &__USB_OTG##__N##_const,                                           \
 };                                                                              \
-ROOT void USB_OTG##__N##_IRQHandler(void)                                       \
+VSF_CAL_ROOT void USB_OTG##__N##_IRQHandler(void)                               \
 {                                                                               \
     if (USB_OTG##__N##_IP.is_host) {                                            \
         mt071_usbh_irq(&USB_OTG##__N##_IP);                                     \
@@ -49,7 +49,7 @@ static const mt071_usb_const_t __USB_OTG##__N##_const = {                       
 mt071_usb_t USB_OTG##__N##_IP = {                                               \
     .param = &__USB_OTG##__N##_const,                                           \
 };                                                                              \
-ROOT void USB_OTG##__N##_IRQHandler(void)                                       \
+VSF_CAL_ROOT void USB_OTG##__N##_IRQHandler(void)                               \
 {                                                                               \
     mt071_usbd_irq(&USB_OTG##__N##_IP);                                         \
 }
@@ -61,7 +61,7 @@ static const mt071_usb_const_t __USB_OTG##__N##_const = {                       
 mt071_usb_t USB_OTG##__N##_IP = {                                               \
     .param = &__USB_OTG##__N##_const,                                           \
 };                                                                              \
-ROOT void USB_OTG##__N##_IRQHandler(void)                                       \
+VSF_CAL_ROOT void USB_OTG##__N##_IRQHandler(void)                               \
 {                                                                               \
     mt071_usbh_irq(&USB_OTG##__N##_IP);                                         \
 }
@@ -76,9 +76,9 @@ ROOT void USB_OTG##__N##_IRQHandler(void)                                       
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK(mt071_usbd_irq)
+VSF_CAL_WEAK(mt071_usbd_irq)
 void mt071_usbd_irq(mt071_usb_t *dc) { VSF_HAL_ASSERT(false); }
-WEAK(mt071_usbh_irq)
+VSF_CAL_WEAK(mt071_usbh_irq)
 void mt071_usbh_irq(mt071_usb_t *dc) { VSF_HAL_ASSERT(false); }
 
 VSF_MREPEAT(USB_OTG_COUNT, USB_OTG_IMPLEMENT, NULL)

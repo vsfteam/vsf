@@ -27,7 +27,7 @@
 #undef  this
 #define this    (*this_ptr)
 
-#ifndef VSF_PBUF_QUEUE_CFG_RAISE_DAVL_EVT_ONCE 
+#ifndef VSF_PBUF_QUEUE_CFG_RAISE_DAVL_EVT_ONCE
 #   if  VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
 #       define VSF_PBUF_QUEUE_CFG_RAISE_DAVL_EVT_ONCE   ENABLED
 #   else
@@ -39,13 +39,13 @@
 #ifndef VSF_PBUF_QUEUE_CFG_ATOM_ACCESS
 
 #   define __VSF_PBUF_QUEUE_USE_DEFAULT_ATOM_ACCESS
-/*! \note   By default, the driver tries to make all APIs thread-safe, in the  
- *!         case when you want to disable it, please use following macro to 
+/*! \note   By default, the driver tries to make all APIs thread-safe, in the
+ *!         case when you want to disable it, please use following macro to
  *!         disable it:
  *!
  *!         #define VSF_PBUF_QUEUE_CFG_ATOM_ACCESS(...)   __VA_ARGS__
- *!                 
- *!         
+ *!
+ *!
  *!         NOTE: This macro should be defined in app_cfg.h or vsf_cfg.h
  */
 #   define VSF_PBUF_QUEUE_CFG_ATOM_ACCESS(...)                                  \
@@ -64,13 +64,13 @@ static vsf_err_t __vsf_stream_pbuf_rx_register_notification(
     vsf_stream_rx_t *obj_ptr, vsf_stream_dat_rdy_evt_t tEventHandling);
 
 #if VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
-static 
+static
 void  __vsf_stream_pbuf_rx_open(vsf_stream_rx_t *obj_ptr);
 
-static 
+static
 void  __vsf_stream_pbuf_rx_close(vsf_stream_rx_t *obj_ptr);
 #endif
-static 
+static
 vsf_stream_status_t __vsf_stream_pbuf_rx_get_status(vsf_stream_rx_t *obj_ptr);
 
 static vsf_err_t __vsf_stream_pbuf_tx_send(
@@ -79,7 +79,7 @@ static vsf_err_t __vsf_stream_pbuf_tx_send(
 static vsf_err_t __vsf_stream_pbuf_tx_register_notification(
     vsf_stream_tx_t *obj_ptr, vsf_stream_dat_drn_evt_t tEventHandling);
 
-static 
+static
 vsf_stream_status_t __vsf_stream_pbuf_tx_get_status(vsf_stream_tx_t *obj_ptr);
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -106,7 +106,7 @@ static const i_stream_pbuf_tx_t c_iStreamFIFOTX = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_stream_fifo_init( vsf_stream_fifo_t *obj_ptr, 
+vsf_err_t vsf_stream_fifo_init( vsf_stream_fifo_t *obj_ptr,
                                 vsf_stream_fifo_cfg_t *cfg_ptr)
 {
     class_internal(obj_ptr, this_ptr, vsf_stream_fifo_t);
@@ -116,14 +116,14 @@ vsf_err_t vsf_stream_fifo_init( vsf_stream_fifo_t *obj_ptr,
 
     if (NULL != cfg_ptr) {
         this.cfg = (*cfg_ptr);
-    } 
+    }
 
 #if defined(__VSF_PBUF_QUEUE_USE_DEFAULT_ATOM_ACCESS)
     if (NULL == this.pregion) {
         this.pregion = (vsf_protect_region_t *)&vsf_protect_region_int;
     }
 #endif
-    
+
     this.RX.piMethod = &c_iStreamFIFORX;
     this.TX.piMethod = &c_iStreamFIFOTX;
 
@@ -139,7 +139,7 @@ vsf_err_t vsf_pbuf_queue_enqueue(vsf_stream_fifo_t *obj_ptr, vsf_pbuf_t *pblock)
     class_internal(obj_ptr, this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
     vsf_err_t result = VSF_ERR_NONE;
-    
+
     do {
         bool bFirstDataReady = false;
         if (NULL == pblock) {
@@ -153,7 +153,7 @@ vsf_err_t vsf_pbuf_queue_enqueue(vsf_stream_fifo_t *obj_ptr, vsf_pbuf_t *pblock)
     #endif
 
         VSF_PBUF_QUEUE_CFG_ATOM_ACCESS(
-            vsf_slist_queue_enqueue(vsf_pbuf_t, 
+            vsf_slist_queue_enqueue(vsf_pbuf_t,
                                     use_as__vsf_slist_node_t,
                                     &this.use_as__vsf_slist_queue_t,
                                     pblock);
@@ -172,10 +172,10 @@ vsf_err_t vsf_pbuf_queue_enqueue(vsf_stream_fifo_t *obj_ptr, vsf_pbuf_t *pblock)
         )
 
         //! raise data ready event
-        if (    bFirstDataReady 
+        if (    bFirstDataReady
             &&  (NULL != this.tDataReadyEventHandling.handler_fn)) {
             this.tDataReadyEventHandling.handler_fn(
-                this.tDataReadyEventHandling.target_ptr, 
+                this.tDataReadyEventHandling.target_ptr,
                 &this.RX,
                 this.Status);
         }
@@ -185,14 +185,14 @@ vsf_err_t vsf_pbuf_queue_enqueue(vsf_stream_fifo_t *obj_ptr, vsf_pbuf_t *pblock)
     return result;
 }
 
-SECTION(".text.vsf.service.stream.pbuf_queue.vsf_pbuf_queue_peek")
+VSF_CAL_SECTION(".text.vsf.service.stream.pbuf_queue.vsf_pbuf_queue_peek")
 vsf_pbuf_t * vsf_pbuf_queue_peek(vsf_stream_fifo_t *obj_ptr)
 {
     class_internal(obj_ptr, this_ptr, vsf_stream_fifo_t);
     vsf_pbuf_t *ptBuff = NULL;
     VSF_SERVICE_ASSERT(NULL != this_ptr);
-    
-    vsf_slist_queue_peek(   vsf_pbuf_t, 
+
+    vsf_slist_queue_peek(   vsf_pbuf_t,
                             use_as__vsf_slist_node_t,
                             &this.use_as__vsf_slist_queue_t,
                             ptBuff);
@@ -209,7 +209,7 @@ vsf_pbuf_t * vsf_pbuf_queue_dequeue(vsf_stream_fifo_t *obj_ptr)
 
     VSF_PBUF_QUEUE_CFG_ATOM_ACCESS(
         do {
-            vsf_slist_queue_dequeue(vsf_pbuf_t, 
+            vsf_slist_queue_dequeue(vsf_pbuf_t,
                                     use_as__vsf_slist_node_t,
                                     &this.use_as__vsf_slist_queue_t,
                                     ptBuff);
@@ -220,7 +220,7 @@ vsf_pbuf_t * vsf_pbuf_queue_dequeue(vsf_stream_fifo_t *obj_ptr)
             this.Status.u14Count--;
             if (!this.Status.u14Count) {
                 this.Status.IsDataReady = false;
-            } 
+            }
             if (this.Status.u14Count <= this.Status.u8DataDrainThreshold) {
                 this.Status.IsDataDrain = true;
                 bDataDrain = true;
@@ -229,10 +229,10 @@ vsf_pbuf_t * vsf_pbuf_queue_dequeue(vsf_stream_fifo_t *obj_ptr)
     )
 
     //! raise data drain event
-    if (    bDataDrain 
+    if (    bDataDrain
         &&  (NULL != this.tDataDrainEventHandling.handler_fn)) {
         this.tDataDrainEventHandling.handler_fn(
-            this.tDataDrainEventHandling.target_ptr, 
+            this.tDataDrainEventHandling.target_ptr,
             &this.TX,
             this.Status);
     }
@@ -262,21 +262,21 @@ vsf_err_t vsf_pbuf_queue_data_drain_event_register(
  * Interface Wrapper                                                          *
  *----------------------------------------------------------------------------*/
 
-static 
+static
 vsf_pbuf_t * __vsf_stream_pbuf_rx_fecch(vsf_stream_rx_t *obj_ptr)
 {
-    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, RX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, RX),
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
-    
+
     return vsf_pbuf_queue_dequeue((vsf_stream_fifo_t *)this_ptr);
 }
 
 #if VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
-static 
+static
 void  __vsf_stream_pbuf_rx_open(vsf_stream_rx_t *obj_ptr)
 {
-    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, RX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, RX),
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
     VSF_PBUF_QUEUE_CFG_ATOM_ACCESS(
@@ -284,10 +284,10 @@ void  __vsf_stream_pbuf_rx_open(vsf_stream_rx_t *obj_ptr)
     )
 }
 
-static 
+static
 void  __vsf_stream_pbuf_rx_close(vsf_stream_rx_t *obj_ptr)
 {
-    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, RX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, RX),
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
     VSF_PBUF_QUEUE_CFG_ATOM_ACCESS(
@@ -296,10 +296,10 @@ void  __vsf_stream_pbuf_rx_close(vsf_stream_rx_t *obj_ptr)
 }
 #endif
 
-static 
+static
 vsf_stream_status_t __vsf_stream_pbuf_rx_get_status(vsf_stream_rx_t *obj_ptr)
 {
-    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, RX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, RX),
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
 
@@ -309,38 +309,38 @@ vsf_stream_status_t __vsf_stream_pbuf_rx_get_status(vsf_stream_rx_t *obj_ptr)
 static vsf_err_t __vsf_stream_pbuf_rx_register_notification(
     vsf_stream_rx_t *obj_ptr, vsf_stream_dat_rdy_evt_t tEventHandling)
 {
-    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, RX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, RX),
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
 
-    return vsf_pbuf_queue_data_available_event_register( 
+    return vsf_pbuf_queue_data_available_event_register(
         (vsf_stream_fifo_t *)this_ptr, tEventHandling);
 }
 
 static vsf_err_t __vsf_stream_pbuf_tx_send(vsf_stream_tx_t *obj_ptr, vsf_pbuf_t *pbuf)
 {
-    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, TX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, TX),
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
-    
+
     return vsf_pbuf_queue_enqueue((vsf_stream_fifo_t *)this_ptr, pbuf);
 }
 
 static vsf_err_t __vsf_stream_pbuf_tx_register_notification(
     vsf_stream_tx_t *obj_ptr, vsf_stream_dat_drn_evt_t tEventHandling)
 {
-    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, TX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, TX),
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
 
-    return vsf_pbuf_queue_data_drain_event_register( (vsf_stream_fifo_t *)this_ptr, 
+    return vsf_pbuf_queue_data_drain_event_register( (vsf_stream_fifo_t *)this_ptr,
                                                         tEventHandling);
 }
 
-static 
+static
 vsf_stream_status_t __vsf_stream_pbuf_tx_get_status(vsf_stream_tx_t *obj_ptr)
 {
-    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, TX), 
+    class_internal( vsf_container_of(obj_ptr, vsf_stream_fifo_t, TX),
                     this_ptr, vsf_stream_fifo_t);
     VSF_SERVICE_ASSERT(NULL != this_ptr);
 

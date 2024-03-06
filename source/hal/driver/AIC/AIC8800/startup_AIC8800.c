@@ -31,10 +31,10 @@
 #include "chip.h"
 
 #define __imp_unprocessed_weak_handler(__name)                                  \
-            WEAK(__name)                                                        \
+            VSF_CAL_WEAK(__name)                                                \
             void __name(void){}
 #define __imp_blocked_weak_handler(__name)                                      \
-            WEAK(__name)                                                        \
+            VSF_CAL_WEAK(__name)                                                \
             void __name(void){while(1);}
 
 /*----------------------------------------------------------------------------
@@ -161,7 +161,7 @@ __imp_unprocessed_weak_handler(PMIC_IRQHandler)
 #pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
-ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
+VSF_CAL_ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
     (pFunc)(&__INITIAL_SP),                             /*     Initial Stack Pointer */
     Reset_Handler,                                      /*     Reset Handler */
     NMI_Handler,                                        /* -14 NMI Handler */
@@ -268,13 +268,13 @@ ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
     (pFunc)0xFFFFFFFF,
 };
 
-NO_INIT pFunc __isr_vector[dimof(__VECTOR_TABLE) - 4] ALIGN(512);
+VSF_CAL_NO_INIT pFunc __isr_vector[dimof(__VECTOR_TABLE) - 4] VSF_CAL_ALIGN(512);
 
 #if defined ( __GNUC__ )
 #pragma GCC diagnostic pop
 #endif
 
-WEAK(vsf_hal_pre_startup_init)
+VSF_CAL_WEAK(vsf_hal_pre_startup_init)
 void vsf_hal_pre_startup_init(void)
 {}
 

@@ -45,7 +45,7 @@
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #   if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-SECTION(".text.vsf.kernel.eda_task")
+VSF_CAL_SECTION(".text.vsf.kernel.eda_task")
 fsm_rt_t __vsf_eda_call_task(   vsf_task_entry_t entry,
                                 uintptr_t param,
                                 size_t local_size)
@@ -85,7 +85,7 @@ fsm_rt_t __vsf_eda_call_task(   vsf_task_entry_t entry,
     return fsm_rt_yield;
 }
 
-SECTION(".text.vsf.kernel.eda_task")
+VSF_CAL_SECTION(".text.vsf.kernel.eda_task")
 void __vsf_eda_task_evthandler_process_return_value(vsf_eda_t *pthis, vsf_evt_t evt)
 {
     fsm_rt_t ret;

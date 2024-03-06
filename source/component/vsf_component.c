@@ -28,7 +28,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK(vsf_component_init)
+VSF_CAL_WEAK(vsf_component_init)
 void vsf_component_init(void)
 {
 

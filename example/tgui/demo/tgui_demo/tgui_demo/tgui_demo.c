@@ -66,12 +66,12 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ LOCAL VARIABLES ===============================*/
-NO_INIT vsf_tgui_t g_tTGUIDemo;
+VSF_CAL_NO_INIT vsf_tgui_t g_tTGUIDemo;
 
 #if APP_USE_TGUI_DESIGNER_DEMO == ENABLED
-static NO_INIT tgui_designer_t s_tDesigner;
+static VSF_CAL_NO_INIT tgui_designer_t s_tDesigner;
 #else
-NO_INIT union {
+VSF_CAL_NO_INIT union {
     stopwatch_t stopwatch;
     popup_t popup;
 } panels;
@@ -87,10 +87,10 @@ void vsf_tgui_low_level_on_ready_to_refresh(void)
 
 vsf_err_t tgui_demo_init(void)
 {
-    NO_INIT static vsf_tgui_evt_t s_tEvtQueueBuffer[APP_TGUI_DEMO_CFG_QUEUE_MAX];
+    VSF_CAL_NO_INIT static vsf_tgui_evt_t s_tEvtQueueBuffer[APP_TGUI_DEMO_CFG_QUEUE_MAX];
 
 #if VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_BREADTH_FIRST_TRAVERSAL
-    NO_INIT static uint16_t s_tBFSBuffer[APP_TGUI_DEMO_CFG_QUEUE_MAX];
+    VSF_CAL_NO_INIT static uint16_t s_tBFSBuffer[APP_TGUI_DEMO_CFG_QUEUE_MAX];
 #endif
 
     const vsf_tgui_cfg_t cfg = {

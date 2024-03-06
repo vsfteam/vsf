@@ -33,7 +33,7 @@ struct usb_cdcacm_line_coding_t {
     uint8_t stop;
     uint8_t parity;
     uint8_t datalen;
-} PACKED;
+} VSF_CAL_PACKED;
 
 #define USB_CDCACM_CONTROLLINE_RTS          0x02
 #define USB_CDCACM_CONTROLLINE_DTR          0x01

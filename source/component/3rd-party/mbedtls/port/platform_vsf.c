@@ -66,7 +66,7 @@ static void __vsf_mbedtls_hardware_poll_on_ready(void *param, uint32_t *buffer, 
     }
 }
 
-WEAK(mbedtls_hardware_poll)
+VSF_CAL_WEAK(mbedtls_hardware_poll)
 int mbedtls_hardware_poll(void *data, unsigned char *output, size_t len, size_t *olen)
 {
     static bool __is_inited = false;

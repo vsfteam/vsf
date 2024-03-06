@@ -67,7 +67,7 @@ typedef struct vsfip_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT vsfip_t __vsfip;
+static VSF_CAL_NO_INIT vsfip_t __vsfip;
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -95,52 +95,40 @@ extern vsfip_netif_t * vsfip_ip_route_imp(vsfip_ipaddr_t *addr);
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSFIP_MEM_SOCKET_GET
-WEAK(vsfip_mem_socket_get)
+VSF_CAL_WEAK(vsfip_mem_socket_get)
 vsfip_socket_t * vsfip_mem_socket_get(void)
 {
     return NULL;
 }
-#endif
 
-#ifndef WEAK_VSFIP_MEM_SOCKET_FREE
-WEAK(vsfip_mem_socket_free)
+VSF_CAL_WEAK(vsfip_mem_socket_free)
 void vsfip_mem_socket_free(vsfip_socket_t *socket)
 {
 }
-#endif
 
 #if VSFIP_CFG_TCP_EN == ENABLED
-#   ifndef WEAK_VSFIP_MEM_TCP_PCB_GET
-WEAK(vsfip_mem_tcp_pcb_get)
+VSF_CAL_WEAK(vsfip_mem_tcp_pcb_get)
 vsfip_tcp_pcb_t * vsfip_mem_tcp_pcb_get(void)
 {
     return NULL;
 }
-#   endif
 
-#   ifndef WEAK_VSFIP_MEM_TCP_PCB_FREE
-WEAK(vsfip_mem_tcp_pcb_free)
+VSF_CAL_WEAK(vsfip_mem_tcp_pcb_free)
 void vsfip_mem_tcp_pcb_free(vsfip_tcp_pcb_t *tcp_pcb)
 {
 }
-#   endif
 #endif
 
-#ifndef WEAK_VSFIP_MEM_NETBUF_GET
-WEAK(vsfip_mem_netbuf_get)
+VSF_CAL_WEAK(vsfip_mem_netbuf_get)
 vsfip_netbuf_t * vsfip_mem_netbuf_get(uint_fast32_t size)
 {
     return NULL;
 }
-#endif
 
-#ifndef WEAK_VSFIP_MEM_NETBUF_FREE
-WEAK(vsfip_mem_netbuf_free)
+VSF_CAL_WEAK(vsfip_mem_netbuf_free)
 void vsfip_mem_netbuf_free(vsfip_netbuf_t *netbuf)
 {
 }
-#endif
 
 // socket buffer
 static vsfip_socket_t * __vsfip_socket_get(void)
@@ -367,13 +355,11 @@ vsf_err_t vsfip_netif_remove(vsfip_netif_t *netif)
     return VSF_ERR_NONE;
 }
 
-#ifndef WEAK_VSFIP_IP_ROUTE_IMP
-WEAK(vsfip_ip_route_imp)
+VSF_CAL_WEAK(vsfip_ip_route_imp)
 vsfip_netif_t * vsfip_ip_route_imp(vsfip_ipaddr_t *addr)
 {
     return NULL;
 }
-#endif
 
 // vsfip_ip_route MUST be called protected
 static vsfip_netif_t * __vsfip_ip_route(vsfip_ipaddr_t *addr)

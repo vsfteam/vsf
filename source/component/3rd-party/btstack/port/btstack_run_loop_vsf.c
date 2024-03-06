@@ -75,7 +75,7 @@ static const btstack_run_loop_t __btstack_run_loop_vsf = {
 /*============================ IMPLEMENTATION ================================*/
 
 #ifdef ENABLE_BTSTACK_ASSERT
-WEAK(btstack_assert_failed)
+VSF_CAL_WEAK(btstack_assert_failed)
 void btstack_assert_failed(const char * file, uint16_t line_nr)
 {
 #if VSF_USE_TRACE == ENABLED

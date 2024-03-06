@@ -67,7 +67,7 @@ extern "C" {
             uint8_t bDescriptorType;                                            \
             uint8_t bScheme;                                                    \
             char url_utf8[(__url_len) + 3];                                     \
-        } PACKED const __##__name##_webusb_url##__landing_page##_desc = {       \
+        } VSF_CAL_PACKED const __##__name##_webusb_url##__landing_page##_desc = {\
             .bLength            = 6 + (__url_len),                              \
             .bDescriptorType    = USB_DT_WEBUSB_URL,                            \
             .bScheme            = (__prefix),                                   \

@@ -106,77 +106,71 @@ extern "C" {
 //! \brief none standard memory types
 #if __IS_COMPILER_IAR__
 #   define LOW_LEVEL_INIT_RET_T int
-#   define ROM_FLASH            _Pragma(__VSF_STR(location=".rom.flash")) const
-#   define ROM_EEPROM           _Pragma(__VSF_STR(location=".rom.eeprom")) const
-#   define NO_INIT              __no_init
-#   define ROOT                 __root
-#   define INLINE               inline
-#   define NO_INLINE            __attribute__((noinline))
-#   define ALWAYS_INLINE        inline __attribute__((always_inline))
-#   define WEAK(...)            __weak
-#   define RAMFUNC              __ramfunc
-#   define __asm__              __asm
-#   define __ALIGN(__N)         __attribute__((aligned (__N)))
-#   define __AT_ADDR(__ADDR)    @ __ADDR
-#   define __SECTION(__SEC)     __attribute__((section (__SEC)))
-#   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
-                                _Pragma(__VSF_STR(weak __ORIGIN=__ALIAS))
-#   define PACKED               __attribute__((packed))
-#   define UNALIGNED            __packed
-#   define TRANSPARENT_UNION    __attribute__((transparent_union))
-#   define __ALIGN_OF(...)      __ALIGNOF__(__VA_ARGS__)
+#   define VSF_CAL_NO_INIT              __no_init
+#   define VSF_CAL_ROOT                 __root
+#   define VSF_CAL_INLINE               inline
+#   define VSF_CAL_NO_INLINE            __attribute__((noinline))
+#   define VSF_CAL_ALWAYS_INLINE        inline __attribute__((always_inline))
+#   define VSF_CAL_WEAK(...)            __weak
+#   define VSF_CAL_RAMFUNC              __ramfunc
+#   define __asm__                      __asm
+#   define __VSF_CAL_ALIGN(__N)         __attribute__((aligned (__N)))
+#   define __VSF_CAL_AT_ADDR(__ADDR)    @ __ADDR
+#   define __VSF_CAL_SECTION(__SEC)     __attribute__((section (__SEC)))
+#   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS) \
+                                        _Pragma(__VSF_STR(weak __ORIGIN=__ALIAS))
+#   define VSF_CAL_PACKED               __attribute__((packed))
+#   define VSF_CAL_UNALIGNED            __packed
+#   define VSF_CAL_TRANSPARENT_UNION    __attribute__((transparent_union))
+#   define __VSF_CAL_ALIGN_OF(...)      __ALIGNOF__(__VA_ARGS__)
 
-#   define __IAR_STARTUP_DATA_INIT  __iar_data_init3
+#   define __IAR_STARTUP_DATA_INIT      __iar_data_init3
 
-#   define __ISR(__VEC)       void __VEC(void)
+#   define __VSF_CAL_ISR(__VEC)         void __VEC(void)
 
 #elif __IS_COMPILER_ARM_COMPILER_5__
-#   define ROM_FLASH            __attribute__(( section( ".rom.flash"))) const
-#   define ROM_EEPROM           __attribute__(( section( ".rom.eeprom"))) const
-#   define NO_INIT              __attribute__( ( section( ".bss.noinit"),zero_init) )
-#   define ROOT                 __attribute__((used))
-#   define INLINE               __inline
-#   define NO_INLINE            __attribute__((noinline))
-#   define ALWAYS_INLINE        __inline __attribute__((always_inline))
-#   define WEAK(...)            __attribute__((weak))
-#   define RAMFUNC              __attribute__((section (".textrw")))
-#   define __asm__              __asm
-#   define __ALIGN(__N)         __attribute__((aligned (__N)))
-#   define __AT_ADDR(__ADDR)    __attribute__((at(__ADDR)))
-#   define __SECTION(__SEC)     __attribute__((section (__SEC)))
-#   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
-                                __attribute__((weakref(__VSF_STR(__ALIAS))))
+#   define VSF_CAL_NO_INIT              __attribute__( ( section( ".bss.noinit"),zero_init) )
+#   define VSF_CAL_ROOT                 __attribute__((used))
+#   define VSF_CAL_INLINE               __inline
+#   define VSF_CAL_NO_INLINE            __attribute__((noinline))
+#   define VSF_CAL_ALWAYS_INLINE        __inline __attribute__((always_inline))
+#   define VSF_CAL_WEAK(...)            __attribute__((weak))
+#   define VSF_CAL_RAMFUNC              __attribute__((section (".textrw")))
+#   define __asm__                      __asm
+#   define __VSF_CAL_ALIGN(__N)         __attribute__((aligned (__N)))
+#   define __VSF_CAL_AT_ADDR(__ADDR)    __attribute__((at(__ADDR)))
+#   define __VSF_CAL_SECTION(__SEC)     __attribute__((section (__SEC)))
+#   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS) \
+                                        __attribute__((weakref(__VSF_STR(__ALIAS))))
 
-#   define PACKED               __attribute__((packed))
-#   define UNALIGNED            __packed
-#   define TRANSPARENT_UNION    __attribute__((transparent_union))
-#   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
+#   define VSF_CAL_PACKED               __attribute__((packed))
+#   define VSF_CAL_UNALIGNED            __packed
+#   define VSF_CAL_TRANSPARENT_UNION    __attribute__((transparent_union))
+#   define __VSF_CAL_ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
-#   define __ISR(__VEC)       void __VEC(void)
+#   define __VSF_CAL_ISR(__VEC)         void __VEC(void)
 
 #elif __IS_COMPILER_ARM_COMPILER_6__
-#   define ROM_FLASH            __attribute__(( section( ".rom.flash"))) const
-#   define ROM_EEPROM           __attribute__(( section( ".rom.eeprom"))) const
-#   define NO_INIT              __attribute__( ( section( ".bss.noinit")) )
-#   define ROOT                 __attribute__((used))
-#   define INLINE               __inline
-#   define NO_INLINE            __attribute__((noinline))
-#   define ALWAYS_INLINE        __inline __attribute__((always_inline))
-#   define WEAK(...)            __attribute__((weak))
-#   define RAMFUNC              __attribute__((section (".textrw")))
-#   define __asm__              __asm
-#   define __ALIGN(__N)         __attribute__((aligned (__N)))
-#   define __AT_ADDR(__ADDR)    __attribute__((section (".ARM.__at_" #__ADDR)))
-#   define __SECTION(__SEC)     __attribute__((section (__SEC)))
-#   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
-                                __attribute__((weakref(__VSF_STR(__ALIAS))))
+#   define VSF_CAL_NO_INIT              __attribute__( ( section( ".bss.noinit")) )
+#   define VSF_CAL_ROOT                 __attribute__((used))
+#   define VSF_CAL_INLINE               __inline
+#   define VSF_CAL_NO_INLINE            __attribute__((noinline))
+#   define VSF_CAL_ALWAYS_INLINE        __inline __attribute__((always_inline))
+#   define VSF_CAL_WEAK(...)            __attribute__((weak))
+#   define VSF_CAL_RAMFUNC              __attribute__((section (".textrw")))
+#   define __asm__                      __asm
+#   define __VSF_CAL_ALIGN(__N)         __attribute__((aligned (__N)))
+#   define __VSF_CAL_AT_ADDR(__ADDR)    __attribute__((section (".ARM.__at_" #__ADDR)))
+#   define __VSF_CAL_SECTION(__SEC)     __attribute__((section (__SEC)))
+#   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS) \
+                                        __attribute__((weakref(__VSF_STR(__ALIAS))))
 
-#   define PACKED               __attribute__((packed))
-#   define UNALIGNED            __unaligned
-#   define TRANSPARENT_UNION    __attribute__((transparent_union))
-#   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
+#   define VSF_CAL_PACKED               __attribute__((packed))
+#   define VSF_CAL_UNALIGNED            __unaligned
+#   define VSF_CAL_TRANSPARENT_UNION    __attribute__((transparent_union))
+#   define __VSF_CAL_ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
-#   define __ISR(__VEC)       void __VEC(void)
+#   define __VSF_CAL_ISR(__VEC)         void __VEC(void)
 #endif
 
 /*----------------------------------------------------------------------------*

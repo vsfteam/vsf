@@ -92,7 +92,7 @@ typedef struct vsfip_dhcp_head_t {
     char file[128];
     uint32_t magic;
     uint8_t options[DHCP_OPT_MINLEN];    // min option size
-} PACKED vsfip_dhcp_head_t;
+} VSF_CAL_PACKED vsfip_dhcp_head_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

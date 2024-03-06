@@ -34,11 +34,11 @@
  *!         in the case when you want to disable it,
  *!         please use following macro:
  *!         #define VSF_MEM_STREAM_CFG_PROTECT_LEVEL    none
- *!         
+ *!
  *!         in the case when you want to use scheduler-safe,
  *!         please use following macro:
  *!         #define VSF_MEM_STREAM_CFG_PROTECT_LEVEL    scheduler
- *!         
+ *!
  *!         NOTE: This macro should be defined in vsf_usr_cfg.h
  */
 #   define VSF_MEM_STREAM_CFG_PROTECT_LEVEL     interrupt

@@ -65,9 +65,9 @@ vsf_hw_usb_t USB_OTG##__N##_IP = {                                              
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK(vsf_hw_usbd_irq)
+VSF_CAL_WEAK(vsf_hw_usbd_irq)
 void vsf_hw_usbd_irq(vsf_hw_usb_t *dc) { VSF_HAL_ASSERT(false); }
-WEAK(vsf_hw_usbh_irq)
+VSF_CAL_WEAK(vsf_hw_usbh_irq)
 void vsf_hw_usbh_irq(vsf_hw_usb_t *dc) { VSF_HAL_ASSERT(false); }
 
 VSF_MREPEAT(USB_OTG_COUNT, USB_OTG_IMPLEMENT, NULL)

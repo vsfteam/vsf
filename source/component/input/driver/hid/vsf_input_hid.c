@@ -97,24 +97,19 @@ extern void vsf_hid_on_report_input(vk_hid_evt_t *hid_evt);
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_HID_ON_NEW_DEV
-WEAK(vsf_hid_on_new_dev)
+VSF_CAL_WEAK(vsf_hid_on_new_dev)
 void vsf_hid_on_new_dev(vk_input_hid_t *dev)
 {
     vsf_input_on_new_dev(VSF_INPUT_TYPE_HID, dev);
 }
-#endif
 
-#ifndef WEAK_VSF_HID_ON_FREE_DEV
-WEAK(vsf_hid_on_free_dev)
+VSF_CAL_WEAK(vsf_hid_on_free_dev)
 void vsf_hid_on_free_dev(vk_input_hid_t *dev)
 {
     vsf_input_on_free_dev(VSF_INPUT_TYPE_HID, dev);
 }
-#endif
 
-#ifndef WEAK_VSF_HID_ON_REPORT_INPUT
-WEAK(vsf_hid_on_report_input)
+VSF_CAL_WEAK(vsf_hid_on_report_input)
 void vsf_hid_on_report_input(vk_hid_evt_t *hid_evt)
 {
 #if VSF_HID_CFG_TRACE == ENABLED
@@ -131,7 +126,6 @@ void vsf_hid_on_report_input(vk_hid_evt_t *hid_evt)
     vsf_hid_parse_touch_screen(hid_evt);
     vsf_input_on_evt(VSF_INPUT_TYPE_HID, &hid_evt->use_as__vk_input_evt_t);
 }
-#endif
 
 void vsf_hid_parse_touch_screen(vk_hid_evt_t *hid_evt)
 {

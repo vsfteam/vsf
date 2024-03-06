@@ -128,7 +128,7 @@ typedef struct scsi_inquiry_t {
     uint8_t vendor[8];
     uint8_t product[16];
     uint8_t revision[4];
-} PACKED scsi_inquiry_t;
+} VSF_CAL_PACKED scsi_inquiry_t;
 
 vsf_class(vk_scsi_drv_t) {
     protected_member(

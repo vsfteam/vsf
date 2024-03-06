@@ -1,4 +1,4 @@
-#define VSF_APPLET_VPLT_FUNC_DECORATOR(__NAME)      WEAK(__NAME)
+#define VSF_APPLET_VPLT_FUNC_DECORATOR(__NAME)      VSF_CAL_WEAK(__NAME)
 #define __VSF_APPLET_LIB__
 
 #include <stdio.h>

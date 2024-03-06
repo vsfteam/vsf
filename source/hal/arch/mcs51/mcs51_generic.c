@@ -42,7 +42,7 @@ typedef struct __vsf_mcs51_t __vsf_mcs51_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-NO_INIT static __vsf_mcs51_t __vsf_mcs51;
+VSF_CAL_NO_INIT static __vsf_mcs51_t __vsf_mcs51;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -162,9 +162,9 @@ vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
 }
 
 #if __IS_COMPILER_IAR__
-ISR(timer0)
+VSF_CAL_ISR(timer0)
 #elif __IS_COMPILER_51_KEIL__
-ISR(1)
+VSF_CAL_ISR(1)
 #endif
 {
     __vsf_mcs51.tf0 = 1;

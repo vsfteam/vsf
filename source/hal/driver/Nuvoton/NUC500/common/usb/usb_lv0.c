@@ -30,7 +30,7 @@ static const nuc500_##__TYPE##_const_t __USB_HC##__N##_const = {                
 nuc500_##__TYPE##_t USB_HC##__N##_IP = {                                        \
     .param = &__USB_HC##__N##_const,                                            \
 };                                                                              \
-ROOT ISR(USB_HC##__N##_IRQHandler)                                              \
+VSF_CAL_ROOT VSF_CAL_ISR(USB_HC##__N##_IRQHandler)                              \
 {                                                                               \
     nuc500_##__TYPE##_irq(&USB_HC##__N##_IP);                                   \
 }
@@ -42,7 +42,7 @@ static const nuc500_##__TYPE##_const_t __USB_HC##__N##_const = {                
 nuc500_##__TYPE##_t USB_HC##__N##_IP = {                                        \
     .param = &__USB_HC##__N##_const,                                            \
 };                                                                              \
-ISR(USB_HC##__N##_IRQHandler)                                                   \
+VSF_CAL_ISR(USB_HC##__N##_IRQHandler)                                           \
 {                                                                               \
     nuc500_##__TYPE##_irq(&USB_HC##__N##_IP);                                   \
 }
@@ -53,7 +53,7 @@ ISR(USB_HC##__N##_IRQHandler)                                                   
 
 
 
- 
+
 #ifdef NUC500_USBD_HS_WROKAROUND_ISO
 #   if VSF_USE_USB_DEVICE == ENABLED
 #   define __USB_DC_IMPLEMENT(__N, __TYPE)                                      \
@@ -68,7 +68,7 @@ static const nuc500_##__TYPE##_const_t __USB_DC##__N##_const = {                
 nuc500_##__TYPE##_t USB_DC##__N = {                                             \
     .param = &__USB_DC##__N##_const                                             \
 };                                                                              \
-ROOT ISR(USB_DC##__N##_IRQHandler)                                              \
+VSF_CAL_ROOT VSF_CAL_ISR(USB_DC##__N##_IRQHandler)                              \
 {                                                                               \
     nuc500_##__TYPE##_irq(&USB_DC##__N);                                        \
 }
@@ -85,7 +85,7 @@ static const nuc500_##__TYPE##_const_t __USB_DC##__N##_const = {                
 nuc500_##__TYPE##_t USB_DC##__N = {                                             \
     .param = &__USB_DC##__N##_const                                             \
 };                                                                              \
-ISR(USB_DC##__N##_IRQHandler)                                                   \
+VSF_CAL_ISR(USB_DC##__N##_IRQHandler)                                           \
 {                                                                               \
     nuc500_##__TYPE##_irq(&USB_DC##__N);                                        \
 }
@@ -99,7 +99,7 @@ static const nuc500_##__TYPE##_const_t __USB_DC##__N##_const = {                
 nuc500_##__TYPE##_t USB_DC##__N = {                                             \
     .param = &__USB_DC##__N##_const                                             \
 };                                                                              \
-ROOT ISR(USB_DC##__N##_IRQHandler)                                              \
+VSF_CAL_ROOT VSF_CAL_ISR(USB_DC##__N##_IRQHandler)                              \
 {                                                                               \
     nuc500_##__TYPE##_irq(&USB_DC##__N);                                        \
 }
@@ -111,7 +111,7 @@ static const nuc500_##__TYPE##_const_t __USB_DC##__N##_const = {                
 nuc500_##__TYPE##_t USB_DC##__N = {                                             \
     .param = &__USB_DC##__N##_const                                             \
 };                                                                              \
-ISR(USB_DC##__N##_IRQHandler)                                                   \
+VSF_CAL_ISR(USB_DC##__N##_IRQHandler)                                           \
 {                                                                               \
     nuc500_##__TYPE##_irq(&USB_DC##__N);                                        \
 }

@@ -96,11 +96,11 @@ struct usb_dfu_functional_descriptor_t {
             uint8_t bitManifestationTolerant    : 1;
             uint8_t bitWillDetach               : 1;
         };
-    } PACKED;
+    } VSF_CAL_PACKED;
     uint16_t wDetachTimeOut;
     uint16_t wTransferSize;
     uint16_t bcdDFUVersion;
-} PACKED;
+} VSF_CAL_PACKED;
 
 typedef struct usb_dfu_status_t usb_dfu_status_t;
 struct usb_dfu_status_t {
@@ -108,7 +108,7 @@ struct usb_dfu_status_t {
     uint8_t bwPollTimeout[3];
     uint8_t bState;
     uint8_t iString;
-} PACKED;
+} VSF_CAL_PACKED;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

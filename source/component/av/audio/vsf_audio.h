@@ -133,10 +133,10 @@ typedef union vk_audio_format_t {
                 uint8_t         __bitlen : 5;           // please use VSF_AUDIO_DATA_TYPE_BITLEN to get real bitwidth
             };
             uint8_t             value;
-        } PACKED datatype;
+        } VSF_CAL_PACKED datatype;
         uint8_t                 channel_num;            // eg: 2
         uint16_t                sample_rate;            // in 100Hz, eg: 441/480 means 44100/48000
-    } PACKED;
+    } VSF_CAL_PACKED;
     // if value is 0, means adaptive format(from format in vk_audio_start)
     uint32_t                    value;
 } vk_audio_format_t;

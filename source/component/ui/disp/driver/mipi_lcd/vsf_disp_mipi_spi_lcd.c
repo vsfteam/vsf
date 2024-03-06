@@ -102,7 +102,7 @@ void vsf_disp_mipi_te_line_ready(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
     vsf_eda_post_evt(&disp_mipi_spi_lcd->teda.use_as__vsf_eda_t, VSF_EVT_REFRESHING);
 }
 
-WEAK(vsf_disp_mipi_spi_lcd_wait_te_line_ready)
+vsf_tgui_sv_get_background_color(vsf_disp_mipi_spi_lcd_wait_te_line_ready)
 void vsf_disp_mipi_spi_lcd_wait_te_line_ready(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
 {
     // If we want to avoid tearing, then we need to wait for the TE signal to be ready.
@@ -112,7 +112,7 @@ void vsf_disp_mipi_spi_lcd_wait_te_line_ready(vk_disp_mipi_spi_lcd_t *disp_mipi_
 }
 
 #if VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
-WEAK(vk_disp_mipi_spi_lcd_hw_reset_io_write)
+vsf_tgui_sv_get_background_color(vk_disp_mipi_spi_lcd_hw_reset_io_write)
 void vk_disp_mipi_spi_lcd_hw_reset_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd, bool level)
 {
 #if VSF_DISP_MIPI_SPI_LCD_USING_VSF_GPIO == ENABLED
@@ -123,7 +123,7 @@ void vk_disp_mipi_spi_lcd_hw_reset_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_sp
 }
 #endif
 
-WEAK(vsf_disp_mipi_spi_lcd_dcx_io_write)
+vsf_tgui_sv_get_background_color(vsf_disp_mipi_spi_lcd_dcx_io_write)
 void vsf_disp_mipi_spi_lcd_dcx_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd, bool level)
 {
 #if VSF_DISP_MIPI_SPI_LCD_USING_VSF_GPIO == ENABLED
@@ -133,7 +133,7 @@ void vsf_disp_mipi_spi_lcd_dcx_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lc
 #endif
 }
 
-WEAK(vsf_disp_mipi_spi_lcd_io_init)
+vsf_tgui_sv_get_background_color(vsf_disp_mipi_spi_lcd_io_init)
 void vsf_disp_mipi_spi_lcd_io_init(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
 {
 #if VSF_DISP_MIPI_SPI_LCD_USING_VSF_GPIO == ENABLED
@@ -151,7 +151,7 @@ void vsf_disp_mipi_spi_lcd_io_init(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
 
 
 
-WEAK(vk_disp_mipi_te_line_isr_enable_once)
+vsf_tgui_sv_get_background_color(vk_disp_mipi_te_line_isr_enable_once)
 void vk_disp_mipi_te_line_isr_enable_once(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
 {
     vsf_disp_mipi_te_line_ready(disp_mipi_spi_lcd);

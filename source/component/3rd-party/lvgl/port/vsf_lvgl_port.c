@@ -52,7 +52,7 @@
 
 #if VSF_LVGL_IMP_WAIT_CB == ENABLED
 // TODO: support multiple displays
-NO_INIT static vsf_eda_t * eda_pending;
+VSF_CAL_NO_INIT static vsf_eda_t * eda_pending;
 #endif
 
 /*============================ PROTOTYPES ====================================*/

@@ -61,8 +61,8 @@
             VSF_ASSERT(false);                                                  \
         } while (0)
 
-#define PACK_STRUCT_FIELD(x) x PACKED
-#define PACK_STRUCT_STRUCT PACKED
+#define PACK_STRUCT_FIELD(x) x VSF_CAL_PACKED
+#define PACK_STRUCT_STRUCT VSF_CAL_PACKED
 #define PACK_STRUCT_BEGIN
 #define PACK_STRUCT_END
 

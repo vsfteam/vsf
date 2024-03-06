@@ -23,7 +23,7 @@ struct font_desc {
 struct font_data {
     unsigned int extra[FONT_EXTRA_WORDS];
     const unsigned char data[];
-} PACKED;
+} VSF_CAL_PACKED;
 
 typedef struct vsf_linux_font_vplt_t {
     vsf_vplt_info_t info;

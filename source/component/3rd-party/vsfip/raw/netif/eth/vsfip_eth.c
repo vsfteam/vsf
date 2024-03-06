@@ -34,7 +34,7 @@ typedef struct vsfip_eth_head_t {
     uint8_t dst_addr[TCPIP_ETH_ADDRLEN];
     uint8_t src_addr[TCPIP_ETH_ADDRLEN];
     uint16_t type;
-} PACKED vsfip_eth_head_t;
+} VSF_CAL_PACKED vsfip_eth_head_t;
 
 typedef enum vsfip_eth_type_t {
     VSFIP_ETH_TYPE_IP       = 0x0800,

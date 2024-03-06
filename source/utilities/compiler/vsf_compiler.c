@@ -1,7 +1,7 @@
 #include "utilities/compiler/compiler.h"
 
 #if VSF_APPLET_USE_COMPILER == ENABLED
-WEAK(__paritysi2)
+VSF_CAL_WEAK(__paritysi2)
 int __paritysi2(unsigned int a)
 {
     int x = (int)a;

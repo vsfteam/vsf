@@ -99,24 +99,6 @@
 #   define VSF_USE_HEAP                         ENABLED
 #endif
 
-//  weak
-
-#if VSF_USE_USB_DEVICE == ENABLED
-#   define WEAK_VSF_USBD_NOTIFY_USER
-#endif
-
-#define WEAK_VSF_KERNEL_ERR_REPORT
-#define WEAK___POST_VSF_KERNEL_INIT
-#define WEAK_VSF_DRIVER_INIT
-
-#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-#   define WEAK_VSF_SYSTIMER_EVTHANDLER
-#endif
-
-#if VSF_USE_HEAP == ENABLED
-#   define WEAK_VSF_HEAP_MALLOC_ALIGNED
-#endif
-
 #endif
 
 /*============================ TYPES =========================================*/

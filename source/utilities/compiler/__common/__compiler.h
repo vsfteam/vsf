@@ -88,125 +88,107 @@ extern "C" {
 //! \brief none standard memory types
 #if __IS_COMPILER_LLVM__
 #   ifdef __APPLE__
-#       define NO_INIT
+#       define VSF_CAL_NO_INIT
 #   else
-#       define NO_INIT          __attribute__((__section__(".bss.noinit")))
+#       define VSF_CAL_NO_INIT          __attribute__((__section__(".bss.noinit")))
 #   endif
-#   define ROOT                 __attribute__((__used__))
-#   ifndef INLINE
-#       define INLINE           __inline__
-#   endif
-#   ifndef NO_INLINE
-#       define NO_INLINE        __attribute__((__noinline__))
-#   endif
-#   ifndef ALWAYS_INLINE
-#       define ALWAYS_INLINE    __inline__ __attribute__((__always_inline__))
-#   endif
-#   define WEAK(...)            __attribute__((__weak__))
+#   define VSF_CAL_ROOT                 __attribute__((__used__))
+#   define VSF_CAL_INLINE               __inline__
+#   define VSF_CAL_NO_INLINE            __attribute__((__noinline__))
+#   define VSF_CAL_ALWAYS_INLINE        __inline__ __attribute__((__always_inline__))
+#   define VSF_CAL_WEAK(...)            __attribute__((__weak__))
 #   ifdef __APPLE__
-#       define RAMFUNC          Not Supported by Apple LLVM
+#       define VSF_CAL_RAMFUNC          Not Supported by Apple LLVM
 #   else
-#       define RAMFUNC          __attribute__((__section__(".textrw")))
+#       define VSF_CAL_RAMFUNC          __attribute__((__section__(".textrw")))
 #   endif
-#   define __asm__              __asm
-#   define __ALIGN(__N)         __attribute__((__aligned__(__N)))
-#   define __AT_ADDR(__ADDR)    Not Supported by LLVM
+#   define __asm__                      __asm
+#   define __VSF_CAL_ALIGN(__N)         __attribute__((__aligned__(__N)))
+#   define __VSF_CAL_AT_ADDR(__ADDR)    Not Supported by LLVM
 #   ifdef __APPLE__
-#       define __SECTION(__SEC)
+#       define __VSF_CAL_SECTION(__SEC)
 #   else
-#       define __SECTION(__SEC) __attribute__((__section__(__SEC)))
+#       define __VSF_CAL_SECTION(__SEC) __attribute__((__section__(__SEC)))
 #   endif
-#   define __WEAK_ALIAS(__ORIGIN, __ALIAS)                                      \
-                                __asm__(".weak " #__ALIAS);                     \
-                                __asm__(".equ " #__ALIAS ", " #__ORIGIN)
+#   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS)                              \
+                                        __asm__(".weak " #__ALIAS);             \
+                                        __asm__(".equ " #__ALIAS ", " #__ORIGIN)
 
-#   ifndef PACKED
-#       define PACKED           __attribute__((__packed__))
-#   endif
-//#   define UNALIGNED            __attribute__((__packed__))
-#   undef UNALIGNED                                                             //! llvm doesn't support this
-#   define TRANSPARENT_UNION    __attribute__((__transparent_union__))
-#   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
+#   define VSF_CAL_PACKED               __attribute__((__packed__))
+//#   define VSF_CAL_UNALIGNED            __attribute__((__packed__))
+#   undef VSF_CAL_                                                      //! llvm doesn't support this
+#   define VSF_CAL_TRANSPARENT_UNION    __attribute__((__transparent_union__))
+#   define __VSF_CAL_ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
-#   define __ISR(__VEC)         void __VEC(void)
-#   define __COMPILER_WRAPPER(__API)    __wrap_ ## __API
+#   define __VSF_CAL_ISR(__VEC)         void __VEC(void)
+#   define __VSF_CAL_WRAPPER(__API)     __wrap_ ## __API
 
 #elif  __IS_COMPILER_GCC__
-#   define NO_INIT              __attribute__((section(".bss.noinit")))
-#   define ROOT                 __attribute__((used))
-#   ifndef INLINE
-#       define INLINE           inline
-#   endif
-#   ifndef NO_INLINE
-#       define NO_INLINE        __attribute__((noinline))
-#   endif
-#   ifndef ALWAYS_INLINE
-#       define ALWAYS_INLINE    inline __attribute__((always_inline))
-#   endif
-#   define WEAK(...)            __attribute__((weak))
-#   define RAMFUNC              __attribute__((section(".textrw")))
-#   define __asm__              __asm
-#   define __ALIGN(__N)         __attribute__((aligned(__N)))
-#   define __AT_ADDR(__ADDR)    Not Supported by GCC
-#   define __SECTION(__SEC)     __attribute__((section(__SEC)))
-#   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
-                                __attribute__((weakref(__VSF_STR(__ALIAS))))
+#   define VSF_CAL_NO_INIT              __attribute__((section(".bss.noinit")))
+#   define VSF_CAL_ROOT                 __attribute__((used))
+#   define VSF_CAL_INLINE               inline
+#   define VSF_CAL_NO_INLINE            __attribute__((noinline))
+#   define VSF_CAL_ALWAYS_INLINE        inline __attribute__((always_inline))
+#   define VSF_CAL_WEAK(...)            __attribute__((weak))
+#   define VSF_CAL_RAMFUNC              __attribute__((section(".textrw")))
+#   define __asm__                      __asm
+#   define __VSF_CAL_ALIGN(__N)         __attribute__((aligned(__N)))
+#   define __VSF_CAL_AT_ADDR(__ADDR)    Not Supported by GCC
+#   define __VSF_CAL_SECTION(__SEC)     __attribute__((section(__SEC)))
+#   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS) \
+                                        __attribute__((weakref(__VSF_STR(__ALIAS))))
 
-#   ifndef PACKED
-#       define PACKED           __attribute__((packed))
-#   endif
-//#   define UNALIGNED            __attribute__((packed))
-#   undef UNALIGNED                                                             //! gcc doesn't support this
-#   define TRANSPARENT_UNION    __attribute__((transparent_union))
-#   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
+#   define VSF_CAL_PACKED               __attribute__((packed))
+//#   define VSF_CAL_UNALIGNED            __attribute__((packed))
+#   undef VSF_CAL_UNALIGNED                                             //! gcc doesn't support this
+#   define VSF_CAL_TRANSPARENT_UNION    __attribute__((transparent_union))
+#   define __VSF_CAL_ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
-#   define __ISR(__VEC)         void __VEC(void)
-#   define __COMPILER_WRAPPER(__API)    __wrap_ ## __API
+#   define __VSF_CAL_ISR(__VEC)         void __VEC(void)
+#   define __VSF_CAL_WRAPPER(__API)     __wrap_ ## __API
 
 #elif  __IS_COMPILER_TCC__
-#   define NO_INIT              __attribute__((section( ".bss.noinit")))
-#   define ROOT                 __attribute__((used))
-#   define INLINE               inline
-#   define NO_INLINE            __attribute__((noinline))
-#   define ALWAYS_INLINE        inline __attribute__((always_inline))
-#   define WEAK(...)            __attribute__((weak))
-#   define __asm__              __asm
-#   define __ALIGN(__N)         __attribute__((aligned (__N)))
-#   define __AT_ADDR(__ADDR)    Not Supported by TCC
-#   define __SECTION(__SEC)
-#   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
-                                __attribute__((weakref(__VSF_STR(__ALIAS))))
+#   define VSF_CAL_NO_INIT              __attribute__((section( ".bss.noinit")))
+#   define VSF_CAL_ROOT                 __attribute__((used))
+#   define VSF_CAL_INLINE               inline
+#   define VSF_CAL_NO_INLINE            __attribute__((noinline))
+#   define VSF_CAL_ALWAYS_INLINE        inline __attribute__((always_inline))
+#   define VSF_CAL_WEAK(...)            __attribute__((weak))
+#   define __asm__                      __asm
+#   define __VSF_CAL_ALIGN(__N)         __attribute__((aligned (__N)))
+#   define __VSF_CAL_AT_ADDR(__ADDR)    Not Supported by TCC
+#   define __VSF_CAL_SECTION(__SEC)
+#   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS) \
+                                        __attribute__((weakref(__VSF_STR(__ALIAS))))
 
-#   define PACKED               __attribute__((packed))
-#   define UNALIGNED            __attribute__((packed))
-#   define TRANSPARENT_UNION    __attribute__((transparent_union))
-#   define __ALIGN_OF(...)      __alignof__(__VA_ARGS__)
+#   define VSF_CAL_PACKED               __attribute__((packed))
+#   define VSF_CAL_UNALIGNED            __attribute__((packed))
+#   define VSF_CAL_TRANSPARENT_UNION    __attribute__((transparent_union))
+#   define __VSF_CAL_ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
-#   define __ISR(__VEC)         void __VEC(void)
-#   define __COMPILER_WRAPPER(__API)    __wrap_ ## __API
+#   define __VSF_CAL_ISR(__VEC)         void __VEC(void)
+#   define __VSF_CAL_WRAPPER(__API)     __wrap_ ## __API
 #endif
 
-#define WEAK_ALIAS(__ORIGIN, __ALIAS)                                           \
-                                __WEAK_ALIAS(__ORIGIN, __ALIAS)
-#define AT_ADDR(__ADDR)         __AT_ADDR(__ADDR)
-#define ALIGN(__N)              __ALIGN(__N)
+#define VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS)                                   \
+                                        __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS)
+#define VSF_CAL_AT_ADDR(__ADDR)         __VSF_CAL_AT_ADDR(__ADDR)
+#define VSF_CAL_ALIGN(__N)              __VSF_CAL_ALIGN(__N)
 
-#ifndef SECTION
-#   define SECTION(__SEC)          __SECTION(__SEC)
-#endif
+#define VSF_CAL_SECTION(__SEC)          __VSF_CAL_SECTION(__SEC)
 
-#ifdef __COMPILER_WRAPPER
-#   define COMPILER_WRAPPER(__API)      __COMPILER_WRAPPER(__API)
+#ifdef __VSF_CAL_WRAPPER
+#   define VSF_CAL_WRAPPER(__API)      __VSF_CAL_WRAPPER(__API)
 #endif
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#define ALIGN_OF(__TYPE)        __ALIGN_OF(__TYPE)
-#define ALIGN_WITH(__TYPE)      ALIGN(ALIGN_OF(__TYPE))
-#define ISR(__VECT)             __ISR(__VECT)
+#define VSF_CAL_ALIGN_OF(__TYPE)        __VSF_CAL_ALIGN_OF(__TYPE)
+#define VSF_CAL_ALIGN_WITH(__TYPE)      VSF_CAL_ALIGN(VSF_CAL_ALIGN_OF(__TYPE))
+#define VSF_CAL_ISR(__VECT)             __VSF_CAL_ISR(__VECT)
 #else
-#define ALIGN_OF(...)           __ALIGN_OF(__VA_ARGS__)
-#define ALIGN_WITH(...)         ALIGN(ALIGN_OF(__VA_ARGS__))
-#define ISR(...)                __ISR(__VA_ARGS__)
+#define VSF_CAL_ALIGN_OF(...)           __VSF_CAL_ALIGN_OF(__VA_ARGS__)
+#define VSF_CAL_ALIGN_WITH(...)         VSF_CAL_ALIGN(VSF_CAL_ALIGN_OF(__VA_ARGS__))
+#define VSF_CAL_ISR(...)                __VSF_CAL_ISR(__VA_ARGS__)
 #endif
 
 

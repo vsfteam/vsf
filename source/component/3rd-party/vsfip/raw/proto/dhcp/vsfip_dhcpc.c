@@ -55,12 +55,10 @@ extern void vsfip_dhcpc_on_finish(vsfip_dhcpc_t *dhcpc);
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSFIP_DHCPC_ON_FINISH
-WEAK(vsfip_dhcpc_on_finish)
+VSF_CAL_WEAK(vsfip_dhcpc_on_finish)
 void vsfip_dhcpc_on_finish(vsfip_dhcpc_t *dhcpc)
 {
 }
-#endif
 
 static vsf_err_t __vsfip_dhcpc_init_msg(vsfip_dhcpc_t *dhcpc, uint_fast8_t op)
 {

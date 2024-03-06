@@ -265,7 +265,7 @@ void vsf_hw_usart_irq_disable(vsf_hw_usart_t *hw_usart_ptr, vsf_usart_irq_mask_t
         .reg = UART ## __N ## _BASE,                                            \
         .UART_IRQn = UART ## __N ## _IRQn,                                      \
     };                                                                          \
-    ROOT void UART ## __N ## _Handler(void)                                     \
+    VSF_CAL_ROOT void UART ## __N ## _Handler(void)                             \
     {                                                                           \
         vsf_hw_usart_irqhandler(&vsf_hw_usart ## __N);                          \
     }

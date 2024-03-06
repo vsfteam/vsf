@@ -300,7 +300,7 @@ end:
 
 #ifdef __WIN__
 // TODO: fixme. to avoid conflict with libvcruntime(assert.obj) in the latest Visual Studio 2022
-WEAK(swprintf)
+VSF_CAL_WEAK(swprintf)
 #endif
 int swprintf(wchar_t *str, size_t len, const wchar_t *format, ...)
 {

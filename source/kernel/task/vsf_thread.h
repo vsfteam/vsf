@@ -126,7 +126,7 @@ extern "C" {
 #   define __vsf_thread_def_stack_member(__name, __bytesize)                    \
             uint32_t canary;                                                    \
             uint64_t stack_arr[(__VSF_THREAD_STACK_SAFE_SIZE(__bytesize) + 7) / 8]\
-                        ALIGN(1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT);
+                        VSF_CAL_ALIGN(1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT);
 #   define __vsf_thread_imp_stack(__name, __thread, __task)                     \
             __vsf_thread_set_stack((__thread), (__task), (__task)->stack_arr, sizeof((__task)->stack_arr))
 #   define __vsf_eda_call_thread_prepare_stack(__name, __thread)                \
@@ -145,7 +145,7 @@ extern "C" {
             struct __name {                                                     \
                 implement(vsf_thread_t)                                         \
                 implement_ex(thread_cb_##__name##_t, param)                     \
-            } ALIGN(8);                                                         \
+            } VSF_CAL_ALIGN(8);                                                 \
             extern void vsf_thread_##__name##_start(struct __name *task,        \
                                                     vsf_prio_t priority);       \
             extern void vsf_thread_##__name##_entry(                            \
@@ -266,7 +266,7 @@ extern "C" {
             struct __name {                                                     \
                 __vsf_thread_def_stack_member(__name, (__stack_bytesize))       \
                 implement_ex(thread_cb_##__name##_t, param);                    \
-            } ALIGN(8);                                                         \
+            } VSF_CAL_ALIGN(8);                                                 \
             extern void vsf_thread_##__name##_start(struct __name *task,        \
                                                     vsf_prio_t priority);       \
             extern void vsf_thread_##__name##_entry(                            \
@@ -296,7 +296,7 @@ extern "C" {
             };                                                                  \
             struct __name {                                                     \
                 implement_ex(thread_cb_##__name##_t, param);                    \
-            } ALIGN(8);                                                         \
+            } VSF_CAL_ALIGN(8);                                                 \
             extern void vsf_thread_##__name##_start(struct __name *task,        \
                                                     vsf_prio_t priority);       \
             extern void vsf_thread_##__name##_entry(                            \
@@ -509,20 +509,20 @@ end_def_class(vsf_thread_t)
 /*============================ PROTOTYPES ====================================*/
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-SECTION(".text.vsf.kernel.vk_eda_call_thread_prepare")
+VSF_CAL_SECTION(".text.vsf.kernel.vk_eda_call_thread_prepare")
 extern vsf_err_t vk_eda_call_thread_prepare(    vsf_thread_cb_t *thread_cb,
                                                 vsf_thread_prepare_cfg_t *cfg);
 
-SECTION(".text.vsf.kernel.vk_eda_call_thread")
+VSF_CAL_SECTION(".text.vsf.kernel.vk_eda_call_thread")
 extern vsf_err_t vk_eda_call_thread(vsf_thread_cb_t *thread_cb);
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TASK == ENABLED && VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-SECTION(".text.vsf.kernel.vk_thread_call_task")
+VSF_CAL_SECTION(".text.vsf.kernel.vk_thread_call_task")
 extern
 fsm_rt_t vk_thread_call_task(vsf_task_entry_t task_handler, uintptr_t param, size_t local_size);
 #endif
 
-SECTION(".text.vsf.kernel.vk_thread_call_eda")
+VSF_CAL_SECTION(".text.vsf.kernel.vk_thread_call_eda")
 extern
 vsf_err_t vk_thread_call_eda(   uintptr_t eda_handler,
                                 uintptr_t param,
@@ -530,14 +530,14 @@ vsf_err_t vk_thread_call_eda(   uintptr_t eda_handler,
                                 size_t local_buff_size,
                                 uintptr_t local_buff);
 
-SECTION(".text.vsf.kernel.vsf_thread_call_thread")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_call_thread")
 extern vsf_err_t vk_thread_call_thread(     vsf_thread_cb_t *thread_cb,
                                             vsf_thread_prepare_cfg_t *cfg);
 
 #endif
 
 
-SECTION(".text.vsf.kernel.vsf_thread")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread")
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 extern vsf_err_t vsf_thread_start(  vsf_thread_t *thread,
                                     vsf_thread_cb_t *thread_cb,
@@ -547,61 +547,61 @@ extern vsf_err_t vsf_thread_start(vsf_thread_t *this_ptr, vsf_prio_t priority);
 #endif
 
 #if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
-SECTION(".text.vsf.kernel.vsf_thread_stack_check")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_stack_check")
 extern void vsf_thread_stack_check(void);
 #endif
 
-SECTION(".text.vsf.kernel.vsf_thread_exit")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_exit")
 extern void vsf_thread_exit(void);
 
-SECTION(".text.vsf.kernel.vsf_thread_get_cur")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_get_cur")
 extern vsf_thread_t *vsf_thread_get_cur(void);
 
-SECTION(".text.vsf.kernel.vsf_thread_wait")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_wait")
 extern vsf_evt_t vsf_thread_wait(void);
 
-SECTION(".text.vsf.kernel.vsf_thread_wait_for_evt")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_wait_for_evt")
 extern void vsf_thread_wait_for_evt(vsf_evt_t evt);
 
-SECTION(".text.vsf.kernel.vsf_thread_sendevt")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_sendevt")
 extern void vsf_thread_sendevt(vsf_thread_t *thread, vsf_evt_t evt);
 
 #if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
-SECTION(".text.vsf.kernel.vsf_thread_wait_for_evt_msg")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_wait_for_evt_msg")
 extern uintptr_t vsf_thread_wait_for_evt_msg(vsf_evt_t evt);
 #endif
 
-SECTION(".text.vsf.kernel.vsf_thread_wait_for_evt_msg")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_wait_for_evt_msg")
 extern uintptr_t vsf_thread_wait_for_msg(void);
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-SECTION(".text.vsf.kernel.vsf_thread_delay")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_delay")
 extern void vsf_thread_delay(vsf_systimer_tick_t tick);
 #endif
 
-SECTION(".text.vsf.kernel.vsf_thread_yield")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_yield")
 void vsf_thread_yield(void);
 
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
-SECTION(".text.vsf.kernel.vsf_thread_set_priority")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_set_priority")
 extern vsf_prio_t vsf_thread_set_priority(vsf_prio_t priority);
 #endif
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
-SECTION(".text.vsf.kernel.__vsf_thread_wait_for_sync")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_thread_wait_for_sync")
 vsf_sync_reason_t __vsf_thread_wait_for_sync(vsf_sync_t *sync, vsf_timeout_tick_t time_out);
 
-SECTION(".text.vsf.kernel.vsf_thread_mutex")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_mutex")
 extern vsf_err_t vsf_thread_mutex_leave(vsf_mutex_t *mtx);
 
-SECTION(".text.vsf.kernel.vsf_thread_queue")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_queue")
 vsf_sync_reason_t vsf_thread_queue_send(vsf_eda_queue_t *queue, void *node, vsf_timeout_tick_t timeout);
 
-SECTION(".text.vsf.kernel.vsf_thread_queue")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_queue")
 vsf_sync_reason_t vsf_thread_queue_recv(vsf_eda_queue_t *queue, void **node, vsf_timeout_tick_t timeout);
 
 #   if VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT == ENABLED
-SECTION(".text.vsf.kernel.vsf_thread_bmpevt_pend")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_bmpevt_pend")
 extern vsf_sync_reason_t vsf_thread_bmpevt_pend(
                     vsf_bmpevt_t *bmpevt,
                     vsf_bmpevt_pender_t *pender,

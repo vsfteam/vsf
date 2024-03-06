@@ -40,13 +40,11 @@ extern uint_fast16_t vsf_dwcotg_dcd_get_fifo_size(uint_fast8_t ep, usb_ep_type_t
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_DWCOTG_DCD_GET_FIFO_SIZE
-WEAK(vsf_dwcotg_dcd_get_fifo_size)
+VSF_CAL_WEAK(vsf_dwcotg_dcd_get_fifo_size)
 uint_fast16_t vsf_dwcotg_dcd_get_fifo_size(uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size)
 {
     return size;
 }
-#endif
 
 static void __vk_dwcotg_dcd_init_regs(vk_dwcotg_dcd_t *dwcotg_dcd, void *regbase, uint_fast8_t ep_num)
 {

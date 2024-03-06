@@ -50,7 +50,7 @@ extern int vsfvm_module_require_lib_imp(vsfvm_compiler_t *compiler, const char *
 #   pragma diag_suppress=pe111
 #endif
 
-WEAK(vsfvm_set_bytecode_imp)
+VSF_CAL_WEAK(vsfvm_set_bytecode_imp)
 int vsfvm_set_bytecode_imp(vsfvm_compiler_t *compiler, vsfvm_bytecode_t code, uint_fast32_t offset)
 {
     VSFVM_ASSERT(false);
@@ -64,14 +64,12 @@ int vsfvm_set_bytecode_imp(vsfvm_compiler_t *compiler, vsfvm_bytecode_t code, ui
 
 #endif
 
-#ifndef WEAK_VSFVM_MODULE_GET_LEXER_IMP
-WEAK(vsfvm_module_get_lexer_imp)
+VSF_CAL_WEAK(vsfvm_module_get_lexer_imp)
 char * vsfvm_module_get_lexer_imp(const char *path)
 {
     // usr dart lexar by default
     return "dart";
 }
-#endif
 
 #ifndef WEAK_VSFVM_MODULE_REQUIRE_LIB_IMP
 
@@ -80,7 +78,7 @@ char * vsfvm_module_get_lexer_imp(const char *path)
 #   pragma diag_suppress=pe111
 #endif
 
-WEAK(vsfvm_module_require_lib_imp)
+VSF_CAL_WEAK(vsfvm_module_require_lib_imp)
 int vsfvm_module_require_lib_imp(vsfvm_compiler_t *compiler, const char *path)
 {
     VSFVM_ASSERT(false);

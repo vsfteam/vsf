@@ -64,7 +64,7 @@ def_vsf_thread(user_thread_a_t, 1024,
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-static NO_INIT vsf_sem_t __user_sem;
+static VSF_CAL_NO_INIT vsf_sem_t __user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -199,7 +199,7 @@ void vsf_kernel_fsm_simple_demo(void)
 
     //! start a user task
     {
-        static NO_INIT user_fsm_task_t __user_task;
+        static VSF_CAL_NO_INIT user_fsm_task_t __user_task;
         init_vsf_fsm(user_fsm_task_t, &(__user_task.param), vsf_args(&__user_sem));
         start_vsf_fsm(user_fsm_task_t, &__user_task, vsf_prio_0);
     };
@@ -207,7 +207,7 @@ void vsf_kernel_fsm_simple_demo(void)
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     //! start the user task a
     {
-        static NO_INIT user_thread_a_t __user_task_a;
+        static VSF_CAL_NO_INIT user_thread_a_t __user_task_a;
         __user_task_a.param.sem_ptr = &__user_sem;
         init_vsf_thread(user_thread_a_t, &__user_task_a, vsf_prio_0);
     }
@@ -215,7 +215,7 @@ void vsf_kernel_fsm_simple_demo(void)
     //! in this case, we only use main to initialise vsf_tasks
     //! start a user task b
     {
-        static NO_INIT user_task_b_t __user_task_b;
+        static VSF_CAL_NO_INIT user_task_b_t __user_task_b;
         init_vsf_fsm(user_task_b_t, &(__user_task_b.param), args(&__user_sem));
         start_vsf_fsm(user_task_b_t, &__user_task_b, vsf_prio_0);
     };

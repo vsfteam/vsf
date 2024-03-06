@@ -39,7 +39,7 @@ struct vsf_usb_nspro_gamepad_in_report_common_t {
     //  1: switch/usb powered
     uint8_t power_state : 1;
     // con_info
-    //  
+    //
     uint8_t con_info : 3;
     uint8_t charging : 1;
     // battery_level:
@@ -58,7 +58,7 @@ struct vsf_usb_nspro_gamepad_in_report_common_t {
     uint8_t : 2;
     uint8_t rb : 1;
     uint8_t rt : 1;
-    
+
     uint8_t minus : 1;
     uint8_t plus : 1;
     uint8_t rs : 1;
@@ -67,7 +67,7 @@ struct vsf_usb_nspro_gamepad_in_report_common_t {
     uint8_t capture : 1;
     uint8_t : 1;
     uint8_t keep_1: 1;
-    
+
     uint8_t ld : 1;
     uint8_t lu : 1;
     uint8_t lr : 1;
@@ -90,7 +90,7 @@ struct vsf_usb_nspro_gamepad_in_report_common_t {
 
     // Vibrator input report. Decides if next vibration pattern should be sent. 12
     uint8_t vivrator;
-} PACKED;
+} VSF_CAL_PACKED;
 
 typedef struct vsf_usb_nspro_gamepad_in_report_full_t vsf_usb_nspro_gamepad_in_report_full_t;
 struct vsf_usb_nspro_gamepad_in_report_full_t {
@@ -103,19 +103,19 @@ struct vsf_usb_nspro_gamepad_in_report_full_t {
         uint16_t roll;
         uint16_t pitch;
         uint16_t yaw;
-    } PACKED gyro_acc[3];
-} PACKED;
+    } VSF_CAL_PACKED gyro_acc[3];
+} VSF_CAL_PACKED;
 
 typedef struct vsf_usb_nspro_gamepad_in_report_t vsf_usb_nspro_gamepad_in_report_t;
 struct vsf_usb_nspro_gamepad_in_report_t {
     implement(vsf_usb_nspro_gamepad_in_report_full_t)
     uint8_t zero[15];   // fill data to make 64 bytes report
-} PACKED;
+} VSF_CAL_PACKED;
 
 typedef struct vsf_usb_nspro_gamepad_out_report_t vsf_usb_nspro_gamepad_out_report_t;
 struct vsf_usb_nspro_gamepad_out_report_t {
     uint8_t buffer[64];
-} PACKED;
+} VSF_CAL_PACKED;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

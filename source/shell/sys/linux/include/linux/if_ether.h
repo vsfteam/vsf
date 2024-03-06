@@ -2,7 +2,7 @@
 #define __VSF_LINUX_IF_ETHER_H__
 
 #include <linux/skbuff.h>
-// for CAL(Compiler Abstraction Layer) PACKED
+// for CAL(Compiler Abstraction Layer) VSF_CAL_PACKED
 #include "utilities/vsf_utilities.h"
 
 #ifdef __cplusplus
@@ -24,7 +24,7 @@ struct ethhdr {
     unsigned char               h_dest[ETH_ALEN];
     unsigned char               h_source[ETH_ALEN];
     __be16                      h_proto;
-} PACKED;
+} VSF_CAL_PACKED;
 
 #ifdef __cplusplus
 }

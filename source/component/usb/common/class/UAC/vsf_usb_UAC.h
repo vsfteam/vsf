@@ -43,7 +43,7 @@ typedef enum usb_uac_req_t {
     USB_UAC_REQ_MEM             = 5,
     USB_UAC_REQ_SET             = 0,
     USB_UAC_REQ_GET             = 0x80,
-    
+
     USB_UAC2_REQ_CUR            = 1,
     USB_UAC2_REQ_RANGE          = 2,
     USB_UAC2_REQ_MEM            = 3,
@@ -93,7 +93,7 @@ struct usb_uac_ac_interface_header_desc_t {
     uint16_t wTotalLength;
     uint8_t bInCollection;
     uint8_t baInterfaceNr[1];
-} PACKED;
+} VSF_CAL_PACKED;
 
 typedef struct usb_uac_as_interface_desc_t usb_uac_as_interface_desc_t;
 struct usb_uac_as_interface_desc_t {
@@ -103,7 +103,7 @@ struct usb_uac_as_interface_desc_t {
     uint8_t bTerminalLink;
     uint8_t bDelay;
     uint16_t wFormatTag;
-} PACKED;
+} VSF_CAL_PACKED;
 
 typedef struct usb_uac_as_format_i_desc_t usb_uac_as_format_i_desc_t;
 struct usb_uac_as_format_i_desc_t {
@@ -116,7 +116,7 @@ struct usb_uac_as_format_i_desc_t {
     uint8_t bBitResolution;
     uint8_t bSamFreqType;
     uint8_t tSamFreq[1][3];
-} PACKED;
+} VSF_CAL_PACKED;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

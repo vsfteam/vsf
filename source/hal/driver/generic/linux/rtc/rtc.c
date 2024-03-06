@@ -21,9 +21,6 @@
 
 #if VSF_HAL_USE_RTC == ENABLED
 
-// for NO_INIT
-#include "utilities/vsf_utilities.h"
-
 // for gettimeofday
 #include <sys/time.h>
 // for struct tm

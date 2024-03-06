@@ -47,15 +47,13 @@
 extern vsf_tgui_size_t vsf_tgui_idx_root_tile_get_size(const vsf_tgui_tile_t* ptTile);
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE
-WEAK(vsf_tgui_idx_root_tile_get_size)
+VSF_CAL_WEAK(vsf_tgui_idx_root_tile_get_size)
 vsf_tgui_size_t vsf_tgui_idx_root_tile_get_size(const vsf_tgui_tile_t* ptTile)
 {
     vsf_tgui_size_t tSize = {0};
     VSF_TGUI_ASSERT(0);
     return tSize;
 }
-#endif
 
 vsf_tgui_size_t vsf_tgui_root_tile_get_size(const vsf_tgui_tile_t* ptTile)
 {

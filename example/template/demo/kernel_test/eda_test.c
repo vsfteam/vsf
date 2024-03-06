@@ -78,7 +78,7 @@ declare_vsf_thread(caller_thread_t)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-static NO_INIT vsf_sem_t __user_sem;
+static VSF_CAL_NO_INIT vsf_sem_t __user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -232,7 +232,7 @@ void vsf_kernel_eda_simple_demo(void)
 #else
     //! start a user task
     {
-        static NO_INIT user_task_t __user_task;
+        static VSF_CAL_NO_INIT user_task_t __user_task;
         const vsf_eda_cfg_t cfg = {
             .fn.evthandler = user_task_evthandler,
             .priority = vsf_prio_0,
@@ -256,7 +256,7 @@ void vsf_kernel_eda_simple_demo(void)
 
     //! start a user task b
     {
-        static NO_INIT vsf_teda_t __user_task_b;
+        static VSF_CAL_NO_INIT vsf_teda_t __user_task_b;
         const vsf_eda_cfg_t cfg = {
             .fn.evthandler = user_task_b_evthandler,
             .priority = vsf_prio_0,

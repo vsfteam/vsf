@@ -42,19 +42,19 @@ extern bool vsf_driver_init(void);
 
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK(vsf_app_driver_init)
+VSF_CAL_WEAK(vsf_app_driver_init)
 bool vsf_app_driver_init(void)
 {
     return true;
 }
 
-WEAK(vsf_driver_poll)
+VSF_CAL_WEAK(vsf_driver_poll)
 bool vsf_driver_poll(void)
 {
     return true;
 }
 
-WEAK(vsf_hal_irq_enter)
+VSF_CAL_WEAK(vsf_hal_irq_enter)
 uintptr_t vsf_hal_irq_enter(void)
 {
 #if VSF_HAL_USE_DEFAULT_IRQ_ENTER == ENABLED
@@ -65,7 +65,7 @@ uintptr_t vsf_hal_irq_enter(void)
 #endif
 }
 
-WEAK(vsf_hal_irq_leave)
+VSF_CAL_WEAK(vsf_hal_irq_leave)
 void vsf_hal_irq_leave(uintptr_t ctx)
 {
 #if VSF_HAL_USE_DEFAULT_IRQ_LEVEL == ENABLED

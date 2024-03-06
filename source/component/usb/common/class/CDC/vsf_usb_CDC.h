@@ -46,7 +46,7 @@ struct usb_cdc_union_descriptor_t {
 
     uint8_t bControlInterface;
     uint8_t bSubordinateInterface[1];
-} PACKED;
+} VSF_CAL_PACKED;
 
 typedef struct usb_cdc_ecm_descriptor_t usb_cdc_ecm_descriptor_t;
 struct usb_cdc_ecm_descriptor_t {
@@ -59,7 +59,7 @@ struct usb_cdc_ecm_descriptor_t {
     uint16_t wMaxSegmentSize;
     uint16_t wNumberMCFilters;
     uint8_t bNumberPowerFilters;
-} PACKED;
+} VSF_CAL_PACKED;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

@@ -143,7 +143,7 @@ static void __vk_usbh_nspro_process_input(vk_usbh_nspro_t *dev, vsf_usb_nspro_ga
 }
 #endif
 
-WEAK(vsf_usbh_nspro_on_report_input)
+VSF_CAL_WEAK(vsf_usbh_nspro_on_report_input)
 void vsf_usbh_nspro_on_report_input(vk_usbh_nspro_t *nspro, vsf_usb_nspro_gamepad_in_report_t *report)
 {
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
@@ -151,12 +151,12 @@ void vsf_usbh_nspro_on_report_input(vk_usbh_nspro_t *nspro, vsf_usb_nspro_gamepa
 #endif
 }
 
-WEAK(vsf_usbh_nspro_on_report_output)
+VSF_CAL_WEAK(vsf_usbh_nspro_on_report_output)
 void vsf_usbh_nspro_on_report_output(vk_usbh_nspro_t *nspro)
 {
 }
 
-WEAK(vsf_usbh_nspro_on_new)
+VSF_CAL_WEAK(vsf_usbh_nspro_on_new)
 void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro)
 {
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED
@@ -164,7 +164,7 @@ void vsf_usbh_nspro_on_new(vk_usbh_nspro_t *nspro)
 #endif
 }
 
-WEAK(vsf_usbh_nspro_on_free)
+VSF_CAL_WEAK(vsf_usbh_nspro_on_free)
 void vsf_usbh_nspro_on_free(vk_usbh_nspro_t *nspro)
 {
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_NSPRO == ENABLED

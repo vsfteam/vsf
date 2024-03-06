@@ -36,7 +36,7 @@ void __NO_RETURN Default_Handler(void);
  *----------------------------------------------------------------------------*/
 
 #define WEAK_ISR(__NAME, ...)                                                   \
-    WEAK(__NAME)                                                                \
+    VSF_CAL_WEAK(__NAME)                                                        \
     void __NAME(void) { __VA_ARGS__ }
 
 /* Exceptions */
@@ -65,7 +65,7 @@ WEAK_ISR( AudioCodec_Handler)
 WEAK_ISR( KEYADC_Handler)
 WEAK_ISR( SDC0_Handler)
 WEAK_ISR( SDC1_Handler)                               /*!< IRQ24 */
-                                        
+
 WEAK_ISR( USBOTG_Handler)
 WEAK_ISR( TVD_Handler)
 WEAK_ISR( TVE_Handler)                                /*!< IRQ28 */
@@ -83,7 +83,7 @@ WEAK_ISR( PIOF_Handler)                               /*!< IRQ40 */
 
 
 #define __DECLARE_SWI_IRQ_HANDLER(__N, __NULL)                                  \
-    WEAK_ISR(SWI##__N##_IRQHandler)                                             
+    WEAK_ISR(SWI##__N##_IRQHandler)
 
 VSF_MREPEAT(VSF_DEV_SWI_NUM, __DECLARE_SWI_IRQ_HANDLER, NULL)
 
@@ -96,7 +96,7 @@ VSF_MREPEAT(VSF_DEV_SWI_NUM, __DECLARE_SWI_IRQ_HANDLER, NULL)
 #pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
-ALIGN(256)
+VSF_CAL_ALIGN(256)
 const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE  = {
     NMI_Handler,                                /*!< FIQ0 */
     UART0_Handler,
@@ -110,7 +110,7 @@ const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE  = {
     TWI2_Handler,
     SPI0_Handler,
     SPI1_Handler,
-    0,                                          /*!< IRQ12 */ 
+    0,                                          /*!< IRQ12 */
     Timer0_Handler,
     Timer1_Handler,
     Timer2_Handler,
@@ -123,7 +123,7 @@ const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE  = {
     KEYADC_Handler,
     SDC0_Handler,
     SDC1_Handler,                               /*!< IRQ24 */
-    0,                                            
+    0,
     USBOTG_Handler,
     TVD_Handler,
     TVE_Handler,                                /*!< IRQ28 */

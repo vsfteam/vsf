@@ -277,23 +277,23 @@ const vsf_msgt_node_t *vsf_msgt_backward_propagate_msg_get_last_node(
                                                             vsf_msgt_t* obj_ptr);
 
 
-SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_offset_tree_init")
+VSF_CAL_SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_offset_tree_init")
 extern
 void vsf_msgt_offset_tree_init(const vsf_msgt_container_t * root_ptr);
 
-SECTION(".text.vsf.osa_service.msg_tree"
+VSF_CAL_SECTION(".text.vsf.osa_service.msg_tree"
         ".vsf_msgt_forward_propagate_msg_pre_order_traversal_init")
 extern
 void vsf_msgt_forward_propagate_msg_pre_order_traversal_init(vsf_msgt_t* obj_ptr,
                                              bool is_support_container_post_handling);
 
-SECTION(".text.vsf.osa_service.msg_tree"
+VSF_CAL_SECTION(".text.vsf.osa_service.msg_tree"
         ".vsf_msgt_forward_propagate_msg_pre_order_traversal_setting")
 extern
 void vsf_msgt_forward_propagate_msg_pre_order_traversal_setting(vsf_msgt_t* obj_ptr,
                                                 bool is_support_container_post_handling);
 
-SECTION(".text.vsf.osa_service.msg_tree"
+VSF_CAL_SECTION(".text.vsf.osa_service.msg_tree"
         ".vsf_msgt_forward_propagate_msg_pre_order_traversal")
 extern
 fsm_rt_t vsf_msgt_forward_propagate_msg_pre_order_traversal(
@@ -302,30 +302,30 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_pre_order_traversal(
                                             vsf_msgt_msg_t* msg_ptr,
                                             uint_fast8_t status_msk);
 
-SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
+VSF_CAL_SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
 extern
 void vsf_msgt_forward_propagate_msg_bfs_init(   vsf_msgt_t* obj_ptr,
                                                 uint16_t *fifo_buffer_ptr,
                                                 uint_fast16_t buff_size,
                                                 bool is_support_container_post_handling);
 
-SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs_setting")
+VSF_CAL_SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs_setting")
 extern
 void vsf_msgt_forward_propagate_msg_bfs_setting(vsf_msgt_t* obj_ptr,
                                                 bool is_support_container_post_handling);
 
-SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
+VSF_CAL_SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_bfs")
 extern
 fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* obj_ptr,
                                             const vsf_msgt_node_t* node_ptr,
                                             vsf_msgt_msg_t* msg_ptr,
                                             uint_fast8_t status_msk);
 
-SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_dfs")
+VSF_CAL_SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_dfs")
 extern
 void vsf_msgt_forward_propagate_msg_dfs_init(vsf_msgt_t* obj_ptr);
 
-SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_dfs")
+VSF_CAL_SECTION(".text.vsf.osa_service.msg_tree.vsf_msgt_forward_propagate_msg_dfs")
 extern
 fsm_rt_t vsf_msgt_forward_propagate_msg_dfs(vsf_msgt_t* obj_ptr,
                                             const vsf_msgt_node_t* node_ptr,

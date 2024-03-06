@@ -103,7 +103,7 @@ enum {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack)
+static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack)
 {
     __asm__ __volatile__ ("mov SP, %0" ::"r"(stack):);
 }

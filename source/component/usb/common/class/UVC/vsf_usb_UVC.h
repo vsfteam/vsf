@@ -67,7 +67,7 @@ struct usb_uvc_vc_interface_header_desc_t {
     uint32_t dwClockFrequency;
     uint8_t bInCollection;
     uint8_t baInterfaceNr[1];
-} PACKED;
+} VSF_CAL_PACKED;
 
 typedef struct usb_uvc_vs_interface_header_desc_t usb_uvc_vs_interface_header_desc_t;
 struct usb_uvc_vs_interface_header_desc_t {
@@ -84,7 +84,7 @@ struct usb_uvc_vs_interface_header_desc_t {
     uint8_t bTriggerUsage;
     uint8_t bControlSize;
     uint8_t bmControls[0];
-} PACKED;
+} VSF_CAL_PACKED;
 
 typedef struct usb_uvc_format_desc_t usb_uvc_format_desc_t;
 struct usb_uvc_format_desc_t {
@@ -102,7 +102,7 @@ struct usb_uvc_format_desc_t {
             uint8_t bAspectRatioY;
             uint8_t bmInterlaceFlags;
             uint8_t bCopyProtect;
-        } PACKED uncompressed;
+        } VSF_CAL_PACKED uncompressed;
         struct {
             uint8_t bmFlags;
             uint8_t bDefaultFrameIndex;
@@ -110,9 +110,9 @@ struct usb_uvc_format_desc_t {
             uint8_t bAspectRatioY;
             uint8_t bmInterlaceFlags;
             uint8_t bCopyProtect;
-        } PACKED mjpeg;
-    } PACKQED;
-} PACKED;
+        } VSF_CAL_PACKED mjpeg;
+    } VSF_CAL_PACKED;
+} VSF_CAL_PACKED;
 
 typedef struct usb_uvc_frame_desc_t usb_uvc_frame_desc_t;
 struct usb_uvc_frame_desc_t {
@@ -129,7 +129,7 @@ struct usb_uvc_frame_desc_t {
     uint32_t dwDefaultFrameInterval;
     uint8_t bFrameIntervalType;
     uint32_t dwFrameInterval[0];
-} PACKED;
+} VSF_CAL_PACKED;
 
 // Stream Controls
 typedef struct usb_uvc_vs_t usb_uvc_vs_t;
@@ -156,7 +156,7 @@ struct usb_uvc_vs_t {
     uint8_t bMaxNumberOfFramesPlus1;
     uint16_t bmRateControlModes;
     uint64_t bmLayoutPerStream;
-} PACKED;
+} VSF_CAL_PACKED;
 
 // Camera Terminal
 typedef struct usb_uvc_ct_roi_t usb_uvc_ct_roi_t;
@@ -166,7 +166,7 @@ struct usb_uvc_ct_roi_t {
     uint16_t wROI_Bottom;
     uint16_t wROI_Right;
     uint16_t bmAutoControls;
-} PACKED;
+} VSF_CAL_PACKED;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

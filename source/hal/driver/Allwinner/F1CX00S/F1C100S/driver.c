@@ -52,7 +52,7 @@ static uint32_t __f1c100s_mmu_ttb[4096] ALIGN(0x4000);
 #endif
 
 #if defined(VSF_HAL_CFG_COHERENT_START) && defined(VSF_HAL_CFG_COHERENT_SIZE) && (VSF_USE_HEAP == ENABLED)
-static NO_INIT __vsf_coherent_heap_t __vsf_coherent_heap;
+static VSF_CAL_NO_INIT __vsf_coherent_heap_t __vsf_coherent_heap;
 #endif
 
 /*============================ PROTOTYPES ====================================*/
@@ -179,8 +179,8 @@ bool vsf_driver_poll(void)
 #endif
 
     /*! \note example about how to put poll functions for each instance of peripherals
-     *!       even if the function doesn't exist, the compilation would not be 
-     *!       affected as long as the corresponding macro 
+     *!       even if the function doesn't exist, the compilation would not be
+     *!       affected as long as the corresponding macro
      *!       VSF_HAL_DRV_CFG_XXXX_POLL_MODE_EN is set to DISABLED, i.e. 0
      */
     USART_POLL_AGENTS

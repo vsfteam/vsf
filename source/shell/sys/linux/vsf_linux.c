@@ -716,13 +716,13 @@ int vsf_linux_trigger_pend(vsf_linux_trigger_t *trig, vsf_timeout_tick_t timeout
 #endif
 }
 
-WEAK(vsf_linux_create_fhs_user)
+VSF_CAL_WEAK(vsf_linux_create_fhs_user)
 int vsf_linux_create_fhs_user(void)
 {
     return 0;
 }
 
-WEAK(vsf_linux_create_fhs)
+VSF_CAL_WEAK(vsf_linux_create_fhs)
 int vsf_linux_create_fhs(void)
 {
     vsf_linux_vfs_init();

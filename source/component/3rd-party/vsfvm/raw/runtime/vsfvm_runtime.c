@@ -51,21 +51,17 @@ extern int_fast32_t vsfvm_get_res_imp(const void *token, uint_fast32_t offset, u
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSFVM_ALLOC_THREAD_IMP
-WEAK(vsfvm_alloc_thread_imp)
+VSF_CAL_WEAK(vsfvm_alloc_thread_imp)
 vsfvm_thread_t * vsfvm_alloc_thread_imp(vsfvm_runtime_t *runtime)
 {
     return (vsfvm_thread_t *)vsf_heap_malloc(sizeof(vsfvm_thread_t));
 }
-#endif
 
-#ifndef WEAK_VSFVM_FREE_THREAD_IMP
-WEAK(vsfvm_free_thread_imp)
+VSF_CAL_WEAK(vsfvm_free_thread_imp)
 void vsfvm_free_thread_imp(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
 {
     vsf_heap_free(thread);
 }
-#endif
 
 #ifndef WEAK_VSFVM_GET_BYTECODE_IMP
 
@@ -74,7 +70,7 @@ void vsfvm_free_thread_imp(vsfvm_runtime_t *runtime, vsfvm_thread_t *thread)
 #   pragma diag_suppress=pe111
 #endif
 
-WEAK(vsfvm_get_bytecode_imp)
+VSF_CAL_WEAK(vsfvm_get_bytecode_imp)
 vsfvm_bytecode_t vsfvm_get_bytecode_imp(const void *token, uint_fast32_t *pc)
 {
     VSFVM_ASSERT(false);
@@ -88,14 +84,12 @@ vsfvm_bytecode_t vsfvm_get_bytecode_imp(const void *token, uint_fast32_t *pc)
 
 #endif
 
-#ifndef WEAK_VSFVM_GET_RES_IMP
-
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
 #   pragma diag_suppress=pe111
 #endif
 
-WEAK(vsfvm_get_res_imp)
+VSF_CAL_WEAK(vsfvm_get_res_imp)
 int_fast32_t vsfvm_get_res_imp(const void *token, uint_fast32_t offset, uint8_t **buffer)
 {
     VSFVM_ASSERT(false);
@@ -105,8 +99,6 @@ int_fast32_t vsfvm_get_res_imp(const void *token, uint_fast32_t offset, uint8_t 
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
 #   pragma diag_warning=pe111
-#endif
-
 #endif
 
 int_fast32_t vsfvm_get_res(vsfvm_runtime_script_t *script, uint_fast32_t offset, uint8_t **buffer)

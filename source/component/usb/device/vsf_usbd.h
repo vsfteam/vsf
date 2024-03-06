@@ -162,7 +162,7 @@ extern "C" {
             uint8_t bLength;                                                    \
             uint8_t bDescriptorType;                                            \
             usb_unicode_t str[dimof(__str) - 1];                                \
-        } PACKED const __##__name##_str_##__type = {                            \
+        } VSF_CAL_PACKED const __##__name##_str_##__type = {                    \
             .bLength            = sizeof(__##__name##_str_##__type),            \
             .bDescriptorType    = USB_DT_STRING,                                \
             .str                = __str,                                        \
@@ -191,7 +191,7 @@ extern "C" {
             uint8_t bLength;                                                    \
             uint8_t bDescriptorType;                                            \
             usb_unicode_t str[1];                                               \
-        } PACKED const __##__name##_str_langid = {                              \
+        } VSF_CAL_PACKED const __##__name##_str_langid = {                      \
             .bLength            = 4,                                            \
             .bDescriptorType    = USB_DT_STRING,                                \
             .str                = (__##__name##_langid),                        \

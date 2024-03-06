@@ -89,13 +89,11 @@ extern uint_fast16_t vsf_usbd_get_fifo_size(uint_fast8_t ep, usb_ep_type_t type,
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_USBD_GET_FIFO_SIZE
-WEAK(vsf_usbd_get_fifo_size)
+VSF_CAL_WEAK(vsf_usbd_get_fifo_size)
 uint_fast16_t vsf_usbd_get_fifo_size(uint_fast8_t ep, usb_ep_type_t type, uint_fast16_t size)
 {
     return size;
 }
-#endif
 
 static void __f1cx00s_usbd_notify(f1cx00s_usb_dcd_t *usbd, usb_evt_t evt, uint_fast8_t value)
 {

@@ -595,7 +595,7 @@ static void __hc32f10x_usbhd_hcd_isr(void *param)
 }
 
 #ifdef USB_HDC_IRQHandler
-ROOT void USB_HDC_IRQHandler(void)
+VSF_CAL_ROOT void USB_HDC_IRQHandler(void)
 {
     __hc32f10x_usbhd_hcd_isr(__hc32f10x_usbhd_hcd);
 }

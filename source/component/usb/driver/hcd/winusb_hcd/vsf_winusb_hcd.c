@@ -191,21 +191,17 @@ static vk_winusb_hcd_t __vk_winusb_hcd = {
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_WINUSB_CFG_INSTALL_DRIVER == ENABLED
-#ifndef WEAK_VSF_WINUSB_ON_INSTALL_DRIVER
-WEAK(vsf_winusb_on_install_driver)
+VSF_CAL_WEAK(vsf_winusb_on_install_driver)
 void vsf_winusb_on_install_driver(uint_fast16_t vid, uint_fast16_t pid)
 {
 
 }
-#endif
 
-#ifndef WEAK_VSF_WINUSB_ON_DRIVER_INSTALLED
-WEAK(vsf_winusb_on_driver_installed)
+VSF_CAL_WEAK(vsf_winusb_on_driver_installed)
 void vsf_winusb_on_driver_installed(uint_fast16_t vid, uint_fast16_t pid, int result, const char *strerr)
 {
 
 }
-#endif
 
 static bool __vk_winusb_ensure_driver(uint_fast16_t vid, uint_fast16_t pid, bool force)
 {

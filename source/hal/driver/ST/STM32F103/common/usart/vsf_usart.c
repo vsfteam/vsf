@@ -35,7 +35,7 @@ vsf_usart_t vsf_usart##__N = {                                                  
     .reg_ptr = USART##__N,                                                      \
     .USART_IRQn = USART##__N##_IRQn,                                            \
 };                                                                              \
-ROOT void USART##__N##_IRQHandler(void)                                         \
+VSF_CAL_ROOT void USART##__N##_IRQHandler(void)                                 \
 {                                                                               \
     vsf_usart_irqhandler(&vsf_usart##__N);                                      \
 }

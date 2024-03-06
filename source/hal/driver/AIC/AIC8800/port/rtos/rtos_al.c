@@ -122,7 +122,7 @@ typedef struct rtos_timer_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT rtos_task_handle __rtos_timer_task;
+static VSF_CAL_NO_INIT rtos_task_handle __rtos_timer_task;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/

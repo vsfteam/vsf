@@ -152,7 +152,7 @@ typedef struct vsfip_ip4_head_t {
     uint16_t checksum;
     uint32_t ipsrc;
     uint32_t ipdest;
-} PACKED vsfip_ip4_head_t;
+} VSF_CAL_PACKED vsfip_ip4_head_t;
 #define VSFIP_IP4H_V(h)         ((h)->ver_hl >> 4)
 #define VSFIP_IP4H_HLEN(h)      ((h)->ver_hl & 0x0F)
 
@@ -160,14 +160,14 @@ typedef struct vsfip_ip4_head_t {
 typedef struct vsfip_proto_port_t {
     uint16_t src;
     uint16_t dst;
-} PACKED vsfip_proto_port_t;
+} VSF_CAL_PACKED vsfip_proto_port_t;
 
 // UDP
 typedef struct vsfip_udp_head_t {
     vsfip_proto_port_t port;
     uint16_t len;
     uint16_t checksum;
-} PACKED vsfip_udp_head_t;
+} VSF_CAL_PACKED vsfip_udp_head_t;
 
 // TCP
 typedef struct vsfip_tcp_head_t {
@@ -185,7 +185,7 @@ typedef struct vsfip_tcp_head_t {
     uint16_t window_size;
     uint16_t checksum;
     uint16_t urgent_ptr;
-} PACKED vsfip_tcp_head_t;
+} VSF_CAL_PACKED vsfip_tcp_head_t;
 
 // ICMP
 typedef struct vsfip_icmp_head_t {
@@ -198,7 +198,7 @@ typedef struct vsfip_icmp_head_t {
             uint16_t seqnum;
         } echo;
     } body;
-} PACKED vsfip_icmp_head_t;
+} VSF_CAL_PACKED vsfip_icmp_head_t;
 
 
 typedef enum vsfip_tcp_stat_t {

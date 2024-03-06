@@ -49,8 +49,7 @@ extern vsf_mem_t vsf_service_req___heap_memory_buffer___from_usr(void);
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_SERVICE_INIT
-WEAK(vsf_service_init)
+VSF_CAL_WEAK(vsf_service_init)
 void vsf_service_init(void)
 {
 #if VSF_USE_HEAP == ENABLED && VSF_ARCH_PROVIDE_HEAP != ENABLED
@@ -87,7 +86,6 @@ void vsf_service_init(void)
     vsf_service_stream_init();
 #endif
 }
-#endif
 
 #if VSF_APPLET_USE_SERVICE == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_service_vplt_t vsf_service_vplt = {

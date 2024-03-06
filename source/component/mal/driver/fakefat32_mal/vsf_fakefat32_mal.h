@@ -72,7 +72,7 @@ vsf_class(vk_fakefat32_file_t) {
             uint16_t WrtTime;
             uint16_t WrtDate;
             uint16_t FstClusLO;
-        } PACKED record;
+        } VSF_CAL_PACKED record;
     )
 };
 

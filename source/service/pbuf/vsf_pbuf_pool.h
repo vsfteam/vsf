@@ -80,7 +80,7 @@ extern "C" {
 
 #define __init_pbuf_pool(__NAME, __POOL, __ID, __COUNT, ...)                    \
         do {                                                                    \
-            NO_INIT static vsf_pool_item(__NAME)                                \
+            VSF_CAL_NO_INIT static vsf_pool_item(__NAME)                        \
                     __##__NAME##_data_buffer[__COUNT];                          \
             const vsf_pbuf_adapter_t *adapter_ptr =                             \
                     vsf_pbuf_adapter_get(__ID);                                 \
@@ -92,7 +92,7 @@ extern "C" {
                                                                                 \
             vsf_pbuf_pool_init( &((__POOL)->use_as__vsf_pbuf_pool_t),           \
                                 sizeof(vsf_pool_item(__NAME)),                  \
-                                __alignof__(vsf_pool_item(__NAME)),             \
+                                VSF_CAL_ALIGN_OF(vsf_pool_item(__NAME)),        \
                                 &cfg);                                          \
             vsf_pbuf_pool_add_buffer(   &((__POOL)->use_as__vsf_pbuf_pool_t),   \
                                         __##__NAME##_data_buffer,               \
@@ -116,7 +116,7 @@ extern "C" {
                                                                                 \
             vsf_pbuf_pool_init( &((__POOL)->use_as__vsf_pbuf_pool_t),           \
                                 sizeof(vsf_pool_item(__NAME)),                  \
-                                __alignof__(vsf_pool_item(__NAME)),             \
+                                VSF_CAL_ALIGN_OF(vsf_pool_item(__NAME)),        \
                                 &cfg);                                          \
         } while(0)
 
@@ -174,13 +174,13 @@ extern vsf_pbuf_t *vsf_pbuf_pool_alloc(vsf_pbuf_pool_t *);
 
 extern void vsf_pbuf_pool_free(vsf_pbuf_pool_t *, vsf_pbuf_t *);
 
-SECTION(".text." "vsf_pbuf" "_get_pool_item_count")
+VSF_CAL_SECTION(".text." "vsf_pbuf" "_get_pool_item_count")
 extern uint_fast32_t vsf_pbuf_get_pool_item_count(vsf_pbuf_pool_t *);
 
-SECTION(".text." "vsf_pbuf" "_pool_get_region")
+VSF_CAL_SECTION(".text." "vsf_pbuf" "_pool_get_region")
 extern vsf_protect_region_t *vsf_pbuf_pool_get_region(vsf_pbuf_pool_t *);
 
-SECTION(".text." "vsf_pbuf" "_pool_get_target")
+VSF_CAL_SECTION(".text." "vsf_pbuf" "_pool_get_target")
 extern uintptr_t vsf_pbuf_pool_get_target(vsf_pbuf_pool_t *);
 
 #ifdef __cplusplus

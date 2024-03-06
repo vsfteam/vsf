@@ -46,317 +46,317 @@ void __NO_RETURN Reset_Handler  (void);
   Exception / Interrupt Handler
  *----------------------------------------------------------------------------*/
 /* Exceptions */
-WEAK(NMI_Handler)
+VSF_CAL_WEAK(NMI_Handler)
 void NMI_Handler            (void){}
 
-WEAK(HardFault_Handler)
+VSF_CAL_WEAK(HardFault_Handler)
 void HardFault_Handler      (void){while(1);}
 
-WEAK(MemManage_Handler)
+VSF_CAL_WEAK(MemManage_Handler)
 void MemManage_Handler      (void){while(1);}
 
-WEAK(BusFault_Handler)
+VSF_CAL_WEAK(BusFault_Handler)
 void BusFault_Handler       (void){while(1);}
 
-WEAK(UsageFault_Handler)
+VSF_CAL_WEAK(UsageFault_Handler)
 void UsageFault_Handler     (void){while(1);}
 
-WEAK(SVC_Handler)
+VSF_CAL_WEAK(SVC_Handler)
 void SVC_Handler            (void){}
 
-WEAK(DebugMon_Handler)
+VSF_CAL_WEAK(DebugMon_Handler)
 void DebugMon_Handler       (void){}
 
-WEAK(PendSV_Handler)
+VSF_CAL_WEAK(PendSV_Handler)
 void PendSV_Handler         (void){}
 
-WEAK(SysTick_Handler)
+VSF_CAL_WEAK(SysTick_Handler)
 void SysTick_Handler        (void){}
 
-WEAK(BOD_IRQHandler)
+VSF_CAL_WEAK(BOD_IRQHandler)
 void BOD_IRQHandler         (void){}
 
-WEAK(IRC_IRQHandler)
+VSF_CAL_WEAK(IRC_IRQHandler)
 void IRC_IRQHandler         (void){}
 
-WEAK(PWRWU_IRQHandler)
+VSF_CAL_WEAK(PWRWU_IRQHandler)
 void PWRWU_IRQHandler       (void){}
 
-WEAK(RAMPE_IRQHandler)
+VSF_CAL_WEAK(RAMPE_IRQHandler)
 void RAMPE_IRQHandler       (void){}
 
-WEAK(CKFAIL_IRQHandler)
+VSF_CAL_WEAK(CKFAIL_IRQHandler)
 void CKFAIL_IRQHandler      (void){}
 
-WEAK(RTC_IRQHandler)
+VSF_CAL_WEAK(RTC_IRQHandler)
 void RTC_IRQHandler         (void){}
 
-WEAK(TAMPER_IRQHandler)
+VSF_CAL_WEAK(TAMPER_IRQHandler)
 void TAMPER_IRQHandler      (void){}
 
-WEAK(WDT_IRQHandler)
+VSF_CAL_WEAK(WDT_IRQHandler)
 void WDT_IRQHandler         (void){}
 
-WEAK(WWDT_IRQHandler)
+VSF_CAL_WEAK(WWDT_IRQHandler)
 void WWDT_IRQHandler        (void){}
 
-WEAK(EINT0_IRQHandler)
+VSF_CAL_WEAK(EINT0_IRQHandler)
 void EINT0_IRQHandler       (void){}
 
-WEAK(EINT1_IRQHandler)
+VSF_CAL_WEAK(EINT1_IRQHandler)
 void EINT1_IRQHandler       (void){}
 
-WEAK(EINT2_IRQHandler)
+VSF_CAL_WEAK(EINT2_IRQHandler)
 void EINT2_IRQHandler       (void){}
 
-WEAK(EINT3_IRQHandler)
+VSF_CAL_WEAK(EINT3_IRQHandler)
 void EINT3_IRQHandler       (void){}
 
-WEAK(EINT4_IRQHandler)
+VSF_CAL_WEAK(EINT4_IRQHandler)
 void EINT4_IRQHandler       (void){}
 
-WEAK(EINT5_IRQHandler)
+VSF_CAL_WEAK(EINT5_IRQHandler)
 void EINT5_IRQHandler       (void){}
 
-WEAK(EINT6_IRQHandler)
+VSF_CAL_WEAK(EINT6_IRQHandler)
 void EINT6_IRQHandler       (void){}
 
-WEAK(EINT7_IRQHandler)
+VSF_CAL_WEAK(EINT7_IRQHandler)
 void EINT7_IRQHandler       (void){}
 
-WEAK(GPA_IRQHandler)
+VSF_CAL_WEAK(GPA_IRQHandler)
 void GPA_IRQHandler         (void){}
 
-WEAK(GPB_IRQHandler)
+VSF_CAL_WEAK(GPB_IRQHandler)
 void GPB_IRQHandler         (void){}
 
-WEAK(GPC_IRQHandler)
+VSF_CAL_WEAK(GPC_IRQHandler)
 void GPC_IRQHandler         (void){}
 
-WEAK(GPD_IRQHandler)
+VSF_CAL_WEAK(GPD_IRQHandler)
 void GPD_IRQHandler         (void){}
 
-WEAK(GPE_IRQHandler)
+VSF_CAL_WEAK(GPE_IRQHandler)
 void GPE_IRQHandler         (void){}
 
-WEAK(GPF_IRQHandler)
+VSF_CAL_WEAK(GPF_IRQHandler)
 void GPF_IRQHandler         (void){}
 
-WEAK(GPG_IRQHandler)
+VSF_CAL_WEAK(GPG_IRQHandler)
 void GPG_IRQHandler         (void){}
 
-WEAK(GPH_IRQHandler)
+VSF_CAL_WEAK(GPH_IRQHandler)
 void GPH_IRQHandler         (void){}
 
-WEAK(QSPI0_IRQHandler)
+VSF_CAL_WEAK(QSPI0_IRQHandler)
 void QSPI0_IRQHandler       (void){}
 
-WEAK(SPI0_IRQHandler)
+VSF_CAL_WEAK(SPI0_IRQHandler)
 void SPI0_IRQHandler        (void){}
 
-WEAK(SPI1_IRQHandler)
+VSF_CAL_WEAK(SPI1_IRQHandler)
 void SPI1_IRQHandler        (void){}
 
-WEAK(SPI2_IRQHandler)
+VSF_CAL_WEAK(SPI2_IRQHandler)
 void SPI2_IRQHandler        (void){}
 
-WEAK(SPI3_IRQHandler)
+VSF_CAL_WEAK(SPI3_IRQHandler)
 void SPI3_IRQHandler        (void){}
 
-WEAK(BRAKE0_IRQHandler)
+VSF_CAL_WEAK(BRAKE0_IRQHandler)
 void BRAKE0_IRQHandler      (void){}
 
-WEAK(PWM0P0_IRQHandler)
+VSF_CAL_WEAK(PWM0P0_IRQHandler)
 void PWM0P0_IRQHandler      (void){}
 
-WEAK(PWM0P1_IRQHandler)
+VSF_CAL_WEAK(PWM0P1_IRQHandler)
 void PWM0P1_IRQHandler      (void){}
 
-WEAK(PWM0P2_IRQHandler)
+VSF_CAL_WEAK(PWM0P2_IRQHandler)
 void PWM0P2_IRQHandler      (void){}
 
-WEAK(BRAKE1_IRQHandler)
+VSF_CAL_WEAK(BRAKE1_IRQHandler)
 void BRAKE1_IRQHandler      (void){}
 
-WEAK(PWM1P0_IRQHandler)
+VSF_CAL_WEAK(PWM1P0_IRQHandler)
 void PWM1P0_IRQHandler      (void){}
 
-WEAK(PWM1P1_IRQHandler)
+VSF_CAL_WEAK(PWM1P1_IRQHandler)
 void PWM1P1_IRQHandler      (void){}
 
-WEAK(PWM1P2_IRQHandler)
+VSF_CAL_WEAK(PWM1P2_IRQHandler)
 void PWM1P2_IRQHandler      (void){}
 
 
-WEAK(TMR0_IRQHandler)
+VSF_CAL_WEAK(TMR0_IRQHandler)
 void TMR0_IRQHandler        (void){}
 
-WEAK(TMR1_IRQHandler)
+VSF_CAL_WEAK(TMR1_IRQHandler)
 void TMR1_IRQHandler        (void){}
 
-WEAK(TMR2_IRQHandler)
+VSF_CAL_WEAK(TMR2_IRQHandler)
 void TMR2_IRQHandler        (void){}
 
-WEAK(TMR3_IRQHandler)
+VSF_CAL_WEAK(TMR3_IRQHandler)
 void TMR3_IRQHandler        (void){}
 
-WEAK(UART0_IRQHandler)
+VSF_CAL_WEAK(UART0_IRQHandler)
 void UART0_IRQHandler       (void){}
 
-WEAK(UART1_IRQHandler)
+VSF_CAL_WEAK(UART1_IRQHandler)
 void UART1_IRQHandler       (void){}
 
-WEAK(UART2_IRQHandler)
+VSF_CAL_WEAK(UART2_IRQHandler)
 void UART2_IRQHandler       (void){}
 
-WEAK(UART3_IRQHandler)
+VSF_CAL_WEAK(UART3_IRQHandler)
 void UART3_IRQHandler       (void){}
 
-WEAK(UART4_IRQHandler)
+VSF_CAL_WEAK(UART4_IRQHandler)
 void UART4_IRQHandler       (void){}
 
-WEAK(UART5_IRQHandler)
+VSF_CAL_WEAK(UART5_IRQHandler)
 void UART5_IRQHandler       (void){}
 
-WEAK(I2C0_IRQHandler)
+VSF_CAL_WEAK(I2C0_IRQHandler)
 void I2C0_IRQHandler        (void){}
 
-WEAK(I2C1_IRQHandler)
+VSF_CAL_WEAK(I2C1_IRQHandler)
 void I2C1_IRQHandler        (void){}
 
-WEAK(I2C2_IRQHandler)
+VSF_CAL_WEAK(I2C2_IRQHandler)
 void I2C2_IRQHandler        (void){}
 
-WEAK(PDMA_IRQHandler)
+VSF_CAL_WEAK(PDMA_IRQHandler)
 void PDMA_IRQHandler        (void){}
 
-WEAK(DAC_IRQHandler)
+VSF_CAL_WEAK(DAC_IRQHandler)
 void DAC_IRQHandler         (void){}
 
-WEAK(ADC00_IRQHandler)
+VSF_CAL_WEAK(ADC00_IRQHandler)
 void ADC00_IRQHandler       (void){}
 
-WEAK(ADC01_IRQHandler)
+VSF_CAL_WEAK(ADC01_IRQHandler)
 void ADC01_IRQHandler       (void){}
 
-WEAK(ACMP01_IRQHandler)
+VSF_CAL_WEAK(ACMP01_IRQHandler)
 void ACMP01_IRQHandler      (void){}
 
-WEAK(ADC02_IRQHandler)
+VSF_CAL_WEAK(ADC02_IRQHandler)
 void ADC02_IRQHandler       (void){}
 
-WEAK(ADC03_IRQHandler)
+VSF_CAL_WEAK(ADC03_IRQHandler)
 void ADC03_IRQHandler       (void){}
 
-WEAK(USBD_IRQHandler)
+VSF_CAL_WEAK(USBD_IRQHandler)
 void USBD_IRQHandler        (void){}
 
-WEAK(OHCI_IRQHandler)
+VSF_CAL_WEAK(OHCI_IRQHandler)
 void OHCI_IRQHandler        (void){}
 
-WEAK(USBOTG_IRQHandler)
+VSF_CAL_WEAK(USBOTG_IRQHandler)
 void USBOTG_IRQHandler      (void){}
 
-WEAK(CAN0_IRQHandler)
+VSF_CAL_WEAK(CAN0_IRQHandler)
 void CAN0_IRQHandler        (void){}
 
-WEAK(CAN1_IRQHandler)
+VSF_CAL_WEAK(CAN1_IRQHandler)
 void CAN1_IRQHandler        (void){}
 
-WEAK(SC0_IRQHandler)
+VSF_CAL_WEAK(SC0_IRQHandler)
 void SC0_IRQHandler         (void){}
 
-WEAK(SC1_IRQHandler)
+VSF_CAL_WEAK(SC1_IRQHandler)
 void SC1_IRQHandler         (void){}
 
-WEAK(SC2_IRQHandler)
+VSF_CAL_WEAK(SC2_IRQHandler)
 void SC2_IRQHandler         (void){}
 
-WEAK(SC3_IRQHandler)
+VSF_CAL_WEAK(SC3_IRQHandler)
 void SC3_IRQHandler         (void){}
 
-WEAK(SDH0_IRQHandler)
+VSF_CAL_WEAK(SDH0_IRQHandler)
 void SDH0_IRQHandler        (void){}
 
-WEAK(SDH1_IRQHandler)
+VSF_CAL_WEAK(SDH1_IRQHandler)
 void SDH1_IRQHandler        (void){}
 
-WEAK(USBD20_IRQHandler)
+VSF_CAL_WEAK(USBD20_IRQHandler)
 void USBD20_IRQHandler      (void){}
 
-WEAK(EMAC_TX_IRQHandler)
+VSF_CAL_WEAK(EMAC_TX_IRQHandler)
 void EMAC_TX_IRQHandler     (void){}
 
-WEAK(EMAC_RX_IRQHandler)
+VSF_CAL_WEAK(EMAC_RX_IRQHandler)
 void EMAC_RX_IRQHandler     (void){}
 
-WEAK(I2S0_IRQHandler)
+VSF_CAL_WEAK(I2S0_IRQHandler)
 void I2S0_IRQHandler        (void){}
 
-WEAK(OPA0_IRQHandler)
+VSF_CAL_WEAK(OPA0_IRQHandler)
 void OPA0_IRQHandler        (void){}
 
-WEAK(CRYPTO_IRQHandler)
+VSF_CAL_WEAK(CRYPTO_IRQHandler)
 void CRYPTO_IRQHandler      (void){}
 
-WEAK(USCI0_IRQHandler)
+VSF_CAL_WEAK(USCI0_IRQHandler)
 void USCI0_IRQHandler       (void){}
 
-WEAK(USCI1_IRQHandler)
+VSF_CAL_WEAK(USCI1_IRQHandler)
 void USCI1_IRQHandler       (void){}
 
-WEAK(BPWM0_IRQHandler)
+VSF_CAL_WEAK(BPWM0_IRQHandler)
 void BPWM0_IRQHandler       (void){}
 
-WEAK(BPWM1_IRQHandler)
+VSF_CAL_WEAK(BPWM1_IRQHandler)
 void BPWM1_IRQHandler       (void){}
 
-WEAK(SPIM_IRQHandler)
+VSF_CAL_WEAK(SPIM_IRQHandler)
 void SPIM_IRQHandler        (void){}
 
-WEAK(QEI0_IRQHandler)
+VSF_CAL_WEAK(QEI0_IRQHandler)
 void QEI0_IRQHandler        (void){}
 
-WEAK(QEI1_IRQHandler)
+VSF_CAL_WEAK(QEI1_IRQHandler)
 void QEI1_IRQHandler        (void){}
 
-WEAK(ECAP0_IRQHandler)
+VSF_CAL_WEAK(ECAP0_IRQHandler)
 void ECAP0_IRQHandler       (void){}
 
-WEAK(ECAP1_IRQHandler)
+VSF_CAL_WEAK(ECAP1_IRQHandler)
 void ECAP1_IRQHandler       (void){}
 
-WEAK(EHCI_IRQHandler)
+VSF_CAL_WEAK(EHCI_IRQHandler)
 void EHCI_IRQHandler        (void){}
 
-WEAK(USBOTG20_IRQHandler)
+VSF_CAL_WEAK(USBOTG20_IRQHandler)
 void USBOTG20_IRQHandler    (void){}
 
-WEAK(SWI0_IRQHandler)
+VSF_CAL_WEAK(SWI0_IRQHandler)
 void SWI0_IRQHandler        (void){}
 
-WEAK(SWI1_IRQHandler)
+VSF_CAL_WEAK(SWI1_IRQHandler)
 void SWI1_IRQHandler        (void){}
 
-WEAK(SWI2_IRQHandler)
+VSF_CAL_WEAK(SWI2_IRQHandler)
 void SWI2_IRQHandler        (void){}
 
-WEAK(SWI3_IRQHandler)
+VSF_CAL_WEAK(SWI3_IRQHandler)
 void SWI3_IRQHandler        (void){}
 
-WEAK(SWI4_IRQHandler)
+VSF_CAL_WEAK(SWI4_IRQHandler)
 void SWI4_IRQHandler        (void){}
 
-WEAK(SWI5_IRQHandler)
+VSF_CAL_WEAK(SWI5_IRQHandler)
 void SWI5_IRQHandler        (void){}
 
-WEAK(SWI6_IRQHandler)
+VSF_CAL_WEAK(SWI6_IRQHandler)
 void SWI6_IRQHandler        (void){}
 
-WEAK(SWI7_IRQHandler)
+VSF_CAL_WEAK(SWI7_IRQHandler)
 void SWI7_IRQHandler        (void){}
 
-WEAK(SWI8_IRQHandler)
+VSF_CAL_WEAK(SWI8_IRQHandler)
 void SWI8_IRQHandler        (void){}
 
 
@@ -369,7 +369,7 @@ void SWI8_IRQHandler        (void){}
 #pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
-ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
+VSF_CAL_ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
     (pFunc)(&__INITIAL_SP),                   /*     Initial Stack Pointer */
     Reset_Handler,                            /*     Reset Handler */
     NMI_Handler,                              /* -14 NMI Handler */
@@ -490,7 +490,7 @@ ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
 #pragma GCC diagnostic pop
 #endif
 
-WEAK(vsf_hal_pre_startup_init)
+VSF_CAL_WEAK(vsf_hal_pre_startup_init)
 void vsf_hal_pre_startup_init(void)
 {}
 

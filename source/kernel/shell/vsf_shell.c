@@ -26,7 +26,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-SECTION(".vsf.feature.kernel")
+VSF_CAL_SECTION(".vsf.feature.kernel")
 const struct {
     union {
         struct {
@@ -56,7 +56,7 @@ const struct {
         };
         uint8_t IPC;
     };
-    
+
     union {
         struct {
             uint16_t    is_support_dynamic_priority     : 1;
@@ -90,7 +90,7 @@ const struct {
     .is_support_bmpevt =            (VSF_KERNEL_CFG_SUPPORT_BITMAP_EVENT ? (true) : false),
     .is_support_premption =         (VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED ? (true) : false),
     .is_support_slist_queue =       (VSF_KERNEL_CFG_SUPPORT_SLIST_QUEUE ? (true) : false),
-    
+
     .is_support_dynamic_priority =  (VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY ? (true) : false),
     .is_support_on_terminate =      (VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE ? true : false),
     .is_support_sub_call =          (VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL ? (true) : false),
@@ -104,7 +104,7 @@ const struct {
  *!     v1.20       Introduce param_eda and the concept of local, arg and param
  *!     v1.1x       Introduce cross call among different types of tasks
  *!     v1.0x       First stable release
- *!     v0.9x       Alpha release 
+ *!     v0.9x       Alpha release
  *!
  */
 /*============================ IMPLEMENTATION ================================*/

@@ -199,14 +199,14 @@ void vsf_usbh_uvc_disconnect_stream(void *param)
     vsf_eda_post_evt((vsf_eda_t *)&uvc->task, VSF_USBH_UVC_EVT_DISCONNECT);
 }
 
-WEAK(vsf_usbh_uvc_on_new)
+VSF_CAL_WEAK(vsf_usbh_uvc_on_new)
 void vsf_usbh_uvc_on_new(void *uvc, usb_uvc_vc_interface_header_desc_t *vc_header,
         usb_uvc_vs_interface_header_desc_t *vs_header)
 {
     // TODO: call av layer as default processor
 }
 
-WEAK(vsf_usbh_uvc_on_del)
+VSF_CAL_WEAK(vsf_usbh_uvc_on_del)
 void vsf_usbh_uvc_on_del(void *uvc)
 {
     // TODO: call av layer as default processor

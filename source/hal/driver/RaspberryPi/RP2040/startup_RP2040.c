@@ -33,10 +33,10 @@
 #include "RP2040.h"
 
 #define __imp_unprocessed_weak_handler(__name)                                  \
-            WEAK(__name)                                                        \
+            VSF_CAL_WEAK(__name)                                                \
             void __name(void){}
 #define __imp_blocked_weak_handler(__name)                                      \
-            WEAK(__name)                                                        \
+            VSF_CAL_WEAK(__name)                                                \
             void __name(void){while(1);}
 
 /*----------------------------------------------------------------------------
@@ -81,7 +81,7 @@ VSF_MFOREACH(__imp_blocked_weak_handler,
   Exception / Interrupt Vector table
  *----------------------------------------------------------------------------*/
 
-ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
+VSF_CAL_ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
     (pFunc)(&__INITIAL_SP),                             /*     Initial Stack Pointer */
     Reset_Handler,                                      /*     Reset Handler */
     NMI_Handler,                                        /* -14 NMI Handler */
@@ -136,7 +136,7 @@ ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
 
 uint32_t __attribute__((section(".ram_vector_table"))) ram_vector_table[dimof(__VECTOR_TABLE)];
 
-WEAK(vsf_hal_pre_startup_init)
+VSF_CAL_WEAK(vsf_hal_pre_startup_init)
 void vsf_hal_pre_startup_init(void)
 {}
 

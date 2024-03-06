@@ -123,13 +123,13 @@ extern void vsf_usbh_on_remove_interface(vk_usbh_ifs_t *ifs);
 
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK(vsf_usbh_on_dev_parsed)
+VSF_CAL_WEAK(vsf_usbh_on_dev_parsed)
 void vsf_usbh_on_dev_parsed(vk_usbh_dev_t *dev, vk_usbh_dev_parser_t *parser)
 {
 
 }
 
-WEAK(vsf_usbh_on_match_interface)
+VSF_CAL_WEAK(vsf_usbh_on_match_interface)
 vsf_err_t vsf_usbh_on_match_interface(
         vk_usbh_dev_parser_t *parser, vk_usbh_ifs_parser_t *parser_ifs)
 {
@@ -140,7 +140,7 @@ vsf_err_t vsf_usbh_on_match_interface(
     return VSF_ERR_NONE;
 }
 
-WEAK(vsf_usbh_on_remove_interface)
+VSF_CAL_WEAK(vsf_usbh_on_remove_interface)
 void vsf_usbh_on_remove_interface(vk_usbh_ifs_t *ifs)
 {
     vsf_trace_info("%s: remove interface" VSF_TRACE_CFG_LINEEND, ifs->drv->name);

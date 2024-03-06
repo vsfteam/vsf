@@ -772,7 +772,7 @@ void vk_usbd_stdreq_data_stage(vk_usbd_dev_t *dev)
     }
 }
 
-WEAK(vsf_usbd_notify_user)
+VSF_CAL_WEAK(vsf_usbd_notify_user)
 vsf_err_t vsf_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *param)
 {
     return VSF_ERR_NONE;

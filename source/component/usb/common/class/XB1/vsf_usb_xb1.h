@@ -58,12 +58,12 @@ struct vsf_usb_xb1_gamepad_in_report_t {
     int16_t ly;             //data12,data13
     int16_t rx;             //data14,data15
     int16_t ry;             //data16,data17
-} PACKED;
+} VSF_CAL_PACKED;
 
 typedef struct vsf_usb_xb1_gamepad_out_report_t vsf_usb_xb1_gamepad_out_report_t;
 struct vsf_usb_xb1_gamepad_out_report_t {
     uint8_t buffer[36];
-} PACKED;
+} VSF_CAL_PACKED;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

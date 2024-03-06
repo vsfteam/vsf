@@ -70,25 +70,25 @@ typedef enum vsf_hal_distbus_gpio_feature_t {
 typedef struct vsf_hal_distbus_gpio_config_pin_t {
     vsf_gpio_pin_mask_t pin_mask;
     uint32_t feature;
-} PACKED vsf_hal_distbus_gpio_config_pin_t;
+} VSF_CAL_PACKED vsf_hal_distbus_gpio_config_pin_t;
 
 typedef struct vsf_hal_distbus_gpio_set_direction_t {
     vsf_gpio_pin_mask_t pin_mask;
     vsf_gpio_pin_mask_t direction_mask;
-} PACKED vsf_hal_distbus_gpio_set_direction_t;
+} VSF_CAL_PACKED vsf_hal_distbus_gpio_set_direction_t;
 
 typedef struct vsf_hal_distbus_gpio_write_t {
     vsf_gpio_pin_mask_t pin_mask;
     vsf_gpio_pin_mask_t value;
-} PACKED vsf_hal_distbus_gpio_write_t;
+} VSF_CAL_PACKED vsf_hal_distbus_gpio_write_t;
 
 typedef struct vsf_hal_distbus_gpio_pin_mask_t {
     vsf_gpio_pin_mask_t pin_mask;
-} PACKED vsf_hal_distbus_gpio_pin_mask_t;
+} VSF_CAL_PACKED vsf_hal_distbus_gpio_pin_mask_t;
 
 typedef struct vsf_hal_distbus_gpio_sync_t {
     vsf_gpio_pin_mask_t value;
-} PACKED vsf_hal_distbus_gpio_sync_t;
+} VSF_CAL_PACKED vsf_hal_distbus_gpio_sync_t;
 #endif
 
 typedef struct vsf_hal_distbus_gpio_info_t {
@@ -100,7 +100,7 @@ typedef struct vsf_hal_distbus_gpio_info_t {
 
     vsf_gpio_pin_mask_t direction;
     vsf_gpio_pin_mask_t value;
-} PACKED vsf_hal_distbus_gpio_info_t;
+} VSF_CAL_PACKED vsf_hal_distbus_gpio_info_t;
 
 vsf_class(vsf_hal_distbus_gpio_t) {
 #if VSF_HAL_DISTBUS_GPIO_CFG_MULTI_CLASS == ENABLED

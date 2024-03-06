@@ -249,7 +249,7 @@ typedef vsf_eda_evthandler_t    vsf_task_entry_t;
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 #   if VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-SECTION(".text.vsf.kernel.eda_task")
+VSF_CAL_SECTION(".text.vsf.kernel.eda_task")
 extern fsm_rt_t __vsf_eda_call_task(vsf_task_entry_t entry,
                                     uintptr_t param,
                                     size_t local_size);

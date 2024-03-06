@@ -80,7 +80,7 @@ typedef struct vsf_trace_t {
 #if VSF_USE_SIMPLE_STREAM == ENABLED
 static vsf_trace_t __vsf_trace;
 #elif VSF_USE_STREAM == ENABLED
-NO_INIT static vsf_stream_writer_t __vsf_trace;
+VSF_CAL_NO_INIT static vsf_stream_writer_t __vsf_trace;
 #endif
 
 #if VSF_TRACE_CFG_COLOR_EN == ENABLED
@@ -241,7 +241,7 @@ void vsf_trace_string(vsf_trace_level_t level, const char *str)
     __vsf_trace_set_level(VSF_TRACE_CFG_DEFAULT_LEVEL);
 }
 
-SECTION(".text.vsf.trace.__vsf_trace_buffer")
+VSF_CAL_SECTION(".text.vsf.trace.__vsf_trace_buffer")
 void __vsf_trace_buffer(vsf_trace_level_t level,
                         void *buffer,
                         uint_fast16_t len,
@@ -400,37 +400,37 @@ void vsf_bgtrace_print(vsf_bgtrace_t *bgtrace, int cnt)
 }
 
 // default retarget to vsf_trace
-WEAK(vsf_stdout_init)
+VSF_CAL_WEAK(vsf_stdout_init)
 void vsf_stdout_init(void)
 {
     VSF_SERVICE_ASSERT(__vsf_trace_is_inited());
 }
 
-WEAK(vsf_stderr_init)
+VSF_CAL_WEAK(vsf_stderr_init)
 void vsf_stderr_init(void)
 {
     VSF_SERVICE_ASSERT(__vsf_trace_is_inited());
 }
 
-WEAK(vsf_stdin_init)
+VSF_CAL_WEAK(vsf_stdin_init)
 void vsf_stdin_init(void)
 {
     VSF_SERVICE_ASSERT(__vsf_trace_is_inited());
 }
 
-WEAK(vsf_stdout_putchar)
+VSF_CAL_WEAK(vsf_stdout_putchar)
 int vsf_stdout_putchar(char ch)
 {
     return __vsf_trace_output(&ch, 1);
 }
 
-WEAK(vsf_stderr_putchar)
+VSF_CAL_WEAK(vsf_stderr_putchar)
 int vsf_stderr_putchar(char ch)
 {
     return __vsf_trace_output(&ch, 1);
 }
 
-WEAK(vsf_stdin_getchar)
+VSF_CAL_WEAK(vsf_stdin_getchar)
 int vsf_stdin_getchar(void)
 {
     while(1);

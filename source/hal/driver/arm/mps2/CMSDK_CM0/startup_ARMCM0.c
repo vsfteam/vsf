@@ -46,7 +46,7 @@ void __NO_RETURN Reset_Handler  (void);
   Exception / Interrupt Handler
  *----------------------------------------------------------------------------*/
 #define WEAK_ISR(__NAME, ...)                                                   \
-    WEAK(__NAME)                                                                \
+    VSF_CAL_WEAK(__NAME)                                                        \
     void __NAME(void) { __VA_ARGS__ }
 
 /* Exceptions */
@@ -107,7 +107,7 @@ void GPIO0_7_Handler        (void) __attribute__ ((weak, alias("Default_Handler"
 */
 
 #define __DECLARE_SWI_IRQ_HANDLER(__N, __NULL)                                  \
-    WEAK_ISR(SWI##__N##_IRQHandler)                                             
+    WEAK_ISR(SWI##__N##_IRQHandler)
 
 VSF_MREPEAT(VSF_DEV_SWI_NUM, __DECLARE_SWI_IRQ_HANDLER, NULL)
 
@@ -177,7 +177,7 @@ VSF_MREPEAT(VSF_DEV_SWI_NUM, __DECLARE_SWI_IRQ_HANDLER, NULL)
 #pragma GCC diagnostic pop
 #endif
 
-WEAK(vsf_hal_pre_startup_init) 
+WEAK(vsf_hal_pre_startup_init)
 void vsf_hal_pre_startup_init(void)
 {}
 

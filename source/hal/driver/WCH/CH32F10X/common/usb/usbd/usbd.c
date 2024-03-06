@@ -185,7 +185,7 @@ static const char * __ch32f10x_usbd_trace_str[VSF_USBD_TRACE_NUM] = {
 static void __ch32f10x_usbd_trace(vsf_usbd_trace_t item)
 {
 #   if CH32F10X_USBD_CFG_TRACE == CH32F10X_USBD_CFG_TRACE_ARR
-    static volatile ROOT vsf_usbd_trace_t __trace_items[512];
+    static volatile VSF_CAL_ROOT vsf_usbd_trace_t __trace_items[512];
     static int __trace_pos = 0;
 
     if (__trace_pos < dimof(__trace_items)) {
@@ -396,7 +396,7 @@ void ch32f10x_usbd_disconnect(ch32f10x_usbd_t *usbd)
 
 void ch32f10x_usbd_wakeup(ch32f10x_usbd_t *usbd)
 {
-    
+
 }
 
 void ch32f10x_usbd_set_address(ch32f10x_usbd_t *usbd, uint_fast8_t addr)

@@ -99,7 +99,7 @@ uint32_t vsf_loader_xip_read(vsf_loader_target_t *target, uint32_t offset, void 
     return size;
 }
 
-WEAK(vsf_loader_link)
+VSF_CAL_WEAK(vsf_loader_link)
 void * vsf_loader_link(vsf_loader_t *loader, const char *name)
 {
     return NULL;

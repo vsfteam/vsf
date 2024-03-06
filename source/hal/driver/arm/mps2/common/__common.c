@@ -36,7 +36,7 @@
 #endif
 
 #define __MPS2_SWI(__N, __VALUE)                                                \
-    ROOT ISR(SWI##__N##_IRQHandler)                                             \
+    VSF_CAL_ROOT VSF_CAL_ISR(SWI##__N##_IRQHandler)                             \
     {                                                                           \
         if (__mps2_common.swi[__N].handler != NULL) {                           \
             __mps2_common.swi[__N].handler(__mps2_common.swi[__N].pparam);      \
@@ -81,9 +81,9 @@ static __mps2_common_t __mps2_common;
 VSF_MREPEAT(__VSF_DEV_SWI_NUM, __MPS2_SWI, NULL)
 #endif
 
-static ALWAYS_INLINE vsf_err_t vsf_drv_swi_init(uint_fast8_t idx, 
+static VSF_CAL_ALWAYS_INLINE vsf_err_t vsf_drv_swi_init(uint_fast8_t idx,
                                                 vsf_arch_prio_t priority,
-                                                vsf_swi_handler_t *handler, 
+                                                vsf_swi_handler_t *handler,
                                                 void *pparam)
 {
 #if __VSF_DEV_SWI_NUM > 0
@@ -98,7 +98,7 @@ static ALWAYS_INLINE vsf_err_t vsf_drv_swi_init(uint_fast8_t idx,
             NVIC_DisableIRQ(mps2_soft_irq[idx]);
         }
         return VSF_ERR_NONE;
-    } 
+    }
     VSF_HAL_ASSERT(false);
     return VSF_ERR_INVALID_RANGE;
 #else
@@ -107,7 +107,7 @@ static ALWAYS_INLINE vsf_err_t vsf_drv_swi_init(uint_fast8_t idx,
 #endif
 }
 
-static ALWAYS_INLINE void vsf_drv_swi_trigger(uint_fast8_t idx)
+static VSF_CAL_ALWAYS_INLINE void vsf_drv_swi_trigger(uint_fast8_t idx)
 {
 #if __VSF_DEV_SWI_NUM > 0
     if (idx < __VSF_DEV_SWI_NUM) {
@@ -146,9 +146,9 @@ void vsf_drv_usr_swi_trigger(uint_fast8_t idx)
     VSF_HAL_ASSERT(false);
 }
 
-vsf_err_t vsf_drv_usr_swi_init( uint_fast8_t idx, 
+vsf_err_t vsf_drv_usr_swi_init( uint_fast8_t idx,
                                 vsf_arch_prio_t priority,
-                                vsf_swi_handler_t *handler, 
+                                vsf_swi_handler_t *handler,
                                 void *param)
 {
 #if __VSF_HAL_SWI_NUM > VSF_ARCH_SWI_NUM || !defined(__VSF_HAL_SWI_NUM)

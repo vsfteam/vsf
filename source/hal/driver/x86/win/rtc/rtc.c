@@ -23,8 +23,6 @@
 
 // for vsf_trace_warning
 #include "service/vsf_service.h"
-// for NO_INIT
-#include "utilities/vsf_utilities.h"
 
 #include <Windows.h>
 

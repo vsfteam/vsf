@@ -32,7 +32,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_USE_APPLET == ENABLED
-WEAK(vsf_vplt)
+VSF_CAL_WEAK(vsf_vplt)
 __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_vplt_t, 0, 0, false),
 
@@ -98,7 +98,7 @@ static void * __vsf_vplt_link(void *vplt, char *symname)
     return NULL;
 }
 
-WEAK(vsf_vplt_link)
+VSF_CAL_WEAK(vsf_vplt_link)
 void * vsf_vplt_link(void *vplt, char *symname)
 {
     if (NULL == vplt) {
@@ -171,24 +171,24 @@ int vsf_vplt_load_dyn(vsf_vplt_info_t *info)
 
 #if (VSF_USE_APPLET == ENABLED || VSF_LINUX_USE_APPLET == ENABLED) && !defined(__VSF_APPLET__)
 
-WEAK(vsf_vplt_init_array)
+VSF_CAL_WEAK(vsf_vplt_init_array)
 int vsf_vplt_init_array(void *target) { return -1; }
-WEAK(vsf_vplt_fini_array)
+VSF_CAL_WEAK(vsf_vplt_fini_array)
 void vsf_vplt_fini_array(void *target) { }
 
-WEAK(vsf_applet_ctx)
+VSF_CAL_WEAK(vsf_applet_ctx)
 vsf_applet_ctx_t * vsf_applet_ctx(void)
 {
     return NULL;
 }
 
-WEAK(vsf_applet_remap)
+VSF_CAL_WEAK(vsf_applet_remap)
 void * vsf_applet_remap(vsf_applet_ctx_t *ctx, void *vaddr)
 {
     return vaddr;
 }
 
-WEAK(vsf_vplt_trace_arg)
+VSF_CAL_WEAK(vsf_vplt_trace_arg)
 void vsf_vplt_trace_arg(const char* fmt, va_list arg)
 {
 #   if VSF_USE_TRACE == ENABLED

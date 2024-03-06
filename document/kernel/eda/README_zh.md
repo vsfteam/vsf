@@ -164,8 +164,8 @@ typedef struct vsf_eda_cfg_t {
 ```c
 #include "vsf.h"
 
-/* NO_INIT 表示对应的内存不需要初始化 */
-static NO_INIT vsf_eda_t __eda_task;
+/* VSF_CAL_NO_INIT 表示对应的内存不需要初始化 */
+static VSF_CAL_NO_INIT vsf_eda_t __eda_task;
 
 static void __user_eda_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
@@ -197,8 +197,8 @@ int VSF_USER_ENTRY(void)
 ```c
 #include "vsf.h"
 
-/* NO_INIT 表示对应的内存不需要初始化 */
-static NO_INIT vsf_teda_t __teda_task;
+/* VSF_CAL_NO_INIT 表示对应的内存不需要初始化 */
+static VSF_CAL_NO_INIT vsf_teda_t __teda_task;
 
 static void __user_teda_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
@@ -263,9 +263,9 @@ typedef enum vsf_sync_reason_t {
 ```c
 #include "vsf.h"
 
-static NO_INIT vsf_sem_t __user_sem;
-static NO_INIT vsf_teda_t __teda_a;
-static NO_INIT vsf_eda_t __eda_b;
+static VSF_CAL_NO_INIT vsf_sem_t __user_sem;
+static VSF_CAL_NO_INIT vsf_teda_t __teda_a;
+static VSF_CAL_NO_INIT vsf_eda_t __eda_b;
 
 static void __user_teda_a_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
@@ -332,9 +332,9 @@ int VSF_USER_ENTRY(void)
 ```c
 #include "vsf.h"
 
-static NO_INIT vsf_mutex_t __user_mutex;
-static NO_INIT vsf_teda_t __teda_a;
-static NO_INIT vsf_teda_t __teda_b;
+static VSF_CAL_NO_INIT vsf_mutex_t __user_mutex;
+static VSF_CAL_NO_INIT vsf_teda_t __teda_a;
+static VSF_CAL_NO_INIT vsf_teda_t __teda_b;
 
 static void __user_teda_a_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
@@ -429,9 +429,9 @@ int VSF_USER_ENTRY(void)
 ```c
 #include "vsf.h"
 
-static NO_INIT vsf_trig_t __user_trig;
-static NO_INIT vsf_teda_t __teda_a;
-static NO_INIT vsf_eda_t __eda_b;
+static VSF_CAL_NO_INIT vsf_trig_t __user_trig;
+static VSF_CAL_NO_INIT vsf_teda_t __teda_a;
+static VSF_CAL_NO_INIT vsf_eda_t __eda_b;
 
 static void __user_teda_a_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {

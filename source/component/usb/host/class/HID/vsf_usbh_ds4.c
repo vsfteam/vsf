@@ -119,31 +119,31 @@ extern void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt);
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_DS4 == ENABLED
-WEAK(vsf_ds4u_on_new_dev)
+VSF_CAL_WEAK(vsf_ds4u_on_new_dev)
 void vsf_ds4u_on_new_dev(vk_input_ds4u_t *dev)
 {
     vsf_input_on_new_dev(VSF_INPUT_TYPE_DS4, dev);
 }
 
-WEAK(vsf_ds4u_on_free_dev)
+VSF_CAL_WEAK(vsf_ds4u_on_free_dev)
 void vsf_ds4u_on_free_dev(vk_input_ds4u_t *dev)
 {
     vsf_input_on_free_dev(VSF_INPUT_TYPE_DS4, dev);
 }
 
-WEAK(vsf_ds4u_on_report_parsed)
+VSF_CAL_WEAK(vsf_ds4u_on_report_parsed)
 void vsf_ds4u_on_report_parsed(vk_input_evt_t *evt)
 {
     vsf_input_on_evt(VSF_INPUT_TYPE_SYNC, evt);
 }
 
-WEAK(vsf_ds4u_on_gamepad)
+VSF_CAL_WEAK(vsf_ds4u_on_gamepad)
 void vsf_ds4u_on_gamepad(vk_gamepad_evt_t *gamepad_evt)
 {
     vsf_input_on_gamepad(gamepad_evt);
 }
 
-WEAK(vsf_ds4u_on_sensor)
+VSF_CAL_WEAK(vsf_ds4u_on_sensor)
 void vsf_ds4u_on_sensor(vk_sensor_evt_t *sensor_evt)
 {
     vsf_input_on_sensor(sensor_evt);
@@ -242,7 +242,7 @@ void vk_ds4u_process_input(vk_input_ds4u_t *dev, vsf_usb_ds4_gamepad_in_report_t
 }
 #endif
 
-WEAK(vsf_usbh_ds4_on_report_input)
+VSF_CAL_WEAK(vsf_usbh_ds4_on_report_input)
 void vsf_usbh_ds4_on_report_input(vk_usbh_ds4_t *ds4, vsf_usb_ds4_gamepad_in_report_t *report)
 {
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_DS4 == ENABLED
@@ -250,12 +250,12 @@ void vsf_usbh_ds4_on_report_input(vk_usbh_ds4_t *ds4, vsf_usb_ds4_gamepad_in_rep
 #endif
 }
 
-WEAK(vsf_usbh_ds4_on_report_output)
+VSF_CAL_WEAK(vsf_usbh_ds4_on_report_output)
 void vsf_usbh_ds4_on_report_output(vk_usbh_ds4_t *ds4)
 {
 }
 
-WEAK(vsf_usbh_ds4_on_new)
+VSF_CAL_WEAK(vsf_usbh_ds4_on_new)
 void vsf_usbh_ds4_on_new(vk_usbh_ds4_t *ds4)
 {
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_DS4 == ENABLED
@@ -263,7 +263,7 @@ void vsf_usbh_ds4_on_new(vk_usbh_ds4_t *ds4)
 #endif
 }
 
-WEAK(vsf_usbh_ds4_on_free)
+VSF_CAL_WEAK(vsf_usbh_ds4_on_free)
 void vsf_usbh_ds4_on_free(vk_usbh_ds4_t *ds4)
 {
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_DS4 == ENABLED

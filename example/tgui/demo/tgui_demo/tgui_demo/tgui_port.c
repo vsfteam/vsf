@@ -591,7 +591,7 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* gui_ptr)
 }
 
 #ifndef WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH
-WEAK(vsf_tgui_low_level_on_ready_to_refresh)
+VSF_CAL_WEAK(vsf_tgui_low_level_on_ready_to_refresh)
 void vsf_tgui_low_level_on_ready_to_refresh(void)
 {
 }

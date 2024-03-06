@@ -88,7 +88,7 @@ typedef struct usb_ctrlrequest_t {
     uint16_t wValue;
     uint16_t wIndex;
     uint16_t wLength;
-} PACKED usb_ctrlrequest_t;
+} VSF_CAL_PACKED usb_ctrlrequest_t;
 
 enum usb_req_t {
     USB_REQ_GET_STATUS          = 0x00,
@@ -174,13 +174,13 @@ enum usb_desc_type_t {
 typedef struct usb_descriptor_header_t {
     uint8_t  bLength;
     uint8_t  bDescriptorType;
-} PACKED usb_descriptor_header_t;
+} VSF_CAL_PACKED usb_descriptor_header_t;
 
 typedef struct usb_class_interface_desc_t {
     uint8_t  bLength;
     uint8_t  bDescriptorType;
     uint8_t  bDescriptorSubType;
-} PACKED usb_class_interface_desc_t;
+} VSF_CAL_PACKED usb_class_interface_desc_t;
 
 typedef struct usb_device_desc_t {
     uint8_t  bLength;
@@ -198,7 +198,7 @@ typedef struct usb_device_desc_t {
     uint8_t  iProduct;
     uint8_t  iSerialNumber;
     uint8_t  bNumConfigurations;
-} PACKED usb_device_desc_t;
+} VSF_CAL_PACKED usb_device_desc_t;
 
 typedef struct usb_config_desc_t {
     uint8_t  bLength;
@@ -210,7 +210,7 @@ typedef struct usb_config_desc_t {
     uint8_t  iConfiguration;
     uint8_t  bmAttributes;
     uint8_t  bMaxPower;
-} PACKED usb_config_desc_t;
+} VSF_CAL_PACKED usb_config_desc_t;
 
 enum usb_config_desc_att_t {
     USB_CONFIG_ATT_ONE          = (1 << 7),     /* must be set */
@@ -235,7 +235,7 @@ typedef struct usb_interface_desc_t {
     uint8_t  bInterfaceSubClass;
     uint8_t  bInterfaceProtocol;
     uint8_t  iInterface;
-} PACKED usb_interface_desc_t;
+} VSF_CAL_PACKED usb_interface_desc_t;
 
 typedef struct usb_endpoint_desc_t {
     uint8_t  bLength;
@@ -250,7 +250,7 @@ typedef struct usb_endpoint_desc_t {
     /* use USB_DT_ENDPOINT*_SIZE in bLength, not sizeof. */
     uint8_t  bRefresh;
     uint8_t  bSynchAddress;
-} PACKED usb_endpoint_desc_t;
+} VSF_CAL_PACKED usb_endpoint_desc_t;
 
 typedef struct usb_interface_assoc_desc_t {
     uint8_t  bLength;
@@ -262,7 +262,7 @@ typedef struct usb_interface_assoc_desc_t {
     uint8_t  bFunctionSubClass;
     uint8_t  bFunctionProtocol;
     uint8_t  iFunction;
-} PACKED usb_interface_assoc_desc_t;
+} VSF_CAL_PACKED usb_interface_assoc_desc_t;
 
 typedef enum usb_device_speed_t {
     USB_SPEED_UNKNOWN = 0,          /* enumerating */

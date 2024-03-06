@@ -104,7 +104,7 @@ typedef struct ntp_packet_header_t {
 
     uint32_t TransmitTimestampSeconds;
     uint32_t TransmitTimestampFraction;
-} PACKED ntp_packet_header_t;
+} VSF_CAL_PACKED ntp_packet_header_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

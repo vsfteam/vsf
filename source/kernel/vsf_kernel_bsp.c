@@ -81,7 +81,7 @@ extern int VSF_USER_ENTRY(void);
 
 /*============================ IMPLEMENTATION ================================*/
 
-ROOT
+VSF_CAL_ROOT
 const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 {
 
@@ -121,21 +121,21 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
 
-    static NO_INIT vsf_evtq_t __vsf_os_evt_queue[VSF_OS_CFG_PRIORITY_NUM];
+    static VSF_CAL_NO_INIT vsf_evtq_t __vsf_os_evt_queue[VSF_OS_CFG_PRIORITY_NUM];
 
 #   if defined(__VSF_OS_CFG_EVTQ_LIST) && defined(VSF_OS_CFG_EVTQ_POOL_SIZE)
-    static NO_INIT vsf_pool_item(vsf_evt_node_pool)
+    static VSF_CAL_NO_INIT vsf_pool_item(vsf_evt_node_pool)
         __evt_node_buffer[VSF_OS_CFG_EVTQ_POOL_SIZE];
 #   endif
 
 #   if defined(__VSF_OS_CFG_EVTQ_ARRAY)
-    static NO_INIT vsf_evt_node_t
+    static VSF_CAL_NO_INIT vsf_evt_node_t
         __vsf_os_nodes[VSF_OS_CFG_PRIORITY_NUM][1 << VSF_OS_CFG_EVTQ_BITSIZE];
 #   endif
 #endif
 
 #if     __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
-    static NO_INIT vsf_pool_item(vsf_eda_frame_pool)
+    static VSF_CAL_NO_INIT vsf_pool_item(vsf_eda_frame_pool)
         __vsf_eda_frame_buffer[VSF_OS_CFG_EDA_FRAME_POOL_SIZE];
 #endif
 
@@ -255,16 +255,16 @@ static void __app_main_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 }
 #endif
 
-ROOT void __post_vsf_kernel_init(void)
+VSF_CAL_ROOT void __post_vsf_kernel_init(void)
 {
 #if     VSF_OS_CFG_MAIN_MODE == VSF_OS_CFG_MAIN_MODE_THREAD                     \
     &&  VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
 
 #   if VSF_KERNEL_THREAD_USE_HOST == ENABLED
-    // no set stack, host_thread is used, remove NO_INIT because host_thread need to be initialized to 0
+    // no set stack, host_thread is used, remove VSF_CAL_NO_INIT because host_thread need to be initialized to 0
     static app_main_thread_t __app_main;
 #   else
-    static NO_INIT app_main_thread_t __app_main;
+    static VSF_CAL_NO_INIT app_main_thread_t __app_main;
 #   endif
 
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
@@ -288,14 +288,14 @@ ROOT void __post_vsf_kernel_init(void)
         .priority = vsf_prio_0,
     };
 #   if  VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-    static NO_INIT vsf_teda_t __app_main;
+    static VSF_CAL_NO_INIT vsf_teda_t __app_main;
 #       if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     __app_main  .use_as__vsf_eda_t
                 .on_terminate = NULL;
 #       endif
     vsf_teda_start(&__app_main, (vsf_eda_cfg_t *)&cfg);
 #   else
-    static NO_INIT vsf_eda_t __app_main;
+    static VSF_CAL_NO_INIT vsf_eda_t __app_main;
 #       if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     __app_main  .on_terminate = NULL;
 #       endif
@@ -315,8 +315,7 @@ will be forced to DISABLED.
 }
 
 #if VSF_USE_HEAP == ENABLED && VSF_ARCH_PROVIDE_HEAP != ENABLED
-#ifndef WEAK_VSF_SERVICE_REQ___HEAP_MEMORY_BUFFER___FROM_USR
-WEAK(vsf_service_req___heap_memory_buffer___from_usr)
+VSF_CAL_WEAK(vsf_service_req___heap_memory_buffer___from_usr)
 vsf_mem_t vsf_service_req___heap_memory_buffer___from_usr(void)
 {
 #ifndef VSF_HEAP_SIZE
@@ -329,7 +328,7 @@ this macro in vsf_usr_cfg.h or you can call vsf_heap_add()/vsf_heap_add_memory()
 #if     defined(VSF_HEAP_ADDR)
     uint8_t *__heap_buffer = (uint8_t *)(VSF_HEAP_ADDR);
 #else
-    NO_INIT static uint_fast8_t __heap_buffer[
+    VSF_CAL_NO_INIT static uint_fast8_t __heap_buffer[
         (VSF_HEAP_SIZE + sizeof(uint_fast8_t) - 1) / sizeof(uint_fast8_t)];
 #endif
 
@@ -339,7 +338,6 @@ this macro in vsf_usr_cfg.h or you can call vsf_heap_add()/vsf_heap_add_memory()
     };
 #endif
 }
-#endif
 #endif
 
 // call __vsf_main_entry in a standalone host-os thread
@@ -357,7 +355,7 @@ __asm(".global __ARM_use_no_argv\n\t");
  * Compiler Specific Code to run __vsf_main_entry() before main()             *
  *----------------------------------------------------------------------------*/
 #if __IS_COMPILER_IAR__
-WEAK(__low_level_init)
+VSF_CAL_WEAK(__low_level_init)
 LOW_LEVEL_INIT_RET_T __low_level_init(void)
 {
     return 1;

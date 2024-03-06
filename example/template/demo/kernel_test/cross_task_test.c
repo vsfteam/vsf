@@ -98,7 +98,7 @@ def_vsf_thread(user_thread_a0_t, 1024,
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-static NO_INIT vsf_sem_t __user_sem;
+static VSF_CAL_NO_INIT vsf_sem_t __user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -250,7 +250,7 @@ void vsf_kernel_cross_call_demo(void)
 
     //! start a user task
     {
-        static NO_INIT user_pt_task_t __user_pt;
+        static VSF_CAL_NO_INIT user_pt_task_t __user_pt;
         memset(&__user_pt, 0, sizeof(user_pt_task_t));
         __user_pt.param.sem_ptr = &__user_sem;
         init_vsf_pt(user_pt_task_t, &__user_pt, vsf_prio_0);
@@ -261,7 +261,7 @@ void vsf_kernel_cross_call_demo(void)
 
     //! start the user task a
     {
-        static NO_INIT user_thread_a0_t __user_task_a;
+        static VSF_CAL_NO_INIT user_thread_a0_t __user_task_a;
         __user_task_a.param.sem_ptr = &__user_sem;
         init_vsf_thread(user_thread_a0_t, &__user_task_a, vsf_prio_0);
     }
@@ -270,7 +270,7 @@ void vsf_kernel_cross_call_demo(void)
 
     //! start a user task b
     {
-        static NO_INIT user_pt_task_b_t __user_pt_task_b;
+        static VSF_CAL_NO_INIT user_pt_task_b_t __user_pt_task_b;
         __user_pt_task_b.param.sem_ptr = &__user_sem;
         __user_pt_task_b.param.cnt = 0;
         init_vsf_pt(user_pt_task_b_t, &__user_pt_task_b, vsf_prio_0);

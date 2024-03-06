@@ -84,19 +84,15 @@ const vk_usbh_class_drv_t vk_usbh_dfu_drv = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_USBH_DFU_ON_NEW
-WEAK(vsf_usbh_dfu_on_new)
+VSF_CAL_WEAK(vsf_usbh_dfu_on_new)
 void vsf_usbh_dfu_on_new(void *dfu)
 {
 }
-#endif
 
-#ifndef WEAK_VSF_USBH_DFU_ON_NEW
-WEAK(vsf_usbh_dfu_on_free)
+VSF_CAL_WEAK(vsf_usbh_dfu_on_free)
 void vsf_usbh_dfu_on_free(void *dfu)
 {
 }
-#endif
 
 static vsf_err_t __vk_usbh_dfu_detach(vk_usbh_dfu_t *dfu, uint_fast16_t timeout)
 {

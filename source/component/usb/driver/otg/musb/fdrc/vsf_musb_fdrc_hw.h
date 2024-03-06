@@ -209,7 +209,7 @@ typedef struct vk_musb_fdrc_epn_dynfifo_reg_t {
     volatile vk_musb_reg_t RxFIFOSz;
     volatile uint16_t TxFIFOAdd;
     volatile uint16_t RxFIFOAdd;
-} PACKED vk_musb_fdrc_epn_dynfifo_reg_t;
+} VSF_CAL_PACKED vk_musb_fdrc_epn_dynfifo_reg_t;
 #endif
 
 typedef union vk_musb_fdrc_fifo_reg_t {
@@ -268,7 +268,7 @@ typedef struct vk_musb_fdrc_reg_t {
 #   endif
     // some musb instance have no hw fifo, so need fifos from user(driver)
     // granularity of musb fifo is 8-byte
-    uint64_t __fifo[VSF_MUSB_FDRC_FIFO_SIZE >> 3] ALIGN(8);
+    uint64_t __fifo[VSF_MUSB_FDRC_FIFO_SIZE >> 3] VSF_CAL_ALIGN(8);
     vk_musb_fdrc_fifo_reg_t __fifo_reg[2];
 #endif
 } vk_musb_fdrc_reg_t;

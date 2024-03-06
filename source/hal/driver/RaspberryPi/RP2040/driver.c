@@ -345,7 +345,7 @@ uint32_t clock_get_hz(enum clock_index clk_index) {
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
  */
-WEAK(vsf_driver_init)
+VSF_CAL_WEAK(vsf_driver_init)
 bool vsf_driver_init(void)
 {
     // Reset all peripherals to put system into a known state,

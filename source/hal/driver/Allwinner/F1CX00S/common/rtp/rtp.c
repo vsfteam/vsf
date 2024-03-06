@@ -33,12 +33,12 @@ vsf_rtp_t VSF_RTP0  = {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK(vsf_hal_on_rtp)
+VSF_CAL_WEAK(vsf_hal_on_rtp)
 void vsf_hal_on_rtp(vsf_rtp_t *rtp, uint_fast8_t id, bool is_down, uint_fast16_t x, uint_fast16_t y)
 {
 }
 
-__arm void TouchPanel_Handler(void) 
+__arm void TouchPanel_Handler(void)
 {
     int x, y;
     uint_fast32_t val;

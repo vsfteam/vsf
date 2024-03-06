@@ -46,7 +46,7 @@
 #   pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
-SECTION(".text.vsf.kernel.__vsf_delay")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_delay")
 vsf_evt_t __vsf_delay(uint_fast32_t tick)
 {
     vsf_evt_t result = VSF_EVT_INVALID;
@@ -99,7 +99,7 @@ vsf_evt_t __vsf_delay(uint_fast32_t tick)
 
 
 
-SECTION(".text.vsf.kernel.__vsf_sem_pend")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_sem_pend")
 vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *sem_ptr, int_fast32_t time_out)
 {
     vsf_sync_reason_t result = VSF_SYNC_PENDING;
@@ -146,7 +146,7 @@ vsf_sync_reason_t __vsf_sem_pend(vsf_sem_t *sem_ptr, int_fast32_t time_out)
     return result;
 }
 
-SECTION(".text.vsf.kernel.vsf_mutex_enter")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_mutex_enter")
 vsf_sync_reason_t __vsf_mutex_enter(vsf_mutex_t *mtx_ptr, int_fast32_t time_out)
 {
     VSF_KERNEL_ASSERT(NULL != mtx_ptr);
@@ -155,7 +155,7 @@ vsf_sync_reason_t __vsf_mutex_enter(vsf_mutex_t *mtx_ptr, int_fast32_t time_out)
 
 #endif
 
-SECTION(".text.vsf.kernel.vsf_yield")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_yield")
 vsf_evt_t __vsf_yield(void)
 {
     vsf_evt_t result = VSF_EVT_YIELD;
@@ -189,7 +189,7 @@ vsf_evt_t __vsf_yield(void)
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
 
-SECTION(".text.vsf.kernel.vsf_call_eda_ex")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_call_eda_ex")
 extern vsf_err_t __vsf_call_eda(uintptr_t evthandler,
                                 uintptr_t param,
                                 size_t local_size,
@@ -237,7 +237,7 @@ extern vsf_err_t __vsf_call_eda(uintptr_t evthandler,
 }
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TASK == ENABLED && VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE == ENABLED
-SECTION(".text.vsf.kernel.__vsf_call_task")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_call_task")
 fsm_rt_t __vsf_call_task(vsf_task_entry_t entry, uintptr_t param, size_t local_size)
 {
     vsf_eda_t *eda = vsf_eda_get_cur();

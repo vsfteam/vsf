@@ -57,35 +57,33 @@ extern "C" {
 
 //! \brief 1 cycle nop operation
 #ifndef NOP
-    #define NOP()               __asm__ __volatile__ ("nop");
+    #define NOP()                       __asm__ __volatile__ ("nop");
 #endif
 
 
 //! \brief none standard memory types
 #if __IS_COMPILER_IAR__
-#   define ROM_FLASH            _Pragma(__VSF_STR(location=".rom.flash")) const
-#   define ROM_EEPROM           _Pragma(__VSF_STR(location=".rom.eeprom")) const
-#   define NO_INIT              __no_init
-#   define ROOT                 __root
-#   define INLINE               inline
-#   define NO_INLINE            __attribute__((noinline))
-#   define ALWAYS_INLINE        inline __attribute__((always_inline))
-#   define WEAK(...)            __weak
-#   define RAMFUNC              __ramfunc
-#   define __asm__              __asm
-#   define __ALIGN(__N)         __attribute__((aligned (__N)))
-#   define __AT_ADDR(__ADDR)    @ __ADDR
-#   define __SECTION(__SEC)     __attribute__((section (__SEC)))
-#   define __WEAK_ALIAS(__ORIGIN, __ALIAS) \
-                                _Pragma(__VSF_STR(weak __ORIGIN=__ALIAS))
-#   define PACKED               __attribute__((packed))
-#   define UNALIGNED            __attribute__((packed))
-#   define TRANSPARENT_UNION    __attribute__((transparent_union))
-#   define __ALIGN_OF(...)      __ALIGNOF__(__VA_ARGS__)
+#   define VSF_CAL_NO_INIT              __no_init
+#   define VSF_CAL_ROOT                 __root
+#   define VSF_CAL_INLINE               inline
+#   define VSF_CAL_NO_INLINE            __attribute__((noinline))
+#   define VSF_CAL_ALWAYS_INLINE        inline __attribute__((always_inline))
+#   define VSF_CAL_WEAK(...)            __weak
+#   define VSF_CAL_RAMFUNC              __ramfunc
+#   define __asm__                      __asm
+#   define __VSF_CAL_ALIGN(__N)         __attribute__((aligned (__N)))
+#   define __VSF_CAL_AT_ADDR(__ADDR)    @ __ADDR
+#   define __VSF_CAL_SECTION(__SEC)     __attribute__((section (__SEC)))
+#   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS) \
+                                        _Pragma(__VSF_STR(weak __ORIGIN=__ALIAS))
+#   define VSF_CAL_PACKED               __attribute__((packed))
+#   define VSF_CAL_UNALIGNED            __attribute__((packed))
+#   define VSF_CAL_TRANSPARENT_UNION    __attribute__((transparent_union))
+#   define __VSF_CAL_ALIGN_OF(...)      __ALIGNOF__(__VA_ARGS__)
 
-#   define __IAR_STARTUP_DATA_INIT  __iar_data_init3
+#   define __IAR_STARTUP_DATA_INIT      __iar_data_init3
 
-#   define __ISR(__VEC)       void __VEC(void)
+#   define __VSF_CAL_ISR(__VEC)         void __VEC(void)
 
 #endif
 

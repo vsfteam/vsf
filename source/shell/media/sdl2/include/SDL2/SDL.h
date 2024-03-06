@@ -373,7 +373,7 @@ typedef struct SDL_Surface {
     SDL_PixelFormat __format;
     void *pixels;
 
-    uint32_t __pixels[0] ALIGN(4);
+    uint32_t __pixels[0] VSF_CAL_ALIGN(4);
 } SDL_Surface;
 
 typedef struct SDL_DisplayMode {

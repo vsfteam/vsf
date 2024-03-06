@@ -149,7 +149,7 @@ const vk_usbh_hcd_drv_t vsf_usb_hcd_drv = {
 
 // USB_HC0 is usb host controller hardware instance, so use upper-case
 //  use singleton here to avoid allocation on heap
-static NO_INIT f1cx00s_usbh_hcd_t USB_HC0;
+static VSF_CAL_NO_INIT f1cx00s_usbh_hcd_t USB_HC0;
 
 /*============================ IMPLEMENTATION ================================*/
 

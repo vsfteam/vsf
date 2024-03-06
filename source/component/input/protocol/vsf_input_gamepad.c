@@ -31,13 +31,11 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_INPUT_ON_GAMEPAD
-WEAK(vsf_input_on_gamepad)
+VSF_CAL_WEAK(vsf_input_on_gamepad)
 void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt)
 {
     vsf_input_on_evt(VSF_INPUT_TYPE_GAMEPAD, &gamepad_evt->use_as__vk_input_evt_t);
 }
-#endif
 
 void vk_gamepad_input_parse(void *dev, vk_input_item_info_t *item_info,
                         uint8_t *pre, uint8_t *cur)

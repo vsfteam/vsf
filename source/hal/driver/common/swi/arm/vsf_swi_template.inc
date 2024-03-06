@@ -26,7 +26,7 @@ Please read the "vsf_swi_template.h" header file for usage
 #endif
 
 #define __MCU_SWI(__N, __VALUE)                                                 \
-    ROOT ISR(SWI##__N##_IRQHandler)                                             \
+    VSF_CAL_ROOT VSF_CAL_ISR(SWI##__N##_IRQHandler)                             \
     {                                                                           \
         if (__mcu_common.swi[__N].handler != NULL) {                            \
             __mcu_common.swi[__N].handler(__mcu_common.swi[__N].param);         \
@@ -75,9 +75,9 @@ WEAK_VSF_USR_SWI_TRIGGER_EXTERN
 #if __VSF_DEV_SWI_NUM > 0
 VSF_MREPEAT(__VSF_DEV_SWI_NUM, __MCU_SWI, NULL)
 
-static ALWAYS_INLINE vsf_err_t __vsf_drv_swi_init(uint_fast8_t idx, 
+static VSF_CAL_ALWAYS_INLINE vsf_err_t __vsf_drv_swi_init(uint_fast8_t idx,
                                                 vsf_arch_prio_t priority,
-                                                vsf_swi_handler_t *handler, 
+                                                vsf_swi_handler_t *handler,
                                                 void *param)
 {
     if (idx < __VSF_DEV_SWI_NUM) {
@@ -96,7 +96,7 @@ static ALWAYS_INLINE vsf_err_t __vsf_drv_swi_init(uint_fast8_t idx,
     return VSF_ERR_FAIL;
 }
 
-static ALWAYS_INLINE void __vsf_drv_swi_trigger(uint_fast8_t idx)
+static VSF_CAL_ALWAYS_INLINE void __vsf_drv_swi_trigger(uint_fast8_t idx)
 {
     if (idx < __VSF_DEV_SWI_NUM) {
         NVIC_SetPendingIRQ(__mcu_soft_irq[idx]);
@@ -109,13 +109,11 @@ static ALWAYS_INLINE void __vsf_drv_swi_trigger(uint_fast8_t idx)
 #if __VSF_HAL_SWI_NUM > 0 || !defined(__VSF_HAL_SWI_NUM)
 // SWI
 
-#ifndef WEAK_VSF_USR_SWI_TRIGGER
-WEAK(vsf_usr_swi_trigger)
+VSF_CAL_WEAK(vsf_usr_swi_trigger)
 void vsf_usr_swi_trigger(uint_fast8_t idx)
 {
     VSF_HAL_ASSERT(false);
 }
-#endif
 
 void vsf_drv_usr_swi_trigger(uint_fast8_t idx)
 {
@@ -143,21 +141,19 @@ void vsf_drv_usr_swi_trigger(uint_fast8_t idx)
 #endif
 }
 
-#ifndef WEAK_VSF_USR_SWI_INIT
-WEAK(vsf_usr_swi_init)
-vsf_err_t vsf_usr_swi_init(     uint_fast8_t idx, 
+VSF_CAL_WEAK(vsf_usr_swi_init)
+vsf_err_t vsf_usr_swi_init(     uint_fast8_t idx,
                                 vsf_arch_prio_t priority,
-                                vsf_swi_handler_t *handler, 
+                                vsf_swi_handler_t *handler,
                                 void *param)
 {
     VSF_HAL_ASSERT(false);
     return VSF_ERR_FAIL;
 }
-#endif
 
-vsf_err_t vsf_drv_usr_swi_init( uint_fast8_t idx, 
+vsf_err_t vsf_drv_usr_swi_init( uint_fast8_t idx,
                                 vsf_arch_prio_t priority,
-                                vsf_swi_handler_t *handler, 
+                                vsf_swi_handler_t *handler,
                                 void *param)
 {
 #if __VSF_HAL_SWI_NUM > VSF_ARCH_SWI_NUM || !defined(__VSF_HAL_SWI_NUM)

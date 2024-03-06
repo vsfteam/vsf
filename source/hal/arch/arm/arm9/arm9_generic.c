@@ -48,7 +48,7 @@ typedef volatile struct vsf_arm9_swi_t {
 
 
 #if VSF_ARCH_SWI_NUM > 0
-static NO_INIT vsf_arm9_swi_t __vsf_arm9_swi;
+static VSF_CAL_NO_INIT vsf_arm9_swi_t __vsf_arm9_swi;
 #endif
 
 /*============================ PROTOTYPES ====================================*/
@@ -74,7 +74,7 @@ bool vsf_arch_low_level_init(void)
  * SWI                                                                        *
  *----------------------------------------------------------------------------*/
 #if VSF_ARCH_SWI_NUM > 0
-ROOT ISR(SWI_Handler)
+VSF_CAL_ROOT VSF_CAL_ISR(SWI_Handler)
 {
     /*!  loop until there is no enabled pending swi whose priority is higher
      *!  than base

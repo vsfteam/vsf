@@ -39,10 +39,10 @@ def_fsm(user_fsm_task_t,
     def_params(
         vsf_sem_t *sem_ptr;
         uint32_t cnt;
-        
+
         vsf_task(user_fsm_sub_task_t) print_task;
     ));
-    
+
 #if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
 declare_vsf_fsm(user_task_b_t)
 def_fsm(user_task_b_t,
@@ -59,7 +59,7 @@ def_vsf_thread(user_thread_a_t, 1024,
         mem_sharable( )
         mem_nonsharable( )
     )
-    
+
     def_params(
         vsf_sem_t *sem_ptr;
     ));
@@ -67,7 +67,7 @@ def_vsf_thread(user_thread_a_t, 1024,
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-static NO_INIT vsf_sem_t __user_sem;
+static VSF_CAL_NO_INIT vsf_sem_t __user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -81,15 +81,15 @@ vsf_fsm_initialiser(user_fsm_sub_task_t,
     )
 
 
-implement_vsf_fsm(user_fsm_sub_task_t) 
+implement_vsf_fsm(user_fsm_sub_task_t)
     def_states(PRINT_INFO);
-    
-    vsf_fsm_body(                                                                       
+
+    vsf_fsm_body(
         //! this can be ignored
         on_start(
             update_state_to(PRINT_INFO);
         )
-    
+
         vsf_state(PRINT_INFO) {
             printf("receive semaphore...[%08x]\r\n", vsf_this.cnt++);
             vsf_fsm_cpl();
@@ -112,11 +112,11 @@ vsf_fsm_initialiser(user_fsm_task_t,
  * Example of unprotected fsm                                                 *
  * NOTE: you can debug content between body_begin() and body_end()            *
  *----------------------------------------------------------------------------*/
-implement_vsf_fsm(user_fsm_task_t) 
+implement_vsf_fsm(user_fsm_task_t)
 {
     def_states(WAIT_FOR_SEM, CALL_SUB_TO_PRINT);
 
-    vsf_fsm_begin();                                             
+    vsf_fsm_begin();
 
     /*! this can be ignored
     on_start(
@@ -126,13 +126,13 @@ implement_vsf_fsm(user_fsm_task_t)
 
     vsf_state(WAIT_FOR_SEM) {
         vsf_sem_pend(vsf_this.sem_ptr){                                         //!< wait for semaphore forever
-            init_vsf_fsm(   user_fsm_sub_task_t, 
-                            &vsf_this.print_task, 
+            init_vsf_fsm(   user_fsm_sub_task_t,
+                            &vsf_this.print_task,
                             vsf_args(vsf_this.cnt));    //!< init sub fsm
             transfer_to(CALL_SUB_TO_PRINT);                                     //!< transfer to next vsf_state
         }
     }
-    
+
     vsf_state(CALL_SUB_TO_PRINT) {
         if (fsm_rt_cpl == call_vsf_fsm(user_fsm_sub_task_t, &vsf_this.print_task)) {
             //! fsm complete
@@ -141,7 +141,7 @@ implement_vsf_fsm(user_fsm_task_t)
         }
     }
 
-    vsf_fsm_end();  
+    vsf_fsm_end();
 }
 
 #if VSF_KERNEL_CFG_SUPPORT_THREAD != ENABLED
@@ -161,28 +161,28 @@ vsf_fsm_initialiser(user_task_b_t,
  * Example of protected fsm                                                   *
  * NOTE: content in vsf_fsm_body() is protected from debug                            *
  *----------------------------------------------------------------------------*/
-implement_vsf_fsm(user_task_b_t) 
+implement_vsf_fsm(user_task_b_t)
     def_states(DELAY, PRINT);
-    
+
     vsf_fsm_body(
         on_start(
             update_state_to(DELAY);
         )
-        
+
         vsf_state(DELAY){
             vsf_task_wait_until(vsf_delay_ms(3000))                            //!< wait 10s
             update_state_to(PRINT);                                             //!< transfer to PRINT without yielding...
         }
-        
+
         vsf_state(PRINT){
             printf("post semaphore...   [%08x]\r\n", vsf_this.cnt++);
             vsf_sem_post(vsf_this.sem_ptr);                                            //!< post a semaphore
             reset_vsf_fsm();                                                        //!< reset fsm
         }
-        
+
     )
 #else
-implement_vsf_thread(user_thread_a_t) 
+implement_vsf_thread(user_thread_a_t)
 {
     uint32_t cnt = 0;
     while (1) {
@@ -196,13 +196,13 @@ implement_vsf_thread(user_thread_a_t)
 
 
 void vsf_kernel_fsm_simple_demo(void)
-{   
+{
     //! initialise semaphore
-    vsf_sem_init(&__user_sem, 0); 
-    
+    vsf_sem_init(&__user_sem, 0);
+
     //! start a user task
     {
-        static NO_INIT user_fsm_task_t __user_task;
+        static VSF_CAL_NO_INIT user_fsm_task_t __user_task;
         init_vsf_fsm(user_fsm_task_t, &(__user_task.param), vsf_args(&__user_sem));
         start_vsf_fsm(user_fsm_task_t, &__user_task, vsf_prio_0);
     };
@@ -210,7 +210,7 @@ void vsf_kernel_fsm_simple_demo(void)
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     //! start the user task a
     {
-        static NO_INIT user_thread_a_t __user_task_a;
+        static VSF_CAL_NO_INIT user_thread_a_t __user_task_a;
         __user_task_a.param.sem_ptr = &__user_sem;
         init_vsf_thread(user_thread_a_t, &__user_task_a, vsf_prio_0);
     }
@@ -218,7 +218,7 @@ void vsf_kernel_fsm_simple_demo(void)
     //! in this case, we only use main to initialise vsf_tasks
     //! start a user task b
     {
-        static NO_INIT user_task_b_t __user_task_b;
+        static VSF_CAL_NO_INIT user_task_b_t __user_task_b;
         init_vsf_fsm(user_task_b_t, &(__user_task_b.param), args(&__user_sem));
         start_vsf_fsm(user_task_b_t, &__user_task_b, vsf_prio_0);
     };
@@ -238,9 +238,9 @@ int main(void)
     )
 
     vsf_stdio_init();
-    
+
     vsf_kernel_fsm_simple_demo();
-    
+
     while(1) {
         printf("hello world! \r\n");
         vsf_delay_ms(1000);
@@ -264,9 +264,9 @@ void main(void)
     vsf_pt_begin()
 
     vsf_stdio_init();
-    
+
     vsf_kernel_fsm_simple_demo();
-    
+
     vsf_this.cnt = 0;
     while(1) {
         printf("hello world! \r\n");
@@ -274,13 +274,13 @@ void main(void)
     }
     vsf_pt_end()
 }
-#else 
+#else
 int main(void)
 {
     vsf_stdio_init();
-    
+
     vsf_kernel_fsm_simple_demo();
-    
+
     return 0;
 }
 

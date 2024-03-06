@@ -40,7 +40,7 @@ typedef struct vsf_dma_t {
 /*============================ LOCAL VARIABLES ===============================*/
 
 #if VSF_HAL_USE_DMA == ENABLED
-static NO_INIT vsf_dma_t __dma;
+static VSF_CAL_NO_INIT vsf_dma_t __dma;
 const uint16_t __dma_max_trans_size[DMA_CHANNEL_COUNT] = {
     DMA_CHANNEL_MAX_TRANS_SIZES
 };

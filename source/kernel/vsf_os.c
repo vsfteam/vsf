@@ -72,7 +72,7 @@ typedef struct vsf_os_t {
 #if __VSF_OS_SWI_NUM > 0
 static bool __vsf_os_is_inited = false;
 #endif
-static NO_INIT vsf_os_t __vsf_os;
+static VSF_CAL_NO_INIT vsf_os_t __vsf_os;
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -84,7 +84,7 @@ extern void __post_vsf_kernel_init(void);
 extern vsf_err_t vsf_kernel_start(void);
 
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
-SECTION(".text.vsf.kernel.__vsf_set_cur_evtq")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_set_cur_evtq")
 extern vsf_evtq_t *__vsf_set_cur_evtq(vsf_evtq_t *new_ptr);
 extern vsf_err_t vsf_evtq_poll(vsf_evtq_t *this_ptr);
 #endif
@@ -115,8 +115,8 @@ const vsf_protect_region_t vsf_protect_region_sched = {
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-SECTION(".text.vsf.kernel.vsf_eda_new_frame")
-WEAK(vsf_eda_new_frame)
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_eda_new_frame")
+VSF_CAL_WEAK(vsf_eda_new_frame)
 __vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size)
 {
     //! make sure local_size is aligned with sizeof(uintalu_t);
@@ -151,8 +151,8 @@ __vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size)
     return frame;
 }
 
-SECTION(".text.vsf.kernel.vsf_eda_free_frame")
-WEAK(vsf_eda_free_frame)
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_eda_free_frame")
+VSF_CAL_WEAK(vsf_eda_free_frame)
 void vsf_eda_free_frame(__vsf_eda_frame_t *frame)
 {
     /* todo: add smart pool support in the future */
@@ -551,7 +551,7 @@ void vsf_cpu_usage_stop(void)
 }
 #endif
 
-WEAK(vsf_plug_in_on_kernel_idle)
+VSF_CAL_WEAK(vsf_plug_in_on_kernel_idle)
 void vsf_plug_in_on_kernel_idle(void)
 {
 #ifdef VSF_DEBUG_STREAM_NEED_POLL
@@ -561,13 +561,13 @@ void vsf_plug_in_on_kernel_idle(void)
 #endif
 }
 
-WEAK(vsf_plug_in_for_kernel_diagnosis)
+VSF_CAL_WEAK(vsf_plug_in_for_kernel_diagnosis)
 void vsf_plug_in_for_kernel_diagnosis(void)
 {
     //! doing nothing here
 }
 
-WEAK(__post_vsf_kernel_init)
+VSF_CAL_WEAK(__post_vsf_kernel_init)
 void __post_vsf_kernel_init(void)
 {
 }

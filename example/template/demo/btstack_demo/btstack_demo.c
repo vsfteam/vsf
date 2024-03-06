@@ -45,10 +45,10 @@ void btstack_assert_failed(const char * file, uint16_t line_nr){
 }
 #endif
 
-WEAK(btstack_install)
+VSF_CAL_WEAK(btstack_install)
 void btstack_install(void) {}
 
-WEAK(btstack_main)
+VSF_CAL_WEAK(btstack_main)
 int btstack_main(int argc, const char * argv[]) { return 0; }
 
 #if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_BTHCI == ENABLED

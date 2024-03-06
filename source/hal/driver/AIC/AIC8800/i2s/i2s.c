@@ -69,7 +69,7 @@ typedef struct vsf_hw_i2s_t {
         bool                    path_opened;
         vsf_i2s_isr_handler_t   *isrhandler;
         void                    *isr_param;
-    } ALIGN(8) rx, tx;
+    } VSF_CAL_ALIGN(8) rx, tx;
 } vsf_hw_i2s_t;
 
 /*============================ INCLUDES ======================================*/

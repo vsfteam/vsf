@@ -47,7 +47,7 @@ static __vsf_arch_template_t __vsf_arch_template;
 /*----------------------------------------------------------------------------*
  * Infrastructure                                                             *
  *----------------------------------------------------------------------------*/
-/*! \note initialize architecture specific service 
+/*! \note initialize architecture specific service
  *  \param none
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
@@ -62,7 +62,7 @@ bool vsf_arch_low_level_init(void)
  *----------------------------------------------------------------------------*/
 
 #ifdef VSF_SYSTIMER_CFG_IMPL_MODE
-#   if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       
+#   if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 
 vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void)
 {
@@ -71,12 +71,12 @@ vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void)
 
 void vsf_systimer_clear_int_pending_bit(void)
 {
-    
+
 }
 
 void vsf_systimer_reset_counter_value(void)
 {
-    
+
 }
 
 /*! \brief disable systimer and return over-flow flag status
@@ -93,31 +93,31 @@ bool vsf_systimer_low_level_disable(void)
  */
 void vsf_systimer_low_level_enable(void)
 {
-    
+
 }
 
 void vsf_systimer_low_level_int_disable(void)
 {
-    
+
 }
 
 void vsf_systimer_low_level_int_enable(void)
 {
-    
+
 }
 
 void vsf_systimer_set_reload_value(vsf_systimer_tick_t tick_cnt)
 {
-    
+
 }
 
-ROOT ISR(SysTick_Handler)
-{   
+VSF_CAL_ROOT VSF_CAL_ISR(SysTick_Handler)
+{
     vsf_systimer_ovf_evt_handler();
 }
 
 
-/*! \brief initialise systimer without enable it 
+/*! \brief initialise systimer without enable it
  */
 vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks )
 {
@@ -134,7 +134,7 @@ vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks )
 #if VSF_ARCH_SWI_NUM > 0
 
 // TODO: implement swi interrupt(s)
-ROOT ISR(SWI_Handler)
+VSF_CAL_ROOT VSF_CAL_ISR(SWI_Handler)
 {
     if (__vsf_arch_template.swi[0].handler != NULL) {
         __vsf_arch_template.swi[0].handler(__vsf_arch_template.swi[0].param);
@@ -145,9 +145,9 @@ ROOT ISR(SWI_Handler)
  *! \param idx the index of the software interrupt
  *! \return initialization result in vsf_err_t
  */
-vsf_err_t vsf_arch_swi_init(uint_fast8_t idx, 
+vsf_err_t vsf_arch_swi_init(uint_fast8_t idx,
                             vsf_arch_prio_t priority,
-                            vsf_swi_handler_t *handler, 
+                            vsf_swi_handler_t *handler,
                             void *param)
 {
     if (idx < VSF_ARCH_SWI_NUM) {

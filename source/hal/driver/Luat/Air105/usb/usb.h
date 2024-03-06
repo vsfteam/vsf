@@ -70,7 +70,7 @@ typedef struct vk_musb_fdrc_common_reg_t {
     volatile uint8_t Index;
     volatile uint8_t Dummy[1 + 0x50];
     volatile uint8_t DevCtl;
-} PACKED vk_musb_fdrc_common_reg_t;
+} VSF_CAL_PACKED vk_musb_fdrc_common_reg_t;
 #endif
 
 typedef struct vsf_hw_usb_const_t {

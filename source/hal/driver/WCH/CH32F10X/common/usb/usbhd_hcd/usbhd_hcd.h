@@ -96,7 +96,7 @@ vsf_class(hc32f10x_usbhd_hcd_t) {
         uint8_t cur_size;
         bool is_transacting;
         void *cur_buffer;
-        uint8_t ep_buffer[64] ALIGN(4);
+        uint8_t ep_buffer[64] VSF_CAL_ALIGN(4);
     )
 };
 typedef struct hc32f10x_usbhd_hcd_t hc32f10x_usbhd_hcd_t;

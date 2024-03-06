@@ -51,7 +51,7 @@ const vk_usbd_class_op_t vk_usbd_dfu = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK(vsf_usbd_dfu_download)
+VSF_CAL_WEAK(vsf_usbd_dfu_download)
 vsf_err_t vsf_usbd_dfu_download(vk_usbd_dfu_t *dfu, uint32_t addr, uint8_t *buffer, uint16_t size)
 {
     return VSF_ERR_NONE;

@@ -51,7 +51,7 @@ struct vk_romfs_header_t {
     uint32_t size;
     uint32_t checksum;
     uint8_t name[16];
-} PACKED;
+} VSF_CAL_PACKED;
 typedef struct vk_romfs_header_t vk_romfs_header_t;
 
 vsf_class(vk_romfs_file_t) {

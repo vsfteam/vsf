@@ -27,8 +27,8 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#ifdef COMPILER_WRAPPER
-#   define VSF_SHELL_WRAPPER(__header, __api)       COMPILER_WRAPPER(__api)
+#ifdef VSF_CAL_WRAPPER
+#   define VSF_SHELL_WRAPPER(__header, __api)       VSF_CAL_WRAPPER(__api)
 #else
 #   define __VSF_SHELL_API_NAME(__header, __api)    __ ## header ## _ ## __api
 #   define VSF_SHELL_WRAPPER(__header, __api)       __VSF_SHELL_API_NAME(__header, __api)

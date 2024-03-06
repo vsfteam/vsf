@@ -221,7 +221,7 @@ const char * inet_ntop(int af, const void *src, char *dst, socklen_t size)
 }
 
 // fcntl, dedicated driver can over-write this common version
-WEAK(__vsf_linux_socket_inet_fcntl)
+VSF_CAL_WEAK(__vsf_linux_socket_inet_fcntl)
 int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     switch (cmd) {
@@ -759,13 +759,13 @@ fail:
 
 #if VSF_LINUX_SOCKET_USE_INET == ENABLED
 // ifaddrs.h
-WEAK(getifaddrs)
+VSF_CAL_WEAK(getifaddrs)
 int getifaddrs(struct ifaddrs **ifaddrs)
 {
     return 0;
 }
 
-WEAK(freeifaddrs)
+VSF_CAL_WEAK(freeifaddrs)
 void freeifaddrs(struct ifaddrs *ifaddrs)
 {
 }

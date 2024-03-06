@@ -39,7 +39,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 #if VSF_STREAM_CFG_GENERAL_PBUF_POOL == ENABLED
-NO_INIT vsf_pool(general_pbuf_pool_t) g_tGeneralPBUFPool;
+VSF_CAL_NO_INIT vsf_pool(general_pbuf_pool_t) g_tGeneralPBUFPool;
 #endif
 
 const i_stream_src_t VSF_STREAM_SRC = {
@@ -52,7 +52,7 @@ const i_stream_src_t VSF_STREAM_SRC = {
 };
 
 
-const i_stream_usr_t VSF_STREAM_USR = {  
+const i_stream_usr_t VSF_STREAM_USR = {
     .Init =             &vsf_stream_usr_init,
 #if VSF_STREAM_CFG_SUPPORT_OPEN_CLOSE == ENABLED
     .Open =             &vsf_stream_usr_open,
@@ -82,13 +82,13 @@ vsf_stream_tx_t *vsf_stream_src_get_tx(vsf_stream_src_t *obj_ptr)
     return this.ptTX;
 }
 
-vsf_err_t vsf_stream_src_init(  vsf_stream_src_t *obj_ptr, 
+vsf_err_t vsf_stream_src_init(  vsf_stream_src_t *obj_ptr,
                                 const vsf_stream_src_cfg_t *cfg_ptr)
 {
     class_internal(obj_ptr, this_ptr, vsf_stream_src_t);
     vsf_err_t result = VSF_ERR_INVALID_PARAMETER;
 
-    /*! \note check them separately to avoid busfault, in order to give the right 
+    /*! \note check them separately to avoid busfault, in order to give the right
               diagnosis info
      */
     VSF_SERVICE_ASSERT(     (NULL != this_ptr)
@@ -106,12 +106,12 @@ vsf_err_t vsf_stream_src_init(  vsf_stream_src_t *obj_ptr,
         if (NULL == this.tRequestPBUFEvent.handler_fn) {
     #if VSF_STREAM_CFG_GENERAL_PBUF_POOL == ENABLED
             //! using general pbuf pool
-            this.tRequestPBUFEvent = vsf_pbuf_pool_req_pbuf_evt( general_pbuf_pool_t, 
+            this.tRequestPBUFEvent = vsf_pbuf_pool_req_pbuf_evt( general_pbuf_pool_t,
                                                                 &g_tGeneralPBUFPool);
     #   if VSF_STREAM_CFG_SUPPORT_RESOURCE_LIMITATION == ENABLED
             if (0 == this.hwpbufPoolReserve) {
-                /*! \note non-privileged user of general pbuf pool will reserve 
-                 *        specific count of pbuf for privileged (0xFF) users 
+                /*! \note non-privileged user of general pbuf pool will reserve
+                 *        specific count of pbuf for privileged (0xFF) users
                  *        by default (hwpbufPoolReserve equals 0x00)
                  */
                 this.hwpbufPoolReserve = GENERAL_PBUF_POLL_PRIV_USER_COUNT;
@@ -137,7 +137,7 @@ vsf_pbuf_t *vsf_stream_src_new_pbuf (      vsf_stream_src_t *obj_ptr,
                                            int_fast32_t nBestSize)
 {
     class_internal(obj_ptr, this_ptr, vsf_stream_src_t);
-    /*! \note check them separately to avoid busfault, in order to give the right 
+    /*! \note check them separately to avoid busfault, in order to give the right
               diagnosis info
      */
     VSF_SERVICE_ASSERT(NULL != obj_ptr);
@@ -163,8 +163,8 @@ vsf_pbuf_t *vsf_stream_src_new_pbuf (      vsf_stream_src_t *obj_ptr,
         }
     #endif
         VSF_SERVICE_ASSERT(NULL != this.tRequestPBUFEvent.handler_fn);
-        pbuf =  this.tRequestPBUFEvent.handler_fn(this.tRequestPBUFEvent.target_ptr, 
-                                                nNoLessThan, 
+        pbuf =  this.tRequestPBUFEvent.handler_fn(this.tRequestPBUFEvent.target_ptr,
+                                                nNoLessThan,
                                                 nBestSize,
     #if VSF_STREAM_CFG_SUPPORT_RESOURCE_LIMITATION == ENABLED
                                                 this.hwpbufPoolReserve
@@ -186,19 +186,19 @@ vsf_err_t vsf_stream_src_set_limitation(    vsf_stream_src_t *obj_ptr,
 {
     class_internal(obj_ptr, this_ptr, vsf_stream_src_t);
     VSF_SERVICE_ASSERT(NULL != obj_ptr);
-    
+
     this.hwpbufCountUpLimit = hwpbufCountUpLimit;
     this.hwpbufPoolReserve = hwpbufPoolReserve;
     return VSF_ERR_NONE;
 }
 #endif
 
-vsf_err_t vsf_stream_src_send_pbuf (vsf_stream_src_t *obj_ptr, 
+vsf_err_t vsf_stream_src_send_pbuf (vsf_stream_src_t *obj_ptr,
                                     vsf_pbuf_t *ptOldBlock)
 {
     class_internal(obj_ptr, this_ptr, vsf_stream_src_t);
 
-    /*! \note check them separately to avoid busfault, in order to give the right 
+    /*! \note check them separately to avoid busfault, in order to give the right
               diagnosis info
      */
     VSF_SERVICE_ASSERT(NULL != obj_ptr);
@@ -220,13 +220,13 @@ vsf_err_t vsf_stream_src_send_pbuf (vsf_stream_src_t *obj_ptr,
  * STREAM USER                                                                *
  *----------------------------------------------------------------------------*/
 
-vsf_err_t vsf_stream_usr_init(  vsf_stream_usr_t *obj_ptr, 
+vsf_err_t vsf_stream_usr_init(  vsf_stream_usr_t *obj_ptr,
                                 const vsf_stream_usr_cfg_t *cfg_ptr)
 {
     class_internal(obj_ptr, this_ptr, vsf_stream_usr_t);
     vsf_err_t result = VSF_ERR_INVALID_PARAMETER;
 
-    /*! \note check them separately to avoid busfault, in order to give the right 
+    /*! \note check them separately to avoid busfault, in order to give the right
               diagnosis info
      */
     VSF_SERVICE_ASSERT(     (NULL != this_ptr)
@@ -243,11 +243,11 @@ vsf_err_t vsf_stream_usr_init(  vsf_stream_usr_t *obj_ptr,
         this.ptRX = cfg_ptr->ptRX;
         /*
         this.ptRX->piMethod->DataReadyEvent.Register(
-                                                this.ptRX, 
+                                                this.ptRX,
                                                 cfg_ptr->tDataReadyEventHandling);
         */
     } while(0);
- 
+
     return result;
 }
 
@@ -256,7 +256,7 @@ vsf_pbuf_t *vsf_stream_usr_fetch_pbuf ( vsf_stream_usr_t *obj_ptr)
 {
     class_internal(obj_ptr, this_ptr, vsf_stream_usr_t);
 
-    /*! \note check them separately to avoid busfault, in order to give the right 
+    /*! \note check them separately to avoid busfault, in order to give the right
               diagnosis info
      */
     VSF_SERVICE_ASSERT(NULL != obj_ptr);

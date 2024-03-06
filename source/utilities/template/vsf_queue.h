@@ -48,48 +48,48 @@
 
     // 3. Implement your ring buffer with specific atom access protection macro:
     implement_vsf_rng_buf(<ring buffer name>, <item type>, <atom access macro>)
-    
+
     NOTE: You can use vsf_interrupt_safe_simple for interrupt, use __vsf_sched_safe for
           scheduler, use NO_RNG_BUF_PROTECT for no protection
 
     // 4. Defining your ring buffer variable
-    NO_INIT static <ring buffer name> <ring buffer var>;
+    VSF_CAL_NO_INIT static <ring buffer name> <ring buffer var>;
 
-    // 5. Initialise a ring buffer with specific ring buffer buffer 
+    // 5. Initialise a ring buffer with specific ring buffer buffer
     vsf_rng_buf_init( <ring buffer name>, <item type>, <address of ring buffer var>, <item count>);
 
     // 6. If you want to initialise a ring buffer with a given buffer, use vsf_rng_buf_prepare
           rather than vsf_rng_buf_init above:
-    vsf_rng_buf_prepare(  <ring buffer name>, 
-                        <address of ring buffer var>, 
-                        <address of buffer>, 
+    vsf_rng_buf_prepare(  <ring buffer name>,
+                        <address of ring buffer var>,
+                        <address of buffer>,
                         <size of ring buffer buffer> );
 
     // 7. Use following macro for enqueue, dequeue and peek one item:
-    vsf_rng_buf_send(  <ring buffer name>, 
-                        <address of ring buffer var>, 
+    vsf_rng_buf_send(  <ring buffer name>,
+                        <address of ring buffer var>,
                         <Item>);
-    vsf_rng_buf_get(  <ring buffer name>, 
-                        <address of ring buffer var>, 
+    vsf_rng_buf_get(  <ring buffer name>,
+                        <address of ring buffer var>,
                         <address of item buffer>);
-    vsf_rng_buf_peek(     <ring buffer name>, 
-                        <address of ring buffer var>, 
+    vsf_rng_buf_peek(     <ring buffer name>,
+                        <address of ring buffer var>,
                         <address of item pointer>);
 
     NOTE: Peek returns a reference to existing data in the ring buffer, there is no copy access
 
     // 8. Use following macro for enqueue, dequeue and peek multiple items:
-    vsf_rng_buf_send(  <ring buffer name>, 
-                        <address of ring buffer var>, 
-                        <address of item buffer>, 
+    vsf_rng_buf_send(  <ring buffer name>,
+                        <address of ring buffer var>,
+                        <address of item buffer>,
                         <number of Items>);
-    vsf_rng_buf_get(  <ring buffer name>, 
-                        <address of ring buffer var>, 
-                        <address of item buffer>, 
+    vsf_rng_buf_get(  <ring buffer name>,
+                        <address of ring buffer var>,
+                        <address of item buffer>,
                         <number of Items>);
-    vsf_rng_buf_peek(     <ring buffer name>, 
-                        <address of ring buffer var>, 
-                        <address of item pointer>, 
+    vsf_rng_buf_peek(     <ring buffer name>,
+                        <address of ring buffer var>,
+                        <address of item pointer>,
                         <number of Items>);
 
     NOTE: Peek returns a reference to existing data in the ring buffer, there is no copy access
@@ -117,12 +117,12 @@
 
     void vsf_ring_buffer_example(void)
     {
-        NO_INIT static my_hword_queue_t __queue;
+        VSF_CAL_NO_INIT static my_hword_queue_t __queue;
 
         static uint16_t __temp[] = { 0x1234, 0x5678 };
         static uint16_t __item;
 
-        //NO_INIT static uint8_t s_chQueueBuffer[1024];
+        //VSF_CAL_NO_INIT static uint8_t s_chQueueBuffer[1024];
         //vsf_rng_buf_prepare(my_hword_queue_t, &__queue, &s_chQueueBuffer, sizeof(s_chQueueBuffer));
 
         vsf_rng_buf_init(my_hword_queue_t, uint16_t, &__queue, 32);
@@ -136,7 +136,7 @@
         vsf_rng_buf_get(my_hword_queue_t, &__queue, &__item);
 
         const uint16_t* item_ref_ptr = NULL;
-        vsf_rng_buf_peek(my_hword_queue_t, &__queue, &item_ref_ptr, 2);    
+        vsf_rng_buf_peek(my_hword_queue_t, &__queue, &item_ref_ptr, 2);
         vsf_rng_buf_peek(my_hword_queue_t, &__queue, &item_ref_ptr);
     }
 
@@ -156,7 +156,7 @@
 #elif   defined(__VSF_QUEUE_CLASS_INHERIT__)
 #   define __PLOOC_CLASS_INHERIT__
 #   undef __VSF_QUEUE_CLASS_INHERIT__
-#endif   
+#endif
 
 #include "utilities/ooc_class.h"
 
@@ -201,46 +201,46 @@ bool __name##_send_one(__name* queue_ptr, __type item);                         
 extern                                                                          \
 bool __name##_get_one(__name* queue_ptr, __type* item_ptr);                     \
                                                                                 \
-SECTION(".text." #__name "_item_count")                                         \
+VSF_CAL_SECTION(".text." #__name "_item_count")                                 \
 extern                                                                          \
 uint_fast16_t __name##_item_count(__name* queue_ptr);                           \
                                                                                 \
-SECTION(".text." #__name "_send_multiple")                                      \
+VSF_CAL_SECTION(".text." #__name "_send_multiple")                              \
 extern                                                                          \
 int32_t __name##_send_multiple(__name* queue_ptr,                               \
                                         const __type* item_ptr,                 \
                                         uint16_t count);                        \
                                                                                 \
-SECTION(".text." #__name "_get_multiple")                                       \
+VSF_CAL_SECTION(".text." #__name "_get_multiple")                               \
 extern                                                                          \
 int32_t __name##_get_multiple(  __name* queue_ptr,                              \
                                     __type* item_ptr,                           \
                                     uint16_t count);                            \
                                                                                 \
-SECTION(".text." #__name "_peek_one")                                           \
+VSF_CAL_SECTION(".text." #__name "_peek_one")                                   \
 extern                                                                          \
 bool __name##_peek_one(__name* queue_ptr, const __type** item_pptr);            \
                                                                                 \
-SECTION(".text." #__name "_reset_peek")                                         \
+VSF_CAL_SECTION(".text." #__name "_reset_peek")                                 \
 extern                                                                          \
 void __name##_reset_peek(__name *queue_ptr);                                    \
                                                                                 \
-SECTION(".text." #__name "_get_all_peeked")                                     \
+VSF_CAL_SECTION(".text." #__name "_get_all_peeked")                             \
 extern                                                                          \
 void __name##_get_all_peeked(__name *queue_ptr);                                \
                                                                                 \
-SECTION(".text." #__name "_item_count_peekable")                                \
+VSF_CAL_SECTION(".text." #__name "_item_count_peekable")                        \
 extern                                                                          \
 uint_fast16_t __name##_item_count_peekable(__name* queue_ptr);                  \
                                                                                 \
-SECTION(".text." #__name "_peek_multiple")                                      \
+VSF_CAL_SECTION(".text." #__name "_peek_multiple")                              \
 extern                                                                          \
 int32_t __name##_peek_multiple( __name* queue_ptr,                              \
                                 const __type** item_pptr,                       \
                                 uint16_t count);
 
 #   define def_vsf_rng_buf(__name, __type)                                      \
-            __def_vsf_rng_buf(__name, __type) 
+            __def_vsf_rng_buf(__name, __type)
 
 #else
 #   define NO_RNG_BUF_PROTECT(...)               __VA_ARGS__
@@ -268,46 +268,46 @@ bool __name##_send_one(__name* queue_ptr, __type item);                         
 extern                                                                          \
 bool __name##_get_one(__name* queue_ptr, __type* item_ptr);                     \
                                                                                 \
-SECTION(".text." #__name "_item_count")                                         \
+VSF_CAL_SECTION(".text." #__name "_item_count")                                 \
 extern                                                                          \
 uint_fast16_t __name##_item_count(__name* queue_ptr);                           \
                                                                                 \
-SECTION(".text." #__name "_send_multiple")                                      \
+VSF_CAL_SECTION(".text." #__name "_send_multiple")                              \
 extern                                                                          \
 int32_t __name##_send_multiple(__name* queue_ptr,                               \
                                         const __type* item_ptr,                 \
                                         uint16_t count);                        \
                                                                                 \
-SECTION(".text." #__name "_get_multiple")                                       \
+VSF_CAL_SECTION(".text." #__name "_get_multiple")                               \
 extern                                                                          \
 int32_t __name##_get_multiple(  __name* queue_ptr,                              \
                                     __type* item_ptr,                           \
                                     uint16_t count);                            \
                                                                                 \
-SECTION(".text." #__name "_peek_one")                                           \
+VSF_CAL_SECTION(".text." #__name "_peek_one")                                   \
 extern                                                                          \
 bool __name##_peek_one(__name* queue_ptr, const __type** item_pptr);            \
                                                                                 \
-SECTION(".text." #__name "_reset_peek")                                         \
+VSF_CAL_SECTION(".text." #__name "_reset_peek")                                 \
 extern                                                                          \
 void __name##_reset_peek(__name *queue_ptr);                                    \
                                                                                 \
-SECTION(".text." #__name "_get_all_peeked")                                     \
+VSF_CAL_SECTION(".text." #__name "_get_all_peeked")                             \
 extern                                                                          \
 void __name##_get_all_peeked(__name *queue_ptr);                                \
                                                                                 \
-SECTION(".text." #__name "_item_count_peekable")                                \
+VSF_CAL_SECTION(".text." #__name "_item_count_peekable")                        \
 extern                                                                          \
 uint_fast16_t __name##_item_count_peekable(__name* queue_ptr);                  \
                                                                                 \
-SECTION(".text." #__name "_peek_multiple")                                      \
+VSF_CAL_SECTION(".text." #__name "_peek_multiple")                              \
 extern                                                                          \
 int32_t __name##_peek_multiple( __name* queue_ptr,                              \
                                 const __type** item_pptr,                       \
                                 uint16_t count);
 
 #   define def_vsf_rng_buf(__name, __type, ...)                                 \
-            __def_vsf_rng_buf(__name, __type, __VA_ARGS__) 
+            __def_vsf_rng_buf(__name, __type, __VA_ARGS__)
 
 #endif
 
@@ -363,14 +363,14 @@ bool __name##_get_one(__name * queue_ptr, __type *item_ptr)                     
     return result;                                                              \
 }                                                                               \
                                                                                 \
-SECTION(".text." #__name "_item_count")                                         \
+VSF_CAL_SECTION(".text." #__name "_item_count")                                 \
 uint_fast16_t __name##_item_count(__name * queue_ptr)                           \
 {                                                                               \
     VSF_ASSERT(NULL != queue_ptr);                                              \
     return __vsf_rng_buf_item_count(&(queue_ptr->use_as__vsf_rng_buf_t));       \
 }                                                                               \
                                                                                 \
-SECTION(".text." #__name "_send_multiple")                                      \
+VSF_CAL_SECTION(".text." #__name "_send_multiple")                              \
 int32_t __name##_send_multiple(  __name * queue_ptr,                            \
                                     const __type*item_ptr,                      \
                                     uint16_t count)                             \
@@ -398,7 +398,7 @@ int32_t __name##_send_multiple(  __name * queue_ptr,                            
     return result;                                                              \
 }                                                                               \
                                                                                 \
-SECTION(".text." #__name "_get_multiple")                                       \
+VSF_CAL_SECTION(".text." #__name "_get_multiple")                               \
 int32_t __name##_get_multiple(  __name * queue_ptr,                             \
                                     __type* item_ptr,                           \
                                     uint16_t count)                             \
@@ -426,7 +426,7 @@ int32_t __name##_get_multiple(  __name * queue_ptr,                             
     return result;                                                              \
 }                                                                               \
                                                                                 \
-SECTION(".text." #__name "_peek_one")                                           \
+VSF_CAL_SECTION(".text." #__name "_peek_one")                                   \
 bool __name##_peek_one(__name *queue_ptr, const __type** item_pptr)             \
 {                                                                               \
     bool result = false;                                                        \
@@ -448,7 +448,7 @@ bool __name##_peek_one(__name *queue_ptr, const __type** item_pptr)             
     return result;                                                              \
 }                                                                               \
                                                                                 \
-SECTION(".text." #__name "_reset_peek")                                         \
+VSF_CAL_SECTION(".text." #__name "_reset_peek")                                 \
 void __name##_reset_peek(__name *queue_ptr)                                     \
 {                                                                               \
     VSF_ASSERT(NULL != queue_ptr);                                              \
@@ -457,7 +457,7 @@ void __name##_reset_peek(__name *queue_ptr)                                     
     )                                                                           \
 }                                                                               \
                                                                                 \
-SECTION(".text." #__name "_get_all_peeked")                                     \
+VSF_CAL_SECTION(".text." #__name "_get_all_peeked")                             \
 void __name##_get_all_peeked(__name *queue_ptr)                                 \
 {                                                                               \
     VSF_ASSERT(NULL != queue_ptr);                                              \
@@ -466,14 +466,14 @@ void __name##_get_all_peeked(__name *queue_ptr)                                 
     )                                                                           \
 }                                                                               \
                                                                                 \
-SECTION(".text." #__name "_item_count_peekable")                                \
+VSF_CAL_SECTION(".text." #__name "_item_count_peekable")                        \
 uint_fast16_t __name##_item_count_peekable(__name *queue_ptr)                   \
 {                                                                               \
     VSF_ASSERT(NULL != queue_ptr);                                              \
     return __vsf_rng_buf_item_count_peekable(&queue_ptr->use_as__vsf_rng_buf_t);\
 }                                                                               \
                                                                                 \
-SECTION(".text." #__name "_peek_multiple")                                      \
+VSF_CAL_SECTION(".text." #__name "_peek_multiple")                              \
 int32_t __name##_peek_multiple( __name * queue_ptr,                             \
                                 const __type** item_pptr,                       \
                                 uint16_t count)                                 \
@@ -502,12 +502,12 @@ int32_t __name##_peek_multiple( __name * queue_ptr,                             
 
 
 #define implement_vsf_rng_buf(__name, __type, __queue_protect)                  \
-            __implement_vsf_rng_buf(__name, __type, __queue_protect) 
+            __implement_vsf_rng_buf(__name, __type, __queue_protect)
 
 
 #define __vsf_rng_buf_init(__name, __type, __qaddr, __item_count)               \
     do {                                                                        \
-        NO_INIT static uint16_t __buffer[(__item_count)];                       \
+        VSF_CAL_NO_INIT static uint16_t __buffer[(__item_count)];               \
         __name##_cfg_t cfg = {                                                  \
             __buffer,                                                           \
             sizeof(__buffer),                                                   \
@@ -586,13 +586,13 @@ int32_t __name##_peek_multiple( __name * queue_ptr,                             
 
 #define vsf_rng_buf_send_one(__name, __qaddr, __item)                           \
             __vsf_rng_buf_send_1(__name, (__qaddr), (__item))
-            
+
 #define vsf_rng_buf_send_buf(__name, __qaddr, __buffer, __size)                 \
             __vsf_rng_buf_send_2(__name, (__qaddr), (__buffer), (__size))
-            
+
 #define vsf_rng_buf_get_one(__name, __qaddr, __item)                            \
             __vsf_rng_buf_get_1(__name, (__qaddr), (__item))
-            
+
 #define vsf_rng_buf_get_buf(__name, __qaddr, __buffer, __size)                  \
             __vsf_rng_buf_get_2(__name, (__qaddr), (__buffer), (__size))
 
@@ -621,7 +621,7 @@ int32_t __name##_peek_multiple( __name * queue_ptr,                             
 declare_class(vsf_rng_buf_t)
 
 def_class(vsf_rng_buf_t,
-    
+
     protected_member(
         uint16_t buffer_item_cnt;
         uint16_t tail;
@@ -636,50 +636,50 @@ end_def_class(vsf_rng_buf_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern 
-void __vsf_rng_buf_init_ex( vsf_rng_buf_t* obj_ptr, 
-                            uint_fast16_t buffer_item_cnt, 
+extern
+void __vsf_rng_buf_init_ex( vsf_rng_buf_t* obj_ptr,
+                            uint_fast16_t buffer_item_cnt,
                             bool is_init_as_full);
 
-extern 
+extern
 int32_t __vsf_rng_buf_send_one(vsf_rng_buf_t* obj_ptr);
 
-extern 
+extern
 int32_t __vsf_rng_buf_get_one(vsf_rng_buf_t* obj_ptr);
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_send_multiple")
-extern 
-int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t* obj_ptr, 
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_send_multiple")
+extern
+int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t* obj_ptr,
                                     uint16_t* item_cnt_ptr);
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_get_multiple")
-extern 
-int32_t __vsf_rng_buf_get_multiple( vsf_rng_buf_t* obj_ptr, 
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_get_multiple")
+extern
+int32_t __vsf_rng_buf_get_multiple( vsf_rng_buf_t* obj_ptr,
                                     uint16_t* item_cnt_ptr);
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count")
-extern 
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count")
+extern
 uint_fast16_t __vsf_rng_buf_item_count(vsf_rng_buf_t* obj_ptr);
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_one")
-extern 
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_one")
+extern
 int32_t __vsf_rng_buf_peek_one(vsf_rng_buf_t* obj_ptr);
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_get_all_peeked")
-extern 
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_get_all_peeked")
+extern
 void __vsf_rng_buf_get_all_peeked(vsf_rng_buf_t* obj_ptr);
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_reset_peek")
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_reset_peek")
 extern
 void __vsf_rng_buf_reset_peek(vsf_rng_buf_t* obj_ptr);
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count_peekable")
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count_peekable")
 extern
 uint_fast16_t __vsf_rng_buf_item_count_peekable(vsf_rng_buf_t* obj_ptr);
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_multiple")
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_multiple")
 extern
-int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* obj_ptr, 
+int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* obj_ptr,
                                     uint16_t* item_cnt_ptr);
 
 

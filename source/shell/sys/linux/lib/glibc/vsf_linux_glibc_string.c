@@ -161,7 +161,7 @@ int ffs(int i)
     return (int)vsf_ffs32((uint_fast32_t)i) + 1;
 }
 
-WEAK(strverscmp)
+VSF_CAL_WEAK(strverscmp)
 int strverscmp(const char *str1, const char *str2)
 {
     return 0;

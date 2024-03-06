@@ -99,7 +99,7 @@ static vsfvm_ret_t __vsfvm_ext_libusb_protocol(vsfvm_thread_t *thread);
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT vsfvm_ext_libusb_t __vsfvm_ext_libusb;
+static VSF_CAL_NO_INIT vsfvm_ext_libusb_t __vsfvm_ext_libusb;
 
 const vsfvm_class_t vsfvm_ext_libusb_dev = {
 #if VSFVM_CFG_COMPILER_EN == ENABLED

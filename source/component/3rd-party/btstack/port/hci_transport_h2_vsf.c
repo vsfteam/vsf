@@ -69,13 +69,11 @@ static hci_transport_h2_param_t __hci_transport_h2_param;
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_BLUETOOTH_H2_ON_NEW
-WEAK(vsf_bluetooth_h2_on_new)
+VSF_CAL_WEAK(vsf_bluetooth_h2_on_new)
 vsf_err_t vsf_bluetooth_h2_on_new(void *dev, vk_usbh_dev_id_t *id)
 {
     return VSF_ERR_NOT_SUPPORT;
 }
-#endif
 
 static int __hci_transport_h2_open(void)
 {
@@ -154,7 +152,7 @@ void vsf_usbh_bthci_on_packet(void *dev, uint8_t type, uint8_t *packet, uint16_t
 
 static void __hci_transport_h2_init(const void *transport_config)
 {
-    
+
 }
 
 const hci_transport_t * hci_transport_usb_instance(void)

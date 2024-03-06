@@ -231,7 +231,7 @@ VSF_APPLET_VPLT_FUNC_DECORATOR(vsf_trace) void vsf_trace(vsf_trace_level_t level
 
 #else
 
-SECTION(".text.vsf.trace.__vsf_trace_buffer")
+VSF_CAL_SECTION(".text.vsf.trace.__vsf_trace_buffer")
 extern void __vsf_trace_buffer( vsf_trace_level_t level,
                                 void *buffer,
                                 uint_fast16_t len,

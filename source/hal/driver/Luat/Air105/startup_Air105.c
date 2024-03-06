@@ -38,10 +38,10 @@
 #include "global_config.h"
 
 #define __imp_unprocessed_weak_handler(__name)                                  \
-            WEAK(__name)                                                        \
+            VSF_CAL_WEAK(__name)                                                \
             void __name(void){}
 #define __imp_blocked_weak_handler(__name)                                      \
-            WEAK(__name)                                                        \
+            VSF_CAL_WEAK(__name)                                                \
             void __name(void){while(1);}
 
 /*----------------------------------------------------------------------------
@@ -103,7 +103,7 @@ __imp_unprocessed_weak_handler(UART3_Handler)
 #pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
-ROOT const pFunc __VECTOR_TABLE[] ALIGN(512) = {
+VSF_CAL_ROOT const pFunc __VECTOR_TABLE[] VSF_CAL_ALIGN(512) = {
     (pFunc)(&__INITIAL_SP),                             /*     Initial Stack Pointer */
     Reset_Handler,                                      /*     Reset Handler */
     NMI_Handler,                                        /* -14 NMI Handler */
@@ -176,8 +176,8 @@ ROOT const pFunc __VECTOR_TABLE[] ALIGN(512) = {
     ISR_GlobalHandler,
 };
 
-WEAK(g_CAppInfo)
-ROOT const uint32_t g_CAppInfo[] __VECTOR_TABLE_ATTRIBUTE = {
+VSF_CAL_WEAK(g_CAppInfo)
+VSF_CAL_ROOT const uint32_t g_CAppInfo[] __VECTOR_TABLE_ATTRIBUTE = {
     __APP_START_MAGIC__,
     (uint32_t)__VECTOR_TABLE,
     __BL_VERSION__,
@@ -192,7 +192,7 @@ ROOT const uint32_t g_CAppInfo[] __VECTOR_TABLE_ATTRIBUTE = {
 #pragma GCC diagnostic pop
 #endif
 
-WEAK(vsf_hal_pre_startup_init)
+VSF_CAL_WEAK(vsf_hal_pre_startup_init)
 void vsf_hal_pre_startup_init(void)
 {}
 

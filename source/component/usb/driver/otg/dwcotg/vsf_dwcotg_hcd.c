@@ -218,7 +218,7 @@ const vk_usbh_hcd_drv_t vk_dwcotg_hcd_drv = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK(vsf_dwcotg_hcd_get_fifo_size)
+VSF_CAL_WEAK(vsf_dwcotg_hcd_get_fifo_size)
 void vsf_dwcotg_hcd_get_fifo_size(vk_usbh_hcd_t *hcd,
         uint16_t *rx_fifo_size, uint16_t *non_periodic_tx_fifo_size, uint16_t *periodic_tx_fifo_size)
 {

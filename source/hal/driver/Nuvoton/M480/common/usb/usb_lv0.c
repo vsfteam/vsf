@@ -31,7 +31,7 @@ static const m480_##__TYPE##_const_t __USB_HC##__N##_const = {                  
 m480_##__TYPE##_t USB_HC##__N##_IP = {                                          \
     .param = &__USB_HC##__N##_const,                                            \
 };                                                                              \
-ROOT ISR(VSF_HW_USB_HC##__N##_IRQHandler)                                       \
+VSF_CAL_ROOT VSF_CAL_ISR(VSF_HW_USB_HC##__N##_IRQHandler)                       \
 {                                                                               \
     m480_##__TYPE##_irq(&USB_HC##__N##_IP);                                     \
 }
@@ -43,7 +43,7 @@ static const m480_##__TYPE##_const_t __USB_HC##__N##_const = {                  
 m480_##__TYPE##_t USB_HC##__N##_IP = {                                          \
     .param = &__USB_HC##__N##_const,                                            \
 };                                                                              \
-ISR(VSF_HW_USB_HC##__N##_IRQHandler)                                            \
+VSF_CAL_ISR(VSF_HW_USB_HC##__N##_IRQHandler)                                    \
 {                                                                               \
     m480_##__TYPE##_irq(&USB_HC##__N##_IP);                                     \
 }
@@ -69,7 +69,7 @@ static const m480_##__TYPE##_const_t __USB_DC##__N##_const = {                  
 m480_##__TYPE##_t USB_DC##__N = {                                               \
     .param = &__USB_DC##__N##_const                                             \
 };                                                                              \
-ROOT ISR(VSF_HW_USB_DC##__N##_IRQHandler)                                       \
+VSF_CAL_ROOT VSF_CAL_ISR(VSF_HW_USB_DC##__N##_IRQHandler)                       \
 {                                                                               \
     m480_##__TYPE##_irq(&USB_DC##__N);                                          \
 }
@@ -86,7 +86,7 @@ static const m480_##__TYPE##_const_t __USB_DC##__N##_const = {                  
 m480_##__TYPE##_t USB_DC##__N = {                                               \
     .param = &__USB_DC##__N##_const                                             \
 };                                                                              \
-ISR(VSF_HW_USB_DC##__N##_IRQHandler)                                            \
+VSF_CAL_ISR(VSF_HW_USB_DC##__N##_IRQHandler)                                    \
 {                                                                               \
     m480_##__TYPE##_irq(&USB_DC##__N);                                          \
 }
@@ -100,7 +100,7 @@ static const m480_##__TYPE##_const_t __USB_DC##__N##_const = {                  
 m480_##__TYPE##_t USB_DC##__N = {                                               \
     .param = &__USB_DC##__N##_const                                             \
 };                                                                              \
-ROOT ISR(USB_DC##__N##_IRQHandler)                                              \
+VSF_CAL_ROOT VSF_CAL_ISR(USB_DC##__N##_IRQHandler)                              \
 {                                                                               \
     m480_##__TYPE##_irq(&USB_DC##__N);                                          \
 }
@@ -112,7 +112,7 @@ static const m480_##__TYPE##_const_t __USB_DC##__N##_const = {                  
 m480_##__TYPE##_t USB_DC##__N = {                                               \
     .param = &__USB_DC##__N##_const                                             \
 };                                                                              \
-ISR(USB_DC##__N##_IRQHandler)                                                   \
+VSF_CAL_ISR(USB_DC##__N##_IRQHandler)                                           \
 {                                                                               \
     m480_##__TYPE##_irq(&USB_DC##__N);                                          \
 }

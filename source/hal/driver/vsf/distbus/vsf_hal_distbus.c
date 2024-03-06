@@ -45,7 +45,7 @@ static const vsf_distbus_service_info_t __vsf_hal_distbus_info = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK(vsf_hal_distbus_on_new)
+VSF_CAL_WEAK(vsf_hal_distbus_on_new)
 void vsf_hal_distbus_on_new(vsf_hal_distbus_t *hal_distbus, vsf_hal_distbus_type_t type, uint8_t num, void *devs)
 {
 }

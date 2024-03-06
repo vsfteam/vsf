@@ -385,7 +385,7 @@ const vk_usbh_hcd_drv_t vk_ohci_drv = {
 
 imp_vsf_pool(ohci_td_pool, ohci_td_t);
 
-static NO_INIT vsf_pool(ohci_td_pool) __vk_ohci_td_pool;
+static VSF_CAL_NO_INIT vsf_pool(ohci_td_pool) __vk_ohci_td_pool;
 
 static ohci_td_t * __ohci_td_alloc(void)
 {

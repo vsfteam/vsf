@@ -120,7 +120,7 @@ bool vsf_fifo_pop(vsf_fifo_t *fifo, uintptr_t item, vsf_fifo_fast_item_size_t it
     return ret;
 }
 
-SECTION(".text.vsf.utilities.vsf_fifo_get_head")
+VSF_CAL_SECTION(".text.vsf.utilities.vsf_fifo_get_head")
 uintptr_t vsf_fifo_get_head(vsf_fifo_t *fifo, vsf_fifo_fast_item_size_t item_size)
 {
     VSF_SERVICE_ASSERT((fifo != NULL) && (item_size > 0));
@@ -135,7 +135,7 @@ uintptr_t vsf_fifo_get_head(vsf_fifo_t *fifo, vsf_fifo_fast_item_size_t item_siz
     return (uintptr_t)NULL;
 }
 
-SECTION(".text.vsf.utilities.vsf_fifo_get_tail")
+VSF_CAL_SECTION(".text.vsf.utilities.vsf_fifo_get_tail")
 uintptr_t vsf_fifo_get_tail(vsf_fifo_t *fifo, vsf_fifo_fast_item_size_t item_size)
 {
     VSF_SERVICE_ASSERT((fifo != NULL) && (item_size > 0));
@@ -150,7 +150,7 @@ uintptr_t vsf_fifo_get_tail(vsf_fifo_t *fifo, vsf_fifo_fast_item_size_t item_siz
     return (uintptr_t)NULL;
 }
 
-SECTION(".text.vsf.utilities.vsf_fifo_get_number")
+VSF_CAL_SECTION(".text.vsf.utilities.vsf_fifo_get_number")
 vsf_fifo_index_t vsf_fifo_get_number(vsf_fifo_t *fifo)
 {
     vsf_fifo_index_t number;

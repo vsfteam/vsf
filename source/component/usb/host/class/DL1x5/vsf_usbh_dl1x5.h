@@ -39,18 +39,18 @@ typedef struct edid_t {
         uint32_t    serial;
         uint8_t     week;
         uint8_t     year;
-    } PACKED        product;
+    } VSF_CAL_PACKED product;
     struct edid_vendor_version_t {
         uint8_t     version;
         uint8_t     revision;
-    } PACKED        version;
+    } VSF_CAL_PACKED version;
     struct edid_basic_param_t {
         uint8_t     video_input;
         uint8_t     h_size_cm;
         uint8_t     v_size_cm;
         uint8_t     gamma;
         uint8_t     dpms;
-    } PACKED        basic;
+    } VSF_CAL_PACKED basic;
     struct edid_color_t {
         uint8_t     red_green_low;
         uint8_t     bluw_white_low;
@@ -62,14 +62,14 @@ typedef struct edid_t {
         uint8_t     blue_y;
         uint8_t     white_x;
         uint8_t     white_y;
-    } PACKED        color;
+    } VSF_CAL_PACKED color;
     struct edid_established_timings_t {
         uint16_t    timings;
         uint8_t     reserved_timings;
-    } PACKED established_timings;
+    } VSF_CAL_PACKED established_timings;
     struct edid_standard_timings_t {
         uint16_t    timing_id[8];
-    } PACKED standard_timings;
+    } VSF_CAL_PACKED standard_timings;
     struct edid_detailed_timing_t {
         uint16_t    pixel_clock_10khz;
         uint8_t     h_active_low;
@@ -100,10 +100,10 @@ typedef struct edid_t {
         uint8_t     seperate_sync           : 2;
         uint8_t     stereo                  : 2;
         uint8_t     interlaced              : 1;
-    } PACKED detailed_timings[4];
+    } VSF_CAL_PACKED detailed_timings[4];
     uint8_t         extension_flag;
     uint8_t         checksum;
-} PACKED edid_t;
+} VSF_CAL_PACKED edid_t;
 
 typedef struct vga_timing_t {
     uint16_t        pixel_clock_10khz;

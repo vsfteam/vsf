@@ -52,7 +52,7 @@ typedef struct vsfip_arp_head_t {
     uint8_t hwlen;
     uint8_t protolen;
     uint16_t op;
-} PACKED vsfip_arp_head_t;
+} VSF_CAL_PACKED vsfip_arp_head_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

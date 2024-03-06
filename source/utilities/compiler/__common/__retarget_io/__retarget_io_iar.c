@@ -22,7 +22,7 @@
 #include <LowLevelIOInterface.h>
 #include <fcntl.h>
 
-SECTION(".vsf.utilities.stdio.iar.__open")
+VSF_CAL_SECTION(".vsf.utilities.stdio.iar.__open")
 int __open(const char *path_name, int flags)
 {
     int real_flags = 0;
@@ -43,13 +43,13 @@ int __open(const char *path_name, int flags)
     return fd;
 }
 
-SECTION(".vsf.utilities.stdio.iar.__close")
+VSF_CAL_SECTION(".vsf.utilities.stdio.iar.__close")
 int __close(int handle)
 {
     return close(handle);
 }
 
-SECTION(".vsf.utilities.stdio.iar.__lseek")
+VSF_CAL_SECTION(".vsf.utilities.stdio.iar.__lseek")
 off_t __lseek(int handle, off_t offset, int whence)
 {
     return lseek(handle, offset, whence);
@@ -58,7 +58,7 @@ off_t __lseek(int handle, off_t offset, int whence)
 #   if VSF_USE_LINUX == ENABLED
 
 #       if !(VSF_LINUX_USE_SIMPLE_LIBC == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED)
-SECTION(".vsf.utilities.stdio.iar.__exit")
+VSF_CAL_SECTION(".vsf.utilities.stdio.iar.__exit")
 void __exit(int status)
 {
     // exit process is not supported, can exit current thread only
@@ -71,7 +71,7 @@ void __exit(int status)
 //! statement is unreachable
 #pragma diag_suppress=pe111
 
-SECTION(".vsf.utilities.stdio.iar.remove")
+VSF_CAL_SECTION(".vsf.utilities.stdio.iar.remove")
 int remove(const char * pathname)
 {
     int fd = open(pathname, 0);
@@ -87,7 +87,7 @@ int remove(const char * pathname)
     return 0;
 }
 
-SECTION(".vsf.utilities.stdio.iar.rename")
+VSF_CAL_SECTION(".vsf.utilities.stdio.iar.rename")
 int rename(const char *old_filename, const char *new_filename)
 {
     VSF_LINUX_ASSERT(false);
@@ -99,13 +99,13 @@ int rename(const char *old_filename, const char *new_filename)
 
 #endif      // VSF_USE_POSIX
 
-SECTION(".vsf.utilities.stdio.iar.__write")
+VSF_CAL_SECTION(".vsf.utilities.stdio.iar.__write")
 size_t __write(int handle, const unsigned char *buf, size_t buf_size)
 {
     return __vsf_stdio_write(handle, buf, buf_size);
 }
 
-SECTION(".vsf.utilities.stdio.iar.__read")
+VSF_CAL_SECTION(".vsf.utilities.stdio.iar.__read")
 size_t __read(int handle, unsigned char *buf, size_t buf_size)
 {
     return __vsf_stdio_read(handle, buf, buf_size);

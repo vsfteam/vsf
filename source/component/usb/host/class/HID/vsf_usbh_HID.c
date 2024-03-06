@@ -45,7 +45,7 @@
 typedef struct usb_hid_class_descriptor_t {
     uint8_t bDescriptorType;
     uint16_t wDescriptorLength;
-} PACKED usb_hid_class_descriptor_t;
+} VSF_CAL_PACKED usb_hid_class_descriptor_t;
 
 typedef struct usb_hid_descriptor_t {
     uint8_t bLength;
@@ -55,7 +55,7 @@ typedef struct usb_hid_descriptor_t {
     uint8_t bNumDescriptors;
 
     usb_hid_class_descriptor_t desc[1];
-} PACKED usb_hid_descriptor_t;
+} VSF_CAL_PACKED usb_hid_descriptor_t;
 
 struct vk_usbh_hid_input_t {
     implement(vk_usbh_hid_teda_t)
@@ -294,7 +294,7 @@ vsf_err_t __vk_usbh_hid_recv_report_imp(vk_usbh_hid_teda_t *hid, uint8_t *buffer
 
 
 // hid input, which uses vsf_hid
-WEAK(vsf_usbh_hid_input_on_desc)
+VSF_CAL_WEAK(vsf_usbh_hid_input_on_desc)
 uint_fast8_t vsf_usbh_hid_input_on_desc(vk_usbh_hid_input_t *hid, uint8_t *desc_buf, uint_fast32_t desc_len)
 {
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
@@ -304,7 +304,7 @@ uint_fast8_t vsf_usbh_hid_input_on_desc(vk_usbh_hid_input_t *hid, uint8_t *desc_
 #endif
 }
 
-WEAK(vsf_usbh_hid_input_on_report_input)
+VSF_CAL_WEAK(vsf_usbh_hid_input_on_report_input)
 void vsf_usbh_hid_input_on_report_input(vk_usbh_hid_input_t *hid, uint8_t *report, uint_fast32_t len)
 {
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
@@ -312,12 +312,12 @@ void vsf_usbh_hid_input_on_report_input(vk_usbh_hid_input_t *hid, uint8_t *repor
 #endif
 }
 
-WEAK(vsf_usbh_hid_input_on_report_output)
+VSF_CAL_WEAK(vsf_usbh_hid_input_on_report_output)
 void vsf_usbh_hid_input_on_report_output(vk_usbh_hid_input_t *hid, int_fast16_t status)
 {
 }
 
-WEAK(vsf_usbh_hid_input_on_new)
+VSF_CAL_WEAK(vsf_usbh_hid_input_on_new)
 bool vsf_usbh_hid_input_on_new(vk_usbh_hid_input_t *hid)
 {
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
@@ -326,7 +326,7 @@ bool vsf_usbh_hid_input_on_new(vk_usbh_hid_input_t *hid)
     return true;
 }
 
-WEAK(vsf_usbh_hid_input_on_free)
+VSF_CAL_WEAK(vsf_usbh_hid_input_on_free)
 void vsf_usbh_hid_input_on_free(vk_usbh_hid_input_t *hid)
 {
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED

@@ -150,19 +150,15 @@ static void __vk_usbd_uac_trace_request_process(vk_usbd_uac_ac_t *uac_ac, vk_usb
 }
 #endif
 
-#ifndef WEAK_VSF_USBD_UAC_STOP_STREAM
-WEAK(vsf_usbd_uac_stop_stream)
+VSF_CAL_WEAK(vsf_usbd_uac_stop_stream)
 void vsf_usbd_uac_stop_stream(vk_usbd_uac_as_t *uac_as, uint_fast8_t ifs)
 {
 }
-#endif
 
-#ifndef WEAK_VSF_USBD_UAC_START_STREAM
-WEAK(vsf_usbd_uac_start_stream)
+VSF_CAL_WEAK(vsf_usbd_uac_start_stream)
 void vsf_usbd_uac_start_stream(vk_usbd_uac_as_t *uac_as, uint_fast8_t ifs)
 {
 }
-#endif
 
 static vk_usbd_uac_control_t *__vk_usbd_uac_get_control(vk_usbd_uac_ac_t *uac_ac,
         uint_fast8_t id, uint_fast8_t selector, uint_fast8_t channel)

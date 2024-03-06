@@ -61,8 +61,8 @@ typedef struct vsf_arch_systimer_ctx_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT DWORD __vsf_arch_tls_thread_ctx;
-static NO_INIT vsf_arch_systimer_ctx_t __vsf_arch_systimer;
+static VSF_CAL_NO_INIT DWORD __vsf_arch_tls_thread_ctx;
+static VSF_CAL_NO_INIT vsf_arch_systimer_ctx_t __vsf_arch_systimer;
 
 /*============================ IMPLEMENTATION ================================*/
 

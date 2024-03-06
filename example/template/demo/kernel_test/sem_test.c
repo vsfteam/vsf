@@ -33,7 +33,7 @@ typedef struct usrapp_sem_test_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT usrapp_sem_test_t __usrapp_sem;
+static VSF_CAL_NO_INIT usrapp_sem_test_t __usrapp_sem;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/

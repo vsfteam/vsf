@@ -179,8 +179,7 @@ static const vk_disp_drv_t __vk_disp_drv_dl1x5 = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_DL1X5_ON_NEW_DEV
-WEAK(vsf_dl1x5_on_new_dev)
+VSF_CAL_WEAK(vsf_dl1x5_on_new_dev)
 void vsf_dl1x5_on_new_dev(void *dev, edid_t *edid)
 {
     vga_timing_t *timing = vk_usbh_dl1x5_get_timing(dev);
@@ -199,18 +198,13 @@ void vsf_dl1x5_on_new_dev(void *dev, edid_t *edid)
         timing->v.sync_positive = 0;
     }
 }
-#endif
 
 #ifdef __VSF_DL1X5_USE_DISP
-#   ifndef WEAK_VSF_DL1X5_ON_NEW_DISP
-WEAK(vsf_dl1x5_on_new_disp)
+VSF_CAL_WEAK(vsf_dl1x5_on_new_disp)
 void vsf_dl1x5_on_new_disp(vk_disp_t *disp) {}
-#   endif
 #else
-#   ifndef WEAK_VSF_DL1X5_ON_DEV_READY
-WEAK(vsf_dl1x5_on_dev_ready)
+VSF_CAL_WEAK(vsf_dl1x5_on_dev_ready)
 void vsf_dl1x5_on_dev_ready(void *dev) {}
-#   endif
 #endif
 
 static vsf_err_t __vk_usbh_dl1x5_get_status(vk_usbh_dl1x5_t *dl1x5)

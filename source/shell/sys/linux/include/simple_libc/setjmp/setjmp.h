@@ -13,7 +13,7 @@
 
 typedef struct {
     uint64_t part[2];
-} ALIGN(16) setjmp_float128;
+} VSF_CAL_ALIGN(16) setjmp_float128;
 typedef setjmp_float128 jmp_buf[16];
 
 #   elif    defined(__CPU_ARM__)

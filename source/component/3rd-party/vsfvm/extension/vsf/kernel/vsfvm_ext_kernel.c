@@ -51,7 +51,7 @@ static vsfvm_ret_t __vsfvm_ext_kernel_delay_ms(vsfvm_thread_t *thread);
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT vsfvm_ext_kernel_t __vsfvm_ext_kernel;
+static VSF_CAL_NO_INIT vsfvm_ext_kernel_t __vsfvm_ext_kernel;
 
 #if VSFVM_CFG_COMPILER_EN == ENABLED
 extern const vsfvm_ext_op_t __vsfvm_ext_kernel_op;

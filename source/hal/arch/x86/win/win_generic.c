@@ -234,11 +234,11 @@ static const char *__vsf_x86_trace_color[] = {
 static vsf_arch_background_trace_t __vsf_arch_background_trace;
 #endif
 
-NO_INIT static vsf_arch_systimer_ctx_t __vsf_x86_systimer;
+VSF_CAL_NO_INIT static vsf_arch_systimer_ctx_t __vsf_x86_systimer;
 
 #if VSF_ARCH_PRI_NUM != 1 || VSF_ARCH_SWI_NUM != 0
 
-NO_INIT static vsf_x86_t __vsf_x86;
+VSF_CAL_NO_INIT static vsf_x86_t __vsf_x86;
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -1325,7 +1325,7 @@ int vsf_arch_argu(char ***argv)
 /*----------------------------------------------------------------------------*
  * dummy WinMain, Just make some compilers happy                              *
  *----------------------------------------------------------------------------*/
-WEAK(WinMain)
+VSF_CAL_WEAK(WinMain)
 int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     return 0;

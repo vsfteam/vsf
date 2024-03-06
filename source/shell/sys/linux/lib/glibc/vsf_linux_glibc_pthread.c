@@ -66,7 +66,7 @@ typedef struct vsf_linux_pthread_priv_t {
 static void __vsf_linux_pthread_on_run(vsf_thread_cb_t *cb);
 static void __vsf_linux_pthread_on_terminate(vsf_linux_thread_t *thread);
 
-SECTION(".text.vsf.kernel.vsf_sync")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_sync")
 void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, vsf_timeout_tick_t timeout);
 
 /*============================ GLOBAL VARIABLES ==============================*/

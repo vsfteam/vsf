@@ -54,7 +54,7 @@ typedef struct vsf_sdl2_event_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT vsf_sdl2_event_t __vsf_sdl2_event;
+static VSF_CAL_NO_INIT vsf_sdl2_event_t __vsf_sdl2_event;
 
 static const SDL_Keycode SDL_default_keymap[SDL_NUM_SCANCODES] = {
     0, 0, 0, 0,
@@ -677,7 +677,7 @@ static void __vsf_sdl2_event_on_input(vk_input_notifier_t *notifier, vk_input_ty
         return;
     }
 
-    SDL_PushEvent(&event);    
+    SDL_PushEvent(&event);
 
     if (text_input != '\0') {
         event.type = SDL_TEXTINPUT;
@@ -822,7 +822,7 @@ int SDL_WaitEventTimeout(SDL_Event * event, int timeout)
     vsf_protect_t orig = vsf_protect_int();
         is_empty = vsf_slist_queue_is_empty(&__vsf_sdl2_event.evt_list);
         if (is_empty && timeout > 0) {
-            SECTION(".text.vsf.kernel.vsf_sync")
+            VSF_CAL_SECTION(".text.vsf.kernel.vsf_sync")
             vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_timeout_tick_t timeout);
 
             __vsf_sdl2_event.eda_pending = vsf_eda_get_cur();
@@ -835,7 +835,7 @@ int SDL_WaitEventTimeout(SDL_Event * event, int timeout)
         vsf_evt_t evt = vsf_thread_wait();
         VSF_UNUSED_PARAM(evt);
 
-        SECTION(".text.vsf.kernel.__vsf_teda_cancel_timer")
+        VSF_CAL_SECTION(".text.vsf.kernel.__vsf_teda_cancel_timer")
         vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
         __vsf_teda_cancel_timer((vsf_teda_t *)eda);
 

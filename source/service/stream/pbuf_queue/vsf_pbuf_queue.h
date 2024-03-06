@@ -28,18 +28,18 @@
 #include "../pbuf/vsf_pbuf.h"
 
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
- *!        definition and there is NO ANY OTHER module-interface-header file 
+ *!        definition and there is NO ANY OTHER module-interface-header file
  *!        included in this file
  */
 #define __PLOOC_CLASS_USE_STRICT_TEMPLATE__
-   
+
 #if     defined(__VSF_PBUF_QUEUE_CLASS_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT__
 #   undef __VSF_PBUF_QUEUE_CLASS_IMPLEMENT
 #elif   defined(__VSF_PBUF_QUEUE_CLASS_INHERIT__)
 #   define __PLOOC_CLASS_INHERIT__
 #   undef __VSF_PBUF_QUEUE_CLASS_INHERIT__
-#endif   
+#endif
 
 #include "utilities/ooc_class.h"
 
@@ -95,25 +95,25 @@ end_def_class(vsf_stream_fifo_t)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
-extern 
-vsf_err_t vsf_stream_fifo_init( vsf_stream_fifo_t *obj_ptr, 
+extern
+vsf_err_t vsf_stream_fifo_init( vsf_stream_fifo_t *obj_ptr,
                                 vsf_stream_fifo_cfg_t *cfg_ptr);
 
-extern 
+extern
 vsf_err_t vsf_pbuf_queue_enqueue(vsf_stream_fifo_t *obj_ptr, vsf_pbuf_t *pblock);
 
-extern 
+extern
 vsf_pbuf_t * vsf_pbuf_queue_dequeue(vsf_stream_fifo_t *obj_ptr);
 
-SECTION(".text.vsf.service.stream.pbuf_queue.vsf_pbuf_queue_peek")
-extern 
+VSF_CAL_SECTION(".text.vsf.service.stream.pbuf_queue.vsf_pbuf_queue_peek")
+extern
 vsf_pbuf_t * vsf_pbuf_queue_peek(vsf_stream_fifo_t *obj_ptr);
 
 extern
 vsf_err_t vsf_pbuf_queue_data_available_event_register(
     vsf_stream_fifo_t *obj_ptr, vsf_stream_dat_rdy_evt_t tEventHandling);
 
-extern 
+extern
 vsf_err_t vsf_pbuf_queue_data_drain_event_register(
     vsf_stream_fifo_t *obj_ptr, vsf_stream_dat_drn_evt_t tEventHandling);
 

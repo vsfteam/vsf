@@ -50,21 +50,21 @@ struct usb_hub_desc_t {
             /* add 1 bit for hub status change; round to bytes */
             uint8_t  DeviceRemovable[(USB_MAXCHILDREN + 1 + 7) / 8];
             uint8_t  PortPwrCtrlMask[(USB_MAXCHILDREN + 1 + 7) / 8];
-        } PACKED hs;
+        } VSF_CAL_PACKED hs;
 
         struct {
             uint8_t bHubHdrDecLat;
             uint16_t wHubDelay;
             uint16_t DeviceRemovable;
-        } PACKED ss;
-    } PACKED u;
-} PACKED;
+        } VSF_CAL_PACKED ss;
+    } VSF_CAL_PACKED u;
+} VSF_CAL_PACKED;
 
 typedef struct usb_port_status_t usb_port_status_t;
 struct usb_port_status_t {
     uint16_t wPortStatus;
     uint16_t wPortChange;
-} PACKED;
+} VSF_CAL_PACKED;
 
 enum usb_port_feature_t {
     USB_PORT_FEAT_CONNECTION        = 0,

@@ -37,30 +37,20 @@ extern void vsf_pnp_on_netdrv_disconnect(vk_netdrv_t *netdrv);
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_PNP_ON_NETDRV_NEW
-WEAK(vsf_pnp_on_netdrv_new)
+VSF_CAL_WEAK(vsf_pnp_on_netdrv_new)
 void vsf_pnp_on_netdrv_new(vk_netdrv_t *netdrv) {}
-#endif
 
-#ifndef WEAK_VSF_PNP_ON_NETDRV_DEL
-WEAK(vsf_pnp_on_netdrv_del)
+VSF_CAL_WEAK(vsf_pnp_on_netdrv_del)
 void vsf_pnp_on_netdrv_del(vk_netdrv_t *netdrv) {}
-#endif
 
-#ifndef WEAK_VSF_PNP_ON_NETDRV_PREPARE
-WEAK(vsf_pnp_on_netdrv_prepare)
+VSF_CAL_WEAK(vsf_pnp_on_netdrv_prepare)
 void vsf_pnp_on_netdrv_prepare(vk_netdrv_t *netdrv) {}
-#endif
 
-#ifndef WEAK_VSF_PNP_ON_NETDRV_CONNECTED
-WEAK(vsf_pnp_on_netdrv_connected)
+VSF_CAL_WEAK(vsf_pnp_on_netdrv_connected)
 void vsf_pnp_on_netdrv_connected(vk_netdrv_t *netdrv) {}
-#endif
 
-#ifndef WEAK_VSF_PNP_ON_NETDRV_DISCONNECT
-WEAK(vsf_pnp_on_netdrv_disconnect)
+VSF_CAL_WEAK(vsf_pnp_on_netdrv_disconnect)
 void vsf_pnp_on_netdrv_disconnect(vk_netdrv_t *netdrv) {}
-#endif
 
 void vk_netdrv_on_netbuf_outputted(vk_netdrv_t *netdrv, void *netbuf)
 {

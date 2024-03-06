@@ -15,7 +15,7 @@ extern "C" {
 struct hid_class_descriptor {
     __u8  bDescriptorType;
     __le16 wDescriptorLength;
-} __packed;
+} VSF_CAL_PACKED;
 
 struct hid_descriptor {
     __u8  bLength;
@@ -25,7 +25,7 @@ struct hid_descriptor {
     __u8  bNumDescriptors;
 
     struct hid_class_descriptor desc[1];
-} __packed;
+} VSF_CAL_PACKED;
 
 struct hid_device;
 struct hid_ll_driver;

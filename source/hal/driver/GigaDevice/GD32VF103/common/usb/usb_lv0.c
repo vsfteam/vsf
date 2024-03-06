@@ -35,7 +35,7 @@ static const gd32vf103_usb_const_t __USB_OTG##__N##_const = {                   
 gd32vf103_usb_t USB_OTG##__N##_IP = {                                           \
     .param = &__USB_OTG##__N##_const,                                           \
 };                                                                              \
-ROOT void USB_OTG##__N##_IRQHandler(void)                                       \
+VSF_CAL_ROOT void USB_OTG##__N##_IRQHandler(void)                               \
 {                                                                               \
     if (USB_OTG##__N##_IP.is_host) {                                            \
         gd32vf103_usbh_irq(&USB_OTG##__N##_IP);                                 \
@@ -70,9 +70,9 @@ void USB_OTG##__N##_IRQHandler(void)                                            
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-WEAK(gd32vf103_usbd_irq)
+VSF_CAL_WEAK(gd32vf103_usbd_irq)
 void gd32vf103_usbd_irq(gd32vf103_usb_t *dc) { VSF_ASSERT(false); }
-WEAK(gd32vf103_usbh_irq)
+VSF_CAL_WEAK(gd32vf103_usbh_irq)
 void gd32vf103_usbh_irq(gd32vf103_usb_t *dc) { VSF_ASSERT(false); }
 
 VSF_MREPEAT(USB_OTG_COUNT, USB_OTG_IMPLEMENT, NULL)

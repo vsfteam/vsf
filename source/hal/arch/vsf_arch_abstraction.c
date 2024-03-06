@@ -24,78 +24,78 @@
 /*============================ MACROS ========================================*/
 
 #define IMPLEMENT_ENDIAN_FUNC(__bitlen)                                         \
-WEAK(cpu_to_le##__bitlen##p)                                                    \
+VSF_CAL_WEAK(cpu_to_le##__bitlen##p)                                            \
 uint_fast##__bitlen##_t cpu_to_le##__bitlen##p(uint##__bitlen##_t *p)           \
 {                                                                               \
     return cpu_to_le##__bitlen(*p);                                             \
 }                                                                               \
-WEAK(cpu_to_be##__bitlen##p)                                                    \
+VSF_CAL_WEAK(cpu_to_be##__bitlen##p)                                            \
 uint_fast##__bitlen##_t cpu_to_be##__bitlen##p(uint##__bitlen##_t *p)           \
 {                                                                               \
     return cpu_to_be##__bitlen(*p);                                             \
 }                                                                               \
-WEAK(le##__bitlen##_to_cpup)                                                    \
+VSF_CAL_WEAK(le##__bitlen##_to_cpup)                                            \
 uint_fast##__bitlen##_t le##__bitlen##_to_cpup(uint##__bitlen##_t *p)           \
 {                                                                               \
     return le##__bitlen##_to_cpu(*p);                                           \
 }                                                                               \
-WEAK(be##__bitlen##_to_cpup)                                                    \
+VSF_CAL_WEAK(be##__bitlen##_to_cpup)                                            \
 uint_fast##__bitlen##_t be##__bitlen##_to_cpup(uint##__bitlen##_t *p)           \
 {                                                                               \
     return be##__bitlen##_to_cpu(*p);                                           \
 }                                                                               \
-WEAK(cpu_to_le##__bitlen##s)                                                    \
+VSF_CAL_WEAK(cpu_to_le##__bitlen##s)                                            \
 void cpu_to_le##__bitlen##s(uint##__bitlen##_t *p)                              \
 {                                                                               \
     *p = cpu_to_le##__bitlen(*p);                                               \
 }                                                                               \
-WEAK(cpu_to_be##__bitlen##s)                                                    \
+VSF_CAL_WEAK(cpu_to_be##__bitlen##s)                                            \
 void cpu_to_be##__bitlen##s(uint##__bitlen##_t *p)                              \
 {                                                                               \
     *p = cpu_to_be##__bitlen(*p);                                               \
 }                                                                               \
-WEAK(le##__bitlen##_to_cpus)                                                    \
+VSF_CAL_WEAK(le##__bitlen##_to_cpus)                                            \
 void le##__bitlen##_to_cpus(uint##__bitlen##_t *p)                              \
 {                                                                               \
     *p = le##__bitlen##_to_cpu(*p);                                             \
 }                                                                               \
-WEAK(be##__bitlen##_to_cpus)                                                    \
+VSF_CAL_WEAK(be##__bitlen##_to_cpus)                                            \
 void be##__bitlen##_to_cpus(uint##__bitlen##_t *p)                              \
 {                                                                               \
     *p = be##__bitlen##_to_cpu(*p);                                             \
 }                                                                               \
-WEAK(get_unaligned_cpu##__bitlen)                                               \
+VSF_CAL_WEAK(get_unaligned_cpu##__bitlen)                                       \
 uint_fast##__bitlen##_t get_unaligned_cpu##__bitlen(const void *p)              \
 {                                                                               \
-    struct PACKED __packed_##__bitlen_t {                                       \
+    struct VSF_CAL_PACKED __packed_##__bitlen_t {                               \
         uint##__bitlen##_t __v;                                                 \
     } *__p = (struct __packed_##__bitlen_t *)p;                                 \
     return __p->__v;                                                            \
 }                                                                               \
-WEAK(get_unaligned_le##__bitlen)                                                \
+VSF_CAL_WEAK(get_unaligned_le##__bitlen)                                        \
 uint_fast##__bitlen##_t get_unaligned_le##__bitlen(const void *p)               \
 {                                                                               \
     return cpu_to_le##__bitlen(get_unaligned_cpu##__bitlen(p));                 \
 }                                                                               \
-WEAK(get_unaligned_be##__bitlen)                                                \
+VSF_CAL_WEAK(get_unaligned_be##__bitlen)                                        \
 uint_fast##__bitlen##_t get_unaligned_be##__bitlen(const void *p)               \
 {                                                                               \
     return cpu_to_be##__bitlen(get_unaligned_cpu##__bitlen(p));                 \
 }                                                                               \
-WEAK(put_unaligned_cpu##__bitlen)                                               \
+VSF_CAL_WEAK(put_unaligned_cpu##__bitlen)                                       \
 void put_unaligned_cpu##__bitlen(uint_fast##__bitlen##_t val, void *p)          \
 {                                                                               \
-    struct PACKED __packed_##__bitlen_t {                                       \
+    struct VSF_CAL_PACKED __packed_##__bitlen_t {                               \
         uint##__bitlen##_t __v;                                                 \
     } *__p = (struct __packed_##__bitlen_t *)p;                                 \
     __p->__v = val;                                                             \
 }                                                                               \
-WEAK(put_unaligned_le##__bitlen)                                                \
+VSF_CAL_WEAK(put_unaligned_le##__bitlen)                                        \
 void put_unaligned_le##__bitlen(uint_fast##__bitlen##_t val, void *p)           \
 {                                                                               \
     put_unaligned_cpu##__bitlen(cpu_to_le##__bitlen(val), p);                   \
 }                                                                               \
-WEAK(put_unaligned_be##__bitlen)                                                \
+VSF_CAL_WEAK(put_unaligned_be##__bitlen)                                        \
 void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t val, void *p)           \
 {                                                                               \
     put_unaligned_cpu##__bitlen(cpu_to_be##__bitlen(val), p);                   \
@@ -221,7 +221,7 @@ static void __vsf_protect_region_none_leave(vsf_protect_t orig)
  * Architecture Infrastructure                                                *
  *----------------------------------------------------------------------------*/
 
-WEAK(bswap_16)
+VSF_CAL_WEAK(bswap_16)
 uint_fast16_t bswap_16(uint_fast16_t value16)
 {
 #if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
@@ -231,7 +231,7 @@ uint_fast16_t bswap_16(uint_fast16_t value16)
 #endif
 }
 
-WEAK(bswap_32)
+VSF_CAL_WEAK(bswap_32)
 uint_fast32_t bswap_32(uint_fast32_t value32)
 {
 #if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
@@ -242,7 +242,7 @@ uint_fast32_t bswap_32(uint_fast32_t value32)
 }
 
 #ifdef UINT64_MAX
-WEAK(bswap_64)
+VSF_CAL_WEAK(bswap_64)
 uint_fast64_t bswap_64(uint_fast64_t value64)
 {
 #if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
@@ -263,7 +263,7 @@ IMPLEMENT_ENDIAN_FUNC(64)
 
 #ifndef __VSF_ARCH_CLZ
 // __vsf_arch_clz(0) = sizeof(uintalu_t) * 8
-WEAK(__vsf_arch_clz)
+VSF_CAL_WEAK(__vsf_arch_clz)
 uint_fast8_t __vsf_arch_clz(uintalu_t a)
 {
 #if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
@@ -287,7 +287,7 @@ uint_fast8_t __vsf_arch_clz(uintalu_t a)
 
 
 #ifndef __VSF_ARCH_MSB
-WEAK(__vsf_arch_msb)
+VSF_CAL_WEAK(__vsf_arch_msb)
 int_fast8_t __vsf_arch_msb(uintalu_t a)
 {
     int_fast8_t c = -1;
@@ -300,7 +300,7 @@ int_fast8_t __vsf_arch_msb(uintalu_t a)
 #endif
 
 #ifndef __VSF_ARCH_FFS
-WEAK(__vsf_arch_ffs)
+VSF_CAL_WEAK(__vsf_arch_ffs)
 int_fast8_t __vsf_arch_ffs(uintalu_t a)
 {
 #if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
@@ -316,7 +316,7 @@ int_fast8_t __vsf_arch_ffs(uintalu_t a)
 #endif
 
 #ifndef __VSF_ARCH_FFZ
-WEAK(__vsf_arch_ffz)
+VSF_CAL_WEAK(__vsf_arch_ffz)
 int_fast8_t __vsf_arch_ffz(uintalu_t a)
 {
 #   ifndef __VSF_ARCH_FFS
@@ -328,7 +328,7 @@ int_fast8_t __vsf_arch_ffz(uintalu_t a)
 #endif
 
 #ifndef VSF_CLZ32
-WEAK(vsf_clz32)
+VSF_CAL_WEAK(vsf_clz32)
 uint_fast8_t vsf_clz32(uint_fast32_t a)
 {
     uint_fast8_t num = 0;
@@ -363,7 +363,7 @@ uint_fast8_t vsf_clz32(uint_fast32_t a)
 #endif
 
 #ifndef VSF_MSB32
-WEAK(vsf_msb32)
+VSF_CAL_WEAK(vsf_msb32)
 int_fast8_t vsf_msb32(uint_fast32_t a)
 {
     if (__optimal_bit_sz >= 32) {
@@ -397,7 +397,7 @@ int_fast8_t vsf_msb32(uint_fast32_t a)
 #endif
 
 #ifndef VSF_FFS32
-WEAK(vsf_ffs32)
+VSF_CAL_WEAK(vsf_ffs32)
 int_fast8_t vsf_ffs32(uint_fast32_t a)
 {
     if (__optimal_bit_sz >= 32) {
@@ -432,7 +432,7 @@ int_fast8_t vsf_ffs32(uint_fast32_t a)
 #endif
 
 #ifndef VSF_FFZ32
-WEAK(vsf_ffz32)
+VSF_CAL_WEAK(vsf_ffz32)
 int_fast8_t vsf_ffz32(uint_fast32_t a)
 {
 #   ifndef VSF_FFS32
@@ -447,14 +447,14 @@ int_fast8_t vsf_ffz32(uint_fast32_t a)
  * SWI                                                                        *
  *----------------------------------------------------------------------------*/
 
-WEAK(vsf_drv_usr_swi_trigger)
+VSF_CAL_WEAK(vsf_drv_usr_swi_trigger)
 void vsf_drv_usr_swi_trigger(uint_fast8_t idx)
 {
     VSF_UNUSED_PARAM(idx);
     VSF_ARCH_ASSERT(false);
 }
 
-WEAK(vsf_swi_trigger)
+VSF_CAL_WEAK(vsf_swi_trigger)
 void vsf_swi_trigger(uint_fast8_t idx)
 {
 #if __VSF_HAL_SWI_NUM > 0 || !defined(__VSF_HAL_SWI_NUM)
@@ -481,7 +481,7 @@ void vsf_swi_trigger(uint_fast8_t idx)
 #   pragma diag_suppress=pe111
 #endif
 
-WEAK(vsf_drv_usr_swi_init)
+VSF_CAL_WEAK(vsf_drv_usr_swi_init)
 vsf_err_t vsf_drv_usr_swi_init(     uint_fast8_t idx,
                                     vsf_arch_prio_t priority,
                                     vsf_swi_handler_t *handler,
@@ -496,7 +496,7 @@ vsf_err_t vsf_drv_usr_swi_init(     uint_fast8_t idx,
     return VSF_ERR_FAIL;
 }
 
-WEAK(vsf_swi_init)
+VSF_CAL_WEAK(vsf_swi_init)
 vsf_err_t vsf_swi_init(     uint_fast8_t idx,
                             vsf_arch_prio_t priority,
                             vsf_swi_handler_t *handler,
@@ -533,21 +533,21 @@ vsf_err_t vsf_swi_init(     uint_fast8_t idx,
 
 #ifdef VSF_SYSTIMER_CFG_IMPL_MODE
 #   if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_TICK_MODE
-WEAK(vsf_systimer_evthandler)
+VSF_CAL_WEAK(vsf_systimer_evthandler)
 void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
 {
     VSF_UNUSED_PARAM(tick);
     VSF_ARCH_ASSERT(false);
 }
 #   else
-WEAK(vsf_systimer_on_tick)
+VSF_CAL_WEAK(vsf_systimer_on_tick)
 void vsf_systimer_on_tick(void)
 {
     VSF_ARCH_ASSERT(false);
 }
 #   endif
 
-WEAK(on_arch_systimer_tick_evt)
+VSF_CAL_WEAK(on_arch_systimer_tick_evt)
 bool on_arch_systimer_tick_evt(vsf_systimer_tick_t tick)
 {
     VSF_UNUSED_PARAM(tick);
@@ -559,14 +559,14 @@ bool on_arch_systimer_tick_evt(vsf_systimer_tick_t tick)
 #if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
     ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
 
-WEAK(vsf_arch_req___systimer_freq___from_usr)
+VSF_CAL_WEAK(vsf_arch_req___systimer_freq___from_usr)
 uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void)
 {
     return VSF_GET_MAIN_CLK();
 }
 
 
-WEAK(vsf_systimer_us_to_tick)
+VSF_CAL_WEAK(vsf_systimer_us_to_tick)
 vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 {
     return ((vsf_systimer_tick_t)
@@ -574,7 +574,7 @@ vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
                 (vsf_systimer_tick_t)__systimer.unit);
 }
 
-WEAK(vsf_systimer_ms_to_tick)
+VSF_CAL_WEAK(vsf_systimer_ms_to_tick)
 vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 {
     return ((vsf_systimer_tick_t)(
@@ -582,13 +582,13 @@ vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
                 (vsf_systimer_tick_t)__systimer.unit * 1000));
 }
 
-WEAK(vsf_systimer_tick_to_us)
+VSF_CAL_WEAK(vsf_systimer_tick_to_us)
 vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
 {
     return tick / __systimer.unit;
 }
 
-WEAK(vsf_systimer_tick_to_ms)
+VSF_CAL_WEAK(vsf_systimer_tick_to_ms)
 vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
 {
     return vsf_systimer_tick_to_us(tick) / 1000;
@@ -709,7 +709,7 @@ void vsf_systimer_ovf_evt_handler(void)
  *! \param frequency the target tick frequency in Hz
  *! \return initialization result in vsf_err_t
  */
-WEAK(vsf_systimer_init)
+VSF_CAL_WEAK(vsf_systimer_init)
 vsf_err_t vsf_systimer_init(void)
 {
     //! calculate the cycle count of 1 tick
@@ -725,13 +725,13 @@ vsf_err_t vsf_systimer_init(void)
     return vsf_systimer_low_level_init(__systimer.max_tick_per_round);
 }
 
-WEAK(vsf_systimer_get_freq)
+VSF_CAL_WEAK(vsf_systimer_get_freq)
 uint32_t vsf_systimer_get_freq(void)
 {
     return vsf_arch_req___systimer_freq___from_usr();
 }
 
-WEAK(vsf_systimer_set_idle)
+VSF_CAL_WEAK(vsf_systimer_set_idle)
 void vsf_systimer_set_idle(void)
 {
 //    vsf_trace_debug("systimer_idle\r\n");
@@ -741,7 +741,7 @@ void vsf_systimer_set_idle(void)
     vsf_set_interrupt(gint_state);
 }
 
-WEAK(vsf_systimer_get)
+VSF_CAL_WEAK(vsf_systimer_get)
 vsf_systimer_tick_t vsf_systimer_get(void)
 {
     static vsf_systimer_tick_t __ticks_prev = 0;
@@ -794,7 +794,7 @@ vsf_systimer_tick_t vsf_systimer_get(void)
     return ticks;
 }
 
-WEAK(vsf_systimer_start)
+VSF_CAL_WEAK(vsf_systimer_start)
 vsf_err_t vsf_systimer_start(void)
 {
     vsf_arch_prio_t gint_state = vsf_disable_interrupt();
@@ -805,7 +805,7 @@ vsf_err_t vsf_systimer_start(void)
 }
 
 
-WEAK(vsf_systimer_set)
+VSF_CAL_WEAK(vsf_systimer_set)
 bool vsf_systimer_set(vsf_systimer_tick_t due)
 {
     bool result = false;
@@ -839,7 +839,7 @@ bool vsf_systimer_set(vsf_systimer_tick_t due)
     return result;
 }
 
-WEAK(vsf_systimer_is_due)
+VSF_CAL_WEAK(vsf_systimer_is_due)
 bool vsf_systimer_is_due(vsf_systimer_tick_t due)
 {
     vsf_systimer_tick_t tick = __vsf_systimer_update();
@@ -863,7 +863,7 @@ void vsf_systimer_match_evthandler(void)
  *! \param frequency the target tick frequency in Hz
  *! \return initialization result in vsf_err_t
  */
-WEAK(vsf_systimer_init)
+VSF_CAL_WEAK(vsf_systimer_init)
 vsf_err_t vsf_systimer_init(void)
 {
     //! calculate the cycle count of 1 tick
@@ -876,24 +876,24 @@ vsf_err_t vsf_systimer_init(void)
     return vsf_systimer_low_level_init();
 }
 
-WEAK(vsf_systimer_get_freq)
+VSF_CAL_WEAK(vsf_systimer_get_freq)
 uint32_t vsf_systimer_get_freq(void)
 {
     return vsf_arch_req___systimer_freq___from_usr();
 }
 
-WEAK(vsf_systimer_set_idle)
+VSF_CAL_WEAK(vsf_systimer_set_idle)
 void vsf_systimer_set_idle(void)
 {
 }
 
-WEAK(vsf_systimer_get)
+VSF_CAL_WEAK(vsf_systimer_get)
 vsf_systimer_tick_t vsf_systimer_get(void)
 {
     return vsf_systimer_low_level_get_current();
 }
 
-WEAK(vsf_systimer_start)
+VSF_CAL_WEAK(vsf_systimer_start)
 vsf_err_t vsf_systimer_start(void)
 {
     vsf_systimer_low_level_enable();
@@ -901,14 +901,14 @@ vsf_err_t vsf_systimer_start(void)
 }
 
 
-WEAK(vsf_systimer_set)
+VSF_CAL_WEAK(vsf_systimer_set)
 bool vsf_systimer_set(vsf_systimer_tick_t due)
 {
     vsf_systimer_low_level_set_match(due);
     return true;
 }
 
-WEAK(vsf_systimer_is_due)
+VSF_CAL_WEAK(vsf_systimer_is_due)
 bool vsf_systimer_is_due(vsf_systimer_tick_t due)
 {
     return (vsf_systimer_low_level_get_current() >= due);
@@ -922,19 +922,19 @@ bool vsf_systimer_is_due(vsf_systimer_tick_t due)
  *----------------------------------------------------------------------------*/
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE
 
-WEAK(vsf_arch_req___systimer_freq___from_usr)
+VSF_CAL_WEAK(vsf_arch_req___systimer_freq___from_usr)
 uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void)
 {
     return VSF_GET_MAIN_CLK();
 }
 
-WEAK(vsf_arch_req___systimer_resolution___from_usr)
+VSF_CAL_WEAK(vsf_arch_req___systimer_resolution___from_usr)
 uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
 {
     return 1000ul;          //!< 1ms (1KHz)
 }
 
-WEAK(vsf_systimer_us_to_tick)
+VSF_CAL_WEAK(vsf_systimer_us_to_tick)
 vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 {
     vsf_systimer_tick_t clock_src_freq = vsf_arch_req___systimer_freq___from_usr();
@@ -945,7 +945,7 @@ vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
     return tick;
 }
 
-WEAK(vsf_systimer_ms_to_tick)
+VSF_CAL_WEAK(vsf_systimer_ms_to_tick)
 vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 {
     vsf_systimer_tick_t clock_src_freq = vsf_arch_req___systimer_freq___from_usr();
@@ -956,7 +956,7 @@ vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
     return tick;
 }
 
-WEAK(vsf_systimer_tick_to_us)
+VSF_CAL_WEAK(vsf_systimer_tick_to_us)
 vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
 {
     if (tick > 0) {
@@ -967,7 +967,7 @@ vsf_systimer_tick_t vsf_systimer_tick_to_us(vsf_systimer_tick_t tick)
     return tick;
 }
 
-WEAK(vsf_systimer_tick_to_ms)
+VSF_CAL_WEAK(vsf_systimer_tick_to_ms)
 vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick)
 {
     if (tick > 0) {
@@ -996,7 +996,7 @@ void vsf_systimer_ovf_evt_handler(void)
  *! \param frequency the target tick frequency in Hz
  *! \return initialization result in vsf_err_t
  */
-WEAK(vsf_systimer_init)
+VSF_CAL_WEAK(vsf_systimer_init)
 vsf_err_t vsf_systimer_init(void)
 {
 
@@ -1015,20 +1015,20 @@ vsf_err_t vsf_systimer_init(void)
     return vsf_systimer_low_level_init(__systimer.cycle_per_tick);
 }
 
-WEAK(vsf_systimer_get_freq)
+VSF_CAL_WEAK(vsf_systimer_get_freq)
 uint32_t vsf_systimer_get_freq(void)
 {
     // systimer resolution is the tick frequency
     return vsf_arch_req___systimer_resolution___from_usr();
 }
 
-WEAK(vsf_systimer_set_idle)
+VSF_CAL_WEAK(vsf_systimer_set_idle)
 void vsf_systimer_set_idle(void)
 {
 //    vsf_trace_debug("systimer_idle\r\n");
 }
 
-WEAK(vsf_systimer_get)
+VSF_CAL_WEAK(vsf_systimer_get)
 vsf_systimer_tick_t vsf_systimer_get(void)
 {
     vsf_protect_t orig = vsf_protect_int();
@@ -1037,7 +1037,7 @@ vsf_systimer_tick_t vsf_systimer_get(void)
     return cur_tick;
 }
 
-WEAK(vsf_systimer_start)
+VSF_CAL_WEAK(vsf_systimer_start)
 vsf_err_t vsf_systimer_start(void)
 {
     {
@@ -1055,13 +1055,13 @@ vsf_err_t vsf_systimer_start(void)
 }
 
 
-WEAK(vsf_systimer_set)
+VSF_CAL_WEAK(vsf_systimer_set)
 bool vsf_systimer_set(vsf_systimer_tick_t due)
 {
     return true;
 }
 
-WEAK(vsf_systimer_is_due)
+VSF_CAL_WEAK(vsf_systimer_is_due)
 bool vsf_systimer_is_due(vsf_systimer_tick_t due)
 {
     return (__systimer.tick >= due);
@@ -1084,7 +1084,7 @@ void vsf_systimer_timeout_evt_handler(vsf_systimer_tick_t tick)
     }
 }
 
-WEAK(vsf_systimer_get_freq)
+VSF_CAL_WEAK(vsf_systimer_get_freq)
 uint32_t vsf_systimer_get_freq(void)
 {
 #ifdef VSF_ARCH_SYSTIMER_FREQ
@@ -1102,7 +1102,7 @@ uint32_t vsf_systimer_get_freq(void)
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
  */
-WEAK(vsf_arch_init)
+VSF_CAL_WEAK(vsf_arch_init)
 bool vsf_arch_init(void)
 {
     vsf_arch_low_level_init();

@@ -127,7 +127,7 @@ const i_heap_t VSF_HEAP = {
 /*============================ LOCAL VARIABLES ===============================*/
 
 #if VSF_ARCH_PROVIDE_HEAP != ENABLED
-static NO_INIT vsf_default_heap_t __vsf_heap;
+static VSF_CAL_NO_INIT vsf_default_heap_t __vsf_heap;
 #endif
 
 /*============================ PROTOTYPES ====================================*/
@@ -536,9 +536,8 @@ void __vsf_heap_statistics(vsf_heap_t *heap, vsf_heap_statistics_t *statistics)
 #endif
 
 // default heap
-#ifndef WEAK_VSF_HEAP_GET_FREELIST
 // default freelist, single free list
-WEAK(vsf_heap_get_freelist)
+VSF_CAL_WEAK(vsf_heap_get_freelist)
 vsf_dlist_t * vsf_heap_get_freelist(vsf_dlist_t *freelist, uint_fast8_t freelist_num, uint_fast32_t size)
 {
     VSF_UNUSED_PARAM(freelist);
@@ -546,7 +545,6 @@ vsf_dlist_t * vsf_heap_get_freelist(vsf_dlist_t *freelist, uint_fast8_t freelist
     VSF_UNUSED_PARAM(size);
     return freelist;
 }
-#endif
 
 #if VSF_ARCH_PROVIDE_HEAP != ENABLED
 // MUST NOT return NULL;

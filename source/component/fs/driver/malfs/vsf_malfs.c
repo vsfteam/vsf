@@ -89,7 +89,7 @@ typedef struct vk_malfs_dpt_t {
     uint8_t end_cylinder_number;
     uint32_t sectors_preceding;
     uint32_t sectors_in_partition;
-} PACKED vk_malfs_dpt_t;
+} VSF_CAL_PACKED vk_malfs_dpt_t;
 
 typedef struct vk_malfs_mbr_t {
     uint8_t boot_record[440];
@@ -97,7 +97,7 @@ typedef struct vk_malfs_mbr_t {
     uint16_t reserved;
     vk_malfs_dpt_t dpt[4];
     uint16_t magic;
-} PACKED vk_malfs_mbr_t;
+} VSF_CAL_PACKED vk_malfs_mbr_t;
 
 typedef struct vk_malfs_gpt_header_t {
     char signature[8];              // should be "EFI PART"
@@ -114,7 +114,7 @@ typedef struct vk_malfs_gpt_header_t {
     uint32_t partition_entry_num;
     uint32_t partition_entry_size;
     uint32_t partition_entry_crc;
-} PACKED vk_malfs_gpt_header_t;
+} VSF_CAL_PACKED vk_malfs_gpt_header_t;
 
 typedef struct vk_mal_gpt_entry_t {
     uint8_t type_guid[16];
@@ -123,7 +123,7 @@ typedef struct vk_mal_gpt_entry_t {
     uint64_t last_lba;
     uint64_t attr;
     uint16_t name_utf16[36];
-} PACKED vk_mal_gpt_entry_t;
+} VSF_CAL_PACKED vk_mal_gpt_entry_t;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

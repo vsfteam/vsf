@@ -174,13 +174,13 @@ extern "C" {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-SECTION(".text.vsf.kernel.__vsf_grouped_evts_init")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_grouped_evts_init")
 extern void __vsf_grouped_evts_init(  vsf_bmpevt_t *this_ptr,
                                 vsf_bmpevt_adapter_t **adapters_pptr,
                                 uint_fast8_t adapter_count,
                                 uint_fast32_t auto_reset);
 
-SECTION(".text.vsf.kernel.__vsf_bmpevt_wait_for")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_bmpevt_wait_for")
 extern vsf_sync_reason_t __vsf_bmpevt_wait_for(
                                             vsf_bmpevt_t *bmpevt_ptr,
                                             const vsf_bmpevt_pender_t *pender_ptr,

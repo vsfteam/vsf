@@ -633,7 +633,7 @@ static int __hci_transport_aic8800_can_send_packet_now(uint8_t packet_type)
     return bt_hci_tx_available(BT_HCI_CH_0) && (NULL == __hci_transport_aic8800_param.tx_buffer);
 }
 
-WEAK(__hci_transport_aic8800_get_cmd_delay_ms)
+VSF_CAL_WEAK(__hci_transport_aic8800_get_cmd_delay_ms)
 uint_fast8_t __hci_transport_aic8800_get_cmd_delay_ms(uint8_t *packet, int size)
 {
     return 0;

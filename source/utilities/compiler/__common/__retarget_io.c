@@ -38,13 +38,13 @@ void vsf_stdio_init(void)
 
 }
 
-SECTION(".vsf.utilities.stdio.__vsf_stdio_write")
+VSF_CAL_SECTION(".vsf.utilities.stdio.__vsf_stdio_write")
 size_t __vsf_stdio_write(int handle, const unsigned char *buf, size_t buf_size)
 {
     return write(handle, (void *)buf, buf_size);
 }
 
-SECTION(".vsf.utilities.stdio.iar.__vsf_stdio_read")
+VSF_CAL_SECTION(".vsf.utilities.stdio.iar.__vsf_stdio_read")
 size_t __vsf_stdio_read(int handle, unsigned char *buf, size_t buf_size)
 {
     return read(handle, buf, buf_size);
@@ -59,13 +59,13 @@ extern int vsf_stdin_getchar(void);
 extern void vsf_stdout_init(void);
 extern void vsf_stdin_init(void);
 
-WEAK(vsf_stdout_putchar)
+VSF_CAL_WEAK(vsf_stdout_putchar)
 int vsf_stdout_putchar(char ch)
 {
     return 0;
 }
 
-WEAK(vsf_stderr_putchar)
+VSF_CAL_WEAK(vsf_stderr_putchar)
 int vsf_stderr_putchar(char ch)
 {
     return vsf_stdout_putchar(ch);
@@ -77,7 +77,7 @@ void vsf_stdio_init(void)
     vsf_stdin_init();
 }
 
-SECTION(".vsf.utilities.stdio.__vsf_stdio_write")
+VSF_CAL_SECTION(".vsf.utilities.stdio.__vsf_stdio_write")
 size_t __vsf_stdio_write(int handle, const unsigned char *buf, size_t buf_size)
 {
     size_t nChars = 0;
@@ -97,7 +97,7 @@ size_t __vsf_stdio_write(int handle, const unsigned char *buf, size_t buf_size)
     return nChars;
 }
 
-SECTION(".vsf.utilities.stdio.__vsf_stdio_read")
+VSF_CAL_SECTION(".vsf.utilities.stdio.__vsf_stdio_read")
 size_t __vsf_stdio_read(int handle, unsigned char *buf, size_t buf_size)
 {
     size_t nChars = 0;

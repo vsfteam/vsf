@@ -33,7 +33,7 @@ extern const __isr_t __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-ROOT
+VSF_CAL_ROOT
 #if __IS_COMPILER_IAR__
 __irq __nested __arm
 #endif

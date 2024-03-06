@@ -57,7 +57,7 @@ extern struct pbuf * pbuf_free_header(struct pbuf *q, u16_t size);
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT vk_usbip_server_lwip_t __vk_usbip_server_lwip;
+static VSF_CAL_NO_INIT vk_usbip_server_lwip_t __vk_usbip_server_lwip;
 
 /*============================ IMPLEMENTATION ================================*/
 

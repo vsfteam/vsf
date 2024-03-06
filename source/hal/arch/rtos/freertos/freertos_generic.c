@@ -80,7 +80,7 @@ typedef struct __vsf_freertos_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT __vsf_freertos_t __vsf_freertos;
+static VSF_CAL_NO_INIT __vsf_freertos_t __vsf_freertos;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -434,13 +434,13 @@ void vsf_freertos_start(void)
                         NULL);                                  /* The pointer to the task_id. */
 }
 
-WEAK(vApplicationMallocFailedHook)
+VSF_CAL_WEAK(vApplicationMallocFailedHook)
 void vApplicationMallocFailedHook(void)
 {
     VSF_ARCH_ASSERT(false);
 }
 
-WEAK(vApplicationGetIdleTaskMemory)
+VSF_CAL_WEAK(vApplicationGetIdleTaskMemory)
 void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackType_t **ppxIdleTaskStackBuffer, uint32_t *pulIdleTaskStackSize)
 {
     static StaticTask_t xIdleTaskTCB;
@@ -451,7 +451,7 @@ void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer, StackTyp
     *pulIdleTaskStackSize = configMINIMAL_STACK_SIZE;
 }
 
-WEAK(vApplicationGetTimerTaskMemory)
+VSF_CAL_WEAK(vApplicationGetTimerTaskMemory)
 void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer, StackType_t **ppxTimerTaskStackBuffer, uint32_t *pulTimerTaskStackSize )
 {
     static StaticTask_t xTimerTaskTCB;
@@ -462,17 +462,17 @@ void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer, StackT
     *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
 }
 
-WEAK(vApplicationIdleHook)
+VSF_CAL_WEAK(vApplicationIdleHook)
 void vApplicationIdleHook(void)
 {
 }
 
-WEAK(vApplicationTickHook)
+VSF_CAL_WEAK(vApplicationTickHook)
 void vApplicationTickHook(void)
 {
 }
 
-WEAK(vApplicationDaemonTaskStartupHook)
+VSF_CAL_WEAK(vApplicationDaemonTaskStartupHook)
 void vApplicationDaemonTaskStartupHook(void)
 {
 }

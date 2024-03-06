@@ -49,8 +49,8 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-void __vsf_rng_buf_init_ex( vsf_rng_buf_t* obj_ptr, 
-                            uint_fast16_t buffer_item_cnt, 
+void __vsf_rng_buf_init_ex( vsf_rng_buf_t* obj_ptr,
+                            uint_fast16_t buffer_item_cnt,
                             bool is_init_as_full)
 {
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
@@ -108,7 +108,7 @@ int32_t __vsf_rng_buf_get_one(vsf_rng_buf_t* obj_ptr)
     return index;
 }
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count")
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count")
 uint_fast16_t __vsf_rng_buf_item_count(vsf_rng_buf_t* obj_ptr)
 {
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
@@ -118,16 +118,16 @@ uint_fast16_t __vsf_rng_buf_item_count(vsf_rng_buf_t* obj_ptr)
     return vsf_this.length;
 }
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_send_multiple")
-int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *obj_ptr, 
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_send_multiple")
+int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *obj_ptr,
                                     uint16_t *item_cnt_ptr)
 {
-    
+
     int32_t index = -1;
     uint_fast16_t hwWritten = 0;
     uint_fast16_t hwSpaceLeft;
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
-    
+
     VSF_ASSERT(NULL != obj_ptr && NULL != item_cnt_ptr);
 
     do {
@@ -143,7 +143,7 @@ int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *obj_ptr,
         hwWritten = vsf_min(hwWritten, hwSpaceLeft);
 
         *item_cnt_ptr = hwWritten;  /*!< update actual written number */
-        
+
         vsf_this.tail += hwWritten;
         vsf_this.length += hwWritten;
 
@@ -155,15 +155,15 @@ int32_t __vsf_rng_buf_send_multiple(vsf_rng_buf_t *obj_ptr,
     return index;
 }
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_get_multiple")
-int32_t __vsf_rng_buf_get_multiple( vsf_rng_buf_t* obj_ptr, 
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_get_multiple")
+int32_t __vsf_rng_buf_get_multiple( vsf_rng_buf_t* obj_ptr,
                                     uint16_t* item_cnt_ptr)
 {
-    
+
     int32_t index = -1;
     uint_fast16_t hwRead = 0;
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
-    
+
     VSF_ASSERT(NULL != obj_ptr && NULL != item_cnt_ptr);
 
     do {
@@ -195,7 +195,7 @@ int32_t __vsf_rng_buf_get_multiple( vsf_rng_buf_t* obj_ptr,
 }
 
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_one")
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_one")
 int32_t __vsf_rng_buf_peek_one(vsf_rng_buf_t* obj_ptr)
 {
     int32_t index = -1;
@@ -218,7 +218,7 @@ int32_t __vsf_rng_buf_peek_one(vsf_rng_buf_t* obj_ptr)
     return index;
 }
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_reset_peek")
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_reset_peek")
 void __vsf_rng_buf_reset_peek(vsf_rng_buf_t* obj_ptr)
 {
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
@@ -228,7 +228,7 @@ void __vsf_rng_buf_reset_peek(vsf_rng_buf_t* obj_ptr)
     vsf_this.peek_cnt = 0;
 }
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_get_all_peeked")
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_get_all_peeked")
 void __vsf_rng_buf_get_all_peeked(vsf_rng_buf_t* obj_ptr)
 {
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
@@ -240,7 +240,7 @@ void __vsf_rng_buf_get_all_peeked(vsf_rng_buf_t* obj_ptr)
 }
 
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count_peekable")
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_item_count_peekable")
 uint_fast16_t __vsf_rng_buf_item_count_peekable(vsf_rng_buf_t* obj_ptr)
 {
     class_internal(obj_ptr, this_ptr, vsf_rng_buf_t);
@@ -251,8 +251,8 @@ uint_fast16_t __vsf_rng_buf_item_count_peekable(vsf_rng_buf_t* obj_ptr)
 }
 
 
-SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_multiple")
-int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* obj_ptr, 
+VSF_CAL_SECTION(".text.vsf.utilities.__vsf_rng_buf_peek_multiple")
+int32_t __vsf_rng_buf_peek_multiple(vsf_rng_buf_t* obj_ptr,
                                     uint16_t* item_cnt_ptr)
 {
     int32_t index = -1;

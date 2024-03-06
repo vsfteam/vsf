@@ -31,12 +31,10 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_INPUT_ON_KEYBOARD
-WEAK(vsf_input_on_keyboard)
+VSF_CAL_WEAK(vsf_input_on_keyboard)
 void vsf_input_on_keyboard(vk_keyboard_evt_t *keyboard_evt)
 {
     vsf_input_on_evt(VSF_INPUT_TYPE_KEYBOARD, &keyboard_evt->use_as__vk_input_evt_t);
 }
-#endif
 
 #endif      // VSF_USE_INPUT

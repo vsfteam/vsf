@@ -66,7 +66,7 @@ typedef struct vk_usbd_uac_control_info_t {
     uint16_t size;
 
     void (*on_set)(vk_usbd_uac_control_t *control);
-    
+
     vk_av_control_value_t min;
     vk_av_control_value_t max;
     vk_av_control_value_t res;
@@ -98,7 +98,7 @@ typedef struct vk_usbd_uac2_range_t {
         vk_usbd_uac2_lay2_t lay2;
         vk_usbd_uac2_lay3_t lay3;
     } attributes[0];
-} PACKED vk_usbd_uac2_range_t;
+} VSF_CAL_PACKED vk_usbd_uac2_range_t;
 
 typedef struct vk_usbd_uac2_control_info_t {
     uint8_t selector;
@@ -116,7 +116,7 @@ typedef struct vk_usbd_uac_control_t {
     union {
         const vk_usbd_uac_control_info_t *info;
         const vk_usbd_uac2_control_info_t *info2;
-    };    
+    };
     vk_av_control_value_t cur;
 } vk_usbd_uac_control_t;
 
@@ -150,7 +150,7 @@ vsf_class(vk_usbd_uac_ac_t) {
         uint32_t control_value;
 #endif
 #if (VSF_USBD_UAC_CFG_UAC1_EN == ENABLED) && (VSF_USBD_UAC_CFG_UAC2_EN == ENABLED)
-        vk_usb_uac_version_t version; 
+        vk_usb_uac_version_t version;
 #endif
     )
 };

@@ -339,7 +339,7 @@ struct libusb_ss_endpoint_companion_descriptor {
     uint8_t  bMaxBurst;
     uint8_t  bmAttributes;
     uint16_t wBytesPerInterval;
-} PACKED;
+} VSF_CAL_PACKED;
 
 static inline void libusb_fill_control_transfer(
     struct libusb_transfer *transfer, libusb_device_handle *dev_handle,

@@ -403,7 +403,7 @@ typedef union vsf_mmc_csd_t {
         uint32_t                    : 6;        //  120
 
         uint32_t CSD_STRUCTURE      : 2;        //  126
-    } PACKED sd_v1;
+    } VSF_CAL_PACKED sd_v1;
 // refer to: Part_1_Physical_Layer_Specification_Ver3.01_Final_100218.pdf
     struct {
         uint32_t                    : 1;        //  0
@@ -452,7 +452,7 @@ typedef union vsf_mmc_csd_t {
         uint32_t                    : 6;        //  120
 
         uint32_t CSD_STRUCTURE      : 2;        //  126
-    } PACKED sd_v2;
+    } VSF_CAL_PACKED sd_v2;
 // refer to: mmc specification
     struct {
         uint32_t                    : 1;        //  0
@@ -509,8 +509,8 @@ typedef union vsf_mmc_csd_t {
         uint32_t SPEC_VERS          : 4;        //  122
 
         uint32_t CSD_STRUCTURE      : 2;        //  126
-    } PACKED mmc;
-} PACKED vsf_mmc_csd_t;
+    } VSF_CAL_PACKED mmc;
+} VSF_CAL_PACKED vsf_mmc_csd_t;
 
 typedef struct vsf_mmc_cid_t {
 // refer to: Part_1_Physical_Layer_Specification_Ver3.01_Final_100218.pdf
@@ -523,7 +523,7 @@ typedef struct vsf_mmc_cid_t {
     uint64_t PNM                    : 40;       //  64  Product name
     uint64_t OID                    : 16;       //  104 OEM/Application ID
     uint64_t MID                    : 8;        //  120 Manufacturer ID
-} PACKED vsf_mmc_cid_t;
+} VSF_CAL_PACKED vsf_mmc_cid_t;
 
 #if VSF_MMC_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
 typedef enum vsf_mmc_mode_t {

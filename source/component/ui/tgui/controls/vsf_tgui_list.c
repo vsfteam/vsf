@@ -264,7 +264,7 @@ static bool __vk_tgui_list_next(vsf_tgui_list_t* ptList)
     } else {
         ptList->chStartIndex++;
     }
-    
+
     __vk_tgui_list_invoke_event(ptList, VSF_TGUI_EVT_LIST_SELECTION_CHANGED);
     __vsf_tgui_list_adjust_inner_container_location(ptList, ptList->chStartIndex);
 
@@ -473,26 +473,26 @@ int_fast16_t vk_tgui_list_selected_item_set(vsf_tgui_list_t* ptList,
 }
 
 #if VSF_TGUI_CFG_LIST_SUPPORT_SCROOLBAR == ENABLED
-SECTION(".text.vsf.component.tgui.vsf_tgui_list_scrollbar_regions_generate");
+VSF_CAL_SECTION(".text.vsf.component.tgui.vsf_tgui_list_scrollbar_regions_generate");
 vsf_tgui_list_scrollbar_region_t * vsf_tgui_list_scrollbar_regions_generate(
                             const vsf_tgui_control_t* control_ptr,
-                            const vsf_tgui_list_t* ptList, 
-                            uint_fast8_t chScalingRatio, 
+                            const vsf_tgui_list_t* ptList,
+                            uint_fast8_t chScalingRatio,
                             vsf_tgui_list_scrollbar_region_t *ptOutputBuffer)
 {
-    VSF_TGUI_ASSERT(    NULL != control_ptr 
-                    &&  NULL != ptList 
-                    &&  chScalingRatio > 0 
+    VSF_TGUI_ASSERT(    NULL != control_ptr
+                    &&  NULL != ptList
+                    &&  chScalingRatio > 0
                     &&  NULL != ptOutputBuffer);
 
     const vsf_tgui_container_t* ptInnerContainer = ptList->ptList;
-    const vsf_tgui_size_t *ptPanelSize = 
+    const vsf_tgui_size_t *ptPanelSize =
         vsf_tgui_control_get_size((const vsf_tgui_control_t *)control_ptr);
-    const vsf_tgui_size_t *ptListSize = 
+    const vsf_tgui_size_t *ptListSize =
         vsf_tgui_control_get_size((const vsf_tgui_control_t *)ptList);
-    const vsf_tgui_size_t *ptListInnerContainerSize = 
+    const vsf_tgui_size_t *ptListInnerContainerSize =
         vsf_tgui_control_get_size((const vsf_tgui_control_t *)ptInnerContainer);
-    const vsf_tgui_location_t *ptListInnerContainerLocation = 
+    const vsf_tgui_location_t *ptListInnerContainerLocation =
         vsf_tgui_control_get_location((const vsf_tgui_control_t *)ptInnerContainer);
 
     int16_t iScrollbarTrackPieceSize;
@@ -527,13 +527,13 @@ vsf_tgui_list_scrollbar_region_t * vsf_tgui_list_scrollbar_regions_generate(
                         .tSize = { .iWidth = iLineWidth, .iHeight = iScrollbarSize },
                     }, // right
                 };
- 
-                tRectRegionsY.tBar.tLocation.iY +=iScrollbarTrackPieceSize*(-ptListInnerContainerLocation->iY)/iInnerContainerRawSize;    // ¹ö¶¯ÌõÎª¶¨ÖµÊ±±ØÐëÓÃÕâÌõ
+
+                tRectRegionsY.tBar.tLocation.iY +=iScrollbarTrackPieceSize*(-ptListInnerContainerLocation->iY)/iInnerContainerRawSize;    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ÖµÊ±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 if ((tRectRegionsY.tBar.tLocation.iY+iScrollbarSize)>(tRectRegionsY.tTrack.tLocation.iY+iScrollbarTrackPieceSize)) {
                      tRectRegionsY.tBar.tSize.iHeight-=tRectRegionsY.tBar.tLocation.iY+iScrollbarSize-tRectRegionsY.tTrack.tLocation.iY-iScrollbarTrackPieceSize;
                 }
                 if ((tRectRegionsY.tBar.tLocation.iY)<(tRectRegionsY.tTrack.tLocation.iY)) {
-                     tRectRegionsY.tBar.tSize.iHeight-=(tRectRegionsY.tTrack.tLocation.iY-tRectRegionsY.tBar.tLocation.iY);//½Ø¶Ì
+                     tRectRegionsY.tBar.tSize.iHeight-=(tRectRegionsY.tTrack.tLocation.iY-tRectRegionsY.tBar.tLocation.iY);//ï¿½Ø¶ï¿½
                      tRectRegionsY.tBar.tLocation.iY=tRectRegionsY.tTrack.tLocation.iY;
                 }
                 *ptOutputBuffer = tRectRegionsY;
@@ -550,27 +550,27 @@ vsf_tgui_list_scrollbar_region_t * vsf_tgui_list_scrollbar_regions_generate(
         #endif
             iScrollbarSize = iListRawSize/chScalingRatio;
             iScrollbarTrackPieceSize = iInnerContainerRawSize/chScalingRatio;
-            iOriginOffset = (ptPanelSize->iWidth / 2) - (iScrollbarTrackPieceSize/2); // ¾ÓÖÐ
+            iOriginOffset = (ptPanelSize->iWidth / 2) - (iScrollbarTrackPieceSize/2); // ï¿½ï¿½ï¿½ï¿½
 
             do {
                 vsf_tgui_list_scrollbar_region_t tRectRegionsX = {
                     {
                         .tLocation = { .iX = iOriginOffset, .iY = ptPanelSize->iHeight - iLineHeight },
                         .tSize = { .iWidth = iScrollbarTrackPieceSize, .iHeight = iLineHeight },
-                    }, // bottom »¬¶¯Ìõ²Û
+                    }, // bottom ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                     {
                         .tLocation = { .iX = iOriginOffset, .iY = ptPanelSize->iHeight - iLineHeight },
                         .tSize = { .iWidth = iScrollbarSize, .iHeight = iLineHeight },
                     }, // bottom
                 };
-            
+
                 tRectRegionsX.tBar.tLocation.iX +=iScrollbarTrackPieceSize*(-ptListInnerContainerLocation->iX)/iInnerContainerRawSize;
                 if ((tRectRegionsX.tBar.tLocation.iX+iScrollbarSize)>(tRectRegionsX.tTrack.tLocation.iX+iScrollbarTrackPieceSize)) {
                      tRectRegionsX.tBar.tSize.iWidth-=tRectRegionsX.tBar.tLocation.iX+iScrollbarSize-tRectRegionsX.tTrack.tLocation.iX-iScrollbarTrackPieceSize;
                 }
 
                 if ((tRectRegionsX.tBar.tLocation.iX)<(tRectRegionsX.tTrack.tLocation.iX)) {
-                     tRectRegionsX.tBar.tSize.iWidth-=(tRectRegionsX.tTrack.tLocation.iX-tRectRegionsX.tBar.tLocation.iX);//½Ø¶Ì
+                     tRectRegionsX.tBar.tSize.iWidth-=(tRectRegionsX.tTrack.tLocation.iX-tRectRegionsX.tBar.tLocation.iX);//ï¿½Ø¶ï¿½
                      tRectRegionsX.tBar.tLocation.iX=tRectRegionsX.tTrack.tLocation.iX;
                 }
 

@@ -86,7 +86,7 @@ extern union {
 } panels;
 
 /*============================ LOCAL VARIABLES ===============================*/
-//NO_INIT popup_t s_tPopup;
+//VSF_CAL_NO_INIT popup_t s_tPopup;
 /*============================ IMPLEMENTATION ================================*/
 
 
@@ -122,7 +122,7 @@ describ_tgui_panel(popup_t, pupup_panel_descriptor,
         tgui_text(tLabel, "OK", true),
 
         tgui_msgmap(
-            tgui_msg_handler(VSF_TGUI_EVT_POINTER_CLICK, __on_button_ok_click), 
+            tgui_msg_handler(VSF_TGUI_EVT_POINTER_CLICK, __on_button_ok_click),
             ),
 
         ),
@@ -203,7 +203,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                 tgui_margin(104, 4, 0, 4),
                 tgui_text(tLabel, "LAP", false),
                 tgui_msgmap(
-                    tgui_msg_mux(VSF_TGUI_MSG_POINTER_EVT, __on_button_lap_all_pointer_evt, VSF_TGUI_MSG_MSK), 
+                    tgui_msg_mux(VSF_TGUI_MSG_POINTER_EVT, __on_button_lap_all_pointer_evt, VSF_TGUI_MSG_MSK),
                     ),
                 ),
 #if 0
@@ -226,7 +226,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                         //tgui_attribute(tSlider, 400),
 #endif
                         tgui_msgmap(
-                            tgui_msg_handler(VSF_TGUI_EVT_POST_REFRESH, __on_text_list_post_refresh), 
+                            tgui_msg_handler(VSF_TGUI_EVT_POST_REFRESH, __on_text_list_post_refresh),
                         ),
 
                         tgui_text_list_content(

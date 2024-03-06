@@ -156,17 +156,17 @@ vk_input_item_info_t * vk_input_parse(vk_input_parser_t *parser, uint8_t *pre, u
     return NULL;
 }
 
-WEAK(vsf_input_on_new_dev)
+VSF_CAL_WEAK(vsf_input_on_new_dev)
 void vsf_input_on_new_dev(vk_input_type_t type, void *dev)
 {
 }
 
-WEAK(vsf_input_on_free_dev)
+VSF_CAL_WEAK(vsf_input_on_free_dev)
 void vsf_input_on_free_dev(vk_input_type_t type, void *dev)
 {
 }
 
-WEAK(vsf_input_on_evt)
+VSF_CAL_WEAK(vsf_input_on_evt)
 void vsf_input_on_evt(vk_input_type_t type, vk_input_evt_t *evt)
 {
 #if VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED

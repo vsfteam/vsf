@@ -154,15 +154,15 @@ typedef struct vsf_hal_distbus_usart_init_t {
     uint32_t                                    mode;
     uint32_t                                    baudrate;
     uint32_t                                    rx_timeout;
-} PACKED vsf_hal_distbus_usart_init_t;
+} VSF_CAL_PACKED vsf_hal_distbus_usart_init_t;
 
 typedef struct vsf_hal_distbus_usart_isr_t {
     uint32_t                                    irq_mask;
-} PACKED vsf_hal_distbus_usart_isr_t;
+} VSF_CAL_PACKED vsf_hal_distbus_usart_isr_t;
 
 typedef struct vsf_hal_distbus_usart_txed_cnt_t {
     uint32_t                                    count;
-} PACKED vsf_hal_distbus_usart_txed_cnt_t;
+} VSF_CAL_PACKED vsf_hal_distbus_usart_txed_cnt_t;
 #endif
 
 vsf_class(vsf_hal_distbus_usart_t) {

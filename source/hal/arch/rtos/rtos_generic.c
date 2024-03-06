@@ -56,7 +56,7 @@ typedef struct vsf_rtos_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT vsf_rtos_t __vsf_rtos;
+static VSF_CAL_NO_INIT vsf_rtos_t __vsf_rtos;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/

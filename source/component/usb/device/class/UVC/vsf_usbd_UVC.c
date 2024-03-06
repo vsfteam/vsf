@@ -112,19 +112,15 @@ static void __vk_usbd_uvc_trace_request_process(vk_usbd_ctrl_handler_t *ctrl_han
 }
 #endif
 
-#ifndef WEAK_VSF_USBD_UVC_STOP_STREAM
-WEAK(vsf_usbd_uvc_stop_stream)
+VSF_CAL_WEAK(vsf_usbd_uvc_stop_stream)
 void vsf_usbd_uvc_stop_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs)
 {
 }
-#endif
 
-#ifndef WEAK_VSF_USBD_UVC_START_STREAM
-WEAK(vsf_usbd_uvc_start_stream)
+VSF_CAL_WEAK(vsf_usbd_uvc_start_stream)
 void vsf_usbd_uvc_start_stream(vk_usbd_uvc_t *uvc, uint_fast8_t ifs)
 {
 }
-#endif
 
 vsf_err_t vk_usbd_uvc_send_packet(vk_usbd_uvc_t *uvc, uint8_t *buffer, uint_fast32_t size)
 {

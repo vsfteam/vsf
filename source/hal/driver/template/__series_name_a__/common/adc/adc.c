@@ -198,7 +198,7 @@ static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_irqhandler)(
         .reg                = VSF_MCONNECT(VSF_ADC_CFG_IMP_UPCASE_PREFIX, _ADC, __IDX,_REG_),\
         __HAL_OP                                                                \
     };                                                                          \
-    void VSF_MCONNECT(VSF_ADC_CFG_IMP_UPCASE_PREFIX, _ADC, __IDX, _IRQHandler)(void)\
+    VSF_CAL_ROOT void VSF_MCONNECT(VSF_ADC_CFG_IMP_UPCASE_PREFIX, _ADC, __IDX, _IRQHandler)(void)\
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
         VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_irqhandler)(              \

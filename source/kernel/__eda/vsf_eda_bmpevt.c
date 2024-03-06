@@ -29,7 +29,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-SECTION(".text.vsf.kernel.__vsf_teda_cancel_timer")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_teda_cancel_timer")
 extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
 
 /*============================ IMPLEMENTATION ================================*/
@@ -41,21 +41,21 @@ extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr);
  * vsf_bmpevt_t                                                                *
  *-----------------------------------------------------------------------------*/
 
-SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_set")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_set")
 static void __vsf_eda_bmpevt_adapter_set(vsf_bmpevt_adapter_t *this_ptr)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
     vsf_eda_bmpevt_set(this_ptr->bmpevt_host, this_ptr->mask);
 }
 
-SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_eda_init")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_eda_init")
 static vsf_err_t __vsf_eda_bmpevt_adapter_eda_init(vsf_bmpevt_adapter_eda_t *this_ptr)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
     return vsf_eda_init(&this_ptr->eda);
 }
 
-SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_sync_evthander")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_sync_evthander")
 static void __vsf_eda_bmpevt_adapter_sync_evthander(vsf_eda_t *eda, vsf_evt_t evt)
 {
     VSF_KERNEL_ASSERT(eda != NULL);
@@ -81,7 +81,7 @@ static void __vsf_eda_bmpevt_adapter_sync_evthander(vsf_eda_t *eda, vsf_evt_t ev
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
-SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_sync_init")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_sync_init")
 static vsf_err_t __vsf_eda_bmpevt_adapter_sync_init(vsf_bmpevt_adapter_t *this_ptr)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
@@ -92,7 +92,7 @@ static vsf_err_t __vsf_eda_bmpevt_adapter_sync_init(vsf_bmpevt_adapter_t *this_p
     return __vsf_eda_bmpevt_adapter_eda_init(adapter_eda);
 }
 
-SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_sync_reset")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_sync_reset")
 static vsf_err_t __vsf_eda_bmpevt_adapter_sync_reset(vsf_bmpevt_adapter_t *this_ptr)
 {
     // GCC: -Wcast-align
@@ -106,13 +106,13 @@ static vsf_err_t __vsf_eda_bmpevt_adapter_sync_reset(vsf_bmpevt_adapter_t *this_
     return __vsf_eda_bmpevt_adapter_eda_init((vsf_bmpevt_adapter_eda_t *)adapter_sync);
 }
 
-SECTION(".data.vsf.kernel.vsf_eda_bmpevt_adapter_sync_op")
+VSF_CAL_SECTION(".data.vsf.kernel.vsf_eda_bmpevt_adapter_sync_op")
 const vsf_bmpevt_adapter_op_t vsf_eda_bmpevt_adapter_sync_op = {
     .init = __vsf_eda_bmpevt_adapter_sync_init,
     .reset = __vsf_eda_bmpevt_adapter_sync_reset,
 };
 
-SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_bmpevt_evthander")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_bmpevt_evthander")
 static void __vsf_eda_bmpevt_adapter_bmpevt_evthander(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vsf_bmpevt_adapter_bmpevt_t *adapter_bmpevt;
@@ -131,7 +131,7 @@ static void __vsf_eda_bmpevt_adapter_bmpevt_evthander(vsf_eda_t *eda, vsf_evt_t 
     }
 }
 
-SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_bmpevt_init")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_bmpevt_init")
 static vsf_err_t __vsf_eda_bmpevt_adapter_bmpevt_init(vsf_bmpevt_adapter_t *this_ptr)
 {
     // GCC: -Wcast-align
@@ -142,7 +142,7 @@ static vsf_err_t __vsf_eda_bmpevt_adapter_bmpevt_init(vsf_bmpevt_adapter_t *this
     return __vsf_eda_bmpevt_adapter_eda_init(adapter_eda);
 }
 
-SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_bmpevt_reset")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_adapter_bmpevt_reset")
 static vsf_err_t __vsf_eda_bmpevt_adapter_bmpevt_reset(vsf_bmpevt_adapter_t *this_ptr)
 {
     // GCC: -Wcast-align
@@ -158,13 +158,13 @@ static vsf_err_t __vsf_eda_bmpevt_adapter_bmpevt_reset(vsf_bmpevt_adapter_t *thi
 #   pragma clang diagnostic pop
 #endif
 
-SECTION(".data.vsf.kernel.vsf_eda_bmpevt_adapter_bmpevt_op")
+VSF_CAL_SECTION(".data.vsf.kernel.vsf_eda_bmpevt_adapter_bmpevt_op")
 const vsf_bmpevt_adapter_op_t vsf_eda_bmpevt_adapter_bmpevt_op = {
     .init = __vsf_eda_bmpevt_adapter_bmpevt_init,
     .reset = __vsf_eda_bmpevt_adapter_bmpevt_reset,
 };
 
-SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_remove_pender")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_remove_pender")
 static void __vsf_eda_bmpevt_remove_pender(vsf_bmpevt_t *this_ptr, vsf_bmpevt_pender_t *pender)
 {
     VSF_KERNEL_ASSERT((this_ptr != NULL) && (pender != NULL) && (pender->eda_pending != NULL));
@@ -174,7 +174,7 @@ static void __vsf_eda_bmpevt_remove_pender(vsf_bmpevt_t *this_ptr, vsf_bmpevt_pe
     vsf_unprotect_sched(lock_status);
 }
 
-SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_poll")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_poll")
 static bool __vsf_eda_bmpevt_poll(vsf_bmpevt_t *this_ptr, vsf_bmpevt_pender_t *pender)
 {
     uint_fast32_t cur_mask;
@@ -199,7 +199,7 @@ static bool __vsf_eda_bmpevt_poll(vsf_bmpevt_t *this_ptr, vsf_bmpevt_pender_t *p
     return (err == VSF_ERR_NONE);
 }
 
-SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_post_evt")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_post_evt")
 static void __vsf_eda_bmpevt_post_evt(vsf_bmpevt_t *this_ptr, vsf_dlist_node_t *node, vsf_evt_t evt)
 {
     bool is_poll_event = evt == VSF_EVT_SYNC_POLL;
@@ -241,7 +241,7 @@ static void __vsf_eda_bmpevt_post_evt(vsf_bmpevt_t *this_ptr, vsf_dlist_node_t *
     }
 }
 
-SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_cancel_start")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_cancel_start")
 static void __vsf_eda_bmpevt_cancel_start(vsf_bmpevt_t *this_ptr)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
@@ -253,7 +253,7 @@ static void __vsf_eda_bmpevt_cancel_start(vsf_bmpevt_t *this_ptr)
     __vsf_eda_bmpevt_post_evt(this_ptr, this_ptr->pending_list.head, VSF_EVT_SYNC_CANCEL);
 }
 
-SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_poll_start")
+VSF_CAL_SECTION(".text.vsf.kernel.__vsf_eda_bmpevt_poll_start")
 static void __vsf_eda_bmpevt_poll_start(vsf_bmpevt_t *this_ptr)
 {
     bool is_polling;
@@ -274,7 +274,7 @@ static void __vsf_eda_bmpevt_poll_start(vsf_bmpevt_t *this_ptr)
     }
 }
 
-SECTION(".text.vsf.kernel.vsf_eda_bmpevt_init")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_eda_bmpevt_init")
 vsf_err_t vsf_eda_bmpevt_init(vsf_bmpevt_t *this_ptr, uint_fast8_t adapter_count)
 {
     vsf_bmpevt_adapter_t *adapter;
@@ -299,7 +299,7 @@ vsf_err_t vsf_eda_bmpevt_init(vsf_bmpevt_t *this_ptr, uint_fast8_t adapter_count
     return VSF_ERR_NONE;
 }
 
-SECTION(".text.vsf.kernel.vsf_eda_bmpevt_reset")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_eda_bmpevt_reset")
 vsf_err_t vsf_eda_bmpevt_reset(vsf_bmpevt_t *this_ptr, uint_fast32_t mask)
 {
     vsf_bmpevt_adapter_t *adapter;
@@ -322,7 +322,7 @@ vsf_err_t vsf_eda_bmpevt_reset(vsf_bmpevt_t *this_ptr, uint_fast32_t mask)
     return VSF_ERR_NONE;
 }
 
-SECTION(".text.vsf.kernel.vsf_eda_bmpevt_cancel")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_eda_bmpevt_cancel")
 vsf_err_t vsf_eda_bmpevt_cancel(vsf_bmpevt_t *this_ptr, uint_fast32_t mask)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
@@ -335,7 +335,7 @@ vsf_err_t vsf_eda_bmpevt_cancel(vsf_bmpevt_t *this_ptr, uint_fast32_t mask)
     return VSF_ERR_NONE;
 }
 
-SECTION(".text.vsf.kernel.vsf_eda_bmpevt_set")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_eda_bmpevt_set")
 vsf_err_t vsf_eda_bmpevt_set(vsf_bmpevt_t *this_ptr, uint_fast32_t mask)
 {
     VSF_KERNEL_ASSERT(this_ptr != NULL);
@@ -348,7 +348,7 @@ vsf_err_t vsf_eda_bmpevt_set(vsf_bmpevt_t *this_ptr, uint_fast32_t mask)
     return VSF_ERR_NONE;
 }
 
-SECTION(".text.vsf.kernel.vsf_eda_bmpevt_pend")
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_eda_bmpevt_pend")
 vsf_err_t vsf_eda_bmpevt_pend(vsf_bmpevt_t *this_ptr, vsf_bmpevt_pender_t *pender, vsf_timeout_tick_t timeout)
 {
     vsf_protect_t orig;
@@ -393,16 +393,16 @@ vsf_err_t vsf_eda_bmpevt_pend(vsf_bmpevt_t *this_ptr, vsf_bmpevt_pender_t *pende
 #   pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
-SECTION(".text.vsf.kernel.vsf_eda_bmpevt_poll")
-vsf_sync_reason_t vsf_eda_bmpevt_poll(  vsf_bmpevt_t *this_ptr, 
-                                        vsf_bmpevt_pender_t *pender, 
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_eda_bmpevt_poll")
+vsf_sync_reason_t vsf_eda_bmpevt_poll(  vsf_bmpevt_t *this_ptr,
+                                        vsf_bmpevt_pender_t *pender,
                                         vsf_evt_t evt)
 {
     vsf_sync_reason_t reason = VSF_SYNC_FAIL;
     vsf_eda_t *eda;
 
-    VSF_KERNEL_ASSERT(  (this_ptr != NULL) 
-                    &&  (pender != NULL) 
+    VSF_KERNEL_ASSERT(  (this_ptr != NULL)
+                    &&  (pender != NULL)
                     &&  (pender->eda_pending == vsf_eda_get_cur()));
     eda = pender->eda_pending;
 

@@ -209,7 +209,7 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _flash_irqhandler)(
         .reg                = VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, __IDX, _REG),\
         __HAL_OP                                                                \
     };                                                                          \
-    void VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, __IDX, _IRQHandler)(void)\
+    VSF_CAL_ROOT void VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, __IDX, _IRQHandler)(void)\
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
         VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _flash_irqhandler)(          \

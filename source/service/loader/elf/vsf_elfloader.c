@@ -106,25 +106,25 @@ const struct vsf_loader_op_t vsf_elfloader_op = {
 
 // vsf_elfloader_arch_relocate_sym will be over-written by the same function in
 //  the source code for specified arch.
-WEAK(vsf_elfloader_arch_relocate_sym)
+VSF_CAL_WEAK(vsf_elfloader_arch_relocate_sym)
 int vsf_elfloader_arch_relocate_sym(vsf_elfloader_t *elfloader, Elf_Addr tgtaddr, int type, Elf_Addr tgtvalue)
 {
     return -1;
 }
 
 // vsf_elfloader_arch_init_plt is used to allocate necessary resources before linking
-WEAK(vsf_elfloader_arch_init_plt)
+VSF_CAL_WEAK(vsf_elfloader_arch_init_plt)
 int vsf_elfloader_arch_init_plt(vsf_elfloader_t *elfloader, int num)
 {
     return 0;
 }
 
 // vsf_elfloader_arch_fini_plt is used to free necessary resources after linking
-WEAK(vsf_elfloader_arch_fini_plt)
+VSF_CAL_WEAK(vsf_elfloader_arch_fini_plt)
 void vsf_elfloader_arch_fini_plt(vsf_elfloader_t *elfloader) { }
 
 // vsf_elfloader_link should be over-written by user to do symbol linking
-WEAK(vsf_elfloader_link)
+VSF_CAL_WEAK(vsf_elfloader_link)
 int vsf_elfloader_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *target)
 {
 #if (VSF_USE_APPLET == ENABLED || (VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_APPLET == ENABLED)) && VSF_APPLET_CFG_LINKABLE == ENABLED
@@ -141,7 +141,7 @@ int vsf_elfloader_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *targ
 #endif
 }
 
-WEAK(vsf_elfloader_arch_link)
+VSF_CAL_WEAK(vsf_elfloader_arch_link)
 int vsf_elfloader_arch_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr *target)
 {
     return vsf_elfloader_link(elfloader, symname, target);

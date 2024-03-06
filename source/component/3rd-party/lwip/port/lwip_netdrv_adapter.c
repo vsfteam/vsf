@@ -90,12 +90,10 @@ static const vk_netdrv_adapter_op_t __lwip_netdrv_adapter_op = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_LWIP_REQ___ADDR___FROM_USER
-WEAK(lwip_req___addr___from_user)
+VSF_CAL_WEAK(lwip_req___addr___from_user)
 void lwip_req___addr___from_user(ip_addr_t *ipaddr, ip_addr_t *netmask, ip_addr_t *gateway)
 {
 }
-#endif
 
 // ethernetif implementation
 static err_t __ethernetif_low_level_output(struct netif *netif, struct pbuf *p)

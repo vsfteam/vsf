@@ -55,7 +55,7 @@ typedef struct vk_wav_riff_t {
     char        chunk_id[4];    // "RIFF"
     uint32_t    size;           // all size except chunk_id and size(file_size - 8)
     char        format[4];      // "WAVE"
-} PACKED vk_wav_riff_t;
+} VSF_CAL_PACKED vk_wav_riff_t;
 
 typedef struct vk_wav_format_t {
     char        sub_chunk_id[4];// "fmt "
@@ -66,12 +66,12 @@ typedef struct vk_wav_format_t {
     uint32_t    byte_rate;
     uint16_t    block_align;
     uint16_t    bit_width;
-} PACKED vk_wav_format_t;
+} VSF_CAL_PACKED vk_wav_format_t;
 
 typedef struct vk_wav_data_t {
     char        sub_chunk_id[4];// "data"
     uint32_t    sub_chunk_size;
-} PACKED vk_wav_data_t;
+} VSF_CAL_PACKED vk_wav_data_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

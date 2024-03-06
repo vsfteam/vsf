@@ -132,9 +132,9 @@ void vsf_systimer_set_reload_value(vsf_systimer_tick_t tick_cnt)
 }
 
 #if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-ROOT
+VSF_CAL_ROOT
 #endif
-ISR(SysTick_Handler)
+VSF_CAL_ISR(SysTick_Handler)
 {
     vsf_systimer_ovf_evt_handler();
 }
@@ -171,9 +171,9 @@ void vsf_systimer_prio_set(vsf_arch_prio_t priority)
  * SWI / PendSV                                                               *
  *----------------------------------------------------------------------------*/
 #if VSF_USE_KERNEL == ENABLED
-ROOT
+VSF_CAL_ROOT
 #endif
-ISR(PendSV_Handler)
+VSF_CAL_ISR(PendSV_Handler)
 {
     if (__vsf_cm.pendsv.handler != NULL) {
         __vsf_cm.pendsv.handler(__vsf_cm.pendsv.param);
@@ -320,31 +320,31 @@ vsf_arch_prio_t vsf_set_base_priority(vsf_arch_prio_t priority)
  * interrupt                                                                  *
  *----------------------------------------------------------------------------*/
 
-WEAK(vsf_get_interrupt)
+VSF_CAL_WEAK(vsf_get_interrupt)
 vsf_gint_state_t vsf_get_interrupt(void)
 {
     return (vsf_gint_state_t)vsf_get_base_priority();
 }
 
-WEAK(vsf_set_interrupt)
+VSF_CAL_WEAK(vsf_set_interrupt)
 vsf_gint_state_t vsf_set_interrupt(vsf_gint_state_t prio)
 {
     return (vsf_gint_state_t)vsf_set_base_priority(prio);
 }
 
-WEAK(vsf_disable_interrupt)
+VSF_CAL_WEAK(vsf_disable_interrupt)
 vsf_gint_state_t vsf_disable_interrupt(void)
 {
     return (vsf_gint_state_t)vsf_set_base_priority(vsf_arch_prio_disable_all);
 }
 
-WEAK(vsf_enable_interrupt)
+VSF_CAL_WEAK(vsf_enable_interrupt)
 vsf_gint_state_t vsf_enable_interrupt(void)
 {
     return (vsf_gint_state_t)vsf_set_base_priority(vsf_arch_prio_enable_all);
 }
 
-WEAK(vsf_get_interrupt_id)
+VSF_CAL_WEAK(vsf_get_interrupt_id)
 int vsf_get_interrupt_id(void)
 {
     return ((SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) >> SCB_ICSR_VECTACTIVE_Pos);
@@ -354,7 +354,7 @@ int vsf_get_interrupt_id(void)
  * Others: sleep, reset, etc                                                  *
  *----------------------------------------------------------------------------*/
 
-WEAK(vsf_arch_sleep)
+VSF_CAL_WEAK(vsf_arch_sleep)
 void vsf_arch_sleep(uint_fast32_t mode)
 {
     switch (mode) {
@@ -370,13 +370,13 @@ void vsf_arch_sleep(uint_fast32_t mode)
     __WFE();
 }
 
-WEAK(vsf_arch_reset)
+VSF_CAL_WEAK(vsf_arch_reset)
 void vsf_arch_reset(void)
 {
     NVIC_SystemReset();
 }
 
-WEAK(vsf_arch_shutdown)
+VSF_CAL_WEAK(vsf_arch_shutdown)
 void vsf_arch_shutdown(void)
 {
     VSF_ARCH_ASSERT(false);

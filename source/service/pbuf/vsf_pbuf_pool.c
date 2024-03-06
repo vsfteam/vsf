@@ -40,63 +40,63 @@ static vsf_pbuf_t * __vsf_stream_src_pbuf_free(void *obj_ptr, vsf_pbuf_t *block_
     vsf_pbuf_pool_free( (vsf_pbuf_pool_t *)obj_ptr, block_ptr);
     return NULL;
 };
-                                                                            
-void vsf_pbuf_pool_init(vsf_pbuf_pool_t *this_ptr,  
-                        uint32_t u32_item_size, 
-                        uint_fast16_t u16_align, 
-                        vsf_pool_cfg_t *pcfg)           
-{                                                                               
-    vsf_pool_init((vsf_pool_t *)this_ptr, u32_item_size, u16_align, pcfg);                                   
-}                                                                               
-                                                                            
-bool vsf_pbuf_pool_add_buffer(  vsf_pbuf_pool_t *this_ptr, 
-                                void *buffer_ptr, 
-                                uint_fast32_t u32_size, 
-                                uint_fast16_t u16_item_size)                
-{                  
+
+void vsf_pbuf_pool_init(vsf_pbuf_pool_t *this_ptr,
+                        uint32_t u32_item_size,
+                        uint_fast16_t u16_align,
+                        vsf_pool_cfg_t *pcfg)
+{
+    vsf_pool_init((vsf_pool_t *)this_ptr, u32_item_size, u16_align, pcfg);
+}
+
+bool vsf_pbuf_pool_add_buffer(  vsf_pbuf_pool_t *this_ptr,
+                                void *buffer_ptr,
+                                uint_fast32_t u32_size,
+                                uint_fast16_t u16_item_size)
+{
     if (   (NULL == buffer_ptr)
-        || (0 == u32_size) 
+        || (0 == u32_size)
         || (u16_item_size <sizeof(vsf_pbuf_t))) {
         return false;
     }
-                                                                
-    return vsf_pool_add_buffer_ex(  (vsf_pool_t *)this_ptr, (uintptr_t)buffer_ptr,              
-                                    u32_size,                                      
-                                    u16_item_size,               
-                                    vsf_pbuf_pool_item_init_event_handler );                            
-}                                                                               
-                                                                                                                                          
-                                                                            
-vsf_pbuf_t *vsf_pbuf_pool_alloc(vsf_pbuf_pool_t *this_ptr)                             
-{                  
+
+    return vsf_pool_add_buffer_ex(  (vsf_pool_t *)this_ptr, (uintptr_t)buffer_ptr,
+                                    u32_size,
+                                    u16_item_size,
+                                    vsf_pbuf_pool_item_init_event_handler );
+}
+
+
+vsf_pbuf_t *vsf_pbuf_pool_alloc(vsf_pbuf_pool_t *this_ptr)
+{
     vsf_pbuf_t *pbuf = (vsf_pbuf_t *)vsf_pool_alloc((vsf_pool_t *)this_ptr);
     if (NULL != pbuf) {
         vsf_pbuf_size_reset(pbuf);
     }
     return pbuf;
-}                                                                               
-                                                                            
-void vsf_pbuf_pool_free(vsf_pbuf_pool_t *this_ptr, vsf_pbuf_t *item_ptr)                 
-{                                                                               
-    vsf_pool_free((vsf_pool_t *)this_ptr, (uintptr_t)item_ptr);                         
-}                                                                               
-                                                                            
-SECTION(".text." "vsf_pbuf" "_get_pool_item_count")                                
-uint_fast32_t vsf_pbuf_get_pool_item_count(vsf_pbuf_pool_t *this_ptr)              
-{                                                                               
-    return vsf_pool_get_count((vsf_pool_t *)this_ptr);                             
-}                                                                               
-                                
-                                       
-SECTION(".text." "vsf_pbuf" "_pool_get_region")                                    
-vsf_protect_region_t *vsf_pbuf_pool_get_region(vsf_pbuf_pool_t *this_ptr)                 
-{                                                                               
-    return vsf_pool_get_region((vsf_pool_t *)this_ptr);                            
-}                                                                               
-                                                                            
-SECTION(".text." "vsf_pbuf" "_pool_get_target")                                    
-uintptr_t vsf_pbuf_pool_get_target(vsf_pbuf_pool_t *this_ptr)                          
-{                                                                               
-    return vsf_pool_get_tag((vsf_pool_t *)this_ptr);                               
-}                                                                               
-#endif                                                                            
+}
+
+void vsf_pbuf_pool_free(vsf_pbuf_pool_t *this_ptr, vsf_pbuf_t *item_ptr)
+{
+    vsf_pool_free((vsf_pool_t *)this_ptr, (uintptr_t)item_ptr);
+}
+
+VSF_CAL_SECTION(".text." "vsf_pbuf" "_get_pool_item_count")
+uint_fast32_t vsf_pbuf_get_pool_item_count(vsf_pbuf_pool_t *this_ptr)
+{
+    return vsf_pool_get_count((vsf_pool_t *)this_ptr);
+}
+
+
+VSF_CAL_SECTION(".text." "vsf_pbuf" "_pool_get_region")
+vsf_protect_region_t *vsf_pbuf_pool_get_region(vsf_pbuf_pool_t *this_ptr)
+{
+    return vsf_pool_get_region((vsf_pool_t *)this_ptr);
+}
+
+VSF_CAL_SECTION(".text." "vsf_pbuf" "_pool_get_target")
+uintptr_t vsf_pbuf_pool_get_target(vsf_pbuf_pool_t *this_ptr)
+{
+    return vsf_pool_get_tag((vsf_pool_t *)this_ptr);
+}
+#endif

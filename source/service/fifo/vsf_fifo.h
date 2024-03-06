@@ -35,7 +35,7 @@
     def_vsf_fifo(xxxx_fifo, xxxx_t, 8)
 
     // 4. Defining fifo variable
-    static NO_INIT vsf_fifo(xxxx_fifo) __xxxx_fifo;
+    static VSF_CAL_NO_INIT vsf_fifo(xxxx_fifo) __xxxx_fifo;
 
     void user_example_task(void)
     {
@@ -198,13 +198,13 @@ extern void vsf_fifo_init(vsf_fifo_t *fifo, vsf_fifo_fast_index_t fifo_depth);
 extern bool vsf_fifo_push(vsf_fifo_t *fifo, uintptr_t item, vsf_fifo_fast_item_size_t item_size);
 extern bool vsf_fifo_pop(vsf_fifo_t *fifo, uintptr_t item, vsf_fifo_fast_item_size_t item_size);
 
-SECTION(".text.vsf.utilities.vsf_fifo_get_head")
+VSF_CAL_SECTION(".text.vsf.utilities.vsf_fifo_get_head")
 extern uintptr_t vsf_fifo_get_head(vsf_fifo_t *fifo, vsf_fifo_fast_item_size_t item_size);
 
-SECTION(".text.vsf.utilities.vsf_fifo_get_tail")
+VSF_CAL_SECTION(".text.vsf.utilities.vsf_fifo_get_tail")
 extern uintptr_t vsf_fifo_get_tail(vsf_fifo_t *fifo, vsf_fifo_fast_item_size_t item_size);
 
-SECTION(".text.vsf.utilities.vsf_fifo_get_number")
+VSF_CAL_SECTION(".text.vsf.utilities.vsf_fifo_get_number")
 extern vsf_fifo_index_t vsf_fifo_get_number(vsf_fifo_t *fifo);
 
 #ifdef __cplusplus

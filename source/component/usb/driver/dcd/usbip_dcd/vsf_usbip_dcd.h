@@ -202,7 +202,7 @@ typedef struct vk_usbip_rep_ifs_t {
     uint8_t     bInterfaceSubClass;
     uint8_t     bInterfaceProtocol;
     uint8_t     padding;
-} PACKED vk_usbip_rep_ifs_t;
+} VSF_CAL_PACKED vk_usbip_rep_ifs_t;
 
 typedef struct vk_usbip_rep_dev_t {
     uint32_t    busnum;
@@ -218,7 +218,7 @@ typedef struct vk_usbip_rep_dev_t {
     uint8_t     bNumConfigurations;
     uint8_t     bNumInterfaces;
     vk_usbip_rep_ifs_t ifs[16];
-} PACKED vk_usbip_rep_dev_t;
+} VSF_CAL_PACKED vk_usbip_rep_dev_t;
 
 typedef enum vk_usbip_cmd_t {
     USBIP_CMD_INVALID   = 0x00000000,
@@ -237,12 +237,12 @@ typedef struct vk_usbip_op_common_t {
     uint16_t    version_bcd;
     uint16_t    code;
     uint32_t    status;
-} PACKED vk_usbip_op_common_t;
+} VSF_CAL_PACKED vk_usbip_op_common_t;
 
 // OP_REQ_DEVLIST
 typedef struct vk_usbip_req_devlist_t {
     implement(vk_usbip_op_common_t)
-} PACKED vk_usbip_req_devlist_t;
+} VSF_CAL_PACKED vk_usbip_req_devlist_t;
 
 // OP_REP_DEVLIST
 //  vk_usbip_rep_devlist_t
@@ -251,20 +251,20 @@ typedef struct vk_usbip_req_devlist_t {
 typedef struct vk_usbip_rep_devlist_t {
     implement(vk_usbip_op_common_t)
     uint32_t    devnum;     // number of devices
-} PACKED vk_usbip_rep_devlist_t;
+} VSF_CAL_PACKED vk_usbip_rep_devlist_t;
 
 // OP_REQ_IMPORT
 typedef struct vk_usbip_req_import_t {
     implement(vk_usbip_op_common_t)
     char        busid[32];
-} PACKED vk_usbip_req_import_t;
+} VSF_CAL_PACKED vk_usbip_req_import_t;
 
 // OP_REP_IMPORT
 //  vk_usbip_rep_import_t
 //  vk_usbip_rep_dev_t
 typedef struct vk_usbip_rep_import_t {
     implement(vk_usbip_op_common_t)
-} PACKED vk_usbip_rep_import_t;
+} VSF_CAL_PACKED vk_usbip_rep_import_t;
 
 // USBIP_CMD_SUBMIT
 //  vk_usbip_req_submit_t
@@ -281,7 +281,7 @@ typedef struct vk_usbip_req_submit_t {
     uint32_t    number_of_packets;  // for ISO
     uint32_t    interval;
     struct usb_ctrlrequest_t setup;
-} PACKED vk_usbip_req_submit_t;
+} VSF_CAL_PACKED vk_usbip_req_submit_t;
 
 // USBIP_RET_SUBMIT
 //  vk_usbip_rep_submit_t
@@ -297,7 +297,7 @@ typedef struct vk_usbip_rep_submit_t {
     uint32_t    start_frame;        // for ISO
     uint32_t    number_of_packets;  // for ISO
     uint32_t    error_count;
-} PACKED vk_usbip_rep_submit_t;
+} VSF_CAL_PACKED vk_usbip_rep_submit_t;
 
 // USBIP_CMD_UNLINK
 //  vk_usbip_req_unlink_t
@@ -309,7 +309,7 @@ typedef struct vk_usbip_req_unlink_t {
     uint32_t    direction;          // 0: OUT, 1: IN
     uint32_t    ep;
     uint32_t    seqnum_to_unlink;
-} PACKED vk_usbip_req_unlink_t;
+} VSF_CAL_PACKED vk_usbip_req_unlink_t;
 
 // USBIP_RET_UNLINK
 //  vk_usbip_rep_unlink_t
@@ -321,7 +321,7 @@ typedef struct vk_usbip_rep_unlink_t {
     uint32_t    direction;          // 0: OUT, 1: IN
     uint32_t    ep;
     uint32_t    status;
-} PACKED vk_usbip_rep_unlink_t;
+} VSF_CAL_PACKED vk_usbip_rep_unlink_t;
 
 typedef struct vk_usbip_urb_t {
     vsf_dlist_node_t urb_node;
@@ -381,7 +381,7 @@ typedef struct vk_usbip_server_t {
         struct {
             uint16_t version_bcd;
             uint16_t cmd16;
-        } PACKED;
+        } VSF_CAL_PACKED;
         vk_usbip_req_devlist_t devlist;
         vk_usbip_req_import_t import;
         vk_usbip_req_submit_t submit;

@@ -15,16 +15,14 @@ typedef struct btstack_t {
 } btstack_t;
 
 static void btstack_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size);
-static NO_INIT btstack_t btstack;
+static VSF_CAL_NO_INIT btstack_t btstack;
 
-#ifndef WEAK_BTSTACK_EVTHANDLER
-WEAK(btstack_evthandler)
+VSF_CAL_WEAK(btstack_evthandler)
 int btstack_evthandler(btstack_evt_t evt, void *param)
 {
     BTSTACK_ASSERT(false);
     return 0;
 }
-#endif
 
 static void btstack_on_timer(btstack_timer_source_t *timer)
 {

@@ -28,11 +28,9 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSF_OSA_SERVICE_INIT
-WEAK(vsf_osa_service_init)
+VSF_CAL_WEAK(vsf_osa_service_init)
 void vsf_osa_service_init(void)
 {
 }
-#endif
 
 /* EOF */

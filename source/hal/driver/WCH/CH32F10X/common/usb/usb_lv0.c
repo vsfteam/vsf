@@ -31,14 +31,14 @@ static const ch32f10x_##__TYPE##_const_t __USB_DC##__N##_const = {              
 ch32f10x_##__TYPE##_t USB_DC##__N = {                                           \
     .param = &__USB_DC##__N##_const                                             \
 };                                                                              \
-ISR(USB_DC##__N##_IRQHandler)                                                   \
+VSF_CAL_ISR(USB_DC##__N##_IRQHandler)                                           \
 {                                                                               \
     ch32f10x_##__TYPE##_irq(&USB_DC##__N);                                      \
 }
 #else
 #   define __USB_DC_IMPLEMENT(__N, __TYPE)                                      \
 ch32f10x_##__TYPE##_t USB_DC##__N;                                              \
-ISR(USB_DC##__N##_IRQHandler)                                                   \
+VSF_CAL_ISR(USB_DC##__N##_IRQHandler)                                           \
 {                                                                               \
     ch32f10x_##__TYPE##_irq(&USB_DC##__N);                                      \
 }

@@ -138,7 +138,7 @@ vsf_class(vsf_arch_irq_thread_with_stack_t) {
         implement(vsf_arch_irq_thread_t)
 
 #ifdef VSF_ARCH_STACK_ALIGN_BIT
-        VSF_ARCH_RTOS_STACK_T       stack[VSF_ARCH_RTOS_CFG_STACK_DEPTH] ALIGN(1 << VSF_ARCH_STACK_ALIGN_BIT);
+        VSF_ARCH_RTOS_STACK_T       stack[VSF_ARCH_RTOS_CFG_STACK_DEPTH] VSF_CAL_ALIGN(1 << VSF_ARCH_STACK_ALIGN_BIT);
 #else
         VSF_ARCH_RTOS_STACK_T       stack[VSF_ARCH_RTOS_CFG_STACK_DEPTH];
 #endif
@@ -179,7 +179,7 @@ extern vsf_arch_prio_t __vsf_arch_irq_get_priority(vsf_arch_irq_thread_t *irq_th
 extern void vsf_arch_wakeup(void);
 
 #ifndef VSF_ARCH_LIMIT_NO_SET_STACK
-static ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack)
+static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack)
 {
     VSF_ARCH_RTOS_CFG_SET_STACK(stack);
 }

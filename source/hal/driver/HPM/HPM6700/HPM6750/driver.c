@@ -127,9 +127,9 @@ void ASWI_IRQHandler(void)
 }
 SDK_DECLARE_SWI_ISR(ASWI_IRQHandler)
 
-vsf_err_t vsf_arch_swi_init(    uint_fast8_t idx, 
+vsf_err_t vsf_arch_swi_init(    uint_fast8_t idx,
                                 vsf_arch_prio_t priority,
-                                vsf_swi_handler_t *handler, 
+                                vsf_swi_handler_t *handler,
                                 void *param)
 {
     if (idx < VSF_ARCH_SWI_NUM) {
@@ -166,21 +166,21 @@ static const uint8_t __hpm_swi_irq[VSF_DEV_SWI_NUM] = {
     VSF_MREPEAT(VSF_DEV_SWI_NUM, __HPM_SWI_IRQ, null)
 };
 
-#define __HPM_SWI(__N, __VALUE)                                               \
-    ROOT void VSF_MCONNECT(SWI, __N, _IRQHandler)(void)                       \
-    {                                                                         \
-        __hpm_swi_t *swi = &__hpm_swi[VSF_ARCH_SWI_NUM + __N];                \
-        if (swi->handler != NULL) {                                           \
-            swi->handler(swi->param);                                         \
-        }                                                                     \
-    }                                                                         \
+#define __HPM_SWI(__N, __VALUE)                                                 \
+    VSF_CAL_ROOT void VSF_MCONNECT(SWI, __N, _IRQHandler)(void)                 \
+    {                                                                           \
+        __hpm_swi_t *swi = &__hpm_swi[VSF_ARCH_SWI_NUM + __N];                  \
+        if (swi->handler != NULL) {                                             \
+            swi->handler(swi->param);                                           \
+        }                                                                       \
+    }                                                                           \
     SDK_DECLARE_EXT_ISR_M(VSF_MCONNECT(VSF_DEV_SWI, __N, _IRQ), VSF_MCONNECT(SWI, __N, _IRQHandler))
 
 VSF_MREPEAT(VSF_DEV_SWI_NUM, __HPM_SWI, NULL)
 
-vsf_err_t vsf_drv_usr_swi_init( uint_fast8_t idx, 
+vsf_err_t vsf_drv_usr_swi_init( uint_fast8_t idx,
                                 vsf_arch_prio_t priority,
-                                vsf_swi_handler_t *handler, 
+                                vsf_swi_handler_t *handler,
                                 void *param)
 {
     if (idx < VSF_DEV_SWI_NUM) {

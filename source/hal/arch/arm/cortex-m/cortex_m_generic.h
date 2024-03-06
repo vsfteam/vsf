@@ -193,18 +193,18 @@ extern __VSF_VPLT_DECORATOR__ vsf_arch_abi_vplt_t vsf_arch_abi_vplt;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
+static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
 {
     __set_MSP(stack);
 }
 
-static ALWAYS_INLINE uintptr_t vsf_arch_get_stack(void)
+static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_get_stack(void)
 {
     return __get_MSP();
 }
 
 #if VSF_ARCH_USE_THREAD_REG == ENABLED
-static ALWAYS_INLINE uintptr_t vsf_arch_set_thread_reg(uintptr_t value)
+static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_set_thread_reg(uintptr_t value)
 {
     register uintptr_t result;
     __asm__ __volatile__ ("MOV %0, r9" : "=r"(result));

@@ -42,7 +42,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT bool __lvgl_is_looping;
+static VSF_CAL_NO_INIT bool __lvgl_is_looping;
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -346,7 +346,7 @@ void * __lvgl_thread(void *arg)
     return NULL;
 }
 
-static NO_INIT vsf_eda_t *__lvgl_demo_evt_to_notify;
+static VSF_CAL_NO_INIT vsf_eda_t *__lvgl_demo_evt_to_notify;
 void __lvgl_on_disp_drv_inited(lv_disp_drv_t *disp_drv)
 {
     if (__lvgl_demo_evt_to_notify != NULL) {
@@ -369,7 +369,7 @@ int lvgl_main(int argc, char *argv[])
         return -1;
     }
 #else
-static NO_INIT bool __lvgl_is_disp_inited;
+static VSF_CAL_NO_INIT bool __lvgl_is_disp_inited;
 void __lvgl_on_disp_drv_inited(lv_disp_drv_t *disp_drv)
 {
     __lvgl_is_disp_inited = true;

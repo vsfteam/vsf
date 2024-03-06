@@ -96,7 +96,7 @@ static vsf_err_t __vk_file_lookup(vk_file_t *dir, const char *name, vk_file_t **
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static NO_INIT __vk_fs_t __vk_fs;
+static VSF_CAL_NO_INIT __vk_fs_t __vk_fs;
 
 #if     __IS_COMPILER_GCC__
 #   pragma GCC diagnostic push

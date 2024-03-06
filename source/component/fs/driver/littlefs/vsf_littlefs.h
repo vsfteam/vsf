@@ -84,7 +84,7 @@ vsf_class(vk_lfs_info_t) {
         vsf_thread_t thread;
         vsf_thread_cb_t thread_cb;
         uint64_t thread_stack[(__VSF_THREAD_STACK_SAFE_SIZE(VSF_LITTLEFS_CFG_STACK_SIZE) + 7 ) / 8]\
-                ALIGN(1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT);
+                VSF_CAL_ALIGN(1 << VSF_KERNEL_CFG_THREAD_STACK_ALIGN_BIT);
 
         int op;
         union {

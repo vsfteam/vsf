@@ -30,7 +30,7 @@ def_vsf_thread(user_thread_a_t, 1024,
         mem_sharable( )
         mem_nonsharable( )
     )
-    
+
     def_params(
         vsf_sem_t *sem_ptr;
     ));
@@ -43,39 +43,39 @@ def_vsf_thread(user_thread_b_t, 1024,
         mem_sharable( )
         mem_nonsharable( )
     )
-    
+
     def_params(
         vsf_sem_t *sem_ptr;
     ));
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-static NO_INIT vsf_sem_t user_sem;
+static VSF_CAL_NO_INIT vsf_sem_t user_sem;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
 
 void vsf_kernel_thread_simple_demo(void)
-{    
+{
     //! initialise semaphore
-    vsf_sem_init(&user_sem, 0); 
-    
+    vsf_sem_init(&user_sem, 0);
+
     //! start the user task a
     {
-        static NO_INIT user_thread_a_t __user_task_a;
+        static VSF_CAL_NO_INIT user_thread_a_t __user_task_a;
         __user_task_a.param.sem_ptr = &user_sem;
         init_vsf_thread(user_thread_a_t, &__user_task_a, vsf_prio_0);
     }
-    
+
     //! start the user task b
     {
-        static NO_INIT user_thread_b_t __user_task_b;
+        static VSF_CAL_NO_INIT user_thread_b_t __user_task_b;
         __user_task_b.param.sem_ptr = &user_sem;
         init_vsf_thread(user_thread_b_t, &__user_task_b, vsf_prio_0);
     }
 }
 
-implement_vsf_thread(user_thread_a_t) 
+implement_vsf_thread(user_thread_a_t)
 {
     uint32_t cnt = 0;
     while (1) {
@@ -85,7 +85,7 @@ implement_vsf_thread(user_thread_a_t)
     }
 }
 
-implement_vsf_thread(user_thread_b_t) 
+implement_vsf_thread(user_thread_b_t)
 {
     uint32_t cnt = 0;
     while (1) {
@@ -106,9 +106,9 @@ int main(void)
     )
 
     vsf_stdio_init();
-    
+
     vsf_kernel_thread_simple_demo();
-    
+
     while(1) {
         printf("hello world! \r\n");
         vsf_delay_ms(1000);
@@ -132,9 +132,9 @@ void main(void)
     vsf_pt_begin()
 
     vsf_stdio_init();
-    
+
     vsf_kernel_thread_simple_demo();
-    
+
     vsf_this.cnt = 0;
     while(1) {
         printf("hello world! \r\n");
@@ -142,13 +142,13 @@ void main(void)
     }
     vsf_pt_end()
 }
-#else 
+#else
 int main(void)
 {
     vsf_stdio_init();
-    
+
     vsf_kernel_thread_simple_demo();
-    
+
     return 0;
 }
 
