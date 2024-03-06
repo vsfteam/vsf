@@ -42,7 +42,7 @@
 
 // HW
 #ifndef VSF_HW_I2C_CFG_MULTI_CLASS
-#   define VSF_HW_I2C_CFG_MULTI_CLASS                       VSF_I2C_CFG_MULTI_CLASS
+#   define VSF_HW_I2C_CFG_MULTI_CLASS           VSF_I2C_CFG_MULTI_CLASS
 #endif
 // HW end
 
@@ -59,13 +59,13 @@
 /*============================ TYPES =========================================*/
 
 // HW
-typedef struct vsf_hw_i2c_t {
+typedef struct VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) {
 #if VSF_HW_I2C_CFG_MULTI_CLASS == ENABLED
     vsf_i2c_t               vsf_i2c;
 #endif
     void                    *reg;
     vsf_i2c_isr_t           isr;
-} vsf_hw_i2c_t;
+} VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t);
 // HW end
 
 /*============================ INCLUDES ======================================*/
@@ -168,7 +168,7 @@ vsf_i2c_capability_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)(
     };
 }
 
-static void __vsf_hw_i2c_irqhandler(
+static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _i2c_irqhandler)(
     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
 ) {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
@@ -189,14 +189,17 @@ static void __vsf_hw_i2c_irqhandler(
 
 // HW
 #define VSF_I2C_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
-    vsf_hw_i2c_t VSF_MCONNECT(vsf_hw_i2c, __IDX) = {                            \
-        .reg                = VSF_MCONNECT(VSF_HW_I2C, __IDX, _REG),            \
+    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t)                                \
+         VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c, __IDX) = {                  \
+        .reg                = VSF_MCONNECT(VSF_I2C_CFG_IMP_UPCASE_PREFIX, _I2C, __IDX, _REG),\
         __HAL_OP                                                                \
     };                                                                          \
-    void VSF_MCONNECT(VSF_HW_I2C, __IDX, _IRQHandler)(void)                     \
+    void VSF_MCONNECT(VSF_I2C_CFG_IMP_UPCASE_PREFIX, _I2C, __IDX, _IRQHandler)(void)\
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
-        __vsf_hw_i2c_irqhandler(&VSF_MCONNECT(vsf_hw_i2c, __IDX));              \
+        VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _i2c_irqhandler)(            \
+            &VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c, __IDX)                  \
+        );                                                                      \
         vsf_hal_irq_leave(ctx);                                                 \
     }
 #include "hal/driver/common/i2c/i2c_template.inc"

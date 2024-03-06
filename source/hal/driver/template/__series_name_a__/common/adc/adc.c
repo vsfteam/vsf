@@ -42,7 +42,7 @@
 
 // HW
 #ifndef VSF_HW_ADC_CFG_MULTI_CLASS
-#   define VSF_HW_ADC_CFG_MULTI_CLASS VSF_ADC_CFG_MULTI_CLASS
+#   define VSF_HW_ADC_CFG_MULTI_CLASS           VSF_ADC_CFG_MULTI_CLASS
 #endif
 // HW end
 
@@ -58,13 +58,13 @@
 /*============================ TYPES =========================================*/
 
 // HW
-typedef struct vsf_hw_adc_t {
+typedef struct VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) {
 #if VSF_HW_ADC_CFG_MULTI_CLASS == ENABLED
     vsf_adc_t               vsf_adc;
 #endif
     void                    *reg;
     vsf_adc_isr_t           isr;
-} vsf_hw_adc_t;
+} VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t);
 // HW end
 
 /*============================ INCLUDES ======================================*/
@@ -168,11 +168,11 @@ vsf_adc_capability_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_capability)(
     return (vsf_adc_capability_t) {
         .irq_mask           = VSF_ADC_IRQ_MASK_CPL,
         .max_data_bits      = 8,
-        .channel_count      = VSF_HW_ADC_CFG_CHANNEL_COUNT,
+        .channel_count      = 1,
     };
 }
 
-static void __vsf_hw_adc_irqhandler(
+static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_irqhandler)(
     VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr
 ) {
     VSF_HAL_ASSERT(NULL != adc_ptr);
@@ -193,14 +193,17 @@ static void __vsf_hw_adc_irqhandler(
 
 // HW
 #define VSF_ADC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
-    vsf_hw_adc_t VSF_MCONNECT(vsf_hw_adc, __IDX) = {                            \
-        .reg                = VSF_MCONNECT(VSF_HW_ADC, __IDX,_REG_),            \
+    VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t)                                \
+        VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc, __IDX) = {                   \
+        .reg                = VSF_MCONNECT(VSF_ADC_CFG_IMP_UPCASE_PREFIX, _ADC, __IDX,_REG_),\
         __HAL_OP                                                                \
     };                                                                          \
-    void VSF_MCONNECT(VSF_HW_ADC, __IDX, _IRQHandler)(void)                     \
+    void VSF_MCONNECT(VSF_ADC_CFG_IMP_UPCASE_PREFIX, _ADC, __IDX, _IRQHandler)(void)\
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
-        __vsf_hw_adc_irqhandler(&VSF_MCONNECT(vsf_hw_adc, __IDX));              \
+        VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_irqhandler)(              \
+            &VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc, __IDX)                  \
+        );                                                                      \
         vsf_hal_irq_leave(ctx);                                                 \
     }
 #include "hal/driver/common/adc/adc_template.inc"

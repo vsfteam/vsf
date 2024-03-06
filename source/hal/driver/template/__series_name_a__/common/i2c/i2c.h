@@ -112,6 +112,8 @@ typedef enum vsf_i2c_mode_t {
 
     VSF_I2C_ADDR_7_BITS                         = (0x0ul << 31),
     VSF_I2C_ADDR_10_BITS                        = (0x1ul << 31),
+
+    // more vendor specified irq_mask can be added here
 } vsf_i2c_mode_t;
 
 typedef enum vsf_i2c_cmd_t {
@@ -127,6 +129,8 @@ typedef enum vsf_i2c_cmd_t {
 
     VSF_I2C_CMD_7_BITS                          = (0x00ul << 31),
     VSF_I2C_CMD_10_BITS                         = (0x01ul << 31),
+
+    // more vendor specified commands can be added here
 } vsf_i2c_cmd_t;
 
 typedef enum vsf_i2c_irq_mask_t {
@@ -140,6 +144,8 @@ typedef enum vsf_i2c_irq_mask_t {
 
     VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE   = (0x1ul <<  8),
     VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK        = (0x1ul <<  9),
+
+    // more vendor specified irq_masks can be added here
 } vsf_i2c_irq_mask_t;
 
 /*\note It's not obligated to inherit from vsf_peripheral_status_t.

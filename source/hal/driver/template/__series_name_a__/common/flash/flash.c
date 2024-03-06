@@ -59,12 +59,12 @@
 /*============================ TYPES =========================================*/
 
 // HW
-typedef struct vsf_hw_flash_t {
+typedef struct VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) {
 #if VSF_HW_FLASH_CFG_MULTI_CLASS == ENABLED
     vsf_flash_t vsf_flash;
 #endif
     vsf_flash_isr_t isr;
-} vsf_hw_flash_t;
+} VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t);
 // HW end
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -166,16 +166,16 @@ vsf_flash_capability_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
 ) {
     return (vsf_flash_capability_t) {
         .irq_mask              = VSF_FLASH_IRQ_ALL_BITS_MASK,
-        .base_address          = VSF_HW_FLASH_CFG_BASE_ADDRESS,
+        .base_address          = 0,
         .max_size              = 0,
-        .erase_sector_size     = VSF_HW_FLASH_CFG_ERASE_SECTORE_SIZE,
-        .write_sector_size     = VSF_HW_FLASH_CFG_WRITE_SECTORE_SIZE,
+        .erase_sector_size     = 4096,
+        .write_sector_size     = 256,
         .can_write_any_address = 0,
-        .can_read_any_address  = 1,
+        .can_read_any_address  = 0,
     };
 }
 
-static void __vsf_hw_flash_irqhandler(
+static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _flash_irqhandler)(
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr
 ) {
     VSF_HAL_ASSERT(NULL != flash_ptr);
@@ -204,14 +204,17 @@ static void __vsf_hw_flash_irqhandler(
 #define VSF_FLASH_CFG_READ_ONE_SECTOR_TEMPLATE      ENABLED
 
 #define VSF_FLASH_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
-    vsf_hw_flash_t vsf_hw_flash ## __IDX = {                                    \
-        .reg                = VSF_MCONNECT(VSF_HW_FLASH, __IDX, _REG),          \
+    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t)                            \
+        VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash ## __IDX) = {             \
+        .reg                = VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, __IDX, _REG),\
         __HAL_OP                                                                \
     };                                                                          \
-    void VSF_MCONNECT(VSF_HW_FLASH, __IDX, _IRQHandler)(void)                   \
+    void VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, __IDX, _IRQHandler)(void)\
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
-        __vsf_hw_flash_irqhandler(&VSF_MCONNECT(vsf_hw_flash, __IDX));          \
+        VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _flash_irqhandler)(          \
+            &VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash, __IDX)              \
+        );                                                                      \
         vsf_hal_irq_leave(ctx);                                                 \
     }
 #include "hal/driver/common/flash/flash_template.inc"
