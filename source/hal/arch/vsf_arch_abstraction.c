@@ -267,7 +267,7 @@ WEAK(__vsf_arch_clz)
 uint_fast8_t __vsf_arch_clz(uintalu_t a)
 {
 #if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
-    // TODO: result of __builtin_clz(0) is undefined, if it's not 32,
+    // TODO: result of __builtin_clz(0) is undefined, if it's not sizeof(uintalu_t) * 8,
     //  __vsf_arch_clz MUST be re-implemented in arch driver
     return __builtin_clz(a);
 #else
