@@ -220,25 +220,25 @@ vsf_err_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_request_tx)(
 }
 
 vsf_err_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_cancel_rx)(
-    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,(vsf_usart_t *usart_ptr)
+    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
 }
 
 vsf_err_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_cancel_tx)(
-    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,(vsf_usart_t *usart_ptr)
+    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
 }
 
 int_fast32_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_get_rx_count)(
-    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,(vsf_usart_t *usart_ptr)
+    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
 }
 
 int_fast32_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)(
-    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,(vsf_usart_t *usart_ptr)
+    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
 }
