@@ -30,7 +30,7 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #if (__IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__) && !defined(__VSF_ARCH_CLZ)
-// __vsf_arch_clz(0) = 32
+// __vsf_arch_clz(0) = sizeof(uintalu_t) * 8
 uint_fast8_t __vsf_arch_clz(uintalu_t a)
 {
     // __builtin_clz(0) for riscv is -1

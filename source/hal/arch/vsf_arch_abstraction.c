@@ -262,7 +262,7 @@ IMPLEMENT_ENDIAN_FUNC(64)
 
 
 #ifndef __VSF_ARCH_CLZ
-// __vsf_arch_clz(0) = 32
+// __vsf_arch_clz(0) = sizeof(uintalu_t) * 8
 WEAK(__vsf_arch_clz)
 uint_fast8_t __vsf_arch_clz(uintalu_t a)
 {
