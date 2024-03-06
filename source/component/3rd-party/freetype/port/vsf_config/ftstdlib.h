@@ -112,12 +112,12 @@ typedef struct FT_FILE {
 
 extern FT_FILE ft_root;
 
-static ALWAYS_INLINE int ft_fclose(FT_FILE *f)
+static VSF_CAL_ALWAYS_INLINE int ft_fclose(FT_FILE *f)
 {
     return 0;
 }
 
-static ALWAYS_INLINE FT_FILE * ft_fopen(const char *filename, const char *mode)
+static VSF_CAL_ALWAYS_INLINE FT_FILE * ft_fopen(const char *filename, const char *mode)
 {
     return (FT_FILE *)vk_memfs_open(&ft_root.use_as__vk_memfs_file_t, filename);
 }
@@ -127,7 +127,7 @@ static ALWAYS_INLINE FT_FILE * ft_fopen(const char *filename, const char *mode)
 #   pragma diag_suppress=pe111
 #endif
 
-static ALWAYS_INLINE int ft_fseek(FT_FILE *f, long offset, int fromwhere)
+static VSF_CAL_ALWAYS_INLINE int ft_fseek(FT_FILE *f, long offset, int fromwhere)
 {
     uint64_t new_pos;
 
@@ -154,18 +154,18 @@ static ALWAYS_INLINE int ft_fseek(FT_FILE *f, long offset, int fromwhere)
     return 0;
 }
 
-static ALWAYS_INLINE long ft_ftell(FT_FILE *f)
+static VSF_CAL_ALWAYS_INLINE long ft_ftell(FT_FILE *f)
 {
     return vk_memfs_tell(&f->use_as__vk_memfs_file_t);
 }
 
-static ALWAYS_INLINE size_t ft_fread(const void *ptr, size_t size, size_t nmemb, FT_FILE *f)
+static VSF_CAL_ALWAYS_INLINE size_t ft_fread(const void *ptr, size_t size, size_t nmemb, FT_FILE *f)
 {
     int_fast32_t rlen = vk_memfs_read(&f->use_as__vk_memfs_file_t, (uint8_t *)ptr, size * nmemb);
     return rlen;
 }
 
-static ALWAYS_INLINE size_t ft_fwrite(const void *ptr, size_t size, size_t nmemb, FT_FILE *f)
+static VSF_CAL_ALWAYS_INLINE size_t ft_fwrite(const void *ptr, size_t size, size_t nmemb, FT_FILE *f)
 {
     int_fast32_t wlen = vk_memfs_write(&f->use_as__vk_memfs_file_t, (uint8_t *)ptr, size * nmemb);
     return wlen;

@@ -43,8 +43,6 @@ extern int vsfvm_module_require_lib_imp(vsfvm_compiler_t *compiler, const char *
 
 /*============================ IMPLEMENTATION ================================*/
 
-#ifndef WEAK_VSFVM_SET_BYTECODE_IMP
-
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
 #   pragma diag_suppress=pe111
@@ -60,8 +58,6 @@ int vsfvm_set_bytecode_imp(vsfvm_compiler_t *compiler, vsfvm_bytecode_t code, ui
 #if __IS_COMPILER_IAR__
 //! statement is unreachable
 #   pragma diag_warning=pe111
-#endif
-
 #endif
 
 VSF_CAL_WEAK(vsfvm_module_get_lexer_imp)
