@@ -188,7 +188,7 @@ extern "C" {
 #if __IS_COMPILER_IAR__
 #   define DISABLE_GLOBAL_INTERRUPT()           ____disable_irq()
 
-static ALWAYS_INLINE uint32_t ____disable_irq(void)
+static VSF_CAL_ALWAYS_INLINE uint32_t ____disable_irq(void)
 {
     uint32_t wPRIMASK = __get_interrupt_state();
     __disable_interrupt();
@@ -205,7 +205,7 @@ static ALWAYS_INLINE uint32_t ____disable_irq(void)
 
 #   define DISABLE_GLOBAL_INTERRUPT()           ____disable_irq()
 
-static ALWAYS_INLINE uint32_t ____disable_irq(void)
+static VSF_CAL_ALWAYS_INLINE uint32_t ____disable_irq(void)
 {
     uint32_t cpsr;
 
@@ -237,7 +237,7 @@ typedef uint32_t   vsf_gint_state_t;
   \details Returns the current state of the priority mask bit from the Priority Mask Register.
   \return               Priority Mask value
  */
-__attribute__((always_inline)) static inline uint32_t ____get_PRIMASK(void)
+VSF_CAL_ALWAYS_INLINE static inline uint32_t ____get_PRIMASK(void)
 {
     unsigned int result;
 
@@ -252,7 +252,7 @@ __attribute__((always_inline)) static inline uint32_t ____get_PRIMASK(void)
   \details Assigns the given value to the Priority Mask Register.
   \param [in]    priMask  Priority Mask
  */
-__attribute__((always_inline)) static inline void ____set_PRIMASK(uint32_t priMask)
+VSF_CAL_ALWAYS_INLINE static inline void ____set_PRIMASK(uint32_t priMask)
 {
     __asm__ volatile ("MSR primask, %0" : : "r" (priMask) : "memory");
 }
