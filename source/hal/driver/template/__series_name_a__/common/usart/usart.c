@@ -203,7 +203,7 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
  *          which will use fifo APIs + interrupt to implement DMA APIs.
  */
 
-vsf_err_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_request_rx)(
+vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_request_rx)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,
     void *buffer_ptr,
     uint_fast32_t count
@@ -212,7 +212,7 @@ vsf_err_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_request_rx)(
     return VSF_ERR_NONE;
 }
 
-vsf_err_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_request_tx)(
+vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_request_tx)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,
     void *buffer_ptr,
     uint_fast32_t count
@@ -221,28 +221,28 @@ vsf_err_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_request_tx)(
     return VSF_ERR_NONE;
 }
 
-vsf_err_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_cancel_rx)(
+vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cancel_rx)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
     return VSF_ERR_NONE;
 }
 
-vsf_err_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_cancel_tx)(
+vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cancel_tx)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
     return VSF_ERR_NONE;
 }
 
-int_fast32_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_get_rx_count)(
+int_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_rx_count)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
     return 0;
 }
 
-int_fast32_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)(
+int_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
