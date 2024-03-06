@@ -55,7 +55,7 @@ const vsf_http_op_t vsf_mbedtls_http_op = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_tgui_sv_get_background_color(strnchr)
+VSF_CAL_WEAK(strnchr)
 char * strnchr(const char *s, size_t n, int c)
 {
     do {
