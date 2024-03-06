@@ -269,7 +269,11 @@ uint_fast8_t __vsf_arch_clz(uintalu_t a)
 #if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
     // TODO: result of __builtin_clz(0) is undefined, if it's not sizeof(uintalu_t) * 8,
     //  __vsf_arch_clz MUST be re-implemented in arch driver
+#   if __VSF64__
+    return __builtin_clzll(a);
+#   else
     return __builtin_clz(a);
+#   endif
 #else
     uint_fast8_t num = __optimal_bit_sz;
     uintalu_t bitmask = ((uintalu_t)1 << (__optimal_bit_sz - 1));
@@ -304,7 +308,11 @@ VSF_CAL_WEAK(__vsf_arch_ffs)
 int_fast8_t __vsf_arch_ffs(uintalu_t a)
 {
 #if __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
+#   if __VSF64__
+    return __builtin_ffsll(a) - 1;
+#   else
     return __builtin_ffs(a) - 1;
+#   endif
 #else
 #   ifndef __VSF_ARCH_MSB
     return __vsf_arch_msb(a & -(uintalu_t)a);

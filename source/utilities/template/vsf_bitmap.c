@@ -54,12 +54,12 @@ void __vsf_bitmap_range_assign(uintalu_t *bitmap_ptr, int_fast32_t begin_bit, in
 
 int_fast32_t __vsf_bitmap_ffz(uintalu_t *bitmap_ptr, int_fast32_t bit_size)
 {
-    int_fast32_t word_size =    (bit_size + (int_fast32_t)__optimal_bit_sz - 1) 
+    int_fast32_t word_size =    (bit_size + (int_fast32_t)__optimal_bit_sz - 1)
                             /   (int_fast32_t)__optimal_bit_sz;
-    int_fast32_t index = 0, i = 0;
+    int_fast32_t index = 0, i = 0, temp;
 
     for (; i < word_size; i++) {
-        int_fast32_t temp = __vsf_arch_ffz(bitmap_ptr[i]);
+        temp = __vsf_arch_ffz(bitmap_ptr[i]);
         if (temp >= 0) {
             index += temp;
             return index >= bit_size ? -1 : index;
@@ -71,12 +71,12 @@ int_fast32_t __vsf_bitmap_ffz(uintalu_t *bitmap_ptr, int_fast32_t bit_size)
 
 int_fast32_t __vsf_bitmap_ffs(uintalu_t *bitmap_ptr, int_fast32_t bit_size)
 {
-    int_fast32_t word_size =    (bit_size + (int_fast32_t)__optimal_bit_sz - 1) 
+    int_fast32_t word_size =    (bit_size + (int_fast32_t)__optimal_bit_sz - 1)
                             /   (int_fast32_t)__optimal_bit_sz;
-    int_fast32_t index = 0, i = 0;
+    int_fast32_t index = 0, i = 0, temp;
 
     for (; i < word_size; i++) {
-        int_fast32_t temp = __vsf_arch_ffs(bitmap_ptr[i]);
+        temp = __vsf_arch_ffs(bitmap_ptr[i]);
         if (temp >= 0) {
             index += temp;
             return index >= bit_size ? -1 : index;
