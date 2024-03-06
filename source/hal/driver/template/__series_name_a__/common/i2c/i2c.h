@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_${DEVICE/I2C_IP}_I2C_H__
-#define __HAL_DRIVER_${DEVICE/I2C_IP}_I2C_H__
+#ifndef __HAL_DRIVER_${SERIES/I2C_IP}_I2C_H__
+#define __HAL_DRIVER_${SERIES/I2C_IP}_I2C_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -166,7 +166,7 @@ typedef struct vsf_i2c_status_t {
 // IPCore
 /*\note Extern APIs for ip core diriver.
  *      There is no requirement about how APIs of IPCore drivers should be implemented.
- *      Just consider the simplicity for drivers of actual device.
+ *      Just consider the simplicity for actual peripherial drivers.
  */
 // IPCore end
 
@@ -175,5 +175,5 @@ typedef struct vsf_i2c_status_t {
 #endif
 
 #endif      // VSF_HAL_USE_I2C
-#endif      // __HAL_DRIVER_${DEVICE/I2C_IP}_I2C_H__
+#endif      // __HAL_DRIVER_${SERIES/I2C_IP}_I2C_H__
 /* EOF */

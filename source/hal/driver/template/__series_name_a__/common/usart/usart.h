@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_${DEVICE/USART_IP}_USART_H__
-#define __HAL_DRIVER_${DEVICE/USART_IP}_USART_H__
+#ifndef __HAL_DRIVER_${SERIES/USART_IP}_USART_H__
+#define __HAL_DRIVER_${SERIES/USART_IP}_USART_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -168,7 +168,7 @@ typedef struct vsf_usart_status_t {
 // IPCore
 /*\note Extern APIs for ip core diriver.
  *      There is no requirement about how APIs of IPCore drivers should be implemented.
- *      Just consider the simplicity for drivers of actual device.
+ *      Just consider the simplicity for actual peripherial drivers.
  */
 // IPCore end
 
@@ -177,5 +177,5 @@ typedef struct vsf_usart_status_t {
 #endif
 
 #endif      // VSF_HAL_USE_USART
-#endif      // __HAL_DRIVER_${DEVICE/USART_IP}_USART_H__
+#endif      // __HAL_DRIVER_${SERIES/USART_IP}_USART_H__
 /* EOF */

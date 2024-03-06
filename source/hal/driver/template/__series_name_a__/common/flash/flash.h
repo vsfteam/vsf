@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_${DEVICE/FLASH_IP}_FLASH_H__
-#define __HAL_DRIVER_${DEVICE/FLASH_IP}_FLASH_H__
+#ifndef __HAL_DRIVER_${SERIES/FLASH_IP}_FLASH_H__
+#define __HAL_DRIVER_${SERIES/FLASH_IP}_FLASH_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -89,7 +89,7 @@ vsf_class(vsf_${flash_ip}_flash_t) {
 // IPCore
 /*\note Extern APIs for ip core diriver.
  *      There is no requirement about how APIs of IPCore drivers should be implemented.
- *      Just consider the simplicity for drivers of actual device.
+ *      Just consider the simplicity for actual peripherial drivers.
  */
 // IPCore end
 
@@ -98,5 +98,5 @@ vsf_class(vsf_${flash_ip}_flash_t) {
 #endif
 
 #endif      // VSF_HAL_USE_FLASH
-#endif      // __HAL_DRIVER_${DEVICE/FLASH_IP}_FLASH_H__
+#endif      // __HAL_DRIVER_${SERIES/FLASH_IP}_FLASH_H__
 /* EOF */
