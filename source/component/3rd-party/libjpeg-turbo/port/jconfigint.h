@@ -4,8 +4,8 @@
 /* Compiler's inline keyword */
 //#undef inline
 /* How to obtain function inlining. */
-//#define INLINE  __inline__ __attribute__((always_inline))
 #include "utilities/vsf_utilities.h"
+#define INLINE  VSF_CAL_ALWAYS_INLINE
 
 /* How to obtain thread-local storage */
 #define THREAD_LOCAL  //__thread
