@@ -896,7 +896,7 @@ int echo_main(int argc, char *argv[])
         printf("%s%s", *argv++, argc > 0 ? " " : "");
     }
     if (!skip_tail_new_line) {
-        printf(VSH_LINEEND);
+        printf("\n");
     }
     return 0;
 }
