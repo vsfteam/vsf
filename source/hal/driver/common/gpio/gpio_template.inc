@@ -198,7 +198,7 @@ void vsf_real_gpio_output_and_clear(vsf_real_gpio_t *gpio_ptr, vsf_gpio_pin_mask
 }
 #endif
 
-#if VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#if VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
 {
     vsf_gpio_capability_t gpio_capability = {
