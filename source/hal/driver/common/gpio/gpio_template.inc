@@ -184,7 +184,7 @@ void vsf_real_gpio_output_and_clear(vsf_real_gpio_t *gpio_ptr, vsf_gpio_pin_mask
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     VSF_HAL_ASSERT(0 != pin_mask);
 
-#if VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET == 0
+#if VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_CLEAR == 0
     VSF_HAL_ASSERT(0);
 #else
 #if VSF_GPIO_CFG_CHANGE_DIR_FIRST == ENABLED
