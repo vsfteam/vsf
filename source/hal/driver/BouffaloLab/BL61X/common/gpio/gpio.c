@@ -27,7 +27,7 @@
 #include "bflb_gpio.h"
 #include "hardware/gpio_reg.h"
 
-#define VSF_GPIO_USE_DEFAULT_CAPABILITY_IMPLEMENT       ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY         ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_SET                ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_CLEAR              ENABLED
 #define VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_SET      1

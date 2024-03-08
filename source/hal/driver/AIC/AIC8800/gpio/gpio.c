@@ -27,6 +27,7 @@
 #include "../vendor/plf/aic8800/src/driver/aic1000lite_regs/aic1000Lite_iomux.h"
 #include "../vendor/plf/aic8800/src/driver/pmic/pmic_api.h"
 
+#define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY         ENABLED
 #define VSF_GPIO_CFG_CHANGE_DIR_FIRST                   ENABLED
 #define VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_SET      1
 #define VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_CLEAR    1
