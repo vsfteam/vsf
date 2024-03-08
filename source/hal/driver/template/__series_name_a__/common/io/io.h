@@ -92,6 +92,10 @@ typedef enum vsf_io_mode_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ INCLUDES ======================================*/
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif      // VSF_HAL_USE_IO
 #endif      // __HAL_DRIVER_${SERIES}_IO_H__
 /* EOF */
