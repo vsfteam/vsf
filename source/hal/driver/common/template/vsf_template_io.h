@@ -119,81 +119,83 @@ extern "C" {
 
 #if VSF_IO_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
 typedef enum vsf_io_mode_t {
-    VSF_IO_PULL_UP                 = (1 << 0),           //!< enable pull-up resistor
-    VSF_IO_PULL_DOWN               = (1 << 1),           //!< enable pull-down resistor
-    VSF_IO_OPEN_DRAIN              = (1 << 2),           //!< enable open-drain mode
+    VSF_IO_PULL_UP                  = (0 << 0),         //!< enable pull-up resistor
+    VSF_IO_PULL_DOWN                = (1 << 0),         //!< enable pull-down resistor
+    VSF_IO_OPEN_DRAIN               = (2 << 0),         //!< enable open-drain mode
+    VSF_IO_ANALOG                   = (3 << 0),         //!< enable analog function
 
-    VSF_IO_NORMAL_INPUT            = (0 << 3),           //!< invert the input pin level
-    VSF_IO_INVERT_INPUT            = (1 << 3),           //!< invert the input pin level
-    VSF_IO_DISABLE_INPUT           = (1 << 4),           //!< disable input
+    VSF_IO_NORMAL_INPUT             = (0 << 3),         //!< normal input pin level
+    VSF_IO_INVERT_INPUT             = (1 << 3),         //!< inverted input pin level
+    VSF_IO_DISABLE_INPUT            = (1 << 4),         //!< disable input
 
-    VSF_IO_FILTER_BYPASS           = (0 << 5),          //!< filter is bypassed
-    VSF_IO_FILTER_2CLK             = (1 << 5),          //!< levels should keep 2 clks
-    VSF_IO_FILTER_4CLK             = (2 << 5),          //!< levels should keep 4 clks
-    VSF_IO_FILTER_8CLK             = (3 << 5),          //!< levels should keep 8 clks
+    VSF_IO_FILTER_BYPASS            = (0 << 5),         //!< filter is bypassed
+    VSF_IO_FILTER_2CLK              = (1 << 5),         //!< levels should keep 2 clks
+    VSF_IO_FILTER_4CLK              = (2 << 5),         //!< levels should keep 4 clks
+    VSF_IO_FILTER_8CLK              = (3 << 5),         //!< levels should keep 8 clks
 
-    VSF_IO_FILTER_CLK_SRC0         = (0 << 7),          //!< select clock src 0 for filter
-    VSF_IO_FILTER_CLK_SRC1         = (1 << 7),          //!< select clock src 1 for filter
-    VSF_IO_FILTER_CLK_SRC2         = (2 << 7),          //!< select clock src 2 for filter
-    VSF_IO_FILTER_CLK_SRC3         = (3 << 7),          //!< select clock src 3 for filter
-    VSF_IO_FILTER_CLK_SRC4         = (4 << 7),          //!< select clock src 4 for filter
-    VSF_IO_FILTER_CLK_SRC5         = (5 << 7),          //!< select clock src 5 for filter
-    VSF_IO_FILTER_CLK_SRC6         = (6 << 7),          //!< select clock src 6 for filter
-    VSF_IO_FILTER_CLK_SRC7         = (7 << 7),          //!< select clock src 7 for filter
+    VSF_IO_FILTER_CLK_SRC0          = (0 << 7),         //!< select clock src 0 for filter
+    VSF_IO_FILTER_CLK_SRC1          = (1 << 7),         //!< select clock src 1 for filter
+    VSF_IO_FILTER_CLK_SRC2          = (2 << 7),         //!< select clock src 2 for filter
+    VSF_IO_FILTER_CLK_SRC3          = (3 << 7),         //!< select clock src 3 for filter
+    VSF_IO_FILTER_CLK_SRC4          = (4 << 7),         //!< select clock src 4 for filter
+    VSF_IO_FILTER_CLK_SRC5          = (5 << 7),         //!< select clock src 5 for filter
+    VSF_IO_FILTER_CLK_SRC6          = (6 << 7),         //!< select clock src 6 for filter
+    VSF_IO_FILTER_CLK_SRC7          = (7 << 7),         //!< select clock src 7 for filter
 
-    VSF_IO_HIGH_DRIVE_STRENGTH     = (1 << 10),         //!< enable high drive strength
-    VSF_IO_HIGH_DRIVE_NO_STRENGTH  = (1 << 10),         //!< enable high drive strength
+    VSF_IO_HIGH_DRIVE_STRENGTH      = (1 << 10),        //!< enable high drive strength
+    VSF_IO_HIGH_DRIVE_NO_STRENGTH   = (1 << 10),        //!< enable high drive strength
 
-    VSF_IO_INTERRUPT_DISABLED      = (0 << 11),
-    VSF_IO_INTERRUPT_ENABLED       = (1 << 11),
+    VSF_IO_INTERRUPT_DISABLED       = (0 << 11),
+    VSF_IO_INTERRUPT_ENABLED        = (1 << 11),
 } vsf_io_mode_t;
 #endif
 
 enum {
-    VSF_IO_OUTPUT_COUNT              = 3,
-    VSF_IO_OUTPUT_MASK               = VSF_IO_PULL_UP |
-                                       VSF_IO_PULL_DOWN |
-                                       VSF_IO_OPEN_DRAIN,
+    VSF_IO_OUTPUT_COUNT             = 3,
+    VSF_IO_OUTPUT_MASK              = VSF_IO_PULL_UP
+                                    | VSF_IO_PULL_DOWN
+                                    | VSF_IO_OPEN_DRAIN,
 
-    VSF_IO_INPUT_COUNT               = 3,
-    VSF_IO_INPUT_MASK                = VSF_IO_NORMAL_INPUT |
-                                       VSF_IO_INVERT_INPUT |
-                                       VSF_IO_DISABLE_INPUT,
+    VSF_IO_INPUT_COUNT              = 3,
+    VSF_IO_INPUT_MASK               = VSF_IO_NORMAL_INPUT
+                                    | VSF_IO_INVERT_INPUT
+                                    | VSF_IO_DISABLE_INPUT,
 
-    VSF_IO_FILTER_COUNT              = 4,
-    VSF_IO_FILTER_MASK               = VSF_IO_FILTER_BYPASS |
-                                       VSF_IO_FILTER_2CLK   |
-                                       VSF_IO_FILTER_4CLK   |
-                                       VSF_IO_FILTER_8CLK,
+    VSF_IO_FILTER_COUNT             = 4,
+    VSF_IO_FILTER_MASK              = VSF_IO_FILTER_BYPASS
+                                    | VSF_IO_FILTER_2CLK
+                                    | VSF_IO_FILTER_4CLK
+                                    | VSF_IO_FILTER_8CLK,
 
-    VSF_IO_FILTER_CLK_COUNT          = 8,
-    VSF_IO_FILTER_CLK_MASK           = VSF_IO_FILTER_CLK_SRC0 |
-                                       VSF_IO_FILTER_CLK_SRC1 |
-                                       VSF_IO_FILTER_CLK_SRC2 |
-                                       VSF_IO_FILTER_CLK_SRC3 |
-                                       VSF_IO_FILTER_CLK_SRC4 |
-                                       VSF_IO_FILTER_CLK_SRC5 |
-                                       VSF_IO_FILTER_CLK_SRC6 |
-                                       VSF_IO_FILTER_CLK_SRC7,
+    VSF_IO_FILTER_CLK_COUNT         = 8,
+    VSF_IO_FILTER_CLK_MASK          = VSF_IO_FILTER_CLK_SRC0
+                                    | VSF_IO_FILTER_CLK_SRC1
+                                    | VSF_IO_FILTER_CLK_SRC2
+                                    | VSF_IO_FILTER_CLK_SRC3
+                                    | VSF_IO_FILTER_CLK_SRC4
+                                    | VSF_IO_FILTER_CLK_SRC5
+                                    | VSF_IO_FILTER_CLK_SRC6
+                                    | VSF_IO_FILTER_CLK_SRC7,
 
     // Independent switching options
     // VSF_IO_HIGH_DRIVE_STRENGTH
-    VSF_IO_HIGH_DRIVE_STRENGTH_COUNT = 2,
-    VSF_IO_HIGH_DRIVE_STRENGTH_MASK  = VSF_IO_HIGH_DRIVE_STRENGTH |
-                                       VSF_IO_HIGH_DRIVE_NO_STRENGTH,
+    VSF_IO_HIGH_DRIVE_STRENGTH_COUNT= 2,
+    VSF_IO_HIGH_DRIVE_STRENGTH_MASK = VSF_IO_HIGH_DRIVE_STRENGTH
+                                    | VSF_IO_HIGH_DRIVE_NO_STRENGTH,
 
-    VSF_IO_INTERRUPT_COUNT           = 2,
-    VSF_IO_INTERRUPT_MASK            = VSF_IO_INTERRUPT_ENABLED | VSF_IO_INTERRUPT_DISABLED,
+    VSF_IO_INTERRUPT_COUNT          = 2,
+    VSF_IO_INTERRUPT_MASK           = VSF_IO_INTERRUPT_ENABLED
+                                    | VSF_IO_INTERRUPT_DISABLED,
 
-    VSF_IO_MODE_MASK_COUNT           = 6,
-    VSF_IO_MODE_ALL_BITS_MASK        = VSF_IO_PULL_UP               |
-                                       VSF_IO_OPEN_DRAIN            |
-                                       VSF_IO_DISABLE_INPUT         |
-                                       VSF_IO_INVERT_INPUT          |
-                                       VSF_IO_FILTER_MASK           |
-                                       VSF_IO_FILTER_CLK_MASK       |
-                                       VSF_IO_HIGH_DRIVE_STRENGTH   |
-                                       VSF_IO_INTERRUPT_MASK
+    VSF_IO_MODE_MASK_COUNT          = 6,
+    VSF_IO_MODE_ALL_BITS_MASK       = VSF_IO_PULL_UP
+                                    | VSF_IO_OPEN_DRAIN
+                                    | VSF_IO_DISABLE_INPUT
+                                    | VSF_IO_INVERT_INPUT
+                                    | VSF_IO_FILTER_MASK
+                                    | VSF_IO_FILTER_CLK_MASK
+                                    | VSF_IO_HIGH_DRIVE_STRENGTH
+                                    | VSF_IO_INTERRUPT_MASK,
 };
 
 

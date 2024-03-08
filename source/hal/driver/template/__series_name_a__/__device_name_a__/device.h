@@ -72,6 +72,11 @@
  *      Usually need irqn, irqhandler, peripherial clock enable bits, peripherial reset bites, etc.
  */
 
+// IO
+
+#define VSF_HW_IO_PORT_COUNT                        1
+#define VSF_HW_IO_PIN_COUNT                         32
+
 // I2C0, I2C2
 
 #define VSF_HW_I2C_COUNT                            2
