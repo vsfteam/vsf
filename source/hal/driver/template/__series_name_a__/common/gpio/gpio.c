@@ -124,15 +124,18 @@ static void VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
 
-    uint32_t irq_pin_mask;
-    while ((irq_pin_mask = GET_IRQ_MASK(gpio_ptr))) {
+    uint32_t irq_pin_mask = GET_IRQ_MASK(gpio_ptr);
+    CLEAR_IRQ_FLAG(gpio_ptr, irq_pin_mask);
+    while (irq_pin_mask != 0) {
         uint32_t pin = 31 - vsf_clz32(irq_pin_mask);
         uint32_t pin_mask = 0x01UL << pin;
-        CLEAR_IRQ_FLAG(gpio_ptr, pin_mask);
 
         VSF_HAL_ASSERT(NULL != gpio_ptr->isrs[pin].handler_fn);
-        gpio_ptr->isrs[pin].handler_fn(gpio_ptr->isrs[pin].target_ptr,
-                                         (vsf_gpio_t *)gpio_ptr, pin_mask);
+        gpio_ptr->isrs[pin].handler_fn(
+            gpio_ptr->isrs[pin].target_ptr,
+            (vsf_gpio_t *)gpio_ptr,
+            pin_mask
+        );
     }
 }
 
@@ -169,14 +172,14 @@ static void VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_irqhandler)(
  *              VSF_GPIO_CFG_CAPABILITY_PIN_MASK
  */
 
-void VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_output_and_set)(
+void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_output_and_set)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
     vsf_gpio_pin_mask_t pin_mask
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
 }
 
-void VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_output_and_clear)(
+void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_output_and_clear)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
     vsf_gpio_pin_mask_t pin_mask
 ) {
