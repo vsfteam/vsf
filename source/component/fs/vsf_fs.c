@@ -1082,7 +1082,7 @@ __vsf_component_peda_ifs_entry(__vk_vfs_create, vk_file_create)
 __vsf_component_peda_ifs_entry(__vk_vfs_unlink, vk_file_unlink)
 {
     vsf_peda_begin();
-    vsf_err_t err;
+    vsf_err_t err = VSF_ERR_NONE;
     vk_vfs_file_t *dir = (vk_vfs_file_t *)&vsf_this;
     switch (evt) {
     case VSF_EVT_INIT:

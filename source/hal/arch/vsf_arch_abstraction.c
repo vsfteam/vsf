@@ -120,11 +120,11 @@ void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t val, void *p)           
 /*============================ TYPES =========================================*/
 
 #if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
-typedef struct __systimer_t {
+typedef struct __vsf_systimer_t {
     vsf_systimer_tick_t unit;
-} __systimer_t;
+} __vsf_systimer_t;
 #elif   VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
-typedef struct __systimer_t {
+typedef struct __vsf_systimer_t {
     vsf_systimer_tick_t tick;
     vsf_systimer_tick_t base;
     vsf_systimer_tick_t unit;
@@ -132,12 +132,12 @@ typedef struct __systimer_t {
     vsf_systimer_tick_t reload;
     bool enabled;
     //uint32_t           tick_freq;
-} __systimer_t;
-#elif  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE
-typedef struct __systimer_t {
+} __vsf_systimer_t;
+#elif   VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE
+typedef struct __vsf_systimer_t {
     vsf_systimer_tick_t tick;
     vsf_systimer_tick_t cycle_per_tick;
-} __systimer_t;
+} __vsf_systimer_t;
 #endif
 
 /*============================ PROTOTYPES ====================================*/
@@ -179,7 +179,7 @@ static void __vsf_protect_region_none_leave(vsf_protect_t orig);
 #if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
     ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER         \
     ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE
-static volatile __systimer_t __systimer;
+static volatile __vsf_systimer_t __systimer;
 #endif
 
 

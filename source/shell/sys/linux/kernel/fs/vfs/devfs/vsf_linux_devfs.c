@@ -1020,7 +1020,7 @@ static ssize_t __vsf_linux_input_write(vsf_linux_fd_t *sfd, const void *buf, siz
     VSF_LINUX_ASSERT(!(count % sizeof(struct input_event)));
     struct input_event *linux_input_event = (struct input_event *)buf;
     size_t written_count = 0;
-    vk_input_type_t vsf_input_type;
+    vk_input_type_t vsf_input_type = VSF_INPUT_TYPE_UNKNOWN;
     vk_input_evt_t vsf_input_event;
 
     while (written_count < count) {
