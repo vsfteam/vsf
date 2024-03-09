@@ -206,7 +206,7 @@ vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
 #define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED
 
 #define VSF_GPIO_CFG_IMP_LV0(__IDX, __HAL_OP)                                   \
-    static vsf_gpio_isr_t VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio, __IDX, _isr)[VSF_HW_IO_PIN_COUNT];\
+    static vsf_gpio_isr_t VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio, __IDX, _isr)[VSF_HW_GPIO_PIN_COUNT];\
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t)                              \
         VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio, __IDX) = {                 \
         .isrs = VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio, __IDX, _isr),  \
