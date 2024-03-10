@@ -56,9 +56,7 @@ extern "C" {
 #ifndef FALSE
 #   define FALSE                    0
 #endif
-#ifndef BOOL
-#   define BOOL                     int
-#endif
+// DO not define BOOL, it will conflict with system headers in some platform
 
 #ifndef offsetof
 // use offsetof from compiler if available for constexpr feature in cpp
