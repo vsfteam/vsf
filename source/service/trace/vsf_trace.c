@@ -298,7 +298,7 @@ void __vsf_trace_buffer(vsf_trace_level_t level,
                 for (uint_fast16_t j = 0; j < data_size * data_per_line; j++, line++) {
                     if (line < pend) {
                         ch = *line;
-                        *ptr++ = ((ch < 32) || (ch > 127)) ? '.' : ch;
+                        *ptr++ = ((ch < 32) || (ch > 126)) ? '.' : ch;
                     } else {
                         *ptr++ = ' ';
                     }
