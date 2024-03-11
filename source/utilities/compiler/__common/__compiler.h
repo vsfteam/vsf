@@ -136,7 +136,7 @@ extern "C" {
 #   define __VSF_CAL_AT_ADDR(__ADDR)    Not Supported by GCC
 #   define __VSF_CAL_SECTION(__SEC)     __attribute__((section(__SEC)))
 #   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS) \
-                                        __attribute__((weakref(__VSF_STR(__ALIAS))))
+                                        __attribute__((weakref(__VSF_STR(__ORIGIN))))
 
 #   define VSF_CAL_PACKED               __attribute__((packed))
 //#   define VSF_CAL_UNALIGNED            __attribute__((packed))
@@ -159,7 +159,7 @@ extern "C" {
 #   define __VSF_CAL_AT_ADDR(__ADDR)    Not Supported by TCC
 #   define __VSF_CAL_SECTION(__SEC)
 #   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS) \
-                                        __attribute__((weakref(__VSF_STR(__ALIAS))))
+                                        __attribute__((weakref(__VSF_STR(__ORIGIN))))
 
 #   define VSF_CAL_PACKED               __attribute__((packed))
 #   define VSF_CAL_UNALIGNED            __attribute__((packed))
