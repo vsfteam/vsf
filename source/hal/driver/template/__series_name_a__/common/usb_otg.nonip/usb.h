@@ -59,16 +59,13 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
-
-/*\note IMPORTANT: ******** Add configurations below to vsf_board_cfg.h. ********
-#define VSF_USBD_CFG_DRV_LV0_OO
-#   define VSF_USBD_CFG_DRV_LV0_OO_PREFIX           vsf_hw_usbd
-#   define VSF_USBD_CFG_DRV_LV0_OO_OBJ              VSF_HW_USB_OTG0
- */
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_HW_USB_OTG_DEF(__N, __VALUE)  extern vsf_hw_usb_t VSF_HW_USB_OTG##__N;
+#define __VSF_HW_USB_OTG_DEF(__N, __VALUE)                                      \
+        extern vsf_hw_usb_t VSF_HW_USB_OTG##__N;                                \
+        static vsf_hw_usb_t USB_DC##__N VSF_CAL_WEAK_ALIAS(VSF_HW_USB_OTG##__N, USB_DC##__N);\
+        extern const i_usb_dc_t VSF_USB_DC##__N;
+
 #define _VSF_HW_USB_OTG_DEF(__N, __VALUE)   __VSF_HW_USB_OTG_DEF(__N, __VALUE)
 #define VSF_HW_USB_OTG_DEF(__N, __VALUE)    _VSF_HW_USB_OTG_DEF(__N, __VALUE)
 

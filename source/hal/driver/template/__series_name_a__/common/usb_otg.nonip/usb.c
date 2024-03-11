@@ -25,7 +25,9 @@
 
 #if VSF_HAL_USE_USBD == ENABLED && VSF_HAL_USE_USBH == ENABLED
 #   define ____VSF_HW_USB_OTG_IMPLEMENT(__N, __VALUE)                           \
-static vsf_hw_usb_t VSF_HW_USB_OTG##__N = {                                     \
+__USB_DC_BODY(__N, __VALUE##_usbd)                                              \
+const i_usb_dc_t VSF_USB_DC##__N = __USB_DC_INTERFACE_FUNC_DEF(__N, __VALUE##_usbd);\
+vsf_hw_usb_t VSF_HW_USB_OTG##__N = {                                            \
     .irq        = VSF_HW_USB_OTG##__N##_IRQN,                                   \
     .reg        = (void *)VSF_HW_USB_OTG##__N##_REG,                            \
 };                                                                              \
@@ -39,7 +41,9 @@ VSF_CAL_ROOT void VSF_HW_USB_OTG##__N##_IRQHandler(void)                        
 }
 #elif VSF_HAL_USE_USBD == ENABLED
 #   define ____VSF_HW_USB_OTG_IMPLEMENT(__N, __VALUE)                           \
-static vsf_hw_usb_t VSF_HW_USB_OTG##__N = {                                     \
+__USB_DC_BODY(__N, __VALUE##_usbd)                                              \
+const i_usb_dc_t VSF_USB_DC##__N = __USB_DC_INTERFACE_FUNC_DEF(__N, __VALUE##_usbd);\
+vsf_hw_usb_t VSF_HW_USB_OTG##__N = {                                            \
     .irq        = VSF_HW_USB_OTG##__N##_IRQN,                                   \
     .reg        = (void *)VSF_HW_USB_OTG##__N##_REG,                            \
 };                                                                              \
@@ -49,7 +53,7 @@ VSF_CAL_ROOT void VSF_HW_USB_OTG##__N##_IRQHandler(void)                        
 }
 #elif VSF_HAL_USE_USBH == ENABLED
 #   define ____VSF_HW_USB_OTG_IMPLEMENT(__N, __VALUE)                           \
-static vsf_hw_usb_t VSF_HW_USB_OTG##__N = {                                     \
+vsf_hw_usb_t VSF_HW_USB_OTG##__N = {                                            \
     .irq        = VSF_HW_USB_OTG##__N##_IRQN,                                   \
     .reg        = (void *)VSF_HW_USB_OTG##__N##_REG,                            \
 };                                                                              \
