@@ -319,14 +319,11 @@ static int16_t __vk_usbd_get_config(vk_usbd_dev_t *dev, uint_fast8_t value)
 static vsf_err_t __vk_usbd_auto_init(vk_usbd_dev_t *dev)
 {
     VSF_USB_ASSERT(dev != NULL);
-    vk_usbd_cfg_t *config;
     vk_usbd_desc_t *desc;
     struct usb_config_desc_t *desc_config;
 
     uint_fast16_t pos, cur_ifs;
     uint_fast8_t attr, feature;
-
-    config = &dev->config[dev->configuration];
 
     // config other eps according to descriptors
     desc = vk_usbd_get_descriptor(dev->desc, dev->num_of_desc, USB_DT_CONFIG, dev->configuration, 0);
@@ -335,7 +332,7 @@ static vsf_err_t __vk_usbd_auto_init(vk_usbd_dev_t *dev)
     VSF_USB_ASSERT(     (desc->size == desc_config->wTotalLength)
            &&   (desc_config->bLength == USB_DT_CONFIG_SIZE)
            &&   (desc_config->bDescriptorType == USB_DT_CONFIG)
-           &&   (desc_config->bNumInterfaces == config->num_of_ifs));
+           &&   (desc_config->bNumInterfaces == dev->config[dev->configuration].num_of_ifs));
 
     // initialize device feature according to
     // bmAttributes field in configuration descriptor

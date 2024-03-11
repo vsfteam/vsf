@@ -318,7 +318,8 @@ extern "C" {
 #define __usbd_ifs(__name)                                                      \
         vk_usbd_ifs_t __##__name##_ifs[__##__name##_ifsnum] = {
 
-#define __end_describe_usbd(__name, __drv, ...)                                 \
+#ifdef __VSF_USBD_CFG_DRV_INTERFACE
+#   define __end_describe_usbd(__name, __drv, ...)                              \
         };                                                                      \
         vk_usbd_cfg_t __##__name##_cfg[1] = {                                   \
             {                                                                   \
@@ -335,6 +336,24 @@ extern "C" {
             .drv                = &(__drv),                                     \
             __VA_ARGS__                                                         \
         };
+#else
+#   define __end_describe_usbd(__name, __drv, ...)                              \
+        };                                                                      \
+        vk_usbd_cfg_t __##__name##_cfg[1] = {                                   \
+            {                                                                   \
+                .num_of_ifs         = dimof(__##__name##_ifs),                  \
+                .ifs                = __##__name##_ifs,                         \
+            },                                                                  \
+        };                                                                      \
+        vk_usbd_dev_t __name = {                                                \
+            .num_of_config      = dimof(__##__name##_cfg),                      \
+            .config             = __##__name##_cfg,                             \
+            .num_of_desc        = dimof(__##__name##_std_descs),                \
+            .desc               = (vk_usbd_desc_t *)__##__name##_std_descs,     \
+            .speed              = (usb_dc_speed_t)__##__name##_speed,           \
+            __VA_ARGS__                                                         \
+        };
+#endif
 
 
 // prototype:
