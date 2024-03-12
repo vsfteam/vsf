@@ -58,7 +58,7 @@ static vk_mal_scsi_t __usrapp_mal_scsi = {
 };
 
 describe_usbd(__user_usbd_msc, APP_CFG_USBD_VID, APP_CFG_USBD_PID, USRAPP_CFG_USBD_SPEED)
-    usbd_func(__user_usbd_cdc,
+    usbd_func(__user_usbd_msc,
         usbd_mscbot_func(__user_usbd_msc,
                         // function index
                         0,
