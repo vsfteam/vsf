@@ -40,44 +40,50 @@ describe_block_stream(__stream_usart_tx, 2, 64)
 describe_block_stream(__stream_usart_rx, 2, 64)
 
 describe_usbd(__usbd, APP_CFG_USBD_VID, APP_CFG_USBD_PID, USB_DC_SPEED_FULL)
-    usbd_common_desc_iad(__usbd,
-                    // str_product, str_vendor, str_serial
-                    u"VSF-USBD-Simplest", u"SimonQian", u"1.0.0",
-                    // ep0_size
-                    64,
-                    // total function descriptor size
-                    USB_DESC_CDC_ACM_IAD_LEN,
-                    // total function interface number
-                    USB_CDC_ACM_IFS_NUM,
-                    // attribute, max_power
-                    USB_CONFIG_ATT_WAKEUP, 100)
-        usbd_cdc_acm_desc_iad(__usbd,
-                    // interface_start
-                    0 * USB_CDC_ACM_IFS_NUM,
-                    // function string index(start from 0)
-                    0,
-                    // interrupt in ep, bulk in ep, bulk out ep
-                    1, 2, 2,
-                    // bulk ep size
-                    64,
-                    // interrupt ep interval
-                    16)
-    usbd_func_desc(__usbd)
-        usbd_func_str_desc(__usbd, 0, u"VSF-CDC0")
-    usbd_std_desc_table(__usbd)
-        usbd_func_str_desc_table(__usbd, 0)
-    usbd_func(__usbd)
+    usbd_func(__usbd,
         usbd_cdc_acm_func(__usbd,
-                    // function index
-                    0,
-                    // interrupt in ep, bulk in ep, bulk out ep
-                    1, 2, 2,
-                    // stream_rx, stream_tx
-                    &__stream_usart_tx, &__stream_usart_rx,
-                    // default line coding
-                    USB_CDC_ACM_LINECODE_115200_8N1)
-    usbd_ifs(__usbd)
+                        // function index
+                        0,
+                        // function string
+                        u"VSF-CDC0",
+                        // interface_start
+                        0 * USB_CDC_ACM_IFS_NUM,
+                        // function string index(start from 0)
+                        0,
+                        // interrupt in ep, bulk in ep, bulk out ep
+                        1, 2, 2,
+                        // bulk ep size
+                        64,
+                        // interrupt ep interval
+                        16,
+                        // stream_rx, stream_tx
+                        &__stream_usart_tx, &__stream_usart_rx,
+                        // default line coding
+                        USB_CDC_ACM_LINECODE(115200, 8, USB_CDC_ACM_PARITY_NONE, USB_CDC_ACM_STOPBIT_1)
+        )
+    )
+
+    usbd_common_desc_iad(__usbd,
+                        // str_product, str_vendor, str_serial
+                        u"VSF-USBD-Simplest", u"SimonQian", u"1.0.0",
+                        // ep0_size
+                        64,
+                        // total function descriptor size
+                        USB_DESC_CDC_ACM_IAD_LEN,
+                        // total function interface number
+                        USB_CDC_ACM_IFS_NUM,
+                        // attribute, max_power
+                        USB_CONFIG_ATT_WAKEUP, 100,
+        usbd_cdc_acm_desc_iad(__usbd, 0)
+    )
+
+    usbd_std_desc_table(__usbd,
+        usbd_func_str_desc_table(__usbd, 0)
+    )
+
+    usbd_ifs(__usbd,
         usbd_cdc_acm_ifs(__usbd, 0)
+    )
 end_describe_usbd(__usbd, VSF_USB_DC0)
 
 static vsf_usart_stream_t __stream_usart = {
