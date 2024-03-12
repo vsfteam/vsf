@@ -21,6 +21,7 @@
 
 #if VSF_HAL_USE_USBH == ENABLED
 
+#define __VSF_HAL_HW_USB_CLASS_INHERIT__
 #include "./usbh.h"
 
 /*============================ MACROS ========================================*/

@@ -272,10 +272,6 @@ extern "C" {
                                         )                                       \
         __usbd_common_desc(__name, (__str_product), (__str_vendor), (__str_serial), USB_CLASS_MISC, 0x02, 0x01, (__ep0_size), (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))
 
-
-#define __usbd_func_desc(__name)                                                \
-        };
-
 #define __usbd_func_str_desc(__name, __func_id, __str_func)                     \
         __usbd_str_desc(__name, func##__func_id, __str_func)
 
@@ -312,14 +308,10 @@ extern "C" {
 #define __usbd_qualifier_desc_table(__name)                                     \
             VSF_USBD_DESC_QUALIFIER(&__##__name##_qualifier_desc),
 
-#define __usbd_func(__name)                                                     \
-        };
-
 #define __usbd_ifs(__name)                                                      \
         vk_usbd_ifs_t __##__name##_ifs[__##__name##_ifsnum] = {
 
 #define __end_describe_usbd(__name, __drv, ...)                                 \
-        };                                                                      \
         vk_usbd_cfg_t __##__name##_cfg[1] = {                                   \
             {                                                                   \
                 .num_of_ifs         = dimof(__##__name##_ifs),                  \
@@ -342,28 +334,28 @@ extern "C" {
 #define describe_usbd(__name, __vid, __pid, __speed, ...)                       \
         extern vk_usbd_dev_t __name;                                            \
         __PLOOC_EVAL(__describe_usbd, __name, __vid, __pid, __speed, ##__VA_ARGS__)(__name, __vid, __pid, __speed, ##__VA_ARGS__)
-#define usbd_common_desc_iad(__name, __str_product, __str_vendor, __str_serial, __ep0_size, __func_desc_size, __func_ifs_num, __attribute, __max_power_ma)\
-        __usbd_common_desc_iad(__name, __str_product, __str_vendor, __str_serial, (__ep0_size), (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))
+#define usbd_common_desc_iad(__name, __str_product, __str_vendor, __str_serial, __ep0_size, __func_desc_size, __func_ifs_num, __attribute, __max_power_ma, ...)\
+        __usbd_common_desc_iad(__name, __str_product, __str_vendor, __str_serial, (__ep0_size), (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))\
+        __VA_ARGS__};
 #define usbd_common_desc(__name, __str_product, __str_vendor, __str_serial, __class, __subclass, __protocol, __ep0_size, __func_desc_size, __func_ifs_num, __attribute, __max_power_ma)\
         __usbd_common_desc(__name, __str_product, __str_vendor, __str_serial, (__class), (__subclass), (__protocol), (__ep0_size), (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))
-#define usbd_func_desc(__name)                                                  \
-        __usbd_func_desc(__name)
 #define usbd_func_str_desc(__name, __func_id, __str_func)                       \
         __usbd_func_str_desc(__name, __func_id, __str_func)
 #define usbd_qualifier_desc(__name)                                             \
         __usbd_qualifier_desc(__name)
-#define usbd_std_desc_table(__name)                                             \
-        __usbd_std_desc_table(__name)
+#define usbd_std_desc_table(__name, ...)                                        \
+        __usbd_std_desc_table(__name)                                           \
+        __VA_ARGS__};
 // prototype:
 //  usbd_func_str_desc_table(__name, __func_id, __lang_id = __LANG_ID_FROM_DESCRIBE_USBD)
 #define usbd_func_str_desc_table(__name, __func_id, ...)                        \
         __PLOOC_EVAL(__usbd_func_str_desc_table, __name, __func_id, ##__VA_ARGS__)(__name, __func_id, ##__VA_ARGS__)
 #define usbd_qualifier_desc_table(__name)                                       \
         __usbd_qualifier_desc_table(__name)
-#define usbd_func(__name)                                                       \
-        __usbd_func(__name)
-#define usbd_ifs(__name)                                                        \
-        __usbd_ifs(__name)
+#define usbd_func(__name, ...)                          __VA_ARGS__
+#define usbd_ifs(__name, ...)                                                   \
+        __usbd_ifs(__name)                                                      \
+        __VA_ARGS__};
 #define end_describe_usbd(__name, __drv, ...)                                   \
         __end_describe_usbd(__name, (__drv), ##__VA_ARGS__)
 
