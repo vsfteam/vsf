@@ -1,20 +1,24 @@
 #ifndef __SIMPLE_LIBC_LIMITS_H__
 #define __SIMPLE_LIBC_LIMITS_H__
 
+// IMPORTANT: DO NOT use sizeof in MACROs below,
+//  because sizeof will not get correct value in preprocess stage.
+
 #define CHAR_BIT                        8
 #define LONG_BIT                        32
 #define WORD_BIT                        32
 
-#define UCHAR_MAX                       ((unsigned char)(~0U))
-#define SCHAR_MAX                       ((signed char)(UCHAR_MAX >> 1))
-#define USHRT_MAX                       ((unsigned short)(~0U))
-#define SHRT_MAX                        ((short)(USHRT_MAX >> 1))
-#define UINT_MAX                        (~0U)
-#define INT_MAX                         ((int)(~0U >> 1))
-#define ULONG_MAX                       (~0UL)
-#define LONG_MAX                        ((long)(~0UL >> 1))
-#define ULLONG_MAX                      (~0ULL)
-#define LLONG_MAX                       ((long long)(~0ULL >> 1))
+#define SCHAR_MAX                       127
+#define SHRT_MAX                        32767
+#define INT_MAX                         2147483647
+#define LONG_MAX                        2147483647L
+#define LLONG_MAX                       9223372036854775807LL
+
+#define UCHAR_MAX                       (2 * SCHAR_MAX + 1)
+#define USHRT_MAX                       (2 * SHRT_MAX + 1)
+#define UINT_MAX                        (2U * INT_MAX + 1U)
+#define ULONG_MAX                       (2UL * LONG_MAX + 1UL)
+#define ULLONG_MAX                      (2ULL * LLONG_MAX + 1ULL)
 
 #define CHAR_MIN                        SCHAR_MIN
 #define CHAR_MAX                        SCHAR_MAX
