@@ -51,6 +51,17 @@ static const vk_usbd_class_op_t __vk_usbd_user = {
 };
 
 describe_usbd(__user_usbd, APP_CFG_USBD_VID, APP_CFG_USBD_PID, USRAPP_CFG_USBD_SPEED)
+    usbd_func(__user_usbd,
+        typedef struct vk_user_usbd_param_t {
+            vk_usbd_dev_t *dev;
+            vk_usbd_trans_t trans_tx;
+            vk_usbd_trans_t trans_rx;
+            uint8_t buffer[4096];
+        } vk_user_usbd_param_t;
+        static vk_user_usbd_param_t __user_usbd_param;
+        usbd_func_str_desc(__user_usbd, 0, u"VSF-User0")
+    )
+
     usbd_common_desc_iad(__user_usbd,
                         // str_product, str_vendor, str_serial
                         u"VSF-USBD-User", u"SimonQian", u"1.0.0",
@@ -61,26 +72,19 @@ describe_usbd(__user_usbd, APP_CFG_USBD_VID, APP_CFG_USBD_PID, USRAPP_CFG_USBD_S
                         // total function interface number
                         1,
                         // attribute, max_power
-                        USB_CONFIG_ATT_WAKEUP, 100
-    )
+                        USB_CONFIG_ATT_WAKEUP, 100,
         USB_DESC_IAD(0, 1, 0xFF, 0xFF, 0, 0)
         USB_DESC_IFS(0, 0, 2, 0xFF, 0xFF, 0, 0)
         USB_DESC_EP(USB_DIR_IN | 1, USB_ENDPOINT_XFER_BULK, __APP_CFG_BULK_SIZE, 0x00)
         USB_DESC_EP(USB_DIR_OUT | 1, USB_ENDPOINT_XFER_BULK, __APP_CFG_BULK_SIZE, 0x00)
-    usbd_func_desc(__user_usbd)
-        usbd_func_str_desc(__user_usbd, 0, u"VSF-User0")
-    usbd_std_desc_table(__user_usbd)
+    )
+
+    usbd_std_desc_table(__user_usbd,
         usbd_func_str_desc_table(__user_usbd, 0)
-    usbd_func(__user_usbd)
-        typedef struct vk_user_usbd_param_t {
-            vk_usbd_dev_t *dev;
-            vk_usbd_trans_t trans_tx;
-            vk_usbd_trans_t trans_rx;
-            uint8_t buffer[4096];
-        } vk_user_usbd_param_t;
-        static vk_user_usbd_param_t __user_usbd_param;
-    usbd_ifs(__user_usbd)
+    )
+    usbd_ifs(__user_usbd,
         USB_IFS(&__vk_usbd_user, &__user_usbd_param)
+    )
 end_describe_usbd(__user_usbd, VSF_USB_DC0)
 
 /*============================ IMPLEMENTATION ================================*/

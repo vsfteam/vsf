@@ -83,7 +83,7 @@ extern "C" {
                 (__int_in_ep), (__bulk_in_ep), (__bulk_out_ep),                 \
                 (__bulk_ep_size), (__int_ep_interval))
 
-#define __usbd_cdc_acm_func(__name, __func_id, __str_func, __ifs_start, __i_func,\
+#define __usbd_cdc_acm_func(__name, __func_id, __str_func, __i_func, __ifs_start,\
         __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval,\
         __stream_rx, __stream_tx, ...)                                          \
             enum {                                                              \
@@ -95,7 +95,7 @@ extern "C" {
                 __##__name##_CDCACM##__func_id##_BULK_EP_SIZE = (__bulk_ep_size),\
                 __##__name##_CDCACM##__func_id##_BULK_EP_INTERVAL = (__int_ep_interval),\
             };                                                                  \
-            __usbd_str_desc(__name, func##__func_id, __str_func)                \
+            usbd_func_str_desc(__name, __func_id, __str_func)                   \
             vk_usbd_cdcacm_t __##__name##_CDCACM##__func_id = {                 \
                 USB_CDC_ACM_PARAM((__int_in_ep), (__bulk_in_ep), (__bulk_out_ep),\
                 (__stream_rx), (__stream_tx), __VA_ARGS__)                      \
@@ -114,10 +114,10 @@ extern "C" {
                 __##__name##_CDCACM##__func_id##_BULKOUT_EP,                    \
                 __##__name##_CDCACM##__func_id##_BULK_EP_SIZE,                  \
                 __##__name##_CDCACM##__func_id##_BULK_EP_INTERVAL)
-#define usbd_cdc_acm_func(__name, __func_id, __str_func, __ifs_start, __i_func, \
+#define usbd_cdc_acm_func(__name, __func_id, __str_func, __i_func, __ifs_start, \
         __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval,\
         __stream_rx, __stream_tx, ...)                                          \
-            __usbd_cdc_acm_func(__name, __func_id, __str_func, (__ifs_start), (__i_func),\
+            __usbd_cdc_acm_func(__name, __func_id, (__str_func), (__i_func), (__ifs_start),\
                 (__int_in_ep), (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size), (__int_ep_interval),\
                 (__stream_rx), (__stream_tx), __VA_ARGS__)
 #define usbd_cdc_acm_ifs(__name, __func_id)                                     \

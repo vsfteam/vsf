@@ -66,7 +66,16 @@ extern "C" {
 #define __usbd_mscbot_desc_iad(__name, __ifs, __i_func, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size)\
             USB_DESC_MSCBOT_IAD((__ifs), 4 + (__i_func), (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size))
 
-#define __usbd_mscbot_func(__name, __func_id, __bulk_in_ep, __bulk_out_ep, __stream, ...)\
+#define __usbd_mscbot_func(__name, __func_id, __str_func, __i_func, __ifs,      \
+        __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __stream, ...)             \
+            enum {                                                              \
+                __##__name##_MSCBOT##__func_id##_IFS        = (__ifs),          \
+                __##__name##_MSCBOT##__func_id##_I_FUNC     = (__i_func),       \
+                __##__name##_MSCBOT##__func_id##_BULKIN_EP  = (__bulk_in_ep),   \
+                __##__name##_MSCBOT##__func_id##_BULKOUT_EP = (__bulk_out_ep),  \
+                __##__name##_MSCBOT##__func_id##_BULK_EP_SIZE = (__bulk_ep_size),\
+            };                                                                  \
+            usbd_func_str_desc(__name, __func_id, __str_func)                   \
             vk_scsi_t * __##__name##_MSC##__scsi_devs[] = {                     \
                 __VA_ARGS__                                                     \
             };                                                                  \
@@ -79,12 +88,25 @@ extern "C" {
 #define __usbd_msc_ifs(__name, __func_id)                                       \
             USB_MSC_IFS(__##__name##_MSC##__func_id)
 
-#define usbd_mscbot_desc(__name, __ifs, __i_func, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size)\
-            __usbd_mscbot_desc(__name, (__ifs), (__i_func), (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size))
-#define usbd_mscbot_desc_iad(__name, __ifs, __i_func, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size)\
-            __usbd_mscbot_desc_iad(__name, (__ifs), (__i_func), (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size))
-#define usbd_mscbot_func(__name, __func_id, __bulk_in_ep, __bulk_out_ep, __stream, ...)\
-            __usbd_mscbot_func(__name, __func_id, (__bulk_in_ep), (__bulk_out_ep), (__stream), __VA_ARGS__)
+#define usbd_mscbot_desc(__name, __func_id)                                     \
+            __usbd_mscbot_desc(__name,                                          \
+                __##__name##_MSCBOT##__func_id##_IFS,                           \
+                __##__name##_MSCBOT##__func_id##_I_FUNC,                        \
+                __##__name##_MSCBOT##__func_id##_BULKIN_EP,                     \
+                __##__name##_MSCBOT##__func_id##_BULKOUT_EP,                    \
+                __##__name##_MSCBOT##__func_id##_BULK_EP_SIZE)
+#define usbd_mscbot_desc_iad(__name, __func_id)                                 \
+            __usbd_mscbot_desc_iad(__name,                                      \
+                __##__name##_MSCBOT##__func_id##_IFS,                           \
+                __##__name##_MSCBOT##__func_id##_I_FUNC,                        \
+                __##__name##_MSCBOT##__func_id##_BULKIN_EP,                     \
+                __##__name##_MSCBOT##__func_id##_BULKOUT_EP,                    \
+                __##__name##_MSCBOT##__func_id##_BULK_EP_SIZE)
+#define usbd_mscbot_func(__name, __func_id, __str_func, __i_func, __ifs,        \
+        __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __stream, ...)             \
+            __usbd_mscbot_func(__name, __func_id, (__str_func), (__i_func), (__ifs),\
+                (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size),              \
+                (__stream), __VA_ARGS__)
 #define usbd_mscbot_ifs(__name, __func_id)                                      \
             __usbd_msc_ifs(__name, __func_id)
 
