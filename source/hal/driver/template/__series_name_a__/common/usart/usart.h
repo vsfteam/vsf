@@ -176,6 +176,11 @@ typedef struct vsf_usart_status_t {
 }
 #endif
 
+// IPCore
+#undef __VSF_HAL_${USART_IP}_USART_CLASS_IMPLEMENT
+#undef __VSF_HAL_${USART_IP}_USART_CLASS_INHERIT__
+// IPCore end
+
 #endif      // VSF_HAL_USE_USART
 #endif      // __HAL_DRIVER_${SERIES/USART_IP}_USART_H__
 /* EOF */

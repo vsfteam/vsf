@@ -97,6 +97,11 @@ vsf_class(vsf_${flash_ip}_flash_t) {
 }
 #endif
 
+// IPCore
+#undef __VSF_HAL_${FLASH_IP}_FLASH_CLASS_IMPLEMENT
+#undef __VSF_HAL_${FLASH_IP}_FLASH_CLASS_INHERIT__
+// IPCore end
+
 #endif      // VSF_HAL_USE_FLASH
 #endif      // __HAL_DRIVER_${SERIES/FLASH_IP}_FLASH_H__
 /* EOF */

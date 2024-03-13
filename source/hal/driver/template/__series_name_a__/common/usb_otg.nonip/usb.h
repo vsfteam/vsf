@@ -110,9 +110,16 @@ VSF_MREPEAT(VSF_HW_USB_OTG_COUNT, VSF_HW_USB_OTG_DEF, NULL)
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
+#if defined(__VSF_HAL_HW_USB_CLASS_IMPLEMENT) || defined(__VSF_HAL_HW_USB_CLASS_INHERIT__)
+// common APIs for both dc and hc driver only, not visible to user
+#endif
+
 #ifdef __cplusplus
 }
 #endif
+
+#undef __VSF_HAL_HW_USB_CLASS_IMPLEMENT
+#undef __VSF_HAL_HW_USB_CLASS_INHERIT__
 
 #endif      // VSF_HAL_USE_USBD || VSF_HAL_USE_USBH
 #endif      // __HAL_DRIVER_${SERIES}_USB_H__

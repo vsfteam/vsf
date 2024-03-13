@@ -174,6 +174,11 @@ typedef struct vsf_i2c_status_t {
 }
 #endif
 
+// IPCore
+#undef __VSF_HAL_${I2C_IP}_I2C_CLASS_IMPLEMENT
+#undef __VSF_HAL_${I2C_IP}_I2C_CLASS_INHERIT__
+// IPCore end
+
 #endif      // VSF_HAL_USE_I2C
 #endif      // __HAL_DRIVER_${SERIES/I2C_IP}_I2C_H__
 /* EOF */

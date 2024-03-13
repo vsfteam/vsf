@@ -97,6 +97,11 @@ vsf_class(vsf_${adc_ip}_adc_t) {
 }
 #endif
 
+// IPCore
+#undef __VSF_HAL_${ADC_IP}_ADC_CLASS_IMPLEMENT
+#undef __VSF_HAL_${ADC_IP}_ADC_CLASS_INHERIT__
+// IPCore end
+
 #endif      // VSF_HAL_USE_ADC
 #endif      // __HAL_DRIVER_${SERIES/ADC_IP}_ADC_H__
 /* EOF */
