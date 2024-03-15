@@ -265,7 +265,7 @@ vsf_gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
 #   define VSF_GPIO_CFG_IMP_INSTANCE_PREFIX         VSF_GPIO_CFG_IMP_PREFIX
 #endif
 
-#include "hal/driver/common/template/vsf_template_implementation.h"
+#include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_GPIO_CFG_IMP_PREFIX
 #undef VSF_GPIO_CFG_IMP_INSTANCE_PREFIX

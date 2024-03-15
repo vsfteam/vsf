@@ -82,7 +82,7 @@ vsf_i2s_capability_t vsf_real_i2s_capability(vsf_real_i2s_t *i2s_ptr)
 #   define VSF_I2S_CFG_IMP_INSTANCE_PREFIX         VSF_I2S_CFG_IMP_PREFIX
 #endif
 
-#include "hal/driver/common/template/vsf_template_implementation.h"
+#include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_I2S_CFG_IMP_PREFIX
 #undef VSF_I2S_CFG_IMP_UPCASE_PREFIX

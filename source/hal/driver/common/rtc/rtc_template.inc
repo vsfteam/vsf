@@ -193,7 +193,7 @@ vsf_rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
 #   define VSF_RTC_CFG_IMP_INSTANCE_PREFIX         VSF_RTC_CFG_IMP_PREFIX
 #endif
 
-#include "hal/driver/common/template/vsf_template_implementation.h"
+#include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_RTC_CFG_IMP_PREFIX
 #undef VSF_RTC_CFG_IMP_INSTANCE_PREFIX

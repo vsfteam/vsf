@@ -38,7 +38,7 @@
 #   define VSF_HAL_TEMPLATE_DEC_UPCASE_PREFIX       VSF_RNG_CFG_DEC_UPCASE_PREFIX
 #endif
 
-#include "hal/driver/common/template/vsf_template_declaration.h"
+#include "hal/driver/common/template/vsf_template_instance_declaration.h"
 
 #undef VSF_RNG_CFG_DEC_PREFIX
 #undef VSF_RNG_CFG_DEC_INSTANCE_PREFIX

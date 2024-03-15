@@ -36,7 +36,7 @@
 #define VSF_HAL_TEMPLATE_DEC_COUNT                1
 #define VSF_HAL_TEMPLATE_DEC_MASK                 1
 
-#include "hal/driver/common/template/vsf_template_declaration.h"
+#include "hal/driver/common/template/vsf_template_instance_declaration.h"
 
 #undef VSF_PM_CFG_DEC_PREFIX
 #undef VSF_PM_CFG_DEC_UPCASE_PREFIX
