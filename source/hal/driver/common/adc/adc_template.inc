@@ -85,7 +85,7 @@ vsf_adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
 #   define VSF_ADC_CFG_IMP_INSTANCE_PREFIX         VSF_ADC_CFG_IMP_PREFIX
 #endif
 
-#include "hal/driver/common/template/vsf_template_implementation.h"
+#include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_ADC_CFG_IMP_PREFIX
 #undef VSF_ADC_CFG_IMP_INSTANCE_PREFIX

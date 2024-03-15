@@ -109,7 +109,7 @@ vsf_i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
 #   define VSF_I2C_CFG_IMP_INSTANCE_PREFIX         VSF_I2C_CFG_IMP_PREFIX
 #endif
 
-#include "hal/driver/common/template/vsf_template_implementation.h"
+#include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_I2C_CFG_IMP_PREFIX
 #undef VSF_I2C_CFG_IMP_INSTANCE_PREFIX

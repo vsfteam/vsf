@@ -87,7 +87,7 @@ vsf_io_capability_t vsf_real_io_capability(vsf_real_io_t *io_ptr)
 #define VSF_HAL_TEMPLATE_IMP_DEFINED_COUNT          1
 #define VSF_HAL_TEMPLATE_IMP_DEFINED_MASK           1
 
-#include "hal/driver/common/template/vsf_template_implementation.h"
+#include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_IO_CFG_IMP_PREFIX
 #undef VSF_IO_CFG_IMP_INSTANCE_PREFIX

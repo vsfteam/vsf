@@ -58,7 +58,7 @@ vsf_pm_capability_t vsf_real_pm_capability(vsf_real_pm_t *pm_ptr)
 #   error "Please define VSF_PM_CFG_IMP_UPCASE_PREFIX    in pm driver"
 #endif
 
-#include "hal/driver/common/template/vsf_template_implementation.h"
+#include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_PM_CFG_IMP_PREFIX
 #undef VSF_PM_CFG_IMP_UPCASE_PREFIX

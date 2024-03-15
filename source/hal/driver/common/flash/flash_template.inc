@@ -242,7 +242,7 @@ vsf_flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
 #   define VSF_FLASH_CFG_IMP_INSTANCE_PREFIX         VSF_FLASH_CFG_IMP_PREFIX
 #endif
 
-#include "hal/driver/common/template/vsf_template_implementation.h"
+#include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_FLASH_CFG_IMP_PREFIX
 #undef VSF_FLASH_CFG_IMP_INSTANCE_PREFIX

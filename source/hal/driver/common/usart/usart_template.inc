@@ -164,7 +164,7 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 #   define VSF_USART_CFG_IMP_INSTANCE_PREFIX         VSF_USART_CFG_IMP_PREFIX
 #endif
 
-#include "hal/driver/common/template/vsf_template_implementation.h"
+#include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_USART_CFG_IMP_PREFIX
 #undef VSF_USART_CFG_IMP_INSTANCE_PREFIX

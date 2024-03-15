@@ -546,11 +546,11 @@
     <ClInclude Include="..\..\..\..\source\hal\arch\__vsf_arch_interface.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\common.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_adc.h" />
-    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_declaration.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_instance_declaration.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_flash.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_hal_driver.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_i2c.h" />
-    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_implementation.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_instance_implementation.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_io.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_pm.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_pwm.h" />

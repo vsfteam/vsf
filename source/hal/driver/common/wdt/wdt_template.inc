@@ -94,7 +94,7 @@ vsf_wdt_capability_t vsf_real_wdt_capability(vsf_real_wdt_t *wdt_ptr)
 #   define VSF_WDT_CFG_IMP_INSTANCE_PREFIX         VSF_WDT_CFG_IMP_PREFIX
 #endif
 
-#include "hal/driver/common/template/vsf_template_implementation.h"
+#include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_WDT_CFG_IMP_PREFIX
 #undef VSF_WDT_CFG_IMP_INSTANCE_PREFIX

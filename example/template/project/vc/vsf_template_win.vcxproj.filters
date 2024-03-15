@@ -3240,7 +3240,7 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_i2c.h">
       <Filter>vsf\hal\driver\common\template</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_implementation.h">
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_instance_implementation.h">
       <Filter>vsf\hal\driver\common\template</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_io.h">
@@ -3273,7 +3273,7 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_adc.h">
       <Filter>vsf\hal\driver\common\template</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_declaration.h">
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_instance_declaration.h">
       <Filter>vsf\hal\driver\common\template</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\driver\common\template\vsf_template_flash.h">
