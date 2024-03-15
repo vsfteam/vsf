@@ -81,7 +81,7 @@ VSF_USBD_CFG_PROTECT_LEVEL MUST be set to the level suitable for stream evthandl
 #if VSF_USBD_CFG_TRACE_SETUP == ENABLED
 #   define __vsf_usbd_trace_setup(__req)                                        \
         do {                                                                    \
-            __vsf_usbd_trace("%d: usbd_setup: ", vsf_systimer_get_ms());        \
+            __vsf_usbd_trace("%lld: usbd_setup: ", vsf_systimer_get_ms());      \
             __vsf_usbd_trace_buffer((__req), 8);                                \
         } while (0)
 #else
@@ -91,8 +91,8 @@ VSF_USBD_CFG_PROTECT_LEVEL MUST be set to the level suitable for stream evthandl
 #if VSF_USBD_CFG_TRACE_EVT == ENABLED
 #   define __vsf_usbd_trace_evt(__evt, __value)                                 \
         do {                                                                    \
-            __vsf_usbd_trace("%d: usbd_evt: %s %d" VSF_TRACE_CFG_LINEEND,       \
-                (int)vsf_systimer_get_ms(), __vsf_usbd_trace_evts[(__evt)], (__value));\
+            __vsf_usbd_trace("%lld: usbd_evt: %s %d" VSF_TRACE_CFG_LINEEND,     \
+                vsf_systimer_get_ms(), __vsf_usbd_trace_evts[(__evt)], (__value));\
         } while (0)
 #else
 #   define __vsf_usbd_trace_evt(__evt, __value)
