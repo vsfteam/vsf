@@ -138,14 +138,14 @@ VSF_HAL_TEMPLATE_IMP_OP_ATR const VSF_HAL_TEMPLATE_IMP_OP_TYPE VSF_HAL_TEMPLATE_
 #   define __VSF_HAL_TEMPLATE_MASK                             VSF_HAL_TEMPLATE_IMP_MASK
 #   define __VSF_HAL_TEMPLATE_MACRO                            VSF_MCONNECT(VSF, VSF_HAL_TEMPLATE_IMP_UPCASE_NAME, _CFG_IMP_LV0)
 #   define __VSF_HAL_TEMPLATE_ARG                              VSF_HAL_TEMPLATE_IMP_OP
-#   include "./vsf_template_mask.h"
+#   include "./vsf_template_instance_mask.h"
 
 #   if !defined(VSF_HAL_TEMPLATE_IMP_REMOVE_ARRAY)
 VSF_HAL_TEMPLATE_IMP_INSTANCE_TYPE * const VSF_HAL_TEMPLATE_IMP_INSTANCE_ARRAY[VSF_HAL_TEMPLATE_IMP_COUNT] = {
 #       define __VSF_HAL_TEMPLATE_MASK                             VSF_HAL_TEMPLATE_IMP_MASK
 #       define __VSF_HAL_TEMPLATE_MACRO                            VSF_HAL_TEMPLATE_IMP_INSTANCE_ARRAY_ITEM
 #       define __VSF_HAL_TEMPLATE_ARG                              VSF_HAL_TEMPLATE_IMP_OP
-#       include "./vsf_template_mask.h"
+#       include "./vsf_template_instance_mask.h"
 };
 
 const uint8_t VSF_HAL_TEMPLATE_IMP_INSTANCE_INDEX_ARRAY[VSF_HAL_TEMPLATE_IMP_COUNT] = {
@@ -153,7 +153,7 @@ const uint8_t VSF_HAL_TEMPLATE_IMP_INSTANCE_INDEX_ARRAY[VSF_HAL_TEMPLATE_IMP_COU
 #       define __VSF_HAL_TEMPLATE_MASK                             VSF_HAL_TEMPLATE_IMP_MASK
 #       define __VSF_HAL_TEMPLATE_MACRO                            __VSF_HAL_TEMPLATE_INDEX_ARRAY_ITEM
 #       define __VSF_HAL_TEMPLATE_ARG                              VSF_HAL_TEMPLATE_IMP_OP
-#       include "./vsf_template_mask.h"
+#       include "./vsf_template_instance_mask.h"
 };
 
 const char* VSF_HAL_TEMPLATE_IMP_INSTANCE_NAME_ARRAY[VSF_HAL_TEMPLATE_IMP_COUNT] = {
@@ -162,7 +162,7 @@ const char* VSF_HAL_TEMPLATE_IMP_INSTANCE_NAME_ARRAY[VSF_HAL_TEMPLATE_IMP_COUNT]
 #       define __VSF_HAL_TEMPLATE_MASK                             VSF_HAL_TEMPLATE_IMP_MASK
 #       define __VSF_HAL_TEMPLATE_MACRO                            VSF_HAL_TEMPLATE_IMP_NAME_ARRAY_ITEM
 #       define __VSF_HAL_TEMPLATE_ARG                              VSF_MCONNECT(VSF_HAL_TEMPLATE_IMP_INSTANCE_PREFIX, VSF_HAL_TEMPLATE_IMP_NAME)
-#       include "./vsf_template_mask.h"
+#       include "./vsf_template_instance_mask.h"
 };
 
 const vsf_hal_device_t VSF_HAL_TEMPLATE_IMP_DEVICE_ARRAY[VSF_HAL_TEMPLATE_IMP_COUNT] = {
@@ -171,7 +171,7 @@ const vsf_hal_device_t VSF_HAL_TEMPLATE_IMP_DEVICE_ARRAY[VSF_HAL_TEMPLATE_IMP_CO
 #       define __VSF_HAL_TEMPLATE_MASK                             VSF_HAL_TEMPLATE_IMP_MASK
 #       define __VSF_HAL_TEMPLATE_MACRO                            VSF_HAL_TEMPLATE_IMP_DEVICE_ARRAY_ITEM
 #       define __VSF_HAL_TEMPLATE_ARG                              VSF_MCONNECT(VSF_HAL_TEMPLATE_IMP_INSTANCE_PREFIX, VSF_HAL_TEMPLATE_IMP_NAME)
-#       include "./vsf_template_mask.h"
+#       include "./vsf_template_instance_mask.h"
 };
 #   endif
 #endif

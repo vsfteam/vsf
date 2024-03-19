@@ -127,7 +127,7 @@ extern const VSF_HAL_TEMPLATE_DEC_INSTANCE_OP_TYPE VSF_HAL_TEMPLATE_DEC_INSTANCE
 #define __VSF_HAL_TEMPLATE_MASK                             VSF_HAL_TEMPLATE_DEC_MASK
 #define __VSF_HAL_TEMPLATE_MACRO                            VSF_HAL_TEMPLATE_DEC_LV0
 #define __VSF_HAL_TEMPLATE_ARG                              VSF_HAL_TEMPLATE_DEC_OP
-#include "./vsf_template_mask.h"
+#include "./vsf_template_instance_mask.h"
 
 #if !defined(VSF_HAL_TEMPLATE_DEC_REMOVE_ARRAY) && (VSF_HAL_TEMPLATE_DEC_MASK != 0)
 extern VSF_HAL_TEMPLATE_DEC_INSTANCE_TYPE *const VSF_HAL_TEMPLATE_DEC_INSTANCE_ARRAY[VSF_HAL_TEMPLATE_DEC_COUNT];
