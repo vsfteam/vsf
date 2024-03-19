@@ -24,7 +24,7 @@
 
 #if VSF_HAL_USE_I2C == ENABLED
 
-#include "../__device.h"
+#include "../../__device.h"
 
 /*\note Refer to template/README.md for usage cases.
  *      For peripherial drivers, blackbox mode is recommended but not required, reimplementation part MUST be open.
