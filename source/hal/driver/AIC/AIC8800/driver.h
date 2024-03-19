@@ -163,6 +163,7 @@
 #endif
 
 #if VSF_HAL_USE_USART == ENABLED
+#   define VSF_USART_CFG_FIFO_TO_REQUEST                    ENABLED
 #   define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE              ENABLED
 #   define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK          ENABLED
 #   include "hal/driver/common/template/vsf_template_usart.h"

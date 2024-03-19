@@ -26,11 +26,6 @@
 #include "./i_reg_uart.h"
 
 /*============================ MACROS ========================================*/
-
-#define VSF_USART_CFG_FIFO_TO_REQUEST            ENABLED
-#define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE      ENABLED
-#define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK  ENABLED
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
