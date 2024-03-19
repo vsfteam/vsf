@@ -23,11 +23,11 @@
 #define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _RNG
 
 #ifndef __VSF_TEMPLATE_RNG_H__
-#   error "Please include \"vsf_template_adc.h\" before include adc_template.h"
+#   error "Please include \"vsf_template_adc.h\" before include rng_template.h"
 #endif
 
 #ifndef VSF_RNG_CFG_DEC_PREFIX
-#   error "Please define VSF_RNG_CFG_DEC_PREFIX before include adc_template.h"
+#   error "Please define VSF_RNG_CFG_DEC_PREFIX before include rng_template.h"
 #endif
 
 #ifndef VSF_RNG_CFG_DEC_INSTANCE_PREFIX
