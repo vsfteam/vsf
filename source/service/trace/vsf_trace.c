@@ -430,10 +430,4 @@ int vsf_stderr_putchar(char ch)
     return __vsf_trace_output(&ch, 1);
 }
 
-VSF_CAL_WEAK(vsf_stdin_getchar)
-int vsf_stdin_getchar(void)
-{
-    while(1);
-}
-
 #endif      // VSF_USE_TRACE

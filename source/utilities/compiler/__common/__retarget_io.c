@@ -54,10 +54,15 @@ size_t __vsf_stdio_read(int handle, unsigned char *buf, size_t buf_size)
 
 extern int vsf_stdout_putchar(char ch);
 extern int vsf_stderr_putchar(char ch);
-extern int vsf_stdin_getchar(void);
 
 extern void vsf_stdout_init(void);
 extern void vsf_stdin_init(void);
+
+VSF_CAL_WEAK(vsf_stdin_getchar)
+int vsf_stdin_getchar(void)
+{
+    while(1);
+}
 
 VSF_CAL_WEAK(vsf_stdout_putchar)
 int vsf_stdout_putchar(char ch)
