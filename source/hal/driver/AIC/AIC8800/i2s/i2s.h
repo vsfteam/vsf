@@ -27,10 +27,6 @@
 #include "../__device.h"
 
 /*============================ MACROS ========================================*/
-
-#define VSF_I2S_CFG_REIMPLEMENT_TYPE_IRQ_MASK   ENABLED
-#define VSF_I2S_CFG_REIMPLEMENT_TYPE_MODE       ENABLED
-
 /*============================ TYPES =========================================*/
 
 typedef enum vsf_i2s_irq_mask_t {

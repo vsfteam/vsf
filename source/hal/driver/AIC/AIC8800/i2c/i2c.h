@@ -27,9 +27,6 @@
 #include "../__device.h"
 
 /*============================ MACROS ========================================*/
-
-#define VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD     ENABLED
-
 /*============================ TYPES =========================================*/
 
 typedef enum vsf_i2c_cmd_t {
