@@ -43,6 +43,10 @@
         be non-reentrant.
 #endif
 
+#ifdef __VSF_FS_WARN_HEAP
+#   warning heap is used if VSF_FS_CFG_MALLOC is not defined, please enable VSF_USE_HEAP
+#endif
+
 //#define VSF_FS_REF_TRACE            ENABLED
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

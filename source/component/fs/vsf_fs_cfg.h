@@ -79,12 +79,16 @@
 #   error VSF_FS_CFG_MALLOC must be defined
 #endif
 
+#undef __VSF_FS_WARN_HEAP
 #ifndef VSF_FS_CFG_MALLOC
 #   if VSF_USE_HEAP != ENABLED
-#       error heap is used if VSF_FS_CFG_MALLOC is not defined, please enable VSF_USE_HEAP
+#       define VSF_FS_CFG_MALLOC(...)   ((vk_file_t *)NULL)
+#       define VSF_FS_CFG_FREE(...)
+#       define __VSF_FS_WARN_HEAP
+#   else
+#       define VSF_FS_CFG_MALLOC        vsf_heap_malloc
+#       define VSF_FS_CFG_FREE          vsf_heap_free
 #   endif
-#   define VSF_FS_CFG_MALLOC            vsf_heap_malloc
-#   define VSF_FS_CFG_FREE              vsf_heap_free
 #endif
 #endif
 
