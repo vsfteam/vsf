@@ -163,20 +163,20 @@
 #endif
 
 #if VSF_HAL_USE_USART == ENABLED
-#   define VSF_USART_CFG_FIFO_TO_REQUEST                    ENABLED
 #   define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE              ENABLED
 #   define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK          ENABLED
 #   include "hal/driver/common/template/vsf_template_usart.h"
 
-#   define VSF_USART_CFG_DEC_INSTANCE_PREFIX                __vsf_hw
-#   define VSF_USART_CFG_DEC_PREFIX                         vsf_hw
-#   define VSF_USART_CFG_DEC_UPCASE_PREFIX                  VSF_HW
+#   define VSF_USART_CFG_DEC_PREFIX                         __vsf_hw
+#   define VSF_USART_CFG_DEC_UPCASE_PREFIX                  __VSF_HW
 #   include "hal/driver/common/usart/usart_template.h"
 
-#   define VSF_USART_CFG_DEC_INSTANCE_PREFIX                vsf_hw
-#   define VSF_FIFO2REQ_USART_COUNT                         VSF_HW_USART_COUNT
-#   define VSF_FIFO2REQ_USART_MASK                          VSF_HW_USART_MASK
 #   include "hal/driver/common/usart/fifo2req_usart.h"
+
+#   define VSF_USART_CFG_DEC_PREFIX                         vsf_hw
+#   define VSF_USART_CFG_DEC_UPCASE_PREFIX                  VSF_HW
+#   define VSF_USART_CFG_DEC_OP_PREFIX                      vsf_fifo2req
+#   include "hal/driver/common/usart/usart_template.h"
 #endif
 
 #if VSF_HAL_USE_WDT == ENABLED
