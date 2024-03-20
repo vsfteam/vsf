@@ -18,8 +18,8 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_HAL_TEMPLATE_DEC_NAME                     _dac
-#define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _DAC
+#define VSF_HAL_TEMPLATE_DEC_NAME                   _dac
+#define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME            _DAC
 
 #ifndef __VSF_TEMPLATE_DAC_H__
 #   error "Please include \"vsf_template_dac.h\" before include dac_template.h"
@@ -30,7 +30,11 @@
 #endif
 
 #ifndef VSF_DAC_CFG_DEC_INSTANCE_PREFIX
-#   define VSF_DAC_CFG_DEC_INSTANCE_PREFIX         VSF_DAC_CFG_DEC_PREFIX
+#   define VSF_DAC_CFG_DEC_INSTANCE_PREFIX          VSF_DAC_CFG_DEC_PREFIX
+#endif
+
+#ifndef VSF_DAC_CFG_DEC_OP_PREFIX
+#   define VSF_DAC_CFG_DEC_OP_PREFIX                VSF_DAC_CFG_DEC_PREFIX
 #endif
 
 #ifdef VSF_DAC_CFG_DEC_UPCASE_PREFIX
@@ -40,7 +44,7 @@
 #include "hal/driver/common/template/vsf_template_instance_declaration.h"
 
 #undef VSF_DAC_CFG_DEC_PREFIX
-#undef VSF_DAC_CFG_DEC_INSTANCE_PREFIX
 #undef VSF_DAC_CFG_DEC_UPCASE_PREFIX
+#undef VSF_DAC_CFG_DEC_INSTANCE_PREFIX
+#undef VSF_DAC_CFG_DEC_OP_PREFIX
 #undef VSF_DAC_CFG_DEC_EXTERN_OP
-

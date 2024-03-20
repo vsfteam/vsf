@@ -44,14 +44,14 @@
 #   define __describe_fifo2req_usart_op()
 #endif
 
-#define __describe_fifo2req_usart(__name, __usart)                              \
-    vsf_fifo2req_usart_t __name = {                                             \
+#define __describe_fifo2req_usart(__prefix, __name, __usart)                    \
+    VSF_MCONNECT(__prefix, _usart_t) __name = {                                 \
         __describe_fifo2req_usart_op()                                          \
         .usart = (vsf_usart_t *) & __usart,                                     \
     };
 
-#define describe_fifo2req_usart(__name, __usart)                                \
-            __describe_fifo2req_usart(__name, __usart)
+#define describe_fifo2req_usart(__prefix, __name, __usart)                      \
+            __describe_fifo2req_usart(__prefix, __name, __usart)
 
 /*============================ TYPES =========================================*/
 
@@ -87,9 +87,6 @@ vsf_class(vsf_fifo2req_usart_t) {
 #define VSF_USART_CFG_DEC_UPCASE_PREFIX       VSF_FIFO2REQ
 #define VSF_USART_CFG_DEC_EXTERN_OP           ENABLED
 #include "hal/driver/common/usart/usart_template.h"
-
-#undef VSF_FIFO2REQ_USART_COUNT
-#undef VSF_FIFO2REQ_USART_MASK
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/

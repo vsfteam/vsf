@@ -18,8 +18,8 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_HAL_TEMPLATE_DEC_NAME                     _i2s
-#define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _I2S
+#define VSF_HAL_TEMPLATE_DEC_NAME                   _i2s
+#define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME            _I2S
 
 #ifndef __VSF_TEMPLATE_I2S_H__
 #   error "Please include \"vsf_template_i2s.h\" before include i2s_template.h"
@@ -30,7 +30,11 @@
 #endif
 
 #ifndef VSF_I2S_CFG_DEC_INSTANCE_PREFIX
-#   define VSF_I2S_CFG_DEC_INSTANCE_PREFIX         VSF_I2S_CFG_DEC_PREFIX
+#   define VSF_I2S_CFG_DEC_INSTANCE_PREFIX          VSF_I2S_CFG_DEC_PREFIX
+#endif
+
+#ifndef VSF_I2S_CFG_DEC_OP_PREFIX
+#   define VSF_I2S_CFG_DEC_OP_PREFIX                VSF_I2S_CFG_DEC_PREFIX
 #endif
 
 #ifdef VSF_I2S_CFG_DEC_UPCASE_PREFIX
@@ -40,7 +44,7 @@
 #include "hal/driver/common/template/vsf_template_instance_declaration.h"
 
 #undef VSF_I2S_CFG_DEC_PREFIX
-#undef VSF_I2S_CFG_DEC_INSTANCE_PREFIX
 #undef VSF_I2S_CFG_DEC_UPCASE_PREFIX
+#undef VSF_I2S_CFG_DEC_INSTANCE_PREFIX
+#undef VSF_I2S_CFG_DEC_OP_PREFIX
 #undef VSF_I2S_CFG_DEC_EXTERN_OP
-

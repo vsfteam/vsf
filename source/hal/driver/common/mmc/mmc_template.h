@@ -21,8 +21,8 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_HAL_TEMPLATE_DEC_NAME                     _mmc
-#define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _MMC
+#define VSF_HAL_TEMPLATE_DEC_NAME                   _mmc
+#define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME            _MMC
 
 #ifndef __VSF_TEMPLATE_MMC_H__
 #   error "Please include \"vsf_template_mmc.h\" before include mmc_template.h"
@@ -33,7 +33,11 @@
 #endif
 
 #ifndef VSF_MMC_CFG_DEC_INSTANCE_PREFIX
-#   define VSF_MMC_CFG_DEC_INSTANCE_PREFIX         VSF_MMC_CFG_DEC_PREFIX
+#   define VSF_MMC_CFG_DEC_INSTANCE_PREFIX          VSF_MMC_CFG_DEC_PREFIX
+#endif
+
+#ifndef VSF_MMC_CFG_DEC_OP_PREFIX
+#   define VSF_MMC_CFG_DEC_OP_PREFIX                VSF_MMC_CFG_DEC_PREFIX
 #endif
 
 #ifdef VSF_MMC_CFG_DEC_UPCASE_PREFIX
@@ -43,7 +47,7 @@
 #include "hal/driver/common/template/vsf_template_instance_declaration.h"
 
 #undef VSF_MMC_CFG_DEC_PREFIX
-#undef VSF_MMC_CFG_DEC_INSTANCE_PREFIX
 #undef VSF_MMC_CFG_DEC_UPCASE_PREFIX
+#undef VSF_MMC_CFG_DEC_INSTANCE_PREFIX
+#undef VSF_MMC_CFG_DEC_OP_PREFIX
 #undef VSF_MMC_CFG_DEC_EXTERN_OP
-
