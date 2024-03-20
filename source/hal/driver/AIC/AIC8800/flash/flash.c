@@ -131,7 +131,9 @@ vsf_err_t vsf_hw_flash_erase_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flas
 
     if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
         vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_ERASE_MASK : VSF_FLASH_IRQ_ERASE_ERROR_MASK;
-        hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, (vsf_flash_t *)hw_flash_ptr, mask);
+        if (hw_flash_ptr->irq_mask & mask) {
+            hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, (vsf_flash_t *)hw_flash_ptr, mask);
+        }
     }
 
     return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
@@ -153,7 +155,9 @@ vsf_err_t vsf_hw_flash_write_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flas
 
     if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
         vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_WRITE_MASK : VSF_FLASH_IRQ_WRITE_ERROR_MASK;
-        hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, (vsf_flash_t *)hw_flash_ptr, mask);
+        if (hw_flash_ptr->irq_mask & mask) {
+            hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, (vsf_flash_t *)hw_flash_ptr, mask);
+        }
     }
 
     return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
@@ -174,7 +178,9 @@ vsf_err_t vsf_hw_flash_read_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flash
 
     if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
         vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_READ_MASK : VSF_FLASH_IRQ_READ_ERROR_MASK;
-        hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, (vsf_flash_t *)hw_flash_ptr, mask);
+        if (hw_flash_ptr->irq_mask & mask) {
+            hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, (vsf_flash_t *)hw_flash_ptr, mask);
+        }
     }
 
     return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
