@@ -624,8 +624,6 @@ static inline uint8_t vsf_usart_mode_to_data_bits(vsf_usart_mode_t mode)
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/driver/common/usart/fifo2req_usart.h"
-
 #ifdef __cplusplus
 }
 #endif

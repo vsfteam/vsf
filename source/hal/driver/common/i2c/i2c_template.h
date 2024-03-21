@@ -48,3 +48,10 @@
 #undef VSF_I2C_CFG_DEC_COUNT_MASK_PREFIX
 #undef VSF_I2C_CFG_DEC_REMAP_PREFIX
 #undef VSF_I2C_CFG_DEC_EXTERN_OP
+
+/*============================ INCLUDES ======================================*/
+
+#include "hal/driver/common/i2c/i2c_request.h"
+#include "hal/driver/common/i2c/mrequest_i2c.h"
+#include "hal/driver/common/i2c/multiplex_i2c.h"
+

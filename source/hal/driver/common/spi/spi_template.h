@@ -48,3 +48,8 @@
 #undef VSF_SPI_CFG_DEC_COUNT_MASK_PREFIX
 #undef VSF_SPI_CFG_DEC_REMAP_PREFIX
 #undef VSF_SPI_CFG_DEC_EXTERN_OP
+
+/*============================ INCLUDES ======================================*/
+
+#include "hal/driver/common/spi/fifo2req_spi.h"
+#include "hal/driver/common/spi/multiplex_spi.h"
