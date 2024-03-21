@@ -114,13 +114,14 @@ typedef struct vsf_win_usart_port_t {
     };
 #include "hal/driver/common/usart/usart_template.inc"
 
-#define VSF_USART_CFG_IMP_INSTANCE_PREFIX           vsf_win_fifo2req
-#define VSF_USART_CFG_IMP_PREFIX                    vsf_fifo2req
-#define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_FIFO2REQ
-#define VSF_FIFO2REQ_USART_COUNT                    VSF_WIN_USART_COUNT
+#define VSF_USART_CFG_IMP_PREFIX                    vsf_hw
+#define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_HW
+#define VSF_USART_CFG_IMP_COUNT_MASK_PREFIX         VSF_WIN
+#define VSF_USART_CFG_IMP_WRAP_PREFIX               vsf_fifo2req
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     describe_fifo2req_usart(                                                    \
-        VSF_MCONNECT(VSF_USART_CFG_IMP_INSTANCE_PREFIX, _usart, __IDX),         \
+        VSF_USART_CFG_IMP_PREFIX,                                               \
+        VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __IDX),                  \
         VSF_MCONNECT(vsf_win_usart, __IDX))
 #include "hal/driver/common/usart/usart_template.inc"
 
@@ -668,15 +669,5 @@ uint_fast16_t vsf_win_usart_txfifo_write(vsf_win_usart_t *win_usart, void *buffe
 }
 
 /*============================ GLOBAL VARIABLES ==============================*/
-
-#if VSF_WIN_USART_CFG_USE_AS_HW_USART == ENABLED
-#define VSF_USART_CFG_IMP_INSTANCE_PREFIX           vsf_hw
-#define VSF_USART_CFG_IMP_PREFIX                    vsf_remapped
-#define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_REMAPPED
-#define VSF_REMAPPED_USART_COUNT                    VSF_WIN_USART_COUNT
-#define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
-    describe_remapped_usart(VSF_MCONNECT(vsf_hw_usart, __IDX), VSF_MCONNECT(vsf_win_fifo2req_usart, __IDX))
-#include "hal/driver/common/usart/usart_template.inc"
-#endif
 
 #endif

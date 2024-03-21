@@ -129,8 +129,8 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_HAL_TEMPLATE_IMP_NAME                     _pwm
-#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _PWM
+#define VSF_HAL_TEMPLATE_IMP_NAME                   _pwm
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _PWM
 
 #ifndef VSF_PWM_CFG_IMP_PREFIX
 #   error "Please define VSF_PWM_CFG_IMP_PREFIX in pwm driver"
@@ -140,14 +140,14 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 #   error "Please define VSF_PWM_CFG_IMP_UPCASE_PREFIX in pwm driver"
 #endif
 
-#ifndef VSF_PWM_CFG_IMP_INSTANCE_PREFIX
-#   define VSF_PWM_CFG_IMP_INSTANCE_PREFIX         VSF_PWM_CFG_IMP_PREFIX
+#ifndef VSF_PWM_CFG_IMP_COUNT_MASK_PREFIX
+#   define VSF_PWM_CFG_IMP_COUNT_MASK_PREFIX        VSF_PWM_CFG_IMP_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_PWM_CFG_IMP_PREFIX
-#undef VSF_PWM_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_PWM_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_PWM_CFG_IMP_UPCASE_PREFIX
 #undef VSF_PWM_CFG_IMP_LV0
 

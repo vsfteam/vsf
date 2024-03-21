@@ -227,8 +227,8 @@ vsf_flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_HAL_TEMPLATE_IMP_NAME                     _flash
-#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _FLASH
+#define VSF_HAL_TEMPLATE_IMP_NAME                   _flash
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _FLASH
 
 #ifndef VSF_FLASH_CFG_IMP_PREFIX
 #   error "Please define VSF_FLASH_CFG_IMP_PREFIX in flash driver"
@@ -238,14 +238,14 @@ vsf_flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
 #   error "Please define VSF_FLASH_CFG_IMP_UPCASE_PREFIX in flash driver"
 #endif
 
-#ifndef VSF_FLASH_CFG_IMP_INSTANCE_PREFIX
-#   define VSF_FLASH_CFG_IMP_INSTANCE_PREFIX         VSF_FLASH_CFG_IMP_PREFIX
+#ifndef VSF_FLASH_CFG_IMP_COUNT_MASK_PREFIX
+#   define VSF_FLASH_CFG_IMP_COUNT_MASK_PREFIX      VSF_FLASH_CFG_IMP_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_FLASH_CFG_IMP_PREFIX
-#undef VSF_FLASH_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_FLASH_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_FLASH_CFG_IMP_UPCASE_PREFIX
 #undef VSF_FLASH_CFG_IMP_LV0
 

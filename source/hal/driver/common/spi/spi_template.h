@@ -29,22 +29,22 @@
 #   error "Please define VSF_SPI_CFG_DEC_PREFIX before include spi_template.h"
 #endif
 
-#ifndef VSF_SPI_CFG_DEC_INSTANCE_PREFIX
-#   define VSF_SPI_CFG_DEC_INSTANCE_PREFIX          VSF_SPI_CFG_DEC_PREFIX
+#ifndef VSF_SPI_CFG_DEC_UPCASE_PREFIX
+#   error "Please define VSF_SPI_CFG_DEC_UPCASE_PREFIX before include spi_template.h"
 #endif
 
 #ifndef VSF_SPI_CFG_DEC_OP_PREFIX
 #   define VSF_SPI_CFG_DEC_OP_PREFIX                VSF_SPI_CFG_DEC_PREFIX
 #endif
 
-#ifdef VSF_SPI_CFG_DEC_UPCASE_PREFIX
-#   define VSF_HAL_TEMPLATE_DEC_UPCASE_PREFIX       VSF_SPI_CFG_DEC_UPCASE_PREFIX
+#ifndef VSF_SPI_CFG_DEC_COUNT_MASK_PREFIX
+#   define VSF_SPI_CFG_DEC_COUNT_MASK_PREFIX        VSF_SPI_CFG_DEC_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_instance_declaration.h"
 
 #undef VSF_SPI_CFG_DEC_PREFIX
 #undef VSF_SPI_CFG_DEC_UPCASE_PREFIX
-#undef VSF_SPI_CFG_DEC_INSTANCE_PREFIX
+#undef VSF_SPI_CFG_DEC_COUNT_MASK_PREFIX
 #undef VSF_SPI_CFG_DEC_OP_PREFIX
 #undef VSF_SPI_CFG_DEC_EXTERN_OP

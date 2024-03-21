@@ -53,8 +53,8 @@ vsf_rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_HAL_TEMPLATE_IMP_NAME                     _rng
-#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _RNG
+#define VSF_HAL_TEMPLATE_IMP_NAME                   _rng
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _RNG
 
 #ifndef VSF_RNG_CFG_IMP_PREFIX
 #   error "Please define VSF_RNG_CFG_IMP_PREFIX in rng driver"
@@ -64,14 +64,14 @@ vsf_rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 #   error "Please define VSF_RNG_CFG_IMP_UPCASE_PREFIX in rng driver"
 #endif
 
-#ifndef VSF_RNG_CFG_IMP_INSTANCE_PREFIX
-#   define VSF_RNG_CFG_IMP_INSTANCE_PREFIX         VSF_RNG_CFG_IMP_PREFIX
+#ifndef VSF_RNG_CFG_IMP_COUNT_MASK_PREFIX
+#   define VSF_RNG_CFG_IMP_COUNT_MASK_PREFIX        VSF_RNG_CFG_IMP_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_RNG_CFG_IMP_PREFIX
-#undef VSF_RNG_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_RNG_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_RNG_CFG_IMP_UPCASE_PREFIX
 #undef VSF_RNG_CFG_IMP_LV0
 

@@ -32,10 +32,6 @@
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
 
-#ifndef VSF_WIN_USART_CFG_USE_AS_HW_USART
-#   define VSF_WIN_USART_CFG_USE_AS_HW_USART        ENABLED
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

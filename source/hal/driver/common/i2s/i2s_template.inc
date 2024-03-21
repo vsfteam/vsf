@@ -67,8 +67,8 @@ vsf_i2s_capability_t vsf_real_i2s_capability(vsf_real_i2s_t *i2s_ptr)
 /*============================ IMPLEMENTATION ================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_HAL_TEMPLATE_IMP_NAME                     _i2s
-#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _I2S
+#define VSF_HAL_TEMPLATE_IMP_NAME                   _i2s
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _I2S
 
 #ifndef VSF_I2S_CFG_IMP_PREFIX
 #   error "Please define VSF_I2S_CFG_IMP_PREFIX in i2s driver"
@@ -78,15 +78,15 @@ vsf_i2s_capability_t vsf_real_i2s_capability(vsf_real_i2s_t *i2s_ptr)
 #   error "Please define VSF_I2S_CFG_IMP_UPCASE_PREFIX in i2s driver"
 #endif
 
-#ifndef VSF_I2S_CFG_IMP_INSTANCE_PREFIX
-#   define VSF_I2S_CFG_IMP_INSTANCE_PREFIX         VSF_I2S_CFG_IMP_PREFIX
+#ifndef VSF_I2S_CFG_IMP_COUNT_MASK_PREFIX
+#   define VSF_I2S_CFG_IMP_COUNT_MASK_PREFIX        VSF_I2S_CFG_IMP_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_I2S_CFG_IMP_PREFIX
 #undef VSF_I2S_CFG_IMP_UPCASE_PREFIX
-#undef VSF_I2S_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_I2S_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_I2S_CFG_IMP_LV0
 
 #endif // VSF_HAL_USE_I2S == ENABLED

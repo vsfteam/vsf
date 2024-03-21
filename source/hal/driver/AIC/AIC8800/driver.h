@@ -169,9 +169,8 @@
 
 #   define VSF_USART_CFG_DEC_PREFIX                         __vsf_hw
 #   define VSF_USART_CFG_DEC_UPCASE_PREFIX                  __VSF_HW
+#   define VSF_USART_CFG_DEC_COUNT_MASK_PREFIX              VSF_HW
 #   include "hal/driver/common/usart/usart_template.h"
-
-#   include "hal/driver/common/usart/fifo2req_usart.h"
 
 #   define VSF_USART_CFG_DEC_PREFIX                         vsf_hw
 #   define VSF_USART_CFG_DEC_UPCASE_PREFIX                  VSF_HW
