@@ -15,7 +15,6 @@
  *                                                                           *
  ****************************************************************************/
 
-/*============================ INCLUDES ======================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_HAL_TEMPLATE_DEC_NAME                   _usart
@@ -48,3 +47,7 @@
 #undef VSF_USART_CFG_DEC_COUNT_MASK_PREFIX
 #undef VSF_USART_CFG_DEC_REMAP_PREFIX
 #undef VSF_USART_CFG_DEC_EXTERN_OP
+
+/*============================ INCLUDES ======================================*/
+
+#include "hal/driver/common/usart/fifo2req_usart.h"
