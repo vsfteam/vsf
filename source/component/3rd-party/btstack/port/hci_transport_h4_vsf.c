@@ -22,6 +22,7 @@
 #if VSF_USE_BTSTACK == ENABLED
 
 #define __VSF_EDA_CLASS_INHERIT__
+#define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
 
 #include "hal/vsf_hal.h"
 #include "kernel/vsf_kernel.h"
@@ -80,7 +81,7 @@ static void __hci_transport_h4_on_in(vsf_stream_t *stream, void *param, vsf_stre
 {
     hci_transport_h4_param_t *h4param = (hci_transport_h4_param_t *)param;
     uint8_t *ptr = &h4param->rx.buffer[HCI_INCOMING_PRE_SIZE];
-    vsf_mem_t buffer;
+    vsf_mem_t buffer = { 0 };
 
     if (evt != VSF_STREAM_ON_IN) {
         return;
