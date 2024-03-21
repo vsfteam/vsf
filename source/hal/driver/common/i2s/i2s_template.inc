@@ -62,6 +62,93 @@ vsf_i2s_capability_t vsf_real_i2s_capability(vsf_real_i2s_t *i2s_ptr)
 #undef vsf_real_i2s_t
 #undef vsf_real_i2s_capability
 
+/*============================ MACROS ========================================*/
+
+#ifdef VSF_I2S_CFG_IMP_REMAP_PREFIX
+#   define vsf_imp_i2s_t            VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t)
+#   define vsf_imp_i2s_init         VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_init)
+#   define vsf_imp_i2s_enable       VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_enable)
+#   define vsf_imp_i2s_disable      VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_disable)
+#   define vsf_imp_i2s_status       VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_status)
+#   define vsf_imp_i2s_capability   VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_capability)
+#   define vsf_imp_i2s_tx_init      VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_tx_init)
+#   define vsf_imp_i2s_tx_fini      VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_tx_fini)
+#   define vsf_imp_i2s_tx_start     VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_tx_start)
+#   define vsf_imp_i2s_rx_init      VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_rx_init)
+#   define vsf_imp_i2s_rx_fini      VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_rx_fini)
+#   define vsf_imp_i2s_rx_start     VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_rx_start)
+
+#   define vsf_remap_i2s_t          VSF_MCONNECT(VSF_I2S_CFG_IMP_REMAP_PREFIX, _i2s_t)
+#   define vsf_remap_i2s_init       VSF_MCONNECT(VSF_I2S_CFG_IMP_REMAP_PREFIX, _i2s_init)
+#   define vsf_remap_i2s_enable     VSF_MCONNECT(VSF_I2S_CFG_IMP_REMAP_PREFIX, _i2s_enable)
+#   define vsf_remap_i2s_disable    VSF_MCONNECT(VSF_I2S_CFG_IMP_REMAP_PREFIX, _i2s_disable)
+#   define vsf_remap_i2s_status     VSF_MCONNECT(VSF_I2S_CFG_IMP_REMAP_PREFIX, _i2s_status)
+#   define vsf_remap_i2s_capability VSF_MCONNECT(VSF_I2S_CFG_IMP_REMAP_PREFIX, _i2s_capability)
+#   define vsf_remap_i2s_tx_init    VSF_MCONNECT(VSF_I2S_CFG_IMP_REMAP_PREFIX, _i2s_tx_init)
+#   define vsf_remap_i2s_tx_fini    VSF_MCONNECT(VSF_I2S_CFG_IMP_REMAP_PREFIX, _i2s_tx_fini)
+#   define vsf_remap_i2s_tx_start   VSF_MCONNECT(VSF_I2S_CFG_IMP_REMAP_PREFIX, _i2s_tx_start)
+#   define vsf_remap_i2s_rx_init    VSF_MCONNECT(VSF_I2S_CFG_IMP_REMAP_PREFIX, _i2s_rx_init)
+#   define vsf_remap_i2s_rx_fini    VSF_MCONNECT(VSF_I2S_CFG_IMP_REMAP_PREFIX, _i2s_rx_fini)
+#   define vsf_remap_i2s_rx_start   VSF_MCONNECT(VSF_I2S_CFG_IMP_REMAP_PREFIX, _i2s_rx_start)
+
+#   define VSF_I2S_CFG_IMP_REMAP_FUNCTIONS                                                                \
+        vsf_err_t vsf_imp_i2s_init(vsf_imp_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)          \
+        {                                                                                   \
+            VSF_HAL_ASSERT(i2s_ptr != NULL);                                                \
+            return vsf_remap_i2s_init(i2s_ptr, cfg_ptr);                                    \
+        }                                                                                   \
+        vsf_err_t vsf_imp_i2s_tx_init(vsf_imp_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)       \
+        {                                                                                   \
+            VSF_HAL_ASSERT(i2s_ptr != NULL);                                                \
+            return vsf_remap_i2s_tx_init(i2s_ptr, cfg_ptr);                                 \
+        }                                                                                   \
+        void vsf_imp_i2s_tx_fini(vsf_imp_i2s_t *i2s_ptr)                                    \
+        {                                                                                   \
+            VSF_HAL_ASSERT(i2s_ptr != NULL);                                                \
+            vsf_remap_i2s_tx_fini(i2s_ptr);                                                 \
+        }                                                                                   \
+        vsf_err_t vsf_imp_i2s_tx_start(vsf_imp_i2s_t *i2s_ptr)                              \
+        {                                                                                   \
+            VSF_HAL_ASSERT(i2s_ptr != NULL);                                                \
+            return vsf_remap_i2s_tx_start(i2s_ptr);                                         \
+        }                                                                                   \
+        vsf_err_t vsf_imp_i2s_rx_init(vsf_imp_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)       \
+        {                                                                                   \
+            VSF_HAL_ASSERT(i2s_ptr != NULL);                                                \
+            return vsf_remap_i2s_rx_init(i2s_ptr, cfg_ptr);                                 \
+        }                                                                                   \
+        void vsf_imp_i2s_rx_fini(vsf_imp_i2s_t *i2s_ptr)                                    \
+        {                                                                                   \
+            VSF_HAL_ASSERT(i2s_ptr != NULL);                                                \
+            vsf_remap_i2s_rx_fini(i2s_ptr);                                                 \
+        }                                                                                   \
+        vsf_err_t vsf_imp_i2s_rx_start(vsf_imp_i2s_t *i2s_ptr)                              \
+        {                                                                                   \
+            VSF_HAL_ASSERT(i2s_ptr != NULL);                                                \
+            return vsf_remap_i2s_rx_start(i2s_ptr);                                         \
+        }                                                                                   \
+        fsm_rt_t vsf_imp_i2s_enable(vsf_imp_i2s_t *i2s_ptr)                                 \
+        {                                                                                   \
+            VSF_HAL_ASSERT(i2s_ptr != NULL);                                                \
+            return vsf_remap_i2s_enable(i2s_ptr);                                           \
+        }                                                                                   \
+        fsm_rt_t vsf_imp_i2s_disable(vsf_imp_i2s_t *i2s_ptr)                                \
+        {                                                                                   \
+            VSF_HAL_ASSERT(i2s_ptr != NULL);                                                \
+            return vsf_remap_i2s_disable(i2s_ptr);                                          \
+        }                                                                                   \
+        vsf_i2s_status_t vsf_imp_i2s_status(vsf_imp_i2s_t *i2s_ptr)                         \
+        {                                                                                   \
+            VSF_HAL_ASSERT(i2s_ptr != NULL);                                                \
+            return vsf_remap_i2s_status(i2s_ptr);                                           \
+        }                                                                                   \
+        vsf_i2s_capability_t vsf_imp_i2s_capability(vsf_imp_i2s_t *i2s_ptr)                 \
+        {                                                                                   \
+            VSF_HAL_ASSERT(i2s_ptr != NULL);                                                \
+            return vsf_remap_i2s_capability(i2s_ptr);                                       \
+        }
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -82,11 +169,42 @@ vsf_i2s_capability_t vsf_real_i2s_capability(vsf_real_i2s_t *i2s_ptr)
 #   define VSF_I2S_CFG_IMP_COUNT_MASK_PREFIX        VSF_I2S_CFG_IMP_UPCASE_PREFIX
 #endif
 
+#ifdef VSF_I2S_CFG_IMP_REMAP_FUNCTIONS
+#   define VSF_HAL_CFG_IMP_REMAP_FUNCTIONS          VSF_I2S_CFG_IMP_REMAP_FUNCTIONS
+#endif
+
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_I2S_CFG_IMP_PREFIX
 #undef VSF_I2S_CFG_IMP_UPCASE_PREFIX
 #undef VSF_I2S_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_I2S_CFG_IMP_LV0
+#undef VSF_I2S_CFG_IMP_REMAP_FUNCTIONS
+
+#undef vsf_imp_i2s_t
+#undef vsf_imp_i2s_init
+#undef vsf_imp_i2s_enable
+#undef vsf_imp_i2s_disable
+#undef vsf_imp_i2s_status
+#undef vsf_imp_i2s_capability
+#undef vsf_imp_i2s_tx_init
+#undef vsf_imp_i2s_tx_fini
+#undef vsf_imp_i2s_tx_start
+#undef vsf_imp_i2s_rx_init
+#undef vsf_imp_i2s_rx_fini
+#undef vsf_imp_i2s_rx_start
+
+#undef vsf_remap_i2s_t
+#undef vsf_remap_i2s_init
+#undef vsf_remap_i2s_enable
+#undef vsf_remap_i2s_disable
+#undef vsf_remap_i2s_status
+#undef vsf_remap_i2s_capability
+#undef vsf_remap_i2s_tx_init
+#undef vsf_remap_i2s_tx_fini
+#undef vsf_remap_i2s_tx_start
+#undef vsf_remap_i2s_rx_init
+#undef vsf_remap_i2s_rx_fini
+#undef vsf_remap_i2s_rx_start
 
 #endif // VSF_HAL_USE_I2S == ENABLED

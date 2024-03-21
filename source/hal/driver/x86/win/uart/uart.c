@@ -117,7 +117,7 @@ typedef struct vsf_win_usart_port_t {
 #define VSF_USART_CFG_IMP_PREFIX                    vsf_hw
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_HW
 #define VSF_USART_CFG_IMP_COUNT_MASK_PREFIX         VSF_WIN
-#define VSF_USART_CFG_IMP_WRAP_PREFIX               vsf_fifo2req
+#define VSF_USART_CFG_IMP_REMAP_PREFIX              vsf_fifo2req
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     describe_fifo2req_usart(                                                    \
         VSF_USART_CFG_IMP_PREFIX,                                               \

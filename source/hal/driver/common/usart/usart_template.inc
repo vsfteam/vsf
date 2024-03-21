@@ -148,84 +148,141 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 #undef vsf_real_usart_capability
 
 /*============================ IMPLEMENTATION ================================*/
+/*============================ MACROS ========================================*/
 
-#define __VSF_USART_API_WRAP(__WRAP_PREFIX, __ORIGIN_PREFIX)                                                                                                \
-    vsf_err_t VSF_MCONNECT(__WRAP_PREFIX, _usart_init)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr, vsf_usart_cfg_t *cfg_ptr)                          \
-    {                                                                                                                                                       \
-        return VSF_MCONNECT(__ORIGIN_PREFIX, _usart_init)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr, cfg_ptr);                                   \
-    }                                                                                                                                                       \
-    void VSF_MCONNECT(__WRAP_PREFIX, _usart_fini)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr)                                                         \
-    {                                                                                                                                                       \
-        VSF_MCONNECT(__ORIGIN_PREFIX, _usart_fini)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr);                                                   \
-    }                                                                                                                                                       \
-    fsm_rt_t VSF_MCONNECT(__WRAP_PREFIX, _usart_enable)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr)                                                   \
-    {                                                                                                                                                       \
-        return VSF_MCONNECT(__ORIGIN_PREFIX, _usart_enable)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr);                                          \
-    }                                                                                                                                                       \
-    fsm_rt_t VSF_MCONNECT(__WRAP_PREFIX, _usart_disable)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr)                                                  \
-    {                                                                                                                                                       \
-        return VSF_MCONNECT(__ORIGIN_PREFIX, _usart_disable)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr);                                         \
-    }                                                                                                                                                       \
-    void VSF_MCONNECT(__WRAP_PREFIX, _usart_irq_enable)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr, vsf_usart_irq_mask_t irq_mask)                    \
-    {                                                                                                                                                       \
-        VSF_MCONNECT(__ORIGIN_PREFIX, _usart_irq_enable)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr, irq_mask);                                   \
-    }                                                                                                                                                       \
-    void VSF_MCONNECT(__WRAP_PREFIX, _usart_irq_disable)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr, vsf_usart_irq_mask_t irq_mask)                   \
-    {                                                                                                                                                       \
-        VSF_MCONNECT(__ORIGIN_PREFIX, _usart_irq_disable)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr, irq_mask);                                  \
-    }                                                                                                                                                       \
-    vsf_usart_status_t VSF_MCONNECT(__WRAP_PREFIX, _usart_status)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr)                                         \
-    {                                                                                                                                                       \
-        return VSF_MCONNECT(__ORIGIN_PREFIX, _usart_status)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr);                                          \
-    }                                                                                                                                                       \
-    vsf_usart_capability_t VSF_MCONNECT(__WRAP_PREFIX, _usart_capability)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr)                                 \
-    {                                                                                                                                                       \
-        return VSF_MCONNECT(__ORIGIN_PREFIX, _usart_capability)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr);                                      \
-    }                                                                                                                                                       \
-    uint_fast16_t VSF_MCONNECT(__WRAP_PREFIX, _usart_rxfifo_get_data_count)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr)                               \
-    {                                                                                                                                                       \
-        return VSF_MCONNECT(__ORIGIN_PREFIX, _usart_rxfifo_get_data_count)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr);                           \
-    }                                                                                                                                                       \
-    uint_fast16_t VSF_MCONNECT(__WRAP_PREFIX, _usart_rxfifo_read)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast16_t count)  \
-    {                                                                                                                                                       \
-        return VSF_MCONNECT(__ORIGIN_PREFIX, _usart_rxfifo_read)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr, buffer_ptr, count);                  \
-    }                                                                                                                                                       \
-    uint_fast16_t VSF_MCONNECT(__WRAP_PREFIX, _usart_txfifo_get_free_count)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr)                               \
-    {                                                                                                                                                       \
-        return VSF_MCONNECT(__ORIGIN_PREFIX, _usart_txfifo_get_free_count)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr);                           \
-    }                                                                                                                                                       \
-    uint_fast16_t VSF_MCONNECT(__WRAP_PREFIX, _usart_txfifo_write)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast16_t count) \
-    {                                                                                                                                                       \
-        return VSF_MCONNECT(__ORIGIN_PREFIX, _usart_txfifo_write)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr, buffer_ptr, count);                 \
-    }                                                                                                                                                       \
-    vsf_err_t VSF_MCONNECT(__WRAP_PREFIX, _usart_request_rx)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast32_t count)       \
-    {                                                                                                                                                       \
-        return VSF_MCONNECT(__ORIGIN_PREFIX, _usart_request_rx)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr, buffer_ptr, count);                   \
-    }                                                                                                                                                       \
-    vsf_err_t VSF_MCONNECT(__WRAP_PREFIX, _usart_request_tx)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr, void *buffer_ptr, uint_fast32_t count)       \
-    {                                                                                                                                                       \
-        return VSF_MCONNECT(__ORIGIN_PREFIX, _usart_request_tx)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr, buffer_ptr, count);                   \
-    }                                                                                                                                                       \
-    vsf_err_t VSF_MCONNECT(__WRAP_PREFIX, _usart_cancel_rx)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr)                                               \
-    {                                                                                                                                                       \
-        return VSF_MCONNECT(__ORIGIN_PREFIX, _usart_cancel_rx)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr);                                       \
-    }                                                                                                                                                       \
-    vsf_err_t VSF_MCONNECT(__WRAP_PREFIX, _usart_cancel_tx)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr)                                               \
-    {                                                                                                                                                       \
-        return VSF_MCONNECT(__ORIGIN_PREFIX, _usart_cancel_tx)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr);                                       \
-    }                                                                                                                                                       \
-    int_fast32_t VSF_MCONNECT(__WRAP_PREFIX, _usart_get_rx_count)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr)                                         \
-    {                                                                                                                                                       \
-        return VSF_MCONNECT(__ORIGIN_PREFIX, _usart_get_rx_count)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr);                                    \
-    }                                                                                                                                                       \
-    int_fast32_t VSF_MCONNECT(__WRAP_PREFIX, _usart_get_tx_count)(VSF_MCONNECT(__WRAP_PREFIX, _usart_t) *usart_ptr)                                         \
-    {                                                                                                                                                       \
-        return VSF_MCONNECT(__ORIGIN_PREFIX, _usart_get_tx_count)((VSF_MCONNECT(__ORIGIN_PREFIX, _usart_t) *)usart_ptr);                                    \
-    }
+#ifdef VSF_USART_CFG_IMP_REMAP_PREFIX
+#   define vsf_imp_usart_t                          VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t)
+#   define vsf_imp_usart_init                       VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)
+#   define vsf_imp_usart_fini                       VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_fini)
+#   define vsf_imp_usart_capability                 VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
+#   define vsf_imp_usart_enable                     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_enable)
+#   define vsf_imp_usart_disable                    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_disable)
+#   define vsf_imp_usart_irq_enable                 VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_enable)
+#   define vsf_imp_usart_irq_disable                VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_disable)
+#   define vsf_imp_usart_status                     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_status)
+#   define vsf_imp_usart_rxfifo_get_data_count      VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_rxfifo_get_data_count)
+#   define vsf_imp_usart_rxfifo_read                VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_rxfifo_read)
+#   define vsf_imp_usart_txfifo_get_free_count      VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_txfifo_get_free_count)
+#   define vsf_imp_usart_txfifo_write               VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_txfifo_write)
+#   define vsf_imp_usart_request_rx                 VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_request_rx)
+#   define vsf_imp_usart_request_tx                 VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_request_tx)
+#   define vsf_imp_usart_cancel_rx                  VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cancel_rx)
+#   define vsf_imp_usart_cancel_tx                  VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cancel_tx)
+#   define vsf_imp_usart_get_rx_count               VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_rx_count)
+#   define vsf_imp_usart_get_tx_count               VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)
 
-#define VSF_USART_API_WRAP(__WRAP_PREFIX, __ORIGIN_PREFIX)                      \
-    __VSF_USART_API_WRAP(__WRAP_PREFIX, __ORIGIN_PREFIX)
+#   define vsf_remap_usart_t                        VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_t)
+#   define vsf_remap_usart_init                     VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_init)
+#   define vsf_remap_usart_fini                     VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_fini)
+#   define vsf_remap_usart_capability               VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_capability)
+#   define vsf_remap_usart_enable                   VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_enable)
+#   define vsf_remap_usart_disable                  VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_disable)
+#   define vsf_remap_usart_irq_enable               VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_irq_enable)
+#   define vsf_remap_usart_irq_disable              VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_irq_disable)
+#   define vsf_remap_usart_status                   VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_status)
+#   define vsf_remap_usart_rxfifo_get_data_count    VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_rxfifo_get_data_count)
+#   define vsf_remap_usart_rxfifo_read              VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_rxfifo_read)
+#   define vsf_remap_usart_txfifo_get_free_count    VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_txfifo_get_free_count)
+#   define vsf_remap_usart_txfifo_write             VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_txfifo_write)
+#   define vsf_remap_usart_request_rx               VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_request_rx)
+#   define vsf_remap_usart_request_tx               VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_request_tx)
+#   define vsf_remap_usart_cancel_rx                VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_cancel_rx)
+#   define vsf_remap_usart_cancel_tx                VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_cancel_tx)
+#   define vsf_remap_usart_get_rx_count             VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_get_rx_count)
+#   define vsf_remap_usart_get_tx_count             VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_get_tx_count)
 
+#   define VSF_USART_CFG_IMP_REMAP_FUNCTIONS                                                                        \
+        vsf_err_t vsf_imp_usart_init(vsf_imp_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr)                          \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_init(usart_ptr, cfg_ptr);                                                        \
+        }                                                                                                           \
+        void vsf_imp_usart_fini(vsf_imp_usart_t *usart_ptr)                                                         \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            vsf_remap_usart_fini(usart_ptr);                                                                        \
+        }                                                                                                           \
+        fsm_rt_t vsf_imp_usart_enable(vsf_imp_usart_t *usart_ptr)                                                   \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_enable(usart_ptr);                                                               \
+        }                                                                                                           \
+        fsm_rt_t vsf_imp_usart_disable(vsf_imp_usart_t *usart_ptr)                                                  \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_disable(usart_ptr);                                                              \
+        }                                                                                                           \
+        void vsf_imp_usart_irq_enable(vsf_imp_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)                    \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            vsf_remap_usart_irq_enable(usart_ptr, irq_mask);                                                        \
+        }                                                                                                           \
+        void vsf_imp_usart_irq_disable(vsf_imp_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)                   \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            vsf_remap_usart_irq_disable(usart_ptr, irq_mask);                                                       \
+        }                                                                                                           \
+        vsf_usart_status_t vsf_imp_usart_status(vsf_imp_usart_t *usart_ptr)                                         \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_status(usart_ptr);                                                               \
+        }                                                                                                           \
+        vsf_usart_capability_t vsf_imp_usart_capability(vsf_imp_usart_t *usart_ptr)                                 \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_capability(usart_ptr);                                                           \
+        }                                                                                                           \
+        uint_fast16_t vsf_imp_usart_rxfifo_get_data_count(vsf_imp_usart_t *usart_ptr)                               \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_rxfifo_get_data_count(usart_ptr);                                                \
+        }                                                                                                           \
+        uint_fast16_t vsf_imp_usart_rxfifo_read(vsf_imp_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)  \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_rxfifo_read(usart_ptr, buffer_ptr, count);                                       \
+        }                                                                                                           \
+        uint_fast16_t vsf_imp_usart_txfifo_get_free_count(vsf_imp_usart_t *usart_ptr)                               \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_txfifo_get_free_count(usart_ptr);                                                \
+        }                                                                                                           \
+        uint_fast16_t vsf_imp_usart_txfifo_write(vsf_imp_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count) \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_txfifo_write(usart_ptr, buffer_ptr, count);                                      \
+        }                                                                                                           \
+        vsf_err_t vsf_imp_usart_request_rx(vsf_imp_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)       \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_request_rx(usart_ptr, buffer_ptr, count);                                        \
+        }                                                                                                           \
+        vsf_err_t vsf_imp_usart_request_tx(vsf_imp_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)       \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_request_tx(usart_ptr, buffer_ptr, count);                                        \
+        }                                                                                                           \
+        vsf_err_t vsf_imp_usart_cancel_rx(vsf_imp_usart_t *usart_ptr)                                               \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_cancel_rx(usart_ptr);                                                            \
+        }                                                                                                           \
+        vsf_err_t vsf_imp_usart_cancel_tx(vsf_imp_usart_t *usart_ptr)                                               \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_cancel_tx(usart_ptr);                                                            \
+        }                                                                                                           \
+        int_fast32_t vsf_imp_usart_get_rx_count(vsf_imp_usart_t *usart_ptr)                                         \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_get_rx_count(usart_ptr);                                                         \
+        }                                                                                                           \
+        int_fast32_t vsf_imp_usart_get_tx_count(vsf_imp_usart_t *usart_ptr)                                         \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_get_tx_count(usart_ptr);                                                         \
+        }
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -244,16 +301,57 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 #   define VSF_USART_CFG_IMP_COUNT_MASK_PREFIX      VSF_USART_CFG_IMP_UPCASE_PREFIX
 #endif
 
-#ifdef VSF_USART_CFG_IMP_WRAP_PREFIX
-#   define VSF_HAL_TEMPLATE_IMP_WRAP_PREFIX         VSF_USART_CFG_IMP_WRAP_PREFIX
+#ifdef VSF_USART_CFG_IMP_REMAP_FUNCTIONS
+#   define VSF_HAL_CFG_IMP_REMAP_FUNCTIONS          VSF_USART_CFG_IMP_REMAP_FUNCTIONS
 #endif
 
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_USART_CFG_IMP_PREFIX
 #undef VSF_USART_CFG_IMP_COUNT_MASK_PREFIX
-#undef VSF_USART_CFG_IMP_WRAP_PREFIX
 #undef VSF_USART_CFG_IMP_UPCASE_PREFIX
+#undef VSF_USART_CFG_IMP_REMAP_PREFIX
 #undef VSF_USART_CFG_IMP_LV0
+#undef VSF_USART_CFG_IMP_REMAP_FUNCTIONS
+
+#undef vsf_imp_usart_t
+#undef vsf_imp_usart_init
+#undef vsf_imp_usart_fini
+#undef vsf_imp_usart_capability
+#undef vsf_imp_usart_enable
+#undef vsf_imp_usart_disable
+#undef vsf_imp_usart_irq_enable
+#undef vsf_imp_usart_irq_disable
+#undef vsf_imp_usart_status
+#undef vsf_imp_usart_rxfifo_get_data_count
+#undef vsf_imp_usart_rxfifo_read
+#undef vsf_imp_usart_txfifo_get_free_count
+#undef vsf_imp_usart_txfifo_write
+#undef vsf_imp_usart_request_rx
+#undef vsf_imp_usart_request_tx
+#undef vsf_imp_usart_cancel_rx
+#undef vsf_imp_usart_cancel_tx
+#undef vsf_imp_usart_get_rx_count
+#undef vsf_imp_usart_get_tx_count
+
+#undef vsf_remap_usart_t
+#undef vsf_remap_usart_init
+#undef vsf_remap_usart_fini
+#undef vsf_remap_usart_capability
+#undef vsf_remap_usart_enable
+#undef vsf_remap_usart_disable
+#undef vsf_remap_usart_irq_enable
+#undef vsf_remap_usart_irq_disable
+#undef vsf_remap_usart_status
+#undef vsf_remap_usart_rxfifo_get_data_count
+#undef vsf_remap_usart_rxfifo_read
+#undef vsf_remap_usart_txfifo_get_free_count
+#undef vsf_remap_usart_txfifo_write
+#undef vsf_remap_usart_request_rx
+#undef vsf_remap_usart_request_tx
+#undef vsf_remap_usart_cancel_rx
+#undef vsf_remap_usart_cancel_tx
+#undef vsf_remap_usart_get_rx_count
+#undef vsf_remap_usart_get_tx_count
 
 #endif  /* VSF_HAL_USE_USART */

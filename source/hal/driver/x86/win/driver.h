@@ -55,7 +55,7 @@ extern "C" {
 
 #   define VSF_USART_CFG_DEC_PREFIX                     vsf_hw
 #   define VSF_USART_CFG_DEC_UPCASE_PREFIX              VSF_HW
-#   define VSF_USART_CFG_DEC_OP_PREFIX                  vsf_fifo2req
+#   define VSF_USART_CFG_DEC_REMAP_PREFIX               vsf_fifo2req
 #   define VSF_HW_USART_COUNT                           VSF_WIN_USART_COUNT
 #   include "hal/driver/common/usart/usart_template.h"
 #endif

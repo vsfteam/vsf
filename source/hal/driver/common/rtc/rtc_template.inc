@@ -176,6 +176,80 @@ vsf_rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
 #undef vsf_real_rtc_t
 #undef vsf_real_rtc_capability
 
+/*============================ MACROS ========================================*/
+
+#ifdef VSF_RTC_CFG_IMP_REMAP_PREFIX
+
+#   define vsf_imp_rtc_t            VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t)
+#   define vsf_imp_rtc_init         VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_init)
+#   define vsf_imp_rtc_enable       VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_enable)
+#   define vsf_imp_rtc_disable      VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_disable)
+#   define vsf_imp_rtc_capability   VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_capability)
+#   define vsf_imp_rtc_get          VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get)
+#   define vsf_imp_rtc_set          VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set)
+#   define vsf_imp_rtc_get_time     VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_time)
+#   define vsf_imp_rtc_set_time     VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set_time)
+
+#   define vsf_remap_rtc_t          VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_t)
+#   define vsf_remap_rtc_init       VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_init)
+#   define vsf_remap_rtc_enable     VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_enable)
+#   define vsf_remap_rtc_disable    VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_disable)
+#   define vsf_remap_rtc_capability VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_capability)
+#   define vsf_remap_rtc_get        VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_get)
+#   define vsf_remap_rtc_set        VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_set)
+#   define vsf_remap_rtc_get_time   VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_get_time)
+#   define vsf_remap_rtc_set_time   VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_set_time)
+
+#   define VSF_RTC_CFG_IMP_REMAP_FUNCTIONS                                                                        \
+        vsf_err_t vsf_imp_rtc_init(vsf_imp_rtc_t *rtc_ptr, vsf_rtc_cfg_t *cfg_ptr)            \
+        {                                                                                     \
+            VSF_HAL_ASSERT(rtc_ptr != NULL);                                                  \
+            return vsf_remap_rtc_init(rtc_ptr, cfg_ptr);                                      \
+        }                                                                                     \
+        void vsf_imp_rtc_fini(vsf_imp_rtc_t *rtc_ptr)                                         \
+        {                                                                                     \
+            VSF_HAL_ASSERT(rtc_ptr != NULL);                                                  \
+            vsf_remap_rtc_fini(rtc_ptr);                                                      \
+        }                                                                                     \
+        fsm_rt_t vsf_imp_rtc_enable(vsf_imp_rtc_t *rtc_ptr)                                   \
+        {                                                                                     \
+            VSF_HAL_ASSERT(rtc_ptr != NULL);                                                  \
+            return vsf_remap_rtc_enable(rtc_ptr);                                             \
+        }                                                                                     \
+        fsm_rt_t vsf_imp_rtc_disable(vsf_imp_rtc_t *rtc_ptr)                                  \
+        {                                                                                     \
+            VSF_HAL_ASSERT(rtc_ptr != NULL);                                                  \
+            return vsf_remap_rtc_disable(rtc_ptr);                                            \
+        }                                                                                     \
+        vsf_err_t vsf_imp_rtc_get(vsf_imp_rtc_t *rtc_ptr, vsf_imp_rtc_tm_t *rtc_tm)           \
+        {                                                                                     \
+            VSF_HAL_ASSERT(rtc_ptr != NULL);                                                  \
+            return vsf_remap_rtc_get(rtc_ptr, rtc_tm);                                        \
+        }                                                                                     \
+        vsf_err_t vsf_imp_rtc_set(vsf_imp_rtc_t *rtc_ptr, const vsf_imp_rtc_tm_t *rtc_tm)     \
+        {                                                                                     \
+            VSF_HAL_ASSERT(rtc_ptr != NULL);                                                  \
+            return vsf_remap_rtc_set(rtc_ptr, rtc_tm);                                        \
+        }                                                                                     \
+        vsf_err_t vsf_imp_rtc_get_time(vsf_imp_rtc_t *rtc_ptr, vsf_imp_rtc_time_t *second_ptr,\
+                                       vsf_imp_rtc_time_t *millisecond_ptr)                   \
+        {                                                                                     \
+            VSF_HAL_ASSERT(rtc_ptr != NULL);                                                  \
+            return vsf_remap_rtc_get_time(rtc_ptr, second_ptr, millisecond_ptr);              \
+        }                                                                                     \
+        vsf_err_t vsf_imp_rtc_set_time(vsf_imp_rtc_t *rtc_ptr, vsf_imp_rtc_time_t second,     \
+                                       vsf_imp_rtc_time_t millisecond)                        \
+        {                                                                                     \
+            VSF_HAL_ASSERT(rtc_ptr != NULL);                                                  \
+            return vsf_remap_rtc_set_time(rtc_ptr, second, millisecond);                      \
+        }                                                                                     \
+        vsf_rtc_capability_t vsf_imp_rtc_capability(vsf_imp_rtc_t *rtc_ptr)                   \
+        {                                                                                     \
+            VSF_HAL_ASSERT(rtc_ptr != NULL);                                                  \
+            return vsf_remap_rtc_capability(rtc_ptr);                                         \
+        }
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #define VSF_HAL_TEMPLATE_IMP_NAME                   _rtc
@@ -193,12 +267,37 @@ vsf_rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
 #   define VSF_RTC_CFG_IMP_COUNT_MASK_PREFIX        VSF_RTC_CFG_IMP_UPCASE_PREFIX
 #endif
 
+#ifdef VSF_RTC_CFG_IMP_REMAP_FUNCTIONS
+#   define VSF_HAL_CFG_IMP_REMAP_FUNCTIONS          VSF_RTC_CFG_IMP_REMAP_FUNCTIONS
+#endif
+
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_RTC_CFG_IMP_PREFIX
 #undef VSF_RTC_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_RTC_CFG_IMP_UPCASE_PREFIX
 #undef VSF_RTC_CFG_IMP_LV0
+#undef VSF_RTC_CFG_IMP_REMAP_FUNCTIONS
+
+#undef vsf_imp_rtc_t
+#undef vsf_imp_rtc_init
+#undef vsf_imp_rtc_enable
+#undef vsf_imp_rtc_disable
+#undef vsf_imp_rtc_capability
+#undef vsf_imp_rtc_get
+#undef vsf_imp_rtc_set
+#undef vsf_imp_rtc_get_time
+#undef vsf_imp_rtc_set_time
+
+#undef vsf_remap_rtc_t
+#undef vsf_remap_rtc_init
+#undef vsf_remap_rtc_enable
+#undef vsf_remap_rtc_disable
+#undef vsf_remap_rtc_capability
+#undef vsf_remap_rtc_get
+#undef vsf_remap_rtc_set
+#undef vsf_remap_rtc_get_time
+#undef vsf_remap_rtc_set_time
 
 #endif  /* VSF_HAL_USE_RTC */
 

@@ -309,7 +309,7 @@ static void __vsf_hw_usart_irq_handler(__vsf_hw_usart_t *hw_usart_ptr)
 
 #define VSF_USART_CFG_IMP_PREFIX                vsf_hw
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX         VSF_HW
-#define VSF_USART_CFG_IMP_WRAP_PREFIX           vsf_fifo2req
+#define VSF_USART_CFG_IMP_REMAP_PREFIX          vsf_fifo2req
 #define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                \
     describe_fifo2req_usart(VSF_USART_CFG_IMP_PREFIX,                           \
                             vsf_hw_usart ## __COUNT, __vsf_hw_usart ## __COUNT)
