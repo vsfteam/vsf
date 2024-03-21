@@ -33,8 +33,8 @@
 #   error "Please define VSF_IO_CFG_DEC_UPCASE_PREFIX before include io_template.h"
 #endif
 
-#ifndef VSF_IO_CFG_DEC_OP_PREFIX
-#   define VSF_IO_CFG_DEC_OP_PREFIX                 VSF_IO_CFG_DEC_PREFIX
+#ifndef VSF_IO_CFG_DEC_REMAP_PREFIX
+#   define VSF_IO_CFG_DEC_REMAP_PREFIX              VSF_IO_CFG_DEC_PREFIX
 #endif
 
 #ifndef VSF_IO_CFG_DEC_COUNT_MASK_PREFIX
@@ -54,5 +54,5 @@
 #undef VSF_IO_CFG_DEC_PREFIX
 #undef VSF_IO_CFG_DEC_UPCASE_PREFIX
 #undef VSF_IO_CFG_DEC_COUNT_MASK_PREFIX
-#undef VSF_IO_CFG_DEC_OP_PREFIX
+#undef VSF_IO_CFG_DEC_REMAP_PREFIX
 #undef VSF_IO_CFG_DEC_EXTERN_OP

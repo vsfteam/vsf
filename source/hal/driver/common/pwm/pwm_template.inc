@@ -127,6 +127,69 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 #undef vsf_real_pwm_t
 #undef vsf_real_pwm_capability
 
+
+/*============================ MACROS ========================================*/
+
+#ifdef VSF_PWM_CFG_IMP_REMAP_PREFIX
+
+#   define vsf_imp_pwm_t            VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t)
+#   define vsf_imp_pwm_init         VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_init)
+#   define vsf_imp_pwm_fini         VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_fini)
+#   define vsf_imp_pwm_enable       VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_enable)
+#   define vsf_imp_pwm_disable      VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_disable)
+#   define vsf_imp_pwm_capability   VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_capability)
+#   define vsf_imp_pwm_set          VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set)
+#   define vsf_imp_pwm_get_freq     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_freq)
+
+#   define vsf_remap_pwm_t          VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_t)
+#   define vsf_remap_pwm_init       VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_init)
+#   define vsf_remap_pwm_fini       VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_fini)
+#   define vsf_remap_pwm_enable     VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_enable)
+#   define vsf_remap_pwm_disable    VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_disable)
+#   define vsf_remap_pwm_capability VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_capability)
+#   define vsf_remap_pwm_set        VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_set)
+#   define vsf_remap_pwm_get_freq   VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_get_freq)
+
+#   define VSF_PWM_CFG_IMP_REMAP_FUNCTIONS                                                       \
+        vsf_err_t vsf_imp_pwm_init(vsf_imp_pwm_t *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr) \
+        {                                                                          \
+            VSF_HAL_ASSERT(pwm_ptr != NULL);                                       \
+            return vsf_remap_pwm_init(pwm_ptr, cfg_ptr);                           \
+        }                                                                          \
+        void vsf_imp_pwm_fini(vsf_imp_pwm_t *pwm_ptr)                              \
+        {                                                                          \
+            VSF_HAL_ASSERT(pwm_ptr != NULL);                                       \
+            vsf_remap_pwm_fini(pwm_ptr);                                           \
+        }                                                                          \
+        fsm_rt_t vsf_imp_pwm_enable(vsf_imp_pwm_t *pwm_ptr)                        \
+        {                                                                          \
+            VSF_HAL_ASSERT(pwm_ptr != NULL);                                       \
+            return vsf_remap_pwm_enable(pwm_ptr);                                  \
+        }                                                                          \
+        fsm_rt_t vsf_imp_pwm_disable(vsf_imp_pwm_t *pwm_ptr)                       \
+        {                                                                          \
+            VSF_HAL_ASSERT(pwm_ptr != NULL);                                       \
+            return vsf_remap_pwm_disable(pwm_ptr);                                 \
+        }                                                                          \
+        vsf_pwm_capability_t vsf_imp_pwm_capability(vsf_imp_pwm_t *pwm_ptr)        \
+        {                                                                          \
+            VSF_HAL_ASSERT(pwm_ptr != NULL);                                       \
+            return vsf_remap_pwm_capability(pwm_ptr);                              \
+        }                                                                          \
+        vsf_err_t vsf_imp_pwm_set(vsf_imp_pwm_t *pwm_ptr, uint8_t channel,         \
+                                  uint32_t period, uint32_t pulse)                 \
+        {                                                                          \
+            VSF_HAL_ASSERT(pwm_ptr != NULL);                                       \
+            return vsf_remap_pwm_set(pwm_ptr, channel, period, pulse);             \
+        }                                                                          \
+        uint32_t vsf_imp_pwm_get_freq(vsf_imp_pwm_t *pwm_ptr)                      \
+        {                                                                          \
+            VSF_HAL_ASSERT(pwm_ptr != NULL);                                       \
+            return vsf_remap_pwm_get_freq(pwm_ptr);                                \
+        }
+#endif
+
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #define VSF_HAL_TEMPLATE_IMP_NAME                   _pwm
@@ -144,11 +207,34 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 #   define VSF_PWM_CFG_IMP_COUNT_MASK_PREFIX        VSF_PWM_CFG_IMP_UPCASE_PREFIX
 #endif
 
+#ifdef VSF_PWM_CFG_IMP_REMAP_FUNCTIONS
+#   define VSF_HAL_CFG_IMP_REMAP_FUNCTIONS          VSF_PWM_CFG_IMP_REMAP_FUNCTIONS
+#endif
+
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_PWM_CFG_IMP_PREFIX
 #undef VSF_PWM_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_PWM_CFG_IMP_UPCASE_PREFIX
 #undef VSF_PWM_CFG_IMP_LV0
+#undef VSF_PWM_CFG_IMP_REMAP_FUNCTIONS
+
+#undef vsf_imp_pwm_t
+#undef vsf_imp_pwm_init
+#undef vsf_imp_pwm_fini
+#undef vsf_imp_pwm_enable
+#undef vsf_imp_pwm_disable
+#undef vsf_imp_pwm_capability
+#undef vsf_imp_pwm_set
+#undef vsf_imp_pwm_get_freq
+
+#undef vsf_remap_pwm_t
+#undef vsf_remap_pwm_init
+#undef vsf_remap_pwm_fini
+#undef vsf_remap_pwm_enable
+#undef vsf_remap_pwm_disable
+#undef vsf_remap_pwm_capability
+#undef vsf_remap_pwm_set
+#undef vsf_remap_pwm_get_freq
 
 #endif  /* VSF_HAL_USE_PWM */

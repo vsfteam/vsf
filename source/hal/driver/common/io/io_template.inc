@@ -66,6 +66,41 @@ vsf_io_capability_t vsf_real_io_capability(vsf_real_io_t *io_ptr)
 #undef vsf_real_io_t
 #undef vsf_real_io_capability
 
+/*============================ MACROS ========================================*/
+
+#ifdef VSF_IO_CFG_IMP_REMAP_PREFIX
+
+#   define vsf_imp_io_t                 VSF_MCONNECT(VSF_IO_CFG_IMP_PREFIX, _io_t)
+#   define vsf_imp_io_config_one_pin    VSF_MCONNECT(VSF_IO_CFG_IMP_PREFIX, _io_config_one_pin)
+#   define vsf_imp_io_config            VSF_MCONNECT(VSF_IO_CFG_IMP_PREFIX, _io_config)
+#   define vsf_imp_io_capability        VSF_MCONNECT(VSF_IO_CFG_IMP_PREFIX, _io_capability)
+
+#   define vsf_remap_io_t               VSF_MCONNECT(VSF_IO_CFG_IMP_REMAP_PREFIX, _io_t)
+#   define vsf_remap_io_config_one_pin  VSF_MCONNECT(VSF_IO_CFG_IMP_REMAP_PREFIX, _io_config_one_pin)
+#   define vsf_remap_io_config          VSF_MCONNECT(VSF_IO_CFG_IMP_REMAP_PREFIX, _io_config)
+#   define vsf_remap_io_capability      VSF_MCONNECT(VSF_IO_CFG_IMP_REMAP_PREFIX, _io_capability)
+
+#   define VSF_IO_CFG_IMP_REMAP_FUNCTIONS                                                                               \
+        vsf_err_t vsf_imp_io_config_one_pin(vsf_imp_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr)                  \
+        {                                                                                                 \
+            VSF_HAL_ASSERT(io_ptr != NULL);                                                               \
+            VSF_HAL_ASSERT(cfg_ptr != NULL);                                                              \
+            return vsf_remap_io_config_one_pin(io_ptr, cfg_ptr);                                          \
+        }                                                                                                 \
+        vsf_err_t vsf_imp_io_config(vsf_imp_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr, uint_fast8_t count)      \
+        {                                                                                                 \
+            VSF_HAL_ASSERT(io_ptr != NULL);                                                               \
+            VSF_HAL_ASSERT(cfg_ptr != NULL);                                                              \
+            VSF_HAL_ASSERT(count != 0);                                                                   \
+            return vsf_remap_io_config(io_ptr, cfg_ptr, count);                                           \
+        }                                                                                                 \
+        vsf_io_capability_t vsf_imp_io_capability(vsf_imp_io_t *io_ptr)                                   \
+        {                                                                                                 \
+            VSF_HAL_ASSERT(io_ptr != NULL);                                                               \
+            return vsf_remap_io_capability(io_ptr);                                                       \
+        }
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #define VSF_HAL_TEMPLATE_IMP_NAME                   _io
@@ -83,6 +118,10 @@ vsf_io_capability_t vsf_real_io_capability(vsf_real_io_t *io_ptr)
 #   define VSF_IO_CFG_IMP_COUNT_MASK_PREFIX         VSF_IO_CFG_IMP_UPCASE_PREFIX
 #endif
 
+#ifdef VSF_IO_CFG_IMP_REMAP_FUNCTIONS
+#   define VSF_HAL_CFG_IMP_REMAP_FUNCTIONS          VSF_IO_CFG_IMP_REMAP_FUNCTIONS
+#endif
+
 #define VSF_HAL_TEMPLATE_IMP_REMOVE_ARRAY
 #define VSF_HAL_TEMPLATE_IMP_DEFINED_COUNT          1
 #define VSF_HAL_TEMPLATE_IMP_DEFINED_MASK           1
@@ -93,5 +132,16 @@ vsf_io_capability_t vsf_real_io_capability(vsf_real_io_t *io_ptr)
 #undef VSF_IO_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_IO_CFG_IMP_UPCASE_PREFIX
 #undef VSF_IO_CFG_IMP_LV0
+#undef VSF_IO_CFG_IMP_REMAP_FUNCTIONS
+
+#undef vsf_imp_io_t
+#undef vsf_imp_io_config_one_pin
+#undef vsf_imp_io_config
+#undef vsf_imp_io_capability
+
+#undef vsf_remap_io_t
+#undef vsf_remap_io_config_one_pin
+#undef vsf_remap_io_config
+#undef vsf_remap_io_capability
 
 #endif  /* VSF_HAL_USE_IO */

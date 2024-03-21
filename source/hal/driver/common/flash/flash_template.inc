@@ -225,6 +225,127 @@ vsf_flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
 #undef vsf_real_flash_read_multi_sector
 #undef vsf_real_flash_capability
 
+/*============================ MACROS ========================================*/
+
+#ifdef VSF_DAC_CFG_IMP_REMAP_PREFIX
+#   define vsf_imp_flash_t                    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t)
+#   define vsf_imp_flash_init                 VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_init)
+#   define vsf_imp_flash_fini                 VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_fini)
+#   define vsf_imp_flash_enable               VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_enable)
+#   define vsf_imp_flash_disable              VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_disable)
+#   define vsf_imp_flash_capability           VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
+#   define vsf_imp_flash_status               VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_status)
+#   define vsf_imp_flash_irq_enable           VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_enable)
+#   define vsf_imp_flash_irq_disable          VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_disable)
+#   define vsf_imp_flash_erase_one_sector     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_one_sector)
+#   define vsf_imp_flash_erase_multi_sector   VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_multi_sector)
+#   define vsf_imp_flash_erase                VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_multi_sector)
+#   define vsf_imp_flash_erase_all            VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_all)
+#   define vsf_imp_flash_write_one_sector     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_one_sector)
+#   define vsf_imp_flash_write_multi_sector   VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)
+#   define vsf_imp_flash_write                VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)
+#   define vsf_imp_flash_read_one_sector      VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_one_sector)
+#   define vsf_imp_flash_read_multi_sector    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)
+#   define vsf_imp_flash_read                 VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)
+
+#   define vsf_remap_flash_t                  VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_t)
+#   define vsf_remap_flash_init               VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_init)
+#   define vsf_remap_flash_fini               VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_fini)
+#   define vsf_remap_flash_enable             VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_enable)
+#   define vsf_remap_flash_disable            VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_disable)
+#   define vsf_remap_flash_capability         VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_capability)
+#   define vsf_remap_flash_status             VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_status)
+#   define vsf_remap_flash_irq_enable         VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_irq_enable)
+#   define vsf_remap_flash_irq_disable        VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_irq_disable)
+#   define vsf_remap_flash_erase_one_sector   VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_erase_one_sector)
+#   define vsf_remap_flash_erase_multi_sector VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_erase_multi_sector)
+#   define vsf_remap_flash_erase              VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_erase_multi_sector)
+#   define vsf_remap_flash_erase_all          VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_erase_all)
+#   define vsf_remap_flash_write_one_sector   VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_write_one_sector)
+#   define vsf_remap_flash_write_multi_sector VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_write_multi_sector)
+#   define vsf_remap_flash_write              VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_write_multi_sector)
+#   define vsf_remap_flash_read_one_sector    VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_read_one_sector)
+#   define vsf_remap_flash_read_multi_sector  VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_read_multi_sector)
+#   define vsf_remap_flash_read               VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_read_multi_sector)
+
+#   define VSF_FLASH_CFG_IMP_REMAP_FUNCTIONS                                                                                              \
+        vsf_err_t vsf_imp_flash_init(vsf_imp_flash_t *flash_ptr, vsf_flash_cfg_t *cfg_ptr)                                                \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            return vsf_remap_flash_init((vsf_remap_flash_t *)flash_ptr, cfg_ptr);                                                         \
+        }                                                                                                                                 \
+        void vsf_imp_flash_fini(vsf_imp_flash_t *flash_ptr)                                                                               \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            vsf_remap_flash_fini((vsf_remap_flash_t *)flash_ptr);                                                                         \
+        }                                                                                                                                 \
+        fsm_rt_t vsf_imp_flash_enable(vsf_imp_flash_t *flash_ptr)                                                                         \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            return vsf_remap_flash_enable((vsf_remap_flash_t *)flash_ptr);                                                                \
+        }                                                                                                                                 \
+        fsm_rt_t vsf_imp_flash_disable(vsf_imp_flash_t *flash_ptr)                                                                        \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            return vsf_remap_flash_disable((vsf_remap_flash_t *)flash_ptr);                                                               \
+        }                                                                                                                                 \
+        void vsf_imp_flash_irq_enable(vsf_imp_flash_t *flash_ptr, vsf_flash_irq_mask_t irq_mask)                                          \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            vsf_remap_flash_irq_enable((vsf_remap_flash_t *)flash_ptr, irq_mask);                                                         \
+        }                                                                                                                                 \
+        void vsf_imp_flash_irq_disable(vsf_imp_flash_t *flash_ptr, vsf_flash_irq_mask_t irq_mask)                                         \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            vsf_remap_flash_irq_disable((vsf_remap_flash_t *)flash_ptr, irq_mask);                                                        \
+        }                                                                                                                                 \
+        vsf_flash_status_t vsf_imp_flash_status(vsf_imp_flash_t *flash_ptr)                                                               \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            return vsf_remap_flash_status((vsf_remap_flash_t *)flash_ptr);                                                                \
+        }                                                                                                                                 \
+        vsf_flash_capability_t vsf_imp_flash_capability(vsf_imp_flash_t *flash_ptr)                                                       \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            return vsf_remap_flash_capability((vsf_remap_flash_t *)flash_ptr);                                                            \
+        }                                                                                                                                 \
+        vsf_err_t vsf_imp_flash_erase_one_sector(vsf_imp_flash_t *flash_ptr, uint_fast32_t offset)                                        \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            return vsf_remap_flash_erase_one_sector((vsf_remap_flash_t *)flash_ptr, offset);                                              \
+        }                                                                                                                                 \
+        vsf_err_t vsf_imp_flash_erase_multi_sector(vsf_imp_flash_t *flash_ptr, uint_fast32_t offset, uint_fast32_t size)                  \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            return vsf_remap_flash_erase_multi_sector((vsf_remap_flash_t *)flash_ptr, offset, size);                                      \
+        }                                                                                                                                 \
+        vsf_err_t vsf_imp_flash_erase_all(vsf_imp_flash_t *flash_ptr)                                                                     \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            return vsf_remap_flash_erase_all((vsf_remap_flash_t *)flash_ptr);                                                             \
+        }                                                                                                                                 \
+        vsf_err_t vsf_imp_flash_write_one_sector(vsf_imp_flash_t *flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)   \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            return vsf_remap_flash_write_one_sector((vsf_remap_flash_t *)flash_ptr, offset, buffer, size);                                \
+        }                                                                                                                                 \
+        vsf_err_t vsf_imp_flash_write_multi_sector(vsf_imp_flash_t *flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size) \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            return vsf_remap_flash_write_multi_sector((vsf_remap_flash_t *)flash_ptr, offset, buffer, size);                              \
+        }                                                                                                                                 \
+        vsf_err_t vsf_imp_flash_read_one_sector(vsf_imp_flash_t *flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)    \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            return vsf_remap_flash_read_one_sector((vsf_remap_flash_t *)flash_ptr, offset, buffer, size);                                 \
+        }                                                                                                                                 \
+        vsf_err_t vsf_imp_flash_read_multi_sector(vsf_imp_flash_t *flash_ptr, uint_fast32_t offset, uint8_t* buffer, uint_fast32_t size)  \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            return vsf_remap_flash_read_multi_sector((vsf_remap_flash_t *)flash_ptr, offset, buffer, size);                               \
+        }
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #define VSF_HAL_TEMPLATE_IMP_NAME                   _flash
@@ -242,11 +363,56 @@ vsf_flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
 #   define VSF_FLASH_CFG_IMP_COUNT_MASK_PREFIX      VSF_FLASH_CFG_IMP_UPCASE_PREFIX
 #endif
 
+#ifdef VSF_FLASH_CFG_IMP_REMAP_FUNCTIONS
+#   define VSF_HAL_CFG_IMP_REMAP_FUNCTIONS          VSF_FLASH_CFG_IMP_REMAP_FUNCTIONS
+#endif
+
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_FLASH_CFG_IMP_PREFIX
 #undef VSF_FLASH_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_FLASH_CFG_IMP_UPCASE_PREFIX
 #undef VSF_FLASH_CFG_IMP_LV0
+#undef VSF_FLASH_CFG_IMP_REMAP_FUNCTIONS
+
+#undef vsf_imp_flash_t
+#undef vsf_imp_flash_init
+#undef vsf_imp_flash_fini
+#undef vsf_imp_flash_enable
+#undef vsf_imp_flash_disable
+#undef vsf_imp_flash_capability
+#undef vsf_imp_flash_status
+#undef vsf_imp_flash_irq_enable
+#undef vsf_imp_flash_irq_disable
+#undef vsf_imp_flash_erase_one_sector
+#undef vsf_imp_flash_erase_multi_sector
+#undef vsf_imp_flash_erase
+#undef vsf_imp_flash_erase_all
+#undef vsf_imp_flash_write_one_sector
+#undef vsf_imp_flash_write_multi_sector
+#undef vsf_imp_flash_write
+#undef vsf_imp_flash_read_one_sector
+#undef vsf_imp_flash_read_multi_sector
+#undef vsf_imp_flash_read
+
+#undef vsf_remap_flash_t
+#undef vsf_remap_flash_init
+#undef vsf_remap_flash_fini
+#undef vsf_remap_flash_enable
+#undef vsf_remap_flash_disable
+#undef vsf_remap_flash_capability
+#undef vsf_remap_flash_status
+#undef vsf_remap_flash_irq_enable
+#undef vsf_remap_flash_irq_disable
+#undef vsf_remap_flash_erase_one_sector
+#undef vsf_remap_flash_erase_multi_sector
+#undef vsf_remap_flash_erase
+#undef vsf_remap_flash_erase_all
+#undef vsf_remap_flash_write_one_sector
+#undef vsf_remap_flash_write_multi_sector
+#undef vsf_remap_flash_write
+#undef vsf_remap_flash_read_one_sector
+#undef vsf_remap_flash_read_multi_sector
+#undef vsf_remap_flash_read
 
 #endif  /* VSF_HAL_USE_FLASH */
