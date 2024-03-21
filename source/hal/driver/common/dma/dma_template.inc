@@ -69,8 +69,8 @@ vsf_dma_capability_t vsf_real_dma_capability(vsf_real_dma_t *dma_ptr)
 /*============================ MACROS ========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_HAL_TEMPLATE_IMP_NAME                     _dma
-#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _DMA
+#define VSF_HAL_TEMPLATE_IMP_NAME                   _dma
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _DMA
 
 #ifndef VSF_DMA_CFG_IMP_PREFIX
 #   error "Please define VSF_DMA_CFG_IMP_PREFIX in dma driver"
@@ -80,14 +80,14 @@ vsf_dma_capability_t vsf_real_dma_capability(vsf_real_dma_t *dma_ptr)
 #   error "Please define VSF_DMA_CFG_IMP_UPCASE_PREFIX in dma driver"
 #endif
 
-#ifndef VSF_DMA_CFG_IMP_INSTANCE_PREFIX
-#   define VSF_DMA_CFG_IMP_INSTANCE_PREFIX         VSF_DMA_CFG_IMP_PREFIX
+#ifndef VSF_DMA_CFG_IMP_COUNT_MASK_PREFIX
+#   define VSF_DMA_CFG_IMP_COUNT_MASK_PREFIX        VSF_DMA_CFG_IMP_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_DMA_CFG_IMP_PREFIX
-#undef VSF_DMA_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_DMA_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_DMA_CFG_IMP_UPCASE_PREFIX
 #undef VSF_DMA_CFG_IMP_LV0
 

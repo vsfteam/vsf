@@ -76,8 +76,8 @@ vsf_dac_capability_t vsf_real_dac_capability(vsf_real_dac_t *dac_ptr)
 /*============================ MACROS ========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_HAL_TEMPLATE_IMP_NAME                     _dac
-#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _DAC
+#define VSF_HAL_TEMPLATE_IMP_NAME                   _dac
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _DAC
 
 #ifndef VSF_DAC_CFG_IMP_PREFIX
 #   error "Please define VSF_DAC_CFG_IMP_PREFIX in dac driver"
@@ -87,14 +87,14 @@ vsf_dac_capability_t vsf_real_dac_capability(vsf_real_dac_t *dac_ptr)
 #   error "Please define VSF_DAC_CFG_IMP_UPCASE_PREFIX in dac driver"
 #endif
 
-#ifndef VSF_DAC_CFG_IMP_INSTANCE_PREFIX
-#   define VSF_DAC_CFG_IMP_INSTANCE_PREFIX         VSF_DAC_CFG_IMP_PREFIX
+#ifndef VSF_DAC_CFG_IMP_COUNT_MASK_PREFIX
+#   define VSF_DAC_CFG_IMP_COUNT_MASK_PREFIX        VSF_DAC_CFG_IMP_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_DAC_CFG_IMP_PREFIX
-#undef VSF_DAC_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_DAC_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_DAC_CFG_IMP_UPCASE_PREFIX
 #undef VSF_DAC_CFG_IMP_LV0
 

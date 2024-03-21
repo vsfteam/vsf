@@ -68,8 +68,8 @@ vsf_io_capability_t vsf_real_io_capability(vsf_real_io_t *io_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_HAL_TEMPLATE_IMP_NAME                     _io
-#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _IO
+#define VSF_HAL_TEMPLATE_IMP_NAME                   _io
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _IO
 
 #ifndef VSF_IO_CFG_IMP_PREFIX
 #   error "Please define VSF_IO_CFG_IMP_PREFIX in io driver"
@@ -79,8 +79,8 @@ vsf_io_capability_t vsf_real_io_capability(vsf_real_io_t *io_ptr)
 #   error "Please define VSF_IO_CFG_IMP_UPCASE_PREFIX in io driver"
 #endif
 
-#ifndef VSF_IO_CFG_IMP_INSTANCE_PREFIX
-#   define VSF_IO_CFG_IMP_INSTANCE_PREFIX         VSF_IO_CFG_IMP_PREFIX
+#ifndef VSF_IO_CFG_IMP_COUNT_MASK_PREFIX
+#   define VSF_IO_CFG_IMP_COUNT_MASK_PREFIX         VSF_IO_CFG_IMP_UPCASE_PREFIX
 #endif
 
 #define VSF_HAL_TEMPLATE_IMP_REMOVE_ARRAY
@@ -90,7 +90,7 @@ vsf_io_capability_t vsf_real_io_capability(vsf_real_io_t *io_ptr)
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_IO_CFG_IMP_PREFIX
-#undef VSF_IO_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_IO_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_IO_CFG_IMP_UPCASE_PREFIX
 #undef VSF_IO_CFG_IMP_LV0
 

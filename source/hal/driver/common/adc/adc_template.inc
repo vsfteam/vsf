@@ -70,8 +70,8 @@ vsf_adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
 /*============================ MACROS ========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_HAL_TEMPLATE_IMP_NAME                     _adc
-#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _ADC
+#define VSF_HAL_TEMPLATE_IMP_NAME                   _adc
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _ADC
 
 #ifndef VSF_ADC_CFG_IMP_PREFIX
 #   error "Please define VSF_ADC_CFG_IMP_PREFIX in adc driver"
@@ -81,14 +81,14 @@ vsf_adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
 #   error "Please define VSF_ADC_CFG_IMP_UPCASE_PREFIX in adc driver"
 #endif
 
-#ifndef VSF_ADC_CFG_IMP_INSTANCE_PREFIX
-#   define VSF_ADC_CFG_IMP_INSTANCE_PREFIX         VSF_ADC_CFG_IMP_PREFIX
+#ifndef VSF_ADC_CFG_IMP_COUNT_MASK_PREFIX
+#   define VSF_ADC_CFG_IMP_COUNT_MASK_PREFIX        VSF_ADC_CFG_IMP_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_ADC_CFG_IMP_PREFIX
-#undef VSF_ADC_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_ADC_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_ADC_CFG_IMP_UPCASE_PREFIX
 #undef VSF_ADC_CFG_IMP_LV0
 

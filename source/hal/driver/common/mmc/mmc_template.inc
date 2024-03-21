@@ -64,8 +64,8 @@ vsf_mmc_capability_t vsf_real_mmc_capability(vsf_real_mmc_t *mmc_ptr)
 /*============================ IMPLEMENTATION ================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_HAL_TEMPLATE_IMP_NAME                     _mmc
-#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _MMC
+#define VSF_HAL_TEMPLATE_IMP_NAME                   _mmc
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _MMC
 
 #ifndef VSF_MMC_CFG_IMP_PREFIX
 #   error "Please define VSF_MMC_CFG_IMP_PREFIX in mmc driver"
@@ -75,14 +75,14 @@ vsf_mmc_capability_t vsf_real_mmc_capability(vsf_real_mmc_t *mmc_ptr)
 #   error "Please define VSF_MMC_CFG_IMP_UPCASE_PREFIX in mmc driver"
 #endif
 
-#ifndef VSF_MMC_CFG_IMP_INSTANCE_PREFIX
-#   define VSF_MMC_CFG_IMP_INSTANCE_PREFIX         VSF_MMC_CFG_IMP_PREFIX
+#ifndef VSF_MMC_CFG_IMP_COUNT_MASK_PREFIX
+#   define VSF_MMC_CFG_IMP_COUNT_MASK_PREFIX        VSF_MMC_CFG_IMP_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_MMC_CFG_IMP_PREFIX
-#undef VSF_MMC_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_MMC_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_MMC_CFG_IMP_UPCASE_PREFIX
 #undef VSF_MMC_CFG_IMP_LV0
 

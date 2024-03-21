@@ -77,8 +77,8 @@ vsf_spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
 /*============================ IMPLEMENTATION ================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_HAL_TEMPLATE_IMP_NAME                     _spi
-#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _SPI
+#define VSF_HAL_TEMPLATE_IMP_NAME                   _spi
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _SPI
 
 #ifndef VSF_SPI_CFG_IMP_PREFIX
 #   error "Please define VSF_SPI_CFG_IMP_PREFIX in spi driver"
@@ -88,14 +88,14 @@ vsf_spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
 #   error "Please define VSF_SPI_CFG_IMP_UPCASE_PREFIX in spi driver"
 #endif
 
-#ifndef VSF_SPI_CFG_IMP_INSTANCE_PREFIX
-#   define VSF_SPI_CFG_IMP_INSTANCE_PREFIX         VSF_SPI_CFG_IMP_PREFIX
+#ifndef VSF_SPI_CFG_IMP_COUNT_MASK_PREFIX
+#   define VSF_SPI_CFG_IMP_COUNT_MASK_PREFIX        VSF_SPI_CFG_IMP_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_SPI_CFG_IMP_PREFIX
-#undef VSF_SPI_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_SPI_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_SPI_CFG_IMP_UPCASE_PREFIX
 #undef VSF_SPI_CFG_IMP_LV0
 

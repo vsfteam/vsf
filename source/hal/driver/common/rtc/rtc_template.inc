@@ -178,8 +178,8 @@ vsf_rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_HAL_TEMPLATE_IMP_NAME                     _rtc
-#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME              _RTC
+#define VSF_HAL_TEMPLATE_IMP_NAME                   _rtc
+#define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _RTC
 
 #ifndef VSF_RTC_CFG_IMP_PREFIX
 #   error "Please define VSF_RTC_CFG_IMP_PREFIX in rtc driver"
@@ -189,14 +189,14 @@ vsf_rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
 #   error "Please define VSF_RTC_CFG_IMP_UPCASE_PREFIX in rtc driver"
 #endif
 
-#ifndef VSF_RTC_CFG_IMP_INSTANCE_PREFIX
-#   define VSF_RTC_CFG_IMP_INSTANCE_PREFIX         VSF_RTC_CFG_IMP_PREFIX
+#ifndef VSF_RTC_CFG_IMP_COUNT_MASK_PREFIX
+#   define VSF_RTC_CFG_IMP_COUNT_MASK_PREFIX        VSF_RTC_CFG_IMP_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_instance_implementation.h"
 
 #undef VSF_RTC_CFG_IMP_PREFIX
-#undef VSF_RTC_CFG_IMP_INSTANCE_PREFIX
+#undef VSF_RTC_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_RTC_CFG_IMP_UPCASE_PREFIX
 #undef VSF_RTC_CFG_IMP_LV0
 

@@ -622,6 +622,10 @@ static inline uint8_t vsf_usart_mode_to_data_bits(vsf_usart_mode_t mode)
 #   define vsf_usart_get_tx_count(__USART)               VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_tx_count)          ((__vsf_usart_t *)__USART)
 #endif
 
+/*============================ INCLUDES ======================================*/
+
+#include "hal/driver/common/usart/fifo2req_usart.h"
+
 #ifdef __cplusplus
 }
 #endif

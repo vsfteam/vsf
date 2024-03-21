@@ -97,10 +97,6 @@ vsf_class(vsf_mrequest_i2c_t) {
 #define VSF_I2C_CFG_DEC_EXTERN_OP           ENABLED
 #include "hal/driver/common/i2c/i2c_template.h"
 
-#ifdef VSF_I2C_CFG_DEC_EXTERN_OP
-#error "xxxx
-#endif
-
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
