@@ -3,7 +3,21 @@
 
 #include <string.h>
 #include <wchar.h>
+
+// memroy depends on _MSC_VER on WIN platform
+#undef __WIN_STRING_DEF_MSC_VER
+#if defined(__WIN__) && !defined(_MSC_VER)
+#   define _MSC_VER    1926
+#   define __WIN_STRING_DEF_MSC_VER
+#endif
+
 #include <memory>
+
+#ifdef __WIN_STRING_DEF_MSC_VER
+#   undef __WIN_STRING_DEF_MSC_VER
+#   undef _MSC_VER
+#endif
+
 #include <iosfwd>
 
 namespace std {
