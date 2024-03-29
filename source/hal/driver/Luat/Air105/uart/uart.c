@@ -284,6 +284,7 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
 
 #define VSF_USART_CFG_IMP_PREFIX                    __vsf_hw
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX             __VSF_HW
+#define VSF_USART_CFG_IMP_COUNT_MASK_PREFIX         VSF_HW
 #define VSF_USART_CFG_IMP_FIFO_TO_REQUEST           ENABLED
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     static const vsf_hw_usart_const_t __vsf_hw_usart ## __IDX ## _clock = {     \
@@ -305,10 +306,10 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
 
 #define VSF_USART_CFG_IMP_PREFIX                vsf_hw
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX         vsf_hw
-#define VSF_FIFO2REQ_USART_COUNT                VSF_HW_USART_COUNT
-#define VSF_FIFO2REQ_USART_MASK                 VSF_HW_USART_MASK
+#define VSF_USART_CFG_IMP_REMAP_PREFIX          vsf_fifo2req
 #define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                \
-    describe_fifo2req_usart(vsf_hw_usart ## __COUNT, __vsf_hw_usart ## __COUNT)
+    describe_fifo2req_usart(VSF_USART_CFG_IMP_PREFIX,                           \
+                            vsf_hw_usart ## __COUNT, __vsf_hw_usart ## __COUNT)
 #include "hal/driver/common/usart/usart_template.inc"
 
 #endif      // VSF_HAL_USE_USART
