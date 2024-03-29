@@ -50,9 +50,8 @@
 
 #   define VSF_USART_CFG_DEC_PREFIX                         vsf_hw
 #   define VSF_USART_CFG_DEC_UPCASE_PREFIX                  VSF_HW
-#   define VSF_FIFO2REQ_USART_COUNT                         VSF_HW_USART_COUNT
-#   define VSF_FIFO2REQ_USART_MASK                          VSF_HW_USART_MASK
-#   include "hal/driver/common/usart/fifo2req_usart.h"
+#   define VSF_USART_CFG_DEC_REMAP_PREFIX                   vsf_fifo2req
+#   include "hal/driver/common/usart/usart_template.h"
 #endif
 
 #   endif   // __HAL_DRIVER_LUAT_AIR05_H__
