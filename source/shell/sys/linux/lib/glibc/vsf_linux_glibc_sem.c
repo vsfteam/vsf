@@ -132,9 +132,18 @@ int sem_close(sem_t *sem)
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout)
 {
-    int_fast32_t timeout_us = abs_timeout->tv_sec * 1000000 + abs_timeout->tv_nsec / 1000;
-    if (vsf_eda_sem_pend(sem, vsf_systimer_us_to_tick(timeout_us))) {
-        return __sync_pend(sem);
+    struct timespec now;
+    clock_gettime(CLOCK_REALTIME, &now);
+    vsf_systimer_tick_t now_us = now.tv_sec * 1000000 + now.tv_nsec / 1000;
+    vsf_systimer_tick_t timeout_us = abs_timeout->tv_sec * 1000000 + abs_timeout->tv_nsec / 1000;
+    vsf_systimer_tick_t diff_tick = vsf_systimer_us_to_tick(now_us > timeout_us ? 0 : timeout_us - now_us);
+
+    if (vsf_eda_sem_pend(sem, diff_tick)) {
+        if (diff_tick != 0) {
+            return __sync_pend(sem);
+        } else {
+            return -ETIMEDOUT;
+        }
     }
     return 0;
 }
