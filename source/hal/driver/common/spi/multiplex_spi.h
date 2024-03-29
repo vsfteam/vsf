@@ -34,10 +34,6 @@
 
 #include "utilities/ooc_class.h"
 
-#define VSF_SPI_CFG_DEC_PREFIX              vsf_multiplex
-#define VSF_SPI_CFG_DEC_UPCASE_PREFIX       VSF_MULTIPLEX
-#include "hal/driver/common/spi/spi_template.h"
-
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_MULTIPLEXER_SPI_CFG_MASK_TYPE
@@ -98,6 +94,11 @@ vsf_class(vsf_multiplex_spi_t) {
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+#define VSF_SPI_CFG_DEC_PREFIX              vsf_multiplex
+#define VSF_SPI_CFG_DEC_UPCASE_PREFIX       VSF_MULTIPLEX
+#include "hal/driver/common/spi/spi_template.h"
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
