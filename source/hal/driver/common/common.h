@@ -32,16 +32,19 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ INCLUDES ======================================*/
 
-#include "adc/adc_interface.h"
-#include "flash/flash_interface.h"
-#include "spi/spi_interface.h"
-#include "usart/usart_interface.h"
+#include "hal/driver/common/adc/adc_interface.h"
+#include "hal/driver/common/flash/flash_interface.h"
+#include "hal/driver/common/spi/spi_interface.h"
+#include "hal/driver/common/usart/usart_interface.h"
 
-#include "i2c/multiplex_i2c.h"
-#include "i2c/mrequest_i2c.h"
-#include "spi/multiplex_spi.h"
-#include "spi/fifo2req_spi.h"
-#include "usart/fifo2req_usart.h"
+#include "hal/driver/common/i2c/i2c_request.h"
+#include "hal/driver/common/i2c/mrequest_i2c.h"
+#include "hal/driver/common/i2c/multiplex_i2c.h"
+
+#include "hal/driver/common/spi/multiplex_spi.h"
+#include "hal/driver/common/spi/fifo2req_spi.h"
+
+#include "hal/driver/common/usart/fifo2req_usart.h"
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
