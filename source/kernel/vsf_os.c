@@ -554,8 +554,27 @@ void vsf_cpu_usage_stop(void)
 VSF_CAL_WEAK(vsf_plug_in_on_kernel_idle)
 void vsf_plug_in_on_kernel_idle(void)
 {
-#ifdef VSF_DEBUG_STREAM_NEED_POLL
+#if     defined(VSF_DEBUG_STREAM_NEED_POLL)
     VSF_DEBUG_STREAM_POLL();
+#   ifdef VSF_HAL_POLL
+#       ifdef VSF_HAL_NEED_POLL
+    if (VSF_HAL_NEED_POLL()) {
+        VSF_HAL_POLL();
+    }
+#       else
+    VSF_HAL_POLL();
+#       endif
+#   endif
+#elif   defined(VSF_HAL_POLL)
+#   ifdef VSF_HAL_NEED_POLL
+    if (VSF_HAL_NEED_POLL()) {
+        VSF_HAL_POLL();
+    } else {
+        vsf_sleep();
+    }
+#   else
+    VSF_HAL_POLL();
+#   endif
 #else
     vsf_sleep();
 #endif
