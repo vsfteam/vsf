@@ -36,23 +36,9 @@ extern int free_main(int argc, char *argv[]);
 
 extern int vsf_linux_init_main(int argc, char *argv[]);
 
-#ifndef WEAK_VSF_LINUX_INIT_MAIN
-#if __IS_COMPILER_GCC__
-#   pragma GCC diagnostic push
-#   pragma GCC diagnostic ignored "-Wcast-align"
-#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
-#   pragma clang diagnostic push
-#   pragma clang diagnostic ignored "-Wcast-align"
-#endif
 VSF_CAL_WEAK(vsf_linux_init_main)
 int vsf_linux_init_main(int argc, char *argv[])
 {
-#ifndef VSF_LINUX_CFG_PATH
-#   define VSF_LINUX_CFG_PATH               VSF_LINUX_CFG_BIN_PATH
-#endif
-    // GCC: -Wcast-align
-    vsh_set_path((char **)VSF_LINUX_CFG_PATH);
-
     // run init scripts first
 #ifdef VSF_LINUX_CFG_INIT_SCRIPTS
     static const char * __init_scripts[] = {
@@ -83,17 +69,19 @@ int vsf_linux_init_main(int argc, char *argv[])
 
     return vsh_main(argc, argv);
 }
-#if __IS_COMPILER_GCC__
-#   pragma GCC diagnostic pop
-#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
-#   pragma clang diagnostic pop
-#endif
-#endif
 
 int busybox_bind(char *path, vsf_linux_main_entry_t entry)
 {
     return vsf_linux_fs_bind_executable(path, entry);
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wcast-align"
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wcast-align"
+#endif
 
 int busybox_install(void)
 {
@@ -124,8 +112,20 @@ int busybox_install(void)
         return -1;
     }
 #endif
+
+#ifndef VSF_LINUX_CFG_PATH
+#   define VSF_LINUX_CFG_PATH               VSF_LINUX_CFG_BIN_PATH
+#endif
+    // GCC: -Wcast-align
+    vsh_set_path((char **)VSF_LINUX_CFG_PATH);
     return 0;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#elif   __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
+#   pragma clang diagnostic pop
+#endif
 
 #endif
 
