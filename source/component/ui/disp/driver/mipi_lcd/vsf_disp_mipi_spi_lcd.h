@@ -233,7 +233,7 @@ extern "C" {
     MIPI_DCS_CMD_SET_ADDRESS_MODE(__MODE),                                      \
     MIPI_DCS_CMD_SET_PIXEL_FORMAT(__PIXEL_FORMAT),                              \
     MIPI_DCS_CMD_SET_DISPLAY_ON,                                                \
-    __VA_ARGS__
+    ##__VA_ARGS__
 
 #define VSF_DISP_MIPI_SPI_LCD_ST7796S_BASE                                      \
     VSF_DISP_MIPI_LCD_WRITE(0xF0,  1, 0xC3), /* Command Set Control, C3h enable command 2 part I */ \
