@@ -18,6 +18,17 @@
 #ifndef __VSF_74HC165_GPIO_H__
 #define __VSF_74HC165_GPIO_H__
 
+/* connection:
+    control api     <==>    signal(pin) <==>    signal(pin) shared with 74HC595
+    ce_control      <==>    nCE(15)
+    load_control    <==>    nPL(1)      <==>    ST_CP(12)
+    clock_control   <==>    CP(2)       <==>    SH_CP(11)
+    serial_input    <==>    Q7(9)
+
+   note:
+    nCE is optional, can be connect to GND directly, set ce_control to NULL in this case.
+ */
+
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
@@ -36,16 +47,28 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_74HC165_GPIO_CFG_MULTI_CLASS
+#   define VSF_74HC165_GPIO_CFG_MULTI_CLASS VSF_GPIO_CFG_MULTI_CLASS
+#endif
+
+#if VSF_74HC165_GPIO_CFG_MULTI_CLASS == ENABLED
+#   define __VSF_74HC165_GPIO_HALOP         .vsf_gpio.op = &vsf_74hc165_gpio_op,
+#else
+#   define __VSF_74HC165_GPIO_HALOP
+#endif
+
 #define __VSF_74HC165_GPIO_INIT(__CASCADE_NUM, __OP, __PARAM)                   \
-            .op                 = (vsf_74hc165_gpio_op_t *)(__OP),              \
+            __VSF_74HC165_GPIO_HALOP                                            \
+            .op                 = (vsf_74hc165_op_t *)(__OP),                   \
             .param              = (__PARAM),                                    \
             .cascade_num        = (__CASCADE_NUM),
 #define VSF_74HC165_GPIO_INIT(__CASCADE_NUM, __OP, __PARAM)                     \
             __VSF_74HC165_GPIO_INIT((__CASCADE_NUM), (__OP), (__PARAM))
 
-#define __describe_74hc165_gpio(__name, __cascade_num, __param, __load_control, \
-                                __clock_control, __serial_input)                \
-            static const vsf_74hc165_gpio_op_t VSF_MCONNECT3(__, __name, _op) = {\
+#define __describe_74hc165_gpio(__name, __cascade_num, __param, __ce_control,   \
+                __load_control, __clock_control, __serial_input)                \
+            static const vsf_74hc165_op_t VSF_MCONNECT3(__, __name, _op) = {    \
+                .ce_control     = (__ce_control),                               \
                 .load_control   = (__load_control),                             \
                 .clock_control  = (__clock_control),                            \
                 .serial_input   = (__serial_input),                             \
@@ -55,33 +78,42 @@ extern "C" {
                                 &VSF_MCONNECT3(__, __name, _op), (__param))     \
             };
 
-#define describe_74hc165_gpio(__name, __cascade_num, __param, __load_control,   \
-                                __clock_control, __serial_input)                \
+#define describe_74hc165_gpio(__name, __cascade_num, __param, __ce_control,     \
+                __load_control, __clock_control, __serial_input)                \
             __describe_74hc165_gpio(__name, (__cascade_num), (__param),         \
-                                (__load_control), (__clock_control), (__serial_input))
+                (__ce_control), (__load_control), (__clock_control), (__serial_input))
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef struct vsf_74hc165_gpio_op_t {
+typedef struct vsf_74hc165_op_t {
     void (*ce_control)(void *param, uint_fast8_t bit);
     void (*load_control)(void *param, uint_fast8_t bit);
     void (*clock_control)(void *param, uint_fast8_t bit);
     uint_fast8_t (*serial_input)(void *param);
-} vsf_74hc165_gpio_op_t;
+} vsf_74hc165_op_t;
 
 vsf_class(vsf_74hc165_gpio_t) {
     public_member(
-        vsf_74hc165_gpio_op_t *op;
+#if VSF_74HC165_GPIO_CFG_MULTI_CLASS == ENABLED
+        vsf_gpio_t vsf_gpio;
+#endif
+        vsf_74hc165_op_t *op;
         void *param;
         uint8_t cascade_num;
     )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+#if VSF_74HC165_GPIO_CFG_MULTI_CLASS == ENABLED
+extern const vsf_gpio_op_t vsf_74hc165_gpio_op;
+#endif
+
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
+extern void vsf_74hc165_gpio_init(vsf_74hc165_gpio_t *gpio_ptr);
 extern void vsf_74hc165_gpio_config_pin(vsf_74hc165_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, uint_fast32_t feature);
 extern void vsf_74hc165_gpio_set_direction(vsf_74hc165_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask);
 extern vsf_gpio_pin_mask_t vsf_74hc165_gpio_get_direction(vsf_74hc165_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);

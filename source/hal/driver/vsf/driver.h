@@ -30,6 +30,10 @@
 #   include "./gpio/74hc165/vsf_gpio_74hc165.h"
 #endif
 
+#if VSF_HAL_GPIO_USE_74HC595 == ENABLED
+#   include "./gpio/74hc595/vsf_gpio_74hc595.h"
+#endif
+
 #if VSF_HAL_USE_GPIO_I2C == ENABLED
 #   include "./i2c/gpio_i2c/vsf_gpio_i2c.h"
 #endif
