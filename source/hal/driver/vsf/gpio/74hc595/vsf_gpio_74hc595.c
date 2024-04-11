@@ -63,16 +63,18 @@ void vsf_74hc595_gpio_config_pin(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask
 
 void vsf_74hc595_gpio_set_direction(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)
 {
+    vsf_gpio_pin_mask_t allmask = (1ULL << (8 * gpio_ptr->cascade_num)) - 1;
+    VSF_UNUSED_PARAM(allmask);
     VSF_HAL_ASSERT(gpio_ptr != NULL);
-    VSF_HAL_ASSERT(pin_mask == (((vsf_gpio_pin_mask_t)1 << (8 * gpio_ptr->cascade_num)) - 1));
-    VSF_HAL_ASSERT((0 == direction_mask) || (pin_mask == direction_mask));
+    VSF_HAL_ASSERT( (((direction_mask & pin_mask) == 0)         && (!gpio_ptr->output || (pin_mask == allmask)))
+                ||  (((direction_mask & pin_mask) == pin_mask)  && (gpio_ptr->output || (pin_mask == allmask))));
 
-    if (0 == direction_mask) {
+    if ((direction_mask & pin_mask) == 0) {
         gpio_ptr->op->oe_control(gpio_ptr->param, 1);
-        gpio_ptr->output = 0;
-    } else {
+        gpio_ptr->output = false;
+    } else if (!gpio_ptr->output) {
         gpio_ptr->op->oe_control(gpio_ptr->param, 0);
-        gpio_ptr->output = 1;
+        gpio_ptr->output = true;
     }
 }
 
