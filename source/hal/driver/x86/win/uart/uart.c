@@ -104,6 +104,7 @@ typedef struct vsf_win_usart_port_t {
 
 /*============================ INCLUDES ======================================*/
 
+#define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
 #define VSF_USART_CFG_IMP_PREFIX                    vsf_win
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_WIN
 #define VSF_USART_CFG_IMP_FIFO_TO_REQUEST           ENABLED
@@ -114,6 +115,7 @@ typedef struct vsf_win_usart_port_t {
     };
 #include "hal/driver/common/usart/usart_template.inc"
 
+#define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
 #define VSF_USART_CFG_IMP_PREFIX                    vsf_hw
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_HW
 #define VSF_USART_CFG_IMP_COUNT_MASK_PREFIX         VSF_WIN
