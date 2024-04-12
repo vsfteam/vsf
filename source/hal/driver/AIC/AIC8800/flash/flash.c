@@ -213,6 +213,7 @@ vsf_flash_capability_t vsf_hw_flash_capability(vsf_hw_flash_t *hw_flash_ptr)
 /*============================ INCLUDES ======================================*/
 
 // only define in source file
+#define VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
 #define VSF_FLASH_CFG_ERASE_ALL_TEMPLATE            ENABLED
 #define VSF_FLASH_CFG_ERASE_ONE_SECTOR_TEMPLATE     ENABLED
 #define VSF_FLASH_CFG_WRITE_ONE_SECTOR_TEMPLATE     ENABLED

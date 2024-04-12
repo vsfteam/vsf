@@ -34,6 +34,9 @@
 #   define VSF_HW_PWM_CFG_MULTI_CLASS           VSF_PWM_CFG_MULTI_CLASS
 #endif
 
+
+#define AIC_PWM_CLOCK                   (32 * 1000)
+
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_aic_pwm_const_t {
@@ -132,6 +135,8 @@ uint32_t vsf_aic_pwm_get_freq(vsf_aic_pwm_t *hw_pwm_ptr)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define VSF_PWM_CFG_CAPABILITY_MAX_FREQ         AIC_PWM_CLOCK
+#define VSF_PWM_CFG_CAPABILITY_MIN_FREQ         (AIC_PWM_CLOCK / 256)
 #define VSF_PWM_CFG_IMP_PREFIX                  vsf_aic
 #define VSF_PWM_CFG_IMP_UPCASE_PREFIX           VSF_AIC
 #define VSF_PWM_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \

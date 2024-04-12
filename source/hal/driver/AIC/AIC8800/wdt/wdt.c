@@ -158,6 +158,7 @@ void __vsf_hw_wdt_irq_handler(vsf_hw_wdt_t *wdt_ptr)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
 #define VSF_WDT_CFG_IMP_PREFIX                      vsf_hw
 #define VSF_WDT_CFG_IMP_UPCASE_PREFIX               VSF_HW
 #define VSF_WDT_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \

@@ -149,6 +149,7 @@ vsf_io_capability_t vsf_hw_io_capability(vsf_hw_io_t *io)
 
 /*============================ INCLUDES ======================================*/
 
+#define VSF_IO_CFG_REIMPLEMENT_API_CAPABILITY ENABLED
 #define VSF_IO_CFG_IMP_PREFIX                 vsf_hw
 #define VSF_IO_CFG_IMP_UPCASE_PREFIX          VSF_HW
 #define __VSF_HW_IOMUX(__IDX, __)                                               \

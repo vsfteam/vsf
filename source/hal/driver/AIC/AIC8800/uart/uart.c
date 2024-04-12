@@ -280,6 +280,7 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
 
 /*============================ INCLUDES ======================================*/
 
+#define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
 #define VSF_USART_CFG_IMP_INSTANCE_PREFIX           __vsf_hw
 #define VSF_USART_CFG_IMP_PREFIX                    vsf_hw
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_HW
@@ -304,11 +305,12 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
     }
 #include "hal/driver/common/usart/usart_template.inc"
 
-#define VSF_USART_CFG_IMP_INSTANCE_PREFIX       vsf_hw
-#define VSF_USART_CFG_IMP_PREFIX                vsf_fifo2req
-#define VSF_USART_CFG_IMP_UPCASE_PREFIX         VSF_FIFO2REQ
-#define VSF_FIFO2REQ_USART_COUNT                VSF_HW_USART_COUNT
-#define VSF_FIFO2REQ_USART_MASK                 VSF_HW_USART_MASK
+#define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
+#define VSF_USART_CFG_IMP_INSTANCE_PREFIX           vsf_hw
+#define VSF_USART_CFG_IMP_PREFIX                    vsf_fifo2req
+#define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_FIFO2REQ
+#define VSF_FIFO2REQ_USART_COUNT                    VSF_HW_USART_COUNT
+#define VSF_FIFO2REQ_USART_MASK                     VSF_HW_USART_MASK
 #define VSF_USART_CFG_IMP_LV0(__COUNT, __HAL_OP)                                \
     describe_fifo2req_usart(vsf_hw_usart ## __COUNT, __vsf_hw_usart ## __COUNT)
 #include "hal/driver/common/usart/usart_template.inc"

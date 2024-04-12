@@ -792,6 +792,7 @@ vsf_i2s_status_t vsf_hw_i2s_status(vsf_hw_i2s_t *hw_i2s_ptr)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY  ENABLED
 #define VSF_I2S_CFG_IMP_PREFIX                  vsf_hw
 #define VSF_I2S_CFG_IMP_UPCASE_PREFIX           VSF_HW
 #define VSF_I2S_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \

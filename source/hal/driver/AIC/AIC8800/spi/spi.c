@@ -513,6 +513,7 @@ vsf_spi_capability_t vsf_hw_spi_capability(vsf_hw_spi_t *spi_ptr)
 
 /*============================ INCLUDES ======================================*/
 
+#define VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY  ENABLED
 #define VSF_SPI_CFG_IMP_PREFIX                  vsf_hw
 #define VSF_SPI_CFG_IMP_UPCASE_PREFIX           VSF_HW
 #define VSF_SPI_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
