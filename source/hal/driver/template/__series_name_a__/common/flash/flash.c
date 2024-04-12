@@ -52,7 +52,7 @@
 // HW end
 // IPCore
 #define VSF_FLASH_CFG_IMP_PREFIX                vsf_${flash_ip}
-#define VSF_FLASH_CFG_IMP_UPCASE_PREFIX         VSF_${flash_ip}
+#define VSF_FLASH_CFG_IMP_UPCASE_PREFIX         VSF_${FLASH_IP}
 // IPCore end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

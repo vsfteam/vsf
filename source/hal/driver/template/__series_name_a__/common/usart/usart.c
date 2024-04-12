@@ -52,7 +52,7 @@
 // HW end
 // IPCore
 #define VSF_USART_CFG_IMP_PREFIX                vsf_${USART_ip}
-#define VSF_USART_CFG_IMP_UPCASE_PREFIX         VSF_${USART_ip}
+#define VSF_USART_CFG_IMP_UPCASE_PREFIX         VSF_${USART_IP}
 // IPCore end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

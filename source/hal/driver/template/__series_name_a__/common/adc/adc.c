@@ -52,7 +52,7 @@
 // HW end
 // IPCore
 #define VSF_ADC_CFG_IMP_PREFIX                  vsf_${adc_ip}
-#define VSF_ADC_CFG_IMP_UPCASE_PREFIX           VSF_${adc_ip}
+#define VSF_ADC_CFG_IMP_UPCASE_PREFIX           VSF_${ADC_IP}
 // IPCore end
 
 /*============================ TYPES =========================================*/
@@ -209,4 +209,4 @@ static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_irqhandler)(
 #include "hal/driver/common/adc/adc_template.inc"
 // HW end
 
-#endif /* VSF_HAL_USE_AD */
+#endif /* VSF_HAL_USE_ADC */
