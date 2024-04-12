@@ -103,6 +103,7 @@ vsf_err_t vsf_hw_rtc_set(vsf_hw_rtc_t *hw_rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
 
 #define VSF_RTC_CFG_IMP_PREFIX              vsf_hw
 #define VSF_RTC_CFG_IMP_UPCASE_PREFIX       VSF_HW
+#define VSF_RTC_CFG_CAPABILITY_IRQ_MASK     0
 
 #define VSF_RTC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     vsf_hw_rtc_t vsf_hw_rtc ## __IDX = {                                        \

@@ -162,7 +162,7 @@ vsf_err_t vsf_real_rtc_set_time(vsf_real_rtc_t *rtc_ptr, vsf_rtc_time_t second, 
 vsf_rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
 {
     vsf_rtc_capability_t rtc_capability = {
-        .irq_mask = VSF_RTC_CFG_CAPABILITY_T_IRQ_MASK,
+        .irq_mask = VSF_RTC_CFG_CAPABILITY_IRQ_MASK,
     };
 
     return rtc_capability;
