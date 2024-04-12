@@ -52,7 +52,7 @@
 // HW end
 // IPCore
 #define VSF_I2C_CFG_IMP_PREFIX                  vsf_${i2c_ip}
-#define VSF_I2C_CFG_IMP_UPCASE_PREFIX           VSF_${i2c_ip}
+#define VSF_I2C_CFG_IMP_UPCASE_PREFIX           VSF_${I2C_IP}
 // IPCore end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
