@@ -254,6 +254,7 @@ vsf_i2c_capability_t vsf_gpio_i2c_capability(vsf_gpio_i2c_t *gpio_i2c_ptr)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
+#define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
 #include "hal/driver/common/i2c/i2c_template.inc"
 
 #endif
