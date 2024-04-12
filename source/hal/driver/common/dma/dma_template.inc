@@ -42,7 +42,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#if VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_dma_capability_t vsf_real_dma_capability(vsf_real_dma_t *dma_ptr)
 {
     vsf_dma_capability_t dma_capability = {

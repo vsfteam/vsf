@@ -34,7 +34,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_PM_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#if VSF_PM_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_pm_capability_t vsf_real_pm_capability(vsf_real_pm_t *pm_ptr)
 {
     vsf_pm_capability_t pm_capability = {

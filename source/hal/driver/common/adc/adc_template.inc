@@ -42,7 +42,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#if VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
 {
     vsf_adc_capability_t adc_capability = {

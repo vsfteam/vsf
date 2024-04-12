@@ -185,7 +185,7 @@ vsf_err_t vsf_real_flash_read_multi_sector(vsf_real_flash_t *real_flash_ptr, vsf
 }
 #endif
 
-#if VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#if VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
 {
     vsf_flash_capability_t flash_capability = {

@@ -47,7 +47,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#if VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_wdt_capability_t vsf_real_wdt_capability(vsf_real_wdt_t *wdt_ptr)
 {
     vsf_wdt_capability_t wdt_capability = {

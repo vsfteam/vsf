@@ -63,7 +63,7 @@ vsf_err_t vsf_real_i2c_master_request(vsf_real_i2c_t *i2c_ptr, uint16_t address,
 }
 #endif
 
-#if VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#if VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
 {
     vsf_i2c_capability_t i2c_capability = {

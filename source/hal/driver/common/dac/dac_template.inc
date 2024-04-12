@@ -46,7 +46,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#if VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_dac_capability_t vsf_real_dac_capability(vsf_real_dac_t *dac_ptr)
 {
     vsf_dac_capability_t dac_capability = {

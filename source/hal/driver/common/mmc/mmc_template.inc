@@ -39,7 +39,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#if VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_mmc_capability_t vsf_real_mmc_capability(vsf_real_mmc_t *mmc_ptr)
 {
     vsf_mmc_capability_t mmc_capability = {

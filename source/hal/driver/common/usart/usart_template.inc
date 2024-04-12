@@ -102,7 +102,7 @@ int_fast32_t vsf_real_usart_get_tx_count(vsf_real_usart_t *usart_ptr)
 
 #endif
 
-#if VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#if VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 {
     vsf_usart_capability_t usart_capability = {

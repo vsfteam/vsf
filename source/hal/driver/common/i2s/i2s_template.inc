@@ -39,7 +39,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#if VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_i2s_capability_t vsf_real_i2s_capability(vsf_real_i2s_t *i2s_ptr)
 {
     vsf_i2s_capability_t i2s_capability = {

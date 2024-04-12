@@ -61,7 +61,7 @@ vsf_err_t vsf_real_timer_pwm_set(vsf_real_timer_t *timer_ptr, uint8_t channel, u
 }
 #endif
 
-#if VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY == ENABLED
+#if VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_timer_capability_t vsf_real_timer_capability(vsf_real_timer_t *timer_ptr)
 {
     vsf_timer_capability_t timer_capability = {
