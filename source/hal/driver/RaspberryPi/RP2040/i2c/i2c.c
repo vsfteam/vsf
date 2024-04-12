@@ -125,6 +125,7 @@ vsf_i2c_capability_t vsf_hw_i2c_capability(vsf_hw_i2c_t *hw_i2c_ptr)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
 #define VSF_I2C_CFG_IMP_PREFIX                  vsf_hw
 #define VSF_I2C_CFG_IMP_UPCASE_PREFIX           VSF_HW
 #define VSF_I2C_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
