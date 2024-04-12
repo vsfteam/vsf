@@ -428,7 +428,7 @@ vsf_adc_capability_t vsf_hw_adc_capability(vsf_hw_adc_t *adc_ptr)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY  DISABLED
+#define VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY  ENABLED
 #define VSF_ADC_CFG_IMP_PREFIX                  vsf_hw
 #define VSF_ADC_CFG_IMP_UPCASE_PREFIX           VSF_HW
 #define VSF_ADC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \

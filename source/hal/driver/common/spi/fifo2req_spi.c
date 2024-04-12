@@ -258,7 +258,7 @@ vsf_spi_capability_t vsf_fifo2req_spi_capability(vsf_fifo2req_spi_t *fifo2req_sp
 #define VSF_SPI_CFG_IMP_PREFIX                      vsf_fifo2req
 #define VSF_SPI_CFG_IMP_UPCASE_PREFIX               VSF_FIFO2REQ
 #define VSF_SPI_CFG_IMP_EXTERN_OP                   ENABLED
-#define VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY      DISABLED
+#define VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
 #include "hal/driver/common/spi/spi_template.inc"
 
 

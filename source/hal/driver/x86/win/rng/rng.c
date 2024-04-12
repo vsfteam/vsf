@@ -89,7 +89,6 @@ vsf_err_t vsf_hw_rng_generate_request(vsf_hw_rng_t *rng, uint32_t *buffer, uint3
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY  ENABLED
 #define VSF_RNG_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     vsf_hw_rng_t VSF_MCONNECT(vsf_hw_rng, __IDX) = {                            \
         __HAL_OP                                                                \

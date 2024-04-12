@@ -399,7 +399,7 @@ vsf_i2c_capability_t vsf_multiplex_i2c_capability(vsf_multiplex_i2c_t *m_i2c_ptr
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY  DISABLED
+#define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY  ENABLED
 #define VSF_I2C_CFG_IMP_PREFIX                  vsf_multiplex
 #define VSF_I2C_CFG_IMP_UPCASE_PREFIX           VSF_MULTIPLEX
 #define VSF_I2C_CFG_IMP_EXTERN_OP               ENABLED

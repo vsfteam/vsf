@@ -232,7 +232,7 @@ vsf_i2c_capability_t vsf_mrequest_i2c_capability(vsf_mrequest_i2c_t *m_i2c_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY  DISABLED
+#define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY  ENABLED
 #define VSF_I2C_CFG_IMP_PREFIX                  vsf_mrequest
 #define VSF_I2C_CFG_IMP_UPCASE_PREFIX           VSF_MREQUEST
 #include "hal/driver/common/i2c/i2c_template.inc"

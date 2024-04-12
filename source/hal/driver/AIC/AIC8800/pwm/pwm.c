@@ -143,7 +143,6 @@ uint32_t vsf_hw_pwm_get_freq(vsf_hw_pwm_t *hw_pwm_ptr)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY          ENABLED
 #define VSF_PWM_CFG_CAPABILITY_MIN_FREQ                 (PWM_MAX_FREQ / 255)
 #define VSF_PWM_CFG_CAPABILITY_MAX_FREQ                 (PWM_MAX_FREQ)
 #define VSF_PWM_CFG_IMP_PREFIX                          vsf_hw

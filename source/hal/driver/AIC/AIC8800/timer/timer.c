@@ -184,7 +184,6 @@ void vsf_hw_timer_irq_disable(vsf_hw_timer_t *timer_ptr, vsf_timer_irq_mask_t ir
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
 #   define VSF_TIMER_CFG_CAPABILITY_IRQ_MASK        VSF_TIMER_IRQ_ALL_BITS_MASK
 #   define VSF_TIMER_CFG_CAPABILITY_TIMER_BITLEN    32
 #   define VSF_TIMER_CFG_CAPABILITY_SUPPORT_PWM     0
