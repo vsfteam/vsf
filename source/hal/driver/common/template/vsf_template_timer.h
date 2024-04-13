@@ -75,6 +75,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_enable,  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_disable, VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_timer_capability_t, timer, capability,  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, set_period,  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, uint32_t period) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, pwm_set,     VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr,  uint8_t channel, uint32_t period, uint32_t pulse)
 
 /*============================ TYPES =========================================*/
@@ -131,7 +132,10 @@ typedef struct vsf_timer_isr_t {
 typedef struct vsf_timer_cfg_t {
     vsf_timer_mode_t mode;
 
-    uint32_t max_count;
+    union {
+        uint32_t max_count;
+        uint32_t period;
+    };
     union {
         uint32_t freq;
         uint32_t min_freq;
@@ -201,7 +205,6 @@ extern vsf_err_t vsf_timer_init(vsf_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr
  \~chinese
  @brief 终止一个 timer 实例
  @param[in] timer_ptr: 结构体 vsf_timer_t 的指针，参考 @ref vsf_timer_t
- @param[in] cfg_ptr: 结构体 vsf_timer_cfg_t 的指针，参考 @ref vsf_timer_cfg_t
  @return 无。
  */
 extern void vsf_timer_fini(vsf_timer_t *timer_ptr);
@@ -281,20 +284,35 @@ extern void vsf_timer_irq_disable(vsf_timer_t *timer_ptr, vsf_timer_irq_mask_t i
 
 /**
  \~english
+ @brief timer set period (maximum count)
+ @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
+ @param[in] period: timer period width (in clock counter)
+ @return vsf_err_t: VSF_ERR_NONE if the timer set period was successfully, or a negative error code
+
+ \~chinese
+ @brief timer 设置一个定时器的周期（最大计数值）
+ @param[in] timer_ptr: 结构体 vsf_timer_t 的指针，参考 @ref vsf_timer_t
+ @param[in] period: timer 周期宽度 (时钟计数)
+ @return vsf_err_t: 如果 timer 设置周期成功成功返回 VSF_ERR_NONE , 否则返回负数。
+ */
+extern vsf_err_t vsf_timer_set_period(vsf_timer_t *timer_ptr, uint32_t period);
+
+/**
+ \~english
  @brief timer pwm set the period width and pulse width for a channel
- @param[in] pwm_ptr: a pointer to structure @ref vsf_pwm_t
+ @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
  @param[in] channel: timer pwm channel
- @param[in] period: timer pwm  period width (in clock counter)
- @param[in] pulse: timer pwm  pulse width (in clock counter)
+ @param[in] period: timer pwm period width (in clock counter)
+ @param[in] pulse: timer pwm pulse width (in clock counter)
  @return vsf_err_t: VSF_ERR_NONE if the timer pwm  set was successfully, or a negative error code
 
  \~chinese
  @brief timer pwm  设置一个通道的周期和宽度
- @param[in] pwm_ptr: 结构体 vsf_pwm_t 的指针，参考 @ref vsf_pwm_t
+ @param[in] timer_ptr: 结构体 vsf_timer_t 的指针，参考 @ref vsf_timer_t
  @param[in] channel: timer pwm 通道
  @param[in] period: timer pwm 周期宽度 (时钟计数)
  @param[in] pulse: timer pwm 脉冲宽度 (时钟计数)
- @return vsf_err_t: 如果 timer pwm  设置成功成功返回 VSF_ERR_NONE , 否则返回负数。
+ @return vsf_err_t: 如果 timer pwm 设置成功成功返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_timer_pwm_set(vsf_timer_t *timer_ptr, uint8_t channel, uint32_t period, uint32_t pulse);
 
@@ -309,6 +327,7 @@ extern vsf_err_t vsf_timer_pwm_set(vsf_timer_t *timer_ptr, uint8_t channel, uint
 #   define vsf_timer_capability(__TIME)       VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_capability)  ((__vsf_timer_t *)__TIME)
 #   define vsf_timer_irq_enable(__TIME, ...)  VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_enable)  ((__vsf_timer_t *)__TIME, ##__VA_ARGS__)
 #   define vsf_timer_irq_disable(__TIME, ...) VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_disable) ((__vsf_timer_t *)__TIME, ##__VA_ARGS__)
+#   define vsf_timer_set_period(__TIME, ...)  VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_set_period)  ((__vsf_timer_t *)__TIME, ##__VA_ARGS__)
 #   define vsf_timer_pwm_set(__TIME, ...)     VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_pwm_set)     ((__vsf_timer_t *)__TIME, ##__VA_ARGS__)
 #endif
 

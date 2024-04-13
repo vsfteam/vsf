@@ -97,6 +97,15 @@ vsf_timer_capability_t vsf_timer_capability(vsf_timer_t *timer_ptr)
     return timer_ptr->op->capability(timer_ptr);
 }
 
+vsf_err_t vsf_timer_set_period(vsf_timer_t *timer_ptr, uint32_t period)
+{
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+    VSF_HAL_ASSERT(timer_ptr->op != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->pwm_set != NULL);
+
+    return timer_ptr->op->set_period(timer_ptr, period);
+}
+
 vsf_err_t vsf_timer_pwm_set(vsf_timer_t *timer_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
 {
     VSF_HAL_ASSERT(NULL != timer_ptr);
