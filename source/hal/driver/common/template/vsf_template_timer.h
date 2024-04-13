@@ -131,11 +131,8 @@ typedef struct vsf_timer_isr_t {
 //! timer configuration
 typedef struct vsf_timer_cfg_t {
     vsf_timer_mode_t mode;
-
-    union {
-        uint32_t max_count;
-        uint32_t period;
-    };
+    // counting period
+    uint32_t period;
     union {
         uint32_t freq;
         uint32_t min_freq;

@@ -111,7 +111,7 @@ vsf_err_t vsf_hw_timer_init(vsf_hw_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr)
     reg->CTL &= ~0x01UL;                // disable us ticker
     reg->TD = 0x01UL | (0x01UL << 4);   // div 2, div 1 not work
     reg->PR = TIMER_CLOCK_FREQ / 0x02UL / cfg_ptr->freq - 1; // default to 1MHz (1 us ticks)
-    reg->MR = cfg_ptr->max_count;
+    reg->MR = cfg_ptr->period;
 
     vsf_timer_isr_t *isr_ptr = &cfg_ptr->isr;
     timer_ptr->isr = *isr_ptr;

@@ -125,7 +125,7 @@ HAL_DEMO_INIT(timer, APP_TIMER,
     .test.method = METHOD_OVERFLOW_ISR,
 
     .test.cfg.mode          = VSF_TIMER_MODE_ONESHOT,
-    .test.cfg.max_count     = APP_TIMER_DEMO_CFG_MAX_COUNT,
+    .test.cfg.period        = APP_TIMER_DEMO_CFG_MAX_COUNT,
     .test.cfg.freq          = APP_TIMER_DEMO_CFG_FREQ,
 
     .init_has_cfg           = true,
@@ -294,8 +294,8 @@ static vsf_err_t __timer_parser_args(hal_test_t *hal_test, int argc, char *argv[
             break;
 
         case 'n':
-            test->cfg.max_count = strtol(optarg, NULL, 0);
-            if (test->cfg.max_count == 0) {
+            test->cfg.period = strtol(optarg, NULL, 0);
+            if (test->cfg.period == 0) {
                 vsf_trace_error("timer max counter cannot be zero!" VSF_TRACE_CFG_LINEEND);
                 return VSF_ERR_FAIL;
             }
