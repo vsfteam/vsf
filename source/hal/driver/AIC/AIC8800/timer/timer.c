@@ -182,6 +182,20 @@ void vsf_hw_timer_irq_disable(vsf_hw_timer_t *timer_ptr, vsf_timer_irq_mask_t ir
     }
 }
 
+vsf_err_t vsf_hw_timer_set_period(vsf_hw_timer_t *timer_ptr, uint32_t period)
+{
+    VSF_HAL_ASSERT(timer_ptr != NULL);
+    const vsf_hw_timer_const_t *timer_const = timer_ptr->timer_const;
+    VSF_HAL_ASSERT(timer_const != NULL);
+    AIC_TIM_REG_T* reg = timer_const->reg;
+    VSF_HAL_ASSERT(reg != NULL);
+
+    // TODO: test
+    reg->MR = period;
+
+    return VSF_ERR_NONE;
+}
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #   define VSF_TIMER_CFG_CAPABILITY_IRQ_MASK        VSF_TIMER_IRQ_ALL_BITS_MASK
