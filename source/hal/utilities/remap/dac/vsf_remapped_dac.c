@@ -45,10 +45,10 @@ const vsf_dac_op_t vsf_remapped_dac_op = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_remapped_dac_init(vsf_remapped_dac_t *dac)
+vsf_err_t vsf_remapped_dac_init(vsf_remapped_dac_t *dac, vsf_dac_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));
-    return vsf_dac_init(dac->target);
+    return vsf_dac_init(dac->target, cfg_ptr);
 }
 
 void vsf_remapped_dac_fini(vsf_remapped_dac_t *dac)

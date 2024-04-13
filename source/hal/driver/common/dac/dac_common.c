@@ -35,13 +35,13 @@
 
 #if VSF_DAC_CFG_MULTI_CLASS == ENABLED
 
-vsf_err_t vsf_dac_init(vsf_dac_t *dac_ptr)
+vsf_err_t vsf_dac_init(vsf_dac_t *dac_ptr, vsf_dac_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(dac_ptr != NULL);
     VSF_HAL_ASSERT(dac_ptr->op != NULL);
     VSF_HAL_ASSERT(dac_ptr->op->init != NULL);
 
-    return dac_ptr->op->init(dac_ptr);
+    return dac_ptr->op->init(dac_ptr, cfg_ptr);
 }
 
 void vsf_dac_fini(vsf_dac_t *dac_ptr)
