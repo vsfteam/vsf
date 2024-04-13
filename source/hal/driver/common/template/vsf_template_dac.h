@@ -68,7 +68,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_DAC_APIS(__prefix_name) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, init,                 VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, init,                 VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr, vsf_dac_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 dac, fini,                 VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             dac, enable,               VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             dac, disable,              VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr) \
@@ -171,7 +171,7 @@ struct vsf_dac_t  {
  @note 失败后不需要调用 vsf_dac_fini() 反初始化。
        vsf_dac_init() 应该在除 vsf_dac_capability() 之外的其他 DAC API 之前调用。
  */
-extern vsf_err_t vsf_dac_init(vsf_dac_t *dac_ptr);
+extern vsf_err_t vsf_dac_init(vsf_dac_t *dac_ptr, vsf_dac_cfg_t *cfg_ptr);
 
 /**
  \~english
@@ -337,7 +337,7 @@ extern vsf_err_t vsf_dac_channel_request(vsf_dac_t *dac_ptr,
 
 #if VSF_DAC_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_dac_t                              VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_t)
-#   define vsf_dac_init(__DAC)                      VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_init)                 ((__vsf_dac_t *)__DAC)
+#   define vsf_dac_init(__DAC, ...)                 VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_init)                 ((__vsf_dac_t *)__DAC, ##__VA_ARGS__)
 #   define vsf_dac_fini(__DAC)                      VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_fini)                 ((__vsf_dac_t *)__DAC)
 #   define vsf_dac_enable(__DAC)                    VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_enable)               ((__vsf_dac_t *)__DAC)
 #   define vsf_dac_disable(__DAC)                   VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_disable)              ((__vsf_dac_t *)__DAC)
