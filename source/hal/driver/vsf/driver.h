@@ -26,16 +26,30 @@
 #   include "./distbus/driver.h"
 #endif
 
-#if VSF_HAL_GPIO_USE_74HC165 == ENABLED
-#   include "./gpio/74hc165/vsf_gpio_74hc165.h"
+#if VSF_HAL_USE_GPIO == ENABLED
+// emulate GPIO driver on 74hc165
+#   if VSF_HAL_USE_74HC165_GPIO == ENABLED
+#       include "./gpio/74hc165/vsf_gpio_74hc165.h"
+#   endif
+
+// emulate GPIO driver on 74hc595
+#   if VSF_HAL_USE_74HC595_GPIO == ENABLED
+#       include "./gpio/74hc595/vsf_gpio_74hc595.h"
+#   endif
 #endif
 
-#if VSF_HAL_GPIO_USE_74HC595 == ENABLED
-#   include "./gpio/74hc595/vsf_gpio_74hc595.h"
+#if VSF_HAL_USE_I2C == ENABLED
+// emulate I2C driver with GPIO
+#   if VSF_HAL_USE_GPIO_I2C == ENABLED
+#       include "./i2c/gpio_i2c/vsf_gpio_i2c.h"
+#   endif
 #endif
 
-#if VSF_HAL_USE_GPIO_I2C == ENABLED
-#   include "./i2c/gpio_i2c/vsf_gpio_i2c.h"
+#if VSF_HAL_USE_PWM == ENABLED
+// emulate PWM driver with TIMER + GPIO
+#   if VSF_HAL_USE_TIMER_GPIO_PWM == ENABLED
+#       include "./pwm/timer_gpio/vsf_timer_gpio_pwm.h"
+#   endif
 #endif
 
 /*============================ MACROS ========================================*/

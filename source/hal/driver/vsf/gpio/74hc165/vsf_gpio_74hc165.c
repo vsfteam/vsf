@@ -19,9 +19,9 @@
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_GPIO_USE_74HC165 == ENABLED
+#if VSF_HAL_USE_GPIO == ENABLED && VSF_HAL_USE_74HC165_GPIO == ENABLED
 
-#define __VSF_HAL_GPIO_74HC164_CLASS_IMPLEMENT
+#define __VSF_HAL_74HC164_GPIO_CLASS_IMPLEMENT
 #include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
@@ -146,4 +146,4 @@ vsf_gpio_capability_t vsf_74hc165_gpio_capability(vsf_74hc165_gpio_t *gpio_ptr)
 #define VSF_GPIO_CFG_IMP_UPCASE_PREFIX          VSF_74HC165
 #include "hal/driver/common/gpio/gpio_template.inc"
 
-#endif      // VSF_HAL_GPIO_USE_74HC165
+#endif      // VSF_HAL_USE_GPIO && VSF_HAL_USE_74HC165_GPIO

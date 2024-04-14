@@ -19,9 +19,9 @@
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_GPIO_USE_74HC595 == ENABLED
+#if VSF_HAL_USE_GPIO == ENABLED && VSF_HAL_USE_74HC595_GPIO == ENABLED
 
-#define __VSF_HAL_GPIO_74HC595_CLASS_IMPLEMENT
+#define __VSF_HAL_74HC595_GPIO_CLASS_IMPLEMENT
 #include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
@@ -148,4 +148,4 @@ vsf_gpio_capability_t vsf_74hc595_gpio_capability(vsf_74hc595_gpio_t *gpio_ptr)
 #define VSF_GPIO_CFG_IMP_UPCASE_PREFIX          VSF_74HC595
 #include "hal/driver/common/gpio/gpio_template.inc"
 
-#endif      // VSF_HAL_GPIO_USE_74HC595
+#endif      // VSF_HAL_USE_GPIO && VSF_HAL_USE_74HC595_GPIO

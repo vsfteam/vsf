@@ -18,7 +18,8 @@
 #ifndef __VSF_74HC595_GPIO_H__
 #define __VSF_74HC595_GPIO_H__
 
-/* connection:
+/* Implement GPIO device driver on 74HC595
+   connection:
     control api     <==>    signal(pin) <==>    signal(pin) shared with 74HC165
     oe_control      <==>    nOE(13)
     latch_control   <==>    ST_CP(12)   <==>    nPL(1)
@@ -30,9 +31,9 @@
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_GPIO_USE_74HC595 == ENABLED
+#if VSF_HAL_USE_GPIO == ENABLED && VSF_HAL_USE_74HC595_GPIO == ENABLED
 
-#if defined(__VSF_HAL_GPIO_74HC595_CLASS_IMPLEMENT)
+#if defined(__VSF_HAL_74HC595_GPIO_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #endif
 

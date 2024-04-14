@@ -109,7 +109,8 @@ typedef enum vsf_arch_prio_t {
 
     VSF_MREPEAT(VSF_ARCH_PRI_NUM,__VSF_ARCH_PRI,VSF_ARCH_PRI_BIT)
 
-    vsf_arch_prio_highest           = ((VSF_ARCH_PRI_NUM - 1 - (__vsf_arch_prio_index_number - 1))) & 0xFF ,
+    vsf_arch_prio_highest           = ((VSF_ARCH_PRI_NUM - 1 - (__vsf_arch_prio_index_number - 1))) & 0xFF,
+    VSF_ARCH_PRIO_HIGHEST           = vsf_arch_prio_highest,
 } vsf_arch_prio_t;
 
 #ifndef VSF_APPLET_USE_ARCH_ABI
