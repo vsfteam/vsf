@@ -78,10 +78,10 @@ vsf_timer_capability_t vsf_real_timer_capability(vsf_real_timer_t *timer_ptr)
 /*============================ MACROS ========================================*/
 
 #undef VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY
-#undef VSF_TIMER_CFG_CAPABILITY_IRQ_MASK,
-#undef VSF_TIMER_CFG_CAPABILITY_TIMER_BITLEN,
-#undef VSF_TIMER_CFG_CAPABILITY_SUPPORT_PWM,
-#undef VSF_TIMER_CFG_CAPABILITY_PWM_CHANNEL_CNT,
+#undef VSF_TIMER_CFG_CAPABILITY_IRQ_MASK
+#undef VSF_TIMER_CFG_CAPABILITY_TIMER_BITLEN
+#undef VSF_TIMER_CFG_CAPABILITY_SUPPORT_PWM
+#undef VSF_TIMER_CFG_CAPABILITY_PWM_CHANNEL_CNT
 #undef vsf_real_timer_t
 #undef vsf_real_timer_capability
 #undef vsf_real_timer_pwm_set
