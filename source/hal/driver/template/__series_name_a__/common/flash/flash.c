@@ -135,17 +135,18 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_multi_sector)(
 vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)(
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr,
     vsf_flash_size_t offset,
-    uint8_t* buffer,
+    uint8_t *buffer,
     vsf_flash_size_t size
 ) {
     VSF_HAL_ASSERT(flash_ptr != NULL);
+    VSF_HAL_ASSERT(NULL != buffer);
     return VSF_ERR_FAIL;
 }
 
 vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)(
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr,
     vsf_flash_size_t offset,
-    uint8_t* buffer,
+    uint8_t *buffer,
     vsf_flash_size_t size
 ) {
     VSF_HAL_ASSERT(flash_ptr != NULL);
