@@ -47,6 +47,7 @@ typedef struct vsf_crc_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 
 extern const vsf_crc_t vsf_crc8_ccitt;
+extern const vsf_crc_t vsf_crc16_ccitt;
 
 /*============================ PROTOTYPES ====================================*/
 
