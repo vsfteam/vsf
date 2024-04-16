@@ -24,7 +24,7 @@
 #define vsf_real_mmc_capability                       VSF_MCONNECT(VSF_MMC_CFG_IMP_PREFIX, _mmc_capability)
 
 #ifndef VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY
-#   define  VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#   define  VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
 #endif
 
 #if VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED

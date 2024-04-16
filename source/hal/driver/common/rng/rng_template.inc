@@ -24,7 +24,7 @@
 #define vsf_real_rng_capability VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_capability)
 
 #ifndef VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY
-#   define  VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#   define  VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

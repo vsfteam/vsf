@@ -21,7 +21,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY
-#   define  VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#   define  VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
 #endif
 
 #if VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED

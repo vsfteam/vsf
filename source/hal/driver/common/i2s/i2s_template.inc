@@ -24,7 +24,7 @@
 #define vsf_real_i2s_capability                             VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_capability)
 
 #ifndef VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY
-#   define  VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#   define  VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
 #endif
 
 #if VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED

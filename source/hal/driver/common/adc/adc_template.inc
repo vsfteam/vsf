@@ -24,7 +24,7 @@
 #define vsf_real_adc_capability                                 VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_capability)
 
 #ifndef VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY
-#   define  VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#   define  VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
 #endif
 
 #if VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
