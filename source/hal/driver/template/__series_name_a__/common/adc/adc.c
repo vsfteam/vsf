@@ -22,7 +22,7 @@
 #if VSF_HAL_USE_ADC == ENABLED
 
 /*\note For IPCore drivers, define __VSF_HAL_${ADC_IP}_ADC_CLASS_IMPLEMENT before including vsf_hal.h.
- *      For peripherial drivers, if IPCore driver is used, define __VSF_HAL_${ADC_IP}_ADC_CLASS_INHERIT__ before including vsf_hal.h
+ *      For peripheral drivers, if IPCore driver is used, define __VSF_HAL_${ADC_IP}_ADC_CLASS_INHERIT__ before including vsf_hal.h
  */
 
 // IPCore

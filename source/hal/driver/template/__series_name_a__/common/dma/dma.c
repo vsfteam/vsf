@@ -23,7 +23,7 @@
 #if VSF_HAL_USE_DMA == ENABLED
 
 /*\note For IPCore drivers, define __VSF_HAL_${DMA_IP}_DMA_CLASS_IMPLEMENT before including vsf_hal.h.
- *      For peripherial drivers, if IPCore driver is used, define __VSF_HAL_${DMA_IP}_DMA_CLASS_INHERIT__ before including vsf_hal.h
+ *      For peripheral drivers, if IPCore driver is used, define __VSF_HAL_${DMA_IP}_DMA_CLASS_INHERIT__ before including vsf_hal.h
  */
 
 // IPCore

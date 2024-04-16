@@ -32,16 +32,16 @@
 #include "./hc/usbh.h"
 
 /*\note Refer to template/README.md for usage cases.
- *      For peripherial drivers, blackbox mode is recommended but not required, reimplementation part MUST be open.
+ *      For peripheral drivers, blackbox mode is recommended but not required, reimplementation part MUST be open.
  *      For IPCore drivers, class structure, MULTI_CLASS configuration, reimplementation and class APIs should be open to user.
  *      For emulated drivers, **** No reimplementation ****.
  *
- *      This template is designed only for peripherial drivers with host and device functionality.
+ *      This template is designed only for peripheral drivers with host and device functionality.
  */
 
 #include "hal/driver/common/template/vsf_template_usb.h"
 
-/*\note Incudes CAN ONLY be put here. */
+/*\note Includes CAN ONLY be put here. */
 
 /*\note Use OOC because vsf_hw_usb_t should be open to dc/hc drivers, while should not open to users.
  */

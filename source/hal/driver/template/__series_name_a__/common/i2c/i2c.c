@@ -22,7 +22,7 @@
 #if VSF_HAL_USE_I2C == ENABLED
 
 /*\note For IPCore drivers, define __VSF_HAL_${I2C_IP}_I2C_CLASS_IMPLEMENT before including vsf_hal.h.
- *      For peripherial drivers, if IPCore driver is used, define __VSF_HAL_${I2C_IP}_I2C_CLASS_INHERIT__ before including vsf_hal.h
+ *      For peripheral drivers, if IPCore driver is used, define __VSF_HAL_${I2C_IP}_I2C_CLASS_INHERIT__ before including vsf_hal.h
  */
 
 // IPCore
