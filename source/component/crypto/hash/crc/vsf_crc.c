@@ -33,7 +33,7 @@ const vsf_crc_t vsf_crc8_ccitt = {
 
 const vsf_crc_t vsf_crc16_ccitt = {
     .bitlen = 16,
-    .poly   = 0x07,
+    .poly   = 0x1021,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
