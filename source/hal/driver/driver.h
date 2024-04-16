@@ -128,7 +128,7 @@ extern "C" {
  */
 extern bool vsf_driver_init(void);
 
-/*! \note common entry for upper layer to poll driver servcie
+/*! \note common entry for upper layer to poll driver service
  *  \param none
  *  \retval true it is safe to enter sleep mode
  *  \retval false polling work is on going, please keep calling the function

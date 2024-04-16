@@ -65,7 +65,7 @@
 
 /*\note For specified peripheral, VSF_HW_PERIPHERIAL_COUNT MUST be defined as number of peripheral instance.
  *      If peripheral instances start from 0, and are in sequence order(eg, 3 I2Cs: I2C0, I2C1, I2C2), VSF_HW_PERIPHERIAL_MASK is not needed.
- *      Otherwise, defind VSF_HW_PERIPHERIAL_MASK to indicate which peripheral instances to implmenent.
+ *      Otherwise, define VSF_HW_PERIPHERIAL_MASK to indicate which peripheral instances to implmenent.
  *      eg: 3 I2Cs: I2C0, I2C2, I2C4, define VSF_HW_I2C_MASK to 0x15(BIT(0) | BIT(2)) | BIT(4)).
  *
  *      Other configurations are vendor specified, drivers will use these information to generate peripheral instances.

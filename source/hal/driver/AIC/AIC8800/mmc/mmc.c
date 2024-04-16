@@ -90,7 +90,7 @@ static void __vsf_hw_mmc_irq_handler(vsf_hw_mmc_t *mmc_ptr)
         }
 
         // if autocmd12 is enabled, resp is processed by hardware,
-        //  and the valud in RxR register are invalid, so remove resp_done flag
+        //  and the value in RxR register are invalid, so remove resp_done flag
         if (reg->CFGR & SDMMC_AUTOCMD12_ENABLE) {
             irq &= ~MMC_IRQ_MASK_HOST_RESP_DONE;
         }
