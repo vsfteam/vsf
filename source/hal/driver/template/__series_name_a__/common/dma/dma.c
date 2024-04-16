@@ -38,7 +38,7 @@
 /*============================ MACROS ========================================*/
 
 /*\note VSF_HW_DMA_CFG_MULTI_CLASS is only for drivers for specified device(hw drivers).
- *      For other drivers, plase define VSF_${DMA_IP}_DMA_CFG_MULTI_CLASS in header file.
+ *      For other drivers, please define VSF_${DMA_IP}_DMA_CFG_MULTI_CLASS in header file.
  */
 
 // HW
