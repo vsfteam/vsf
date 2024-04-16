@@ -107,13 +107,13 @@ struct vsf_rng_t  {
        vsf_rng_init() should be called before any other rng API except vsf_rng_capability().
 
  \~chinese
- @brief ³õÊ¼»¯Ò»¸ö rng ÊµÀı
- @param[in] rng_ptr: ½á¹¹Ìå vsf_rng_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_rng_t
- @param[in] cfg_ptr: ½á¹¹Ìå vsf_rng_cfg_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_rng_cfg_t
- @return vsf_err_t: Èç¹û rng ³õÊ¼»¯³É¹¦·µ»Ø VSF_ERR_NONE , Ê§°Ü·µ»Ø¸ºÊı¡£
+ @brief åˆå§‹åŒ–ä¸€ä¸ª rng å®ä¾‹
+ @param[in] rng_ptr: ç»“æ„ä½“ vsf_rng_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_rng_t
+ @param[in] cfg_ptr: ç»“æ„ä½“ vsf_rng_cfg_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_rng_cfg_t
+ @return vsf_err_t: å¦‚æœ rng åˆå§‹åŒ–æˆåŠŸè¿”å› VSF_ERR_NONE , å¤±è´¥è¿”å›è´Ÿæ•°ã€‚
 
- @note Ê§°Üºó²»ĞèÒªµ÷ÓÃ vsf_rng_fini() ·´³õÊ¼»¯¡£
-       vsf_rng_init() Ó¦¸ÃÔÚ³ı vsf_rng_capability() Ö®ÍâµÄÆäËû rng API Ö®Ç°µ÷ÓÃ¡£
+ @note å¤±è´¥åä¸éœ€è¦è°ƒç”¨ vsf_rng_fini() ååˆå§‹åŒ–ã€‚
+       vsf_rng_init() åº”è¯¥åœ¨é™¤ vsf_rng_capability() ä¹‹å¤–çš„å…¶ä»– rng API ä¹‹å‰è°ƒç”¨ã€‚
  */
 extern vsf_err_t vsf_rng_init(vsf_rng_t *rng_ptr);
 
@@ -124,10 +124,10 @@ extern vsf_err_t vsf_rng_init(vsf_rng_t *rng_ptr);
  @return none
 
  \~chinese
- @brief ÖÕÖ¹Ò»¸ö rng ÊµÀı
- @param[in] rng_ptr: ½á¹¹Ìå vsf_rng_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_rng_t
- @param[in] cfg_ptr: ½á¹¹Ìå vsf_rng_cfg_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_rng_cfg_t
- @return ÎŞ¡£
+ @brief ç»ˆæ­¢ä¸€ä¸ª rng å®ä¾‹
+ @param[in] rng_ptr: ç»“æ„ä½“ vsf_rng_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_rng_t
+ @param[in] cfg_ptr: ç»“æ„ä½“ vsf_rng_cfg_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_rng_cfg_t
+ @return æ— ã€‚
  */
 extern void vsf_rng_fini(vsf_rng_t *rng_ptr);
 
@@ -138,9 +138,9 @@ extern void vsf_rng_fini(vsf_rng_t *rng_ptr);
  @return vsf_rng_capability_t: return all capability of current rng @ref vsf_rng_capability_t
 
  \~chinese
- @brief »ñÈ¡ rng ÊµÀıµÄÄÜÁ¦
- @param[in] rng_ptr: ½á¹¹Ìå vsf_rng_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_rng_t
- @return vsf_rng_capability_t: ·µ»Øµ±Ç° rng µÄËùÓĞÄÜÁ¦ @ref vsf_rng_capability_t
+ @brief è·å– rng å®ä¾‹çš„èƒ½åŠ›
+ @param[in] rng_ptr: ç»“æ„ä½“ vsf_rng_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_rng_t
+ @return vsf_rng_capability_t: è¿”å›å½“å‰ rng çš„æ‰€æœ‰èƒ½åŠ› @ref vsf_rng_capability_t
  */
 extern vsf_rng_capability_t vsf_rng_capability(vsf_rng_t *rng_ptr);
 
@@ -155,9 +155,9 @@ extern vsf_rng_capability_t vsf_rng_capability(vsf_rng_t *rng_ptr);
  @return vsf_err_t: VSF_ERR_NONE if rng generate request was successfully, or a negative error code
 
  \~chinese
- @brief rng Éú³ÉÇëÇó
- @param[in] rng_ptr: ½á¹¹Ìå vsf_rng_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_rng_t
- @return vsf_err_t: Èç¹û rng Éú³ÉÇëÇó³É¹¦·µ»Ø VSF_ERR_NONE , ·ñÔò·µ»Ø¸ºÊı¡£
+ @brief rng ç”Ÿæˆè¯·æ±‚
+ @param[in] rng_ptr: ç»“æ„ä½“ vsf_rng_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_rng_t
+ @return vsf_err_t: å¦‚æœ rng ç”Ÿæˆè¯·æ±‚æˆåŠŸè¿”å› VSF_ERR_NONE , å¦åˆ™è¿”å›è´Ÿæ•°ã€‚
  */
 extern vsf_err_t vsf_rng_generate_request(vsf_rng_t *rng_ptr, uint32_t *buffer, uint32_t num,
                                           void *param, vsf_rng_on_ready_callback_t * on_ready_cb);

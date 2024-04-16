@@ -282,11 +282,11 @@ struct vsf_io_t  {
  @return vsf_err_t: VSF_ERR_NONE if io configuration was complete, or a negative error code
 
  \~chinese
- @brief ÅäÖÃ IO
- @param[in] io_ptr: ½á¹¹Ìå vsf_io_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_io_t
- @param[in] cfg_ptr: ½á¹¹Ìå vsf_io_cfg_t Êı×é£¬²Î¿¼ @ref vsf_io_t
- @param[in] count: ½á¹¹Ìå vsf_io_cfg_t Êı×éµÄ³¤¶È
- @return vsf_err_t: Èç¹û io ÅäÖÃÍê³É·µ»Ø VSF_ERR_NONE , ·ñÔò·µ»Ø¸ºÊı
+ @brief é…ç½® IO
+ @param[in] io_ptr: ç»“æ„ä½“ vsf_io_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_io_t
+ @param[in] cfg_ptr: ç»“æ„ä½“ vsf_io_cfg_t æ•°ç»„ï¼Œå‚è€ƒ @ref vsf_io_t
+ @param[in] count: ç»“æ„ä½“ vsf_io_cfg_t æ•°ç»„çš„é•¿åº¦
+ @return vsf_err_t: å¦‚æœ io é…ç½®å®Œæˆè¿”å› VSF_ERR_NONE , å¦åˆ™è¿”å›è´Ÿæ•°
  */
 extern vsf_err_t vsf_io_config(vsf_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr, uint_fast8_t count);
 
@@ -298,10 +298,10 @@ extern vsf_err_t vsf_io_config(vsf_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr, uint_fas
  @return vsf_err_t: VSF_ERR_NONE if io configuration was complete, or a negative error code
 
  \~chinese
- @brief ÅäÖÃÒ»¸ö io
- @param[in] io_ptr: ½á¹¹Ìå vsf_io_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_io_t
- @param[in] cfg_ptr: ½á¹¹Ìå vsf_io_cfg_t Êı×é£¬²Î¿¼ @ref vsf_io_t
- @return vsf_err_t: Èç¹û io ÅäÖÃÍê³É·µ»Ø VSF_ERR_NONE , ·ñÔò·µ»Ø¸ºÊı
+ @brief é…ç½®ä¸€ä¸ª io
+ @param[in] io_ptr: ç»“æ„ä½“ vsf_io_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_io_t
+ @param[in] cfg_ptr: ç»“æ„ä½“ vsf_io_cfg_t æ•°ç»„ï¼Œå‚è€ƒ @ref vsf_io_t
+ @return vsf_err_t: å¦‚æœ io é…ç½®å®Œæˆè¿”å› VSF_ERR_NONE , å¦åˆ™è¿”å›è´Ÿæ•°
  */
 extern vsf_err_t vsf_io_config_one_pin(vsf_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr);
 
@@ -312,9 +312,9 @@ extern vsf_err_t vsf_io_config_one_pin(vsf_io_t *io_ptr, vsf_io_cfg_t *cfg_ptr);
  @return vsf_io_capability_t: return all capability of current io @ref vsf_io_capability_t
 
  \~chinese
- @brief »ñÈ¡ io ÊµÀıµÄÄÜÁ¦
- @param[in] io_ptr: ½á¹¹Ìå vsf_io_t µÄÖ¸Õë£¬²Î¿¼ @ref vsf_io_t
- @return vsf_io_capability_t: ·µ»Øµ±Ç° io µÄËùÓĞÄÜÁ¦ @ref vsf_io_capability_t
+ @brief è·å– io å®ä¾‹çš„èƒ½åŠ›
+ @param[in] io_ptr: ç»“æ„ä½“ vsf_io_t çš„æŒ‡é’ˆï¼Œå‚è€ƒ @ref vsf_io_t
+ @return vsf_io_capability_t: è¿”å›å½“å‰ io çš„æ‰€æœ‰èƒ½åŠ› @ref vsf_io_capability_t
  */
 extern vsf_io_capability_t vsf_io_capability(vsf_io_t *io_ptr);
 
