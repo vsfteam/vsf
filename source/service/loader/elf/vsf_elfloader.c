@@ -515,7 +515,7 @@ second_round_for_ram_base:
         } else if (elfloader->is_xip) {
             linfo.dynamic.symtbl = (Elf_Addr)target->object + __vsf_elfloader_vaddr2off(elfloader, target, linfo.dynamic.symtbl);
         } else {
-            vsf_trace_error("symtbl not accessable" VSF_TRACE_CFG_LINEEND);
+            vsf_trace_error("symtbl not accessible" VSF_TRACE_CFG_LINEEND);
             goto cleanup_and_fail;
         }
         if (__vsf_elfloader_is_vaddr_loaded(elfloader, linfo.dynamic.strtbl)) {
@@ -523,7 +523,7 @@ second_round_for_ram_base:
         } else if (elfloader->is_xip) {
             linfo.dynamic.strtbl = (Elf_Addr)target->object + __vsf_elfloader_vaddr2off(elfloader, target, linfo.dynamic.strtbl);
         } else {
-            vsf_trace_error("strtbl not accessable" VSF_TRACE_CFG_LINEEND);
+            vsf_trace_error("strtbl not accessible" VSF_TRACE_CFG_LINEEND);
             goto cleanup_and_fail;
         }
 

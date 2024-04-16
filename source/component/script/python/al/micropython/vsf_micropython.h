@@ -458,7 +458,7 @@ extern int __vsf_pyal_parse_tuple_keyword(__vsf_pyal_keyword_parser_arg(arg), co
 #define vsf_pyal_class_new(__mod, __class, __args_num, __args)                  \
     __mod ## _ ## __class ## _make_new(NULL, (__args_num), 0, (__args))
 
-// vsf_pyal_class_newc will create class in C, user can set a exsize and get a C pinter
+// vsf_pyal_class_newc will create class in C, user can set a exsize and get a C pointer
 #define vsf_pyal_class_newc(__mod, __class, __exsize, __obj_ptr)                \
     ({                                                                          \
         __mod ## _ ## __class ## _t *VSF_MACRO_SAFE_NAME(inst) = (__mod ## _ ## __class ## _t *)m_malloc_with_finaliser(sizeof(__mod ## _ ## __class ## _t) + (__exsize));\
