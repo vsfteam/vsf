@@ -104,10 +104,10 @@ typedef struct vsf_win_usart_port_t {
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
-#define VSF_USART_CFG_IMP_PREFIX                    vsf_win
-#define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_WIN
-#define VSF_USART_CFG_IMP_FIFO_TO_REQUEST           ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_REQUEST           DISABLED
+#define VSF_USART_CFG_IMP_PREFIX                        vsf_win
+#define VSF_USART_CFG_IMP_UPCASE_PREFIX                 VSF_WIN
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     vsf_win_usart_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __IDX) = {   \
         .handle                            = INVALID_HANDLE_VALUE,              \
