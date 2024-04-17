@@ -180,6 +180,8 @@ vsf_i2s_capability_t vsf_real_i2s_capability(vsf_real_i2s_t *i2s_ptr)
 #undef VSF_I2S_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_I2S_CFG_IMP_LV0
 #undef VSF_I2S_CFG_IMP_REMAP_FUNCTIONS
+#undef VSF_I2S_CFG_IMP_HAS_OP
+#undef VSF_I2S_CFG_IMP_EXTERN_OP
 
 #undef vsf_imp_i2s_t
 #undef vsf_imp_i2s_init

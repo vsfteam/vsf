@@ -202,6 +202,8 @@ vsf_dac_capability_t vsf_real_dac_capability(vsf_real_dac_t *dac_ptr)
 #undef VSF_DAC_CFG_IMP_UPCASE_PREFIX
 #undef VSF_DAC_CFG_IMP_LV0
 #undef VSF_DAC_CFG_IMP_REMAP_FUNCTIONS
+#undef VSF_DAC_CFG_IMP_HAS_OP
+#undef VSF_DAC_CFG_IMP_EXTERN_OP
 
 #undef vsf_imp_dac_t
 #undef vsf_imp_dac_init

@@ -185,6 +185,8 @@ vsf_timer_capability_t vsf_real_timer_capability(vsf_real_timer_t *timer_ptr)
 #undef VSF_TIMER_CFG_IMP_UPCASE_PREFIX
 #undef VSF_TIMER_CFG_IMP_LV0
 #undef VSF_TIMER_CFG_IMP_REMAP_FUNCTIONS
+#undef VSF_TIMER_CFG_IMP_HAS_OP
+#undef VSF_TIMER_CFG_IMP_EXTERN_OP
 
 #undef vsf_imp_timer_t
 #undef vsf_imp_timer_init

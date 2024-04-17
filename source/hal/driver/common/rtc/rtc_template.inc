@@ -278,6 +278,8 @@ vsf_rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
 #undef VSF_RTC_CFG_IMP_UPCASE_PREFIX
 #undef VSF_RTC_CFG_IMP_LV0
 #undef VSF_RTC_CFG_IMP_REMAP_FUNCTIONS
+#undef VSF_RTC_CFG_IMP_HAS_OP
+#undef VSF_RTC_CFG_IMP_EXTERN_OP
 
 #undef vsf_imp_rtc_t
 #undef vsf_imp_rtc_init
