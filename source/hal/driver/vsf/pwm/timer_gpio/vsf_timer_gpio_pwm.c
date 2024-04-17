@@ -25,6 +25,15 @@
 #include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_TIMER_GPIO_MULTI_PWM_CFG_MULTI_CLASS
+#   define VSF_TIMER_GPIO_MULTI_PWM_CFG_MULTI_CLASS     VSF_TIMER_GPIO_PWM_CFG_MULTI_CLASS
+#endif
+
+#ifndef VSF_TIMER_GPIO_SINGLE_PWM_CFG_MULTI_CLASS
+#   define VSF_TIMER_GPIO_SINGLE_PWM_CFG_MULTI_CLASS    VSF_TIMER_GPIO_PWM_CFG_MULTI_CLASS
+#endif
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -111,9 +120,6 @@ uint32_t vsf_timer_gpio_multi_pwm_get_freq(vsf_timer_gpio_multi_pwm_t *pwm_ptr)
 /*============================ INCLUDES ======================================*/
 
 #define VSF_HAL_TEMPLATE_IMP_EXTERN_OP                  ENABLED
-#define VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY          ENABLED
-#define VSF_PWM_CFG_CAPABILITY_MIN_FREQ                 (1000)
-#define VSF_PWM_CFG_CAPABILITY_MAX_FREQ                 (1000)
 #define VSF_PWM_CFG_IMP_PREFIX                          vsf_timer_gpio_multi
 #define VSF_PWM_CFG_IMP_UPCASE_PREFIX                   VSF_TIMER_GPIO_MULTI
 #include "hal/driver/common/pwm/pwm_template.inc"
@@ -126,12 +132,8 @@ static void __vsf_timer_gpio_single_pwm_update(vsf_timer_gpio_single_pwm_t *pwm_
     pwm_ptr->pulse_shadow = pwm_ptr->pulse;
     pwm_ptr->period_shadow = pwm_ptr->period;
 
-    if ((0 == pwm_ptr->period_shadow) || (0 == pwm_ptr->pulse_shadow)) {
-        pwm_ptr->gpio_control(pwm_ptr->reverse);
-        vsf_timer_set_period(pwm_ptr->timer, 0);
-        pwm_ptr->timer_started = false;
-    } else if (pwm_ptr->period_shadow == pwm_ptr->pulse_shadow) {
-        pwm_ptr->gpio_control(!pwm_ptr->reverse);
+    if (pwm_ptr->period_shadow == pwm_ptr->pulse_shadow) {
+        pwm_ptr->gpio_control(pwm_ptr->reverse ^ !!pwm_ptr->period_shadow);
         vsf_timer_set_period(pwm_ptr->timer, 0);
         pwm_ptr->timer_started = false;
     } else {
@@ -161,7 +163,7 @@ vsf_err_t vsf_timer_gpio_single_pwm_init(vsf_timer_gpio_single_pwm_t *pwm_ptr, v
 
     pwm_ptr->freq = cfg_ptr->freq;
     pwm_ptr->timer_started = false;
-    return vsf_timer_init(pwm_ptr->timer, &(vsf_timer_cfg_t){
+    vsf_err_t err = vsf_timer_init(pwm_ptr->timer, &(vsf_timer_cfg_t){
         .mode           = VSF_TIMER_MODE_ONESHOT,
         .period         = 0,
         .freq           = cfg_ptr->freq,
@@ -171,6 +173,12 @@ vsf_err_t vsf_timer_gpio_single_pwm_init(vsf_timer_gpio_single_pwm_t *pwm_ptr, v
             .prio       = VSF_ARCH_PRIO_HIGHEST,
         },
     });
+    if (err != VSF_ERR_NONE) {
+        return err;
+    }
+
+    vsf_timer_irq_enable(pwm_ptr->timer, VSF_TIMER_IRQ_MASK_OVERFLOW);
+    return VSF_ERR_NONE;
 }
 
 void vsf_timer_gpio_single_pwm_fini(vsf_timer_gpio_single_pwm_t *pwm_ptr)
