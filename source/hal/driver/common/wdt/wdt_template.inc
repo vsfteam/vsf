@@ -157,6 +157,8 @@ vsf_wdt_capability_t vsf_real_wdt_capability(vsf_real_wdt_t *wdt_ptr)
 #undef VSF_WDT_CFG_IMP_UPCASE_PREFIX
 #undef VSF_WDT_CFG_IMP_LV0
 #undef VSF_WDT_CFG_IMP_REMAP_FUNCTIONS
+#undef VSF_WDT_CFG_IMP_HAS_OP
+#undef VSF_WDT_CFG_IMP_EXTERN_OP
 
 #undef vsf_imp_wdt_t
 #undef vsf_imp_wdt_init

@@ -317,6 +317,8 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 #undef VSF_USART_CFG_IMP_REMAP_PREFIX
 #undef VSF_USART_CFG_IMP_LV0
 #undef VSF_USART_CFG_IMP_REMAP_FUNCTIONS
+#undef VSF_USART_CFG_IMP_HAS_OP
+#undef VSF_USART_CFG_IMP_EXTERN_OP
 
 #undef vsf_imp_usart_t
 #undef vsf_imp_usart_init

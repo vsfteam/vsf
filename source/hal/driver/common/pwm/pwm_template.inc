@@ -218,6 +218,8 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 #undef VSF_PWM_CFG_IMP_UPCASE_PREFIX
 #undef VSF_PWM_CFG_IMP_LV0
 #undef VSF_PWM_CFG_IMP_REMAP_FUNCTIONS
+#undef VSF_PWM_CFG_IMP_HAS_OP
+#undef VSF_PWM_CFG_IMP_EXTERN_OP
 
 #undef vsf_imp_pwm_t
 #undef vsf_imp_pwm_init

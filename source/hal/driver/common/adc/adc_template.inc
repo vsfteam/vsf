@@ -198,6 +198,8 @@ vsf_adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
 #undef VSF_ADC_CFG_IMP_REMAP_PREFIX
 #undef VSF_ADC_CFG_IMP_LV0
 #undef VSF_ADC_CFG_IMP_REMAP_FUNCTIONS
+#undef VSF_ADC_CFG_IMP_HAS_OP
+#undef VSF_ADC_CFG_IMP_EXTERN_OP
 
 #undef vsf_imp_adc_t
 #undef vsf_imp_adc_init
