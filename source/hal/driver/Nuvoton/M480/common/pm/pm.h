@@ -564,7 +564,7 @@ typedef struct vsf_pm_pclk_cfg_t {
     uint16_t            div;
 } vsf_pm_pclk_cfg_t;
 
-//! main clock config sturct
+//! main clock config struct
 typedef struct vsf_pm_mclk_cfg_t {
     vsf_pm_clk_src_sel_t    clk_src;                //!< main clock source
     uint32_t            freq;                   //!< system oscillator frequency

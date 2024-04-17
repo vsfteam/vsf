@@ -34,7 +34,7 @@
 // For SWI
 #   include "hal/driver/common/swi/vsf_swi_template.h"
 
-/*\note It's up to developper to decide the actual path of the driver headers. */
+/*\note It's up to developer to decide the actual path of the driver headers. */
 
 #   if VSF_HAL_USE_IO == ENABLED
 #       include "../common/io/io.h"

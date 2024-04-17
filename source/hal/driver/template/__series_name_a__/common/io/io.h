@@ -27,14 +27,14 @@
 #include "../../__device.h"
 
 /*\note Refer to template/README.md for usage cases.
- *      For peripherial drivers, blackbox mode is recommended but not required, reimplementation part MUST be open.
+ *      For peripheral drivers, blackbox mode is recommended but not required, reimplementation part MUST be open.
  *      For IPCore drivers, class structure, MULTI_CLASS configuration, reimplementation and class APIs should be open to user.
  *      For emulated drivers, **** No reimplementation ****.
  *
  *      Usually, there is no IPCore driver for IO.
  */
 
-/*\note Incudes CAN ONLY be put here. */
+/*\note Includes CAN ONLY be put here. */
 
 #ifdef __cplusplus
 extern "C" {

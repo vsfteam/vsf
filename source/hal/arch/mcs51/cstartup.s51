@@ -84,7 +84,7 @@
 
         // The reset vector must be located at address zero, the reset
         // vector is located first in the INTVEC segment. This segment
-        // must thus be located at address zero. Be carefull if using
+        // must thus be located at address zero. Be careful if using
         // assembler sequences located with the ASEG directive, which may
         // prevent the INTVEC segment from being located at address zero.
 

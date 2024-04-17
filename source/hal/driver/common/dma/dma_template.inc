@@ -20,11 +20,11 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define vsf_real_dma_t                                VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t)
-#define vsf_real_dma_capability                       VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_capability)
+#define vsf_real_dma_t                                      VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t)
+#define vsf_real_dma_capability                             VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_capability)
 
 #ifndef VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY
-#   define  VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#   define  VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY          DISABLED
 #endif
 
 #if VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED

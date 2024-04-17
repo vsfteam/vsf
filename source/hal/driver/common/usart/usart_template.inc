@@ -20,8 +20,12 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_USART_CFG_REIMPLEMENT_API_REQUEST
+#   define  VSF_USART_CFG_REIMPLEMENT_API_REQUEST               ENABLED
+#endif
+
 #ifndef VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY
-#   define  VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#   define  VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY            DISABLED
 #endif
 
 #if VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -62,7 +66,7 @@
 
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_USART_CFG_IMP_FIFO_TO_REQUEST == ENABLED
+#if VSF_USART_CFG_REIMPLEMENT_API_REQUEST == DISABLED
 
 vsf_err_t vsf_real_usart_request_rx(vsf_real_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)
 {
@@ -131,7 +135,7 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 #undef VSF_USART_CFG_CAPABILITY_MAX_DATA_BITS
 #undef VSF_USART_CFG_CAPABILITY_MIN_DATA_BITS
 #undef VSF_USART_CFG_CAPABILITY_SUPPORT_RX_TIMEOUT
-#undef VSF_USART_CFG_IMP_FIFO_TO_REQUEST
+#undef VSF_USART_CFG_REIMPLEMENT_API_REQUEST
 #undef vsf_real_usart_t
 #undef vsf_real_usart_init
 #undef vsf_real_usart_fini

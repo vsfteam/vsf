@@ -25,7 +25,7 @@
 #define vsf_real_dac_capability                                 VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_capability)
 
 #ifndef VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY
-#   define  VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#   define  VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
 #endif
 
 #if VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED

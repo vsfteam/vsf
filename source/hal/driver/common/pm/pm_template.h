@@ -32,7 +32,7 @@
 #   define VSF_HAL_TEMPLATE_DEC_UPCASE_PREFIX         VSF_PM_CFG_DEC_UPCASE_PREFIX
 #endif
 
-// PM always is singl instance
+// PM always is single instance
 #define VSF_HAL_TEMPLATE_DEC_COUNT                1
 #define VSF_HAL_TEMPLATE_DEC_MASK                 1
 

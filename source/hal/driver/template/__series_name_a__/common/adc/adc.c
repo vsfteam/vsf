@@ -22,7 +22,7 @@
 #if VSF_HAL_USE_ADC == ENABLED
 
 /*\note For IPCore drivers, define __VSF_HAL_${ADC_IP}_ADC_CLASS_IMPLEMENT before including vsf_hal.h.
- *      For peripherial drivers, if IPCore driver is used, define __VSF_HAL_${ADC_IP}_ADC_CLASS_INHERIT__ before including vsf_hal.h
+ *      For peripheral drivers, if IPCore driver is used, define __VSF_HAL_${ADC_IP}_ADC_CLASS_INHERIT__ before including vsf_hal.h
  */
 
 // IPCore
@@ -37,7 +37,7 @@
 /*============================ MACROS ========================================*/
 
 /*\note VSF_HW_ADC_CFG_MULTI_CLASS is only for drivers for specified device(hw drivers).
- *      For other drivers, plase define VSF_${ADC_IP}_ADC_CFG_MULTI_CLASS in header file.
+ *      For other drivers, please define VSF_${ADC_IP}_ADC_CFG_MULTI_CLASS in header file.
  */
 
 // HW

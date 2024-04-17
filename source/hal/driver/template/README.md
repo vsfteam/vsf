@@ -1,24 +1,24 @@
 # HAL TEMPLATE GUIDE
 
 Template in current directory can be used for:
-1. Add a driver for peripherials of DEVICE in a SERIES from VENDOR.
+1. Add a driver for peripherals of DEVICE in a SERIES from VENDOR.
 
 These drivers are called HW drivers in VSF, codes between "HW" - "HW end" comments sections in the source code of the template are for these drivers.
-It's recommended to use blackbox mode for peripherial drivers, which hide everything in peripherial header files(eg adc.h), but REIMPLEMENT part(reimplement some structure/emun according to the reigster) MUST be open.
+It's recommended to use blackbox mode for peripheral drivers, which hide everything in peripheral header files(eg adc.h), but REIMPLEMENT part(reimplement some structure/emun according to the register) MUST be open.
 Here VENDOR/SERIES/DEVICE will be referenced in the source code of the template, please replace them with the actual name.
 
 2. Implement an IPCore driver XXX_IP from VENDOR.
 
-User of IPCore drivers is peripherial driver.
+User of IPCore drivers is peripheral driver.
 codes between "IPCore" - "IPCore end" comments sections in the source code of the template are for these drivers.
-IPCore drivers are actually provided to peripherial drivers, so information in IPCore drivers should be open.
+IPCore drivers are actually provided to peripheral drivers, so information in IPCore drivers should be open.
 Here VENDOR/XXX_IP will be referenced in the source code of the template, please replace them with the actual name.
 
-3. Implement a emulated driver as if it's an specified peripherial.
+3. Implement a emulated driver as if it's an specified peripheral.
 
-User of emulated drivers is application developper.
+User of emulated drivers is application developer.
 In this case, it's similar to IPCore case, so the source code of the template will take it as IPCore usage.
-But VENDOR is not used, XXX_IP should be the name of the emulated peripherial driver.
+But VENDOR is not used, XXX_IP should be the name of the emulated peripheral driver.
 Usage case example:
   - gpio_i2c: gpio emulated i2c driver which has the same API as vsf_i2c_t driver.
   - spi_flash: spi flash driver can provide 2 interfaces. One is mal which is block interface, another is vsf_flash_t driver interface.

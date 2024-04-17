@@ -132,7 +132,7 @@ typedef enum vsf_dma_channel_mode_t {
     VSF_DMA_PRIOPIRY_HIGH            = (0x02 << 22),
     VSF_DMA_PRIOPIRY_VERY_HIGH       = (0x03 << 22),
 
-    // reqeust line
+    // request line
 } vsf_dma_channel_mode_t;
 #endif
 

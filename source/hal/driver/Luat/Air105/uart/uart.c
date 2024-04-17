@@ -285,7 +285,7 @@ static void __vsf_hw_usart_irq_handler(vsf_hw_usart_t *hw_usart_ptr)
 #define VSF_USART_CFG_IMP_PREFIX                    __vsf_hw
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX             __VSF_HW
 #define VSF_USART_CFG_IMP_COUNT_MASK_PREFIX         VSF_HW
-#define VSF_USART_CFG_IMP_FIFO_TO_REQUEST           ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_REQUEST       DISABLED
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     static const vsf_hw_usart_const_t __vsf_hw_usart ## __IDX ## _clock = {     \
         .reg        = UART ## __IDX,                                            \

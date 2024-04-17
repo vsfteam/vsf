@@ -52,7 +52,7 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_CTS_HWCONTROL             = (0x02ul << 5),
     VSF_USART_RTS_CTS_HWCONTROL         = (0x03ul << 5),
 
-    // unsupport for win
+    // unsupported for win
     VSF_USART_6_BIT_LENGTH              = (0x01ul << 7),
     VSF_USART_7_BIT_LENGTH              = (0x01ul << 8),
     VSF_USART_5_BIT_LENGTH              = (0x01ul << 9),

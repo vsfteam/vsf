@@ -54,7 +54,7 @@
 /*============================ INCLUDES ======================================*/
 
 /*\note this is should be the only place where __common.h is included if implemented.
-        The path of __common.h is up to developper to decide.
+        The path of __common.h is up to developer to decide.
 */
 //#include "../common/__common.h"
 
@@ -63,13 +63,13 @@
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_NUM                             0
 
-/*\note For specified peripherial, VSF_HW_PERIPHERIAL_COUNT MUST be defined as number of peripherial instance.
- *      If peripherial instances start from 0, and are in sequence order(eg, 3 I2Cs: I2C0, I2C1, I2C2), VSF_HW_PERIPHERIAL_MASK is not needed.
- *      Otherwise, defind VSF_HW_PERIPHERIAL_MASK to indicate which peripherial instances to implmenent.
+/*\note For specified peripheral, VSF_HW_PERIPHERIAL_COUNT MUST be defined as number of peripheral instance.
+ *      If peripheral instances start from 0, and are in sequence order(eg, 3 I2Cs: I2C0, I2C1, I2C2), VSF_HW_PERIPHERIAL_MASK is not needed.
+ *      Otherwise, define VSF_HW_PERIPHERIAL_MASK to indicate which peripheral instances to implmenent.
  *      eg: 3 I2Cs: I2C0, I2C2, I2C4, define VSF_HW_I2C_MASK to 0x15(BIT(0) | BIT(2)) | BIT(4)).
  *
- *      Other configurations are vendor specified, drivers will use these information to generate peripherial instances.
- *      Usually need irqn, irqhandler, peripherial clock enable bits, peripherial reset bites, etc.
+ *      Other configurations are vendor specified, drivers will use these information to generate peripheral instances.
+ *      Usually need irqn, irqhandler, peripheral clock enable bits, peripheral reset bites, etc.
  */
 
 // IO

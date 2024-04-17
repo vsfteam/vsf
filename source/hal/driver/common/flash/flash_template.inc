@@ -21,18 +21,18 @@
 
 /*============================ MACROS ========================================*/
 
-#define vsf_real_flash_t                    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t)
-#define vsf_real_flash_capability           VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
-#define vsf_real_flash_erase_all            VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_all)
-#define vsf_real_flash_erase_one_sector     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_one_sector)
-#define vsf_real_flash_erase_multi_sector   VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_multi_sector)
-#define vsf_real_flash_write_one_sector     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_one_sector)
-#define vsf_real_flash_write_multi_sector   VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)
-#define vsf_real_flash_read_one_sector      VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_one_sector)
-#define vsf_real_flash_read_multi_sector    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)
+#define vsf_real_flash_t                                            VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t)
+#define vsf_real_flash_capability                                   VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
+#define vsf_real_flash_erase_all                                    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_all)
+#define vsf_real_flash_erase_one_sector                             VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_one_sector)
+#define vsf_real_flash_erase_multi_sector                           VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_multi_sector)
+#define vsf_real_flash_write_one_sector                             VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_one_sector)
+#define vsf_real_flash_write_multi_sector                           VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)
+#define vsf_real_flash_read_one_sector                              VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_one_sector)
+#define vsf_real_flash_read_multi_sector                            VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)
 
 #ifndef VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY
-#   define  VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#   define  VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY                DISABLED
 #endif
 
 #if VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -52,10 +52,10 @@
 #       define VSF_FLASH_CFG_CAPABILITY_WRITE_SECTORE_SIZE          512
 #   endif
 #   ifndef VSF_FLASH_CFG_CAPABILITY_SECTORE_WRITE_ANY_ADDRESS
-#       define VSF_FLASH_CFG_CAPABILITY_SECTORE_WRITE_ANY_ADDRESS  0
+#       define VSF_FLASH_CFG_CAPABILITY_SECTORE_WRITE_ANY_ADDRESS   0
 #   endif
 #   ifndef VSF_FLASH_CFG_CAPABILITY_SECTORE_READ_ANY_ADDRESS
-#       define VSF_FLASH_CFG_CAPABILITY_SECTORE_READ_ANY_ADDRESS   1
+#       define VSF_FLASH_CFG_CAPABILITY_SECTORE_READ_ANY_ADDRESS    1
 #   endif
 #endif
 

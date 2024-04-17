@@ -110,7 +110,7 @@ extern "C" {
 
 #define declare_vsf_fsm(__name)         __declare_fsm(__name)
 
-/*! \brief extern fsm initialisation function and provide function prototye
+/*! \brief extern fsm initialisation function and provide function prototype
            as <__name>_fn, E.g
            extern_vsf_fsm_initialiser( demo_fsm );
            we extern a function called:
@@ -127,7 +127,7 @@ extern "C" {
             __extern_fsm_initialiser(__name, __VA_ARGS__)
 
 
-/*! \brief extern fsm task function and provide function prototye as <__name>_fn, E.g
+/*! \brief extern fsm task function and provide function prototype as <__name>_fn, E.g
            extern_vsf_fsm_implementation( demo_fsm );
            we extern a function called:
            fsm_rt_t demo_fsm( fsm_demo_fsm_t *fsm_ptr )

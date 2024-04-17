@@ -157,7 +157,7 @@ void _entry_point(void)
 
     // call reset handler
     vsf_arch_set_stack((uintptr_t)vtab[0]);
-    // code below maybe buggy, if vtab is in original stack, will cause error becasue SP register is updated
+    // code below maybe buggy, if vtab is in original stack, will cause error because SP register is updated
     ((void (*)(void))(vtab[1]))();
 }
 

@@ -190,7 +190,7 @@ vsf_class(vsf_stream_op_t) {
         /**
          \~english write function, must be called after init.
          @param stream stream instance, cannot be NULL.
-         @param buf buffer pointer, poin to a buffer or NULL
+         @param buf buffer pointer, point to a buffer or NULL
          @param size write size(bytes), if buffer is NULL, then increase stream size.
 
          \~chinese 初始化函数，必须在其他API之前调用。
@@ -203,7 +203,7 @@ vsf_class(vsf_stream_op_t) {
         /**
          \~english read function, must be called after init.
          @param stream stream instance, cannot be NULL.
-         @param buf buffer pointer, poin to a buffer or NULL
+         @param buf buffer pointer, point to a buffer or NULL
          @param size read size(bytes), if buffer is NULL, then decrease stream size
 
          \~chinese 初始化函数，必须在其他API之前调用。
@@ -310,7 +310,7 @@ extern vsf_err_t vsf_stream_fini(vsf_stream_t *stream);
 /**
  \~english write function, must be called after init.
  @param stream stream instance, cannot be NULL.
- @param buf buffer pointer, poin to a buffer or NULL
+ @param buf buffer pointer, point to a buffer or NULL
  @param size write size(bytes), if buffer is NULL, then increase stream size.
 
  \~chinese 初始化函数，必须在其他API之前调用。
@@ -322,7 +322,7 @@ extern uint_fast32_t vsf_stream_write(vsf_stream_t *stream, uint8_t *buf, uint_f
 /**
  \~english read function, must be called after init.
  @param stream stream instance, cannot be NULL.
- @param buf buffer pointer, poin to a buffer or NULL
+ @param buf buffer pointer, point to a buffer or NULL
  @param size read size(bytes), if buffer is NULL, then decrease stream size
 
  \~chinese 初始化函数，必须在其他API之前调用。

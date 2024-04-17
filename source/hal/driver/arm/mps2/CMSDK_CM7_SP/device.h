@@ -188,7 +188,7 @@ struct pm_periph_asyn_clk_cfg_t {
     uint16_t             div;
 };
 
-//! \name main clock config sturct
+//! \name main clock config struct
 //! @{
 struct pm_main_clk_cfg_t {
     vsf_pm_clk_src_sel_t clk_src;                //!< main clock source

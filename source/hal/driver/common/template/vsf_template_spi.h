@@ -391,7 +391,7 @@ extern void vsf_spi_irq_disable(vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
 
 /**
  \~english
- @brief spi set chip select ative
+ @brief spi set chip select active
  @param[in] spi_ptr: a pointer to structure @ref vsf_spi_t
  @param[in] index: chip select index
  @return none.

@@ -27,13 +27,13 @@
 #include "../../__device.h"
 
 /*\note Refer to template/README.md for usage cases.
- *      For peripherial drivers, blackbox mode is recommended but not required, reimplementation part MUST be open.
+ *      For peripheral drivers, blackbox mode is recommended but not required, reimplementation part MUST be open.
  *      For IPCore drivers, class structure, MULTI_CLASS configuration, reimplementation and class APIs should be open to user.
  *      For emulated drivers, **** No reimplementation ****.
  */
 
-/*\note Incudes CAN ONLY be put here. */
-/*\note If current header is for a peripherial driver(hw driver), and inherit from an IPCore driver, include IPCore header here. */
+/*\note Includes CAN ONLY be put here. */
+/*\note If current header is for a peripheral driver(hw driver), and inherit from an IPCore driver, include IPCore header here. */
 
 // IPCore
 #if     defined(__VSF_HAL_${DAC_IP}_DAC_CLASS_IMPLEMENT)
@@ -72,8 +72,8 @@ vsf_class(vsf_${dac_ip}_dac_t) {
     )
 #endif
 
-/*\note You can add more memmber in vsf_${dac_ip}_dac_t instance.
- *      For members accessable from child, put in protected_member.
+/*\note You can add more member in vsf_${dac_ip}_dac_t instance.
+ *      For members accessible from child, put in protected_member.
  *      Else, put in private_member.
  */
 
@@ -89,7 +89,7 @@ vsf_class(vsf_${dac_ip}_dac_t) {
 // IPCore
 /*\note Extern APIs for ip core diriver.
  *      There is no requirement about how APIs of IPCore drivers should be implemented.
- *      Just consider the simplicity for actual peripherial drivers.
+ *      Just consider the simplicity for actual peripheral drivers.
  */
 // IPCore end
 

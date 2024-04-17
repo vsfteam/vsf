@@ -23,7 +23,7 @@
 #if VSF_HAL_USE_PWM == ENABLED
 
 /*\note For IPCore drivers, define __VSF_HAL_${PWM_IP}_PWM_CLASS_IMPLEMENT before including vsf_hal.h.
- *      For peripherial drivers, if IPCore driver is used, define __VSF_HAL_${PWM_IP}_PWM_CLASS_INHERIT__ before including vsf_hal.h
+ *      For peripheral drivers, if IPCore driver is used, define __VSF_HAL_${PWM_IP}_PWM_CLASS_INHERIT__ before including vsf_hal.h
  */
 
 // IPCore
@@ -38,7 +38,7 @@
 /*============================ MACROS ========================================*/
 
 /*\note VSF_HW_PWM_CFG_MULTI_CLASS is only for drivers for specified device(hw drivers).
- *      For other drivers, plase define VSF_${PWM_IP}_PWM_CFG_MULTI_CLASS in header file.
+ *      For other drivers, please define VSF_${PWM_IP}_PWM_CFG_MULTI_CLASS in header file.
  */
 
 // HW

@@ -21,7 +21,11 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY
-#   define  VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY              DISALBED
+#   define  VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
+#endif
+
+#ifndef VSF_TIMER_CFG_REIMPLEMENT_API_PWM_SET
+#   define  VSF_TIMER_CFG_REIMPLEMENT_API_PWM_SET                 DISABLED
 #endif
 
 #if VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -51,7 +55,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_TIMER_CFG_IMP_PWM_SET == DISABLED
+#if VSF_TIMER_CFG_REIMPLEMENT_API_PWM_SET == DISABLED
 vsf_err_t vsf_real_timer_pwm_set(vsf_real_timer_t *timer_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
 {
     VSF_HAL_ASSERT(NULL != timer_ptr);

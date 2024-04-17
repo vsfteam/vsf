@@ -143,7 +143,7 @@
 /*============================ MACROS ========================================*/
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE != ENABLED
-#   error VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE MUST be enbled for linux
+#   error VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE MUST be enabled for linux
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL != ENABLED
@@ -969,7 +969,7 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
     VSF_LINUX_ASSERT(ret == STDERR_FILENO);
     priv = (vsf_linux_stream_priv_t *)sfd->priv;
     // stderr is initialized after stdin, so stdin events will be bound to stderr
-    //  inplement a evthandler to redirect to stdin if stdin stream_rx is same as stderr
+    //  implement a evthandler to redirect to stdin if stdin stream_rx is same as stderr
     priv->on_evt = __vsf_linux_stderr_on_evt;
     priv->stream_rx = stdio_stream->in;
     priv->stream_tx = stdio_stream->err;
@@ -2998,7 +2998,7 @@ key_t ftok(const char *pathname, int id)
 
 #if VSF_LINUX_CFG_SUPPORT_SEM == ENABLED
 // sys/sem.h
-// TODO: use vsf_linux_trigger_t, so that sleeping thred can be wakened by signal
+// TODO: use vsf_linux_trigger_t, so that sleeping thread can be wakened by signal
 
 static void __semfini(vsf_linux_fd_t *sfd)
 {
@@ -3936,7 +3936,7 @@ delete_process_and_fail:
     return -1;
 }
 
-// the last paramter, which is priv_size is used to capture necessary variables when
+// the last parameter, which is priv_size is used to capture necessary variables when
 //  use spawn to replace fork/vfork.
 // __vsf_linux_get_process_priv can be used to get the buffer in priv_size which is
 //  bounded to process.
