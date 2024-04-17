@@ -111,7 +111,6 @@ vsf_class(vsf_74hc165_gpio_t) {
 extern const vsf_gpio_op_t vsf_74hc165_gpio_op;
 #endif
 
-/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsf_74hc165_gpio_init(vsf_74hc165_gpio_t *gpio_ptr);

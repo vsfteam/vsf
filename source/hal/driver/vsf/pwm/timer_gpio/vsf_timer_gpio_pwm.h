@@ -53,48 +53,56 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_TIMER_GPIO_MULTI_PWM_INIT(__TIMER, __GPIO, __CHANNEL_NUM, __CHANNELS)\
+#if VSF_TIMER_GPIO_PWM_CFG_MULTI_CLASS == ENABLED
+#   define __VSF_TIMER_GPIO_MULTI_PWM_INIT_HALOP                                \
+            .vsf_pwm.op         = &vsf_timer_gpio_multi_pwm_op,
+#   define __VSF_TIMER_GPIO_SINGLE_PWM_INIT_HALOP                               \
+            .vsf_pwm.op         = &vsf_timer_gpio_single_pwm_op,
+#else
+#   define __VSF_TIMER_GPIO_MULTI_PWM_INIT_HALOP
+#   define __VSF_TIMER_GPIO_SINGLE_PWM_INIT_HALOP
+#endif
+
+#define __VSF_TIMER_GPIO_MULTI_PWM_INIT(__TIMER, __GPIO_PORT, __CHANNEL_NUM, __CHANNELS)\
+            __VSF_TIMER_GPIO_MULTI_PWM_INIT_HALOP                               \
             .timer              = (vsf_timer_t *)(__TIMER),                     \
-            .gpio               = (vsf_gpio_t *)(__GPIO),                       \
+            .gpio               = (vsf_gpio_t *)(__GPIO_PORT),                  \
             .channels           = (__CHANNELS),                                 \
             .channel_num        = (__CHANNEL_NUM),
-#define VSF_TIMER_GPIO_MULTI_PWM_INIT(__TIMER, __GPIO, __CHANNEL_NUM, __CHANNELS)\
-            __VSF_TIMER_GPIO_MULTI_PWM_INIT((__TIMER), (__GPIO), (__CHANNEL_NUM), (__CHANNELS))
+#define VSF_TIMER_GPIO_MULTI_PWM_INIT(__TIMER, __GPIO_PORT, __CHANNEL_NUM, __CHANNELS)\
+            __VSF_TIMER_GPIO_MULTI_PWM_INIT((__TIMER), (__GPIO_PORT), (__CHANNEL_NUM), (__CHANNELS))
 
 #define __describe_timer_gpio_multi_pwm_channel(__config)                       \
             { .config = (__config) },
 
-#define __describe_timer_gpio_multi_pwm(__name, __timer, __gpio, ...)           \
+#define __describe_timer_gpio_multi_pwm(__name, __timer, __gpio_port, ...)      \
             static vsf_timer_gpio_multi_pwm_channel_t VSF_MCONNECT3(__, __name, _channels)[] = {\
                 VSF_MFOREACH(__describe_timer_gpio_multi_pwm_channel, __VA_ARGS__)\
             };                                                                  \
             vsf_timer_gpio_multi_pwm_t __name = {                               \
-                VSF_TIMER_GPIO_MULTI_PWM_INIT((__timer), (__gpio),              \
+                VSF_TIMER_GPIO_MULTI_PWM_INIT((__timer), (__gpio_port),         \
                         dimof(VSF_MCONNECT3(__, __name, _channels)),            \
                         VSF_MCONNECT3(__, __name, _channels))                   \
             };
 
-#define describe_timer_gpio_multi_pwm(__name, __timer, __gpio, ...)             \
-            __describe_timer_gpio_multi_pwm(__name, (__timer), (__gpio), __VA_ARGS__)
+#define describe_timer_gpio_multi_pwm(__name, __timer, __gpio_port, ...)        \
+            __describe_timer_gpio_multi_pwm(__name, (__timer), (__gpio_port), __VA_ARGS__)
 
 
-#define __VSF_TIMER_GPIO_SINGLE_PWM_INIT(__TIMER, __GPIO, __CHANNEL_NUM, __CHANNELS)\
+#define __VSF_TIMER_GPIO_SINGLE_PWM_INIT(__TIMER, __FN_GPIO_CONTROL)            \
+            __VSF_TIMER_GPIO_SINGLE_PWM_INIT_HALOP                              \
             .timer              = (vsf_timer_t *)(__TIMER),                     \
-            .gpio               = (vsf_gpio_t *)(__GPIO),                       \
-            .channels           = (__CHANNELS),                                 \
-            .channel_num        = (__CHANNEL_NUM),
-#define VSF_TIMER_GPIO_SINGLE_PWM_INIT(__TIMER, __GPIO, __CHANNEL_NUM, __CHANNELS)\
-            __VSF_TIMER_GPIO_SINGLE_PWM_INIT((__TIMER), (__GPIO), (__CHANNEL_NUM), (__CHANNELS))
+            .gpio_control       = (__FN_GPIO_CONTROL),
+#define VSF_TIMER_GPIO_SINGLE_PWM_INIT(__TIMER, __FN_GPIO_CONTROL)              \
+            __VSF_TIMER_GPIO_SINGLE_PWM_INIT((__TIMER), (__FN_GPIO_CONTROL))
 
-#define __describe_timer_gpio_single_pwm(__name, __timer, __gpio, __pin)        \
+#define __describe_timer_gpio_single_pwm(__name, __timer, __fn_gpio_control)    \
             vsf_timer_gpio_single_pwm_t __name = {                              \
-                VSF_TIMER_GPIO_SINGLE_PWM_INIT((__timer), (__gpio),             \
-                        dimof(VSF_MCONNECT3(__, __name, _channels)),            \
-                        VSF_MCONNECT3(__, __name, _channels))                   \
+                VSF_TIMER_GPIO_SINGLE_PWM_INIT((__timer), (__fn_gpio_control))  \
             };
 
-#define describe_timer_gpio_single_pwm(__name, __timer, __gpio, ...)            \
-            __describe_timer_gpio_single_pwm(__name, (__timer), (__gpio), __VA_ARGS__)
+#define describe_timer_gpio_single_pwm(__name, __timer, __fn_gpio_control)      \
+            __describe_timer_gpio_single_pwm(__name, (__timer), (__fn_gpio_control))
 
 /*============================ TYPES =========================================*/
 
@@ -159,7 +167,14 @@ vsf_class(vsf_timer_gpio_single_pwm_t) {
     )
 };
 
-/*============================ INCLUDES ======================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+
+#if VSF_TIMER_GPIO_PWM_CFG_MULTI_CLASS == ENABLED
+extern const vsf_pwm_op_t vsf_timer_gpio_single_pwm_op;
+extern const vsf_pwm_op_t vsf_timer_gpio_multi_pwm_op;
+#endif
+
+/*============================ PROTOTYPES ====================================*/
 
 #ifdef __cplusplus
 }
