@@ -172,6 +172,8 @@ int_fast32_t vsf_hw_usart_get_tx_count(vsf_hw_usart_t *hw_usart_ptr)
 
 /*============================ INCLUDES ======================================*/
 
+#define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_REQUEST       ENABLED
 #define VSF_USART_CFG_IMP_PREFIX                vsf_hw
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX         VSF_HW
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \

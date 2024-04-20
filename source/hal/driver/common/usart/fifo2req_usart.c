@@ -316,6 +316,7 @@ int_fast32_t vsf_fifo2req_usart_get_tx_count(vsf_fifo2req_usart_t *fifo2req_usar
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX               VSF_FIFO2REQ
 #define VSF_USART_CFG_IMP_EXTERN_OP                   ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_REQUEST         ENABLED
 #include "hal/driver/common/usart/usart_template.inc"
 
 #endif      // VSF_HAL_USE_USART

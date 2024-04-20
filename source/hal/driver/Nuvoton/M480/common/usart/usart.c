@@ -289,6 +289,8 @@ vsf_err_t vsf_hw_usart_request_tx(vsf_hw_usart_t *usart_ptr, void *buffer_ptr, u
 
 /*============================ IMPLEMENTATION ================================*/
 
+#define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY        DISABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_REQUEST           ENABLED
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                                  \
     static const vsf_hw_usart_const_t vsf_hw_usart ## __IDX ## _const = {                       \
         .usart = (UART ## __IDX),                                                               \

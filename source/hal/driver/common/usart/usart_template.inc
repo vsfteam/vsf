@@ -21,7 +21,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_USART_CFG_REIMPLEMENT_API_REQUEST
-#   define  VSF_USART_CFG_REIMPLEMENT_API_REQUEST               ENABLED
+#   define  VSF_USART_CFG_REIMPLEMENT_API_REQUEST               DISABLED
 #endif
 
 #ifndef VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY

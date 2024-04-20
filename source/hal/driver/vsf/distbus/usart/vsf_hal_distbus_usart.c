@@ -58,7 +58,7 @@ static const vsf_distbus_service_info_t __vsf_hal_distbus_usart_info = {
 
 #define VSF_USART_CFG_IMP_PREFIX                vsf_hal_distbus
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX         VSF_HAL_DISTBUS
-#define VSF_USART_CFG_REIMPLEMENT_API_REQUEST   DISABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_REQUEST   ENABLED
 #include "hal/driver/common/usart/usart_template.inc"
 
 
