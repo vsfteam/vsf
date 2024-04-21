@@ -2602,7 +2602,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "VSF:BM20B_0R8-10DS"
+		(property "Footprint" "BM20B_0R8-10DS"
 			(at 0 0 0)
 			(effects
 				(font
