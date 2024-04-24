@@ -65,7 +65,6 @@ vsf_class(vk_audio_dummy_dev_t) {
     )
 
     private_member(
-        bool is_inited;
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
         vk_audio_dummy_playback_ctx_t playback_ctx;
 #endif

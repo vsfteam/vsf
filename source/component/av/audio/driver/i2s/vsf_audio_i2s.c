@@ -183,7 +183,6 @@ __vsf_component_peda_ifs_entry(__vk_audio_i2s_init, vk_audio_init)
     vk_audio_i2s_dev_t *dev = vsf_container_of(&vsf_this, vk_audio_i2s_dev_t, use_as__vk_audio_dev_t);
 
     if (0 == dev->stream_num) {
-        dev->stream_num = 0;
         dev->stream = dev->__stream;
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
         dev->stream[dev->stream_num].stream_index = dev->stream_num;

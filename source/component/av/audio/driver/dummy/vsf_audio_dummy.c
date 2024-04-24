@@ -87,28 +87,24 @@ __vsf_component_peda_ifs_entry(__vk_audio_dummy_init, vk_audio_init)
 {
     vsf_peda_begin();
     vk_audio_dummy_dev_t *dev = vsf_container_of(&vsf_this, vk_audio_dummy_dev_t, use_as__vk_audio_dev_t);
-    uint_fast8_t stream_idx = 0;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        if (!dev->is_inited) {
-            dev->is_inited = true;
-
+        if (0 == dev->stream_num) {
             dev->stream = dev->__stream;
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
-            dev->stream[stream_idx].dir_in1out0 = 0;
-            dev->stream[stream_idx].format.value = 0;
-            dev->stream[stream_idx].drv = &__vk_audio_dummy_stream_drv_playback;
+            dev->stream[dev->stream_num].dir_in1out0 = 0;
+            dev->stream[dev->stream_num].format.value = 0;
+            dev->stream[dev->stream_num].drv = &__vk_audio_dummy_stream_drv_playback;
             dev->stream[dev->stream_num].dev = &dev->use_as__vk_audio_dev_t;
-            stream_idx++;
+            dev->stream_num++;
 #endif
 #if VSF_AUDIO_USE_CATURE == ENABLED
-            dev->stream[stream_idx].dir_in1out0 = 1;
-            dev->stream[stream_idx].drv = &__vk_audio_dummy_stream_drv_capture;
+            dev->stream[dev->stream_num].dir_in1out0 = 1;
+            dev->stream[dev->stream_num].drv = &__vk_audio_dummy_stream_drv_capture;
             dev->stream[dev->stream_num].dev = &dev->use_as__vk_audio_dev_t;
-            stream_idx++;
+            dev->stream_num++;
 #endif
-            dev->stream_num = stream_idx;
         }
         vsf_eda_return(VSF_ERR_NONE);
         break;
