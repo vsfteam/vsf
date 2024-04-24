@@ -51,7 +51,7 @@ dcl_vsf_peda_methods(static, __vk_audio_dummy_playback_stop)
 static void __vk_audio_dummy_playback_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt);
 #endif
 
-#if VSF_AUDIO_CFG_USE_CATURE == ENABLED
+#if VSF_AUDIO_USE_CATURE == ENABLED
 dcl_vsf_peda_methods(static, __vk_audio_dummy_capture_control)
 dcl_vsf_peda_methods(static, __vk_audio_dummy_capture_start)
 dcl_vsf_peda_methods(static, __vk_audio_dummy_capture_stop)
@@ -73,7 +73,7 @@ static const vk_audio_stream_drv_t __vk_audio_dummy_stream_drv_playback = {
 };
 #endif
 
-#if VSF_AUDIO_CFG_USE_CATURE == ENABLED
+#if VSF_AUDIO_USE_CATURE == ENABLED
 static const vk_audio_stream_drv_t __vk_audio_dummy_stream_drv_capture = {
     .control    = (vsf_peda_evthandler_t)vsf_peda_func(__vk_audio_dummy_capture_control),
     .start      = (vsf_peda_evthandler_t)vsf_peda_func(__vk_audio_dummy_capture_start),
