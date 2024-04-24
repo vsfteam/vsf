@@ -69,7 +69,7 @@ vsf_class(vk_audio_dummy_dev_t) {
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
         vk_audio_dummy_playback_ctx_t playback_ctx;
 #endif
-vk_audio_stream_t __stream[
+        vk_audio_stream_t __stream[
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED && VSF_AUDIO_USE_CAPTURE == ENABLED
             2
 #else
