@@ -18,7 +18,6 @@
 // force convert vsf_i2c_init to vsf_i2c_init
 #define VSF_I2C_CFG_IMP_PREFIX              vsf_gpio
 #define VSF_I2C_CFG_IMP_UPCASE_PREFIX       VSF_GPIO
-#define VSF_I2C_CFG_IMP_EXTERN_OP           ENABLED
 
 #define __VSF_HAL_GPIO_I2C_CLASS_IMPLEMENT  ENABLED
 
@@ -255,6 +254,7 @@ vsf_i2c_capability_t vsf_gpio_i2c_capability(vsf_gpio_i2c_t *gpio_i2c_ptr)
 /*============================ LOCAL VARIABLES ===============================*/
 
 #define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
+#define VSF_I2C_CFG_IMP_EXTERN_OP                   ENABLED
 #include "hal/driver/common/i2c/i2c_template.inc"
 
 #endif

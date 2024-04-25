@@ -52,6 +52,12 @@
 #   endif
 #endif
 
+#if VSF_HAL_USE_ADC == ENABLED
+#   if VSF_HAL_USE_ADC128D818_ADC == ENABLED
+#       include "./adc/TI/adc128d818/vsf_adc128d818.h"
+#   endif
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

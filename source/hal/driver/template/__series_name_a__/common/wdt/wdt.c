@@ -75,7 +75,6 @@ typedef struct VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t) {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
 /*============================ IMPLEMENTATION ================================*/
 
 /*\note Implementation below is for hw wdt only, because there is no requirements

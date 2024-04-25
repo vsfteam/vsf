@@ -230,7 +230,7 @@ uint32_t vsf_timer_gpio_single_pwm_get_freq(vsf_timer_gpio_single_pwm_t *pwm_ptr
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_HAL_TEMPLATE_IMP_EXTERN_OP                  ENABLED
+#define VSF_PWM_CFG_IMP_EXTERN_OP                       ENABLED
 #define VSF_PWM_CFG_IMP_PREFIX                          vsf_timer_gpio_single
 #define VSF_PWM_CFG_IMP_UPCASE_PREFIX                   VSF_TIMER_GPIO_SINGLE
 #include "hal/driver/common/pwm/pwm_template.inc"

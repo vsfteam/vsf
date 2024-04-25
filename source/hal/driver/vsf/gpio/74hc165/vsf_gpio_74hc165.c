@@ -140,7 +140,7 @@ vsf_gpio_capability_t vsf_74hc165_gpio_capability(vsf_74hc165_gpio_t *gpio_ptr)
     };
 }
 
-#define VSF_HAL_TEMPLATE_IMP_EXTERN_OP          ENABLED
+#define VSF_GPIO_CFG_IMP_EXTERN_OP              ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY ENABLED
 #define VSF_GPIO_CFG_IMP_PREFIX                 vsf_74hc165
 #define VSF_GPIO_CFG_IMP_UPCASE_PREFIX          VSF_74HC165
