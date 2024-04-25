@@ -27,11 +27,11 @@
 #include "bflb_gpio.h"
 #include "hardware/gpio_reg.h"
 
-#define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY         ENABLED
-#define VSF_GPIO_CFG_REIMPLEMENT_API_SET                ENABLED
-#define VSF_GPIO_CFG_REIMPLEMENT_API_CLEAR              ENABLED
-#define VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_SET      1
-#define VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_CLEAR    1
+#define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_API_SET                    ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_API_CLEAR                  ENABLED
+#define VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET      1
+#define VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_CLEAR    1
 
 /*============================ MACROS ========================================*/
 
@@ -167,8 +167,8 @@ void vsf_hw_gpio_toggle(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask
 vsf_gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
 {
     vsf_gpio_capability_t gpio_capability = {
-        .support_output_and_set = VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_SET,
-        .support_output_and_clear = VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_CLEAR,
+        .support_output_and_set = VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET,
+        .support_output_and_clear = VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_CLEAR,
         .pin_count = VSF_HW_GPIO_PIN_COUNT,
         .pin_mask = VSF_HW_GPIO_PIN_MASK,
     };
