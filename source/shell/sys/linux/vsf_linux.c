@@ -4323,12 +4323,12 @@ char * nl_langinfo(nl_item item)
 
 // dlfcn
 
+#if VSF_USE_LOADER == ENABLED
 static void * __dlmalloc(int size)
 {
     return malloc((size_t)size);
 }
 
-#if VSF_USE_LOADER == ENABLED
 static uint32_t __vsf_linux_loader_fd_read(vsf_loader_target_t *target, uint32_t offset, void *buffer, uint32_t size)
 {
     int fd = (int)target->object;
