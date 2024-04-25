@@ -104,8 +104,7 @@ vsf_i2c_status_t vsf_gpio_i2c_status(vsf_gpio_i2c_t *gpio_i2c_ptr)
 
 static void __vsf_gpio_i2c_scl_dominant(vsf_gpio_i2c_t *gpio_i2c_ptr)
 {
-    vsf_gpio_set_output(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->scl_pin);
-    vsf_gpio_clear(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->scl_pin);
+    vsf_gpio_output_and_clear(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->scl_pin);
 }
 
 static void __vsf_gpio_i2c_scl_recessive(vsf_gpio_i2c_t *gpio_i2c_ptr)
@@ -161,8 +160,7 @@ static uint8_t __vsf_gpio_i2c_in(vsf_gpio_i2c_t *gpio_i2c_ptr, bool ack)
     }
 
     if (ack) {
-        vsf_gpio_set_output(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
-        vsf_gpio_clear(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
+        vsf_gpio_output_and_clear(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
     }
     gpio_i2c_ptr->fn_delay(gpio_i2c_ptr);
     __vsf_gpio_i2c_scl_recessive(gpio_i2c_ptr);
@@ -191,8 +189,7 @@ vsf_err_t vsf_gpio_i2c_master_request(vsf_gpio_i2c_t *gpio_i2c_ptr,
     if ((cmd & VSF_I2C_CMD_START) || (cmd & VSF_I2C_CMD_RESTART)) {
         __vsf_gpio_i2c_scl_recessive(gpio_i2c_ptr);
         gpio_i2c_ptr->fn_delay(gpio_i2c_ptr);
-        vsf_gpio_set_output(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
-        vsf_gpio_clear(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
+        vsf_gpio_output_and_clear(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
         gpio_i2c_ptr->fn_delay(gpio_i2c_ptr);
 
         uint32_t rw_mask = is_read ? 1 : 0;
@@ -217,8 +214,7 @@ vsf_err_t vsf_gpio_i2c_master_request(vsf_gpio_i2c_t *gpio_i2c_ptr,
 
 check_stop:
     if (cmd & VSF_I2C_CMD_STOP) {
-        vsf_gpio_set_output(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
-        vsf_gpio_clear(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
+        vsf_gpio_output_and_clear(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
         gpio_i2c_ptr->fn_delay(gpio_i2c_ptr);
         __vsf_gpio_i2c_scl_recessive(gpio_i2c_ptr);
         vsf_gpio_set_input(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
