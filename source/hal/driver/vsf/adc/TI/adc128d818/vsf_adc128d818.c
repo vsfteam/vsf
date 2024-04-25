@@ -39,6 +39,23 @@
 // IPCore end
 
 /*============================ TYPES =========================================*/
+
+enum {
+    ADC128D818_REG_CONFIGURATION                = 0x00,
+    ADC128D818_REG_INTERRUPT_STATUS             = 0x01,
+    ADC128D818_REG_INTERRUPT_MASK               = 0x03,
+    ADC128D818_REG_CONVERSION_RATE              = 0x07,
+    ADC128D818_REG_CHANNEL_DISABLED             = 0x08,
+    ADC128D818_REG_ONE_SHOT                     = 0x09,
+    ADC128D818_REG_DEEP_SHUTDOWN                = 0x0A,
+    ADC128D818_REG_ADVANCED_CONFIGURATION       = 0x0B,
+    ADC128D818_REG_BUSY_STATUS                  = 0x0C,
+    ADC128D818_REG_CHANNEL_READINGS             = 0x20,
+    ADC128D818_REG_LIMIT                        = 0x2A,
+    ADC128D818_REG_MANUFACTURER_ID              = 0x3E,
+    ADC128D818_REG_REVISION_ID                  = 0x3F,
+};
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -49,15 +66,149 @@
  *      Usage of VSF_MCONNECT is not a requirement, but for convenience only,
  */
 
+static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_config_channels)(
+    VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr)
+{
+    adc_ptr->cur_reg = ADC128D818_REG_CHANNEL_DISABLED;
+    adc_ptr->data_buffer[0] = ~adc_ptr->cur_channels;
+    vsf_i2c_master_request(adc_ptr->i2c, adc_ptr->i2c_addr,
+            VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP, 2, &adc_ptr->cur_reg);
+}
+
 // HW
+static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_i2c_irqhandler)(
+    void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
+{
+    VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr = target_ptr;
+    vsf_i2c_t *i2c = adc_ptr->i2c;
+
+    if (irq_mask != VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
+        vsf_trace_error("adc128d818: i2c failure" VSF_TRACE_CFG_LINEEND);
+        return;
+    }
+
+    if (adc_ptr->rx_byte_len > 0) {
+        uint8_t rx_byte_len = adc_ptr->rx_byte_len;
+        adc_ptr->rx_byte_len = 0;
+        vsf_i2c_master_request(i2c_ptr, adc_ptr->i2c_addr,
+            VSF_I2C_CMD_RESTART | VSF_I2C_CMD_READ | VSF_I2C_CMD_STOP,
+            rx_byte_len, (uint8_t *)adc_ptr->data);
+        return;
+    }
+
+    switch (adc_ptr->cur_reg) {
+    case ADC128D818_REG_BUSY_STATUS:
+        if (adc_ptr->total_count > 0) {
+            if (adc_ptr->data & (1 << 0)) {
+                goto poll_again;
+            }
+
+        read_result: {
+                int_fast8_t idx = vsf_ffs32(adc_ptr->cur_channels);
+                if (idx < 0) {
+                    adc_ptr->cur_channels = adc_ptr->channels_configured;
+                    goto one_shot;
+                } else {
+                    adc_ptr->total_count--;
+                    adc_ptr->cur_channels &= ~(1 << idx);
+                    adc_ptr->cur_reg = ADC128D818_REG_CHANNEL_READINGS + idx;
+                    adc_ptr->rx_byte_len = 2;
+                    vsf_i2c_master_request(i2c, adc_ptr->i2c_addr,
+                        VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE, 1, &adc_ptr->cur_reg);
+                }
+            }
+        } else {
+            if (adc_ptr->data & (1 << 1)) {
+            poll_again:
+                adc_ptr->rx_byte_len = 1;
+                vsf_i2c_master_request(i2c, adc_ptr->i2c_addr,
+                    VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE, 1, &adc_ptr->cur_reg);
+                break;
+            }
+
+            adc_ptr->cur_reg = ADC128D818_REG_ADVANCED_CONFIGURATION;
+            adc_ptr->data_buffer[0] = (1 << 0) /* External Reference Enable */
+                                | (1 << 1) /* Mode1: IN0 - IN7 */;
+            vsf_i2c_master_request(i2c, adc_ptr->i2c_addr,
+                VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP,
+                2, &adc_ptr->cur_reg);
+        }
+        break;
+    case ADC128D818_REG_ADVANCED_CONFIGURATION: {
+            uint8_t cur_channels;
+            vsf_protect_t orig = vsf_protect_int();
+                adc_ptr->is_inited = true;
+                cur_channels = adc_ptr->cur_channels;
+            vsf_unprotect_int(orig);
+
+            if (cur_channels != 0) {
+                VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_config_channels)(adc_ptr);
+            }
+        }
+        break;
+    case ADC128D818_REG_CHANNEL_DISABLED:
+    one_shot:
+        adc_ptr->cur_reg = ADC128D818_REG_ONE_SHOT;
+        adc_ptr->data_buffer[0] = 1;
+        vsf_i2c_master_request(i2c, adc_ptr->i2c_addr,
+            VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP,
+            2, &adc_ptr->cur_reg);
+        break;
+    case ADC128D818_REG_ONE_SHOT:
+        adc_ptr->cur_reg = ADC128D818_REG_BUSY_STATUS;
+        goto poll_again;
+    case ADC128D818_REG_CHANNEL_READINGS + 0:
+    case ADC128D818_REG_CHANNEL_READINGS + 1:
+    case ADC128D818_REG_CHANNEL_READINGS + 2:
+    case ADC128D818_REG_CHANNEL_READINGS + 3:
+    case ADC128D818_REG_CHANNEL_READINGS + 4:
+    case ADC128D818_REG_CHANNEL_READINGS + 5:
+    case ADC128D818_REG_CHANNEL_READINGS + 6:
+    case ADC128D818_REG_CHANNEL_READINGS + 7:
+        *adc_ptr->result_buffer++ = adc_ptr->data;
+        if (adc_ptr->total_count > 0) {
+            goto read_result;
+        } else if ( (adc_ptr->irq_mask & VSF_ADC_IRQ_MASK_CPL)
+                &&  (adc_ptr->isr.handler_fn != NULL)) {
+            adc_ptr->isr.handler_fn(adc_ptr->isr.target_ptr, (vsf_adc_t *)adc_ptr,
+                VSF_ADC_IRQ_MASK_CPL);
+        }
+    }
+}
+
 vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_init)(
     VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr,
     vsf_adc_cfg_t *cfg_ptr
 ) {
     VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != cfg_ptr));
+
+    vsf_i2c_t *i2c = adc_ptr->i2c;
     // configure according to cfg_ptr
+    adc_ptr->cur_channels = 0;
+    adc_ptr->total_count = 0;
+    adc_ptr->result_buffer = NULL;
     adc_ptr->isr = cfg_ptr->isr;
-    // configure interrupt according to cfg_ptr->isr
+    adc_ptr->is_continuous_mode = (cfg_ptr->mode & VSF_ADC_SCAN_CONV_MASK) == VSF_ADC_SCAN_CONV_SEQUENCE_MODE;
+    adc_ptr->is_inited = false;
+
+    vsf_i2c_init(i2c, &(vsf_i2c_cfg_t){
+        .mode           = VSF_I2C_MODE_MASTER | VSF_I2C_SPEED_FAST_MODE | VSF_I2C_ADDR_7_BITS,
+        .clock_hz       = 400 * 1000,
+        .isr            = {
+            .handler_fn = VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_i2c_irqhandler),
+            .target_ptr = adc_ptr,
+            .prio       = cfg_ptr->isr.prio,
+        },
+    });
+    vsf_i2c_irq_enable(i2c, VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE
+                        |   VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK
+                        |   VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT);
+    vsf_i2c_enable(i2c);
+
+    adc_ptr->cur_reg = ADC128D818_REG_BUSY_STATUS;
+    adc_ptr->rx_byte_len = 1;
+    vsf_i2c_master_request(i2c, adc_ptr->i2c_addr,
+            VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE, 1, &adc_ptr->cur_reg);
     return VSF_ERR_NONE;
 }
 
@@ -86,6 +237,7 @@ void VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_irq_enable)(
     vsf_adc_irq_mask_t irq_mask
 ) {
     VSF_HAL_ASSERT(NULL != adc_ptr);
+    adc_ptr->irq_mask |= irq_mask;
 }
 
 void VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_irq_disable)(
@@ -93,6 +245,7 @@ void VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_irq_disable)(
     vsf_adc_irq_mask_t irq_mask
 ) {
     VSF_HAL_ASSERT(NULL != adc_ptr);
+    adc_ptr->irq_mask &= ~irq_mask;
 }
 
 vsf_adc_status_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_status)(
@@ -100,7 +253,7 @@ vsf_adc_status_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_status)(
 ) {
     VSF_HAL_ASSERT(NULL != adc_ptr);
     return (vsf_adc_status_t) {
-        .is_busy                = false,
+        .is_busy                = adc_ptr->is_busy,
     };
 }
 
@@ -110,6 +263,20 @@ vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_channel_request_once)(
     void *buffer_ptr
 ) {
     VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != buffer_ptr));
+
+    uint8_t cur_channels = 1 << channel_cfg_ptr->channel;
+    adc_ptr->result_buffer = buffer_ptr;
+    adc_ptr->total_count = 1;
+    vsf_protect_t orig = vsf_protect_int();
+        adc_ptr->cur_channels = cur_channels;
+        if (!adc_ptr->is_inited) {
+            cur_channels = 0;
+        }
+    vsf_unprotect_int(orig);
+
+    if (cur_channels > 0) {
+        VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_config_channels)(adc_ptr);
+    }
     return VSF_ERR_NONE;
 }
 
@@ -120,6 +287,12 @@ vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_channel_config)(
 ) {
     VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != channel_cfgs_ptr));
     VSF_HAL_ASSERT(0 != channel_cfgs_cnt);
+
+    uint8_t channels_configured = 0;
+    for (uint32_t i = 0; i < channel_cfgs_cnt; i++, channel_cfgs_ptr++) {
+        channels_configured |=  1 << channel_cfgs_ptr->channel;
+    }
+    adc_ptr->channels_configured = channels_configured;
     return VSF_ERR_NONE;
 }
 
@@ -129,6 +302,21 @@ vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_channel_request)(
     uint_fast32_t count
 ) {
     VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != buffer_ptr) && (count > 0));
+
+    uint8_t cur_channels = adc_ptr->channels_configured;
+    adc_ptr->result_buffer = buffer_ptr;
+    adc_ptr->total_count = count;
+    vsf_protect_t orig = vsf_protect_int();
+        adc_ptr->cur_channels = cur_channels;
+        if (!adc_ptr->is_inited) {
+            cur_channels = 0;
+        }
+    vsf_unprotect_int(orig);
+
+    if (cur_channels > 0) {
+        VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_config_channels)(adc_ptr);
+    }
+
     return VSF_ERR_NONE;
 }
 

@@ -60,15 +60,39 @@ extern "C" {
 // IPCore end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#if VSF_ADC128D818_ADC_CFG_MULTI_CLASS == ENABLED
+#   define __VSF_ADC128D818_ADC_HALOP       .vsf_adc.op = &vsf_adc128d818_adc_op,
+#else
+#   define __VSF_ADC128D818_ADC_HALOP
+#endif
+
+#define __VSF_ADC128D818_ADC_INIT(__I2C, __I2C_ADDR)                            \
+            __VSF_ADC128D818_ADC_HALOP                                          \
+            .i2c                = (__I2C),                                      \
+            .i2c_addr           = (__I2C_ADDR),
+#define VSF_ADC128D818_ADC_INIT(__I2C, __I2C_ADDR)                              \
+            __VSF_ADC128D818_ADC_INIT((__I2C), (__I2C_ADDR))
+
+#define __describe_adc128d818_adc(__name, __i2c, __i2c_addr)                    \
+            vsf_adc128d818_adc_t __name = {                                     \
+                __VSF_ADC128D818_ADC_INIT((__i2c), (__i2c_addr))                \
+            };
+
+#define describe_adc128d818_adc(__name, __i2c, __i2c_addr)                      \
+            __describe_adc128d818_adc(__name, (__i2c), (__i2c_addr))
+
 /*============================ TYPES =========================================*/
 
 // IPCore
 vsf_class(vsf_adc128d818_adc_t) {
-#if VSF_ADC128D818_CFG_MULTI_CLASS == ENABLED
     public_member(
+#if VSF_ADC128D818_ADC_CFG_MULTI_CLASS == ENABLED
         vsf_adc_t               vsf_adc;
-    )
 #endif
+        vsf_i2c_t               *i2c;
+        uint8_t                 i2c_addr;
+    )
 
 /*\note You can add more member in vsf_adc128d818_adc_t instance.
  *      For members accessible from child, put in protected_member.
@@ -77,6 +101,22 @@ vsf_class(vsf_adc128d818_adc_t) {
 
     protected_member(
         vsf_adc_isr_t           isr;
+        vsf_adc_irq_mask_t      irq_mask;
+        uint16_t                *result_buffer;
+        uint32_t                total_count;
+        uint8_t                 is_continuous_mode : 1;
+        uint8_t                 is_inited : 1;
+        uint8_t                 is_busy : 1;
+        uint8_t                 rx_byte_len : 2;
+        uint8_t                 channels_configured;
+        uint8_t                 cur_channels;
+        struct {
+            uint8_t             cur_reg;
+            union {
+                uint8_t         data_buffer[2];
+                uint16_t        data;
+            };
+        } VSF_CAL_PACKED;
     )
 };
 // IPCore end
