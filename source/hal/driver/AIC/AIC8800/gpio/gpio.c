@@ -181,8 +181,8 @@ vsf_gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
 {
     vsf_gpio_capability_t gpio_capability = {
         .is_async = hw_gpio_ptr->is_pmic,
-        .support_output_and_set = VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_SET,
-        .support_output_and_clear = VSF_GPIO_CFG_CAPABILITY_HAS_OUTPUT_AND_CLEAR,
+        .support_output_and_set = VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET,
+        .support_output_and_clear = VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_CLEAR,
         .support_interrupt = 1,
         .pin_count = VSF_HW_GPIO_PIN_COUNT,
         .pin_mask = VSF_HW_GPIO_PIN_MASK,
