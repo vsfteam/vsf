@@ -78,8 +78,8 @@ vsf_err_t vsf_dw_apb_i2c_init(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr, vsf_i2c_cfg_t *c
                     |   (1 << I2C_IC_CON_IC_RESTART_EN_POS)
                     |   (1 << I2C_IC_CON_TX_EMPTY_CTRL_POS)
                     |   (1 << I2C_IC_CON_RX_FIFO_FULL_HLD_CTRL_POS);
-    reg->IC_RX_TL.RX_TL = reg->IC_COMP_PARAM_1.RX_BUFFER_DEPTH;
-    reg->IC_TX_TL.TX_TL = reg->IC_COMP_PARAM_1.TX_BUFFER_DEPTH;
+    reg->IC_RX_TL.RX_TL = 0;
+    reg->IC_TX_TL.TX_TL = 0;
 
     dw_apb_i2c_ptr->isr = cfg_ptr->isr;
     dw_apb_i2c_ptr->irq_mask = 0;
