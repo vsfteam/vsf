@@ -146,6 +146,7 @@ vsf_class(vsf_dw_apb_i2c_t) {
         vsf_i2c_irq_mask_t      irq_mask;
         uint8_t                 *ptr;
         uint16_t                count;
+        uint16_t                rx_req_count;
         uint16_t                is_master   : 1;
         uint16_t                is_read     : 1;
         uint16_t                need_stop   : 1;
