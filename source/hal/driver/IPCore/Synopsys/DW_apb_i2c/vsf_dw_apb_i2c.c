@@ -44,8 +44,10 @@
 
 // IC_INTR_XXXX
 
+#define I2C_IC_INTR_RX_FULL_POS                 2
 #define I2C_IC_INTR_RD_REQ_POS                  5
 #define I2C_IC_INTR_TX_ABRT_POS                 6
+#define I2C_IC_INTR_STOP_DET_POS                9
 
 // IC_TX_ABRT
 
@@ -150,9 +152,9 @@ vsf_i2c_irq_mask_t vsf_dw_apb_i2c_irq_enable(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr, v
     dw_apb_i2c_ptr->irq_mask |= irq_mask;
     reg->IC_INTR_MASK.VALUE |= irq_mask & __VSF_DW_APB_I2C_IRQ_MASK;
     if (!dw_apb_i2c_ptr->is_master) {
-        reg->IC_INTR_MASK.VALUE |= (1 << I2C_IC_INTR_RD_REQ_POS) | (1 << I2C_IC_INTR_TX_ABRT_POS) | VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY;
+        reg->IC_INTR_MASK.VALUE |= (1 << I2C_IC_INTR_RD_REQ_POS) | (1 << I2C_IC_INTR_TX_ABRT_POS);
     } else {
-        reg->IC_INTR_MASK.VALUE |= 1 << I2C_IC_INTR_TX_ABRT_POS;
+        reg->IC_INTR_MASK.VALUE |= (1 << I2C_IC_INTR_TX_ABRT_POS) | (1 << I2C_IC_INTR_RX_FULL_POS);
     }
     return (vsf_i2c_irq_mask_t)reg->IC_INTR_MASK.VALUE & __VSF_DW_APB_I2C_IRQ_MASK;
 }
@@ -180,8 +182,7 @@ static void __vsf_dw_apb_i2c_continue(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != dw_apb_i2c_ptr);
     vsf_dw_apb_i2c_reg_t *reg = dw_apb_i2c_ptr->reg;
-    uint32_t stop = dw_apb_i2c_ptr->need_stop && (1 == dw_apb_i2c_ptr->count) ?
-                        VSF_I2C_CMD_STOP : 0;
+    uint32_t stop;
 
     if (dw_apb_i2c_ptr->is_read) {
         if (reg->IC_STATUS.RFNE) {
@@ -189,10 +190,12 @@ static void __vsf_dw_apb_i2c_continue(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr)
             dw_apb_i2c_ptr->count--;
         }
         if (dw_apb_i2c_ptr->count) {
+            stop = dw_apb_i2c_ptr->need_stop && (1 == dw_apb_i2c_ptr->count) ? VSF_I2C_CMD_STOP : 0;
             reg->IC_DATA_CMD.VALUE = VSF_I2C_CMD_READ | stop;
         }
     } else {
-        if (reg->IC_STATUS.TFE) {
+        if (reg->IC_STATUS.TFNF) {
+            stop = dw_apb_i2c_ptr->need_stop && (1 == dw_apb_i2c_ptr->count) ? VSF_I2C_CMD_STOP : 0;
             reg->IC_DATA_CMD.VALUE = *dw_apb_i2c_ptr->ptr++ | stop;
             dw_apb_i2c_ptr->count--;
         }
@@ -228,8 +231,10 @@ void vsf_dw_apb_i2c_irqhandler(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr)
     if (mask & (1 << I2C_IC_INTR_RD_REQ_POS)) {
         (void)reg->IC_CLR_RD_REQ.VALUE;
     }
-    if (mask & VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY) {
-        reg->IC_INTR_MASK.VALUE &= ~VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY;
+    if (mask & (1 << I2C_IC_INTR_STOP_DET_POS)) {
+        (void)reg->IC_CLR_STOP_DET.VALUE;
+        mask_notify |=  VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE
+                    |   VSF_I2C_IRQ_MASK_MASTER_STOPPED;
     }
 
     if (dw_apb_i2c_ptr->is_master) {
@@ -243,22 +248,24 @@ void vsf_dw_apb_i2c_irqhandler(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr)
         if (!(mask_notify & __VSF_DW_APB_I2C_ERROR_MASK)) {
             __vsf_dw_apb_i2c_continue(dw_apb_i2c_ptr);
             if (dw_apb_i2c_ptr->is_read && !dw_apb_i2c_ptr->count) {
-                if (dw_apb_i2c_ptr->need_stop) {
-                    mask_notify |= VSF_I2C_IRQ_MASK_MASTER_STOPPED;
+                if (!dw_apb_i2c_ptr->need_stop) {
+                    mask_notify |= VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
                 }
-                mask_notify |= VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
             }
         }
     } else {
         if (!(mask_notify & __VSF_DW_APB_I2C_ERROR_MASK)) {
             if (!dw_apb_i2c_ptr->is_read) {
+                reg->IC_INTR_MASK.VALUE &= ~VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY;
                 mask_notify |= VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY;
             }
             if (dw_apb_i2c_ptr->need_stop) {
                 mask_notify |= VSF_I2C_IRQ_MASK_MASTER_STOPPED;
             }
         }
-        mask_notify |= VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
+        if (!dw_apb_i2c_ptr->need_stop) {
+            mask_notify |= VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
+        }
     }
     if (mask_notify != 0) {
         __vsf_dw_apb_i2c_notify(dw_apb_i2c_ptr, mask_notify);
@@ -288,9 +295,19 @@ vsf_err_t vsf_dw_apb_i2c_master_request(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr,
     }
     reg->IC_ENABLE.ENABLE = 1;
 
+    if (dw_apb_i2c_ptr->need_stop) {
+        reg->IC_INTR_MASK.VALUE |= 1 << I2C_IC_INTR_STOP_DET_POS;
+    }
     if (count > 0) {
         dw_apb_i2c_ptr->ptr = buffer;
         dw_apb_i2c_ptr->count = count;
+
+#if DW_APB_I2C_CFG_IC_EMPTYFIFO_HOLD_MASTER_EN != ENABLED
+        if (!dw_apb_i2c_ptr->is_read) {
+            VSF_HAL_ASSERT(count <= (reg->IC_COMP_PARAM_1.TX_BUFFER_DEPTH + 1));
+            reg->IC_TX_TL.TX_TL = count;
+        }
+#endif
         __vsf_dw_apb_i2c_continue(dw_apb_i2c_ptr);
 
         if (!(cmd & VSF_I2C_CMD_READ)) {
