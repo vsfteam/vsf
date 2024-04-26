@@ -92,15 +92,15 @@ static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_i2c_irqhandler)(
         adc_ptr->rx_byte_len = 0;
         vsf_i2c_master_request(i2c_ptr, adc_ptr->i2c_addr,
             VSF_I2C_CMD_RESTART | VSF_I2C_CMD_READ | VSF_I2C_CMD_STOP,
-            rx_byte_len, (uint8_t *)adc_ptr->data);
+            rx_byte_len, (uint8_t *)adc_ptr->data_buffer);
         return;
     }
 
     switch (adc_ptr->cur_reg) {
     case ADC128D818_REG_BUSY_STATUS:
-        if (adc_ptr->total_count > 0) {
+        if (adc_ptr->is_inited) {
             if (adc_ptr->data & (1 << 0)) {
-                goto poll_again;
+                goto read_status;
             }
 
         read_result: {
@@ -119,7 +119,7 @@ static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_i2c_irqhandler)(
             }
         } else {
             if (adc_ptr->data & (1 << 1)) {
-            poll_again:
+            read_status:
                 adc_ptr->rx_byte_len = 1;
                 vsf_i2c_master_request(i2c, adc_ptr->i2c_addr,
                     VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE, 1, &adc_ptr->cur_reg);
@@ -128,7 +128,7 @@ static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_i2c_irqhandler)(
 
             adc_ptr->cur_reg = ADC128D818_REG_ADVANCED_CONFIGURATION;
             adc_ptr->data_buffer[0] = (1 << 0) /* External Reference Enable */
-                                | (1 << 1) /* Mode1: IN0 - IN7 */;
+                                    | (1 << 1) /* Mode1: IN0 - IN7 */;
             vsf_i2c_master_request(i2c, adc_ptr->i2c_addr,
                 VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP,
                 2, &adc_ptr->cur_reg);
@@ -156,7 +156,7 @@ static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_i2c_irqhandler)(
         break;
     case ADC128D818_REG_ONE_SHOT:
         adc_ptr->cur_reg = ADC128D818_REG_BUSY_STATUS;
-        goto poll_again;
+        goto read_status;
     case ADC128D818_REG_CHANNEL_READINGS + 0:
     case ADC128D818_REG_CHANNEL_READINGS + 1:
     case ADC128D818_REG_CHANNEL_READINGS + 2:
