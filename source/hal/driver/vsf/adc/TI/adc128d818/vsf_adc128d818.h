@@ -49,6 +49,10 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
+#if VSF_HAL_USE_I2C != ENABLED
+#   error ADC128D818 uses I2C, please enable VSF_HAL_USE_I2C
+#endif
+
 /*\note VSF_ADC128D818_ADC_CFG_MULTI_CLASS should be implemented for IP drives and open to user,
  *          while VSF_HW_ADC_CFG_MULTI_CLASS should be in adc.c.
  */
@@ -90,6 +94,7 @@ vsf_class(vsf_adc128d818_adc_t) {
 #if VSF_ADC128D818_ADC_CFG_MULTI_CLASS == ENABLED
         vsf_adc_t               vsf_adc;
 #endif
+        // TODO: support INT
         vsf_i2c_t               *i2c;
         uint8_t                 i2c_addr;
     )

@@ -165,7 +165,7 @@ static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_i2c_irqhandler)(
     case ADC128D818_REG_CHANNEL_READINGS + 5:
     case ADC128D818_REG_CHANNEL_READINGS + 6:
     case ADC128D818_REG_CHANNEL_READINGS + 7:
-        *adc_ptr->result_buffer++ = adc_ptr->data;
+        *adc_ptr->result_buffer++ = be16_to_cpu(adc_ptr->data) >> 4;
         if (adc_ptr->total_count > 0) {
             goto read_result;
         } else if ( (adc_ptr->irq_mask & VSF_ADC_IRQ_MASK_CPL)
