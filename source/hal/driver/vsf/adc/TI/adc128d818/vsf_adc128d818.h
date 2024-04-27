@@ -114,7 +114,9 @@ vsf_class(vsf_adc128d818_adc_t) {
         uint8_t                 is_busy : 1;
         uint8_t                 rx_byte_len : 2;
         uint8_t                 channels_configured;
+        uint8_t                 channels_map[8];
         uint8_t                 cur_channels;
+        uint8_t                 cur_idx;
         struct {
             uint8_t             cur_reg;
             union {

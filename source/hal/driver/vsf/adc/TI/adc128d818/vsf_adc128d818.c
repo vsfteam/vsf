@@ -102,20 +102,20 @@ static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_i2c_irqhandler)(
             if (adc_ptr->data & (1 << 0)) {
                 goto read_status;
             }
+            adc_ptr->cur_idx = 0;
 
-        read_result: {
-                int_fast8_t idx = vsf_ffs32(adc_ptr->cur_channels);
-                if (idx < 0) {
-                    adc_ptr->cur_channels = adc_ptr->channels_configured;
-                    goto one_shot;
-                } else {
-                    adc_ptr->total_count--;
-                    adc_ptr->cur_channels &= ~(1 << idx);
-                    adc_ptr->cur_reg = ADC128D818_REG_CHANNEL_READINGS + idx;
-                    adc_ptr->rx_byte_len = 2;
-                    vsf_i2c_master_request(i2c, adc_ptr->i2c_addr,
-                        VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE, 1, &adc_ptr->cur_reg);
-                }
+        read_result:
+            if (!adc_ptr->cur_channels) {
+                adc_ptr->cur_channels = adc_ptr->channels_configured;
+                goto one_shot;
+            } else {
+                uint8_t idx = adc_ptr->channels_map[adc_ptr->cur_idx++];
+                adc_ptr->total_count--;
+                adc_ptr->cur_channels &= ~(1 << idx);
+                adc_ptr->cur_reg = ADC128D818_REG_CHANNEL_READINGS + idx;
+                adc_ptr->rx_byte_len = 2;
+                vsf_i2c_master_request(i2c, adc_ptr->i2c_addr,
+                    VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE, 1, &adc_ptr->cur_reg);
             }
         } else {
             if (adc_ptr->data & (1 << 1)) {
@@ -290,7 +290,8 @@ vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_channel_config)(
 
     uint8_t channels_configured = 0;
     for (uint32_t i = 0; i < channel_cfgs_cnt; i++, channel_cfgs_ptr++) {
-        channels_configured |=  1 << channel_cfgs_ptr->channel;
+        adc_ptr->channels_map[i] = channel_cfgs_ptr->channel;
+        channels_configured |= 1 << channel_cfgs_ptr->channel;
     }
     adc_ptr->channels_configured = channels_configured;
     return VSF_ERR_NONE;
