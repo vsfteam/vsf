@@ -8149,6 +8149,17 @@
 		)
 		(uuid "ff11204e-2911-4a53-a096-46630aa635dc")
 	)
+	(label "AD_RT"
+		(at 177.8 138.43 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "021604a8-0dae-402c-8ae5-f028437bb515")
+	)
 	(label "74OUT"
 		(at 276.86 104.14 0)
 		(fields_autoplaced yes)
@@ -8237,7 +8248,7 @@
 		)
 		(uuid "0aceca32-8d3f-47e1-9b2e-5b40add8743e")
 	)
-	(label "5V"
+	(label "VBAT"
 		(at 71.12 127.635 0)
 		(fields_autoplaced yes)
 		(effects
@@ -8281,7 +8292,18 @@
 		)
 		(uuid "130ddf12-2f4c-4a67-a61b-57328855e000")
 	)
-	(label "5V"
+	(label "RUMBLE_ML"
+		(at 256.54 105.41 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "14956529-c3d6-4811-8f50-bde86307432b")
+	)
+	(label "VBAT"
 		(at 115.57 155.575 0)
 		(fields_autoplaced yes)
 		(effects
@@ -8302,6 +8324,17 @@
 			(justify right bottom)
 		)
 		(uuid "15ae0e5a-cbc6-4f2b-ad3a-bb0ad4230b5b")
+	)
+	(label "74OE"
+		(at 276.86 101.6 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "1639b10a-959b-4fe8-a989-698c2ff6ff65")
 	)
 	(label "GPIO5"
 		(at 200.025 25.4 0)
@@ -8501,6 +8534,17 @@
 		)
 		(uuid "24d26c60-5fa4-4f99-a3ef-ee7fd343b126")
 	)
+	(label "AD_RX"
+		(at 177.8 140.97 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "267dad06-ec54-4162-8611-6b4326ee0fa5")
+	)
 	(label "74PL"
 		(at 214.63 100.33 180)
 		(fields_autoplaced yes)
@@ -8545,6 +8589,17 @@
 		)
 		(uuid "3023de75-6cfe-4562-a157-256a1be0135a")
 	)
+	(label "AD_RX"
+		(at 256.54 77.47 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "3024e792-2000-44ff-bb5f-6bcc8f3eee23")
+	)
 	(label "RUMBLE_MR"
 		(at 120.65 168.275 0)
 		(fields_autoplaced yes)
@@ -8555,6 +8610,17 @@
 			(justify left bottom)
 		)
 		(uuid "321c2afd-4c11-4879-9c59-d9464a24d4c7")
+	)
+	(label "74IN"
+		(at 276.86 106.68 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "32373c73-1e61-4212-aaf8-39864e30d726")
 	)
 	(label "VCC"
 		(at 71.12 75.565 0)
@@ -8588,6 +8654,17 @@
 			(justify right bottom)
 		)
 		(uuid "3b05fc4e-809b-4141-b19f-8350c1110c6b")
+	)
+	(label "AD_RY"
+		(at 177.8 143.51 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "3bc16880-f8db-47b2-b50d-0a8d917fd383")
 	)
 	(label "VCC"
 		(at 190.5 125.73 90)
@@ -8655,17 +8732,6 @@
 		)
 		(uuid "42ed2bda-c142-4c9e-aad4-3681ea3286ca")
 	)
-	(label "AD_LT"
-		(at 177.8 140.97 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "4573f454-d0b3-44c2-a415-f3fea5e2356e")
-	)
 	(label "GPIO8"
 		(at 187.325 30.48 180)
 		(fields_autoplaced yes)
@@ -8676,17 +8742,6 @@
 			(justify right bottom)
 		)
 		(uuid "4a84f820-e92a-4a55-a670-302dbd116c03")
-	)
-	(label "AD_RX"
-		(at 256.54 82.55 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "4b062a97-8e3f-4276-9a24-af52d9e4ef48")
 	)
 	(label "GPIO12"
 		(at 187.325 35.56 180)
@@ -8710,7 +8765,7 @@
 		)
 		(uuid "4c61d5ce-e979-4ed4-992d-e028108b0139")
 	)
-	(label "5V"
+	(label "VBAT"
 		(at 71.12 155.575 0)
 		(fields_autoplaced yes)
 		(effects
@@ -8853,6 +8908,17 @@
 		)
 		(uuid "60787c0a-e9a1-4ff4-9094-4ca962354f92")
 	)
+	(label "AD_LT"
+		(at 177.8 135.89 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "614819b8-3cb5-4400-b948-a3b853c771a0")
+	)
 	(label "GND"
 		(at 45.72 107.315 180)
 		(fields_autoplaced yes)
@@ -8919,17 +8985,6 @@
 		)
 		(uuid "658b5fbe-62a2-4122-b446-ad791330f0a5")
 	)
-	(label "AD_RT"
-		(at 177.8 143.51 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "6594ffbf-b446-4f0f-b91a-59be5e3241a2")
-	)
 	(label "VCC"
 		(at 222.25 48.26 0)
 		(fields_autoplaced yes)
@@ -8940,17 +8995,6 @@
 			(justify left bottom)
 		)
 		(uuid "67da98cc-59c5-473f-9953-bd00828b1734")
-	)
-	(label "74OE"
-		(at 276.86 106.68 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "685e110b-0da6-49f4-b1e9-3d3ff17e338c")
 	)
 	(label "SW_RD"
 		(at 127 80.01 0)
@@ -8974,7 +9018,7 @@
 		)
 		(uuid "6995042d-bf57-4b35-83b6-70a2ab868b75")
 	)
-	(label "5V"
+	(label "VBAT"
 		(at 187.325 55.88 180)
 		(fields_autoplaced yes)
 		(effects
@@ -9139,17 +9183,6 @@
 		)
 		(uuid "80cbf409-dee1-4631-91b6-c78e6b241a83")
 	)
-	(label "74IN"
-		(at 276.86 101.6 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "81363bbc-40c5-4c03-9867-0ae4d95e30e5")
-	)
 	(label "GND"
 		(at 130.81 107.315 180)
 		(fields_autoplaced yes)
@@ -9172,8 +9205,8 @@
 		)
 		(uuid "8306a93e-71b0-4ab9-abd4-da5714dba48c")
 	)
-	(label "RUMBLE_ML"
-		(at 256.54 102.87 0)
+	(label "AD_LT"
+		(at 256.54 82.55 0)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -9181,7 +9214,7 @@
 			)
 			(justify left bottom)
 		)
-		(uuid "844482cd-57b4-4910-aaad-9a933e9cf851")
+		(uuid "8450a934-e554-4c5d-ae82-7d6d4c3a731d")
 	)
 	(label "GPIO10"
 		(at 187.325 33.02 180)
@@ -9391,28 +9424,6 @@
 			(justify left bottom)
 		)
 		(uuid "9a06fec3-608e-43c2-b485-690202bdfc34")
-	)
-	(label "AD_LT"
-		(at 256.54 77.47 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "9a62fc3d-e4ee-48fe-9100-df96189b5615")
-	)
-	(label "RUMBLE_TR"
-		(at 256.54 105.41 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "9ae90798-8a32-4efd-8aa9-83aa4c30fbed")
 	)
 	(label "VCC"
 		(at 57.15 67.945 0)
@@ -9689,17 +9700,6 @@
 		)
 		(uuid "b9530da6-ccce-4ffb-8d27-ea6c87944b1f")
 	)
-	(label "AD_RT"
-		(at 256.54 74.93 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "bac8da66-b0ad-44da-8549-723a8191d295")
-	)
 	(label "74PL"
 		(at 276.86 99.06 0)
 		(fields_autoplaced yes)
@@ -9754,17 +9754,6 @@
 			(justify right bottom)
 		)
 		(uuid "c15e397c-1f7f-4cfe-a871-4bc5e6373e46")
-	)
-	(label "AD_RY"
-		(at 256.54 80.01 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "c2694209-1138-4923-822e-03b0b58e9cbf")
 	)
 	(label "VCC"
 		(at 63.5 94.615 0)
@@ -9832,6 +9821,17 @@
 		)
 		(uuid "cca41257-65cc-4a5d-a98d-3b451e4b849c")
 	)
+	(label "AD_RT"
+		(at 256.54 80.01 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "ccba8cd1-a8af-4632-9cde-7c431d641742")
+	)
 	(label "INT"
 		(at 228.6 133.35 180)
 		(fields_autoplaced yes)
@@ -9842,17 +9842,6 @@
 			(justify right bottom)
 		)
 		(uuid "cd2e66a7-34d2-4e72-a25e-b87f0d6bf221")
-	)
-	(label "AD_RY"
-		(at 177.8 138.43 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "d1e4ffbc-9cb6-4fa3-8441-14e34c0a4764")
 	)
 	(label "AD_LT"
 		(at 55.88 31.75 0)
@@ -9876,18 +9865,7 @@
 		)
 		(uuid "d731d804-2517-4c46-a6d4-52d52b27bc54")
 	)
-	(label "AD_RX"
-		(at 177.8 135.89 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right bottom)
-		)
-		(uuid "d76631a0-9ba0-4358-8eda-18ca7d9a6362")
-	)
-	(label "5V"
+	(label "VBAT"
 		(at 115.57 127.635 0)
 		(fields_autoplaced yes)
 		(effects
@@ -9919,6 +9897,17 @@
 			(justify right bottom)
 		)
 		(uuid "d99bcef0-55c8-4df6-8696-3c745c171646")
+	)
+	(label "RUMBLE_TR"
+		(at 256.54 102.87 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "dcf8097f-28d4-4dc2-92ae-bbd998b790e4")
 	)
 	(label "RUMBLE_TL"
 		(at 76.2 140.335 0)
@@ -9996,6 +9985,17 @@
 			(justify left bottom)
 		)
 		(uuid "e52282c0-44f0-4255-91c3-688858ff1ec3")
+	)
+	(label "AD_RY"
+		(at 256.54 74.93 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e6c338ab-1a26-4af8-9ae3-3317665acfc8")
 	)
 	(label "DI"
 		(at 233.68 138.43 180)
@@ -10249,7 +10249,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R25")
 					(unit 1)
@@ -10324,7 +10324,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "SW2")
 					(unit 1)
@@ -10392,7 +10392,7 @@
 			(uuid "587582cd-6b9f-42a8-a85d-a6a0ce2a671e")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR027")
 					(unit 1)
@@ -10465,7 +10465,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R6")
 					(unit 1)
@@ -10540,7 +10540,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "SW11")
 					(unit 1)
@@ -10615,7 +10615,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "SW13")
 					(unit 1)
@@ -10682,7 +10682,7 @@
 			(uuid "ee44c1d0-029d-4e3d-8fb2-2ef96ba6a50f")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR029")
 					(unit 1)
@@ -10749,7 +10749,7 @@
 			(uuid "fc606a9f-4163-469d-8a85-2a42fc356d72")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R29")
 					(unit 1)
@@ -10827,7 +10827,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "Q3")
 					(unit 1)
@@ -10900,7 +10900,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR022")
 					(unit 1)
@@ -10973,7 +10973,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R18")
 					(unit 1)
@@ -11044,7 +11044,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR01")
 					(unit 1)
@@ -11120,7 +11120,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "C3")
 					(unit 1)
@@ -11196,7 +11196,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "J1")
 					(unit 1)
@@ -11271,7 +11271,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R8")
 					(unit 1)
@@ -11346,7 +11346,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "D3")
 					(unit 1)
@@ -11419,7 +11419,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR028")
 					(unit 1)
@@ -11494,7 +11494,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "C8")
 					(unit 1)
@@ -11561,7 +11561,7 @@
 			(uuid "43e851cc-19ba-4a4c-96f0-4b889e40bbe2")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R28")
 					(unit 1)
@@ -11637,7 +11637,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "J4")
 					(unit 1)
@@ -11712,7 +11712,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "C5")
 					(unit 1)
@@ -11787,7 +11787,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "SW10")
 					(unit 1)
@@ -11863,7 +11863,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "C4")
 					(unit 1)
@@ -11936,7 +11936,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR012")
 					(unit 1)
@@ -12011,7 +12011,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "SW15")
 					(unit 1)
@@ -12087,7 +12087,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "J2")
 					(unit 1)
@@ -12160,7 +12160,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR019")
 					(unit 1)
@@ -12233,7 +12233,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R19")
 					(unit 1)
@@ -12308,7 +12308,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "SW1")
 					(unit 1)
@@ -12380,7 +12380,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR07")
 					(unit 1)
@@ -12458,7 +12458,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "Q4")
 					(unit 1)
@@ -12531,7 +12531,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR09")
 					(unit 1)
@@ -12604,7 +12604,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R5")
 					(unit 1)
@@ -12762,7 +12762,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "J9")
 					(unit 1)
@@ -12829,7 +12829,7 @@
 			(uuid "d35a513c-3c07-4d2f-a84d-6b5a82e3a21b")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R30")
 					(unit 1)
@@ -12902,7 +12902,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R16")
 					(unit 1)
@@ -12975,7 +12975,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "C9")
 					(unit 1)
@@ -13048,7 +13048,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R7")
 					(unit 1)
@@ -13121,7 +13121,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R12")
 					(unit 1)
@@ -13194,7 +13194,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR031")
 					(unit 1)
@@ -13269,7 +13269,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "D4")
 					(unit 1)
@@ -13342,7 +13342,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR016")
 					(unit 1)
@@ -13416,7 +13416,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "SW3")
 					(unit 1)
@@ -13489,7 +13489,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "D6")
 					(unit 1)
@@ -13565,7 +13565,7 @@
 			(uuid "364f2564-1f00-4d43-a304-75b9b151a7ef")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "J12")
 					(unit 1)
@@ -13636,7 +13636,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR06")
 					(unit 1)
@@ -13709,7 +13709,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R11")
 					(unit 1)
@@ -13784,7 +13784,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "SW6")
 					(unit 1)
@@ -13857,7 +13857,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR023")
 					(unit 1)
@@ -13930,7 +13930,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR020")
 					(unit 1)
@@ -14002,7 +14002,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR04")
 					(unit 1)
@@ -14113,7 +14113,7 @@
 			(uuid "6533c65b-f317-48ab-91f8-79f3150bb0ed")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "U3")
 					(unit 1)
@@ -14180,7 +14180,7 @@
 			(uuid "f6153367-9943-4f7e-8fbd-ac1920662782")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R27")
 					(unit 1)
@@ -14253,7 +14253,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R21")
 					(unit 1)
@@ -14326,7 +14326,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR013")
 					(unit 1)
@@ -14399,7 +14399,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "D7")
 					(unit 1)
@@ -14475,7 +14475,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "J3")
 					(unit 1)
@@ -14546,7 +14546,7 @@
 			(uuid "e98d0aae-ffe8-4e39-9c2c-3be4c5271b07")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "J8")
 					(unit 1)
@@ -14621,7 +14621,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "SW12")
 					(unit 1)
@@ -14694,7 +14694,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R13")
 					(unit 1)
@@ -14769,7 +14769,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "D2")
 					(unit 1)
@@ -14842,7 +14842,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR021")
 					(unit 1)
@@ -14915,7 +14915,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R10")
 					(unit 1)
@@ -14986,7 +14986,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR05")
 					(unit 1)
@@ -15059,7 +15059,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "C12")
 					(unit 1)
@@ -15127,7 +15127,7 @@
 			(uuid "2e19543c-9cb1-46cf-9369-e0785dd205de")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR025")
 					(unit 1)
@@ -15230,7 +15230,7 @@
 			(uuid "daf7caaa-2c9d-4b69-80f0-858a3469a514")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "J10")
 					(unit 1)
@@ -15301,7 +15301,7 @@
 			(uuid "45a81584-a859-471d-94d6-208ed2dea27b")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "J7")
 					(unit 1)
@@ -15374,7 +15374,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR017")
 					(unit 1)
@@ -15447,7 +15447,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R15")
 					(unit 1)
@@ -15520,7 +15520,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R14")
 					(unit 1)
@@ -15591,7 +15591,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR02")
 					(unit 1)
@@ -15664,7 +15664,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R20")
 					(unit 1)
@@ -15731,7 +15731,7 @@
 			(uuid "b061ddbe-30cc-4e71-8992-889f0af70774")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR026")
 					(unit 1)
@@ -15798,7 +15798,7 @@
 			(uuid "88cc2c8e-0c35-4745-95d0-ecb375eba66a")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR034")
 					(unit 1)
@@ -15886,7 +15886,7 @@
 			(uuid "b6e1238f-7d2c-43f0-8ab2-306100bc5e8c")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "J5")
 					(unit 1)
@@ -15997,7 +15997,7 @@
 			(uuid "4969d5b9-280d-4304-b509-7cd0257f5849")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "U2")
 					(unit 1)
@@ -16072,7 +16072,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "SW8")
 					(unit 1)
@@ -16148,7 +16148,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R4")
 					(unit 1)
@@ -16221,7 +16221,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR011")
 					(unit 1)
@@ -16300,7 +16300,7 @@
 			(uuid "48259be0-ab33-4d00-9e34-a12717135055")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "J13")
 					(unit 1)
@@ -16376,7 +16376,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "C2")
 					(unit 1)
@@ -16448,7 +16448,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR08")
 					(unit 1)
@@ -16521,7 +16521,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR010")
 					(unit 1)
@@ -16599,7 +16599,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "Q2")
 					(unit 1)
@@ -16696,7 +16696,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "J11")
 					(unit 1)
@@ -16775,7 +16775,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R22")
 					(unit 1)
@@ -16848,7 +16848,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R9")
 					(unit 1)
@@ -16960,7 +16960,7 @@
 			(uuid "2ab40b49-ae3a-46fa-80d8-994658f8502d")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "U4")
 					(unit 1)
@@ -17071,7 +17071,7 @@
 			(uuid "c4a5058f-4fc4-4a90-a0d5-35200d9ee34c")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "U1")
 					(unit 1)
@@ -17146,7 +17146,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "C6")
 					(unit 1)
@@ -17224,7 +17224,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "Q1")
 					(unit 1)
@@ -17299,7 +17299,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "SW7")
 					(unit 1)
@@ -17374,7 +17374,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "D1")
 					(unit 1)
@@ -17449,7 +17449,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "SW14")
 					(unit 1)
@@ -17522,7 +17522,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "D5")
 					(unit 1)
@@ -17598,7 +17598,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R2")
 					(unit 1)
@@ -17665,7 +17665,7 @@
 			(uuid "ea993d57-e695-45fd-92e1-16f502d71ac5")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R26")
 					(unit 1)
@@ -17741,7 +17741,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R1")
 					(unit 1)
@@ -17814,7 +17814,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR015")
 					(unit 1)
@@ -17881,7 +17881,7 @@
 			(uuid "397da607-c06e-4943-acc7-144fea8c4515")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "C13")
 					(unit 1)
@@ -17956,7 +17956,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "SW4")
 					(unit 1)
@@ -18029,7 +18029,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R24")
 					(unit 1)
@@ -18102,7 +18102,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR014")
 					(unit 1)
@@ -18169,7 +18169,7 @@
 			(uuid "09740724-1a27-4be2-bba7-38ab84b775fc")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR033")
 					(unit 1)
@@ -18242,7 +18242,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R23")
 					(unit 1)
@@ -18315,7 +18315,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R17")
 					(unit 1)
@@ -18388,7 +18388,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "D8")
 					(unit 1)
@@ -18461,7 +18461,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR030")
 					(unit 1)
@@ -18534,7 +18534,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "C11")
 					(unit 1)
@@ -18609,7 +18609,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "SW9")
 					(unit 1)
@@ -18685,7 +18685,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "C1")
 					(unit 1)
@@ -18760,7 +18760,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "C7")
 					(unit 1)
@@ -18832,7 +18832,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR03")
 					(unit 1)
@@ -18905,7 +18905,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR018")
 					(unit 1)
@@ -18981,7 +18981,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "R3")
 					(unit 1)
@@ -19054,7 +19054,7 @@
 					(unit 1)
 				)
 			)
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "C10")
 					(unit 1)
@@ -19122,7 +19122,7 @@
 			(uuid "d499f022-c068-42c8-b153-e3cb7f22febd")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR024")
 					(unit 1)
@@ -19189,7 +19189,7 @@
 			(uuid "2d618f0d-7cb3-4c90-a16f-719e9e4207d7")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "#PWR032")
 					(unit 1)
@@ -19256,7 +19256,7 @@
 			(uuid "5bc4ccde-0081-431a-858c-1cde7b6fd240")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "C14")
 					(unit 1)
@@ -19320,7 +19320,7 @@
 			)
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "VSF1")
 					(unit 1)
@@ -19407,7 +19407,7 @@
 			(uuid "5ea25737-5554-4d08-ba40-3a69443e7e98")
 		)
 		(instances
-			(project "gamepad_ext"
+			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "J6")
 					(unit 1)
