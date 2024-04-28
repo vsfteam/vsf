@@ -270,7 +270,7 @@
 		(property ki_fp_filters "DIP?16* SO*16*3.9x9.9mm*P1.27mm* SSOP*16*5.3x6.2mm*P0.65mm* TSSOP*16*4.4x5mm*P0.65*")
 		(path "/613e0ec2-7533-4cd3-bda2-013ece199ca9")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 -5.06)
@@ -652,7 +652,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/1ec57d50-6aae-44b3-88a0-b1b409b76fe2")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 0.38)
@@ -862,7 +862,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/13e528cd-bfe5-4cf1-8cd4-aa56762fba68")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 0.38)
@@ -1071,7 +1071,7 @@
 		)
 		(path "/29f1d90d-3cda-4647-97ac-072845fe22fe")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.23 -3.23)
@@ -1370,7 +1370,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/a2db80be-ba18-4a40-86cc-df2b7a3035d2")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -1580,7 +1580,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/b4c5ff1a-8443-43cb-a394-d410263ae019")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -1789,7 +1789,7 @@
 		)
 		(path "/6e86a251-885a-4a75-b594-25e06d38fcf4")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.23 -3.23)
@@ -2087,7 +2087,7 @@
 		)
 		(path "/9fb24c40-e148-4a63-afc4-11b4f893274d")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.23 -3.23)
@@ -2386,7 +2386,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/0bde5852-2821-47ff-8951-560d060086eb")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -2596,7 +2596,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/6f588a4e-4f69-44a6-a33e-d1a30eda33ab")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 0.38)
@@ -2806,7 +2806,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/3ca41be6-4396-4f56-a9b4-74dc05f60c15")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 0.38)
@@ -3016,7 +3016,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/62e309f6-c7ed-439a-b62f-f76234074aa8")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 0.38)
@@ -3226,7 +3226,7 @@
 		(property ki_fp_filters "TO-???* *_Diode_* *SingleDiode* D_*")
 		(path "/45bc1096-0292-4808-b29a-a614066ae8cf")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -2.01 0.85)
@@ -3507,7 +3507,7 @@
 		)
 		(path "/c1726f5d-f36d-422b-9436-962d4aaebb6e")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 -1.56)
@@ -3759,7 +3759,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/3b6281a5-ef25-4838-b963-946f796f9da8")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.107836 0.36)
@@ -3969,7 +3969,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/f588273a-20a1-46fe-85bc-92b7acaf0c4e")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.107836 0.36)
@@ -4179,7 +4179,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/8b3e1b9a-807e-4342-be71-7acc8c380c2e")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 -1.33)
@@ -4575,7 +4575,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/8e78d51f-b897-44e5-aa91-1fd3bc68aa1a")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 -1.33)
@@ -4850,7 +4850,7 @@
 		(property ki_fp_filters "TO-???* *_Diode_* *SingleDiode* D_*")
 		(path "/c99fec86-3734-4ced-9c83-5b64deaec70d")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -2.01 0.85)
@@ -5132,7 +5132,7 @@
 		(property ki_fp_filters "LED* LED_SMD:* LED_THT:*")
 		(path "/cdc4a2bd-895f-49ac-a3e9-751ded1e8888")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 1 -0.96)
@@ -5364,7 +5364,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/aa4af08f-2881-4928-bd41-d900bab051db")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 14.03)
@@ -5672,7 +5672,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/3d4af53c-907d-4a36-b86f-823be04d2d70")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 0.38)
@@ -5881,7 +5881,7 @@
 		)
 		(path "/246205cc-75f4-46de-8850-c01dec29514a")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.23 -3.23)
@@ -6179,7 +6179,7 @@
 		)
 		(path "/c26a3c66-c66c-4939-8d69-0cebd6380d98")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.23 -3.23)
@@ -6478,7 +6478,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/33e94fae-8d46-4550-8dcf-5f5a4819dd15")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 0.38)
@@ -6688,7 +6688,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/631b5a78-2858-4418-8849-2db6e40aa080")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -6898,7 +6898,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/10b6acbc-5088-4f23-b02b-b7debc29d584")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 0.38)
@@ -7108,7 +7108,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/bc8b2a63-c8c5-40b0-b369-f8ba95fb233c")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.107836 -0.36)
@@ -7318,7 +7318,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/266cd290-a88c-49fc-b989-962f6eff2f67")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.107836 0.36)
@@ -7528,7 +7528,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/ab2efa78-5f84-472f-bb84-85c8b218e3fb")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.107836 -0.36)
@@ -7738,7 +7738,7 @@
 		(property ki_fp_filters "LED* LED_SMD:* LED_THT:*")
 		(path "/4ae9e8f6-dc45-435d-8cb3-a1077141efad")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 1 -0.96)
@@ -7970,7 +7970,7 @@
 		(property ki_fp_filters "DIP*W7.62mm* SOIC*3.9x9.9mm*P1.27mm* TSSOP*4.4x5mm*P0.65mm* SOIC*5.3x10.2mm*P1.27mm* SOIC*7.5x10.3mm*P1.27mm*")
 		(path "/b7ffce04-021f-4de1-aec5-7e3ef150c9e8")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 -5.06)
@@ -8352,7 +8352,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/782848e2-951b-42a4-98e2-253f9894b647")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 0.38)
@@ -8562,7 +8562,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/94c33760-e9a4-401f-842c-b5bec6222970")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -8771,7 +8771,7 @@
 		)
 		(path "/074045a6-7202-4a4e-8528-7dd4d9075286")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.23 -3.23)
@@ -9069,7 +9069,7 @@
 		)
 		(path "/0c4353b6-2e95-4a0e-82bb-158606e8e679")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.23 -3.23)
@@ -9308,7 +9308,7 @@
 		(descr "Capacitor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "capacitor")
 		(property "Reference" "C13"
-			(at -2.54 0 270)
+			(at -2.54 0 -90)
 			(layer "F.SilkS")
 			(uuid "6181644c-15be-4f14-912b-ea81d5985157")
 			(effects
@@ -9319,7 +9319,7 @@
 			)
 		)
 		(property "Value" "1uF"
-			(at 0 1.16 270)
+			(at 0 1.16 -90)
 			(layer "F.Fab")
 			(uuid "b5617fe2-cd74-4121-af1a-0c704cfe41db")
 			(effects
@@ -9368,7 +9368,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/dd06eff7-384c-4ce5-bdcc-1380732e7d1c")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.107836 -0.36)
@@ -9471,7 +9471,7 @@
 			(uuid "69bdabe4-13ea-44b7-b823-3b5b0a098c71")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 270)
+			(at 0 0 -90)
 			(layer "F.Fab")
 			(uuid "044fcd0c-2759-4ebc-aad7-2323aa8f8b1e")
 			(effects
@@ -9575,7 +9575,7 @@
 		)
 		(path "/9dd49dbf-a036-40dd-97dd-92e9e41eaa2c")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr through_hole)
 		(fp_rect
 			(start -10.2 4.75)
@@ -9817,7 +9817,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/ee46f4f8-19d9-4b4f-bfa5-88cb32424d77")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.107836 -0.36)
@@ -10026,7 +10026,7 @@
 		)
 		(path "/de3f66dd-a5ae-4927-9548-b8d77c495c41")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.23 -3.23)
@@ -10324,7 +10324,7 @@
 		)
 		(path "/ca4f3bcd-b19a-4789-9724-fd30e0b5a88d")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.23 -3.23)
@@ -10622,7 +10622,7 @@
 		)
 		(path "/51d16b81-8f98-40a0-868a-028d94635a69")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.23 -3.23)
@@ -10920,7 +10920,7 @@
 		)
 		(path "/2ff462ec-8867-4c3c-b871-a3ba9f5e0de9")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 -1.56)
@@ -11171,7 +11171,7 @@
 		)
 		(path "/2d9cf733-a2ad-48ee-bd3a-9cb55beae353")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.61 -2.7)
@@ -11591,7 +11591,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/153e3ab2-0501-482b-b0b3-14835c666683")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.107836 0.36)
@@ -11801,7 +11801,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/ed4cc9ba-0f9e-4859-8258-3018de680cc0")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.107836 -0.36)
@@ -12011,7 +12011,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/7b1a19c9-7057-41fa-9e3f-23faf73a56bf")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.107836 0.36)
@@ -12221,7 +12221,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/34e39d33-04c5-4419-af71-16a94c88749f")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -12431,7 +12431,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/2a3492a2-2ade-4df1-8df4-636fcbe0e1aa")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 -1.33)
@@ -12694,7 +12694,7 @@
 		)
 		(path "/0c0f2c40-737f-4b8b-93a1-eef7a0e9f60b")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.61 -2.7)
@@ -13114,7 +13114,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/e2462626-329e-4801-9a4d-7a0496845fb5")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -13324,7 +13324,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/16841755-70aa-4ba0-85d1-90976ddfe7ff")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 -1.33)
@@ -13588,7 +13588,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/5016f790-3dc4-4ee8-9d74-6e6997702d3a")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -13797,7 +13797,7 @@
 		)
 		(path "/485ed46b-be09-4edc-a92c-db63b833c215")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.23 -3.23)
@@ -14096,7 +14096,7 @@
 		(property ki_fp_filters "Connector*:*_2x??_*")
 		(path "/3340be00-c34b-4c59-a8df-b87eb2159fb9")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 2.54 -22.86)
@@ -14566,7 +14566,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/b5fb3aa7-6cdb-42e8-b006-ca9855e11878")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 0.38)
@@ -14716,7 +14716,7 @@
 		(descr "Capacitor SMD 0402 (1005 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "capacitor")
 		(property "Reference" "C14"
-			(at -2.54 0 270)
+			(at -2.54 0 -90)
 			(layer "F.SilkS")
 			(uuid "595f17db-6429-4fda-aacd-16c9e685a48a")
 			(effects
@@ -14727,7 +14727,7 @@
 			)
 		)
 		(property "Value" "100nF"
-			(at 0 1.16 270)
+			(at 0 1.16 -90)
 			(layer "F.Fab")
 			(uuid "492f8177-2037-47dd-9b15-acca617e3320")
 			(effects
@@ -14776,7 +14776,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/fdb295ee-bd5f-4de1-837a-6cf3fd50d9a1")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.107836 -0.36)
@@ -14879,7 +14879,7 @@
 			(uuid "a5687197-ed96-4396-9532-b8b57d6572d5")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 270)
+			(at 0 0 -90)
 			(layer "F.Fab")
 			(uuid "37bc9c0b-767a-414c-be12-fe0eeb6290c2")
 			(effects
@@ -14986,7 +14986,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/94047370-5568-4953-99d6-a5b841cb8e24")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 0.38)
@@ -15196,7 +15196,7 @@
 		(property ki_fp_filters "microSD*")
 		(path "/b3f7acdb-4ed9-40d2-b840-30cc1cbfc737")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -4.572 -6.604)
@@ -15456,7 +15456,7 @@
 		(property ki_fp_filters "LED* LED_SMD:* LED_THT:*")
 		(path "/e755929d-03d7-4932-88ef-35da0f6d716d")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 1 -0.96)
@@ -15687,7 +15687,7 @@
 		)
 		(path "/b3aec497-fd68-4a40-9693-a1da496e1386")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 -1.56)
@@ -15939,7 +15939,7 @@
 		)
 		(path "/fef01f29-0ddf-4225-b453-9dff130ad9aa")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -67.946196 38.097867)
@@ -16131,7 +16131,7 @@
 		(property ki_fp_filters "LED* LED_SMD:* LED_THT:*")
 		(path "/68fe1954-306a-4678-b5de-b1bf7490e2be")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 1 -0.96)
@@ -16363,7 +16363,7 @@
 		(property ki_fp_filters "TO-???* *_Diode_* *SingleDiode* D_*")
 		(path "/742e2567-3e57-4876-ad04-65e4153db585")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -2.01 0.85)
@@ -16645,7 +16645,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/32572975-9c71-4461-aece-96a3fb37b844")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -16855,7 +16855,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/1f125412-d1e9-467d-be1c-a4ee5c614b6c")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 -1.33)
@@ -17119,7 +17119,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/ce372c6f-c314-414c-9073-f1f8e9501a8f")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -17329,7 +17329,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/20391d41-8fde-4f94-bbcf-f76c0199aa54")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.107836 -0.36)
@@ -17539,7 +17539,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/d2ecb11d-807a-49e1-b4f3-a00f394c9a58")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -17749,7 +17749,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/2cbba54b-6976-48df-b33d-0608e0210b55")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 0.38)
@@ -17959,7 +17959,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/f45066ae-0c05-46f7-998e-f6aa448af7bf")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -18169,7 +18169,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/031756a1-2860-433e-b16f-db0f10daab02")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -18379,7 +18379,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/920c40d0-cafd-4bdc-9db8-5d5061564bd1")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 0.38)
@@ -18589,7 +18589,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/dea0a650-1e35-4370-bc2f-0ec0458c014c")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -18798,7 +18798,7 @@
 		)
 		(path "/e9d121ac-fd1d-4d93-bcb4-ff4ce0cc833f")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -3.23 -3.23)
@@ -19097,7 +19097,7 @@
 		(property ki_fp_filters "DIP?16* SO*16*3.9x9.9mm*P1.27mm* SSOP*16*5.3x6.2mm*P0.65mm* TSSOP*16*4.4x5mm*P0.65*")
 		(path "/9ea9c329-4583-4dec-90bf-c7c0bd226973")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 -5.06)
@@ -19479,7 +19479,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/4b15aa7e-2b8d-467e-b71c-6f35a17d95f1")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 11.49)
@@ -19773,7 +19773,7 @@
 		)
 		(path "/ffd7a057-57b9-4e2d-a934-7136e62c735d")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr through_hole)
 		(fp_rect
 			(start -10.2 4.75)
@@ -20014,7 +20014,7 @@
 		)
 		(path "/129f2031-e0b0-4b93-b96a-b74622ef8c4b")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 -1.56)
@@ -20266,7 +20266,7 @@
 		(property ki_fp_filters "TSSOP*4.4x5mm*P0.65mm*")
 		(path "/b5ff9121-eedd-4006-97d9-b2ca512edca0")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start 0 -2.735)
@@ -20660,7 +20660,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/e83940c6-794f-47e3-a9f5-9fd7e560aade")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.107836 -0.36)
@@ -20870,7 +20870,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/6c814035-508f-48af-ae79-a01dc1c86e2c")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 -1.33)
@@ -21145,7 +21145,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/e6f3e2e4-f94b-44d7-8032-2737afc83699")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -21355,7 +21355,7 @@
 		(property ki_fp_filters "TO-???* *_Diode_* *SingleDiode* D_*")
 		(path "/1a88b913-92bb-4925-83a0-cd1bc6e35837")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -2.01 0.85)
@@ -21637,7 +21637,7 @@
 		(property ki_fp_filters "Connector*:*_1x??_*")
 		(path "/6936cb7b-7849-4311-9577-d6c3ee17ad89")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr through_hole)
 		(fp_line
 			(start -1.33 -1.33)
@@ -21901,7 +21901,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/d4949d47-4ec3-4598-8c69-62f280b17ac2")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 -0.38)
@@ -22111,7 +22111,7 @@
 		(property ki_fp_filters "C_*")
 		(path "/1c14e5d9-d886-4340-bd7c-7a2236cb3746")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.107836 -0.36)
@@ -22321,7 +22321,7 @@
 		(property ki_fp_filters "R_*")
 		(path "/1854cb1f-d2e0-4e59-bb9b-b6d83747c871")
 		(sheetname "根目录")
-		(sheetfile "gamepad_ext.kicad_sch")
+		(sheetfile "gamepad.kicad_sch")
 		(attr smd)
 		(fp_line
 			(start -0.153641 0.38)
