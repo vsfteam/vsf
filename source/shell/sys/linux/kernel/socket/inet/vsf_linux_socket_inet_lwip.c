@@ -68,6 +68,12 @@
 #   error LWIP_SO_RCVBUF MUST be enabled for SO_RCVBUF control in setsockopt/getsockopt
 #endif
 
+#if LWIP_IPV6
+#   if !LWIP_IPV6_SCOPES
+#       error please LWIP_IPV6_SCOPES if IPV6 is enabled
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
