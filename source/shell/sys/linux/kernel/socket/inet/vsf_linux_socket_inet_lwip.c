@@ -987,7 +987,7 @@ int __inet_gethostbyname(const char *name, in_addr_t *addr)
         vsf_evt_t evt = vsf_thread_wait();
         if (    (evt != VSF_EVT_USER)
 #if LWIP_IPV4 && LWIP_IPV6
-            ||  (IPADDR_TYPE_V6 == ipaddr.type)
+            ||  (IPADDR_TYPE_V6 == param.ipaddr.type)
 #endif
         ) {
             return -1;

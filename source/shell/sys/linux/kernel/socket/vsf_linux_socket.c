@@ -65,7 +65,10 @@ extern const vsf_linux_socket_op_t vsf_linux_socket_unix_op;
 #endif
 #if VSF_LINUX_SOCKET_USE_INET == ENABLED
 extern const vsf_linux_socket_op_t vsf_linux_socket_inet_op;
+// use weak implementation because lower implementation(eg: lwip) may implement the same variable
+VSF_CAL_WEAK(in6addr_any)
 const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;
+VSF_CAL_WEAK(in6addr_loopback)
 const struct in6_addr in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
 #endif
 
@@ -203,6 +206,7 @@ int inet_pton(int af, const char *src, void *dst)
         }
     case AF_INET6:
         VSF_LINUX_ASSERT(false);
+    default:
         return -1;
     }
 }
