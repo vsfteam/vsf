@@ -118,7 +118,7 @@ static vsf_err_t __m_i2c_reconfig_and_request(vsf_multiplex_i2c_t *m_i2c_ptr, bo
     }
 
     if (is_req) {
-        multiplexer->req_on_going = true;
+        multiplexer->req_done = false;
         result = vsf_i2c_master_request(multiplexer->i2c_ptr,
                                         m_i2c_ptr->request.address,
                                         m_i2c_ptr->request.cmd,
@@ -153,7 +153,7 @@ static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_
     // Provide support for continuous requests, there are some peripherals
     // that want to be requested multiple times in a row without being interrupted.
     if (next_req) {
-        multiplexer->req_on_going = false;
+        multiplexer->req_done = true;
     }
 
     vsf_i2c_isr_t *isr_ptr = &m_i2c_ptr->cfg.isr;
@@ -162,7 +162,7 @@ static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_i2c_t *)m_i2c_ptr, real_irq_mask);
     }
 
-    if (multiplexer->req_on_going) {
+    if (multiplexer->req_done) {
         bool is_need = false;
         vsf_multiplex_i2c_t *new_m_i2c_ptr;
         vsf_protect_t state = vsf_multiplex_i2c_protect();
