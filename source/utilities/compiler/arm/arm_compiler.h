@@ -107,6 +107,7 @@ extern "C" {
 #if __IS_COMPILER_IAR__
 #   define LOW_LEVEL_INIT_RET_T int
 #   define VSF_CAL_NO_INIT              __no_init
+#   define VSF_CAL_NO_RETURN            __attribute__((noreturn))
 #   define VSF_CAL_ROOT                 __root
 #   define VSF_CAL_INLINE               inline
 #   define VSF_CAL_NO_INLINE            __attribute__((noinline))
@@ -130,6 +131,7 @@ extern "C" {
 
 #elif __IS_COMPILER_ARM_COMPILER_5__
 #   define VSF_CAL_NO_INIT              __attribute__( ( section( ".bss.noinit"),zero_init) )
+#   define VSF_CAL_NO_RETURN            __attribute__((noreturn))
 #   define VSF_CAL_ROOT                 __attribute__((used))
 #   define VSF_CAL_INLINE               __inline
 #   define VSF_CAL_NO_INLINE            __attribute__((noinline))
@@ -152,6 +154,7 @@ extern "C" {
 
 #elif __IS_COMPILER_ARM_COMPILER_6__
 #   define VSF_CAL_NO_INIT              __attribute__( ( section( ".bss.noinit")) )
+#   define VSF_CAL_NO_RETURN            __attribute__((noreturn))
 #   define VSF_CAL_ROOT                 __attribute__((used))
 #   define VSF_CAL_INLINE               __inline
 #   define VSF_CAL_NO_INLINE            __attribute__((noinline))

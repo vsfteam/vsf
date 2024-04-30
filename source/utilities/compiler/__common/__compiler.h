@@ -92,6 +92,7 @@ extern "C" {
 #   else
 #       define VSF_CAL_NO_INIT          __attribute__((__section__(".bss.noinit")))
 #   endif
+#   define VSF_CAL_NO_RETURN            __attribute__((__noreturn__))
 #   define VSF_CAL_ROOT                 __attribute__((__used__))
 #   define VSF_CAL_INLINE               __inline__
 #   define VSF_CAL_NO_INLINE            __attribute__((__noinline__))
@@ -125,6 +126,7 @@ extern "C" {
 
 #elif  __IS_COMPILER_GCC__
 #   define VSF_CAL_NO_INIT              __attribute__((section(".bss.noinit")))
+#   define VSF_CAL_NO_RETURN            __attribute__((noreturn))
 #   define VSF_CAL_ROOT                 __attribute__((used))
 #   define VSF_CAL_INLINE               inline
 #   define VSF_CAL_NO_INLINE            __attribute__((noinline))
@@ -149,6 +151,7 @@ extern "C" {
 
 #elif  __IS_COMPILER_TCC__
 #   define VSF_CAL_NO_INIT              __attribute__((section( ".bss.noinit")))
+#   define VSF_CAL_NO_RETURN            __attribute__((noreturn))
 #   define VSF_CAL_ROOT                 __attribute__((used))
 #   define VSF_CAL_INLINE               inline
 #   define VSF_CAL_NO_INLINE            __attribute__((noinline))

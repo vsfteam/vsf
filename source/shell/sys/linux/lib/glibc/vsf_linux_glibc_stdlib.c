@@ -202,7 +202,7 @@ void free(void *p)
 }
 #endif
 
-void exit(int status)
+VSF_CAL_NO_RETURN void exit(int status)
 {
     vsf_linux_exit_process(status, false);
 }
@@ -222,7 +222,7 @@ int atexit(void (*func)(void))
     return 0;
 }
 
-void _Exit(int status)
+VSF_CAL_NO_RETURN void _Exit(int status)
 {
     vsf_linux_exit_process(status, true);
 }
@@ -793,9 +793,10 @@ int clearenv(void)
 }
 #endif
 
-void abort(void)
+VSF_CAL_NO_RETURN void abort(void)
 {
     VSF_LINUX_ASSERT(false);
+    while (1);
 }
 
 char *realpath(const char *path, char *resolved_path)

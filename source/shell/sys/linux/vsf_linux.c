@@ -1356,7 +1356,7 @@ void vsf_linux_delete_process(vsf_linux_process_t *process)
     }
 }
 
-void vsf_linux_exit_process(int status, bool _exit)
+VSF_CAL_NO_RETURN void vsf_linux_exit_process(int status, bool _exit)
 {
     vsf_linux_thread_t *thread2wait;
     vsf_linux_thread_t *cur_thread = vsf_linux_get_cur_thread();
@@ -1467,7 +1467,7 @@ end_no_return:
     vsf_thread_exit();
 }
 
-void _exit(int status)
+VSF_CAL_NO_RETURN void _exit(int status)
 {
     vsf_linux_exit_process(status, true);
 }
@@ -3402,6 +3402,11 @@ long sys_futex(uint32_t *futex, int futex_op, uint32_t val, uintptr_t val2, uint
 
 // prctl.h
 
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wsizeof-pointer-memaccess"
+#endif
+
 int prctl(int option, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4, uintptr_t arg5)
 {
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
@@ -3419,6 +3424,10 @@ int prctl(int option, uintptr_t arg2, uintptr_t arg3, uintptr_t arg4, uintptr_t 
     VSF_LINUX_ASSERT(false);
     return -1;
 }
+
+#if __IS_COMPILER_GCC__
+#   pragma GCC diagnostic pop
+#endif
 
 #if VSF_LINUX_CFG_SUPPORT_SHM == ENABLED
 // shm.h

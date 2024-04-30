@@ -526,7 +526,7 @@ extern int vsf_linux_fs_get_executable(const char *pathname, vsf_linux_main_entr
 extern vsf_linux_process_t * vsf_linux_create_process(int stack_size, int heap_size, int priv_size);
 extern void vsf_linux_delete_process(vsf_linux_process_t *process);
 extern int vsf_linux_start_process(vsf_linux_process_t *process);
-extern void vsf_linux_exit_process(int status, bool _exit);
+extern VSF_CAL_NO_RETURN void vsf_linux_exit_process(int status, bool _exit);
 #if VSF_ARCH_USE_THREAD_REG == ENABLED
 extern uintptr_t vsf_linux_set_process_reg(uintptr_t reg);
 #endif

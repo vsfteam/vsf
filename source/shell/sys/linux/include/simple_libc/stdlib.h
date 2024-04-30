@@ -474,12 +474,12 @@ long int random(void);
 
 void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*));
 
-void abort(void);
+VSF_CAL_NO_RETURN void abort(void);
 int system(const char *command);
 
-void exit(int status);
+VSF_CAL_NO_RETURN void exit(int status);
 int atexit(void (*func)(void));
-void _Exit(int exit_code);
+VSF_CAL_NO_RETURN void _Exit(int exit_code);
 
 int abs(int j);
 long labs(long j);

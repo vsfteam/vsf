@@ -26,13 +26,14 @@
 //  __assert_func in newlib depends on fprintf, which is not usable outside vsf linux
 VSF_CAL_SECTION(".vsf.utilities.stdio.gcc.__assert_func")
 VSF_CAL_WEAK(__assert_func)
-void __assert_func(const char *file, int line, const char *func, const char *failedexpr)
+VSF_CAL_NO_RETURN void __assert_func(const char *file, int line, const char *func, const char *failedexpr)
 {
 #if VSF_USE_TRACE == ENABLED
     vsf_trace_error("assertion \"%s\" failed: file \"%s\", line %d%s%s\n",
             failedexpr, file, line, func ? ", function: " : "", func ? func : "");
 #endif
     VSF_ASSERT(false);
+    while (1);
 }
 
 VSF_CAL_SECTION(".vsf.utilities.stdio.gcc._open")
@@ -154,7 +155,7 @@ void * _sbrk(intptr_t increment)
 #if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED && VSF_USE_KERNEL == ENABLED
 VSF_CAL_SECTION(".vsf.utilities.stdio.gcc._exit")
 VSF_CAL_WEAK(_exit)
-void _exit(int status)
+VSF_CAL_NO_RETURN void _exit(int status)
 {
     vsf_thread_exit();
 }

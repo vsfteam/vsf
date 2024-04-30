@@ -552,7 +552,7 @@ extern void vsf_thread_stack_check(void);
 #endif
 
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_exit")
-extern void vsf_thread_exit(void);
+extern VSF_CAL_NO_RETURN void vsf_thread_exit(void);
 
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_get_cur")
 extern vsf_thread_t *vsf_thread_get_cur(void);

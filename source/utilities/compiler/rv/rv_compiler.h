@@ -64,6 +64,7 @@ extern "C" {
 //! \brief none standard memory types
 #if __IS_COMPILER_IAR__
 #   define VSF_CAL_NO_INIT              __no_init
+#   define VSF_CAL_NO_RETURN            __attribute__((noreturn))
 #   define VSF_CAL_ROOT                 __root
 #   define VSF_CAL_INLINE               inline
 #   define VSF_CAL_NO_INLINE            __attribute__((noinline))
