@@ -81,12 +81,10 @@ vsf_class(vsf_multiplexer_i2c_t) {
 
         vsf_multiplex_i2c_t *req_m_i2c;
         vsf_multiplex_i2c_t *inited_m_i2c;
-        // irq mask
         vsf_i2c_irq_mask_t irq_mask;     // All CS IRQ Mask Wire-OR
-
         vsf_i2c_multiplex_mask_t init_mask;
         vsf_i2c_multiplex_mask_t en_mask;
-        //vsf_i2c_multiplex_mask_t id_mask;
+        bool req_on_going;
     )
 };
 
