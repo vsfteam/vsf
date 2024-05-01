@@ -56,6 +56,9 @@
 #   if VSF_HAL_USE_ADC128D818_ADC == ENABLED
 #       include "./adc/TI/adc128d818/vsf_adc128d818.h"
 #   endif
+#   if VSF_HAL_USE_ADS7830_ADC == ENABLED
+#       include "./adc/TI/ads7830/vsf_ads7830.h"
+#   endif
 #endif
 
 /*============================ MACROS ========================================*/

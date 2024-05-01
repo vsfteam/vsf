@@ -15,14 +15,14 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_ADC128D818_ADC_H__
-#define __HAL_ADC128D818_ADC_H__
+#ifndef __HAL_ADS7830_ADC_H__
+#define __HAL_ADS7830_ADC_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_ADC == ENABLED && VSF_HAL_USE_ADC128D818_ADC == ENABLED
+#if VSF_HAL_USE_ADC == ENABLED && VSF_HAL_USE_ADS7830_ADC == ENABLED
 
 /*\note Refer to template/README.md for usage cases.
  *      For peripheral drivers, blackbox mode is recommended but not required, reimplementation part MUST be open.
@@ -34,9 +34,9 @@
 /*\note If current header is for a peripheral driver(hw driver), and inherit from an IPCore driver, include IPCore header here. */
 
 // IPCore
-#if     defined(__VSF_HAL_ADC128D818_ADC_CLASS_IMPLEMENT)
+#if     defined(__VSF_HAL_ADS7830_ADC_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
-#elif   defined(__VSF_HAL_ADC128D818_ADC_CLASS_INHERIT__)
+#elif   defined(__VSF_HAL_ADS7830_ADC_CLASS_INHERIT__)
 #   define __VSF_CLASS_INHERIT__
 #endif
 
@@ -50,56 +50,55 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 #if VSF_HAL_USE_I2C != ENABLED
-#   error ADC128D818 uses I2C, please enable VSF_HAL_USE_I2C
+#   error ADS7830 uses I2C, please enable VSF_HAL_USE_I2C
 #endif
 
-/*\note VSF_ADC128D818_ADC_CFG_MULTI_CLASS should be implemented for IP drives and open to user,
+/*\note VSF_ADS7830_ADC_CFG_MULTI_CLASS should be implemented for IP drives and open to user,
  *          while VSF_HW_ADC_CFG_MULTI_CLASS should be in adc.c.
  */
 
 // IPCore
-#ifndef VSF_ADC128D818_ADC_CFG_MULTI_CLASS
-#   define VSF_ADC128D818_ADC_CFG_MULTI_CLASS   VSF_ADC_CFG_MULTI_CLASS
+#ifndef VSF_ADS7830_ADC_CFG_MULTI_CLASS
+#   define VSF_ADS7830_ADC_CFG_MULTI_CLASS  VSF_ADC_CFG_MULTI_CLASS
 #endif
 // IPCore end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#if VSF_ADC128D818_ADC_CFG_MULTI_CLASS == ENABLED
-#   define __VSF_ADC128D818_ADC_HALOP       .vsf_adc.op = &vsf_adc128d818_adc_op,
+#if VSF_ADS7830_ADC_CFG_MULTI_CLASS == ENABLED
+#   define __VSF_ADS7830_ADC_HALOP          .vsf_adc.op = &vsf_ads7830_adc_op,
 #else
-#   define __VSF_ADC128D818_ADC_HALOP
+#   define __VSF_ADS7830_ADC_HALOP
 #endif
 
-#define __VSF_ADC128D818_ADC_INIT(__I2C, __I2C_ADDR)                            \
-            __VSF_ADC128D818_ADC_HALOP                                          \
+#define __VSF_ADS7830_ADC_INIT(__I2C, __I2C_ADDR)                               \
+            __VSF_ADS7830_ADC_HALOP                                             \
             .i2c                = (__I2C),                                      \
             .i2c_addr           = (__I2C_ADDR),
-#define VSF_ADC128D818_ADC_INIT(__I2C, __I2C_ADDR)                              \
-            __VSF_ADC128D818_ADC_INIT((__I2C), (__I2C_ADDR))
+#define VSF_ADS7830_ADC_INIT(__I2C, __I2C_ADDR)                                 \
+            __VSF_ADS7830_ADC_INIT((__I2C), (__I2C_ADDR))
 
-#define __describe_adc128d818_adc(__name, __i2c, __i2c_addr)                    \
-            vsf_adc128d818_adc_t __name = {                                     \
-                __VSF_ADC128D818_ADC_INIT((__i2c), (__i2c_addr))                \
+#define __describe_ads7830_adc(__name, __i2c, __i2c_addr)                       \
+            vsf_ads7830_adc_t __name = {                                        \
+                __VSF_ADS7830_ADC_INIT((__i2c), (__i2c_addr))                   \
             };
 
-#define describe_adc128d818_adc(__name, __i2c, __i2c_addr)                      \
-            __describe_adc128d818_adc(__name, (__i2c), (__i2c_addr))
+#define describe_ads7830_adc(__name, __i2c, __i2c_addr)                         \
+            __describe_ads7830_adc(__name, (__i2c), (__i2c_addr))
 
 /*============================ TYPES =========================================*/
 
 // IPCore
-vsf_class(vsf_adc128d818_adc_t) {
+vsf_class(vsf_ads7830_adc_t) {
     public_member(
-#if VSF_ADC128D818_ADC_CFG_MULTI_CLASS == ENABLED
+#if VSF_ADS7830_ADC_CFG_MULTI_CLASS == ENABLED
         vsf_adc_t               vsf_adc;
 #endif
-        // TODO: support INT
         vsf_i2c_t               *i2c;
         uint8_t                 i2c_addr;
     )
 
-/*\note You can add more member in vsf_adc128d818_adc_t instance.
+/*\note You can add more member in vsf_ads7830_adc_t instance.
  *      For members accessible from child, put in protected_member.
  *      Else, put in private_member.
  */
@@ -107,31 +106,24 @@ vsf_class(vsf_adc128d818_adc_t) {
     protected_member(
         vsf_adc_isr_t           isr;
         vsf_adc_irq_mask_t      irq_mask;
-        uint16_t                *result_buffer;
         uint32_t                total_count;
+        uint8_t                 *result_buffer;
         uint8_t                 is_continuous_mode : 1;
         uint8_t                 is_inited : 1;
         uint8_t                 is_busy : 1;
-        uint8_t                 rx_byte_len : 2;
-        uint8_t                 configured_channel_mask;
+        uint8_t                 is_cmd : 1;
+        uint8_t                 cur_channel_seq_idx;
+        uint8_t                 tmp;
+        uint8_t                 channel_seq_num;
         uint8_t                 channel_seq_map[8];
-        uint8_t                 cur_channel_mask;
-        uint8_t                 cur_channel;
-        struct {
-            uint8_t             cur_reg;
-            union {
-                uint8_t         data_buffer[2];
-                uint16_t        data;
-            };
-        } VSF_CAL_PACKED;
     )
 };
 // IPCore end
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_ADC_CFG_DEC_PREFIX              vsf_adc128d818
-#define VSF_ADC_CFG_DEC_UPCASE_PREFIX       VSF_ADC128D818
+#define VSF_ADC_CFG_DEC_PREFIX              vsf_ads7830
+#define VSF_ADC_CFG_DEC_UPCASE_PREFIX       VSF_ADS7830
 #define VSF_ADC_CFG_DEC_EXTERN_OP           ENABLED
 #include "hal/driver/common/adc/adc_template.h"
 
@@ -140,10 +132,10 @@ vsf_class(vsf_adc128d818_adc_t) {
 #endif
 
 // IPCore
-#undef __VSF_HAL_ADC128D818_ADC_CLASS_IMPLEMENT
-#undef __VSF_HAL_ADC128D818_ADC_CLASS_INHERIT__
+#undef __VSF_HAL_ADS7830_ADC_CLASS_IMPLEMENT
+#undef __VSF_HAL_ADS7830_ADC_CLASS_INHERIT__
 // IPCore end
 
 #endif      // VSF_HAL_USE_ADC
-#endif      // __HAL_ADC128D818_ADC_H__
+#endif      // __HAL_ADS7830_ADC_H__
 /* EOF */
