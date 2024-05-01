@@ -203,17 +203,7 @@ vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_channel_config)(
 ) {
     VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != channel_cfgs_ptr));
     VSF_HAL_ASSERT(0 != channel_cfgs_cnt);
-    VSF_HAL_ASSERT(adc_ptr->is_continuous_mode);
-
-    vsf_protect_t orig = vsf_protect_int();
-    bool is_busy = adc_ptr->is_busy;
-    if (!adc_ptr->is_busy) {
-        adc_ptr->is_busy = true;
-    }
-    vsf_unprotect_int(orig);
-    if (is_busy) {
-        return VSF_ERR_FAIL;
-    }
+    VSF_HAL_ASSERT(adc_ptr->is_continuous_mode && !adc_ptr->is_busy);
 
     for (uint32_t i = 0; i < channel_cfgs_cnt; i++, channel_cfgs_ptr++) {
         VSF_HAL_ASSERT(channel_cfgs_ptr->channel < 8);
@@ -231,6 +221,7 @@ vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_channel_request)(
     VSF_HAL_ASSERT((NULL != adc_ptr) && (NULL != buffer_ptr) && (count > 0));
     VSF_HAL_ASSERT(!adc_ptr->is_busy);
     VSF_HAL_ASSERT(adc_ptr->is_continuous_mode);
+    VSF_HAL_ASSERT(adc_ptr->channel_seq_num > 0);
 
     vsf_protect_t orig = vsf_protect_int();
     bool is_busy = adc_ptr->is_busy;
@@ -246,10 +237,8 @@ vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_channel_request)(
     adc_ptr->total_count = count;
     adc_ptr->cur_channel_seq_idx = 0;
 
-    if ((adc_ptr->channel_seq_num > 0) && (count > 0)) {
-        VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_start_channel)(adc_ptr,
-            adc_ptr->channel_seq_map[0]);
-    }
+    VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_start_channel)(adc_ptr,
+        adc_ptr->channel_seq_map[0]);
 
     return VSF_ERR_NONE;
 }
