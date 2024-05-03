@@ -79,7 +79,7 @@ vsf_err_t vsf_dw_apb_i2c_init(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr, vsf_i2c_cfg_t *c
                     |   (1 << I2C_IC_CON_TX_EMPTY_CTRL_POS)
                     |   (1 << I2C_IC_CON_RX_FIFO_FULL_HLD_CTRL_POS);
     reg->IC_RX_TL.RX_TL = 0;
-    reg->IC_TX_TL.TX_TL = 0;
+    reg->IC_TX_TL.TX_TL = reg->IC_COMP_PARAM_1.TX_BUFFER_DEPTH;
 
     dw_apb_i2c_ptr->isr = cfg_ptr->isr;
     dw_apb_i2c_ptr->irq_mask = 0;
@@ -308,7 +308,7 @@ vsf_err_t vsf_dw_apb_i2c_master_request(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr,
         __vsf_dw_apb_i2c_continue(dw_apb_i2c_ptr);
 
         if (!(cmd & VSF_I2C_CMD_READ)) {
-            if (dw_apb_i2c_ptr->rx_req_count > 0) {
+            if (dw_apb_i2c_ptr->count > 0) {
                 // enable VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY for VSF_I2C_CMD_WRITE
                 reg->IC_INTR_MASK.VALUE |= VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY;
             } else if (!dw_apb_i2c_ptr->need_stop) {
