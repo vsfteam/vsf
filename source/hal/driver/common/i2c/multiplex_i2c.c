@@ -118,7 +118,6 @@ static vsf_err_t __m_i2c_reconfig_and_request(vsf_multiplex_i2c_t *m_i2c_ptr, bo
     }
 
     if (is_req) {
-        multiplexer->req_done = false;
         result = vsf_i2c_master_request(multiplexer->i2c_ptr,
                                         m_i2c_ptr->request.address,
                                         m_i2c_ptr->request.cmd,
@@ -148,38 +147,29 @@ static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_
                                     | VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK
                                     | VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
                                     | VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
-    bool next_req = (irq_mask & cpl_irq_mask) && (m_i2c_ptr->request.cmd & VSF_I2C_CMD_STOP);
 
-    // Provide support for continuous requests, there are some peripherals
-    // that want to be requested multiple times in a row without being interrupted.
-    if (next_req) {
-        multiplexer->req_done = true;
+    if ((irq_mask & cpl_irq_mask) && (m_i2c_ptr->request.cmd & VSF_I2C_CMD_STOP)) {
+        vsf_multiplex_i2c_t *new_m_i2c_ptr;
+
+        vsf_protect_t state = vsf_multiplex_i2c_protect();
+            vsf_slist_queue_dequeue(vsf_multiplex_i2c_t, slist_node, &multiplexer->waiting_queue, multiplexer->req_m_i2c);
+            new_m_i2c_ptr = multiplexer->req_m_i2c;
+            if (new_m_i2c_ptr != NULL) {
+                VSF_HAL_ASSERT(multiplexer->en_mask & (1 << new_m_i2c_ptr->id));
+            }
+        vsf_multiplex_i2c_unprotect(state);
+
+        if (new_m_i2c_ptr != NULL) {
+            vsf_err_t result = __m_i2c_reconfig_and_request(new_m_i2c_ptr, true, true);
+            (void) result;
+            VSF_ASSERT(result == VSF_ERR_NONE);
+        }
     }
 
     vsf_i2c_isr_t *isr_ptr = &m_i2c_ptr->cfg.isr;
     vsf_i2c_irq_mask_t real_irq_mask = irq_mask & m_i2c_ptr->irq_mask;
     if ((real_irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_i2c_t *)m_i2c_ptr, real_irq_mask);
-    }
-
-    if (multiplexer->req_done) {
-        bool is_need = false;
-        vsf_multiplex_i2c_t *new_m_i2c_ptr;
-        vsf_protect_t state = vsf_multiplex_i2c_protect();
-            if (!vsf_slist_queue_is_empty(&multiplexer->waiting_queue)) {
-                is_need = true;
-                // pop new instance
-                vsf_slist_queue_dequeue(vsf_multiplex_i2c_t, slist_node, &multiplexer->waiting_queue, multiplexer->req_m_i2c);
-                new_m_i2c_ptr = multiplexer->req_m_i2c;
-                VSF_HAL_ASSERT(multiplexer->en_mask & (1 << new_m_i2c_ptr->id));
-            }
-        vsf_multiplex_i2c_unprotect(state);
-
-        if (is_need) {
-            vsf_err_t result = __m_i2c_reconfig_and_request(new_m_i2c_ptr, true, true);
-            (void) result;
-            VSF_ASSERT(result == VSF_ERR_NONE);
-        }
     }
 }
 
