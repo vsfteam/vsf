@@ -647,28 +647,28 @@ static void __vsf_sdl2_event_on_input(vk_input_notifier_t *notifier, vk_input_ty
         }
         break;
     case VSF_INPUT_TYPE_MOUSE:
-        switch (vk_input_mouse_evt_get(evt)) {
+        switch (vsf_input_mouse_evt_get(evt)) {
         case VSF_INPUT_MOUSE_EVT_MOVE:
             event.type = SDL_MOUSEMOTION;
-            event.motion.x = vk_input_mouse_evt_get_x(evt);
-            event.motion.y = vk_input_mouse_evt_get_y(evt);
+            event.motion.x = vsf_input_mouse_evt_get_x(evt);
+            event.motion.y = vsf_input_mouse_evt_get_y(evt);
             // TODO: fix relative motion values
             event.motion.xrel = event.motion.yrel = 0;
             break;
         case VSF_INPUT_MOUSE_EVT_BUTTON:
-            if (vk_input_mouse_evt_button_is_down(evt)) {
+            if (vsf_input_mouse_evt_button_is_down(evt)) {
                 event.type = SDL_MOUSEBUTTONDOWN;
             } else {
                 event.type = SDL_MOUSEBUTTONUP;
             }
-            event.button.x = vk_input_mouse_evt_get_x(evt);
-            event.button.y = vk_input_mouse_evt_get_y(evt);
+            event.button.x = vsf_input_mouse_evt_get_x(evt);
+            event.button.y = vsf_input_mouse_evt_get_y(evt);
             event.button.clicks = 1;
             break;
         case VSF_INPUT_MOUSE_EVT_WHEEL:
             event.type = SDL_MOUSEWHEEL;
-            event.wheel.x = vk_input_mouse_evt_get_x(evt);
-            event.wheel.y = vk_input_mouse_evt_get_y(evt);
+            event.wheel.x = vsf_input_mouse_evt_get_x(evt);
+            event.wheel.y = vsf_input_mouse_evt_get_y(evt);
             // TODO: initialize more members in wheel
             break;
         }

@@ -909,27 +909,27 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
         __vsf_linux_input_push(input_priv, &input_event);
         break;
     case VSF_INPUT_TYPE_MOUSE:
-        switch (vk_input_mouse_evt_get(evt)) {
+        switch (vsf_input_mouse_evt_get(evt)) {
         case VSF_INPUT_MOUSE_EVT_BUTTON:
-            input_event.code = BTN_MOUSE + vk_input_mouse_evt_button_get(evt);
-            input_event.value = vk_input_mouse_evt_button_is_down(evt) ? 1 : 0;
+            input_event.code = BTN_MOUSE + vsf_input_mouse_evt_button_get(evt);
+            input_event.value = vsf_input_mouse_evt_button_is_down(evt) ? 1 : 0;
             input_event.type = EV_KEY;
             __vsf_linux_input_push(input_priv, &input_event);
             // fall through
         case VSF_INPUT_MOUSE_EVT_MOVE:
             input_event.code = ABS_X;
-            input_event.value = vk_input_mouse_evt_get_x(evt);
+            input_event.value = vsf_input_mouse_evt_get_x(evt);
             input_event.type = EV_ABS;
             __vsf_linux_input_push(input_priv, &input_event);
 
             input_event.code = ABS_Y;
-            input_event.value = vk_input_mouse_evt_get_y(evt);
+            input_event.value = vsf_input_mouse_evt_get_y(evt);
             input_event.type = EV_ABS;
             __vsf_linux_input_push(input_priv, &input_event);
             break;
         case VSF_INPUT_MOUSE_EVT_WHEEL:
             input_event.code = REL_WHEEL;
-            input_event.value = vk_input_mouse_evt_get_y(evt);
+            input_event.value = vsf_input_mouse_evt_get_y(evt);
             input_event.type = EV_REL;
             __vsf_linux_input_push(input_priv, &input_event);
             break;

@@ -157,46 +157,46 @@ void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt)
 void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
 {
 /*
-    switch (vk_input_mouse_evt_get(mouse_evt)) {
+    switch (vsf_input_mouse_evt_get(mouse_evt)) {
         case VSF_INPUT_MOUSE_EVT_BUTTON:
             vsf_trace_debug("mouse button: %d %s @(%d, %d)" VSF_TRACE_CFG_LINEEND,
-                vk_input_mouse_evt_button_get(mouse_evt),
-                vk_input_mouse_evt_button_is_down(mouse_evt) ? "down" : "up",
-                vk_input_mouse_evt_get_x(mouse_evt),
-                vk_input_mouse_evt_get_y(mouse_evt));
+                vsf_input_mouse_evt_button_get(mouse_evt),
+                vsf_input_mouse_evt_button_is_down(mouse_evt) ? "down" : "up",
+                vsf_input_mouse_evt_get_x(mouse_evt),
+                vsf_input_mouse_evt_get_y(mouse_evt));
             break;
         case VSF_INPUT_MOUSE_EVT_MOVE:
             vsf_trace_debug("mouse move: @(%d, %d)" VSF_TRACE_CFG_LINEEND,
-                vk_input_mouse_evt_get_x(mouse_evt),
-                vk_input_mouse_evt_get_y(mouse_evt));
+                vsf_input_mouse_evt_get_x(mouse_evt),
+                vsf_input_mouse_evt_get_y(mouse_evt));
             break;
         case VSF_INPUT_MOUSE_EVT_WHEEL:
             vsf_trace_debug("mouse wheel: (%d, %d)" VSF_TRACE_CFG_LINEEND,
-                vk_input_mouse_evt_get_x(mouse_evt),
-                vk_input_mouse_evt_get_y(mouse_evt));
+                vsf_input_mouse_evt_get_x(mouse_evt),
+                vsf_input_mouse_evt_get_y(mouse_evt));
             break;
     }
 
 */
     //! this block of code is used for test purpose only
-    int_fast8_t button_id = vk_input_mouse_evt_button_get(mouse_evt) == 0 ? 0 : 1;
+    int_fast8_t button_id = vsf_input_mouse_evt_button_get(mouse_evt) == 0 ? 0 : 1;
     static uint_fast8_t __button_status = 0;
     vsf_err_t result = VSF_ERR_NONE;
 
-    switch (vk_input_mouse_evt_get(mouse_evt)) {
+    switch (vsf_input_mouse_evt_get(mouse_evt)) {
         case VSF_INPUT_MOUSE_EVT_BUTTON: {
 
             result =
                 vsf_tgui_send_touch_evt(&s_tTGUIDemo,
                                         button_id,
                                         (vsf_tgui_location_t) {
-                                            vk_input_mouse_evt_get_x(mouse_evt),
-                                            vk_input_mouse_evt_get_y(mouse_evt)},
-                                        vk_input_mouse_evt_button_is_down(mouse_evt),
+                                            vsf_input_mouse_evt_get_x(mouse_evt),
+                                            vsf_input_mouse_evt_get_y(mouse_evt)},
+                                        vsf_input_mouse_evt_button_is_down(mouse_evt),
                                         mouse_evt->use_as__vk_input_evt_t.duration
                                         );
 
-            if (vk_input_mouse_evt_button_is_down(mouse_evt)) {
+            if (vsf_input_mouse_evt_button_is_down(mouse_evt)) {
                 __button_status |= BIT(button_id);
             } else {
                 __button_status &= ~BIT(button_id);
@@ -214,8 +214,8 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
                     vsf_tgui_send_touch_evt(&s_tTGUIDemo,
                                             button_id,
                                             (vsf_tgui_location_t) {
-                                                vk_input_mouse_evt_get_x(mouse_evt),
-                                                vk_input_mouse_evt_get_y(mouse_evt)},
+                                                vsf_input_mouse_evt_get_x(mouse_evt),
+                                                vsf_input_mouse_evt_get_y(mouse_evt)},
                                             __button_status & BIT(button_id),
                                             mouse_evt->use_as__vk_input_evt_t.duration
                                             );
@@ -226,8 +226,8 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
                     vsf_tgui_send_touch_evt(&s_tTGUIDemo,
                                             0,
                                             (vsf_tgui_location_t) {
-                                                vk_input_mouse_evt_get_x(mouse_evt),
-                                                vk_input_mouse_evt_get_y(mouse_evt)},
+                                                vsf_input_mouse_evt_get_x(mouse_evt),
+                                                vsf_input_mouse_evt_get_y(mouse_evt)},
                                             __button_status & BIT(0),
                                             mouse_evt->use_as__vk_input_evt_t.duration
                                             );
@@ -238,8 +238,8 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
                     vsf_tgui_send_touch_evt(&s_tTGUIDemo,
                                             1,
                                             (vsf_tgui_location_t) {
-                                                vk_input_mouse_evt_get_x(mouse_evt),
-                                                vk_input_mouse_evt_get_y(mouse_evt)},
+                                                vsf_input_mouse_evt_get_x(mouse_evt),
+                                                vsf_input_mouse_evt_get_y(mouse_evt)},
                                             __button_status & BIT(1),
                                             mouse_evt->use_as__vk_input_evt_t.duration
                                             );
@@ -256,7 +256,7 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
                         .msg = VSF_TGUI_EVT_GESTURE_WHEEL,
                         .delta = {
                             .iX = 0,
-                            .iY = -vk_input_mouse_evt_get_y(mouse_evt),
+                            .iY = -vsf_input_mouse_evt_get_y(mouse_evt),
                             .ms = 20,            //! 50Hz
                         },
                     },
