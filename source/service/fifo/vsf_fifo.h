@@ -43,7 +43,7 @@
 
         // 5. Initialization user fifo.
 
-              vsf_fifo_init(&__xxxx_fifo);
+              vsf_fifo_init((vsf_fifo_t *)&__xxxx_fifo);
 
         ......
 
@@ -52,22 +52,22 @@
               xxxx_t xxxx_to_push = {
                   ........
               };
-              vsf_fifo_push(&__xxxx_fifo, &xxxx_to_push);
+              vsf_fifo_push((vsf_fifo_t *)&__xxxx_fifo, &xxxx_to_push, sizeof(xxxx_t));
 
         // 7. Pop from user fifo
 
               xxxx_t xxxx_to_pop;
-              vsf_fifo_pop(&__xxxx_fifo, &xxxx_to_pop);
+              vsf_fifo_pop((vsf_fifo_t *)&__xxxx_fifo, &xxxx_to_pop, sizeof(xxxx_t));
 
         // 8. Get pointer of head/tail element
 
               xxxx_t *xxxx_head_ptr = vsf_fifo_get_head(&__xxxx_fifo);
               write members pointed by xxxx_head_ptr;
-              vsf_fifo_push(&__xxxx_fifo, NULL);
+              vsf_fifo_push((vsf_fifo_t *)&__xxxx_fifo, NULL, sizeof(xxxx_t));
 
               xxxx_t *xxxx_tail_ptr = vsf_fifo_get_tail(&__xxxx_fifo);
               read members pointed by xxxx_head_ptr
-              vsf_fifo_pop(&__xxxx_fifo, NULL);
+              vsf_fifo_pop((vsf_fifo_t *)&__xxxx_fifo, NULL, sizeof(xxxx_t));
 
         ......
     }
