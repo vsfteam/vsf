@@ -6471,7 +6471,7 @@
 	)
 	(wire
 		(pts
-			(xy 203.2 133.35) (xy 209.55 133.35)
+			(xy 203.2 133.35) (xy 213.36 133.35)
 		)
 		(stroke
 			(width 0)
@@ -7271,6 +7271,16 @@
 	)
 	(wire
 		(pts
+			(xy 213.36 133.35) (xy 213.36 130.81)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9c4ecd31-ebe6-40b8-8eef-f0cbe959f44c")
+	)
+	(wire
+		(pts
 			(xy 90.17 86.995) (xy 90.17 90.17)
 		)
 		(stroke
@@ -7658,6 +7668,16 @@
 			(type default)
 		)
 		(uuid "d3cd11da-7fee-483b-80c7-87f4fdaca55f")
+	)
+	(wire
+		(pts
+			(xy 209.55 123.19) (xy 213.36 123.19)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d40cac2a-8406-4dc6-8956-1d5e2a8a1938")
 	)
 	(wire
 		(pts
@@ -9798,6 +9818,17 @@
 			(justify right bottom)
 		)
 		(uuid "c99a8a06-14f5-4c32-be34-983a23a72fc0")
+	)
+	(label "VCC"
+		(at 209.55 123.19 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "cc10f0c5-d68d-4364-8375-7b61370f1da6")
 	)
 	(label "CLK"
 		(at 276.86 77.47 0)
@@ -14408,6 +14439,73 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 209.55 127 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "691bb759-aac5-436d-b2ef-6dee204f4ad7")
+		(property "Reference" "R31"
+			(at 211.455 127 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "4.7K"
+			(at 209.55 127 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 211.328 127 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 209.55 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 209.55 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "3742a182-3f99-428e-928a-68864542333a")
+		)
+		(pin "2"
+			(uuid "e58021c4-dddc-4ed8-81a9-6a658a218b98")
+		)
+		(instances
+			(project "gamepad"
+				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
+					(reference "R31")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Connector_Generic:Conn_01x02")
 		(at 144.78 130.175 0)
 		(unit 1)
@@ -17074,6 +17172,73 @@
 			(project "gamepad"
 				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
 					(reference "U1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 213.36 127 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "ba08a565-72d4-4102-b202-fb11a787cf4e")
+		(property "Reference" "R32"
+			(at 215.265 127 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "4.7K"
+			(at 213.36 127 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 215.138 127 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 213.36 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 213.36 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "aabec9fc-70fa-4d98-94b2-401058331e61")
+		)
+		(pin "2"
+			(uuid "ff4e21e3-17ea-410b-b95c-1b448410fe94")
+		)
+		(instances
+			(project "gamepad"
+				(path "/988ff9b3-4390-4b63-b073-de63e3b1969b"
+					(reference "R32")
 					(unit 1)
 				)
 			)
