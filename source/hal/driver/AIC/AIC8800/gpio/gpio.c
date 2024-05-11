@@ -191,7 +191,32 @@ vsf_gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
     return gpio_capability;
 }
 
-vsf_err_t vsf_hw_gpio_pin_interrupt_enable(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)
+vsf_err_t vsf_hw_gpio_config_exti_interrupt(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)
+{
+    VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
+    VSF_HAL_ASSERT(vsf_arch_prio_invalid != prio);
+
+    uint16_t pin_mask_orig;
+    vsf_protect_t orig;
+
+    if (hw_gpio_ptr->is_pmic) {
+        return VSF_ERR_NOT_SUPPORT;
+    }
+
+    orig = __vsf_gpio_protect();
+    pin_mask_orig = hw_gpio_ptr->gpio_pin_isr_mask;
+    hw_gpio_ptr->gpio_pin_isr_mask |= pin_mask;
+    __vsf_gpio_unprotect(orig);
+
+    if (!pin_mask_orig) {
+        NVIC_SetPriority(hw_gpio_ptr->irqn, prio);
+        NVIC_EnableIRQ(hw_gpio_ptr->irqn);
+    }
+
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_hw_gpio_pin_interrupt_disable(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     uint16_t pin_mask_orig;
@@ -201,31 +226,20 @@ vsf_err_t vsf_hw_gpio_pin_interrupt_enable(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_
         return VSF_ERR_NOT_SUPPORT;
     }
 
-    if (prio == vsf_arch_prio_invalid) {
-        orig = __vsf_gpio_protect();
-        hw_gpio_ptr->gpio_pin_isr_mask &= ~pin_mask;
-        pin_mask_orig = hw_gpio_ptr->gpio_pin_isr_mask;
-        __vsf_gpio_unprotect(orig);
+    orig = __vsf_gpio_protect();
+    hw_gpio_ptr->gpio_pin_isr_mask &= ~pin_mask;
+    pin_mask_orig = hw_gpio_ptr->gpio_pin_isr_mask;
+    __vsf_gpio_unprotect(orig);
 
-        if (!pin_mask_orig) {
-            NVIC_DisableIRQ(hw_gpio_ptr->irqn);
-        }
-    } else {
-        orig = __vsf_gpio_protect();
-        pin_mask_orig = hw_gpio_ptr->gpio_pin_isr_mask;
-        hw_gpio_ptr->gpio_pin_isr_mask |= pin_mask;
-        __vsf_gpio_unprotect(orig);
-
-        if (!pin_mask_orig) {
-            NVIC_SetPriority(hw_gpio_ptr->irqn, prio);
-            NVIC_EnableIRQ(hw_gpio_ptr->irqn);
-        }
+    if (!pin_mask_orig) {
+        NVIC_DisableIRQ(hw_gpio_ptr->irqn);
     }
 
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_hw_gpio_pin_interrupt_config(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
+
+vsf_err_t vsf_hw_gpio_config_exti(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);

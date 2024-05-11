@@ -201,8 +201,8 @@ static const hal_option_t __mode_options[] = {
     HAL_DEMO_OPTION(VSF_GPIO_HIGH_DRIVE_STRENGTH_MASK, VSF_GPIO_HIGH_DRIVE_STRENGTH),
     HAL_DEMO_OPTION(VSF_GPIO_HIGH_DRIVE_STRENGTH_MASK, VSF_IO_HIGH_DRIVE_NO_STRENGTH),
 
-    HAL_DEMO_OPTION(VSF_GPIO_INTERRUPT_MASK, VSF_GPIO_INTERRUPT_DISABLED),
-    HAL_DEMO_OPTION(VSF_GPIO_INTERRUPT_MASK, VSF_GPIO_INTERRUPT_ENABLED),
+    HAL_DEMO_OPTION(VSF_GPIO_EXTI_MASK, VSF_GPIO_EXTI_DISABLED),
+    HAL_DEMO_OPTION(VSF_GPIO_EXTI_MASK, VSF_GPIO_EXTI_ENABLED),
 };
 
 static const hal_option_t __int_mode_options[] = {
@@ -301,7 +301,7 @@ static bool __gpio_demo_check(hal_test_t *hal_test)
     switch (test->method & METHOD_PIN_INT_MASK) {
     case METHOD_PIN_INT_NONE:
         test->int_mode = VSF_GPIO_INT_MODE_NONE;
-        test->in.mode = (test->in.mode & ~VSF_GPIO_INTERRUPT_MASK) | VSF_GPIO_INTERRUPT_DISABLED;
+        test->in.mode = (test->in.mode & ~VSF_GPIO_EXTI_MASK) | VSF_GPIO_EXTI_DISABLED;
         return true;
 
     case METHOD_PIN_INT_LOW_LEVEL:
@@ -320,7 +320,7 @@ static bool __gpio_demo_check(hal_test_t *hal_test)
         test->int_mode = VSF_GPIO_INT_MODE_RISING_FALLING;
         break;
     }
-    test->in.mode = (test->in.mode & ~VSF_GPIO_INTERRUPT_MASK) | VSF_GPIO_INTERRUPT_ENABLED;
+    test->in.mode = (test->in.mode & ~VSF_GPIO_EXTI_MASK) | VSF_GPIO_EXTI_ENABLED;
 
     if (!in_cap.support_interrupt) {
         vsf_trace_error("External interrupts are not supported!" VSF_TRACE_CFG_LINEEND);
@@ -467,9 +467,9 @@ static vsf_err_t __gpio_demo_pin_interrupt_init(gpio_test_t *test, vsf_arch_prio
     VSF_ASSERT(NULL != test);
     vsf_gpio_t *gpio_ptr = test->in.gpio;
 
-    vsf_err_t err = vsf_gpio_pin_interrupt_enable(gpio_ptr, test->in.pin_mask, arch_prio);
+    vsf_err_t err = vsf_gpio_config_exti_interrupt(gpio_ptr, test->in.pin_mask, arch_prio);
     if (test->verbose >= 2) {
-        vsf_trace_debug("vsf_gpio_pin_interrupt_enable(&%s, %d, vsf_arch_prio_%d) = %d/*vsf_err_t*/" VSF_TRACE_CFG_LINEEND,
+        vsf_trace_debug("vsf_gpio_config_exti_interrupt(&%s, %d, vsf_arch_prio_%d) = %d/*vsf_err_t*/" VSF_TRACE_CFG_LINEEND,
                         test->in.name, test->in.pin_mask, hal_demo_arch_prio_to_num(arch_prio), err);
     }
     return err;
@@ -486,11 +486,11 @@ static vsf_err_t __gpio_demo_pin_interrupt_config(gpio_test_t *test, vsf_gpio_in
         .isr.handler_fn = (mode == VSF_GPIO_INT_MODE_NONE) ? NULL : __gpio_isr_handler,
         .isr.target_ptr = (mode == VSF_GPIO_INT_MODE_NONE) ? NULL : test,
     };
-    vsf_err_t err = vsf_gpio_pin_interrupt_config(gpio_ptr, &cfg);
+    vsf_err_t err = vsf_gpio_config_exti(gpio_ptr, &cfg);
     if (test->verbose >= 2) {
         vsf_trace_debug("vsf_gpio_pin_irq_cfg_t cfg = {.pin_mask = 0x%08x, .mode = ", cfg.pin_mask);
         hal_options_trace(VSF_TRACE_DEBUG, "", __int_mode_options, dimof(__int_mode_options), cfg.mode);
-        vsf_trace_debug("};" VSF_TRACE_CFG_LINEEND "vsf_gpio_pin_interrupt_config(&%s, &cfg) = %d/*vsf_err_t*/" VSF_TRACE_CFG_LINEEND,
+        vsf_trace_debug("};" VSF_TRACE_CFG_LINEEND "vsf_gpio_config_exti(&%s, &cfg) = %d/*vsf_err_t*/" VSF_TRACE_CFG_LINEEND,
                         test->in.name, err);
     }
     return err;

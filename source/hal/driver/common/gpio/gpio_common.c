@@ -159,22 +159,22 @@ vsf_gpio_capability_t vsf_gpio_capability(vsf_gpio_t *gpio_ptr)
 }
 
 
-vsf_err_t vsf_gpio_pin_interrupt_enable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)
+vsf_err_t vsf_gpio_config_exti_interrupt(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
-    VSF_HAL_ASSERT(gpio_ptr->op->pin_interrupt_enable != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op->config_exti_interrupt != NULL);
 
-    return gpio_ptr->op->pin_interrupt_enable(gpio_ptr, pin_mask, prio);
+    return gpio_ptr->op->config_exti_interrupt(gpio_ptr, pin_mask, prio);
 }
 
-vsf_err_t vsf_gpio_pin_interrupt_config(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg)
+vsf_err_t vsf_gpio_config_exti(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
-    VSF_HAL_ASSERT(gpio_ptr->op->pin_interrupt_config != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op->config_exti != NULL);
 
-    return gpio_ptr->op->pin_interrupt_config(gpio_ptr, cfg);
+    return gpio_ptr->op->config_exti(gpio_ptr, cfg);
 }
 
 #endif

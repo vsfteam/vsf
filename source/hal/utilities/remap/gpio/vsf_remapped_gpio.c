@@ -129,16 +129,16 @@ vsf_gpio_capability_t vsf_remapped_gpio_capability(vsf_remapped_gpio_t *gpio)
     return vsf_gpio_capability(gpio->target);
 }
 
-vsf_err_t vsf_remapped_gpio_pin_interrupt_enable(vsf_remapped_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)
+vsf_err_t vsf_remapped_gpio_config_exti_interrupt(vsf_remapped_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)
 {
     VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));
-    return vsf_gpio_pin_interrupt_enable(gpio->target, pin_mask, prio);
+    return vsf_gpio_config_exti_interrupt(gpio->target, pin_mask, prio);
 }
 
-vsf_err_t vsf_remapped_gpio_pin_interrupt_config(vsf_remapped_gpio_t *gpio, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
+vsf_err_t vsf_remapped_gpio_config_exti(vsf_remapped_gpio_t *gpio, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));
-    return vsf_gpio_pin_interrupt_config(gpio->target, cfg_ptr);
+    return vsf_gpio_config_exti(gpio->target, cfg_ptr);
 }
 
 #endif
