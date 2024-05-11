@@ -266,6 +266,7 @@ vsf_gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
 #   define vsf_imp_gpio_output_and_clear        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_clear)
 #   define vsf_imp_gpio_toggle                  VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_toggle)
 #   define vsf_imp_gpio_pin_interrupt_enable    VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_pin_interrupt_enable)
+#   define vsf_imp_gpio_pin_interrupt_disable   VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_pin_interrupt_disable)
 #   define vsf_imp_gpio_pin_interrupt_config    VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_pin_interrupt_config)
 
 #   define vsf_remap_gpio_t                     VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t)
@@ -285,9 +286,10 @@ vsf_gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
 #   define vsf_remap_gpio_output_and_clear      VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_clear)
 #   define vsf_remap_gpio_toggle                VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_toggle)
 #   define vsf_remap_gpio_pin_interrupt_enable  VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_pin_interrupt_enable)
+#   define vsf_remap_gpio_pin_interrupt_disable VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_pin_interrupt_disable)
 #   define vsf_remap_gpio_pin_interrupt_config  VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_pin_interrupt_config)
 
-#   define VSF_GPIO_CFG_IMP_REMAP_FUNCTIONS                                                                                                       \
+#   define VSF_GPIO_CFG_IMP_REMAP_FUNCTIONS                                                                                         \
         void vsf_imp_gpio_config_pin(vsf_impl_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_mode_t feature)              \
         {                                                                                                                           \
             VSF_HAL_ASSERT(gpio_ptr != NULL);                                                                                       \
@@ -362,6 +364,11 @@ vsf_gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
         {                                                                                                                           \
             VSF_HAL_ASSERT(gpio_ptr != NULL);                                                                                       \
             return vsf_remap_gpio_pin_interrupt_enable(gpio_ptr, pin_mask, prio);                                                   \
+        }                                                                                                                           \
+        vsf_err_t vsf_imp_gpio_pin_interrupt_enable(vsf_impl_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                        \
+        {                                                                                                                           \
+            VSF_HAL_ASSERT(gpio_ptr != NULL);                                                                                       \
+            return vsf_remap_gpio_pin_interrupt_disable(gpio_ptr, pin_mask);                                                        \
         }                                                                                                                           \
         vsf_err_t vsf_imp_gpio_pin_interrupt_config(vsf_impl_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg)                         \
         {                                                                                                                           \

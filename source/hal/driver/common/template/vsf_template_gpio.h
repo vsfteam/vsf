@@ -136,8 +136,9 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, toggle,                  VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_set,          VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_clear,        VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, config_exti_interrupt,   VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, config_exti,             VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exit_config,             VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)                                   \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_enable,         VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)                \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_disable,        VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 
 /*============================ TYPES =========================================*/
 
@@ -169,8 +170,8 @@ typedef enum vsf_gpio_mode_t {
     VSF_GPIO_HIGH_DRIVE_STRENGTH        = (1 << 10),        //!< enable high drive strength
     VSF_GPIO_HIGH_DRIVE_NO_STRENGTH     = (1 << 10),        //!< enable high drive strength
 
-    VSF_GPIO_EXTI_DISABLED         = (0 << 11),
-    VSF_GPIO_EXTI_ENABLED          = (1 << 11),
+    VSF_GPIO_EXTI_DISABLED              = (0 << 11),
+    VSF_GPIO_EXTI_ENABLED               = (1 << 11),
 } vsf_gpio_mode_t;
 #elif VSF_GPIO_USE_IO_MODE_TYPE == ENABLED
 typedef enum vsf_gpio_mode_t {
@@ -578,25 +579,6 @@ extern vsf_gpio_capability_t vsf_gpio_capability(vsf_gpio_t *gpio_ptr);
 
 /**
  \~english
- @brief Enable or Disable interrupt of a pin
- @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
- @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the bit
- @param[in] prio: priority of the interrupt or vsf_arch_prio_invalid for disable
- @note For some devices, prio parameter maybe shared between pins on the gpio.
- @note All pending interrupts should be cleared before interrupts are enabled.
-
- \~chinese
- @brief 使能或者禁能指定引脚的中断
- @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
- @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，1表示该位需要使能，0表示该位不需要使能
- @param[in] prio: 中断优先级，或者用 vsf_arch_prio_invalid 表示关闭中断
- @note 对于一些芯片, 中断优先级可能是 gpio 上所有引脚公用的。
- @note 在中断使能之前，应该清除所有悬挂的中断。
- */
-extern vsf_err_t vsf_gpio_config_exti_interrupt(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio);
-
-/**
- \~english
  @brief Configure interrupt of one or more pins of the gpio instance
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
  @param[in] cfg: a pointer to structure @ref vsf_gpio_pin_irq_cfg_t
@@ -606,7 +588,41 @@ extern vsf_err_t vsf_gpio_config_exti_interrupt(vsf_gpio_t *gpio_ptr, vsf_gpio_p
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
  @param[in] cfg: 结构体 vsf_gpio_pin_irq_cfg_t 的指针，参考 @ref vsf_gpio_pin_irq_cfg_t
  */
-extern vsf_err_t vsf_gpio_config_exti(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr);
+extern vsf_err_t vsf_gpio_exit_config(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr);
+
+/**
+ \~english
+ @brief Enable interrupt of a pin
+ @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
+ @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the bit
+ @param[in] prio: priority of the interrupt or vsf_arch_prio_invalid for disable
+ @note For some devices, prio parameter maybe shared between pins on the gpio.
+ @note All pending interrupts should be cleared before interrupts are enabled.
+
+ \~chinese
+ @brief 使能指定引脚的中断
+ @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
+ @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，1表示该位需要使能，0表示该位不需要使能
+ @param[in] prio: 中断优先级，或者用 vsf_arch_prio_invalid 表示关闭中断
+ @note 对于一些芯片, 中断优先级可能是 gpio 上所有引脚公用的。
+ @note 在中断使能之前，应该清除所有悬挂的中断。
+ */
+extern vsf_err_t vsf_gpio_exti_irq_enable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio);
+
+/**
+ \~english
+ @brief Disable interrupt of a pin
+ @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
+ @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the bit
+ @note For some devices, prio parameter maybe shared between pins on the gpio.
+
+ \~chinese
+ @brief 禁能指定引脚的中断
+ @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
+ @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，1表示该位需要使能，0表示该位不需要使能
+ @note 对于一些芯片, 中断优先级可能是 gpio 上所有引脚公用的。
+ */
+extern vsf_err_t vsf_gpio_exti_irq_disable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 
 /*============================ MACROS ========================================*/
 
@@ -626,8 +642,9 @@ extern vsf_err_t vsf_gpio_config_exti(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg
 #   define vsf_gpio_output_and_set(__GPIO, ...)         VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_set)         ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
 #   define vsf_gpio_output_and_clear(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_clear)       ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
 #   define vsf_gpio_toggle(__GPIO, ...)                 VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_toggle)                 ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_config_exti_interrupt(__GPIO, ...)  VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_config_exti_interrupt)  ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_config_exti(__GPIO, ...)            VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_config_exti)            ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_exit_config(__GPIO, ...)            VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exit_config)            ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_exti_irq_enable(__GPIO, ...)        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_enable)        ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_exti_irq_disable(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_disable)       ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus
