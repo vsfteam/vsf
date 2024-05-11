@@ -365,12 +365,14 @@ extern fsm_rt_t vsf_spi_disable(vsf_spi_t *spi_ptr);
  @param[in] spi_ptr: a pointer to structure @ref vsf_spi_t
  @param[in] irq_mask: one or more value of enum @ref vsf_spi_irq_mask_t
  @return none.
+ @note All pending interrupts should be cleared before interrupts are enabled.
 
  \~chinese
  @brief 使能 spi 实例的中断
  @param[in] spi_ptr: 结构体 vsf_spi_t 的指针，参考 @ref vsf_spi_t
  @param[in] irq_mask: 一个或者多个枚举 vsf_spi_irq_mask_t 的值的按位或，@ref vsf_spi_irq_mask_t
  @return 无。
+ @note 在中断使能之前，应该清除所有悬挂的中断。
  */
 extern void vsf_spi_irq_enable(vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask);
 

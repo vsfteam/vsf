@@ -279,12 +279,14 @@ extern vsf_flash_capability_t vsf_flash_capability(vsf_flash_t *flash_ptr);
  @param[in] flash_ptr: a pointer to structure @ref vsf_flash_t
  @param[in] irq_mask: one or more value of enum @ref vsf_flash_irq_mask_t
  @return none.
+ @note All pending interrupts should be cleared before interrupts are enabled.
 
  \~chinese
  @brief 使能 flash 实例的中断
  @param[in] flash_ptr: 结构体 vsf_flash_t 的指针，参考 @ref vsf_flash_t
  @param[in] irq_mask: 一个或者多个枚举 vsf_flash_irq_mask_t 的值的按位或，@ref vsf_flash_irq_mask_t
  @return 无。
+ @note 在中断使能之前，应该清除所有悬挂的中断。
  */
 extern void vsf_flash_irq_enable(vsf_flash_t *flash_ptr, vsf_flash_irq_mask_t irq_mask);
 

@@ -309,6 +309,7 @@ extern fsm_rt_t vsf_adc_enable(vsf_adc_t *adc_ptr);
  @param[in] adc_ptr: 结构体 vsf_adc_t 的指针，参考 @ref vsf_adc_t
  @param[in] irq_mask: 一个或者多个枚举 vsf_adc_irq_mask_t 的值的按位或，@ref vsf_adc_irq_mask_t
  @return 无。
+ @note All pending interrupts should be cleared before interrupts are enabled.
  */
 extern fsm_rt_t vsf_adc_disable(vsf_adc_t *adc_ptr);
 
@@ -324,6 +325,7 @@ extern fsm_rt_t vsf_adc_disable(vsf_adc_t *adc_ptr);
  @param[in] adc_ptr: 结构体 vsf_adc_t 的指针，参考 @ref vsf_adc_t
  @param[in] irq_mask: 一个或者多个枚举 vsf_adc_irq_mask_t 的值的按位或，@ref vsf_adc_irq_mask_t
  @return 无。
+ @note 在中断使能之前，应该清除所有悬挂的中断。
  */
 extern void vsf_adc_irq_enable(vsf_adc_t *adc_ptr, vsf_adc_irq_mask_t irq_mask);
 
