@@ -373,12 +373,14 @@ extern fsm_rt_t vsf_usart_disable(vsf_usart_t *usart_ptr);
  @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
  @param[in] irq_mask: one or more value of enum @ref vsf_usart_irq_mask_t
  @return none.
+ @note All pending interrupts should be cleared before interrupts are enabled.
 
  \~chinese
  @brief 使能 usart 实例的中断
  @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
  @param[in] irq_mask: 一个或者多个枚举 vsf_usart_irq_mask_t 的值的按位或，@ref vsf_usart_irq_mask_t
  @return 无。
+ @note 在中断使能之前，应该清除所有悬挂的中断。
  */
 extern void vsf_usart_irq_enable(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask);
 

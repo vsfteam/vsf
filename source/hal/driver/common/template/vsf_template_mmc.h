@@ -739,12 +739,14 @@ extern void vsf_mmc_fini(vsf_mmc_t *mmc_ptr);
  @param[in] mmc_ptr: a pointer to structure @ref vsf_mmc_t
  @param[in] irq_mask: one or more value of enum @ref vsf_mmc_irq_mask_t
  @return none.
+ @note All pending interrupts should be cleared before interrupts are enabled.
 
  \~chinese
  @brief 使能 mmc 实例的中断
  @param[in] mmc_ptr: 结构体 vsf_mmc_t 的指针，参考 @ref vsf_mmc_t
  @param[in] irq_mask: 一个或者多个枚举 vsf_i2c_irq_mask_t 的值的按位或，@ref vsf_mmc_irq_mask_t
  @return 无。
+ @note 在中断使能之前，应该清除所有悬挂的中断。
  */
 extern void vsf_mmc_irq_enable(vsf_mmc_t *mmc_ptr, vsf_mmc_irq_mask_t irq_mask);
 

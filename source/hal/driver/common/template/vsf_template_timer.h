@@ -255,12 +255,14 @@ extern vsf_timer_capability_t vsf_timer_capability(vsf_timer_t *timer_ptr);
  @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
  @param[in] irq_mask: one or more value of enum @ref vsf_timer_irq_mask_t
  @return none.
+ @note All pending interrupts should be cleared before interrupts are enabled.
 
  \~chinese
  @brief 使能 timer 实例的中断
  @param[in] timer_ptr: 结构体 vsf_timer_t 的指针，参考 @ref vsf_timer_t
  @param[in] irq_mask: 一个或者多个枚举 vsf_timer_irq_mask_t 的值的按位或，@ref vsf_timer_irq_mask_t
  @return 无。
+ @note All pending interrupts should be cleared before interrupts are enabled.
  */
 extern void vsf_timer_irq_enable(vsf_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask);
 

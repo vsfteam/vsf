@@ -395,12 +395,14 @@ extern fsm_rt_t vsf_i2c_disable(vsf_i2c_t *i2c_ptr);
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
  @param[in] irq_mask: one or more value of enum @ref vsf_i2c_irq_mask_t
  @return none.
+ @note All pending interrupts should be cleared before interrupts are enabled.
 
  \~chinese
  @brief 使能 i2c 实例的中断
  @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
  @param[in] irq_mask: 一个或者多个枚举 vsf_i2c_irq_mask_t 的值的按位或，@ref vsf_i2c_irq_mask_t
  @return 无。
+ @note 在中断使能之前，应该清除所有悬挂的中断。
  */
 extern void vsf_i2c_irq_enable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask);
 
