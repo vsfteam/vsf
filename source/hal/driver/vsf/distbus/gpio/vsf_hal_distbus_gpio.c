@@ -149,12 +149,12 @@ void vsf_hal_distbus_gpio_set_direction(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_p
     __vsf_gpio_unprotect(orig);
 }
 
-vsf_err_t vsf_hal_distbus_gpio_pin_interrupt_enable(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)
+vsf_err_t vsf_hal_distbus_gpio_config_exti_interrupt(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)
 {
     return VSF_ERR_NOT_SUPPORT;
 }
 
-vsf_err_t vsf_hal_distbus_gpio_pin_interrupt_config(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_irq_cfg_t *cfg)
+vsf_err_t vsf_hal_distbus_gpio_config_exti(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_irq_cfg_t *cfg)
 {
     return VSF_ERR_NOT_SUPPORT;
 }

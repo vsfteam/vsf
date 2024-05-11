@@ -114,14 +114,14 @@ void vsf_74hc595_gpio_toggle(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t p
     VSF_HAL_ASSERT(false);
 }
 
-vsf_err_t vsf_74hc595_gpio_pin_interrupt_enable(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)
+vsf_err_t vsf_74hc595_gpio_config_exti_interrupt(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(false);
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_74hc595_gpio_pin_interrupt_config(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
+vsf_err_t vsf_74hc595_gpio_config_exti(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(false);
