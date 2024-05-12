@@ -159,7 +159,7 @@ vsf_err_t vsf_hal_distbus_gpio_exti_irq_disable(vsf_hal_distbus_gpio_t *gpio, vs
     return VSF_ERR_NOT_SUPPORT;
 }
 
-vsf_err_t vsf_hal_distbus_gpio_exit_config(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_irq_cfg_t *cfg)
+vsf_err_t vsf_hal_distbus_gpio_exti_config(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_irq_cfg_t *cfg)
 {
     return VSF_ERR_NOT_SUPPORT;
 }

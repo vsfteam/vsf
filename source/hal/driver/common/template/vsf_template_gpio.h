@@ -136,7 +136,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, toggle,                  VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_set,          VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_clear,        VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exit_config,             VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)                                   \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_config,             VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)                                   \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_enable,         VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)                \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_disable,        VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 
@@ -588,7 +588,7 @@ extern vsf_gpio_capability_t vsf_gpio_capability(vsf_gpio_t *gpio_ptr);
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
  @param[in] cfg: 结构体 vsf_gpio_pin_irq_cfg_t 的指针，参考 @ref vsf_gpio_pin_irq_cfg_t
  */
-extern vsf_err_t vsf_gpio_exit_config(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr);
+extern vsf_err_t vsf_gpio_exti_config(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr);
 
 /**
  \~english
@@ -642,7 +642,7 @@ extern vsf_err_t vsf_gpio_exti_irq_disable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_ma
 #   define vsf_gpio_output_and_set(__GPIO, ...)         VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_set)         ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
 #   define vsf_gpio_output_and_clear(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_clear)       ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
 #   define vsf_gpio_toggle(__GPIO, ...)                 VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_toggle)                 ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
-#   define vsf_gpio_exit_config(__GPIO, ...)            VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exit_config)            ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
+#   define vsf_gpio_exti_config(__GPIO, ...)            VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_config)            ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
 #   define vsf_gpio_exti_irq_enable(__GPIO, ...)        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_enable)        ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
 #   define vsf_gpio_exti_irq_disable(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_disable)       ((__vsf_gpio_t *)__GPIO, ##__VA_ARGS__)
 #endif

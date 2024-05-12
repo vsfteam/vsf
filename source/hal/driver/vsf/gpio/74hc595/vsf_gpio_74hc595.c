@@ -128,7 +128,7 @@ vsf_err_t vsf_74hc595_gpio_exti_irq_disable(vsf_74hc595_gpio_t *gpio_ptr, vsf_gp
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_74hc595_gpio_exit_config(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
+vsf_err_t vsf_74hc595_gpio_exti_config(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(false);
