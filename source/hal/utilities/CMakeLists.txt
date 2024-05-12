@@ -1,3 +1,3 @@
 add_subdirectory(remap)
 add_subdirectory(stream)
-add_subdirectory(ic_util)
+add_subdirectory(i2c_util)
