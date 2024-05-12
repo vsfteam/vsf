@@ -239,7 +239,7 @@ vsf_err_t vsf_hw_gpio_exti_irq_disable(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_
 
 
 
-vsf_err_t vsf_hw_gpio_exit_config(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_gpio_exti_config(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);

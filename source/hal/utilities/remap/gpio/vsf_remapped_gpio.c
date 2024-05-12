@@ -141,10 +141,10 @@ vsf_err_t vsf_remapped_gpio_exti_irq_disable(vsf_remapped_gpio_t *gpio, vsf_gpio
     return vsf_gpio_exti_irq_disable(gpio->target, pin_mask);
 }
 
-vsf_err_t vsf_remapped_gpio_exit_config(vsf_remapped_gpio_t *gpio, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
+vsf_err_t vsf_remapped_gpio_exti_config(vsf_remapped_gpio_t *gpio, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));
-    return vsf_gpio_exit_config(gpio->target, cfg_ptr);
+    return vsf_gpio_exti_config(gpio->target, cfg_ptr);
 }
 
 #endif

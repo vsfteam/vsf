@@ -486,11 +486,11 @@ static vsf_err_t __gpio_demo_pin_interrupt_config(gpio_test_t *test, vsf_gpio_in
         .isr.handler_fn = (mode == VSF_GPIO_INT_MODE_NONE) ? NULL : __gpio_isr_handler,
         .isr.target_ptr = (mode == VSF_GPIO_INT_MODE_NONE) ? NULL : test,
     };
-    vsf_err_t err = vsf_gpio_exit_config(gpio_ptr, &cfg);
+    vsf_err_t err = vsf_gpio_exti_config(gpio_ptr, &cfg);
     if (test->verbose >= 2) {
         vsf_trace_debug("vsf_gpio_pin_irq_cfg_t cfg = {.pin_mask = 0x%08x, .mode = ", cfg.pin_mask);
         hal_options_trace(VSF_TRACE_DEBUG, "", __int_mode_options, dimof(__int_mode_options), cfg.mode);
-        vsf_trace_debug("};" VSF_TRACE_CFG_LINEEND "vsf_gpio_exit_config(&%s, &cfg) = %d/*vsf_err_t*/" VSF_TRACE_CFG_LINEEND,
+        vsf_trace_debug("};" VSF_TRACE_CFG_LINEEND "vsf_gpio_exti_config(&%s, &cfg) = %d/*vsf_err_t*/" VSF_TRACE_CFG_LINEEND,
                         test->in.name, err);
     }
     return err;
