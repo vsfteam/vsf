@@ -32,9 +32,11 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+// prototype: vsf_input_touchscreen_set(vk_touchscreen_evt_t *evt, uint8_t id,
+//                      bool is_done, uint16_t x, uint16_t y, uint16_t pressure);
 #define vsf_input_touchscreen_set(__evt, __id, __is_down, __pressure, __x, __y) \
             do {                                                                \
-                (__evt)->id = ((__id) | ((__is_down) << 8));                    \
+                (__evt)->id = ((__id) | (!!(__is_down) << 8));                  \
                 (__evt)->cur.valu64 = (__x) | ((__y) << 16) | ((uint64_t)(__pressure) << 32);\
             } while (0)
 

@@ -142,6 +142,9 @@ vsf_class(vk_input_notifier_t) {
 #if VSF_INPUT_USE_NSPRO == ENABLED
 #   include "./driver/nspro/vsf_input_nspro.h"
 #endif
+#if VSF_INPUT_USE_CST8 == ENABLED
+#   include "./driver/touch_screen/hynitron/cst8/vsf_input_cst8.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
