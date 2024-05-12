@@ -38,7 +38,7 @@
 #   include "./utilities/remap/vsf_hal_remap.h"
 
 #   if VSF_HAL_USE_I2C == ENABLED
-#       include "./utilities/i2c_regacc/vsf_i2c_regacc.h"
+#       include "./utilities/i2c_util/vsf_i2c_util.h"
 #   endif
 
 #   ifdef __cplusplus

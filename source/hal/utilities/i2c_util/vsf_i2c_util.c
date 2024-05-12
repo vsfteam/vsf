@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define __VSF_I2C_REGACC_CLASS_IMPLEMENT
+#define __VSF_I2C_UTIL_CLASS_IMPLEMENT
 #include "hal/vsf_hal.h"
 
 #if VSF_HAL_USE_I2C == ENABLED
@@ -36,8 +36,8 @@ vsf_err_t vsf_i2c_regacc_irqhandler(vsf_i2c_regacc_t *i2c_regacc, vsf_i2c_irq_ma
         return VSF_ERR_FAIL;
     }
 
-    if (!i2c_regacc->is_data_written) {
-        i2c_regacc->is_data_written = true;
+    if (i2c_regacc->is_regaddr) {
+        i2c_regacc->is_regaddr = false;
         if (i2c_regacc->is_read) {
             vsf_i2c_master_request(i2c_regacc->i2c_ptr, i2c_regacc->i2c_addr,
                 VSF_I2C_CMD_RESTART | VSF_I2C_CMD_READ | VSF_I2C_CMD_STOP,
@@ -61,7 +61,7 @@ vsf_err_t vsf_i2c_regacc(vsf_i2c_regacc_t *i2c_regacc, uint_fast8_t reg,
     VSF_HAL_ASSERT((data != NULL) && (datalen > 0));
     VSF_HAL_ASSERT(!i2c_regacc->is_busy);
 
-    i2c_regacc->is_data_written = false;
+    i2c_regacc->is_regaddr = true;
     i2c_regacc->is_read = is_read;
     i2c_regacc->data = data;
     i2c_regacc->datalen = datalen;

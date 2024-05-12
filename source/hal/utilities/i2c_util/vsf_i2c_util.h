@@ -15,18 +15,21 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_I2C_REGACC_H__
-#define __HAL_I2C_REGACC_H__
+#ifndef __HAL_I2C_UTIL_H__
+#define __HAL_I2C_UTIL_H__
 
-/* Implement common register access code for i2c */
+/* Utilities for i2c: reg access utility, etc */
 
 /*============================ INCLUDES ======================================*/
 
 #if VSF_HAL_USE_I2C == ENABLED
 
-#if defined(__VSF_I2C_REGACC_CLASS_IMPLEMENT)
-#   undef __VSF_I2C_REGACC_CLASS_IMPLEMENT
+#if     defined(__VSF_I2C_UTIL_CLASS_IMPLEMENT)
+#   undef __VSF_I2C_UTIL_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
+#elif   defined(__VSF_I2C_UTIL_CLASS_INHERIT__)
+#   undef __VSF_I2C_UTIL_CLASS_INHERIT__
+#   define __VSF_CLASS_INHERIT__
 #endif
 
 #include "utilities/ooc_class.h"
@@ -41,13 +44,15 @@ vsf_class(vsf_i2c_regacc_t) {
         vsf_i2c_t *i2c_ptr;
         uint8_t i2c_addr;
     )
-    private_member(
-        uint8_t is_busy         : 1;
-        uint8_t is_read         : 1;
-        uint8_t is_data_written : 1;
+    protected_member(
         uint8_t reg;
         uint16_t datalen;
         void *data;
+    )
+    private_member(
+        uint8_t is_busy     : 1;
+        uint8_t is_read     : 1;
+        uint8_t is_regaddr  : 1;
     )
 };
 
@@ -61,5 +66,5 @@ extern vsf_err_t vsf_i2c_regacc_irqhandler(vsf_i2c_regacc_t *i2c_regacc,
 extern vsf_err_t vsf_i2c_regacc(vsf_i2c_regacc_t *i2c_regacc, uint_fast8_t reg,
                         bool is_read, uint8_t *data, uint_fast16_t datalen);
 
-#endif      // VSF_HAL_I2C_IMP_REQUEST_BY_CMD
-#endif      // __HAL_I2C_REG_ACCESS_H__
+#endif      // VSF_HAL_USE_I2C
+#endif      // __HAL_I2C_UTIL_H__
