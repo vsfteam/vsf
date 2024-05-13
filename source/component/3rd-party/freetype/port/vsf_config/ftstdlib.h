@@ -204,12 +204,20 @@ static VSF_CAL_ALWAYS_INLINE size_t ft_fwrite(const void *ptr, size_t size, size
    *
    */
 
+#include "service/vsf_service.h"
 
-#define ft_scalloc   calloc
-#define ft_sfree     free
-#define ft_smalloc   malloc
-#define ft_srealloc  realloc
+#define ft_sfree     vsf_heap_free
+#define ft_smalloc   vsf_heap_malloc
+#define ft_srealloc  vsf_heap_realloc
 
+static inline void * ft_scalloc(unsigned int num, unsigned int size) {
+    unsigned int totalsize = num * size;
+    void *result = ft_smalloc(totalsize);
+    if (result != NULL) {
+        ft_memset(result, 0, totalsize);
+    }
+    return result;
+}
 
   /**************************************************************************
    *
@@ -219,7 +227,7 @@ static VSF_CAL_ALWAYS_INLINE size_t ft_fwrite(const void *ptr, size_t size, size
 
 
 #define ft_strtol  strtol
-#define ft_getenv  getenv
+#define ft_getenv(...)  (NULL)
 
 
   /**************************************************************************
