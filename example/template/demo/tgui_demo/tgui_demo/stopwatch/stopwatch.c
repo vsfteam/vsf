@@ -69,36 +69,257 @@ static fsm_rt_t __on_list_sliding_stopped( vsf_tgui_list_t* ptList,
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-describe_tgui_msgmap(tStartStopMSGMap,
-    tgui_msg_handler(VSF_TGUI_EVT_POINTER_CLICK,        __on_button_start_stop_click),
-    tgui_msg_handler(VSF_TGUI_EVT_KEY_PRESSED,          __on_button_start_stop_ok),
-)
+describ_tgui_panel(stopwatch_t, main_panel_descriptor,
+    tgui_region(100, 100, 0, 0),
+    tgui_text(tTitle, "My Stopwatch", false),
+    tgui_padding(16, 16, 16, 16),
+
+    tgui_msgmap(
+        tgui_msg_handler(VSF_TGUI_EVT_ON_LOAD, __on_top_panel_load),
+        tgui_msg_handler(VSF_TGUI_EVT_ON_DEPOSE, __on_top_panel_depose),
+#if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
+        tgui_msg_handler(VSF_TGUI_EVT_ON_TIME, __on_top_panel_time),
+#endif
+    ),
+
+    tgui_container_type(VSF_TGUI_CONTAINER_TYPE_STREAM_VERTICAL),
+
+    tgui_container(tLeftContainer, tgui_null_parent(stopwatch_t), tLeftContainer, tRightPanel,
+
+        tgui_size(300, 0),
+        tgui_margin(0, 48, 0, 0),
+        tgui_container_type(VSF_TGUI_CONTAINER_TYPE_STREAM_HORIZONTAL),
+
+        tgui_contains(
+
+            tgui_label(tTime, &(tgui_null_parent(stopwatch_t)->tLeftContainer), tTime, tSetting,
+                tgui_size(228, 32),
+                tgui_margin(0, 0, 0, 4),
+                tgui_text(tLabel, "", false),
+                tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S20),
+                tgui_background((vsf_tgui_tile_t*)&ic_settings_phone_RGBA, VSF_TGUI_ALIGN_LEFT),
+                ),
+
+            tgui_button(tSetting, &(tgui_null_parent(stopwatch_t)->tLeftContainer), tTime, tStartStop,
+                tgui_size(32, 32),
+                tgui_margin(8, 0, 0, 4),
+                tgui_background((vsf_tgui_tile_t*)&ic_build_black_18dp_RGBA, VSF_TGUI_ALIGN_CENTER),
+                ),
+
+            tgui_button(tStartStop, &(tgui_null_parent(stopwatch_t)->tLeftContainer), tSetting, tLap,
+                tgui_location(0, 32),
+                tgui_margin(0, 4, 4, 4),
+                tgui_text(tLabel, "START", true),
+                tgui_attribute(bIsCheckButton, true),
+
+                tgui_msgmap(
+                    tgui_msg_handler(VSF_TGUI_EVT_POINTER_CLICK, __on_button_start_stop_click),
+                    tgui_msg_handler(VSF_TGUI_EVT_KEY_PRESSED, __on_button_start_stop_ok),
+                    ),
+                ),
+
+            tgui_button(tLap, &(tgui_null_parent(stopwatch_t)->tLeftContainer), tStartStop, tLap,
+                tgui_size(64, 32),
+                tgui_margin(104, 4, 0, 4),
+                tgui_text(tLabel, "LAP", false),
+                tgui_msgmap(
+                    tgui_msg_mux(VSF_TGUI_MSG_POINTER_EVT, __on_button_lap_all_pointer_evt, VSF_TGUI_MSG_MSK),
+                    ),
+                ),
+#if 0
+            tgui_container(tContainerA, &(tgui_null_parent(stopwatch_t)->tLeftContainer), tLap, tContainerA,
+
+                tgui_margin(0, 4, 0, 0),
+
+#if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED && VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
+                tgui_container_type(VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL),
+#else
+                tgui_container_type(VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL),
+#endif
+                tgui_contains(
 
 #if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
-describe_tgui_msgmap(tTextListMGSMap,
-    tgui_msg_handler(VSF_TGUI_EVT_POST_REFRESH,         __on_text_list_post_refresh),
-)
+                    tgui_text_list(tNumberList, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA), tNumberList, tVContainer,
+                        tgui_size(100, 100),
+                        tgui_margin(0, 0, 8, 0),
+#if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABELD
+                        //tgui_attribute(tSlider, 400),
 #endif
+                        tgui_msgmap(
+                            tgui_msg_handler(VSF_TGUI_EVT_POST_REFRESH, __on_text_list_post_refresh),
+                        ),
 
+                        tgui_text_list_content(
+
+                            tgui_size(100, 0),
+
+                            /*! \note as inside text_list, the autosize param will be overrided,
+                             *        so the true or false here doesn't really affect the result.
+                             */
+                            tgui_text(tLabel,
+                                "0\n1\n2\n3\n4\n5\n6\n7\n8\n9",
+                                true),
+                            tgui_line_space(tLabel, 8),
+                            tgui_sv_font_color(VSF_TGUI_COLOR_GRAY),
+                            )
+                    ),
+
+#   if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
+                    tgui_list(tVContainer, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA), tNumberList, tVContainer,
+#   endif
+#else
+#   if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
+                        tgui_list(tVContainer, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA), tVContainer, tVContainer,
+#   endif
+#endif
 #if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
-describe_tgui_msgmap(tListMGSMap,
-    tgui_msg_handler(VSF_TGUI_EVT_POST_REFRESH,         __on_list_post_refresh),
-    tgui_msg_handler(VSF_TGUI_EVT_LIST_SLIDING_STARTED, __on_list_sliding_started),
-    tgui_msg_handler(VSF_TGUI_EVT_LIST_SLIDING_STOPPED, __on_list_sliding_stopped),
-)
+                            tgui_size(160, 130),
+                            tgui_margin(8, 0, 0, 0),
+                            //tgui_attribute(u2WorkMode, VSF_TGUI_LIST_MODE_ITEM_SELECTION),
+                            tgui_padding(0, 0, 0, 0),
+                            tgui_msgmap(
+                                tgui_msg_handler(VSF_TGUI_EVT_POST_REFRESH, __on_list_post_refresh),
+                                tgui_msg_handler(VSF_TGUI_EVT_LIST_SLIDING_STARTED, __on_list_sliding_started),
+                                tgui_msg_handler(VSF_TGUI_EVT_LIST_SLIDING_STOPPED, __on_list_sliding_stopped),
+                                ),
+
+                            tgui_list_items(
+                                tgui_container_type(VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL),
+
+                                tgui_button(tButton1, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list), tButton1, tButton2,
+                                    tgui_size(150, 32),
+                                    tgui_text(tLabel, "tButton1", false),
+                                    tgui_sv_font_color(VSF_TGUI_COLOR_RGBA(0x80, 0x80, 0x00, 0x30)),
+                                    tgui_margin(0, 2, 0, 2),
+                                    ),
+
+                                tgui_button(tButton2, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list), tButton1, tHContainer,
+                                    tgui_size(150, 32),
+                                    tgui_text(tLabel, "tButton2", false),
+                                    tgui_margin(0, 2, 0, 2),
+                                    ),
+
+                                tgui_list(tHContainer, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list), tButton2, tHistory,
+                                    tgui_size(150, 32),
+                                    tgui_margin(0, 2, 0, 2),
+#if VSF_TGUI_CFG_LIST_SUPPORT_SLIDE == ENABELD
+                                    //! set the sliding speed. Usually, you don't have to modify it.
+                                    //tgui_attribute(tSlider, 500),
+#endif
+                                    tgui_attribute(u2WorkMode, VSF_TGUI_LIST_MODE_ITEM_SELECTION),
+
+                                    tgui_list_items(
+                                        tgui_container_type(VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL),
+
+                                        tgui_button(tButtonA, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list.tHContainer.list), tButtonA, tButtonB,
+                                            tgui_size(80, 32),
+                                            tgui_text(tLabel, "A", false),
+                                            tgui_margin(2, 0, 2, 0),
+                                            ),
+                                        tgui_button(tButtonB, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list.tHContainer.list), tButtonA, tButtonC,
+                                            tgui_size(80, 32),
+                                            tgui_text(tLabel, "B", false),
+                                            tgui_margin(2, 0, 2, 0),
+                                            ),
+                                        tgui_button(tButtonC, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list.tHContainer.list), tButtonB, tButtonC,
+                                            tgui_size(80, 32),
+                                            tgui_text(tLabel, "C", false),
+                                            tgui_margin(2, 0, 2, 0),
+                                            ),
+                                        )
+                                ),
+
+                                tgui_label(tHistory, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list), tHContainer, tHistory,
+                                    tgui_text(tLabel, "tHistory\n1234\nABCDEF", false),
+                                    tgui_size(150, 128),
+                                    tgui_sv_tile_show_corner(false),
+                                    tgui_sv_font_color(VSF_TGUI_COLOR_GRAY),
+                                    tgui_margin(0, 2, 0, 2),
+                                    ),
+
+                                )
+
+
+                        ),
+#else
+                        tgui_button(tButton1, &(tgui_null_parent(stopwatch_t)->tContainerA), tButton1, tButton2,
+                            tgui_size(150, 32),
+                            tgui_text(tLabel, "tButton1", false),
+                            tgui_attribute(tFontColor, VSF_TGUI_COLOR_RGBA(0x80, 0x80, 0x00, 0x30)),
+                            tgui_margin(0, 2, 0, 2),
+                            ),
+
+                        tgui_button(tButton2, &(tgui_null_parent(stopwatch_t)->tContainerA), tButton1, tHistory,
+
+#if VSF_TGUI_CFG_SUPPORT_LINE_STREAM_CONTAINER != ENABLED
+                            tgui_location(50, 42),
+#endif
+                            tgui_size(150, 32),
+                            tgui_text(tLabel, "tButton2", false),
+                            tgui_margin(0, 2, 0, 2),
+                            ),
+
+                        tgui_label(tHistory, &(tgui_null_parent(stopwatch_t)->tContainerA), tButton2, tHistory,
+#if VSF_TGUI_CFG_SUPPORT_LINE_STREAM_CONTAINER != ENABLED
+                            tgui_location(100, 84),
 #endif
 
-describe_tgui_msgmap(tStopWatchMSGMap,
-    tgui_msg_handler(VSF_TGUI_EVT_ON_LOAD,              __on_top_panel_load),
-    tgui_msg_handler(VSF_TGUI_EVT_ON_DEPOSE,            __on_top_panel_depose),
+                            tgui_text(tLabel, "tHistory\n1234\nABCDEF", true),
+                            tgui_size(150, 128),
+                            tgui_sv_tile_show_corner(false),
+                            tgui_attribute(tFontColor, VSF_TGUI_COLOR_GRAY),
+                            tgui_margin(0, 2, 0, 2),
+                            ),
+#endif
+                    )
+                ),
+#endif
+            )
+
+        ),
+
+        tgui_panel(tRightPanel, tgui_null_parent(stopwatch_t), tLeftContainer, tRightPanel,
+            tgui_size(140, 0),
+            tgui_padding(10, 10, 10, 10),
+            tgui_margin(0, 48, 0, 0),
+
+            tgui_sv_background_color(VSF_TGUI_COLOR_WHITE),
+            tgui_sv_tile_show_corner(false),
+
+            //tgui_text(tTitle, "Right Panel", false),
+            tgui_container_type(VSF_TGUI_CONTAINER_TYPE_STREAM_HORIZONTAL),
+
+
+#define __key(__num, __pre, __next, ...)                                                    \
+            tgui_button(tKey[__num], &(tgui_null_parent(stopwatch_t)->tRightPanel), tKey[__pre], tKey[__next],    \
+                tgui_size(32, 32),                                                          \
+                tgui_margin(4, 4, 4, 4),                                                    \
+                tgui_text(tLabel, #__num, false),                                           \
+                tgui_sv_tile_show_corner(false),                                            \
+                __VA_ARGS__                                                                 \
+            )
+
+            tgui_contains(
+                __key(0, 0, 1),
+                __key(1, 0, 2),
+                __key(2, 1, 3),
+                __key(3, 2, 4),
+                __key(4, 3, 5),
+                __key(5, 4, 6),
+                __key(6, 5, 7),
+                __key(7, 6, 8),
+                __key(8, 7, 9),
+                __key(9, 8, 9,
+                    tgui_margin(44, 4, 44, 4),
+                    ),
+                )
+        ),
+
 #if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
-    tgui_msg_handler(VSF_TGUI_EVT_ON_TIME,              __on_top_panel_time),
+        tgui_timer(tTimer, 97, false),
 #endif
-)
 
-describe_tgui_msgmap(tLapMSGMap,
-    tgui_msg_mux(VSF_TGUI_MSG_POINTER_EVT, __on_button_lap_all_pointer_evt, VSF_TGUI_MSG_MSK),
-)
+    );
 
 stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
 {
@@ -107,239 +328,9 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel, vsf_tgui_t *gui_ptr)
             break;
         }
 
-        describ_tgui_panel(stopwatch_t, *ptPanel,
-            tgui_region( 100, 100, 0, 0),
-            tgui_text(tTitle, "My Stopwatch", false),
-            tgui_padding(16,16,16,16),
-
-            tgui_msgmap(tStopWatchMSGMap),
-            tgui_container_type(VSF_TGUI_CONTAINER_TYPE_STREAM_VERTICAL),
-
-            tgui_container(tLeftContainer, ptPanel, tLeftContainer, tRightPanel,
-
-                tgui_size(300, 0),
-                tgui_margin(0, 48, 0, 0),
-                tgui_container_type(VSF_TGUI_CONTAINER_TYPE_STREAM_HORIZONTAL),
-
-                tgui_contains(
-
-                    tgui_label(tTime, &(ptPanel->tLeftContainer), tTime, tSetting,
-                        tgui_size(228, 32),
-                        tgui_margin(0, 0, 0, 4),
-                        tgui_text(tLabel, ptPanel->chTimeBuffer, false),
-                        tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S20),
-                        tgui_background((vsf_tgui_tile_t*)&ic_settings_phone_RGBA, VSF_TGUI_ALIGN_LEFT),
-                    ),
-
-                    tgui_button(tSetting, &(ptPanel->tLeftContainer), tTime, tStartStop,
-                        tgui_size(32, 32),
-                        tgui_margin(8, 0, 0, 4),
-                        tgui_background((vsf_tgui_tile_t*)&ic_build_black_18dp_RGBA, VSF_TGUI_ALIGN_CENTER),
-                    ),
-
-                    tgui_button(tStartStop, &(ptPanel->tLeftContainer), tSetting, tLap,
-                        tgui_location(0, 32),
-                        tgui_margin(0, 4, 4, 4),
-                        tgui_text(tLabel, "START", true),
-                        tgui_attribute(bIsCheckButton, true),
-
-                        tgui_msgmap(tStartStopMSGMap),
-                    ),
-
-                    tgui_button(tLap, &(ptPanel->tLeftContainer), tStartStop, tContainerA,
-                        tgui_size( 64, 32),
-                        tgui_margin(104, 4, 0, 4),
-                        tgui_text(tLabel, "LAP", false),
-                        tgui_msgmap(tLapMSGMap),
-                    ),
-
-
-
-                    tgui_container(tContainerA, &(ptPanel->tLeftContainer), tSetting, tContainerA,
-
-                        tgui_margin(0, 4, 0, 0),
-
-        #if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED && VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
-                        tgui_container_type(VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL),
-        #else
-                        tgui_container_type(VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL),
-        #endif
-                        tgui_contains(
-
-        #if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
-                            tgui_text_list(tNumberList, &(ptPanel->tLeftContainer.tContainerA), tNumberList, tVContainer,
-                                tgui_size(100, 100),
-                                tgui_margin(0, 0, 8, 0),
-                            #if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABELD
-                                //tgui_attribute(tSlider, 400),
-                            #endif
-                                tgui_msgmap(tTextListMGSMap),
-
-                                tgui_text_list_content(
-
-                                    tgui_size(100, 0),
-
-                                    /*! \note as inside text_list, the autosize param will be overrided,
-                                     *        so the true or false here doesn't really affect the result.
-                                     */
-                                    tgui_text(  tLabel,
-                                                "0\n1\n2\n3\n4\n5\n6\n7\n8\n9",
-                                                true),
-                                    tgui_line_space(tLabel, 8),
-                                    tgui_sv_font_color(VSF_TGUI_COLOR_GRAY),
-                                )
-                            ),
-
-        #   if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
-                            tgui_list(tVContainer, &(ptPanel->tLeftContainer.tContainerA), tNumberList, tVContainer,
-        #   endif
-        #else
-        #   if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
-                            tgui_list(tVContainer, &(ptPanel->tLeftContainer.tContainerA), tVContainer, tVContainer,
-        #   endif
-        #endif
-        #if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
-                                tgui_size(160, 130),
-                                tgui_margin(8, 0, 0, 0),
-                                //tgui_attribute(u2WorkMode, VSF_TGUI_LIST_MODE_ITEM_SELECTION),
-                                tgui_padding(0,0,0,0),
-                                tgui_msgmap(tListMGSMap),
-
-                                tgui_list_items(
-                                    tgui_container_type(VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL),
-
-                                    tgui_button(tButton1, &(ptPanel->tLeftContainer.tContainerA.tVContainer.list), tButton1, tButton2,
-                                        tgui_size(150, 32),
-                                        tgui_text(tLabel, "tButton1", false),
-                                        tgui_sv_font_color(VSF_TGUI_COLOR_RGBA(0x80, 0x80, 0x00, 0x30)),
-                                           tgui_margin(0, 2, 0, 2),
-                                    ),
-
-                                    tgui_button(tButton2,&(ptPanel->tLeftContainer.tContainerA.tVContainer.list), tButton1, tHContainer,
-                                        tgui_size(150, 32),
-                                        tgui_text(tLabel, "tButton2", false),
-                                        tgui_margin(0, 2, 0, 2),
-                                    ),
-
-                                    tgui_list(tHContainer, &(ptPanel->tLeftContainer.tContainerA.tVContainer.list), tButton2, tHistory,
-                                        tgui_size(150, 32),
-                                        tgui_margin(0, 2, 0, 2),
-                                    #if VSF_TGUI_CFG_LIST_SUPPORT_SLIDE == ENABELD
-                                        //! set the sliding speed. Usually, you don't have to modify it.
-                                        //tgui_attribute(tSlider, 500),
-                                    #endif
-                                        tgui_attribute(u2WorkMode, VSF_TGUI_LIST_MODE_ITEM_SELECTION),
-
-                                        tgui_list_items(
-                                            tgui_container_type(VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL),
-
-                                            tgui_button(tButtonA, &(ptPanel->tLeftContainer.tContainerA.tVContainer.list.tHContainer.list), tButtonA, tButtonB,
-                                                tgui_size(80, 32),
-                                                tgui_text(tLabel, "A", false),
-                                                tgui_margin(2, 0, 2, 0),
-                                            ),
-                                            tgui_button(tButtonB, &(ptPanel->tLeftContainer.tContainerA.tVContainer.list.tHContainer.list), tButtonA, tButtonC,
-                                                tgui_size(80, 32),
-                                                tgui_text(tLabel, "B", false),
-                                                tgui_margin(2, 0, 2, 0),
-                                            ),
-                                            tgui_button(tButtonC, &(ptPanel->tLeftContainer.tContainerA.tVContainer.list.tHContainer.list), tButtonB, tButtonC,
-                                                tgui_size(80, 32),
-                                                tgui_text(tLabel, "C", false),
-                                                tgui_margin(2, 0, 2, 0),
-                                            ),
-                                        )
-                                    ),
-
-                                    tgui_label(tHistory, &(ptPanel->tLeftContainer.tContainerA.tVContainer.list), tHContainer, tHistory,
-                                        tgui_text(tLabel, "tHistory\n1234\nABCDEF", false),
-                                        tgui_size(150, 128),
-                                        tgui_sv_tile_show_corner(false),
-                                        tgui_sv_font_color(VSF_TGUI_COLOR_GRAY),
-                                        tgui_margin(0, 2, 0, 2),
-                                    ),
-
-                                )
-
-
-                            ),
-        #else
-                            tgui_button(tButton1, &(ptPanel->tContainerA), tButton1, tButton2,
-                                tgui_size(150, 32),
-                                tgui_text(tLabel, "tButton1", false),
-                                tgui_attribute(tFontColor, VSF_TGUI_COLOR_RGBA(0x80, 0x80, 0x00, 0x30)),
-                                tgui_margin(0, 2, 0, 2),
-                            ),
-
-                            tgui_button(tButton2, &(ptPanel->tContainerA), tButton1, tHistory,
-
-                            #if VSF_TGUI_CFG_SUPPORT_LINE_STREAM_CONTAINER != ENABLED
-                                tgui_location(50, 42),
-                            #endif
-                                tgui_size(150, 32),
-                                tgui_text(tLabel, "tButton2", false),
-                                tgui_margin(0, 2, 0, 2),
-                            ),
-
-                            tgui_label(tHistory, &(ptPanel->tContainerA), tButton2, tHistory,
-                            #if VSF_TGUI_CFG_SUPPORT_LINE_STREAM_CONTAINER != ENABLED
-                                tgui_location(100, 84),
-                            #endif
-
-                                tgui_text(tLabel, "tHistory\n1234\nABCDEF", true),
-                                tgui_size(150, 128),
-                                tgui_sv_tile_show_corner(false),
-                                tgui_attribute(tFontColor, VSF_TGUI_COLOR_GRAY),
-                                tgui_margin(0, 2, 0, 2),
-                            ),
-        #endif
-                        )
-                    ),
-                )
-            ),
-
-            tgui_panel(tRightPanel, ptPanel, tLeftContainer, tRightPanel,
-                tgui_size(140, 0),
-                tgui_padding(10,10,10,10),
-                tgui_margin(0, 48, 0, 0),
-
-                tgui_sv_background_color(VSF_TGUI_COLOR_WHITE),
-                tgui_sv_tile_show_corner(false),
-
-                //tgui_text(tTitle, "Right Panel", false),
-                tgui_container_type(VSF_TGUI_CONTAINER_TYPE_STREAM_HORIZONTAL),
-
-
-#define __key(__num, __pre, __next, ...)                                                    \
-            tgui_button(tKey[__num], &(ptPanel->tRightPanel), tKey[__pre], tKey[__next],    \
-                tgui_size(32, 32),                                                          \
-                tgui_margin(4, 4, 4, 4),                                                    \
-                tgui_text(tLabel, #__num, false),                                           \
-                tgui_sv_tile_show_corner(false),                                            \
-                __VA_ARGS__                                                                 \
-            )
-
-                tgui_contains(
-                    __key(0, 0, 1),
-                    __key(1, 0, 2),
-                    __key(2, 1, 3),
-                    __key(3, 2, 4),
-                    __key(4, 3, 5),
-                    __key(5, 4, 6),
-                    __key(6, 5, 7),
-                    __key(7, 6, 8),
-                    __key(8, 7, 9),
-                    __key(9, 8, 9,
-                        tgui_margin(44, 4, 44, 4),
-                    ),
-                )
-            ),
-
-        #if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
-            tgui_timer(tTimer, 97, false),
-        #endif
-
-        );
+        tgui_initalize_top_container(main_panel_descriptor, ptPanel);
+        ptPanel->tLeftContainer.tTime.tLabel.tString.pstrText = ptPanel->chTimeBuffer;
+        ptPanel->tLeftContainer.tTime.tLabel.tString.s16_size = sizeof(ptPanel->chTimeBuffer);
     } while (0);
 
     return ptPanel;
@@ -416,7 +407,6 @@ static fsm_rt_t __on_button_lap_all_pointer_evt(vsf_tgui_control_t* node_ptr,
     VSF_TGUI_LOG(VSF_TRACE_WARNING, "\t User Handler\r\n");
     return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
 }
-
 
 #if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
 static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_control_t* control_ptr,

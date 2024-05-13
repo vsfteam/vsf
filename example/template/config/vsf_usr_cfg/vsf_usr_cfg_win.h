@@ -58,7 +58,7 @@
 #define APP_USE_SCSI_DEMO                               ENABLED
 #define APP_USE_AUDIO_DEMO                              ENABLED
 #   define APP_CFG_AUDIO_BUFFER_SIZE                    (VSF_LINUX_CFG_STACKSIZE - (4 * 1024))
-#define APP_USE_TGUI_DEMO                               DISABLED
+#define APP_USE_TGUI_DEMO                               ENABLED
 #define APP_USE_TGUI_DESIGNER_DEMO                      DISABLED
 #define APP_USE_SDL2_DEMO                               ENABLED
 #define APP_USE_DISP_DEMO                               ENABLED
@@ -115,6 +115,9 @@
 #define APP_USE_VSFIP_DEMO                              DISABLED
 #define APP_USE_LWIP_DEMO                               ENABLED
 #define APP_USE_SOCKET_DEMO                             ENABLED
+#if APP_USE_SOCKET_DEMO == ENABLED
+#   define VSF_TCPIP_USE_WINSOCK                        ENABLED
+#endif
 #define APP_USE_LUA_DEMO                                ENABLED
 #define APP_USE_COREMARK_DEMO                           ENABLED
 
@@ -307,7 +310,7 @@
 
 #if APP_USE_TGUI_DEMO == ENABLED
 #   if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
-#       define APP_CFG_TGUI_RES_DIR                     "/winfs/ui/"
+#       define APP_CFG_TGUI_RES_DIR                     "/mnt/hostfs/winfs_root/ui/"
 #   else
 #       define APP_CFG_TGUI_RES_DIR                     "./winfs_root/ui/"
 #   endif
@@ -372,75 +375,6 @@
 
 #	define VSF_DEBUGGER_CFG_CONSOLE                     VSF_DEBUGGER_CFG_CONSOLE_USER
 #	undef  VSF_HAL_USE_DEBUG_STREAM
-#endif
-
-/*----------------------------------------------------------------------------*
- * Regarget Weak interface                                                    *
- *----------------------------------------------------------------------------*/
-
-#define WEAK_VSF_KERNEL_ERR_REPORT
-#define WEAK___POST_VSF_KERNEL_INIT
-#define WEAK_VSF_SYSTIMER_EVTHANDLER
-#define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR
-#define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR
-#define WEAK_VSF_DRIVER_INIT
-#define WEAK_VSF_HEAP_MALLOC_ALIGNED
-
-#if VSF_USE_LINUX == ENABLED
-#   define WEAK_VSF_LINUX_CREATE_FHS
-#endif
-
-#if APP_USE_BTSTACK_DEMO == ENABLED && APP_USE_USBH_DEMO == ENABLED
-#   define WEAK_VSF_USBH_BTHCI_ON_NEW
-#   define WEAK_VSF_USBH_BTHCI_ON_DEL
-#   define WEAK_VSF_USBH_BTHCI_ON_PACKET
-
-#   define WEAK_VSF_BLUETOOTH_H2_ON_NEW
-
-// if btstack_application does not contain btstack_install
-//  undef WEAK_BTSTACK_INSTALL
-#   define WEAK_BTSTACK_INSTALL
-// use btstack_main in btstack_application instead of in btstack_demo
-#   define WEAK_BTSTACK_MAIN
-#endif
-
-#define WEAK_VSF_SCSI_ON_NEW
-#define WEAK_VSF_SCSI_ON_DELETE
-
-#if APP_USE_USBH_DEMO == ENABLED
-#   define WEAK_VSF_USBH_UAC_ON_NEW
-#endif
-
-#if APP_USE_VSFVM_DEMO == ENABLED
-#   define WEAK_VSF_PLUG_IN_ON_KERNEL_IDLE
-
-#   define WEAK_VSFVM_SET_BYTECODE_IMP
-#   define WEAK_VSFVM_GET_RES_IMP
-#   define WEAK_VSFVM_GET_BYTECODE_IMP
-#endif
-
-#if APP_USE_VSFIP_DEMO == ENABLED || APP_USE_LWIP_DEMO == ENABLED
-#   define WEAK_VSF_PNP_ON_NETDRV_PREPARE
-#   define WEAK_VSF_PNP_ON_NETDRV_CONNECTED
-
-#   if APP_USE_VSFIP_DEMO == ENABLED
-#       define WEAK_VSFIP_DHCPC_ON_FINISH
-
-#       define WEAK_VSFIP_MEM_SOCKET_GET
-#       define WEAK_VSFIP_MEM_SOCKET_FREE
-#       define WEAK_VSFIP_MEM_TCP_PCB_GET
-#       define WEAK_VSFIP_MEM_TCP_PCB_FREE
-#       define WEAK_VSFIP_MEM_NETBUF_GET
-#       define WEAK_VSFIP_MEM_NETBUF_FREE
-#   endif
-#endif
-
-#if APP_USE_SOCKET_DEMO == ENABLED
-#   define VSF_TCPIP_USE_WINSOCK                        ENABLED
-#endif
-
-#if VSF_USBH_USE_DL1X5 == ENABLED && VSF_DISP_USE_DL1X5 == ENABLED
-#   define WEAK_VSF_DL1X5_ON_NEW_DISP
 #endif
 
 /*============================ TYPES =========================================*/

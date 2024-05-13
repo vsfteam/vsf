@@ -197,9 +197,9 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
                                         );
 
             if (vsf_input_mouse_evt_button_is_down(mouse_evt)) {
-                __button_status |= BIT(button_id);
+                __button_status |= VSF_BIT(button_id);
             } else {
-                __button_status &= ~BIT(button_id);
+                __button_status &= ~VSF_BIT(button_id);
             }
 
 
@@ -216,11 +216,11 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
                                             (vsf_tgui_location_t) {
                                                 vsf_input_mouse_evt_get_x(mouse_evt),
                                                 vsf_input_mouse_evt_get_y(mouse_evt)},
-                                            __button_status & BIT(button_id),
+                                            __button_status & VSF_BIT(button_id),
                                             mouse_evt->use_as__vk_input_evt_t.duration
                                             );
             } else {
-                if (__button_status & BIT(0)) {
+                if (__button_status & VSF_BIT(0)) {
                     //! simulate finger 0 move
                     result =
                     vsf_tgui_send_touch_evt(&s_tTGUIDemo,
@@ -228,11 +228,11 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
                                             (vsf_tgui_location_t) {
                                                 vsf_input_mouse_evt_get_x(mouse_evt),
                                                 vsf_input_mouse_evt_get_y(mouse_evt)},
-                                            __button_status & BIT(0),
+                                            __button_status & VSF_BIT(0),
                                             mouse_evt->use_as__vk_input_evt_t.duration
                                             );
                 }
-                if (__button_status & BIT(1)) {
+                if (__button_status & VSF_BIT(1)) {
                     //! simulate finger 1 move
                     result =
                     vsf_tgui_send_touch_evt(&s_tTGUIDemo,
@@ -240,7 +240,7 @@ void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt)
                                             (vsf_tgui_location_t) {
                                                 vsf_input_mouse_evt_get_x(mouse_evt),
                                                 vsf_input_mouse_evt_get_y(mouse_evt)},
-                                            __button_status & BIT(1),
+                                            __button_status & VSF_BIT(1),
                                             mouse_evt->use_as__vk_input_evt_t.duration
                                             );
                 }

@@ -152,6 +152,13 @@
 #       endif
 #   endif
 
+#   if APP_USE_FREETYPE_DEMO == ENABLED
+#       define VSF_LINUX_FREETYPE_INIT_SCRIPTS                                  \
+            "freetype",
+#   else
+#       define VSF_LINUX_FREETYPE_INIT_SCRIPTS
+#   endif
+
 #   if      defined(__WIN__)
 #   define VSF_LINUX_HOSTFS_INIT_SCRIPTS                                        \
             "mkdir -p /mnt/hostfs",                                             \
@@ -168,7 +175,8 @@
 
 #   define VSF_LINUX_CFG_INIT_SCRIPTS                                           \
             "echo \"vsf build on " __DATE__ "\"",                               \
-            VSF_LINUX_HOSTFS_INIT_SCRIPTS
+            VSF_LINUX_HOSTFS_INIT_SCRIPTS                                       \
+            VSF_LINUX_FREETYPE_INIT_SCRIPTS
 #endif
 
 #if APP_USE_EVM_DEMO == ENABLED

@@ -67,6 +67,14 @@
 VSF_CAL_WEAK(vsf_board_init)
 void vsf_board_init(void) {}
 
+#if APP_USE_FREETYPE_DEMO == ENABLED
+int freetype_main(int argc, char *argv[])
+{
+    extern void freetype_demo_init(void);
+    freetype_demo_init();
+}
+#endif
+
 int vsf_linux_create_fhs(void)
 {
     int fd;
@@ -127,8 +135,7 @@ int vsf_linux_create_fhs(void)
 
     // 3. demos depends on fs after all fs mounted
 #if APP_USE_FREETYPE_DEMO == ENABLED
-    extern void freetype_demo_init(void);
-    freetype_demo_init();
+    busybox_bind(VSF_LINUX_CFG_BIN_PATH "/freetype", freetype_main);
 #endif
 
     // 4. install executables

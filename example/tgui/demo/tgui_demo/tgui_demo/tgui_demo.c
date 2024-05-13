@@ -109,8 +109,8 @@ vsf_err_t tgui_demo_init(void)
     vsf_err_t err = vk_tgui_init(&g_tTGUIDemo, &cfg);
 
 #if APP_USE_TGUI_DESIGNER_DEMO == ENABLED
-    tgui_designer_init(&s_tDesigner, &s_tTGUIDemo);
-    vk_tgui_set_root_container(&s_tTGUIDemo, (vsf_tgui_root_container_t *)&s_tDesigner, true);
+    tgui_designer_init(&s_tDesigner, &g_tTGUIDemo);
+    vk_tgui_set_root_container(&g_tTGUIDemo, (vsf_tgui_root_container_t *)&s_tDesigner, true);
 #else
     //my_stopwatch_init(&g_tMyStopwatch, &g_tTGUIDemo);
     popup_init(&panels.popup);
