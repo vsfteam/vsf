@@ -18,7 +18,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_DMA_CFG_FUNCTION_RENAME DISABLED
+#include "hal/vsf_hal_cfg.h"
 
 #if VSF_HAL_USE_DMA == ENABLED
 
