@@ -133,7 +133,7 @@ int sem_close(sem_t *sem)
 int sem_timedwait(sem_t *sem, const struct timespec *abs_timeout)
 {
     struct timespec now;
-    clock_gettime(CLOCK_REALTIME, &now);
+    clock_gettime(CLOCK_MONOTONIC, &now);
     vsf_systimer_tick_t now_us = now.tv_sec * 1000000 + now.tv_nsec / 1000;
     vsf_systimer_tick_t timeout_us = abs_timeout->tv_sec * 1000000 + abs_timeout->tv_nsec / 1000;
     vsf_systimer_tick_t diff_tick = vsf_systimer_us_to_tick(now_us > timeout_us ? 0 : timeout_us - now_us);
