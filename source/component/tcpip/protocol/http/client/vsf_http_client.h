@@ -43,6 +43,18 @@ vsf_class(vsf_http_op_t) {
     )
 };
 
+typedef struct vsf_http_client_req_t {
+    const char *host;
+    const char *port;
+    const char *verb;
+
+    char *header;
+    char *path;
+
+    uint8_t *txdata;
+    size_t txdata_len;
+} vsf_http_client_req_t;
+
 vsf_class(vsf_http_client_t) {
     public_member(
         const vsf_http_op_t *op;
@@ -72,10 +84,7 @@ extern const vsf_http_op_t vsf_mbedtls_http_op;
 
 extern void vsf_http_client_close(vsf_http_client_t *http);
 extern void vsf_http_client_init(vsf_http_client_t *http);
-extern int vsf_http_client_request(vsf_http_client_t *http,
-        const char *host, const char *port,
-        const char *verb, char *path,
-        uint8_t *txdata, size_t txdata_len);
+extern int vsf_http_client_request(vsf_http_client_t *http, vsf_http_client_req_t *req);
 extern int vsf_http_client_read(vsf_http_client_t *http, uint8_t *buf, uint16_t len);
 
 #endif      // __VSF_HTTP_CLIENT_H__

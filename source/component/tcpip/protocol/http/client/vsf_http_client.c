@@ -76,27 +76,47 @@ void vsf_http_client_close(vsf_http_client_t *http)
     http->op->fn_close(http->param);
 }
 
-int vsf_http_client_request(vsf_http_client_t *http,
-        const char *host, const char *port,
-        const char *verb, char *path,
-        uint8_t *txdata, size_t txdata_len)
+int vsf_http_client_request(vsf_http_client_t *http, vsf_http_client_req_t *req)
 {
-    int result = http->op->fn_connect(http->param, host, port);
+    int result = http->op->fn_connect(http->param, req->host, req->port);
     if (result != 0) {
         return result;
     }
 
-    result = sprintf((char *)http->buffer, "\
+    if (NULL == req->header) {
+        req->header = (char *)"Accept: */*\r\n";
+    }
+
+    if ((req->txdata_len > 0) && (req->txdata != NULL)) {
+        result = sprintf((char *)http->buffer, "\
 %s %s HTTP/1.1\r\n\
 Host: %s\r\n\
 User-Agent: %s\r\n\
-Accept: */*\r\n\
 Connection: close\r\n\
-\r\n", verb, path, host, "vsf");
-    vsf_http_trace("http request:\n%s", http->buffer);
+Content-Length: %d\r\n\
+%s\
+\r\n", NULL == req->verb ? "POST" : req->verb, req->path, req->host, "vsf", req->header);
+        vsf_http_trace("http request:\n%s", http->buffer, req->txdata_len);
+    } else {
+        result = sprintf((char *)http->buffer, "\
+%s %s HTTP/1.1\r\n\
+Host: %s\r\n\
+User-Agent: %s\r\n\
+Connection: close\r\n\
+%s\
+\r\n", NULL == req->verb ? "GET" : req->verb, req->path, req->host, "vsf", req->header);
+        vsf_http_trace("http request:\n%s", http->buffer);
+    }
     result = http->op->fn_write(http->param, http->buffer, result);
     if (result < 0) {
         return result;
+    }
+
+    if ((req->txdata_len > 0) && (req->txdata != NULL)) {
+        result = http->op->fn_write(http->param, req->txdata, req->txdata_len);
+        if (result < 0) {
+            return result;
+        }
     }
 
     vsf_http_trace("http response:\n");
