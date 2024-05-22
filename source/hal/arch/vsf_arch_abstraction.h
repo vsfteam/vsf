@@ -272,7 +272,33 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 #define vsf_protect(__type)                 __vsf_protect(__type)
 #define vsf_unprotect(__type)               __vsf_unprotect(__type)
 
+// atom
+#ifndef vsf_atom32_op
+#   define vsf_atom32_op(__ptr, __op)                                           \
+        do {                                                                    \
+            vsf_protect_t VSF_MACRO_SAFE_NAME(orig) = vsf_protect_int();        \
+                *(volatile uint32_t *)(__ptr) = ((*(volatile uint32_t *)(__ptr)) __op);\
+            vsf_unprotect_int(VSF_MACRO_SAFE_NAME(orig));                       \
+        } while (0)
+#endif
 
+#ifndef vsf_atom16_op
+#   define vsf_atom16_op(__ptr, __op)                                           \
+        do {                                                                    \
+            vsf_protect_t VSF_MACRO_SAFE_NAME(orig) = vsf_protect_int();        \
+                *(volatile uint16_t *)(__ptr) = ((*(volatile uint16_t *)(__ptr)) __op);\
+            vsf_unprotect_int(VSF_MACRO_SAFE_NAME(orig));                       \
+        } while (0)
+#endif
+
+#ifndef vsf_atom8_op
+#   define vsf_atom8_op(__ptr, __op)                                            \
+        do {                                                                    \
+            vsf_protect_t VSF_MACRO_SAFE_NAME(orig) = vsf_protect_int();        \
+                *(volatile uint8_t *)(__ptr) = ((*(volatile uint8_t *)(__ptr)) __op);\
+            vsf_unprotect_int(VSF_MACRO_SAFE_NAME(orig));                       \
+        } while (0)
+#endif
 
 // host invoke
 #define vsf_arch_host_invoke_ctx_t(__name)  VSF_MCONNECT(__name, _ctx_t)

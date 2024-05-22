@@ -76,6 +76,34 @@ extern "C" {
 
 #define vsf_arch_wakeup()
 
+#if (__ARM_ARCH >= 7) || (__TARGET_ARCH_7_M == 1) || (__TARGET_ARCH_7E_M == 1)
+
+#   define vsf_atom32_op(__ptr, __op)                                           \
+        do {                                                                    \
+            uint32_t val;                                                       \
+            do {                                                                \
+                val = __LDREXW((volatile uint32_t *)(__ptr)) __op;              \
+            } while ((__STREXW(val, (volatile uint32_t *)(__ptr))) != 0U);      \
+        } while (0)
+
+#   define vsf_atom16_op(__ptr, __op)                                           \
+        do {                                                                    \
+            uint16_t val;                                                       \
+            do {                                                                \
+                val = __LDREXH((volatile uint16_t *)(__ptr)) __op;              \
+            } while ((__STREXH(val, (volatile uint16_t *)(__ptr))) != 0U);      \
+        } while (0)
+
+#   define vsf_atom8_op(__ptr, __op)                                            \
+        do {                                                                    \
+            uint8_t val;                                                        \
+            do {                                                                \
+                val = __LDREXB((volatile uint8_t *)(__ptr)) __op;               \
+            } while ((__STREXB(val, (volatile uint8_t *)(__ptr))) != 0U);       \
+        } while (0)
+
+#endif
+
 /*============================ TYPES =========================================*/
 
 typedef uint64_t vsf_systimer_tick_t;
