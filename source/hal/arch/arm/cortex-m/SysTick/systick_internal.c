@@ -131,7 +131,7 @@ bool vsf_systick_init(systick_cfg_t *cfg_ptr)
     //! \brief check the input
     VSF_HAL_ASSERT(cfg_ptr != NULL);
 
-    vsf_systick_set_reload(0);
+    vsf_systick_set_reload(cfg_ptr->reload_value);
     vsf_systick_clear_count();
 
     __SYSTICK_ATOM_CODE(
