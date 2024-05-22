@@ -80,28 +80,47 @@ extern "C" {
 
 #   define vsf_atom32_op(__ptr, __op)                                           \
         do {                                                                    \
-            uint32_t val;                                                       \
+            uint32_t VSF_MACRO_SAFE_NAME(val);                                  \
             do {                                                                \
-                val = __LDREXW((volatile uint32_t *)(__ptr)) __op;              \
-            } while ((__STREXW(val, (volatile uint32_t *)(__ptr))) != 0U);      \
+                VSF_MACRO_SAFE_NAME(val) = __LDREXW((volatile uint32_t *)(__ptr)) __op;\
+            } while ((__STREXW(VSF_MACRO_SAFE_NAME(val), (volatile uint32_t *)(__ptr))) != 0U);\
         } while (0)
 
 #   define vsf_atom16_op(__ptr, __op)                                           \
         do {                                                                    \
-            uint16_t val;                                                       \
+            uint16_t VSF_MACRO_SAFE_NAME(val);                                  \
             do {                                                                \
-                val = __LDREXH((volatile uint16_t *)(__ptr)) __op;              \
-            } while ((__STREXH(val, (volatile uint16_t *)(__ptr))) != 0U);      \
+                VSF_MACRO_SAFE_NAME(val) = __LDREXH((volatile uint16_t *)(__ptr)) __op;\
+            } while ((__STREXH(VSF_MACRO_SAFE_NAME(val), (volatile uint16_t *)(__ptr))) != 0U);\
         } while (0)
 
 #   define vsf_atom8_op(__ptr, __op)                                            \
         do {                                                                    \
-            uint8_t val;                                                        \
+            uint8_t VSF_MACRO_SAFE_NAME(val);                                   \
             do {                                                                \
-                val = __LDREXB((volatile uint8_t *)(__ptr)) __op;               \
-            } while ((__STREXB(val, (volatile uint8_t *)(__ptr))) != 0U);       \
+                VSF_MACRO_SAFE_NAME(val) = __LDREXB((volatile uint8_t *)(__ptr)) __op;\
+            } while ((__STREXB(VSF_MACRO_SAFE_NAME(val), (volatile uint8_t *)(__ptr))) != 0U);\
         } while (0)
 
+#   define vsf_spinlock_t               uint32_t
+#   define vsf_spinlock_init(__plock)                                           \
+        do {                                                                    \
+            *(__plock) = 0;                                                     \
+        } while (0)
+#   define vsf_spin_lock(__plock)                                               \
+        do {                                                                    \
+            vsf_spinlock_t VSF_MACRO_SAFE_NAME(value) = __LDREXW((volatile vsf_spinlock_t *)(__plock));\
+            if (VSF_MACRO_SAFE_NAME(value) != 0) {                              \
+                __WFE();                                                        \
+            } else if ((__STREXW(1, (volatile vsf_spinlock_t *)(__plock))) == 0U) {\
+                break;                                                          \
+            }                                                                   \
+        } while (1)
+#   define vsf_spin_unlock(__plock)                                             \
+        do {                                                                    \
+            *(__plock) = 0;                                                     \
+            __SEV();                                                            \
+        } while (0)
 #endif
 
 /*============================ TYPES =========================================*/
