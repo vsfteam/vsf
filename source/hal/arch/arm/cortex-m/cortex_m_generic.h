@@ -124,7 +124,7 @@ extern "C" {
             *(__plock) = 0;                                                     \
             __SEV();                                                            \
         } while (0)
-#   define vsf_spin_trylock(__plock)    vsf_spin_lock(__plock)
+#   define vsf_spin_trylock(__plock)    (vsf_spin_lock(__plock), 1)
 #endif
 
 /*============================ TYPES =========================================*/
