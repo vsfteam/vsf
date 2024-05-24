@@ -792,6 +792,11 @@ vsf_class(vsf_eda_t) {
         };
 #   endif
 
+    // some specified task need a pointer to task specified data
+#   if (VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED)
+        void *task_data;
+#   endif
+
 #   if VSF_KERNEL_CFG_ALLOW_KERNEL_BEING_PREEMPTED == ENABLED
 #       if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
         vsf_dlist_node_t        rdy_node;

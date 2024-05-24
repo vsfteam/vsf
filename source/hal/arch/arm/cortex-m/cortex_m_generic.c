@@ -36,13 +36,16 @@ typedef struct __vsf_cm_t {
 #endif
     } pendsv;
     vsf_arch_prio_t  basepri;
+#if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
+    vsf_arch_text_region_t text_region;
+#endif
 } __vsf_cm_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
 static __vsf_cm_t __vsf_cm = {
-    . basepri = 0x100,
+    .basepri        = 0x100,
 };
 
 /*============================ PROTOTYPES ====================================*/
@@ -69,6 +72,26 @@ bool vsf_arch_low_level_init(void)
 
     // SEVONPEND is maybe initialized to 0, which will make wfe not sensitive to interrupt
     SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
+
+#if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
+#   if      __IS_COMPILER_IAR__
+#pragma section = ".text"
+    __vsf_cm.text_region.start = (uintptr_t)__section_begin(".text");
+    __vsf_cm.text_region.size = (uintptr_t)__section_end(".text") - __vsf_cm.text_region.start;
+#   elif    __IS_COMPILER_ARM_COMPILER_5__
+    extern const int Image$$ER_ROM1$$Base;
+    extern const int Image$$ER_ROM1$$Limit;
+    __vsf_cm.text_region.start = (uintptr_t)&Image$$ER_ROM1$$Base;
+    __vsf_cm.text_region.size = (uintptr_t)&Image$$ER_ROM1$$Limit - __vsf_cm.text_region.start;
+#   elif    __IS_COMPILER_GCC__
+    extern const int _stext;
+    extern const int _etext;
+    __vsf_cm.text_region.start = (uintptr_t)&_stext;
+    __vsf_cm.text_region.size = (uintptr_t)&_etext - __vsf_cm.text_region.start;
+#   else
+#       error contact author to add compiler support
+#   endif
+#endif
     return true;
 }
 
@@ -405,6 +428,90 @@ int_fast8_t __vsf_arch_msb(uintalu_t a)
 {
     return 31 - (int_fast8_t)__CLZ(a);
 }
+
+/*----------------------------------------------------------------------------*
+ * callstack trace                                                            *
+ *----------------------------------------------------------------------------*/
+
+#if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
+
+#if VSF_USE_KERNEL == ENABLED
+#   define __VSF_EDA_CLASS_INHERIT__
+#   include "kernel/vsf_kernel.h"
+#endif
+
+static bool __vsf_arch_test_text_region(uintptr_t pc)
+{
+    vsf_arch_text_region_t *text_region = &__vsf_cm.text_region;
+    while (text_region != NULL) {
+        if (    (pc >= (text_region->start + sizeof(uint32_t)))
+            &&  (pc <= (text_region->start + text_region->size))) {
+            return true;
+        }
+        text_region = text_region->next;
+    }
+    return false;
+}
+
+static bool __vsf_arch_test_bl_blx(uintptr_t pc)
+{
+    uint16_t ins1 = *(uint16_t *)(pc + 0);
+    uint16_t ins2 = *(uint16_t *)(pc + 2);
+
+    return  (((ins2 & 0xF800) == 0xF800) && ((ins1 & 0xF800) == 0xF000))
+        ||  ((ins2 & 0xFF00) == 0x4700);
+}
+
+void vsf_arch_add_text_region(vsf_arch_text_region_t *region)
+{
+    vsf_arch_text_region_t *text_region = &__vsf_cm.text_region;
+    while (text_region->next != NULL) {
+        text_region = text_region->next;
+    }
+    region->next = NULL;
+    text_region->next = region;
+}
+
+uint_fast16_t vsf_arch_get_callstack(uintptr_t sp, uintptr_t *callstack, uint_fast16_t callstack_num)
+{
+    uint32_t pc;
+    uint_fast16_t realnum = 0;
+    uintptr_t stack_bottom;
+
+#if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    if ((NULL == eda) || !vsf_eda_is_stack_owner(eda)) {
+        stack_bottom = *(uintptr_t *)SCB->VTOR;
+    } else {
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+        vsf_thread_cb_t *thread_cb = eda->task_data;
+        stack_bottom = (uintptr_t)thread_cb->stack + thread_cb->stack_size;
+#   else
+        vsf_thread_t *thread = (vsf_thread_t *)eda;
+        stack_bottom = (uintptr_t)thread->stack + thread->stack_size;
+#   endif
+    }
+#else
+    stack_bottom = *(uintptr_t *)SCB->VTOR;
+#endif
+
+    // if callstack is allocated on steak, avoid garbage in callstack itself
+    memset(callstack, 0, sizeof(uintptr_t) * callstack_num);
+    for (; (sp < stack_bottom) && (realnum < callstack_num); sp += sizeof(uint32_t)) {
+        pc = *(uint32_t *)sp;
+        if (!(pc & 1)) {
+            continue;
+        }
+        pc -= 5;    /* fix thumb and bl/blx */
+        if (__vsf_arch_test_text_region(pc) && __vsf_arch_test_bl_blx(pc)) {
+            *callstack++ = pc;
+            realnum++;
+        }
+    }
+    return realnum;
+}
+
+#endif
 
 /*----------------------------------------------------------------------------*
  * arch abi for applet                                                        *

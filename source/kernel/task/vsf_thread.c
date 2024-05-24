@@ -455,6 +455,7 @@ vsf_err_t vsf_thread_start( vsf_thread_t *pthis,
 #if VSF_KERNEL_THREAD_USE_HOST == ENABLED
     thread_cb->is_inited = false;
 #endif
+    pthis->task_data = thread_cb;
 
     vsf_err_t err;
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED

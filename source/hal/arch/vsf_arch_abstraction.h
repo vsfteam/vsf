@@ -55,6 +55,13 @@ typedef struct vsf_protect_region_t {
     void (*leave)(vsf_protect_t orig);
 } vsf_protect_region_t;
 
+typedef struct vsf_arch_text_region_t vsf_arch_text_region_t;
+struct vsf_arch_text_region_t {
+    vsf_arch_text_region_t *next;
+    uintptr_t start;
+    uintptr_t size;
+};
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 extern const vsf_protect_region_t vsf_protect_region_int;

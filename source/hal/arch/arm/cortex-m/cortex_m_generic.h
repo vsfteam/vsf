@@ -63,6 +63,10 @@ extern "C" {
 #   endif
 #endif
 
+#ifndef VSF_ARCH_CFG_CALLSTACK_TRACE
+#   define VSF_ARCH_CFG_CALLSTACK_TRACE ENABLED
+#endif
+
 // software interrupt provided by arch
 #define VSF_ARCH_SWI_NUM                1
 
@@ -263,6 +267,11 @@ static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_set_thread_reg(uintptr_t value)
     __asm__ __volatile__ ("MOV r9, %0" : : "r"(value));
     return result;
 }
+#endif
+
+#if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
+extern void vsf_arch_add_text_region(vsf_arch_text_region_t *region);
+extern uint_fast16_t vsf_arch_get_callstack(uintptr_t sp, uintptr_t *callstack, uint_fast16_t callstack_num);
 #endif
 
 #ifdef __cplusplus

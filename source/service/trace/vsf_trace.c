@@ -40,6 +40,9 @@
 #ifndef VSF_TRACE_CFG_BUFSIZE
 #   define VSF_TRACE_CFG_BUFSIZE            1024
 #endif
+#ifndef VSF_TRACE_CFG_COLOR_EN
+#   define VSF_TRACE_CFG_COLOR_EN           ENABLED
+#endif
 
 #define VSF_TRACE_LINEBUF_SIZE              128
 
@@ -338,7 +341,15 @@ void vsf_trace(vsf_trace_level_t level, const char *format, ...)
 
 void vsf_trace_assert(const char *expr, const char *file, int line, const char *func)
 {
-    vsf_trace_error("%s:%d %s -- assertion failed on %s\n", file, line, func, NULL == expr ? "unknown" : expr);
+    vsf_trace_error("%s:%d %s -- assertion failed on %s" VSF_TRACE_CFG_LINEEND, file, line, func, NULL == expr ? "unknown" : expr);
+#if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
+    uintptr_t callstack[16];
+    uint_fast16_t num = vsf_arch_get_callstack(vsf_arch_get_stack(), callstack, dimof(callstack));
+    vsf_trace_error("callstack:" VSF_TRACE_CFG_LINEEND);
+    for (uint_fast16_t i = 0; i < num; i++) {
+        vsf_trace_error("0x%08X" VSF_TRACE_CFG_LINEEND, callstack[i]);
+    }
+#endif
     while (true);
 }
 
