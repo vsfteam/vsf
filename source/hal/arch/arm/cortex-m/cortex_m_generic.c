@@ -84,6 +84,8 @@ bool vsf_arch_low_level_init(void)
     __vsf_cm.text_region.start = (uintptr_t)&Image$$ER_ROM1$$Base;
     __vsf_cm.text_region.size = (uintptr_t)&Image$$ER_ROM1$$Limit - __vsf_cm.text_region.start;
 #   elif    __IS_COMPILER_GCC__
+    // if link error indicating _stext and _etext not exist,
+    //  please add these in linker file for start text and end text to use callback trace
     extern const int _stext;
     extern const int _etext;
     __vsf_cm.text_region.start = (uintptr_t)&_stext;
