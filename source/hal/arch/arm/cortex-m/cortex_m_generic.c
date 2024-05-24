@@ -486,7 +486,9 @@ uint_fast16_t vsf_arch_get_callstack(uintptr_t sp, uintptr_t *callstack, uint_fa
         stack_bottom = *(uintptr_t *)SCB->VTOR;
     } else {
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-        vsf_thread_cb_t *thread_cb = eda->task_data;
+        __vsf_eda_frame_t *frame = eda->fn.frame;
+        VSF_ARCH_ASSERT(frame != NULL);
+        vsf_thread_cb_t *thread_cb = (vsf_thread_cb_t *)frame->ptr.target;
         stack_bottom = (uintptr_t)thread_cb->stack + thread_cb->stack_size;
 #   else
         vsf_thread_t *thread = (vsf_thread_t *)eda;
