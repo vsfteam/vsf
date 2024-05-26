@@ -257,10 +257,13 @@ void __vsf_trace_buffer(vsf_trace_level_t level,
     bool disp_newline = flag & VSF_TRACE_DF_NEWLINE;
     uint8_t *buf_tmp = (uint8_t *)buffer, *pend = buf_tmp + len, *line;
 
-    if (!data_size || (data_size > 4) || (data_size == 3))
+    if (    !data_size || (data_size > 8) || (data_size == 6)
+        ||  ((data_size != 1) && (data_size & 1))) {
         data_size = 1;
-    if (!data_per_line || (data_per_line > 16))
-        data_per_line = 16;
+    }
+    if (!data_per_line || (data_per_line * data_size > 16)) {
+        data_per_line = 16 / data_size;
+    }
 
     __vsf_trace_set_level(level);
     if (len > 0) {
@@ -289,6 +292,19 @@ void __vsf_trace_buffer(vsf_trace_level_t level,
                         *ptr++ = ' ';
                     }
                 }
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+                if (data_size > 1) {
+                    char tmp, half_data_size = data_size >> 1, *center = ptr - data_size;
+                    for (uint_fast8_t k = 0; k < half_data_size; k++) {
+                        tmp = center[-(k + 1) * 2];
+                        center[-(k + 1) * 2] = center[k * 2];
+                        center[k * 2] = tmp;
+                        tmp = center[-(k + 1) * 2 + 1];
+                        center[-(k + 1) * 2 + 1] = center[k * 2 + 1];
+                        center[k * 2 + 1] = tmp;
+                    }
+                }
+#endif
                 *ptr++ = ' ';
                 if (!disp_char && (buf_tmp >= pend)) {
                     break;
