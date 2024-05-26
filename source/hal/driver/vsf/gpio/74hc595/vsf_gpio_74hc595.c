@@ -110,6 +110,16 @@ void vsf_74hc595_gpio_write(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pi
     __vsf_gpio_74hc595_unprotect(orig);
 }
 
+void vsf_74hc595_gpio_toggle(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
+{
+    VSF_HAL_ASSERT(gpio_ptr != NULL);
+
+    vsf_protect_t orig = __vsf_gpio_74hc595_protect();
+    vsf_gpio_pin_mask_t value = gpio_ptr->output_value ^ pin_mask;
+    vsf_74hc595_gpio_write(gpio_ptr, pin_mask, value);
+    __vsf_gpio_74hc595_unprotect(orig);
+}
+
 vsf_err_t vsf_74hc595_gpio_exti_irq_enable(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
