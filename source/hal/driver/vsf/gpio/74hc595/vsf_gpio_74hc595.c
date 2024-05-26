@@ -51,6 +51,7 @@ void vsf_74hc595_gpio_init(vsf_74hc595_gpio_t *gpio_ptr)
                 &&  (gpio_ptr->cascade_num <= 4) && (gpio_ptr->cascade_num >= 1));
 
     gpio_ptr->output = false;
+    gpio_ptr->output_value = 0;
     gpio_ptr->op->oe_control(gpio_ptr->param, 1);
     gpio_ptr->op->latch_control(gpio_ptr->param, 0);
     gpio_ptr->op->clock_control(gpio_ptr->param, 0);
@@ -97,6 +98,7 @@ void vsf_74hc595_gpio_write(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pi
     uint32_t pins = gpio_ptr->cascade_num << 3;
     vsf_gpio_pin_mask_t msb = 1 << (pins - 1);
     vsf_protect_t orig = __vsf_gpio_74hc595_protect();
+    value = gpio_ptr->output_value = (gpio_ptr->output_value & ~pin_mask) | (value & pin_mask);
     for (uint_fast8_t i = 0; i < pins; i++, value <<= 1) {
         gpio_ptr->op->serial_output(gpio_ptr->param, value & msb ? 1 : 0);
         gpio_ptr->op->clock_control(gpio_ptr->param, 1);
@@ -106,12 +108,6 @@ void vsf_74hc595_gpio_write(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pi
     gpio_ptr->op->latch_control(gpio_ptr->param, 1);
     gpio_ptr->op->latch_control(gpio_ptr->param, 0);
     __vsf_gpio_74hc595_unprotect(orig);
-}
-
-void vsf_74hc595_gpio_toggle(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
-{
-    VSF_HAL_ASSERT(gpio_ptr != NULL);
-    VSF_HAL_ASSERT(false);
 }
 
 vsf_err_t vsf_74hc595_gpio_exti_irq_enable(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)

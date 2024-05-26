@@ -98,6 +98,7 @@ vsf_class(vsf_74hc595_gpio_t) {
 #endif
         vsf_74hc595_op_t *op;
         void *param;
+        uint32_t output_value;
         uint8_t cascade_num;
         bool output;
     )
