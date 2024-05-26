@@ -48,6 +48,12 @@ extern "C" {
 #   define VSF_ARCH_SWI_NUM             0
 #endif
 
+// callstack trace is disabled on RiscV by default.
+//  To use callstack trace, please add -fno-omit-frame-pointer to compile options
+#ifndef VSF_ARCH_CFG_CALLSTACK_TRACE
+#   define VSF_ARCH_CFG_CALLSTACK_TRACE DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define vsf_arch_wakeup()
@@ -98,6 +104,18 @@ static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
 {
     __asm volatile("mv sp, %0" : : "r"(stack) : );
 }
+
+static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_get_stack(void)
+{
+    uintptr_t result;
+    __asm volatile("mv %0, sp" : "=r"(result) : );
+    return result;
+}
+
+#if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
+extern void vsf_arch_add_text_region(vsf_arch_text_region_t *region);
+extern uint_fast16_t vsf_arch_get_callstack(uintptr_t sp, uintptr_t *callstack, uint_fast16_t callstack_num);
+#endif
 
 #ifdef __cplusplus
 }

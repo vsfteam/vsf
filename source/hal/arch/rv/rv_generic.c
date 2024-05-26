@@ -56,5 +56,58 @@ bool vsf_arch_low_level_init(void)
     return true;
 }
 
+/*----------------------------------------------------------------------------*
+ * callstack trace                                                            *
+ *----------------------------------------------------------------------------*/
+
+#if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
+
+#if VSF_USE_KERNEL == ENABLED
+#   define __VSF_EDA_CLASS_INHERIT__
+#   include "kernel/vsf_kernel.h"
+#endif
+
+void vsf_arch_add_text_region(vsf_arch_text_region_t *region)
+{
+    // TODO
+}
+
+uint_fast16_t vsf_arch_get_callstack(uintptr_t sp, uintptr_t *callstack, uint_fast16_t callstack_num)
+{
+    uint32_t pc;
+    uint_fast16_t realnum = 0;
+    uintptr_t stack_bottom;
+
+    extern uintptr_t _sp;
+#if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+    vsf_eda_t *eda = vsf_eda_get_cur();
+    if ((NULL == eda) || !vsf_eda_is_stack_owner(eda)) {
+        stack_bottom = &_sp;
+    } else {
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+        __vsf_eda_frame_t *frame = eda->fn.frame;
+        vsf_thread_cb_t *thread_cb = (vsf_thread_cb_t *)frame->ptr.target;
+        stack_bottom = (uintptr_t)thread_cb->stack + thread_cb->stack_size;
+#   else
+        vsf_thread_t *thread = (vsf_thread_t *)eda;
+        stack_bottom = (uintptr_t)thread->stack + thread->stack_size;
+#   endif
+    }
+#else
+    stack_bottom = &_sp;
+#endif
+
+    uintptr_t frame_pointer;
+    __asm volatile("mv %0, s0" : "=r"(frame_pointer) : );
+
+    for (; (frame_pointer < stack_bottom) && (realnum < callstack_num); frame_pointer = ((uintptr_t *)frame_pointer)[-2]) {
+        *callstack++ = ((uintptr_t *)frame_pointer)[-1];
+        realnum++;
+    }
+
+    return realnum;
+}
+
+#endif
 
 /* EOF */

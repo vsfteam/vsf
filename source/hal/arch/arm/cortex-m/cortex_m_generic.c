@@ -487,7 +487,6 @@ uint_fast16_t vsf_arch_get_callstack(uintptr_t sp, uintptr_t *callstack, uint_fa
     } else {
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
         __vsf_eda_frame_t *frame = eda->fn.frame;
-        VSF_ARCH_ASSERT(frame != NULL);
         vsf_thread_cb_t *thread_cb = (vsf_thread_cb_t *)frame->ptr.target;
         stack_bottom = (uintptr_t)thread_cb->stack + thread_cb->stack_size;
 #   else
@@ -506,8 +505,8 @@ uint_fast16_t vsf_arch_get_callstack(uintptr_t sp, uintptr_t *callstack, uint_fa
         if (!(pc & 1)) {
             continue;
         }
-        pc -= 5;    /* fix thumb and bl/blx */
-        if (__vsf_arch_test_text_region(pc) && __vsf_arch_test_bl_blx(pc)) {
+        pc -= 1;    /* fix thumb */
+        if (__vsf_arch_test_text_region(pc) && __vsf_arch_test_bl_blx(pc - 4)) {
             *callstack++ = pc;
             realnum++;
         }
