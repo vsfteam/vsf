@@ -946,7 +946,7 @@ VSF_CAL_WEAK(vsf_systimer_us_to_tick)
 vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
 {
     vsf_systimer_tick_t clock_src_freq = vsf_arch_req___systimer_freq___from_usr();
-    vsf_systimer_tick_t tick = (vsf_systimer_tick_t)time_us * clock_src_freq / 1000000;
+    vsf_systimer_tick_t tick = (uint64_t)time_us * clock_src_freq / 1000000;
     tick /= __systimer.cycle_per_tick;
     tick = vsf_max(1, tick);
 
@@ -957,7 +957,7 @@ VSF_CAL_WEAK(vsf_systimer_ms_to_tick)
 vsf_systimer_tick_t vsf_systimer_ms_to_tick(uint_fast32_t time_ms)
 {
     vsf_systimer_tick_t clock_src_freq = vsf_arch_req___systimer_freq___from_usr();
-    vsf_systimer_tick_t tick = (vsf_systimer_tick_t)time_ms * clock_src_freq / 1000;
+    vsf_systimer_tick_t tick = (uint64_t)time_ms * clock_src_freq / 1000;
     tick /= __systimer.cycle_per_tick;
     tick = vsf_max(1, tick);
 
@@ -1030,12 +1030,6 @@ uint32_t vsf_systimer_get_freq(void)
     return vsf_arch_req___systimer_resolution___from_usr();
 }
 
-VSF_CAL_WEAK(vsf_systimer_set_idle)
-void vsf_systimer_set_idle(void)
-{
-//    vsf_trace_debug("systimer_idle\r\n");
-}
-
 VSF_CAL_WEAK(vsf_systimer_get)
 vsf_systimer_tick_t vsf_systimer_get(void)
 {
@@ -1043,36 +1037,6 @@ vsf_systimer_tick_t vsf_systimer_get(void)
     vsf_systimer_tick_t cur_tick = __systimer.tick;
     vsf_unprotect_int(orig);
     return cur_tick;
-}
-
-VSF_CAL_WEAK(vsf_systimer_start)
-vsf_err_t vsf_systimer_start(void)
-{
-    {
-        vsf_arch_prio_t gint_state = vsf_disable_interrupt();
-            vsf_systimer_low_level_disable();
-
-            vsf_systimer_reset_counter_value();
-            vsf_systimer_clear_int_pending_bit();
-
-            vsf_systimer_low_level_int_enable();
-            vsf_systimer_low_level_enable();
-        vsf_set_interrupt(gint_state);
-    }
-    return VSF_ERR_NONE;
-}
-
-
-VSF_CAL_WEAK(vsf_systimer_set)
-bool vsf_systimer_set(vsf_systimer_tick_t due)
-{
-    return true;
-}
-
-VSF_CAL_WEAK(vsf_systimer_is_due)
-bool vsf_systimer_is_due(vsf_systimer_tick_t due)
-{
-    return (__systimer.tick >= due);
 }
 
 #endif

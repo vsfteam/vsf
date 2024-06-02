@@ -83,7 +83,11 @@
 #       define VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER        ENABLED
 #   endif
 #   ifndef VSF_KERNEL_CFG_TIMER_MODE
-#       define VSF_KERNEL_CFG_TIMER_MODE                    VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
+#       if defined(VSF_SYSTIMER_CFG_IMPL_MODE) && (VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE)
+#           define VSF_KERNEL_CFG_TIMER_MODE                VSF_KERNEL_CFG_TIMER_MODE_TICK
+#       else
+#           define VSF_KERNEL_CFG_TIMER_MODE                VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
+#       endif
 #   endif
 #else
 #   ifndef VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER

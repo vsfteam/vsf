@@ -151,7 +151,7 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #define vsf_systimer_ms_to_tick(__ms)                   (__ms)
 #define vsf_systimer_us_to_tick(__us)                   ((__us) / 1000)
 typedef unsigned int vsf_systimer_tick_t;
-typedef int vsf_systimer_cnt_signed_t;
+typedef int vsf_systimer_tick_signed_t;
 
 #define VSF_HAL_USE_DEBUG_STREAM                        ENABLED
 

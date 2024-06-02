@@ -170,7 +170,7 @@ static void __vsf_systimer_start(void)
 VSF_CAL_SECTION(".text.vsf.kernel.teda")
 static bool __vsf_systimer_is_due(vsf_systimer_tick_t due)
 {
-    return ((vsf_systimer_cnt_signed_t)(vsf_systimer_get_tick() - due) >= 0);
+    return ((vsf_systimer_tick_signed_t)(vsf_systimer_get_tick() - due) >= 0);
 }
 
 VSF_CAL_SECTION(".text.vsf.kernel.teda")
