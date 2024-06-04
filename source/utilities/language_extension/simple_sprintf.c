@@ -24,6 +24,13 @@
 
 #include "../compiler/compiler.h"
 
+#ifndef VSF_SIMPLE_SPRINTF_SUPPORT_FLOAT
+#   define VSF_SIMPLE_SPRINTF_SUPPORT_FLOAT     ENABLED
+#endif
+#ifndef VSF_SIMPLE_SPRINTF_SUPPORT_IPMAC
+#   define VSF_SIMPLE_SPRINTF_SUPPORT_IPMAC     ENABLED
+#endif
+
 #if VSF_SIMPLE_SPRINTF_SUPPORT_FLOAT == ENABLED
 #   include <math.h>
 #endif
