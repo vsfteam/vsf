@@ -47,31 +47,6 @@
 /*============================ IMPLEMENTATION ================================*/
 
 /*******************************************************************************
-* linux/atomic                                                                 *
-*******************************************************************************/
-
-#include <linux/atomic.h>
-
-VSF_CAL_WEAK(atomic_inc)
-void atomic_inc(atomic_t *a)
-{
-    vsf_protect_t orig = vsf_protect_int();
-    a->counter++;
-    vsf_unprotect_int(orig);
-}
-
-VSF_CAL_WEAK(atomic_dec_and_test)
-int atomic_dec_and_test(atomic_t *a)
-{
-    int value;
-
-    vsf_protect_t orig = vsf_protect_int();
-    value = --a->counter;
-    vsf_unprotect_int(orig);
-    return !value;
-}
-
-/*******************************************************************************
 * kernel object                                                                *
 *******************************************************************************/
 

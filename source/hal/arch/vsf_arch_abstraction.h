@@ -284,10 +284,10 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 #   define vsf_atom32_op(__ptr, __op)                                           \
         ({                                                                      \
             vsf_protect_t VSF_MACRO_SAFE_NAME(orig) = vsf_protect_int();        \
-            uint32_t VSF_MACRO_SAFE_NAME(value) = (*(uint32_t *)(__ptr));       \
-            *(uint32_t *)(__ptr) = VSF_MACRO_SAFE_NAME(value) __op;             \
+            int32_t _ = (*(int32_t *)(__ptr));                                  \
+            *(int32_t *)(__ptr) = __op;                                         \
             vsf_unprotect_int(VSF_MACRO_SAFE_NAME(orig));                       \
-            VSF_MACRO_SAFE_NAME(value);                                         \
+            _;                                                                  \
         })
 #endif
 
@@ -295,10 +295,10 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 #   define vsf_atom16_op(__ptr, __op)                                           \
         ({                                                                      \
             vsf_protect_t VSF_MACRO_SAFE_NAME(orig) = vsf_protect_int();        \
-            uint16_t VSF_MACRO_SAFE_NAME(value) = (*(uint16_t *)(__ptr));       \
-            *(uint16_t *)(__ptr) = VSF_MACRO_SAFE_NAME(value) __op;             \
+            int16_t _ = (*(int16_t *)(__ptr));                                  \
+            *(int16_t *)(__ptr) = __op;                                         \
             vsf_unprotect_int(VSF_MACRO_SAFE_NAME(orig));                       \
-            VSF_MACRO_SAFE_NAME(value);                                         \
+            _;                                                                  \
         })
 #endif
 
@@ -306,32 +306,36 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 #   define vsf_atom8_op(__ptr, __op)                                            \
         ({                                                                      \
             vsf_protect_t VSF_MACRO_SAFE_NAME(orig) = vsf_protect_int();        \
-            uint8_t VSF_MACRO_SAFE_NAME(value) = (*(uint8_t *)(__ptr));         \
-            *(uint8_t *)(__ptr) = VSF_MACRO_SAFE_NAME(value) __op;              \
+            int8_t _ = (*(int8_t *)(__ptr));                                    \
+            *(int8_t *)(__ptr) = __op;                                          \
             vsf_unprotect_int(VSF_MACRO_SAFE_NAME(orig));                       \
-            VSF_MACRO_SAFE_NAME(value);                                         \
+            _;                                                                  \
         })
 #endif
 
 #ifndef vsf_atom_add
-#   define vsf_atom_add(__bitlen, __ptr, value)                                 \
-        VSF_MCONNECT(vsf_atom, __bitlen, _op)(__ptr, + value)
+#   define vsf_atom_add(__bitlen, __ptr, __value)                               \
+        VSF_MCONNECT(vsf_atom, __bitlen, _op)(__ptr, _ + __value)
 #endif
 #ifndef vsf_atom_dec
-#   define vsf_atom_dec(__bitlen, __ptr, value)                                 \
-        vsf_atom_add(__bitlen, __ptr, - (value))
+#   define vsf_atom_dec(__bitlen, __ptr, __value)                               \
+        vsf_atom_add(__bitlen, __ptr, - (__value))
 #endif
 #ifndef vsf_atom_or
-#   define vsf_atom_or(__bitlen, __ptr, value)                                  \
-        VSF_MCONNECT(vsf_atom, __bitlen, _op)(__ptr, | value)
+#   define vsf_atom_or(__bitlen, __ptr, __value)                                \
+        VSF_MCONNECT(vsf_atom, __bitlen, _op)(__ptr, _ | __value)
 #endif
 #ifndef vsf_atom_and
-#   define vsf_atom_and(__bitlen, __ptr, value)                                 \
-        VSF_MCONNECT(vsf_atom, __bitlen, _op)(__ptr, & value)
+#   define vsf_atom_and(__bitlen, __ptr, __value)                               \
+        VSF_MCONNECT(vsf_atom, __bitlen, _op)(__ptr, _ & __value)
 #endif
 #ifndef vsf_atom_xor
-#   define vsf_atom_xor(__bitlen, __ptr, value)                                 \
-        VSF_MCONNECT(vsf_atom, __bitlen, _op)(__ptr, ^ value)
+#   define vsf_atom_xor(__bitlen, __ptr, __value)                               \
+        VSF_MCONNECT(vsf_atom, __bitlen, _op)(__ptr, _ ^ __value)
+#endif
+#ifndef vsf_atom_xchg
+#   define vsf_atom_xchg(__bitlen, __ptr, __new_value)                          \
+        VSF_MCONNECT(vsf_atom, __bitlen, _op)(__ptr, __new_value)
 #endif
 
 // host invoke

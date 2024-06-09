@@ -84,29 +84,29 @@ extern "C" {
 
 #   define vsf_atom32_op(__ptr, __op)                                           \
         ({                                                                      \
-            uint32_t VSF_MACRO_SAFE_NAME(val);                                  \
+            int32_t _;                                                          \
             do {                                                                \
-                VSF_MACRO_SAFE_NAME(val) = __LDREXW((volatile uint32_t *)(__ptr));\
-            } while ((__STREXW(VSF_MACRO_SAFE_NAME(val) __op, (volatile uint32_t *)(__ptr))) != 0U);\
-            VSF_MACRO_SAFE_NAME(val);                                           \
+                _ = __LDREXW((volatile int32_t *)(__ptr));                      \
+            } while ((__STREXW(__op, (volatile int32_t *)(__ptr))) != 0U);      \
+            _;                                                                  \
         })
 
 #   define vsf_atom16_op(__ptr, __op)                                           \
         ({                                                                      \
-            uint16_t VSF_MACRO_SAFE_NAME(val);                                  \
+            int16_t _;                                                          \
             do {                                                                \
-                VSF_MACRO_SAFE_NAME(val) = __LDREXH((volatile uint16_t *)(__ptr));\
-            } while ((__STREXH(VSF_MACRO_SAFE_NAME(val) __op, (volatile uint16_t *)(__ptr))) != 0U);\
-            VSF_MACRO_SAFE_NAME(val);                                           \
+                _ = __LDREXH((volatile int16_t *)(__ptr));                      \
+            } while ((__STREXH(__op, (volatile int16_t *)(__ptr))) != 0U);      \
+            _;                                                                  \
         })
 
 #   define vsf_atom8_op(__ptr, __op)                                            \
         ({                                                                      \
-            uint8_t VSF_MACRO_SAFE_NAME(val);                                   \
+            int8_t _;                                                           \
             do {                                                                \
-                VSF_MACRO_SAFE_NAME(val) = __LDREXB((volatile uint8_t *)(__ptr));\
-            } while ((__STREXB(VSF_MACRO_SAFE_NAME(val) __op, (volatile uint8_t *)(__ptr))) != 0U);\
-            VSF_MACRO_SAFE_NAME(val);                                           \
+                _ = __LDREXB((volatile int8_t *)(__ptr));                       \
+            } while ((__STREXB(__op, (volatile int8_t *)(__ptr))) != 0U);       \
+            _;                                                                  \
         })
 
 #   define vsf_spinlock_t               uint32_t
