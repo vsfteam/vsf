@@ -1023,11 +1023,13 @@ vsf_class(vsf_eda_queue_t) {
         vsf_protect_region_t    *region;
 #endif
         vsf_eda_queue_op_t      op;
-        uint16_t                readable_cnt;
     )
 
     protected_member(
         vsf_eda_t               *eda_rx;
+#if VSF_EDA_QUEUE_CFG_SUPPORT_ISR == ENABLED
+        uint16_t                readable_cnt;
+#endif
 #if VSF_KERNEL_CFG_QUEUE_HAS_RX_NOTIFIED == ENABLED
         bool                    rx_notified;
 #endif
