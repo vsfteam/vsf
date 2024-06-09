@@ -82,30 +82,30 @@ extern "C" {
 
 #if (__ARM_ARCH >= 7) || (__TARGET_ARCH_7_M == 1) || (__TARGET_ARCH_7E_M == 1)
 
-#   define vsf_atom32_op(__ptr, __op)                                           \
+#   define vsf_atom32_op(__ptr, ...)                                            \
         ({                                                                      \
             int32_t _;                                                          \
             do {                                                                \
                 _ = __LDREXW((volatile int32_t *)(__ptr));                      \
-            } while ((__STREXW(__op, (volatile int32_t *)(__ptr))) != 0U);      \
+            } while ((__STREXW((__VA_ARGS__), (volatile int32_t *)(__ptr))) != 0U);\
             _;                                                                  \
         })
 
-#   define vsf_atom16_op(__ptr, __op)                                           \
+#   define vsf_atom16_op(__ptr, ...)                                            \
         ({                                                                      \
             int16_t _;                                                          \
             do {                                                                \
                 _ = __LDREXH((volatile int16_t *)(__ptr));                      \
-            } while ((__STREXH(__op, (volatile int16_t *)(__ptr))) != 0U);      \
+            } while ((__STREXH((__VA_ARGS__), (volatile int16_t *)(__ptr))) != 0U);\
             _;                                                                  \
         })
 
-#   define vsf_atom8_op(__ptr, __op)                                            \
+#   define vsf_atom8_op(__ptr, ...)                                             \
         ({                                                                      \
             int8_t _;                                                           \
             do {                                                                \
                 _ = __LDREXB((volatile int8_t *)(__ptr));                       \
-            } while ((__STREXB(__op, (volatile int8_t *)(__ptr))) != 0U);       \
+            } while ((__STREXB((__VA_ARGS__), (volatile int8_t *)(__ptr))) != 0U);\
             _;                                                                  \
         })
 
