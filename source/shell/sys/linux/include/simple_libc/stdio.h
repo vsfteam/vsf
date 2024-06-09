@@ -221,8 +221,6 @@ typedef struct vsf_linux_libc_stdio_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vasprintf);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsscanf);
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsnscanf);
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(snscanf);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sscanf);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(remove);
@@ -472,10 +470,6 @@ VSF_LINUX_APPLET_LIBC_STDIO_IMP(vsscanf, int, const char *str, const char *forma
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vsscanf)(str, format, ap);
 }
-VSF_LINUX_APPLET_LIBC_STDIO_IMP(vsnscanf, int, const char *str, size_t size, const char *format, va_list ap) {
-    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vsnscanf)(str, size, format, ap);
-}
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(remove, int, const char *filename) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(remove)(filename);
@@ -554,14 +548,6 @@ VSF_APPLET_VPLT_FUNC_DECORATOR(asprintf) int asprintf(char **strp, const char *f
     va_list ap;
     va_start(ap, format);
         result = vasprintf(strp, format, ap);
-    va_end(ap);
-    return result;
-}
-VSF_APPLET_VPLT_FUNC_DECORATOR(snscanf) int snscanf(const char *str, size_t size, const char *format, ...) {
-    int result;
-    va_list ap;
-    va_start(ap, format);
-        result = vsnscanf(str, size, format, ap);
     va_end(ap);
     return result;
 }
@@ -649,8 +635,6 @@ int asprintf(char **strp, const char *format, ...);
 int vasprintf(char **strp, const char *format, va_list ap);
 
 int vsscanf(const char *str, const char *format, va_list ap);
-int vsnscanf(const char *str, size_t size, const char *format, va_list ap);
-int snscanf(const char *str, size_t size, const char *format, ...);
 int sscanf(const char *str, const char *format, ...);
 
 int remove(const char *filename);
