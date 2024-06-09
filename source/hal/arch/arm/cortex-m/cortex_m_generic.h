@@ -86,8 +86,8 @@ extern "C" {
         ({                                                                      \
             int32_t _;                                                          \
             do {                                                                \
-                _ = __LDREXW((volatile int32_t *)(__ptr));                      \
-            } while ((__STREXW((__VA_ARGS__), (volatile int32_t *)(__ptr))) != 0U);\
+                _ = (int32_t)__LDREXW((volatile uint32_t *)(__ptr));            \
+            } while ((__STREXW((uint32_t)(__VA_ARGS__), (volatile uint32_t *)(__ptr))) != 0U);\
             _;                                                                  \
         })
 
@@ -95,8 +95,8 @@ extern "C" {
         ({                                                                      \
             int16_t _;                                                          \
             do {                                                                \
-                _ = __LDREXH((volatile int16_t *)(__ptr));                      \
-            } while ((__STREXH((__VA_ARGS__), (volatile int16_t *)(__ptr))) != 0U);\
+                _ = (int16_t)__LDREXH((volatile uint16_t *)(__ptr));            \
+            } while ((__STREXH((uint16_t)(__VA_ARGS__), (volatile uint16_t *)(__ptr))) != 0U);\
             _;                                                                  \
         })
 
@@ -104,8 +104,8 @@ extern "C" {
         ({                                                                      \
             int8_t _;                                                           \
             do {                                                                \
-                _ = __LDREXB((volatile int8_t *)(__ptr));                       \
-            } while ((__STREXB((__VA_ARGS__), (volatile int8_t *)(__ptr))) != 0U);\
+                _ = (int8_t)__LDREXB((volatile uint8_t *)(__ptr));              \
+            } while ((__STREXB((uint8_t)(__VA_ARGS__), (volatile uint8_t *)(__ptr))) != 0U);\
             _;                                                                  \
         })
 
