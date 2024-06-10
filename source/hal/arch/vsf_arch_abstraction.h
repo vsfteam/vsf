@@ -280,6 +280,18 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 #define vsf_unprotect(__type)               __vsf_unprotect(__type)
 
 // atom
+
+#ifndef vsf_atom64_op
+#   define vsf_atom64_op(__ptr, ...)                                            \
+        ({                                                                      \
+            vsf_protect_t VSF_MACRO_SAFE_NAME(orig) = vsf_protect_int();        \
+            int64_t _ = (*(int64_t *)(__ptr));                                  \
+            *(int64_t *)(__ptr) = (__VA_ARGS__);                                \
+            vsf_unprotect_int(VSF_MACRO_SAFE_NAME(orig));                       \
+            _;                                                                  \
+        })
+#endif
+
 #ifndef vsf_atom32_op
 #   define vsf_atom32_op(__ptr, ...)                                            \
         ({                                                                      \
