@@ -62,13 +62,13 @@ vsf_dma_capability_t vsf_dma_capability(vsf_dma_t *dma_ptr)
     return dma_ptr->op->capability(dma_ptr);
 }
 
-int8_t vsf_dma_channel_request(vsf_dma_t *dma_ptr, void *filter_param)
+int8_t vsf_dma_channel_request(vsf_dma_t *dma_ptr)
 {
     VSF_HAL_ASSERT(dma_ptr != NULL);
     VSF_HAL_ASSERT(dma_ptr->op != NULL);
     VSF_HAL_ASSERT(dma_ptr->op->channel_request != NULL);
 
-    return dma_ptr->op->channel_request(dma_ptr, filter_param);
+    return dma_ptr->op->channel_request(dma_ptr);
 }
 
 void vsf_dma_channel_release(vsf_dma_t *dma_ptr, int8_t channel)
@@ -90,6 +90,18 @@ vsf_err_t vsf_dma_channel_config(vsf_dma_t *dma_ptr, int8_t channel,
     return dma_ptr->op->channel_config(dma_ptr, channel, cfg_ptr);
 }
 
+vsf_err_t vsf_dma_channel_start(vsf_dma_t *dma_ptr, int8_t channel,
+                                uint32_t src_address, uint32_t dst_address,
+                                uint32_t count)
+{
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+    VSF_HAL_ASSERT(dma_ptr->op != NULL);
+    VSF_HAL_ASSERT(dma_ptr->op->channel_start != NULL);
+
+    return dma_ptr->op->channel_start(dma_ptr, channel, src_address,
+                                      dst_address, count);
+}
+
 vsf_err_t vsf_dma_channel_cancel(vsf_dma_t *dma_ptr, int8_t channel)
 {
     VSF_HAL_ASSERT(dma_ptr != NULL);
@@ -97,6 +109,15 @@ vsf_err_t vsf_dma_channel_cancel(vsf_dma_t *dma_ptr, int8_t channel)
     VSF_HAL_ASSERT(dma_ptr->op->channel_cancel != NULL);
 
     return dma_ptr->op->channel_cancel(dma_ptr, channel);
+}
+
+uint32_t vsf_dma_channel_get_transferred_count(vsf_dma_t *dma_ptr, int8_t channel)
+{
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+    VSF_HAL_ASSERT(dma_ptr->op != NULL);
+    VSF_HAL_ASSERT(dma_ptr->op->channel_get_transferred_count != NULL);
+
+    return dma_ptr->op->channel_get_transferred_count(dma_ptr, channel);
 }
 
 vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr,
