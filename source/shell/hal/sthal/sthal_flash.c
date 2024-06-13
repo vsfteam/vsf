@@ -1,0 +1,84 @@
+
+
+/*============================ INCLUDES ======================================*/
+
+#include "hal/vsf_hal.h"
+#include "sthal.h"
+
+#ifdef HAL_FLASH_MODULE_ENABLED
+
+/*============================ MACROS ========================================*/
+
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ LOCAL VARIABLES ===============================*/
+
+FLASH_ProcessTypeDef pFlash;
+
+/*============================ PROTOTYPES ====================================*/
+
+HAL_StatusTypeDef FLASH_WaitForLastOperation(uint32_t Timeout);
+
+/*============================ IMPLEMENTATION ================================*/
+
+HAL_StatusTypeDef HAL_FLASH_Program(uint32_t TypeProgram, uint32_t Address,
+                                    uint64_t Data)
+{
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_FLASH_Program_IT(uint32_t TypeProgram, uint32_t Address,
+                                       uint64_t Data)
+{
+    return HAL_OK;
+}
+
+void HAL_FLASH_IRQHandler(void) {}
+
+__weak void HAL_FLASH_EndOfOperationCallback(uint32_t ReturnValue)
+{
+    UNUSED(ReturnValue);
+}
+
+__weak void HAL_FLASH_OperationErrorCallback(uint32_t ReturnValue)
+{
+    UNUSED(ReturnValue);
+}
+
+HAL_StatusTypeDef HAL_FLASH_Unlock(void)
+{
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_FLASH_Lock(void)
+{
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_FLASH_OB_Unlock(void)
+{
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_FLASH_OB_Lock(void)
+{
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_FLASH_OB_Launch(void)
+{
+    return HAL_OK;
+}
+
+uint32_t HAL_FLASH_GetError(void)
+{
+    return pFlash.ErrorCode;
+}
+
+HAL_StatusTypeDef FLASH_WaitForLastOperation(uint32_t Timeout)
+{
+    return HAL_OK;
+}
+
+#endif
