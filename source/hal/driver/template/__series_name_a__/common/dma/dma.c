@@ -87,10 +87,7 @@ typedef struct VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) {
 vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_init)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr
 ) {
-    VSF_HAL_ASSERT((NULL != dma_ptr) && (NULL != cfg_ptr));
-    // configure according to cfg_ptr
-    dma_ptr->isr = cfg_ptr->isr;
-    // configure interrupt according to cfg_ptr->isr
+    VSF_HAL_ASSERT(NULL != dma_ptr);
     return VSF_ERR_NONE;
 }
 
@@ -104,28 +101,28 @@ vsf_dma_capability_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_capability)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr
 ) {
     VSF_HAL_ASSERT(dma_ptr != NULL);
-    return (vsf_dma_capability) {
+    return (vsf_dma_capability_t) {
         .irq_mask          = 0xff,
         .max_request_count = 8,
         .channel_count     = 16
     };
 }
 
-int8_t VSF_MCONNECT(VSF_DMA_CHANNEL_CFG_IMP_PREFIX, _dma_channel_request)(
+int8_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_request)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
     void *filter_param
 ) {
     return 0;
 }
 
-void VSF_MCONNECT(VSF_DMA_CHANNEL_CFG_IMP_PREFIX, _dma_channel_release)(
+void VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_release)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
     int8_t channel
 ) {
     VSF_HAL_ASSERT(dma_ptr != NULL);
 }
 
-vsf_err_t VSF_MCONNECT(VSF_DMA_CHANNEL_CFG_IMP_PREFIX, _dma_channel_config)(
+vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_config)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
     int8_t channel,
                                  vsf_dma_channel_cfg_t *cfg_ptr
@@ -135,7 +132,19 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CHANNEL_CFG_IMP_PREFIX, _dma_channel_config)(
     return VSF_ERR_NONE;
 }
 
-vsf_err_t VSF_MCONNECT(VSF_DMA_CHANNEL_CFG_IMP_PREFIX, _dma_channel_cancel)(
+vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_start)(
+    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
+    int8_t channel,
+    uint32_t src_address,
+    uint32_t dst_address,
+    uint32_t count
+) {
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_cancel)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
     int8_t channel
 ) {
@@ -144,7 +153,7 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CHANNEL_CFG_IMP_PREFIX, _dma_channel_cancel)(
     return VSF_ERR_NONE;
 }
 
-vsf_dma_channel_status_t VSF_MCONNECT(VSF_DMA_CHANNEL_CFG_IMP_PREFIX, _dma_channel_status)(
+vsf_dma_channel_status_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_status)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
     int8_t channel)
 {
@@ -194,3 +203,4 @@ static void VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_irqhandler)(
 // HW end
 
 #endif /* VSF_HAL_USE_DMA */
+
