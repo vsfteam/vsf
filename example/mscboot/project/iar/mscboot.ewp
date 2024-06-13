@@ -4891,6 +4891,15 @@
                             </file>
                         </group>
                         <group>
+                            <name>io</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\io\io.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\io\io.h</name>
+                            </file>
+                        </group>
+                        <group>
                             <name>port</name>
                             <group>
                                 <name>arch</name>
@@ -5408,6 +5417,9 @@
                                                 <name>gpio</name>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\gpio\gpio_api.c</name>
+                                                    <excluded>
+                                                        <configuration>mscboot_aic8800</configuration>
+                                                    </excluded>
                                                 </file>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\gpio\gpio_api.h</name>
