@@ -20,7 +20,6 @@
 
 #include "./arch/vsf_arch.h"
 #include "./driver/driver.h"
-#include "kernel/vsf_eda.h"
 
 /*============================ MACROS ========================================*/
 
@@ -39,6 +38,8 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern bool vsf_driver_init(void);
+extern uintptr_t vsf_irq_enter(void);
+extern void vsf_irq_leave(uintptr_t ctx);
 
 /*============================ IMPLEMENTATION ================================*/
 
