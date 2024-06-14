@@ -242,8 +242,10 @@ typedef struct vsf_dma_isr_t {
 typedef struct vsf_dma_channel_cfg_t {
     vsf_dma_channel_mode_t  mode;
     vsf_dma_isr_t           isr;
-    uint8_t                 src_req_num;
-    uint8_t                 dst_req_num;
+    //! Index of the peripheral or memory corresponding to the source address of the DMA
+    uint8_t                 src_idx;
+    //! Index of the peripheral or memory corresponding to the destination address of the DMA
+    uint8_t                 dst_idx;
 } vsf_dma_channel_cfg_t;
 
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
