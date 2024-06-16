@@ -149,6 +149,9 @@ typedef enum vsf_usart_mode_t {
 
     VSF_USART_RX_ENABLE          = (0x1ul << 31),
     VSF_USART_RX_DISABLE         = (0x0ul << 31),
+
+    VSF_USART_HALF_DUPLEX_ENABLE = (0x0ul << 19),
+    VSF_USART_HALF_DUPLEX_DISABLE= (0x1ul << 19),
 } vsf_usart_mode_t;
 #endif
 
@@ -185,6 +188,10 @@ enum {
     VSF_USART_RX_ENABLE_COUNT    = 2,
     VSF_USART_RX_ENABLE_MASK     = VSF_USART_RX_ENABLE |
                                    VSF_USART_RX_DISABLE,
+
+    VSF_USART_HALF_DUPLEX_COUNT  = 2,
+    VSF_USART_HALF_DUPLEX_MASK   = VSF_USART_HALF_DUPLEX_ENABLE |
+                                   VSF_USART_HALF_DUPLEX_DISABLE,
 
     VSF_USART_MODE_MASK_COUNT    = 5,
     VSF_USART_MODE_ALL_BITS_MASK = VSF_USART_PARITY_MASK |
