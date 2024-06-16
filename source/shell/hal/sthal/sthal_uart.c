@@ -29,9 +29,10 @@
 #        define VSF_USART_CFG_PREFIX VSF_HAL_LV2_ST_HAL_USART_CFG_CALL_PREFIX
 #    endif
 
-#    define HAL_USART_RX_IRQ_MASK                                              \
+#    define STHAL_USART_RX_ERR_IRQ_MASK                                        \
         (VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_OVERFLOW_ERR |             \
-         VSF_USART_IRQ_MASK_FRAME_ERR | VSF_USART_IRQ_MASK_BREAK_ERR)
+         VSF_USART_IRQ_MASK_FRAME_ERR | VSF_USART_IRQ_MASK_BREAK_ERR |         \
+         VSF_USART_IRQ_MASK_PARITY_ERR)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -84,7 +85,7 @@ static void __usart_isr_handler(void *target_ptr, vsf_usart_t *usart,
                 huart->TxCpltCallback(huart);
 #    else
                 HAL_UART_TxCpltCallback(huart);
-#    endif /* USE_HAL_UART_REGISTER_CALLBACKS */
+#    endif
             }
         } else {
             VSF_HAL_ASSERT(0);
@@ -117,30 +118,49 @@ static void __usart_isr_handler(void *target_ptr, vsf_usart_t *usart,
                     huart->RxEventCallback(huart, huart->RxXferSize);
 #    else
                     HAL_UARTEx_RxEventCallback(huart, huart->RxXferSize);
-#    endif /* USE_HAL_UART_REGISTER_CALLBACKS */
+#    endif
                 } else {
 #    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
                     huart->RxCpltCallback(huart);
 #    else
                     HAL_UART_RxCpltCallback(huart);
-#    endif /* USE_HAL_UART_REGISTER_CALLBACKS */
+#    endif
                 }
             }
         } else {
             VSF_HAL_ASSERT(0);
         }
-        irq_mask &= VSF_USART_IRQ_MASK_RX;
+        irq_mask &= ~VSF_USART_IRQ_MASK_RX;
     }
 
     if (irq_mask & VSF_USART_IRQ_MASK_RX_CPL) {
-        // TODO
-        VSF_HAL_ASSERT(0);
+        irq_mask &= ~VSF_USART_IRQ_MASK_RX_CPL;
+#    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+        huart->RxCpltCallback(huart);
+#    else
+        HAL_UART_RxCpltCallback(huart);
+#    endif
     }
 
     if (irq_mask & VSF_USART_IRQ_MASK_TX_CPL) {
-        // TODO
-        VSF_HAL_ASSERT(0);
+        irq_mask &= ~VSF_USART_IRQ_MASK_TX_CPL;
+#    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+        huart->TxCpltCallback(huart);
+#    else
+        HAL_UART_TxCpltCallback(huart);
+#    endif
     }
+
+    if (irq_mask & STHAL_USART_RX_ERR_IRQ_MASK) {
+#    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+        huart->ErrorCallback(huart);
+#    else
+        HAL_UART_ErrorCallback(huart);
+#    endif
+    }
+
+    // TODO: HAL_UART_TxHalfCpltCallback
+    // TODO: HAL_UART_RxHalfCpltCallback
 }
 
 HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart)
@@ -160,7 +180,7 @@ HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart)
     huart->MspDeInitCallback(huart);
 #    else
     HAL_UART_MspDeInit(huart);
-#    endif /* (USE_HAL_UART_REGISTER_CALLBACKS) */
+#    endif
 
     huart->ErrorCode     = HAL_UART_ERROR_NONE;
     huart->gState        = HAL_UART_STATE_RESET;
@@ -174,9 +194,9 @@ HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart)
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
+static HAL_StatusTypeDef __HAL_UART_Init(UART_HandleTypeDef *huart,
+                                         uint32_t            append_mode)
 {
-    /* Check the UART handle allocation */
     if (huart == NULL) {
         return HAL_ERROR;
     }
@@ -192,7 +212,7 @@ HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
         huart->MspInitCallback(huart);
 #    else
         HAL_UART_MspInit(huart);
-#    endif /* (USE_HAL_UART_REGISTER_CALLBACKS) */
+#    endif
     }
 
     huart->gState = HAL_UART_STATE_BUSY;
@@ -201,7 +221,8 @@ HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
 
     vsf_usart_cfg_t cfg = {
         .mode = huart->Init.WordLength | huart->Init.StopBits |
-                huart->Init.Parity | huart->Init.HwFlowCtl | huart->Init.Mode,
+                huart->Init.Parity | huart->Init.HwFlowCtl | huart->Init.Mode |
+                append_mode,
         .baudrate   = huart->Init.BaudRate,
         .rx_timeout = 0,
         .isr =
@@ -226,15 +247,33 @@ HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
     return HAL_OK;
 }
 
+HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
+{
+    VSF_HAL_ASSERT(huart != NULL);
+    vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+    VSF_HAL_ASSERT(usart != NULL);
+
+    return __HAL_UART_Init(huart, 0);
+}
+
+HAL_StatusTypeDef HAL_HalfDuplex_Init(UART_HandleTypeDef *huart)
+{
+    VSF_HAL_ASSERT(huart != NULL);
+    vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+    VSF_HAL_ASSERT(usart != NULL);
+
+    return __HAL_UART_Init(huart, VSF_USART_HALF_DUPLEX_ENABLE);
+}
+
 HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart,
                                     const uint8_t *pData, uint16_t Size,
                                     uint32_t Timeout)
 {
-    const uint8_t  *pdata8bits;
-    const uint16_t *pdata16bits;
-    uint32_t        tickstart = 0U;
-    vsf_usart_t    *usart     = (vsf_usart_t *)huart->Instance;
-    uint32_t data_len = (huart->Init.WordLength == UART_WORDLENGTH_9B) ? 2 : 1;
+    VSF_HAL_ASSERT(huart != NULL);
+    vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+    VSF_HAL_ASSERT(usart != NULL);
+    VSF_HAL_ASSERT(pData != NULL);
+    VSF_HAL_ASSERT(Size != 0);
 
     if (huart->gState == HAL_UART_STATE_READY) {
         if ((pData == NULL) || (Size == 0U)) {
@@ -246,7 +285,9 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart,
         huart->TxXferSize  = Size;
         huart->TxXferCount = Size;
 
-        tickstart = HAL_GetTick();
+        uint32_t data_len =
+            (huart->Init.WordLength == UART_WORDLENGTH_9B) ? 2 : 1;
+        uint32_t tickstart = HAL_GetTick();
 
         do {
             uint16_t write_size = vsf_usart_txfifo_write(
@@ -272,11 +313,11 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart,
 HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData,
                                    uint16_t Size, uint32_t Timeout)
 {
-    uint8_t     *pdata8bits;
-    uint16_t    *pdata16bits;
-    uint32_t     tickstart = 0U;
-    vsf_usart_t *usart     = (vsf_usart_t *)huart->Instance;
-    uint32_t data_len = (huart->Init.WordLength == UART_WORDLENGTH_9B) ? 2 : 1;
+    VSF_HAL_ASSERT(huart != NULL);
+    vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+    VSF_HAL_ASSERT(usart != NULL);
+    VSF_HAL_ASSERT(pData != NULL);
+    VSF_HAL_ASSERT(Size != 0);
 
     if (huart->RxState == HAL_UART_STATE_READY) {
         if ((pData == NULL) || (Size == 0U)) {
@@ -289,7 +330,9 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData,
         huart->RxXferSize    = Size;
         huart->RxXferCount   = Size;
 
-        tickstart = HAL_GetTick();
+        uint32_t data_len =
+            (huart->Init.WordLength == UART_WORDLENGTH_9B) ? 2 : 1;
+        uint32_t tickstart = HAL_GetTick();
         do {
             uint16_t read_size = vsf_usart_rxfifo_read(
                 usart,
@@ -314,7 +357,12 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData,
 HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart,
                                        const uint8_t *pData, uint16_t Size)
 {
-    /* Check that a Tx process is not already ongoing */
+    VSF_HAL_ASSERT(huart != NULL);
+    vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+    VSF_HAL_ASSERT(usart != NULL);
+    VSF_HAL_ASSERT(pData != NULL);
+    VSF_HAL_ASSERT(Size != 0);
+
     if (huart->gState == HAL_UART_STATE_READY) {
         if ((pData == NULL) || (Size == 0U)) {
             return HAL_ERROR;
@@ -342,7 +390,11 @@ HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart,
 HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData,
                                       uint16_t Size)
 {
+    VSF_HAL_ASSERT(huart != NULL);
     vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+    VSF_HAL_ASSERT(usart != NULL);
+    VSF_HAL_ASSERT(pData != NULL);
+    VSF_HAL_ASSERT(Size != 0);
 
     if (huart->RxState == HAL_UART_STATE_READY) {
         if ((pData == NULL) || (Size == 0U)) {
@@ -357,24 +409,13 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData,
         huart->ErrorCode   = HAL_UART_ERROR_NONE;
         huart->RxState     = HAL_UART_STATE_BUSY_RX;
 
-        vsf_usart_irq_mask_t irq_mask = HAL_USART_RX_IRQ_MASK;
-
-        if (huart->Init.Parity != UART_PARITY_NONE) {
-            irq_mask |= VSF_USART_IRQ_MASK_PARITY_ERR;
-        }
-
-        vsf_usart_irq_enable(usart, irq_mask);
+        vsf_usart_irq_enable(usart, VSF_USART_IRQ_MASK_RX |
+                                        STHAL_USART_RX_ERR_IRQ_MASK);
 
         return HAL_OK;
     } else {
         return HAL_BUSY;
     }
-}
-
-HAL_StatusTypeDef HAL_HalfDuplex_Init(UART_HandleTypeDef *huart)
-{
-    VSF_HAL_ASSERT(0);
-    return HAL_ERROR;
 }
 
 __weak void HAL_UART_MspInit(UART_HandleTypeDef *huart)
@@ -560,82 +601,259 @@ HAL_StatusTypeDef HAL_UART_UnRegisterRxEventCallback(UART_HandleTypeDef *huart)
 HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart,
                                         const uint8_t *pData, uint16_t Size)
 {
-    return HAL_OK;
+    vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+
+    if (huart->gState == HAL_UART_STATE_READY) {
+        if ((pData == NULL) || (Size == 0U)) {
+            return HAL_ERROR;
+        }
+
+        huart->pTxBuffPtr  = pData;
+        huart->TxXferSize  = Size;
+        huart->TxXferCount = Size;
+
+        huart->ErrorCode = HAL_UART_ERROR_NONE;
+        huart->gState    = HAL_UART_STATE_BUSY_TX;
+
+        if (VSF_ERR_NONE != vsf_usart_request_tx(usart, (void *)pData, Size)) {
+            return HAL_ERROR;
+        }
+
+        return HAL_OK;
+    } else {
+        return HAL_BUSY;
+    }
 }
 
 HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart,
                                        uint8_t *pData, uint16_t Size)
 {
-    return HAL_OK;
-}
+    VSF_HAL_ASSERT(huart != NULL);
+    vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+    VSF_HAL_ASSERT(usart != NULL);
+    VSF_HAL_ASSERT(pData != NULL);
+    VSF_HAL_ASSERT(Size != 0);
 
-HAL_StatusTypeDef HAL_UART_DMAPause(UART_HandleTypeDef *huart)
-{
-    return HAL_OK;
-}
+    if (huart->RxState == HAL_UART_STATE_READY) {
+        if ((pData == NULL) || (Size == 0U)) {
+            return HAL_ERROR;
+        }
 
-HAL_StatusTypeDef HAL_UART_DMAResume(UART_HandleTypeDef *huart)
-{
-    return HAL_OK;
+        huart->ReceptionType = HAL_UART_RECEPTION_STANDARD;
+
+        huart->pRxBuffPtr  = pData;
+        huart->RxXferSize  = Size;
+        huart->RxXferCount = Size;
+        huart->ErrorCode   = HAL_UART_ERROR_NONE;
+        huart->RxState     = HAL_UART_STATE_BUSY_RX;
+
+        if (VSF_ERR_NONE != vsf_usart_request_rx(usart, (void *)pData, Size)) {
+            return HAL_ERROR;
+        }
+
+        return HAL_OK;
+    } else {
+        return HAL_BUSY;
+    }
 }
 
 HAL_StatusTypeDef HAL_UART_DMAStop(UART_HandleTypeDef *huart)
 {
+    VSF_HAL_ASSERT(huart != NULL);
+    vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+    VSF_HAL_ASSERT(usart != NULL);
+    vsf_err_t err;
+
+    err = vsf_usart_cancel_tx(usart);
+    if (err != VSF_ERR_NONE) {
+        return HAL_ERROR;
+    }
+
+    huart->gState = HAL_UART_STATE_READY;
+
+    err = vsf_usart_cancel_rx(usart);
+    if (err != VSF_ERR_NONE) {
+        return HAL_ERROR;
+    }
+
+    huart->RxState       = HAL_UART_STATE_READY;
+    huart->ReceptionType = HAL_UART_RECEPTION_STANDARD;
+
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle(UART_HandleTypeDef *huart,
-                                           uint8_t *pData, uint16_t Size,
-                                           uint16_t *RxLen, uint32_t Timeout)
+HAL_StatusTypeDef HAL_UART_Abort(UART_HandleTypeDef *huart)
 {
+    VSF_HAL_ASSERT(huart != NULL);
+    vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+    VSF_HAL_ASSERT(usart != NULL);
+    vsf_err_t err;
+
+    vsf_usart_irq_disable(usart, VSF_USART_IRQ_ALL_BITS_MASK);
+
+    err = vsf_usart_cancel_tx(usart);
+    if (err != VSF_ERR_NONE) {
+        huart->ErrorCode = HAL_UART_ERROR_DMA;
+        return HAL_ERROR;
+    }
+
+    err = vsf_usart_cancel_rx(usart);
+    if (err != VSF_ERR_NONE) {
+        huart->ErrorCode = HAL_UART_ERROR_DMA;
+        return HAL_ERROR;
+    }
+
+    huart->TxXferCount   = 0x00U;
+    huart->RxXferCount   = 0x00U;
+    huart->ErrorCode     = HAL_UART_ERROR_NONE;
+    huart->RxState       = HAL_UART_STATE_READY;
+    huart->gState        = HAL_UART_STATE_READY;
+    huart->ReceptionType = HAL_UART_RECEPTION_STANDARD;
+
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart,
-                                              uint8_t *pData, uint16_t Size)
+HAL_StatusTypeDef HAL_UART_AbortTransmit(UART_HandleTypeDef *huart)
 {
+    HAL_StatusTypeDef status;
+    VSF_HAL_ASSERT(huart != NULL);
+    vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+    VSF_HAL_ASSERT(usart != NULL);
+    vsf_usart_irq_disable(usart,
+                          VSF_USART_IRQ_MASK_TX | VSF_USART_IRQ_MASK_TX_CPL);
+    vsf_err_t err;
+
+    err = vsf_usart_cancel_tx(usart);
+    if (err != VSF_ERR_NONE) {
+        huart->ErrorCode = HAL_UART_ERROR_DMA;
+        return HAL_ERROR;
+    }
+
+    huart->TxXferCount = 0x00U;
+    huart->TxXferCount = 0x00U;
+    huart->gState      = HAL_UART_STATE_READY;
+
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_DMA(UART_HandleTypeDef *huart,
-                                               uint8_t *pData, uint16_t Size)
+HAL_StatusTypeDef HAL_UART_AbortReceive(UART_HandleTypeDef *huart)
 {
+    HAL_StatusTypeDef status;
+    VSF_HAL_ASSERT(huart != NULL);
+    vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+    VSF_HAL_ASSERT(usart != NULL);
+    vsf_usart_irq_disable(usart, VSF_USART_IRQ_MASK_RX |
+                                     VSF_USART_IRQ_MASK_RX_CPL |
+                                     STHAL_USART_RX_ERR_IRQ_MASK);
+    vsf_err_t err;
+
+    err = vsf_usart_cancel_rx(usart);
+    if (err != VSF_ERR_NONE) {
+        huart->ErrorCode = HAL_UART_ERROR_DMA;
+        return HAL_ERROR;
+    }
+
+    huart->RxXferCount   = 0x00U;
+    huart->RxState       = HAL_UART_STATE_READY;
+    huart->ReceptionType = HAL_UART_RECEPTION_STANDARD;
+
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_UART_Abort_IT(UART_HandleTypeDef *huart)
+{
+    vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+    VSF_HAL_ASSERT(usart != NULL);
+    vsf_usart_irq_disable(usart, VSF_USART_IRQ_ALL_BITS_MASK);
+    vsf_err_t err;
+
+    err = vsf_usart_cancel_tx(usart);
+    if (err != VSF_ERR_NONE) {
+        huart->ErrorCode = HAL_UART_ERROR_DMA;
+        return HAL_ERROR;
+    }
+
+    err = vsf_usart_cancel_rx(usart);
+    if (err != VSF_ERR_NONE) {
+        huart->ErrorCode = HAL_UART_ERROR_DMA;
+        return HAL_ERROR;
+    }
+
+    huart->TxXferCount   = 0x00U;
+    huart->RxXferCount   = 0x00U;
+    huart->ErrorCode     = HAL_UART_ERROR_NONE;
+    huart->gState        = HAL_UART_STATE_READY;
+    huart->RxState       = HAL_UART_STATE_READY;
+    huart->ReceptionType = HAL_UART_RECEPTION_STANDARD;
+
+#    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+    huart->AbortCpltCallback(huart);
+#    else
+    HAL_UART_AbortCpltCallback(huart);
+#    endif
+
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_UART_AbortTransmit_IT(UART_HandleTypeDef *huart)
+{
+    vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+    VSF_HAL_ASSERT(usart != NULL);
+    vsf_usart_irq_disable(usart,
+                          VSF_USART_IRQ_MASK_TX | VSF_USART_IRQ_MASK_TX_CPL);
+    vsf_err_t err;
+
+    err = vsf_usart_cancel_tx(usart);
+    if (err != VSF_ERR_NONE) {
+        huart->ErrorCode = HAL_UART_ERROR_DMA;
+        return HAL_ERROR;
+    }
+
+    huart->TxXferCount = 0x00U;
+    huart->TxXferCount = 0x00U;
+    huart->gState      = HAL_UART_STATE_READY;
+
+#    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+    huart->AbortTransmitCpltCallback(huart);
+#    else
+    HAL_UART_AbortTransmitCpltCallback(huart);
+#    endif
+
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_UART_AbortReceive_IT(UART_HandleTypeDef *huart)
+{
+    vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+    VSF_HAL_ASSERT(usart != NULL);
+    vsf_usart_irq_disable(usart, VSF_USART_IRQ_MASK_RX |
+                                     VSF_USART_IRQ_MASK_RX_CPL |
+                                     STHAL_USART_RX_ERR_IRQ_MASK);
+    vsf_err_t err;
+
+    err = vsf_usart_cancel_rx(usart);
+    if (err != VSF_ERR_NONE) {
+        huart->ErrorCode = HAL_UART_ERROR_DMA;
+        return HAL_ERROR;
+    }
+
+    huart->RxXferCount   = 0x00U;
+    huart->ErrorCode     = HAL_UART_ERROR_NONE;
+    huart->RxState       = HAL_UART_STATE_READY;
+    huart->ReceptionType = HAL_UART_RECEPTION_STANDARD;
+
+#    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+    huart->AbortReceiveCpltCallback(huart);
+#    else
+    HAL_UART_AbortReceiveCpltCallback(huart);
+#    endif
+
     return HAL_OK;
 }
 
 HAL_UART_RxEventTypeTypeDef HAL_UARTEx_GetRxEventType(UART_HandleTypeDef *huart)
 {
     return (huart->RxEventType);
-}
-
-HAL_StatusTypeDef HAL_UART_Abort(UART_HandleTypeDef *huart)
-{
-    return HAL_OK;
-}
-
-HAL_StatusTypeDef HAL_UART_AbortTransmit(UART_HandleTypeDef *huart)
-{
-    return HAL_OK;
-}
-
-HAL_StatusTypeDef HAL_UART_AbortReceive(UART_HandleTypeDef *huart)
-{
-    return HAL_OK;
-}
-
-HAL_StatusTypeDef HAL_UART_Abort_IT(UART_HandleTypeDef *huart)
-{
-    return HAL_OK;
-}
-
-HAL_StatusTypeDef HAL_UART_AbortTransmit_IT(UART_HandleTypeDef *huart)
-{
-    return HAL_OK;
-}
-
-HAL_StatusTypeDef HAL_UART_AbortReceive_IT(UART_HandleTypeDef *huart)
-{
-    return HAL_OK;
 }
 
 void HAL_UART_IRQHandler(UART_HandleTypeDef *huart) {}
@@ -688,11 +906,13 @@ __weak void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 
 HAL_StatusTypeDef HAL_HalfDuplex_EnableTransmitter(UART_HandleTypeDef *huart)
 {
+    // Leave it blank here
     return HAL_OK;
 }
 
 HAL_StatusTypeDef HAL_HalfDuplex_EnableReceiver(UART_HandleTypeDef *huart)
 {
+    // Leave it blank here
     return HAL_OK;
 }
 
@@ -722,20 +942,41 @@ void UART_InitCallbacksToDefault(UART_HandleTypeDef *huart)
 }
 #    endif
 
-HAL_StatusTypeDef UART_Start_Receive_IT(UART_HandleTypeDef *huart,
-                                        uint8_t *pData, uint16_t Size)
-{
-    return HAL_OK;
-}
-
-HAL_StatusTypeDef UART_Start_Receive_DMA(UART_HandleTypeDef *huart,
-                                         uint8_t *pData, uint16_t Size)
-{
-    return HAL_OK;
-}
-
 /*============================ Unsupported APIs =============================*/
 
+HAL_StatusTypeDef HAL_UART_DMAPause(UART_HandleTypeDef *huart)
+{
+    VSF_HAL_ASSERT(0);
+    return HAL_ERROR;
+}
+
+HAL_StatusTypeDef HAL_UART_DMAResume(UART_HandleTypeDef *huart)
+{
+    VSF_HAL_ASSERT(0);
+    return HAL_ERROR;
+}
+
+HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle(UART_HandleTypeDef *huart,
+                                           uint8_t *pData, uint16_t Size,
+                                           uint16_t *RxLen, uint32_t Timeout)
+{
+    VSF_HAL_ASSERT(0);
+    return HAL_ERROR;
+}
+
+HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart,
+                                              uint8_t *pData, uint16_t Size)
+{
+    VSF_HAL_ASSERT(0);
+    return HAL_ERROR;
+}
+
+HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_DMA(UART_HandleTypeDef *huart,
+                                               uint8_t *pData, uint16_t Size)
+{
+    VSF_HAL_ASSERT(0);
+    return HAL_ERROR;
+}
 
 HAL_StatusTypeDef HAL_LIN_Init(UART_HandleTypeDef *huart,
                                uint32_t            BreakDetectLength)
@@ -751,7 +992,6 @@ HAL_StatusTypeDef HAL_MultiProcessor_Init(UART_HandleTypeDef *huart,
     VSF_HAL_ASSERT(0);
     return HAL_ERROR;
 }
-
 
 HAL_StatusTypeDef HAL_LIN_SendBreak(UART_HandleTypeDef *huart)
 {

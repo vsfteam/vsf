@@ -103,8 +103,6 @@ typedef struct __UART_HandleTypeDef {
     __IO uint16_t                    RxXferCount;
     __IO HAL_UART_RxTypeTypeDef      ReceptionType;
     __IO HAL_UART_RxEventTypeTypeDef RxEventType;
-    DMA_HandleTypeDef               *hdmatx;
-    DMA_HandleTypeDef               *hdmarx;
     HAL_LockTypeDef                  Lock;
     __IO HAL_UART_StateTypeDef       gState;
     __IO HAL_UART_StateTypeDef       RxState;
