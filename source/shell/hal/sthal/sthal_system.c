@@ -18,6 +18,8 @@
 /*============================ INCLUDES ======================================*/
 
 #include "sthal.h"
+
+#if VSF_USE_STHAL == ENABLED
 #include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
@@ -33,3 +35,5 @@ uint32_t SystemCoreClock = VSF_SYSTIMER_FREQ;
 //void SystemInit(void) {}
 
 void SystemCoreClockUpdate(void) {}
+
+#endif

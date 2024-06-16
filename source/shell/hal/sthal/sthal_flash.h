@@ -47,14 +47,14 @@ typedef enum {
 } FLASH_ProcedureTypeDef;
 
 typedef struct {
-    __IO FLASH_ProcedureTypeDef ProcedureOnGoing;
-    __IO uint32_t               NbSectorsToErase;
-    __IO uint8_t                VoltageForErase;
-    __IO uint32_t               Sector;
-    __IO uint32_t               Bank;
-    __IO uint32_t               Address;
+    volatile FLASH_ProcedureTypeDef ProcedureOnGoing;
+    volatile uint32_t               NbSectorsToErase;
+    volatile uint8_t                VoltageForErase;
+    volatile uint32_t               Sector;
+    volatile uint32_t               Bank;
+    volatile uint32_t               Address;
     HAL_LockTypeDef             Lock;
-    __IO uint32_t               ErrorCode;
+    volatile uint32_t               ErrorCode;
 } FLASH_ProcessTypeDef;
 
 /*============================ GLOBAL VARIABLES ==============================*/

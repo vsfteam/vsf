@@ -59,6 +59,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef vsf_dma_t DMA_Stream_TypeDef;
+
 typedef struct {
     uint32_t Channel;
     uint32_t Direction;
@@ -102,7 +104,7 @@ typedef struct __DMA_HandleTypeDef {
     DMA_Stream_TypeDef       *Instance;
     DMA_InitTypeDef           Init;
     HAL_LockTypeDef           Lock;
-    __IO HAL_DMA_StateTypeDef State;
+    volatile HAL_DMA_StateTypeDef State;
     void                     *Parent;
     void (*XferCpltCallback)(struct __DMA_HandleTypeDef *hdma);
     void (*XferHalfCpltCallback)(struct __DMA_HandleTypeDef *hdma);
@@ -110,7 +112,7 @@ typedef struct __DMA_HandleTypeDef {
     void (*XferM1HalfCpltCallback)(struct __DMA_HandleTypeDef *hdma);
     void (*XferErrorCallback)(struct __DMA_HandleTypeDef *hdma);
     void (*XferAbortCallback)(struct __DMA_HandleTypeDef *hdma);
-    __IO uint32_t ErrorCode;
+    volatile uint32_t ErrorCode;
     uint32_t      StreamBaseAddress;
     uint32_t      StreamIndex;
 

@@ -420,12 +420,12 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData,
 
 __weak void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 {
-    UNUSED(huart);
+    VSF_UNUSED_PARAM(huart);
 }
 
 __weak void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 {
-    UNUSED(huart);
+    VSF_UNUSED_PARAM(huart);
 }
 
 #    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
@@ -860,48 +860,48 @@ void HAL_UART_IRQHandler(UART_HandleTypeDef *huart) {}
 
 __weak void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-    UNUSED(huart);
+    VSF_UNUSED_PARAM(huart);
 }
 
 __weak void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart)
 {
-    UNUSED(huart);
+    VSF_UNUSED_PARAM(huart);
 }
 
 __weak void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    UNUSED(huart);
+    VSF_UNUSED_PARAM(huart);
 }
 
 __weak void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
 {
-    UNUSED(huart);
+    VSF_UNUSED_PARAM(huart);
 }
 
 __weak void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
-    UNUSED(huart);
+    VSF_UNUSED_PARAM(huart);
 }
 
 __weak void HAL_UART_AbortCpltCallback(UART_HandleTypeDef *huart)
 {
-    UNUSED(huart);
+    VSF_UNUSED_PARAM(huart);
 }
 
 __weak void HAL_UART_AbortTransmitCpltCallback(UART_HandleTypeDef *huart)
 {
-    UNUSED(huart);
+    VSF_UNUSED_PARAM(huart);
 }
 
 __weak void HAL_UART_AbortReceiveCpltCallback(UART_HandleTypeDef *huart)
 {
-    UNUSED(huart);
+    VSF_UNUSED_PARAM(huart);
 }
 
 __weak void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
-    UNUSED(huart);
-    UNUSED(Size);
+    VSF_UNUSED_PARAM(huart);
+    VSF_UNUSED_PARAM(Size);
 }
 
 HAL_StatusTypeDef HAL_HalfDuplex_EnableTransmitter(UART_HandleTypeDef *huart)

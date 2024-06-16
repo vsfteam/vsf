@@ -41,7 +41,7 @@ HAL_StatusTypeDef HAL_WWDG_Init(WWDG_HandleTypeDef *hwwdg)
 
 __weak void HAL_WWDG_MspInit(WWDG_HandleTypeDef *hwwdg)
 {
-    UNUSED(hwwdg);
+    VSF_UNUSED_PARAM(hwwdg);
 }
 
 #    if (USE_HAL_WWDG_REGISTER_CALLBACKS == 1)
@@ -98,7 +98,7 @@ void HAL_WWDG_IRQHandler(WWDG_HandleTypeDef *hwwdg) {}
 
 __weak void HAL_WWDG_EarlyWakeupCallback(WWDG_HandleTypeDef *hwwdg)
 {
-    UNUSED(hwwdg);
+    VSF_UNUSED_PARAM(hwwdg);
 }
 
 #endif

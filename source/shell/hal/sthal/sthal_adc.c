@@ -166,12 +166,12 @@ HAL_StatusTypeDef HAL_ADC_UnRegisterCallback(
 
 __weak void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc)
 {
-    UNUSED(hadc);
+    VSF_UNUSED_PARAM(hadc);
 }
 
 __weak void HAL_ADC_MspDeInit(ADC_HandleTypeDef *hadc)
 {
-    UNUSED(hadc);
+    VSF_UNUSED_PARAM(hadc);
 }
 
 HAL_StatusTypeDef HAL_ADC_Start(ADC_HandleTypeDef *hadc)
@@ -226,22 +226,22 @@ uint32_t HAL_ADC_GetValue(ADC_HandleTypeDef *hadc)
 
 __weak void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
-    UNUSED(hadc);
+    VSF_UNUSED_PARAM(hadc);
 }
 
 __weak void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)
 {
-    UNUSED(hadc);
+    VSF_UNUSED_PARAM(hadc);
 }
 
 __weak void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef *hadc)
 {
-    UNUSED(hadc);
+    VSF_UNUSED_PARAM(hadc);
 }
 
 __weak void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *hadc)
 {
-    UNUSED(hadc);
+    VSF_UNUSED_PARAM(hadc);
 }
 
 HAL_StatusTypeDef HAL_ADC_ConfigChannel(ADC_HandleTypeDef      *hadc,
@@ -316,7 +316,7 @@ uint32_t HAL_ADCEx_MultiModeGetValue(ADC_HandleTypeDef *hadc)
 
 __weak void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
-    UNUSED(hadc);
+    VSF_UNUSED_PARAM(hadc);
 }
 
 HAL_StatusTypeDef HAL_ADCEx_InjectedConfigChannel(

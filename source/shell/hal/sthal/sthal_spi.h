@@ -43,6 +43,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef vsf_spi_t SPI_TypeDef;
+
 typedef struct {
     uint32_t Mode;
     uint32_t Direction;
@@ -73,17 +75,17 @@ typedef struct __SPI_HandleTypeDef {
     SPI_InitTypeDef Init;
     uint8_t        *pTxBuffPtr;
     uint16_t        TxXferSize;
-    __IO uint16_t   TxXferCount;
+    volatile uint16_t   TxXferCount;
     uint8_t        *pRxBuffPtr;
     uint16_t        RxXferSize;
-    __IO uint16_t   RxXferCount;
+    volatile uint16_t   RxXferCount;
     void (*RxISR)(struct __SPI_HandleTypeDef *hspi);
     void (*TxISR)(struct __SPI_HandleTypeDef *hspi);
     DMA_HandleTypeDef        *hdmatx;
     DMA_HandleTypeDef        *hdmarx;
     HAL_LockTypeDef           Lock;
-    __IO HAL_SPI_StateTypeDef State;
-    __IO uint32_t             ErrorCode;
+    volatile HAL_SPI_StateTypeDef State;
+    volatile uint32_t             ErrorCode;
 #if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)
     void (*TxCpltCallback)(struct __SPI_HandleTypeDef *hspi);
     void (*RxCpltCallback)(struct __SPI_HandleTypeDef *hspi);

@@ -59,7 +59,7 @@ void HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin) {}
 
 __weak void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    UNUSED(GPIO_Pin);
+    VSF_UNUSED_PARAM(GPIO_Pin);
 }
 
 #endif

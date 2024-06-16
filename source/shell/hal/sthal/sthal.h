@@ -26,9 +26,15 @@ extern "C" {
 
 /*============================ INCLUDES ======================================*/
 
-// TODO: remove dirct include
-#include "HME_MCU.h"
-#include "sthal_conf.h"
+#include "hal/vsf_hal.h"
+
+#ifdef VSF_STHAL_HEADER
+#   include VSF_STHAL_HEADER
+#else
+#   include "sthal_conf_template.h"
+#endif
+
+#include "sthal_def.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -41,10 +47,24 @@ typedef enum {
     HAL_TICK_FREQ_DEFAULT = HAL_TICK_FREQ_1KHZ
 } HAL_TickFreqTypeDef;
 
+typedef enum {
+    RESET = 0U,
+    SET   = !RESET
+} FlagStatus, ITStatus;
+
+typedef enum {
+    DISABLE = 0U,
+    ENABLE  = !DISABLE
+} FunctionalState;
+
+typedef enum {
+    SUCCESS = 0U,
+    ERROR   = !SUCCESS
+} ErrorStatus;
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern __IO uint32_t       uwTick;
-extern uint32_t            uwTickPrio;
+extern volatile uint32_t       uwTick;
 extern HAL_TickFreqTypeDef uwTickFreq;
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -58,25 +78,54 @@ HAL_StatusTypeDef   HAL_InitTick(uint32_t TickPriority);
 void                HAL_IncTick(void);
 void                HAL_Delay(uint32_t Delay);
 uint32_t            HAL_GetTick(void);
-uint32_t            HAL_GetTickPrio(void);
 HAL_StatusTypeDef   HAL_SetTickFreq(HAL_TickFreqTypeDef Freq);
 HAL_TickFreqTypeDef HAL_GetTickFreq(void);
 void                HAL_SuspendTick(void);
 void                HAL_ResumeTick(void);
 uint32_t            HAL_GetHalVersion(void);
-uint32_t            HAL_GetREVID(void);
-uint32_t            HAL_GetDEVID(void);
-void                HAL_DBGMCU_EnableDBGSleepMode(void);
-void                HAL_DBGMCU_DisableDBGSleepMode(void);
-void                HAL_DBGMCU_EnableDBGStopMode(void);
-void                HAL_DBGMCU_DisableDBGStopMode(void);
-void                HAL_DBGMCU_EnableDBGStandbyMode(void);
-void                HAL_DBGMCU_DisableDBGStandbyMode(void);
-void                HAL_EnableCompensationCell(void);
-void                HAL_DisableCompensationCell(void);
-uint32_t            HAL_GetUIDw0(void);
-uint32_t            HAL_GetUIDw1(void);
 uint32_t            HAL_GetUIDw2(void);
+
+/*============================ INCLUDES ======================================*/
+
+#ifdef HAL_GPIO_MODULE_ENABLED
+#    include "sthal_gpio.h"
+#endif
+
+#ifdef HAL_DMA_MODULE_ENABLED
+#    include "sthal_dma.h"
+#endif
+
+#ifdef HAL_ADC_MODULE_ENABLED
+#    include "sthal_adc.h"
+#endif
+
+#ifdef HAL_FLASH_MODULE_ENABLED
+#    include "sthal_flash.h"
+#endif
+
+#ifdef HAL_I2C_MODULE_ENABLED
+#    include "sthal_i2c.h"
+#endif
+
+#ifdef HAL_RTC_MODULE_ENABLED
+#    include "sthal_rtc.h"
+#endif
+
+#ifdef HAL_SPI_MODULE_ENABLED
+#    include "sthal_spi.h"
+#endif
+
+#ifdef HAL_TIM_MODULE_ENABLED
+#    include "sthal_tim.h"
+#endif
+
+#ifdef HAL_UART_MODULE_ENABLED
+#    include "sthal_uart.h"
+#endif
+
+#ifdef HAL_WWDG_MODULE_ENABLED
+#    include "sthal_wwdg.h"
+#endif
 
 #ifdef __cplusplus
 }

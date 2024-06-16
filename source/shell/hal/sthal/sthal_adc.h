@@ -56,6 +56,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef vsf_adc_t ADC_TypeDef;
+
 typedef struct {
     uint32_t        ClockPrescaler;
     uint32_t        Resolution;
@@ -95,11 +97,11 @@ typedef struct
 {
     ADC_TypeDef       *Instance;
     ADC_InitTypeDef    Init;
-    __IO uint32_t      NbrOfCurrentConversionRank;
+    volatile uint32_t      NbrOfCurrentConversionRank;
     DMA_HandleTypeDef *DMA_Handle;
     HAL_LockTypeDef    Lock;
-    __IO uint32_t      State;
-    __IO uint32_t      ErrorCode;
+    volatile uint32_t      State;
+    volatile uint32_t      ErrorCode;
 #if (USE_HAL_ADC_REGISTER_CALLBACKS == 1)
     void (*ConvCpltCallback)(struct __ADC_HandleTypeDef *hadc);
     void (*ConvHalfCpltCallback)(struct __ADC_HandleTypeDef *hadc);

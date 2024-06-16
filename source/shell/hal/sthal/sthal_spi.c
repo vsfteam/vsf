@@ -77,12 +77,12 @@ HAL_StatusTypeDef HAL_SPI_DeInit(SPI_HandleTypeDef *hspi)
 
 __weak void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
 {
-    UNUSED(hspi);
+    VSF_UNUSED_PARAM(hspi);
 }
 
 __weak void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
 {
-    UNUSED(hspi);
+    VSF_UNUSED_PARAM(hspi);
 }
 
 #    if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)
@@ -132,7 +132,7 @@ HAL_StatusTypeDef HAL_SPI_RegisterCallback(SPI_HandleTypeDef        *hspi,
             hspi->MspDeInitCallback = pCallback;
             break;
         default:
-            SET_BIT(hspi->ErrorCode, HAL_SPI_ERROR_INVALID_CALLBACK);
+            hspi->ErrorCode |= HAL_SPI_ERROR_INVALID_CALLBACK;
             status = HAL_ERROR;
             break;
         }
@@ -145,12 +145,12 @@ HAL_StatusTypeDef HAL_SPI_RegisterCallback(SPI_HandleTypeDef        *hspi,
             hspi->MspDeInitCallback = pCallback;
             break;
         default:
-            SET_BIT(hspi->ErrorCode, HAL_SPI_ERROR_INVALID_CALLBACK);
+            hspi->ErrorCode |= HAL_SPI_ERROR_INVALID_CALLBACK;
             status = HAL_ERROR;
             break;
         }
     } else {
-        SET_BIT(hspi->ErrorCode, HAL_SPI_ERROR_INVALID_CALLBACK);
+        hspi->ErrorCode |= HAL_SPI_ERROR_INVALID_CALLBACK;
         status = HAL_ERROR;
     }
 
@@ -196,7 +196,7 @@ HAL_StatusTypeDef HAL_SPI_UnRegisterCallback(
             hspi->MspDeInitCallback = HAL_SPI_MspDeInit;
             break;
         default:
-            SET_BIT(hspi->ErrorCode, HAL_SPI_ERROR_INVALID_CALLBACK);
+            hspi->ErrorCode |= HAL_SPI_ERROR_INVALID_CALLBACK;
             status = HAL_ERROR;
             break;
         }
@@ -209,12 +209,12 @@ HAL_StatusTypeDef HAL_SPI_UnRegisterCallback(
             hspi->MspDeInitCallback = HAL_SPI_MspDeInit;
             break;
         default:
-            SET_BIT(hspi->ErrorCode, HAL_SPI_ERROR_INVALID_CALLBACK);
+            hspi->ErrorCode |= HAL_SPI_ERROR_INVALID_CALLBACK;
             status = HAL_ERROR;
             break;
         }
     } else {
-        SET_BIT(hspi->ErrorCode, HAL_SPI_ERROR_INVALID_CALLBACK);
+        hspi->ErrorCode |= HAL_SPI_ERROR_INVALID_CALLBACK;
         status = HAL_ERROR;
     }
 
@@ -309,42 +309,42 @@ void HAL_SPI_IRQHandler(SPI_HandleTypeDef *hspi) {}
 
 __weak void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-    UNUSED(hspi);
+    VSF_UNUSED_PARAM(hspi);
 }
 
 __weak void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-    UNUSED(hspi);
+    VSF_UNUSED_PARAM(hspi);
 }
 
 __weak void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 {
-    UNUSED(hspi);
+    VSF_UNUSED_PARAM(hspi);
 }
 
 __weak void HAL_SPI_TxHalfCpltCallback(SPI_HandleTypeDef *hspi)
 {
-    UNUSED(hspi);
+    VSF_UNUSED_PARAM(hspi);
 }
 
 __weak void HAL_SPI_RxHalfCpltCallback(SPI_HandleTypeDef *hspi)
 {
-    UNUSED(hspi);
+    VSF_UNUSED_PARAM(hspi);
 }
 
 __weak void HAL_SPI_TxRxHalfCpltCallback(SPI_HandleTypeDef *hspi)
 {
-    UNUSED(hspi);
+    VSF_UNUSED_PARAM(hspi);
 }
 
 __weak void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
 {
-    UNUSED(hspi);
+    VSF_UNUSED_PARAM(hspi);
 }
 
 __weak void HAL_SPI_AbortCpltCallback(SPI_HandleTypeDef *hspi)
 {
-    UNUSED(hspi);
+    VSF_UNUSED_PARAM(hspi);
 }
 
 HAL_SPI_StateTypeDef HAL_SPI_GetState(SPI_HandleTypeDef *hspi)

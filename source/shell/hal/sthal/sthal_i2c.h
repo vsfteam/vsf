@@ -59,6 +59,8 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
+typedef vsf_i2c_t I2C_TypeDef;
+
 typedef enum {
     HAL_I2C_STATE_RESET          = 0x00U,
     HAL_I2C_STATE_READY          = 0x20U,
@@ -100,19 +102,19 @@ typedef struct {
     I2C_InitTypeDef           Init;
     uint8_t                  *pBuffPtr;
     uint16_t                  XferSize;
-    __IO uint16_t             XferCount;
-    __IO uint32_t             XferOptions;
-    __IO uint32_t             PreviousState;
+    volatile uint16_t             XferCount;
+    volatile uint32_t             XferOptions;
+    volatile uint32_t             PreviousState;
     DMA_HandleTypeDef        *hdmatx;
     DMA_HandleTypeDef        *hdmarx;
     HAL_LockTypeDef           Lock;
-    __IO HAL_I2C_StateTypeDef State;
-    __IO HAL_I2C_ModeTypeDef  Mode;
-    __IO uint32_t             ErrorCode;
-    __IO uint32_t             Devaddress;
-    __IO uint32_t             Memaddress;
-    __IO uint32_t             MemaddSize;
-    __IO uint32_t             EventCount;
+    volatile HAL_I2C_StateTypeDef State;
+    volatile HAL_I2C_ModeTypeDef  Mode;
+    volatile uint32_t             ErrorCode;
+    volatile uint32_t             Devaddress;
+    volatile uint32_t             Memaddress;
+    volatile uint32_t             MemaddSize;
+    volatile uint32_t             EventCount;
 
 #if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)
     void (*MasterTxCpltCallback)(struct __I2C_HandleTypeDef *hi2c);

@@ -30,6 +30,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef vsf_rtc_t RTC_TypeDef;
+
 typedef enum {
     HAL_RTC_STATE_RESET   = 0x00U,
     HAL_RTC_STATE_READY   = 0x01U,
@@ -82,7 +84,7 @@ typedef struct {
     RTC_TypeDef             *Instance;
     RTC_InitTypeDef          Init;
     HAL_LockTypeDef          Lock;
-    __IO HAL_RTCStateTypeDef State;
+    volatile HAL_RTCStateTypeDef State;
 #if (USE_HAL_RTC_REGISTER_CALLBACKS == 1)
     void (*AlarmAEventCallback)(struct __RTC_HandleTypeDef *hrtc);
     void (*AlarmBEventCallback)(struct __RTC_HandleTypeDef *hrtc);

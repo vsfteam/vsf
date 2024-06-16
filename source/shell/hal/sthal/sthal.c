@@ -20,6 +20,8 @@
 #include "sthal.h"
 #include "hal/vsf_hal.h"
 
+#if VSF_HAL_USE_USART == ENABLED
+
 /*============================ MACROS ========================================*/
 
 #define __ST_HAL_VERSION_MAIN (0x01U)
@@ -34,8 +36,7 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-__IO uint32_t       uwTick;
-uint32_t            uwTickPrio = (1UL << __NVIC_PRIO_BITS);
+volatile uint32_t       uwTick;
 HAL_TickFreqTypeDef uwTickFreq = HAL_TICK_FREQ_DEFAULT;
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -143,3 +144,5 @@ uint32_t HAL_GetHalVersion(void)
 {
     return __ST_HAL_VERSION;
 }
+
+#endif

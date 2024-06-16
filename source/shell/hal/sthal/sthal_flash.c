@@ -38,12 +38,12 @@ void HAL_FLASH_IRQHandler(void) {}
 
 __weak void HAL_FLASH_EndOfOperationCallback(uint32_t ReturnValue)
 {
-    UNUSED(ReturnValue);
+    VSF_UNUSED_PARAM(ReturnValue);
 }
 
 __weak void HAL_FLASH_OperationErrorCallback(uint32_t ReturnValue)
 {
-    UNUSED(ReturnValue);
+    VSF_UNUSED_PARAM(ReturnValue);
 }
 
 HAL_StatusTypeDef HAL_FLASH_Unlock(void)

@@ -79,6 +79,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef vsf_wdt_t WWDG_TypeDef;
+
 typedef struct {
     uint32_t Prescaler;
     uint32_t Window;

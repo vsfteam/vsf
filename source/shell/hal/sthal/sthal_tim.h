@@ -37,6 +37,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef vsf_timer_t TIM_TypeDef;
+
 typedef struct {
     uint32_t Prescaler;
     uint32_t CounterMode;
@@ -167,10 +169,10 @@ typedef struct
     HAL_TIM_ActiveChannel             Channel;
     DMA_HandleTypeDef                *hdma[7];
     HAL_LockTypeDef                   Lock;
-    __IO HAL_TIM_StateTypeDef         State;
-    __IO HAL_TIM_ChannelStateTypeDef  ChannelState[4];
-    __IO HAL_TIM_ChannelStateTypeDef  ChannelNState[4];
-    __IO HAL_TIM_DMABurstStateTypeDef DMABurstState;
+    volatile HAL_TIM_StateTypeDef         State;
+    volatile HAL_TIM_ChannelStateTypeDef  ChannelState[4];
+    volatile HAL_TIM_ChannelStateTypeDef  ChannelNState[4];
+    volatile HAL_TIM_DMABurstStateTypeDef DMABurstState;
 
 #if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
     void (*Base_MspInitCallback)(struct __TIM_HandleTypeDef *htim);

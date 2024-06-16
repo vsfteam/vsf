@@ -25,12 +25,9 @@ extern "C" {
 /*============================ INCLUDES ======================================*/
 
 #include <stddef.h>
+#include <stdint.h>
 
 /*============================ MACROS ========================================*/
-
-#if !defined(UNUSED)
-#    define UNUSED(X) (void)X
-#endif
 
 #define HAL_MAX_DELAY 0xFFFFFFFFU
 
@@ -61,91 +58,10 @@ extern "C" {
 #    ifndef __weak
 #        define __weak __attribute__((weak))
 #    endif
-#    ifndef __packed
-#        define __packed __attribute__((packed))
-#    endif
 #elif defined(__GNUC__) && !defined(__CC_ARM)
 #    ifndef __weak
 #        define __weak __attribute__((weak))
 #    endif
-#    ifndef __packed
-#        define __packed __attribute__((__packed__))
-#    endif
-#endif
-
-/* Macro to get variable aligned on 4-bytes, for __ICCARM__ the directive
- * "#pragma data_alignment=4" must be used instead */
-#if defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
-#    ifndef __ALIGN_BEGIN
-#        define __ALIGN_BEGIN
-#    endif
-#    ifndef __ALIGN_END
-#        define __ALIGN_END __attribute__((aligned(4)))
-#    endif
-#elif defined(__GNUC__) && !defined(__CC_ARM)
-#    ifndef __ALIGN_END
-#        define __ALIGN_END __attribute__((aligned(4)))
-#    endif
-#    ifndef __ALIGN_BEGIN
-#        define __ALIGN_BEGIN
-#    endif
-#else
-#    ifndef __ALIGN_END
-#        define __ALIGN_END
-#    endif
-#    ifndef __ALIGN_BEGIN
-#        if defined(__CC_ARM) /* ARM Compiler V5*/
-#            define __ALIGN_BEGIN __align(4)
-#        elif defined(__ICCARM__)
-#            define __ALIGN_BEGIN
-#        endif
-#    endif
-#endif
-
-#if defined(__CC_ARM) ||                                                       \
-    (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050))
-/* ARM Compiler V4/V5 and V6
-   --------------------------
-   RAM functions are defined using the toolchain options.
-   Functions that are executed in RAM should reside in a separate source module.
-   Using the 'Options for File' dialog you can simply change the 'Code / Const'
-   area of a module to a memory space in physical RAM.
-   Available memory areas are declared in the 'Target' tab of the 'Options for
-   Target' dialog.
-*/
-#    define __RAM_FUNC
-
-#elif defined(__ICCARM__)
-/* ICCARM Compiler
-   ---------------
-   RAM functions are defined using a specific toolchain keyword "__ramfunc".
-*/
-#    define __RAM_FUNC __ramfunc
-
-#elif defined(__GNUC__)
-/* GNU Compiler
-   ------------
-  RAM functions are defined using a specific toolchain attribute
-   "__attribute__((section(".RamFunc")))".
-*/
-#    define __RAM_FUNC __attribute__((section(".RamFunc")))
-
-#endif
-
-#if defined(__CC_ARM) ||                                                       \
-    (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)) ||              \
-    defined(__GNUC__)
-/* ARM V4/V5 and V6 & GNU Compiler
-   -------------------------------
-*/
-#    define __NOINLINE __attribute__((noinline))
-
-#elif defined(__ICCARM__)
-/* ICCARM Compiler
-   ---------------
-*/
-#    define __NOINLINE _Pragma("optimize = no_inline")
-
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -175,12 +175,12 @@ HAL_StatusTypeDef HAL_I2C_DeInit(I2C_HandleTypeDef *hi2c)
 
 __weak void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
 {
-    UNUSED(hi2c);
+    VSF_UNUSED_PARAM(hi2c);
 }
 
 __weak void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c)
 {
-    UNUSED(hi2c);
+    VSF_UNUSED_PARAM(hi2c);
 }
 
 #    if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)
@@ -576,22 +576,22 @@ void HAL_I2C_ER_IRQHandler(I2C_HandleTypeDef *hi2c) {}
 
 __weak void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-    UNUSED(hi2c);
+    VSF_UNUSED_PARAM(hi2c);
 }
 
 __weak void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-    UNUSED(hi2c);
+    VSF_UNUSED_PARAM(hi2c);
 }
 
 __weak void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-    UNUSED(hi2c);
+    VSF_UNUSED_PARAM(hi2c);
 }
 
 __weak void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-    UNUSED(hi2c);
+    VSF_UNUSED_PARAM(hi2c);
 }
 
 __weak void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c,
@@ -599,37 +599,37 @@ __weak void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c,
                                  uint16_t           AddrMatchCode)
 {
 
-    UNUSED(hi2c);
-    UNUSED(TransferDirection);
-    UNUSED(AddrMatchCode);
+    VSF_UNUSED_PARAM(hi2c);
+    VSF_UNUSED_PARAM(TransferDirection);
+    VSF_UNUSED_PARAM(AddrMatchCode);
 }
 
 __weak void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 
-    UNUSED(hi2c);
+    VSF_UNUSED_PARAM(hi2c);
 }
 
 __weak void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 
-    UNUSED(hi2c);
+    VSF_UNUSED_PARAM(hi2c);
 }
 
 __weak void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 
-    UNUSED(hi2c);
+    VSF_UNUSED_PARAM(hi2c);
 }
 
 __weak void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
 {
-    UNUSED(hi2c);
+    VSF_UNUSED_PARAM(hi2c);
 }
 
 __weak void HAL_I2C_AbortCpltCallback(I2C_HandleTypeDef *hi2c)
 {
-    UNUSED(hi2c);
+    VSF_UNUSED_PARAM(hi2c);
 }
 
 HAL_I2C_StateTypeDef HAL_I2C_GetState(I2C_HandleTypeDef *hi2c)

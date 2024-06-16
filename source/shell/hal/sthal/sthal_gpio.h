@@ -77,6 +77,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef vsf_gpio_t GPIO_TypeDef;
+
 typedef struct {
     uint32_t Pin;
     uint32_t Mode;

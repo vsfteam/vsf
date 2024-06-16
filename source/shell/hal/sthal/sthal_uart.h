@@ -24,7 +24,7 @@ extern "C" {
 
 /*============================ INCLUDES ======================================*/
 
-#include "sthal_def.h"
+#if VSF_HAL_USE_USART == ENABLED
 
 /*============================ MACROS ========================================*/
 
@@ -67,6 +67,8 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+typedef vsf_usart_t USART_TypeDef;
+
 typedef struct {
     uint32_t BaudRate;
     uint32_t WordLength;
@@ -93,20 +95,20 @@ typedef uint32_t HAL_UART_RxTypeTypeDef;
 typedef uint32_t HAL_UART_RxEventTypeTypeDef;
 
 typedef struct __UART_HandleTypeDef {
-    USART_TypeDef                   *Instance;
-    UART_InitTypeDef                 Init;
-    const uint8_t                   *pTxBuffPtr;
-    uint16_t                         TxXferSize;
-    __IO uint16_t                    TxXferCount;
-    uint8_t                         *pRxBuffPtr;
-    uint16_t                         RxXferSize;
-    __IO uint16_t                    RxXferCount;
-    __IO HAL_UART_RxTypeTypeDef      ReceptionType;
-    __IO HAL_UART_RxEventTypeTypeDef RxEventType;
-    HAL_LockTypeDef                  Lock;
-    __IO HAL_UART_StateTypeDef       gState;
-    __IO HAL_UART_StateTypeDef       RxState;
-    __IO uint32_t                    ErrorCode;
+    USART_TypeDef                       *Instance;
+    UART_InitTypeDef                     Init;
+    const uint8_t                       *pTxBuffPtr;
+    uint16_t                             TxXferSize;
+    volatile uint16_t                    TxXferCount;
+    uint8_t                             *pRxBuffPtr;
+    uint16_t                             RxXferSize;
+    volatile uint16_t                    RxXferCount;
+    volatile HAL_UART_RxTypeTypeDef      ReceptionType;
+    volatile HAL_UART_RxEventTypeTypeDef RxEventType;
+    HAL_LockTypeDef                      Lock;
+    volatile HAL_UART_StateTypeDef       gState;
+    volatile HAL_UART_StateTypeDef       RxState;
+    volatile uint32_t                    ErrorCode;
 
 #if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
     void (*TxHalfCpltCallback)(struct __UART_HandleTypeDef *huart);
@@ -234,6 +236,8 @@ HAL_StatusTypeDef UART_Start_Receive_IT(UART_HandleTypeDef *huart,
                                         uint8_t *pData, uint16_t Size);
 HAL_StatusTypeDef UART_Start_Receive_DMA(UART_HandleTypeDef *huart,
                                          uint8_t *pData, uint16_t Size);
+                                         
+#endif
 
 #ifdef __cplusplus
 }

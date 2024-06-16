@@ -46,49 +46,6 @@ extern "C" {
 #define USE_HAL_UART_REGISTER_CALLBACKS 1U
 
 /*============================ INCLUDES ======================================*/
-
-#include "sthal_devices.h"
-
-#ifdef HAL_GPIO_MODULE_ENABLED
-#    include "sthal_gpio.h"
-#endif
-
-#ifdef HAL_DMA_MODULE_ENABLED
-#    include "sthal_dma.h"
-#endif
-
-#ifdef HAL_ADC_MODULE_ENABLED
-#    include "sthal_adc.h"
-#endif
-
-#ifdef HAL_FLASH_MODULE_ENABLED
-#    include "sthal_flash.h"
-#endif
-
-#ifdef HAL_I2C_MODULE_ENABLED
-#    include "sthal_i2c.h"
-#endif
-
-#ifdef HAL_RTC_MODULE_ENABLED
-#    include "sthal_rtc.h"
-#endif
-
-#ifdef HAL_SPI_MODULE_ENABLED
-#    include "sthal_spi.h"
-#endif
-
-#ifdef HAL_TIM_MODULE_ENABLED
-#    include "sthal_tim.h"
-#endif
-
-#ifdef HAL_UART_MODULE_ENABLED
-#    include "sthal_uart.h"
-#endif
-
-#ifdef HAL_WWDG_MODULE_ENABLED
-#    include "sthal_wwdg.h"
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
