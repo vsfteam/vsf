@@ -32,6 +32,10 @@
     ((__ST_HAL_VERSION_MAIN << 24U) | (__ST_HAL_VERSION_SUB1 << 16U) |         \
      (__ST_HAL_VERSION_SUB2 << 8U) | (__ST_HAL_VERSION_RC))
 
+#ifndef VSF_STHAL_USE_VSFHAL_INIT
+#   define VSF_STHAL_USE_VSFHAL_INIT            DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -118,6 +122,9 @@ __weak void HAL_ResumeTick(void)
 
 HAL_StatusTypeDef HAL_Init(void)
 {
+#if VSF_STHAL_USE_VSFHAL_INIT == ENABLED
+    vsf_hal_init();
+#endif
     
 #if VSF_STHAL_USE_CALL_SYSTIMER_INIT == ENABLED
     extern vsf_err_t vsf_systimer_init(void);

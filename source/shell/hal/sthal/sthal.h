@@ -28,8 +28,8 @@ extern "C" {
 
 #include "hal/vsf_hal.h"
 
-#ifdef VSF_STHAL_HEADER
-#   include VSF_STHAL_HEADER
+#ifdef VSF_STHAL_CONF_HEADER
+#   include VSF_STHAL_CONF_HEADER
 #else
 #   include "sthal_conf_template.h"
 #endif
