@@ -20,17 +20,18 @@
 #include "hal/vsf_hal.h"
 #include "sthal.h"
 
+#if VSF_HAL_USE_USART == ENABLED
 #ifdef HAL_UART_MODULE_ENABLED
 
 /*============================ MACROS ========================================*/
 
-#    ifdef VSF_HAL_LV2_ST_HAL_USART_CFG_CALL_PREFIX
+#    ifdef VSF_STHAL_CFG_CALL_USART_PREFIX
 #        undef VSF_USART_CFG_PREFIX
-#        define VSF_USART_CFG_PREFIX VSF_HAL_LV2_ST_HAL_USART_CFG_CALL_PREFIX
+#        define VSF_USART_CFG_PREFIX VSF_STHAL_CFG_CALL_USART_PREFIX
 #    endif
 
 #    define STHAL_USART_RX_ERR_IRQ_MASK                                        \
-        (VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_OVERFLOW_ERR |             \
+        (VSF_USART_IRQ_MASK_OVERFLOW_ERR |             							\
          VSF_USART_IRQ_MASK_FRAME_ERR | VSF_USART_IRQ_MASK_BREAK_ERR |         \
          VSF_USART_IRQ_MASK_PARITY_ERR)
 
@@ -90,8 +91,6 @@ static void __usart_isr_handler(void *target_ptr, vsf_usart_t *usart,
         } else {
             VSF_HAL_ASSERT(0);
         }
-
-        irq_mask &= VSF_USART_IRQ_MASK_TX;
     }
 
     if (irq_mask & VSF_USART_IRQ_MASK_RX) {
@@ -107,7 +106,8 @@ static void __usart_isr_handler(void *target_ptr, vsf_usart_t *usart,
             }
 
             if (huart->RxXferCount == 0U) {
-                vsf_usart_irq_disable(usart, irq_mask);
+                vsf_usart_irq_disable(usart, irq_mask | STHAL_USART_RX_ERR_IRQ_MASK);
+
                 huart->RxState     = HAL_UART_STATE_READY;
                 huart->RxEventType = HAL_UART_RXEVENT_TC;
 
@@ -130,11 +130,12 @@ static void __usart_isr_handler(void *target_ptr, vsf_usart_t *usart,
         } else {
             VSF_HAL_ASSERT(0);
         }
-        irq_mask &= ~VSF_USART_IRQ_MASK_RX;
     }
 
     if (irq_mask & VSF_USART_IRQ_MASK_RX_CPL) {
-        irq_mask &= ~VSF_USART_IRQ_MASK_RX_CPL;
+
+        vsf_usart_irq_disable(usart, VSF_USART_IRQ_MASK_RX_CPL | STHAL_USART_RX_ERR_IRQ_MASK);
+
 #    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
         huart->RxCpltCallback(huart);
 #    else
@@ -143,7 +144,9 @@ static void __usart_isr_handler(void *target_ptr, vsf_usart_t *usart,
     }
 
     if (irq_mask & VSF_USART_IRQ_MASK_TX_CPL) {
-        irq_mask &= ~VSF_USART_IRQ_MASK_TX_CPL;
+
+        vsf_usart_irq_disable(usart, VSF_USART_IRQ_MASK_TX_CPL);
+
 #    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
         huart->TxCpltCallback(huart);
 #    else
@@ -152,6 +155,18 @@ static void __usart_isr_handler(void *target_ptr, vsf_usart_t *usart,
     }
 
     if (irq_mask & STHAL_USART_RX_ERR_IRQ_MASK) {
+        vsf_usart_irq_disable(usart, VSF_USART_IRQ_MASK_RX_CPL);
+
+        if (irq_mask & VSF_USART_IRQ_MASK_OVERFLOW_ERR) {
+            huart->ErrorCode |= HAL_UART_ERROR_ORE;
+        }
+        if (irq_mask & VSF_USART_IRQ_MASK_FRAME_ERR) {
+            huart->ErrorCode |= HAL_UART_ERROR_FE;
+        }
+        if (irq_mask & VSF_USART_IRQ_MASK_PARITY_ERR) {
+            huart->ErrorCode |= HAL_UART_ERROR_PE;
+        }
+
 #    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
         huart->ErrorCallback(huart);
 #    else
@@ -615,6 +630,8 @@ HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart,
         huart->ErrorCode = HAL_UART_ERROR_NONE;
         huart->gState    = HAL_UART_STATE_BUSY_TX;
 
+        vsf_usart_irq_enable(usart, VSF_USART_IRQ_MASK_TX_CPL);
+
         if (VSF_ERR_NONE != vsf_usart_request_tx(usart, (void *)pData, Size)) {
             return HAL_ERROR;
         }
@@ -646,6 +663,8 @@ HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart,
         huart->RxXferCount = Size;
         huart->ErrorCode   = HAL_UART_ERROR_NONE;
         huart->RxState     = HAL_UART_STATE_BUSY_RX;
+
+        vsf_usart_irq_enable(usart, VSF_USART_IRQ_MASK_RX_CPL | STHAL_USART_RX_ERR_IRQ_MASK);
 
         if (VSF_ERR_NONE != vsf_usart_request_rx(usart, (void *)pData, Size)) {
             return HAL_ERROR;
@@ -1011,4 +1030,5 @@ HAL_StatusTypeDef HAL_MultiProcessor_ExitMuteMode(UART_HandleTypeDef *huart)
     return HAL_ERROR;
 }
 
+#endif
 #endif
