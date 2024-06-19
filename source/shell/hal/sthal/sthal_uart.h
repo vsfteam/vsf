@@ -28,41 +28,41 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#define HAL_UART_ERROR_NONE 0x00000000U
-#define HAL_UART_ERROR_PE   0x00000001U
-#define HAL_UART_ERROR_NE   0x00000002U
-#define HAL_UART_ERROR_FE   0x00000004U
-#define HAL_UART_ERROR_ORE  0x00000008U
-#define HAL_UART_ERROR_DMA  0x00000010U
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
-#    define HAL_UART_ERROR_INVALID_CALLBACK 0x00000020U
-#endif
+#    define HAL_UART_ERROR_NONE 0x00000000U
+#    define HAL_UART_ERROR_PE   0x00000001U
+#    define HAL_UART_ERROR_NE   0x00000002U
+#    define HAL_UART_ERROR_FE   0x00000004U
+#    define HAL_UART_ERROR_ORE  0x00000008U
+#    define HAL_UART_ERROR_DMA  0x00000010U
+#    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+#        define HAL_UART_ERROR_INVALID_CALLBACK 0x00000020U
+#    endif
 
-#define HAL_UART_RXEVENT_TC   (0x00000000U)
-#define HAL_UART_RXEVENT_HT   (0x00000001U)
-#define HAL_UART_RXEVENT_IDLE (0x00000002U)
+#    define HAL_UART_RXEVENT_TC   (0x00000000U)
+#    define HAL_UART_RXEVENT_HT   (0x00000001U)
+#    define HAL_UART_RXEVENT_IDLE (0x00000002U)
 
-#define HAL_UART_RECEPTION_STANDARD (0x00000000U)
-#define HAL_UART_RECEPTION_TOIDLE   (0x00000001U)
+#    define HAL_UART_RECEPTION_STANDARD (0x00000000U)
+#    define HAL_UART_RECEPTION_TOIDLE   (0x00000001U)
 
-#define UART_WORDLENGTH_8B VSF_USART_8_BIT_LENGTH
-#define UART_WORDLENGTH_9B VSF_USART_9_BIT_LENGTH
+#    define UART_WORDLENGTH_8B VSF_USART_8_BIT_LENGTH
+#    define UART_WORDLENGTH_9B VSF_USART_9_BIT_LENGTH
 
-#define UART_STOPBITS_1 VSF_USART_1_STOPBIT
-#define UART_STOPBITS_2 VSF_USART_2_STOPBIT
+#    define UART_STOPBITS_1 VSF_USART_1_STOPBIT
+#    define UART_STOPBITS_2 VSF_USART_2_STOPBIT
 
-#define UART_PARITY_NONE VSF_USART_NO_PARITY
-#define UART_PARITY_EVEN VSF_USART_EVEN_PARITY
-#define UART_PARITY_ODD  VSF_USART_ODD_PARITY
+#    define UART_PARITY_NONE VSF_USART_NO_PARITY
+#    define UART_PARITY_EVEN VSF_USART_EVEN_PARITY
+#    define UART_PARITY_ODD  VSF_USART_ODD_PARITY
 
-#define UART_HWCONTROL_NONE    VSF_USART_NO_HWCONTROL
-#define UART_HWCONTROL_RTS     VSF_USART_RTS_HWCONTROL
-#define UART_HWCONTROL_CTS     VSF_USART_CTS_HWCONTROL
-#define UART_HWCONTROL_RTS_CTS VSF_USART_RTS_CTS_HWCONTROL
+#    define UART_HWCONTROL_NONE    VSF_USART_NO_HWCONTROL
+#    define UART_HWCONTROL_RTS     VSF_USART_RTS_HWCONTROL
+#    define UART_HWCONTROL_CTS     VSF_USART_CTS_HWCONTROL
+#    define UART_HWCONTROL_RTS_CTS VSF_USART_RTS_CTS_HWCONTROL
 
-#define UART_MODE_RX    (VSF_USART_TX_ENABLE | VSF_USART_RX_DISABLE)
-#define UART_MODE_TX    (VSF_USART_RX_ENABLE | VSF_USART_TX_DISABLE)
-#define UART_MODE_TX_RX (VSF_USART_TX_ENABLE | VSF_USART_RX_ENABLE)
+#    define UART_MODE_RX    (VSF_USART_TX_ENABLE | VSF_USART_RX_DISABLE)
+#    define UART_MODE_TX    (VSF_USART_RX_ENABLE | VSF_USART_TX_DISABLE)
+#    define UART_MODE_TX_RX (VSF_USART_TX_ENABLE | VSF_USART_RX_ENABLE)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -110,7 +110,7 @@ typedef struct __UART_HandleTypeDef {
     volatile HAL_UART_StateTypeDef       RxState;
     volatile uint32_t                    ErrorCode;
 
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+#    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
     void (*TxHalfCpltCallback)(struct __UART_HandleTypeDef *huart);
     void (*TxCpltCallback)(struct __UART_HandleTypeDef *huart);
     void (*RxHalfCpltCallback)(struct __UART_HandleTypeDef *huart);
@@ -123,10 +123,10 @@ typedef struct __UART_HandleTypeDef {
     void (*RxEventCallback)(struct __UART_HandleTypeDef *huart, uint16_t Pos);
     void (*MspInitCallback)(struct __UART_HandleTypeDef *huart);
     void (*MspDeInitCallback)(struct __UART_HandleTypeDef *huart);
-#endif
+#    endif
 } UART_HandleTypeDef;
 
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+#    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
 
 typedef enum {
     HAL_UART_TX_HALFCOMPLETE_CB_ID         = 0x00U,
@@ -148,7 +148,7 @@ typedef void (*pUART_CallbackTypeDef)(UART_HandleTypeDef *huart);
 typedef void (*pUART_RxEventCallbackTypeDef)(struct __UART_HandleTypeDef *huart,
                                              uint16_t                     Pos);
 
-#endif
+#    endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -164,7 +164,7 @@ HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart);
 void              HAL_UART_MspInit(UART_HandleTypeDef *huart);
 void              HAL_UART_MspDeInit(UART_HandleTypeDef *huart);
 
-#if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
+#    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
 HAL_StatusTypeDef HAL_UART_RegisterCallback(
     UART_HandleTypeDef *huart, HAL_UART_CallbackIDTypeDef CallbackID,
     pUART_CallbackTypeDef pCallback);
@@ -174,7 +174,7 @@ HAL_StatusTypeDef HAL_UART_UnRegisterCallback(
 HAL_StatusTypeDef HAL_UART_RegisterRxEventCallback(
     UART_HandleTypeDef *huart, pUART_RxEventCallbackTypeDef pCallback);
 HAL_StatusTypeDef HAL_UART_UnRegisterRxEventCallback(UART_HandleTypeDef *huart);
-#endif
+#    endif
 
 HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart,
                                     const uint8_t *pData, uint16_t Size,
@@ -236,7 +236,7 @@ HAL_StatusTypeDef UART_Start_Receive_IT(UART_HandleTypeDef *huart,
                                         uint8_t *pData, uint16_t Size);
 HAL_StatusTypeDef UART_Start_Receive_DMA(UART_HandleTypeDef *huart,
                                          uint8_t *pData, uint16_t Size);
-                                         
+
 #endif
 
 #ifdef __cplusplus
