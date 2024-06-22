@@ -34,6 +34,18 @@ namespace std {
         }
     };
 
+    class recursive_mutex : public mutex {
+    protected:
+        pthread_mutexattr_t __attr;
+    public:
+        recursive_mutex() noexcept {
+            pthread_mutexattr_init(&__attr);
+            pthread_mutexattr_settype(&__attr, PTHREAD_MUTEX_RECURSIVE);
+            pthread_mutex_init(&__mutex, (const pthread_mutexattr_t *)&__attr);
+        }
+        ~recursive_mutex() = default;
+    };
+
     template<typename Mutex>
     class lock_guard {
     private:

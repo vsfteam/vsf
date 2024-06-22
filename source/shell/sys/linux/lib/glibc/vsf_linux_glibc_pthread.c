@@ -572,7 +572,7 @@ int pthread_mutexattr_getpshared(pthread_mutexattr_t *mattr, int *pshared)
     return EINVAL;
 }
 
-int pthread_mutexattr_settype(pthread_mutexattr_t *mattr , int type)
+int pthread_mutexattr_settype(pthread_mutexattr_t *mattr, int type)
 {
     if (mattr != NULL) {
         mattr->attr |= type;
@@ -581,7 +581,7 @@ int pthread_mutexattr_settype(pthread_mutexattr_t *mattr , int type)
     return EINVAL;
 }
 
-int pthread_mutexattr_gettype(pthread_mutexattr_t *mattr , int *type)
+int pthread_mutexattr_gettype(pthread_mutexattr_t *mattr, int *type)
 {
     if (mattr != NULL) {
         if (type != NULL) {
