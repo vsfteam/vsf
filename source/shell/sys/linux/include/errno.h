@@ -148,6 +148,7 @@ extern "C" {
 #define ENOTSUP         EOPNOTSUPP
 
 #define errno           (*__vsf_linux_errno())
+#define program_invocation_short_name   "unknown"
 
 #if VSF_LINUX_APPLET_USE_ERRNO == ENABLED
 typedef struct vsf_linux_errno_vplt_t {
