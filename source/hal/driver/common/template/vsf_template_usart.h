@@ -332,7 +332,6 @@ extern vsf_err_t vsf_usart_init(vsf_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr
  \~chinese
  @brief 终止一个 usart 实例
  @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
- @param[in] cfg_ptr: 结构体 vsf_usart_cfg_t 的指针，参考 @ref vsf_usart_cfg_t
  @return 无。
  */
 extern void vsf_usart_fini(vsf_usart_t *usart_ptr);
@@ -341,13 +340,11 @@ extern void vsf_usart_fini(vsf_usart_t *usart_ptr);
  \~english
  @brief enable interrupt masks of usart instance.
  @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
- @param[in] irq_mask: one or more value of enum @ref vsf_usart_irq_mask_t
  @return none.
 
  \~chinese
  @brief 使能 usart 实例的中断
  @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
- @param[in] irq_mask: 一个或者多个枚举 vsf_usart_irq_mask_t 的值的按位或，@ref vsf_usart_irq_mask_t
  @return 无。
  */
 extern fsm_rt_t vsf_usart_enable(vsf_usart_t *usart_ptr);
@@ -356,13 +353,11 @@ extern fsm_rt_t vsf_usart_enable(vsf_usart_t *usart_ptr);
  \~english
  @brief disable interrupt masks of usart instance.
  @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
- @param[in] irq_mask: one or more value of enum vsf_usart_irq_mask_t, @ref vsf_usart_irq_mask_t
  @return none.
 
  \~chinese
  @brief 禁能 usart 实例的中断
  @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
- @param[in] irq_mask: 一个或者多个枚举 vsf_usart_irq_mask_t 的值的按位或，@ref vsf_usart_irq_mask_t
  @return 无。
  */
 extern fsm_rt_t vsf_usart_disable(vsf_usart_t *usart_ptr);
@@ -429,7 +424,7 @@ extern vsf_usart_capability_t vsf_usart_capability(vsf_usart_t *usart_ptr);
  \~english
  @brief get the number of data currently received in the usart receive fifo
  @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
- @return vsf_usart_capability_t: return all capability of current usart @ref vsf_usart_capability_t
+ @return uint_fast16_t: return the number of data currently in the usart receive queue.
 
  \~chinese
  @brief 获取 usart 接收队列里当前收到的数据的个数
