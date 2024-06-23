@@ -25,7 +25,8 @@ extern "C" {
 #   else
 #       define _CONST_RETURN
 #   endif
-#else
+#elif !__IS_COMPILER_IAR__
+// mbstate_t is defined in uchar.h in IAR
 #   define _CONST_RETURN
 typedef struct {
     unsigned long wc;
