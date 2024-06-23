@@ -365,8 +365,8 @@ namespace std {
         size_t __length;
     };
 
-    // char_traits should be define in <iosfwd>
-#if 0
+    // char_traits should be define in <iosfwd>, but not for __WIN__
+#ifdef __WIN__
     template <class T, class IntT>
     struct _char_traits {
         typedef T char_type;
