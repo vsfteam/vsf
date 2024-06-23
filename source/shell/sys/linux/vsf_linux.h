@@ -435,7 +435,7 @@ extern void vsf_linux_loader_keep_ram(void);
 // IMPORTANT: priority of stdio_stream MUST be within scheduler priorities
 extern vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream);
 
-extern vsf_systimer_tick_t vsf_linux_sleep(vsf_systimer_tick_t ticks);
+extern vsf_systimer_tick_t vsf_linux_sleep(vsf_timeout_tick_t ticks);
 
 // used for dynamic libraries, allocate/free memory from resources_process
 extern vsf_linux_process_t * vsf_linux_resources_process(void);

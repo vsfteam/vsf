@@ -47,6 +47,7 @@ extern "C" {
 
 #define usleep              VSF_LINUX_WRAPPER(usleep)
 #define sleep               VSF_LINUX_WRAPPER(sleep)
+#define pause               VSF_LINUX_WRAPPER(pause)
 
 #define getlogin            VSF_LINUX_WRAPPER(getlogin)
 #define getlogin_r          VSF_LINUX_WRAPPER(getlogin_r)
@@ -242,6 +243,7 @@ typedef struct vsf_linux_unistd_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(confstr);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(usleep);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sleep);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pause);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(alarm);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ualarm);
 
@@ -271,6 +273,7 @@ typedef struct vsf_linux_unistd_vplt_t {
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__execl_va);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(execl);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(execle);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__execlp_va);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(execlp);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(execv);
@@ -373,9 +376,9 @@ extern __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt;
 #define VSF_LINUX_APPLET_UNISTD_IMP(...)                                        \
             VSF_APPLET_VPLT_ENTRY_FUNC_IMP(VSF_LINUX_APPLET_UNISTD_VPLT, __VA_ARGS__)
 
-VSF_LINUX_APPLET_UNISTD_IMP(__execl_va, exec_ret_t, const char *pathname, const char *arg, va_list ap) {
+VSF_LINUX_APPLET_UNISTD_IMP(__execl_va, exec_ret_t, const char *pathname, const char *arg, va_list ap, bool has_env) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    return VSF_LINUX_APPLET_UNISTD_ENTRY(__execl_va)(pathname, arg, ap);
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(__execl_va)(pathname, arg, ap, has_env);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(__execlp_va, exec_ret_t, const char *pathname, const char *arg, va_list ap) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -392,6 +395,10 @@ VSF_LINUX_APPLET_UNISTD_IMP(usleep, int, int micro_seconds) {
 VSF_LINUX_APPLET_UNISTD_IMP(sleep, unsigned, unsigned seconds) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(sleep)(seconds);
+}
+VSF_LINUX_APPLET_UNISTD_IMP(pause, int, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(pause)();
 }
 VSF_LINUX_APPLET_UNISTD_IMP(alarm, unsigned int, unsigned int seconds) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -751,7 +758,16 @@ VSF_APPLET_VPLT_FUNC_DECORATOR(execl) exec_ret_t execl(const char *pathname, con
 
     va_list ap;
     va_start(ap, arg);
-        ret = VSF_LINUX_APPLET_UNISTD_ENTRY(__execl_va)(pathname, arg, ap);
+        ret = VSF_LINUX_APPLET_UNISTD_ENTRY(__execl_va)(pathname, arg, ap, false);
+    va_end(ap);
+    return ret;
+}
+VSF_APPLET_VPLT_FUNC_DECORATOR(execle) exec_ret_t execle(const char *pathname, const char *arg, ...) {
+    exec_ret_t ret;
+
+    va_list ap;
+    va_start(ap, arg);
+        ret = VSF_LINUX_APPLET_UNISTD_ENTRY(__execl_va)(pathname, arg, ap, true);
     va_end(ap);
     return ret;
 }
@@ -771,6 +787,7 @@ size_t confstr(int name, char *buf, size_t len);
 
 int usleep(int micro_seconds);
 unsigned sleep(unsigned seconds);
+int pause(void);
 
 unsigned int alarm(unsigned int seconds);
 useconds_t ualarm(useconds_t usecs, useconds_t interval);
@@ -800,6 +817,7 @@ int setresuid(uid_t ruid, uid_t euid, uid_t suid);
 int setresgid(gid_t rgid, gid_t egid, gid_t sgid);
 
 exec_ret_t execl(const char *pathname, const char *arg, ...);
+exec_ret_t execle(const char *pathname, const char *arg, ...);
 exec_ret_t execlp(const char *file, const char *arg, ...);
 exec_ret_t execv(const char *pathname, char * const * argv);
 exec_ret_t execve(const char *pathname, char * const * argv, char * const * envp);

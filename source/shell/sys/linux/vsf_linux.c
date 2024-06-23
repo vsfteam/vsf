@@ -2237,7 +2237,7 @@ exec_ret_t execv(const char *pathname, char * const * argv)
     return execve(pathname, argv, NULL);
 }
 
-static exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, va_list ap, char *path)
+static exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char *arg, va_list ap, char *path, bool has_env)
 {
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(process != NULL);
@@ -2282,6 +2282,11 @@ static exec_ret_t __vsf_linux_execlp_va(vsf_linux_main_entry_t entry, const char
     }
     ctx->entry = entry;
 
+    if (has_env) {
+        args = va_arg(ap2, const char *);
+        vsf_linux_merge_env(process, (char **)args);
+    }
+
     return __vsf_linux_exec_start(
 #if VSF_LINUX_USE_VFORK == ENABLED
         parent_process,
@@ -2307,10 +2312,11 @@ exec_ret_t __execlp_va(const char *pathname, const char *arg, va_list ap)
     }
     return __vsf_linux_execlp_va(entry, arg, ap,
 #if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
-            localpath
+            localpath,
 #else
-            NULL
+            NULL,
 #endif
+            false
         );
 }
 
@@ -2325,7 +2331,7 @@ exec_ret_t execlp(const char *pathname, const char *arg, ...)
     return ret;
 }
 
-exec_ret_t __execl_va(const char *pathname, const char *arg, va_list ap)
+exec_ret_t __execl_va(const char *pathname, const char *arg, va_list ap, bool has_env)
 {
     vsf_linux_main_entry_t entry;
 #if __VSF_LINUX_PROCESS_HAS_PATH
@@ -2343,10 +2349,11 @@ exec_ret_t __execl_va(const char *pathname, const char *arg, va_list ap)
     }
     return __vsf_linux_execlp_va(entry, arg, ap,
 #if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
-            localpath
+            localpath£¬
 #else
-            NULL
+            NULL£¬
 #endif
+            has_env
         );
 }
 
@@ -2356,7 +2363,18 @@ exec_ret_t execl(const char *pathname, const char *arg, ...)
 
     va_list ap;
     va_start(ap, arg);
-        ret = __execl_va(pathname, arg, ap);
+        ret = __execl_va(pathname, arg, ap, false);
+    va_end(ap);
+    return ret;
+}
+
+exec_ret_t execle(const char *pathname, const char *arg, ...)
+{
+    exec_ret_t ret;
+
+    va_list ap;
+    va_start(ap, arg);
+        ret = __execl_va(pathname, arg, ap, true);
     va_end(ap);
     return ret;
 }
@@ -2935,14 +2953,14 @@ char * getpass(const char *prompt)
 }
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-vsf_systimer_tick_t vsf_linux_sleep(vsf_systimer_tick_t ticks)
+vsf_systimer_tick_t vsf_linux_sleep(vsf_timeout_tick_t ticks)
 {
     vsf_systimer_tick_t realticks;
     vsf_linux_trigger_t trigger;
     vsf_linux_trigger_init(&trigger);
 
     realticks = vsf_systimer_get_tick();
-    vsf_linux_trigger_pend(&trigger, (vsf_timeout_tick_t)ticks);
+    vsf_linux_trigger_pend(&trigger, ticks);
     realticks = vsf_systimer_get_elapsed(realticks);
 
     return ticks > realticks ? ticks - realticks : 0;
@@ -2960,6 +2978,12 @@ unsigned sleep(unsigned sec)
 {
     vsf_systimer_tick_t ticks_remain = vsf_linux_sleep(vsf_systimer_ms_to_tick(sec * 1000));
     return vsf_systimer_tick_to_ms(ticks_remain) / 1000;
+}
+
+int pause(void)
+{
+    vsf_linux_sleep((vsf_timeout_tick_t)-1);
+    return -1;
 }
 #endif
 
