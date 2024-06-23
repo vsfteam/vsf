@@ -49,6 +49,7 @@
 #   include "./include/sys/timex.h"
 #   include "./include/sys/resource.h"
 #   include "./include/sys/sysinfo.h"
+#   include "./include/sys/xattr.h"
 #   include "./include/fcntl.h"
 #   include "./include/errno.h"
 #   include "./include/termios.h"
@@ -83,6 +84,7 @@
 #   include <sys/timex.h>
 #   include <sys/resource.h>
 #   include <sys/sysinfo.h>
+#   include <sys/xattr.h>
 #   include <fcntl.h>
 #   include <errno.h>
 #   include <termios.h>
@@ -2349,7 +2351,7 @@ exec_ret_t __execl_va(const char *pathname, const char *arg, va_list ap, bool ha
     }
     return __vsf_linux_execlp_va(entry, arg, ap,
 #if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
-            localpath£¬
+            localpath,
 #else
             NULL£¬
 #endif
@@ -3327,6 +3329,53 @@ int reboot(int howto)
         vsf_arch_reset();
         break;
     }
+    return 0;
+}
+
+// sys/xattr.h
+
+int removexattr(const char *path, const char *name)
+{
+    return 0;
+}
+
+int lremovexattr(const char *path, const char *name)
+{
+    return 0;
+}
+
+int fremovexattr(int fd, const char *name)
+{
+    return 0;
+}
+
+int setxattr(const char *path, const char *name, const void *value, size_t size, int flags)
+{
+    return 0;
+}
+
+int lsetxattr(const char *path, const char *name, const void *value, size_t size, int flags)
+{
+    return 0;
+}
+
+int fsetxattr(int fd, const char *name, const void *value, size_t size, int flags)
+{
+    return 0;
+}
+
+ssize_t getxattr(const char *path, const char *name, void *value, size_t size)
+{
+    return 0;
+}
+
+ssize_t lgetxattr(const char *path, const char *name, void *value, size_t size)
+{
+    return 0;
+}
+
+ssize_t fgetxattr(int fd, const char *name, void *value, size_t size)
+{
     return 0;
 }
 
@@ -5139,6 +5188,22 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_reboot_vplt_t vsf_linux_sys_reboot_vplt = {
 };
 #endif
 
+#if VSF_LINUX_APPLET_USE_SYS_XATTR == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_xattr_vplt_t vsf_linux_sys_xattr_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_xattr_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(removexattr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(lremovexattr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(fremovexattr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(setxattr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(lsetxattr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(fsetxattr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getxattr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(lgetxattr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(fgetxattr),
+};
+#endif
+
 #if VSF_LINUX_APPLET_USE_SYS_STATFS == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_sys_statfs_vplt_t vsf_linux_sys_statfs_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_sys_statfs_vplt_t, 0, 0, true),
@@ -5322,6 +5387,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #endif
 #if VSF_LINUX_APPLET_USE_SYS_IOCTL == ENABLED
     .sys_ioctl_vplt     = (void *)&vsf_linux_sys_ioctl_vplt,
+#endif
+#if VSF_LINUX_APPLET_USE_SYS_XATTR == ENABLED
+    .sys_xattr_vplt     = (void *)&vsf_linux_sys_xattr_vplt,
 #endif
 
 #if VSF_LINUX_APPLET_USE_UNISTD == ENABLED
