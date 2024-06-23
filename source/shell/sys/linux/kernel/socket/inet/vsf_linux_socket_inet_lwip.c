@@ -49,9 +49,12 @@
 #include "../vsf_linux_socket.h"
 
 #include "lwip/tcpip.h"
+// avoid to include lwip/inet.h for conflictions
+//#include "lwip/inet.h"
 #include "lwip/api.h"
 #include "lwip/ip.h"
 #include "lwip/tcp.h"
+#include "lwip/udp.h"
 #include "lwip/dns.h"
 
 /*============================ MACROS ========================================*/
@@ -75,6 +78,11 @@
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define inet_addr_from_ip4addr(target_inaddr, source_ipaddr) ((target_inaddr)->s_addr = ip4_addr_get_u32(source_ipaddr))
+#define inet_addr_to_ip4addr(target_ipaddr, source_inaddr)   (ip4_addr_set_u32(target_ipaddr, (source_inaddr)->s_addr))
+#define inet_addr_to_ip4addr_p(target_ip4addr_p, source_inaddr)   ((target_ip4addr_p) = (ip4_addr_t*)&((source_inaddr)->s_addr))
+
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_linux_socket_inet_priv_t {
@@ -335,6 +343,7 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
             }
             // fall through
         case SO_KEEPALIVE:
+        case SO_REUSEADDR:
             optname = lwip_sockopt_to_ipopt(optname);
             if (*(const int *)optval) {
                 ip_set_option(conn->pcb.ip, optname);
@@ -347,19 +356,6 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
             break;
         case SO_RCVBUF:
             netconn_set_recvbufsize(conn, *(const int *)optval);
-            break;
-        case SO_REUSEADDR:
-            if (    (optname == SO_BROADCAST)
-                &&  (NETCONNTYPE_GROUP(netconn_type(conn)) != NETCONN_UDP)) {
-                return ENOPROTOOPT;
-            }
-
-            optname = lwip_sockopt_to_ipopt(optname);
-            if (*(const int *)optval) {
-                ip_set_option(conn->pcb.ip, optname);
-            } else {
-                ip_reset_option(conn->pcb.ip, optname);
-            }
             break;
 #if LWIP_SO_RCVTIMEO
         case SO_RCVTIMEO: {
@@ -390,10 +386,88 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
             }
             break;
 #endif
+#if LWIP_UDP
+        case SO_NO_CHECK:
+#if LWIP_UDPLITE
+            if ((udp_flags(conn->pcb.udp) & UDP_FLAGS_UDPLITE) != 0) {
+                return EAFNOSUPPORT;
+            }
+#endif
+            if (*(const int*)optval) {
+                udp_setflags(conn->pcb.udp, udp_flags(conn->pcb.udp) | UDP_FLAGS_NOCHKSUM);
+            } else {
+                udp_setflags(conn->pcb.udp, udp_flags(conn->pcb.udp) & ~UDP_FLAGS_NOCHKSUM);
+            }
+            break;
+#endif
+#if 0
+        case SO_BINDTODEVICE: {
+                const struct ifreq *iface;
+                struct netif *n = NULL;
+
+                iface = (const struct ifreq *)optval;
+                if (iface->ifr_name[0] != 0) {
+                    n = netif_find(iface->ifr_name);
+                    if (n == NULL) {
+                        return ENODEV;
+                    }
+                }
+
+                switch (NETCONNTYPE_GROUP(netconn_type(conn))) {
+#if LWIP_TCP
+                case NETCONN_TCP:
+                    tcp_bind_netif(conn->pcb.tcp, n);
+                    break;
+#endif
+#if LWIP_UDP
+                case NETCONN_UDP:
+                    udp_bind_netif(conn->pcb.udp, n);
+                    break;
+#endif
+#if LWIP_RAW
+                case NETCONN_RAW:
+                    raw_bind_netif(conn->pcb.raw, n);
+                    break;
+#endif
+                default:
+                    LWIP_ASSERT("Unhandled netconn type in SO_BINDTODEVICE", 0);
+                    break;
+                }
+            }
+            break;
+#endif
         default:
             // TODO: add support
             VSF_LINUX_ASSERT(false);
             break;
+        }
+        break;
+    case IPPROTO_IP:
+        switch (optname) {
+        case IP_TTL:
+            conn->pcb.ip->ttl = (u8_t)(*(const int*)optval);
+            break;
+        case IP_TOS:
+            conn->pcb.ip->tos = (u8_t)(*(const int*)optval);
+            break;
+#if LWIP_MULTICAST_TX_OPTIONS
+        case IP_MULTICAST_TTL:
+            udp_set_multicast_ttl(conn->pcb.udp, (u8_t)(*(const u8_t*)optval));
+            break;
+        case IP_MULTICAST_IF: {
+                ip4_addr_t if_addr;
+                inet_addr_to_ip4addr(&if_addr, (const struct in_addr*)optval);
+                udp_set_multicast_netif_addr(conn->pcb.udp, &if_addr);
+            }
+            break;
+        case IP_MULTICAST_LOOP:
+            if (*(const u8_t*)optval) {
+                udp_setflags(conn->pcb.udp, udp_flags(conn->pcb.udp) | UDP_FLAGS_MULTICAST_LOOP);
+            } else {
+                udp_setflags(conn->pcb.udp, udp_flags(conn->pcb.udp) & ~UDP_FLAGS_MULTICAST_LOOP);
+            }
+            break;
+#endif
         }
         break;
     case IPPROTO_TCP:
@@ -502,9 +576,50 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
             }
             break;
 #endif
+#if LWIP_UDP
+        case SO_NO_CHECK:
+#if LWIP_UDPLITE
+            if ((udp_flags(conn->pcb.udp) & UDP_FLAGS_UDPLITE) != 0) {
+                return EAFNOSUPPORT;
+            }
+#endif
+            *(int*)optval = (udp_flags(conn->pcb.udp) & UDP_FLAGS_NOCHKSUM) ? 1 : 0;
+            break;
+#endif
         default:
             VSF_LINUX_ASSERT(false);
             break;
+        }
+        break;
+    case IPPROTO_IP:
+        switch (optname) {
+        case IP_TTL:
+            *(int*)optval = conn->pcb.ip->ttl;
+            break;
+        case IP_TOS:
+            *(int*)optval = conn->pcb.ip->tos;
+            break;
+#if LWIP_MULTICAST_TX_OPTIONS
+        case IP_MULTICAST_TTL:
+            if (NETCONNTYPE_GROUP(netconn_type(conn)) != NETCONN_UDP) {
+                return ENOPROTOOPT;
+            }
+            *(u8_t*)optval = udp_get_multicast_ttl(conn->pcb.udp);
+            break;
+        case IP_MULTICAST_IF:
+            if (NETCONNTYPE_GROUP(netconn_type(conn)) != NETCONN_UDP) {
+                return ENOPROTOOPT;
+            }
+            inet_addr_from_ip4addr((struct in_addr*)optval, udp_get_multicast_netif_addr(conn->pcb.udp));
+            break;
+        case IP_MULTICAST_LOOP:
+            if ((conn->pcb.udp->flags & UDP_FLAGS_MULTICAST_LOOP) != 0) {
+                *(u8_t*)optval = 1;
+            } else {
+                *(u8_t*)optval = 0;
+            }
+            break;
+#endif /* LWIP_MULTICAST_TX_OPTIONS */
         }
         break;
     case IPPROTO_TCP:
