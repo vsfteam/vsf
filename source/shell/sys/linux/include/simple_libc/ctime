@@ -1,0 +1,17 @@
+#include <time.h>
+
+namespace std {
+    using ::clock_t;
+    using ::size_t;
+    using ::time_t;
+    using ::tm;
+    using ::asctime;
+    using ::clock;
+    using ::ctime;
+    using ::difftime;
+    using ::gmtime;
+    using ::localtime;
+    using ::mktime;
+    using ::strftime;
+    using ::time;
+};

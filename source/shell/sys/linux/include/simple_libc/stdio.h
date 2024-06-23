@@ -113,6 +113,12 @@ extern "C" {
 typedef off64_t             fpos_t;
 typedef off64_t             fpos64_t;
 
+// fpos_t here is not compatible with fpos_t in DLib, so _FPOSOFF MUST be redefined
+#if __IS_COMPILER_IAR__
+#   undef _FPOSOFF
+#   define _FPOSOFF(__FPOS) (__FPOS)
+#endif
+
 #ifdef __WIN__
 #   define sprintf_s        snprintf
 #   define _scprintf        printf

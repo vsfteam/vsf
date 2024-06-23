@@ -34,6 +34,9 @@ typedef __WINT_TYPE__               wint_t;
 #else
 typedef unsigned short              wint_t;
 #endif
+#if __IS_COMPILER_IAR__
+#   define                          _WINTT
+#endif
 
 // include compiler detect only, do not include compiler.h
 #include "utilities/compiler/compiler_detect.h"
@@ -89,6 +92,11 @@ typedef struct {
 } max_align_t;
 #   endif
 #else
+typedef long double max_align_t;
+#endif
+
+#if __IS_COMPILER_IAR__
+typedef void *nullptr_t;
 #endif
 
 #if defined(__PTRDIFF_TYPE__)

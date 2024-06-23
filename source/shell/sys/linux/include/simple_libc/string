@@ -103,6 +103,25 @@ namespace std {
     }
 
     template <class T>
+    constexpr static T * __strrstr(const T *start, const T *end, const T *sub)
+    {
+        T *r = nullptr, *p;
+
+        end -= __strlen(sub);
+        if (sub[0] == T(0)) {
+            return end;
+        }
+        while (1) {
+            p = __strstr(start, sub);
+            if (!p || (p > end)) {
+                return r;
+            }
+            r = p;
+            start = p + 1;
+        }
+    }
+
+    template <class T>
     class array_base {
     public:
         typedef T *iterator;
@@ -282,6 +301,18 @@ namespace std {
         {
             return replace(pos, 0, n, t);
         }
+        array_base<T> & insert(size_t pos, const T *s)
+        {
+            return replace(pos, 0, s, strlen(s));
+        }
+        iterator insert(const_iterator pos, T t)
+        {
+            if ((const_iterator)nullptr == pos) {
+                return (iterator)nullptr;
+            }
+            replace(pos - &__array[0], 0, 1, t);
+            return (iterator)(pos + 1);
+        }
         array_base<T> & erase(size_t pos, size_t len)
         {
             return replace(pos, len, nullptr, 0);
@@ -334,6 +365,8 @@ namespace std {
         size_t __length;
     };
 
+    // char_traits should be define in <iosfwd>
+#if 0
     template <class T, class IntT>
     struct _char_traits {
         typedef T char_type;
@@ -417,7 +450,7 @@ namespace std {
     struct char_traits<char16_t> : _char_traits<char16_t, uint_least16_t> {};
     template <>
     struct char_traits<char32_t> : _char_traits<char32_t, uint_least32_t> {};
-
+#endif
     template <class T, class Traits = char_traits<T>, class Alloc = allocator<T>>
     class basic_string : public array_base<T> {
     public:
@@ -572,6 +605,12 @@ namespace std {
             size_t len = vsf_min(lsize, rsize) + 1;
             return Traits::compare(c_str(), right.c_str(), len);
         }
+        int compare(size_t pos1, size_t count1, const T *s) const
+        {
+            size_t lsize = length();
+            size_t len = vsf_min(lsize, count1) + 1;
+            return Traits::compare(c_str() + pos1, s, len);
+        }
         basic_string<T, Traits, Alloc> & substr(size_t start = 0, size_t count = npos) const
         {
             size_t len = length();
@@ -607,6 +646,28 @@ namespace std {
         {
             T str[2] = { c, T(0) };
             return find(str, pos);
+        }
+        size_t rfind(const T *str, size_t pos = npos) const
+        {
+            const T *start = c_str();
+            size_t len = length();
+            if (pos >= len) {
+                pos = len;
+            }
+            T *found = __strrstr(start, start + pos, str);
+            if (found) {
+                return (found - start) / sizeof(T);
+            }
+            return npos;
+        }
+        size_t rfind(const basic_string<T, Traits, Alloc> &str, size_t pos = npos) const
+        {
+            return find(str.c_str(), pos);
+        }
+        size_t rfind(T c, size_t pos = npos) const
+        {
+            T str[2] = { c, T(0) };
+            return rfind(str, pos);
         }
 
         basic_string<T, Traits, Alloc> & replace(size_t pos, size_t len, const T *str, size_t sublen = -1)
@@ -950,5 +1011,6 @@ namespace std {
 }
 
 #include <string_view>
+#include <ios>
 
 #endif      // __SIMPLE_LIBC_STRING__
