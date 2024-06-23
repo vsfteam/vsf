@@ -2353,7 +2353,7 @@ exec_ret_t __execl_va(const char *pathname, const char *arg, va_list ap, bool ha
 #if __VSF_LINUX_PROCESS_HAS_PATH && VSF_LINUX_CFG_LINK_FILE == ENABLED
             localpath,
 #else
-            NULL£¬
+            NULL,
 #endif
             has_env
         );
