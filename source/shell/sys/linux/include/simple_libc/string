@@ -109,7 +109,7 @@ namespace std {
 
         end -= __strlen(sub);
         if (sub[0] == T(0)) {
-            return end;
+            return (T *)end;
         }
         while (1) {
             p = __strstr(start, sub);
@@ -1012,5 +1012,8 @@ namespace std {
 
 #include <string_view>
 #include <ios>
+
+#include <istream>
+#include <ostream>
 
 #endif      // __SIMPLE_LIBC_STRING__

@@ -121,7 +121,7 @@ namespace std {
         using value_type = T;
 
     private:
-        T __fetch_add(T val, memory_order sync = memory_order_seq_cst) noexcept {
+        T __fetch_add(T val, memory_order sync = memory_order_seq_cst) volatile noexcept {
             T tmp;
             vsf_protect_t orig = vsf_protect_int();
                 tmp = atomic_base<T>::__base;
@@ -129,7 +129,7 @@ namespace std {
             vsf_unprotect_int(orig);
             return tmp;
         }
-        T __fetch_sub(T val, memory_order sync = memory_order_seq_cst) noexcept {
+        T __fetch_sub(T val, memory_order sync = memory_order_seq_cst) volatile noexcept {
             T tmp;
             vsf_protect_t orig = vsf_protect_int();
                 tmp = atomic_base<T>::__base;
@@ -137,7 +137,7 @@ namespace std {
             vsf_unprotect_int(orig);
             return tmp;
         }
-        T __fetch_and(T val, memory_order sync = memory_order_seq_cst) noexcept {
+        T __fetch_and(T val, memory_order sync = memory_order_seq_cst) volatile noexcept {
             T tmp;
             vsf_protect_t orig = vsf_protect_int();
                 tmp = atomic_base<T>::__base;
@@ -145,7 +145,7 @@ namespace std {
             vsf_unprotect_int(orig);
             return tmp;
         }
-        T __fetch_or(T val, memory_order sync = memory_order_seq_cst) noexcept {
+        T __fetch_or(T val, memory_order sync = memory_order_seq_cst) volatile noexcept {
             T tmp;
             vsf_protect_t orig = vsf_protect_int();
                 tmp = atomic_base<T>::__base;
@@ -153,7 +153,7 @@ namespace std {
             vsf_unprotect_int(orig);
             return tmp;
         }
-        T __fetch_xor(T val, memory_order sync = memory_order_seq_cst) noexcept {
+        T __fetch_xor(T val, memory_order sync = memory_order_seq_cst) volatile noexcept {
             T tmp;
             vsf_protect_t orig = vsf_protect_int();
                 tmp = atomic_base<T>::__base;
@@ -162,7 +162,7 @@ namespace std {
             return tmp;
         }
 
-        bool __compare_exchange(T &expected, T desired) noexcept
+        bool __compare_exchange(T &expected, T desired) volatile noexcept
         {
             T tmp;
             bool res;
