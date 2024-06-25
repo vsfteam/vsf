@@ -1013,7 +1013,8 @@ namespace std {
 #include <string_view>
 #include <ios>
 
-#include <istream>
-#include <ostream>
+// do not include istream/ostream
+//#include <ostream>
+//#include <istream>
 
 #endif      // __SIMPLE_LIBC_STRING__
