@@ -1011,9 +1011,9 @@ namespace std {
 }
 
 #include <string_view>
-#include <ios>
 
-// do not include istream/ostream
+// do not include istream/ostream/ios until tested OK on Windows
+//#include <ios>
 //#include <ostream>
 //#include <istream>
 
