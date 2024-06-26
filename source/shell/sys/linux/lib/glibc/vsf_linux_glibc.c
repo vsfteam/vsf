@@ -42,6 +42,8 @@
 #   include "../../include/simple_libc/math/math.h"
 #endif
 
+#include <resolv.h>
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -255,43 +257,43 @@ void vsf_linux_glibc_init(void)
 
 // b64_ntop and b64_pton from https://github.com/yasuoka/base64
 
-int b64_ntop(u_char *src, size_t srclength, char *target, size_t target_size)
+int b64_ntop(const unsigned char *src, int srclen, char *dst, size_t dstlen)
 {
     int i, j, expect_siz;
     uint32_t bit24;
     const char b64str[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-    expect_siz = ((srclength + 2) / 3) * 4 + 1;
+    expect_siz = ((srclen + 2) / 3) * 4 + 1;
 
-    if (target == NULL)
+    if (dst == NULL)
         return (expect_siz);
-    if (target_size < expect_siz)
+    if (dstlen < expect_siz)
         return (-1);
 
-    for (i = 0, j = 0; i < srclength; i += 3) {
+    for (i = 0, j = 0; i < srclen; i += 3) {
         bit24 = src[i] << 16;
-        if (i + 1 < srclength)
+        if (i + 1 < srclen)
             bit24 |= src[i + 1] << 8;
-        if (i + 2 < srclength)
+        if (i + 2 < srclen)
             bit24 |= src[i + 2];
 
-        target[j++] = b64str[(bit24 & 0xfc0000) >> 18];
-        target[j++] = b64str[(bit24 & 0x03f000) >> 12];
-        if (i + 1 < srclength)
-            target[j++] = b64str[(bit24 & 0x000fc0) >> 6];
+        dst[j++] = b64str[(bit24 & 0xfc0000) >> 18];
+        dst[j++] = b64str[(bit24 & 0x03f000) >> 12];
+        if (i + 1 < srclen)
+            dst[j++] = b64str[(bit24 & 0x000fc0) >> 6];
         else
-            target[j++] = '=';
-        if (i + 2 < srclength)
-            target[j++] = b64str[(bit24 & 0x00003f)];
+            dst[j++] = '=';
+        if (i + 2 < srclen)
+            dst[j++] = b64str[(bit24 & 0x00003f)];
         else
-            target[j++] = '=';
+            dst[j++] = '=';
     }
-    target[j] = '\0';
+    dst[j] = '\0';
 
     return j;
 }
 
-int b64_pton(const char *src, u_char *dst, size_t dstsiz)
+int b64_pton(char *src, unsigned char *dst, size_t dstlen)
 {
     int i, j, k;
     uint32_t val3 = 0;
@@ -320,7 +322,7 @@ int b64_pton(const char *src, u_char *dst, size_t dstsiz)
             return(-1);
         val3 |= b64_tbl[(u_char)src[i]];
         if (src[i] != '=') {
-            if (dst != NULL && k >= (ssize_t)dstsiz)
+            if (dst != NULL && k >= (ssize_t)dstlen)
                 return (-1);
             if (j % 4 == 1) {
                 if (dst != NULL)
