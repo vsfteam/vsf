@@ -41,6 +41,7 @@ typedef int nfds_t;
 #define POLLRDBAND      (1 << 7)
 #define POLLWRNORM      (1 << 8)
 #define POLLWRBAND      (1 << 9)
+#define POLLRDHUP       (1 << 10)
 
 struct pollfd {
     int fd;

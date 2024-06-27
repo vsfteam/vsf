@@ -1173,7 +1173,8 @@ void vsf_linux_process_heap_free(vsf_linux_process_t *process, void *buffer)
 {
     if (buffer != NULL) {
         process = vsf_linux_get_real_process(process);
-        if (NULL == process->heap) {
+        // if process is NULL, means not in linux environment, maybe allocating for C++ static instance
+        if (NULL == process || NULL == process->heap) {
             vsf_heap_free(buffer);
         } else {
             __vsf_heap_free(process->heap, buffer);

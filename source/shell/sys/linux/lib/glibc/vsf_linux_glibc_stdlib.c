@@ -69,14 +69,6 @@ static void __vsf_linux_heap_trace_alloc(vsf_linux_process_t *process,
         const char *file, const char *func, int line
 )
 {
-    if (NULL == process) {
-        process = vsf_linux_get_cur_process();
-    }
-    // if process is NULL, means not in linux environment, maybe allocating for C++ static instance
-    if (NULL == process) {
-        return;
-    }
-
     node->ptr = ptr;
     node->size = size;
 #   if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
@@ -86,17 +78,26 @@ static void __vsf_linux_heap_trace_alloc(vsf_linux_process_t *process,
 #   endif
     vsf_dlist_init_node(vsf_liunx_heap_node_t, node, node);
 
-    vsf_protect_t orig = vsf_protect_sched();
-        vsf_dlist_add_to_tail(vsf_liunx_heap_node_t, node, &process->heap_monitor.list, node);
-        process->heap_monitor.usage += size;
+    if (NULL == process) {
+        process = vsf_linux_get_cur_process();
+    }
+    if (process != NULL) {
+        vsf_protect_t orig = vsf_protect_sched();
+            vsf_dlist_add_to_tail(vsf_liunx_heap_node_t, node, &process->heap_monitor.list, node);
+            process->heap_monitor.usage += size;
 #   if VSF_LINUX_SIMPLE_STDLIB_HEAP_MONITOR_MAX == ENABLED
-        if (process->heap_monitor.usage > process->heap_monitor.max_usage) {
-            process->heap_monitor.max_usage = process->heap_monitor.usage;
-        }
+            if (process->heap_monitor.usage > process->heap_monitor.max_usage) {
+                process->heap_monitor.max_usage = process->heap_monitor.usage;
+            }
 #   endif
-        process->heap_monitor.balance++;
-//        vsf_trace_debug("0x%p: +%d 0x%p\n", process, node->size, ptr);
-    vsf_unprotect_sched(orig);
+            process->heap_monitor.balance++;
+//            vsf_trace_debug("0x%p: +%d 0x%p\n", process, node->size, ptr);
+        vsf_unprotect_sched(orig);
+    } else {
+#ifdef __WIN__
+//        __vsf_arch_trace(0, "arch: +%d 0x%p\n", node->size, ptr);
+#endif
+    }
 }
 
 static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, vsf_liunx_heap_node_t *node, void *ptr)
@@ -104,14 +105,18 @@ static void __vsf_linux_heap_trace_free(vsf_linux_process_t *process, vsf_liunx_
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
     }
-    VSF_LINUX_ASSERT(process != NULL);
-
-    vsf_protect_t orig = vsf_protect_sched();
-//        vsf_trace_debug("0x%p: -%d 0x%p\n", process, node->size, ptr);
-        process->heap_monitor.usage -= node->size;
-        process->heap_monitor.balance--;
-        vsf_dlist_remove(vsf_liunx_heap_node_t, node, &process->heap_monitor.list, node);
-    vsf_unprotect_sched(orig);
+    if (process != NULL) {
+        vsf_protect_t orig = vsf_protect_sched();
+//            vsf_trace_debug("0x%p: -%d 0x%p\n", process, node->size, ptr);
+            process->heap_monitor.usage -= node->size;
+            process->heap_monitor.balance--;
+            vsf_dlist_remove(vsf_liunx_heap_node_t, node, &process->heap_monitor.list, node);
+        vsf_unprotect_sched(orig);
+    } else {
+#ifdef __WIN__
+//        __vsf_arch_trace(0, "arch: -%d 0x%p\n", node->size, ptr);
+#endif
+    }
 }
 
 void __free_ex(vsf_linux_process_t *process, void *ptr)
@@ -841,6 +846,95 @@ void * calloc(size_t n, size_t size)
 {
     return __calloc_ex(NULL, n, size);
 }
+
+#ifdef __WIN__
+// avoid linking ucrt.debug_heap
+
+void _CrtDumpMemoryLeaks(void){}
+void _CrtSetDbgFlag(void){}
+void _CrtSetDumpClient(void){}
+
+void *_malloc_dbg(size_t size, int blockType, const char *filename, int linenumber)
+{
+    return malloc(size);
+}
+
+void * _calloc_dbg(size_t num, size_t size, int blockType, const char *filename, int linenumber)
+{
+    size *= num;
+    void *result = _malloc_dbg(size, blockType, filename, linenumber);
+    if (result != 0) {
+        memset(result, 0, size);
+    }
+    return result;
+}
+
+void * _aligned_malloc_dbg(size_t size, size_t alignment, const char *filename, int linenumber)
+{
+    return aligned_alloc(alignment, size);
+}
+
+void _free_dbg(void *p, int blockType)
+{
+    free(p);
+}
+
+void _aligned_free_dbg(void *p)
+{
+    free(p);
+}
+
+void * _aligned_offset_malloc_dbg(size_t size, size_t alignment, size_t offset, const char *filename, int linenumber)
+{
+    return _aligned_malloc_dbg(size, alignment, filename, linenumber);
+}
+
+size_t _aligned_msize_dbg(void *p, size_t alignment, size_t offset)
+{
+    return malloc_usable_size(p);
+}
+
+void * _realloc_dbg(void *p, size_t size, int blockType, const char *filename, int linenumber)
+{
+    return realloc(p, size);
+}
+
+void * _aligned_realloc_dbg(void *p, size_t size, size_t alignment, const char *filename, int linenumber)
+{
+    return realloc(p, size);
+}
+
+void * _aligned_offset_realloc_dbg(void *p, size_t size, size_t alignment, size_t offset, const char *filename, int linenumber)
+{
+    return _aligned_realloc_dbg(p, size, alignment, filename, linenumber);
+}
+
+void * _recalloc_dbg(void *p, size_t num, size_t size, int blockType, const char *filename, int linenumber)
+{
+    size *= num;
+    void *result = _realloc_dbg(p, size, blockType, filename, linenumber);
+    if (result != 0) {
+        memset(result, 0, size);
+    }
+    return result;
+}
+
+void * _aligned_recalloc_dbg(void *p, size_t num, size_t size, size_t alignment, const char *filename, int linenumber)
+{
+    size *= num;
+    void *result = _aligned_realloc_dbg(p, size, alignment, filename, linenumber);
+    if (result != 0) {
+        memset(result, 0, size);
+    }
+    return result;
+}
+
+void * _aligned_offset_recalloc_dbg(void *p, size_t num, size_t size, size_t alignment, size_t offset, const char *filename, int linenumber)
+{
+    return _aligned_recalloc_dbg(p, num * size, alignment, offset, filename, linenumber);
+}
+
+#endif
 
 #if VSF_LINUX_APPLET_USE_LIBC_STDLIB == ENABLED && !defined(__VSF_APPLET__)
 
