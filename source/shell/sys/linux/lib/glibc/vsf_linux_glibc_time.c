@@ -588,6 +588,49 @@ int timespec_get(struct timespec *ts, int base)
     return base;
 }
 
+#ifdef __WIN__
+// functions below is necessary to avoid linking usrt/strftime.o
+//  add implementation if asserted in functions below
+char * _Getdays_l(void *locale)
+{
+    VSF_LINUX_ASSERT(false);
+    return NULL;
+}
+
+char * _Getdays(void)
+{
+    return _Getdays_l(NULL);
+}
+
+char * _Getmonths_l(void *locale)
+{
+    VSF_LINUX_ASSERT(false);
+    return NULL;
+}
+
+char * _Getmonths(void)
+{
+    return _Getmonths_l(NULL);
+}
+
+void * _Gettnames(void)
+{
+    VSF_LINUX_ASSERT(false);
+    return NULL;
+}
+
+size_t _Strftime_l(char *buf, size_t bufsize, const char *format, const struct tm *time, void *arg, void *locale)
+{
+    VSF_LINUX_ASSERT(false);
+    return 0;
+}
+
+int _Strftime(char *buf, size_t bufsize, const char *format, const struct tm *time, void *arg)
+{
+    return _Strftime_l(buf, bufsize, format, time, arg, NULL);
+}
+#endif
+
 #if VSF_LINUX_APPLET_USE_LIBC_TIME == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_time_vplt_t vsf_linux_libc_time_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_time_vplt_t, 0, 0, true),
