@@ -5849,9 +5849,6 @@
     <ClCompile Include="..\..\..\..\source\utilities\language_extension\simple_swprintf.c">
       <Filter>vsf\utilities\language_externsion</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibcpp_stdio.cpp">
-      <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\driver\common\gpio\gpio_common.c">
       <Filter>vsf\hal\driver\common\gpio</Filter>
     </ClCompile>
@@ -6040,6 +6037,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\utilities\compiler\vsf_compiler.c">
       <Filter>vsf\utilities\compiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibcpp.cc">
+      <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
