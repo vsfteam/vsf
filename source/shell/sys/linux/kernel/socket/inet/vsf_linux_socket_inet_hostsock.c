@@ -61,6 +61,7 @@ struct dirent64 {
 
 #if defined(__WIN__)
 #   include <WinSock2.h>
+#   include <ws2tcpip.h>
 #   pragma comment (lib, "ws2_32.lib")
 #elif defined(__LINUX__) || defined(__linux__) || defined(__MACOS__)
 #   include <unistd.h>
@@ -108,6 +109,12 @@ struct dirent64 {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+union host_sockaddr {
+    struct sockaddr sa;
+    struct sockaddr_in si;
+    struct sockaddr_in6 si6;
+};
+
 // need to sync types/constants below with the real definitions in vsf
 // from vsf_linux.h
 vsf_class(vsf_linux_trigger_t) {
@@ -154,6 +161,7 @@ extern int VSF_LINUX_WRAPPER(poll)(struct vsf_linux_pollfd *fds, vsf_linux_nfds_
 #define VSF_LINUX_SOCKET_INVALID_SOCKET -1
 #define VSF_LINUX_SOCKET_SOCKET_ERROR   -1
 #define VSF_LINUX_SOCKET_AF_INET        2
+#define VSF_LINUX_SOCKET_AF_INET6       10
 #define VSF_LINUX_SOCKET_SOCK_STREAM    1
 #define VSF_LINUX_SOCKET_SOCK_DGRAM     2
 #define VSF_LINUX_SOCKET_SOCK_RAW       3
@@ -191,12 +199,12 @@ enum {
 typedef uint32_t vsf_socklen_t;
 typedef uint16_t vsf_linux_socket_sa_family_t;
 struct vsf_linux_socket_sockaddr {
-    vsf_linux_socket_sa_family_t sa_family;
-    char sa_data[14];
+    vsf_linux_socket_sa_family_t        sa_family;
+    char                                sa_data[32];
 };
 struct vsf_linux_socket_linger {
-    int l_onoff;
-    int l_linger;
+    int                                 l_onoff;
+    int                                 l_linger;
 };
 
 // from netinet/in.h
@@ -204,13 +212,25 @@ typedef uint32_t vsf_in_addr_t;
 typedef uint16_t vsf_in_port_t;
 struct vsf_linux_socket_in_addr {
     // s_addr maybe MACRO
-    vsf_in_addr_t __s_addr;
+    vsf_in_addr_t                       __s_addr;
 };
 struct vsf_linux_socket_sockaddr_in {
-    vsf_linux_socket_sa_family_t sin_family;
-    vsf_in_port_t sin_port;
-    struct vsf_linux_socket_in_addr sin_addr;
-    char sin_zero[8];
+    vsf_linux_socket_sa_family_t        sin_family;
+    vsf_in_port_t                       sin_port;
+    struct vsf_linux_socket_in_addr     sin_addr;
+    char                                sin_zero[8];
+};
+
+struct vsf_linux_socket_in6_addr {
+    // s6_addr maybe MACRO
+    uint8_t                             __s6_addr[16];
+};
+struct vsf_linux_socket_sockaddr_in6 {
+    vsf_linux_socket_sa_family_t        sin6_family;
+    vsf_in_port_t                       sin6_port;
+    uint32_t                            sin6_flowinfo;
+    struct vsf_linux_socket_in6_addr    sin6_addr;
+    uint32_t                            sin6_scope_id;
 };
 
 // from netinet/tcp.h
@@ -549,31 +569,53 @@ __assert_fail:
 static void __vsf_linux_sockaddr2host(const struct vsf_linux_socket_sockaddr *sockaddr,
                     struct sockaddr *hsockaddr)
 {
-    struct vsf_linux_socket_sockaddr_in *sockaddr_in = (struct vsf_linux_socket_sockaddr_in *)sockaddr;
-    struct sockaddr_in *hsockaddr_in = (struct sockaddr_in *)hsockaddr;
-
-    switch (sockaddr_in->sin_family) {
+    switch (sockaddr->sa_family) {
     case 0:
-    case VSF_LINUX_SOCKET_AF_INET:  hsockaddr_in->sin_family = AF_INET; break;
-    default:                        VSF_LINUX_ASSERT(false);
+    case VSF_LINUX_SOCKET_AF_INET: {
+            struct vsf_linux_socket_sockaddr_in *sockaddr_in = (struct vsf_linux_socket_sockaddr_in *)sockaddr;
+            struct sockaddr_in *hsockaddr_in = (struct sockaddr_in *)hsockaddr;
+            hsockaddr_in->sin_family = AF_INET;
+            hsockaddr_in->sin_port = sockaddr_in->sin_port;
+            hsockaddr_in->sin_addr.s_addr = sockaddr_in->sin_addr.__s_addr;
+        }
+        break;
+    case VSF_LINUX_SOCKET_AF_INET6: {
+            struct vsf_linux_socket_sockaddr_in6 *sockaddr_in = (struct vsf_linux_socket_sockaddr_in6 *)sockaddr;
+            struct sockaddr_in6 *hsockaddr_in = (struct sockaddr_in6 *)hsockaddr;
+            hsockaddr_in->sin6_family = AF_INET6;
+            hsockaddr_in->sin6_port = sockaddr_in->sin6_port;
+            memcpy(&hsockaddr_in->sin6_addr, &sockaddr_in->sin6_addr, sizeof(hsockaddr_in->sin6_addr));
+        }
+        break;
+    default:
+        VSF_LINUX_ASSERT(false);
     }
-    hsockaddr_in->sin_port = sockaddr_in->sin_port;
-    hsockaddr_in->sin_addr.s_addr = sockaddr_in->sin_addr.__s_addr;
 }
 
 static void __vsf_linux_sockaddr2vsf(const struct sockaddr *hsockaddr,
                     struct vsf_linux_socket_sockaddr *sockaddr)
 {
-    struct vsf_linux_socket_sockaddr_in *sockaddr_in = (struct vsf_linux_socket_sockaddr_in *)sockaddr;
-    struct sockaddr_in *hsockaddr_in = (struct sockaddr_in *)hsockaddr;
-
-    switch (hsockaddr_in->sin_family) {
+    switch (hsockaddr->sa_family) {
     case 0:
-    case AF_INET:   sockaddr_in->sin_family = VSF_LINUX_SOCKET_AF_INET; break;
-    default:        VSF_LINUX_ASSERT(false);
+    case AF_INET: {
+            struct vsf_linux_socket_sockaddr_in *sockaddr_in = (struct vsf_linux_socket_sockaddr_in *)sockaddr;
+            struct sockaddr_in *hsockaddr_in = (struct sockaddr_in *)hsockaddr;
+            sockaddr_in->sin_family = VSF_LINUX_SOCKET_AF_INET;
+            sockaddr_in->sin_port = hsockaddr_in->sin_port;
+            sockaddr_in->sin_addr.__s_addr = hsockaddr_in->sin_addr.s_addr;
+        }
+        break;
+    case AF_INET6: {
+            struct vsf_linux_socket_sockaddr_in6 *sockaddr_in = (struct vsf_linux_socket_sockaddr_in6 *)sockaddr;
+            struct sockaddr_in6 *hsockaddr_in = (struct sockaddr_in6 *)hsockaddr;
+            sockaddr_in->sin6_family = VSF_LINUX_SOCKET_AF_INET6;
+            sockaddr_in->sin6_port = hsockaddr_in->sin6_port;
+            memcpy(&sockaddr_in->sin6_addr, &hsockaddr_in->sin6_addr, sizeof(sockaddr_in->sin6_addr));
+        }
+        break;
+    default:
+        VSF_LINUX_ASSERT(false);
     }
-    sockaddr_in->sin_port = hsockaddr_in->sin_port;
-    sockaddr_in->sin_addr.__s_addr = hsockaddr_in->sin_addr.s_addr;
 }
 
 static unsigned long __vsf_linux_timeval_to_ms(const struct vsf_linux_timeval *t)
@@ -609,6 +651,7 @@ static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
 
     switch (socket_priv->domain) {
     case VSF_LINUX_SOCKET_AF_INET:      priv->hdomain = AF_INET;        break;
+    case VSF_LINUX_SOCKET_AF_INET6:     priv->hdomain = AF_INET6;       break;
     default:                            goto assert_fail;
     }
     switch (socket_priv->type) {
@@ -881,8 +924,8 @@ static int __vsf_linux_socket_inet_bind(vsf_linux_socket_priv_t *socket_priv,
                     const struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t addrlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
-    struct sockaddr hsockaddr = { 0 };
-    __vsf_linux_sockaddr2host(addr, &hsockaddr);
+    union host_sockaddr hsockaddr = { 0 };
+    __vsf_linux_sockaddr2host(addr, &hsockaddr.sa);
     int ret = bind(priv->hostsock, (const struct sockaddr *)&hsockaddr, sizeof(hsockaddr));
     return SOCKET_ERROR == ret ? VSF_LINUX_SOCKET_SOCKET_ERROR : ret;
 }
@@ -891,7 +934,7 @@ static int __vsf_linux_socket_inet_connect(vsf_linux_socket_priv_t *socket_priv,
                     const struct vsf_linux_socket_sockaddr *addr, vsf_socklen_t addrlen)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
-    struct sockaddr hsockaddr = { 0 };
+    union host_sockaddr hsockaddr = { 0 };
     __vsf_linux_sockaddr2host(addr, &hsockaddr);
     int ret = connect(priv->hostsock, &hsockaddr, sizeof(hsockaddr));
     if (    (SOCKET_ERROR == ret)
@@ -940,7 +983,7 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
     }
 
     if (dst_addr != NULL) {
-        struct sockaddr hsockaddr = { 0 };
+        union host_sockaddr hsockaddr = { 0 };
         __vsf_linux_sockaddr2host(dst_addr, &hsockaddr);
         ret = sendto(priv->hostsock, buffer, size, __vsf_linux_sockflag2host(flags), &hsockaddr, sizeof(hsockaddr));
     } else {

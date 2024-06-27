@@ -71,12 +71,12 @@ typedef uint32_t                socklen_t;
 typedef uint16_t                sa_family_t;
 struct sockaddr {
     sa_family_t                 sa_family;
-    char                        sa_data[14];
+    char                        sa_data[32];
 };
 struct sockaddr_storage {
     sa_family_t                 ss_family;
     // TODO: need to be larger?
-    char                        sa_data[14];
+    char                        sa_data[32];
 };
 
 struct linger {
