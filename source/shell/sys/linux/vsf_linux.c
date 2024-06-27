@@ -1149,7 +1149,8 @@ void * vsf_linux_process_heap_malloc_aligned(vsf_linux_process_t *process, uint_
 void * vsf_linux_process_heap_malloc(vsf_linux_process_t *process, size_t size)
 {
     process = vsf_linux_get_real_process(process);
-    if (NULL == process->heap) {
+    // if process is NULL, means not in linux environment, maybe allocating for C++ static instance
+    if (NULL == process || NULL == process->heap) {
         return vsf_heap_malloc(size);
     } else {
         return __vsf_heap_malloc_aligned(process->heap, size, 0);

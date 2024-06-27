@@ -72,7 +72,10 @@ static void __vsf_linux_heap_trace_alloc(vsf_linux_process_t *process,
     if (NULL == process) {
         process = vsf_linux_get_cur_process();
     }
-    VSF_LINUX_ASSERT(process != NULL);
+    // if process is NULL, means not in linux environment, maybe allocating for C++ static instance
+    if (NULL == process) {
+        return;
+    }
 
     node->ptr = ptr;
     node->size = size;
