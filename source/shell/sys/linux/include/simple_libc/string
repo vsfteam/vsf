@@ -578,7 +578,17 @@ namespace std {
         }
         basic_string<T, Traits, Alloc> & append(const T *arr, size_t num)
         {
-            array_base<T>::append(arr, num);
+            if (num > 0) {
+                bool append_null = arr[num - 1] != '\0';
+                if (append_null) {
+                    num++;
+                }
+                array_base<T>::append(arr, num);
+                if (append_null) {
+                    T *end = (T *)array_base<T>::rbegin();
+                    *end = T(0);
+                }
+            }
             return (*this);
         }
         basic_string<T, Traits, Alloc> & append(const T *str)
