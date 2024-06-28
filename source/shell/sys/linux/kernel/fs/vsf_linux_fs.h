@@ -94,6 +94,7 @@ vsf_class(vsf_linux_fd_priv_t) {
         short user_data;
 
         struct {
+            short pendind_events;
             void *param;
             void (*cb)(vsf_linux_fd_priv_t *priv, void *param, short events, vsf_protect_t orig);
         } events_callback;

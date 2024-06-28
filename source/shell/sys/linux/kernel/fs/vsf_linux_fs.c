@@ -729,6 +729,7 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
 
         orig = vsf_protect_sched();
         vsf_dlist_add_to_head(vsf_linux_epoll_node_t, fd_node, &epoll_priv->fd_list, node);
+        priv->events_callback.pendind_events = node->events;
         priv->events_callback.param = epoll_priv;
         priv->events_callback.cb = __vsf_linux_epoll_on_events;
         events_triggered = priv->events & node->events;
@@ -1099,6 +1100,7 @@ short vsf_linux_fd_pend_events(vsf_linux_fd_priv_t *priv, short events, vsf_linu
             .events     = events,
             .trig       = &fd_trigger,
         };
+        priv->events_callback.pendind_events = events;
         priv->events_callback.param = &pfd;
         priv->events_callback.cb = __vsf_linux_fd_on_events;
         vsf_unprotect_sched(orig);
@@ -1195,6 +1197,7 @@ int __vsf_linux_poll_tick(struct pollfd *fds, nfds_t nfds, vsf_timeout_tick_t ti
             priv = sfd->priv;
             fds[i].events_triggered = 0;
             fds[i].trig = &fd_trigger;
+            priv->events_callback.pendind_events = fds[i].events;
             priv->events_callback.param = &fds[i];
             priv->events_callback.cb = __vsf_linux_fd_on_events;
         }
@@ -2906,7 +2909,8 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
         }
 
         orig = vsf_protect_sched();
-        VSF_LINUX_ASSERT(NULL == sfd->priv->events_callback.cb);
+        VSF_LINUX_ASSERT(   (NULL == priv->events_callback.cb)
+                        ||  !(priv->events_callback.pendind_events & POLLIN));
         if (!vsf_stream_get_data_size(stream)) {
             __vsf_linux_stream_evt(priv, orig, POLLIN, false);
         } else {
@@ -2951,7 +2955,8 @@ ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t co
         }
 
         orig = vsf_protect_sched();
-        VSF_LINUX_ASSERT(NULL == sfd->priv->events_callback.cb);
+        VSF_LINUX_ASSERT(   (NULL == priv->events_callback.cb)
+                        ||  !(priv->events_callback.pendind_events & POLLOUT));
         if (!vsf_stream_get_free_size(stream)) {
             __vsf_linux_stream_evt(priv, orig, POLLOUT, false);
         } else {
