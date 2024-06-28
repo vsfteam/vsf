@@ -481,7 +481,13 @@ namespace std {
         basic_string<T, Traits, Alloc>()
             : array_base<T>(nullptr, 0) { }
         basic_string<T, Traits, Alloc>(const T *arr, size_t num)
-            : array_base<T>(arr, num) { }
+            : array_base<T>(nullptr, (arr != NULL) && (num > 0) && (arr[num - 1] != T(0)) ? num + 1 : num)
+        {
+            __memcpy((T *)c_str(), arr, num);
+            if (array_base<T>::length() > num) {
+                ((T *)c_str())[array_base<T>::length() - 1] = T(0);
+            }
+        }
         basic_string<T, Traits, Alloc>(size_t n, T c, const allocator_type &a = allocator_type())
             : array_base<T>(n)
         {
