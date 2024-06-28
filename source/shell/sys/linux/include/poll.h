@@ -50,6 +50,7 @@ struct pollfd {
 
     // private
     short events_triggered;
+    vsf_linux_fd_priv_callback_t *callback;
     void *trig;
 };
 

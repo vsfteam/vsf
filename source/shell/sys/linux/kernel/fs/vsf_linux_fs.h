@@ -56,6 +56,7 @@ extern "C" {
 vsf_dcl_class(vsf_linux_fd_t)
 vsf_dcl_class(vsf_linux_trigger_t)
 vsf_dcl_class(vsf_linux_process_t)
+vsf_dcl_class(vsf_linux_fd_priv_t)
 
 enum {
     VSF_LINUX_FDOP_FEATURE_FS       = 1 << 0,
@@ -79,6 +80,12 @@ typedef struct vsf_linux_fd_op_t {
     int (*fn_msync)(vsf_linux_fd_t *sfd, void *buffer);
 } vsf_linux_fd_op_t;
 
+typedef struct vsf_linux_fd_priv_callback_t {
+    short pendind_events;
+    void *param;
+    void (*cb)(vsf_linux_fd_priv_t *priv, void *param, short events, vsf_protect_t orig);
+} vsf_linux_fd_priv_callback_t;
+
 vsf_class(vsf_linux_fd_priv_t) {
     protected_member(
         // target is used in socket_unix to indicate message for sendmsg/recvmsg,
@@ -93,11 +100,7 @@ vsf_class(vsf_linux_fd_priv_t) {
         short sticky_events;
         short user_data;
 
-        struct {
-            short pendind_events;
-            void *param;
-            void (*cb)(vsf_linux_fd_priv_t *priv, void *param, short events, vsf_protect_t orig);
-        } events_callback;
+        vsf_linux_fd_priv_callback_t events_callback[2];
     )
     private_member(
         int ref;
@@ -235,6 +238,8 @@ extern int vsf_linux_fd_add_feature(int fd, uint_fast32_t feature);
 extern int vsf_linux_fd_set_size(int fd, uint64_t size);
 
 // vsf_linux_fd_xx_trigger/vsf_linux_fd_xx_pend MUST be called scheduler protected
+vsf_linux_fd_priv_callback_t * vsf_linux_fd_claim_calback(vsf_linux_fd_priv_t *priv);
+void vsf_linux_fd_release_calback(vsf_linux_fd_priv_t *priv, vsf_linux_fd_priv_callback_t *callback);
 extern short vsf_linux_fd_pend_events(vsf_linux_fd_priv_t *priv, short events, vsf_linux_trigger_t *trig, vsf_protect_t orig);
 extern void vsf_linux_fd_set_events(vsf_linux_fd_priv_t *priv, short events, vsf_protect_t orig);
 extern void vsf_linux_fd_set_status(vsf_linux_fd_priv_t *priv, short status, vsf_protect_t orig);

@@ -974,11 +974,17 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
     int ret;
 
     if (!priv->is_nonblock && !(flags & VSF_LINUX_SOCKET_MSG_DONTWAIT) && (priv->hprotocol != IPPROTO_UDP)) {
-        vsf_linux_trigger_t trig;
-        vsf_linux_trigger_init(&trig);
-        short events = vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLOUT, &trig, vsf_protect_sched());
-        if (!(events & VSF_LINUX_POLLOUT)) {
-            return VSF_LINUX_SOCKET_INVALID_SOCKET;
+        vsf_protect_t orig = vsf_protect_sched();
+        if (!vsf_linux_fd_get_status(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLOUT)) {
+            vsf_linux_trigger_t trig;
+            vsf_linux_trigger_init(&trig);
+
+            short events = vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLOUT, &trig, orig);
+            if (!(events & VSF_LINUX_POLLOUT)) {
+                return VSF_LINUX_SOCKET_INVALID_SOCKET;
+            }
+        } else {
+            vsf_unprotect_sched(orig);
         }
     }
 
@@ -1002,11 +1008,17 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
     int ret;
 
     if (!priv->is_nonblock && !(flags & VSF_LINUX_SOCKET_MSG_DONTWAIT)) {
-        vsf_linux_trigger_t trig;
-        vsf_linux_trigger_init(&trig);
-        short events = vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLIN, &trig, vsf_protect_sched());
-        if (!(events & VSF_LINUX_POLLIN)) {
-            return VSF_LINUX_SOCKET_INVALID_SOCKET;
+        vsf_protect_t orig = vsf_protect_sched();
+        if (!vsf_linux_fd_get_status(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLIN)) {
+            vsf_linux_trigger_t trig;
+            vsf_linux_trigger_init(&trig);
+
+            short events = vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, VSF_LINUX_POLLIN, &trig, orig);
+            if (!(events & VSF_LINUX_POLLIN)) {
+                return VSF_LINUX_SOCKET_INVALID_SOCKET;
+            }
+        } else {
+            vsf_unprotect_sched(orig);
         }
     }
 
