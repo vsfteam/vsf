@@ -2867,6 +2867,7 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
     VSF_LINUX_ASSERT(stream != NULL);
     uint_fast32_t size = count, cursize;
     vsf_protect_t orig;
+    ssize_t result;
 
     while (size > 0) {
         orig = vsf_protect_sched();
@@ -2954,7 +2955,9 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
     }
 
 do_return:
-    return count - size;
+    result = count - size;
+    // return 0 means EOF
+    return 0 == result ? -1 : result;
 }
 
 ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
