@@ -481,11 +481,12 @@ namespace std {
         basic_string<T, Traits, Alloc>()
             : array_base<T>(nullptr, 0) { }
         basic_string<T, Traits, Alloc>(const T *arr, size_t num)
-            : array_base<T>(nullptr, (arr != NULL) && (num > 0) && (arr[num - 1] != T(0)) ? num + 1 : num)
+            : array_base<T>(nullptr, num + 1)
         {
+            T *str = (T *)c_str();
             __memcpy((T *)c_str(), arr, num);
             if (array_base<T>::length() > num) {
-                ((T *)c_str())[array_base<T>::length() - 1] = T(0);
+                str[array_base<T>::length() - 1] = T(0);
             }
         }
         basic_string<T, Traits, Alloc>(size_t n, T c, const allocator_type &a = allocator_type())
@@ -638,9 +639,7 @@ namespace std {
             }
 
             const T *sub = array_base<T>::cbegin();
-            basic_string<T, Traits, Alloc> *newstr = new basic_string<T, Traits, Alloc>(&sub[start], count + 1);
-            T *n = (T *)newstr->c_str();
-            n[count] = T(0);
+            basic_string<T, Traits, Alloc> *newstr = new basic_string<T, Traits, Alloc>(&sub[start], count);
             return (*newstr);
         }
         size_t find(const T *str, size_t pos = 0) const
