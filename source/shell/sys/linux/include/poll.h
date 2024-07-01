@@ -43,6 +43,7 @@ typedef int nfds_t;
 #define POLLWRBAND      (1 << 9)
 #define POLLRDHUP       (1 << 10)
 
+typedef struct vsf_linux_fd_priv_callback_t vsf_linux_fd_priv_callback_t;
 struct pollfd {
     int fd;
     short events;
