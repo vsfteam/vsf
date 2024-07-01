@@ -42,7 +42,6 @@ extern void vsf_test_stdio_wdt_feed(vsf_test_wdt_t *wdt);
 
 /**
  @brief Reboot watchdog timeout (requires assist device support)
- @param[in] wdt: a pointer to structure @ref vsf_test_wdt_t
  */
 extern void vsf_test_stdio_reboot(void);
 

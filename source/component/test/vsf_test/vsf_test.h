@@ -484,7 +484,9 @@ extern void vsf_test_run_tests(vsf_test_t *test);
 
 /**
  @brief rong jump. the user does not need to directly call this API
- @param[in] file_name: a pointer to structure @ref vsf_test_t
+ @param[in] test: a pointer to structure @ref vsf_test_t
+ @param[in] result: test result,  @ref vsf_test_result_t
+ @param[in] file_name: then name of the file where the assertion occurred
  @param[in] line: the line number of the code where the assertion occurred
  @param[in] function_name: the name of the function where the assertion occurred
  @param[in] condition: String of asserted code
@@ -499,7 +501,9 @@ extern void __vsf_test_longjmp(vsf_test_t *test, vsf_test_result_t result,
 
 /**
  @brief reboot, usually called inside an exception.
- @param[in] file_name: a pointer to structure @ref vsf_test_t
+ @param[in] test: a pointer to structure @ref vsf_test_t
+ @param[in] result: test result,  @ref vsf_test_result_t
+ @param[in] file_name: then name of the file where the assertion occurred
  @param[in] line: the line number of the code where the assertion occurred
  @param[in] function_name: the name of the function where the assertion occurred
  @param[in] additional_str: provide additional exception information
