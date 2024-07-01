@@ -28,7 +28,7 @@
  *!             Generate a vitual fat32 mal device.
  *!         file_mal by VSF_MAL_USE_FILE_MAL, depends on VSF_USE_FS:
  *!             Generate a mal device from a file.
- *!         hw_flash_mal by VSF_MAL_USE_HW_FLASH_MAL, depends on VSF_HAL_USE_FLASH:
+ *!         flash_mal by VSF_MAL_USE_FLASH_MAL, depends on VSF_HAL_USE_FLASH:
  *!             Generate a mal device from partial of the FLASH in HAL.
  *!         mem_mal by VSF_MAL_USE_MEM_MAL:
  *!             Generate a mal device from io-accessable memory.
@@ -494,7 +494,7 @@ extern vsf_err_t vk_mal_write_stream(vk_mal_stream_t *pthis, uint_fast64_t addr,
 #include "./driver/fakefat32_mal/vsf_fakefat32_mal.h"
 #include "./driver/scsi_mal/vsf_scsi_mal.h"
 #include "./driver/file_mal/vsf_file_mal.h"
-#include "./driver/hw_flash_mal/vsf_hw_flash_mal.h"
+#include "./driver/flash_mal/vsf_flash_mal.h"
 #include "./driver/mmc_mal/vsf_mmc_mal.h"
 #include "./driver/cached_mal/vsf_cached_mal.h"
 

@@ -10594,12 +10594,12 @@
                         </file>
                     </group>
                     <group>
-                        <name>hw_flash_mal</name>
+                        <name>flash_mal</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\hw_flash_mal\vsf_hw_flash_mal.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\flash_mal\vsf_flash_mal.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\hw_flash_mal\vsf_hw_flash_mal.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\flash_mal\vsf_flash_mal.h</name>
                         </file>
                     </group>
                     <group>
@@ -14225,9 +14225,6 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_adc.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_instance_declaration.h</name>
-                        </file>
-                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_dma.h</name>
                         </file>
                         <file>
@@ -14244,6 +14241,9 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_i2s.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_instance_declaration.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_instance_implementation.h</name>

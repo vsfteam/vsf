@@ -20,41 +20,41 @@
 #include "../../vsf_mal_cfg.h"
 #include "hal/driver/driver.h"
 
-#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_HW_FLASH_MAL == ENABLED && VSF_HAL_USE_FLASH == ENABLED
+#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_FLASH_MAL == ENABLED && VSF_HAL_USE_FLASH == ENABLED
 
 #define __VSF_MAL_CLASS_INHERIT__
-#define __VSF_HW_FLASH_MAL_CLASS_IMPLEMENT
+#define __VSF_FLASH_MAL_CLASS_IMPLEMENT
 
 #include "../../vsf_mal.h"
-#include "./vsf_hw_flash_mal.h"
+#include "./vsf_flash_mal.h"
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_HW_FLASH_MAL_CFG_ISR_PRIO
-#   define VSF_HW_FLASH_MAL_CFG_ISR_PRIO            vsf_arch_prio_1
+#ifndef VSF_FLASH_MAL_CFG_ISR_PRIO
+#   define VSF_FLASH_MAL_CFG_ISR_PRIO               vsf_arch_prio_1
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef enum vsf_hw_flash_evt_t {
+typedef enum vsf_flash_evt_t {
     VSF_EVT_FLASH_ERASE_CPL = VSF_EVT_USER,
     VSF_EVT_FLASH_WRITE_CPL,
     VSF_EVT_FLASH_READ_CPL,
     VSF_EVT_FLASH_ERASE_ERR,
     VSF_EVT_FLASH_WRITE_ERR,
     VSF_EVT_FLASH_READ_ERR,
-} vsf_hw_flash_evt_t;
+} vsf_flash_evt_t;
 
 /*============================ PROTOTYPES ====================================*/
 
-static uint_fast32_t __vk_hw_flash_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
-static bool __vk_hw_flash_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
-dcl_vsf_peda_methods(static, __vk_hw_flash_mal_init)
-dcl_vsf_peda_methods(static, __vk_hw_flash_mal_fini)
-dcl_vsf_peda_methods(static, __vk_hw_flash_mal_read)
-dcl_vsf_peda_methods(static, __vk_hw_flash_mal_write)
-dcl_vsf_peda_methods(static, __vk_hw_flash_mal_erase)
+static uint_fast32_t __vk_flash_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
+static bool __vk_flash_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
+dcl_vsf_peda_methods(static, __vk_flash_mal_init)
+dcl_vsf_peda_methods(static, __vk_flash_mal_fini)
+dcl_vsf_peda_methods(static, __vk_flash_mal_read)
+dcl_vsf_peda_methods(static, __vk_flash_mal_write)
+dcl_vsf_peda_methods(static, __vk_flash_mal_erase)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -63,14 +63,14 @@ dcl_vsf_peda_methods(static, __vk_hw_flash_mal_erase)
 #   pragma GCC diagnostic ignored "-Wcast-function-type"
 #endif
 
-const vk_mal_drv_t vk_hw_flash_mal_drv = {
-    .blksz          = __vk_hw_flash_mal_blksz,
-    .buffer         = __vk_hw_flash_mal_buffer,
-    .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_hw_flash_mal_init),
-    .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_hw_flash_mal_fini),
-    .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_hw_flash_mal_read),
-    .write          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_hw_flash_mal_write),
-    .erase          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_hw_flash_mal_erase),
+const vk_mal_drv_t vk_flash_mal_drv = {
+    .blksz          = __vk_flash_mal_blksz,
+    .buffer         = __vk_flash_mal_buffer,
+    .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_flash_mal_init),
+    .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_flash_mal_fini),
+    .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_flash_mal_read),
+    .write          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_flash_mal_write),
+    .erase          = (vsf_peda_evthandler_t)vsf_peda_func(__vk_flash_mal_erase),
 };
 
 #if     __IS_COMPILER_GCC__
@@ -80,10 +80,10 @@ const vk_mal_drv_t vk_hw_flash_mal_drv = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static uint_fast32_t __vk_hw_flash_mal_blksz(vk_mal_t *mal, uint_fast64_t addr,
+static uint_fast32_t __vk_flash_mal_blksz(vk_mal_t *mal, uint_fast64_t addr,
                 uint_fast32_t size, vsf_mal_op_t op)
 {
-    vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)mal;
+    vk_flash_mal_t *pthis = (vk_flash_mal_t *)mal;
     switch (op) {
     case VSF_MAL_OP_ERASE:
         return pthis->cap.erase_sector_size;
@@ -96,7 +96,7 @@ static uint_fast32_t __vk_hw_flash_mal_blksz(vk_mal_t *mal, uint_fast64_t addr,
     }
 }
 
-static bool __vk_hw_flash_mal_buffer(vk_mal_t *mal, uint_fast64_t addr,
+static bool __vk_flash_mal_buffer(vk_mal_t *mal, uint_fast64_t addr,
                 uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem)
 {
     mem->buffer = 0;
@@ -104,9 +104,9 @@ static bool __vk_hw_flash_mal_buffer(vk_mal_t *mal, uint_fast64_t addr,
     return false;
 }
 
-static void __hw_flash_isrhandler(void *target_ptr, vsf_flash_t *flash_ptr, vsf_flash_irq_mask_t mask)
+static void __flash_isrhandler(void *target_ptr, vsf_flash_t *flash_ptr, vsf_flash_irq_mask_t mask)
 {
-    vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)target_ptr;
+    vk_flash_mal_t *pthis = (vk_flash_mal_t *)target_ptr;
     VSF_ASSERT(pthis != NULL);
     VSF_ASSERT(pthis->cur != NULL);
     VSF_MAL_ASSERT((mask & ~VSF_FLASH_IRQ_ALL_BITS_MASK) == 0);
@@ -138,10 +138,10 @@ static void __hw_flash_isrhandler(void *target_ptr, vsf_flash_t *flash_ptr, vsf_
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
-__vsf_component_peda_ifs_entry(__vk_hw_flash_mal_init, vk_mal_init)
+__vsf_component_peda_ifs_entry(__vk_flash_mal_init, vk_mal_init)
 {
     vsf_peda_begin();
-    vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)&vsf_this;
+    vk_flash_mal_t *pthis = (vk_flash_mal_t *)&vsf_this;
     VSF_MAL_ASSERT(pthis != NULL);
     VSF_MAL_ASSERT(pthis->flash != NULL);
     vsf_err_t err;
@@ -150,7 +150,7 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_init, vk_mal_init)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        pthis->cap = vsf_hw_flash_capability(pthis->flash);
+        pthis->cap = vsf_flash_capability(pthis->flash);
         if (0 == pthis->size) {
             pthis->size = pthis->cap.max_size;
         }
@@ -159,13 +159,13 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_init, vk_mal_init)
             err = VSF_ERR_NOT_SUPPORT;
         } else {
             pthis->cur = NULL;
-            cfg.isr.handler_fn = __hw_flash_isrhandler;
+            cfg.isr.handler_fn = __flash_isrhandler;
             cfg.isr.target_ptr = pthis;
-            cfg.isr.prio = VSF_HW_FLASH_MAL_CFG_ISR_PRIO;
-            err = vsf_hw_flash_init(pthis->flash, &cfg);
+            cfg.isr.prio = VSF_FLASH_MAL_CFG_ISR_PRIO;
+            err = vsf_flash_init(pthis->flash, &cfg);
             if (err == VSF_ERR_NONE) {
-                while (vsf_hw_flash_enable(pthis->flash) != fsm_rt_cpl);
-                vsf_hw_flash_irq_enable(pthis->flash, VSF_FLASH_IRQ_ALL_BITS_MASK);
+                while (vsf_flash_enable(pthis->flash) != fsm_rt_cpl);
+                vsf_flash_irq_enable(pthis->flash, VSF_FLASH_IRQ_ALL_BITS_MASK);
             }
         }
         vsf_eda_return(err);
@@ -179,17 +179,17 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_init, vk_mal_init)
     vsf_peda_end();
 }
 
-__vsf_component_peda_ifs_entry(__vk_hw_flash_mal_fini, vk_mal_fini)
+__vsf_component_peda_ifs_entry(__vk_flash_mal_fini, vk_mal_fini)
 {
     vsf_peda_begin();
-    vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)&vsf_this;
+    vk_flash_mal_t *pthis = (vk_flash_mal_t *)&vsf_this;
     VSF_MAL_ASSERT(pthis != NULL);
 
     switch (evt) {
     case VSF_EVT_INIT:
-        vsf_hw_flash_irq_disable(pthis->flash, VSF_FLASH_IRQ_ALL_BITS_MASK);
-        while (vsf_hw_flash_disable(pthis->flash) != fsm_rt_cpl);
-        vsf_hw_flash_fini(pthis->flash);
+        vsf_flash_irq_disable(pthis->flash, VSF_FLASH_IRQ_ALL_BITS_MASK);
+        while (vsf_flash_disable(pthis->flash) != fsm_rt_cpl);
+        vsf_flash_fini(pthis->flash);
         vsf_eda_return(VSF_ERR_NONE);
         break;
 
@@ -201,17 +201,17 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_fini, vk_mal_fini)
     vsf_peda_end();
 }
 
-__vsf_component_peda_ifs_entry(__vk_hw_flash_mal_erase, vk_mal_erase)
+__vsf_component_peda_ifs_entry(__vk_flash_mal_erase, vk_mal_erase)
 {
     vsf_peda_begin();
-    vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)&vsf_this;
+    vk_flash_mal_t *pthis = (vk_flash_mal_t *)&vsf_this;
     VSF_MAL_ASSERT(pthis != NULL);
 
     switch (evt) {
     case VSF_EVT_INIT:
         pthis->cur = vsf_eda_get_cur();
         VSF_MAL_ASSERT((vsf_local.addr + vsf_local.size) <= pthis->cap.max_size);
-        if (VSF_ERR_NONE == vsf_hw_flash_erase_multi_sector(pthis->flash, vsf_local.addr, vsf_local.size)) {
+        if (VSF_ERR_NONE == vsf_flash_erase_multi_sector(pthis->flash, vsf_local.addr, vsf_local.size)) {
             break;
         }
         // fall through
@@ -232,17 +232,17 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_erase, vk_mal_erase)
     vsf_peda_end();
 }
 
-__vsf_component_peda_ifs_entry(__vk_hw_flash_mal_read, vk_mal_read)
+__vsf_component_peda_ifs_entry(__vk_flash_mal_read, vk_mal_read)
 {
     vsf_peda_begin();
-    vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)&vsf_this;
+    vk_flash_mal_t *pthis = (vk_flash_mal_t *)&vsf_this;
     VSF_MAL_ASSERT(pthis != NULL);
 
     switch (evt) {
     case VSF_EVT_INIT:
         pthis->cur = vsf_eda_get_cur();
         VSF_MAL_ASSERT((vsf_local.size > 0) && ((vsf_local.addr + vsf_local.size) <= pthis->cap.max_size));
-        if (VSF_ERR_NONE == vsf_hw_flash_read_multi_sector(pthis->flash, vsf_local.addr, vsf_local.buff, vsf_local.size)) {
+        if (VSF_ERR_NONE == vsf_flash_read_multi_sector(pthis->flash, vsf_local.addr, vsf_local.buff, vsf_local.size)) {
             break;
         }
         // fall through
@@ -263,17 +263,17 @@ __vsf_component_peda_ifs_entry(__vk_hw_flash_mal_read, vk_mal_read)
     vsf_peda_end();
 }
 
-__vsf_component_peda_ifs_entry(__vk_hw_flash_mal_write, vk_mal_write)
+__vsf_component_peda_ifs_entry(__vk_flash_mal_write, vk_mal_write)
 {
     vsf_peda_begin();
-    vk_hw_flash_mal_t *pthis = (vk_hw_flash_mal_t *)&vsf_this;
+    vk_flash_mal_t *pthis = (vk_flash_mal_t *)&vsf_this;
     VSF_MAL_ASSERT(pthis != NULL);
 
     switch (evt) {
     case VSF_EVT_INIT:
         pthis->cur = vsf_eda_get_cur();
         VSF_MAL_ASSERT((vsf_local.size > 0) && ((vsf_local.addr + vsf_local.size) <= pthis->cap.max_size));
-        if (VSF_ERR_NONE == vsf_hw_flash_write_multi_sector(pthis->flash, vsf_local.addr, vsf_local.buff, vsf_local.size)) {
+        if (VSF_ERR_NONE == vsf_flash_write_multi_sector(pthis->flash, vsf_local.addr, vsf_local.buff, vsf_local.size)) {
             break;
         }
         // fall through

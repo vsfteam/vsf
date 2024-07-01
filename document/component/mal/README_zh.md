@@ -19,9 +19,9 @@
 // 使能 scsi_mal 模块
 #   define VSF_MAL_USE_SCSI_MAL         ENABLED
 // 使能 mmc_mal 模块，需要 hal 层使能 VSF_HAL_USE_MMC
-#   define VSF_MAL_USE_MMC_MAL         ENABLED
-// 使能 hw_flash_mal 模块，需要 hal 层使能 VSF_HAL_USE_FLASH
-#   define VSF_MAL_USE_HW_FLASH_MAL    ENABLED
+#   define VSF_MAL_USE_MMC_MAL          ENABLED
+// 使能 flash_mal 模块，需要 hal 层使能 VSF_HAL_USE_FLASH
+#   define VSF_MAL_USE_FLASH_MAL        ENABLED
 ```
 
 ## 3. API 接口以及调用方式
@@ -234,12 +234,12 @@ vsf_class(vk_file_mal_t) {
 1. file -- 镜像文件
 2. block_size -- 模拟的块设备的块大小
 
-### 5.5 hw_flash_mal
+### 5.5 flash_mal
 继承自 vk_mal_t ，用于把芯片内部 flash 的一部分（或者全部），模拟成一个块设备。
 需要使能 HAL 层中的 VSF_HAL_USE_FLASH 。
 
 ```c
-vsf_class(vk_hw_flash_mal_t) {
+vsf_class(vk_flash_mal_t) {
     public_member(
         implement(vk_mal_t)
         vsf_hw_flash_t *flash;
