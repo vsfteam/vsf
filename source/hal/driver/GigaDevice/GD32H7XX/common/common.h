@@ -15,37 +15,23 @@
  *                                                                           *
  ****************************************************************************/
 
+#ifndef __HAL_DRIVER_GIGADEVICE_GD32H7XX_COMMON_H__
+#define __HAL_DRIVER_GIGADEVICE_GD32H7XX_COMMON_H__
+
+/* \note common.h should only be included by device.h */
+
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
-
-#undef VSF_GIGADEVICE_DRIVER_HEADER
-
-#if     defined(__GD32VF103__)
-//  TODO
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32VF103/GD32VF103C8/driver.h"
-#elif   defined(__GD32E103__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32E10X/GD32E103/driver.h"
-#elif   defined(__GD32H759IMT6__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32H7XX/GD32H759/driver.h"
-#else
-#   error No supported device found.
-#endif
-
-/* include specified device driver header file */
-#include VSF_GIGADEVICE_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_GIGADEVICE_H__
-#define __HAL_DRIVER_GIGADEVICE_H__
+#include "hal/arch/vsf_arch.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
-
 
 #endif
 /* EOF */

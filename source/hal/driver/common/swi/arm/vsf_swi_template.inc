@@ -2,7 +2,13 @@
 Please read the "vsf_swi_template.h" header file for usage
 *******************************************************************************/
 
+#define __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 #include "hal/driver/driver.h"
+#undef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+
+#define __VSF_HAL_SHOW_VENDOR_INFO__
+#include "hal/driver/driver.h"
+
 #include "hal/driver/common/swi/vsf_swi_template.h"
 
 #if __IS_COMPILER_IAR__

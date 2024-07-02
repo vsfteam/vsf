@@ -15,37 +15,29 @@
  *                                                                           *
  ****************************************************************************/
 
+#ifndef __OSA_HAL_DRIVER_GIGADEVICE_GD32H7XX_USBD_H__
+#define __OSA_HAL_DRIVER_GIGADEVICE_GD32H7XX_USBD_H__
+
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal_cfg.h"
+#include "../usb.h"
 
-#undef VSF_GIGADEVICE_DRIVER_HEADER
-
-#if     defined(__GD32VF103__)
-//  TODO
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32VF103/GD32VF103C8/driver.h"
-#elif   defined(__GD32E103__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32E10X/GD32E103/driver.h"
-#elif   defined(__GD32H759IMT6__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32H7XX/GD32H759/driver.h"
-#else
-#   error No supported device found.
-#endif
-
-/* include specified device driver header file */
-#include VSF_GIGADEVICE_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_GIGADEVICE_H__
-#define __HAL_DRIVER_GIGADEVICE_H__
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_DWCOTG == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
+/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
+extern vsf_err_t vsf_hw_usbd_init(vsf_hw_usb_t *dc, usb_dc_ip_cfg_t *cfg);
+extern void vsf_hw_usbd_fini(vsf_hw_usb_t *dc);
+extern void vsf_hw_usbd_get_info(vsf_hw_usb_t *dc, usb_dc_ip_info_t *info);
+extern void vsf_hw_usbd_connect(vsf_hw_usb_t *dc);
+extern void vsf_hw_usbd_disconnect(vsf_hw_usb_t *dc);
+extern void vsf_hw_usbd_irq(vsf_hw_usb_t *dc);
 
+#endif
 #endif
 /* EOF */

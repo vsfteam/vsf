@@ -15,29 +15,20 @@
  *                                                                           *
  ****************************************************************************/
 
-/*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__) || defined(__VSF_HAL_SHOW_VENDOR_INFO__)
 
-#undef VSF_GIGADEVICE_DRIVER_HEADER
+#   include "../__device.h"
 
-#if     defined(__GD32VF103__)
-//  TODO
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32VF103/GD32VF103C8/driver.h"
-#elif   defined(__GD32E103__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32E10X/GD32E103/driver.h"
-#elif   defined(__GD32H759IMT6__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32H7XX/GD32H759/driver.h"
 #else
-#   error No supported device found.
-#endif
 
-/* include specified device driver header file */
-#include VSF_GIGADEVICE_DRIVER_HEADER
+#   ifndef __HAL_DRIVER_GIGADEVICE_GD32H7XX_H__
+#       define __HAL_DRIVER_GIGADEVICE_GD32H7XX_H__
 
+/*============================ INCLUDES ======================================*/
 
-
-#ifndef __HAL_DRIVER_GIGADEVICE_H__
-#define __HAL_DRIVER_GIGADEVICE_H__
+#       include "hal/vsf_hal_cfg.h"
+#       include "./device.h"
+//#       include "../common/usb/usb.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -45,7 +36,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
+#   endif
 
 #endif
 /* EOF */

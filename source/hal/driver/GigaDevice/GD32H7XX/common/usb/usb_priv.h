@@ -15,37 +15,43 @@
  *                                                                           *
  ****************************************************************************/
 
+#ifndef __OSA_HAL_DRIVER_GIGADEVICE_GD32H7XX_USB_PRIV_H__
+#define __OSA_HAL_DRIVER_GIGADEVICE_GD32H7XX_USB_PRIV_H__
+
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
 
-#undef VSF_GIGADEVICE_DRIVER_HEADER
+#include "hal/vsf_hal.h"
 
-#if     defined(__GD32VF103__)
-//  TODO
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32VF103/GD32VF103C8/driver.h"
-#elif   defined(__GD32E103__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32E10X/GD32E103/driver.h"
-#elif   defined(__GD32H759IMT6__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32H7XX/GD32H759/driver.h"
-#else
-#   error No supported device found.
-#endif
+#if VSF_USE_USB_DEVICE == ENABLED || VSF_USE_USB_HOST == ENABLED
 
-/* include specified device driver header file */
-#include VSF_GIGADEVICE_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_GIGADEVICE_H__
-#define __HAL_DRIVER_GIGADEVICE_H__
+// for dedicated vk_dwcotg_hw_info_t
+#include "component/usb/driver/otg/dwcotg/vsf_dwcotg_hw.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef struct vsf_hw_usb_const_t {
+    uint8_t ep_num;
+    IRQn_Type irq;
+    void *reg;
+
+    implement(vk_dwcotg_hw_info_t)
+} vsf_hw_usb_const_t;
+
+typedef struct vsf_hw_usb_t {
+    bool is_host;
+    struct {
+        usb_ip_irqhandler_t irqhandler;
+        void *param;
+    } callback;
+    const vsf_hw_usb_const_t *param;
+} vsf_hw_usb_t;
+
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
+/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-
+#endif
 #endif
 /* EOF */

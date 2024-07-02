@@ -16,36 +16,45 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
 
-#undef VSF_GIGADEVICE_DRIVER_HEADER
+#include "./usb.h"
 
-#if     defined(__GD32VF103__)
-//  TODO
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32VF103/GD32VF103C8/driver.h"
-#elif   defined(__GD32E103__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32E10X/GD32E103/driver.h"
-#elif   defined(__GD32H759IMT6__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32H7XX/GD32H759/driver.h"
-#else
-#   error No supported device found.
-#endif
-
-/* include specified device driver header file */
-#include VSF_GIGADEVICE_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_GIGADEVICE_H__
-#define __HAL_DRIVER_GIGADEVICE_H__
+#if VSF_USE_USB_DEVICE == ENABLED || VSF_USE_USB_HOST == ENABLED
 
 /*============================ MACROS ========================================*/
+
+#define __USB_HC_INTERFACE_DEF(__N, __VALUE)                                    \
+const i_usb_hc_ip_t VSF_USB_HC##__N##_IP = __USB_HC_IP_INTERFACE_FUNC_DEF(__N, __VALUE);
+
+#define __USB_DC_INTERFACE_DEF(__N, __VALUE)                                    \
+const i_usb_dc_ip_t VSF_USB_DC##__N##_IP = __USB_DC_IP_INTERFACE_FUNC_DEF(__N, __VALUE);
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+
+#if USB_OTG_COUNT > 0
+#   if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_DWCOTG == ENABLED
+VSF_MREPEAT(USB_OTG_COUNT, __USB_HC_IP_FUNC_DEF, NULL)
+VSF_MREPEAT(USB_OTG_COUNT, __USB_HC_INTERFACE_DEF, NULL)
+#   endif
+#   if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_DWCOTG == ENABLED
+VSF_MREPEAT(USB_OTG_COUNT, __USB_DC_IP_FUNC_DEF, NULL)
+VSF_MREPEAT(USB_OTG_COUNT, __USB_DC_INTERFACE_DEF, NULL)
+#   endif
+#endif
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
 
+#if USB_OTG_COUNT > 0
+#   if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_DWCOTG == ENABLED
+VSF_MREPEAT(USB_OTG_COUNT, __USB_OTG_HC_IP_BODY, vsf_hw_usbh)
+#   endif
+#   if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_DWCOTG == ENABLED
+VSF_MREPEAT(USB_OTG_COUNT, __USB_OTG_DC_IP_BODY, vsf_hw_usbd)
+#   endif
+#endif
 
 #endif
-/* EOF */

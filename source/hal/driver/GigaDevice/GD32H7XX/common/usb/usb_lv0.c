@@ -16,36 +16,48 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
 
-#undef VSF_GIGADEVICE_DRIVER_HEADER
+#include "./usb.h"
 
-#if     defined(__GD32VF103__)
-//  TODO
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32VF103/GD32VF103C8/driver.h"
-#elif   defined(__GD32E103__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32E10X/GD32E103/driver.h"
-#elif   defined(__GD32H759IMT6__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32H7XX/GD32H759/driver.h"
-#else
-#   error No supported device found.
-#endif
+#if VSF_USE_USB_DEVICE == ENABLED || VSF_USE_USB_HOST == ENABLED
 
-/* include specified device driver header file */
-#include VSF_GIGADEVICE_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_GIGADEVICE_H__
-#define __HAL_DRIVER_GIGADEVICE_H__
+// for usb_device_speed_t
+#include "component/vsf_component.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+// TODO: add vsf_hw_usbh_irq
+#define __USB_OTG_IMPLEMENT(__N, __VALUE)                                       \
+static const vsf_hw_usb_const_t __USB_OTG##__N##_const = {                      \
+    USB_OTG##__N##_CONFIG                                                       \
+};                                                                              \
+vsf_hw_usb_t USB_OTG##__N##_IP = {                                              \
+    .param = &__USB_OTG##__N##_const,                                           \
+};                                                                              \
+VSF_CAL_ROOT void USB_OTG##__N##_IRQHandler(void)                               \
+{                                                                               \
+    if (USB_OTG##__N##_IP.is_host) {                                            \
+        vsf_hw_usbh_irq(&USB_OTG##__N##_IP);                                    \
+    } else {                                                                    \
+        vsf_hw_usbd_irq(&USB_OTG##__N##_IP);                                    \
+    }                                                                           \
+}
+
+#define _USB_OTG_IMPLEMENT(__N, __VALUE)    __USB_OTG_IMPLEMENT(__N, __VALUE)
+#define USB_OTG_IMPLEMENT(__N, __VALUE)     _USB_OTG_IMPLEMENT(__N, __VALUE)
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
 
+VSF_CAL_WEAK(vsf_hw_usbd_irq)
+void vsf_hw_usbd_irq(vsf_hw_usb_t *dc) { VSF_HAL_ASSERT(false); }
+VSF_CAL_WEAK(vsf_hw_usbh_irq)
+void vsf_hw_usbh_irq(vsf_hw_usb_t *dc) { VSF_HAL_ASSERT(false); }
+
+VSF_MREPEAT(USB_OTG_COUNT, USB_OTG_IMPLEMENT, NULL)
 
 #endif
-/* EOF */

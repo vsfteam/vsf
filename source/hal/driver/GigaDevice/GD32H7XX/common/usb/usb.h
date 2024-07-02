@@ -15,37 +15,45 @@
  *                                                                           *
  ****************************************************************************/
 
+#ifndef __OSA_HAL_DRIVER_GIGADEVICE_GD32H7XX_USB_H__
+#define __OSA_HAL_DRIVER_GIGADEVICE_GD32H7XX_USB_H__
+
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
+#include "hal/vsf_hal.h"
 
-#undef VSF_GIGADEVICE_DRIVER_HEADER
+#if VSF_USE_USB_DEVICE == ENABLED || VSF_USE_USB_HOST == ENABLED
 
-#if     defined(__GD32VF103__)
-//  TODO
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32VF103/GD32VF103C8/driver.h"
-#elif   defined(__GD32E103__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32E10X/GD32E103/driver.h"
-#elif   defined(__GD32H759IMT6__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32H7XX/GD32H759/driver.h"
-#else
-#   error No supported device found.
-#endif
+#include "hal/driver/common/template/vsf_template_usb.h"
 
-/* include specified device driver header file */
-#include VSF_GIGADEVICE_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_GIGADEVICE_H__
-#define __HAL_DRIVER_GIGADEVICE_H__
+// for dedicated vk_dwcotg_hw_info_t
+#include "component/usb/driver/otg/dwcotg/vsf_dwcotg_hw.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define __USB_OTG_DEF(__N, __VALUE)                                             \
+    extern vsf_hw_usb_t USB_OTG##__N##_IP;                                      \
+    extern const i_usb_dc_ip_t VSF_USB_DC##__N##_IP;                            \
+    extern const i_usb_hc_ip_t VSF_USB_HC##__N##_IP;
+#define _USB_OTG_DEF(__N, __VALUE)          __USB_OTG_DEF(__N, __VALUE)
+#define USB_OTG_DEF(__N, __VALUE)           _USB_OTG_DEF(__N, __VALUE)
+
 /*============================ TYPES =========================================*/
+
+typedef struct vsf_hw_usb_t vsf_hw_usb_t;
+
+/*============================ INCLUDES ======================================*/
+
+#include "./hc/usbh.h"
+#include "./dc/usbd.h"
+
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
+
+VSF_MREPEAT(USB_OTG_COUNT, USB_OTG_DEF, NULL)
+
+/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-
+#endif
 #endif
 /* EOF */

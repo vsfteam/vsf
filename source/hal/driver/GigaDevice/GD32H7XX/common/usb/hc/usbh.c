@@ -16,28 +16,14 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
 
-#undef VSF_GIGADEVICE_DRIVER_HEADER
+//#include "../../common.h"
+#include "./usbh.h"
 
-#if     defined(__GD32VF103__)
-//  TODO
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32VF103/GD32VF103C8/driver.h"
-#elif   defined(__GD32E103__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32E10X/GD32E103/driver.h"
-#elif   defined(__GD32H759IMT6__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32H7XX/GD32H759/driver.h"
-#else
-#   error No supported device found.
-#endif
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_HCD_DWCOTG == ENABLED
 
-/* include specified device driver header file */
-#include VSF_GIGADEVICE_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_GIGADEVICE_H__
-#define __HAL_DRIVER_GIGADEVICE_H__
+// for vk_dwcotg_hc_ip_info_t and USB_SPEED_XXX
+#include "component/vsf_component.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -46,6 +32,32 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+extern vsf_err_t __vsf_hw_usb_init(vsf_hw_usb_t *usb, vsf_arch_prio_t priority);
+extern void __vsf_hw_usb_irq(vsf_hw_usb_t *usb);
+
+/*============================ IMPLEMENTATION ================================*/
+
+vsf_err_t vsf_hw_usbh_init(vsf_hw_usb_t *hc, usb_hc_ip_cfg_t *cfg)
+{
+    hc->is_host = true;
+    hc->callback.irqhandler = cfg->irqhandler;
+    hc->callback.param = cfg->param;
+    return __vsf_hw_usb_init(hc, cfg->priority);
+}
+
+void vsf_hw_usbh_get_info(vsf_hw_usb_t *hc, usb_hc_ip_info_t *info)
+{
+    vk_dwcotg_hc_ip_info_t *dwcotg_info = (vk_dwcotg_hc_ip_info_t *)info;
+    VSF_ASSERT(info != NULL);
+    dwcotg_info->regbase = hc->param->reg;
+    dwcotg_info->ep_num = vsf_hw_usbh_ep_number;
+    dwcotg_info->is_dma = vsf_hw_usbh_ep_is_dma;
+    dwcotg_info->speed = USB_SPEED_FULL;
+}
+
+void vsf_hw_usbh_irq(vsf_hw_usb_t *hc)
+{
+    __vsf_hw_usb_irq(hc);
+}
 
 #endif
-/* EOF */

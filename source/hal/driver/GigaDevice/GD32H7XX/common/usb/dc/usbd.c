@@ -16,28 +16,13 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
 
-#undef VSF_GIGADEVICE_DRIVER_HEADER
+#include "./usbd.h"
 
-#if     defined(__GD32VF103__)
-//  TODO
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32VF103/GD32VF103C8/driver.h"
-#elif   defined(__GD32E103__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32E10X/GD32E103/driver.h"
-#elif   defined(__GD32H759IMT6__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32H7XX/GD32H759/driver.h"
-#else
-#   error No supported device found.
-#endif
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_DWCOTG == ENABLED
 
-/* include specified device driver header file */
-#include VSF_GIGADEVICE_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_GIGADEVICE_H__
-#define __HAL_DRIVER_GIGADEVICE_H__
+// for vk_dwcotg_dc_ip_info_t
+#include "component/vsf_component.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -46,6 +31,46 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+extern vsf_err_t __vsf_hw_usb_init(vsf_hw_usb_t *usb, vsf_arch_prio_t priority);
+extern void __vsf_hw_usb_irq(vsf_hw_usb_t *usb);
 
-#endif
-/* EOF */
+/*============================ IMPLEMENTATION ================================*/
+
+vsf_err_t vsf_hw_usbd_init(vsf_hw_usb_t *dc, usb_dc_ip_cfg_t *cfg)
+{
+    dc->is_host = false;
+    dc->callback.irqhandler = cfg->irqhandler;
+    dc->callback.param = cfg->param;
+    return __vsf_hw_usb_init(dc, cfg->priority);
+}
+
+void vsf_hw_usbd_fini(vsf_hw_usb_t *dc)
+{
+}
+
+void vsf_hw_usbd_get_info(vsf_hw_usb_t *dc, usb_dc_ip_info_t *info)
+{
+    const vsf_hw_usb_const_t *param = dc->param;
+    vk_dwcotg_dc_ip_info_t *dwcotg_info = (vk_dwcotg_dc_ip_info_t *)info;
+
+    VSF_HAL_ASSERT(dwcotg_info != NULL);
+    dwcotg_info->regbase = param->reg;
+    dwcotg_info->ep_num = param->ep_num;
+    dwcotg_info->buffer_word_size = param->buffer_word_size;
+    dwcotg_info->feature = param->feature;
+}
+
+void vsf_hw_usbd_connect(vsf_hw_usb_t *dc)
+{
+}
+
+void vsf_hw_usbd_disconnect(vsf_hw_usb_t *dc)
+{
+}
+
+void vsf_hw_usbd_irq(vsf_hw_usb_t *dc)
+{
+    __vsf_hw_usb_irq(dc);
+}
+
+#endif      // VSF_USE_USB_DEVICE && VSF_USBD_USE_DCD_DWCOTG
