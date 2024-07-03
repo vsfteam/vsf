@@ -31,6 +31,9 @@
 #   include "hal/vsf_hal_cfg.h"
 #   include "./device.h"
 
+// for common hal structure/enum/etc, include before user driver headers below.
+#   include "hal/driver/common/template/vsf_template_hal_driver.h"
+
 // For SWI
 #   include "hal/driver/common/swi/vsf_swi_template.h"
 

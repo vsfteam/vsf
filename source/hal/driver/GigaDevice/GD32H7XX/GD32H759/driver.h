@@ -21,14 +21,24 @@
 
 #else
 
-#   ifndef __HAL_DRIVER_GIGADEVICE_GD32H7XX_H__
-#       define __HAL_DRIVER_GIGADEVICE_GD32H7XX_H__
+#ifndef __HAL_DRIVER_GIGADEVICE_GD32H7XX_H__
+#define __HAL_DRIVER_GIGADEVICE_GD32H7XX_H__
 
 /*============================ INCLUDES ======================================*/
 
-#       include "hal/vsf_hal_cfg.h"
-#       include "./device.h"
-//#       include "../common/usb/usb.h"
+#   include "hal/vsf_hal_cfg.h"
+#   include "./device.h"
+
+// for common hal structure/enum/etc, include before user driver headers below.
+#   include "hal/driver/common/template/vsf_template_hal_driver.h"
+
+// For SWI
+#   include "hal/driver/common/swi/vsf_swi_template.h"
+
+#   include "../common/io/io.h"
+#   include "../common/gpio/gpio.h"
+#   include "../common/usart/usart.h"
+#   include "../common/usb/usb.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -36,7 +46,8 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-#   endif
+
+#endif
 
 #endif
 /* EOF */
