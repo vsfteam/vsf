@@ -167,6 +167,7 @@
 #define VSH_HAS_COLOR                                   0
 
 //#define VSF_SYSTIMER_CFG_IMPL_MODE                      VSF_SYSTIMER_IMPL_TICK_MODE
+#define VSF_ARCH_CFG_CALLSTACK_TRACE                    DISABLED
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
