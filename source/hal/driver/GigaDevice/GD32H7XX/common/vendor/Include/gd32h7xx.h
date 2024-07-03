@@ -350,7 +350,7 @@ typedef enum IRQn {
 
 /* includes */
 #include "core_cm7.h"
-//#include "system_gd32h7xx.h"
+#include "system_gd32h7xx.h"
 #include <stdint.h>
 
 /* enum definitions */

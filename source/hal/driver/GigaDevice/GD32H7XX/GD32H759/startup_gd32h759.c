@@ -549,10 +549,8 @@ void Reset_Handler(void)
     vsf_arch_set_stack((uintptr_t)&__INITIAL_SP);
     vsf_hal_pre_startup_init();
 
-    //! enable FPU
-    SCB->CPACR |= ((3UL << 10*2) | (3UL << 11*2));  /* set CP10 and CP11 Full Access */
-
-    SCB->VTOR = (uint32_t)__VECTOR_TABLE;
-
+    SystemInit();
+    SCB_EnableICache();
+    SCB_EnableDCache();
     __PROGRAM_START();                        /* Enter PreMain (C library entry point) */
 }

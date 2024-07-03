@@ -29,3 +29,11 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #include "hal/driver/common/swi/arm/vsf_swi_template.inc"
+
+// this function should be in gd32h7xx_misc.c, but this file is not included.
+//  So implement this function here.
+void nvic_vector_table_set(uint32_t nvic_vict_tab, uint32_t offset)
+{
+    SCB->VTOR = nvic_vict_tab | (offset & NVIC_VECTTAB_OFFSET_MASK);
+    __DSB();
+}
