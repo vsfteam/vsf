@@ -178,6 +178,8 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #define VSF_TRACE_CFG_COLOR_EN                          DISABLED
 #define VSH_HAS_COLOR                                   0
 
+#define VSF_ARCH_CFG_CALLSTACK_TRACE                    DISABLED
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
