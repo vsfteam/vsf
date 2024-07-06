@@ -66,6 +66,25 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#if VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
+vsf_flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
+{
+    vsf_flash_capability_t flash_capability = {
+        .irq_mask                   = VSF_FLASH_CFG_CAPABILITY_IRQ_MASK,
+        .base_address               = VSF_FLASH_CFG_CAPABILITY_BASE_ADDRESS,
+        .max_size                   = VSF_FLASH_CFG_CAPABILITY_MAX_SIZE,
+        .erase_sector_size          = VSF_FLASH_CFG_CAPABILITY_ERASE_SECTORE_SIZE,
+        .write_sector_size          = VSF_FLASH_CFG_CAPABILITY_WRITE_SECTORE_SIZE,
+        .can_write_any_address      = VSF_FLASH_CFG_CAPABILITY_SECTORE_WRITE_ANY_ADDRESS,
+        .can_read_any_address       = VSF_FLASH_CFG_CAPABILITY_SECTORE_READ_ANY_ADDRESS,
+    };
+
+    VSF_ASSERT(flash_capability.erase_sector_size >= flash_capability.write_sector_size);
+
+    return flash_capability;
+}
+#endif
+
 #if VSF_FLASH_CFG_ERASE_ONE_SECTOR_TEMPLATE == ENABLED
 vsf_err_t vsf_real_flash_erase_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_flash_size_t offset)
 {
@@ -182,25 +201,6 @@ vsf_err_t vsf_real_flash_read_multi_sector(vsf_real_flash_t *real_flash_ptr, vsf
     }
 
     return VSF_ERR_NONE;
-}
-#endif
-
-#if VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
-vsf_flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
-{
-    vsf_flash_capability_t flash_capability = {
-        .irq_mask                   = VSF_FLASH_CFG_CAPABILITY_IRQ_MASK,
-        .base_address               = VSF_FLASH_CFG_CAPABILITY_BASE_ADDRESS,
-        .max_size                   = VSF_FLASH_CFG_CAPABILITY_MAX_SIZE,
-        .erase_sector_size          = VSF_FLASH_CFG_CAPABILITY_ERASE_SECTORE_SIZE,
-        .write_sector_size          = VSF_FLASH_CFG_CAPABILITY_WRITE_SECTORE_SIZE,
-        .can_write_any_address      = VSF_FLASH_CFG_CAPABILITY_SECTORE_WRITE_ANY_ADDRESS,
-        .can_read_any_address       = VSF_FLASH_CFG_CAPABILITY_SECTORE_READ_ANY_ADDRESS,
-    };
-
-    VSF_ASSERT(flash_capability.erase_sector_size >= flash_capability.write_sector_size);
-
-    return flash_capability;
 }
 #endif
 
