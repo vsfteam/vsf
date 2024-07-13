@@ -51,6 +51,14 @@ extern "C" {
 #endif
 
 // application code can redefine it
+/*!
+In the application code, we can redefine this macro to call the actual API directly without a runtime cost for example:
+#define VSF_IO_CFG_MULTI_CLASS vsf_hw
+vsf_io_config(&vsf_hw_io0, &cfg);
+ It will be expanded at compile time to vsf_hw_io_config(&vsf_hw_io0, &cfg).
+
+Dependency: VSF_IO_CFG_FUNCTION_RENAME enable
+*/
 #ifndef VSF_IO_CFG_PREFIX
 #   if VSF_IO_CFG_MULTI_CLASS == ENABLED
 #       define VSF_IO_CFG_PREFIX                    vsf
@@ -61,10 +69,12 @@ extern "C" {
 #   endif
 #endif
 
+//!If VSF_IO_CFG_FUNCTION_RENAME is enabled, the actual API is called based on the value of VSF_IO_CFG_PREFIX
 #ifndef VSF_IO_CFG_FUNCTION_RENAME
 #   define VSF_IO_CFG_FUNCTION_RENAME               ENABLED
 #endif
 
+//! In the specific hardware driver, we can enable VSF_IO_CFG_REIMPLEMENT_TYPE_MODE to redefine vsf_io_mode_t as needed.
 #ifndef VSF_IO_CFG_REIMPLEMENT_TYPE_MODE
 #   define VSF_IO_CFG_REIMPLEMENT_TYPE_MODE               DISABLED
 #endif
@@ -134,84 +144,134 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 #if VSF_IO_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
+/**
+ * \~english
+ * @brief Predefined VSF IO modes that can be reimplemented in specific hal drivers.
+ *
+ * \~chinese
+ * @brief 预定义的VSF IO 模式，可以在具体的hal驱动重新实现。
+ *
+ * \~english
+ * Even if the hardware doesn't support these features, these modes must be implemented:
+ * \~chinese
+ * 即使硬件不支持这些功能，但是这些模式是必须实现的：
+ *
+ * - INPUT/OUTPUT
+ *  - VSF_IO_INPUT
+ *  - VSF_IO_ANALOG
+ *  - VSF_IO_OUTPUT_PUSH_PULL
+ *  - VSF_IO_OUTPUT_OPEN_DRAIN
+ *  - VSF_IO_AF_PUSH_PULL
+ *  - VSF_IO_AF_OPEN_DRAIN
+ *  - VSF_IO_EXTI
+ * - PULL_UP_AND_DOWN:
+ *  - VSF_IO_NO_PULL_UP_DOWN
+ *  - VSF_IO_PULL_UP
+ *  - VSF_IO_PULL_DOWN
+ *
+ * \~english
+ *  Optional features require one or more enumeration options and a macro with the same
+ *  name to determine if they are supported at runtime. If the feature supports more than
+ *  one option, it is recommended to provide the corresponding MASK option, so that the
+ *  user can switch to different modes at runtime.
+ * \~chinese
+ * 可选特性需要提供一个或者多个枚举选项，还需要提供同名的宏，方便用户在运行时判断是否支持。
+ * 如果它特性支持多个选项，建议提供对应的 MASK 选项，方便用户在运行时切换到不同的模式。
+ *
+ * ```c
+ * vsf_io_cfg_t cfg = {
+ *  { VSF_PA0, 0, VSF_IO_OUTPUT_PUSH_PULL },
+ *  { VSF_PA1, 0, VSF_IO_ANALOG },
+ * };
+ * vsf_io_config(&vsf_hw_io0, &cfg, 1);
+ * ```
+ *
+ * \~chinese
+ * 考虑上面的代码，用户调用 vsf_io_cfg() API 的时候，提供的 vsf_io_mode_t 可能会省略很多选项。
+ * 所以我们要求部分选项的值应该是 0。包括:
+ * - VSF_IO_NO_PULL_UP_DOWN
+ * - VSF_IO_INTERRUPT_DISABLED
+ * 可选特性选项的值也应该考虑默认值的问题。
+ *
+ * \~english
+ * Consider the code above. the vsf_io_mode_t provided when the user calls the vsf_io_cfg() API
+ * may omit many options. So we require that some of the options should have a value of 0. Including:
+ * - VSF_IO_NO_PULL_UP_DOWN
+ * - VSF_IO_INTERRUPT_DISABLED
+ * The values of the optional feature options should also be considered for the default values.
+ */
 typedef enum vsf_io_mode_t {
-    VSF_IO_PULL_UP                  = (0 << 0),         //!< enable pull-up resistor
-    VSF_IO_PULL_DOWN                = (1 << 0),         //!< enable pull-down resistor
-    VSF_IO_OPEN_DRAIN               = (2 << 0),         //!< enable open-drain mode
-    VSF_IO_ANALOG                   = (3 << 0),         //!< enable analog function
+    //! Set the IO to the general-purpose input state.
+    //! It is independent of the pull-up, pull-down, and float configurations.
+    VSF_IO_INPUT                    = (0 << 0),
+    //! Set the IO to analog IO, including analog input and analog output.
+    VSF_IO_ANALOG                   = (1 << 0),
+    //! Set IO to push-pull output
+    VSF_IO_OUTPUT_PUSH_PULL         = (2 << 0),
+    //! Set IO to open drain output
+    VSF_IO_OUTPUT_OPEN_DRAIN        = (3 << 0),
+    //! Set IO to push-pull alternative output
+    VSF_IO_AF_PUSH_PULL             = (4 << 0),
+    //! Set IO to push-pull alternative output
+    VSF_IO_AF_OPEN_DRAIN            = (5 << 0),
+    //! Set IO to external interrupt
+    VSF_IO_EXTI                     = (6 << 0),
 
-    VSF_IO_NORMAL_INPUT             = (0 << 3),         //!< normal input pin level
-    VSF_IO_INVERT_INPUT             = (1 << 3),         //!< inverted input pin level
-    VSF_IO_DISABLE_INPUT            = (1 << 4),         //!< disable input
+    // Turn on or off the internal pull-up and pull-down resistors of the IOs
+    // It is independent of the direction of the IO and the alternative function
+    VSF_IO_NO_PULL_UP_DOWN          = (0 << 4),
+    VSF_IO_PULL_UP                  = (1 << 4),
+    VSF_IO_PULL_DOWN                = (2 << 4),
 
-    VSF_IO_FILTER_BYPASS            = (0 << 5),         //!< filter is bypassed
-    VSF_IO_FILTER_2CLK              = (1 << 5),         //!< levels should keep 2 clks
-    VSF_IO_FILTER_4CLK              = (2 << 5),         //!< levels should keep 4 clks
-    VSF_IO_FILTER_8CLK              = (3 << 5),         //!< levels should keep 8 clks
+/*
+    VSF_IO_INVERT_INPUT             = (1 << 7),
+    #define VSF_IO_INVERT_INPUT VSF_IO_INVERT_INPUT
+*/
 
-    VSF_IO_FILTER_CLK_SRC0          = (0 << 7),         //!< select clock src 0 for filter
-    VSF_IO_FILTER_CLK_SRC1          = (1 << 7),         //!< select clock src 1 for filter
-    VSF_IO_FILTER_CLK_SRC2          = (2 << 7),         //!< select clock src 2 for filter
-    VSF_IO_FILTER_CLK_SRC3          = (3 << 7),         //!< select clock src 3 for filter
-    VSF_IO_FILTER_CLK_SRC4          = (4 << 7),         //!< select clock src 4 for filter
-    VSF_IO_FILTER_CLK_SRC5          = (5 << 7),         //!< select clock src 5 for filter
-    VSF_IO_FILTER_CLK_SRC6          = (6 << 7),         //!< select clock src 6 for filter
-    VSF_IO_FILTER_CLK_SRC7          = (7 << 7),         //!< select clock src 7 for filter
+/*
+    VSF_IO_HIGH_DRIVE_STRENGTH      = (1 << 8),
+    #define VSF_IO_HIGH_DRIVE_STRENGTH VSF_IO_HIGH_DRIVE_STRENGTH
+*/
 
-    VSF_IO_HIGH_DRIVE_STRENGTH      = (1 << 10),        //!< enable high drive strength
-    VSF_IO_HIGH_DRIVE_NO_STRENGTH   = (1 << 10),        //!< enable high drive strength
-
-    VSF_IO_INTERRUPT_DISABLED       = (0 << 11),
-    VSF_IO_INTERRUPT_ENABLED        = (1 << 11),
+/*
+    VSF_IO_SPEED_2MHZ               = (0 << 9),
+    VSF_IO_SPEED_10MHZ              = (1 << 9),
+    VSF_IO_SPEED_50MHZ              = (2 << 9),
+    VSF_IO_SPEED_MASK               = (3 << 9),
+    #define VSF_IO_SPEED_2MHZ   VSF_IO_SPEED_2MHZ
+    #define VSF_IO_SPEED_10MHZ  VSF_IO_SPEED_10MHZ
+    #define VSF_IO_SPEED_50MHZ  VSF_IO_SPEED_50MHZ
+    #define VSF_IO_SPEED_MASK   VSF_IO_SPEED_MASK
+*/
 } vsf_io_mode_t;
 #endif
 
 enum {
-    VSF_IO_OUTPUT_COUNT             = 3,
-    VSF_IO_OUTPUT_MASK              = VSF_IO_PULL_UP
-                                    | VSF_IO_PULL_DOWN
-                                    | VSF_IO_OPEN_DRAIN,
+    VSF_IO_FLOATING                 = VSF_IO_NO_PULL_UP_DOWN,
 
-    VSF_IO_INPUT_COUNT              = 3,
-    VSF_IO_INPUT_MASK               = VSF_IO_NORMAL_INPUT
+    VSF_IO_INOUT_MASK               = VSF_IO_INPUT
+                                    | VSF_IO_EXTI
+                                    | VSF_IO_ANALOG
+                                    | VSF_IO_OUTPUT_PUSH_PULL
+                                    | VSF_IO_OUTPUT_OPEN_DRAIN
+                                    | VSF_IO_AF_PUSH_PULL
+                                    | VSF_IO_AF_OPEN_DRAIN,
+
+    VSF_IO_PULL_UP_DOWN_MASK        = VSF_IO_NO_PULL_UP_DOWN
+                                    | VSF_IO_PULL_UP
+                                    | VSF_IO_PULL_DOWN,
+
+    VSF_IO_MODE_ALL_BITS_MASK       = VSF_IO_INOUT_MASK
+                                    | VSF_IO_PULL_UP_DOWN_MASK
+#ifdef VSF_IO_INVERT_INPUT
                                     | VSF_IO_INVERT_INPUT
-                                    | VSF_IO_DISABLE_INPUT,
-
-    VSF_IO_FILTER_COUNT             = 4,
-    VSF_IO_FILTER_MASK              = VSF_IO_FILTER_BYPASS
-                                    | VSF_IO_FILTER_2CLK
-                                    | VSF_IO_FILTER_4CLK
-                                    | VSF_IO_FILTER_8CLK,
-
-    VSF_IO_FILTER_CLK_COUNT         = 8,
-    VSF_IO_FILTER_CLK_MASK          = VSF_IO_FILTER_CLK_SRC0
-                                    | VSF_IO_FILTER_CLK_SRC1
-                                    | VSF_IO_FILTER_CLK_SRC2
-                                    | VSF_IO_FILTER_CLK_SRC3
-                                    | VSF_IO_FILTER_CLK_SRC4
-                                    | VSF_IO_FILTER_CLK_SRC5
-                                    | VSF_IO_FILTER_CLK_SRC6
-                                    | VSF_IO_FILTER_CLK_SRC7,
-
-    // Independent switching options
-    // VSF_IO_HIGH_DRIVE_STRENGTH
-    VSF_IO_HIGH_DRIVE_STRENGTH_COUNT= 2,
-    VSF_IO_HIGH_DRIVE_STRENGTH_MASK = VSF_IO_HIGH_DRIVE_STRENGTH
-                                    | VSF_IO_HIGH_DRIVE_NO_STRENGTH,
-
-    VSF_IO_INTERRUPT_COUNT          = 2,
-    VSF_IO_INTERRUPT_MASK           = VSF_IO_INTERRUPT_ENABLED
-                                    | VSF_IO_INTERRUPT_DISABLED,
-
-    VSF_IO_MODE_MASK_COUNT          = 6,
-    VSF_IO_MODE_ALL_BITS_MASK       = VSF_IO_PULL_UP
-                                    | VSF_IO_OPEN_DRAIN
-                                    | VSF_IO_DISABLE_INPUT
-                                    | VSF_IO_INVERT_INPUT
-                                    | VSF_IO_FILTER_MASK
-                                    | VSF_IO_FILTER_CLK_MASK
+#endif
+#ifdef VSF_IO_HIGH_DRIVE_STRENGTH
                                     | VSF_IO_HIGH_DRIVE_STRENGTH
-                                    | VSF_IO_INTERRUPT_MASK,
+#endif
+#ifdef VSF_IO_SPEED_MASK
+                                    | VSF_IO_SPEED_MASK
+#endif
 };
 
 
@@ -256,7 +316,7 @@ typedef enum vsf_io_port_pin_no_t {
     VSF_MREPEAT(VSF_IO_CFG_PIN_COUNT, __VSF_IO_PORT_PIN_NUM, D)
 #endif
 #if defined(VSF_IO_CFG_PORTE)
-    VSF_MREPEAT(VSF_IO_CFG_PIN_COUNT, __VSF_IO_PORT_PIN_NUM, D)
+    VSF_MREPEAT(VSF_IO_CFG_PIN_COUNT, __VSF_IO_PORT_PIN_NUM, E)
 #endif
 #if defined(VSF_IO_CFG_PORTF)
     VSF_MREPEAT(VSF_IO_CFG_PIN_COUNT, __VSF_IO_PORT_PIN_NUM, F)
@@ -283,8 +343,10 @@ typedef struct vsf_io_cfg_t {
 #endif
         };
     };
-    uint16_t        function;       //!< io Functions
-    vsf_io_mode_t   mode;           //!< pin mode
+    //! IO Alternative Function Values for alternative functions for different pins
+    uint16_t        function;
+    //! IO mode
+    vsf_io_mode_t   mode;
 } vsf_io_cfg_t;
 
 typedef struct vsf_io_capability_t {
