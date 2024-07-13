@@ -143,115 +143,153 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 #if VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
+/**
+ * \~english
+ * @brief Predefined VSF GPIO modes that can be reimplemented in specific hal drivers.
+ *
+ * \~chinese
+ * @brief 预定义的VSF GPIO 模式，可以在具体的hal驱动重新实现。
+ *
+ * \~english
+ * Even if the hardware doesn't support these features, these modes must be implemented:
+ * \~chinese
+ * 即使硬件不支持这些功能，但是这些模式是必须实现的：
+ *
+ * - INPUT/OUTPUT
+ *  - VSF_GPIO_INPUT
+ *  - VSF_GPIO_ANALOG
+ *  - VSF_GPIO_OUTPUT_PUSH_PULL
+ *  - VSF_GPIO_OUTPUT_OPEN_DRAIN
+ *  - VSF_GPIO_AF_PUSH_PULL
+ *  - VSF_GPIO_AF_OPEN_DRAIN
+ *  - VSF_GPIO_EXTI
+ * - PULL_UP_AND_DOWN:
+ *  - VSF_GPIO_NO_PULL_UP_DOWN
+ *  - VSF_GPIO_PULL_UP
+ *  - VSF_GPIO_PULL_DOWN
+ *
+ * \~english
+ *  Optional features require one or more enumeration options and a macro with the same
+ *  name to determine if they are supported at runtime. If the feature supports more than
+ *  one option, it is recommended to provide the corresponding MASK option, so that the
+ *  user can switch to different modes at runtime.
+ * \~chinese
+ * 可选特性需要提供一个或者多个枚举选项，还需要提供同名的宏，方便用户在运行时判断是否支持。
+ * 如果它特性支持多个选项，建议提供对应的 MASK 选项，方便用户在运行时切换到不同的模式。
+ *
+ * ```c
+ * vsf_gpio_mode_t mode = VSF_IO_OUTPUT_PUSH_PULL;
+ * vsf_gpio_config_pin(&vsf_hw_gpi0, 0x00000001, mode);
+ * ```
+ *
+ * \~chinese
+ * 考虑上面的代码，用户调用 vsf_io_cfg() API 的时候，提供的 vsf_io_mode_t 可能会省略很多选项。
+ * 所以我们要求部分选项的值应该是 0。包括:
+ * - VSF_IO_NO_PULL_UP_DOWN
+ * - VSF_IO_INTERRUPT_DISABLED
+ * 可选特性选项的值也应该考虑默认值的问题。
+ *
+ * \~english
+ * Consider the code above. the vsf_io_mode_t provided when the user calls the vsf_io_cfg() API
+ * may omit many options. So we require that some of the options should have a value of 0. Including:
+ * - VSF_IO_NO_PULL_UP_DOWN
+ * - VSF_IO_INTERRUPT_DISABLED
+ * The values of the optional feature options should also be considered for the default values.
+ */
 typedef enum vsf_gpio_mode_t {
-    VSF_GPIO_PULL_UP                    = (0 << 0),         //!< enable pull-up resistor
-    VSF_GPIO_PULL_DOWN                  = (1 << 0),         //!< enable pull-down resistor
-    VSF_GPIO_OPEN_DRAIN                 = (2 << 0),         //!< enable open-drain mode
-    VSF_GPIO_ANALOG                     = (3 << 0),         //!< enable analog function
+      //! Set the IO to the general-purpose input state.
+    //! It is independent of the pull-up, pull-down, and float configurations.
+    VSF_GPIO_INPUT                    = (0 << 0),
+    //! Set the IO to analog IO, including analog input and analog output.
+    VSF_GPIO_ANALOG                   = (1 << 0),
+    //! Set IO to push-pull output
+    VSF_GPIO_OUTPUT_PUSH_PULL         = (2 << 0),
+    //! Set IO to open drain output
+    VSF_GPIO_OUTPUT_OPEN_DRAIN        = (3 << 0),
+    //! Set IO to push-pull alternative output
+    VSF_GPIO_AF_PUSH_PULL             = (4 << 0),
+    //! Set IO to push-pull alternative output
+    VSF_GPIO_AF_OPEN_DRAIN            = (5 << 0),
+    //! Set IO to external interrupt
+    VSF_GPIO_EXTI                     = (6 << 0),
 
-    VSF_GPIO_NORMAL_INPUT               = (0 << 3),         //!< normal input pin level
-    VSF_GPIO_INVERT_INPUT               = (1 << 3),         //!< inverted input pin level
-    VSF_GPIO_DISABLE_INPUT              = (1 << 4),         //!< disable input
+    // Turn on or off the internal pull-up and pull-down resistors of the IOs
+    // It is independent of the direction of the IO and the alternative function
+    VSF_GPIO_NO_PULL_UP_DOWN          = (0 << 4),
+    VSF_GPIO_PULL_UP                  = (1 << 4),
+    VSF_GPIO_PULL_DOWN                = (2 << 4),
 
-    VSF_GPIO_FILTER_BYPASS              = (0 << 5),         //!< filter is bypassed
-    VSF_GPIO_FILTER_2CLK                = (1 << 5),         //!< levels should keep 2 clks
-    VSF_GPIO_FILTER_4CLK                = (2 << 5),         //!< levels should keep 4 clks
-    VSF_GPIO_FILTER_8CLK                = (3 << 5),         //!< levels should keep 8 clks
+/*
+    VSF_GPIO_INVERT_INPUT             = (1 << 7),
+    #define VSF_GPIO_INVERT_INPUT VSF_GPIO_INVERT_INPUT
+*/
 
-    VSF_GPIO_FILTER_CLK_SRC0            = (0 << 7),         //!< select clock src 0 for filter
-    VSF_GPIO_FILTER_CLK_SRC1            = (1 << 7),         //!< select clock src 1 for filter
-    VSF_GPIO_FILTER_CLK_SRC2            = (2 << 7),         //!< select clock src 2 for filter
-    VSF_GPIO_FILTER_CLK_SRC3            = (3 << 7),         //!< select clock src 3 for filter
-    VSF_GPIO_FILTER_CLK_SRC4            = (4 << 7),         //!< select clock src 4 for filter
-    VSF_GPIO_FILTER_CLK_SRC5            = (5 << 7),         //!< select clock src 5 for filter
-    VSF_GPIO_FILTER_CLK_SRC6            = (6 << 7),         //!< select clock src 6 for filter
-    VSF_GPIO_FILTER_CLK_SRC7            = (7 << 7),         //!< select clock src 7 for filter
+/*
+    VSF_GPIO_HIGH_DRIVE_STRENGTH      = (1 << 8),
+*/
 
-    VSF_GPIO_HIGH_DRIVE_STRENGTH        = (1 << 10),        //!< enable high drive strength
-    VSF_GPIO_HIGH_DRIVE_NO_STRENGTH     = (1 << 10),        //!< enable high drive strength
-
-    VSF_GPIO_EXTI_DISABLED              = (0 << 11),
-    VSF_GPIO_EXTI_ENABLED               = (1 << 11),
+/*
+    VSF_GPIO_SPEED_2MHZ               = (0 << 9),
+    VSF_GPIO_SPEED_10MHZ              = (1 << 9),
+    VSF_GPIO_SPEED_50MHZ              = (2 << 9),
+    VSF_GPIO_SPEED_MASK               = (3 << 9),
+*/
 } vsf_gpio_mode_t;
 #elif VSF_GPIO_USE_IO_MODE_TYPE == ENABLED
 typedef enum vsf_gpio_mode_t {
-    VSF_GPIO_PULL_UP                    = VSF_IO_PULL_UP,
-    VSF_GPIO_PULL_DOWN                  = VSF_IO_PULL_DOWN,
-    VSF_GPIO_OPEN_DRAIN                 = VSF_IO_OPEN_DRAIN,
-    VSF_GPIO_ANALOG                     = VSF_IO_ANALOG,
+    VSF_GPIO_IO_INPUT               = VSF_IO_INPUT,
+    VSF_GPIO_IO_ANALOG              = VSF_IO_ANALOG,
+    VSF_GPIO_IO_OUTPUT_PUSH_PULL    = VSF_IO_OUTPUT_PUSH_PULL,
+    VSF_GPIO_IO_OUTPUT_OPEN_DRAIN   = VSF_IO_OUTPUT_OPEN_DRAIN,
+    VSF_GPIO_IO_AF_PUSH_PULL        = VSF_IO_AF_PUSH_PULL,
+    VSF_GPIO_IO_AF_OPEN_DRAIN       = VSF_IO_AF_OPEN_DRAIN,
+    VSF_GPIO_IO_EXTI                = VSF_IO_EXTI,
+    VSF_GPIO_IO_NO_PULL_UP_DOWN     = VSF_IO_NO_PULL_UP_DOWN,
+    VSF_GPIO_IO_PULL_UP             = VSF_IO_PULL_UP,
+    VSF_GPIO_IO_PULL_DOWN           = VSF_IO_PULL_DOWN,
 
-    VSF_GPIO_NORMAL_INPUT               = VSF_IO_NORMAL_INPUT,
-    VSF_GPIO_INVERT_INPUT               = VSF_IO_INVERT_INPUT,
-    VSF_GPIO_DISABLE_INPUT              = VSF_IO_DISABLE_INPUT,
+#ifdef VSF_IO_INVERT_INPUT
+    VSF_GPIO_INVERT_INPUT           = VSF_IO_INVERT_INPUT,
+#endif
 
-    VSF_GPIO_FILTER_BYPASS              = VSF_IO_FILTER_BYPASS,
-    VSF_GPIO_FILTER_2CLK                = VSF_IO_FILTER_2CLK,
-    VSF_GPIO_FILTER_4CLK                = VSF_IO_FILTER_4CLK,
-    VSF_GPIO_FILTER_8CLK                = VSF_IO_FILTER_8CLK,
+#ifdef VSF_IO_HIGH_DRIVE_STRENGTH
+    VSF_GPIO_HIGH_DRIVE_STRENGTH    = VSF_IO_HIGH_DRIVE_STRENGTH,
+#endif
 
-    VSF_GPIO_FILTER_CLK_SRC0            = VSF_IO_FILTER_CLK_SRC0,
-    VSF_GPIO_FILTER_CLK_SRC1            = VSF_IO_FILTER_CLK_SRC1,
-    VSF_GPIO_FILTER_CLK_SRC2            = VSF_IO_FILTER_CLK_SRC2,
-    VSF_GPIO_FILTER_CLK_SRC3            = VSF_IO_FILTER_CLK_SRC3,
-    VSF_GPIO_FILTER_CLK_SRC4            = VSF_IO_FILTER_CLK_SRC4,
-    VSF_GPIO_FILTER_CLK_SRC5            = VSF_IO_FILTER_CLK_SRC5,
-    VSF_GPIO_FILTER_CLK_SRC6            = VSF_IO_FILTER_CLK_SRC6,
-    VSF_GPIO_FILTER_CLK_SRC7            = VSF_IO_FILTER_CLK_SRC7,
-
-    VSF_GPIO_HIGH_DRIVE_STRENGTH        = VSF_IO_HIGH_DRIVE_STRENGTH,
-    VSF_GPIO_HIGH_DRIVE_NO_STRENGTH     = VSF_IO_HIGH_DRIVE_NO_STRENGTH,
-
-    VSF_GPIO_EXTI_DISABLED              = (0 << 11),
-    VSF_GPIO_EXTI_ENABLED               = (1 << 11),
+#ifdef VSF_IO_SPEED_MASK
+    VSF_GPIO_SPEED_2MHZ             = VSF_IO_SPEED_2MHZ,
+    VSF_GPIO_SPEED_10MHZ            = VSF_IO_SPEED_10MHZ,
+    VSF_GPIO_SPEED_50MHZ            = VSF_IO_SPEED_50MHZ,
+    VSF_GPIO_SPEED_MASK             = VSF_IO_SPEED_MASK,
+#endif
 } vsf_gpio_mode_t;
 #endif
 
 enum {
-    VSF_GPIO_OUTPUT_COUNT               = 3,
-    VSF_GPIO_OUTPUT_MASK                = VSF_GPIO_PULL_UP
-                                        | VSF_GPIO_PULL_DOWN
-                                        | VSF_GPIO_OPEN_DRAIN,
+    VSF_GPIO_FLOATING               = VSF_GPIO_NO_PULL_UP_DOWN,
+    VSF_GPIO_INOUT_MASK             = VSF_GPIO_INPUT
+                                    | VSF_GPIO_EXTI
+                                    | VSF_GPIO_ANALOG
+                                    | VSF_GPIO_OUTPUT_PUSH_PULL
+                                    | VSF_GPIO_OUTPUT_OPEN_DRAIN
+                                    | VSF_GPIO_AF_PUSH_PULL
+                                    | VSF_GPIO_AF_OPEN_DRAIN,
 
-    VSF_GPIO_INPUT_COUNT                = 3,
-    VSF_GPIO_INPUT_MASK                 = VSF_GPIO_NORMAL_INPUT
-                                        | VSF_GPIO_INVERT_INPUT
-                                        | VSF_GPIO_DISABLE_INPUT,
+    VSF_GPIO_PULL_UP_DOWN_MASK      = VSF_GPIO_NO_PULL_UP_DOWN
+                                    | VSF_GPIO_PULL_UP
+                                    | VSF_GPIO_PULL_DOWN,
 
-    VSF_GPIO_FILTER_COUNT               = 4,
-    VSF_GPIO_FILTER_MASK                = VSF_GPIO_FILTER_BYPASS
-                                        | VSF_GPIO_FILTER_2CLK
-                                        | VSF_GPIO_FILTER_4CLK
-                                        | VSF_GPIO_FILTER_8CLK,
-
-    VSF_GPIO_FILTER_CLK_COUNT           = 8,
-    VSF_GPIO_FILTER_CLK_MASK            = VSF_GPIO_FILTER_CLK_SRC0
-                                        | VSF_GPIO_FILTER_CLK_SRC1
-                                        | VSF_GPIO_FILTER_CLK_SRC2
-                                        | VSF_GPIO_FILTER_CLK_SRC3
-                                        | VSF_GPIO_FILTER_CLK_SRC4
-                                        | VSF_GPIO_FILTER_CLK_SRC5
-                                        | VSF_GPIO_FILTER_CLK_SRC6
-                                        | VSF_GPIO_FILTER_CLK_SRC7,
-
-    // Independent switching options
-    // VSF_GPIO_HIGH_DRIVE_STRENGTH
-    VSF_GPIO_HIGH_DRIVE_STRENGTH_COUNT  = 2,
-    VSF_GPIO_HIGH_DRIVE_STRENGTH_MASK   = VSF_GPIO_HIGH_DRIVE_STRENGTH
-                                        | VSF_GPIO_HIGH_DRIVE_NO_STRENGTH,
-
-    VSF_GPIO_EXTI_COUNT                 = 2,
-    VSF_GPIO_EXTI_MASK                  = VSF_GPIO_EXTI_ENABLED
-                                        | VSF_GPIO_EXTI_DISABLED,
-
-    VSF_GPIO_MODE_MASK_COUNT            = 5,
-    VSF_GPIO_MODE_ALL_BITS_MASK         = VSF_GPIO_PULL_UP
-                                        | VSF_GPIO_OPEN_DRAIN
-                                        | VSF_GPIO_DISABLE_INPUT
-                                        | VSF_GPIO_INVERT_INPUT
-                                        | VSF_GPIO_FILTER_MASK
-                                        | VSF_GPIO_FILTER_CLK_MASK
-                                        | VSF_GPIO_HIGH_DRIVE_STRENGTH
-                                        | VSF_GPIO_EXTI_MASK,
+    VSF_GPIO_MODE_ALL_BITS_MASK     = VSF_GPIO_INOUT_MASK
+                                    | VSF_GPIO_PULL_UP_DOWN_MASK
+#ifdef VSF_GPIO_INVERT_INPUT
+                                    | VSF_GPIO_INVERT_INPUT
+#endif
+#ifdef VSF_GPIO_HIGH_DRIVE_STRENGTH
+                                    | VSF_GPIO_HIGH_DRIVE_STRENGTH
+#endif
+#ifdef VSF_GPIO_SPEED_MASK
+                                    | VSF_GPIO_SPEED_MASK
+#endif
 };
 
 #if VSF_GPIO_CFG_REIMPLEMENT_TYPE_EXT_MODE == DISABLED
