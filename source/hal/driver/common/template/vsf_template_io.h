@@ -85,6 +85,22 @@ extern "C" {
 #   define VSF_IO_CFG_PORTD                         ENABLED
 #endif
 
+#ifndef VSF_IO_CFG_PORTE
+#   define VSF_IO_CFG_PORTE                         ENABLED
+#endif
+
+#ifndef VSF_IO_CFG_PORTF
+#   define VSF_IO_CFG_PORTF                         ENABLED
+#endif
+
+#ifndef VSF_IO_CFG_PORTG
+#   define VSF_IO_CFG_PORTG                         ENABLED
+#endif
+
+#ifndef VSF_IO_CFG_PORTH
+#   define VSF_IO_CFG_PORTH                         ENABLED
+#endif
+
 #ifndef VSF_IO_CFG_PIN_COUNT
 #   if defined(VSF_HW_IO_PIN_COUNT) && (VSF_HW_IO_PIN_COUNT > 32)
 #	    define vsf_io_pin_mask_t                    uint64_t
@@ -212,6 +228,18 @@ typedef enum vsf_io_port_no_t {
 #if defined(VSF_IO_CFG_PORTD)
     VSF_PORTD,
 #endif
+#if defined(VSF_IO_CFG_PORTE)
+    VSF_PORTE,
+#endif
+#if defined(VSF_IO_CFG_PORTF)
+    VSF_PORTF,
+#endif
+#if defined(VSF_IO_CFG_PORTG)
+    VSF_PORTG,
+#endif
+#if defined(VSF_IO_CFG_PORTH)
+    VSF_PORTH,
+#endif
 } vsf_io_port_no_t;
 
 typedef enum vsf_io_port_pin_no_t {
@@ -226,6 +254,18 @@ typedef enum vsf_io_port_pin_no_t {
 #endif
 #if defined(VSF_IO_CFG_PORTD)
     VSF_MREPEAT(VSF_IO_CFG_PIN_COUNT, __VSF_IO_PORT_PIN_NUM, D)
+#endif
+#if defined(VSF_IO_CFG_PORTE)
+    VSF_MREPEAT(VSF_IO_CFG_PIN_COUNT, __VSF_IO_PORT_PIN_NUM, D)
+#endif
+#if defined(VSF_IO_CFG_PORTF)
+    VSF_MREPEAT(VSF_IO_CFG_PIN_COUNT, __VSF_IO_PORT_PIN_NUM, F)
+#endif
+#if defined(VSF_IO_CFG_PORTG)
+    VSF_MREPEAT(VSF_IO_CFG_PIN_COUNT, __VSF_IO_PORT_PIN_NUM, G)
+#endif
+#if defined(VSF_IO_CFG_PORTH)
+    VSF_MREPEAT(VSF_IO_CFG_PIN_COUNT, __VSF_IO_PORT_PIN_NUM, H)
 #endif
 } vsf_io_port_pin_no_t;
 
