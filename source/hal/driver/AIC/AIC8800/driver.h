@@ -27,6 +27,8 @@
 /*============================ INCLUDES ======================================*/
 
 #       include "hal/vsf_hal_cfg.h"
+#       include "hal/driver/common/template/vsf_template_hal_driver.h"
+
 #       include "hal/driver/common/swi/vsf_swi_template.h"
 #       include "./device.h"
 
