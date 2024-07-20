@@ -156,6 +156,10 @@
 #   error VSF_KERNEL_CFG_EDA_SUPPORT_TIMER MUST be enabled for linux
 #endif
 
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED && VSF_KERNEL_CFG_THREAD_SIGNAL != ENABLED
+#    error VSF_KERNEL_CFG_THREAD_SIGNAL MUST be enabled for VSF_LINUX_CFG_SUPPORT_SIG
+#endif
+
 #if VSF_LINUX_CFG_STACKSIZE < 512
 #   warning You sure use this stack size for linux?
 #endif
