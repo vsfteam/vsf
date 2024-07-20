@@ -1593,6 +1593,7 @@ static void __vsf_linux_sighandler(vsf_thread_cb_t *cb, int sig)
 #endif
     vsf_protect_t orig;
 
+    sig++;
     while (true) {
         orig = vsf_protect_sched();
         sig_mask = process->sig.pending.sig[0] & ~process->sig.mask.sig[0];
@@ -2473,7 +2474,7 @@ int kill(pid_t pid, int sig)
 
     vsf_linux_thread_t *thread;
     vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
-    vsf_thread_signal(&thread->use_as__vsf_thread_t, sig);
+    vsf_thread_signal(&thread->use_as__vsf_thread_t, sig - 1);
 
     // priority of sighandler which is defined by VSF_LINUX_CFG_PRIO_SIGNAL should
     //  be higher than normal task, so no need to yield here, and thus kill can
