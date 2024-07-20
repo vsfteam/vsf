@@ -1586,60 +1586,52 @@ static void __vsf_linux_sighandler(vsf_thread_cb_t *cb, int sig)
     vsf_linux_process_t *process = thread->process;
     vsf_linux_sig_handler_t *handler;
     sighandler_t sighandler;
-#if _NSIG >= 32
-    unsigned long long sig_mask;
-#else
-    unsigned long sig_mask;
-#endif
     vsf_protect_t orig;
 
     sig++;
-    while (true) {
-        orig = vsf_protect_sched();
-        sig_mask = process->sig.pending.sig[0] & ~process->sig.mask.sig[0];
-        if (!sig_mask) {
-            vsf_unprotect_sched(orig);
-            break;
-        } else {
-            process->sig.pending.sig[0] &= ~(1ULL << sig);
-        }
+    orig = vsf_protect_sched();
+    if ((process->sig.pending.sig[0] & ~process->sig.mask.sig[0]) & (1ULL << sig)) {
+        process->sig.pending.sig[0] &= ~(1ULL << sig);
+    } else {
         vsf_unprotect_sched(orig);
+        return;
+    }
+    vsf_unprotect_sched(orig);
 
-        handler = __vsf_linux_get_sighandler_ex(process, sig);
-        sighandler = SIG_DFL;
-        if (handler != NULL) {
-            if (handler->flags & SA_SIGINFO) {
-                VSF_LINUX_ASSERT(handler->sigaction_handler != NULL);
-                siginfo_t siginfo = {
-                    .si_signo   = sig,
-                    .si_errno   = errno,
-                };
-                handler->sigaction_handler(sig, &siginfo, NULL);
-                // signal processed by sigaction, but still needs to interrupt slow syscall if necessary
-                sighandler = SIG_IGN;
-            } else {
-                sighandler = handler->sighandler;
-            }
-        }
-
-        if (SIG_DFL == sighandler) {
-            // TODO: try to get default handler
+    handler = __vsf_linux_get_sighandler_ex(process, sig);
+    sighandler = SIG_DFL;
+    if (handler != NULL) {
+        if (handler->flags & SA_SIGINFO) {
+            VSF_LINUX_ASSERT(handler->sigaction_handler != NULL);
+            siginfo_t siginfo = {
+                .si_signo   = sig,
+                .si_errno   = errno,
+            };
+            handler->sigaction_handler(sig, &siginfo, NULL);
+            // signal processed by sigaction, but still needs to interrupt slow syscall if necessary
             sighandler = SIG_IGN;
+        } else {
+            sighandler = handler->sighandler;
         }
-        if (sighandler != SIG_IGN) {
-            sighandler(sig);
-        } else if ((NULL == handler) || !(handler->flags & SA_RESTART)) {
-            // handler is not registered, or SA_RESTART is not set
-            orig = vsf_protect_sched();
-                vsf_linux_trigger_t *trigger;
-                do {
-                    vsf_dlist_peek_head(vsf_linux_trigger_t, node,  &process->sig.trigger_list, trigger);
-                    if (trigger != NULL) {
-                        vsf_linux_trigger_signal(trigger, sig);
-                    }
-                } while (trigger != NULL);
-            vsf_unprotect_sched(orig);
-        }
+    }
+
+    if (SIG_DFL == sighandler) {
+        // TODO: try to get default handler
+        sighandler = SIG_IGN;
+    }
+    if (sighandler != SIG_IGN) {
+        sighandler(sig);
+    } else if ((NULL == handler) || !(handler->flags & SA_RESTART)) {
+        // handler is not registered, or SA_RESTART is not set
+        orig = vsf_protect_sched();
+            vsf_linux_trigger_t *trigger;
+            do {
+                vsf_dlist_peek_head(vsf_linux_trigger_t, node,  &process->sig.trigger_list, trigger);
+                if (trigger != NULL) {
+                    vsf_linux_trigger_signal(trigger, sig);
+                }
+            } while (trigger != NULL);
+        vsf_unprotect_sched(orig);
     }
 }
 #endif
