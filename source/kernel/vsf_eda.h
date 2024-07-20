@@ -596,6 +596,9 @@ enum {
     VSF_EVT_INVALID             = -1,       //!< compatible with fsm_rt_err
     VSF_EVT_NONE                = 0,        //!< compatible with fsm_rt_cpl
     VSF_EVT_YIELD               = 1,        //!< compatible with fsm_rt_on_going
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED && VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+    VSF_EVT_SIGNAL              = 2,
+#endif
 
     VSF_EVT_SYSTEM              = 0x100,
     VSF_EVT_DUMMY               = VSF_EVT_SYSTEM + 0,

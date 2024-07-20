@@ -321,7 +321,6 @@ vsf_class(vsf_linux_process_t) {
             sigset_t mask;
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
             vsf_dlist_t handler_list;
-            vsf_linux_thread_t *sighandler_thread;
             vsf_dlist_t trigger_list;
 #endif
         } sig;

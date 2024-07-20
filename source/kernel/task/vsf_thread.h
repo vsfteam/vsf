@@ -422,6 +422,10 @@ declare_class(vsf_thread_cb_t)
 
 typedef void vsf_thread_entry_t(vsf_thread_cb_t *thread);
 
+#   if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+typedef void vsf_thread_sighandler_t(vsf_thread_cb_t *thread, int sig);
+#   endif
+
 def_class( vsf_thread_t,
     public_member(
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
@@ -438,6 +442,9 @@ def_class(vsf_thread_cb_t,
 
     public_member(
         vsf_thread_entry_t      *entry;
+#if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+        vsf_thread_sighandler_t *sighandler;
+#endif
 #if VSF_KERNEL_CFG_THREAD_STACK_LARGE == ENABLED
         uint32_t                stack_size;
 #else
@@ -455,6 +462,11 @@ def_class(vsf_thread_cb_t,
 #else
         jmp_buf                 *pos;
         jmp_buf                 *ret;
+#endif
+#if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+        // set sig_pending if current thread is in subcall,
+        //  sighandler will be called if sig_pending is set and subcall returns.
+        VSF_KERNEL_CFG_THREAD_SIGNAL_MASK_T sig_pending;
 #endif
     )
 )
@@ -474,6 +486,10 @@ typedef struct {
 
 typedef void vsf_thread_entry_t(vsf_thread_t *thread);
 
+#   if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+typedef void vsf_thread_sighandler_t(vsf_thread_t *thread, int sig);
+#   endif
+
 //! \name thread
 //! @{
 def_class(vsf_thread_t,
@@ -487,6 +503,9 @@ def_class(vsf_thread_t,
 
     public_member(
         vsf_thread_entry_t      *entry;
+#if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+        vsf_thread_sighandler_t *sighandler;
+#endif
         uint32_t                stack_size;
         uint64_t                *stack;                 //!< stack must be 8byte aligned
     )
@@ -499,6 +518,11 @@ def_class(vsf_thread_t,
 #else
         jmp_buf                 *pos;
         jmp_buf                 *ret;
+#endif
+#if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+        // set sig_pending if current thread is in subcall,
+        //  sighandler will be called if sig_pending is set and subcall returns.
+        VSF_KERNEL_CFG_THREAD_SIGNAL_MASK_T sig_pending;
 #endif
     )
 )
@@ -585,6 +609,11 @@ void vsf_thread_yield(void);
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_set_priority")
 extern vsf_prio_t vsf_thread_set_priority(vsf_prio_t priority);
+#endif
+
+#if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_signal")
+extern void vsf_thread_signal(vsf_thread_t *thread, int sig);
 #endif
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED

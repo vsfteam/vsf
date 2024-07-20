@@ -146,6 +146,16 @@ not what you want, please disable VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE."
 #ifndef VSF_KERNEL_CFG_SUPPORT_THREAD
 #   define VSF_KERNEL_CFG_SUPPORT_THREAD                    ENABLED
 #endif
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
+#   ifndef VSF_KERNEL_CFG_THREAD_SIGNAL
+#       define VSF_KERNEL_CFG_THREAD_SIGNAL                 ENABLED
+#   endif
+#   if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+#       ifndef VSF_KERNEL_CFG_THREAD_SIGNAL_MASK_T
+#           define VSF_KERNEL_CFG_THREAD_SIGNAL_MASK_T      uint64_t
+#       endif
+#   endif
+#endif
 
 #ifndef VSF_KERNEL_USE_SIMPLE_SHELL
 #   define VSF_KERNEL_USE_SIMPLE_SHELL                      ENABLED

@@ -266,7 +266,7 @@ extern void vsf_linux_glibc_init(void);
 static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb);
 
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
-static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb);
+static void __vsf_linux_sighandler(vsf_thread_cb_t *cb, int sig);
 #endif
 
 // private APIs in other files
@@ -300,14 +300,6 @@ static const vsf_linux_thread_op_t __vsf_linux_main_op = {
     .on_run             = __vsf_linux_main_on_run,
     .on_terminate       = vsf_linux_thread_on_terminate,
 };
-
-#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
-static const vsf_linux_thread_op_t __vsf_linux_sighandler_op = {
-    .priv_size          = 0,
-    .on_run             = __vsf_linux_sighandler_on_run,
-    .on_terminate       = vsf_linux_thread_on_terminate,
-};
-#endif
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -1060,6 +1052,7 @@ vsf_linux_thread_t * vsf_linux_create_raw_thread(const vsf_linux_thread_op_t *op
 #else
         thread->entry = (vsf_thread_entry_t *)op->on_run;
 #endif
+        thread->sighandler = __vsf_linux_sighandler;
 
         // set stack
         thread->stack_size = stack_size;
@@ -1587,7 +1580,7 @@ static vsf_linux_sig_handler_t * __vsf_linux_get_sighandler_ex(vsf_linux_process
     return handler;
 }
 
-static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb)
+static void __vsf_linux_sighandler(vsf_thread_cb_t *cb, int sig)
 {
     vsf_linux_thread_t *thread = vsf_container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
     vsf_linux_process_t *process = thread->process;
@@ -1598,32 +1591,18 @@ static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb)
 #else
     unsigned long sig_mask;
 #endif
-    int sig;
     vsf_protect_t orig;
-    bool is_all_done = false;
 
     while (true) {
         orig = vsf_protect_sched();
-            sig_mask = process->sig.pending.sig[0] & ~process->sig.mask.sig[0];
-            if (!sig_mask) {
-                process->sig.sighandler_thread = NULL;
-                is_all_done = true;
-            } else {
-#if _NSIG >= 32
-                sig = vsf_ffz32(~sig_mask);
-                if (sig < 0) {
-                    sig = vsf_ffz32(~(sig_mask >> 32)) + 32;
-                }
-                process->sig.pending.sig[0] &= ~(1ULL << sig);
-#else
-                sig = vsf_ffz32(~sig_mask);
-                process->sig.pending.sig[0] &= ~(1 << sig);
-#endif
-            }
-        vsf_unprotect_sched(orig);
-        if (is_all_done) {
+        sig_mask = process->sig.pending.sig[0] & ~process->sig.mask.sig[0];
+        if (!sig_mask) {
+            vsf_unprotect_sched(orig);
             break;
+        } else {
+            process->sig.pending.sig[0] &= ~(1ULL << sig);
         }
+        vsf_unprotect_sched(orig);
 
         handler = __vsf_linux_get_sighandler_ex(process, sig);
         sighandler = SIG_DFL;
@@ -1661,7 +1640,6 @@ static void __vsf_linux_sighandler_on_run(vsf_thread_cb_t *cb)
             vsf_unprotect_sched(orig);
         }
     }
-    vsf_linux_detach_thread(thread);
 }
 #endif
 
@@ -2491,22 +2469,12 @@ int kill(pid_t pid, int sig)
 #else
     process->sig.pending.sig[0] |= 1 << sig;
 #endif
-    if (NULL == process->sig.sighandler_thread) {
-        process->sig.sighandler_thread = vsf_linux_create_raw_thread(&__vsf_linux_sighandler_op, 0, NULL);
-        if (NULL == process->sig.sighandler_thread) {
-            vsf_unprotect_sched(orig);
-            return -1;
-        }
-
-        vsf_linux_thread_t *thread = process->sig.sighandler_thread;
-        thread->process = process;
-        thread->tid = -1;
-        vsf_dlist_add_to_tail(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
-        vsf_unprotect_sched(orig);
-        vsf_linux_start_thread(thread, VSF_LINUX_CFG_PRIO_SIGNAL);
-        return 0;
-    }
     vsf_unprotect_sched(orig);
+
+    vsf_linux_thread_t *thread;
+    vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
+    vsf_thread_signal(&thread->use_as__vsf_thread_t, sig);
+
     // priority of sighandler which is defined by VSF_LINUX_CFG_PRIO_SIGNAL should
     //  be higher than normal task, so no need to yield here, and thus kill can
     //  be called in non-thread environment.

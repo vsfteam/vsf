@@ -961,6 +961,37 @@ int time_main(int argc, char *argv[])
     return ret;
 }
 
+#if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
+int kill_main(int argc, char *argv[])
+{
+    if ((argc < 2) || (argc > 3)) {
+        printf("format: kill [-SIGNAL] PID" VSH_LINEEND);
+        return -1;
+    }
+
+    int sig = SIGKILL;
+    if (argv[1][0] == '-') {
+        sig = atoi((const char *)&argv[1][1]);
+        if ((sig <= 0) || (sig > _NSIG)) {
+            printf("invalid signal number: %s" VSH_LINEEND, &argv[1][1]);
+            return -1;
+        }
+    }
+
+    int pid = atoi(argv[argc - 1]);
+    if (pid <= 0) {
+        printf("invalid pid: %s" VSH_LINEEND, argv[argc - 1]);
+        return -1;
+    }
+
+    if (kill(pid, sig) < 0) {
+        printf("fail to send signal %d to pid %d" VSH_LINEEND, sig, pid);
+        return -1;
+    }
+    return 0;
+}
+#endif
+
 #if     (VSF_HEAP_CFG_STATISTICS == ENABLED)                                    \
     &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                                  \
         ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED))

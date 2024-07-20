@@ -28,6 +28,12 @@
 
 /*============================ MACROS ========================================*/
 
+#if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+#  if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE != ENABLED
+#      error please enable VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE
+#  endif
+#endif
+
 #ifdef VSF_ARCH_SETJMP
 #   undef setjmp
 #   define setjmp               VSF_ARCH_SETJMP
@@ -120,9 +126,21 @@ static vsf_evt_t __vsf_thread_wait(vsf_thread_cb_t *pthis)
     VSF_KERNEL_ASSERT(pthis != NULL);
 
 #   if VSF_KERNEL_THREAD_USE_HOST == ENABLED
-    __vsf_kernel_host_request_send(pthis->rep);
-    __vsf_kernel_host_request_pend(&pthis->req);
-    curevt = pthis->evt;
+#       if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+    while (true) {
+#       endif
+        __vsf_kernel_host_request_send(pthis->rep);
+        __vsf_kernel_host_request_pend(&pthis->req);
+        curevt = pthis->evt;
+#       if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+        if (curevt != VSF_EVT_SIGNAL) {
+            break;
+        }
+        if (pthis->sighandler != NULL) {
+            pthis->sighandler(pthis, (int)vsf_eda_get_cur_msg());
+        }
+    }
+#       endif
 #   else
     jmp_buf pos;
 
@@ -131,11 +149,28 @@ static vsf_evt_t __vsf_thread_wait(vsf_thread_cb_t *pthis)
 #       endif
 
     pthis->pos = &pos;
-    curevt = setjmp(*(pthis->pos));
+#       if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+    while (true) {
+#       endif
+        curevt = setjmp(*(pthis->pos));
 
-    if (!curevt) {
-        longjmp(*(pthis->ret), -1);
+        if (!curevt) {
+#       if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+            if (VSF_EVT_SIGNAL == curevt) {
+                if (pthis->sighandler != NULL) {
+                    pthis->sighandler(pthis, (int)vsf_eda_get_cur_msg());
+                }
+            } else {
+#       endif
+                longjmp(*(pthis->ret), -1);
+#       if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+                break;
+            }
+#       endif
+        }
+#       if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
     }
+#       endif
     pthis->pos = NULL;
 #   endif
     return curevt;
@@ -153,9 +188,21 @@ vsf_evt_t vsf_thread_wait(void)
     curevt = __vsf_thread_wait((vsf_thread_cb_t *)thread_obj->fn.frame->ptr.param);
 #else
 #   if VSF_KERNEL_THREAD_USE_HOST == ENABLED
-    __vsf_kernel_host_request_send(thread_obj->rep);
-    __vsf_kernel_host_request_pend(&thread_obj->req);
-    curevt = thread_obj->evt;
+#       if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+    while (true) {
+#       endif
+        __vsf_kernel_host_request_send(thread_obj->rep);
+        __vsf_kernel_host_request_pend(&thread_obj->req);
+        curevt = thread_obj->evt;
+#       if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+        if (curevt != VSF_EVT_SIGNAL) {
+            break;
+        }
+        if (pthis->sighandler != NULL) {
+            pthis->sighandler(pthis, (int)vsf_eda_get_cur_msg());
+        }
+    }
+#       endif
 #    else
     jmp_buf pos;
 
@@ -164,10 +211,27 @@ vsf_evt_t vsf_thread_wait(void)
 #       endif
 
     thread_obj->pos = &pos;
-    curevt = setjmp(*thread_obj->pos);
-    if (!curevt) {
-        longjmp(*(thread_obj->ret), -1);
+#       if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+    while (true) {
+#       endif
+        curevt = setjmp(*thread_obj->pos);
+        if (!curevt) {
+#       if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+            if (VSF_EVT_SIGNAL == curevt) {
+                if (pthis->sighandler != NULL) {
+                    pthis->sighandler(pthis, (int)vsf_eda_get_cur_msg());
+                }
+            } else {
+#       endif
+            longjmp(*(thread_obj->ret), -1);
+#       if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+            break;
+            }
+#       endif
+        }
+#       if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
     }
+#       endif
     thread_obj->pos = NULL;
 #    endif
 #endif
@@ -455,6 +519,9 @@ vsf_err_t vsf_thread_start( vsf_thread_t *pthis,
 #if VSF_KERNEL_THREAD_USE_HOST == ENABLED
     thread_cb->is_inited = false;
 #endif
+#if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+    thread_cb->sig_pending = 0;
+#endif
 
     vsf_err_t err;
 #   if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
@@ -546,12 +613,34 @@ static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler,
         VSF_KERNEL_ASSERT(false);
     }
 #   endif
+
     vsf_evt_t evt = __vsf_thread_wait(cb_obj);
     VSF_KERNEL_ASSERT(evt == VSF_EVT_RETURN);
+
+#   if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+    vsf_protect_t orig = vsf_protect_int();
+    VSF_KERNEL_CFG_THREAD_SIGNAL_MASK_T sig_mask = cb_obj->sig_pending;
+    cb_obj->sig_pending = 0;
+    vsf_unprotect_int(orig);
+
+    if (sig_mask) {
+        for (int i = 0; i < sizeof(sig_mask) * 8; i++) {
+            if (sig_mask * (1ULL << i)) {
+                if (cb_obj->sighandler != NULL) {
+                    cb_obj->sighandler(cb_obj, i);
+                }
+            }
+        }
+    }
+#   endif
 
 #else
     jmp_buf pos;
     cb_obj->pos = &pos;
+
+#   if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+next_evt:
+#   endif
     if (!setjmp(*(cb_obj->pos))) {
         err = __vsf_eda_call_eda_ex_prepare(eda_handler, param, state, true);
         VSF_KERNEL_ASSERT(VSF_ERR_NONE == err);
@@ -572,6 +661,25 @@ static vsf_err_t __vsf_thread_call_eda_ex(  uintptr_t eda_handler,
             VSF_KERNEL_ASSERT(false);
         }
 #   endif
+
+#   if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+    vsf_protect_t orig = vsf_protect_int();
+    VSF_KERNEL_CFG_THREAD_SIGNAL_MASK_T sig_mask = cb_obj->sig_pending;
+    cb_obj->sig_pending = 0;
+    vsf_unprotect_int(orig);
+
+    if (sig_mask) {
+        for (int i = 0; i < sizeof(sig_mask) * 8; i++) {
+            if (sig_mask * (1ULL << i)) {
+                if (cb_obj->sighandler != NULL) {
+                    cb_obj->sighandler(cb_obj, i);
+                }
+            }
+        }
+        goto next_evt;
+    }
+#   endif
+
 #   if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
         // can not check stack here, because __vsf_eda_call_eda_ex_prepare switch
         //  current frame to eda context instead of thread context
@@ -715,6 +823,37 @@ vsf_prio_t vsf_thread_set_priority(vsf_prio_t priority)
         vsf_thread_yield();
     }
     return orig_prio;
+}
+#endif
+
+#if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_thread_signal")
+void vsf_thread_signal(vsf_thread_t *thread, int sig)
+{
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL != ENABLED
+    vsf_eda_post_evt_msg((vsf_eda_t *)thread, VSF_EVT_SIGNAL, (void *)sig);
+#   else
+    VSF_KERNEL_ASSERT(sig < (sizeof(VSF_KERNEL_CFG_THREAD_SIGNAL_MASK_T) * 8));
+    __vsf_eda_frame_t *frame = thread->fn.frame;
+    VSF_KERNEL_ASSERT(frame != NULL);
+
+    vsf_protect_t orig = vsf_protect_int();
+    if (frame->next != NULL) {
+        // in subcall
+        vsf_thread_cb_t *thread_cb;
+
+        while (frame->next != NULL) {
+            frame = (__vsf_eda_frame_t *)frame->next;
+        }
+        VSF_KERNEL_ASSERT(frame->state.feature.is_stack_owner);
+
+        thread_cb = (vsf_thread_cb_t *)frame->ptr.param;
+        thread_cb->sig_pending |= 1ULL << sig;
+    } else {
+        vsf_eda_post_evt_msg((vsf_eda_t *)thread, VSF_EVT_SIGNAL, (void *)sig);
+    }
+    vsf_unprotect_int(orig);
+#   endif
 }
 #endif
 
