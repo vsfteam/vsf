@@ -723,7 +723,7 @@ fsm_rt_t vk_thread_call_task(vsf_task_entry_t task_handler, uintptr_t param, siz
         } else {
             break;
         }
-        __vsf_thread_wait(cb);
+        __vsf_thread_wait(thread_obj, cb);
     }
 
     return ret;
