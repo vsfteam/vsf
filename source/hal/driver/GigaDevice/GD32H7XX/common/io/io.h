@@ -58,34 +58,34 @@ extern "C" {
 
 // HW, not for emulated drivers
 typedef enum vsf_io_mode_t {
-    VSF_IO_PULL_UP                              = (0 << 0),     //!< enable pull-up resistor
-    VSF_IO_PULL_DOWN                            = (1 << 0),     //!< enable pull-down resistor
-    VSF_IO_OPEN_DRAIN                           = (2 << 0),     //!< enable open-drain mode
+    // 0..1, GPIO_CTL: INPUT(0)/OUTPUT(1)/AF(2)/ANALOG(3)
+    // 2: GPIO_OMODE: PUSHPULL(0)/OPENDRAIN(1)
+    VSF_IO_INPUT                                = (0 << 0),     //!< enable input mode
     VSF_IO_ANALOG                               = (3 << 0),     //!< enable analog function
+    VSF_IO_OUTPUT_PUSH_PULL                     = (1 << 4) | (0 << 2),  //!< enable output push-pull mode
+    VSF_IO_OUTPUT_OPEN_DRAIN                    = (1 << 4) | (1 << 2),  //!< enable output open-drain mode
+    VSF_IO_AF_PUSH_PULL                         = (2 << 0) | (0 << 2),  //!< enable AF push-pull mode
+    VSF_IO_AF_OPEN_DRAIN                        = (2 << 0) | (1 << 2),  //!< enable AF open-drain mode
+    VSF_IO_EXTI                                 = VSF_IO_INPUT,
 
-    VSF_IO_NORMAL_INPUT                         = (0 << 3),     //!< normal input pin level
-    VSF_IO_INVERT_INPUT                         = (1 << 3),     //!< inverted input pin level
-    VSF_IO_DISABLE_INPUT                        = (1 << 4),     //!< disable input
+    // 3..4, GPIO_PUD: FLOATING(0)/PULLUP(1)/PULLDOWN(2)
+    VSF_IO_NO_PULL_UP_DOWN                      = (0 << 3),     //!< enable floating
+    VSF_IO_PULL_UP                              = (1 << 3),     //!< enable pull-up resistor
+    VSF_IO_PULL_DOWN                            = (2 << 3),     //!< enable pull-down resistor
 
-    VSF_IO_FILTER_BYPASS                        = (0 << 5),     //!< filter is bypassed
-    VSF_IO_FILTER_2CLK                          = (1 << 5),     //!< levels should keep 2 clks
-    VSF_IO_FILTER_4CLK                          = (2 << 5),     //!< levels should keep 4 clks
-    VSF_IO_FILTER_8CLK                          = (3 << 5),     //!< levels should keep 8 clks
+    // 5..6, GPIO_OSPD: 12M(0)/60M(1)/85M(2)/100/220M(3)
+    VSF_IO_SPEED_12MHZ                          = (0 << 5),
+    VSF_IO_SPEED_60MHZ                          = (1 << 5),
+    VSF_IO_SPEED_85MHZ                          = (2 << 5),
+    VSF_IO_SPEED_100MHZ_220MHZ                  = (3 << 5),
+    VSF_IO_SPEED_MASK                           = (3 << 5),
+#define VSF_IO_SPEED_12MHZ                      VSF_IO_SPEED_12MHZ
+#define VSF_IO_SPEED_60MHZ                      VSF_IO_SPEED_60MHZ
+#define VSF_IO_SPEED_85MHZ                      VSF_IO_SPEED_85MHZ
+#define VSF_IO_SPEED_100MHZ_220MHZ              VSF_IO_SPEED_100MHZ_220MHZ
+#define VSF_IO_SPEED_MASK                       VSF_IO_SPEED_MASK
 
-    VSF_IO_FILTER_CLK_SRC0                      = (0 << 7),     //!< select clock src 0 for filter
-    VSF_IO_FILTER_CLK_SRC1                      = (1 << 7),     //!< select clock src 1 for filter
-    VSF_IO_FILTER_CLK_SRC2                      = (2 << 7),     //!< select clock src 2 for filter
-    VSF_IO_FILTER_CLK_SRC3                      = (3 << 7),     //!< select clock src 3 for filter
-    VSF_IO_FILTER_CLK_SRC4                      = (4 << 7),     //!< select clock src 4 for filter
-    VSF_IO_FILTER_CLK_SRC5                      = (5 << 7),     //!< select clock src 5 for filter
-    VSF_IO_FILTER_CLK_SRC6                      = (6 << 7),     //!< select clock src 6 for filter
-    VSF_IO_FILTER_CLK_SRC7                      = (7 << 7),     //!< select clock src 7 for filter
-
-    VSF_IO_HIGH_DRIVE_STRENGTH                  = (1 << 10),    //!< enable high drive strength
-    VSF_IO_HIGH_DRIVE_NO_STRENGTH               = (1 << 10),    //!< enable high drive strength
-
-    VSF_IO_INTERRUPT_DISABLED                   = (0 << 11),
-    VSF_IO_INTERRUPT_ENABLED                    = (1 << 11),
+    // TODO: add input fileter modes
 } vsf_io_mode_t;
 // HW end
 
