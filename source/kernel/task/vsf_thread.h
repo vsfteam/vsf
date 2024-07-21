@@ -417,34 +417,23 @@ extern "C" {
 
 declare_class(vsf_thread_t)
 
-#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-declare_class(vsf_thread_cb_t)
-
-typedef void vsf_thread_entry_t(vsf_thread_cb_t *thread);
-
 #   if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
-typedef void vsf_thread_sighandler_t(vsf_thread_cb_t *thread, int sig);
+typedef void vsf_thread_sighandler_t(vsf_thread_t *thread, int sig);
 #   endif
 
-def_class( vsf_thread_t,
-    public_member(
-#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-        implement(vsf_teda_t)
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+declare_class(vsf_thread_cb_t)
+typedef void vsf_thread_entry_t(vsf_thread_cb_t *thread);
 #else
-        implement(vsf_eda_t)
+typedef void vsf_thread_entry_t(vsf_thread_t *thread);
 #endif
-    )
-)
-end_def_class(vsf_thread_t)
-//! \name thread
+
+//! \name thread control block
 //! @{
 def_class(vsf_thread_cb_t,
 
     public_member(
         vsf_thread_entry_t      *entry;
-#if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
-        vsf_thread_sighandler_t *sighandler;
-#endif
 #if VSF_KERNEL_CFG_THREAD_STACK_LARGE == ENABLED
         uint32_t                stack_size;
 #else
@@ -458,20 +447,40 @@ def_class(vsf_thread_cb_t,
         vsf_arch_irq_thread_t   host_thread;
         vsf_arch_irq_request_t  req, *rep;
         vsf_evt_t               evt;
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
         bool                    is_inited;
+#   endif
 #else
         jmp_buf                 *pos;
         jmp_buf                 *ret;
-#endif
-#if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
-        // set sig_pending if current thread is in subcall,
-        //  sighandler will be called if sig_pending is set and subcall returns.
-        VSF_KERNEL_CFG_THREAD_SIGNAL_MASK_T sig_pending;
 #endif
     )
 )
 end_def_class(vsf_thread_cb_t)
 //! @}
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+
+def_class( vsf_thread_t,
+    public_member(
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+        implement(vsf_teda_t)
+#else
+        implement(vsf_eda_t)
+#endif
+#if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
+        vsf_thread_sighandler_t *sighandler;
+#endif
+    )
+#if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+    private_member(
+        // set sig_pending if current thread is in subcall,
+        //  sighandler will be called if sig_pending is set and subcall returns.
+        VSF_KERNEL_CFG_THREAD_SIGNAL_MASK_T sig_pending;
+    )
+#endif
+)
+end_def_class(vsf_thread_t)
 
 typedef struct {
     vsf_thread_entry_t          *entry;
@@ -483,13 +492,6 @@ typedef struct {
 
 #else
 
-
-typedef void vsf_thread_entry_t(vsf_thread_t *thread);
-
-#   if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
-typedef void vsf_thread_sighandler_t(vsf_thread_t *thread, int sig);
-#   endif
-
 //! \name thread
 //! @{
 def_class(vsf_thread_t,
@@ -499,32 +501,19 @@ def_class(vsf_thread_t,
 #else
         implement(vsf_eda_t)
 #endif
-    )
-
-    public_member(
-        vsf_thread_entry_t      *entry;
 #if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED
         vsf_thread_sighandler_t *sighandler;
 #endif
-        uint32_t                stack_size;
-        uint64_t                *stack;                 //!< stack must be 8byte aligned
+        implement(vsf_thread_cb_t)
     )
 
-    private_member(
-#if VSF_KERNEL_THREAD_USE_HOST == ENABLED
-        vsf_arch_irq_thread_t   host_thread;
-        vsf_arch_irq_request_t  req, *rep;
-        vsf_evt_t               evt;
-#else
-        jmp_buf                 *pos;
-        jmp_buf                 *ret;
-#endif
 #if VSF_KERNEL_CFG_THREAD_SIGNAL == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_SUB_CALL == ENABLED
+    private_member(
         // set sig_pending if current thread is in subcall,
         //  sighandler will be called if sig_pending is set and subcall returns.
         VSF_KERNEL_CFG_THREAD_SIGNAL_MASK_T sig_pending;
-#endif
     )
+#endif
 )
 end_def_class(vsf_thread_t)
 //! @}

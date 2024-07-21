@@ -270,7 +270,7 @@ extern void vsf_linux_glibc_init(void);
 static void __vsf_linux_main_on_run(vsf_thread_cb_t *cb);
 
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
-static void __vsf_linux_sighandler(vsf_thread_cb_t *cb, int sig);
+static void __vsf_linux_sighandler(vsf_thread_t *thread, int sig);
 #endif
 
 // private APIs in other files
@@ -1584,10 +1584,9 @@ static vsf_linux_sig_handler_t * __vsf_linux_get_sighandler_ex(vsf_linux_process
     return handler;
 }
 
-static void __vsf_linux_sighandler(vsf_thread_cb_t *cb, int sig)
+static void __vsf_linux_sighandler(vsf_thread_t *thread, int sig)
 {
-    vsf_linux_thread_t *thread = vsf_container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
-    vsf_linux_process_t *process = thread->process;
+    vsf_linux_process_t *process = ((vsf_linux_thread_t *)thread)->process;
     vsf_linux_sig_handler_t *handler;
     sighandler_t sighandler;
     vsf_protect_t orig;
