@@ -28,7 +28,14 @@
 #define VSF_ARCH_PRI_BIT            4
 
 // software interrupt provided by a dedicated device
-#define VSF_DEV_SWI_NUM             5
+#ifndef VSF_DEV_SWI_NUM
+#   define VSF_DEV_SWI_NUM          5
+#endif
+#if VSF_DEV_SWI_NUM > VSF_ARCH_PRI_NUM
+#   warning too many VSF_DEV_SWI_NUM, max is VSF_ARCH_PRI_NUM
+#   undef VSF_DEV_SWI_NUM
+#   define VSF_DEV_SWI_NUM          VSF_ARCH_PRI_NUM
+#endif
 
 #elif defined(__VSF_HAL_SHOW_VENDOR_INFO__)
 
@@ -41,7 +48,9 @@
 #define __HAL_DEVICE_GIGADEVICE_GD32H7XX_H__
 
 // software interrupt provided by a dedicated device
-#define VSF_DEV_SWI_LIST            SWI0_IRQn,SWI1_IRQn,SWI2_IRQn,SWI3_IRQn,SWI4_IRQn
+#define __VSF_DEF_SWI_LIST_DEF(__N, __PARAM)                                    \
+                                    VSF_MCONNECT(SWI, __N, _IRQn),
+#define VSF_DEV_SWI_LIST            VSF_MREPEAT(VSF_DEV_SWI_NUM, __VSF_DEF_SWI_LIST_DEF, NULL)
 
 /*============================ INCLUDES ======================================*/
 
@@ -65,6 +74,21 @@
     .ulpi_en = false,                                                           \
     .utmi_en = false,                                                           \
     .vbus_en = false,
+
+#define VSF_HW_IO_PORT_COUNT            10
+#define VSF_HW_IO_PORT_MASK             0x6FF       // no GPIOI
+#define VSF_HW_IO_PIN_COUNT             16
+#define VSF_HW_IO_FUNCTION_MAX          16
+#define VSF_HW_IO_PORT0_REG_BASE        (0x58020000)
+#define VSF_HW_IO_PORT1_REG_BASE        (0x58020400)
+#define VSF_HW_IO_PORT2_REG_BASE        (0x58020800)
+#define VSF_HW_IO_PORT3_REG_BASE        (0x58020C00)
+#define VSF_HW_IO_PORT4_REG_BASE        (0x58021000)
+#define VSF_HW_IO_PORT5_REG_BASE        (0x58021400)
+#define VSF_HW_IO_PORT6_REG_BASE        (0x58021800)
+#define VSF_HW_IO_PORT7_REG_BASE        (0x58021C00)
+#define VSF_HW_IO_PORT9_REG_BASE        (0x58022400)
+#define VSF_HW_IO_PORT10_REG_BASE       (0x58022800)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

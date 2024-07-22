@@ -23,6 +23,8 @@
 
 #include "hal/vsf_hal.h"
 
+#include "../vendor/Include/gd32h7xx_gpio.h"
+
 /*============================ MACROS ========================================*/
 
 /*\note VSF_HW_GPIO_CFG_MULTI_CLASS is only for drivers for specified device(hw drivers).
@@ -49,10 +51,16 @@ typedef struct VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) {
 #if VSF_HW_GPIO_CFG_MULTI_CLASS == ENABLED
     vsf_gpio_t                  vsf_gpio;
 #endif
+    uint32_t                    reg;
 } VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t);
 // HW end
 
 /*============================ IMPLEMENTATION ================================*/
+
+uint32_t __vsf_hw_gpio_get_regbase(vsf_hw_gpio_t *gpio_ptr)
+{
+    return gpio_ptr->reg;
+}
 
 void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_config_pin)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
@@ -60,6 +68,25 @@ void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_config_pin)(
     vsf_gpio_mode_t mode
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
+
+    uint32_t reg = gpio_ptr->reg, offset_len2;
+    uint32_t ctl = (mode >> 0) & 3;
+    uint32_t omode = (mode >> 2) & 1;
+    uint32_t pud = (mode >> 3) & 3;
+    uint32_t ospd = (mode >> 4) & 3;
+    uint32_t current_pin_mask;
+
+    for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
+        current_pin_mask = 1 << i;
+        if (pin_mask & current_pin_mask) {
+            offset_len2 = i << 1;
+
+            vsf_atom32_op(&GPIO_CTL(reg), (_ & ~(3 << offset_len2)) | (ctl << offset_len2));
+            vsf_atom32_op(&GPIO_OMODE(reg), (_ & ~(1 << i)) | (omode << i));
+            vsf_atom32_op(&GPIO_OSPD(reg), (_ & ~(3 << offset_len2)) | (ospd << offset_len2));
+            vsf_atom32_op(&GPIO_PUD(reg), (_ & ~(3 << offset_len2)) | (pud << offset_len2));
+        }
+    }
 }
 
 void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_set_direction)(
@@ -68,6 +95,19 @@ void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_set_direction)(
     vsf_gpio_pin_mask_t direction_mask
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
+
+    uint32_t reg = gpio_ptr->reg, offset_len2;
+    uint32_t ctl, current_pin_mask;
+
+    for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
+        current_pin_mask = 1 << i;
+        if (pin_mask & current_pin_mask) {
+            ctl = (direction_mask >> i) & 1;
+            offset_len2 = i << 1;
+
+            vsf_atom32_op(&GPIO_CTL(reg), (_ & ~(3 << offset_len2)) | (ctl << offset_len2));
+        }
+    }
 }
 
 vsf_gpio_pin_mask_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_get_direction)(
@@ -75,14 +115,26 @@ vsf_gpio_pin_mask_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_get_direction)(
     vsf_gpio_pin_mask_t pin_mask
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
-    return 0;
+
+    uint32_t ctl = GPIO_CTL(gpio_ptr->reg), current_pin_mask;
+    vsf_gpio_pin_mask_t direction = 0;
+
+    for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++, ctl >>= 2) {
+        current_pin_mask = 1 << i;
+        if (pin_mask & current_pin_mask) {
+            if ((ctl & 3) == 1) {
+                direction |= current_pin_mask;
+            }
+        }
+    }
+    return direction;
 }
 
 vsf_gpio_pin_mask_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_read)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
-    return 0;
+    return GPIO_ISTAT(gpio_ptr->reg);
 }
 
 void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_write)(
@@ -91,6 +143,9 @@ void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_write)(
     vsf_gpio_pin_mask_t value
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
+
+    value &= pin_mask;
+    vsf_atom32_op(&GPIO_OCTL(gpio_ptr->reg), (_ & ~pin_mask) | value);
 }
 
 void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_toggle)(
@@ -98,6 +153,7 @@ void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_toggle)(
     vsf_gpio_pin_mask_t pin_mask
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
+    GPIO_TG(gpio_ptr->reg) |= pin_mask;
 }
 
 vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_enable)(
@@ -106,6 +162,7 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_enable)(
     vsf_arch_prio_t prio
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
+    VSF_HAL_ASSERT(false);
     return VSF_ERR_NONE;
 }
 
@@ -113,6 +170,7 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_disable)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
     vsf_gpio_pin_mask_t pin_mask) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
+    VSF_HAL_ASSERT(false);
     return VSF_ERR_NONE;
 }
 
@@ -122,6 +180,7 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_config)(
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);
+    VSF_HAL_ASSERT(false);
     return VSF_ERR_NONE;
 }
 
@@ -158,20 +217,6 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_config)(
  *              VSF_GPIO_CFG_CAPABILITY_PIN_MASK
  */
 
-void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_output_and_set)(
-    VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
-    vsf_gpio_pin_mask_t pin_mask
-) {
-    VSF_HAL_ASSERT(NULL != gpio_ptr);
-}
-
-void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_output_and_clear)(
-    VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
-    vsf_gpio_pin_mask_t pin_mask
-) {
-    VSF_HAL_ASSERT(NULL != gpio_ptr);
-}
-
 vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr
 ) {
@@ -187,14 +232,17 @@ vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET         ENABLED
-#define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR       ENABLED
+#define VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET      1
+#define VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_CLEAR    1
+#define VSF_GPIO_CFG_CHANGE_DIR_FIRST                       DISABLED
+
 #define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED
 
 #define VSF_GPIO_CFG_IMP_LV0(__IDX, __HAL_OP)                                   \
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t)                              \
         VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio, __IDX) = {                 \
         __HAL_OP                                                                \
+        .reg                        = VSF_HW_IO_PORT ## __IDX ## _REG_BASE,     \
     };
 
 #include "hal/driver/common/gpio/gpio_template.inc"

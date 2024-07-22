@@ -23,6 +23,8 @@
 
 #include "hal/vsf_hal.h"
 
+#include "../vendor/Include/gd32h7xx_gpio.h"
+
 /*============================ MACROS ========================================*/
 
 /*\note VSF_HW_IO_CFG_MULTI_CLASS is only for drivers for specified device(hw drivers).
@@ -61,6 +63,21 @@ vsf_err_t VSF_MCONNECT(VSF_IO_CFG_IMP_PREFIX, _io_config_one_pin)(
     VSF_HAL_ASSERT(io_ptr != NULL);
     VSF_HAL_ASSERT(cfg_ptr != NULL);
 
+    vsf_hw_gpio_t *gpio_ptr = vsf_hw_gpios[cfg_ptr->port_index];
+    VSF_HAL_ASSERT(gpio_ptr != NULL);
+    uint32_t reg = __vsf_hw_gpio_get_regbase(gpio_ptr);
+    uint32_t pin = cfg_ptr->pin_index, function = cfg_ptr->function, offset_len4;
+
+    if (VSF_IO_AF == (cfg_ptr->mode & 3)) {
+        if (pin < 8) {
+            offset_len4 = pin << 2;
+            vsf_atom32_op(&GPIO_AFSEL0(reg), (_ & ~(15 << offset_len4)) | (function << offset_len4));
+        } else {
+            offset_len4 = (pin - 8) << 2;
+            vsf_atom32_op(&GPIO_AFSEL1(reg), (_ & ~(15 << offset_len4)) | (function << offset_len4));
+        }
+    }
+    vsf_hw_gpio_config_pin(gpio_ptr, 1 << pin, cfg_ptr->mode);
     return VSF_ERR_NONE;
 }
 
@@ -86,7 +103,10 @@ vsf_err_t VSF_MCONNECT(VSF_IO_CFG_IMP_PREFIX, _io_config)(
 vsf_io_capability_t VSF_MCONNECT(VSF_IO_CFG_IMP_PREFIX, _io_capability)(
     VSF_MCONNECT(VSF_IO_CFG_IMP_PREFIX, _io_t) *io_ptr
 ) {
-    return (vsf_io_capability_t){ 0 };
+    return (vsf_io_capability_t){
+        .pin_count                  = 16,
+        .pin_mask                   = 0xFFFF,
+    };
 }
 
 /*============================ INCLUDES ======================================*/

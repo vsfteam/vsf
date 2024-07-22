@@ -60,8 +60,14 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef struct vsf_hw_gpio_t vsf_hw_gpio_t;
+
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
+
+// __vsf_hw_gpio_get_regbase is used in io module to access af registers
+extern uint32_t __vsf_hw_gpio_get_regbase(vsf_hw_gpio_t *gpio_ptr);
 
 #ifdef __cplusplus
 }
