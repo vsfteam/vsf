@@ -149,20 +149,26 @@ Dependency: VSF_IO_CFG_FUNCTION_RENAME enable
  * @brief Predefined VSF IO modes that can be reimplemented in specific hal drivers.
  *
  * \~chinese
- * @brief 预定义的VSF IO 模式，可以在具体的hal驱动重新实现。
+ * @brief 预定义的 VSF IO 模式，可以在具体的 HAL 驱动重新实现。
  *
  * \~english
- * Even if the hardware doesn't support these features, these modes must be implemented:
+ * Even if the hardware doesn't support these features, these modes must be implemented.
+ * If the IO supports more modes, such as the alternative output push-pull and
+ * the alternative open-drain output, We can implement it in the hardware driver.
+ * However, VSF_IO_AF mode must be retained.
+ * If we add a new mode in the hardware driver, then we also need to define the
+ * macro VSF_IO_MODE_MASK, whose value is the OR of the value of all modes.
  * \~chinese
- * 即使硬件不支持这些功能，但是这些模式是必须实现的：
+ * 即使硬件不支持这些功能，但是这些模式是必须实现的。如果硬件支持更多模式，例如复用推挽输出或者
+ * 复用开漏输出，我们可以在硬件驱动里实现它，但是 VSF_IO_AF 模式必须保留。
+ * 如果硬件驱动里我们添加了新的模式，那么也需要定义宏 VSF_IO_MODE_MASK，它的值是所有模式的值的或。
  *
  * - INPUT/OUTPUT
  *  - VSF_IO_INPUT
  *  - VSF_IO_ANALOG
  *  - VSF_IO_OUTPUT_PUSH_PULL
  *  - VSF_IO_OUTPUT_OPEN_DRAIN
- *  - VSF_IO_AF_PUSH_PULL
- *  - VSF_IO_AF_OPEN_DRAIN
+ *  - VSF_IO_AF
  *  - VSF_IO_EXTI
  * - PULL_UP_AND_DOWN:
  *  - VSF_IO_NO_PULL_UP_DOWN
@@ -210,12 +216,10 @@ typedef enum vsf_io_mode_t {
     VSF_IO_OUTPUT_PUSH_PULL         = (2 << 0),
     //! Set IO to open drain output
     VSF_IO_OUTPUT_OPEN_DRAIN        = (3 << 0),
-    //! Set IO to push-pull alternative output
-    VSF_IO_AF_PUSH_PULL             = (4 << 0),
-    //! Set IO to push-pull alternative output
-    VSF_IO_AF_OPEN_DRAIN            = (5 << 0),
     //! Set IO to external interrupt
-    VSF_IO_EXTI                     = (6 << 0),
+    VSF_IO_EXTI                     = (4 << 0),
+    //! Set IO to alternative function.
+    VSF_IO_AF                       = (5 << 0),
 
     // Turn on or off the internal pull-up and pull-down resistors of the IOs
     // It is independent of the direction of the IO and the alternative function
@@ -249,19 +253,20 @@ typedef enum vsf_io_mode_t {
 enum {
     VSF_IO_FLOATING                 = VSF_IO_NO_PULL_UP_DOWN,
 
-    VSF_IO_INOUT_MASK               = VSF_IO_INPUT
+#ifndef VSF_IO_MODE_MASK
+    VSF_IO_MODE_MASK                = VSF_IO_INPUT
                                     | VSF_IO_EXTI
                                     | VSF_IO_ANALOG
                                     | VSF_IO_OUTPUT_PUSH_PULL
                                     | VSF_IO_OUTPUT_OPEN_DRAIN
-                                    | VSF_IO_AF_PUSH_PULL
-                                    | VSF_IO_AF_OPEN_DRAIN,
+                                    | VSF_IO_AF,
+#endif
 
     VSF_IO_PULL_UP_DOWN_MASK        = VSF_IO_NO_PULL_UP_DOWN
                                     | VSF_IO_PULL_UP
                                     | VSF_IO_PULL_DOWN,
 
-    VSF_IO_MODE_ALL_BITS_MASK       = VSF_IO_INOUT_MASK
+    VSF_IO_MODE_ALL_BITS_MASK       = VSF_IO_MODE_MASK
                                     | VSF_IO_PULL_UP_DOWN_MASK
 #ifdef VSF_IO_INVERT_INPUT
                                     | VSF_IO_INVERT_INPUT

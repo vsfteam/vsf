@@ -152,16 +152,22 @@ extern "C" {
  *
  * \~english
  * Even if the hardware doesn't support these features, these modes must be implemented:
+ * If the IO supports more modes, such as the alternative output push-pull and
+ * the alternative open-drain output, We can implement it in the hardware driver.
+ * However, VSF_GPIO_AF mode must be retained.
+ * If we add a new mode in the hardware driver, then we also need to define the
+ * macro VSF_GPIO_MODE_MASK, whose value is the OR of the value of all modes.
  * \~chinese
- * 即使硬件不支持这些功能，但是这些模式是必须实现的：
+ * 即使硬件不支持这些功能，但是这些模式是必须实现的。如果硬件支持更多模式，例如复用推挽输出或者
+ * 复用开漏输出，我们可以在硬件驱动里实现它，但是 VSF_GPIO_AF 模式必须保留。
+ * 如果硬件驱动里我们添加了新的模式，那么也需要定义宏 VSF_IO_MODE_MASK，它的值是所有模式的值的或。
  *
  * - INPUT/OUTPUT
  *  - VSF_GPIO_INPUT
  *  - VSF_GPIO_ANALOG
  *  - VSF_GPIO_OUTPUT_PUSH_PULL
  *  - VSF_GPIO_OUTPUT_OPEN_DRAIN
- *  - VSF_GPIO_AF_PUSH_PULL
- *  - VSF_GPIO_AF_OPEN_DRAIN
+ *  - VSF_GPIO_AF
  *  - VSF_GPIO_EXTI
  * - PULL_UP_AND_DOWN:
  *  - VSF_GPIO_NO_PULL_UP_DOWN
@@ -206,12 +212,10 @@ typedef enum vsf_gpio_mode_t {
     VSF_GPIO_OUTPUT_PUSH_PULL         = (2 << 0),
     //! Set IO to open drain output
     VSF_GPIO_OUTPUT_OPEN_DRAIN        = (3 << 0),
-    //! Set IO to push-pull alternative output
-    VSF_GPIO_AF_PUSH_PULL             = (4 << 0),
-    //! Set IO to push-pull alternative output
-    VSF_GPIO_AF_OPEN_DRAIN            = (5 << 0),
     //! Set IO to external interrupt
-    VSF_GPIO_EXTI                     = (6 << 0),
+    VSF_GPIO_EXTI                     = (4 << 0),
+    //! Set IO to alternative function
+    VSF_GPIO_AF                       = (5 << 0),
 
     // Turn on or off the internal pull-up and pull-down resistors of the IOs
     // It is independent of the direction of the IO and the alternative function
@@ -267,19 +271,21 @@ typedef enum vsf_gpio_mode_t {
 
 enum {
     VSF_GPIO_FLOATING               = VSF_GPIO_NO_PULL_UP_DOWN,
-    VSF_GPIO_INOUT_MASK             = VSF_GPIO_INPUT
+
+#ifndef VSF_GPIO_MODE_MASK
+    VSF_GPIO_MODE_MASK              = VSF_GPIO_INPUT
                                     | VSF_GPIO_EXTI
                                     | VSF_GPIO_ANALOG
                                     | VSF_GPIO_OUTPUT_PUSH_PULL
                                     | VSF_GPIO_OUTPUT_OPEN_DRAIN
-                                    | VSF_GPIO_AF_PUSH_PULL
-                                    | VSF_GPIO_AF_OPEN_DRAIN,
+                                    | VSF_GPIO_AF,
+#endif
 
     VSF_GPIO_PULL_UP_DOWN_MASK      = VSF_GPIO_NO_PULL_UP_DOWN
                                     | VSF_GPIO_PULL_UP
                                     | VSF_GPIO_PULL_DOWN,
 
-    VSF_GPIO_MODE_ALL_BITS_MASK     = VSF_GPIO_INOUT_MASK
+    VSF_GPIO_MODE_ALL_BITS_MASK     = VSF_GPIO_MODE_MASK
                                     | VSF_GPIO_PULL_UP_DOWN_MASK
 #ifdef VSF_GPIO_INVERT_INPUT
                                     | VSF_GPIO_INVERT_INPUT
