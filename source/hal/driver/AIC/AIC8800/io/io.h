@@ -45,8 +45,7 @@ typedef enum vsf_io_mode_t {
     VSF_IO_OUTPUT_PUSH_PULL         = (2 << 17),
     VSF_IO_ANALOG                   = (3 << 17),
     VSF_IO_EXTI                     = (4 << 17),
-    VSF_IO_AF_PUSH_PULL             = (5 << 17),
-    VSF_IO_AF_OPEN_DRAIN            = (6 << 17),
+    VSF_IO_AF                       = (5 << 17),
 } vsf_io_mode_t;
 
 /*============================ PROTOTYPES ====================================*/
