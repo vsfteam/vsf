@@ -1613,21 +1613,28 @@ int vsf_linux_fs_bind_gpio(char *path, vsf_linux_gpio_chip_t *gpio_chip)
 }
 
 #if VSF_HW_GPIO_COUNT > 0
+
+#ifndef VSF_HW_GPIO_MASK
+#   define VSF_HW_GPIO_MASK                 VSF_HAL_COUNT_TO_MASK(VSF_HW_GPIO_COUNT)
+#endif
+
 int vsf_linux_fs_bind_gpio_hw(char *path)
 {
 #define __VSF_LINUX_DEF_GPIO_PORT(__N, __UNUSED)                                \
                 (vsf_gpio_t *)&VSF_MCONNECT(vsf_hw_gpio, __N),
-#define describe_vsf_linux_gpio_chip_hw(__name)                                 \
-    struct VSF_MCONNECT(__name, _gpio_chip_t) {                                 \
-        uint8_t port_num;                                                       \
-        vsf_gpio_t * ports[VSF_HW_GPIO_COUNT];                                  \
-    } static const __name = {                                                   \
-        .port_num     = VSF_HW_GPIO_COUNT,                                      \
-        .ports        = {                                                       \
-            VSF_MREPEAT(VSF_HW_GPIO_COUNT, __VSF_LINUX_DEF_GPIO_PORT, NULL)     \
-        },                                                                      \
+
+    struct __vsf_linux_gpio_chip_hw_gpio_chip_t {
+        uint8_t port_num;
+        vsf_gpio_t * ports[VSF_HW_GPIO_COUNT];
+    } static const __vsf_linux_gpio_chip_hw = {
+        .port_num     = VSF_HW_GPIO_COUNT,
+        .ports        = {
+#define __VSF_HAL_TEMPLATE_MASK             VSF_HW_GPIO_MASK
+#define __VSF_HAL_TEMPLATE_MACRO            __VSF_LINUX_DEF_GPIO_PORT
+#define __VSF_HAL_TEMPLATE_ARG              NULL
+#include "hal/driver/common/template/vsf_template_instance_mask.h"
+        },
     };
-    describe_vsf_linux_gpio_chip_hw(__vsf_linux_gpio_chip_hw)
     return vsf_linux_fs_bind_gpio(path, (vsf_linux_gpio_chip_t *)&__vsf_linux_gpio_chip_hw);
 }
 #endif      // VSF_HW_GPIO_COUNT > 0
