@@ -74,13 +74,15 @@
 
 // IO
 
-#define VSF_HW_IO_PORT_COUNT                        1
-#define VSF_HW_IO_PIN_COUNT                         32
+// VSF_HW_IO_PORT_COUNT and VSF_HW_IO_PIN_COUNT are not necessary, io moudule is singleton mode.
+//  Define below only if they are needed by the actual io driver.
+//#define VSF_HW_IO_PORT_COUNT                        VSF_HW_GPIO_PORT_COUNT
+//#define VSF_HW_IO_PIN_COUNT                         VSF_HW_GPIO_PIN_COUNT
 
 // GPIO
 
-#define VSF_HW_GPIO_PORT_COUNT                      VSF_HW_IO_PORT_COUNT
-#define VSF_HW_GPIO_PIN_COUNT                       VSF_HW_IO_PIN_COUNT
+#define VSF_HW_GPIO_PORT_COUNT                      1
+#define VSF_HW_GPIO_PIN_COUNT                       32
 
 // I2C0, I2C2
 

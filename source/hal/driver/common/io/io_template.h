@@ -41,7 +41,7 @@
 #   define VSF_IO_CFG_DEC_COUNT_MASK_PREFIX         VSF_IO_CFG_DEC_UPCASE_PREFIX
 #endif
 
-// IO always is single instance
+// IO always is singleton mode
 #define VSF_HAL_TEMPLATE_DEC_REMOVE_ARRAY
 #define VSF_HAL_TEMPLATE_DEC_COUNT                1
 #define VSF_HAL_TEMPLATE_DEC_MASK                 1

@@ -76,7 +76,7 @@ void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_config_pin)(
     uint32_t ospd = (mode >> 4) & 3;
     uint32_t current_pin_mask;
 
-    for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
+    for (int i = 0; i < VSF_HW_GPIO_PIN_COUNT; i++) {
         current_pin_mask = 1 << i;
         if (pin_mask & current_pin_mask) {
             offset_len2 = i << 1;
@@ -99,7 +99,7 @@ void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_set_direction)(
     uint32_t reg = gpio_ptr->reg, offset_len2;
     uint32_t ctl, current_pin_mask;
 
-    for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
+    for (int i = 0; i < VSF_HW_GPIO_PIN_COUNT; i++) {
         current_pin_mask = 1 << i;
         if (pin_mask & current_pin_mask) {
             ctl = (direction_mask >> i) & 1;
@@ -119,7 +119,7 @@ vsf_gpio_pin_mask_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_get_direction)(
     uint32_t ctl = GPIO_CTL(gpio_ptr->reg), current_pin_mask;
     vsf_gpio_pin_mask_t direction = 0;
 
-    for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++, ctl >>= 2) {
+    for (int i = 0; i < VSF_HW_GPIO_PIN_COUNT; i++, ctl >>= 2) {
         current_pin_mask = 1 << i;
         if (pin_mask & current_pin_mask) {
             if ((ctl & 3) == 1) {
@@ -242,7 +242,7 @@ vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t)                              \
         VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio, __IDX) = {                 \
         __HAL_OP                                                                \
-        .reg                        = VSF_HW_IO_PORT ## __IDX ## _REG_BASE,     \
+        .reg                        = VSF_HW_GPIO_PORT ## __IDX ## _REG_BASE,   \
     };
 
 #include "hal/driver/common/gpio/gpio_template.inc"

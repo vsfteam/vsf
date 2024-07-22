@@ -75,20 +75,20 @@
     .utmi_en = false,                                                           \
     .vbus_en = false,
 
-#define VSF_HW_IO_PORT_COUNT            10
-#define VSF_HW_IO_PORT_MASK             0x6FF       // no GPIOI
-#define VSF_HW_IO_PIN_COUNT             16
-#define VSF_HW_IO_FUNCTION_MAX          16
-#define VSF_HW_IO_PORT0_REG_BASE        (0x58020000)
-#define VSF_HW_IO_PORT1_REG_BASE        (0x58020400)
-#define VSF_HW_IO_PORT2_REG_BASE        (0x58020800)
-#define VSF_HW_IO_PORT3_REG_BASE        (0x58020C00)
-#define VSF_HW_IO_PORT4_REG_BASE        (0x58021000)
-#define VSF_HW_IO_PORT5_REG_BASE        (0x58021400)
-#define VSF_HW_IO_PORT6_REG_BASE        (0x58021800)
-#define VSF_HW_IO_PORT7_REG_BASE        (0x58021C00)
-#define VSF_HW_IO_PORT9_REG_BASE        (0x58022400)
-#define VSF_HW_IO_PORT10_REG_BASE       (0x58022800)
+#define VSF_HW_GPIO_PORT_COUNT          10
+#define VSF_HW_GPIO_PORT_MASK           0x6FF       // no GPIOI
+#define VSF_HW_GPIO_PIN_COUNT           16
+#define VSF_HW_GPIO_FUNCTION_MAX        16
+#define VSF_HW_GPIO_PORT0_REG_BASE      (0x58020000)
+#define VSF_HW_GPIO_PORT1_REG_BASE      (0x58020400)
+#define VSF_HW_GPIO_PORT2_REG_BASE      (0x58020800)
+#define VSF_HW_GPIO_PORT3_REG_BASE      (0x58020C00)
+#define VSF_HW_GPIO_PORT4_REG_BASE      (0x58021000)
+#define VSF_HW_GPIO_PORT5_REG_BASE      (0x58021400)
+#define VSF_HW_GPIO_PORT6_REG_BASE      (0x58021800)
+#define VSF_HW_GPIO_PORT7_REG_BASE      (0x58021C00)
+#define VSF_HW_GPIO_PORT9_REG_BASE      (0x58022400)
+#define VSF_HW_GPIO_PORT10_REG_BASE     (0x58022800)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

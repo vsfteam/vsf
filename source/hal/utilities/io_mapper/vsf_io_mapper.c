@@ -22,6 +22,11 @@
 #if VSF_HAL_USE_GPIO == ENABLED && VSF_HW_GPIO_COUNT > 0
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HW_GPIO_MASK
+#   define VSF_HW_GPIO_MASK                 VSF_HAL_COUNT_TO_MASK(VSF_HW_GPIO_COUNT)
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_IO_MAPPER_HW(__N, __BIT)      &VSF_MCONNECT(vsf_hw_gpio, __N),
@@ -33,7 +38,10 @@ const vsf_io_mapper_type(vsf_hw) vsf_hw_io_mapper = {
     VSF_IO_MAPPER_INIT(VSF_HW_GPIO_COUNT, VSF_HW_IO_MAPPER_PORT_BITS_LOG2)
 
     .io = {
-        VSF_MREPEAT(VSF_HW_GPIO_COUNT, __VSF_IO_MAPPER_HW, 0)
+#define __VSF_HAL_TEMPLATE_MASK                             VSF_HW_GPIO_MASK
+#define __VSF_HAL_TEMPLATE_MACRO                            __VSF_IO_MAPPER_HW
+#define __VSF_HAL_TEMPLATE_ARG                              NULL
+#include "hal/driver/common/template/vsf_template_instance_mask.h"
     }
 };
 
