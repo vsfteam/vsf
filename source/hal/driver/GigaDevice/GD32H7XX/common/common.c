@@ -20,8 +20,6 @@
 #include "hal/vsf_hal_cfg.h"
 #include "../__device.h"
 
-#include "../common/vendor/Include/gd32h7xx_rcu.h"
-
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -31,12 +29,6 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #include "hal/driver/common/swi/arm/vsf_swi_template.inc"
-
-// APIs from SDK
-void rcu_periph_clock_enable(rcu_periph_enum periph)
-{
-    RCU_REG_VAL(periph) |= BIT(RCU_BIT_POS(periph));
-}
 
 // this function should be in gd32h7xx_misc.c, but this file is not included.
 //  So implement this function here.

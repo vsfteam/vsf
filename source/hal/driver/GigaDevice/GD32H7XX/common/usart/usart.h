@@ -82,57 +82,137 @@ extern "C" {
 
 // HW/IPCore, not for emulated drivers
 typedef enum vsf_usart_mode_t {
-    VSF_USART_9_BIT_LENGTH              = (0x4ul << 0),
-    VSF_USART_8_BIT_LENGTH              = (0x3ul << 0),
-    VSF_USART_7_BIT_LENGTH              = (0x2ul << 0),
-    VSF_USART_6_BIT_LENGTH              = (0x1ul << 0),
-    VSF_USART_5_BIT_LENGTH              = (0x0ul << 0),
+    // 0..1: STB(13:12) in USART_CTL1, shift right by 12 to avoid conflict with BIT_LENGTH
+    VSF_USART_0_5_STOPBIT               = (1 << 12) << 12,
+    VSF_USART_1_STOPBIT                 = (0),
+    VSF_USART_1_5_STOPBIT               = (3 << 12) << 12,
+    VSF_USART_2_STOPBIT                 = (2 << 12) << 12,
 
-    VSF_USART_1_STOPBIT                 = (0x0ul << 3),
-    VSF_USART_2_STOPBIT                 = (0x1ul << 3),
-    VSF_USART_1_5_STOPBIT               = (0x2ul << 3),
+    // 2..3: TEN(3)/REN(2) in USART_CTL0
+    VSF_USART_TX_ENABLE                 = (1 << 3),
+    VSF_USART_TX_DISABLE                = (0 << 3),
+    VSF_USART_RX_ENABLE                 = (1 << 2),
+    VSF_USART_RX_DISABLE                = (0 << 2),
 
-    VSF_USART_NO_PARITY                 = (0x0ul << 5),
-    VSF_USART_ODD_PARITY                = (0x1ul << 5),
-    VSF_USART_EVEN_PARITY               = (0x2ul << 5),
-    VSF_USART_FORCE_0_PARITY            = (0x3ul << 5),
-    VSF_USART_FORCE_1_PARITY            = (0x4ul << 5),
+    // 4..5: CTSEN(9)/RTSEN(8) in USART_CTL2, shift right by 4 to void conflict with PARITY
+    VSF_USART_NO_HWCONTROL              = (0),
+    VSF_USART_RTS_HWCONTROL             = (1 << 8) >> 4,
+    VSF_USART_CTS_HWCONTROL             = (1 << 9) >> 4,
+    VSF_USART_RTS_CTS_HWCONTROL         = VSF_USART_RTS_HWCONTROL
+                                        | VSF_USART_CTS_HWCONTROL,
 
-    VSF_USART_NO_HWCONTROL              = (0x0ul << 8),
-    VSF_USART_RTS_HWCONTROL             = (0x1ul << 8),
-    VSF_USART_CTS_HWCONTROL             = (0x2ul << 8),
-    VSF_USART_RTS_CTS_HWCONTROL         = (0x3ul << 8),
+    // 9..10: PCEN(10)/PM(9) in USART_CTL0
+    VSF_USART_NO_PARITY                 = (0 << 10),
+    VSF_USART_ODD_PARITY                = (1 << 10) | (1 << 9),
+    VSF_USART_EVEN_PARITY               = (1 << 10),
 
-    VSF_USART_TX_ENABLE                 = (0x1ul << 10),
-    VSF_USART_TX_DISABLE                = (0x0ul << 10),
-    VSF_USART_RX_ENABLE                 = (0x1ul << 11),
-    VSF_USART_RX_DISABLE                = (0x0ul << 11),
+    // 11: CKEN(11) in USART_CTL1
+    VSF_USART_SYNC                      = (1 << 11),
+
+    // 12&28: WL1(28):WL0(12) in USART_CTL0
+    VSF_USART_10_BIT_LENGTH             = (1 << 12) | (1 << 28),
+    VSF_USART_9_BIT_LENGTH              = (1 << 12),
+    VSF_USART_8_BIT_LENGTH              = (0),
+    VSF_USART_7_BIT_LENGTH              = (1 << 28),
 
     // more vendor specified modes can be added here
+
+    // 15: STRP(15) in USART_CTL1
+    VSF_USART_SWAP                      = (1 << 15),
+    // 16..17: TINV(17)/RINV(16) in USART_CTL1
+    VSF_USART_TX_INV                    = (1 << 17),
+    VSF_USART_RX_INV                    = (1 << 16),
+
+
+    __VSF_HW_USART_CTL0_MASK            = VSF_USART_10_BIT_LENGTH
+                                        | VSF_USART_9_BIT_LENGTH
+                                        | VSF_USART_8_BIT_LENGTH
+                                        | VSF_USART_7_BIT_LENGTH
+                                        | VSF_USART_NO_PARITY
+                                        | VSF_USART_ODD_PARITY
+                                        | VSF_USART_EVEN_PARITY
+                                        | VSF_USART_TX_ENABLE
+                                        | VSF_USART_RX_ENABLE,
+    __VSF_HW_USART_CTL1_MASK            = VSF_USART_SYNC
+                                        | VSF_USART_0_5_STOPBIT
+                                        | VSF_USART_1_STOPBIT
+                                        | VSF_USART_1_5_STOPBIT
+                                        | VSF_USART_2_STOPBIT
+                                        | VSF_USART_TX_INV
+                                        | VSF_USART_RX_INV
+                                        | VSF_USART_SWAP,
+    __VSF_HW_USART_CTL2_MASK            = VSF_USART_RTS_CTS_HWCONTROL,
+
+    // not supported, allocate unused bits
+    // 6..8
+    VSF_USART_6_BIT_LENGTH              = (1 << 6),
+    VSF_USART_5_BIT_LENGTH              = (2 << 6),
+    VSF_USART_FORCE_0_PARITY            = (0 << 8),
+    VSF_USART_FORCE_1_PARITY            = (1 << 8),
+
+    __VSF_HW_USART_NOT_SUPPORT_MASK     = VSF_USART_5_BIT_LENGTH
+                                        | VSF_USART_5_BIT_LENGTH
+                                        | VSF_USART_FORCE_0_PARITY
+                                        | VSF_USART_FORCE_1_PARITY,
 } vsf_usart_mode_t;
 
 typedef enum vsf_usart_irq_mask_t {
     // usart fifo interrupt
-    VSF_USART_IRQ_MASK_RX               = (0x1ul << 0),
-    VSF_USART_IRQ_MASK_TX               = (0x1ul << 1),
-    VSF_USART_IRQ_MASK_RX_TIMEOUT       = (0x1ul << 2),
+    // 5: RFNEIE(5) in USART_CTL0
+    VSF_USART_IRQ_MASK_RX               = (1 << 5),
+    // 7: TFNFIE(7) in USART_CTL0
+    VSF_USART_IRQ_MASK_TX               = (1 << 7),
+    // 26: RTIE(26) in USART_CTL0
+    VSF_USART_IRQ_MASK_RX_TIMEOUT       = (1 << 26),
 
     // usart request interrupt
-    VSF_USART_IRQ_MASK_RX_CPL           = (0x1ul << 3),
-    VSF_USART_IRQ_MASK_TX_CPL           = (0x1ul << 4),
+    // TODO: add DMA support
+    VSF_USART_IRQ_MASK_RX_CPL           = (0),
+    VSF_USART_IRQ_MASK_TX_CPL           = (0),
 
     // usart error interrupt
-    VSF_USART_IRQ_MASK_FRAME_ERR        = (0x1ul << 5),
-    VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 6),
-    VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 7),
-    VSF_USART_IRQ_MASK_OVERFLOW_ERR     = (0x1ul << 8),
+    // 8: PERRIE(8) in USART_CTL0
+    VSF_USART_IRQ_MASK_PARITY_ERR       = (1 << 8),
 
     // more vendor specified irq_masks can be added here
+
+    __VSF_HW_USART_IRQ_MASK =           VSF_USART_IRQ_MASK_RX
+                                        | VSF_USART_IRQ_MASK_TX
+                                        | VSF_USART_IRQ_MASK_RX_TIMEOUT
+                                        | VSF_USART_IRQ_MASK_RX_CPL
+                                        | VSF_USART_IRQ_MASK_TX_CPL
+                                        | VSF_USART_IRQ_MASK_PARITY_ERR,
+
+    // not supported
+    // 0..2
+    VSF_USART_IRQ_MASK_FRAME_ERR        = (1 << 0),
+    VSF_USART_IRQ_MASK_BREAK_ERR        = (1 << 1),
+    VSF_USART_IRQ_MASK_OVERFLOW_ERR     = (1 << 2),
+
+    __VSF_HW_USART_NOT_SUPPORT_IRQ_MASK = VSF_USART_IRQ_MASK_FRAME_ERR
+                                        | VSF_USART_IRQ_MASK_BREAK_ERR
+                                        | VSF_USART_IRQ_MASK_OVERFLOW_ERR,
 } vsf_usart_irq_mask_t;
 
 typedef struct vsf_usart_status_t {
     union {
-        implement(vsf_peripheral_status_t)
+        struct {
+            uint32_t parity_err         : 1;    // PERR(0) in USART_STAT
+            uint32_t frame_err          : 1;    // FERR(1) in USART_STAT
+            uint32_t noise_err          : 1;    // NERR(2) in USART_STAT
+            uint32_t overrun_err        : 1;    // ORERR(3) in USART_STAT
+            uint32_t idle               : 1;    // IDLEF(4) in USART_STAT
+            uint32_t rfne               : 1;    // RFNE(5) in USART_STAT
+            uint32_t trans_complete     : 1;    // TC(6) in USART_STAT
+            uint32_t tfnf               : 1;    // TFNF(7) in USART_STAT
+            uint32_t __dummy0           : 1;    // LBDF(8) in USART_STAT
+            uint32_t cts_changed        : 1;    // CTSF(9) in USART_STAT
+            uint32_t cts_level          : 1;    // CTS(10) in USART_STAT
+            uint32_t rx_timeouted       : 1;    // RTF(11) in USART_STAT
+            uint32_t __dummy1           : 4;
+            uint32_t is_busy            : 1;    // BSY(16) in USART_STAT
+            uint32_t __dummy2           : 15;
+        };
         uint32_t value;
     };
 } vsf_usart_status_t;
