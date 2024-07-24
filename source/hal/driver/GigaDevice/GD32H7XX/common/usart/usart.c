@@ -201,8 +201,9 @@ uint_fast16_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_rxfifo_get_data_coun
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
-    uint32_t cnt = USART_FCS(usart_ptr->reg);
-    return ((cnt & USART_FCS_RFCNT3_4) << 2) | ((cnt & USART_FCS_RFCNT0_2) >> 12);
+    return (USART_STAT(usart_ptr->reg) & USART_STAT_RFNE) ? 1 : 0;
+//    uint32_t cnt = USART_FCS(usart_ptr->reg);
+//    return ((cnt & USART_FCS_RFCNT3_4) << 2) | ((cnt & USART_FCS_RFCNT0_2) >> 12);
 }
 
 uint_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_rxfifo_read)(
@@ -295,7 +296,6 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
     vsf_usart_irq_mask_t irq_mask = irq_mask_orig | ((irq_mask_orig & USART_STAT_RTF) << 15) | ((irq_mask_orig & USART_STAT_PERR) << 8);
 
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
-        USART_INTC(reg) = irq_mask_orig;
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_usart_t *)usart_ptr, irq_mask);
     }
 }
