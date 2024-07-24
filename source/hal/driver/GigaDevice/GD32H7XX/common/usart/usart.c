@@ -89,6 +89,8 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     uint32_t intdiv = 0U, fradiv = 0U, udiv = 0U;
     uint32_t baudval = cfg_ptr->baudrate;
 
+    rcu_periph_clock_enable(usart_ptr->clk_gating);
+
     // boardrate
     if (USART_CTL0(reg) & USART_CTL0_OVSMOD){
         /* oversampling by 8, configure the value of USART_BAUD */
@@ -174,7 +176,7 @@ void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_enable)(
     vsf_usart_irq_mask_t irq_mask
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
-    VSF_HAL_ASSERT(!(irq_mask & __VSF_HW_USART_IRQ_MASK));
+    VSF_HAL_ASSERT(!(irq_mask & ~__VSF_HW_USART_IRQ_MASK));
     USART_CTL0(usart_ptr->reg) |= irq_mask;
 }
 
@@ -252,10 +254,10 @@ uint_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_txfifo_write)(
     while (cnt < count) {
         if (USART_STAT(reg) & USART_STAT_TFNF) {
             if (is16bit) {
-                USART_RDATA(reg) = *(uint16_t *)buffer_ptr & USART_TDATA_TDATA;
+                USART_TDATA(reg) = *(uint16_t *)buffer_ptr & USART_TDATA_TDATA;
                 buffer_ptr = (void *)((uintptr_t)buffer_ptr + 2);
             } else {
-                USART_RDATA(reg) = *(uint8_t *)buffer_ptr;
+                USART_TDATA(reg) = *(uint8_t *)buffer_ptr;
                 buffer_ptr = (void *)((uintptr_t)buffer_ptr + 1);
             }
             cnt++;

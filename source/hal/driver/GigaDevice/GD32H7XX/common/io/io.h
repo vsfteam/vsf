@@ -62,9 +62,11 @@ typedef enum vsf_io_mode_t {
     // 2: GPIO_OMODE: PUSHPULL(0)/OPENDRAIN(1)
     VSF_IO_INPUT                                = (0 << 0),     //!< enable input mode
     VSF_IO_ANALOG                               = (3 << 0),     //!< enable analog function
-    VSF_IO_OUTPUT_PUSH_PULL                     = (1 << 4) | (0 << 2),  //!< enable output push-pull mode
-    VSF_IO_OUTPUT_OPEN_DRAIN                    = (1 << 4) | (1 << 2),  //!< enable output open-drain mode
+    VSF_IO_OUTPUT_PUSH_PULL                     = (1 << 0) | (0 << 2),  //!< enable output push-pull mode
+    VSF_IO_OUTPUT_OPEN_DRAIN                    = (1 << 0) | (1 << 2),  //!< enable output open-drain mode
     VSF_IO_AF                                   = (2 << 0),     //!< enable AF mode
+    VSF_IO_AF_PUSH_PULL                         = (2 << 0) | (0 << 2),  //!< enable output push-pull mode
+    VSF_IO_AF_OPEN_DRAIN                        = (2 << 0) | (1 << 2),  //!< enable output open-drain mode
     VSF_IO_EXTI                                 = VSF_IO_INPUT,
 
     // 3..4, GPIO_PUD: FLOATING(0)/PULLUP(1)/PULLDOWN(2)
