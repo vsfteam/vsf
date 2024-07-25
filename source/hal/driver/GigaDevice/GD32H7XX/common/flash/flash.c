@@ -199,8 +199,8 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)(
 ) {
     VSF_HAL_ASSERT(flash_ptr != NULL);
     VSF_HAL_ASSERT(NULL != buffer);
-    VSF_HAL_ASSERT(!(offset & (4096 - 1)));
-    VSF_HAL_ASSERT(!(size & (4096 - 1)));
+    VSF_HAL_ASSERT(!(offset & (8 - 1)));
+    VSF_HAL_ASSERT(!(size & (8 - 1)));
 
     flash_ptr->erase0_write1 = 1;
     flash_ptr->offset_orig = flash_ptr->offset_cur = offset;
@@ -249,7 +249,7 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)(
         &&  (isr_ptr->handler_fn != NULL)) {
         flash_ptr->isr.handler_fn(isr_ptr->target_ptr, (vsf_flash_t *)flash_ptr, VSF_FLASH_IRQ_READ_MASK);
     }
-    return VSF_ERR_FAIL;
+    return VSF_ERR_NONE;
 }
 
 vsf_flash_status_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_status)(
