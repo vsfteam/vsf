@@ -173,9 +173,10 @@ __vsf_component_peda_ifs_entry(__vk_cached_mal_read, vk_mal_read,
             vsf_local.remain_size -= cur_size;
             vk_mal_read(pthis->host_mal, cur_addr, cur_size, cur_buff);
             break;
-        } else if (cur_addr == pthis->cache_addr) {
-            cur_size = vsf_min(cur_size, pthis->cache_size);
-            memcpy(cur_buff, pthis->cache, cur_size);
+        } else {
+            uint32_t offset = cur_addr - pthis->cache_addr;
+            cur_size = vsf_min(cur_size, pthis->cache_size - offset);
+            memcpy(cur_buff, pthis->cache + offset, cur_size);
             vsf_local.remain_size -= cur_size;
             cur_addr += cur_size;
             cur_buff += cur_size;
@@ -208,13 +209,12 @@ __vsf_component_peda_ifs_entry(__vk_cached_mal_write, vk_mal_write,
 
     switch (evt) {
     case VSF_EVT_INIT:
+        vsf_local.is_sync_erasing = false;
         cur_size = vsf_local.remain_size = vsf_local.size;
         if (NULL == pthis->cache) {
             vk_mal_write(pthis->host_mal, cur_addr, cur_size, cur_buff);
             break;
         }
-
-        vsf_local.is_sync_erasing = false;
         // fall through
     case VSF_EVT_RETURN:
         if (vsf_local.is_sync_erasing) {
@@ -241,31 +241,28 @@ __vsf_component_peda_ifs_entry(__vk_cached_mal_write, vk_mal_write,
                 sync_cache:
                     vsf_local.is_sync_erasing = true;
                     vk_mal_erase(pthis->host_mal, pthis->cache_addr, pthis->cache_size);
-                    break;
                 } else {
                     vsf_eda_return(vsf_local.size);
-                    break;
                 }
+                break;
             } else {
                 goto sync_cache;
             }
-        } else if (!(cur_addr % pthis->cache_size) && (cur_size > pthis->cache_size)) {
+        } else if (!(cur_addr % pthis->cache_size) && (cur_size >= pthis->cache_size)) {
             cur_size = pthis->cache_size;
             vsf_local.addr += cur_size;
             vsf_local.buff += cur_size;
             vsf_local.remain_size -= cur_size;
             vsf_local.is_sync_erasing = true;
             pthis->cache_addr = cur_addr;
-            memcpy(pthis->cache, cur_buff, pthis->cache_size);
-            vk_mal_erase(pthis->host_mal, pthis->cache_addr, pthis->cache_size);
-            break;
+            memcpy(pthis->cache, cur_buff, cur_size);
+            vk_mal_erase(pthis->host_mal, pthis->cache_addr, cur_size);
         } else {
-            cur_addr = cur_addr & ~(pthis->cache_size - 1);
+            uint64_t aligned_addr = cur_addr & ~(pthis->cache_size - 1);
             pthis->cache_valid = true;
-            pthis->cache_pos = 0;
-            pthis->cache_addr = cur_addr;
-            vk_mal_read(pthis->host_mal, cur_addr, pthis->cache_size, pthis->cache);
-            break;
+            pthis->cache_pos = cur_addr - aligned_addr;
+            pthis->cache_addr = aligned_addr;
+            vk_mal_read(pthis->host_mal, aligned_addr, pthis->cache_size, pthis->cache);
         }
         break;
     }
@@ -279,9 +276,8 @@ __vsf_component_peda_ifs_entry(__vk_cached_mal_erase, vk_mal_erase)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        if ((pthis->cache != NULL) && (vsf_local.addr == pthis->cache_addr)) {
-            vsf_heap_free(pthis->cache);
-            pthis->cache = NULL;
+        if (pthis->cache_valid && (vsf_local.addr == pthis->cache_addr) && (pthis->cache != NULL)) {
+            pthis->cache_valid = false;
         }
         vk_mal_erase(pthis->host_mal, vsf_local.addr, vsf_local.size);
         break;
