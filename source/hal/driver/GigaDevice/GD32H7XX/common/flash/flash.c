@@ -25,14 +25,9 @@
  *      For peripheral drivers, if IPCore driver is used, define __VSF_HAL_${FLASH_IP}_FLASH_CLASS_INHERIT__ before including vsf_hal.h
  */
 
-// IPCore
-#define __VSF_HAL_${FLASH_IP}_FLASH_CLASS_IMPLEMENT
-// IPCore end
-// HW using ${FLASH_IP} IPCore driver
-#define __VSF_HAL_${FLASH_IP}_FLASH_CLASS_INHERIT__
-// HW end
-
 #include "hal/vsf_hal.h"
+
+#include "../vendor/Include/gd32h7xx_fmc.h"
 
 /*============================ MACROS ========================================*/
 
@@ -50,10 +45,6 @@
 #define VSF_FLASH_CFG_IMP_PREFIX                vsf_hw
 #define VSF_FLASH_CFG_IMP_UPCASE_PREFIX         VSF_HW
 // HW end
-// IPCore
-#define VSF_FLASH_CFG_IMP_PREFIX                vsf_${flash_ip}
-#define VSF_FLASH_CFG_IMP_UPCASE_PREFIX         VSF_${FLASH_IP}
-// IPCore end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -61,11 +52,21 @@
 // HW
 typedef struct VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) {
 #if VSF_HW_FLASH_CFG_MULTI_CLASS == ENABLED
-    vsf_flash_t vsf_flash;
+    vsf_flash_t             vsf_flash;
 #endif
-    // TODO: fix reg to the real type
-    void *reg;
-    vsf_flash_isr_t isr;
+    uint32_t                addr;
+    uint32_t                reg;
+    vsf_flash_irq_mask_t    irq_mask;
+    IRQn_Type               irqn;
+    bool                    is_multi;
+    uint8_t                 erase0_write1;
+    vsf_flash_isr_t         isr;
+
+    vsf_flash_size_t        offset_orig;
+    vsf_flash_size_t        size_orig;
+    vsf_flash_size_t        offset_cur;
+    vsf_flash_size_t        size_cur;
+    uint8_t                 *buffer;
 } VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t);
 // HW end
 
@@ -87,7 +88,13 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_init)(
     VSF_HAL_ASSERT(flash_ptr != NULL);
     // configure according to cfg_ptr
     flash_ptr->isr = cfg_ptr->isr;
-    // configure interrupt according to cfg_ptr->isr
+    if (flash_ptr->isr.handler_fn != NULL) {
+        NVIC_SetPriority(flash_ptr->irqn, (uint32_t)flash_ptr->isr.prio);
+        NVIC_EnableIRQ(flash_ptr->irqn);
+    } else {
+        vsf_trace_warning("gd32h7xx_flash: irq not enabled, erase/write operation will not complete!!!");
+        NVIC_DisableIRQ(flash_ptr->irqn);
+    }
     return VSF_ERR_NONE;
 }
 
@@ -116,6 +123,19 @@ void VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_enable)(
     vsf_flash_irq_mask_t irq_mask
 ) {
     VSF_HAL_ASSERT(flash_ptr != NULL);
+
+    FMC_KEY = UNLOCK_KEY0;
+    FMC_KEY = UNLOCK_KEY1;
+
+    flash_ptr->irq_mask = irq_mask;
+    irq_mask &= __VSF_HW_FLASH_IRQ_MASK;
+    if (irq_mask & VSF_FLASH_IRQ_WRITE_MASK) {
+        irq_mask &= ~VSF_FLASH_IRQ_WRITE_MASK;
+        irq_mask |= FMC_CTL_ENDIE;
+    }
+    FMC_CTL |= irq_mask;
+
+    FMC_CTL |= FMC_CTL_LK;
 }
 
 void VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_disable)(
@@ -123,6 +143,37 @@ void VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_disable)(
     vsf_flash_irq_mask_t irq_mask
 ) {
     VSF_HAL_ASSERT(flash_ptr != NULL);
+
+    FMC_KEY = UNLOCK_KEY0;
+    FMC_KEY = UNLOCK_KEY1;
+
+    flash_ptr->irq_mask &= ~irq_mask;
+    irq_mask &= __VSF_HW_FLASH_IRQ_MASK;
+    if (irq_mask & VSF_FLASH_IRQ_WRITE_MASK) {
+        irq_mask &= ~VSF_FLASH_IRQ_WRITE_MASK;
+        irq_mask |= FMC_CTL_ENDIE;
+    }
+    FMC_CTL &= ~irq_mask;
+
+    FMC_CTL |= FMC_CTL_LK;
+}
+
+vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_one_sector)(
+    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr,
+    vsf_flash_size_t offset
+) {
+    VSF_HAL_ASSERT(flash_ptr != NULL);
+    VSF_HAL_ASSERT(!(offset & (4096 - 1)));
+
+    flash_ptr->erase0_write1 = 0;
+    FMC_KEY = UNLOCK_KEY0;
+    FMC_KEY = UNLOCK_KEY1;
+
+    FMC_CTL |= FMC_CTL_SER;
+    FMC_ADDR = flash_ptr->addr + offset;
+    FMC_CTL |= FMC_CTL_START | FMC_CTL_LK;
+
+    return VSF_ERR_NONE;
 }
 
 vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_multi_sector)(
@@ -131,7 +182,13 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_multi_sector)(
     vsf_flash_size_t size
 ) {
     VSF_HAL_ASSERT(flash_ptr != NULL);
-    return VSF_ERR_NONE;
+    VSF_HAL_ASSERT(!(offset & (4096 - 1)));
+    VSF_HAL_ASSERT(!(size & (4096 - 1)));
+
+    flash_ptr->offset_orig = flash_ptr->offset_cur = offset;
+    flash_ptr->size_orig = flash_ptr->size_cur = size;
+    return VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_one_sector)(
+        flash_ptr, offset);
 }
 
 vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)(
@@ -142,7 +199,38 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)(
 ) {
     VSF_HAL_ASSERT(flash_ptr != NULL);
     VSF_HAL_ASSERT(NULL != buffer);
-    return VSF_ERR_FAIL;
+    VSF_HAL_ASSERT(!(offset & (4096 - 1)));
+    VSF_HAL_ASSERT(!(size & (4096 - 1)));
+
+    flash_ptr->erase0_write1 = 1;
+    flash_ptr->offset_orig = flash_ptr->offset_cur = offset;
+    flash_ptr->size_orig = flash_ptr->size_cur = size;
+    flash_ptr->buffer = buffer;
+    uint32_t addr = flash_ptr->addr + offset;
+
+    FMC_KEY = UNLOCK_KEY0;
+    FMC_KEY = UNLOCK_KEY1;
+
+    FMC_CTL |= FMC_CTL_PG;
+    __ISB();
+    __DSB();
+    REG32(addr) = ((uint32_t *)buffer)[0];
+    REG32(addr + 4U) = ((uint32_t *)buffer)[1];
+    __ISB();
+    __DSB();
+    FMC_CTL |= FMC_CTL_LK;
+
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_one_sector)(
+    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr,
+    vsf_flash_size_t offset,
+    uint8_t* buffer,
+    vsf_flash_size_t size
+) {
+    return VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)(
+        flash_ptr, offset, buffer, size);
 }
 
 vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)(
@@ -153,6 +241,14 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)(
 ) {
     VSF_HAL_ASSERT(flash_ptr != NULL);
     VSF_HAL_ASSERT(NULL != buffer);
+
+    memcpy(buffer, (void *)(flash_ptr->addr + offset), size);
+
+    vsf_flash_isr_t *isr_ptr = &flash_ptr->isr;
+    if (    (flash_ptr->irq_mask & VSF_FLASH_IRQ_READ_MASK)
+        &&  (isr_ptr->handler_fn != NULL)) {
+        flash_ptr->isr.handler_fn(isr_ptr->target_ptr, (vsf_flash_t *)flash_ptr, VSF_FLASH_IRQ_READ_MASK);
+    }
     return VSF_ERR_FAIL;
 }
 
@@ -169,12 +265,12 @@ vsf_flash_capability_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
 ) {
     return (vsf_flash_capability_t) {
         .irq_mask              = VSF_FLASH_IRQ_ALL_BITS_MASK,
-        .base_address          = 0,
-        .max_size              = 0,
+        .base_address          = 0x08000000,
+        .max_size              = 3840 * 1024,
         .erase_sector_size     = 4096,
         .write_sector_size     = 256,
         .can_write_any_address = 0,
-        .can_read_any_address  = 0,
+        .can_read_any_address  = 1,
     };
 }
 
@@ -183,8 +279,58 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _flash_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != flash_ptr);
 
-    vsf_flash_irq_mask_t irq_mask = GET_IRQ_MASK(flash_ptr);
+    vsf_flash_irq_mask_t irq_mask = FMC_STAT;
     vsf_flash_isr_t *isr_ptr = &flash_ptr->isr;
+
+    FMC_STAT = irq_mask;
+    FMC_KEY = UNLOCK_KEY0;
+    FMC_KEY = UNLOCK_KEY1;
+        FMC_CTL &= ~(FMC_CTL_PG | FMC_CTL_SER);
+    FMC_CTL |= FMC_CTL_LK;
+
+    if (irq_mask & __VSF_HW_FLASH_ERR_IRQ_MASK) {
+        flash_ptr->size_cur = 0;
+    } else {
+        // no error
+        VSF_HAL_ASSERT(irq_mask & FMC_STAT_ENDF);
+        if (flash_ptr->erase0_write1) {
+            VSF_HAL_ASSERT(flash_ptr->size_cur >= 8);
+            flash_ptr->size_cur -= 8;
+            flash_ptr->offset_cur += 8;
+            flash_ptr->buffer += 8;
+            if (flash_ptr->size_cur > 0) {
+                uint32_t addr = flash_ptr->addr + flash_ptr->offset_cur;
+
+                FMC_KEY = UNLOCK_KEY0;
+                FMC_KEY = UNLOCK_KEY1;
+
+                FMC_CTL |= FMC_CTL_PG;
+                __ISB();
+                __DSB();
+                REG32(addr) = ((uint32_t *)flash_ptr->buffer)[0];
+                REG32(addr + 4U) = ((uint32_t *)flash_ptr->buffer)[1];
+                __ISB();
+                __DSB();
+                FMC_CTL |= FMC_CTL_LK;
+                return;
+            }
+            irq_mask = VSF_FLASH_IRQ_WRITE_MASK;
+        } else {
+            if (flash_ptr->size_cur > 0) {
+                VSF_HAL_ASSERT(flash_ptr->size_cur >= 4096);
+                flash_ptr->size_cur -= 4096;
+                flash_ptr->offset_cur += 4096;
+            }
+            if (flash_ptr->size_cur > 0) {
+                VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_one_sector)(
+                    flash_ptr, flash_ptr->offset_cur);
+                return;
+            }
+        }
+    }
+
+    SCB_CleanInvalidateDCache_by_Addr((void *)(flash_ptr->addr + flash_ptr->offset_orig), flash_ptr->size_orig);
+    SCB_InvalidateICache_by_Addr((void *)(flash_ptr->addr + flash_ptr->offset_orig), flash_ptr->size_orig);
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_flash_t *)flash_ptr, irq_mask);
     }
@@ -196,21 +342,24 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _flash_irqhandler)(
 /*\note TODO: add comments about template configurations below:
  *  VSF_FLASH_CFG_ERASE_ALL_TEMPLATE
  *  VSF_FLASH_CFG_ERASE_ONE_SECTOR_TEMPLATE
+ *  VSF_FLASH_CFG_ERASE_MULTI_SECTOR_TEMPLATE
  *  VSF_FLASH_CFG_WRITE_ONE_SECTOR_TEMPLATE
+ *  VSF_FLASH_CFG_WRITE_MULTI_SECTOR_TEMPLATE
  *  VSF_FLASH_CFG_READ_ONE_SECTOR_TEMPLATE
+ *  VSF_FLASH_CFG_READ_MULTI_SECTOR_TEMPLATE
  */
 
 // only define in source file
 #define VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
 #define VSF_FLASH_CFG_ERASE_ALL_TEMPLATE            ENABLED
-#define VSF_FLASH_CFG_ERASE_ONE_SECTOR_TEMPLATE     ENABLED
-#define VSF_FLASH_CFG_WRITE_ONE_SECTOR_TEMPLATE     ENABLED
 #define VSF_FLASH_CFG_READ_ONE_SECTOR_TEMPLATE      ENABLED
 
 #define VSF_FLASH_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t)                            \
         VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash ## __IDX) = {             \
+        .addr               = VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, __IDX, _ADDR),\
         .reg                = VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, __IDX, _REG_BASE),\
+        .irqn               = VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, __IDX, _IRQN),\
         __HAL_OP                                                                \
     };                                                                          \
     VSF_CAL_ROOT void VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, __IDX, _IRQHandler)(void)\

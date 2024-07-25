@@ -168,6 +168,12 @@
 #define VSF_HW_USART7_IRQN              UART7_IRQn
 #define VSF_HW_USART7_IRQHandler        UART7_IRQHandler
 
+#define VSF_HW_FLASH_COUNT              1
+#define VSF_HW_FLASH0_ADDR              0x08000000
+#define VSF_HW_FLASH0_REG_BASE          FMC
+#define VSF_HW_FLASH0_IRQN              FMC_IRQn
+#define VSF_HW_FLASH0_IRQHandler        FMC_IRQHandler
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
