@@ -2470,11 +2470,6 @@ int kill(pid_t pid, int sig)
     vsf_linux_thread_t *thread;
     vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, thread);
     vsf_thread_signal(&thread->use_as__vsf_thread_t, sig - 1);
-
-    // priority of sighandler which is defined by VSF_LINUX_CFG_PRIO_SIGNAL should
-    //  be higher than normal task, so no need to yield here, and thus kill can
-    //  be called in non-thread environment.
-//    vsf_thread_yield();
     return 0;
 #else
     return -1;
