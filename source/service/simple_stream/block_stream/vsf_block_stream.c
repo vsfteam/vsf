@@ -154,7 +154,7 @@ static uint_fast32_t __vsf_block_stream_write(vsf_stream_t *stream, uint8_t *buf
         }
         item->size = size;
         item->pos = 0;
-        vsf_fifo_push((vsf_fifo_t *)&block_stream->__fifo, (uintptr_t)NULL, block_stream->block_size + sizeof(item->size));
+        vsf_fifo_push((vsf_fifo_t *)&block_stream->__fifo, (uintptr_t)NULL, block_stream->block_size + sizeof(*item));
 
         vsf_protect_t orig = __vsf_block_stream_protect();
         block_stream->data_size += size;
@@ -180,7 +180,7 @@ static uint_fast32_t __vsf_block_stream_read(vsf_stream_t *stream, uint8_t *buf,
         item->pos += size;
         VSF_SERVICE_ASSERT(item->pos <= item->size);
         if (item->pos == item->size) {
-            vsf_fifo_pop((vsf_fifo_t *)&block_stream->__fifo, (uintptr_t)NULL, block_stream->block_size + sizeof(item->size));
+            vsf_fifo_pop((vsf_fifo_t *)&block_stream->__fifo, (uintptr_t)NULL, block_stream->block_size + sizeof(*item));
         }
 
         vsf_protect_t orig = __vsf_block_stream_protect();
