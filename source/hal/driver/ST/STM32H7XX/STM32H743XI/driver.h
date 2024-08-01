@@ -15,24 +15,36 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_ST_STM32H7_COMMON_H__
-#define __HAL_DRIVER_ST_STM32H7_COMMON_H__
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
 
-/* \note __common.h should only be included by device.h */
+#   include "../__device.h"
+
+#else
+
+#   ifndef __HAL_DRIVER_ST_STM32H743XI_H__
+#   define __HAL_DRIVER_ST_STM32H743XI_H__
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/vsf_hal_cfg.h"
-#include "./vendor/Include/stm32h7xx.h"
-#include "hal/arch/vsf_arch.h"
+#       include "hal/vsf_hal_cfg.h"
+#       include "./device.h"
+
+// for common hal structure/enum/etc, include before user driver headers below.
+#       include "hal/driver/common/template/vsf_template_hal_driver.h"
+
+// For SWI
+#       include "hal/driver/common/swi/vsf_swi_template.h"
+
+// For peripherials
+//#       include "../common/io/io.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
+#   endif       // __HAL_DRIVER_ST_STM32H743XI_H__
 
 #endif
 /* EOF */

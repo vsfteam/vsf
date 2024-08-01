@@ -15,39 +15,23 @@
  *                                                                           *
  ****************************************************************************/
 
+#ifndef __HAL_DRIVER_ST_STM32H7XX_COMMON_H__
+#define __HAL_DRIVER_ST_STM32H7XX_COMMON_H__
+
+/* \note __common.h should only be included by device.h */
+
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
-
-#undef VSF_ST_DRIVER_HEADER
-
-#if     defined(__STM32F730R8__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32F730/STM32F730R8/driver.h"
-#elif   defined(__STM32F103ZE__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32F103/STM32F103ZE/driver.h"
-#elif   defined(__STM32H743VI__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32H7XX/STM32H743VI/driver.h"
-#elif   defined(__STM32H743XI__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32H7XX/STM32H743XI/driver.h"
-#else
-#   error No supported device found.
-#endif
-
-/* include specified device driver header file */
-#include VSF_ST_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_ST_H__
-#define __HAL_DRIVER_ST_H__
+#include "hal/arch/vsf_arch.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
-
-
 
 #endif
 /* EOF */

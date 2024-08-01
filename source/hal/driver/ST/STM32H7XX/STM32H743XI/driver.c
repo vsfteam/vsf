@@ -16,29 +16,9 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
-
-#undef VSF_ST_DRIVER_HEADER
-
-#if     defined(__STM32F730R8__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32F730/STM32F730R8/driver.h"
-#elif   defined(__STM32F103ZE__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32F103/STM32F103ZE/driver.h"
-#elif   defined(__STM32H743VI__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32H7XX/STM32H743VI/driver.h"
-#elif   defined(__STM32H743XI__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32H7XX/STM32H743XI/driver.h"
-#else
-#   error No supported device found.
-#endif
-
-/* include specified device driver header file */
-#include VSF_ST_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_ST_H__
-#define __HAL_DRIVER_ST_H__
+#include "./device.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -46,8 +26,23 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
+
+// TODO: if these initialization is implemented in startup file, remove here
+int __low_level_init(void)
+{
+    return 1;
+}
+
+/*! \note initialize device driver
+ *  \param none
+ *  \retval true initialization succeeded.
+ *  \retval false initialization failed
+ */
+bool vsf_driver_init(void)
+{
+    return true;
+}
 
 
-
-#endif
 /* EOF */

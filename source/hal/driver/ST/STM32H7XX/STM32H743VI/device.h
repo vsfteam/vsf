@@ -16,29 +16,36 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 
-#undef VSF_ST_DRIVER_HEADER
+/*============================ MACROS ========================================*/
 
-#if     defined(__STM32F730R8__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32F730/STM32F730R8/driver.h"
-#elif   defined(__STM32F103ZE__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32F103/STM32F103ZE/driver.h"
-#elif   defined(__STM32H743VI__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32H7XX/STM32H743VI/driver.h"
-#elif   defined(__STM32H743XI__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32H7XX/STM32H743XI/driver.h"
+/*\note first define basic info for arch. */
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
+//! arch info
+#   define VSF_ARCH_PRI_NUM         16
+#   define VSF_ARCH_PRI_BIT         4
+
+// software interrupt provided by a dedicated device
+#define VSF_DEV_SWI_NUM             4
+
+#elif defined(__VSF_HAL_SHOW_VENDOR_INFO__)
+
+#define __VSF_HEADER_ONLY_SHOW_VENDOR_INFO__
+#include "./vendor/Inc/stm32h7xx.h"
+
 #else
-#   error No supported device found.
-#endif
 
-/* include specified device driver header file */
-#include VSF_ST_DRIVER_HEADER
+#ifndef __HAL_DEVICE_ST_STM32H743VI_H__
+#define __HAL_DEVICE_ST_STM32H743VI_H__
 
+#define VSF_DEV_SWI_LIST            42, 66, 67, 147
 
+/*============================ INCLUDES ======================================*/
 
-#ifndef __HAL_DRIVER_ST_H__
-#define __HAL_DRIVER_ST_H__
+/*\note this is should be the only place where common.h is included.*/
+#include "../common/common.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -47,7 +54,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-
-#endif
+#endif      // __HAL_DEVICE_ST_STM32H743VI_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

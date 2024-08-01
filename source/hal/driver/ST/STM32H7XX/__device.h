@@ -20,7 +20,9 @@
 
 #undef VSF_DEVICE_HEADER
 
-#if     defined(__STM32H743XI__)
+#if     defined(__STM32H743VI__)
+#   define  VSF_DEVICE_HEADER       "./STM32H743VI/device.h"
+#elif   defined(__STM32H743XI__)
 #   define  VSF_DEVICE_HEADER       "./STM32H743XI/device.h"
 #else
 #   error No supported device found.

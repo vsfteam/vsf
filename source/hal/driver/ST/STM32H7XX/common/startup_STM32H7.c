@@ -24,6 +24,12 @@
 
 #include "../__device.h"
 
+#define __VSF_HAL_SHOW_VENDOR_INFO__
+#include "hal/driver/driver.h"
+
+// for VSF_MFOREACH
+#include "utilities/vsf_utilities.h"
+
 /*----------------------------------------------------------------------------
   Exception / Interrupt Handler Function Prototype
  *----------------------------------------------------------------------------*/

@@ -15,30 +15,28 @@
  *                                                                           *
  ****************************************************************************/
 
-/*============================ INCLUDES ======================================*/
-#include "hal/vsf_hal_cfg.h"
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
 
-#undef VSF_ST_DRIVER_HEADER
+#   include "../__device.h"
 
-#if     defined(__STM32F730R8__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32F730/STM32F730R8/driver.h"
-#elif   defined(__STM32F103ZE__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32F103/STM32F103ZE/driver.h"
-#elif   defined(__STM32H743VI__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32H7XX/STM32H743VI/driver.h"
-#elif   defined(__STM32H743XI__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32H7XX/STM32H743XI/driver.h"
 #else
-#   error No supported device found.
-#endif
 
-/* include specified device driver header file */
-#include VSF_ST_DRIVER_HEADER
+#   ifndef __HAL_DRIVER_ST_STM32H743VI_H__
+#   define __HAL_DRIVER_ST_STM32H743VI_H__
 
+/*============================ INCLUDES ======================================*/
 
+#       include "hal/vsf_hal_cfg.h"
+#       include "./device.h"
 
-#ifndef __HAL_DRIVER_ST_H__
-#define __HAL_DRIVER_ST_H__
+// for common hal structure/enum/etc, include before user driver headers below.
+#       include "hal/driver/common/template/vsf_template_hal_driver.h"
+
+// For SWI
+#       include "hal/driver/common/swi/vsf_swi_template.h"
+
+// For peripherials
+//#       include "../common/io/io.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -48,6 +46,7 @@
 /*============================ PROTOTYPES ====================================*/
 
 
+#   endif       // __HAL_DRIVER_ST_STM32H743VI_H__
 
 #endif
 /* EOF */
