@@ -137,14 +137,12 @@ static vsf_err_t __vk_usbd_dfu_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t
     case USB_DFUREQ_DNLOAD:
         dfu->cur_size = request->wLength;
         dfu->status.bState = (dfu->cur_size > 0) ? DFU_dfuDNLOAD_SYNC : DFU_dfuMANIFEST_SYNC;
+        vsf_usbd_dfu_download(dfu, dfu->addr, dfu->transfer_buffer, dfu->cur_size);
         break;
     case USB_DFUREQ_UPLOAD:
         break;
     case USB_DFUREQ_GETSTATUS:
         switch (dfu->status.bState) {
-        case DFU_dfuDNLOAD_SYNC:
-            vsf_usbd_dfu_download(dfu, dfu->addr, dfu->transfer_buffer, dfu->cur_size);
-            break;
         case DFU_dfuMANIFEST_SYNC:
             dfu->status.bState = DFU_dfuMANIFEST;
             break;
