@@ -33,7 +33,7 @@
 #elif defined(__VSF_HAL_SHOW_VENDOR_INFO__)
 
 #define __VSF_HEADER_ONLY_SHOW_VENDOR_INFO__
-#include "./vendor/Inc/stm32h7xx.h"
+#include "../common/vendor/Inc/stm32h7xx.h"
 
 #else
 
