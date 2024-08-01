@@ -337,8 +337,9 @@ extern "C" {
 #define usbd_common_desc_iad(__name, __str_product, __str_vendor, __str_serial, __ep0_size, __func_desc_size, __func_ifs_num, __attribute, __max_power_ma, ...)\
         __usbd_common_desc_iad(__name, __str_product, __str_vendor, __str_serial, (__ep0_size), (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))\
         __VA_ARGS__};
-#define usbd_common_desc(__name, __str_product, __str_vendor, __str_serial, __class, __subclass, __protocol, __ep0_size, __func_desc_size, __func_ifs_num, __attribute, __max_power_ma)\
-        __usbd_common_desc(__name, __str_product, __str_vendor, __str_serial, (__class), (__subclass), (__protocol), (__ep0_size), (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))
+#define usbd_common_desc(__name, __str_product, __str_vendor, __str_serial, __class, __subclass, __protocol, __ep0_size, __func_desc_size, __func_ifs_num, __attribute, __max_power_ma, ...)\
+        __usbd_common_desc(__name, __str_product, __str_vendor, __str_serial, (__class), (__subclass), (__protocol), (__ep0_size), (__func_desc_size), (__func_ifs_num), (__attribute), (__max_power_ma))\
+        __VA_ARGS__};
 #define usbd_func_str_desc(__name, __func_id, __str_func)                       \
         __usbd_func_str_desc(__name, __func_id, __str_func)
 #define usbd_qualifier_desc(__name)                                             \
