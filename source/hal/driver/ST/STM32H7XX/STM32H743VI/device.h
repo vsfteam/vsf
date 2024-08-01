@@ -28,7 +28,14 @@
 #   define VSF_ARCH_PRI_BIT         4
 
 // software interrupt provided by a dedicated device
-#define VSF_DEV_SWI_NUM             4
+#ifndef VSF_DEV_SWI_NUM
+#   define VSF_DEV_SWI_NUM          4
+#endif
+#if VSF_DEV_SWI_NUM > VSF_ARCH_PRI_NUM
+#   warning too many VSF_DEV_SWI_NUM, max is VSF_ARCH_PRI_NUM
+#   undef VSF_DEV_SWI_NUM
+#   define VSF_DEV_SWI_NUM          VSF_ARCH_PRI_NUM
+#endif
 
 #elif defined(__VSF_HAL_SHOW_VENDOR_INFO__)
 
@@ -40,7 +47,10 @@
 #ifndef __HAL_DEVICE_ST_STM32H743VI_H__
 #define __HAL_DEVICE_ST_STM32H743VI_H__
 
-#define VSF_DEV_SWI_LIST            42, 66, 67, 147
+// software interrupt provided by a dedicated device
+#define __VSF_DEF_SWI_LIST_DEF(__N, __PARAM)                                    \
+                                    VSF_MCONNECT(SWI, __N, _IRQn),
+#define VSF_DEV_SWI_LIST            VSF_MREPEAT(VSF_DEV_SWI_NUM, __VSF_DEF_SWI_LIST_DEF, NULL)
 
 /*============================ INCLUDES ======================================*/
 
@@ -48,6 +58,14 @@
 #include "../common/common.h"
 
 /*============================ MACROS ========================================*/
+
+// SWI
+
+#define SWI0_IRQn                   42
+#define SWI1_IRQn                   66
+#define SWI2_IRQn                   67
+#define SWI3_IRQn                   147
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

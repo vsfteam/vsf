@@ -539,7 +539,11 @@ VSF_CAL_ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
 
 VSF_CAL_WEAK(vsf_hal_pre_startup_init)
 void vsf_hal_pre_startup_init(void)
-{}
+{
+    SystemInit();
+    SCB_EnableICache();
+    SCB_EnableDCache();
+}
 
 /*----------------------------------------------------------------------------
   Reset Handler called on controller reset
@@ -548,9 +552,5 @@ void Reset_Handler(void)
 {
     vsf_arch_set_stack((uintptr_t)&__INITIAL_SP);
     vsf_hal_pre_startup_init();
-
-    SystemInit();
-    SCB_EnableICache();
-    SCB_EnableDCache();
     __PROGRAM_START();                        /* Enter PreMain (C library entry point) */
 }
