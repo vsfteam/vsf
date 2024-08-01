@@ -327,6 +327,9 @@ this macro in vsf_usr_cfg.h or you can call vsf_heap_add()/vsf_heap_add_memory()
 #else
 #if     defined(VSF_HEAP_ADDR)
     uint8_t *__heap_buffer = (uint8_t *)(VSF_HEAP_ADDR);
+#elif   defined(VSF_HEAP_SECTION)
+    VSF_CAL_NO_INIT static uint_fast8_t __heap_buffer[
+        (VSF_HEAP_SIZE + sizeof(uint_fast8_t) - 1) / sizeof(uint_fast8_t)] VSF_CAL_SECTION(VSF_HEAP_SECTION);
 #else
     VSF_CAL_NO_INIT static uint_fast8_t __heap_buffer[
         (VSF_HEAP_SIZE + sizeof(uint_fast8_t) - 1) / sizeof(uint_fast8_t)];
