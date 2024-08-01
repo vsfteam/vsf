@@ -51,6 +51,10 @@ const vk_usbd_class_op_t vk_usbd_dfu = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+// Last call to vsf_usbd_dfu_download() with parameter size 0.
+// DFU 1.1 P26:
+// After the zero length DFU_DNLOAD request terminates the Transfer phase, 
+// the device is ready to manifest the new firmware.
 VSF_CAL_WEAK(vsf_usbd_dfu_download)
 vsf_err_t vsf_usbd_dfu_download(vk_usbd_dfu_t *dfu, uint32_t addr, uint8_t *buffer, uint16_t size)
 {
