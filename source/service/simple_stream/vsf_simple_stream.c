@@ -246,8 +246,8 @@ uint_fast32_t vsf_stream_adapter_evthandler(vsf_stream_t *stream, void *param, v
 {
     vsf_stream_adapter_t *adapter = param;
     uint_fast32_t tx_size, rx_size, all_size = 0;
-    uint_fast32_t threshold_tx = adapter->threshold_tx > 0 ? adapter->threshold_tx-- : 0;
-    uint_fast32_t threshold_rx = adapter->threshold_rx > 0 ? adapter->threshold_rx-- : 0;
+    uint_fast32_t threshold_tx = adapter->threshold_tx > 0 ? adapter->threshold_tx - 1 : 0;
+    uint_fast32_t threshold_rx = adapter->threshold_rx > 0 ? adapter->threshold_rx - 1 : 0;
     bool user_callback = adapter->on_data != NULL;
 
     if (    (VSF_STREAM_ON_DISCONNECT == evt)
