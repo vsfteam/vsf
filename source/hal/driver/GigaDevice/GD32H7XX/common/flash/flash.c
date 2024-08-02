@@ -274,7 +274,7 @@ vsf_flash_capability_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
     };
 }
 
-static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _flash_irqhandler)(
+static void VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr
 ) {
     VSF_HAL_ASSERT(NULL != flash_ptr);
@@ -365,7 +365,7 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _flash_irqhandler)(
     VSF_CAL_ROOT void VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, __IDX, _IRQHandler)(void)\
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
-        VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _flash_irqhandler)(          \
+        VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(          \
             &VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash, __IDX)              \
         );                                                                      \
         vsf_hal_irq_leave(ctx);                                                 \

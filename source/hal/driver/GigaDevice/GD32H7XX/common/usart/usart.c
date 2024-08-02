@@ -58,6 +58,7 @@ typedef struct VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) {
     rcu_clock_freq_enum     clk;
     rcu_periph_enum         clk_gating;
     rcu_periph_reset_enum   rst;
+    bool                    support_sync;
     IRQn_Type               irqn;
     vsf_usart_isr_t         isr;
 } VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t);
@@ -126,9 +127,9 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     USART_CTL1(reg) = ctl;
 
     ctl = USART_CTL2(reg);
-    ctl &= ~(USART_CTL2_RTSEN | USART_CTL2_CTSEN);
+    ctl &= ~(USART_CTL2_RTSEN | USART_CTL2_CTSEN | USART_CTL2_HDEN);
     cfg = cfg_ptr->mode & __VSF_HW_USART_CTL2_MASK;
-    ctl |= (((cfg & 0x30) << 4) | (cfg & ~0x30));
+    ctl |= (((cfg & 0x30) << 4) | ((cfg & 0x40) >> 3) | (cfg & ~0x70));
     USART_CTL2(reg) = ctl;
 
     if (enabled) {
@@ -370,6 +371,7 @@ int_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)(
         .clk                = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _CLK),\
         .clk_gating         = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _CLK_GATING),\
         .rst                = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _RST),\
+        .support_sync       = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _SYNC),\
         .irqn               = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _IRQN),\
         __HAL_OP                                                                \
     };                                                                          \

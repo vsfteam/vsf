@@ -83,10 +83,10 @@ extern "C" {
 // HW/IPCore, not for emulated drivers
 typedef enum vsf_usart_mode_t {
     // 0..1: STB(13:12) in USART_CTL1, shift right by 12 to avoid conflict with BIT_LENGTH
-    VSF_USART_0_5_STOPBIT               = (1 << 12) << 12,
-    VSF_USART_1_STOPBIT                 = (0),
-    VSF_USART_1_5_STOPBIT               = (3 << 12) << 12,
-    VSF_USART_2_STOPBIT                 = (2 << 12) << 12,
+    VSF_USART_0_5_STOPBIT               = (1 << 12) >> 12,
+    VSF_USART_1_STOPBIT                 = (0 << 12) >> 12,
+    VSF_USART_1_5_STOPBIT               = (3 << 12) >> 12,
+    VSF_USART_2_STOPBIT                 = (2 << 12) >> 12,
 
     // 2..3: TEN(3)/REN(2) in USART_CTL0
     VSF_USART_TX_ENABLE                 = (1 << 3),
@@ -100,6 +100,10 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_CTS_HWCONTROL             = (1 << 9) >> 4,
     VSF_USART_RTS_CTS_HWCONTROL         = VSF_USART_RTS_HWCONTROL
                                         | VSF_USART_CTS_HWCONTROL,
+
+    // 6: HDEN(3) in USART_CTL2, shift left by 3
+    VSF_USART_HALF_DUPLEX_ENABLE        = (1 << 3) << 3,
+    VSF_USART_HALF_DUPLEX_DISABLE       = 0,
 
     // 9..10: PCEN(10)/PM(9) in USART_CTL0
     VSF_USART_NO_PARITY                 = (0 << 10),
@@ -141,7 +145,8 @@ typedef enum vsf_usart_mode_t {
                                         | VSF_USART_TX_INV
                                         | VSF_USART_RX_INV
                                         | VSF_USART_SWAP,
-    __VSF_HW_USART_CTL2_MASK            = VSF_USART_RTS_CTS_HWCONTROL,
+    __VSF_HW_USART_CTL2_MASK            = VSF_USART_RTS_CTS_HWCONTROL
+                                        | VSF_USART_HALF_DUPLEX_ENABLE,
 
     // not supported, allocate unused bits
     // 6..8
