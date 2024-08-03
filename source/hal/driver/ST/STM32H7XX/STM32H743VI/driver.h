@@ -36,7 +36,10 @@
 #       include "hal/driver/common/swi/vsf_swi_template.h"
 
 // For peripherials
-//#       include "../common/io/io.h"
+#       include "../common/io/io.h"
+#       include "../common/gpio/gpio.h"
+#       include "../common/usart/usart.h"
+#       include "../common/flash/flash.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
