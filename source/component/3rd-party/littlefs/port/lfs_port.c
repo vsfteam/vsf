@@ -121,8 +121,13 @@ int vsf_lfs_bind_mal(struct lfs_config *c, vk_mal_t *mal)
     c->read_size = mal_blksz_read;
     c->prog_size = mal_blksz_write;
     c->block_size = mal_blksz_erase;
+#ifndef LFS_READONLY
     c->block_count = mal->size / mal_blksz_erase;
     c->cache_size = mal_blksz_erase;
+#else
+    c->block_count = mal->size / mal_blksz_read;
+    c->cache_size = mal_blksz_read;
+#endif
 
     c->lookahead_size = vsf_min(c->block_count, 32);
     return 0;
