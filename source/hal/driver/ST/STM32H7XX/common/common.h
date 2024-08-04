@@ -63,6 +63,18 @@ typedef enum vsf_hw_peripheral_rst_t {
 } vsf_hw_peripheral_rst_t;
 
 typedef enum vsf_hw_peripheral_en_t {
+    VSF_HW_EN_GPIOA                     = VSF_HW_REG32_REGION(0x38, 0, 1),  // GPIOAEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOB                     = VSF_HW_REG32_REGION(0x38, 1, 1),  // GPIOBEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOC                     = VSF_HW_REG32_REGION(0x38, 2, 1),  // GPIOCEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOD                     = VSF_HW_REG32_REGION(0x38, 3, 1),  // GPIODEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOE                     = VSF_HW_REG32_REGION(0x38, 4, 1),  // GPIOEEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOF                     = VSF_HW_REG32_REGION(0x38, 5, 1),  // GPIOFEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOG                     = VSF_HW_REG32_REGION(0x38, 6, 1),  // GPIOGEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOH                     = VSF_HW_REG32_REGION(0x38, 7, 1),  // GPIOHEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOI                     = VSF_HW_REG32_REGION(0x38, 8, 1),  // GPIOIEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOJ                     = VSF_HW_REG32_REGION(0x38, 9, 1),  // GPIOJEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOK                     = VSF_HW_REG32_REGION(0x38, 10, 1), // GPIOKEN IN RCC.AHB4ENR
+
     VSF_HW_EN_USART1                    = VSF_HW_REG32_REGION(0x3C, 4, 1),  // USART1EN IN RCC.APB2ENR
     VSF_HW_EN_USART2                    = VSF_HW_REG32_REGION(0x3A, 17, 1), // USART2EN IN RCC.APB1LENR
     VSF_HW_EN_USART3                    = VSF_HW_REG32_REGION(0x3A, 18, 1), // USART3EN IN RCC.APB1LENR
@@ -74,7 +86,6 @@ typedef enum vsf_hw_peripheral_en_t {
 } vsf_hw_peripheral_en_t;
 
 enum {
-    VSF_HW_CLK_PRESCALER_NONE           = 0,
     VSF_HW_CLK_PRESCALER_DIV,
     VSF_HW_CLK_PRESCALER_ADD1_DIV,
     VSF_HW_CLK_PRESCALER_SFT,

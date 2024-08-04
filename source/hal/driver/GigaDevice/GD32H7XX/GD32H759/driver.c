@@ -38,16 +38,6 @@
 VSF_CAL_WEAK(vsf_driver_init)
 bool vsf_driver_init(void)
 {
-    rcu_periph_clock_enable(RCU_GPIOA);
-    rcu_periph_clock_enable(RCU_GPIOB);
-    rcu_periph_clock_enable(RCU_GPIOC);
-    rcu_periph_clock_enable(RCU_GPIOD);
-    rcu_periph_clock_enable(RCU_GPIOE);
-    rcu_periph_clock_enable(RCU_GPIOF);
-    rcu_periph_clock_enable(RCU_GPIOG);
-    rcu_periph_clock_enable(RCU_GPIOH);
-    rcu_periph_clock_enable(RCU_GPIOJ);
-    rcu_periph_clock_enable(RCU_GPIOK);
     return true;
 }
 

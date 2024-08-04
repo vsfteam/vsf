@@ -28,17 +28,12 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-// TODO: if these initialization is implemented in startup file, remove here
-int __low_level_init(void)
-{
-    return 1;
-}
-
 /*! \note initialize device driver
  *  \param none
  *  \retval true initialization succeeded.
  *  \retval false initialization failed
  */
+VSF_CAL_WEAK(vsf_driver_init)
 bool vsf_driver_init(void)
 {
     return true;

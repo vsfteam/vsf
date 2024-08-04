@@ -125,8 +125,6 @@ static const vsf_hw_clk_t __VSF_HW_CLK_PLL_SRC = {
 
     .clksel_mapper              = __VSF_HW_CLK_PLL_CLKSEL_MAPPER,
     .clktype                    = VSF_HW_CLK_TYPE_SEL,
-
-    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_NONE,
 };
 static const vsf_hw_clk_t __VSF_HW_CLK_PLL1_VCO = {
     .clkprescaler_region        = VSF_HW_REG32_REGION(0x0A, 4, 6),  // DIVM1 IN RCC.PLLCKSELR
@@ -276,8 +274,6 @@ const vsf_hw_clk_t VSF_HW_CLK_SYS = {
 
     .clksel_mapper              = __VSF_HW_CLK_SYS_CLKSEL_MAPPER,
     .clktype                    = VSF_HW_CLK_TYPE_SEL,
-
-    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_NONE,
 };
 static const uint8_t __VSF_HW_CLK_SYSD1_PRESCALER[16] = {
     0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9,
@@ -315,8 +311,6 @@ const vsf_hw_clk_t VSF_HW_CLK_PER = {
 
     .clksel_mapper              = __VSF_HW_CLK_PER_CLKSEL_MAPPER,
     .clktype                    = VSF_HW_CLK_TYPE_SEL,
-
-    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_NONE,
 };
 
 static const uint8_t __VSF_HW_CLK_PCLK_PRESCALER[8] = {
@@ -483,28 +477,29 @@ uint32_t vsf_hw_clk_get(const vsf_hw_clk_t *clk)
         return 0;
     }
 
-    uint32_t prescaler = clk->clkprescaler_region != 0 ? vsf_hw_reg_region_get(clk->clkprescaler_region) : 0;
-    switch (clk->clkprescaler_type) {
-    case VSF_HW_CLK_PRESCALER_NONE:
-        break;
-    case VSF_HW_CLK_PRESCALER_DIV: {
-            uint8_t divider = clk->clkprescaler_mapper[prescaler];
-            if (divider != 0) {
-                clk_freq_hz /= divider;
+    if (clk->clkprescaler_region != 0) {
+        uint32_t prescaler =  vsf_hw_reg_region_get(clk->clkprescaler_region);
+        if (clk->clkprescaler_mapper != NULL) {
+            prescaler = clk->clkprescaler_mapper[prescaler];
+        }
+        switch (clk->clkprescaler_type) {
+        case VSF_HW_CLK_PRESCALER_DIV:
+            if (prescaler != 0) {
+                clk_freq_hz /= prescaler;
             } else {
                 clk_freq_hz = 0;
             }
+        break;
+        case VSF_HW_CLK_PRESCALER_ADD1_DIV:
+            clk_freq_hz /= prescaler + 1;
+            break;
+        case VSF_HW_CLK_PRESCALER_SFT:
+            clk_freq_hz >>= prescaler;
+            break;
+        case VSF_HW_CLK_PRESCALER_FUNC:
+            clk_freq_hz = clk->getclk(clk, clk_freq_hz, prescaler);
+            break;
         }
-        break;
-    case VSF_HW_CLK_PRESCALER_ADD1_DIV:
-        clk_freq_hz /= clk->clkprescaler_mapper[prescaler] + 1;
-        break;
-    case VSF_HW_CLK_PRESCALER_SFT:
-        clk_freq_hz >>= clk->clkprescaler_mapper[prescaler];
-        break;
-    case VSF_HW_CLK_PRESCALER_FUNC:
-        clk_freq_hz = clk->getclk(clk, clk_freq_hz, prescaler);
-        break;
     }
     return clk_freq_hz;
 }
