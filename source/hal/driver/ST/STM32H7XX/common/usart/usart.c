@@ -103,27 +103,28 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
         :   VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart234578_clks)[clksel];
 
     uint32_t pclk = vsf_hw_clk_get(clk);
-//    uint32_t intdiv = 0U, fradiv = 0U, udiv = 0U;
-//    uint32_t baudval = cfg_ptr->baudrate;
+    uint32_t over16 = (cfg_ptr->mode & VSF_USART_OVERSAMPLE_MASK) >> 3;
+    cfg_ptr->mode &= ~VSF_USART_OVERSAMPLE_MASK;
+    uint32_t intdiv = 0U, fradiv = 0U, udiv = 0U;
+    uint32_t baudval = cfg_ptr->baudrate;
 
     vsf_hw_peripheral_enable(usart_ptr->en);
+    // to achieve max speed
+    reg->PRESC = 0;
 
     // boardrate
-#if 0
-    if (reg->CR1 & USART_CTL0_OVSMOD){
-        /* oversampling by 8, configure the value of USART_BAUD */
-        udiv = ((2U * uclk) + baudval / 2U) / baudval;
-        intdiv = udiv & 0x0000fff0U;
-        fradiv = (udiv >> 1U) & 0x00000007U;
-        USART_BAUD(reg) = ((USART_BAUD_FRADIV | USART_BAUD_INTDIV) & (intdiv | fradiv));
-    } else {
-        /* oversampling by 16, configure the value of USART_BAUD */
-        udiv = (uclk + baudval / 2U) / baudval;
+    if (over16){
+        udiv = (pclk + baudval / 2U) / baudval;
         intdiv = udiv & 0x0000fff0U;
         fradiv = udiv & 0x0000000fU;
-        USART_BAUD(reg) = ((USART_BAUD_FRADIV | USART_BAUD_INTDIV) & (intdiv | fradiv));
+        reg->BRR = ((USART_BRR_DIV_FRACTION | USART_BRR_DIV_MANTISSA) & (intdiv | fradiv));
+    } else {
+        udiv = ((2U * pclk) + (baudval / 2U)) / baudval;
+        intdiv = udiv & 0x0000fff0U;
+        fradiv = (udiv >> 1U) & 0x00000007U;
+        reg->BRR = ((USART_BRR_DIV_FRACTION | USART_BRR_DIV_MANTISSA) & (intdiv | fradiv));
     }
-#endif
+
     uint32_t ctl, cfg;
     uint32_t enabled = reg->CR1 & USART_CR1_UE;
     if (enabled) {
@@ -133,7 +134,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     ctl = reg->CR1;
     ctl &= ~(USART_CR1_RE | USART_CR1_TE | USART_CR1_PS | USART_CR1_PCE | USART_CR1_M);
     ctl |= (cfg_ptr->mode & __VSF_HW_USART_CR1_MASK) | USART_CR1_FIFOEN;
-    reg->CR1 = ctl;
+    reg->CR1 = ctl | over16;
 
     ctl = reg->CR2;
     ctl &= ~(USART_CR2_CLKEN | USART_CR2_STOP | USART_CR2_SWAP | USART_CR2_RXINV | USART_CR2_TXINV);

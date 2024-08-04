@@ -125,6 +125,10 @@ typedef enum vsf_usart_mode_t {
     // 16..17: RXINV(16)/TXINV(17) in USART_CR2
     VSF_USART_TX_INV                    = (1 << 17),
     VSF_USART_RX_INV                    = (1 << 16),
+    // 18: OVER8(15) in USART_CR1
+    VSF_USART_OVERSAMPLE_8              = (0 << 18),
+    VSF_USART_OVERSAMPLE_16             = (1 << 18),
+    VSF_USART_OVERSAMPLE_MASK           = (1 << 18),
 
 
     __VSF_HW_USART_CR1_MASK             = VSF_USART_9_BIT_LENGTH
@@ -134,7 +138,8 @@ typedef enum vsf_usart_mode_t {
                                         | VSF_USART_ODD_PARITY
                                         | VSF_USART_EVEN_PARITY
                                         | VSF_USART_TX_ENABLE
-                                        | VSF_USART_RX_ENABLE,
+                                        | VSF_USART_RX_ENABLE
+                                        | VSF_USART_OVERSAMPLE_MASK,
     __VSF_HW_USART_CR2_MASK             = VSF_USART_SYNC
                                         | VSF_USART_0_5_STOPBIT
                                         | VSF_USART_1_STOPBIT
@@ -145,6 +150,7 @@ typedef enum vsf_usart_mode_t {
                                         | VSF_USART_SWAP,
     __VSF_HW_USART_CR3_MASK             = VSF_USART_RTS_CTS_HWCONTROL
                                         | VSF_USART_HALF_DUPLEX_ENABLE,
+
 
     // not supported, allocate unused bits
     // 6..8
