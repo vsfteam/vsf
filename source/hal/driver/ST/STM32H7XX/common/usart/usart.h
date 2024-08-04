@@ -126,8 +126,8 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_TX_INV                    = (1 << 17),
     VSF_USART_RX_INV                    = (1 << 16),
     // 18: OVER8(15) in USART_CR1
-    VSF_USART_OVERSAMPLE_8              = (0 << 18),
-    VSF_USART_OVERSAMPLE_16             = (1 << 18),
+    VSF_USART_OVERSAMPLE_8              = (1 << 18),
+    VSF_USART_OVERSAMPLE_16             = (0 << 18),
     VSF_USART_OVERSAMPLE_MASK           = (1 << 18),
 
 

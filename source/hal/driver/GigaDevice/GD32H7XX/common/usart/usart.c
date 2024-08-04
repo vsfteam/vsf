@@ -87,7 +87,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
 
     uint32_t reg = usart_ptr->reg;
     uint32_t uclk = rcu_clock_freq_get(usart_ptr->clk);
-    uint32_t over16 = (cfg_ptr->mode & VSF_USART_OVERSAMPLE_MASK) >> 3;
+    uint32_t over8 = (cfg_ptr->mode & VSF_USART_OVERSAMPLE_MASK) >> 3;
     cfg_ptr->mode &= ~VSF_USART_OVERSAMPLE_MASK;
     uint32_t intdiv = 0U, fradiv = 0U, udiv = 0U;
     uint32_t baudval = cfg_ptr->baudrate;
@@ -95,17 +95,17 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     rcu_periph_clock_enable(usart_ptr->clk_gating);
 
     // boardrate
-    if (over16){
-        /* oversampling by 16, configure the value of USART_BAUD */
-        udiv = (uclk + baudval / 2U) / baudval;
-        intdiv = udiv & 0x0000fff0U;
-        fradiv = udiv & 0x0000000fU;
-        USART_BAUD(reg) = ((USART_BAUD_FRADIV | USART_BAUD_INTDIV) & (intdiv | fradiv));
-    } else {
+    if (over8){
         /* oversampling by 8, configure the value of USART_BAUD */
         udiv = ((2U * uclk) + baudval / 2U) / baudval;
         intdiv = udiv & 0x0000fff0U;
         fradiv = (udiv >> 1U) & 0x00000007U;
+        USART_BAUD(reg) = ((USART_BAUD_FRADIV | USART_BAUD_INTDIV) & (intdiv | fradiv));
+    } else {
+        /* oversampling by 16, configure the value of USART_BAUD */
+        udiv = (uclk + baudval / 2U) / baudval;
+        intdiv = udiv & 0x0000fff0U;
+        fradiv = udiv & 0x0000000fU;
         USART_BAUD(reg) = ((USART_BAUD_FRADIV | USART_BAUD_INTDIV) & (intdiv | fradiv));
     }
 
@@ -120,7 +120,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     ctl = USART_CTL0(reg);
     ctl &= ~(USART_CTL0_REN | USART_CTL0_TEN | USART_CTL0_PM | USART_CTL0_PCEN | USART_CTL0_WL0 | USART_CTL0_WL1);
     ctl |= cfg_ptr->mode & __VSF_HW_USART_CTL0_MASK;
-    USART_CTL0(reg) = ctl | over16;
+    USART_CTL0(reg) = ctl | over8;
 
     ctl = USART_CTL1(reg);
     ctl &= ~(USART_CTL1_CKEN | USART_CTL1_STB | USART_CTL1_STRP | USART_CTL1_RINV | USART_CTL1_TINV);
