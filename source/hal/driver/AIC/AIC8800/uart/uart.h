@@ -46,12 +46,14 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_EVEN_PARITY               = (0x2ul << 3),
 
     // Not hardware, just keep for build
-    VSF_USART_9_BIT_LENGTH              = (0x1ul << 24),
+    VSF_USART_9_BIT_LENGTH              = (0x1ul << 22),
+    VSF_USART_10_BIT_LENGTH             = (0x2ul << 22),
 
-    VSF_USART_FORCE_0_PARITY            = (0x1ul << 25),
-    VSF_USART_FORCE_1_PARITY            = (0x2ul << 25),
+    VSF_USART_FORCE_0_PARITY            = (0x1ul << 24),
+    VSF_USART_FORCE_1_PARITY            = (0x2ul << 24),
 
-    VSF_USART_1_5_STOPBIT               = (0x1ul << 27),
+    VSF_USART_1_5_STOPBIT               = (0x1ul << 26),
+    VSF_USART_0_5_STOPBIT               = (0x2ul << 26),
 
     VSF_USART_NO_HWCONTROL              = (0x0ul << 28),
     VSF_USART_RTS_HWCONTROL             = (0x1ul << 28),
