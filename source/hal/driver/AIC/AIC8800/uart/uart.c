@@ -113,9 +113,10 @@ vsf_usart_capability_t __vsf_hw_usart_capability(__vsf_hw_usart_t *hw_usart_ptr)
         .min_baudrate = pclk / (16 * 1) / 65535,
         .min_data_bits = 8,
         .max_data_bits = 9,
-        .max_tx_fifo_counter = 64,
-        .max_rx_fifo_counter = 64,
+        .txfifo_depth = 64,
+        .rxfifo_depth = 64,
         .support_rx_timeout = 0,
+        .support_send_break = 0,
     };
 
     return usart_capability;
