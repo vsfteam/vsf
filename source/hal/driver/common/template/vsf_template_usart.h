@@ -235,6 +235,8 @@ typedef enum vsf_usart_irq_mask_t {
 #endif
 
 enum {
+    VSF_USART_IRQ_MASK_RX_IDLE          = VSF_USART_IRQ_MASK_RX_TIMEOUT,
+
 #ifndef VSF_USART_IRQ_MASK_ERR
     VSF_USART_IRQ_MASK_ERR              = VSF_USART_IRQ_MASK_FRAME_ERR |
                                           VSF_USART_IRQ_MASK_PARITY_ERR |
