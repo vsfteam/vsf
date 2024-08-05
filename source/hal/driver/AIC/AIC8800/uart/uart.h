@@ -60,11 +60,10 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_CTS_HWCONTROL             = (0x2ul << 28),
     VSF_USART_RTS_CTS_HWCONTROL         = (0x3ul << 28),
 
-    VSF_USART_TX_ENABLE                 = (0x1ul << 30),
-    VSF_USART_TX_DISABLE                = (0x0ul << 30),
-
-    VSF_USART_RX_ENABLE                 = (0x1ul << 31),
-    VSF_USART_RX_DISABLE                = (0x0ul << 31),
+    VSF_USART_FULL_DUPLEX               = (0x0ul << 30),
+    VSF_USART_HALF_DUPLEX               = (0x1ul << 30),
+    VSF_USART_TX_ONLY                   = (0x2ul << 30),
+    VSF_USART_RX_ONLY                   = (0x3ul << 30),
 
     AIC8800_VSF_USART_BIT_LENGTH_MASK   = VSF_USART_8_BIT_LENGTH |
                                           VSF_USART_7_BIT_LENGTH |
