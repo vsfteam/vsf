@@ -129,15 +129,17 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_FORCE_0_PARITY     = (0x3ul << 20),
     VSF_USART_FORCE_1_PARITY     = (0x4ul << 20),
 
-    VSF_USART_1_STOPBIT          = (0x0ul << 23),
-    VSF_USART_1_5_STOPBIT        = (0x1ul << 23),
-    VSF_USART_2_STOPBIT          = (0x2ul << 23),
+    VSF_USART_1_STOPBIT          = (0x0ul << 23),   // stopbit: 1   bit
+    VSF_USART_1_5_STOPBIT        = (0x1ul << 23),   // stopbit: 1.5 bit
+    VSF_USART_0_5_STOPBIT        = (0x2ul << 23),   // stopbit: 0.5 bit
+    VSF_USART_2_STOPBIT          = (0x3ul << 23),   // stopbit: 2   bit
 
     VSF_USART_5_BIT_LENGTH       = (0x0ul << 25),
     VSF_USART_6_BIT_LENGTH       = (0x1ul << 25),
     VSF_USART_7_BIT_LENGTH       = (0x2ul << 25),
     VSF_USART_8_BIT_LENGTH       = (0x3ul << 25),
     VSF_USART_9_BIT_LENGTH       = (0x4ul << 25),
+    VSF_USART_10_BIT_LENGTH      = (0x4ul << 25),
 
     VSF_USART_NO_HWCONTROL       = (0x0ul << 28),
     VSF_USART_RTS_HWCONTROL      = (0x1ul << 28),
@@ -149,51 +151,39 @@ typedef enum vsf_usart_mode_t {
 
     VSF_USART_RX_ENABLE          = (0x1ul << 31),
     VSF_USART_RX_DISABLE         = (0x0ul << 31),
-
-    VSF_USART_HALF_DUPLEX_ENABLE = (0x0ul << 19),
-    VSF_USART_HALF_DUPLEX_DISABLE= (0x1ul << 19),
 } vsf_usart_mode_t;
 #endif
 
 enum {
-    VSF_USART_PARITY_COUNT       = 5,
     VSF_USART_PARITY_MASK        = VSF_USART_NO_PARITY |
                                    VSF_USART_EVEN_PARITY |
                                    VSF_USART_ODD_PARITY |
                                    VSF_USART_FORCE_0_PARITY |
                                    VSF_USART_FORCE_1_PARITY,
 
-    VSF_USART_STOPBIT_COUNT      = 3,
     VSF_USART_STOPBIT_MASK       = VSF_USART_1_STOPBIT |
                                    VSF_USART_1_5_STOPBIT |
+                                   VSF_USART_0_5_STOPBIT |
                                    VSF_USART_2_STOPBIT,
 
-    VSF_USART_BIT_LENGTH_COUNT   = 5,
     VSF_USART_BIT_LENGTH_MASK    = VSF_USART_5_BIT_LENGTH |
                                    VSF_USART_6_BIT_LENGTH |
                                    VSF_USART_7_BIT_LENGTH |
                                    VSF_USART_8_BIT_LENGTH |
-                                   VSF_USART_9_BIT_LENGTH,
+                                   VSF_USART_9_BIT_LENGTH |
+                                   VSF_USART_10_BIT_LENGTH,
 
-    VSF_USART_HWCONTROL_COUNT    = 4,
     VSF_USART_HWCONTROL_MASK     = VSF_USART_NO_HWCONTROL |
                                    VSF_USART_RTS_HWCONTROL |
                                    VSF_USART_CTS_HWCONTROL |
                                    VSF_USART_RTS_CTS_HWCONTROL,
 
-    VSF_USART_TX_ENABLE_COUNT    = 2,
     VSF_USART_TX_ENABLE_MASK     = VSF_USART_TX_ENABLE |
                                    VSF_USART_TX_DISABLE,
 
-    VSF_USART_RX_ENABLE_COUNT    = 2,
     VSF_USART_RX_ENABLE_MASK     = VSF_USART_RX_ENABLE |
                                    VSF_USART_RX_DISABLE,
 
-    VSF_USART_HALF_DUPLEX_COUNT  = 2,
-    VSF_USART_HALF_DUPLEX_MASK   = VSF_USART_HALF_DUPLEX_ENABLE |
-                                   VSF_USART_HALF_DUPLEX_DISABLE,
-
-    VSF_USART_MODE_MASK_COUNT    = 5,
     VSF_USART_MODE_ALL_BITS_MASK = VSF_USART_PARITY_MASK |
                                    VSF_USART_STOPBIT_MASK |
                                    VSF_USART_BIT_LENGTH_MASK |
