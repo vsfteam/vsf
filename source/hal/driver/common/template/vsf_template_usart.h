@@ -268,20 +268,20 @@ typedef struct vsf_usart_capability_t {
 #endif
     vsf_usart_irq_mask_t irq_mask;
 
+    // baudrate range
     uint32_t max_baudrate;
     uint32_t min_baudrate;
 
-    uint8_t max_tx_fifo_counter;
-    uint8_t max_rx_fifo_counter;
+    // tx fifo depth, in bytes
+    uint8_t txfifo_depth;
+    // rx fifo depth, in bytes
+    uint8_t rxfifo_depth;
 
     uint8_t max_data_bits;
     uint8_t min_data_bits;
 
     uint8_t support_rx_timeout : 1;
-
-    // TODO : stopbits
-    // TODO : parity
-    // TODO : hwcontrol
+    uint8_t support_send_break : 1;
 } vsf_usart_capability_t;
 
 typedef struct vsf_usart_op_t {
