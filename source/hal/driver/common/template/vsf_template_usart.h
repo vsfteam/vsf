@@ -160,17 +160,21 @@ enum {
                                    VSF_USART_FORCE_0_PARITY |
                                    VSF_USART_FORCE_1_PARITY,
 
+#ifndef VSF_USART_STOPBIT_MASK
     VSF_USART_STOPBIT_MASK       = VSF_USART_1_STOPBIT |
                                    VSF_USART_1_5_STOPBIT |
                                    VSF_USART_0_5_STOPBIT |
                                    VSF_USART_2_STOPBIT,
+#endif
 
+#ifndef VSF_USART_BIT_LENGTH_MASK
     VSF_USART_BIT_LENGTH_MASK    = VSF_USART_5_BIT_LENGTH |
                                    VSF_USART_6_BIT_LENGTH |
                                    VSF_USART_7_BIT_LENGTH |
                                    VSF_USART_8_BIT_LENGTH |
                                    VSF_USART_9_BIT_LENGTH |
                                    VSF_USART_10_BIT_LENGTH,
+#endif
 
     VSF_USART_HWCONTROL_MASK     = VSF_USART_NO_HWCONTROL |
                                    VSF_USART_RTS_HWCONTROL |
