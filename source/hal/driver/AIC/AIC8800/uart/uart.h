@@ -46,24 +46,32 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_EVEN_PARITY               = (0x2ul << 3),
 
     // Not hardware, just keep for build
-    VSF_USART_9_BIT_LENGTH              = (0x1ul << 22),
-    VSF_USART_10_BIT_LENGTH             = (0x2ul << 22),
+    VSF_USART_9_BIT_LENGTH              = (0x1ul << 8),
+    VSF_USART_10_BIT_LENGTH             = (0x2ul << 8),
 
-    VSF_USART_FORCE_0_PARITY            = (0x1ul << 24),
-    VSF_USART_FORCE_1_PARITY            = (0x2ul << 24),
+    VSF_USART_FORCE_0_PARITY            = (0x1ul << 10),
+    VSF_USART_FORCE_1_PARITY            = (0x2ul << 10),
 
-    VSF_USART_1_5_STOPBIT               = (0x1ul << 26),
-    VSF_USART_0_5_STOPBIT               = (0x2ul << 26),
+    VSF_USART_1_5_STOPBIT               = (0x1ul << 12),
+    VSF_USART_0_5_STOPBIT               = (0x2ul << 12),
 
-    VSF_USART_NO_HWCONTROL              = (0x0ul << 28),
-    VSF_USART_RTS_HWCONTROL             = (0x1ul << 28),
-    VSF_USART_CTS_HWCONTROL             = (0x2ul << 28),
-    VSF_USART_RTS_CTS_HWCONTROL         = (0x3ul << 28),
+    VSF_USART_NO_HWCONTROL              = (0x0ul << 14),
+    VSF_USART_RTS_HWCONTROL             = (0x1ul << 14),
+    VSF_USART_CTS_HWCONTROL             = (0x2ul << 14),
+    VSF_USART_RTS_CTS_HWCONTROL         = (0x3ul << 14),
 
-    VSF_USART_FULL_DUPLEX               = (0x0ul << 30),
-    VSF_USART_HALF_DUPLEX               = (0x1ul << 30),
-    VSF_USART_TX_ONLY                   = (0x2ul << 30),
-    VSF_USART_RX_ONLY                   = (0x3ul << 30),
+    VSF_USART_FULL_DUPLEX               = (0x0ul << 16),
+    VSF_USART_HALF_DUPLEX               = (0x1ul << 16),
+    VSF_USART_TX_ONLY                   = (0x2ul << 16),
+    VSF_USART_RX_ONLY                   = (0x3ul << 16),
+
+    VSF_USART_TX_FIFO_THRESH_ONE        = (0x0ul << 18),
+    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x1ul << 18),
+    VSF_USART_TX_FIFO_THRESH_FULL       = (0x2ul << 18),
+
+    VSF_USART_RX_FIFO_THRESH_ONE        = (0x0ul << 20),
+    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (0x1ul << 20),
+    VSF_USART_RX_FIFO_THRESH_FULL       = (0x2ul << 20),
 
     AIC8800_VSF_USART_BIT_LENGTH_MASK   = VSF_USART_8_BIT_LENGTH |
                                           VSF_USART_7_BIT_LENGTH |
