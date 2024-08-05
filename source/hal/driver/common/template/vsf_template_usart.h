@@ -123,33 +123,41 @@ extern "C" {
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
 typedef enum vsf_usart_mode_t {
-    VSF_USART_NO_PARITY          = (0x0ul << 0),
-    VSF_USART_EVEN_PARITY        = (0x1ul << 0),
-    VSF_USART_ODD_PARITY         = (0x2ul << 0),
-    VSF_USART_FORCE_0_PARITY     = (0x3ul << 0),
-    VSF_USART_FORCE_1_PARITY     = (0x4ul << 0),
+    VSF_USART_NO_PARITY                 = (0x0ul << 0),
+    VSF_USART_EVEN_PARITY               = (0x1ul << 0),
+    VSF_USART_ODD_PARITY                = (0x2ul << 0),
+    VSF_USART_FORCE_0_PARITY            = (0x3ul << 0),
+    VSF_USART_FORCE_1_PARITY            = (0x4ul << 0),
 
-    VSF_USART_1_STOPBIT          = (0x0ul << 3),   // stopbit: 1   bit
-    VSF_USART_1_5_STOPBIT        = (0x1ul << 3),   // stopbit: 1.5 bit
-    VSF_USART_0_5_STOPBIT        = (0x2ul << 3),   // stopbit: 0.5 bit
-    VSF_USART_2_STOPBIT          = (0x3ul << 3),   // stopbit: 2   bit
+    VSF_USART_1_STOPBIT                 = (0x0ul << 3),   // stopbit: 1   bit
+    VSF_USART_1_5_STOPBIT               = (0x1ul << 3),   // stopbit: 1.5 bit
+    VSF_USART_0_5_STOPBIT               = (0x2ul << 3),   // stopbit: 0.5 bit
+    VSF_USART_2_STOPBIT                 = (0x3ul << 3),   // stopbit: 2   bit
 
-    VSF_USART_5_BIT_LENGTH       = (0x0ul << 5),
-    VSF_USART_6_BIT_LENGTH       = (0x1ul << 5),
-    VSF_USART_7_BIT_LENGTH       = (0x2ul << 5),
-    VSF_USART_8_BIT_LENGTH       = (0x3ul << 5),
-    VSF_USART_9_BIT_LENGTH       = (0x4ul << 5),
-    VSF_USART_10_BIT_LENGTH      = (0x4ul << 5),
+    VSF_USART_5_BIT_LENGTH              = (0x0ul << 5),
+    VSF_USART_6_BIT_LENGTH              = (0x1ul << 5),
+    VSF_USART_7_BIT_LENGTH              = (0x2ul << 5),
+    VSF_USART_8_BIT_LENGTH              = (0x3ul << 5),
+    VSF_USART_9_BIT_LENGTH              = (0x4ul << 5),
+    VSF_USART_10_BIT_LENGTH             = (0x4ul << 5),
 
-    VSF_USART_NO_HWCONTROL       = (0x0ul << 8),
-    VSF_USART_RTS_HWCONTROL      = (0x1ul << 8),
-    VSF_USART_CTS_HWCONTROL      = (0x2ul << 8),
-    VSF_USART_RTS_CTS_HWCONTROL  = (0x3ul << 8),
+    VSF_USART_NO_HWCONTROL              = (0x0ul << 8),
+    VSF_USART_RTS_HWCONTROL             = (0x1ul << 8),
+    VSF_USART_CTS_HWCONTROL             = (0x2ul << 8),
+    VSF_USART_RTS_CTS_HWCONTROL         = (0x3ul << 8),
 
-    VSF_USART_FULL_DUPLEX        = (0x0ul << 10),
-    VSF_USART_HALF_DUPLEX        = (0x1ul << 10),
-    VSF_USART_TX_ONLY            = (0x2ul << 10),
-    VSF_USART_RX_ONLY            = (0x3ul << 10),
+    VSF_USART_FULL_DUPLEX               = (0x0ul << 10),
+    VSF_USART_HALF_DUPLEX               = (0x1ul << 10),
+    VSF_USART_TX_ONLY                   = (0x2ul << 10),
+    VSF_USART_RX_ONLY                   = (0x3ul << 10),
+
+    VSF_USART_TX_FIFO_THRESH_ONE        = (0x0ul << 12),
+    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x1ul << 12),
+    VSF_USART_TX_FIFO_THRESH_FULL       = (0x2ul << 12),
+
+    VSF_USART_RX_FIFO_THRESH_ONE        = (0x0ul << 14),
+    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (0x1ul << 14),
+    VSF_USART_RX_FIFO_THRESH_FULL       = (0x2ul << 14),
 } vsf_usart_mode_t;
 #endif
 
@@ -176,6 +184,18 @@ enum {
                                    VSF_USART_10_BIT_LENGTH,
 #endif
 
+#ifndef VSF_USART_TX_FIFO_THRESH_MASK
+    VSF_USART_TX_FIFO_THRESH_MASK = VSF_USART_TX_FIFO_THRESH_ONE |
+                                    VSF_USART_TX_FIFO_THRESH_HALF_FULL |
+                                    VSF_USART_TX_FIFO_THRESH_FULL,
+#endif
+
+#ifndef VSF_USART_RX_FIFO_THRESH_MASK
+    VSF_USART_RX_FIFO_THRESH_MASK = VSF_USART_RX_FIFO_THRESH_ONE |
+                                    VSF_USART_RX_FIFO_THRESH_HALF_FULL |
+                                    VSF_USART_RX_FIFO_THRESH_FULL,
+#endif
+
     VSF_USART_HWCONTROL_MASK     = VSF_USART_NO_HWCONTROL |
                                    VSF_USART_RTS_HWCONTROL |
                                    VSF_USART_CTS_HWCONTROL |
@@ -190,8 +210,9 @@ enum {
                                    VSF_USART_STOPBIT_MASK |
                                    VSF_USART_BIT_LENGTH_MASK |
                                    VSF_USART_HWCONTROL_MASK |
+                                   VSF_USART_TX_FIFO_THRESH_MASK |
+                                   VSF_USART_RX_FIFO_THRESH_MASK |
                                    VSF_USART_TX_RX_MASK,
-
 };
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
@@ -210,25 +231,25 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 29),
     VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 30),
     VSF_USART_IRQ_MASK_OVERFLOW_ERR     = (0x1ul << 31),
-
-
 } vsf_usart_irq_mask_t;
 #endif
 
 enum {
-    VSF_USART_IRQ_ERR_COUNT             = 4,
+#ifndef VSF_USART_IRQ_MASK_ERR
     VSF_USART_IRQ_MASK_ERR              = VSF_USART_IRQ_MASK_FRAME_ERR |
                                           VSF_USART_IRQ_MASK_PARITY_ERR |
                                           VSF_USART_IRQ_MASK_BREAK_ERR |
                                           VSF_USART_IRQ_MASK_OVERFLOW_ERR,
+#endif
 
-    VSF_USART_IRQ_COUNT                 = 9,
+#ifndef VSF_USART_IRQ_ALL_BITS_MASK
     VSF_USART_IRQ_ALL_BITS_MASK         = VSF_USART_IRQ_MASK_TX |
                                           VSF_USART_IRQ_MASK_RX |
                                           VSF_USART_IRQ_MASK_RX_TIMEOUT |
                                           VSF_USART_IRQ_MASK_TX_CPL |
                                           VSF_USART_IRQ_MASK_RX_CPL |
                                           VSF_USART_IRQ_MASK_ERR,
+#endif
 };
 
 typedef struct vsf_usart_t vsf_usart_t;
@@ -255,9 +276,13 @@ typedef struct vsf_usart_status_t {
     union {
         inherit(vsf_peripheral_status_t)
         struct {
-            uint32_t is_busy    : 1;
-            uint32_t is_tx_busy : 1;
-            uint32_t is_rx_busy : 1;
+            uint32_t is_busy         : 1;
+            uint32_t is_tx_busy      : 1;
+            uint32_t is_rx_busy      : 1;
+            // tx fifo threshold in bytes
+            uint32_t tx_fifo_thresh  : 8;
+            // rx fifo threshold in bytes
+            uint32_t rx_fifo_thresh  : 8;
         };
     };
 } vsf_usart_status_t;
