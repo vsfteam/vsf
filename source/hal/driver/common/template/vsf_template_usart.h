@@ -89,10 +89,6 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
                                                     DISABLED
 #endif
 
-#ifndef VSF_USART_CFG_USE_CMD_FUNCTION
-#   define VSF_USART_CFG_USE_CMD_FUNCTION           DISABLED
-#endif
-
 #ifndef VSF_USART_CFG_INHERT_HAL_CAPABILITY
 #   define VSF_USART_CFG_INHERT_HAL_CAPABILITY      ENABLED
 #endif
@@ -139,13 +135,8 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
 #   define __VSF_USART_REQUEST_APIS(__prefix_name)
 #endif
 
-#if VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED
-#   define __VSF_USART_REQUEST_EXTRA_APIS(__prefix_name)                        \
+#define __VSF_USART_REQUEST_EXTRA_APIS(__prefix_name)                           \
         __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, cmd,                   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, vsf_usart_cmd_t cmd, void* param)
-#else
-#   define __VSF_USART_REQUEST_EXTRA_APIS(__prefix_name)                        \
-        __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, tx_send_break,         VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, uint_fast32_t duration)
-#endif
 
 #define VSF_USART_APIS(__prefix_name)                                           \
     __VSF_USART_BASE_APIS(__prefix_name)                                        \
@@ -168,12 +159,12 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_0_5_STOPBIT               = (0x2ul << 3),     //!< stopbit: 0.5 bit
     VSF_USART_2_STOPBIT                 = (0x3ul << 3),     //!< stopbit: 2   bit
 
-    VSF_USART_5_BIT_LENGTH              = (0x0ul << 5),     //!< data bits : 5, 1 byte
-    VSF_USART_6_BIT_LENGTH              = (0x1ul << 5),     //!< data bits : 6, 1 byte
-    VSF_USART_7_BIT_LENGTH              = (0x2ul << 5),     //!< data bits : 7, 1 byte
-    VSF_USART_8_BIT_LENGTH              = (0x3ul << 5),     //!< data bits : 8, 1 byte
-    VSF_USART_9_BIT_LENGTH              = (0x4ul << 5),     //!< data bits : 9, 2 bytes
-    VSF_USART_10_BIT_LENGTH             = (0x5ul << 5),     //!< data bits : 10, 2 bytes
+    VSF_USART_5_BIT_LENGTH              = (0x0ul << 5),     //!< data bits : 5,
+    VSF_USART_6_BIT_LENGTH              = (0x1ul << 5),     //!< data bits : 6,
+    VSF_USART_7_BIT_LENGTH              = (0x2ul << 5),     //!< data bits : 7,
+    VSF_USART_8_BIT_LENGTH              = (0x3ul << 5),     //!< data bits : 8,
+    VSF_USART_9_BIT_LENGTH              = (0x4ul << 5),     //!< data bits : 9,
+    VSF_USART_10_BIT_LENGTH             = (0x5ul << 5),     //!< data bits : 10,
 
     VSF_USART_NO_HWCONTROL              = (0x0ul << 8),
     VSF_USART_RTS_HWCONTROL             = (0x1ul << 8),
@@ -321,7 +312,7 @@ typedef struct vsf_usart_cfg_t {
 } vsf_usart_cfg_t;
 
 typedef enum vsf_usart_cmd_t {
-    VSF_USART_CMD_TX_SEND_BREAK = 0,
+    VSF_USART_CMD_SEND_BREAK = 0,
 } vsf_usart_cmd_t;
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
@@ -351,9 +342,9 @@ typedef struct vsf_usart_capability_t {
     uint32_t max_baudrate;
     uint32_t min_baudrate;
 
-    // tx fifo depth, in bytes
+    // tx fifo depth, in data count (frame)
     uint8_t txfifo_depth;
-    // rx fifo depth, in bytes
+    // rx fifo depth, in data count (frame)
     uint8_t rxfifo_depth;
 
     uint8_t max_data_bits;
@@ -651,7 +642,6 @@ extern int_fast32_t vsf_usart_get_rx_count(vsf_usart_t *usart_ptr);
  */
 extern int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart_ptr);
 
-#if VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED
 /**
  \~english
  @brief Calls the specified usart command
@@ -668,23 +658,6 @@ extern int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart_ptr);
  @return vsf_err_t: 返回当调用 uart 命令的结果，成功返回 VSF_ERR_NONE
  */
 extern vsf_err_t vsf_usart_cmd(vsf_usart_t *usart_ptr, vsf_usart_cmd_t cmd, void * param);
-#else
-/**
- \~english
- @brief usart instance tx send break
- @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
- @param[in] duration: a multiple of the time it takes usart to transfer 1bit data.
-            If duration is 0, the hardware default break time is used.
- @return vsf_err_t: returns the result of the usart sending tx break, success returns VSF_ERR_NONE
-
- \~chinese
- @brief 获取 usart 实例的状态
- @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
- @param[in] duration: usart 传输一位数据的时间的倍数，如果 duration 等于 0，表示使用硬件默认的时间
- @return vsf_err_t: 返回当前 usart 发送 tx break 的结果，成功返回 VSF_ERR_NONE
- */
-extern vsf_err_t vsf_usart_tx_send_break(vsf_usart_t *usart_ptr, uint_fast32_t duration);
-#endif
 
 /*============================ INLINE FUNCTIONS ==============================*/
 
@@ -710,12 +683,21 @@ static inline uint8_t vsf_usart_mode_to_data_bits(vsf_usart_mode_t mode)
 }
 #endif
 
-#if VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED
-static inline vsf_err_t vsf_usart_tx_send_break(vsf_usart_t *usart_ptr, uint_fast32_t duration)
+/**
+ \~english
+ @brief usart instance tx send break
+ @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
+ @return vsf_err_t: returns the result of the usart sending tx break, success returns VSF_ERR_NONE
+
+ \~chinese
+ @brief 获取 usart 实例的状态
+ @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
+ @return vsf_err_t: 返回当前 usart 发送 tx break 的结果，成功返回 VSF_ERR_NONE
+ */
+static inline vsf_err_t vsf_usart_send_break(vsf_usart_t *usart_ptr)
 {
-    return vsf_usart_cmd(usart_ptr, VSF_USART_CMD_TX_SEND_BREAK, (void *)duration);
+    return vsf_usart_cmd(usart_ptr, VSF_USART_CMD_SEND_BREAK, NULL);
 }
-#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -739,7 +721,7 @@ static inline vsf_err_t vsf_usart_tx_send_break(vsf_usart_t *usart_ptr, uint_fas
 #   define vsf_usart_cancel_tx(__USART)                  VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_tx)             ((__vsf_usart_t *)__USART)
 #   define vsf_usart_get_rx_count(__USART)               VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_rx_count)          ((__vsf_usart_t *)__USART)
 #   define vsf_usart_get_tx_count(__USART)               VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_tx_count)          ((__vsf_usart_t *)__USART)
-#   define vsf_usart_tx_send_break(__USART, ...)         VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_tx_send_break)         ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_send_break(__USART, ...)            VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_send_break)            ((__vsf_usart_t *)__USART)
 #   define vsf_usart_cmd(__USART, ...)                   VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cmd)                   ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
 #endif
 
