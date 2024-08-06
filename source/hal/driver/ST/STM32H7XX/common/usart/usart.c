@@ -293,8 +293,8 @@ vsf_usart_capability_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
         .min_baudrate               = 0,
         .min_data_bits              = 7,
         .max_data_bits              = 10,
-        .max_tx_fifo_counter        = 0,
-        .max_rx_fifo_counter        = 0,
+        .txfifo_depth               = 0,
+        .rxfifo_depth               = 0,
         // TODO: support tx_timeout
         .support_rx_timeout         = 0,
     };
