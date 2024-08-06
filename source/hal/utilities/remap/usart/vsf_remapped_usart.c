@@ -153,17 +153,11 @@ int_fast32_t vsf_remapped_usart_get_tx_count(vsf_remapped_usart_t *usart)
     return vsf_usart_get_tx_count(usart->target);
 }
 
-#if VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED
 vsf_err_t vsf_remapped_usart_cmd(vsf_remapped_usart_t *usart_ptr, vsf_usart_cmd_t cmd, void *param)
 {
     return vsf_usart_cmd(usart_ptr, cmd, param);
 }
-#else
-vsf_err_t vsf_remapped_usart_tx_send_break(vsf_remapped_usart_t *usart_ptr, uint_fast32_t duration)
-{
-    return vsf_usart_tx_send_break(usart_ptr, duration);
-}
-#endif
+
 
 #endif
 #endif
