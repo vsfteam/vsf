@@ -21,20 +21,13 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_PWM_CFG_REIMPLEMENT_API_SET_MS
-#   define VSF_PWM_CFG_REIMPLEMENT_API_SET_MS       DISABLED
-#endif
-
-#ifndef VSF_PWM_CFG_REIMPLEMENT_API_SET_US
-#   define VSF_PWM_CFG_REIMPLEMENT_API_SET_US       DISABLED
-#endif
-
-#ifndef VSF_PWM_CFG_REIMPLEMENT_API_SET_NS
-#   define VSF_PWM_CFG_REIMPLEMENT_API_SET_NS       DISABLED
-#endif
-
 #ifndef VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY
 #   define  VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY  DISABLED
+#endif
+
+#ifdef VSF_PWM_CFG_IMP_REMAP_PREFIX
+#   undef VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY
+#   define VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY           ENABLED
 #endif
 
 #if VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -48,9 +41,6 @@
 
 #define vsf_real_pwm_t          VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t)
 #define vsf_real_pwm_set        VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set)
-#define vsf_real_pwm_set_ms     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set_ms)
-#define vsf_real_pwm_set_us     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set_us)
-#define vsf_real_pwm_set_ns     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set_ns)
 #define vsf_real_pwm_get_freq   VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_freq)
 #define vsf_real_pwm_capability VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_capability)
 
@@ -60,52 +50,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
-
-#if VSF_PWM_CFG_REIMPLEMENT_API_SET_MS == DISABLED
-vsf_err_t vsf_real_pwm_set_ms(vsf_real_pwm_t *pwm_ptr, uint8_t channel, uint32_t period_ms, uint32_t pulse_ms)
-{
-    VSF_HAL_ASSERT(NULL != pwm_ptr);
-
-    uint32_t freq = vsf_real_pwm_get_freq(pwm_ptr);
-    VSF_HAL_ASSERT(freq != 0);
-
-    uint32_t period = (uint64_t)1000 * 1000 * period_ms / freq;
-    uint32_t pulse  = (uint64_t)1000 * 1000 * pulse_ms  / freq;
-
-    return vsf_real_pwm_set(pwm_ptr, channel, period, pulse);
-}
-#endif
-
-#if VSF_PWM_CFG_REIMPLEMENT_API_SET_US == DISABLED
-vsf_err_t vsf_real_pwm_set_us(vsf_real_pwm_t *pwm_ptr, uint8_t channel, uint32_t period_us, uint32_t pulse_us)
-{
-    VSF_HAL_ASSERT(NULL != pwm_ptr);
-
-    uint32_t freq = vsf_real_pwm_get_freq(pwm_ptr);
-    VSF_HAL_ASSERT(freq != 0);
-
-    uint32_t period = (uint64_t)1000 * period_us / freq;
-    uint32_t pulse  = (uint64_t)1000 * pulse_us  / freq;
-
-    return vsf_real_pwm_set(pwm_ptr, channel, period, pulse);
-}
-#endif
-
-#if VSF_PWM_CFG_REIMPLEMENT_API_SET_NS == DISABLED
-vsf_err_t vsf_real_pwm_set_ns(vsf_real_pwm_t *pwm_ptr, uint8_t channel, uint32_t period_ns, uint32_t pulse_ns)
-{
-    VSF_HAL_ASSERT(NULL != pwm_ptr);
-
-
-    uint32_t freq = vsf_real_pwm_get_freq(pwm_ptr);
-    VSF_HAL_ASSERT(freq != 0);
-
-    uint32_t period = period_ns / freq;
-    uint32_t pulse  = pulse_ns  / freq;
-
-    return vsf_real_pwm_set(pwm_ptr, channel, period, pulse);
-}
-#endif
 
 #if VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
@@ -126,7 +70,6 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 #undef VSF_PWM_CFG_CAPABILITY_MIN_FREQ
 #undef vsf_real_pwm_t
 #undef vsf_real_pwm_capability
-
 
 /*============================ MACROS ========================================*/
 

@@ -20,11 +20,16 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define vsf_real_mmc_t                                VSF_MCONNECT(VSF_MMC_CFG_IMP_PREFIX, _mmc_t)
-#define vsf_real_mmc_capability                       VSF_MCONNECT(VSF_MMC_CFG_IMP_PREFIX, _mmc_capability)
+#define vsf_real_mmc_t                                      VSF_MCONNECT(VSF_MMC_CFG_IMP_PREFIX, _mmc_t)
+#define vsf_real_mmc_capability                             VSF_MCONNECT(VSF_MMC_CFG_IMP_PREFIX, _mmc_capability)
 
 #ifndef VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY
-#   define  VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
+#   define  VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY          DISABLED
+#endif
+
+#ifdef VSF_MMC_CFG_IMP_REMAP_PREFIX
+#   undef VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY
+#   define VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY           ENABLED
 #endif
 
 #if VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
