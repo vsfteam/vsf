@@ -84,6 +84,11 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
 #   define VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS    DISABLED
 #endif
 
+#ifndef VSF_USART_CFG_REIMPLEMENT_MODE_TO_DATA_BITS
+#   define VSF_USART_CFG_REIMPLEMENT_MODE_TO_DATA_BITS      \
+                                                    DISABLED
+#endif
+
 #ifndef VSF_USART_CFG_USE_CMD_FUNCTION
 #   define VSF_USART_CFG_USE_CMD_FUNCTION           DISABLED
 #endif
@@ -658,14 +663,14 @@ extern vsf_err_t vsf_usart_cmd(vsf_usart_t *usart_ptr, vsf_usart_cmd_t cmd, void
  \~english
  @brief usart instance tx send break
  @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
- @param[in] duration: a multiple of the time it takes usart to transfer 1bit.
+ @param[in] duration: a multiple of the time it takes usart to transfer 1bit data.
             If duration is 0, the hardware default break time is used.
  @return vsf_err_t: returns the result of the usart sending tx break, success returns VSF_ERR_NONE
 
  \~chinese
  @brief 获取 usart 实例的状态
  @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
- @param[in] duration: usart 传输一位的时间的倍数，如果 duration 等于0，表示使用硬件默认的时间
+ @param[in] duration: usart 传输一位数据的时间的倍数，如果 duration 等于 0，表示使用硬件默认的时间
  @return vsf_err_t: 返回当前 usart 发送 tx break 的结果，成功返回 VSF_ERR_NONE
  */
 extern vsf_err_t vsf_usart_tx_send_break(vsf_usart_t *usart_ptr, uint_fast32_t duration);
@@ -673,6 +678,7 @@ extern vsf_err_t vsf_usart_tx_send_break(vsf_usart_t *usart_ptr, uint_fast32_t d
 
 /*============================ INLINE FUNCTIONS ==============================*/
 
+#if VSF_USART_CFG_REIMPLEMENT_MODE_TO_DATA_BITS == DISABLED
 static inline uint8_t vsf_usart_mode_to_data_bits(vsf_usart_mode_t mode)
 {
     switch (mode & VSF_USART_BIT_LENGTH_MASK) {
@@ -686,10 +692,13 @@ static inline uint8_t vsf_usart_mode_to_data_bits(vsf_usart_mode_t mode)
         return 8;
     case VSF_USART_9_BIT_LENGTH:
         return 9;
+    case VSF_USART_10_BIT_LENGTH:
+        return 10;
     default:
         return 0;
     }
 }
+#endif
 
 #if VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED
 static inline vsf_err_t vsf_usart_tx_send_break(vsf_usart_t *usart_ptr, uint_fast32_t duration)
