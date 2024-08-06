@@ -138,6 +138,14 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
 #define __VSF_USART_REQUEST_EXTRA_APIS(__prefix_name)                           \
         __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, cmd,                   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, vsf_usart_cmd_t cmd, void* param)
 
+#define VSF_USART_INLINE_APIS(__prefix_name)                                    \
+    static inline vsf_err_t VSF_MCONNECT(__prefix_name, _usart_send_break)      \
+        (VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr)                      \
+    {                                                                           \
+        return VSF_MCONNECT(__prefix_name, _usart_cmd)                          \
+                (usart_ptr, VSF_USART_CMD_SEND_BREAK, NULL);                    \
+    }
+
 #define VSF_USART_APIS(__prefix_name)                                           \
     __VSF_USART_BASE_APIS(__prefix_name)                                        \
     __VSF_USART_FIFO_APIS(__prefix_name)                                        \
@@ -147,18 +155,90 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
 /*============================ TYPES =========================================*/
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
+/**
+ * \~english
+ * @brief Predefined VSF USART modes that can be reimplemented in specific hal drivers.
+ *
+ * \~chinese
+ * @brief 预定义的 VSF USART 模式，可以在具体的 HAL 驱动重新实现。
+ *
+ * \~english
+ * Even if the hardware doesn't support these features, these modes must be implemented.
+ * If the hardware supports more modes, e.g. more parity modes, more databits, more stopbits,
+ * more FIFO threshold size, we can implement it in the hardware driver, but the following
+ * modes must be kept:
+ * \~chinese
+ * 即使硬件不支持这些功能，但是这些模式是必须实现的: 如果硬件支持更多模式，例如更多的奇偶校验模式、
+ * 数据位大小、停止位大小、FIFO 门限值，我们可以在硬件驱动里实现它，但是以下的模式必须保留：
+ *
+ * - VSF_USART_NO_PARITY
+ * - VSF_USART_EVEN_PARITY
+ * - VSF_USART_ODD_PARITY
+ * - VSF_USART_FORCE_0_PARITY
+ * - VSF_USART_FORCE_1_PARITY
+ * - VSF_USART_1_STOPBIT
+ * - VSF_USART_1_5_STOPBIT
+ * - VSF_USART_0_5_STOPBIT
+ * - VSF_USART_2_STOPBIT
+ * - VSF_USART_5_BIT_LENGTH
+ * - VSF_USART_6_BIT_LENGTH
+ * - VSF_USART_7_BIT_LENGTH
+ * - VSF_USART_8_BIT_LENGTH
+ * - VSF_USART_9_BIT_LENGTH
+ * - VSF_USART_10_BIT_LENGTH
+ * - VSF_USART_NO_HWCONTROL
+ * - VSF_USART_RTS_HWCONTROL
+ * - VSF_USART_CTS_HWCONTROL
+ * - VSF_USART_RTS_CTS_HWCONTROL
+ * - VSF_USART_TX_ENABLE
+ * - VSF_USART_TX_DISABLE
+ * - VSF_USART_RX_ENABLE
+ * - VSF_USART_RX_DISABLE
+ * - VSF_USART_HALF_DUPLEX_DISABLE
+ * - VSF_USART_HALF_DUPLEX_ENABLE
+ * - VSF_USART_TX_FIFO_THRESH_ONE
+ * - VSF_USART_TX_FIFO_THRESH_HALF_FULL
+ * - VSF_USART_TX_FIFO_THRESH_FULL
+ * - VSF_USART_RX_FIFO_THRESH_ONE
+ * - VSF_USART_RX_FIFO_THRESH_HALF_FULL
+ * - VSF_USART_RX_FIFO_THRESH_FULL
+ *
+ * \~english
+ * If more new modes are added to the driver, then the corresponding MASK macros need to
+ * be defined to include the values of the new modes. For example, Adding the new TX FIFO
+ * Threshold option requires that the macro VSF_USART_TX_FIFO_THRESH_MASK be defined.
+ * Adding the new parity check option requires the macro VSF_USART_PARITY_MASK be defined.
+ * Adding the new stop bit option requires the macro of VSF_USART_BIT_LENGTH_MASK be defined.
+ * \~chinese
+ * 驱动里如果添加更多的新模式的时候，那也需要定义对应的 MASK 宏 来包含新的模式的值。例如添加了新的
+ * TX FIFO 门限值选项，就需要定义宏 VSF_USART_TX_FIFO_THRESH_MASK; 添加了新的奇偶检验选项，就需要
+ * 定义宏 VSF_USART_PARITY_MASK; 添加了新的停止位选项，就需要定义宏 VSF_USART_BIT_LENGTH_MASK。
+ *
+ * \~english
+ *  Optional features require one or more enumeration options and a macro with the same
+ *  name to determine if they are supported at runtime. If the feature supports more than
+ *  one option, it is recommended to provide the corresponding MASK option, so that the
+ *  user can switch to different modes at runtime.
+ * \~chinese
+ * 可选特性需要提供一个或者多个枚举选项，还需要提供同名的宏，方便用户在运行时判断是否支持。
+ * 如果它特性支持多个选项，建议提供对应的 MASK 选项，方便用户在运行时切换到不同的模式。
+ *
+ */
 typedef enum vsf_usart_mode_t {
+    //! USART Parity
     VSF_USART_NO_PARITY                 = (0x0ul << 0),
     VSF_USART_EVEN_PARITY               = (0x1ul << 0),
     VSF_USART_ODD_PARITY                = (0x2ul << 0),
     VSF_USART_FORCE_0_PARITY            = (0x3ul << 0),
     VSF_USART_FORCE_1_PARITY            = (0x4ul << 0),
 
+    //! USART Stopbit
     VSF_USART_1_STOPBIT                 = (0x0ul << 3),     //!< stopbit: 1   bit
     VSF_USART_1_5_STOPBIT               = (0x1ul << 3),     //!< stopbit: 1.5 bit
     VSF_USART_0_5_STOPBIT               = (0x2ul << 3),     //!< stopbit: 0.5 bit
     VSF_USART_2_STOPBIT                 = (0x3ul << 3),     //!< stopbit: 2   bit
 
+    //! USART Databit Lenght
     VSF_USART_5_BIT_LENGTH              = (0x0ul << 5),     //!< data bits : 5,
     VSF_USART_6_BIT_LENGTH              = (0x1ul << 5),     //!< data bits : 6,
     VSF_USART_7_BIT_LENGTH              = (0x2ul << 5),     //!< data bits : 7,
@@ -166,6 +246,7 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_9_BIT_LENGTH              = (0x4ul << 5),     //!< data bits : 9,
     VSF_USART_10_BIT_LENGTH             = (0x5ul << 5),     //!< data bits : 10,
 
+    //! USART Hardware Control
     VSF_USART_NO_HWCONTROL              = (0x0ul << 8),
     VSF_USART_RTS_HWCONTROL             = (0x1ul << 8),
     VSF_USART_CTS_HWCONTROL             = (0x2ul << 8),
@@ -194,63 +275,67 @@ typedef enum vsf_usart_mode_t {
 #endif
 
 enum {
-    VSF_USART_PARITY_MASK        = VSF_USART_NO_PARITY |
-                                   VSF_USART_EVEN_PARITY |
-                                   VSF_USART_ODD_PARITY |
-                                   VSF_USART_FORCE_0_PARITY |
-                                   VSF_USART_FORCE_1_PARITY,
+#ifndef VSF_USART_PARITY_MASK
+    VSF_USART_PARITY_MASK           = VSF_USART_NO_PARITY |
+                                      VSF_USART_EVEN_PARITY |
+                                      VSF_USART_ODD_PARITY |
+                                      VSF_USART_FORCE_0_PARITY |
+                                      VSF_USART_FORCE_1_PARITY,
+#endif
 
 #ifndef VSF_USART_STOPBIT_MASK
-    VSF_USART_STOPBIT_MASK       = VSF_USART_1_STOPBIT |
-                                   VSF_USART_1_5_STOPBIT |
-                                   VSF_USART_0_5_STOPBIT |
-                                   VSF_USART_2_STOPBIT,
+    VSF_USART_STOPBIT_MASK          = VSF_USART_1_STOPBIT |
+                                      VSF_USART_1_5_STOPBIT |
+                                      VSF_USART_0_5_STOPBIT |
+                                      VSF_USART_2_STOPBIT,
 #endif
 
 #ifndef VSF_USART_BIT_LENGTH_MASK
-    VSF_USART_BIT_LENGTH_MASK    = VSF_USART_5_BIT_LENGTH |
-                                   VSF_USART_6_BIT_LENGTH |
-                                   VSF_USART_7_BIT_LENGTH |
-                                   VSF_USART_8_BIT_LENGTH |
-                                   VSF_USART_9_BIT_LENGTH |
-                                   VSF_USART_10_BIT_LENGTH,
+    VSF_USART_BIT_LENGTH_MASK       = VSF_USART_5_BIT_LENGTH |
+                                      VSF_USART_6_BIT_LENGTH |
+                                      VSF_USART_7_BIT_LENGTH |
+                                      VSF_USART_8_BIT_LENGTH |
+                                      VSF_USART_9_BIT_LENGTH |
+                                      VSF_USART_10_BIT_LENGTH,
 #endif
 
 #ifndef VSF_USART_TX_FIFO_THRESH_MASK
-    VSF_USART_TX_FIFO_THRESH_MASK = VSF_USART_TX_FIFO_THRESH_ONE |
-                                    VSF_USART_TX_FIFO_THRESH_HALF_FULL |
-                                    VSF_USART_TX_FIFO_THRESH_FULL,
+    VSF_USART_TX_FIFO_THRESH_MASK   = VSF_USART_TX_FIFO_THRESH_ONE |
+                                      VSF_USART_TX_FIFO_THRESH_HALF_FULL |
+                                      VSF_USART_TX_FIFO_THRESH_FULL,
 #endif
 
 #ifndef VSF_USART_RX_FIFO_THRESH_MASK
-    VSF_USART_RX_FIFO_THRESH_MASK = VSF_USART_RX_FIFO_THRESH_ONE |
-                                    VSF_USART_RX_FIFO_THRESH_HALF_FULL |
-                                    VSF_USART_RX_FIFO_THRESH_FULL,
+    VSF_USART_RX_FIFO_THRESH_MASK   = VSF_USART_RX_FIFO_THRESH_ONE |
+                                      VSF_USART_RX_FIFO_THRESH_HALF_FULL |
+                                      VSF_USART_RX_FIFO_THRESH_FULL,
 #endif
 
-    VSF_USART_HWCONTROL_MASK     = VSF_USART_NO_HWCONTROL |
-                                   VSF_USART_RTS_HWCONTROL |
-                                   VSF_USART_CTS_HWCONTROL |
-                                   VSF_USART_RTS_CTS_HWCONTROL,
+#ifndef VSF_USART_HWCONTROL_MASK
+    VSF_USART_HWCONTROL_MASK        = VSF_USART_NO_HWCONTROL |
+                                      VSF_USART_RTS_HWCONTROL |
+                                      VSF_USART_CTS_HWCONTROL |
+                                      VSF_USART_RTS_CTS_HWCONTROL,
+#endif
 
-    VSF_USART_TX_MASK                   = VSF_USART_TX_ENABLE |
-                                          VSF_USART_TX_DISABLE,
+    VSF_USART_TX_MASK               = VSF_USART_TX_ENABLE |
+                                      VSF_USART_TX_DISABLE,
 
-    VSF_USART_RX_MASK                   = VSF_USART_RX_ENABLE |
-                                          VSF_USART_RX_DISABLE,
+    VSF_USART_RX_MASK               = VSF_USART_RX_ENABLE |
+                                      VSF_USART_RX_DISABLE,
 
-    VSF_USART_HALF_DUPLEX_MASK          = VSF_USART_HALF_DUPLEX_DISABLE |
-                                           VSF_USART_HALF_DUPLEX_ENABLE,
+    VSF_USART_HALF_DUPLEX_MASK      = VSF_USART_HALF_DUPLEX_DISABLE |
+                                      VSF_USART_HALF_DUPLEX_ENABLE,
 
-    VSF_USART_MODE_ALL_BITS_MASK = VSF_USART_PARITY_MASK |
-                                   VSF_USART_STOPBIT_MASK |
-                                   VSF_USART_BIT_LENGTH_MASK |
-                                   VSF_USART_HWCONTROL_MASK |
-                                   VSF_USART_TX_FIFO_THRESH_MASK |
-                                   VSF_USART_RX_FIFO_THRESH_MASK |
-                                   VSF_USART_TX_MASK |
-                                   VSF_USART_RX_MASK |
-                                   VSF_USART_HALF_DUPLEX_MASK,
+    VSF_USART_MODE_ALL_BITS_MASK    = VSF_USART_PARITY_MASK |
+                                      VSF_USART_STOPBIT_MASK |
+                                      VSF_USART_BIT_LENGTH_MASK |
+                                      VSF_USART_HWCONTROL_MASK |
+                                      VSF_USART_TX_FIFO_THRESH_MASK |
+                                      VSF_USART_RX_FIFO_THRESH_MASK |
+                                      VSF_USART_TX_MASK |
+                                      VSF_USART_RX_MASK |
+                                      VSF_USART_HALF_DUPLEX_MASK,
 };
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
@@ -264,7 +349,7 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_RX               = (0x1ul << 26),
     VSF_USART_IRQ_MASK_RX_TIMEOUT       = (0x1ul << 27),
 
-    // error
+    // Error interrupt
     VSF_USART_IRQ_MASK_FRAME_ERR        = (0x1ul << 28),
     VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 29),
     VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 30),
