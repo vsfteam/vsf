@@ -307,13 +307,13 @@ vsf_flash_capability_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr
 ) {
     return (vsf_flash_capability_t) {
-        .irq_mask              = VSF_FLASH_IRQ_ALL_BITS_MASK,
-        .base_address          = flash_ptr->addr,
-        .max_size              = 1024 * 1024,
-        .erase_sector_size     = 128 * 1024,
-        .write_sector_size     = 256,
-        .can_write_any_address = 0,
-        .can_read_any_address  = 1,
+        .irq_mask                  = VSF_FLASH_IRQ_ALL_BITS_MASK,
+        .base_address              = flash_ptr->addr,
+        .max_size                  = 1024 * 1024,
+        .erase_sector_size         = 128 * 1024,
+        .write_sector_size         = 256,
+        .none_sector_aligned_write = 0,
+        .none_sector_aligned_read  = 1,
     };
 }
 
