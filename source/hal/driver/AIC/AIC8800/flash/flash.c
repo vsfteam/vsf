@@ -203,8 +203,8 @@ vsf_flash_capability_t vsf_hw_flash_capability(vsf_hw_flash_t *hw_flash_ptr)
         .max_size              = hw_flash_ptr->flash_size,
         .erase_sector_size     = VSF_HW_FLASH_CFG_ERASE_SECTORE_SIZE,
         .write_sector_size     = VSF_HW_FLASH_CFG_WRITE_SECTORE_SIZE,
-        .can_write_any_address = 0,
-        .can_read_any_address  = 1,
+        .none_sector_aligned_write = 0,
+        .none_sector_aligned_read  = 1,
     };
 
     return flash_capability;

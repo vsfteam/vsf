@@ -247,7 +247,7 @@ static bool __flash_demo_check(hal_test_t *hal_test)
                           test->size, cap.erase_sector_size);
     }
 
-    if (!cap.can_write_any_address) {
+    if (!cap.none_sector_aligned_write) {
         if (test->offset % cap.write_sector_size) {
             vsf_trace_error("programming address(%u) must be aligned  to the sector size(%u)" VSF_TRACE_CFG_LINEEND,
                             test->size, cap.write_sector_size);

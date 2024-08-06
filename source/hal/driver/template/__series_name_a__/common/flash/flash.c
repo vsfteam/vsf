@@ -173,8 +173,8 @@ vsf_flash_capability_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
         .max_size              = 0,
         .erase_sector_size     = 4096,
         .write_sector_size     = 256,
-        .can_write_any_address = 0,
-        .can_read_any_address  = 0,
+        .none_sector_aligned_write = 0,
+        .none_sector_aligned_read  = 0,
     };
 }
 
