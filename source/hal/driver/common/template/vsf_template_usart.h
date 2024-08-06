@@ -144,7 +144,7 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
         __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, cmd,                   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, vsf_usart_cmd_t cmd, void* param)
 #else
 #   define __VSF_USART_REQUEST_EXTRA_APIS(__prefix_name)                        \
-        __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, tx_send_break,         VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, uint32_t duration)
+        __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, tx_send_break,         VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, uint_fast32_t duration)
 #endif
 
 #define VSF_USART_APIS(__prefix_name)                                           \
