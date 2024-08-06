@@ -173,7 +173,7 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_7_BIT_LENGTH              = (0x2ul << 5),     //!< data bits : 7, 1 byte
     VSF_USART_8_BIT_LENGTH              = (0x3ul << 5),     //!< data bits : 8, 1 byte
     VSF_USART_9_BIT_LENGTH              = (0x4ul << 5),     //!< data bits : 9, 2 bytes
-    VSF_USART_10_BIT_LENGTH             = (0x4ul << 5),     //!< data bits : 10, 2 bytes
+    VSF_USART_10_BIT_LENGTH             = (0x5ul << 5),     //!< data bits : 10, 2 bytes
 
     VSF_USART_NO_HWCONTROL              = (0x0ul << 8),
     VSF_USART_RTS_HWCONTROL             = (0x1ul << 8),
