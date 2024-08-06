@@ -28,8 +28,12 @@
 #   define  VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY            DISABLED
 #endif
 
+#ifndef VSF_USART_CFG_REIMPLEMENT_API_CMD
+#   define  VSF_USART_CFG_REIMPLEMENT_API_CMD                   DISABLED
+#endif
+
 #ifndef VSF_USART_CFG_REIMPLEMENT_API_TX_SEND_BREAK
-#   define  VSF_USART_CFG_REIMPLEMENT_API_TX_SEND_BREAK            DISABLED
+#   define  VSF_USART_CFG_REIMPLEMENT_API_TX_SEND_BREAK         DISABLED
 #endif
 
 #if VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -137,8 +141,8 @@ vsf_err_t vsf_real_usart_tx_send_break(vsf_real_usart_t *usart_ptr, uint_fast32_
 }
 #endif
 
-#if VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED
-vsf_err_t vsf_real_usart_cmd(vsf_real_usart_t *usart_ptr, int cmd, void * param)
+#if (VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED) && (VSF_USART_CFG_REIMPLEMENT_API_CMD == DISABLED)
+vsf_err_t vsf_real_usart_cmd(vsf_real_usart_t *usart_ptr, vsf_usart_cmd_t cmd, void * param)
 {
     vsf_err_t err = VSF_ERR_NOT_SUPPORT;
 
@@ -164,6 +168,8 @@ vsf_err_t vsf_real_usart_cmd(vsf_real_usart_t *usart_ptr, int cmd, void * param)
 #undef VSF_USART_CFG_CAPABILITY_MIN_DATA_BITS
 #undef VSF_USART_CFG_CAPABILITY_SUPPORT_RX_TIMEOUT
 #undef VSF_USART_CFG_REIMPLEMENT_API_REQUEST
+#undef VSF_USART_CFG_REIMPLEMENT_API_CMD
+#undef VSF_USART_CFG_REIMPLEMENT_API_TX_SEND_BREAK
 #undef vsf_real_usart_t
 #undef vsf_real_usart_init
 #undef vsf_real_usart_fini
@@ -232,7 +238,7 @@ vsf_err_t vsf_real_usart_cmd(vsf_real_usart_t *usart_ptr, int cmd, void * param)
 #   if VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED
 #       define vsf_remap_usart_cmd                  VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_cmd)
 #       define VSF_USART_CFG_IMP_REMAP_EXTRA_FUNCTIONS                                                              \
-        vsf_err_t vsf_imp_usart_cmd(vsf_imp_usart_t *usart_ptr, int cmd, void *param)                               \
+        vsf_err_t vsf_imp_usart_cmd(vsf_imp_usart_t *usart_ptr, vsf_usart_cmd_t cmd, void *param)                   \
         {                                                                                                           \
             VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
             return vsf_remap_usart_cmd(usart_ptr, cmd, param);                                                      \

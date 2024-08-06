@@ -41,7 +41,15 @@ extern "C" {
 #   define VSF_HW_USART_COUNT                       VSF_HAL_MASK_TO_COUNT(VSF_HW_USART_MASK)
 #endif
 
-// application code can redefine it
+/*!
+In the application code, we can redefine this macro to call the actual API directly without
+a runtime cost. For example:
+#define VSF_USART_CFG_MULTI_CLASS vsf_hw
+vsf_usart_init(&vsf_hw_usart0, &cfg);
+ It will be expanded at compile time to vsf_hw_usart_init(&vsf_hw_usart0, &cfg).
+
+Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
+*/
 #ifndef VSF_USART_CFG_PREFIX
 #   if VSF_USART_CFG_MULTI_CLASS == ENABLED
 #       define VSF_USART_CFG_PREFIX                 vsf
@@ -52,18 +60,26 @@ extern "C" {
 #   endif
 #endif
 
+//! If VSF_USART_CFG_FUNCTION_RENAME is enabled, the actual API is called
+//! based on the value of VSF_USART_CFG_PREFIX
 #ifndef VSF_USART_CFG_FUNCTION_RENAME
 #   define VSF_USART_CFG_FUNCTION_RENAME            ENABLED
 #endif
 
+//! In the specific hardware driver, we can enable
+//! VSF_USART_CFG_REIMPLEMENT_TYPE_MODE to redefine VSF_USART_mode_t as needed.
 #ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_MODE
 #   define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE      DISABLED
 #endif
 
+//! In the specific hardware driver, we can enable
+//! VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK to redefine vsf_usart_irq_mask_t as needed.
 #ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK
 #   define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK  DISABLED
 #endif
 
+//! In the specific hardware driver, we can enable
+//! VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS to redefine vsf_usart_status_t as needed.
 #ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS
 #   define VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS    DISABLED
 #endif
@@ -120,7 +136,7 @@ extern "C" {
 
 #if VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED
 #   define __VSF_USART_REQUEST_EXTRA_APIS(__prefix_name)                        \
-        __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, cmd,                   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, int cmd, void* param)
+        __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, cmd,                   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, vsf_usart_cmd_t cmd, void* param)
 #else
 #   define __VSF_USART_REQUEST_EXTRA_APIS(__prefix_name)                        \
         __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, tx_send_break,         VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, uint32_t duration)
@@ -142,35 +158,38 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_FORCE_0_PARITY            = (0x3ul << 0),
     VSF_USART_FORCE_1_PARITY            = (0x4ul << 0),
 
-    VSF_USART_1_STOPBIT                 = (0x0ul << 3),   // stopbit: 1   bit
-    VSF_USART_1_5_STOPBIT               = (0x1ul << 3),   // stopbit: 1.5 bit
-    VSF_USART_0_5_STOPBIT               = (0x2ul << 3),   // stopbit: 0.5 bit
-    VSF_USART_2_STOPBIT                 = (0x3ul << 3),   // stopbit: 2   bit
+    VSF_USART_1_STOPBIT                 = (0x0ul << 3),     //!< stopbit: 1   bit
+    VSF_USART_1_5_STOPBIT               = (0x1ul << 3),     //!< stopbit: 1.5 bit
+    VSF_USART_0_5_STOPBIT               = (0x2ul << 3),     //!< stopbit: 0.5 bit
+    VSF_USART_2_STOPBIT                 = (0x3ul << 3),     //!< stopbit: 2   bit
 
-    VSF_USART_5_BIT_LENGTH              = (0x0ul << 5),
-    VSF_USART_6_BIT_LENGTH              = (0x1ul << 5),
-    VSF_USART_7_BIT_LENGTH              = (0x2ul << 5),
-    VSF_USART_8_BIT_LENGTH              = (0x3ul << 5),
-    VSF_USART_9_BIT_LENGTH              = (0x4ul << 5),
-    VSF_USART_10_BIT_LENGTH             = (0x4ul << 5),
+    VSF_USART_5_BIT_LENGTH              = (0x0ul << 5),     //!< data bits : 5, 1 byte
+    VSF_USART_6_BIT_LENGTH              = (0x1ul << 5),     //!< data bits : 6, 1 byte
+    VSF_USART_7_BIT_LENGTH              = (0x2ul << 5),     //!< data bits : 7, 1 byte
+    VSF_USART_8_BIT_LENGTH              = (0x3ul << 5),     //!< data bits : 8, 1 byte
+    VSF_USART_9_BIT_LENGTH              = (0x4ul << 5),     //!< data bits : 9, 2 bytes
+    VSF_USART_10_BIT_LENGTH             = (0x4ul << 5),     //!< data bits : 10, 2 bytes
 
     VSF_USART_NO_HWCONTROL              = (0x0ul << 8),
     VSF_USART_RTS_HWCONTROL             = (0x1ul << 8),
     VSF_USART_CTS_HWCONTROL             = (0x2ul << 8),
     VSF_USART_RTS_CTS_HWCONTROL         = (0x3ul << 8),
 
-    VSF_USART_FULL_DUPLEX               = (0x0ul << 10),
-    VSF_USART_HALF_DUPLEX               = (0x1ul << 10),
-    VSF_USART_TX_ONLY                   = (0x2ul << 10),
-    VSF_USART_RX_ONLY                   = (0x3ul << 10),
+    VSF_USART_FULL_DUPLEX               = (0x0ul << 10),    //!< tx and rx work at the same time
+    VSF_USART_HALF_DUPLEX               = (0x1ul << 10),    //!< only one of tx and rx work at the same time
+    VSF_USART_TX_ONLY                   = (0x2ul << 10),    //!< tx only
+    VSF_USART_RX_ONLY                   = (0x3ul << 10),    //!< rx only
 
-    VSF_USART_TX_FIFO_THRESH_ONE        = (0x0ul << 12),
-    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x1ul << 12),
-    VSF_USART_TX_FIFO_THRESH_FULL       = (0x2ul << 12),
+    //! As generic options, only three modes are defined here.
+    //! More options for thresholds can be defined in the specific driver.
 
-    VSF_USART_RX_FIFO_THRESH_ONE        = (0x0ul << 14),
-    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (0x1ul << 14),
-    VSF_USART_RX_FIFO_THRESH_FULL       = (0x2ul << 14),
+    VSF_USART_TX_FIFO_THRESH_ONE        = (0x0ul << 12),    //!< one data for txfifo
+    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x1ul << 12),    //!< Half of the threshold for txfifo
+    VSF_USART_TX_FIFO_THRESH_FULL       = (0x2ul << 12),    //!< Full of the threshold for txfifo
+
+    VSF_USART_RX_FIFO_THRESH_ONE        = (0x0ul << 14),    //!< one data for txfifo
+    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (0x1ul << 14),    //!< Half of the threshold for txfifo
+    VSF_USART_RX_FIFO_THRESH_FULL       = (0x2ul << 14),    //!< Full of the threshold for txfifo
 } vsf_usart_mode_t;
 #endif
 
@@ -618,8 +637,37 @@ extern int_fast32_t vsf_usart_get_rx_count(vsf_usart_t *usart_ptr);
 extern int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart_ptr);
 
 #if VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED
-extern vsf_err_t vsf_usart_cmd(vsf_usart_t *usart_ptr, int cmd, void * param);
+/**
+ \~english
+ @brief Calls the specified usart command
+ @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
+ @param[in] cmd: usart command @ref vsf_usart_cmd_t.
+ @param[in] param: the parameter of the command, its use is determined by the command
+ @return vsf_err_t: returns the result of the usart command when it is invoked,
+        success returns VSF_ERR_NONE
+
+ \~chinese
+ @brief 获取 usart 实例的状态
+ @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
+ @param[in] duration: usart 传输一位的时间的倍数，如果 duration 等于0，表示使用硬件默认的时间
+ @return vsf_err_t: 返回当调用 uart 命令的结果，成功返回 VSF_ERR_NONE
+ */
+extern vsf_err_t vsf_usart_cmd(vsf_usart_t *usart_ptr, vsf_usart_cmd_t cmd, void * param);
 #else
+/**
+ \~english
+ @brief usart instance tx send break
+ @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
+ @param[in] duration: a multiple of the time it takes usart to transfer 1bit.
+            If duration is 0, the hardware default break time is used.
+ @return vsf_err_t: returns the result of the usart sending tx break, success returns VSF_ERR_NONE
+
+ \~chinese
+ @brief 获取 usart 实例的状态
+ @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
+ @param[in] duration: usart 传输一位的时间的倍数，如果 duration 等于0，表示使用硬件默认的时间
+ @return vsf_err_t: 返回当前 usart 发送 tx break 的结果，成功返回 VSF_ERR_NONE
+ */
 extern vsf_err_t vsf_usart_tx_send_break(vsf_usart_t *usart_ptr, uint_fast32_t duration);
 #endif
 
