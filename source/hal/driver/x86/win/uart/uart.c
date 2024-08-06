@@ -495,8 +495,8 @@ vsf_usart_capability_t vsf_win_usart_capability(vsf_win_usart_t *win_usart)
         .min_baudrate = 50,
         .min_data_bits = 8,
         .max_data_bits = 9,
-        .max_tx_fifo_counter = dimof(win_usart->tx.buffer),
-        .max_rx_fifo_counter = dimof(win_usart->rx.buffer),
+        .txfifo_depth = dimof(win_usart->tx.buffer),
+        .rxfifo_depth = dimof(win_usart->rx.buffer),
         .support_rx_timeout = 0,
     };
 

@@ -115,8 +115,8 @@ vsf_usart_capability_t vsf_hw_usart_capability(vsf_hw_usart_t *hw_usart_ptr)
         .min_baudrate = (SystemCoreClock >> 6) / (16 * 65535),
         .min_data_bits = 5,
         .max_data_bits = 8,
-        .max_tx_fifo_counter = 16,
-        .max_rx_fifo_counter = 16,
+        .txfifo_depth = 16,
+        .rxfifo_depth = 16,
         .support_rx_timeout = 0,
     };
 

@@ -82,8 +82,8 @@ vsf_usart_capability_t vsf_pl011_usart_capability(vsf_pl011_usart_t *pl011_usart
         .min_baudrate           = clk_hz / 65535,
         .min_data_bits          = 5,
         .max_data_bits          = 8,
-        .max_tx_fifo_counter    = 32,
-        .max_rx_fifo_counter    = 32,
+        .txfifo_depth    = 32,
+        .rxfifo_depth    = 32,
         .support_rx_timeout     = true,
     };
 }
