@@ -68,6 +68,10 @@ extern "C" {
 #   define VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS    DISABLED
 #endif
 
+#ifndef VSF_USART_CFG_USE_CMD_FUNCTION
+#   define VSF_USART_CFG_USE_CMD_FUNCTION           DISABLED
+#endif
+
 #ifndef VSF_USART_CFG_INHERT_HAL_CAPABILITY
 #   define VSF_USART_CFG_INHERT_HAL_CAPABILITY      ENABLED
 #endif
@@ -114,10 +118,19 @@ extern "C" {
 #   define __VSF_USART_REQUEST_APIS(__prefix_name)
 #endif
 
+#if VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED
+#   define __VSF_USART_REQUEST_EXTRA_APIS(__prefix_name)                        \
+        __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, cmd,                   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, int cmd, void* param)
+#else
+#   define __VSF_USART_REQUEST_EXTRA_APIS(__prefix_name)                        \
+        __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, tx_send_break,         VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, uint32_t duration)
+#endif
+
 #define VSF_USART_APIS(__prefix_name)                                           \
     __VSF_USART_BASE_APIS(__prefix_name)                                        \
     __VSF_USART_FIFO_APIS(__prefix_name)                                        \
-    __VSF_USART_REQUEST_APIS(__prefix_name)
+    __VSF_USART_REQUEST_APIS(__prefix_name)                                     \
+    __VSF_USART_REQUEST_EXTRA_APIS(__prefix_name)
 
 /*============================ TYPES =========================================*/
 
@@ -272,6 +285,10 @@ typedef struct vsf_usart_cfg_t {
     uint32_t rx_timeout;
     vsf_usart_isr_t isr;
 } vsf_usart_cfg_t;
+
+typedef enum vsf_usart_cmd_t {
+    VSF_USART_CMD_TX_SEND_BREAK = 0,
+} vsf_usart_cmd_t;
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
 typedef struct vsf_usart_status_t {
@@ -600,6 +617,12 @@ extern int_fast32_t vsf_usart_get_rx_count(vsf_usart_t *usart_ptr);
  */
 extern int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart_ptr);
 
+#if VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED
+extern vsf_err_t vsf_usart_cmd(vsf_usart_t *usart_ptr, int cmd, void * param);
+#else
+extern vsf_err_t vsf_usart_tx_send_break(vsf_usart_t *usart_ptr, uint_fast32_t duration);
+#endif
+
 /*============================ INLINE FUNCTIONS ==============================*/
 
 static inline uint8_t vsf_usart_mode_to_data_bits(vsf_usart_mode_t mode)
@@ -619,6 +642,13 @@ static inline uint8_t vsf_usart_mode_to_data_bits(vsf_usart_mode_t mode)
         return 0;
     }
 }
+
+#if VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED
+static inline vsf_err_t vsf_usart_tx_send_break(vsf_usart_t *usart_ptr, uint_fast32_t duration)
+{
+    return vsf_usart_cmd(usart_ptr, VSF_USART_CMD_TX_SEND_BREAK, (void *)duration);
+}
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -642,6 +672,8 @@ static inline uint8_t vsf_usart_mode_to_data_bits(vsf_usart_mode_t mode)
 #   define vsf_usart_cancel_tx(__USART)                  VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cancel_tx)             ((__vsf_usart_t *)__USART)
 #   define vsf_usart_get_rx_count(__USART)               VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_rx_count)          ((__vsf_usart_t *)__USART)
 #   define vsf_usart_get_tx_count(__USART)               VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_tx_count)          ((__vsf_usart_t *)__USART)
+#   define vsf_usart_tx_send_break(__USART, ...)         VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_tx_send_break)         ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
+#   define vsf_usart_cmd(__USART, ...)                   VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cmd)                   ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
 #endif
 
 /*============================ INCLUDES ======================================*/
