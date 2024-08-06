@@ -307,6 +307,7 @@ static void __vsf_hw_usart_irq_handler(__vsf_hw_usart_t *hw_usart_ptr)
 
 #define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_REQUEST       ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_CMD           ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_TX_SEND_BREAK ENABLED
 #define VSF_USART_CFG_IMP_PREFIX                    vsf_hw
 #define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_HW
