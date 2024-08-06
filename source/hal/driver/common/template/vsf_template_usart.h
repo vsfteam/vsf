@@ -180,10 +180,14 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_CTS_HWCONTROL             = (0x2ul << 8),
     VSF_USART_RTS_CTS_HWCONTROL         = (0x3ul << 8),
 
-    VSF_USART_FULL_DUPLEX               = (0x0ul << 10),    //!< tx and rx work at the same time
-    VSF_USART_HALF_DUPLEX               = (0x1ul << 10),    //!< only one of tx and rx work at the same time
-    VSF_USART_TX_ONLY                   = (0x2ul << 10),    //!< tx only
-    VSF_USART_RX_ONLY                   = (0x3ul << 10),    //!< rx only
+    VSF_USART_TX_ENABLE                 = (0x0ul << 9),
+    VSF_USART_TX_DISABLE                = (0x1ul << 9),
+
+    VSF_USART_RX_ENABLE                 = (0x0ul << 10),
+    VSF_USART_RX_DISABLE                = (0x1ul << 10),
+
+    VSF_USART_HALF_DUPLEX_DISABLE       = (0x0ul << 10),
+    VSF_USART_HALF_DUPLEX_ENABLE        = (0x1ul << 10),
 
     //! As generic options, only three modes are defined here.
     //! More options for thresholds can be defined in the specific driver.
@@ -238,10 +242,14 @@ enum {
                                    VSF_USART_CTS_HWCONTROL |
                                    VSF_USART_RTS_CTS_HWCONTROL,
 
-    VSF_USART_TX_RX_MASK         = VSF_USART_FULL_DUPLEX |
-                                   VSF_USART_HALF_DUPLEX |
-                                   VSF_USART_TX_ONLY |
-                                   VSF_USART_RX_ONLY,
+    VSF_USART_TX_MASK                   = VSF_USART_TX_ENABLE |
+                                          VSF_USART_TX_DISABLE,
+
+    VSF_USART_RX_MASK                   = VSF_USART_RX_ENABLE |
+                                          VSF_USART_RX_DISABLE,
+
+    VSF_USART_HALF_DUPLEX_MASK          = VSF_USART_HALF_DUPLEX_DISABLE |
+                                           VSF_USART_HALF_DUPLEX_ENABLE,
 
     VSF_USART_MODE_ALL_BITS_MASK = VSF_USART_PARITY_MASK |
                                    VSF_USART_STOPBIT_MASK |
@@ -249,7 +257,9 @@ enum {
                                    VSF_USART_HWCONTROL_MASK |
                                    VSF_USART_TX_FIFO_THRESH_MASK |
                                    VSF_USART_RX_FIFO_THRESH_MASK |
-                                   VSF_USART_TX_RX_MASK,
+                                   VSF_USART_TX_MASK |
+                                   VSF_USART_RX_MASK |
+                                   VSF_USART_HALF_DUPLEX_MASK,
 };
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
