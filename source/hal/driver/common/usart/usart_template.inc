@@ -28,6 +28,10 @@
 #   define  VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY            DISABLED
 #endif
 
+#ifndef VSF_USART_CFG_REIMPLEMENT_API_TX_SEND_BREAK
+#   define  VSF_USART_CFG_REIMPLEMENT_API_TX_SEND_BREAK            DISABLED
+#endif
+
 #if VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 #   ifndef VSF_USART_CFG_CAPABILITY_IRQ_MASK
 #       define VSF_USART_CFG_CAPABILITY_IRQ_MASK                VSF_USART_IRQ_ALL_BITS_MASK
@@ -38,11 +42,11 @@
 #   ifndef VSF_USART_CFG_CAPABILITY_MIN_BAUDRATE
 #       define VSF_USART_CFG_CAPABILITY_MIN_BAUDRATE            4800
 #   endif
-#   ifndef VSF_USART_CFG_CAPABILITY_MAX_TX_FIFO_COUNTER
-#       define VSF_USART_CFG_CAPABILITY_MAX_TX_FIFO_COUNTER     64
+#   ifndef VSF_USART_CFG_CAPABILITY_TXFIFO_DEPTH
+#       define VSF_USART_CFG_CAPABILITY_TXFIFO_DEPTH            64
 #   endif
-#   ifndef VSF_USART_CFG_CAPABILITY_MAX_RX_FIFO_COUNTER
-#       define VSF_USART_CFG_CAPABILITY_MAX_RX_FIFO_COUNTER     64
+#   ifndef VSF_USART_CFG_CAPABILITY_RXFIFO_DEPTH
+#       define VSF_USART_CFG_CAPABILITY_RXFIFO_DEPTH            64
 #   endif
 #   ifndef VSF_USART_CFG_CAPABILITY_MAX_DATA_BITS
 #       define VSF_USART_CFG_CAPABILITY_MAX_DATA_BITS           9
@@ -63,6 +67,8 @@
 #define vsf_real_usart_cancel_tx            VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cancel_tx)
 #define vsf_real_usart_get_tx_count         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)
 #define vsf_real_usart_capability           VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
+#define vsf_real_usart_cmd                  VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cmd)
+#define vsf_real_usart_tx_send_break        VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_tx_send_break)
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -113,8 +119,8 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
         .irq_mask               = VSF_USART_CFG_CAPABILITY_IRQ_MASK,
         .max_baudrate           = VSF_USART_CFG_CAPABILITY_MAX_BAUDRATE,
         .min_baudrate           = VSF_USART_CFG_CAPABILITY_MIN_BAUDRATE,
-        .max_tx_fifo_counter    = VSF_USART_CFG_CAPABILITY_MAX_TX_FIFO_COUNTER,
-        .max_rx_fifo_counter    = VSF_USART_CFG_CAPABILITY_MAX_RX_FIFO_COUNTER,
+        .txfifo_depth           = VSF_USART_CFG_CAPABILITY_TXFIFO_DEPTH,
+        .rxfifo_depth           = VSF_USART_CFG_CAPABILITY_RXFIFO_DEPTH,
         .max_data_bits          = VSF_USART_CFG_CAPABILITY_MAX_DATA_BITS,
         .min_data_bits          = VSF_USART_CFG_CAPABILITY_MIN_DATA_BITS,
         .support_rx_timeout     = VSF_USART_CFG_CAPABILITY_SUPPORT_RX_TIMEOUT,
@@ -124,14 +130,36 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 }
 #endif
 
+#if VSF_USART_CFG_REIMPLEMENT_API_TX_SEND_BREAK == DISABLED
+vsf_err_t vsf_real_usart_tx_send_break(vsf_real_usart_t *usart_ptr, uint_fast32_t duration)
+{
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
+#if VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED
+vsf_err_t vsf_real_usart_cmd(vsf_real_usart_t *usart_ptr, int cmd, void * param)
+{
+    vsf_err_t err = VSF_ERR_NOT_SUPPORT;
+
+    switch (cmd) {
+    case VSF_USART_CMD_TX_SEND_BREAK:
+        err = vsf_real_usart_tx_send_break(usart_ptr, (uint_fast32_t)param);
+        break;
+    }
+
+    return err;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_USART_CFG_CAPABILITY_IRQ_MASK
 #undef VSF_USART_CFG_CAPABILITY_MAX_BAUDRATE
 #undef VSF_USART_CFG_CAPABILITY_MIN_BAUDRATE
-#undef VSF_USART_CFG_CAPABILITY_MAX_TX_FIFO_COUNTER
-#undef VSF_USART_CFG_CAPABILITY_MAX_RX_FIFO_COUNTER
+#undef VSF_USART_CFG_CAPABILITY_TXFIFO_DEPTH
+#undef VSF_USART_CFG_CAPABILITY_RXFIFO_DEPTH
 #undef VSF_USART_CFG_CAPABILITY_MAX_DATA_BITS
 #undef VSF_USART_CFG_CAPABILITY_MIN_DATA_BITS
 #undef VSF_USART_CFG_CAPABILITY_SUPPORT_RX_TIMEOUT
@@ -150,6 +178,8 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 #undef vsf_real_usart_cancel_tx
 #undef vsf_real_usart_get_tx_count
 #undef vsf_real_usart_capability
+#undef vsf_real_usart_cmd
+#undef vsf_real_usart_tx_send_break
 
 /*============================ IMPLEMENTATION ================================*/
 /*============================ MACROS ========================================*/
@@ -174,6 +204,11 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 #   define vsf_imp_usart_cancel_tx                  VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cancel_tx)
 #   define vsf_imp_usart_get_rx_count               VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_rx_count)
 #   define vsf_imp_usart_get_tx_count               VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)
+#   if VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED
+#       define vsf_imp_usart_cmd                    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cmd)
+#   else
+#       define vsf_imp_usart_tx_send_break          VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_tx_send_break)
+#   endif
 
 #   define vsf_remap_usart_t                        VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_t)
 #   define vsf_remap_usart_init                     VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_init)
@@ -194,6 +229,23 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 #   define vsf_remap_usart_cancel_tx                VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_cancel_tx)
 #   define vsf_remap_usart_get_rx_count             VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_get_rx_count)
 #   define vsf_remap_usart_get_tx_count             VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_get_tx_count)
+#   if VSF_USART_CFG_USE_CMD_FUNCTION == ENABLED
+#       define vsf_remap_usart_cmd                  VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_cmd)
+#       define VSF_USART_CFG_IMP_REMAP_EXTRA_FUNCTIONS                                                              \
+        vsf_err_t vsf_imp_usart_cmd(vsf_imp_usart_t *usart_ptr, int cmd, void *param)                               \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_cmd(usart_ptr, cmd, param);                                                      \
+        }
+#   else
+#       define vsf_remap_usart_tx_send_break        VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_tx_send_break)
+#       define VSF_USART_CFG_IMP_REMAP_EXTRA_FUNCTIONS                                                              \
+        vsf_err_t vsf_imp_usart_tx_send_break(vsf_imp_usart_t *usart_ptr, uint_fast32_t duration)                   \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_tx_send_break(usart_ptr, duration);                                              \
+        }
+#   endif
 
 #   define VSF_USART_CFG_IMP_REMAP_FUNCTIONS                                                                        \
         vsf_err_t vsf_imp_usart_init(vsf_imp_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr)                          \
@@ -285,7 +337,8 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
         {                                                                                                           \
             VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
             return vsf_remap_usart_get_tx_count(usart_ptr);                                                         \
-        }
+        }                                                                                                           \
+        VSF_USART_CFG_IMP_REMAP_EXTRA_FUNCTIONS
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -339,6 +392,8 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 #undef vsf_imp_usart_cancel_tx
 #undef vsf_imp_usart_get_rx_count
 #undef vsf_imp_usart_get_tx_count
+#undef vsf_imp_usart_cmd
+#undef vsf_imp_usart_tx_send_break
 
 #undef vsf_remap_usart_t
 #undef vsf_remap_usart_init
@@ -359,5 +414,7 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 #undef vsf_remap_usart_cancel_tx
 #undef vsf_remap_usart_get_rx_count
 #undef vsf_remap_usart_get_tx_count
+#undef vsf_remap_usart_cmd
+#undef vsf_remap_usart_tx_send_break
 
 #endif  /* VSF_HAL_USE_USART */
