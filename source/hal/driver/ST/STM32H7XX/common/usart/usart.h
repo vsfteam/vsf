@@ -154,10 +154,19 @@ typedef enum vsf_usart_mode_t {
 
     // not supported, allocate unused bits
     // 6..8
-    VSF_USART_6_BIT_LENGTH              = (1 << 6),
-    VSF_USART_5_BIT_LENGTH              = (2 << 6),
+    VSF_USART_6_BIT_LENGTH              = (1 << 20),
+    VSF_USART_5_BIT_LENGTH              = (2 << 20),
+    VSF_USART_10_BIT_LENGTH             = (3 << 20),
     VSF_USART_FORCE_0_PARITY            = (0 << 8),
     VSF_USART_FORCE_1_PARITY            = (1 << 8),
+
+    VSF_USART_TX_FIFO_THRESH_ONE        = (0x0ul << 20),
+    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x1ul << 20),
+    VSF_USART_TX_FIFO_THRESH_FULL       = (0x2ul << 20),
+
+    VSF_USART_RX_FIFO_THRESH_ONE        = (0x0ul << 22),
+    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (0x1ul << 22),
+    VSF_USART_RX_FIFO_THRESH_FULL       = (0x2ul << 22),
 
     __VSF_HW_USART_NOT_SUPPORT_MASK     = VSF_USART_5_BIT_LENGTH
                                         | VSF_USART_5_BIT_LENGTH
