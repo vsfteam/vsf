@@ -27,6 +27,11 @@
 #   define  VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
 #endif
 
+#ifdef VSF_RNG_CFG_IMP_REMAP_PREFIX
+#   undef VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY
+#   define VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY                ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

@@ -26,6 +26,15 @@
 #   define VSF_PM_CFG_CS_COUNT     1
 #endif
 
+#ifndef VSF_PM_CFG_REIMPLEMENT_API_CAPABILITY
+#   define  VSF_PM_CFG_REIMPLEMENT_API_CAPABILITY               DISABLED
+#endif
+
+#ifdef VSF_PM_CFG_IMP_REMAP_PREFIX
+#   undef VSF_PM_CFG_REIMPLEMENT_API_CAPABILITY
+#   define VSF_PM_CFG_REIMPLEMENT_API_CAPABILITY                ENABLED
+#endif
+
 #define vsf_real_pm_t          VSF_MCONNECT(VSF_PM_CFG_IMP_PREFIX, _pm_t)
 #define vsf_real_pm_capability VSF_MCONNECT(VSF_PM_CFG_IMP_PREFIX, _pm_capability)
 
