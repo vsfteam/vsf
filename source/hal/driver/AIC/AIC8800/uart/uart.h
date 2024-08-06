@@ -60,10 +60,14 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_CTS_HWCONTROL             = (0x2ul << 14),
     VSF_USART_RTS_CTS_HWCONTROL         = (0x3ul << 14),
 
-    VSF_USART_FULL_DUPLEX               = (0x0ul << 16),
-    VSF_USART_HALF_DUPLEX               = (0x1ul << 16),
-    VSF_USART_TX_ONLY                   = (0x2ul << 16),
-    VSF_USART_RX_ONLY                   = (0x3ul << 16),
+    VSF_USART_TX_ENABLE                 = (0x0ul << 15),
+    VSF_USART_TX_DISABLE                = (0x1ul << 15),
+
+    VSF_USART_RX_ENABLE                 = (0x0ul << 16),
+    VSF_USART_RX_DISABLE                = (0x1ul << 16),
+
+    VSF_USART_HALF_DUPLEX_DISABLE       = (0x0ul << 17),
+    VSF_USART_HALF_DUPLEX_ENABLE        = (0x1ul << 17),
 
     VSF_USART_TX_FIFO_THRESH_ONE        = (0x0ul << 18),
     VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x1ul << 18),
