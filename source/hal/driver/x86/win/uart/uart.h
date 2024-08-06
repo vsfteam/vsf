@@ -54,17 +54,31 @@ typedef enum vsf_usart_mode_t {
 
     // unsupported for win
     VSF_USART_6_BIT_LENGTH              = (0x01ul << 7),
-    VSF_USART_7_BIT_LENGTH              = (0x01ul << 8),
-    VSF_USART_5_BIT_LENGTH              = (0x01ul << 9),
+    VSF_USART_7_BIT_LENGTH              = (0x02ul << 7),
+    VSF_USART_5_BIT_LENGTH              = (0x03ul << 7),
+    VSF_USART_10_BIT_LENGTH             = (0x04ul << 7),
 
     VSF_USART_FORCE_0_PARITY            = (0x01ul << 10),
-    VSF_USART_FORCE_1_PARITY            = (0x01ul << 11),
+    VSF_USART_FORCE_1_PARITY            = (0x02ul << 10),
 
-    VSF_USART_TX_ENABLE                 = (0x01ul << 12),
-    VSF_USART_TX_DISABLE                = (0x00ul << 12),
+    VSF_USART_0_5_STOPBIT               = (0x01ul << 12),
 
-    VSF_USART_RX_ENABLE                 = (0x01ul << 13),
-    VSF_USART_RX_DISABLE                = (0x00ul << 13),
+    VSF_USART_TX_ENABLE                 = (0x01ul << 13),
+    VSF_USART_TX_DISABLE                = (0x00ul << 13),
+
+    VSF_USART_RX_ENABLE                 = (0x01ul << 14),
+    VSF_USART_RX_DISABLE                = (0x00ul << 14),
+
+    VSF_USART_HALF_DUPLEX_DISABLE       = (0x00ul << 15),
+    VSF_USART_HALF_DUPLEX_ENABLE        = (0x01ul << 15),
+
+    VSF_USART_TX_FIFO_THRESH_ONE        = (0x00ul << 16),    //!< one data for txfifo
+    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x01ul << 16),    //!< Half of the threshold for txfifo
+    VSF_USART_TX_FIFO_THRESH_FULL       = (0x02ul << 16),    //!< Full of the threshold for txfifo
+
+    VSF_USART_RX_FIFO_THRESH_ONE        = (0x00ul << 18),    //!< one data for txfifo
+    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (0x01ul << 18),    //!< Half of the threshold for txfifo
+    VSF_USART_RX_FIFO_THRESH_FULL       = (0x02ul << 18),    //!< Full of the threshold for txfifo
 
     WIN_USART_BIT_LENGTH_MASK           = VSF_USART_8_BIT_LENGTH |
                                           VSF_USART_9_BIT_LENGTH,
