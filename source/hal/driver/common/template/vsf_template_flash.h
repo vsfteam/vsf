@@ -160,8 +160,8 @@ typedef struct vsf_flash_capability_t {
     vsf_flash_size_t write_sector_size;
     struct {
         // Some flash allow only full sectors to be write or read
-        uint8_t can_write_any_address : 1;
-        uint8_t can_read_any_address  : 1;
+        uint8_t none_sector_aligned_write : 1;
+        uint8_t none_sector_aligned_read  : 1;
     };
 } vsf_flash_capability_t;
 

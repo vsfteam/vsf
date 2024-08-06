@@ -56,11 +56,11 @@
 #   ifndef VSF_FLASH_CFG_CAPABILITY_WRITE_SECTORE_SIZE
 #       define VSF_FLASH_CFG_CAPABILITY_WRITE_SECTORE_SIZE          512
 #   endif
-#   ifndef VSF_FLASH_CFG_CAPABILITY_SECTORE_WRITE_ANY_ADDRESS
-#       define VSF_FLASH_CFG_CAPABILITY_SECTORE_WRITE_ANY_ADDRESS   0
+#   ifndef VSF_FLASH_CFG_CAPABILITY_NONE_SECTOR_ALIGNED_WRITE
+#       define VSF_FLASH_CFG_CAPABILITY_NONE_SECTOR_ALIGNED_WRITE   0
 #   endif
-#   ifndef VSF_FLASH_CFG_CAPABILITY_SECTORE_READ_ANY_ADDRESS
-#       define VSF_FLASH_CFG_CAPABILITY_SECTORE_READ_ANY_ADDRESS    1
+#   ifndef VSF_FLASH_CFG_CAPABILITY_NONE_SECTOR_ALIGNED_READ
+#       define VSF_FLASH_CFG_CAPABILITY_NONE_SECTOR_ALIGNED_READ    1
 #   endif
 #endif
 
@@ -80,8 +80,8 @@ vsf_flash_capability_t vsf_real_flash_capability(vsf_real_flash_t *flash_ptr)
         .max_size                   = VSF_FLASH_CFG_CAPABILITY_MAX_SIZE,
         .erase_sector_size          = VSF_FLASH_CFG_CAPABILITY_ERASE_SECTORE_SIZE,
         .write_sector_size          = VSF_FLASH_CFG_CAPABILITY_WRITE_SECTORE_SIZE,
-        .can_write_any_address      = VSF_FLASH_CFG_CAPABILITY_SECTORE_WRITE_ANY_ADDRESS,
-        .can_read_any_address       = VSF_FLASH_CFG_CAPABILITY_SECTORE_READ_ANY_ADDRESS,
+        .none_sector_aligned_write  = VSF_FLASH_CFG_CAPABILITY_NONE_SECTOR_ALIGNED_WRITE,
+        .none_sector_aligned_read   = VSF_FLASH_CFG_CAPABILITY_NONE_SECTOR_ALIGNED_READ,
     };
 
     VSF_ASSERT(flash_capability.erase_sector_size >= flash_capability.write_sector_size);
@@ -147,7 +147,7 @@ vsf_err_t vsf_real_flash_write_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_
 
     vsf_flash_capability_t flash_capability = vsf_real_flash_capability(real_flash_ptr);
     VSF_ASSERT(size <= flash_capability.write_sector_size);
-    VSF_ASSERT(flash_capability.can_write_any_address || ((offset % flash_capability.write_sector_size) == 0));
+    VSF_ASSERT(flash_capability.none_sector_aligned_write || ((offset % flash_capability.write_sector_size) == 0));
 
     return vsf_real_flash_write_multi_sector(real_flash_ptr, offset, buffer, size);
 }
@@ -160,7 +160,7 @@ vsf_err_t vsf_real_flash_write_multi_sector(vsf_real_flash_t *real_flash_ptr, vs
 
     vsf_flash_capability_t flash_capability = vsf_real_flash_capability(real_flash_ptr);
     VSF_ASSERT((size % flash_capability.write_sector_size) == 0);
-    VSF_ASSERT(flash_capability.can_write_any_address || ((offset % flash_capability.write_sector_size) == 0));
+    VSF_ASSERT(flash_capability.none_sector_aligned_write || ((offset % flash_capability.write_sector_size) == 0));
 
     for (vsf_flash_size_t i = 0; i < size; i += flash_capability.write_sector_size) {
         vsf_flash_size_t current_size = vsf_min(flash_capability.write_sector_size, size - i);
@@ -181,7 +181,7 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 
     vsf_flash_capability_t flash_capability = vsf_real_flash_capability(real_flash_ptr);
     VSF_ASSERT(size <= flash_capability.write_sector_size);
-    VSF_ASSERT(flash_capability.can_read_any_address || ((offset % flash_capability.write_sector_size) == 0));
+    VSF_ASSERT(flash_capability.none_sector_aligned_read || ((offset % flash_capability.write_sector_size) == 0));
 
     return vsf_real_flash_read_multi_sector(real_flash_ptr, offset, buffer, size);
 }
@@ -217,8 +217,8 @@ vsf_err_t vsf_real_flash_read_multi_sector(vsf_real_flash_t *real_flash_ptr, vsf
 #undef VSF_FLASH_CFG_CAPABILITY_MAX_SIZE
 #undef VSF_FLASH_CFG_CAPABILITY_ERASE_SECTORE_SIZE
 #undef VSF_FLASH_CFG_CAPABILITY_WRITE_SECTORE_SIZE
-#undef VSF_FLASH_CFG_CAPABILITY_SECTORE_WRITE_ANY_ADDRESS
-#undef VSF_FLASH_CFG_CAPABILITY_SECTORE_READ_ANY_ADDRESS
+#undef VSF_FLASH_CFG_CAPABILITY_NONE_SECTOR_ALIGNED_WRITE
+#undef VSF_FLASH_CFG_CAPABILITY_NONE_SECTOR_ALIGNED_READ
 
 #undef vsf_real_flash_t
 #undef vsf_real_flash_erase_all
