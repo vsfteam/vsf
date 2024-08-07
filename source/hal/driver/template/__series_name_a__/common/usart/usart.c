@@ -175,15 +175,16 @@ vsf_usart_capability_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     return (vsf_usart_capability_t) {
-        .irq_mask                   = 0,
-        .max_baudrate               = 0,
-        .min_baudrate               = 0,
-        .min_data_bits              = 0,
-        .max_data_bits              = 0,
-        .txfifo_depth               = 0,
-        .rxfifo_depth               = 0,
-        .support_rx_timeout         = 0,
-        .support_send_break         = 0,
+        .irq_mask                    = 0,
+        .max_baudrate                = 0,
+        .min_baudrate                = 0,
+        .min_data_bits               = 0,
+        .max_data_bits               = 0,
+        .txfifo_depth                = 0,
+        .rxfifo_depth                = 0,
+        .support_rx_timeout          = 0,
+        .support_send_break          = 0,
+        .support_set_and_clear_break = 0,
     };
 }
 
