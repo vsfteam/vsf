@@ -250,12 +250,13 @@ int_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)(
     return 0;
 }
 
-vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_tx_send_break)(
+vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cmd)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,
-    uint_fast32_t duration
+    vsf_usart_cmd_t cmd,
+    void * param
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
-    return 0;
+    return VSF_ERR_NONE;
 }
 
 // HW end
@@ -270,7 +271,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_tx_send_break)(
 // TODO: add comments about fifo2req
 #define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY        DISABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_REQUEST           ENABLED
-#define VSF_USART_CFG_REIMPLEMENT_API_TX_SEND_BREAK     ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_CMD               ENABLED
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t)                            \
         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __IDX) = {               \
