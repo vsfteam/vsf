@@ -284,6 +284,16 @@ uint_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_txfifo_write)(
     return cnt;
 }
 
+vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cmd)(
+    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,
+    vsf_usart_cmd_t cmd,
+    void *param
+) {
+    VSF_HAL_ASSERT(!(cmd & ~__VSF_HW_USART_SUPPORT_CMD_MASK));
+    usart_ptr->reg->RQR = cmd;
+    return VSF_ERR_NONE;
+}
+
 vsf_usart_capability_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
@@ -297,6 +307,7 @@ vsf_usart_capability_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
         .rxfifo_depth               = 0,
         // TODO: support tx_timeout
         .support_rx_timeout         = 0,
+        .support_send_break         = 1,
     };
 }
 
@@ -378,6 +389,7 @@ int_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)(
 // TODO: add comments about fifo2req
 #define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_REQUEST           ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_CMD               ENABLED
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t)                            \
         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __IDX) = {               \
