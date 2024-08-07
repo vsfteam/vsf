@@ -52,8 +52,8 @@ typedef struct VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) {
     vsf_gpio_t                  vsf_gpio;
 #endif
     uint32_t                    reg;
-    rcu_periph_enum             clk_gating;
-    rcu_periph_reset_enum       rst;
+    vsf_hw_peripheral_en_t      en;
+    vsf_hw_peripheral_rst_t     rst;
 } VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t);
 // HW end
 
@@ -245,7 +245,7 @@ vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
         VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio, __IDX) = {                 \
         __HAL_OP                                                                \
         .reg                        = VSF_HW_GPIO_PORT ## __IDX ## _REG_BASE,   \
-        .clk_gating                 = VSF_HW_GPIO_PORT ## __IDX ## _CLK_GATING, \
+        .en                         = VSF_HW_GPIO_PORT ## __IDX ## _EN,         \
         .rst                        = VSF_HW_GPIO_PORT ## __IDX ## _RST,        \
     };
 

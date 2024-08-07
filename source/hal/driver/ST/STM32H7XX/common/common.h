@@ -27,62 +27,62 @@
 
 /*============================ MACROS ========================================*/
 
-// CLOCK
+// CLKRST REGION
 
-#define VSF_HW_REG32_REGION(__WORD_OFFSET, __BIT_OFFSET, __BIT_LENGTH)          \
+#define VSF_HW_CLKRST_REGION(__WORD_OFFSET, __BIT_OFFSET, __BIT_LENGTH)         \
             (((__WORD_OFFSET) << 16) | ((__BIT_LENGTH) << 8) | ((__BIT_OFFSET) << 0))
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define vsf_hw_peripheral_clk_set       vsf_hw_reg_region_set
-#define vsf_hw_peripheral_clk_get       vsf_hw_reg_region_get
+#define vsf_hw_peripheral_clk_set       vsf_hw_clkrst_region_set
+#define vsf_hw_peripheral_clk_get       vsf_hw_clkrst_region_get
 
-#define vsf_hw_peripheral_rst_set       vsf_hw_reg_region_set_bit
-#define vsf_hw_peripheral_rst_clear     vsf_hw_reg_region_clear_bit
-#define vsf_hw_peripheral_rst_get       vsf_hw_reg_region_get_bit
+#define vsf_hw_peripheral_rst_set       vsf_hw_clkrst_region_set_bit
+#define vsf_hw_peripheral_rst_clear     vsf_hw_clkrst_region_clear_bit
+#define vsf_hw_peripheral_rst_get       vsf_hw_clkrst_region_get_bit
 
-#define vsf_hw_peripheral_enable        vsf_hw_reg_region_set_bit
-#define vsf_hw_peripheral_disable       vsf_hw_reg_region_clear_bit
+#define vsf_hw_peripheral_enable        vsf_hw_clkrst_region_set_bit
+#define vsf_hw_peripheral_disable       vsf_hw_clkrst_region_clear_bit
 
 /*============================ TYPES =========================================*/
 
 typedef enum vsf_hw_peripheral_clk_t {
-    VSF_HW_CLK_USART16                  = VSF_HW_REG32_REGION(0x15, 3, 3),  // USART16SEL IN RCC.D2CCIP2R
-    VSF_HW_CLK_USART234578              = VSF_HW_REG32_REGION(0x15, 0, 3),  // USART234578SEL IN RCC.D2CCIP2R
+    VSF_HW_CLK_USART16                  = VSF_HW_CLKRST_REGION(0x15, 3, 3), // USART16SEL IN RCC.D2CCIP2R
+    VSF_HW_CLK_USART234578              = VSF_HW_CLKRST_REGION(0x15, 0, 3), // USART234578SEL IN RCC.D2CCIP2R
 } vsf_hw_peripheral_clk_t;
 
 typedef enum vsf_hw_peripheral_rst_t {
-    VSF_HW_RST_USART1                   = VSF_HW_REG32_REGION(0x26, 4, 1),  // USART1RST IN RCC.APB2RSTR
-    VSF_HW_RST_USART2                   = VSF_HW_REG32_REGION(0x24, 17, 1), // USART2RST IN RCC.APB1LRSTR
-    VSF_HW_RST_USART3                   = VSF_HW_REG32_REGION(0x24, 18, 1), // USART3RST IN RCC.APB1LRSTR
-    VSF_HW_RST_USART4                   = VSF_HW_REG32_REGION(0x24, 19, 1), // USART4RST IN RCC.APB1LRSTR
-    VSF_HW_RST_USART5                   = VSF_HW_REG32_REGION(0x24, 20, 1), // USART5RST IN RCC.APB1LRSTR
-    VSF_HW_RST_USART6                   = VSF_HW_REG32_REGION(0x26, 5, 1),  // USART6RST IN RCC.APB2RSTR
-    VSF_HW_RST_USART7                   = VSF_HW_REG32_REGION(0x24, 30, 1), // USART7RST IN RCC.APB1LRSTR
-    VSF_HW_RST_USART8                   = VSF_HW_REG32_REGION(0x24, 31, 1), // USART8RST IN RCC.APB1LRSTR
+    VSF_HW_RST_USART1                   = VSF_HW_CLKRST_REGION(0x26, 4, 1), // USART1RST IN RCC.APB2RSTR
+    VSF_HW_RST_USART2                   = VSF_HW_CLKRST_REGION(0x24, 17, 1),// USART2RST IN RCC.APB1LRSTR
+    VSF_HW_RST_USART3                   = VSF_HW_CLKRST_REGION(0x24, 18, 1),// USART3RST IN RCC.APB1LRSTR
+    VSF_HW_RST_USART4                   = VSF_HW_CLKRST_REGION(0x24, 19, 1),// USART4RST IN RCC.APB1LRSTR
+    VSF_HW_RST_USART5                   = VSF_HW_CLKRST_REGION(0x24, 20, 1),// USART5RST IN RCC.APB1LRSTR
+    VSF_HW_RST_USART6                   = VSF_HW_CLKRST_REGION(0x26, 5, 1), // USART6RST IN RCC.APB2RSTR
+    VSF_HW_RST_USART7                   = VSF_HW_CLKRST_REGION(0x24, 30, 1),// USART7RST IN RCC.APB1LRSTR
+    VSF_HW_RST_USART8                   = VSF_HW_CLKRST_REGION(0x24, 31, 1),// USART8RST IN RCC.APB1LRSTR
 } vsf_hw_peripheral_rst_t;
 
 typedef enum vsf_hw_peripheral_en_t {
-    VSF_HW_EN_GPIOA                     = VSF_HW_REG32_REGION(0x38, 0, 1),  // GPIOAEN IN RCC.AHB4ENR
-    VSF_HW_EN_GPIOB                     = VSF_HW_REG32_REGION(0x38, 1, 1),  // GPIOBEN IN RCC.AHB4ENR
-    VSF_HW_EN_GPIOC                     = VSF_HW_REG32_REGION(0x38, 2, 1),  // GPIOCEN IN RCC.AHB4ENR
-    VSF_HW_EN_GPIOD                     = VSF_HW_REG32_REGION(0x38, 3, 1),  // GPIODEN IN RCC.AHB4ENR
-    VSF_HW_EN_GPIOE                     = VSF_HW_REG32_REGION(0x38, 4, 1),  // GPIOEEN IN RCC.AHB4ENR
-    VSF_HW_EN_GPIOF                     = VSF_HW_REG32_REGION(0x38, 5, 1),  // GPIOFEN IN RCC.AHB4ENR
-    VSF_HW_EN_GPIOG                     = VSF_HW_REG32_REGION(0x38, 6, 1),  // GPIOGEN IN RCC.AHB4ENR
-    VSF_HW_EN_GPIOH                     = VSF_HW_REG32_REGION(0x38, 7, 1),  // GPIOHEN IN RCC.AHB4ENR
-    VSF_HW_EN_GPIOI                     = VSF_HW_REG32_REGION(0x38, 8, 1),  // GPIOIEN IN RCC.AHB4ENR
-    VSF_HW_EN_GPIOJ                     = VSF_HW_REG32_REGION(0x38, 9, 1),  // GPIOJEN IN RCC.AHB4ENR
-    VSF_HW_EN_GPIOK                     = VSF_HW_REG32_REGION(0x38, 10, 1), // GPIOKEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOA                     = VSF_HW_CLKRST_REGION(0x38, 0, 1), // GPIOAEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOB                     = VSF_HW_CLKRST_REGION(0x38, 1, 1), // GPIOBEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOC                     = VSF_HW_CLKRST_REGION(0x38, 2, 1), // GPIOCEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOD                     = VSF_HW_CLKRST_REGION(0x38, 3, 1), // GPIODEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOE                     = VSF_HW_CLKRST_REGION(0x38, 4, 1), // GPIOEEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOF                     = VSF_HW_CLKRST_REGION(0x38, 5, 1), // GPIOFEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOG                     = VSF_HW_CLKRST_REGION(0x38, 6, 1), // GPIOGEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOH                     = VSF_HW_CLKRST_REGION(0x38, 7, 1), // GPIOHEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOI                     = VSF_HW_CLKRST_REGION(0x38, 8, 1), // GPIOIEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOJ                     = VSF_HW_CLKRST_REGION(0x38, 9, 1), // GPIOJEN IN RCC.AHB4ENR
+    VSF_HW_EN_GPIOK                     = VSF_HW_CLKRST_REGION(0x38, 10, 1),// GPIOKEN IN RCC.AHB4ENR
 
-    VSF_HW_EN_USART1                    = VSF_HW_REG32_REGION(0x3C, 4, 1),  // USART1EN IN RCC.APB2ENR
-    VSF_HW_EN_USART2                    = VSF_HW_REG32_REGION(0x3A, 17, 1), // USART2EN IN RCC.APB1LENR
-    VSF_HW_EN_USART3                    = VSF_HW_REG32_REGION(0x3A, 18, 1), // USART3EN IN RCC.APB1LENR
-    VSF_HW_EN_USART4                    = VSF_HW_REG32_REGION(0x3A, 19, 1), // USART4EN IN RCC.APB1LENR
-    VSF_HW_EN_USART5                    = VSF_HW_REG32_REGION(0x3A, 20, 1), // USART5EN IN RCC.APB1LENR
-    VSF_HW_EN_USART6                    = VSF_HW_REG32_REGION(0x3C, 5, 1),  // USART6EN IN RCC.APB2ENR
-    VSF_HW_EN_USART7                    = VSF_HW_REG32_REGION(0x3A, 30, 1), // USART7EN IN RCC.APB1LENR
-    VSF_HW_EN_USART8                    = VSF_HW_REG32_REGION(0x3A, 31, 1), // USART8EN IN RCC.APB1LENR
+    VSF_HW_EN_USART1                    = VSF_HW_CLKRST_REGION(0x3C, 4, 1), // USART1EN IN RCC.APB2ENR
+    VSF_HW_EN_USART2                    = VSF_HW_CLKRST_REGION(0x3A, 17, 1),// USART2EN IN RCC.APB1LENR
+    VSF_HW_EN_USART3                    = VSF_HW_CLKRST_REGION(0x3A, 18, 1),// USART3EN IN RCC.APB1LENR
+    VSF_HW_EN_USART4                    = VSF_HW_CLKRST_REGION(0x3A, 19, 1),// USART4EN IN RCC.APB1LENR
+    VSF_HW_EN_USART5                    = VSF_HW_CLKRST_REGION(0x3A, 20, 1),// USART5EN IN RCC.APB1LENR
+    VSF_HW_EN_USART6                    = VSF_HW_CLKRST_REGION(0x3C, 5, 1), // USART6EN IN RCC.APB2ENR
+    VSF_HW_EN_USART7                    = VSF_HW_CLKRST_REGION(0x3A, 30, 1),// USART7EN IN RCC.APB1LENR
+    VSF_HW_EN_USART8                    = VSF_HW_CLKRST_REGION(0x3A, 31, 1),// USART8EN IN RCC.APB1LENR
 } vsf_hw_peripheral_en_t;
 
 enum {
@@ -157,12 +157,12 @@ extern const vsf_hw_clk_t VSF_HW_CLK_PCLK4;
 
 extern uint32_t vsf_hw_clk_get(const vsf_hw_clk_t *clk);
 
-extern void vsf_hw_reg_region_set(uint32_t region, uint_fast8_t value);
-extern uint_fast8_t vsf_hw_reg_region_get(uint32_t region);
+extern void vsf_hw_clkrst_region_set(uint32_t region, uint_fast8_t value);
+extern uint_fast8_t vsf_hw_clkrst_region_get(uint32_t region);
 
-extern void vsf_hw_reg_region_set_bit(uint32_t region);
-extern void vsf_hw_reg_region_clear_bit(uint32_t region);
-extern uint_fast8_t vsf_hw_reg_region_get_bit(uint32_t region);
+extern void vsf_hw_clkrst_region_set_bit(uint32_t region);
+extern void vsf_hw_clkrst_region_clear_bit(uint32_t region);
+extern uint_fast8_t vsf_hw_clkrst_region_get_bit(uint32_t region);
 
 #endif
 /* EOF */

@@ -56,8 +56,8 @@ typedef struct VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) {
 #endif
     uint32_t                reg;
     rcu_clock_freq_enum     clk;
-    rcu_periph_enum         clk_gating;
-    rcu_periph_reset_enum   rst;
+    vsf_hw_peripheral_en_t  en;
+    vsf_hw_peripheral_rst_t rst;
     bool                    support_sync;
     IRQn_Type               irqn;
     vsf_usart_isr_t         isr;
@@ -92,7 +92,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     uint32_t intdiv = 0U, fradiv = 0U, udiv = 0U;
     uint32_t baudval = cfg_ptr->baudrate;
 
-    rcu_periph_clock_enable(usart_ptr->clk_gating);
+    vsf_hw_peripheral_enable(usart_ptr->en);
 
     // boardrate
     if (over8){
@@ -154,8 +154,8 @@ void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_fini)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
-    rcu_periph_reset_enable(usart_ptr->rst);
-    rcu_periph_reset_disable(usart_ptr->rst);
+    vsf_hw_peripheral_rst_set(usart_ptr->rst);
+    vsf_hw_peripheral_rst_clear(usart_ptr->rst);
 }
 
 fsm_rt_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_enable)(
@@ -383,7 +383,7 @@ int_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)(
         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __IDX) = {               \
         .reg                = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _REG_BASE),\
         .clk                = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _CLK),\
-        .clk_gating         = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _CLK_GATING),\
+        .en                 = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _EN),\
         .rst                = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _RST),\
         .support_sync       = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _SYNC),\
         .irqn               = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _IRQN),\
