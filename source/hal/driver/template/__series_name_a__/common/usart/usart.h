@@ -155,7 +155,9 @@ typedef enum vsf_usart_irq_mask_t {
 
 typedef enum vsf_usart_cmd_t {
     // usart default command
-    VSF_USART_CMD_SEND_BREAK = 0,
+    VSF_USART_CMD_SEND_BREAK    = (0x01ul << 0),
+    VSF_USART_CMD_SET_BREAK     = (0x01ul << 1),
+    VSF_USART_CMD_CLEAR_BREAK   = (0x01ul << 2),
 
     // more vendor specified commnad can be added here
 } vsf_usart_cmd_t;
