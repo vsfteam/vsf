@@ -21,50 +21,56 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_USART_CFG_REIMPLEMENT_API_REQUEST
-#   define VSF_USART_CFG_REIMPLEMENT_API_REQUEST                DISABLED
+#   define VSF_USART_CFG_REIMPLEMENT_API_REQUEST                    DISABLED
 #endif
 
 #ifndef VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY
-#   define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY             DISABLED
+#   define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY                 DISABLED
 #endif
 
 #ifndef VSF_USART_CFG_REIMPLEMENT_API_CMD
-#   define VSF_USART_CFG_REIMPLEMENT_API_CMD                    DISABLED
+#   define VSF_USART_CFG_REIMPLEMENT_API_CMD                        DISABLED
 #endif
 
 #ifdef VSF_USART_CFG_IMP_REMAP_PREFIX
 #   undef VSF_USART_CFG_REIMPLEMENT_API_REQUEST
 #   undef VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY
 #   undef VSF_USART_CFG_REIMPLEMENT_API_CMD
-#   define VSF_USART_CFG_REIMPLEMENT_API_REQUEST                ENABLED
-#   define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED
-#   define VSF_USART_CFG_REIMPLEMENT_API_CMD                    ENABLED
+#   define VSF_USART_CFG_REIMPLEMENT_API_REQUEST                    ENABLED
+#   define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY                 ENABLED
+#   define VSF_USART_CFG_REIMPLEMENT_API_CMD                        ENABLED
 #endif
 
 #if VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 #   ifndef VSF_USART_CFG_CAPABILITY_IRQ_MASK
-#       define VSF_USART_CFG_CAPABILITY_IRQ_MASK                VSF_USART_IRQ_ALL_BITS_MASK
+#       define VSF_USART_CFG_CAPABILITY_IRQ_MASK                    VSF_USART_IRQ_ALL_BITS_MASK
 #   endif
 #   ifndef VSF_USART_CFG_CAPABILITY_MAX_BAUDRATE
-#       define VSF_USART_CFG_CAPABILITY_MAX_BAUDRATE            921600
+#       define VSF_USART_CFG_CAPABILITY_MAX_BAUDRATE                921600
 #   endif
 #   ifndef VSF_USART_CFG_CAPABILITY_MIN_BAUDRATE
-#       define VSF_USART_CFG_CAPABILITY_MIN_BAUDRATE            4800
+#       define VSF_USART_CFG_CAPABILITY_MIN_BAUDRATE                4800
 #   endif
 #   ifndef VSF_USART_CFG_CAPABILITY_TXFIFO_DEPTH
-#       define VSF_USART_CFG_CAPABILITY_TXFIFO_DEPTH            64
+#       define VSF_USART_CFG_CAPABILITY_TXFIFO_DEPTH                64
 #   endif
 #   ifndef VSF_USART_CFG_CAPABILITY_RXFIFO_DEPTH
-#       define VSF_USART_CFG_CAPABILITY_RXFIFO_DEPTH            64
+#       define VSF_USART_CFG_CAPABILITY_RXFIFO_DEPTH                64
 #   endif
 #   ifndef VSF_USART_CFG_CAPABILITY_MAX_DATA_BITS
-#       define VSF_USART_CFG_CAPABILITY_MAX_DATA_BITS           9
+#       define VSF_USART_CFG_CAPABILITY_MAX_DATA_BITS               9
 #   endif
 #   ifndef VSF_USART_CFG_CAPABILITY_MIN_DATA_BITS
-#       define VSF_USART_CFG_CAPABILITY_MIN_DATA_BITS           8
+#       define VSF_USART_CFG_CAPABILITY_MIN_DATA_BITS               8
 #   endif
 #   ifndef VSF_USART_CFG_CAPABILITY_SUPPORT_RX_TIMEOUT
-#       define VSF_USART_CFG_CAPABILITY_SUPPORT_RX_TIMEOUT      1
+#       define VSF_USART_CFG_CAPABILITY_SUPPORT_RX_TIMEOUT          1
+#   endif
+#   ifndef VSF_USART_CFG_CAPABILITY_SUPPORT_SEND_BREAK
+#       define VSF_USART_CFG_CAPABILITY_SUPPORT_SEND_BREAK          1
+#   endif
+#   ifndef VSF_USART_CFG_CAPABILITY_SUPPORT_SET_AND_CLEAR_BREAK
+#       define VSF_USART_CFG_CAPABILITY_SUPPORT_SET_AND_CLEAR_BREAK 0
 #   endif
 #endif
 
@@ -125,14 +131,16 @@ int_fast32_t vsf_real_usart_get_tx_count(vsf_real_usart_t *usart_ptr)
 vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 {
     vsf_usart_capability_t usart_capability = {
-        .irq_mask               = VSF_USART_CFG_CAPABILITY_IRQ_MASK,
-        .max_baudrate           = VSF_USART_CFG_CAPABILITY_MAX_BAUDRATE,
-        .min_baudrate           = VSF_USART_CFG_CAPABILITY_MIN_BAUDRATE,
-        .txfifo_depth           = VSF_USART_CFG_CAPABILITY_TXFIFO_DEPTH,
-        .rxfifo_depth           = VSF_USART_CFG_CAPABILITY_RXFIFO_DEPTH,
-        .max_data_bits          = VSF_USART_CFG_CAPABILITY_MAX_DATA_BITS,
-        .min_data_bits          = VSF_USART_CFG_CAPABILITY_MIN_DATA_BITS,
-        .support_rx_timeout     = VSF_USART_CFG_CAPABILITY_SUPPORT_RX_TIMEOUT,
+        .irq_mask                       = VSF_USART_CFG_CAPABILITY_IRQ_MASK,
+        .max_baudrate                   = VSF_USART_CFG_CAPABILITY_MAX_BAUDRATE,
+        .min_baudrate                   = VSF_USART_CFG_CAPABILITY_MIN_BAUDRATE,
+        .txfifo_depth                   = VSF_USART_CFG_CAPABILITY_TXFIFO_DEPTH,
+        .rxfifo_depth                   = VSF_USART_CFG_CAPABILITY_RXFIFO_DEPTH,
+        .max_data_bits                  = VSF_USART_CFG_CAPABILITY_MAX_DATA_BITS,
+        .min_data_bits                  = VSF_USART_CFG_CAPABILITY_MIN_DATA_BITS,
+        .support_rx_timeout             = VSF_USART_CFG_CAPABILITY_SUPPORT_RX_TIMEOUT,
+        .support_send_break             = VSF_USART_CFG_CAPABILITY_SUPPORT_SEND_BREAK,
+        .support_set_and_clear_break    = VSF_USART_CFG_CAPABILITY_SUPPORT_SET_AND_CLEAR_BREAK,
     };
 
     return usart_capability;
