@@ -84,6 +84,12 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
 #   define VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS    DISABLED
 #endif
 
+//! In the specific hardware driver, we can enable
+//! VSF_USART_CFG_REIMPLEMENT_TYPE_CMD to redefine vsf_usart_cmd_t as needed.
+#ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_CMD
+#   define VSF_USART_CFG_REIMPLEMENT_TYPE_CMD       DISABLED
+#endif
+
 #ifndef VSF_USART_CFG_REIMPLEMENT_MODE_TO_DATA_BITS
 #   define VSF_USART_CFG_REIMPLEMENT_MODE_TO_DATA_BITS      \
                                                     DISABLED
@@ -163,13 +169,12 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
  * @brief 预定义的 VSF USART 模式，可以在具体的 HAL 驱动重新实现。
  *
  * \~english
- * Even if the hardware doesn't support these features, these modes must be implemented.
+ * Even if the hardware doesn't support these features, the following modes must be kept，
  * If the hardware supports more modes, e.g. more parity modes, more databits, more stopbits,
- * more FIFO threshold size, we can implement it in the hardware driver, but the following
- * modes must be kept:
+ * more FIFO threshold size, we can implement it in the hardware driver:
  * \~chinese
- * 即使硬件不支持这些功能，但是这些模式是必须实现的: 如果硬件支持更多模式，例如更多的奇偶校验模式、
- * 数据位大小、停止位大小、FIFO 门限值，我们可以在硬件驱动里实现它，但是以下的模式必须保留：
+ * 即使硬件不支持这些功能，但是以下的模式必须保留，如果硬件支持更多模式，例如更多的奇偶校验模式、
+ * 数据位大小、停止位大小、FIFO 门限值，我们可以在硬件驱动里实现它：
  *
  * - VSF_USART_NO_PARITY
  * - VSF_USART_EVEN_PARITY
@@ -339,6 +344,28 @@ enum {
 };
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
+/**
+ * \~english
+ * @brief Predefined VSF USART interrupt that can be reimplemented in specific hal drivers.
+ *
+ * \~chinese
+ * @brief 预定义的 VSF USART 中断，可以在具体的 HAL 驱动重新实现。
+ *
+ * \~english
+ * Even if the hardware doesn't support these features, these interrupt must be kept.
+ * \~chinese
+ * 即使硬件不支持这些中断，但是这些中断是必须实现的：
+ *
+ * - VSF_USART_IRQ_MASK_TX_CPL
+ * - VSF_USART_IRQ_MASK_RX_CPL
+ * - VSF_USART_IRQ_MASK_TX
+ * - VSF_USART_IRQ_MASK_RX
+ * - VSF_USART_IRQ_MASK_RX_TIMEOUT
+ * - VSF_USART_IRQ_MASK_FRAME_ERR
+ * - VSF_USART_IRQ_MASK_PARITY_ERR
+ * - VSF_USART_IRQ_MASK_BREAK_ERR
+ * - VSF_USART_IRQ_MASK_OVERFLOW_ERR
+ */
 typedef enum vsf_usart_irq_mask_t {
     // request_rx/request_tx complete
     VSF_USART_IRQ_MASK_TX_CPL           = (0x1ul << 23),
@@ -396,9 +423,26 @@ typedef struct vsf_usart_cfg_t {
     vsf_usart_isr_t isr;
 } vsf_usart_cfg_t;
 
+#if VSF_USART_CFG_REIMPLEMENT_TYPE_CMD == DISABLED
+/**
+ * \~english
+ * @brief Predefined VSF USART command that can be reimplemented in specific hal drivers.
+ *
+ * \~chinese
+ * @brief 预定义的 VSF USART 命令，可以在具体的 HAL 驱动重新实现。
+ *
+ * \~english
+ * Even if the hardware doesn't support these features, these commands must be kept.
+ * If the hardware supports more commands, but the following commands must be kept:
+ * \~chinese
+ * 即使硬件不支持这些功能，但是这些命令是必须保留：
+ *
+ * - VSF_USART_CMD_SEND_BREAK
+ */
 typedef enum vsf_usart_cmd_t {
     VSF_USART_CMD_SEND_BREAK = 0,
 } vsf_usart_cmd_t;
+#endif
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
 typedef struct vsf_usart_status_t {
