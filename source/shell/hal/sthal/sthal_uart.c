@@ -870,6 +870,38 @@ HAL_StatusTypeDef HAL_UART_AbortReceive_IT(UART_HandleTypeDef *huart)
     return HAL_OK;
 }
 
+
+HAL_StatusTypeDef HAL_LIN_SendBreak(UART_HandleTypeDef *huart)
+{
+    vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
+    VSF_HAL_ASSERT(usart != NULL);
+
+    __HAL_LOCK(huart);
+
+    huart->gState = HAL_UART_STATE_BUSY;
+    
+    vsf_usart_capability_t cap = vsf_usart_capability(usart);
+    if (cap.support_send_break) {
+        vsf_usart_send_break(usart);
+    } else if (cap.support_set_and_clear_break) {
+        vsf_usart_set_break(usart);
+
+        uint32_t tickstart = HAL_GetTick();
+        // start bit + data bits + stop bit(max: 2)
+        uint32_t bit_cnt = 1 + vsf_usart_mode_to_data_bits(huart->Init.WordLength) + 2;
+        uint32_t timeout = (bit_cnt * 1000000 + huart->Init.BaudRate - 1) / huart->Init.BaudRate;
+        while (!__uart_is_timeout(tickstart, timeout));
+        
+        vsf_usart_clear_break(usart);
+    }
+
+    huart->gState = HAL_UART_STATE_READY;
+
+    __HAL_UNLOCK(huart);
+
+    return HAL_OK;
+}
+
 HAL_UART_RxEventTypeTypeDef HAL_UARTEx_GetRxEventType(UART_HandleTypeDef *huart)
 {
     return (huart->RxEventType);
@@ -1007,12 +1039,6 @@ HAL_StatusTypeDef HAL_LIN_Init(UART_HandleTypeDef *huart,
 HAL_StatusTypeDef HAL_MultiProcessor_Init(UART_HandleTypeDef *huart,
                                           uint8_t             Address,
                                           uint32_t            WakeUpMethod)
-{
-    VSF_HAL_ASSERT(0);
-    return HAL_ERROR;
-}
-
-HAL_StatusTypeDef HAL_LIN_SendBreak(UART_HandleTypeDef *huart)
 {
     VSF_HAL_ASSERT(0);
     return HAL_ERROR;
