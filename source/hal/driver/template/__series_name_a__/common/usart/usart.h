@@ -67,6 +67,7 @@ extern "C" {
  *          VSF_USART_CFG_REIMPLEMENT_TYPE_MODE for vsf_usart_mode_t
  *          VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS for vsf_usart_status_t
  *          VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_usart_irq_mask_t
+ *          VSF_USART_CFG_REIMPLEMENT_TYPE_CMD for vsf_usart_cmd_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
@@ -74,6 +75,7 @@ extern "C" {
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_TYPE_CMD          ENABLED
 // HW end
 
 // TODO: add comments about fifo2req
@@ -149,6 +151,14 @@ typedef enum vsf_usart_irq_mask_t {
 
     // more vendor specified irq_masks can be added here
 } vsf_usart_irq_mask_t;
+
+
+typedef enum vsf_usart_cmd_t {
+    // usart default command
+    VSF_USART_CMD_SEND_BREAK = 0,
+
+    // more vendor specified commnad can be added here
+} vsf_usart_cmd_t;
 
 /*\note It's not obligated to inherit from vsf_peripheral_status_t.
  *      If not, there MUST be a is_busy bit in vsf_usart_status_t.
