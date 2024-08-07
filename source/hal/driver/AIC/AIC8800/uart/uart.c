@@ -117,6 +117,7 @@ vsf_usart_capability_t __vsf_hw_usart_capability(__vsf_hw_usart_t *hw_usart_ptr)
         .rxfifo_depth = 64,
         .support_rx_timeout = 0,
         .support_send_break = 0,
+        .support_set_and_clear_break = 0,
     };
 
     return usart_capability;

@@ -148,8 +148,26 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
     static inline vsf_err_t VSF_MCONNECT(__prefix_name, _usart_send_break)      \
         (VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr)                      \
     {                                                                           \
-        return VSF_MCONNECT(__prefix_name, _usart_cmd)                          \
-                (usart_ptr, VSF_USART_CMD_SEND_BREAK, NULL);                    \
+        return VSF_MCONNECT(__prefix_name, _usart_cmd)(usart_ptr,               \
+            VSF_USART_CMD_SEND_BREAK, NULL);                                    \
+    }                                                                           \
+    static inline vsf_err_t VSF_MCONNECT(__prefix_name, _usart_set_break)       \
+        (VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr)                      \
+    {                                                                           \
+        vsf_usart_capability_t cap =                                            \
+            VSF_MCONNECT(__prefix_name, _usart_capability)(usart_ptr);          \
+        VSF_HAL_ASSERT(cap.support_set_and_clear_break);                        \
+        return VSF_MCONNECT(__prefix_name, _usart_cmd)(usart_ptr,               \
+            VSF_USART_CMD_SET_BREAK, NULL);                                     \
+    }                                                                           \
+    static inline vsf_err_t VSF_MCONNECT(__prefix_name, _usart_clear_break)     \
+        (VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr)                      \
+    {                                                                           \
+        vsf_usart_capability_t cap =                                            \
+            VSF_MCONNECT(__prefix_name, _usart_capability)(usart_ptr);          \
+        VSF_HAL_ASSERT(cap.support_set_and_clear_break);                        \
+        return VSF_MCONNECT(__prefix_name, _usart_cmd)(usart_ptr,               \
+            VSF_USART_CMD_CLEAR_BREAK, NULL);                                   \
     }
 
 #define VSF_USART_APIS(__prefix_name)                                           \
@@ -438,9 +456,19 @@ typedef struct vsf_usart_cfg_t {
  * 即使硬件不支持这些功能，但是这些命令是必须保留：
  *
  * - VSF_USART_CMD_SEND_BREAK
+ * - VSF_USART_CMD_SET_BREAK
+ * - VSF_USART_CMD_CLEAR_BREAK
  */
 typedef enum vsf_usart_cmd_t {
-    VSF_USART_CMD_SEND_BREAK = 0,
+    //! usart send break
+    //! After a number of bits, the hardware will automatically clear the break condition
+    //! automatically.
+    VSF_USART_CMD_SEND_BREAK    = (0x01ul << 0),
+
+    //! usart set break condition
+    VSF_USART_CMD_SET_BREAK     = (0x01ul << 1),
+    //! usart clean break condition
+    VSF_USART_CMD_CLEAR_BREAK   = (0x01ul << 2),
 } vsf_usart_cmd_t;
 #endif
 
@@ -479,8 +507,9 @@ typedef struct vsf_usart_capability_t {
     uint8_t max_data_bits;
     uint8_t min_data_bits;
 
-    uint8_t support_rx_timeout : 1;
-    uint8_t support_send_break : 1;
+    uint8_t support_rx_timeout          : 1;
+    uint8_t support_send_break          : 1;
+    uint8_t support_set_and_clear_break : 1;
 } vsf_usart_capability_t;
 
 typedef struct vsf_usart_op_t {
@@ -814,18 +843,60 @@ static inline uint8_t vsf_usart_mode_to_data_bits(vsf_usart_mode_t mode)
 
 /**
  \~english
- @brief usart instance tx send break
+ @brief The usart instance sends a break and the hardware automatically
+        clears the break after a number of data bits of time
  @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
- @return vsf_err_t: returns the result of the usart sending tx break, success returns VSF_ERR_NONE
+ @return vsf_err_t: returns the result of the usart send break, success returns VSF_ERR_NONE
 
  \~chinese
- @brief 获取 usart 实例的状态
+ @brief usart 实例发送 break，硬件在若干个数据位的时间后会自动清除 break
  @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
- @return vsf_err_t: 返回当前 usart 发送 tx break 的结果，成功返回 VSF_ERR_NONE
+ @return vsf_err_t: 返回当前 usart 发送 break 的结果，成功返回 VSF_ERR_NONE
  */
 static inline vsf_err_t vsf_usart_send_break(vsf_usart_t *usart_ptr)
 {
+    vsf_usart_capability_t cap = vsf_usart_capability(usart_ptr);
+    VSF_HAL_ASSERT(cap.support_send_break);
+
     return vsf_usart_cmd(usart_ptr, VSF_USART_CMD_SEND_BREAK, NULL);
+}
+
+/**
+ \~english
+ @brief The usart instance sets break, hardware does not clear break automatically
+ @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
+ @return vsf_err_t: returns the result of the usart set break, success returns VSF_ERR_NONE
+
+ \~chinese
+ @brief usart 实例设置 break，硬件不会自动清除 break
+ @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
+ @return vsf_err_t: 返回当前 usart 发送 break 的结果，成功返回 VSF_ERR_NONE
+ */
+static inline vsf_err_t vsf_usart_set_break(vsf_usart_t *usart_ptr)
+{
+    vsf_usart_capability_t cap = vsf_usart_capability(usart_ptr);
+    VSF_HAL_ASSERT(cap.support_set_and_clear_break);
+
+    return vsf_usart_cmd(usart_ptr, VSF_USART_CMD_SET_BREAK, NULL);
+}
+
+/**
+ \~english
+ @brief The usart instance clear break
+ @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
+ @return vsf_err_t: returns the result of the usart clean break, success returns VSF_ERR_NONE
+
+ \~chinese
+ @brief usart 实例清除 break
+ @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
+ @return vsf_err_t: 返回当前 usart 发送 break 的结果，成功返回 VSF_ERR_NONE
+ */
+static inline vsf_err_t vsf_usart_clear_break(vsf_usart_t *usart_ptr)
+{
+    vsf_usart_capability_t cap = vsf_usart_capability(usart_ptr);
+    VSF_HAL_ASSERT(cap.support_set_and_clear_break);
+
+    return vsf_usart_cmd(usart_ptr, VSF_USART_CMD_CLEAR_BREAK, NULL);
 }
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
