@@ -114,22 +114,25 @@ int vsf_lfs_bind_mal(struct lfs_config *c, vk_mal_t *mal)
     c->sync = __vsf_lfs_mal_sync;
     c->block_cycles = 500;
 
-    uint_fast32_t mal_blksz_erase = vk_mal_blksz(mal, 0, 0, VSF_MAL_OP_ERASE);
-    uint_fast32_t mal_blksz_write = vk_mal_blksz(mal, 0, 0, VSF_MAL_OP_WRITE);
-    uint_fast32_t mal_blksz_read = vk_mal_blksz(mal, 0, 0, VSF_MAL_OP_READ);
+    lfs_size_t mal_blksz_erase = vk_mal_blksz(mal, 0, 0, VSF_MAL_OP_ERASE);
+    lfs_size_t mal_blksz_write = vk_mal_blksz(mal, 0, 0, VSF_MAL_OP_WRITE);
+    lfs_size_t mal_blksz_read = vk_mal_blksz(mal, 0, 0, VSF_MAL_OP_READ);
+    lfs_size_t mal_blksz_rw = vsf_max(mal_blksz_read, mal_blksz_write);
 
     c->read_size = mal_blksz_read;
     c->prog_size = mal_blksz_write;
-    c->block_size = mal_blksz_erase;
+    c->cache_size = mal_blksz_rw;
 #ifndef LFS_READONLY
+    c->block_size = mal_blksz_erase;
     c->block_count = mal->size / mal_blksz_erase;
-    c->cache_size = mal_blksz_erase;
 #else
-    c->block_count = mal->size / mal_blksz_read;
-    c->cache_size = mal_blksz_read;
+    c->block_size = mal_blksz_rw;
+    c->block_count = mal->size / mal_blksz_rw;
 #endif
 
     c->lookahead_size = vsf_min(c->block_count, 32);
+    // lookahead_size MUST be multiple of 8
+    c->lookahead_size = (c->lookahead_size + 7) & ~7;
     return 0;
 }
 
