@@ -31,6 +31,10 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_HW_FLASH_PROG_WORD_CNT
+#   error VSF_HW_FLASH_PROG_WORD_CNT MUST be defined in device.h
+#endif
+
 /*\note VSF_HW_FLASH_CFG_MULTI_CLASS is only for drivers for specified device(hw drivers).
  *      For other drivers, please define VSF_${FLASH_IP}_FLASH_CFG_MULTI_CLASS in header file.
  */
@@ -241,27 +245,30 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)(
 ) {
     VSF_HAL_ASSERT(flash_ptr != NULL);
     VSF_HAL_ASSERT(NULL != buffer);
-    VSF_HAL_ASSERT(!(offset & (8 - 1)));
-    VSF_HAL_ASSERT(!(size & (8 - 1)));
+    VSF_HAL_ASSERT(!(offset & ((VSF_HW_FLASH_PROG_WORD_CNT << 2) - 1)));
+    VSF_HAL_ASSERT(!(size & ((VSF_HW_FLASH_PROG_WORD_CNT << 2) - 1)));
 
     FLASH_BANK_TypeDef *reg = flash_ptr->reg;
     flash_ptr->erase0_write1 = 1;
     flash_ptr->offset_orig = flash_ptr->offset_cur = offset;
     flash_ptr->size_orig = flash_ptr->size_cur = size;
     flash_ptr->buffer = buffer;
+    uint32_t *buffer32 = (uint32_t *)buffer;
     uint32_t *addr = (uint32_t *)(flash_ptr->addr + offset);
 
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_unlock)(reg);
-
-    reg->CR |= FLASH_CR_PG;
-    __ISB();
-    __DSB();
-    addr[0] = ((uint32_t *)buffer)[0];
-    addr[1] = ((uint32_t *)buffer)[1];
-    __ISB();
-    __DSB();
-
+        reg->CR |= FLASH_CR_PG;
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_lock)(reg);
+
+    __ISB();
+    __DSB();
+
+    for (uint_fast8_t i = 0; i < VSF_HW_FLASH_PROG_WORD_CNT; i++, addr++, buffer32++) {
+        *addr = *buffer32;
+    }
+
+    __ISB();
+    __DSB();
 
     return VSF_ERR_NONE;
 }
@@ -337,24 +344,28 @@ static void VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(
         // no error
         VSF_HAL_ASSERT(irq_mask & FLASH_SR_EOP);
         if (flash_ptr->erase0_write1) {
-            VSF_HAL_ASSERT(flash_ptr->size_cur >= 8);
-            flash_ptr->size_cur -= 8;
-            flash_ptr->offset_cur += 8;
-            flash_ptr->buffer += 8;
+            VSF_HAL_ASSERT(flash_ptr->size_cur >= (VSF_HW_FLASH_PROG_WORD_CNT << 2));
+            flash_ptr->size_cur -= VSF_HW_FLASH_PROG_WORD_CNT << 2;
+            flash_ptr->offset_cur += VSF_HW_FLASH_PROG_WORD_CNT << 2;
+            flash_ptr->buffer += VSF_HW_FLASH_PROG_WORD_CNT << 2;
             if (flash_ptr->size_cur > 0) {
                 uint32_t *addr = (uint32_t *)(flash_ptr->addr + flash_ptr->offset_cur);
 
                 VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_unlock)(reg);
-
-                reg->CR |= FLASH_CR_PG;
-                __ISB();
-                __DSB();
-                addr[0] = ((uint32_t *)flash_ptr->buffer)[0];
-                addr[1] = ((uint32_t *)flash_ptr->buffer)[1];
-                __ISB();
-                __DSB();
-
+                    reg->CR |= FLASH_CR_PG;
                 VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_lock)(reg);
+
+                __ISB();
+                __DSB();
+
+                uint32_t *buffer32 = (uint32_t *)flash_ptr->buffer;
+                for (uint_fast8_t i = 0; i < VSF_HW_FLASH_PROG_WORD_CNT; i++, addr++, buffer32++) {
+                    *addr = *buffer32;
+                }
+
+                __ISB();
+                __DSB();
+
                 return;
             }
             irq_mask = VSF_FLASH_IRQ_WRITE_MASK;

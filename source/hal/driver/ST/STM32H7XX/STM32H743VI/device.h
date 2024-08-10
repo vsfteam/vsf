@@ -125,6 +125,7 @@
 #define VSF_HW_FLASH_COUNT              2
 #define VSF_HW_FLASH_IRQN               FLASH_IRQn
 #define VSF_HW_FLASH_IRQHandler         FLASH_IRQHandler
+#define VSF_HW_FLASH_PROG_WORD_CNT      FLASH_NB_32BITWORD_IN_FLASHWORD
 #define VSF_HW_FLASH0_ADDR              0x08000000
 #define VSF_HW_FLASH0_REG_BASE          (&FLASH->KEYR1)
 #define VSF_HW_FLASH1_ADDR              0x08100000

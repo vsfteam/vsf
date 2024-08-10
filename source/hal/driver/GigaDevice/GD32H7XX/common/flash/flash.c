@@ -210,15 +210,14 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)(
 
     FMC_KEY = UNLOCK_KEY0;
     FMC_KEY = UNLOCK_KEY1;
+    FMC_CTL |= FMC_CTL_PG | FMC_CTL_LK;
 
-    FMC_CTL |= FMC_CTL_PG;
     __ISB();
     __DSB();
     REG32(addr) = ((uint32_t *)buffer)[0];
     REG32(addr + 4U) = ((uint32_t *)buffer)[1];
     __ISB();
     __DSB();
-    FMC_CTL |= FMC_CTL_LK;
 
     return VSF_ERR_NONE;
 }
@@ -303,15 +302,14 @@ static void VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(
 
                 FMC_KEY = UNLOCK_KEY0;
                 FMC_KEY = UNLOCK_KEY1;
+                FMC_CTL |= FMC_CTL_PG | FMC_CTL_LK;
 
-                FMC_CTL |= FMC_CTL_PG;
                 __ISB();
                 __DSB();
                 REG32(addr) = ((uint32_t *)flash_ptr->buffer)[0];
                 REG32(addr + 4U) = ((uint32_t *)flash_ptr->buffer)[1];
                 __ISB();
                 __DSB();
-                FMC_CTL |= FMC_CTL_LK;
                 return;
             }
             irq_mask = VSF_FLASH_IRQ_WRITE_MASK;
