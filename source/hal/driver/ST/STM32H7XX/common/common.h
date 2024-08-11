@@ -46,10 +46,10 @@
 
 /*============================ TYPES =========================================*/
 
-typedef enum vsf_hw_peripheral_clk_t {
-    VSF_HW_CLK_USART16                  = VSF_HW_CLKRST_REGION(0x15, 3, 3), // USART16SEL IN RCC.D2CCIP2R
-    VSF_HW_CLK_USART234578              = VSF_HW_CLKRST_REGION(0x15, 0, 3), // USART234578SEL IN RCC.D2CCIP2R
-} vsf_hw_peripheral_clk_t;
+typedef enum vsf_hw_peripheral_clksel_t {
+    VSF_HW_CLKSEL_USART16               = VSF_HW_CLKRST_REGION(0x15, 3, 3), // USART16SEL IN RCC.D2CCIP2R
+    VSF_HW_CLKSEL_USART234578           = VSF_HW_CLKRST_REGION(0x15, 0, 3), // USART234578SEL IN RCC.D2CCIP2R
+} vsf_hw_peripheral_clksel_t;
 
 typedef enum vsf_hw_peripheral_rst_t {
     VSF_HW_RST_USART1                   = VSF_HW_CLKRST_REGION(0x26, 4, 1), // USART1RST IN RCC.APB2RSTR
@@ -155,7 +155,7 @@ extern const vsf_hw_clk_t VSF_HW_CLK_PCLK4;
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern uint32_t vsf_hw_clk_get(const vsf_hw_clk_t *clk);
+extern uint32_t vsf_hw_clk_get_freq(const vsf_hw_clk_t *clk);
 
 extern void vsf_hw_clkrst_region_set(uint32_t region, uint_fast8_t value);
 extern uint_fast8_t vsf_hw_clkrst_region_get(uint32_t region);

@@ -55,7 +55,7 @@ typedef struct VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) {
     vsf_usart_t             vsf_usart;
 #endif
     uint32_t                reg;
-    rcu_clock_freq_enum     clk;
+    const vsf_hw_clk_t      *clk;
     vsf_hw_peripheral_en_t  en;
     vsf_hw_peripheral_rst_t rst;
     bool                    support_sync;
@@ -86,7 +86,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     VSF_HAL_ASSERT(!(cfg_ptr->mode & __VSF_HW_USART_NOT_SUPPORT_MASK));
 
     uint32_t reg = usart_ptr->reg;
-    uint32_t uclk = rcu_clock_freq_get(usart_ptr->clk);
+    uint32_t uclk = vsf_hw_clk_get_freq(usart_ptr->clk);
     uint32_t over8 = (cfg_ptr->mode & VSF_USART_OVERSAMPLE_MASK) >> 3;
     cfg_ptr->mode &= ~VSF_USART_OVERSAMPLE_MASK;
     uint32_t intdiv = 0U, fradiv = 0U, udiv = 0U;
@@ -382,7 +382,7 @@ int_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t)                            \
         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __IDX) = {               \
         .reg                = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _REG_BASE),\
-        .clk                = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _CLK),\
+        .clk                = &VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _CLK),\
         .en                 = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _EN),\
         .rst                = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _RST),\
         .support_sync       = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _SYNC),\

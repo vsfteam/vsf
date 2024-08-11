@@ -46,37 +46,37 @@
 
 /*============================ TYPES =========================================*/
 
-typedef enum vsf_hw_peripheral_clk_t {
+typedef enum vsf_hw_peripheral_clksel_t {
     // RCU.CFG1
-    VSF_HW_CLK_HPDF                     = VSF_HW_CLKRST_REGION(0x23, 31, 1),// HPDFSEL in RCU.CFG1
-    VSF_HW_CLK_TIMER                    = VSF_HW_CLKRST_REGION(0x23, 24, 1),// TIMERSEL in RCU.CFG1
-    VSF_HW_CLK_USART5                   = VSF_HW_CLKRST_REGION(0x23, 22, 2),// USART5SEL in RCU.CFG1
-    VSF_HW_CLK_USART2                   = VSF_HW_CLKRST_REGION(0x23, 20, 2),// USART2SEL in RCU.CFG1
-    VSF_HW_CLK_USART1                   = VSF_HW_CLKRST_REGION(0x23, 18, 2),// USART1SEL in RCU.CFG1
-    VSF_HW_CLK_PER                      = VSF_HW_CLKRST_REGION(0x23, 14, 2),// PERSEL in RCU.CFG1
-    VSF_HW_CLK_CAN2                     = VSF_HW_CLKRST_REGION(0x23, 12, 2),// CAN2SEL in RCU.CFG1
-    VSF_HW_CLK_CAN1                     = VSF_HW_CLKRST_REGION(0x23, 10, 2),// CAN1SEL in RCU.CFG1
-    VSF_HW_CLK_CAN0                     = VSF_HW_CLKRST_REGION(0x23, 8, 2), // CAN0SEL in RCU.CFG1
-    VSF_HW_CLK_RSPDIF                   = VSF_HW_CLKRST_REGION(0x23, 4, 2), // RSPDIFSEL in RCU.CFG1
-    VSF_HW_CLK_USART0                   = VSF_HW_CLKRST_REGION(0x23, 0, 2), // USART0SEL in RCU.CFG1
+    VSF_HW_CLKSEL_HPDF                  = VSF_HW_CLKRST_REGION(0x23, 31, 1),// HPDFSEL in RCU.CFG1
+    VSF_HW_CLKSEL_TIMER                 = VSF_HW_CLKRST_REGION(0x23, 24, 1),// TIMERSEL in RCU.CFG1
+    VSF_HW_CLKSEL_USART5                = VSF_HW_CLKRST_REGION(0x23, 22, 2),// USART5SEL in RCU.CFG1
+    VSF_HW_CLKSEL_USART2                = VSF_HW_CLKRST_REGION(0x23, 20, 2),// USART2SEL in RCU.CFG1
+    VSF_HW_CLKSEL_USART1                = VSF_HW_CLKRST_REGION(0x23, 18, 2),// USART1SEL in RCU.CFG1
+    VSF_HW_CLKSEL_PER                   = VSF_HW_CLKRST_REGION(0x23, 14, 2),// PERSEL in RCU.CFG1
+    VSF_HW_CLKSEL_CAN2                  = VSF_HW_CLKRST_REGION(0x23, 12, 2),// CAN2SEL in RCU.CFG1
+    VSF_HW_CLKSEL_CAN1                  = VSF_HW_CLKRST_REGION(0x23, 10, 2),// CAN1SEL in RCU.CFG1
+    VSF_HW_CLKSEL_CAN0                  = VSF_HW_CLKRST_REGION(0x23, 8, 2), // CAN0SEL in RCU.CFG1
+    VSF_HW_CLKSEL_RSPDIF                = VSF_HW_CLKRST_REGION(0x23, 4, 2), // RSPDIFSEL in RCU.CFG1
+    VSF_HW_CLKSEL_USART0                = VSF_HW_CLKRST_REGION(0x23, 0, 2), // USART0SEL in RCU.CFG1
 
     // RCU.CFG2
-    VSF_HW_CLK_SAI2B1                   = VSF_HW_CLKRST_REGION(0x24, 28, 3),// SAI2B1SEL in RCU.CFG2
-    VSF_HW_CLK_SAI2B0                   = VSF_HW_CLKRST_REGION(0x24, 24, 3),// SAI2B0SEL in RCU.CFG2
-    VSF_HW_CLK_SAI1                     = VSF_HW_CLKRST_REGION(0x24, 20, 3),// SAI1SEL in RCU.CFG2
-    VSF_HW_CLK_SAI0                     = VSF_HW_CLKRST_REGION(0x24, 16, 3),// SAI0SEL in RCU.CFG2
-    VSF_HW_CLK_CKOUT1                   = VSF_HW_CLKRST_REGION(0x24, 12, 3),// CKOUT1SEL in RCU.CFG2
-    VSF_HW_CLK_CKOUT0                   = VSF_HW_CLKRST_REGION(0x24, 4, 3), // CKOUT0SEL in RCU.CFG2
+    VSF_HW_CLKSEL_SAI2B1                = VSF_HW_CLKRST_REGION(0x24, 28, 3),// SAI2B1SEL in RCU.CFG2
+    VSF_HW_CLKSEL_SAI2B0                = VSF_HW_CLKRST_REGION(0x24, 24, 3),// SAI2B0SEL in RCU.CFG2
+    VSF_HW_CLKSEL_SAI1                  = VSF_HW_CLKRST_REGION(0x24, 20, 3),// SAI1SEL in RCU.CFG2
+    VSF_HW_CLKSEL_SAI0                  = VSF_HW_CLKRST_REGION(0x24, 16, 3),// SAI0SEL in RCU.CFG2
+    VSF_HW_CLKSEL_CKOUT1                = VSF_HW_CLKRST_REGION(0x24, 12, 3),// CKOUT1SEL in RCU.CFG2
+    VSF_HW_CLKSEL_CKOUT0                = VSF_HW_CLKRST_REGION(0x24, 4, 3), // CKOUT0SEL in RCU.CFG2
 
     // RCU.CFG3
-    VSF_HW_CLK_ADC2                     = VSF_HW_CLKRST_REGION(0x25, 28, 2),// ADC2SEL in RCU.CFG3
-    VSF_HW_CLK_ADC1                     = VSF_HW_CLKRST_REGION(0x25, 26, 2),// ADC1SEL in RCU.CFG3
-    VSF_HW_CLK_DSPWUS                   = VSF_HW_CLKRST_REGION(0x25, 24, 1),// DSPWUSSEL in RCU.CFG3
-    VSF_HW_CLK_SDIO1                    = VSF_HW_CLKRST_REGION(0x25, 12, 1),// SDIO1SEL in RCU.CFG3
-    VSF_HW_CLK_I2C3                     = VSF_HW_CLKRST_REGION(0x25, 4, 2), // I2C3SEL in RCU.CFG3
-    VSF_HW_CLK_I2C2                     = VSF_HW_CLKRST_REGION(0x25, 2, 2), // I2C2SEL in RCU.CFG3
-    VSF_HW_CLK_I2C1                     = VSF_HW_CLKRST_REGION(0x25, 0, 2), // I2C1SEL in RCU.CFG3
-} vsf_hw_peripheral_clk_t;
+    VSF_HW_CLKSEL_ADC2                  = VSF_HW_CLKRST_REGION(0x25, 28, 2),// ADC2SEL in RCU.CFG3
+    VSF_HW_CLKSEL_ADC1                  = VSF_HW_CLKRST_REGION(0x25, 26, 2),// ADC1SEL in RCU.CFG3
+    VSF_HW_CLKSEL_DSPWUS                = VSF_HW_CLKRST_REGION(0x25, 24, 1),// DSPWUSSEL in RCU.CFG3
+    VSF_HW_CLKSEL_SDIO1                 = VSF_HW_CLKRST_REGION(0x25, 12, 1),// SDIO1SEL in RCU.CFG3
+    VSF_HW_CLKSEL_I2C3                  = VSF_HW_CLKRST_REGION(0x25, 4, 2), // I2C3SEL in RCU.CFG3
+    VSF_HW_CLKSEL_I2C2                  = VSF_HW_CLKRST_REGION(0x25, 2, 2), // I2C2SEL in RCU.CFG3
+    VSF_HW_CLKSEL_I2C1                  = VSF_HW_CLKRST_REGION(0x25, 0, 2), // I2C1SEL in RCU.CFG3
+} vsf_hw_peripheral_clksel_t;
 
 typedef enum vsf_hw_peripheral_rst_t {
     // RCU.AHB1RST
@@ -331,34 +331,53 @@ enum {
 };
 
 typedef struct vsf_hw_clk_t vsf_hw_clk_t;
-struct vsf_hw_clk_t {
-    uint32_t clksel_region;
-    uint32_t clkprescaler_region;
-    uint32_t clken_region;
-    uint32_t clkrdy_region;
-
-    union {
-        const vsf_hw_clk_t **clksel_mapper;
-        uint32_t clk_freq_hz;
-        const vsf_hw_clk_t *clksrc;
-    };
-    union {
-        const uint8_t *clkprescaler_mapper;
-        uint32_t (*getclk)(const vsf_hw_clk_t *clk, uint32_t clksrc_freq_hz, uint32_t prescaler);
-    };
-
-    uint8_t clktype;
-    uint8_t clkprescaler_type;
-    uint8_t clkprescaler_min;
-    uint8_t clkprescaler_max;
-};
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
+extern const vsf_hw_clk_t VSF_HW_CLK_HXTAL;
+extern const vsf_hw_clk_t VSF_HW_CLK_LXTAL;
+extern const vsf_hw_clk_t VSF_HW_CLK_IRC64MDIV;
+extern const vsf_hw_clk_t VSF_HW_CLK_LPIRC4M;
+extern const vsf_hw_clk_t VSF_HW_CLK_IRC32K;
+
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL0P;
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL0Q;
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL0R;
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL1P;
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL1Q;
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL1R;
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL2P;
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL2Q;
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL2R;
+
+extern const vsf_hw_clk_t VSF_HW_CLK_RTC;
+extern const vsf_hw_clk_t VSF_HW_CLK_SYS;
+extern const vsf_hw_clk_t VSF_HW_CLK_AHB;
+extern const vsf_hw_clk_t VSF_HW_CLK_PER;
+
+extern const vsf_hw_clk_t VSF_HW_CLK_PCLK1;
+#define VSF_HW_CLK_APB1         VSF_HW_CLK_PCLK1
+extern const vsf_hw_clk_t VSF_HW_CLK_PCLK2;
+#define VSF_HW_CLK_APB2         VSF_HW_CLK_PCLK2
+extern const vsf_hw_clk_t VSF_HW_CLK_PCLK3;
+#define VSF_HW_CLK_APB3         VSF_HW_CLK_PCLK3
+extern const vsf_hw_clk_t VSF_HW_CLK_PCLK4;
+#define VSF_HW_CLK_APB4         VSF_HW_CLK_PCLK4
+
+extern const vsf_hw_clk_t VSF_HW_CLK_USART0;
+extern const vsf_hw_clk_t VSF_HW_CLK_USART1;
+extern const vsf_hw_clk_t VSF_HW_CLK_USART2;
+#define VSF_HW_CLK_UART3        VSF_HW_CLK_APB1
+#define VSF_HW_CLK_UART4        VSF_HW_CLK_APB1
+extern const vsf_hw_clk_t VSF_HW_CLK_USART5;
+#define VSF_HW_CLK_UART6        VSF_HW_CLK_APB1
+#define VSF_HW_CLK_UART7        VSF_HW_CLK_APB1
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern uint32_t vsf_hw_clk_get(const vsf_hw_clk_t *clk);
+extern uint32_t vsf_hw_clk_get_freq(const vsf_hw_clk_t *clk);
 
 extern void vsf_hw_clkrst_region_set(uint32_t region, uint_fast8_t value);
 extern uint_fast8_t vsf_hw_clkrst_region_get(uint32_t region);
