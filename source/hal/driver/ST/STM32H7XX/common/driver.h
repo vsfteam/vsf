@@ -27,7 +27,7 @@
 /*============================ INCLUDES ======================================*/
 
 #       include "hal/vsf_hal_cfg.h"
-#       include "./device.h"
+#       include "../__device.h"
 
 // for common hal structure/enum/etc, include before user driver headers below.
 #       include "hal/driver/common/template/vsf_template_hal_driver.h"
@@ -36,7 +36,10 @@
 #       include "hal/driver/common/swi/vsf_swi_template.h"
 
 // For peripherials
-//#       include "../common/io/io.h"
+#       include "./io/io.h"
+#       include "./gpio/gpio.h"
+#       include "./flash/flash.h"
+#       include "./usart/usart.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

@@ -26,7 +26,7 @@
 #elif   defined(__GD32E103__)
 #   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32E10X/GD32E103/driver.h"
 #elif   defined(__GD32H759IMT6__)
-#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32H7XX/GD32H759/driver.h"
+#   define  VSF_GIGADEVICE_DRIVER_HEADER    "./GD32H7XX/common/driver.h"
 #else
 #   error No supported device found.
 #endif

@@ -24,10 +24,8 @@
 #   define  VSF_ST_DRIVER_HEADER       "./STM32F730/STM32F730R8/driver.h"
 #elif   defined(__STM32F103ZE__)
 #   define  VSF_ST_DRIVER_HEADER       "./STM32F103/STM32F103ZE/driver.h"
-#elif   defined(__STM32H743VI__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32H7XX/STM32H743VI/driver.h"
-#elif   defined(__STM32H743XI__)
-#   define  VSF_ST_DRIVER_HEADER       "./STM32H7XX/STM32H743XI/driver.h"
+#elif   defined(__STM32H743XI__) || defined(__STM32H743VI__)
+#   define  VSF_ST_DRIVER_HEADER       "./STM32H7XX/common/driver.h"
 #else
 #   error No supported device found.
 #endif
