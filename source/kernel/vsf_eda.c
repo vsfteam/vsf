@@ -58,7 +58,7 @@ typedef struct vsf_local_t {
 
         vsf_timer_queue_t   timq;
 #   if VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS
-#       ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+#       if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_NONE
         vsf_systimer_tick_t pre_tick;
 #       endif
         // TODO: use vsf_atomic_t instead

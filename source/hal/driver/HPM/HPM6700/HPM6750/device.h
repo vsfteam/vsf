@@ -27,7 +27,9 @@
 // __vsf_main_entry is called in reset_handler
 #define VSF_KERNEL_CFG_NON_STANDALONE   ENABLED
 
-#define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
+#ifndef VSF_SYSTIMER_CFG_IMPL_MODE
+#   define VSF_SYSTIMER_CFG_IMPL_MODE   VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
+#endif
 #define VSF_ARCH_PRI_NUM                7
 // do not use PLICSW
 #define VSF_ARCH_SWI_NUM                0

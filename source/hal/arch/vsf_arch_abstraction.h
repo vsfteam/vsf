@@ -31,10 +31,11 @@ extern "C" {
 
 //! \name different models to implement systimer
 //! @{
-#define VSF_SYSTIMER_IMPL_REQUEST_RESPONSE                      0
-#define VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER                     1
-#define VSF_SYSTIMER_IMPL_WITH_COMP_TIMER                       2
-#define VSF_SYSTIMER_IMPL_TICK_MODE                             3
+#define VSF_SYSTIMER_IMPL_NONE                                  0
+#define VSF_SYSTIMER_IMPL_REQUEST_RESPONSE                      1
+#define VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER                     2
+#define VSF_SYSTIMER_IMPL_WITH_COMP_TIMER                       3
+#define VSF_SYSTIMER_IMPL_TICK_MODE                             4
 //! @}
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

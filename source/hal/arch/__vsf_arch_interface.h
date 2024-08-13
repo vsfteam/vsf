@@ -51,7 +51,7 @@ extern "C" {
 extern bool vsf_arch_low_level_init(void);
 
 
-#ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+#if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_NONE
 
 extern void vsf_systimer_prio_set(vsf_arch_prio_t priority);
 

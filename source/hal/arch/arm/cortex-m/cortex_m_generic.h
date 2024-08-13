@@ -72,7 +72,7 @@ extern "C" {
 
 #ifndef VSF_SYSTIMER_CFG_IMPL_MODE
 //! \note by default, use tickless mode
-#   define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+#   define VSF_SYSTIMER_CFG_IMPL_MODE   VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 #endif
 #define __VSF_ARCH_SYSTIMER_BITS        24
 

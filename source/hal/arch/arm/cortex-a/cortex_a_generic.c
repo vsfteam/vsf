@@ -45,7 +45,7 @@ bool vsf_arch_low_level_init(void)
  * System Timer Implementation                                                *
  *----------------------------------------------------------------------------*/
 
-//#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 
 vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void)
 {
@@ -107,7 +107,7 @@ vsf_err_t vsf_systimer_low_level_init(uintmax_t ticks)
     return VSF_ERR_NOT_SUPPORT;
 }
 
-//#endif
+#endif
 
 /*----------------------------------------------------------------------------*
  * SWI / PendSV                                                               *

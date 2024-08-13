@@ -60,11 +60,13 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
-#if defined(VSF_SYSTIMER_CFG_IMPL_MODE) && (VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE)
+#if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_CFG_IMPL_NONE
+#   if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE
 typedef uint32_t vsf_systimer_tick_t;
 typedef int32_t vsf_systimer_tick_signed_t;
-#else
+#   else
 typedef uint64_t vsf_systimer_tick_t;
+#   endif
 #endif
 typedef uint32_t vsf_gint_state_t;
 

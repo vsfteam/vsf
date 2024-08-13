@@ -101,7 +101,7 @@ bool vsf_arch_low_level_init(void)
  * System Timer Implementation                                                *
  *----------------------------------------------------------------------------*/
 
-//#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 
 vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void)
 {
@@ -156,10 +156,7 @@ void vsf_systimer_set_reload_value(vsf_systimer_tick_t tick_cnt)
     vsf_systick_set_reload((uint32_t)tick_cnt);
 }
 
-#if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-VSF_CAL_ROOT
-#endif
-VSF_CAL_ISR(SysTick_Handler)
+VSF_CAL_ROOT VSF_CAL_ISR(SysTick_Handler)
 {
     vsf_systimer_ovf_evt_handler();
 }
@@ -190,7 +187,7 @@ void vsf_systimer_prio_set(vsf_arch_prio_t priority)
     NVIC_SetPriority(SysTick_IRQn, priority);
 }
 
-//#endif
+#endif
 
 /*----------------------------------------------------------------------------*
  * SWI / PendSV                                                               *

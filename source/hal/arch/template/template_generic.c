@@ -61,7 +61,7 @@ bool vsf_arch_low_level_init(void)
  * System Timer Implementation                                                *
  *----------------------------------------------------------------------------*/
 
-#ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+#if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_NONE
 #   if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 
 vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void)

@@ -45,13 +45,15 @@ extern "C" {
 #define VSF_ARCH_SWI_NUM                0
 
 // template arch supports no systimer
-//#define VSF_SYSTIMER_CFG_IMPL_MODE      VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+//#ifndef VSF_SYSTIMER_CFG_IMPL_MODE
+//#   define VSF_SYSTIMER_CFG_IMPL_MODE     VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+//#endif
 //#define __VSF_ARCH_SYSTIMER_BITS        0
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+#if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_NONE
 typedef uint64_t vsf_systimer_tick_t;
 #endif
 

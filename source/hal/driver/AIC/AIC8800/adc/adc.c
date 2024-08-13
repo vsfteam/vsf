@@ -33,6 +33,10 @@
 
 /*============================ MACROS ========================================*/
 
+#if VSF_USE_KERNEL != ENABLED || VSF_KERNEL_CFG_EDA_SUPPORT_TIMER != ENABLED
+#   error VSF_USE_KERNEL and VSF_KERNEL_CFG_EDA_SUPPORT_TIMER are necessary for AIC8800M adc
+#endif
+
 #if PLF_PMIC_VER_LITE == 0
 #   error "TODO"
 #endif

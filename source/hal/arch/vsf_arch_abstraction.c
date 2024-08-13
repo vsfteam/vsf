@@ -142,7 +142,7 @@ typedef struct __vsf_systimer_t {
 
 /*============================ PROTOTYPES ====================================*/
 
-#ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+#if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_NONE
 #   if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_TICK_MODE
 extern void vsf_systimer_evthandler(vsf_systimer_tick_t tick);
 #   else
@@ -539,7 +539,7 @@ vsf_err_t vsf_swi_init(     uint_fast8_t idx,
  * System Timer                                                               *
  *----------------------------------------------------------------------------*/
 
-#ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+#if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_NONE
 #   if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_TICK_MODE
 VSF_CAL_WEAK(vsf_systimer_evthandler)
 void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
@@ -1081,7 +1081,7 @@ bool vsf_arch_init(void)
 
     // do not initialize systimer here, because kernel is not ready to accept systimer interrupt now
     //  vsf_systimer_init will be called in __vsf_systimer_init
-#ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+#if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_NONE
 //    vsf_systimer_init();
 #endif
     return true;

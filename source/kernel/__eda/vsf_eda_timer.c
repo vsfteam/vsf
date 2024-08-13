@@ -44,7 +44,7 @@
 /*============================ PROTOTYPES ====================================*/
 
 #if     VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
-#   ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+#   if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_NONE
 #       if      (VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS)   \
             &&  (VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE)
 #           error systimer is in tick mode while tickless mode is required on kernel
@@ -59,7 +59,7 @@
 #   endif
 
 #   if      VSF_KERNEL_CFG_TIMER_MODE == VSF_KERNEL_CFG_TIMER_MODE_TICKLESS     \
-        &&  !defined(VSF_SYSTIMER_CFG_IMPL_MODE)
+        &&  (VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_NONE)
 extern bool vsf_systimer_is_due(vsf_systimer_tick_t due);
 extern vsf_err_t vsf_systimer_start(void);
 extern vsf_systimer_tick_t vsf_systimer_get(void);
@@ -91,7 +91,7 @@ static void __vsf_systimer_wakeup(void)
     }
 }
 
-#ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+#if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_NONE
 static void __vsf_systimer_update(bool force)
 {
     vsf_teda_t *teda;
@@ -205,7 +205,7 @@ static void __vsf_systimer_init(void)
     vsf_callback_timq_init(&__vsf_eda.timer.callback_timq_done);
 #endif
 
-#ifdef VSF_SYSTIMER_CFG_IMPL_MODE
+#if VSF_SYSTIMER_CFG_IMPL_MODE != VSF_SYSTIMER_IMPL_NONE
     vsf_systimer_init();
 #endif
 }

@@ -68,7 +68,7 @@ bool vsf_arch_low_level_init(void)
 /*----------------------------------------------------------------------------*
  * System Timer                                                               *
  *----------------------------------------------------------------------------*/
-//#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
 vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void)
 {
     vsf_systimer_tick_t value = ((uint32_t)TH0 << 8) + TL0;
@@ -178,7 +178,7 @@ void vsf_systimer_prio_set(vsf_arch_prio_t priority)
 
 }
 
-//#endif
+#endif
 
 /*----------------------------------------------------------------------------*
  * SWI / PendSV                                                               *
