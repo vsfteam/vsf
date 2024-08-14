@@ -75,7 +75,7 @@ void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_config_pin)(
     uint32_t ctl = (mode >> 0) & 3;
     uint32_t omode = (mode >> 2) & 1;
     uint32_t pud = (mode >> 3) & 3;
-    uint32_t ospd = (mode >> 4) & 3;
+    uint32_t ospd = (mode >> 5) & 3;
     uint32_t current_pin_mask;
 
     for (int i = 0; i < VSF_HW_GPIO_PIN_COUNT; i++) {

@@ -73,7 +73,7 @@ void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_config_pin)(
     uint32_t offset_len2;
     uint32_t otype = (mode >> 2) & 1;
     uint32_t pupd = (mode >> 3) & 3;
-    uint32_t ospeed = (mode >> 4) & 3;
+    uint32_t ospeed = (mode >> 5) & 3;
     uint32_t current_pin_mask;
 
     mode = (mode >> 0) & 3;
