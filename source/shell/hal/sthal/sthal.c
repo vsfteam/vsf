@@ -48,22 +48,16 @@ HAL_TickFreqTypeDef uwTickFreq = HAL_TICK_FREQ_DEFAULT;
 
 
 #if VSF_STHAL_TICK_USE_SYSTIMER == ENABLED
-
 #if VSF_STHAL_USE_CALL_SYSTIMER_INIT == ENABLED
-void vsf_systimer_on_tick(void)
-{
 
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
+{
+    vsf_systimer_set_idle();
 }
+#else
+#   error "TODO: support more systimer mode"
 #endif
-
-__weak uint32_t HAL_GetTick(void)
-{
-    extern vsf_systimer_tick_t vsf_systimer_get(void);
-    extern vsf_systimer_tick_t vsf_systimer_tick_to_ms(vsf_systimer_tick_t tick);
-
-    vsf_systimer_tick_t tick = vsf_systimer_get();
-    return vsf_systimer_tick_to_ms(tick);
-}
 
 __weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
@@ -115,9 +109,12 @@ __weak void HAL_ResumeTick(void)
 {
     VSF_HAL_ASSERT(0);
 }
-
-#else
-#   error "TODO"
+#endif
+__weak uint32_t HAL_GetTick(void)
+{
+    vsf_systimer_tick_t tick = vsf_systimer_get();
+    return vsf_systimer_tick_to_ms(tick);
+}
 #endif
 
 HAL_StatusTypeDef HAL_Init(void)
@@ -125,12 +122,14 @@ HAL_StatusTypeDef HAL_Init(void)
 #if VSF_STHAL_USE_VSFHAL_INIT == ENABLED
     vsf_hal_init();
 #endif
-    
-#if VSF_STHAL_USE_CALL_SYSTIMER_INIT == ENABLED
-    extern vsf_err_t vsf_systimer_init(void);
-    extern vsf_err_t vsf_systimer_low_level_enable(void);
+
+#if (VSF_STHAL_TICK_USE_SYSTIMER == ENABLED) && VSF_STHAL_USE_CALL_SYSTIMER_INIT == ENABLED
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
     vsf_systimer_init();
-    vsf_systimer_low_level_enable();
+    vsf_systimer_set_idle();
+#else
+#   error "TODO: support more systimer mode"
+#endif
 #endif
 
     HAL_MspInit();
