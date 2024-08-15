@@ -10621,12 +10621,12 @@
                         </file>
                     </group>
                     <group>
-                        <name>mmc_mal</name>
+                        <name>sdmmc_mal</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\mmc_mal\vsf_mmc_mal.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\sdmmc_mal\vsf_sdmmc_mal.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\mmc_mal\vsf_mmc_mal.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\sdmmc_mal\vsf_sdmmc_mal.h</name>
                         </file>
                     </group>
                     <group>
@@ -12109,12 +12109,12 @@
                             </file>
                         </group>
                         <group>
-                            <name>mmc</name>
+                            <name>sdio</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\mmc\mmc.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\sdio\sdio.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\mmc\mmc.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\sdio\sdio.h</name>
                             </file>
                         </group>
                         <group>
@@ -14121,21 +14121,18 @@
                         </file>
                     </group>
                     <group>
-                        <name>mmc</name>
+                        <name>sdio</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\mmc\mmc_common.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\sdio\sdio_common.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\mmc\mmc_probe.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\sdio\sdio_probe.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\mmc\mmc_probe.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\sdio\sdio_probe.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\mmc\mmc_template.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\mmc\mmc_template.inc</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\sdio\sdio_template.h</name>
                         </file>
                     </group>
                     <group>
@@ -14252,9 +14249,6 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_io.h</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_mmc.h</name>
-                        </file>
-                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_pm.h</name>
                         </file>
                         <file>
@@ -14265,6 +14259,9 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_rtc.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_sdio.h</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\template\vsf_template_spi.h</name>
@@ -15305,12 +15302,12 @@
                         </file>
                     </group>
                     <group>
-                        <name>mmc</name>
+                        <name>sdio</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\mmc\vsf_remapped_mmc.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\sdio\vsf_remapped_sdio.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\mmc\vsf_remapped_mmc.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\sdio\vsf_remapped_sdio.h</name>
                         </file>
                     </group>
                     <group>

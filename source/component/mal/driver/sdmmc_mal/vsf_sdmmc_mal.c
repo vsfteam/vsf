@@ -187,9 +187,9 @@ __vsf_component_peda_ifs_entry(__vk_sdmmc_mal_read, vk_mal_read)
         pthis->eda = vsf_eda_get_cur();
         VSF_FS_ASSERT(pthis->eda != NULL);
         vsf_sdio_host_transact_start(pthis->sdio, &(vsf_sdio_trans_t){
-            .cmd                = block_num > 1 ? SDIO_READ_MULTIPLE_BLOCK : SDIO_READ_SINGLE_BLOCK,
+            .cmd                = block_num > 1 ? MMC_READ_MULTIPLE_BLOCK : MMC_READ_SINGLE_BLOCK,
             .arg                = pthis->high_capacity ? block_start : vsf_local.addr,
-            .op                 = block_num > 1 ? SDIO_READ_MULTIPLE_BLOCK_OP : SDIO_READ_SINGLE_BLOCK_OP,
+            .op                 = block_num > 1 ? MMC_READ_MULTIPLE_BLOCK_OP : MMC_READ_SINGLE_BLOCK_OP,
             .block_size_bits    = pthis->csd.sd_v2.READ_BL_LEN,
             .buffer             = vsf_local.buff,
             .count              = vsf_local.size,
@@ -219,9 +219,9 @@ __vsf_component_peda_ifs_entry(__vk_sdmmc_mal_write, vk_mal_write)
         pthis->eda = vsf_eda_get_cur();
         VSF_FS_ASSERT(pthis->eda != NULL);
         vsf_sdio_host_transact_start(pthis->sdio, &(vsf_sdio_trans_t){
-            .cmd                = block_num > 1 ? SDIO_WRITE_MULTIPLE_BLOCK : SDIO_WRITE_BLOCK,
+            .cmd                = block_num > 1 ? MMC_WRITE_MULTIPLE_BLOCK : MMC_WRITE_BLOCK,
             .arg                = pthis->high_capacity ? block_start : vsf_local.addr,
-            .op                 = block_num > 1 ? SDIO_WRITE_MULTIPLE_BLOCK_OP : SDIO_WRITE_BLOCK_OP,
+            .op                 = block_num > 1 ? MMC_WRITE_MULTIPLE_BLOCK_OP : MMC_WRITE_BLOCK_OP,
             .block_size_bits    = pthis->csd.sd_v2.READ_BL_LEN,
             .buffer             = vsf_local.buff,
             .count              = vsf_local.size,

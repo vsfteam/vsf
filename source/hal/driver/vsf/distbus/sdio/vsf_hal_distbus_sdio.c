@@ -19,10 +19,10 @@
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_MMC == ENABLED && VSF_HAL_DISTBUS_USE_MMC == ENABLED
+#if VSF_HAL_USE_SDIO == ENABLED && VSF_HAL_DISTBUS_USE_SDIO == ENABLED
 
 #define __VSF_DISTBUS_CLASS_INHERIT__
-#define __VSF_HAL_DISTBUS_MMC_CLASS_IMPLEMENT
+#define __VSF_HAL_DISTBUS_SDIO_CLASS_IMPLEMENT
 #include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
@@ -30,23 +30,23 @@
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
-static bool __vsf_hal_distbus_mmc_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg);
+static bool __vsf_hal_distbus_sdio_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static const vsf_distbus_service_info_t __vsf_hal_distbus_mmc_info = {
+static const vsf_distbus_service_info_t __vsf_hal_distbus_sdio_info = {
     .mtu                = VSF_HAL_DISTBUS_CFG_MTU,
     .type               = 0,
-    .addr_range         = VSF_HAL_DISTBUS_MMC_CMD_ADDR_RANGE,
-    .handler            = __vsf_hal_distbus_mmc_msghandler,
+    .addr_range         = VSF_HAL_DISTBUS_SDIO_CMD_ADDR_RANGE,
+    .handler            = __vsf_hal_distbus_sdio_msghandler,
 };
 
 /*============================ IMPLEMENTATION ================================*/
 
-static bool __vsf_hal_distbus_mmc_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
+static bool __vsf_hal_distbus_sdio_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
-    vsf_hal_distbus_mmc_t *mmc = vsf_container_of(service, vsf_hal_distbus_mmc_t, service);
+    vsf_hal_distbus_sdio_t *sdio = vsf_container_of(service, vsf_hal_distbus_sdio_t, service);
     uint8_t *data = (uint8_t *)&msg->header + sizeof(msg->header);
     bool retain_msg = false;
 
@@ -58,11 +58,11 @@ static bool __vsf_hal_distbus_mmc_msghandler(vsf_distbus_t *distbus, vsf_distbus
     return retain_msg;
 }
 
-uint32_t vsf_hal_distbus_mmc_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_mmc_t *mmc, void *info, uint32_t infolen)
+uint32_t vsf_hal_distbus_sdio_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_sdio_t *sdio, void *info, uint32_t infolen)
 {
-    mmc->distbus = distbus;
-    mmc->service.info = &__vsf_hal_distbus_mmc_info;
-    vsf_distbus_register_service(distbus, &mmc->service);
+    sdio->distbus = distbus;
+    sdio->service.info = &__vsf_hal_distbus_sdio_info;
+    vsf_distbus_register_service(distbus, &sdio->service);
     return 0;
 }
 

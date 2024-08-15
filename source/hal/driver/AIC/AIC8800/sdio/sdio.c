@@ -153,7 +153,7 @@ vsf_sdio_capability_t vsf_hw_sdio_capability(vsf_hw_sdio_t *sdio_ptr)
     return capability;
 }
 
-vsf_err_t vsf_hw_sdio_set_clock(vsf_hw_sdio_t *sdio_ptr, uint32_t clock_hz)
+vsf_err_t vsf_hw_sdio_set_clock(vsf_hw_sdio_t *sdio_ptr, uint32_t clock_hz, bool is_ddr)
 {
     AIC_SDMMC_TypeDef *reg = sdio_ptr->sdio_const->reg;
     extern uint32_t SystemCoreClock;

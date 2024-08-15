@@ -1084,9 +1084,6 @@
     <Filter Include="vsf\hal\driver\common\i2s">
       <UniqueIdentifier>{d242bfb6-6554-4ec0-b12e-f609f36c8625}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\hal\driver\common\mmc">
-      <UniqueIdentifier>{4bcab4b1-621b-45f2-a38d-dd07557110d1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\hal\driver\common\pwm">
       <UniqueIdentifier>{a62d8561-4219-482a-add0-3c3df151e17b}</UniqueIdentifier>
     </Filter>
@@ -1132,9 +1129,6 @@
     <Filter Include="vsf\hal\utilities\remap\spi">
       <UniqueIdentifier>{86e19b75-7947-44a9-bfa0-eca0a299acef}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\hal\utilities\remap\mmc">
-      <UniqueIdentifier>{aa53cf20-34c8-4a49-b06c-8b2904fc8b16}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\hal\utilities\remap\pwm">
       <UniqueIdentifier>{4dce2369-5f3e-4429-b099-f07ad550eb5c}</UniqueIdentifier>
     </Filter>
@@ -1179,6 +1173,12 @@
     </Filter>
     <Filter Include="vsf\component\fs\driver\romfs">
       <UniqueIdentifier>{181d9d3f-65d6-4872-8c1f-c7b399ad8478}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\common\sdio">
+      <UniqueIdentifier>{4bcab4b1-621b-45f2-a38d-dd07557110d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\utilities\remap\sdio">
+      <UniqueIdentifier>{aa53cf20-34c8-4a49-b06c-8b2904fc8b16}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -3333,9 +3333,6 @@
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\spi\vsf_remapped_spi.h">
       <Filter>vsf\hal\utilities\remap\spi</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\mmc\vsf_remapped_mmc.h">
-      <Filter>vsf\hal\utilities\remap\mmc</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.h">
       <Filter>vsf\hal\utilities\remap\pwm</Filter>
     </ClInclude>
@@ -3432,12 +3429,6 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\common\i2s\i2s_template.h">
       <Filter>vsf\hal\driver\common\i2s</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\driver\common\mmc\mmc_probe.h">
-      <Filter>vsf\hal\driver\common\mmc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\driver\common\mmc\mmc_template.h">
-      <Filter>vsf\hal\driver\common\mmc</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\demo\hal_demo\hal_demo.h">
       <Filter>usrapp\demo\hal_demo</Filter>
     </ClInclude>
@@ -3476,6 +3467,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\3rd-party\mbedtls\raw\library\psa_crypto_mac.h">
       <Filter>vsf\component\3rd-party\mbedtls\raw\library</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\sdio\sdio_probe.h">
+      <Filter>vsf\hal\driver\common\sdio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\sdio\sdio_template.h">
+      <Filter>vsf\hal\driver\common\sdio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\sdio\vsf_remapped_sdio.h">
+      <Filter>vsf\hal\utilities\remap\sdio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -5864,9 +5864,6 @@
     <ClCompile Include="..\..\..\..\source\hal\driver\common\i2s\i2s_common.c">
       <Filter>vsf\hal\driver\common\i2s</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\hal\driver\common\mmc\mmc_common.c">
-      <Filter>vsf\hal\driver\common\mmc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\driver\common\pwm\pwm_common.c">
       <Filter>vsf\hal\driver\common\pwm</Filter>
     </ClCompile>
@@ -5902,9 +5899,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\spi\vsf_remapped_spi.c">
       <Filter>vsf\hal\utilities\remap\spi</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\mmc\vsf_remapped_mmc.c">
-      <Filter>vsf\hal\utilities\remap\mmc</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.c">
       <Filter>vsf\hal\utilities\remap\pwm</Filter>
@@ -5990,9 +5984,6 @@
     <ClCompile Include="..\..\..\..\source\hal\driver\common\i2c\i2c_request.c">
       <Filter>vsf\hal\driver\common\i2c</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\hal\driver\common\mmc\mmc_probe.c">
-      <Filter>vsf\hal\driver\common\mmc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\demo\hal_demo\hal_demo.c">
       <Filter>usrapp\demo\hal_demo</Filter>
     </ClCompile>
@@ -6040,6 +6031,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\shell\sys\linux\lib\glibc\vsf_linux_glibcpp.cc">
       <Filter>vsf\shell\sys\linux\lib\glibc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\sdio\sdio_common.c">
+      <Filter>vsf\hal\driver\common\sdio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\sdio\sdio_probe.c">
+      <Filter>vsf\hal\driver\common\sdio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\sdio\vsf_remapped_sdio.c">
+      <Filter>vsf\hal\utilities\remap\sdio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -6109,8 +6109,8 @@
     <None Include="..\..\..\..\source\hal\driver\common\i2s\i2s_template.inc">
       <Filter>vsf\hal\driver\common\i2s</Filter>
     </None>
-    <None Include="..\..\..\..\source\hal\driver\common\mmc\mmc_template.inc">
-      <Filter>vsf\hal\driver\common\mmc</Filter>
+    <None Include="..\..\..\..\source\hal\driver\common\sdio\sdio_template.inc">
+      <Filter>vsf\hal\driver\common\sdio</Filter>
     </None>
   </ItemGroup>
 </Project>

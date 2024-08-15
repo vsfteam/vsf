@@ -23,13 +23,13 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\common\i2c\multiplex_i2c.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\i2s\i2s_template.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\io\io_template.h" />
-    <ClInclude Include="..\..\..\..\source\hal\driver\common\mmc\mmc_probe.h" />
-    <ClInclude Include="..\..\..\..\source\hal\driver\common\mmc\mmc_template.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\pm\pm_template.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\pwm\pwm_template.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\rng\rng_template.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\rtc\rtc_common.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\rtc\rtc_template.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\sdio\sdio_probe.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\sdio\sdio_template.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\spi\fifo2req_spi.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\spi\multiplex_spi.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\spi\spi_interface.h" />
@@ -236,8 +236,8 @@
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\i2c\vsf_remapped_i2c.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\i2s\vsf_remapped_i2s.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\io\vsf_remapped_io.h" />
-    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\mmc\vsf_remapped_mmc.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.h" />
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\sdio\vsf_remapped_sdio.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\spi\vsf_remapped_spi.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\usart\vsf_remapped_usart.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\stream\usart\vsf_usart_stream.h" />
@@ -337,11 +337,11 @@
     <ClCompile Include="..\..\..\..\source\hal\driver\common\i2c\multiplex_i2c.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\i2s\i2s_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\io\io_common.c" />
-    <ClCompile Include="..\..\..\..\source\hal\driver\common\mmc\mmc_common.c" />
-    <ClCompile Include="..\..\..\..\source\hal\driver\common\mmc\mmc_probe.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\pwm\pwm_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\rng\rng_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\rtc\rtc_common.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\sdio\sdio_common.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\sdio\sdio_probe.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\spi\fifo2req_spi.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\spi\multiplex_spi.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\spi\spi_common.c" />
@@ -459,8 +459,8 @@
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\i2c\vsf_remapped_i2c.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\i2s\vsf_remapped_i2s.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\io\vsf_remapped_io.c" />
-    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\mmc\vsf_remapped_mmc.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.c" />
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\sdio\vsf_remapped_sdio.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\spi\vsf_remapped_spi.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\usart\vsf_remapped_usart.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\stream\usart\vsf_usart_stream.c" />
@@ -527,12 +527,12 @@
     <None Include="..\..\..\..\source\hal\driver\common\i2c\i2c_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\i2s\i2s_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\io\io_template.inc" />
-    <None Include="..\..\..\..\source\hal\driver\common\mmc\mmc_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\pm\pm_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\pwm\pwm_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\pwm\timer_to_pwm.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\rng\rng_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\rtc\rtc_template.inc" />
+    <None Include="..\..\..\..\source\hal\driver\common\sdio\sdio_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\spi\spi_template.inc" />
     <None Include="..\..\..\..\source\hal\driver\common\timer\timer_template.inc" />
   </ItemGroup>

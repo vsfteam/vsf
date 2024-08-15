@@ -19,13 +19,13 @@
 
 #include "hal/vsf_hal.h"
 
-#if VSF_HAL_USE_MMC == ENABLED
+#if VSF_HAL_USE_SDIO == ENABLED
 
 #define __VSF_DISTBUS_CLASS_INHERIT__
-#define __VSF_REMAPPED_MMC_CLASS_IMPLEMENT
-#include "./vsf_remapped_mmc.h"
+#define __VSF_REMAPPED_SDIO_CLASS_IMPLEMENT
+#include "./vsf_remapped_sdio.h"
 
-#if VSF_MMC_CFG_MULTI_CLASS == ENABLED
+#if VSF_SDIO_CFG_MULTI_CLASS == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -33,76 +33,76 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_REMAPPED_MMC_CFG_MULTI_CLASS == ENABLED
-const vsf_mmc_op_t vsf_remapped_mmc_op = {
+#if VSF_REMAPPED_SDIO_CFG_MULTI_CLASS == ENABLED
+const vsf_sdio_op_t vsf_remapped_sdio_op = {
 #   undef __VSF_HAL_TEMPLATE_API
 #   define __VSF_HAL_TEMPLATE_API   VSF_HAL_TEMPLATE_API_OP
 
-    VSF_MMC_APIS(vsf_remapped)
+    VSF_SDIO_APIS(vsf_remapped)
 };
 #endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_remapped_mmc_init(vsf_remapped_mmc_t *mmc, vsf_mmc_cfg_t *cfg)
+vsf_err_t vsf_remapped_sdio_init(vsf_remapped_sdio_t *sdio, vsf_sdio_cfg_t *cfg)
 {
-    VSF_HAL_ASSERT((mmc != NULL) && (mmc->target != NULL));
-    return vsf_mmc_init(mmc->target, cfg);
+    VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
+    return vsf_sdio_init(sdio->target, cfg);
 }
 
-void vsf_remapped_mmc_fini(vsf_remapped_mmc_t *mmc)
+void vsf_remapped_sdio_fini(vsf_remapped_sdio_t *sdio)
 {
-    VSF_HAL_ASSERT((mmc != NULL) && (mmc->target != NULL));
-    vsf_mmc_fini(mmc->target);
+    VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
+    vsf_sdio_fini(sdio->target);
 }
 
-void vsf_remapped_mmc_irq_enable(vsf_remapped_mmc_t *mmc, vsf_mmc_irq_mask_t irq_mask)
+void vsf_remapped_sdio_irq_enable(vsf_remapped_sdio_t *sdio, vsf_sdio_irq_mask_t irq_mask)
 {
-    VSF_HAL_ASSERT((mmc != NULL) && (mmc->target != NULL));
-    vsf_mmc_irq_enable(mmc->target, irq_mask);
+    VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
+    vsf_sdio_irq_enable(sdio->target, irq_mask);
 }
 
-void vsf_remapped_mmc_irq_disable(vsf_remapped_mmc_t *mmc, vsf_mmc_irq_mask_t irq_mask)
+void vsf_remapped_sdio_irq_disable(vsf_remapped_sdio_t *sdio, vsf_sdio_irq_mask_t irq_mask)
 {
-    VSF_HAL_ASSERT((mmc != NULL) && (mmc->target != NULL));
-    vsf_mmc_irq_disable(mmc->target, irq_mask);
+    VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
+    vsf_sdio_irq_disable(sdio->target, irq_mask);
 }
 
-vsf_mmc_status_t vsf_remapped_mmc_status(vsf_remapped_mmc_t *mmc)
+vsf_sdio_status_t vsf_remapped_sdio_status(vsf_remapped_sdio_t *sdio)
 {
-    VSF_HAL_ASSERT((mmc != NULL) && (mmc->target != NULL));
-    return vsf_mmc_status(mmc->target);
+    VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
+    return vsf_sdio_status(sdio->target);
 }
 
-vsf_mmc_capability_t vsf_remapped_mmc_capability(vsf_remapped_mmc_t *mmc)
+vsf_sdio_capability_t vsf_remapped_sdio_capability(vsf_remapped_sdio_t *sdio)
 {
-    VSF_HAL_ASSERT((mmc != NULL) && (mmc->target != NULL));
-    return vsf_mmc_capability(mmc->target);
+    VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
+    return vsf_sdio_capability(sdio->target);
 }
 
-vsf_err_t vsf_remapped_mmc_set_clock(vsf_remapped_mmc_t *mmc, uint32_t clock_hz)
+vsf_err_t vsf_remapped_sdio_set_clock(vsf_remapped_sdio_t *sdio, uint32_t clock_hz, bool is_ddr)
 {
-    VSF_HAL_ASSERT((mmc != NULL) && (mmc->target != NULL));
-    return vsf_mmc_set_clock(mmc->target, clock_hz);
+    VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
+    return vsf_sdio_set_clock(sdio->target, clock_hz, is_ddr);
 }
 
-vsf_err_t vsf_remapped_mmc_set_bus_width(vsf_remapped_mmc_t *mmc, uint8_t bus_width)
+vsf_err_t vsf_remapped_sdio_set_bus_width(vsf_remapped_sdio_t *sdio, uint8_t bus_width)
 {
-    VSF_HAL_ASSERT((mmc != NULL) && (mmc->target != NULL));
-    return vsf_mmc_set_bus_width(mmc->target, bus_width);
+    VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
+    return vsf_sdio_set_bus_width(sdio->target, bus_width);
 }
 
-vsf_err_t vsf_remapped_mmc_host_transact_start(vsf_remapped_mmc_t *mmc, vsf_mmc_trans_t *trans)
+vsf_err_t vsf_remapped_sdio_host_transact_start(vsf_remapped_sdio_t *sdio, vsf_sdio_trans_t *trans)
 {
-    VSF_HAL_ASSERT((mmc != NULL) && (mmc->target != NULL));
-    return vsf_mmc_host_transact_start(mmc->target, trans);
+    VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
+    return vsf_sdio_host_transact_start(sdio->target, trans);
 }
 
-void vsf_remapped_mmc_host_transact_stop(vsf_remapped_mmc_t *mmc)
+void vsf_remapped_sdio_host_transact_stop(vsf_remapped_sdio_t *sdio)
 {
-    VSF_HAL_ASSERT((mmc != NULL) && (mmc->target != NULL));
-    vsf_mmc_host_transact_stop(mmc->target);
+    VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
+    vsf_sdio_host_transact_stop(sdio->target);
 }
 
 #endif

@@ -87,13 +87,13 @@ vsf_sdio_capability_t vsf_sdio_capability(vsf_sdio_t *sdio_ptr)
     return sdio_ptr->op->capability(sdio_ptr);
 }
 
-vsf_err_t vsf_sdio_set_clock(vsf_sdio_t *sdio_ptr, uint32_t clock_hz)
+vsf_err_t vsf_sdio_set_clock(vsf_sdio_t *sdio_ptr, uint32_t clock_hz, bool is_ddr)
 {
     VSF_HAL_ASSERT(sdio_ptr != NULL);
     VSF_HAL_ASSERT(sdio_ptr->op != NULL);
     VSF_HAL_ASSERT(sdio_ptr->op->set_clock != NULL);
 
-    return sdio_ptr->op->set_clock(sdio_ptr, clock_hz);
+    return sdio_ptr->op->set_clock(sdio_ptr, clock_hz, is_ddr);
 }
 
 vsf_err_t vsf_sdio_set_bus_width(vsf_sdio_t *sdio_ptr, uint8_t bus_width)
