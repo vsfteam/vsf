@@ -922,6 +922,8 @@ static inline vsf_err_t vsf_usart_clear_break(vsf_usart_t *usart_ptr)
 #   define vsf_usart_get_rx_count(__USART)               VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_rx_count)          ((__vsf_usart_t *)__USART)
 #   define vsf_usart_get_tx_count(__USART)               VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_tx_count)          ((__vsf_usart_t *)__USART)
 #   define vsf_usart_send_break(__USART, ...)            VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_send_break)            ((__vsf_usart_t *)__USART)
+#   define vsf_usart_set_break(__USART)                  VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_send_break)            ((__vsf_usart_t *)__USART)
+#   define vsf_usart_clear_break(__USART)                VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_send_break)            ((__vsf_usart_t *)__USART)
 #   define vsf_usart_cmd(__USART, ...)                   VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_cmd)                   ((__vsf_usart_t *)__USART, ##__VA_ARGS__)
 #endif
 
