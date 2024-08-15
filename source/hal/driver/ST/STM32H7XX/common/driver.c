@@ -434,7 +434,21 @@ static uint32_t __vsf_hw_pll_get_vco(const vsf_hw_clk_t *clk, uint32_t clksrc_fr
     return (uint32_t)(((float)clksrc_freq_hz / prescaler) * ((float)divn + ((float)frac / 0x2000) + 1));
 }
 
-uint32_t vsf_hw_clk_get_freq(const vsf_hw_clk_t *clk)
+const vsf_hw_clk_t * vsf_hw_clk_get_src(const vsf_hw_clk_t *clk)
+{
+    VSF_HAL_ASSERT(clk != NULL);
+
+    switch (clk->clktype) {
+    case VSF_HW_CLK_TYPE_CLK:
+        return clk->clksrc;
+    case VSF_HW_CLK_TYPE_SEL:
+        return clk->clksel_mapper[vsf_hw_clkrst_region_get(clk->clksel_region)];
+    default:
+        return NULL;
+    }
+}
+
+uint32_t vsf_hw_clk_get_freq_hz(const vsf_hw_clk_t *clk)
 {
     VSF_HAL_ASSERT(clk != NULL);
 
@@ -450,14 +464,14 @@ uint32_t vsf_hw_clk_get_freq(const vsf_hw_clk_t *clk)
         break;
     case VSF_HW_CLK_TYPE_CLK:
         VSF_HAL_ASSERT(clk->clksrc != NULL);
-        clk_freq_hz = vsf_hw_clk_get_freq(clk->clksrc);
+        clk_freq_hz = vsf_hw_clk_get_freq_hz(clk->clksrc);
         break;
     case VSF_HW_CLK_TYPE_SEL: {
             const vsf_hw_clk_t *clksrc = clk->clksel_mapper[vsf_hw_clkrst_region_get(clk->clksel_region)];
             if (NULL == clksrc) {
                 return 0;
             } else {
-                clk_freq_hz = vsf_hw_clk_get_freq(clksrc);
+                clk_freq_hz = vsf_hw_clk_get_freq_hz(clksrc);
             }
         }
         break;

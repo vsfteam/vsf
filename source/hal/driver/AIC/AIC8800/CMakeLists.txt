@@ -19,7 +19,7 @@ add_subdirectory(timer)
 add_subdirectory(trng)
 add_subdirectory(uart)
 add_subdirectory(usb)
-add_subdirectory(mmc)
+add_subdirectory(sdio)
 add_subdirectory(i2s)
 add_subdirectory(wdt)
 

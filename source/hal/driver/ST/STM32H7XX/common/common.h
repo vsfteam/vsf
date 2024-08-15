@@ -155,7 +155,8 @@ extern const vsf_hw_clk_t VSF_HW_CLK_PCLK4;
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern uint32_t vsf_hw_clk_get_freq(const vsf_hw_clk_t *clk);
+extern const vsf_hw_clk_t * vsf_hw_clk_get_src(const vsf_hw_clk_t *clk);
+extern uint32_t vsf_hw_clk_get_freq_hz(const vsf_hw_clk_t *clk);
 
 extern void vsf_hw_clkrst_region_set(uint32_t region, uint_fast8_t value);
 extern uint_fast8_t vsf_hw_clkrst_region_get(uint32_t region);

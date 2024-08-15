@@ -1,9 +1,7 @@
-# CMakeLists head
-
 vsf_add_sources(
     vendor/system_stm32H7xx.c
 
-    __common.c
+    driver.c
     startup_STM32H7.c
 )
 

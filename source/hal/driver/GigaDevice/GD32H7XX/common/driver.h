@@ -97,12 +97,12 @@
 #   include "hal/driver/common/i2s/i2s_template.h"
 #endif
 
-#if VSF_HAL_USE_MMC == ENABLED
-#   include "hal/driver/common/template/vsf_template_mmc.h"
+#if VSF_HAL_USE_SDIO == ENABLED
+#   include "hal/driver/common/template/vsf_template_sdio.h"
 
-#   define VSF_MMC_CFG_DEC_PREFIX                           vsf_hw
-#   define VSF_MMC_CFG_DEC_UPCASE_PREFIX                    VSF_HW
-#   include "hal/driver/common/mmc/mmc_template.h"
+#   define VSF_SDIO_CFG_DEC_PREFIX                          vsf_hw
+#   define VSF_SDIO_CFG_DEC_UPCASE_PREFIX                   VSF_HW
+#   include "hal/driver/common/sdio/sdio_template.h"
 #endif
 
 #if VSF_HAL_USE_PWM == ENABLED

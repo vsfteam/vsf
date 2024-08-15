@@ -15,20 +15,20 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_MMC_MAL_H__
-#define __VSF_MMC_MAL_H__
+#ifndef __VSF_SDMMC_MAL_H__
+#define __VSF_SDMMC_MAL_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "../../vsf_mal_cfg.h"
 
-#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_MMC_MAL == ENABLED && VSF_HAL_USE_MMC == ENABLED
+#if VSF_USE_MAL == ENABLED && VSF_MAL_USE_SDMMC_MAL == ENABLED && VSF_HAL_USE_SDIO == ENABLED
 
 #include "hal/vsf_hal.h"
 #include "kernel/vsf_kernel.h"
 
-#if     defined(__VSF_MMC_MAL_CLASS_IMPLEMENT)
-#   undef __VSF_MMC_MAL_CLASS_IMPLEMENT
+#if     defined(__VSF_SDMMC_MAL_CLASS_IMPLEMENT)
+#   undef __VSF_SDMMC_MAL_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
 #endif
 
@@ -47,12 +47,12 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-vsf_class(vk_mmc_mal_t) {
+vsf_class(vk_sdmmc_mal_t) {
     public_member(
         implement(vk_mal_t)
-        vsf_mmc_t              *mmc;
+        vsf_sdio_t             *sdio;
         vsf_arch_prio_t         hw_priority;
-        implement(vsf_mmc_probe_t)
+        implement(vsf_sdio_probe_t)
     )
     private_member(
         vsf_callback_timer_t    timer;
@@ -63,7 +63,7 @@ vsf_class(vk_mmc_mal_t) {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-extern const vk_mal_drv_t vk_mmc_mal_drv;
+extern const vk_mal_drv_t vk_sdmmc_mal_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -71,5 +71,5 @@ extern const vk_mal_drv_t vk_mmc_mal_drv;
 }
 #endif
 
-#endif      // VSF_USE_MAL && VSF_MAL_USE_MMC_MAL && VSF_HAL_USE_MMC
-#endif      // __VSF_MMC_MAL_H__
+#endif      // VSF_USE_MAL && VSF_MAL_USE_SDMMC_MAL && VSF_HAL_USE_SDIO
+#endif      // __VSF_SDMMC_MAL_H__

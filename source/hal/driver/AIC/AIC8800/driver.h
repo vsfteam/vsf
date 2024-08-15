@@ -45,7 +45,7 @@
 #       include "./trng/trng.h"
 #       include "./uart/uart.h"
 #       include "./usb/usb.h"
-#       include "./mmc/mmc.h"
+#       include "./sdio/sdio.h"
 #       include "./i2s/i2s.h"
 #       include "./wdt/wdt.h"
 
@@ -108,15 +108,15 @@
 #   include "hal/driver/common/i2s/i2s_template.h"
 #endif
 
-#if VSF_HAL_USE_MMC == ENABLED
-#   define VSF_MMC_CFG_REIMPLEMENT_TYPE_TRANSOP             ENABLED
-#   define VSF_MMC_CFG_REIMPLEMENT_TYPE_IRQ_MASK            ENABLED
-#   define VSF_MMC_CFG_REIMPLEMENT_TYPE_TRANSACT_STATUS     ENABLED
-#   include "hal/driver/common/template/vsf_template_mmc.h"
+#if VSF_HAL_USE_SDIO == ENABLED
+#   define VSF_SDIO_CFG_REIMPLEMENT_TYPE_TRANSOP            ENABLED
+#   define VSF_SDIO_CFG_REIMPLEMENT_TYPE_IRQ_MASK           ENABLED
+#   define VSF_SDIO_CFG_REIMPLEMENT_TYPE_TRANSACT_STATUS    ENABLED
+#   include "hal/driver/common/template/vsf_template_sdio.h"
 
-#   define VSF_MMC_CFG_DEC_PREFIX                           vsf_hw
-#   define VSF_MMC_CFG_DEC_UPCASE_PREFIX                    VSF_HW
-#   include "hal/driver/common/mmc/mmc_template.h"
+#   define VSF_SDIO_CFG_DEC_PREFIX                          vsf_hw
+#   define VSF_SDIO_CFG_DEC_UPCASE_PREFIX                   VSF_HW
+#   include "hal/driver/common/sdio/sdio_template.h"
 #endif
 
 #if VSF_HAL_USE_PWM == ENABLED

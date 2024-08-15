@@ -102,7 +102,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
             VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart16_clks)[clksel]
         :   VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart234578_clks)[clksel];
 
-    uint32_t pclk = vsf_hw_clk_get_freq(clk);
+    uint32_t pclk = vsf_hw_clk_get_freq_hz(clk);
     uint32_t over8 = (cfg_ptr->mode & VSF_USART_OVERSAMPLE_MASK) >> 3;
     cfg_ptr->mode &= ~VSF_USART_OVERSAMPLE_MASK;
     uint32_t intdiv = 0U, fradiv = 0U, udiv = 0U;

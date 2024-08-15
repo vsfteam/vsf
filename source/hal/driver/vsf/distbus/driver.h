@@ -42,8 +42,8 @@
 #if VSF_HAL_DISTBUS_USE_USART == ENABLED && VSF_HAL_USE_USART == ENABLED
 #   include "./usart/vsf_hal_distbus_usart.h"
 #endif
-#if VSF_HAL_DISTBUS_USE_MMC == ENABLED && VSF_HAL_USE_MMC == ENABLED
-#   include "./mmc/vsf_hal_distbus_mmc.h"
+#if VSF_HAL_DISTBUS_USE_SDIO == ENABLED && VSF_HAL_USE_SDIO == ENABLED
+#   include "./sdio/vsf_hal_distbus_sdio.h"
 #endif
 #if VSF_HAL_DISTBUS_USE_ADC == ENABLED && VSF_HAL_USE_ADC == ENABLED
 #   include "./adc/vsf_hal_distbus_adc.h"
@@ -96,7 +96,7 @@ typedef enum vsf_hal_distbus_type_t {
     VSF_HAL_DISTBUS_I2C,
     VSF_HAL_DISTBUS_SPI,
     VSF_HAL_DISTBUS_USART,
-    VSF_HAL_DISTBUS_MMC,
+    VSF_HAL_DISTBUS_SDIO,
     VSF_HAL_DISTBUS_ADC,
     VSF_HAL_DISTBUS_DAC,
     VSF_HAL_DISTBUS_PWM,
@@ -110,7 +110,7 @@ typedef enum vsf_hal_distbus_type_t {
     VSF_HAL_DISTBUS_i2c     = VSF_HAL_DISTBUS_I2C,
     VSF_HAL_DISTBUS_spi     = VSF_HAL_DISTBUS_SPI,
     VSF_HAL_DISTBUS_usart   = VSF_HAL_DISTBUS_USART,
-    VSF_HAL_DISTBUS_mmc     = VSF_HAL_DISTBUS_MMC,
+    VSF_HAL_DISTBUS_sdio    = VSF_HAL_DISTBUS_SDIO,
     VSF_HAL_DISTBUS_adc     = VSF_HAL_DISTBUS_ADC,
     VSF_HAL_DISTBUS_dac     = VSF_HAL_DISTBUS_DAC,
     VSF_HAL_DISTBUS_pwm     = VSF_HAL_DISTBUS_PWM,

@@ -46,38 +46,6 @@
 
 /*============================ TYPES =========================================*/
 
-typedef enum vsf_hw_peripheral_clksel_t {
-    // RCU.CFG1
-    VSF_HW_CLKSEL_HPDF                  = VSF_HW_CLKRST_REGION(0x23, 31, 1),// HPDFSEL in RCU.CFG1
-    VSF_HW_CLKSEL_TIMER                 = VSF_HW_CLKRST_REGION(0x23, 24, 1),// TIMERSEL in RCU.CFG1
-    VSF_HW_CLKSEL_USART5                = VSF_HW_CLKRST_REGION(0x23, 22, 2),// USART5SEL in RCU.CFG1
-    VSF_HW_CLKSEL_USART2                = VSF_HW_CLKRST_REGION(0x23, 20, 2),// USART2SEL in RCU.CFG1
-    VSF_HW_CLKSEL_USART1                = VSF_HW_CLKRST_REGION(0x23, 18, 2),// USART1SEL in RCU.CFG1
-    VSF_HW_CLKSEL_PER                   = VSF_HW_CLKRST_REGION(0x23, 14, 2),// PERSEL in RCU.CFG1
-    VSF_HW_CLKSEL_CAN2                  = VSF_HW_CLKRST_REGION(0x23, 12, 2),// CAN2SEL in RCU.CFG1
-    VSF_HW_CLKSEL_CAN1                  = VSF_HW_CLKRST_REGION(0x23, 10, 2),// CAN1SEL in RCU.CFG1
-    VSF_HW_CLKSEL_CAN0                  = VSF_HW_CLKRST_REGION(0x23, 8, 2), // CAN0SEL in RCU.CFG1
-    VSF_HW_CLKSEL_RSPDIF                = VSF_HW_CLKRST_REGION(0x23, 4, 2), // RSPDIFSEL in RCU.CFG1
-    VSF_HW_CLKSEL_USART0                = VSF_HW_CLKRST_REGION(0x23, 0, 2), // USART0SEL in RCU.CFG1
-
-    // RCU.CFG2
-    VSF_HW_CLKSEL_SAI2B1                = VSF_HW_CLKRST_REGION(0x24, 28, 3),// SAI2B1SEL in RCU.CFG2
-    VSF_HW_CLKSEL_SAI2B0                = VSF_HW_CLKRST_REGION(0x24, 24, 3),// SAI2B0SEL in RCU.CFG2
-    VSF_HW_CLKSEL_SAI1                  = VSF_HW_CLKRST_REGION(0x24, 20, 3),// SAI1SEL in RCU.CFG2
-    VSF_HW_CLKSEL_SAI0                  = VSF_HW_CLKRST_REGION(0x24, 16, 3),// SAI0SEL in RCU.CFG2
-    VSF_HW_CLKSEL_CKOUT1                = VSF_HW_CLKRST_REGION(0x24, 12, 3),// CKOUT1SEL in RCU.CFG2
-    VSF_HW_CLKSEL_CKOUT0                = VSF_HW_CLKRST_REGION(0x24, 4, 3), // CKOUT0SEL in RCU.CFG2
-
-    // RCU.CFG3
-    VSF_HW_CLKSEL_ADC2                  = VSF_HW_CLKRST_REGION(0x25, 28, 2),// ADC2SEL in RCU.CFG3
-    VSF_HW_CLKSEL_ADC1                  = VSF_HW_CLKRST_REGION(0x25, 26, 2),// ADC1SEL in RCU.CFG3
-    VSF_HW_CLKSEL_DSPWUS                = VSF_HW_CLKRST_REGION(0x25, 24, 1),// DSPWUSSEL in RCU.CFG3
-    VSF_HW_CLKSEL_SDIO1                 = VSF_HW_CLKRST_REGION(0x25, 12, 1),// SDIO1SEL in RCU.CFG3
-    VSF_HW_CLKSEL_I2C3                  = VSF_HW_CLKRST_REGION(0x25, 4, 2), // I2C3SEL in RCU.CFG3
-    VSF_HW_CLKSEL_I2C2                  = VSF_HW_CLKRST_REGION(0x25, 2, 2), // I2C2SEL in RCU.CFG3
-    VSF_HW_CLKSEL_I2C1                  = VSF_HW_CLKRST_REGION(0x25, 0, 2), // I2C1SEL in RCU.CFG3
-} vsf_hw_peripheral_clksel_t;
-
 typedef enum vsf_hw_peripheral_rst_t {
     // RCU.AHB1RST
     VSF_HW_RST_USBHS1                   = VSF_HW_CLKRST_REGION(0x04, 29, 1),// USBHS1RST in RCU.AHB1RST
@@ -318,18 +286,6 @@ typedef enum vsf_hw_peripheral_en_t {
     VSF_HW_EN_SYSCFG                    = VSF_HW_CLKRST_REGION(0x13, 0, 1), // SYSCFGEN in RCU.APB4EN
 } vsf_hw_peripheral_en_t;
 
-enum {
-    VSF_HW_CLK_PRESCALER_DIV,
-    VSF_HW_CLK_PRESCALER_ADD1_DIV,
-    VSF_HW_CLK_PRESCALER_SFT,
-    VSF_HW_CLK_PRESCALER_FUNC,
-};
-enum {
-    VSF_HW_CLK_TYPE_CONST,
-    VSF_HW_CLK_TYPE_CLK,
-    VSF_HW_CLK_TYPE_SEL,
-};
-
 typedef struct vsf_hw_clk_t vsf_hw_clk_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -373,11 +329,15 @@ extern const vsf_hw_clk_t VSF_HW_CLK_USART5;
 #define VSF_HW_CLK_UART6        VSF_HW_CLK_APB1
 #define VSF_HW_CLK_UART7        VSF_HW_CLK_APB1
 
+extern const vsf_hw_clk_t VSF_HW_CLK_SDIO0;
+extern const vsf_hw_clk_t VSF_HW_CLK_SDIO1;
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern uint32_t vsf_hw_clk_get_freq(const vsf_hw_clk_t *clk);
+extern const vsf_hw_clk_t * vsf_hw_clk_get_src(const vsf_hw_clk_t *clk);
+extern uint32_t vsf_hw_clk_get_freq_hz(const vsf_hw_clk_t *clk);
 
 extern void vsf_hw_clkrst_region_set(uint32_t region, uint_fast8_t value);
 extern uint_fast8_t vsf_hw_clkrst_region_get(uint32_t region);

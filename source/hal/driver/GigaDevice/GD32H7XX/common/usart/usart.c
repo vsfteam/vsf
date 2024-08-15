@@ -86,7 +86,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     VSF_HAL_ASSERT(!(cfg_ptr->mode & __VSF_HW_USART_NOT_SUPPORT_MASK));
 
     uint32_t reg = usart_ptr->reg;
-    uint32_t uclk = vsf_hw_clk_get_freq(usart_ptr->clk);
+    uint32_t uclk = vsf_hw_clk_get_freq_hz(usart_ptr->clk);
     uint32_t over8 = (cfg_ptr->mode & VSF_USART_OVERSAMPLE_MASK) >> 3;
     cfg_ptr->mode &= ~VSF_USART_OVERSAMPLE_MASK;
     uint32_t intdiv = 0U, fradiv = 0U, udiv = 0U;

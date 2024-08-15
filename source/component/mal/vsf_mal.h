@@ -32,8 +32,8 @@
  *!             Generate a mal device from partial of the FLASH in HAL.
  *!         mem_mal by VSF_MAL_USE_MEM_MAL:
  *!             Generate a mal device from io-accessable memory.
- *!         mmc_mal by VSF_MAL_USE_MMC_MAL:
- *!             Mal device from a MMC card.
+ *!         sdmmc_mal by VSF_MAL_USE_SDMMC_MAL:
+ *!             Mal device from a SD/MMC card.
  *!         scsi_mal by VSF_MAL_USE_SCSI_MAL, depnends on VSF_USE_SCSI:
  *!             Mal device from a SCSI device.
  */
@@ -495,7 +495,7 @@ extern vsf_err_t vk_mal_write_stream(vk_mal_stream_t *pthis, uint_fast64_t addr,
 #include "./driver/scsi_mal/vsf_scsi_mal.h"
 #include "./driver/file_mal/vsf_file_mal.h"
 #include "./driver/flash_mal/vsf_flash_mal.h"
-#include "./driver/mmc_mal/vsf_mmc_mal.h"
+#include "./driver/sdmmc_mal/vsf_sdmmc_mal.h"
 #include "./driver/cached_mal/vsf_cached_mal.h"
 
 #undef __VSF_MAL_CLASS_IMPLEMENT

@@ -69,7 +69,7 @@
 #define VSF_HAL_USE_SPI                                 ENABLED
 #define VSF_HAL_USE_USART                               ENABLED
 #define VSF_HAL_USE_FLASH                               ENABLED
-#define VSF_HAL_USE_MMC                                 ENABLED
+#define VSF_HAL_USE_SDIO                                ENABLED
 
 // Application configure
 #define APP_USE_LINUX_DEMO                              ENABLED
@@ -202,7 +202,7 @@
 #   define VSF_MAL_USE_SCSI_MAL                         ENABLED
 #   define VSF_MAL_USE_FILE_MAL                         ENABLED
 #   define VSF_MAL_USE_FLASH_MAL                        VSF_HAL_USE_FLASH
-#   define VSF_MAL_USE_MMC_MAL                          VSF_HAL_USE_MMC
+#   define VSF_MAL_USE_SDMMC_MAL                        VSF_HAL_USE_SDIO
 
 #define VSF_USE_SCSI                                    ENABLED
 #   define VSF_SCSI_USE_MAL_SCSI                        ENABLED

@@ -17,37 +17,37 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "hal/driver/common/mmc/mmc_probe.h"
+#include "hal/driver/common/sdio/sdio_probe.h"
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_HAL_TEMPLATE_DEC_NAME                   _mmc
-#define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME            _MMC
+#define VSF_HAL_TEMPLATE_DEC_NAME                   _sdio
+#define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME            _SDIO
 
-#ifndef __VSF_TEMPLATE_MMC_H__
-#   error "Please include \"vsf_template_mmc.h\" before include mmc_template.h"
+#ifndef __VSF_TEMPLATE_SDIO_H__
+#   error "Please include \"vsf_template_sdio.h\" before include sdio_template.h"
 #endif
 
-#ifndef VSF_MMC_CFG_DEC_PREFIX
-#   error "Please define VSF_MMC_CFG_DEC_PREFIX before include mmc_template.h"
+#ifndef VSF_SDIO_CFG_DEC_PREFIX
+#   error "Please define VSF_SDIO_CFG_DEC_PREFIX before include sdio_template.h"
 #endif
 
-#ifndef VSF_MMC_CFG_DEC_UPCASE_PREFIX
-#   error "Please define VSF_MMC_CFG_DEC_UPCASE_PREFIX before include mmc_template.h"
+#ifndef VSF_SDIO_CFG_DEC_UPCASE_PREFIX
+#   error "Please define VSF_SDIO_CFG_DEC_UPCASE_PREFIX before include sdio_template.h"
 #endif
 
-#ifndef VSF_MMC_CFG_DEC_REMAP_PREFIX
-#   define VSF_MMC_CFG_DEC_REMAP_PREFIX             VSF_MMC_CFG_DEC_PREFIX
+#ifndef VSF_SDIO_CFG_DEC_REMAP_PREFIX
+#   define VSF_SDIO_CFG_DEC_REMAP_PREFIX            VSF_SDIO_CFG_DEC_PREFIX
 #endif
 
-#ifndef VSF_MMC_CFG_DEC_COUNT_MASK_PREFIX
-#   define VSF_MMC_CFG_DEC_COUNT_MASK_PREFIX        VSF_MMC_CFG_DEC_UPCASE_PREFIX
+#ifndef VSF_SDIO_CFG_DEC_COUNT_MASK_PREFIX
+#   define VSF_SDIO_CFG_DEC_COUNT_MASK_PREFIX       VSF_SDIO_CFG_DEC_UPCASE_PREFIX
 #endif
 
 #include "hal/driver/common/template/vsf_template_instance_declaration.h"
 
-#undef VSF_MMC_CFG_DEC_PREFIX
-#undef VSF_MMC_CFG_DEC_UPCASE_PREFIX
-#undef VSF_MMC_CFG_DEC_COUNT_MASK_PREFIX
-#undef VSF_MMC_CFG_DEC_REMAP_PREFIX
-#undef VSF_MMC_CFG_DEC_EXTERN_OP
+#undef VSF_SDIO_CFG_DEC_PREFIX
+#undef VSF_SDIO_CFG_DEC_UPCASE_PREFIX
+#undef VSF_SDIO_CFG_DEC_COUNT_MASK_PREFIX
+#undef VSF_SDIO_CFG_DEC_REMAP_PREFIX
+#undef VSF_SDIO_CFG_DEC_EXTERN_OP

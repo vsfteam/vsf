@@ -15,18 +15,18 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_MMC_PROBE_H__
-#define __HAL_DRIVER_MMC_PROBE_H__
+#ifndef __HAL_DRIVER_SDIO_PROBE_H__
+#define __HAL_DRIVER_SDIO_PROBE_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_MMC == ENABLED
+#if VSF_HAL_USE_SDIO == ENABLED
 
 #undef public_const
-#if     defined(__VSF_MMC_PROBE_CLASS_IMPLEMENT)
-#   undef __VSF_MMC_PROBE_CLASS_IMPLEMENT
+#if     defined(__VSF_SDIO_PROBE_CLASS_IMPLEMENT)
+#   undef __VSF_SDIO_PROBE_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
 #   define public_const
 #else
@@ -43,7 +43,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-vsf_class(vsf_mmc_probe_t) {
+vsf_class(vsf_sdio_probe_t) {
     public_member(
         uint32_t                    voltage;
         uint32_t                    working_clock_hz;
@@ -55,8 +55,8 @@ vsf_class(vsf_mmc_probe_t) {
         public_const uint32_t       version;
         public_const uint32_t       ocr;
         public_const uint64_t       capacity;
-        public_const vsf_mmc_csd_t  csd;
-        public_const vsf_mmc_cid_t  cid;
+        public_const vsf_sdio_csd_t csd;
+        public_const vsf_sdio_cid_t cid;
     )
     private_member(
         uint8_t                     state;
@@ -76,49 +76,49 @@ vsf_class(vsf_mmc_probe_t) {
 
 /**
  \~english
- @brief start mmc probe, mmc MUST be initialized by calling vsf_mmc_init first.
- @param[in] mmc_ptr: a pointer to structure @ref vsf_mmc_t
- @param[in] vsf_mmc_probe_t: a pointer to struct @ref vsf_mmc_probe_t
- @return vsf_err_t: on success，returns VSF_ERR_NONE(0); on error, returns err code(< 0)
+ @brief start sdio probe, SDIO MUST be initialized by calling vsf_sdio_init first.
+ @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
+ @param[in] vsf_sdio_probe_t: a pointer to struct @ref vsf_sdio_probe_t
+ @return vsf_err_t: on success, returns VSF_ERR_NONE(0); on error, returns err code(< 0)
 
  \~chinese
- @brief 启动 mmc 外设检测, mmc 必须已经经过 vsf_mmc_init 完成初始化。
- @param[in] mmc_ptr: 结构体 vsf_mmc_t 的指针, 参考 @ref vsf_mmc_t
- @param[in] vsf_mmc_probe_t mmc 实例的指针
+ @brief 启动 sdio 外设检测, SDIO 必须已经经过 vsf_sdio_init 完成初始化。
+ @param[in] sdio_ptr: 结构体 vsf_sdio_t 的指针, 参考 @ref vsf_sdio_t
+ @param[in] vsf_sdio_probe_t sdio 实例的指针
  @return vsf_err_t: 操作完成返回 VSF_ERR_NONE(0); 出错返回错误码 (< 0)。
  */
-extern vsf_err_t vsf_mmc_probe_start(vsf_mmc_t *mmc, vsf_mmc_probe_t *probe);
+extern vsf_err_t vsf_sdio_probe_start(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe);
 
 /**
  \~english
- @brief called in mmc irqhandler while probing mmc.
+ @brief called in sdio irqhandler while probing sdio.
  @note if probe->delay_ms is none zero after returned with VSF_ERR_NOT_READY,
-        vsf_mmc_probe_irqhandler(irq_mask: 0, status: 0) should be called again after delay_ms delayed.
- @param[in] mmc_ptr: a pointer to structure @ref vsf_mmc_t
- @param[in] vsf_mmc_probe_t: a pointer to struct @ref vsf_mmc_probe_t
- @param[in] irq_mask: one or more value of enum vsf_mmc_irq_mask_t
+        vsf_sdio_probe_irqhandler(irq_mask: 0, status: 0) should be called again after delay_ms delayed.
+ @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
+ @param[in] vsf_sdio_probe_t: a pointer to struct @ref vsf_sdio_probe_t
+ @param[in] irq_mask: one or more value of enum vsf_sdio_irq_mask_t
  @param[in] status: transact status.
  @param[in] resp: response.
- @return vsf_err_t: on success，returns VSF_ERR_NONE(0); on going, returns VSF_ERR_NOT_READY(> 0); on error, returns err code(< 0)
+ @return vsf_err_t: on success, returns VSF_ERR_NONE(0); on going, returns VSF_ERR_NOT_READY(> 0); on error, returns err code(< 0)
 
  \~chinese
- @brief 检测 mmc 外设的时候，在 mmc 传输完成中断中调用的中断处理函数
+ @brief 检测 sdio 外设的时候，在 sdio 传输完成中断中调用的中断处理函数
  @note 如果调用返回 VSF_ERR_NOT_READY 后， probe->delay_ms 非零,
-        需要在 delay_ms 等待完成之后，再次调用 vsf_mmc_probe_irqhandler(irq_mask: 0, status: 0).
- @param[in] mmc_ptr: 结构体 vsf_mmc_t 的指针, 参考 @ref vsf_mmc_t
- @param[in] vsf_mmc_probe_t mmc 实例的指针
- @param[in] irq_mask: 一个或者多个枚举 vsf_mmc_irq_mask_t 的值的按位或
+        需要在 delay_ms 等待完成之后，再次调用 vsf_sdio_probe_irqhandler(irq_mask: 0, status: 0).
+ @param[in] sdio_ptr: 结构体 vsf_sdio_t 的指针, 参考 @ref vsf_sdio_t
+ @param[in] vsf_sdio_probe_t sdio_probe 实例的指针
+ @param[in] irq_mask: 一个或者多个枚举 vsf_sdio_irq_mask_t 的值的按位或
  @param[in] status: 传输状态
  @param[in] resp: 应答
  @return vsf_err_t: 操作完成返回 VSF_ERR_NONE(0); 未完成返回 VSF_ERR_NOT_READY(> 0); 出错返回错误码 (< 0)。
  */
-extern vsf_err_t vsf_mmc_probe_irqhandler(vsf_mmc_t *mmc, vsf_mmc_probe_t *probe,
-        vsf_mmc_irq_mask_t irq_mask, vsf_mmc_transact_status_t status,
+extern vsf_err_t vsf_sdio_probe_irqhandler(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe,
+        vsf_sdio_irq_mask_t irq_mask, vsf_sdio_transact_status_t status,
         uint32_t resp[4]);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* VSF_HAL_USE_MMC */
-#endif /* __HAL_DRIVER_MMC_PROBE_H__ */
+#endif /* VSF_HAL_USE_SDIO */
+#endif /* __HAL_DRIVER_SDIO_PROBE_H__ */

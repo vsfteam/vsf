@@ -174,6 +174,20 @@
 #define VSF_HW_FLASH0_IRQN              FMC_IRQn
 #define VSF_HW_FLASH0_IRQHandler        FMC_IRQHandler
 
+#define VSF_HW_SDIO_COUNT               2
+#define VSF_HW_SDIO0_REG_BASE           SDIO0
+#define VSF_HW_SDIO0_CLK                VSF_HW_CLK_SDIO0
+#define VSF_HW_SDIO0_EN                 VSF_HW_EN_SDIO0
+#define VSF_HW_SDIO0_RST                VSF_HW_RST_SDIO0
+#define VSF_HW_SDIO0_IRQN               SDIO0_IRQn
+#define VSF_HW_SDIO0_IRQHandler         SDIO0_IRQHandler
+#define VSF_HW_SDIO1_REG_BASE           SDIO1
+#define VSF_HW_SDIO1_CLK                VSF_HW_CLK_SDIO1
+#define VSF_HW_SDIO1_EN                 VSF_HW_EN_SDIO1
+#define VSF_HW_SDIO1_RST                VSF_HW_RST_SDIO1
+#define VSF_HW_SDIO1_IRQN               SDIO1_IRQn
+#define VSF_HW_SDIO1_IRQHandler         SDIO1_IRQHandler
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

@@ -56,8 +56,8 @@
 #   include "./vsf_template_i2s.h"
 #endif
 
-#if defined(VSF_HAL_USE_MMC) && !defined(__VSF_TEMPLATE_MMC_H__)
-#   include "./vsf_template_mmc.h"
+#if defined(VSF_HAL_USE_SDIO) && !defined(__VSF_TEMPLATE_SDIO_H__)
+#   include "./vsf_template_sdio.h"
 #endif
 
 #if defined(VSF_HAL_USE_PM) && !defined(__VSF_TEMPLATE_PM_H__)

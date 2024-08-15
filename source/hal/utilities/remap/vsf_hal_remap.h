@@ -25,7 +25,7 @@
 #include "./i2c/vsf_remapped_i2c.h"
 #include "./spi/vsf_remapped_spi.h"
 #include "./usart/vsf_remapped_usart.h"
-#include "./mmc/vsf_remapped_mmc.h"
+#include "./sdio/vsf_remapped_sdio.h"
 #include "./adc/vsf_remapped_adc.h"
 #include "./dac/vsf_remapped_dac.h"
 #include "./pwm/vsf_remapped_pwm.h"

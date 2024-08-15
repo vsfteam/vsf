@@ -145,10 +145,10 @@
 #define VSF_HW_SPI0_OCLKME_EN_BIT   CSC_OCLKME_SPI_EN_BIT
 #define VSF_HW_SPI0_HCLKME_EN_BIT   CSC_HCLKME_DMA_EN_BIT
 
-#define VSF_HW_MMC_COUNT            1
-#define VSF_HW_MMC0_IRQ_IDX         SDMMC_IRQn
-#define VSF_HW_MMC0_IRQ             SDMMC_IRQHandler
-#define VSF_HW_MMC0_REG             (AIC_SDMMC_TypeDef *)AIC_SDMMC_BASE
+#define VSF_HW_SDIO_COUNT           1
+#define VSF_HW_SDIO0_IRQ_IDX        SDMMC_IRQn
+#define VSF_HW_SDIO0_IRQ            SDMMC_IRQHandler
+#define VSF_HW_SDIO0_REG            (AIC_SDMMC_TypeDef *)AIC_SDMMC_BASE
 
 #define VSF_HW_I2S_COUNT            2
 #define VSF_HW_I2S0_REG             (HWP_AUD_PROC_T *)REG_AUD_PROC_BASE

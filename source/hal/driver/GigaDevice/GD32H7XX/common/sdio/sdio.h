@@ -15,14 +15,14 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_AIC8800_HW_MMC_H__
-#define __HAL_DRIVER_AIC8800_HW_MMC_H__
+#ifndef __HAL_DRIVER_GIGADEVICE_GD32H7XX_SDIO_H__
+#define __HAL_DRIVER_GIGADEVICE_GD32H7XX_SDIO_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_MMC == ENABLED
+#if VSF_HAL_USE_SDIO == ENABLED
 
 #include "../__device.h"
 
@@ -30,37 +30,37 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef enum vsf_mmc_transop_t {
-    MMC_CMDOP_SINGLE_BLOCK              = (1ul << 8),   // MMC_CMDOP_RW
-    MMC_CMDOP_MULTI_BLOCK               = (1ul << 8) | (1ul << 10) | (1ul << 16),
+typedef enum vsf_sdio_transop_t {
+    SDIO_CMDOP_SINGLE_BLOCK             = (1ul << 8),   // MMC_CMDOP_RW
+    SDIO_CMDOP_MULTI_BLOCK              = (1ul << 8) | (1ul << 10) | (1ul << 16),
                                                         // MMC_CMDOP_RW | SDMMC_MULTI_BLOCK_MODE | SDMMC_AUTOCMD12_ENABLE
-    MMC_CMDOP_WRITE                     = (1ul << 9),   // SDMMC_WRITE_MODE
-    MMC_CMDOP_RESP                      = (1ul << 4),   // SDMMC_RESPONSE_ENABLE
-    MMC_CMDOP_RESP_SHORT                = (1ul << 5),   // SDMMC_CONFIG_R3
-    MMC_CMDOP_RESP_SHORT_CRC            = (0ul << 5),   // SDMMC_CONFIG_Rx
-    MMC_CMDOP_RESP_LONG_CRC             = (2ul << 5),   // SDMMC_CONFIG_R2
-} vsf_mmc_transop_t;
+    SDIO_CMDOP_WRITE                    = (1ul << 9),   // SDMMC_WRITE_MODE
+    SDIO_CMDOP_RESP                     = (1ul << 4),   // SDMMC_RESPONSE_ENABLE
+    SDIO_CMDOP_RESP_SHORT               = (1ul << 5),   // SDMMC_CONFIG_R3
+    SDIO_CMDOP_RESP_SHORT_CRC           = (0ul << 5),   // SDMMC_CONFIG_Rx
+    SDIO_CMDOP_RESP_LONG_CRC            = (2ul << 5),   // SDMMC_CONFIG_R2
+} vsf_sdio_transop_t;
 
-typedef enum vsf_mmc_irq_mask_t {
-    MMC_IRQ_MASK_HOST_RESP_DONE         = (0x1ul << 9), // SDMMC_RESP_DONE_FLAG
-    MMC_IRQ_MASK_HOST_DATA_DONE         = (0x1ul << 4), // SDMMC_DATA_DONE_FLAG
-    MMC_IRQ_MASK_HOST_ALL               = MMC_IRQ_MASK_HOST_RESP_DONE
-                                        | MMC_IRQ_MASK_HOST_DATA_DONE,
-} vsf_mmc_irq_mask_t;
+typedef enum vsf_sdio_irq_mask_t {
+    SDIO_IRQ_MASK_HOST_RESP_DONE        = (0x1ul << 9), // SDMMC_RESP_DONE_FLAG
+    SDIO_IRQ_MASK_HOST_DATA_DONE        = (0x1ul << 4), // SDMMC_DATA_DONE_FLAG
+    SDIO_IRQ_MASK_HOST_ALL              = SDIO_IRQ_MASK_HOST_RESP_DONE
+                                        | SDIO_IRQ_MASK_HOST_DATA_DONE,
+} vsf_sdio_irq_mask_t;
 
-typedef enum vsf_mmc_transact_status_t {
-    MMC_TRANSACT_STATUS_DONE            = 0,
-    MMC_TRANSACT_STATUS_ERR_RESP_NONE   = (0x1ul << 9),
-    MMC_TRANSACT_STATUS_ERR_RESP_CRC    = (0x1ul << 8),
-    MMC_TRANSACT_STATUS_ERR_DATA_CRC    = (0xFFul << 16),
-    MMC_TRANSACT_STATUS_DATA_BUSY       = (0x1ul << 2),
-    MMC_TRANSACT_STATUS_BUSY            = (0x1ul << 1),
-    MMC_TRANSACT_STATUS_ERR_MASK        = MMC_TRANSACT_STATUS_ERR_RESP_NONE
-                                        | MMC_TRANSACT_STATUS_ERR_RESP_CRC
-                                        | MMC_TRANSACT_STATUS_ERR_DATA_CRC,
-} vsf_mmc_transact_status_t;
+typedef enum vsf_sdio_transact_status_t {
+    SDIO_TRANSACT_STATUS_DONE           = 0,
+    SDIO_TRANSACT_STATUS_ERR_RESP_NONE  = (0x1ul << 9),
+    SDIO_TRANSACT_STATUS_ERR_RESP_CRC   = (0x1ul << 8),
+    SDIO_TRANSACT_STATUS_ERR_DATA_CRC   = (0xFFul << 16),
+    SDIO_TRANSACT_STATUS_DATA_BUSY      = (0x1ul << 2),
+    SDIO_TRANSACT_STATUS_BUSY           = (0x1ul << 1),
+    SDIO_TRANSACT_STATUS_ERR_MASK       = SDIO_TRANSACT_STATUS_ERR_RESP_NONE
+                                        | SDIO_TRANSACT_STATUS_ERR_RESP_CRC
+                                        | SDIO_TRANSACT_STATUS_ERR_DATA_CRC,
+} vsf_sdio_transact_status_t;
 
 /*============================ INCLUDES ======================================*/
 
-#endif /* VSF_HAL_USE_MMC */
-#endif /* __HAL_DRIVER_AIC8800_HW_MMC_H__ */
+#endif      // VSF_HAL_USE_SDIO
+#endif      // __HAL_DRIVER_GIGADEVICE_GD32H7XX_SDIO_H__

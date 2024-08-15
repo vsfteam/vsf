@@ -19,7 +19,7 @@
 
 #include "../driver.h"
 
-#if VSF_HAL_USE_MMC == ENABLED
+#if VSF_HAL_USE_SDIO == ENABLED
 
 #include "hal/vsf_hal.h"
 #include "../vendor/plf/aic8800/src/driver/sysctrl/reg_sysctrl.h"
@@ -30,8 +30,8 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_HW_MMC_CFG_MULTI_CLASS
-#   define VSF_HW_MMC_CFG_MULTI_CLASS           VSF_MMC_CFG_MULTI_CLASS
+#ifndef VSF_HW_SDIO_CFG_MULTI_CLASS
+#   define VSF_HW_SDIO_CFG_MULTI_CLASS          VSF_SDIO_CFG_MULTI_CLASS
 #endif
 
 #define DATARD_TRIG_TH                          4
@@ -42,33 +42,33 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef struct vsf_hw_mmc_const_t {
+typedef struct vsf_hw_sdio_const_t {
     AIC_SDMMC_TypeDef *reg;
     IRQn_Type irqn;
-} vsf_hw_mmc_const_t;
+} vsf_hw_sdio_const_t;
 
-typedef struct vsf_hw_mmc_t {
-#if VSF_HW_MMC_CFG_MULTI_CLASS == ENABLED
-    vsf_mmc_t vsf_mmc;
+typedef struct vsf_hw_sdio_t {
+#if VSF_HW_SDIO_CFG_MULTI_CLASS == ENABLED
+    vsf_sdio_t vsf_sdio;
 #endif
 
-    const vsf_hw_mmc_const_t *mmc_const;
-    vsf_mmc_cfg_t cfg;
+    const vsf_hw_sdio_const_t *sdio_const;
+    vsf_sdio_cfg_t cfg;
     bool is_resp_long;
-} vsf_hw_mmc_t;
+} vsf_hw_sdio_t;
 
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vsf_hw_mmc_irq_handler(vsf_hw_mmc_t *mmc_ptr)
+static void __vsf_hw_sdio_irq_handler(vsf_hw_sdio_t *sdio_ptr)
 {
-    if (mmc_ptr->cfg.isr.handler_fn != NULL) {
-        AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
+    if (sdio_ptr->cfg.isr.handler_fn != NULL) {
+        AIC_SDMMC_TypeDef *reg = sdio_ptr->sdio_const->reg;
         uint32_t irq = reg->ISR;
         reg->ICR = irq;
         uint32_t resp[4];
 
-        if (irq & MMC_IRQ_MASK_HOST_RESP_DONE) {
-            if (mmc_ptr->is_resp_long) {
+        if (irq & SDIO_IRQ_MASK_HOST_RESP_DONE) {
+            if (sdio_ptr->is_resp_long) {
                 resp[0] = reg->R0R << 1;
                 resp[1] = reg->R1R;
                 resp[2] = reg->R2R;
@@ -78,8 +78,8 @@ static void __vsf_hw_mmc_irq_handler(vsf_hw_mmc_t *mmc_ptr)
             }
         }
 
-        if (irq & MMC_IRQ_MASK_HOST_DATA_DONE) {
-            int ch = reg->CFGR & MMC_CMDOP_WRITE ? DMA_CHANNEL_SDMMC_TX : DMA_CHANNEL_SDMMC_RX;
+        if (irq & SDIO_IRQ_MASK_HOST_DATA_DONE) {
+            int ch = reg->CFGR & SDIO_CMDOP_WRITE ? DMA_CHANNEL_SDMMC_TX : DMA_CHANNEL_SDMMC_RX;
             dma_ch_icsr_set(ch, (dma_ch_icsr_get(ch) | DMA_CH_TBL0_ICLR_BIT |
                          DMA_CH_TBL1_ICLR_BIT | DMA_CH_TBL2_ICLR_BIT));
 
@@ -92,70 +92,70 @@ static void __vsf_hw_mmc_irq_handler(vsf_hw_mmc_t *mmc_ptr)
         // if autocmd12 is enabled, resp is processed by hardware,
         //  and the value in RxR register are invalid, so remove resp_done flag
         if (reg->CFGR & SDMMC_AUTOCMD12_ENABLE) {
-            irq &= ~MMC_IRQ_MASK_HOST_RESP_DONE;
+            irq &= ~SDIO_IRQ_MASK_HOST_RESP_DONE;
         }
-        mmc_ptr->cfg.isr.handler_fn(mmc_ptr->cfg.isr.target_ptr, &mmc_ptr->vsf_mmc, irq, reg->GSR, resp);
+        sdio_ptr->cfg.isr.handler_fn(sdio_ptr->cfg.isr.target_ptr, &sdio_ptr->vsf_sdio, irq, reg->GSR, resp);
     }
 }
 
-static bool __vsf_hw_mmc_host_is_busy(vsf_hw_mmc_t *mmc_ptr)
+static bool __vsf_hw_sdio_host_is_busy(vsf_hw_sdio_t *sdio_ptr)
 {
-    AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
+    AIC_SDMMC_TypeDef *reg = sdio_ptr->sdio_const->reg;
     return !!(reg->GSR & (SDMMC_COMMAND_NOT_OVER | SDMMC_HOST_BUSY | SDMMC_DATABUS_BUSY));
 }
 
-vsf_err_t vsf_hw_mmc_init(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_cfg_t *cfg_ptr)
+vsf_err_t vsf_hw_sdio_init(vsf_hw_sdio_t *sdio_ptr, vsf_sdio_cfg_t *cfg_ptr)
 {
     cpusysctrl_hclkme_set(CSC_HCLKME_DMA_EN_BIT);
     cpusysctrl_oclkme_set(CSC_OCLKME_SDMMC_EN_BIT);
     cpusysctrl_hclk1me_set(CSC_HCLK1ME_SDMMC_EN_BIT | CSC_HCLK1ME_SDMMC_ALWAYS_EN_BIT);
 
-    mmc_ptr->cfg = *cfg_ptr;
-    NVIC_SetPriority(mmc_ptr->mmc_const->irqn, (uint32_t)cfg_ptr->isr.prio);
-    NVIC_EnableIRQ(mmc_ptr->mmc_const->irqn);
+    sdio_ptr->cfg = *cfg_ptr;
+    NVIC_SetPriority(sdio_ptr->sdio_const->irqn, (uint32_t)cfg_ptr->isr.prio);
+    NVIC_EnableIRQ(sdio_ptr->sdio_const->irqn);
     return VSF_ERR_NONE;
 }
 
-void vsf_hw_mmc_fini(vsf_hw_mmc_t *mmc_ptr)
+void vsf_hw_sdio_fini(vsf_hw_sdio_t *sdio_ptr)
 {
 }
 
-void vsf_hw_mmc_irq_enable(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_irq_mask_t irq_mask)
+void vsf_hw_sdio_irq_enable(vsf_hw_sdio_t *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)
 {
-    AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
+    AIC_SDMMC_TypeDef *reg = sdio_ptr->sdio_const->reg;
     reg->IER |= irq_mask;
 }
 
-void vsf_hw_mmc_irq_disable(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_irq_mask_t irq_mask)
+void vsf_hw_sdio_irq_disable(vsf_hw_sdio_t *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)
 {
-    AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
+    AIC_SDMMC_TypeDef *reg = sdio_ptr->sdio_const->reg;
     reg->IER &= ~irq_mask;
 }
 
-vsf_mmc_status_t vsf_hw_mmc_status(vsf_hw_mmc_t *mmc_ptr)
+vsf_sdio_status_t vsf_hw_sdio_status(vsf_hw_sdio_t *sdio_ptr)
 {
-    AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
-    vsf_mmc_status_t status = {
+    AIC_SDMMC_TypeDef *reg = sdio_ptr->sdio_const->reg;
+    vsf_sdio_status_t status = {
         .transact_status    = reg->GSR,
         .irq_status         = reg->ISR,
     };
     return status;
 }
 
-vsf_mmc_capability_t vsf_hw_mmc_capability(vsf_hw_mmc_t *mmc_ptr)
+vsf_sdio_capability_t vsf_hw_sdio_capability(vsf_hw_sdio_t *sdio_ptr)
 {
-    vsf_mmc_capability_t capability = {
-        .mmc_capability     = {
-            .bus_width      = MMC_CAP_BUS_WIDTH_1 | MMC_CAP_BUS_WIDTH_4,
+    vsf_sdio_capability_t capability = {
+        .sdio_capability     = {
+            .bus_width      = SDIO_CAP_BUS_WIDTH_1 | SDIO_CAP_BUS_WIDTH_4,
             .max_freq_hz    = 24 * 1000 * 1000,
         },
     };
     return capability;
 }
 
-vsf_err_t vsf_hw_mmc_set_clock(vsf_hw_mmc_t *mmc_ptr, uint32_t clock_hz)
+vsf_err_t vsf_hw_sdio_set_clock(vsf_hw_sdio_t *sdio_ptr, uint32_t clock_hz)
 {
-    AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
+    AIC_SDMMC_TypeDef *reg = sdio_ptr->sdio_const->reg;
     extern uint32_t SystemCoreClock;
     if (clock_hz > SystemCoreClock / 2) {
         clock_hz = SystemCoreClock / 2;
@@ -164,25 +164,26 @@ vsf_err_t vsf_hw_mmc_set_clock(vsf_hw_mmc_t *mmc_ptr, uint32_t clock_hz)
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_hw_mmc_set_bus_width(vsf_hw_mmc_t *mmc_ptr, uint8_t bus_width)
+vsf_err_t vsf_hw_sdio_set_bus_width(vsf_hw_sdio_t *sdio_ptr, uint8_t bus_width)
 {
-    AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
+    AIC_SDMMC_TypeDef *reg = sdio_ptr->sdio_const->reg;
     reg->DBWR = bus_width;
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_hw_mmc_host_transact_start(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_trans_t *trans)
+vsf_err_t vsf_hw_sdio_host_transact_start(vsf_hw_sdio_t *sdio_ptr, vsf_sdio_trans_t *trans)
 {
     VSF_HAL_ASSERT(trans != NULL);
-    if (__vsf_hw_mmc_host_is_busy(mmc_ptr)) {
+    if (__vsf_hw_sdio_host_is_busy(sdio_ptr)) {
         return VSF_ERR_BUSY;
     }
 
-    AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
+    AIC_SDMMC_TypeDef *reg = sdio_ptr->sdio_const->reg;
     bool has_data = ((trans->buffer != NULL) && (trans->count > 0));
-    bool is_write = trans->op & MMC_CMDOP_WRITE;
+    bool is_write = trans->op & SDIO_CMDOP_WRITE;
     int ch;
 
+    trans->op &= __VSF_HW_SDIO_TRANSOP_MASK;
     if (has_data) {
         VSF_HAL_ASSERT(trans->block_size_bits != 0);
         reg->DBLR = trans->block_size_bits;
@@ -222,7 +223,7 @@ vsf_err_t vsf_hw_mmc_host_transact_start(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_trans_t 
         }
     }
 
-    mmc_ptr->is_resp_long = !!((trans->op & (3 << 5)) == MMC_CMDOP_RESP_LONG_CRC);
+    sdio_ptr->is_resp_long = !!((trans->op & (3 << 5)) == SDIO_CMDOP_RESP_LONG_CRC);
     reg->CFGR = 0;
     reg->CMDR = trans->cmd;
     reg->ARGR = trans->arg;
@@ -235,9 +236,9 @@ vsf_err_t vsf_hw_mmc_host_transact_start(vsf_hw_mmc_t *mmc_ptr, vsf_mmc_trans_t 
     return VSF_ERR_NONE;
 }
 
-void vsf_hw_mmc_host_transact_stop(vsf_hw_mmc_t *mmc_ptr)
+void vsf_hw_sdio_host_transact_stop(vsf_hw_sdio_t *sdio_ptr)
 {
-    AIC_SDMMC_TypeDef *reg = mmc_ptr->mmc_const->reg;
+    AIC_SDMMC_TypeDef *reg = sdio_ptr->sdio_const->reg;
 
     reg->DBLR = 0x00UL;
     reg->DBCR = 0x00UL;
@@ -249,24 +250,24 @@ void vsf_hw_mmc_host_transact_stop(vsf_hw_mmc_t *mmc_ptr)
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_MMC_CFG_REIMPLEMENT_API_CAPABILITY  ENABLED
-#define VSF_MMC_CFG_IMP_PREFIX                  vsf_hw
-#define VSF_MMC_CFG_IMP_UPCASE_PREFIX           VSF_HW
-#define VSF_MMC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
-    static const vsf_hw_mmc_const_t __vsf_hw_mmc ## __IDX ## _const = {         \
-        .reg  = VSF_HW_MMC ## __IDX ## _REG,                                    \
-        .irqn = VSF_HW_MMC ## __IDX ## _IRQ_IDX,                                \
+#define VSF_SDIO_CFG_REIMPLEMENT_API_CAPABILITY ENABLED
+#define VSF_SDIO_CFG_IMP_PREFIX                 vsf_hw
+#define VSF_SDIO_CFG_IMP_UPCASE_PREFIX          VSF_HW
+#define VSF_SDIO_CFG_IMP_LV0(__IDX, __HAL_OP)                                   \
+    static const vsf_hw_sdio_const_t __vsf_hw_sdio ## __IDX ## _const = {       \
+        .reg  = VSF_HW_SDIO ## __IDX ## _REG,                                   \
+        .irqn = VSF_HW_SDIO ## __IDX ## _IRQ_IDX,                               \
     };                                                                          \
-    vsf_hw_mmc_t vsf_hw_mmc ## __IDX = {                                        \
-        .mmc_const = &__vsf_hw_mmc ## __IDX ## _const,                          \
+    vsf_hw_sdio_t vsf_hw_sdio ## __IDX = {                                      \
+        .sdio_const = &__vsf_hw_sdio ## __IDX ## _const,                        \
         __HAL_OP                                                                \
     };                                                                          \
-    void VSF_HW_MMC ## __IDX ## _IRQ(void)                                      \
+    void VSF_HW_SDIO ## __IDX ## _IRQ(void)                                     \
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
-        __vsf_hw_mmc_irq_handler(&vsf_hw_mmc ## __IDX);                         \
+        __vsf_hw_sdio_irq_handler(&vsf_hw_sdio ## __IDX);                       \
         vsf_hal_irq_leave(ctx);                                                 \
     }
-#include "hal/driver/common/mmc/mmc_template.inc"
+#include "hal/driver/common/sdio/sdio_template.inc"
 
-#endif      // VSF_HAL_USE_MMC
+#endif      // VSF_HAL_USE_SDIO

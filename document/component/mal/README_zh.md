@@ -18,8 +18,8 @@
 #   define VSF_MAL_USE_MIM_MAL          ENABLED
 // 使能 scsi_mal 模块
 #   define VSF_MAL_USE_SCSI_MAL         ENABLED
-// 使能 mmc_mal 模块，需要 hal 层使能 VSF_HAL_USE_MMC
-#   define VSF_MAL_USE_MMC_MAL          ENABLED
+// 使能 sdmmc_mal 模块，需要 hal 层使能 VSF_HAL_USE_SDIO
+#   define VSF_MAL_USE_SDMMC_MAL        ENABLED
 // 使能 flash_mal 模块，需要 hal 层使能 VSF_HAL_USE_FLASH
 #   define VSF_MAL_USE_FLASH_MAL        ENABLED
 ```
@@ -254,17 +254,17 @@ vsf_class(vk_flash_mal_t) {
 1. file -- 镜像文件
 2. block_size -- 模拟的块设备的块大小
 
-### 5.6 mmc_mal
-继承自 vk_mal_t ，用于支持 SDIO/MMC 接口的储存设备。
-需要使能 HAL 层中的 VSF_HAL_USE_MMC 。
+### 5.6 sdmmc_mal
+继承自 vk_mal_t ，用于支持 SDIO 接口的储存设备。
+需要使能 HAL 层中的 VSF_HAL_USE_SDIO 。
 
 ```c
-vsf_class(vk_mmc_mal_t) {
+vsf_class(vk_sdmmc_mal_t) {
     public_member(
         implement(vk_mal_t)
-        vsf_mmc_t              *mmc;
+        vsf_sdio_t              *sdio;
         vsf_arch_prio_t         hw_priority;
-        implement(vsf_mmc_probe_t)
+        implement(vsf_sdio_probe_t)
     )
     private_member(
         vsf_callback_timer_t    timer;
@@ -274,11 +274,11 @@ vsf_class(vk_mmc_mal_t) {
 };
 ```
 需要初始化的成员：
-1. mmc -- mmc 接口实例
+1. sdio -- sdio 接口实例
 2. hw_priority -- 硬件中断优先级
-3. working_clock_hz（ vsf_mmc_probe_t 成员） -- sdio/mmc 工作频率
-4. voltage（ vsf_mmc_probe_t 成员） -- sdio/mmc 工作电压
-5. bus_width（ vsf_mmc_probe_t 成员） -- sdio/mmc 的总线位宽
+3. working_clock_hz（ vsf_sdio_probe_t 成员） -- sdio 工作频率
+4. voltage（ vsf_sdio_probe_t 成员） -- sdio 工作电压
+5. bus_width（ vsf_sdio_probe_t 成员） -- sdio 的总线位宽
 
 ### 5.7 scsi_mal
 继承自 vk_mal_t ，用于把 SCSI 设备转成块设备。比如 USB 接口的 U 盘，是一个 scsi 设备，通过 scsi_mal 可以模拟成一个块设备。

@@ -75,8 +75,8 @@
 #   if VSF_HAL_USE_USB == ENABLED
 #       include "../common/usb/usb.h"
 #   endif
-#   if VSF_HAL_USE_MMC == ENABLED
-#       include "../common/mmc/mmc.h"
+#   if VSF_HAL_USE_SDIO == ENABLED
+#       include "../common/sdio/sdio.h"
 #   endif
 #   if VSF_HAL_USE_I2S == ENABLED
 #       include "../common/i2s/i2s.h"

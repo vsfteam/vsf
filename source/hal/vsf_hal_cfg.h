@@ -129,8 +129,8 @@ extern "C" {
 #   define VSF_HAL_USE_PWM                  ENABLED
 #endif
 
-#ifndef VSF_HAL_USE_MMC
-#   define VSF_HAL_USE_MMC                  ENABLED
+#ifndef VSF_HAL_USE_SDIO
+#   define VSF_HAL_USE_SDIO                 ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

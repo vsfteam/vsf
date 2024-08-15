@@ -15,14 +15,14 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_${SERIES/MMC_IP}_MMC_H__
-#define __HAL_DRIVER_${SERIES/MMC_IP}_MMC_H__
+#ifndef __HAL_DRIVER_${SERIES/SDIO_IP}_SDIO_H__
+#define __HAL_DRIVER_${SERIES/SDIO_IP}_SDIO_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_MMC == ENABLED
+#if VSF_HAL_USE_SDIO == ENABLED
 
 #include "../../__device.h"
 
@@ -36,9 +36,9 @@
 /*\note If current header is for a peripheral driver(hw driver), and inherit from an IPCore driver, include IPCore header here. */
 
 // IPCore
-#if     defined(__VSF_HAL_${MMC_IP}_MMC_CLASS_IMPLEMENT)
+#if     defined(__VSF_HAL_${SDIO_IP}_SDIO_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
-#elif   defined(__VSF_HAL_${MMC_IP}_MMC_CLASS_INHERIT__)
+#elif   defined(__VSF_HAL_${SDIO_IP}_SDIO_CLASS_INHERIT__)
 #   define __VSF_CLASS_INHERIT__
 #endif
 
@@ -51,13 +51,13 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-/*\note VSF_${MMC_IP}_MMC_CFG_MULTI_CLASS should be implemented for IP drives and open to user,
- *          while VSF_HW_MMC_CFG_MULTI_CLASS should be in mmc.c.
+/*\note VSF_${SDIO_IP}_SDIO_CFG_MULTI_CLASS should be implemented for IP drives and open to user,
+ *          while VSF_HW_SDIO_CFG_MULTI_CLASS should be in sdio.c.
  */
 
 // IPCore
-#ifndef VSF_${MMC_IP}_MMC_CFG_MULTI_CLASS
-#   define VSF_${MMC_IP}_MMC_CFG_MULTI_CLASS    VSF_MMC_CFG_MULTI_CLASS
+#ifndef VSF_${SDIO_IP}_SDIO_CFG_MULTI_CLASS
+#   define VSF_${SDIO_IP}_SDIO_CFG_MULTI_CLASS  VSF_SDIO_CFG_MULTI_CLASS
 #endif
 // IPCore end
 
@@ -65,21 +65,21 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 // IPCore
-vsf_class(vsf_${mmc_ip}_mmc_t) {
-#if VSF_${MMC_IP}_CFG_MULTI_CLASS == ENABLED
+vsf_class(vsf_${sdio_ip}_sdio_t) {
+#if VSF_${SDIO_IP}_CFG_MULTI_CLASS == ENABLED
     public_member(
-        vsf_mmc_t               vsf_mmc;
+        vsf_sdio_t                  vsf_sdio;
     )
 #endif
 
-/*\note You can add more member in vsf_${mmc_ip}_mmc_t instance.
+/*\note You can add more member in vsf_${sdio_ip}_sdio_t instance.
  *      For members accessible from child, put in protected_member.
  *      Else, put in private_member.
  */
 
     protected_member(
-        vsf_${mmc_ip}_mmc_reg_t *reg;
-        vsf_mmc_isr_t           isr;
+        vsf_${sdio_ip}_sdio_reg_t   *reg;
+        vsf_sdio_isr_t              isr;
     )
 };
 // IPCore end
@@ -98,10 +98,10 @@ vsf_class(vsf_${mmc_ip}_mmc_t) {
 #endif
 
 // IPCore
-#undef __VSF_HAL_${MMC_IP}_MMC_CLASS_IMPLEMENT
-#undef __VSF_HAL_${MMC_IP}_MMC_CLASS_INHERIT__
+#undef __VSF_HAL_${SDIO_IP}_SDIO_CLASS_IMPLEMENT
+#undef __VSF_HAL_${SDIO_IP}_SDIO_CLASS_INHERIT__
 // IPCore end
 
-#endif      // VSF_HAL_USE_MMC
-#endif      // __HAL_DRIVER_${SERIES/MMC_IP}_MMC_H__
+#endif      // VSF_HAL_USE_SDIO
+#endif      // __HAL_DRIVER_${SERIES/SDIO_IP}_SDIO_H__
 /* EOF */
