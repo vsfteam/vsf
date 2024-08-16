@@ -112,22 +112,23 @@ static void __flash_isrhandler(void *target_ptr, vsf_flash_t *flash_ptr, vsf_fla
     VSF_MAL_ASSERT((mask & ~VSF_FLASH_IRQ_ALL_BITS_MASK) == 0);
 
     if (mask & VSF_FLASH_IRQ_ERASE_ERROR_MASK) {
-        vsf_eda_post_evt(pthis->cur, VSF_FLASH_IRQ_ERASE_ERROR_MASK);
+        vsf_eda_post_evt(pthis->cur, VSF_EVT_FLASH_ERASE_ERR);
     } else if (mask & VSF_FLASH_IRQ_ERASE_MASK) {
         vsf_eda_post_evt(pthis->cur, VSF_EVT_FLASH_ERASE_CPL);
     }
 
     if (mask & VSF_FLASH_IRQ_WRITE_ERROR_MASK) {
-        vsf_eda_post_evt(pthis->cur, VSF_FLASH_IRQ_WRITE_ERROR_MASK);
+        vsf_eda_post_evt(pthis->cur, VSF_EVT_FLASH_WRITE_ERR);
     } else if (mask & VSF_FLASH_IRQ_WRITE_MASK) {
         vsf_eda_post_evt(pthis->cur, VSF_EVT_FLASH_WRITE_CPL);
     }
 
     if (mask & VSF_FLASH_IRQ_READ_ERROR_MASK) {
-        vsf_eda_post_evt(pthis->cur, VSF_FLASH_IRQ_READ_ERROR_MASK);
+        vsf_eda_post_evt(pthis->cur, VSF_EVT_FLASH_READ_ERR);
     } else if (mask & VSF_FLASH_IRQ_READ_MASK) {
         vsf_eda_post_evt(pthis->cur, VSF_EVT_FLASH_READ_CPL);
     }
+    pthis->cur = NULL;
 }
 
 #if     __IS_COMPILER_GCC__
