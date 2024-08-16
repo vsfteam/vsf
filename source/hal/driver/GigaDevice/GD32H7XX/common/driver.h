@@ -39,6 +39,7 @@
 #   include "../common/gpio/gpio.h"
 #   include "../common/usart/usart.h"
 #   include "../common/flash/flash.h"
+#   include "../common/sdio/sdio.h"
 #   include "../common/usb/usb.h"
 
 /*============================ MACROS ========================================*/

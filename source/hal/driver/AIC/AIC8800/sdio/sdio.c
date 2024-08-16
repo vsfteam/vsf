@@ -174,6 +174,7 @@ vsf_err_t vsf_hw_sdio_set_bus_width(vsf_hw_sdio_t *sdio_ptr, uint8_t bus_width)
 vsf_err_t vsf_hw_sdio_host_transact_start(vsf_hw_sdio_t *sdio_ptr, vsf_sdio_trans_t *trans)
 {
     VSF_HAL_ASSERT(trans != NULL);
+    VSF_HAL_ASSERT(!(trans->op & (SDIO_CMDOP_CLKHOLD | SDIO_CMDOP_TRANS_STOP | SDIO_CMDOP_BYTE | SDIO_CMDOP_STREAM)));
     if (__vsf_hw_sdio_host_is_busy(sdio_ptr)) {
         return VSF_ERR_BUSY;
     }
@@ -183,7 +184,6 @@ vsf_err_t vsf_hw_sdio_host_transact_start(vsf_hw_sdio_t *sdio_ptr, vsf_sdio_tran
     bool is_write = trans->op & SDIO_CMDOP_WRITE;
     int ch;
 
-    trans->op &= __VSF_HW_SDIO_TRANSOP_MASK;
     if (has_data) {
         VSF_HAL_ASSERT(trans->block_size_bits != 0);
         reg->DBLR = trans->block_size_bits;

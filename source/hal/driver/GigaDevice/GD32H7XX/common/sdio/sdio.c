@@ -68,6 +68,8 @@ vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_init)(
 ) {
     uint32_t reg = sdio_ptr->reg;
 
+    vsf_hw_peripheral_enable(sdio_ptr->en);
+
     uint32_t tmp = SDIO_CLKCTL(reg) & ~(SDIO_CLKCTL_HWEN | SDIO_CLKCTL_CLKEDGE | SDIO_CLKCTL_BUSMODE | SDIO_CLKCTL_CLKPWRSAV);
     SDIO_CLKCTL(reg) = tmp | SDIO_BUSMODE_1BIT;
     vsf_hw_sdio_set_clock(sdio_ptr, 400000, false);

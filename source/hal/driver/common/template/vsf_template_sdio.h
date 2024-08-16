@@ -77,42 +77,42 @@ extern "C" {
   /* class 0 */
 /* This is basically the same command as for MMC with some quirks. */
 #define SD_SEND_RELATIVE_ADDR           3   /* bcr                      R6  */
-#define SD_SEND_RELATIVE_ADDR_OP        (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define SD_SEND_RELATIVE_ADDR_OP        (SDIO_RESP_R6)
 #define SD_SEND_IF_COND                 8   /* bcr  [11:0] See below    R7  */
-#define SD_SEND_IF_COND_OP              (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define SD_SEND_IF_COND_OP              (SDIO_RESP_R7)
 #define SD_SWITCH_VOLTAGE               11  /* ac                       R1  */
-#define SD_SWITCH_VOLTAGE_OP            (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC | SDIO_CMDOP_CLKHOLD)
+#define SD_SWITCH_VOLTAGE_OP            (SDIO_RESP_R1 | SDIO_CMDOP_CLKHOLD)
 
   /* class 10 */
 #define SD_SWITCH                       6   /* adtc [31:0] See below    R1  */
-#define SD_SWITCH_OP                    (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define SD_SWITCH_OP                    (SDIO_RESP_R1)
 
   /* class 5 */
 #define SD_ERASE_WR_BLK_START           32   /* ac   [31:0] data addr   R1  */
-#define SD_ERASE_WR_BLK_START_OP        (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define SD_ERASE_WR_BLK_START_OP        (SDIO_RESP_R1)
 #define SD_ERASE_WR_BLK_END             33   /* ac   [31:0] data addr   R1  */
-#define SD_ERASE_WR_BLK_END_OP          (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define SD_ERASE_WR_BLK_END_OP          (SDIO_RESP_R1)
 
   /* Application commands */
 #define SD_APP_SET_BUS_WIDTH            6   /* ac   [1:0] bus width     R1  */
-#define SD_APP_SET_BUS_WIDTH_OP         (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define SD_APP_SET_BUS_WIDTH_OP         (SDIO_RESP_R1)
 #   define SD_BUS_WIDTH_1               0
 #   define SD_BUS_WIDTH_4               2
 #   define SD_BUS_WIDTH_8               3
 #define SD_APP_SD_STATUS                13   /* adtc                    R1  */
-#define SD_APP_SD_STATUS_OP             (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define SD_APP_SD_STATUS_OP             (SDIO_RESP_R1)
 #define SD_APP_SEND_NUM_WR_BLKS         22   /* adtc                    R1  */
-#define SD_APP_SEND_NUM_WR_BLKS_OP      (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define SD_APP_SEND_NUM_WR_BLKS_OP      (SDIO_RESP_R1)
 #define SD_APP_OP_COND                  41   /* bcr  [31:0] OCR         R3  */
-#define SD_APP_OP_COND_OP               (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT)
+#define SD_APP_OP_COND_OP               (SDIO_RESP_R3)
 #define SD_APP_SEND_SCR                 51   /* adtc                    R1  */
-#define SD_APP_SEND_SCR_OP              (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define SD_APP_SEND_SCR_OP              (SDIO_RESP_R1)
 
   /* class 11 */
 #define SD_READ_EXTR_SINGLE             48   /* adtc [31:0]             R1  */
-#define SD_READ_EXTR_SINGLE_OP          (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define SD_READ_EXTR_SINGLE_OP          (SDIO_RESP_R1)
 #define SD_WRITE_EXTR_SINGLE            49   /* adtc [31:0]             R1  */
-#define SD_WRITE_EXTR_SINGLE_OP         (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define SD_WRITE_EXTR_SINGLE_OP         (SDIO_RESP_R1)
 
 /* OCR bit definitions */
 #define SD_OCR_VDD_165_195              0x00000080  /* VDD voltage 1.65 - 1.95 */
@@ -145,112 +145,112 @@ extern "C" {
 #define MMC_GO_IDLE_STATE               0    /* bc                          */
 #define MMC_GO_IDLE_STATE_OP            0
 #define MMC_SEND_OP_COND                1    /* bcr  [31:0] OCR         R3  */
-#define MMC_SEND_OP_COND_OP             (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT)
+#define MMC_SEND_OP_COND_OP             (SDIO_RESP_R3)
 #define MMC_ALL_SEND_CID                2    /* bcr                     R2  */
-#define MMC_ALL_SEND_CID_OP             (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_LONG_CRC)
+#define MMC_ALL_SEND_CID_OP             (SDIO_RESP_R2)
 #define MMC_SET_RELATIVE_ADDR           3    /* ac   [31:16] RCA        R1  */
-#define MMC_SET_RELATIVE_ADDR_OP        (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_SET_RELATIVE_ADDR_OP        (SDIO_RESP_R1)
 #define MMC_SET_DSR                     4    /* bc   [31:16] RCA            */
 #define MMC_SET_DSR_OP                  0
 #define MMC_SLEEP_AWAKE                 5    /* ac   [31:16] RCA 15:flg R1b */
-#define MMC_SLEEP_AWAKE_OP              (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_SLEEP_AWAKE_OP              (SDIO_RESP_R1B)
 #define MMC_SWITCH                      6    /* ac   [31:0] See below   R1b */
-#define MMC_SWITCH_OP                   (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_SWITCH_OP                   (SDIO_RESP_R1B)
 #define MMC_SELECT_CARD                 7    /* ac   [31:16] RCA        R1  */
-#define MMC_SELECT_CARD_OP              (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_SELECT_CARD_OP              (SDIO_RESP_R1)
 #define MMC_SEND_EXT_CSD                8    /* adtc                    R1  */
-#define MMC_SEND_EXT_CSD_OP             (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_SEND_EXT_CSD_OP             (SDIO_RESP_R1)
 #define MMC_SEND_CSD                    9    /* ac   [31:16] RCA        R2  */
-#define MMC_SEND_CSD_OP                 (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_LONG_CRC)
+#define MMC_SEND_CSD_OP                 (SDIO_RESP_R2)
 #define MMC_SEND_CID                    10   /* ac   [31:16] RCA        R2  */
-#define MMC_SEND_CID_OP                 (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_LONG_CRC)
+#define MMC_SEND_CID_OP                 (SDIO_RESP_R2)
 #define MMC_READ_DAT_UNTIL_STOP         11   /* adtc [31:0] dadr        R1  */
-#define MMC_READ_DAT_UNTIL_STOP_OP      (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_READ_DAT_UNTIL_STOP_OP      (SDIO_RESP_R1)
 #define MMC_STOP_TRANSMISSION           12   /* ac                      R1b */
-#define MMC_STOP_TRANSMISSION_OP        (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC | SDIO_CMDOP_TRANS_STOP)
+#define MMC_STOP_TRANSMISSION_OP        (SDIO_RESP_R1B | SDIO_CMDOP_TRANS_STOP)
 #define MMC_SEND_STATUS                 13   /* ac   [31:16] RCA        R1  */
-#define MMC_SEND_STATUS_OP              (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_SEND_STATUS_OP              (SDIO_RESP_R1)
 #define MMC_BUS_TEST_R                  14   /* adtc                    R1  */
-#define MMC_BUS_TEST_R_OP               (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_BUS_TEST_R_OP               (SDIO_RESP_R1)
 #define MMC_GO_INACTIVE_STATE           15   /* ac   [31:16] RCA            */
 #define MMC_BUS_TEST_W                  19   /* adtc                    R1  */
-#define MMC_BUS_TEST_W_OP               (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_BUS_TEST_W_OP               (SDIO_RESP_R1)
 #define MMC_SPI_READ_OCR                58   /* spi                  spi_R3 */
-#define MMC_SPI_READ_OCR_OP             (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT)
+#define MMC_SPI_READ_OCR_OP             (SDIO_RESP_SPI_R3)
 #define MMC_SPI_CRC_ON_OFF              59   /* spi  [0:0] flag      spi_R1 */
-#define MMC_SPI_CRC_ON_OFF_OP           (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_SPI_CRC_ON_OFF_OP           (SDIO_RESP_SPI_R1)
 
   /* class 2 */
 #define MMC_SET_BLOCKLEN                16   /* ac   [31:0] block len   R1  */
-#define MMC_SET_BLOCKLEN_OP             (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_SET_BLOCKLEN_OP             (SDIO_RESP_R1)
 #define MMC_READ_SINGLE_BLOCK           17   /* adtc [31:0] data addr   R1  */
-#define MMC_READ_SINGLE_BLOCK_OP        (SDIO_CMDOP_SINGLE_BLOCK | SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_READ_SINGLE_BLOCK_OP        (SDIO_RESP_R1 | SDIO_CMDOP_SINGLE_BLOCK)
 #define MMC_READ_MULTIPLE_BLOCK         18   /* adtc [31:0] data addr   R1  */
-#define MMC_READ_MULTIPLE_BLOCK_OP      (SDIO_CMDOP_MULTI_BLOCK | SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_READ_MULTIPLE_BLOCK_OP      (SDIO_RESP_R1 | SDIO_CMDOP_MULTI_BLOCK)
 #define MMC_SEND_TUNING_BLOCK           19   /* adtc                    R1  */
-#define MMC_SEND_TUNING_BLOCK_OP        (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
-#define MMC_SEND_TUNING_BLOCK_HS200     21   /* adtc R1  */
-#define MMC_SEND_TUNING_BLOCK_HS200_OP  (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_SEND_TUNING_BLOCK_OP        (SDIO_RESP_R1)
+#define MMC_SEND_TUNING_BLOCK_HS200     21   /* adtc                    R1  */
+#define MMC_SEND_TUNING_BLOCK_HS200_OP  (SDIO_RESP_R1)
 
   /* class 3 */
 #define MMC_WRITE_DAT_UNTIL_STOP        20   /* adtc [31:0] data addr   R1  */
-#define MMC_WRITE_DAT_UNTIL_STOP_OP     (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_WRITE_DAT_UNTIL_STOP_OP     (SDIO_RESP_R1)
 
   /* class 4 */
 #define MMC_SET_BLOCK_COUNT             23   /* adtc [31:0] data addr   R1  */
-#define MMC_SET_BLOCK_COUNT_OP          (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_SET_BLOCK_COUNT_OP          (SDIO_RESP_R1)
 #define MMC_WRITE_BLOCK                 24   /* adtc [31:0] data addr   R1  */
-#define MMC_WRITE_BLOCK_OP              (SDIO_CMDOP_SINGLE_BLOCK | SDIO_CMDOP_WRITE | SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_WRITE_BLOCK_OP              (SDIO_RESP_R1 | SDIO_CMDOP_SINGLE_BLOCK | SDIO_CMDOP_WRITE)
 #define MMC_WRITE_MULTIPLE_BLOCK        25   /* adtc                    R1  */
-#define MMC_WRITE_MULTIPLE_BLOCK_OP     (SDIO_CMDOP_MULTI_BLOCK | SDIO_CMDOP_WRITE | SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_WRITE_MULTIPLE_BLOCK_OP     (SDIO_RESP_R1 | SDIO_CMDOP_MULTI_BLOCK | SDIO_CMDOP_WRITE)
 #define MMC_PROGRAM_CID                 26   /* adtc                    R1  */
-#define MMC_PROGRAM_CID_OP              (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_PROGRAM_CID_OP              (SDIO_RESP_R1)
 #define MMC_PROGRAM_CSD                 27   /* adtc                    R1  */
-#define MMC_PROGRAM_CSD_OP              (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_PROGRAM_CSD_OP              (SDIO_RESP_R1)
 
   /* class 6 */
 #define MMC_SET_WRITE_PROT              28   /* ac   [31:0] data addr   R1b */
-#define MMC_SET_WRITE_PROT_OP           (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_SET_WRITE_PROT_OP           (SDIO_RESP_R1B)
 #define MMC_CLR_WRITE_PROT              29   /* ac   [31:0] data addr   R1b */
-#define MMC_CLR_WRITE_PROT_OP           (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_CLR_WRITE_PROT_OP           (SDIO_RESP_R1B)
 #define MMC_SEND_WRITE_PROT             30   /* adtc [31:0] wpdata addr R1  */
-#define MMC_SEND_WRITE_PROT_OP          (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_SEND_WRITE_PROT_OP          (SDIO_RESP_R1)
 
   /* class 5 */
 #define MMC_ERASE_GROUP_START           35   /* ac   [31:0] data addr   R1  */
-#define MMC_ERASE_GROUP_START_OP        (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_ERASE_GROUP_START_OP        (SDIO_RESP_R1)
 #define MMC_ERASE_GROUP_END             36   /* ac   [31:0] data addr   R1  */
-#define MMC_ERASE_GROUP_END_OP          (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_ERASE_GROUP_END_OP          (SDIO_RESP_R1)
 #define MMC_ERASE                       38   /* ac                      R1b */
-#define MMC_ERASE_OP                    (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_ERASE_OP                    (SDIO_RESP_R1B)
 
   /* class 9 */
 #define MMC_FAST_IO                     39   /* ac   <Complex>          R4  */
-#define MMC_FAST_IO_OP                  (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_FAST_IO_OP                  (SDIO_RESP_R4)
 #define MMC_GO_IRQ_STATE                40   /* bcr                     R5  */
-#define MMC_GO_IRQ_STATE_OP             (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_GO_IRQ_STATE_OP             (SDIO_RESP_R5)
 
   /* class 7 */
 #define MMC_LOCK_UNLOCK                 42   /* adtc                    R1b */
-#define MMC_LOCK_UNLOCK_OP              (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_LOCK_UNLOCK_OP              (SDIO_RESP_R1B)
 
   /* class 8 */
 #define MMC_APP_CMD                     55   /* ac   [31:16] RCA        R1  */
-#define MMC_APP_CMD_OP                  (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_APP_CMD_OP                  (SDIO_RESP_R1)
 #define MMC_GEN_CMD                     56   /* adtc [0] RD/WR          R1  */
-#define MMC_GEN_CMD_OP                  (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_GEN_CMD_OP                  (SDIO_RESP_R1)
 
   /* class 11 */
 #define MMC_QUE_TASK_PARAMS             44   /* ac   [20:16] task id    R1  */
-#define MMC_QUE_TASK_PARAMS_OP          (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_QUE_TASK_PARAMS_OP          (SDIO_RESP_R1)
 #define MMC_QUE_TASK_ADDR               45   /* ac   [31:0] data addr   R1  */
-#define MMC_QUE_TASK_ADDR_OP            (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_QUE_TASK_ADDR_OP            (SDIO_RESP_R1)
 #define MMC_EXECUTE_READ_TASK           46   /* adtc [20:16] task id    R1  */
-#define MMC_EXECUTE_READ_TASK_OP        (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_EXECUTE_READ_TASK_OP        (SDIO_RESP_R1)
 #define MMC_EXECUTE_WRITE_TASK          47   /* adtc [20:16] task id    R1  */
-#define MMC_EXECUTE_WRITE_TASK_OP       (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_EXECUTE_WRITE_TASK_OP       (SDIO_RESP_R1)
 #define MMC_CMDQ_TASK_MGMT              48   /* ac   [20:16] task id    R1b */
-#define MMC_CMDQ_TASK_MGMT_OP           (SDIO_CMDOP_RESP | SDIO_CMDOP_RESP_SHORT_CRC)
+#define MMC_CMDQ_TASK_MGMT_OP           (SDIO_RESP_R1B)
 
 /* SD/MMC version bits; 8 flags, 8 major, 8 minor, 8 change */
 #define SD_VERSION_SD                   (1U << 31)
@@ -544,17 +544,32 @@ typedef enum vsf_sdio_mode_t {
  */
 #if VSF_SDIO_CFG_REIMPLEMENT_TYPE_TRANSOP == DISABLED
 typedef enum vsf_sdio_transop_t {
-    SDIO_CMDOP_SINGLE_BLOCK         = (1ul << 0),
-    SDIO_CMDOP_MULTI_BLOCK          = (1ul << 1),
+    SDIO_CMDOP_BYTE                 = (0ul << 0),
+    SDIO_CMDOP_STREAM               = (1ul << 0),
+    SDIO_CMDOP_SINGLE_BLOCK         = (2ul << 0),
+    SDIO_CMDOP_MULTI_BLOCK          = (3ul << 0),
     SDIO_CMDOP_WRITE                = (1ul << 2),
-    SDIO_CMDOP_RESP                 = (1ul << 3),
-    SDIO_CMDOP_RESP_SHORT           = (1ul << 4),
-    SDIO_CMDOP_RESP_SHORT_CRC       = (2ul << 4),
-    SDIO_CMDOP_RESP_LONG_CRC        = (3ul << 4),
+
+    // prefix __ means private, not mandatory, different names can be used according to different hw
+    __SDIO_CMDOP_RESP               = (1ul << 3),
+    __SDIO_CMDOP_RESP_BUSY          = (1ul << 4),
+    __SDIO_CMDOP_RESP_SHORT         = (1ul << 5),
+    __SDIO_CMDOP_RESP_SHORT_CRC     = (2ul << 5),
+    __SDIO_CMDOP_RESP_LONG_CRC      = (3ul << 5),
+    // SDIO_RESP_R1 etc are mandatory
+#define SDIO_RESP_R1                (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT_CRC)
+#define SDIO_RESP_R1B               (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT_CRC | __SDIO_CMDOP_RESP_BUSY)
+#define SDIO_RESP_R2                (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_LONG_CRC)
+#define SDIO_RESP_R3                (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT)
+#define SDIO_RESP_R4                (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT)
+#define SDIO_RESP_R5                (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT_CRC)
+#define SDIO_RESP_R6                (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT_CRC)
+#define SDIO_RESP_R7                (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT_CRC)
+
     // used for CMD11(SD_SWITCH_VOLTAGE) only, hold clock after resp, ignore if no resp
-    SDIO_CMDOP_CLKHOLD              = (1ul << 6),
+    SDIO_CMDOP_CLKHOLD              = (1ul << 7),
     // used for CMD12(MMC_STOP_TRANSMISSION) only
-    SDIO_CMDOP_TRANS_STOP           = (1ul << 7),
+    SDIO_CMDOP_TRANS_STOP           = (1ul << 8),
 } vsf_sdio_transop_t;
 #endif
 
