@@ -40,6 +40,47 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef enum vsf_hw_peripheral_clksel_t {
+    VSF_HW_CLKSEL_USART16               = VSF_HW_CLKRST_REGION(0x15, 3, 3), // USART16SEL IN RCC.D2CCIP2R
+    VSF_HW_CLKSEL_USART234578           = VSF_HW_CLKRST_REGION(0x15, 0, 3), // USART234578SEL IN RCC.D2CCIP2R
+    VSF_HW_CLKSEL_SDMMC                 = VSF_HW_CLKRST_REGION(0x13, 16, 1),// SDMMCSEL IN RCC.D1CCIPR
+} vsf_hw_peripheral_clksel_t;
+
+enum {
+    VSF_HW_CLK_PRESCALER_DIV,
+    VSF_HW_CLK_PRESCALER_ADD1_DIV,
+    VSF_HW_CLK_PRESCALER_SFT,
+    VSF_HW_CLK_PRESCALER_FUNC,
+};
+enum {
+    VSF_HW_CLK_TYPE_CONST,
+    VSF_HW_CLK_TYPE_CLK,
+    VSF_HW_CLK_TYPE_SEL,
+};
+
+struct vsf_hw_clk_t {
+    uint32_t clksel_region;
+    uint32_t clkprescaler_region;
+    uint32_t clken_region;
+    uint32_t clkrdy_region;
+
+    union {
+        const vsf_hw_clk_t **clksel_mapper;
+        uint32_t clk_freq_hz;
+        const vsf_hw_clk_t *clksrc;
+    };
+    union {
+        const uint8_t *clkprescaler_mapper;
+        uint32_t (*getclk)(const vsf_hw_clk_t *clk, uint32_t clksrc_freq_hz, uint32_t prescaler);
+    };
+
+    uint8_t clktype;
+    uint8_t clkprescaler_type;
+    uint8_t clkprescaler_min;
+    uint8_t clkprescaler_max;
+};
+
 /*============================ PROTOTYPES ====================================*/
 
 static uint32_t __vsf_hw_pll_get_vco(const vsf_hw_clk_t *clk, uint32_t clksrc_freq_hz, uint32_t prescaler);
@@ -359,6 +400,42 @@ const vsf_hw_clk_t VSF_HW_CLK_PCLK4 = {
     .clkprescaler_min           = 0,
     .clkprescaler_max           = 4,
 };
+
+// USARTs
+
+#if VSF_HAL_USE_USART == ENABLED
+static const vsf_hw_clk_t * __VSF_HW_CLK_USART_APB1_CLKSEL_MAPPER[8] = {
+    &VSF_HW_CLK_PCLK1, &VSF_HW_CLK_PLL2_Q, &VSF_HW_CLK_PLL3_Q,
+    &VSF_HW_CLK_HSI, &VSF_HW_CLK_CSI, &VSF_HW_CLK_LSE, NULL, NULL
+};
+static const vsf_hw_clk_t * __VSF_HW_CLK_USART_APB2_CLKSEL_MAPPER[8] = {
+    &VSF_HW_CLK_PCLK2, &VSF_HW_CLK_PLL2_Q, &VSF_HW_CLK_PLL3_Q,
+    &VSF_HW_CLK_HSI, &VSF_HW_CLK_CSI, &VSF_HW_CLK_LSE, NULL, NULL
+};
+const vsf_hw_clk_t VSF_HW_CLK_USART16 = {
+    .clksel_region              = VSF_HW_CLKSEL_USART16,
+    .clksel_mapper              = __VSF_HW_CLK_USART_APB2_CLKSEL_MAPPER,
+    .clktype                    = VSF_HW_CLK_TYPE_SEL,
+};
+const vsf_hw_clk_t VSF_HW_CLK_USART234578 = {
+    .clksel_region              = VSF_HW_CLKSEL_USART234578,
+    .clksel_mapper              = __VSF_HW_CLK_USART_APB1_CLKSEL_MAPPER,
+    .clktype                    = VSF_HW_CLK_TYPE_SEL,
+};
+#endif
+
+// SDIOs
+
+#if VSF_HAL_USE_SDIO == ENABLED
+static const vsf_hw_clk_t * __VSF_HW_CLK_SDMMC_CLKSEL_MAPPER[2] = {
+    &VSF_HW_CLK_PLL1_Q, &VSF_HW_CLK_PLL2_R,
+};
+const vsf_hw_clk_t VSF_HW_CLK_SDMMC = {
+    .clksel_region              = VSF_HW_CLKSEL_SDMMC,
+    .clksel_mapper              = __VSF_HW_CLK_SDMMC_CLKSEL_MAPPER,
+    .clktype                    = VSF_HW_CLK_TYPE_SEL,
+};
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/

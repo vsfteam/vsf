@@ -320,6 +320,7 @@ extern const vsf_hw_clk_t VSF_HW_CLK_PCLK3;
 extern const vsf_hw_clk_t VSF_HW_CLK_PCLK4;
 #define VSF_HW_CLK_APB4         VSF_HW_CLK_PCLK4
 
+#if VSF_HAL_USE_USART == ENABLED
 extern const vsf_hw_clk_t VSF_HW_CLK_USART0;
 extern const vsf_hw_clk_t VSF_HW_CLK_USART1;
 extern const vsf_hw_clk_t VSF_HW_CLK_USART2;
@@ -328,9 +329,12 @@ extern const vsf_hw_clk_t VSF_HW_CLK_USART2;
 extern const vsf_hw_clk_t VSF_HW_CLK_USART5;
 #define VSF_HW_CLK_UART6        VSF_HW_CLK_APB1
 #define VSF_HW_CLK_UART7        VSF_HW_CLK_APB1
+#endif
 
+#if VSF_HAL_USE_SDIO == ENABLED
 extern const vsf_hw_clk_t VSF_HW_CLK_SDIO0;
 extern const vsf_hw_clk_t VSF_HW_CLK_SDIO1;
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ INCLUDES ======================================*/

@@ -393,6 +393,7 @@ const vsf_hw_clk_t VSF_HW_CLK_PCLK4 = {
 
 // USARTs
 
+#if VSF_HAL_USE_USART == ENABLED
 static const vsf_hw_clk_t * __VSF_HW_CLK_USART_APB1_CLKSEL_MAPPER[4] = {
     &VSF_HW_CLK_APB1, &VSF_HW_CLK_AHB, &VSF_HW_CLK_LXTAL, &VSF_HW_CLK_IRC64MDIV,
 };
@@ -419,9 +420,11 @@ const vsf_hw_clk_t VSF_HW_CLK_USART5 = {
     .clksel_mapper              = __VSF_HW_CLK_USART_APB2_CLKSEL_MAPPER,
     .clktype                    = VSF_HW_CLK_TYPE_SEL,
 };
+#endif
 
-// SDIO
+// SDIOs
 
+#if VSF_HAL_USE_SDIO == ENABLED
 static const vsf_hw_clk_t * __VSF_HW_CLK_SDIO_CLKSEL_MAPPER[2] = {
     &VSF_HW_CLK_PLL0Q, &VSF_HW_CLK_PLL1R,
 };
@@ -435,6 +438,7 @@ const vsf_hw_clk_t VSF_HW_CLK_SDIO1 = {
     .clksel_mapper              = __VSF_HW_CLK_SDIO_CLKSEL_MAPPER,
     .clktype                    = VSF_HW_CLK_TYPE_SEL,
 };
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/

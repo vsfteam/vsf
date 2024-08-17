@@ -23,7 +23,7 @@
 
 #include "hal/vsf_hal.h"
 
-#include "../vendor/Include/gd32h7xx_sdio.h"
+#include "../vendor/Inc/stm32h7xx.h"
 
 /*============================ MACROS ========================================*/
 
@@ -44,7 +44,7 @@ typedef struct VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) {
     vsf_sdio_t vsf_sdio;
 #endif
 
-    uint32_t                reg;
+    SDMMC_TypeDef           *reg;
     const vsf_hw_clk_t      *clk;
     vsf_hw_peripheral_en_t  en;
     vsf_hw_peripheral_rst_t rst;
@@ -60,18 +60,18 @@ typedef struct VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) {
 static void VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_irqhandler)(
     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
 ) {
-    uint32_t reg = sdio_ptr->reg;
-    uint32_t sts = SDIO_STAT(reg);
-    SDIO_INTC(reg) = SDIO_INTC_CMDTMOUTC | SDIO_INTC_CCRCERRC | SDIO_INTC_DTCRCERRC | SDIO_INTC_CMDRECVC | SDIO_INTC_CMDSENDC | SDIO_INTC_DTENDC;
+    SDMMC_TypeDef *reg = sdio_ptr->reg;
+    uint32_t sts = reg->STA;
+    reg->ICR = SDMMC_ICR_CTIMEOUTC | SDMMC_ICR_CCRCFAILC | SDMMC_ICR_DCRCFAILC | SDMMC_ICR_CMDRENDC | SDMMC_ICR_CMDSENTC | SDMMC_ICR_DATAENDC;
     if (sdio_ptr->isr.handler_fn != NULL) {
         uint32_t resp[4];
-        if (((SDIO_CMDCTL(reg) >> 8) & 0x03) == 0x03) {
-            resp[0] = SDIO_RESP3(reg);
-            resp[1] = SDIO_RESP2(reg);
-            resp[2] = SDIO_RESP1(reg);
-            resp[3] = SDIO_RESP0(reg);
+        if (((reg->CMD >> SDMMC_CMD_WAITRESP_Pos) & 0x03) == 0x03) {
+            resp[0] = reg->RESP4;
+            resp[1] = reg->RESP3;
+            resp[2] = reg->RESP2;
+            resp[3] = reg->RESP1;
         } else {
-            resp[0] = SDIO_RESP0(reg);
+            resp[0] = reg->RESP1;
         }
         if ((sdio_ptr->buf != NULL) && (sdio_ptr->bufsiz > 0)) {
             SCB_CleanInvalidateDCache_by_Addr(sdio_ptr->buf, sdio_ptr->bufsiz);
@@ -85,14 +85,14 @@ vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_init)(
     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr,
     vsf_sdio_cfg_t *cfg_ptr
 ) {
-    uint32_t reg = sdio_ptr->reg;
+    SDMMC_TypeDef *reg = sdio_ptr->reg;
 
     vsf_hw_peripheral_enable(sdio_ptr->en);
 
-    SDIO_CLKCTL(reg) &= ~(SDIO_CLKCTL_HWEN | SDIO_CLKCTL_CLKEDGE | SDIO_CLKCTL_BUSMODE | SDIO_CLKCTL_CLKPWRSAV);
+    reg->CLKCR &= ~(SDMMC_CLKCR_HWFC_EN | SDMMC_CLKCR_NEGEDGE | SDMMC_CLKCR_WIDBUS | SDMMC_CLKCR_PWRSAV);
     vsf_hw_sdio_set_clock(sdio_ptr, 400000, false);
     vsf_hw_sdio_set_bus_width(sdio_ptr, 1);
-    SDIO_PWRCTL(sdio_ptr->reg) = (SDIO_PWRCTL(sdio_ptr->reg) & ~SDIO_PWRCTL_PWRCTL) | SDIO_POWER_ON;
+    reg->POWER = (reg->POWER & ~SDMMC_POWER_PWRCTRL) | 3;
 
     sdio_ptr->isr = cfg_ptr->isr;
     if (cfg_ptr->isr.handler_fn != NULL) {
@@ -115,16 +115,16 @@ void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_irq_enable)(
     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr,
     vsf_sdio_irq_mask_t irq_mask
 ) {
-    irq_mask |= SDIO_INTEN_CMDTMOUTIE | SDIO_INTEN_CCRCERRIE | SDIO_INTEN_DTCRCERRIE;
-    SDIO_INTEN(sdio_ptr->reg) |= irq_mask;
+    irq_mask |= SDMMC_MASK_CTIMEOUTIE | SDMMC_MASK_CCRCFAILIE | SDMMC_MASK_DCRCFAILIE;
+    sdio_ptr->reg->MASK |= irq_mask;
 }
 
 void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_irq_disable)(
     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr,
     vsf_sdio_irq_mask_t irq_mask
 ) {
-    irq_mask |= SDIO_INTEN_CMDTMOUTIE | SDIO_INTEN_CCRCERRIE | SDIO_INTEN_DTCRCERRIE;
-    SDIO_INTEN(sdio_ptr->reg) &= ~irq_mask;
+    irq_mask |= SDMMC_MASK_CTIMEOUTIE | SDMMC_MASK_CCRCFAILIE | SDMMC_MASK_DCRCFAILIE;
+    sdio_ptr->reg->MASK &= ~irq_mask;
 }
 
 vsf_sdio_status_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_status)(
@@ -153,11 +153,11 @@ vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_set_clock)(
     bool is_ddr
 ) {
     VSF_HAL_ASSERT(sdio_ptr != NULL);
-    uint32_t reg = sdio_ptr->reg;
-    uint32_t tmp = SDIO_CLKCTL(reg) & ~SDIO_CLKCTL_DIV;
+    SDMMC_TypeDef *reg = sdio_ptr->reg;
+    uint32_t tmp = reg->CLKCR & ~SDMMC_CLKCR_CLKDIV;
     uint32_t div = (vsf_hw_clk_get_freq_hz(sdio_ptr->clk) / clock_hz) >> 1;
     VSF_HAL_ASSERT(div <= 0x3FF);
-    SDIO_CLKCTL(reg) = tmp | div;
+    reg->CLKCR = tmp | div;
     return VSF_ERR_NONE;
 }
 
@@ -166,17 +166,17 @@ vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_set_bus_width)(
     uint8_t bus_width
 ) {
     VSF_HAL_ASSERT(sdio_ptr != NULL);
-    uint32_t reg = sdio_ptr->reg;
-    uint32_t tmp = SDIO_CLKCTL(reg) & ~SDIO_CLKCTL_BUSMODE;
+    SDMMC_TypeDef *reg = sdio_ptr->reg;
+    uint32_t tmp = reg->CLKCR & ~SDMMC_CLKCR_WIDBUS;
     switch (bus_width) {
     case 1:
-        SDIO_CLKCTL(reg) = tmp | SDIO_BUSMODE_1BIT;
+        reg->CLKCR = tmp | (0 << SDMMC_CLKCR_WIDBUS_Pos);
         break;
     case 4:
-        SDIO_CLKCTL(reg) = tmp | SDIO_BUSMODE_4BIT;
+        reg->CLKCR = tmp | (1 << SDMMC_CLKCR_WIDBUS_Pos);
         break;
     case 8:
-        SDIO_CLKCTL(reg) = tmp | SDIO_BUSMODE_8BIT;
+        reg->CLKCR = tmp | (2 << SDMMC_CLKCR_WIDBUS_Pos);
         break;
     default:
         VSF_HAL_ASSERT(false);
@@ -194,19 +194,19 @@ vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_request)(
     VSF_HAL_ASSERT(!(req->cmd & ~0x3F));
     req->op &= 0xFFFF;
 
-    uint32_t reg = sdio_ptr->reg;
+    SDMMC_TypeDef *reg = sdio_ptr->reg;
     uint32_t datactl = req->op & 0x00FF;
     uint32_t cmdctl = (req->op & 0xFF00) >> 2;
 
-    VSF_HAL_ASSERT(!(SDIO_CMDCTL(reg) & SDIO_CMDCTL_CSMEN));
+    VSF_HAL_ASSERT(!(reg->CMD & SDMMC_CMD_CPSMEN));
 
-    if (req->op & __SDIO_CMDOP_DATAEN) {
+    if (req->op & __SDIO_CMDOP_DTEN) {
         VSF_HAL_ASSERT(!(req->count & 0x1F) && ((req->count >> 5) <= 2040));
         VSF_HAL_ASSERT(req->block_size_bits < 15);
         VSF_HAL_ASSERT(!(req->count % (1 << req->block_size_bits)));
         VSF_HAL_ASSERT(!((uint32_t)req->buffer & 3));
 
-        if (req->op & __SDIO_CMDOP_DATADIR) {
+        if (req->op & __SDIO_CMDOP_DTDIR) {
             // for read operation, invalid buffer after done
             sdio_ptr->buf = req->buffer;
             sdio_ptr->bufsiz = req->count;
@@ -215,19 +215,19 @@ vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_request)(
             sdio_ptr->buf = NULL;
         }
 
-        SDIO_IDMASIZE(reg) = req->count;
-        SDIO_DATALEN(reg) = req->count;
-        SDIO_IDMAADDR0(reg) = (uint32_t)req->buffer;
-        SDIO_DATATO(reg) = 0xFFFFFFFF;
-        SDIO_IDMACTL(reg) = SDIO_IDMA_SINGLE_BUFFER | SDIO_IDMACTL_IDMAEN;
+        reg->IDMABSIZE = req->count;
+        reg->DLEN = req->count;
+        reg->IDMABASE0 = (uint32_t)req->buffer;
+        reg->DTIMER = 0xFFFFFFFF;
+        reg->IDMACTRL = SDMMC_IDMA_IDMAEN;
         datactl |= req->block_size_bits << 4;
     } else {
-        SDIO_IDMACTL(reg) = 0;
+        reg->IDMACTRL = 0;
     }
 
-    SDIO_CMDAGMT(reg) = req->arg;
-    SDIO_DATACTL(reg) = datactl;
-    SDIO_CMDCTL(reg) = req->cmd | cmdctl | SDIO_CMDCTL_CSMEN;
+    reg->ARG = req->arg;
+    reg->DCTRL = datactl;
+    reg->CMD = req->cmd | cmdctl | SDMMC_CMD_CPSMEN;
 
     return VSF_ERR_NONE;
 }

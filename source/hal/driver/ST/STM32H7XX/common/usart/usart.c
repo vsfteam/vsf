@@ -55,7 +55,7 @@ typedef struct VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) {
     vsf_usart_t             vsf_usart;
 #endif
     USART_TypeDef           *reg;
-    vsf_hw_peripheral_clksel_t clksel;
+    const vsf_hw_clk_t      *clk;
     vsf_hw_peripheral_rst_t rst;
     vsf_hw_peripheral_en_t  en;
     bool                    support_sync;
@@ -67,16 +67,6 @@ typedef struct VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) {
 /*============================ INCLUDES ======================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-
-static const vsf_hw_clk_t * VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart16_clks)[6] = {
-    &VSF_HW_CLK_PCLK2, &VSF_HW_CLK_PLL2_Q, &VSF_HW_CLK_PLL3_Q,
-    &VSF_HW_CLK_HSI, &VSF_HW_CLK_CSI, &VSF_HW_CLK_LSE
-};
-static const vsf_hw_clk_t * VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart234578_clks)[6] = {
-    &VSF_HW_CLK_PCLK1, &VSF_HW_CLK_PLL2_Q, &VSF_HW_CLK_PLL3_Q,
-    &VSF_HW_CLK_HSI, &VSF_HW_CLK_CSI, &VSF_HW_CLK_LSE
-};
-
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -96,13 +86,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     VSF_HAL_ASSERT(!(cfg_ptr->mode & __VSF_HW_USART_NOT_SUPPORT_MASK));
 
     USART_TypeDef *reg = usart_ptr->reg;
-    uint8_t clksel = vsf_hw_peripheral_clk_get(usart_ptr->clksel);
-    VSF_HAL_ASSERT(clksel < 6);
-    const vsf_hw_clk_t *clk = usart_ptr->clksel == VSF_HW_CLKSEL_USART16 ?
-            VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart16_clks)[clksel]
-        :   VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart234578_clks)[clksel];
-
-    uint32_t pclk = vsf_hw_clk_get_freq_hz(clk);
+    uint32_t pclk = vsf_hw_clk_get_freq_hz(usart_ptr->clk);
     uint32_t over8 = (cfg_ptr->mode & VSF_USART_OVERSAMPLE_MASK) >> 3;
     cfg_ptr->mode &= ~VSF_USART_OVERSAMPLE_MASK;
     uint32_t intdiv = 0U, fradiv = 0U, udiv = 0U;
@@ -394,7 +378,7 @@ int_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t)                            \
         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __IDX) = {               \
         .reg                = (USART_TypeDef *)VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _REG_BASE),\
-        .clksel             = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _CLKSEL),\
+        .clk                = &VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _CLK),\
         .en                 = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _EN),\
         .rst                = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _RST),\
         .support_sync       = VSF_MCONNECT(VSF_USART_CFG_IMP_UPCASE_PREFIX, _USART, __IDX, _SYNC),\
