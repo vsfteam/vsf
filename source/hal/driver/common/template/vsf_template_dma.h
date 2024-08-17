@@ -446,16 +446,16 @@ extern vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr, int8_
 
 #if VSF_DMA_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_dma_t                                          VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_t)
-#   define vsf_dma_init(__DMA, ...)                             VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_init)                             ((__vsf_dma_t *)__DMA, ##__VA_ARGS__)
-#   define vsf_dma_fini(__DMA)                                  VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_fini)                             ((__vsf_dma_t *)__DMA)
-#   define vsf_dma_capability(__DMA)                            VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_capability)                       ((__vsf_dma_t *)__DMA)
-#   define vsf_dma_channel_request(__DMA, ...)                  VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_request)                  ((__vsf_dma_t *)__DMA, ##__VA_ARGS__)
-#   define vsf_dma_channel_release(__DMA, ...)                  VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_release)                  ((__vsf_dma_t *)__DMA, ##__VA_ARGS__)
-#   define vsf_dma_channel_config(__DMA, ...)                   VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_config)                   ((__vsf_dma_t *)__DMA, ##__VA_ARGS__)
-#   define vsf_dma_channel_start(__DMA, ...)                    VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_start)                    ((__vsf_dma_t *)__DMA, ##__VA_ARGS__)
-#   define vsf_dma_channel_cancel(__DMA, ...)                   VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_cancel)                   ((__vsf_dma_t *)__DMA, ##__VA_ARGS__)
-#   define vsf_dma_channel_get_transferred_count(__DMA, ...)    VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_get_transferred_count)    ((__vsf_dma_t *)__DMA, ##__VA_ARGS__)
-#   define vsf_dma_channel_status(__DMA, ...)                   VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_status)                   ((__vsf_dma_t *)__DMA, ##__VA_ARGS__)
+#   define vsf_dma_init(__DMA, ...)                             VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_init)                             ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_fini(__DMA)                                  VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_fini)                             ((__vsf_dma_t *)(__DMA))
+#   define vsf_dma_capability(__DMA)                            VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_capability)                       ((__vsf_dma_t *)(__DMA))
+#   define vsf_dma_channel_request(__DMA, ...)                  VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_request)                  ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_release(__DMA, ...)                  VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_release)                  ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_config(__DMA, ...)                   VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_config)                   ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_start(__DMA, ...)                    VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_start)                    ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_cancel(__DMA, ...)                   VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_cancel)                   ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_get_transferred_count(__DMA, ...)    VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_get_transferred_count)    ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_status(__DMA, ...)                   VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_status)                   ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

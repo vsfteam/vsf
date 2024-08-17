@@ -497,16 +497,16 @@ extern uint_fast32_t vsf_i2c_get_transferred_count(vsf_i2c_t *i2c_ptr);
 
 #if VSF_I2C_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_i2c_t                              VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t)
-#   define vsf_i2c_init(__I2C, ...)                 VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_init)                 ((__vsf_i2c_t *)__I2C, ##__VA_ARGS__)
-#   define vsf_i2c_fini(__I2C)                      VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_fini)                 ((__vsf_i2c_t *)__I2C)
-#   define vsf_i2c_enable(__I2C)                    VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_enable)               ((__vsf_i2c_t *)__I2C)
-#   define vsf_i2c_disable(__I2C)                   VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_disable)              ((__vsf_i2c_t *)__I2C)
-#   define vsf_i2c_irq_enable(__I2C, ...)           VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_enable)           ((__vsf_i2c_t *)__I2C, ##__VA_ARGS__)
-#   define vsf_i2c_irq_disable(__I2C, ...)          VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_disable)          ((__vsf_i2c_t *)__I2C, ##__VA_ARGS__)
-#   define vsf_i2c_status(__I2C)                    VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_status)               ((__vsf_i2c_t *)__I2C)
-#   define vsf_i2c_capability(__I2C)                VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_capability)           ((__vsf_i2c_t *)__I2C)
-#   define vsf_i2c_master_request(__I2C, ...)       VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_request)       ((__vsf_i2c_t *)__I2C, ##__VA_ARGS__)
-#   define vsf_i2c_get_transferred_count(__I2C, ...) VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_get_transferred_count) ((__vsf_i2c_t *)__I2C, ##__VA_ARGS__)
+#   define vsf_i2c_init(__I2C, ...)                 VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_init)                 ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
+#   define vsf_i2c_fini(__I2C)                      VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_fini)                 ((__vsf_i2c_t *)(__I2C))
+#   define vsf_i2c_enable(__I2C)                    VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_enable)               ((__vsf_i2c_t *)(__I2C))
+#   define vsf_i2c_disable(__I2C)                   VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_disable)              ((__vsf_i2c_t *)(__I2C))
+#   define vsf_i2c_irq_enable(__I2C, ...)           VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_enable)           ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
+#   define vsf_i2c_irq_disable(__I2C, ...)          VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_disable)          ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
+#   define vsf_i2c_status(__I2C)                    VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_status)               ((__vsf_i2c_t *)(__I2C))
+#   define vsf_i2c_capability(__I2C)                VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_capability)           ((__vsf_i2c_t *)(__I2C))
+#   define vsf_i2c_master_request(__I2C, ...)       VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_request)       ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
+#   define vsf_i2c_get_transferred_count(__I2C, ...) VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_get_transferred_count) ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

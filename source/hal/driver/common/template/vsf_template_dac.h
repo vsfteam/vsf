@@ -337,17 +337,17 @@ extern vsf_err_t vsf_dac_channel_request(vsf_dac_t *dac_ptr,
 
 #if VSF_DAC_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_dac_t                              VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_t)
-#   define vsf_dac_init(__DAC, ...)                 VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_init)                 ((__vsf_dac_t *)__DAC, ##__VA_ARGS__)
-#   define vsf_dac_fini(__DAC)                      VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_fini)                 ((__vsf_dac_t *)__DAC)
-#   define vsf_dac_enable(__DAC)                    VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_enable)               ((__vsf_dac_t *)__DAC)
-#   define vsf_dac_disable(__DAC)                   VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_disable)              ((__vsf_dac_t *)__DAC)
-#   define vsf_dac_status(__DAC)                    VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_status)               ((__vsf_dac_t *)__DAC)
-#   define vsf_dac_capability(__DAC)                VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_capability)           ((__vsf_dac_t *)__DAC)
-#   define vsf_dac_irq_enable(__DAC, ...)           VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_irq_enable)           ((__vsf_dac_t *)__DAC, ##__VA_ARGS__)
-#   define vsf_dac_irq_disable(__DAC, ...)          VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_irq_disable)          ((__vsf_dac_t *)__DAC, ##__VA_ARGS__)
-#   define vsf_dac_channel_request_once(__DAC, ...) VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_channel_request_once) ((__vsf_dac_t *)__DAC, ##__VA_ARGS__)
-#   define vsf_dac_channel_config(__DAC, ...)       VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_channel_config)       ((__vsf_dac_t *)__DAC, ##__VA_ARGS__)
-#   define vsf_dac_channel_request(__DAC, ...)      VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_channel_request)      ((__vsf_dac_t *)__DAC, ##__VA_ARGS__)
+#   define vsf_dac_init(__DAC, ...)                 VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_init)                 ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
+#   define vsf_dac_fini(__DAC)                      VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_fini)                 ((__vsf_dac_t *)(__DAC))
+#   define vsf_dac_enable(__DAC)                    VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_enable)               ((__vsf_dac_t *)(__DAC))
+#   define vsf_dac_disable(__DAC)                   VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_disable)              ((__vsf_dac_t *)(__DAC))
+#   define vsf_dac_status(__DAC)                    VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_status)               ((__vsf_dac_t *)(__DAC))
+#   define vsf_dac_capability(__DAC)                VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_capability)           ((__vsf_dac_t *)(__DAC))
+#   define vsf_dac_irq_enable(__DAC, ...)           VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_irq_enable)           ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
+#   define vsf_dac_irq_disable(__DAC, ...)          VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_irq_disable)          ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
+#   define vsf_dac_channel_request_once(__DAC, ...) VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_channel_request_once) ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
+#   define vsf_dac_channel_config(__DAC, ...)       VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_channel_config)       ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
+#   define vsf_dac_channel_request(__DAC, ...)      VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_channel_request)      ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus
