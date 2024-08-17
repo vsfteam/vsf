@@ -95,20 +95,25 @@ static void __vk_sdmmc_mal_irqhandler(void *target, vsf_sdio_t *sdio,
                 vsf_eda_post_evt(eda, (err < 0) ? VSF_EVT_SDMMC_ERROR : VSF_EVT_SDMMC_DONE);
             }
         }
+    } else if (pthis->is_stopping) {
+        pthis->is_stopping = false;
+        if ((eda = pthis->eda) != NULL) {
+            pthis->eda = NULL;
+            vsf_eda_post_evt(eda, VSF_EVT_SDMMC_ERROR);
+        }
     } else {
+        // TODO: does code below necessary?
         if (    (status & SDIO_REQSTS_ERR_MASK)
             ||  (   (irq_mask & SDIO_IRQ_MASK_HOST_RESP_DONE)
                  && !(resp[0] & R1_READY_FOR_DATA)
                 )
            ) {
+            pthis->is_stopping = true;
             vsf_sdio_host_request(pthis->sdio, &(vsf_sdio_req_t){
                 .cmd                = MMC_STOP_TRANSMISSION,
                 .op                 = MMC_STOP_TRANSMISSION_OP,
             });
-            if ((eda = pthis->eda) != NULL) {
-                pthis->eda = NULL;
-                vsf_eda_post_evt(eda, VSF_EVT_SDMMC_ERROR);
-            }
+            return;
         }
         if (irq_mask & SDIO_IRQ_MASK_HOST_DATA_DONE) {
             if ((eda = pthis->eda) != NULL) {
@@ -143,6 +148,7 @@ __vsf_component_peda_ifs_entry(__vk_sdmmc_mal_init, vk_mal_init)
         pthis->timer.on_timer = __vk_sdmmc_mal_on_timer;
         vsf_callback_timer_init(&pthis->timer);
 
+        pthis->is_stopping = false;
         pthis->is_probing = true;
         pthis->eda = vsf_eda_get_cur();
         VSF_FS_ASSERT(pthis->eda != NULL);

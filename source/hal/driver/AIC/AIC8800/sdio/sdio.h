@@ -27,10 +27,15 @@
 #include "../__device.h"
 
 /*============================ MACROS ========================================*/
+
+#define VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQOP     ENABLED
+#define VSF_SDIO_CFG_REIMPLEMENT_TYPE_IRQ_MASK  ENABLED
+#define VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQSTS    ENABLED
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef enum vsf_sdio_transop_t {
+typedef enum vsf_sdio_reqop_t {
     SDIO_CMDOP_SINGLE_BLOCK             = (1ul << 8),   // MMC_CMDOP_RW
     SDIO_CMDOP_MULTI_BLOCK              = (1ul << 8) | (1ul << 10) | (1ul << 16),
                                                         // MMC_CMDOP_RW | SDMMC_MULTI_BLOCK_MODE | SDMMC_AUTOCMD12_ENABLE
@@ -51,13 +56,13 @@ typedef enum vsf_sdio_transop_t {
     // not care
     SDIO_RESP_BUSY                      = (1 << 28),
 
-    __VSF_HW_SDIO_TRANSOP_MASK          = SDIO_CMDOP_SINGLE_BLOCK
+    __VSF_HW_SDIO_CMDOP_MASK            = SDIO_CMDOP_SINGLE_BLOCK
                                         | SDIO_CMDOP_MULTI_BLOCK
                                         | SDIO_CMDOP_WRITE
                                         | __SDIO_CMDOP_RESP
                                         | __SDIO_CMDOP_RESP_SHORT
                                         | __SDIO_CMDOP_RESP_SHORT_CRC
-                                        | __SDIO_CMDOP_RESP_LONG,
+                                        | __SDIO_CMDOP_RESP_LONG_CRC,
 
 #define SDIO_RESP_NONE                  0
 #define SDIO_RESP_R1                    (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT_CRC)
@@ -68,7 +73,7 @@ typedef enum vsf_sdio_transop_t {
 #define SDIO_RESP_R5                    (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT_CRC)
 #define SDIO_RESP_R6                    (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT_CRC)
 #define SDIO_RESP_R7                    (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT_CRC)
-} vsf_sdio_transop_t;
+} vsf_sdio_reqop_t;
 
 typedef enum vsf_sdio_irq_mask_t {
     SDIO_IRQ_MASK_HOST_RESP_DONE        = (0x1ul << 9), // SDMMC_RESP_DONE_FLAG
@@ -77,17 +82,17 @@ typedef enum vsf_sdio_irq_mask_t {
                                         | SDIO_IRQ_MASK_HOST_DATA_DONE,
 } vsf_sdio_irq_mask_t;
 
-typedef enum vsf_sdio_transact_status_t {
-    SDIO_TRANSACT_STATUS_DONE           = 0,
-    SDIO_TRANSACT_STATUS_ERR_RESP_NONE  = (0x1ul << 9),
-    SDIO_TRANSACT_STATUS_ERR_RESP_CRC   = (0x1ul << 8),
-    SDIO_TRANSACT_STATUS_ERR_DATA_CRC   = (0xFFul << 16),
-    SDIO_TRANSACT_STATUS_DATA_BUSY      = (0x1ul << 2),
-    SDIO_TRANSACT_STATUS_BUSY           = (0x1ul << 1),
-    SDIO_TRANSACT_STATUS_ERR_MASK       = SDIO_TRANSACT_STATUS_ERR_RESP_NONE
-                                        | SDIO_TRANSACT_STATUS_ERR_RESP_CRC
-                                        | SDIO_TRANSACT_STATUS_ERR_DATA_CRC,
-} vsf_sdio_transact_status_t;
+typedef enum vsf_sdio_reqsts_t {
+    SDIO_REQSTS_DONE                    = 0,
+    SDIO_REQSTS_ERR_RESP_NONE           = (0x1ul << 9),
+    SDIO_REQSTS_ERR_RESP_CRC            = (0x1ul << 8),
+    SDIO_REQSTS_ERR_DATA_CRC            = (0xFFul << 16),
+    SDIO_REQSTS_DATA_BUSY               = (0x1ul << 2),
+    SDIO_REQSTS_BUSY                    = (0x1ul << 1),
+    SDIO_REQSTS_ERR_MASK                = SDIO_REQSTS_ERR_RESP_NONE
+                                        | SDIO_REQSTS_ERR_RESP_CRC
+                                        | SDIO_REQSTS_ERR_DATA_CRC,
+} vsf_sdio_reqsts_t;
 
 /*============================ INCLUDES ======================================*/
 

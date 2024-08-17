@@ -58,6 +58,7 @@ vsf_class(vk_sdmmc_mal_t) {
         vsf_callback_timer_t    timer;
         vsf_eda_t              *eda;
         bool                    is_probing;
+        bool                    is_stopping;
     )
 };
 

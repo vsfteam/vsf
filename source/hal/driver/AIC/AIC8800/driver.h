@@ -109,9 +109,6 @@
 #endif
 
 #if VSF_HAL_USE_SDIO == ENABLED
-#   define VSF_SDIO_CFG_REIMPLEMENT_TYPE_TRANSOP            ENABLED
-#   define VSF_SDIO_CFG_REIMPLEMENT_TYPE_IRQ_MASK           ENABLED
-#   define VSF_SDIO_CFG_REIMPLEMENT_TYPE_TRANSACT_STATUS    ENABLED
 #   include "hal/driver/common/template/vsf_template_sdio.h"
 
 #   define VSF_SDIO_CFG_DEC_PREFIX                          vsf_hw

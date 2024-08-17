@@ -136,7 +136,7 @@ vsf_sdio_status_t vsf_hw_sdio_status(vsf_hw_sdio_t *sdio_ptr)
 {
     AIC_SDMMC_TypeDef *reg = sdio_ptr->sdio_const->reg;
     vsf_sdio_status_t status = {
-        .transact_status    = reg->GSR,
+        .req_status         = reg->GSR,
         .irq_status         = reg->ISR,
     };
     return status;
@@ -169,25 +169,40 @@ vsf_err_t vsf_hw_sdio_set_bus_width(vsf_hw_sdio_t *sdio_ptr, uint8_t bus_width)
     return VSF_ERR_NONE;
 }
 
-vsf_err_t vsf_hw_sdio_host_transact_start(vsf_hw_sdio_t *sdio_ptr, vsf_sdio_trans_t *trans)
+vsf_err_t vsf_hw_sdio_host_request(vsf_hw_sdio_t *sdio_ptr, vsf_sdio_req_t *req)
 {
-    VSF_HAL_ASSERT(trans != NULL);
-    VSF_HAL_ASSERT(!(trans->op & (SDIO_CMDOP_CLKHOLD | SDIO_CMDOP_TRANS_STOP | SDIO_CMDOP_BYTE | SDIO_CMDOP_STREAM)));
-    trans->op &= __VSF_HW_SDIO_TRANSOP_MASK;
+    VSF_HAL_ASSERT(req != NULL);
+    VSF_HAL_ASSERT(!(req->op & (SDIO_CMDOP_CLKHOLD | SDIO_CMDOP_TRANS_STOP | SDIO_CMDOP_BYTE | SDIO_CMDOP_STREAM)));
+    req->op &= __VSF_HW_SDIO_CMDOP_MASK;
+
+    if (req->cmd == 12) {
+        reg->DBLR = 0x00UL;
+        reg->DBCR = 0x00UL;
+        reg->CTLR = (SDMMC_ENDIAN_TYPE(1) | SDMMC_DATARD_TRIGEN | SDMMC_DATAWR_TRIGEN |
+                       SDMMC_DATARD_TRIGTH(DATARD_TRIG_TH) | SDMMC_DATAWR_TRIGTH(DATAWR_TRIG_TH));
+        reg->CTLR = (SDMMC_RESET_N | SDMMC_ENDIAN_TYPE(1) | SDMMC_DATARD_TRIGEN | SDMMC_DATAWR_TRIGEN |
+                       SDMMC_DATARD_TRIGTH(DATARD_TRIG_TH) | SDMMC_DATAWR_TRIGTH(DATAWR_TRIG_TH));
+
+        if (sdio_ptr->cfg.isr.handler_fn != NULL) {
+            sdio_ptr->cfg.isr.handler_fn(sdio_ptr->cfg.isr.target_ptr, &sdio_ptr->vsf_sdio,
+                    SDIO_IRQ_MASK_HOST_RESP_DONE, SDIO_REQSTS_DONE, NULL);
+        }
+        return VSF_ERR_NONE;
+    }
 
     if (__vsf_hw_sdio_host_is_busy(sdio_ptr)) {
         return VSF_ERR_BUSY;
     }
 
     AIC_SDMMC_TypeDef *reg = sdio_ptr->sdio_const->reg;
-    bool has_data = ((trans->buffer != NULL) && (trans->count > 0));
-    bool is_write = trans->op & SDIO_CMDOP_WRITE;
+    bool has_data = ((req->buffer != NULL) && (req->count > 0));
+    bool is_write = req->op & SDIO_CMDOP_WRITE;
     int ch;
 
     if (has_data) {
-        VSF_HAL_ASSERT(trans->block_size_bits != 0);
-        reg->DBLR = trans->block_size_bits;
-        reg->DBCR = trans->count / (1 << trans->block_size_bits);
+        VSF_HAL_ASSERT(req->block_size_bits != 0);
+        reg->DBLR = req->block_size_bits;
+        reg->DBCR = req->count / (1 << req->block_size_bits);
 
         reg->CTLR = (SDMMC_RESET_N | SDMMC_ENDIAN_TYPE(1) | SDMMC_DATARD_TRIGEN | SDMMC_DATAWR_TRIGEN |
                        SDMMC_DATARD_TRIGTH(DATARD_TRIG_TH) | SDMMC_DATAWR_TRIGTH(DATAWR_TRIG_TH));
@@ -197,21 +212,21 @@ vsf_err_t vsf_hw_sdio_host_transact_start(vsf_hw_sdio_t *sdio_ptr, vsf_sdio_tran
             dma_erqcsr_set(REQ_CID_SDMMC_TX, ch);
             dma_ch_rqr_erql_setb(ch);
             dma_ch_dar_set(ch, (unsigned int)(&reg->DWRR));
-            dma_ch_sar_set(ch, (unsigned int)trans->buffer);
+            dma_ch_sar_set(ch, (unsigned int)req->buffer);
             dma_ch_tbl0cr_set(ch, ((4 * DATAWR_TRIG_TH) | (REQ_FRAG << DMA_CH_RQTYP_LSB) | (AHB_WORD << DMA_CH_DBUSU_LSB) |
                              (AHB_WORD << DMA_CH_SBUSU_LSB) | DMA_CH_CONSTDA_BIT));
         } else {
             ch = DMA_CHANNEL_SDMMC_RX;
             dma_erqcsr_set(REQ_CID_SDMMC_RX, ch);
             dma_ch_rqr_erql_setb(ch);
-            dma_ch_dar_set(ch, (unsigned int)trans->buffer);
+            dma_ch_dar_set(ch, (unsigned int)req->buffer);
             dma_ch_sar_set(ch, (unsigned int)(&reg->DRDR));
             dma_ch_tbl0cr_set(ch, ((4 * DATARD_TRIG_TH) | (REQ_FRAG << DMA_CH_RQTYP_LSB) | (AHB_WORD << DMA_CH_DBUSU_LSB) |
                              (AHB_WORD << DMA_CH_SBUSU_LSB) | DMA_CH_CONSTSA_BIT));
         }
 
-        dma_ch_tbl1cr_set(ch, trans->count);
-        dma_ch_tbl2cr_set(ch, trans->count);
+        dma_ch_tbl1cr_set(ch, req->count);
+        dma_ch_tbl2cr_set(ch, req->count);
         dma_ch_tsr_set(ch, ((4 << DMA_CH_STRANSZ_LSB) | (4 << DMA_CH_DTRANSZ_LSB)));
         dma_ch_wmar_set(ch, 0);
         dma_ch_wjar_set(ch, 0);
@@ -223,29 +238,17 @@ vsf_err_t vsf_hw_sdio_host_transact_start(vsf_hw_sdio_t *sdio_ptr, vsf_sdio_tran
         }
     }
 
-    sdio_ptr->is_resp_long = !!((trans->op & (3 << 5)) == __SDIO_CMDOP_RESP_LONG_CRC);
+    sdio_ptr->is_resp_long = !!((req->op & (3 << 5)) == __SDIO_CMDOP_RESP_LONG_CRC);
     reg->CFGR = 0;
-    reg->CMDR = trans->cmd;
-    reg->ARGR = trans->arg;
-    reg->CFGR = trans->op | SDMMC_COMMAND_START;
+    reg->CMDR = req->cmd;
+    reg->ARGR = req->arg;
+    reg->CFGR = req->op | SDMMC_COMMAND_START;
 
     if (has_data && !is_write) {
         dma_ch_ctlr_set(ch, (DMA_CH_CHENA_BIT | (0x01UL << DMA_CH_BUSBU_LSB)));
     }
 
     return VSF_ERR_NONE;
-}
-
-void vsf_hw_sdio_host_transact_stop(vsf_hw_sdio_t *sdio_ptr)
-{
-    AIC_SDMMC_TypeDef *reg = sdio_ptr->sdio_const->reg;
-
-    reg->DBLR = 0x00UL;
-    reg->DBCR = 0x00UL;
-    reg->CTLR = (SDMMC_ENDIAN_TYPE(1) | SDMMC_DATARD_TRIGEN | SDMMC_DATAWR_TRIGEN |
-                       SDMMC_DATARD_TRIGTH(DATARD_TRIG_TH) | SDMMC_DATAWR_TRIGTH(DATAWR_TRIG_TH));
-    reg->CTLR = (SDMMC_RESET_N | SDMMC_ENDIAN_TYPE(1) | SDMMC_DATARD_TRIGEN | SDMMC_DATAWR_TRIGEN |
-                       SDMMC_DATARD_TRIGTH(DATARD_TRIG_TH) | SDMMC_DATAWR_TRIGTH(DATAWR_TRIG_TH));
 }
 
 /*============================ INCLUDES ======================================*/
