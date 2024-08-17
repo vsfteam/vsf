@@ -174,6 +174,7 @@ vsf_err_t vsf_hw_sdio_host_request(vsf_hw_sdio_t *sdio_ptr, vsf_sdio_req_t *req)
     VSF_HAL_ASSERT(req != NULL);
     VSF_HAL_ASSERT(!(req->op & (SDIO_CMDOP_CLKHOLD | SDIO_CMDOP_TRANS_STOP | SDIO_CMDOP_BYTE | SDIO_CMDOP_STREAM)));
     req->op &= __VSF_HW_SDIO_CMDOP_MASK;
+    AIC_SDMMC_TypeDef *reg = sdio_ptr->sdio_const->reg;
 
     if (req->cmd == 12) {
         reg->DBLR = 0x00UL;
@@ -194,7 +195,6 @@ vsf_err_t vsf_hw_sdio_host_request(vsf_hw_sdio_t *sdio_ptr, vsf_sdio_req_t *req)
         return VSF_ERR_BUSY;
     }
 
-    AIC_SDMMC_TypeDef *reg = sdio_ptr->sdio_const->reg;
     bool has_data = ((req->buffer != NULL) && (req->count > 0));
     bool is_write = req->op & SDIO_CMDOP_WRITE;
     int ch;
