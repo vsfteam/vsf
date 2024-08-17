@@ -34,7 +34,9 @@ typedef enum vsf_sdio_transop_t {
     SDIO_CMDOP_SINGLE_BLOCK             = (1ul << 8),   // MMC_CMDOP_RW
     SDIO_CMDOP_MULTI_BLOCK              = (1ul << 8) | (1ul << 10) | (1ul << 16),
                                                         // MMC_CMDOP_RW | SDMMC_MULTI_BLOCK_MODE | SDMMC_AUTOCMD12_ENABLE
-    SDIO_CMDOP_WRITE                    = (1ul << 9),   // SDMMC_WRITE_MODE
+
+    SDIO_CMDOP_READ                     = (0ul << 9),   // SDMMC_WRITE_MODE(0)
+    SDIO_CMDOP_WRITE                    = (1ul << 9),   // SDMMC_WRITE_MODE(1)
 
     __SDIO_CMDOP_RESP                   = (1ul << 4),   // SDMMC_RESPONSE_ENABLE
     __SDIO_CMDOP_RESP_SHORT             = (1ul << 5),   // SDMMC_CONFIG_R3
@@ -46,7 +48,18 @@ typedef enum vsf_sdio_transop_t {
     SDIO_CMDOP_TRANS_STOP               = (1ul << 25),
     SDIO_CMDOP_BYTE                     = (1ul << 26),
     SDIO_CMDOP_STREAM                   = (1ul << 27),
+    // not care
+    SDIO_RESP_BUSY                      = (1 << 28),
 
+    __VSF_HW_SDIO_TRANSOP_MASK          = SDIO_CMDOP_SINGLE_BLOCK
+                                        | SDIO_CMDOP_MULTI_BLOCK
+                                        | SDIO_CMDOP_WRITE
+                                        | __SDIO_CMDOP_RESP
+                                        | __SDIO_CMDOP_RESP_SHORT
+                                        | __SDIO_CMDOP_RESP_SHORT_CRC
+                                        | __SDIO_CMDOP_RESP_LONG,
+
+#define SDIO_RESP_NONE                  0
 #define SDIO_RESP_R1                    (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT_CRC)
 #define SDIO_RESP_R1B                   (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT_CRC)
 #define SDIO_RESP_R2                    (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_LONG_CRC)

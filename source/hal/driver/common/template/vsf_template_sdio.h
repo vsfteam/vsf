@@ -143,7 +143,7 @@ extern "C" {
 /* Standard MMC commands (4.1)                  type  argument     response */
    /* class 1 */
 #define MMC_GO_IDLE_STATE               0    /* bc                          */
-#define MMC_GO_IDLE_STATE_OP            0
+#define MMC_GO_IDLE_STATE_OP            (SDIO_RESP_NONE)
 #define MMC_SEND_OP_COND                1    /* bcr  [31:0] OCR         R3  */
 #define MMC_SEND_OP_COND_OP             (SDIO_RESP_R3)
 #define MMC_ALL_SEND_CID                2    /* bcr                     R2  */
@@ -151,7 +151,7 @@ extern "C" {
 #define MMC_SET_RELATIVE_ADDR           3    /* ac   [31:16] RCA        R1  */
 #define MMC_SET_RELATIVE_ADDR_OP        (SDIO_RESP_R1)
 #define MMC_SET_DSR                     4    /* bc   [31:16] RCA            */
-#define MMC_SET_DSR_OP                  0
+#define MMC_SET_DSR_OP                  (SDIO_RESP_NONE)
 #define MMC_SLEEP_AWAKE                 5    /* ac   [31:16] RCA 15:flg R1b */
 #define MMC_SLEEP_AWAKE_OP              (SDIO_RESP_R1B)
 #define MMC_SWITCH                      6    /* ac   [31:0] See below   R1b */
@@ -184,9 +184,9 @@ extern "C" {
 #define MMC_SET_BLOCKLEN                16   /* ac   [31:0] block len   R1  */
 #define MMC_SET_BLOCKLEN_OP             (SDIO_RESP_R1)
 #define MMC_READ_SINGLE_BLOCK           17   /* adtc [31:0] data addr   R1  */
-#define MMC_READ_SINGLE_BLOCK_OP        (SDIO_RESP_R1 | SDIO_CMDOP_SINGLE_BLOCK)
+#define MMC_READ_SINGLE_BLOCK_OP        (SDIO_RESP_R1 | SDIO_CMDOP_SINGLE_BLOCK | SDIO_CMDOP_READ)
 #define MMC_READ_MULTIPLE_BLOCK         18   /* adtc [31:0] data addr   R1  */
-#define MMC_READ_MULTIPLE_BLOCK_OP      (SDIO_RESP_R1 | SDIO_CMDOP_MULTI_BLOCK)
+#define MMC_READ_MULTIPLE_BLOCK_OP      (SDIO_RESP_R1 | SDIO_CMDOP_MULTI_BLOCK | SDIO_CMDOP_READ)
 #define MMC_SEND_TUNING_BLOCK           19   /* adtc                    R1  */
 #define MMC_SEND_TUNING_BLOCK_OP        (SDIO_RESP_R1)
 #define MMC_SEND_TUNING_BLOCK_HS200     21   /* adtc                    R1  */
@@ -336,16 +336,15 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_SDIO_APIS(__prefix)                                                                                                                                     \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             sdio, init,                  VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, vsf_sdio_cfg_t *cfg_ptr)        \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                  sdio, fini,                  VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr)                                 \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                  sdio, irq_enable,            VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)   \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                  sdio, irq_disable,           VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)   \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_sdio_status_t,     sdio, status,                VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr)                                 \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_sdio_capability_t, sdio, capability,            VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr)                                 \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             sdio, set_clock,             VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, uint32_t clock_hz, bool is_ddr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             sdio, set_bus_width,         VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, uint8_t bus_width)              \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             sdio, host_transact_start,   VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, vsf_sdio_trans_t *trans)        \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                  sdio, host_transact_stop,    VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             sdio, init,                 VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, vsf_sdio_cfg_t *cfg_ptr)         \
+    __VSF_HAL_TEMPLATE_API(__prefix, void,                  sdio, fini,                 VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix, void,                  sdio, irq_enable,           VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)    \
+    __VSF_HAL_TEMPLATE_API(__prefix, void,                  sdio, irq_disable,          VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)    \
+    __VSF_HAL_TEMPLATE_API(__prefix, vsf_sdio_status_t,     sdio, status,               VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix, vsf_sdio_capability_t, sdio, capability,           VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             sdio, set_clock,            VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, uint32_t clock_hz, bool is_ddr)  \
+    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             sdio, set_bus_width,        VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, uint8_t bus_width)               \
+    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             sdio, host_request,         VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, vsf_sdio_req_t *req)
 
 /*============================ TYPES =========================================*/
 
@@ -535,30 +534,33 @@ typedef enum vsf_sdio_mode_t {
 
 /**
  \~english
- @brief flags of sdio transfer operations
- @note vsf_sdio_transop_t is implemented by specific driver.
+ @brief flags of sdio request operations
+ @note vsf_sdio_reqop_t is implemented by specific driver.
 
  \~chinese
  @brief sdio 传输操作的标志
- @note vsf_sdio_transop_t 由具体驱动实现。
+ @note vsf_sdio_reqop_t 由具体驱动实现。
  */
-#if VSF_SDIO_CFG_REIMPLEMENT_TYPE_TRANSOP == DISABLED
-typedef enum vsf_sdio_transop_t {
+#if VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQOP == DISABLED
+typedef enum vsf_sdio_reqop_t {
     SDIO_CMDOP_BYTE                 = (0ul << 0),
     SDIO_CMDOP_STREAM               = (1ul << 0),
     SDIO_CMDOP_SINGLE_BLOCK         = (2ul << 0),
     SDIO_CMDOP_MULTI_BLOCK          = (3ul << 0),
-    SDIO_CMDOP_WRITE                = (1ul << 2),
 
+    SDIO_CMDOP_WRITE                = (1ul << 2),
+    SDIO_CMDOP_READ                 = (0ul << 2),
+
+    SDIO_CMDOP_RESP_BUSY            = (1ul << 3),
     // prefix __ means private, not mandatory, different names can be used according to different hw
-    __SDIO_CMDOP_RESP               = (1ul << 3),
-    __SDIO_CMDOP_RESP_BUSY          = (1ul << 4),
+    __SDIO_CMDOP_RESP               = (1ul << 4),
     __SDIO_CMDOP_RESP_SHORT         = (1ul << 5),
     __SDIO_CMDOP_RESP_SHORT_CRC     = (2ul << 5),
     __SDIO_CMDOP_RESP_LONG_CRC      = (3ul << 5),
     // SDIO_RESP_R1 etc are mandatory
+#define SDIO_RESP_NONE              0
 #define SDIO_RESP_R1                (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT_CRC)
-#define SDIO_RESP_R1B               (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT_CRC | __SDIO_CMDOP_RESP_BUSY)
+#define SDIO_RESP_R1B               (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT_CRC | SDIO_CMDOP_RESP_BUSY)
 #define SDIO_RESP_R2                (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_LONG_CRC)
 #define SDIO_RESP_R3                (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT)
 #define SDIO_RESP_R4                (__SDIO_CMDOP_RESP | __SDIO_CMDOP_RESP_SHORT)
@@ -570,48 +572,51 @@ typedef enum vsf_sdio_transop_t {
     SDIO_CMDOP_CLKHOLD              = (1ul << 7),
     // used for CMD12(MMC_STOP_TRANSMISSION) only
     SDIO_CMDOP_TRANS_STOP           = (1ul << 8),
-} vsf_sdio_transop_t;
+} vsf_sdio_reqop_t;
 #endif
 
-typedef struct vsf_sdio_trans_t {
+typedef struct vsf_sdio_req_t {
     uint8_t cmd;
     uint32_t arg;
-    vsf_sdio_transop_t op;
+    vsf_sdio_reqop_t op;
 
     // block_size will be 1 << block_size_bits
     uint8_t block_size_bits;
     uint8_t *buffer;
     uint32_t count;
-} vsf_sdio_trans_t;
+} vsf_sdio_req_t;
 
 #if VSF_SDIO_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
 typedef enum vsf_sdio_irq_mask_t {
-    SDIO_IRQ_MASK_HOST_RESP_DONE                 = (0x1ul <<  0),
-    SDIO_IRQ_MASK_HOST_DATA_DONE                 = (0x1ul <<  1),
-    SDIO_IRQ_MASK_HOST_ALL                       = SDIO_IRQ_MASK_HOST_RESP_DONE
-                                                | SDIO_IRQ_MASK_HOST_DATA_DONE,
+    // TODO: add irq mask for stream mode
+    SDIO_IRQ_MASK_HOST_RESP_DONE    = (0x1ul <<  0),
+    SDIO_IRQ_MASK_HOST_DATA_DONE    = (0x1ul <<  1),
+    SDIO_IRQ_MASK_HOST_DATA_ABORT   = (0x1ul <<  2),        // aborted by CMD12
+    SDIO_IRQ_MASK_HOST_ALL          = SDIO_IRQ_MASK_HOST_RESP_DONE
+                                    | SDIO_IRQ_MASK_HOST_DATA_DONE
+                                    | SDIO_IRQ_MASK_HOST_DATA_ABORT,
 } vsf_sdio_irq_mask_t;
 #endif
 
-#if VSF_SDIO_CFG_REIMPLEMENT_TYPE_TRANSACT_STATUS == DISABLED
-typedef enum vsf_sdio_transact_status_t {
-    SDIO_TRANSACT_STATUS_DONE                    = 0,
-    SDIO_TRANSACT_STATUS_ERR_RESP_NONE           = (0x1ul <<  0),
-    SDIO_TRANSACT_STATUS_ERR_RESP_CRC            = (0x1ul <<  1),
-    SDIO_TRANSACT_STATUS_ERR_DATA_CRC            = (0x1ul <<  2),
-    SDIO_TRANSACT_STATUS_DATA_BUSY               = (0x1ul <<  3),
-    SDIO_TRANSACT_STATUS_BUSY                    = (0x1ul <<  4),
-    SDIO_TRANSACT_STATUS_ERR_MASK                = SDIO_TRANSACT_STATUS_ERR_RESP_NONE
-                                                | SDIO_TRANSACT_STATUS_ERR_RESP_CRC
-                                                | SDIO_TRANSACT_STATUS_ERR_DATA_CRC,
-} vsf_sdio_transact_status_t;
+#if VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQSTS == DISABLED
+typedef enum vsf_sdio_reqsts_t {
+    SDIO_REQSTS_DONE                = 0,
+    SDIO_REQSTS_ERR_RESP_NONE       = (0x1ul <<  0),
+    SDIO_REQSTS_ERR_RESP_CRC        = (0x1ul <<  1),
+    SDIO_REQSTS_ERR_DATA_CRC        = (0x1ul <<  2),
+    SDIO_REQSTS_DATA_BUSY           = (0x1ul <<  3),
+    SDIO_REQSTS_BUSY                = (0x1ul <<  4),
+    SDIO_REQSTS_ERR_MASK            = SDIO_REQSTS_ERR_RESP_NONE
+                                    | SDIO_REQSTS_ERR_RESP_CRC
+                                    | SDIO_REQSTS_ERR_DATA_CRC,
+} vsf_sdio_reqsts_t;
 #endif
 
 #if VSF_SDIO_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
 typedef struct vsf_sdio_status_t {
     union {
         inherit(vsf_peripheral_status_t)
-        vsf_sdio_transact_status_t transact_status;
+        vsf_sdio_reqsts_t req_status;
         vsf_sdio_irq_mask_t irq_status;
     };
 } vsf_sdio_status_t;
@@ -621,14 +626,13 @@ typedef struct vsf_sdio_capability_t {
 #if VSF_SDIO_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
-    struct {
-        enum {
-            SDIO_CAP_BUS_WIDTH_1                 = (0x1ul <<  0),
-            SDIO_CAP_BUS_WIDTH_4                 = (0x1ul <<  1),
-            SDIO_CAP_BUS_WIDTH_8                 = (0x1ul <<  2),
-        } bus_width;
-        uint32_t max_freq_hz;
-    } sdio_capability;
+    enum {
+        SDIO_CAP_BUS_WIDTH_1        = (0x1ul <<  0),
+        SDIO_CAP_BUS_WIDTH_4        = (0x1ul <<  1),
+        SDIO_CAP_BUS_WIDTH_8        = (0x1ul <<  2),
+    } bus_width;
+    uint32_t max_freq_hz;
+    bool support_ddr;
 } vsf_sdio_capability_t;
 
 typedef struct vsf_sdio_t vsf_sdio_t;
@@ -641,7 +645,7 @@ typedef struct vsf_sdio_t vsf_sdio_t;
  @param target_ptr pointer of user.
  @param sdio_ptr pointer of sdio instance.
  @param irq_mask one or more value of enum vsf_sdio_irq_mask_t
- @param status transact status.
+ @param status request status.
  @param resp response.
  @return None.
 
@@ -658,7 +662,8 @@ typedef struct vsf_sdio_t vsf_sdio_t;
 
  \~
  \code {.c}
-    static void __user_sdio_irchandler(void *target_ptr, vsf_sdio_t *sdio_ptr, enum irq_mask)
+    static void __user_sdio_irchandler(void *target_ptr, vsf_sdio_t *sdio_ptr,
+        vsf_sdio_irq_mask_t irq_mask, vsf_sdio_reqsts_t req_status, uint32_t resp[4])
     {
         if (irq_mask & SDIO_IRQ_MASK_HOST_RESP_DONE) {
             // do something
@@ -669,7 +674,7 @@ typedef struct vsf_sdio_t vsf_sdio_t;
 typedef void vsf_sdio_isr_handler_t(void *target_ptr,
                                    vsf_sdio_t *sdio_ptr,
                                    vsf_sdio_irq_mask_t irq_mask,
-                                   vsf_sdio_transact_status_t status,
+                                   vsf_sdio_reqsts_t status,
                                    uint32_t resp[4]);
 
 /**
@@ -859,47 +864,35 @@ extern vsf_err_t vsf_sdio_single_voltage(vsf_sdio_t *sdio_ptr, uint8_t bus_width
 
 /**
  \~english
- @brief start sdio transaction in host mode.
+ @brief request sdio operation in host mode.
  @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
- @param[in] trans: a pointer to sdio transaction structure
+ @param[in] req: a pointer to sdio rqeust structure
  @return vsf_err_t: VSF_ERR_NONE if sdio was successfully, or a negative error code
 
  \~chinese
- @brief 启动 sdio 传输
+ @brief 启动 sdio 请求
  @param[in] sdio_ptr: 结构体 vsf_sdio_t 的指针，参考 @ref vsf_sdio_t
- @param[in] trans: sdio 传输结构指针
+ @param[in] req: sdio 请求结构指针
  @return vsf_err_t: 如果 sdio 主机传输开始返回 VSF_ERR_NONE , 否则返回负数。
  */
-extern vsf_err_t vsf_sdio_host_transact_start(vsf_sdio_t *sdio_ptr, vsf_sdio_trans_t *trans);
+extern vsf_err_t vsf_sdio_host_request(vsf_sdio_t *sdio_ptr, vsf_sdio_req_t *req);
 
-/**
- \~english
- @brief stop sdio transaction if not done in host mode.
- @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
- @return none.
-
- \~chinese
- @brief sdio 传输未完成时，停止 sdio 传输
- @param[in] sdio_ptr: 结构体 vsf_sdio_t 的指针，参考 @ref vsf_sdio_t
- @return 无。
- */
-extern void vsf_sdio_host_transact_stop(vsf_sdio_t *sdio_ptr);
+// TODO: add APIs for stream mode
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_SDIO_CFG_FUNCTION_RENAME == ENABLED
-#   define __vsf_sdio_t                              VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_t)
-#   define vsf_sdio_init(__SDIO, ...)                 VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_init)                 ((__vsf_sdio_t *)__SDIO, ##__VA_ARGS__)
-#   define vsf_sdio_enable(__SDIO)                    VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_enable)               ((__vsf_sdio_t *)__SDIO)
-#   define vsf_sdio_disable(__SDIO)                   VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_disable)              ((__vsf_sdio_t *)__SDIO)
-#   define vsf_sdio_irq_enable(__SDIO, ...)           VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_irq_enable)           ((__vsf_sdio_t *)__SDIO, ##__VA_ARGS__)
-#   define vsf_sdio_irq_disable(__SDIO, ...)          VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_irq_disable)          ((__vsf_sdio_t *)__SDIO, ##__VA_ARGS__)
-#   define vsf_sdio_status(__SDIO)                    VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_status)               ((__vsf_sdio_t *)__SDIO)
-#   define vsf_sdio_capability(__SDIO)                VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_capability)           ((__vsf_sdio_t *)__SDIO)
-#   define vsf_sdio_set_clock(__SDIO, ...)            VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_set_clock)            ((__vsf_sdio_t *)__SDIO, ##__VA_ARGS__)
-#   define vsf_sdio_set_bus_width(__SDIO, ...)        VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_set_bus_width)        ((__vsf_sdio_t *)__SDIO, ##__VA_ARGS__)
-#   define vsf_sdio_host_transact_start(__SDIO, ...)  VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_host_transact_start)  ((__vsf_sdio_t *)__SDIO, ##__VA_ARGS__)
-#   define vsf_sdio_host_transact_stop(__SDIO, ...)   VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_host_transact_stop)   ((__vsf_sdio_t *)__SDIO, ##__VA_ARGS__)
+#   define __vsf_sdio_t                             VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_t)
+#   define vsf_sdio_init(__SDIO, ...)               VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_init)           ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_enable(__SDIO)                  VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_enable)         ((__vsf_sdio_t *)(__SDIO))
+#   define vsf_sdio_disable(__SDIO)                 VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_disable)        ((__vsf_sdio_t *)(__SDIO))
+#   define vsf_sdio_irq_enable(__SDIO, ...)         VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_irq_enable)     ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_irq_disable(__SDIO, ...)        VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_irq_disable)    ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_status(__SDIO)                  VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_status)         ((__vsf_sdio_t *)(__SDIO))
+#   define vsf_sdio_capability(__SDIO)              VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_capability)     ((__vsf_sdio_t *)(__SDIO))
+#   define vsf_sdio_set_clock(__SDIO, ...)          VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_set_clock)      ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_set_bus_width(__SDIO, ...)      VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_set_bus_width)  ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_host_request(__SDIO, ...)       VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_host_request)   ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

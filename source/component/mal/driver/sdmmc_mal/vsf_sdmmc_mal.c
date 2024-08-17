@@ -77,7 +77,7 @@ static void __vk_sdmmc_mal_on_timer(vsf_callback_timer_t *timer)
 }
 
 static void __vk_sdmmc_mal_irqhandler(void *target, vsf_sdio_t *sdio,
-    vsf_sdio_irq_mask_t irq_mask, vsf_sdio_transact_status_t status, uint32_t resp[4])
+    vsf_sdio_irq_mask_t irq_mask, vsf_sdio_reqsts_t status, uint32_t resp[4])
 {
     vk_sdmmc_mal_t *pthis = target;
     vsf_eda_t *eda;
@@ -96,12 +96,15 @@ static void __vk_sdmmc_mal_irqhandler(void *target, vsf_sdio_t *sdio,
             }
         }
     } else {
-        if (    (status & SDIO_TRANSACT_STATUS_ERR_MASK)
+        if (    (status & SDIO_REQSTS_ERR_MASK)
             ||  (   (irq_mask & SDIO_IRQ_MASK_HOST_RESP_DONE)
                  && !(resp[0] & R1_READY_FOR_DATA)
                 )
            ) {
-            vsf_sdio_host_transact_stop(pthis->sdio);
+            vsf_sdio_host_request(pthis->sdio, &(vsf_sdio_req_t){
+                .cmd                = MMC_STOP_TRANSMISSION,
+                .op                 = MMC_STOP_TRANSMISSION_OP,
+            });
             if ((eda = pthis->eda) != NULL) {
                 pthis->eda = NULL;
                 vsf_eda_post_evt(eda, VSF_EVT_SDMMC_ERROR);
@@ -151,7 +154,9 @@ __vsf_component_peda_ifs_entry(__vk_sdmmc_mal_init, vk_mal_init)
                 .handler_fn = __vk_sdmmc_mal_irqhandler,
             },
         });
-        vsf_sdio_probe_start(pthis->sdio, &pthis->use_as__vsf_sdio_probe_t);
+        if (VSF_ERR_NONE != vsf_sdio_probe_start(pthis->sdio, &pthis->use_as__vsf_sdio_probe_t)) {
+            vsf_eda_return(VSF_ERR_FAIL);
+        }
         break;
     case VSF_EVT_SDMMC_ERROR:
         vsf_eda_return(VSF_ERR_FAIL);
@@ -186,7 +191,7 @@ __vsf_component_peda_ifs_entry(__vk_sdmmc_mal_read, vk_mal_read)
     case VSF_EVT_INIT:
         pthis->eda = vsf_eda_get_cur();
         VSF_FS_ASSERT(pthis->eda != NULL);
-        vsf_sdio_host_transact_start(pthis->sdio, &(vsf_sdio_trans_t){
+        vsf_sdio_host_request(pthis->sdio, &(vsf_sdio_req_t){
             .cmd                = block_num > 1 ? MMC_READ_MULTIPLE_BLOCK : MMC_READ_SINGLE_BLOCK,
             .arg                = pthis->high_capacity ? block_start : vsf_local.addr,
             .op                 = block_num > 1 ? MMC_READ_MULTIPLE_BLOCK_OP : MMC_READ_SINGLE_BLOCK_OP,
@@ -218,7 +223,7 @@ __vsf_component_peda_ifs_entry(__vk_sdmmc_mal_write, vk_mal_write)
     case VSF_EVT_INIT:
         pthis->eda = vsf_eda_get_cur();
         VSF_FS_ASSERT(pthis->eda != NULL);
-        vsf_sdio_host_transact_start(pthis->sdio, &(vsf_sdio_trans_t){
+        vsf_sdio_host_request(pthis->sdio, &(vsf_sdio_req_t){
             .cmd                = block_num > 1 ? MMC_WRITE_MULTIPLE_BLOCK : MMC_WRITE_BLOCK,
             .arg                = pthis->high_capacity ? block_start : vsf_local.addr,
             .op                 = block_num > 1 ? MMC_WRITE_MULTIPLE_BLOCK_OP : MMC_WRITE_BLOCK_OP,

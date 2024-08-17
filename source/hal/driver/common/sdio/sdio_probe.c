@@ -89,13 +89,13 @@ vsf_err_t vsf_sdio_probe_start(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe)
     VSF_HAL_ASSERT((probe->bus_width == 1) || (probe->bus_width == 4) || (probe->bus_width == 8));
 
     vsf_sdio_capability_t capability = vsf_sdio_capability(sdio);
-    if (probe->working_clock_hz > capability.sdio_capability.max_freq_hz) {
-        probe->working_clock_hz = capability.sdio_capability.max_freq_hz;
+    if (probe->working_clock_hz > capability.max_freq_hz) {
+        probe->working_clock_hz = capability.max_freq_hz;
     }
     switch (probe->bus_width) {
-    case 1: if (!(capability.sdio_capability.bus_width & SDIO_CAP_BUS_WIDTH_1)) { return VSF_ERR_INVALID_PARAMETER; } break;
-    case 4: if (!(capability.sdio_capability.bus_width & SDIO_CAP_BUS_WIDTH_4)) { return VSF_ERR_INVALID_PARAMETER; } break;
-    case 8: if (!(capability.sdio_capability.bus_width & SDIO_CAP_BUS_WIDTH_8)) { return VSF_ERR_INVALID_PARAMETER; } break;
+    case 1: if (!(capability.bus_width & SDIO_CAP_BUS_WIDTH_1)) { return VSF_ERR_INVALID_PARAMETER; } break;
+    case 4: if (!(capability.bus_width & SDIO_CAP_BUS_WIDTH_4)) { return VSF_ERR_INVALID_PARAMETER; } break;
+    case 8: if (!(capability.bus_width & SDIO_CAP_BUS_WIDTH_8)) { return VSF_ERR_INVALID_PARAMETER; } break;
     }
 
     vsf_sdio_set_clock(sdio, 400 * 1000, false);
@@ -107,7 +107,7 @@ vsf_err_t vsf_sdio_probe_start(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe)
     probe->is_app_cmd = false;
     probe->is_resp_r1 = false;
 
-    return vsf_sdio_host_transact_start(sdio, &(vsf_sdio_trans_t){
+    return vsf_sdio_host_request(sdio, &(vsf_sdio_req_t){
         .cmd    = MMC_GO_IDLE_STATE,
         .arg    = 0,
         .op     = MMC_GO_IDLE_STATE_OP,
@@ -115,10 +115,10 @@ vsf_err_t vsf_sdio_probe_start(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe)
 }
 
 vsf_err_t vsf_sdio_probe_irqhandler(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe,
-        vsf_sdio_irq_mask_t irq_mask, vsf_sdio_transact_status_t status,
+        vsf_sdio_irq_mask_t irq_mask, vsf_sdio_reqsts_t status,
         uint32_t resp[4])
 {
-    bool is_failed = !!(status & SDIO_TRANSACT_STATUS_ERR_MASK);
+    bool is_failed = !!(status & SDIO_REQSTS_ERR_MASK);
     if (is_failed && !probe->is_to_ignore_fail) {
         return VSF_ERR_FAIL;
     }
@@ -140,21 +140,21 @@ vsf_err_t vsf_sdio_probe_irqhandler(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe,
         probe->delay_ms = 0;
     }
 
-    vsf_sdio_trans_t trans = { 0 };
+    vsf_sdio_req_t req = { 0 };
     switch (probe->state) {
     case VSF_SDIO_PROBE_STATE_APP_CMD:
     send_app_cmd:
-        trans.cmd = MMC_APP_CMD;
-        trans.arg = probe->rca;
-        trans.op = MMC_APP_CMD_OP;
+        req.cmd = MMC_APP_CMD;
+        req.arg = probe->rca;
+        req.op = MMC_APP_CMD_OP;
         probe->r1_expected_card_status |= R1_APP_CMD;
         probe->r1_expected_card_status_mask |= R1_APP_CMD;
         probe->is_resp_r1 = true;
         break;
     case VSF_SDIO_PROBE_STATE_GO_IDLE:
-        trans.cmd = SD_SEND_IF_COND;
-        trans.arg = (((probe->voltage & SD_OCR_VDD_HIGH) != 0) << 8) | SDIO_SEND_IF_COND_CHECK_PATTERN;
-        trans.op = SD_SEND_IF_COND_OP;
+        req.cmd = SD_SEND_IF_COND;
+        req.arg = (((probe->voltage & SD_OCR_VDD_HIGH) != 0) << 8) | SDIO_SEND_IF_COND_CHECK_PATTERN;
+        req.op = SD_SEND_IF_COND_OP;
         break;
     case VSF_SDIO_PROBE_STATE_SEND_IF_COND:
         if ((resp[0] & 0xFF) != SDIO_SEND_IF_COND_CHECK_PATTERN) {
@@ -167,11 +167,11 @@ vsf_err_t vsf_sdio_probe_irqhandler(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe,
         probe->is_to_retry = true;
         goto send_app_cmd;
     case VSF_SDIO_PROBE_STATE_SEND_OP_COND:
-        trans.cmd = SD_APP_OP_COND;
-        trans.arg = probe->voltage
+        req.cmd = SD_APP_OP_COND;
+        req.arg = probe->voltage
                 |   (SD_VERSION_2 == probe->version ? SD_ACMD41_ARG_OCR_HCS : 0)
                 |   (probe->uhs_en ? SD_ACMD41_ARG_OCR_S18R : 0);
-        trans.op = SD_APP_OP_COND_OP;
+        req.op = SD_APP_OP_COND_OP;
         probe->is_to_ignore_fail = true;
         break;
     case VSF_SDIO_PROBE_STATE_SEND_OP_COND_DONE:
@@ -195,14 +195,14 @@ vsf_err_t vsf_sdio_probe_irqhandler(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe,
         goto send_cid;
     case VSF_SDIO_PROBE_STATE_MMC_SEND_OP_COND_GO_IDLE:
 //    go_idle:
-        trans.cmd = MMC_GO_IDLE_STATE;
-        trans.arg = 0;
-        trans.op = MMC_GO_IDLE_STATE_OP;
+        req.cmd = MMC_GO_IDLE_STATE;
+        req.arg = 0;
+        req.op = MMC_GO_IDLE_STATE_OP;
         break;
     case VSF_SDIO_PROBE_STATE_MMC_SEND_OP_COND:
-        trans.cmd = MMC_SEND_OP_COND;
-        trans.arg = 0;
-        trans.op = MMC_SEND_OP_COND_OP;
+        req.cmd = MMC_SEND_OP_COND;
+        req.arg = 0;
+        req.op = MMC_SEND_OP_COND_OP;
         probe->is_to_ignore_fail = true;
         break;
     case VSF_SDIO_PROBE_STATE_MMC_SEND_OP_COND_DONE:
@@ -223,20 +223,20 @@ vsf_err_t vsf_sdio_probe_irqhandler(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe,
         probe->rca = 1 << 16;
 
     send_cid:
-        trans.cmd = MMC_ALL_SEND_CID;
-        trans.arg = 0;
-        trans.op = MMC_ALL_SEND_CID_OP;
+        req.cmd = MMC_ALL_SEND_CID;
+        req.arg = 0;
+        req.op = MMC_ALL_SEND_CID_OP;
         break;
     case VSF_SDIO_PROBE_STATE_ALL_SEND_CID:
         probe->cid = *(vsf_sdio_cid_t *)resp;
 
-        trans.arg = probe->rca;
+        req.arg = probe->rca;
         if (IS_MMC(probe->version)) {
-            trans.cmd = MMC_SET_RELATIVE_ADDR;
-            trans.op = MMC_SET_RELATIVE_ADDR_OP;
+            req.cmd = MMC_SET_RELATIVE_ADDR;
+            req.op = MMC_SET_RELATIVE_ADDR_OP;
         } else {
-            trans.cmd = SD_SEND_RELATIVE_ADDR;
-            trans.op = SD_SEND_RELATIVE_ADDR_OP;
+            req.cmd = SD_SEND_RELATIVE_ADDR;
+            req.op = SD_SEND_RELATIVE_ADDR_OP;
         }
         break;
     case VSF_SDIO_PROBE_STATE_RELATIVE_ADDR:
@@ -244,9 +244,9 @@ vsf_err_t vsf_sdio_probe_irqhandler(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe,
             probe->rca = resp[0] & 0xFFFF0000UL;
         }
 
-        trans.cmd = MMC_SEND_CSD;
-        trans.arg = probe->rca;
-        trans.op = MMC_SEND_CSD_OP;
+        req.cmd = MMC_SEND_CSD;
+        req.arg = probe->rca;
+        req.op = MMC_SEND_CSD_OP;
         break;
     case VSF_SDIO_PROBE_STATE_SEND_CSD:
         probe->csd = *(vsf_sdio_csd_t *)resp;
@@ -269,18 +269,18 @@ vsf_err_t vsf_sdio_probe_irqhandler(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe,
         }
 
         if (probe->csd.sd_v2.DSR_IMP) {
-            trans.cmd = MMC_SET_DSR;
-            trans.arg = 0;
-            trans.op = MMC_SET_DSR_OP;
+            req.cmd = MMC_SET_DSR;
+            req.arg = 0;
+            req.op = MMC_SET_DSR_OP;
             break;
         } else {
             probe->state = VSF_SDIO_PROBE_STATE_SET_DSR;
             // fall through
         }
     case VSF_SDIO_PROBE_STATE_SET_DSR:
-        trans.cmd = MMC_SELECT_CARD;
-        trans.arg = probe->rca;
-        trans.op = MMC_SELECT_CARD_OP;
+        req.cmd = MMC_SELECT_CARD;
+        req.arg = probe->rca;
+        req.op = MMC_SELECT_CARD_OP;
         probe->r1_expected_card_status_mask =
             probe->r1_expected_card_status = R1_READY_FOR_DATA;
         probe->is_resp_r1 = true;
@@ -291,13 +291,13 @@ vsf_err_t vsf_sdio_probe_irqhandler(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe,
         }
         break;
     case VSF_SDIO_PROBE_STATE_SET_BUS_WIDTH:
-        trans.cmd = SD_APP_SET_BUS_WIDTH;
+        req.cmd = SD_APP_SET_BUS_WIDTH;
         switch (probe->bus_width) {
-        case 1:     trans.arg = SD_BUS_WIDTH_1; break;
-        case 4:     trans.arg = SD_BUS_WIDTH_4; break;
-        case 8:     trans.arg = SD_BUS_WIDTH_8; break;
+        case 1:     req.arg = SD_BUS_WIDTH_1; break;
+        case 4:     req.arg = SD_BUS_WIDTH_4; break;
+        case 8:     req.arg = SD_BUS_WIDTH_8; break;
         }
-        trans.op = SD_APP_SET_BUS_WIDTH_OP;
+        req.op = SD_APP_SET_BUS_WIDTH_OP;
         probe->r1_expected_card_status_mask = R1_APP_CMD | R1_READY_FOR_DATA | R1_CUR_STATE(R1_STATE_MASK);
         probe->r1_expected_card_status = R1_APP_CMD | R1_READY_FOR_DATA | R1_CUR_STATE(R1_STATE_TRAN);
         probe->is_resp_r1 = true;
@@ -305,9 +305,9 @@ vsf_err_t vsf_sdio_probe_irqhandler(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe,
     case VSF_SDIO_PROBE_STATE_SET_BUS_WIDTH_DONE:
         vsf_sdio_set_bus_width(sdio, probe->bus_width);
 
-        trans.cmd = MMC_SET_BLOCKLEN;
-        trans.arg = 1 << probe->csd.sd_v2.READ_BL_LEN;
-        trans.op = MMC_SET_BLOCKLEN_OP;
+        req.cmd = MMC_SET_BLOCKLEN;
+        req.arg = 1 << probe->csd.sd_v2.READ_BL_LEN;
+        req.op = MMC_SET_BLOCKLEN_OP;
         probe->r1_expected_card_status_mask = R1_READY_FOR_DATA | R1_CUR_STATE(R1_STATE_MASK);
         probe->r1_expected_card_status = R1_READY_FOR_DATA | R1_CUR_STATE(R1_STATE_TRAN);
         probe->is_resp_r1 = true;
@@ -322,8 +322,8 @@ vsf_err_t vsf_sdio_probe_irqhandler(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe,
     }
 
     probe->state++;
-    probe->is_app_cmd = MMC_APP_CMD == trans.cmd;
-    if (VSF_ERR_NONE != vsf_sdio_host_transact_start(sdio, &trans)) {
+    probe->is_app_cmd = MMC_APP_CMD == req.cmd;
+    if (VSF_ERR_NONE != vsf_sdio_host_request(sdio, &req)) {
         return VSF_ERR_FAIL;
     }
     return VSF_ERR_NOT_READY;

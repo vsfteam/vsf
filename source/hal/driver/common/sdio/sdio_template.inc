@@ -76,8 +76,7 @@ vsf_sdio_capability_t vsf_real_sdio_capability(vsf_real_sdio_t *sdio_ptr)
 #   define vsf_imp_sdio_capability              VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_capability)
 #   define vsf_imp_sdio_set_clock               VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_set_clock)
 #   define vsf_imp_sdio_set_bus_width           VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_set_bus_width)
-#   define vsf_imp_sdio_host_transact_start     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_transact_start)
-#   define vsf_imp_sdio_host_transact_stop      VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_transact_stop)
+#   define vsf_imp_sdio_host_request            VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_request)
 
 #   define vsf_remap_sdio_t                     VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_t)
 #   define vsf_remap_sdio_init                  VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_init)
@@ -89,8 +88,7 @@ vsf_sdio_capability_t vsf_real_sdio_capability(vsf_real_sdio_t *sdio_ptr)
 #   define vsf_remap_sdio_capability            VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_capability)
 #   define vsf_remap_sdio_set_clock             VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_set_clock)
 #   define vsf_remap_sdio_set_bus_width         VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_set_bus_width)
-#   define vsf_remap_sdio_host_transact_start   VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_host_transact_start)
-#   define vsf_remap_sdio_host_transact_stop    VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_host_transact_stop)
+#   define vsf_remap_sdio_host_request          VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_host_request)
 
 #   define VSF_SDIO_CFG_IMP_REMAP_FUNCTIONS                                                     \
         vsf_err_t vsf_imp_sdio_init(vsf_imp_sdio_t *sdio_ptr, vsf_sdio_cfg_t *cfg_ptr)          \
@@ -133,15 +131,10 @@ vsf_sdio_capability_t vsf_real_sdio_capability(vsf_real_sdio_t *sdio_ptr)
             VSF_HAL_ASSERT(sdio_ptr != NULL);                                                   \
             return vsf_remap_sdio_set_bus_width(sdio_ptr, bus_width);                           \
         }                                                                                       \
-        vsf_err_t vsf_imp_sdio_host_transact_start(vsf_imp_sdio_t *sdio_ptr, vsf_sdio_trans_t *trans)\
+        vsf_err_t vsf_imp_sdio_host_request(vsf_imp_sdio_t *sdio_ptr, vsf_sdio_trans_t *trans)  \
         {                                                                                       \
             VSF_HAL_ASSERT(sdio_ptr != NULL);                                                   \
-            return vsf_remap_sdio_host_transact_start(sdio_ptr, trans);                         \
-        }                                                                                       \
-        void vsf_imp_sdio_host_transact_stop(vsf_imp_sdio_t *sdio_ptr)                          \
-        {                                                                                       \
-            VSF_HAL_ASSERT(sdio_ptr != NULL);                                                   \
-            vsf_remap_sdio_host_transact_stop(sdio_ptr);                                        \
+            return vsf_remap_sdio_host_request(sdio_ptr, trans);                                \
         }
 #endif
 
@@ -189,8 +182,7 @@ vsf_sdio_capability_t vsf_real_sdio_capability(vsf_real_sdio_t *sdio_ptr)
 #undef vsf_imp_sdio_capability
 #undef vsf_imp_sdio_set_clock
 #undef vsf_imp_sdio_set_bus_width
-#undef vsf_imp_sdio_host_transact_start
-#undef vsf_imp_sdio_host_transact_stop
+#undef vsf_imp_sdio_host_request
 
 #undef vsf_remap_sdio_t
 #undef vsf_remap_sdio_init
@@ -202,7 +194,6 @@ vsf_sdio_capability_t vsf_real_sdio_capability(vsf_real_sdio_t *sdio_ptr)
 #undef vsf_remap_sdio_capability
 #undef vsf_remap_sdio_set_clock
 #undef vsf_remap_sdio_set_bus_width
-#undef vsf_remap_sdio_host_transact_start
-#undef vsf_remap_sdio_host_transact_stop
+#undef vsf_remap_sdio_host_request
 
 #endif  /* VSF_HAL_USE_SDIO */

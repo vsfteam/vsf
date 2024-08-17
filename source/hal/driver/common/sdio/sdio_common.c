@@ -105,22 +105,13 @@ vsf_err_t vsf_sdio_set_bus_width(vsf_sdio_t *sdio_ptr, uint8_t bus_width)
     return sdio_ptr->op->set_bus_width(sdio_ptr, bus_width);
 }
 
-vsf_err_t vsf_sdio_host_transact_start(vsf_sdio_t *sdio_ptr, vsf_sdio_trans_t *trans)
+vsf_err_t vsf_sdio_host_request(vsf_sdio_t *sdio_ptr, vsf_sdio_req_t *req)
 {
     VSF_HAL_ASSERT(sdio_ptr != NULL);
     VSF_HAL_ASSERT(sdio_ptr->op != NULL);
-    VSF_HAL_ASSERT(sdio_ptr->op->host_transact_start != NULL);
+    VSF_HAL_ASSERT(sdio_ptr->op->host_request != NULL);
 
-    return sdio_ptr->op->host_transact_start(sdio_ptr, trans);
-}
-
-void vsf_sdio_host_transact_stop(vsf_sdio_t *sdio_ptr)
-{
-    VSF_HAL_ASSERT(sdio_ptr != NULL);
-    VSF_HAL_ASSERT(sdio_ptr->op != NULL);
-    VSF_HAL_ASSERT(sdio_ptr->op->host_transact_stop != NULL);
-
-    sdio_ptr->op->host_transact_stop(sdio_ptr);
+    return sdio_ptr->op->host_request(sdio_ptr, req);
 }
 
 #endif      // VSF_HAL_USE_SDIO && VSF_SDIO_CFG_MULTI_CLASS

@@ -113,7 +113,7 @@ extern vsf_err_t vsf_sdio_probe_start(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe)
  @return vsf_err_t: 操作完成返回 VSF_ERR_NONE(0); 未完成返回 VSF_ERR_NOT_READY(> 0); 出错返回错误码 (< 0)。
  */
 extern vsf_err_t vsf_sdio_probe_irqhandler(vsf_sdio_t *sdio, vsf_sdio_probe_t *probe,
-        vsf_sdio_irq_mask_t irq_mask, vsf_sdio_transact_status_t status,
+        vsf_sdio_irq_mask_t irq_mask, vsf_sdio_reqsts_t status,
         uint32_t resp[4]);
 
 #ifdef __cplusplus

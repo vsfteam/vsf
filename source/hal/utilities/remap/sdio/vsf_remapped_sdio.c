@@ -93,16 +93,10 @@ vsf_err_t vsf_remapped_sdio_set_bus_width(vsf_remapped_sdio_t *sdio, uint8_t bus
     return vsf_sdio_set_bus_width(sdio->target, bus_width);
 }
 
-vsf_err_t vsf_remapped_sdio_host_transact_start(vsf_remapped_sdio_t *sdio, vsf_sdio_trans_t *trans)
+vsf_err_t vsf_remapped_sdio_host_request(vsf_remapped_sdio_t *sdio, vsf_sdio_req_t *req)
 {
     VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
-    return vsf_sdio_host_transact_start(sdio->target, trans);
-}
-
-void vsf_remapped_sdio_host_transact_stop(vsf_remapped_sdio_t *sdio)
-{
-    VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
-    vsf_sdio_host_transact_stop(sdio->target);
+    return vsf_sdio_host_request(sdio->target, req);
 }
 
 #endif

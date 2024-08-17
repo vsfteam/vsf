@@ -145,10 +145,8 @@ vsf_sdio_status_t vsf_hw_sdio_status(vsf_hw_sdio_t *sdio_ptr)
 vsf_sdio_capability_t vsf_hw_sdio_capability(vsf_hw_sdio_t *sdio_ptr)
 {
     vsf_sdio_capability_t capability = {
-        .sdio_capability     = {
-            .bus_width      = SDIO_CAP_BUS_WIDTH_1 | SDIO_CAP_BUS_WIDTH_4,
-            .max_freq_hz    = 24 * 1000 * 1000,
-        },
+        .bus_width      = SDIO_CAP_BUS_WIDTH_1 | SDIO_CAP_BUS_WIDTH_4,
+        .max_freq_hz    = 24 * 1000 * 1000,
     };
     return capability;
 }
@@ -175,6 +173,8 @@ vsf_err_t vsf_hw_sdio_host_transact_start(vsf_hw_sdio_t *sdio_ptr, vsf_sdio_tran
 {
     VSF_HAL_ASSERT(trans != NULL);
     VSF_HAL_ASSERT(!(trans->op & (SDIO_CMDOP_CLKHOLD | SDIO_CMDOP_TRANS_STOP | SDIO_CMDOP_BYTE | SDIO_CMDOP_STREAM)));
+    trans->op &= __VSF_HW_SDIO_TRANSOP_MASK;
+
     if (__vsf_hw_sdio_host_is_busy(sdio_ptr)) {
         return VSF_ERR_BUSY;
     }
@@ -223,7 +223,7 @@ vsf_err_t vsf_hw_sdio_host_transact_start(vsf_hw_sdio_t *sdio_ptr, vsf_sdio_tran
         }
     }
 
-    sdio_ptr->is_resp_long = !!((trans->op & (3 << 5)) == SDIO_CMDOP_RESP_LONG_CRC);
+    sdio_ptr->is_resp_long = !!((trans->op & (3 << 5)) == __SDIO_CMDOP_RESP_LONG_CRC);
     reg->CFGR = 0;
     reg->CMDR = trans->cmd;
     reg->ARGR = trans->arg;
