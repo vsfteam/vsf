@@ -488,7 +488,7 @@ extern vsf_io_capability_t vsf_io_capability(vsf_io_t *io_ptr);
 #   define __vsf_io_config_eval3(__IO, __CFGS, __CNT)   __vsf_io_config( (__vsf_io_t *) __IO, __CFGS, __CNT)
 #   define __vsf_io_config_eval2(__CFGS, __CNT)         __vsf_io_config( (__vsf_io_t *) &vsf_hw_io, __CFGS, __CNT)
 #   define vsf_io_config(...)                           __PLOOC_EVAL(__vsf_io_config_eval, __VA_ARGS__)(__VA_ARGS__)
-#   define vsf_io_capability(__IO)                      VSF_MCONNECT(VSF_IO_CFG_PREFIX, _io_capability)((__vsf_io_t *)__IO)
+#   define vsf_io_capability(__IO)                      VSF_MCONNECT(VSF_IO_CFG_PREFIX, _io_capability)((__vsf_io_t *)(__IO))
 #endif
 
 // too long, put it end of file

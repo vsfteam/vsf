@@ -246,12 +246,12 @@ extern void vsf_wdt_feed(vsf_wdt_t *wdt_ptr);
 
 #if VSF_WDT_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_wdt_t                VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_t)
-#   define vsf_wdt_init(__WDT, ...)   VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_init)                 ((__vsf_wdt_t *)__WDT, ##__VA_ARGS__)
-#   define vsf_wdt_fini(__WDT)        VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_fini)                 ((__vsf_wdt_t *)__WDT)
-#   define vsf_wdt_enable(__WDT)      VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_enable)               ((__vsf_wdt_t *)__WDT)
-#   define vsf_wdt_disable(__WDT)     VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_disable)              ((__vsf_wdt_t *)__WDT)
-#   define vsf_wdt_capability(__WDT)  VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_capability)           ((__vsf_wdt_t *)__WDT)
-#   define vsf_wdt_feed(__WDT, ...)   VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_feed)                 ((__vsf_wdt_t *)__WDT)
+#   define vsf_wdt_init(__WDT, ...)   VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_init)                 ((__vsf_wdt_t *)(__WDT), ##__VA_ARGS__)
+#   define vsf_wdt_fini(__WDT)        VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_fini)                 ((__vsf_wdt_t *)(__WDT))
+#   define vsf_wdt_enable(__WDT)      VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_enable)               ((__vsf_wdt_t *)(__WDT))
+#   define vsf_wdt_disable(__WDT)     VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_disable)              ((__vsf_wdt_t *)(__WDT))
+#   define vsf_wdt_capability(__WDT)  VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_capability)           ((__vsf_wdt_t *)(__WDT))
+#   define vsf_wdt_feed(__WDT, ...)   VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_feed)                 ((__vsf_wdt_t *)(__WDT))
 #endif
 
 #ifdef __cplusplus
