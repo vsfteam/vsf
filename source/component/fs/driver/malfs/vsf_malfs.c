@@ -359,6 +359,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
             vsf_eda_mutex_init(mounter->mutex);
         }
 #endif
+        mounter->partition_mounted = 0;
         vsf_local.sectbuf = vsf_heap_malloc(mal_block_size);
         if (NULL == vsf_local.sectbuf) {
         return_not_enough_resources:
@@ -367,7 +368,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
             if (vsf_local.sectbuf != NULL) {
                 vsf_heap_free(vsf_local.sectbuf);
             }
-            vsf_eda_return();
+            vsf_eda_return(mounter->err);
             break;
         }
 
@@ -429,7 +430,6 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
                 goto return_failed;
             }
             vsf_local.partition_idx = -1;
-            mounter->partition_mounted = 0;
             if (mbr->dpt[0].partition_type == 0xEE) {
                 vsf_local.mount_state = VSF_MOUNT_STATE_READ_GPT_HEADER;
                 // lba1 is gpt header
