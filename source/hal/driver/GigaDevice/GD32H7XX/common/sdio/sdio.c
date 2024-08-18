@@ -74,7 +74,7 @@ static void VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_irqhandler)(
             resp[0] = SDIO_RESP0(reg);
         }
         if ((sdio_ptr->buf != NULL) && (sdio_ptr->bufsiz > 0)) {
-            SCB_CleanInvalidateDCache_by_Addr(sdio_ptr->buf, sdio_ptr->bufsiz);
+            SCB_InvalidateDCache_by_Addr(sdio_ptr->buf, sdio_ptr->bufsiz);
             sdio_ptr->buf = NULL;
         }
         sdio_ptr->isr.handler_fn(sdio_ptr->isr.target_ptr, &sdio_ptr->vsf_sdio, (vsf_sdio_irq_mask_t)sts, (vsf_sdio_reqsts_t)sts, resp);
@@ -206,12 +206,14 @@ vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_request)(
         VSF_HAL_ASSERT(!(req->count % (1 << req->block_size_bits)));
         VSF_HAL_ASSERT(!((uint32_t)req->buffer & 3));
 
+        // Clean cache first even for read operation, because the cache maybe uncommited,
+        //  while SDIO DMA write to the same ram.
+        SCB_CleanDCache_by_Addr(req->buffer, req->count);
         if (req->op & __SDIO_CMDOP_DATADIR) {
             // for read operation, invalid buffer after done
             sdio_ptr->buf = req->buffer;
             sdio_ptr->bufsiz = req->count;
         } else {
-            SCB_CleanInvalidateDCache_by_Addr(req->buffer, req->count);
             sdio_ptr->buf = NULL;
         }
 
