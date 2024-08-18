@@ -368,7 +368,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
             if (vsf_local.sectbuf != NULL) {
                 vsf_heap_free(vsf_local.sectbuf);
             }
-            vsf_eda_return(mounter->err);
+            vsf_eda_return();
             break;
         }
 
