@@ -34,6 +34,20 @@ extern "C" {
 #   define VSF_IO_CFG_MULTI_CLASS                   ENABLED
 #endif
 
+// get io configurations from GPIO module if not defined as IO moudle
+#if !defined(VSF_HW_IO_PORT_COUNT) && !defined(VSF_HW_IO_PORT_MASK)
+#   ifdef VSF_HW_GPIO_PORT_COUNT
+#       define VSF_HW_IO_PORT_COUNT                 VSF_HW_GPIO_PORT_COUNT
+#   endif
+#   ifdef VSF_HW_GPIO_PORT_MASK
+#       define VSF_HW_IO_PORT_MASK                  VSF_HW_GPIO_PORT_MASK
+#   endif
+#endif
+
+#if !defined(VSF_HW_IO_PORT_COUNT) && !defined(VSF_HW_IO_PORT_MASK)
+#   error Please provide IO/GPIO configurations in device.h
+#endif
+
 #if defined(VSF_HW_IO_PORT_COUNT) && !defined(VSF_HW_IO_PORT_MASK)
 #   define VSF_HW_IO_PORT_MASK                      VSF_HAL_COUNT_TO_MASK(VSF_HW_IO_PORT_COUNT)
 #endif
@@ -76,39 +90,55 @@ Dependency: VSF_IO_CFG_FUNCTION_RENAME enable
 
 //! In the specific hardware driver, we can enable VSF_IO_CFG_REIMPLEMENT_TYPE_MODE to redefine vsf_io_mode_t as needed.
 #ifndef VSF_IO_CFG_REIMPLEMENT_TYPE_MODE
-#   define VSF_IO_CFG_REIMPLEMENT_TYPE_MODE               DISABLED
+#   define VSF_IO_CFG_REIMPLEMENT_TYPE_MODE         DISABLED
 #endif
 
-#ifndef VSF_IO_CFG_PORTA
+#ifndef VSF_HW_IO_PORT_MASK
+#   error jfiewjiofejw
+#endif
+
+#if !defined(VSF_IO_CFG_PORTA) && (VSF_HW_IO_PORT_MASK & (1ul << 0))
 #   define VSF_IO_CFG_PORTA                         ENABLED
 #endif
 
-#ifndef VSF_IO_CFG_PORTB
+#if !defined(VSF_IO_CFG_PORTB) && (VSF_HW_IO_PORT_MASK & (1ul << 1))
 #   define VSF_IO_CFG_PORTB                         ENABLED
 #endif
 
-#ifndef VSF_IO_CFG_PORTC
+#if !defined(VSF_IO_CFG_PORTC) && (VSF_HW_IO_PORT_MASK & (1ul << 2))
 #   define VSF_IO_CFG_PORTC                         ENABLED
 #endif
 
-#ifndef VSF_IO_CFG_PORTD
+#if !defined(VSF_IO_CFG_PORTD) && (VSF_HW_IO_PORT_MASK & (1ul << 3))
 #   define VSF_IO_CFG_PORTD                         ENABLED
 #endif
 
-#ifndef VSF_IO_CFG_PORTE
+#if !defined(VSF_IO_CFG_PORTE) && (VSF_HW_IO_PORT_MASK & (1ul << 4))
 #   define VSF_IO_CFG_PORTE                         ENABLED
 #endif
 
-#ifndef VSF_IO_CFG_PORTF
+#if !defined(VSF_IO_CFG_PORTF) && (VSF_HW_IO_PORT_MASK & (1ul << 5))
 #   define VSF_IO_CFG_PORTF                         ENABLED
 #endif
 
-#ifndef VSF_IO_CFG_PORTG
+#if !defined(VSF_IO_CFG_PORTG) && (VSF_HW_IO_PORT_MASK & (1ul << 6))
 #   define VSF_IO_CFG_PORTG                         ENABLED
 #endif
 
-#ifndef VSF_IO_CFG_PORTH
+#if !defined(VSF_IO_CFG_PORTH) && (VSF_HW_IO_PORT_MASK & (1ul << 7))
 #   define VSF_IO_CFG_PORTH                         ENABLED
+#endif
+
+#if !defined(VSF_IO_CFG_PORTI) && (VSF_HW_IO_PORT_MASK & (1ul << 8))
+#   define VSF_IO_CFG_PORTI                         ENABLED
+#endif
+
+#if !defined(VSF_IO_CFG_PORTJ) && (VSF_HW_IO_PORT_MASK & (1ul << 9))
+#   define VSF_IO_CFG_PORTJ                         ENABLED
+#endif
+
+#if !defined(VSF_IO_CFG_PORTK) && (VSF_HW_IO_PORT_MASK & (1ul << 10))
+#   define VSF_IO_CFG_PORTK                         ENABLED
 #endif
 
 #ifndef VSF_IO_CFG_PIN_COUNT
@@ -305,6 +335,15 @@ typedef enum vsf_io_port_no_t {
 #if defined(VSF_IO_CFG_PORTH)
     VSF_PORTH,
 #endif
+#if defined(VSF_IO_CFG_PORTI)
+    VSF_PORTI,
+#endif
+#if defined(VSF_IO_CFG_PORTJ)
+    VSF_PORTJ,
+#endif
+#if defined(VSF_IO_CFG_PORTK)
+    VSF_PORTK,
+#endif
 } vsf_io_port_no_t;
 
 typedef enum vsf_io_port_pin_no_t {
@@ -331,6 +370,15 @@ typedef enum vsf_io_port_pin_no_t {
 #endif
 #if defined(VSF_IO_CFG_PORTH)
     VSF_MREPEAT(VSF_IO_CFG_PIN_COUNT, __VSF_IO_PORT_PIN_NUM, H)
+#endif
+#if defined(VSF_IO_CFG_PORTI)
+    VSF_MREPEAT(VSF_IO_CFG_PIN_COUNT, __VSF_IO_PORT_PIN_NUM, I)
+#endif
+#if defined(VSF_IO_CFG_PORTJ)
+    VSF_MREPEAT(VSF_IO_CFG_PIN_COUNT, __VSF_IO_PORT_PIN_NUM, J)
+#endif
+#if defined(VSF_IO_CFG_PORTK)
+    VSF_MREPEAT(VSF_IO_CFG_PIN_COUNT, __VSF_IO_PORT_PIN_NUM, K)
 #endif
 } vsf_io_port_pin_no_t;
 
