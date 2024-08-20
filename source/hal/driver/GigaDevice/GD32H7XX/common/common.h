@@ -34,6 +34,13 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define VSF_HW_PLL_IN_RANGE_1M_2M       0
+#define VSF_HW_PLL_IN_RANGE_2M_4M       1
+#define VSF_HW_PLL_IN_RANGE_4M_8M       2
+#define VSF_HW_PLL_IN_RANGE_8M_16M      3
+#define VSF_HW_PLL_OUT_RANGE_192M_836M  0
+#define VSF_HW_PLL_OUT_RANGE_150M_420M  1
+
 #define vsf_hw_peripheral_clk_set       vsf_hw_clkrst_region_set
 #define vsf_hw_peripheral_clk_get       vsf_hw_clkrst_region_get
 
@@ -296,6 +303,10 @@ extern const vsf_hw_clk_t VSF_HW_CLK_IRC64MDIV;
 extern const vsf_hw_clk_t VSF_HW_CLK_LPIRC4M;
 extern const vsf_hw_clk_t VSF_HW_CLK_IRC32K;
 
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL0_VCO;
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL1_VCO;
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL2_VCO;
+
 extern const vsf_hw_clk_t VSF_HW_CLK_PLL0P;
 extern const vsf_hw_clk_t VSF_HW_CLK_PLL0Q;
 extern const vsf_hw_clk_t VSF_HW_CLK_PLL0R;
@@ -336,12 +347,17 @@ extern const vsf_hw_clk_t VSF_HW_CLK_SDIO0;
 extern const vsf_hw_clk_t VSF_HW_CLK_SDIO1;
 #endif
 
+extern const vsf_hw_clk_t VSF_HW_CLK_TLI;
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
 extern const vsf_hw_clk_t * vsf_hw_clk_get_src(const vsf_hw_clk_t *clk);
 extern uint32_t vsf_hw_clk_get_freq_hz(const vsf_hw_clk_t *clk);
+extern void vsf_hw_clk_enable(const vsf_hw_clk_t *clk);
+extern void vsf_hw_clk_disable(const vsf_hw_clk_t *clk);
+extern vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc, uint16_t prescaler, uint32_t freq_hz);
 
 extern void vsf_hw_clkrst_region_set(uint32_t region, uint_fast8_t value);
 extern uint_fast8_t vsf_hw_clkrst_region_get(uint32_t region);
@@ -349,6 +365,27 @@ extern uint_fast8_t vsf_hw_clkrst_region_get(uint32_t region);
 extern void vsf_hw_clkrst_region_set_bit(uint32_t region);
 extern void vsf_hw_clkrst_region_clear_bit(uint32_t region);
 extern uint_fast8_t vsf_hw_clkrst_region_get_bit(uint32_t region);
+
+/**
+ \~english
+ @brief configure frequency range of pll input/output clocks
+ @param[in] clk: a pointer to PLL_VCO clock
+                VSF_HW_CLK_PLL0_VCO
+                VSF_HW_CLK_PLL1_VCO
+                VSF_HW_CLK_PLL2_VCO
+ @param[in] src_prescaler: prescaler of clock src, [1 .. 63]
+ @param[in] vco_freq_hz: VCO frequency in Hz
+
+ \~chinese
+ @brief 配置 PLL 输入输出时钟的频率范围
+ @param[in] clk: 指向 PLL_VCO 的时钟
+                VSF_HW_CLK_PLL0_VCO
+                VSF_HW_CLK_PLL1_VCO
+                VSF_HW_CLK_PLL2_VCO
+ @param[in] src_prescaler: 时钟源分频系数，1 到 63
+ @param[in] vco_freq_hz: VCO 时钟频率，单位 Hz
+ */
+extern vsf_err_t vsf_hw_pll_vco_config(const vsf_hw_clk_t *clk, uint_fast8_t src_prescaler, uint32_t vco_freq_hz);
 
 #endif
 /* EOF */
