@@ -44,10 +44,6 @@ extern "C" {
 #   endif
 #endif
 
-#if !defined(VSF_HW_IO_PORT_COUNT) && !defined(VSF_HW_IO_PORT_MASK)
-#   error Please provide IO/GPIO configurations in device.h
-#endif
-
 #if defined(VSF_HW_IO_PORT_COUNT) && !defined(VSF_HW_IO_PORT_MASK)
 #   define VSF_HW_IO_PORT_MASK                      VSF_HAL_COUNT_TO_MASK(VSF_HW_IO_PORT_COUNT)
 #endif
@@ -91,10 +87,6 @@ Dependency: VSF_IO_CFG_FUNCTION_RENAME enable
 //! In the specific hardware driver, we can enable VSF_IO_CFG_REIMPLEMENT_TYPE_MODE to redefine vsf_io_mode_t as needed.
 #ifndef VSF_IO_CFG_REIMPLEMENT_TYPE_MODE
 #   define VSF_IO_CFG_REIMPLEMENT_TYPE_MODE         DISABLED
-#endif
-
-#ifndef VSF_HW_IO_PORT_MASK
-#   error jfiewjiofejw
 #endif
 
 #if !defined(VSF_IO_CFG_PORTA) && (VSF_HW_IO_PORT_MASK & (1ul << 0))
@@ -309,7 +301,7 @@ enum {
 #endif
 };
 
-
+#if VSF_HW_IO_PORT_COUNT > 0
 typedef enum vsf_io_port_no_t {
 #if defined(VSF_IO_CFG_PORTA)
     VSF_PORTA,
@@ -381,6 +373,7 @@ typedef enum vsf_io_port_pin_no_t {
     VSF_MREPEAT(VSF_IO_CFG_PIN_COUNT, __VSF_IO_PORT_PIN_NUM, K)
 #endif
 } vsf_io_port_pin_no_t;
+#endif
 
 //! io configuration structure
 typedef struct vsf_io_cfg_t {
