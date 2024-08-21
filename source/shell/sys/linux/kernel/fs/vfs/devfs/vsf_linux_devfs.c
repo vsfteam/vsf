@@ -1297,6 +1297,7 @@ static ssize_t __vsf_linux_fb_write(vsf_linux_fd_t *sfd, const void *buf, size_t
 
     if (fb_priv->front_buffer != NULL) {
         if (fb_priv->is_area_set) {
+            fb_priv->is_area_set = false;
             // TODO: use accelerator if available
             uint_fast32_t line_byte_size = fb_priv->area.size.x * pixel_byte_size;
             uint8_t *fb_ptr =   (uint8_t *)fb_priv->front_buffer
