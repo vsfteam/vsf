@@ -1287,14 +1287,31 @@ static ssize_t __vsf_linux_fb_write(vsf_linux_fd_t *sfd, const void *buf, size_t
     vsf_linux_fb_priv_t *fb_priv = (vsf_linux_fb_priv_t *)sfd->priv;
     vk_vfs_file_t *vfs_file = (vk_vfs_file_t *)fb_priv->file;
     vk_disp_t *disp = (vk_disp_t *)vfs_file->f.param;
-    uint_fast32_t frame_size = disp->param.height * disp->param.width * vsf_disp_get_pixel_bytesize(disp);
+    uint_fast8_t pixel_byte_size = vsf_disp_get_pixel_bytesize(disp);
+    uint_fast32_t pitch = disp->param.width * pixel_byte_size;
+    uint_fast32_t frame_size = disp->param.height * pitch;
 
     if (vfs_file->pos + count >= frame_size) {
         count = frame_size - vfs_file->pos;
     }
 
     if (fb_priv->front_buffer != NULL) {
-        memcpy((void *)((uint8_t *)fb_priv->front_buffer + vfs_file->pos), buf, count);
+        if (fb_priv->is_area_set) {
+            // TODO: use accelerator if available
+            uint_fast32_t line_byte_size = fb_priv->area.size.x * pixel_byte_size;
+            uint8_t *fb_ptr =   (uint8_t *)fb_priv->front_buffer
+                            +   fb_priv->area.pos.y * pitch
+                            +   fb_priv->area.pos.x * pixel_byte_size;
+
+            for (int i = 0; i < fb_priv->area.size.y; i++) {
+                memcpy(fb_ptr, buf, line_byte_size);
+                buf = (const void *)((uint8_t *)buf + line_byte_size);
+                fb_ptr += pitch;
+            }
+        } else {
+            memcpy((void *)((uint8_t *)fb_priv->front_buffer + vfs_file->pos), buf, count);
+        }
+
 #if VSF_DISP_USE_FB == ENABLED
         if (!fb_priv->is_disp_fb)
 #endif
