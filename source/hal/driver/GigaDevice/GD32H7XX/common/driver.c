@@ -697,12 +697,12 @@ vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc,
 
         VSF_HAL_ASSERT((prescaler >= clk->clkprescaler_min) && (prescaler <= clk->clkprescaler_max));
         vsf_hw_clkrst_region_set(clk->clkprescaler_region, prescaler);
-        return VSF_ERR_NONE;
     } else if (freq_hz != 0) {
         uint32_t clk_freq_hz = __vsf_hw_clk_get_src_freq_hz(clk);
         VSF_HAL_ASSERT(clk_freq_hz >= freq_hz);
         return vsf_hw_clk_config(clk, NULL, clk_freq_hz / freq_hz, 0);
     }
+    return VSF_ERR_NONE;
 }
 
 vsf_err_t vsf_hw_pll_vco_config(const vsf_hw_clk_t *clk, uint_fast8_t src_prescaler, uint32_t vco_freq_hz)
