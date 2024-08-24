@@ -19813,6 +19813,16 @@
 	)
 	(wire
 		(pts
+			(xy 374.65 34.29) (xy 381 34.29)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a24b8440-c691-4bbf-8493-028598184b9f")
+	)
+	(wire
+		(pts
 			(xy 129.54 49.53) (xy 132.08 49.53)
 		)
 		(stroke
@@ -20693,16 +20703,6 @@
 	)
 	(wire
 		(pts
-			(xy 336.55 34.29) (xy 342.9 34.29)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "d86a9b47-bd6b-4a07-b3f2-e566a4f21af7")
-	)
-	(wire
-		(pts
 			(xy 43.18 243.84) (xy 39.37 243.84)
 		)
 		(stroke
@@ -21497,7 +21497,7 @@
 		)
 		(uuid "08bfbfd8-5d70-43fb-9f24-f5fb4a79f747")
 	)
-	(label "VCC"
+	(label "VDD"
 		(at 284.48 189.23 180)
 		(fields_autoplaced yes)
 		(effects
@@ -21573,17 +21573,6 @@
 			(justify right bottom)
 		)
 		(uuid "0dbed6d6-1694-42f6-9346-d09302e74a8d")
-	)
-	(label "VBAT"
-		(at 336.55 34.29 0)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify left bottom)
-		)
-		(uuid "0f739017-8c73-410b-87eb-72bbe346b0ac")
 	)
 	(label "MIC_INP"
 		(at 375.285 147.32 90)
@@ -22641,7 +22630,7 @@
 		)
 		(uuid "8b6b8508-d77e-48b7-baf7-17e44658cd66")
 	)
-	(label "USB5V"
+	(label "USB5V_IN"
 		(at 284.48 185.42 180)
 		(fields_autoplaced yes)
 		(effects
@@ -23003,6 +22992,17 @@
 			(justify right bottom)
 		)
 		(uuid "b7851595-63d8-4f09-8e0a-32676627b24d")
+	)
+	(label "VBAT"
+		(at 374.65 34.29 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b8c9d7c5-b4e5-4aef-8630-a0db24cffb88")
 	)
 	(label "GND"
 		(at 514.35 127 0)
@@ -23477,7 +23477,7 @@
 		)
 		(uuid "ef4c0874-6a45-4116-b992-1132ebc89442")
 	)
-	(label "VCC"
+	(label "VDD"
 		(at 284.48 179.07 180)
 		(fields_autoplaced yes)
 		(effects
@@ -24904,7 +24904,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_2x32_P2.54mm_Vertical"
 			(at 328.93 69.85 0)
 			(effects
 				(font
@@ -25225,7 +25225,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "VSF:Key_2Pin_2.9X4.3"
+		(property "Footprint" "VSF:JHA004"
 			(at 198.12 111.76 0)
 			(effects
 				(font
@@ -26993,7 +26993,7 @@
 				)
 			)
 		)
-		(property "Footprint" "VSF:Key_2Pin_2.9X4.3"
+		(property "Footprint" "VSF:JHA004"
 			(at 35.56 63.5 0)
 			(effects
 				(font
@@ -29896,7 +29896,7 @@
 				)
 			)
 		)
-		(property "Footprint" ""
+		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_2x32_P2.54mm_Vertical"
 			(at 367.03 69.85 0)
 			(effects
 				(font
@@ -30904,7 +30904,7 @@
 				(hide yes)
 			)
 		)
-		(property "Footprint" "VSF:Key_2Pin_2.9X4.3"
+		(property "Footprint" "VSF:JHA004"
 			(at 204.47 118.11 0)
 			(effects
 				(font
