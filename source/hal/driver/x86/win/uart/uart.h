@@ -69,16 +69,24 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_RX_ENABLE                 = (0x01ul << 14),
     VSF_USART_RX_DISABLE                = (0x00ul << 14),
 
-    VSF_USART_HALF_DUPLEX_DISABLE       = (0x00ul << 15),
-    VSF_USART_HALF_DUPLEX_ENABLE        = (0x01ul << 15),
+    VSF_USART_SYNC_CLOCK_ENABLE         = (0x00ul << 15),
+    VSF_USART_SYNC_CLOCK_DISABLE        = (0x01ul << 15),
 
-    VSF_USART_TX_FIFO_THRESH_ONE        = (0x00ul << 16),    //!< one data for txfifo
-    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x01ul << 16),    //!< Half of the threshold for txfifo
-    VSF_USART_TX_FIFO_THRESH_FULL       = (0x02ul << 16),    //!< Full of the threshold for txfifo
+    VSF_USART_HALF_DUPLEX_DISABLE       = (0x00ul << 16),
+    VSF_USART_HALF_DUPLEX_ENABLE        = (0x01ul << 16),
 
-    VSF_USART_RX_FIFO_THRESH_ONE        = (0x00ul << 18),    //!< one data for txfifo
-    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (0x01ul << 18),    //!< Half of the threshold for txfifo
-    VSF_USART_RX_FIFO_THRESH_FULL       = (0x02ul << 18),    //!< Full of the threshold for txfifo
+    VSF_USART_TX_FIFO_THRESH_ONE        = (0x00ul << 17),    //!< one data for txfifo
+    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x01ul << 17),    //!< Half of the threshold for txfifo
+    VSF_USART_TX_FIFO_THRESH_FULL       = (0x02ul << 17),    //!< Full of the threshold for txfifo
+
+    VSF_USART_RX_FIFO_THRESH_ONE        = (0x00ul << 19),    //!< one data for txfifo
+    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (0x01ul << 19),    //!< Half of the threshold for txfifo
+    VSF_USART_RX_FIFO_THRESH_FULL       = (0x02ul << 19),    //!< Full of the threshold for txfifo
+
+    VSF_USART_SYNC_CLOCK_POLARITY_LOW   = (0x00ul << 21),
+    VSF_USART_SYNC_CLOCK_POLARITY_HIGH  = (0x01ul << 21),
+    VSF_USART_SYNC_CLOCK_PHASE_1_EDGE   = (0x00ul << 22),
+    VSF_USART_SYNC_CLOCK_PHASE_2_EDGE   = (0x01ul << 22),
 
     WIN_USART_BIT_LENGTH_MASK           = VSF_USART_8_BIT_LENGTH |
                                           VSF_USART_9_BIT_LENGTH,
@@ -113,6 +121,8 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_BREAK_ERR        = VSF_BIT(7),
     VSF_USART_IRQ_MASK_OVERFLOW_ERR     = VSF_BIT(8),
     VSF_USART_IRQ_MASK_TX_ERR           = VSF_BIT(9),
+
+    VSF_USART_IRQ_MASK_CTS              = VSF_BIT(10),
 
     WIN_USART_IRQ_ALL_BITS_MASK         = VSF_USART_IRQ_MASK_RX |
                                           VSF_USART_IRQ_MASK_TX,
