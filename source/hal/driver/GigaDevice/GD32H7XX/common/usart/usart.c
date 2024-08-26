@@ -125,13 +125,13 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     ctl = USART_CTL1(reg);
     ctl &= ~(USART_CTL1_CKEN | USART_CTL1_STB | USART_CTL1_STRP | USART_CTL1_RINV | USART_CTL1_TINV);
     cfg = cfg_ptr->mode & __VSF_HW_USART_CTL1_MASK;
-    ctl |= (((cfg & 0x03) << 12) | (cfg & ~0x03));
+    ctl |= ((cfg & 0x03) << 12) | ((cfg & 0xF00000) >> 12) | (cfg & ~0xF00003);
     USART_CTL1(reg) = ctl;
 
     ctl = USART_CTL2(reg);
     ctl &= ~(USART_CTL2_RTSEN | USART_CTL2_CTSEN | USART_CTL2_HDEN);
     cfg = cfg_ptr->mode & __VSF_HW_USART_CTL2_MASK;
-    ctl |= (((cfg & 0x30) << 4) | ((cfg & 0x40) >> 3) | (cfg & ~0x70));
+    ctl |= ((cfg & 0x30) << 4) | ((cfg & 0x40) >> 3) | (cfg & ~0x70);
     USART_CTL2(reg) = ctl;
 
     if (enabled) {
@@ -180,7 +180,9 @@ void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_enable)(
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
     VSF_HAL_ASSERT(!(irq_mask & ~__VSF_HW_USART_IRQ_MASK));
-    USART_CTL0(usart_ptr->reg) |= irq_mask;
+
+    USART_CTL0(usart_ptr->reg) |= irq_mask & __VSF_HW_USART_CTL0_IRQ_MASK;
+    USART_CTL2(usart_ptr->reg) |= irq_mask & __VSF_HW_USART_CTL2_IRQ_MASK;
 }
 
 void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_disable)(
@@ -188,7 +190,8 @@ void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_disable)(
     vsf_usart_irq_mask_t irq_mask
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
-    USART_CTL0(usart_ptr->reg) &= ~irq_mask;
+    USART_CTL0(usart_ptr->reg) &= ~(irq_mask & __VSF_HW_USART_CTL0_IRQ_MASK);
+    USART_CTL0(usart_ptr->reg) &= ~(irq_mask & __VSF_HW_USART_CTL2_IRQ_MASK);
 }
 
 vsf_usart_status_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_status)(
@@ -306,8 +309,11 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
 
     uint32_t reg = usart_ptr->reg;
     vsf_usart_isr_t *isr_ptr = &usart_ptr->isr;
-    uint32_t irq_mask_orig = USART_STAT(reg) & (USART_STAT_RFNE | USART_STAT_TFNF | USART_STAT_RTF | USART_STAT_PERR);
-    vsf_usart_irq_mask_t irq_mask = irq_mask_orig | ((irq_mask_orig & USART_STAT_RTF) << 15) | ((irq_mask_orig & USART_STAT_PERR) << 8);
+    uint32_t irq_mask_orig = USART_STAT(reg) & (USART_STAT_RFNE | USART_STAT_TFNF | USART_STAT_RTF | USART_STAT_PERR | USART_STAT_CTSF);
+    vsf_usart_irq_mask_t irq_mask = irq_mask_orig
+                                |   ((irq_mask_orig & USART_STAT_RTF) << 15)
+                                |   ((irq_mask_orig & USART_STAT_PERR) << 8)
+                                |   ((irq_mask_orig & USART_STAT_CTSF) << 1);
 
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_usart_t *)usart_ptr, irq_mask);

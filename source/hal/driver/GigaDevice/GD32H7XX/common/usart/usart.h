@@ -112,8 +112,17 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_ODD_PARITY                = (1 << 10) | (1 << 9),
     VSF_USART_EVEN_PARITY               = (1 << 10),
 
-    // 11: CKEN(11) in USART_CTL1
-    VSF_USART_SYNC                      = (1 << 11),
+    // 23: CKEN(11) in USART_CTL1, shift left by 12
+    VSF_USART_SYNC_CLOCK_ENABLE         = (1 << 11) << 12,
+    VSF_USART_SYNC_CLOCK_DISABLE        = (0 << 11) << 12,
+    // 22: CPL(10) in USART_CTL1, shift left by 12
+    VSF_USART_SYNC_CLOCK_POLARITY_LOW   = (0 << 10) << 12,
+    VSF_USART_SYNC_CLOCK_POLARITY_HIGH  = (1 << 10) << 12,
+    // 21: CPH(9) in USART_CTL1, shift left by 12
+    VSF_USART_SYNC_CLOCK_PHASE_1_EDGE   = (0 << 9) << 12,
+    VSF_USART_SYNC_CLOCK_PHASE_2_EDGE   = (1 << 9) << 12,
+    // 20: CLEN(8) in USART_CTL1, shift left by 12
+    VSF_USART_SYNC_CLOCK_CLEN           = (0 << 8) << 12,
 
     // 12&28: WL1(28):WL0(12) in USART_CTL0
     VSF_USART_10_BIT_LENGTH             = (1 << 12) | (1 << 28),
@@ -123,6 +132,8 @@ typedef enum vsf_usart_mode_t {
 
     // more vendor specified modes can be added here
 
+    // 13: MEN(13) in USART_CTL0
+    VSF_USART_MUTE                      = (1 << 13),
     // 15: STRP(15) in USART_CTL1
     VSF_USART_SWAP                      = (1 << 15),
     // 16..17: TINV(17)/RINV(16) in USART_CTL1
@@ -143,8 +154,15 @@ typedef enum vsf_usart_mode_t {
                                         | VSF_USART_EVEN_PARITY
                                         | VSF_USART_TX_ENABLE
                                         | VSF_USART_RX_ENABLE
-                                        | VSF_USART_OVERSAMPLE_MASK,
-    __VSF_HW_USART_CTL1_MASK            = VSF_USART_SYNC
+                                        | VSF_USART_OVERSAMPLE_MASK
+                                        | VSF_USART_MUTE,
+    __VSF_HW_USART_CTL1_MASK            = VSF_USART_SYNC_CLOCK_ENABLE
+                                        | VSF_USART_SYNC_CLOCK_DISABLE
+                                        | VSF_USART_SYNC_CLOCK_POLARITY_LOW
+                                        | VSF_USART_SYNC_CLOCK_POLARITY_HIGH
+                                        | VSF_USART_SYNC_CLOCK_PHASE_1_EDGE
+                                        | VSF_USART_SYNC_CLOCK_PHASE_2_EDGE
+                                        | VSF_USART_SYNC_CLOCK_CLEN
                                         | VSF_USART_0_5_STOPBIT
                                         | VSF_USART_1_STOPBIT
                                         | VSF_USART_1_5_STOPBIT
@@ -185,6 +203,9 @@ typedef enum vsf_usart_irq_mask_t {
     // 26: RTIE(26) in USART_CTL0
     VSF_USART_IRQ_MASK_RX_TIMEOUT       = (1 << 26),
 
+    // 10: CTSIE(10) in USART_CTL2
+    VSF_USART_IRQ_MASK_CTS              = (1 << 0),
+
     // usart request interrupt
     // TODO: add DMA support
     VSF_USART_IRQ_MASK_RX_CPL           = (0),
@@ -196,12 +217,20 @@ typedef enum vsf_usart_irq_mask_t {
 
     // more vendor specified irq_masks can be added here
 
-    __VSF_HW_USART_IRQ_MASK =           VSF_USART_IRQ_MASK_RX
+    __VSF_HW_USART_IRQ_MASK             = VSF_USART_IRQ_MASK_RX
+                                        | VSF_USART_IRQ_MASK_TX
+                                        | VSF_USART_IRQ_MASK_RX_TIMEOUT
+                                        | VSF_USART_IRQ_MASK_RX_CPL
+                                        | VSF_USART_IRQ_MASK_TX_CPL
+                                        | VSF_USART_IRQ_MASK_PARITY_ERR
+                                        | VSF_USART_IRQ_MASK_CTS,
+    __VSF_HW_USART_CTL0_IRQ_MASK        = VSF_USART_IRQ_MASK_RX
                                         | VSF_USART_IRQ_MASK_TX
                                         | VSF_USART_IRQ_MASK_RX_TIMEOUT
                                         | VSF_USART_IRQ_MASK_RX_CPL
                                         | VSF_USART_IRQ_MASK_TX_CPL
                                         | VSF_USART_IRQ_MASK_PARITY_ERR,
+    __VSF_HW_USART_CTL2_IRQ_MASK        = VSF_USART_IRQ_MASK_CTS,
 
     // not supported
     // 0..2
