@@ -66,16 +66,24 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_RX_ENABLE                 = (0x0ul << 16),
     VSF_USART_RX_DISABLE                = (0x1ul << 16),
 
-    VSF_USART_HALF_DUPLEX_DISABLE       = (0x0ul << 17),
-    VSF_USART_HALF_DUPLEX_ENABLE        = (0x1ul << 17),
+    VSF_USART_SYNC_CLOCK_ENABLE         = (0x0ul << 17),
+    VSF_USART_SYNC_CLOCK_DISABLE        = (0x1ul << 17),
 
-    VSF_USART_TX_FIFO_THRESH_ONE        = (0x0ul << 18),
-    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x1ul << 18),
-    VSF_USART_TX_FIFO_THRESH_FULL       = (0x2ul << 18),
+    VSF_USART_HALF_DUPLEX_DISABLE       = (0x0ul << 18),
+    VSF_USART_HALF_DUPLEX_ENABLE        = (0x1ul << 18),
 
-    VSF_USART_RX_FIFO_THRESH_ONE        = (0x0ul << 20),
-    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (0x1ul << 20),
-    VSF_USART_RX_FIFO_THRESH_FULL       = (0x2ul << 20),
+    VSF_USART_TX_FIFO_THRESH_ONE        = (0x0ul << 19),
+    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x1ul << 19),
+    VSF_USART_TX_FIFO_THRESH_FULL       = (0x2ul << 19),
+
+    VSF_USART_RX_FIFO_THRESH_ONE        = (0x0ul << 21),
+    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (0x1ul << 21),
+    VSF_USART_RX_FIFO_THRESH_FULL       = (0x2ul << 21),
+
+    VSF_USART_SYNC_CLOCK_POLARITY_LOW   = (0x0ul << 23),
+    VSF_USART_SYNC_CLOCK_POLARITY_HIGH  = (0x1ul << 23),
+    VSF_USART_SYNC_CLOCK_PHASE_1_EDGE   = (0x0ul << 24),
+    VSF_USART_SYNC_CLOCK_PHASE_2_EDGE   = (0x1ul << 24),
 
     AIC8800_VSF_USART_BIT_LENGTH_MASK   = VSF_USART_8_BIT_LENGTH |
                                           VSF_USART_7_BIT_LENGTH |
@@ -103,6 +111,8 @@ typedef enum vsf_usart_irq_mask_t {
     AIC8800_USART_IRQ_MASK_FIFO         =  VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_TX
                                          | AIC8800_USART_IRQ_MASK_LS | AIC8800_USART_IRQ_MASK_MS
                                          | AIC8800_USART_IRQ_MASK_PT,
+
+    VSF_USART_IRQ_MASK_CTS              = (0x1ul << 24),
 
     VSF_USART_IRQ_MASK_RX_TIMEOUT       = (0x1ul << 25),
 
