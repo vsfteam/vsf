@@ -47,18 +47,6 @@ HAL_TickFreqTypeDef uwTickFreq = HAL_TICK_FREQ_DEFAULT;
 /*============================ PROTOTYPES ====================================*/
 
 
-#if VSF_STHAL_TICK_USE_SYSTIMER == ENABLED
-#if VSF_STHAL_USE_CALL_SYSTIMER_INIT == ENABLED
-
-#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
-void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
-{
-    vsf_systimer_set_idle();
-}
-#else
-#   error "TODO: support more systimer mode"
-#endif
-
 __weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
     VSF_HAL_ASSERT(0);
@@ -70,19 +58,29 @@ __weak void HAL_IncTick(void)
     VSF_HAL_ASSERT(0);
 }
 
-uint32_t HAL_GetTickPrio(void)
+__weak uint32_t HAL_GetTickPrio(void)
 {
     VSF_HAL_ASSERT(0);
     return 0;
 }
 
-HAL_StatusTypeDef HAL_SetTickFreq(HAL_TickFreqTypeDef Freq)
+__weak HAL_StatusTypeDef HAL_SetTickFreq(HAL_TickFreqTypeDef Freq)
 {
     VSF_HAL_ASSERT(0);
     return HAL_OK;
 }
 
-HAL_TickFreqTypeDef HAL_GetTickFreq(void)
+__weak void HAL_SuspendTick(void)
+{
+    VSF_HAL_ASSERT(0);
+}
+
+__weak void HAL_ResumeTick(void)
+{
+    VSF_HAL_ASSERT(0);
+}
+
+__weak HAL_TickFreqTypeDef HAL_GetTickFreq(void)
 {
     return uwTickFreq;
 }
@@ -100,16 +98,20 @@ __weak void HAL_Delay(uint32_t Delay)
     }
 }
 
-__weak void HAL_SuspendTick(void)
-{
-    VSF_HAL_ASSERT(0);
-}
 
-__weak void HAL_ResumeTick(void)
+#if VSF_STHAL_TICK_USE_SYSTIMER == ENABLED
+#if VSF_STHAL_USE_CALL_SYSTIMER_INIT == ENABLED
+
+#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
 {
-    VSF_HAL_ASSERT(0);
+    vsf_systimer_set_idle();
 }
+#else
+#   error "TODO: support more systimer mode"
 #endif
+#endif
+
 __weak uint32_t HAL_GetTick(void)
 {
     vsf_systimer_tick_t tick = vsf_systimer_get();
@@ -136,15 +138,20 @@ HAL_StatusTypeDef HAL_Init(void)
     return HAL_OK;
 }
 
-
 HAL_StatusTypeDef HAL_DeInit(void)
 {
     return HAL_OK;
 }
 
-__weak void HAL_MspInit(void) {}
+__weak void HAL_MspInit(void)
+{
+    /*weak*/
+}
 
-__weak void HAL_MspDeInit(void) {}
+__weak void HAL_MspDeInit(void)    
+{
+    /*weak*/
+}
 
 uint32_t HAL_GetHalVersion(void)
 {
