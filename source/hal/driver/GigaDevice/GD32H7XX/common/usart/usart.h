@@ -166,7 +166,8 @@ typedef enum vsf_usart_mode_t {
                                         | VSF_USART_SYNC_CLOCK_POLARITY_HIGH
                                         | VSF_USART_SYNC_CLOCK_PHASE_1_EDGE
                                         | VSF_USART_SYNC_CLOCK_PHASE_2_EDGE
-                                        | VSF_USART_SYNC_CLOCK_CLEN
+                                        | VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE
+                                        | VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE
                                         | VSF_USART_0_5_STOPBIT
                                         | VSF_USART_1_STOPBIT
                                         | VSF_USART_1_5_STOPBIT

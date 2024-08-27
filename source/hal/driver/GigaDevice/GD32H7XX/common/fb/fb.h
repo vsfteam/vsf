@@ -64,9 +64,7 @@ typedef struct vsf_hw_fb_timing_rgb_t {
         };
     };
 
-    uint32_t                    pll2_vco_freq_hz;
-    uint32_t                    pll2r_freq_hz;
-    uint32_t                    pixel_clock_freq_hz;
+    uint8_t                     fps;
     // for VGA signals, de and pixel_clk are not used
     bool                        use_de;
     bool                        use_pixel_clk;

@@ -74,13 +74,40 @@ int_fast8_t vsf_hw_fb_init(vsf_hw_fb_t *fb)
 {
     vsf_hw_fb_timing_rgb_t *timing = &fb->timing.rgb;
 
+    uint32_t pixel_clock_hz = (timing->hsw + timing->hbp + timing->hfp + fb->width)
+                            * (timing->vsw + timing->vbp + timing->vfp + fb->height)
+                            * timing->fps;
+    const vsf_hw_clk_t *pll2_clksrc = vsf_hw_clk_get_src(&VSF_HW_CLK_PLL2_VCO);
+    uint32_t pll2_input_clock_hz = vsf_hw_clk_get_freq_hz(pll2_clksrc), pll2_vco_clock_hz;
+    uint8_t pll2_input_clock_div = pll2_input_clock_hz / 1000000;
+    uint16_t pll2_n, pll2r, pll2r_div;
+    bool done = false;
+
+    for (pll2r = 1; pll2r <= 128; pll2r++) {
+        for (pll2r_div = 2; pll2r_div <= 16; pll2r <<= 1) {
+            pll2_vco_clock_hz = pixel_clock_hz * pll2r_div * pll2r;
+            pll2_n = pll2_vco_clock_hz / pll2_input_clock_hz;
+            if (    (pll2_vco_clock_hz >= 150000000) && (pll2_vco_clock_hz <= 836000000)
+                &&  (pll2_n >= 9) && (pll2_n <= 128)) {
+                done = true;
+                break;
+            }
+        }
+        if (done) {
+            break;
+        }
+    }
+    if (!done) {
+        return -1;
+    }
+
     vsf_hw_peripheral_enable(VSF_HW_EN_TLI);
     vsf_hw_clk_disable(&VSF_HW_CLK_PLL2_VCO);
     // clock source of PLL2_VCO is ready, so can use frequency
-    vsf_hw_pll_vco_config(&VSF_HW_CLK_PLL2_VCO, 25, timing->pll2_vco_freq_hz);
+    vsf_hw_pll_vco_config(&VSF_HW_CLK_PLL2_VCO, pll2_input_clock_div, pll2_vco_clock_hz);
     // clock sources of PLL2R and TLI are not ready, can not use frequency
-    vsf_hw_clk_config(&VSF_HW_CLK_PLL2R, NULL, timing->pll2_vco_freq_hz / timing->pll2r_freq_hz, 0);
-    vsf_hw_clk_config(&VSF_HW_CLK_TLI, NULL, timing->pll2r_freq_hz / timing->pixel_clock_freq_hz, 0);
+    vsf_hw_clk_config(&VSF_HW_CLK_PLL2R, NULL, pll2r, 0);
+    vsf_hw_clk_config(&VSF_HW_CLK_TLI, NULL, pll2r_div, 0);
     vsf_hw_clk_enable(&VSF_HW_CLK_PLL2R);
     vsf_hw_clk_enable(&VSF_HW_CLK_PLL2_VCO);
 
