@@ -41,6 +41,7 @@
 #   include "../common/flash/flash.h"
 #   include "../common/sdio/sdio.h"
 #   include "../common/usb/usb.h"
+#   include "../common/fb/fb.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

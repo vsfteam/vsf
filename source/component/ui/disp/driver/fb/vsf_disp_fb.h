@@ -41,43 +41,73 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+// keey vk_disp_fb_drv_t independent of ui module, because maybe it's implemented in hal
 typedef struct vk_disp_fb_drv_t {
-    vsf_err_t (*init)(vk_disp_t *pthis);
+    vsf_err_t (*init)(void *fb);
+    vsf_err_t (*fini)(void *fb);
+    vsf_err_t (*enable)(void *fb);
+    vsf_err_t (*disable)(void *fb);
+
     struct {
-        vsf_err_t (*init)(void *fb, vk_disp_color_type_t color_format, void *initial_pixel_buffer);
-        vsf_err_t (*fini)(void *fb);
-        vsf_err_t (*present)(void *fb, void *pixel_buffer);
-    } fb;
+        vsf_err_t (*config)(void *fb, int layer,
+                    uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+                    int color_format, uint_fast8_t alpha,
+                    void *initial_pixel_buffer);
+        vsf_err_t (*enable)(void *fb, int layer);
+        vsf_err_t (*disable)(void *fb, int layer);
+        vsf_err_t (*present)(void *fb, int layer, void *pixel_buffer);
+    } layer;
+
+    struct {
+        vsf_err_t (*fill_color)(void *fb,
+            uint_fast16_t x, uint_fast16_t y, uint_fast16_t w, uint_fast16_t h,
+            uint32_t color, uint32_t color_format);
+        vsf_err_t (*fill_colors)(void *fb,
+            uint_fast16_t x, uint_fast16_t y, uint_fast16_t w, uint_fast16_t h,
+            void *colors, uint32_t color_format,
+            uint_fast16_t rotate_degrees, float xscale, float yscale);
+        vsf_err_t (*blend_colors)(void *fb,
+            uint_fast16_t x, uint_fast16_t y, uint_fast16_t w, uint_fast16_t h,
+            void *colors0, uint32_t color0_format, uint_fast8_t color0_alpha,
+            void *colors1, uint32_t color1_format, uint_fast8_t color1_alpha);
+    } gpu;
 } vk_disp_fb_drv_t;
 
 vsf_class(vk_disp_fb_t) {
     public_member(
         implement(vk_disp_t)
 
-        struct {
-            // user can provide the frame buffer here
-            //  if NULL, frame buffer will be allocated from heap
-            void            *buffer;
+        // user can provide the frame buffer here
+        //  if NULL, frame buffer will be allocated from heap
+        void                    *buffer;
 
-            const vk_disp_fb_drv_t
-                            *drv;
-            void            *param;
+        const vk_disp_fb_drv_t  *drv;
+        void                    *drv_param;
 
-            uint32_t        size;
-            uint8_t         num;
-            uint8_t         pixel_byte_size;
-        } fb;
+        uint8_t                 fb_num;
+        uint32_t                fb_size;
+        uint8_t                 layer_idx;
+        uint8_t                 layer_alpha;
+        vk_disp_area_t          layer_area;
     )
 
     private_member(
-        void                *fb_buffer;
-        uint8_t             front_buffer_idx;
+        void                    *fb_buffer;
+        uint8_t                 front_buffer_idx;
     )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 extern const vk_disp_drv_t vk_disp_drv_fb;
+
+#if VSF_HAL_USE_FB == ENABLED
+// hal can not include display module, so declare hal structures here
+// vsf_disp_hw_fb_drv is used for the first layer,
+//  while vsf_disp_hw_fb_layer_drv is used for other layers, which has only layer APIs
+extern const vk_disp_fb_drv_t vsf_disp_hw_fb_drv;
+extern const vk_disp_fb_drv_t vsf_disp_hw_fb_layer_drv;
+#endif
 
 /*============================ PROTOTYPES ====================================*/
 

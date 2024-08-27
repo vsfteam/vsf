@@ -1,0 +1,201 @@
+/*****************************************************************************
+ *   Copyright(C)2009-2022 by VSF Team                                       *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *     http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ ****************************************************************************/
+
+/*============================ INCLUDES ======================================*/
+
+#include "./fb.h"
+
+#if VSF_USE_UI == ENABLED
+
+#include "hal/vsf_hal.h"
+
+#include "../vendor/Include/gd32h7xx_tli.h"
+
+// in order to use color format and vk_disp_fb_drv_t
+#include "component/ui/disp/vsf_disp.h"
+
+/*============================ MACROS ========================================*/
+
+#define TLI_PIXFORMAT_ARGB8888          0x00
+#define TLI_PIXFORMAT_RGB888            0x01
+#define TLI_PIXFORMAT_RGB565            0x02
+#define TLI_PIXFORMAT_ARGB1555          0x03
+#define TLI_PIXFORMAT_ARGB4444          0x04
+#define TLI_PIXFORMAT_L8                0x05
+#define TLI_PIXFORMAT_AL44              0x06
+#define TLI_PIXFORMAT_AL88              0x07
+
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+
+const vk_disp_fb_drv_t vsf_disp_hw_fb_drv = {
+    .init           = (vsf_err_t (*)(void *))vsf_hw_fb_init,
+    .fini           = (vsf_err_t (*)(void *))vsf_hw_fb_fini,
+    .enable         = (vsf_err_t (*)(void *))vsf_hw_fb_enable,
+    .disable        = (vsf_err_t (*)(void *))vsf_hw_fb_disable,
+
+    .layer          = {
+        .config     = (vsf_err_t (*)(void *, int, uint16_t, uint16_t, uint16_t, uint16_t, int, uint_fast8_t, void *))vsf_hw_fb_layer_config,
+        .enable     = (vsf_err_t (*)(void *, int))vsf_hw_fb_layer_enable,
+        .disable    = (vsf_err_t (*)(void *, int))vsf_hw_fb_layer_disable,
+        .present    = (vsf_err_t (*)(void *, int, void *))vsf_hw_fb_layer_present,
+    },
+};
+
+const vk_disp_fb_drv_t vsf_disp_hw_fb_layer_drv = {
+    .layer          = {
+        .config     = (vsf_err_t (*)(void *, int, uint16_t, uint16_t, uint16_t, uint16_t, int, uint_fast8_t, void *))vsf_hw_fb_layer_config,
+        .enable     = (vsf_err_t (*)(void *, int))vsf_hw_fb_layer_enable,
+        .disable    = (vsf_err_t (*)(void *, int))vsf_hw_fb_layer_disable,
+        .present    = (vsf_err_t (*)(void *, int, void *))vsf_hw_fb_layer_present,
+    },
+};
+
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
+
+int_fast8_t vsf_hw_fb_init(vsf_hw_fb_t *fb)
+{
+    vsf_hw_fb_timing_rgb_t *timing = &fb->timing.rgb;
+
+    vsf_hw_peripheral_enable(VSF_HW_EN_TLI);
+    vsf_hw_clk_disable(&VSF_HW_CLK_PLL2_VCO);
+    // clock source of PLL2_VCO is ready, so can use frequency
+    vsf_hw_pll_vco_config(&VSF_HW_CLK_PLL2_VCO, 25, timing->pll2_vco_freq_hz);
+    // clock sources of PLL2R and TLI are not ready, can not use frequency
+    vsf_hw_clk_config(&VSF_HW_CLK_PLL2R, NULL, timing->pll2_vco_freq_hz / timing->pll2r_freq_hz, 0);
+    vsf_hw_clk_config(&VSF_HW_CLK_TLI, NULL, timing->pll2r_freq_hz / timing->pixel_clock_freq_hz, 0);
+    vsf_hw_clk_enable(&VSF_HW_CLK_PLL2R);
+    vsf_hw_clk_enable(&VSF_HW_CLK_PLL2_VCO);
+
+    uint32_t htmp = timing->hsw - 1;
+    uint32_t vtmp = timing->vsw - 1;
+    TLI_SPSZ &= ~(TLI_SPSZ_VPSZ | TLI_SPSZ_HPSZ);
+    TLI_SPSZ = vtmp | (htmp << 16U);
+
+    htmp += timing->hbp;
+    vtmp += timing->vbp;
+    TLI_BPSZ &= ~(TLI_BPSZ_VBPSZ | TLI_BPSZ_HBPSZ);
+    TLI_BPSZ = vtmp | (htmp << 16U);
+
+    htmp += fb->width;
+    vtmp += fb->height;
+    TLI_ASZ &= ~(TLI_ASZ_VASZ | TLI_ASZ_HASZ);
+    TLI_ASZ = vtmp | (htmp << 16U);
+
+    htmp += timing->hfp;
+    vtmp += timing->vfp;
+    TLI_TSZ &= ~(TLI_TSZ_VTSZ | TLI_TSZ_HTSZ);
+    TLI_TSZ = vtmp | (htmp << 16U);
+
+    TLI_BGC = 0xFFFFFF;
+    TLI_CTL &= ~(TLI_CTL_HPPS | TLI_CTL_VPPS | TLI_CTL_DEPS | TLI_CTL_CLKPS);
+    TLI_CTL |= TLI_HSYN_ACTLIVE_LOW | TLI_VSYN_ACTLIVE_LOW | TLI_DE_ACTLIVE_LOW | TLI_PIXEL_CLOCK_TLI;
+    return 2;
+}
+
+vsf_err_t vsf_hw_fb_fini(vsf_hw_fb_t *fb)
+{
+    vsf_hw_peripheral_rst_set(VSF_HW_RST_TLI);
+    vsf_hw_peripheral_rst_clear(VSF_HW_RST_TLI);
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_hw_fb_enable(vsf_hw_fb_t *fb)
+{
+    TLI_CTL |= TLI_CTL_TLIEN;
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_hw_fb_disable(vsf_hw_fb_t *fb)
+{
+    TLI_CTL &= ~TLI_CTL_TLIEN;
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_hw_fb_layer_config(vsf_hw_fb_t *fb, int layer,
+        uint16_t x, uint16_t y, uint16_t w, uint16_t h,
+        int color_format, uint_fast8_t alpha,
+        void *initial_pixel_buffer)
+{
+    VSF_HAL_ASSERT((fb != NULL) && (layer < 2));
+    layer = 0 == layer ? LAYER0 : LAYER1;
+    vsf_hw_fb_timing_rgb_t *timing = &fb->timing.rgb;
+    uint8_t pixel_byte_size = vsf_disp_get_pixel_format_bytesize(color_format);
+
+    x += timing->hsw + timing->hbp;
+    y += timing->vsw + timing->vbp;
+    TLI_LXHPOS(layer) = x | ((x + w - 1) << 16U);
+    TLI_LXVPOS(layer) = y | ((y + h - 1) << 16U);
+
+    switch (color_format) {
+    case VSF_DISP_COLOR_ARGB8888:
+        TLI_LXPPF(layer) = TLI_PIXFORMAT_ARGB8888;
+        break;
+    case VSF_DISP_COLOR_RGB888_24:
+        TLI_LXPPF(layer) = TLI_PIXFORMAT_RGB888;
+        break;
+    case VSF_DISP_COLOR_RGB565:
+        TLI_LXPPF(layer) = TLI_PIXFORMAT_RGB565;
+        break;
+    default:
+        VSF_ASSERT(false);
+        break;
+    }
+
+    TLI_LXSA(layer) = alpha;
+    TLI_LXDC(layer) = 0;
+    TLI_LXBLEND(layer) &= ~(TLI_LXBLEND_ACF2 | (TLI_LXBLEND_ACF1));
+    TLI_LXBLEND(layer) = LAYER_ACF2_PASA | LAYER_ACF1_PASA;
+    TLI_LXFBADDR(layer) = (uint32_t)initial_pixel_buffer;
+    TLI_LXFLLEN(layer) &= ~(TLI_LXFLLEN_FLL | (TLI_LXFLLEN_STDOFF));
+
+    uint32_t pitch = w * pixel_byte_size;
+    TLI_LXFLLEN(layer) = (pitch + 3) | (pitch << 16U);
+    TLI_LXFTLN(layer) = h;
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_hw_fb_layer_enable(vsf_hw_fb_t *fb, int layer)
+{
+    VSF_HAL_ASSERT((fb != NULL) && (layer < 2));
+    layer = 0 == layer ? LAYER0 : LAYER1;
+    TLI_LXCTL(layer) |= TLI_LXCTL_LEN;
+    TLI_RL |= TLI_RL_RQR;
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_hw_fb_layer_disable(vsf_hw_fb_t *fb, int layer)
+{
+    VSF_HAL_ASSERT((fb != NULL) && (layer < 2));
+    layer = 0 == layer ? LAYER0 : LAYER1;
+    TLI_LXCTL(layer) &= ~TLI_LXCTL_LEN;
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_hw_fb_layer_present(vsf_hw_fb_t *fb, int layer, void *pixel_buffer)
+{
+    VSF_HAL_ASSERT((fb != NULL) && (layer < 2));
+    layer = 0 == layer ? LAYER0 : LAYER1;
+    TLI_LXFBADDR(layer) = (uint32_t)pixel_buffer;
+    TLI_RL |= TLI_RL_FBR;
+    return VSF_ERR_NONE;
+}
+
+#endif

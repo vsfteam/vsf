@@ -133,6 +133,10 @@ extern "C" {
 #   define VSF_HAL_USE_SDIO                 ENABLED
 #endif
 
+#ifndef VSF_HAL_USE_FB
+#   define VSF_HAL_USE_FB                   ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

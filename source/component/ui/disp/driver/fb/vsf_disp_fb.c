@@ -53,7 +53,7 @@ const vk_disp_drv_t vk_disp_drv_fb = {
 static uint8_t __vk_disp_fb_get_back_buffer_idx(vk_disp_fb_t *disp_fb)
 {
     uint8_t back_buffer_idx = disp_fb->front_buffer_idx + 1;
-    if (back_buffer_idx >= disp_fb->fb.num) {
+    if (back_buffer_idx >= disp_fb->fb_num) {
         back_buffer_idx = 0;
     }
     return back_buffer_idx;
@@ -62,7 +62,7 @@ static uint8_t __vk_disp_fb_get_back_buffer_idx(vk_disp_fb_t *disp_fb)
 void * vk_disp_fb_get_buffer(vk_disp_t *pthis, uint_fast8_t idx)
 {
     vk_disp_fb_t *disp_fb = (vk_disp_fb_t *)pthis;
-    return ((uint8_t *)disp_fb->fb_buffer + idx * disp_fb->fb.size);
+    return ((uint8_t *)disp_fb->fb_buffer + idx * disp_fb->fb_size);
 }
 
 void * vk_disp_fb_set_front_buffer(vk_disp_t *pthis, int_fast8_t idx)
@@ -70,7 +70,7 @@ void * vk_disp_fb_set_front_buffer(vk_disp_t *pthis, int_fast8_t idx)
     vk_disp_fb_t *disp_fb = (vk_disp_fb_t *)pthis;
     disp_fb->front_buffer_idx = idx < 0 ? __vk_disp_fb_get_back_buffer_idx(disp_fb) : idx;
     void *buffer = vk_disp_fb_get_buffer(pthis, disp_fb->front_buffer_idx);
-    disp_fb->fb.drv->fb.present(disp_fb->fb.param, buffer);
+    disp_fb->drv->layer.present(disp_fb->drv_param, disp_fb->layer_idx, buffer);
     return buffer;
 }
 
@@ -87,17 +87,23 @@ void * vk_disp_fb_get_back_buffer(vk_disp_t *pthis)
 static vsf_err_t __vk_disp_fb_init(vk_disp_t *pthis)
 {
     vk_disp_fb_t *disp_fb = (vk_disp_fb_t *)pthis;
-    VSF_UI_ASSERT((disp_fb != NULL) && (disp_fb->fb.drv != NULL) && (disp_fb->fb.num > 0));
+    vk_disp_area_t *area = &disp_fb->layer_area;
+    VSF_UI_ASSERT((disp_fb != NULL) && (disp_fb->drv != NULL) && (disp_fb->fb_num > 0));
+    VSF_UI_ASSERT((area->size.x != 0) && (area->size.y != 0));
 
-    if (disp_fb->fb.drv->init != NULL) {
-        disp_fb->fb.drv->init(pthis);
+    if (disp_fb->drv->init != NULL) {
+        disp_fb->drv->init(disp_fb->drv_param);
     }
 
-    if (disp_fb->fb.buffer != NULL) {
-        disp_fb->fb_buffer = disp_fb->fb.buffer;
+    if (!disp_fb->fb_size) {
+        uint_fast8_t pixel_byte_size = vsf_disp_get_pixel_format_bytesize(disp_fb->param.color);
+        disp_fb->fb_size = area->size.x * area->size.y * pixel_byte_size;
+    }
+    if (disp_fb->buffer != NULL) {
+        disp_fb->fb_buffer = disp_fb->buffer;
     } else {
 #if VSF_USE_HEAP == ENABLED
-        uint_fast32_t size = disp_fb->fb.num * disp_fb->fb.size;
+        uint_fast32_t size = disp_fb->fb_num * disp_fb->fb_size;
         disp_fb->fb_buffer = vsf_heap_malloc(size);
         memset(disp_fb->fb_buffer, 0, size);
 #else
@@ -105,10 +111,16 @@ static vsf_err_t __vk_disp_fb_init(vk_disp_t *pthis)
 #endif
     }
 
+    disp_fb->drv->layer.disable(disp_fb->drv_param, disp_fb->layer_idx);
+
     disp_fb->front_buffer_idx = 0;
-    vsf_err_t err = disp_fb->fb.drv->fb.init(disp_fb->fb.param, disp_fb->param.color,
+    vsf_err_t err = disp_fb->drv->layer.config(disp_fb->drv_param, disp_fb->layer_idx,
+                area->pos.x, area->pos.y, area->size.x, area->size.y,
+                disp_fb->param.color, disp_fb->layer_alpha,
                 vk_disp_fb_get_buffer(pthis, disp_fb->front_buffer_idx));
     if (VSF_ERR_NONE == err) {
+        disp_fb->drv->layer.enable(disp_fb->drv_param, disp_fb->layer_idx);
+        disp_fb->drv->enable(disp_fb->drv_param);
         vk_disp_on_ready(pthis);
     }
     return VSF_ERR_NONE;
@@ -129,9 +141,10 @@ static vsf_err_t __vk_disp_fb_refresh(vk_disp_t *pthis, vk_disp_area_t *area, vo
         real_area = *area;
     }
 
-    uint_fast32_t line_size = disp_fb->fb.pixel_byte_size * disp_fb->param.width;
-    uint_fast32_t copy_size = disp_fb->fb.pixel_byte_size * real_area.size.x;
-    uint_fast32_t x_offset = disp_fb->fb.pixel_byte_size * real_area.pos.x;
+    uint_fast8_t pixel_byte_size = vsf_disp_get_pixel_format_bytesize(disp_fb->param.color);
+    uint_fast32_t line_size = pixel_byte_size * disp_fb->param.width;
+    uint_fast32_t copy_size = pixel_byte_size * real_area.size.x;
+    uint_fast32_t x_offset = pixel_byte_size * real_area.pos.x;
     uint_fast32_t y_end = real_area.pos.y + real_area.size.y;
     void *cur_buffer = vk_disp_fb_get_back_buffer(pthis);
 
