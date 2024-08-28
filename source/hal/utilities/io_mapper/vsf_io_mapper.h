@@ -76,7 +76,11 @@ extern "C" {
         uint8_t VSF_MACRO_SAFE_NAME(port_idx) = vsf_io_mapper_get_port(__io_mapper, __pin);\
         uint8_t VSF_MACRO_SAFE_NAME(pin_idx) = vsf_io_mapper_get_pin(__io_mapper, __pin);\
         VSF_HAL_ASSERT(VSF_MACRO_SAFE_NAME(port_idx) < (__io_mapper)->port_num);\
-        vsf_gpio_config_pin((__io_mapper)->io[VSF_MACRO_SAFE_NAME(port_idx)], 1 << VSF_MACRO_SAFE_NAME(pin_idx), (__feature));\
+        vsf_gpio_cfg_t cfg = {                                                  \
+            .pin_mask = 1 << VSF_MACRO_SAFE_NAME(pin_idx),                      \
+            .mode = (__feature),                                                \
+        };                                                                      \
+        vsf_gpio_config_pin((__io_mapper)->io[VSF_MACRO_SAFE_NAME(port_idx)], &cfg);\
     })
 #define vsf_io_mapper_set_direction(__io_mapper, __dir, __pin) ({               \
         uint8_t VSF_MACRO_SAFE_NAME(port_idx) = vsf_io_mapper_get_port(__io_mapper, __pin);\

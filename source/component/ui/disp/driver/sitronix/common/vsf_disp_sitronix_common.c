@@ -71,9 +71,14 @@ void vk_disp_sitronix_init(vk_disp_sitronix_t *disp_sitronix)
     vsf_gpio_t *gpio = disp_sitronix->hw.gpio;
 
     vsf_gpio_set(gpio, 1 << disp_sitronix->hw.cs_pin);
-    vsf_gpio_config_pin(gpio, 1 << disp_sitronix->hw.cs_pin, IO_OUTPUT_PP);
-    vsf_gpio_config_pin(gpio, 1 << disp_sitronix->hw.dc_pin, IO_OUTPUT_PP);
-    vsf_gpio_config_pin(gpio, 1 << disp_sitronix->hw.reset_pin, IO_OUTPUT_PP);
+
+    vsf_gpio_cfg_t cfg = {
+        .pin_mask = (1 << disp_sitronix->hw.cs_pin) |
+                    (1 << disp_sitronix->hw.dc_pin) |
+                    (1 << disp_sitronix->hw.reset_pin),
+        .mode = VSF_GPIO_PULL_UP,
+    };
+    vsf_gpio_config_pin(gpio, &cfg);
 }
 
 void vk_disp_sitronix_reset(vk_disp_sitronix_t *disp_sitronix, bool reset)
