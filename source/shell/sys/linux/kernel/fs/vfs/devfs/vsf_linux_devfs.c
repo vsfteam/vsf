@@ -1180,7 +1180,7 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
             }
 #if VSF_DISP_USE_FB == ENABLED
             if (fb_priv->is_disp_fb) {
-                info->yres_virtual *= disp_fb->fb.num;
+                info->yres_virtual *= disp_fb->fb_num;
             }
 #endif
             info->bits_per_pixel = vsf_disp_get_pixel_bitsize(disp);
@@ -1208,8 +1208,8 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
             strcpy(info->id, "vsf_disp_fb");
 #if VSF_DISP_USE_FB == ENABLED
             if (fb_priv->is_disp_fb) {
-                info->smem_start = (uintptr_t)disp_fb->fb.buffer;
-                info->smem_len = disp_fb->fb.size * disp_fb->fb.num;
+                info->smem_start = (uintptr_t)disp_fb->buffer;
+                info->smem_len = disp_fb->fb_size * disp_fb->fb_num;
             } else
 #endif
             {
@@ -1222,7 +1222,7 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
     case FBIOPAN_DISPLAY: {
             struct fb_var_screeninfo *info = (struct fb_var_screeninfo *)arg;
 #if VSF_DISP_USE_FB == ENABLED
-            uint_fast8_t frame_number = fb_priv->is_disp_fb ? disp_fb->fb.num : 1;
+            uint_fast8_t frame_number = fb_priv->is_disp_fb ? disp_fb->fb_num : 1;
 #else
             uint_fast8_t frame_number = 1;
 #endif
