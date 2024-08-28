@@ -46,6 +46,14 @@ typedef enum vsf_io_mode_t {
     VSF_IO_ANALOG                   = (3 << 17),
     VSF_IO_EXTI                     = (4 << 17),
     VSF_IO_AF                       = (5 << 17),
+
+    VSF_IO_EXTI_MODE_NONE           = (0 << 21),
+    VSF_IO_EXTI_MODE_LOW_LEVEL      = (1 << 21),
+    VSF_IO_EXTI_MODE_HIGH_LEVEL     = (2 << 21),
+    VSF_IO_EXTI_MODE_RISING         = (3 << 21),
+    VSF_IO_EXTI_MODE_FALLING        = (4 << 21),
+    VSF_IO_EXTI_MODE_RISING_FALLING = (5 << 21),
+
 } vsf_io_mode_t;
 
 /*============================ PROTOTYPES ====================================*/

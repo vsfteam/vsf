@@ -94,11 +94,13 @@ void __vsf_hw_aic8800_gpio_init(void)
     }
 }
 
-void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_mode_t mode)
+vsf_err_t vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+    vsf_gpio_mode_t mode = cfg_ptr->mode & __AIC8800_IO_MODE_ALL_BITS;
+    vsf_gpio_pin_mask_t pin_mask = cfg_ptr->pin_mask;
     VSF_HAL_ASSERT(__AIC8800_IO_IS_VAILID_PIN(pin_mask));
-    mode = mode & __AIC8800_IO_MODE_ALL_BITS;
 
     for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
         uint32_t current_pin_mask = 1 << i;
@@ -110,6 +112,80 @@ void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_
             }
         }
     }
+
+    if ((mode & VSF_GPIO_MODE_MASK) == VSF_GPIO_EXTI) {
+        if (hw_gpio_ptr->is_pmic) {
+            return VSF_ERR_NOT_SUPPORT;
+        }
+        VSF_HAL_ASSERT(NULL != hw_gpio_ptr->isrs);
+
+        uint32_t pin_mask = cfg_ptr->pin_mask;
+
+        if (mode == VSF_GPIO_EXTI_MODE_NONE) {
+            hw_gpio_ptr->GPIO->TIR &= ~pin_mask;
+            hw_gpio_ptr->GPIO->ICR &= ~pin_mask;
+            for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
+                if (pin_mask & (1 << i)) {
+                    hw_gpio_ptr->isrs[i].handler_fn = NULL;
+                    hw_gpio_ptr->isrs[i].target_ptr = NULL;
+                }
+            }
+            return VSF_ERR_NONE;
+        } else {
+            for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
+                if (pin_mask & (1 << i)) {
+                    hw_gpio_ptr->isrs[i] = cfg_ptr->isr;
+                }
+            }
+
+            hw_gpio_ptr->GPIO->DR  &= ~pin_mask;
+            hw_gpio_ptr->GPIO->TIR |=  pin_mask;
+
+            switch (mode) {
+            case VSF_GPIO_EXTI_MODE_LOW_LEVEL:
+                hw_gpio_ptr->GPIO->TELR |=  pin_mask;
+                hw_gpio_ptr->GPIO->TER  &= ~pin_mask;
+                hw_gpio_ptr->GPIO->TLR  &= ~pin_mask;
+                break;
+
+            case VSF_GPIO_EXTI_MODE_HIGH_LEVEL:
+                hw_gpio_ptr->GPIO->TELR |=  pin_mask;
+                hw_gpio_ptr->GPIO->TER  &= ~pin_mask;
+                hw_gpio_ptr->GPIO->TLR  |=  pin_mask;
+                break;
+
+            case VSF_GPIO_EXTI_MODE_RISING:
+                hw_gpio_ptr->GPIO->TELR &= ~pin_mask;
+                hw_gpio_ptr->GPIO->TER  &= ~pin_mask;
+                hw_gpio_ptr->GPIO->TLR  |=  pin_mask;
+                break;
+
+            case VSF_GPIO_EXTI_MODE_FALLING:
+                hw_gpio_ptr->GPIO->TELR &= ~pin_mask;
+                hw_gpio_ptr->GPIO->TER  &= ~pin_mask;
+                hw_gpio_ptr->GPIO->TLR  &= ~pin_mask;
+                break;
+
+            case VSF_GPIO_EXTI_MODE_RISING_FALLING:
+                hw_gpio_ptr->GPIO->TELR &= ~pin_mask;
+                hw_gpio_ptr->GPIO->TER  |= pin_mask;
+                break;
+            }
+
+            uint32_t fr_mask = 0;
+            for (int i = 0; i < VSF_HW_IO_PIN_COUNT / 4; i++) {
+                if (pin_mask & (0x03 << i)) {
+                    fr_mask |= (0x07 << i);
+                }
+            }
+            hw_gpio_ptr->GPIO->FR  |= fr_mask;
+            hw_gpio_ptr->GPIO->ICR |= pin_mask;
+
+            NVIC_SetPriority(hw_gpio_ptr->irqn, cfg_ptr->isr.prio);
+        }
+    }
+
+    return VSF_ERR_NONE;
 }
 
 void vsf_hw_gpio_set_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)
@@ -191,7 +267,7 @@ vsf_gpio_capability_t vsf_hw_gpio_capability(vsf_hw_gpio_t *hw_gpio_ptr)
     return gpio_capability;
 }
 
-vsf_err_t vsf_hw_gpio_exti_irq_enable(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)
+vsf_err_t vsf_hw_gpio_exti_irq_enable(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
     uint16_t pin_mask_orig;
@@ -207,7 +283,6 @@ vsf_err_t vsf_hw_gpio_exti_irq_enable(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_m
     __vsf_gpio_unprotect(orig);
 
     if (!pin_mask_orig) {
-        NVIC_SetPriority(hw_gpio_ptr->irqn, prio);
         NVIC_EnableIRQ(hw_gpio_ptr->irqn);
     }
 
@@ -232,84 +307,6 @@ vsf_err_t vsf_hw_gpio_exti_irq_disable(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_
 
     if (!pin_mask_orig) {
         NVIC_DisableIRQ(hw_gpio_ptr->irqn);
-    }
-
-    return VSF_ERR_NONE;
-}
-
-
-
-vsf_err_t vsf_hw_gpio_exti_config(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)
-{
-    VSF_HAL_ASSERT(NULL != hw_gpio_ptr);
-    VSF_HAL_ASSERT(NULL != cfg_ptr);
-
-    if (hw_gpio_ptr->is_pmic) {
-        return VSF_ERR_NOT_SUPPORT;
-    }
-    VSF_HAL_ASSERT(NULL != hw_gpio_ptr->isrs);
-
-    uint32_t pin_mask = cfg_ptr->pin_mask;
-
-    if (cfg_ptr->mode == VSF_GPIO_INT_MODE_NONE) {
-        hw_gpio_ptr->GPIO->TIR &= ~pin_mask;
-        hw_gpio_ptr->GPIO->ICR &= ~pin_mask;
-        for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
-            if (pin_mask & (1 << i)) {
-                hw_gpio_ptr->isrs[i].handler_fn = NULL;
-                hw_gpio_ptr->isrs[i].target_ptr = NULL;
-            }
-        }
-        return VSF_ERR_NONE;
-    } else {
-        for (int i = 0; i < VSF_HW_IO_PIN_COUNT; i++) {
-            if (pin_mask & (1 << i)) {
-                hw_gpio_ptr->isrs[i] = cfg_ptr->isr;
-            }
-        }
-
-        hw_gpio_ptr->GPIO->DR  &= ~pin_mask;
-        hw_gpio_ptr->GPIO->TIR |=  pin_mask;
-
-        switch (cfg_ptr->mode) {
-        case VSF_GPIO_INT_MODE_LOW_LEVEL:
-            hw_gpio_ptr->GPIO->TELR |=  pin_mask;
-            hw_gpio_ptr->GPIO->TER  &= ~pin_mask;
-            hw_gpio_ptr->GPIO->TLR  &= ~pin_mask;
-            break;
-
-        case VSF_GPIO_INT_MODE_HIGH_LEVEL:
-            hw_gpio_ptr->GPIO->TELR |=  pin_mask;
-            hw_gpio_ptr->GPIO->TER  &= ~pin_mask;
-            hw_gpio_ptr->GPIO->TLR  |=  pin_mask;
-            break;
-
-        case VSF_GPIO_INT_MODE_RISING:
-            hw_gpio_ptr->GPIO->TELR &= ~pin_mask;
-            hw_gpio_ptr->GPIO->TER  &= ~pin_mask;
-            hw_gpio_ptr->GPIO->TLR  |=  pin_mask;
-            break;
-
-        case VSF_GPIO_INT_MODE_FALLING:
-            hw_gpio_ptr->GPIO->TELR &= ~pin_mask;
-            hw_gpio_ptr->GPIO->TER  &= ~pin_mask;
-            hw_gpio_ptr->GPIO->TLR  &= ~pin_mask;
-            break;
-
-        case VSF_GPIO_INT_MODE_RISING_FALLING:
-            hw_gpio_ptr->GPIO->TELR &= ~pin_mask;
-            hw_gpio_ptr->GPIO->TER  |= pin_mask;
-            break;
-        }
-
-        uint32_t fr_mask = 0;
-        for (int i = 0; i < VSF_HW_IO_PIN_COUNT / 4; i++) {
-            if (pin_mask & (0x03 << i)) {
-                fr_mask |= (0x07 << i);
-            }
-        }
-        hw_gpio_ptr->GPIO->FR  |= fr_mask;
-        hw_gpio_ptr->GPIO->ICR |= pin_mask;
     }
 
     return VSF_ERR_NONE;

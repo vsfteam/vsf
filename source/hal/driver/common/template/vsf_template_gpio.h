@@ -95,10 +95,6 @@ extern "C" {
 #   define VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE       DISABLED
 #endif
 
-#ifndef VSF_GPIO_CFG_REIMPLEMENT_TYPE_EXT_MODE
-#   define VSF_GPIO_CFG_REIMPLEMENT_TYPE_EXT_MODE   DISABLED
-#endif
-
 #ifndef VSF_GPIO_USE_IO_MODE_TYPE
 #   define VSF_GPIO_USE_IO_MODE_TYPE                DISABLED
 #endif
@@ -106,6 +102,22 @@ extern "C" {
 #ifndef VSF_GPIO_CFG_FUNCTION_RENAME
 #   define VSF_GPIO_CFG_FUNCTION_RENAME             ENABLED
 #endif
+
+
+//! Redefine struct vsf_gpio_cfg_t. The vsf_gpio_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_gpio_cfg_t redefining.
+#if VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#    define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG DISABLED
+#endif
+
+//! Redefine struct vsf_gpio_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_gpio_capability_t redefining.
+#if VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#    define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
+#endif
+
 
 #ifndef VSF_GPIO_CFG_INHERT_HAL_CAPABILITY
 #   define VSF_GPIO_CFG_INHERT_HAL_CAPABILITY       ENABLED
@@ -123,7 +135,7 @@ extern "C" {
 
 #define VSF_GPIO_APIS(__prefix_name)                                                                                                                                                                               \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_gpio_capability_t, gpio, capability,              VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr)                                                                    \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, config_pin,              VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_mode_t mode)                \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, config_pin,              VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_cfg_t * cfg_ptr)                \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set_direction,           VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_gpio_pin_mask_t,   gpio, get_direction,           VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set_input,               VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
@@ -136,13 +148,48 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, toggle,                  VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_set,          VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_clear,        VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_config,             VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr)                                   \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_enable,         VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio)                \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_enable,         VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_disable,        VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 
 /*============================ TYPES =========================================*/
 
-#if VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
+#if VSF_GPIO_USE_IO_MODE_TYPE == ENABLED
+typedef enum vsf_gpio_mode_t {
+    VSF_GPIO_INPUT                      = VSF_IO_INPUT,
+    VSF_GPIO_ANALOG                     = VSF_IO_ANALOG,
+    VSF_GPIO_OUTPUT_PUSH_PULL           = VSF_IO_OUTPUT_PUSH_PULL,
+    VSF_GPIO_OUTPUT_OPEN_DRAIN          = VSF_IO_OUTPUT_OPEN_DRAIN,
+    VSF_GPIO_EXTI                       = VSF_IO_EXTI,
+    VSF_GPIO_AF                         = VSF_IO_AF,
+    VSF_GPIO_NO_PULL_UP_DOWN            = VSF_IO_NO_PULL_UP_DOWN,
+    VSF_GPIO_PULL_UP                    = VSF_IO_PULL_UP,
+    VSF_GPIO_PULL_DOWN                  = VSF_IO_PULL_DOWN,
+
+    VSF_GPIO_EXTI_MODE_NONE             = VSF_IO_EXTI_MODE_NONE,
+    VSF_GPIO_EXTI_MODE_LOW_LEVEL        = VSF_IO_EXTI_MODE_LOW_LEVEL,
+    VSF_GPIO_EXTI_MODE_HIGH_LEVEL       = VSF_IO_EXTI_MODE_HIGH_LEVEL,
+    VSF_GPIO_EXTI_MODE_RISING           = VSF_IO_EXTI_MODE_RISING,
+    VSF_GPIO_EXTI_MODE_FALLING          = VSF_IO_EXTI_MODE_FALLING,
+    VSF_GPIO_EXTI_MODE_RISING_FALLING   = VSF_IO_EXTI_MODE_RISING_FALLING,
+
+#ifdef VSF_IO_INVERT_INPUT
+    VSF_GPIO_INVERT_INPUT               = VSF_IO_INVERT_INPUT,
+#endif
+
+#ifdef VSF_IO_HIGH_DRIVE_STRENGTH
+    VSF_GPIO_HIGH_DRIVE_STRENGTH        = VSF_IO_HIGH_DRIVE_STRENGTH,
+#endif
+
+#ifdef VSF_IO_SPEED_MASK
+    VSF_GPIO_SPEED_LOW                  = VSF_IO_SPEED_LOW,
+    VSF_GPIO_SPEED_MEDIUM               = VSF_IO_SPEED_MEDIUM,
+    VSF_GPIO_SPEED_HIGH                 = VSF_IO_SPEED_HIGH,
+    VSF_GPIO_SPEED_VERY_HIGH            = VSF_IO_SPEED_VERY_HIGH,
+    VSF_GPIO_SPEED_MASK                 = VSF_IO_SPEED_MASK,
+#endif
+} vsf_gpio_mode_t;
+
+#elif VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
 /**
  * \~english
  * @brief Predefined VSF GPIO modes that can be reimplemented in specific hal drivers.
@@ -223,49 +270,36 @@ typedef enum vsf_gpio_mode_t {
     VSF_GPIO_PULL_UP                  = (1 << 4),
     VSF_GPIO_PULL_DOWN                = (2 << 4),
 
+    VSF_GPIO_EXTI_MODE_NONE           = (0 << 6),
+    VSF_GPIO_EXTI_MODE_LOW_LEVEL      = (1 << 6),
+    VSF_GPIO_EXTI_MODE_HIGH_LEVEL     = (2 << 6),
+    VSF_GPIO_EXTI_MODE_RISING         = (3 << 6),
+    VSF_GPIO_EXTI_MODE_FALLING        = (4 << 6),
+    VSF_GPIO_EXTI_MODE_RISING_FALLING = (5 << 6),
+
 /*
     VSF_GPIO_INVERT_INPUT             = (1 << 7),
     #define VSF_GPIO_INVERT_INPUT VSF_GPIO_INVERT_INPUT
-*/
 
-/*
     VSF_GPIO_HIGH_DRIVE_STRENGTH      = (1 << 8),
-*/
+    #define VSF_GPIO_HIGH_DRIVE_STRENGTH VSF_GPIO_HIGH_DRIVE_STRENGTH
 
-/*
-    VSF_GPIO_SPEED_2MHZ               = (0 << 9),
-    VSF_GPIO_SPEED_10MHZ              = (1 << 9),
-    VSF_GPIO_SPEED_50MHZ              = (2 << 9),
+    VSF_GPIO_SPEED_LOW                = (0 << 9),
+    VSF_GPIO_SPEED_MEDIUM             = (1 << 9),
+    VSF_GPIO_SPEED_HIGH               = (2 << 9),
+    VSF_GPIO_SPEED_VERY_HIGH          = (3 << 9),
     VSF_GPIO_SPEED_MASK               = (3 << 9),
+    #define VSF_GPIO_SPEED_LOW        VSF_GPIO_SPEED_LOW
+    #define VSF_GPIO_SPEED_MEDIUM     VSF_GPIO_SPEED_MEDIUM
+    #define VSF_GPIO_SPEED_HIGH       VSF_GPIO_SPEED_HIGH
+    #define VSF_GPIO_SPEED_VERY_HIGH  VSF_GPIO_SPEED_VERY_HIGH
+    #define VSF_GPIO_SPEED_MASK       VSF_GPIO_SPEED_MASK
+
+    VSF_GPIO_ALTERNATE_OFFSET         = 11,
+    VSF_GPIO_ALTERNATE_MASK           = (0xFF << VSF_GPIO_ALTERNATE_OFFSET),
+    #define VSF_GPIO_ALTERNATE_OFFSET VSF_GPIO_ALTERNATE_OFFSET
+    #define VSF_GPIO_ALTERNATE_MASK   VSF_GPIO_ALTERNATE_MASK
 */
-} vsf_gpio_mode_t;
-#elif VSF_GPIO_USE_IO_MODE_TYPE == ENABLED
-typedef enum vsf_gpio_mode_t {
-    VSF_GPIO_IO_INPUT               = VSF_IO_INPUT,
-    VSF_GPIO_IO_ANALOG              = VSF_IO_ANALOG,
-    VSF_GPIO_IO_OUTPUT_PUSH_PULL    = VSF_IO_OUTPUT_PUSH_PULL,
-    VSF_GPIO_IO_OUTPUT_OPEN_DRAIN   = VSF_IO_OUTPUT_OPEN_DRAIN,
-    VSF_GPIO_IO_AF_PUSH_PULL        = VSF_IO_AF_PUSH_PULL,
-    VSF_GPIO_IO_AF_OPEN_DRAIN       = VSF_IO_AF_OPEN_DRAIN,
-    VSF_GPIO_IO_EXTI                = VSF_IO_EXTI,
-    VSF_GPIO_IO_NO_PULL_UP_DOWN     = VSF_IO_NO_PULL_UP_DOWN,
-    VSF_GPIO_IO_PULL_UP             = VSF_IO_PULL_UP,
-    VSF_GPIO_IO_PULL_DOWN           = VSF_IO_PULL_DOWN,
-
-#ifdef VSF_IO_INVERT_INPUT
-    VSF_GPIO_INVERT_INPUT           = VSF_IO_INVERT_INPUT,
-#endif
-
-#ifdef VSF_IO_HIGH_DRIVE_STRENGTH
-    VSF_GPIO_HIGH_DRIVE_STRENGTH    = VSF_IO_HIGH_DRIVE_STRENGTH,
-#endif
-
-#ifdef VSF_IO_SPEED_MASK
-    VSF_GPIO_SPEED_2MHZ             = VSF_IO_SPEED_2MHZ,
-    VSF_GPIO_SPEED_10MHZ            = VSF_IO_SPEED_10MHZ,
-    VSF_GPIO_SPEED_50MHZ            = VSF_IO_SPEED_50MHZ,
-    VSF_GPIO_SPEED_MASK             = VSF_IO_SPEED_MASK,
-#endif
 } vsf_gpio_mode_t;
 #endif
 
@@ -285,8 +319,16 @@ enum {
                                     | VSF_GPIO_PULL_UP
                                     | VSF_GPIO_PULL_DOWN,
 
+    VSF_GPIO_EXTI_MODE_MASK         = VSF_GPIO_EXTI_MODE_NONE
+                                    | VSF_GPIO_EXTI_MODE_LOW_LEVEL
+                                    | VSF_GPIO_EXTI_MODE_HIGH_LEVEL
+                                    | VSF_GPIO_EXTI_MODE_RISING
+                                    | VSF_GPIO_EXTI_MODE_FALLING
+                                    | VSF_GPIO_EXTI_MODE_RISING_FALLING,
+
     VSF_GPIO_MODE_ALL_BITS_MASK     = VSF_GPIO_MODE_MASK
                                     | VSF_GPIO_PULL_UP_DOWN_MASK
+                                    | VSF_GPIO_EXTI_MODE_MASK
 #ifdef VSF_GPIO_INVERT_INPUT
                                     | VSF_GPIO_INVERT_INPUT
 #endif
@@ -296,48 +338,29 @@ enum {
 #ifdef VSF_GPIO_SPEED_MASK
                                     | VSF_GPIO_SPEED_MASK
 #endif
+#ifdef VSF_GPIO_SPEED_MASK
+                                    | VSF_GPIO_SPEED_MASK
+#endif
 };
 
-#if VSF_GPIO_CFG_REIMPLEMENT_TYPE_EXT_MODE == DISABLED
-typedef enum vsf_gpio_interrupt_mode_t {
-    VSF_GPIO_INT_MODE_NONE              = (0x0 << 0),
-    VSF_GPIO_INT_MODE_LOW_LEVEL         = (0x1 << 0),
-    VSF_GPIO_INT_MODE_HIGH_LEVEL        = (0x2 << 0),
-    VSF_GPIO_INT_MODE_RISING            = (0x3 << 0),
-    VSF_GPIO_INT_MODE_FALLING           = (0x4 << 0),
-    VSF_GPIO_INT_MODE_RISING_FALLING    = (0x5 << 0),
-} vsf_gpio_interrupt_mode_t;
+#if VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+typedef struct vsf_gpio_t vsf_gpio_t;
+typedef void vsf_gpio_isr_handler_t(void *target_ptr, vsf_gpio_t *gpio_ptr,
+                                    vsf_gpio_pin_mask_t pin_mask);
+typedef struct vsf_gpio_isr_t {
+    vsf_gpio_isr_handler_t *handler_fn;
+    void                   *target_ptr;
+    vsf_arch_prio_t         prio;
+} vsf_gpio_isr_t;
+//! gpio channel configuration
+typedef struct vsf_gpio_cfg_t {
+    vsf_gpio_pin_mask_t pin_mask;
+    vsf_gpio_mode_t     mode;
+    vsf_gpio_isr_t      isr;
+} vsf_gpio_cfg_t;
 #endif
 
-enum {
-    VSF_GPIO_INT_MODE_COUNT             = 6,
-    VSF_GPIO_INT_MODE_MASK              = VSF_GPIO_INT_MODE_NONE
-                                        | VSF_GPIO_INT_MODE_LOW_LEVEL
-                                        | VSF_GPIO_INT_MODE_HIGH_LEVEL
-                                        | VSF_GPIO_INT_MODE_RISING
-                                        | VSF_GPIO_INT_MODE_FALLING
-                                        | VSF_GPIO_INT_MODE_RISING_FALLING,
-
-    VSF_GPIO_INT_MODE_MASK_COUNT        = 1,
-    VSF_GPIO_INT_MODE_ALL_BITS_MASK     = VSF_GPIO_INT_MODE_MASK,
-};
-
-typedef struct vsf_gpio_t vsf_gpio_t;
-
-typedef void vsf_gpio_isr_handler_t(void *target_ptr, vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
-
-typedef struct vsf_gpio_isr_t {
-    vsf_gpio_isr_handler_t              *handler_fn;
-    void                                *target_ptr;
-} vsf_gpio_isr_t;
-
-//! gpio channel configuration
-typedef struct vsf_gpio_pin_irq_cfg_t {
-    vsf_gpio_pin_mask_t                 pin_mask;
-    vsf_gpio_interrupt_mode_t           mode;
-    vsf_gpio_isr_t                      isr;
-} vsf_gpio_pin_irq_cfg_t;
-
+#if VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_gpio_capability_t {
 #if VSF_GPIO_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
@@ -372,8 +395,7 @@ typedef struct vsf_gpio_capability_t {
     //!  0xFFFFFFFE (32 pins, but pin0 cannot be used as GPIO)
     vsf_gpio_pin_mask_t pin_mask;
 } vsf_gpio_capability_t;
-
-typedef struct vsf_gpio_t vsf_gpio_t;
+#endif
 
 typedef struct vsf_gpio_op_t {
 #undef __VSF_HAL_TEMPLATE_API
@@ -404,19 +426,18 @@ struct vsf_gpio_t  {
  \~english
  @brief Configure one or more pins of the gpio instance
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
- @param[in] pin_mask: pin mask, each pin corresponds to one bit, the value of
-            this bit 1 means configuration is required
- @param[in] mode: enumeration type @ref vsf_gpio_mode_t
+ @param[in] cfg: a pointer to structure @ref vsf_gpio_cfg_t
+ @return vsf_err_t: VSF_ERR_NONE if GPIO Configuration Successful, or a negative error code
+
 
  \~chinese
  @brief 配置 gpio 实例的一个或者多个引脚
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
- @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，该bit的值位1表示需要配置
- @param[in] mode: 枚举类型 @ref vsf_gpio_mode_t
+ @param[in] cfg: 结构体 vsf_gpio_cfg_t 的指针，参考 @ref vsf_gpio_cfg_t
+ @return vsf_err_t: 如果 GPIO 配置成功返回 VSF_ERR_NONE , 失败返回负数。
  */
-extern void vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr,
-                                vsf_gpio_pin_mask_t pin_mask,
-                                vsf_gpio_mode_t mode);
+extern vsf_err_t vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr,
+                                     vsf_gpio_cfg_t * cfg);
 
 /**
  \~english
@@ -620,20 +641,6 @@ extern void vsf_gpio_output_and_clear(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t 
  */
 extern vsf_gpio_capability_t vsf_gpio_capability(vsf_gpio_t *gpio_ptr);
 
-
-/**
- \~english
- @brief Configure interrupt of one or more pins of the gpio instance
- @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
- @param[in] cfg: a pointer to structure @ref vsf_gpio_pin_irq_cfg_t
-
- \~chinese
- @brief 配置 gpio 实例的一个或者多个引脚
- @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
- @param[in] cfg: 结构体 vsf_gpio_pin_irq_cfg_t 的指针，参考 @ref vsf_gpio_pin_irq_cfg_t
- */
-extern vsf_err_t vsf_gpio_exti_config(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg_t *cfg_ptr);
-
 /**
  \~english
  @brief Enable interrupt of a pin
@@ -647,11 +654,10 @@ extern vsf_err_t vsf_gpio_exti_config(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_irq_cfg
  @brief 使能指定引脚的中断
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，1表示该位需要使能，0表示该位不需要使能
- @param[in] prio: 中断优先级，或者用 vsf_arch_prio_invalid 表示关闭中断
  @note 对于一些芯片, 中断优先级可能是 gpio 上所有引脚公用的。
  @note 在中断使能之前，应该清除所有悬挂的中断。
  */
-extern vsf_err_t vsf_gpio_exti_irq_enable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_arch_prio_t prio);
+extern vsf_err_t vsf_gpio_exti_irq_enable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 
 /**
  \~english
@@ -686,7 +692,6 @@ extern vsf_err_t vsf_gpio_exti_irq_disable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_ma
 #   define vsf_gpio_output_and_set(__GPIO, ...)         VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_set)         ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_output_and_clear(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_clear)       ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_toggle(__GPIO, ...)                 VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_toggle)                 ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
-#   define vsf_gpio_exti_config(__GPIO, ...)            VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_config)            ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_exti_irq_enable(__GPIO, ...)        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_enable)        ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_exti_irq_disable(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_disable)       ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #endif
