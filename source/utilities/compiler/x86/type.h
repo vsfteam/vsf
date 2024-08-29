@@ -139,13 +139,16 @@ typedef long long           off64_t;
 // __WIN__ uses _alloca instead of alloca in alloca.h
 
 #   ifndef __VSF_APPLET__
+#    ifndef alloca
 #       define alloca _alloca
+#    endif
 extern void * _alloca(size_t);
 extern int stricmp(const char *s1, const char *s2);
 extern int strnicmp(const char *s1, const char *s2, size_t n);
 
 extern char * strsep(char **stringp, const char *delim);
 extern size_t strlcpy(char *dst, const char *src, size_t dsize);
+extern size_t strlcat(char *dst, const char *src, size_t dsize);
 extern char * strcasestr(const char *str, const char *substr);
 extern char * strtok_r(char *str, const char *delim, char **saveptr);
 

@@ -118,6 +118,7 @@ typedef int_fast8_t         intalu_t;
 extern "C" {
 #endif
 extern size_t strlcpy(char *dst, const char *src, size_t dsize);
+extern size_t strlcat(char *dst, const char *src, size_t dsize);
 extern char * strsep(char **stringp, const char *delim);
 extern char * strcasestr(const char *str, const char *substr);
 #ifdef __cplusplus

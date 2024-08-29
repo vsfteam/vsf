@@ -117,6 +117,35 @@ size_t strlcpy(char *dst, const char *src, size_t dsize)
     return(src - osrc - 1);     /* count does not include NUL */
 }
 
+size_t strlcat(char *dst, const char *src, size_t dsize)
+{
+    char *d = dst;
+    const char *s = src;
+    size_t n = dsize;
+    size_t dlen;
+
+    while (n-- != 0 && *d != '\0') {
+        d++;
+    }
+    dlen = d - dst;
+    n = dsize - dlen;
+
+    if (n == 0) {
+        return (dlen + strlen(s));
+    }
+
+    while (*s != '\0') {
+        if (n != 1) {
+            *d++ = *s;
+            n--;
+        }
+        s++;
+    }
+    *d = '\0';
+
+    return (dlen + (s - src));
+}
+
 char * strsep(char **stringp, const char *delim)
 {
     char *s;

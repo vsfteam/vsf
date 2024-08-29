@@ -49,6 +49,23 @@ extern "C" {
 #define O_NOCTTY        0x2000
 #define O_NDELAY        O_NONBLOCK
 
+#define FNONBLOCK       O_NONBLOCK
+#define FNDELAY         O_NDELAY
+#define FAPPEND         O_APPEND
+#define FASYNC          O_ASYNC
+#define FSYNC           O_SYNC
+#define FCREAT          O_CREAT
+#define FTRUNC          O_TRUNC
+#define FEXCL           O_EXCL
+#define FNOCTTY         O_NOCTTY
+#define FNOFOLLOW       O_NOFOLLOW
+#define FCLOEXEC        O_CLOEXEC
+#define FDIRECTORY      O_DIRECTORY
+#define FSYNC           O_SYNC
+#define FASYNC          O_ASYNC
+#define FLARGEFILE      O_LARGEFILE
+#define FBINARY         O_BINARY
+
 #define F_DUPFD         0
 #define F_GETFD         1
 #define F_SETFD         2

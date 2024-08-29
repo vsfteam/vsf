@@ -31,12 +31,18 @@ extern "C" {
 #ifndef FD_SETSIZE
 #   define FD_SETSIZE           1024
 #endif
-#define FD_ZERO(set)            vsf_bitmap_reset(*(set), FD_SETSIZE)
-#define FD_SET(fd, set)         vsf_bitmap_set(*(set), (fd))
-#define FD_CLR(fd, set)         vsf_bitmap_clear(*(set), (fd))
-#define FD_ISSET(fd, set)       vsf_bitmap_get(*(set), (fd))
+#define FD_ZERO(set)            vsf_bitmap_reset((set)->fds_bits, FD_SETSIZE)
+#define FD_SET(fd, set)         vsf_bitmap_set((set)->fds_bits, (fd))
+#define FD_CLR(fd, set)         vsf_bitmap_clear((set)->fds_bits, (fd))
+#define FD_ISSET(fd, set)       vsf_bitmap_get((set)->fds_bits, (fd))
 
-__vsf_declare_bitmap_ex(fd_set, FD_SETSIZE)
+#define NFDBITS                 (sizeof(fd_mask) << 3)
+
+typedef uintalu_t fd_mask;
+typedef struct fd_set {
+    fd_mask fds_bits[(FD_SETSIZE + NFDBITS - 1) / NFDBITS];
+} fd_set;
+//__vsf_declare_bitmap_ex(fd_set, FD_SETSIZE)
 
 #if VSF_LINUX_APPLET_USE_SYS_SELECT == ENABLED
 typedef struct vsf_linux_sys_select_vplt_t {

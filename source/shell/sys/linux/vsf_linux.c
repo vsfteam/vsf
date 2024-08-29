@@ -3783,6 +3783,11 @@ int sethostid(long hostid)
     return 0;
 }
 
+int getdtablesize(void)
+{
+    return 1024;
+}
+
 #if VSF_LINUX_USE_VFORK == ENABLED
 pid_t __vsf_linux_vfork_prepare(vsf_linux_process_t *parent_process)
 {
@@ -5001,6 +5006,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(acct),
     VSF_APPLET_VPLT_ENTRY_FUNC(__vsf_linux_vfork_prepare),
     VSF_APPLET_VPLT_ENTRY_FUNC(mkdirs),
+    VSF_APPLET_VPLT_ENTRY_FUNC(getdtablesize),
 };
 #endif
 

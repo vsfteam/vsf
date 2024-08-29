@@ -352,6 +352,7 @@ typedef struct vsf_linux_unistd_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__vsf_linux_vfork_prepare);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkdirs);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(getdtablesize);
 } vsf_linux_unistd_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt;
@@ -752,6 +753,10 @@ VSF_LINUX_APPLET_UNISTD_IMP(mkdirs, int, const char *pathname, mode_t mode) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(mkdirs)(pathname, mode);
 }
+VSF_LINUX_APPLET_UNISTD_IMP(getdtablesize, int, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_UNISTD_ENTRY(getdtablesize)();
+}
 
 VSF_APPLET_VPLT_FUNC_DECORATOR(execl) exec_ret_t execl(const char *pathname, const char *arg, ...) {
     exec_ret_t ret;
@@ -894,6 +899,8 @@ int getentropy(void *buffer, size_t length);
 
 long gethostid(void);
 int sethostid(long hostid);
+
+int getdtablesize(void);
 
 int acct(const char *filename);
 
