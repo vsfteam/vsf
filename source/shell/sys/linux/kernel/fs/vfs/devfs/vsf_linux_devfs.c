@@ -1217,6 +1217,7 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
                 info->smem_len = frame_size;
             }
             info->line_length = pitch_size;
+            info->visual = FB_VISUAL_TRUECOLOR;
         }
         break;
     case FBIOPAN_DISPLAY: {
