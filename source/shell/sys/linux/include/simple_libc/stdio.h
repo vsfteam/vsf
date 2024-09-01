@@ -18,6 +18,9 @@
 
 //! \note libc belongs to compiler layer in utilities, so only include compiler.h
 //! IMPORTANT: to avoid including other c headers, define __USE_LOCAL_XXXX__ here
+//! 
+//! Do not include stdbool in compiler.h, because user maybe define bool,
+//!     which maybe conflict with bool in stdbool.h
 #define __USE_LOCAL_STDBOOL__
 #include "utilities/compiler/compiler.h"
 
