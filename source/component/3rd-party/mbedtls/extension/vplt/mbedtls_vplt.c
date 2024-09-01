@@ -21,6 +21,9 @@
 
 #if VSF_USE_MBEDTLS == ENABLED
 
+// include vsf.h for bool
+#include "vsf.h"
+
 #include <mbedtls/version.h>
 #include <mbedtls/error.h>
 #include <mbedtls/ctr_drbg.h>
