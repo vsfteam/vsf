@@ -243,16 +243,16 @@ struct vsf_peripheral_capability_t {
 //! \name interface: i_peripheral_t
 //! @{
 def_interface(i_peripheral_t)
-    vsf_peripheral_status_t (*Status)       (void);
-    vsf_peripheral_capability_t (*Capability)   (void);
-    fsm_rt_t                (*Uninit)       (void);
+    vsf_peripheral_status_t     (*fn_Status)        (void);
+    vsf_peripheral_capability_t (*fn_Capability)    (void);
+    fsm_rt_t                    (*fn_Uninit)        (void);
     union {
-        fsm_rt_t            (*Enable)       (void);
-        fsm_rt_t            (*Open)         (void);
+        fsm_rt_t                (*fn_Enable)        (void);
+        fsm_rt_t                (*fn_Open)          (void);
     };
     union {
-        fsm_rt_t            (*Disable)      (void);
-        fsm_rt_t            (*Close)        (void);
+        fsm_rt_t                (*fn_Disable)       (void);
+        fsm_rt_t                (*fn_Close)         (void);
     };
 end_def_interface(i_peripheral_t)
 //! @}
@@ -268,13 +268,13 @@ def_interface(vsf_async_block_access_t)
      *!                     value is returned.
      *! \retval vsf_err_t   Error value is returned.
      */
-    vsf_err_t               (*Request)(uint8_t *buffer_ptr, uint_fast32_t size);
+    vsf_err_t               (*fn_Request)(uint8_t *buffer_ptr, uint_fast32_t size);
 
     /*! \brief cancel on going communication */
-    vsf_err_t               (*Cancel) (void);
+    vsf_err_t               (*fn_Cancel) (void);
 
     /*! \brief get transferred count */
-    int_fast32_t            (*GetTransferredCount)(void);
+    int_fast32_t            (*fn_GetTransferredCount)(void);
 end_def_interface(vsf_async_block_access_t)
 
 
