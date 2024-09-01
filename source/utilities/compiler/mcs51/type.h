@@ -25,12 +25,12 @@ typedef unsigned char       uint8_t;
 typedef signed char         int8_t;
 typedef unsigned char       uint_fast8_t;
 typedef signed char         int_fast8_t;
-    
+
 typedef unsigned short      uint16_t;
 typedef signed short        int16_t;
 typedef unsigned short      uint_fast16_t;
 typedef signed short        int_fast16_t;
-    
+
 typedef unsigned long int   uint32_t;
 typedef signed long int     int32_t;
 typedef unsigned long int   uint_fast32_t;
@@ -46,11 +46,6 @@ typedef uint32_t            uintptr_t;
 typedef int32_t             intptr_t;
 typedef uint32_t            uintmax_t;
 typedef int32_t             intmax_t;
-
-typedef enum {
-    false = 0,
-    true = !false,
-} bool;
 
 #define INT8_MIN         (-127i8 - 1)
 #define INT16_MIN        (-32767i16 - 1)
@@ -101,7 +96,21 @@ typedef enum {
 
 #else
 #   include <stdint.h>
-#   include <stdbool.h>
+#endif
+
+#if !defined(__USE_LOCAL_STDBOOL__)
+#   if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
+#       if !defined(bool)
+typedef enum {
+    false = 0,
+    true = !false,
+} bool;
+#       endif
+#   else
+#       include <stdbool.h>
+#   endif
+#else
+#   undef __USE_LOCAL_STDINT_STDBOOL__
 #endif
 
 #if !__IS_COMPILER_GCC__
@@ -120,7 +129,7 @@ extern "C" {
 /*============================ TYPE DEFINE ===================================*/
 
 typedef uint_fast8_t        uintalu_t;
-typedef int_fast8_t         intalu_t; 
+typedef int_fast8_t         intalu_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

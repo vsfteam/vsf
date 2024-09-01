@@ -42,14 +42,21 @@ typedef uint32_t            uintptr_t;
 typedef int32_t             intptr_t;
 typedef uint32_t            uintmax_t;
 typedef int32_t             intmax_t;
+#else
+#include <stdint.h>
+#endif
 
+#if !defined(__USE_LOCAL_STDBOOL__)
+#   if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 typedef enum {
     false = 0,
     true = !false,
 } bool;
+#   else
+#       include <stdbool.h>
+#   endif
 #else
-#include <stdint.h>
-#include <stdbool.h>
+#   undef __USE_LOCAL_STDINT_STDBOOL__
 #endif
 
 #if !__IS_COMPILER_GCC__ && !__IS_COMPILER_LLVM__
@@ -87,6 +94,7 @@ typedef int64_t             intalu_t;
 #endif // __APP_TYPE_H_INCLUDED__
 
 /*============================ Multiple-Entry ================================*/
+
 #include "../__common/__type.h"
 
 /*============================ Library Patch  ================================*/

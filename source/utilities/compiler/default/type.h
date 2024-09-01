@@ -23,7 +23,21 @@
 /*============================ INCLUDES ======================================*/
 
 #include <stdint.h>
-#include <stdbool.h>
+
+#if !defined(__USE_LOCAL_STDBOOL__)
+#   if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
+#       if !defined(bool)
+typedef enum {
+    false = 0,
+    true = !false,
+} bool;
+#       endif
+#   else
+#       include <stdbool.h>
+#   endif
+#else
+#   undef __USE_LOCAL_STDINT_STDBOOL__
+#endif
 
 #if !__IS_COMPILER_GCC__ && !__IS_COMPILER_LLVM__
 #   include <uchar.h>
