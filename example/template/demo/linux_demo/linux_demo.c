@@ -357,7 +357,9 @@ int vsf_linux_create_fhs(void)
 #endif
 
     // call vsf_arch_cpp_startup only after dependency of cpp initializer is ready
+#ifdef __VSF_CPP__
     vsf_arch_cpp_startup();
+#endif
     return 0;
 }
 
