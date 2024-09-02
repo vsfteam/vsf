@@ -10,6 +10,9 @@
 #endif
 #include <stdio.h>
 
+// for elf_loader in service.loader
+#include "service/vsf_service.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
