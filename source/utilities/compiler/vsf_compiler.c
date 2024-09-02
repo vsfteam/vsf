@@ -17,3 +17,11 @@ __VSF_VPLT_DECORATOR__ vsf_compiler_vplt_t vsf_compiler_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(__paritysi2),
 };
 #endif
+
+#ifdef __VSF_CPP__
+VSF_CAL_WEAK(vsf_compiler_cpp_startup)
+int vsf_compiler_cpp_startup(void)
+{
+    return -1;
+}
+#endif

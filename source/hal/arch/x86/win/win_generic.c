@@ -1331,4 +1331,86 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     return 0;
 }
 
+/*----------------------------------------------------------------------------*
+ * cpp startup                                                                *
+ *----------------------------------------------------------------------------*/
+
+// save cpp static initializer for app, and call after linux startup
+
+#ifdef __VSF_CPP__
+
+typedef int (* cpp_init_func_t)(void);
+typedef struct cpp_init_t {
+    bool returns_int;
+    cpp_init_func_t func;
+} cpp_init_t;
+static cpp_init_t __vsf_cpp_init[128];
+static int __vsf_cpp_init_cnt = 0;
+
+static int __vsf_arch_cpp_init_range(cpp_init_func_t * const start, cpp_init_func_t * const end, bool returns_int)
+{
+    int result;
+    for (const cpp_init_func_t * it = start; it != end; ++it) {
+        if (*it == NULL) {
+            continue;
+        }
+
+        result = (**it)();
+        if (returns_int && (result != 0)) {
+            VSF_ASSERT(false);
+            return result;
+        }
+    }
+    return 0;
+}
+
+void vsf_arch_cpp_startup(void)
+{
+    int result;
+    for (int i = 0; i < __vsf_cpp_init_cnt; i++) {
+        result = __vsf_cpp_init[i].func();
+        if (__vsf_cpp_init[i].returns_int && (result != 0)) {
+            VSF_ASSERT(false);
+            while (1);
+        }
+    }
+}
+
+void _initterm(cpp_init_func_t * const first, cpp_init_func_t * const last)
+{
+    // IMPORTANT: Some static initializers of cpp instances in app will depend on linux,
+    //  so we have to record these functions, and call later after linux started.
+    //  first[0]                should be NULL
+    //  first[1]                should be pre_cpp_initialization
+    //  first[2] .. last[-2]    should be cpp static instance initializers
+    //  last[-1]                should be vsf_main_entry
+    //  last[0]                 should be NULL
+    //  So simply save first[2] .. last[-2]
+
+    int count = last - first + 1;
+    cpp_init_func_t funcs[count];
+    memcpy(funcs, first, count * sizeof(funcs[0]));
+
+    for (int idx = 0; idx < count; idx++) {
+        if ((idx >= 2) && (idx <= count - 3)) {
+            VSF_ARCH_ASSERT(__vsf_cpp_init_cnt < dimof(__vsf_cpp_init));
+            __vsf_cpp_init[__vsf_cpp_init_cnt++] = (cpp_init_t){
+                .returns_int = false,
+                .func = funcs[idx],
+            };
+            funcs[idx] = NULL;
+        }
+    }
+
+    __vsf_arch_cpp_init_range(funcs, last, false);
+}
+
+int _initterm_e(cpp_init_func_t * const first, cpp_init_func_t * const last)
+{
+    __vsf_arch_cpp_init_range(first, last, true);
+    return 0;
+}
+
+#endif
+
 /* EOF */

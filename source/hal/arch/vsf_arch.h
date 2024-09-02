@@ -48,7 +48,9 @@ extern "C" {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
+#ifdef __VSF_CPP__
+extern void vsf_arch_cpp_startup(void);
+#endif
 
 /*! \note initialize architecture specific service
  *  \param none

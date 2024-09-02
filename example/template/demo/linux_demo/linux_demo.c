@@ -356,6 +356,8 @@ int vsf_linux_create_fhs(void)
     busybox_bind(VSF_LINUX_CFG_BIN_PATH "/load", dynloader_main);
 #endif
 
+    // call vsf_arch_cpp_startup only after dependency of cpp initializer is ready
+    vsf_arch_cpp_startup();
     return 0;
 }
 

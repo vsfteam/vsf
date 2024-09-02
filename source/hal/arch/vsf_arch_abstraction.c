@@ -1097,4 +1097,16 @@ __VSF_VPLT_DECORATOR__ vsf_arch_vplt_t vsf_arch_vplt = {
 };
 #endif
 
+#ifdef __VSF_CPP__
+
+VSF_CAL_WEAK(vsf_arch_cpp_startup)
+void vsf_arch_cpp_startup(void)
+{
+    if (vsf_compiler_cpp_startup() < 0) {
+        VSF_ARCH_ASSERT(false);
+    }
+}
+
+#endif
+
 /* EOF */

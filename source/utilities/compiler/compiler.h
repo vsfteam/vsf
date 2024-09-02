@@ -244,4 +244,16 @@ extern __VSF_VPLT_DECORATOR__ vsf_compiler_vplt_t vsf_compiler_vplt;
 #   undef __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
 #endif
 
+#ifdef __VSF_CPP__
+// vsf_compiler_cpp_startup returns -1 if not implemented,
+//  otherwise, it returns 0.
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern int vsf_compiler_cpp_startup(void);
+#ifdef __cplusplus
+}
+#endif
+#endif
+
 //#endif
