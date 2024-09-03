@@ -295,17 +295,48 @@ extern void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, vsf_timeout_ti
 
 /*============================ LOCAL VARIABLES ===============================*/
 
+#if VSF_LINUX_CFG_HEAP_SIZE > 0
+struct __vsf_linux_heap_t {
+    implement(vsf_heap_t)
+    uint8_t memory[VSF_LINUX_CFG_HEAP_SIZE];
+    vsf_dlist_t freelist[2];
+} static __vsf_linux_heap;
+#endif
+
 static vsf_linux_t __vsf_linux = {
-    .cur_pid            = -1,
+    .cur_pid                = -1,
+
+#if VSF_LINUX_CFG_HEAP_SIZE > 0
+    .process_for_resources  = {
+        .heap               = &__vsf_linux_heap.use_as__vsf_heap_t,
+    },
+#endif
 };
 
 static const vsf_linux_thread_op_t __vsf_linux_main_op = {
-    .priv_size          = 0,
-    .on_run             = __vsf_linux_main_on_run,
-    .on_terminate       = vsf_linux_thread_on_terminate,
+    .priv_size              = 0,
+    .on_run                 = __vsf_linux_main_on_run,
+    .on_terminate           = vsf_linux_thread_on_terminate,
 };
 
 /*============================ IMPLEMENTATION ================================*/
+
+#if VSF_LINUX_CFG_HEAP_SIZE > 0
+static vsf_dlist_t * __vsf_linux_heap_get_freelist(vsf_heap_t *heap, uint_fast32_t size)
+{
+    return &__vsf_linux_heap.freelist[0];
+}
+
+static void __vsf_linux_heap_init(void)
+{
+    memset(&__vsf_linux_heap.use_as__vsf_heap_t, 0, sizeof(__vsf_linux_heap.use_as__vsf_heap_t));
+    for (uint_fast8_t i = 0; i < dimof(__vsf_linux_heap.freelist); i++) {
+        vsf_dlist_init(&__vsf_linux_heap.freelist[i]);
+    }
+    __vsf_linux_heap.get_freelist = __vsf_linux_heap_get_freelist;
+    __vsf_heap_add_buffer(&__vsf_linux_heap.use_as__vsf_heap_t, __vsf_linux_heap.memory, sizeof(__vsf_linux_heap.memory));
+}
+#endif
 
 vsf_linux_process_t * vsf_linux_get_real_process(vsf_linux_process_t *process)
 {
@@ -928,6 +959,10 @@ vsf_err_t vsf_linux_init(vsf_linux_stdio_stream_t *stdio_stream)
 #endif
     vk_fs_init();
 
+#if VSF_LINUX_CFG_HEAP_SIZE > 0
+    __vsf_linux_heap_init();
+#endif
+
 #if VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
     vsf_linux_glibc_init();
 #endif
@@ -1229,6 +1264,11 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size, int heap
             process->heap = &process_heap->heap;
             __vsf_heap_add_buffer(&process_heap->heap, (uint8_t *)&process_heap[1], heap_size);
         }
+#if VSF_LINUX_CFG_HEAP_SIZE > 0
+        else {
+            process->heap = __vsf_linux.process_for_resources.heap;
+        }
+#endif
     }
     return process;
 }
