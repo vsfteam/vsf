@@ -88,6 +88,9 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_SYNC_CLOCK_PHASE_1_EDGE   = (0x00ul << 22),
     VSF_USART_SYNC_CLOCK_PHASE_2_EDGE   = (0x01ul << 22),
 
+    VSF_USART_IRDA_ENABLE               = (0x01ul << 23),
+    VSF_USART_IRDA_DISABLE              = (0x01ul << 23),
+
     WIN_USART_BIT_LENGTH_MASK           = VSF_USART_8_BIT_LENGTH |
                                           VSF_USART_9_BIT_LENGTH,
     WIN_USART_STOPBIT_MASK              = VSF_USART_1_STOPBIT |
