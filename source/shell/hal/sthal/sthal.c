@@ -47,45 +47,53 @@ HAL_TickFreqTypeDef uwTickFreq = HAL_TICK_FREQ_DEFAULT;
 /*============================ PROTOTYPES ====================================*/
 
 
-__weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
+VSF_CAL_WEAK(HAL_InitTick)
+HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
-    VSF_HAL_ASSERT(0);
+    VSF_STHAL_ASSERT(0);
     return HAL_OK;
 }
 
-__weak void HAL_IncTick(void)
+VSF_CAL_WEAK(HAL_IncTick)
+void HAL_IncTick(void)
 {
-    VSF_HAL_ASSERT(0);
+    VSF_STHAL_ASSERT(0);
 }
 
-__weak uint32_t HAL_GetTickPrio(void)
+VSF_CAL_WEAK(HAL_GetTickPrio)
+uint32_t HAL_GetTickPrio(void)
 {
-    VSF_HAL_ASSERT(0);
+    VSF_STHAL_ASSERT(0);
     return 0;
 }
 
-__weak HAL_StatusTypeDef HAL_SetTickFreq(HAL_TickFreqTypeDef Freq)
+VSF_CAL_WEAK(HAL_SetTickFreq)
+HAL_StatusTypeDef HAL_SetTickFreq(HAL_TickFreqTypeDef Freq)
 {
-    VSF_HAL_ASSERT(0);
+    VSF_STHAL_ASSERT(0);
     return HAL_OK;
 }
 
-__weak void HAL_SuspendTick(void)
+VSF_CAL_WEAK(HAL_SuspendTick)
+void HAL_SuspendTick(void)
 {
-    VSF_HAL_ASSERT(0);
+    VSF_STHAL_ASSERT(0);
 }
 
-__weak void HAL_ResumeTick(void)
+VSF_CAL_WEAK(HAL_ResumeTick)
+void HAL_ResumeTick(void)
 {
-    VSF_HAL_ASSERT(0);
+    VSF_STHAL_ASSERT(0);
 }
 
-__weak HAL_TickFreqTypeDef HAL_GetTickFreq(void)
+VSF_CAL_WEAK(HAL_GetTickFreq)
+HAL_TickFreqTypeDef HAL_GetTickFreq(void)
 {
     return uwTickFreq;
 }
 
-__weak void HAL_Delay(uint32_t Delay)
+VSF_CAL_WEAK(HAL_Delay)
+void HAL_Delay(uint32_t Delay)
 {
     uint32_t tickstart = HAL_GetTick();
     uint32_t wait      = Delay;
@@ -112,7 +120,8 @@ void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
 #endif
 #endif
 
-__weak uint32_t HAL_GetTick(void)
+VSF_CAL_WEAK(HAL_GetTick)
+uint32_t HAL_GetTick(void)
 {
     vsf_systimer_tick_t tick = vsf_systimer_get();
     return vsf_systimer_tick_to_ms(tick);
@@ -143,12 +152,14 @@ HAL_StatusTypeDef HAL_DeInit(void)
     return HAL_OK;
 }
 
-__weak void HAL_MspInit(void)
+VSF_CAL_WEAK(HAL_MspInit)
+void HAL_MspInit(void)
 {
     /*weak*/
 }
 
-__weak void HAL_MspDeInit(void)    
+VSF_CAL_WEAK(HAL_MspDeInit)
+void HAL_MspDeInit(void)    
 {
     /*weak*/
 }

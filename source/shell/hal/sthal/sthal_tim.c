@@ -44,12 +44,14 @@ HAL_StatusTypeDef HAL_TIM_Base_DeInit(TIM_HandleTypeDef *htim)
     return HAL_OK;
 }
 
-__weak void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_Base_MspInit)
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
 
-__weak void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_Base_MspDeInit)
+void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
@@ -95,12 +97,14 @@ HAL_StatusTypeDef HAL_TIM_OC_DeInit(TIM_HandleTypeDef *htim)
     return HAL_OK;
 }
 
-__weak void HAL_TIM_OC_MspInit(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_OC_MspInit)
+void HAL_TIM_OC_MspInit(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
 
-__weak void HAL_TIM_OC_MspDeInit(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_OC_MspDeInit)
+void HAL_TIM_OC_MspDeInit(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
@@ -147,12 +151,14 @@ HAL_StatusTypeDef HAL_TIM_PWM_DeInit(TIM_HandleTypeDef *htim)
     return HAL_OK;
 }
 
-__weak void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_PWM_MspInit)
+void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
 
-__weak void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_PWM_MspDeInit)
+void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
@@ -201,12 +207,14 @@ HAL_StatusTypeDef HAL_TIM_IC_DeInit(TIM_HandleTypeDef *htim)
     return HAL_OK;
 }
 
-__weak void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_IC_MspInit)
+void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
 
-__weak void HAL_TIM_IC_MspDeInit(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_IC_MspDeInit)
+void HAL_TIM_IC_MspDeInit(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
@@ -255,12 +263,14 @@ HAL_StatusTypeDef HAL_TIM_OnePulse_DeInit(TIM_HandleTypeDef *htim)
     return HAL_OK;
 }
 
-__weak void HAL_TIM_OnePulse_MspInit(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_OnePulse_MspInit)
+void HAL_TIM_OnePulse_MspInit(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
 
-__weak void HAL_TIM_OnePulse_MspDeInit(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_OnePulse_MspDeInit)
+void HAL_TIM_OnePulse_MspDeInit(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
@@ -300,12 +310,14 @@ HAL_StatusTypeDef HAL_TIM_Encoder_DeInit(TIM_HandleTypeDef *htim)
     return HAL_OK;
 }
 
-__weak void HAL_TIM_Encoder_MspInit(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_Encoder_MspInit)
+void HAL_TIM_Encoder_MspInit(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
 
-__weak void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_Encoder_MspDeInit)
+void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
@@ -492,52 +504,62 @@ uint32_t HAL_TIM_ReadCapturedValue(const TIM_HandleTypeDef *htim,
     return tmpreg;
 }
 
-__weak void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_PeriodElapsedCallback)
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
 
-__weak void HAL_TIM_PeriodElapsedHalfCpltCallback(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_PeriodElapsedHalfCpltCallback)
+void HAL_TIM_PeriodElapsedHalfCpltCallback(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
 
-__weak void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_OC_DelayElapsedCallback)
+void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
 
-__weak void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_IC_CaptureCallback)
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
 
-__weak void HAL_TIM_IC_CaptureHalfCpltCallback(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_IC_CaptureHalfCpltCallback)
+void HAL_TIM_IC_CaptureHalfCpltCallback(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
 
-__weak void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_PWM_PulseFinishedCallback)
+void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
 
-__weak void HAL_TIM_PWM_PulseFinishedHalfCpltCallback(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_PWM_PulseFinishedHalfCpltCallback)
+void HAL_TIM_PWM_PulseFinishedHalfCpltCallback(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
 
-__weak void HAL_TIM_TriggerCallback(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_TriggerCallback)
+void HAL_TIM_TriggerCallback(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
 
-__weak void HAL_TIM_TriggerHalfCpltCallback(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_TriggerHalfCpltCallback)
+void HAL_TIM_TriggerHalfCpltCallback(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }
 
-__weak void HAL_TIM_ErrorCallback(TIM_HandleTypeDef *htim)
+VSF_CAL_WEAK(HAL_TIM_ErrorCallback)
+void HAL_TIM_ErrorCallback(TIM_HandleTypeDef *htim)
 {
     VSF_UNUSED_PARAM(htim);
 }

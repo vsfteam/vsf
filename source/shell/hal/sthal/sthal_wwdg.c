@@ -39,7 +39,8 @@ HAL_StatusTypeDef HAL_WWDG_Init(WWDG_HandleTypeDef *hwwdg)
     return HAL_OK;
 }
 
-__weak void HAL_WWDG_MspInit(WWDG_HandleTypeDef *hwwdg)
+VSF_CAL_WEAK(HAL_WWDG_MspInit)
+void HAL_WWDG_MspInit(WWDG_HandleTypeDef *hwwdg)
 {
     VSF_UNUSED_PARAM(hwwdg);
 }
@@ -96,7 +97,8 @@ HAL_StatusTypeDef HAL_WWDG_Refresh(WWDG_HandleTypeDef *hwwdg)
 
 void HAL_WWDG_IRQHandler(WWDG_HandleTypeDef *hwwdg) {}
 
-__weak void HAL_WWDG_EarlyWakeupCallback(WWDG_HandleTypeDef *hwwdg)
+VSF_CAL_WEAK(HAL_WWDG_EarlyWakeupCallback)
+void HAL_WWDG_EarlyWakeupCallback(WWDG_HandleTypeDef *hwwdg)
 {
     VSF_UNUSED_PARAM(hwwdg);
 }

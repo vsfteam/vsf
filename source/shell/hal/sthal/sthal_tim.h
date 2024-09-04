@@ -135,7 +135,7 @@ typedef enum {
     HAL_TIM_STATE_READY   = 0x01U,
     HAL_TIM_STATE_BUSY    = 0x02U,
     HAL_TIM_STATE_TIMEOUT = 0x03U,
-    HAL_TIM_STATE_ERROR   = 0x04U
+    HAL_TIM_STATE_ERROR   = 0x04U,
 } HAL_TIM_StateTypeDef;
 
 typedef enum {
@@ -155,7 +155,7 @@ typedef enum {
     HAL_TIM_ACTIVE_CHANNEL_2       = 0x02U,
     HAL_TIM_ACTIVE_CHANNEL_3       = 0x04U,
     HAL_TIM_ACTIVE_CHANNEL_4       = 0x08U,
-    HAL_TIM_ACTIVE_CHANNEL_CLEARED = 0x00U
+    HAL_TIM_ACTIVE_CHANNEL_CLEARED = 0x00U,
 } HAL_TIM_ActiveChannel;
 
 #if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
@@ -234,7 +234,7 @@ typedef enum {
     HAL_TIM_ERROR_CB_ID                   = 0x17U,
     HAL_TIM_COMMUTATION_CB_ID             = 0x18U,
     HAL_TIM_COMMUTATION_HALF_CB_ID        = 0x19U,
-    HAL_TIM_BREAK_CB_ID                   = 0x1AU
+    HAL_TIM_BREAK_CB_ID                   = 0x1AU,
 } HAL_TIM_CallbackIDTypeDef;
 
 typedef void (*pTIM_CallbackTypeDef)(TIM_HandleTypeDef *htim);

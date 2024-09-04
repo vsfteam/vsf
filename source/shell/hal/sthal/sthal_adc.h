@@ -121,7 +121,7 @@ typedef enum {
     HAL_ADC_ERROR_CB_ID                   = 0x03U,
     HAL_ADC_INJ_CONVERSION_COMPLETE_CB_ID = 0x04U,
     HAL_ADC_MSPINIT_CB_ID                 = 0x05U,
-    HAL_ADC_MSPDEINIT_CB_ID               = 0x06U
+    HAL_ADC_MSPDEINIT_CB_ID               = 0x06U,
 } HAL_ADC_CallbackIDTypeDef;
 typedef void (*pADC_CallbackTypeDef)(ADC_HandleTypeDef *hadc);
 #endif

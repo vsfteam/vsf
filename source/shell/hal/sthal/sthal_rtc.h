@@ -37,7 +37,7 @@ typedef enum {
     HAL_RTC_STATE_READY   = 0x01U,
     HAL_RTC_STATE_BUSY    = 0x02U,
     HAL_RTC_STATE_TIMEOUT = 0x03U,
-    HAL_RTC_STATE_ERROR   = 0x04U
+    HAL_RTC_STATE_ERROR   = 0x04U,
 } HAL_RTCStateTypeDef;
 
 typedef struct {
@@ -110,7 +110,7 @@ typedef enum {
     HAL_RTC_TAMPER2_EVENT_CB_ID = 0x05U,
 #    endif
     HAL_RTC_MSPINIT_CB_ID   = 0x0EU,
-    HAL_RTC_MSPDEINIT_CB_ID = 0x0FU
+    HAL_RTC_MSPDEINIT_CB_ID = 0x0FU,
 } HAL_RTC_CallbackIDTypeDef;
 
 typedef void (*pRTC_CallbackTypeDef)(RTC_HandleTypeDef *hrtc);

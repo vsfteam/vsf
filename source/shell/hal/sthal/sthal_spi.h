@@ -67,7 +67,7 @@ typedef enum {
     HAL_SPI_STATE_BUSY_RX    = 0x04U,
     HAL_SPI_STATE_BUSY_TX_RX = 0x05U,
     HAL_SPI_STATE_ERROR      = 0x06U,
-    HAL_SPI_STATE_ABORT      = 0x07U
+    HAL_SPI_STATE_ABORT      = 0x07U,
 } HAL_SPI_StateTypeDef;
 
 typedef struct __SPI_HandleTypeDef {

@@ -36,12 +36,14 @@ HAL_StatusTypeDef HAL_FLASH_Program_IT(uint32_t TypeProgram, uint32_t Address,
 
 void HAL_FLASH_IRQHandler(void) {}
 
-__weak void HAL_FLASH_EndOfOperationCallback(uint32_t ReturnValue)
+VSF_CAL_WEAK(HAL_FLASH_EndOfOperationCallback)
+void HAL_FLASH_EndOfOperationCallback(uint32_t ReturnValue)
 {
     VSF_UNUSED_PARAM(ReturnValue);
 }
 
-__weak void HAL_FLASH_OperationErrorCallback(uint32_t ReturnValue)
+VSF_CAL_WEAK(HAL_FLASH_OperationErrorCallback)
+void HAL_FLASH_OperationErrorCallback(uint32_t ReturnValue)
 {
     VSF_UNUSED_PARAM(ReturnValue);
 }

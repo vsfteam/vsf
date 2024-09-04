@@ -173,12 +173,14 @@ HAL_StatusTypeDef HAL_RTC_UnRegisterCallback(
 }
 #    endif
 
-__weak void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
+VSF_CAL_WEAK(HAL_RTC_MspInit)
+void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
 {
     VSF_UNUSED_PARAM(hrtc);
 }
 
-__weak void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc)
+VSF_CAL_WEAK(HAL_RTC_MspDeInit)
+void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc)
 {
     VSF_UNUSED_PARAM(hrtc);
 }
@@ -234,7 +236,8 @@ HAL_StatusTypeDef HAL_RTC_GetAlarm(RTC_HandleTypeDef *hrtc,
 
 void HAL_RTC_AlarmIRQHandler(RTC_HandleTypeDef *hrtc) {}
 
-__weak void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
+VSF_CAL_WEAK(HAL_RTC_AlarmAEventCallback)
+void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
     VSF_UNUSED_PARAM(hrtc);
 }

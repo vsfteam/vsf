@@ -75,12 +75,14 @@ HAL_StatusTypeDef HAL_SPI_DeInit(SPI_HandleTypeDef *hspi)
     return HAL_OK;
 }
 
-__weak void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
+VSF_CAL_WEAK(HAL_SPI_MspInit)
+void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
 {
     VSF_UNUSED_PARAM(hspi);
 }
 
-__weak void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
+VSF_CAL_WEAK(HAL_SPI_MspDeInit)
+void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi)
 {
     VSF_UNUSED_PARAM(hspi);
 }
@@ -307,42 +309,50 @@ HAL_StatusTypeDef HAL_SPI_DMAStop(SPI_HandleTypeDef *hspi)
 
 void HAL_SPI_IRQHandler(SPI_HandleTypeDef *hspi) {}
 
-__weak void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+VSF_CAL_WEAK(HAL_SPI_TxCpltCallback)
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
 {
     VSF_UNUSED_PARAM(hspi);
 }
 
-__weak void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
+VSF_CAL_WEAK(HAL_SPI_RxCpltCallback)
+void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)
 {
     VSF_UNUSED_PARAM(hspi);
 }
 
-__weak void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
+VSF_CAL_WEAK(HAL_SPI_TxRxCpltCallback)
+void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
 {
     VSF_UNUSED_PARAM(hspi);
 }
 
-__weak void HAL_SPI_TxHalfCpltCallback(SPI_HandleTypeDef *hspi)
+VSF_CAL_WEAK(HAL_SPI_TxHalfCpltCallback)
+void HAL_SPI_TxHalfCpltCallback(SPI_HandleTypeDef *hspi)
 {
     VSF_UNUSED_PARAM(hspi);
 }
 
-__weak void HAL_SPI_RxHalfCpltCallback(SPI_HandleTypeDef *hspi)
+VSF_CAL_WEAK(HAL_SPI_RxHalfCpltCallback)
+void HAL_SPI_RxHalfCpltCallback(SPI_HandleTypeDef *hspi)
 {
     VSF_UNUSED_PARAM(hspi);
 }
 
-__weak void HAL_SPI_TxRxHalfCpltCallback(SPI_HandleTypeDef *hspi)
+VSF_CAL_WEAK(HAL_SPI_TxRxHalfCpltCallback)
+void HAL_SPI_TxRxHalfCpltCallback(SPI_HandleTypeDef *hspi)
 {
     VSF_UNUSED_PARAM(hspi);
 }
 
-__weak void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
+VSF_CAL_WEAK(HAL_SPI_ErrorCallback)
+void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)
 {
     VSF_UNUSED_PARAM(hspi);
 }
 
-__weak void HAL_SPI_AbortCpltCallback(SPI_HandleTypeDef *hspi)
+VSF_CAL_WEAK(HAL_SPI_AbortCpltCallback)
+void HAL_SPI_AbortCpltCallback(SPI_HandleTypeDef *hspi)
 {
     VSF_UNUSED_PARAM(hspi);
 }

@@ -31,11 +31,6 @@ extern "C" {
 
 #define HAL_MAX_DELAY 0xFFFFFFFFU
 
-#define HAL_IS_BIT_SET(REG, BIT) (((REG) & (BIT)) == (BIT))
-#define HAL_IS_BIT_CLR(REG, BIT) (((REG) & (BIT)) == 0U)
-
-#define __HAL_RESET_HANDLE_STATE(__HANDLE__) ((__HANDLE__)->State = 0U)
-
 #if (USE_RTOS == 1U)
 #    error "USE_RTOS should be 0 in the current HAL release"
 #else
@@ -54,13 +49,13 @@ extern "C" {
         } while (0U)
 #endif
 
-#if defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
-#    ifndef __weak
-#        define __weak __attribute__((weak))
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#    ifndef VSF_STHAL_ASSERT
+#        define VSF_STHAL_ASSERT(__CON) VSF_ASSERT(__CON)
 #    endif
-#elif defined(__GNUC__) && !defined(__CC_ARM)
-#    ifndef __weak
-#        define __weak __attribute__((weak))
+#else
+#    ifndef VSF_STHAL_ASSERT
+#        define VSF_STHAL_ASSERT(...) VSF_ASSERT(__VA_ARGS__)
 #    endif
 #endif
 
@@ -71,12 +66,12 @@ typedef enum {
     HAL_OK      = 0x00U,
     HAL_ERROR   = 0x01U,
     HAL_BUSY    = 0x02U,
-    HAL_TIMEOUT = 0x03U
+    HAL_TIMEOUT = 0x03U,
 } HAL_StatusTypeDef;
 
 typedef enum {
     HAL_UNLOCKED = 0x00U,
-    HAL_LOCKED   = 0x01U
+    HAL_LOCKED   = 0x01U,
 } HAL_LockTypeDef;
 
 /*============================ GLOBAL VARIABLES ==============================*/
