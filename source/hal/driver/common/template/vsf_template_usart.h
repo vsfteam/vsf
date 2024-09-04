@@ -84,6 +84,10 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
 #   define VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS    DISABLED
 #endif
 
+#ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_CFG
+#   define VSF_USART_CFG_REIMPLEMENT_TYPE_CFG       DISABLED
+#endif
+
 //! In the specific hardware driver, we can enable
 //! VSF_USART_CFG_REIMPLEMENT_TYPE_CMD to redefine vsf_usart_cmd_t as needed.
 #ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_CMD
@@ -93,6 +97,20 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
 #ifndef VSF_USART_CFG_REIMPLEMENT_MODE_TO_DATA_BITS
 #   define VSF_USART_CFG_REIMPLEMENT_MODE_TO_DATA_BITS      \
                                                     DISABLED
+#endif
+
+//! Redefine struct vsf_usart_cfg_t. The vsf_usart_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_usart_cfg_t redefining.
+#if VSF_USART_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#    define VSF_USART_CFG_REIMPLEMENT_TYPE_CFG DISABLED
+#endif
+
+//! Redefine struct vsf_usart_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_usart_capability_t redefining.
+#if VSF_USART_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#    define VSF_USART_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
 #ifndef VSF_USART_CFG_INHERT_HAL_CAPABILITY
@@ -308,14 +326,33 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_SYNC_CLOCK_PHASE_1_EDGE   = (0x0ul << 17),
     VSF_USART_SYNC_CLOCK_PHASE_2_EDGE   = (0x1ul << 17),
 
-    /*
+    /* Optional mode
+    //! Infrared Data Association
+    VSF_USART_IRDA_ENABLE               = (0x1ul << 18),
+    VSF_USART_IRDA_DISABLE              = (0x0ul << 18),
+    #define VSF_USART_IRDA_ENABLE       VSF_USART_IRDA_ENABLE
+    #define VSF_USART_IRDA_DISABLE      VSF_USART_IRDA_DISABLE
+    #define VSF_USART_IRDA_MASK         VSF_USART_IRDA_ENABLE | VSF_USART_IRDA_DISABLE
+
+    VSF_USART_SMARTCARD_ENABLE          = (0x1ul << 19),
+    VSF_USART_SMARTCARD_DISABLE         = (0x0ul << 19),
+    #define VSF_USART_SMARTCARD_ENABLE       VSF_USART_SMARTCARD_ENABLE
+    #define VSF_USART_SMARTCARD_DISABLE      VSF_USART_SMARTCARD_DISABLE
+    #define VSF_USART_SMARTCARD_MASK         VSF_USART_SMARTCARDENABLE | VSF_USART_SMARTCARD_DISABLE
+
     // whether the clock pulse corresponding to the last transmitted
-    VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE  = (0x0ul << 18),
-    VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE = (0x0ul << 18),
+    VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE  = (0x0ul << 20),
+    VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE = (0x0ul << 20),
     #define VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE     VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE
     #define VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE    VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE
     #define VSF_USART_SYNC_CLOCK_LAST_BIT_MASK       VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE | \
                                                      VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE
+
+    // divisor of IRDA clock
+    VSF_USART_IRDA_PRESCALER_BIT_OFFSET = (21),
+    VSF_USART_IRDA_PRESCALER_MASK       = (0xFul << VSF_USART_IRDA_PRESCALER_BIT_OFFSET),
+    #define VSF_USART_IRDA_PRESCALER_BIT_OFFSET VSF_USART_IRDA_PRESCALER_BIT_OFFSET
+    #define VSF_USART_IRDA_PRESCALER_MASK       VSF_USART_IRDA_PRESCALER_MASK
     */
 } vsf_usart_mode_t;
 #endif
@@ -383,6 +420,8 @@ enum {
     VSF_USART_SYNC_CLOCK_PHASE_MASK = VSF_USART_SYNC_CLOCK_PHASE_1_EDGE
                                     | VSF_USART_SYNC_CLOCK_PHASE_2_EDGE,
 
+
+
     VSF_USART_MODE_ALL_BITS_MASK    = VSF_USART_PARITY_MASK
                                     | VSF_USART_STOPBIT_MASK
                                     | VSF_USART_BIT_LENGTH_MASK
@@ -399,6 +438,16 @@ enum {
                                     | VSF_USART_SYNC_CLOCK_LAST_BIT_MASK
 #endif
 
+#ifdef VSF_USART_IRDA_PRESCALER_MASK
+                                    | VSF_USART_IRDA_PRESCALER_MASK
+#endif
+#ifdef VSF_USART_IRDA_MASK
+                                    | VSF_USART_IRDA_MASK
+#endif
+
+#ifdef VSF_USART_SMARTCARD_MASK
+                                    | VSF_USART_SMARTCARD_MASK
+#endif
 };
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
@@ -429,7 +478,7 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_TX_CPL           = (0x1ul << 0),
     VSF_USART_IRQ_MASK_RX_CPL           = (0x1ul << 1),
 
-    // TX/RX reach fifo threshold, threshold on some devices is bound to 1
+    // TX/RX reach fifo threshold, thres    hold on some devices is bound to 1
     VSF_USART_IRQ_MASK_TX               = (0x1ul << 2),
     VSF_USART_IRQ_MASK_RX               = (0x1ul << 3),
     VSF_USART_IRQ_MASK_RX_TIMEOUT       = (0x1ul << 4),
@@ -442,30 +491,61 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 7),
     VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 8),
     VSF_USART_IRQ_MASK_OVERFLOW_ERR     = (0x1ul << 9),
+
+    /*
+    VSF_USART_IRQ_MASK_TX_HALF_CPL      = (0x1ul << 10),
+    #define VSF_USART_IRQ_MASK_TX_HALF_CPL VSF_USART_IRQ_MASK_TX_HALF_CPL
+    VSF_USART_IRQ_MASK_RX_HALF_CPL      = (0x1ul << 11),
+    #define VSF_USART_IRQ_MASK_RX_HALF_CPL VSF_USART_IRQ_MASK_RX_HALF_CPL
+
+    VSF_USART_IRQ_MASK_CANCEL_TX_CPL    = (0x1ul << 12),
+    #define VSF_USART_IRQ_MASK_CANCEL_TX_CPL VSF_USART_IRQ_MASK_CANCEL_TX_CPL
+    VSF_USART_IRQ_MASK_CANCEL_RX_CPL    = (0x1ul << 13),
+    #define VSF_USART_IRQ_MASK_CANCEL_RX_CPL VSF_USART_IRQ_MASK_CANCEL_RX_CPL
+
+    VSF_USART_IRQ_MASK_NOISE_ERR        = (0x1ul << 14),
+    #define VSF_USART_IRQ_MASK_NOISE_ERR VSF_USART_IRQ_MASK_NOISE_ERR
+
+    */
 } vsf_usart_irq_mask_t;
 #endif
 
 enum {
-    VSF_USART_IRQ_MASK_RX_IDLE          = VSF_USART_IRQ_MASK_RX_TIMEOUT,
+    VSF_USART_IRQ_MASK_RX_IDLE              = VSF_USART_IRQ_MASK_RX_TIMEOUT,
+    VSF_USART_IRQ_MASK_TX_FIFO_THRESHOLD    = VSF_USART_IRQ_MASK_TX,
+    VSF_USART_IRQ_MASK_RX_FIFO_THRESHOLD    = VSF_USART_IRQ_MASK_RX,
 
 #ifndef VSF_USART_IRQ_MASK_ERR
-    VSF_USART_IRQ_MASK_ERR              = VSF_USART_IRQ_MASK_FRAME_ERR |
-                                          VSF_USART_IRQ_MASK_PARITY_ERR |
-                                          VSF_USART_IRQ_MASK_BREAK_ERR |
-                                          VSF_USART_IRQ_MASK_OVERFLOW_ERR,
+    VSF_USART_IRQ_MASK_ERR                  = VSF_USART_IRQ_MASK_FRAME_ERR
+                                            | VSF_USART_IRQ_MASK_PARITY_ERR
+                                            | VSF_USART_IRQ_MASK_BREAK_ERR
+                                            | VSF_USART_IRQ_MASK_OVERFLOW_ERR,
 #endif
 
 #ifndef VSF_USART_IRQ_ALL_BITS_MASK
-    VSF_USART_IRQ_ALL_BITS_MASK         = VSF_USART_IRQ_MASK_TX |
-                                          VSF_USART_IRQ_MASK_RX |
-                                          VSF_USART_IRQ_MASK_RX_TIMEOUT |
-                                          VSF_USART_IRQ_MASK_CTS |
-                                          VSF_USART_IRQ_MASK_TX_CPL |
-                                          VSF_USART_IRQ_MASK_RX_CPL |
-                                          VSF_USART_IRQ_MASK_ERR,
+    VSF_USART_IRQ_ALL_BITS_MASK             = VSF_USART_IRQ_MASK_TX
+                                            |  VSF_USART_IRQ_MASK_RX
+                                            |  VSF_USART_IRQ_MASK_RX_TIMEOUT
+                                            |  VSF_USART_IRQ_MASK_CTS
+                                            |  VSF_USART_IRQ_MASK_TX_CPL
+                                            |  VSF_USART_IRQ_MASK_RX_CPL
+                                            |  VSF_USART_IRQ_MASK_ERR,
+#    ifdef VSF_USART_IRQ_MASK_TX_HALF_CPL
+                                            | VSF_USART_IRQ_MASK_TX_HALF_CPL
+#    endif
+#    ifdef VSF_USART_IRQ_MASK_RX_HALF_CPL
+                                            | VSF_USART_IRQ_MASK_RX_HALF_CPL
+#    endif
+#    ifdef VSF_USART_IRQ_MASK_CANCEL_TX_CPL
+                                            | VSF_USART_IRQ_MASK_CANCEL_TX_CPL
+#    endif
+#    ifdef VSF_USART_IRQ_MASK_CANCEL_RX_CPL
+                                            | VSF_USART_IRQ_MASK_CANCEL_RX_CPL
+#    endif
 #endif
 };
 
+#if VSF_USART_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 typedef struct vsf_usart_t vsf_usart_t;
 
 typedef void vsf_usart_isr_handler_t(void *target_ptr,
@@ -484,6 +564,7 @@ typedef struct vsf_usart_cfg_t {
     uint32_t rx_timeout;
     vsf_usart_isr_t isr;
 } vsf_usart_cfg_t;
+#endif
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_CMD == DISABLED
 /**

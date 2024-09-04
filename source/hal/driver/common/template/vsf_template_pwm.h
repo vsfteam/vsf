@@ -57,6 +57,20 @@ extern "C" {
 #   define VSF_PWM_CFG_FUNCTION_RENAME          ENABLED
 #endif
 
+//! Redefine struct vsf_pwm_cfg_t. The vsf_pwm_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_pwm_cfg_t redefining.
+#if VSF_PWM_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#    define VSF_PWM_CFG_REIMPLEMENT_TYPE_CFG DISABLED
+#endif
+
+//! Redefine struct vsf_pwm_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_pwm_capability_t redefining.
+#if VSF_PWM_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#    define VSF_PWM_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
+#endif
+
 #ifndef VSF_PWM_CFG_INHERT_HAL_CAPABILITY
 #   define VSF_PWM_CFG_INHERT_HAL_CAPABILITY       ENABLED
 #endif
@@ -74,13 +88,16 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
+#if VSF_PWM_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 typedef struct vsf_pwm_cfg_t {
     union {
         uint32_t freq;        //!< The clock frequency, in Hz
         uint32_t min_freq;    //!< The minimum clock frequency, in Hz
     };
 } vsf_pwm_cfg_t;
+#endif
 
+#if VSF_PWM_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_pwm_capability_t {
 #if VSF_PWM_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
@@ -89,6 +106,7 @@ typedef struct vsf_pwm_capability_t {
     uint32_t max_freq;
     uint32_t min_freq;
 } vsf_pwm_capability_t;
+#endif
 
 typedef struct vsf_pwm_t vsf_pwm_t;
 

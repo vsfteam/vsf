@@ -73,6 +73,20 @@ extern "C" {
 #   define VSF_SPI_CFG_REIMPLEMENT_TYPE_STATUS          DISABLED
 #endif
 
+//! Redefine struct vsf_spi_cfg_t. The vsf_spi_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_spi_cfg_t redefining.
+#if VSF_SPI_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#    define VSF_SPI_CFG_REIMPLEMENT_TYPE_CFG DISABLED
+#endif
+
+//! Redefine struct vsf_spi_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_spi_capability_t redefining.
+#if VSF_SPI_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#    define VSF_SPI_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
+#endif
+
 #ifndef VSF_SPI_CFG_REIMPLEMENT_MODE_TO_DATA_BITS
 #   define VSF_SPI_CFG_REIMPLEMENT_MODE_TO_DATA_BITS    DISABLED
 #endif
@@ -250,6 +264,7 @@ typedef struct vsf_spi_status_t {
 } vsf_spi_status_t;
 #endif
 
+#if VSF_SPI_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_spi_capability_t {
 #if VSF_SPI_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
@@ -263,7 +278,9 @@ typedef struct vsf_spi_capability_t {
     uint32_t max_clock_hz;
     uint32_t min_clock_hz;
 } vsf_spi_capability_t;
+#endif
 
+#if VSF_SPI_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 typedef struct vsf_spi_t vsf_spi_t;
 
 typedef void vsf_spi_isr_handler_t(void *target_ptr,
@@ -284,6 +301,7 @@ typedef struct vsf_spi_cfg_t {
     vsf_spi_isr_t    isr;
     uint8_t          auto_cs_index;     //!< spi auto chip select of pin when multiple cs are supported
 } vsf_spi_cfg_t;
+#endif
 
 typedef struct vsf_spi_op_t {
 #undef __VSF_HAL_TEMPLATE_API

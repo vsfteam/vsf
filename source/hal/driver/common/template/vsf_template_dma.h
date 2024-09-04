@@ -61,6 +61,27 @@ extern "C" {
 #   define VSF_DMA_CFG_REIMPLEMENT_TYPE_IRQ_MASK        DISABLED
 #endif
 
+//! Redefine struct vsf_dma_channel_cfg_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_dma_channel_cfg_t redefining.
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == DISABLED
+#   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG     DISABLED
+#endif
+
+//! Redefine struct vsf_dma_cfg_t. The vsf_dma_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_dma_cfg_t redefining.
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG             DISABLED
+#endif
+
+//! Redefine struct vsf_dma_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_dma_capability_t redefining.
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY     DISABLED
+#endif
+
 #ifndef VSF_DMA_CFG_INHERT_HAL_CAPABILITY
 #   define VSF_DMA_CFG_INHERT_HAL_CAPABILITY            ENABLED
 #endif
@@ -224,11 +245,7 @@ enum {
                                       VSF_DMA_IRQ_MASK_ERROR,
 };
 
-typedef struct vsf_dma_channel_filter_t {
-    uint8_t src_request;
-    uint8_t dst_request;
-} vsf_dma_channel_filter_t;
-
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == DISABLED
 typedef struct vsf_dma_t vsf_dma_t;
 
 typedef void vsf_dma_isr_handler_t(void *target_ptr, vsf_dma_t *dma_ptr, int8_t channel, vsf_dma_irq_mask_t irq_mask);
@@ -247,6 +264,7 @@ typedef struct vsf_dma_channel_cfg_t {
     //! Index of the peripheral or memory corresponding to the destination address of the DMA
     uint8_t                 dst_idx;
 } vsf_dma_channel_cfg_t;
+#endif
 
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
 typedef struct vsf_dma_channel_status_t {
@@ -259,6 +277,7 @@ typedef struct vsf_dma_channel_status_t {
 } vsf_dma_channel_status_t;
 #endif
 
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_dma_capability_t {
 #if VSF_DMA_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
@@ -268,6 +287,7 @@ typedef struct vsf_dma_capability_t {
     uint32_t max_request_count;
     uint8_t channel_count;
 } vsf_dma_capability_t;
+#endif
 
 typedef struct vsf_dma_op_t {
 #undef  __VSF_HAL_TEMPLATE_API
