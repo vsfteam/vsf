@@ -146,7 +146,7 @@ typedef enum {
     HAL_I2C_ABORT_CB_ID              = 0x08U,
 
     HAL_I2C_MSPINIT_CB_ID   = 0x09U,
-    HAL_I2C_MSPDEINIT_CB_ID = 0x0AU
+    HAL_I2C_MSPDEINIT_CB_ID = 0x0AU,
 } HAL_I2C_CallbackIDTypeDef;
 #endif
 

@@ -22,9 +22,11 @@
 extern "C" {
 #endif
 
+#if VSF_HAL_USE_USART == ENABLED && defined(HAL_UART_MODULE_ENABLED)
+
 /*============================ INCLUDES ======================================*/
 
-#if VSF_HAL_USE_USART == ENABLED
+#    include "sthal_uart_base.h"
 
 /*============================ MACROS ========================================*/
 
@@ -64,91 +66,99 @@ extern "C" {
 #    define UART_MODE_TX    (VSF_USART_RX_ENABLE | VSF_USART_TX_DISABLE)
 #    define UART_MODE_TX_RX (VSF_USART_TX_ENABLE | VSF_USART_RX_ENABLE)
 
+#    if defined(VSF_USART_LINE_BREAK_DETECT_LENGTH_MASK)
+#        if define VSF_USART_LINE_BREAK_DETECT_LENGTH_10B
+#            define UART_LINBREAKDETECTLENGTH_10B                              \
+                VSF_USART_LINE_BREAK_DETECT_LENGTH_10B
+#        endif
+#        if define VSF_USART_LINE_BREAK_DETECT_LENGTH_11B
+#            define UART_LINBREAKDETECTLENGTH_11B                              \
+                VSF_USART_LINE_BREAK_DETECT_LENGTH_11B
+#        endif
+#    endif
+
+#    if defined(VSF_USART_OVER_SAMPLING_MASK)
+#        if define VSF_USART_OVER_SAMPLING_16
+#            define UART_OVERSAMPLING_16 VSF_USART_OVER_SAMPLING_16
+#        endif
+#        if define VSF_USART_OVER_SAMPLING_8
+#            define UART_OVERSAMPLING_8 VSF_USART_OVER_SAMPLING_8
+#        endif
+#    endif
+
+#    if defined(VSF_USART_WAKEUP_METHOD_MASK)
+#        if define VSF_USART_WAKEUP_METHOD_IDLE_LINE
+#            define UART_WAKEUPMETHOD_IDLELINE VSF_USART_WAKEUP_METHOD_IDLE_LINE
+#        endif
+#        if define VSF_USART_WAKEUP_METHOD_IDLE_ADDRESS_MARK
+#            define UART_WAKEUPMETHOD_ADDRESSMARK                              \
+                VSF_USART_WAKEUP_METHOD_IDLE_ADDRESS_MARK
+#        endif
+#    endif
+
+// Unsupport Features
+#    ifndef UART_LINBREAKDETECTLENGTH_10B
+#        define UART_LINBREAKDETECTLENGTH_10B 0
+#    endif
+
+#    ifndef UART_LINBREAKDETECTLENGTH_11B
+#        define UART_LINBREAKDETECTLENGTH_11B 0
+#    endif
+
+#    ifndef UART_OVERSAMPLING_16
+#        define UART_OVERSAMPLING_16 0
+#    endif
+
+#    ifndef UART_OVERSAMPLING_8
+#        define UART_OVERSAMPLING_8 0
+#    endif
+
+#    ifndef UART_WAKEUPMETHOD_IDLELINE
+#        define UART_WAKEUPMETHOD_IDLELINE 0
+#    endif
+
+#    ifndef UART_WAKEUPMETHOD_ADDRESSMARK
+#        define UART_WAKEUPMETHOD_ADDRESSMARK 0
+#    endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef vsf_usart_t USART_TypeDef;
-
-typedef struct {
-    uint32_t BaudRate;
-    uint32_t WordLength;
-    uint32_t StopBits;
-    uint32_t Parity;
-    uint32_t Mode;
-    uint32_t HwFlowCtl;
-    uint32_t OverSampling;
-} UART_InitTypeDef;
-
 typedef enum {
-    HAL_UART_STATE_RESET      = 0x00U,
-    HAL_UART_STATE_READY      = 0x20U,
-    HAL_UART_STATE_BUSY       = 0x24U,
-    HAL_UART_STATE_BUSY_TX    = 0x21U,
-    HAL_UART_STATE_BUSY_RX    = 0x22U,
-    HAL_UART_STATE_BUSY_TX_RX = 0x23U,
-    HAL_UART_STATE_TIMEOUT    = 0xA0U,
-    HAL_UART_STATE_ERROR      = 0xE0U
+    HAL_UART_STATE_RESET      = __HAL_UART_STATE_RESET,
+    HAL_UART_STATE_READY      = __HAL_UART_STATE_READY,
+    HAL_UART_STATE_BUSY       = __HAL_UART_STATE_BUSY,
+    HAL_UART_STATE_BUSY_TX    = __HAL_UART_STATE_BUSY_TX,
+    HAL_UART_STATE_BUSY_RX    = __HAL_UART_STATE_BUSY_RX,
+    HAL_UART_STATE_BUSY_TX_RX = __HAL_UART_STATE_BUSY_TX_RX,
+    HAL_UART_STATE_TIMEOUT    = __HAL_UART_STATE_TIMEOUT,
+    HAL_UART_STATE_ERROR      = __HAL_UART_STATE_ERROR,
 } HAL_UART_StateTypeDef;
 
-typedef uint32_t HAL_UART_RxTypeTypeDef;
-
-typedef uint32_t HAL_UART_RxEventTypeTypeDef;
-
-typedef struct __UART_HandleTypeDef {
-    USART_TypeDef                       *Instance;
-    UART_InitTypeDef                     Init;
-    const uint8_t                       *pTxBuffPtr;
-    uint16_t                             TxXferSize;
-    volatile uint16_t                    TxXferCount;
-    uint8_t                             *pRxBuffPtr;
-    uint16_t                             RxXferSize;
-    volatile uint16_t                    RxXferCount;
-    volatile HAL_UART_RxTypeTypeDef      ReceptionType;
-    volatile HAL_UART_RxEventTypeTypeDef RxEventType;
-    HAL_LockTypeDef                      Lock;
-    volatile HAL_UART_StateTypeDef       gState;
-    volatile HAL_UART_StateTypeDef       RxState;
-    volatile uint32_t                    ErrorCode;
-
 #    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
-    void (*TxHalfCpltCallback)(struct __UART_HandleTypeDef *huart);
-    void (*TxCpltCallback)(struct __UART_HandleTypeDef *huart);
-    void (*RxHalfCpltCallback)(struct __UART_HandleTypeDef *huart);
-    void (*RxCpltCallback)(struct __UART_HandleTypeDef *huart);
-    void (*ErrorCallback)(struct __UART_HandleTypeDef *huart);
-    void (*AbortCpltCallback)(struct __UART_HandleTypeDef *huart);
-    void (*AbortTransmitCpltCallback)(struct __UART_HandleTypeDef *huart);
-    void (*AbortReceiveCpltCallback)(struct __UART_HandleTypeDef *huart);
-    void (*WakeupCallback)(struct __UART_HandleTypeDef *huart);
-    void (*RxEventCallback)(struct __UART_HandleTypeDef *huart, uint16_t Pos);
-    void (*MspInitCallback)(struct __UART_HandleTypeDef *huart);
-    void (*MspDeInitCallback)(struct __UART_HandleTypeDef *huart);
-#    endif
-} UART_HandleTypeDef;
-
-#    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
-
 typedef enum {
-    HAL_UART_TX_HALFCOMPLETE_CB_ID         = 0x00U,
-    HAL_UART_TX_COMPLETE_CB_ID             = 0x01U,
-    HAL_UART_RX_HALFCOMPLETE_CB_ID         = 0x02U,
-    HAL_UART_RX_COMPLETE_CB_ID             = 0x03U,
-    HAL_UART_ERROR_CB_ID                   = 0x04U,
-    HAL_UART_ABORT_COMPLETE_CB_ID          = 0x05U,
-    HAL_UART_ABORT_TRANSMIT_COMPLETE_CB_ID = 0x06U,
-    HAL_UART_ABORT_RECEIVE_COMPLETE_CB_ID  = 0x07U,
-    HAL_UART_WAKEUP_CB_ID                  = 0x08U,
-
-    HAL_UART_MSPINIT_CB_ID   = 0x0BU,
-    HAL_UART_MSPDEINIT_CB_ID = 0x0CU
-
+    HAL_UART_TX_HALFCOMPLETE_CB_ID = __HAL_UART_TX_HALFCOMPLETE_CB_ID,
+    HAL_UART_TX_COMPLETE_CB_ID     = __HAL_UART_TX_COMPLETE_CB_ID,
+    HAL_UART_RX_HALFCOMPLETE_CB_ID = __HAL_UART_RX_HALFCOMPLETE_CB_ID,
+    HAL_UART_RX_COMPLETE_CB_ID     = __HAL_UART_RX_COMPLETE_CB_ID,
+    HAL_UART_ERROR_CB_ID           = __HAL_UART_ERROR_CB_ID,
+    HAL_UART_ABORT_COMPLETE_CB_ID  = __HAL_UART_ABORT_COMPLETE_CB_ID,
+    HAL_UART_ABORT_TRANSMIT_COMPLETE_CB_ID =
+        __HAL_UART_ABORT_TRANSMIT_COMPLETE_CB_ID,
+    HAL_UART_ABORT_RECEIVE_COMPLETE_CB_ID =
+        __HAL_UART_ABORT_RECEIVE_COMPLETE_CB_ID,
+    HAL_UART_WAKEUP_CB_ID    = __HAL_UART_WAKEUP_CB_ID,
+    HAL_UART_MSPINIT_CB_ID   = __HAL_UART_MSPINIT_CB_ID,
+    HAL_UART_MSPDEINIT_CB_ID = __HAL_UART_MSPDEINIT_CB_ID,
 } HAL_UART_CallbackIDTypeDef;
-
-typedef void (*pUART_CallbackTypeDef)(UART_HandleTypeDef *huart);
-typedef void (*pUART_RxEventCallbackTypeDef)(struct __UART_HandleTypeDef *huart,
-                                             uint16_t                     Pos);
-
 #    endif
+
+typedef __UART_TypeDef              UART_TypeDef;
+typedef __UART_InitTypeDef          UART_InitTypeDef;
+typedef struct __UART_HandleTypeDef UART_HandleTypeDef;
+typedef void (*pUART_CallbackTypeDef)(UART_HandleTypeDef *huart);
+typedef void (*pUART_RxEventCallbackTypeDef)(UART_HandleTypeDef *huart,
+                                             uint16_t            Pos);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -222,6 +232,7 @@ void HAL_UART_AbortTransmitCpltCallback(UART_HandleTypeDef *huart);
 void HAL_UART_AbortReceiveCpltCallback(UART_HandleTypeDef *huart);
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size);
+void HAL_UARTEx_WakeupCallback(UART_HandleTypeDef *huart);
 
 HAL_StatusTypeDef HAL_LIN_SendBreak(UART_HandleTypeDef *huart);
 HAL_StatusTypeDef HAL_MultiProcessor_EnterMuteMode(UART_HandleTypeDef *huart);
@@ -243,4 +254,4 @@ HAL_StatusTypeDef UART_Start_Receive_DMA(UART_HandleTypeDef *huart,
 }
 #endif
 
-#endif
+#endif /* __ST_HAL_USART_H__ */

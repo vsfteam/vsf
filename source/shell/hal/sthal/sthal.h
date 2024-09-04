@@ -99,6 +99,10 @@ uint32_t            HAL_GetUIDw2(void);
 #    include "sthal_adc.h"
 #endif
 
+#ifdef HAL_EXTI_MODULE_ENABLED
+#    include "sthal_exti.h"
+#endif
+
 #ifdef HAL_FLASH_MODULE_ENABLED
 #    include "sthal_flash.h"
 #endif
@@ -121,6 +125,18 @@ uint32_t            HAL_GetUIDw2(void);
 
 #ifdef HAL_UART_MODULE_ENABLED
 #    include "sthal_uart.h"
+#endif
+
+#ifdef HAL_USART_MODULE_ENABLED
+#    include "sthal_usart.h"
+#endif
+
+#ifdef HAL_IRDA_MODULE_ENABLED
+#    include "sthal_irda.h"
+#endif
+
+#ifdef HAL_SMARTCARD_MODULE_ENABLED
+#    include "sthal_smartcard.h"
 #endif
 
 #ifdef HAL_WWDG_MODULE_ENABLED

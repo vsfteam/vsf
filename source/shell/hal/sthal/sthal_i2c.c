@@ -173,12 +173,14 @@ HAL_StatusTypeDef HAL_I2C_DeInit(I2C_HandleTypeDef *hi2c)
     return HAL_OK;
 }
 
-__weak void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
+VSF_CAL_WEAK(HAL_I2C_MspInit)
+void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c)
 {
     VSF_UNUSED_PARAM(hi2c);
 }
 
-__weak void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c)
+VSF_CAL_WEAK(HAL_I2C_MspDeInit)
+void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c)
 {
     VSF_UNUSED_PARAM(hi2c);
 }
@@ -574,27 +576,32 @@ void HAL_I2C_EV_IRQHandler(I2C_HandleTypeDef *hi2c) {}
 
 void HAL_I2C_ER_IRQHandler(I2C_HandleTypeDef *hi2c) {}
 
-__weak void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
+VSF_CAL_WEAK(HAL_I2C_MasterTxCpltCallback)
+void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     VSF_UNUSED_PARAM(hi2c);
 }
 
-__weak void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
+VSF_CAL_WEAK(HAL_I2C_MasterRxCpltCallback)
+void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     VSF_UNUSED_PARAM(hi2c);
 }
 
-__weak void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
+VSF_CAL_WEAK(HAL_I2C_SlaveTxCpltCallback)
+void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     VSF_UNUSED_PARAM(hi2c);
 }
 
-__weak void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
+VSF_CAL_WEAK(HAL_I2C_SlaveRxCpltCallback)
+void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     VSF_UNUSED_PARAM(hi2c);
 }
 
-__weak void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c,
+VSF_CAL_WEAK(HAL_I2C_AddrCallback)
+void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c,
                                  uint8_t            TransferDirection,
                                  uint16_t           AddrMatchCode)
 {
@@ -604,30 +611,35 @@ __weak void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c,
     VSF_UNUSED_PARAM(AddrMatchCode);
 }
 
-__weak void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c)
+VSF_CAL_WEAK(HAL_I2C_ListenCpltCallback)
+void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 
     VSF_UNUSED_PARAM(hi2c);
 }
 
-__weak void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c)
+VSF_CAL_WEAK(HAL_I2C_MemTxCpltCallback)
+void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 
     VSF_UNUSED_PARAM(hi2c);
 }
 
-__weak void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)
+VSF_CAL_WEAK(HAL_I2C_MemRxCpltCallback)
+void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)
 {
 
     VSF_UNUSED_PARAM(hi2c);
 }
 
-__weak void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
+VSF_CAL_WEAK(HAL_I2C_ErrorCallback)
+void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)
 {
     VSF_UNUSED_PARAM(hi2c);
 }
 
-__weak void HAL_I2C_AbortCpltCallback(I2C_HandleTypeDef *hi2c)
+VSF_CAL_WEAK(HAL_I2C_AbortCpltCallback)
+void HAL_I2C_AbortCpltCallback(I2C_HandleTypeDef *hi2c)
 {
     VSF_UNUSED_PARAM(hi2c);
 }

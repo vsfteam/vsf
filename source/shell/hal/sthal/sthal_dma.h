@@ -87,7 +87,7 @@ typedef enum {
 
 typedef enum {
     HAL_DMA_FULL_TRANSFER = 0x00U,
-    HAL_DMA_HALF_TRANSFER = 0x01U
+    HAL_DMA_HALF_TRANSFER = 0x01U,
 } HAL_DMA_LevelCompleteTypeDef;
 
 typedef enum {
@@ -97,7 +97,7 @@ typedef enum {
     HAL_DMA_XFER_M1HALFCPLT_CB_ID = 0x03U,
     HAL_DMA_XFER_ERROR_CB_ID      = 0x04U,
     HAL_DMA_XFER_ABORT_CB_ID      = 0x05U,
-    HAL_DMA_XFER_ALL_CB_ID        = 0x06U
+    HAL_DMA_XFER_ALL_CB_ID        = 0x06U,
 } HAL_DMA_CallbackIDTypeDef;
 
 typedef struct __DMA_HandleTypeDef {
