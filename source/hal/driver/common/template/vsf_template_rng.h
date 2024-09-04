@@ -57,6 +57,20 @@ extern "C" {
 #   define VSF_RNG_CFG_FUNCTION_RENAME          ENABLED
 #endif
 
+//! Redefine struct vsf_rng_cfg_t. The vsf_rng_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_rng_cfg_t redefining.
+#if VSF_RNG_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#    define VSF_RNG_CFG_REIMPLEMENT_TYPE_CFG DISABLED
+#endif
+
+//! Redefine struct vsf_rng_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_rng_capability_t redefining.
+#if VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#    define VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
+#endif
+
 #ifndef VSF_RNG_CFG_INHERT_HAL_CAPABILITY
 #   define VSF_RNG_CFG_INHERT_HAL_CAPABILITY       ENABLED
 #endif

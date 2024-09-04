@@ -70,6 +70,20 @@ extern "C" {
 #   define VSF_FLASH_CFG_REIMPLEMENT_TYPE_STATUS            DISABLED
 #endif
 
+//! Redefine struct vsf_flash_cfg_t. The vsf_flash_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_flash_cfg_t redefining.
+#if VSF_FLASH_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#   define VSF_FLASH_CFG_REIMPLEMENT_TYPE_CFG               DISABLED
+#endif
+
+//! Redefine struct vsf_flash_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_flash_capability_t redefining.
+#if VSF_FLASH_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#   define VSF_FLASH_CFG_REIMPLEMENT_TYPE_CAPABILITY        DISABLED
+#endif
+
 #ifndef VSF_FLASH_CFG_INHERT_HAL_CAPABILITY
 #   define VSF_FLASH_CFG_INHERT_HAL_CAPABILITY              ENABLED
 #endif
@@ -121,21 +135,19 @@ enum {
 typedef uint_fast32_t vsf_flash_size_t;
 #endif
 
+#if VSF_FLASH_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 typedef struct vsf_flash_t vsf_flash_t;
-
-typedef void vsf_flash_isr_handler_t(void *target_ptr,
-                                     vsf_flash_t *flash_ptr,
+typedef void vsf_flash_isr_handler_t(void *target_ptr, vsf_flash_t *flash_ptr,
                                      vsf_flash_irq_mask_t mask);
-
 typedef struct vsf_flash_isr_t {
     vsf_flash_isr_handler_t *handler_fn;
     void                    *target_ptr;
     vsf_arch_prio_t          prio;
 } vsf_flash_isr_t;
-
 typedef struct vsf_flash_cfg_t {
     vsf_flash_isr_t isr;
 } vsf_flash_cfg_t;
+#endif
 
 #if VSF_FLASH_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
 typedef struct vsf_flash_status_t {
@@ -148,6 +160,7 @@ typedef struct vsf_flash_status_t {
 } vsf_flash_status_t;
 #endif
 
+#if VSF_FLASH_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_flash_capability_t {
 #if VSF_FLASH_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
@@ -164,6 +177,7 @@ typedef struct vsf_flash_capability_t {
         uint8_t none_sector_aligned_read  : 1;
     };
 } vsf_flash_capability_t;
+#endif
 
 typedef struct vsf_flash_op_t {
 #undef __VSF_HAL_TEMPLATE_API

@@ -61,6 +61,20 @@ extern "C" {
 #   define VSF_TIMER_CFG_REIMPLEMENT_TYPE_IRQ_MASK  DISABLED
 #endif
 
+//! Redefine struct vsf_timer_cfg_t. The vsf_timer_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_timer_cfg_t redefining.
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#    define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CFG DISABLED
+#endif
+
+//! Redefine struct vsf_timer_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_timer_capability_t redefining.
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#    define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
+#endif
+
 #ifndef VSF_TIMER_CFG_INHERT_HAL_CAPABILITY
 #   define VSF_TIMER_CFG_INHERT_HAL_CAPABILITY       ENABLED
 #endif
@@ -116,6 +130,7 @@ enum {
     VSF_TIMER_IRQ_ALL_BITS_MASK = VSF_TIMER_IRQ_MASK_OVERFLOW,
 };
 
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 typedef struct vsf_timer_t vsf_timer_t;
 
 typedef void vsf_timer_isr_handler_t(void *target_ptr,
@@ -140,8 +155,9 @@ typedef struct vsf_timer_cfg_t {
 
     vsf_timer_isr_t isr;
 } vsf_timer_cfg_t;
+#endif
 
-
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_timer_capability_t {
 #if VSF_TIMER_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
@@ -155,6 +171,7 @@ typedef struct vsf_timer_capability_t {
     uint8_t pwm_channel_cnt;
 
 } vsf_timer_capability_t;
+#endif
 
 typedef struct vsf_timer_op_t {
 #undef __VSF_HAL_TEMPLATE_API

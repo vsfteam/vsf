@@ -79,14 +79,30 @@ Dependency: VSF_IO_CFG_FUNCTION_RENAME enable
 #   endif
 #endif
 
-//!If VSF_IO_CFG_FUNCTION_RENAME is enabled, the actual API is called based on the value of VSF_IO_CFG_PREFIX
+//! If VSF_IO_CFG_FUNCTION_RENAME is enabled, the actual API is called based on
+//! the value of VSF_IO_CFG_PREFIX
 #ifndef VSF_IO_CFG_FUNCTION_RENAME
-#   define VSF_IO_CFG_FUNCTION_RENAME               ENABLED
+#    define VSF_IO_CFG_FUNCTION_RENAME ENABLED
 #endif
 
-//! In the specific hardware driver, we can enable VSF_IO_CFG_REIMPLEMENT_TYPE_MODE to redefine vsf_io_mode_t as needed.
+//! In the specific hardware driver, we can enable
+//! VSF_IO_CFG_REIMPLEMENT_TYPE_MODE to redefine vsf_io_mode_t as needed.
 #ifndef VSF_IO_CFG_REIMPLEMENT_TYPE_MODE
-#   define VSF_IO_CFG_REIMPLEMENT_TYPE_MODE         DISABLED
+#    define VSF_IO_CFG_REIMPLEMENT_TYPE_MODE DISABLED
+#endif
+
+//! Redefine struct vsf_io_cfg_t. The vsf_io_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_io_cfg_t redefining.
+#if VSF_IO_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#    define VSF_IO_CFG_REIMPLEMENT_TYPE_CFG DISABLED
+#endif
+
+//! Redefine struct vsf_io_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_io_capability_t redefining.
+#if VSF_IO_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#    define VSF_IO_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
 #if !defined(VSF_IO_CFG_PORTA) && (VSF_HW_IO_PORT_MASK & (1ul << 0))
@@ -249,6 +265,13 @@ typedef enum vsf_io_mode_t {
     VSF_IO_PULL_UP                  = (1 << 4),
     VSF_IO_PULL_DOWN                = (2 << 4),
 
+    VSF_IO_EXTI_MODE_NONE           = (0 << 6),
+    VSF_IO_EXTI_MODE_LOW_LEVEL      = (1 << 6),
+    VSF_IO_EXTI_MODE_HIGH_LEVEL     = (2 << 6),
+    VSF_IO_EXTI_MODE_RISING         = (3 << 6),
+    VSF_IO_EXTI_MODE_FALLING        = (4 << 6),
+    VSF_IO_EXTI_MODE_RISING_FALLING = (5 << 6),
+
 /*
     VSF_IO_INVERT_INPUT             = (1 << 7),
     #define VSF_IO_INVERT_INPUT VSF_IO_INVERT_INPUT
@@ -260,14 +283,17 @@ typedef enum vsf_io_mode_t {
 */
 
 /*
-    VSF_IO_SPEED_2MHZ               = (0 << 9),
-    VSF_IO_SPEED_10MHZ              = (1 << 9),
-    VSF_IO_SPEED_50MHZ              = (2 << 9),
-    VSF_IO_SPEED_MASK               = (3 << 9),
-    #define VSF_IO_SPEED_2MHZ   VSF_IO_SPEED_2MHZ
-    #define VSF_IO_SPEED_10MHZ  VSF_IO_SPEED_10MHZ
-    #define VSF_IO_SPEED_50MHZ  VSF_IO_SPEED_50MHZ
-    #define VSF_IO_SPEED_MASK   VSF_IO_SPEED_MASK
+    VSF_IO_SPEED_LOW                  = (0 << 9),
+    VSF_IO_SPEED_MEDIUM               = (1 << 9),
+    VSF_IO_SPEED_HIGH                 = (2 << 9),
+    VSF_IO_SPEED_VERY_HIGH            = (3 << 9),
+    VSF_IO_SPEED_MASK                 = (3 << 9),
+
+    #define VSF_IO_SPEED_LOW          VSF_IO_SPEED_LOW
+    #define VSF_IO_SPEED_MEDIUM       VSF_IO_SPEED_MEDIUM
+    #define VSF_IO_SPEED_HIGH         VSF_IO_SPEED_HIGH
+    #define VSF_IO_SPEED_VERY_HIGH    VSF_IO_SPEED_VERY_HIGH
+    #define VSF_IO_SPEED_MASK         VSF_IO_SPEED_MASK
 */
 } vsf_io_mode_t;
 #endif
@@ -288,8 +314,17 @@ enum {
                                     | VSF_IO_PULL_UP
                                     | VSF_IO_PULL_DOWN,
 
+
+    VSF_IO_EXTI_MODE_MASK           = VSF_IO_EXTI_MODE_NONE
+                                    | VSF_IO_EXTI_MODE_LOW_LEVEL
+                                    | VSF_IO_EXTI_MODE_HIGH_LEVEL
+                                    | VSF_IO_EXTI_MODE_RISING
+                                    | VSF_IO_EXTI_MODE_FALLING
+                                    | VSF_IO_EXTI_MODE_RISING_FALLING,
+
     VSF_IO_MODE_ALL_BITS_MASK       = VSF_IO_MODE_MASK
                                     | VSF_IO_PULL_UP_DOWN_MASK
+                                    | VSF_IO_EXTI_MODE_MASK
 #ifdef VSF_IO_INVERT_INPUT
                                     | VSF_IO_INVERT_INPUT
 #endif
@@ -376,6 +411,7 @@ typedef enum vsf_io_port_pin_no_t {
 #endif
 
 //! io configuration structure
+#if VSF_IO_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 typedef struct vsf_io_cfg_t {
     union {
         uint16_t port_pin_index;
@@ -394,7 +430,9 @@ typedef struct vsf_io_cfg_t {
     //! IO mode
     vsf_io_mode_t   mode;
 } vsf_io_cfg_t;
+#endif
 
+#if VSF_IO_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_io_capability_t {
 #if VSF_IO_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
@@ -402,6 +440,7 @@ typedef struct vsf_io_capability_t {
     uint8_t pin_count;
     vsf_io_pin_mask_t pin_mask;
 } vsf_io_capability_t;
+#endif
 
 typedef struct vsf_io_t vsf_io_t;
 

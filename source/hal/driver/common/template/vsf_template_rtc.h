@@ -65,6 +65,20 @@ extern "C" {
 #   define VSF_RTC_CFG_TIME_TYPE                    uint64_t
 #endif
 
+//! Redefine struct vsf_rtc_cfg_t. The vsf_rtc_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_rtc_cfg_t redefining.
+#if VSF_RTC_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#    define VSF_RTC_CFG_REIMPLEMENT_TYPE_CFG DISABLED
+#endif
+
+//! Redefine struct vsf_rtc_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_rtc_capability_t redefining.
+#if VSF_RTC_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#    define VSF_RTC_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
+#endif
+
 #ifndef VSF_RTC_CFG_INHERT_HAL_CAPABILITY
 #   define VSF_RTC_CFG_INHERT_HAL_CAPABILITY        ENABLED
 #endif
@@ -108,8 +122,9 @@ typedef struct vsf_rtc_tm_t {
     uint16_t tm_ms;
 } vsf_rtc_tm_t;
 
-typedef struct vsf_rtc_t vsf_rtc_t;
 
+#if VSF_RTC_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+typedef struct vsf_rtc_t vsf_rtc_t;
 typedef void vsf_rtc_isr_handler_t(void *target_ptr, vsf_rtc_t *rtc_ptr, vsf_rtc_irq_mask_t irq_mask);
 
 typedef struct vsf_rtc_isr_t {
@@ -122,7 +137,9 @@ typedef struct vsf_rtc_isr_t {
 typedef struct vsf_rtc_cfg_t {
     vsf_rtc_isr_t isr;
 } vsf_rtc_cfg_t;
+#endif
 
+#if VSF_RTC_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_rtc_capability_t {
 #if VSF_RTC_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
@@ -130,6 +147,7 @@ typedef struct vsf_rtc_capability_t {
 
     vsf_rtc_irq_mask_t irq_mask;
 } vsf_rtc_capability_t;
+#endif
 
 typedef struct vsf_rtc_op_t {
 #undef __VSF_HAL_TEMPLATE_API

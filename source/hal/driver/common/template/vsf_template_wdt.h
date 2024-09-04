@@ -65,6 +65,20 @@ extern "C" {
 #   define VSF_WDT_CFG_REIMPLEMENT_TYPE_IRQ_MASK        DISABLED
 #endif
 
+//! Redefine struct vsf_wdt_cfg_t. The vsf_wdt_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_wdt_cfg_t redefining.
+#if VSF_WDT_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#    define VSF_WDT_CFG_REIMPLEMENT_TYPE_CFG DISABLED
+#endif
+
+//! Redefine struct vsf_wdt_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_wdt_capability_t redefining.
+#if VSF_WDT_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#    define VSF_WDT_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
+#endif
+
 #ifndef VSF_WDT_CFG_INHERT_HAL_CAPABILITY
 #   define VSF_WDT_CFG_INHERT_HAL_CAPABILITY            ENABLED
 #endif
@@ -107,10 +121,9 @@ enum {
                                       VSF_WDT_MODE_RESET_MASK,
 };
 
+#if VSF_WDT_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 typedef struct vsf_wdt_t vsf_wdt_t;
-
 typedef void vsf_wdt_isr_handler_t(void *target_ptr, vsf_wdt_t *wdt_ptr);
-
 typedef struct vsf_wdt_isr_t {
     vsf_wdt_isr_handler_t  *handler_fn;
     void                   *target_ptr;
@@ -124,7 +137,9 @@ typedef struct vsf_wdt_cfg_t {
     uint32_t        min_ms;            //The window watchdog supports a timeout range
     vsf_wdt_isr_t   isr;
 } vsf_wdt_cfg_t;
+#endif
 
+#if VSF_WDT_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_wdt_capability_t {
 #if VSF_WDT_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
@@ -137,6 +152,7 @@ typedef struct vsf_wdt_capability_t {
     uint8_t support_disable      : 1;
     uint32_t max_timeout_ms;
 } vsf_wdt_capability_t;
+#endif
 
 typedef struct vsf_wdt_op_t {
 #undef  __VSF_HAL_TEMPLATE_API

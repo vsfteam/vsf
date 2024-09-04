@@ -61,6 +61,27 @@ extern "C" {
 #   define VSF_DAC_CFG_REIMPLEMENT_TYPE_IRQ_MASK        DISABLED
 #endif
 
+//! Redefine struct vsf_dac_channel_cfg_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_dac_channel_cfg_t redefining.
+#if VSF_DAC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == DISABLED
+#   define VSF_DAC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG     DISABLED
+#endif
+
+//! Redefine struct vsf_dac_cfg_t. The vsf_dac_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_dac_cfg_t redefining.
+#if VSF_DAC_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#   define VSF_DAC_CFG_REIMPLEMENT_TYPE_CFG             DISABLED
+#endif
+
+//! Redefine struct vsf_dac_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_dac_capability_t redefining.
+#if VSF_DAC_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#   define VSF_DAC_CFG_REIMPLEMENT_TYPE_CAPABILITY     DISABLED
+#endif
+
 #ifndef VSF_DAC_CFG_INHERT_HAL_CAPABILITY
 #   define VSF_DAC_CFG_INHERT_HAL_CAPABILITY            ENABLED
 #endif
@@ -95,13 +116,15 @@ enum {
 };
 
 //! dac channel configuration
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == DISABLED
 typedef struct vsf_dac_channel_cfg_t {
     uint8_t channel;
     uint8_t resolution;
 } vsf_dac_channel_cfg_t;
+#endif
 
+#if VSF_DAC_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 typedef struct vsf_dac_t vsf_dac_t;
-
 typedef void vsf_dac_isr_handler_t(void *target_ptr, vsf_dac_t *dac_ptr, vsf_dac_irq_mask_t irq_mask);
 
 typedef struct vsf_dac_isr_t {
@@ -114,6 +137,7 @@ typedef struct vsf_dac_isr_t {
 typedef struct vsf_dac_cfg_t {
     vsf_dac_isr_t   isr;
 } vsf_dac_cfg_t;
+#endif
 
 #if VSF_DAC_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
 typedef struct vsf_dac_status_t {
@@ -126,6 +150,7 @@ typedef struct vsf_dac_status_t {
 } vsf_dac_status_t;
 #endif
 
+#if VSF_DAC_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_dac_capability_t {
 #if VSF_DAC_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
@@ -136,6 +161,7 @@ typedef struct vsf_dac_capability_t {
     uint8_t min_resolution_bits;
     uint8_t channel_count;
 } vsf_dac_capability_t;
+#endif
 
 typedef struct vsf_dac_op_t {
 #undef  __VSF_HAL_TEMPLATE_API

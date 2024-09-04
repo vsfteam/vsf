@@ -69,6 +69,27 @@ extern "C" {
 #   define VSF_ADC_CFG_REIMPLEMENT_TYPE_IRQ_MASK        DISABLED
 #endif
 
+//! Redefine struct vsf_adc_channel_cfg_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_adc_channel_cfg_t redefining.
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == DISABLED
+#    define VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG DISABLED
+#endif
+
+//! Redefine struct vsf_adc_cfg_t. The vsf_adc_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_adc_cfg_t redefining.
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#    define VSF_ADC_CFG_REIMPLEMENT_TYPE_CFG DISABLED
+#endif
+
+//! Redefine struct vsf_adc_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_adc_capability_t redefining.
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#    define VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
+#endif
+
 #ifndef VSF_ADC_CFG_INHERT_HAL_CAPABILITY
 #   define VSF_ADC_CFG_INHERT_HAL_CAPABILITY            ENABLED
 #endif
@@ -186,30 +207,31 @@ enum {
 };
 
 //! adc channel configuration
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == DISABLED
 typedef struct vsf_adc_channel_cfg_t {
     vsf_adc_channel_mode_t mode;    // Channel mode
     uint16_t sample_cycles;
     uint8_t  channel;       // Channel Index
 } vsf_adc_channel_cfg_t;
+#endif
 
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 typedef struct vsf_adc_t vsf_adc_t;
-
 typedef void vsf_adc_isr_handler_t(void *target_ptr,
                                    vsf_adc_t *adc_ptr,
                                    vsf_adc_irq_mask_t irq_mask);
-
 typedef struct vsf_adc_isr_t {
     vsf_adc_isr_handler_t  *handler_fn;
     void                   *target_ptr;
     vsf_arch_prio_t         prio;
 } vsf_adc_isr_t;
-
 //! adc configuration
 typedef struct vsf_adc_cfg_t {
     vsf_adc_mode_t  mode;
     vsf_adc_isr_t   isr;
     uint32_t        clock_hz;
 } vsf_adc_cfg_t;
+#endif
 
 #if VSF_ADC_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
 typedef struct vsf_adc_status_t {
@@ -222,6 +244,7 @@ typedef struct vsf_adc_status_t {
 } vsf_adc_status_t;
 #endif
 
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_adc_capability_t {
 #if VSF_ADC_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
@@ -231,6 +254,7 @@ typedef struct vsf_adc_capability_t {
     uint8_t max_data_bits;
     uint8_t channel_count;
 } vsf_adc_capability_t;
+#endif
 
 typedef struct vsf_adc_op_t {
 #undef  __VSF_HAL_TEMPLATE_API

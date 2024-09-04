@@ -77,6 +77,21 @@ extern "C" {
 #   define VSF_I2C_CFG_REIMPLEMENT_TYPE_STATUS      DISABLED
 #endif
 
+//! Redefine struct vsf_i2c_cfg_t. The vsf_i2c_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_i2c_cfg_t redefining.
+#if VSF_I2C_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#    define VSF_I2C_CFG_REIMPLEMENT_TYPE_CFG DISABLED
+#endif
+
+//! Redefine struct vsf_i2c_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_i2c_capability_t redefining.
+#if VSF_I2C_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#    define VSF_I2C_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
+#endif
+
+
 #ifndef VSF_I2C_CFG_INHERT_HAL_CAPABILITY
 #   define VSF_I2C_CFG_INHERT_HAL_CAPABILITY       ENABLED
 #endif
@@ -212,6 +227,7 @@ typedef struct vsf_i2c_status_t {
 } vsf_i2c_status_t;
 #endif
 
+#if VSF_I2C_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_i2c_capability_t {
 #if VSF_I2C_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
@@ -230,7 +246,9 @@ typedef struct vsf_i2c_capability_t {
     // 0, there is no data, just send start condition
     uint16_t min_transfer_size;
 } vsf_i2c_capability_t;
+#endif
 
+#if VSF_I2C_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 typedef struct vsf_i2c_t vsf_i2c_t;
 
 /**
@@ -303,6 +321,7 @@ typedef struct vsf_i2c_cfg_t {
     uint16_t slave_addr;                    //!< \~english i2c slave address, only valid in slave mode
                                             //!< \~chinese i2c 从机地址，仅在从机模式下有效
 } vsf_i2c_cfg_t;
+#endif
 
 typedef struct vsf_i2c_op_t {
 #undef __VSF_HAL_TEMPLATE_API

@@ -69,6 +69,20 @@ extern "C" {
 #   define VSF_I2S_CFG_REIMPLEMENT_TYPE_STATUS      DISABLED
 #endif
 
+//! Redefine struct vsf_i2s_cfg_t. The vsf_i2s_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_i2s_cfg_t redefining.
+#if VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#    define VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG DISABLED
+#endif
+
+//! Redefine struct vsf_i2s_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_i2s_capability_t redefining.
+#if VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#    define VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
+#endif
+
 #ifndef VSF_I2S_CFG_INHERT_HAL_CAPABILITY
 #   define VSF_I2S_CFG_INHERT_HAL_CAPABILITY       ENABLED
 #endif
@@ -163,6 +177,7 @@ typedef struct vsf_i2s_status_t {
 } vsf_i2s_status_t;
 #endif
 
+#if VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_i2s_capability_t {
 #if VSF_I2S_CFG_INHERT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
@@ -174,7 +189,9 @@ typedef struct vsf_i2s_capability_t {
         bool is_dbuffer_supported;
     } i2s_capability;
 } vsf_i2s_capability_t;
+#endif
 
+#if VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 typedef struct vsf_i2s_t vsf_i2s_t;
 
 /**
@@ -253,6 +270,7 @@ typedef struct vsf_i2s_cfg_t {
     vsf_i2s_isr_t isr;                      //!< \~english i2s interrupt
                                             //!< \~chinese i2s 中断
 } vsf_i2s_cfg_t;
+#endif
 
 typedef struct vsf_i2s_op_t {
 #undef __VSF_HAL_TEMPLATE_API

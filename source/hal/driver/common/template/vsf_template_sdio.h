@@ -69,6 +69,20 @@ extern "C" {
 #   define VSF_SDIO_CFG_REIMPLEMENT_TYPE_STATUS     DISABLED
 #endif
 
+//! Redefine struct vsf_sdio_cfg_t. The vsf_sdio_isr_handler_t type also needs to
+//! be redefined For compatibility, members should not be deleted when struct
+//! @ref vsf_sdio_cfg_t redefining.
+#if VSF_SDIO_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#    define VSF_SDIO_CFG_REIMPLEMENT_TYPE_CFG DISABLED
+#endif
+
+//! Redefine struct vsf_sdio_capability_t.
+//! For compatibility, members should not be deleted when struct @ref
+//! vsf_sdio_capability_t redefining.
+#if VSF_SDIO_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#    define VSF_SDIO_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
+#endif
+
 #ifndef VSF_SDIO_CFG_INHERT_HAL_CAPABILITY
 #   define VSF_SDIO_CFG_INHERT_HAL_CAPABILITY       ENABLED
 #endif
@@ -635,6 +649,7 @@ typedef struct vsf_sdio_capability_t {
     bool support_ddr;
 } vsf_sdio_capability_t;
 
+#if VSF_STIO_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 typedef struct vsf_sdio_t vsf_sdio_t;
 
 /**
@@ -706,6 +721,7 @@ typedef struct vsf_sdio_cfg_t {
     vsf_sdio_isr_t isr;                          //!< \~english sdio interrupt
                                                 //!< \~chinese sdio 中断
 } vsf_sdio_cfg_t;
+#endif
 
 typedef struct vsf_sdio_op_t {
 #undef __VSF_HAL_TEMPLATE_API
