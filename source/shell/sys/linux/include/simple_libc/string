@@ -130,6 +130,7 @@ namespace std {
         typedef const T &const_reference;
         typedef size_t size_type;
 
+        array_base<T>() : __array(nullptr), __length(0) { }
         array_base<T>(const T *arr, size_t num)
             : __length(num)
         {
@@ -484,8 +485,19 @@ namespace std {
             : array_base<T>(nullptr, num + 1)
         {
             T *str = (T *)c_str();
-            __memcpy((T *)c_str(), arr, num);
+            __memcpy(str, arr, num);
             if (array_base<T>::length() > num) {
+                str[array_base<T>::length() - 1] = T(0);
+            }
+        }
+        basic_string<T, Traits, Alloc>(const T *str_begin, const T *str_end)
+        {
+            bool str_last_is_null = *str_end == T(0);
+            array_base<T>::resize(str_end - str_begin + 1 + (str_last_is_null ? 0 : 1));
+
+            T *str = (T *)c_str();
+            __memcpy(str, str_begin, str_end - str_begin + 1);
+            if (!str_last_is_null) {
                 str[array_base<T>::length() - 1] = T(0);
             }
         }
@@ -582,6 +594,10 @@ namespace std {
                 return assign(str, __strlen(str));
             }
             return (*this);
+        }
+        basic_string<T, Traits, Alloc> & assign(const T *str_begin, const T *str_end)
+        {
+            return assign(str_begin, str_end - str_begin + ((*str_end == T(0)) ? 0 : 1));
         }
         basic_string<T, Traits, Alloc> & append(const T *arr, size_t num)
         {
@@ -706,6 +722,16 @@ namespace std {
 //                throw out_of_range("out of range");
             }
             return replace(pos, len, str.c_str() + subpos, sublen);
+        }
+        basic_string<T, Traits, Alloc> & replace(iterator first, iterator last, const basic_string<T, Traits, Alloc> &str)
+        {
+            size_t pos = first - begin(), len = last - first + 1;
+            return replace(pos, len, str);
+        }
+        basic_string<T, Traits, Alloc> & replace(iterator first, iterator last, const T *str)
+        {
+            size_t pos = first - begin(), len = last - first + 1;
+            return replace(pos, len, str);
         }
         basic_string<T, Traits, Alloc> & erase(size_t pos = 0, size_t len = npos)
         {
