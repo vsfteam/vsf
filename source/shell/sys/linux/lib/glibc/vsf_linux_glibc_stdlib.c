@@ -186,6 +186,10 @@ void * ____calloc_ex(vsf_linux_process_t *process, size_t n, size_t size,
 #if VSF_LINUX_SIMPLE_LIBC_CFG_NO_MM != ENABLED
 size_t malloc_usable_size(void *p)
 {
+    if (NULL == p) {
+        return (size_t)0;
+    }
+
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
     return vsf_linux_process_heap_size(NULL, (uint8_t *)p - sizeof(vsf_liunx_heap_node_t))
         - sizeof(vsf_liunx_heap_node_t);
