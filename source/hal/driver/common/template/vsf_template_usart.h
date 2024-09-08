@@ -84,10 +84,6 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
 #   define VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS    DISABLED
 #endif
 
-#ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_CFG
-#   define VSF_USART_CFG_REIMPLEMENT_TYPE_CFG       DISABLED
-#endif
-
 //! In the specific hardware driver, we can enable
 //! VSF_USART_CFG_REIMPLEMENT_TYPE_CMD to redefine vsf_usart_cmd_t as needed.
 #ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_CMD
@@ -505,7 +501,6 @@ typedef enum vsf_usart_irq_mask_t {
 
     VSF_USART_IRQ_MASK_NOISE_ERR        = (0x1ul << 14),
     #define VSF_USART_IRQ_MASK_NOISE_ERR VSF_USART_IRQ_MASK_NOISE_ERR
-
     */
 } vsf_usart_irq_mask_t;
 #endif
@@ -594,6 +589,24 @@ typedef enum vsf_usart_cmd_t {
     VSF_USART_CMD_SET_BREAK     = (0x01ul << 1),
     //! usart clean break condition
     VSF_USART_CMD_CLEAR_BREAK   = (0x01ul << 2),
+
+    /*
+    VSF_USART_CMD_REQUEST_RX_RESUME                     = (0x1ul << 3),
+    #define VSF_USART_CMD_REQUEST_RX_RESUME VSF_USART_CMD_REQUEST_RX_RESUME
+    VSF_USART_CMD_REQUEST_TX_RESUME                     = (0x1ul << 4),
+    #define VSF_USART_CMD_REQUEST_TX_RESUME VSF_USART_CMD_REQUEST_TX_RESUME
+
+    VSF_USART_CMD_REQUEST_RX_PAUSE                      = (0x1ul << 5),
+    #define VSF_USART_CMD_REQUEST_RX_PAUSE VSF_USART_CMD_REQUEST_RX_PAUSE
+    VSF_USART_CMD_REQUEST_TX_PAUSE                      = (0x1ul << 6),
+    #define VSF_USART_CMD_REQUEST_TX_PAUSE VSF_USART_CMD_REQUEST_TX_PAUSE
+
+    VSF_USART_CMD_HALF_DUPLEX_ENABLE_TRANSMITTER        = (0x1ul << 7),
+    #define VSF_USART_CMD_HALF_DUPLEX_ENABLE_TRANSMITTER VSF_USART_CMD_HALF_DUPLEX_ENABLE_TRANSMITTER
+
+    VSF_USART_CMD_HALF_DUPLEX_ENABLE_RECEIVER           = (0x1ul << 8),
+    #define VSF_USART_CMD_HALF_DUPLEX_ENABLE_RECEIVER VSF_USART_CMD_HALF_DUPLEX_ENABLE_RECEIVER
+    */
 } vsf_usart_cmd_t;
 #endif
 
