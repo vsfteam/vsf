@@ -3366,8 +3366,9 @@ static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
     sfd->fd_flags |= __FD_READALL;
 
     const vsf_linux_fd_op_t *subop = priv->subop;
-    if ((subop != NULL) && (subop->fn_init != NULL)) {
+    if ((subop != NULL) && (subop->fn_init != NULL) && !priv->subop_inited) {
         subop->fn_init(sfd);
+        priv->subop_inited = true;
     }
 }
 

@@ -53,6 +53,8 @@ extern "C" {
 
 // refer scancodes to https://kbdlayout.info/kbdusx/scancodes
 // get the lower bytes of the scancode, if is keypad
+#define vsf_input_keyboard_get_scancode_from_keycode(__keycode)                 \
+            __vsf_input_keyboard_get_scancode((__keycode) & 0xFF)
 #define vsf_input_keyboard_get_scancode(__event)                                \
             __vsf_input_keyboard_get_scancode(vsf_input_keyboard_get_keycode(__event) & 0xFF)
 
@@ -205,6 +207,7 @@ enum {
     VSF_KB_VOLUMEDOWN       = 129,
     VSF_KP_COMMA            = 133,
 
+    VSF_KB_MODIFIER_START   = 224,
     VSF_KB_LCTRL            = 224,
     VSF_KB_LSHIFT           = 225,
     VSF_KB_LALT             = 226,
@@ -215,6 +218,8 @@ enum {
     VSF_KB_RALT             = 230,
     VSF_KB_RGUI             = 231,
     VSF_KB_RMETA            = VSF_KB_RGUI,
+    VSF_KB_MODIFIER_END     = 231,
+    VSF_KB_MODIFIER_NUM     = 8,
     VSF_KB_MODE             = 257,
 
     VSF_KB_EJECT            = 281,

@@ -36,6 +36,7 @@
 #   include "shell/sys/linux/include/sys/mman.h"
 #   include "shell/sys/linux/include/linux/serial.h"
 #   include "shell/sys/linux/include/linux/input.h"
+#   include "shell/sys/linux/include/linux/kd.h"
 #   include "shell/sys/linux/include/linux/fb.h"
 #   include "shell/sys/linux/include/linux/fs.h"
 #   include "shell/sys/linux/include/linux/hdreg.h"
@@ -52,6 +53,7 @@
 #   include <sys/mman.h>
 #   include <linux/serial.h>
 #   include <linux/input.h>
+#   include <linux/kd.h>
 #   include <linux/fb.h>
 #   include <linux/fs.h>
 #   include <linux/hdreg.h>
@@ -113,6 +115,50 @@ int vsf_linux_fs_bind_rand(char *path)
 }
 #endif
 
+// terminal common
+
+static void __vsf_linux_term_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    if (VSF_EVT_MESSAGE == evt) {
+        vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)vsf_eda_get_cur_msg();
+        vsf_protect_t orig = vsf_protect_sched();
+        if (vsf_stream_get_data_size(priv->stream_rx)) {
+            vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
+        } else {
+            vsf_unprotect_sched(orig);
+        }
+    }
+}
+
+static void __vsf_linux_term_notify_rx(vsf_linux_term_priv_t *priv)
+{
+    static vsf_eda_t __vsf_linux_term_eda;
+
+    if (NULL == __vsf_linux_term_eda.fn.evthandler) {
+        __vsf_linux_term_eda.fn.evthandler = __vsf_linux_term_evthandler;
+        vsf_eda_init(&__vsf_linux_term_eda, vsf_prio_highest);
+    }
+
+    vsf_eda_post_evt_msg(&__vsf_linux_term_eda, VSF_EVT_MESSAGE, priv);
+}
+
+static int __vsf_linux_term_fcntl_common(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
+{
+    vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
+    union {
+        uintptr_t arg;
+    } arg_union;
+    arg_union.arg = arg;
+
+    switch (cmd) {
+    case TCSETS:
+        break;
+    default:
+        return __vsf_linux_default_fcntl(sfd, cmd, arg);
+    }
+    return 0;
+}
+
 #if VSF_HAL_USE_USART == ENABLED
 
 #   if VSF_USE_SIMPLE_STREAM != ENABLED
@@ -127,7 +173,6 @@ int vsf_linux_fs_bind_rand(char *path)
 
 typedef struct vsf_linux_uart_priv_t {
     implement(vsf_linux_term_priv_t)
-    implement(vsf_eda_t)
     struct serial_struct ss;
     vsf_eda_t *eda_pending_tx;
 
@@ -168,34 +213,17 @@ static void __vsf_linux_uart_isrhandler(void *target, vsf_usart_t *uart,
         vsf_usart_irq_mask_t irq_mask)
 {
     vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)target;
-    vsf_eda_t *eda = NULL;
 
     if (irq_mask & VSF_USART_IRQ_MASK_RX) {
         if (__vsf_linux_uart_rx(uart, priv) > 0) {
-            eda = &priv->use_as__vsf_eda_t;
+            __vsf_linux_term_notify_rx(&priv->use_as__vsf_linux_term_priv_t);
         }
     }
     if (irq_mask & VSF_USART_IRQ_MASK_TX_CPL) {
-        eda = priv->eda_pending_tx;
+        vsf_eda_t *eda = priv->eda_pending_tx;
         VSF_LINUX_ASSERT(eda != NULL);
         priv->eda_pending_tx = NULL;
-    }
-
-    if (eda != NULL) {
         vsf_eda_post_evt(eda, VSF_EVT_USER);
-    }
-}
-
-static void __vsf_linux_uart_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
-{
-    if (VSF_EVT_USER == evt) {
-        vsf_linux_uart_priv_t *priv = vsf_container_of(eda, vsf_linux_uart_priv_t, use_as__vsf_eda_t);
-        vsf_protect_t orig = vsf_protect_sched();
-        if (vsf_stream_get_data_size(priv->stream_rx)) {
-            vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
-        } else {
-            vsf_unprotect_sched(orig);
-        }
     }
 }
 
@@ -275,6 +303,7 @@ static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
     vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)sfd->priv;
 
     priv->subop = sfd->op;
+    priv->subop_inited = true;
     sfd->op = &vsf_linux_term_fdop;
     vsf_linux_term_fdop.fn_init(sfd);
 
@@ -286,13 +315,10 @@ static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
     vsf_stream_connect_tx(priv->stream_rx);
 
     // DO NOT call __vsf_linux_rx_stream_init
-    //  event is trigger in __vsf_linux_uart_evthandler, not in stream evthandler
+    //  event is trigger in __vsf_linux_term_notify_rx, not in stream evthandler
     vsf_stream_connect_rx(priv->stream_rx);
-    __vsf_linux_uart_evthandler(&priv->use_as__vsf_eda_t, VSF_EVT_USER);
+    __vsf_linux_term_notify_rx(&priv->use_as__vsf_linux_term_priv_t);
     __vsf_linux_uart_config(priv);
-
-    priv->fn.evthandler = __vsf_linux_uart_evthandler;
-    vsf_eda_init(&priv->use_as__vsf_eda_t, vsf_prio_highest);
 }
 
 static int __vsf_linux_uart_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
@@ -317,7 +343,7 @@ static int __vsf_linux_uart_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
         __vsf_linux_uart_config(priv);
         break;
     default:
-        return __vsf_linux_default_fcntl(sfd, cmd, arg);
+        return __vsf_linux_term_fcntl_common(sfd, cmd, arg);
     }
     return 0;
 }
@@ -863,13 +889,94 @@ def_vsf_pool(vsf_linux_input_event_pool, vsf_linux_input_event_t)
 #include "service/pool/impl_vsf_pool.inc"
 
 typedef struct vsf_linux_input_priv_t {
+#if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
+    implement(vsf_linux_term_priv_t)
+#else
     implement(vsf_linux_fs_priv_t)
+#endif
     vk_input_notifier_t notifier;
 
-    vsf_pool(vsf_linux_input_event_pool) event_pool;
-    vsf_linux_input_event_t event_buffer[VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE];
-    vsf_slist_queue_t event_queue;
+    union {
+        struct {
+            vsf_pool(vsf_linux_input_event_pool) event_pool;
+            vsf_linux_input_event_t event_buffer[VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE];
+            vsf_slist_queue_t event_queue;
+        };
+#if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
+        struct {
+            implement(vsf_fifo_stream_t)
+            uint8_t keyboard_buffer[VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE * sizeof(vsf_linux_input_event_t)];
+            uint8_t text_graphics_mode;
+            uint8_t keyboard_mode;
+            uint8_t led_status;
+            uint8_t keyboard_modifiers;
+        };
+#endif
+    };
+
+#if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
+    bool is_terminal;
+#endif
 } vsf_linux_input_priv_t;
+
+#if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
+// refer to https://www.linuxjournal.com/article/1080
+static uint8_t __vsf_linux_terminal_keyboard_get_keycode(uint8_t modifier, uint8_t vsf_keycode)
+{
+    uint8_t keycode = 0;
+    uint16_t scancode = vsf_input_keyboard_get_scancode_from_keycode(vsf_keycode);
+    if (scancode <= 0x58) {
+        // 0 .. 0x58(F12) is scancode compatible
+        keycode = scancode;
+    } else {
+        switch (vsf_keycode) {
+        case VSF_KP_ENTER:          keycode = 0x60;     break;
+        case VSF_KB_RCTRL:          keycode = 0x61;     break;
+        case VSF_KP_DIVIDE:         keycode = 0x62;     break;
+        case VSF_KB_RALT:           keycode = 0x64;     break;
+        case VSF_KB_HOME:           keycode = 0x66;     break;
+        case VSF_KB_UP:             keycode = 0x67;     break;
+        case VSF_KB_PAGEUP:         keycode = 0x68;     break;
+        case VSF_KB_LEFT:           keycode = 0x69;     break;
+        case VSF_KB_RIGHT:          keycode = 0x6A;     break;
+        case VSF_KB_END:            keycode = 0x6B;     break;
+        case VSF_KB_DOWN:           keycode = 0x6C;     break;
+        case VSF_KB_PAGEDOWN:       keycode = 0x6D;     break;
+        case VSF_KB_INSERT:         keycode = 0x6E;     break;
+        case VSF_KB_DELETE:         keycode = 0x6F;     break;
+        case VSF_KB_LMETA:          keycode = 0x7D;     break;
+        case VSF_KB_RMETA:          keycode = 0x7E;     break;
+        case VSF_KB_APPLICATION:    keycode = 0x7F;     break;
+        case VSF_KB_PRINT_SCREEN:
+            if (    modifier
+                &   (   (1 << (VSF_KB_LALT - VSF_KB_MODIFIER_START))
+                    |   (1 << (VSF_KB_RALT - VSF_KB_MODIFIER_START)))) {
+                keycode = 0x54;
+            } else {
+                keycode = 0x63;
+            }
+            break;
+        case VSF_KB_PAUSE:
+            if (    modifier
+                &   (   (1 << (VSF_KB_LCTRL - VSF_KB_MODIFIER_START))
+                    |   (1 << (VSF_KB_RCTRL - VSF_KB_MODIFIER_START)))) {
+                // CTRL + PAUSE = BREAK
+                keycode = 0x65;
+            } else {
+                keycode = 0x77;
+            }
+            break;
+        }
+    }
+    return keycode;
+}
+
+// return the byte length of translated data in keybuffer
+static uint8_t __vsf_linux_terminal_keyboard_translate(uint8_t modifier, uint8_t keycode, uint8_t keybuffer[6])
+{
+    return 0;
+}
+#endif
 
 static int __vsf_linux_input_push(vsf_linux_input_priv_t *input_priv, struct input_event *input_event)
 {
@@ -903,10 +1010,87 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
         __vsf_linux_input_push(input_priv, &input_event);
         break;
     case VSF_INPUT_TYPE_KEYBOARD:
-        input_event.code = vsf_input_keyboard_get_keycode(evt);
-        input_event.value = vsf_input_keyboard_is_down(evt) ? 1 : 0;
-        input_event.type = EV_KEY;
-        __vsf_linux_input_push(input_priv, &input_event);
+#if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
+        if (input_priv->is_terminal) {
+            bool is_down = vsf_input_keyboard_is_down(evt);
+            uint16_t vsf_keycode = vsf_input_keyboard_get_keycode(evt);
+            // max scancode is 6 byte in length
+            uint8_t keybuffer[6], keylen = 0;
+
+            if ((vsf_keycode >= VSF_KB_MODIFIER_START) && (vsf_keycode <= VSF_KB_MODIFIER_END)) {
+                if (is_down) {
+                    input_priv->keyboard_modifiers |= 1 << (vsf_keycode - VSF_KB_MODIFIER_START);
+                } else {
+                    input_priv->keyboard_modifiers &= ~(1 << (vsf_keycode - VSF_KB_MODIFIER_START));
+                }
+            }
+            if (input_priv->keyboard_mode == K_RAW) {
+                // raw mode, send scancode directly
+                uint16_t scancode = vsf_input_keyboard_get_scancode_from_keycode(vsf_keycode);
+
+                if (is_down && (vsf_keycode == VSF_KB_PAUSE)) {
+                    keylen = 6;
+                    keybuffer[0] = 0xE1;
+                    keybuffer[1] = 0x1D;
+                    keybuffer[2] = 0x45;
+                    keybuffer[3] = 0xE1;
+                    keybuffer[4] = 0x9D;
+                    keybuffer[5] = 0xC5;
+                } else if (is_down && (scancode & 0xFF00)) {
+                    keylen = 2;
+                    keybuffer[0] = scancode >> 8;
+                    keybuffer[1] = scancode & 0xFF;
+                } else {
+                    keylen = 1;
+                    keybuffer[0] = (is_down ? 0 : 0x80) | (scancode & 0xFF);
+                }
+            } else if (input_priv->keyboard_mode == K_MEDIUMRAW) {
+                uint8_t keycode = __vsf_linux_terminal_keyboard_get_keycode(input_priv->keyboard_modifiers, vsf_keycode);
+                keylen = 1;
+                keybuffer[0] = (is_down ? 0 : 0x80) | keycode;
+            } else if (input_priv->keyboard_mode == K_XLATE) {
+                uint8_t keycode = __vsf_linux_terminal_keyboard_get_keycode(input_priv->keyboard_modifiers, vsf_keycode);
+                keylen = __vsf_linux_terminal_keyboard_translate(input_priv->keyboard_modifiers, keycode, keybuffer);
+            } else {
+                vsf_trace_error("keyboard: not supported mode %d\n", input_priv->keyboard_mode);
+                break;
+            }
+
+            if (keylen > 0) {
+                uint_fast32_t avail_len = vsf_stream_get_free_size(&input_priv->use_as__vsf_stream_t);
+                if (keylen > avail_len) {
+                    vsf_trace_error("keyboard: keyboard rx buffer overflow, please increase VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE\n");
+                    break;
+                } else {
+                    vsf_stream_write(&input_priv->use_as__vsf_stream_t, keybuffer, keylen);
+                }
+            }
+
+            // update led status if necessary
+            if (is_down) {
+                switch (vsf_keycode) {
+                case VSF_KP_NUMLOCK:
+                    input_priv->led_status ^= LED_NUM;
+                    break;
+                case VSF_KB_CAPSLOCK:
+                    input_priv->led_status ^= LED_CAP;
+                    break;
+                case VSF_KB_SCROLLLOCK:
+                    input_priv->led_status ^= LED_SCR;
+                    break;
+                default:
+                    break;
+                }
+            }
+            __vsf_linux_term_notify_rx(&input_priv->use_as__vsf_linux_term_priv_t);
+        } else
+#endif
+        {
+            input_event.code = vsf_input_keyboard_get_keycode(evt);
+            input_event.value = vsf_input_keyboard_is_down(evt) ? 1 : 0;
+            input_event.type = EV_KEY;
+            __vsf_linux_input_push(input_priv, &input_event);
+        }
         break;
     case VSF_INPUT_TYPE_MOUSE:
         switch (vsf_input_mouse_evt_get(evt)) {
@@ -953,11 +1137,16 @@ static void __vsf_linux_input_init(vsf_linux_fd_t *sfd)
         vk_input_notifier_register(&input_priv->notifier);
     }
 
-    VSF_POOL_PREPARE(vsf_linux_input_event_pool, &input_priv->event_pool,
-        .region_ptr = (vsf_protect_region_t *)&vsf_protect_region_int,
-    );
-    VSF_POOL_ADD_BUFFER(vsf_linux_input_event_pool, &input_priv->event_pool,
-        input_priv->event_buffer, sizeof(input_priv->event_buffer));
+#if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
+    if (!input_priv->is_terminal)
+#endif
+    {
+        VSF_POOL_PREPARE(vsf_linux_input_event_pool, &input_priv->event_pool,
+            .region_ptr = (vsf_protect_region_t *)&vsf_protect_region_int,
+        );
+        VSF_POOL_ADD_BUFFER(vsf_linux_input_event_pool, &input_priv->event_pool,
+            input_priv->event_buffer, sizeof(input_priv->event_buffer));
+    }
 }
 
 static int __vsf_linux_input_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
@@ -1059,6 +1248,83 @@ int vsf_linux_fs_bind_input(char *path, vk_input_notifier_t *notifier)
                 path, notifier, &__vsf_linux_input_fdop, NULL, NULL,
                 VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
 }
+
+#if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
+static void __vsf_linux_terminal_keyboard_init(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_input_priv_t *keyboard_priv = (vsf_linux_input_priv_t *)sfd->priv;
+
+    keyboard_priv->is_terminal = true;
+    __vsf_linux_input_init(sfd);
+
+    keyboard_priv->subop = sfd->op;
+    keyboard_priv->subop_inited = true;
+    sfd->op = &vsf_linux_term_fdop;
+    vsf_linux_term_fdop.fn_init(sfd);
+
+    keyboard_priv->op = &vsf_fifo_stream_op;
+    keyboard_priv->buffer = keyboard_priv->keyboard_buffer;
+    keyboard_priv->size = sizeof(keyboard_priv->keyboard_buffer);
+    keyboard_priv->stream_rx = &keyboard_priv->use_as__vsf_stream_t;
+
+    vsf_stream_connect_tx(keyboard_priv->stream_rx);
+}
+
+static int __vsf_linux_terminal_keyboard_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
+{
+    vsf_linux_input_priv_t *keyboard_priv = (vsf_linux_input_priv_t *)sfd->priv;
+
+    switch (cmd) {
+    case KDGETMODE:
+        *(int *)arg = keyboard_priv->text_graphics_mode;
+        break;
+    case KDSETMODE:
+        keyboard_priv->text_graphics_mode = arg;
+        break;
+    case KDGKBMODE:
+        *(int *)arg = keyboard_priv->keyboard_mode;
+        break;
+    case KDSKBMODE:
+        keyboard_priv->keyboard_mode = arg;
+        break;
+    case KDGETLED:
+        *(int *)arg = keyboard_priv->led_status;
+        break;
+    case KDGKBENT: {
+            struct kbentry *entry = (struct kbentry *)arg;
+            entry->kb_value = 0;
+        }
+        break;
+    case KDSKBENT:
+        // TODO: add support
+        return -1;
+    case KDGKBTYPE:
+        *(int *)arg = KB_101;
+        break;
+    default:
+        return __vsf_linux_term_fcntl_common(sfd, cmd, arg);
+    }
+    return 0;
+}
+
+static const vsf_linux_fd_op_t __vsf_linux_terminal_keyboard_fdop = {
+    .priv_size          = sizeof(vsf_linux_input_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
+    .fn_init            = __vsf_linux_terminal_keyboard_init,
+    .fn_fcntl           = __vsf_linux_terminal_keyboard_fcntl,
+    .fn_read            = __vsf_linux_stream_read,
+    .fn_close           = __vsf_linux_input_close,
+    .fn_stat            = __vsf_linux_input_stat,
+};
+
+int vsf_linux_fs_bind_terminal_keyboard(char *path, vk_input_notifier_t *notifier)
+{
+    VSF_LINUX_ASSERT(notifier->mask == (1 << VSF_INPUT_TYPE_KEYBOARD));
+    return vsf_linux_fs_bind_target_ex(
+                path, notifier, &__vsf_linux_terminal_keyboard_fdop, NULL, NULL,
+                VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
+}
+#endif      // VSF_LINUX_USE_TERMINAL_KEYBOARD
 #endif
 
 #if VSF_USE_UI == ENABLED

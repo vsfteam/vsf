@@ -173,6 +173,7 @@ typedef struct vsf_linux_term_priv_t {
     struct termios termios;
     char esc_type;
     bool line_start;
+    bool subop_inited;
 } vsf_linux_term_priv_t;
 
 typedef struct vsf_linux_key_t vsf_linux_key_t;

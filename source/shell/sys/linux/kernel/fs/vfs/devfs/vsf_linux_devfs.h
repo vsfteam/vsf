@@ -61,6 +61,9 @@ extern int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal);
 #endif
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
 extern int vsf_linux_fs_bind_input(char *path, vk_input_notifier_t *notifier);
+#   if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
+extern int vsf_linux_fs_bind_terminal_keyboard(char *path, vk_input_notifier_t *notifier);
+#   endif
 #endif
 #if VSF_USE_UI == ENABLED
 extern int vsf_linux_fs_bind_disp(char *path, vk_disp_t *disp);
