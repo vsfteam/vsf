@@ -76,6 +76,8 @@ extern "C" {
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_CMD          ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end
 
 // TODO: add comments about fifo2req
@@ -104,50 +106,74 @@ vsf_class(vsf_${usart_ip}_usart_t) {
 
 // HW/IPCore, not for emulated drivers
 typedef enum vsf_usart_mode_t {
-    VSF_USART_9_BIT_LENGTH              = (0x4ul << 0),
-    VSF_USART_8_BIT_LENGTH              = (0x3ul << 0),
-    VSF_USART_7_BIT_LENGTH              = (0x2ul << 0),
-    VSF_USART_6_BIT_LENGTH              = (0x1ul << 0),
-    VSF_USART_5_BIT_LENGTH              = (0x0ul << 0),
+    VSF_USART_NO_PARITY                 = (0x0ul << 0),
+    VSF_USART_EVEN_PARITY               = (0x1ul << 0),
+    VSF_USART_ODD_PARITY                = (0x2ul << 0),
+    VSF_USART_FORCE_0_PARITY            = (0x3ul << 0),
+    VSF_USART_FORCE_1_PARITY            = (0x4ul << 0),
 
     VSF_USART_1_STOPBIT                 = (0x0ul << 3),
-    VSF_USART_2_STOPBIT                 = (0x1ul << 3),
-    VSF_USART_1_5_STOPBIT               = (0x2ul << 3),
+    VSF_USART_1_5_STOPBIT               = (0x1ul << 3),
+    VSF_USART_0_5_STOPBIT               = (0x2ul << 3),
+    VSF_USART_2_STOPBIT                 = (0x3ul << 3),
 
-    VSF_USART_NO_PARITY                 = (0x0ul << 5),
-    VSF_USART_ODD_PARITY                = (0x1ul << 5),
-    VSF_USART_EVEN_PARITY               = (0x2ul << 5),
-    VSF_USART_FORCE_0_PARITY            = (0x3ul << 5),
-    VSF_USART_FORCE_1_PARITY            = (0x4ul << 5),
+    VSF_USART_5_BIT_LENGTH              = (0x0ul << 5),
+    VSF_USART_6_BIT_LENGTH              = (0x1ul << 5),
+    VSF_USART_7_BIT_LENGTH              = (0x2ul << 5),
+    VSF_USART_8_BIT_LENGTH              = (0x3ul << 5),
+    VSF_USART_9_BIT_LENGTH              = (0x4ul << 5),
+    VSF_USART_10_BIT_LENGTH             = (0x5ul << 5),
 
     VSF_USART_NO_HWCONTROL              = (0x0ul << 8),
     VSF_USART_RTS_HWCONTROL             = (0x1ul << 8),
     VSF_USART_CTS_HWCONTROL             = (0x2ul << 8),
     VSF_USART_RTS_CTS_HWCONTROL         = (0x3ul << 8),
 
-    VSF_USART_TX_ENABLE                 = (0x1ul << 10),
-    VSF_USART_TX_DISABLE                = (0x0ul << 10),
-    VSF_USART_RX_ENABLE                 = (0x1ul << 11),
-    VSF_USART_RX_DISABLE                = (0x0ul << 11),
+    VSF_USART_TX_ENABLE                 = (0x0ul << 9),
+    VSF_USART_TX_DISABLE                = (0x1ul << 9),
+
+    VSF_USART_RX_ENABLE                 = (0x0ul << 10),
+    VSF_USART_RX_DISABLE                = (0x1ul << 10),
+
+    VSF_USART_SYNC_CLOCK_ENABLE         = (0x0ul << 11),
+    VSF_USART_SYNC_CLOCK_DISABLE        = (0x1ul << 11),
+
+    VSF_USART_HALF_DUPLEX_DISABLE       = (0x0ul << 12),
+    VSF_USART_HALF_DUPLEX_ENABLE        = (0x1ul << 12),
+
+    VSF_USART_TX_FIFO_THRESH_ONE        = (0x0ul << 13),
+    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x1ul << 13),
+    VSF_USART_TX_FIFO_THRESH_FULL       = (0x2ul << 13),
+    VSF_USART_RX_FIFO_THRESH_ONE        = (0x0ul << 15),
+    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (0x1ul << 15),
+    VSF_USART_RX_FIFO_THRESH_FULL       = (0x2ul << 15),
+
+    VSF_USART_SYNC_CLOCK_POLARITY_LOW   = (0x0ul << 16),
+    VSF_USART_SYNC_CLOCK_POLARITY_HIGH  = (0x1ul << 16),
+    VSF_USART_SYNC_CLOCK_PHASE_1_EDGE   = (0x0ul << 17),
+    VSF_USART_SYNC_CLOCK_PHASE_2_EDGE   = (0x1ul << 17),
 
     // more vendor specified modes can be added here
 } vsf_usart_mode_t;
 
 typedef enum vsf_usart_irq_mask_t {
-    // usart fifo interrupt
-    VSF_USART_IRQ_MASK_RX               = (0x1ul << 0),
-    VSF_USART_IRQ_MASK_TX               = (0x1ul << 1),
-    VSF_USART_IRQ_MASK_RX_TIMEOUT       = (0x1ul << 2),
+    // request_rx/request_tx complete
+    VSF_USART_IRQ_MASK_TX_CPL           = (0x1ul << 0),
+    VSF_USART_IRQ_MASK_RX_CPL           = (0x1ul << 1),
 
-    // usart request interrupt
-    VSF_USART_IRQ_MASK_RX_CPL           = (0x1ul << 3),
-    VSF_USART_IRQ_MASK_TX_CPL           = (0x1ul << 4),
+    // TX/RX reach fifo threshold, thres    hold on some devices is bound to 1
+    VSF_USART_IRQ_MASK_TX               = (0x1ul << 2),
+    VSF_USART_IRQ_MASK_RX               = (0x1ul << 3),
+    VSF_USART_IRQ_MASK_RX_TIMEOUT       = (0x1ul << 4),
 
-    // usart error interrupt
-    VSF_USART_IRQ_MASK_FRAME_ERR        = (0x1ul << 5),
-    VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 6),
-    VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 7),
-    VSF_USART_IRQ_MASK_OVERFLOW_ERR     = (0x1ul << 8),
+    // clear to send interrupt
+    VSF_USART_IRQ_MASK_CTS              = (0x1ul << 5),
+
+    // Error interrupt
+    VSF_USART_IRQ_MASK_FRAME_ERR        = (0x1ul << 6),
+    VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 7),
+    VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 8),
+    VSF_USART_IRQ_MASK_OVERFLOW_ERR     = (0x1ul << 9),
 
     // more vendor specified irq_masks can be added here
 } vsf_usart_irq_mask_t;

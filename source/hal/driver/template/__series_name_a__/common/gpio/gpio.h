@@ -46,31 +46,21 @@ extern "C" {
 /*\note hw GPIO driver can reimplement vsf_gpio_mode_t/vsf_gpio_interrupt_mode_t.
  *      To enable reimplementation, please enable macro below:
  *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE for vsf_gpio_mode_t, mutually exclusive with VSF_GPIO_USE_IO_MODE_TYPE
- *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_EXT_MODE for vsf_gpio_interrupt_mode_t
  *          VSF_GPIO_USE_IO_MODE_TYPE to use vsf_io_mode_t to implement vsf_gpio_mode_t, mutually exclusive with VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE
+ *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG for vsf_gpio_cfg_t
+ *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_gpio_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
 
-//#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE      ENABLED
-#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_EXT_MODE  ENABLED
-#define VSF_GPIO_USE_IO_MODE_TYPE               ENABLED
+//#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE        ENABLED
+#define VSF_GPIO_USE_IO_MODE_TYPE                   ENABLED
+//#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG         ENABLED
+//#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY  ENABLED
 // HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-
-// HW
-typedef enum vsf_gpio_interrupt_mode_t {
-    VSF_GPIO_INT_MODE_NONE                      = (0x0 << 0),
-    VSF_GPIO_INT_MODE_LOW_LEVEL                 = (0x1 << 0),
-    VSF_GPIO_INT_MODE_HIGH_LEVEL                = (0x2 << 0),
-    VSF_GPIO_INT_MODE_RISING                    = (0x3 << 0),
-    VSF_GPIO_INT_MODE_FALLING                   = (0x4 << 0),
-    VSF_GPIO_INT_MODE_RISING_FALLING            = (0x5 << 0),
-} vsf_gpio_interrupt_mode_t;
-// HW end
-
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
