@@ -52,11 +52,13 @@ extern "C" {
             (!vsf_input_keyboard_is_kpevt(__event))
 
 // refer scancodes to https://kbdlayout.info/kbdusx/scancodes
-// get the lower bytes of the scancode, if is keypad
-#define vsf_input_keyboard_get_scancode_from_keycode(__keycode)                 \
-            __vsf_input_keyboard_get_scancode((__keycode) & 0xFF)
-#define vsf_input_keyboard_get_scancode(__event)                                \
-            __vsf_input_keyboard_get_scancode(vsf_input_keyboard_get_keycode(__event) & 0xFF)
+// get scancode if pressed, returns length of scancode
+
+#define vsf_input_keyboard_get_scancode_from_keycode(__keycode, __scancode_ptr) \
+            __vsf_input_keyboard_get_scancode((__keycode) & 0xFF, (__scancode_ptr))
+#define vsf_input_keyboard_get_scancode(__event, __scancode_ptr)                \
+            __vsf_input_keyboard_get_scancode(                                  \
+                vsf_input_keyboard_get_keycode(__event) & 0xFF, (__scancode_ptr))
 
 /*============================ TYPES =========================================*/
 
@@ -317,25 +319,10 @@ typedef struct vk_keyboard_evt_t {
 } vk_keyboard_evt_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
-
-extern const uint16_t __vsf_keyboard_keycode2scancode_0_99[100];
-extern const uint16_t __vsf_keyboard_keycode2scancode_224_231[8];
-
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static inline uint16_t __vsf_input_keyboard_get_scancode(uint8_t keycode)
-{
-    if (keycode < 100) {
-        return __vsf_keyboard_keycode2scancode_0_99[keycode];
-    } else if (keycode < 224) {
-        return 0;
-    } else if (keycode < 232) {
-        return __vsf_keyboard_keycode2scancode_224_231[keycode - 224];
-    } else {
-        return 0;
-    }
-}
+extern uint_fast8_t __vsf_input_keyboard_get_scancode(uint8_t keycode, uint8_t scancode[6]);
 
 #ifdef __cplusplus
 }

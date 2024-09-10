@@ -924,10 +924,11 @@ typedef struct vsf_linux_input_priv_t {
 static uint8_t __vsf_linux_terminal_keyboard_get_keycode(uint8_t modifier, uint8_t vsf_keycode)
 {
     uint8_t keycode = 0;
-    uint16_t scancode = vsf_input_keyboard_get_scancode_from_keycode(vsf_keycode);
-    if (scancode <= 0x58) {
+    uint8_t scancode_buffer[6];
+    uint16_t scancode_len = vsf_input_keyboard_get_scancode_from_keycode(vsf_keycode, scancode_buffer);
+    if ((1 == scancode_len) && (scancode_buffer[0] <= 0x58)) {
         // 0 .. 0x58(F12) is scancode compatible
-        keycode = scancode;
+        keycode = scancode_buffer[0];
     } else {
         switch (vsf_keycode) {
         case VSF_KP_ENTER:          keycode = 0x60;     break;
@@ -1026,23 +1027,20 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
             }
             if (input_priv->keyboard_mode == K_RAW) {
                 // raw mode, send scancode directly
-                uint16_t scancode = vsf_input_keyboard_get_scancode_from_keycode(vsf_keycode);
+                keylen = vsf_input_keyboard_get_scancode_from_keycode(vsf_keycode, keybuffer);
 
-                if (is_down && (vsf_keycode == VSF_KB_PAUSE)) {
-                    keylen = 6;
-                    keybuffer[0] = 0xE1;
-                    keybuffer[1] = 0x1D;
-                    keybuffer[2] = 0x45;
-                    keybuffer[3] = 0xE1;
-                    keybuffer[4] = 0x9D;
-                    keybuffer[5] = 0xC5;
-                } else if (is_down && (scancode & 0xFF00)) {
-                    keylen = 2;
-                    keybuffer[0] = scancode >> 8;
-                    keybuffer[1] = scancode & 0xFF;
-                } else {
-                    keylen = 1;
-                    keybuffer[0] = (is_down ? 0 : 0x80) | (scancode & 0xFF);
+                if (!is_down) {
+                    if (keylen > 2) {
+                        // should be pause, which has no keycode for release
+                        keylen = 0;
+                    } else {
+                        if (keylen > 1) {
+                            keybuffer[0] = 0x80 | keybuffer[1];
+                        } else {
+                            keybuffer[0] |= 0x80;
+                        }
+                        keylen = 1;
+                    }
                 }
             } else if (input_priv->keyboard_mode == K_MEDIUMRAW) {
                 uint8_t keycode = __vsf_linux_terminal_keyboard_get_keycode(input_priv->keyboard_modifiers, vsf_keycode);
