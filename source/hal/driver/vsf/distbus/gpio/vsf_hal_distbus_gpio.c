@@ -113,10 +113,10 @@ uint32_t vsf_hal_distbus_gpio_register_service(vsf_distbus_t *distbus, vsf_hal_d
     return sizeof(vsf_hal_distbus_gpio_info_t);
 }
 
-void vsf_hal_distbus_gpio_config_pin(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_mode_t feature)
+vsf_err_t vsf_hal_distbus_gpio_config_pin(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_cfg_t *cfg)
 {
     VSF_HAL_ASSERT(NULL != gpio);
-    VSF_HAL_ASSERT(0 != pin_mask);
+    VSF_HAL_ASSERT(NULL != cfg);
     VSF_HAL_ASSERT(gpio->info.support_config_pin);
 
     vsf_hal_distbus_gpio_config_pin_t *param;
@@ -124,9 +124,10 @@ void vsf_hal_distbus_gpio_config_pin(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_
     VSF_HAL_ASSERT(msg != NULL);
 
     msg->header.addr = VSF_HAL_DISTBUS_GPIO_CMD_CONFIG_PIN;
-    param->pin_mask = cpu_to_le32(pin_mask);
-    param->feature = cpu_to_le32(vsf_generic_io_feature_to_hal_distbus_io_feature(feature));
+    param->pin_mask = cpu_to_le32(cfg->pin_mask);
+    param->mode = cpu_to_le32(vsf_generic_io_feature_to_hal_distbus_io_feature(cfg->mode));
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
+    return VSF_ERR_NONE;
 }
 
 void vsf_hal_distbus_gpio_set_direction(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)
@@ -155,11 +156,6 @@ vsf_err_t vsf_hal_distbus_gpio_exti_irq_enable(vsf_hal_distbus_gpio_t *gpio, vsf
 }
 
 vsf_err_t vsf_hal_distbus_gpio_exti_irq_disable(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask)
-{
-    return VSF_ERR_NOT_SUPPORT;
-}
-
-vsf_err_t vsf_hal_distbus_gpio_exti_config(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_irq_cfg_t *cfg)
 {
     return VSF_ERR_NOT_SUPPORT;
 }
