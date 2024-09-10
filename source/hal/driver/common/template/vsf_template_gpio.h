@@ -235,7 +235,6 @@ typedef enum vsf_gpio_mode_t {
  *     .mode = VSF_IO_OUTPUT_PUSH_PULL,
  *     ...
  * };
- * vsf_gpio_mode_t
  * vsf_gpio_config_pin(&vsf_hw_gpi0, &cfg);
  * ```
  *
