@@ -117,29 +117,20 @@ int vsf_linux_fs_bind_rand(char *path)
 
 // terminal common
 
-static void __vsf_linux_term_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+void __vsf_linux_term_rx(vsf_linux_fd_priv_t *priv)
 {
-    if (VSF_EVT_MESSAGE == evt) {
-        vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)vsf_eda_get_cur_msg();
-        vsf_protect_t orig = vsf_protect_sched();
-        if (vsf_stream_get_data_size(priv->stream_rx)) {
-            vsf_linux_fd_set_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
-        } else {
-            vsf_unprotect_sched(orig);
-        }
+    vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)priv;
+    vsf_protect_t orig = vsf_protect_sched();
+    if (vsf_stream_get_data_size(term_priv->stream_rx)) {
+        vsf_linux_fd_set_status(&term_priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
+    } else {
+        vsf_unprotect_sched(orig);
     }
 }
 
 static void __vsf_linux_term_notify_rx(vsf_linux_term_priv_t *priv)
 {
-    static vsf_eda_t __vsf_linux_term_eda;
-
-    if (NULL == __vsf_linux_term_eda.fn.evthandler) {
-        __vsf_linux_term_eda.fn.evthandler = __vsf_linux_term_evthandler;
-        vsf_eda_init(&__vsf_linux_term_eda, vsf_prio_highest);
-    }
-
-    vsf_eda_post_evt_msg(&__vsf_linux_term_eda, VSF_EVT_MESSAGE, priv);
+    vsf_eda_post_evt_msg(vsf_linux_get_kernel_task(), __VSF_EVT_LINUX_TERM_RX, priv);
 }
 
 static int __vsf_linux_term_fcntl_common(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)

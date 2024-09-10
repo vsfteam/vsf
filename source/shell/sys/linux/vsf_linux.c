@@ -230,6 +230,8 @@ typedef struct vsf_linux_t {
 
     long hostid;
     char hostname[HOST_NAME_MAX + 1];
+
+    vsf_eda_t task;
 } vsf_linux_t;
 
 typedef struct vsf_linux_process_heap_t {
@@ -873,6 +875,25 @@ static void __vsf_linux_thread_on_run(vsf_thread_cb_t *cb)
 }
 #endif
 
+static void __vsf_linux_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    switch (evt) {
+    case __VSF_EVT_LINUX_EVENTFD_INC:
+        extern void __vsf_linux_eventfd_inc(vsf_linux_fd_priv_t *priv);
+        __vsf_linux_eventfd_inc((vsf_linux_fd_priv_t *)vsf_eda_get_cur_msg());
+        break;
+    case __VSF_EVT_LINUX_TERM_RX:
+        extern void __vsf_linux_term_rx(vsf_linux_fd_priv_t *priv);
+        __vsf_linux_term_rx((vsf_linux_fd_priv_t *)vsf_eda_get_cur_msg());
+        break;
+    }
+}
+
+vsf_eda_t * vsf_linux_get_kernel_task(void)
+{
+    return &__vsf_linux.task;
+}
+
 static int __vsf_linux_init_thread(int argc, char *argv[])
 {
     int err = vsf_linux_create_fhs();
@@ -896,6 +917,10 @@ static int __vsf_linux_kernel_thread(int argc, char *argv[])
     vsf_kernel_trace_eda_info(&thread->use_as__vsf_eda_t, "linux_kernel_thread",
                                 thread->stack, thread->stack_size);
 #endif
+
+    __vsf_linux.task.fn.evthandler = __vsf_linux_kernel_evthandler;
+    __vsf_linux.task.on_terminate = NULL;
+    vsf_eda_init(&__vsf_linux.task);
 
     __vsf_linux.kernel_process = vsf_linux_get_cur_process();
     VSF_LINUX_ASSERT(__vsf_linux.kernel_process != NULL);

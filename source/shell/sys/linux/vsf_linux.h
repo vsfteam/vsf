@@ -88,6 +88,13 @@ extern "C" {
 
 /*============================ TYPES =========================================*/
 
+// linux kernel events
+
+enum {
+    __VSF_EVT_LINUX_EVENTFD_INC = VSF_EVT_USER + 0,
+    __VSF_EVT_LINUX_TERM_RX     = VSF_EVT_USER + 1,
+};
+
 vsf_dcl_class(vsf_linux_process_t)
 vsf_dcl_class(vsf_linux_thread_t)
 
@@ -468,6 +475,7 @@ extern void __free_ex(vsf_linux_process_t *process, void *ptr);
 #   define __strdup_ex(__process, __str)                vsf_linux_process_heap_strdup((__process), (char *)(__str))
 #endif
 
+extern vsf_eda_t * vsf_linux_get_kernel_task(void);
 extern void * vsf_linux_malloc_res(size_t size);
 extern void vsf_linux_free_res(void *ptr);
 

@@ -502,6 +502,20 @@ int eventfd_write(int fd, eventfd_t value)
     return write(fd, &value, sizeof(eventfd_t)) != sizeof(eventfd_t) ? -1 : 0;
 }
 
+// eventfd_inc_isr can be called in isr to increase eventfd
+void eventfd_inc_isr(vsf_linux_fd_priv_t *eventfd_priv)
+{
+    vsf_eda_post_evt_msg(vsf_linux_get_kernel_task(), __VSF_EVT_LINUX_EVENTFD_INC, eventfd_priv);
+}
+
+void __vsf_linux_eventfd_inc(vsf_linux_fd_priv_t *priv)
+{
+    vsf_linux_eventfd_priv_t *eventfd_priv = priv;
+    vsf_protect_t orig = vsf_protect_sched();
+    eventfd_priv->counter += 1;
+    vsf_linux_fd_set_status(&eventfd_priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
+}
+
 static int __vsf_linux_eventfd_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     return __vsf_linux_default_fcntl(sfd, cmd, arg);
