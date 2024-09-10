@@ -80,6 +80,7 @@
 
 extern int __vsf_linux_default_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 extern void __vsf_linux_term_notify_rx(vsf_linux_term_priv_t *priv);
+extern ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -337,7 +338,6 @@ static ssize_t __vsf_linux_uart_write(vsf_linux_fd_t *sfd, const void *buf, size
     return count;
 }
 
-extern ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static const vsf_linux_fd_op_t __vsf_linux_uart_fdop = {
     .priv_size          = sizeof(vsf_linux_uart_priv_t),
     .feature            = VSF_LINUX_FDOP_FEATURE_FS,
@@ -868,7 +868,7 @@ typedef struct vsf_linux_input_priv_t {
 #if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
     implement(vsf_linux_term_priv_t)
 #else
-    implement(vsf_linux_fs_priv_t)
+    implement(vsf_linux_stream_priv_t)
 #endif
     vk_input_notifier_t notifier;
 
@@ -878,21 +878,35 @@ typedef struct vsf_linux_input_priv_t {
             vsf_linux_input_event_t event_buffer[VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE];
             vsf_slist_queue_t event_queue;
         };
+        struct {
+            implement(vsf_fifo_stream_t)
+            uint8_t evtbuffer[VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE * sizeof(vsf_linux_input_event_t)];
+            enum {
+                VSF_LINUX_MOUSE_MODE_PS2 = 0,       // 3 buttons, x, y
+                VSF_LINUX_MOUSE_MODE_IMPS2,         // 3 buttons, x, y, wheel
+                VSF_LINUX_MOUSE_MODE_EXPLORERPS2,   // NOT SUPPORTED, 8 buttons, x, y
+            } mode;
+            uint8_t button;
+            uint16_t x, y;
+            bool x_sampled, y_sampled;
+        } mouse;
 #if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
         struct {
             implement(vsf_fifo_stream_t)
-            uint8_t keyboard_buffer[VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE * sizeof(vsf_linux_input_event_t)];
+            uint8_t evtbuffer[VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE * sizeof(vsf_linux_input_event_t)];
             uint8_t text_graphics_mode;
-            uint8_t keyboard_mode;
+            uint8_t mode;
             uint8_t led_status;
-            uint8_t keyboard_modifiers;
-        };
+            uint8_t modifiers;
+        } keyboard;
 #endif
     };
 
-#if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
-    bool is_terminal;
-#endif
+    // if is_extend is false, it's a normal input device,
+    //  like /dev/input/eventX
+    // if is_extend is true, it's a extended input device,
+    //  like /dev/console, /dev/keyboard, /dev/input/mouseX, /dev/input/mice
+    bool is_extend;
 } vsf_linux_input_priv_t;
 
 #if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
@@ -981,14 +995,16 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
 
     switch (type) {
     case VSF_INPUT_TYPE_SYNC:
-        input_event.code = SYN_REPORT;
-        input_event.value = 0;
-        input_event.type = EV_SYN;
-        __vsf_linux_input_push(input_priv, &input_event);
+        if (!input_priv->is_extend) {
+            input_event.code = SYN_REPORT;
+            input_event.value = 0;
+            input_event.type = EV_SYN;
+            __vsf_linux_input_push(input_priv, &input_event);
+        }
         break;
     case VSF_INPUT_TYPE_KEYBOARD:
 #if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
-        if (input_priv->is_terminal) {
+        if (input_priv->is_extend) {
             bool is_down = vsf_input_keyboard_is_down(evt);
             uint16_t vsf_keycode = vsf_input_keyboard_get_keycode(evt);
             // max scancode is 6 byte in length
@@ -996,12 +1012,12 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
 
             if ((vsf_keycode >= VSF_KB_MODIFIER_START) && (vsf_keycode <= VSF_KB_MODIFIER_END)) {
                 if (is_down) {
-                    input_priv->keyboard_modifiers |= 1 << (vsf_keycode - VSF_KB_MODIFIER_START);
+                    input_priv->keyboard.modifiers |= 1 << (vsf_keycode - VSF_KB_MODIFIER_START);
                 } else {
-                    input_priv->keyboard_modifiers &= ~(1 << (vsf_keycode - VSF_KB_MODIFIER_START));
+                    input_priv->keyboard.modifiers &= ~(1 << (vsf_keycode - VSF_KB_MODIFIER_START));
                 }
             }
-            if (input_priv->keyboard_mode == K_RAW) {
+            if (input_priv->keyboard.mode == K_RAW) {
                 // raw mode, send scancode directly
                 keylen = vsf_input_keyboard_get_scancode_from_keycode(vsf_keycode, keybuffer);
 
@@ -1018,25 +1034,25 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
                         keylen = 1;
                     }
                 }
-            } else if (input_priv->keyboard_mode == K_MEDIUMRAW) {
-                uint8_t keycode = __vsf_linux_terminal_keyboard_get_keycode(input_priv->keyboard_modifiers, vsf_keycode);
+            } else if (input_priv->keyboard.mode == K_MEDIUMRAW) {
+                uint8_t keycode = __vsf_linux_terminal_keyboard_get_keycode(input_priv->keyboard.modifiers, vsf_keycode);
                 keylen = 1;
                 keybuffer[0] = (is_down ? 0 : 0x80) | keycode;
-            } else if (input_priv->keyboard_mode == K_XLATE) {
-                uint8_t keycode = __vsf_linux_terminal_keyboard_get_keycode(input_priv->keyboard_modifiers, vsf_keycode);
-                keylen = __vsf_linux_terminal_keyboard_translate(input_priv->keyboard_modifiers, keycode, keybuffer);
+            } else if (input_priv->keyboard.mode == K_XLATE) {
+                uint8_t keycode = __vsf_linux_terminal_keyboard_get_keycode(input_priv->keyboard.modifiers, vsf_keycode);
+                keylen = __vsf_linux_terminal_keyboard_translate(input_priv->keyboard.modifiers, keycode, keybuffer);
             } else {
-                vsf_trace_error("keyboard: not supported mode %d\n", input_priv->keyboard_mode);
+                vsf_trace_error("keyboard: not supported mode %d\n", input_priv->keyboard.mode);
                 break;
             }
 
             if (keylen > 0) {
-                uint_fast32_t avail_len = vsf_stream_get_free_size(&input_priv->use_as__vsf_stream_t);
+                uint_fast32_t avail_len = vsf_stream_get_free_size(&input_priv->keyboard.use_as__vsf_stream_t);
                 if (keylen > avail_len) {
                     vsf_trace_error("keyboard: keyboard rx buffer overflow, please increase VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE\n");
                     break;
                 } else {
-                    vsf_stream_write(&input_priv->use_as__vsf_stream_t, keybuffer, keylen);
+                    vsf_stream_write(&input_priv->keyboard.use_as__vsf_stream_t, keybuffer, keylen);
                 }
             }
 
@@ -1044,13 +1060,13 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
             if (is_down) {
                 switch (vsf_keycode) {
                 case VSF_KP_NUMLOCK:
-                    input_priv->led_status ^= LED_NUM;
+                    input_priv->keyboard.led_status ^= LED_NUM;
                     break;
                 case VSF_KB_CAPSLOCK:
-                    input_priv->led_status ^= LED_CAP;
+                    input_priv->keyboard.led_status ^= LED_CAP;
                     break;
                 case VSF_KB_SCROLLLOCK:
-                    input_priv->led_status ^= LED_SCR;
+                    input_priv->keyboard.led_status ^= LED_SCR;
                     break;
                 default:
                     break;
@@ -1067,30 +1083,87 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
         }
         break;
     case VSF_INPUT_TYPE_MOUSE:
-        switch (vsf_input_mouse_evt_get(evt)) {
-        case VSF_INPUT_MOUSE_EVT_BUTTON:
-            input_event.code = BTN_MOUSE + vsf_input_mouse_evt_button_get(evt);
-            input_event.value = vsf_input_mouse_evt_button_is_down(evt) ? 1 : 0;
-            input_event.type = EV_KEY;
-            __vsf_linux_input_push(input_priv, &input_event);
-            // fall through
-        case VSF_INPUT_MOUSE_EVT_MOVE:
-            input_event.code = ABS_X;
-            input_event.value = vsf_input_mouse_evt_get_x(evt);
-            input_event.type = EV_ABS;
-            __vsf_linux_input_push(input_priv, &input_event);
+        if (input_priv->is_extend) {
+            int8_t mousebuffer[4] = { 0 };
+            uint16_t tmp;
+            bool valid = false;
 
-            input_event.code = ABS_Y;
-            input_event.value = vsf_input_mouse_evt_get_y(evt);
-            input_event.type = EV_ABS;
-            __vsf_linux_input_push(input_priv, &input_event);
-            break;
-        case VSF_INPUT_MOUSE_EVT_WHEEL:
-            input_event.code = REL_WHEEL;
-            input_event.value = vsf_input_mouse_evt_get_y(evt);
-            input_event.type = EV_REL;
-            __vsf_linux_input_push(input_priv, &input_event);
-            break;
+            switch (vsf_input_mouse_evt_get(evt)) {
+            case VSF_INPUT_MOUSE_EVT_BUTTON:
+                mousebuffer[0] = vsf_input_mouse_evt_button_get(evt);
+                switch (mousebuffer[0]) {
+                case VSF_INPUT_MOUSE_BUTTON_LEFT:   mousebuffer[0] = 1; break;
+                case VSF_INPUT_MOUSE_BUTTON_MIDDLE: mousebuffer[0] = 4; break;
+                case VSF_INPUT_MOUSE_BUTTON_RIGHT:  mousebuffer[0] = 2; break;
+                }
+                if (vsf_input_mouse_evt_button_is_down(evt)) {
+                    input_priv->mouse.button |= mousebuffer[0];
+                } else {
+                    input_priv->mouse.button &= ~mousebuffer[0];
+                }
+                valid = true;
+                // fall through
+            case VSF_INPUT_MOUSE_EVT_MOVE:
+                tmp = vsf_input_mouse_evt_get_x(evt);
+                if (!input_priv->mouse.x_sampled) {
+                    input_priv->mouse.x_sampled = true;
+                } else {
+                    mousebuffer[1] = tmp - input_priv->mouse.x;
+                }
+                input_priv->mouse.x = tmp;
+
+                tmp = vsf_input_mouse_evt_get_y(evt);
+                if (!input_priv->mouse.y_sampled) {
+                    input_priv->mouse.y_sampled = true;
+                } else {
+                    mousebuffer[2] = tmp - input_priv->mouse.y;
+                }
+                input_priv->mouse.y = tmp;
+                valid = mousebuffer[1] != 0 || mousebuffer[2] != 0;
+                break;
+            case VSF_INPUT_MOUSE_EVT_WHEEL:
+                if (input_priv->mouse.mode == VSF_LINUX_MOUSE_MODE_IMPS2) {
+                    mousebuffer[3] = vsf_input_mouse_evt_get_y(evt);
+                    valid = true;
+                }
+                break;
+            }
+            mousebuffer[0] = input_priv->mouse.button;
+            if (valid) {
+                uint_fast32_t avail_len = vsf_stream_get_free_size(&input_priv->mouse.use_as__vsf_stream_t);
+                if (avail_len < 4) {
+                    vsf_trace_error("mouse: mouse rx buffer overflow, please increase VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE\n");
+                    break;
+                } else {
+                    vsf_stream_write(&input_priv->mouse.use_as__vsf_stream_t, (uint8_t *)mousebuffer, 4);
+                }
+            }
+        } else {
+            switch (vsf_input_mouse_evt_get(evt)) {
+            case VSF_INPUT_MOUSE_EVT_BUTTON:
+                input_event.code = BTN_MOUSE + vsf_input_mouse_evt_button_get(evt);
+                input_event.value = vsf_input_mouse_evt_button_is_down(evt) ? 1 : 0;
+                input_event.type = EV_KEY;
+                __vsf_linux_input_push(input_priv, &input_event);
+                // fall through
+            case VSF_INPUT_MOUSE_EVT_MOVE:
+                input_event.code = ABS_X;
+                input_event.value = vsf_input_mouse_evt_get_x(evt);
+                input_event.type = EV_ABS;
+                __vsf_linux_input_push(input_priv, &input_event);
+
+                input_event.code = ABS_Y;
+                input_event.value = vsf_input_mouse_evt_get_y(evt);
+                input_event.type = EV_ABS;
+                __vsf_linux_input_push(input_priv, &input_event);
+                break;
+            case VSF_INPUT_MOUSE_EVT_WHEEL:
+                input_event.code = REL_WHEEL;
+                input_event.value = vsf_input_mouse_evt_get_y(evt);
+                input_event.type = EV_REL;
+                __vsf_linux_input_push(input_priv, &input_event);
+                break;
+            }
         }
         break;
     }
@@ -1111,10 +1184,7 @@ static void __vsf_linux_input_init(vsf_linux_fd_t *sfd)
         vk_input_notifier_register(&input_priv->notifier);
     }
 
-#if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
-    if (!input_priv->is_terminal)
-#endif
-    {
+    if (!input_priv->is_extend) {
         VSF_POOL_PREPARE(vsf_linux_input_event_pool, &input_priv->event_pool,
             .region_ptr = (vsf_protect_region_t *)&vsf_protect_region_int,
         );
@@ -1223,12 +1293,65 @@ int vsf_linux_fs_bind_input(char *path, vk_input_notifier_t *notifier)
                 VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
 }
 
+static void __vsf_linux_mouse_init(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_input_priv_t *keyboard_priv = (vsf_linux_input_priv_t *)sfd->priv;
+
+    keyboard_priv->is_extend = true;
+    __vsf_linux_input_init(sfd);
+
+    keyboard_priv->mouse.op = &vsf_fifo_stream_op;
+    keyboard_priv->mouse.buffer = keyboard_priv->mouse.evtbuffer;
+    keyboard_priv->mouse.size = sizeof(keyboard_priv->mouse.evtbuffer);
+    keyboard_priv->stream_rx = &keyboard_priv->mouse.use_as__vsf_stream_t;
+}
+
+static ssize_t __vsf_linux_mouse_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    VSF_LINUX_ASSERT(!(count % 4));
+    return __vsf_linux_stream_read(sfd, buf, count);
+}
+
+static ssize_t __vsf_linux_mouse_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
+{
+    vsf_linux_input_priv_t *input_priv = (vsf_linux_input_priv_t *)sfd->priv;
+
+    // switch mouse mode between PS2/ImPS2/ExplorerPS2 modes
+    static const uint8_t __imps2_seq[6] = { 0xf3, 200, 0xf3, 100, 0xf3, 80 };
+    if ((count == 6) && !memcmp(buf, __imps2_seq, 5)) {
+        input_priv->mouse.mode = VSF_LINUX_MOUSE_MODE_IMPS2;
+        return count;
+    } else {
+        vsf_trace_error("mouse: unrecognized mouse sequence");
+        return -1;
+    }
+}
+
+static const vsf_linux_fd_op_t __vsf_linux_mouse_fdop = {
+    .priv_size          = sizeof(vsf_linux_input_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
+    .fn_init            = __vsf_linux_mouse_init,
+    .fn_fcntl           = __vsf_linux_input_fcntl,
+    .fn_read            = __vsf_linux_mouse_read,
+    .fn_write           = __vsf_linux_mouse_write,
+    .fn_close           = __vsf_linux_input_close,
+    .fn_stat            = __vsf_linux_input_stat,
+};
+
+int vsf_linux_fs_bind_mouse(char *path, vk_input_notifier_t *notifier)
+{
+    VSF_LINUX_ASSERT(notifier->mask == (1 << VSF_INPUT_TYPE_MOUSE));
+    return vsf_linux_fs_bind_target_ex(
+                path, notifier, &__vsf_linux_mouse_fdop, NULL, NULL,
+                VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
+}
+
 #if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
 static void __vsf_linux_terminal_keyboard_init(vsf_linux_fd_t *sfd)
 {
     vsf_linux_input_priv_t *keyboard_priv = (vsf_linux_input_priv_t *)sfd->priv;
 
-    keyboard_priv->is_terminal = true;
+    keyboard_priv->is_extend = true;
     __vsf_linux_input_init(sfd);
 
     keyboard_priv->subop = sfd->op;
@@ -1236,10 +1359,10 @@ static void __vsf_linux_terminal_keyboard_init(vsf_linux_fd_t *sfd)
     sfd->op = &vsf_linux_term_fdop;
     vsf_linux_term_fdop.fn_init(sfd);
 
-    keyboard_priv->op = &vsf_fifo_stream_op;
-    keyboard_priv->buffer = keyboard_priv->keyboard_buffer;
-    keyboard_priv->size = sizeof(keyboard_priv->keyboard_buffer);
-    keyboard_priv->stream_rx = &keyboard_priv->use_as__vsf_stream_t;
+    keyboard_priv->keyboard.op = &vsf_fifo_stream_op;
+    keyboard_priv->keyboard.buffer = keyboard_priv->keyboard.evtbuffer;
+    keyboard_priv->keyboard.size = sizeof(keyboard_priv->keyboard.evtbuffer);
+    keyboard_priv->stream_rx = &keyboard_priv->keyboard.use_as__vsf_stream_t;
 
     vsf_stream_connect_tx(keyboard_priv->stream_rx);
 }
@@ -1250,19 +1373,19 @@ static int __vsf_linux_terminal_keyboard_fcntl(vsf_linux_fd_t *sfd, int cmd, uin
 
     switch (cmd) {
     case KDGETMODE:
-        *(int *)arg = keyboard_priv->text_graphics_mode;
+        *(int *)arg = keyboard_priv->keyboard.text_graphics_mode;
         break;
     case KDSETMODE:
-        keyboard_priv->text_graphics_mode = arg;
+        keyboard_priv->keyboard.text_graphics_mode = arg;
         break;
     case KDGKBMODE:
-        *(int *)arg = keyboard_priv->keyboard_mode;
+        *(int *)arg = keyboard_priv->keyboard.mode;
         break;
     case KDSKBMODE:
-        keyboard_priv->keyboard_mode = arg;
+        keyboard_priv->keyboard.mode = arg;
         break;
     case KDGETLED:
-        *(int *)arg = keyboard_priv->led_status;
+        *(int *)arg = keyboard_priv->keyboard.led_status;
         break;
     case KDGKBENT: {
             struct kbentry *entry = (struct kbentry *)arg;
@@ -1296,7 +1419,7 @@ int vsf_linux_fs_bind_terminal_keyboard(char *path, vk_input_notifier_t *notifie
     VSF_LINUX_ASSERT(notifier->mask == (1 << VSF_INPUT_TYPE_KEYBOARD));
     return vsf_linux_fs_bind_target_ex(
                 path, notifier, &__vsf_linux_terminal_keyboard_fdop, NULL, NULL,
-                VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
+                VSF_FILE_ATTR_READ, 0);
 }
 #endif      // VSF_LINUX_USE_TERMINAL_KEYBOARD
 #endif
