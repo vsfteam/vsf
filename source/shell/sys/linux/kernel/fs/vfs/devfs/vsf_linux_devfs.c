@@ -1299,15 +1299,10 @@ static void __vsf_linux_mouse_init(vsf_linux_fd_t *sfd)
     vsf_linux_input_priv_t *mouse_priv = (vsf_linux_input_priv_t *)sfd->priv;
 
     vsf_linux_mouse_t *mouse = (vsf_linux_mouse_t *)(((vk_vfs_file_t *)(mouse_priv->file))->f.param);
-    mouse_priv->notifier.dev = mouse->notifier.dev;
-    mouse_priv->notifier.mask = mouse->notifier.mask;
     mouse_priv->mouse.sensitivity = mouse->default_sensitivity;
-    mouse_priv->is_extend = true;
 
-    if (mouse_priv->notifier.mask != 0) {
-        mouse_priv->notifier.on_evt = __vsf_linux_input_on_event;
-        vk_input_notifier_register(&mouse_priv->notifier);
-    }
+    mouse_priv->is_extend = true;
+    __vsf_linux_input_init(sfd);
 
     mouse_priv->mouse.op = &vsf_fifo_stream_op;
     mouse_priv->mouse.buffer = mouse_priv->mouse.evtbuffer;
@@ -1349,7 +1344,7 @@ static const vsf_linux_fd_op_t __vsf_linux_mouse_fdop = {
 
 int vsf_linux_fs_bind_mouse(char *path, vsf_linux_mouse_t *mouse)
 {
-    VSF_LINUX_ASSERT(mouse->notifier.mask == (1 << VSF_INPUT_TYPE_MOUSE));
+    mouse->notifier.mask = 1 << VSF_INPUT_TYPE_MOUSE;
     return vsf_linux_fs_bind_target_ex(
                 path, mouse, &__vsf_linux_mouse_fdop, NULL, NULL,
                 VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
@@ -1423,11 +1418,11 @@ static const vsf_linux_fd_op_t __vsf_linux_terminal_keyboard_fdop = {
     .fn_stat            = __vsf_linux_input_stat,
 };
 
-int vsf_linux_fs_bind_terminal_keyboard(char *path, vk_input_notifier_t *notifier)
+int vsf_linux_fs_bind_terminal_keyboard(char *path, vsf_linux_terminal_keyboard_t *keyboard)
 {
-    VSF_LINUX_ASSERT(notifier->mask == (1 << VSF_INPUT_TYPE_KEYBOARD));
+    keyboard->notifier.mask = 1 << VSF_INPUT_TYPE_KEYBOARD;
     return vsf_linux_fs_bind_target_ex(
-                path, notifier, &__vsf_linux_terminal_keyboard_fdop, NULL, NULL,
+                path, keyboard, &__vsf_linux_terminal_keyboard_fdop, NULL, NULL,
                 VSF_FILE_ATTR_READ, 0);
 }
 #endif      // VSF_LINUX_USE_TERMINAL_KEYBOARD
