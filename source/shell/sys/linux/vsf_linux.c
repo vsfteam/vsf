@@ -877,13 +877,14 @@ static void __vsf_linux_thread_on_run(vsf_thread_cb_t *cb)
 
 static void __vsf_linux_kernel_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
+    extern void __vsf_linux_eventfd_inc(vsf_linux_fd_priv_t *priv);
+    extern void __vsf_linux_term_rx(vsf_linux_fd_priv_t *priv);
+
     switch (evt) {
     case __VSF_EVT_LINUX_EVENTFD_INC:
-        extern void __vsf_linux_eventfd_inc(vsf_linux_fd_priv_t *priv);
         __vsf_linux_eventfd_inc((vsf_linux_fd_priv_t *)vsf_eda_get_cur_msg());
         break;
     case __VSF_EVT_LINUX_TERM_RX:
-        extern void __vsf_linux_term_rx(vsf_linux_fd_priv_t *priv);
         __vsf_linux_term_rx((vsf_linux_fd_priv_t *)vsf_eda_get_cur_msg());
         break;
     }
