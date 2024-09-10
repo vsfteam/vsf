@@ -889,6 +889,7 @@ typedef struct vsf_linux_input_priv_t {
             uint8_t button;
             uint16_t x, y;
             bool x_sampled, y_sampled;
+            float sensitivity;
         } mouse;
 #if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
         struct {
@@ -1295,15 +1296,23 @@ int vsf_linux_fs_bind_input(char *path, vk_input_notifier_t *notifier)
 
 static void __vsf_linux_mouse_init(vsf_linux_fd_t *sfd)
 {
-    vsf_linux_input_priv_t *keyboard_priv = (vsf_linux_input_priv_t *)sfd->priv;
+    vsf_linux_input_priv_t *mouse_priv = (vsf_linux_input_priv_t *)sfd->priv;
 
-    keyboard_priv->is_extend = true;
-    __vsf_linux_input_init(sfd);
+    vsf_linux_mouse_t *mouse = (vsf_linux_mouse_t *)(((vk_vfs_file_t *)(mouse_priv->file))->f.param);
+    mouse_priv->notifier.dev = mouse->notifier.dev;
+    mouse_priv->notifier.mask = mouse->notifier.mask;
+    mouse_priv->mouse.sensitivity = mouse->default_sensitivity;
+    mouse_priv->is_extend = true;
 
-    keyboard_priv->mouse.op = &vsf_fifo_stream_op;
-    keyboard_priv->mouse.buffer = keyboard_priv->mouse.evtbuffer;
-    keyboard_priv->mouse.size = sizeof(keyboard_priv->mouse.evtbuffer);
-    keyboard_priv->stream_rx = &keyboard_priv->mouse.use_as__vsf_stream_t;
+    if (mouse_priv->notifier.mask != 0) {
+        mouse_priv->notifier.on_evt = __vsf_linux_input_on_event;
+        vk_input_notifier_register(&mouse_priv->notifier);
+    }
+
+    mouse_priv->mouse.op = &vsf_fifo_stream_op;
+    mouse_priv->mouse.buffer = mouse_priv->mouse.evtbuffer;
+    mouse_priv->mouse.size = sizeof(mouse_priv->mouse.evtbuffer);
+    mouse_priv->stream_rx = &mouse_priv->mouse.use_as__vsf_stream_t;
 }
 
 static ssize_t __vsf_linux_mouse_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
@@ -1314,12 +1323,12 @@ static ssize_t __vsf_linux_mouse_read(vsf_linux_fd_t *sfd, void *buf, size_t cou
 
 static ssize_t __vsf_linux_mouse_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
-    vsf_linux_input_priv_t *input_priv = (vsf_linux_input_priv_t *)sfd->priv;
+    vsf_linux_input_priv_t *mouse_priv = (vsf_linux_input_priv_t *)sfd->priv;
 
     // switch mouse mode between PS2/ImPS2/ExplorerPS2 modes
     static const uint8_t __imps2_seq[6] = { 0xf3, 200, 0xf3, 100, 0xf3, 80 };
     if ((count == 6) && !memcmp(buf, __imps2_seq, 5)) {
-        input_priv->mouse.mode = VSF_LINUX_MOUSE_MODE_IMPS2;
+        mouse_priv->mouse.mode = VSF_LINUX_MOUSE_MODE_IMPS2;
         return count;
     } else {
         vsf_trace_error("mouse: unrecognized mouse sequence");
@@ -1338,11 +1347,11 @@ static const vsf_linux_fd_op_t __vsf_linux_mouse_fdop = {
     .fn_stat            = __vsf_linux_input_stat,
 };
 
-int vsf_linux_fs_bind_mouse(char *path, vk_input_notifier_t *notifier)
+int vsf_linux_fs_bind_mouse(char *path, vsf_linux_mouse_t *mouse)
 {
-    VSF_LINUX_ASSERT(notifier->mask == (1 << VSF_INPUT_TYPE_MOUSE));
+    VSF_LINUX_ASSERT(mouse->notifier.mask == (1 << VSF_INPUT_TYPE_MOUSE));
     return vsf_linux_fs_bind_target_ex(
-                path, notifier, &__vsf_linux_mouse_fdop, NULL, NULL,
+                path, mouse, &__vsf_linux_mouse_fdop, NULL, NULL,
                 VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
 }
 

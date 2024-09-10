@@ -42,6 +42,13 @@ typedef struct vsf_linux_gpio_chip_t {
 } vsf_linux_gpio_chip_t;
 #endif
 
+#if VSF_USE_INPUT == ENABLED && VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
+typedef struct vsf_linux_mouse_t {
+    vk_input_notifier_t notifier;
+    float default_sensitivity;
+} vsf_linux_mouse_t;
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -61,7 +68,7 @@ extern int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal);
 #endif
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
 extern int vsf_linux_fs_bind_input(char *path, vk_input_notifier_t *notifier);
-extern int vsf_linux_fs_bind_mouse(char *path, vk_input_notifier_t *notifier);
+extern int vsf_linux_fs_bind_mouse(char *path, vsf_linux_mouse_t *mouse);
 #   if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
 extern int vsf_linux_fs_bind_terminal_keyboard(char *path, vk_input_notifier_t *notifier);
 #   endif
