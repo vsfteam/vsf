@@ -63,13 +63,13 @@ enum {
     VSF_HAL_DISTBUS_GPIO_CMD_ADDR_RANGE,
 };
 
-typedef enum vsf_hal_distbus_gpio_feature_t {
-    // TODO: add more features
-    VSF_HAL_DISTBUS_GPIO_FEATURE_DUMMY,
-} vsf_hal_distbus_gpio_feature_t;
+typedef enum vsf_hal_distbus_gpio_mode_t {
+    // TODO: add more mode
+    VSF_HAL_DISTBUS_GPIO_MODE_DUMMY,
+} vsf_hal_distbus_gpio_mode_t;
 typedef struct vsf_hal_distbus_gpio_config_pin_t {
     vsf_gpio_pin_mask_t pin_mask;
-    uint32_t feature;
+    vsf_gpio_mode_t     mode;
 } VSF_CAL_PACKED vsf_hal_distbus_gpio_config_pin_t;
 
 typedef struct vsf_hal_distbus_gpio_set_direction_t {
