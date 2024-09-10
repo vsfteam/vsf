@@ -231,8 +231,12 @@ typedef enum vsf_gpio_mode_t {
  * 如果它特性支持多个选项，建议提供对应的 MASK 选项，方便用户在运行时切换到不同的模式。
  *
  * ```c
- * vsf_gpio_mode_t mode = VSF_IO_OUTPUT_PUSH_PULL;
- * vsf_gpio_config_pin(&vsf_hw_gpi0, 0x00000001, mode);
+ * vsf_gpio_cfg_t cfg = {
+ *     .mode = VSF_IO_OUTPUT_PUSH_PULL,
+ *     ...
+ * };
+ * vsf_gpio_mode_t
+ * vsf_gpio_config_pin(&vsf_hw_gpi0, &cfg);
  * ```
  *
  * \~chinese
