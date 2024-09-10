@@ -1310,20 +1310,17 @@ static void __vsf_linux_mouse_init(vsf_linux_fd_t *sfd)
     mouse_priv->stream_rx = &mouse_priv->mouse.use_as__vsf_stream_t;
 }
 
-static ssize_t __vsf_linux_mouse_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
-{
-    VSF_LINUX_ASSERT(!(count % 4));
-    return __vsf_linux_stream_read(sfd, buf, count);
-}
-
 static ssize_t __vsf_linux_mouse_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
     vsf_linux_input_priv_t *mouse_priv = (vsf_linux_input_priv_t *)sfd->priv;
 
     // switch mouse mode between PS2/ImPS2/ExplorerPS2 modes
-    static const uint8_t __imps2_seq[6] = { 0xf3, 200, 0xf3, 100, 0xf3, 80 };
+    static const uint8_t __imps2_seq[6] = { 0xF3, 200, 0xF3, 100, 0xF3, 80 };
+    uint8_t reply;
     if ((count == 6) && !memcmp(buf, __imps2_seq, 5)) {
         mouse_priv->mouse.mode = VSF_LINUX_MOUSE_MODE_IMPS2;
+        reply = 0xF4;
+        vsf_stream_write(&mouse_priv->mouse.use_as__vsf_stream_t, &reply, 1);
         return count;
     } else {
         vsf_trace_error("mouse: unrecognized mouse sequence");
@@ -1336,7 +1333,7 @@ static const vsf_linux_fd_op_t __vsf_linux_mouse_fdop = {
     .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_init            = __vsf_linux_mouse_init,
     .fn_fcntl           = __vsf_linux_input_fcntl,
-    .fn_read            = __vsf_linux_mouse_read,
+    .fn_read            = __vsf_linux_stream_read,
     .fn_write           = __vsf_linux_mouse_write,
     .fn_close           = __vsf_linux_input_close,
     .fn_stat            = __vsf_linux_input_stat,
