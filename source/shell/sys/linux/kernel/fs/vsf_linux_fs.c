@@ -3356,6 +3356,22 @@ int mknodat(int dirfd, const char *pathname, mode_t mode, dev_t dev)
 
 // term
 
+void __vsf_linux_term_rx(vsf_linux_fd_priv_t *priv)
+{
+    vsf_linux_term_priv_t *term_priv = (vsf_linux_term_priv_t *)priv;
+    vsf_protect_t orig = vsf_protect_sched();
+    if (vsf_stream_get_data_size(term_priv->stream_rx)) {
+        vsf_linux_fd_set_status(&term_priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
+    } else {
+        vsf_unprotect_sched(orig);
+    }
+}
+
+void __vsf_linux_term_notify_rx(vsf_linux_term_priv_t *priv)
+{
+    vsf_eda_post_evt_msg(vsf_linux_get_kernel_task(), __VSF_EVT_LINUX_TERM_RX, priv);
+}
+
 static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
 {
     vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
