@@ -888,7 +888,7 @@ typedef struct vsf_linux_input_priv_t {
             } mode;
             uint8_t button;
             uint16_t x, y;
-            bool x_sampled, y_sampled;
+            bool sampled;
             float sensitivity;
         } mouse;
 #if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
@@ -1086,7 +1086,7 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
     case VSF_INPUT_TYPE_MOUSE:
         if (input_priv->is_extend) {
             int8_t mousebuffer[4] = { 0 };
-            uint16_t tmp;
+            uint16_t tmpx, tmpy;
             bool valid = false;
 
             switch (vsf_input_mouse_evt_get(evt)) {
@@ -1105,22 +1105,17 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
                 valid = true;
                 // fall through
             case VSF_INPUT_MOUSE_EVT_MOVE:
-                tmp = vsf_input_mouse_evt_get_x(evt);
-                if (!input_priv->mouse.x_sampled) {
-                    input_priv->mouse.x_sampled = true;
+                tmpx = vsf_input_mouse_evt_get_x(evt);
+                tmpy = vsf_input_mouse_evt_get_y(evt);
+                if (!input_priv->mouse.sampled) {
+                    input_priv->mouse.sampled = true;
                 } else {
-                    mousebuffer[1] = tmp - input_priv->mouse.x;
+                    mousebuffer[1] = tmpx - input_priv->mouse.x;
+                    mousebuffer[2] = -(tmpy - input_priv->mouse.y);
+                    valid = true;
                 }
-                input_priv->mouse.x = tmp;
-
-                tmp = vsf_input_mouse_evt_get_y(evt);
-                if (!input_priv->mouse.y_sampled) {
-                    input_priv->mouse.y_sampled = true;
-                } else {
-                    mousebuffer[2] = tmp - input_priv->mouse.y;
-                }
-                input_priv->mouse.y = tmp;
-                valid = mousebuffer[1] != 0 || mousebuffer[2] != 0;
+                input_priv->mouse.x = tmpx;
+                input_priv->mouse.y = tmpy;
                 break;
             case VSF_INPUT_MOUSE_EVT_WHEEL:
                 if (input_priv->mouse.mode == VSF_LINUX_MOUSE_MODE_IMPS2) {
@@ -1129,13 +1124,14 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
                 }
                 break;
             }
-            mousebuffer[0] = input_priv->mouse.button;
+
             if (valid) {
                 uint_fast32_t avail_len = vsf_stream_get_free_size(&input_priv->mouse.use_as__vsf_stream_t);
                 if (avail_len < 4) {
                     vsf_trace_error("mouse: mouse rx buffer overflow, please increase VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE\n");
                     break;
                 } else {
+                    mousebuffer[0] = input_priv->mouse.button;
                     vsf_stream_write(&input_priv->mouse.use_as__vsf_stream_t, (uint8_t *)mousebuffer, 4);
                 }
             }
