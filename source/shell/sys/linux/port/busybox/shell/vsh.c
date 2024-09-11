@@ -638,6 +638,25 @@ cleanup:
 #   pragma diag_suppress=pe111
 #endif
 
+int vsh_run_scripts(const char *scripts)
+{
+    FILE *f = fopen(scripts, "rt");
+    if (f != NULL) {
+        char linebuf[256], *line;
+        do {
+            line = fgets(linebuf, sizeof(linebuf), f);
+            if (line != NULL) {
+                while ((*line != '\0') && isspace((int)*line)) { line++; }
+
+                if (*line != '\0' && *line != '#') {
+                    system(line);
+                }
+            }
+        } while (line != NULL);
+    }
+    return 0;
+}
+
 int vsh_main(int argc, char *argv[])
 {
     vsh_cmd_ctx_t ctx = { 0 };
@@ -651,6 +670,9 @@ int vsh_main(int argc, char *argv[])
 
         strcpy(ctx.cmd, argv[2]);
         return __vsh_run_cmd(ctx.cmd);
+    }
+    if (argc > 1) {
+        return vsh_run_scripts(argv[1]);
     }
 
 #if VSH_HAS_COLOR
