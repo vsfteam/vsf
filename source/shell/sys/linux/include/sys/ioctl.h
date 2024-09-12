@@ -59,6 +59,7 @@ enum {
     FIONREAD        = F_IO + 4,
     TIOCSERCONFIG   = F_IO + 5,
     TIOCSWINSZ      = F_IO + 6,
+    TIOCCONS        = F_IO + 7,
 };
 
 #if VSF_LINUX_APPLET_USE_SYS_IOCTL == ENABLED
