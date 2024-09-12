@@ -208,8 +208,8 @@ static int __vsf_linux_socket_unix_connect(vsf_linux_socket_priv_t *socket_priv,
         ||  (NULL == priv->pipe_remote)) {
         return -1;
     }
-    VSF_LINUX_ASSERT(priv_remote->trig != NULL);
     priv_remote = (vsf_linux_socket_unix_priv_t *)priv->pipe_remote;
+    VSF_LINUX_ASSERT(priv_remote->trig != NULL);
 
     if (__vsf_linux_tx_pipe_init(&priv->use_as__vsf_linux_pipe_priv_t, &priv_remote->use_as__vsf_linux_pipe_priv_t)) {
         priv_remote->pipe_remote = NULL;
