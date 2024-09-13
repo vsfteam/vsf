@@ -137,19 +137,18 @@ VSF_CAL_WEAK(vsf_disp_mipi_spi_lcd_io_init)
 void vsf_disp_mipi_spi_lcd_io_init(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
 {
 #if VSF_DISP_MIPI_SPI_LCD_USING_VSF_GPIO == ENABLED
-    vsf_gpio_cfg_t reset_cfg = {
-        .pin_mask = disp_mipi_spi_lcd->reset.pin_mask,
+    vsf_gpio_cfg_t cfg = {
         .mode = VSF_GPIO_PULL_UP,
     };
-    vsf_gpio_config_pin(disp_mipi_spi_lcd->reset.gpio, &reset_cfg);
+    vsf_gpio_port_config_pins(disp_mipi_spi_lcd->reset.gpio,
+                        disp_mipi_spi_lcd->reset.pin_mask,
+                        &cfg);
     vsf_gpio_set_output(disp_mipi_spi_lcd->reset.gpio,
                         disp_mipi_spi_lcd->reset.pin_mask);
 
-    vsf_gpio_cfg_t dcx_cfg = {
-        .pin_mask = disp_mipi_spi_lcd->dcx.pin_mask,
-        .mode = VSF_GPIO_PULL_UP,
-    };
-    vsf_gpio_config_pin(disp_mipi_spi_lcd->dcx.gpio, &dcx_cfg);
+    vsf_gpio_port_config_pins(disp_mipi_spi_lcd->dcx.gpio,
+                        disp_mipi_spi_lcd->dcx.pin_mask,
+                        &cfg);
     vsf_gpio_set_output(disp_mipi_spi_lcd->dcx.gpio,
                         disp_mipi_spi_lcd->dcx.pin_mask);
 #endif

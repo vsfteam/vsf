@@ -45,10 +45,10 @@ const vsf_gpio_op_t vsf_remapped_gpio_op = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_remapped_gpio_config_pin(vsf_remapped_gpio_t *gpio, vsf_gpio_cfg_t *cfg)
+vsf_err_t vsf_remapped_gpio_port_config_pins(vsf_remapped_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_cfg_t *cfg)
 {
     VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));
-    return vsf_gpio_config_pin(gpio->target, cfg);
+    return vsf_gpio_port_config_pins(gpio->target, pin_mask, cfg);
 }
 
 void vsf_remapped_gpio_set_direction(vsf_remapped_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)
@@ -127,6 +127,12 @@ vsf_gpio_capability_t vsf_remapped_gpio_capability(vsf_remapped_gpio_t *gpio)
 {
     VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));
     return vsf_gpio_capability(gpio->target);
+}
+
+vsf_err_t vsf_remapped_gpio_exti_irq_config(vsf_remapped_gpio_t *gpio, vsf_gpio_exti_irq_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));
+    return vsf_gpio_exti_irq_config(gpio->target, cfg_ptr);
 }
 
 vsf_err_t vsf_remapped_gpio_exti_irq_enable(vsf_remapped_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask)

@@ -15,53 +15,62 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_AIC8800_HW_IO_H__
-#define __HAL_DRIVER_AIC8800_HW_IO_H__
+#ifndef __HAL_DRIVER_GPIO_EXTI_H__
+#define __HAL_DRIVER_GPIO_EXTI_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_IO == ENABLED
+#if VSF_HAL_USE_GPIO == ENABLED
 
-#include "../__device.h"
+#if defined(__VSF_HAL_USE_GPIO_EXTI_CLASS_IMPLEMENT)
+#   define __VSF_CLASS_IMPLEMENT__
+#endif
 
-/*============================ MACROS ========================================*/
+#include "utilities/ooc_class.h"
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ MACROS ========================================*/
+
+#ifndef VSF_EXTI_GPIO_CFG_MULTI_CLASS
+#   define VSF_EXTI_GPIO_CFG_MULTI_CLASS   VSF_GPIO_CFG_MULTI_CLASS
+#endif
+
 /*============================ TYPES =========================================*/
 
-typedef enum vsf_io_mode_t {
-    // bit 9  : IOMUX_AGPIO_CONFIG_PULL_UP_LSB
-    // bit 8  : IOMUX_AGPIO_CONFIG_PULL_DN_LSB
-    // bit 16 : IOMUX_GPIO_CONFIG_PULL_FRC_LSB
-    __AIC8800_IO_MODE_ALL_BITS      = (1 << 8) | (1 << 9) | (1 << 16),
+typedef struct vsf_exti_gpio_irq_t {
+    vsf_gpio_exti_isr_handler_t *handler_fn;
+    void                        *target_ptr;
+} vsf_exti_gpio_irq_t;
 
-    VSF_IO_PULL_UP                  = (1 << 16) | (1 << 9),
-    VSF_IO_PULL_DOWN                = (1 << 16) | (1 << 8),
-    VSF_IO_NO_PULL_UP_DOWN          = (0 << 16) | (0 << 8),
+typedef struct vsf_exti_gpio_t {
+#if VSF_EXTI_GPIO_CFG_MULTI_CLASS == ENABLED
+    vsf_gpio_t vsf_gpio;
+#endif
+    vsf_gpio_t * gpio;
+    uint8_t pin_cnt;
+    vsf_arch_prio_t prio;
+    vsf_exti_gpio_irq_t *exti_irq;
+} vsf_exti_gpio_t;
 
-    VSF_IO_INPUT                    = (0 << 17),
-    VSF_IO_OUTPUT_OPEN_DRAIN        = (1 << 17),
-    VSF_IO_OUTPUT_PUSH_PULL         = (2 << 17),
-    VSF_IO_ANALOG                   = (3 << 17),
-    VSF_IO_EXTI                     = (4 << 17),
-    VSF_IO_AF                       = (5 << 17),
+/*============================ INCLUDES ======================================*/
 
-    VSF_IO_EXTI_MODE_NONE           = (0 << 21),
-    VSF_IO_EXTI_MODE_LOW_LEVEL      = (1 << 21),
-    VSF_IO_EXTI_MODE_HIGH_LEVEL     = (2 << 21),
-    VSF_IO_EXTI_MODE_RISING         = (3 << 21),
-    VSF_IO_EXTI_MODE_FALLING        = (4 << 21),
-    VSF_IO_EXTI_MODE_RISING_FALLING = (5 << 21),
-
-} vsf_io_mode_t;
+#define VSF_GPIO_CFG_DEC_PREFIX              vsf_exti
+#define VSF_GPIO_CFG_DEC_UPCASE_PREFIX       vsf_exti
+#define VSF_GPIO_CFG_DEC_EXTERN_OP           ENABLED
+#include "hal/driver/common/gpio/gpio_template.h"
 
 /*============================ PROTOTYPES ====================================*/
 
-extern uint32_t aic8800_io_reg_read(bool is_pmic, volatile uint32_t *reg);
-extern void aic8800_io_reg_mask_write(bool is_pmic, volatile uint32_t *reg,
-                                      uint32_t wdata, uint32_t wmask);
-/*============================ INCLUDES ======================================*/
+extern vsf_err_t vsf_exti_gpio_exti_irq_pin_config(
+    vsf_exti_gpio_t *hw_exti_gpio_ptr, vsf_gpio_pin_mask_t pin_mask,
+    vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr);
 
-#endif /* VSF_HAL_USE_IO */
-#endif /* __HAL_DRIVER_AIC8800_HW_IO_H__ */
+/*============================ IMPLEMENTATION ================================*/
+
+#endif
+
+#endif
+/* EOF */

@@ -57,7 +57,7 @@ void vsf_74hc595_gpio_init(vsf_74hc595_gpio_t *gpio_ptr)
     gpio_ptr->op->clock_control(gpio_ptr->param, 0);
 }
 
-void vsf_74hc595_gpio_config_pin(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, uint_fast32_t feature)
+void vsf_74hc595_gpio_port_config_pins(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_cfg_t *cfg_ptr)
 {
 
 }

@@ -89,27 +89,33 @@
                 .utmi_en            = false,                                    \
                 .vbus_en            = false,
 
-#define VSF_HW_IO_PORT_COUNT            2
-#define VSF_HW_IO_PIN_COUNT             16
-#define VSF_HW_IO_FUNCTION_MAX          10 // All Function 10 ~ Function 15 is invalid
-#define VSF_HW_IO_PORT0_IOMUX_REG_BASE  (0x40503000)
-#define VSF_HW_IO_PORT0_IS_PMIC         false
-#define VSF_HW_IO_PORT0_MAP             NULL
-#define VSF_HW_IO_PORT0_GPIO_PIN_MASK   (0x00000000)    // PORTA is not pmic port, only used to compile, ignore it's value
-#define VSF_HW_IO_PORT1_IOMUX_REG_BASE  (0x50012000)
-#define VSF_HW_IO_PORT1_IS_PMIC         true
-#define VSF_HW_IO_PORT1_MAP             &((vsf_hw_io_gpio_map_t){1, 1, 0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0})
-#define VSF_HW_IO_PORT1_GPIO_PIN_MASK   (0x0000FFFC)    // GPIOB0 and GPIOB1 default function is not GPIO
                                                         //GPIOB2 ~ GPIOB15 default function is GPIO
 
-#define VSF_HW_GPIO_PORT_COUNT          VSF_HW_IO_PORT_COUNT
-#define VSF_HW_GPIO_PIN_COUNT           VSF_HW_IO_PIN_COUNT
+#define VSF_HW_GPIO_PORT_COUNT          2
+#define VSF_HW_GPIO_PIN_COUNT           16
+#define VSF_HW_GPIO_EXTI_PORT_MASK      0x01    // only PORTA support external interrupt
+
+#define VSF_HW_GPIO_FUNCTION_MAX        10 // All Function 10 ~ Function 15 is invalid
 #define VSF_HW_GPIO0_BASE_ADDRESS       (0x40504000UL)
+#define VSF_HW_GPIO0_IOMUX_REG_BASE     (0x40503000)
+// GPIOA0 : SWCLK
+// GPIOA1 : SWD
+// GPIOA8 : UART0_RX
+// GPIOA9 : UART0_TX
+#define VSF_HW_GPIO0_MAP                {1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0}
+#define VSF_HW_GPIO0_GPIO_PIN_MASK      (0x00000000)    // PORTA is not pmic port, only used to compile, ignore it's value
 #define VSF_HW_GPIO0_IRQ_IDX            GPIO_IRQn
 #define VSF_HW_GPIO0_IRQ                GPIO_IRQHandler
+#define VSF_HW_GPIO0_IS_PMIC            false
 #define VSF_HW_GPIO1_BASE_ADDRESS       (0x50011000UL)
+#define VSF_HW_GPIO1_IOMUX_REG_BASE     (0x50012000)
+// GPIOB0: PSI_SCL
+// GPIOB1: PSI_SDA
+#define VSF_HW_GPIO1_MAP                {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define VSF_HW_GPIO1_GPIO_PIN_MASK      (0x0000FFFC)    // GPIOB0 and GPIOB1 default function is not GPIO
 #define VSF_HW_GPIO1_IRQ_IDX            0                   // TODO
 #define VSF_HW_GPIO1_IRQ                GPIOB_IRQHandler
+#define VSF_HW_GPIO1_IS_PMIC            true
 
 #define VSF_HW_RNG_COUNT            1
 #define VSF_HW_RNG_BITLEN           32

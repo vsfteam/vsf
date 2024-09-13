@@ -10621,21 +10621,21 @@
                         </file>
                     </group>
                     <group>
-                        <name>sdmmc_mal</name>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\sdmmc_mal\vsf_sdmmc_mal.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\sdmmc_mal\vsf_sdmmc_mal.h</name>
-                        </file>
-                    </group>
-                    <group>
                         <name>scsi_mal</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\scsi_mal\vsf_scsi_mal.c</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\scsi_mal\vsf_scsi_mal.h</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>sdmmc_mal</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\sdmmc_mal\vsf_sdmmc_mal.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\component\mal\driver\sdmmc_mal\vsf_sdmmc_mal.h</name>
                         </file>
                     </group>
                 </group>
@@ -12100,24 +12100,6 @@
                             </file>
                         </group>
                         <group>
-                            <name>io</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\io\io.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\io\io.h</name>
-                            </file>
-                        </group>
-                        <group>
-                            <name>sdio</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\sdio\sdio.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\sdio\sdio.h</name>
-                            </file>
-                        </group>
-                        <group>
                             <name>port</name>
                             <group>
                                 <name>arch</name>
@@ -12196,6 +12178,15 @@
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\rtc\rtc.h</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>sdio</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\sdio\sdio.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\sdio\sdio.h</name>
                             </file>
                         </group>
                         <group>
@@ -14057,6 +14048,12 @@
                     <group>
                         <name>gpio</name>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\exti_gpio.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\exti_gpio.h</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_common.c</name>
                         </file>
                         <file>
@@ -14064,6 +14061,12 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_template.inc</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_template_base.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\gpio\gpio_template_base.inc</name>
                         </file>
                     </group>
                     <group>
@@ -14109,33 +14112,6 @@
                         </file>
                     </group>
                     <group>
-                        <name>io</name>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\io\io_common.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\io\io_template.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\io\io_template.inc</name>
-                        </file>
-                    </group>
-                    <group>
-                        <name>sdio</name>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\sdio\sdio_common.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\sdio\sdio_probe.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\sdio\sdio_probe.h</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\sdio\sdio_template.h</name>
-                        </file>
-                    </group>
-                    <group>
                         <name>pwm</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\pwm\pwm_common.c</name>
@@ -14172,6 +14148,21 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\rtc\rtc_template.inc</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>sdio</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\sdio\sdio_common.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\sdio\sdio_probe.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\sdio\sdio_probe.h</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\sdio\sdio_template.h</name>
                         </file>
                     </group>
                     <group>
@@ -15293,12 +15284,12 @@
                         </file>
                     </group>
                     <group>
-                        <name>io</name>
+                        <name>pwm</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\io\vsf_remapped_io.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.c</name>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\io\vsf_remapped_io.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.h</name>
                         </file>
                     </group>
                     <group>
@@ -15308,15 +15299,6 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\sdio\vsf_remapped_sdio.h</name>
-                        </file>
-                    </group>
-                    <group>
-                        <name>pwm</name>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.c</name>
-                        </file>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.h</name>
                         </file>
                     </group>
                     <group>

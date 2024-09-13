@@ -47,9 +47,9 @@
 
 #ifndef VSF_AIC8800_ADC_CFG_EDA_PRIORITY
 #   warning AIC8800_ADC has no complete interrupt, so teda is used to poll result,\
-        VSF_AIC8800_ADC_CFG_EDA_PRIORITY can be used to confire the priority of the teda.\
-        Default value vsf_prio_0 is used since it's not defined by user.\
-        Note that callback_timer is avoided because priority can not be adjusted.
+VSF_AIC8800_ADC_CFG_EDA_PRIORITY can be used to confire the priority of the teda.\
+Default value vsf_prio_0 is used since it's not defined by user.\
+Note that callback_timer is avoided because priority can not be adjusted.
 #   define VSF_AIC8800_ADC_CFG_EDA_PRIORITY     vsf_prio_0
 #endif
 
@@ -174,10 +174,9 @@ static vsf_err_t __vsf_hw_adc_channel_config(vsf_hw_adc_t *hw_adc_ptr, vsf_adc_c
     }
 
     vsf_gpio_cfg_t cfg = {
-        .pin_mask = 1 << channel,
         .mode = VSF_GPIO_INPUT,
     };
-    vsf_hw_gpio_config_pin(&vsf_hw_gpio1, &cfg);
+    vsf_hw_gpio_port_config_pins(&vsf_hw_gpio1, 1 << channel, &cfg);
     vsf_hw_gpio_set_input(&vsf_hw_gpio1, 1 << channel);
 
     PMIC_MEM_MASK_WRITE((unsigned int)(&aic1000liteIomux->GPCFG[channel]),

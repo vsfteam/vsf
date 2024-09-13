@@ -71,7 +71,7 @@ void __vsf_hw_bl61x_gpio_init(void)
     }
 }
 
-void vsf_hw_gpio_config_pin(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_mode_t feature)
+void vsf_hw_gpio_port_config_pins(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_mode_t feature)
 {
     VSF_HAL_ASSERT((NULL != hw_gpio_ptr) && (hw_gpio_ptr->dev != NULL));
     VSF_HAL_ASSERT(__BL61X_IO_IS_VAILID_PIN(pin_mask));
@@ -91,12 +91,12 @@ void vsf_hw_gpio_set_direction(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_mask_t p
 
     vsf_gpio_pin_mask_t mask = pin_mask & direction_mask;
     if (mask) {
-        vsf_hw_gpio_config_pin(hw_gpio_ptr, mask, GPIO_OUTPUT);
+        vsf_hw_gpio_port_config_pins(hw_gpio_ptr, mask, GPIO_OUTPUT);
         hw_gpio_ptr->direction |= mask;
     }
     mask = pin_mask & ~direction_mask;
     if (mask) {
-        vsf_hw_gpio_config_pin(hw_gpio_ptr, mask, GPIO_OUTPUT);
+        vsf_hw_gpio_port_config_pins(hw_gpio_ptr, mask, GPIO_OUTPUT);
         hw_gpio_ptr->direction &= ~mask;
     }
 }

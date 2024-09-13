@@ -32,19 +32,17 @@ extern "C" {
 /*============================ MACROS ========================================*/
 /*============================ INCLUDES ======================================*/
 
-#include "hal/driver/common/adc/adc_interface.h"
-#include "hal/driver/common/flash/flash_interface.h"
-#include "hal/driver/common/spi/spi_interface.h"
-#include "hal/driver/common/usart/usart_interface.h"
-
-#include "hal/driver/common/i2c/i2c_request.h"
-#include "hal/driver/common/i2c/mrequest_i2c.h"
-#include "hal/driver/common/i2c/multiplex_i2c.h"
-
-#include "hal/driver/common/spi/multiplex_spi.h"
-#include "hal/driver/common/spi/fifo2req_spi.h"
-
-#include "hal/driver/common/usart/fifo2req_usart.h"
+#    include "hal/driver/common/adc/adc_interface.h"
+#    include "hal/driver/common/flash/flash_interface.h"
+#    include "hal/driver/common/gpio/exti_gpio.h"
+#    include "hal/driver/common/i2c/i2c_request.h"
+#    include "hal/driver/common/i2c/mrequest_i2c.h"
+#    include "hal/driver/common/i2c/multiplex_i2c.h"
+#    include "hal/driver/common/spi/fifo2req_spi.h"
+#    include "hal/driver/common/spi/multiplex_spi.h"
+#    include "hal/driver/common/spi/spi_interface.h"
+#    include "hal/driver/common/usart/fifo2req_usart.h"
+#    include "hal/driver/common/usart/usart_interface.h"
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

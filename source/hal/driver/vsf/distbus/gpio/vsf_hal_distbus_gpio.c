@@ -113,19 +113,20 @@ uint32_t vsf_hal_distbus_gpio_register_service(vsf_distbus_t *distbus, vsf_hal_d
     return sizeof(vsf_hal_distbus_gpio_info_t);
 }
 
-vsf_err_t vsf_hal_distbus_gpio_config_pin(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_cfg_t *cfg)
+vsf_err_t vsf_hal_distbus_gpio_port_config_pins(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_cfg_t *cfg)
 {
     VSF_HAL_ASSERT(NULL != gpio);
     VSF_HAL_ASSERT(NULL != cfg);
     VSF_HAL_ASSERT(gpio->info.support_config_pin);
 
-    vsf_hal_distbus_gpio_config_pin_t *param;
+    vsf_hal_distbus_gpio_port_config_pins_t *param;
     vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(gpio->distbus, sizeof(*param), (uint8_t **)&param);
     VSF_HAL_ASSERT(msg != NULL);
 
     msg->header.addr = VSF_HAL_DISTBUS_GPIO_CMD_CONFIG_PIN;
-    param->pin_mask = cpu_to_le32(cfg->pin_mask);
+    param->pin_mask = cpu_to_le32(pin_mask);
     param->mode = cpu_to_le32(vsf_generic_io_feature_to_hal_distbus_io_feature(cfg->mode));
+    param->alternate_function = cpu_to_le32(cfg->alternate_function);
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
     return VSF_ERR_NONE;
 }
@@ -148,6 +149,11 @@ void vsf_hal_distbus_gpio_set_direction(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_p
         gpio->info.direction &= ~pin_mask;
         gpio->info.direction |= pin_mask & direction_mask;
     __vsf_gpio_unprotect(orig);
+}
+
+vsf_err_t vsf_hal_distbus_gpio_exti_irq_config(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_exti_irq_cfg_t *cfg_ptr)
+{
+    return VSF_ERR_NOT_SUPPORT;
 }
 
 vsf_err_t vsf_hal_distbus_gpio_exti_irq_enable(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask)
@@ -282,7 +288,6 @@ vsf_gpio_capability_t vsf_hal_distbus_gpio_capability(vsf_hal_distbus_gpio_t *gp
 {
     return (vsf_gpio_capability_t) {
         .is_async                    = true,
-        .support_config_pin          = gpio->info.support_config_pin,
         .support_output_and_set      = gpio->info.support_output_and_set,
         .support_output_and_clear    = gpio->info.support_output_and_clear,
         .pin_count                   = gpio->info.pin_count,

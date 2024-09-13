@@ -32,7 +32,6 @@
 #       include "hal/driver/common/swi/vsf_swi_template.h"
 #       include "./device.h"
 
-#       include "./io/io.h"
 #       include "./adc/adc.h"
 #       include "./debug_uart/debug_uart.h"
 #       include "./flash/flash.h"
@@ -55,17 +54,8 @@
 /*============================ TYPES =========================================*/
 /*============================ INCLUDES ======================================*/
 
-#if VSF_HAL_USE_IO == ENABLED
-#   define VSF_IO_CFG_REIMPLEMENT_TYPE_MODE                 ENABLED
-#   include "hal/driver/common/template/vsf_template_io.h"
-
-#   define VSF_IO_CFG_DEC_PREFIX                            vsf_hw
-#   define VSF_IO_CFG_DEC_UPCASE_PREFIX                     VSF_HW
-#   include "hal/driver/common/io/io_template.h"
-#endif
-
 #if VSF_HAL_USE_GPIO == ENABLED
-#   define VSF_GPIO_USE_IO_MODE_TYPE                        ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE               ENABLED
 #   include "hal/driver/common/template/vsf_template_gpio.h"
 
 #   define VSF_GPIO_CFG_DEC_PREFIX                          vsf_hw

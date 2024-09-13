@@ -32,13 +32,13 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_gpio_config_pin(vsf_gpio_t *gpio_ptr, vsf_gpio_cfg_t *cfg_ptr)
+vsf_err_t vsf_gpio_port_config_pins(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(gpio_ptr->op != NULL);
-    VSF_HAL_ASSERT(gpio_ptr->op->config_pin != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op->port_config_pins != NULL);
 
-    return gpio_ptr->op->config_pin(gpio_ptr, cfg_ptr);
+    return gpio_ptr->op->port_config_pins(gpio_ptr, pin_mask, cfg_ptr);
 }
 
 void vsf_gpio_set_direction(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)
@@ -156,6 +156,16 @@ vsf_gpio_capability_t vsf_gpio_capability(vsf_gpio_t *gpio_ptr)
     VSF_HAL_ASSERT(gpio_ptr->op->capability != NULL);
 
     return gpio_ptr->op->capability(gpio_ptr);
+}
+
+vsf_err_t vsf_gpio_exti_irq_config(vsf_gpio_t *gpio_ptr, vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)
+{
+    VSF_HAL_ASSERT(gpio_ptr != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op->exti_irq_config != NULL);
+    VSF_HAL_ASSERT(irq_cfg_ptr != NULL);
+
+    return gpio_ptr->op->exti_irq_config(gpio_ptr, irq_cfg_ptr);
 }
 
 vsf_err_t vsf_gpio_exti_irq_enable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)

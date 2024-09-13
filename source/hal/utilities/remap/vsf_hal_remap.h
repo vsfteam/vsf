@@ -20,7 +20,6 @@
 #ifndef __VSF_HAL_REMAP_H__
 #define __VSF_HAL_REMAP_H__
 
-#include "./io/vsf_remapped_io.h"
 #include "./gpio/vsf_remapped_gpio.h"
 #include "./i2c/vsf_remapped_i2c.h"
 #include "./spi/vsf_remapped_spi.h"
