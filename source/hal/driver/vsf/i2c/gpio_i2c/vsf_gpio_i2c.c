@@ -48,11 +48,11 @@ vsf_err_t vsf_gpio_i2c_init(vsf_gpio_i2c_t *gpio_i2c_ptr, vsf_i2c_cfg_t *cfg_ptr
     VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);
 
+    vsf_gpio_pin_mask_t pin_mask = (1 << gpio_i2c_ptr->scl_pin) | (1 << gpio_i2c_ptr->sda_pin);
     vsf_gpio_cfg_t cfg = {
-        .pin_mask = (1 << gpio_i2c_ptr->scl_pin) | (1 << gpio_i2c_ptr->sda_pin),
         .mode = VSF_GPIO_OUTPUT_OPEN_DRAIN | VSF_GPIO_PULL_UP,
     };
-    vsf_gpio_config_pin(gpio_i2c_ptr->port, &cfg);
+    vsf_gpio_port_config_pins(gpio_i2c_ptr->port, pin_mask, &cfg);
     vsf_gpio_set_input(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->scl_pin);
     vsf_gpio_set_input(gpio_i2c_ptr->port, 1 << gpio_i2c_ptr->sda_pin);
 

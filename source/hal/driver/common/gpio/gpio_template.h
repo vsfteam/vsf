@@ -9,44 +9,40 @@
  *                                                                           *
  *  Unless required by applicable law or agreed to in writing, software      *
  *  distributed under the License is distributed on an "AS IS" BASIS,        *
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or DEClied. *
  *  See the License for the specific language governing permissions and      *
  *  limitations under the License.                                           *
  *                                                                           *
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-/*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define VSF_HAL_TEMPLATE_DEC_NAME                   _gpio
-#define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME            _GPIO
-#define VSF_HAL_TEMPLATE_DEC_COUNT_SUFFIX           _PORT_COUNT
-#define VSF_HAL_TEMPLATE_DEC_MASK_SUFFIX            _PORT_MASK
+#define VSF_HAL_TEMPLATE_DEC_RETAIN_DEFINED_PREFIX  ENABLED
+#include "hal/driver/common/gpio/gpio_template_base.h"
+#undef VSF_HAL_TEMPLATE_DEC_RETAIN_DEFINED_PREFIX
 
-#ifndef __VSF_TEMPLATE_GPIO_H__
-#   error "Please include \"vsf_template_gpio.h\" before include gpio_template.h"
+#define VSF_GPIO_EXTI_DEC_PORT_MASK                 VSF_MCONNECT(VSF_GPIO_CFG_DEC_UPCASE_PREFIX, _GPIO_EXTI_PORT_MASK)
+#define VSF_GPIO_EXTI_DEC_PORT_COUNT                VSF_MCONNECT(VSF_GPIO_CFG_DEC_UPCASE_PREFIX, _GPIO_EXTI_PORT_COUNT)
+
+#if !defined(VSF_GPIO_EXTI_DEC_MACRO_ONCE) && ((VSF_GPIO_EXTI_DEC_PORT_COUNT > 0) || (VSF_GPIO_EXTI_DEC_PORT_MASK > 0))
+#   define VSF_HAL_TEMPLATE_DEC_PREFIX              VSF_MCONNECT(VSF_GPIO_CFG_DEC_PREFIX, _exti)
+#   define VSF_HAL_TEMPLATE_DEC_INSTANCE_PREFIX     VSF_MCONNECT(VSF_GPIO_CFG_DEC_PREFIX, _exti)
+#   define VSF_HAL_TEMPLATE_DEC_UPCASE_PREFIX       VSF_MCONNECT(VSF_GPIO_CFG_DEC_UPCASE_PREFIX, _EXTI)
+
+#   define VSF_HAL_TEMPLATE_DEC_COUNT_MASK_PREFIX   VSF_GPIO_CFG_DEC_UPCASE_PREFIX
+#   define VSF_HAL_TEMPLATE_DEC_COUNT_SUFFIX        _EXTI_PORT_COUNT
+#   define VSF_HAL_TEMPLATE_DEC_MASK_SUFFIX         _EXTI_PORT_MASK
+
+#   define VSF_GPIO_CFG_DEC_REMAP_PREFIX            vsf_exti
+#   include "hal/driver/common/gpio/gpio_template_base.h"
+#   undef VSF_HAL_TEMPLATE_DEC_RETAIN_DEFINED_PREFIX
+
+#   undef VSF_GPIO_EXTI_DEC_PORT_MASK
+#   undef VSF_GPIO_EXTI_DEC_PORT_COUNT
+#   define VSF_GPIO_EXTI_DEC_MACRO_ONCE
+#else
+#   undef VSF_GPIO_CFG_DEC_PREFIX
+#   undef VSF_GPIO_CFG_DEC_UPCASE_PREFIX
 #endif
 
-#ifndef VSF_GPIO_CFG_DEC_PREFIX
-#   error "Please define VSF_GPIO_CFG_DEC_PREFIX before include gpio_template.h"
-#endif
-
-#ifndef VSF_GPIO_CFG_DEC_UPCASE_PREFIX
-#   error "Please define VSF_GPIO_CFG_DEC_UPCASE_PREFIX before include gpio_template.h"
-#endif
-
-#ifndef VSF_GPIO_CFG_DEC_REMAP_PREFIX
-#   define VSF_GPIO_CFG_DEC_REMAP_PREFIX            VSF_GPIO_CFG_DEC_PREFIX
-#endif
-
-#ifndef VSF_GPIO_CFG_DEC_COUNT_MASK_PREFIX
-#   define VSF_GPIO_CFG_DEC_COUNT_MASK_PREFIX       VSF_GPIO_CFG_DEC_UPCASE_PREFIX
-#endif
-
-#include "hal/driver/common/template/vsf_template_instance_declaration.h"
-
-#undef VSF_GPIO_CFG_DEC_PREFIX
-#undef VSF_GPIO_CFG_DEC_UPCASE_PREFIX
-#undef VSF_GPIO_CFG_DEC_COUNT_MASK_PREFIX
-#undef VSF_GPIO_CFG_DEC_REMAP_PREFIX
-#undef VSF_GPIO_CFG_DEC_EXTERN_OP
+#include "hal/driver/common/gpio/exti_gpio.h"

@@ -1123,9 +1123,6 @@
     <Filter Include="vsf\hal\utilities\remap\i2s">
       <UniqueIdentifier>{be611d08-5d6a-4ca2-9749-e4db33ffdbb6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\hal\utilities\remap\io">
-      <UniqueIdentifier>{4bb1e40d-69f4-421a-a040-9ffcdf5dd3a9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\hal\utilities\remap\spi">
       <UniqueIdentifier>{86e19b75-7947-44a9-bfa0-eca0a299acef}</UniqueIdentifier>
     </Filter>
@@ -1134,9 +1131,6 @@
     </Filter>
     <Filter Include="vsf\hal\utilities\remap\usart">
       <UniqueIdentifier>{08986211-2554-4bef-ae8e-2c4d767ed848}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\hal\driver\common\io">
-      <UniqueIdentifier>{96b65b31-903f-4efe-85fc-965bff6e9c26}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\hal\driver\x86\win\rng">
       <UniqueIdentifier>{19fbc2cb-69d7-4255-bad1-888d1ca4ad5e}</UniqueIdentifier>
@@ -3327,9 +3321,6 @@
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\i2s\vsf_remapped_i2s.h">
       <Filter>vsf\hal\utilities\remap\i2s</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\io\vsf_remapped_io.h">
-      <Filter>vsf\hal\utilities\remap\io</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\spi\vsf_remapped_spi.h">
       <Filter>vsf\hal\utilities\remap\spi</Filter>
     </ClInclude>
@@ -3338,9 +3329,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\usart\vsf_remapped_usart.h">
       <Filter>vsf\hal\utilities\remap\usart</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\driver\common\io\io_template.h">
-      <Filter>vsf\hal\driver\common\io</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rng\rng.h">
       <Filter>vsf\hal\driver\x86\win\rng</Filter>
@@ -5894,9 +5882,6 @@
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\i2s\vsf_remapped_i2s.c">
       <Filter>vsf\hal\utilities\remap\i2s</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\io\vsf_remapped_io.c">
-      <Filter>vsf\hal\utilities\remap\io</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\spi\vsf_remapped_spi.c">
       <Filter>vsf\hal\utilities\remap\spi</Filter>
     </ClCompile>
@@ -5905,9 +5890,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\usart\vsf_remapped_usart.c">
       <Filter>vsf\hal\utilities\remap\usart</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\hal\driver\common\io\io_common.c">
-      <Filter>vsf\hal\driver\common\io</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rng\rng.c">
       <Filter>vsf\hal\driver\x86\win\rng</Filter>
@@ -6075,9 +6057,6 @@
     </None>
     <None Include="..\..\..\..\source\shell\sys\linux\include\simple_libc\xstring">
       <Filter>vsf\shell\sys\linux\include\simple_libc</Filter>
-    </None>
-    <None Include="..\..\..\..\source\hal\driver\common\io\io_template.inc">
-      <Filter>vsf\hal\driver\common\io</Filter>
     </None>
     <None Include="..\..\..\..\source\hal\driver\common\adc\adc_template.inc">
       <Filter>vsf\hal\driver\common\adc</Filter>

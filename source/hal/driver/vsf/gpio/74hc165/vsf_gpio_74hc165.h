@@ -114,7 +114,7 @@ extern const vsf_gpio_op_t vsf_74hc165_gpio_op;
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsf_74hc165_gpio_init(vsf_74hc165_gpio_t *gpio_ptr);
-extern void vsf_74hc165_gpio_config_pin(vsf_74hc165_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, uint_fast32_t feature);
+extern void vsf_74hc165_gpio_port_config_pins(vsf_74hc165_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_cfg_t *cfg);
 extern void vsf_74hc165_gpio_set_direction(vsf_74hc165_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask);
 extern vsf_gpio_pin_mask_t vsf_74hc165_gpio_get_direction(vsf_74hc165_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 extern void vsf_74hc165_gpio_set_input(vsf_74hc165_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);

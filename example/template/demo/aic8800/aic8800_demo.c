@@ -109,32 +109,32 @@ void vsf_board_init(void)
         VSF_HAL_ASSERT(false);
     }
 
-    vsf_io_cfg_t cfgs[] = {
-        {VSF_PA10,  0x03,   0}, // PA10 as spi sck
-        {VSF_PA11,  0x03,   0}, // PA10 as spi csn
-        {VSF_PA12,  0x03,   0}, // PA10 as spi di
-        {VSF_PA13,  0x03,   0}, // PA10 as spi do
+    vsf_gpio_port_cfg_pin_t cfgs[] = {
+        {VSF_PA10, VSF_GPIO_AF, 0x03}, // PA10 as spi sck
+        {VSF_PA11, VSF_GPIO_AF, 0x03}, // PA10 as spi csn
+        {VSF_PA12, VSF_GPIO_AF, 0x03}, // PA10 as spi di
+        {VSF_PA13, VSF_GPIO_AF, 0x03}, // PA10 as spi do
 
 #if VSF_DISP_USE_MIPI_SPI_LCD == ENABLED
-        {VSF_PA5,   0x00,   0},    // PA5 as LCD RESET
-        {VSF_PA6,   0x00,   0},    // PA6 as LCD DCS
-        {VSF_PA7,   0x00,   0},    // PA7 as LCD TE
+        {VSF_PA5,  VSF_GPIO_INPUT},    // PA5 as LCD RESET
+        {VSF_PA6,  VSF_GPIO_INPUT},    // PA6 as LCD DCS
+        {VSF_PA7,  VSF_GPIO_INPUT},    // PA7 as LCD TE
 #endif
 
 #ifdef APP_USE_HAL_GPIO_DEMO
-        {VSF_PA10,  0x00,   VSF_IO_PULL_UP},
-        {VSF_PB3,   0x00,   VSF_IO_PULL_UP},
+        {VSF_PA10, VSF_GPIO_INPUT | VSF_GPIO_PULL_UP},
+        {VSF_PB3,  VSF_GPIO_INPUT | VSF_GPIO_PULL_UP},
 #endif
 #if APP_USE_LINUX_TTY_DEMO == ENABLED
-        {VSF_PA10,  0x01,   0},
-        {VSF_PA11,  0x01,   0},
+        {VSF_PB2, VSF_GPIO_AF, 0x01},
+        {VSF_PB3, VSF_GPIO_AF, 0x01},
 #endif
 #ifdef APP_USE_HAL_I2C_DEMO
-        {VSF_PA14,  0x01,   VSF_IO_PULL_UP},
-        {VSF_PA15,  0x01,   VSF_IO_PULL_UP},
+        {VSF_PA14, VSF_GPIO_AF | VSF_GPIO_PULL_UP, 0x01},
+        {VSF_PA15, VSF_GPIO_AF | VSF_GPIO_PULL_UP, 0x01},
 #endif
     };
-    vsf_io_config(cfgs, dimof(cfgs));
+    vsf_hw_gpio_ports_config_pin(cfgs, dimof(cfgs));
 
 #if AIC8800_APP_USE_WIFI_DEMO == ENABLED
     extern void aic8800_wifi_start(void);

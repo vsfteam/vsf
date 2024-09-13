@@ -59,7 +59,7 @@ typedef struct w600_gpio_reg_t w600_gpio_reg_t;
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-void vsf_gpio_config_pin(       vsf_gpio_t *pthis,
+void vsf_gpio_port_config_pins(       vsf_gpio_t *pthis,
                                 vsf_gpio_cfg_t *cfg_ptr)
 {
     w600_gpio_reg_t *reg = (w600_gpio_reg_t *)pthis->reg;

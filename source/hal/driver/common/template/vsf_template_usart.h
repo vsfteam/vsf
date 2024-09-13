@@ -158,7 +158,7 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
 #define __VSF_USART_REQUEST_EXTRA_APIS(__prefix_name)                           \
         __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,          usart, cmd,                   VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr, vsf_usart_cmd_t cmd, void* param)
 
-#define VSF_USART_INLINE_APIS(__prefix_name)                                    \
+#define VSF_USART_ADDITIONAL_APIS(__prefix_name)                                \
     static inline vsf_err_t VSF_MCONNECT(__prefix_name, _usart_send_break)      \
         (VSF_MCONNECT(__prefix_name, _usart_t) *usart_ptr)                      \
     {                                                                           \

@@ -121,19 +121,14 @@ vsf_err_t vk_input_cst8_init(vk_input_cst8_t *cst8, vsf_arch_prio_t prio)
     vsf_i2c_enable(cst8->i2c_ptr);
 
     vsf_gpio_cfg_t cfg = {
-        .pin_mask = 1 << cst8->gpio_int_pin_idx,
         .mode = VSF_GPIO_PULL_UP | VSF_GPIO_EXTI | VSF_GPIO_EXTI_MODE_FALLING,
-        .isr            = {
-            .handler_fn = __vk_input_cst8_eint_isrhandler,
-            .target_ptr = cst8,
-            .prio = cst8->prio,
-        },
-    };
-    vsf_gpio_config_pin(cst8->gpio_int_port, ,
-        );
-    vsf_gpio_exti_config(cst8->gpio_int_port, &(vsf_gpio_pin_irq_cfg_t){
-        .pin_mask       = 1 << cst8->gpio_int_pin_idx,
 
+    };
+    vsf_gpio_port_config_pins(cst8->gpio_int_port, 1 << cst8->gpio_int_pin_idx, &cfg);
+    vsf_gpio_exti_irq_pin_config(cst8->gpio_int_port, 1 << cst8->gpio_int_pin_idx, &(vsf_gpio_pin_irq_cfg_t){
+        .handler_fn = __vk_input_cst8_eint_isrhandler,
+        .target_ptr = cst8,
+        .prio = cst8->prio,
     });
     cst8->prio = prio;
     vsf_gpio_exti_irq_disable(cst8->gpio_int_port, 1 << cst8->gpio_int_pin_idx);

@@ -29,6 +29,10 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef __VSF_HW_USART_CFG_MULTI_CLASS
+#   define __VSF_HW_USART_CFG_MULTI_CLASS           VSF_USART_CFG_MULTI_CLASS
+#endif
+
 #ifndef VSF_HW_USART_CFG_MULTI_CLASS
 #   define VSF_HW_USART_CFG_MULTI_CLASS             VSF_USART_CFG_MULTI_CLASS
 #endif

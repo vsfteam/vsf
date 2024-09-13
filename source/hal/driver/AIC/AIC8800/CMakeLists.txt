@@ -5,7 +5,6 @@ vsf_add_sources(
     startup_AIC8800.c
 )
 
-add_subdirectory(io)
 add_subdirectory(adc)
 add_subdirectory(debug_uart)
 add_subdirectory(flash)

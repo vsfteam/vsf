@@ -67,10 +67,11 @@ typedef enum vsf_hal_distbus_gpio_mode_t {
     // TODO: add more mode
     VSF_HAL_DISTBUS_GPIO_MODE_DUMMY,
 } vsf_hal_distbus_gpio_mode_t;
-typedef struct vsf_hal_distbus_gpio_config_pin_t {
+typedef struct vsf_hal_distbus_gpio_port_config_pins_t {
     vsf_gpio_pin_mask_t pin_mask;
     vsf_gpio_mode_t     mode;
-} VSF_CAL_PACKED vsf_hal_distbus_gpio_config_pin_t;
+    uint16_t            alternate_function;
+} VSF_CAL_PACKED vsf_hal_distbus_gpio_port_config_pins_t;
 
 typedef struct vsf_hal_distbus_gpio_set_direction_t {
     vsf_gpio_pin_mask_t pin_mask;

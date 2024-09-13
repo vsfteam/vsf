@@ -325,9 +325,6 @@
     <Filter Include="vsf\hal\utilities\remap\i2s">
       <UniqueIdentifier>{e02012f2-69eb-43b6-9e9f-83abbafedb6d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vsf\hal\utilities\remap\io">
-      <UniqueIdentifier>{59977ead-32ee-4b4b-a7d9-c616633f157a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vsf\hal\utilities\remap\pwm">
       <UniqueIdentifier>{6ac9eb08-6239-451a-a677-00eb88b9db56}</UniqueIdentifier>
     </Filter>
@@ -351,9 +348,6 @@
     </Filter>
     <Filter Include="vsf\hal\driver\common\i2s">
       <UniqueIdentifier>{432cd71e-6925-49ba-a660-14adb677edb4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="vsf\hal\driver\common\io">
-      <UniqueIdentifier>{c38bb877-9e2d-456d-bfdd-ff9051fa6a8a}</UniqueIdentifier>
     </Filter>
     <Filter Include="vsf\hal\driver\common\pwm">
       <UniqueIdentifier>{a140cc5f-879c-4d46-b2ca-5e6d9914e20a}</UniqueIdentifier>
@@ -1179,9 +1173,6 @@
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\i2s\vsf_remapped_i2s.h">
       <Filter>vsf\hal\utilities\remap\i2s</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\io\vsf_remapped_io.h">
-      <Filter>vsf\hal\utilities\remap\io</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.h">
       <Filter>vsf\hal\utilities\remap\pwm</Filter>
     </ClInclude>
@@ -1277,9 +1268,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\driver\common\pm\pm_template.h">
       <Filter>vsf\hal\driver\common\pm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\hal\driver\common\io\io_template.h">
-      <Filter>vsf\hal\driver\common\io</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\driver\common\i2s\i2s_template.h">
       <Filter>vsf\hal\driver\common\i2s</Filter>
@@ -1814,9 +1802,6 @@
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\i2s\vsf_remapped_i2s.c">
       <Filter>vsf\hal\utilities\remap\i2s</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\io\vsf_remapped_io.c">
-      <Filter>vsf\hal\utilities\remap\io</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.c">
       <Filter>vsf\hal\utilities\remap\pwm</Filter>
     </ClCompile>
@@ -1849,9 +1834,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\driver\common\pwm\pwm_common.c">
       <Filter>vsf\hal\driver\common\pwm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\hal\driver\common\io\io_common.c">
-      <Filter>vsf\hal\driver\common\io</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\driver\common\i2s\i2s_common.c">
       <Filter>vsf\hal\driver\common\i2s</Filter>
@@ -1920,9 +1902,6 @@
     </None>
     <None Include="..\..\..\..\source\hal\driver\common\pm\pm_template.inc">
       <Filter>vsf\hal\driver\common\pm</Filter>
-    </None>
-    <None Include="..\..\..\..\source\hal\driver\common\io\io_template.inc">
-      <Filter>vsf\hal\driver\common\io</Filter>
     </None>
     <None Include="..\..\..\..\source\hal\driver\common\i2s\i2s_template.inc">
       <Filter>vsf\hal\driver\common\i2s</Filter>

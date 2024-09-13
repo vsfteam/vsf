@@ -60,18 +60,19 @@ void HAL_GPIO_Init(GPIO_TypeDef *GPIOx, GPIO_InitTypeDef *GPIO_Init)
     vsf_gpio_t *gpio = (vsf_gpio_t *)GPIOx;
 
     vsf_gpio_cfg_t cfg = {
-        .pin_mask = GPIO_Init->Pin,
         .mode = GPIO_Init->Mode | GPIO_Init->Pull |
-                           GPIO_Init->Speed | GPIO_Init->Alternate,
-        .isr = {
+                           GPIO_Init->Speed,
+        .alternate =  GPIO_Init->Alternate,
+    };
+    vsf_gpio_port_config_pins(gpio, GPIO_Init->Pin, &cfg);
+    if ((cfg.mode & VSF_GPIO_MODE_MASK) == VSF_GPIO_EXTI) {
+        vsf_gpio_exti_irq_cfg_t exti_irq_cfg = {
             .handler_fn = __sthal_gpio_isr_handler,
             .target_ptr = NULL,
             .prio = VSF_STHAL_CFG_GPIO_EXTI_RPIO,
-        },
-    };
-    vsf_gpio_config_pin(gpio, &cfg);
-    if ((cfg.mode & VSF_GPIO_MODE_MASK) == VSF_GPIO_EXTI) {
-        vsf_gpio_exti_irq_enable(gpio, cfg.pin_mask);
+        };
+        vsf_gpio_exti_irq_config(gpio, &exti_irq_cfg);
+        vsf_gpio_exti_irq_enable(gpio, GPIO_Init->Pin);
     }
 }
 
@@ -81,11 +82,10 @@ void HAL_GPIO_DeInit(GPIO_TypeDef *GPIOx, uint32_t GPIO_Pin)
     vsf_gpio_t *gpio = (vsf_gpio_t *)GPIOx;
 
     vsf_gpio_cfg_t cfg = {
-        .pin_mask = GPIO_Pin,
         .mode = VSF_GPIO_INPUT | VSF_GPIO_NO_PULL_UP_DOWN
     };
-    vsf_gpio_config_pin(gpio, &cfg);
-    vsf_gpio_exti_irq_disable(gpio, cfg.pin_mask);
+    vsf_gpio_port_config_pins(gpio, GPIO_Pin, &cfg);
+    vsf_gpio_exti_irq_disable(gpio, GPIO_Pin);
 }
 
 GPIO_PinState HAL_GPIO_ReadPin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)

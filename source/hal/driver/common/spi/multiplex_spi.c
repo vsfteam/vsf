@@ -110,10 +110,9 @@ static void __spi_cs_gpio_init(vsf_multiplex_spi_t *m_spi_ptr)
         VSF_HAL_ASSERT(m_spi_ptr->pin_mask != 0);
 
         vsf_gpio_cfg_t cfg = {
-            .pin_mask = m_spi_ptr->pin_mask,
             .mode = VSF_MULTIPLEXER_SPI_CFG_GPIO_MODE,
         };
-        vsf_gpio_config_pin(m_spi_ptr->gpio, &cfg);
+        vsf_gpio_port_config_pins(m_spi_ptr->gpio, m_spi_ptr->pin_mask, &cfg);
         vsf_gpio_output_and_set(m_spi_ptr->gpio, m_spi_ptr->pin_mask);
 #else
         VSF_HAL_ASSERT(0);

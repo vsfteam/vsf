@@ -27,6 +27,33 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef enum vsf_gpio_mode_t {
+    // bit 9  : IOMUX_AGPIO_CONFIG_PULL_UP_LSB
+    // bit 8  : IOMUX_AGPIO_CONFIG_PULL_DN_LSB
+    // bit 16 : IOMUX_GPIO_CONFIG_PULL_FRC_LSB
+    __AIC8800_GPIO_MODE_ALL_BITS      = (1 << 8) | (1 << 9) | (1 << 16),
+
+    VSF_GPIO_PULL_UP                  = (1 << 16) | (1 << 9),
+    VSF_GPIO_PULL_DOWN                = (1 << 16) | (1 << 8),
+    VSF_GPIO_NO_PULL_UP_DOWN          = (0 << 16) | (0 << 8),
+
+    VSF_GPIO_INPUT                    = (0 << 17),
+    VSF_GPIO_OUTPUT_OPEN_DRAIN        = (1 << 17),
+    VSF_GPIO_OUTPUT_PUSH_PULL         = (2 << 17),
+    VSF_GPIO_ANALOG                   = (3 << 17),
+    VSF_GPIO_EXTI                     = (4 << 17),
+    VSF_GPIO_AF                       = (5 << 17),
+
+    VSF_GPIO_EXTI_MODE_NONE           = (0 << 21),
+    VSF_GPIO_EXTI_MODE_LOW_LEVEL      = (1 << 21),
+    VSF_GPIO_EXTI_MODE_HIGH_LEVEL     = (2 << 21),
+    VSF_GPIO_EXTI_MODE_RISING         = (3 << 21),
+    VSF_GPIO_EXTI_MODE_FALLING        = (4 << 21),
+    VSF_GPIO_EXTI_MODE_RISING_FALLING = (5 << 21),
+
+} vsf_gpio_mode_t;
+
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 

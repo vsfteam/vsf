@@ -40,7 +40,7 @@
 #   define VSF_USART_CFG_DEC_REMAP_PREFIX           VSF_USART_CFG_DEC_PREFIX
 #endif
 
-#define VSF_HAL_TEMPLATE_DEC_INLINE_API
+#define VSF_HAL_TEMPLATE_DEC_ADDITIONAL_API
 
 #include "hal/driver/common/template/vsf_template_instance_declaration.h"
 

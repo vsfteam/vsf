@@ -20,10 +20,6 @@
 
 /*============================ INCLUDES ======================================*/
 
-#if defined(VSF_HAL_USE_IO) && !defined(__VSF_TEMPLATE_IO_H__)
-#   include "./vsf_template_io.h"
-#endif
-
 #if defined(VSF_HAL_USE_GPIO) && !defined(__VSF_TEMPLATE_GPIO_H__)
 #   include "./vsf_template_gpio.h"
 #endif

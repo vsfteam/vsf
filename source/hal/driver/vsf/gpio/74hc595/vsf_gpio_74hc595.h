@@ -113,7 +113,7 @@ extern const vsf_gpio_op_t vsf_74hc595_gpio_op;
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsf_74hc595_gpio_init(vsf_74hc595_gpio_t *gpio_ptr);
-extern void vsf_74hc595_gpio_config_pin(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, uint_fast32_t feature);
+extern void vsf_74hc595_gpio_port_config_pins(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_cfg_t *cfg_ptr);
 extern void vsf_74hc595_gpio_set_direction(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask);
 extern vsf_gpio_pin_mask_t vsf_74hc595_gpio_get_direction(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 extern void vsf_74hc595_gpio_set_input(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
@@ -127,7 +127,7 @@ extern void vsf_74hc595_gpio_toggle(vsf_74hc595_gpio_t *gpio_ptr, vsf_gpio_pin_m
 
 #ifdef __cplusplus
 }
-#endif
+#    endif
 
 #endif
 #endif
