@@ -510,7 +510,7 @@ void eventfd_inc_isr(vsf_linux_fd_priv_t *eventfd_priv)
 
 void __vsf_linux_eventfd_inc(vsf_linux_fd_priv_t *priv)
 {
-    vsf_linux_eventfd_priv_t *eventfd_priv = priv;
+    vsf_linux_eventfd_priv_t *eventfd_priv = (vsf_linux_eventfd_priv_t *)priv;
     vsf_protect_t orig = vsf_protect_sched();
     eventfd_priv->counter += 1;
     vsf_linux_fd_set_status(&eventfd_priv->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
