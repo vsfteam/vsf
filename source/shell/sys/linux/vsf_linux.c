@@ -300,7 +300,9 @@ extern void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, vsf_timeout_ti
 #if VSF_LINUX_CFG_HEAP_SIZE > 0
 struct __vsf_linux_heap_t {
     implement(vsf_heap_t)
+#ifndef VSF_LINUX_CFG_HEAP_ADDR
     uint8_t memory[VSF_LINUX_CFG_HEAP_SIZE];
+#endif
     vsf_dlist_t freelist[2];
 } static __vsf_linux_heap;
 #endif
@@ -336,7 +338,11 @@ static void __vsf_linux_heap_init(void)
         vsf_dlist_init(&__vsf_linux_heap.freelist[i]);
     }
     __vsf_linux_heap.get_freelist = __vsf_linux_heap_get_freelist;
-    __vsf_heap_add_buffer(&__vsf_linux_heap.use_as__vsf_heap_t, __vsf_linux_heap.memory, sizeof(__vsf_linux_heap.memory));
+#ifndef VSF_LINUX_CFG_HEAP_ADDR
+    __vsf_heap_add_buffer(&__vsf_linux_heap.use_as__vsf_heap_t, __vsf_linux_heap.memory, VSF_LINUX_CFG_HEAP_SIZE);
+#else
+    __vsf_heap_add_buffer(&__vsf_linux_heap.use_as__vsf_heap_t, (uint8_t *)VSF_LINUX_CFG_HEAP_ADDR, VSF_LINUX_CFG_HEAP_SIZE);
+#endif
 }
 #endif
 
