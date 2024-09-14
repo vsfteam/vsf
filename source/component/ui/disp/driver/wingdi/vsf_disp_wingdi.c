@@ -30,6 +30,8 @@
 
 #include <Windows.h>
 
+#pragma comment(lib, "imm32.lib")
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_DISP_WINGDI_CFG_HW_PRIORITY
@@ -443,6 +445,7 @@ static void __vk_disp_wingdi_thread(void *arg)
         .bottom = disp_wingdi->param.height,
     };
     AdjustWindowRect(&rect, WS_CAPTION | WS_SYSMENU | WS_VISIBLE, false);
+    ImmDisableIME(0);
     __vk_disp_wingdi.hWnd = CreateWindow(__ClassName,
         TEXT(VSF_DISP_WINGDI_CFG_WINDOW_TITLE),
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE,
