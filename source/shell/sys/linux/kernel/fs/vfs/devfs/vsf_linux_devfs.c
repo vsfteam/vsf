@@ -43,6 +43,7 @@
 #   include "shell/sys/linux/include/linux/i2c.h"
 #   include "shell/sys/linux/include/linux/i2c-dev.h"
 #   include "shell/sys/linux/include/linux/spi/spidev.h"
+#   include "shell/sys/linux/include/linux/keyboard.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
@@ -60,6 +61,7 @@
 #   include <linux/i2c.h>
 #   include <linux/i2c-dev.h>
 #   include <linux/spi/spidev.h>
+#   include <linux/keyboard.h>
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_LIBC == ENABLED
 #   include "shell/sys/linux/include/simple_libc/stdio.h"
@@ -963,7 +965,80 @@ static uint8_t __vsf_linux_terminal_keyboard_get_keycode(uint8_t modifier, uint8
     return keycode;
 }
 
+VSF_CAL_WEAK(vsf_linux_terminal_keyboard_value_user)
+unsigned short vsf_linux_terminal_keyboard_value_user(uint8_t modifier, uint8_t keycode)
+{
+    return K_HOLE;
+}
+
 // return the byte length of translated data in keybuffer
+unsigned short __vsf_linux_terminal_keyboard_value(uint8_t modifier, uint8_t keycode)
+{
+    static const unsigned short __plain_map[NR_KEYS] = {
+        0x200, 0x01b, 0x031, 0x032, 0x033, 0x034, 0x035, 0x036,
+        0x037, 0x038, 0x039, 0x030, 0x02d, 0x03d, 0x07f, 0x009,
+        0xb71, 0xb77, 0xb65, 0xb72, 0xb74, 0xb79, 0xb75, 0xb69,
+        0xb6f, 0xb70, 0x05b, 0x05d, 0x201, 0x702, 0xb61, 0xb73,
+        0xb64, 0xb66, 0xb67, 0xb68, 0xb6a, 0xb6b, 0xb6c, 0x03b,
+        0x027, 0x060, 0x700, 0x05c, 0xb7a, 0xb78, 0xb63, 0xb76,
+        0xb62, 0xb6e, 0xb6d, 0x02c, 0x02e, 0x02f, 0x700, 0x30c,
+        0x703, 0x020, 0x207, 0x100, 0x101, 0x102, 0x103, 0x104,
+        0x105, 0x106, 0x107, 0x108, 0x109, 0x208, 0x209, 0x307,
+        0x308, 0x309, 0x30b, 0x304, 0x305, 0x306, 0x30a, 0x301,
+        0x302, 0x303, 0x300, 0x310, 0x206, 0x200, 0x03c, 0x10a,
+        0x10b, 0x200, 0x200, 0x200, 0x200, 0x200, 0x200, 0x200,
+        0x30e, 0x702, 0x30d, 0x01c, 0x701, 0x205, 0x114, 0x603,
+        0x118, 0x601, 0x602, 0x117, 0x600, 0x119, 0x115, 0x116,
+        0x11a, 0x10c, 0x10d, 0x11b, 0x11c, 0x110, 0x311, 0x11d,
+        0x200, 0x200, 0x200, 0x200, 0x200, 0x200, 0x200, 0x200,
+    };
+    static const char *__shift_map = "\0\0!@#$%^&*()_+\0\0QWERTYUIOP{}\0\0ASDFGHJKL:\"~\0|ZXCVBNM<>?";
+
+    unsigned short keyvalue = vsf_linux_terminal_keyboard_value_user(modifier, keycode);
+    if (keyvalue != K_HOLE) {
+        return keyvalue;
+    }
+
+    uint16_t keycode_mapped = __plain_map[keycode];
+    uint8_t key = KVAL(keycode_mapped);
+    switch (modifier) {
+    case 0:
+        return keycode_mapped;
+    case 1 << KG_ALT:
+        // 2 .. 15:     1 .. 0, -=, backspace, tab
+        // 26 .. 27:    []
+        // 39 .. 41:    ;'`
+        // 43:          backslash
+        // 51 .. 53:    ,./
+        // 57:          space
+        if (    ((key >= 2) && (key <= 15))
+            ||  ((key >= 26) && (key <= 27))
+            ||  ((key >= 39) && (key <= 41))
+            ||  (key == 43)
+            ||  ((key >= 51) && (key <= 51))
+            ||  (key == 57)) {
+            return K(KT_META, key);
+        }
+        // Alt + Enter = Ctrl + M
+        if (key == 28) {
+            return K(KT_META, 13);      // Meda-Ctrl-M
+        }
+        return K_HOLE;
+    case 1 << KG_CTRL:
+        if (KTYP(keycode_mapped) == KT_LETTER) {
+            return K(KT_LATIN, key - 'a');
+        }
+        return K_HOLE;
+    case 1 << KG_SHIFT:
+        if (keycode <= 53) {
+            return K(KTYP(keycode_mapped), __shift_map[keycode]);
+        }
+        return K_HOLE;
+    default:
+        return K_NOSUCHMAP;
+    }
+}
+
 static uint8_t __vsf_linux_terminal_keyboard_translate(uint8_t modifier, uint8_t keycode, uint8_t keybuffer[6])
 {
     return 0;
@@ -1386,7 +1461,7 @@ static int __vsf_linux_terminal_keyboard_fcntl(vsf_linux_fd_t *sfd, int cmd, uin
         break;
     case KDGKBENT: {
             struct kbentry *entry = (struct kbentry *)arg;
-            entry->kb_value = 0;
+            entry->kb_value = __vsf_linux_terminal_keyboard_value(entry->kb_table, entry->kb_index);
         }
         break;
     case KDSKBENT:
