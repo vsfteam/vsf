@@ -1378,31 +1378,35 @@ void vsf_arch_cpp_startup(void)
 
 void _initterm(cpp_init_func_t * const first, cpp_init_func_t * const last)
 {
+    extern void vsf_main_entry(void);
+
     // IMPORTANT: Some static initializers of cpp instances in app will depend on linux,
     //  so we have to record these functions, and call later after linux started.
     //  first[0]                should be NULL
     //  first[1]                should be pre_cpp_initialization
-    //  first[2] .. last[-2]    should be cpp static instance initializers
-    //  last[-1]                should be vsf_main_entry
+    //  first[2] .. last[-1]    vsf_main_entry should be cpp static instance initializers and vsf_main_entry
     //  last[0]                 should be NULL
-    //  So simply save first[2] .. last[-2]
+    //  So simply save cpp static instance initializers and remove vsf_main_entry(will be called after __vsf_arch_cpp_init_range)
 
     int count = last - first + 1;
     cpp_init_func_t funcs[count];
     memcpy(funcs, first, count * sizeof(funcs[0]));
 
     for (int idx = 0; idx < count; idx++) {
-        if ((idx >= 2) && (idx <= count - 3)) {
-            VSF_ARCH_ASSERT(__vsf_cpp_init_cnt < dimof(__vsf_cpp_init));
-            __vsf_cpp_init[__vsf_cpp_init_cnt++] = (cpp_init_t){
-                .returns_int = false,
-                .func = funcs[idx],
-            };
+        if ((idx >= 2) && (idx <= count - 2)) {
+            if (funcs[idx] != vsf_main_entry) {
+                VSF_ARCH_ASSERT(__vsf_cpp_init_cnt < dimof(__vsf_cpp_init));
+                __vsf_cpp_init[__vsf_cpp_init_cnt++] = (cpp_init_t){
+                    .returns_int = false,
+                    .func = funcs[idx],
+                };
+            }
             funcs[idx] = NULL;
         }
     }
 
-    __vsf_arch_cpp_init_range(funcs, last, false);
+    __vsf_arch_cpp_init_range(funcs, &funcs[count - 1], false);
+    vsf_main_entry();
 }
 
 int _initterm_e(cpp_init_func_t * const first, cpp_init_func_t * const last)
