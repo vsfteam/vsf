@@ -494,13 +494,14 @@ extern void * vsf_linux_library_ctx(int lib_idx);
 extern vsf_err_t vsf_linux_dynlib_init(int *lib_idx, int module_num, int bss_size);
 #endif
 
-#if defined(__VSF_LINUX_CLASS_IMPLEMENT) || defined(__VSF_LINUX_CLASS_INHERIT__)
-#   if VSF_LINUX_CFG_PLS_NUM > 0
+// pls(process local storage) is open to user
+#if VSF_LINUX_CFG_PLS_NUM > 0
 extern int vsf_linux_pls_alloc(void);
 extern void vsf_linux_pls_free(int idx);
 extern vsf_linux_localstorage_t * vsf_linux_pls_get(int idx);
-#   endif
+#endif
 
+#if defined(__VSF_LINUX_CLASS_IMPLEMENT) || defined(__VSF_LINUX_CLASS_INHERIT__)
 #   if VSF_LINUX_CFG_TLS_NUM > 0
 extern int vsf_linux_tls_alloc(void (*destructor)(void *));
 extern void vsf_linux_tls_free(int idx);
