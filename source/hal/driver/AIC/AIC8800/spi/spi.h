@@ -74,8 +74,8 @@ typedef enum vsf_spi_mode_t {
                                           VSF_SPI_DATASIZE_28 | VSF_SPI_DATASIZE_29 | VSF_SPI_DATASIZE_30 | VSF_SPI_DATASIZE_31 |
                                           VSF_SPI_DATASIZE_32,
 
-    VSF_SPI_AUTO_CS_DISABLE             = 0x01ul << 8,
-    VSF_SPI_AUTO_CS_ENABLE              = 0x00ul << 8,
+    VSF_SPI_CS_SOFTWARE_MODE            = 0x01ul << 8,
+    VSF_SPI_CS_HARDWARE_MODE            = 0x00ul << 8,
 
     VSF_SPI_MSB_FIRST                   = 0x00ul << 9,
     VSF_SPI_LSB_FIRST                   = 0x01ul << 9,
@@ -86,8 +86,8 @@ typedef enum vsf_spi_mode_t {
                                           VSF_SPI_MODE_1 |
                                           VSF_SPI_MODE_2 |
                                           VSF_SPI_MODE_3 |
-                                          VSF_SPI_AUTO_CS_DISABLE |
-                                          VSF_SPI_AUTO_CS_ENABLE |
+                                          VSF_SPI_CS_SOFTWARE_MODE |
+                                          VSF_SPI_CS_HARDWARE_MODE |
                                           VSF_SPI_MSB_FIRST |
                                           VSF_SPI_LSB_FIRST |
                                           __AIC8800_VSF_SPI_DATASIZE_MASK,

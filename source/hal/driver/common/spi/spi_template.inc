@@ -56,11 +56,11 @@
 vsf_spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
 {
     vsf_spi_capability_t spi_capability = {
-        .support_auto_cs    = VSF_SPI_CFG_CAPABILITY_SUPPORT_AUTO_CS,
-        .support_manual_cs  = VSF_SPI_CFG_CAPABILITY_SUPPORT_MANUAL_CS,
-        .cs_count           = VSF_SPI_CFG_CAPABILITY_CS_COUNT,
-        .max_clock_hz       = VSF_SPI_CFG_CAPABILITY_MAX_CLOCK_HZ,
-        .min_clock_hz       = VSF_SPI_CFG_CAPABILITY_MIN_CLOCK_HZ,
+        .support_hardware_cs  = VSF_SPI_CFG_CAPABILITY_SUPPORT_AUTO_CS,
+        .support_software_cs  = VSF_SPI_CFG_CAPABILITY_SUPPORT_MANUAL_CS,
+        .cs_count             = VSF_SPI_CFG_CAPABILITY_CS_COUNT,
+        .max_clock_hz         = VSF_SPI_CFG_CAPABILITY_MAX_CLOCK_HZ,
+        .min_clock_hz         = VSF_SPI_CFG_CAPABILITY_MIN_CLOCK_HZ,
     };
 
     return spi_capability;

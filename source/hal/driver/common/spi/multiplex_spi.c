@@ -58,7 +58,7 @@ static void __vsf_multiplex_spi_irq_handler(void *target_ptr, vsf_spi_t *spi_ptr
 
 static bool __spi_mode_is_auto_cs(vsf_spi_mode_t mode)
 {
-    return (mode & VSF_SPI_AUTO_CS_MASK) == VSF_SPI_AUTO_CS_ENABLE;
+    return (mode & VSF_SPI_CS_MODE_MASK) == VSF_SPI_CS_HARDWARE_MODE;
 }
 
 static bool __spi_cs_pin_is_hardware(vsf_multiplex_spi_t *m_spi_ptr)
@@ -139,7 +139,7 @@ static vsf_err_t __spi_init_en_req(vsf_multiplex_spi_t *m_spi_ptr, bool need_rec
     if (need_reconf) {
         vsf_spi_cfg_t local_cfg = m_spi_ptr->spi_cfg;
         // force disable auto cs mode
-        local_cfg.mode =  (local_cfg.mode & ~VSF_SPI_AUTO_CS_MASK) | VSF_SPI_AUTO_CS_DISABLE;
+        local_cfg.mode =  (local_cfg.mode & ~VSF_SPI_CS_MODE_MASK) | VSF_SPI_CS_SOFTWARE_MODE;
         local_cfg.isr.handler_fn = __vsf_multiplex_spi_irq_handler;
         local_cfg.isr.target_ptr = m_spi_ptr;
 

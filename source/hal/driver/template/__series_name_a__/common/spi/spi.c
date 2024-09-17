@@ -203,11 +203,11 @@ vsf_spi_capability_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_capability)(
 
     return (vsf_spi_capability_t) {
         .irq_mask = VSF_SPI_IRQ_MASK_TX | VSF_SPI_IRQ_MASK_RX,
-        .support_auto_cs   = 1,
-        .support_manual_cs = 1,
-        .cs_count          = 1,
-        .max_clock_hz      = 100 * 1000 * 1000,
-        .min_clock_hz;     = 100 * 1000,
+        .support_hardware_cs = 1,
+        .support_software_cs = 1,
+        .cs_count            = 1,
+        .max_clock_hz        = 100 * 1000 * 1000,
+        .min_clock_hz;       = 100 * 1000,
     };
 }
 

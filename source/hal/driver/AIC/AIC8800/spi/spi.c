@@ -162,7 +162,7 @@ vsf_err_t vsf_hw_spi_init(vsf_hw_spi_t *hw_spi_ptr, vsf_spi_cfg_t *cfg_ptr)
     reg->CR[2] = (0x01ul <<  6); // en dma
     reg->CR[3] = ((0x02ul << 8) | (0x01ul << 0));
 
-    hw_spi_ptr->is_auto_cs = ((cfg_ptr->mode & VSF_SPI_AUTO_CS_MASK) == VSF_SPI_AUTO_CS_ENABLE);
+    hw_spi_ptr->is_auto_cs = ((cfg_ptr->mode & VSF_SPI_CS_MODE_MASK) == VSF_SPI_CS_HARDWARE_MODE);
     hw_spi_ptr->isr = cfg_ptr->isr;
     if (hw_spi_ptr->isr.handler_fn != NULL) {
         uint32_t prio = (uint32_t)hw_spi_ptr->isr.prio;
@@ -501,8 +501,8 @@ vsf_spi_capability_t vsf_hw_spi_capability(vsf_hw_spi_t *spi_ptr)
     uint32_t pclk = sysctrl_clock_get(SYS_PCLK);
 
     vsf_spi_capability_t spi_capability = {
-        .support_auto_cs = 1,
-        .support_manual_cs = 1,
+        .support_hardware_cs = 1,
+        .support_software_cs = 1,
         .cs_count = 1,
         .max_clock_hz = pclk / 2,
         .min_clock_hz = pclk / 2 / 0x10000,

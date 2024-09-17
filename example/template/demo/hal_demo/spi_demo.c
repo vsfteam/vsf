@@ -48,7 +48,7 @@
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_DEFAULT_MODE
-#   define APP_SPI_DEMO_CFG_DEFAULT_MODE                (VSF_SPI_MASTER | VSF_SPI_MODE_3 | VSF_SPI_MSB_FIRST | VSF_SPI_DATASIZE_8 | VSF_SPI_AUTO_CS_DISABLE)
+#   define APP_SPI_DEMO_CFG_DEFAULT_MODE                (VSF_SPI_MASTER | VSF_SPI_MODE_3 | VSF_SPI_MSB_FIRST | VSF_SPI_DATASIZE_8 | VSF_SPI_CS_SOFTWARE_MODE)
 #endif
 
 #ifndef APP_SPI_DEMO_CFG_DEFAULT_CLOCK
@@ -155,8 +155,8 @@ static const hal_option_t __mode_options[] = {
     HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_31),
     HAL_DEMO_OPTION(VSF_SPI_DATASIZE_MASK, VSF_SPI_DATASIZE_32),
 
-    HAL_DEMO_OPTION(VSF_SPI_AUTO_CS_MASK, VSF_SPI_AUTO_CS_DISABLE),
-    HAL_DEMO_OPTION(VSF_SPI_AUTO_CS_MASK, VSF_SPI_AUTO_CS_ENABLE),
+    HAL_DEMO_OPTION(VSF_SPI_CS_MODE_MASK, VSF_SPI_CS_SOFTWARE_MODE),
+    HAL_DEMO_OPTION(VSF_SPI_CS_MODE_MASK, VSF_SPI_CS_HARDWARE_MODE),
 };
 
 static const hal_option_t __irq_options[] = {
@@ -231,12 +231,12 @@ static bool __spi_demo_check(hal_test_t *hal_test)
 
     vsf_spi_capability_t cap = vsf_spi_capability(test->device);
 
-    if (((test->cfg.mode & VSF_SPI_AUTO_CS_MASK) == VSF_SPI_AUTO_CS_ENABLE) && !cap.support_auto_cs) {
-        vsf_trace_error("use VSF_SPI_AUTO_CS_ENABLE but not support!" VSF_TRACE_CFG_LINEEND);
+    if (((test->cfg.mode & VSF_SPI_CS_MODE_MASK) == VSF_SPI_CS_HARDWARE_MODE) && !cap.support_hardware_cs) {
+        vsf_trace_error("use VSF_SPI_CS_HARDWARE_MODE but not support!" VSF_TRACE_CFG_LINEEND);
         return false;
     }
-    if (((test->cfg.mode & VSF_SPI_AUTO_CS_MASK) == VSF_SPI_AUTO_CS_DISABLE) && !cap.support_manual_cs) {
-        vsf_trace_error("use VSF_SPI_AUTO_CS_DISABLE but not support!" VSF_TRACE_CFG_LINEEND);
+    if (((test->cfg.mode & VSF_SPI_CS_MODE_MASK) == VSF_SPI_CS_SOFTWARE_MODE) && !cap.support_software_cs) {
+        vsf_trace_error("use VSF_SPI_CS_SOFTWARE_MODE but not support!" VSF_TRACE_CFG_LINEEND);
         return false;
     }
     if (test->cs_index >= cap.cs_count) {
@@ -351,7 +351,7 @@ static void __spi_cs_active(spi_test_t *test)
     vsf_spi_t *spi_ptr = test->device;
     VSF_ASSERT(spi_ptr != NULL);
 
-    if ((test->cfg.mode & VSF_SPI_AUTO_CS_MASK) == VSF_SPI_AUTO_CS_DISABLE) {
+    if ((test->cfg.mode & VSF_SPI_CS_MODE_MASK) == VSF_SPI_CS_SOFTWARE_MODE) {
         if (test->verbose >= 2) {
             vsf_trace_debug("vsf_spi_cs_active(&%s, %u)" VSF_TRACE_CFG_LINEEND, test->device_name, test->cs_index);
         }
@@ -365,7 +365,7 @@ static void __spi_cs_inactive(spi_test_t *test)
     vsf_spi_t *spi_ptr = test->device;
     VSF_ASSERT(spi_ptr != NULL);
 
-    if ((test->cfg.mode & VSF_SPI_AUTO_CS_MASK) == VSF_SPI_AUTO_CS_DISABLE) {
+    if ((test->cfg.mode & VSF_SPI_CS_MODE_MASK) == VSF_SPI_CS_SOFTWARE_MODE) {
         if (test->verbose >= 2) {
             vsf_trace_debug("vsf_spi_cs_inactive(&%s, %u)" VSF_TRACE_CFG_LINEEND, test->device_name, test->cs_index);
         }
