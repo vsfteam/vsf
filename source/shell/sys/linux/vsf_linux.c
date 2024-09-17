@@ -790,6 +790,23 @@ int vsf_linux_generate_path(char *path_out, int path_out_lenlen, char *dir, char
         }
         strcpy(path_out, path_in);
     } else {
+        if (path_in[0] == '~') {
+            dir = getenv("HOME");
+            if (NULL == dir) {
+                VSF_LINUX_ASSERT(false);
+                return -ENOENT;
+            }
+
+            if (path_in[1] != '\0') {
+                if (path_in[1] != '/') {
+                    return -ENOMEM;
+                }
+                path_in = &path_in[2];
+            } else {
+                path_in = &path_in[1];
+            }
+        }
+
         if (strlen(dir) + strlen(path_in) + 1 >= path_out_lenlen) {
             return -ENOMEM;
         }
