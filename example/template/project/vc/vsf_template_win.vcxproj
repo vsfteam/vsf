@@ -1590,7 +1590,6 @@
     <ClCompile Include="..\..\demo\hal_demo\hal_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\i2c_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\i2s_demo.c" />
-    <ClCompile Include="..\..\demo\hal_demo\io_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\mmc_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\pm_demo.c" />
     <ClCompile Include="..\..\demo\hal_demo\pwm_demo.c" />

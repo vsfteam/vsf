@@ -7171,9 +7171,6 @@
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\i2s_demo.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\demo\hal_demo\io_demo.c</name>
-                </file>
-                <file>
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\mmc_demo.c</name>
                 </file>
                 <file>

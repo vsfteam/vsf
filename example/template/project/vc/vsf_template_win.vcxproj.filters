@@ -5972,9 +5972,6 @@
     <ClCompile Include="..\..\demo\hal_demo\i2s_demo.c">
       <Filter>usrapp\demo\hal_demo</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\demo\hal_demo\io_demo.c">
-      <Filter>usrapp\demo\hal_demo</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\demo\hal_demo\mmc_demo.c">
       <Filter>usrapp\demo\hal_demo</Filter>
     </ClCompile>
