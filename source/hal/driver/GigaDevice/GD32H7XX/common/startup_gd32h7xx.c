@@ -542,7 +542,9 @@ void vsf_hal_pre_startup_init(void)
 {
     SystemInit();
     SCB_EnableICache();
+#if GD32H7XX_CFG_DCACHE == ENABLED
     SCB_EnableDCache();
+#endif
 }
 
 /*----------------------------------------------------------------------------

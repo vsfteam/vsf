@@ -327,7 +327,9 @@ static void VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(
         }
     }
 
+#if GD32H7XX_CFG_DCACHE == ENABLED
     SCB_CleanInvalidateDCache_by_Addr((void *)(flash_ptr->addr + flash_ptr->offset_orig), flash_ptr->size_orig);
+#endif
     SCB_InvalidateICache_by_Addr((void *)(flash_ptr->addr + flash_ptr->offset_orig), flash_ptr->size_orig);
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_flash_t *)flash_ptr, irq_mask);
