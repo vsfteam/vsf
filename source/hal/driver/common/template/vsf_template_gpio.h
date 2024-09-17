@@ -59,63 +59,63 @@ extern "C" {
 #endif
 
 #if !defined(VSF_GPIO_CFG_PORTA) && (VSF_HW_GPIO_PORT_MASK & (1ul << 0))
-#   define VSF_GPIO_CFG_PORTA                         ENABLED
+#   define VSF_GPIO_CFG_PORTA                       ENABLED
 #endif
 
 #if !defined(VSF_GPIO_CFG_PORTB) && (VSF_HW_GPIO_PORT_MASK & (1ul << 1))
-#   define VSF_GPIO_CFG_PORTB                         ENABLED
+#   define VSF_GPIO_CFG_PORTB                       ENABLED
 #endif
 
 #if !defined(VSF_GPIO_CFG_PORTC) && (VSF_HW_GPIO_PORT_MASK & (1ul << 2))
-#   define VSF_GPIO_CFG_PORTC                         ENABLED
+#   define VSF_GPIO_CFG_PORTC                       ENABLED
 #endif
 
 #if !defined(VSF_GPIO_CFG_PORTD) && (VSF_HW_GPIO_PORT_MASK & (1ul << 3))
-#   define VSF_GPIO_CFG_PORTD                         ENABLED
+#   define VSF_GPIO_CFG_PORTD                       ENABLED
 #endif
 
 #if !defined(VSF_GPIO_CFG_PORTE) && (VSF_HW_GPIO_PORT_MASK & (1ul << 4))
-#   define VSF_GPIO_CFG_PORTE                         ENABLED
+#   define VSF_GPIO_CFG_PORTE                       ENABLED
 #endif
 
 #if !defined(VSF_GPIO_CFG_PORTF) && (VSF_HW_GPIO_PORT_MASK & (1ul << 5))
-#   define VSF_GPIO_CFG_PORTF                         ENABLED
+#   define VSF_GPIO_CFG_PORTF                       ENABLED
 #endif
 
 #if !defined(VSF_GPIO_CFG_PORTG) && (VSF_HW_GPIO_PORT_MASK & (1ul << 6))
-#   define VSF_GPIO_CFG_PORTG                         ENABLED
+#   define VSF_GPIO_CFG_PORTG                       ENABLED
 #endif
 
 #if !defined(VSF_GPIO_CFG_PORTH) && (VSF_HW_GPIO_PORT_MASK & (1ul << 7))
-#   define VSF_GPIO_CFG_PORTH                         ENABLED
+#   define VSF_GPIO_CFG_PORTH                       ENABLED
 #endif
 
 #if !defined(VSF_GPIO_CFG_PORTI) && (VSF_HW_GPIO_PORT_MASK & (1ul << 8))
-#   define VSF_GPIO_CFG_PORTI                         ENABLED
+#   define VSF_GPIO_CFG_PORTI                       ENABLED
 #endif
 
 #if !defined(VSF_GPIO_CFG_PORTJ) && (VSF_HW_GPIO_PORT_MASK & (1ul << 9))
-#   define VSF_GPIO_CFG_PORTJ                         ENABLED
+#   define VSF_GPIO_CFG_PORTJ                       ENABLED
 #endif
 
 #if !defined(VSF_GPIO_CFG_PORTK) && (VSF_HW_GPIO_PORT_MASK & (1ul << 10))
-#   define VSF_GPIO_CFG_PORTK                         ENABLED
+#   define VSF_GPIO_CFG_PORTK                       ENABLED
 #endif
 
 
 #ifndef VSF_GPIO_CFG_PIN_COUNT
 #   if defined(VSF_HW_GPIO_PIN_COUNT) && (VSF_HW_GPIO_PIN_COUNT > 32)
 #	    define vsf_io_pin_mask_t                    uint64_t
-#       define VSF_GPIO_CFG_PIN_COUNT                 64
-#       define VSF_GPIO_CFG_PIN_MASK                  0xFFFFFFFFFFFFFFFF
+#       define VSF_GPIO_CFG_PIN_COUNT               64
+#       define VSF_GPIO_CFG_PIN_MASK                0xFFFFFFFFFFFFFFFF
 #   elif defined(VSF_HW_GPIO_PIN_AMSK) && (VSF_HW_GPIO_PIN_MASK & 0xFFFFFFFF00000000)
 #	    define vsf_io_pin_mask_t                    uint64_t
-#       define VSF_GPIO_CFG_PIN_COUNT                 64
-#       define VSF_GPIO_CFG_PIN_MASK                  0xFFFFFFFFFFFFFFFF
+#       define VSF_GPIO_CFG_PIN_COUNT               64
+#       define VSF_GPIO_CFG_PIN_MASK                0xFFFFFFFFFFFFFFFF
 #   else
 #	    define vsf_io_pin_mask_t                    uint32_t
-#       define VSF_GPIO_CFG_PIN_COUNT                 32
-#       define VSF_GPIO_CFG_PIN_MASK                  0xFFFFFFFF
+#       define VSF_GPIO_CFG_PIN_COUNT               32
+#       define VSF_GPIO_CFG_PIN_MASK                0xFFFFFFFF
 #   endif
 #endif
 
@@ -399,6 +399,7 @@ typedef struct vsf_gpio_cfg_t {
 
 typedef struct vsf_gpio_port_cfg_pin_t {
     uint16_t            port_pin_index;
+
     //! For simplicity, the expansion of type vsf_gpio_cfg_t is used here instead
     //! of using type vsf_gpio_cfg_t directly
     vsf_gpio_mode_t     mode;
