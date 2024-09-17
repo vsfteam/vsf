@@ -7,7 +7,6 @@ target_sources(${CMAKE_PROJECT_NAME} PUBLIC
     hal_demo.c
     i2c_demo.c
     i2s_demo.c
-    io_demo.c
     mmc_demo.c
     pm_demo.c
     pwm_demo.c

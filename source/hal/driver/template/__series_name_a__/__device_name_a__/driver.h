@@ -39,9 +39,6 @@
 
 /*\note It's up to developer to decide the actual path of the driver headers. */
 
-#   if VSF_HAL_USE_IO == ENABLED
-#       include "../common/io/io.h"
-#   endif
 #   if VSF_HAL_USE_ADC == ENABLED
 #       include "../common/adc/adc.h"
 #   endif
@@ -95,14 +92,6 @@
 
 
 /*============================ INCLUDES ======================================*/
-
-#if VSF_HAL_USE_IO == ENABLED
-#   include "hal/driver/common/template/vsf_template_io.h"
-
-#   define VSF_IO_CFG_DEC_PREFIX                            vsf_hw
-#   define VSF_IO_CFG_DEC_UPCASE_PREFIX                     VSF_HW
-#   include "hal/driver/common/io/io_template.h"
-#endif
 
 #if VSF_HAL_USE_GPIO == ENABLED
 #   include "hal/driver/common/template/vsf_template_gpio.h"

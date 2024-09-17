@@ -2,7 +2,6 @@ vsf_add_sources(
     vsf_hal_distbus.c
 )
 
-add_subdirectory(io)
 add_subdirectory(gpio)
 add_subdirectory(i2c)
 add_subdirectory(spi)

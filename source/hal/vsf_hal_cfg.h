@@ -41,10 +41,6 @@ extern "C" {
 #endif
 #endif
 
-#ifndef VSF_HAL_USE_IO
-#   define VSF_HAL_USE_IO                   ENABLED
-#endif
-
 #ifndef VSF_HAL_USE_GPIO
 #   define VSF_HAL_USE_GPIO                 ENABLED
 #endif

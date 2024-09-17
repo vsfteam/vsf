@@ -27,9 +27,6 @@
 // for distbus
 #include "service/vsf_service.h"
 
-#if VSF_HAL_DISTBUS_USE_IO == ENABLED && VSF_HAL_USE_IO == ENABLED
-#   include "./io/vsf_hal_distbus_io.h"
-#endif
 #if VSF_HAL_DISTBUS_USE_GPIO == ENABLED && VSF_HAL_USE_GPIO == ENABLED
 #   include "./gpio/vsf_hal_distbus_gpio.h"
 #endif
