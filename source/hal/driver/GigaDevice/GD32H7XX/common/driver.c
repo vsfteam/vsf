@@ -758,6 +758,46 @@ void nvic_vector_table_set(uint32_t nvic_vict_tab, uint32_t offset)
 
 
 
+
+#if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
+
+#include "service/trace/vsf_trace.h"
+
+// re-write HardFault_Handler to dump stack
+void HardFault_Handler(void)
+{
+    uintptr_t stack = vsf_arch_get_stack();
+    uintptr_t callstack[16] = { 0 };
+    uint_fast16_t num = vsf_arch_get_callstack(stack, callstack, dimof(callstack));
+
+    vsf_trace_error("Hardfault:" VSF_TRACE_CFG_LINEEND);
+    vsf_trace_error("dumping stack @ 0x%X:" VSF_TRACE_CFG_LINEEND, stack);
+#   if      defined(__VSF64__)
+    vsf_trace_buffer(VSF_TRACE_ERROR, (void *)stack, 1024,
+        VSF_TRACE_DF_DS(8) | VSF_TRACE_DF_DPL(2) | VSF_TRACE_DF_ADDR | VSF_TRACE_DF_CHAR | VSF_TRACE_DF_NEWLINE);
+#   elif    defined(__VSF16__)
+    vsf_trace_buffer(VSF_TRACE_ERROR, (void *)stack, 256,
+        VSF_TRACE_DF_DS(2) | VSF_TRACE_DF_DPL(8) | VSF_TRACE_DF_ADDR | VSF_TRACE_DF_CHAR | VSF_TRACE_DF_NEWLINE);
+#   elif    defined(__VSF8__)
+    vsf_trace_buffer(VSF_TRACE_ERROR, (void *)stack, 256,
+        VSF_TRACE_DF_DS(1) | VSF_TRACE_DF_DPL(16) | VSF_TRACE_DF_ADDR | VSF_TRACE_DF_CHAR | VSF_TRACE_DF_NEWLINE);
+#   else
+    vsf_trace_buffer(VSF_TRACE_ERROR, (void *)stack, 256,
+        VSF_TRACE_DF_DS(4) | VSF_TRACE_DF_DPL(4) | VSF_TRACE_DF_ADDR | VSF_TRACE_DF_CHAR | VSF_TRACE_DF_NEWLINE);
+#   endif
+
+    vsf_trace_error("callstack:" VSF_TRACE_CFG_LINEEND);
+    for (uint_fast16_t i = 0; i < num; i++) {
+        vsf_trace_error("0x%08X" VSF_TRACE_CFG_LINEEND, callstack[i]);
+    }
+    while (1);
+}
+#endif
+
+
+
+
+
 /*! \note initialize device driver
  *  \param none
  *  \retval true initialization succeeded.
