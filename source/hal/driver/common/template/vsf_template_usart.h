@@ -67,7 +67,7 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
 #endif
 
 //! In the specific hardware driver, we can enable
-//! VSF_USART_CFG_REIMPLEMENT_TYPE_MODE to redefine VSF_USART_mode_t as needed.
+//! VSF_USART_CFG_REIMPLEMENT_TYPE_MODE to redefine vsf_usart_mode_t as needed.
 #ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_MODE
 #   define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE      DISABLED
 #endif
@@ -201,7 +201,7 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
  * @brief 预定义的 VSF USART 模式，可以在具体的 HAL 驱动重新实现。
  *
  * \~english
- * Even if the hardware doesn't support these features, the following modes must be kept，
+ * Even if the hardware doesn't support these modes, the following modes must be kept，
  * If the hardware supports more modes, e.g. more parity modes, more databits, more stopbits,
  * more FIFO threshold size, we can implement it in the hardware driver:
  * \~chinese
@@ -261,9 +261,9 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
  *  Optional features require one or more enumeration options and a macro with the same
  *  name to determine if they are supported at runtime. If the feature supports more than
  *  one option, it is recommended to provide the corresponding MASK option, so that the
- *  user can switch to different modes at runtime.
+ *  user can switch to different modes at compile-time.
  * \~chinese
- * 可选特性需要提供一个或者多个枚举选项，还需要提供同名的宏，方便用户在运行时判断是否支持。
+ * 可选特性需要提供一个或者多个枚举选项，还需要提供同名的宏，方便用户在编译时判断是否支持。
  * 如果它特性支持多个选项，建议提供对应的 MASK 选项，方便用户在运行时切换到不同的模式。
  *
  */
