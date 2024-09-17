@@ -575,36 +575,38 @@ extern vsf_err_t vsf_gpio_port_config_pins(vsf_gpio_t         *gpio_ptr,
 ///**
 // \~english
 // @brief Configure one or more ports and pin of the gpio instance
-// @param[in] cfg: a pointer to structure @ref vsf_gpio_port_cfg_pin_t
+// @param[in] cfg: array of vsf_gpio_port_cfg_pins_t structures, refer @ref vsf_gpio_port_cfg_pins_t
+// @param[in] count: number of struct array vsf_gpio_port_cfg_pins_t
 // @return vsf_err_t: VSF_ERR_NONE if GPIO Configuration Successful, or a negative error code
 // @note The VSF_PREFIX prefix of this can be replaced with the actual prefix, e.g. vsf_hw
 //
 // \~chinese
 // @brief 配置 gpio 的一个或者多个端口和引脚
-// @param[in] cfg: 结构体 vsf_gpio_port_cfg_pin_t 的指针，参考 @ref vsf_gpio_port_cfg_pin_t
+// @param[in] cfg: vsf_gpio_port_cfg_pins_t 结构体数组, 参考 @ref vsf_gpio_port_cfg_pins_t
+// @param[in] count: 结构体数组 vsf_gpio_port_cfg_pins_t 的数量
 // @return vsf_err_t: 如果 GPIO 配置成功返回 VSF_ERR_NONE , 失败返回负数。
 // @note VSF_PREFIX 前缀可以替换成实际的前缀，例如 vsf_hw
 // */
-//extern vsf_err_t VSF_PREFIX_gpio_ports_config_pins(vsf_gpio_t         *gpio_ptr,
-//                                           vsf_gpio_pin_mask_t  pin_mask,
-//                                           vsf_gpio_cfg_t      *cfg);
+//extern vsf_err_t VSF_PREFIX_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
+//                                                   uint_fast8_t              count);
 //
 ///**
 // \~english
 // @brief Configure one pin for one or more ports of the gpio instance
-// @param[in] cfg: a pointer to structure @ref vsf_gpio_port_cfg_pins_t
+// @param[in] cfg: a pointer to structure @ref vsf_gpio_port_cfg_pin_t
+// @param[in] count: number of struct array vsf_gpio_port_cfg_pin_t
 // @return vsf_err_t: VSF_ERR_NONE if GPIO Configuration Successful, or a negative error code
 // @note The VSF_PREFIX prefix of this can be replaced with the actual prefix, e.g. vsf_hw
 //
 // \~chinese
 // @brief 配置 gpio 的一个或者多个端口的一个引脚
-// @param[in] cfg: 结构体 vsf_gpio_port_cfg_pins_t 的指针，参考 @ref vsf_gpio_port_cfg_pins_t
+// @param[in] cfg: 结构体 vsf_gpio_port_cfg_pin_t 的指针，参考 @ref vsf_gpio_port_cfg_pin_t
+// @param[in] count: 结构体数组 vsf_gpio_port_cfg_pin_t 的数量
 // @return vsf_err_t: 如果 GPIO 配置成功返回 VSF_ERR_NONE , 失败返回负数。
 // @note VSF_PREFIX 前缀可以替换成实际的前缀，例如 vsf_hw
 // */
-//extern vsf_err_t VSF_PREFIX_gpio_ports_config_pin(vsf_gpio_t         *gpio_ptr,
-//                                           vsf_gpio_pin_mask_t    pin_mask,
-//                                           vsf_gpio_cfg_t        *cfg);
+//extern vsf_err_t VSF_PREFIX_gpio_ports_config_pin(vsf_gpio_port_cfg_pin_t *cfg_ptr,
+//                                                  uint_fast8_t              count);
 
 
 /**
