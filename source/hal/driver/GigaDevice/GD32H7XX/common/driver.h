@@ -35,7 +35,6 @@
 // For SWI
 #   include "hal/driver/common/swi/vsf_swi_template.h"
 
-#   include "../common/io/io.h"
 #   include "../common/gpio/gpio.h"
 #   include "../common/usart/usart.h"
 #   include "../common/flash/flash.h"
@@ -50,14 +49,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ INCLUDES ======================================*/
-
-#if VSF_HAL_USE_IO == ENABLED
-#   include "hal/driver/common/template/vsf_template_io.h"
-
-#   define VSF_IO_CFG_DEC_PREFIX                            vsf_hw
-#   define VSF_IO_CFG_DEC_UPCASE_PREFIX                     VSF_HW
-#   include "hal/driver/common/io/io_template.h"
-#endif
 
 #if VSF_HAL_USE_GPIO == ENABLED
 #   include "hal/driver/common/template/vsf_template_gpio.h"

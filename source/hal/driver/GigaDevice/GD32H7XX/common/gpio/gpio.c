@@ -64,31 +64,42 @@ uint32_t __vsf_hw_gpio_get_regbase(vsf_hw_gpio_t *gpio_ptr)
     return gpio_ptr->reg;
 }
 
-void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_config_pin)(
+vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_port_config_pins)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
     vsf_gpio_pin_mask_t pin_mask,
-    vsf_gpio_mode_t mode
+    vsf_gpio_cfg_t *cfg_ptr
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
 
     uint32_t reg = gpio_ptr->reg, offset_len2;
-    uint32_t ctl = (mode >> 0) & 3;
-    uint32_t omode = (mode >> 2) & 1;
-    uint32_t pud = (mode >> 3) & 3;
-    uint32_t ospd = (mode >> 5) & 3;
+    uint32_t ctl = (cfg_ptr->mode >> 0) & 3;
+    uint32_t omode = (cfg_ptr->mode >> 2) & 1;
+    uint32_t pud = (cfg_ptr->mode >> 3) & 3;
+    uint32_t ospd = (cfg_ptr->mode >> 5) & 3;
     uint32_t current_pin_mask;
+    uint32_t function = cfg_ptr->alternate_function, offset_len4;
 
-    for (int i = 0; i < VSF_HW_GPIO_PIN_COUNT; i++) {
-        current_pin_mask = 1 << i;
+    for (int pin = 0; pin < VSF_HW_GPIO_PIN_COUNT; pin++) {
+        current_pin_mask = 1 << pin;
         if (pin_mask & current_pin_mask) {
-            offset_len2 = i << 1;
+            offset_len2 = pin << 1;
 
+            if (VSF_GPIO_AF == (cfg_ptr->mode & 3)) {
+                if (pin < 8) {
+                    offset_len4 = pin << 2;
+                    vsf_atom32_op(&GPIO_AFSEL0(reg), (_ & ~(15 << offset_len4)) | (function << offset_len4));
+                } else {
+                    offset_len4 = (pin - 8) << 2;
+                    vsf_atom32_op(&GPIO_AFSEL1(reg), (_ & ~(15 << offset_len4)) | (function << offset_len4));
+                }
+            }
             vsf_atom32_op(&GPIO_CTL(reg), (_ & ~(3 << offset_len2)) | (ctl << offset_len2));
-            vsf_atom32_op(&GPIO_OMODE(reg), (_ & ~(1 << i)) | (omode << i));
+            vsf_atom32_op(&GPIO_OMODE(reg), (_ & ~(1 << pin)) | (omode << pin));
             vsf_atom32_op(&GPIO_OSPD(reg), (_ & ~(3 << offset_len2)) | (ospd << offset_len2));
             vsf_atom32_op(&GPIO_PUD(reg), (_ & ~(3 << offset_len2)) | (pud << offset_len2));
         }
     }
+    return VSF_ERR_NONE;
 }
 
 void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_set_direction)(
@@ -158,32 +169,31 @@ void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_toggle)(
     GPIO_TG(gpio_ptr->reg) |= pin_mask;
 }
 
-vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_enable)(
+vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_config)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
-    vsf_gpio_pin_mask_t pin_mask,
-    vsf_arch_prio_t prio
+    vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     VSF_HAL_ASSERT(false);
-    return VSF_ERR_NONE;
+    return VSF_ERR_NOT_SUPPORT;
+}
+
+vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_enable)(
+    VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
+    vsf_gpio_pin_mask_t pin_mask
+) {
+    VSF_HAL_ASSERT(NULL != gpio_ptr);
+    VSF_HAL_ASSERT(false);
+    return VSF_ERR_NOT_SUPPORT;
 }
 
 vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_disable)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
-    vsf_gpio_pin_mask_t pin_mask) {
-    VSF_HAL_ASSERT(NULL != gpio_ptr);
-    VSF_HAL_ASSERT(false);
-    return VSF_ERR_NONE;
-}
-
-vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_config)(
-    VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
-    vsf_gpio_pin_irq_cfg_t *cfg_ptr
+    vsf_gpio_pin_mask_t pin_mask
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
-    VSF_HAL_ASSERT(NULL != cfg_ptr);
     VSF_HAL_ASSERT(false);
-    return VSF_ERR_NONE;
+    return VSF_ERR_NOT_SUPPORT;
 }
 
 /*\note Implementation of APIs below is optional, because there is default implementation in gpio_template.inc.
