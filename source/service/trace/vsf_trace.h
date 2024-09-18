@@ -243,6 +243,7 @@ extern void vsf_trace(vsf_trace_level_t level, const char *format, ...);
 
 extern uint_fast32_t __vsf_trace_output(const char *buff, uint_fast32_t size);
 extern void vsf_trace_assert(const char *expr, const char *file, int line, const char *func);
+extern void vsf_trace_dump_stack(void);
 
 #endif
 

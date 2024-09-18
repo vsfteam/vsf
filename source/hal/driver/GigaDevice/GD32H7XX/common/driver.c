@@ -771,16 +771,84 @@ void HardFault_Handler(void)
     uint_fast16_t num = vsf_arch_get_callstack(stack, callstack, dimof(callstack));
 
     vsf_trace_error("Hardfault:" VSF_TRACE_CFG_LINEEND);
-    vsf_trace_error("dumping stack @ 0x%X:" VSF_TRACE_CFG_LINEEND, stack);
-    vsf_trace_buffer(VSF_TRACE_ERROR, (void *)stack, 256,
-        VSF_TRACE_DF_DS(4) | VSF_TRACE_DF_DPL(4) | VSF_TRACE_DF_ADDR | VSF_TRACE_DF_CHAR | VSF_TRACE_DF_NEWLINE);
 
-    vsf_trace_error("callstack:" VSF_TRACE_CFG_LINEEND);
-    for (uint_fast16_t i = 0; i < num; i++) {
-        vsf_trace_error("0x%08X" VSF_TRACE_CFG_LINEEND, callstack[i]);
+    uint32_t cfsr = SCB->CFSR, addr;
+    vsf_trace_error("CFSR: 0x%08X" VSF_TRACE_CFG_LINEEND, cfsr);
+
+    if (cfsr & 0xFF) {
+        addr = SCB->MMFAR;
+        if (cfsr & SCB_CFSR_IACCVIOL_Msk) {
+            vsf_trace_error("Instruction access violation at 0x%08X" VSF_TRACE_CFG_LINEEND, addr);
+        }
+        if (cfsr & SCB_CFSR_DACCVIOL_Msk) {
+            vsf_trace_error("Data access violation at 0x%08X" VSF_TRACE_CFG_LINEEND, addr);
+        }
+        if (cfsr & SCB_CFSR_MUNSTKERR_Msk) {
+            vsf_trace_error("MemManage fault on unstacking for a return from exception at 0x%08X" VSF_TRACE_CFG_LINEEND, addr);
+        }
+        if (cfsr & SCB_CFSR_MSTKERR_Msk) {
+            vsf_trace_error("MemManage fault on stacking for exception entry at 0x%08X" VSF_TRACE_CFG_LINEEND, addr);
+        }
+        if (cfsr & SCB_CFSR_MLSPERR_Msk) {
+            vsf_trace_error("MemManage fault during floating-point lazy state preservation at 0x%08X" VSF_TRACE_CFG_LINEEND, addr);
+        }
     }
+    if (cfsr & 0xFF00) {
+        addr = SCB->BFAR;
+        if (cfsr & SCB_CFSR_IBUSERR_Msk) {
+            vsf_trace_error("Instruction bus error at 0x%08X" VSF_TRACE_CFG_LINEEND, addr);
+        }
+        if (cfsr & SCB_CFSR_PRECISERR_Msk) {
+            vsf_trace_error("Precise data bus error at 0x%08X" VSF_TRACE_CFG_LINEEND, addr);
+        }
+        if (cfsr & SCB_CFSR_IMPRECISERR_Msk) {
+            vsf_trace_error("Imprecise data bus error at 0x%08X" VSF_TRACE_CFG_LINEEND, addr);
+        }
+        if (cfsr & SCB_CFSR_UNSTKERR_Msk) {
+            vsf_trace_error("BusFault on unstacking for a return from exception at 0x%08X" VSF_TRACE_CFG_LINEEND, addr);
+        }
+        if (cfsr & SCB_CFSR_STKERR_Msk) {
+            vsf_trace_error("BusFault on stacking for exception entry at 0x%08X" VSF_TRACE_CFG_LINEEND, addr);
+        }
+        if (cfsr & SCB_CFSR_LSPERR_Msk) {
+            vsf_trace_error("BusFault during floating-point lazy state preservation at 0x%08X" VSF_TRACE_CFG_LINEEND, addr);
+        }
+    }
+    if (cfsr & 0xFFFF0000) {
+        if (cfsr & SCB_CFSR_UNDEFINSTR_Msk) {
+            vsf_trace_error("Undefined instruction" VSF_TRACE_CFG_LINEEND);
+        }
+        if (cfsr & SCB_CFSR_INVSTATE_Msk) {
+            vsf_trace_error("Invalid state" VSF_TRACE_CFG_LINEEND);
+        }
+        if (cfsr & SCB_CFSR_INVPC_Msk) {
+            vsf_trace_error("Invalid PC" VSF_TRACE_CFG_LINEEND);
+        }
+        if (cfsr & SCB_CFSR_NOCP_Msk) {
+            vsf_trace_error("No coprocessor" VSF_TRACE_CFG_LINEEND);
+        }
+        if (cfsr & SCB_CFSR_UNALIGNED_Msk) {
+            vsf_trace_error("Unaligned access" VSF_TRACE_CFG_LINEEND);
+        }
+        if (cfsr & SCB_CFSR_DIVBYZERO_Msk) {
+            vsf_trace_error("Divide by zero" VSF_TRACE_CFG_LINEEND);
+        }
+    }
+
+    vsf_trace_dump_stack();
     while (1);
 }
+
+void MemManage_Handler(void)
+{
+    HardFault_Handler();
+}
+
+void BusFault_Handler(void)
+{
+    HardFault_Handler();
+}
+
 #endif
 
 

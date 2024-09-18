@@ -355,10 +355,9 @@ void vsf_trace(vsf_trace_level_t level, const char *format, ...)
     __vsf_trace_set_level(VSF_TRACE_CFG_DEFAULT_LEVEL);
 }
 
-void vsf_trace_assert(const char *expr, const char *file, int line, const char *func)
-{
-    vsf_trace_error("%s:%d %s -- assertion failed on %s" VSF_TRACE_CFG_LINEEND, file, line, func, NULL == expr ? "unknown" : expr);
 #if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
+void vsf_trace_dump_stack(void)
+{
     uintptr_t stack = vsf_arch_get_stack();
     uintptr_t callstack[16] = { 0 };
     uint_fast16_t num = vsf_arch_get_callstack(stack, callstack, dimof(callstack));
@@ -382,6 +381,14 @@ void vsf_trace_assert(const char *expr, const char *file, int line, const char *
     for (uint_fast16_t i = 0; i < num; i++) {
         vsf_trace_error("0x%08X" VSF_TRACE_CFG_LINEEND, callstack[i]);
     }
+}
+#endif
+
+void vsf_trace_assert(const char *expr, const char *file, int line, const char *func)
+{
+    vsf_trace_error("%s:%d %s -- assertion failed on %s" VSF_TRACE_CFG_LINEEND, file, line, func, NULL == expr ? "unknown" : expr);
+#if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
+    vsf_trace_dump_stack();
 #endif
     while (true);
 }
