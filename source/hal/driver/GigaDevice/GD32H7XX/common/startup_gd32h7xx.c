@@ -537,14 +537,95 @@ VSF_CAL_ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
 #pragma GCC diagnostic pop
 #endif
 
+VSF_CAL_WEAK(mpu_set_protection)
+void mpu_set_protection(uint32_t baseaddr, uint32_t size, uint32_t rnum, uint8_t de, uint8_t ap, uint8_t sen, uint8_t cen, uint8_t ben)
+{
+    mpu_region_init_struct mpu_init_struct;
+    mpu_region_struct_para_init(&mpu_init_struct);
+
+    ARM_MPU_Disable();                                           /* 配置MPU之前先关闭MPU,配置完成以后再使能MPU */
+
+    mpu_init_struct.region_number       = rnum;                  /* 设置保护区域编号 */
+    mpu_init_struct.region_base_address = baseaddr;              /* 设置保护区域基地址 */
+    mpu_init_struct.instruction_exec    = de;                    /* 是否允许指令访问 */
+    mpu_init_struct.access_permission   = ap;                    /* 设置访问权限 */
+    mpu_init_struct.tex_type            = MPU_TEX_TYPE0;         /* 设置TEX类型为type 0 */
+    mpu_init_struct.access_shareable    = sen;                   /* 是否共用? */
+    mpu_init_struct.access_cacheable    = cen;                   /* 是否cache? */
+    mpu_init_struct.access_bufferable   = ben;                   /* 是否缓冲? */
+    mpu_init_struct.subregion_disable   = 0X00;                  /* 禁止子区域 */
+    mpu_init_struct.region_size         = size;                  /* 设置保护区域大小 */
+    mpu_region_config(&mpu_init_struct);                         /* 配置MPU区域 */
+    mpu_region_enable();                                         /* 使能MPU区域 */
+
+    ARM_MPU_Enable(MPU_MODE_PRIV_DEFAULT);                       /* 设置完毕,使能MPU保护 */
+}
+
+VSF_CAL_WEAK(mpu_memory_protection)
+void mpu_memory_protection(void)
+{
+    /* 保护整个ITCM,共64K字节 */
+    mpu_set_protection( 0x00000000,                 /* 区域基地址 */
+                        MPU_REGION_SIZE_64KB,       /* 区域大小 */
+                        MPU_REGION_NUMBER0,         /* 区域编号 */
+                        MPU_INSTRUCTION_EXEC_PERMIT,/* 允许指令访问 */
+                        MPU_AP_FULL_ACCESS,         /* 全访问 */
+                        MPU_ACCESS_NON_SHAREABLE,   /* 禁止共用 */
+                        MPU_ACCESS_CACHEABLE,       /* 允许cache */
+                        MPU_ACCESS_BUFFERABLE);     /* 允许缓冲 */
+
+    /* 保护整个DTCM,共128K字节 */
+    mpu_set_protection( 0x20000000,                 /* 区域基地址 */
+                        MPU_REGION_SIZE_128KB,      /* 区域大小 */
+                        MPU_REGION_NUMBER1,         /* 区域编号 */
+                        MPU_INSTRUCTION_EXEC_PERMIT,/* 允许指令访问 */
+                        MPU_AP_FULL_ACCESS,         /* 全访问 */
+                        MPU_ACCESS_NON_SHAREABLE,   /* 禁止共用 */
+                        MPU_ACCESS_CACHEABLE,       /* 允许cache */
+                        MPU_ACCESS_BUFFERABLE);     /* 允许缓冲 */
+
+    /* 保护整个AXI SRAM,共1024K字节 */
+    mpu_set_protection( 0x24000000,                 /* 区域基地址 */
+                        MPU_REGION_SIZE_1MB,        /* 区域大小 */
+                        MPU_REGION_NUMBER2,         /* 区域编号 */
+                        MPU_INSTRUCTION_EXEC_PERMIT,/* 允许指令访问 */
+                        MPU_AP_FULL_ACCESS,         /* 全访问 */
+                        MPU_ACCESS_SHAREABLE,       /* 允许共用 */
+                        MPU_ACCESS_CACHEABLE,       /* 允许cache */
+                        MPU_ACCESS_NON_BUFFERABLE); /* 禁止缓冲 */
+
+    /* 保护整个SRAM0和SRAM1,共32K字节 */
+    mpu_set_protection( 0x30000000,                 /* 区域基地址 */
+                        MPU_REGION_SIZE_32KB,       /* 区域大小 */
+                        MPU_REGION_NUMBER3,         /* 区域编号 */
+                        MPU_INSTRUCTION_EXEC_PERMIT,/* 允许指令访问 */
+                        MPU_AP_FULL_ACCESS,         /* 全访问 */
+                        MPU_ACCESS_NON_SHAREABLE,   /* 禁止共用 */
+                        MPU_ACCESS_CACHEABLE,       /* 允许cache */
+                        MPU_ACCESS_BUFFERABLE);     /* 允许缓冲 */
+
+    /* 保护SDRAM区域,共32M字节 */
+    mpu_set_protection( 0xC0000000,                 /* 区域基地址 */
+                        MPU_REGION_SIZE_32MB,       /* 区域大小 */
+                        MPU_REGION_NUMBER4,         /* 区域编号 */
+                        MPU_INSTRUCTION_EXEC_PERMIT,/* 允许指令访问 */
+                        MPU_AP_FULL_ACCESS,         /* 全访问 */
+                        MPU_ACCESS_NON_SHAREABLE,   /* 禁止共用 */
+                        MPU_ACCESS_CACHEABLE,       /* 允许cache */
+                        MPU_ACCESS_BUFFERABLE);     /* 允许缓冲 */
+}
+
 VSF_CAL_WEAK(vsf_hal_pre_startup_init)
 void vsf_hal_pre_startup_init(void)
 {
     SystemInit();
     SCB_EnableICache();
-#if GD32H7XX_CFG_DCACHE == ENABLED
     SCB_EnableDCache();
-#endif
+
+    // force cache write through, will have strange behaviour if not set
+    SCB->CACR |= 1 << 2;
+    // also a MUST, will have strange behaviour if not called
+    mpu_memory_protection();
 }
 
 /*----------------------------------------------------------------------------
