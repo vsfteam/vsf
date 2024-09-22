@@ -867,7 +867,7 @@ void BusFault_Handler(void)
 void vsf_hw_mpu_add_region(uint32_t baseaddr,
         uint32_t size, uint8_t de, uint8_t ap, uint8_t sen, uint8_t cen, uint8_t ben)
 {
-    static uint8_t __mpu_region_idx = 0;
+    static uint32_t __mpu_region_idx = 0;
     vsf_arch_mpu_config_region(__mpu_region_idx, baseaddr, MPU_TEX_TYPE0,
         size, de, ap, sen, cen, ben);
     __mpu_region_idx++;
