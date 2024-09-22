@@ -12,6 +12,12 @@
 #   include "../../../include/fcntl.h"
 #   include "../../../include/findprog.h"
 #   include "../../../include/linux/limits.h"
+#   if  (VSF_LINUX_CFG_HEAP_SIZE > 0)                                           \
+    ||  (   (VSF_HEAP_CFG_STATISTICS == ENABLED)                                \
+        &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                              \
+            ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED)))
+#       include "../../../include/sys/sysinfo.h"
+#   endif
 #else
 #   include <unistd.h>
 #   include <errno.h>
@@ -21,6 +27,13 @@
 #   include <findprog.h>
 // for PATH_MAX
 #   include <linux/limits.h>
+#   if  (VSF_LINUX_CFG_HEAP_SIZE > 0)                                           \
+    ||  (   (VSF_HEAP_CFG_STATISTICS == ENABLED)                                \
+        &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                              \
+            ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED)))
+// for sysinfo to get heap usage
+#       include <sys/sysinfo.h>
+#   endif
 #endif
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_CTYPE == ENABLED
 #   include "../../../include/simple_libc/ctype.h"
@@ -1014,19 +1027,20 @@ int kill_main(int argc, char *argv[])
 }
 #endif
 
-#if     (VSF_HEAP_CFG_STATISTICS == ENABLED)                                    \
-    &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                                  \
-        ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED))
+#if     (VSF_LINUX_CFG_HEAP_SIZE > 0)                                           \
+    ||  (   (VSF_HEAP_CFG_STATISTICS == ENABLED)                                \
+        &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                              \
+            ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED)))
 int free_main(int argc, char *argv[])
 {
-    vsf_heap_statistics_t statistics;
-    vsf_heap_statistics(&statistics);
+    struct sysinfo info;
+    sysinfo(&info);
 
     // 20 bytes is enough for 64-bit value
     char numbuf_total[20], numbuf_used[20], numbuf_free[20];
-    itoa(statistics.all_size, numbuf_total, 10);
-    itoa(statistics.used_size, numbuf_used, 10);
-    itoa(statistics.all_size - statistics.used_size, numbuf_free, 10);
+    itoa(info.totalram, numbuf_total, 10);
+    itoa(info.totalram - info.freeram, numbuf_used, 10);
+    itoa(info.freeram, numbuf_free, 10);
 
     printf("          total       used       free\nMem:%11s%11s%11s\n",
             numbuf_total, numbuf_used, numbuf_free);
