@@ -864,30 +864,13 @@ void BusFault_Handler(void)
 
 
 // the region added later will have higher priority
-void vsf_hw_mpu_add_region(uint32_t baseaddr, uint32_t size, uint8_t de,
-        uint8_t ap, uint8_t sen, uint8_t cen, uint8_t ben)
+void vsf_hw_mpu_add_region(uint32_t baseaddr,
+        uint32_t size, uint8_t de, uint8_t ap, uint8_t sen, uint8_t cen, uint8_t ben)
 {
-    static uint32_t __region_idx = 0;
-
-    mpu_region_init_struct mpu_init_struct;
-    mpu_region_struct_para_init(&mpu_init_struct);
-
-    ARM_MPU_Disable();
-
-    mpu_init_struct.region_number       = __region_idx++;
-    mpu_init_struct.region_base_address = baseaddr;
-    mpu_init_struct.instruction_exec    = de;
-    mpu_init_struct.access_permission   = ap;
-    mpu_init_struct.tex_type            = MPU_TEX_TYPE0;
-    mpu_init_struct.access_shareable    = sen;
-    mpu_init_struct.access_cacheable    = cen;
-    mpu_init_struct.access_bufferable   = ben;
-    mpu_init_struct.subregion_disable   = 0X00;
-    mpu_init_struct.region_size         = size;
-    mpu_region_config(&mpu_init_struct);
-    mpu_region_enable();
-
-    ARM_MPU_Enable(MPU_MODE_PRIV_DEFAULT);
+    static uint8_t __mpu_region_idx = 0;
+    vsf_arch_mpu_config_region(__mpu_region_idx, baseaddr, MPU_TEX_TYPE0,
+        size, de, ap, sen, cen, ben);
+    __mpu_region_idx++;
 }
 
 void vsf_hw_mpu_add_basic_resgions(void)

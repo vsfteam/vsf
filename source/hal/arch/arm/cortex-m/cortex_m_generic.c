@@ -373,7 +373,7 @@ int vsf_get_interrupt_id(void)
 }
 
 /*----------------------------------------------------------------------------*
- * Others: sleep, reset, etc                                                  *
+ * Others: sleep, reset, mpu, etc                                             *
  *----------------------------------------------------------------------------*/
 
 VSF_CAL_WEAK(vsf_arch_sleep)
@@ -403,6 +403,35 @@ void vsf_arch_shutdown(void)
 {
     VSF_ARCH_ASSERT(false);
 }
+
+#if __MPU_PRESENT
+// the region added later will have higher priority
+void vsf_arch_mpu_config_region(uint8_t idx, uint32_t baseaddr, uint32_t type,
+        uint32_t size, uint8_t de, uint8_t ap, uint8_t sen, uint8_t cen, uint8_t ben)
+{
+    VSF_ARCH_ASSERT(idx <= 15);
+    ARM_MPU_Disable();
+
+    ARM_MPU_SetRegionEx(idx, baseaddr,
+        ((uint32_t)de       << MPU_RASR_XN_Pos)     |
+        ((uint32_t)ap       << MPU_RASR_AP_Pos)     |
+        ((uint32_t)type     << MPU_RASR_TEX_Pos)    |
+        ((uint32_t)sen      << MPU_RASR_S_Pos)      |
+        ((uint32_t)cen      << MPU_RASR_C_Pos)      |
+        ((uint32_t)ben      << MPU_RASR_B_Pos)      |
+        ((uint32_t)0x00     << MPU_RASR_SRD_Pos)    |
+        ((uint32_t)size     << MPU_RASR_SIZE_Pos)   |
+        MPU_RASR_ENABLE_Msk
+    );
+
+    ARM_MPU_Enable(MPU_MODE_PRIV_DEFAULT);
+}
+
+void vsf_arch_mpu_remove_region(uint8_t idx)
+{
+    ARM_MPU_ClrRegion(idx);
+}
+#endif
 
 /*----------------------------------------------------------------------------*
  * arch enhancement                                                           *

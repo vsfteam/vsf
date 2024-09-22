@@ -274,6 +274,13 @@ extern void vsf_arch_add_text_region(vsf_arch_text_region_t *region);
 extern uint_fast16_t vsf_arch_get_callstack(uintptr_t sp, uintptr_t *callstack, uint_fast16_t callstack_num);
 #endif
 
+// __MPU_PRESENT is maybe not available here
+//#if __MPU_PRESENT
+extern void vsf_arch_mpu_config_region(uint8_t idx, uint32_t baseaddr, uint32_t type,
+        uint32_t size, uint8_t de, uint8_t ap, uint8_t sen, uint8_t cen, uint8_t ben);
+extern void vsf_arch_mpu_remove_region(uint8_t idx);
+//#endif
+
 #ifdef __cplusplus
 }
 #endif
