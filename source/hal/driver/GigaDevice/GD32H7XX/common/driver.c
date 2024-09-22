@@ -863,6 +863,88 @@ void BusFault_Handler(void)
 
 
 
+// the region added later will have higher priority
+void vsf_hw_mpu_add_region(uint32_t baseaddr, uint32_t size, uint8_t de,
+        uint8_t ap, uint8_t sen, uint8_t cen, uint8_t ben)
+{
+    static uint32_t __region_idx = 0;
+
+    mpu_region_init_struct mpu_init_struct;
+    mpu_region_struct_para_init(&mpu_init_struct);
+
+    ARM_MPU_Disable();
+
+    mpu_init_struct.region_number       = __region_idx++;
+    mpu_init_struct.region_base_address = baseaddr;
+    mpu_init_struct.instruction_exec    = de;
+    mpu_init_struct.access_permission   = ap;
+    mpu_init_struct.tex_type            = MPU_TEX_TYPE0;
+    mpu_init_struct.access_shareable    = sen;
+    mpu_init_struct.access_cacheable    = cen;
+    mpu_init_struct.access_bufferable   = ben;
+    mpu_init_struct.subregion_disable   = 0X00;
+    mpu_init_struct.region_size         = size;
+    mpu_region_config(&mpu_init_struct);
+    mpu_region_enable();
+
+    ARM_MPU_Enable(MPU_MODE_PRIV_DEFAULT);
+}
+
+void vsf_hw_mpu_add_basic_resgions(void)
+{
+    vsf_hw_mpu_add_region(  0x00000000,
+                            MPU_REGION_SIZE_64KB,
+                            MPU_INSTRUCTION_EXEC_PERMIT,
+                            MPU_AP_FULL_ACCESS,
+                            MPU_ACCESS_NON_SHAREABLE,
+                            MPU_ACCESS_CACHEABLE,
+                            MPU_ACCESS_BUFFERABLE);
+
+    vsf_hw_mpu_add_region(  0x20000000,
+                            MPU_REGION_SIZE_128KB,
+                            MPU_INSTRUCTION_EXEC_PERMIT,
+                            MPU_AP_FULL_ACCESS,
+                            MPU_ACCESS_NON_SHAREABLE,
+                            MPU_ACCESS_CACHEABLE,
+                            MPU_ACCESS_BUFFERABLE);
+
+    vsf_hw_mpu_add_region(  0x24000000,
+                            MPU_REGION_SIZE_1MB,
+                            MPU_INSTRUCTION_EXEC_PERMIT,
+                            MPU_AP_FULL_ACCESS,
+                            MPU_ACCESS_NON_SHAREABLE,
+                            MPU_ACCESS_CACHEABLE,
+                            MPU_ACCESS_NON_BUFFERABLE);
+
+    vsf_hw_mpu_add_region(  0x30000000,
+                            MPU_REGION_SIZE_32KB,
+                            MPU_INSTRUCTION_EXEC_PERMIT,
+                            MPU_AP_FULL_ACCESS,
+                            MPU_ACCESS_NON_SHAREABLE,
+                            MPU_ACCESS_CACHEABLE,
+                            MPU_ACCESS_BUFFERABLE);
+
+    vsf_hw_mpu_add_region(  0xC0000000,
+                            MPU_REGION_SIZE_32MB,
+                            MPU_INSTRUCTION_EXEC_PERMIT,
+                            MPU_AP_FULL_ACCESS,
+                            MPU_ACCESS_NON_SHAREABLE,
+                            MPU_ACCESS_CACHEABLE,
+                            MPU_ACCESS_BUFFERABLE);
+
+    vsf_hw_mpu_add_region(  0x80000000,
+                            MPU_REGION_SIZE_4MB,
+                            MPU_INSTRUCTION_EXEC_PERMIT,
+                            MPU_AP_FULL_ACCESS,
+                            MPU_ACCESS_NON_SHAREABLE,
+                            MPU_ACCESS_CACHEABLE,
+                            MPU_ACCESS_NON_BUFFERABLE);
+}
+
+
+
+
+
 /*! \note initialize device driver
  *  \param none
  *  \retval true initialization succeeded.
@@ -871,6 +953,7 @@ void BusFault_Handler(void)
 VSF_CAL_WEAK(vsf_driver_init)
 bool vsf_driver_init(void)
 {
+    vsf_hw_mpu_add_basic_resgions();
     return true;
 }
 

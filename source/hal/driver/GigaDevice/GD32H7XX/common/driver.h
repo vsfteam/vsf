@@ -48,6 +48,11 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern void vsf_hw_mpu_add_region(uint32_t baseaddr, uint32_t size, uint8_t de,
+        uint8_t ap, uint8_t sen, uint8_t cen, uint8_t ben);
+extern void vsf_hw_mpu_add_basic_resgions(void);
+
 /*============================ INCLUDES ======================================*/
 
 #if VSF_HAL_USE_GPIO == ENABLED
