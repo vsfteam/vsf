@@ -424,14 +424,14 @@ void vsf_arch_mpu_config_region(uint32_t idx, uint32_t baseaddr, uint32_t type,
         MPU_RASR_ENABLE_Msk
     );
 
-    ARM_MPU_Enable(MPU_MODE_PRIV_DEFAULT);
+    ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
 }
 
 void vsf_arch_mpu_remove_region(uint32_t idx)
 {
     ARM_MPU_Disable();
     ARM_MPU_ClrRegion(idx);
-    ARM_MPU_Enable(MPU_MODE_PRIV_DEFAULT);
+    ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
 }
 #endif
 
