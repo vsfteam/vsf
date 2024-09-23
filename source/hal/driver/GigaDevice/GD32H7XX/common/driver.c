@@ -915,7 +915,7 @@ void vsf_hw_mpu_add_basic_resgions(void)
                             MPU_ACCESS_CACHEABLE,
                             MPU_ACCESS_BUFFERABLE);
 
-    vsf_hw_mpu_add_region(  0x80000000,
+    vsf_hw_mpu_add_region(  0x08000000,
                             MPU_REGION_SIZE_4MB,
                             MPU_INSTRUCTION_EXEC_PERMIT,
                             MPU_AP_FULL_ACCESS,
