@@ -925,6 +925,9 @@ static int __vsf_linux_init_thread(int argc, char *argv[])
 
     // init shall be called in pid1
     vsf_linux_process_t *process = vsf_linux_get_cur_process();
+    // IMPORTANT: the process MUST be the first linux process and NO OTHER processes are created
+    //  If asserted here, make sure no APIs(like system(), etc) which will create process are called in vsf_linux_create_fhs.
+    VSF_LINUX_ASSERT((process->id.pid == 0) && (__vsf_linux.cur_pid == 1));
     process->id.pid = 1;
     __vsf_linux.cur_pid = 2;
     execlp(VSF_LINUX_CFG_BIN_PATH "/init", "init", NULL);
