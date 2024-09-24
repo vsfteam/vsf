@@ -419,8 +419,8 @@ void vsf_systimer_prio_set(vsf_arch_prio_t priority)
 
 static void __vsf_main_task(void *param)
 {
-    extern void __vsf_main_entry(void);
-    __vsf_main_entry();
+    extern void vsf_main_entry(void);
+    vsf_main_entry();
 }
 
 void vsf_freertos_start(void)

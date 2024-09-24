@@ -187,7 +187,7 @@ extern const vsf_protect_region_t vsf_protect_region_sched;
 
 /*============================ PROTOTYPES ====================================*/
 
-//! __vsf_kernel_os_start and __vsf_kernel_os_run_priority are ONLY used when __vsf_main_entry is not used
+//! __vsf_kernel_os_start and __vsf_kernel_os_run_priority are ONLY used when embedded weak vsf_main_entry is not used
 extern void __vsf_kernel_os_start(void);
 extern void __vsf_kernel_os_run_priority(vsf_prio_t priority);
 #ifndef WEAK_VSF_KERNEL_ERR_REPORT

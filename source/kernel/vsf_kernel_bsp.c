@@ -76,7 +76,7 @@ def_vsf_thread(app_main_thread_t, VSF_OS_CFG_MAIN_STACK_SIZE)
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void __vsf_main_entry(void);
+extern void vsf_main_entry(void);
 extern int VSF_USER_ENTRY(void);
 
 /*============================ IMPLEMENTATION ================================*/
@@ -343,7 +343,7 @@ this macro in vsf_usr_cfg.h or you can call vsf_heap_add()/vsf_heap_add_memory()
 }
 #endif
 
-// call __vsf_main_entry in a standalone host-os thread
+// call vsf_main_entry in a standalone host-os thread
 #if VSF_KERNEL_CFG_NON_STANDALONE != ENABLED
 
 #if __IS_COMPILER_ARM_COMPILER_6__
@@ -355,7 +355,7 @@ __asm(".global __ARM_use_no_argv\n\t");
 #endif
 
 /*----------------------------------------------------------------------------*
- * Compiler Specific Code to run __vsf_main_entry() before main()             *
+ * Compiler Specific Code to run vsf_main_entry() before main()               *
  *----------------------------------------------------------------------------*/
 #if __IS_COMPILER_IAR__
 VSF_CAL_WEAK(__low_level_init)
@@ -372,7 +372,7 @@ __root
 __noreturn
 __stackless void __cmain(void)
 {
-    __vsf_main_entry();
+    vsf_main_entry();
     exit(0);
 }
 
@@ -409,7 +409,7 @@ void __cmain(void)
 
         __IAR_STARTUP_DATA_INIT();
     }
-    __vsf_main_entry();
+    vsf_main_entry();
     exit(0);
 }
 #   endif
@@ -441,7 +441,7 @@ void __vsf_heap_init(void)
 #if VSF_KERNEL_CFG_ENTRY_IS_MAIN == ENABLED
 int main(void)
 {
-    __vsf_main_entry();
+    vsf_main_entry();
 #   ifdef VSF_ARCH_ENTRY_NO_PENDING
     vsf_arch_main();
 #   endif
@@ -451,16 +451,16 @@ int main(void)
 #   if __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
 __attribute__((constructor(MAX_CONSTRUCTOR_PRIORITY)))
 #   endif
-void vsf_main_entry(void)
+void __vsf_main_entry(void)
 {
-    __vsf_main_entry();
+    vsf_main_entry();
 }
 #endif
 
 
 #else
 
-#warning please call __vsf_main_entry() before entering the main.
+#warning please call vsf_main_entry() before entering the main.
 #endif
 
 #endif      // VSF_KERNEL_CFG_NON_STANDALONE

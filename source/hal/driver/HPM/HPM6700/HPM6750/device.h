@@ -24,7 +24,7 @@
 /*\note first define basic info for arch. */
 #if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
 
-// __vsf_main_entry is called in reset_handler
+// vsf_main_entry is called in reset_handler
 #define VSF_KERNEL_CFG_NON_STANDALONE   ENABLED
 
 #ifndef VSF_SYSTIMER_CFG_IMPL_MODE

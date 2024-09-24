@@ -18,11 +18,11 @@ post_startup     SEGMENT   CODE
 ;                RSEG    ?STACK
 ;                DS      1
 
-                 EXTRN CODE (__vsf_main_entry)
+                 EXTRN CODE (vsf_main_entry)
                  PUBLIC  ?C_START
 
 ;                CSEG    AT      0
-?C_START:        LJMP    __vsf_main_entry
+?C_START:        LJMP    vsf_main_entry
 
 ;                RSEG    ?C_C51START
 

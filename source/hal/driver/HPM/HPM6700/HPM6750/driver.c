@@ -239,8 +239,8 @@ void reset_handler(void)
 #endif
 
     /* Entry function */
-    extern void __vsf_main_entry(void);
-    __vsf_main_entry();
+    extern void vsf_main_entry(void);
+    vsf_main_entry();
 }
 
 /*! \note initialize device driver

@@ -144,8 +144,8 @@ Reset_Handler:
 
 
 	bl	SystemInit
-    
-	bl	__vsf_main_entry
+
+	bl	vsf_main_entry
 
 	.pool
 	.size	Reset_Handler, . - Reset_Handler
