@@ -56,6 +56,7 @@ typedef enum vk_malfs_mount_state_t {
     VSF_MOUNT_STATE_OPEN_ROOT,
     VSF_MOUNT_STATE_MOUNT,
     VSF_MOUNT_STATE_RENAME_ROOT,
+    VSF_MOUNT_STATE_UNLINK_ROOT,
 } vk_malfs_mount_state_t;
 
 typedef enum vk_malfs_partition_type_t {
@@ -336,6 +337,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
     uint8_t partition_idx;
     uint8_t partition_type;
     uint8_t partition_num;      // only used in gpt partition
+    uint8_t try_idx;
 )
 {
     vsf_peda_begin();
@@ -343,6 +345,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
     // partition_num is valid only for gpt
 #define __is_gpt()              (vsf_local.partition_num > 0)
 
+    static const uint8_t __partition_type_idxes[] = { VSF_MBR_PARTITION_TYPE_FAT12_CHS };
     vk_malfs_mounter_t *mounter = (vk_malfs_mounter_t *)&vsf_this;
     vk_malfs_mbr_t *mbr = (vk_malfs_mbr_t *)vsf_local.sectbuf;
     vk_malfs_dpt_t *dpt;
@@ -360,6 +363,7 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
         }
 #endif
         mounter->partition_mounted = 0;
+        vsf_local.try_idx = 0;
         vsf_local.sectbuf = vsf_heap_malloc(mal_block_size);
         if (NULL == vsf_local.sectbuf) {
         return_not_enough_resources:
@@ -488,6 +492,15 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
                 break;
             } else {
                 if (++vsf_local.partition_idx >= dimof(mbr->dpt)) {
+                    if (!mounter->partition_mounted) {
+                        if (vsf_local.try_idx < dimof(__partition_type_idxes)) {
+                            // nothing mounted, try using fat/exfat for the whole mal
+                            vsf_local.partition_type = __partition_type_idxes[vsf_local.try_idx++];
+                            vsf_local.start_sector = 0;
+                            vsf_local.sector_count = mal->size / mal_block_size;
+                            goto mount_partition;
+                        }
+                    }
                     mounter->err = VSF_ERR_NONE;
                     goto do_return;
                 }
@@ -563,27 +576,27 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
             }
             vsf_local.mount_state = VSF_MOUNT_STATE_OPEN_ROOT;
             if (VSF_ERR_NONE != vk_file_open(mounter->dir, vsf_local.cur_root_name, &partition->root)) {
-                goto return_mount_failed;
+                goto return_mount_failed_remove_dir;
             }
             break;
         case VSF_MOUNT_STATE_OPEN_ROOT:
             if (result < 0) {
-                goto return_mount_failed;
+                goto return_mount_failed_remove_dir;
             }
             vsf_local.mount_state = VSF_MOUNT_STATE_MOUNT;
             if (VSF_ERR_NONE != vk_fs_mount(partition->root, partition->fsop, partition->fsinfo)) {
-                goto return_mount_failed;
+                goto return_mount_failed_remove_dir;
             }
             break;
         case VSF_MOUNT_STATE_MOUNT:
             if (result < 0) {
-            return_mount_failed:
-                if (partition->malfs_info->total_cb != NULL) {
-                    vsf_heap_free(partition->malfs_info->total_cb);
+            return_mount_failed_remove_dir:
+                vsf_local.mount_state = VSF_MOUNT_STATE_UNLINK_ROOT;
+                if (VSF_ERR_NONE != vk_file_unlink(mounter->dir, vsf_local.cur_root_name)) {
+                    goto return_mount_failed;
                 }
-                goto return_failed;
-            }
-            if (partition->malfs_info->volume_name != NULL) {
+                break;
+            } else if (partition->malfs_info->volume_name != NULL) {
                 vsf_local.mount_state = VSF_MOUNT_STATE_RENAME_ROOT;
                 vk_file_rename(mounter->dir, partition->root->name, NULL, partition->malfs_info->volume_name);
                 break;
@@ -592,7 +605,12 @@ __vsf_component_peda_private_entry(__vk_malfs_mount,
         case VSF_MOUNT_STATE_RENAME_ROOT:
             mounter->partition_mounted++;
             goto next_partition;
-            break;
+        case VSF_MOUNT_STATE_UNLINK_ROOT:
+        return_mount_failed:
+            if (partition->malfs_info->total_cb != NULL) {
+                vsf_heap_free(partition->malfs_info->total_cb);
+            }
+            goto next_partition;
         }
         break;
     }

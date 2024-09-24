@@ -411,7 +411,7 @@ static vsf_err_t __vk_fatfs_parse_dbr(__vk_fatfs_info_t *info, uint8_t *buff)
         if (    (   (sector_size != info->block_size)
                 ||  (   (sector_size != 512) && (sector_size != 1024)
                     &&  (sector_size != 2048) && (sector_size != 4096)))
-            ||  (!dbr->bpb.SecPerClus || !info->cluster_size_bits)
+            ||  !dbr->bpb.SecPerClus
             ||  !reserved_size
             ||  !info->fat_num
             ||  !sector_num
