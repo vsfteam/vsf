@@ -694,6 +694,7 @@ static void __vsf_main_thread(void *arg)
 }
 #endif
 
+VSF_CAL_WEAK(__vsf_main_entry)
 void __vsf_main_entry(void)
 {
     __vsf_kernel_os_start();
