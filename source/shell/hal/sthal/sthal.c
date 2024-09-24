@@ -32,10 +32,6 @@
     ((__ST_HAL_VERSION_MAIN << 24U) | (__ST_HAL_VERSION_SUB1 << 16U) |         \
      (__ST_HAL_VERSION_SUB2 << 8U) | (__ST_HAL_VERSION_RC))
 
-#ifndef VSF_STHAL_USE_VSFHAL_INIT
-#   define VSF_STHAL_USE_VSFHAL_INIT            DISABLED
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -108,17 +104,6 @@ void HAL_Delay(uint32_t Delay)
 
 
 #if VSF_STHAL_TICK_USE_SYSTIMER == ENABLED
-#if VSF_STHAL_USE_CALL_SYSTIMER_INIT == ENABLED
-
-#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
-void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
-{
-    vsf_systimer_set_idle();
-}
-#else
-#   error "TODO: support more systimer mode"
-#endif
-#endif
 
 VSF_CAL_WEAK(HAL_GetTick)
 uint32_t HAL_GetTick(void)
@@ -130,14 +115,22 @@ uint32_t HAL_GetTick(void)
 
 HAL_StatusTypeDef HAL_Init(void)
 {
-#if VSF_STHAL_USE_VSFHAL_INIT == ENABLED
+// Normally, arch/hal will be initialized when vsf kernel startup,
+//  but if kernel is not enabled, user MUST call vsf_arch_init() and vsf_hal_init()
+#if VSF_USE_KERNEL != ENABLED
+    vsf_arch_init();
     vsf_hal_init();
 #endif
 
-#if (VSF_STHAL_TICK_USE_SYSTIMER == ENABLED) && VSF_STHAL_USE_CALL_SYSTIMER_INIT == ENABLED
-#if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+// Normally, systimer will be initialized in vsf kernel,
+//  but if kernel is not enabled or kernel does not support timer,
+//  systimer MUST be initialized here.
+#if     (VSF_STHAL_TICK_USE_SYSTIMER == ENABLED)                                \
+    &&  ((VSF_USE_KERNEL != ENABLED) || (VSF_KERNEL_CFG_EDA_SUPPORT_TIMER != ENABLED))
+#if     (VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER)     \
+    ||  (VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER)
     vsf_systimer_init();
-    vsf_systimer_set_idle();
+    vsf_systimer_start();
 #else
 #   error "TODO: support more systimer mode"
 #endif
@@ -159,7 +152,7 @@ void HAL_MspInit(void)
 }
 
 VSF_CAL_WEAK(HAL_MspDeInit)
-void HAL_MspDeInit(void)    
+void HAL_MspDeInit(void)
 {
     /*weak*/
 }

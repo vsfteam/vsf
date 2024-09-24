@@ -545,7 +545,10 @@ VSF_CAL_WEAK(vsf_systimer_evthandler)
 void vsf_systimer_evthandler(vsf_systimer_tick_t tick)
 {
     VSF_UNUSED_PARAM(tick);
-    VSF_ARCH_ASSERT(false);
+#       if  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER     \
+        ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER
+    vsf_systimer_set_idle();
+#       endif
 }
 #   else
 VSF_CAL_WEAK(vsf_systimer_on_tick)
