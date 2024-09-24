@@ -1378,7 +1378,7 @@ void vsf_arch_cpp_startup(void)
 
 void _initterm(cpp_init_func_t * const first, cpp_init_func_t * const last)
 {
-    extern void vsf_main_entry(void);
+    extern void __vsf_main_entry(void);
 
     // IMPORTANT: Some static initializers of cpp instances in app will depend on linux,
     //  so we have to record these functions, and call later after linux started.
@@ -1394,7 +1394,7 @@ void _initterm(cpp_init_func_t * const first, cpp_init_func_t * const last)
 
     for (int idx = 0; idx < count; idx++) {
         if ((idx >= 2) && (idx <= count - 2)) {
-            if (funcs[idx] != vsf_main_entry) {
+            if (funcs[idx] != __vsf_main_entry) {
                 VSF_ARCH_ASSERT(__vsf_cpp_init_cnt < dimof(__vsf_cpp_init));
                 __vsf_cpp_init[__vsf_cpp_init_cnt++] = (cpp_init_t){
                     .returns_int = false,
@@ -1406,7 +1406,7 @@ void _initterm(cpp_init_func_t * const first, cpp_init_func_t * const last)
     }
 
     __vsf_arch_cpp_init_range(funcs, &funcs[count - 1], false);
-    vsf_main_entry();
+    __vsf_main_entry();
 }
 
 int _initterm_e(cpp_init_func_t * const first, cpp_init_func_t * const last)
