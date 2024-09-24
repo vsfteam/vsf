@@ -406,20 +406,16 @@ void vsf_arch_shutdown(void)
 
 #if __MPU_PRESENT
 // the region added later will have higher priority
-void vsf_arch_mpu_config_region(uint32_t idx, uint32_t baseaddr, uint32_t type,
-        uint32_t size, uint8_t de, uint8_t ap, uint8_t sen, uint8_t cen, uint8_t ben)
+void vsf_arch_mpu_config_region(uint32_t idx, uint32_t baseaddr, uint32_t size, vsf_arch_mpu_feature_t feature)
 {
     VSF_ARCH_ASSERT(idx <= 15);
+    VSF_ARCH_ASSERT(!(size & (size - 1)));
     ARM_MPU_Disable();
 
+    size = vsf_ffs32(size) - 1;
+    VSF_ARCH_ASSERT((size >= 4) && (size <= 31));
     ARM_MPU_SetRegionEx(idx, baseaddr,
-        (de     << MPU_RASR_XN_Pos)     |
-        (ap     << MPU_RASR_AP_Pos)     |
-        (type   << MPU_RASR_TEX_Pos)    |
-        (sen    << MPU_RASR_S_Pos)      |
-        (cen    << MPU_RASR_C_Pos)      |
-        (ben    << MPU_RASR_B_Pos)      |
-        (0x00   << MPU_RASR_SRD_Pos)    |
+        feature                         |
         (size   << MPU_RASR_SIZE_Pos)   |
         MPU_RASR_ENABLE_Msk
     );

@@ -135,6 +135,29 @@ extern "C" {
 
 typedef uint64_t vsf_systimer_tick_t;
 
+typedef enum vsf_arch_mpu_feature_t {
+    // compatible with MPU_RASR definitation
+    //                                            MPU_RASR.S
+    VSF_ARCH_MPU_SHARABLE                       = 1ul << 18,
+    VSF_ARCH_MPU_NON_SHARABLE                   = 0ul << 18,
+
+    //                                            MPU_RASR.XN
+    VSF_ARCH_MPU_EXECUTABLE                     = 0ul << 28,
+    VSF_ARCH_MPU_NON_EXECUTABLE                 = 1ul << 28,
+
+    // access permission
+    //                                            MPU_RASR.AP
+    VSF_ARCH_MPU_ACCESS_NO                      = 0ul << 24,
+    VSF_ARCH_MPU_ACCESS_FULL                    = 3ul << 24,
+    VSF_ARCH_MPU_ACCESS_READONLY                = 6ul << 24,
+
+    //                                            MPU_RASR.C  | MPU_RASR.B  | MPU_RASR.TEX
+    VSF_ARCH_MPU_CACHABLE_WRITE_THROUGH_NOALLOC = (1ul << 17) | (0ul << 16) | (0ul << 19),
+    VSF_ARCH_MPU_CACHABLE_WRITE_BACK_NOALLOC    = (1ul << 17) | (1ul << 16) | (0ul << 19),
+    VSF_ARCH_MPU_CACHABLE_WRITE_BACK_ALLOC      = (1ul << 17) | (1ul << 16) | (1ul << 19),
+    VSF_ARCH_MPU_NON_CACHABLE                   = 0ul << 17,
+} vsf_arch_mpu_feature_t;
+
 #define __VSF_ARCH_PRI_INDEX(__N, __UNUSED)                                     \
             __vsf_arch_prio_index_##__N = (__N),
 
@@ -276,8 +299,7 @@ extern uint_fast16_t vsf_arch_get_callstack(uintptr_t sp, uintptr_t *callstack, 
 
 // __MPU_PRESENT is maybe not available here
 //#if __MPU_PRESENT
-extern void vsf_arch_mpu_config_region(uint32_t idx, uint32_t baseaddr, uint32_t type,
-        uint32_t size, uint8_t de, uint8_t ap, uint8_t sen, uint8_t cen, uint8_t ben);
+extern void vsf_arch_mpu_config_region(uint32_t idx, uint32_t baseaddr, uint32_t size, vsf_arch_mpu_feature_t feature);
 extern void vsf_arch_mpu_remove_region(uint32_t idx);
 //#endif
 
