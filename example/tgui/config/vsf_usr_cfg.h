@@ -114,18 +114,6 @@
 #   define APP_CFG_TGUI_RES_DIR                         "./winfs_root/ui/"
 #endif
 
-/*----------------------------------------------------------------------------*
- * Regarget Weak interface                                                    *
- *----------------------------------------------------------------------------*/
-
-#define WEAK_VSF_KERNEL_ERR_REPORT
-#define WEAK___POST_VSF_KERNEL_INIT
-#define WEAK_VSF_SYSTIMER_EVTHANDLER
-#define WEAK_VSF_ARCH_REQ___SYSTIMER_RESOLUTION___FROM_USR
-#define WEAK_VSF_ARCH_REQ___SYSTIMER_FREQ___FROM_USR
-#define WEAK_VSF_DRIVER_INIT
-#define WEAK_VSF_HEAP_MALLOC_ALIGNED
-
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
