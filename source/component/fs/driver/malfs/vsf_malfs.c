@@ -229,10 +229,13 @@ __vsf_component_peda_private_entry(__vk_malfs_read,
     uint64_t block_addr;
     uint32_t block_num;
     uint8_t *buff;
+
+    uint8_t *read_buff;
     uint8_t state;
 ) {
     vsf_peda_begin();
     __vk_malfs_info_t *info = (__vk_malfs_info_t *)&vsf_this;
+    uint_fast16_t alignment = vk_mal_alignment(info->mal);
     enum {
         STATE_GET_CACHE,
         STATE_COMMIT_READ,
@@ -241,12 +244,13 @@ __vsf_component_peda_private_entry(__vk_malfs_read,
 
     switch (evt) {
     case VSF_EVT_INIT:
-        if (NULL == vsf_local.buff) {
+        if ((NULL == vsf_local.buff) || ((uint32_t)vsf_local.buff & (alignment - 1))) {
             VSF_FS_ASSERT(1 == vsf_local.block_num);
             vsf_local.state = STATE_GET_CACHE;
             __vk_malfs_alloc_cache(info, &info->cache, vsf_local.block_addr);
             return;
         }
+        vsf_local.read_buff = vsf_local.buff;
         vsf_local.state = STATE_COMMIT_READ;
     case VSF_EVT_RETURN:
         switch (vsf_local.state) {
@@ -254,9 +258,9 @@ __vsf_component_peda_private_entry(__vk_malfs_read,
                 __vk_malfs_cache_node_t *node = (__vk_malfs_cache_node_t *)vsf_eda_get_return_value();
                 VSF_FS_ASSERT(node != NULL);
 
-                vsf_local.buff = __vk_malfs_get_cache_buff(&info->cache, node);
+                vsf_local.read_buff = __vk_malfs_get_cache_buff(&info->cache, node);
                 if (node->block_addr == vsf_local.block_addr) {
-                    vsf_eda_return(vsf_local.buff);
+                    vsf_eda_return(vsf_local.read_buff);
                     break;
                 }
                 node->block_addr = vsf_local.block_addr;
@@ -265,9 +269,14 @@ __vsf_component_peda_private_entry(__vk_malfs_read,
         case STATE_COMMIT_READ:
             vsf_local.state = STATE_FINISH_READ;
             vk_mal_read(info->mal, info->block_size * vsf_local.block_addr,
-                        info->block_size * vsf_local.block_num, vsf_local.buff);
+                        info->block_size * vsf_local.block_num, vsf_local.read_buff);
             break;
         case STATE_FINISH_READ:
+            if (NULL == vsf_local.buff) {
+                vsf_local.buff = vsf_local.read_buff;
+            } else if (vsf_local.read_buff != vsf_local.buff) {
+                memcpy(vsf_local.buff, vsf_local.read_buff, info->block_size * vsf_local.block_num);
+            }
             vsf_eda_return((int32_t)vsf_eda_get_return_value() > 0 ? vsf_local.buff : NULL);
             break;
         }
@@ -306,6 +315,8 @@ vsf_err_t __vk_malfs_read(__vk_malfs_info_t *info, uint_fast64_t block_addr, uin
 vsf_err_t __vk_malfs_write(__vk_malfs_info_t *info, uint_fast64_t block_addr, uint_fast32_t block_num, uint8_t *buff)
 {
     // TODO: add lock and unlock
+    uint_fast16_t alignment = vk_mal_alignment(info->mal);
+    VSF_FS_ASSERT(((uint32_t)buff & (alignment - 1)));
     return vk_mal_write(info->mal, info->block_size * block_addr, info->block_size * block_num, buff);
 }
 

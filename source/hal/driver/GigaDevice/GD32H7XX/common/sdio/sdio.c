@@ -144,6 +144,7 @@ vsf_sdio_capability_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_capability)(
         .bus_width      = SDIO_CAP_BUS_WIDTH_1 | SDIO_CAP_BUS_WIDTH_4 | SDIO_CAP_BUS_WIDTH_8,
         .max_freq_hz    = 200 * 1000 * 1000,
         .support_ddr    = true,
+        .data_alignment = 4,
     };
 }
 

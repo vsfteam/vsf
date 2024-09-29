@@ -54,6 +54,7 @@ enum {
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 static uint_fast32_t __vk_reentrant_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
 static bool __vk_reentrant_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
+static uint_fast16_t __vk_reentrant_mal_alignment(vk_mal_t *mal);
 dcl_vsf_peda_methods(static, __vk_reentrant_mal_init)
 dcl_vsf_peda_methods(static, __vk_reentrant_mal_fini)
 dcl_vsf_peda_methods(static, __vk_reentrant_mal_read)
@@ -71,6 +72,7 @@ dcl_vsf_peda_methods(static, __vk_reentrant_mal_write)
 const vk_mal_drv_t vk_reentrant_mal_drv = {
     .blksz          = __vk_reentrant_mal_blksz,
     .buffer         = __vk_reentrant_mal_buffer,
+//    .alignment      = __vk_reentrant_mal_alignment,
     .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_reentrant_mal_init),
     .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_reentrant_mal_fini),
     .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_reentrant_mal_read),
@@ -116,6 +118,15 @@ bool vk_mal_prepare_buffer(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t si
     mem->buffer = NULL;
     mem->size = 0;
     return false;
+}
+
+uint_fast16_t vk_mal_alignment(vk_mal_t *pthis)
+{
+    VSF_MAL_ASSERT((pthis != NULL) && (pthis->drv != NULL));
+    if (pthis->drv->alignment != NULL) {
+        return pthis->drv->alignment(pthis);
+    }
+    return 1;
 }
 
 // to erase all, size should be 0
@@ -169,6 +180,12 @@ static bool __vk_reentrant_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fa
 {
     vk_reentrant_mal_t *pthis = (vk_reentrant_mal_t *)mal;
     return vk_mal_prepare_buffer(pthis->mal, addr + pthis->offset, size, op, mem);
+}
+
+static uint_fast16_t __vk_reentrant_mal_alignment(vk_mal_t *mal)
+{
+    vk_reentrant_mal_t *pthis = (vk_reentrant_mal_t *)mal;
+    return vk_mal_alignment(pthis->mal);
 }
 
 #if     __IS_COMPILER_GCC__

@@ -34,6 +34,7 @@
 
 static uint_fast32_t __vk_mim_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
 static bool __vk_mim_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
+static uint_fast16_t __vk_mim_mal_alignment(vk_mal_t *mal);
 dcl_vsf_peda_methods(static, __vk_mim_mal_init)
 dcl_vsf_peda_methods(static, __vk_mim_mal_fini)
 dcl_vsf_peda_methods(static, __vk_mim_mal_read)
@@ -50,6 +51,7 @@ dcl_vsf_peda_methods(static, __vk_mim_mal_erase)
 const vk_mal_drv_t vk_mim_mal_drv = {
     .blksz          = __vk_mim_mal_blksz,
     .buffer         = __vk_mim_mal_buffer,
+    .alignment      = __vk_mim_mal_alignment,
     .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mim_mal_init),
     .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mim_mal_fini),
     .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_mim_mal_read),
@@ -74,6 +76,12 @@ static bool __vk_mim_mal_buffer(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t
 {
     vk_mim_mal_t *pthis = (vk_mim_mal_t *)mal;
     return vk_mal_prepare_buffer(pthis->host_mal, addr + pthis->offset, size, op, mem);
+}
+
+static uint_fast16_t __vk_mim_mal_alignment(vk_mal_t *mal)
+{
+    vk_mim_mal_t *pthis = (vk_mim_mal_t *)mal;
+    return vk_mal_alignment(pthis->host_mal);
 }
 
 #if     __IS_COMPILER_GCC__

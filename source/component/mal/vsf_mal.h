@@ -111,6 +111,14 @@ vsf_class(vk_mal_drv_t) {
          @note 必须在正常初始化之后，才能调用
         */
         bool (*buffer)(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
+        /**
+         \~english get data alignment in bytes, if not implemented, default alignment 1 is used
+         @note must be called after mal is successfully initialized
+         \~chinese 获得读写操作的数据对其字节参数，如果没有实现的话，默认使用 1 字节对其
+         @note 必须在正常初始化之后，才能调用
+        */
+        uint_fast16_t (*alignment)(vk_mal_t *mal);
+
         uint8_t init_local_size;
         uint8_t fini_local_size;
         uint8_t erase_local_size;
@@ -357,6 +365,19 @@ extern uint_fast32_t vk_mal_blksz(vk_mal_t *pthis, uint_fast64_t addr, uint_fast
  @return true: 有效的本地缓冲已经返回；false: 不支持本地缓冲
  */
 extern bool vk_mal_prepare_buffer(vk_mal_t *pthis, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
+
+/**
+ \~english
+ @brief get the alignment of data pointer while reading and writing.
+ @param[in] pthis: mal instance
+ @return alignment in bytes
+
+ \~chinese
+ @brief 获得读写操作时，数据的对其参数
+ @param[in] pthis: mal 实例
+ @return 数据对其字节数
+ */
+extern uint_fast16_t vk_mal_alignment(vk_mal_t *pthis);
 
 /**
  \~english

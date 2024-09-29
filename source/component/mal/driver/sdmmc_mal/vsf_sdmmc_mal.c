@@ -37,6 +37,7 @@
 /*============================ PROTOTYPES ====================================*/
 
 static uint_fast32_t __vk_sdmmc_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op);
+static uint_fast16_t __vk_sdmmc_mal_alignment(vk_mal_t *mal);
 dcl_vsf_peda_methods(static, __vk_sdmmc_mal_init)
 dcl_vsf_peda_methods(static, __vk_sdmmc_mal_fini)
 dcl_vsf_peda_methods(static, __vk_sdmmc_mal_read)
@@ -51,6 +52,7 @@ dcl_vsf_peda_methods(static, __vk_sdmmc_mal_write)
 
 const vk_mal_drv_t vk_sdmmc_mal_drv = {
     .blksz          = __vk_sdmmc_mal_blksz,
+    .alignment      = __vk_sdmmc_mal_alignment,
     .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_sdmmc_mal_init),
     .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_sdmmc_mal_fini),
     .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_sdmmc_mal_read),
@@ -128,6 +130,13 @@ static uint_fast32_t __vk_sdmmc_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uin
 {
     vk_sdmmc_mal_t *pthis = (vk_sdmmc_mal_t *)mal;
     return 1 << pthis->csd.sd_v2.READ_BL_LEN;
+}
+
+static uint_fast16_t __vk_sdmmc_mal_alignment(vk_mal_t *mal)
+{
+    vk_sdmmc_mal_t *pthis = (vk_sdmmc_mal_t *)mal;
+    vsf_sdio_capability_t cap = vsf_sdio_capability(pthis->sdio);
+    return !cap.data_alignment ? 1 : cap.data_alignment;
 }
 
 #if     __IS_COMPILER_GCC__
