@@ -72,7 +72,7 @@ dcl_vsf_peda_methods(static, __vk_reentrant_mal_write)
 const vk_mal_drv_t vk_reentrant_mal_drv = {
     .blksz          = __vk_reentrant_mal_blksz,
     .buffer         = __vk_reentrant_mal_buffer,
-//    .alignment      = __vk_reentrant_mal_alignment,
+    .alignment      = __vk_reentrant_mal_alignment,
     .init           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_reentrant_mal_init),
     .fini           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_reentrant_mal_fini),
     .read           = (vsf_peda_evthandler_t)vsf_peda_func(__vk_reentrant_mal_read),
