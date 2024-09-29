@@ -25,6 +25,14 @@ typedef __WCHAR_TYPE__              wchar_t;
 typedef unsigned short              wchar_t;
 #   elif __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
 typedef int                         wchar_t;
+#   elif __IS_COMPILER_IAR__
+#       if __ARM_SIZEOF_WCHAR_T == 2
+typedef unsigned short              wchar_t;
+#       elif __ARM_SIZEOF_WCHAR_T == 4
+typedef unsigned int                wchar_t;
+#       else
+#           error __ARM_SIZEOF_WCHAR_T not supported
+#       endif
 #   else
 typedef unsigned short              wchar_t;
 #   endif
