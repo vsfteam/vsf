@@ -62,7 +62,10 @@ static void VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_irqhandler)(
 ) {
     uint32_t reg = sdio_ptr->reg;
     uint32_t sts = SDIO_STAT(reg);
-    SDIO_INTC(reg) = SDIO_INTC_CMDTMOUTC | SDIO_INTC_CCRCERRC | SDIO_INTC_DTCRCERRC | SDIO_INTC_CMDRECVC | SDIO_INTC_CMDSENDC | SDIO_INTC_DTENDC;
+    SDIO_INTC(reg) =    SDIO_INTC_CMDTMOUTC | SDIO_INTC_CCRCERRC | SDIO_INTC_DTCRCERRC
+                    |   SDIO_INTC_CMDRECVC | SDIO_INTC_CMDSENDC | SDIO_INTC_DTENDC
+                    |   SDIO_INTC_DTTMOUTC;
+
     if (sdio_ptr->isr.handler_fn != NULL) {
         uint32_t resp[4];
         if (((SDIO_CMDCTL(reg) >> 8) & 0x03) == 0x03) {
