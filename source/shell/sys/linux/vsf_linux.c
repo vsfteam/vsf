@@ -1131,7 +1131,8 @@ vsf_linux_thread_t * vsf_linux_create_raw_thread(const vsf_linux_thread_op_t *op
         alignment = 0;
     }
 
-    thread = (vsf_linux_thread_t *)vsf_heap_malloc_aligned(all_size, alignment);
+    thread = (vsf_linux_thread_t *)vsf_linux_process_heap_malloc_aligned(
+            vsf_linux_resources_process(), all_size, alignment);
     if (thread != NULL) {
         memset(thread, 0, thread_size);
 
@@ -1830,7 +1831,7 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
         if (    (NULL == process) ||
                 !vsf_dlist_is_in(vsf_linux_thread_t, thread_node, &process->thread_list, thread)) {
             vsf_unprotect_sched(orig);
-            vsf_heap_free(thread);
+            vsf_linux_process_heap_free(vsf_linux_resources_process(), thread);
             return;
         }
         vsf_unprotect_sched(orig);
@@ -1890,7 +1891,7 @@ int vsf_linux_wait_thread(int tid, int *retval)
         *retval = thread->retval;
     }
     vsf_linux_detach_thread(thread);
-    vsf_heap_free(thread);
+    vsf_linux_process_heap_free(vsf_linux_resources_process(), thread);
     return 0;
 }
 
