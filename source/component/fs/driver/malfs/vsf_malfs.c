@@ -230,7 +230,10 @@ __vsf_component_peda_private_entry(__vk_malfs_read,
     uint32_t block_num;
     uint8_t *buff;
 
+    uint8_t *cur_buff;
     uint8_t *read_buff;
+    __vk_malfs_cache_node_t *node;
+    uint32_t read_block_num;
     uint8_t state;
 ) {
     vsf_peda_begin();
@@ -244,39 +247,54 @@ __vsf_component_peda_private_entry(__vk_malfs_read,
 
     switch (evt) {
     case VSF_EVT_INIT:
+        vsf_local.cur_buff = vsf_local.buff;
         if ((NULL == vsf_local.buff) || ((uint32_t)vsf_local.buff & (alignment - 1))) {
-            VSF_FS_ASSERT(1 == vsf_local.block_num);
+            if (NULL == vsf_local.buff) {
+                VSF_FS_ASSERT(vsf_local.block_num == 1);
+            }
+            vsf_local.read_block_num = 1;
             vsf_local.state = STATE_GET_CACHE;
             __vk_malfs_alloc_cache(info, &info->cache, vsf_local.block_addr);
             return;
         }
+        vsf_local.read_block_num = vsf_local.block_num;
         vsf_local.read_buff = vsf_local.buff;
         vsf_local.state = STATE_COMMIT_READ;
     case VSF_EVT_RETURN:
         switch (vsf_local.state) {
         case STATE_GET_CACHE: {
-                __vk_malfs_cache_node_t *node = (__vk_malfs_cache_node_t *)vsf_eda_get_return_value();
-                VSF_FS_ASSERT(node != NULL);
+                vsf_local.node = (__vk_malfs_cache_node_t *)vsf_eda_get_return_value();
+                VSF_FS_ASSERT(vsf_local.node != NULL);
 
-                vsf_local.read_buff = __vk_malfs_get_cache_buff(&info->cache, node);
-                if (node->block_addr == vsf_local.block_addr) {
+                vsf_local.read_buff = __vk_malfs_get_cache_buff(&info->cache, vsf_local.node);
+                if (vsf_local.node->block_addr == vsf_local.block_addr) {
                     vsf_eda_return(vsf_local.read_buff);
                     break;
                 }
-                node->block_addr = vsf_local.block_addr;
+                vsf_local.node->block_addr = vsf_local.block_addr;
             }
             // fall through
         case STATE_COMMIT_READ:
+        read_next_block:
             vsf_local.state = STATE_FINISH_READ;
             vk_mal_read(info->mal, info->block_size * vsf_local.block_addr,
-                        info->block_size * vsf_local.block_num, vsf_local.read_buff);
+                        info->block_size * vsf_local.read_block_num, vsf_local.read_buff);
             break;
         case STATE_FINISH_READ:
             if (NULL == vsf_local.buff) {
                 vsf_local.buff = vsf_local.read_buff;
-            } else if (vsf_local.read_buff != vsf_local.buff) {
-                memcpy(vsf_local.buff, vsf_local.read_buff, info->block_size * vsf_local.block_num);
+            } else if (vsf_local.buff != vsf_local.read_buff) {
+                // unaligned buffer
+                memcpy(vsf_local.cur_buff, vsf_local.read_buff, info->block_size);
+
+                if (--vsf_local.block_num > 0) {
+                    vsf_local.block_addr++;
+                    vsf_local.node->block_addr = vsf_local.block_addr;
+                    vsf_local.cur_buff += info->block_size;
+                    goto read_next_block;
+                }
             }
+
             vsf_eda_return((int32_t)vsf_eda_get_return_value() > 0 ? vsf_local.buff : NULL);
             break;
         }
