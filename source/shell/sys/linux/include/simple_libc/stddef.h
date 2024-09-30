@@ -12,6 +12,9 @@
 // for uintptr_t
 #include <stdint.h>
 
+// include compiler detect only, do not include compiler.h
+#include "utilities/compiler/compiler_detect.h"
+
 #define VSF_LINUX_LIBC_WRAPPER(__api)   VSF_SHELL_WRAPPER(vsf_linux_libc, __api)
 
 // define wchar_t and wint_t before include vsf_utilities.h
@@ -46,19 +49,16 @@ typedef unsigned short              wint_t;
 #   define                          _WINTT
 #endif
 
-// include compiler detect only, do not include compiler.h
-#include "utilities/compiler/compiler_detect.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifndef NULL
 #   ifdef __cplusplus
 #       define NULL                 (0)
 #   else
 #       define NULL                 ((void *)0)
 #   endif
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 #ifndef TRUE
