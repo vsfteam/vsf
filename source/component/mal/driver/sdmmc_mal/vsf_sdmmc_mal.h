@@ -59,6 +59,7 @@ vsf_class(vk_sdmmc_mal_t) {
         vsf_eda_t              *eda;
         bool                    is_probing;
         bool                    is_stopping;
+        bool                    is_to_stop;
     )
 };
 

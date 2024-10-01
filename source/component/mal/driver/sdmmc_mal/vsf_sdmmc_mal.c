@@ -83,6 +83,7 @@ static void __vk_sdmmc_mal_irqhandler(void *target, vsf_sdio_t *sdio,
 {
     vk_sdmmc_mal_t *pthis = target;
     vsf_eda_t *eda;
+    vsf_evt_t evt;
 
     if (pthis->is_probing) {
         vsf_err_t err = vsf_sdio_probe_irqhandler(sdio, &pthis->use_as__vsf_sdio_probe_t, irq_mask, status, resp);
@@ -92,38 +93,38 @@ static void __vk_sdmmc_mal_irqhandler(void *target, vsf_sdio_t *sdio,
             }
         } else {
             pthis->is_probing = false;
-            if ((eda = pthis->eda) != NULL) {
-                pthis->eda = NULL;
-                vsf_eda_post_evt(eda, (err < 0) ? VSF_EVT_SDMMC_ERROR : VSF_EVT_SDMMC_DONE);
-            }
+            evt = (err < 0) ? VSF_EVT_SDMMC_ERROR : VSF_EVT_SDMMC_DONE;
+            goto request_done;
         }
     } else if (pthis->is_stopping) {
         pthis->is_stopping = false;
-        if ((eda = pthis->eda) != NULL) {
-            pthis->eda = NULL;
-            vsf_eda_post_evt(eda, VSF_EVT_SDMMC_ERROR);
-        }
+        evt = !(irq_mask & SDIO_IRQ_MASK_HOST_RESP_DONE) ? VSF_EVT_SDMMC_ERROR : VSF_EVT_SDMMC_DONE;
+        goto request_done;
     } else {
-        // TODO: does code below necessary?
-        if (    (status & SDIO_REQSTS_ERR_MASK)
-            ||  (   (irq_mask & SDIO_IRQ_MASK_HOST_RESP_DONE)
-                 && !(resp[0] & R1_READY_FOR_DATA)
-                )
-           ) {
-            pthis->is_stopping = true;
-            vsf_sdio_host_request(pthis->sdio, &(vsf_sdio_req_t){
-                .cmd                = MMC_STOP_TRANSMISSION,
-                .op                 = MMC_STOP_TRANSMISSION_OP,
-            });
-            return;
+        if (status & SDIO_REQSTS_ERR_MASK) {
+            evt = VSF_EVT_SDMMC_ERROR;
+            goto request_done;
         }
         if (irq_mask & SDIO_IRQ_MASK_HOST_DATA_DONE) {
-            if ((eda = pthis->eda) != NULL) {
-                pthis->eda = NULL;
-                vsf_eda_post_evt(eda, VSF_EVT_SDMMC_DONE);
+            if (pthis->is_to_stop) {
+                pthis->is_stopping = true;
+                vsf_sdio_host_request(pthis->sdio, &(vsf_sdio_req_t){
+                    .cmd                = MMC_STOP_TRANSMISSION,
+                    .op                 = MMC_STOP_TRANSMISSION_OP,
+                });
+                return;
             }
+            evt = VSF_EVT_SDMMC_DONE;
+            goto request_done;
         }
     }
+    return;
+request_done:
+    if ((eda = pthis->eda) != NULL) {
+        pthis->eda = NULL;
+        vsf_eda_post_evt(eda, evt);
+    }
+    return;
 }
 
 static uint_fast32_t __vk_sdmmc_mal_blksz(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op)
@@ -157,6 +158,7 @@ __vsf_component_peda_ifs_entry(__vk_sdmmc_mal_init, vk_mal_init)
         pthis->timer.on_timer = __vk_sdmmc_mal_on_timer;
         vsf_callback_timer_init(&pthis->timer);
 
+        pthis->is_to_stop = false;
         pthis->is_stopping = false;
         pthis->is_probing = true;
         pthis->eda = vsf_eda_get_cur();
@@ -206,6 +208,7 @@ __vsf_component_peda_ifs_entry(__vk_sdmmc_mal_read, vk_mal_read)
     case VSF_EVT_INIT:
         pthis->eda = vsf_eda_get_cur();
         VSF_FS_ASSERT(pthis->eda != NULL);
+        pthis->is_to_stop = block_num > 1;
         vsf_sdio_host_request(pthis->sdio, &(vsf_sdio_req_t){
             .cmd                = block_num > 1 ? MMC_READ_MULTIPLE_BLOCK : MMC_READ_SINGLE_BLOCK,
             .arg                = pthis->high_capacity ? block_start : vsf_local.addr,
