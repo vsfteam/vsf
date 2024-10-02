@@ -22,6 +22,6 @@ __VSF_VPLT_DECORATOR__ vsf_compiler_vplt_t vsf_compiler_vplt = {
 VSF_CAL_WEAK(vsf_compiler_cpp_startup)
 int vsf_compiler_cpp_startup(void)
 {
-    return -1;
+    return 0;
 }
 #endif
