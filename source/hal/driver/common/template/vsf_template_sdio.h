@@ -646,8 +646,9 @@ typedef struct vsf_sdio_capability_t {
         SDIO_CAP_BUS_WIDTH_8        = (0x1ul <<  2),
     } bus_width;
     uint32_t max_freq_hz;
-    // buffer alignment in bytes for data, 0 means 1-byte alignment
-    uint16_t data_alignment;
+    // data alignment(address and size) in bytes
+    uint16_t data_ptr_alignment;    // alignment of data pointer
+    uint16_t data_size_alignment;   // alignment of data size
     bool support_ddr;
 } vsf_sdio_capability_t;
 

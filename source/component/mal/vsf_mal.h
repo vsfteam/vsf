@@ -88,6 +88,12 @@ typedef enum vsf_mal_feature_t {
     VSF_MAL_LOCAL_BUFFER        = 1 << 4,
 } vsf_mal_feature_t;
 
+typedef struct vsf_mal_capability_t {
+    // alignment in bytes, 1 byte alignment if 0
+    uint16_t data_ptr_alignment;    // alignment of data pointer
+    uint16_t data_size_alignment;   // alignment of data size
+} vsf_mal_capability_t;
+
 /**
  \~english
  @brief mal driver
@@ -112,12 +118,12 @@ vsf_class(vk_mal_drv_t) {
         */
         bool (*buffer)(vk_mal_t *mal, uint_fast64_t addr, uint_fast32_t size, vsf_mal_op_t op, vsf_mem_t *mem);
         /**
-         \~english get data alignment in bytes, if not implemented, default alignment 1 is used
+         \~english get capability of the mal device
          @note must be called after mal is successfully initialized
-         \~chinese 获得读写操作的数据对其字节参数，如果没有实现的话，默认使用 1 字节对其
+         \~chinese 获得 mal 设备的能力参数
          @note 必须在正常初始化之后，才能调用
         */
-        uint_fast16_t (*alignment)(vk_mal_t *mal);
+        vsf_mal_capability_t (*capability)(vk_mal_t *mal);
 
         uint8_t init_local_size;
         uint8_t fini_local_size;
@@ -368,16 +374,16 @@ extern bool vk_mal_prepare_buffer(vk_mal_t *pthis, uint_fast64_t addr, uint_fast
 
 /**
  \~english
- @brief get the alignment of data pointer while reading and writing.
+ @brief get the capability of mal.
  @param[in] pthis: mal instance
- @return alignment in bytes
+ @return vsf_mal_capability_t structure
 
  \~chinese
- @brief 获得读写操作时，数据的对其参数
+ @brief 获得 mal 的能力参数
  @param[in] pthis: mal 实例
- @return 数据对其字节数
+ @return vsf_mal_capability_t 数据结构
  */
-extern uint_fast16_t vk_mal_alignment(vk_mal_t *pthis);
+extern vsf_mal_capability_t vk_mal_capability(vk_mal_t *pthis);
 
 /**
  \~english

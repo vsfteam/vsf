@@ -53,6 +53,9 @@ typedef struct VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) {
     vsf_sdio_isr_t          isr;
     void                   *buf;
     uint32_t                bufsiz;
+    uint32_t                bufpos;
+    uint16_t                block_size;
+    bool                    is_to_sync_cache;
 } VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t);
 
 /*============================ IMPLEMENTATION ================================*/
@@ -61,10 +64,25 @@ static void VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_irqhandler)(
     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
 ) {
     uint32_t reg = sdio_ptr->reg;
-    uint32_t sts = SDIO_STAT(reg);
+    uint32_t sts = SDIO_STAT(reg) & SDIO_INTEN(reg);
     SDIO_INTC(reg) =    SDIO_INTC_CMDTMOUTC | SDIO_INTC_CCRCERRC | SDIO_INTC_DTCRCERRC
                     |   SDIO_INTC_CMDRECVC | SDIO_INTC_CMDSENDC | SDIO_INTC_DTENDC
-                    |   SDIO_INTC_DTTMOUTC;
+                    |   SDIO_INTC_DTTMOUTC | SDIO_INTC_IDMERRC | SDIO_INTC_IDMAENDC;
+
+    if (sts & SDIO_STAT_IDMERR) {
+        VSF_HAL_ASSERT(false);
+    } else if (sts & SDIO_STAT_IDMAEND) {
+        if (SDIO_IDMACTL(reg) & SDIO_IDMACTL_BUFSEL) {
+            SDIO_IDMAADDR0(reg) = (uint32_t)sdio_ptr->buf + sdio_ptr->bufpos;
+        } else {
+            SDIO_IDMAADDR1(reg) = (uint32_t)sdio_ptr->buf + sdio_ptr->bufpos;
+        }
+        sdio_ptr->bufpos += sdio_ptr->block_size;
+        if (sdio_ptr->bufpos >= sdio_ptr->bufsiz) {
+            SDIO_INTEN(reg) &= ~(SDIO_STAT_IDMERR | SDIO_STAT_IDMAEND);
+        }
+        sts &= ~SDIO_STAT_IDMAEND;
+    }
 
     if (sdio_ptr->isr.handler_fn != NULL) {
         uint32_t resp[4];
@@ -76,7 +94,7 @@ static void VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_irqhandler)(
         } else {
             resp[0] = SDIO_RESP0(reg);
         }
-        if ((sdio_ptr->buf != NULL) && (sdio_ptr->bufsiz > 0)) {
+        if ((sts & SDIO_STAT_DTEND) && sdio_ptr->is_to_sync_cache) {
             SCB_InvalidateDCache_by_Addr(sdio_ptr->buf, sdio_ptr->bufsiz);
             sdio_ptr->buf = NULL;
         }
@@ -144,10 +162,11 @@ vsf_sdio_capability_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_capability)(
 ) {
     VSF_HAL_ASSERT(sdio_ptr != NULL);
     return (vsf_sdio_capability_t){
-        .bus_width      = SDIO_CAP_BUS_WIDTH_1 | SDIO_CAP_BUS_WIDTH_4 | SDIO_CAP_BUS_WIDTH_8,
-        .max_freq_hz    = 200 * 1000 * 1000,
-        .support_ddr    = true,
-        .data_alignment = 4,
+        .bus_width          = SDIO_CAP_BUS_WIDTH_1 | SDIO_CAP_BUS_WIDTH_4 | SDIO_CAP_BUS_WIDTH_8,
+        .max_freq_hz        = 200 * 1000 * 1000,
+        .support_ddr        = true,
+        .data_ptr_alignment = 4,
+        .data_size_alignment= 32,
     };
 }
 
@@ -205,27 +224,54 @@ vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_request)(
     VSF_HAL_ASSERT(!(SDIO_CMDCTL(reg) & SDIO_CMDCTL_CSMEN));
 
     if (req->op & __SDIO_CMDOP_DATAEN) {
-        VSF_HAL_ASSERT(!(req->count & 0x1F) && ((req->count >> 5) <= 2040));
+        uint16_t block_size = 1UL << req->block_size_bits;
+        VSF_HAL_ASSERT(!(req->count & 0x1F) && (req->count <= 0x1FFFFFF));
         VSF_HAL_ASSERT(req->block_size_bits < 15);
-        VSF_HAL_ASSERT(!(req->count % (1 << req->block_size_bits)));
+        VSF_HAL_ASSERT(!(req->count % block_size));
         VSF_HAL_ASSERT(!((uint32_t)req->buffer & 3));
 
         // Clean cache first even for read operation, because the cache maybe uncommited,
         //  while SDIO DMA write to the same ram.
         SCB_CleanDCache_by_Addr(req->buffer, req->count);
-        if (req->op & __SDIO_CMDOP_DATADIR) {
-            // for read operation, invalid buffer after done
-            sdio_ptr->buf = req->buffer;
-            sdio_ptr->bufsiz = req->count;
+
+        // for read operation, invalid buffer after done
+        sdio_ptr->is_to_sync_cache = !!(req->op & __SDIO_CMDOP_DATADIR);
+        sdio_ptr->buf = req->buffer;
+        sdio_ptr->bufsiz = req->count;
+
+        SDIO_DATALEN(reg) = req->count;
+        SDIO_DATATO(reg) = 0xFFFFFFFF;
+
+        if (req->count <= (0xFF << 5)) {
+            SDIO_IDMASIZE(reg) = req->count;
+            SDIO_IDMAADDR0(reg) = (uint32_t)req->buffer;
+            SDIO_IDMACTL(reg) = SDIO_IDMA_SINGLE_BUFFER | SDIO_IDMACTL_IDMAEN;
         } else {
-            sdio_ptr->buf = NULL;
+            if (req->count > 0xFF * 64) {
+                // need IDMA switch, interrupt MUST be enabled
+                VSF_HAL_ASSERT(sdio_ptr->isr.handler_fn != NULL);
+            }
+
+            // calculate a more sutiable block_size
+            block_size <<= 1;
+            while (block_size < (0xFF << 5)) {
+                block_size <<= 1;
+            }
+            block_size >>= 1;
+            sdio_ptr->block_size = block_size;
+            sdio_ptr->bufpos = block_size << 1;
+
+            SDIO_IDMASIZE(reg) = block_size;
+            SDIO_IDMAADDR0(reg) = (uint32_t)req->buffer;
+            SDIO_IDMAADDR1(reg) = (uint32_t)req->buffer + block_size;
+            SDIO_IDMACTL(reg) = SDIO_IDMA_DOUBLE_BUFFER | SDIO_IDMACTL_IDMAEN;
+
+            if (req->count > sdio_ptr->bufpos) {
+                // need buffer switch
+                SDIO_INTEN(reg) |= SDIO_INT_IDMAERR | SDIO_INT_IDMAEND;
+            }
         }
 
-        SDIO_IDMASIZE(reg) = req->count;
-        SDIO_DATALEN(reg) = req->count;
-        SDIO_IDMAADDR0(reg) = (uint32_t)req->buffer;
-        SDIO_DATATO(reg) = 0xFFFFFFFF;
-        SDIO_IDMACTL(reg) = SDIO_IDMA_SINGLE_BUFFER | SDIO_IDMACTL_IDMAEN;
         datactl |= req->block_size_bits << 4;
     } else {
         SDIO_IDMACTL(reg) = 0;
