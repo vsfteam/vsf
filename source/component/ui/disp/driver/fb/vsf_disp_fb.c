@@ -154,6 +154,7 @@ static vsf_err_t __vk_disp_fb_refresh(vk_disp_t *pthis, vk_disp_area_t *area, vo
         cur_buffer = (uint8_t *)cur_buffer + line_size;
     }
     vk_disp_fb_set_front_buffer(pthis, -1);
+    vk_disp_on_ready(pthis);
     return VSF_ERR_NONE;
 }
 #endif
