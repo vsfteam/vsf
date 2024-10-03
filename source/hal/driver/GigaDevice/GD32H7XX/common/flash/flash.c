@@ -85,14 +85,16 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_init)(
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr,
     vsf_flash_cfg_t *cfg_ptr
 ) {
-    VSF_HAL_ASSERT(flash_ptr != NULL);
+    VSF_HAL_ASSERT((flash_ptr != NULL) && (cfg_ptr != NULL));
     // configure according to cfg_ptr
-    if (cfg_ptr != NULL) {
-        flash_ptr->isr = cfg_ptr->isr;
+    flash_ptr->isr = cfg_ptr->isr;
+    if (flash_ptr->isr.handler_fn != NULL) {
+        NVIC_SetPriority(flash_ptr->irqn, (uint32_t)flash_ptr->isr.prio);
+        NVIC_EnableIRQ(flash_ptr->irqn);
+    } else {
+        vsf_trace_warning("gd32h7xx_flash: irq not enabled, erase/write operation will not complete!!!");
+        NVIC_DisableIRQ(flash_ptr->irqn);
     }
-    // IRQ MUST be enabled for write/erase operation
-    NVIC_SetPriority(flash_ptr->irqn, (uint32_t)flash_ptr->isr.prio);
-    NVIC_EnableIRQ(flash_ptr->irqn);
     return VSF_ERR_NONE;
 }
 
@@ -356,7 +358,6 @@ static void VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(
         .addr               = VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, __IDX, _ADDR),\
         .reg                = VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, __IDX, _REG_BASE),\
         .irqn               = VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, __IDX, _IRQN),\
-        .isr.prio           = vsf_arch_prio_0,                                  \
         __HAL_OP                                                                \
     };                                                                          \
     VSF_CAL_ROOT void VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, __IDX, _IRQHandler)(void)\
