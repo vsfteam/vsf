@@ -348,6 +348,7 @@ extern const vsf_hw_clk_t VSF_HW_CLK_SDIO1;
 #endif
 
 extern const vsf_hw_clk_t VSF_HW_CLK_TLI;
+extern const vsf_hw_clk_t VSF_HW_CLK_EXMC;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ INCLUDES ======================================*/

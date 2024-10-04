@@ -463,6 +463,17 @@ const vsf_hw_clk_t VSF_HW_CLK_TLI = {
     .clkprescaler_max           = 3,
 };
 
+// EXMC
+
+static const vsf_hw_clk_t * __VSF_HW_CLK_EXMC_CLKSEL_MAPPER[4] = {
+    &VSF_HW_CLK_AHB, &VSF_HW_CLK_PLL0Q, &VSF_HW_CLK_PLL1R, &VSF_HW_CLK_PER,
+};
+const vsf_hw_clk_t VSF_HW_CLK_EXMC = {
+    .clksel_region              = VSF_HW_CLKSEL_EXMC,
+    .clksel_mapper              = __VSF_HW_CLK_EXMC_CLKSEL_MAPPER,
+    .clktype                    = VSF_HW_CLK_TYPE_SEL,
+};
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
