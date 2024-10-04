@@ -158,14 +158,21 @@ void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size,
         }
         return NULL;
     } else {
-        void *new_buff = __malloc_ex(process, size);
-        if (new_buff != NULL) {
-            size_t copy_size = vsf_linux_process_heap_size(process, (uint8_t *)p - sizeof(vsf_liunx_heap_node_t))
-                                    - sizeof(vsf_liunx_heap_node_t);
-            copy_size = vsf_min(size, copy_size);
-            memcpy(new_buff, p, copy_size);
+        vsf_liunx_heap_node_t *node = (vsf_liunx_heap_node_t *)((uint8_t *)p - sizeof(vsf_liunx_heap_node_t));
+        size_t total_size = vsf_linux_process_heap_size(process, node) - sizeof(vsf_liunx_heap_node_t);
+        void *new_buff;
+
+        if (total_size > size) {
+            node->size = size;
+            new_buff = p;
+        } else {
+            new_buff = __malloc_ex(process, size);
+            if (new_buff != NULL) {
+                size = vsf_min(size, node->size);
+                memcpy(new_buff, p, size);
+            }
+            __free_ex(process, p);
         }
-        __free_ex(process, p);
         return new_buff;
     }
 }
