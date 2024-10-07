@@ -150,8 +150,8 @@ static bool __vk_audio_dummy_playback_buffer(vk_audio_dummy_dev_t *dev, uint8_t 
         memset(&audio_dummy_buffer->timer, 0, sizeof(audio_dummy_buffer->timer));
         audio_dummy_buffer->timer.on_timer = __vk_audio_dummy_ontimer;
         audio_dummy_buffer->param = playback_ctx;
-        uint_fast32_t nsamples = size / (audio_format->channel_num * audio_format->sample_bit_width >> 3);
-        vsf_callback_timer_add_us(&audio_dummy_buffer->timer, nsamples * 1000000 / audio_format->sample_rate);
+        uint_fast32_t nsamples = size / (audio_format->channel_num * VSF_AUDIO_DATA_TYPE_BITLEN(audio_format->datatype.value) >> 3);
+        vsf_callback_timer_add_us(&audio_dummy_buffer->timer, nsamples * 1000000 / (audio_format->sample_rate * 100));
 
         return true;
     }
@@ -162,7 +162,7 @@ static void __vk_audio_dummy_playback_evthandler(vsf_stream_t *stream, void *par
 {
     vk_audio_stream_t *audio_stream = param;
     vk_audio_stream_t *audio_stream_base = audio_stream - audio_stream->stream_index;
-    vk_audio_dummy_dev_t *dev = vsf_container_of(audio_stream_base, vk_audio_dummy_dev_t, stream);
+    vk_audio_dummy_dev_t *dev = vsf_container_of(audio_stream_base, vk_audio_dummy_dev_t, __stream);
     vk_audio_dummy_playback_ctx_t *playback_ctx = &dev->playback_ctx;
     uint_fast32_t datasize;
     uint8_t *buff;

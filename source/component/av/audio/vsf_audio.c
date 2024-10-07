@@ -60,8 +60,10 @@ vsf_err_t vk_audio_init(vk_audio_dev_t *pthis)
                 &&  (pthis->drv != NULL)
                 &&  (pthis->drv->init != NULL));
 
-    for (uint_fast8_t i = 0; i < pthis->stream_num; i++) {
-        pthis->stream[i].stream_index = i;
+    if (pthis->stream != NULL) {
+        for (uint_fast8_t i = 0; i < pthis->stream_num; i++) {
+            pthis->stream[i].stream_index = i;
+        }
     }
     __vsf_component_call_peda_ifs(vk_audio_init, err, pthis->drv->init, 0, pthis);
     return err;

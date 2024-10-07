@@ -224,6 +224,10 @@ extern void vsf_audio_capture_ticktock_stream_adapter_init(vsf_audio_ticktock_st
 #   include "./driver/winsound/vsf_winsound.h"
 #endif
 
+#if VSF_AUDIO_USE_DUMMY == ENABLED
+#   include "./driver/dummy/vsf_audio_dummy.h"
+#endif
+
 #if VSF_HAL_USE_I2S == ENABLED
 #   include "./driver/i2s/vsf_audio_i2s.h"
 
