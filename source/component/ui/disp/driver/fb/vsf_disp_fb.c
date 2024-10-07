@@ -148,6 +148,13 @@ static vsf_err_t __vk_disp_fb_refresh(vk_disp_t *pthis, vk_disp_area_t *area, vo
     uint_fast32_t y_end = real_area.pos.y + real_area.size.y;
     void *cur_buffer = vk_disp_fb_get_back_buffer(pthis);
 
+    if (    (real_area.pos.x != 0) || (real_area.pos.y != 0)
+        ||  (real_area.size.x != disp_fb->param.width)
+        ||  (real_area.size.y != disp_fb->param.height)) {
+        void *prev_buffer = vk_disp_fb_get_front_buffer(pthis);
+        memcpy(cur_buffer, prev_buffer, disp_fb->fb_size);
+    }
+
     for (uint_fast32_t y = real_area.pos.y; y < y_end; y++) {
         memcpy((uint8_t *)cur_buffer + x_offset, disp_buff, copy_size);
         disp_buff = (uint8_t *)disp_buff + copy_size;
