@@ -315,6 +315,8 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
                                 |   ((irq_mask_orig & USART_STAT_PERR) << 8)
                                 |   ((irq_mask_orig & USART_STAT_CTSF) << 1);
 
+    // ORERR can be triggered if RFNEIE is enabled
+    USART_INTC(reg) = USART_INTC_OREC;
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_usart_t *)usart_ptr, irq_mask);
     }
