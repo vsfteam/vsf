@@ -121,40 +121,32 @@ __vsf_component_peda_ifs_entry(__vk_audio_dummy_playback_control, vk_audio_contr
 
 static void __vk_audio_dummy_ontimer(vsf_callback_timer_t *timer)
 {
-    vk_audio_dummy_playback_buffer_t *audio_dummy_buffer = vsf_container_of(timer, vk_audio_dummy_playback_buffer_t, timer);
-    vk_audio_dummy_playback_ctx_t *playback_ctx = audio_dummy_buffer->param;
+    vk_audio_dummy_playback_ctx_t *playback_ctx = vsf_container_of(timer, vk_audio_dummy_playback_ctx_t, timer);
 
-    if (playback_ctx->buffer_taken > 0) {
-        __vsf_audio_dummy_trace(VSF_TRACE_DEBUG, "%d [audio_dummy]: playback evt %d\r\n", vsf_systimer_get_ms(), header->dwFlags);
-        vsf_protect_t orig = vsf_protect_int();
-            playback_ctx->buffer_taken--;
-        vsf_unprotect_int(orig);
-        __vk_audio_dummy_playback_evthandler(playback_ctx->audio_stream->stream, playback_ctx->audio_stream, VSF_STREAM_ON_IN);
-    }
+    __vsf_audio_dummy_trace(VSF_TRACE_DEBUG, "%d [audio_dummy]: on_timer\r\n", vsf_systimer_get_ms());
+
+    playback_ctx->is_timing = false;
+    __vk_audio_dummy_playback_evthandler(playback_ctx->audio_stream->stream, playback_ctx->audio_stream, VSF_STREAM_ON_IN);
 }
 
 static bool __vk_audio_dummy_playback_buffer(vk_audio_dummy_dev_t *dev, uint8_t *buffer, uint_fast32_t size)
 {
     vk_audio_dummy_playback_ctx_t *playback_ctx = &dev->playback_ctx;
     vk_audio_format_t *audio_format = &playback_ctx->audio_stream->format;
-    if (playback_ctx->buffer_taken < dimof(playback_ctx->buffer)) {
-        vk_audio_dummy_playback_buffer_t *audio_dummy_buffer =
-            playback_ctx->fill_ticktock ? &playback_ctx->buffer[0] : &playback_ctx->buffer[1];
 
-        vsf_protect_t orig = vsf_protect_int();
-            playback_ctx->buffer_taken++;
+    // __vk_audio_dummy_playback_buffer can be called in stream evthandler and on_timer event,
+    //  with different priority, so need protect here
+    vsf_protect_t orig = vsf_protect_int();
+    if (!playback_ctx->is_timing) {
+        playback_ctx->is_timing = true;
         vsf_unprotect_int(orig);
 
-        playback_ctx->fill_ticktock = !playback_ctx->fill_ticktock;
-
-        memset(&audio_dummy_buffer->timer, 0, sizeof(audio_dummy_buffer->timer));
-        audio_dummy_buffer->timer.on_timer = __vk_audio_dummy_ontimer;
-        audio_dummy_buffer->param = playback_ctx;
         uint_fast32_t nsamples = size / (audio_format->channel_num * VSF_AUDIO_DATA_TYPE_BITLEN(audio_format->datatype.value) >> 3);
-        vsf_callback_timer_add_us(&audio_dummy_buffer->timer, nsamples * 1000000 / (audio_format->sample_rate * 100));
+        vsf_callback_timer_add_us(&playback_ctx->timer, nsamples * 1000000 / (audio_format->sample_rate * 100));
 
         return true;
     }
+    vsf_unprotect_int(orig);
     return false;
 }
 
@@ -170,7 +162,7 @@ static void __vk_audio_dummy_playback_evthandler(vsf_stream_t *stream, void *par
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
     case VSF_STREAM_ON_IN:
-        while (playback_ctx->is_playing && (playback_ctx->buffer_taken < dimof(playback_ctx->buffer))) {
+        if (playback_ctx->is_playing) {
             __vsf_audio_dummy_trace(VSF_TRACE_DEBUG, "%d [audio_dummy]: play stream evthandler\r\n", vsf_systimer_get_ms());
             datasize = vsf_stream_get_rbuf(stream, &buff);
             if (!datasize) { break; }
@@ -194,15 +186,15 @@ __vsf_component_peda_ifs_entry(__vk_audio_dummy_playback_start, vk_audio_start)
     case VSF_EVT_INIT:
         if (playback_ctx->is_playing) {
             VSF_AV_ASSERT(false);
-        do_return_fail:
             vsf_eda_return(VSF_ERR_FAIL);
             return;
         }
 
         playback_ctx->audio_stream = audio_stream;
         playback_ctx->is_playing = true;
-        playback_ctx->fill_ticktock = false;
-        playback_ctx->buffer_taken = 0;
+        playback_ctx->is_timing = false;
+        vsf_callback_timer_init(&playback_ctx->timer);
+        playback_ctx->timer.on_timer = __vk_audio_dummy_ontimer;
         audio_stream->stream->rx.param = audio_stream;
         audio_stream->stream->rx.evthandler = __vk_audio_dummy_playback_evthandler;
         vsf_stream_connect_rx(audio_stream->stream);

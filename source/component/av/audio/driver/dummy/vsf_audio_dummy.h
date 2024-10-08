@@ -43,18 +43,12 @@ extern "C" {
 
 #if VSF_AUDIO_USE_PLAYBACK == ENABLED
 
-typedef struct vk_audio_dummy_playback_buffer_t {
-    vsf_callback_timer_t timer;
-    void *param;
-} vk_audio_dummy_playback_buffer_t;
-
 typedef struct vk_audio_dummy_playback_ctx_t {
     vk_audio_stream_t *audio_stream;
-    vk_audio_dummy_playback_buffer_t buffer[2];
+    vsf_callback_timer_t timer;
 
     bool is_playing;
-    bool fill_ticktock;
-    uint8_t buffer_taken;
+    bool is_timing;
 } vk_audio_dummy_playback_ctx_t;
 
 #endif
