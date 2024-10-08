@@ -128,13 +128,19 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
             break;
         case VK_LFS_LOOKUP: {
                 vk_lfs_file_t *dir = fsinfo->param.open.dir;
+                vk_file_t *dir_tmp;
                 const char *name = fsinfo->param.open.name;
                 struct lfs_info lfsinfo;
 
                 path[0] = '\0';
-                while (dir->name != NULL) {
-                    VSF_FS_ASSERT(strlen(path) + strlen(dir->name) <= sizeof(path) - 1);
-                    strcat(path, dir->name);
+                dir_tmp = &dir->use_as__vk_file_t;
+                while (dir_tmp->name != NULL) {
+                    VSF_FS_ASSERT(strlen(path) + strlen(dir_tmp->name) <= sizeof(path) - 1);
+                    strcat(path, dir_tmp->name);
+                    dir_tmp = dir_tmp->parent;
+                    if (dir_tmp->fsop != &vk_lfs_op) {
+                        break;
+                    }
                 }
 
                 ret = 0;
@@ -205,12 +211,18 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
 #ifndef LFS_READONLY
         case VK_LFS_CREATE: {
                 vk_lfs_file_t *dir = fsinfo->param.create.dir;
+                vk_file_t *dir_tmp;
                 const char *name = fsinfo->param.create.name;
 
                 path[0] = '\0';
-                while (dir->name != NULL) {
-                    VSF_FS_ASSERT(strlen(path) + strlen(dir->name) <= sizeof(path) - 1);
-                    strcat(path, dir->name);
+                dir_tmp = &dir->use_as__vk_file_t;
+                while (dir_tmp->name != NULL) {
+                    VSF_FS_ASSERT(strlen(path) + strlen(dir_tmp->name) <= sizeof(path) - 1);
+                    strcat(path, dir_tmp->name);
+                    dir_tmp = dir_tmp->parent;
+                    if (dir_tmp->fsop != &vk_lfs_op) {
+                        break;
+                    }
                 }
                 VSF_FS_ASSERT(strlen(path) + strlen(name) <= sizeof(path) - 1);
                 strcat(path, name);
@@ -228,12 +240,18 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
             break;
         case VK_LFS_UNLINK: {
                 vk_lfs_file_t *dir = fsinfo->param.unlink.dir;
+                vk_file_t *dir_tmp;
                 const char *name = fsinfo->param.unlink.name;
 
                 path[0] = '\0';
-                while (dir->name != NULL) {
-                    VSF_FS_ASSERT(strlen(path) + strlen(dir->name) <= sizeof(path) - 1);
-                    strcat(path, dir->name);
+                dir_tmp = &dir->use_as__vk_file_t;
+                while (dir_tmp->name != NULL) {
+                    VSF_FS_ASSERT(strlen(path) + strlen(dir_tmp->name) <= sizeof(path) - 1);
+                    strcat(path, dir_tmp->name);
+                    dir_tmp = dir_tmp->parent;
+                    if (dir_tmp->fsop != &vk_lfs_op) {
+                        break;
+                    }
                 }
                 VSF_FS_ASSERT(strlen(path) + strlen(name) <= sizeof(path) - 1);
                 strcat(path, name);
