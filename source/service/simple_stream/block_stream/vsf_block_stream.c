@@ -172,9 +172,9 @@ static uint_fast32_t __vsf_block_stream_read(vsf_stream_t *stream, uint8_t *buf,
 
     VSF_SERVICE_ASSERT(size <= block_stream->block_size);
     if (item != NULL) {
-        size = vsf_min(size, item->size);
+        size = vsf_min(size, item->size - item->pos);
         if (buf != NULL) {
-            memcpy(buf, &item[1], size);
+            memcpy(buf, (char *)&item[1] + item->pos, size);
         }
 
         item->pos += size;
