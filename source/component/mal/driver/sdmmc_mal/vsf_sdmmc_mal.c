@@ -102,7 +102,7 @@ static void __vk_sdmmc_mal_irqhandler(void *target, vsf_sdio_t *sdio,
         goto request_done;
     } else {
         if (status & SDIO_REQSTS_ERR_MASK) {
-            vsf_trace_error("sdmmc: sdio failed with" VSF_TRACE_CFG_LINEEND, status);
+            vsf_trace_error("sdmmc: sdio failed with 0x%x" VSF_TRACE_CFG_LINEEND, status);
             if (status & SDIO_REQSTS_ERR_RESP_NONE) {
                 vsf_trace_error("sdmmc: sdio resp not received" VSF_TRACE_CFG_LINEEND);
             }
