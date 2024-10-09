@@ -102,6 +102,15 @@ static void __vk_sdmmc_mal_irqhandler(void *target, vsf_sdio_t *sdio,
         goto request_done;
     } else {
         if (status & SDIO_REQSTS_ERR_MASK) {
+            if (status & SDIO_REQSTS_ERR_RESP_NONE) {
+                vsf_trace_error("sdio: resp not received\r\n" VSF_TRACE_CFG_LINEEND);
+            }
+            if (status & SDIO_REQSTS_ERR_RESP_CRC) {
+                vsf_trace_error("sdio: data crc failed\r\n" VSF_TRACE_CFG_LINEEND);
+            }
+            if (status & SDIO_REQSTS_ERR_DATA_CRC) {
+                vsf_trace_error("sdio: resp crc failed\r\n" VSF_TRACE_CFG_LINEEND);
+            }
             evt = VSF_EVT_SDMMC_ERROR;
             goto request_done;
         }
