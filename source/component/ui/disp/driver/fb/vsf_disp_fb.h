@@ -84,11 +84,12 @@ vsf_class(vk_disp_fb_t) {
         const vk_disp_fb_drv_t  *drv;
         void                    *drv_param;
 
-        uint8_t                 fb_num;
         uint32_t                fb_size;
+        vk_disp_color_type_t    layer_color;
+        vk_disp_area_t          layer_area;
+        uint8_t                 fb_num;
         uint8_t                 layer_idx;
         uint8_t                 layer_alpha;
-        vk_disp_area_t          layer_area;
     )
 
     private_member(
