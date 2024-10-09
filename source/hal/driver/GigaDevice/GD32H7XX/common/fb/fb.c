@@ -190,6 +190,8 @@ vsf_err_t vsf_hw_fb_layer_config(vsf_hw_fb_t *fb, int layer,
     TLI_LXDC(layer) = 0;
     TLI_LXBLEND(layer) &= ~(TLI_LXBLEND_ACF2 | (TLI_LXBLEND_ACF1));
     TLI_LXBLEND(layer) = LAYER_ACF2_PASA | LAYER_ACF1_PASA;
+    // frame buffer MUST be 8-byte aligned
+    VSF_HAL_ASSERT(!((uint32_t)initial_pixel_buffer & 7));
     TLI_LXFBADDR(layer) = (uint32_t)initial_pixel_buffer;
     TLI_LXFLLEN(layer) &= ~(TLI_LXFLLEN_FLL | (TLI_LXFLLEN_STDOFF));
 
@@ -220,6 +222,8 @@ vsf_err_t vsf_hw_fb_layer_present(vsf_hw_fb_t *fb, int layer, void *pixel_buffer
 {
     VSF_HAL_ASSERT((fb != NULL) && (layer < 2));
     layer = 0 == layer ? LAYER0 : LAYER1;
+    // frame buffer MUST be 8-byte aligned
+    VSF_HAL_ASSERT(!((uint32_t)pixel_buffer & 7));
     TLI_LXFBADDR(layer) = (uint32_t)pixel_buffer;
     TLI_RL |= TLI_RL_FBR;
     return VSF_ERR_NONE;
