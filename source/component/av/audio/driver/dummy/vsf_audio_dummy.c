@@ -129,21 +129,26 @@ static void __vk_audio_dummy_ontimer(vsf_callback_timer_t *timer)
     __vk_audio_dummy_playback_evthandler(playback_ctx->audio_stream->stream, playback_ctx->audio_stream, VSF_STREAM_ON_IN);
 }
 
-static bool __vk_audio_dummy_playback_buffer(vk_audio_dummy_dev_t *dev, uint8_t *buffer, uint_fast32_t size)
+static bool __vk_audio_dummy_playback(vk_audio_dummy_dev_t *dev)
 {
     vk_audio_dummy_playback_ctx_t *playback_ctx = &dev->playback_ctx;
-    vk_audio_format_t *audio_format = &playback_ctx->audio_stream->format;
+    vk_audio_stream_t *audio_stream = playback_ctx->audio_stream;
+    vsf_stream_t *stream = audio_stream->stream;
+    vk_audio_format_t *audio_format = &audio_stream->format;
+    // data threshold is half buffer for tick-tock operation
+    uint_fast32_t audio_data_size_threshold = vsf_stream_get_buff_size(stream) >> 1;
+    uint_fast32_t audio_data_size = vsf_stream_get_data_size(stream);
 
     // __vk_audio_dummy_playback_buffer can be called in stream evthandler and on_timer event,
     //  with different priority, so need protect here
     vsf_protect_t orig = vsf_protect_int();
-    if (!playback_ctx->is_timing) {
+    if (!playback_ctx->is_timing && (audio_data_size >= audio_data_size_threshold)) {
         playback_ctx->is_timing = true;
         vsf_unprotect_int(orig);
 
-        uint_fast32_t nsamples = size / (audio_format->channel_num * VSF_AUDIO_DATA_TYPE_BITLEN(audio_format->datatype.value) >> 3);
+        uint_fast32_t nsamples = audio_data_size_threshold / (audio_format->channel_num * VSF_AUDIO_DATA_TYPE_BITLEN(audio_format->datatype.value) >> 3);
+        vsf_stream_read(stream, NULL, audio_data_size_threshold);
         vsf_callback_timer_add_us(&playback_ctx->timer, nsamples * 1000000 / (audio_format->sample_rate * 100));
-
         return true;
     }
     vsf_unprotect_int(orig);
@@ -156,20 +161,13 @@ static void __vk_audio_dummy_playback_evthandler(vsf_stream_t *stream, void *par
     vk_audio_stream_t *audio_stream_base = audio_stream - audio_stream->stream_index;
     vk_audio_dummy_dev_t *dev = vsf_container_of(audio_stream_base, vk_audio_dummy_dev_t, __stream);
     vk_audio_dummy_playback_ctx_t *playback_ctx = &dev->playback_ctx;
-    uint_fast32_t datasize;
-    uint8_t *buff;
 
     switch (evt) {
     case VSF_STREAM_ON_CONNECT:
     case VSF_STREAM_ON_IN:
         if (playback_ctx->is_playing) {
             __vsf_audio_dummy_trace(VSF_TRACE_DEBUG, "%d [audio_dummy]: play stream evthandler\r\n", vsf_systimer_get_ms());
-            datasize = vsf_stream_get_rbuf(stream, &buff);
-            if (!datasize) { break; }
-
-            if (__vk_audio_dummy_playback_buffer(dev, buff, datasize)) {
-                vsf_stream_read(stream, (uint8_t *)buff, datasize);
-            }
+            __vk_audio_dummy_playback(dev);
         }
         break;
     }
