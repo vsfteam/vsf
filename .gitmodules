@@ -64,3 +64,9 @@
 [submodule "source/component/3rd-party/qrcode/raw"]
 	path = source/component/3rd-party/qrcode/raw
 	url = ../QRCode
+[submodule "source/hal/driver/ST/STM32H7RSXX/common/vendor/cmsis_device_h7rs"]
+	path = source/hal/driver/ST/STM32H7RSXX/common/vendor/cmsis_device_h7rs
+	url = https://github.com/STMicroelectronics/cmsis_device_h7rs
+[submodule "source/hal/driver/ST/STM32H7XX/common/vendor/cmsis_device_h7"]
+	path = source/hal/driver/ST/STM32H7XX/common/vendor/cmsis_device_h7
+	url = https://github.com/STMicroelectronics/cmsis_device_h7
