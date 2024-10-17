@@ -63,6 +63,8 @@ typedef enum vsf_hw_peripheral_clksel_t {
 } vsf_hw_peripheral_clksel_t;
 
 enum {
+    VSF_HW_CLK_PRESCALER_NONE           = 0,
+    VSF_HW_CLK_PRESCALER_CONST,
     VSF_HW_CLK_PRESCALER_DIV,
     VSF_HW_CLK_PRESCALER_ADD1_DIV,
     VSF_HW_CLK_PRESCALER_SFT,
@@ -88,6 +90,7 @@ struct vsf_hw_clk_t {
     };
     union {
         const uint8_t *clkprescaler_mapper;
+        uint32_t prescaler;
         uint32_t (*getclk)(const vsf_hw_clk_t *clk, uint32_t clksrc_freq_hz, uint32_t prescaler);
     };
 
@@ -599,7 +602,11 @@ uint32_t vsf_hw_clk_get_freq_hz(const vsf_hw_clk_t *clk)
 
     uint32_t clk_freq_hz = __vsf_hw_clk_get_src_freq_hz(clk);
 
-    if (clk->clkprescaler_region != 0) {
+    if (VSF_HW_CLK_PRESCALER_CONST == clk->clkprescaler_type) {
+        VSF_HAL_ASSERT(clk->prescaler > 0);
+        clk_freq_hz /= clk->prescaler;
+    } else if (clk->clkprescaler_type != VSF_HW_CLK_PRESCALER_NONE) {
+        VSF_HAL_ASSERT(clk->clkprescaler_region != 0);
         bool isfunc = clk->clkprescaler_type == VSF_HW_CLK_PRESCALER_FUNC;
         uint32_t prescaler =  vsf_hw_clkrst_region_get(clk->clkprescaler_region);
         if ((clk->clkprescaler_mapper != NULL) && !isfunc) {
@@ -611,6 +618,7 @@ uint32_t vsf_hw_clk_get_freq_hz(const vsf_hw_clk_t *clk)
             switch (clk->clkprescaler_type) {
             case VSF_HW_CLK_PRESCALER_ADD1_DIV:
                 prescaler++;
+                // fall through
             case VSF_HW_CLK_PRESCALER_DIV:
                 VSF_HAL_ASSERT(prescaler > 0);
                 clk_freq_hz /= prescaler;
@@ -677,19 +685,21 @@ vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc,
         VSF_HAL_ASSERT(clk->clkprescaler_region != 0);
 
         switch (clk->clkprescaler_type) {
+        case VSF_HW_CLK_PRESCALER_CONST:
+            VSF_HAL_ASSERT(false);
+            break;
         case VSF_HW_CLK_PRESCALER_DIV:
             break;
+        case VSF_HW_CLK_PRESCALER_ADD1_SFT:
+            VSF_HAL_ASSERT(!(prescaler & (prescaler - 1)));
+            prescaler = vsf_msb32(prescaler);
+            // fall through
         case VSF_HW_CLK_PRESCALER_ADD1_DIV:
             prescaler--;
             break;
         case VSF_HW_CLK_PRESCALER_SFT:
             VSF_HAL_ASSERT(prescaler & (prescaler - 1));
             prescaler = vsf_msb32(prescaler);
-            break;
-        case VSF_HW_CLK_PRESCALER_ADD1_SFT:
-            VSF_HAL_ASSERT(!(prescaler & (prescaler - 1)));
-            prescaler = vsf_msb32(prescaler);
-            prescaler--;
             break;
         case VSF_HW_CLK_PRESCALER_FUNC:
             VSF_HAL_ASSERT(false);

@@ -27,7 +27,7 @@
 
 /*============================ MACROS ========================================*/
 
-// CLKRST REGION
+// CLK & RST REGION
 
 #define VSF_HW_CLKRST_REGION(__WORD_OFFSET, __BIT_OFFSET, __BIT_LENGTH)         \
             (((__WORD_OFFSET) << 16) | ((__BIT_LENGTH) << 8) | ((__BIT_OFFSET) << 0))

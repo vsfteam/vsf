@@ -21,8 +21,8 @@
 
 #else
 
-#   ifndef __HAL_DRIVER_ST_STM32H_H__
-#   define __HAL_DRIVER_ST_STM32H_H__
+#   ifndef __HAL_DRIVER_ST_STM32H7RS_H__
+#   define __HAL_DRIVER_ST_STM32H7RS_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -36,11 +36,11 @@
 #       include "hal/driver/common/swi/vsf_swi_template.h"
 
 // For peripherials
-#       include "./io/io.h"
-#       include "./gpio/gpio.h"
-#       include "./flash/flash.h"
-#       include "./usart/usart.h"
-#       include "./sdio/sdio.h"
+//#       include "./io/io.h"
+//#       include "./gpio/gpio.h"
+//#       include "./flash/flash.h"
+//#       include "./usart/usart.h"
+//#       include "./sdio/sdio.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -163,7 +163,7 @@
 #   include "hal/driver/common/wdt/wdt_template.h"
 #endif
 
-#   endif       // __HAL_DRIVER_ST_STM32H_H__
+#   endif       // __HAL_DRIVER_ST_STM32H743XI_H__
 
 #endif
 /* EOF */
