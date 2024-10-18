@@ -29,7 +29,10 @@ typedef unsigned short              wchar_t;
 #   elif __IS_COMPILER_GCC__ || __IS_COMPILER_LLVM__
 typedef int                         wchar_t;
 #   elif __IS_COMPILER_IAR__
-#       if __ARM_SIZEOF_WCHAR_T == 2
+#       if !defined(__ARM_SIZEOF_WCHAR_T)
+// old iar has no __ARM_SIZEOF_WCHAR_T, and use 4 bytes as wchar_t
+typedef unsigned int                wchar_t;
+#       elif __ARM_SIZEOF_WCHAR_T == 2
 typedef unsigned short              wchar_t;
 #       elif __ARM_SIZEOF_WCHAR_T == 4
 typedef unsigned int                wchar_t;
