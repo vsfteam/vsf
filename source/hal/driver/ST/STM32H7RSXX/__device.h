@@ -21,7 +21,8 @@
 #undef VSF_DEVICE_HEADER
 
 #if     defined(__STM32H7R7L8__)
-#   define  VSF_DEVICE_HEADER       "./STM32H7R7L8/device.h"
+#   define  VSF_DEVICE_HEADER           "./STM32H7R7L8/device.h"
+#   define  __VSF_DEVICE_VENDOR_HEADER  "../vendor/cmsis_device_h7rs/Include/stm32h7r7xx.h"
 #else
 #   error No supported device found.
 #endif

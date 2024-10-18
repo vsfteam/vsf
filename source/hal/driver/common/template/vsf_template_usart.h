@@ -584,12 +584,12 @@ enum {
 
 #ifndef VSF_USART_IRQ_ALL_BITS_MASK
     VSF_USART_IRQ_ALL_BITS_MASK             = VSF_USART_IRQ_MASK_TX
-                                            |  VSF_USART_IRQ_MASK_RX
-                                            |  VSF_USART_IRQ_MASK_RX_TIMEOUT
-                                            |  VSF_USART_IRQ_MASK_CTS
-                                            |  VSF_USART_IRQ_MASK_TX_CPL
-                                            |  VSF_USART_IRQ_MASK_RX_CPL
-                                            |  VSF_USART_IRQ_MASK_ERR,
+                                            | VSF_USART_IRQ_MASK_RX
+                                            | VSF_USART_IRQ_MASK_RX_TIMEOUT
+                                            | VSF_USART_IRQ_MASK_CTS
+                                            | VSF_USART_IRQ_MASK_TX_CPL
+                                            | VSF_USART_IRQ_MASK_RX_CPL
+                                            | VSF_USART_IRQ_MASK_ERR,
 #    ifdef VSF_USART_IRQ_MASK_TX_HALF_CPL
                                             | VSF_USART_IRQ_MASK_TX_HALF_CPL
 #    endif

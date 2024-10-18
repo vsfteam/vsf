@@ -121,8 +121,8 @@
 
 // UART/USART
 
-#define VSF_HW_USART_COUNT              8
-#define VSF_HW_USART_MASK               0x01FE      // start from 1
+#define VSF_HW_USART_COUNT              7
+#define VSF_HW_USART_MASK               0x01BE      // start from 1
 #define VSF_HW_USART1_REG_BASE          USART1
 #define VSF_HW_USART1_CLK               VSF_HW_CLK_USART1
 #define VSF_HW_USART1_EN                VSF_HW_EN_USART1
@@ -158,13 +158,6 @@
 #define VSF_HW_USART5_SYNC              false
 #define VSF_HW_USART5_IRQN              UART5_IRQn
 #define VSF_HW_USART5_IRQHandler        UART5_IRQHandler
-#define VSF_HW_USART6_REG_BASE          USART6
-#define VSF_HW_USART6_CLK               VSF_HW_CLK_USART6
-#define VSF_HW_USART6_EN                VSF_HW_EN_USART6
-#define VSF_HW_USART6_RST               VSF_HW_RST_USART6
-#define VSF_HW_USART6_SYNC              true
-#define VSF_HW_USART6_IRQN              USART6_IRQn
-#define VSF_HW_USART6_IRQHandler        USART6_IRQHandler
 #define VSF_HW_USART7_REG_BASE          UART7
 #define VSF_HW_USART7_CLK               VSF_HW_CLK_UART7
 #define VSF_HW_USART7_EN                VSF_HW_EN_UART7

@@ -39,7 +39,7 @@
 //#       include "./io/io.h"
 //#       include "./gpio/gpio.h"
 //#       include "./flash/flash.h"
-//#       include "./usart/usart.h"
+#       include "./usart/usart.h"
 //#       include "./sdio/sdio.h"
 
 /*============================ MACROS ========================================*/
