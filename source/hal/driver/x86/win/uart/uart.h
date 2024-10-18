@@ -75,13 +75,17 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_HALF_DUPLEX_DISABLE       = (0x00ul << 16),
     VSF_USART_HALF_DUPLEX_ENABLE        = (0x01ul << 16),
 
-    VSF_USART_TX_FIFO_THRESH_ONE        = (0x00ul << 17),    //!< one data for txfifo
-    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x01ul << 17),    //!< Half of the threshold for txfifo
-    VSF_USART_TX_FIFO_THRESH_FULL       = (0x02ul << 17),    //!< Full of the threshold for txfifo
+    VSF_USART_TX_FIFO_THRESHOLD_EMPTY   = (0x00ul << 17),
+    VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY
+                                        = (0x01ul << 17),    //!< Half of the threshold for txfifo
+    VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL
+                                        = (0x02ul << 17),
 
-    VSF_USART_RX_FIFO_THRESH_ONE        = (0x00ul << 19),    //!< one data for txfifo
-    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (0x01ul << 19),    //!< Half of the threshold for txfifo
-    VSF_USART_RX_FIFO_THRESH_FULL       = (0x02ul << 19),    //!< Full of the threshold for txfifo
+    VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
+                                        = (0x00ul << 19),
+    VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL
+                                        = (0x01ul << 19),    //!< Half of the threshold for txfifo
+    VSF_USART_RX_FIFO_THRESHOLD_FULL    = (0x02ul << 19),
 
     VSF_USART_SYNC_CLOCK_POLARITY_LOW   = (0x00ul << 21),
     VSF_USART_SYNC_CLOCK_POLARITY_HIGH  = (0x01ul << 21),
