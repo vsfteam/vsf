@@ -185,13 +185,17 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_FORCE_0_PARITY            = (0 << 8),
     VSF_USART_FORCE_1_PARITY            = (1 << 8),
 
-    VSF_USART_TX_FIFO_THRESH_ONE        = (0 << 20),
-    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (1 << 20),
-    VSF_USART_TX_FIFO_THRESH_FULL       = (2 << 20),
+    VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL
+                                        = (0 << 20),
+    VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY
+                                        = (1 << 20),
+    VSF_USART_TX_FIFO_THRESHOLD_EMPTY   = (2 << 20),
 
-    VSF_USART_RX_FIFO_THRESH_ONE        = (0 << 22),
-    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (1 << 22),
-    VSF_USART_RX_FIFO_THRESH_FULL       = (2 << 22),
+    VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
+                                        = (0 << 22),
+    VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL
+                                        = (1 << 22),
+    VSF_USART_RX_FIFO_THRESHOLD_FULL    = (2 << 22),
 
     __VSF_HW_USART_NOT_SUPPORT_MASK     = VSF_USART_5_BIT_LENGTH
                                         | VSF_USART_5_BIT_LENGTH

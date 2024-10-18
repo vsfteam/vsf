@@ -141,12 +141,17 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_HALF_DUPLEX_DISABLE       = (0x0ul << 12),
     VSF_USART_HALF_DUPLEX_ENABLE        = (0x1ul << 12),
 
-    VSF_USART_TX_FIFO_THRESH_ONE        = (0x0ul << 13),
-    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x1ul << 13),
-    VSF_USART_TX_FIFO_THRESH_FULL       = (0x2ul << 13),
-    VSF_USART_RX_FIFO_THRESH_ONE        = (0x0ul << 15),
-    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (0x1ul << 15),
-    VSF_USART_RX_FIFO_THRESH_FULL       = (0x2ul << 15),
+    VSF_USART_TX_FIFO_THRESHOLD_EMPTY   = (0x0ul << 13),
+    VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY
+                                        = (0x1ul << 13),
+    VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL
+                                        = (0x2ul << 15),
+
+    VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
+                                        = (0x0ul << 15),
+    VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL
+                                        = (0x1ul << 15),
+    VSF_USART_RX_FIFO_THRESHOLD_FULL    = (0x2ul << 15),
 
     VSF_USART_SYNC_CLOCK_POLARITY_LOW   = (0x0ul << 16),
     VSF_USART_SYNC_CLOCK_POLARITY_HIGH  = (0x1ul << 16),
@@ -161,7 +166,7 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_TX_CPL           = (0x1ul << 0),
     VSF_USART_IRQ_MASK_RX_CPL           = (0x1ul << 1),
 
-    // TX/RX reach fifo threshold, thres    hold on some devices is bound to 1
+    // TX/RX reach fifo threshold, threshold on some devices is bound to 1
     VSF_USART_IRQ_MASK_TX               = (0x1ul << 2),
     VSF_USART_IRQ_MASK_RX               = (0x1ul << 3),
     VSF_USART_IRQ_MASK_RX_TIMEOUT       = (0x1ul << 4),

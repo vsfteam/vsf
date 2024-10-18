@@ -72,13 +72,17 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_HALF_DUPLEX_DISABLE       = (0x0ul << 18),
     VSF_USART_HALF_DUPLEX_ENABLE        = (0x1ul << 18),
 
-    VSF_USART_TX_FIFO_THRESH_ONE        = (0x0ul << 19),
-    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x1ul << 19),
-    VSF_USART_TX_FIFO_THRESH_FULL       = (0x2ul << 19),
+    VSF_USART_TX_FIFO_THRESHOLD_EMPTY   = (0x0ul << 19),
+    VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY
+                                        = (0x1ul << 19),
+    VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL
+                                        = (0x2ul << 19),
 
-    VSF_USART_RX_FIFO_THRESH_ONE        = (0x0ul << 21),
-    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (0x1ul << 21),
-    VSF_USART_RX_FIFO_THRESH_FULL       = (0x2ul << 21),
+    VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
+                                        = (0x0ul << 21),
+    VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL
+                                        = (0x1ul << 21),
+    VSF_USART_RX_FIFO_THRESHOLD_FULL    = (0x2ul << 21),
 
     VSF_USART_SYNC_CLOCK_POLARITY_LOW   = (0x0ul << 23),
     VSF_USART_SYNC_CLOCK_POLARITY_HIGH  = (0x1ul << 23),

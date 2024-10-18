@@ -235,12 +235,12 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
  * - VSF_USART_SYNC_CLOCK_DISABLE
  * - VSF_USART_HALF_DUPLEX_DISABLE
  * - VSF_USART_HALF_DUPLEX_ENABLE
- * - VSF_USART_TX_FIFO_THRESH_ONE
- * - VSF_USART_TX_FIFO_THRESH_HALF_FULL
- * - VSF_USART_TX_FIFO_THRESH_FULL
- * - VSF_USART_RX_FIFO_THRESH_ONE
- * - VSF_USART_RX_FIFO_THRESH_HALF_FULL
- * - VSF_USART_RX_FIFO_THRESH_FULL
+ * - VSF_USART_TX_FIFO_THRESHOLD_EMPTY
+ * - VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY
+ * - VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL
+ * - VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
+ * - VSF_USART_RX_FIFO_THRESHOLD_FULL
+ * - VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL
  * - VSF_USART_SYNC_CLOCK_POLARITY_LOW
  * - VSF_USART_SYNC_CLOCK_POLARITY_HIGH
  * - VSF_USART_SYNC_CLOCK_PHASE_1_EDGE
@@ -249,12 +249,12 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
  * \~english
  * If more new modes are added to the driver, then the corresponding MASK macros need to
  * be defined to include the values of the new modes. For example, Adding the new TX FIFO
- * Threshold option requires that the macro VSF_USART_TX_FIFO_THRESH_MASK be defined.
+ * Threshold option requires that the macro VSF_USART_TX_FIFO_THRESHOLD_MASK be defined.
  * Adding the new parity check option requires the macro VSF_USART_PARITY_MASK be defined.
  * Adding the new stop bit option requires the macro of VSF_USART_BIT_LENGTH_MASK be defined.
  * \~chinese
  * 驱动里如果添加更多的新模式的时候，那也需要定义对应的 MASK 宏 来包含新的模式的值。例如添加了新的
- * TX FIFO 门限值选项，就需要定义宏 VSF_USART_TX_FIFO_THRESH_MASK; 添加了新的奇偶检验选项，就需要
+ * TX FIFO 门限值选项，就需要定义宏 VSF_USART_TX_FIFO_THRESHOLD_MASK; 添加了新的奇偶检验选项，就需要
  * 定义宏 VSF_USART_PARITY_MASK; 添加了新的停止位选项，就需要定义宏 VSF_USART_BIT_LENGTH_MASK。
  *
  * \~english
@@ -269,180 +269,245 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
  */
 typedef enum vsf_usart_mode_t {
     //! USART Parity
-    VSF_USART_NO_PARITY                 = (0x0ul << 0),
-    VSF_USART_EVEN_PARITY               = (0x1ul << 0),
-    VSF_USART_ODD_PARITY                = (0x2ul << 0),
-    VSF_USART_FORCE_0_PARITY            = (0x3ul << 0),
-    VSF_USART_FORCE_1_PARITY            = (0x4ul << 0),
+    VSF_USART_NO_PARITY                                 = (0x0ul << 0),
+    VSF_USART_EVEN_PARITY                               = (0x1ul << 0),
+    VSF_USART_ODD_PARITY                                = (0x2ul << 0),
+    VSF_USART_FORCE_0_PARITY                            = (0x3ul << 0),
+    VSF_USART_FORCE_1_PARITY                            = (0x4ul << 0),
 
     //! USART Stopbit
-    VSF_USART_1_STOPBIT                 = (0x0ul << 3),     //!< stopbit: 1   bit
-    VSF_USART_1_5_STOPBIT               = (0x1ul << 3),     //!< stopbit: 1.5 bit
-    VSF_USART_0_5_STOPBIT               = (0x2ul << 3),     //!< stopbit: 0.5 bit
-    VSF_USART_2_STOPBIT                 = (0x3ul << 3),     //!< stopbit: 2   bit
+    VSF_USART_1_STOPBIT                                 = (0x0ul << 3),     //!< stopbit: 1   bit
+    VSF_USART_1_5_STOPBIT                               = (0x1ul << 3),     //!< stopbit: 1.5 bit
+    VSF_USART_0_5_STOPBIT                               = (0x2ul << 3),     //!< stopbit: 0.5 bit
+    VSF_USART_2_STOPBIT                                 = (0x3ul << 3),     //!< stopbit: 2   bit
 
     //! USART Databit Lenght
-    VSF_USART_5_BIT_LENGTH              = (0x0ul << 5),     //!< data bits : 5,
-    VSF_USART_6_BIT_LENGTH              = (0x1ul << 5),     //!< data bits : 6,
-    VSF_USART_7_BIT_LENGTH              = (0x2ul << 5),     //!< data bits : 7,
-    VSF_USART_8_BIT_LENGTH              = (0x3ul << 5),     //!< data bits : 8,
-    VSF_USART_9_BIT_LENGTH              = (0x4ul << 5),     //!< data bits : 9,
-    VSF_USART_10_BIT_LENGTH             = (0x5ul << 5),     //!< data bits : 10,
+    VSF_USART_5_BIT_LENGTH                              = (0x0ul << 5),     //!< data bits : 5,
+    VSF_USART_6_BIT_LENGTH                              = (0x1ul << 5),     //!< data bits : 6,
+    VSF_USART_7_BIT_LENGTH                              = (0x2ul << 5),     //!< data bits : 7,
+    VSF_USART_8_BIT_LENGTH                              = (0x3ul << 5),     //!< data bits : 8,
+    VSF_USART_9_BIT_LENGTH                              = (0x4ul << 5),     //!< data bits : 9,
+    VSF_USART_10_BIT_LENGTH                             = (0x5ul << 5),     //!< data bits : 10,
 
     //! USART Hardware Control
-    VSF_USART_NO_HWCONTROL              = (0x0ul << 8),
-    VSF_USART_RTS_HWCONTROL             = (0x1ul << 8),
-    VSF_USART_CTS_HWCONTROL             = (0x2ul << 8),
-    VSF_USART_RTS_CTS_HWCONTROL         = (0x3ul << 8),
+    VSF_USART_NO_HWCONTROL                              = (0x0ul << 8),
+    VSF_USART_RTS_HWCONTROL                             = (0x1ul << 8),
+    VSF_USART_CTS_HWCONTROL                             = (0x2ul << 8),
+    VSF_USART_RTS_CTS_HWCONTROL                         = (0x3ul << 8),
 
-    VSF_USART_TX_ENABLE                 = (0x0ul << 9),
-    VSF_USART_TX_DISABLE                = (0x1ul << 9),
+    VSF_USART_TX_ENABLE                                 = (0x0ul << 9),
+    VSF_USART_TX_DISABLE                                = (0x1ul << 9),
 
-    VSF_USART_RX_ENABLE                 = (0x0ul << 10),
-    VSF_USART_RX_DISABLE                = (0x1ul << 10),
+    VSF_USART_RX_ENABLE                                 = (0x0ul << 10),
+    VSF_USART_RX_DISABLE                                = (0x1ul << 10),
 
-    VSF_USART_SYNC_CLOCK_ENABLE         = (0x0ul << 11),
-    VSF_USART_SYNC_CLOCK_DISABLE        = (0x1ul << 11),
-
-    VSF_USART_HALF_DUPLEX_DISABLE       = (0x0ul << 12),
-    VSF_USART_HALF_DUPLEX_ENABLE        = (0x1ul << 12),
-
-    //! As generic options for tx/rx fifo threshold, only three modes are defined here.
-    //! More options for thresholds can be defined in the specific driver.
-    VSF_USART_TX_FIFO_THRESH_ONE        = (0x0ul << 13),    //!< one data for txfifo
-    VSF_USART_TX_FIFO_THRESH_HALF_FULL  = (0x1ul << 13),    //!< Half of the threshold for txfifo
-    VSF_USART_TX_FIFO_THRESH_FULL       = (0x2ul << 13),    //!< Full of the threshold for txfifo
-    VSF_USART_RX_FIFO_THRESH_ONE        = (0x0ul << 15),    //!< one data for txfifo
-    VSF_USART_RX_FIFO_THRESH_HALF_FULL  = (0x1ul << 15),    //!< Half of the threshold for txfifo
-    VSF_USART_RX_FIFO_THRESH_FULL       = (0x2ul << 15),    //!< Full of the threshold for txfifo
+    VSF_USART_SYNC_CLOCK_ENABLE                         = (0x0ul << 11),
+    VSF_USART_SYNC_CLOCK_DISABLE                        = (0x1ul << 11),
 
     //! USART SYNC Mode Clock
-    VSF_USART_SYNC_CLOCK_POLARITY_LOW   = (0x0ul << 16),
-    VSF_USART_SYNC_CLOCK_POLARITY_HIGH  = (0x1ul << 16),
-    VSF_USART_SYNC_CLOCK_PHASE_1_EDGE   = (0x0ul << 17),
-    VSF_USART_SYNC_CLOCK_PHASE_2_EDGE   = (0x1ul << 17),
+    VSF_USART_SYNC_CLOCK_POLARITY_LOW                   = (0x0ul << 12),
+    VSF_USART_SYNC_CLOCK_POLARITY_HIGH                  = (0x1ul << 12),
+    VSF_USART_SYNC_CLOCK_PHASE_1_EDGE                   = (0x0ul << 13),
+    VSF_USART_SYNC_CLOCK_PHASE_2_EDGE                   = (0x1ul << 13),
+
+    VSF_USART_HALF_DUPLEX_DISABLE                       = (0x0ul << 14),
+    VSF_USART_HALF_DUPLEX_ENABLE                        = (0x1ul << 14),
+
+    //! As generic options for tx/RX FIFO threshold, only three modes are defined here.
+    //! More options for thresholds can be defined in the specific driver.
+    /*
+        // Here are some examples of fifo implementations
+
+        // Example A of driver-specific threshold
+        VSF_USART_TX_FIFO_THRESHOLD_1_8                 = (0x0ul << 15),    //!< TX FIFO reaches 1/8 of its depth
+        VSF_USART_TX_FIFO_THRESHOLD_1_4                 = (0x1ul << 15),    //!< TX FIFO reaches 1/4 of its depth
+        VSF_USART_TX_FIFO_THRESHOLD_1_2                 = (0x2ul << 15),    //!< TX FIFO reaches 1/2 of its depth
+        VSF_USART_TX_FIFO_THRESHOLD_3_4                 = (0x3ul << 15),    //!< TX FIFO reaches 3/4 of its depth
+        VSF_USART_TX_FIFO_THRESHOLD_7_8                 = (0x4ul << 15),    //!< TX FIFO reaches 7/8 of its depth
+        VSF_USART_TX_FIFO_THRESHOLD_EMPTY               = (0x5ul << 15),    //!< TX FIFO becoms empty
+        VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY          = VSF_USART_TX_FIFO_THRESHOLD_1_2,
+        VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL            = (0x6ul << 15),
+
+        // Example B of driver-specific threshold
+        VSF_USART_TX_FIFO_THRESHOLD_1                   = (0x0ul << 15),    //!<  Triggers VSF_USART_IRQ_MASK_TX interrupt when the data in TX FIFO is less than 1
+        VSF_USART_TX_FIFO_THRESHOLD_2                   = (0x1ul << 15),    //!<  Triggers VSF_USART_IRQ_MASK_TX interrupt when the data in TX FIFO is less than 2
+        VSF_USART_TX_FIFO_THRESHOLD_3                   = (0x2ul << 15),    //!<  Triggers VSF_USART_IRQ_MASK_TX interrupt when the data in TX FIFO is less than 3
+        VSF_USART_TX_FIFO_THRESHOLD_4                   = (0x3ul << 15),    //!<  Triggers VSF_USART_IRQ_MASK_TX interrupt when the data in TX FIFO is less than 4
+        VSF_USART_TX_FIFO_THRESHOLD_5                   = (0x4ul << 15),    //!<  Triggers VSF_USART_IRQ_MASK_TX interrupt when the data in TX FIFO is less than 5
+        VSF_USART_TX_FIFO_THRESHOLD_6                   = (0x5ul << 15),    //!<  Triggers VSF_USART_IRQ_MASK_TX interrupt when the data in TX FIFO is less than 6
+        VSF_USART_TX_FIFO_THRESHOLD_7                   = (0x6ul << 15),    //!<  Triggers VSF_USART_IRQ_MASK_TX interrupt when the data in TX FIFO is less than 7
+        VSF_USART_TX_FIFO_THRESHOLD_8                   = (0x7ul << 15),    //!<  Triggers VSF_USART_IRQ_MASK_TX interrupt when the data in TX FIFO is less than 8
+        VSF_USART_TX_FIFO_THRESHOLD_EMPTY               = VSF_USART_TX_FIFO_THRESHOLD_1,
+        VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY          = VSF_USART_TX_FIFO_THRESHOLD_4,
+        VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL            = VSF_USART_TX_FIFO_THRESHOLD_8,
+    */
+    VSF_USART_TX_FIFO_THRESHOLD_EMPTY                   = (0x0ul << 15),    //!< TX FIFO becomes emtpy
+    VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY              = (0x1ul << 15),    //!< TX FIFO becomes half emtpy
+    //! TX FIFO maximum non-full threshold value, it can send at least one data.
+    //! If the TX FIFO threshold cannot be set to the fifo maximum minus 1,
+    //! then we can use the tx not full interrupt to accomplish this.
+    VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL                = (0x2ul << 15),
+
+    /*
+        // Here are some examples of fifo implementations
+
+        // Example A of driver-specific threshold
+        VSF_USART_RX_FIFO_THRESHOLD_1_8                 = (0x0ul << 17),    //!< RX FIFO reaches 1/8 of its depth
+        VSF_USART_RX_FIFO_THRESHOLD_1_4                 = (0x1ul << 17),    //!< RX FIFO reaches 1/4 of its depth
+        VSF_USART_RX_FIFO_THRESHOLD_1_2                 = (0x2ul << 17),    //!< RX FIFO reaches 1/2 of its depth
+        VSF_USART_RX_FIFO_THRESHOLD_3_4                 = (0x3ul << 17),    //!< RX FIFO reaches 3/4 of its depth
+        VSF_USART_RX_FIFO_THRESHOLD_7_8                 = (0x4ul << 17),    //!< RX FIFO reaches 7/8 of its depth
+        VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY   = VSF_USART_RX_FIFO_THRESHOLD_1_8,
+        VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL           = VSF_USART_RX_FIFO_THRESHOLD_1_2,
+        VSF_USART_RX_FIFO_THRESHOLD_FULL                = (0x5ul << 17),    //!< RX FIFO becomes full
+
+        // Example B of driver-specific threshold
+        //! Triggers VSF_USART_IRQ_MASK_RX interrupt when the data in RX FIFO is greater than or equal to 1
+        VSF_USART_RX_FIFO_THRESHOLD_1                   = (0x0ul << 17),
+        //! Triggers VSF_USART_IRQ_MASK_RX interrupt when the data in RX FIFO is greater than or equal to 2
+        VSF_USART_RX_FIFO_THRESHOLD_2                   = (0x1ul << 17),
+        //! Triggers VSF_USART_IRQ_MASK_RX interrupt when the data in RX FIFO is greater than or equal to 3
+        VSF_USART_RX_FIFO_THRESHOLD_3                   = (0x2ul << 17),
+        //! Triggers VSF_USART_IRQ_MASK_RX interrupt when the data in RX FIFO is greater than or equal to 4
+        VSF_USART_RX_FIFO_THRESHOLD_4                   = (0x3ul << 17),
+        //! Triggers VSF_USART_IRQ_MASK_RX interrupt when the data in RX FIFO is greater than or equal to 5
+        VSF_USART_RX_FIFO_THRESHOLD_5                   = (0x4ul << 17),
+        //! Triggers VSF_USART_IRQ_MASK_RX interrupt when the data in RX FIFO is greater than or equal to 6
+        VSF_USART_RX_FIFO_THRESHOLD_6                   = (0x5ul << 17),
+        //! Triggers VSF_USART_IRQ_MASK_RX interrupt when the data in RX FIFO is greater than or equal to 7
+        VSF_USART_RX_FIFO_THRESHOLD_7                   = (0x6ul << 17),
+        //! Triggers VSF_USART_IRQ_MASK_RX interrupt when the data in RX FIFO is greater than or equal to 8
+        VSF_USART_RX_FIFO_THRESHOLD_8                   = (0x7ul << 17),
+        VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY           = VSF_USART_RX_FIFO_THRESHOLD_1,
+        VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL           = VSF_USART_RX_FIFO_THRESHOLD_4,
+        VSF_USART_RX_FIFO_THRESHOLD_FULL                = VSF_USART_RX_FIFO_THRESHOLD_8,
+    */
+    //! RX FIFO Minimum non-empty threshold, which should contain at least one data.
+    //! If the threshold value of RX FIFO cannot be set to 1, then we can use the RX FIFO not empty interrupt to accomplish this.
+    VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY               = (0x0ul << 17),
+    VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL               = (0x1ul << 17),    //!< Half of the threshold for RX FIFO
+    VSF_USART_RX_FIFO_THRESHOLD_FULL                    = (0x2ul << 17),    //!< Full of the threshold for RX FIFO
 
     /* Optional mode
     //! Infrared Data Association
-    VSF_USART_IRDA_ENABLE               = (0x1ul << 18),
-    VSF_USART_IRDA_DISABLE              = (0x0ul << 18),
-    #define VSF_USART_IRDA_ENABLE       VSF_USART_IRDA_ENABLE
-    #define VSF_USART_IRDA_DISABLE      VSF_USART_IRDA_DISABLE
-    #define VSF_USART_IRDA_MASK         VSF_USART_IRDA_ENABLE | VSF_USART_IRDA_DISABLE
+    VSF_USART_IRDA_ENABLE                               = (0x1ul << 18),
+    VSF_USART_IRDA_DISABLE                              = (0x0ul << 18),
+    #define VSF_USART_IRDA_ENABLE                       VSF_USART_IRDA_ENABLE
+    #define VSF_USART_IRDA_DISABLE                      VSF_USART_IRDA_DISABLE
+    #define VSF_USART_IRDA_MASK                         VSF_USART_IRDA_ENABLE | VSF_USART_IRDA_DISABLE
 
-    VSF_USART_SMARTCARD_ENABLE          = (0x1ul << 19),
-    VSF_USART_SMARTCARD_DISABLE         = (0x0ul << 19),
-    #define VSF_USART_SMARTCARD_ENABLE       VSF_USART_SMARTCARD_ENABLE
-    #define VSF_USART_SMARTCARD_DISABLE      VSF_USART_SMARTCARD_DISABLE
-    #define VSF_USART_SMARTCARD_MASK         VSF_USART_SMARTCARDENABLE | VSF_USART_SMARTCARD_DISABLE
+    VSF_USART_SMARTCARD_ENABLE                          = (0x1ul << 19),
+    VSF_USART_SMARTCARD_DISABLE                         = (0x0ul << 19),
+    #define VSF_USART_SMARTCARD_ENABLE                  VSF_USART_SMARTCARD_ENABLE
+    #define VSF_USART_SMARTCARD_DISABLE                 VSF_USART_SMARTCARD_DISABLE
+    #define VSF_USART_SMARTCARD_MASK                    VSF_USART_SMARTCARDENABLE | VSF_USART_SMARTCARD_DISABLE
 
     // whether the clock pulse corresponding to the last transmitted
-    VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE  = (0x0ul << 20),
-    VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE = (0x0ul << 20),
-    #define VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE     VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE
-    #define VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE    VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE
-    #define VSF_USART_SYNC_CLOCK_LAST_BIT_MASK       VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE | \
-                                                     VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE
+    VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE                = (0x0ul << 20),
+    VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE               = (0x0ul << 20),
+    #define VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE        VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE
+    #define VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE       VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE
+    #define VSF_USART_SYNC_CLOCK_LAST_BIT_MASK          VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE | \
+                                                        VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE
 
     // divisor of IRDA clock
-    VSF_USART_IRDA_PRESCALER_BIT_OFFSET = (21),
-    VSF_USART_IRDA_PRESCALER_MASK       = (0xFul << VSF_USART_IRDA_PRESCALER_BIT_OFFSET),
-    #define VSF_USART_IRDA_PRESCALER_BIT_OFFSET VSF_USART_IRDA_PRESCALER_BIT_OFFSET
-    #define VSF_USART_IRDA_PRESCALER_MASK       VSF_USART_IRDA_PRESCALER_MASK
+    VSF_USART_IRDA_PRESCALER_BIT_OFFSET                 = (21),
+    VSF_USART_IRDA_PRESCALER_MASK                       = (0xFul << VSF_USART_IRDA_PRESCALER_BIT_OFFSET),
+    #define VSF_USART_IRDA_PRESCALER_BIT_OFFSET         VSF_USART_IRDA_PRESCALER_BIT_OFFSET
+    #define VSF_USART_IRDA_PRESCALER_MASK               VSF_USART_IRDA_PRESCALER_MASK
     */
 } vsf_usart_mode_t;
 #endif
 
 enum {
 #ifndef VSF_USART_PARITY_MASK
-    VSF_USART_PARITY_MASK           = VSF_USART_NO_PARITY
-                                    | VSF_USART_EVEN_PARITY
-                                    | VSF_USART_ODD_PARITY
-                                    | VSF_USART_FORCE_0_PARITY
-                                    | VSF_USART_FORCE_1_PARITY,
+    VSF_USART_PARITY_MASK               = VSF_USART_NO_PARITY
+                                        | VSF_USART_EVEN_PARITY
+                                        | VSF_USART_ODD_PARITY
+                                        | VSF_USART_FORCE_0_PARITY
+                                        | VSF_USART_FORCE_1_PARITY,
 #endif
 
 #ifndef VSF_USART_STOPBIT_MASK
-    VSF_USART_STOPBIT_MASK          = VSF_USART_1_STOPBIT
-                                    | VSF_USART_1_5_STOPBIT
-                                    | VSF_USART_0_5_STOPBIT
-                                    | VSF_USART_2_STOPBIT,
+    VSF_USART_STOPBIT_MASK              = VSF_USART_1_STOPBIT
+                                        | VSF_USART_1_5_STOPBIT
+                                        | VSF_USART_0_5_STOPBIT
+                                        | VSF_USART_2_STOPBIT,
 #endif
 
 #ifndef VSF_USART_BIT_LENGTH_MASK
-    VSF_USART_BIT_LENGTH_MASK       = VSF_USART_5_BIT_LENGTH
-                                    | VSF_USART_6_BIT_LENGTH
-                                    | VSF_USART_7_BIT_LENGTH
-                                    | VSF_USART_8_BIT_LENGTH
-                                    | VSF_USART_9_BIT_LENGTH
-                                    | VSF_USART_10_BIT_LENGTH,
+    VSF_USART_BIT_LENGTH_MASK           = VSF_USART_5_BIT_LENGTH
+                                        | VSF_USART_6_BIT_LENGTH
+                                        | VSF_USART_7_BIT_LENGTH
+                                        | VSF_USART_8_BIT_LENGTH
+                                        | VSF_USART_9_BIT_LENGTH
+                                        | VSF_USART_10_BIT_LENGTH,
 #endif
 
-#ifndef VSF_USART_TX_FIFO_THRESH_MASK
-    VSF_USART_TX_FIFO_THRESH_MASK   = VSF_USART_TX_FIFO_THRESH_ONE
-                                    | VSF_USART_TX_FIFO_THRESH_HALF_FULL
-                                    | VSF_USART_TX_FIFO_THRESH_FULL,
+#ifndef VSF_USART_TX_FIFO_THRESHOLD_MASK
+    VSF_USART_TX_FIFO_THRESHOLD_MASK    = VSF_USART_TX_FIFO_THRESHOLD_EMPTY
+                                        | VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY
+                                        | VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL,
 #endif
 
-#ifndef VSF_USART_RX_FIFO_THRESH_MASK
-    VSF_USART_RX_FIFO_THRESH_MASK   = VSF_USART_RX_FIFO_THRESH_ONE
-                                    | VSF_USART_RX_FIFO_THRESH_HALF_FULL
-                                    | VSF_USART_RX_FIFO_THRESH_FULL,
+#ifndef VSF_USART_RX_FIFO_THRESHOLD_MASK
+    VSF_USART_RX_FIFO_THRESHOLD_MASK    = VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
+                                        | VSF_USART_RX_FIFO_THRESHOLD_FULL
+                                        | VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL,
 #endif
 
 #ifndef VSF_USART_HWCONTROL_MASK
-    VSF_USART_HWCONTROL_MASK        = VSF_USART_NO_HWCONTROL
-                                    | VSF_USART_RTS_HWCONTROL
-                                    | VSF_USART_CTS_HWCONTROL
-                                    | VSF_USART_RTS_CTS_HWCONTROL,
+    VSF_USART_HWCONTROL_MASK            = VSF_USART_NO_HWCONTROL
+                                        | VSF_USART_RTS_HWCONTROL
+                                        | VSF_USART_CTS_HWCONTROL
+                                        | VSF_USART_RTS_CTS_HWCONTROL,
 #endif
 
-    VSF_USART_TX_MASK               = VSF_USART_TX_ENABLE
-                                    | VSF_USART_TX_DISABLE,
+    VSF_USART_TX_MASK                   = VSF_USART_TX_ENABLE
+                                        | VSF_USART_TX_DISABLE,
 
-    VSF_USART_RX_MASK               = VSF_USART_RX_ENABLE
-                                    | VSF_USART_RX_DISABLE,
+    VSF_USART_RX_MASK                   = VSF_USART_RX_ENABLE
+                                        | VSF_USART_RX_DISABLE,
 
-    VSF_USART_SYNC_CLOCK_MASK       = VSF_USART_SYNC_CLOCK_ENABLE
-                                    | VSF_USART_SYNC_CLOCK_DISABLE,
+    VSF_USART_SYNC_CLOCK_MASK           = VSF_USART_SYNC_CLOCK_ENABLE
+                                        | VSF_USART_SYNC_CLOCK_DISABLE,
 
-    VSF_USART_HALF_DUPLEX_MASK      = VSF_USART_HALF_DUPLEX_DISABLE
-                                    | VSF_USART_HALF_DUPLEX_ENABLE,
+    VSF_USART_HALF_DUPLEX_MASK          = VSF_USART_HALF_DUPLEX_DISABLE
+                                        | VSF_USART_HALF_DUPLEX_ENABLE,
 
-    VSF_USART_SYNC_CLOCK_POLARITY_MASK \
-                                    = VSF_USART_SYNC_CLOCK_POLARITY_LOW
-                                    | VSF_USART_SYNC_CLOCK_POLARITY_HIGH,
+    VSF_USART_SYNC_CLOCK_POLARITY_MASK  = VSF_USART_SYNC_CLOCK_POLARITY_LOW
+                                        | VSF_USART_SYNC_CLOCK_POLARITY_HIGH,
 
-    VSF_USART_SYNC_CLOCK_PHASE_MASK = VSF_USART_SYNC_CLOCK_PHASE_1_EDGE
-                                    | VSF_USART_SYNC_CLOCK_PHASE_2_EDGE,
-
+    VSF_USART_SYNC_CLOCK_PHASE_MASK     = VSF_USART_SYNC_CLOCK_PHASE_1_EDGE
+                                        | VSF_USART_SYNC_CLOCK_PHASE_2_EDGE,
 
 
-    VSF_USART_MODE_ALL_BITS_MASK    = VSF_USART_PARITY_MASK
-                                    | VSF_USART_STOPBIT_MASK
-                                    | VSF_USART_BIT_LENGTH_MASK
-                                    | VSF_USART_HWCONTROL_MASK
-                                    | VSF_USART_TX_FIFO_THRESH_MASK
-                                    | VSF_USART_RX_FIFO_THRESH_MASK
-                                    | VSF_USART_TX_MASK
-                                    | VSF_USART_RX_MASK
-                                    | VSF_USART_SYNC_CLOCK_MASK
-                                    | VSF_USART_HALF_DUPLEX_MASK
-                                    | VSF_USART_SYNC_CLOCK_POLARITY_MASK
-                                    | VSF_USART_SYNC_CLOCK_PHASE_MASK
+
+    VSF_USART_MODE_ALL_BITS_MASK        = VSF_USART_PARITY_MASK
+                                        | VSF_USART_STOPBIT_MASK
+                                        | VSF_USART_BIT_LENGTH_MASK
+                                        | VSF_USART_HWCONTROL_MASK
+                                        | VSF_USART_TX_FIFO_THRESHOLD_MASK
+                                        | VSF_USART_RX_FIFO_THRESHOLD_MASK
+                                        | VSF_USART_TX_MASK
+                                        | VSF_USART_RX_MASK
+                                        | VSF_USART_SYNC_CLOCK_MASK
+                                        | VSF_USART_HALF_DUPLEX_MASK
+                                        | VSF_USART_SYNC_CLOCK_POLARITY_MASK
+                                        | VSF_USART_SYNC_CLOCK_PHASE_MASK
 #ifdef VSF_USART_SYNC_CLOCK_LAST_BIT_MASK
-                                    | VSF_USART_SYNC_CLOCK_LAST_BIT_MASK
+                                        | VSF_USART_SYNC_CLOCK_LAST_BIT_MASK
 #endif
 
 #ifdef VSF_USART_IRDA_PRESCALER_MASK
-                                    | VSF_USART_IRDA_PRESCALER_MASK
+                                        | VSF_USART_IRDA_PRESCALER_MASK
 #endif
 #ifdef VSF_USART_IRDA_MASK
-                                    | VSF_USART_IRDA_MASK
+                                        | VSF_USART_IRDA_MASK
 #endif
 
 #ifdef VSF_USART_SMARTCARD_MASK
-                                    | VSF_USART_SMARTCARD_MASK
+                                        | VSF_USART_SMARTCARD_MASK
 #endif
 };
 
@@ -474,7 +539,7 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_TX_CPL           = (0x1ul << 0),
     VSF_USART_IRQ_MASK_RX_CPL           = (0x1ul << 1),
 
-    // TX/RX reach fifo threshold, thres    hold on some devices is bound to 1
+    // TX/RX reach fifo threshold, threshold on some devices is bound to 1
     VSF_USART_IRQ_MASK_TX               = (0x1ul << 2),
     VSF_USART_IRQ_MASK_RX               = (0x1ul << 3),
     VSF_USART_IRQ_MASK_RX_TIMEOUT       = (0x1ul << 4),
@@ -618,9 +683,9 @@ typedef struct vsf_usart_status_t {
             uint32_t is_busy         : 1;
             uint32_t is_tx_busy      : 1;
             uint32_t is_rx_busy      : 1;
-            // tx fifo threshold in bytes
+            // TX FIFO threshold in bytes
             uint32_t tx_fifo_thresh  : 8;
-            // rx fifo threshold in bytes
+            // RX FIFO threshold in bytes
             uint32_t rx_fifo_thresh  : 8;
         };
     };
@@ -637,9 +702,9 @@ typedef struct vsf_usart_capability_t {
     uint32_t max_baudrate;
     uint32_t min_baudrate;
 
-    // tx fifo depth, in data count (frame)
+    // TX FIFO depth, in data count (frame)
     uint8_t txfifo_depth;
-    // rx fifo depth, in data count (frame)
+    // RX FIFO depth, in data count (frame)
     uint8_t rxfifo_depth;
 
     uint8_t max_data_bits;
