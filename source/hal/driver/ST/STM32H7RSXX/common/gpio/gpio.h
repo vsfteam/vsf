@@ -89,9 +89,24 @@ typedef enum vsf_gpio_mode_t {
 #define VSF_GPIO_SPEED_VERY_HIGH                VSF_GPIO_SPEED_VERY_HIGH
 #define VSF_GPIO_SPEED_MASK                     VSF_GPIO_SPEED_MASK
 
+    // level trigger is not supported by EXTI, but implemented by software with EXTI_SWIER
+    // 7..10, virtual: EXTI_RTSR(7)/EXTI_FTSR(8)/TRIG_LEVEL(9)/LEVEL(10)
+    VSF_GPIO_EXTI_MODE_NONE                     = (0 << 7),
+    VSF_GPIO_EXTI_MODE_LOW_LEVEL                = (1 << 9) | (0 << 10),
+    VSF_GPIO_EXTI_MODE_HIGH_LEVEL               = (1 << 9) | (1 << 10),
+    VSF_GPIO_EXTI_MODE_RISING                   = (1 << 7),
+    VSF_GPIO_EXTI_MODE_FALLING                  = (1 << 8),
+    VSF_GPIO_EXTI_MODE_RISING_FALLING           = (1 << 7) | (1 << 8),
+
     // TODO: add input fileter modes
 
 
+    __VSF_HW_EXTI_MODE_ALL_BITS                 = VSF_GPIO_EXTI_MODE_NONE
+                                                | VSF_GPIO_EXTI_MODE_LOW_LEVEL
+                                                | VSF_GPIO_EXTI_MODE_HIGH_LEVEL
+                                                | VSF_GPIO_EXTI_MODE_RISING
+                                                | VSF_GPIO_EXTI_MODE_FALLING
+                                                | VSF_GPIO_EXTI_MODE_RISING_FALLING,
     __VSF_HW_GPIO_MODE_ALL_BITS                 = 0x7F,
 } vsf_gpio_mode_t;
 // HW end
