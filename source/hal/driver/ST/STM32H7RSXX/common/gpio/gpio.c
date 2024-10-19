@@ -23,7 +23,7 @@
 
 #include "hal/vsf_hal.h"
 
-#include "../vendor/Inc/stm32h7xx.h"
+#include __VSF_DEVICE_VENDOR_HEADER
 
 /*============================ MACROS ========================================*/
 

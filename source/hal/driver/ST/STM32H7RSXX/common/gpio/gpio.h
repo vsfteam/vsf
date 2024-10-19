@@ -15,14 +15,14 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_GIGADEVICE_GD32H7XX_IO_H__
-#define __HAL_DRIVER_GIGADEVICE_GD32H7XX_IO_H__
+#ifndef __HAL_DRIVER_GIGADEVICE_GD32H7XX_GPIO_H__
+#define __HAL_DRIVER_GIGADEVICE_GD32H7XX_GPIO_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_IO == ENABLED
+#if VSF_HAL_USE_GPIO == ENABLED
 
 #include "../../__device.h"
 
@@ -31,7 +31,7 @@
  *      For IPCore drivers, class structure, MULTI_CLASS configuration, reimplementation and class APIs should be open to user.
  *      For emulated drivers, **** No reimplementation ****.
  *
- *      Usually, there is no IPCore driver for IO.
+ *      Usually, there is no IPCore driver for GPIO.
  */
 
 /*\note Includes CAN ONLY be put here. */
@@ -43,63 +43,68 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 // HW
-/*\note hw IO driver can reimplement vsf_io_mode_t.
+/*\note hw GPIO driver can reimplement vsf_gpio_mode_t/vsf_gpio_interrupt_mode_t.
  *      To enable reimplementation, please enable macro below:
- *          VSF_IO_CFG_REIMPLEMENT_TYPE_MODE for vsf_io_mode_t
- *      Reimplementation is used for optimization hw drivers, reimplement the bit mask according to hw registers.
+ *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE for vsf_gpio_mode_t
+ *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_EXT_MODE for vsf_gpio_interrupt_mode_t
+ *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
 
-#define VSF_IO_CFG_REIMPLEMENT_TYPE_MODE        ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE      ENABLED
+// HW GPIO has no interrupt for GD32H7XX
+//#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_EXT_MODE  ENABLED
 // HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 // HW, not for emulated drivers
-typedef enum vsf_io_mode_t {
+typedef enum vsf_gpio_mode_t {
     // 0..1, GPIOx_MODER: INPUT(0)/OUTPUT(1)/AF(2)/ANALOG(3)
     // 2: GPIOx_OTYPER: PUSHPULL(0)/OPENDRAIN(1)
-    VSF_IO_INPUT                                = (0 << 0),     //!< enable input mode
-    VSF_IO_ANALOG                               = (3 << 0),     //!< enable analog function
-    VSF_IO_OUTPUT_PUSH_PULL                     = (1 << 0) | (0 << 2),  //!< enable output push-pull mode
-    VSF_IO_OUTPUT_OPEN_DRAIN                    = (1 << 0) | (1 << 2),  //!< enable output open-drain mode
-    VSF_IO_AF                                   = (2 << 0),     //!< enable AF mode
-    VSF_IO_AF_PUSH_PULL                         = (2 << 0) | (0 << 2),  //!< enable output push-pull mode
-    VSF_IO_AF_OPEN_DRAIN                        = (2 << 0) | (1 << 2),  //!< enable output open-drain mode
-    VSF_IO_EXTI                                 = VSF_IO_INPUT,
+    VSF_GPIO_INPUT                              = (0 << 0),
+    VSF_GPIO_ANALOG                             = (3 << 0),
+    VSF_GPIO_OUTPUT_PUSH_PULL                   = (1 << 0) | (0 << 2),
+    VSF_GPIO_OUTPUT_OPEN_DRAIN                  = (1 << 0) | (1 << 2),
+    VSF_GPIO_AF                                 = (2 << 0),
+    VSF_GPIO_AF_PUSH_PULL                       = (2 << 0) | (0 << 2),
+    VSF_GPIO_AF_OPEN_DRAIN                      = (2 << 0) | (1 << 2),
+    VSF_GPIO_EXTI                               = VSF_GPIO_INPUT,
 
     // 3..4, GPIOx_PUPDR: FLOATING(0)/PULLUP(1)/PULLDOWN(2)
-    VSF_IO_NO_PULL_UP_DOWN                      = (0 << 3),     //!< enable floating
-    VSF_IO_PULL_UP                              = (1 << 3),     //!< enable pull-up resistor
-    VSF_IO_PULL_DOWN                            = (2 << 3),     //!< enable pull-down resistor
+    VSF_GPIO_NO_PULL_UP_DOWN                    = (0 << 3),
+    VSF_GPIO_PULL_UP                            = (1 << 3),
+    VSF_GPIO_PULL_DOWN                          = (2 << 3),
 
     // 5..6, GPIOx_OSPEEDR: LOW(0)/MEDIUM(1)/HIGH(2)/VERY_HIGH(3)
-    VSF_IO_SPEED_LOW                            = (0 << 5),
-    VSF_IO_SPEED_MEDIUM                         = (1 << 5),
-    VSF_IO_SPEED_HIGH                           = (2 << 5),
-    VSF_IO_SPEED_VERY_HIGH                      = (3 << 5),
-    VSF_IO_SPEED_MASK                           = (3 << 5),
-#define VSF_IO_SPEED_LOW                        VSF_IO_SPEED_LOW
-#define VSF_IO_SPEED_MEDIUM                     VSF_IO_SPEED_MEDIUM
-#define VSF_IO_SPEED_HIGH                       VSF_IO_SPEED_HIGH
-#define VSF_IO_SPEED_VERY_HIGH                  VSF_IO_SPEED_VERY_HIGH
-#define VSF_IO_SPEED_MASK                       VSF_IO_SPEED_MASK
+    VSF_GPIO_SPEED_LOW                          = (0 << 5),
+    VSF_GPIO_SPEED_MEDIUM                       = (1 << 5),
+    VSF_GPIO_SPEED_HIGH                         = (2 << 5),
+    VSF_GPIO_SPEED_VERY_HIGH                    = (3 << 5),
+    VSF_GPIO_SPEED_MASK                         = (3 << 5),
+#define VSF_GPIO_SPEED_LOW                      VSF_GPIO_SPEED_LOW
+#define VSF_GPIO_SPEED_MEDIUM                   VSF_GPIO_SPEED_MEDIUM
+#define VSF_GPIO_SPEED_HIGH                     VSF_GPIO_SPEED_HIGH
+#define VSF_GPIO_SPEED_VERY_HIGH                VSF_GPIO_SPEED_VERY_HIGH
+#define VSF_GPIO_SPEED_MASK                     VSF_GPIO_SPEED_MASK
 
     // TODO: add input fileter modes
 
 
-    __VSF_HW_IO_MODE_ALL_BITS                   = 0x7F,
-} vsf_io_mode_t;
+    __VSF_HW_GPIO_MODE_ALL_BITS                 = 0x7F,
+} vsf_gpio_mode_t;
 // HW end
 
-/*============================ PROTOTYPES ====================================*/
+typedef struct vsf_hw_gpio_t vsf_hw_gpio_t;
+
 /*============================ INCLUDES ======================================*/
+/*============================ PROTOTYPES ====================================*/
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif      // VSF_HAL_USE_IO
-#endif      // __HAL_DRIVER_GIGADEVICE_GD32H7XX_IO_H__
+#endif      // VSF_HAL_USE_GPIO
+#endif      // __HAL_DRIVER_GIGADEVICE_GD32H7XX_GPIO_H__
 /* EOF */
