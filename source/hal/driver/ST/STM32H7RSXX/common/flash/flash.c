@@ -27,7 +27,7 @@
 
 #include "hal/vsf_hal.h"
 
-#include __VSF_DEVICE_VENDOR_HEADER
+#include "hal/driver/ST/STM32H7RSXX/common/vendor/cmsis_device_h7rs/Include/stm32h7rsxx.h"
 
 /*============================ MACROS ========================================*/
 

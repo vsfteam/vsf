@@ -23,7 +23,7 @@
 
 #include "hal/vsf_hal.h"
 
-#include __VSF_DEVICE_VENDOR_HEADER
+#include "hal/driver/ST/STM32H7RSXX/common/vendor/cmsis_device_h7rs/Include/stm32h7rsxx.h"
 
 /*============================ MACROS ========================================*/
 
@@ -62,32 +62,44 @@ GPIO_TypeDef * __vsf_hw_gpio_get_regbase(vsf_hw_gpio_t *gpio_ptr)
     return gpio_ptr->reg;
 }
 
-void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_config_pin)(
+vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_port_config_pins)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
     vsf_gpio_pin_mask_t pin_mask,
-    vsf_gpio_mode_t mode
+    vsf_gpio_cfg_t *cfg_ptr
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
 
     GPIO_TypeDef *reg = gpio_ptr->reg;
     uint32_t offset_len2;
-    uint32_t otype = (mode >> 2) & 1;
-    uint32_t pupd = (mode >> 3) & 3;
-    uint32_t ospeed = (mode >> 5) & 3;
-    uint32_t current_pin_mask;
+    uint32_t mode = (cfg_ptr->mode >> 0) & 3;
+    uint32_t otype = (cfg_ptr->mode >> 2) & 1;
+    uint32_t pupd = (cfg_ptr->mode >> 3) & 3;
+    uint32_t ospeed = (cfg_ptr->mode >> 5) & 3;
+    uint32_t function = cfg_ptr->alternate_function;
+    uint32_t current_pin_mask, offset_len4;
 
-    mode = (mode >> 0) & 3;
-    for (int i = 0; i < VSF_HW_GPIO_PIN_COUNT; i++) {
-        current_pin_mask = 1 << i;
+    for (int pin = 0; pin < VSF_HW_GPIO_PIN_COUNT; pin++) {
+        current_pin_mask = 1 << pin;
         if (pin_mask & current_pin_mask) {
-            offset_len2 = i << 1;
+            offset_len2 = pin << 1;
+
+            if (VSF_GPIO_AF == (cfg_ptr->mode & 3)) {
+                if (pin < 8) {
+                    offset_len4 = pin << 2;
+                    vsf_atom32_op(&reg->AFR[0], (_ & ~(15 << offset_len4)) | (function << offset_len4));
+                } else {
+                    offset_len4 = (pin - 8) << 2;
+                    vsf_atom32_op(&reg->AFR[1], (_ & ~(15 << offset_len4)) | (function << offset_len4));
+                }
+            }
 
             vsf_atom32_op(&reg->MODER, (_ & ~(3 << offset_len2)) | (mode << offset_len2));
-            vsf_atom32_op(&reg->OTYPER, (_ & ~(1 << i)) | (otype << i));
+            vsf_atom32_op(&reg->OTYPER, (_ & ~(1 << pin)) | (otype << pin));
             vsf_atom32_op(&reg->OSPEEDR, (_ & ~(3 << offset_len2)) | (ospeed << offset_len2));
             vsf_atom32_op(&reg->PUPDR, (_ & ~(3 << offset_len2)) | (pupd << offset_len2));
         }
     }
+    return VSF_ERR_NONE;
 }
 
 void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_set_direction)(

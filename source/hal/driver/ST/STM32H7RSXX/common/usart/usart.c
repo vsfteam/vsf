@@ -27,7 +27,7 @@
 
 #include "hal/vsf_hal.h"
 
-#include __VSF_DEVICE_VENDOR_HEADER
+#include "hal/driver/ST/STM32H7RSXX/common/vendor/cmsis_device_h7rs/Include/stm32h7rsxx.h"
 
 /*============================ MACROS ========================================*/
 
@@ -99,10 +99,10 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     if (over8){
         bauddiv = ((pclk << 1) + (cfg_ptr->baudrate >> 1)) / cfg_ptr->baudrate;
         VSF_HAL_ASSERT((bauddiv >= 16) && (bauddiv <= 0xFFFF));
+        bauddiv = (bauddiv & ~0xF) | ((bauddiv & 0x0F) >> 1);
     } else {
         bauddiv = (pclk + (cfg_ptr->baudrate >> 1)) / cfg_ptr->baudrate;
         VSF_HAL_ASSERT((bauddiv >= 16) && (bauddiv <= 0xFFFF));
-        bauddiv = (bauddiv & ~0xF) | ((bauddiv & 0x0F) >> 1);
     }
     reg->BRR = bauddiv;
 
