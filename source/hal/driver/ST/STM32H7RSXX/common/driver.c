@@ -739,7 +739,7 @@ vsf_err_t vsf_hw_pll_vco_config(const vsf_hw_clk_t *clk, uint_fast8_t src_presca
 {
     VSF_HAL_ASSERT((clk == &VSF_HW_CLK_PLL0_VCO) || (clk == &VSF_HW_CLK_PLL1_VCO) || (clk == &VSF_HW_CLK_PLL2_VCO));
     VSF_HAL_ASSERT((src_prescaler > 0) && (src_prescaler < 64));
-    VSF_HAL_ASSERT((vco_freq_hz >= 150000000) && (vco_freq_hz <= 1675000000));
+    VSF_HAL_ASSERT((vco_freq_hz >= 150000000) && (vco_freq_hz <= 836000000));
 
     uint8_t pllidx = ((clk->clkprescaler_region & 0x1F) - 4) >> 3;
     uint32_t *pllcfgr = &(((uint32_t *)RCC)[clk->clksel_region >> 16]);
@@ -766,7 +766,7 @@ vsf_err_t vsf_hw_pll_vco_config(const vsf_hw_clk_t *clk, uint_fast8_t src_presca
 
     if (vco_freq_hz > 420000000) {
         VSF_HAL_ASSERT(clk_range >= (1 << 3));
-    } else if (vco_freq_hz < 384000000) {
+    } else if (vco_freq_hz < 192000000) {
         VSF_HAL_ASSERT(clk_range == 0);
         clk_range |= 1 << 1;                        // PLLxVCOSEL
     }
