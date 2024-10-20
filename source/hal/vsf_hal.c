@@ -38,8 +38,13 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern bool vsf_driver_init(void);
+#if VSF_USE_KERNEL == ENABLED
 extern uintptr_t vsf_irq_enter(void);
 extern void vsf_irq_leave(uintptr_t ctx);
+#else
+#   define vsf_irq_enter()          ((uintptr_t)0)
+#   define vsf_irq_leave(...)
+#endif
 
 /*============================ IMPLEMENTATION ================================*/
 
