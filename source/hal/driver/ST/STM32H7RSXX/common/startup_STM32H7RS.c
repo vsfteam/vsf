@@ -233,7 +233,7 @@ VSF_MFOREACH(__imp_blocked_weak_handler,
 #pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
-VSF_CAL_ROOT const pFunc __VECTOR_TABLE[240] __VECTOR_TABLE_ATTRIBUTE = {
+VSF_CAL_ROOT const pFunc __VECTOR_TABLE[16 + 140] __VECTOR_TABLE_ATTRIBUTE = {
     (pFunc)(&__INITIAL_SP),                   /*     Initial Stack Pointer */
     Reset_Handler,                            /*     Reset Handler */
     NMI_Handler,                              /* -14 NMI Handler */
