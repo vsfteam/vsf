@@ -34,7 +34,7 @@
 #endif
 
 #ifndef VSF_MAL_USE_CACHED_MAL
-#   define VSF_MAL_USE_CACHED_MAL       ENABLED
+#   define VSF_MAL_USE_CACHED_MAL       VSF_USE_HEAP
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
