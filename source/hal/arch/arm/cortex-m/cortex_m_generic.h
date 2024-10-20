@@ -300,7 +300,10 @@ extern uint_fast16_t vsf_arch_get_callstack(uintptr_t sp, uintptr_t *callstack, 
 // __MPU_PRESENT is maybe not available here
 //#if __MPU_PRESENT
 extern void vsf_arch_mpu_config_region(uint32_t idx, uint32_t baseaddr, uint32_t size, vsf_arch_mpu_feature_t feature);
-extern void vsf_arch_mpu_remove_region(uint32_t idx);
+extern void vsf_arch_mpu_clear_region(uint32_t idx);
+
+// the region added later will have higher priority
+extern void vsf_arch_mpu_add_region(uint32_t baseaddr, uint32_t size, vsf_arch_mpu_feature_t feature);
 //#endif
 
 #ifdef __cplusplus

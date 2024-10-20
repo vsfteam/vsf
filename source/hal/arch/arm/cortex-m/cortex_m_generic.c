@@ -423,11 +423,18 @@ void vsf_arch_mpu_config_region(uint32_t idx, uint32_t baseaddr, uint32_t size, 
     ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
 }
 
-void vsf_arch_mpu_remove_region(uint32_t idx)
+void vsf_arch_mpu_clear_region(uint32_t idx)
 {
     ARM_MPU_Disable();
     ARM_MPU_ClrRegion(idx);
     ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
+}
+
+void vsf_arch_mpu_add_region(uint32_t baseaddr, uint32_t size, vsf_arch_mpu_feature_t feature)
+{
+    static uint32_t __mpu_region_idx = 0;
+    vsf_arch_mpu_config_region(__mpu_region_idx, baseaddr, size, feature);
+    __mpu_region_idx++;
 }
 #endif
 

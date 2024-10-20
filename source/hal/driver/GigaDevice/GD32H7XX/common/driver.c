@@ -885,28 +885,21 @@ void BusFault_Handler(void)
 
 
 // the region added later will have higher priority
-void vsf_hw_mpu_add_region(uint32_t baseaddr, uint32_t size, vsf_arch_mpu_feature_t feature)
-{
-    static uint32_t __mpu_region_idx = 0;
-    vsf_arch_mpu_config_region(__mpu_region_idx, baseaddr, size, feature);
-    __mpu_region_idx++;
-}
-
 void vsf_hw_mpu_add_basic_resgions(void)
 {
-    vsf_hw_mpu_add_region(  0x24000000, 1 * 1024 * 1024,
+    vsf_arch_mpu_add_region(0x24000000, 1 * 1024 * 1024,
                             VSF_ARCH_MPU_NON_SHARABLE       |
                             VSF_ARCH_MPU_EXECUTABLE         |
                             VSF_ARCH_MPU_ACCESS_FULL        |
                             VSF_ARCH_MPU_CACHABLE_WRITE_THROUGH_NOALLOC);
 
-    vsf_hw_mpu_add_region(  0x30000000, 32 * 1024,
+    vsf_arch_mpu_add_region(0x30000000, 32 * 1024,
                             VSF_ARCH_MPU_NON_SHARABLE       |
                             VSF_ARCH_MPU_EXECUTABLE         |
                             VSF_ARCH_MPU_ACCESS_FULL        |
                             VSF_ARCH_MPU_CACHABLE_WRITE_BACK_NOALLOC);
 
-    vsf_hw_mpu_add_region(  0x08000000, 4 * 1024 * 1024,
+    vsf_arch_mpu_add_region(0x08000000, 4 * 1024 * 1024,
                             VSF_ARCH_MPU_NON_SHARABLE       |
                             VSF_ARCH_MPU_EXECUTABLE         |
                             VSF_ARCH_MPU_ACCESS_FULL        |
