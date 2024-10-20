@@ -61,6 +61,10 @@ extern "C" {
 #   error VSF_USE_SIMPLE_STREAM MUST be enabled to use vsf_linux
 #endif
 
+#if VSF_USE_HEAP != ENABLED
+#   error VSF_USE_HEAP MUST be enabled to use vsf_linux
+#endif
+
 #ifndef VSF_LINUX_CFG_STACKSIZE
 #   if defined(VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE) && defined(VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE)
 #       if (VSF_KERNEL_CFG_THREAD_STACK_PAGE_SIZE + VSF_KERNEL_CFG_THREAD_STACK_GUARDIAN_SIZE) < 1024
