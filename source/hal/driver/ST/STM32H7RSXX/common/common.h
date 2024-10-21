@@ -293,9 +293,9 @@ extern const vsf_hw_clk_t VSF_HW_CLK_HSE;
 extern const vsf_hw_clk_t VSF_HW_CLK_LSE;
 
 extern const vsf_hw_clk_t VSF_HW_CLK_PLL_SRC;
-extern const vsf_hw_clk_t VSF_HW_CLK_PLL0_VCO;
 extern const vsf_hw_clk_t VSF_HW_CLK_PLL1_VCO;
 extern const vsf_hw_clk_t VSF_HW_CLK_PLL2_VCO;
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL3_VCO;
 extern const vsf_hw_clk_t VSF_HW_CLK_PLL1_P;
 extern const vsf_hw_clk_t VSF_HW_CLK_PLL1_Q;
 extern const vsf_hw_clk_t VSF_HW_CLK_PLL1_S;
@@ -312,6 +312,7 @@ extern const vsf_hw_clk_t VSF_HW_CLK_PLL3_S;
 extern const vsf_hw_clk_t VSF_HW_CLK_SYS;
 extern const vsf_hw_clk_t VSF_HW_CLK_SYS_CPU;
 extern const vsf_hw_clk_t VSF_HW_CLK_SYS_BUS;
+#define VSF_HW_CLK_AXI                  VSF_HW_CLK_SYS_BUS
 #define VSF_HW_CLK_HCLK                 VSF_HW_CLK_SYS_BUS
 #define VSF_HW_CLK_HCLK1                VSF_HW_CLK_HCLK
 #define VSF_HW_CLK_HCLK2                VSF_HW_CLK_HCLK
@@ -358,6 +359,12 @@ extern uint_fast8_t vsf_hw_clkrst_region_get(uint32_t region);
 extern void vsf_hw_clkrst_region_set_bit(uint32_t region);
 extern void vsf_hw_clkrst_region_clear_bit(uint32_t region);
 extern uint_fast8_t vsf_hw_clkrst_region_get_bit(uint32_t region);
+
+extern void vsf_hw_clk_enable(const vsf_hw_clk_t *clk);
+extern void vsf_hw_clk_disable(const vsf_hw_clk_t *clk);
+extern vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc, uint16_t prescaler, uint32_t freq_hz);
+// vsf_hw_clk_config_secure will tweak flash latency
+extern vsf_err_t vsf_hw_clk_config_secure(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc, uint16_t prescaler, uint32_t freq_hz);
 
 /**
  \~english

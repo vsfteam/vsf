@@ -71,6 +71,13 @@ typedef enum vsf_flash_irq_mask_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
+// lantency related APIs, lantency in range [0, 15], if -1 is returned, means not support
+
+// vcore_low_range is 1.15V - 1.26V, vcore_high_range is 1.30V - 1.40V
+extern int8_t vsf_hw_flash_calc_latency(uint8_t is_vcore_low_range, uint32_t axi_clk_hz);
+extern uint8_t vsf_hw_flash_get_latency(void);
+extern void vsf_hw_flash_set_latency(uint8_t latency);
+
 #ifdef __cplusplus
 }
 #endif

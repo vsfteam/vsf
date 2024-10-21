@@ -20,6 +20,9 @@
 #include "hal/vsf_hal_cfg.h"
 #include "../__device.h"
 
+// for flash latency APIs
+#include "./flash/flash.h"
+
 /*============================ MACROS ========================================*/
 
 #ifndef HSE_VALUE
@@ -68,7 +71,7 @@ struct vsf_hw_clk_t {
     uint32_t clkrdy_region;
 
     union {
-        const vsf_hw_clk_t **clksel_mapper;
+        const vsf_hw_clk_t * const *clksel_mapper;
         uint32_t clk_freq_hz;
         const vsf_hw_clk_t *clksrc;
     };
@@ -189,7 +192,7 @@ const vsf_hw_clk_t VSF_HW_CLK_LSE = {
     .clktype                    = VSF_HW_CLK_TYPE_CONST,
 };
 
-static const vsf_hw_clk_t * __VSF_HW_CLK_PLL_CLKSEL_MAPPER[4] = {
+static const vsf_hw_clk_t * const __VSF_HW_CLK_PLL_CLKSEL_MAPPER[4] = {
     &VSF_HW_CLK_HSI, &VSF_HW_CLK_CSI, &VSF_HW_CLK_HSE, NULL,
 };
 const vsf_hw_clk_t VSF_HW_CLK_PLL_SRC = {
@@ -199,6 +202,8 @@ const vsf_hw_clk_t VSF_HW_CLK_PLL_SRC = {
     .clktype                    = VSF_HW_CLK_TYPE_SEL,
 };
 const vsf_hw_clk_t VSF_HW_CLK_PLL1_VCO = {
+    .clken_region               = VSF_HW_CLKRST_REGION(0x00, 24, 1),// PLL1ON IN RCC.CR
+    .clkrdy_region              = VSF_HW_CLKRST_REGION(0x00, 25, 1),// PLL1RDY IN RCC.CR
     .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x0A, 4,  6),// DIVM1 IN RCC.PLLCKSELR
     .clksel_region              = VSF_HW_CLKRST_REGION(0x0B, 0,  5),// PLLxFRACEN/PLLxVCOSEL/PLLxRGE IN RCC.PLLCFGR
 
@@ -211,6 +216,8 @@ const vsf_hw_clk_t VSF_HW_CLK_PLL1_VCO = {
     .clkprescaler_max           = 63,
 };
 const vsf_hw_clk_t VSF_HW_CLK_PLL2_VCO = {
+    .clken_region               = VSF_HW_CLKRST_REGION(0x00, 26, 1),// PLL2ON IN RCC.CR
+    .clkrdy_region              = VSF_HW_CLKRST_REGION(0x00, 27, 1),// PLL2RDY IN RCC.CR
     .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x0A, 12, 6),// DIVM2 IN RCC.PLLCKSELR
     .clksel_region              = VSF_HW_CLKRST_REGION(0x0B, 11, 5),// PLLxFRACEN/PLLxVCOSEL/PLLxRGE IN RCC.PLLCFGR
 
@@ -223,6 +230,8 @@ const vsf_hw_clk_t VSF_HW_CLK_PLL2_VCO = {
     .clkprescaler_max           = 63,
 };
 const vsf_hw_clk_t VSF_HW_CLK_PLL3_VCO = {
+    .clken_region               = VSF_HW_CLKRST_REGION(0x00, 28, 1),// PLL3ON IN RCC.CR
+    .clkrdy_region              = VSF_HW_CLKRST_REGION(0x00, 29, 1),// PLL3RDY IN RCC.CR
     .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x0A, 20, 6),// DIVM3 IN RCC.PLLCKSELR
     .clksel_region              = VSF_HW_CLKRST_REGION(0x0B, 22, 5),// PLLxFRACEN/PLLxVCOSEL/PLLxRGE IN RCC.PLLCFGR
 
@@ -367,7 +376,7 @@ const vsf_hw_clk_t VSF_HW_CLK_PLL3_S = {
     .clkprescaler_max           = 7,
 };
 
-static const vsf_hw_clk_t * __VSF_HW_CLK_SYS_CLKSEL_MAPPER[8] = {
+static const vsf_hw_clk_t * const __VSF_HW_CLK_SYS_CLKSEL_MAPPER[8] = {
     &VSF_HW_CLK_HSI, &VSF_HW_CLK_CSI, &VSF_HW_CLK_HSE, &VSF_HW_CLK_PLL1_P,
     NULL, NULL, NULL, NULL,
 };
@@ -390,7 +399,7 @@ const vsf_hw_clk_t VSF_HW_CLK_SYS_CPU = {
     .clkprescaler_type          = VSF_HW_CLK_PRESCALER_SFT,
 
     .clkprescaler_min           = 0,
-    .clkprescaler_max           = 9,
+    .clkprescaler_max           = 15,
 };
 const vsf_hw_clk_t VSF_HW_CLK_SYS_BUS = {
     .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x07, 0,  4),// BMPRE IN RCC.BMCFGR
@@ -402,10 +411,10 @@ const vsf_hw_clk_t VSF_HW_CLK_SYS_BUS = {
     .clkprescaler_type          = VSF_HW_CLK_PRESCALER_SFT,
 
     .clkprescaler_min           = 0,
-    .clkprescaler_max           = 9,
+    .clkprescaler_max           = 15,
 };
 
-static const vsf_hw_clk_t * __VSF_HW_CLK_PER_CLKSEL_MAPPER[4] = {
+static const vsf_hw_clk_t * const __VSF_HW_CLK_PER_CLKSEL_MAPPER[4] = {
     &VSF_HW_CLK_HSI_KER, &VSF_HW_CLK_CSI_KER, &VSF_HW_CLK_HSE, NULL,
 };
 const vsf_hw_clk_t VSF_HW_CLK_PER = {
@@ -470,11 +479,11 @@ const vsf_hw_clk_t VSF_HW_CLK_PCLK5 = {
 // USARTs
 
 #if VSF_HAL_USE_USART == ENABLED
-static const vsf_hw_clk_t * __VSF_HW_CLK_USART_APB1_CLKSEL_MAPPER[8] = {
+static const vsf_hw_clk_t * const __VSF_HW_CLK_USART_APB1_CLKSEL_MAPPER[8] = {
     &VSF_HW_CLK_PCLK1, &VSF_HW_CLK_PLL2_Q, &VSF_HW_CLK_PLL3_Q,
     &VSF_HW_CLK_HSI_KER, &VSF_HW_CLK_CSI_KER, &VSF_HW_CLK_LSE, NULL, NULL
 };
-static const vsf_hw_clk_t * __VSF_HW_CLK_USART_APB2_CLKSEL_MAPPER[8] = {
+static const vsf_hw_clk_t * const __VSF_HW_CLK_USART_APB2_CLKSEL_MAPPER[8] = {
     &VSF_HW_CLK_PCLK2, &VSF_HW_CLK_PLL2_Q, &VSF_HW_CLK_PLL3_Q,
     &VSF_HW_CLK_HSI_KER, &VSF_HW_CLK_CSI_KER, &VSF_HW_CLK_LSE, NULL, NULL
 };
@@ -707,7 +716,7 @@ vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc,
             prescaler--;
             break;
         case VSF_HW_CLK_PRESCALER_SFT:
-            VSF_HAL_ASSERT(prescaler & (prescaler - 1));
+            VSF_HAL_ASSERT(!(prescaler & (prescaler - 1)));
             prescaler = vsf_msb32(prescaler);
             break;
         case VSF_HW_CLK_PRESCALER_FUNC:
@@ -737,7 +746,7 @@ vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc,
 
 vsf_err_t vsf_hw_pll_vco_config(const vsf_hw_clk_t *clk, uint_fast8_t src_prescaler, uint32_t vco_freq_hz)
 {
-    VSF_HAL_ASSERT((clk == &VSF_HW_CLK_PLL0_VCO) || (clk == &VSF_HW_CLK_PLL1_VCO) || (clk == &VSF_HW_CLK_PLL2_VCO));
+    VSF_HAL_ASSERT((clk == &VSF_HW_CLK_PLL1_VCO) || (clk == &VSF_HW_CLK_PLL2_VCO) || (clk == &VSF_HW_CLK_PLL3_VCO));
     VSF_HAL_ASSERT((src_prescaler > 0) && (src_prescaler < 64));
     VSF_HAL_ASSERT((vco_freq_hz >= 150000000) && (vco_freq_hz <= 836000000));
 
@@ -776,6 +785,22 @@ vsf_err_t vsf_hw_pll_vco_config(const vsf_hw_clk_t *clk, uint_fast8_t src_presca
 
     *pll = (*pll & ~0x1FF) | (clk_div - 1);
     *pllfrac = clkfrac_div == 0 ? 0 : clkfrac_div;
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t vsf_hw_clk_config_secure(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc, uint16_t prescaler, uint32_t freq_hz)
+{
+    vsf_hw_flash_set_latency(7);
+
+    if (VSF_ERR_NONE != vsf_hw_clk_config(clk, clksrc, prescaler, freq_hz)) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+
+    int8_t latency = vsf_hw_flash_calc_latency(0, vsf_hw_clk_get_freq_hz(&VSF_HW_CLK_AXI));
+    if (latency < 0) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+    vsf_hw_flash_set_latency((uint8_t)latency);
     return VSF_ERR_NONE;
 }
 

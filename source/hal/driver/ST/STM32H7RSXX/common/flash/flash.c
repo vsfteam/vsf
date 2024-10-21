@@ -374,6 +374,39 @@ VSF_CAL_ROOT void VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, _IRQHand
     vsf_hal_irq_leave(ctx);
 }
 
+int8_t vsf_hw_flash_calc_latency(uint8_t is_vcore_low_range, uint32_t axi_clk_hz)
+{
+    int8_t result;
+    if (is_vcore_low_range) {
+        result = axi_clk_hz / (36 * 1000 * 1000);
+        if (result > 5) {
+            result = -1;
+        }
+    } else {
+        result = axi_clk_hz / (40 * 1000 * 1000);
+        if (result > 7) {
+            result = -1;
+        }
+    }
+    return result;
+}
+
+uint8_t vsf_hw_flash_get_latency(void)
+{
+    return (FLASH->ACR & FLASH_ACR_LATENCY_Msk) >> FLASH_ACR_LATENCY_Pos;
+}
+
+void vsf_hw_flash_set_latency(uint8_t latency)
+{
+    VSF_HAL_ASSERT(latency <= 15);
+    if (latency >= 6) {
+        latency |= FLASH_ACR_WRHIGHFREQ_Msk;
+    } else {
+        latency |= (latency >> 1) << FLASH_ACR_WRHIGHFREQ_Pos;
+    }
+    FLASH->ACR = latency;
+}
+
 /*============================ INCLUDES ======================================*/
 
 /*\note TODO: add comments about template configurations below:
