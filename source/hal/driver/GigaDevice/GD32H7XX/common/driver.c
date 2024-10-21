@@ -84,7 +84,7 @@ struct vsf_hw_clk_t {
     uint32_t clkrdy_region;
 
     union {
-        const vsf_hw_clk_t **clksel_mapper;
+        const vsf_hw_clk_t * const *clksel_mapper;
         uint32_t clk_freq_hz;
         const vsf_hw_clk_t *clksrc;
     };
@@ -150,7 +150,7 @@ const vsf_hw_clk_t VSF_HW_CLK_IRC32K = {
     .clktype                    = VSF_HW_CLK_TYPE_CONST,
 };
 
-static const vsf_hw_clk_t * __VSF_HW_CLK_PLL_CLKSEL_MAPPER[4] = {
+static const vsf_hw_clk_t * const __VSF_HW_CLK_PLL_CLKSEL_MAPPER[4] = {
     &VSF_HW_CLK_IRC64MDIV, &VSF_HW_CLK_LPIRC4M, &VSF_HW_CLK_HXTAL, NULL,
 };
 static const vsf_hw_clk_t __VSF_HW_CLK_PLL_SRC = {
@@ -310,7 +310,7 @@ const vsf_hw_clk_t VSF_HW_CLK_RTCDIV = {
     .clkprescaler_min           = 2,
     .clkprescaler_max           = 63,
 };
-static const vsf_hw_clk_t * __VSF_HW_CLK_RTC_CLKSEL_MAPPER[4] = {
+static const vsf_hw_clk_t * const __VSF_HW_CLK_RTC_CLKSEL_MAPPER[4] = {
     NULL, &VSF_HW_CLK_LXTAL, &VSF_HW_CLK_IRC32K, &VSF_HW_CLK_RTCDIV,
 };
 const vsf_hw_clk_t VSF_HW_CLK_RTC = {
@@ -320,7 +320,7 @@ const vsf_hw_clk_t VSF_HW_CLK_RTC = {
     .clktype                    = VSF_HW_CLK_TYPE_SEL,
 };
 
-static const vsf_hw_clk_t * __VSF_HW_CLK_SYS_CLKSEL_MAPPER[4] = {
+static const vsf_hw_clk_t * const __VSF_HW_CLK_SYS_CLKSEL_MAPPER[4] = {
     &VSF_HW_CLK_IRC64MDIV, &VSF_HW_CLK_HXTAL, &VSF_HW_CLK_LPIRC4M, &VSF_HW_CLK_PLL0P,
 };
 const vsf_hw_clk_t VSF_HW_CLK_SYS = {
@@ -406,10 +406,10 @@ const vsf_hw_clk_t VSF_HW_CLK_PCLK4 = {
 // USARTs
 
 #if VSF_HAL_USE_USART == ENABLED
-static const vsf_hw_clk_t * __VSF_HW_CLK_USART_APB1_CLKSEL_MAPPER[4] = {
+static const vsf_hw_clk_t * const __VSF_HW_CLK_USART_APB1_CLKSEL_MAPPER[4] = {
     &VSF_HW_CLK_APB1, &VSF_HW_CLK_AHB, &VSF_HW_CLK_LXTAL, &VSF_HW_CLK_IRC64MDIV,
 };
-static const vsf_hw_clk_t * __VSF_HW_CLK_USART_APB2_CLKSEL_MAPPER[4] = {
+static const vsf_hw_clk_t * const __VSF_HW_CLK_USART_APB2_CLKSEL_MAPPER[4] = {
     &VSF_HW_CLK_APB2, &VSF_HW_CLK_AHB, &VSF_HW_CLK_LXTAL, &VSF_HW_CLK_IRC64MDIV,
 };
 const vsf_hw_clk_t VSF_HW_CLK_USART0 = {
@@ -437,7 +437,7 @@ const vsf_hw_clk_t VSF_HW_CLK_USART5 = {
 // SDIOs
 
 #if VSF_HAL_USE_SDIO == ENABLED
-static const vsf_hw_clk_t * __VSF_HW_CLK_SDIO_CLKSEL_MAPPER[2] = {
+static const vsf_hw_clk_t * const __VSF_HW_CLK_SDIO_CLKSEL_MAPPER[2] = {
     &VSF_HW_CLK_PLL0Q, &VSF_HW_CLK_PLL1R,
 };
 const vsf_hw_clk_t VSF_HW_CLK_SDIO0 = {
@@ -468,7 +468,7 @@ const vsf_hw_clk_t VSF_HW_CLK_TLI = {
 
 // EXMC
 
-static const vsf_hw_clk_t * __VSF_HW_CLK_EXMC_CLKSEL_MAPPER[4] = {
+static const vsf_hw_clk_t * const __VSF_HW_CLK_EXMC_CLKSEL_MAPPER[4] = {
     &VSF_HW_CLK_AHB, &VSF_HW_CLK_PLL0Q, &VSF_HW_CLK_PLL1R, &VSF_HW_CLK_PER,
 };
 const vsf_hw_clk_t VSF_HW_CLK_EXMC = {
