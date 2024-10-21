@@ -551,6 +551,10 @@ void vsf_hal_pre_startup_init(void)
 void Reset_Handler(void)
 {
     vsf_arch_set_stack((uintptr_t)&__INITIAL_SP);
+    //! enable FPU before vsf_hal_pre_startup_init, in case vsf_hal_pre_startup_init uses FPU
+    SCB->CPACR |= ((3U << 10U*2U) |           /* enable CP10 Full Access */
+                   (3U << 11U*2U));           /* enable CP11 Full Access */
+
     vsf_hal_pre_startup_init();
     __PROGRAM_START();                        /* Enter PreMain (C library entry point) */
 }
