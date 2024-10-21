@@ -348,7 +348,7 @@ const vsf_hw_clk_t VSF_HW_CLK_AHB = {
     .clkprescaler_mapper        = __VSF_HW_CLK_AHB_PRESCALER,
     .clkprescaler_type          = VSF_HW_CLK_PRESCALER_SFT,
     .clkprescaler_min           = 0,
-    .clkprescaler_max           = 9,
+    .clkprescaler_max           = 15,
 };
 
 static const uint8_t __VSF_HW_CLK_PCLK_PRESCALER[8] = {
@@ -698,7 +698,7 @@ vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc,
             prescaler--;
             break;
         case VSF_HW_CLK_PRESCALER_SFT:
-            VSF_HAL_ASSERT(prescaler & (prescaler - 1));
+            VSF_HAL_ASSERT(!(prescaler & (prescaler - 1)));
             prescaler = vsf_msb32(prescaler);
             break;
         case VSF_HW_CLK_PRESCALER_FUNC:
