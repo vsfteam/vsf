@@ -436,6 +436,7 @@ void Reset_Handler(void)
 
     //! trap unaligned access
     //SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;
+    SCB->VTOR = (uint32_t)__VECTOR_TABLE;
 
     __PROGRAM_START();                        /* Enter PreMain (C library entry point) */
 }
