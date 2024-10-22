@@ -354,18 +354,18 @@ extern const vsf_hw_clk_t VSF_HW_CLK_EXMC;
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern const vsf_hw_clk_t * vsf_hw_clk_get_src(const vsf_hw_clk_t *clk);
-extern uint32_t vsf_hw_clk_get_freq_hz(const vsf_hw_clk_t *clk);
-extern void vsf_hw_clk_enable(const vsf_hw_clk_t *clk);
-extern void vsf_hw_clk_disable(const vsf_hw_clk_t *clk);
-extern vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc, uint16_t prescaler, uint32_t freq_hz);
-
 extern void vsf_hw_clkrst_region_set(uint32_t region, uint_fast8_t value);
 extern uint_fast8_t vsf_hw_clkrst_region_get(uint32_t region);
 
 extern void vsf_hw_clkrst_region_set_bit(uint32_t region);
 extern void vsf_hw_clkrst_region_clear_bit(uint32_t region);
 extern uint_fast8_t vsf_hw_clkrst_region_get_bit(uint32_t region);
+
+extern const vsf_hw_clk_t * vsf_hw_clk_get_src(const vsf_hw_clk_t *clk);
+extern uint32_t vsf_hw_clk_get_freq_hz(const vsf_hw_clk_t *clk);
+extern void vsf_hw_clk_enable(const vsf_hw_clk_t *clk);
+extern void vsf_hw_clk_disable(const vsf_hw_clk_t *clk);
+extern vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc, uint16_t prescaler, uint32_t freq_hz);
 
 /**
  \~english

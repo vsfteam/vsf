@@ -765,6 +765,12 @@ vsf_err_t vsf_hw_pll_vco_config(const vsf_hw_clk_t *clk, uint_fast8_t src_presca
     return VSF_ERR_NONE;
 }
 
+uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void)
+{
+    // SysTick runs at CK_SYS / 2
+    return vsf_hw_clk_get_freq_hz(&VSF_HW_CLK_SYS) >> 1;
+}
+
 
 
 // this function should be in gd32h7xx_misc.c, but this file is not included.
@@ -885,25 +891,47 @@ void BusFault_Handler(void)
 
 
 // the region added later will have higher priority
+VSF_CAL_WEAK(vsf_hw_mpu_add_basic_resgions)
 void vsf_hw_mpu_add_basic_resgions(void)
 {
+    vsf_arch_mpu_disable();
+
+    // background, 4G from 0x00000000
+    vsf_arch_mpu_add_region(0x00000000, 0,
+                            VSF_ARCH_MPU_NON_SHARABLE       |
+                            VSF_ARCH_MPU_NON_EXECUTABLE     |
+                            VSF_ARCH_MPU_ACCESS_NO          |
+                            VSF_ARCH_MPU_NON_CACHABLE);
+
+    // AHBs & APBs, 512M from 0x40000000
+    vsf_arch_mpu_add_region(0x40000000, 512 * 1024 * 1024,
+                            VSF_ARCH_MPU_SHARABLE           |
+                            VSF_ARCH_MPU_NON_EXECUTABLE     |
+                            VSF_ARCH_MPU_ACCESS_FULL        |
+                            VSF_ARCH_MPU_NON_CACHABLE);
+
+    // AXI SRAM, 512K from 0x24000000
     vsf_arch_mpu_add_region(0x24000000, 1 * 1024 * 1024,
                             VSF_ARCH_MPU_NON_SHARABLE       |
                             VSF_ARCH_MPU_EXECUTABLE         |
                             VSF_ARCH_MPU_ACCESS_FULL        |
                             VSF_ARCH_MPU_CACHABLE_WRITE_THROUGH_NOALLOC);
 
+    // AHB SRAM, 32K from 0x30000000
     vsf_arch_mpu_add_region(0x30000000, 32 * 1024,
                             VSF_ARCH_MPU_NON_SHARABLE       |
                             VSF_ARCH_MPU_EXECUTABLE         |
                             VSF_ARCH_MPU_ACCESS_FULL        |
                             VSF_ARCH_MPU_CACHABLE_WRITE_BACK_NOALLOC);
 
+    // User FLASH, 4M from 0x08000000
     vsf_arch_mpu_add_region(0x08000000, 4 * 1024 * 1024,
                             VSF_ARCH_MPU_NON_SHARABLE       |
                             VSF_ARCH_MPU_EXECUTABLE         |
                             VSF_ARCH_MPU_ACCESS_FULL        |
                             VSF_ARCH_MPU_CACHABLE_WRITE_THROUGH_NOALLOC);
+
+    vsf_arch_mpu_enable();
 }
 
 

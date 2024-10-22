@@ -405,14 +405,32 @@ void vsf_arch_shutdown(void)
 }
 
 #if __MPU_PRESENT
+void vsf_arch_mpu_disable(void)
+{
+    ARM_MPU_Disable();
+}
+
+void vsf_arch_mpu_enable(void)
+{
+    ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
+}
+
 // the region added later will have higher priority
 void vsf_arch_mpu_config_region(uint32_t idx, uint32_t baseaddr, uint32_t size, vsf_arch_mpu_feature_t feature)
 {
     VSF_ARCH_ASSERT(idx <= 15);
     VSF_ARCH_ASSERT(!(size & (size - 1)));
-    ARM_MPU_Disable();
 
-    size = vsf_ffs32(size) - 1;
+    bool mpu_enabled = !!(MPU->CTRL & MPU_CTRL_ENABLE_Msk);
+    if (mpu_enabled) {
+        vsf_arch_mpu_disable();
+    }
+
+    if (0 == size) {
+        size = 31;
+    } else {
+        size = vsf_ffs32(size) - 1;
+    }
     VSF_ARCH_ASSERT((size >= 4) && (size <= 31));
     ARM_MPU_SetRegionEx(idx, baseaddr,
         feature                         |
@@ -420,14 +438,21 @@ void vsf_arch_mpu_config_region(uint32_t idx, uint32_t baseaddr, uint32_t size, 
         MPU_RASR_ENABLE_Msk
     );
 
-    ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
+    if (mpu_enabled) {
+        vsf_arch_mpu_enable();
+    }
 }
 
 void vsf_arch_mpu_clear_region(uint32_t idx)
 {
-    ARM_MPU_Disable();
+    bool mpu_enabled = !!(MPU->CTRL & MPU_CTRL_ENABLE_Msk);
+    if (mpu_enabled) {
+        vsf_arch_mpu_disable();
+    }
     ARM_MPU_ClrRegion(idx);
-    ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
+    if (mpu_enabled) {
+        vsf_arch_mpu_enable();
+    }
 }
 
 void vsf_arch_mpu_add_region(uint32_t baseaddr, uint32_t size, vsf_arch_mpu_feature_t feature)

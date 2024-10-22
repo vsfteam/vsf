@@ -49,8 +49,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-// the region added later will have higher priority
-extern void vsf_hw_mpu_add_region(uint32_t baseaddr, uint32_t size, vsf_arch_mpu_feature_t feature);
 extern void vsf_hw_mpu_add_basic_resgions(void);
 
 /*============================ INCLUDES ======================================*/
