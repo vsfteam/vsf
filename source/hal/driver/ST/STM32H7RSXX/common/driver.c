@@ -826,8 +826,7 @@ vsf_err_t vsf_hw_pll_vco_config(const vsf_hw_clk_t *clk, uint_fast8_t src_presca
 
 uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void)
 {
-    // SysTick runs at Fsys_cpu_clk / 8
-    return vsf_hw_clk_get_freq_hz(&VSF_HW_CLK_SYS_CPU) >> 3;
+    return vsf_hw_clk_get_freq_hz(&VSF_HW_CLK_SYS_CPU);
 }
 
 
