@@ -202,7 +202,7 @@ not what you want, please disable VSF_KERNEL_CFG_EDA_SUBCALL_HAS_RETURN_VALUE."
 #   endif
 #endif
 #ifndef VSF_KERNEL_CFG_SUPPORT_EDA_QUEUE
-#   define VSF_KERNEL_CFG_SUPPORT_EDA_QUEUE                 ENABLED
+#   define VSF_KERNEL_CFG_SUPPORT_EDA_QUEUE                 VSF_KERNEL_CFG_SUPPORT_SYNC
 #endif
 
 

@@ -186,6 +186,7 @@ const vsf_kernel_resource_t * vsf_kernel_get_resource_on_init(void)
 }
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+VSF_CAL_WEAK(vsf_arch_req___systimer_freq___from_usr)
 uint32_t vsf_arch_req___systimer_freq___from_usr(void)
 {
 #ifdef VSF_ARCH_SYSTIMER_FREQ

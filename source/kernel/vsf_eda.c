@@ -128,15 +128,21 @@ static vsf_evtq_ctx_t * __vsf_evtq_get_cur_ctx(void);
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_irq_enter")
 uintptr_t vsf_irq_enter(void)
 {
+#if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
     uintptr_t ctx = (uintptr_t)__vsf_eda_evtq_cur;
     __vsf_eda_evtq_cur = NULL;
     return ctx;
+#else
+    return (uintptr_t)0;
+#endif
 }
 
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_irq_leave")
 void vsf_irq_leave(uintptr_t ctx)
 {
+#if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
     __vsf_eda_evtq_cur = (vsf_evtq_t *)ctx;
+#endif
 }
 
 VSF_CAL_SECTION(".text.vsf.kernel.eda")
