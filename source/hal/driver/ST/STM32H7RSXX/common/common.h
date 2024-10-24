@@ -161,32 +161,32 @@ typedef enum vsf_hw_peripheral_rst_t {
 } vsf_hw_peripheral_rst_t;
 
 typedef enum vsf_hw_peripheral_en_t {
-    // RCC.PHB1ENR
+    // RCC.AHB1ENR
     VSF_HW_EN_ADF1                      = VSF_HW_REG_REGION(0x4E, 31, 1),   // ADF1EN
     VSF_HW_EN_OTGFS                     = VSF_HW_REG_REGION(0x4E, 27, 1),   // OTGFSEN
     VSF_HW_EN_USBPHYC                   = VSF_HW_REG_REGION(0x4E, 26, 1),   // USBPHYCEN
-    VSF_HW_EN_OTGHS                     = VSF_HW_REG_REGION(0x4E, 26, 1),   // OTGHSEN
+    VSF_HW_EN_OTGHS                     = VSF_HW_REG_REGION(0x4E, 25, 1),   // OTGHSEN
     VSF_HW_EN_ETH1RX                    = VSF_HW_REG_REGION(0x4E, 17, 1),   // ETH1RXEN
     VSF_HW_EN_ETH1TX                    = VSF_HW_REG_REGION(0x4E, 16, 1),   // ETH1TXEN
     VSF_HW_EN_ETH1MAC                   = VSF_HW_REG_REGION(0x4E, 15, 1),   // ETH1MACEN
     VSF_HW_EN_ADC12                     = VSF_HW_REG_REGION(0x4E, 5,  1),   // ADC12EN
     VSF_HW_EN_GPDMA                     = VSF_HW_REG_REGION(0x4E, 4,  1),   // GPDMAEN
 
-    // RCC.PHB2ENR
+    // RCC.AHB2ENR
     VSF_HW_EN_SRAM2                     = VSF_HW_REG_REGION(0x4F, 30, 1),   // SRAM2EN
     VSF_HW_EN_SRAM1                     = VSF_HW_REG_REGION(0x4F, 29, 1),   // SRAM1EN
     VSF_HW_EN_CORDIC                    = VSF_HW_REG_REGION(0x4F, 14, 1),   // CORDICEN
     VSF_HW_EN_SDMMC2                    = VSF_HW_REG_REGION(0x4F, 9,  1),   // SDMMC2EN
     VSF_HW_EN_PSSI                      = VSF_HW_REG_REGION(0x4F, 1,  1),   // PSSIEN
 
-    // RCC.PHB3ENR
+    // RCC.AHB3ENR
     VSF_HW_EN_PKA                       = VSF_HW_REG_REGION(0x56, 6,  1),   // PKAEN
     VSF_HW_EN_SAES                      = VSF_HW_REG_REGION(0x56, 4,  1),   // SAESEN
     VSF_HW_EN_CRYP                      = VSF_HW_REG_REGION(0x56, 2,  1),   // CRYPEN
     VSF_HW_EN_HASH                      = VSF_HW_REG_REGION(0x56, 1,  1),   // HASHEN
     VSF_HW_EN_RNG                       = VSF_HW_REG_REGION(0x56, 0,  1),   // RNGEN
 
-    // RCC.PHB4ENR
+    // RCC.AHB4ENR
     VSF_HW_EN_BKPRAM                    = VSF_HW_REG_REGION(0x50, 28, 1),   // BKPRAMEN
     VSF_HW_EN_CRC                       = VSF_HW_REG_REGION(0x50, 19, 1),   // CRCEN
     VSF_HW_EN_GPIOP                     = VSF_HW_REG_REGION(0x50, 15, 1),   // GPIOPEN
@@ -202,7 +202,7 @@ typedef enum vsf_hw_peripheral_en_t {
     VSF_HW_EN_GPIOB                     = VSF_HW_REG_REGION(0x50, 1,  1),   // GPIOBEN
     VSF_HW_EN_GPIOA                     = VSF_HW_REG_REGION(0x50, 0,  1),   // GPIOAEN
 
-    // RCC.PHB5ENR
+    // RCC.AHB5ENR
     VSF_HW_EN_GPU2D                     = VSF_HW_REG_REGION(0x4D, 20, 1),   // GPU2DEN
     VSF_HW_EN_GFXMMU                    = VSF_HW_REG_REGION(0x4D, 19, 1),   // FGXMMUEN
     VSF_HW_EN_XSPIM                     = VSF_HW_REG_REGION(0x4D, 14, 1),   // XSPIMEN
@@ -280,10 +280,11 @@ typedef enum vsf_hw_peripheral_en_t {
 
 typedef enum vsf_hw_power_en_t {
     // PWR.CSR2
+    VSF_HW_PWR_EN_USBHS_REGULATOR       = VSF_HW_REG_REGION(0x03, 27, 1),   // USBHSREGEN
+    VSF_HW_PWR_EN_USB33_DET             = VSF_HW_REG_REGION(0x03, 24, 1),   // USB33DEN
     VSF_HW_PWR_EN_XSPIM1                = VSF_HW_REG_REGION(0x03, 14, 1),   // EN_XSPIM1
     VSF_HW_PWR_EN_XSPIM2                = VSF_HW_REG_REGION(0x03, 15, 1),   // EN_XSPIM2
-    VSF_HW_PWR_EN_USB33_DET             = VSF_HW_REG_REGION(0x03, 24, 1),   // USB33DEN
-    VSF_HW_PWR_EN_GPIOM                 = VSF_HW_PWR_EN_USB33_DET,      // GPIOM depends on USB33_DET
+    VSF_HW_PWR_EN_GPIOM                 = VSF_HW_PWR_EN_USB33_DET,          // GPIOM depends on USB33_DET
 } vsf_hw_power_en_t;
 
 typedef enum vsf_hw_power_mode_t {
