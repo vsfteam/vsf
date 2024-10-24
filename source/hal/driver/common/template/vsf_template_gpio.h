@@ -102,6 +102,26 @@ extern "C" {
 #   define VSF_GPIO_CFG_PORTK                       ENABLED
 #endif
 
+#if !defined(VSF_GPIO_CFG_PORTL) && (VSF_HW_GPIO_PORT_MASK & (1ul << 11))
+#   define VSF_GPIO_CFG_PORTL                       ENABLED
+#endif
+
+#if !defined(VSF_GPIO_CFG_PORTM) && (VSF_HW_GPIO_PORT_MASK & (1ul << 12))
+#   define VSF_GPIO_CFG_PORTM                       ENABLED
+#endif
+
+#if !defined(VSF_GPIO_CFG_PORTN) && (VSF_HW_GPIO_PORT_MASK & (1ul << 13))
+#   define VSF_GPIO_CFG_PORTN                       ENABLED
+#endif
+
+#if !defined(VSF_GPIO_CFG_PORTO) && (VSF_HW_GPIO_PORT_MASK & (1ul << 14))
+#   define VSF_GPIO_CFG_PORTO                       ENABLED
+#endif
+
+#if !defined(VSF_GPIO_CFG_PORTP) && (VSF_HW_GPIO_PORT_MASK & (1ul << 15))
+#   define VSF_GPIO_CFG_PORTP                       ENABLED
+#endif
+
 
 #ifndef VSF_GPIO_CFG_PIN_COUNT
 #   if defined(VSF_HW_GPIO_PIN_COUNT) && (VSF_HW_GPIO_PIN_COUNT > 32)
@@ -509,6 +529,21 @@ typedef enum vsf_io_port_no_t {
 #if defined(VSF_GPIO_CFG_PORTK)
     VSF_PORTK,
 #endif
+#if defined(VSF_GPIO_CFG_PORTL)
+    VSF_PORTL,
+#endif
+#if defined(VSF_GPIO_CFG_PORTM)
+    VSF_PORTM,
+#endif
+#if defined(VSF_GPIO_CFG_PORTN)
+    VSF_PORTN,
+#endif
+#if defined(VSF_GPIO_CFG_PORTO)
+    VSF_PORTO,
+#endif
+#if defined(VSF_GPIO_CFG_PORTP)
+    VSF_PORTP,
+#endif
 } vsf_io_port_no_t;
 
 typedef enum vsf_io_port_pin_no_t {
@@ -544,6 +579,21 @@ typedef enum vsf_io_port_pin_no_t {
 #endif
 #if defined(VSF_GPIO_CFG_PORTK)
     VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, K)
+#endif
+#if defined(VSF_GPIO_CFG_PORTL)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, L)
+#endif
+#if defined(VSF_GPIO_CFG_PORTM)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, M)
+#endif
+#if defined(VSF_GPIO_CFG_PORTN)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, N)
+#endif
+#if defined(VSF_GPIO_CFG_PORTO)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, O)
+#endif
+#if defined(VSF_GPIO_CFG_PORTP)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, P)
 #endif
 } vsf_io_port_pin_no_t;
 #endif
