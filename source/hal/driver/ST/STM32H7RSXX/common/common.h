@@ -319,6 +319,8 @@ extern const vsf_hw_clk_t VSF_HW_CLK_CSI_KER;
 extern const vsf_hw_clk_t VSF_HW_CLK_CSI_CAL;
 extern const vsf_hw_clk_t VSF_HW_CLK_HSE;
 #define VSF_HW_CLK_HSE_KER              VSF_HW_CLK_HSE
+extern const vsf_hw_clk_t VSF_HW_CLK_HSE_DIV2;
+#define VSF_HW_CLK_HSE_KER_DIV2         VSF_HW_CLK_HSE_DIV2
 extern const vsf_hw_clk_t VSF_HW_CLK_LSE;
 
 extern const vsf_hw_clk_t VSF_HW_CLK_PLL_SRC;
@@ -376,6 +378,10 @@ extern const vsf_hw_clk_t VSF_HW_CLK_USART234578;
 #define VSF_HW_CLK_UART5                VSF_HW_CLK_USART234578
 #define VSF_HW_CLK_UART7                VSF_HW_CLK_USART234578
 #define VSF_HW_CLK_UART8                VSF_HW_CLK_USART234578
+#endif
+
+#if VSF_USE_USB_DEVICE == ENABLED || VSF_USE_USB_HOST == ENABLED
+extern const vsf_hw_clk_t VSF_HW_CLK_USBPHY;
 #endif
 
 /*============================ LOCAL VARIABLES ===============================*/

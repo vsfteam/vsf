@@ -869,7 +869,9 @@ void HardFault_Handler(void)
         }
     }
 
+#if VSF_USE_TRACE == ENABLED && VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
     vsf_trace_dump_stack();
+#endif
     while (1);
 }
 
