@@ -56,7 +56,7 @@ typedef struct vk_dwcotg_dc_ip_info_t {
 
     struct {
         void *param;
-        void (*phy_init)(void *param);
+        void (*phy_init)(void *usb_param, vk_dwcotg_dcd_param_t *param);
     } vendor;
 } vk_dwcotg_dc_ip_info_t;
 

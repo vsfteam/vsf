@@ -103,9 +103,13 @@ vsf_err_t vk_dwcotg_dcd_init(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
         dwcotg_dcd->param->op->Init(&ip_cfg);
     }
 
-    vk_dwcotg_phy_init(&dwcotg_dcd->use_as__vk_dwcotg_t,
+    if (info.vendor.phy_init != NULL) {
+        info.vendor.phy_init(info.vendor.param, (vk_dwcotg_dcd_param_t *)param);
+    } else {
+        vk_dwcotg_phy_init(&dwcotg_dcd->use_as__vk_dwcotg_t,
                         &param->use_as__vk_dwcotg_param_t,
                         &info.use_as__vk_dwcotg_hw_info_t);
+    }
 
     global_regs->gahbcfg |= USB_OTG_GAHBCFG_TXFELVL;
     if (dwcotg_dcd->dma_en) {
@@ -126,9 +130,6 @@ vsf_err_t vk_dwcotg_dcd_init(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
         dev_global_regs->dcfg = USB_OTG_DCFG_NZLSOHSK | USB_OTG_DCFG_DSPD_0 | USB_OTG_DCFG_DSPD_1;
     }
 
-    if (info.vendor.phy_init != NULL) {
-        info.vendor.phy_init(info.vendor.param);
-    }
     // disconnect
     dev_global_regs->dctl |= USB_OTG_DCTL_SDIS;
 
@@ -662,7 +663,9 @@ void vk_dwcotg_dcd_irq(vk_dwcotg_dcd_t *dwcotg_dcd)
         global_regs->gintmsk |= USB_OTG_GINTMSK_USBSUSPM;
     }
     if (intsts & USB_OTG_GINTSTS_USBSUSP) {
-        __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_SUSPEND, 0);
+        if (dev_global_regs->dsts & USB_OTG_DSTS_SUSPSTS) {
+            __vk_dwcotg_dcd_notify(dwcotg_dcd, USB_ON_SUSPEND, 0);
+        }
         global_regs->gintsts = USB_OTG_GINTSTS_USBSUSP;
     }
     if (intsts & USB_OTG_GINTSTS_WKUINT) {

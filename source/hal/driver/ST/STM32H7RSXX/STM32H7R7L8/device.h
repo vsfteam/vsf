@@ -189,6 +189,32 @@
 #define VSF_HW_SDIO2_IRQN               SDMMC2_IRQn
 #define VSF_HW_SDIO2_IRQHandler         SDMMC2_IRQHandler
 
+#define USB_OTG_COUNT                   1
+// required by dwcotg, define the max ep number of dwcotg include ep0
+#define USB_DWCOTG_MAX_EP_NUM           16
+
+#ifndef VSF_STM32H7RS_USB_CFG_SPEED
+#   define VSF_STM32H7RS_USB_CFG_SPEED  USB_SPEED_HIGH
+#endif
+#define USB_OTG0_IRQHandler             OTG_HS_IRQHandler
+#define USB_OTG0_CONFIG                                                         \
+            .pwr_regulator_en           = VSF_HW_PWR_EN_USBHS_REGULATOR,        \
+            .rst                        = VSF_HW_RST_OTGHS,                     \
+            .en                         = VSF_HW_EN_OTGHS,                      \
+            .phy_clk                    = &VSF_HW_CLK_USBPHY,                   \
+            .gpio_port_en               = VSF_HW_EN_GPIOM,                      \
+            .dc_ep_num                  = 8 << 1,                               \
+            .hc_ep_num                  = 16,                                   \
+            .reg                        = (void *)USB_OTG_HS,                   \
+            .irq                        = OTG_HS_IRQn,                          \
+            /* vk_dwcotg_hw_info_t */                                           \
+                .buffer_word_size       = 1024,                                 \
+                .speed                  = VSF_STM32H7RS_USB_CFG_SPEED,          \
+                .dma_en                 = true,                                 \
+                .ulpi_en                = false,                                \
+                .utmi_en                = true,                                 \
+                .vbus_en                = false,
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

@@ -40,6 +40,7 @@
 #       include "./flash/flash.h"
 #       include "./usart/usart.h"
 //#       include "./sdio/sdio.h"
+#       include "./usb/usb.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

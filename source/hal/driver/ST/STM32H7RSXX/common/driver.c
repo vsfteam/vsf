@@ -1023,7 +1023,7 @@ void vsf_hw_mpu_add_basic_resgions(void)
                             VSF_ARCH_MPU_CACHABLE_WRITE_BACK_ALLOC);
 
     // User FLASH, 64K from 0x08000000
-    vsf_arch_mpu_add_region(0x08000000, 64 * 1024,
+    vsf_arch_mpu_add_region(0x08000000, 16 * 1024 * 1024,
                             VSF_ARCH_MPU_SHARABLE           |
                             VSF_ARCH_MPU_EXECUTABLE         |
                             VSF_ARCH_MPU_ACCESS_FULL        |
