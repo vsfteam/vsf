@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_GIGADEVICE_GD32H7XX_FLASH_H__
-#define __HAL_DRIVER_GIGADEVICE_GD32H7XX_FLASH_H__
+#ifndef __HAL_DRIVER_ST_STM32H7RSXX_FLASH_H__
+#define __HAL_DRIVER_ST_STM32H7RSXX_FLASH_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -83,5 +83,5 @@ extern void vsf_hw_flash_set_latency(uint8_t latency);
 #endif
 
 #endif      // VSF_HAL_USE_FLASH
-#endif      // __HAL_DRIVER_GIGADEVICE_GD32H7XX_FLASH_H__
+#endif      // __HAL_DRIVER_ST_STM32H7RSXX_FLASH_H__
 /* EOF */

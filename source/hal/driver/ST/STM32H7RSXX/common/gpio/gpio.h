@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_GIGADEVICE_GD32H7XX_GPIO_H__
-#define __HAL_DRIVER_GIGADEVICE_GD32H7XX_GPIO_H__
+#ifndef __HAL_DRIVER_ST_STM32H7RSXX_GPIO_H__
+#define __HAL_DRIVER_ST_STM32H7RSXX_GPIO_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -52,7 +52,7 @@ extern "C" {
  */
 
 #define VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE      ENABLED
-// HW GPIO has no interrupt for GD32H7XX
+// HW GPIO has no interrupt for STM32H7RSXX
 //#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_EXT_MODE  ENABLED
 // HW end
 
@@ -121,5 +121,5 @@ typedef struct vsf_hw_gpio_t vsf_hw_gpio_t;
 #endif
 
 #endif      // VSF_HAL_USE_GPIO
-#endif      // __HAL_DRIVER_GIGADEVICE_GD32H7XX_GPIO_H__
+#endif      // __HAL_DRIVER_ST_STM32H7RSXX_GPIO_H__
 /* EOF */

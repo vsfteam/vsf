@@ -109,7 +109,7 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_init)(
         NVIC_SetPriority(VSF_HW_FLASH_IRQN, (uint32_t)flash_ptr->isr.prio);
         NVIC_EnableIRQ(VSF_HW_FLASH_IRQN);
     } else {
-        vsf_trace_warning("gd32h7xx_flash: irq not enabled, erase/write operation will not complete!!!");
+        vsf_trace_warning("stm327rsxx_flash: irq not enabled, erase/write operation will not complete!!!");
         NVIC_DisableIRQ(VSF_HW_FLASH_IRQN);
     }
     return VSF_ERR_NONE;
