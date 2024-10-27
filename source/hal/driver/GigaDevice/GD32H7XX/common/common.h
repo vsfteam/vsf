@@ -365,6 +365,8 @@ extern const vsf_hw_clk_t * vsf_hw_clk_get_src(const vsf_hw_clk_t *clk);
 extern uint32_t vsf_hw_clk_get_freq_hz(const vsf_hw_clk_t *clk);
 extern void vsf_hw_clk_enable(const vsf_hw_clk_t *clk);
 extern void vsf_hw_clk_disable(const vsf_hw_clk_t *clk);
+extern bool vsf_hw_clk_is_enabled(const vsf_hw_clk_t *clk);
+extern bool vsf_hw_clk_is_ready(const vsf_hw_clk_t *clk);
 extern vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc, uint16_t prescaler, uint32_t freq_hz);
 
 /**

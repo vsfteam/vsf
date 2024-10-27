@@ -656,6 +656,22 @@ void vsf_hw_clk_disable(const vsf_hw_clk_t *clk)
     }
 }
 
+bool vsf_hw_clk_is_enabled(const vsf_hw_clk_t *clk)
+{
+    if (clk->clken_region != 0) {
+        return !!vsf_hw_clkrst_region_get_bit(clk->clken_region);
+    }
+    return true;
+}
+
+bool vsf_hw_clk_is_ready(const vsf_hw_clk_t *clk)
+{
+    if (clk->clkrdy_region != 0) {
+        return !!vsf_hw_clkrst_region_get_bit(clk->clkrdy_region);
+    }
+    return true;
+}
+
 vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc, uint16_t prescaler, uint32_t freq_hz)
 {
     VSF_HAL_ASSERT(clk != NULL);

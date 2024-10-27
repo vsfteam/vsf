@@ -339,6 +339,18 @@ extern const vsf_hw_clk_t VSF_HW_CLK_PLL3_P;
 extern const vsf_hw_clk_t VSF_HW_CLK_PLL3_Q;
 extern const vsf_hw_clk_t VSF_HW_CLK_PLL3_R;
 extern const vsf_hw_clk_t VSF_HW_CLK_PLL3_S;
+#define VSF_HW_CLK_PLL1P                VSF_HW_CLK_PLL1_P
+#define VSF_HW_CLK_PLL1Q                VSF_HW_CLK_PLL1_Q
+#define VSF_HW_CLK_PLL1S                VSF_HW_CLK_PLL1_S
+#define VSF_HW_CLK_PLL2P                VSF_HW_CLK_PLL2_P
+#define VSF_HW_CLK_PLL2Q                VSF_HW_CLK_PLL2_Q
+#define VSF_HW_CLK_PLL2R                VSF_HW_CLK_PLL2_R
+#define VSF_HW_CLK_PLL2S                VSF_HW_CLK_PLL2_S
+#define VSF_HW_CLK_PLL2T                VSF_HW_CLK_PLL2_T
+#define VSF_HW_CLK_PLL3P                VSF_HW_CLK_PLL3_P
+#define VSF_HW_CLK_PLL3Q                VSF_HW_CLK_PLL3_Q
+#define VSF_HW_CLK_PLL3R                VSF_HW_CLK_PLL3_R
+#define VSF_HW_CLK_PLL3S                VSF_HW_CLK_PLL3_S
 
 extern const vsf_hw_clk_t VSF_HW_CLK_SYS;
 extern const vsf_hw_clk_t VSF_HW_CLK_SYS_CPU;
@@ -400,6 +412,8 @@ extern uint_fast8_t vsf_hw_clkrst_region_get_bit(uint32_t region);
 
 extern void vsf_hw_clk_enable(const vsf_hw_clk_t *clk);
 extern void vsf_hw_clk_disable(const vsf_hw_clk_t *clk);
+extern bool vsf_hw_clk_is_enabled(const vsf_hw_clk_t *clk);
+extern bool vsf_hw_clk_is_ready(const vsf_hw_clk_t *clk);
 extern vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc, uint16_t prescaler, uint32_t freq_hz);
 // vsf_hw_clk_config_secure will tweak flash latency
 extern vsf_err_t vsf_hw_clk_config_secure(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc, uint16_t prescaler, uint32_t freq_hz);
