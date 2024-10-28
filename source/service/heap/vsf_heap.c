@@ -30,6 +30,9 @@
 // need pool configurations to determine VSF_HEAP_CFG_PROTECT_LEVEL
 #include "../pool/vsf_pool.h"
 
+// for vsf_trace_XXX
+#include "../trace/vsf_trace.h"
+
 #if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wcast-align"
@@ -59,7 +62,7 @@
 #endif
 
 
-// heap protection uses scheduler protection by default
+// heap protection uses interrupt protection by default
 #ifndef VSF_HEAP_CFG_PROTECT_LEVEL
 #   if      VSF_USE_KERNEL == ENABLED                                           \
         &&  defined(__VSF_OS_CFG_EVTQ_LIST)                                     \
@@ -68,10 +71,8 @@
 #           warning ******** evtq_list is used with VSF_POOL_CFG_FEED_ON_HEAP enabled,\
 so set heap protection level to interrupt, and interrupt lantancy will be increased ********
 #       endif
-#       define VSF_HEAP_CFG_PROTECT_LEVEL   interrupt
-#   else
-#       define VSF_HEAP_CFG_PROTECT_LEVEL   scheduler
 #   endif
+#   define VSF_HEAP_CFG_PROTECT_LEVEL   interrupt
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
