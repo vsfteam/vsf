@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_GIGADEVICE_GD32H7XX_FB_H__
-#define __HAL_DRIVER_GIGADEVICE_GD32H7XX_FB_H__
+#ifndef __HAL_DRIVER_ST_STM32H7RSXX_FB_H__
+#define __HAL_DRIVER_ST_STM32H7RSXX_FB_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -54,8 +54,8 @@ typedef enum vsf_hw_fb_polarity_t {
     VSF_HW_FB_DE_POL_HIGH       = 1 << 29,
     VSF_HW_FB_DE_POL_LOW        = 0 << 29,
 
-    VSF_HW_FB_PIXELCLK_POL_HIGH = 1 << 28,
-    VSF_HW_FB_PIXELCLK_POL_LOW  = 0 << 28,
+    VSF_HW_FB_PIXELCLK_INVERT   = 0 << 28,
+    VSF_HW_FB_PIXELCLK_NORMAL   = 1 << 28,
 } vsf_hw_fb_polarity_t;
 
 typedef struct vsf_hw_fb_timing_rgb_t {

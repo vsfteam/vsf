@@ -51,7 +51,7 @@ typedef struct vk_disp_fb_drv_t {
     struct {
         vsf_err_t (*config)(void *fb, int layer,
                     uint16_t x, uint16_t y, uint16_t w, uint16_t h,
-                    int color_format, uint_fast8_t alpha,
+                    int color_format, uint_fast8_t alpha, uint32_t default_color,
                     void *initial_pixel_buffer);
         vsf_err_t (*enable)(void *fb, int layer);
         vsf_err_t (*disable)(void *fb, int layer);
@@ -85,7 +85,8 @@ vsf_class(vk_disp_fb_t) {
         void                    *drv_param;
 
         uint32_t                fb_size;
-        vk_disp_color_type_t    layer_color;
+        uint32_t                layer_default_color;
+        vk_disp_color_type_t    layer_color_type;
         vk_disp_area_t          layer_area;
         uint8_t                 fb_num;
         uint8_t                 layer_idx;

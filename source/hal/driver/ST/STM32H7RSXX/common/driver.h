@@ -41,6 +41,7 @@
 #       include "./usart/usart.h"
 //#       include "./sdio/sdio.h"
 #       include "./usb/usb.h"
+#       include "./fb/fb.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

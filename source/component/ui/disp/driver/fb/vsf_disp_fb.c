@@ -96,7 +96,7 @@ static vsf_err_t __vk_disp_fb_init(vk_disp_t *pthis)
     }
 
     if (!disp_fb->fb_size) {
-        uint_fast8_t pixel_byte_size = vsf_disp_get_pixel_format_bytesize(disp_fb->layer_color);
+        uint_fast8_t pixel_byte_size = vsf_disp_get_pixel_format_bytesize(disp_fb->layer_color_type);
         disp_fb->fb_size = area->size.x * area->size.y * pixel_byte_size;
     }
     if (disp_fb->buffer != NULL) {
@@ -116,7 +116,7 @@ static vsf_err_t __vk_disp_fb_init(vk_disp_t *pthis)
     disp_fb->front_buffer_idx = 0;
     vsf_err_t err = disp_fb->drv->layer.config(disp_fb->drv_param, disp_fb->layer_idx,
                 area->pos.x, area->pos.y, area->size.x, area->size.y,
-                disp_fb->layer_color, disp_fb->layer_alpha,
+                disp_fb->layer_color_type, disp_fb->layer_alpha, disp_fb->layer_default_color,
                 vk_disp_fb_get_buffer(pthis, disp_fb->front_buffer_idx));
     if (VSF_ERR_NONE == err) {
         disp_fb->drv->layer.enable(disp_fb->drv_param, disp_fb->layer_idx);
@@ -141,7 +141,7 @@ static vsf_err_t __vk_disp_fb_refresh(vk_disp_t *pthis, vk_disp_area_t *area, vo
         real_area = *area;
     }
 
-    uint_fast8_t pixel_byte_size = vsf_disp_get_pixel_format_bytesize(disp_fb->layer_color);
+    uint_fast8_t pixel_byte_size = vsf_disp_get_pixel_format_bytesize(disp_fb->layer_color_type);
     uint_fast32_t line_size = pixel_byte_size * disp_fb->layer_area.size.x;
     uint_fast32_t copy_size = pixel_byte_size * real_area.size.x;
     uint_fast32_t x_offset = pixel_byte_size * real_area.pos.x;
