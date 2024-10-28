@@ -27,27 +27,29 @@
 
 /*============================ MACROS ========================================*/
 
-#if VSF_SYNC_CFG_SUPPORT_ISR != ENABLED
+#if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED && VSF_SYNC_CFG_SUPPORT_ISR != ENABLED
 #   error VSF_SYNC_CFG_SUPPORT_ISR is needed for reentrant_disp
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+#if VSF_USE_KERNEL == ENABLED
 enum {
     VSF_EVT_REFRESH = VSF_EVT_USER,
 };
+#endif
 
 /*============================ PROTOTYPES ====================================*/
 
-#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
+#if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 static vsf_err_t __vk_reentrant_disp_init(vk_disp_t *pthis);
 static vsf_err_t __vk_reentrant_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
+#if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 const vk_disp_drv_t vk_reentrant_disp_drv = {
     .init                   = __vk_reentrant_disp_init,
     .refresh                = __vk_reentrant_disp_refresh,
@@ -98,7 +100,7 @@ vsf_err_t vk_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buf
 /*******************************************************************************
 * reentrant disp                                                               *
 *******************************************************************************/
-#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
+#if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 static void __vk_reentrant_disp_on_ready(vk_disp_t *disp)
 {
     vk_reentrant_disp_t *pthis = (vk_reentrant_disp_t *)disp->ui_data;
