@@ -50,7 +50,7 @@ const vk_disp_fb_drv_t vsf_disp_hw_fb_drv = {
     .disable        = (vsf_err_t (*)(void *))vsf_hw_fb_disable,
 
     .layer          = {
-        .config     = (vsf_err_t (*)(void *, int, uint16_t, uint16_t, uint16_t, uint16_t, int, uint_fast8_t, void *))vsf_hw_fb_layer_config,
+        .config     = (vsf_err_t (*)(void *, int, uint16_t, uint16_t, uint16_t, uint16_t, int, uint_fast8_t, uint32_t, void *))vsf_hw_fb_layer_config,
         .enable     = (vsf_err_t (*)(void *, int))vsf_hw_fb_layer_enable,
         .disable    = (vsf_err_t (*)(void *, int))vsf_hw_fb_layer_disable,
         .present    = (vsf_err_t (*)(void *, int, void *))vsf_hw_fb_layer_present,
@@ -59,7 +59,7 @@ const vk_disp_fb_drv_t vsf_disp_hw_fb_drv = {
 
 const vk_disp_fb_drv_t vsf_disp_hw_fb_layer_drv = {
     .layer          = {
-        .config     = (vsf_err_t (*)(void *, int, uint16_t, uint16_t, uint16_t, uint16_t, int, uint_fast8_t, void *))vsf_hw_fb_layer_config,
+        .config     = (vsf_err_t (*)(void *, int, uint16_t, uint16_t, uint16_t, uint16_t, int, uint_fast8_t, uint32_t, void *))vsf_hw_fb_layer_config,
         .enable     = (vsf_err_t (*)(void *, int))vsf_hw_fb_layer_enable,
         .disable    = (vsf_err_t (*)(void *, int))vsf_hw_fb_layer_disable,
         .present    = (vsf_err_t (*)(void *, int, void *))vsf_hw_fb_layer_present,
