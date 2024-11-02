@@ -3325,6 +3325,11 @@ int semop(int semid, struct sembuf *sops, size_t nsops)
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
 int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
+    if (tz != NULL) {
+        tz->tz_dsttime = 0;
+        tz->tz_minuteswest = 0;
+    }
+
 #ifdef VSF_LINUX_CFG_RTC
     vsf_rtc_tm_t rtc_tm;
     vsf_rtc_get(&VSF_LINUX_CFG_RTC, &rtc_tm);
