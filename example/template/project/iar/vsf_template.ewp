@@ -10515,6 +10515,21 @@
                             <name>$PROJ_DIR$\..\..\..\..\source\component\input\driver\nspro\vsf_input_nspro.h</name>
                         </file>
                     </group>
+                    <group>
+                        <name>touch_screen</name>
+                        <group>
+                            <name>hynitron</name>
+                            <group>
+                                <name>cst8</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\input\driver\touch_screen\hynitron\cst8\vsf_input_cst8.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\component\input\driver\touch_screen\hynitron\cst8\vsf_input_cst8.h</name>
+                                </file>
+                            </group>
+                        </group>
+                    </group>
                 </group>
                 <group>
                     <name>protocol</name>
