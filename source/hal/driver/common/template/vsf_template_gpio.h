@@ -948,8 +948,6 @@ static inline vsf_err_t vsf_gpio_port_config_pin(vsf_gpio_t      *gpio_ptr,
 #   define vsf_gpio_exti_irq_config(__GPIO, ...)        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_config)        ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_exti_irq_enable(__GPIO, ...)        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_enable)        ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_exti_irq_disable(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_disable)       ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
-
-#   define vsf_gpio_exti_irq_pin_config(__GPIO, ...)    VSF_MCONNECT(vsf_exti_gpio, _exti_irq_pin_config)               ((vsf_exti_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #endif
 
 // too long, put it end of file
