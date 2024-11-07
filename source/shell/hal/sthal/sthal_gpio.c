@@ -60,9 +60,8 @@ void HAL_GPIO_Init(GPIO_TypeDef *GPIOx, GPIO_InitTypeDef *GPIO_Init)
     vsf_gpio_t *gpio = (vsf_gpio_t *)GPIOx;
 
     vsf_gpio_cfg_t cfg = {
-        .mode = GPIO_Init->Mode | GPIO_Init->Pull |
-                           GPIO_Init->Speed,
-        .alternate =  GPIO_Init->Alternate,
+        .mode = GPIO_Init->Mode | GPIO_Init->Pull | GPIO_Init->Speed,
+        .alternate_function =  GPIO_Init->Alternate,
     };
     vsf_gpio_port_config_pins(gpio, GPIO_Init->Pin, &cfg);
     if ((cfg.mode & VSF_GPIO_MODE_MASK) == VSF_GPIO_EXTI) {
