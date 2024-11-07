@@ -25,12 +25,12 @@
 #if VSF_HAL_USE_GPIO == ENABLED
 
 #if defined(__VSF_HAL_USE_GPIO_EXTI_CLASS_IMPLEMENT)
+#   undef __VSF_HAL_USE_GPIO_EXTI_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
 #endif
 
 #include "utilities/ooc_class.h"
 
-/*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ MACROS ========================================*/
 
@@ -38,6 +38,31 @@
 #   define VSF_EXTI_GPIO_CFG_MULTI_CLASS   VSF_GPIO_CFG_MULTI_CLASS
 #endif
 
+#define vsf_gpio_exti_irq_pin_config(__GPIO, ...)                               \
+    vsf_exti_gpio_exti_irq_pin_config((vsf_exti_gpio_t *)(__GPIO), ##__VA_ARGS__)
+
+
+#if VSF_EXTI_GPIO_CFG_MULTI_CLASS == ENABLED
+#   define __describe_exti_gpio_op()        .vsf_gpio.op = &vsf_exti_gpio_op,
+#else
+#   define __describe_exti_gpio_op()
+#endif
+
+#define __describe_exti_gpio(__name, __gpio, __pin_count, ...)                  \
+    static vsf_exti_gpio_irq_t VSF_MCONNECT(__name, _irqs)[__pin_count];        \
+    vsf_exti_gpio_t __name = {                                                  \
+        __describe_exti_gpio_op()                                               \
+        .gpio = (vsf_gpio_t *)&__gpio,                                          \
+        .prio = vsf_arch_prio_invalid,                                          \
+        .exti_irq = VSF_MCONNECT(__name, _irqs),                                \
+        __VA_ARGS__                                                             \
+    };
+
+#define describe_exti_gpio(__name, __gpio, ...)                                 \
+    __describe_exti_gpio(__name, __gpio, __VA_ARGS__)
+
+
+/*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_exti_gpio_irq_t {
@@ -50,7 +75,6 @@ typedef struct vsf_exti_gpio_t {
     vsf_gpio_t vsf_gpio;
 #endif
     vsf_gpio_t * gpio;
-    uint8_t pin_cnt;
     vsf_arch_prio_t prio;
     vsf_exti_gpio_irq_t *exti_irq;
 } vsf_exti_gpio_t;

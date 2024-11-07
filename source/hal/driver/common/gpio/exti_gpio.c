@@ -46,6 +46,8 @@ static void __exti_gpio_isr_handler(void *target_ptr, vsf_gpio_t *gpio_ptr,
     VSF_HAL_ASSERT(pin_mask != 0);
 
     vsf_exti_gpio_t *exti_gpio_ptr = (vsf_exti_gpio_t *)target_ptr;
+    VSF_HAL_ASSERT(exti_gpio_ptr != NULL);
+    VSF_HAL_ASSERT(exti_gpio_ptr->gpio != NULL);
     VSF_HAL_ASSERT(exti_gpio_ptr->exti_irq != NULL);
 
     while (pin_mask) {
@@ -53,10 +55,12 @@ static void __exti_gpio_isr_handler(void *target_ptr, vsf_gpio_t *gpio_ptr,
         VSF_HAL_ASSERT(pin < VSF_HW_GPIO_PIN_COUNT);
         pin_mask &= ~(1 << pin);
 
-        exti_gpio_ptr->exti_irq[pin].handler_fn(
-               exti_gpio_ptr->exti_irq[pin].target_ptr,
-               (vsf_gpio_t *)exti_gpio_ptr->gpio,
-               0x01UL << pin);
+        if (exti_gpio_ptr->exti_irq[pin].handler_fn != NULL) {
+            exti_gpio_ptr->exti_irq[pin].handler_fn(
+                exti_gpio_ptr->exti_irq[pin].target_ptr,
+                (vsf_gpio_t *)exti_gpio_ptr->gpio,
+                0x01UL << pin);
+        }
     }
 }
 

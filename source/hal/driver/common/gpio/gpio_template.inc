@@ -43,20 +43,12 @@
 #   define VSF_HAL_TEMPLATE_IMP_UPCASE_PREFIX       VSF_MCONNECT(VSF_GPIO_CFG_IMP_UPCASE_PREFIX, _EXTI)
 
 #   define VSF_GPIO_CFG_IMP_LV0(__IDX, __HAL_OP)                                \
-        static vsf_exti_gpio_irq_t VSF_MCONNECT(__, VSF_HAL_TEMPLATE_IMP_PREFIX,\
-            _gpio, __IDX, _irqs)[                                               \
-                VSF_MCONNECT(VSF_GPIO_CFG_IMP_UPCASE_PREFIX, _GPIO_PIN_COUNT)]; \
-        vsf_exti_gpio_t VSF_MCONNECT(VSF_HAL_TEMPLATE_IMP_PREFIX,               \
-                                    _gpio, __IDX) = {                           \
-            .gpio = (vsf_gpio_t *)&VSF_MCONNECT(VSF_GPIO_CFG_IMP_INSTANCE,      \
-                                                _gpio, __IDX),                  \
-            .prio = vsf_arch_prio_invalid,                                      \
-            .exti_irq = VSF_MCONNECT(__, VSF_HAL_TEMPLATE_IMP_PREFIX,           \
-                                _gpio, __IDX, _irqs),                           \
-            .pin_cnt = VSF_MCONNECT(VSF_GPIO_CFG_IMP_UPCASE_PREFIX,             \
-                                _GPIO_PIN_COUNT),                               \
+        describe_exti_gpio(                                                     \
+            VSF_MCONNECT(VSF_HAL_TEMPLATE_IMP_PREFIX, _gpio, __IDX),            \
+            VSF_MCONNECT(VSF_GPIO_CFG_IMP_INSTANCE, _gpio, __IDX),              \
+            VSF_MCONNECT(VSF_GPIO_CFG_IMP_UPCASE_PREFIX, _GPIO_PIN_COUNT),      \
             __HAL_OP                                                            \
-        };
+        )
 #   include "hal/driver/common/gpio/gpio_template_base.inc"
 #   undef VSF_GPIO_CFG_RETAIN_DEFINED_PREFIX
 
