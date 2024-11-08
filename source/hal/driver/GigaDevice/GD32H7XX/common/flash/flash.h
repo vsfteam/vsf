@@ -54,7 +54,7 @@ typedef enum vsf_flash_irq_mask_t {
 
     // 17: WPERRIE(17) IN FMC_CTL
     VSF_FLASH_IRQ_ERASE_ERROR_MASK      = (1 << 17),
-    // 17..18: GPSERRIE(18)/WPERRIE(17) IN FMC_CTL
+    // 17..18: PGSERRIE(18)/WPERRIE(17) IN FMC_CTL
     VSF_FLASH_IRQ_WRITE_ERROR_MASK      = (1 << 18) | (1 << 17),
     // 23..24: RSERRIE(24)/RPERRIE(23) IN GMC_CTL
     VSF_FLASH_IRQ_READ_ERROR_MASK       = (1 << 24) | (1 << 23),

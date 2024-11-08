@@ -87,6 +87,8 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_init)(
 ) {
     VSF_HAL_ASSERT((flash_ptr != NULL) && (cfg_ptr != NULL));
     // configure according to cfg_ptr
+    FMC_KEY = UNLOCK_KEY0;
+    FMC_KEY = UNLOCK_KEY1;
     flash_ptr->isr = cfg_ptr->isr;
     if (flash_ptr->isr.handler_fn != NULL) {
         NVIC_SetPriority(flash_ptr->irqn, (uint32_t)flash_ptr->isr.prio);
@@ -124,9 +126,6 @@ void VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_enable)(
 ) {
     VSF_HAL_ASSERT(flash_ptr != NULL);
 
-    FMC_KEY = UNLOCK_KEY0;
-    FMC_KEY = UNLOCK_KEY1;
-
     flash_ptr->irq_mask = irq_mask;
     irq_mask &= __VSF_HW_FLASH_IRQ_MASK;
     if (irq_mask & VSF_FLASH_IRQ_WRITE_MASK) {
@@ -134,8 +133,6 @@ void VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_enable)(
         irq_mask |= FMC_CTL_ENDIE;
     }
     FMC_CTL |= irq_mask;
-
-    FMC_CTL |= FMC_CTL_LK;
 }
 
 void VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_disable)(
@@ -144,9 +141,6 @@ void VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_disable)(
 ) {
     VSF_HAL_ASSERT(flash_ptr != NULL);
 
-    FMC_KEY = UNLOCK_KEY0;
-    FMC_KEY = UNLOCK_KEY1;
-
     flash_ptr->irq_mask &= ~irq_mask;
     irq_mask &= __VSF_HW_FLASH_IRQ_MASK;
     if (irq_mask & VSF_FLASH_IRQ_WRITE_MASK) {
@@ -154,8 +148,6 @@ void VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_disable)(
         irq_mask |= FMC_CTL_ENDIE;
     }
     FMC_CTL &= ~irq_mask;
-
-    FMC_CTL |= FMC_CTL_LK;
 }
 
 vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_one_sector)(
@@ -166,12 +158,10 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_one_sector)(
     VSF_HAL_ASSERT(!(offset & (4096 - 1)));
 
     flash_ptr->erase0_write1 = 0;
-    FMC_KEY = UNLOCK_KEY0;
-    FMC_KEY = UNLOCK_KEY1;
 
     FMC_CTL |= FMC_CTL_SER;
     FMC_ADDR = flash_ptr->addr + offset;
-    FMC_CTL |= FMC_CTL_START | FMC_CTL_LK;
+    FMC_CTL |= FMC_CTL_START;
 
     return VSF_ERR_NONE;
 }
@@ -208,9 +198,7 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)(
     flash_ptr->buffer = buffer;
     uint32_t addr = flash_ptr->addr + offset;
 
-    FMC_KEY = UNLOCK_KEY0;
-    FMC_KEY = UNLOCK_KEY1;
-    FMC_CTL |= FMC_CTL_PG | FMC_CTL_LK;
+    FMC_CTL |= FMC_CTL_PG;
 
     __ISB();
     __DSB();
@@ -282,13 +270,14 @@ static void VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(
     vsf_flash_isr_t *isr_ptr = &flash_ptr->isr;
 
     FMC_STAT = irq_mask;
-    FMC_KEY = UNLOCK_KEY0;
-    FMC_KEY = UNLOCK_KEY1;
-        FMC_CTL &= ~(FMC_CTL_PG | FMC_CTL_SER);
-    FMC_CTL |= FMC_CTL_LK;
+    FMC_CTL &= ~(FMC_CTL_PG | FMC_CTL_SER);
 
     if (irq_mask & __VSF_HW_FLASH_ERR_IRQ_MASK) {
         flash_ptr->size_cur = 0;
+        if (irq_mask & FMC_STAT_PGSERR) {
+            // sequency error should not happen
+            VSF_HAL_ASSERT(false);
+        }
     } else {
         // no error
         VSF_HAL_ASSERT(irq_mask & FMC_STAT_ENDF);
@@ -300,9 +289,7 @@ static void VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(
             if (flash_ptr->size_cur > 0) {
                 uint32_t addr = flash_ptr->addr + flash_ptr->offset_cur;
 
-                FMC_KEY = UNLOCK_KEY0;
-                FMC_KEY = UNLOCK_KEY1;
-                FMC_CTL |= FMC_CTL_PG | FMC_CTL_LK;
+                FMC_CTL |= FMC_CTL_PG;
 
                 __ISB();
                 __DSB();
