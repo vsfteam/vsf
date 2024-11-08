@@ -27,6 +27,9 @@
 #include "./vsf_queue_stream.h"
 #include "kernel/vsf_kernel.h"
 
+// for heap
+#include "service/vsf_service.h"
+
 /*============================ MACROS ========================================*/
 
 // \note    Queue_stream can use be used in interrupt, because heap is used for buffer allocation.
