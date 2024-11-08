@@ -781,11 +781,6 @@ vsf_err_t vsf_hw_pll_vco_config(const vsf_hw_clk_t *clk, uint_fast8_t src_presca
     return VSF_ERR_NONE;
 }
 
-uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void)
-{
-    return vsf_hw_clk_get_freq_hz(&VSF_HW_CLK_SYS);
-}
-
 
 
 // this function should be in gd32h7xx_misc.c, but this file is not included.

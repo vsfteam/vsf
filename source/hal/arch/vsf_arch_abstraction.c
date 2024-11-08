@@ -111,11 +111,6 @@ void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t val, void *p)           
 #   endif
 #endif
 
-
-#ifndef VSF_GET_MAIN_CLK
-#   define VSF_GET_MAIN_CLK()         (0)
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -155,6 +150,11 @@ extern bool on_arch_systimer_tick_evt(vsf_systimer_tick_t tick);
 extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
 #   endif
 #   if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE
+
+#       ifndef VSF_SYSTIMER_RESOLUTION
+#           define VSF_SYSTIMER_RESOLUTION      (1000)    /*! using default 1us */
+#       endif
+
 extern uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void);
 extern uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void);
 #   endif
@@ -568,14 +568,23 @@ bool on_arch_systimer_tick_evt(vsf_systimer_tick_t tick)
 
 
 #if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
-    ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
+    ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER         \
+    ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE
 
 VSF_CAL_WEAK(vsf_arch_req___systimer_freq___from_usr)
 uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void)
 {
-    return VSF_GET_MAIN_CLK();
+#if     defined(VSF_ARCH_SYSTIMER_FREQ)
+    return VSF_ARCH_SYSTIMER_FREQ;
+#else
+    return VSF_SYSTIMER_FREQ;
+#endif
 }
 
+#endif
+
+#if     VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_NORMAL_TIMER       \
+    ||  VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_WITH_COMP_TIMER
 
 VSF_CAL_WEAK(vsf_systimer_us_to_tick)
 vsf_systimer_tick_t vsf_systimer_us_to_tick(uint_fast32_t time_us)
@@ -933,16 +942,10 @@ bool vsf_systimer_is_due(vsf_systimer_tick_t due)
  *----------------------------------------------------------------------------*/
 #if VSF_SYSTIMER_CFG_IMPL_MODE == VSF_SYSTIMER_IMPL_TICK_MODE
 
-VSF_CAL_WEAK(vsf_arch_req___systimer_freq___from_usr)
-uint_fast32_t vsf_arch_req___systimer_freq___from_usr(void)
-{
-    return VSF_GET_MAIN_CLK();
-}
-
 VSF_CAL_WEAK(vsf_arch_req___systimer_resolution___from_usr)
 uint_fast32_t vsf_arch_req___systimer_resolution___from_usr(void)
 {
-    return 1000ul;          //!< 1ms (1KHz)
+    return VSF_SYSTIMER_RESOLUTION;
 }
 
 VSF_CAL_WEAK(vsf_systimer_us_to_tick)

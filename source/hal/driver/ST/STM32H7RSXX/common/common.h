@@ -47,6 +47,8 @@
 #define vsf_hw_power_enable             vsf_hw_power_region_set_bit
 #define vsf_hw_power_disable            vsf_hw_power_region_clear_bit
 
+#define VSF_SYSTIMER_FREQ               vsf_hw_clk_get_freq_hz(&VSF_HW_CLK_SYS_CPU)
+
 /*============================ TYPES =========================================*/
 
 typedef enum vsf_hw_peripheral_rst_t {
