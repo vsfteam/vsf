@@ -21,6 +21,9 @@
 #include "vsf_arch_abstraction.h"
 #include "./__vsf_arch_interface.h"
 
+// for hal specified configurations
+#include "hal/vsf_hal.h"
+
 /*============================ MACROS ========================================*/
 
 #define IMPLEMENT_ENDIAN_FUNC(__bitlen)                                         \
