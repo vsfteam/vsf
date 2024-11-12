@@ -71,12 +71,6 @@
 #   error LWIP_SO_RCVBUF MUST be enabled for SO_RCVBUF control in setsockopt/getsockopt
 #endif
 
-#if LWIP_IPV6
-#   if !LWIP_IPV6_SCOPES
-#       error please LWIP_IPV6_SCOPES if IPV6 is enabled
-#   endif
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define inet_addr_from_ip4addr(target_inaddr, source_ipaddr) ((target_inaddr)->s_addr = ip4_addr_get_u32(source_ipaddr))
@@ -171,11 +165,14 @@ static void __sockaddr_to_ipaddr_port(const struct sockaddr *sockaddr, ip_addr_t
         ip_2_ip6(ipaddr)->addr[1] = sockaddr_in6->sin6_addr.s6_addr[1];
         ip_2_ip6(ipaddr)->addr[2] = sockaddr_in6->sin6_addr.s6_addr[2];
         ip_2_ip6(ipaddr)->addr[3] = sockaddr_in6->sin6_addr.s6_addr[3];
-        ip6_addr_clear_zone(ip_2_ip6(ipaddr));
 
+#   if LWIP_IPV6_SCOPES
+        ip6_addr_clear_zone(ip_2_ip6(ipaddr));
         if (ip6_addr_has_scope(ip_2_ip6(ipaddr), IP6_UNKNOWN)) {
             ip6_addr_set_zone(ip_2_ip6(ipaddr), (u8_t)(sockaddr_in6->sin6_scope_id));
         }
+#   endif
+
         *port = lwip_ntohs(sockaddr_in6->sin6_port);
         ipaddr->type = IPADDR_TYPE_V6;
     } else
@@ -204,7 +201,9 @@ static void __ipaddr_port_to_sockaddr(struct sockaddr *sockaddr, ip_addr_t *ipad
         sockaddr_in6->sin6_addr.s6_addr[1] = ip_2_ip6(ipaddr)->addr[1];
         sockaddr_in6->sin6_addr.s6_addr[2] = ip_2_ip6(ipaddr)->addr[2];
         sockaddr_in6->sin6_addr.s6_addr[3] = ip_2_ip6(ipaddr)->addr[3];
+#   if LWIP_IPV6_SCOPES
         sockaddr_in6->sin6_scope_id = ip6_addr_zone(ip_2_ip6(ipaddr));
+#   endif
     } else
 #endif
     {
