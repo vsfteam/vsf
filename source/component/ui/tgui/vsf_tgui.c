@@ -190,6 +190,7 @@ vsf_err_t vk_tgui_close_root_container(vsf_tgui_t* gui_ptr)
 
 bool vk_tgui_send_message(vsf_tgui_t* gui_ptr, vsf_tgui_evt_t event)
 {
+    bool is_to_notify;
     class_internal(gui_ptr, this_ptr, vsf_tgui_t);
     if (NULL == gui_ptr) {
         return false;
@@ -202,13 +203,17 @@ bool vk_tgui_send_message(vsf_tgui_t* gui_ptr, vsf_tgui_evt_t event)
     }
 
     __vsf_interrupt_safe(
-        if (this.consumer.param.Attribute.is_queue_drain) {
+        is_to_notify = this.consumer.param.Attribute.is_queue_drain;
+        if (is_to_notify) {
             this.consumer.param.Attribute.is_queue_drain = false;
-            //! wake pt task up
-            vsf_eda_post_evt(&(this.consumer.use_as__vsf_pt_t.use_as__vsf_eda_t),
-                VSF_TGUI_MSG_AVAILABLE);
         }
     )
+
+    if (is_to_notify) {
+        //! wake pt task up
+        vsf_eda_post_evt(&(this.consumer.use_as__vsf_pt_t.use_as__vsf_eda_t),
+            VSF_TGUI_MSG_AVAILABLE);
+    }
 
     return true;
 }
