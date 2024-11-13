@@ -62,19 +62,33 @@ static const vsf_tgui_tile_t __controls_container_corner_tiles[__CORNOR_TILE_NUM
     },
 };
 
-static const vsf_tgui_tile_t __controls_label_corner_tiles[2] = {
+static const vsf_tgui_tile_t __controls_label_corner_tiles[4] = {
     [CORNOR_TILE_IN_TOP_LEFT] = {
         .tChild = {
-            .tSize = {.iWidth = 16, .iHeight = 32, },
+            .tSize = {.iWidth = 16, .iHeight = 16, },
             .parent_ptr = (vsf_tgui_tile_core_t*)&bg3_RGB,
             .tLocation = {.iX = 0, .iY = 0},
         },
     },
     [CORNOR_TILE_IN_TOP_RIGHT] = {
         .tChild = {
-            .tSize = {.iWidth = 16, .iHeight = 32, },
+            .tSize = {.iWidth = 16, .iHeight = 16, },
             .parent_ptr = (vsf_tgui_tile_core_t*)&bg3_RGB,
             .tLocation = {.iX = 16, .iY = 0},
+        },
+    },
+    [CORNOR_TILE_IN_BOTTOM_LEFT] = {
+        .tChild = {
+            .tSize = {.iWidth = 16, .iHeight = 16, },
+            .parent_ptr = (vsf_tgui_tile_core_t*)&bg3_RGB,
+            .tLocation = {.iX = 0, .iY = 16},
+        },
+    },
+    [CORNOR_TILE_IN_BOTTOM_RIGHT] = {
+        .tChild = {
+            .tSize = {.iWidth = 16, .iHeight = 16, },
+            .parent_ptr = (vsf_tgui_tile_core_t*)&bg3_RGB,
+            .tLocation = {.iX = 16, .iY = 16},
         },
     },
 };
@@ -83,7 +97,7 @@ static const vsf_tgui_tile_t __controls_label_corner_tiles[2] = {
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
-#ifdef WEAK_VSF_TGUI_SV_GET_CORNOR_TILE
+
 const vsf_tgui_tile_t* vsf_tgui_control_v_get_corner_tile(vsf_tgui_control_t* control_ptr, vsf_tgui_sv_cornor_tile_mode_t mode)
 {
     if (control_ptr->id == VSF_TGUI_COMPONENT_ID_BUTTON || control_ptr->id == VSF_TGUI_COMPONENT_ID_LABEL) {
@@ -98,7 +112,6 @@ const vsf_tgui_tile_t* vsf_tgui_control_v_get_corner_tile(vsf_tgui_control_t* co
 
     return NULL;
 }
-#endif
 
 #endif
 

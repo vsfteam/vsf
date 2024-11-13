@@ -124,7 +124,7 @@ vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* l
     return size;
 }
 
-#ifndef WEAK_VSF_TGUI_SV_GET_TEXT_COLOR
+VSF_CAL_WEAK(vsf_tgui_sv_get_text_color)
 vsf_tgui_sv_color_t vsf_tgui_sv_get_text_color(vsf_tgui_label_t* label_ptr)
 {
 #if VSF_TGUI_CFG_SV_LABLE_SUPPORT_TEXT_COLOR == ENABLED
@@ -135,7 +135,6 @@ vsf_tgui_sv_color_t vsf_tgui_sv_get_text_color(vsf_tgui_label_t* label_ptr)
 #   error "todo: "
 #endif
 }
-#endif
 
 fsm_rt_t vsf_tgui_label_v_rendering(vsf_tgui_label_t* label_ptr,
                                     vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity

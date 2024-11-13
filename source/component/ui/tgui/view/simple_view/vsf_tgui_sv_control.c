@@ -44,14 +44,13 @@ const char* vsf_tgui_control_get_node_name(vsf_tgui_control_t* control_ptr)
 }
 #endif
 
-#ifndef WEAK_VSF_TGUI_SV_GET_CORNOR_TILE
+VSF_CAL_WEAK(vsf_tgui_control_v_get_corner_tile)
 const vsf_tgui_tile_t* vsf_tgui_control_v_get_corner_tile(vsf_tgui_control_t* control_ptr, vsf_tgui_sv_cornor_tile_mode_t mode)
 {
     return NULL;
 }
-#endif
 
-#ifndef WEAK_VSF_TGUI_SV_GET_BACKGROUND_COLOR
+VSF_CAL_WEAK(vsf_tgui_sv_get_background_color)
 vsf_tgui_sv_color_t vsf_tgui_sv_get_background_color(vsf_tgui_control_t* control_ptr)
 {
 #if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
@@ -69,7 +68,6 @@ vsf_tgui_sv_color_t vsf_tgui_sv_get_background_color(vsf_tgui_control_t* control
     return VSF_TGUI_COLOR_BLUE;
 #endif
 }
-#endif
 
 fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_control_t* control_ptr)
 {

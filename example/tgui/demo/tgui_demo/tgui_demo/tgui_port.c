@@ -133,7 +133,6 @@ static uint32_t __color_to_sdl_color(vsf_tgui_sv_color_t color)
 #endif
 }
 
-#ifdef WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE
 vsf_tgui_size_t vsf_tgui_idx_root_tile_get_size(const vsf_tgui_tile_t* tile_ptr)
 {
     VSF_TGUI_ASSERT(tile_ptr != NULL);
@@ -142,7 +141,6 @@ vsf_tgui_size_t vsf_tgui_idx_root_tile_get_size(const vsf_tgui_tile_t* tile_ptr)
 
     return tile_ptr->tBufRoot.tSize;
 }
-#endif
 
 static unsigned char* vsf_tgui_sdl_tile_get_pixelmap(const vsf_tgui_tile_t* tile_ptr)
 {
@@ -590,12 +588,10 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t* gui_ptr)
     }
 }
 
-#ifndef WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH
 VSF_CAL_WEAK(vsf_tgui_low_level_on_ready_to_refresh)
 void vsf_tgui_low_level_on_ready_to_refresh(void)
 {
 }
-#endif
 
 
 static void __vsf_tgui_on_ready(vk_disp_t* disp)

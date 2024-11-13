@@ -49,13 +49,6 @@
     TGUI_SV_FT2_FONT_DEF(VSF_TGUI_FONT_WQY_MICROHEI_S16, "wqy-microhei.ttc", 16),     \
     TGUI_SV_FT2_FONT_DEF(VSF_TGUI_FONT_DEJAVUSERIF_S24,  "DejaVuSerif.ttf",  24)
 
-/*----------------------------------------------------------------------------*
- * Regarget Weak interface                                                    *
- *----------------------------------------------------------------------------*/
-#define WEAK_VSF_TGUI_LOW_LEVEL_ON_READY_TO_REFRESH
-#define WEAK_VSF_TGUI_IDX_ROOT_TILE_GET_SIZE
-#define WEAK_VSF_TGUI_SV_GET_CORNOR_TILE
-
 #if VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN == ENABLED
 #   undef VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS
 #   define VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS   ENABLED
