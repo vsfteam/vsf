@@ -40,9 +40,10 @@ vsf_tgui_sv_color_t vsf_tgui_sv_color_mix(vsf_tgui_sv_color_t color_0, vsf_tgui_
     color_0.value  += ((((color_1.value >> 8) & 0x00FF00FF) * mix) & 0xFF00FF00)
                     + ((((color_1.value & 0x00FF00FF) * mix) >> 8) & 0x00FF00FF);
 #else
-    color_0.red     = ((uint32_t)color_0.red   * mix + (uint32_t)color_1.red   * (255 - mix)) / 255;
-    color_0.green   = ((uint32_t)color_0.green * mix + (uint32_t)color_1.green * (255 - mix)) / 255;
-    color_0.blue    = ((uint32_t)color_0.blue  * mix + (uint32_t)color_1.blue  * (255 - mix)) / 255;
+    uint_fast8_t rmix = ~mix;
+    color_0.red     = ((uint32_t)color_0.red   * mix + (uint32_t)color_1.red   * rmix) / 255;
+    color_0.green   = ((uint32_t)color_0.green * mix + (uint32_t)color_1.green * rmix) / 255;
+    color_0.blue    = ((uint32_t)color_0.blue  * mix + (uint32_t)color_1.blue  * rmix) / 255;
 #endif
 
 #if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
