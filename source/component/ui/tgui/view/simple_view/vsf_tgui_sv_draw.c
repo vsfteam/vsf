@@ -265,7 +265,8 @@ void vsf_tgui_control_v_draw_tile(  const vsf_tgui_control_t* control_ptr,
                                     const vsf_tgui_align_mode_t mode,
                                     const uint8_t trans_rate,
                                     vsf_tgui_region_t * placed_region_ptr,
-                                    vsf_tgui_sv_color_t color)
+                                    vsf_tgui_sv_color_t color,
+                                    vsf_tgui_sv_color_t bg_color)
 {
     vsf_tgui_region_t resource_region;
     vsf_tgui_location_t real_location;
@@ -295,7 +296,7 @@ void vsf_tgui_control_v_draw_tile(  const vsf_tgui_control_t* control_ptr,
                                         &resource_region.tSize,
                                         tile_ptr,
                                         trans_rate,
-                                        color);
+                                        color, bg_color);
     } else {
     }
 }

@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2024 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -23,8 +23,6 @@
 
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
 /*============================ MACROS ========================================*/
-#define VSF_TGUI_COLORTYPE_RGB         0
-#define VSF_TGUI_COLORTYPE_RGBA        1
 
 MACROS_REPLACE
 /*============================ MACROFIED FUNCTIONS ===========================*/

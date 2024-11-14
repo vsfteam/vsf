@@ -5,10 +5,6 @@ import os
 from PIL import Image
 from cProfile import Profile
 
-PIX_CNT = 4
-rgba_index = 0
-rgb_index = 0
-
 def tgui_get_data_from_image(mode, file_path):
     im = Image.open(file_path).convert(mode)
     width, height = im.size
@@ -37,23 +33,17 @@ def tgui_image_to_dict(mode, file_path):
         image_dict['color_size'] = 5
         image_dict['color_type'] = 1
         image_dict['size'] = width * height * 4
-    else:
+    elif mode == 'RGB':
         image_dict['color_size'] = 6
         image_dict['color_type'] = 0
         image_dict['size'] = width * height * 3
+    elif mode == 'L':
+        image_dict['color_size'] = 3
+        image_dict['color_type'] = 2
+        image_dict['size'] = width * height
     return image_dict
 
 def tgui_image_data_buid(image, offset):
-    global rgba_index
-    global rgb_index
-
-    if image['mode'] == 'RGBA':
-        index = rgba_index
-        rgba_index += 1
-        rgba_pixmap = '    '
-    else:
-        index = rgb_index
-        rgb_index += 1
 
     ## tile define
     tile_def = '''const vsf_tgui_tile_buf_root_t {name}_{mode}  = {{
@@ -130,7 +120,7 @@ def main():
     offset = 0
     counter = 0
 
-    search_dirs = {'RGB':'./rgb-images', 'RGBA':'./rgba-images'}
+    search_dirs = {'RGB':'./rgb-images', 'RGBA':'./rgba-images', 'L':'./grayscale-images'}
     for (mode, dirname) in search_dirs.items():
         files = os.listdir(dirname)
         for f in files:

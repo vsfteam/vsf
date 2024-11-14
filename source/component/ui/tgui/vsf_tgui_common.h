@@ -44,8 +44,8 @@
 #define VSF_TGUI_COLORSIZE_4BIT     2
 #define VSF_TGUI_COLORSIZE_8BIT     3
 #define VSF_TGUI_COLORSIZE_16BIT    4
-#define VSF_TGUI_COLORSIZE_24IT     6
-#define VSF_TGUI_COLORSIZE_32IT     5
+#define VSF_TGUI_COLORSIZE_24BIT    6
+#define VSF_TGUI_COLORSIZE_32BIT    5
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 

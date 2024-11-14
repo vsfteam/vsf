@@ -69,6 +69,23 @@ vsf_tgui_sv_color_t vsf_tgui_sv_get_background_color(vsf_tgui_control_t* control
 #endif
 }
 
+vsf_tgui_sv_color_t vsf_tgui_sv_get_parent_background_color(vsf_tgui_control_t* control_ptr)
+{
+#if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
+    vsf_tgui_control_t* control_tmp_ptr;
+    do {
+        control_tmp_ptr = vsf_tgui_control_get_parent(control_ptr);
+        if (NULL == control_tmp_ptr) {
+            return (vsf_tgui_sv_color_t){ 0 };
+        }
+        control_ptr = control_tmp_ptr;
+    } while (0 == control_ptr->background_color.alpha);
+    return control_ptr->background_color;
+#else
+    return VSF_TGUI_COLOR_BLUE;
+#endif
+}
+
 fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_control_t* control_ptr)
 {
 #if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
@@ -101,6 +118,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
 
 #if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED || VSF_TGUI_CFG_SV_SUPPORT_FIXED_BACKGROUND_COLOR == ENABLED
     vsf_tgui_sv_color_t color = vsf_tgui_sv_get_background_color(control_ptr);
+    vsf_tgui_sv_color_t bg_color = vsf_tgui_sv_get_parent_background_color(control_ptr);
     uint_fast8_t trans_rate = vsf_tgui_sv_color_get_trans_rate(color);
     if (trans_rate) {
         vsf_tgui_region_t region = {
@@ -126,7 +144,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
                 const vsf_tgui_tile_t* tile_ptr = vsf_tgui_control_v_get_corner_tile(control_ptr, i);
                 if (tile_ptr) {
                     vsf_tgui_control_v_draw_tile(control_ptr, dirty_region_ptr, tile_ptr, __cornor_tiles_align_mode[i], trans_rate, &regions[i],
-                        control_ptr->background_color);
+                        color, bg_color);
                 } else {
                     memset(&regions[i], 0, sizeof(vsf_tgui_region_t));
                 }
@@ -225,7 +243,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
         uint8_t tile_trans_rate = 0xFF;
 #endif
         vsf_tgui_control_v_draw_tile(control_ptr, dirty_region_ptr, ptTile, control_ptr->tBackground.tAlign, tile_trans_rate, NULL,
-            (vsf_tgui_sv_color_t){.value = 0xFFFFFFF});
+            color, bg_color);
     }
 
     return fsm_rt_cpl;

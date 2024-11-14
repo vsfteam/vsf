@@ -34,30 +34,30 @@
 static const vsf_tgui_tile_t __controls_container_corner_tiles[CORNOR_TILE_NUM] = {
     [CORNOR_TILE_IN_TOP_LEFT] = {
         .tChild = {
-            .parent_ptr = (vsf_tgui_tile_core_t*)&bg1_RGB,
             .tSize = {.iWidth = 12, .iHeight = 12, },
+            .parent_ptr = (vsf_tgui_tile_core_t*)&corner12_L,
             .tLocation = {.iX = 0, .iY = 0},
         },
     },
     [CORNOR_TILE_IN_TOP_RIGHT] = {
         .tChild = {
             .tSize = {.iWidth = 12, .iHeight = 12, },
-            .parent_ptr = (vsf_tgui_tile_core_t*)&bg1_RGB,
-            .tLocation = {.iX = 200 - 12, .iY = 0},
+            .parent_ptr = (vsf_tgui_tile_core_t*)&corner12_L,
+            .tLocation = {.iX = 12, .iY = 0},
         },
     },
     [CORNOR_TILE_IN_BOTTOM_LEFT] = {
         .tChild = {
             .tSize = {.iWidth = 12, .iHeight = 12, },
-            .parent_ptr = (vsf_tgui_tile_core_t*)&bg1_RGB,
-            .tLocation = {.iX = 0, .iY = 200 - 12},
+            .parent_ptr = (vsf_tgui_tile_core_t*)&corner12_L,
+            .tLocation = {.iX = 0, .iY = 12},
         },
     },
     [CORNOR_TILE_IN_BOTTOM_RIGHT] = {
         .tChild = {
             .tSize = {.iWidth = 12, .iHeight = 12, },
-            .parent_ptr = (vsf_tgui_tile_core_t*)&bg1_RGB,
-            .tLocation = {.iX = 200 - 12, .iY = 200 - 12},
+            .parent_ptr = (vsf_tgui_tile_core_t*)&corner12_L,
+            .tLocation = {.iX = 12, .iY = 12},
         },
     },
 };
@@ -66,34 +66,32 @@ static const vsf_tgui_tile_t __controls_label_corner_tiles[CORNOR_TILE_NUM] = {
     [CORNOR_TILE_IN_TOP_LEFT] = {
         .tChild = {
             .tSize = {.iWidth = 16, .iHeight = 16, },
-            .parent_ptr = (vsf_tgui_tile_core_t*)&bg3_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t*)&corner16_L,
             .tLocation = {.iX = 0, .iY = 0},
         },
     },
     [CORNOR_TILE_IN_TOP_RIGHT] = {
         .tChild = {
             .tSize = {.iWidth = 16, .iHeight = 16, },
-            .parent_ptr = (vsf_tgui_tile_core_t*)&bg3_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t*)&corner16_L,
             .tLocation = {.iX = 16, .iY = 0},
         },
     },
     [CORNOR_TILE_IN_BOTTOM_LEFT] = {
         .tChild = {
             .tSize = {.iWidth = 16, .iHeight = 16, },
-            .parent_ptr = (vsf_tgui_tile_core_t*)&bg3_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t*)&corner16_L,
             .tLocation = {.iX = 0, .iY = 16},
         },
     },
     [CORNOR_TILE_IN_BOTTOM_RIGHT] = {
         .tChild = {
             .tSize = {.iWidth = 16, .iHeight = 16, },
-            .parent_ptr = (vsf_tgui_tile_core_t*)&bg3_RGB,
+            .parent_ptr = (vsf_tgui_tile_core_t*)&corner16_L,
             .tLocation = {.iX = 16, .iY = 16},
         },
     },
 };
-
-
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/

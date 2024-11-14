@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2022 by VSF Team                                       *
+ *   Copyright(C)2009-2019 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -24,63 +24,6 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-const vsf_tgui_tile_buf_root_t bg1_RGB  = {
-    .use_as__vsf_tgui_tile_core_t = {
-        .Attribute = {
-            .u2RootTileType = 0,
-            .u2ColorType = 0,
-            .u3ColorSize = 6,
-            .bIsRootTile = 1,
-        },
-#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
-        .name_ptr = "bg1_RGB",
-#endif
-    },
-    .tSize = {
-        .iWidth = 200,
-        .iHeight = 200,
-    },
-    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x00,
-};
-
-const vsf_tgui_tile_buf_root_t bg2_RGB  = {
-    .use_as__vsf_tgui_tile_core_t = {
-        .Attribute = {
-            .u2RootTileType = 0,
-            .u2ColorType = 0,
-            .u3ColorSize = 6,
-            .bIsRootTile = 1,
-        },
-#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
-        .name_ptr = "bg2_RGB",
-#endif
-    },
-    .tSize = {
-        .iWidth = 1280,
-        .iHeight = 718,
-    },
-    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x1D4C0,
-};
-
-const vsf_tgui_tile_buf_root_t bg3_RGB  = {
-    .use_as__vsf_tgui_tile_core_t = {
-        .Attribute = {
-            .u2RootTileType = 0,
-            .u2ColorType = 0,
-            .u3ColorSize = 6,
-            .bIsRootTile = 1,
-        },
-#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
-        .name_ptr = "bg3_RGB",
-#endif
-    },
-    .tSize = {
-        .iWidth = 32,
-        .iHeight = 32,
-    },
-    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x2BE6C0,
-};
-
 const vsf_tgui_tile_buf_root_t ic_autorenew_black_18dp_RGBA  = {
     .use_as__vsf_tgui_tile_core_t = {
         .Attribute = {
@@ -97,7 +40,7 @@ const vsf_tgui_tile_buf_root_t ic_autorenew_black_18dp_RGBA  = {
         .iWidth = 18,
         .iHeight = 18,
     },
-    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x2BF2C0,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x00,
 };
 
 const vsf_tgui_tile_buf_root_t ic_build_black_18dp_RGBA  = {
@@ -116,7 +59,7 @@ const vsf_tgui_tile_buf_root_t ic_build_black_18dp_RGBA  = {
         .iWidth = 18,
         .iHeight = 18,
     },
-    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x2BF7D0,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x510,
 };
 
 const vsf_tgui_tile_buf_root_t ic_done_black_18dp_RGBA  = {
@@ -135,7 +78,7 @@ const vsf_tgui_tile_buf_root_t ic_done_black_18dp_RGBA  = {
         .iWidth = 18,
         .iHeight = 18,
     },
-    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x2BFCE0,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0xA20,
 };
 
 const vsf_tgui_tile_buf_root_t ic_find_in_page_white_18dp_RGBA  = {
@@ -154,7 +97,7 @@ const vsf_tgui_tile_buf_root_t ic_find_in_page_white_18dp_RGBA  = {
         .iWidth = 18,
         .iHeight = 18,
     },
-    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x2C01F0,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0xF30,
 };
 
 const vsf_tgui_tile_buf_root_t ic_help_outline_black_18dp_RGBA  = {
@@ -173,7 +116,7 @@ const vsf_tgui_tile_buf_root_t ic_help_outline_black_18dp_RGBA  = {
         .iWidth = 18,
         .iHeight = 18,
     },
-    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x2C0700,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x1440,
 };
 
 const vsf_tgui_tile_buf_root_t ic_https_white_18dp_RGBA  = {
@@ -192,7 +135,7 @@ const vsf_tgui_tile_buf_root_t ic_https_white_18dp_RGBA  = {
         .iWidth = 18,
         .iHeight = 18,
     },
-    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x2C0C10,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x1950,
 };
 
 const vsf_tgui_tile_buf_root_t ic_power_settings_new_18pt_RGBA  = {
@@ -211,7 +154,7 @@ const vsf_tgui_tile_buf_root_t ic_power_settings_new_18pt_RGBA  = {
         .iWidth = 18,
         .iHeight = 18,
     },
-    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x2C1120,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x1E60,
 };
 
 const vsf_tgui_tile_buf_root_t ic_settings_applications_RGBA  = {
@@ -230,7 +173,7 @@ const vsf_tgui_tile_buf_root_t ic_settings_applications_RGBA  = {
         .iWidth = 24,
         .iHeight = 24,
     },
-    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x2C1630,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x2370,
 };
 
 const vsf_tgui_tile_buf_root_t ic_settings_bluetooth_white_18dp_RGBA  = {
@@ -249,7 +192,7 @@ const vsf_tgui_tile_buf_root_t ic_settings_bluetooth_white_18dp_RGBA  = {
         .iWidth = 18,
         .iHeight = 18,
     },
-    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x2C1F30,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x2C70,
 };
 
 const vsf_tgui_tile_buf_root_t ic_settings_phone_RGBA  = {
@@ -268,13 +211,48 @@ const vsf_tgui_tile_buf_root_t ic_settings_phone_RGBA  = {
         .iWidth = 24,
         .iHeight = 24,
     },
-    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x2C2440,
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x3180,
 };
 
-const vsf_tgui_tile_t* tiles_list[13] = {
-    (const vsf_tgui_tile_t *)&bg1_RGB, //bg1:RGB, width: 200, height: 200
-    (const vsf_tgui_tile_t *)&bg2_RGB, //bg2:RGB, width: 1280, height: 718
-    (const vsf_tgui_tile_t *)&bg3_RGB, //bg3:RGB, width: 32, height: 32
+const vsf_tgui_tile_buf_root_t corner12_L  = {
+    .use_as__vsf_tgui_tile_core_t = {
+        .Attribute = {
+            .u2RootTileType = 0,
+            .u2ColorType = 2,
+            .u3ColorSize = 3,
+            .bIsRootTile = 1,
+        },
+#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
+        .name_ptr = "corner12_L",
+#endif
+    },
+    .tSize = {
+        .iWidth = 24,
+        .iHeight = 24,
+    },
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x3A80,
+};
+
+const vsf_tgui_tile_buf_root_t corner16_L  = {
+    .use_as__vsf_tgui_tile_core_t = {
+        .Attribute = {
+            .u2RootTileType = 0,
+            .u2ColorType = 2,
+            .u3ColorSize = 3,
+            .bIsRootTile = 1,
+        },
+#if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
+        .name_ptr = "corner16_L",
+#endif
+    },
+    .tSize = {
+        .iWidth = 32,
+        .iHeight = 32,
+    },
+    .ptBitmap = (vsf_tgui_disp_ram_uintptr_t)0x3CC0,
+};
+
+const vsf_tgui_tile_t* tiles_list[12] = {
     (const vsf_tgui_tile_t *)&ic_autorenew_black_18dp_RGBA, //ic_autorenew_black_18dp:RGBA, width: 18, height: 18
     (const vsf_tgui_tile_t *)&ic_build_black_18dp_RGBA, //ic_build_black_18dp:RGBA, width: 18, height: 18
     (const vsf_tgui_tile_t *)&ic_done_black_18dp_RGBA, //ic_done_black_18dp:RGBA, width: 18, height: 18
@@ -285,6 +263,8 @@ const vsf_tgui_tile_t* tiles_list[13] = {
     (const vsf_tgui_tile_t *)&ic_settings_applications_RGBA, //ic_settings_applications:RGBA, width: 24, height: 24
     (const vsf_tgui_tile_t *)&ic_settings_bluetooth_white_18dp_RGBA, //ic_settings_bluetooth_white_18dp:RGBA, width: 18, height: 18
     (const vsf_tgui_tile_t *)&ic_settings_phone_RGBA, //ic_settings_phone:RGBA, width: 24, height: 24
+    (const vsf_tgui_tile_t *)&corner12_L, //corner12:L, width: 24, height: 24
+    (const vsf_tgui_tile_t *)&corner16_L, //corner16:L, width: 32, height: 32
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
