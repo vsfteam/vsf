@@ -125,7 +125,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
             for (int i = 0; i < dimof(__cornor_tiles_align_mode); i++) {
                 const vsf_tgui_tile_t* tile_ptr = vsf_tgui_control_v_get_corner_tile(control_ptr, i);
                 if (tile_ptr) {
-                    vsf_tgui_control_v_draw_tile(control_ptr, dirty_region_ptr, tile_ptr, __cornor_tiles_align_mode[i], trans_rate, &regions[i]);
+                    vsf_tgui_control_v_draw_tile(control_ptr, dirty_region_ptr, tile_ptr, __cornor_tiles_align_mode[i], trans_rate, &regions[i], control_ptr->background_color);
                 } else {
                     memset(&regions[i], 0, sizeof(vsf_tgui_region_t));
                 }
@@ -223,7 +223,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
 #else
         uint8_t tile_trans_rate = 0xFF;
 #endif
-        vsf_tgui_control_v_draw_tile(control_ptr, dirty_region_ptr, ptTile, control_ptr->tBackground.tAlign, tile_trans_rate, NULL);
+        vsf_tgui_control_v_draw_tile(control_ptr, dirty_region_ptr, ptTile, control_ptr->tBackground.tAlign, tile_trans_rate, NULL, (vsf_tgui_sv_color_t){0});
     }
 
     return fsm_rt_cpl;

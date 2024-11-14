@@ -44,7 +44,8 @@ extern void vsf_tgui_control_v_draw_tile(const vsf_tgui_control_t* control_ptr,
                                          const vsf_tgui_tile_t* tile_ptr,
                                          const vsf_tgui_align_mode_t mode,
                                          const uint8_t trans_rate,
-                                         vsf_tgui_region_t* ptPlacedRegion);
+                                         vsf_tgui_region_t* ptPlacedRegion,
+                                         vsf_tgui_sv_color_t color);
 
 extern void vsf_tgui_control_v_draw_text(const vsf_tgui_control_t* control_ptr,
                                          const vsf_tgui_region_t* dirty_region_ptr,
