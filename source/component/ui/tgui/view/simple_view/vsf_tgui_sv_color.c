@@ -97,7 +97,9 @@ vsf_tgui_sv_color_t vsf_tgui_sv_rgb565_to_color(vsf_tgui_sv_color_rgb565_t rgb56
         .red   = rgb565_color.red   << 3,
         .green = rgb565_color.green << 2,
         .blue  = rgb565_color.blue  << 3,
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
         .alpha = rgb565_color.alpha,
+#endif
     };
     return color;
 #elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_BGR_565
@@ -151,7 +153,9 @@ vsf_tgui_sv_color_t vsf_tgui_sv_bgr565_to_color(vsf_tgui_sv_color_bgr565_t bgr56
         .red   = bgr565_color.red   >> 3,
         .green = bgr565_color.green >> 2,
         .blue  = bgr565_color.blue  >> 3,
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
         .alpha = bgr565_color.alpha,
+#endif
     };
     return color;
 #elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565
