@@ -35,9 +35,18 @@ vsf_tgui_sv_color_t vsf_tgui_sv_color_mix(vsf_tgui_sv_color_t color_0, vsf_tgui_
 {
     vsf_tgui_sv_color_t result;
 
-    result.red   = ((uint32_t)color_0.red   * mix + (uint32_t)color_1.red   * (255 - mix)) / 255;
-    result.green = ((uint32_t)color_0.green * mix + (uint32_t)color_1.green * (255 - mix)) / 255;
-    result.blue  = ((uint32_t)color_0.blue  * mix + (uint32_t)color_1.blue  * (255 - mix)) / 255;
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
+    result.value    = ((((color_0.value >> 8) & 0x00FF00FF) * mix) & 0xFF00FF00)
+                    + ((((color_0.value & 0x00FF00FF) * mix) >> 8) & 0x00FF00FF);
+    mix = ~mix;
+    result.value   += ((((color_1.value >> 8) & 0x00FF00FF) * mix) & 0xFF00FF00)
+                    + ((((color_1.value & 0x00FF00FF) * mix) >> 8) & 0x00FF00FF);
+#else
+    result.red      = ((uint32_t)color_0.red   * mix + (uint32_t)color_1.red   * (255 - mix)) / 255;
+    result.green    = ((uint32_t)color_0.green * mix + (uint32_t)color_1.green * (255 - mix)) / 255;
+    result.blue     = ((uint32_t)color_0.blue  * mix + (uint32_t)color_1.blue  * (255 - mix)) / 255;
+#endif
+
 #if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
     result.alpha = 0xFF;
 #endif
