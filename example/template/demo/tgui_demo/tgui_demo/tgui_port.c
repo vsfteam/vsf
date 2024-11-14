@@ -160,7 +160,7 @@ static inline void vsf_tgui_sdl_tile_get_pixel(const char* pixelmap_ptr, vsf_tgu
 
     VSF_TGUI_ASSERT(color_ptr != NULL);
 
-    if (type == VSF_TGUI_COLORTYPE_A) {
+    if (type == VSF_TGUI_TILE_COLORTYPE_A) {
         argb_color          = bg_color;
         argb_color.alpha    = *pixelmap_ptr++;
     } else {
@@ -168,7 +168,7 @@ static inline void vsf_tgui_sdl_tile_get_pixel(const char* pixelmap_ptr, vsf_tgu
         argb_color.green    = *pixelmap_ptr++;
         argb_color.blue     = *pixelmap_ptr++;
 
-        if (type == VSF_TGUI_COLORTYPE_RGBA) {
+        if (type == VSF_TILE_TGUI_COLORTYPE_RGBA) {
             argb_color.alpha = *pixelmap_ptr++;
         } else {
             argb_color.alpha = 0xFF;

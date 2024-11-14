@@ -23,9 +23,6 @@
 
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
 /*============================ MACROS ========================================*/
-#define VSF_TGUI_COLORTYPE_RGB         0
-#define VSF_TGUI_COLORTYPE_RGBA        1
-#define VSF_TGUI_COLORTYPE_A           3
 
 #define TILES_TEXT_LIST \
     "bg1\n" /*width: 200, height: 200, RGB*/ \

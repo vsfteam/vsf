@@ -350,10 +350,14 @@ typedef struct vsf_tgui_text_info_t {
 
 typedef VSF_TGUI_CFG_DRAM_POINTER_TYPE vsf_tgui_disp_ram_uintptr_t;
 
+#define VSF_TGUI_TILE_COLORTYPE_RGB         0
+#define VSF_TGUI_TILE_COLORTYPE_RGBA        1
+#define VSF_TGUI_TILE_COLORTYPE_A           2
+
 typedef struct vsf_tgui_tile_core_t {
     struct {
         uint8_t         u2RootTileType      : 2;    /* 0: buf tile, 1: index tile, 2 and 3 undefined*/
-        uint8_t         u2ColorType         : 2;    /* 0: rgb, 1: rgba, 3: alpha */
+        uint8_t         u2ColorType         : 2;    /* 0: rgb, 1: rgba, 2: alpha/graysacle */
         uint8_t         u3ColorSize         : 3;    /* 0: 1bit, 2: 4bit, 3: 8bit 4: 16bit, 5: 32bit, 6: 24bit */
         uint8_t         bIsRootTile         : 1;    /* 0: Child Tile, u3ColorSize and u4RootTileType have no meaning
                                                        1: Root Tile, u3ColorSize and u4RootTileType have meaning*/
