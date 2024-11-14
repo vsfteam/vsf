@@ -60,7 +60,8 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* location_ptr,
                         vsf_tgui_location_t* tile_ptrLocation,
                         vsf_tgui_size_t* size_ptr,
                         const vsf_tgui_tile_t* tile_ptr,
-                        uint_fast8_t trans_rate);
+                        uint_fast8_t trans_rate,
+                        vsf_tgui_sv_color_t color);
 
 extern
 vsf_tgui_size_t vsf_tgui_font_get_size(void* font_ptr, uint32_t char_u32);

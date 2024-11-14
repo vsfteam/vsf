@@ -119,17 +119,47 @@ typedef VSF_TGUI_CFG_COLOR_TYPE vsf_tgui_sv_color_t;
 /*============================ PROTOTYPES ====================================*/
 extern vsf_tgui_sv_color_t vsf_tgui_sv_color_mix(vsf_tgui_sv_color_t color_0, vsf_tgui_sv_color_t color_1, uint_fast8_t mix);
 
-extern bool vsf_tgui_sv_color_is_opaque(vsf_tgui_sv_color_t color);
-extern uint_fast8_t vsf_tgui_sv_color_get_trans_rate(vsf_tgui_sv_color_t color);
-extern void vsf_tgui_sv_color_set_trans_rate(vsf_tgui_sv_color_t* color_ptr, uint_fast8_t alpha);
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+#   define vsf_tgui_sv_color_get_trans_rate(__color)    ((__color).alpha)
+#   define vsf_tgui_sv_color_set_trans_rate(__color_ptr, __alpha)   do { (__color_ptr)->alpha = (__alpha); } while (0)
+#   define vsf_tgui_sv_color_is_opaque(__color)         ((__color).alpha == 0xFF)
+#else
+#   define vsf_tgui_sv_color_get_trans_rate(__color)    0xFF
+#   define vsf_tgui_sv_color_set_trans_rate(__color_ptr, __alpha)
+#   define vsf_tgui_sv_color_is_opaque(__color)         true
+#endif
 
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
+#   define vsf_tgui_sv_argb8888_to_color(__color)       (__color)
+#else
 extern vsf_tgui_sv_color_t vsf_tgui_sv_argb8888_to_color(vsf_tgui_sv_color_argb8888_t argb8888_color);
+#endif
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565
+#   define vsf_tgui_sv_rgb565_to_color(__color)         (__color)
+#else
 extern vsf_tgui_sv_color_t vsf_tgui_sv_rgb565_to_color(vsf_tgui_sv_color_rgb565_t rgb565_color);
+#endif
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_BGR_565
+#   define vsf_tgui_sv_bgr565_to_color(__color)         (__color)
+#else
 extern vsf_tgui_sv_color_t vsf_tgui_sv_bgr565_to_color(vsf_tgui_sv_color_bgr565_t bgr565_color);
+#endif
 
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
+#   define vsf_tgui_sv_color_to_argb8888(__color)       (__color)
+#else
 extern vsf_tgui_sv_color_argb8888_t vsf_tgui_sv_color_to_argb8888(vsf_tgui_sv_color_t color);
+#endif
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565
+#   define vsf_tgui_sv_color_to_rgb565(__color)         (__color)
+#else
 extern vsf_tgui_sv_color_rgb565_t   vsf_tgui_sv_color_to_rgb565(vsf_tgui_sv_color_t color);
+#endif
+#if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_BGR_565
+#   define vsf_tgui_sv_color_to_bgr565(__color)         (__color)
+#else
 extern vsf_tgui_sv_color_bgr565_t   vsf_tgui_sv_color_to_bgr565(vsf_tgui_sv_color_t color);
+#endif
 
 #endif
 

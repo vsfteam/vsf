@@ -154,22 +154,25 @@ static unsigned char* vsf_tgui_sdl_tile_get_pixelmap(const vsf_tgui_tile_t* tile
     }
 }
 
-static void vsf_tgui_sdl_tile_get_pixel(const char* pixelmap_ptr, vsf_tgui_sv_color_t* color_ptr, uint_fast8_t type)
+static inline void vsf_tgui_sdl_tile_get_pixel(const char* pixelmap_ptr, vsf_tgui_sv_color_t* color_ptr, uint_fast8_t type, vsf_tgui_sv_color_t bg_color)
 {
     vsf_tgui_sv_color_argb8888_t argb_color;
 
     VSF_TGUI_ASSERT(color_ptr != NULL);
 
-    argb_color.red   = *pixelmap_ptr++;
-    argb_color.green = *pixelmap_ptr++;
-    argb_color.blue  = *pixelmap_ptr++;
-
-    if (type == VSF_TGUI_COLORTYPE_RGBA) {
-        argb_color.alpha = *pixelmap_ptr++;
-    } else if (type == VSF_TGUI_COLORTYPE_RGB) {
-        argb_color.alpha = 0xFF;
+    if (type == VSF_TGUI_COLORTYPE_A) {
+        argb_color          = bg_color;
+        argb_color.alpha    = *pixelmap_ptr++;
     } else {
-        VSF_TGUI_ASSERT(0);
+        argb_color.red      = *pixelmap_ptr++;
+        argb_color.green    = *pixelmap_ptr++;
+        argb_color.blue     = *pixelmap_ptr++;
+
+        if (type == VSF_TGUI_COLORTYPE_RGBA) {
+            argb_color.alpha = *pixelmap_ptr++;
+        } else {
+            argb_color.alpha = 0xFF;
+        }
     }
 
     *color_ptr = vsf_tgui_sv_argb8888_to_color(argb_color);
@@ -339,7 +342,8 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* location_ptr,
                                      vsf_tgui_location_t* tile_location_ptr,
                                      vsf_tgui_size_t* size_ptr,
                                      const vsf_tgui_tile_t* tile_ptr,
-                                     uint_fast8_t trans_rate)
+                                     uint_fast8_t trans_rate,
+                                     vsf_tgui_sv_color_t color)
 {
     vsf_tgui_size_t tile_size;
     vsf_tgui_region_t display;
@@ -390,7 +394,7 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* location_ptr,
 
         for (uint16_t j = 0; j < display.tSize.iWidth; j++) {
             vsf_tgui_sv_color_t sv_color;
-            vsf_tgui_sdl_tile_get_pixel(data_ptr, &sv_color, tile_ptr->_.tCore.Attribute.u2ColorType);
+            vsf_tgui_sdl_tile_get_pixel(data_ptr, &sv_color, tile_ptr->_.tCore.Attribute.u2ColorType, color);
             data_ptr += pixel_size;
             info_ptr.pixmap[pixel_location] = __color_to_sdl_color(vsf_tgui_sv_color_mix(sv_color,
 			                                                              __sdl_color_to_color(info_ptr.pixmap[pixel_location]),

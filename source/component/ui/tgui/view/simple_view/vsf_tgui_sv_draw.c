@@ -293,7 +293,8 @@ void vsf_tgui_control_v_draw_tile(  const vsf_tgui_control_t* control_ptr,
                                         &resource_region.tLocation,
                                         &resource_region.tSize,
                                         tile_ptr,
-                                        trans_rate);
+                                        trans_rate,
+                                        control_ptr->background_color);
     } else {
     }
 }
