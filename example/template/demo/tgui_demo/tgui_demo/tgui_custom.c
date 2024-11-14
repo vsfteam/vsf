@@ -31,7 +31,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-static const vsf_tgui_tile_t __controls_container_corner_tiles[__CORNOR_TILE_NUM] = {
+static const vsf_tgui_tile_t __controls_container_corner_tiles[CORNOR_TILE_NUM] = {
     [CORNOR_TILE_IN_TOP_LEFT] = {
         .tChild = {
             .parent_ptr = (vsf_tgui_tile_core_t*)&bg1_RGB,
@@ -62,7 +62,7 @@ static const vsf_tgui_tile_t __controls_container_corner_tiles[__CORNOR_TILE_NUM
     },
 };
 
-static const vsf_tgui_tile_t __controls_label_corner_tiles[4] = {
+static const vsf_tgui_tile_t __controls_label_corner_tiles[CORNOR_TILE_NUM] = {
     [CORNOR_TILE_IN_TOP_LEFT] = {
         .tChild = {
             .tSize = {.iWidth = 16, .iHeight = 16, },

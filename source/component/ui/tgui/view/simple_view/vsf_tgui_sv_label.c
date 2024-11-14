@@ -99,7 +99,7 @@ vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* l
 
 #if VSF_TGUI_CFG_SV_SUPPORT_CORNER_TILE == ENABLED
     if (label_ptr->show_corner_tile) {
-        vsf_tgui_region_t regions[__CORNOR_TILE_NUM] = { {0} };
+        vsf_tgui_region_t regions[CORNOR_TILE_NUM] = { {0} };
 
         for (int i = 0; i < dimof(regions); i++) {
             const vsf_tgui_tile_t* tile_ptr = vsf_tgui_control_v_get_corner_tile((vsf_tgui_control_t *)label_ptr, i);

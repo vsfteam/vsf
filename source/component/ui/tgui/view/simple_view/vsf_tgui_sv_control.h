@@ -39,7 +39,7 @@ typedef enum vsf_tgui_sv_cornor_tile_mode_t {
     CORNOR_TILE_IN_BOTTOM_LEFT,
     CORNOR_TILE_IN_BOTTOM_RIGHT,
 
-    __CORNOR_TILE_NUM,
+    CORNOR_TILE_NUM,
 } vsf_tgui_sv_cornor_tile_mode_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
