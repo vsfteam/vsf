@@ -300,15 +300,22 @@ void vsf_tgui_sv_port_draw_rect(vsf_tgui_location_t* location_ptr,
     vsf_tgui_port_info_t info_ptr;
     __vsf_tgui_get_info(location_ptr, &info_ptr);
 
-    for (int16_t i = 0; i < height; i++) {
-        uint32_t pixel_location = i * info_ptr.pixmap_width + info_ptr.pixmap_location_x;
-        for (int16_t j = 0; j < width; j++) {
-            if (rect_trans_rate != 0xFF) {
-                info_ptr.pixmap[pixel_location] = __color_to_sdl_color(vsf_tgui_sv_color_mix(rect_color, __sdl_color_to_color(info_ptr.pixmap[pixel_location]), rect_trans_rate));
-            } else {
-                info_ptr.pixmap[pixel_location] = __color_to_sdl_color(rect_color);
+    if (rect_trans_rate != 0xFF) {
+        for (int16_t i = 0; i < height; i++) {
+            uint32_t pixel_location = i * info_ptr.pixmap_width + info_ptr.pixmap_location_x;
+            for (int16_t j = 0; j < width; j++) {
+                info_ptr.pixmap[pixel_location] = __color_to_sdl_color(vsf_tgui_sv_color_mix(rect_color,
+                    __sdl_color_to_color(info_ptr.pixmap[pixel_location]), rect_trans_rate));
+                pixel_location++;
             }
-            pixel_location++;
+        }
+    } else {
+        for (int16_t i = 0; i < height; i++) {
+            uint32_t pixel_location = i * info_ptr.pixmap_width + info_ptr.pixmap_location_x;
+            for (int16_t j = 0; j < width; j++) {
+                info_ptr.pixmap[pixel_location] = __color_to_sdl_color(rect_color);
+                pixel_location++;
+            }
         }
     }
     __vsf_tgui_draw_wait_for_done();
@@ -397,11 +404,11 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* location_ptr,
 
             if (is_mask) {
                 info_ptr.pixmap[pixel_location] = __color_to_sdl_color(vsf_tgui_sv_color_mix(sv_color, bg_color,
-                                                                          vsf_tgui_sv_color_get_trans_rate(sv_color) * trans_rate / 255));
+                    (vsf_tgui_sv_color_get_trans_rate(sv_color) * trans_rate) >> 8));
             } else {
                 info_ptr.pixmap[pixel_location] = __color_to_sdl_color(vsf_tgui_sv_color_mix(sv_color,
-                                                                          __sdl_color_to_color(info_ptr.pixmap[pixel_location]),
-                                                                          vsf_tgui_sv_color_get_trans_rate(sv_color) * trans_rate / 255));
+                    __sdl_color_to_color(info_ptr.pixmap[pixel_location]),
+                    (vsf_tgui_sv_color_get_trans_rate(sv_color) * trans_rate) >> 8));
             }
             pixel_location++;
         }
@@ -475,7 +482,8 @@ void vsf_tgui_sv_port_draw_char(vsf_tgui_location_t* location_ptr,
 
         for (uint16_t j = 0; j < real_bitmap_region.tSize.iWidth; j++) {
             uint8_t mix = glyph->bitmap.buffer[bitmap_location++];
-            info_ptr.pixmap[pixel_location] = __color_to_sdl_color(vsf_tgui_sv_color_mix(char_color, __sdl_color_to_color(info_ptr.pixmap[pixel_location]), ((uint16_t)mix * trans_rate) / 255));
+            info_ptr.pixmap[pixel_location] = __color_to_sdl_color(vsf_tgui_sv_color_mix(char_color,
+                __sdl_color_to_color(info_ptr.pixmap[pixel_location]), ((uint16_t)mix * trans_rate) >> 8));
             pixel_location++;
         }
     }
