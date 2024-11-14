@@ -154,30 +154,6 @@ static unsigned char* vsf_tgui_sdl_tile_get_pixelmap(const vsf_tgui_tile_t* tile
     }
 }
 
-static inline void vsf_tgui_sdl_tile_get_pixel(const char* pixelmap_ptr, vsf_tgui_sv_color_t* color_ptr, uint_fast8_t type, vsf_tgui_sv_color_t bg_color)
-{
-    vsf_tgui_sv_color_argb8888_t argb_color;
-
-    VSF_TGUI_ASSERT(color_ptr != NULL);
-
-    if (type == VSF_TGUI_TILE_COLORTYPE_A) {
-        argb_color          = bg_color;
-        argb_color.alpha    = *pixelmap_ptr++;
-    } else {
-        argb_color.red      = *pixelmap_ptr++;
-        argb_color.green    = *pixelmap_ptr++;
-        argb_color.blue     = *pixelmap_ptr++;
-
-        if (type == VSF_TGUI_TILE_COLORTYPE_RGBA) {
-            argb_color.alpha = *pixelmap_ptr++;
-        } else {
-            argb_color.alpha = 0xFF;
-        }
-    }
-
-    *color_ptr = vsf_tgui_sv_argb8888_to_color(argb_color);
-}
-
 /*********************************************************************************/
 static uint8_t freetype_get_char_height(FT_Face face)
 {
@@ -343,7 +319,8 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* location_ptr,
                                      vsf_tgui_size_t* size_ptr,
                                      const vsf_tgui_tile_t* tile_ptr,
                                      uint_fast8_t trans_rate,
-                                     vsf_tgui_sv_color_t color)
+                                     vsf_tgui_sv_color_t color,
+                                     vsf_tgui_sv_color_t bg_color)
 {
     vsf_tgui_size_t tile_size;
     vsf_tgui_region_t display;
@@ -375,10 +352,14 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* location_ptr,
         return;
     }
 
-    if (tile_ptr->_.tCore.Attribute.u3ColorSize == VSF_TGUI_COLORSIZE_32IT) {
+    if (tile_ptr->_.tCore.Attribute.u3ColorSize == VSF_TGUI_COLORSIZE_32BIT) {
         pixel_size = 4;
-    } else if (tile_ptr->_.tCore.Attribute.u3ColorSize == VSF_TGUI_COLORSIZE_24IT) {
+    } else if (tile_ptr->_.tCore.Attribute.u3ColorSize == VSF_TGUI_COLORSIZE_24BIT) {
         pixel_size = 3;
+    } else if (tile_ptr->_.tCore.Attribute.u3ColorSize == VSF_TGUI_COLORSIZE_16BIT) {
+        pixel_size = 2;
+    } else if (tile_ptr->_.tCore.Attribute.u3ColorSize == VSF_TGUI_COLORSIZE_8BIT) {
+        pixel_size = 1;
     } else {
         VSF_TGUI_ASSERT(0);
     }
@@ -387,18 +368,41 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* location_ptr,
     __vsf_tgui_get_info(location_ptr, &info_ptr);
     pixelmap_u8 = vsf_tgui_sdl_tile_get_pixelmap(tile_ptr);
 
+    uint_fast8_t type = tile_ptr->_.tCore.Attribute.u2ColorType;
+    bool is_mask = type == VSF_TGUI_TILE_COLORTYPE_A;
+    vsf_tgui_sv_color_t sv_color;
+    vsf_tgui_sv_color_argb8888_t argb_color;
+
     for (uint16_t i = 0; i < display.tSize.iHeight; i++) {
         uint32_t u32_offset = pixel_size * ((tile_location_ptr->iY + i) * tile_size.iWidth + tile_location_ptr->iX);
         const char* data_ptr = (const char*)(pixelmap_u8 + u32_offset);
         uint32_t pixel_location = i * info_ptr.pixmap_width + info_ptr.pixmap_location_x;
 
         for (uint16_t j = 0; j < display.tSize.iWidth; j++) {
-            vsf_tgui_sv_color_t sv_color;
-            vsf_tgui_sdl_tile_get_pixel(data_ptr, &sv_color, tile_ptr->_.tCore.Attribute.u2ColorType, color);
-            data_ptr += pixel_size;
-            info_ptr.pixmap[pixel_location] = __color_to_sdl_color(vsf_tgui_sv_color_mix(sv_color,
-			                                                              __sdl_color_to_color(info_ptr.pixmap[pixel_location]),
-																		  vsf_tgui_sv_color_get_trans_rate(sv_color) * trans_rate / 255));
+            if (is_mask) {
+                argb_color          = color;
+                argb_color.alpha    = *data_ptr++;
+            } else {
+                argb_color.red      = *data_ptr++;
+                argb_color.green    = *data_ptr++;
+                argb_color.blue     = *data_ptr++;
+
+                if (type == VSF_TGUI_TILE_COLORTYPE_RGBA) {
+                    argb_color.alpha = *data_ptr++;
+                } else {
+                    argb_color.alpha = 0xFF;
+                }
+            }
+            sv_color = vsf_tgui_sv_argb8888_to_color(argb_color);
+
+            if (is_mask) {
+                info_ptr.pixmap[pixel_location] = __color_to_sdl_color(vsf_tgui_sv_color_mix(sv_color, bg_color,
+                                                                          vsf_tgui_sv_color_get_trans_rate(sv_color) * trans_rate / 255));
+            } else {
+                info_ptr.pixmap[pixel_location] = __color_to_sdl_color(vsf_tgui_sv_color_mix(sv_color,
+                                                                          __sdl_color_to_color(info_ptr.pixmap[pixel_location]),
+                                                                          vsf_tgui_sv_color_get_trans_rate(sv_color) * trans_rate / 255));
+            }
             pixel_location++;
         }
     }
