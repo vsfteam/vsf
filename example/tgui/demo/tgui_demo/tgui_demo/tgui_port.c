@@ -39,10 +39,6 @@
 #   define VSF_TGUI_CFG_SV_PORT_SET_INIT_BG_COLOR   ENABLED
 #endif
 
-#ifndef VSF_TGUI_CFG_SV_PORT_INIT_BG_COLOR
-#   define VSF_TGUI_CFG_SV_PORT_INIT_BG_COLOR       VSF_TGUI_COLOR_WHITE
-#endif
-
 #ifndef VSF_TGUI_CFG_SV_PORT_LOG
 #   define VSF_TGUI_CFG_SV_PORT_LOG                 DISABLED
 #endif
@@ -539,12 +535,6 @@ vsf_tgui_region_t* vsf_tgui_v_refresh_loop_begin( vsf_tgui_t* gui_ptr, const vsf
                          current_region_ptr->tLocation.iY,
                          current_region_ptr->tSize.iWidth,
                          current_region_ptr->tSize.iHeight);
-
-            vk_disp_sdl_pixel_t* color_ptr = __vsf_tgui_port.disp->ui_data;
-            uint32_t sdl_color = __color_to_sdl_color(VSF_TGUI_CFG_SV_PORT_INIT_BG_COLOR);
-            for (int i = 0; i < __vsf_tgui_port.bitmap_size; i++) {
-                color_ptr[i] = sdl_color;
-            }
         }
     }
 
