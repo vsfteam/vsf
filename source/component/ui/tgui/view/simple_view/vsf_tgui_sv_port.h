@@ -64,14 +64,6 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* location_ptr,
                         vsf_tgui_sv_color_t color,
                         vsf_tgui_sv_color_t bg_color);
 
-extern
-vsf_tgui_size_t vsf_tgui_font_get_size(void* font_ptr, uint32_t char_u32);
-
-extern
-uint8_t vsf_tgui_font_get_pixel_color(void* font_ptr,
-                                        uint32_t char_u32,
-                                        vsf_tgui_location_t* location_ptr);
-
 #endif
 
 #endif
