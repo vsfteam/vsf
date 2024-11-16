@@ -61,11 +61,13 @@ static fsm_rt_t __on_button_ok_click(   vsf_tgui_control_t* node_ptr,
 static fsm_rt_t __on_button_lap_all_pointer_evt(vsf_tgui_control_t* node_ptr,
                                                 vsf_msgt_msg_t* ptMSG);
 #if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
-static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_control_t* node_ptr,
+static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_t *gui_ptr,
+                                                vsf_tgui_control_t* node_ptr,
                                                 vsf_msgt_msg_t* ptMSG);
 #endif
 #if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
-static fsm_rt_t __on_list_post_refresh( vsf_tgui_list_t* ptList,
+static fsm_rt_t __on_list_post_refresh( vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_list_t* ptList,
                                         vsf_tgui_refresh_evt_t* event_ptr);
 
 static fsm_rt_t __on_list_sliding_started(  vsf_tgui_list_t* ptList,
@@ -535,7 +537,8 @@ static fsm_rt_t __on_button_lap_all_pointer_evt(vsf_tgui_control_t* node_ptr,
 
 
 #if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
-static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_control_t* control_ptr,
+static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_t *gui_ptr,
+                                            vsf_tgui_control_t* control_ptr,
                                             vsf_msgt_msg_t* ptMSG)
 {
     vsf_tgui_refresh_evt_t *event_ptr = (vsf_tgui_refresh_evt_t *)ptMSG;
@@ -552,7 +555,8 @@ static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_control_t* control_ptr,
         tRegion.tSize.iHeight = 2;
         tRegion.tSize.iWidth -= 8;
 
-        vsf_tgui_control_v_draw_rect(   control_ptr,
+        vsf_tgui_control_v_draw_rect(   gui_ptr,
+                                        control_ptr,
                                         ptDirtyRegion,
                                         &tRegion,
                                         tColor);
@@ -579,7 +583,8 @@ static fsm_rt_t __on_list_sliding_stopped(  vsf_tgui_list_t* ptList,
     return fsm_rt_cpl;
 }
 
-static fsm_rt_t __on_list_post_refresh( vsf_tgui_list_t* ptList,
+static fsm_rt_t __on_list_post_refresh( vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_list_t* ptList,
                                         vsf_tgui_refresh_evt_t* event_ptr)
 {
 
@@ -602,12 +607,14 @@ static fsm_rt_t __on_list_post_refresh( vsf_tgui_list_t* ptList,
         return fsm_rt_cpl;
     }
 
-    vsf_tgui_control_v_draw_rect(   (const vsf_tgui_control_t *)ptList,
+    vsf_tgui_control_v_draw_rect(   gui_ptr,
+                                    (const vsf_tgui_control_t *)ptList,
                                     ptDirtyRegion,
                                     &tScrollbarRegion.tTrack,
                                     VSF_TGUI_SCROLLBAR_TRACK_PIECE_COLOR_WHITE);
 
-    vsf_tgui_control_v_draw_rect(   (const vsf_tgui_control_t *)ptList,
+    vsf_tgui_control_v_draw_rect(   gui_ptr,
+                                    (const vsf_tgui_control_t *)ptList,
                                     ptDirtyRegion,
                                     &tScrollbarRegion.tBar,
                                     VSF_TGUI_SCROLLBAR_COLOR_BLUE);

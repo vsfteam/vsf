@@ -48,7 +48,7 @@ declare_class(vsf_tgui_t)
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
-static fsm_rt_t __vsf_tgui_panel_v_rendering(
+static fsm_rt_t __vsf_tgui_panel_v_rendering(vsf_tgui_t *gui_ptr,
                                         vsf_tgui_panel_t* ptPanel,
                                         vsf_tgui_region_t* ptDirtyRegion,
                                         vsf_tgui_control_refresh_mode_t tMode);
@@ -58,23 +58,25 @@ static fsm_rt_t __vsf_tgui_panel_v_rendering(
 static const i_tgui_control_methods_t c_tVPanel= {
 
     .tView = {
-        .Init =     (vsf_tgui_method_t*)&vsf_tgui_panel_v_init,
-        .Depose =   (vsf_tgui_method_t*)&vsf_tgui_panel_v_depose,
+        .Init =     (vsf_tgui_v_method_t*)&vsf_tgui_panel_v_init,
+        .Depose =   (vsf_tgui_v_method_t*)&vsf_tgui_panel_v_depose,
         .Render =   (vsf_tgui_v_method_render_t *)&__vsf_tgui_panel_v_rendering,
         .ContainerPostRender = (vsf_tgui_v_method_render_t *)&vsf_tgui_panel_v_post_rendering,
-        .Update =   (vsf_tgui_method_t *)&vsf_tgui_panel_v_update,
+        .Update =   (vsf_tgui_v_method_t *)&vsf_tgui_panel_v_update,
     },
-    .Init =     (vsf_tgui_method_t*)&vk_tgui_panel_init,
-    .Update =   (vsf_tgui_method_t*)&vk_tgui_panel_update,
+    .Init =     (vsf_tgui_control_method_t*)&vk_tgui_panel_init,
+    .Update =   (vsf_tgui_control_method_t*)&vk_tgui_panel_update,
 
 };
 
 /*============================ IMPLEMENTATION ================================*/
 
-fsm_rt_t vsf_tgui_panel_msg_handler( vsf_tgui_panel_t* control_ptr,
+fsm_rt_t vsf_tgui_panel_msg_handler(vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_panel_t* control_ptr,
                                         vsf_tgui_msg_t* ptMSG)
 {
-    return __vsf_tgui_control_msg_handler(  (vsf_tgui_control_t *)control_ptr,
+    return __vsf_tgui_control_msg_handler(  gui_ptr,
+                                            (vsf_tgui_control_t *)control_ptr,
                                             ptMSG,
                                             &c_tVPanel);
 }
@@ -120,11 +122,12 @@ fsm_rt_t vk_tgui_panel_init(vsf_tgui_panel_t* ptPanel)
     return fsm_rt_on_going;
 }
 
-static fsm_rt_t __vsf_tgui_panel_v_rendering(vsf_tgui_panel_t* ptPanel,
+static fsm_rt_t __vsf_tgui_panel_v_rendering(vsf_tgui_t *gui_ptr,
+                                            vsf_tgui_panel_t* ptPanel,
                                             vsf_tgui_region_t* ptDirtyRegion,
                                             vsf_tgui_control_refresh_mode_t tMode)
 {
-    if (fsm_rt_cpl == vsf_tgui_panel_v_rendering(ptPanel, ptDirtyRegion, tMode)) {
+    if (fsm_rt_cpl == vsf_tgui_panel_v_rendering(gui_ptr, ptPanel, ptDirtyRegion, tMode)) {
     #if VSF_TGUI_CFG_PANEL_HAS_LABEL == ENABLED
         vsf_tgui_label_t* ptLabel = &(ptPanel->tTitleLabel);
         if (    (NULL != ptPanel->tTitle.tString.pstrText)
@@ -140,7 +143,7 @@ static fsm_rt_t __vsf_tgui_panel_v_rendering(vsf_tgui_panel_t* ptPanel,
                                                 (const vsf_tgui_control_t *)ptLabel,
                                                 &tRegion)) {
 
-                return vsf_tgui_label_v_rendering(  ptLabel,
+                return vsf_tgui_label_v_rendering(gui_ptr, ptLabel,
                                                 &tRegion,
                                                 VSF_TGUI_CONTROL_REFRESHED_BY_PARENT);
             }

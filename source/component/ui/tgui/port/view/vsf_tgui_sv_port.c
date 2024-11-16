@@ -18,7 +18,8 @@
  /*============================ INCLUDES ======================================*/
 
 #define __VSF_DISP_CLASS_INHERIT__
-#include "vsf.h"
+#define __VSF_TGUI_CLASS_INHERIT
+#include "../../vsf_tgui.h"
 
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
 
@@ -33,14 +34,6 @@
 
 #ifndef VSF_TGUI_CFG_SV_PORT_LOG
 #   define VSF_TGUI_CFG_SV_PORT_LOG                 DISABLED
-#endif
-
-#ifndef VSF_TGUI_CFG_SV_REFRESH_RATE
-#   define VSF_TGUI_CFG_SV_REFRESH_RATE             ENABLED
-#endif
-
-#ifndef VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY
-#   define VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY         DISABLED
 #endif
 
 #if VSF_TGUI_CFG_SV_PORT_LOG != ENABLED
@@ -91,28 +84,8 @@ typedef struct vsf_tgui_sv_port_info_t {
     uint32_t pixmap_location_x;
 } vsf_tgui_sv_port_info_t;
 
-typedef struct vsf_tgui_sv_port_t {
-    vk_disp_t *disp;
-    size_t pfb_size;
-
-    bool is_ready;
-#if VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY == ENABLED
-    volatile bool is_draw_ready;
-#endif
-    vsf_tgui_region_t request_region;
-    vsf_tgui_region_t current_region;
-#if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
-    vsf_systimer_tick_t start_cnt;
-    uint16_t refresh_cnt;
-    uint16_t fps;
-#endif
-} vsf_tgui_sv_port_t;
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
-
-static vsf_tgui_sv_port_t __vsf_tgui_sv_port;
-
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -123,30 +96,20 @@ unsigned char* vsf_tgui_tile_get_pixelmap(const vsf_tgui_tile_t *tile_ptr)
     return NULL;
 }
 
-static void __vsf_tgui_get_info(vsf_tgui_location_t *location_ptr, vsf_tgui_sv_port_info_t *info_ptr)
-{
-    vk_disp_t *disp = __vsf_tgui_sv_port.disp;
-    vsf_tgui_region_t *current_region_ptr = &__vsf_tgui_sv_port.current_region;
-
-    info_ptr->pixmap = disp->ui_data;
-    info_ptr->pixmap_width = current_region_ptr->tSize.iWidth;
-    info_ptr->pixmap_location_x = (location_ptr->iY - current_region_ptr->tLocation.iY) * info_ptr->pixmap_width
-        + location_ptr->iX - current_region_ptr->tLocation.iX;
-}
-
 #if VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY == ENABLED
 static void __vsf_tgui_draw_debug_on_ready(vk_disp_t *disp)
 {
-    __vsf_tgui_sv_port.is_draw_ready = true;
+    vsf_tgui_t *gui_ptr = (vsf_tgui_t *)disp->ui_data;
+    gui_ptr->is_draw_ready = true;
 }
 
-static void __vsf_tgui_draw_wait_for_done(void)
+static void __vsf_tgui_draw_wait_for_done(vsf_tgui_t *gui_ptr)
 {
-    vk_disp_t *disp = __vsf_tgui_sv_port.disp;
+    vk_disp_t *disp = gui_ptr->disp;
     vk_disp_on_ready_t old_ready_func = disp->ui_on_ready;
     disp->ui_on_ready = __vsf_tgui_draw_debug_on_ready;
-    __vsf_tgui_sv_port.is_draw_ready = false;
-    vsf_tgui_region_t *current_region_ptr = &__vsf_tgui_sv_port.current_region;
+    gui_ptr->is_draw_ready = false;
+    vsf_tgui_region_t *current_region_ptr = &gui_ptr->current_region;
     vk_disp_area_t area = {
         .pos = {
             .x = current_region_ptr->tLocation.iX,
@@ -157,18 +120,19 @@ static void __vsf_tgui_draw_wait_for_done(void)
             .y = current_region_ptr->tSize.iHeight,
         },
     };
-    vk_disp_refresh(disp, &area, disp->ui_data);
-    while (!__vsf_tgui_sv_port.is_draw_ready);
+    vk_disp_refresh(disp, &area, gui_ptr->pfb);
+    while (!gui_ptr->is_draw_ready);
     disp->ui_on_ready = old_ready_func;
 }
 #else
-static void __vsf_tgui_draw_wait_for_done(void)
+static void __vsf_tgui_draw_wait_for_done(vsf_tgui_t *gui_ptr)
 {
 }
 #endif
 
 
-void vsf_tgui_sv_port_draw_rect(vsf_tgui_location_t *location_ptr,
+void vsf_tgui_sv_port_draw_rect(vsf_tgui_t *gui_ptr,
+                                vsf_tgui_location_t *location_ptr,
                                 vsf_tgui_size_t *size_ptr,
                                 vsf_tgui_sv_color_t rect_color)
 {
@@ -194,30 +158,34 @@ void vsf_tgui_sv_port_draw_rect(vsf_tgui_location_t *location_ptr,
                  "[Simple View Port] draw rect(%x) in (x:%d, y:%d), size(w:%d, h:%d)" VSF_TRACE_CFG_LINEEND,
                  rect_color.value, location_ptr->iX, location_ptr->iY, size_ptr->iWidth, size_ptr->iHeight);
 
-    vsf_tgui_sv_port_info_t info;
-    __vsf_tgui_get_info(location_ptr, &info);
+    vsf_tgui_region_t *current_region_ptr = &gui_ptr->current_region;
+    vsf_tgui_disp_pixel_t *pixmap = (vsf_tgui_disp_pixel_t *)gui_ptr->pfb;
+    uint32_t pixmap_width = current_region_ptr->tSize.iWidth;
+    uint32_t pixmap_location_x = (location_ptr->iY - current_region_ptr->tLocation.iY) * pixmap_width
+        + location_ptr->iX - current_region_ptr->tLocation.iX;
 
     if (rect_trans_rate != 0xFF) {
         for (int16_t i = 0; i < height; i++) {
-            uint32_t pixel_location = i * info.pixmap_width + info.pixmap_location_x;
+            uint32_t pixel_location = i * pixmap_width + pixmap_location_x;
             for (int16_t j = 0; j < width; j++) {
-                info.pixmap[pixel_location++] = __tgui_color_to_disp_color(vsf_tgui_sv_color_mix(rect_color,
-                    __disp_color_to_tgui_color(info.pixmap[pixel_location]), rect_trans_rate));
+                pixmap[pixel_location++] = __tgui_color_to_disp_color(vsf_tgui_sv_color_mix(rect_color,
+                    __disp_color_to_tgui_color(pixmap[pixel_location]), rect_trans_rate));
             }
         }
     } else {
         vsf_tgui_disp_pixel_t disp_color = __tgui_color_to_disp_color(rect_color);
         for (int16_t i = 0; i < height; i++) {
-            uint32_t pixel_location = i * info.pixmap_width + info.pixmap_location_x;
+            uint32_t pixel_location = i * pixmap_width + pixmap_location_x;
             for (int16_t j = 0; j < width; j++) {
-                info.pixmap[pixel_location++] = disp_color;
+                pixmap[pixel_location++] = disp_color;
             }
         }
     }
-    __vsf_tgui_draw_wait_for_done();
+    __vsf_tgui_draw_wait_for_done(gui_ptr);
 }
 
-void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t *location_ptr,
+void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_t *gui_ptr,
+                                     vsf_tgui_location_t *location_ptr,
                                      vsf_tgui_location_t *tile_location_ptr,
                                      vsf_tgui_size_t *size_ptr,
                                      const vsf_tgui_tile_t *tile_ptr,
@@ -267,8 +235,11 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t *location_ptr,
         VSF_TGUI_ASSERT(0);
     }
 
-    vsf_tgui_sv_port_info_t info;
-    __vsf_tgui_get_info(location_ptr, &info);
+    vsf_tgui_region_t *current_region_ptr = &gui_ptr->current_region;
+    vsf_tgui_disp_pixel_t *pixmap = (vsf_tgui_disp_pixel_t *)gui_ptr->pfb;
+    uint32_t pixmap_width = current_region_ptr->tSize.iWidth;
+    uint32_t pixmap_location_x = (location_ptr->iY - current_region_ptr->tLocation.iY) * pixmap_width
+        + location_ptr->iX - current_region_ptr->tLocation.iX;
     pixelmap_u8 = vsf_tgui_tile_get_pixelmap(tile_ptr);
 
     uint_fast8_t type = tile_ptr->_.tCore.Attribute.u2ColorType;
@@ -279,7 +250,7 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t *location_ptr,
     for (uint16_t i = 0; i < display.tSize.iHeight; i++) {
         uint32_t u32_offset = pixel_size * ((tile_location_ptr->iY + i) * tile_size.iWidth + tile_location_ptr->iX);
         const char *data_ptr = (const char*)(pixelmap_u8 + u32_offset);
-        uint32_t pixel_location = i * info.pixmap_width + info.pixmap_location_x;
+        uint32_t pixel_location = i * pixmap_width + pixmap_location_x;
 
         for (uint16_t j = 0; j < display.tSize.iWidth; j++) {
             if (is_mask) {
@@ -299,20 +270,21 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t *location_ptr,
             sv_color = vsf_tgui_sv_argb8888_to_color(argb_color);
 
             if (is_mask) {
-                info.pixmap[pixel_location] = __tgui_color_to_disp_color(vsf_tgui_sv_color_mix(sv_color, bg_color,
+                pixmap[pixel_location] = __tgui_color_to_disp_color(vsf_tgui_sv_color_mix(sv_color, bg_color,
                     (vsf_tgui_sv_color_get_trans_rate(sv_color) * trans_rate) >> 8));
             } else {
-                info.pixmap[pixel_location] = __tgui_color_to_disp_color(vsf_tgui_sv_color_mix(sv_color,
-                    __disp_color_to_tgui_color(info.pixmap[pixel_location]),
+                pixmap[pixel_location] = __tgui_color_to_disp_color(vsf_tgui_sv_color_mix(sv_color,
+                    __disp_color_to_tgui_color(pixmap[pixel_location]),
                     (vsf_tgui_sv_color_get_trans_rate(sv_color) * trans_rate) >> 8));
             }
             pixel_location++;
         }
     }
-    __vsf_tgui_draw_wait_for_done();
+    __vsf_tgui_draw_wait_for_done(gui_ptr);
 }
 
-void vsf_tgui_sv_port_draw_char(vsf_tgui_location_t *location_ptr,
+void vsf_tgui_sv_port_draw_char(vsf_tgui_t *gui_ptr,
+                                vsf_tgui_location_t *location_ptr,
                                 vsf_tgui_location_t *font_location_ptr,
                                 vsf_tgui_size_t *size_ptr,
                                 uint8_t font_index,
@@ -347,23 +319,26 @@ void vsf_tgui_sv_port_draw_char(vsf_tgui_location_t *location_ptr,
 
     uint_fast8_t trans_rate = vsf_tgui_sv_color_get_trans_rate(char_color);
 
-    vsf_tgui_sv_port_info_t info;
-    __vsf_tgui_get_info(location_ptr, &info);
+    vsf_tgui_region_t *current_region_ptr = &gui_ptr->current_region;
+    vsf_tgui_disp_pixel_t *pixmap = (vsf_tgui_disp_pixel_t *)gui_ptr->pfb;
+    uint32_t pixmap_width = current_region_ptr->tSize.iWidth;
+    uint32_t pixmap_location_x = (location_ptr->iY - current_region_ptr->tLocation.iY) * pixmap_width
+        + location_ptr->iX - current_region_ptr->tLocation.iX;
 
     for (uint16_t i = 0; i < real_bitmap_region.tSize.iHeight; i++) {
-        uint32_t pixel_location = (i + resource_draw_location.iY) * info.pixmap_width + (info.pixmap_location_x + resource_draw_location.iX);
+        uint32_t pixel_location = (i + resource_draw_location.iY) * pixmap_width + (pixmap_location_x + resource_draw_location.iX);
         uint32_t bitmap_location = (i + bitmap_draw_location.iY) * bitmap_region.tSize.iWidth + bitmap_draw_location.iX;
 
         for (uint16_t j = 0; j < real_bitmap_region.tSize.iWidth; j++) {
             uint8_t mix = bitmap[bitmap_location++];
-            info.pixmap[pixel_location] = __tgui_color_to_disp_color(vsf_tgui_sv_color_mix(char_color,
-                __disp_color_to_tgui_color(info.pixmap[pixel_location]), ((uint16_t)mix * trans_rate) >> 8));
+            pixmap[pixel_location] = __tgui_color_to_disp_color(vsf_tgui_sv_color_mix(char_color,
+                __disp_color_to_tgui_color(pixmap[pixel_location]), ((uint16_t)mix * trans_rate) >> 8));
             pixel_location++;
         }
     }
     vsf_tgui_font_release_char(font_index, char_u32, bitmap);
 
-    __vsf_tgui_draw_wait_for_done();
+    __vsf_tgui_draw_wait_for_done(gui_ptr);
 }
 
 /**********************************************************************************/
@@ -378,15 +353,15 @@ void vsf_tgui_sv_port_draw_char(vsf_tgui_location_t *location_ptr,
  *!       will be ignored and vsf_tgui_v_refresh_loop_end is called immediately
  **********************************************************************************/
 
-vsf_tgui_region_t* vsf_tgui_v_refresh_loop_begin( vsf_tgui_t *gui_ptr, const vsf_tgui_region_t *planned_refresh_region_ptr)
+vsf_tgui_region_t* vsf_tgui_v_refresh_loop_begin(vsf_tgui_t *gui_ptr, const vsf_tgui_region_t *planned_refresh_region_ptr)
 {
-    if (!__vsf_tgui_sv_port.is_ready) {
+    if (!gui_ptr->is_ready) {
         VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View Port] no ready to refresh" VSF_TRACE_CFG_LINEEND);
         return NULL;
     }
 
-    vsf_tgui_region_t *current_region_ptr = &__vsf_tgui_sv_port.current_region;
-    vsf_tgui_region_t *request_region_ptr = &__vsf_tgui_sv_port.request_region;
+    vsf_tgui_region_t *current_region_ptr = &gui_ptr->current_region;
+    vsf_tgui_region_t *request_region_ptr = &gui_ptr->request_region;
 
     if (current_region_ptr->tSize.iHeight <= 0 || current_region_ptr->tSize.iWidth <= 0) {
         const vsf_tgui_region_t s_displayRegion = {0,0, VSF_TGUI_HOR_MAX, VSF_TGUI_VER_MAX};
@@ -401,7 +376,7 @@ vsf_tgui_region_t* vsf_tgui_v_refresh_loop_begin( vsf_tgui_t *gui_ptr, const vsf
                          request_region_ptr->tSize.iWidth,
                          request_region_ptr->tSize.iHeight);
 
-            int16_t height = __vsf_tgui_sv_port.pfb_size / request_region_ptr->tSize.iWidth;
+            int16_t height = gui_ptr->pfb_size / request_region_ptr->tSize.iWidth;
             height = vsf_min(request_region_ptr->tSize.iHeight, height);
 
             current_region_ptr->tLocation.iX = request_region_ptr->tLocation.iX;
@@ -419,8 +394,8 @@ vsf_tgui_region_t* vsf_tgui_v_refresh_loop_begin( vsf_tgui_t *gui_ptr, const vsf
     }
 
 #if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
-    if (0 == __vsf_tgui_sv_port.refresh_cnt) {
-        __vsf_tgui_sv_port.start_cnt = vsf_systimer_get_tick();
+    if (0 == gui_ptr->refresh_cnt) {
+        gui_ptr->start_cnt = vsf_systimer_get_tick();
     }
 #endif
 
@@ -430,13 +405,13 @@ vsf_tgui_region_t* vsf_tgui_v_refresh_loop_begin( vsf_tgui_t *gui_ptr, const vsf
 bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t *gui_ptr)
 {
     __vsf_sched_safe(
-        if (__vsf_tgui_sv_port.is_ready) {
-            __vsf_tgui_sv_port.is_ready = false;
+        if (gui_ptr->is_ready) {
+            gui_ptr->is_ready = false;
         }
     )
 
-    vsf_tgui_region_t *current_region_ptr = &__vsf_tgui_sv_port.current_region;
-    vsf_tgui_region_t *request_region_ptr = &__vsf_tgui_sv_port.request_region;
+    vsf_tgui_region_t *current_region_ptr = &gui_ptr->current_region;
+    vsf_tgui_region_t *request_region_ptr = &gui_ptr->request_region;
 
     vk_disp_area_t area = {
         .pos = {
@@ -448,8 +423,8 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t *gui_ptr)
             .y = current_region_ptr->tSize.iHeight,
         },
     };
-    vk_disp_t *disp = __vsf_tgui_sv_port.disp;
-    vsf_tgui_disp_pixel_t *pixmap = disp->ui_data;
+    vk_disp_t *disp = gui_ptr->disp;
+    vsf_tgui_disp_pixel_t *pixmap = gui_ptr->pfb;
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View Port]vk_disp_refresh (%d %d) (%d %d)." VSF_TRACE_CFG_LINEEND,
                  area.pos.x, area.pos.y,
                  area.size.x, area.size.y);
@@ -460,7 +435,7 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t *gui_ptr)
     int remain = request_location_y2 - current_location_y2;
 
     if (remain > 0) {
-        int16_t height = __vsf_tgui_sv_port.pfb_size / request_region_ptr->tSize.iWidth;
+        int16_t height = gui_ptr->pfb_size / request_region_ptr->tSize.iWidth;
         VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View Port]iHeight: %d, current_region_ptr->tLocation.iY:%d, request_location_y2:%d" VSF_TRACE_CFG_LINEEND,
                      height, current_region_ptr->tLocation.iY, request_location_y2);
         height = vsf_min(height, remain);
@@ -474,24 +449,25 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t *gui_ptr)
     }
 }
 
-VSF_CAL_WEAK(vsf_tgui_low_level_on_ready_to_refresh)
-void vsf_tgui_low_level_on_ready_to_refresh(void)
+void vsf_tgui_low_level_on_ready_to_refresh(vsf_tgui_t *gui_ptr)
 {
+    vsf_tgui_low_level_refresh_ready(gui_ptr);
 }
 
 
 static void __vsf_tgui_on_ready(vk_disp_t *disp)
 {
-    __vsf_tgui_sv_port.is_ready = true;
+    vsf_tgui_t *gui_ptr = (vsf_tgui_t *)disp->ui_data;
+    gui_ptr->is_ready = true;
 
-    vsf_tgui_low_level_on_ready_to_refresh();
+    vsf_tgui_low_level_on_ready_to_refresh(gui_ptr);
 
 #if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
-    uint32_t elapse = vsf_systimer_tick_to_ms(vsf_systimer_get_tick() - __vsf_tgui_sv_port.start_cnt);
-    __vsf_tgui_sv_port.refresh_cnt++;
+    uint32_t elapse = vsf_systimer_tick_to_ms(vsf_systimer_get_tick() - gui_ptr->start_cnt);
+    gui_ptr->refresh_cnt++;
     if (elapse >= 1000) {
-        __vsf_tgui_sv_port.fps = __vsf_tgui_sv_port.refresh_cnt;
-        __vsf_tgui_sv_port.refresh_cnt = 0;
+        gui_ptr->fps = gui_ptr->refresh_cnt;
+        gui_ptr->refresh_cnt = 0;
     }
 #endif
 }
@@ -503,23 +479,24 @@ static void __vsf_tgui_on_inited(vk_disp_t *disp)
 }
 
 #if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
-uint32_t vsf_tgui_port_get_refresh_rate(void)
+uint32_t vsf_tgui_port_get_refresh_rate(vsf_tgui_t *gui_ptr)
 {
-    return __vsf_tgui_sv_port.fps;
+    return gui_ptr->fps;
 }
 #endif
 
-void vsf_tgui_sv_bind_disp(vk_disp_t *disp, void *pfb, size_t pfb_size)
+void vsf_tgui_sv_bind_disp(vsf_tgui_t *gui_ptr, vk_disp_t *disp, void *pfb, size_t pfb_size)
 {
     VSF_TGUI_ASSERT(disp != NULL);
     VSF_TGUI_ASSERT(pfb != NULL);
     VSF_TGUI_ASSERT(pfb_size >= VSF_TGUI_HOR_MAX);
 
-    __vsf_tgui_sv_port.disp = disp;
-    __vsf_tgui_sv_port.pfb_size = pfb_size;
-    __vsf_tgui_sv_port.is_ready = false;
+    gui_ptr->disp = disp;
+    gui_ptr->pfb = pfb;
+    gui_ptr->pfb_size = pfb_size;
+    gui_ptr->is_ready = false;
 
-    disp->ui_data = pfb;
+    disp->ui_data = gui_ptr;
     disp->ui_on_ready = __vsf_tgui_on_inited;
     vk_disp_init(disp);
 }

@@ -36,7 +36,7 @@
 #define __VSF_TGUI_CONTROLS_LIST_H__
 
 /*============================ INCLUDES ======================================*/
-#include "./__vsf_tgui_controls_common.h"
+
 #include "./vsf_tgui_control.h"
 #include "./__vk_tgui_slider.h"
 
@@ -220,7 +220,8 @@ extern
 fsm_rt_t vk_tgui_list_init(vsf_tgui_list_t* ptList);
 
 extern
-fsm_rt_t vsf_tgui_list_msg_handler( vsf_tgui_list_t* control_ptr,
+fsm_rt_t vsf_tgui_list_msg_handler( vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_list_t* control_ptr,
                                         vsf_tgui_msg_t* ptMSG);
 
 #if VSF_TGUI_CFG_LIST_SUPPORT_SCROOLBAR == ENABLED

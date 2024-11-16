@@ -225,7 +225,8 @@ static bool __sv_update_place_resouce_with_align(const vsf_tgui_control_t* contr
     return __sv_place_resource_with_absolute(control_ptr, dirty_region_ptr, &contrl_relative_region, real_location_ptr, resource_region_ptr);
 }
 
-void vsf_tgui_control_v_draw_rect(  const vsf_tgui_control_t* control_ptr,
+void vsf_tgui_control_v_draw_rect(  vsf_tgui_t* gui_ptr,
+                                    const vsf_tgui_control_t* control_ptr,
                                     const vsf_tgui_region_t* dirty_region_ptr,
                                     const vsf_tgui_region_t* rect_region_ptr,
                                     const vsf_tgui_sv_color_t color)
@@ -253,13 +254,14 @@ void vsf_tgui_control_v_draw_rect(  const vsf_tgui_control_t* control_ptr,
             real_location.iX, real_location.iY, resource_region.tSize.iWidth, resource_region.tSize.iHeight);
 #endif
 
-        vsf_tgui_sv_port_draw_rect(&real_location, &resource_region.tSize, color);
+        vsf_tgui_sv_port_draw_rect(gui_ptr, &real_location, &resource_region.tSize, color);
     }
 
 }
 
 
-void vsf_tgui_control_v_draw_tile(  const vsf_tgui_control_t* control_ptr,
+void vsf_tgui_control_v_draw_tile(  vsf_tgui_t* gui_ptr,
+                                    const vsf_tgui_control_t* control_ptr,
                                     const vsf_tgui_region_t* dirty_region_ptr,
                                     const vsf_tgui_tile_t* tile_ptr,
                                     const vsf_tgui_align_mode_t mode,
@@ -291,7 +293,8 @@ void vsf_tgui_control_v_draw_tile(  const vsf_tgui_control_t* control_ptr,
                      resource_region.tSize.iWidth, resource_region.tSize.iHeight);
 #endif
 
-        vsf_tgui_sv_port_draw_root_tile(&real_location,
+        vsf_tgui_sv_port_draw_root_tile(gui_ptr,
+                                        &real_location,
                                         &resource_region.tLocation,
                                         &resource_region.tSize,
                                         tile_ptr,
@@ -370,7 +373,8 @@ static int16_t __sv_text_draw_get_x(const vsf_tgui_string_t* string_ptr, const u
 }
 #endif
 
-static void __sv_text_draw(const vsf_tgui_location_t* location_ptr,
+static void __sv_text_draw(vsf_tgui_t* gui_ptr,
+                           const vsf_tgui_location_t* location_ptr,
                            const vsf_tgui_size_t *origin_resource_size,
                            const vsf_tgui_region_t* dirty_region_ptr,
                            const vsf_tgui_string_t* string_ptr,
@@ -435,7 +439,7 @@ static void __sv_text_draw(const vsf_tgui_location_t* location_ptr,
             location.iX = base_location.iX + dirty_char_region.tLocation.iX;
             location.iY = base_location.iY + dirty_char_region.tLocation.iY;
 
-            vsf_tgui_sv_port_draw_char(&location, &relative_char_location, &dirty_char_region.tSize, font_index, char_u32, color);
+            vsf_tgui_sv_port_draw_char(gui_ptr, &location, &relative_char_location, &dirty_char_region.tSize, font_index, char_u32, color);
 
             char_draw_region.tLocation.iX += char_draw_region.tSize.iWidth;
         }
@@ -443,7 +447,8 @@ static void __sv_text_draw(const vsf_tgui_location_t* location_ptr,
 }
 
 
-void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* control_ptr,
+void vsf_tgui_control_v_draw_text(  vsf_tgui_t* gui_ptr,
+                                    const vsf_tgui_control_t* control_ptr,
                                     const vsf_tgui_region_t* dirty_region_ptr,
                                     vsf_tgui_text_info_t *string_info_ptr,
                                     const uint8_t font_index,
@@ -475,7 +480,7 @@ void vsf_tgui_control_v_draw_text(  const vsf_tgui_control_t* control_ptr,
             __sv_get_node_name(control_ptr), string_info_ptr->tString, real_location.iX, real_location.iY,
             resource_region.tSize.iWidth, resource_region.tSize.iHeight);
 #endif
-        __sv_text_draw(&real_location, &size, &resource_region, &(string_info_ptr->tString),
+        __sv_text_draw(gui_ptr, &real_location, &size, &resource_region, &(string_info_ptr->tString),
                        font_index, color, string_info_ptr->chInterLineSpace, mode);
     }
 }

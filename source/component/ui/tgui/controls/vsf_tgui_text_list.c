@@ -58,14 +58,14 @@ int_fast16_t __vk_tgui_label_get_line_height( const vsf_tgui_label_t* ptLabel);
 static const i_tgui_control_methods_t c_tVTextList= {
 
     .tView = {
-        .Init =     (vsf_tgui_method_t *)&vsf_tgui_text_list_v_init,
-        .Depose =   (vsf_tgui_method_t *)&vsf_tgui_text_list_v_depose,
+        .Init =     (vsf_tgui_v_method_t *)&vsf_tgui_text_list_v_init,
+        .Depose =   (vsf_tgui_v_method_t *)&vsf_tgui_text_list_v_depose,
         .Render =   (vsf_tgui_v_method_render_t *)&vsf_tgui_text_list_v_rendering,
         .ContainerPostRender = (vsf_tgui_v_method_render_t *)&vsf_tgui_text_list_v_post_rendering,
-        .Update =   (vsf_tgui_method_t *)&vsf_tgui_text_list_v_update,
+        .Update =   (vsf_tgui_v_method_t *)&vsf_tgui_text_list_v_update,
     },
-    .Init =     (vsf_tgui_method_t *)&vk_tgui_text_list_init,
-    .Update =   (vsf_tgui_method_t *)&vk_tgui_text_list_update,
+    .Init =     (vsf_tgui_control_method_t *)&vk_tgui_text_list_init,
+    .Update =   (vsf_tgui_control_method_t *)&vk_tgui_text_list_update,
 
 };
 
@@ -278,7 +278,8 @@ static void __vk_tui_text_list_update_container_position(vsf_tgui_text_list_t* p
 }
 #endif
 
-fsm_rt_t vsf_tgui_text_list_msg_handler( vsf_tgui_text_list_t* ptTextList,
+fsm_rt_t vsf_tgui_text_list_msg_handler( vsf_tgui_t *gui_ptr,
+                                            vsf_tgui_text_list_t* ptTextList,
                                             vsf_tgui_msg_t* ptMSG)
 {
     fsm_rt_t fsm;
@@ -304,7 +305,8 @@ fsm_rt_t vsf_tgui_text_list_msg_handler( vsf_tgui_text_list_t* ptTextList,
     }
 #endif
 
-    fsm = __vsf_tgui_control_msg_handler(   (vsf_tgui_control_t *)ptTextList,
+    fsm = __vsf_tgui_control_msg_handler(   gui_ptr,
+                                            (vsf_tgui_control_t *)ptTextList,
                                             ptMSG,
                                             &c_tVTextList);
 

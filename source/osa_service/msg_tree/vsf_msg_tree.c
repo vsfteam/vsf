@@ -323,7 +323,7 @@ fsm_rt_t __vsf_msg_handling(__vsf_msgt_msg_handling_fsm_t *fsm_ptr,
         }
 
         case HANDLE_FSM: {
-            fsm_rt_t fsm_rt = fsm_ptr->handler_fn->fn.fsm_fn((vsf_msgt_node_t *)node_ptr, fsm_ptr->msg_ptr);
+            fsm_rt_t fsm_rt = fsm_ptr->handler_fn->fn.fsm_fn(this_ptr->target_ptr, (vsf_msgt_node_t *)node_ptr, fsm_ptr->msg_ptr);
             if (fsm_rt_cpl == fsm_rt) {
                 //! message has been handled
                 RESET_MSGT_HANDLING_FSM();

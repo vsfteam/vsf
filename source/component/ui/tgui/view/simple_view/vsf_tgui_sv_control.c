@@ -86,7 +86,7 @@ vsf_tgui_sv_color_t vsf_tgui_sv_get_parent_background_color(vsf_tgui_control_t* 
 #endif
 }
 
-fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_control_t* control_ptr)
+fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_control_t* control_ptr)
 {
 #if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) control view init" VSF_TRACE_CFG_LINEEND, vsf_tgui_control_get_node_name(control_ptr), control_ptr);
@@ -105,7 +105,8 @@ fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_control_t* control_ptr)
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
+fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
+                                        vsf_tgui_control_t* control_ptr,
                                         vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
                                         vsf_tgui_control_refresh_mode_t mode)
 {
@@ -130,7 +131,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
         vsf_tgui_control_v_draw_rect(control_ptr, dirty_region_ptr, &region, color);
 #else
         if (!control_ptr->show_corner_tile) {
-            vsf_tgui_control_v_draw_rect(control_ptr, dirty_region_ptr, &region, color);
+            vsf_tgui_control_v_draw_rect(gui_ptr, control_ptr, dirty_region_ptr, &region, color);
         }else {
             static const vsf_tgui_align_mode_t __cornor_tiles_align_mode[] = {
                 {VSF_TGUI_ALIGN_TOP | VSF_TGUI_ALIGN_LEFT},
@@ -143,7 +144,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
             for (int i = 0; i < dimof(__cornor_tiles_align_mode); i++) {
                 const vsf_tgui_tile_t* tile_ptr = vsf_tgui_control_v_get_corner_tile(control_ptr, i);
                 if (tile_ptr) {
-                    vsf_tgui_control_v_draw_tile(control_ptr, dirty_region_ptr, tile_ptr, __cornor_tiles_align_mode[i], trans_rate, &regions[i],
+                    vsf_tgui_control_v_draw_tile(gui_ptr, control_ptr, dirty_region_ptr, tile_ptr, __cornor_tiles_align_mode[i], trans_rate, &regions[i],
                         color, bg_color);
                 } else {
                     memset(&regions[i], 0, sizeof(vsf_tgui_region_t));
@@ -167,7 +168,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
                         .iHeight = top_height,
                     },
                 };
-                vsf_tgui_control_v_draw_rect(control_ptr, dirty_region_ptr, &region, color);
+                vsf_tgui_control_v_draw_rect(gui_ptr, control_ptr, dirty_region_ptr, &region, color);
             }
 
             int16_t botton_height = vsf_max(regions[CORNOR_TILE_IN_BOTTOM_LEFT].iHeight, regions[CORNOR_TILE_IN_BOTTOM_RIGHT].iHeight);
@@ -182,7 +183,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
                         .iHeight = botton_height,
                     },
                 };
-                vsf_tgui_control_v_draw_rect(control_ptr, dirty_region_ptr, &region, color);
+                vsf_tgui_control_v_draw_rect(gui_ptr, control_ptr, dirty_region_ptr, &region, color);
             }
 
             int16_t left_width = vsf_min(regions[CORNOR_TILE_IN_TOP_LEFT].iWidth, regions[CORNOR_TILE_IN_TOP_RIGHT].iWidth);
@@ -197,7 +198,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
                         .iHeight = left_height,
                     },
                 };
-                vsf_tgui_control_v_draw_rect(control_ptr, dirty_region_ptr, &region, color);
+                vsf_tgui_control_v_draw_rect(gui_ptr, control_ptr, dirty_region_ptr, &region, color);
             }
 
             int16_t right_width = vsf_min(regions[CORNOR_TILE_IN_BOTTOM_LEFT].iWidth, regions[CORNOR_TILE_IN_BOTTOM_RIGHT].iWidth);
@@ -212,7 +213,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
                         .iHeight = right_height,
                     },
                 };
-                vsf_tgui_control_v_draw_rect(control_ptr, dirty_region_ptr, &region, color);
+                vsf_tgui_control_v_draw_rect(gui_ptr, control_ptr, dirty_region_ptr, &region, color);
             }
 
             int16_t remain_width = control_ptr->iWidth - left_width - right_width;
@@ -228,7 +229,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
                         .iHeight = remain_height,
                     },
                 };
-                vsf_tgui_control_v_draw_rect(control_ptr, dirty_region_ptr, &region, color);
+                vsf_tgui_control_v_draw_rect(gui_ptr, control_ptr, dirty_region_ptr, &region, color);
             }
         }
 #endif
@@ -242,19 +243,19 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_control_t* control_ptr,
 #else
         uint8_t tile_trans_rate = 0xFF;
 #endif
-        vsf_tgui_control_v_draw_tile(control_ptr, dirty_region_ptr, ptTile, control_ptr->tBackground.tAlign, tile_trans_rate, NULL,
+        vsf_tgui_control_v_draw_tile(gui_ptr, control_ptr, dirty_region_ptr, ptTile, control_ptr->tBackground.tAlign, tile_trans_rate, NULL,
             color, bg_color);
     }
 
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_control_v_depose(vsf_tgui_control_t* control_ptr)
+fsm_rt_t vsf_tgui_control_v_depose(vsf_tgui_t* gui_ptr, vsf_tgui_control_t* control_ptr)
 {
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_control_v_update(vsf_tgui_control_t* control_ptr)
+fsm_rt_t vsf_tgui_control_v_update(vsf_tgui_t* gui_ptr, vsf_tgui_control_t* control_ptr)
 {
     return fsm_rt_cpl;
 }

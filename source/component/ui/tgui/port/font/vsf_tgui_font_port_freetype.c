@@ -21,6 +21,8 @@
 
 #if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED && VSF_TGUI_CFG_FONT_USE_FREETYPE == ENABLED
 
+#include "../vsf_tgui_port.h"
+
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
@@ -87,7 +89,7 @@ uint8_t vsf_tgui_font_get_char_width(const uint8_t font_index, uint32_t char_u32
     const vsf_tgui_font_t *font_ptr = vsf_tgui_font_get(font_index);
     VSF_TGUI_ASSERT(font_ptr != NULL);
 
-    FT_Face face = (FT_Face)font_ptr->data_ptr;
+    FT_Face face = (FT_Face)font_ptr->ft2.data_ptr;
     VSF_TGUI_ASSERT(face != NULL);
     if (FT_Err_Ok == FT_Load_Char(face, char_u32, FREETYPE_LOAD_FLAGS)) {
         return face->glyph->advance.x >> 6;
@@ -110,10 +112,10 @@ void vsf_tgui_font_release_char(const uint8_t font_index, uint32_t char_u32, voi
 
 void * vsf_tgui_font_get_char(const uint8_t font_index, uint32_t char_u32, vsf_tgui_region_t *char_region_ptr)
 {
-    const vsf_tgui_font_t* font_ptr = vsf_tgui_font_get(font_index);
+    const vsf_tgui_font_t *font_ptr = vsf_tgui_font_get(font_index);
     VSF_TGUI_ASSERT(font_ptr != NULL);
 
-    FT_Face face = (FT_Face)font_ptr->data_ptr;
+    FT_Face face = (FT_Face)font_ptr->ft2.data_ptr;
     VSF_TGUI_ASSERT(face != NULL);
 
     if (FT_Err_Ok != FT_Load_Char(face, char_u32, FREETYPE_LOAD_FLAGS)) {
@@ -134,7 +136,7 @@ void * vsf_tgui_font_get_char(const uint8_t font_index, uint32_t char_u32, vsf_t
     return glyph->bitmap.buffer;
 }
 
-static bool vsf_tgui_fonts_init(vsf_tgui_font_t* font_ptr, size_t size)
+bool vsf_tgui_fonts_init(vsf_tgui_font_t *font_ptr, size_t size)
 {
     int i;
     FT_Library library;
@@ -152,14 +154,14 @@ static bool vsf_tgui_fonts_init(vsf_tgui_font_t* font_ptr, size_t size)
 
         char path[256];
         strcpy(path, "font/");
-        strcat(path, font_ptr->font_path_ptr);
+        strcat(path, font_ptr->ft2.font_path_ptr);
         if (FT_Err_Ok != FT_New_Face(library, path, 0, &face)) {
             VSF_TGUI_ASSERT(0);
             return false;
         }
 
-        if (font_ptr->font_size != 0) {
-            if (FT_Err_Ok != FT_Set_Char_Size(face, 0, font_ptr->font_size * 64, 0, 0)) {
+        if (font_ptr->ft2.font_size != 0) {
+            if (FT_Err_Ok != FT_Set_Char_Size(face, 0, font_ptr->ft2.font_size * 64, 0, 0)) {
                 VSF_TGUI_ASSERT(0);
                 return false;
             }
@@ -184,7 +186,7 @@ static bool vsf_tgui_fonts_init(vsf_tgui_font_t* font_ptr, size_t size)
             VSF_TGUI_ASSERT(0);
             return false;
         }
-        font_ptr->data_ptr = face;
+        font_ptr->ft2.data_ptr = face;
 
         font_ptr++;
     }

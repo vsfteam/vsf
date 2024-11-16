@@ -36,12 +36,23 @@
 #define __VSF_TGUI_CONTROLS_CONTROL_H__
 
 /*============================ INCLUDES ======================================*/
-#include "./__vsf_tgui_controls_common.h"
 
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
  *!        definition and there is NO ANY OTHER module-interface-header file
  *!        included in this file
  */
+
+#ifndef VSF_TGUI_V_TEMPLATE_TYPE_HEADER_FILE
+#if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
+#   define VSF_TGUI_V_TEMPLATE_TYPE_HEADER_FILE "../view/simple_view/vsf_tgui_v_type.h"
+#else
+#   undef VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL
+#   define VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL  VSF_TGUI_V_TEMPLATE_EXAMPLE
+#   define VSF_TGUI_V_TEMPLATE_TYPE_HEADER_FILE "../view/template/vsf_tgui_v_type.h"
+#endif
+
+#include VSF_TGUI_V_TEMPLATE_TYPE_HEADER_FILE
+#endif
 
 #if     defined(__VSF_TGUI_CONTROLS_CONTROL_CLASS_IMPLEMENT)
 #   define __PLOOC_CLASS_IMPLEMENT__
@@ -568,6 +579,7 @@ def_class(vsf_tgui_container_t,
 )
 end_def_class(vsf_tgui_container_t)
 
+declare_class(vsf_tgui_t)
 declare_class(vsf_tgui_root_container_t)
 
 def_class(vsf_tgui_root_container_t,
@@ -585,23 +597,26 @@ typedef enum vsf_tgui_control_refresh_mode_t {
     VSF_TGUI_CONTROL_REFRESHED_DIRECTLY_BY_USER
 } vsf_tgui_control_refresh_mode_t;
 
-typedef fsm_rt_t vsf_tgui_method_t  (vsf_tgui_control_t* control_ptr);
-typedef fsm_rt_t vsf_tgui_v_method_render_t(vsf_tgui_control_t* control_ptr,
+typedef fsm_rt_t vsf_tgui_v_method_t(vsf_tgui_t* gui_ptr, vsf_tgui_control_t* control_ptr);
+typedef fsm_rt_t vsf_tgui_v_method_render_t(vsf_tgui_t* gui_ptr,
+                                            vsf_tgui_control_t* control_ptr,
                                             vsf_tgui_region_t* ptDirtyRegion,
                                             vsf_tgui_control_refresh_mode_t tMode);
 
+typedef fsm_rt_t vsf_tgui_control_method_t(vsf_tgui_control_t* control_ptr);
+
 typedef struct i_tgui_v_vtable_t{
-    vsf_tgui_method_t          *Init;
-    vsf_tgui_method_t          *Depose;
+    vsf_tgui_v_method_t        *Init;
+    vsf_tgui_v_method_t        *Depose;
     vsf_tgui_v_method_render_t *Render;
     vsf_tgui_v_method_render_t *ContainerPostRender;
-    vsf_tgui_method_t          *Update;
+    vsf_tgui_v_method_t        *Update;
 }i_tgui_v_vtable_t;
 
 typedef struct i_tgui_control_vtable_t {
     i_tgui_v_vtable_t           tView;
-    vsf_tgui_method_t          *Init;
-    vsf_tgui_method_t          *Update;
+    vsf_tgui_control_method_t  *Init;
+    vsf_tgui_control_method_t  *Update;
 } i_tgui_control_methods_t;
 
 #if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
@@ -801,15 +816,18 @@ extern
 bool vsf_tgui_control_set_active(const vsf_tgui_control_t* control_ptr);
 
 extern
-fsm_rt_t vsf_tgui_control_msg_handler(  vsf_tgui_control_t* node_ptr,
+fsm_rt_t vsf_tgui_control_msg_handler(  vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_control_t* node_ptr,
                                         vsf_tgui_msg_t* ptMSG);
 
 extern
-fsm_rt_t vsf_tgui_container_msg_handler(vsf_tgui_container_t* node_ptr,
+fsm_rt_t vsf_tgui_container_msg_handler(vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_container_t* node_ptr,
                                         vsf_tgui_msg_t* ptMSG);
 
 extern
-fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
+fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_control_t* control_ptr,
                                         vsf_tgui_msg_t* ptMSG,
                                         const i_tgui_control_methods_t* ptMethods);
 

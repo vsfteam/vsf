@@ -36,7 +36,7 @@
 #define __VSF_TGUI_CONTROLS_BUTTON_H__
 
 /*============================ INCLUDES ======================================*/
-#include "./__vsf_tgui_controls_common.h"
+
 #include "./vsf_tgui_label.h"
 
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
@@ -155,7 +155,8 @@ extern
 fsm_rt_t vk_tgui_button_update(vsf_tgui_button_t* ptButton);
 
 extern
-fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* control_ptr,
+fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_button_t* control_ptr,
                                         vsf_tgui_msg_t* ptMSG);
 
 #endif

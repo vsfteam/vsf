@@ -33,23 +33,24 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern
-fsm_rt_t vsf_tgui_container_v_init(vsf_tgui_container_t* container_ptr);
+fsm_rt_t vsf_tgui_container_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_container_t* container_ptr);
 
 extern
-fsm_rt_t vsf_tgui_container_v_rendering(
+fsm_rt_t vsf_tgui_container_v_rendering(    vsf_tgui_t* gui_ptr,
                                             vsf_tgui_container_t* container_ptr,
                                             vsf_tgui_region_t* ptDirtyRegion,
                                             vsf_tgui_control_refresh_mode_t tMode);
 extern
-fsm_rt_t vsf_tgui_container_v_post_rendering(vsf_tgui_container_t* container_ptr,
+fsm_rt_t vsf_tgui_container_v_post_rendering(vsf_tgui_t* gui_ptr,
+                                            vsf_tgui_container_t* container_ptr,
                                             vsf_tgui_region_t* ptDirtyRegion,
                                             vsf_tgui_control_refresh_mode_t tMode);
 
 extern
-fsm_rt_t vsf_tgui_container_v_depose(vsf_tgui_container_t* container_ptr);
+fsm_rt_t vsf_tgui_container_v_depose(vsf_tgui_t* gui_ptr, vsf_tgui_container_t* container_ptr);
 
 extern
-fsm_rt_t vsf_tgui_container_v_update(vsf_tgui_container_t* container_ptr);
+fsm_rt_t vsf_tgui_container_v_update(vsf_tgui_t* gui_ptr, vsf_tgui_container_t* container_ptr);
 
 #endif
 

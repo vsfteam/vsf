@@ -15,49 +15,56 @@
  *                                                                           *
  ****************************************************************************/
 
+#ifndef __VSF_TINY_GUI_SV_PORT_H__
+#define __VSF_TINY_GUI_SV_PORT_H__
+
 /*============================ INCLUDES ======================================*/
+
 #include "../../vsf_tgui_cfg.h"
 
-#if     VSF_USE_TINY_GUI == ENABLED \
-    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_EXAMPLE
+#if     VSF_USE_TINY_GUI == ENABLED                                             \
+    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 
-#define __VSF_TGUI_CONTROLS_LABEL_CLASS_INHERIT
-#include "./vsf_tgui_v_label.h"
-#include "../../__vsf_tgui_control_types.h"
+#define __VSF_DISP_CLASS_INHERIT__
+#include "component/ui/disp//vsf_disp.h"
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_TGUI_CFG_SV_REFRESH_RATE
+#   define VSF_TGUI_CFG_SV_REFRESH_RATE                 ENABLED
+#endif
+
+#ifndef VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY
+#   define VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY             DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ LOCAL VARIABLES ===============================*/
-/*============================ PROTOTYPES ====================================*/
+
+declare_class(vsf_tgui_t)
+declare_structure(vsf_tgui_v_port_t)
+def_structure(vsf_tgui_v_port_t)
+    vk_disp_t *disp;
+    void *pfb;
+    size_t pfb_size;
+
+    bool is_ready;
+#if VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY == ENABLED
+    volatile bool is_draw_ready;
+#endif
+    vsf_tgui_region_t request_region;
+    vsf_tgui_region_t current_region;
+#if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
+    vsf_systimer_tick_t start_cnt;
+    uint16_t refresh_cnt;
+    uint16_t fps;
+#endif
+end_def_structure(vsf_tgui_v_port_t)
+
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ IMPLEMENTATION ================================*/
-
-
-fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* ptLabel)
-{
-    return fsm_rt_cpl;
-}
-
-fsm_rt_t vsf_tgui_label_v_rendering(vsf_tgui_t* gui_ptr,
-                                    vsf_tgui_label_t* label_ptr,
-                                    vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
-                                    vsf_tgui_control_refresh_mode_t mode)
-{
-    return fsm_rt_cpl;
-}
-
-fsm_rt_t vsf_tgui_label_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* ptLabel)
-{
-    return fsm_rt_cpl;
-}
-
-fsm_rt_t vsf_tgui_label_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* ptLabel)
-{
-    return fsm_rt_cpl;
-}
+/*============================ PROTOTYPES ====================================*/
 
 #endif
 
-
+#endif
 /* EOF */

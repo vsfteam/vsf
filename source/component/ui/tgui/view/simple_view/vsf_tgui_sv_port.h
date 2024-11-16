@@ -24,7 +24,6 @@
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 
-#include "./vsf_tgui_sv_font.h"
 #include "./vsf_tgui_sv_color.h"
 
 /*============================ MACROS ========================================*/
@@ -43,12 +42,14 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern
-void vsf_tgui_sv_port_draw_rect(vsf_tgui_location_t* location_ptr,
+void vsf_tgui_sv_port_draw_rect(vsf_tgui_t* gui_ptr,
+                        vsf_tgui_location_t* location_ptr,
                         vsf_tgui_size_t* size_ptr,
                         vsf_tgui_sv_color_t tColor);
 
 extern
-void vsf_tgui_sv_port_draw_char(vsf_tgui_location_t* location_ptr,
+void vsf_tgui_sv_port_draw_char(vsf_tgui_t* gui_ptr,
+                        vsf_tgui_location_t* location_ptr,
                         vsf_tgui_location_t* font_location_ptr,
                         vsf_tgui_size_t* size_ptr,
                         const uint8_t chFontIndex,
@@ -56,7 +57,8 @@ void vsf_tgui_sv_port_draw_char(vsf_tgui_location_t* location_ptr,
                         vsf_tgui_sv_color_t tCharColor);
 
 extern
-void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_location_t* location_ptr,
+void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_t* gui_ptr,
+                        vsf_tgui_location_t* location_ptr,
                         vsf_tgui_location_t* tile_ptrLocation,
                         vsf_tgui_size_t* size_ptr,
                         const vsf_tgui_tile_t* tile_ptr,

@@ -44,7 +44,6 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-extern vsf_tgui_size_t vsf_tgui_idx_root_tile_get_size(const vsf_tgui_tile_t* ptTile);
 /*============================ IMPLEMENTATION ================================*/
 
 VSF_CAL_WEAK(vsf_tgui_idx_root_tile_get_size)

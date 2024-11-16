@@ -26,7 +26,10 @@
 
 #include "./vsf_tgui_sv_color.h"
 
+#include "../../port/view/vsf_tgui_sv_port.h"
+
 /*============================ MACROS ========================================*/
+
 #ifndef VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR
 #   define VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR        ENABLED
 #endif
@@ -231,26 +234,20 @@
 /*============================ TYPES =========================================*/
 
 declare_structure(vsf_tgui_v_control_t)
-
 def_structure(vsf_tgui_v_control_t)
     uint8_t font_index : 7;
-
 #if VSF_TGUI_CFG_SV_SUPPORT_CORNER_TILE == ENABLED
     uint8_t show_corner_tile : 1;
 #endif
-
 #if VSF_TGUI_CFG_SV_SUPPORT_TILE_TRANSPARENCY == ENABLED
     uint8_t tile_trans_rate;
 #endif
-
 #if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
     vsf_tgui_sv_color_t background_color;
 #endif
-
 end_def_structure(vsf_tgui_v_control_t)
 
 declare_structure(vsf_tgui_v_container_t)
-
 def_structure(vsf_tgui_v_container_t)
 #if __IS_COMPILER_IAR__ || (!defined( __STDC_VERSION__ ) || __STDC_VERSION__ < 199901L)
     //please remove this if your structure is not emplty

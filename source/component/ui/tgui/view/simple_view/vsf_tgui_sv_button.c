@@ -33,36 +33,38 @@ declare_class(vsf_tgui_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-fsm_rt_t vsf_tgui_button_v_init(vsf_tgui_button_t* button_ptr)
+fsm_rt_t vsf_tgui_button_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_button_t* button_ptr)
 {
 #if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) button init" VSF_TRACE_CFG_LINEEND,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t*)button_ptr), button_ptr);
 #endif
 
-    return vsf_tgui_label_v_init(&(button_ptr->use_as__vsf_tgui_label_t));
+    return vsf_tgui_label_v_init(gui_ptr, &(button_ptr->use_as__vsf_tgui_label_t));
 }
 
-fsm_rt_t vsf_tgui_button_v_rendering(   vsf_tgui_button_t* button_ptr,
+fsm_rt_t vsf_tgui_button_v_rendering(   vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_button_t* button_ptr,
                                         vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
                                         vsf_tgui_control_refresh_mode_t mode)
 {
 
     VSF_TGUI_ASSERT(button_ptr != NULL);
     VSF_TGUI_ASSERT(dirty_region_ptr != NULL);
+    VSF_TGUI_ASSERT(dirty_region_ptr != NULL);
 
 
-    vsf_tgui_label_v_rendering((vsf_tgui_label_t *)button_ptr, dirty_region_ptr, mode);
+    vsf_tgui_label_v_rendering(gui_ptr, (vsf_tgui_label_t *)button_ptr, dirty_region_ptr, mode);
 
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_button_v_depose(vsf_tgui_button_t* button_ptr)
+fsm_rt_t vsf_tgui_button_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_button_t* button_ptr)
 {
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_button_v_update(vsf_tgui_button_t* button_ptr)
+fsm_rt_t vsf_tgui_button_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_button_t* button_ptr)
 {
     return fsm_rt_cpl;
 }

@@ -21,7 +21,7 @@
 #if     VSF_USE_TINY_GUI == ENABLED \
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 
-
+#include "../../view/vsf_tgui_v.h"
 
 #define __VSF_TGUI_CONTROLS_LABEL_CLASS_INHERIT
 declare_class(vsf_tgui_t)
@@ -38,13 +38,13 @@ extern vsf_tgui_sv_color_t vsf_tgui_sv_get_text_color(vsf_tgui_label_t* label_pt
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_label_t* label_ptr)
+fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr)
 {
 #if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) label init" VSF_TRACE_CFG_LINEEND,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t*)label_ptr), label_ptr);
 #endif
-    return vsf_tgui_control_v_init(&label_ptr->use_as__vsf_tgui_control_t);
+    return vsf_tgui_control_v_init(gui_ptr, &label_ptr->use_as__vsf_tgui_control_t);
 }
 
 int_fast16_t __vk_tgui_label_get_line_height( const vsf_tgui_label_t* label_ptr)
@@ -136,7 +136,8 @@ vsf_tgui_sv_color_t vsf_tgui_sv_get_text_color(vsf_tgui_label_t* label_ptr)
 #endif
 }
 
-fsm_rt_t vsf_tgui_label_v_rendering(vsf_tgui_label_t* label_ptr,
+fsm_rt_t vsf_tgui_label_v_rendering(vsf_tgui_t* gui_ptr,
+                                    vsf_tgui_label_t* label_ptr,
                                     vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
                                     vsf_tgui_control_refresh_mode_t mode)
 {
@@ -148,14 +149,15 @@ fsm_rt_t vsf_tgui_label_v_rendering(vsf_tgui_label_t* label_ptr,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t*)label_ptr), label_ptr);
 #endif
 
-    vsf_tgui_control_v_rendering((vsf_tgui_control_t *)label_ptr, dirty_region_ptr, mode);
+    vsf_tgui_control_v_rendering(gui_ptr, (vsf_tgui_control_t *)label_ptr, dirty_region_ptr, mode);
 
     if (    (label_ptr->tLabel.tString.pstrText != NULL)
 #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
         &&  (label_ptr->tLabel.tString.s16_size > 0)
 #endif
     ) {
-        vsf_tgui_control_v_draw_text((vsf_tgui_control_t *)label_ptr,
+        vsf_tgui_control_v_draw_text(gui_ptr,
+                                     (vsf_tgui_control_t *)label_ptr,
                                      dirty_region_ptr,
                                      &(label_ptr->tLabel),
                                      label_ptr->font_index,
@@ -166,12 +168,12 @@ fsm_rt_t vsf_tgui_label_v_rendering(vsf_tgui_label_t* label_ptr,
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_label_v_depose(vsf_tgui_label_t* label_ptr)
+fsm_rt_t vsf_tgui_label_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr)
 {
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_label_v_update(vsf_tgui_label_t* label_ptr)
+fsm_rt_t vsf_tgui_label_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr)
 {
     return fsm_rt_cpl;
 }

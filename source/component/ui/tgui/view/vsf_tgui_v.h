@@ -79,6 +79,12 @@ vsf_tgui_size_t __vk_tgui_label_v_text_get_size(vsf_tgui_label_t* ptLabel,
 extern
 vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* ptLabel);
 
+// font APIs for all views
+
+extern uint8_t vsf_tgui_font_get_char_height(const uint8_t font_index);
+extern uint8_t vsf_tgui_font_get_char_width(const uint8_t font_index, uint32_t char_u32);
+extern void vsf_tgui_font_release_char(const uint8_t font_index, uint32_t char_u32, void *bitmap);
+extern void * vsf_tgui_font_get_char(const uint8_t font_index, uint32_t char_u32, vsf_tgui_region_t *char_region_ptr);
 
 #endif
 

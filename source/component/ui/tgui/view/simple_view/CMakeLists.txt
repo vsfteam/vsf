@@ -6,7 +6,6 @@ vsf_add_sources(
     vsf_tgui_sv_container.c
     vsf_tgui_sv_control.c
     vsf_tgui_sv_draw.c
-    vsf_tgui_sv_font.c
     vsf_tgui_sv_label.c
     vsf_tgui_sv_list.c
     vsf_tgui_sv_panel.c

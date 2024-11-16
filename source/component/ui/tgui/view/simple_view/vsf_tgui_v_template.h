@@ -24,6 +24,7 @@
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 
+#include "./vsf_tgui_v_type.h"
 #include "./vsf_tgui_sv_port.h"
 #include "./vsf_tgui_sv_control.h"
 #include "./vsf_tgui_sv_container.h"

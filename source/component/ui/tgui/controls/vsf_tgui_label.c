@@ -52,22 +52,24 @@ declare_class(vsf_tgui_t)
 static const i_tgui_control_methods_t c_tVLabel= {
 
     .tView = {
-        .Init =     (vsf_tgui_method_t *)&vsf_tgui_label_v_init,
-        .Depose =   (vsf_tgui_method_t *)&vsf_tgui_label_v_depose,
+        .Init =     (vsf_tgui_v_method_t *)&vsf_tgui_label_v_init,
+        .Depose =   (vsf_tgui_v_method_t *)&vsf_tgui_label_v_depose,
         .Render =   (vsf_tgui_v_method_render_t *)&vsf_tgui_label_v_rendering,
-        .Update =   (vsf_tgui_method_t *)&vsf_tgui_label_v_update,
+        .Update =   (vsf_tgui_v_method_t *)&vsf_tgui_label_v_update,
     },
-    .Init =     (vsf_tgui_method_t *)&vk_tgui_label_init,
-    .Update =   (vsf_tgui_method_t *)&vk_tgui_label_update,
+    .Init =     (vsf_tgui_control_method_t *)&vk_tgui_label_init,
+    .Update =   (vsf_tgui_control_method_t *)&vk_tgui_label_update,
 
 };
 
 /*============================ IMPLEMENTATION ================================*/
 
-fsm_rt_t vsf_tgui_label_msg_handler( vsf_tgui_label_t* control_ptr,
+fsm_rt_t vsf_tgui_label_msg_handler( vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_label_t* control_ptr,
                                         vsf_tgui_msg_t* ptMSG)
 {
-    return __vsf_tgui_control_msg_handler(  (vsf_tgui_control_t *)control_ptr,
+    return __vsf_tgui_control_msg_handler(  gui_ptr,
+                                            (vsf_tgui_control_t *)control_ptr,
                                             ptMSG,
                                             &c_tVLabel);
 }

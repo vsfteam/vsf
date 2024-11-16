@@ -11,6 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\port\view\vsf_tgui_sv_port.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\port\vsf_tgui_port.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\adc\adc_interface.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\adc\adc_template.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\dac\dac_template.h" />
@@ -186,14 +188,12 @@
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_panel.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\vsf_tgui_text_list.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\__vk_tgui_slider.h" />
-    <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\__vsf_tgui_controls_common.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\utilities\vsf_tgui_text.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_button.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_color.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_container.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_control.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_draw.h" />
-    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_label.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_list.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_panel.h" />
@@ -323,6 +323,9 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\port\font\vsf_tgui_font_port_freetype.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\port\view\vsf_tgui_sv_port.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\port\vsf_tgui_port.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\adc\adc_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\adc\adc_interface.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\dac\dac_common.c" />
@@ -427,7 +430,6 @@
     <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_container.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_control.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_draw.c" />
-    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_label.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_list.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_panel.c" />
@@ -511,7 +513,6 @@
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_control_tree_dump.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.c" />
-    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_port.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_main.c" />
   </ItemGroup>
   <ItemGroup>

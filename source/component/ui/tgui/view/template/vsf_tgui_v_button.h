@@ -30,22 +30,18 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-def_structure(vsf_tgui_v_button_t)
-#if __IS_COMPILER_IAR__
-//please remove this if your structure is not emplty
-uint8_t : 8;
-#endif
-end_def_structure(vsf_tgui_v_button_t)
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern fsm_rt_t vsf_tgui_button_v_init(vsf_tgui_button_t* ptButton);
+extern fsm_rt_t vsf_tgui_button_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_button_t* button_ptr);
 
-extern fsm_rt_t vsf_tgui_button_v_rendering(vsf_tgui_button_t* ptButton,
-    vsf_tgui_region_t* ptDirtyRegion);
+extern fsm_rt_t vsf_tgui_button_v_rendering(vsf_tgui_t *gui_ptr,
+                                            vsf_tgui_button_t* button_ptr,
+                                            vsf_tgui_region_t* dirty_region_ptr,
+                                            vsf_tgui_control_refresh_mode_t mode);
 
-extern fsm_rt_t vsf_tgui_button_v_depose(vsf_tgui_button_t* ptButton);
+extern fsm_rt_t vsf_tgui_button_v_depose(vsf_tgui_t* gui_ptr, vsf_tgui_button_t* button_ptr);
+extern fsm_rt_t vsf_tgui_button_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_button_t* button_ptr);
 
 #endif
 

@@ -34,24 +34,37 @@
 /*============================ IMPLEMENTATION ================================*/
 
 
-fsm_rt_t vsf_tgui_panel_v_init(vsf_tgui_panel_t* ptPanel)
+fsm_rt_t vsf_tgui_panel_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* ptPanel)
 {
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_panel_v_rendering(vsf_tgui_panel_t* ptPanel,
-                                    vsf_tgui_region_t *ptDirtyRegion)             //!< you can ignore the tDirtyRegion for simplicity
+fsm_rt_t vsf_tgui_panel_v_rendering(vsf_tgui_t *gui_ptr,
+                                    vsf_tgui_panel_t* panel_ptr,
+                                    vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
+                                    vsf_tgui_control_refresh_mode_t mode)
 {
 
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_panel_v_depose(vsf_tgui_panel_t* ptPanel)
+fsm_rt_t vsf_tgui_panel_v_post_rendering(vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_panel_t* panel_ptr,
+                                        vsf_tgui_region_t* dirty_region_ptr,
+                                        vsf_tgui_control_refresh_mode_t mode)
 {
     return fsm_rt_cpl;
 }
 
+fsm_rt_t vsf_tgui_panel_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* ptPanel)
+{
+    return fsm_rt_cpl;
+}
 
+fsm_rt_t vsf_tgui_panel_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* ptPanel)
+{
+    return fsm_rt_cpl;
+}
 
 #endif
 

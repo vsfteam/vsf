@@ -40,6 +40,18 @@
 
 #if VSF_USE_TINY_GUI == ENABLED
 
+#ifndef VSF_TGUI_V_TEMPLATE_TYPE_HEADER_FILE
+#if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
+#   define VSF_TGUI_V_TEMPLATE_TYPE_HEADER_FILE "./view/simple_view/vsf_tgui_v_type.h"
+#else
+#   undef VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL
+#   define VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL  VSF_TGUI_V_TEMPLATE_EXAMPLE
+#   define VSF_TGUI_V_TEMPLATE_TYPE_HEADER_FILE "./view/template/vsf_tgui_v_type.h"
+#endif
+#endif
+
+#include VSF_TGUI_V_TEMPLATE_TYPE_HEADER_FILE
+
 #include "utilities/vsf_tgui_text.h"
 
 /*! \NOTE: Make sure #include "utilities/ooc_class.h" is close to the class
@@ -119,6 +131,9 @@ def_class(vsf_tgui_t,
             }finger;
             vsf_tgui_location_t current[2];
         }input;
+    )
+    protected_member(
+        implement(vsf_tgui_v_port_t)
     )
 )
 end_def_class(vsf_tgui_t)
@@ -247,6 +262,8 @@ bool __vk_tgui_send_gesture_evt(vsf_tgui_t *tgui_ptr,
 /*============================ INCLUDES ======================================*/
 #include "controls/vsf_tgui_controls.h"
 #include "view/vsf_tgui_v.h"
+
+#include "port/vsf_tgui_port.h"
 
 #endif
 #endif

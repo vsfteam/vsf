@@ -34,21 +34,23 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern
-fsm_rt_t vsf_tgui_panel_v_init(vsf_tgui_panel_t* panel_ptr);
+fsm_rt_t vsf_tgui_panel_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* panel_ptr);
 
 extern
-fsm_rt_t vsf_tgui_panel_v_rendering(vsf_tgui_panel_t* panel_ptr,
+fsm_rt_t vsf_tgui_panel_v_rendering(vsf_tgui_t *gui_ptr,
+                                    vsf_tgui_panel_t* panel_ptr,
                                     vsf_tgui_region_t* dirty_region_ptr,
                                     vsf_tgui_control_refresh_mode_t mode);
 
 extern
-fsm_rt_t vsf_tgui_panel_v_post_rendering(   vsf_tgui_panel_t* panel_ptr,
+fsm_rt_t vsf_tgui_panel_v_post_rendering(   vsf_tgui_t *gui_ptr,
+                                            vsf_tgui_panel_t* panel_ptr,
                                             vsf_tgui_region_t* dirty_region_ptr,
                                             vsf_tgui_control_refresh_mode_t mode);
 
-extern fsm_rt_t vsf_tgui_panel_v_depose(vsf_tgui_panel_t* panel_ptr);
+extern fsm_rt_t vsf_tgui_panel_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* panel_ptr);
 
-extern fsm_rt_t vsf_tgui_panel_v_update(vsf_tgui_panel_t* panel_ptr);
+extern fsm_rt_t vsf_tgui_panel_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* panel_ptr);
 
 #endif
 

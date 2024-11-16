@@ -36,7 +36,7 @@
 #define __VK_TGUI_CONTROLS_SLIDER_H__
 
 /*============================ INCLUDES ======================================*/
-#include "./__vsf_tgui_controls_common.h"
+
 #include "./vsf_tgui_control.h"
 
 #if VSF_TGUI_CFG_SUPPORT_SLIDER == ENABLED

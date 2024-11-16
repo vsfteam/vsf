@@ -72,14 +72,14 @@ static const i_tgui_control_methods_t c_tVControl= {
 static const i_tgui_control_methods_t c_tVContainer= {
 
     .tView = {
-        .Init =     (vsf_tgui_method_t *)&vsf_tgui_container_v_init,
-        .Depose =   (vsf_tgui_method_t *)&vsf_tgui_container_v_depose,
+        .Init =     (vsf_tgui_v_method_t *)&vsf_tgui_container_v_init,
+        .Depose =   (vsf_tgui_v_method_t *)&vsf_tgui_container_v_depose,
         .Render =   (vsf_tgui_v_method_render_t *)&vsf_tgui_container_v_rendering,
         .ContainerPostRender = (vsf_tgui_v_method_render_t *)&vsf_tgui_container_v_post_rendering,
-        .Update =   (vsf_tgui_method_t *)&vsf_tgui_container_v_update,
+        .Update =   (vsf_tgui_v_method_t *)&vsf_tgui_container_v_update,
     },
-    .Update =   (vsf_tgui_method_t *)&vk_tgui_container_update,
-    .Init =     (vsf_tgui_method_t *)&vk_tgui_container_init,
+    .Update =   (vsf_tgui_control_method_t *)&vk_tgui_container_update,
+    .Init =     (vsf_tgui_control_method_t *)&vk_tgui_container_init,
 
 };
 
@@ -718,7 +718,8 @@ fsm_rt_t __vk_tgui_control_user_message_handling(   vsf_tgui_control_t* control_
     return fsm_rt_on_going;
 }
 
-fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
+fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_control_t* control_ptr,
                                         vsf_tgui_msg_t* ptMSG,
                                         const i_tgui_control_methods_t*ptMethods)
 {
@@ -785,7 +786,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
                     VSF_TGUI_LOG(VSF_TRACE_INFO, "VSF_TGUI_MSG_ON_LOAD");
                 #endif
                     ptMethods->Init(control_ptr);
-                    ptMethods->tView.Init(control_ptr);
+                    ptMethods->tView.Init(gui_ptr, control_ptr);
                     result = fsm_rt_cpl;
                     break;
             #endif
@@ -795,7 +796,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
                 #if VSF_TGUI_CFG_SHOW_ON_DEPOSE_EVT_LOG == ENABLED
                     VSF_TGUI_LOG(VSF_TRACE_INFO, "VSF_TGUI_MSG_ON_DEPOSE");
                 #endif
-                    ptMethods->tView.Depose(control_ptr);
+                    ptMethods->tView.Depose(gui_ptr, control_ptr);
                     result = fsm_rt_cpl;
                     break;
             #endif
@@ -806,7 +807,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
                     VSF_TGUI_LOG(VSF_TRACE_INFO, "VSF_TGUI_EVT_UPDATE");
                 #endif
                     ptMethods->Update(control_ptr);
-                    ptMethods->tView.Update(control_ptr);
+                    ptMethods->tView.Update(gui_ptr, control_ptr);
                     result = fsm_rt_cpl;
                     break;
 
@@ -853,7 +854,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
 
                         if (    (VSF_MSGT_ERR_MSG_NOT_HANDLED == result)
                             &&  (NULL != ptMethods->tView.ContainerPostRender)) {
-                            result = ptMethods->tView.ContainerPostRender(control_ptr, &tRegion, tMode);
+                            result = ptMethods->tView.ContainerPostRender(gui_ptr, control_ptr, &tRegion, tMode);
                         }
                         ptMSG->use_as__vsf_msgt_msg_t.msg = VSF_TGUI_EVT_REFRESH;
                     } else {
@@ -868,7 +869,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
 
                         result = __vk_tgui_control_user_message_handling(control_ptr, (const vsf_tgui_evt_t *)ptMSG);
                         if (VSF_MSGT_ERR_MSG_NOT_HANDLED == result) {
-                            result = ptMethods->tView.Render(control_ptr, &tRegion, tMode);
+                            result = ptMethods->tView.Render(gui_ptr, control_ptr, &tRegion, tMode);
                         }
                     }
 
@@ -1090,18 +1091,22 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
 }
 
 
-fsm_rt_t vsf_tgui_control_msg_handler(  vsf_tgui_control_t* control_ptr,
+fsm_rt_t vsf_tgui_control_msg_handler(  vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_control_t* control_ptr,
                                         vsf_tgui_msg_t* ptMSG)
 {
-    return __vsf_tgui_control_msg_handler(  (vsf_tgui_control_t*)control_ptr,
+    return __vsf_tgui_control_msg_handler(  gui_ptr,
+                                            (vsf_tgui_control_t*)control_ptr,
                                             ptMSG,
                                             &c_tVControl);
 }
 
-fsm_rt_t vsf_tgui_container_msg_handler(vsf_tgui_container_t* control_ptr,
+fsm_rt_t vsf_tgui_container_msg_handler(vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_container_t* control_ptr,
                                         vsf_tgui_msg_t* ptMSG)
 {
-    return __vsf_tgui_control_msg_handler(  (vsf_tgui_control_t*)control_ptr,
+    return __vsf_tgui_control_msg_handler(  gui_ptr,
+                                            (vsf_tgui_control_t*)control_ptr,
                                             ptMSG,
                                             &c_tVContainer);
 }

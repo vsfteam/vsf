@@ -41,12 +41,15 @@ end_def_structure(vsf_tgui_v_label_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_label_t* ptLabel);
+extern fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_label_t* ptLabel);
 
-extern fsm_rt_t vsf_tgui_label_v_rendering(vsf_tgui_label_t* ptLabel,
-    vsf_tgui_region_t* ptDirtyRegion);
+extern fsm_rt_t vsf_tgui_label_v_rendering( vsf_tgui_t *gui_ptr,
+                                            vsf_tgui_label_t* label_ptr,
+                                            vsf_tgui_region_t* dirty_region_ptr,
+                                            vsf_tgui_control_refresh_mode_t mode);
 
-extern fsm_rt_t vsf_tgui_label_v_depose(vsf_tgui_label_t* ptLabel);
+extern fsm_rt_t vsf_tgui_label_v_depose(vsf_tgui_t* gui_ptr, vsf_tgui_label_t* ptLabel);
+extern fsm_rt_t vsf_tgui_label_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr);
 
 #endif
 

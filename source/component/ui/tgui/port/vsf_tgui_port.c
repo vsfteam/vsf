@@ -35,21 +35,22 @@
 #define __TGUI_FONT_DEF(__NAME, __HEIGHT, ...)                                  \
     [__NAME] = {                                                                \
         __TGUI_FONT_NAME(__NAME)                                                \
-        .height = __HEIGHT,                                                     \
+        .height = (__HEIGHT),                                                   \
         __VA_ARGS__                                                             \
     }
 
 #undef TGUI_FONT_DEF
 #define TGUI_FONT_DEF(__NAME, __HEIGHT)                                         \
-    __TGUI_FONT_DEF(__NAME, __HEIGHT)
+    __TGUI_FONT_DEF(__NAME, (__HEIGHT))
 
 #define __TGUI_FT2_FONT_INIT(__PATH, __SIZE)                                    \
-    .font_path_ptr = __PATH,                                                    \
-    .font_size = __SIZE,
+    .type = VSF_TGUI_FONT_FT2,                                                  \
+    .ft2.font_path_ptr = (__PATH),                                              \
+    .ft2.font_size = (__SIZE),
 
 #undef TGUI_FT2_FONT_DEF
 #define TGUI_FT2_FONT_DEF(__NAME, __PATH, __SIZE)                               \
-    __TGUI_FONT_DEF(__NAME, 0, __TGUI_FT2_FONT_INIT(__PATH, __SIZE))
+    __TGUI_FONT_DEF(__NAME, 0, __TGUI_FT2_FONT_INIT((__PATH), (__SIZE)))
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -57,7 +58,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 
 #ifdef VSF_TGUI_FONTS
-#   if VSF_TGUI_CFG_SUPPORT_FONT_USE_FREETYPE != ENABLED
+#   if VSF_TGUI_CFG_FONT_USE_FREETYPE != ENABLED
 const
 #   endif
 static vsf_tgui_font_t __tgui_fonts[] = {
@@ -201,8 +202,9 @@ static void __vsf_tgui_on_mouse_evt(vsf_tgui_t *tgui_ptr, vk_mouse_evt_t *mouse_
 }
 #endif
 
-void vsf_tgui_on_input_evt(vsf_tgui_t *tgui_ptr, vk_input_notifier_t *notifier, vk_input_type_t type, vk_input_evt_t *evt)
+static void __vsf_tgui_on_input_evt(vk_input_notifier_t *notifier, vk_input_type_t type, vk_input_evt_t *evt)
 {
+    vsf_tgui_t *tgui_ptr = (vsf_tgui_t *)notifier->param;
     switch (type) {
     case VSF_INPUT_TYPE_KEYBOARD:
         __vsf_tgui_on_keyboard_evt(tgui_ptr, (vk_keyboard_evt_t *)evt);
@@ -216,6 +218,13 @@ void vsf_tgui_on_input_evt(vsf_tgui_t *tgui_ptr, vk_input_notifier_t *notifier, 
         break;
 #endif
     }
+}
+
+void vsf_tgui_input_init(vsf_tgui_t *gui_ptr, vk_input_notifier_t *notifier)
+{
+    notifier->on_evt = __vsf_tgui_on_input_evt;
+    notifier->param = gui_ptr;
+    vk_input_notifier_register(notifier);
 }
 #endif
 

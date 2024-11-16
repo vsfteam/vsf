@@ -40,18 +40,19 @@ declare_class(vsf_tgui_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-fsm_rt_t vsf_tgui_text_list_v_init(vsf_tgui_text_list_t* text_list_ptr)
+fsm_rt_t vsf_tgui_text_list_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_text_list_t* text_list_ptr)
 {
 #if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) init" VSF_TRACE_CFG_LINEEND,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t*)text_list_ptr), text_list_ptr);
 #endif
-    vsf_tgui_container_v_init(&(text_list_ptr->use_as__vsf_tgui_container_t));
-    vsf_tgui_container_v_init(&(text_list_ptr->tList.use_as__vsf_tgui_container_t));
+    vsf_tgui_container_v_init(gui_ptr, &(text_list_ptr->use_as__vsf_tgui_container_t));
+    vsf_tgui_container_v_init(gui_ptr, &(text_list_ptr->tList.use_as__vsf_tgui_container_t));
     return fsm_rt_on_going;
 }
 
-fsm_rt_t vsf_tgui_text_list_v_rendering( vsf_tgui_text_list_t* text_list_ptr,
+fsm_rt_t vsf_tgui_text_list_v_rendering(vsf_tgui_t *gui_ptr,
+                                    vsf_tgui_text_list_t* text_list_ptr,
                                     vsf_tgui_region_t* ptDirtyRegion,       //!< you can ignore the tDirtyRegion for simplicity
                                     vsf_tgui_control_refresh_mode_t tMode)
 {
@@ -63,27 +64,29 @@ fsm_rt_t vsf_tgui_text_list_v_rendering( vsf_tgui_text_list_t* text_list_ptr,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t*)text_list_ptr), text_list_ptr);
 #endif
 
-    vsf_tgui_container_v_rendering(&(text_list_ptr->use_as__vsf_tgui_container_t),
+    vsf_tgui_container_v_rendering( gui_ptr,
+                                    &(text_list_ptr->use_as__vsf_tgui_container_t),
                                     ptDirtyRegion,
                                     tMode);
 
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_text_list_v_post_rendering(   vsf_tgui_text_list_t* text_list_ptr,
+fsm_rt_t vsf_tgui_text_list_v_post_rendering(   vsf_tgui_t *gui_ptr,
+                                                vsf_tgui_text_list_t* text_list_ptr,
                                                 vsf_tgui_region_t* ptDirtyRegion,
                                                 vsf_tgui_control_refresh_mode_t tMode)
 {
-    return vsf_tgui_container_v_post_rendering((vsf_tgui_container_t *)text_list_ptr, ptDirtyRegion, tMode);
+    return vsf_tgui_container_v_post_rendering(gui_ptr, (vsf_tgui_container_t *)text_list_ptr, ptDirtyRegion, tMode);
 }
 
 
-fsm_rt_t vsf_tgui_text_list_v_depose(vsf_tgui_text_list_t* text_list_ptr)
+fsm_rt_t vsf_tgui_text_list_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_text_list_t* text_list_ptr)
 {
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_text_list_v_update(vsf_tgui_text_list_t* text_list_ptr)
+fsm_rt_t vsf_tgui_text_list_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_text_list_t* text_list_ptr)
 {
     return fsm_rt_cpl;
 }

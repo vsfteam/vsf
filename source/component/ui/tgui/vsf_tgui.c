@@ -112,6 +112,7 @@ vsf_err_t vk_tgui_init(vsf_tgui_t* gui_ptr, const vsf_tgui_cfg_t* cfg_ptr)
 #endif
 
         vsf_msgt_forward_propagate_msg_dfs_init(&(this.use_as__vsf_msgt_t));
+        this.use_as__vsf_msgt_t.target_ptr = gui_ptr;
 
         //! initialise input
         do {
