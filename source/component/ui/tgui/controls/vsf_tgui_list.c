@@ -474,7 +474,6 @@ int_fast16_t vk_tgui_list_selected_item_set(vsf_tgui_list_t* ptList,
 }
 
 #if VSF_TGUI_CFG_LIST_SUPPORT_SCROOLBAR == ENABLED
-VSF_CAL_SECTION(".text.vsf.component.tgui.vsf_tgui_list_scrollbar_regions_generate");
 vsf_tgui_list_scrollbar_region_t * vsf_tgui_list_scrollbar_regions_generate(
                             const vsf_tgui_control_t* control_ptr,
                             const vsf_tgui_list_t* ptList,
