@@ -1394,7 +1394,7 @@ void _initterm(cpp_init_func_t * const first, cpp_init_func_t * const last)
 
     for (int idx = 0; idx < count; idx++) {
         if ((idx >= 2) && (idx <= count - 2)) {
-            if (funcs[idx] != __vsf_main_entry) {
+            if (funcs[idx] != (cpp_init_func_t)__vsf_main_entry) {
                 VSF_ARCH_ASSERT(__vsf_cpp_init_cnt < dimof(__vsf_cpp_init));
                 __vsf_cpp_init[__vsf_cpp_init_cnt++] = (cpp_init_t){
                     .returns_int = false,

@@ -248,7 +248,7 @@ __vsf_component_peda_private_entry(__vk_malfs_read,
     switch (evt) {
     case VSF_EVT_INIT:
         vsf_local.cur_buff = vsf_local.buff;
-        if ((NULL == vsf_local.buff) || ((uint32_t)vsf_local.buff & (cap.data_ptr_alignment - 1))) {
+        if ((NULL == vsf_local.buff) || ((uintptr_t)vsf_local.buff & (cap.data_ptr_alignment - 1))) {
             if (NULL == vsf_local.buff) {
                 VSF_FS_ASSERT(vsf_local.block_num == 1);
             }
@@ -334,7 +334,7 @@ vsf_err_t __vk_malfs_write(__vk_malfs_info_t *info, uint_fast64_t block_addr, ui
 {
     // TODO: add lock and unlock
     vsf_mal_capability_t cap = vk_mal_capability(info->mal);
-    VSF_FS_ASSERT(((uint32_t)buff & (cap.data_ptr_alignment - 1)));
+    VSF_FS_ASSERT(((uintptr_t)buff & (cap.data_ptr_alignment - 1)));
     return vk_mal_write(info->mal, info->block_size * block_addr, info->block_size * block_num, buff);
 }
 
