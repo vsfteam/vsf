@@ -26,8 +26,6 @@
 
 
 #define VSF_USE_UI                                          ENABLED
-#   define VSF_DISP_USE_SDL2                                ENABLED
-
 #   define VSF_USE_TINY_GUI                                 ENABLED
 #       define VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL          VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 #       define VSF_TGUI_CFG_COLOR_MODE                      VSF_TGUI_COLOR_ARGB_8888
@@ -44,16 +42,12 @@
 #       define VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING         ENABLED         /* Enabled for debug */
 #       define VSF_MSGT_NODE_OFFSET_TYPE                    int16_t
 
-#define VSF_TGUI_SV_FONTS                                                                  \
-    TGUI_SV_FT2_FONT_DEF(VSF_TGUI_FONT_WQY_MICROHEI_S24, "wqy-microhei.ttc", 24),     \
-    TGUI_SV_FT2_FONT_DEF(VSF_TGUI_FONT_WQY_MICROHEI_S20, "wqy-microhei.ttc", 20),     \
-    TGUI_SV_FT2_FONT_DEF(VSF_TGUI_FONT_WQY_MICROHEI_S16, "wqy-microhei.ttc", 16),     \
-    TGUI_SV_FT2_FONT_DEF(VSF_TGUI_FONT_DEJAVUSERIF_S24,  "DejaVuSerif.ttf",  24)
-
-#if VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN == ENABLED
-#   undef VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS
-#   define VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS   ENABLED
-#endif
+#define VSF_TGUI_CFG_FONT_USE_FREETYPE                      ENABLED
+#define VSF_TGUI_FONTS                                                              \
+    TGUI_FT2_FONT_DEF(VSF_TGUI_FONT_WQY_MICROHEI_S24, "wqy-microhei.ttc", 24),      \
+    TGUI_FT2_FONT_DEF(VSF_TGUI_FONT_WQY_MICROHEI_S20, "wqy-microhei.ttc", 20),      \
+    TGUI_FT2_FONT_DEF(VSF_TGUI_FONT_WQY_MICROHEI_S16, "wqy-microhei.ttc", 16),      \
+    TGUI_FT2_FONT_DEF(VSF_TGUI_FONT_DEJAVUSERIF_S24,  "DejaVuSerif.ttf",  24)
 
 /*============================ TYPES =========================================*/
 

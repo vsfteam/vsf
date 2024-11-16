@@ -1174,6 +1174,15 @@
     <Filter Include="vsf\hal\utilities\remap\sdio">
       <UniqueIdentifier>{aa53cf20-34c8-4a49-b06c-8b2904fc8b16}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\component\ui\tgui\port">
+      <UniqueIdentifier>{68b0baee-5d04-4a09-964a-fb90c3277ed9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\tgui\port\font">
+      <UniqueIdentifier>{e9ac0007-d994-4930-9bc7-5ff9a8cc327d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\component\ui\tgui\port\view">
+      <UniqueIdentifier>{3f8c606e-acaa-45fc-9aca-d012d7dfb38a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -1986,9 +1995,6 @@
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\__vk_tgui_slider.h">
       <Filter>vsf\component\ui\tgui\controls</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\__vsf_tgui_controls_common.h">
-      <Filter>vsf\component\ui\tgui\controls</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\controls\vsf_msg_tree_cfg.h">
       <Filter>vsf\component\ui\tgui\controls</Filter>
     </ClInclude>
@@ -2074,9 +2080,6 @@
       <Filter>vsf\component\ui\tgui\view\simple_view</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_draw.h">
-      <Filter>vsf\component\ui\tgui\view\simple_view</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.h">
       <Filter>vsf\component\ui\tgui\view\simple_view</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_label.h">
@@ -3465,6 +3468,12 @@
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\sdio\vsf_remapped_sdio.h">
       <Filter>vsf\hal\utilities\remap\sdio</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\port\view\vsf_tgui_sv_port.h">
+      <Filter>vsf\component\ui\tgui\port\view</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\port\vsf_tgui_port.h">
+      <Filter>vsf\component\ui\tgui\port</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
@@ -3750,9 +3759,6 @@
       <Filter>usrapp\demo\tgui_demo\tgui_demo</Filter>
     </ClCompile>
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_demo.c">
-      <Filter>usrapp\demo\tgui_demo\tgui_demo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_port.c">
       <Filter>usrapp\demo\tgui_demo\tgui_demo</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\freetype\raw\src\autofit\autofit.c">
@@ -4447,9 +4453,6 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\btstack_demo\btstack_application.c">
       <Filter>usrapp\demo\btstack_demo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\simple_view\vsf_tgui_sv_font.c">
-      <Filter>vsf\component\ui\tgui\view\simple_view</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\usb\host\class\DL1x5\vsf_usbh_dl1x5.c">
       <Filter>vsf\component\usb\host\class\DL1x5</Filter>
@@ -6019,6 +6022,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\sdio\vsf_remapped_sdio.c">
       <Filter>vsf\hal\utilities\remap\sdio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\port\font\vsf_tgui_font_port_freetype.c">
+      <Filter>vsf\component\ui\tgui\port\font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\port\view\vsf_tgui_sv_port.c">
+      <Filter>vsf\component\ui\tgui\port\view</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\port\vsf_tgui_port.c">
+      <Filter>vsf\component\ui\tgui\port</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

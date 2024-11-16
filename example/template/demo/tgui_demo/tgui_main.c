@@ -31,28 +31,9 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_tgui_bind_disp(vk_disp_t* disp, void* bitmap_data, size_t bitmap_size);
-extern void vsf_tgui_on_touchscreen_evt(vk_touchscreen_evt_t* ts_evt);
-extern void vsf_tgui_on_keyboard_evt(vk_keyboard_evt_t* keyboard_evt);
-extern vsf_err_t tgui_demo_init(void);
+extern vsf_tgui_t * tgui_demo_init(void);
 
 /*============================ IMPLEMENTATION ================================*/
-
-static void __tgui_on_input_evt(vk_input_notifier_t *notifier, vk_input_type_t type, vk_input_evt_t *evt)
-{
-//! this block of code is used for test purpose only
-    if (VSF_INPUT_TYPE_KEYBOARD == type) {
-        vsf_tgui_on_keyboard_evt((vk_keyboard_evt_t *)evt);
-    } else if (VSF_INPUT_TYPE_TOUCHSCREEN == type) {
-        vsf_tgui_on_touchscreen_evt((vk_touchscreen_evt_t *)evt);
-    }
-#if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
-    else if (VSF_INPUT_TYPE_MOUSE == type) {
-        extern void vsf_tgui_on_mouse_evt(vk_mouse_evt_t *mouse_evt);
-        vsf_tgui_on_mouse_evt((vk_mouse_evt_t *)evt);
-    }
-#endif
-}
 
 #if APP_USE_LINUX_DEMO == ENABLED
 int tgui_main(int argc, char *argv[])
@@ -71,21 +52,20 @@ int VSF_USER_ENTRY(void)
     freetype_demo_init();
 #endif
 
-    usrapp_ui_common.tgui.notifier.mask =
+    vsf_tgui_t *tgui = tgui_demo_init();
+    if (tgui != NULL) {
+        vsf_tgui_fonts_init((vsf_tgui_font_t *)vsf_tgui_font_get(0), vsf_tgui_font_number());
+        vsf_tgui_sv_bind_disp(tgui, usrapp_ui_common.disp, &usrapp_ui_common.tgui.color, dimof(usrapp_ui_common.tgui.color));
+
+        usrapp_ui_common.tgui.notifier.mask =
                     (1 << VSF_INPUT_TYPE_TOUCHSCREEN)
                 |   (1 << VSF_INPUT_TYPE_KEYBOARD)
 #if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
                 |   (1 << VSF_INPUT_TYPE_MOUSE)
 #endif
         ;
-    usrapp_ui_common.tgui.notifier.on_evt = __tgui_on_input_evt;
-    vk_input_notifier_register(&usrapp_ui_common.tgui.notifier);
-
-    tgui_demo_init();
-
-    // insecure operation
-    //((vk_disp_param_t *)&usrapp_ui_common.disp->param)->color = VSF_DISP_COLOR_ARGB8888;
-	vsf_tgui_bind_disp(usrapp_ui_common.disp, &usrapp_ui_common.tgui.color, dimof(usrapp_ui_common.tgui.color));
+        vsf_tgui_input_init(tgui, &usrapp_ui_common.tgui.notifier);
+    }
 
     return 0;
 }
