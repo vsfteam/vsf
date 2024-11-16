@@ -43,6 +43,14 @@
 
 /*============================ MACROS ========================================*/
 
+#if VSF_KERNEL_CFG_EDA_SUPPORT_TASK != ENABLED
+#   error please enable VSF_KERNEL_CFG_EDA_SUPPORT_TASK for tgui
+#endif
+
+#if VSF_KERNEL_CFG_EDA_SUPPORT_PT != ENABLED
+#   error please enable VSF_KERNEL_CFG_EDA_SUPPORT_PT for tgui
+#endif
+
 #undef this
 #define this                    (*this_ptr)
 

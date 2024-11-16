@@ -48,9 +48,8 @@
 #   define VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL  VSF_TGUI_V_TEMPLATE_EXAMPLE
 #   define VSF_TGUI_V_TEMPLATE_TYPE_HEADER_FILE "./view/template/vsf_tgui_v_type.h"
 #endif
-#endif
-
 #include VSF_TGUI_V_TEMPLATE_TYPE_HEADER_FILE
+#endif
 
 #include "utilities/vsf_tgui_text.h"
 

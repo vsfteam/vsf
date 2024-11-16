@@ -82,32 +82,44 @@
 #   endif
 
 #   if VSF_TGUI_CFG_SUPPORT_MULTI_LANGUAGE_EXTERNSION == ENABLED
-#       define __tgui_text(__NAME, __ID, ...)                                   \
+#       define __tgui_text(__NAME, __ID, __ALIGN)                               \
                 .__NAME.tString.tID = (__ID),                                   \
                 .__NAME.bIsChanged = true,                                      \
                 .__NAME.bIsAutoSize = false,                                    \
-                .__NAME.u4Align = (0, ##__VA_ARGS__)
+                .__NAME.u4Align = (__ALIGN)
+#       define __tgui_text0(__NAME, __ID)                                       \
+                __tgui_text1(__NAME, (__ID), 0)
+#       define __tgui_text(__NAME, __ID, ...)                                   \
+            __PLOOC_EVAL(__tgui_text, __VA_ARGS__)(__NAME, (__ID), ##__VA_ARGS__)
 #   else
 
 #       if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
-#           define __tgui_text(__NAME, __TEXT, __AUTOSIZE, ...)                 \
+#           define __tgui_text1(__NAME, __TEXT, __AUTOSIZE, __ALIGN)            \
                 .__NAME.tString.pstrText = __TEXT,                              \
                 .__NAME.tString.s16_size = sizeof(__TEXT) - 1,                  \
                 .__NAME.bIsChanged = true,                                      \
                 .__NAME.bIsAutoSize = (__AUTOSIZE),                             \
-                .__NAME.u4Align = (0, ##__VA_ARGS__)
+                .__NAME.u4Align = (__ALIGN)
 #       else
-#           define __tgui_text(__NAME, __TEXT, __AUTOSIZE, ...)                 \
+#           define __tgui_text1(__NAME, __TEXT, __AUTOSIZE, __ALIGN)            \
                 .__NAME.tString.pstrText = __TEXT,                              \
                 .__NAME.bIsChanged = true,                                      \
                 .__NAME.bIsAutoSize = (__AUTOSIZE),                             \
-                .__NAME.u4Align = (0, ##__VA_ARGS__)
+                .__NAME.u4Align = (__ALIGN)
 #       endif
+#       define __tgui_text0(__NAME, __TEXT, __AUTOSIZE)                         \
+                __tgui_text1(__NAME, (__TEXT), (__AUTOSIZE), 0)
+#       define __tgui_text(__NAME, __TEXT, __AUTOSIZE, ...)                     \
+            __PLOOC_EVAL(__tgui_text, __VA_ARGS__)(__NAME, (__TEXT), (__AUTOSIZE), ##__VA_ARGS__)
 #   endif
 
-#   define __tgui_container_type(__TYPE, ...)                                   \
+#   define __tgui_container_type1(__TYPE, __AUTOSIZE)                           \
                 .ContainerAttribute.u5Type = (__TYPE),                          \
-                .ContainerAttribute.bIsAutoSize = (true, ##__VA_ARGS__)      
+                .ContainerAttribute.bIsAutoSize = (__AUTOSIZE)
+#   define __tgui_container_type0(__TYPE)                                       \
+                __tgui_container_type1((__TYPE), true)
+#   define __tgui_container_type(__TYPE, ...)                                   \
+                __PLOOC_EVAL(__tgui_container_type, __VA_ARGS__)((__TYPE), ##__VA_ARGS__)
 
 #   define __tgui_line_space(__NAME, __PIX)                                     \
                 .__NAME.chInterLineSpace = (__PIX)
@@ -126,11 +138,15 @@
                 __tgui_line_space(__NAME, (__PIX))
 
 #   if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
+#       define tgui_timer1(__NAME, __INTERVAL, __REPEATE, __ENABLED)            \
+                __tgui_attribute(__NAME,   {.u29Interval = (__INTERVAL),        \
+                                            .bIsRepeat = (__REPEATE),           \
+                                            .bEnabled = (__ENABLED),            \
+                                           })
+#       define tgui_timer0(__NAME, __INTERVAL, __REPEATE)                       \
+                tgui_timer1(__NAME, (__INTERVAL), (__REPEATE), true)
 #       define tgui_timer(__NAME, __INTERVAL, __REPEATE, ...)                   \
-                 __tgui_attribute(__NAME,   {.u29Interval = (__INTERVAL),       \
-                                             .bIsRepeat = (__REPEATE),          \
-                                             .bEnabled = (true, ##__VA_ARGS__), \
-                                            })
+                __PLOOC_EVAL(tgui_timer, __VA_ARGS__)((__NAME), (__INTERVAL), (__REPEATE), ##__VA_ARGS__)
 #   endif
 
 #   define tgui_handler(...)                                                    \
@@ -163,42 +179,51 @@
 
 #if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
 
-#   define __tgui_msg_handler(__MSG, __FUNC, ...)                               \
+#   define __tgui_msg_handler1(__MSG, __FUNC, __MASK)                           \
             {                                                                   \
                 .msg = (__MSG),                                                 \
                 .u2Type = VSF_MSGT_NODE_HANDLER_TYPE_CALLBACK,                  \
                 .FSM = (vsf_tgui_controal_fsm_t *)&__FUNC,                      \
-                .u10EvtMask = ((uint16_t)-1, ##__VA_ARGS__),                    \
+                .u10EvtMask = (__MASK),                                         \
                 .handler_name_ptr = #__FUNC,                                    \
             }
 
-#   define __tgui_msg_mux(__MSG, __FUNC, ...)                                   \
+#   define __tgui_msg_mux1(__MSG, __FUNC, __MASK)                               \
             {                                                                   \
                 .msg = (__MSG),                                                 \
                 .u2Type = VSF_MSGT_NODE_HANDLER_TYPE_CALLBACK,                  \
                 .FSM = (vsf_tgui_controal_fsm_t *)&__FUNC,                      \
-                .u10EvtMask = (0, ##__VA_ARGS__),                               \
+                .u10EvtMask = (__MASK),                                         \
                 .handler_name_ptr = #__FUNC,                                    \
             }
-
 #else
 
-#   define __tgui_msg_handler(__MSG, __FUNC, ...)                               \
+#   define __tgui_msg_handler1(__MSG, __FUNC, __MASK)                           \
             {                                                                   \
                 .msg = (__MSG),                                                 \
                 .u2Type = VSF_MSGT_NODE_HANDLER_TYPE_CALLBACK,                  \
                 .FSM = (vsf_tgui_controal_fsm_t *)&__FUNC,                      \
-                .u10EvtMask = ((uint16_t)-1, ##__VA_ARGS__),                    \
+                .u10EvtMask = (__MASK),                                         \
             }
 
-#   define __tgui_msg_mux(__MSG, __FUNC, ...)                                   \
+#   define __tgui_msg_mux1(__MSG, __FUNC, __MASK)                               \
             {                                                                   \
                 .msg = (__MSG),                                                 \
                 .u2Type = VSF_MSGT_NODE_HANDLER_TYPE_CALLBACK,                  \
                 .FSM = (vsf_tgui_controal_fsm_t *)&__FUNC,                      \
-                .u10EvtMask = (0, ##__VA_ARGS__),                               \
+                .u10EvtMask = (__MASK),                                         \
             }
 #endif
+
+#define __tgui_msg_handler0(__MSG, __FUNC)                                      \
+            __tgui_msg_handler1((__MSG), __FUNC, (uint16_t)-1)
+#define __tgui_msg_handler(__MSG, __FUNC, ...)                                  \
+            __PLOOC_EVAL(__tgui_msg_handler, __VA_ARGS__)((__MSG), __FUNC, ##__VA_ARGS__)
+
+#define __tgui_msg_mux0(__MSG, __FUNC)                                          \
+            __tgui_msg_mux1((__MSG), __FUNC, 0)
+#define __tgui_msg_mux(__MSG, __FUNC, ...)                                      \
+            __PLOOC_EVAL(__tgui_msg_mux, __VA_ARGS__)((__MSG), __FUNC, ##__VA_ARGS__)
 
 #define tgui_handlers(...)             __tgui_handlers(__VA_ARGS__)
 
