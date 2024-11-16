@@ -146,7 +146,7 @@
 #       define tgui_timer0(__NAME, __INTERVAL, __REPEATE)                       \
                 tgui_timer1(__NAME, (__INTERVAL), (__REPEATE), true)
 #       define tgui_timer(__NAME, __INTERVAL, __REPEATE, ...)                   \
-                __PLOOC_EVAL(tgui_timer, __VA_ARGS__)((__NAME), (__INTERVAL), (__REPEATE), ##__VA_ARGS__)
+                __PLOOC_EVAL(tgui_timer, __VA_ARGS__)(__NAME, (__INTERVAL), (__REPEATE), ##__VA_ARGS__)
 #   endif
 
 #   define tgui_handler(...)                                                    \
