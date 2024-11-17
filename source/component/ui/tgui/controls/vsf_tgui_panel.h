@@ -106,7 +106,7 @@
 #define declare_tgui_panel(__NAME)      __declare_tgui_panel(__NAME)
 
 #define __def_tgui_panel(__NAME, ...)                                           \
-    struct __NAME {                                                             \
+    typedef struct __NAME {                                                     \
         implement(vsf_tgui_panel_t)                                             \
                                                                                 \
         union {                                                                 \
@@ -118,8 +118,8 @@
 
 #define def_tgui_panel(__NAME, ...)     __def_tgui_panel(__NAME, __VA_ARGS__)
 
-#define end_def_tgui_panel(...)                                                 \
-    };
+#define end_def_tgui_panel(__NAME)                                              \
+    } __NAME;
 
 #define __describ_tgui_panel(__TYPE, __NAME, ...)                               \
         describe_tgui_container_base(                                           \
