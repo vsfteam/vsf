@@ -85,7 +85,7 @@ extern void vsf_tgui_input_init(vsf_tgui_t *gui_ptr, vk_input_notifier_t *notifi
 
 extern const vsf_tgui_font_t * vsf_tgui_font_get(uint8_t font_index);
 extern uint8_t vsf_tgui_font_number(void);
-extern bool vsf_tgui_fonts_init(vsf_tgui_font_t *font_ptr, size_t size);
+extern bool vsf_tgui_fonts_init(vsf_tgui_font_t *font_ptr, size_t font_num, const char *font_dir);
 
 // simple view
 

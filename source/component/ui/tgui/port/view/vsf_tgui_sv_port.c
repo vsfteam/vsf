@@ -58,8 +58,8 @@ typedef uint32_t vsf_tgui_disp_pixel_t;
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_TGUI_CFG_DISP_COLOR == VSF_TGUI_CFG_COLOR_MODE
-#   define __disp_color_to_tgui_color(__disp_color) (__disp_color)
-#   define __tgui_color_to_disp_color(__tgui_color) (__tgui_color)
+#   define __disp_color_to_tgui_color(__disp_color) ((vsf_tgui_sv_color_t){ .value = __disp_color})
+#   define __tgui_color_to_disp_color(__tgui_color) (__tgui_color.value)
 #else
 #   define __disp_color_to_tgui_color(__disp_color) ({                          \
         VSF_MCONNECT(vsf_tgui_sv_color_, vsf_tgui_disp_color_prefix, _t)        \
@@ -494,7 +494,6 @@ void vsf_tgui_sv_bind_disp(vsf_tgui_t *gui_ptr, vk_disp_t *disp, void *pfb, size
     gui_ptr->disp = disp;
     gui_ptr->pfb = pfb;
     gui_ptr->pfb_size = pfb_size;
-    gui_ptr->is_ready = false;
 
     disp->ui_data = gui_ptr;
     disp->ui_on_ready = __vsf_tgui_on_inited;

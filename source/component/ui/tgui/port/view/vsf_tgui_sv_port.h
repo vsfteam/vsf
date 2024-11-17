@@ -39,6 +39,14 @@
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+#define vsf_tgui_vport_init(__vsf_tgui_v_port_ptr)                              \
+    do {                                                                        \
+        (__vsf_tgui_v_port_ptr)->is_ready = false;                              \
+        (__vsf_tgui_v_port_ptr)->current_region.tSize.iHeight = 0;              \
+        (__vsf_tgui_v_port_ptr)->current_region.tSize.iWidth = 0;               \
+    } while(0)
+
 /*============================ TYPES =========================================*/
 
 declare_class(vsf_tgui_t)

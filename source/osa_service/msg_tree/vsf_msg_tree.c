@@ -60,6 +60,7 @@ void vsf_msgt_init(vsf_msgt_t* obj_ptr, const vsf_msgt_cfg_t* cfg_ptr)
     VSF_OSA_SERVICE_ASSERT(     (NULL != cfg_ptr->interface_ptr)
                             ||  (0 != cfg_ptr->type_num));
 
+    memset(obj_ptr, 0, sizeof(*obj_ptr));
     vsf_this.NodeTypes = *cfg_ptr;
 }
 

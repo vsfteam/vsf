@@ -94,6 +94,8 @@ vsf_err_t vk_tgui_init(vsf_tgui_t* gui_ptr, const vsf_tgui_cfg_t* cfg_ptr)
             break;
         }
 
+        vsf_tgui_vport_init(&gui_ptr->use_as__vsf_tgui_v_port_t);
+
         //! initialise the queue
         vsf_rng_buf_prepare(__vsf_tgui_evt_queue_t,
             &this.msg_queue,
@@ -551,6 +553,7 @@ implement_vsf_pt(__vsf_tgui_evt_shooter_t)
     vsf_evt_t   msg;
     vsf_pt_begin();
 
+    vsf_this.root_node_ptr = NULL;
     while (1) {
 
 loop_start:
@@ -937,7 +940,7 @@ static void __vk_tgui_depose_top_container( vsf_tgui_t* gui_ptr,
     //! send message
     __vk_tgui_send_dfs_msg(this.msg_tree_ptr, (const vsf_msgt_node_t *)top_ptr, evt_ptr);
 
-    
+
 }
 
 

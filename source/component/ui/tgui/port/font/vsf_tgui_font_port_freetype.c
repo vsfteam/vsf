@@ -136,7 +136,7 @@ void * vsf_tgui_font_get_char(const uint8_t font_index, uint32_t char_u32, vsf_t
     return glyph->bitmap.buffer;
 }
 
-bool vsf_tgui_fonts_init(vsf_tgui_font_t *font_ptr, size_t size)
+bool vsf_tgui_fonts_init(vsf_tgui_font_t *font_ptr, size_t font_num, const char *font_dir)
 {
     int i;
     FT_Library library;
@@ -146,14 +146,14 @@ bool vsf_tgui_fonts_init(vsf_tgui_font_t *font_ptr, size_t size)
 
     VSF_TGUI_ASSERT(font_ptr != NULL);
 
-    for (i = 0; i < size; i++) {
+    for (i = 0; i < font_num; i++) {
         if (FT_Err_Ok != FT_Init_FreeType(&library)) {
             VSF_TGUI_ASSERT(0);
             return false;
         }
 
         char path[256];
-        strcpy(path, "font/");
+        strcpy(path, font_dir);
         strcat(path, font_ptr->ft2.font_path_ptr);
         if (FT_Err_Ok != FT_New_Face(library, path, 0, &face)) {
             VSF_TGUI_ASSERT(0);
