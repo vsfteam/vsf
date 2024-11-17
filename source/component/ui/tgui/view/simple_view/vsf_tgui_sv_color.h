@@ -48,6 +48,9 @@
 #endif
 #define VSF_TGUI_COLOR_RGB(__R, __G, __B)               VSF_TGUI_COLOR_RGBA(__R, __G, __B, 0xFF)
 
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+#   define VSF_TGUI_COLOR_TRANSPARENT                   VSF_TGUI_COLOR_RGBA(0, 0, 0, 0)
+#endif
 #define VSF_TGUI_COLOR_WHITE                            VSF_TGUI_COLOR_RGB(0xFF, 0xFF, 0xFF)    //  Red:100%  Green:100%  Blue:100%
 #define VSF_TGUI_COLOR_SILVER                           VSF_TGUI_COLOR_RGB(0xC0, 0xC0, 0xC0)    //  Red: 75%  Green: 75%  Blue: 75%
 #define VSF_TGUI_COLOR_GRAY                             VSF_TGUI_COLOR_RGB(0x80, 0x80, 0x80)    //  Red: 50%  Green: 50%  Blue: 50%
