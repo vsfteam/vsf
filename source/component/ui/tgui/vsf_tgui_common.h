@@ -381,7 +381,7 @@ typedef VSF_TGUI_CFG_DRAM_POINTER_TYPE vsf_tgui_disp_ram_uintptr_t;
 
 typedef struct vsf_tgui_tile_core_t {
     struct {
-        uint8_t         u2RootTileType      : 2;    /* 0: buf tile, 1: index tile, 2 and 3 undefined*/
+        uint8_t         u2RootTileType      : 2;    /* 0: buf_offset tile, 1: index tile, 2 buf_addr tile, 3 undefined*/
         uint8_t         u2ColorType         : 2;    /* 0: rgb, 1: rgba, 2: alpha/graysacle */
         uint8_t         u3ColorSize         : 3;    /* 0: 1bit, 2: 4bit, 3: 8bit 4: 16bit, 5: 32bit, 6: 24bit */
         uint8_t         bIsRootTile         : 1;    /* 0: Child Tile, u3ColorSize and u4RootTileType have no meaning
