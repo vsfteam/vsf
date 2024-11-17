@@ -122,23 +122,24 @@ def main():
 
     search_dirs = {'RGB':'./rgb-images', 'RGBA':'./rgba-images', 'L':'./grayscale-images'}
     for (mode, dirname) in search_dirs.items():
-        files = os.listdir(dirname)
-        for f in files:
-            file_path = os.path.join(dirname, f)
-            if os.path.isfile(file_path):
-                image = tgui_image_to_dict(mode, file_path)
-                tile_def, tile_ref, tile_data, tile_header, tile_text_list = tgui_image_data_buid(image, offset)
+        if (os.path.exists(dirname) and os.path.isdir(dirname)):
+            files = os.listdir(dirname)
+            for f in files:
+                file_path = os.path.join(dirname, f)
+                if os.path.isfile(file_path):
+                    image = tgui_image_to_dict(mode, file_path)
+                    tile_def, tile_ref, tile_data, tile_header, tile_text_list = tgui_image_data_buid(image, offset)
 
-                tiles_def        += tile_def
-                tiles_header     += tile_header
+                    tiles_def        += tile_def
+                    tiles_header     += tile_header
 
-                tiles_data       += tile_data
-                offset           += image['size']
+                    tiles_data       += tile_data
+                    offset           += image['size']
 
-                tiles_def_list   += tile_ref
-                tiles_text_list  += tile_text_list
+                    tiles_def_list   += tile_ref
+                    tiles_text_list  += tile_text_list
 
-                counter          += 1
+                    counter          += 1
 
     tiles_data = '''static const char __tiles_data[] = {{
 {hex_array}}};
