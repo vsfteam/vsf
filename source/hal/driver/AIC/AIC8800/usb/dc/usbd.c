@@ -74,7 +74,7 @@ void aic8800_usbd_fini(aic8800_usb_t *dc)
 {
 }
 
-static void __aic8800_usbd_phy_init(void *param)
+static void __aic8800_usbd_phy_init(void *param, vk_dwcotg_dcd_param_t *dcd_param)
 {
     aic8800_usb_t *dc = (aic8800_usb_t *)param;
     volatile uint32_t *reg_base = dc->param->reg;
