@@ -36,11 +36,11 @@ vsf_tgui_sv_color_t vsf_tgui_sv_color_mix(vsf_tgui_sv_color_t color_0, vsf_tgui_
 #if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
     color_0.value   = ((((color_0.value >> 8) & 0x00FF00FF) * mix) & 0xFF00FF00)
                     + ((((color_0.value & 0x00FF00FF) * mix) >> 8) & 0x00FF00FF);
-    mix = ~mix;
+    mix = mix ^ 0xFF;
     color_0.value  += ((((color_1.value >> 8) & 0x00FF00FF) * mix) & 0xFF00FF00)
                     + ((((color_1.value & 0x00FF00FF) * mix) >> 8) & 0x00FF00FF);
 #else
-    uint_fast8_t rmix = ~mix;
+    uint_fast8_t rmix = mix ^ 0xFF;
     color_0.red     = ((uint32_t)color_0.red   * mix + (uint32_t)color_1.red   * rmix) / 255;
     color_0.green   = ((uint32_t)color_0.green * mix + (uint32_t)color_1.green * rmix) / 255;
     color_0.blue    = ((uint32_t)color_0.blue  * mix + (uint32_t)color_1.blue  * rmix) / 255;
