@@ -1385,16 +1385,29 @@ int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts, co
     return ready;
 }
 
-static int __vsf_linux_fs_create(const char *pathname, mode_t mode, vk_file_attr_t attr)
+static int __vsf_linux_fs_create(int dirfd, const char *pathname, mode_t mode, vk_file_attr_t attr)
 {
+    vk_file_t *dir = dirfd < 0 ? NULL : __vsf_linux_get_fs_ex(NULL, dirfd);
     char fullpath[PATH_MAX], *name_tmp;
     int err = 0;
-    if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
-        return -1;
+
+    if (NULL == dir) {
+        if (vsf_linux_generate_path(fullpath, sizeof(fullpath), NULL, (char *)pathname)) {
+            return -1;
+        }
+    } else {
+        strcpy(fullpath, pathname);
     }
-    if ((fullpath[0] == '/') && (fullpath[1] == '\0')) {
-        errno = EEXIST;
-        return -1;
+
+    if (fullpath[0] == '/') {
+        if (fullpath[1] == '\0') {
+            errno = EEXIST;
+            return -1;
+        }
+        if (dirfd >= 0) {
+            errno = EINVAL;
+            return -1;
+        }
     }
     size_t fullpath_len = strlen(fullpath);
     if (fullpath[fullpath_len - 1] == '/') {
@@ -1410,7 +1423,7 @@ static int __vsf_linux_fs_create(const char *pathname, mode_t mode, vk_file_attr
     strcpy(filename, name_tmp);
 
     fullpath[name_tmp - fullpath] = '\0';
-    vk_file_t *dir = __vsf_linux_fs_get_file(fullpath);
+    dir = __vsf_linux_fs_get_file_ex(dir, fullpath);
     if (!dir) {
         return -1;
     }
@@ -1531,29 +1544,17 @@ do_close_olddir_and_fail:
     return -1;
 }
 
-int mkdir(const char *pathname, mode_t mode)
+int mkdirat(int dirfd, const char *pathname, mode_t mode)
 {
     if ((NULL == pathname) || ('\0' == *pathname)) {
         return -1;
     }
-
-    return __vsf_linux_fs_create(pathname, mode, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE);
+    return __vsf_linux_fs_create(dirfd, pathname, mode, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE);
 }
 
-int mkdirat(int dirfd, const char *pathname, mode_t mode)
+int mkdir(const char *pathname, mode_t mode)
 {
-    vk_file_t *dir = __vsf_linux_get_fs_ex(NULL, dirfd);
-    if (NULL == dir) {
-        errno = ENOTDIR;
-        return -1;
-    }
-
-    vk_file_create(dir, pathname, VSF_FILE_ATTR_DIRECTORY | VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE);
-    if (VSF_ERR_NONE != (vsf_err_t)vsf_eda_get_return_value()) {
-        return -1;
-    }
-
-    return 0;
+    return mkdirat(-1, pathname, mode);
 }
 
 int mkdirs(const char *pathname, mode_t mode)
@@ -1676,8 +1677,9 @@ int creat(const char *pathname, mode_t mode)
     return open(pathname, O_WRONLY | O_CREAT | O_TRUNC, mode);
 }
 
-int vsf_linux_open(vk_file_t *dir, const char *pathname, int flags, mode_t mode)
+int vsf_linux_open(int dirfd, const char *pathname, int flags, mode_t mode)
 {
+    vk_file_t *dir = dirfd < 0 ? NULL : __vsf_linux_get_fs_ex(NULL, dirfd);
     vk_file_t *file;
     vk_vfs_file_t *vfs_file = NULL;
     vsf_linux_fd_t *sfd;
@@ -1720,20 +1722,16 @@ __open_again_do:
                     break;
                 }
                 *end = '\0';
-                if (    (stat(path_in_ram, &statbuf) < 0)
-                    &&  (mkdir(path_in_ram, mode) < 0)) {
+                if (    (vsf_linux_statat(dirfd, path_in_ram, &statbuf, 0) < 0)
+                    &&  (mkdirat(dirfd, path_in_ram, mode) < 0)) {
                     goto __exit_failure;
                 }
                 *end = '/';
             }
-            if (flags & O_DIRECTORY) {
-                if (mkdir(path_in_ram, mode) < 0) {
-                    goto __exit_failure;
-                }
-            } else {
-                if (__vsf_linux_fs_create(path_in_ram, mode, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE) < 0) {
-                    goto __exit_failure;
-                }
+            int create_flags =  VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE
+                        |   ((flags & O_DIRECTORY) ? VSF_FILE_ATTR_DIRECTORY : 0);
+            if (__vsf_linux_fs_create(dirfd, path_in_ram, mode, create_flags) < 0) {
+                goto __exit_failure;
             }
             flags &= ~O_CREAT;
             free(path_in_ram);
@@ -1841,7 +1839,7 @@ __open_again_do:
 int __open_va(const char *pathname, int flags, va_list ap)
 {
     mode_t mode = va_arg(ap, mode_t);
-    return vsf_linux_open(NULL, pathname, flags, mode);
+    return vsf_linux_open(-1, pathname, flags, mode);
 }
 
 int open(const char *pathname, int flags, ...)
@@ -1858,13 +1856,7 @@ int open(const char *pathname, int flags, ...)
 int __openat_va(int dirfd, const char *pathname, int flags, va_list ap)
 {
     mode_t mode = va_arg(ap, mode_t);
-
-    vk_file_t *dir = __vsf_linux_get_fs_ex(NULL, dirfd);
-    if ((NULL == dir) || !(dir->attr & VSF_FILE_ATTR_DIRECTORY)) {
-        errno = ENOTDIR;
-        return -1;
-    }
-    return vsf_linux_open(dir, pathname, flags, mode);
+    return vsf_linux_open(dirfd, pathname, flags, mode);
 }
 
 int openat(int dirfd, const char *pathname, int flags, ...)
@@ -2334,7 +2326,7 @@ int symlink(const char *target, const char *linkpath)
     case S_IFSOCK:      attr |= VSF_FILE_ATTR_SOCK;         break;
     }
 
-    if (__vsf_linux_fs_create(linkpath, 0, attr) < 0) {
+    if (__vsf_linux_fs_create(-1, linkpath, 0, attr) < 0) {
         return -1;
     }
 
