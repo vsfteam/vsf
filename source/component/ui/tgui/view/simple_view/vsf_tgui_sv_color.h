@@ -120,7 +120,43 @@ typedef VSF_TGUI_CFG_COLOR_TYPE vsf_tgui_sv_color_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#if VSF_TGUI_SV_CFG_MIX_AS_FUNCTION == ENABLED
 extern vsf_tgui_sv_color_t vsf_tgui_sv_color_mix(vsf_tgui_sv_color_t color_0, vsf_tgui_sv_color_t color_1, uint_fast8_t mix);
+#else
+#   if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+#       define __vsf_tgui_sv_color_mix_alpha()                                  \
+            __vsf_tgui_sv_color_mix_result__.alpha = 0xFF;
+#   else
+#       define __vsf_tgui_sv_color_mix_alpha()
+#   endif
+
+#   if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
+#       define vsf_tgui_sv_color_mix(__color_0, __color_1, __mix) ({            \
+        uint_fast8_t __vsf_tgui_sv_color_mix__ = (__mix);                       \
+        vsf_tgui_sv_color_t __vsf_tgui_sv_color_mix_result__;                   \
+        __vsf_tgui_sv_color_mix_result__.value =                                \
+                (((((__color_0).value >> 8) & 0x00FF00FF) * __vsf_tgui_sv_color_mix__) & 0xFF00FF00)\
+            +   (((((__color_0).value & 0x00FF00FF) * __vsf_tgui_sv_color_mix__) >> 8) & 0x00FF00FF);\
+        __vsf_tgui_sv_color_mix__ = __vsf_tgui_sv_color_mix__ ^ 0xFF;           \
+        __vsf_tgui_sv_color_mix_result__.value +=                               \
+                (((((__color_1).value >> 8) & 0x00FF00FF) * __vsf_tgui_sv_color_mix__) & 0xFF00FF00)    \
+            +   (((((__color_1).value & 0x00FF00FF) * __vsf_tgui_sv_color_mix__) >> 8) & 0x00FF00FF);   \
+        __vsf_tgui_sv_color_mix_alpha();                                        \
+        __vsf_tgui_sv_color_mix_result__;                                       \
+    })
+#   else
+#       define vsf_tgui_sv_color_mix(__color_0, __color_1, __mix) ({            \
+        vsf_tgui_sv_color_t __vsf_tgui_sv_color_mix_result__;                   \
+        uint_fast8_t __vsf_tgui_sv_color_rmix__ = (__mix) ^ 0xFF;               \
+        __vsf_tgui_sv_color_mix_result__.red     = ((uint32_t)(__color_0).red   * (__mix) + (uint32_t)(__color_1).red   * __vsf_tgui_sv_color_rmix__) / 255;\
+        __vsf_tgui_sv_color_mix_result__.green   = ((uint32_t)(__color_0).green * (__mix) + (uint32_t)(__color_1).green * __vsf_tgui_sv_color_rmix__) / 255;\
+        __vsf_tgui_sv_color_mix_result__.blue    = ((uint32_t)(__color_0).blue  * (__mix) + (uint32_t)(__color_1).blue  * __vsf_tgui_sv_color_rmix__) / 255;\
+        __vsf_tgui_sv_color_mix_alpha();                                        \
+        __vsf_tgui_sv_color_mix_result__;                                       \
+    })
+#   endif
+#endif
 
 #if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
 #   define vsf_tgui_sv_color_get_trans_rate(__color)    ((__color).alpha)

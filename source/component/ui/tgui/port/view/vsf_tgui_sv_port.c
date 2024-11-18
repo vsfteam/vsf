@@ -164,9 +164,11 @@ void vsf_tgui_sv_port_draw_rect(vsf_tgui_t *gui_ptr,
     uint32_t pixmap_location_x = (location_ptr->iY - current_region_ptr->tLocation.iY) * pixmap_width
         + location_ptr->iX - current_region_ptr->tLocation.iX;
 
-    if (rect_trans_rate != 0xFF) {
+    if (rect_trans_rate == 0) {
+    } else if (rect_trans_rate != 0xFF) {
+        uint32_t pixel_location;
         for (int16_t i = 0; i < height; i++) {
-            uint32_t pixel_location = i * pixmap_width + pixmap_location_x;
+            pixel_location = i * pixmap_width + pixmap_location_x;
             for (int16_t j = 0; j < width; j++) {
                 pixmap[pixel_location++] = __tgui_color_to_disp_color(vsf_tgui_sv_color_mix(rect_color,
                     __disp_color_to_tgui_color(pixmap[pixel_location]), rect_trans_rate));
@@ -174,10 +176,20 @@ void vsf_tgui_sv_port_draw_rect(vsf_tgui_t *gui_ptr,
         }
     } else {
         vsf_tgui_disp_pixel_t disp_color = __tgui_color_to_disp_color(rect_color);
-        for (int16_t i = 0; i < height; i++) {
-            uint32_t pixel_location = i * pixmap_width + pixmap_location_x;
-            for (int16_t j = 0; j < width; j++) {
-                pixmap[pixel_location++] = disp_color;
+        vsf_tgui_disp_pixel_t *ptr = &pixmap[pixmap_location_x];
+        uint32_t step = pixmap_width - width;
+        for (int16_t i = 0; i < height; i++, ptr += step) {
+            uint32_t round = (width + 7) >> 3;
+            switch (width & 7) {
+            case 0: do {    *ptr++ = disp_color;
+            case 7:         *ptr++ = disp_color;
+            case 6:         *ptr++ = disp_color;
+            case 5:         *ptr++ = disp_color;
+            case 4:         *ptr++ = disp_color;
+            case 3:         *ptr++ = disp_color;
+            case 2:         *ptr++ = disp_color;
+            case 1:         *ptr++ = disp_color;
+                    } while (--round);
             }
         }
     }
@@ -236,7 +248,6 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_t *gui_ptr,
     }
 
     vsf_tgui_region_t *current_region_ptr = &gui_ptr->current_region;
-    vsf_tgui_disp_pixel_t *pixmap = (vsf_tgui_disp_pixel_t *)gui_ptr->pfb;
     uint32_t pixmap_width = current_region_ptr->tSize.iWidth;
     uint32_t pixmap_location_x = (location_ptr->iY - current_region_ptr->tLocation.iY) * pixmap_width
         + location_ptr->iX - current_region_ptr->tLocation.iX;
@@ -246,11 +257,13 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_t *gui_ptr,
     bool is_mask = type == VSF_TGUI_TILE_COLORTYPE_A;
     vsf_tgui_sv_color_t sv_color;
     vsf_tgui_sv_color_argb8888_t argb_color;
+    uint_fast8_t pixel_trans_rate;
+    vsf_tgui_disp_pixel_t *pixel_ptr = &((vsf_tgui_disp_pixel_t *)gui_ptr->pfb)[pixmap_location_x];
+    uint32_t step = pixmap_width - display.tSize.iWidth;
 
-    for (uint16_t i = 0; i < display.tSize.iHeight; i++) {
+    for (uint16_t i = 0; i < display.tSize.iHeight; i++, pixel_ptr += step) {
         uint32_t u32_offset = pixel_size * ((tile_location_ptr->iY + i) * tile_size.iWidth + tile_location_ptr->iX);
         const char *data_ptr = (const char*)(pixelmap_u8 + u32_offset);
-        uint32_t pixel_location = i * pixmap_width + pixmap_location_x;
 
         for (uint16_t j = 0; j < display.tSize.iWidth; j++) {
             if (is_mask) {
@@ -269,15 +282,15 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_t *gui_ptr,
             }
             sv_color = vsf_tgui_sv_argb8888_to_color(argb_color);
 
+            pixel_trans_rate = (vsf_tgui_sv_color_get_trans_rate(sv_color) * trans_rate) >> 8;
             if (is_mask) {
-                pixmap[pixel_location] = __tgui_color_to_disp_color(vsf_tgui_sv_color_mix(sv_color, bg_color,
-                    (vsf_tgui_sv_color_get_trans_rate(sv_color) * trans_rate) >> 8));
+                *pixel_ptr = __tgui_color_to_disp_color(vsf_tgui_sv_color_mix(sv_color,
+                    bg_color, pixel_trans_rate));
             } else {
-                pixmap[pixel_location] = __tgui_color_to_disp_color(vsf_tgui_sv_color_mix(sv_color,
-                    __disp_color_to_tgui_color(pixmap[pixel_location]),
-                    (vsf_tgui_sv_color_get_trans_rate(sv_color) * trans_rate) >> 8));
+                *pixel_ptr = __tgui_color_to_disp_color(vsf_tgui_sv_color_mix(sv_color,
+                    __disp_color_to_tgui_color(*pixel_ptr), pixel_trans_rate));
             }
-            pixel_location++;
+            pixel_ptr++;
         }
     }
     __vsf_tgui_draw_wait_for_done(gui_ptr);
@@ -319,21 +332,23 @@ void vsf_tgui_sv_port_draw_char(vsf_tgui_t *gui_ptr,
 
     uint_fast8_t trans_rate = vsf_tgui_sv_color_get_trans_rate(char_color);
 
-    vsf_tgui_region_t *current_region_ptr = &gui_ptr->current_region;
-    vsf_tgui_disp_pixel_t *pixmap = (vsf_tgui_disp_pixel_t *)gui_ptr->pfb;
-    uint32_t pixmap_width = current_region_ptr->tSize.iWidth;
-    uint32_t pixmap_location_x = (location_ptr->iY - current_region_ptr->tLocation.iY) * pixmap_width
-        + location_ptr->iX - current_region_ptr->tLocation.iX;
+    if (trans_rate != 0) {
+        vsf_tgui_region_t *current_region_ptr = &gui_ptr->current_region;
+        vsf_tgui_disp_pixel_t *pixmap = (vsf_tgui_disp_pixel_t *)gui_ptr->pfb;
+        uint32_t pixmap_width = current_region_ptr->tSize.iWidth;
+        uint32_t pixmap_location_x = (location_ptr->iY - current_region_ptr->tLocation.iY) * pixmap_width
+            + location_ptr->iX - current_region_ptr->tLocation.iX;
 
-    for (uint16_t i = 0; i < real_bitmap_region.tSize.iHeight; i++) {
-        uint32_t pixel_location = (i + resource_draw_location.iY) * pixmap_width + (pixmap_location_x + resource_draw_location.iX);
-        uint32_t bitmap_location = (i + bitmap_draw_location.iY) * bitmap_region.tSize.iWidth + bitmap_draw_location.iX;
+        for (uint16_t i = 0; i < real_bitmap_region.tSize.iHeight; i++) {
+            uint32_t pixel_location = (i + resource_draw_location.iY) * pixmap_width + (pixmap_location_x + resource_draw_location.iX);
+            uint32_t bitmap_location = (i + bitmap_draw_location.iY) * bitmap_region.tSize.iWidth + bitmap_draw_location.iX;
 
-        for (uint16_t j = 0; j < real_bitmap_region.tSize.iWidth; j++) {
-            uint8_t mix = bitmap[bitmap_location++];
-            pixmap[pixel_location] = __tgui_color_to_disp_color(vsf_tgui_sv_color_mix(char_color,
-                __disp_color_to_tgui_color(pixmap[pixel_location]), ((uint16_t)mix * trans_rate) >> 8));
-            pixel_location++;
+            for (uint16_t j = 0; j < real_bitmap_region.tSize.iWidth; j++) {
+                uint8_t mix = bitmap[bitmap_location++];
+                pixmap[pixel_location] = __tgui_color_to_disp_color(vsf_tgui_sv_color_mix(char_color,
+                    __disp_color_to_tgui_color(pixmap[pixel_location]), ((uint16_t)mix * trans_rate) >> 8));
+                pixel_location++;
+            }
         }
     }
     vsf_tgui_font_release_char(font_index, char_u32, bitmap);

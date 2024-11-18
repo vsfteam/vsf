@@ -31,6 +31,7 @@ declare_class(vsf_tgui_t)
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#if VSF_TGUI_SV_CFG_MIX_AS_FUNCTION == ENABLED
 vsf_tgui_sv_color_t vsf_tgui_sv_color_mix(vsf_tgui_sv_color_t color_0, vsf_tgui_sv_color_t color_1, uint_fast8_t mix)
 {
 #if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
@@ -52,6 +53,7 @@ vsf_tgui_sv_color_t vsf_tgui_sv_color_mix(vsf_tgui_sv_color_t color_0, vsf_tgui_
 
     return color_0;
 }
+#endif
 
 #if VSF_TGUI_CFG_COLOR_MODE != VSF_TGUI_COLOR_ARGB_8888
 vsf_tgui_sv_color_t vsf_tgui_sv_argb8888_to_color(vsf_tgui_sv_color_argb8888_t rgba888_color)

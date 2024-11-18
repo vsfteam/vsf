@@ -50,25 +50,6 @@ const vsf_tgui_tile_t* vsf_tgui_control_v_get_corner_tile(vsf_tgui_control_t* co
     return NULL;
 }
 
-VSF_CAL_WEAK(vsf_tgui_sv_get_background_color)
-vsf_tgui_sv_color_t vsf_tgui_sv_get_background_color(vsf_tgui_control_t* control_ptr)
-{
-#if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
-    vsf_tgui_sv_color_t color = control_ptr->background_color;
-
-    if (control_ptr->id == VSF_TGUI_COMPONENT_ID_BUTTON) {
-        vsf_tgui_button_t* button_ptr = (vsf_tgui_button_t*)control_ptr;
-        if (button_ptr->_.bIsChecked) {
-            color = vsf_tgui_sv_color_mix(color, VSF_TGUI_CFG_SV_BUTTON_CLICKED_MIX_COLOR, VSF_TGUI_CFG_SV_BUTTON_CLICKED_MIX_VALUE);
-        }
-    }
-
-    return color;
-#else
-    return VSF_TGUI_COLOR_BLUE;
-#endif
-}
-
 vsf_tgui_sv_color_t vsf_tgui_sv_get_parent_background_color(vsf_tgui_control_t* control_ptr)
 {
 #if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
@@ -81,6 +62,30 @@ vsf_tgui_sv_color_t vsf_tgui_sv_get_parent_background_color(vsf_tgui_control_t* 
         control_ptr = control_tmp_ptr;
     } while (0 == control_ptr->background_color.alpha);
     return control_ptr->background_color;
+#else
+    return VSF_TGUI_COLOR_BLUE;
+#endif
+}
+
+VSF_CAL_WEAK(vsf_tgui_sv_get_background_color)
+vsf_tgui_sv_color_t vsf_tgui_sv_get_background_color(vsf_tgui_control_t* control_ptr)
+{
+#if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
+    vsf_tgui_sv_color_t color = control_ptr->background_color;
+
+#if VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED
+    if (0 == vsf_tgui_sv_color_get_trans_rate(color)) {
+        color = vsf_tgui_sv_get_parent_background_color(control_ptr);
+    }
+#endif
+    if (control_ptr->id == VSF_TGUI_COMPONENT_ID_BUTTON) {
+        vsf_tgui_button_t* button_ptr = (vsf_tgui_button_t*)control_ptr;
+        if (button_ptr->_.bIsChecked) {
+            color = vsf_tgui_sv_color_mix(color, VSF_TGUI_CFG_SV_BUTTON_CLICKED_MIX_COLOR, VSF_TGUI_CFG_SV_BUTTON_CLICKED_MIX_VALUE);
+        }
+    }
+
+    return color;
 #else
     return VSF_TGUI_COLOR_BLUE;
 #endif
@@ -244,7 +249,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
         uint8_t tile_trans_rate = 0xFF;
 #endif
         vsf_tgui_control_v_draw_tile(gui_ptr, control_ptr, dirty_region_ptr, ptTile, control_ptr->tBackground.tAlign, tile_trans_rate, NULL,
-            color, bg_color);
+            (vsf_tgui_sv_color_t){ 0 }, bg_color);
     }
 
     return fsm_rt_cpl;
