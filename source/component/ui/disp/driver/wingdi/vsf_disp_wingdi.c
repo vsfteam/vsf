@@ -42,6 +42,10 @@
 #   define VSF_DISP_WINGDI_CFG_WINDOW_TITLE             "vsf display wingdi"
 #endif
 
+#ifndef VSF_DISP_WINGDI_CFG_REFRESH_INSTANTLY
+#   define VSF_DISP_WINGDI_CFG_REFRESH_INSTANTLY        ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -199,6 +203,16 @@ static uint_fast16_t __vk_disp_win_keycode_remap(uint8_t keycode)
 }
 #endif
 
+static void __vk_disp_wingdi_on_ready_irq(vsf_arch_irq_thread_t *irq_thread, vk_disp_wingdi_t *disp_wingdi)
+{
+    __vsf_arch_irq_start(irq_thread);
+    if (!__vk_disp_wingdi.is_notified) {
+        __vk_disp_wingdi.is_notified = true;
+        vk_disp_on_ready(&disp_wingdi->use_as__vk_disp_t);
+    }
+    __vsf_arch_irq_end(irq_thread, false);
+}
+
 static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     vk_disp_wingdi_t *disp_wingdi = __vk_disp_wingdi.disp;
@@ -237,12 +251,15 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
                 SRCCOPY);
             EndPaint(hWnd, &ps);
 
-            __vsf_arch_irq_start(irq_thread);
-                if (!__vk_disp_wingdi.is_notified) {
-                    __vk_disp_wingdi.is_notified = true;
-                    vk_disp_on_ready(&disp_wingdi->use_as__vk_disp_t);
-                }
-            __vsf_arch_irq_end(irq_thread, false);
+            if (!__vk_disp_wingdi.is_inited) {
+                __vk_disp_wingdi.is_inited = true;
+                __vk_disp_wingdi_on_ready_irq(irq_thread, disp_wingdi);
+            }
+#if VSF_DISP_WINGDI_CFG_REFRESH_INSTANTLY != ENABLED
+            else {
+                __vk_disp_wingdi_on_ready_irq(irq_thread, disp_wingdi);
+            }
+#endif
         }
         break;
     case WM_SIZE:
@@ -472,7 +489,6 @@ static vsf_err_t __vk_disp_wingdi_init(vk_disp_t *pthis)
     VSF_UI_ASSERT(disp_wingdi != NULL);
 
     if (!__vk_disp_wingdi.is_inited) {
-        __vk_disp_wingdi.is_inited = true;
         __vk_disp_wingdi.is_notified = false;
         __vk_disp_wingdi.disp = (vk_disp_wingdi_t *)pthis;
         __vsf_arch_irq_init(&__vk_disp_wingdi.thread, "disp_windgi", __vk_disp_wingdi_thread, VSF_DISP_WINGDI_CFG_HW_PRIORITY);        
@@ -542,6 +558,10 @@ static vsf_err_t __vk_disp_wingdi_refresh(vk_disp_t *pthis, vk_disp_area_t *area
     };
     __vk_disp_wingdi.is_notified = false;
     InvalidateRect(__vk_disp_wingdi.hWnd, &rect, false);
+
+#if VSF_DISP_WINGDI_CFG_REFRESH_INSTANTLY == ENABLED
+    vk_disp_on_ready(&disp_wingdi->use_as__vk_disp_t);
+#endif
     return VSF_ERR_NONE;
 }
 
