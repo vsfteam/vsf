@@ -121,6 +121,20 @@
 #define end_def_tgui_panel(__NAME)                                              \
     } __NAME;
 
+#define __def_tgui_panel_ex(__NAME, __VAR_NAME, ...)                            \
+    typedef struct __NAME {                                                     \
+        implement(vsf_tgui_panel_t)                                             \
+                                                                                \
+        union {                                                                 \
+            vsf_msgt_node_t __VAR_NAME##_FirstNode ;                            \
+            struct {                                                            \
+                __VA_ARGS__;                                                    \
+            };                                                                  \
+        };
+
+#define def_tgui_panel_ex(__NAME, __VAR_NAME, ...)                              \
+    __def_tgui_panel_ex(__NAME, __VAR_NAME, __VA_ARGS__)
+
 #define __describ_tgui_panel(__TYPE, __NAME, ...)                               \
         describe_tgui_container_base(                                           \
             __NAME,                                                             \
