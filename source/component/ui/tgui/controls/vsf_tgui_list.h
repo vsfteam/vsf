@@ -168,19 +168,21 @@ def_class(vsf_tgui_list_t,
     )
 #if VSF_TGUI_CFG_LIST_SUPPORT_SLIDE == ENABLED
     union {
-        private_member(
-            implement(__vk_tgui_slider_t)
-            /* use vsf_tgui_list_work_mode_t value*/
-            struct {
-                uint8_t u2WorkMode          : 2;
-                uint8_t bIsSliding          : 1;
-                uint8_t                     : 5;
-            }tMode;
-            union {
-                uint8_t chStartIndex;
-                uint8_t chSelectIndex;
-            };
-        )
+        struct {
+            private_member(
+                implement(__vk_tgui_slider_t)
+                /* use vsf_tgui_list_work_mode_t value*/
+                struct {
+                    uint8_t u2WorkMode          : 2;
+                    uint8_t bIsSliding          : 1;
+                    uint8_t                     : 5;
+                }tMode;
+                union {
+                    uint8_t chStartIndex;
+                    uint8_t chSelectIndex;
+                };
+            )
+        };
         struct {
             inherit_ex(__vk_tgui_slider_t, tSlider)
             /* use vsf_tgui_list_work_mode_t value*/
@@ -189,18 +191,20 @@ def_class(vsf_tgui_list_t,
     };
 #else
     union {
-        private_member(
-            /* use vsf_tgui_list_work_mode_t value*/
-            struct {
-                uint8_t u2WorkMode          : 2;
-                uint8_t bIsSliding          : 1;
-                uint8_t                     : 5;
-            }tMode;
-            union {
-                uint8_t chStartIndex;
-                uint8_t chSelectIndex;
-            };
-        )
+        struct {
+            private_member(
+                /* use vsf_tgui_list_work_mode_t value*/
+                struct {
+                    uint8_t u2WorkMode          : 2;
+                    uint8_t bIsSliding          : 1;
+                    uint8_t                     : 5;
+                }tMode;
+                union {
+                    uint8_t chStartIndex;
+                    uint8_t chSelectIndex;
+                };
+            )
+        };
         struct {
             /* use vsf_tgui_list_work_mode_t value*/
             uint8_t u2WorkMode              : 2;
