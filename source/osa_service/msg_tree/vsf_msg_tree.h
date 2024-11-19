@@ -52,7 +52,7 @@ extern "C" {
 #endif
 
 #ifndef VSF_MSGT_NODE_OFFSET_TYPE
-#   define VSF_MSGT_NODE_OFFSET_TYPE                    int16_t
+#   define VSF_MSGT_NODE_OFFSET_TYPE                    intptr_t
 #endif
 
 #ifndef VSF_MSG_TREE_CFG_SUPPORT_DUAL_LIST

@@ -33,32 +33,41 @@
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
 
-static fsm_rt_t __on_top_panel_load(vsf_tgui_control_t* node_ptr,
+static fsm_rt_t __on_top_panel_load(vsf_tgui_t *gui_ptr,
+                                    vsf_tgui_control_t* node_ptr,
                                     vsf_msgt_msg_t* ptMSG);
 
-static fsm_rt_t __on_top_panel_depose(vsf_tgui_control_t* node_ptr,
+static fsm_rt_t __on_top_panel_depose(vsf_tgui_t *gui_ptr,
+                                    vsf_tgui_control_t* node_ptr,
                                     vsf_msgt_msg_t* ptMSG);
 
-static fsm_rt_t __on_popup_panel_depose(vsf_tgui_control_t* node_ptr,
+static fsm_rt_t __on_popup_panel_depose(vsf_tgui_t *gui_ptr,
+                                    vsf_tgui_control_t* node_ptr,
                                     vsf_msgt_msg_t* ptMSG);
 
 #if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
-static fsm_rt_t __on_top_panel_time(vsf_tgui_control_t* node_ptr,
+static fsm_rt_t __on_top_panel_time(vsf_tgui_t *gui_ptr,
+                                    vsf_tgui_control_t* node_ptr,
                                     vsf_msgt_msg_t* ptMSG);
 #endif
 
-static fsm_rt_t __on_button_start_stop_click(   vsf_tgui_control_t* node_ptr,
+static fsm_rt_t __on_button_start_stop_click(   vsf_tgui_t *gui_ptr,
+                                                vsf_tgui_control_t* node_ptr,
                                                 vsf_msgt_msg_t* ptMSG);
-static fsm_rt_t __on_button_start_stop_ok(  vsf_tgui_control_t* node_ptr,
+static fsm_rt_t __on_button_start_stop_ok(  vsf_tgui_t *gui_ptr,
+                                            vsf_tgui_control_t* node_ptr,
                                             vsf_msgt_msg_t* ptMSG);
 
-static fsm_rt_t __on_button_setting_click(   vsf_tgui_control_t* node_ptr,
-                                                vsf_msgt_msg_t* ptMSG);
+static fsm_rt_t __on_button_setting_click(   vsf_tgui_t *gui_ptr,
+                                            vsf_tgui_control_t* node_ptr,
+                                            vsf_msgt_msg_t* ptMSG);
 
-static fsm_rt_t __on_button_ok_click(   vsf_tgui_control_t* node_ptr,
-                                                vsf_msgt_msg_t* ptMSG);
+static fsm_rt_t __on_button_ok_click(   vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_control_t* node_ptr,
+                                        vsf_msgt_msg_t* ptMSG);
 
-static fsm_rt_t __on_button_lap_all_pointer_evt(vsf_tgui_control_t* node_ptr,
+static fsm_rt_t __on_button_lap_all_pointer_evt(vsf_tgui_t *gui_ptr,
+                                                vsf_tgui_control_t* node_ptr,
                                                 vsf_msgt_msg_t* ptMSG);
 #if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
 static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_t *gui_ptr,
@@ -70,10 +79,12 @@ static fsm_rt_t __on_list_post_refresh( vsf_tgui_t *gui_ptr,
                                         vsf_tgui_list_t* ptList,
                                         vsf_tgui_refresh_evt_t* event_ptr);
 
-static fsm_rt_t __on_list_sliding_started(  vsf_tgui_list_t* ptList,
+static fsm_rt_t __on_list_sliding_started(  vsf_tgui_t *gui_ptr,
+                                            vsf_tgui_list_t* ptList,
                                             vsf_tgui_refresh_evt_t* event_ptr);
 
-static fsm_rt_t __on_list_sliding_stopped( vsf_tgui_list_t* ptList,
+static fsm_rt_t __on_list_sliding_stopped(  vsf_tgui_t *gui_ptr,
+                                            vsf_tgui_list_t* ptList,
                                             vsf_tgui_refresh_evt_t* event_ptr);
 #endif
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -200,7 +211,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                     ),
                 ),
 
-            tgui_button(tLap, &(tgui_null_parent(stopwatch_t)->tLeftContainer), tStartStop, tLap,
+            tgui_button(tLap, &(tgui_null_parent(stopwatch_t)->tLeftContainer), tStartStop, tContainerA,
                 tgui_size(64, 32),
                 tgui_margin(104, 4, 0, 4),
                 tgui_text(tLabel, "LAP", false),
@@ -208,7 +219,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                     tgui_msg_mux(VSF_TGUI_MSG_POINTER_EVT, __on_button_lap_all_pointer_evt, VSF_TGUI_MSG_MSK),
                     ),
                 ),
-#if 0
+#if 1
             tgui_container(tContainerA, &(tgui_null_parent(stopwatch_t)->tLeftContainer), tLap, tContainerA,
 
                 tgui_margin(0, 4, 0, 0),
@@ -422,7 +433,8 @@ stopwatch_t* my_stopwatch_init(stopwatch_t* ptPanel)
     return ptPanel;
 }
 
-static fsm_rt_t __on_top_panel_load(vsf_tgui_control_t* node_ptr,
+static fsm_rt_t __on_top_panel_load(vsf_tgui_t *gui_ptr,
+                                    vsf_tgui_control_t* node_ptr,
                                     vsf_msgt_msg_t* ptMSG)
 {
     stopwatch_t *ptPanel = (stopwatch_t *)node_ptr;
@@ -443,7 +455,8 @@ static fsm_rt_t __on_top_panel_load(vsf_tgui_control_t* node_ptr,
 }
 
 #if VSF_TGUI_CFG_SUPPORT_TIMER == ENABLED
-static fsm_rt_t __on_top_panel_time(vsf_tgui_control_t* node_ptr,
+static fsm_rt_t __on_top_panel_time(vsf_tgui_t *gui_ptr,
+                                    vsf_tgui_control_t* node_ptr,
                                     vsf_msgt_msg_t* ptMSG)
 {
     stopwatch_t *ptPanel = (stopwatch_t *)node_ptr;
@@ -466,7 +479,8 @@ static fsm_rt_t __on_top_panel_time(vsf_tgui_control_t* node_ptr,
 }
 #endif
 
-static fsm_rt_t __on_top_panel_depose(vsf_tgui_control_t* node_ptr,
+static fsm_rt_t __on_top_panel_depose(vsf_tgui_t *gui_ptr,
+                                    vsf_tgui_control_t* node_ptr,
                                     vsf_msgt_msg_t* ptMSG)
 {
 
@@ -478,7 +492,8 @@ static fsm_rt_t __on_top_panel_depose(vsf_tgui_control_t* node_ptr,
     return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
 }
 
-static fsm_rt_t __on_popup_panel_depose(vsf_tgui_control_t* node_ptr,
+static fsm_rt_t __on_popup_panel_depose(vsf_tgui_t *gui_ptr,
+                                    vsf_tgui_control_t* node_ptr,
                                     vsf_msgt_msg_t* ptMSG)
 {
     my_stopwatch_init(&panels.stopwatch);
@@ -487,7 +502,8 @@ static fsm_rt_t __on_popup_panel_depose(vsf_tgui_control_t* node_ptr,
     return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
 }
 
-static fsm_rt_t __on_button_start_stop_click(   vsf_tgui_control_t* node_ptr,
+static fsm_rt_t __on_button_start_stop_click(   vsf_tgui_t *gui_ptr,
+                                                vsf_tgui_control_t* node_ptr,
                                                 vsf_msgt_msg_t* ptMSG)
 {
     VSF_TGUI_LOG(VSF_TRACE_WARNING, "\t User Handler\r\n");
@@ -495,7 +511,8 @@ static fsm_rt_t __on_button_start_stop_click(   vsf_tgui_control_t* node_ptr,
     return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
 }
 
-static fsm_rt_t __on_button_start_stop_ok(  vsf_tgui_control_t* node_ptr,
+static fsm_rt_t __on_button_start_stop_ok(  vsf_tgui_t *gui_ptr,
+                                            vsf_tgui_control_t* node_ptr,
                                             vsf_msgt_msg_t* ptMSG)
 {
     VSF_TGUI_LOG(VSF_TRACE_WARNING, "\t User Handler\r\n");
@@ -504,8 +521,9 @@ static fsm_rt_t __on_button_start_stop_ok(  vsf_tgui_control_t* node_ptr,
 
 
 
-static fsm_rt_t __on_button_setting_click(   vsf_tgui_control_t* node_ptr,
-                                                vsf_msgt_msg_t* ptMSG)
+static fsm_rt_t __on_button_setting_click(  vsf_tgui_t *gui_ptr,
+                                            vsf_tgui_control_t* node_ptr,
+                                            vsf_msgt_msg_t* ptMSG)
 {
     VSF_TGUI_LOG(VSF_TRACE_WARNING, "\t User Handler\r\n");
 
@@ -516,8 +534,9 @@ static fsm_rt_t __on_button_setting_click(   vsf_tgui_control_t* node_ptr,
 }
 
 
-static fsm_rt_t __on_button_ok_click(   vsf_tgui_control_t* node_ptr,
-                                                vsf_msgt_msg_t* ptMSG)
+static fsm_rt_t __on_button_ok_click(   vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_control_t* node_ptr,
+                                        vsf_msgt_msg_t* ptMSG)
 {
     VSF_TGUI_LOG(VSF_TRACE_WARNING, "\t User Handler\r\n");
 
@@ -528,7 +547,8 @@ static fsm_rt_t __on_button_ok_click(   vsf_tgui_control_t* node_ptr,
 }
 
 
-static fsm_rt_t __on_button_lap_all_pointer_evt(vsf_tgui_control_t* node_ptr,
+static fsm_rt_t __on_button_lap_all_pointer_evt(vsf_tgui_t *gui_ptr,
+                                                vsf_tgui_control_t* node_ptr,
                                                 vsf_msgt_msg_t* ptMSG)
 {
     VSF_TGUI_LOG(VSF_TRACE_WARNING, "\t User Handler\r\n");
@@ -569,14 +589,16 @@ static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_t *gui_ptr,
 #if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
 static volatile bool s_bShowProgressbar = false;
 
-static fsm_rt_t __on_list_sliding_started(  vsf_tgui_list_t* ptList,
+static fsm_rt_t __on_list_sliding_started(  vsf_tgui_t *gui_ptr,
+                                            vsf_tgui_list_t* ptList,
                                             vsf_tgui_refresh_evt_t* event_ptr)
 {
     s_bShowProgressbar = true;
     return fsm_rt_cpl;
 }
 
-static fsm_rt_t __on_list_sliding_stopped(  vsf_tgui_list_t* ptList,
+static fsm_rt_t __on_list_sliding_stopped(  vsf_tgui_t *gui_ptr,
+                                            vsf_tgui_list_t* ptList,
                                             vsf_tgui_refresh_evt_t* event_ptr)
 {
     s_bShowProgressbar = false;

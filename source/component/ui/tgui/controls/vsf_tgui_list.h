@@ -126,6 +126,8 @@
 #   define tgui_list_items(...)                                                 \
                     .list = {                                                   \
                         VSF_TGUI_V_CONTAINER_STATIC_INIT_DEFAULT                \
+                        .is_container = 0,                                      \
+                        .is_control_transparent = 0,                            \
                         __VA_ARGS__                                             \
                         VSF_TGUI_V_CONTAINER_STATIC_INIT_OVERRIDE               \
                     },

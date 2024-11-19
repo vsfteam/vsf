@@ -434,6 +434,7 @@ typedef struct vsf_tgui_control_subcall_t {
 } vsf_tgui_control_subcall_t;
 
 typedef fsm_rt_t vsf_tgui_controal_fsm_t(
+        vsf_tgui_t *gui_ptr,
         vsf_tgui_control_t* node_ptr,
         vsf_tgui_msg_t* ptMSG);
 
@@ -832,7 +833,8 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_t *gui_ptr,
                                         const i_tgui_control_methods_t* ptMethods);
 
 extern
-fsm_rt_t __vk_tgui_control_user_message_handling(   vsf_tgui_control_t* control_ptr,
+fsm_rt_t __vk_tgui_control_user_message_handling(   vsf_tgui_t *gui_ptr,
+                                                    vsf_tgui_control_t* control_ptr,
                                                     const vsf_tgui_evt_t* event_ptr);
 
 extern
