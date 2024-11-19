@@ -67,7 +67,7 @@ static const i_tgui_control_methods_t c_tVLabel= {
 /*============================ IMPLEMENTATION ================================*/
 
 
-fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_t *gui_ptr, vsf_tgui_button_t* ptButton, vsf_tgui_msg_t* ptMSG)
+fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t* ptMSG)
 {
     fsm_rt_t fsm;
     vsf_tgui_key_evt_t* key_evt_ptr = (vsf_tgui_key_evt_t*)ptMSG;
@@ -131,7 +131,6 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_t *gui_ptr, vsf_tgui_button_t* ptB
     }
 
     fsm = __vsf_tgui_control_msg_handler(
-                gui_ptr,
                 &(ptButton->use_as__vsf_tgui_label_t.use_as__vsf_tgui_control_t),
                 ptMSG,
                 &c_tVLabel);

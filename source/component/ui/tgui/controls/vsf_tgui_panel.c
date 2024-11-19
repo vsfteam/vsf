@@ -71,12 +71,10 @@ static const i_tgui_control_methods_t c_tVPanel= {
 
 /*============================ IMPLEMENTATION ================================*/
 
-fsm_rt_t vsf_tgui_panel_msg_handler(vsf_tgui_t *gui_ptr,
-                                        vsf_tgui_panel_t* control_ptr,
-                                        vsf_tgui_msg_t* ptMSG)
+fsm_rt_t vsf_tgui_panel_msg_handler(vsf_tgui_panel_t* control_ptr,
+                                    vsf_tgui_msg_t* ptMSG)
 {
-    return __vsf_tgui_control_msg_handler(  gui_ptr,
-                                            (vsf_tgui_control_t *)control_ptr,
+    return __vsf_tgui_control_msg_handler(  (vsf_tgui_control_t *)control_ptr,
                                             ptMSG,
                                             &c_tVPanel);
 }

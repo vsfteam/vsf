@@ -226,9 +226,8 @@ extern
 fsm_rt_t vk_tgui_list_init(vsf_tgui_list_t* ptList);
 
 extern
-fsm_rt_t vsf_tgui_list_msg_handler( vsf_tgui_t *gui_ptr,
-                                        vsf_tgui_list_t* control_ptr,
-                                        vsf_tgui_msg_t* ptMSG);
+fsm_rt_t vsf_tgui_list_msg_handler( vsf_tgui_list_t* control_ptr,
+                                    vsf_tgui_msg_t* ptMSG);
 
 #if VSF_TGUI_CFG_LIST_SUPPORT_SCROOLBAR == ENABLED
 VSF_CAL_SECTION(".text.vsf.component.tgui.vsf_tgui_list_scrollbar_regions_generate")

@@ -271,7 +271,7 @@ static bool __vk_tgui_list_next(vsf_tgui_list_t* ptList)
     return true;
 }
 
-fsm_rt_t vsf_tgui_list_msg_handler(vsf_tgui_t *gui_ptr, vsf_tgui_list_t* ptList, vsf_tgui_msg_t* ptMSG)
+fsm_rt_t vsf_tgui_list_msg_handler(vsf_tgui_list_t* ptList, vsf_tgui_msg_t* ptMSG)
 {
     fsm_rt_t fsm;
 
@@ -285,8 +285,7 @@ fsm_rt_t vsf_tgui_list_msg_handler(vsf_tgui_t *gui_ptr, vsf_tgui_list_t* ptList,
         return (fsm_rt_t)VSF_TGUI_MSG_RT_REFRESH;
     }
 #endif
-    fsm = __vsf_tgui_control_msg_handler(   gui_ptr,
-                                            (vsf_tgui_control_t *)ptList,
+    fsm = __vsf_tgui_control_msg_handler(   (vsf_tgui_control_t *)ptList,
                                             ptMSG,
                                             &c_tVList);
 

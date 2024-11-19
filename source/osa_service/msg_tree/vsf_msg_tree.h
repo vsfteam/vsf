@@ -110,7 +110,7 @@ typedef enum {
 
 typedef bool vsf_msgt_method_shoot_t(const vsf_msgt_node_t*, uintptr_t);
 typedef vsf_msgt_node_status_t vsf_msgt_method_status_t(vsf_msgt_node_t* );
-typedef fsm_rt_t vsf_msgt_method_fsm_t (void* target_ptr, vsf_msgt_node_t* node_ptr, vsf_msgt_msg_t* msg_ptr);
+typedef fsm_rt_t vsf_msgt_method_fsm_t (vsf_msgt_node_t* node_ptr, vsf_msgt_msg_t* msg_ptr);
 typedef struct vsf_msgt_subcall_t {
     vsf_param_eda_evthandler_t* sub_routine_fn;
     uintptr_t target_ptr;
@@ -244,9 +244,6 @@ def_class(vsf_msgt_t,
             uint8_t state;
             __vsf_msgt_msg_handling_fsm_t msg_handling;
         } FWDFS;
-    )
-    public_member(
-        void *target_ptr;
     )
 )
 end_def_class(vsf_msgt_t)

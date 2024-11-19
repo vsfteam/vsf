@@ -220,8 +220,7 @@ extern
 fsm_rt_t vk_tgui_panel_update(vsf_tgui_panel_t* ptPanel);
 
 extern
-fsm_rt_t vsf_tgui_panel_msg_handler(vsf_tgui_t *gui_ptr,
-                                        vsf_tgui_panel_t* control_ptr,
-                                        vsf_tgui_msg_t* ptMSG);
+fsm_rt_t vsf_tgui_panel_msg_handler(vsf_tgui_panel_t* control_ptr,
+                                    vsf_tgui_msg_t* ptMSG);
 #endif
 /* EOF */

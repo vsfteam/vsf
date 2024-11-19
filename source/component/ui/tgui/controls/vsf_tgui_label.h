@@ -153,9 +153,8 @@ end_def_class(vsf_tgui_label_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 extern
-fsm_rt_t vsf_tgui_label_msg_handler(vsf_tgui_t *gui_ptr,
-                                        vsf_tgui_label_t* control_ptr,
-                                        vsf_tgui_msg_t* ptMSG);
+fsm_rt_t vsf_tgui_label_msg_handler(vsf_tgui_label_t* control_ptr,
+                                    vsf_tgui_msg_t* ptMSG);
 extern
 fsm_rt_t vk_tgui_label_init(vsf_tgui_label_t* ptLabel);
 

@@ -278,9 +278,8 @@ static void __vk_tui_text_list_update_container_position(vsf_tgui_text_list_t* p
 }
 #endif
 
-fsm_rt_t vsf_tgui_text_list_msg_handler( vsf_tgui_t *gui_ptr,
-                                            vsf_tgui_text_list_t* ptTextList,
-                                            vsf_tgui_msg_t* ptMSG)
+fsm_rt_t vsf_tgui_text_list_msg_handler(vsf_tgui_text_list_t* ptTextList,
+                                        vsf_tgui_msg_t* ptMSG)
 {
     fsm_rt_t fsm;
     bool bStatusChanged = false;
@@ -305,8 +304,7 @@ fsm_rt_t vsf_tgui_text_list_msg_handler( vsf_tgui_t *gui_ptr,
     }
 #endif
 
-    fsm = __vsf_tgui_control_msg_handler(   gui_ptr,
-                                            (vsf_tgui_control_t *)ptTextList,
+    fsm = __vsf_tgui_control_msg_handler(   (vsf_tgui_control_t *)ptTextList,
                                             ptMSG,
                                             &c_tVTextList);
 
