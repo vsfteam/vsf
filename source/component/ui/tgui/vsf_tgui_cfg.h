@@ -184,6 +184,10 @@ warning."
  * Control Features                                                           *
  *----------------------------------------------------------------------------*/
 
+#ifndef VSF_TGUI_CFG_DYNAMIC
+#   define VSF_TGUI_CFG_DYNAMIC                                 VSF_USE_HEAP
+#endif
+
 #ifndef VSF_TGUI_CFG_SUPPORT_TIMER
 #   define VSF_TGUI_CFG_SUPPORT_TIMER                           ENABLED
 #endif

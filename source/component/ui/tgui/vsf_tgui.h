@@ -259,10 +259,13 @@ bool __vk_tgui_send_gesture_evt(vsf_tgui_t *tgui_ptr,
 #endif
 
 /*============================ INCLUDES ======================================*/
-#include "controls/vsf_tgui_controls.h"
-#include "view/vsf_tgui_v.h"
 
-#include "port/vsf_tgui_port.h"
+#include "./controls/vsf_tgui_controls.h"
+#include "./view/vsf_tgui_v.h"
+
+#include "./ext/dynamic/vsf_tgui_dynamic.h"
+
+#include "./port/vsf_tgui_port.h"
 
 #endif
 #endif
