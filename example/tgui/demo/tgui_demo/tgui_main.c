@@ -52,9 +52,10 @@ int VSF_USER_ENTRY(void)
     freetype_demo_init();
 #endif
 
+    vsf_tgui_fonts_init((vsf_tgui_font_t *)vsf_tgui_font_get(0), vsf_tgui_font_number(), "font/");
+
     vsf_tgui_t *tgui = tgui_demo_init();
     if (tgui != NULL) {
-        vsf_tgui_fonts_init((vsf_tgui_font_t *)vsf_tgui_font_get(0), vsf_tgui_font_number(), "font/");
         vsf_tgui_sv_bind_disp(tgui, usrapp_ui_common.disp, &usrapp_ui_common.tgui.color, dimof(usrapp_ui_common.tgui.color));
 
         usrapp_ui_common.tgui.notifier.mask =

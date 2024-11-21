@@ -86,7 +86,7 @@ static const struct {
 
 void vsf_tgui_create_init(vsf_tgui_t* gui_ptr)
 {
-    describ_tgui_panel(tgui_dync_template_t, __template,
+    describ_tgui_panel(tgui_dync_template_t, template_descriptor,
         tgui_region(0, 0, VSF_TGUI_HOR_MAX, VSF_TGUI_VER_MAX),
         tgui_attribute(bIsAutoSize, false),
 
@@ -145,7 +145,7 @@ void vsf_tgui_create_init(vsf_tgui_t* gui_ptr)
         .container.node_ptr = NULL,
     );
 
-//    __template.container.node_ptr = NULL;
+    tgui_initalize_top_container(template_descriptor, &__template);
 }
 
 static void __vsf_tgui_control_init(vsf_tgui_container_t* parent_ptr, vsf_tgui_control_t* control_ptr, vsf_tree_msg_node_id_t id, char* node_name_ptr, bool first)

@@ -81,6 +81,7 @@
 
 #if 1
 #define VSF_DISP_USE_WINGDI                             ENABLED
+// minimun screen size for tgui designer is 1240(W) X 832(H)
 #   define APP_DISP_WINGDI_HEIGHT                       768
 #   define APP_DISP_WINGDI_WIDTH                        1024
 #   define APP_DISP_WINGDI_COLOR                        VSF_DISP_COLOR_RGB565
