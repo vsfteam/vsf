@@ -883,7 +883,6 @@ refresh_loop :
                                     vsf_this.node_ptr,
                                     &vsf_this.event,
                                     (   VSF_TGUI_CTRL_STATUS_INITIALISED
-                                    |   VSF_TGUI_CTRL_STATUS_ENABLED
                                     |   VSF_TGUI_CTRL_STATUS_VISIBLE
                                     ));
         #elif VSF_TGUI_CFG_REFRESH_SCHEME == VSF_TGUI_REFRESH_SCHEME_PRE_ORDER_TRAVERSAL
@@ -892,7 +891,6 @@ refresh_loop :
                                     vsf_this.node_ptr,
                                     &vsf_this.event,
                                     (   VSF_TGUI_CTRL_STATUS_INITIALISED
-                                    |   VSF_TGUI_CTRL_STATUS_ENABLED
                                     |   VSF_TGUI_CTRL_STATUS_VISIBLE
                                     ));
         #endif

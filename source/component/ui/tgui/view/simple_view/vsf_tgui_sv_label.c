@@ -128,7 +128,11 @@ VSF_CAL_WEAK(vsf_tgui_sv_get_text_color)
 vsf_tgui_sv_color_t vsf_tgui_sv_get_text_color(vsf_tgui_label_t* label_ptr)
 {
 #if VSF_TGUI_CFG_SV_LABLE_SUPPORT_TEXT_COLOR == ENABLED
-    return label_ptr->font_color;
+    if (label_ptr->Status.chStatus & VSF_TGUI_CTRL_STATUS_ENABLED) {
+        return label_ptr->font_color;
+    } else {
+        return vsf_tgui_sv_color_mix(label_ptr->font_color, VSF_TGUI_CFG_SV_LABEL_DISABLED_MIX_COLOR, VSF_TGUI_CFG_SV_LABEL_DISABLED_MIX_VALUE);
+    }
 #elif VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
 #   error "todo: "
 #else
