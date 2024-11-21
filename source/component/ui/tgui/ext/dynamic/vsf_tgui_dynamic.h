@@ -59,6 +59,12 @@
         (__control)->tMargin.chBottom = (__bottom);                             \
     } while(0)
 
+#define vsf_control_set_msghandler(__control, __handler, __num)                 \
+    do {                                                                        \
+        (__control)->tMSGMap.ptItems = (__handler);                             \
+        (__control)->tMSGMap.chCount = (__num);                                 \
+    } while (0)
+
 // container
 
 #define vsf_tgui_container_set_type2(__container, __type, __autosize)           \
