@@ -90,23 +90,23 @@ void vsf_tgui_create_init(vsf_tgui_t* gui_ptr)
         tgui_region(0, 0, VSF_TGUI_HOR_MAX, VSF_TGUI_VER_MAX),
         tgui_attribute(bIsAutoSize, false),
 
-        tgui_control(control, &__template, control, label,
+        tgui_control(control, tgui_null_parent(tgui_dync_template_t), control, label,
             tgui_region(0, 0, 20, 20),
         ),
 
-        tgui_label(label, &__template, control, button,
+        tgui_label(label, tgui_null_parent(tgui_dync_template_t), control, button,
             tgui_attribute(show_corner_tile, true),
             tgui_region(0, 0, 100, 30),
             tgui_text(tLabel, "label", false),
         ),
 
-        tgui_button(button, &__template, label, text_list,
+        tgui_button(button, tgui_null_parent(tgui_dync_template_t), label, text_list,
             tgui_attribute(show_corner_tile, true),
             tgui_region(0, 0, 100, 30),
             tgui_text(tLabel, "button", false),
         ),
 
-        tgui_text_list(text_list, &__template, button, container,
+        tgui_text_list(text_list, tgui_null_parent(tgui_dync_template_t), button, container,
             tgui_region(0, 0, 100, 150),
             tgui_margin(8, 0, 8, 0),
 
@@ -118,18 +118,18 @@ void vsf_tgui_create_init(vsf_tgui_t* gui_ptr)
             )
         ),
 
-        tgui_panel(panel, &__template, text_list, container,
+        tgui_panel(panel, tgui_null_parent(tgui_dync_template_t), text_list, container,
             tgui_attribute(bIsAutoSize, false),
             tgui_attribute(show_corner_tile, false),
             tgui_region(0, 0, 150, 150),
         ),
 
-        tgui_container(container, &__template, text_list, list,
+        tgui_container(container, tgui_null_parent(tgui_dync_template_t), text_list, list,
             tgui_region(0, 00, 100, 100),
             tgui_attribute(bIsAutoSize, false),
         ),
 
-        tgui_list(list, &__template, list, list,
+        tgui_list(list, tgui_null_parent(tgui_dync_template_t), list, list,
             tgui_region(0, 0, 100, 32),
             tgui_attribute(bIsAutoSize, false),
 
@@ -141,9 +141,11 @@ void vsf_tgui_create_init(vsf_tgui_t* gui_ptr)
                 tgui_container_type(VSF_TGUI_CONTAINER_TYPE_PLANE),
             )
         ),
+
+        .container.node_ptr = NULL,
     );
 
-    __template.container.node_ptr = NULL;
+//    __template.container.node_ptr = NULL;
 }
 
 static void __vsf_tgui_control_init(vsf_tgui_container_t* parent_ptr, vsf_tgui_control_t* control_ptr, vsf_tree_msg_node_id_t id, char* node_name_ptr, bool first)

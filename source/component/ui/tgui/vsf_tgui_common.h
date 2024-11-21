@@ -154,6 +154,13 @@
 #   define tgui_container_type(__TYPE, ...)                                     \
                 __tgui_container_type(__TYPE, ##__VA_ARGS__)
 
+#define __describe_tgui_msgmap(__NAME, ...)                                     \
+            const vsf_tgui_user_evt_handler __NAME[] = {                        \
+                __VA_ARGS__                                                     \
+            };
+#define describe_tgui_msgmap(__NAME, ...)                                       \
+            __describe_tgui_msgmap(__NAME, __VA_ARGS__)
+
 
 #define __tgui_handlers(...)                                                    \
                 .tMSGMap = {                                                    \
@@ -175,6 +182,12 @@
                     .chCount = dimof(((const vsf_tgui_user_evt_handler []) {    \
                         __VA_ARGS__                                             \
                     })),                                                        \
+                }
+
+#define __tgui_msgmap_var(__msgmap)                                             \
+                .tMSGMap = {                                                    \
+                    .ptItems = (__msgmap),                                      \
+                    .chCount = dimof(__msgmap),                                 \
                 }
 
 #if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED
@@ -225,9 +238,10 @@
 #define __tgui_msg_mux(__MSG, __FUNC, ...)                                      \
             __PLOOC_EVAL(__tgui_msg_mux, __VA_ARGS__)((__MSG), __FUNC, ##__VA_ARGS__)
 
-#define tgui_handlers(...)             __tgui_handlers(__VA_ARGS__)
+#define tgui_handlers(...)              __tgui_handlers(__VA_ARGS__)
 
-#define tgui_msgmap(...)               __tgui_msgmap(__VA_ARGS__)
+#define tgui_msgmap(...)                __tgui_msgmap(__VA_ARGS__)
+#define tgui_msgmap_var(__msgmap)       __tgui_msgmap_var(__msgmap)
 
 #define tgui_msg_handler(__MSG, __FUNC, ...)                                    \
             __tgui_msg_handler(__MSG, __FUNC, ##__VA_ARGS__)

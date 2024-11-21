@@ -187,7 +187,7 @@ static void __tgui_designer_append_log(char* new_log)
     vk_tgui_refresh_ex(__designer_ptr->gui_ptr, (vsf_tgui_control_t*)&__designer_ptr->log, NULL);
 }
 
-static void __tgui_control_draw_border(vsf_tgui_control_t * draw_control, vsf_tgui_control_t *mask_control, const vsf_tgui_region_t* dirty_region_ptr, vsf_tgui_sv_color_t color)
+static void __tgui_control_draw_border(vsf_tgui_t *gui_ptr, vsf_tgui_control_t * draw_control, vsf_tgui_control_t *mask_control, const vsf_tgui_region_t* dirty_region_ptr, vsf_tgui_sv_color_t color)
 {
     vsf_tgui_region_t region = { 0 };
     vsf_tgui_region_t absolute_mask_region = { 0 };
@@ -208,25 +208,25 @@ static void __tgui_control_draw_border(vsf_tgui_control_t * draw_control, vsf_tg
     region.tLocation.iY = draw_region.tLocation.iY;
     region.tSize.iWidth = draw_region.tSize.iWidth;
     region.tSize.iHeight = APP_TGUI_DESIGNER_PADDING_WIDTH;
-    vsf_tgui_control_v_draw_rect(draw_control, dirty_region_ptr, &region, color);
+    vsf_tgui_control_v_draw_rect(gui_ptr, draw_control, dirty_region_ptr, &region, color);
 
     region.tLocation.iX = draw_region.tLocation.iX;
     region.tLocation.iY = draw_region.tLocation.iY + draw_region.tSize.iHeight - APP_TGUI_DESIGNER_PADDING_WIDTH;
     region.tSize.iWidth = draw_region.tSize.iWidth;
     region.tSize.iHeight = APP_TGUI_DESIGNER_PADDING_WIDTH;
-    vsf_tgui_control_v_draw_rect(draw_control, dirty_region_ptr, &region, color);
+    vsf_tgui_control_v_draw_rect(gui_ptr, draw_control, dirty_region_ptr, &region, color);
 
     region.tLocation.iX = draw_region.tLocation.iX;
     region.tLocation.iY = draw_region.tLocation.iY + APP_TGUI_DESIGNER_PADDING_WIDTH;
     region.tSize.iWidth = APP_TGUI_DESIGNER_PADDING_WIDTH;
     region.tSize.iHeight = draw_region.tSize.iHeight - 2 * APP_TGUI_DESIGNER_PADDING_WIDTH;
-    vsf_tgui_control_v_draw_rect(draw_control, dirty_region_ptr, &region, color);
+    vsf_tgui_control_v_draw_rect(gui_ptr, draw_control, dirty_region_ptr, &region, color);
 
     region.tLocation.iX = draw_region.tLocation.iX + draw_region.tSize.iWidth - APP_TGUI_DESIGNER_PADDING_WIDTH;
     region.tLocation.iY = draw_region.tLocation.iY + APP_TGUI_DESIGNER_PADDING_WIDTH;
     region.tSize.iWidth = APP_TGUI_DESIGNER_PADDING_WIDTH;
     region.tSize.iHeight = draw_region.tSize.iHeight - 2 * APP_TGUI_DESIGNER_PADDING_WIDTH;
-    vsf_tgui_control_v_draw_rect(draw_control, dirty_region_ptr, &region, color);
+    vsf_tgui_control_v_draw_rect(gui_ptr, draw_control, dirty_region_ptr, &region, color);
 }
 
 static int __label_update_int_value(tgui_designer_int_label_t* label_ptr, int new_value)
@@ -536,16 +536,17 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
 
     __designer_ptr = tgui_designer_ptr;
 
-    describ_tgui_panel(tgui_designer_t, *tgui_designer_ptr,
+    describ_tgui_panel(tgui_designer_t, tgui_designer_descriptor,
         tgui_region(0, 0, VSF_TGUI_HOR_MAX, VSF_TGUI_VER_MAX),
-        tgui_msgmap(__panel_msg),
+        tgui_msgmap_var(__panel_msg),
         tgui_attribute(show_corner_tile, false),
         tgui_sv_background_color(VSF_TGUI_COLOR_WHITE),
         tgui_container_type(VSF_TGUI_CONTAINER_TYPE_PLANE),
 
         tgui_panel(tools, tgui_designer_ptr, tools, code_gen,
             tgui_region(APP_TGUI_DESIGNER_RIGHT_ATTRS_X, APP_TGUI_DESIGNER_RIGHT_ATTRS_Y, APP_TGUI_DESIGNER_RIGHT_ATTRS_HOR, APP_TGUI_DESIGNER_RIGHT_ATTRS_VER),
-            tgui_background((const vsf_tgui_tile_t*)&bg2_RGB, VSF_TGUI_ALIGN_CENTER),
+// TODO: add background image
+//            tgui_background((const vsf_tgui_tile_t*)&bg2_RGB, VSF_TGUI_ALIGN_CENTER),
             tgui_container_type(VSF_TGUI_CONTAINER_TYPE_STREAM_HORIZONTAL),
             tgui_attribute(show_corner_tile , false),
             tgui_sv_background_color(VSF_TGUI_COLOR_PURPLE),
@@ -561,7 +562,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                             tgui_region(0, 0, 70, APP_TGUI_DESIGNER_VER_MAX / 4),
                             tgui_attribute(bIsAutoSize, true),
                             tgui_margin(0, 0, 8, 8),
-                            tgui_msgmap(__on_tool_text_list_msg),
+                            tgui_msgmap_var(__on_tool_text_list_msg),
 
                             tgui_text_list_content(
                                 tgui_size(70, 0),
@@ -580,7 +581,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                 tgui_text_list(tiles, &tgui_designer_ptr->tools.ctrl_attrs.tile_container, tiles, tile_align,
                                     tgui_region(0, 0, (APP_TGUI_DESIGNER_RIGHT_ATTRS_HOR - 100 - 80 - 8), APP_TGUI_DESIGNER_VER_MAX / 4),
                                     tgui_margin(0, 0, 8, 8),
-                                    tgui_msgmap(__on_tool_text_list_msg),
+                                    tgui_msgmap_var(__on_tool_text_list_msg),
 
                                     tgui_text_list_content(
                                         tgui_size(100, 0),
@@ -594,7 +595,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_region(0, 0, 100, APP_TGUI_DESIGNER_VER_MAX / 4),
                                     //tgui_attribute(bIsAutoSize, true),
                                     tgui_margin(0, 0, 0, 8),
-                                    tgui_msgmap(__on_tool_text_list_msg),
+                                    tgui_msgmap_var(__on_tool_text_list_msg),
 
                                     tgui_text_list_content(
                                         tgui_size(VSF_TGUI_HOR_MAX - APP_TGUI_DESIGNER_HOR_MAX, 0),
@@ -619,7 +620,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_sv_tile_show_corner(false),
                                     tgui_text(tLabel, tgui_designer_ptr->tools.ctrl_attrs.colors.red.buffer, true, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_control_t, background_color.red)),
@@ -631,7 +632,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_sv_tile_show_corner(false),
                                     tgui_text(tLabel, tgui_designer_ptr->tools.ctrl_attrs.colors.green.buffer, true, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_control_t, background_color.green)),
@@ -643,7 +644,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_sv_tile_show_corner(false),
                                     tgui_text(tLabel, tgui_designer_ptr->tools.ctrl_attrs.colors.blue.buffer, true, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_control_t, background_color.blue)),
@@ -655,7 +656,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_sv_tile_show_corner(false),
                                     tgui_text(tLabel, tgui_designer_ptr->tools.ctrl_attrs.colors.alpha.buffer, true, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_control_t, background_color.alpha)),
@@ -675,7 +676,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_text(tLabel, tgui_designer_ptr->tools.ctrl_attrs.regions.x.buffer, false, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_tile_show_corner(false),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, -100),
                                     tgui_attribute(max_value, APP_TGUI_DESIGNER_HOR_MAX),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_control_t, tRegion.tLocation.iX)),
@@ -688,7 +689,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_text(tLabel, tgui_designer_ptr->tools.ctrl_attrs.regions.y.buffer, false, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_tile_show_corner(false),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, -100),
                                     tgui_attribute(max_value, APP_TGUI_DESIGNER_VER_MAX),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_control_t, tRegion.tLocation.iY)),
@@ -701,7 +702,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_text(tLabel, tgui_designer_ptr->tools.ctrl_attrs.regions.width.buffer, false, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_tile_show_corner(false),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 1),
                                     tgui_attribute(max_value, APP_TGUI_DESIGNER_HOR_MAX),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_control_t, tRegion.tSize.iWidth)),
@@ -713,7 +714,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_text(tLabel, tgui_designer_ptr->tools.ctrl_attrs.regions.height.buffer, false, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_tile_show_corner(false),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 1),
                                     tgui_attribute(max_value, APP_TGUI_DESIGNER_VER_MAX),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_control_t, tRegion.tSize.iHeight)),
@@ -733,7 +734,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_text(tLabel, tgui_designer_ptr->tools.ctrl_attrs.margins.left.buffer, false, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_tile_show_corner(false),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_control_t, tMargin.chLeft)),
@@ -746,7 +747,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_text(tLabel, tgui_designer_ptr->tools.ctrl_attrs.margins.top.buffer, false, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_tile_show_corner(false),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_control_t, tMargin.chTop)),
@@ -759,7 +760,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_text(tLabel, tgui_designer_ptr->tools.ctrl_attrs.margins.right.buffer, false, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_tile_show_corner(false),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_control_t, tMargin.chRight)),
@@ -771,7 +772,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_text(tLabel, tgui_designer_ptr->tools.ctrl_attrs.margins.bottom.buffer, false, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_tile_show_corner(false),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_control_t, tMargin.chBottom)),
@@ -785,7 +786,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                             tgui_margin(0, 0, 8, 8),
                             tgui_text(tLabel, "show corner", true),
                             tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                            tgui_msgmap(__on_tool_button_click_msg),
+                            tgui_msgmap_var(__on_tool_button_click_msg),
                             tgui_attribute(bIsCheckButton, true),
                             tgui_sv_tile_show_corner(false),
                         ),
@@ -797,16 +798,16 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                             tgui_container_type(VSF_TGUI_CONTAINER_TYPE_STREAM_HORIZONTAL),
                             tgui_contains(
 
-#define __button(__current, __default_text, __pre, __next, __evt)                                              \
-            tgui_button(btns.__current, &tgui_designer_ptr->tools.ctrl_attrs.msgmaps, btns.__pre, btns.__next, \
-                tgui_region(0, 0, 200 - 2, 20),                                                                \
-                tgui_margin(0, 0, 2, 2),                                                                       \
-                tgui_sv_tile_show_corner(false),                                                           \
-                tgui_attribute(bIsCheckButton, true),                                                          \
-                tgui_msgmap(__on_tool_button_click_msg),                                                       \
-                tgui_text(tLabel, __default_text, true, VSF_TGUI_ALIGN_LEFT),                                  \
-                tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),                                   \
-                tgui_attribute(desinger_msg, __evt),                                                           \
+#define __button(__current, __default_text, __pre, __next, __evt)                                               \
+            tgui_button(btns.__current, &tgui_designer_ptr->tools.ctrl_attrs.msgmaps, btns.__pre, btns.__next,  \
+                tgui_region(0, 0, 200 - 2, 20),                                                                 \
+                tgui_margin(0, 0, 2, 2),                                                                        \
+                tgui_sv_tile_show_corner(false),                                                                \
+                tgui_attribute(bIsCheckButton, true),                                                           \
+                tgui_msgmap_var(__on_tool_button_click_msg),                                                    \
+                tgui_text(tLabel, __default_text, true, VSF_TGUI_ALIGN_LEFT),                                   \
+                tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),                                                   \
+                tgui_attribute(desinger_msg, __evt),                                                            \
             )
 
                                 __button(low_level_ready_to_refresh,    "low leave refresh",            low_level_ready_to_refresh,   control_evt,                  VSF_TGUI_MSG_LOW_LEVEL_READY_TO_REFRESH),
@@ -859,7 +860,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                         tgui_text_list(font, &tgui_designer_ptr->tools.label_attrs, font, label_align,
                             tgui_region(0, 0, 200, APP_TGUI_DESIGNER_VER_MAX / 4),
                             tgui_margin(0, 0, 8, 8),
-                            tgui_msgmap(__on_tool_text_list_msg),
+                            tgui_msgmap_var(__on_tool_text_list_msg),
 
                             tgui_text_list_content(
                                 tgui_text(tLabel, "", true, VSF_TGUI_ALIGN_LEFT),
@@ -872,7 +873,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                             tgui_region(0, 0, 150, APP_TGUI_DESIGNER_VER_MAX / 4),
                             //tgui_attribute(bIsAutoSize, true),
                             tgui_margin(0, 0, 0, 8),
-                            tgui_msgmap(__on_tool_text_list_msg),
+                            tgui_msgmap_var(__on_tool_text_list_msg),
 
                             tgui_text_list_content(
                                 tgui_size(VSF_TGUI_HOR_MAX - APP_TGUI_DESIGNER_HOR_MAX, 0),
@@ -894,7 +895,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_sv_tile_show_corner(false),
                                     tgui_text(tLabel, tgui_designer_ptr->tools.label_attrs.font_colors.red.buffer, true, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_label_t, font_color.red)),
@@ -905,7 +906,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_sv_tile_show_corner(false),
                                     tgui_text(tLabel, tgui_designer_ptr->tools.label_attrs.font_colors.green.buffer, true, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_label_t, font_color.green)),
@@ -916,7 +917,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_sv_tile_show_corner(false),
                                     tgui_text(tLabel, tgui_designer_ptr->tools.label_attrs.font_colors.blue.buffer, true, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_label_t, font_color.blue)),
@@ -927,7 +928,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_sv_tile_show_corner(false),
                                     tgui_text(tLabel, tgui_designer_ptr->tools.label_attrs.font_colors.alpha.buffer, true, VSF_TGUI_ALIGN_LEFT),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                     tgui_attribute(offset, vsf_offset_of(vsf_tgui_label_t, font_color.alpha)),
@@ -961,7 +962,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                             tgui_margin(0, 0, 8, 8),
                             tgui_sv_tile_show_corner(false),
                             tgui_attribute(bIsCheckButton, true),
-                            tgui_msgmap(__on_tool_button_click_msg),
+                            tgui_msgmap_var(__on_tool_button_click_msg),
                             tgui_text(tLabel, "auto size", true),
                             tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
                         ),
@@ -977,7 +978,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                         tgui_button(check_btn, &tgui_designer_ptr->tools.btn_attrs, check_btn, check_btn,
                             tgui_region(0, 0, 100, 32),
                             tgui_margin(0, 0, 8, 8),
-                            tgui_msgmap(__on_tool_button_click_msg),
+                            tgui_msgmap_var(__on_tool_button_click_msg),
                             tgui_text(tLabel, "check button", true),
                             tgui_attribute(bIsCheckButton, true),
                             tgui_sv_tile_show_corner(false),
@@ -995,7 +996,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                         tgui_button(auto_size, &tgui_designer_ptr->tools.cont_attrs, auto_size, refresh_whole,
                             tgui_region(0, 0, 100, 32),
                             tgui_margin(0, 0, 8, 8),
-                            tgui_msgmap(__on_tool_button_click_msg),
+                            tgui_msgmap_var(__on_tool_button_click_msg),
                             tgui_text(tLabel, "auto size", true),
                             tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
                             tgui_attribute(bIsCheckButton, true),
@@ -1007,7 +1008,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                             tgui_margin(0, 0, 8, 8),
                             tgui_text(tLabel, "refresh whole", true),
                             tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                            tgui_msgmap(__on_tool_button_click_msg),
+                            tgui_msgmap_var(__on_tool_button_click_msg),
                             tgui_attribute(bIsCheckButton, true),
                             tgui_sv_tile_show_corner(false),
                         ),
@@ -1024,7 +1025,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_text(tLabel, tgui_designer_ptr->tools.cont_attrs.padding.left.buffer, false, VSF_TGUI_ALIGN_LEFT | VSF_TGUI_ALIGN_TOP),
                                     tgui_sv_tile_show_corner(false),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                 ),
@@ -1034,7 +1035,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_text(tLabel, tgui_designer_ptr->tools.cont_attrs.padding.top.buffer, false, VSF_TGUI_ALIGN_LEFT | VSF_TGUI_ALIGN_TOP),
                                     tgui_sv_tile_show_corner(false),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                 ),
@@ -1044,7 +1045,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_text(tLabel, tgui_designer_ptr->tools.cont_attrs.padding.right.buffer, false, VSF_TGUI_ALIGN_LEFT | VSF_TGUI_ALIGN_TOP),
                                     tgui_sv_tile_show_corner(false),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                 ),
@@ -1054,7 +1055,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                                     tgui_text(tLabel, tgui_designer_ptr->tools.cont_attrs.padding.bottom.buffer, false, VSF_TGUI_ALIGN_LEFT | VSF_TGUI_ALIGN_TOP),
                                     tgui_sv_tile_show_corner(false),
                                     tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
-                                    tgui_msgmap(__on_tool_label_wheel_msg),
+                                    tgui_msgmap_var(__on_tool_label_wheel_msg),
                                     tgui_attribute(min_value, 0),
                                     tgui_attribute(max_value, 255),
                                 ),
@@ -1064,7 +1065,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
                         tgui_text_list(type, &tgui_designer_ptr->tools.cont_attrs, padding, type,
                             tgui_region(0, 0, 150, APP_TGUI_DESIGNER_VER_MAX / 4),
                             tgui_margin(0, 0, 0, 8),
-                            tgui_msgmap(__on_tool_text_list_msg),
+                            tgui_msgmap_var(__on_tool_text_list_msg),
 
                             tgui_text_list_content(
                                 tgui_size(VSF_TGUI_HOR_MAX - APP_TGUI_DESIGNER_HOR_MAX, 0),
@@ -1101,7 +1102,7 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
         tgui_button(code_gen, tgui_designer_ptr, tools, log,
             tgui_region(APP_TGUI_DESIGNER_CODE_GEN_X, APP_TGUI_DESIGNER_CODE_GEN_Y, APP_TGUI_DESIGNER_CODE_GEN_HOR, APP_TGUI_DESIGNER_CODE_GEN_VER),
             tgui_text(tLabel, "Generate Code", true),
-            tgui_msgmap(__on_tool_button_click_msg),
+            tgui_msgmap_var(__on_tool_button_click_msg),
         ),
 
         tgui_label(log, tgui_designer_ptr, code_gen, log,
@@ -1111,6 +1112,8 @@ tgui_designer_t* tgui_designer_init(tgui_designer_t* tgui_designer_ptr, vsf_tgui
             tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S16),
         ),
     );
+
+    tgui_initalize_top_container(tgui_designer_descriptor, tgui_designer_ptr);
 
     __container_clean_all_child((vsf_tgui_container_t *)&__designer_ptr->tools.list_attrs);
     __container_clean_all_child((vsf_tgui_container_t *)&__designer_ptr->tools.text_list_attrs);
@@ -1137,7 +1140,8 @@ static fsm_rt_t __on_top_panel_load(vsf_tgui_control_t* control_ptr, vsf_msgt_ms
     __designer_ptr->design_panel_ptr = __tgui_design_create_with_id((vsf_tgui_container_t*)__designer_ptr, VSF_TGUI_COMPONENT_ID_PANEL, (vsf_tgui_location_t) { 0, 0 });
     __designer_ptr->design_panel_ptr->tRegion.tSize.iWidth = APP_TGUI_DESIGNER_HOR_MAX;
     __designer_ptr->design_panel_ptr->tRegion.tSize.iHeight = APP_TGUI_DESIGNER_VER_MAX;
-    __designer_ptr->design_panel_ptr->tBackground.ptTile = (vsf_tgui_tile_t*)&bg2_RGB;
+// TODO: add background image
+//    __designer_ptr->design_panel_ptr->tBackground.ptTile = (vsf_tgui_tile_t*)&bg2_RGB;
     __control_set_msgmap(__designer_ptr->design_panel_ptr, __on_design_msg, dimof(__on_design_msg), "__on_design_msg");
 
     vsf_tgui_user_evt_handler * handler = __designer_control_get_msgmaps(__designer_ptr->design_panel_ptr);
@@ -1235,7 +1239,7 @@ static fsm_rt_t __on_design_panel_post_refresh(vsf_tgui_control_t* control_ptr, 
         const vsf_tgui_region_t* dirty_region_ptr = (const vsf_tgui_region_t*)(event_ptr->region_ptr);
 
         vsf_tgui_sv_color_t color = VSF_TGUI_COLOR_RGBA(0xFF, 0x00, 0x00, 0xFF);
-        __tgui_control_draw_border(control_ptr, __designer_ptr->cur_ctrl_ptr, dirty_region_ptr, color);
+        __tgui_control_draw_border(__designer_ptr->gui_ptr, control_ptr, __designer_ptr->cur_ctrl_ptr, dirty_region_ptr, color);
     }
 
     return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
@@ -1259,7 +1263,7 @@ static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_control_t* control_ptr, vsf
     region.tSize.iHeight = 2;
     region.tSize.iWidth -= 8;
 
-    vsf_tgui_control_v_draw_rect(control_ptr, dirty_region_ptr, &region, color);
+    vsf_tgui_control_v_draw_rect(__designer_ptr->gui_ptr, control_ptr, dirty_region_ptr, &region, color);
 
     return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
 }
@@ -1380,7 +1384,7 @@ static fsm_rt_t __on_tool_button_click(vsf_tgui_control_t* control_ptr, vsf_msgt
         static char __definition_buffer[100 * 1024];
         memset(__declaration_buffer, 0x0, sizeof(__declaration_buffer));
         memset(__definition_buffer, 0x0, sizeof(__definition_buffer));
-        vsf_tgui_control_tree_dump(APP_TGUI_PANEL, APP_TGUI_ALL_ATTRS,
+        vsf_tgui_control_tree_dump((vsf_tgui_panel_t *)APP_TGUI_PANEL, APP_TGUI_ALL_ATTRS,
                                    __declaration_buffer, sizeof(__declaration_buffer),
                                    __definition_buffer, sizeof(__definition_buffer));
 
