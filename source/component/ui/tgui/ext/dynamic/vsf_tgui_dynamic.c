@@ -114,26 +114,14 @@ void vsf_tgui_control_add(vsf_tgui_container_t *parent, vsf_tgui_control_t *cont
     }
 }
 
-void vsf_tgui_control_sync(vsf_tgui_container_t *parent, vsf_tgui_control_t *control)
-{
-    const vsf_tgui_root_container_t *top_container_ptr = vk_tgui_control_get_top(control);
-    vk_tgui_send_message(top_container_ptr->gui_ptr, (vsf_tgui_evt_t) {
-        .msg = VSF_TGUI_EVT_ON_LOAD,
-        .target_ptr = control,
-    });
-    vk_tgui_send_message(top_container_ptr->gui_ptr, (vsf_tgui_evt_t) {
-        .msg = VSF_TGUI_EVT_UPDATE,
-        .target_ptr = &parent->use_as__vsf_tgui_control_t,
-    });
-}
-
 void vsf_tgui_control_remove(vsf_tgui_container_t *parent, vsf_tgui_control_t *control)
 {
-    vsf_msgt_node_t *node_prev = parent->node_ptr;
+    vsf_tgui_container_t *parent_real = parent->id == VSF_TGUI_COMPONENT_ID_LIST ? (vsf_tgui_container_t *)parent->node_ptr : parent;
+    vsf_msgt_node_t *node_prev = parent_real->node_ptr;
     vsf_msgt_node_t *node_next = (vsf_msgt_node_t *)((intptr_t)control + control->Offset.next);
 
     if ((uintptr_t)node_prev == (uintptr_t)control) {
-        parent->node_ptr = node_next;
+        parent_real->node_ptr = node_next;
         node_prev = NULL;
     } else {
 #if VSF_MSG_TREE_CFG_SUPPORT_DUAL_LIST == ENABLED
@@ -150,6 +138,19 @@ void vsf_tgui_control_remove(vsf_tgui_container_t *parent, vsf_tgui_control_t *c
     if (node_prev != NULL) {
         node_prev->Offset.next = !node_next ? 0 : (intptr_t)node_next - (intptr_t)node_prev;
     }
+}
+
+void vsf_tgui_control_sync(vsf_tgui_container_t *parent, vsf_tgui_control_t *control)
+{
+    const vsf_tgui_root_container_t *top_container_ptr = vk_tgui_control_get_top(control);
+    vk_tgui_send_message(top_container_ptr->gui_ptr, (vsf_tgui_evt_t) {
+        .msg = VSF_TGUI_EVT_ON_LOAD,
+        .target_ptr = control,
+    });
+    vk_tgui_send_message(top_container_ptr->gui_ptr, (vsf_tgui_evt_t) {
+        .msg = VSF_TGUI_EVT_UPDATE,
+        .target_ptr = &parent->use_as__vsf_tgui_control_t,
+    });
 }
 
 // container

@@ -80,6 +80,7 @@ extern vsf_tgui_control_t * vsf_tgui_control_new(vsf_tree_msg_node_id_t id, char
 extern void vsf_tgui_control_destroy(vsf_tgui_control_t *control);
 
 extern void vsf_tgui_control_add(vsf_tgui_container_t *parent, vsf_tgui_control_t *control_prev, vsf_tgui_control_t *control);
+extern void vsf_tgui_control_remove(vsf_tgui_container_t *parent, vsf_tgui_control_t *control);
 extern void vsf_tgui_control_sync(vsf_tgui_container_t *parent, vsf_tgui_control_t *control);
 
 // container
@@ -92,11 +93,16 @@ extern vsf_tgui_label_t * vsf_tgui_label_new(char *name);
 extern void vsf_tgui_label_set_text_static(vsf_tgui_label_t *label, const char *text);
 extern const char * vsf_tgui_label_get_text(vsf_tgui_label_t *label);
 
-// buttong
+// button
 
 extern vsf_tgui_button_t * vsf_tgui_button_new(char *name);
 #define vsf_tgui_button_set_text_static(__button, __text)                      \
         vsf_tgui_label_set_text_static((vsf_tgui_label_t *)(__button), (__text))
+
+// list
+
+#define vsf_tgui_list_get_child(__list)                                         \
+        ((vsf_tgui_control_t *) (((vsf_tgui_container_t *)((__list)->node_ptr))->node_ptr) )
 
 #endif
 #endif
