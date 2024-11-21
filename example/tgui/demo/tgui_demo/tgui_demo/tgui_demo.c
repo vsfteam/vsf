@@ -75,12 +75,12 @@ VSF_CAL_NO_INIT vsf_tgui_t g_tTGUIDemo;
 
 #if APP_USE_TGUI_DESIGNER_DEMO == ENABLED
 static VSF_CAL_NO_INIT tgui_designer_t s_tDesigner;
-#else
+#endif
+
 VSF_CAL_NO_INIT union {
     stopwatch_t stopwatch;
     popup_t popup;
 } panels;
-#endif
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
