@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.VSF_AIO }}
+          github-token: ${{ secrets.VSF_SYNC }}
           script: |
             await github.rest.actions.createWorkflowDispatch({
               owner: 'vsf-linux',
