@@ -175,7 +175,7 @@ __vsf_component_peda_ifs_entry(__vk_sdmmc_mal_init, vk_mal_init)
         pthis->is_stopping = false;
         pthis->is_probing = true;
         pthis->eda = vsf_eda_get_cur();
-        VSF_FS_ASSERT(pthis->eda != NULL);
+        VSF_MAL_ASSERT(pthis->eda != NULL);
         vsf_sdio_init(pthis->sdio, &(vsf_sdio_cfg_t) {
             .mode   = SDIO_MODE_HOST,
             .isr    = {
@@ -220,7 +220,7 @@ __vsf_component_peda_ifs_entry(__vk_sdmmc_mal_read, vk_mal_read)
     switch (evt) {
     case VSF_EVT_INIT:
         pthis->eda = vsf_eda_get_cur();
-        VSF_FS_ASSERT(pthis->eda != NULL);
+        VSF_MAL_ASSERT(pthis->eda != NULL);
         pthis->is_to_stop = block_num > 1;
         vsf_sdio_host_request(pthis->sdio, &(vsf_sdio_req_t){
             .cmd                = block_num > 1 ? MMC_READ_MULTIPLE_BLOCK : MMC_READ_SINGLE_BLOCK,
@@ -253,7 +253,7 @@ __vsf_component_peda_ifs_entry(__vk_sdmmc_mal_write, vk_mal_write)
     switch (evt) {
     case VSF_EVT_INIT:
         pthis->eda = vsf_eda_get_cur();
-        VSF_FS_ASSERT(pthis->eda != NULL);
+        VSF_MAL_ASSERT(pthis->eda != NULL);
         vsf_sdio_host_request(pthis->sdio, &(vsf_sdio_req_t){
             .cmd                = block_num > 1 ? MMC_WRITE_MULTIPLE_BLOCK : MMC_WRITE_BLOCK,
             .arg                = pthis->high_capacity ? block_start : vsf_local.addr,
