@@ -21,6 +21,11 @@ jobs:
               workflow_id: 'vsf-sync.yml',
               ref: 'main'
             })
+
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.VSF_SYNC }}
+          script: |
             await github.rest.actions.createWorkflowDispatch({
               owner: 'vsfteam',
               repo: 'vsf.demo',
