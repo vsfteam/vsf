@@ -10,6 +10,8 @@
 [![cmake-arm-cross-build](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-arm-cross-build.yml/badge.svg?branch=vsf-sync)](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-arm-cross-build.yml)
 [![cmake-native-build](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-native-build.yml/badge.svg?branch=vsf-sync)](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-native-build.yml)
 
+[![vsf.demo build](https://github.com/vsfteam/vsf.demo/actions/workflows/build.yml/badge.svg?branch=vsf-sync)](https://github.com/vsfteam/vsf.demo/actions/workflows/build.yml)
+
 [English](README.md) |
 
 VSF全称是Versaloon Software Framework，是一个基于Apache2.0协议的开源嵌入式软件平台框架。包含了从底层硬件的hal驱动、抢占式多任务内核、各种服务和组件。全部代码使用C语言，以及面向对象的方式实现。

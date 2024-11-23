@@ -10,6 +10,8 @@
 [![cmake-arm-cross-build](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-arm-cross-build.yml/badge.svg?branch=vsf-sync)](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-arm-cross-build.yml)
 [![cmake-native-build](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-native-build.yml/badge.svg?branch=vsf-sync)](https://github.com/vsf-linux/vsf.linux/actions/workflows/cmake-native-build.yml)
 
+[![vsf.demo build](https://github.com/vsfteam/vsf.demo/actions/workflows/build.yml/badge.svg?branch=vsf-sync)](https://github.com/vsfteam/vsf.demo/actions/workflows/build.yml)
+
 [中文](README_zh.md) |
 
 Full name of VSF is "Versaloon Software Framework". VSF is an open-source software framework for embedded applications based on Apache2 license. VSF includes hal, a pre-emptive multi-thread kernel, services and components. VSF is implemented by C language with object-oriented programming methods(PLOOC).
