@@ -33,6 +33,10 @@
 #   define VSF_GPIO_EXTI_CFG_IMP_PREFIX         VSF_GPIO_EXTI_CFG_CALL_PREFIX
 #endif
 
+#if VSF_GPIO_CFG_PIN_COUNT > 32
+#   error "TODO: Support for more than 32bit cases"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -51,8 +55,7 @@ static void __exti_gpio_isr_handler(void *target_ptr, vsf_gpio_t *gpio_ptr,
     VSF_HAL_ASSERT(exti_gpio_ptr->exti_irq != NULL);
 
     while (pin_mask) {
-        uint32_t pin = 31 - vsf_clz32(pin_mask);
-        VSF_HAL_ASSERT(pin < VSF_HW_GPIO_PIN_COUNT);
+        uint32_t pin = (VSF_GPIO_CFG_PIN_COUNT - 1) - vsf_clz32(pin_mask);
         pin_mask &= ~(1 << pin);
 
         if (exti_gpio_ptr->exti_irq[pin].handler_fn != NULL) {
@@ -164,8 +167,7 @@ vsf_err_t vsf_exti_gpio_exti_irq_pin_config(vsf_exti_gpio_t *exti_gpio_ptr,
     VSF_HAL_ASSERT(irq_cfg_ptr != NULL);
 
     while (pin_mask) {
-        uint32_t pin = 31 - vsf_clz32(pin_mask);
-        VSF_HAL_ASSERT(pin < VSF_HW_GPIO_PIN_COUNT);
+        uint32_t pin = (VSF_GPIO_CFG_PIN_COUNT - 1) - vsf_clz32(pin_mask);
         pin_mask &= ~(1 << pin);
 
         exti_gpio_ptr->exti_irq[pin].handler_fn = irq_cfg_ptr->handler_fn;
