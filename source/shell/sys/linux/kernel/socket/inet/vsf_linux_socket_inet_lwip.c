@@ -30,6 +30,7 @@
 #   include "../../../include/errno.h"
 #   include "../../../include/sys/socket.h"
 #   include "../../../include/sys/time.h"
+#   include "../../../include/net/if.h"
 #   include "../../../include/netinet/in.h"
 #   include "../../../include/netinet/tcp.h"
 #   include "../../../include/arpa/inet.h"
@@ -40,6 +41,7 @@
 #   include <errno.h>
 #   include <sys/socket.h>
 #   include <sys/time.h>
+#   include <net/if.h>
 #   include <netinet/in.h>
 #   include <netinet/tcp.h>
 #   include <arpa/inet.h>
