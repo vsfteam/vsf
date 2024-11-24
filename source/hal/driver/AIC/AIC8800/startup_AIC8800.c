@@ -276,7 +276,11 @@ VSF_CAL_NO_INIT pFunc __isr_vector[dimof(__VECTOR_TABLE) - 4] VSF_CAL_ALIGN(512)
 
 VSF_CAL_WEAK(vsf_hal_pre_startup_init)
 void vsf_hal_pre_startup_init(void)
-{}
+{
+    // if start after firmware download without reset, SysTick wil be on with interrupt enabled, close it here
+    SysTick->CTRL = 0;
+    SCB->ICSR |= SCB_ICSR_PENDSTCLR_Msk;
+}
 
 /*----------------------------------------------------------------------------
   Reset Handler called on controller reset
