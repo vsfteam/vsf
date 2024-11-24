@@ -74,6 +74,7 @@ int vsf_hal_pre_startup_init(void)
     // seems systick is not reset on hw reset of aic8800
     // avoid systick interrupt before os started
     SysTick->CTRL = 0;
+    SCB->ICSR |= SCB_ICSR_PENDSTCLR_Msk;
     return 1;
 }
 
