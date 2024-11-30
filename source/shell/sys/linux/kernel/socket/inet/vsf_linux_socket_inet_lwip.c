@@ -401,7 +401,8 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
             }
             break;
 #endif
-#if 0
+// some old version of lwip does not support bind APIs, lwip supports these APIs, enable VSF_LINUX_CFG_SOCKET_BIND
+#if VSF_LINUX_CFG_SOCKET_BIND == ENABLED
         case SO_BINDTODEVICE: {
                 const struct ifreq *iface;
                 struct netif *n = NULL;
