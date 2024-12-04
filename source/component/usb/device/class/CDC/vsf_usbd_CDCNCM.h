@@ -66,13 +66,14 @@ extern "C" {
 
 #define __usbd_cdc_ncm_desc_iad(__name, __ifs_start, __i_func,                  \
         __int_in_ep, __bulk_in_ep, __bulk_out_ep,                               \
-        __bulk_ep_size, __int_ep_interval, __i_mac, __max_seg_size, ...)        \
+        __bulk_ep_size, __int_ep_interval, __i_mac, ...)                        \
             USB_DESC_CDC_NCM_IAD((__ifs_start), (__i_func),                     \
                 (__int_in_ep), (__bulk_in_ep), (__bulk_out_ep),                 \
-                (__bulk_ep_size), (__int_ep_interval), (__i_mac), (__max_seg_size), ##__VA_ARGS__)
+                (__bulk_ep_size), (__int_ep_interval), (__i_mac), ##__VA_ARGS__)
 
 #define __usbd_cdc_ncm_func(__name, __func_id, __str_func, __i_func, __ifs_start,\
-        __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval)\
+        __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval,\
+        __i_mac, __str_mac)                                                     \
             enum {                                                              \
                 __##__name##_CDCNCM##__func_id##_IFS_START  = (__ifs_start),    \
                 __##__name##_CDCNCM##__func_id##_I_FUNC     = (__i_func),       \
@@ -81,8 +82,10 @@ extern "C" {
                 __##__name##_CDCNCM##__func_id##_BULKOUT_EP = (__bulk_out_ep),  \
                 __##__name##_CDCNCM##__func_id##_BULK_EP_SIZE = (__bulk_ep_size),\
                 __##__name##_CDCNCM##__func_id##_BULK_EP_INTERVAL = (__int_ep_interval),\
+                __##__name##_CDCNCM##__func_id##_I_MAC      = (__i_mac),        \
             };                                                                  \
             usbd_func_str_desc(__name, __func_id, __str_func)                   \
+            usbd_func_str_desc(__name, __func_id ## _mac, __str_mac)            \
             vk_usbd_cdcncm_t __##__name##_CDCNCM##__func_id = {                 \
                 USB_CDC_NCM_PARAM((__int_in_ep), (__bulk_in_ep), (__bulk_out_ep))\
             };
@@ -91,7 +94,10 @@ extern "C" {
             USB_CDC_NCM_IFS_CONTROL(__##__name##_CDCNCM##__func_id)             \
             USB_CDC_NCM_IFS_DATA(__##__name##_CDCNCM##__func_id)
 
-#define usbd_cdc_ncm_desc_iad(__name, __func_id)                                \
+// prototype: usbd_cdc_ncm_desc_iad(__name, __func_id,                          \
+            __network_cap = 0, __multicast_filter_num = 0, __power_filter_num = 0,\
+            __max_segment_size = (14 + 1500))
+#define usbd_cdc_ncm_desc_iad(__name, __func_id, ...)                           \
             __usbd_cdc_ncm_desc_iad(__name,                                     \
                 __##__name##_CDCNCM##__func_id##_IFS_START,                     \
                 4 + __##__name##_CDCNCM##__func_id##_I_FUNC,                    \
@@ -99,11 +105,17 @@ extern "C" {
                 __##__name##_CDCNCM##__func_id##_BULKIN_EP,                     \
                 __##__name##_CDCNCM##__func_id##_BULKOUT_EP,                    \
                 __##__name##_CDCNCM##__func_id##_BULK_EP_SIZE,                  \
-                __##__name##_CDCNCM##__func_id##_BULK_EP_INTERVAL)
+                __##__name##_CDCNCM##__func_id##_BULK_EP_INTERVAL,              \
+                __##__name##_CDCNCM##__func_id##_I_MAC, ##__VA_ARGS__)
+#define usbd_cdc_ncm_str_desc_mac(__name, __func_id)                            \
+            VSF_USBD_DESC_STRING(0x0409, __##__name##_CDCNCM##__func_id##_I_MAC,\
+                &__##__name##_str_func##__func_id##_mac, sizeof(__##__name##_str_func##__func_id##_mac)),
 #define usbd_cdc_ncm_func(__name, __func_id, __str_func, __i_func, __ifs_start, \
-        __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval)\
+        __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval,\
+        __i_mac, __str_mac)                                                     \
             __usbd_cdc_ncm_func(__name, __func_id, (__str_func), (__i_func), (__ifs_start),\
-                (__int_in_ep), (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size), (__int_ep_interval))
+                (__int_in_ep), (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size), (__int_ep_interval),\
+                (__i_mac), (__str_mac))
 #define usbd_cdc_ncm_ifs(__name, __func_id)                                     \
             __usbd_cdc_ncm_ifs(__name, __func_id)
 

@@ -60,7 +60,8 @@ extern "C" {
             (__NETWORK_CAPABILITIES),           /* bmNetworkCapabilities */     \
                                                                                 \
             USB_DESC_EP(USB_DIR_IN | (__INT_IN_EP), USB_ENDPOINT_XFER_INT, 8, (__INT_EP_INTERVAL))\
-            USB_DESC_IFS((__IFS_START) + 1, 0, 2, USB_CLASS_CDC_DATA, 0x00, 0x01, (__I_FUNC))\
+            USB_DESC_IFS((__IFS_START) + 1, 0, 0, USB_CLASS_CDC_DATA, 0x00, 0x01, (__I_FUNC))\
+            USB_DESC_IFS((__IFS_START) + 1, 1, 2, USB_CLASS_CDC_DATA, 0x00, 0x01, (__I_FUNC))\
             USB_DESC_EP(USB_DIR_IN | (__BULK_IN_EP), USB_ENDPOINT_XFER_BULK, (__BULK_EP_SIZE), 0x00)\
             USB_DESC_EP(USB_DIR_OUT | (__BULK_OUT_EP), USB_ENDPOINT_XFER_BULK, (__BULK_EP_SIZE), 0x00)
 #define USB_DESC_CDC_NCM3(__IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL,\
@@ -76,26 +77,26 @@ extern "C" {
             USB_DESC_CDC_NCM2(__IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL,\
                         __I_MAC, __NETWORK_CAPABILITIES, 0)
 #define USB_DESC_CDC_NCM0(__IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL,\
-                        __I_MAC, __NETWORK_CAPABILITIES)                        \
+                        __I_MAC)                                                \
             USB_DESC_CDC_NCM1(__IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL,\
                         __I_MAC, 0)
 
 // prototype: USB_DESC_CDC_NCM(__IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL,
 //                        __I_MAC, __NETWORK_CAPABILITIES = 0, __MC_FITER_NUM = 0, __PWR_FILTER_NUM = 0, __MAX_SEG_SIZE = (14 + 1500))
 #define USB_DESC_CDC_NCM(__IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL,\
-                        __I_MAC, __MAX_SEG_SIZE, ...)                           \
+                        __I_MAC, ...)                                           \
             __PLOOC_EVAL(USB_DESC_CDC_NCM, __VA_ARGS__)                         \
                 (__IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL,\
-                __I_MAC, __MAX_SEG_SIZE, ##__VA_ARGS__)
+                __I_MAC, ##__VA_ARGS__)
 #define USB_DESC_CDC_NCM_LEN                                                    \
             (   USB_DT_INTERFACE_SIZE + 5 + 5 + 13 + 6 + USB_DT_ENDPOINT_SIZE + \
-                USB_DT_INTERFACE_SIZE + 2 * USB_DT_ENDPOINT_SIZE)
+                2 * USB_DT_INTERFACE_SIZE + 2 * USB_DT_ENDPOINT_SIZE)
 
 #define USB_DESC_CDC_NCM_IAD(__IFS_START, __I_FUNC, __INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP, __BULK_EP_SIZE, __INT_EP_INTERVAL,\
-                        __I_MAC, __MAX_SEG_SIZE, ...)                           \
+                        __I_MAC, ...)                                           \
             USB_DESC_IAD((__IFS_START), 2, USB_CLASS_COMM, 0x0D, 0x00, (__I_FUNC))\
             USB_DESC_CDC_NCM((__IFS_START), (__I_FUNC), (__INT_IN_EP), (__BULK_IN_EP), (__BULK_OUT_EP), (__BULK_EP_SIZE), (__INT_EP_INTERVAL),\
-                        __I_MAC, __MAX_SEG_SIZE, ##__VA_ARGS__)
+                        __I_MAC, ##__VA_ARGS__)
 #define USB_DESC_CDC_NCM_IAD_LEN                (USB_DESC_IAD_LEN + USB_DESC_CDC_NCM_LEN)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
