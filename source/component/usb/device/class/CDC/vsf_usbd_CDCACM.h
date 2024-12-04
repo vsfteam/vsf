@@ -114,6 +114,8 @@ extern "C" {
                 __##__name##_CDCACM##__func_id##_BULKOUT_EP,                    \
                 __##__name##_CDCACM##__func_id##_BULK_EP_SIZE,                  \
                 __##__name##_CDCACM##__func_id##_BULK_EP_INTERVAL)
+#define usbd_cdc_acm_desc_table(__name, __func_id)                              \
+            usbd_func_str_desc_table(__name, __func_id)
 #define usbd_cdc_acm_func(__name, __func_id, __str_func, __i_func, __ifs_start, \
         __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval,\
         __stream_rx, __stream_tx, ...)                                          \
@@ -122,6 +124,11 @@ extern "C" {
                 (__stream_rx), (__stream_tx), __VA_ARGS__)
 #define usbd_cdc_acm_ifs(__name, __func_id)                                     \
             __usbd_cdc_acm_ifs(__name, __func_id)
+
+#define usbd_cdcacm_desc_iad(...)           usbd_cdc_acm_desc_iad(__VA_ARGS__)
+#define usbd_cdcacm_desc_table(...)         usbd_cdc_acm_desc_table(__VA_ARGS__)
+#define usbd_cdcacm_func(...)               usbd_cdc_acm_func(__VA_ARGS__)
+#define usbd_cdcacm_ifs(...)                usbd_cdc_acm_ifs(__VA_ARGS__)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

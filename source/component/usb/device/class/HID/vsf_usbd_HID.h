@@ -122,6 +122,8 @@ extern "C" {
                     (__version_bcd), (__country_code), (__report_desc_len),     \
                     (__ep_in), (__ep_in_size), (__ep_in_interval),              \
                     (__ep_out), (__ep_out_size), (__ep_out_interval))
+#define usbd_hid_desc_table(__name, __func_id)                                  \
+            usbd_func_str_desc_table(__name, __func_id)
 
 #define usbd_hid_func(__name, __func_id,                                        \
                     __in_ep, __out_ep, __out_ep_size,                           \

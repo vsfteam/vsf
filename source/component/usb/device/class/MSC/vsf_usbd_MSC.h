@@ -102,6 +102,8 @@ extern "C" {
                 __##__name##_MSCBOT##__func_id##_BULKIN_EP,                     \
                 __##__name##_MSCBOT##__func_id##_BULKOUT_EP,                    \
                 __##__name##_MSCBOT##__func_id##_BULK_EP_SIZE)
+#define usbd_mscbot_desc_table(__name, __func_id)                               \
+            usbd_func_str_desc_table(__name, __func_id)
 #define usbd_mscbot_func(__name, __func_id, __str_func, __i_func, __ifs,        \
         __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __stream, ...)             \
             __usbd_mscbot_func(__name, __func_id, (__str_func), (__i_func), (__ifs),\

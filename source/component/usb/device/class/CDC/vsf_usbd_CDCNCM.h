@@ -107,7 +107,8 @@ extern "C" {
                 __##__name##_CDCNCM##__func_id##_BULK_EP_SIZE,                  \
                 __##__name##_CDCNCM##__func_id##_BULK_EP_INTERVAL,              \
                 __##__name##_CDCNCM##__func_id##_I_MAC, ##__VA_ARGS__)
-#define usbd_cdc_ncm_str_desc_mac(__name, __func_id)                            \
+#define usbd_cdc_ncm_desc_table(__name, __func_id)                              \
+            usbd_func_str_desc_table(__name, __func_id)                         \
             VSF_USBD_DESC_STRING(0x0409, __##__name##_CDCNCM##__func_id##_I_MAC,\
                 &__##__name##_str_func##__func_id##_mac, sizeof(__##__name##_str_func##__func_id##_mac)),
 #define usbd_cdc_ncm_func(__name, __func_id, __str_func, __i_func, __ifs_start, \
@@ -118,6 +119,11 @@ extern "C" {
                 (__i_mac), (__str_mac))
 #define usbd_cdc_ncm_ifs(__name, __func_id)                                     \
             __usbd_cdc_ncm_ifs(__name, __func_id)
+
+#define usbd_cdcncm_desc_iad(...)       usbd_cdc_ncm_desc_iad(__VA_ARGS__)
+#define usbd_cdcncm_desc_table(...)     usbd_cdc_ncm_desc_table(__VA_ARGS__)
+#define usbd_cdcncm_func(...)           usbd_cdc_ncm_func(__VA_ARGS__)
+#define usbd_cdcncm_ifs(...)            usbd_cdc_ncm_ifs(__VA_ARGS__)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
