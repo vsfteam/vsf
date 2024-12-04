@@ -143,25 +143,12 @@ vsf_class(vk_usbd_cdcacm_t) {
     )
 };
 
-typedef struct vk_usbd_cdcacm_cfg_t {
-    implement_ex(vk_usbd_cdc_ep_t, ep);
-#if     VSF_USE_SIMPLE_STREAM == ENABLED
-    vsf_stream_t *tx_stream;
-    vsf_stream_t *rx_stream;
-#elif   VSF_USE_STREAM == ENABLED
-    implement_ex(vsf_stream_usr_cfg_t, stream_usr);
-    implement_ex(vsf_stream_src_cfg_t, stream_src);
-#endif
-} vk_usbd_cdcacm_cfg_t;
-
 /*============================ GLOBAL VARIABLES ==============================*/
 
 extern const vk_usbd_class_op_t vk_usbd_cdcacm_control;
 extern const vk_usbd_class_op_t vk_usbd_cdcacm_data;
 
 /*============================ PROTOTYPES ====================================*/
-
-extern vsf_err_t vk_usbd_cdcacm_init(vk_usbd_cdcacm_t *obj, const vk_usbd_cdcacm_cfg_t *cfg);
 
 #ifdef __cplusplus
 }

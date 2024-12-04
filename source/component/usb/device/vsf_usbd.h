@@ -618,6 +618,9 @@ void vk_usbd_ep_stream_connect_dev(vk_usbd_ep_stream_t *obj,
 #   if VSF_USBD_USE_CDCACM == ENABLED
 #       include "./class/CDC/vsf_usbd_CDCACM.h"
 #   endif
+#   if VSF_USBD_USE_CDCNCM == ENABLED
+#       include "./class/CDC/vsf_usbd_CDCNCM.h"
+#   endif
 #endif
 #if VSF_USBD_USE_HID == ENABLED
 #   include "./class/HID/vsf_usbd_HID.h"
