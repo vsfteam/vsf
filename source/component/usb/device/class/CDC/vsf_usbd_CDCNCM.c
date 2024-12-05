@@ -54,11 +54,34 @@ const vk_usbd_class_op_t vk_usbd_cdcncm_data =
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
+
+static const usb_cdcncm_ntb_param_t __vsf_usbd_cdcncm_ntb_param = {
+    .wLength = __constant_cpu_to_le16(sizeof(usb_cdcncm_ntb_param_t)),
+#if VSF_USBD_CDCNCM_SUPPORT_NTB32 == ENABLED
+    .bmNtbFormatsSupported = __constant_cpu_to_le16(3),
+#else
+    .bmNtbFormatsSupported = __constant_cpu_to_le16(1),
+#endif
+    .dwNtbInMaxSize = __constant_cpu_to_le32(sizeof(VSF_USBD_CDCNCM_CFG_MAX_NTB_IN_SIZE)),
+    .wNdpInDivisor = __constant_cpu_to_le16(4),
+    .wNdpInPayloadRemainder = __constant_cpu_to_le16(0),
+    .wNdpInAlignment = __constant_cpu_to_le16(4),
+    .dwNtbOutMaxSize = __constant_cpu_to_le32(sizeof(VSF_USBD_CDCNCM_CFG_MAX_NTB_OUT_SIZE)),
+    .wNdpOutDivisor = __constant_cpu_to_le16(4),
+    .wNdpOutPayloadRemainder = __constant_cpu_to_le16(0),
+    .wNdpOutAlignment = __constant_cpu_to_le16(4),
+    .wNtbOutMaxDatagrams = __constant_cpu_to_le16(0),
+};
+
 /*============================ IMPLEMENTATION ================================*/
 
 static vsf_err_t __vk_usbd_cdcncm_data_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_cdcncm_t *ncm = ifs->class_param;
+    ncm->ntb_format = __vsf_usbd_cdcncm_ntb_param.bmNtbFormatsSupported;
+    ncm->ntb_input_size.dwNtbInMaxSize = __vsf_usbd_cdcncm_ntb_param.dwNtbInMaxSize;
+    ncm->ntb_input_size.wNtbInMaxDataframs = 0;
+    ncm->ntb_input_size.reserved = 0;
     return vk_usbd_cdc_data.init(dev, ifs);
 }
 
@@ -72,6 +95,28 @@ static vsf_err_t __vk_usbd_cdcncm_control_request_prepare(
     uint_fast32_t size = 0;
 
     switch (request->bRequest) {
+    case USB_CDCNCM_REQ_GET_NTB_PARAMETERS:
+        buffer = (uint8_t *)&__vsf_usbd_cdcncm_ntb_param;
+        size = sizeof(__vsf_usbd_cdcncm_ntb_param);
+        break;
+    case USB_CDCNCM_REQ_SET_NTB_FORMAT:
+    case USB_CDCNCM_REQ_GET_NTB_FORMAT:
+        buffer = (uint8_t *)&ncm->ntb_format;
+        size = sizeof(ncm->ntb_format);
+        break;
+    case USB_CDCNCM_REQ_GET_NTB_INPUT_SIZE:
+    case USB_CDCNCM_REQ_SET_NTB_INPUT_SIZE:
+        buffer = (uint8_t *)&ncm->ntb_input_size;
+        size = sizeof(ncm->ntb_input_size);
+        break;
+    case USB_CDCNCM_REQ_GET_CRC_MODE:
+    case USB_CDCNCM_REQ_SET_CRC_MODE:
+        buffer = (uint8_t *)&ncm->crc_mode;
+        size = sizeof(ncm->crc_mode);
+        break;
+    case USB_CDCNCM_REQ_GET_MAX_DATAGRAM_SIZE:
+    case USB_CDCNCM_REQ_SET_MAX_DATAGRAM_SIZE:
+        break;
     default:
         return vk_usbd_cdc_control.request_prepare(dev, ifs);
     }
@@ -89,6 +134,14 @@ static vsf_err_t __vk_usbd_cdcncm_control_request_process(
     struct usb_ctrlrequest_t *request = &ctrl_handler->request;
 
     switch (request->bRequest) {
+    case USB_CDCNCM_REQ_GET_NTB_PARAMETERS:
+    case USB_CDCNCM_REQ_GET_NTB_FORMAT:
+    case USB_CDCNCM_REQ_SET_NTB_FORMAT:
+    case USB_CDCNCM_REQ_GET_NTB_INPUT_SIZE:
+    case USB_CDCNCM_REQ_SET_NTB_INPUT_SIZE:
+    case USB_CDCNCM_REQ_GET_CRC_MODE:
+    case USB_CDCNCM_REQ_SET_CRC_MODE:
+        break;
     default:
         return vk_usbd_cdc_control.request_process(dev, ifs);
     }

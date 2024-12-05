@@ -42,11 +42,11 @@ extern "C" {
 #ifndef VSF_USBD_CDCNCM_SUPPORT_NTB32
 #   define VSF_USBD_CDCNCM_SUPPORT_NTB32                ENABLED
 #endif
-#ifndef VSF_USBD_CDCNCM_CFG_MAX_NDPIN_SIZE
-#   define VSF_USBD_CDCNCM_CFG_MAX_NDPIN_SIZE           (4 * 1024)
+#ifndef VSF_USBD_CDCNCM_CFG_MAX_NTB_IN_SIZE
+#   define VSF_USBD_CDCNCM_CFG_MAX_NTB_IN_SIZE          (4 * 1024)
 #endif
-#ifndef VSF_USBD_CDCNCM_CFG_MAX_NDPOUT_SIZE
-#   define VSF_USBD_CDCNCM_CFG_MAX_NDPOUT_SIZE          (4 * 1024)
+#ifndef VSF_USBD_CDCNCM_CFG_MAX_NTB_OUT_SIZE
+#   define VSF_USBD_CDCNCM_CFG_MAX_NTB_OUT_SIZE         (4 * 1024)
 #endif
 
 #define USB_CDC_NCM_PARAM(__INT_IN_EP, __BULK_IN_EP, __BULK_OUT_EP)             \
@@ -66,14 +66,15 @@ extern "C" {
 
 #define __usbd_cdc_ncm_desc_iad(__name, __ifs_start, __i_func,                  \
         __int_in_ep, __bulk_in_ep, __bulk_out_ep,                               \
-        __bulk_ep_size, __int_ep_interval, __i_mac, ...)                        \
+        __bulk_ep_size, __int_ep_interval, __i_mac, __max_datagram_size, ...)   \
             USB_DESC_CDC_NCM_IAD((__ifs_start), (__i_func),                     \
                 (__int_in_ep), (__bulk_in_ep), (__bulk_out_ep),                 \
-                (__bulk_ep_size), (__int_ep_interval), (__i_mac), ##__VA_ARGS__)
+                (__bulk_ep_size), (__int_ep_interval), (__i_mac),               \
+                (__max_datagram_size), ##__VA_ARGS__)
 
-#define __usbd_cdc_ncm_func(__name, __func_id, __str_func, __i_func, __ifs_start,\
+#define __usbd_cdc_ncm_func1(__name, __func_id, __str_func, __i_func, __ifs_start,\
         __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval,\
-        __i_mac, __str_mac)                                                     \
+        __i_mac, __str_mac, __max_datagram_size)                                \
             enum {                                                              \
                 __##__name##_CDCNCM##__func_id##_IFS_START  = (__ifs_start),    \
                 __##__name##_CDCNCM##__func_id##_I_FUNC     = (__i_func),       \
@@ -83,20 +84,33 @@ extern "C" {
                 __##__name##_CDCNCM##__func_id##_BULK_EP_SIZE = (__bulk_ep_size),\
                 __##__name##_CDCNCM##__func_id##_BULK_EP_INTERVAL = (__int_ep_interval),\
                 __##__name##_CDCNCM##__func_id##_I_MAC      = (__i_mac),        \
+                __##__name##_CDCNCM##__func_id##_MAX_DATAGRAM_SIZE = (__max_datagram_size),\
             };                                                                  \
             usbd_func_str_desc(__name, __func_id, __str_func)                   \
             usbd_func_str_desc(__name, __func_id ## _mac, __str_mac)            \
             vk_usbd_cdcncm_t __##__name##_CDCNCM##__func_id = {                 \
                 USB_CDC_NCM_PARAM((__int_in_ep), (__bulk_in_ep), (__bulk_out_ep))\
+                .max_datagram_size = (__max_datagram_size),                     \
             };
+#define __usbd_cdc_ncm_func0(__name, __func_id, __str_func, __i_func, __ifs_start,\
+        __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval,\
+        __i_mac, __str_mac)                                                     \
+            __usbd_cdc_ncm_func1(__name, __func_id, __str_func, __i_func, __ifs_start,\
+                __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval,\
+                __i_mac, __str_mac, (14 + 1500))
+#define __usbd_cdc_ncm_func(__name, __func_id, __str_func, __i_func, __ifs_start,\
+        __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval,\
+        __i_mac, __str_mac, ...)                                                \
+            __PLOOC_EVAL(__usbd_cdc_ncm_func, __VA_ARGS__)(__name, __func_id, __str_func, __i_func, __ifs_start,\
+                __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval,\
+                __i_mac, __str_mac, ##__VA_ARGS__)
 
 #define __usbd_cdc_ncm_ifs(__name, __func_id)                                   \
             USB_CDC_NCM_IFS_CONTROL(__##__name##_CDCNCM##__func_id)             \
             USB_CDC_NCM_IFS_DATA(__##__name##_CDCNCM##__func_id)
 
 // prototype: usbd_cdc_ncm_desc_iad(__name, __func_id,                          \
-            __network_cap = 0, __multicast_filter_num = 0, __power_filter_num = 0,\
-            __max_segment_size = (14 + 1500))
+            __network_cap = 0, __multicast_filter_num = 0, __power_filter_num = 0)
 #define usbd_cdc_ncm_desc_iad(__name, __func_id, ...)                           \
             __usbd_cdc_ncm_desc_iad(__name,                                     \
                 __##__name##_CDCNCM##__func_id##_IFS_START,                     \
@@ -106,17 +120,18 @@ extern "C" {
                 __##__name##_CDCNCM##__func_id##_BULKOUT_EP,                    \
                 __##__name##_CDCNCM##__func_id##_BULK_EP_SIZE,                  \
                 __##__name##_CDCNCM##__func_id##_BULK_EP_INTERVAL,              \
-                __##__name##_CDCNCM##__func_id##_I_MAC, ##__VA_ARGS__)
+                __##__name##_CDCNCM##__func_id##_I_MAC,                         \
+                __##__name##_CDCNCM##__func_id##_MAX_DATAGRAM_SIZE, ##__VA_ARGS__)
 #define usbd_cdc_ncm_desc_table(__name, __func_id)                              \
             usbd_func_str_desc_table(__name, __func_id)                         \
             VSF_USBD_DESC_STRING(0x0409, __##__name##_CDCNCM##__func_id##_I_MAC,\
                 &__##__name##_str_func##__func_id##_mac, sizeof(__##__name##_str_func##__func_id##_mac)),
 #define usbd_cdc_ncm_func(__name, __func_id, __str_func, __i_func, __ifs_start, \
         __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval,\
-        __i_mac, __str_mac)                                                     \
+        __i_mac, __str_mac, ...)                                                \
             __usbd_cdc_ncm_func(__name, __func_id, (__str_func), (__i_func), (__ifs_start),\
                 (__int_in_ep), (__bulk_in_ep), (__bulk_out_ep), (__bulk_ep_size), (__int_ep_interval),\
-                (__i_mac), (__str_mac))
+                    (__i_mac), (__str_mac), ##__VA_ARGS__)
 #define usbd_cdc_ncm_ifs(__name, __func_id)                                     \
             __usbd_cdc_ncm_ifs(__name, __func_id)
 
@@ -131,7 +146,14 @@ extern "C" {
 vsf_class(vk_usbd_cdcncm_t) {
     public_member(
         implement(vk_usbd_cdc_t)
-        usb_cdcncm_ntb_param_t ntb_param;
+        uint16_t max_datagram_size;
+    )
+    private_member(
+        uint16_t ntb_format;
+        uint16_t crc_mode;
+        usb_cdcncm_ntb_input_size_t ntb_input_size;
+        uint32_t ntb_in_buffer[VSF_USBD_CDCNCM_CFG_MAX_NTB_IN_SIZE / 4];
+        uint32_t ntb_out_buffer[VSF_USBD_CDCNCM_CFG_MAX_NTB_OUT_SIZE / 4];
     )
 };
 

@@ -131,6 +131,26 @@ extern "C" {
 
 #define VSF_SWI_NUM                         (VSF_ARCH_SWI_NUM + VSF_DEV_SWI_NUM)
 
+#define ___constant_swab16(__x) ((uint16_t)(                                    \
+    (((uint16_t)(__x) & (uint16_t)0x00FFU) << 8) |                              \
+    (((uint16_t)(__x) & (uint16_t)0xFF00U) >> 8)))
+
+#define ___constant_swab32(__x) ((uint32_t)(                                    \
+    (((uint32_t)(__x) & (uint32_t)0x000000ffUL) << 24) |                        \
+    (((uint32_t)(__x) & (uint32_t)0x0000ff00UL) <<  8) |                        \
+    (((uint32_t)(__x) & (uint32_t)0x00ff0000UL) >>  8) |                        \
+    (((uint32_t)(__x) & (uint32_t)0xff000000UL) >> 24)))
+
+#define ___constant_swab64(__x) ((uint64_t)(                                    \
+    (((uint64_t)(__x) & (uint64_t)0x00000000000000ffULL) << 56) |               \
+    (((uint64_t)(__x) & (uint64_t)0x000000000000ff00ULL) << 40) |               \
+    (((uint64_t)(__x) & (uint64_t)0x0000000000ff0000ULL) << 24) |               \
+    (((uint64_t)(__x) & (uint64_t)0x00000000ff000000ULL) <<  8) |               \
+    (((uint64_t)(__x) & (uint64_t)0x000000ff00000000ULL) >>  8) |               \
+    (((uint64_t)(__x) & (uint64_t)0x0000ff0000000000ULL) >> 24) |               \
+    (((uint64_t)(__x) & (uint64_t)0x00ff000000000000ULL) >> 40) |               \
+    (((uint64_t)(__x) & (uint64_t)0xff00000000000000ULL) >> 56)))
+
 #define bswap16                             bswap_16
 #define bswap32                             bswap_32
 #define bswap64                             bswap_64
@@ -160,6 +180,19 @@ extern "C" {
 #   define be16_to_cpu
 #   define be32_to_cpu
 #   define be64_to_cpu
+
+#   define __constant_cpu_to_le16           ___constant_swab16
+#   define __constant_le16_to_cpu           ___constant_swab16
+#   define __constant_cpu_to_le32           ___constant_swab32
+#   define __constant_le32_to_cpu           ___constant_swab32
+#   define __constant_cpu_to_le64           ___constant_swab64
+#   define __constant_le64_to_cpu           ___constant_swab64
+#   define __constant_cpu_to_be16
+#   define __constant_be16_to_cpu
+#   define __constant_cpu_to_be32
+#   define __constant_be32_to_cpu
+#   define __constant_cpu_to_be64
+#   define __constant_be64_to_cpu
 #else
 #   define htobe16                          bswap_16
 #   define htole16
@@ -186,6 +219,19 @@ extern "C" {
 #   define be16_to_cpu                      bswap_16
 #   define be32_to_cpu                      bswap_32
 #   define be64_to_cpu                      bswap_64
+
+#   define __constant_cpu_to_le16
+#   define __constant_le16_to_cpu
+#   define __constant_cpu_to_le32
+#   define __constant_le32_to_cpu
+#   define __constant_cpu_to_le64
+#   define __constant_le64_to_cpu
+#   define __constant_cpu_to_be16           ___constant_swab16
+#   define __constant_be16_to_cpu           ___constant_swab16
+#   define __constant_cpu_to_be32           ___constant_swab32
+#   define __constant_be32_to_cpu           ___constant_swab32
+#   define __constant_cpu_to_be64           ___constant_swab64
+#   define __constant_be64_to_cpu           ___constant_swab64
 #endif
 
 #define DECLARE_ENDIAN_FUNC(__bitlen)                                           \

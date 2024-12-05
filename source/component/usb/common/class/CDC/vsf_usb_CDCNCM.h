@@ -51,6 +51,13 @@ struct usb_cdcncm_ntb_param_t {
     uint16_t wNtbOutMaxDatagrams;
 } VSF_CAL_PACKED;
 
+typedef struct usb_cdcncm_ntb_input_size_t usb_cdcncm_ntb_input_size_t;
+struct usb_cdcncm_ntb_input_size_t {
+    uint32_t dwNtbInMaxSize;
+    uint16_t wNtbInMaxDataframs;
+    uint16_t reserved;
+} VSF_CAL_PACKED;
+
 #define USB_CDCNCM_NTB_PARAM_NTB16              (1 << 0)
 #define USB_CDCNCM_NTB_PARAM_NTB32              (1 << 1)
 
