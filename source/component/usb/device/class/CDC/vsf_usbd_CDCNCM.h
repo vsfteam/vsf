@@ -24,6 +24,8 @@
 
 #if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_CDCNCM == ENABLED
 
+#include "component/tcpip/vsf_tcpip.h"
+#include "component/usb/common/class/CDC/vsf_usb_CDCECM.h"
 #include "component/usb/common/class/CDC/vsf_usb_CDCNCM.h"
 #include "./vsf_usbd_CDCNCM_desc.h"
 
@@ -149,8 +151,17 @@ vsf_class(vk_usbd_cdcncm_t) {
         uint16_t max_datagram_size;
     )
     private_member(
+        vk_usbd_dev_t *dev;
+        vk_netdrv_t netdrv;
+        vk_usbd_trans_t transact_int_in;
+        vk_usbd_trans_t transact_bulk_in;
+        vk_usbd_trans_t transact_bulk_out;
+
         uint16_t ntb_format;
         uint16_t crc_mode;
+        bool is_tx_busy;
+        bool is_rx_busy;
+        uint8_t connect_state;
         usb_cdcncm_ntb_input_size_t ntb_input_size;
         uint32_t ntb_in_buffer[VSF_USBD_CDCNCM_CFG_MAX_NTB_IN_SIZE / 4];
         uint32_t ntb_out_buffer[VSF_USBD_CDCNCM_CFG_MAX_NTB_OUT_SIZE / 4];

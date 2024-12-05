@@ -59,7 +59,7 @@ extern "C" {
             USB_DESC_WORD(0x0100),              /* bcdNcmVersion: 1.00 */       \
             (__NETWORK_CAPABILITIES),           /* bmNetworkCapabilities */     \
                                                                                 \
-            USB_DESC_EP(USB_DIR_IN | (__INT_IN_EP), USB_ENDPOINT_XFER_INT, 8, (__INT_EP_INTERVAL))\
+            USB_DESC_EP(USB_DIR_IN | (__INT_IN_EP), USB_ENDPOINT_XFER_INT, 16, (__INT_EP_INTERVAL))\
             USB_DESC_IFS((__IFS_START) + 1, 0, 0, USB_CLASS_CDC_DATA, 0x00, 0x01, (__I_FUNC))\
             USB_DESC_IFS((__IFS_START) + 1, 1, 2, USB_CLASS_CDC_DATA, 0x00, 0x01, (__I_FUNC))\
             USB_DESC_EP(USB_DIR_IN | (__BULK_IN_EP), USB_ENDPOINT_XFER_BULK, (__BULK_EP_SIZE), 0x00)\
