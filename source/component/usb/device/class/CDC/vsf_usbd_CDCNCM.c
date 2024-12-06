@@ -45,6 +45,8 @@ static vsf_err_t __vk_usbd_cdcncm_netlink_fini(vk_netdrv_t *netdrv);
 static void * __vk_usbd_cdcncm_netlink_can_output(vk_netdrv_t *netdrv);
 static vsf_err_t __vk_usbd_cdcncm_netlink_output(vk_netdrv_t *netdrv, void *slot, void *netbuf);
 
+static void __vk_usbd_cdcncm_netdrv_thread(void *param);
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vk_usbd_class_op_t vk_usbd_cdcncm_control =
@@ -102,8 +104,15 @@ static vsf_err_t __vk_usbd_cdcncm_control_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t
     ncm->dev = dev;
     ncm->ntb_format = __vsf_usbd_cdcncm_ntb_param.bmNtbFormatsSupported;
     ncm->ntb_input_size.dwNtbInMaxSize = __vsf_usbd_cdcncm_ntb_param.dwNtbInMaxSize;
-    ncm->ntb_input_size.wNtbInMaxDataframs = 0;
+    ncm->ntb_input_size.wNtbInMaxDataframes = 0;
     ncm->ntb_input_size.reserved = 0;
+
+    for (uint_fast8_t i = 0; i < TCPIP_ETH_ADDRLEN; i++) {
+        ncm->netdrv.macaddr.addr_buf[i] =
+                (vsf_usb_hex_to_bin(ncm->str_mac[(i << 1) + 0]) << 4)
+            |   (vsf_usb_hex_to_bin(ncm->str_mac[(i << 1) + 1]) << 0);
+    }
+    ncm->netdrv.macaddr.size = TCPIP_ETH_ADDRLEN;
     return VSF_ERR_NONE;
 }
 
@@ -135,6 +144,10 @@ static vsf_err_t __vk_usbd_cdcncm_request_prepare(vk_usbd_dev_t *dev, vk_usbd_if
         buffer = (uint8_t *)&ncm->crc_mode;
         size = sizeof(ncm->crc_mode);
         break;
+    case USB_CDCNCM_REQ_SET_ETHERNET_PACKET_FILTER:
+        buffer = NULL;
+        size = 0;
+        break;
     case USB_CDCNCM_REQ_GET_MAX_DATAGRAM_SIZE:
     case USB_CDCNCM_REQ_SET_MAX_DATAGRAM_SIZE:
         break;
@@ -147,7 +160,20 @@ static vsf_err_t __vk_usbd_cdcncm_request_prepare(vk_usbd_dev_t *dev, vk_usbd_if
     return VSF_ERR_NONE;
 }
 
-static void __vk_usbd_cdcncm_on_notified(void *param)
+static void __vk_usbd_cdcncm_on_bulkout_transfer_finished(void *param)
+{
+    vk_usbd_cdcncm_t *ncm = (vk_usbd_cdcncm_t *)param;
+    vsf_eda_sem_post(&ncm->sem);
+}
+
+static void __vk_usbd_cdcncm_on_bulkin_transfer_finished(void *param)
+{
+    vk_usbd_cdcncm_t *ncm = (vk_usbd_cdcncm_t *)param;
+    ncm->is_tx_busy = false;
+    vk_netdrv_on_netlink_outputted(&ncm->netdrv, VSF_ERR_NONE);
+}
+
+static void __vk_usbd_cdcncm_on_notify_transfer_finished(void *param)
 {
     vk_usbd_ifs_t *ifs = (vk_usbd_ifs_t *)param;
     vk_usbd_cdcncm_t *ncm = (vk_usbd_cdcncm_t *)ifs->class_param;
@@ -163,16 +189,22 @@ static void __vk_usbd_cdcncm_on_notified(void *param)
         notifier->wIndex = cpu_to_le16(vk_usbd_get_ifs_no(ncm->dev, ifs) - 1);
         notifier->wLength = cpu_to_le16(0);
 
-        vk_usbd_trans_t *trans = &ncm->transact_int_in;
+        vk_usbd_trans_t *trans = &ncm->transact_in;
         trans->buffer = (uint8_t *)notifier;
         trans->size = sizeof(*notifier);
-        trans->on_finish = __vk_usbd_cdcncm_on_notified;
+        trans->on_finish = __vk_usbd_cdcncm_on_notify_transfer_finished;
         vk_usbd_ep_send(ncm->dev, trans);
     } else if (1 == ncm->connect_state) {
         ncm->connect_state++;
 
         // connected
-        vk_netdrv_connect(&ncm->netdrv);
+        vsf_trace_info("ncm_event: NETWORK_CONNECTION Connected" VSF_TRACE_CFG_LINEEND);
+
+        vk_netdrv_t *netdrv = &ncm->netdrv;
+        vk_netdrv_prepare(netdrv);
+        vsf_eda_sem_init(&ncm->sem);
+        ncm->thread = vk_netdrv_thread(netdrv, __vk_usbd_cdcncm_netdrv_thread, ncm);
+        VSF_USB_ASSERT(ncm->thread != NULL);
     }
 }
 
@@ -191,7 +223,7 @@ static vsf_err_t __vk_usbd_cdcncm_request_process(vk_usbd_dev_t *dev, vk_usbd_if
 
             bool is_connected = vk_netdrv_is_connected(netdrv);
             if (is_connected != !!request->wValue) {
-                if (request->wValue) {
+                if (!is_connected) {
                     // start connect by issuing ConnectionSpeedChange and NetworkConnection notifications
                     ncm->connect_state = 0;
 
@@ -204,17 +236,17 @@ static vsf_err_t __vk_usbd_cdcncm_request_process(vk_usbd_dev_t *dev, vk_usbd_if
                     notifier->wLength = cpu_to_le16(8);
                     notifier->down = notifier->up = 100 * 1000 * 1000;
 
-                    vk_usbd_trans_t *trans = &ncm->transact_int_in;
+                    vk_usbd_trans_t *trans = &ncm->transact_in;
                     trans->ep = ncm->ep.notify;
                     trans->buffer = (uint8_t *)notifier;
                     trans->size = sizeof(*notifier);
                     trans->zlp = false;
-                    trans->on_finish = __vk_usbd_cdcncm_on_notified;
+                    trans->on_finish = __vk_usbd_cdcncm_on_notify_transfer_finished;
                     trans->param = ifs;
                     trans->notify_eda = false;
                     vk_usbd_ep_send(dev, trans);
-                } else if (vk_netdrv_is_connected(netdrv)) {
-                    vk_netdrv_disconnect(netdrv);
+                } else {
+                    vsf_eda_sem_post(&ncm->sem);
                 }
             }
         }
@@ -232,6 +264,7 @@ static vsf_err_t __vk_usbd_cdcncm_request_process(vk_usbd_dev_t *dev, vk_usbd_if
     case USB_CDCNCM_REQ_SET_NTB_INPUT_SIZE:
     case USB_CDCNCM_REQ_GET_CRC_MODE:
     case USB_CDCNCM_REQ_SET_CRC_MODE:
+    case USB_CDCNCM_REQ_SET_ETHERNET_PACKET_FILTER:
         break;
     default:
         return vk_usbd_cdc_control.request_process(dev, ifs);
@@ -263,7 +296,176 @@ static void * __vk_usbd_cdcncm_netlink_can_output(vk_netdrv_t *netdrv)
 
 static vsf_err_t __vk_usbd_cdcncm_netlink_output(vk_netdrv_t *netdrv, void *slot, void *netbuf)
 {
+    vk_usbd_cdcncm_t *ncm = vsf_container_of(netdrv, vk_usbd_cdcncm_t, netdrv);
+    vk_usbd_trans_t *trans = &ncm->transact_in;
+    uint16_t datagram_offset, datagram_size = 0;
+
+    usb_cdcncm_nth_t *nth = (usb_cdcncm_nth_t *)ncm->ntb_in_buffer;
+    nth->nth16.dwSignature = __constant_le32_to_cpu(USB_CDCNCM_NTH16_SIG);
+    nth->nth16.wHeaderLength = __constant_le16_to_cpu(12);
+    datagram_offset = ncm->seq++;
+    nth->nth16.wSequence = le16_to_cpu(datagram_offset);
+    nth->nth16.wNdpIndex = le16_to_cpu(12);
+
+    usb_cdcncm_ndp_t *ndp = (usb_cdcncm_ndp_t *)((uintptr_t)ncm->ntb_in_buffer + 12);
+    ndp->ndp16.dwSignature = __constant_le32_to_cpu(USB_CDCNCM_NDP16_SIG_NOCRC);
+    ndp->ndp16.wLength = __constant_le16_to_cpu(16);
+    ndp->ndp16.dwNextNdpIndex = 0;
+    // segments(offset, size): NTB(0, 12) NDP(12, 16) padding(28, 2) ETHERNET_HEADER(30, 14) + IP(44)
+    // IP MUST be aligned to 4-byte
+    datagram_offset = 12 + 16 + 2;
+    ndp->ndp16.indexes[0].wDatagramIndex = le16_to_cpu(datagram_offset);
+    ndp->ndp16.indexes[1].wDatagramIndex = 0;
+    ndp->ndp16.indexes[1].wDatagramLength = 0;
+
+    vsf_mem_t mem;
+    uint8_t *ptr = (uint8_t *)ncm->ntb_in_buffer + datagram_offset;
+    void *netbuf_tmp = netbuf;
+    while (netbuf_tmp != NULL) {
+        netbuf_tmp = vk_netdrv_read_buf(netdrv, netbuf_tmp, &mem);
+        memcpy(ptr, mem.buffer, mem.size);
+        ptr += mem.size;
+        datagram_size += mem.size;
+    }
+
+    datagram_offset += datagram_size;
+    nth->nth16.wBlockLength = le16_to_cpu(datagram_offset);
+    ndp->ndp16.indexes[0].wDatagramLength = le16_to_cpu(datagram_size);
+
+    trans->size = datagram_offset;
+    vk_usbd_ep_send(ncm->dev, trans);
+
+    vk_netdrv_on_netbuf_outputted(netdrv, netbuf);
     return VSF_ERR_NONE;
+}
+
+static void __vk_usbd_cdcncm_netdrv_thread(void *param)
+{
+    vk_usbd_cdcncm_t *ncm = param;
+    vk_netdrv_t *netdrv = &ncm->netdrv;
+    vsf_sync_reason_t reason;
+    vsf_protect_t orig;
+    vk_usbd_trans_t *trans;
+
+    trans = &ncm->transact_in;
+    trans->buffer = (uint8_t *)ncm->ntb_in_buffer;
+    trans->ep = ncm->ep.in;
+    trans->zlp = true;
+    trans->param = ncm;
+    trans->on_finish = __vk_usbd_cdcncm_on_bulkin_transfer_finished;
+
+    trans = &ncm->transact_out;
+    trans->buffer = (uint8_t *)ncm->ntb_out_buffer;
+    trans->ep = ncm->ep.out;
+    trans->zlp = true;
+    trans->on_finish = __vk_usbd_cdcncm_on_bulkout_transfer_finished;
+    trans->param = ncm;
+    trans->notify_eda = false;
+
+    vk_netdrv_connect(netdrv);
+
+    usb_cdcncm_nth_t *nth;
+    usb_cdcncm_ndp_t *ndp;
+    uint32_t cur_rx_size, offset, size, cur_size;
+    uint8_t *cur_ptr;
+    bool is_32bit;
+    union {
+        uint16_t *ptr16;
+        uint32_t *ptr32;
+    } datagrams;
+    void *netbuf, *netbuf_cur;
+    vsf_mem_t mem;
+
+    while (true) {
+        if (vk_netdrv_is_connected(netdrv)) {
+            trans->size = sizeof(ncm->ntb_out_buffer);
+            vk_usbd_ep_recv(ncm->dev, trans);
+        }
+
+        reason = vsf_thread_sem_pend(&ncm->sem, -1);
+        VSF_USB_ASSERT(VSF_SYNC_GET == reason);
+
+        orig = vsf_protect_sched();
+        cur_rx_size = ncm->cur_rx_size;
+        ncm->cur_rx_size = 0;
+        vsf_unprotect_sched(orig);
+
+        if (!cur_rx_size) {
+            vk_netdrv_disconnect(netdrv);
+            ncm->thread = NULL;
+            break;
+        }
+
+        nth = (usb_cdcncm_nth_t *)ncm->ntb_out_buffer;
+        if (nth->dwSignature == __constant_le32_to_cpu(USB_CDCNCM_NTH16_SIG)) {
+            offset = le16_to_cpu(nth->nth16.wNdpIndex);
+            ndp = (usb_cdcncm_ndp_t *)((uint8_t *)ncm->ntb_out_buffer + offset);
+            if (    (offset < 12) || (offset & 3)
+                ||  (le16_to_cpu(nth->nth16.wBlockLength) != trans->size)) {
+                continue;
+            }
+            is_32bit = false;
+        } else {
+            offset = le32_to_cpu(nth->nth32.dwNdpIndex);
+            ndp = (usb_cdcncm_ndp_t *)((uint8_t *)ncm->ntb_out_buffer + offset);
+            if (    (offset < 16) || (offset & 3)
+                ||  (le32_to_cpu(nth->nth32.dwBlockLength) != trans->size)) {
+                continue;
+            }
+            is_32bit = true;
+        }
+        if (is_32bit) {
+            datagrams.ptr32 = (uint32_t *)ndp->ndp32.indexes;
+            while ((offset = *datagrams.ptr32++) != 0) {
+                offset = le32_to_cpu(offset);
+                cur_ptr = (uint8_t *)ncm->ntb_out_buffer + offset;
+                size = *datagrams.ptr32;
+                size = le32_to_cpu(size);
+
+                netbuf_cur = netbuf = vk_netdrv_alloc_buf(netdrv);
+                if (NULL == netbuf) {
+                    vsf_trace_error("ncm: fail to allocate netbuf" VSF_TRACE_CFG_LINEEND);
+                    break;
+                }
+
+                do {
+                    netbuf_cur = vk_netdrv_read_buf(netdrv, netbuf_cur, &mem);
+                    cur_size = vsf_min(mem.size, size);
+                    memcpy(mem.buffer, cur_ptr, cur_size);
+                    size -= cur_size;
+                    cur_ptr += cur_size;
+                } while ((netbuf_cur != NULL) && (size > 0));
+
+                size = *datagrams.ptr32++;
+                vk_netdrv_on_inputted(netdrv, netbuf, size);
+            }
+        } else {
+            datagrams.ptr16 = (uint16_t *)ndp->ndp16.indexes;
+            while ((offset = *datagrams.ptr16++) != 0) {
+                offset = le32_to_cpu(offset);
+                cur_ptr = (uint8_t *)ncm->ntb_out_buffer + offset;
+                size = *datagrams.ptr16;
+                size = le16_to_cpu(size);
+
+                netbuf_cur = netbuf = vk_netdrv_alloc_buf(netdrv);
+                if (NULL == netbuf) {
+                    vsf_trace_error("ncm: fail to allocate netbuf" VSF_TRACE_CFG_LINEEND);
+                    break;
+                }
+
+                do {
+                    netbuf_cur = vk_netdrv_read_buf(netdrv, netbuf_cur, &mem);
+                    cur_size = vsf_min(mem.size, size);
+                    memcpy(mem.buffer, cur_ptr, cur_size);
+                    size -= cur_size;
+                    cur_ptr += cur_size;
+                } while ((netbuf_cur != NULL) && (size > 0));
+
+                size = *datagrams.ptr16++;
+                vk_netdrv_on_inputted(netdrv, netbuf, size);
+            }
+        }
+    }
 }
 
 #endif  // VSF_USE_USB_DEVICE && VSF_USBD_USE_CDCNCM

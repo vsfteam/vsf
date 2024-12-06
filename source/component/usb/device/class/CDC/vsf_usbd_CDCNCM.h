@@ -93,6 +93,7 @@ extern "C" {
             vk_usbd_cdcncm_t __##__name##_CDCNCM##__func_id = {                 \
                 USB_CDC_NCM_PARAM((__int_in_ep), (__bulk_in_ep), (__bulk_out_ep))\
                 .max_datagram_size = (__max_datagram_size),                     \
+                    .str_mac = (__##__name##_str_##func##__func_id##_mac.str),  \
             };
 #define __usbd_cdc_ncm_func0(__name, __func_id, __str_func, __i_func, __ifs_start,\
         __int_in_ep, __bulk_in_ep, __bulk_out_ep, __bulk_ep_size, __int_ep_interval,\
@@ -149,20 +150,26 @@ vsf_class(vk_usbd_cdcncm_t) {
     public_member(
         implement(vk_usbd_cdc_t)
         uint16_t max_datagram_size;
+        const usb_unicode_t *str_mac;
     )
     private_member(
-        vk_usbd_dev_t *dev;
-        vk_netdrv_t netdrv;
-        vk_usbd_trans_t transact_int_in;
-        vk_usbd_trans_t transact_bulk_in;
-        vk_usbd_trans_t transact_bulk_out;
+        vsf_eda_t *thread;
+        vsf_sem_t sem;
 
+        vk_usbd_dev_t *dev;
+        vk_usbd_trans_t transact_in;
+        vk_usbd_trans_t transact_out;
+
+        vk_netdrv_t netdrv;
+
+        uint16_t seq;
         uint16_t ntb_format;
         uint16_t crc_mode;
+        uint16_t packet_filter;
         bool is_tx_busy;
-        bool is_rx_busy;
         uint8_t connect_state;
         usb_cdcncm_ntb_input_size_t ntb_input_size;
+        uint32_t cur_rx_size;
         uint32_t ntb_in_buffer[VSF_USBD_CDCNCM_CFG_MAX_NTB_IN_SIZE / 4];
         uint32_t ntb_out_buffer[VSF_USBD_CDCNCM_CFG_MAX_NTB_OUT_SIZE / 4];
     )

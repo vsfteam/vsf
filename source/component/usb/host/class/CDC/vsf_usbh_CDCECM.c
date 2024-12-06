@@ -534,19 +534,6 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
 #   pragma GCC diagnostic pop
 #endif
 
-// TODO: move hex_to_bin to misc
-int hex_to_bin(char ch)
-{
-    if ((ch >= '0') && (ch <= '9')) {
-        return ch - '0';
-    }
-    ch = tolower(ch);
-    if ((ch >= 'a') && (ch <= 'f')) {
-        return ch - 'a' + 10;
-    }
-    return -1;
-}
-
 static vsf_err_t __vk_usbh_ecm_set_filter(vk_usbh_ecm_t *ecm, uint_fast16_t filter)
 {
     struct usb_ctrlrequest_t req = {
@@ -601,7 +588,7 @@ static void __vk_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             {
                 char *str = (char *)vk_usbh_urb_take_buffer(urb) + 2;
                 for (uint_fast8_t i = 0; i < VSF_USBH_ECM_ETH_HEADER_SIZE; i++, str += 4) {
-                    ecm->netdrv.macaddr.addr_buf[i] = (hex_to_bin(str[0]) << 4) | (hex_to_bin(str[2]) << 0);
+                    ecm->netdrv.macaddr.addr_buf[i] = (vsf_usb_hex_to_bin(str[0]) << 4) | (vsf_usb_hex_to_bin(str[2]) << 0);
                 }
                 ecm->netdrv.macaddr.size = VSF_USBH_ECM_ETH_HEADER_SIZE;
             }

@@ -32,6 +32,13 @@ extern "C" {
 #define USB_CDCNCM_CAP_CrcMode                  (1 << 4)
 #define USB_CDCNCM_CAP_NtbInputSize8            (1 << 5)
 
+#define USB_CDCNCM_NTH16_SIG                    0x484D434E
+#define USB_CDCNCM_NTH32_SIG                    0x686D636E
+#define USB_CDCNCM_NDP16_SIG_NOCRC              0x304D434E
+#define USB_CDCNCM_NDP16_SIG_CRC                0x314D434E
+#define USB_CDCNCM_NDP32_SIG_NOCRC              0x306D636E
+#define USB_CDCNCM_NDP32_SIG_CRC                0x316D636E
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -54,7 +61,7 @@ struct usb_cdcncm_ntb_param_t {
 typedef struct usb_cdcncm_ntb_input_size_t usb_cdcncm_ntb_input_size_t;
 struct usb_cdcncm_ntb_input_size_t {
     uint32_t dwNtbInMaxSize;
-    uint16_t wNtbInMaxDataframs;
+    uint16_t wNtbInMaxDataframes;
     uint16_t reserved;
 } VSF_CAL_PACKED;
 
@@ -79,6 +86,57 @@ typedef enum usb_cdcncm_req_t {
     USB_CDCNCM_REQ_GET_CRC_MODE                                 = 0x89,
     USB_CDCNCM_REQ_SET_CRC_MODE                                 = 0x8A,
 } usb_cdcncm_req_t;
+
+typedef union usb_cdcncm_nth_t usb_cdcncm_nth_t;
+union usb_cdcncm_nth_t {
+    struct {
+        uint32_t dwSignature;
+        uint16_t wHeaderLength;
+        uint16_t wSequence;
+        uint16_t wBlockLength;
+        uint16_t wNdpIndex;
+    } VSF_CAL_PACKED nth16;
+    struct {
+        uint32_t dwSignature;
+        uint16_t wHeaderLength;
+        uint16_t wSequence;
+        uint32_t dwBlockLength;
+        uint32_t dwNdpIndex;
+    } VSF_CAL_PACKED nth32;
+    struct {
+        uint32_t dwSignature;
+        uint16_t wHeaderLength;
+        uint16_t wSequence;
+    } VSF_CAL_PACKED;
+} VSF_CAL_PACKED;
+
+typedef union usb_cdcncm_ndp_t usb_cdcncm_ndp_t;
+union usb_cdcncm_ndp_t {
+    struct {
+        uint32_t dwSignature;
+        uint16_t wLength;
+        uint16_t dwNextNdpIndex;
+        struct {
+            uint16_t wDatagramIndex;
+            uint16_t wDatagramLength;
+        } VSF_CAL_PACKED indexes[0];
+    } VSF_CAL_PACKED ndp16;
+    struct {
+        uint32_t dwSignature;
+        uint16_t wLength;
+        uint16_t wReserved6;
+        uint32_t dwNextNdpIndex;
+        uint32_t dwReserved12;
+        struct {
+            uint32_t dwDatagramIndex;
+            uint32_t dwDatagramLength;
+        } VSF_CAL_PACKED indexes[0];
+    } VSF_CAL_PACKED ndp32;
+    struct {
+        uint32_t dwSignature;
+        uint16_t wLength;
+    } VSF_CAL_PACKED;
+} VSF_CAL_PACKED;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
