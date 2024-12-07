@@ -163,6 +163,9 @@ static vsf_err_t __vk_usbd_cdcncm_request_prepare(vk_usbd_dev_t *dev, vk_usbd_if
 static void __vk_usbd_cdcncm_on_bulkout_transfer_finished(void *param)
 {
     vk_usbd_cdcncm_t *ncm = (vk_usbd_cdcncm_t *)param;
+    vk_usbd_trans_t *trans = &ncm->transact_out;
+
+    ncm->cur_rx_size = sizeof(ncm->ntb_out_buffer) - trans->size;
     vsf_eda_sem_post(&ncm->sem);
 }
 
@@ -385,11 +388,8 @@ static void __vk_usbd_cdcncm_netdrv_thread(void *param)
         reason = vsf_thread_sem_pend(&ncm->sem, -1);
         VSF_USB_ASSERT(VSF_SYNC_GET == reason);
 
-        orig = vsf_protect_sched();
         cur_rx_size = ncm->cur_rx_size;
         ncm->cur_rx_size = 0;
-        vsf_unprotect_sched(orig);
-
         if (!cur_rx_size) {
             vk_netdrv_disconnect(netdrv);
             ncm->thread = NULL;
@@ -401,7 +401,7 @@ static void __vk_usbd_cdcncm_netdrv_thread(void *param)
             offset = le16_to_cpu(nth->nth16.wNdpIndex);
             ndp = (usb_cdcncm_ndp_t *)((uint8_t *)ncm->ntb_out_buffer + offset);
             if (    (offset < 12) || (offset & 3)
-                ||  (le16_to_cpu(nth->nth16.wBlockLength) != trans->size)) {
+                ||  (le16_to_cpu(nth->nth16.wBlockLength) != cur_rx_size)) {
                 continue;
             }
             is_32bit = false;
@@ -409,7 +409,7 @@ static void __vk_usbd_cdcncm_netdrv_thread(void *param)
             offset = le32_to_cpu(nth->nth32.dwNdpIndex);
             ndp = (usb_cdcncm_ndp_t *)((uint8_t *)ncm->ntb_out_buffer + offset);
             if (    (offset < 16) || (offset & 3)
-                ||  (le32_to_cpu(nth->nth32.dwBlockLength) != trans->size)) {
+                ||  (le32_to_cpu(nth->nth32.dwBlockLength) != cur_rx_size)) {
                 continue;
             }
             is_32bit = true;
