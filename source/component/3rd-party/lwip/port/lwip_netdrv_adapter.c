@@ -171,6 +171,7 @@ err_t ethernetif_init(struct netif *netif)
 // adapter
 static vsf_err_t __lwip_netdrv_adapter_on_connect(void *netif)
 {
+    static uint8_t __lwip_netif_idx = 0;
     VSF_ASSERT(vsf_eda_is_stack_owner(vsf_eda_get_cur()));
     struct netif *lwip_netif = netif;
     ip_addr_t ipaddr = { 0 }, netmask = { 0 }, gateway = { 0 };
@@ -187,6 +188,8 @@ static vsf_err_t __lwip_netdrv_adapter_on_connect(void *netif)
                 &gateway, lwip_netif->state,
                 ethernetif_init, tcpip_input);
 #endif
+    lwip_netif->name[0] = 'n';
+    lwip_netif->name[1] = '0' + __lwip_netif_idx++;
     UNLOCK_TCPIP_CORE();
     return lwip_netif != NULL ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
