@@ -13,52 +13,90 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cc: [gcc, clang]
-        os: [ubuntu-latest] # [ubuntu-latest, macos-12]
-        src: [linux]        #[linux, macos]
-        exclude:
-          - os: ubuntu-latest
-            src: macos
-          - os: macos-12
-            src: linux
+        vars: [
+          # Supported compilers can be found here: https://github.com/actions/runner-images
+          # Compilers not listed are not necessarily unsupported.
 
-    runs-on: ${{matrix.os}}
+          # Ubuntu 22.04
+          {os: ubuntu-22.04, src: linux, cpp: g++-10, c: gcc-10},
+          {os: ubuntu-22.04, src: linux, cpp: g++-11, c: gcc-11},
+          {os: ubuntu-22.04, src: linux, cpp: g++-12, c: gcc-12},
+          {os: ubuntu-22.04, src: linux, cpp: clang++-11, c: clang-11},
+          {os: ubuntu-22.04, src: linux, cpp: clang++-12, c: clang-12},
+          {os: ubuntu-22.04, src: linux, cpp: clang++-13, c: clang-13},
+          {os: ubuntu-22.04, src: linux, cpp: clang++-14, c: clang-14},
+          {os: ubuntu-22.04, src: linux, cpp: clang++-15, c: clang-15},
+
+          # Ubuntu 24.04
+          {os: ubuntu-24.04, src: linux, cpp: g++-13, c: gcc-13},
+          {os: ubuntu-24.04, src: linux, cpp: g++-14, c: gcc-14},
+          {os: ubuntu-24.04, src: linux, cpp: clang++-16, c: clang-16},
+          {os: ubuntu-24.04, src: linux, cpp: clang++-17, c: clang-17},
+          {os: ubuntu-24.04, src: linux, cpp: clang++-18, c: clang-18},
+
+          # MacOS for arm64
+          # The job was not started because recent account payments have failed or your spending limit needs to be increased
+          #{os: macos-13-xlarge, src: macos, cpp: clang, c: clang++},
+          # MacOS for amd64
+          # Needs more fixes
+          #{os: macos-13, src: macos, cpp: g++, c: gcc},
+          #{os: macos-13, src: macos, cpp: clang++, c: clang},
+          #{os: macos-14, src: macos, cpp: g++, c: gcc},
+          #{os: macos-14, src: macos, cpp: clang++, c: clang},
+          #{os: macos-15, src: macos, cpp: g++, c: gcc},
+          #{os: macos-15, src: macos, cpp: clang++, c: clang},
+
+          # Windows
+          # If we want to use windows compilation, then we need to create a new cmake project
+          #{os: windows-2019, src: linux, cpp: g++, c: gcc},
+          #{os: windows-2019, src: linux, cpp: clang, c: clang},
+          #{os: windows-2022, src: linux, cpp: g++, c: gcc},
+          #{os: windows-2022, src: linux, cpp: clang++, c: clang},
+        ]
+    runs-on: ${{matrix.vars.os}}
 
     steps:
+    - name: install depends for Linux
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y build-essential ninja-build libsdl2-dev libbsd-dev libusb-dev libusb-1.0
+        pip3 install pytest pytest-bdd pexpect simple-hexdump
+
+    - name: Install depends for macOS
+      if: runner.os == 'macOS'
+      run: |
+          brew install sdl2 libusb ninja
+          echo "" >> ~/.bash_profile # fixed last line without line break
+          echo "export LIBRARY_PATH=/usr/local/lib" >> ~/.bash_profile
+          echo "export C_INCLUDE_PATH=/usr/local/include" >> ~/.bash_profile
+      shell: bash
+
+    - name: Install C compiler
+      id: install_c
+      uses: rlalik/setup-cpp-compiler@master
+      with:
+        compiler: ${{ matrix.vars.c }}
+
     - uses: actions/checkout@v2
       with:
         submodules: true # without recursive
-
-    - name: install depends
-      run: |
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo apt-get update
-            sudo apt-get install -y build-essential clang ninja-build libsdl2-dev libbsd-dev libusb-dev libusb-1.0 python3 python3-pip
-          elif [ "$RUNNER_OS" == "macOS" ]; then
-            brew install gcc llvm sdl2 libusb ninja
-
-            echo "" >> ~/.bash_profile # fixed last line without line break
-            echo "export LIBRARY_PATH=/usr/local/lib" >> ~/.bash_profile
-            echo "export C_INCLUDE_PATH=/usr/local/include" >> ~/.bash_profile
-
-          fi
-          pip3 install pytest pytest-bdd pexpect simple-hexdump
-      shell: bash
 
     - name: configure cmake
       run: cmake -GNinja -S ${SOURCE_PATH} -B ${SOURCE_PATH}/build
       shell: bash -ileo pipefail {0}
       env:
-        CC: ${{matrix.cc}}
+        CC: ${{matrix.vars.c}}
+        CXX: ${{matrix.vars.cpp}}
         VSF_PATH: ${{github.workspace}}
-        SOURCE_PATH: ${{github.workspace}}/example/template/project/cmake/${{matrix.src}}
+        SOURCE_PATH: ${{github.workspace}}/example/template/project/cmake/${{matrix.vars.src}}
 
     - name: build
       run: cmake --build ${SOURCE_PATH}/build -v
       shell: bash -ileo pipefail {0}
       env:
-        SOURCE_PATH: ${{github.workspace}}/example/template/project/cmake/${{matrix.src}}
+        SOURCE_PATH: ${{github.workspace}}/example/template/project/cmake/${{matrix.vars.src}}
 
     #- name: test
-    #  run: pytest -m "base or memory or linux-only" --verbose -o log_cli=true --log-cli-level="DEBUG" --vsf_template=${{github.workspace}}/example/template/project/cmake/${{matrix.src}}/build/vsf_template
+    #  run: pytest -m "base or memory or linux-only" --verbose -o log_cli=true --log-cli-level="DEBUG" --vsf_template=${{github.workspace}}/example/template/project/cmake/${{matrix.vars.src}}/build/vsf_template
     #  working-directory: ${{github.workspace}}/test/pytest
