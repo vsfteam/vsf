@@ -23,6 +23,10 @@
 // avoid to include vsf.h, include necessary headers only
 // #include "vsf.h"
 
+#include "utilities/vsf_utilities.h"
+#include "hal/arch/vsf_arch.h"
+#include "kernel/vsf_kernel.h"
+
 #if VSF_USE_LINUX == ENABLED
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
