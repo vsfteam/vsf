@@ -41,6 +41,10 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
+#if VSF_USE_TCPIP != ENABLED
+#   error Please enable VSF_USE_TCPIP to use CDCNCM
+#endif
+
 #ifndef VSF_USBD_CDCNCM_SUPPORT_NTB32
 #   define VSF_USBD_CDCNCM_SUPPORT_NTB32                ENABLED
 #endif
