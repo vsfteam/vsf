@@ -27,17 +27,17 @@
 #include "utilities/vsf_utilities.h"
 #include "component/tcpip/netdrv/vsf_netdrv.h"
 
-#undef PUBLIC_CONST
+#undef __VSF_SOCKET_PUBLIC_CONST__
 #if     defined(__VSF_SOCKET_CLASS_IMPLEMENT)
 #undef __VSF_SOCKET_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
-#   define PUBLIC_CONST
+#   define __VSF_SOCKET_PUBLIC_CONST__
 #elif   defined(__VSF_SOCKET_CLASS_INHERIT__)
 #undef __VSF_SOCKET_CLASS_INHERIT__
 #   define __VSF_CLASS_INHERIT__
-#   define PUBLIC_CONST
+#   define __VSF_SOCKET_PUBLIC_CONST__
 #else
-#   define PUBLIC_CONST             const
+#   define __VSF_SOCKET_PUBLIC_CONST__          const
 #endif
 
 #include "utilities/ooc_class.h"
@@ -99,11 +99,11 @@ vsf_class(vk_socket_op_t) {
 
 vsf_class(vk_socket_t) {
     public_member(
-        PUBLIC_CONST vk_socket_op_t *op;
+        __VSF_SOCKET_PUBLIC_CONST__ vk_socket_op_t *op;
     )
 };
 
-#undef PUBLIC_CONST
+#undef __VSF_SOCKET_PUBLIC_CONST__
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

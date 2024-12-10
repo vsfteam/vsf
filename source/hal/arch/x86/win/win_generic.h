@@ -22,12 +22,12 @@
 #include "hal/vsf_hal_cfg.h"
 #include "utilities/vsf_utilities.h"
 
-#undef PUBLIC_CONST
+#undef __VSF_WIN_PUBLIC_CONST__
 #if     defined(__VSF_ARCH_WIN_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
-#   define PUBLIC_CONST
+#   define __VSF_WIN_PUBLIC_CONST__
 #else
-#   define PUBLIC_CONST                 const
+#   define __VSF_WIN_PUBLIC_CONST__     const
 #endif
 
 #include "utilities/ooc_class.h"
@@ -202,18 +202,18 @@ vsf_class(vsf_arch_irq_thread_t) {
     public_member(
         const char name[32];
 
-        PUBLIC_CONST vsf_dlist_node_t irq_node;
-        PUBLIC_CONST vsf_dlist_node_t rdy_node;
-        PUBLIC_CONST VSF_WIN_HANDLE thread;
-        PUBLIC_CONST VSF_WIN_DWORD thread_id;
-        PUBLIC_CONST vsf_arch_prio_t priority;
-        PUBLIC_CONST vsf_arch_irq_thread_t *prev;     // call stack
-        PUBLIC_CONST vsf_arch_irq_state_t state;
-        PUBLIC_CONST vsf_arch_irq_request_t *reply;
+        __VSF_WIN_PUBLIC_CONST__ vsf_dlist_node_t irq_node;
+        __VSF_WIN_PUBLIC_CONST__ vsf_dlist_node_t rdy_node;
+        __VSF_WIN_PUBLIC_CONST__ VSF_WIN_HANDLE thread;
+        __VSF_WIN_PUBLIC_CONST__ VSF_WIN_DWORD thread_id;
+        __VSF_WIN_PUBLIC_CONST__ vsf_arch_prio_t priority;
+        __VSF_WIN_PUBLIC_CONST__ vsf_arch_irq_thread_t *prev;     // call stack
+        __VSF_WIN_PUBLIC_CONST__ vsf_arch_irq_state_t state;
+        __VSF_WIN_PUBLIC_CONST__ vsf_arch_irq_request_t *reply;
     )
 };
 #endif
-#undef PUBLIC_CONST
+#undef __VSF_WIN_PUBLIC_CONST__
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/

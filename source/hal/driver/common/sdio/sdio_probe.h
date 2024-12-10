@@ -24,13 +24,13 @@
 
 #if VSF_HAL_USE_SDIO == ENABLED
 
-#undef public_const
+#undef __VSF_SDIO_PROBE_PUBLIC_CONST__
 #if     defined(__VSF_SDIO_PROBE_CLASS_IMPLEMENT)
 #   undef __VSF_SDIO_PROBE_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
-#   define public_const
+#   define __VSF_SDIO_PROBE_PUBLIC_CONST__
 #else
-#   define public_const const
+#   define __VSF_SDIO_PROBE_PUBLIC_CONST__              const
 #endif
 
 #include "utilities/ooc_class.h"
@@ -50,13 +50,13 @@ vsf_class(vsf_sdio_probe_t) {
         uint8_t                     bus_width;
         bool                        uhs_en;
 
-        public_const bool           high_capacity;
-        public_const uint8_t        delay_ms;
-        public_const uint32_t       version;
-        public_const uint32_t       ocr;
-        public_const uint64_t       capacity;
-        public_const vsf_sdio_csd_t csd;
-        public_const vsf_sdio_cid_t cid;
+        __VSF_SDIO_PROBE_PUBLIC_CONST__ bool           high_capacity;
+        __VSF_SDIO_PROBE_PUBLIC_CONST__ uint8_t        delay_ms;
+        __VSF_SDIO_PROBE_PUBLIC_CONST__ uint32_t       version;
+        __VSF_SDIO_PROBE_PUBLIC_CONST__ uint32_t       ocr;
+        __VSF_SDIO_PROBE_PUBLIC_CONST__ uint64_t       capacity;
+        __VSF_SDIO_PROBE_PUBLIC_CONST__ vsf_sdio_csd_t csd;
+        __VSF_SDIO_PROBE_PUBLIC_CONST__ vsf_sdio_cid_t cid;
     )
     private_member(
         uint8_t                     state;

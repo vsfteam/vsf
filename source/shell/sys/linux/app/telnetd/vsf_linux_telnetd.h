@@ -30,17 +30,17 @@
 #   include <netinet/in.h>
 #endif
 
-#undef PUBLIC_CONST
+#undef __VSF_LINUX_TELNETD_PUBLIC_CONST__
 #if     defined(__VSF_LINUX_TELNETD_CLASS_IMPLEMENT)
 #   undef __VSF_LINUX_TELNETD_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
-#   define PUBLIC_CONST
+#   define __VSF_LINUX_TELNETD_PUBLIC_CONST__
 #elif   defined(__VSF_LINUX_TELNETD_CLASS_INHERIT__)
 #   undef __VSF_LINUX_TELNETD_CLASS_INHERIT__
 #   define __VSF_CLASS_INHERIT__
-#   define PUBLIC_CONST
+#   define __VSF_LINUX_TELNETD_PUBLIC_CONST__
 #else
-#   define PUBLIC_CONST                             const
+#   define __VSF_LINUX_TELNETD_PUBLIC_CONST__           const
 #endif
 
 #include "utilities/ooc_class.h"
@@ -55,8 +55,8 @@ extern "C" {
 
 vsf_class(vsf_linux_telnetd_t) {
     public_member(
-        PUBLIC_CONST uint16_t port;
-        PUBLIC_CONST uint8_t backlog;
+        __VSF_LINUX_TELNETD_PUBLIC_CONST__ uint16_t port;
+        __VSF_LINUX_TELNETD_PUBLIC_CONST__ uint8_t backlog;
     )
 
     private_member(

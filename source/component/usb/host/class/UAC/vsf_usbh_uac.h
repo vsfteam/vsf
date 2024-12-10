@@ -27,13 +27,13 @@
 
 #include "component/usb/common/class/UAC/vsf_usb_UAC.h"
 
-#undef PUBLIC_CONST
+#undef __VSF_USBH_UAC_PUBLIC_CONST__
 #if     defined(__VSF_USBH_UAC_CLASS_IMPLEMENT)
 #   undef __VSF_USBH_UAC_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
-#   define PUBLIC_CONST
+#   define __VSF_USBH_UAC_PUBLIC_CONST__
 #else
-#   define PUBLIC_CONST                         const
+#   define __VSF_USBH_UAC_PUBLIC_CONST__        const
 #endif
 #include "utilities/ooc_class.h"
 
@@ -60,11 +60,11 @@ extern "C" {
 
 vsf_class(vk_usbh_uac_stream_t) {
     public_member(
-        PUBLIC_CONST uint8_t is_in          : 1;
-        PUBLIC_CONST uint8_t sample_size    : 3;
-        PUBLIC_CONST uint8_t channel_num;
-        PUBLIC_CONST uint16_t format;
-        PUBLIC_CONST uint32_t sample_rate;
+        __VSF_USBH_UAC_PUBLIC_CONST__ uint8_t is_in          : 1;
+        __VSF_USBH_UAC_PUBLIC_CONST__ uint8_t sample_size    : 3;
+        __VSF_USBH_UAC_PUBLIC_CONST__ uint8_t channel_num;
+        __VSF_USBH_UAC_PUBLIC_CONST__ uint16_t format;
+        __VSF_USBH_UAC_PUBLIC_CONST__ uint32_t sample_rate;
     )
 
     private_member(

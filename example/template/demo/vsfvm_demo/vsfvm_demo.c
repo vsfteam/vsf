@@ -17,6 +17,9 @@
 
 /*============================ INCLUDES ======================================*/
 
+// for vk_file_getfileext
+#include <vsf.h>
+
 #include <unistd.h>
 #include <stdio.h>
 

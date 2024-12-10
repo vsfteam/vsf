@@ -31,15 +31,15 @@
 #   include <netinet/in.h>
 #endif
 
-#undef PUBLIC_CONST
+#undef __VSF_LINUX_HTTPD_PUBLIC_CONST__
 #if     defined(__VSF_LINUX_HTTPD_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
-#   define PUBLIC_CONST
+#   define __VSF_LINUX_HTTPD_PUBLIC_CONST__
 #elif   defined(__VSF_LINUX_HTTPD_CLASS_INHERIT__)
 #   define __VSF_CLASS_INHERIT__
-#   define PUBLIC_CONST
+#   define __VSF_LINUX_HTTPD_PUBLIC_CONST__
 #else
-#   define PUBLIC_CONST                                 const
+#   define __VSF_LINUX_HTTPD_PUBLIC_CONST__             const
 #endif
 
 #include "utilities/ooc_class.h"
@@ -317,12 +317,12 @@ def_vsf_pool(vsf_linux_httpd_session_pool, vsf_linux_httpd_session_t)
 
 vsf_class(vsf_linux_httpd_t) {
     public_member(
-        PUBLIC_CONST char *root_path;
-        PUBLIC_CONST uint16_t port;
-        PUBLIC_CONST uint8_t backlog;
+        __VSF_LINUX_HTTPD_PUBLIC_CONST__ char *root_path;
+        __VSF_LINUX_HTTPD_PUBLIC_CONST__ uint16_t port;
+        __VSF_LINUX_HTTPD_PUBLIC_CONST__ uint8_t backlog;
 
-        PUBLIC_CONST uint16_t num_of_urihandler;
-        PUBLIC_CONST vsf_linux_httpd_urihandler_t *urihandler;
+        __VSF_LINUX_HTTPD_PUBLIC_CONST__ uint16_t num_of_urihandler;
+        __VSF_LINUX_HTTPD_PUBLIC_CONST__ vsf_linux_httpd_urihandler_t *urihandler;
     )
     private_member(
         vsf_dlist_t session_list;

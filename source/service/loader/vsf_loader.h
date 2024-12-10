@@ -40,15 +40,15 @@
 
 #if VSF_USE_LOADER == ENABLED
 
-#undef PUBLIC_CONST
+#undef __VSF_LOADER_PUBLIC_CONST__
 #if     defined(__VSF_LOADER_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
-#   define PUBLIC_CONST
+#   define __VSF_LOADER_PUBLIC_CONST__
 #elif   defined(__VSF_LOADER_CLASS_INHERIT__)
 #   define __VSF_CLASS_INHERIT__
-#   define PUBLIC_CONST
+#   define __VSF_LOADER_PUBLIC_CONST__
 #else
-#   define PUBLIC_CONST                 const
+#   define __VSF_LOADER_PUBLIC_CONST__              const
 #endif
 
 #include "utilities/ooc_class.h"
@@ -178,9 +178,9 @@ vsf_class(vsf_loader_t) {
         const vsf_loader_heap_op_t *heap_op;
         const vsf_loader_op_t *op;
 
-        PUBLIC_CONST void *static_base;
-        PUBLIC_CONST void *entry;
-        PUBLIC_CONST void *vplt_out;
+        __VSF_LOADER_PUBLIC_CONST__ void *static_base;
+        __VSF_LOADER_PUBLIC_CONST__ void *entry;
+        __VSF_LOADER_PUBLIC_CONST__ void *vplt_out;
 
         void *vplt;
         void * (*alloc_vplt)(int num);

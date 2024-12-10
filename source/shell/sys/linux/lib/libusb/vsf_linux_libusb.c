@@ -29,6 +29,8 @@
 // for vk_usbh_get_pipe and urb private members
 #define __VSF_USBH_CLASS_IMPLEMENT
 
+#include <vsf.h>
+
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
 #   include "../../include/libusb/libusb.h"

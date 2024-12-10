@@ -26,17 +26,17 @@
 
 #include "component/mal/vsf_mal.h"
 
-#undef public_const
+#undef __VSF_MALFS_PUBLIC_CONST__
 #if     defined(__VSF_MALFS_CLASS_IMPLEMENT)
 #   undef __VSF_MALFS_CLASS_IMPLEMENT
 #   define __VSF_CLASS_IMPLEMENT__
-#   define public_const
+#   define __VSF_MALFS_PUBLIC_CONST__
 #elif   defined(__VSF_MALFS_CLASS_INHERIT__)
 #   undef __VSF_MALFS_CLASS_INHERIT__
 #   define __VSF_CLASS_INHERIT__
-#   define public_const
+#   define __VSF_MALFS_PUBLIC_CONST__
 #else
-#   define public_const const
+#   define __VSF_MALFS_PUBLIC_CONST__       const
 #endif
 
 #include "utilities/ooc_class.h"
@@ -121,8 +121,8 @@ vsf_class(vk_malfs_mounter_t) {
         vsf_mutex_t *mutex;
 #endif
         vk_file_t *dir;
-        public_const vsf_err_t err;
-        public_const uint8_t partition_mounted;
+        __VSF_MALFS_PUBLIC_CONST__ vsf_err_t err;
+        __VSF_MALFS_PUBLIC_CONST__ uint8_t partition_mounted;
     )
 };
 #endif
