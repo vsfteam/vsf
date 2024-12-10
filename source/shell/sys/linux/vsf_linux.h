@@ -20,7 +20,11 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "vsf.h"
+// avoid to include vsf.h, include necessary headers only
+//#include "vsf.h"
+
+#include "kernel/vsf_kernel.h"
+
 #include "./vsf_linux_cfg.h"
 
 #if VSF_USE_LINUX == ENABLED

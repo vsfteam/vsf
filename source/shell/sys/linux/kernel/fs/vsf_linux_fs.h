@@ -20,7 +20,8 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "vsf.h"
+// avoid to include vsf.h, include necessary headers only
+// #include "vsf.h"
 
 #if VSF_USE_LINUX == ENABLED
 
@@ -134,6 +135,7 @@ vsf_class(vsf_linux_fd_t) {
 };
 
 #if defined(__VSF_LINUX_FS_CLASS_IMPLEMENT) || defined(__VSF_LINUX_FS_CLASS_INHERIT__)
+typedef struct vk_file_t vk_file_t;
 typedef struct vsf_linux_fs_priv_t {
     implement(vsf_linux_fd_priv_t)
     vk_file_t *file;
@@ -221,6 +223,7 @@ int vsf_linux_fs_bind_target_ex(const char *pathname,
         vsf_param_eda_evthandler_t peda_write,
         uint_fast32_t feature, uint64_t size);
 extern int vsf_linux_fs_get_target(const char *pathname, void **target);
+typedef struct vk_vfs_file_t vk_vfs_file_t;
 extern int vsf_linux_fs_bind_target_relative(vk_vfs_file_t *dir, const char *pathname,
         void *target, const vsf_linux_fd_op_t *op,
         uint_fast32_t feature, uint64_t size);

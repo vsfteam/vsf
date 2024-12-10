@@ -68,6 +68,7 @@ extern int vsf_linux_fs_bind_spi(char *path, vsf_spi_t *spi);
 #endif
 
 #if VSF_USE_MAL == ENABLED
+typedef struct vk_mal_t vk_mal_t;
 extern int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal);
 #endif
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
@@ -78,6 +79,7 @@ extern int vsf_linux_fs_bind_terminal_keyboard(char *path, vsf_linux_terminal_ke
 #   endif
 #endif
 #if VSF_USE_UI == ENABLED
+typedef struct vk_disp_t vk_disp_t;
 extern int vsf_linux_fs_bind_disp(char *path, vk_disp_t *disp);
 #endif
 #if VSF_HAL_USE_GPIO == ENABLED

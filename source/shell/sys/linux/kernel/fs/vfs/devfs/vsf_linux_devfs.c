@@ -26,6 +26,9 @@
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_FS_CLASS_INHERIT__
 #define __VSF_DISP_CLASS_INHERIT__
+
+#include <vsf.h>
+
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "shell/sys/linux/include/unistd.h"
 #   include "shell/sys/linux/include/errno.h"

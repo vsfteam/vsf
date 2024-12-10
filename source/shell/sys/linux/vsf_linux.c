@@ -29,6 +29,8 @@
 #define __VSF_LINUX_FS_CLASS_IMPLEMENT
 #define __VSF_LINUX_CLASS_IMPLEMENT
 
+#include <vsf.h>
+
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "./include/unistd.h"
 #   include "./include/sched.h"

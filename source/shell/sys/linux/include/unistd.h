@@ -27,7 +27,9 @@
 #define __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
 #include <setjmp/setjmp.h>
 
-#include "vsf.h"
+// avoid to include vsf.h, include necessary headers only
+//#include "vsf.h"
+
 #include "../vsf_linux.h"
 #include "../port/busybox/busybox.h"
 #include "shell/sys/linux/vsf_linux_cfg.h"

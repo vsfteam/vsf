@@ -24,6 +24,9 @@
 #define __VSF_LINUX_CLASS_INHERIT__
 #define __VSF_LINUX_FS_CLASS_INHERIT__
 #define _GNU_SOURCE
+
+#include <vsf.h>
+
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../include/unistd.h"
 #   include "../../include/sys/types.h"
