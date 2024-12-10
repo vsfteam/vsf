@@ -75,6 +75,9 @@ extern "C" {
   #pragma language=extended
 #elif __IS_COMPILER_GCC__
 /* anonymous unions are enabled by default */
+  #if __GNUC__ <= 7
+    #define __COMPILER_HAS_NO_NEXTTOWARDF_IN_MATH__
+  #endif
 #elif __IS_COMPILER_LLVM__
 /* anonymous unions are enabled by default */
 #elif defined(__TMS470__)

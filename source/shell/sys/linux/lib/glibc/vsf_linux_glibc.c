@@ -211,7 +211,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(asinhl),
     VSF_APPLET_VPLT_ENTRY_FUNC(cbrtl),
     VSF_APPLET_VPLT_ENTRY_FUNC(nextafterl),
+#ifdef __COMPILER_HAS_NO_NEXTTOWARDF_IN_MATH__
     VSF_APPLET_VPLT_ENTRY_FUNC(nexttowardf),
+#endif
     VSF_APPLET_VPLT_ENTRY_FUNC(nexttoward),
     VSF_APPLET_VPLT_ENTRY_FUNC(nexttowardl),
     VSF_APPLET_VPLT_ENTRY_FUNC(logbl),
