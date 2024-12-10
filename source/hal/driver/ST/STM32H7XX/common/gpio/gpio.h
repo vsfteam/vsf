@@ -88,6 +88,13 @@ typedef enum vsf_gpio_mode_t {
 
     // TODO: add input fileter modes
 
+    // TODO: add exti support
+    VSF_GPIO_EXTI_MODE_NONE                     = 0,
+    VSF_GPIO_EXTI_MODE_LOW_LEVEL                = 1 << 16,
+    VSF_GPIO_EXTI_MODE_HIGH_LEVEL               = 2 << 16,
+    VSF_GPIO_EXTI_MODE_RISING                   = 3 << 16,
+    VSF_GPIO_EXTI_MODE_FALLING                  = 4 << 16,
+    VSF_GPIO_EXTI_MODE_RISING_FALLING           = 5 << 16,
 
     __VSF_HW_GPIO_MODE_ALL_BITS                 = 0x7F,
 } vsf_gpio_mode_t;

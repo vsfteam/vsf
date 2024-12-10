@@ -174,6 +174,13 @@ typedef enum vsf_usart_mode_t {
                                         = (0x1ul << 22),
     VSF_USART_RX_FIFO_THRESHOLD_FULL    = (0x2ul << 22),
 
+    VSF_USART_SYNC_CLOCK_ENABLE         = (0x1ul << 23),
+    VSF_USART_SYNC_CLOCK_DISABLE        = (0x0ul << 23),
+    VSF_USART_SYNC_CLOCK_POLARITY_LOW   = (0x0ul << 24),
+    VSF_USART_SYNC_CLOCK_POLARITY_HIGH  = (0x1ul << 24),
+    VSF_USART_SYNC_CLOCK_PHASE_1_EDGE   = (0x0ul << 25),
+    VSF_USART_SYNC_CLOCK_PHASE_2_EDGE   = (0x1ul << 25),
+
     __VSF_HW_USART_NOT_SUPPORT_MASK     = VSF_USART_5_BIT_LENGTH
                                         | VSF_USART_5_BIT_LENGTH
                                         | VSF_USART_FORCE_0_PARITY
@@ -212,6 +219,7 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_FRAME_ERR        = (1 << 0),
     VSF_USART_IRQ_MASK_BREAK_ERR        = (1 << 1),
     VSF_USART_IRQ_MASK_OVERFLOW_ERR     = (1 << 2),
+    VSF_USART_IRQ_MASK_CTS              = (1 << 3),
 
     __VSF_HW_USART_NOT_SUPPORT_IRQ_MASK = VSF_USART_IRQ_MASK_FRAME_ERR
                                         | VSF_USART_IRQ_MASK_BREAK_ERR

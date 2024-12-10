@@ -27,7 +27,7 @@
 
 #include "hal/vsf_hal.h"
 
-#include "../vendor/Inc/stm32h7xx.h"
+#include "../vendor/cmsis_device_h7/Include/stm32h7xx.h"
 
 /*============================ MACROS ========================================*/
 

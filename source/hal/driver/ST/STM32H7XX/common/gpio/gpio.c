@@ -23,7 +23,7 @@
 
 #include "hal/vsf_hal.h"
 
-#include "../vendor/Inc/stm32h7xx.h"
+#include "../vendor/cmsis_device_h7/Include/stm32h7xx.h"
 
 /*============================ MACROS ========================================*/
 
@@ -62,15 +62,16 @@ GPIO_TypeDef * __vsf_hw_gpio_get_regbase(vsf_hw_gpio_t *gpio_ptr)
     return gpio_ptr->reg;
 }
 
-void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_config_pin)(
+vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_port_config_pins)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
     vsf_gpio_pin_mask_t pin_mask,
-    vsf_gpio_mode_t mode
+    vsf_gpio_cfg_t *cfg_ptr
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
 
     GPIO_TypeDef *reg = gpio_ptr->reg;
     uint32_t offset_len2;
+    vsf_gpio_mode_t mode = cfg_ptr->mode;
     uint32_t otype = (mode >> 2) & 1;
     uint32_t pupd = (mode >> 3) & 3;
     uint32_t ospeed = (mode >> 5) & 3;
@@ -88,6 +89,7 @@ void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_config_pin)(
             vsf_atom32_op(&reg->PUPDR, (_ & ~(3 << offset_len2)) | (pupd << offset_len2));
         }
     }
+    return VSF_ERR_NONE;
 }
 
 void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_set_direction)(
