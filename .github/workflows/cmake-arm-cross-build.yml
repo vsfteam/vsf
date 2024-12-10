@@ -29,10 +29,14 @@ jobs:
         ]
         os: [ubuntu-latest]
         exclude:
-          # Linking error on arm-none-eabi-gcc-7:
+          # vsfteam/vsf: Linking error on arm-none-eabi-gcc-7:
           #   ld: region `FLASH' overflowed by 27580 bytes
+          # vsfteam/vsf-all-in-one: Linking error on arm-none-eabi-gcc-5:
+          #   ld: region `FLASH' overflowed by 44 bytes
           - os: ubuntu-latest
             cc: 7-2018-q2
+          - os: ubuntu-latest
+            cc: 5-2016-q3
 
     runs-on: ${{matrix.os}}
 
