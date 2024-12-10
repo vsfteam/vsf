@@ -15,7 +15,6 @@ set(VSF_TARGET generic/linux64)
 # VSF_USE configurations
 set(VSF_USE_LINUX 1)
     set(VSF_LINUX_USE_SIMPLE_LIBC 1)
-    set(VSF_LINUX_USE_LIBTUV 1)
 set(VSF_USE_LVGL 1)
     set(VSF_LVGL_USE_FREETYPE 1)
 set(VSF_USE_FREETYPE 1)
