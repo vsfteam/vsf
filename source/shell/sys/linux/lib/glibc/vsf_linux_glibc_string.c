@@ -202,7 +202,10 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt =
     VSF_APPLET_VPLT_ENTRY_FUNC(strnlen),
     VSF_APPLET_VPLT_ENTRY_FUNC(strcmp),
     VSF_APPLET_VPLT_ENTRY_FUNC(strncmp),
+#if     !(VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED)                  \
+    ||  !(VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED)
     VSF_APPLET_VPLT_ENTRY_FUNC(strdup),
+#endif
     VSF_APPLET_VPLT_ENTRY_FUNC(strcpy),
     VSF_APPLET_VPLT_ENTRY_FUNC(strncpy),
     VSF_APPLET_VPLT_ENTRY_FUNC(stpcpy),
