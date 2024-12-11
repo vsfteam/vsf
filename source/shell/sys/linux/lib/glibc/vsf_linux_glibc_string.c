@@ -180,14 +180,14 @@ const char * sigabbrev_np(int sig)
     return "unknown";
 }
 
-#if     VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED                     \
-    &&  VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
-#   undef strdup
-#endif
+#if     !(VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED)                  \
+    ||  !(VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED)
+// strdup will be wrappered to ____strdup_ex if condition not met
 char * strdup(const char *str)
 {
     return __strdup_ex(NULL, str);
 }
+#endif
 
 #if VSF_LINUX_APPLET_USE_LIBC_STRING == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_string_vplt_t vsf_linux_libc_string_vplt = {
