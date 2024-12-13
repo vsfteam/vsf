@@ -24,6 +24,8 @@
 
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_DEVFS == ENABLED
 
+#include "component/input/vsf_input.h"
+
 // for hardware info
 #include "hal/vsf_hal.h"
 
