@@ -18,7 +18,7 @@
 
 //! \note libc belongs to compiler layer in utilities, so only include compiler.h
 //! IMPORTANT: to avoid including other c headers, define __USE_LOCAL_XXXX__ here
-//! 
+//!
 //! Do not include stdbool in compiler.h, because user maybe define bool,
 //!     which maybe conflict with bool in stdbool.h
 #define __USE_LOCAL_STDBOOL__
@@ -138,7 +138,14 @@ static inline unsigned char _scwprintf(const wchar_t *c, ...)
 }
 #endif
 
-typedef int FILE;
+#ifndef __VSF_STDIO_INTERNAL_FILE_NAME
+#   define __VSF_STDIO_INTERNAL_FILE_NAME       __VSF_STDIO_FILE
+#endif
+
+typedef struct __VSF_STDIO_INTERNAL_FILE_NAME {
+    int fd;
+} FILE;
+
 // use extern functions with no dependent on shell.linux
 #define stdin               __vsf_linux_stdin()
 #define stdout              __vsf_linux_stdout()

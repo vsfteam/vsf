@@ -28,6 +28,17 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#if __IS_COMPILER_IAR__ && VSF_USE_LINUX == ENABLED
+// if linux is enabled, _exit will be implemented in vsf linux layer
+// if __cexit_call_dtors is not over-written, compiler will introduce cexit.o in iar libc
+// cexit.o contains _exit which will conflict with _exit implemented in vsf linux layer
+void __cexit_call_dtors(void)
+{
+    // Please provide test case to author if asserted here
+    VSF_ASSERT(false);
+}
+#endif
+
 #if __IS_COMPILER_IAR__ || __IS_COMILER_GCC__
 char * strcasestr(const char *str, const char *substr)
 {

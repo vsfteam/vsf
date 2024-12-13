@@ -73,6 +73,8 @@ extern "C" {
 #elif __IS_COMPILER_ARM_COMPILER_6__
 #elif __IS_COMPILER_IAR__
   #pragma language=extended
+// in new iar, FILE must be derived from __FILE struct
+  #define __VSF_STDIO_INTERNAL_FILE_NAME __FILE
 #elif __IS_COMPILER_GCC__
 /* anonymous unions are enabled by default */
   #if __GNUC__ <= 7
