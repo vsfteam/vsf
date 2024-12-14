@@ -26,6 +26,13 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_TIMER_GPIO_CFG_PROTECT_LEVEL
+#   define VSF_TIMER_GPIO_CFG_PROTECT_LEVEL             interrupt
+#endif
+
+#define __vsf_timer_gpio_protect                        vsf_protect(VSF_TIMER_GPIO_CFG_PROTECT_LEVEL)
+#define __vsf_timer_gpio_unprotect                      vsf_unprotect(VSF_TIMER_GPIO_CFG_PROTECT_LEVEL)
+
 #ifndef VSF_TIMER_GPIO_MULTI_PWM_CFG_MULTI_CLASS
 #   define VSF_TIMER_GPIO_MULTI_PWM_CFG_MULTI_CLASS     VSF_TIMER_GPIO_PWM_CFG_MULTI_CLASS
 #endif
@@ -214,11 +221,16 @@ vsf_err_t vsf_timer_gpio_single_pwm_set(vsf_timer_gpio_single_pwm_t *pwm_ptr, ui
     VSF_HAL_ASSERT(pwm_ptr != NULL);
     VSF_HAL_ASSERT(0 == channel);
 
+    // Updating the pwm configuration needs to be protected so that it won't
+    // be interrupted by timer interrupts
+    vsf_protect_t orig = __vsf_timer_gpio_protect();
     pwm_ptr->period = period;
     pwm_ptr->pulse = pulse;
     if (pwm_ptr->enabled && !pwm_ptr->timer_started) {
         __vsf_timer_gpio_single_pwm_update(pwm_ptr);
     }
+    __vsf_timer_gpio_unprotect(orig);
+
     return VSF_ERR_NONE;
 }
 
