@@ -328,8 +328,10 @@ VSF_CAL_WEAK(vsf_hal_pre_startup_init)
 void vsf_hal_pre_startup_init(void)
 {
     SystemInit();
-    SCB_EnableICache();
-    SCB_EnableDCache();
+
+    // DO NOT enable cache here, it will make chip failure, no idea why
+//    SCB_EnableICache();
+//    SCB_EnableDCache();
 }
 
 /*----------------------------------------------------------------------------
