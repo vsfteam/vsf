@@ -906,10 +906,6 @@ void BusFault_Handler(void)
 VSF_CAL_WEAK(vsf_hw_mpu_add_basic_resgions)
 void vsf_hw_mpu_add_basic_resgions(void)
 {
-    // refer to vsf_hal_pre_startup_init implementation in startup file
-    SCB_EnableICache();
-    SCB_EnableDCache();
-
     vsf_arch_mpu_disable();
 
     // background, 4G from 0x00000000
@@ -962,6 +958,10 @@ void vsf_hw_mpu_add_basic_resgions(void)
 VSF_CAL_WEAK(vsf_driver_init)
 bool vsf_driver_init(void)
 {
+    // refer to vsf_hal_pre_startup_init implementation in startup file
+    SCB_EnableICache();
+    SCB_EnableDCache();
+
     vsf_hw_mpu_add_basic_resgions();
     return true;
 }
