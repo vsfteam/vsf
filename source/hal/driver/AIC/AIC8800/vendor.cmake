@@ -4,6 +4,7 @@ if(VSF_USE_LWIP AND VSF_LWIP_VENDOR)
     target_compile_definitions(${VSF_TARGET_NAME} PUBLIC
         # necessary for llvm to avoid compiler errors: redefinition u32_t etc.
         LWIP_NO_STDINT_H=1
+        LWIP_NO_UNISTD_H=1
     )
     target_include_directories(${VSF_TARGET_NAME} PUBLIC
         vendor/lwip/net_al
