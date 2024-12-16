@@ -59,17 +59,28 @@
 
 /*============================ MACROS ========================================*/
 
-#define USB_OTG_COUNT               1
-#define USB_OTG0_IRQHandler         USBFS_IRQHandler
+#define USB_OTG_COUNT               2
+#define USB_OTG0_IRQHandler         USBHS0_IRQHandler
+#define USB_OTG1_IRQHandler         USBHS1_IRQHandler
 // required by dwcotg, define the max ep number of dwcotg include ep0
-#define USB_DWCOTG_MAX_EP_NUM       4
+#define USB_DWCOTG_MAX_EP_NUM       8
 
 #define USB_OTG0_CONFIG                                                         \
     .ep_num = 8,                                                                \
-    .irq = USBFS_IRQn,                                                          \
-    .reg = (void *)USBFS_BASE,                                                  \
-    .buffer_word_size = 0x500 >> 2,                                             \
-    .speed = USB_SPEED_FULL,                                                    \
+    .irq = USBHS0_IRQn,                                                         \
+    .reg = (void *)0x40040000,                                                  \
+    .buffer_word_size = 4096 >> 2,                                              \
+    .speed = USB_SPEED_HIGH,                                                    \
+    .dma_en = false,                                                            \
+    .ulpi_en = false,                                                           \
+    .utmi_en = false,                                                           \
+    .vbus_en = false,
+#define USB_OTG1_CONFIG                                                         \
+    .ep_num = 8,                                                                \
+    .irq = USBHS1_IRQn,                                                         \
+    .reg = (void *)0x40080000,                                                  \
+    .buffer_word_size = 4096 >> 2,                                              \
+    .speed = USB_SPEED_HIGH,                                                    \
     .dma_en = false,                                                            \
     .ulpi_en = false,                                                           \
     .utmi_en = false,                                                           \

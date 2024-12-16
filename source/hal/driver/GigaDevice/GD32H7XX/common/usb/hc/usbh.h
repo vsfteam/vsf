@@ -27,7 +27,7 @@
 
 /*============================ MACROS ========================================*/
 
-#define vsf_hw_usbh_ep_number           8
+#define vsf_hw_usbh_ep_number           16
 #define vsf_hw_usbh_ep_is_dma           false
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

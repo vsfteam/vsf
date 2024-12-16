@@ -27,6 +27,9 @@
 // for dedicated vk_dwcotg_hw_info_t
 #include "component/usb/driver/otg/dwcotg/vsf_dwcotg_hw.h"
 
+// for IRQn_Type
+#include "../vendor/Include/gd32h7xx.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

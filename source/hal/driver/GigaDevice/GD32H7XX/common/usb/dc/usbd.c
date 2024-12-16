@@ -23,6 +23,7 @@
 
 // for vk_dwcotg_dc_ip_info_t
 #include "component/vsf_component.h"
+#include "../usb_priv.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
