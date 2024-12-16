@@ -4,6 +4,8 @@ endif()
 
 vsf_add_sources(
     port/platform_vsf.c
+    extension/vplt/mbedtls_vplt.c
+    extension/tls_session/mbedtls_tls_session.c
 )
 vsf_add_compile_definitions(
     MBEDTLS_USER_CONFIG_FILE="component/3rd-party/mbedtls/port/platform_vsf.h"
