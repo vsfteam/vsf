@@ -915,6 +915,13 @@ void vsf_hw_mpu_add_basic_resgions(void)
                             VSF_ARCH_MPU_ACCESS_NO          |
                             VSF_ARCH_MPU_NON_CACHABLE);
 
+    // System Memory, 64K from 0x1FF00000
+    vsf_arch_mpu_add_region(0x1FF00000, 64 * 1024,
+                            VSF_ARCH_MPU_NON_SHARABLE       |
+                            VSF_ARCH_MPU_NON_EXECUTABLE     |
+                            VSF_ARCH_MPU_ACCESS_READONLY    |
+                            VSF_ARCH_MPU_NON_CACHABLE);
+
     // AHBs & APBs, 512M from 0x40000000
     vsf_arch_mpu_add_region(0x40000000, 512 * 1024 * 1024,
                             VSF_ARCH_MPU_SHARABLE           |

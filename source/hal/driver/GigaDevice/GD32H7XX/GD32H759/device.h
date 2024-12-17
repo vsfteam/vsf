@@ -68,6 +68,7 @@
 #define USB_OTG0_CONFIG                                                         \
     .ep_num = 8,                                                                \
     .irq = USBHS0_IRQn,                                                         \
+    .en = VSF_HW_EN_USBHS0,                                                     \
     .reg = (void *)0x40040000,                                                  \
     .buffer_word_size = 4096 >> 2,                                              \
     .speed = USB_SPEED_HIGH,                                                    \
@@ -78,6 +79,7 @@
 #define USB_OTG1_CONFIG                                                         \
     .ep_num = 8,                                                                \
     .irq = USBHS1_IRQn,                                                         \
+    .en = VSF_HW_EN_USBHS1,                                                     \
     .reg = (void *)0x40080000,                                                  \
     .buffer_word_size = 4096 >> 2,                                              \
     .speed = USB_SPEED_HIGH,                                                    \

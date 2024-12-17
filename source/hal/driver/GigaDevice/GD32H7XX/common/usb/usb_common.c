@@ -23,6 +23,8 @@
 
 #include "./usb_priv.h"
 
+#include "../vendor/Include/gd32h7xx_pmu.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -34,6 +36,11 @@
 vsf_err_t __vsf_hw_usb_init(vsf_hw_usb_t *usb, vsf_arch_prio_t priority)
 {
     const vsf_hw_usb_const_t *param = usb->param;
+
+    PMU_CTL2 |= PMU_CTL2_USBSEN;
+    PMU_CTL2 |= PMU_CTL2_VUSB33DEN;
+    while (!(PMU_CTL2 & PMU_CTL2_USB33RF));
+    vsf_hw_peripheral_enable(param->en);
 
     if (priority >= 0) {
         NVIC_SetPriority(param->irq, priority);

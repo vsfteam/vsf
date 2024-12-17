@@ -25,7 +25,14 @@
 #include "component/vsf_component.h"
 #include "../usb_priv.h"
 
+#include "component/usb/driver/otg/dwcotg/dwcotg_regs.h"
+
 /*============================ MACROS ========================================*/
+
+// copied from drv_usb_regs.h
+#define GUSBCS_EMBPHY_FS          (1 << 6)              /*!< embedded FS PHY selected */
+#define GUSBCS_EMBPHY_HS          (1 << 5)              /*!< embedded HS PHY selected */
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -36,6 +43,25 @@ extern vsf_err_t __vsf_hw_usb_init(vsf_hw_usb_t *usb, vsf_arch_prio_t priority);
 extern void __vsf_hw_usb_irq(vsf_hw_usb_t *usb);
 
 /*============================ IMPLEMENTATION ================================*/
+
+static void __vsf_hw_usbd_phy_init(void *param, vk_dwcotg_dcd_param_t *dcd_param)
+{
+    vsf_hw_usb_t *dc = (vsf_hw_usb_t *)param;
+    struct dwcotg_core_global_regs_t *global_regs = dc->param->reg;
+
+    if (USB_SPEED_FULL == dcd_param->speed) {
+        global_regs->gusbcfg |= GUSBCS_EMBPHY_FS;
+    } else if (USB_SPEED_HIGH == dcd_param->speed) {
+        global_regs->gusbcfg |= GUSBCS_EMBPHY_HS;
+    } else {
+        VSF_HAL_ASSERT(false);
+    }
+    global_regs->gotgctl |= USB_OTG_GOTGCTL_BVALOEN | USB_OTG_GOTGCTL_BVALOVAL;
+    // PWRCLKCTL = 0
+    ((uint32_t *)global_regs)[0x0E00 / 4] = 0;
+    // Embedded PHY Power On
+    global_regs->gccfg |= USB_OTG_GCCFG_PWRDWN;
+}
 
 vsf_err_t vsf_hw_usbd_init(vsf_hw_usb_t *dc, usb_dc_ip_cfg_t *cfg)
 {
@@ -59,6 +85,9 @@ void vsf_hw_usbd_get_info(vsf_hw_usb_t *dc, usb_dc_ip_info_t *info)
     dwcotg_info->ep_num = param->ep_num;
     dwcotg_info->buffer_word_size = param->buffer_word_size;
     dwcotg_info->feature = param->feature;
+
+    dwcotg_info->vendor.param = dc;
+    dwcotg_info->vendor.phy_init = __vsf_hw_usbd_phy_init;
 }
 
 void vsf_hw_usbd_connect(vsf_hw_usb_t *dc)
