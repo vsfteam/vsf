@@ -130,7 +130,7 @@
 #   ifndef VSF_LINUX_SOCKET_USE_NETLINK
 #       if VSF_USE_LWIP == ENABLED
 #           define VSF_LINUX_SOCKET_USE_NETLINK ENABLED
-#       elif (defined(__WIN__) || defined(__LINUX__) || defined(__linux__) || defined(__MACOS__)) && !defined(__VSF_APPLET__)
+#       else
 #           define VSF_LINUX_SOCKET_USE_NETLINK DISABLED
 #       endif
 #   endif

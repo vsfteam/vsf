@@ -64,6 +64,12 @@ if(NOT VSF_LWIP_VENDOR)
     )
 endif()
 
+if(VSF_USE_LINUX)
+    vsf_add_compile_definitions(
+        # enable LWIP_NETIF_EXT_STATUS_CALLBACK for netlink support in linux
+        LWIP_NETIF_EXT_STATUS_CALLBACK=1
+    )
+endif()
 vsf_add_sources(
     ./port/lwip_netdrv_adapter.c
 )
