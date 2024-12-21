@@ -39,6 +39,8 @@
 #   include "../../../include/fcntl.h"
 #   if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
 #       include "../../../include/linux/netlink.h"
+#       include "../../../include/linux/rtnetlink.h"
+#       include "../../../include/linux/if_addr.h"
 #   endif
 #else
 #   include <unistd.h>
@@ -54,6 +56,8 @@
 #   include <fcntl.h>
 #   if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
 #       include <linux/netlink.h>
+#       include <linux/rtnetlink.h>
+#       include <linux/if_addr.h>
 #   endif
 #endif
 #include "../vsf_linux_socket.h"
@@ -115,11 +119,19 @@ typedef union vsf_linux_sockaddr_t {
 } vsf_linux_sockaddr_t;
 
 #if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
+typedef struct vsf_linux_socket_netlink_msg_t {
+    vsf_slist_node_t node;
+
+    struct nlmsghdr hdr;
+} vsf_linux_socket_netlink_msg_t;
+
 typedef struct vsf_linux_socket_netlink_priv_t {
     implement(vsf_linux_socket_priv_t)
 
+    vsf_slist_queue_t msg_list;
     vsf_dlist_node_t node;
     uint32_t groups;
+    uint32_t seq;
 } vsf_linux_socket_netlink_priv_t;
 #endif
 
@@ -127,7 +139,7 @@ typedef struct vsf_linux_socket_netlink_priv_t {
 /*============================ PROTOTYPES ====================================*/
 
 int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
-int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
+static int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static ssize_t __vsf_linux_socket_inet_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static ssize_t __vsf_linux_socket_inet_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd);
@@ -1089,7 +1101,22 @@ static struct netif * __vsf_linux_lwip_get_netif_by_ifreq(struct ifreq *ifr)
     return NULL;
 }
 
-int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
+static short __vsf_linux_lwip_netif_flags_to_ifr_flags(struct netif *netif)
+{
+    short flags = 0;
+    if (netif->flags & NETIF_FLAG_UP) {
+        flags |= IFF_UP;
+    }
+    if (netif->flags & NETIF_FLAG_BROADCAST) {
+        flags |= IFF_BROADCAST;
+    }
+    if ((netif->name[0] == 'l') && (netif->name[1] == 'o')) {
+        flags |= IFF_LOOPBACK;
+    }
+    return flags;
+}
+
+static int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     struct netif *netif;
 
@@ -1123,16 +1150,7 @@ int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t a
             break;
         }
 
-        u.ifr->ifr_flags = 0;
-        if (netif->flags & NETIF_FLAG_UP) {
-            u.ifr->ifr_flags |= IFF_UP;
-        }
-        if (netif->flags & NETIF_FLAG_BROADCAST) {
-            u.ifr->ifr_flags |= IFF_BROADCAST;
-        }
-        if ((netif->name[0] == 'l') && (netif->name[1] == 'o')) {
-            u.ifr->ifr_flags |= IFF_LOOPBACK;
-        }
+        u.ifr->ifr_flags = __vsf_linux_lwip_netif_flags_to_ifr_flags(netif);
         return 0;
     case SIOCGIFADDR:
         netif = __vsf_linux_lwip_get_netif_by_ifreq(u.ifr);
@@ -1211,33 +1229,97 @@ ssize_t recvfrom(int sockfd, void *buffer, size_t size, int flags,
 
 #if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
 
+static vsf_linux_socket_netlink_msg_t * __vsf_linux_socket_lwip_new_msg(vsf_linux_socket_netlink_priv_t *priv, int msg_size)
+{
+    int size = NLMSG_ALIGN(sizeof(vsf_linux_socket_netlink_msg_t)) + msg_size;
+    vsf_linux_socket_netlink_msg_t *msg = vsf_heap_malloc(size);
+    if (NULL == msg) {
+        vsf_trace_error("fail to allocate netlink message" VSF_TRACE_CFG_LINEEND);
+        return NULL;
+    }
+
+    vsf_slist_init_node(vsf_linux_socket_netlink_msg_t, node, msg);
+    msg->hdr.nlmsg_len = size;
+    msg->hdr.nlmsg_flags = 0;
+    msg->hdr.nlmsg_seq = priv->seq++;
+    msg->hdr.nlmsg_pid = 0;
+    return msg;
+}
+
 static void __vsf_linux_socket_lwip_netif_callback(
         struct netif *netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t *args)
 {
-    bool triggered;
+    vsf_linux_socket_netlink_msg_t *msg = NULL;
 
     __vsf_dlist_foreach_unsafe(vsf_linux_socket_netlink_priv_t, node, &__vsf_linux_netlink_priv_list) {
-        triggered = false;
         switch (reason) {
         case LWIP_NSC_NETIF_ADDED:
             if (_->groups & RTMGRP_LINK) {
-                triggered = true;
+                msg = __vsf_linux_socket_lwip_new_msg(_, sizeof(struct ifinfomsg));
+                if (NULL == msg) {
+                    break;
+                }
+
+                msg->hdr.nlmsg_type = RTM_NEWLINK;
+
+                struct ifinfomsg *ifinfo = (struct ifinfomsg *)((uint8_t *)msg + NLMSG_ALIGN(sizeof(*msg)));
+                ifinfo->ifi_family = AF_UNSPEC;
+                ifinfo->ifi_type = 0;
+                ifinfo->ifi_index = netif->num;
+                ifinfo->ifi_flags = __vsf_linux_lwip_netif_flags_to_ifr_flags(netif);
+                // ifi_change is reserved for future use and should be always set to 0xFFFFFFFF
+                ifinfo->ifi_change = 0xFFFFFFFF;
             }
             break;
         case LWIP_NSC_NETIF_REMOVED:
             if (_->groups & RTMGRP_LINK) {
-                triggered = true;
+                msg = __vsf_linux_socket_lwip_new_msg(_, sizeof(struct ifinfomsg));
+                if (NULL == msg) {
+                    break;
+                }
+
+                msg->hdr.nlmsg_type = RTM_DELLINK;
+
+                struct ifinfomsg *ifinfo = (struct ifinfomsg *)((uint8_t *)msg + NLMSG_ALIGN(sizeof(*msg)));
+                ifinfo->ifi_family = AF_UNSPEC;
+                ifinfo->ifi_type = 0;
+                ifinfo->ifi_index = netif->num;
+                ifinfo->ifi_flags = __vsf_linux_lwip_netif_flags_to_ifr_flags(netif);
+                // ifi_change is reserved for future use and should be always set to 0xFFFFFFFF
+                ifinfo->ifi_change = 0xFFFFFFFF;
             }
             break;
         case LWIP_NSC_IPV4_ADDRESS_CHANGED:
             if (_->groups & RTMGRP_IPV4_IFADDR) {
-                triggered = true;
+                msg = __vsf_linux_socket_lwip_new_msg(_, sizeof(struct ifaddrmsg));
+                if (NULL == msg) {
+                    break;
+                }
+
+#if LWIP_IPV4 && LWIP_IPV6
+                msg->hdr.nlmsg_type = ip4_addr_isany(&netif->ip_addr.u_addr.ip4) ? RTM_DELADDR : RTM_NEWADDR;
+#else
+                msg->hdr.nlmsg_type = ip4_addr_isany(&netif->ip_addr) ? RTM_DELADDR : RTM_NEWADDR;
+#endif
+
+                struct ifaddrmsg *ifaddr = (struct ifaddrmsg *)((uint8_t *)msg + NLMSG_ALIGN(sizeof(*msg)));
+#if LWIP_IPV4 && LWIP_IPV6
+                ifaddr->ifa_family = IP_IS_V6_VAL(netif->ip_addr) ? AF_INET6 : AF_INET;
+#else
+                ifaddr->ifa_family = AF_INET;
+#endif
+                ifaddr->ifa_prefixlen = 0;
+                ifaddr->ifa_flags = 0;
+                ifaddr->ifa_scope = 0;
+                ifaddr->ifa_index = netif->num;
             }
             break;
         }
 
-        if (triggered) {
-            vsf_linux_fd_set_status(&_->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
+        if (msg != NULL) {
+            vsf_protect_t orig = vsf_protect_sched();
+            vsf_slist_queue_enqueue(vsf_linux_socket_netlink_msg_t, node, &_->msg_list, msg);
+            vsf_linux_fd_set_status(&_->use_as__vsf_linux_fd_priv_t, POLLIN, orig);
         }
     }
 }
@@ -1247,6 +1329,7 @@ static int __vsf_linux_socket_netlink_init(vsf_linux_fd_t *sfd)
     vsf_linux_socket_priv_t *socket_priv = (vsf_linux_socket_priv_t *)sfd->priv;
     vsf_linux_socket_netlink_priv_t *priv = (vsf_linux_socket_netlink_priv_t *)socket_priv;
 
+    vsf_slist_init(&priv->msg_list);
     switch (socket_priv->type) {
     case SOCK_RAW:
         switch (socket_priv->protocol) {
@@ -1256,6 +1339,7 @@ static int __vsf_linux_socket_netlink_init(vsf_linux_fd_t *sfd)
                 netif_add_ext_callback(&__vsf_linux_netlink_lwip_netif_cb, __vsf_linux_socket_lwip_netif_callback);
             }
 
+            priv->seq = 0;
             vsf_dlist_add_to_head(vsf_linux_socket_netlink_priv_t, node, &__vsf_linux_netlink_priv_list, priv);
             return 0;
         }
@@ -1273,6 +1357,12 @@ static int __vsf_linux_socket_netlink_fini(vsf_linux_socket_priv_t *socket_priv,
         switch (socket_priv->protocol) {
         case NETLINK_ROUTE:
             vsf_dlist_remove(vsf_linux_socket_netlink_priv_t, node, &__vsf_linux_netlink_priv_list, priv);
+
+            vsf_linux_socket_netlink_msg_t *msg;
+            while (!vsf_slist_queue_is_empty(&priv->msg_list)) {
+                vsf_slist_queue_dequeue(vsf_linux_socket_netlink_msg_t, node, &priv->msg_list, msg);
+                vsf_heap_free(msg);
+            }
             return 0;
         }
         break;
@@ -1290,7 +1380,68 @@ static int __vsf_linux_socket_netlink_bind(vsf_linux_socket_priv_t *socket_priv,
 
 static ssize_t __vsf_linux_socket_netlink_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
-    return 0;
+    vsf_linux_socket_priv_t *socket_priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    vsf_linux_socket_netlink_priv_t *priv = (vsf_linux_socket_netlink_priv_t *)socket_priv;
+    bool is_block = vsf_linux_fd_is_block(sfd);
+    vsf_linux_socket_netlink_msg_t *msg;
+    vsf_protect_t orig;
+    size_t count_remain = count, curlen;
+
+    vsf_linux_trigger_t trig;
+    vsf_linux_trigger_init(&trig);
+
+again:
+    orig = vsf_protect_sched();
+    if (vsf_slist_queue_is_empty(&priv->msg_list)) {
+        if (is_block) {
+            if (!vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, &trig, orig)) {
+                // triggered by signal
+                return -1;
+            }
+            goto again;
+        } else {
+            vsf_unprotect_sched(orig);
+            errno = EAGAIN;
+            return -1;
+        }
+    }
+
+    while (count_remain > 0) {
+        vsf_slist_queue_peek(vsf_linux_socket_netlink_msg_t, node, &priv->msg_list, msg);
+        if (NULL == msg) {
+            break;
+        }
+
+        curlen = msg->hdr.nlmsg_len;
+        if (curlen > count_remain) {
+            break;
+        }
+
+        vsf_slist_queue_dequeue(vsf_linux_socket_netlink_msg_t, node, &priv->msg_list, msg);
+        vsf_unprotect_sched(orig);
+
+        memcpy(buf, &msg->hdr, curlen);
+        buf = (void *)((uint8_t *)buf + curlen);
+        count_remain -= curlen;
+
+        vsf_heap_free(msg);
+
+        orig = vsf_protect_sched();
+        if (vsf_slist_queue_is_empty(&priv->msg_list)) {
+            break;
+        }
+
+        // alignment fix
+        curlen &= NLMSG_ALIGNTO - 1;
+        if (curlen) {
+            curlen = NLMSG_ALIGNTO - curlen;
+            buf = (void *)((uint8_t *)buf + curlen);
+            count_remain -= curlen;
+        }
+    }
+    vsf_unprotect_sched(orig);
+
+    return count - count_remain;
 }
 
 #endif
