@@ -224,8 +224,6 @@ const char * inet_ntop(int af, const void *src, char *dst, socklen_t size)
     return dst;
 }
 
-// fcntl, dedicated driver can over-write this common version
-VSF_CAL_WEAK(__vsf_linux_socket_inet_fcntl)
 int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     switch (cmd) {

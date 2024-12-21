@@ -36,6 +36,7 @@
 #   include "../../../include/arpa/inet.h"
 #   include "../../../include/ifaddrs.h"
 #   include "../../../include/poll.h"
+#   include "../../include/fcntl.h"
 #else
 #   include <unistd.h>
 #   include <errno.h>
@@ -47,6 +48,7 @@
 #   include <arpa/inet.h>
 #   include <ifaddrs.h>
 #   include <poll.h>
+#   include <fcntl.h>
 #endif
 #include "../vsf_linux_socket.h"
 
@@ -58,6 +60,10 @@
 #include "lwip/tcp.h"
 #include "lwip/udp.h"
 #include "lwip/dns.h"
+
+#if LWIP_RAW
+#   include "lwip/raw.h"
+#endif
 
 /*============================ MACROS ========================================*/
 
@@ -102,6 +108,7 @@ typedef union vsf_linux_sockaddr_t {
 /*============================ PROTOTYPES ====================================*/
 
 int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
+int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static ssize_t __vsf_linux_socket_inet_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static ssize_t __vsf_linux_socket_inet_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd);
@@ -128,7 +135,7 @@ static int __vsf_linux_socket_inet_getsockname(vsf_linux_socket_priv_t *socket_p
 const vsf_linux_socket_op_t vsf_linux_socket_inet_op = {
     .fdop               = {
         .priv_size      = sizeof(vsf_linux_socket_inet_priv_t),
-        .fn_fcntl       = __vsf_linux_socket_inet_fcntl,
+        .fn_fcntl       = __vsf_linux_lwip_socket_inet_fcntl,
         .fn_read        = __vsf_linux_socket_inet_read,
         .fn_write       = __vsf_linux_socket_inet_write,
         .fn_close       = __vsf_linux_socket_inet_close,
@@ -1016,6 +1023,95 @@ static void __vsf_linux_socket_inet_lwip_evthandler(struct netconn *conn, enum n
 }
 
 // socket fd
+
+static struct netif * __vsf_linux_lwip_get_netif_by_ifreq(struct ifreq *ifr)
+{
+    extern struct netif *netif_list;
+    struct netif *netif = netif_list;
+
+    for (; netif != NULL; netif = netif->next) {
+        if (ifr->ifr_name[0] != '\0') {
+            if (    (ifr->ifr_name[0] == netif->name[0])
+                &&  (ifr->ifr_name[1] == netif->name[1])
+                &&  (ifr->ifr_name[2] == '\0')) {
+                return netif;
+            }
+        } else if (ifr->ifr_ifindex == netif->num) {
+            return netif;
+        }
+    }
+    return NULL;
+}
+
+int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
+{
+    struct netif *netif;
+
+    union {
+        uintptr_t arg;
+        struct ifreq *ifr;
+        struct ifconf *ifconf;
+    } u;
+    u.arg = arg;
+
+    switch (cmd) {
+    case F_SETFL:
+        return __vsf_linux_socket_inet_fcntl(sfd, cmd, arg);
+    case SIOCGIFNAME:
+        netif = __vsf_linux_lwip_get_netif_by_ifreq(u.ifr);
+        if (NULL == netif) {
+            break;
+        }
+
+        u.ifr->ifr_name[0] = netif->name[0];
+        u.ifr->ifr_name[1] = netif->name[1];
+        u.ifr->ifr_name[2] = '\0';
+        return 0;
+        break;
+    case SIOCGIFCONF:
+        // TODO: add support
+        break;
+    case SIOCGIFFLAGS:
+        netif = __vsf_linux_lwip_get_netif_by_ifreq(u.ifr);
+        if (NULL == netif) {
+            break;
+        }
+
+        u.ifr->ifr_flags = 0;
+        if (netif->flags & NETIF_FLAG_UP) {
+            u.ifr->ifr_flags |= IFF_UP;
+        }
+        if (netif->flags & NETIF_FLAG_BROADCAST) {
+            u.ifr->ifr_flags |= IFF_BROADCAST;
+        }
+        if ((netif->name[0] == 'l') && (netif->name[1] == 'o')) {
+            u.ifr->ifr_flags |= IFF_LOOPBACK;
+        }
+        return 0;
+    case SIOCGIFADDR:
+        netif = __vsf_linux_lwip_get_netif_by_ifreq(u.ifr);
+        if (NULL == netif) {
+            break;
+        }
+
+        __ipaddr_port_to_sockaddr(&u.ifr->ifr_addr, &netif->ip_addr, 0);
+        return 0;
+    case SIOCGIFHWADDR:
+        netif = __vsf_linux_lwip_get_netif_by_ifreq(u.ifr);
+        if (NULL == netif) {
+            break;
+        }
+
+        memcpy(u.ifr->ifr_hwaddr.sa_data, netif->hwaddr, NETIF_MAX_HWADDR_LEN);
+        return 0;
+    case SIOCSIFADDR:
+    case SIOCSIFFLAGS:
+        // not supported
+        break;
+    }
+    return -1;
+}
+
 static ssize_t __vsf_linux_socket_inet_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;

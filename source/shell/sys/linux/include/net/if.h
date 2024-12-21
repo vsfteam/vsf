@@ -2,14 +2,39 @@
 #define __VSF_LINUX_NET_IF_H__
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
+#include <linux/sockios.h>
 
 #define IFNAMSIZ                16
 #define	IFALIASZ                256
+
+struct ifmap {
+    unsigned long               mem_start;
+    unsigned long               mem_end;
+    unsigned short              base_addr;
+    unsigned char               irq;
+    unsigned char               dma;
+    unsigned char               port;
+};
 
 struct ifreq {
     union {
         char                    ifrn_name[IFNAMSIZ];
     } ifr_ifrn;
+
+    union {
+        struct sockaddr         ifru_addr;
+        struct sockaddr         ifru_dstaddr;
+        struct sockaddr         ifru_broadaddr;
+        struct sockaddr         ifru_netmask;
+        struct sockaddr         ifru_hwaddr;
+        short                   ifru_flags;
+        int                     ifru_ivalue;
+        int                     ifru_mtu;
+        struct ifmap            ifru_map;
+        char                    ifru_slave[IFNAMSIZ];
+        char                    ifru_newname[IFNAMSIZ];
+        char                   *ifru_data;
+    } ifr_ifru;
 };
 #define ifr_name                ifr_ifrn.ifrn_name
 #define ifr_hwaddr              ifr_ifru.ifru_hwaddr
