@@ -1211,7 +1211,6 @@ ssize_t recvfrom(int sockfd, void *buffer, size_t size, int flags,
 
 #if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
 
-// not compatible with original lwip implementation, lwip need to be fixed to support this
 static void __vsf_linux_socket_lwip_netif_callback(
         struct netif *netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t *args)
 {
