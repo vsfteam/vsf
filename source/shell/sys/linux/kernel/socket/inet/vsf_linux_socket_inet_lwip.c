@@ -160,7 +160,7 @@ static int __vsf_linux_socket_netlink_bind(vsf_linux_socket_priv_t *socket_priv,
 #if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
 static bool __vsf_linux_netlink_is_callback_installed = false;
 static vsf_dlist_t __vsf_linux_netlink_priv_list = { 0 };
-netif_ext_callback_t __vsf_linux_netlink_lwip_netif_cb;
+static netif_ext_callback_t __vsf_linux_netlink_lwip_netif_cb;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/

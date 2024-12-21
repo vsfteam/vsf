@@ -219,6 +219,8 @@
 #   define VSF_LINUX_USE_BUSYBOX                        ENABLED
 #   define VSF_LINUX_USE_SOCKET                         ENABLED
 #       define VSF_LINUX_SOCKET_USE_INET                VSF_USE_LWIP
+//      lwip in opensource SDK does not support netlink
+#       define VSF_LINUX_SOCKET_USE_NETLINK             DISABLED
 #       define VSF_LINUX_SOCKET_USE_UNIX                ENABLED
 #   define VSF_LINUX_USE_DEVFS                          ENABLED
 #       define VSF_LINUX_DEVFS_USE_RAND                 ENABLED
