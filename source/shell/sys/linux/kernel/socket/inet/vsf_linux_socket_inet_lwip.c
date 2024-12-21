@@ -36,7 +36,10 @@
 #   include "../../../include/arpa/inet.h"
 #   include "../../../include/ifaddrs.h"
 #   include "../../../include/poll.h"
-#   include "../../include/fcntl.h"
+#   include "../../../include/fcntl.h"
+#   if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
+#       include "../../../include/linux/netlink.h"
+#   endif
 #else
 #   include <unistd.h>
 #   include <errno.h>
@@ -49,6 +52,9 @@
 #   include <ifaddrs.h>
 #   include <poll.h>
 #   include <fcntl.h>
+#   if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
+#       include <linux/netlink.h>
+#   endif
 #endif
 #include "../vsf_linux_socket.h"
 
@@ -79,6 +85,10 @@
 #   error LWIP_SO_RCVBUF MUST be enabled for SO_RCVBUF control in setsockopt/getsockopt
 #endif
 
+#if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED && !LWIP_NETIF_EXT_STATUS_CALLBACK
+#   error LWIP_NETIF_EXT_STATUS_CALLBACK MUST be enabled to support netlink socket
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define inet_addr_from_ip4addr(target_inaddr, source_ipaddr) ((target_inaddr)->s_addr = ip4_addr_get_u32(source_ipaddr))
@@ -103,6 +113,18 @@ typedef union vsf_linux_sockaddr_t {
     struct sockaddr_in      in;
     struct sockaddr_in6     in6;
 } vsf_linux_sockaddr_t;
+
+#if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
+typedef struct vsf_linux_socket_netlink_priv_t {
+    implement(vsf_linux_socket_priv_t)
+
+    vsf_dlist_node_t node;
+    uint32_t groups;
+    union {
+        netif_ext_callback_t ext_cb;
+    };
+} vsf_linux_socket_netlink_priv_t;
+#endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -129,7 +151,20 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
 static int __vsf_linux_socket_inet_getpeername(vsf_linux_socket_priv_t *socket_priv, struct sockaddr *addr, socklen_t *addrlen);
 static int __vsf_linux_socket_inet_getsockname(vsf_linux_socket_priv_t *socket_priv, struct sockaddr *addr, socklen_t *addrlen);
 
+#if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
+static int __vsf_linux_socket_netlink_init(vsf_linux_fd_t *sfd);
+static int __vsf_linux_socket_netlink_fini(vsf_linux_socket_priv_t *socket_priv, int how);
+static ssize_t __vsf_linux_socket_netlink_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
+static int __vsf_linux_socket_netlink_bind(vsf_linux_socket_priv_t *socket_priv, const struct sockaddr *addr, socklen_t addrlen);
+#endif
+
 /*============================ LOCAL VARIABLES ===============================*/
+
+#if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
+static bool __vsf_linux_netlink_is_callback_installed = false;
+static vsf_dlist_t __vsf_linux_netlink_priv_list = { 0 };
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vsf_linux_socket_op_t vsf_linux_socket_inet_op = {
@@ -152,6 +187,19 @@ const vsf_linux_socket_op_t vsf_linux_socket_inet_op = {
     .fn_getpeername     = __vsf_linux_socket_inet_getpeername,
     .fn_getsockname     = __vsf_linux_socket_inet_getsockname,
 };
+
+#if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
+const vsf_linux_socket_op_t vsf_linux_socket_netlink_op = {
+    .fdop               = {
+        .priv_size      = sizeof(vsf_linux_socket_netlink_priv_t),
+        .fn_read        = __vsf_linux_socket_netlink_read,
+    },
+
+    .fn_init            = __vsf_linux_socket_netlink_init,
+    .fn_fini            = __vsf_linux_socket_netlink_fini,
+    .fn_bind            = __vsf_linux_socket_netlink_bind,
+};
+#endif
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -1160,6 +1208,95 @@ ssize_t recvfrom(int sockfd, void *buffer, size_t size, int flags,
     return __vsf_linux_socket_inet_recv((vsf_linux_socket_inet_priv_t *)sfd->priv,
                     buffer, size, flags, src_addr, addrlen);
 }
+
+// netlink
+
+#if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
+
+// not compatible with original lwip implementation, lwip need to be fixed to support this
+static void __vsf_linux_socket_lwip_netif_callback(
+        struct netif *netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t *args)
+{
+    bool triggered;
+
+    __vsf_dlist_foreach_unsafe(vsf_linux_socket_netlink_priv_t, node, &__vsf_linux_netlink_priv_list) {
+        triggered = false;
+        switch (reason) {
+        case LWIP_NSC_NETIF_ADDED:
+            if (_->groups & RTMGRP_LINK) {
+                triggered = true;
+            }
+            break;
+        case LWIP_NSC_NETIF_REMOVED:
+            if (_->groups & RTMGRP_LINK) {
+                triggered = true;
+            }
+            break;
+        case LWIP_NSC_IPV4_ADDRESS_CHANGED:
+            if (_->groups & RTMGRP_IPV4_IFADDR) {
+                triggered = true;
+            }
+            break;
+        }
+
+        if (triggered) {
+            vsf_linux_fd_set_status(&_->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
+        }
+    }
+}
+
+static int __vsf_linux_socket_netlink_init(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_socket_priv_t *socket_priv = (vsf_linux_socket_priv_t *)sfd->priv;
+    vsf_linux_socket_netlink_priv_t *priv = (vsf_linux_socket_netlink_priv_t *)socket_priv;
+
+    switch (socket_priv->type) {
+    case SOCK_RAW:
+        switch (socket_priv->protocol) {
+        case NETLINK_ROUTE:
+            if (!__vsf_linux_netlink_is_callback_installed) {
+                __vsf_linux_netlink_is_callback_installed = true;
+                netif_add_ext_callback(&priv->ext_cb, __vsf_linux_socket_lwip_netif_callback);
+            }
+
+            vsf_dlist_add_to_head(vsf_linux_socket_netlink_priv_t, node, &__vsf_linux_netlink_priv_list, priv);
+            return 0;
+        }
+        break;
+    }
+    return -1;
+}
+
+static int __vsf_linux_socket_netlink_fini(vsf_linux_socket_priv_t *socket_priv, int how)
+{
+    vsf_linux_socket_netlink_priv_t *priv = (vsf_linux_socket_netlink_priv_t *)socket_priv;
+
+    switch (socket_priv->type) {
+    case SOCK_RAW:
+        switch (socket_priv->protocol) {
+        case NETLINK_ROUTE:
+            vsf_dlist_remove(vsf_linux_socket_netlink_priv_t, node, &__vsf_linux_netlink_priv_list, priv);
+            return 0;
+        }
+        break;
+    }
+    return -1;
+}
+
+static int __vsf_linux_socket_netlink_bind(vsf_linux_socket_priv_t *socket_priv, const struct sockaddr *addr, socklen_t addrlen)
+{
+    struct sockaddr_nl *addr_nl = (struct sockaddr_nl *) addr;
+    vsf_linux_socket_netlink_priv_t *priv = (vsf_linux_socket_netlink_priv_t *)socket_priv;
+    priv->groups = addr_nl->nl_groups;
+    return 0;
+}
+
+static ssize_t __vsf_linux_socket_netlink_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    return 0;
+}
+
+#endif
 
 // ifaddrs.h
 int getifaddrs(struct ifaddrs **ifaddrs)

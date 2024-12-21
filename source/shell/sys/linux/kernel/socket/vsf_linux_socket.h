@@ -89,6 +89,9 @@ extern const vsf_linux_socket_op_t vsf_linux_socket_unix_op;
 #if VSF_LINUX_SOCKET_USE_INET == ENABLED
 extern const vsf_linux_socket_op_t vsf_linux_socket_inet_op;
 #endif
+#if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
+extern const vsf_linux_socket_op_t vsf_linux_socket_netlink_op;
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/

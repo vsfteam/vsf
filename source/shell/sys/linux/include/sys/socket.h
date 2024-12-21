@@ -28,6 +28,7 @@ extern "C" {
 #define PF_UNIX                 PF_LOCAL
 #define PF_INET                 2
 #define PF_INET6                10
+#define PF_NETLINK              16
 #define PF_PACKET               17
 
 // standard address families
@@ -37,6 +38,7 @@ extern "C" {
 #define AF_FILE                 PF_FILE
 #define AF_INET                 PF_INET
 #define AF_INET6                PF_INET6
+#define AF_NETLINK              PF_NETLINK
 #define AF_PACKET               PF_PACKET
 
 #define SOL_IP                  IPPROTO_IP

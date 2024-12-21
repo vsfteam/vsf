@@ -464,6 +464,10 @@ int socket(int domain, int type, int protocol)
     case AF_INET6:
         sockop = &vsf_linux_socket_inet_op; break;
 #endif
+#if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
+    case AF_NETLINK:
+        sockop = &vsf_linux_socket_netlink_op; break;
+#endif
     default: return -1;
     }
 
