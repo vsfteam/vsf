@@ -120,9 +120,6 @@ typedef struct vsf_linux_socket_netlink_priv_t {
 
     vsf_dlist_node_t node;
     uint32_t groups;
-    union {
-        netif_ext_callback_t ext_cb;
-    };
 } vsf_linux_socket_netlink_priv_t;
 #endif
 
@@ -163,6 +160,7 @@ static int __vsf_linux_socket_netlink_bind(vsf_linux_socket_priv_t *socket_priv,
 #if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
 static bool __vsf_linux_netlink_is_callback_installed = false;
 static vsf_dlist_t __vsf_linux_netlink_priv_list = { 0 };
+netif_ext_callback_t __vsf_linux_netlink_lwip_netif_cb;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -1256,7 +1254,7 @@ static int __vsf_linux_socket_netlink_init(vsf_linux_fd_t *sfd)
         case NETLINK_ROUTE:
             if (!__vsf_linux_netlink_is_callback_installed) {
                 __vsf_linux_netlink_is_callback_installed = true;
-                netif_add_ext_callback(&priv->ext_cb, __vsf_linux_socket_lwip_netif_callback);
+                netif_add_ext_callback(&__vsf_linux_netlink_lwip_netif_cb, __vsf_linux_socket_lwip_netif_callback);
             }
 
             vsf_dlist_add_to_head(vsf_linux_socket_netlink_priv_t, node, &__vsf_linux_netlink_priv_list, priv);
