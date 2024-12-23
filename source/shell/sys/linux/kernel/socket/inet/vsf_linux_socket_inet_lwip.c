@@ -711,13 +711,12 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
             inet6_addr_to_ip6addr(&multi_addr, &imr->ipv6mr_multiaddr);
             LOCK_TCPIP_CORE();
             netif = netif_get_by_index((u8_t)imr->ipv6mr_interface);
-            UNLOCK_TCPIP_CORE();
             if (netif == NULL) {
+                UNLOCK_TCPIP_CORE();
                 return EADDRNOTAVAIL;
             }
 
             if (optname == IPV6_JOIN_GROUP) {
-                LOCK_TCPIP_CORE();
                 mld6_err = mld6_joingroup_netif(netif, &multi_addr);
                 UNLOCK_TCPIP_CORE();
                 if (mld6_err != ERR_OK) {
@@ -734,6 +733,12 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
                 ip6_addr_copy(group->ip6.multi_addr, multi_addr);
                 vsf_dlist_add_to_head(vsf_linux_socket_group_t, node, &priv->group_list, group);
             } else {
+                mld6_err = mld6_leavegroup_netif(netif, &multi_addr);
+                UNLOCK_TCPIP_CORE();
+                if (mld6_err != ERR_OK) {
+                    return EADDRNOTAVAIL;
+                }
+
                 __vsf_dlist_foreach_unsafe(vsf_linux_socket_group_t, node, &priv->group_list) {
                     if ((_->ip6.netif == netif) && ip6_addr_cmp(&group->ip6.multi_addr, &multi_addr)) {
                         group = _;
@@ -742,13 +747,6 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
                 if (group != NULL) {
                     vsf_dlist_remove(vsf_linux_socket_group_t, node, &priv->group_list, group);
                     vsf_heap_free(group);
-
-                    LOCK_TCPIP_CORE();
-                    mld6_err = mld6_leavegroup_netif(netif, &multi_addr);
-                    UNLOCK_TCPIP_CORE();
-                    if (mld6_err != ERR_OK) {
-                        return EADDRNOTAVAIL;
-                    }
                 }
             }
         }
