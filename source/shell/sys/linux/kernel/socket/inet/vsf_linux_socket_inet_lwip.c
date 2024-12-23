@@ -265,6 +265,26 @@ const vsf_linux_socket_op_t vsf_linux_socket_netlink_op = {
 #   pragma GCC diagnostic ignored "-Wcast-align"
 #endif
 
+// lwip weak implementations for compatibility
+
+VSF_CAL_WEAK(netif_get_by_index)
+struct netif * netif_get_by_index(u8_t idx)
+{
+  struct netif *netif;
+
+  LWIP_ASSERT_CORE_LOCKED();
+
+  if (idx != NETIF_NO_INDEX) {
+    NETIF_FOREACH(netif) {
+      if (idx == netif_get_index(netif)) {
+        return netif; /* found! */
+      }
+    }
+  }
+
+  return NULL;
+}
+
 // helper
 static void __sockaddr_to_ipaddr_port(const struct sockaddr *sockaddr, ip_addr_t *ipaddr, u16_t *port)
 {
