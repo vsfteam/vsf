@@ -614,6 +614,7 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
                 }
                 if (group != NULL) {
                     vsf_dlist_remove(vsf_linux_socket_group_t, node, &priv->group_list, group);
+                    vsf_heap_free(group);
                     igmp_err = igmp_leavegroup(&if_addr, &multi_addr);
                     if (igmp_err != ERR_OK) {
                         return EADDRNOTAVAIL;
@@ -693,6 +694,7 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
                 }
                 if (group != NULL) {
                     vsf_dlist_remove(vsf_linux_socket_group_t, node, &priv->group_list, group);
+                    vsf_heap_free(group);
                     mld6_err = mld6_leavegroup_netif(netif, &multi_addr);
                     if (mld6_err != ERR_OK) {
                         return EADDRNOTAVAIL;
