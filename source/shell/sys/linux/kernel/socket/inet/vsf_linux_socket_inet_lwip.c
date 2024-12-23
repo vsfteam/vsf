@@ -1351,14 +1351,20 @@ static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd)
         ip_addr_t multi_addr, if_addr;
 
         __vsf_dlist_foreach_next_unsafe(vsf_linux_socket_group_t, node, &priv->group_list) {
+#if LWIP_IPV6
             if (AF_INET6 == _->family) {
                 ip_addr_copy_from_ip6(multi_addr, _->ip6.multi_addr);
                 netconn_join_leave_group_netif(conn, &multi_addr, netif_get_index(_->ip6.netif), NETCONN_LEAVE);
-            } else {
+            } else
+#endif
+#if LWIP_IPV4
+            if (AF_INET == _->family) {
                 ip_addr_copy_from_ip4(multi_addr, _->ip4.multi_addr);
                 ip_addr_copy_from_ip4(if_addr, _->ip4.if_addr);
                 netconn_join_leave_group(conn, &multi_addr, &if_addr, NETCONN_LEAVE);
             }
+#endif
+            vsf_dlist_remove(vsf_linux_socket_group_t, node, &priv->group_list, _);
             vsf_heap_free(_);
         }
     }
