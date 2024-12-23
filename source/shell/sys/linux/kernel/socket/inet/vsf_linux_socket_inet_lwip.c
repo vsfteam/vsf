@@ -267,6 +267,13 @@ const vsf_linux_socket_op_t vsf_linux_socket_netlink_op = {
 
 // lwip weak implementations for compatibility
 
+#ifndef netif_get_index
+#   define netif_get_index(netif)           ((u8_t)((netif)->num + 1))
+#endif
+#ifndef LWIP_ASSERT_CORE_LOCKED
+#   define LWIP_ASSERT_CORE_LOCKED()
+#endif
+
 VSF_CAL_WEAK(netif_get_by_index)
 struct netif * netif_get_by_index(u8_t idx)
 {
@@ -275,7 +282,7 @@ struct netif * netif_get_by_index(u8_t idx)
   LWIP_ASSERT_CORE_LOCKED();
 
   if (idx != 0) {
-    NETIF_FOREACH(netif) {
+    for ((netif) = netif_list; (netif) != NULL; (netif) = (netif)->next) {
       if (idx == netif_get_index(netif)) {
         return netif; /* found! */
       }
