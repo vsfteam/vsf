@@ -285,6 +285,24 @@ struct netif * netif_get_by_index(u8_t idx)
   return NULL;
 }
 
+VSF_CAL_WEAK(netconn_recv_udp_raw_netbuf_flags)
+err_t netconn_recv_udp_raw_netbuf_flags(struct netconn *conn, struct netbuf **new_buf, u8_t apiflags)
+{
+    return netconn_recv(conn, new_buf);
+}
+
+VSF_CAL_WEAK(netconn_recv_tcp_pbuf_flags)
+err_t netconn_recv_tcp_pbuf_flags(struct netconn *conn, struct pbuf **new_buf, u8_t apiflags)
+{
+    return netconn_recv_tcp_pbuf(conn, new_buf);
+}
+
+VSF_CAL_WEAK(netconn_prepare_delete)
+err_t netconn_prepare_delete(struct netconn *conn)
+{
+    return netconn_delete(conn);
+}
+
 // helper
 static void __sockaddr_to_ipaddr_port(const struct sockaddr *sockaddr, ip_addr_t *ipaddr, u16_t *port)
 {
@@ -1116,9 +1134,7 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
     recv_next:
         if ((type == NETCONN_UDP) || (type == NETCONN_RAW)) {
             struct netbuf *netbuf;
-            err = netconn_recv(conn, &netbuf);
-            // for the latest lwip, use netconn_recv_udp_raw_netbuf_flags
-//            err = netconn_recv_udp_raw_netbuf_flags(conn, &netbuf, flags);
+            err = netconn_recv_udp_raw_netbuf_flags(conn, &netbuf, flags);
             if (ERR_OK == err) {
                 if (priv->last.netbuf != NULL) {
                     netbuf_chain(priv->last.netbuf, netbuf);
@@ -1128,9 +1144,7 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
             }
         } else if (type == NETCONN_TCP) {
             struct pbuf *pbuf;
-            err = netconn_recv_tcp_pbuf(conn, &pbuf);
-            // for the latest lwip, use netconn_recv_tcp_pbuf_flags
-//            err = netconn_recv_tcp_pbuf_flags(conn, &pbuf, flags);
+            err = netconn_recv_tcp_pbuf_flags(conn, &pbuf, flags);
             if (ERR_OK == err) {
                 if (priv->last.pbuf != NULL) {
                     pbuf_chain(priv->last.pbuf, pbuf);
@@ -1392,9 +1406,7 @@ static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd)
     }
 
     conn->socket = 0;
-    // for the latest lwip, use netconn_prepare_delete
-//    netconn_prepare_delete(conn);
-    netconn_delete(conn);
+    netconn_prepare_delete(conn);
     return 0;
 }
 
