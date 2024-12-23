@@ -167,8 +167,11 @@ struct linger {
 #define IPV6_MULTICAST_IF       17
 #define IPV6_MULTICAST_HOPS     18
 #define IPV6_MULTICAST_LOOP     19
-#define IPV6_ADD_MEMBERSHIP     20
-#define IPV6_DROP_MEMBERSHIP    21
+#define IPV6_JOIN_GROUP         20
+#define IPV6_ADD_MEMBERSHIP     IPV6_JOIN_GROUP
+#define IPV6_LEAVE_GROUP        21
+#define IPV6_DROP_MEMBERSHIP    IPV6_LEAVE_GROUP
+#define IPV6_V6ONLY             26
 
 // flags for send/recv
 enum {

@@ -70,7 +70,8 @@
 #include "lwip/tcp.h"
 #include "lwip/udp.h"
 #include "lwip/dns.h"
-
+#include "lwip/mld6.h"
+#include "lwip/igmp.h"
 #if LWIP_RAW
 #   include "lwip/raw.h"
 #endif
@@ -95,16 +96,59 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define inet_addr_from_ip4addr(target_inaddr, source_ipaddr) ((target_inaddr)->s_addr = ip4_addr_get_u32(source_ipaddr))
-#define inet_addr_to_ip4addr(target_ipaddr, source_inaddr)   (ip4_addr_set_u32(target_ipaddr, (source_inaddr)->s_addr))
-#define inet_addr_to_ip4addr_p(target_ip4addr_p, source_inaddr)   ((target_ip4addr_p) = (ip4_addr_t*)&((source_inaddr)->s_addr))
+#if LWIP_IPV4
+#   define inet_addr_from_ip4addr(target_inaddr, source_ipaddr)                 \
+        ((target_inaddr)->s_addr = ip4_addr_get_u32(source_ipaddr))
+#   define inet_addr_to_ip4addr(target_ipaddr, source_inaddr)                   \
+        (ip4_addr_set_u32(target_ipaddr, (source_inaddr)->s_addr))
+#   define inet_addr_to_ip4addr_p(target_ip4addr_p, source_inaddr)              \
+        ((target_ip4addr_p) = (ip4_addr_t*)&((source_inaddr)->s_addr))
+#endif
+
+#if LWIP_IPV6
+#   define inet6_addr_from_ip6addr(target_in6addr, source_ip6addr)              \
+        {                                                                       \
+            (target_in6addr)->s6_addr32[0] = (source_ip6addr)->addr[0];         \
+            (target_in6addr)->s6_addr32[1] = (source_ip6addr)->addr[1];         \
+            (target_in6addr)->s6_addr32[2] = (source_ip6addr)->addr[2];         \
+            (target_in6addr)->s6_addr32[3] = (source_ip6addr)->addr[3];         \
+        }
+#   define inet6_addr_to_ip6addr(target_ip6addr, source_in6addr)                \
+        {                                                                       \
+            (target_ip6addr)->addr[0] = (source_in6addr)->s6_addr32[0];         \
+            (target_ip6addr)->addr[1] = (source_in6addr)->s6_addr32[1];         \
+            (target_ip6addr)->addr[2] = (source_in6addr)->s6_addr32[2];         \
+            (target_ip6addr)->addr[3] = (source_in6addr)->s6_addr32[3];         \
+            ip6_addr_clear_zone(target_ip6addr);                                \
+        }
+#endif /* LWIP_IPV6 */
 
 /*============================ TYPES =========================================*/
+
+typedef struct vsf_linux_socket_group_t {
+    vsf_dlist_node_t        node;
+    sa_family_t             family;
+    union {
+#if LWIP_IPV6
+        struct {
+            ip6_addr_t      multi_addr;
+            struct netif    *netif;
+        } ip6;
+#endif
+#if LWIP_IPV4
+        struct {
+            ip4_addr_t      multi_addr;
+            ip4_addr_t      if_addr;
+        } ip4;
+#endif
+    };
+} vsf_linux_socket_group_t;
 
 typedef struct vsf_linux_socket_inet_priv_t {
     implement(vsf_linux_socket_priv_t)
 
     struct netconn          *conn;
+    vsf_dlist_t             group_list;
     struct {
         struct netbuf       *netbuf;
         struct pbuf         *pbuf;
@@ -535,6 +579,50 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
             }
             break;
 #endif
+#if LWIP_IGMP
+        case IP_ADD_MEMBERSHIP:
+        case IP_DROP_MEMBERSHIP: {
+            err_t igmp_err;
+            const struct ip_mreq *imr = (const struct ip_mreq *)optval;
+            vsf_linux_socket_group_t *group = NULL;
+            ip4_addr_t if_addr;
+            ip4_addr_t multi_addr;
+
+            inet_addr_to_ip4addr(&if_addr, &imr->imr_interface);
+            inet_addr_to_ip4addr(&multi_addr, &imr->imr_multiaddr);
+            if (optname == IP_ADD_MEMBERSHIP) {
+                igmp_err = igmp_joingroup(&if_addr, &multi_addr);
+                if (igmp_err != ERR_OK) {
+                    return EADDRNOTAVAIL;
+                }
+
+                group = vsf_heap_malloc(sizeof(*group));
+                if (NULL == group) {
+                    return ENOMEM;
+                }
+
+                group->family = AF_INET;
+                ip4_addr_copy(group->ip4.if_addr, if_addr);
+                ip4_addr_copy(group->ip4.multi_addr, multi_addr);
+                vsf_dlist_add_to_head(vsf_linux_socket_group_t, node, &priv->group_list, group);
+            } else {
+                __vsf_dlist_foreach_unsafe(vsf_linux_socket_group_t, node, &priv->group_list) {
+                    if (    ip4_addr_cmp(&group->ip4.if_addr, &if_addr)
+                        &&  ip4_addr_cmp(&group->ip4.multi_addr, &multi_addr)) {
+                        group = _;
+                    }
+                }
+                if (group != NULL) {
+                    vsf_dlist_remove(vsf_linux_socket_group_t, node, &priv->group_list, group);
+                    igmp_err = igmp_leavegroup(&if_addr, &multi_addr);
+                    if (igmp_err != ERR_OK) {
+                        return EADDRNOTAVAIL;
+                    }
+                }
+            }
+        }
+        break;
+#endif
         }
         break;
     case IPPROTO_TCP:
@@ -557,6 +645,69 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
             break;
         }
         break;
+#if LWIP_IPV6
+    case IPPROTO_IPV6:
+        switch (optname) {
+        case IPV6_V6ONLY:
+            if (*(const int *)optval) {
+                netconn_set_ipv6only(conn, 1);
+            } else {
+                netconn_set_ipv6only(conn, 0);
+            }
+            break;
+#   if LWIP_IPV6_MLD
+        case IPV6_JOIN_GROUP:
+        case IPV6_LEAVE_GROUP: {
+            err_t mld6_err;
+            struct netif *netif;
+            ip6_addr_t multi_addr;
+            vsf_linux_socket_group_t *group = NULL;
+            const struct ipv6_mreq *imr = (const struct ipv6_mreq *)optval;
+
+            inet6_addr_to_ip6addr(&multi_addr, &imr->ipv6mr_multiaddr);
+            netif = netif_get_by_index((u8_t)imr->ipv6mr_interface);
+            if (netif == NULL) {
+                return EADDRNOTAVAIL;
+            }
+
+            if (optname == IPV6_JOIN_GROUP) {
+                mld6_err = mld6_joingroup_netif(netif, &multi_addr);
+                if (mld6_err != ERR_OK) {
+                    return EADDRNOTAVAIL;
+                }
+
+                group = vsf_heap_malloc(sizeof(*group));
+                if (NULL == group) {
+                    return ENOMEM;
+                }
+
+                group->family = AF_INET6;
+                group->ip6.netif = netif;
+                ip6_addr_copy(group->ip6.multi_addr, multi_addr);
+                vsf_dlist_add_to_head(vsf_linux_socket_group_t, node, &priv->group_list, group);
+            } else {
+                __vsf_dlist_foreach_unsafe(vsf_linux_socket_group_t, node, &priv->group_list) {
+                    if ((_->ip6.netif == netif) && ip6_addr_cmp(&group->ip6.multi_addr, &multi_addr)) {
+                        group = _;
+                    }
+                }
+                if (group != NULL) {
+                    vsf_dlist_remove(vsf_linux_socket_group_t, node, &priv->group_list, group);
+                    mld6_err = mld6_leavegroup_netif(netif, &multi_addr);
+                    if (mld6_err != ERR_OK) {
+                        return EADDRNOTAVAIL;
+                    }
+                }
+            }
+        }
+        break;
+#   endif
+        default:
+            VSF_LINUX_ASSERT(false);
+            break;
+        }
+        break;
+#endif
     default:
         // TODO: add support
         VSF_LINUX_ASSERT(false);
@@ -702,6 +853,18 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
             break;
         }
         break;
+#if LWIP_IPV6
+    case IPPROTO_IPV6:
+      switch (optname) {
+        case IPV6_V6ONLY:
+          *(int *)optval = (netconn_get_ipv6only(conn) ? 1 : 0);
+          break;
+        default:
+          VSF_LINUX_ASSERT(false);
+          break;
+      }
+      break;
+#endif
     default:
         // TODO: add support
         VSF_LINUX_ASSERT(false);
@@ -1084,19 +1247,10 @@ static void __vsf_linux_socket_inet_lwip_evthandler(struct netconn *conn, enum n
 
 static struct netif * __vsf_linux_lwip_get_netif_by_ifreq(struct ifreq *ifr)
 {
-    extern struct netif *netif_list;
-    struct netif *netif = netif_list;
-
-    for (; netif != NULL; netif = netif->next) {
-        if (ifr->ifr_name[0] != '\0') {
-            if (    (ifr->ifr_name[0] == netif->name[0])
-                &&  (ifr->ifr_name[1] == netif->name[1])
-                &&  (ifr->ifr_name[2] == '\0')) {
-                return netif;
-            }
-        } else if (ifr->ifr_ifindex == netif->num) {
-            return netif;
-        }
+    if (ifr->ifr_name[0] != '\0') {
+        return netif_find(ifr->ifr_name);
+    } else if (ifr->ifr_ifindex > 0) {
+        return netif_get_by_index(ifr->ifr_ifindex);
     }
     return NULL;
 }
@@ -1193,6 +1347,22 @@ static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd)
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
     struct netconn *conn = priv->conn;
 
+    if (!vsf_dlist_is_empty(&priv->group_list)) {
+        ip_addr_t multi_addr, if_addr;
+
+        __vsf_dlist_foreach_next_unsafe(vsf_linux_socket_group_t, node, &priv->group_list) {
+            if (AF_INET6 == _->family) {
+                ip_addr_copy_from_ip6(multi_addr, _->ip6.multi_addr);
+                netconn_join_leave_group_netif(conn, &multi_addr, netif_get_index(_->ip6.netif), NETCONN_LEAVE);
+            } else {
+                ip_addr_copy_from_ip4(multi_addr, _->ip4.multi_addr);
+                ip_addr_copy_from_ip4(if_addr, _->ip4.if_addr);
+                netconn_join_leave_group(conn, &multi_addr, &if_addr, NETCONN_LEAVE);
+            }
+            vsf_heap_free(_);
+        }
+    }
+
     conn->socket = 0;
     // for the latest lwip, use netconn_prepare_delete
 //    netconn_prepare_delete(conn);
@@ -1265,7 +1435,7 @@ static void __vsf_linux_socket_lwip_netif_callback(
                 struct ifinfomsg *ifinfo = (struct ifinfomsg *)((uint8_t *)msg + NLMSG_ALIGN(sizeof(*msg)));
                 ifinfo->ifi_family = AF_UNSPEC;
                 ifinfo->ifi_type = 0;
-                ifinfo->ifi_index = netif->num;
+                ifinfo->ifi_index = netif_get_index(netif);
                 ifinfo->ifi_flags = __vsf_linux_lwip_netif_flags_to_ifr_flags(netif);
                 // ifi_change is reserved for future use and should be always set to 0xFFFFFFFF
                 ifinfo->ifi_change = 0xFFFFFFFF;
@@ -1283,7 +1453,7 @@ static void __vsf_linux_socket_lwip_netif_callback(
                 struct ifinfomsg *ifinfo = (struct ifinfomsg *)((uint8_t *)msg + NLMSG_ALIGN(sizeof(*msg)));
                 ifinfo->ifi_family = AF_UNSPEC;
                 ifinfo->ifi_type = 0;
-                ifinfo->ifi_index = netif->num;
+                ifinfo->ifi_index = netif_get_index(netif);
                 ifinfo->ifi_flags = __vsf_linux_lwip_netif_flags_to_ifr_flags(netif);
                 // ifi_change is reserved for future use and should be always set to 0xFFFFFFFF
                 ifinfo->ifi_change = 0xFFFFFFFF;
@@ -1311,7 +1481,7 @@ static void __vsf_linux_socket_lwip_netif_callback(
                 ifaddr->ifa_prefixlen = 0;
                 ifaddr->ifa_flags = 0;
                 ifaddr->ifa_scope = 0;
-                ifaddr->ifa_index = netif->num;
+                ifaddr->ifa_index = netif_get_index(netif);
             }
             break;
         }
