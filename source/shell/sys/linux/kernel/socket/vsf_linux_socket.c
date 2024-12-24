@@ -658,7 +658,9 @@ ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags)
 
     sfd->cur_wrflags = flags;
     priv->msg_tx = msg;
-    return writev(sockfd, msg->msg_iov, msg->msg_iovlen);
+    ssize_t result = writev(sockfd, msg->msg_iov, msg->msg_iovlen);
+    priv->msg_tx = NULL;
+    return result;
 }
 
 ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
@@ -671,8 +673,8 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
 
     sfd->cur_rdflags = flags;
     priv->msg_rx = msg;
-
     ssize_t result = readv(sockfd, msg->msg_iov, msg->msg_iovlen);
+    priv->msg_rx = NULL;
     return result;
 }
 
