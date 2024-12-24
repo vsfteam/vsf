@@ -128,6 +128,12 @@ struct ip_mreq {
     struct in_addr          imr_interface;
 };
 
+struct in_pktinfo {
+    int                     ipi_ifindex;
+    struct in_addr          ipi_spec_dst;
+    struct in_addr          ipi_addr;
+};
+
 #define INET6_ADDRSTRLEN        46
 #define IN6ADDR_ANY_INIT        { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 #define IN6ADDR_LOOPBACK_INIT   { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 }

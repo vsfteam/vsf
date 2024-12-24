@@ -606,6 +606,15 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
         case IP_TOS:
             conn->pcb.ip->tos = (u8_t)(*(const int*)optval);
             break;
+#if LWIP_NETBUF_RECVINFO
+        case IP_PKTINFO:
+            if (*(const int *)optval) {
+                conn->flags |= NETCONN_FLAG_PKTINFO;
+            } else {
+                conn->flags &= ~NETCONN_FLAG_PKTINFO;
+            }
+            break;
+#endif
 #if LWIP_MULTICAST_TX_OPTIONS
         case IP_MULTICAST_TTL:
             udp_set_multicast_ttl(conn->pcb.udp, (u8_t)(*(const u8_t*)optval));
@@ -1140,6 +1149,7 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
 static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, void *buffer, size_t size, int flags,
                     struct sockaddr *src_addr, socklen_t *addrlen)
 {
+    struct msghdr *msg = priv->msg_rx;
     struct netconn *conn = priv->conn;
     enum netconn_type type = NETCONNTYPE_GROUP(netconn_type(conn));
     u16_t len = 0, pos = 0;
@@ -1190,12 +1200,39 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
         pbuf = priv->last.pbuf;
     }
 
-
     u16_t curlen = LWIP_MIN(pbuf->tot_len, size);
     pbuf_copy_partial(pbuf, buffer, curlen, pos);
     len += curlen;
     size -= curlen;
     pos += curlen;
+
+    struct netbuf *netbuf = priv->last.netbuf;
+    if ((type == NETCONN_UDP) && (netbuf != NULL) && (msg != NULL) && (msg->msg_control != NULL)) {
+        u8_t wrote_msg = 0;
+#if LWIP_NETBUF_RECVINFO
+        if ((netbuf->flags & NETBUF_FLAG_DESTADDR) && IP_IS_V4(&netbuf->toaddr)) {
+#   if LWIP_IPV4
+            if (msg->msg_controllen >= CMSG_SPACE(sizeof(struct in_pktinfo))) {
+                struct cmsghdr *chdr = CMSG_FIRSTHDR(msg);
+                struct in_pktinfo *pkti = (struct in_pktinfo *)CMSG_DATA(chdr);
+                chdr->cmsg_level = IPPROTO_IP;
+                chdr->cmsg_type = IP_PKTINFO;
+                chdr->cmsg_len = CMSG_LEN(sizeof(struct in_pktinfo));
+                pkti->ipi_ifindex = netbuf->p->if_idx;
+                inet_addr_from_ip4addr(&pkti->ipi_addr, ip_2_ip4(netbuf_destaddr(netbuf)));
+                msg->msg_controllen = CMSG_SPACE(sizeof(struct in_pktinfo));
+                wrote_msg = 1;
+            } else {
+                msg->msg_flags |= MSG_CTRUNC;
+            }
+#   endif
+        }
+#endif
+        if (!wrote_msg) {
+            msg->msg_controllen = 0;
+        }
+    }
+
     if (!(flags & MSG_PEEK)) {
         pbuf = pbuf_free_header(pbuf, curlen);
         if (priv->last.netbuf != NULL) {
@@ -1210,6 +1247,7 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
         pos = 0;
     }
     if ((flags & MSG_WAITALL) && (size > 0)) {
+        VSF_LINUX_ASSERT(type == NETCONN_TCP);
         // PE546 in IAR: transfer of control by0passes initialization of: err
         goto recv_next;
     }

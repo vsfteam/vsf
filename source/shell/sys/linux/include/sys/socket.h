@@ -153,15 +153,16 @@ struct linger {
 #define IP_TTL                  2
 #define IP_HDRINCL              3
 #define IP_OPTIONS              4
+#define IP_PKTINFO              8
 
 // multicast
 // in.h
-#define IP_MULTICAST_IF         5
-#define IP_MULTICAST_TTL        6
-#define IP_MULTICAST_LOOP       7
-#define IP_ADD_MEMBERSHIP       8
-#define IP_DROP_MEMBERSHIP      9
-#define IP_MULTICAST_ALL        31
+#define IP_MULTICAST_IF         32
+#define IP_MULTICAST_TTL        33
+#define IP_MULTICAST_LOOP       34
+#define IP_ADD_MEMBERSHIP       35
+#define IP_DROP_MEMBERSHIP      36
+#define IP_MULTICAST_ALL        49
 // in6.h
 #define IPV6_UNICAST_HOPS       16
 #define IPV6_MULTICAST_IF       17
@@ -181,6 +182,8 @@ enum {
 #define MSG_PEEK                MSG_PEEK
     MSG_DONTROUTE               = 1 << 2,
 #define MSG_DONTROUTE           MSG_DONTROUTE
+    MSG_CTRUNC                  = 1 << 3,
+#define MSG_CTRUNC              MSG_CTRUNC
     MSG_TRUNC                   = 1 << 5,
 #define MSG_TRUNC               MSG_TRUNC
     MSG_DONTWAIT                = 1 << 6,
