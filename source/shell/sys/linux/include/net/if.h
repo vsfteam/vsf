@@ -54,6 +54,14 @@ struct ifreq {
 #define ifr_newname             ifr_ifru.ifru_newname
 #define ifr_settings            ifr_ifru.ifru_settings
 
+struct ifconf {
+    int                         ifc_len;
+    union {
+        char                   *ifc_buf;
+        struct ifreq           *ifc_req;
+    };
+};
+
 #if VSF_LINUX_APPLET_USE_NET_IF == ENABLED
 typedef struct vsf_linux_net_if_vplt_t {
     vsf_vplt_info_t info;

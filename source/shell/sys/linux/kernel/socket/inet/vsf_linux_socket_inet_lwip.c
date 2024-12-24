@@ -1351,8 +1351,35 @@ static int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uint
         u.ifr->ifr_name[2] = '\0';
         return 0;
         break;
-    case SIOCGIFCONF:
-        // TODO: add support
+    case SIOCGIFCONF: {
+            struct ifreq *ifr = u.ifconf->ifc_req;
+            int ifr_num = 0;
+
+            LOCK_TCPIP_CORE();
+
+            if (NULL == ifr) {
+                u.ifconf->ifc_len = INT_MAX;
+            }
+
+            extern struct netif *netif_list;
+            for (struct netif *netif = netif_list; netif != NULL; netif = netif->next) {
+                if (netif_is_up(netif) && (u.ifconf->ifc_len >= sizeof(*ifr))) {
+                    if (ifr != NULL) {
+                        ifr->ifr_name[0] = netif->name[0];
+                        ifr->ifr_name[1] = netif->name[1];
+                        ifr->ifr_name[2] = '\0';
+                        __ipaddr_port_to_sockaddr(&ifr->ifr_addr, &netif->ip_addr, 0);
+
+                        u.ifconf->ifc_len -= sizeof(*ifr);
+                        ifr++;
+                    }
+                    ifr_num++;
+                }
+            }
+            u.ifconf->ifc_len = ifr_num * sizeof(*ifr);
+
+            UNLOCK_TCPIP_CORE();
+        }
         break;
     case SIOCGIFFLAGS:
         netif = __vsf_linux_lwip_get_netif_by_ifreq(u.ifr);
