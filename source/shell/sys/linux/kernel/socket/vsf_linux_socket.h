@@ -76,7 +76,9 @@ vsf_class(vsf_linux_socket_priv_t) {
         int protocol;
         const vsf_linux_socket_op_t *sockop;
     )
-    private_member(
+    protected_member(
+        struct msghdr *msg_rx;
+        const struct msghdr *msg_tx;
         void *sender_process;
     )
 };

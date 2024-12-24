@@ -24,6 +24,8 @@
 // for linux_trigger
 #define __VSF_LINUX_CLASS_INHERIT__
 #define __VSF_LINUX_FS_CLASS_INHERIT__
+// for protected members in vsf_linux_socket_priv_t
+#define __VSF_LINUX_SOCKET_CLASS_INHERIT__
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../../include/unistd.h"
 #   include "../../../include/errno.h"
@@ -84,6 +86,8 @@ extern ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, si
 static int __vsf_linux_socket_unix_close(vsf_linux_fd_t *sfd);
 extern int __vsf_linux_socket_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 
+static ssize_t __vsf_linux_socket_unix_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
+static ssize_t __vsf_linux_socket_unix_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 static int __vsf_linux_socket_unix_init(vsf_linux_fd_t *sfd);
 static int __vsf_linux_socket_unix_socketpair(vsf_linux_fd_t *sfd1, vsf_linux_fd_t *sfd2);
 static int __vsf_linux_socket_unix_fini(vsf_linux_socket_priv_t *socket_priv, int how);
@@ -101,8 +105,8 @@ const vsf_linux_socket_op_t vsf_linux_socket_unix_op = {
     .fdop               = {
         .priv_size      = sizeof(vsf_linux_socket_unix_priv_t),
         .fn_fcntl       = __vsf_linux_pipe_fcntl,
-        .fn_read        = __vsf_linux_stream_read,
-        .fn_write       = __vsf_linux_stream_write,
+        .fn_read        = __vsf_linux_socket_unix_read,
+        .fn_write       = __vsf_linux_socket_unix_write,
         .fn_close       = __vsf_linux_socket_unix_close,
         .fn_stat        = __vsf_linux_socket_stat,
     },
@@ -119,6 +123,85 @@ const vsf_linux_socket_op_t vsf_linux_socket_unix_op = {
 };
 
 /*============================ IMPLEMENTATION ================================*/
+
+static ssize_t __vsf_linux_socket_unix_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    vsf_linux_socket_unix_priv_t *priv = (vsf_linux_socket_unix_priv_t *)sfd->priv;
+    struct msghdr *msg = priv->msg_rx;
+    ssize_t result = __vsf_linux_stream_read(sfd, buf, count);
+
+    if (priv->target != NULL) {
+        struct msghdr *rx_msg = priv->target;
+        priv->target = NULL;
+        if (msg != NULL) {
+            *msg = *rx_msg;
+
+            struct cmsghdr *cmsg = msg->msg_control;
+            struct cmsghdr *rx_cmsg = rx_msg->msg_control;
+            if ((cmsg != NULL) && (msg->msg_control != NULL)) {
+                VSF_LINUX_ASSERT(msg->msg_controllen == rx_msg->msg_controllen);
+                VSF_LINUX_ASSERT(cmsg->cmsg_len == rx_cmsg->cmsg_len);
+                VSF_LINUX_ASSERT(cmsg->cmsg_level == rx_cmsg->cmsg_level);
+                VSF_LINUX_ASSERT(cmsg->cmsg_type == rx_cmsg->cmsg_type);
+                memcpy(cmsg, rx_cmsg, cmsg->cmsg_len);
+
+                void *data = CMSG_DATA(cmsg), *rx_data = CMSG_DATA(rx_cmsg);
+                int datalen = msg->msg_controllen - sizeof(*msg);
+                vsf_linux_process_t *sender_process = priv->sender_process;
+                priv->sender_process = NULL;
+
+                switch (cmsg->cmsg_type) {
+                case SCM_RIGHTS:
+                    while (datalen > 0) {
+                        int fd = *(int *)rx_data;
+                        extern vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd);
+                        vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex(sender_process, fd);
+                        if (NULL == sfd) {
+                            result = -1;
+                            break;
+                        }
+
+                        extern int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
+                            const vsf_linux_fd_op_t *op, int fd_desired, vsf_linux_fd_priv_t *priv);
+                        *(int *)data = __vsf_linux_fd_create_ex(NULL, NULL, sfd->op, -1, sfd->priv);
+                        data = (void *)((uint8_t *)data + sizeof(int));
+                        rx_data = (void *)((uint8_t *)rx_data + sizeof(int));
+                        VSF_LINUX_ASSERT(datalen >= sizeof(int));
+                        datalen -= sizeof(int);
+                    }
+                    break;
+                default:
+                    VSF_LINUX_ASSERT(false);
+                    break;
+                }
+            }
+        }
+        __free_ex(vsf_linux_resources_process(), rx_msg);
+    }
+
+    return result;
+}
+
+static ssize_t __vsf_linux_socket_unix_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
+{
+    vsf_linux_socket_unix_priv_t *priv = (vsf_linux_socket_unix_priv_t *)sfd->priv;
+    const struct msghdr *msg = priv->msg_tx;
+
+    if ((msg->msg_control != NULL) && (msg->msg_controllen > 0)) {
+        VSF_LINUX_ASSERT(NULL == priv->target);
+        struct msghdr *tx_msg = __malloc_ex(vsf_linux_resources_process(), sizeof(*msg) + msg->msg_controllen);
+        if (NULL == priv->target) {
+            return -1;
+        }
+
+        *tx_msg = *msg;
+        tx_msg->msg_control = (void *)&tx_msg[1];
+        memcpy(tx_msg->msg_control, msg->msg_control, msg->msg_controllen);
+        priv->target = tx_msg;
+        priv->sender_process = vsf_linux_get_cur_process();
+    }
+    return __vsf_linux_stream_write(sfd, buf, count);
+}
 
 static int __vsf_linux_socket_unix_close(vsf_linux_fd_t *sfd)
 {

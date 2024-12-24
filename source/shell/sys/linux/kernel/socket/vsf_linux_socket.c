@@ -654,23 +654,10 @@ ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags)
     if (!sfd) {
         return -1;
     }
-
     vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-    if ((msg->msg_control != NULL) && (msg->msg_controllen > 0)) {
-        VSF_LINUX_ASSERT(NULL == priv->target);
-        struct msghdr *tx_msg = __malloc_ex(vsf_linux_resources_process(), sizeof(*msg) + msg->msg_controllen);
-        if (NULL == priv->target) {
-            return -1;
-        }
-
-        *tx_msg = *msg;
-        tx_msg->msg_control = (void *)&tx_msg[1];
-        memcpy(tx_msg->msg_control, msg->msg_control, msg->msg_controllen);
-        priv->target = tx_msg;
-        priv->sender_process = vsf_linux_get_cur_process();
-    }
 
     sfd->cur_wrflags = flags;
+    priv->msg_tx = msg;
     return writev(sockfd, msg->msg_iov, msg->msg_iovlen);
 }
 
@@ -680,59 +667,12 @@ ssize_t recvmsg(int sockfd, struct msghdr *msg, int flags)
     if (!sfd) {
         return -1;
     }
+    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
+
     sfd->cur_rdflags = flags;
+    priv->msg_rx = msg;
 
     ssize_t result = readv(sockfd, msg->msg_iov, msg->msg_iovlen);
-
-    vsf_linux_socket_priv_t *priv = (vsf_linux_socket_priv_t *)sfd->priv;
-    if (priv->target != NULL) {
-        struct msghdr *rx_msg = priv->target;
-        priv->target = NULL;
-        if (msg != NULL) {
-            *msg = *rx_msg;
-
-            struct cmsghdr *cmsg = msg->msg_control;
-            struct cmsghdr *rx_cmsg = rx_msg->msg_control;
-            if ((cmsg != NULL) && (msg->msg_control != NULL)) {
-                VSF_LINUX_ASSERT(msg->msg_controllen == rx_msg->msg_controllen);
-                VSF_LINUX_ASSERT(cmsg->cmsg_len == rx_cmsg->cmsg_len);
-                VSF_LINUX_ASSERT(cmsg->cmsg_level == rx_cmsg->cmsg_level);
-                VSF_LINUX_ASSERT(cmsg->cmsg_type == rx_cmsg->cmsg_type);
-                memcpy(cmsg, rx_cmsg, cmsg->cmsg_len);
-
-                void *data = CMSG_DATA(cmsg), *rx_data = CMSG_DATA(rx_cmsg);
-                int datalen = msg->msg_controllen - sizeof(*msg);
-                vsf_linux_process_t *sender_process = priv->sender_process;
-                priv->sender_process = NULL;
-
-                switch (cmsg->cmsg_type) {
-                case SCM_RIGHTS:
-                    while (datalen > 0) {
-                        int fd = *(int *)rx_data;
-                        extern vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd);
-                        vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex(sender_process, fd);
-                        if (NULL == sfd) {
-                            result = -1;
-                            break;
-                        }
-
-                        extern int __vsf_linux_fd_create_ex(vsf_linux_process_t *process, vsf_linux_fd_t **sfd,
-                            const vsf_linux_fd_op_t *op, int fd_desired, vsf_linux_fd_priv_t *priv);
-                        *(int *)data = __vsf_linux_fd_create_ex(NULL, NULL, sfd->op, -1, sfd->priv);
-                        data = (void *)((uint8_t *)data + sizeof(int));
-                        rx_data = (void *)((uint8_t *)rx_data + sizeof(int));
-                        VSF_LINUX_ASSERT(datalen >= sizeof(int));
-                        datalen -= sizeof(int);
-                    }
-                    break;
-                default:
-                    VSF_LINUX_ASSERT(false);
-                    break;
-                }
-            }
-        }
-        __free_ex(vsf_linux_resources_process(), rx_msg);
-    }
     return result;
 }
 
