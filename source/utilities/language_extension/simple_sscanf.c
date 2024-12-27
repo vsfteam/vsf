@@ -97,7 +97,7 @@ int vsnscanf(const char *str, size_t size, const char *format, va_list ap)
                         buf.seq_buf[seqlen] = *format++;
                         if (!buf.seq_buf[seqlen]) {
                             return -1;
-                        } else if (buf.seq_buf[seqlen] == ']') {
+                        } else if ((buf.seq_buf[seqlen] == ']') && (seqlen > 0)) {
                             break;
                         } else if (buf.seq_buf[seqlen] == '-') {
                             char last = *format++;
