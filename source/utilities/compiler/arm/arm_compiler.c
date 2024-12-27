@@ -37,6 +37,92 @@ void __cexit_call_dtors(void)
     // Please provide test case to author if asserted here
     VSF_ASSERT(false);
 }
+
+// To avoid initialization of c++ static instance on startup, rewrite IAR_DATA_INIT to bypass __iar_cstart_call_ctors
+// code below are copied from isr startup file, data_init
+#if     !defined(_DLIB_ELF_INIT_INTERFACE_VERSION) || !defined(_DLIB_ELF_INIT_TABLE_MEMORY)\
+    ||  !defined(_DLIB_ELF_INIT_SOURCE_MEMORY) || !defined(_DLIB_ELF_INIT_DESTINATION_MEMORY)\
+    ||  !defined(_DLIB_ELF_INIT_FUNCTION_ATTRIBUTES)
+#   error IAR dlib version not supported
+#endif
+
+#ifndef _GLUE
+#   define _GLUE                    VSF_MCONNECT
+#endif
+
+#define TABLE_MEM                   _DLIB_ELF_INIT_TABLE_MEMORY
+#define SRC_MEM                     _DLIB_ELF_INIT_SOURCE_MEMORY
+#define DEST_MEM                    _DLIB_ELF_INIT_DESTINATION_MEMORY
+
+#define IAR_DATA_INIT _GLUE(__iar_data_init, _DLIB_ELF_INIT_INTERFACE_VERSION)
+
+typedef ptrdiff_t                   __data_ptrdiff_t;
+
+typedef _GLUE(SRC_MEM, _ptrdiff_t)  src_index_t;
+typedef _GLUE(SRC_MEM, _size_t)     src_size_t;
+typedef uint8_t SRC_MEM const *     src_ptr_t;
+
+typedef _GLUE(DEST_MEM, _ptrdiff_t) dest_index_t;
+typedef _GLUE(DEST_MEM, _size_t)    dest_size_t;
+typedef uint8_t DEST_MEM      *     dest_ptr_t;
+
+typedef struct
+{
+#if _DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
+  src_index_t  mOff;
+#else // !_DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
+  init_fun_t * mFun;
+#endif // _DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
+} FAddr;
+
+typedef void _DLIB_ELF_INIT_TABLE_MEMORY const * table_ptr_t;
+
+_DLIB_ELF_INIT_FUNCTION_ATTRIBUTES
+typedef table_ptr_t init_fun_t(table_ptr_t);
+
+extern table_ptr_t __iar_cstart_call_ctors(table_ptr_t);
+
+static VSF_CAL_NO_INIT FAddr TABLE_MEM const * __iar_cstart_ctors_pi;
+
+_DLIB_ELF_INIT_FUNCTION_ATTRIBUTES
+static init_fun_t * FAddr_GetPtr(FAddr const TABLE_MEM * me)
+{
+#if _DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
+  return (init_fun_t *)((src_ptr_t)me + me->mOff);
+#else // !_DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
+  return me->mFun;
+#endif // _DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
+}
+
+#pragma section = "Region$$Table" const TABLE_MEM
+_DLIB_ELF_INIT_FUNCTION_ATTRIBUTES
+void IAR_DATA_INIT(void)
+{
+    FAddr TABLE_MEM const * pi = __section_begin("Region$$Table");
+    table_ptr_t             pe = __section_end  ("Region$$Table");
+
+    __iar_cstart_ctors_pi = NULL;
+    while (pi != pe) {
+        init_fun_t * fun = FAddr_GetPtr(pi);
+        ++pi;
+
+        if (fun == __iar_cstart_call_ctors) {
+            VSF_ASSERT(NULL == __iar_cstart_ctors_pi);
+            __iar_cstart_ctors_pi = pi - 1;
+            VSF_ASSERT(pi == pe);
+        } else {
+            pi = fun(pi);
+        }
+    }
+}
+
+void vsf_arch_cpp_startup(void)
+{
+    if (__iar_cstart_ctors_pi != NULL) {
+        init_fun_t * fun = FAddr_GetPtr(__iar_cstart_ctors_pi);
+        fun(__iar_cstart_ctors_pi);
+    }
+}
 #endif
 
 #if __IS_COMPILER_IAR__ || __IS_COMILER_GCC__
