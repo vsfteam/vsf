@@ -370,10 +370,18 @@ void vsf_tgui_sv_port_draw_char(vsf_tgui_t *gui_ptr,
 
 vsf_tgui_region_t* vsf_tgui_v_refresh_loop_begin(vsf_tgui_t *gui_ptr, const vsf_tgui_region_t *planned_refresh_region_ptr)
 {
-    if (!gui_ptr->is_ready) {
+    vsf_protect_t orig = vsf_protect_int();
+#if VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER == ENABLED
+    if (gui_ptr->refresh_pending_cnt > 1) {
+#else
+    if (gui_ptr->refresh_pending_cnt > 0) {
+#endif
+        gui_ptr->refresh_pending_notify = true;
+        vsf_unprotect_int(orig);
         VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View Port] no ready to refresh" VSF_TRACE_CFG_LINEEND);
         return NULL;
     }
+    vsf_unprotect_int(orig);
 
     vsf_tgui_region_t *current_region_ptr = &gui_ptr->current_region;
     vsf_tgui_region_t *request_region_ptr = &gui_ptr->request_region;
@@ -419,12 +427,6 @@ vsf_tgui_region_t* vsf_tgui_v_refresh_loop_begin(vsf_tgui_t *gui_ptr, const vsf_
 
 bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t *gui_ptr)
 {
-    __vsf_sched_safe(
-        if (gui_ptr->is_ready) {
-            gui_ptr->is_ready = false;
-        }
-    )
-
     vsf_tgui_region_t *current_region_ptr = &gui_ptr->current_region;
     vsf_tgui_region_t *request_region_ptr = &gui_ptr->request_region;
 
@@ -445,12 +447,16 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t *gui_ptr)
                  area.size.x, area.size.y);
     vk_disp_refresh(disp, &area, pixmap);
 #if VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER == ENABLED
-    if (gui_ptr->pfb == gui_ptr->pfb) {
-        gui_ptr->pfb = (void *)((uint8_t *)gui_ptr->orig_pfb + gui_ptr->pfb_size);
+    if (gui_ptr->refresh_is_first_pfb) {
+        gui_ptr->pfb = (void *)((uint8_t *)gui_ptr->pfb + gui_ptr->pfb_size);
     } else {
-        gui_ptr->pfb = gui_ptr->orig_pfb;
+        gui_ptr->pfb = (void *)((uint8_t *)gui_ptr->pfb - gui_ptr->pfb_size);
     }
+    gui_ptr->refresh_is_first_pfb = !gui_ptr->refresh_is_first_pfb;
 #endif
+    vsf_protect_t orig = vsf_protect_int();
+        gui_ptr->refresh_pending_cnt++;
+    vsf_unprotect_int(orig);
 
     int request_location_y2 = request_region_ptr->tLocation.iY + request_region_ptr->tSize.iHeight;
     int current_location_y2 = current_region_ptr->tLocation.iY + current_region_ptr->tSize.iHeight;
@@ -471,18 +477,17 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t *gui_ptr)
     }
 }
 
-void vsf_tgui_low_level_on_ready_to_refresh(vsf_tgui_t *gui_ptr)
-{
-    vsf_tgui_low_level_refresh_ready(gui_ptr);
-}
-
 
 static void __vsf_tgui_on_ready(vk_disp_t *disp)
 {
     vsf_tgui_t *gui_ptr = (vsf_tgui_t *)disp->ui_data;
-    gui_ptr->is_ready = true;
 
-    vsf_tgui_low_level_on_ready_to_refresh(gui_ptr);
+    vsf_protect_t orig = vsf_protect_int();
+        gui_ptr->refresh_pending_cnt--;
+    vsf_unprotect_int(orig);
+    if (gui_ptr->refresh_pending_notify) {
+        vsf_tgui_low_level_refresh_ready(gui_ptr);
+    }
 
 #if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
     uint32_t elapse = vsf_systimer_tick_to_ms(vsf_systimer_get_tick() - gui_ptr->start_cnt);
@@ -515,8 +520,11 @@ void vsf_tgui_sv_bind_disp(vsf_tgui_t *gui_ptr, vk_disp_t *disp, void *pfb, size
 
     gui_ptr->disp = disp;
     gui_ptr->pfb = pfb;
+    // refresh_pending_cnt will be decreased once in __vsf_tgui_on_inited
+    gui_ptr->refresh_pending_cnt = 1;
+    gui_ptr->refresh_pending_notify = false;
 #if VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER == ENABLED
-    gui_ptr->orig_pfb = pfb;
+    gui_ptr->refresh_is_first_pfb = true;
     gui_ptr->pfb_size = pfb_size >> 1;
 #else
     gui_ptr->pfb_size = pfb_size;

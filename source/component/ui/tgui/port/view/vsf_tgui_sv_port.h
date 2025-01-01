@@ -46,7 +46,6 @@
 
 #define vsf_tgui_vport_init(__vsf_tgui_v_port_ptr)                              \
     do {                                                                        \
-        (__vsf_tgui_v_port_ptr)->is_ready = false;                              \
         (__vsf_tgui_v_port_ptr)->current_region.tSize.iHeight = 0;              \
         (__vsf_tgui_v_port_ptr)->current_region.tSize.iWidth = 0;               \
     } while(0)
@@ -59,11 +58,12 @@ def_structure(vsf_tgui_v_port_t)
     vk_disp_t *disp;
     void *pfb;
 #if VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER == ENABLED
-    void *orig_pfb;
+    bool refresh_is_first_pfb;
 #endif
+    bool refresh_pending_notify;
+    uint8_t refresh_pending_cnt;
     size_t pfb_size;
 
-    bool is_ready;
 #if VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY == ENABLED
     volatile bool is_draw_ready;
 #endif
