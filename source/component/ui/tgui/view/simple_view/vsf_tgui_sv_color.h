@@ -133,28 +133,39 @@ extern vsf_tgui_sv_color_t vsf_tgui_sv_color_mix(vsf_tgui_sv_color_t color_0, vs
 
 #   if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
 #       define vsf_tgui_sv_color_mix(__color_0, __color_1, __mix) ({            \
-        uint_fast8_t __vsf_tgui_sv_color_mix__ = (__mix);                       \
-        vsf_tgui_sv_color_t __vsf_tgui_sv_color_mix_result__;                   \
-        __vsf_tgui_sv_color_mix_result__.value =                                \
-                (((((__color_0).value >> 8) & 0x00FF00FF) * __vsf_tgui_sv_color_mix__) & 0xFF00FF00)\
-            +   (((((__color_0).value & 0x00FF00FF) * __vsf_tgui_sv_color_mix__) >> 8) & 0x00FF00FF);\
-        __vsf_tgui_sv_color_mix__ = __vsf_tgui_sv_color_mix__ ^ 0xFF;           \
-        __vsf_tgui_sv_color_mix_result__.value +=                               \
-                (((((__color_1).value >> 8) & 0x00FF00FF) * __vsf_tgui_sv_color_mix__) & 0xFF00FF00)    \
-            +   (((((__color_1).value & 0x00FF00FF) * __vsf_tgui_sv_color_mix__) >> 8) & 0x00FF00FF);   \
-        __vsf_tgui_sv_color_mix_alpha();                                        \
-        __vsf_tgui_sv_color_mix_result__;                                       \
-    })
+            uint_fast8_t __vsf_tgui_sv_color_mix__ = (__mix);                   \
+            vsf_tgui_sv_color_t __vsf_tgui_sv_color_mix_result__;               \
+            __vsf_tgui_sv_color_mix_result__.value =                            \
+                    (((((__color_0).value >> 8) & 0x00FF00FF) * __vsf_tgui_sv_color_mix__) & 0xFF00FF00)\
+                +   (((((__color_0).value & 0x00FF00FF) * __vsf_tgui_sv_color_mix__) >> 8) & 0x00FF00FF);\
+            __vsf_tgui_sv_color_mix__ = __vsf_tgui_sv_color_mix__ ^ 0xFF;       \
+            __vsf_tgui_sv_color_mix_result__.value +=                           \
+                    (((((__color_1).value >> 8) & 0x00FF00FF) * __vsf_tgui_sv_color_mix__) & 0xFF00FF00)    \
+                +   (((((__color_1).value & 0x00FF00FF) * __vsf_tgui_sv_color_mix__) >> 8) & 0x00FF00FF);   \
+            __vsf_tgui_sv_color_mix_alpha();                                    \
+            __vsf_tgui_sv_color_mix_result__;                                   \
+        })
+#   elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565
+#       define vsf_tgui_sv_color_mix(__color_0, __color_1, __mix) ({            \
+            vsf_tgui_sv_color_t __vsf_tgui_sv_color_mix_result__;               \
+            uint32_t __vsf_tgui_sv_color_mix0__ = (__color_1).value & 0xF81F;   \
+            __vsf_tgui_sv_color_mix0__ += ((((__color_0).value & 0xF81F) - __vsf_tgui_sv_color_mix0__) * (__mix >> 2)) >> 6;\
+            uint32_t __vsf_tgui_sv_color_mix1__ = (__color_1).value & 0x07E0;   \
+            __vsf_tgui_sv_color_mix1__ += ((((__color_0).value & 0x07E0) - __vsf_tgui_sv_color_mix1__) * (__mix)) >> 8;\
+            __vsf_tgui_sv_color_mix_result__.value = (__vsf_tgui_sv_color_mix0__ & 0xF81F) | (__vsf_tgui_sv_color_mix1__ & 0x07E0);\
+            __vsf_tgui_sv_color_mix_alpha();                                    \
+            __vsf_tgui_sv_color_mix_result__;                                   \
+        })
 #   else
 #       define vsf_tgui_sv_color_mix(__color_0, __color_1, __mix) ({            \
-        vsf_tgui_sv_color_t __vsf_tgui_sv_color_mix_result__;                   \
-        uint_fast8_t __vsf_tgui_sv_color_rmix__ = (__mix) ^ 0xFF;               \
-        __vsf_tgui_sv_color_mix_result__.red     = ((uint32_t)(__color_0).red   * (__mix) + (uint32_t)(__color_1).red   * __vsf_tgui_sv_color_rmix__) / 255;\
-        __vsf_tgui_sv_color_mix_result__.green   = ((uint32_t)(__color_0).green * (__mix) + (uint32_t)(__color_1).green * __vsf_tgui_sv_color_rmix__) / 255;\
-        __vsf_tgui_sv_color_mix_result__.blue    = ((uint32_t)(__color_0).blue  * (__mix) + (uint32_t)(__color_1).blue  * __vsf_tgui_sv_color_rmix__) / 255;\
-        __vsf_tgui_sv_color_mix_alpha();                                        \
-        __vsf_tgui_sv_color_mix_result__;                                       \
-    })
+            vsf_tgui_sv_color_t __vsf_tgui_sv_color_mix_result__;               \
+            uint_fast8_t __vsf_tgui_sv_color_rmix__ = (__mix) ^ 0xFF;           \
+            __vsf_tgui_sv_color_mix_result__.red     = ((uint32_t)(__color_0).red   * (__mix) + (uint32_t)(__color_1).red   * __vsf_tgui_sv_color_rmix__) / 255;\
+            __vsf_tgui_sv_color_mix_result__.green   = ((uint32_t)(__color_0).green * (__mix) + (uint32_t)(__color_1).green * __vsf_tgui_sv_color_rmix__) / 255;\
+            __vsf_tgui_sv_color_mix_result__.blue    = ((uint32_t)(__color_0).blue  * (__mix) + (uint32_t)(__color_1).blue  * __vsf_tgui_sv_color_rmix__) / 255;\
+            __vsf_tgui_sv_color_mix_alpha();                                    \
+            __vsf_tgui_sv_color_mix_result__;                                   \
+        })
 #   endif
 #endif
 

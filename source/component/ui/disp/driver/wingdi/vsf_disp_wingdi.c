@@ -43,7 +43,11 @@
 #endif
 
 #ifndef VSF_DISP_WINGDI_CFG_REFRESH_INSTANTLY
-#   define VSF_DISP_WINGDI_CFG_REFRESH_INSTANTLY        ENABLED
+#   define VSF_DISP_WINGDI_CFG_REFRESH_INSTANTLY        DISABLED
+#endif
+
+#if VSF_DISP_WINGDI_CFG_REFRESH_INSTANTLY == ENABLED
+#   warning VSF_DISP_WINGDI_CFG_REFRESH_INSTANTLY will increase refresh rate, but may cause problem if refresh too fast
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

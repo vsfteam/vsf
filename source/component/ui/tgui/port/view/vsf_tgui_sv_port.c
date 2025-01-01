@@ -267,7 +267,7 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_t *gui_ptr,
 
         for (uint16_t j = 0; j < display.tSize.iWidth; j++) {
             if (is_mask) {
-                argb_color          = color;
+                argb_color          = vsf_tgui_sv_color_to_argb8888(color);
                 argb_color.alpha    = *data_ptr++;
             } else {
                 argb_color.red      = *data_ptr++;
