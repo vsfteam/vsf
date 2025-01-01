@@ -38,6 +38,10 @@
 #   define VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY             DISABLED
 #endif
 
+#ifndef VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER
+#   define VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER           ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define vsf_tgui_vport_init(__vsf_tgui_v_port_ptr)                              \
@@ -54,6 +58,9 @@ declare_structure(vsf_tgui_v_port_t)
 def_structure(vsf_tgui_v_port_t)
     vk_disp_t *disp;
     void *pfb;
+#if VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER == ENABLED
+    void *orig_pfb;
+#endif
     size_t pfb_size;
 
     bool is_ready;

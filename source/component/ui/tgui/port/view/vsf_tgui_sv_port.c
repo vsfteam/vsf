@@ -444,6 +444,13 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t *gui_ptr)
                  area.pos.x, area.pos.y,
                  area.size.x, area.size.y);
     vk_disp_refresh(disp, &area, pixmap);
+#if VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER == ENABLED
+    if (gui_ptr->pfb == gui_ptr->pfb) {
+        gui_ptr->pfb = (void *)((uint8_t *)gui_ptr->orig_pfb + gui_ptr->pfb_size);
+    } else {
+        gui_ptr->pfb = gui_ptr->orig_pfb;
+    }
+#endif
 
     int request_location_y2 = request_region_ptr->tLocation.iY + request_region_ptr->tSize.iHeight;
     int current_location_y2 = current_region_ptr->tLocation.iY + current_region_ptr->tSize.iHeight;
@@ -508,7 +515,12 @@ void vsf_tgui_sv_bind_disp(vsf_tgui_t *gui_ptr, vk_disp_t *disp, void *pfb, size
 
     gui_ptr->disp = disp;
     gui_ptr->pfb = pfb;
+#if VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER == ENABLED
+    gui_ptr->orig_pfb = pfb;
+    gui_ptr->pfb_size = pfb_size >> 1;
+#else
     gui_ptr->pfb_size = pfb_size;
+#endif
 
     disp->ui_data = gui_ptr;
     disp->ui_on_ready = __vsf_tgui_on_inited;
