@@ -38,7 +38,7 @@
 
 #if VSF_TGUI_CFG_SV_PORT_LOG != ENABLED
 #   undef VSF_TGUI_LOG
-#   define VSF_TGUI_LOG
+#   define VSF_TGUI_LOG(...)
 #endif
 
 #if VSF_TGUI_CFG_DISP_COLOR == VSF_TGUI_COLOR_RGB_565
@@ -371,10 +371,11 @@ void vsf_tgui_sv_port_draw_char(vsf_tgui_t *gui_ptr,
 vsf_tgui_region_t* vsf_tgui_v_refresh_loop_begin(vsf_tgui_t *gui_ptr, const vsf_tgui_region_t *planned_refresh_region_ptr)
 {
     vsf_protect_t orig = vsf_protect_int();
+    if (    !gui_ptr->is_disp_inited ||
 #if VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER == ENABLED
-    if (gui_ptr->refresh_pending_cnt > 1) {
+            (gui_ptr->refresh_pending_cnt > 1)) {
 #else
-    if (gui_ptr->refresh_pending_cnt > 0) {
+            (gui_ptr->refresh_pending_cnt > 0)) {
 #endif
         gui_ptr->refresh_pending_notify = true;
         vsf_unprotect_int(orig);
@@ -501,6 +502,8 @@ static void __vsf_tgui_on_ready(vk_disp_t *disp)
 
 static void __vsf_tgui_on_inited(vk_disp_t *disp)
 {
+    vsf_tgui_t *gui_ptr = (vsf_tgui_t *)disp->ui_data;
+    gui_ptr->is_disp_inited = true;
 	disp->ui_on_ready = __vsf_tgui_on_ready;
 	__vsf_tgui_on_ready(disp);
 }
@@ -530,6 +533,7 @@ void vsf_tgui_sv_bind_disp(vsf_tgui_t *gui_ptr, vk_disp_t *disp, void *pfb, size
     gui_ptr->pfb_size = pfb_size;
 #endif
 
+    gui_ptr->is_disp_inited = false;
     disp->ui_data = gui_ptr;
     disp->ui_on_ready = __vsf_tgui_on_inited;
     vk_disp_init(disp);

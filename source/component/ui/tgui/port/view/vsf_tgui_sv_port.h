@@ -61,6 +61,7 @@ def_structure(vsf_tgui_v_port_t)
     bool refresh_is_first_pfb;
 #endif
     bool refresh_pending_notify;
+    bool is_disp_inited;
     uint8_t refresh_pending_cnt;
     size_t pfb_size;
 
