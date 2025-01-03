@@ -151,22 +151,24 @@ __vsf_component_peda_ifs_entry(__vk_flash_mal_init, vk_mal_init)
 
     switch (evt) {
     case VSF_EVT_INIT:
-        pthis->cap = vsf_flash_capability(pthis->flash);
-        if (0 == pthis->size) {
-            pthis->size = pthis->cap.max_size;
-        }
-        irq_mask = VSF_FLASH_IRQ_ERASE_MASK | VSF_FLASH_IRQ_WRITE_MASK | VSF_FLASH_IRQ_READ_MASK;
-        if ((pthis->cap.irq_mask & irq_mask) != irq_mask) {
-            err = VSF_ERR_NOT_SUPPORT;
-        } else {
-            pthis->cur = NULL;
-            cfg.isr.handler_fn = __flash_isrhandler;
-            cfg.isr.target_ptr = pthis;
-            cfg.isr.prio = VSF_FLASH_MAL_CFG_ISR_PRIO;
-            err = vsf_flash_init(pthis->flash, &cfg);
-            if (err == VSF_ERR_NONE) {
+        cfg.isr.handler_fn = __flash_isrhandler;
+        cfg.isr.target_ptr = pthis;
+        cfg.isr.prio = VSF_FLASH_MAL_CFG_ISR_PRIO;
+        // some flash MUST be initialized first before vsf_flash_capability
+        err = vsf_flash_init(pthis->flash, &cfg);
+        if (VSF_ERR_NONE == err) {
+            pthis->cap = vsf_flash_capability(pthis->flash);
+            if (0 == pthis->size) {
+                pthis->size = pthis->cap.max_size;
+            }
+
+            irq_mask = VSF_FLASH_IRQ_ERASE_MASK | VSF_FLASH_IRQ_WRITE_MASK | VSF_FLASH_IRQ_READ_MASK;
+            if ((pthis->cap.irq_mask & irq_mask) != irq_mask) {
+                err = VSF_ERR_NOT_SUPPORT;
+            } else {
                 while (vsf_flash_enable(pthis->flash) != fsm_rt_cpl);
                 vsf_flash_irq_enable(pthis->flash, VSF_FLASH_IRQ_ALL_BITS_MASK);
+                pthis->cur = NULL;
             }
         }
         vsf_eda_return(err);
