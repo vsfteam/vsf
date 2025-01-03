@@ -57,13 +57,15 @@ declare_structure(vsf_tgui_v_port_t)
 def_structure(vsf_tgui_v_port_t)
     vk_disp_t *disp;
     void *pfb;
+    bool is_disp_inited;
 #if VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER == ENABLED
     bool refresh_is_first_pfb;
+    bool refresh_pending;
 #endif
     bool refresh_pending_notify;
-    bool is_disp_inited;
     uint8_t refresh_pending_cnt;
     size_t pfb_size;
+    vk_disp_area_t refresh_pending_area;
 
 #if VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY == ENABLED
     volatile bool is_draw_ready;

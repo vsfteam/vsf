@@ -373,7 +373,7 @@ vsf_tgui_region_t* vsf_tgui_v_refresh_loop_begin(vsf_tgui_t *gui_ptr, const vsf_
     vsf_protect_t orig = vsf_protect_int();
     if (    !gui_ptr->is_disp_inited ||
 #if VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER == ENABLED
-            (gui_ptr->refresh_pending_cnt > 1)) {
+            gui_ptr->refresh_pending) {
 #else
             (gui_ptr->refresh_pending_cnt > 0)) {
 #endif
@@ -426,6 +426,27 @@ vsf_tgui_region_t* vsf_tgui_v_refresh_loop_begin(vsf_tgui_t *gui_ptr, const vsf_
     return current_region_ptr;
 }
 
+static void __vsf_tgui_v_disp_refresh(vsf_tgui_t *gui_ptr, vk_disp_area_t *area)
+{
+    vsf_trace(VSF_TRACE_INFO, "[Simple View Port]vk_disp_refresh (%d %d) (%d %d)." VSF_TRACE_CFG_LINEEND,
+                 area->pos.x, area->pos.y,
+                 area->size.x, area->size.y);
+
+    vk_disp_refresh(gui_ptr->disp, area, gui_ptr->pfb);
+
+#if VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER == ENABLED
+    if (gui_ptr->refresh_is_first_pfb) {
+        gui_ptr->pfb = (void *)((uint8_t *)gui_ptr->pfb + gui_ptr->pfb_size * sizeof(vsf_tgui_disp_pixel_t));
+    } else {
+        gui_ptr->pfb = (void *)((uint8_t *)gui_ptr->pfb - gui_ptr->pfb_size * sizeof(vsf_tgui_disp_pixel_t));
+    }
+    gui_ptr->refresh_is_first_pfb = !gui_ptr->refresh_is_first_pfb;
+#endif
+    vsf_protect_t orig = vsf_protect_int();
+        gui_ptr->refresh_pending_cnt++;
+    vsf_unprotect_int(orig);
+}
+
 bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t *gui_ptr)
 {
     vsf_tgui_region_t *current_region_ptr = &gui_ptr->current_region;
@@ -441,23 +462,20 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t *gui_ptr)
             .y = current_region_ptr->tSize.iHeight,
         },
     };
-    vk_disp_t *disp = gui_ptr->disp;
-    vsf_tgui_disp_pixel_t *pixmap = gui_ptr->pfb;
-    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View Port]vk_disp_refresh (%d %d) (%d %d)." VSF_TRACE_CFG_LINEEND,
-                 area.pos.x, area.pos.y,
-                 area.size.x, area.size.y);
-    vk_disp_refresh(disp, &area, pixmap);
+
 #if VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER == ENABLED
-    if (gui_ptr->refresh_is_first_pfb) {
-        gui_ptr->pfb = (void *)((uint8_t *)gui_ptr->pfb + gui_ptr->pfb_size);
-    } else {
-        gui_ptr->pfb = (void *)((uint8_t *)gui_ptr->pfb - gui_ptr->pfb_size);
-    }
-    gui_ptr->refresh_is_first_pfb = !gui_ptr->refresh_is_first_pfb;
-#endif
     vsf_protect_t orig = vsf_protect_int();
-        gui_ptr->refresh_pending_cnt++;
-    vsf_unprotect_int(orig);
+    if (gui_ptr->refresh_pending_cnt > 0) {
+        gui_ptr->refresh_pending = true;
+        gui_ptr->refresh_pending_area = area;
+        vsf_unprotect_int(orig);
+    } else {
+        vsf_unprotect_int(orig);
+        __vsf_tgui_v_disp_refresh(gui_ptr, &area);
+    }
+#else
+    __vsf_tgui_v_disp_refresh(gui_ptr, &area);
+#endif
 
     int request_location_y2 = request_region_ptr->tLocation.iY + request_region_ptr->tSize.iHeight;
     int current_location_y2 = current_region_ptr->tLocation.iY + current_region_ptr->tSize.iHeight;
@@ -484,8 +502,21 @@ static void __vsf_tgui_on_ready(vk_disp_t *disp)
     vsf_tgui_t *gui_ptr = (vsf_tgui_t *)disp->ui_data;
 
     vsf_protect_t orig = vsf_protect_int();
-        gui_ptr->refresh_pending_cnt--;
+    gui_ptr->refresh_pending_cnt--;
+#if VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER == ENABLED
+    if (gui_ptr->refresh_pending) {
+        vk_disp_area_t area = gui_ptr->refresh_pending_area;
+        gui_ptr->refresh_pending = false;
+        vsf_unprotect_int(orig);
+
+        __vsf_tgui_v_disp_refresh(gui_ptr, &area);
+    } else {
+        vsf_unprotect_int(orig);
+    }
+#else
     vsf_unprotect_int(orig);
+#endif
+
     if (gui_ptr->refresh_pending_notify) {
         vsf_tgui_low_level_refresh_ready(gui_ptr);
     }
@@ -527,6 +558,7 @@ void vsf_tgui_sv_bind_disp(vsf_tgui_t *gui_ptr, vk_disp_t *disp, void *pfb, size
     gui_ptr->refresh_pending_cnt = 1;
     gui_ptr->refresh_pending_notify = false;
 #if VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER == ENABLED
+    gui_ptr->refresh_pending = false;
     gui_ptr->refresh_is_first_pfb = true;
     gui_ptr->pfb_size = pfb_size >> 1;
 #else

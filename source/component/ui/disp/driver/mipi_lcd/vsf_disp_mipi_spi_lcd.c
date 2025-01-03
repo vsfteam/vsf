@@ -389,11 +389,6 @@ static void __lcd_refresh_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
     vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = vsf_container_of(teda, vk_disp_mipi_spi_lcd_t, teda);
 
     switch (evt) {
-    case VSF_EVT_INIT:
-        // After lcd initialized, send first on ready
-        vk_disp_on_ready(&disp_mipi_spi_lcd->use_as__vk_disp_t);
-        break;
-
     case VSF_EVT_REFRESH:
         vsf_disp_mipi_spi_lcd_wait_te_line_ready(disp_mipi_spi_lcd);
         break;
@@ -422,6 +417,7 @@ static void __lcd_refresh_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
         }
         break;
 
+    case VSF_EVT_INIT:
     case VSF_EVT_MESSAGE:
         vk_disp_on_ready(&disp_mipi_spi_lcd->use_as__vk_disp_t);
         break;
