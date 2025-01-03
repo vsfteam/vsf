@@ -428,7 +428,7 @@ vsf_tgui_region_t* vsf_tgui_v_refresh_loop_begin(vsf_tgui_t *gui_ptr, const vsf_
 
 static void __vsf_tgui_v_disp_refresh(vsf_tgui_t *gui_ptr, vk_disp_area_t *area)
 {
-    vsf_trace(VSF_TRACE_INFO, "[Simple View Port]vk_disp_refresh (%d %d) (%d %d)." VSF_TRACE_CFG_LINEEND,
+    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View Port]vk_disp_refresh (%d %d) (%d %d)." VSF_TRACE_CFG_LINEEND,
                  area->pos.x, area->pos.y,
                  area->size.x, area->size.y);
 
