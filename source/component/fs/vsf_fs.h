@@ -166,6 +166,7 @@ vsf_class(vk_vfs_file_t) {
 #   endif
             } f;
             struct {
+                void *param;
                 vsf_dlist_t child_list;
             } d;
             struct {

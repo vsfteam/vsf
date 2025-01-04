@@ -68,11 +68,18 @@ extern int vsf_linux_fs_bind_i2c(char *path, vsf_i2c_t *i2c);
 #if VSF_HAL_USE_SPI == ENABLED
 extern int vsf_linux_fs_bind_spi(char *path, vsf_spi_t *spi);
 #endif
+#if VSF_HAL_USE_GPIO == ENABLED
+extern int vsf_linux_fs_bind_gpio(char *path, vsf_linux_gpio_chip_t *gpio_chip);
+#   if VSF_HW_GPIO_COUNT > 0
+extern int vsf_linux_fs_bind_gpio_hw(char *path);
+#   endif
+#endif
 
 #if VSF_USE_MAL == ENABLED
 typedef struct vk_mal_t vk_mal_t;
 extern int vsf_linux_fs_bind_mal(char *path, vk_mal_t *mal);
 #endif
+
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_CFG_REGISTRATION_MECHANISM == ENABLED
 extern int vsf_linux_fs_bind_input(char *path, vk_input_notifier_t *notifier);
 extern int vsf_linux_fs_bind_mouse(char *path, vsf_linux_mouse_t *mouse);
@@ -80,16 +87,12 @@ extern int vsf_linux_fs_bind_mouse(char *path, vsf_linux_mouse_t *mouse);
 extern int vsf_linux_fs_bind_terminal_keyboard(char *path, vsf_linux_terminal_keyboard_t *keyboard);
 #   endif
 #endif
+
 #if VSF_USE_UI == ENABLED
 typedef struct vk_disp_t vk_disp_t;
 extern int vsf_linux_fs_bind_disp(char *path, vk_disp_t *disp);
 #endif
-#if VSF_HAL_USE_GPIO == ENABLED
-extern int vsf_linux_fs_bind_gpio(char *path, vsf_linux_gpio_chip_t *gpio_chip);
-#   if VSF_HW_GPIO_COUNT > 0
-extern int vsf_linux_fs_bind_gpio_hw(char *path);
-#   endif
-#endif
+
 extern int vsf_linux_devfs_init(void);
 
 #ifdef __cplusplus
@@ -100,6 +103,10 @@ extern int vsf_linux_devfs_init(void);
 
 #if VSF_LINUX_DEVFS_USE_ALSA == ENABLED
 #   include "./alsa/vsf_linux_devfs_alsa.h"
+#endif
+
+#if VSF_USE_USB_DEVICE == ENABLED
+#   include "./usbd/functionfs/vsf_linux_functionfs.h"
 #endif
 
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_DEVFS

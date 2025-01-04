@@ -529,13 +529,12 @@ static ssize_t __vsf_linux_eventfd_read(vsf_linux_fd_t *sfd, void *buf, size_t c
     }
 
     eventfd_t counter;
+    vsf_linux_trigger_t trig;
+    vsf_linux_trigger_init(&trig);
     vsf_protect_t orig = vsf_protect_sched();
 again:
     if (!priv->counter) {
         if (vsf_linux_fd_is_block(sfd)) {
-            vsf_linux_trigger_t trig;
-            vsf_linux_trigger_init(&trig);
-
             if (!vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, &trig, orig)) {
                 // triggered by signal
                 return -1;
@@ -2668,10 +2667,23 @@ int __vsf_linux_create_open_path(char *path)
     return fd;
 }
 
+int __vsf_linux_create_open_dir_path(char *path)
+{
+    int fd = open(path, 0);
+    if (fd < 0) {
+        fd = mkdirs(path, 0);
+        if (fd < 0) {
+            fprintf(stderr, "fail to create %s.\r\n", path);
+        }
+    }
+    return fd;
+}
+
+// compatible with directory
 int vsf_linux_fd_get_target(int fd, void **target)
 {
     vk_vfs_file_t *vfs_file = __vsf_linux_get_vfs(fd);
-    if ((NULL == vfs_file) || (vfs_file->attr & VSF_FILE_ATTR_DIRECTORY)) {
+    if (NULL == vfs_file) {
         return -1;
     }
 
@@ -2681,9 +2693,11 @@ int vsf_linux_fd_get_target(int fd, void **target)
     return 0;
 }
 
-int vsf_linux_fd_bind_target(int fd, void *target,
+int vsf_linux_fd_bind_target_ex(int fd,
+        void *target, const vsf_linux_fd_op_t *op,
         vsf_param_eda_evthandler_t peda_read,
-        vsf_param_eda_evthandler_t peda_write)
+        vsf_param_eda_evthandler_t peda_write,
+        uint_fast32_t feature, uint64_t size)
 {
     vk_vfs_file_t *vfs_file = __vsf_linux_get_vfs(fd);
     if (NULL == vfs_file) {
@@ -2693,7 +2707,17 @@ int vsf_linux_fd_bind_target(int fd, void *target,
     vfs_file->f.param = target;
     vfs_file->f.callback.fn_read = peda_read;
     vfs_file->f.callback.fn_write = peda_write;
+    vfs_file->attr = feature;
+    vfs_file->size = size;
+    vfs_file->f.op = (void *)op;
     return 0;
+}
+
+int vsf_linux_fd_bind_target(int fd, void *target,
+        vsf_param_eda_evthandler_t peda_read,
+        vsf_param_eda_evthandler_t peda_write)
+{
+    return vsf_linux_fd_bind_target_ex(fd, target, NULL, peda_read, peda_write, 0, 0);
 }
 
 int vsf_linux_fs_get_target(const char *pathname, void **target)
@@ -2738,14 +2762,8 @@ int vsf_linux_fs_bind_target_ex(const char *pathname,
 {
     int fd = __vsf_linux_create_open_path((char *)pathname);
     if (fd >= 0) {
-        int err = vsf_linux_fd_bind_target(fd, target, peda_read, peda_write);
+        int err = vsf_linux_fd_bind_target_ex(fd, target, op, peda_read, peda_write, feature, size);
         if (!err) {
-            vk_vfs_file_t *vfs_file = __vsf_linux_get_vfs(fd);
-            VSF_LINUX_ASSERT(vfs_file != NULL);
-
-            vfs_file->attr = feature;
-            vfs_file->size = size;
-            vfs_file->f.op = (void *)op;
             vsf_trace_info("%s bound.\r\n", pathname);
         }
         close(fd);
@@ -2765,6 +2783,24 @@ int vsf_linux_fs_bind_fdpriv(const char *pathname, vsf_linux_fd_priv_t *priv,
         const vsf_linux_fd_op_t *op, uint_fast32_t feature, uint64_t size)
 {
     return vsf_linux_fs_bind_target_ex(pathname, priv, op, NULL, NULL, feature, size);
+}
+
+int vsf_linux_fs_bind_dir_target(const char *pathname, void *target)
+{
+    int fd = __vsf_linux_create_open_dir_path((char *)pathname);
+    if (fd >= 0) {
+        vk_vfs_file_t *vfs_dir = __vsf_linux_get_vfs(fd);
+        if (NULL == vfs_dir) {
+            return -1;
+        }
+
+        vfs_dir->d.param = target;
+
+        vsf_trace_info("%s bound.\r\n", pathname);
+        close(fd);
+        return 0;
+    }
+    return -1;
 }
 
 __vsf_component_peda_ifs_entry(__vk_vfs_buffer_write, vk_file_write)
@@ -2875,13 +2911,12 @@ ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
     vsf_protect_t orig;
     ssize_t result;
 
+    vsf_linux_trigger_t trig;
+    vsf_linux_trigger_init(&trig);
     while (size > 0) {
         orig = vsf_protect_sched();
         if (!vsf_linux_fd_get_status(&priv->use_as__vsf_linux_fd_priv_t, POLLIN) && (0 == vsf_stream_get_rbuf(stream, NULL))) {
             if (vsf_linux_fd_is_block(sfd) && vsf_stream_is_tx_connected(stream)) {
-                vsf_linux_trigger_t trig;
-                vsf_linux_trigger_init(&trig);
-
                 if (!vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, POLLIN, &trig, orig)) {
                     // triggered by signal
                     return -1;
@@ -2974,12 +3009,11 @@ ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t co
     uint_fast32_t size = count, cursize;
     vsf_protect_t orig;
 
+    vsf_linux_trigger_t trig;
+    vsf_linux_trigger_init(&trig);
     while (size > 0) {
         orig = vsf_protect_sched();
         if (!vsf_linux_fd_get_status(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT)) {
-            vsf_linux_trigger_t trig;
-            vsf_linux_trigger_init(&trig);
-
             if (!vsf_linux_fd_pend_events(&priv->use_as__vsf_linux_fd_priv_t, POLLOUT, &trig, orig)) {
                 // triggered by signal
                 return -1;
