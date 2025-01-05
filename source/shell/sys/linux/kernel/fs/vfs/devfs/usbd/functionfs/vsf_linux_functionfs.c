@@ -109,10 +109,10 @@ static void __vsf_linux_usbd_on_trans_finish(void *p)
     vk_usbd_trans_t *trans = &ep_priv->trans;
 
     if ((ep->ep_no & USB_DIR_MASK) == USB_DIR_IN) {
-        vsf_linux_fd_set_events(&ep_priv->use_as__vsf_linux_fd_priv_t, POLLOUT, vsf_protect_sched());
+        vsf_linux_fd_set_status(&ep_priv->use_as__vsf_linux_fd_priv_t, POLLOUT, vsf_protect_sched());
     } else {
         trans->size = ep->mts - trans->size;
-        vsf_linux_fd_set_events(&ep_priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
+        vsf_linux_fd_set_status(&ep_priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
     }
 }
 
@@ -120,8 +120,8 @@ static void __vsf_linux_usbdep_init(vsf_linux_fd_t *sfd)
 {
     vsf_linux_usbd_ep_priv_t *ep_priv = (vsf_linux_usbd_ep_priv_t *)sfd->priv;
     vk_vfs_file_t *file = (vk_vfs_file_t *)ep_priv->file;
-    vsf_linux_usbd_ifs_t *ifs = (vsf_linux_usbd_ifs_t *)file->f.param;
     vsf_linux_usbd_ep_t *ep = (vsf_linux_usbd_ep_t *)file->f.param;
+    vsf_linux_usbd_ifs_t *ifs = ep->ifs;
     vk_usbd_trans_t *trans = &ep_priv->trans;
 
     file->attr |= VSF_FILE_ATTR_EXCL;
@@ -133,7 +133,7 @@ static void __vsf_linux_usbdep_init(vsf_linux_fd_t *sfd)
     trans->zlp = ep->zlp;
 
     if ((ep->ep_no & USB_DIR_MASK) == USB_DIR_IN) {
-        vsf_linux_fd_set_events(&ep_priv->use_as__vsf_linux_fd_priv_t, POLLOUT, vsf_protect_sched());
+        vsf_linux_fd_set_status(&ep_priv->use_as__vsf_linux_fd_priv_t, POLLOUT, vsf_protect_sched());
     } else {
         ep->cur_pos = 0;
         trans->size = ep->mts;
@@ -145,8 +145,8 @@ static ssize_t __vsf_linux_usbdep_read(vsf_linux_fd_t *sfd, void *buf, size_t co
 {
     vsf_linux_usbd_ep_priv_t *ep_priv = (vsf_linux_usbd_ep_priv_t *)sfd->priv;
     vk_vfs_file_t *file = (vk_vfs_file_t *)ep_priv->file;
-    vsf_linux_usbd_ifs_t *ifs = (vsf_linux_usbd_ifs_t *)file->f.param;
     vsf_linux_usbd_ep_t *ep = (vsf_linux_usbd_ep_t *)file->f.param;
+    vsf_linux_usbd_ifs_t *ifs = ep->ifs;
     vk_usbd_trans_t *trans = &ep_priv->trans;
 
     vsf_linux_trigger_t trig;
@@ -174,6 +174,8 @@ static ssize_t __vsf_linux_usbdep_read(vsf_linux_fd_t *sfd, void *buf, size_t co
 
     trans->size -= remain_size;
     if (0 == trans->size) {
+        vsf_linux_fd_clear_status(&ep_priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());
+
         ep->cur_pos = 0;
         trans->size = ep->mts;
         vk_usbd_ep_recv(ifs->dev, trans);
@@ -181,15 +183,15 @@ static ssize_t __vsf_linux_usbdep_read(vsf_linux_fd_t *sfd, void *buf, size_t co
         ep->cur_pos += remain_size;
     }
 
-    return -1;
+    return remain_size;
 }
 
 static ssize_t __vsf_linux_usbdep_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
     vsf_linux_usbd_ep_priv_t *ep_priv = (vsf_linux_usbd_ep_priv_t *)sfd->priv;
     vk_vfs_file_t *file = (vk_vfs_file_t *)ep_priv->file;
-    vsf_linux_usbd_ifs_t *ifs = (vsf_linux_usbd_ifs_t *)file->f.param;
     vsf_linux_usbd_ep_t *ep = (vsf_linux_usbd_ep_t *)file->f.param;
+    vsf_linux_usbd_ifs_t *ifs = ep->ifs;
     vk_usbd_trans_t *trans = &ep_priv->trans;
     vsf_protect_t orig;
     vsf_linux_trigger_t trig;
@@ -226,6 +228,7 @@ int vsf_linux_fs_bind_usbd_ep(char *ifs_path, vsf_linux_usbd_ep_t *ep)
 {
     int result = -1;
     char epname[8] = "ep";
+    itoa(ep->ep_no & 0x0F, &epname[2], 10);
     if (0 == ep->ep_no) {
         // no need to bind ep0
         return -1;
@@ -234,7 +237,6 @@ int vsf_linux_fs_bind_usbd_ep(char *ifs_path, vsf_linux_usbd_ep_t *ep)
     } else {
         strcat(epname, "out");
     }
-    itoa(ep->ep_no & 0x0F, &epname[strlen(epname)], 10);
 
     int epfd, ifsfd = open(ifs_path, 0);
     VSF_LINUX_ASSERT(ifsfd >= 0);
@@ -257,6 +259,7 @@ int vsf_linux_fs_bind_usbd_ep(char *ifs_path, vsf_linux_usbd_ep_t *ep)
     ep->op.fn_init = __vsf_linux_usbdep_init;
     ep->op.fn_read = __vsf_linux_usbdep_read,
     ep->op.fn_write = __vsf_linux_usbdep_write,
+    ep->ifs = ifs;
 
     result = vsf_linux_fd_bind_target_ex(epfd, ep, &ep->op, NULL, NULL, 0, 0);
 

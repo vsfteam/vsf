@@ -2671,8 +2671,9 @@ int __vsf_linux_create_open_dir_path(char *path)
 {
     int fd = open(path, 0);
     if (fd < 0) {
-        fd = mkdirs(path, 0);
-        if (fd < 0) {
+        if (!mkdirs(path, 0)) {
+            fd = open(path, 0);
+        } else {
             fprintf(stderr, "fail to create %s.\r\n", path);
         }
     }
