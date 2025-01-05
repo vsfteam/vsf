@@ -124,6 +124,7 @@ static void __vsf_linux_usbdep_init(vsf_linux_fd_t *sfd)
     vsf_linux_usbd_ep_t *ep = (vsf_linux_usbd_ep_t *)file->f.param;
     vk_usbd_trans_t *trans = &ep_priv->trans;
 
+    file->attr |= VSF_FILE_ATTR_EXCL;
     trans->ep = ep->ep_no;
     trans->buffer = (void *)&ep_priv[1];
     trans->size = 0;
