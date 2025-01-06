@@ -141,10 +141,13 @@ vsf_err_t vk_dwcotg_dcd_init(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
     global_regs->gintsts = 0xbfffffff;
     global_regs->gotgint = 0xffffffff;
 
-    global_regs->gintmsk = USB_OTG_GINTMSK_USBRST | USB_OTG_GINTMSK_ENUMDNEM |
-            USB_OTG_GINTMSK_IEPINT | USB_OTG_GINTMSK_OEPINT |
-//            USB_OTG_GINTMSK_IISOIXFRM | USB_OTG_GINTMSK_PXFRM_IISOOXFRM |
-            USB_OTG_GINTMSK_RXFLVLM;
+    global_regs->gintmsk = USB_OTG_GINTMSK_USBRST | USB_OTG_GINTMSK_ENUMDNEM
+        |   USB_OTG_GINTMSK_IEPINT | USB_OTG_GINTMSK_OEPINT
+//        |   USB_OTG_GINTMSK_IISOIXFRM | USB_OTG_GINTMSK_PXFRM_IISOOXFRM |
+        ;
+    if (!dwcotg_dcd->dma_en) {
+        global_regs->gintmsk |= USB_OTG_GINTMSK_RXFLVLM;
+    }
 
     global_regs->gahbcfg |= USB_OTG_GAHBCFG_GINT;
     return VSF_ERR_NONE;
@@ -215,10 +218,17 @@ void vk_dwcotg_dcd_get_setup(vk_dwcotg_dcd_t *dwcotg_dcd, uint8_t *buffer)
 void vk_dwcotg_dcd_status_stage(vk_dwcotg_dcd_t *dwcotg_dcd, bool is_in)
 {
     dwcotg_dcd->ctrl_transfer_state = DWCOTG_STATUS_STAGE;
-    if (is_in) {
-        vk_dwcotg_dcd_ep_transfer_send(dwcotg_dcd, 0x80, NULL, 0, true);
+    if (dwcotg_dcd->dma_en) {
+        if (is_in) {
+            vk_dwcotg_dcd_ep_transfer_send(dwcotg_dcd, 0x80, NULL, 0, true);
+        }
+        vk_dwcotg_dcd_ep_transfer_recv(dwcotg_dcd, 0, (uint8_t *)&dwcotg_dcd->setup, 8);
     } else {
-        vk_dwcotg_dcd_ep_transfer_recv(dwcotg_dcd, 0, NULL, 0);
+        if (is_in) {
+            vk_dwcotg_dcd_ep_transfer_send(dwcotg_dcd, 0x80, NULL, 0, true);
+        } else {
+            vk_dwcotg_dcd_ep_transfer_recv(dwcotg_dcd, 0, NULL, 0);
+        }
     }
 }
 
@@ -259,6 +269,13 @@ vsf_err_t vk_dwcotg_dcd_ep_add(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t ep, usb
         default:
             VSF_USB_ASSERT(false);
             return VSF_ERR_NOT_SUPPORT;
+        }
+        if (!is_in && dwcotg_dcd->dma_en) {
+            struct dwcotg_dev_out_ep_regs_t *out_regs = &dwcotg_dcd->reg.dev.ep.out_regs[0];
+            out_regs->doepdma = (uint32_t)&dwcotg_dcd->setup;
+            out_regs->doeptsiz &= ~(USB_OTG_DOEPTSIZ_XFRSIZ | USB_OTG_DOEPTSIZ_PKTCNT);
+            out_regs->doeptsiz |= (1 << 19) | sizeof(dwcotg_dcd->setup);
+            out_regs->doepctl |= USB_OTG_DOEPCTL_EPENA;
         }
     } else {
         *ep_ctrl &= ~USB_OTG_DIEPCTL_EPTYP;
