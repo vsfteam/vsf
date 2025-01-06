@@ -170,7 +170,9 @@ static ssize_t __vsf_linux_usbdep_read(vsf_linux_fd_t *sfd, void *buf, size_t co
 
     uint8_t *cur_buffer = (uint8_t *)&ep_priv[1] + ep->cur_pos;
     ssize_t remain_size = vsf_min(trans->size, count);
-    memcpy(buf, cur_buffer, remain_size);
+    if (buf != NULL) {
+        memcpy(buf, cur_buffer, remain_size);
+    }
 
     trans->size -= remain_size;
     if (0 == trans->size) {
@@ -216,7 +218,9 @@ again:
     }
 
     VSF_LINUX_ASSERT(ep->mts >= count);
-    memcpy(&ep_priv[1], buf, count);
+    if (buf != NULL) {
+        memcpy(&ep_priv[1], buf, count);
+    }
 
     trans->size = count;
     vk_usbd_ep_send(ifs->dev, trans);
