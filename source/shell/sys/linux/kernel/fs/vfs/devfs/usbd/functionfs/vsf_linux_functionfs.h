@@ -41,10 +41,10 @@ typedef struct vsf_linux_usbd_ep_t {
     uint8_t ep_no;
     bool zlp;
     uint32_t mts;
+    uint8_t *buffer;
 
     // private member, don't touch
     uint32_t cur_pos;
-    vsf_linux_fd_op_t op;
     vsf_linux_usbd_ifs_t *ifs;
 } vsf_linux_usbd_ep_t;
 

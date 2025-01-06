@@ -58,12 +58,24 @@ static vk_usbd_desc_t * __vsf_linux_usbdop_get_desc(vk_usbd_dev_t *dev, uint_fas
 static vsf_err_t __vsf_linux_usbdop_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
 static vsf_err_t __vsf_linux_usbdop_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
 
+static void __vsf_linux_usbdep_init(vsf_linux_fd_t *sfd);
+static ssize_t __vsf_linux_usbdep_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
+static ssize_t __vsf_linux_usbdep_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
+
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const vk_usbd_class_op_t __vsf_linux_functionfs = {
     .get_desc           = __vsf_linux_usbdop_get_desc,
     .request_prepare    = __vsf_linux_usbdop_request_prepare,
     .request_process    = __vsf_linux_usbdop_request_process,
+};
+
+static const vsf_linux_fd_op_t __vsf_linux_usbd_fdop = {
+    .priv_size = sizeof(vsf_linux_usbd_ep_priv_t),
+    .feature = VSF_LINUX_FDOP_FEATURE_FS,
+    .fn_init = __vsf_linux_usbdep_init,
+    .fn_read = __vsf_linux_usbdep_read,
+    .fn_write = __vsf_linux_usbdep_write,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -126,7 +138,7 @@ static void __vsf_linux_usbdep_init(vsf_linux_fd_t *sfd)
 
     file->attr |= VSF_FILE_ATTR_EXCL;
     trans->ep = ep->ep_no;
-    trans->buffer = (void *)&ep_priv[1];
+    trans->buffer = (void *)ep->buffer;
     trans->size = 0;
     trans->on_finish = __vsf_linux_usbd_on_trans_finish;
     trans->param = ep_priv;
@@ -168,7 +180,7 @@ static ssize_t __vsf_linux_usbdep_read(vsf_linux_fd_t *sfd, void *buf, size_t co
         vsf_unprotect_sched(orig);
     }
 
-    uint8_t *cur_buffer = (uint8_t *)&ep_priv[1] + ep->cur_pos;
+    uint8_t *cur_buffer = ep->buffer + ep->cur_pos;
     ssize_t remain_size = vsf_min(trans->size, count);
     if (buf != NULL) {
         memcpy(buf, cur_buffer, remain_size);
@@ -219,7 +231,7 @@ again:
 
     VSF_LINUX_ASSERT(ep->mts >= count);
     if (buf != NULL) {
-        memcpy(&ep_priv[1], buf, count);
+        memcpy(ep->buffer, buf, count);
     }
 
     trans->size = count;
@@ -257,15 +269,8 @@ int vsf_linux_fs_bind_usbd_ep(char *ifs_path, vsf_linux_usbd_ep_t *ep)
         goto close_ifs_and_exit;
     }
 
-    memset(&ep->op, 0, sizeof(ep->op));
-    ep->op.priv_size = sizeof(vsf_linux_usbd_ep_priv_t) + ep->mts;
-    ep->op.feature = VSF_LINUX_FDOP_FEATURE_FS;
-    ep->op.fn_init = __vsf_linux_usbdep_init;
-    ep->op.fn_read = __vsf_linux_usbdep_read,
-    ep->op.fn_write = __vsf_linux_usbdep_write,
     ep->ifs = ifs;
-
-    result = vsf_linux_fd_bind_target_ex(epfd, ep, &ep->op, NULL, NULL, 0, 0);
+    result = vsf_linux_fd_bind_target_ex(epfd, ep, &__vsf_linux_usbd_fdop, NULL, NULL, 0, 0);
 
     close(epfd);
 close_ifs_and_exit:
