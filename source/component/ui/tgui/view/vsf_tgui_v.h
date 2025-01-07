@@ -53,6 +53,24 @@
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
+
+// define unsupported view functions
+#ifndef tgui_v_tile_trans_rate
+#   define tgui_v_tile_trans_rate(...)          .dummy_bits = 0
+#endif
+#ifndef tgui_v_tile_show_corner_tile
+#   define tgui_v_tile_show_corner_tile(...)    .dummy_bits = 0
+#endif
+#ifndef tgui_v_background_color
+#   define tgui_v_background_color(...)         .dummy_bits = 0
+#endif
+#ifndef tgui_v_font
+#   define tgui_v_font(...)                     .dummy_bits = 0
+#endif
+#ifndef tgui_v_font_color
+#   define tgui_v_font_color(...)               .dummy_bits = 0
+#endif
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
