@@ -129,6 +129,7 @@ extern vsf_err_t vsf_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *p
 
 /*============================ IMPLEMENTATION ================================*/
 
+VSF_CAL_WEAK(vk_usbd_get_descriptor)
 vk_usbd_desc_t * vk_usbd_get_descriptor(vk_usbd_desc_t *desc,
         uint_fast8_t desc_num, uint_fast8_t type,
         uint_fast8_t index, uint_fast16_t langid)
