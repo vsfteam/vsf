@@ -22,8 +22,8 @@
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_EXAMPLE
 
 #define __VSF_TGUI_CONTROLS_LABEL_CLASS_INHERIT
+declare_class(vsf_tgui_t)
 #include "./vsf_tgui_v_label.h"
-#include "../../__vsf_tgui_control_types.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -55,6 +55,23 @@ fsm_rt_t vsf_tgui_label_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* ptLabel)
 fsm_rt_t vsf_tgui_label_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* ptLabel)
 {
     return fsm_rt_cpl;
+}
+
+vsf_tgui_size_t __vk_tgui_label_v_text_get_size(vsf_tgui_label_t* label_ptr,
+                                                uint16_t *line_count_ptr,
+                                                uint8_t *char_height_ptr)
+{
+    return (vsf_tgui_size_t){0};
+}
+
+vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* label_ptr)
+{
+    return (vsf_tgui_size_t){0};
+}
+
+int_fast16_t __vk_tgui_label_get_line_height( const vsf_tgui_label_t* label_ptr)
+{
+    return 0;
 }
 
 #endif

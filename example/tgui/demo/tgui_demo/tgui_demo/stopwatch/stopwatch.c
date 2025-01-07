@@ -112,8 +112,10 @@ describ_tgui_panel(popup_t, pupup_panel_descriptor,
     tgui_label(tInformation, tgui_null_parent(popup_t), tInformation, tOK,
         tgui_text(tLabel, "This is a popup message. \nPlease click the OK button to close", false, VSF_TGUI_ALIGN_MID_LEFT),
         tgui_region(0, 56, 400, 80),
+#if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
         tgui_sv_tile_show_corner(false),
         tgui_sv_font_color(VSF_TGUI_COLOR_BLACK),
+#endif
         ),
 
     tgui_button(tOK, tgui_null_parent(popup_t), tInformation, tOK,
@@ -172,7 +174,9 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                 tgui_size(228, 32),
                 tgui_margin(0, 0, 0, 4),
                 tgui_text(tLabel, "", false),
+#if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
                 tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S20),
+#endif
                 tgui_background((vsf_tgui_tile_t*)&ic_settings_phone_RGBA, VSF_TGUI_ALIGN_LEFT),
                 ),
 
@@ -240,7 +244,9 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                                 "0\n1\n2\n3\n4\n5\n6\n7\n8\n9",
                                 true),
                             tgui_line_space(tLabel, 8),
+#if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
                             tgui_sv_font_color(VSF_TGUI_COLOR_GRAY),
+#endif
                             )
                     ),
 
@@ -269,7 +275,9 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                                 tgui_button(tButton1, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list), tButton1, tButton2,
                                     tgui_size(150, 32),
                                     tgui_text(tLabel, "tButton1", false),
+#if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
                                     tgui_sv_font_color(VSF_TGUI_COLOR_RGBA(0x80, 0x80, 0x00, 0x30)),
+#endif
                                     tgui_margin(0, 2, 0, 2),
                                     ),
 
@@ -312,8 +320,10 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                                 tgui_label(tHistory, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list), tHContainer, tHistory,
                                     tgui_text(tLabel, "tHistory\n1234\nABCDEF", false),
                                     tgui_size(150, 128),
+#if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
                                     tgui_sv_tile_show_corner(false),
                                     tgui_sv_font_color(VSF_TGUI_COLOR_GRAY),
+#endif
                                     tgui_margin(0, 2, 0, 2),
                                     ),
 
@@ -362,14 +372,14 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
             tgui_size(140, 0),
             tgui_padding(10, 10, 10, 10),
             tgui_margin(0, 48, 0, 0),
-
+#if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
             tgui_sv_background_color(VSF_TGUI_COLOR_WHITE),
             tgui_sv_tile_show_corner(false),
-
+#endif
             //tgui_text(tTitle, "Right Panel", false),
             tgui_container_type(VSF_TGUI_CONTAINER_TYPE_STREAM_HORIZONTAL),
 
-
+#if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 #define __key(__num, __pre, __next, ...)                                                    \
             tgui_button(tKey[__num], &(tgui_null_parent(stopwatch_t)->tRightPanel), tKey[__pre], tKey[__next],    \
                 tgui_size(32, 32),                                                          \
@@ -378,6 +388,15 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                 tgui_sv_tile_show_corner(false),                                            \
                 __VA_ARGS__                                                                 \
             )
+#else
+#define __key(__num, __pre, __next, ...)                                                    \
+            tgui_button(tKey[__num], &(tgui_null_parent(stopwatch_t)->tRightPanel), tKey[__pre], tKey[__next],    \
+                tgui_size(32, 32),                                                          \
+                tgui_margin(4, 4, 4, 4),                                                    \
+                tgui_text(tLabel, #__num, false),                                           \
+                __VA_ARGS__                                                                 \
+            )
+#endif
 
             tgui_contains(
                 __key(0, 0, 1),
@@ -541,7 +560,7 @@ static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_control_t* control_ptr,
     vsf_tgui_t *gui_ptr = vsf_tgui_control_get_gui_instance(control_ptr);
     vsf_tgui_refresh_evt_t *event_ptr = (vsf_tgui_refresh_evt_t *)ptMSG;
     const vsf_tgui_region_t *ptDirtyRegion = (const vsf_tgui_region_t *)(event_ptr->region_ptr);
-
+#if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
     do {
         vsf_tgui_sv_color_t tColor = VSF_TGUI_CFG_SV_TEXT_LIST_INDICATOR_COLOR;
         vsf_tgui_region_t tRegion = {0};
@@ -559,7 +578,7 @@ static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_control_t* control_ptr,
                                         &tRegion,
                                         tColor);
     } while(0);
-
+#endif
     return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
 }
 #endif
@@ -604,7 +623,7 @@ static fsm_rt_t __on_list_post_refresh( vsf_tgui_list_t* ptList,
                                                             &tScrollbarRegion)) {
         return fsm_rt_cpl;
     }
-
+#   if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
     vsf_tgui_control_v_draw_rect(   gui_ptr,
                                     (const vsf_tgui_control_t *)ptList,
                                     ptDirtyRegion,
@@ -616,6 +635,7 @@ static fsm_rt_t __on_list_post_refresh( vsf_tgui_list_t* ptList,
                                     ptDirtyRegion,
                                     &tScrollbarRegion.tBar,
                                     VSF_TGUI_SCROLLBAR_COLOR_BLUE);
+#   endif
 #endif
 
     return fsm_rt_cpl;

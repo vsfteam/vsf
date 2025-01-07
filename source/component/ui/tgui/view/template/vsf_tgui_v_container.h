@@ -30,13 +30,6 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-def_structure(vsf_tgui_v_container_t)
-#if __IS_COMPILER_IAR__
-//please remove this if your structure is not emplty
-uint8_t : 8;
-#endif
-end_def_structure(vsf_tgui_v_container_t)
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 

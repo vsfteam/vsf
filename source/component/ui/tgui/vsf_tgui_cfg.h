@@ -53,6 +53,7 @@
 
 #define VSF_TGUI_V_TEMPLATE_EXAMPLE                             1
 #define VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW                         2
+#define VSF_TGUI_V_TEMPLATE_SCGUI_VIEW                          3
 
 #ifndef VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL
 #   define VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL                  VSF_TGUI_V_TEMPLATE_EXAMPLE

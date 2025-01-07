@@ -22,8 +22,8 @@
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_EXAMPLE
 
 #define __VSF_TGUI_CONTROLS_PANEL_CLASS_INHERIT
+declare_class(vsf_tgui_t)
 #include "./vsf_tgui_v_panel.h"
-#include "../../__vsf_tgui_control_types.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

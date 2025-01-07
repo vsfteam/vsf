@@ -21,7 +21,8 @@
 #define __VSF_TGUI_CLASS_INHERIT
 #include "../../vsf_tgui.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
+#if     VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED                    \
+    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 
 #include <math.h>
 #include <string.h>
@@ -546,7 +547,7 @@ uint32_t vsf_tgui_port_get_refresh_rate(vsf_tgui_t *gui_ptr)
 }
 #endif
 
-void vsf_tgui_sv_bind_disp(vsf_tgui_t *gui_ptr, vk_disp_t *disp, void *pfb, size_t pfb_size)
+void vsf_tgui_v_bind_disp(vsf_tgui_t *gui_ptr, vk_disp_t *disp, void *pfb, size_t pfb_size)
 {
     VSF_TGUI_ASSERT(disp != NULL);
     VSF_TGUI_ASSERT(pfb != NULL);

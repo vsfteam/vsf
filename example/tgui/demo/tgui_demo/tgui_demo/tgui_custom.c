@@ -20,7 +20,9 @@
 #define __VSF_DISP_CLASS_INHERIT
 #include "vsf.h"
 
-#if VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED
+#if     VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED                    \
+    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
+
 #include "./tgui_custom.h"
 #include "./images/demo_images.h"
 #include "./images/demo_images_data.h"
