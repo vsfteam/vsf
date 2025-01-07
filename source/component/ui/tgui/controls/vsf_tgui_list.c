@@ -334,18 +334,18 @@ fsm_rt_t vsf_tgui_list_msg_handler(vsf_tgui_list_t* ptList, vsf_tgui_msg_t* ptMS
         switch (ptList->ptList->ContainerAttribute.u5Type) {
             case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_HORIZONTAL:
                 if (ptEvt->delta.use_as__vsf_tgui_location_t.iX > 0) {
-                    bStatusChanged = __vk_tgui_list_previous(ptList);
+                    bStatusChanged = __vk_tgui_list_next(ptList);
                     break;
                 } else if (ptEvt->delta.use_as__vsf_tgui_location_t.iX < 0) {
-                    bStatusChanged = __vk_tgui_list_next(ptList);
+                    bStatusChanged = __vk_tgui_list_previous(ptList);
                     break;
                 }
                 //! fall-through
             case VSF_TGUI_CONTAINER_TYPE_LINE_STREAM_VERTICAL:
                 if (ptEvt->delta.use_as__vsf_tgui_location_t.iY > 0) {
-                    bStatusChanged = __vk_tgui_list_previous(ptList);
-                } else if (ptEvt->delta.use_as__vsf_tgui_location_t.iY < 0) {
                     bStatusChanged = __vk_tgui_list_next(ptList);
+                } else if (ptEvt->delta.use_as__vsf_tgui_location_t.iY < 0) {
+                    bStatusChanged = __vk_tgui_list_previous(ptList);
                 }
                 break;
         }
