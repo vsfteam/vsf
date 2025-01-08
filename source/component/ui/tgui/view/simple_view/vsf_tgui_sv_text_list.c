@@ -28,6 +28,7 @@ declare_class(vsf_tgui_t)
 #include "./vsf_tgui_sv_text_list.h"
 
 /*============================ MACROS ========================================*/
+
 #ifndef VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR
 #   define VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR   VSF_TGUI_COLOR_BLUE
 #endif

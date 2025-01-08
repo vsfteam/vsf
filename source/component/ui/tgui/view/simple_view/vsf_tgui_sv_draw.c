@@ -30,6 +30,7 @@ declare_class(vsf_tgui_t)
 #include "../vsf_tgui_v.h"
 
 /*============================ MACROS ========================================*/
+
 #ifndef VSF_TGUI_CFG_SV_DRAW_LOG
 #   define VSF_TGUI_CFG_SV_DRAW_LOG              DISABLED
 #endif

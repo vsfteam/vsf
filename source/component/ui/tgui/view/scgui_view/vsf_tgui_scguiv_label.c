@@ -92,36 +92,9 @@ fsm_rt_t vsf_tgui_label_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_pt
     return fsm_rt_cpl;
 }
 
-vsf_tgui_size_t __vk_tgui_label_v_text_get_size(vsf_tgui_label_t* label_ptr,
-                                                uint16_t *line_count_ptr,
-                                                uint8_t *char_height_ptr)
+uint8_t __vk_tgui_label_v_get_font(vsf_tgui_label_t* label_ptr)
 {
-    VSF_TGUI_ASSERT(label_ptr != NULL);
-
-#if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
-    if (label_ptr->tLabel.bIsChanged) {
-        label_ptr->tLabel.bIsChanged = false;
-        label_ptr->tLabel.tInfoCache.tStringSize = vsf_tgui_text_get_size(
-                                        label_ptr->font_index,
-                                        &(label_ptr->tLabel.tString),
-                                        &(label_ptr->tLabel.tInfoCache.hwLines),
-                                        &(label_ptr->tLabel.tInfoCache.chCharHeight),
-                                        label_ptr->tLabel.chInterLineSpace);
-    }
-    if (NULL != char_height_ptr) {
-        *char_height_ptr = label_ptr->tLabel.tInfoCache.chCharHeight;
-    }
-    return label_ptr->tLabel.tInfoCache.tStringSize;
-#else
-    vsf_tgui_size_t size = vsf_tgui_text_get_size(
-                                        label_ptr->font_index,
-                                        &(label_ptr->tLabel.tString),
-                                        line_count_ptr,
-                                        char_height_ptr,
-                                        label_ptr->tLabel.chInterLineSpace);
-
-    return size;
-#endif
+    return label_ptr->font_index;
 }
 
 vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* label_ptr)

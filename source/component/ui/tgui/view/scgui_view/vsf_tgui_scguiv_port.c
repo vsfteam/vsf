@@ -224,40 +224,6 @@ void vsf_tgui_v_bind_disp(vsf_tgui_t *gui_ptr, vk_disp_t *disp, void *pfb, size_
 
 // draw
 
-vsf_tgui_size_t __vk_tgui_text_get_size(const uint8_t font_index,
-                                        vsf_tgui_text_info_t *string_info_ptr,
-                                        uint16_t *line_count_ptr,
-                                        uint8_t *char_height_ptr)
-{
-    VSF_TGUI_ASSERT(string_info_ptr != NULL);
-    VSF_TGUI_ASSERT(string_info_ptr->tString.pstrText != NULL);
-
-#if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
-    if (string_info_ptr->bIsChanged) {
-        string_info_ptr->bIsChanged = false;
-        string_info_ptr->tInfoCache.tStringSize = vsf_tgui_text_get_size(
-                                        font_index,
-                                        &(string_info_ptr->tString),
-                                        &(string_info_ptr->tInfoCache.hwLines),
-                                        &(string_info_ptr->tInfoCache.chCharHeight),
-                                        string_info_ptr->chInterLineSpace);
-    }
-    if (NULL != char_height_ptr) {
-        *char_height_ptr = string_info_ptr->tInfoCache.chCharHeight;
-    }
-    return string_info_ptr->tInfoCache.tStringSize;
-#else
-    vsf_tgui_size_t size = vsf_tgui_text_get_size(
-                                        label_ptr->font_index,
-                                        &(string_info_ptr->tString),
-                                        line_count_ptr,
-                                        char_height_ptr,
-                                        string_info_ptr->chInterLineSpace);
-
-    return size;
-#endif
-}
-
 void vsf_tgui_control_v_draw_text(  vsf_tgui_t* gui_ptr,
                                     const vsf_tgui_control_t* control_ptr,
                                     const vsf_tgui_region_t* dirty_region_ptr,
@@ -270,13 +236,21 @@ void vsf_tgui_control_v_draw_text(  vsf_tgui_t* gui_ptr,
     VSF_TGUI_ASSERT(font_ptr != NULL);
     lv_font_t *font = (lv_font_t *)font_ptr->font;
 
-    vsf_tgui_location_t location = { 0 };
-    vsf_tgui_control_calculate_absolute_location(control_ptr, &location);
+    vsf_tgui_region_t text_region = {
+        .tSize      = vsf_tgui_text_get_size(font_index, ptStringInfo, NULL, NULL),
+    };
+    vsf_tgui_region_update_with_align(&text_region, (vsf_tgui_region_t *)&control_ptr->tRegion, mode);
+    vsf_tgui_control_calculate_absolute_location(control_ptr, &text_region.tLocation);
+#if VSF_TGUI_CFG_V_SUPPORT_ROUND_BORDER == ENABLED
+    if (control_ptr->border_radius > 0) {
+        text_region.tLocation.iX += control_ptr->border_radius;
+    }
+#endif
 
     // TODO: multi line and align support
     uint16_t alpha = gui->alpha;
     gui->alpha = 0;
-    SC_pfb_printf(&gui_ptr->cur_tile, location.iX, location.iY,
+    SC_pfb_printf(&gui_ptr->cur_tile, text_region.tLocation.iX, text_region.tLocation.iY,
         ptStringInfo->tString.pstrText, color, 0, font);
     gui->alpha = alpha;
 }

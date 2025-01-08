@@ -72,14 +72,39 @@ fsm_rt_t vsf_tgui_label_msg_handler(    vsf_tgui_label_t* control_ptr,
                                             &c_tVLabel);
 }
 
+vsf_tgui_size_t vsf_tgui_label_text_get_size(   vsf_tgui_label_t* label_ptr,
+                                                uint16_t *line_count_ptr,
+                                                uint8_t *char_height_ptr)
+{
+    VSF_TGUI_ASSERT(label_ptr != NULL);
+
+#if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
+    if (label_ptr->tLabel.bIsChanged) {
+        label_ptr->tLabel.tInfoCache.tStringSize = vsf_tgui_text_get_size(
+                                        __vk_tgui_label_v_get_font(label_ptr),
+                                        &label_ptr->tLabel,
+                                        line_count_ptr,
+                                        char_height_ptr);
+    }
+    return label_ptr->tLabel.tInfoCache.tStringSize;
+#else
+    vsf_tgui_size_t size = vsf_tgui_text_get_size(
+                                        __vk_tgui_label_v_get_font(label_ptr),
+                                        &label_ptr->tLabel,
+                                        line_count_ptr,
+                                        char_height_ptr);
+
+    return size;
+#endif
+}
+
 fsm_rt_t vk_tgui_label_update(vsf_tgui_label_t* ptLabel)
 {
     if (fsm_rt_cpl == vk_tgui_control_update((vsf_tgui_control_t *)ptLabel)) {
     #if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
         if (ptLabel->tLabel.bIsChanged) {
-            ptLabel->tLabel.bIsChanged = false;
             ptLabel->tLabel.tInfoCache.tStringSize =
-                __vk_tgui_label_v_text_get_size(ptLabel, 
+                vsf_tgui_label_text_get_size(   ptLabel, 
                                                 &(ptLabel->tLabel.tInfoCache.hwLines),
                                                 NULL);
         }

@@ -44,11 +44,10 @@ vsf_tgui_string_t* vsf_tgui_text_get_line(  vsf_tgui_string_t* ptStringIn,
 #endif
 
 extern
-vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t chFontIndex,
-                                        vsf_tgui_string_t* ptString,
-                                        uint16_t *phwLineCount,
-                                        uint8_t *pchCharHeight,
-                                        int_fast8_t chInterlineSpace);
+vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t font_index,
+                                        vsf_tgui_text_info_t *string_info_ptr,
+                                        uint16_t *line_count_ptr,
+                                        uint8_t *char_height_ptr);
 
 extern
 uint32_t vsf_tgui_text_get_next(const char* pchString, size_t* ptSize);

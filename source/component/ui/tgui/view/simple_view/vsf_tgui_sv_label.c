@@ -33,19 +33,8 @@ declare_class(vsf_tgui_t)
 /*============================ TYPES =========================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-extern vsf_tgui_sv_color_t vsf_tgui_sv_get_text_color(vsf_tgui_label_t* label_ptr);
-
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
-
-fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr)
-{
-#if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
-    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) label init" VSF_TRACE_CFG_LINEEND,
-        vsf_tgui_control_get_node_name((vsf_tgui_control_t*)label_ptr), label_ptr);
-#endif
-    return vsf_tgui_control_v_init(gui_ptr, &label_ptr->use_as__vsf_tgui_control_t);
-}
 
 int_fast16_t __vk_tgui_label_get_line_height(const vsf_tgui_label_t* label_ptr)
 {
@@ -53,39 +42,10 @@ int_fast16_t __vk_tgui_label_get_line_height(const vsf_tgui_label_t* label_ptr)
     return (int_fast16_t) vsf_tgui_font_get_char_height(label_ptr->font_index);
 }
 
-vsf_tgui_size_t __vk_tgui_label_v_text_get_size(vsf_tgui_label_t* label_ptr,
-                                                uint16_t *line_count_ptr,
-                                                uint8_t *char_height_ptr)
+uint8_t __vk_tgui_label_v_get_font(vsf_tgui_label_t* label_ptr)
 {
-    VSF_TGUI_ASSERT(label_ptr != NULL);
-
-#if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
-
-    label_ptr->tLabel.bIsChanged = false;
-    label_ptr->tLabel.tInfoCache.tStringSize = vsf_tgui_text_get_size(label_ptr->font_index,
-                                                                    &(label_ptr->tLabel.tString),
-                                                                    &(label_ptr->tLabel.tInfoCache.hwLines),
-                                                                    &(label_ptr->tLabel.tInfoCache.chCharHeight),
-                                                                    label_ptr->tLabel.chInterLineSpace);
-
-    if (NULL != char_height_ptr) {
-        *char_height_ptr = label_ptr->tLabel.tInfoCache.chCharHeight;
-    }
-
-    return label_ptr->tLabel.tInfoCache.tStringSize;
-#else
-    vsf_tgui_size_t size = vsf_tgui_text_get_size(
-                                    label_ptr->font_index,
-                                    &(label_ptr->tLabel.tString),
-                                    line_count_ptr,
-                                    char_height_ptr,
-                                    label_ptr->tLabel.chInterLineSpace);
-
-    return size;
-#endif
-
+    return label_ptr->font_index;
 }
-
 
 vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* label_ptr)
 {
@@ -122,6 +82,15 @@ vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* l
 #endif
 
     return size;
+}
+
+fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr)
+{
+#if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+    VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) label init" VSF_TRACE_CFG_LINEEND,
+        vsf_tgui_control_get_node_name((vsf_tgui_control_t*)label_ptr), label_ptr);
+#endif
+    return vsf_tgui_control_v_init(gui_ptr, &label_ptr->use_as__vsf_tgui_control_t);
 }
 
 VSF_CAL_WEAK(vsf_tgui_sv_get_text_color)

@@ -183,7 +183,7 @@ vsf_tgui_string_t* vsf_tgui_text_get_line(  vsf_tgui_string_t* string_in_ptr,
 }
 #endif
 
-vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t font_index,
+static vsf_tgui_size_t __vsf_tgui_text_get_size( const uint8_t font_index,
                                         vsf_tgui_string_t* string_ptr,
                                         uint16_t *line_count_ptr,
                                         uint8_t *char_height_ptr,
@@ -245,6 +245,40 @@ vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t font_index,
     }
 
     return tSize;
+}
+
+vsf_tgui_size_t vsf_tgui_text_get_size(const uint8_t font_index,
+                                        vsf_tgui_text_info_t *string_info_ptr,
+                                        uint16_t *line_count_ptr,
+                                        uint8_t *char_height_ptr)
+{
+    VSF_TGUI_ASSERT(string_info_ptr != NULL);
+    VSF_TGUI_ASSERT(string_info_ptr->tString.pstrText != NULL);
+
+#if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
+    if (string_info_ptr->bIsChanged) {
+        string_info_ptr->bIsChanged = false;
+        string_info_ptr->tInfoCache.tStringSize = __vsf_tgui_text_get_size(
+                                        font_index,
+                                        &(string_info_ptr->tString),
+                                        &(string_info_ptr->tInfoCache.hwLines),
+                                        &(string_info_ptr->tInfoCache.chCharHeight),
+                                        string_info_ptr->chInterLineSpace);
+    }
+    if (NULL != char_height_ptr) {
+        *char_height_ptr = string_info_ptr->tInfoCache.chCharHeight;
+    }
+    return string_info_ptr->tInfoCache.tStringSize;
+#else
+    vsf_tgui_size_t size = vsf_tgui_text_get_size(
+                                        label_ptr->font_index,
+                                        &(string_info_ptr->tString),
+                                        line_count_ptr,
+                                        char_height_ptr,
+                                        string_info_ptr->chInterLineSpace);
+
+    return size;
+#endif
 }
 
 #endif

@@ -44,16 +44,9 @@ extern fsm_rt_t vsf_tgui_label_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* l
 
 extern fsm_rt_t vsf_tgui_label_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr);
 
-extern
-vsf_tgui_size_t __vk_tgui_label_v_text_get_size(vsf_tgui_label_t* label_ptr,
-                                                uint16_t *line_count_ptr,
-                                                uint8_t *char_height_ptr);
-
-extern
-vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* label_ptr);
-
-extern
-int_fast16_t __vk_tgui_label_get_line_height( const vsf_tgui_label_t* label_ptr);
+extern uint8_t __vk_tgui_label_v_get_font(vsf_tgui_label_t* label_ptr);
+extern vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* label_ptr);
+extern int_fast16_t __vk_tgui_label_get_line_height( const vsf_tgui_label_t* label_ptr);
 
 #endif
 

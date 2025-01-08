@@ -237,10 +237,10 @@ static void __vk_tgui_text_list_internal_update(vsf_tgui_text_list_t* ptTextList
 #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN == ENABLED
     ptTextList->tList.tBuffer.tMargin.chTop = ptTextList->tList.tContent.tLabel.chInterLineSpace;
 #endif 
-#   if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
+#if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
     ptTextList->hwLineCount = ptTextList->tList.tContent.tLabel.tInfoCache.hwLines;
 #else
-    __vk_tgui_label_v_text_get_size(&(ptTextList->tList.tContent), &ptTextList->hwLineCount, NULL);
+    vsf_tgui_label_text_get_size(&(ptTextList->tList.tContent), &ptTextList->hwLineCount, NULL);
 #endif
 }
 
@@ -382,7 +382,7 @@ fsm_rt_t vk_tgui_text_list_update(vsf_tgui_text_list_t* ptTextList)
         #else
             int16_t __char_height = 0; 
             uint8_t __temp;
-            __vk_tgui_label_v_text_get_size(&(ptTextList->tList.tContent.tLabel), NULL, &__temp);
+            vsf_tgui_label_text_get_size(&(ptTextList->tList.tContent.tLabel), NULL, &__temp);
             __char_height = __temp;
         #endif
             int16_t __line_height = __char_height + ptTextList->tList.tContent.tLabel.chInterLineSpace;

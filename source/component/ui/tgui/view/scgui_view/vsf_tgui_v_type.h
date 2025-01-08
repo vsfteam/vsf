@@ -217,10 +217,10 @@ def_structure(vsf_tgui_v_container_t)
 end_def_structure(vsf_tgui_v_container_t)
 
 def_structure(vsf_tgui_v_label_t)
-    uint8_t font_index;
 #if VSF_TGUI_CFG_V_LABLE_SUPPORT_TEXT_COLOR == ENABLED
     vsf_tgui_v_color_t text_color;
 #endif
+    uint8_t font_index;
 end_def_structure(vsf_tgui_v_label_t)
 
 def_structure(vsf_tgui_v_button_t)
