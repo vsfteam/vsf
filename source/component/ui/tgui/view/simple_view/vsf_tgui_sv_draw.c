@@ -317,16 +317,14 @@ static bool __sv_text_get_size(const uint8_t font_index, vsf_tgui_text_info_t* s
         string_info_ptr->tInfoCache.tStringSize = vsf_tgui_text_get_size(font_index,
                                                                       &(string_info_ptr->tString),
                                                                       &(string_info_ptr->tInfoCache.hwLines),
-                                                                      &(string_info_ptr->tInfoCache.chCharHeight),
-                                                                      string_info_ptr->chInterLineSpace);
+                                                                      &(string_info_ptr->tInfoCache.chCharHeight));
     }
     *size_ptr = string_info_ptr->tInfoCache.tStringSize;
 #else
     * size_ptr = vsf_tgui_text_get_size(  font_index,
                                         &(string_info_ptr->tString),
                                         NULL,
-                                        NULL,
-                                        string_info_ptr->chInterLineSpace);
+                                        NULL);
 #endif
 
     if (size_ptr->iWidth <= 0 || size_ptr->iHeight <= 0) {

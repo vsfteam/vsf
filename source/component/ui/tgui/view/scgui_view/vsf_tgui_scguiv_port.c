@@ -87,26 +87,34 @@ vsf_tgui_region_t* vsf_tgui_v_refresh_loop_begin(vsf_tgui_t *gui_ptr, const vsf_
             current_region_ptr->tSize.iHeight = height;
 
             SC_tile *cur_tile = &gui_ptr->cur_tile;
-            SC_pfb_clip(&gui_ptr->cur_tile, current_region_ptr->tLocation.iX, current_region_ptr->tLocation.iY,
-                current_region_ptr->tLocation.iX + current_region_ptr->tSize.iWidth - 1,
-                current_region_ptr->tLocation.iY + current_region_ptr->tSize.iHeight - 1,
+            SC_pfb_clip(cur_tile, request_region_ptr->tLocation.iX, request_region_ptr->tLocation.iY,
+                request_region_ptr->tLocation.iX + request_region_ptr->tSize.iWidth - 1,
+                request_region_ptr->tLocation.iY + request_region_ptr->tSize.iHeight - 1,
                 0);
 
             VSF_TGUI_LOG(VSF_TRACE_INFO,
                          "[SCgui View Port] current region location(%d, %d), size(%d, %d)" VSF_TRACE_CFG_LINEEND,
                          cur_tile->xs, cur_tile->ys, cur_tile->w, cur_tile->h);
         }
+    } else {
+        SC_pfb_clip(&gui_ptr->cur_tile, request_region_ptr->tLocation.iX, request_region_ptr->tLocation.iY,
+                request_region_ptr->tLocation.iX + request_region_ptr->tSize.iWidth - 1,
+                request_region_ptr->tLocation.iY + request_region_ptr->tSize.iHeight - 1,
+                0);
     }
 
     return current_region_ptr;
 }
 
-static void __vsf_tgui_v_disp_refresh(vsf_tgui_t *gui_ptr, vk_disp_area_t *area)
+static void __vsf_tgui_v_disp_refresh(vsf_tgui_t *gui_ptr, vk_disp_area_t *area, uint16_t *buffer)
 {
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[SCgui View Port]vk_disp_refresh (%d %d) (%d %d)." VSF_TRACE_CFG_LINEEND,
                  area->pos.x, area->pos.y, area->size.x, area->size.y);
 
-    vk_disp_refresh(gui_ptr->disp, area, gui_ptr->cur_tile.buf);
+    if(++gui_ptr->cur_tile.stup >= gui_ptr->cur_tile.num) {
+        gui_ptr->cur_tile.stup = 0;
+    }
+    vk_disp_refresh(gui_ptr->disp, area, buffer);
 
     vsf_protect_t orig = vsf_protect_int();
         gui_ptr->refresh_pending_cnt++;
@@ -143,10 +151,11 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t *gui_ptr)
     if (gui_ptr->refresh_pending_cnt > 0) {
         gui_ptr->refresh_pending = true;
         gui_ptr->refresh_pending_area = area;
+        gui_ptr->refresh_pending_buffer = gui_ptr->cur_tile.buf;
         vsf_unprotect_int(orig);
     } else {
         vsf_unprotect_int(orig);
-        __vsf_tgui_v_disp_refresh(gui_ptr, &area);
+        __vsf_tgui_v_disp_refresh(gui_ptr, &area, gui_ptr->cur_tile.buf);
     }
 
     int request_location_y2 = request_region_ptr->tLocation.iY + request_region_ptr->tSize.iHeight;
@@ -179,7 +188,7 @@ static void __vsf_tgui_on_disp_ready(vk_disp_t *disp)
         gui_ptr->refresh_pending = false;
         vsf_unprotect_int(orig);
 
-        __vsf_tgui_v_disp_refresh(gui_ptr, &area);
+        __vsf_tgui_v_disp_refresh(gui_ptr, &area, gui_ptr->refresh_pending_buffer);
     } else {
         vsf_unprotect_int(orig);
     }
@@ -236,10 +245,13 @@ void vsf_tgui_control_v_draw_text(  vsf_tgui_t* gui_ptr,
     VSF_TGUI_ASSERT(font_ptr != NULL);
     lv_font_t *font = (lv_font_t *)font_ptr->font;
 
-    vsf_tgui_region_t text_region = {
+    vsf_tgui_region_t temp_region = {
         .tSize      = vsf_tgui_text_get_size(font_index, ptStringInfo, NULL, NULL),
     };
-    vsf_tgui_region_update_with_align(&text_region, (vsf_tgui_region_t *)&control_ptr->tRegion, mode);
+    vsf_tgui_region_t text_region = {
+        .tSize      = control_ptr->tSize,
+    };
+    vsf_tgui_region_update_with_align(&text_region, &temp_region, mode);
     vsf_tgui_control_calculate_absolute_location(control_ptr, &text_region.tLocation);
 #if VSF_TGUI_CFG_V_SUPPORT_ROUND_BORDER == ENABLED
     if (control_ptr->border_radius > 0) {

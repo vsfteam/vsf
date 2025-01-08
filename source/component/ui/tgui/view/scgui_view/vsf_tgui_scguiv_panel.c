@@ -52,10 +52,10 @@ fsm_rt_t vsf_tgui_panel_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* panel_ptr)
             )
         );
 
-        vk_tgui_label_init(&(panel_ptr->tTitleLabel));
-#endif
-
+        return vk_tgui_label_init(&(panel_ptr->tTitleLabel));
+#else
         return fsm_rt_cpl;
+#endif
     }
     return fsm_rt_on_going;
 }
@@ -65,8 +65,7 @@ fsm_rt_t vsf_tgui_panel_v_rendering(vsf_tgui_t *gui_ptr,
                                     vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
                                     vsf_tgui_control_refresh_mode_t mode)
 {
-    vsf_tgui_container_v_rendering(gui_ptr, &panel_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
-    return fsm_rt_cpl;
+    return vsf_tgui_container_v_rendering(gui_ptr, &panel_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
 }
 
 fsm_rt_t vsf_tgui_panel_v_post_rendering(vsf_tgui_t *gui_ptr,

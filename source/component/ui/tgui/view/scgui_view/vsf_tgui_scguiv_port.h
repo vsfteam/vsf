@@ -71,6 +71,7 @@ def_structure(vsf_tgui_v_port_t)
     bool refresh_pending_notify;
     uint8_t refresh_pending_cnt;
     vk_disp_area_t refresh_pending_area;
+    uint16_t *refresh_pending_buffer;
 
     SC_tile cur_tile;
     vsf_tgui_region_t request_region;
