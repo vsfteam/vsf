@@ -44,7 +44,7 @@ fsm_rt_t vsf_tgui_container_v_rendering(vsf_tgui_t* gui_ptr,
                                         vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
                                         vsf_tgui_control_refresh_mode_t mode)
 {
-    return fsm_rt_cpl;
+    return vsf_tgui_control_v_rendering(gui_ptr, (vsf_tgui_control_t *)container_ptr, dirty_region_ptr, mode);
 }
 
 fsm_rt_t vsf_tgui_container_v_post_rendering(vsf_tgui_t* gui_ptr,

@@ -36,7 +36,7 @@ declare_class(vsf_tgui_t)
 
 fsm_rt_t vsf_tgui_button_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_button_t* button_ptr)
 {
-    return fsm_rt_cpl;
+    return vsf_tgui_label_v_init(gui_ptr, &button_ptr->use_as__vsf_tgui_label_t);
 }
 
 fsm_rt_t vsf_tgui_button_v_rendering(   vsf_tgui_t *gui_ptr,
@@ -44,7 +44,7 @@ fsm_rt_t vsf_tgui_button_v_rendering(   vsf_tgui_t *gui_ptr,
                                         vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
                                         vsf_tgui_control_refresh_mode_t mode)
 {
-    return fsm_rt_cpl;
+    return vsf_tgui_label_v_rendering(gui_ptr, (vsf_tgui_label_t *)button_ptr, dirty_region_ptr, mode);
 }
 
 fsm_rt_t vsf_tgui_button_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_button_t* button_ptr)

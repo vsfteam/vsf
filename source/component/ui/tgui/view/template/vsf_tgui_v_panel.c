@@ -36,7 +36,28 @@ declare_class(vsf_tgui_t)
 
 fsm_rt_t vsf_tgui_panel_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* panel_ptr)
 {
-    return fsm_rt_cpl;
+    if (fsm_rt_cpl == vsf_tgui_container_v_init(gui_ptr, &(panel_ptr->use_as__vsf_tgui_container_t))) {
+#if VSF_TGUI_CFG_PANEL_HAS_LABEL == ENABLED
+    #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
+        int16_t iWidth = panel_ptr->iWidth - panel_ptr->tContainerPadding.chLeft - panel_ptr->tContainerPadding.chRight;
+    #else
+        int16_t iWidth = panel_ptr->iWidth;
+    #endif
+
+        tgui_set_priv_label(panel_ptr, tTitleLabel,
+            tgui_attribute(tLabel, panel_ptr->tTitle),
+            tgui_region(
+                tgui_location(0, 0),
+                tgui_size(iWidth, 32),
+            )
+        );
+
+        return vk_tgui_label_init(&(panel_ptr->tTitleLabel));
+#else
+        return fsm_rt_cpl;
+#endif
+    }
+    return fsm_rt_on_going;
 }
 
 fsm_rt_t vsf_tgui_panel_v_rendering(vsf_tgui_t *gui_ptr,
@@ -45,7 +66,7 @@ fsm_rt_t vsf_tgui_panel_v_rendering(vsf_tgui_t *gui_ptr,
                                     vsf_tgui_control_refresh_mode_t mode)
 {
 
-    return fsm_rt_cpl;
+    return vsf_tgui_container_v_rendering(gui_ptr, &panel_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
 }
 
 fsm_rt_t vsf_tgui_panel_v_post_rendering(vsf_tgui_t *gui_ptr,
