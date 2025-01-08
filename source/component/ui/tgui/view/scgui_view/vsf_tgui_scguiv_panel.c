@@ -19,11 +19,11 @@
 #include "../../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED \
-    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_EXAMPLE
+    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SCGUI_VIEW
 
-#define __VSF_TGUI_CONTROLS_LABEL_CLASS_INHERIT
+#define __VSF_TGUI_CONTROLS_PANEL_CLASS_INHERIT
 declare_class(vsf_tgui_t)
-#include "./vsf_tgui_v_label.h"
+#include "./vsf_tgui_scguiv_panel.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -34,44 +34,66 @@ declare_class(vsf_tgui_t)
 /*============================ IMPLEMENTATION ================================*/
 
 
-fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr)
+fsm_rt_t vsf_tgui_panel_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* panel_ptr)
 {
-    return fsm_rt_cpl;
+    if (fsm_rt_cpl == vsf_tgui_container_v_init(gui_ptr, &(panel_ptr->use_as__vsf_tgui_container_t))) {
+#if VSF_TGUI_CFG_PANEL_HAS_LABEL == ENABLED
+    #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
+        int16_t iWidth = panel_ptr->iWidth - panel_ptr->tContainerPadding.chLeft - panel_ptr->tContainerPadding.chRight;
+    #else
+        int16_t iWidth = panel_ptr->iWidth;
+    #endif
+
+        tgui_set_priv_label(panel_ptr, tTitleLabel,
+            tgui_attribute(tLabel, panel_ptr->tTitle),
+            tgui_region(
+                tgui_location(0, 0),
+                tgui_size(iWidth, 32),
+            )
+        );
+
+        vk_tgui_label_init(&(panel_ptr->tTitleLabel));
+#endif
+
+        return fsm_rt_cpl;
+    }
+    return fsm_rt_on_going;
 }
 
-fsm_rt_t vsf_tgui_label_v_rendering(vsf_tgui_t* gui_ptr,
-                                    vsf_tgui_label_t* label_ptr,
+fsm_rt_t vsf_tgui_panel_v_rendering(vsf_tgui_t *gui_ptr,
+                                    vsf_tgui_panel_t* panel_ptr,
                                     vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
                                     vsf_tgui_control_refresh_mode_t mode)
 {
+    vsf_tgui_container_v_rendering(gui_ptr, &panel_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_label_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr)
+fsm_rt_t vsf_tgui_panel_v_post_rendering(vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_panel_t* panel_ptr,
+                                        vsf_tgui_region_t* dirty_region_ptr,
+                                        vsf_tgui_control_refresh_mode_t mode)
 {
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_label_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr)
+fsm_rt_t vsf_tgui_panel_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* panel_ptr)
 {
     return fsm_rt_cpl;
 }
 
-vsf_tgui_size_t __vk_tgui_label_v_text_get_size(vsf_tgui_label_t* label_ptr,
-                                                uint16_t *line_count_ptr,
-                                                uint8_t *char_height_ptr)
+fsm_rt_t vsf_tgui_panel_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* panel_ptr)
 {
-    return (vsf_tgui_size_t){0};
-}
-
-vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* label_ptr)
-{
-    return (vsf_tgui_size_t){0};
-}
-
-int_fast16_t __vk_tgui_label_get_line_height(const vsf_tgui_label_t* label_ptr)
-{
-    return 0;
+#if VSF_TGUI_CFG_PANEL_HAS_LABEL == ENABLED
+    if (!panel_ptr->tTitle.bIsAutoSize) {
+    #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
+        panel_ptr->tTitleLabel.tRegion.tSize.iWidth = panel_ptr->iWidth - panel_ptr->tContainerPadding.chLeft - panel_ptr->tContainerPadding.chRight;
+    #else
+        panel_ptr->tTitleLabel.tRegion.tSize.iWidth = panel_ptr->iWidth;
+    #endif
+    }
+#endif
+    return fsm_rt_cpl;
 }
 
 #endif

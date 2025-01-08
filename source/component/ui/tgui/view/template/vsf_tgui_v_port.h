@@ -26,7 +26,7 @@
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_EXAMPLE
 
 #define __VSF_DISP_CLASS_INHERIT__
-#include "component/ui/disp//vsf_disp.h"
+#include "component/ui/disp/vsf_disp.h"
 
 /*============================ MACROS ========================================*/
 

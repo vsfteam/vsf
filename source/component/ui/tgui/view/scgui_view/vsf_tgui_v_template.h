@@ -15,17 +15,24 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_TINY_GUI_V_TEXT_LIST_H__
-#define __VSF_TINY_GUI_V_TEXT_LIST_H__
+#ifndef __VSF_TINY_GUI_SCGUIV_H__
+#define __VSF_TINY_GUI_SCGUIV_H__
 
 /*============================ INCLUDES ======================================*/
-#include "../../vsf_tgui_cfg.h"
+#include "../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
-    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_EXAMPLE
+    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SCGUI_VIEW
 
-#include "./vsf_tgui_v_container.h"
-#include "./vsf_tgui_v_label.h"
+#include "./vsf_tgui_v_type.h"
+#include "./vsf_tgui_scguiv_port.h"
+#include "./vsf_tgui_scguiv_control.h"
+#include "./vsf_tgui_scguiv_container.h"
+#include "./vsf_tgui_scguiv_label.h"
+#include "./vsf_tgui_scguiv_button.h"
+#include "./vsf_tgui_scguiv_panel.h"
+#include "./vsf_tgui_scguiv_list.h"
+#include "./vsf_tgui_scguiv_text_list.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -33,21 +40,6 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern fsm_rt_t vsf_tgui_text_list_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_text_list_t* text_list_ptr);
-
-extern fsm_rt_t vsf_tgui_text_list_v_rendering(vsf_tgui_t *gui_ptr,
-                                            vsf_tgui_text_list_t* text_list_ptr,
-                                            vsf_tgui_region_t* dirty_region_ptr,
-                                            vsf_tgui_control_refresh_mode_t mode);
-extern fsm_rt_t vsf_tgui_text_list_v_post_rendering(vsf_tgui_t *gui_ptr,
-                                        vsf_tgui_text_list_t* text_list_ptr,
-                                        vsf_tgui_region_t* dirty_region_ptr,
-                                        vsf_tgui_control_refresh_mode_t mode);
-
-extern fsm_rt_t vsf_tgui_text_list_v_depose(vsf_tgui_t* gui_ptr, vsf_tgui_text_list_t* text_list_ptr);
-extern fsm_rt_t vsf_tgui_text_list_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_text_list_t* text_list_ptr);
-
 #endif
-
 #endif
 /* EOF */

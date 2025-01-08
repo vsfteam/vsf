@@ -15,31 +15,40 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_TINY_GUI_SV_PORT_H__
-#define __VSF_TINY_GUI_SV_PORT_H__
+#ifndef __VSF_TINY_GUI_SCGUIV_PORT_H__
+#define __VSF_TINY_GUI_SCGUIV_PORT_H__
 
 /*============================ INCLUDES ======================================*/
 
 #include "../../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
-    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
+    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SCGUI_VIEW
 
 #define __VSF_DISP_CLASS_INHERIT__
 #include "component/ui/disp/vsf_disp.h"
 
+#include "./scgui/SCGUI/sc_gui.h"
+
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_TGUI_CFG_SV_REFRESH_RATE
-#   define VSF_TGUI_CFG_SV_REFRESH_RATE                 ENABLED
+#if VSF_TGUI_CFG_COLOR_MODE != VSF_TGUI_COLOR_MODE_RGB565
+#   error "SCGui support RGB565 ONLY"
 #endif
 
-#ifndef VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY
-#   define VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY             DISABLED
+#if VSF_TGUI_CFG_FONT_USE_FREETYPE == ENABLED
+#   error "SCGui has internal font implementation, can not use freetype"
+#endif
+#if VSF_TGUI_CFG_FONT_USE_LVGL != ENABLED
+#   error "SCGui ues lvgl as internal font, please enable VSF_TGUI_CFG_FONT_USE_LVGL"
 #endif
 
-#ifndef VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER
-#   define VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER           ENABLED
+#ifndef VSF_TGUI_HOR_MAX
+#   define VSF_TGUI_HOR_MAX                         800
+#endif
+
+#ifndef VSF_TGUI_VER_MAX
+#   define VSF_TGUI_VER_MAX                         600
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -52,37 +61,25 @@
 
 /*============================ TYPES =========================================*/
 
-declare_class(vsf_tgui_t)
-declare_structure(vsf_tgui_v_port_t)
+typedef uint16_t vsf_tgui_v_color_t;
+
 def_structure(vsf_tgui_v_port_t)
     vk_disp_t *disp;
-    void *pfb;
     bool is_disp_inited;
-#if VSF_TGUI_CFG_SV_DRAW_DOUBLE_BUFFER == ENABLED
     bool refresh_is_first_pfb;
     bool refresh_pending;
-#endif
     bool refresh_pending_notify;
     uint8_t refresh_pending_cnt;
-    size_t pfb_size;
     vk_disp_area_t refresh_pending_area;
 
-#if VSF_TGUI_CFG_SV_DRAW_IMMEDIATELY == ENABLED
-    volatile bool is_draw_ready;
-#endif
+    SC_tile cur_tile;
     vsf_tgui_region_t request_region;
     vsf_tgui_region_t current_region;
-#if VSF_TGUI_CFG_SV_REFRESH_RATE == ENABLED
-    vsf_systimer_tick_t start_cnt;
-    uint16_t refresh_cnt;
-    uint16_t fps;
-#endif
 end_def_structure(vsf_tgui_v_port_t)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
 #endif
-
 #endif
 /* EOF */

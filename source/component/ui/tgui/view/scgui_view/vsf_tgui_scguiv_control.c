@@ -19,11 +19,15 @@
 #include "../../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED \
-    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_EXAMPLE
+    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SCGUI_VIEW
 
-#define __VSF_TGUI_CONTROLS_BUTTON_CLASS_INHERIT
-declare_class(vsf_tgui_t)
-#include "./vsf_tgui_v_button.h"
+#define __VSF_TGUI_CONTROLS_CONTROL_CLASS_INHERIT
+#define __VSF_TGUI_CLASS_INHERIT
+#include "component/ui/tgui/vsf_tgui.h"
+
+#include "./vsf_tgui_scguiv_control.h"
+
+#include "./scgui/SCGUI/sc_gui.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -34,25 +38,61 @@ declare_class(vsf_tgui_t)
 /*============================ IMPLEMENTATION ================================*/
 
 
-fsm_rt_t vsf_tgui_button_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_button_t* button_ptr)
+fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_control_t* control_ptr)
 {
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_button_v_rendering(   vsf_tgui_t *gui_ptr,
-                                        vsf_tgui_button_t* button_ptr,
+VSF_CAL_WEAK(vsf_tgui_v_get_background_color)
+vsf_tgui_v_color_t vsf_tgui_v_get_background_color(vsf_tgui_control_t* control_ptr)
+{
+#if VSF_TGUI_CFG_V_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
+    vsf_tgui_v_color_t color = control_ptr->background_color;
+
+    if (control_ptr->id == VSF_TGUI_COMPONENT_ID_BUTTON) {
+        vsf_tgui_button_t* button_ptr = (vsf_tgui_button_t*)control_ptr;
+        if (button_ptr->_.bIsChecked) {
+            color = alphaBlend(color, VSF_TGUI_CFG_V_BUTTON_CLICKED_MIX_COLOR,
+                VSF_TGUI_CFG_V_BUTTON_CLICKED_MIX_VALUE);
+        }
+    }
+
+    return color;
+#else
+    return VSF_TGUI_COLOR_BLUE;
+#endif
+}
+
+fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
+                                        vsf_tgui_control_t* control_ptr,
                                         vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
                                         vsf_tgui_control_refresh_mode_t mode)
 {
+    VSF_TGUI_LOG(VSF_TRACE_INFO, "[SCgui View]%s(%p) control view rendering at ((%d, %d), (%d, %d))" VSF_TRACE_CFG_LINEEND,
+        control_ptr->node_name_ptr, control_ptr, control_ptr->iX, control_ptr->iY, control_ptr->iWidth, control_ptr->iHeight);
+
+    vsf_tgui_v_color_t bg_color = vsf_tgui_v_get_background_color(control_ptr);
+    vsf_tgui_v_color_t border_color = control_ptr->border_width ? control_ptr->border_color : bg_color;
+    int border_tweak = control_ptr->border_width ? 1 : 0;
+
+    vsf_tgui_location_t location = { 0 };
+    vsf_tgui_control_calculate_absolute_location(control_ptr, &location);
+
+    SC_pfb_RoundFrame(&gui_ptr->cur_tile,
+        location.iX, location.iY,
+        location.iX + control_ptr->tRegion.iWidth - 1,
+        location.iY + control_ptr->tRegion.iHeight - 1,
+        control_ptr->border_radius, control_ptr->border_radius - control_ptr->border_width + border_tweak,
+        border_color, bg_color);
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_button_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_button_t* button_ptr)
+fsm_rt_t vsf_tgui_control_v_depose(vsf_tgui_t* gui_ptr, vsf_tgui_control_t* control_ptr)
 {
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_button_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_button_t* button_ptr)
+fsm_rt_t vsf_tgui_control_v_update(vsf_tgui_t* gui_ptr, vsf_tgui_control_t* control_ptr)
 {
     return fsm_rt_cpl;
 }

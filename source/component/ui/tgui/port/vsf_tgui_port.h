@@ -40,6 +40,9 @@
 #if VSF_TGUI_CFG_FONT_USE_FREETYPE == ENABLED
 #   define TGUI_FT2_FONT_DEF(__NAME, __PATH, __SIZE)                            \
     __TGUI_FONT_DEF(__NAME, 0)
+#elif VSF_TGUI_CFG_FONT_USE_LVGL == ENABLED
+#   define TGUI_LVGL_FONT_DEF(__NAME, __PATH, __SIZE)                           \
+    __TGUI_FONT_DEF(__NAME, __SIZE)
 #endif
 
 /*============================ TYPES =========================================*/
@@ -47,6 +50,11 @@
 typedef enum vsf_tgui_font_type_t {
 #if VSF_TGUI_CFG_FONT_USE_FREETYPE == ENABLED
     VSF_TGUI_FONT_FT2,
+    VSF_TGUI_DEFAULT_FONT = VSF_TGUI_FONT_FT2,
+#endif
+#if VSF_TGUI_CFG_FONT_USE_LVGL == ENABLED
+    VSF_TGUI_FONT_LVGL,
+    VSF_TGUI_DEFAULT_FONT = VSF_TGUI_FONT_LVGL,
 #endif
 } vsf_tgui_font_type_t;
 
@@ -64,6 +72,9 @@ typedef struct vsf_tgui_font_t {
             const char *font_path_ptr;
             void *data_ptr;
         } ft2;
+#endif
+#if VSF_TGUI_CFG_FONT_USE_LVGL == ENABLED
+        void *font;     // pointer to lv_font_t
 #endif
     };
 } vsf_tgui_font_t;

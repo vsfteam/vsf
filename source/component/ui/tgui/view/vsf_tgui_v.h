@@ -43,6 +43,8 @@
 
 #if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 #   define VSF_TGUI_V_TEMPLATE_HEADER_FILE      "./simple_view/vsf_tgui_v_template.h"
+#elif VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SCGUI_VIEW
+#   define VSF_TGUI_V_TEMPLATE_HEADER_FILE      "./scgui_view/vsf_tgui_v_template.h"
 #else
 #   undef VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL
 #   define VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL  VSF_TGUI_V_TEMPLATE_EXAMPLE
@@ -67,8 +69,17 @@
 #ifndef tgui_v_font
 #   define tgui_v_font(...)                     .dummy_bits = 0
 #endif
-#ifndef tgui_v_font_color
-#   define tgui_v_font_color(...)               .dummy_bits = 0
+#ifndef tgui_v_text_color
+#   define tgui_v_text_color(...)               .dummy_bits = 0
+#endif
+#ifndef tgui_v_border_width
+#   define tgui_v_border_width(...)             .dummy_bits = 0
+#endif
+#ifndef tgui_v_border_radius
+#   define tgui_v_border_radius(...)            .dummy_bits = 0
+#endif
+#ifndef tgui_v_border_color
+#   define tgui_v_border_color(...)             .dummy_bits = 0
 #endif
 
 /*============================ TYPES =========================================*/

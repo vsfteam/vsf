@@ -43,14 +43,24 @@
 #define TGUI_FONT_DEF(__NAME, __HEIGHT)                                         \
     __TGUI_FONT_DEF(__NAME, (__HEIGHT))
 
-#define __TGUI_FT2_FONT_INIT(__PATH, __SIZE)                                    \
+#if VSF_TGUI_CFG_FONT_USE_FREETYPE == ENABLED
+#   define __TGUI_FT2_FONT_INIT(__PATH, __SIZE)                                 \
     .type = VSF_TGUI_FONT_FT2,                                                  \
     .ft2.font_path_ptr = (__PATH),                                              \
     .ft2.font_size = (__SIZE),
 
-#undef TGUI_FT2_FONT_DEF
-#define TGUI_FT2_FONT_DEF(__NAME, __PATH, __SIZE)                               \
+#   undef TGUI_FT2_FONT_DEF
+#   define TGUI_FT2_FONT_DEF(__NAME, __PATH, __SIZE)                            \
     __TGUI_FONT_DEF(__NAME, 0, __TGUI_FT2_FONT_INIT((__PATH), (__SIZE)))
+#elif VSF_TGUI_CFG_FONT_USE_LVGL == ENABLED
+#   define __TGUI_LVGL_FONT_INIT(__FONT, __SIZE)                                \
+    .type = VSF_TGUI_FONT_LVGL,                                                 \
+    .font = (__FONT),
+
+#   undef TGUI_LVGL_FONT_DEF
+#   define TGUI_LVGL_FONT_DEF(__NAME, __FONT, __SIZE)                           \
+    __TGUI_FONT_DEF(__NAME, __SIZE, __TGUI_LVGL_FONT_INIT((__FONT), (__SIZE)))
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -228,15 +238,25 @@ void vsf_tgui_input_init(vsf_tgui_t *gui_ptr, vk_input_notifier_t *notifier)
 }
 #endif
 
+VSF_CAL_WEAK(vsf_tgui_font_get)
 const vsf_tgui_font_t* vsf_tgui_font_get(uint8_t font_index)
 {
+#ifdef VSF_TGUI_FONTS
     VSF_TGUI_ASSERT(font_index < dimof(__tgui_fonts));
     return &__tgui_fonts[font_index];
+#else
+    return NULL;
+#endif
 }
 
+VSF_CAL_WEAK(vsf_tgui_font_number)
 uint8_t vsf_tgui_font_number(void)
 {
+#ifdef VSF_TGUI_FONTS
     return dimof(__tgui_fonts);
+#else
+    return 0;
+#endif
 }
 
 #endif

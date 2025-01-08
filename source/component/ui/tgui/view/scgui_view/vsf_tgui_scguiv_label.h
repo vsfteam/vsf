@@ -15,17 +15,17 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_TINY_GUI_V_TEXT_LIST_H__
-#define __VSF_TINY_GUI_V_TEXT_LIST_H__
+#ifndef __VSF_TINY_GUI_SCGUIV_LABEL_H__
+#define __VSF_TINY_GUI_SCGUIV_LABEL_H__
 
 /*============================ INCLUDES ======================================*/
 #include "../../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
-    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_EXAMPLE
+    &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SCGUI_VIEW
 
-#include "./vsf_tgui_v_container.h"
-#include "./vsf_tgui_v_label.h"
+#include "./vsf_tgui_scguiv_control.h"
+#include "../../utilities/vsf_tgui_text.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -33,19 +33,25 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern fsm_rt_t vsf_tgui_text_list_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_text_list_t* text_list_ptr);
+extern fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_label_t* ptLabel);
 
-extern fsm_rt_t vsf_tgui_text_list_v_rendering(vsf_tgui_t *gui_ptr,
-                                            vsf_tgui_text_list_t* text_list_ptr,
+extern fsm_rt_t vsf_tgui_label_v_rendering( vsf_tgui_t *gui_ptr,
+                                            vsf_tgui_label_t* label_ptr,
                                             vsf_tgui_region_t* dirty_region_ptr,
                                             vsf_tgui_control_refresh_mode_t mode);
-extern fsm_rt_t vsf_tgui_text_list_v_post_rendering(vsf_tgui_t *gui_ptr,
-                                        vsf_tgui_text_list_t* text_list_ptr,
-                                        vsf_tgui_region_t* dirty_region_ptr,
-                                        vsf_tgui_control_refresh_mode_t mode);
 
-extern fsm_rt_t vsf_tgui_text_list_v_depose(vsf_tgui_t* gui_ptr, vsf_tgui_text_list_t* text_list_ptr);
-extern fsm_rt_t vsf_tgui_text_list_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_text_list_t* text_list_ptr);
+extern fsm_rt_t vsf_tgui_label_v_depose(vsf_tgui_t* gui_ptr, vsf_tgui_label_t* ptLabel);
+extern fsm_rt_t vsf_tgui_label_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr);
+
+extern
+vsf_tgui_size_t __vk_tgui_label_v_text_get_size(vsf_tgui_label_t* label_ptr,
+                                                uint16_t *line_count_ptr,
+                                                uint8_t *char_height_ptr);
+extern
+vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* label_ptr);
+
+extern
+int_fast16_t __vk_tgui_label_get_line_height( const vsf_tgui_label_t* label_ptr);
 
 #endif
 

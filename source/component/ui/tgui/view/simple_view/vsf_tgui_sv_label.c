@@ -47,10 +47,10 @@ fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr)
     return vsf_tgui_control_v_init(gui_ptr, &label_ptr->use_as__vsf_tgui_control_t);
 }
 
-int_fast16_t __vk_tgui_label_get_line_height( const vsf_tgui_label_t* label_ptr)
+int_fast16_t __vk_tgui_label_get_line_height(const vsf_tgui_label_t* label_ptr)
 {
     VSF_TGUI_ASSERT(NULL != label_ptr);
-    return (int_fast16_t) vsf_tgui_font_get_char_height( label_ptr->font_index);
+    return (int_fast16_t) vsf_tgui_font_get_char_height(label_ptr->font_index);
 }
 
 vsf_tgui_size_t __vk_tgui_label_v_text_get_size(vsf_tgui_label_t* label_ptr,

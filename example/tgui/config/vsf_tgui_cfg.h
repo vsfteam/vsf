@@ -44,11 +44,19 @@
 #       define VSF_MSGT_NODE_OFFSET_TYPE                    int16_t
 
 #define VSF_TGUI_CFG_FONT_USE_FREETYPE                      ENABLED
-#define VSF_TGUI_FONTS                                                          \
+#define VSF_TGUI_CFG_FONT_USE_LVGL                          DISABLED
+#if VSF_TGUI_CFG_FONT_USE_FREETYPE == ENABLED
+#   define VSF_TGUI_FONTS                                                       \
     TGUI_FT2_FONT_DEF(VSF_TGUI_FONT_WQY_MICROHEI_S24, "wqy-microhei.ttc", 24),  \
     TGUI_FT2_FONT_DEF(VSF_TGUI_FONT_WQY_MICROHEI_S20, "wqy-microhei.ttc", 20),  \
     TGUI_FT2_FONT_DEF(VSF_TGUI_FONT_WQY_MICROHEI_S16, "wqy-microhei.ttc", 16),  \
     TGUI_FT2_FONT_DEF(VSF_TGUI_FONT_DEJAVUSERIF_S24,  "DejaVuSerif.ttf",  24)
+#elif VSF_TGUI_CFG_FONT_USE_LVGL == ENABLED
+#   include <lvgl.h>
+extern lv_font_t lv_font_14;
+#   define VSF_TGUI_FONTS                                                       \
+    TGUI_LVGL_FONT_DEF(VSF_TGUI_FONT_LVGL_14, &lv_font_14, 18)
+#endif
 
 #if VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN == ENABLED
 #   undef VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS
