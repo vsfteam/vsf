@@ -112,7 +112,7 @@ describ_tgui_panel(popup_t, pupup_panel_descriptor,
     tgui_label(tInformation, tgui_null_parent(popup_t), tInformation, tOK,
         tgui_text(tLabel, "This is a popup message. \nPlease click the OK button to close", false, VSF_TGUI_ALIGN_MID_LEFT),
         tgui_region(0, 56, 400, 80),
-        tgui_v_tile_show_corner_tile(false),
+        tgui_v_show_corner_tile(false),
         tgui_v_border_radius(0),
         tgui_v_text_color(VSF_TGUI_COLOR_BLACK),
         ),
@@ -313,7 +313,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                                 tgui_label(tHistory, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list), tHContainer, tHistory,
                                     tgui_text(tLabel, "tHistory\n1234\nABCDEF", false),
                                     tgui_size(150, 128),
-                                    tgui_v_tile_show_corner_tile(false),
+                                    tgui_v_show_corner_tile(false),
                                     tgui_v_text_color(VSF_TGUI_COLOR_GRAY),
                                     tgui_margin(0, 2, 0, 2),
                                     ),
@@ -347,7 +347,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
 
                             tgui_text(tLabel, "tHistory\n1234\nABCDEF", true),
                             tgui_size(150, 128),
-                            tgui_v_tile_show_corner_tile(false),
+                            tgui_v_show_corner_tile(false),
                             tgui_attribute(tFontColor, VSF_TGUI_COLOR_GRAY),
                             tgui_margin(0, 2, 0, 2),
                             ),
@@ -364,7 +364,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
             tgui_padding(10, 10, 10, 10),
             tgui_margin(0, 48, 0, 0),
             tgui_v_background_color(VSF_TGUI_COLOR_WHITE),
-            tgui_v_tile_show_corner_tile(false),
+            tgui_v_show_corner_tile(false),
             tgui_v_border_radius(0),
             //tgui_text(tTitle, "Right Panel", false),
             tgui_container_type(VSF_TGUI_CONTAINER_TYPE_STREAM_HORIZONTAL),
@@ -374,7 +374,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                 tgui_size(32, 32),                                                          \
                 tgui_margin(4, 4, 4, 4),                                                    \
                 tgui_text(tLabel, #__num, false),                                           \
-                tgui_v_tile_show_corner_tile(false),                                        \
+                tgui_v_show_corner_tile(false),                                        \
                 tgui_v_border_radius(0),                                                    \
                 __VA_ARGS__                                                                 \
             )

@@ -98,7 +98,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                 tgui_size(228, 32),
                 tgui_margin(0, 0, 0, 4),
                 tgui_text(tLabel, "", false),
-                tgui_sv_font(VSF_TGUI_FONT_WQY_MICROHEI_S20),
+                tgui_v_font(VSF_TGUI_FONT_WQY_MICROHEI_S20),
                 tgui_background((vsf_tgui_tile_t*)&ic_settings_phone_RGBA, VSF_TGUI_ALIGN_LEFT),
                 ),
 
@@ -162,7 +162,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                                 "0\n1\n2\n3\n4\n5\n6\n7\n8\n9",
                                 true),
                             tgui_line_space(tLabel, 8),
-                            tgui_sv_font_color(VSF_TGUI_COLOR_GRAY),
+                            tgui_v_font_color(VSF_TGUI_COLOR_GRAY),
                             )
                     ),
 
@@ -191,7 +191,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                                 tgui_button(tButton1, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list), tButton1, tButton2,
                                     tgui_size(150, 32),
                                     tgui_text(tLabel, "tButton1", false),
-                                    tgui_sv_font_color(VSF_TGUI_COLOR_RGBA(0x80, 0x80, 0x00, 0x30)),
+                                    tgui_v_text_color(VSF_TGUI_COLOR_RGBA(0x80, 0x80, 0x00, 0x30)),
                                     tgui_margin(0, 2, 0, 2),
                                     ),
 
@@ -234,8 +234,8 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                                 tgui_label(tHistory, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list), tHContainer, tHistory,
                                     tgui_text(tLabel, "tHistory\n1234\nABCDEF", false),
                                     tgui_size(150, 128),
-                                    tgui_sv_tile_show_corner(false),
-                                    tgui_sv_font_color(VSF_TGUI_COLOR_GRAY),
+                                    tgui_v_show_corner_tile(false),
+                                    tgui_v_text_color(VSF_TGUI_COLOR_GRAY),
                                     tgui_margin(0, 2, 0, 2),
                                     ),
 
@@ -268,7 +268,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
 
                             tgui_text(tLabel, "tHistory\n1234\nABCDEF", true),
                             tgui_size(150, 128),
-                            tgui_sv_tile_show_corner(false),
+                            tgui_v_show_corner_tile(false),
                             tgui_attribute(tFontColor, VSF_TGUI_COLOR_GRAY),
                             tgui_margin(0, 2, 0, 2),
                             ),
@@ -285,8 +285,8 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
             tgui_padding(10, 10, 10, 10),
             tgui_margin(0, 48, 0, 0),
 
-            tgui_sv_background_color(VSF_TGUI_COLOR_WHITE),
-            tgui_sv_tile_show_corner(false),
+            tgui_v_background_color(VSF_TGUI_COLOR_WHITE),
+            tgui_v_show_corner_tile(false),
 
             //tgui_text(tTitle, "Right Panel", false),
             tgui_container_type(VSF_TGUI_CONTAINER_TYPE_STREAM_HORIZONTAL),
@@ -297,7 +297,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                 tgui_size(32, 32),                                                          \
                 tgui_margin(4, 4, 4, 4),                                                    \
                 tgui_text(tLabel, #__num, false),                                           \
-                tgui_sv_tile_show_corner(false),                                            \
+                tgui_v_show_corner_tile(false),                                             \
                 __VA_ARGS__                                                                 \
             )
 

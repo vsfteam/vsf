@@ -211,31 +211,23 @@
             __tgui_attribute(font_index, __VA_ARGS__)
 
 #if VSF_TGUI_CFG_SV_SUPPORT_CORNER_TILE == ENABLED
-#define tgui_v_tile_show_corner_tile(...)                           \
+#define tgui_v_show_corner_tile(...)                                \
             __tgui_attribute(show_corner_tile,  __VA_ARGS__)
-#else
-#define tgui_v_tile_show_corner_tile(...)
 #endif
 
 #if VSF_TGUI_CFG_SV_SUPPORT_TILE_TRANSPARENCY == ENABLED
 #define tgui_v_tile_trans_rate(...)                                 \
             __tgui_attribute(tile_trans_rate,  __VA_ARGS__)
-#else
-#define tgui_v_tile_trans_rate(...)
 #endif
 
 #if VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
 #define tgui_v_background_color(...)                                \
             __tgui_attribute(background_color,  __VA_ARGS__)
-#else
-#define tgui_v_background_color(...)
 #endif
 
 #if VSF_TGUI_CFG_SV_LABLE_SUPPORT_TEXT_COLOR == ENABLED
 #define tgui_v_font_color(...)                                      \
             __tgui_attribute(font_color,  __VA_ARGS__)
-#else
-#define tgui_v_font_color(...)
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

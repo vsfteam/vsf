@@ -162,36 +162,26 @@
 #if VSF_TGUI_CFG_V_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
 #   define tgui_v_background_color(...)                                         \
             __tgui_attribute(background_color,  __VA_ARGS__)
-#else
-#   define tgui_v_background_color(...)
 #endif
 
 #if VSF_TGUI_CFG_V_SUPPORT_BORDER == ENABLED
 #   define tgui_v_border_width(...)                                             \
             __tgui_attribute(border_width,  __VA_ARGS__)
-#else
-#   define tgui_v_border_width(...)
 #endif
 
 #if VSF_TGUI_CFG_V_SUPPORT_BORDER == ENABLED
-#   define tgui_v_border_color(...)                                            \
+#   define tgui_v_border_color(...)                                             \
             __tgui_attribute(border_color,  __VA_ARGS__)
-#else
-#   define tgui_v_border_color(...)
 #endif
 
 #if VSF_TGUI_CFG_V_SUPPORT_ROUND_BORDER == ENABLED
 #   define tgui_v_border_radius(...)                                            \
             __tgui_attribute(border_radius,  __VA_ARGS__)
-#else
-#   define tgui_v_border_radius(...)
 #endif
 
 #if VSF_TGUI_CFG_V_LABLE_SUPPORT_TEXT_COLOR == ENABLED
 #   define tgui_v_text_color(...)                                               \
             __tgui_attribute(text_color,  __VA_ARGS__)
-#else
-#   define tgui_v_text_color(...)
 #endif
 
 /*============================ TYPES =========================================*/

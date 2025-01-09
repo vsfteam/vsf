@@ -60,8 +60,8 @@
 #ifndef tgui_v_tile_trans_rate
 #   define tgui_v_tile_trans_rate(...)          .dummy_bits = 0
 #endif
-#ifndef tgui_v_tile_show_corner_tile
-#   define tgui_v_tile_show_corner_tile(...)    .dummy_bits = 0
+#ifndef tgui_v_show_corner_tile
+#   define tgui_v_show_corner_tile(...)         .dummy_bits = 0
 #endif
 #ifndef tgui_v_background_color
 #   define tgui_v_background_color(...)         .dummy_bits = 0
