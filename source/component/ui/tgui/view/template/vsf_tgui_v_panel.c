@@ -54,7 +54,7 @@ fsm_rt_t vsf_tgui_panel_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* panel_ptr)
 
         return vk_tgui_label_init(&(panel_ptr->tTitleLabel));
 #else
-        return fsm_rt_cpl;
+        return vsf_tgui_control_v_init(gui_ptr, &panel_ptr->use_as__vsf_tgui_control_t);
 #endif
     }
     return fsm_rt_on_going;

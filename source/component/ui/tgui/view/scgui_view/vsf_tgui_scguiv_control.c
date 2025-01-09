@@ -40,6 +40,7 @@
 
 fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_control_t* control_ptr)
 {
+    control_ptr->is_control_transparent = true;
     return fsm_rt_cpl;
 }
 
@@ -73,7 +74,6 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
 
     vsf_tgui_v_color_t bg_color = vsf_tgui_v_get_background_color(control_ptr);
     vsf_tgui_v_color_t border_color = control_ptr->border_width ? control_ptr->border_color : bg_color;
-    int border_tweak = control_ptr->border_width ? 1 : 0;
 
     vsf_tgui_location_t location = { 0 };
     vsf_tgui_control_calculate_absolute_location(control_ptr, &location);
@@ -82,7 +82,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
         location.iX, location.iY,
         location.iX + control_ptr->tRegion.iWidth - 1,
         location.iY + control_ptr->tRegion.iHeight - 1,
-        control_ptr->border_radius, control_ptr->border_radius - control_ptr->border_width + border_tweak,
+        control_ptr->border_radius - 1, control_ptr->border_radius - control_ptr->border_width - 1,
         border_color, bg_color);
     return fsm_rt_cpl;
 }
