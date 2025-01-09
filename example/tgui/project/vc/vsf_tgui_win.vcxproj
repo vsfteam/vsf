@@ -13,6 +13,20 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\port\view\vsf_tgui_sv_port.h" />
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\port\vsf_tgui_port.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\scgui.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_button.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_container.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_control.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_label.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_list.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_panel.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_port.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_text_list.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_v_template.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_v_type.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_list.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_port.h" />
+    <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_text_list.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\adc\adc_interface.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\adc\adc_template.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\common\dac\dac_template.h" />
@@ -324,8 +338,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\component\ui\tgui\port\font\vsf_tgui_font_port_freetype.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\port\font\vsf_tgui_font_port_lvgl.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\tgui\port\view\vsf_tgui_sv_port.c" />
     <ClCompile Include="..\..\..\..\source\component\ui\tgui\port\vsf_tgui_port.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\scgui.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_button.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_container.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_control.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_label.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_list.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_panel.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_port.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\vsf_tgui_scguiv_text_list.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_list.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_port.c" />
+    <ClCompile Include="..\..\..\..\source\component\ui\tgui\view\template\vsf_tgui_v_text_list.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\adc\adc_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\adc\adc_interface.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\dac\dac_common.c" />
@@ -503,6 +530,7 @@
     <ClCompile Include="..\..\demo\common\usrapp_ui_common.c" />
     <ClCompile Include="..\..\demo\fakefat32.c" />
     <ClCompile Include="..\..\demo\freetype_demo\freetype_demo.c" />
+    <ClCompile Include="..\..\demo\lvgl_font\lv_font_14.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\images\demo_images.c" />
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\stopwatch\stopwatch.c">
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</LanguageStandard>

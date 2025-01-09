@@ -143,3 +143,4 @@ To use applications from other system, shell can be used.
 | glob              | source/shell/sys/linux/lib/3rd-party/glob                     | BSD        | https://github.com/cloudius-systems/musl           |
 | setjmp            | source/hal/arch/x86/win                                       | BSD        |                                                    |
 | libtuv            | source/shell/sys/linux/lib/3rd-party/libtuv/raw               | Apache 2.0 | https://github.com/Samsung/libtuv                  |
+| scgui             | source/component/ui/tgui/view/scgui_view/scgui.c&h            | MIT        | https://gitee.com/li_yucheng/scgui                 |

@@ -27,7 +27,7 @@
 
 #include "./vsf_tgui_scguiv_control.h"
 
-#include "./scgui/SCGUI/sc_gui.h"
+#include "./scgui.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -69,8 +69,8 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
                                         vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
                                         vsf_tgui_control_refresh_mode_t mode)
 {
-    VSF_TGUI_LOG(VSF_TRACE_INFO, "[SCgui View]%s(%p) control view rendering at ((%d, %d), (%d, %d))" VSF_TRACE_CFG_LINEEND,
-        control_ptr->node_name_ptr, control_ptr, control_ptr->iX, control_ptr->iY, control_ptr->iWidth, control_ptr->iHeight);
+//    VSF_TGUI_LOG(VSF_TRACE_INFO, "[SCgui View]%s(%p) control view rendering at ((%d, %d), (%d, %d))" VSF_TRACE_CFG_LINEEND,
+//        control_ptr->node_name_ptr, control_ptr, control_ptr->iX, control_ptr->iY, control_ptr->iWidth, control_ptr->iHeight);
 
     vsf_tgui_v_color_t bg_color = vsf_tgui_v_get_background_color(control_ptr);
     vsf_tgui_v_color_t border_color = control_ptr->border_width ? control_ptr->border_color : bg_color;
@@ -80,17 +80,18 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
     vsf_tgui_region_t dirty_region = *dirty_region_ptr;
     vsf_tgui_control_calculate_absolute_location(control_ptr, &dirty_region.tLocation);
 
-    SC_tile *cur_tile = &gui_ptr->cur_tile;
-    cur_tile->dirty_rect.xs = dirty_region.tLocation.iX;
-    cur_tile->dirty_rect.ys = dirty_region.tLocation.iY;
-    cur_tile->dirty_rect.xe = dirty_region.tLocation.iX + dirty_region.tSize.iWidth - 1;
-    cur_tile->dirty_rect.ye = dirty_region.tLocation.iY + dirty_region.tSize.iHeight - 1;
-    SC_pfb_RoundFrame(cur_tile,
+    SC_ARER dirty_area = {
+        .xs = dirty_region.tLocation.iX,
+        .ys = dirty_region.tLocation.iY,
+        .xe = dirty_region.tLocation.iX + dirty_region.tSize.iWidth - 1,
+        .ye = dirty_region.tLocation.iY + dirty_region.tSize.iHeight - 1,
+    };
+    SC_pfb_RoundFrame(&gui_ptr->cur_tile,
         draw_region.tLocation.iX, draw_region.tLocation.iY,
         draw_region.tLocation.iX + control_ptr->tRegion.iWidth - 1,
         draw_region.tLocation.iY + control_ptr->tRegion.iHeight - 1,
         control_ptr->border_radius - 1, control_ptr->border_radius - control_ptr->border_width - 1,
-        border_color, bg_color);
+        border_color, bg_color, &dirty_area);
     return fsm_rt_cpl;
 }
 

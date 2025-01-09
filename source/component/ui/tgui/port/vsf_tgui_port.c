@@ -23,6 +23,17 @@
 
 #include "./vsf_tgui_port.h"
 
+#if VSF_TGUI_CFG_FONT_USE_LVGL == ENABLED
+#   ifdef VSF_TGUI_CFG_LVGL_HEADER
+#       include VSF_TGUI_CFG_LVGL_HEADER
+#   else
+#       include <lvgl.h>
+#   endif
+#   ifdef VSF_TGUI_LVGL_FONT_DECLARE
+VSF_TGUI_LVGL_FONT_DECLARE
+#   endif
+#endif
+
 /*============================ MACROS ========================================*/
 
 #if VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED

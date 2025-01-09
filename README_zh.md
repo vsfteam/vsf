@@ -140,5 +140,6 @@ VSF全称是Versaloon Software Framework，是一个基于Apache2.0协议的开�
 | glob              | source/shell/sys/linux/lib/3rd-party/glob                     | BSD        | https://github.com/cloudius-systems/musl           |
 | setjmp            | source/hal/arch/x86/win                                       | BSD        |                                                    |
 | libtuv            | source/shell/sys/linux/lib/3rd-party/libtuv/raw               | Apache 2.0 | https://github.com/Samsung/libtuv                  |
+| scgui             | source/component/ui/tgui/view/scgui_view/scgui.c&h            | MIT        | https://gitee.com/li_yucheng/scgui                 |
 
 ## [文档](document/README_zh.md)

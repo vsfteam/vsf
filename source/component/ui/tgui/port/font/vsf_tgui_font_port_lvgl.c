@@ -23,7 +23,11 @@
 
 #include "../vsf_tgui_port.h"
 
-#include <lvgl.h>
+#ifdef VSF_TGUI_CFG_LVGL_HEADER
+#   include VSF_TGUI_CFG_LVGL_HEADER
+#else
+#   include <lvgl.h>
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

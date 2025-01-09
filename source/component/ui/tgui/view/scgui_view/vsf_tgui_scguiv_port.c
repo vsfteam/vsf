@@ -24,21 +24,21 @@
 #if     VSF_USE_UI == ENABLED && VSF_USE_TINY_GUI == ENABLED                    \
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SCGUI_VIEW
 
-#include "./scgui/SCGUI/sc_gui.h"
+#include "./scgui.h"
 
 /*============================ MACROS ========================================*/
+
+#if VSF_TGUI_CFG_V_PORT_LOG != ENABLED
+#   undef VSF_TGUI_LOG
+#   define VSF_TGUI_LOG(...)
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
-
-void LCD_DMA_Fill_COLOR(u16 xsta,u16 ysta,u16 xend,u16 yend,u16 *color)
-{
-    vsf_trace_error("should not be called, notify developer about this" VSF_TRACE_CFG_LINEEND);
-    VSF_UI_ASSERT(false);
-}
 
 /**********************************************************************************/
 /*! \brief begin a refresh loop
@@ -213,7 +213,7 @@ void vsf_tgui_v_bind_disp(vsf_tgui_t *gui_ptr, vk_disp_t *disp, void *pfb, size_
     VSF_TGUI_ASSERT(pfb_size >= VSF_TGUI_HOR_MAX);
 
     extern lv_font_t lv_font_14;
-    SC_GUI_Init(NULL,0,C_WHITE,C_RED,(lv_font_t*)&lv_font_14);
+    SC_GUI_Init(0,C_WHITE,C_RED);
 
     if ((pfb != NULL) && (pfb_size > 0)) {
         vsf_trace_warning("pdf not necessary for scgui view" VSF_TRACE_CFG_LINEEND);
@@ -256,17 +256,17 @@ void vsf_tgui_control_v_draw_text(  vsf_tgui_t* gui_ptr,
     vsf_tgui_region_t dirty_region = *dirty_region_ptr;
     vsf_tgui_control_calculate_absolute_location(control_ptr, &dirty_region.tLocation);
 
-    SC_tile *cur_tile = &gui_ptr->cur_tile;
-    cur_tile->dirty_rect.xs = dirty_region.tLocation.iX;
-    cur_tile->dirty_rect.ys = dirty_region.tLocation.iY;
-    cur_tile->dirty_rect.xe = dirty_region.tLocation.iX + dirty_region.tSize.iWidth - 1;
-    cur_tile->dirty_rect.ye = dirty_region.tLocation.iY + dirty_region.tSize.iHeight - 1;
+    SC_ARER dirty_area = {
+        .xs = dirty_region.tLocation.iX,
+        .ys = dirty_region.tLocation.iY,
+        .xe = dirty_region.tLocation.iX + dirty_region.tSize.iWidth - 1,
+        .ye = dirty_region.tLocation.iY + dirty_region.tSize.iHeight - 1,
+    };
 
-    // TODO: multi line and align support
     uint16_t alpha = gui->alpha;
     gui->alpha = 0;
     SC_pfb_printf(&gui_ptr->cur_tile, text_region.tLocation.iX, text_region.tLocation.iY,
-        ptStringInfo->tString.pstrText, color, 0, font);
+        ptStringInfo->tString.pstrText, color, 0, font, ptStringInfo->chInterLineSpace, &dirty_area);
     gui->alpha = alpha;
 }
 

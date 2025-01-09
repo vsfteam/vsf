@@ -29,7 +29,10 @@
 
 #   define VSF_USE_TINY_GUI                                 ENABLED
 #       define VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL          VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
-#       define VSF_TGUI_CFG_COLOR_MODE                      VSF_TGUI_COLOR_ARGB_8888
+// LCD_SCREEN_WIDTH & LCD_SCREEN_HEIGHT are necessary for VSF_TGUI_V_TEMPLATE_SCGUI_VIEW only
+#           define LCD_SCREEN_HEIGHT                        768
+#           define LCD_SCREEN_WIDTH                         1024
+#       define VSF_TGUI_CFG_COLOR_MODE                      VSF_TGUI_COLOR_RGB_565
 #       define VSF_TGUI_CFG_SUPPORT_NAME_STRING             ENABLED         /* Enabled for debug */
 #       define VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS       ENABLED
 
@@ -45,6 +48,7 @@
 
 #define VSF_TGUI_CFG_FONT_USE_FREETYPE                      ENABLED
 #define VSF_TGUI_CFG_FONT_USE_LVGL                          DISABLED
+#   define VSF_TGUI_CFG_LVGL_HEADER                         "component/ui/tgui/view/scgui_view/lvgl.h"
 #if VSF_TGUI_CFG_FONT_USE_FREETYPE == ENABLED
 #   define VSF_TGUI_FONTS                                                       \
     TGUI_FT2_FONT_DEF(VSF_TGUI_FONT_WQY_MICROHEI_S24, "wqy-microhei.ttc", 24),  \
@@ -52,10 +56,10 @@
     TGUI_FT2_FONT_DEF(VSF_TGUI_FONT_WQY_MICROHEI_S16, "wqy-microhei.ttc", 16),  \
     TGUI_FT2_FONT_DEF(VSF_TGUI_FONT_DEJAVUSERIF_S24,  "DejaVuSerif.ttf",  24)
 #elif VSF_TGUI_CFG_FONT_USE_LVGL == ENABLED
-#   include <lvgl.h>
-extern lv_font_t lv_font_14;
 #   define VSF_TGUI_FONTS                                                       \
     TGUI_LVGL_FONT_DEF(VSF_TGUI_FONT_LVGL_14, &lv_font_14, 18)
+#   define VSF_TGUI_LVGL_FONT_DECLARE                                           \
+        extern lv_font_t lv_font_14;
 #endif
 
 #if VSF_DISP_SDL2_CFG_MOUSE_AS_TOUCHSCREEN == ENABLED

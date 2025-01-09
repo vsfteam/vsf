@@ -28,7 +28,7 @@
 #define __VSF_DISP_CLASS_INHERIT__
 #include "component/ui/disp/vsf_disp.h"
 
-#include "./scgui/SCGUI/sc_gui.h"
+#include "./scgui.h"
 
 /*============================ MACROS ========================================*/
 

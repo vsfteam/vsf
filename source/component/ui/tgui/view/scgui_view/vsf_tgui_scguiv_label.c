@@ -25,7 +25,7 @@
 declare_class(vsf_tgui_t)
 #include "./vsf_tgui_scguiv_label.h"
 
-#include "./scgui/SCGUI/sc_gui.h"
+#include "./scgui.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -116,8 +116,8 @@ vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* l
 
 int_fast16_t __vk_tgui_label_get_line_height(const vsf_tgui_label_t* label_ptr)
 {
-    lv_font_t *font = (lv_font_t *)gui->font;
-    return font->line_height;
+    extern uint8_t vsf_tgui_font_get_char_height(const uint8_t font_index);
+    return vsf_tgui_font_get_char_height(label_ptr->font_index);
 }
 
 #endif
