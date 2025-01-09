@@ -45,7 +45,7 @@ extern
 void vsf_tgui_sv_port_draw_rect(vsf_tgui_t* gui_ptr,
                         vsf_tgui_location_t* location_ptr,
                         vsf_tgui_size_t* size_ptr,
-                        vsf_tgui_sv_color_t tColor);
+                        vsf_tgui_v_color_t tColor);
 
 extern
 void vsf_tgui_sv_port_draw_char(vsf_tgui_t* gui_ptr,
@@ -54,7 +54,7 @@ void vsf_tgui_sv_port_draw_char(vsf_tgui_t* gui_ptr,
                         vsf_tgui_size_t* size_ptr,
                         const uint8_t chFontIndex,
                         uint32_t char_u32,
-                        vsf_tgui_sv_color_t tCharColor);
+                        vsf_tgui_v_color_t tCharColor);
 
 extern
 void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_t* gui_ptr,
@@ -63,8 +63,8 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_t* gui_ptr,
                         vsf_tgui_size_t* size_ptr,
                         const vsf_tgui_tile_t* tile_ptr,
                         uint_fast8_t trans_rate,
-                        vsf_tgui_sv_color_t color,
-                        vsf_tgui_sv_color_t bg_color);
+                        vsf_tgui_v_color_t color,
+                        vsf_tgui_v_color_t bg_color);
 
 #endif
 

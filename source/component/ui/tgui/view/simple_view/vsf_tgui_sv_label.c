@@ -57,7 +57,7 @@ vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* l
     vsf_tgui_size_t size = __vk_tgui_label_v_text_get_size(label_ptr, NULL, NULL);
 #endif
 
-#if VSF_TGUI_CFG_SV_SUPPORT_CORNER_TILE == ENABLED
+#if VSF_TGUI_CFG_V_SUPPORT_CORNER_TILE == ENABLED
     if (label_ptr->show_corner_tile) {
         vsf_tgui_region_t regions[CORNOR_TILE_NUM] = { {0} };
 
@@ -86,7 +86,7 @@ vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* l
 
 fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr)
 {
-#if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+#if (VSF_TGUI_CFG_V_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) label init" VSF_TRACE_CFG_LINEEND,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t*)label_ptr), label_ptr);
 #endif
@@ -94,17 +94,17 @@ fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr)
 }
 
 VSF_CAL_WEAK(vsf_tgui_sv_get_text_color)
-vsf_tgui_sv_color_t vsf_tgui_sv_get_text_color(vsf_tgui_label_t* label_ptr)
+vsf_tgui_v_color_t vsf_tgui_sv_get_text_color(vsf_tgui_label_t* label_ptr)
 {
-#if VSF_TGUI_CFG_SV_LABLE_SUPPORT_TEXT_COLOR == ENABLED
+#if VSF_TGUI_CFG_V_LABLE_SUPPORT_TEXT_COLOR == ENABLED
     if (label_ptr->bIsEnabled) {
         return label_ptr->font_color;
     } else {
         return vsf_tgui_sv_color_mix(label_ptr->font_color,
-            VSF_TGUI_CFG_SV_LABEL_DISABLED_TEXT_MIX_COLOR,
-            VSF_TGUI_CFG_SV_LABEL_DISABLED_TEXT_MIX_VALUE);
+            VSF_TGUI_CFG_V_LABEL_DISABLED_TEXT_MIX_COLOR,
+            VSF_TGUI_CFG_V_LABEL_DISABLED_TEXT_MIX_VALUE);
     }
-#elif VSF_TGUI_CFG_SV_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
+#elif VSF_TGUI_CFG_V_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
 #   error "todo: "
 #else
 #   error "todo: "
@@ -119,7 +119,7 @@ fsm_rt_t vsf_tgui_label_v_rendering(vsf_tgui_t* gui_ptr,
     VSF_TGUI_ASSERT(label_ptr != NULL);
     VSF_TGUI_ASSERT(dirty_region_ptr != NULL);
 
-#if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+#if (VSF_TGUI_CFG_V_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) label rendering" VSF_TRACE_CFG_LINEEND,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t*)label_ptr), label_ptr);
 #endif

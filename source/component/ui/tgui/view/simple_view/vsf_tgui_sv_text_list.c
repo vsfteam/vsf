@@ -29,8 +29,8 @@ declare_class(vsf_tgui_t)
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR
-#   define VSF_TGUI_CFG_SV_TEXT_LIST_BACKGROUND_COLOR   VSF_TGUI_COLOR_BLUE
+#ifndef VSF_TGUI_CFG_V_TEXT_LIST_BACKGROUND_COLOR
+#   define VSF_TGUI_CFG_V_TEXT_LIST_BACKGROUND_COLOR    VSF_TGUI_COLOR_BLUE
 #endif
 
 
@@ -43,7 +43,7 @@ declare_class(vsf_tgui_t)
 
 fsm_rt_t vsf_tgui_text_list_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_text_list_t* text_list_ptr)
 {
-#if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+#if (VSF_TGUI_CFG_V_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) init" VSF_TRACE_CFG_LINEEND,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t*)text_list_ptr), text_list_ptr);
 #endif
@@ -60,7 +60,7 @@ fsm_rt_t vsf_tgui_text_list_v_rendering(vsf_tgui_t *gui_ptr,
     VSF_TGUI_ASSERT(text_list_ptr != NULL);
     VSF_TGUI_ASSERT(ptDirtyRegion != NULL);
 
-#if (VSF_TGUI_CFG_SV_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
+#if (VSF_TGUI_CFG_V_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) rendering" VSF_TRACE_CFG_LINEEND,
         vsf_tgui_control_get_node_name((vsf_tgui_control_t*)text_list_ptr), text_list_ptr);
 #endif

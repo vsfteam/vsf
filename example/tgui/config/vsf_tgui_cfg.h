@@ -36,11 +36,11 @@
 #       define VSF_TGUI_CFG_SUPPORT_NAME_STRING             ENABLED         /* Enabled for debug */
 #       define VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS       ENABLED
 
-#       define VSF_TGUI_CFG_SV_SUPPORT_CORNER_TILE          ENABLED
+#       define VSF_TGUI_CFG_V_SUPPORT_CORNER_TILE           ENABLED
 
 #       define VSF_TGUI_LOG                                 vsf_trace
-#           define VSF_TGUI_CFG_SV_PORT_LOG                 DISABLED
-#           define VSF_TGUI_CFG_SV_DRAW_LOG                 DISABLED
+#           define VSF_TGUI_CFG_V_PORT_LOG                  DISABLED
+#           define VSF_TGUI_CFG_V_DRAW_LOG                  DISABLED
 
 #   define VSF_USE_MSG_TREE                                 ENABLED
 #       define VSF_MSG_TREE_CFG_SUPPORT_NAME_STRING         ENABLED         /* Enabled for debug */

@@ -59,7 +59,7 @@ typedef uint32_t vsf_tgui_disp_pixel_t;
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_TGUI_CFG_DISP_COLOR == VSF_TGUI_CFG_COLOR_MODE
-#   define __disp_color_to_tgui_color(__disp_color) ((vsf_tgui_sv_color_t){ .value = __disp_color})
+#   define __disp_color_to_tgui_color(__disp_color) ((vsf_tgui_v_color_t){ .value = __disp_color})
 #   define __tgui_color_to_disp_color(__tgui_color) (__tgui_color.value)
 #else
 #   define __disp_color_to_tgui_color(__disp_color) ({                          \
@@ -135,7 +135,7 @@ static void __vsf_tgui_draw_wait_for_done(vsf_tgui_t *gui_ptr)
 void vsf_tgui_sv_port_draw_rect(vsf_tgui_t *gui_ptr,
                                 vsf_tgui_location_t *location_ptr,
                                 vsf_tgui_size_t *size_ptr,
-                                vsf_tgui_sv_color_t rect_color)
+                                vsf_tgui_v_color_t rect_color)
 {
     int16_t height;
     int16_t width;
@@ -203,8 +203,8 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_t *gui_ptr,
                                      vsf_tgui_size_t *size_ptr,
                                      const vsf_tgui_tile_t *tile_ptr,
                                      uint_fast8_t trans_rate,
-                                     vsf_tgui_sv_color_t color,
-                                     vsf_tgui_sv_color_t bg_color)
+                                     vsf_tgui_v_color_t color,
+                                     vsf_tgui_v_color_t bg_color)
 {
     vsf_tgui_size_t tile_size;
     vsf_tgui_region_t display;
@@ -256,7 +256,7 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_t *gui_ptr,
 
     uint_fast8_t type = tile_ptr->_.tCore.Attribute.u2ColorType;
     bool is_mask = type == VSF_TGUI_TILE_COLORTYPE_A;
-    vsf_tgui_sv_color_t sv_color;
+    vsf_tgui_v_color_t sv_color;
     vsf_tgui_sv_color_argb8888_t argb_color;
     uint_fast8_t pixel_trans_rate;
     vsf_tgui_disp_pixel_t *pixel_ptr = &((vsf_tgui_disp_pixel_t *)gui_ptr->pfb)[pixmap_location_x];
@@ -303,7 +303,7 @@ void vsf_tgui_sv_port_draw_char(vsf_tgui_t *gui_ptr,
                                 vsf_tgui_size_t *size_ptr,
                                 uint8_t font_index,
                                 uint32_t char_u32,
-                                vsf_tgui_sv_color_t char_color)
+                                vsf_tgui_v_color_t char_color)
 {
     VSF_TGUI_ASSERT(location_ptr != NULL);
     VSF_TGUI_ASSERT(font_location_ptr != NULL);

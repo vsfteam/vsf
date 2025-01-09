@@ -541,9 +541,8 @@ static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_control_t* control_ptr,
     vsf_tgui_t *gui_ptr = vsf_tgui_control_get_gui_instance(control_ptr);
     vsf_tgui_refresh_evt_t *event_ptr = (vsf_tgui_refresh_evt_t *)ptMSG;
     const vsf_tgui_region_t *ptDirtyRegion = (const vsf_tgui_region_t *)(event_ptr->region_ptr);
-#if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
     do {
-        vsf_tgui_sv_color_t tColor = VSF_TGUI_CFG_SV_TEXT_LIST_INDICATOR_COLOR;
+        vsf_tgui_v_color_t tColor = VSF_TGUI_CFG_V_TEXT_LIST_INDICATOR_COLOR;
         vsf_tgui_region_t tRegion = {0};
 
         tRegion.tSize = *vsf_tgui_control_get_size(control_ptr);
@@ -559,7 +558,6 @@ static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_control_t* control_ptr,
                                         &tRegion,
                                         tColor);
     } while(0);
-#endif
     return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
 }
 #endif
@@ -604,7 +602,6 @@ static fsm_rt_t __on_list_post_refresh( vsf_tgui_list_t* ptList,
                                                             &tScrollbarRegion)) {
         return fsm_rt_cpl;
     }
-#   if VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
     vsf_tgui_control_v_draw_rect(   gui_ptr,
                                     (const vsf_tgui_control_t *)ptList,
                                     ptDirtyRegion,
@@ -616,7 +613,6 @@ static fsm_rt_t __on_list_post_refresh( vsf_tgui_list_t* ptList,
                                     ptDirtyRegion,
                                     &tScrollbarRegion.tBar,
                                     VSF_TGUI_SCROLLBAR_COLOR_BLUE);
-#   endif
 #endif
 
     return fsm_rt_cpl;

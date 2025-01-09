@@ -92,6 +92,17 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
         draw_region.tLocation.iY + control_ptr->tRegion.iHeight - 1,
         control_ptr->border_radius - 1, control_ptr->border_radius - control_ptr->border_width - 1,
         border_color, bg_color, &dirty_area);
+
+    const vsf_tgui_tile_t* ptTile = control_ptr->tBackground.ptTile;
+    if (ptTile != NULL) {
+#if VSF_TGUI_CFG_SV_SUPPORT_TILE_TRANSPARENCY == ENABLED
+        uint8_t tile_trans_rate = control_ptr->tile_trans_rate;
+#else
+        uint8_t tile_trans_rate = 0xFF;
+#endif
+        vsf_tgui_control_v_draw_tile(gui_ptr, control_ptr, dirty_region_ptr, ptTile, control_ptr->tBackground.tAlign, tile_trans_rate, NULL,
+            (vsf_tgui_v_color_t){ 0 }, bg_color);
+    }
     return fsm_rt_cpl;
 }
 

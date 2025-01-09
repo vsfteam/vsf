@@ -32,7 +32,7 @@ declare_class(vsf_tgui_t)
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_TGUI_SV_CFG_MIX_AS_FUNCTION == ENABLED
-vsf_tgui_sv_color_t vsf_tgui_sv_color_mix(vsf_tgui_sv_color_t color_0, vsf_tgui_sv_color_t color_1, uint_fast8_t mix)
+vsf_tgui_v_color_t vsf_tgui_sv_color_mix(vsf_tgui_v_color_t color_0, vsf_tgui_v_color_t color_1, uint_fast8_t mix)
 {
 #if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
     color_0.value   = ((((color_0.value >> 8) & 0x00FF00FF) * mix) & 0xFF00FF00)
@@ -56,9 +56,9 @@ vsf_tgui_sv_color_t vsf_tgui_sv_color_mix(vsf_tgui_sv_color_t color_0, vsf_tgui_
 #endif
 
 #if VSF_TGUI_CFG_COLOR_MODE != VSF_TGUI_COLOR_ARGB_8888
-vsf_tgui_sv_color_t vsf_tgui_sv_argb8888_to_color(vsf_tgui_sv_color_argb8888_t rgba888_color)
+vsf_tgui_v_color_t vsf_tgui_sv_argb8888_to_color(vsf_tgui_sv_color_argb8888_t rgba888_color)
 {
-    vsf_tgui_sv_color_t color;
+    vsf_tgui_v_color_t color;
 #if (VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_BGR_565) ||  (VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565)
     color.red   = rgba888_color.red   >> 3;
     color.green = rgba888_color.green >> 2;
@@ -73,7 +73,7 @@ vsf_tgui_sv_color_t vsf_tgui_sv_argb8888_to_color(vsf_tgui_sv_color_argb8888_t r
     return color;
 }
 
-vsf_tgui_sv_color_argb8888_t vsf_tgui_sv_color_to_argb8888(vsf_tgui_sv_color_t color)
+vsf_tgui_sv_color_argb8888_t vsf_tgui_sv_color_to_argb8888(vsf_tgui_v_color_t color)
 {
 #if (VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_BGR_565) ||  (VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565)
     vsf_tgui_sv_color_argb8888_t argb8888_color;
@@ -93,10 +93,10 @@ vsf_tgui_sv_color_argb8888_t vsf_tgui_sv_color_to_argb8888(vsf_tgui_sv_color_t c
 #endif
 
 #if VSF_TGUI_CFG_COLOR_MODE != VSF_TGUI_COLOR_RGB_565
-vsf_tgui_sv_color_t vsf_tgui_sv_rgb565_to_color(vsf_tgui_sv_color_rgb565_t rgb565_color)
+vsf_tgui_v_color_t vsf_tgui_sv_rgb565_to_color(vsf_tgui_sv_color_rgb565_t rgb565_color)
 {
 #if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
-    vsf_tgui_sv_color_t color = {
+    vsf_tgui_v_color_t color = {
         .red   = rgb565_color.red   << 3,
         .green = rgb565_color.green << 2,
         .blue  = rgb565_color.blue  << 3,
@@ -106,7 +106,7 @@ vsf_tgui_sv_color_t vsf_tgui_sv_rgb565_to_color(vsf_tgui_sv_color_rgb565_t rgb56
     };
     return color;
 #elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_BGR_565
-    vsf_tgui_sv_color_t color = {
+    vsf_tgui_v_color_t color = {
         .red   = rgb565_color.red   >> 3,
         .green = rgb565_color.green >> 2,
         .blue  = rgb565_color.blue  >> 3,
@@ -120,7 +120,7 @@ vsf_tgui_sv_color_t vsf_tgui_sv_rgb565_to_color(vsf_tgui_sv_color_rgb565_t rgb56
 #endif
 }
 
-vsf_tgui_sv_color_rgb565_t vsf_tgui_sv_color_to_rgb565(vsf_tgui_sv_color_t color)
+vsf_tgui_sv_color_rgb565_t vsf_tgui_sv_color_to_rgb565(vsf_tgui_v_color_t color)
 {
 #if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
     vsf_tgui_sv_color_rgb565_t rgb565_color = {
@@ -149,10 +149,10 @@ vsf_tgui_sv_color_rgb565_t vsf_tgui_sv_color_to_rgb565(vsf_tgui_sv_color_t color
 #endif
 
 #if VSF_TGUI_CFG_COLOR_MODE != VSF_TGUI_COLOR_BGR_565
-vsf_tgui_sv_color_t vsf_tgui_sv_bgr565_to_color(vsf_tgui_sv_color_bgr565_t bgr565_color)
+vsf_tgui_v_color_t vsf_tgui_sv_bgr565_to_color(vsf_tgui_sv_color_bgr565_t bgr565_color)
 {
 #if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
-    vsf_tgui_sv_color_t color = {
+    vsf_tgui_v_color_t color = {
         .red   = bgr565_color.red   >> 3,
         .green = bgr565_color.green >> 2,
         .blue  = bgr565_color.blue  >> 3,
@@ -162,7 +162,7 @@ vsf_tgui_sv_color_t vsf_tgui_sv_bgr565_to_color(vsf_tgui_sv_color_bgr565_t bgr56
     };
     return color;
 #elif VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_RGB_565
-    vsf_tgui_sv_color_t color = {
+    vsf_tgui_v_color_t color = {
         .red   = bgr565_color.red   >> 3,
         .green = bgr565_color.green >> 2,
         .blue  = bgr565_color.blue  >> 3,
@@ -176,7 +176,7 @@ vsf_tgui_sv_color_t vsf_tgui_sv_bgr565_to_color(vsf_tgui_sv_color_bgr565_t bgr56
 #endif
 }
 
-vsf_tgui_sv_color_bgr565_t vsf_tgui_sv_color_to_bgr565(vsf_tgui_sv_color_t color)
+vsf_tgui_sv_color_bgr565_t vsf_tgui_sv_color_to_bgr565(vsf_tgui_v_color_t color)
 {
 #if VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888
     vsf_tgui_sv_color_bgr565_t bgr565_color = {

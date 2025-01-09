@@ -31,8 +31,8 @@ declare_class(vsf_tgui_t)
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_TGUI_CFG_SV_DRAW_LOG
-#   define VSF_TGUI_CFG_SV_DRAW_LOG              DISABLED
+#ifndef VSF_TGUI_CFG_V_DRAW_LOG
+#   define VSF_TGUI_CFG_V_DRAW_LOG            DISABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -72,7 +72,7 @@ static bool __sv_control_get_no_empty_region(const vsf_tgui_control_t* control_p
 
     vsf_tgui_size_t* size_ptr = vsf_tgui_control_get_size(control_ptr);
     if (size_ptr->iWidth <= 0 || size_ptr->iHeight <= 0) {
-#if VSF_TGUI_CFG_SV_DRAW_LOG == ENABLED
+#if VSF_TGUI_CFG_V_DRAW_LOG == ENABLED
         VSF_TGUI_LOG(VSF_TRACE_DEBUG,
                      "[Simple View]%s's area is less than or equal to 0, (width: %d, height: %d)" VSF_TRACE_CFG_LINEEND,
                      __sv_get_node_name(control_ptr), region_ptr->tSize.iWidth, region_ptr->tSize.iHeight);
@@ -85,7 +85,7 @@ static bool __sv_control_get_no_empty_region(const vsf_tgui_control_t* control_p
     region_ptr->tLocation.iY = 0;
     region_ptr->tSize = *size_ptr;
 
-#if VSF_TGUI_CFG_SV_DRAW_LOG == ENABLED
+#if VSF_TGUI_CFG_V_DRAW_LOG == ENABLED
     VSF_TGUI_LOG(VSF_TRACE_DEBUG,
                  "[Simple View]%s control relative region(%d, %d, %d, %d)" VSF_TRACE_CFG_LINEEND,
                  __sv_get_node_name(control_ptr),
@@ -122,7 +122,7 @@ static bool __sv_place_resource_with_absolute( const vsf_tgui_control_t* control
     // only update dirty region
     VSF_TGUI_ASSERT(dirty_region_ptr != NULL);
     if (!vsf_tgui_region_intersect(&control_relative_dirty_region, contrl_relative_region_ptr, dirty_region_ptr)) {
-#if VSF_TGUI_CFG_SV_DRAW_LOG == ENABLED
+#if VSF_TGUI_CFG_V_DRAW_LOG == ENABLED
         VSF_TGUI_LOG(VSF_TRACE_DEBUG, "[Simple View]%s in dirty resion is empty" VSF_TRACE_CFG_LINEEND,
                      __sv_get_node_name(control_ptr));
 #endif
@@ -130,7 +130,7 @@ static bool __sv_place_resource_with_absolute( const vsf_tgui_control_t* control
     }
     __sv_resource_region_update(resource_region_ptr, contrl_relative_region_ptr, &control_relative_dirty_region);
 
-#if VSF_TGUI_CFG_SV_DRAW_LOG == ENABLED
+#if VSF_TGUI_CFG_V_DRAW_LOG == ENABLED
     VSF_TGUI_LOG(VSF_TRACE_DEBUG,
                  "[Simple View]%s relative region (%d, %d, %d, %d) after in dirty region(%d, %d, %d, %d), resource region(%d, %d, %d, %d)" VSF_TRACE_CFG_LINEEND,
                  __sv_get_node_name(control_ptr),
@@ -154,7 +154,7 @@ static bool __sv_place_resource_with_absolute( const vsf_tgui_control_t* control
     absolute_region = control_relative_dirty_region;
     vsf_tgui_control_calculate_absolute_location(control_ptr, &absolute_region.tLocation);
 
-#if VSF_TGUI_CFG_SV_DRAW_LOG == ENABLED
+#if VSF_TGUI_CFG_V_DRAW_LOG == ENABLED
     VSF_TGUI_LOG(VSF_TRACE_DEBUG,
                  "[Simple View]%s absolute region(%d, %d, %d, %d)" VSF_TRACE_CFG_LINEEND,
                  __sv_get_node_name(control_ptr),
@@ -167,7 +167,7 @@ static bool __sv_place_resource_with_absolute( const vsf_tgui_control_t* control
 
     // only focus on the region on the screen
     if (!vsf_tgui_region_intersect(&absolute_region_in_screen, &absolute_region, &screen_region)) {
-#if VSF_TGUI_CFG_SV_DRAW_LOG == ENABLED
+#if VSF_TGUI_CFG_V_DRAW_LOG == ENABLED
         VSF_TGUI_LOG(VSF_TRACE_DEBUG, "[Simple View]%s absolute region in screen is empty" VSF_TRACE_CFG_LINEEND,
                      __sv_get_node_name(control_ptr));
 #endif
@@ -179,7 +179,7 @@ static bool __sv_place_resource_with_absolute( const vsf_tgui_control_t* control
     // save result
     *real_location_ptr = absolute_region_in_screen.tLocation;
 
-#if VSF_TGUI_CFG_SV_DRAW_LOG == ENABLED
+#if VSF_TGUI_CFG_V_DRAW_LOG == ENABLED
     VSF_TGUI_LOG(VSF_TRACE_DEBUG,
                  "[Simple View]%s absolute region(%d, %d, %d, %d) in screen(%d, %d, %d, %d), resource region(%d, %d, %d, %d)" VSF_TRACE_CFG_LINEEND,
                  __sv_get_node_name(control_ptr),
@@ -230,7 +230,7 @@ void vsf_tgui_control_v_draw_rect(  vsf_tgui_t* gui_ptr,
                                     const vsf_tgui_control_t* control_ptr,
                                     const vsf_tgui_region_t* dirty_region_ptr,
                                     const vsf_tgui_region_t* rect_region_ptr,
-                                    const vsf_tgui_sv_color_t color)
+                                    const vsf_tgui_v_color_t color)
 {
     vsf_tgui_region_t resource_region;
     vsf_tgui_location_t real_location;
@@ -248,7 +248,7 @@ void vsf_tgui_control_v_draw_rect(  vsf_tgui_t* gui_ptr,
 
     if (__sv_place_resource_with_absolute(control_ptr, dirty_region_ptr, rect_region_ptr,
                                           &real_location, &resource_region)) {
-#if VSF_TGUI_CFG_SV_DRAW_LOG == ENABLED
+#if VSF_TGUI_CFG_V_DRAW_LOG == ENABLED
         VSF_TGUI_LOG(VSF_TRACE_INFO,
             "[Simple View]%s draw rect(0x%x) in (x:%d, y:%d), size(w:%d, h:%d)" VSF_TRACE_CFG_LINEEND,
             __sv_get_node_name(control_ptr), color.value,
@@ -268,8 +268,8 @@ void vsf_tgui_control_v_draw_tile(  vsf_tgui_t* gui_ptr,
                                     const vsf_tgui_align_mode_t mode,
                                     const uint8_t trans_rate,
                                     vsf_tgui_region_t * placed_region_ptr,
-                                    vsf_tgui_sv_color_t color,
-                                    vsf_tgui_sv_color_t bg_color)
+                                    vsf_tgui_v_color_t color,
+                                    vsf_tgui_v_color_t bg_color)
 {
     vsf_tgui_region_t resource_region;
     vsf_tgui_location_t real_location;
@@ -286,7 +286,7 @@ void vsf_tgui_control_v_draw_tile(  vsf_tgui_t* gui_ptr,
     }
 
     if (__sv_update_place_resouce_with_align(control_ptr, dirty_region_ptr, mode, &real_location, &resource_region)) {
-#if VSF_TGUI_CFG_SV_DRAW_LOG == ENABLED
+#if VSF_TGUI_CFG_V_DRAW_LOG == ENABLED
         VSF_TGUI_LOG(VSF_TRACE_INFO,
             "[Simple View]%s draw tile(0x%p) in (x:%d, y:%d), resource(x:%d, y:%d w:%d, h:%d)" VSF_TRACE_CFG_LINEEND,
             __sv_get_node_name(control_ptr), tile_ptr, real_location.iX, real_location.iY,
@@ -311,21 +311,10 @@ static bool __sv_text_get_size(const uint8_t font_index, vsf_tgui_text_info_t* s
     VSF_TGUI_ASSERT(string_info_ptr->tString.pstrText != NULL);
     VSF_TGUI_ASSERT(size_ptr != NULL);
 
-#if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
-    if (string_info_ptr->bIsChanged) {
-        string_info_ptr->bIsChanged = false;
-        string_info_ptr->tInfoCache.tStringSize = vsf_tgui_text_get_size(font_index,
-                                                                      &(string_info_ptr->tString),
-                                                                      &(string_info_ptr->tInfoCache.hwLines),
-                                                                      &(string_info_ptr->tInfoCache.chCharHeight));
-    }
-    *size_ptr = string_info_ptr->tInfoCache.tStringSize;
-#else
-    * size_ptr = vsf_tgui_text_get_size(  font_index,
-                                        &(string_info_ptr->tString),
-                                        NULL,
-                                        NULL);
-#endif
+    *size_ptr = vsf_tgui_text_get_size(font_index,
+                                        string_info_ptr,
+                                        &(string_info_ptr->tInfoCache.hwLines),
+                                        &(string_info_ptr->tInfoCache.chCharHeight));
 
     if (size_ptr->iWidth <= 0 || size_ptr->iHeight <= 0) {
         return false;
@@ -378,7 +367,7 @@ static void __sv_text_draw(vsf_tgui_t* gui_ptr,
                            const vsf_tgui_region_t* dirty_region_ptr,
                            const vsf_tgui_string_t* string_ptr,
                            const uint8_t font_index,
-                           const vsf_tgui_sv_color_t color,
+                           const vsf_tgui_v_color_t color,
                            const int_fast8_t inter_line_space,
                            const vsf_tgui_align_mode_t mode)
 {
@@ -451,7 +440,7 @@ void vsf_tgui_control_v_draw_text(  vsf_tgui_t* gui_ptr,
                                     const vsf_tgui_region_t* dirty_region_ptr,
                                     vsf_tgui_text_info_t *string_info_ptr,
                                     const uint8_t font_index,
-                                    const vsf_tgui_sv_color_t color,
+                                    const vsf_tgui_v_color_t color,
                                     const vsf_tgui_align_mode_t mode)
 {
     vsf_tgui_region_t resource_region = {{0, 0}, {0,0}};
@@ -473,7 +462,7 @@ void vsf_tgui_control_v_draw_text(  vsf_tgui_t* gui_ptr,
     resource_region.tSize = size;
 
     if (__sv_update_place_resouce_with_align(control_ptr, dirty_region_ptr, mode, &real_location, &resource_region)) {
-#if VSF_TGUI_CFG_SV_DRAW_LOG == ENABLED
+#if VSF_TGUI_CFG_V_DRAW_LOG == ENABLED
         VSF_TGUI_LOG(VSF_TRACE_INFO,
             "[Simple View]%s draw text(%s) in (:%d, y:%d), size(w:%d, h:%d)" VSF_TRACE_CFG_LINEEND,
             __sv_get_node_name(control_ptr), string_info_ptr->tString, real_location.iX, real_location.iY,
