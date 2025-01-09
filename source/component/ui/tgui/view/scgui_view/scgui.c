@@ -292,7 +292,7 @@ int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_
         if(x+g.adv_w>=box->xe)        //»»ÐÐ
         {
             x=box->xs;
-            y+=font->line_height;
+            y+=font->line_height+line_space;
             if(y>box->ye)  break;
         }
         SC_pfb_lv_letter(dest,box,x,y,&g,unicode,font,fc,bc, dirty_area);
