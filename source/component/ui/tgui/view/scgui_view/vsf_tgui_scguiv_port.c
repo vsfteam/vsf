@@ -253,6 +253,14 @@ void vsf_tgui_control_v_draw_text(  vsf_tgui_t* gui_ptr,
     };
     vsf_tgui_region_update_with_align(&text_region, &temp_region, mode);
     vsf_tgui_control_calculate_absolute_location(control_ptr, &text_region.tLocation);
+    vsf_tgui_region_t dirty_region = *dirty_region_ptr;
+    vsf_tgui_control_calculate_absolute_location(control_ptr, &dirty_region.tLocation);
+
+    SC_tile *cur_tile = &gui_ptr->cur_tile;
+    cur_tile->dirty_rect.xs = dirty_region.tLocation.iX;
+    cur_tile->dirty_rect.ys = dirty_region.tLocation.iY;
+    cur_tile->dirty_rect.xe = dirty_region.tLocation.iX + dirty_region.tSize.iWidth - 1;
+    cur_tile->dirty_rect.ye = dirty_region.tLocation.iY + dirty_region.tSize.iHeight - 1;
 
     // TODO: multi line and align support
     uint16_t alpha = gui->alpha;
