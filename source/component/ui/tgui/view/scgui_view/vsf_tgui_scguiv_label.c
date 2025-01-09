@@ -109,7 +109,7 @@ vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* l
 
 #if VSF_TGUI_CFG_V_SUPPORT_ROUND_BORDER == ENABLED
     size.iWidth += label_ptr->border_radius * 2;
-    size.iHeight += label_ptr->border_radius * 2;
+    size.iHeight = vsf_max(size.iHeight, label_ptr->border_radius * 2);
 #endif
     return size;
 }
