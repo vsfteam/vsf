@@ -71,6 +71,10 @@
 #   define VSF_TGUI_CFG_V_BORDER_COLOR                          VSF_TGUI_COLOR_WHITE
 #endif
 
+#ifndef VSF_TGUI_CFG_V_CONTROL_BACKGROUND_COLOR
+#   define VSF_TGUI_CFG_V_CONTROL_BACKGROUND_COLOR              VSF_TGUI_COLOR_RGB(0xB4, 0xC7, 0xE7)
+#endif
+
 // container configurations
 
 #ifndef VSF_TGUI_CFG_V_CONTAINER_BACKGROUND_COLOR
@@ -134,7 +138,8 @@
 // default init and override init
 
 #define VSF_TGUI_V_CONTROL_STATIC_INIT_DEFAULT                                  \
-            tgui_v_border_color(VSF_TGUI_CFG_V_BORDER_COLOR),
+            tgui_v_border_color(VSF_TGUI_CFG_V_BORDER_COLOR),                   \
+            tgui_v_background_color(VSF_TGUI_CFG_V_CONTROL_BACKGROUND_COLOR),
 #define VSF_TGUI_V_LABEL_STATIC_INIT_DEFAULT                                    \
             tgui_v_border_radius(16),                                           \
             tgui_v_background_color(VSF_TGUI_CFG_V_LABEL_BACKGROUND_COLOR),     \

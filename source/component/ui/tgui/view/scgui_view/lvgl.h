@@ -26,14 +26,15 @@ extern "C" {
    #define NULL ((void*) 0)
 #endif
 
+#include <stdbool.h>
+
 #define FALSE   0
 #define TRUE    1
-#define false   0
-#define true    1
+//#define false   0
+//#define true    1
 
 //typedef unsigned char   u8, bool, BOOL, bit1, uint8_t, BaseType_t;
 
-#include <stdbool.h>
 typedef signed char    int8_t;
 //typedef unsigned char   bool;
 typedef unsigned char   u8,  uint8_t;

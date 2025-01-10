@@ -1,6 +1,7 @@
 #ifndef _SC_GUI_H
 #define _SC_GUI_H
 
+#include "vsf_cfg.h"
 #include "./lvgl.h"
 
 #ifndef LCD_SCREEN_WIDTH
