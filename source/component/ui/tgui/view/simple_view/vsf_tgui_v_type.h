@@ -131,7 +131,7 @@
 #endif
 
 #if VSF_TGUI_CFG_V_LABLE_SUPPORT_TEXT_COLOR == ENABLED
-#   define __SV_TEXT_COLOR(__COLOR)                             .font_color = __COLOR,
+#   define __SV_TEXT_COLOR(__COLOR)                             .text_color = __COLOR,
 #else
 #   define __SV_TEXT_COLOR(__COLOR)
 #endif
@@ -225,8 +225,8 @@
 #endif
 
 #if VSF_TGUI_CFG_V_LABLE_SUPPORT_TEXT_COLOR == ENABLED
-#define tgui_v_font_color(...)                                      \
-            __tgui_attribute(font_color,  __VA_ARGS__)
+#define tgui_v_text_color(...)                                      \
+            __tgui_attribute(text_color,  __VA_ARGS__)
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -257,7 +257,7 @@ end_def_structure(vsf_tgui_v_container_t)
 declare_structure(vsf_tgui_v_label_t)
 def_structure(vsf_tgui_v_label_t)
 #if VSF_TGUI_CFG_V_LABLE_SUPPORT_TEXT_COLOR == ENABLED
-    vsf_tgui_v_color_t font_color;
+    vsf_tgui_v_color_t text_color;
 #endif
 end_def_structure(vsf_tgui_v_label_t)
 
