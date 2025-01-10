@@ -146,7 +146,8 @@
 #define VSF_TGUI_V_CONTAINER_STATIC_INIT_DEFAULT                                \
             tgui_v_background_color(VSF_TGUI_CFG_V_CONTAINER_BACKGROUND_COLOR),
 #define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_DEFAULT                                \
-            tgui_v_background_color(VSF_TGUI_CFG_V_CONTAINER_BACKGROUND_COLOR),
+            tgui_v_border_radius(16),                                           \
+            tgui_v_background_color(VSF_TGUI_CFG_V_TEXT_LIST_BACKGROUND_COLOR),
 #define VSF_TGUI_V_TEXT_LIST_CONTENT_INIT_DEFAULT
 #define VSF_TGUI_V_LIST_STATIC_INIT_DEFAULT
 #define VSF_TGUI_V_PANEL_STATIC_INIT_DEFAULT                                    \
@@ -191,6 +192,7 @@
 /*============================ TYPES =========================================*/
 
 def_structure(vsf_tgui_v_control_t)
+    bool __skip_frame;
 #if VSF_TGUI_CFG_V_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
     vsf_tgui_v_color_t background_color;
 #endif

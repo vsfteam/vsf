@@ -50,11 +50,8 @@ fsm_rt_t vsf_tgui_text_list_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_text_list_t* te
     vsf_tgui_container_v_init(gui_ptr, &(text_list_ptr->use_as__vsf_tgui_container_t));
     vsf_tgui_container_v_init(gui_ptr, &(text_list_ptr->tList.use_as__vsf_tgui_container_t));
 
-#if     (VSF_TGUI_CFG_COLOR_MODE == VSF_TGUI_COLOR_ARGB_8888)                   \
-    ||  (VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA == ENABLED)
     text_list_ptr->tList.__skip_frame = true;
     text_list_ptr->tList.tContent.__skip_frame = true;
-#endif
     return fsm_rt_on_going;
 }
 
