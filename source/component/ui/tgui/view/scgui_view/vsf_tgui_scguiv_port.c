@@ -40,6 +40,13 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+VSF_CAL_WEAK(vsf_tgui_tile_get_pixelmap)
+unsigned char* vsf_tgui_tile_get_pixelmap(const vsf_tgui_tile_t *tile_ptr)
+{
+    VSF_TGUI_ASSERT(0);
+    return NULL;
+}
+
 /**********************************************************************************/
 /*! \brief begin a refresh loop
  *! \param gui_ptr the tgui object address
@@ -277,9 +284,9 @@ void vsf_tgui_control_v_draw_text(  vsf_tgui_t* gui_ptr,
     vsf_tgui_region_update_with_align(&text_abs_region, &temp_region, mode);
     text_abs_region.iX = 0;
     vsf_tgui_control_calculate_absolute_location(control_ptr, &text_abs_region.tLocation);
+
     vsf_tgui_region_t dirty_abs_region = *dirty_region_ptr;
     vsf_tgui_control_calculate_absolute_location(control_ptr, &dirty_abs_region.tLocation);
-
     gui->lcd_area.xs = dirty_abs_region.iX;
     gui->lcd_area.ys = dirty_abs_region.iY;
     gui->lcd_area.xe = dirty_abs_region.iX + dirty_abs_region.iWidth - 1;
@@ -293,16 +300,58 @@ void vsf_tgui_control_v_draw_text(  vsf_tgui_t* gui_ptr,
     gui->alpha = alpha;
 }
 
-extern void vsf_tgui_control_v_draw_tile(vsf_tgui_t* gui_ptr,
-                                         const vsf_tgui_control_t* control_ptr,
-                                         const vsf_tgui_region_t* dirty_region_ptr,
-                                         const vsf_tgui_tile_t* tile_ptr,
-                                         const vsf_tgui_align_mode_t mode,
-                                         const uint8_t trans_rate,
-                                         vsf_tgui_region_t* ptPlacedRegion,
-                                         vsf_tgui_v_color_t color,
-                                         vsf_tgui_v_color_t bg_color)
+void vsf_tgui_control_v_draw_tile(  vsf_tgui_t* gui_ptr,
+                                    const vsf_tgui_control_t* control_ptr,
+                                    const vsf_tgui_region_t* dirty_region_ptr,
+                                    const vsf_tgui_tile_t* tile_ptr,
+                                    const vsf_tgui_align_mode_t mode,
+                                    const uint8_t trans_rate,
+                                    vsf_tgui_region_t* placed_region_ptr,
+                                    vsf_tgui_v_color_t color,
+                                    vsf_tgui_v_color_t bg_color)
 {
+    vsf_tgui_region_t resource_region;
+
+    tile_ptr = vsf_tgui_tile_get_root(tile_ptr, &resource_region);
+    VSF_TGUI_ASSERT(tile_ptr != NULL);
+    vsf_tgui_size_t tile_size = vsf_tgui_root_tile_get_size(tile_ptr);
+
+    if (placed_region_ptr != NULL) {
+        *placed_region_ptr = resource_region;
+    }
+
+    vsf_tgui_region_t image_abs_region = {
+        .tSize      = control_ptr->tSize,
+    };
+    vsf_tgui_region_update_with_align(&image_abs_region, &resource_region, mode);
+    vsf_tgui_control_calculate_absolute_location(control_ptr, &image_abs_region.tLocation);
+
+    vsf_tgui_region_t dirty_abs_region = *dirty_region_ptr;
+    vsf_tgui_control_calculate_absolute_location(control_ptr, &dirty_abs_region.tLocation);
+    gui->lcd_area.xs = dirty_abs_region.iX;
+    gui->lcd_area.ys = dirty_abs_region.iY;
+    gui->lcd_area.xe = dirty_abs_region.iX + dirty_abs_region.iWidth - 1;
+    gui->lcd_area.ye = dirty_abs_region.iY + dirty_abs_region.iHeight - 1;
+
+    uint16_t pixel_size = vsf_tgui_root_tile_get_pixel_bitsize(tile_ptr);
+    SC_img_t img = {
+        .map = vsf_tgui_tile_get_pixelmap(tile_ptr) + resource_region.iX * 16,
+        .w = vsf_min(resource_region.iWidth, tile_size.iWidth - resource_region.iX),
+        .h = vsf_min(resource_region.iHeight, tile_size.iHeight - resource_region.iY),
+        .pitch = (tile_ptr->tBufRoot.iWidth * pixel_size) >> 3,
+    };
+
+    switch (tile_ptr->tCore.Attribute.u2ColorType) {
+    case VSF_TGUI_TILE_COLORTYPE_RGB:
+        switch (pixel_size) {
+        case 16:
+            SC_pfb_Image(&gui_ptr->cur_tile, image_abs_region.iX, image_abs_region.iY, &img);
+            break;
+        }
+        break;
+    default:
+        break;
+    }
 }
 
 #endif

@@ -66,6 +66,17 @@ vsf_tgui_size_t vsf_tgui_root_tile_get_size(const vsf_tgui_tile_t* ptTile)
     }
 }
 
+uint16_t vsf_tgui_root_tile_get_pixel_bitsize(const vsf_tgui_tile_t* ptTile)
+{
+    VSF_TGUI_ASSERT(ptTile != NULL);
+    VSF_TGUI_ASSERT(ptTile->_.tCore.Attribute.bIsRootTile == 1);
+    static const uint16_t __color_sizes[8] = {
+        /* 0: 1bit, 2: 4bit, 3: 8bit 4: 16bit, 5: 32bit, 6: 24bit */
+        1, 0, 4, 8, 16, 32, 24, 0
+    };
+
+    return __color_sizes[ptTile->tCore.Attribute.u3ColorSize];
+}
 
 vsf_tgui_tile_t* vsf_tgui_tile_get_root(    const vsf_tgui_tile_t* ptTile,
                                             vsf_tgui_region_t* region_ptr)

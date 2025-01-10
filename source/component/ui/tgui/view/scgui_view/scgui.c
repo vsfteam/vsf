@@ -130,6 +130,41 @@ void SC_pfb_DrawFill(SC_tile *dest,int xs,int ys,int xe,int ye,uint16_t fc)
     }
 }
 
+/**fun: 显示图片*/
+void SC_pfb_Image(SC_tile *dest,int xs,int ys,SC_img_t *src)
+{
+    //===========计算相交===============
+    SC_ARER intersection;
+    if(!SC_pfb_intersection(dest,&intersection,xs,ys,xs+src->w-1,ys+src->h-1))
+    {
+        return;
+    }
+    if (intersection.xs < gui->lcd_area.xs) {
+        intersection.xs = gui->lcd_area.xs;
+    }
+    if (intersection.ys < gui->lcd_area.ys) {
+        intersection.ys = gui->lcd_area.ys;
+    }
+    if (intersection.xe > gui->lcd_area.xe) {
+        intersection.xe = gui->lcd_area.xe;
+    }
+    if (intersection.ye > gui->lcd_area.ye) {
+        intersection.ye = gui->lcd_area.ye;
+    }
+    uint16_t *Image=(uint16_t*)src->map;
+    uint16_t pitch = 0;
+    for (int y = intersection.ys; y <=intersection.ye; y++)
+    {
+        int dest_offs=(y-dest->ys) * dest->w -dest->xs;
+        int src_offs= (y-ys) * src->w - xs;
+        for (int x = intersection.xs; x <=intersection.xe; x++)
+        {
+            dest->buf[dest_offs+x]=Image[src_offs+x+pitch];
+        }
+        pitch+=src->pitch;
+    }
+}
+
 ///=============================字体位图================================================
 /**fun: get_bpp_value*/
 static inline uint16_t get_bpp_value(const uint8_t *buffer,uint16_t offset, uint8_t bpp)

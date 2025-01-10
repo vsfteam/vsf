@@ -598,6 +598,9 @@ extern
 vsf_tgui_size_t vsf_tgui_root_tile_get_size(const vsf_tgui_tile_t* ptTile);
 
 extern
+uint16_t vsf_tgui_root_tile_get_pixel_bitsize(const vsf_tgui_tile_t* ptTile);
+
+extern
 bool vsf_tgui_tile_is_root(const vsf_tgui_tile_t* ptTile);
 
 extern

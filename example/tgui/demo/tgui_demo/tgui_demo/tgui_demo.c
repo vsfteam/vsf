@@ -92,6 +92,8 @@ unsigned char * vsf_tgui_tile_get_pixelmap(const vsf_tgui_tile_t *tile_ptr)
 
     if (tile_ptr->_.tCore.Attribute.u2RootTileType == 0) {  // buf tile
         return (unsigned char *)&__tiles_data[(uint32_t)tile_ptr->tBufRoot.ptBitmap];
+    } else if (tile_ptr->_.tCore.Attribute.u2RootTileType == 2) {  // buf_addr tile
+        return (unsigned char *)tile_ptr->tBufRoot.ptBitmap;
     } else {                                                // index tile
         VSF_TGUI_ASSERT(0);
         return NULL;
