@@ -296,6 +296,7 @@ int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_
     int x_offset = __SC_text_get_x_offset(&txt[i], font, align, width);
     for(;; x+=g.adv_w)
     {
+    next_char:
         unicode = lv_txt_utf8_next(txt,&i);      //txt转unicode
         if(lv_get_glyph_dsc(font,&g,unicode,&xlen)==0) //长度累加直到结束
         {
@@ -305,22 +306,17 @@ int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_
             }
             else if(unicode=='\n'||unicode=='\r')
             {
-                x=xe;
-                continue;
+                x_offset = __SC_text_get_x_offset(&txt[i], font, align, width);
+                x=xorig;
+                y+=font->line_height+line_space;
+                if(y>box->ye)  break;
+                goto next_char;
             }
             else
             {
                 unicode=' ';               //未知字体
                 lv_get_glyph_dsc(font,&g,unicode,&xlen);
             }
-        }
-        if(x+g.adv_w>=xe)        //换行
-        {
-            x_offset = __SC_text_get_x_offset(&txt[i], font, align, width);
-
-            x=xorig;
-            y+=font->line_height+line_space;
-            if(y>box->ye)  break;
         }
         SC_pfb_lv_letter(dest,box,x+x_offset,y,&g,unicode,font,fc,bc);
     }
