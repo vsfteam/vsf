@@ -419,7 +419,7 @@ static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_t* gui_ptr,
     const vsf_tgui_region_t *ptDirtyRegion = (const vsf_tgui_region_t *)(event_ptr->region_ptr);
 
     do {
-        vsf_tgui_sv_color_t tColor = VSF_TGUI_CFG_SV_TEXT_LIST_INDICATOR_COLOR;
+        vsf_tgui_v_color_t tColor = VSF_TGUI_CFG_V_TEXT_LIST_INDICATOR_COLOR;
         vsf_tgui_region_t tRegion = {0};
 
         tRegion.tSize = *vsf_tgui_control_get_size(control_ptr);
