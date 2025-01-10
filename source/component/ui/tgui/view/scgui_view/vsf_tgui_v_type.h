@@ -169,6 +169,9 @@
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define tgui_v_font(...)                                                        \
+            __tgui_attribute(font_index, __VA_ARGS__)
+
 #if VSF_TGUI_CFG_V_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
 #   define tgui_v_background_color(...)                                         \
             __tgui_attribute(background_color,  __VA_ARGS__)
@@ -197,7 +200,6 @@
 /*============================ TYPES =========================================*/
 
 def_structure(vsf_tgui_v_control_t)
-    bool __skip_frame;
 #if VSF_TGUI_CFG_V_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
     vsf_tgui_v_color_t background_color;
 #endif

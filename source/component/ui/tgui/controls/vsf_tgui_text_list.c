@@ -419,8 +419,9 @@ fsm_rt_t vk_tgui_text_list_init(vsf_tgui_text_list_t* ptTextList)
 
     __vk_tgui_text_list_internal_update(ptTextList);
 
-    vk_tgui_container_init(
-                &(ptTextList->use_as__vsf_tgui_container_t));
+    vk_tgui_container_init(&(ptTextList->use_as__vsf_tgui_container_t));
+    ptTextList->tList.Status.Values.__skip_render = true;
+    ptTextList->tList.tContent.Status.Values.__skip_render = true;
 
     do {
         vsf_tgui_status_t Status = vsf_tgui_control_status_get((vsf_tgui_control_t*)ptTextList);

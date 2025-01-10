@@ -121,10 +121,6 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) control view rendering" VSF_TRACE_CFG_LINEEND, vsf_tgui_control_get_node_name(control_ptr), control_ptr);
 #endif
 
-    if (control_ptr->__skip_frame) {
-        return fsm_rt_cpl;
-    }
-
 #if VSF_TGUI_CFG_V_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED || VSF_TGUI_CFG_V_SUPPORT_FIXED_BACKGROUND_COLOR == ENABLED
     vsf_tgui_v_color_t color = vsf_tgui_sv_get_background_color(control_ptr);
     vsf_tgui_v_color_t bg_color = vsf_tgui_sv_get_parent_background_color(control_ptr);

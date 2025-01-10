@@ -876,7 +876,7 @@ fsm_rt_t __vsf_tgui_control_msg_handler(vsf_tgui_control_t* control_ptr,
                      #endif
 
                         result = __vk_tgui_control_user_message_handling(control_ptr, (const vsf_tgui_evt_t *)ptMSG);
-                        if (VSF_MSGT_ERR_MSG_NOT_HANDLED == result) {
+                        if ((VSF_MSGT_ERR_MSG_NOT_HANDLED == result) && !control_ptr->Status.Values.__skip_render) {
                             result = ptMethods->tView.Render(gui_ptr, control_ptr, &tRegion, tMode);
                         }
                     }

@@ -82,9 +82,18 @@ vsf_tgui_control_t * vsf_tgui_control_new(vsf_tree_msg_node_id_t id, char *name)
         control->id = id;
         control->bIsEnabled = true;
         control->bIsVisible = true;
+#if VSF_TGUI_CFG_V_SUPPORT_CORNER_TILE == ENABLED
         control->show_corner_tile = false;
+#endif
+#if VSF_TGUI_CFG_V_SUPPORT_TILE_TRANSPARENCY == ENABLED
         control->tile_trans_rate = 0xFF;
-        control->background_color = VSF_TGUI_CFG_SV_CONTROL_BACKGROUND_COLOR;
+#endif
+#if VSF_TGUI_CFG_V_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
+        control->background_color = VSF_TGUI_CFG_V_CONTROL_BACKGROUND_COLOR;
+#endif
+#if VSF_TGUI_CFG_V_SUPPORT_BORDER == ENABLED
+        control->border_color = VSF_TGUI_CFG_V_BORDER_COLOR;
+#endif
     }
     return control;
 }
@@ -161,7 +170,9 @@ vsf_tgui_container_t * vsf_tgui_container_new(char *name)
     if (container != NULL) {
         container->is_container = true;
         container->ContainerAttribute.bIsAutoSize = true;
-        container->background_color = VSF_TGUI_CFG_SV_CONTAINER_BACKGROUND_COLOR;
+#if VSF_TGUI_CFG_V_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
+        container->background_color = VSF_TGUI_CFG_V_CONTAINER_BACKGROUND_COLOR;
+#endif
     }
     return container;
 }
@@ -172,9 +183,16 @@ vsf_tgui_label_t * vsf_tgui_label_new(char *name)
 {
     vsf_tgui_label_t *label = (vsf_tgui_label_t *)vsf_tgui_control_new(VSF_TGUI_COMPONENT_ID_LABEL, name);
     if (label != NULL) {
+#if VSF_TGUI_CFG_V_SUPPORT_CORNER_TILE == ENABLED
         label->show_corner_tile = true;
-        label->background_color = VSF_TGUI_CFG_SV_LABEL_BACKGROUND_COLOR;
-        label->font_color = VSF_TGUI_CFG_SV_LABEL_TEXT_COLOR;
+#endif
+#if VSF_TGUI_CFG_V_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
+        label->background_color = VSF_TGUI_CFG_V_LABEL_BACKGROUND_COLOR;
+#endif
+        label->text_color = VSF_TGUI_CFG_V_LABEL_TEXT_COLOR;
+#if VSF_TGUI_CFG_V_SUPPORT_BORDER == ENABLED && VSF_TGUI_CFG_V_SUPPORT_ROUND_BORDER == ENABLED
+        label->border_radius = 16;
+#endif
     }
     return label;
 }
@@ -201,9 +219,16 @@ vsf_tgui_button_t * vsf_tgui_button_new(char *name)
 {
     vsf_tgui_button_t *button = (vsf_tgui_button_t *)vsf_tgui_control_new(VSF_TGUI_COMPONENT_ID_BUTTON, name);
     if (button != NULL) {
+#if VSF_TGUI_CFG_V_SUPPORT_CORNER_TILE == ENABLED
         button->show_corner_tile = true;
-        button->background_color = VSF_TGUI_CFG_SV_BUTTON_BACKGROUND_COLOR;
-        button->font_color = VSF_TGUI_CFG_SV_BUTTON_TEXT_COLOR;
+#endif
+#if VSF_TGUI_CFG_V_SUPPORT_FLUXIBLE_BACKGROUND_COLOR == ENABLED
+        button->background_color = VSF_TGUI_CFG_V_BUTTON_BACKGROUND_COLOR;
+#endif
+        button->text_color = VSF_TGUI_CFG_V_BUTTON_TEXT_COLOR;
+#if VSF_TGUI_CFG_V_SUPPORT_BORDER == ENABLED && VSF_TGUI_CFG_V_SUPPORT_ROUND_BORDER == ENABLED
+        button->border_radius = 16;
+#endif
     }
     return button;
 }

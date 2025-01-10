@@ -43,7 +43,6 @@ fsm_rt_t vsf_tgui_list_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_list_t* list_ptr)
 #endif
     vsf_tgui_container_v_init(gui_ptr, &(list_ptr->use_as__vsf_tgui_container_t));
     vsf_tgui_container_v_init(gui_ptr, list_ptr->ptList);
-    list_ptr->ptList->__skip_frame = true;
     return fsm_rt_on_going;
 }
 

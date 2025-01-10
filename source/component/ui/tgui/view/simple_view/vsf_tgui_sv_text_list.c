@@ -49,9 +49,6 @@ fsm_rt_t vsf_tgui_text_list_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_text_list_t* te
 #endif
     vsf_tgui_container_v_init(gui_ptr, &(text_list_ptr->use_as__vsf_tgui_container_t));
     vsf_tgui_container_v_init(gui_ptr, &(text_list_ptr->tList.use_as__vsf_tgui_container_t));
-
-    text_list_ptr->tList.__skip_frame = true;
-    text_list_ptr->tList.tContent.__skip_frame = true;
     return fsm_rt_on_going;
 }
 
