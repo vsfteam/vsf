@@ -1,4 +1,5 @@
 #include "scgui.h"
+#include "vsf.h"
 
 // sc_lcd.c
 
@@ -131,7 +132,7 @@ void SC_pfb_DrawFill(SC_tile *dest,int xs,int ys,int xe,int ye,uint16_t fc)
 }
 
 /**fun: 显示图片*/
-void SC_pfb_Image(SC_tile *dest,int xs,int ys,SC_img_t *src)
+void SC_pfb_Image(SC_tile *dest,int xs,int ys,uint8_t alpha,SC_img_t *src)
 {
     //===========计算相交===============
     SC_ARER intersection;
@@ -151,17 +152,44 @@ void SC_pfb_Image(SC_tile *dest,int xs,int ys,SC_img_t *src)
     if (intersection.ye > gui->lcd_area.ye) {
         intersection.ye = gui->lcd_area.ye;
     }
-    uint16_t *Image=(uint16_t*)src->map;
-    uint16_t pitch = 0;
-    for (int y = intersection.ys; y <=intersection.ye; y++)
-    {
-        int dest_offs=(y-dest->ys) * dest->w -dest->xs;
-        int src_offs= (y-ys) * src->w - xs;
-        for (int x = intersection.xs; x <=intersection.xe; x++)
+
+    int dest_offset;
+    if (src->format == SC_IMAGE_RGB565) {
+        uint16_t *Image=(uint16_t*)src->map + (intersection.ys - ys) * src->pitch + intersection.xs - xs, pixel;
+        uint32_t w = intersection.xe-intersection.xs+1;
+        for (int y = intersection.ys; y <=intersection.ye; y++)
         {
-            dest->buf[dest_offs+x]=Image[src_offs+x+pitch];
+            int dest_offs=(y-dest->ys) * dest->w -dest->xs;
+            for (int x = intersection.xs; x <=intersection.xe; x++)
+            {
+                pixel = *Image++;
+                dest_offset = dest_offs+x;
+                dest->buf[dest_offset]=alphaBlend(pixel, dest->buf[dest_offset], alpha);
+            }
+            Image += src->pitch - w;
         }
-        pitch+=src->pitch;
+    } else if (src->format == SC_IMAGE_ARGB8888) {
+        uint32_t *Image=(uint32_t*)src->map + (intersection.ys - ys) * src->pitch + intersection.xs - xs, pixel;
+        uint8_t pixel_alpha;
+        uint32_t w = intersection.xe-intersection.xs+1;
+        for (int y = intersection.ys; y <=intersection.ye; y++)
+        {
+            int dest_offs=(y-dest->ys) * dest->w -dest->xs;
+            for (int x = intersection.xs; x <=intersection.xe; x++)
+            {
+                pixel = *Image++;
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+                pixel_alpha = pixel >> 24;
+                pixel = ((pixel & 0xF8) << 8) | ((pixel & 0xFC00) >> 6) | ((pixel & 0xF80000) >> 8);
+#else
+                pixel_alpha = pixel && 0xFF;
+                pixel = ((pixel & 0xF80000) >> 8) | ((pixel & 0xFC00) >> 6) | ((pixel & 0xF8) << 8);
+#endif
+                dest_offset = dest_offs+x;
+                dest->buf[dest_offset]=alphaBlend((uint16_t)pixel, dest->buf[dest_offset], (pixel_alpha * alpha) >> 8);
+            }
+            Image += src->pitch - w;
+        }
     }
 }
 

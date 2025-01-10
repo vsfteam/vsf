@@ -338,20 +338,31 @@ void vsf_tgui_control_v_draw_tile(  vsf_tgui_t* gui_ptr,
         .map = vsf_tgui_tile_get_pixelmap(tile_ptr) + resource_region.iX * 16,
         .w = vsf_min(resource_region.iWidth, tile_size.iWidth - resource_region.iX),
         .h = vsf_min(resource_region.iHeight, tile_size.iHeight - resource_region.iY),
-        .pitch = (tile_ptr->tBufRoot.iWidth * pixel_size) >> 3,
+        .pitch = tile_ptr->tBufRoot.iWidth,
     };
 
     switch (tile_ptr->tCore.Attribute.u2ColorType) {
     case VSF_TGUI_TILE_COLORTYPE_RGB:
         switch (pixel_size) {
-        case 16:
-            SC_pfb_Image(&gui_ptr->cur_tile, image_abs_region.iX, image_abs_region.iY, &img);
-            break;
+        case 16:    img.format = SC_IMAGE_RGB565;   break;
+        default:
+            VSF_TGUI_ASSERT(false);
+            return;
+        }
+        break;
+    case VSF_TGUI_TILE_COLORTYPE_RGBA:
+        switch (pixel_size) {
+        case 32:    img.format = SC_IMAGE_ARGB8888;  break;
+        default:
+            VSF_TGUI_ASSERT(false);
+            return;
         }
         break;
     default:
-        break;
+        VSF_TGUI_ASSERT(false);
+        return;
     }
+    SC_pfb_Image(&gui_ptr->cur_tile, image_abs_region.iX, image_abs_region.iY, trans_rate, &img);
 }
 
 #endif
