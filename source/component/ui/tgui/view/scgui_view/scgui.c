@@ -99,6 +99,37 @@ void SC_GUI_Init(uint16_t bkc,uint16_t bc,uint16_t fc)
     gui->lcd_area.ye=LCD_SCREEN_HEIGHT-1;
 }
 
+/**fun: 矩形填充*/
+void SC_pfb_DrawFill(SC_tile *dest,int xs,int ys,int xe,int ye,uint16_t fc)
+{
+    //===========计算相交===============
+    SC_ARER intersection;
+    if(!SC_pfb_intersection(dest,&intersection,xs,ys,xe,ye))
+    {
+        return;
+    }
+    if (intersection.xs < gui->lcd_area.xs) {
+        intersection.xs = gui->lcd_area.xs;
+    }
+    if (intersection.ys < gui->lcd_area.ys) {
+        intersection.ys = gui->lcd_area.ys;
+    }
+    if (intersection.xe > gui->lcd_area.xe) {
+        intersection.xe = gui->lcd_area.xe;
+    }
+    if (intersection.ye > gui->lcd_area.ye) {
+        intersection.ye = gui->lcd_area.ye;
+    }
+    for (int y = intersection.ys; y <=intersection.ye; y++)
+    {
+        int dest_offs=(y-dest->ys) * dest->w -dest->xs;
+        for (int x = intersection.xs; x <=intersection.xe; x++)
+        {
+            dest->buf[dest_offs+x]=alphaBlend(fc,dest->buf[dest_offs+x],gui->alpha);
+        }
+    }
+}
+
 ///=============================字体位图================================================
 /**fun: get_bpp_value*/
 static inline uint16_t get_bpp_value(const uint8_t *buffer,uint16_t offset, uint8_t bpp)

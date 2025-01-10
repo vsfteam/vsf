@@ -248,11 +248,12 @@ void vsf_tgui_control_v_draw_rect(  vsf_tgui_t* gui_ptr,
     gui->lcd_area.ys = dirty_abs_region.iY;
     gui->lcd_area.xe = dirty_abs_region.iX + dirty_abs_region.iWidth - 1;
     gui->lcd_area.ye = dirty_abs_region.iY + dirty_abs_region.iHeight - 1;
-    SC_pfb_RoundFrame(&gui_ptr->cur_tile,
+    SC_pfb_DrawFill(&gui_ptr->cur_tile,
         control_abs_region.iX + region_ptr->iX, control_abs_region.iY + region_ptr->iY,
         control_abs_region.iX + region_ptr->iX + region_ptr->iWidth - 1,
         control_abs_region.iY + region_ptr->iY + region_ptr->iHeight - 1,
-        0, 0, color, color);
+        color
+    );
 }
 
 void vsf_tgui_control_v_draw_text(  vsf_tgui_t* gui_ptr,
