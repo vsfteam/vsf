@@ -79,19 +79,19 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
     vsf_tgui_v_color_t bg_color = vsf_tgui_v_get_background_color(control_ptr);
     vsf_tgui_v_color_t border_color = control_ptr->border_width ? control_ptr->border_color : bg_color;
 
-    vsf_tgui_region_t draw_region = { 0 };
-    vsf_tgui_control_calculate_absolute_location(control_ptr, &draw_region.tLocation);
-    vsf_tgui_region_t dirty_region = *dirty_region_ptr;
-    vsf_tgui_control_calculate_absolute_location(control_ptr, &dirty_region.tLocation);
+    vsf_tgui_region_t draw_abs_region = { 0 };
+    vsf_tgui_control_calculate_absolute_location(control_ptr, &draw_abs_region.tLocation);
+    vsf_tgui_region_t dirty_abs_region = *dirty_region_ptr;
+    vsf_tgui_control_calculate_absolute_location(control_ptr, &dirty_abs_region.tLocation);
 
-    gui->lcd_area.xs = dirty_region.iX;
-    gui->lcd_area.ys = dirty_region.iY;
-    gui->lcd_area.xe = dirty_region.iX + dirty_region.iWidth - 1;
-    gui->lcd_area.ye = dirty_region.iY + dirty_region.iHeight - 1;
+    gui->lcd_area.xs = dirty_abs_region.iX;
+    gui->lcd_area.ys = dirty_abs_region.iY;
+    gui->lcd_area.xe = dirty_abs_region.iX + dirty_abs_region.iWidth - 1;
+    gui->lcd_area.ye = dirty_abs_region.iY + dirty_abs_region.iHeight - 1;
     SC_pfb_RoundFrame(&gui_ptr->cur_tile,
-        draw_region.iX, draw_region.iY,
-        draw_region.iX + control_ptr->iWidth - 1,
-        draw_region.iY + control_ptr->iHeight - 1,
+        draw_abs_region.iX, draw_abs_region.iY,
+        draw_abs_region.iX + control_ptr->iWidth - 1,
+        draw_abs_region.iY + control_ptr->iHeight - 1,
         control_ptr->border_radius - 1, control_ptr->border_radius - control_ptr->border_width - 1,
         border_color, bg_color);
 

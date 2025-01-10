@@ -292,7 +292,7 @@ int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_
             return 0;
         }
     }
-    int xlen=0, xorig = x, xe = x + width - 1;
+    int xlen=0, xorig = x;
     int x_offset = __SC_text_get_x_offset(&txt[i], font, align, width);
     for(;; x+=g.adv_w)
     {
