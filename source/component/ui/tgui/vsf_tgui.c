@@ -543,6 +543,18 @@ static bool __vk_tgui_decide_refresh_region(vsf_pt(__vsf_tgui_evt_shooter_t) *th
     return result;
 }
 
+void __vk_tgui_update_focus(vsf_tgui_t* gui_ptr)
+{
+    //! check new target of activation
+    gui_ptr->consumer.param.node_ptr = (vsf_tgui_control_t *)vsf_msgt_shoot_node(
+                        gui_ptr->consumer.param.msg_tree_ptr,
+                        (const vsf_msgt_node_t*)gui_ptr->consumer.param.root_node_ptr,
+                        (uintptr_t) & (gui_ptr->input.current[0]));
+    __vk_tgui_change_focus_control(gui_ptr,
+                        (const vsf_tgui_control_t *)gui_ptr->consumer.param.node_ptr,
+                        &gui_ptr->consumer.param.pointer_above,
+                        VSF_TGUI_EVT_POINTER_ENTER);
+}
 
 /*! \brief tgui msg queue consumer */
 implement_vsf_pt(__vsf_tgui_evt_shooter_t)

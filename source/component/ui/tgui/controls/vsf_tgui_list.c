@@ -36,10 +36,11 @@
 #include "../vsf_tgui_cfg.h"
 
 #if VSF_USE_TINY_GUI == ENABLED && VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
-declare_class(vsf_tgui_t)
-
 #define __VSF_TGUI_CONTROLS_CONTROL_CLASS_INHERIT
 #define __VSF_TGUI_CONTROLS_LIST_CLASS_IMPLEMENT
+// for slider.tPosition
+#define __VK_TGUI_CONTROLS_SLIDER_CLASS_INHERIT
+declare_class(vsf_tgui_t)
 
 #include "./vsf_tgui_list.h"
 #include "../view/vsf_tgui_v.h"
@@ -227,6 +228,13 @@ static void __vk_tgui_list_update_inner_container_location(vsf_tgui_list_t* ptLi
             ptInnerContainer
                 ->tRegion.tLocation.iX = vk_tgui_slider_on_timer_event_handler(&(ptList->tSlider));
             break;
+    }
+
+    if (ptList->tSlider.tPosition.iTarget == ptList->tSlider.tPosition.iCurrent) {
+        //! check new target of activation
+        const vsf_tgui_root_container_t* ptTopContainer = vk_tgui_control_get_top(&ptList->use_as__vsf_tgui_control_t);
+        extern void __vk_tgui_update_focus(vsf_tgui_t* gui_ptr);
+        __vk_tgui_update_focus(ptTopContainer->gui_ptr);
     }
 }
 #endif
