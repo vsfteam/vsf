@@ -56,13 +56,19 @@ typedef struct
     SC_ARER      lcd_area;
 } SC_GUI;
 
+typedef enum {
+    SC_ALIGN_CENTER         = 0,
+    SC_ALIGN_LEFT           = 1 << 0,
+    SC_ALIGN_RIGHT          = 1 << 1,
+} SC_ALIGN;
+
 extern SC_GUI *gui;
 
 uint16_t alphaBlend( uint16_t fc, uint16_t bc,uint8_t alpha);
 void SC_GUI_Init(uint16_t bkc,uint16_t bc,uint16_t fc);
 void SC_pfb_clip(SC_tile *clip, int xs,int ys,int xe,int ye,uint16_t colour);
 void SC_pfb_RoundFrame(SC_tile *dest,int xs,int ys,int xe,int ye, int r,int ir, uint16_t ac,uint16_t bc);
-int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_t bc, lv_font_t* font, int line_space);
+int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_t bc, lv_font_t* font, int width, int line_space, SC_ALIGN align);
 
 ///-----------------------------------------------------
 #define C_MAROON                       0x8000

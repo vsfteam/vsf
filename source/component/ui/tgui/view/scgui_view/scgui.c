@@ -257,8 +257,27 @@ static bool lv_get_glyph_dsc(lv_font_t *font, lv_font_glyph_dsc_t *glyph, uint32
     }
     return 0;
 }
+
+static int __SC_text_get_x_offset(const char* txt, lv_font_t* font, SC_ALIGN align, int width)
+{
+    if (align & SC_ALIGN_LEFT) {
+        return 0;
+    }
+
+    uint32_t i = 0;
+    int line_width = 0;
+    lv_font_glyph_dsc_t desc;
+    while (lv_get_glyph_dsc(font, &desc, lv_txt_utf8_next(txt,&i), &line_width));
+
+    width -= line_width;
+    if (!(align & SC_ALIGN_RIGHT)) {
+        width >>= 1;
+    }
+    return width;
+}
+
 //长文本显示自动换行，支持\n换行，返回0未结束，返回1结束.
-int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_t bc, lv_font_t* font, int line_space)
+int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_t bc, lv_font_t* font, int width, int line_space, SC_ALIGN align)
 {
     lv_font_glyph_dsc_t g;
     uint32_t i =0;
@@ -273,7 +292,8 @@ int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_
             return 0;
         }
     }
-    int xlen=0;
+    int xlen=0, xorig = x, xe = x + width - 1;
+    int x_offset = __SC_text_get_x_offset(&txt[i], font, align, width);
     for(;; x+=g.adv_w)
     {
         unicode = lv_txt_utf8_next(txt,&i);      //txt转unicode
@@ -285,7 +305,7 @@ int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_
             }
             else if(unicode=='\n'||unicode=='\r')
             {
-                x=box->xe;
+                x=xe;
                 continue;
             }
             else
@@ -294,13 +314,15 @@ int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_
                 lv_get_glyph_dsc(font,&g,unicode,&xlen);
             }
         }
-        if(x+g.adv_w>=box->xe)        //换行
+        if(x+g.adv_w>=xe)        //换行
         {
-            x=box->xs;
+            x_offset = __SC_text_get_x_offset(&txt[i], font, align, width);
+
+            x=xorig;
             y+=font->line_height+line_space;
             if(y>box->ye)  break;
         }
-        SC_pfb_lv_letter(dest,box,x,y,&g,unicode,font,fc,bc);
+        SC_pfb_lv_letter(dest,box,x+x_offset,y,&g,unicode,font,fc,bc);
     }
     return 0;
 }
