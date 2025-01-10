@@ -2,6 +2,18 @@
 
 // sc_lcd.c
 
+/**fun: 快速初始化*/
+static inline void SC_pfb_init(SC_tile *dest,uint32_t colour)
+{
+    int len=dest->w*dest->h;
+    colour=colour<<16|colour;
+    for(int i=0; i<len/2; i++)
+    {
+        ((uint32_t *)dest->buf)[i]=colour;
+    }
+    dest->buf[len-1]=colour;
+}
+
 /**fun: pfb分割*/
 void SC_pfb_clip(SC_tile *clip, int xs,int ys,int xe,int ye,uint16_t colour)
 {
@@ -29,7 +41,7 @@ void SC_pfb_clip(SC_tile *clip, int xs,int ys,int xe,int ye,uint16_t colour)
             clip->h = max_height;
         }
     }
-//    SC_pfb_init(clip,colour);
+    SC_pfb_init(clip,colour);
     // printf("x=%d,y=%d,w=%d,h=%d clip->num=%d clip->stup=%d\r\n",clip->xs,clip->ys,clip->w,clip->h,clip->num,clip->stup);
 }
 
@@ -176,7 +188,7 @@ uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i)
 }
 
 //显示一个lvgl字符
-void SC_pfb_lv_letter(SC_tile *dest,SC_ARER *align,int xs,int ys,lv_font_glyph_dsc_t *dsc,uint32_t unicode, lv_font_t *font,uint16_t fc,uint16_t bc, SC_ARER *dirty_area)
+void SC_pfb_lv_letter(SC_tile *dest,SC_ARER *align,int xs,int ys,lv_font_glyph_dsc_t *dsc,uint32_t unicode, lv_font_t *font,uint16_t fc,uint16_t bc)
 {
     uint16_t w= dsc->adv_w;
     uint16_t h= font->line_height;
@@ -194,16 +206,9 @@ void SC_pfb_lv_letter(SC_tile *dest,SC_ARER *align,int xs,int ys,lv_font_glyph_d
 
     //-----------计算相交-------------------------
     SC_ARER intersection;
-    if (NULL == dirty_area) {
-        if(!SC_pfb_intersection(dest,&intersection,xs,ys,xe,ye))
-        {
-            return;
-        }
-    } else {
-        if(!SC_pfb_intersection(dest,&intersection,dirty_area->xs,dirty_area->ys,dirty_area->xe,dirty_area->ye))
-        {
-            return ;
-        }
+    if(!SC_pfb_intersection(dest,&intersection,xs,ys,xe,ye))
+    {
+        return;
     }
     int x,y,src_x,src_y;
     uint16_t alpha;
@@ -253,7 +258,7 @@ static bool lv_get_glyph_dsc(lv_font_t *font, lv_font_glyph_dsc_t *glyph, uint32
     return 0;
 }
 //长文本显示自动换行，支持\n换行，返回0未结束，返回1结束.
-int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_t bc, lv_font_t* font, int line_space, SC_ARER *dirty_area)
+int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_t bc, lv_font_t* font, int line_space)
 {
     lv_font_glyph_dsc_t g;
     uint32_t i =0;
@@ -295,7 +300,7 @@ int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_
             y+=font->line_height+line_space;
             if(y>box->ye)  break;
         }
-        SC_pfb_lv_letter(dest,box,x,y,&g,unicode,font,fc,bc, dirty_area);
+        SC_pfb_lv_letter(dest,box,x,y,&g,unicode,font,fc,bc);
     }
     return 0;
 }
@@ -378,7 +383,7 @@ uint8_t sc_sqrt(uint32_t num)
 }
 
 /**fun: pfb圆角矩形*/
-void SC_pfb_RoundFrame(SC_tile *dest,int xs,int ys,int xe,int ye, int r,int ir, uint16_t ac,uint16_t bc, SC_ARER *dirty_area)
+void SC_pfb_RoundFrame(SC_tile *dest,int xs,int ys,int xe,int ye, int r,int ir, uint16_t ac,uint16_t bc)
 {
     int r1 =   ir*ir;
     int r2 =   r*r;
@@ -388,22 +393,18 @@ void SC_pfb_RoundFrame(SC_tile *dest,int xs,int ys,int xe,int ye, int r,int ir, 
     int bx=xe-r,by=ye-r;
     int w=bx-ax, h=by-ay;
     SC_ARER intersection;
-    if (NULL == dirty_area) {
-        if(!SC_pfb_intersection(dest,&intersection,xs,ys,xe,ye))
-        {
-            return ;
-        }
-    } else {
-        if(!SC_pfb_intersection(dest,&intersection,dirty_area->xs,dirty_area->ys,dirty_area->xe,dirty_area->ye))
-        {
-            return ;
-        }
+    if(!SC_pfb_intersection(dest,&intersection,xs,ys,xe,ye))
+    {
+        return ;
     }
     int dy2,temp;
     int x,y,cx,cy;
     uint16_t alpha;
     for ( y = intersection.ys,cy=ay; y<=intersection.ye; y++)
     {
+        if(y>gui->lcd_area.ye) {
+            break;
+        }
         int dest_offs=(y-dest->ys) * dest->w-dest->xs;
         if(h>0&&y>ay)
         {
@@ -412,13 +413,16 @@ void SC_pfb_RoundFrame(SC_tile *dest,int xs,int ys,int xe,int ye, int r,int ir, 
             {
                 for ( x = intersection.xs; x <=intersection.xe; x++)
                 {
+                    if(x>gui->lcd_area.xe) {
+                        break;
+                    }
                     if(x<=ax-ir||x>=bx+ir)     //左右垂直线，线宽判断
                     {
                         set_pixel_value(dest,dest_offs+x,gui->alpha,ac);
                     }
                     else
                     {
-                        if(bc!=gui->bkc&&x<=gui->lcd_area.xe&& y>=gui->lcd_area.ys)
+                        if(bc!=gui->bkc)
                         {
                             set_pixel_value(dest,dest_offs+x,gui->alpha,bc);
                         }
@@ -431,6 +435,9 @@ void SC_pfb_RoundFrame(SC_tile *dest,int xs,int ys,int xe,int ye, int r,int ir, 
         dy2 = (y-cy)*(y-cy);
         for ( x = intersection.xs,cx=ax; x <=intersection.xe; x++)
         {
+            if(x>gui->lcd_area.xe) {
+                break;
+            }
             if(w>0&&x>ax)
             {
                 cx=bx;
@@ -442,7 +449,7 @@ void SC_pfb_RoundFrame(SC_tile *dest,int xs,int ys,int xe,int ye, int r,int ir, 
                     }
                     else
                     {
-                        if(bc!=gui->bkc&&x<=gui->lcd_area.xe&& y>=gui->lcd_area.ys)
+                        if(bc!=gui->bkc)
                         {
                             set_pixel_value(dest,dest_offs+x,gui->alpha,bc);
                         }
@@ -459,7 +466,7 @@ void SC_pfb_RoundFrame(SC_tile *dest,int xs,int ys,int xe,int ye, int r,int ir, 
             }
             if (temp<r1)
             {
-                if(bc!=gui->bkc&&x<=gui->lcd_area.xe&& y>=gui->lcd_area.ys)
+                if(bc!=gui->bkc)
                 {
                     set_pixel_value(dest,dest_offs+x,gui->alpha,bc);
                 }

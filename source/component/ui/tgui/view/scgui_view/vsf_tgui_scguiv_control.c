@@ -80,18 +80,16 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
     vsf_tgui_region_t dirty_region = *dirty_region_ptr;
     vsf_tgui_control_calculate_absolute_location(control_ptr, &dirty_region.tLocation);
 
-    SC_ARER dirty_area = {
-        .xs = dirty_region.tLocation.iX,
-        .ys = dirty_region.tLocation.iY,
-        .xe = dirty_region.tLocation.iX + dirty_region.tSize.iWidth - 1,
-        .ye = dirty_region.tLocation.iY + dirty_region.tSize.iHeight - 1,
-    };
+    gui->lcd_area.xs = dirty_region.tLocation.iX;
+    gui->lcd_area.ys = dirty_region.tLocation.iY;
+    gui->lcd_area.xe = dirty_region.tLocation.iX + dirty_region.tSize.iWidth - 1;
+    gui->lcd_area.ye = dirty_region.tLocation.iY + dirty_region.tSize.iHeight - 1;
     SC_pfb_RoundFrame(&gui_ptr->cur_tile,
         draw_region.tLocation.iX, draw_region.tLocation.iY,
         draw_region.tLocation.iX + control_ptr->tRegion.iWidth - 1,
         draw_region.tLocation.iY + control_ptr->tRegion.iHeight - 1,
         control_ptr->border_radius - 1, control_ptr->border_radius - control_ptr->border_width - 1,
-        border_color, bg_color, &dirty_area);
+        border_color, bg_color);
 
     const vsf_tgui_tile_t* ptTile = control_ptr->tBackground.ptTile;
     if (ptTile != NULL) {
