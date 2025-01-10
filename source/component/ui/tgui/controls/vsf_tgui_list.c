@@ -233,8 +233,8 @@ static void __vk_tgui_list_update_inner_container_location(vsf_tgui_list_t* ptLi
     if (ptList->tSlider.tPosition.iTarget == ptList->tSlider.tPosition.iCurrent) {
         //! check new target of activation
         const vsf_tgui_root_container_t* ptTopContainer = vk_tgui_control_get_top(&ptList->use_as__vsf_tgui_control_t);
-        extern void __vk_tgui_update_focus(vsf_tgui_t* gui_ptr);
-        __vk_tgui_update_focus(ptTopContainer->gui_ptr);
+        extern bool __vk_tgui_update_focus(vsf_tgui_t* gui_ptr, bool exit_on_empty);
+        __vk_tgui_update_focus(ptTopContainer->gui_ptr, false);
     }
 }
 #endif

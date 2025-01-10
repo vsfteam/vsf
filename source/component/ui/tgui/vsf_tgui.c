@@ -543,17 +543,24 @@ static bool __vk_tgui_decide_refresh_region(vsf_pt(__vsf_tgui_evt_shooter_t) *th
     return result;
 }
 
-void __vk_tgui_update_focus(vsf_tgui_t* gui_ptr)
+bool __vk_tgui_update_focus(vsf_tgui_t* gui_ptr, bool exit_on_empty)
 {
     //! check new target of activation
-    gui_ptr->consumer.param.node_ptr = (vsf_tgui_control_t *)vsf_msgt_shoot_node(
+    gui_ptr->consumer.param.node_ptr = vsf_msgt_shoot_node(
                         gui_ptr->consumer.param.msg_tree_ptr,
                         (const vsf_msgt_node_t*)gui_ptr->consumer.param.root_node_ptr,
                         (uintptr_t) & (gui_ptr->input.current[0]));
+    if (exit_on_empty && (NULL == gui_ptr->consumer.param.node_ptr)) {
+        return false;
+    }
+
+#if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
     __vk_tgui_change_focus_control(gui_ptr,
                         (const vsf_tgui_control_t *)gui_ptr->consumer.param.node_ptr,
                         &gui_ptr->consumer.param.pointer_above,
                         VSF_TGUI_EVT_POINTER_ENTER);
+#endif
+    return true;
 }
 
 /*! \brief tgui msg queue consumer */
@@ -779,25 +786,9 @@ loop_start:
                 //! pointer up event could only be sent to active node
                 if (VSF_TGUI_EVT_POINTER_DOWN == msg) {
 
-                    //! check new target of activation
-                    vsf_this.node_ptr = vsf_msgt_shoot_node(
-                        vsf_this.msg_tree_ptr,
-                        (const vsf_msgt_node_t*)vsf_this.root_node_ptr,
-                        (uintptr_t) & (vsf_this.event.PointerEvt.use_as__vsf_tgui_location_t));
-
-
-                    if (NULL == vsf_this.node_ptr) {
-                        //! missed all node (control)
+                    if (!__vk_tgui_update_focus(gui_ptr, true)) {
                         goto loop_start;
                     }
-
-
-                #if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
-                    __vk_tgui_change_focus_control( gui_ptr,
-                                    (const vsf_tgui_control_t *)vsf_this.node_ptr,
-                                    &vsf_this.pointer_above,
-                                    VSF_TGUI_EVT_POINTER_ENTER);
-                #endif
 
                     /*! \IMPORTANT only pointer/finger 0 can active controls.
                      *             tGUI is mainly designed to support touch screen
@@ -817,19 +808,10 @@ loop_start:
                 }
             #if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
                 else if (VSF_TGUI_EVT_POINTER_MOVE == msg) {
-                    //! check new target of activation
-                    vsf_this.node_ptr = vsf_msgt_shoot_node(
-                        vsf_this.msg_tree_ptr,
-                        (const vsf_msgt_node_t*)vsf_this.root_node_ptr,
-                        (uintptr_t) & (vsf_this.event.PointerEvt.use_as__vsf_tgui_location_t));
-
-                    __vk_tgui_change_focus_control( gui_ptr,
-                                    (const vsf_tgui_control_t *)vsf_this.node_ptr,
-                                    &vsf_this.pointer_above,
-                                    VSF_TGUI_EVT_POINTER_ENTER);
                     if (vsf_this.event.PointerEvt.idx < dimof(gui_ptr->input.current)) {
                         gui_ptr->input.current[vsf_this.event.PointerEvt.idx] = vsf_this.event.PointerEvt.use_as__vsf_tgui_location_t;
                     }
+                    __vk_tgui_update_focus(gui_ptr, false);
                 #if VSF_TGUI_CFG_SUPPORT_MOUSE_MOVE_HANDLING == ENABLED
                     if (NULL == vsf_this.node_ptr) {
                         //! missed all node (control)
