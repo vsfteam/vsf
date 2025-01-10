@@ -50,10 +50,7 @@
 /*============================ TYPES =========================================*/
 
 def_structure(vsf_tgui_v_control_t)
-#if __IS_COMPILER_IAR__ || (!defined( __STDC_VERSION__ ) || __STDC_VERSION__ < 199901L)
-    //please remove this if your structure is not emplty
-    uint8_t             : 8;
-#endif
+    bool __skip_frame;
 end_def_structure(vsf_tgui_v_control_t)
 
 def_structure(vsf_tgui_v_container_t)
