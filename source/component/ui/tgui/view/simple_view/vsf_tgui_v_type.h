@@ -154,17 +154,17 @@
             __SV_TEXT_COLOR(VSF_TGUI_CFG_V_BUTTON_TEXT_COLOR)
 
 #define VSF_TGUI_V_CONTAINER_STATIC_INIT_DEFAULT                                \
-            __SV_SHOW_CORNER_TILE(false)                                        \
+            __SV_SHOW_CORNER_TILE(true)                                         \
             __SV_TILE_TRANS_RATE(0xFF)                                          \
             __SV_BACKGROUND_COLOR(VSF_TGUI_CFG_V_CONTAINER_BACKGROUND_COLOR)
 
 #define VSF_TGUI_V_TEXT_LIST_STATIC_INIT_DEFAULT                                \
-            __SV_SHOW_CORNER_TILE(false)                                        \
+            __SV_SHOW_CORNER_TILE(true)                                         \
             __SV_TILE_TRANS_RATE(0xFF)                                          \
             __SV_BACKGROUND_COLOR(VSF_TGUI_CFG_V_TEXT_LIST_BACKGROUND_COLOR)
 
 #define VSF_TGUI_V_LIST_STATIC_INIT_DEFAULT                                     \
-            __SV_SHOW_CORNER_TILE(false)                                        \
+            __SV_SHOW_CORNER_TILE(true)                                         \
             __SV_TILE_TRANS_RATE(0xFF)
 
 #define VSF_TGUI_V_PANEL_STATIC_INIT_DEFAULT                                    \
@@ -234,7 +234,8 @@
 
 declare_structure(vsf_tgui_v_control_t)
 def_structure(vsf_tgui_v_control_t)
-    uint8_t font_index : 7;
+    uint8_t font_index : 6;
+    uint8_t __skip_frame : 1;
 #if VSF_TGUI_CFG_V_SUPPORT_CORNER_TILE == ENABLED
     uint8_t show_corner_tile : 1;
 #endif

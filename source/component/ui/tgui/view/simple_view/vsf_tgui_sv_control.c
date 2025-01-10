@@ -125,7 +125,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
     vsf_tgui_v_color_t color = vsf_tgui_sv_get_background_color(control_ptr);
     vsf_tgui_v_color_t bg_color = vsf_tgui_sv_get_parent_background_color(control_ptr);
     uint_fast8_t trans_rate = vsf_tgui_sv_color_get_trans_rate(color);
-    if (trans_rate) {
+    if (trans_rate && !control_ptr->__skip_frame) {
         vsf_tgui_region_t region = {
             .tLocation = {.iX = 0, .iY = 0},
             .tSize = *vsf_tgui_control_get_size(control_ptr),

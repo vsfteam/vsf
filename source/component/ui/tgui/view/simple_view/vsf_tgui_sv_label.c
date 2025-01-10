@@ -98,9 +98,9 @@ vsf_tgui_v_color_t vsf_tgui_sv_get_text_color(vsf_tgui_label_t* label_ptr)
 {
 #if VSF_TGUI_CFG_V_LABLE_SUPPORT_TEXT_COLOR == ENABLED
     if (label_ptr->bIsEnabled) {
-        return label_ptr->font_color;
+        return label_ptr->text_color;
     } else {
-        return vsf_tgui_sv_color_mix(label_ptr->font_color,
+        return vsf_tgui_sv_color_mix(label_ptr->text_color,
             VSF_TGUI_CFG_V_LABEL_DISABLED_TEXT_MIX_COLOR,
             VSF_TGUI_CFG_V_LABEL_DISABLED_TEXT_MIX_VALUE);
     }

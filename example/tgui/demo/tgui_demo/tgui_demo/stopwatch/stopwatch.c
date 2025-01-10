@@ -223,7 +223,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                     tgui_text_list(tNumberList, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA), tNumberList, tVContainer,
                         tgui_size(100, 100),
                         tgui_margin(0, 0, 8, 0),
-#if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABELD
+#if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABLED
                         //tgui_attribute(tSlider, 400),
 #endif
                         tgui_msgmap(

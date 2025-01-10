@@ -123,11 +123,11 @@
                     __VA_ARGS__                                                 \
                     VSF_TGUI_V_LABEL_STATIC_INIT_OVERRIDE                       \
                     VSF_TGUI_V_TEXT_LIST_CONTENT_INIT_OVERRIDE                  \
-                     .id = VSF_TGUI_COMPONENT_ID_LABEL,                         \
+                    .id = VSF_TGUI_COMPONENT_ID_LABEL,                          \
                     .Offset = {                                                 \
                         .next =  sizeof(vsf_tgui_label_t),                      \
                     },                                                          \
-                     __tgui_name_string_tag(tContent, vsf_tgui_label_t)         \
+                    __tgui_name_string_tag(tContent, vsf_tgui_label_t)          \
                     .bIsEnabled = true,                                         \
                     .bIsVisible = true,                                         \
                     .tLabel.bIsAutoSize = true,                                 \
