@@ -42,32 +42,6 @@ extern fsm_rt_t vsf_tgui_control_v_rendering(vsf_tgui_t* gui_ptr,
 extern fsm_rt_t vsf_tgui_control_v_depose(vsf_tgui_t* gui_ptr, vsf_tgui_control_t* control_ptr);
 extern fsm_rt_t vsf_tgui_control_v_update(vsf_tgui_t* gui_ptr, vsf_tgui_control_t* control_ptr);
 
-// draw APIs
-
-extern void vsf_tgui_control_v_draw_rect(vsf_tgui_t* gui_ptr,
-                                         const vsf_tgui_control_t* control_ptr,
-                                         const vsf_tgui_region_t* dirty_region_ptr,
-                                         const vsf_tgui_region_t* ptRectRegion,
-                                         const vsf_tgui_v_color_t color);
-
-extern void vsf_tgui_control_v_draw_text(vsf_tgui_t* gui_ptr,
-                                         const vsf_tgui_control_t* control_ptr,
-                                         const vsf_tgui_region_t* dirty_region_ptr,
-                                         vsf_tgui_text_info_t *ptStringInfo,
-                                         const uint8_t font_index,
-                                         const vsf_tgui_v_color_t color,
-                                         const vsf_tgui_align_mode_t mode);
-
-extern void vsf_tgui_control_v_draw_tile(vsf_tgui_t* gui_ptr,
-                                         const vsf_tgui_control_t* control_ptr,
-                                         const vsf_tgui_region_t* dirty_region_ptr,
-                                         const vsf_tgui_tile_t* tile_ptr,
-                                         const vsf_tgui_align_mode_t mode,
-                                         const uint8_t trans_rate,
-                                         vsf_tgui_region_t* ptPlacedRegion,
-                                         vsf_tgui_v_color_t color,
-                                         vsf_tgui_v_color_t bg_color);
-
 #endif
 #endif
 /* EOF */

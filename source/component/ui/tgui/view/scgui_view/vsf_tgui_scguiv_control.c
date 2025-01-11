@@ -78,12 +78,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
     vsf_tgui_region_t draw_abs_region = { 0 };
     vsf_tgui_control_calculate_absolute_location(control_ptr, &draw_abs_region.tLocation);
 
-    vsf_tgui_region_t dirty_abs_region = *dirty_region_ptr;
-    vsf_tgui_control_calculate_absolute_location(control_ptr, &dirty_abs_region.tLocation);
-    gui->lcd_area.xs = dirty_abs_region.iX;
-    gui->lcd_area.ys = dirty_abs_region.iY;
-    gui->lcd_area.xe = dirty_abs_region.iX + dirty_abs_region.iWidth - 1;
-    gui->lcd_area.ye = dirty_abs_region.iY + dirty_abs_region.iHeight - 1;
+    __vsf_tgui_v_update_dirty_region(gui_ptr, control_ptr, dirty_region_ptr);
 
     SC_pfb_RoundFrame(&gui_ptr->cur_tile,
         draw_abs_region.iX, draw_abs_region.iY,

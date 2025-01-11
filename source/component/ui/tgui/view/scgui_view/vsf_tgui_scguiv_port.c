@@ -240,6 +240,18 @@ void vsf_tgui_v_bind_disp(vsf_tgui_t *gui_ptr, vk_disp_t *disp, void *pfb, size_
 
 // draw
 
+void __vsf_tgui_v_update_dirty_region(  vsf_tgui_t *gui_ptr,
+                                        const vsf_tgui_control_t* control_ptr,
+                                        const vsf_tgui_region_t* dirty_region_ptr)
+{
+    vsf_tgui_region_t dirty_abs_region = *dirty_region_ptr;
+    vsf_tgui_control_calculate_absolute_location(control_ptr, &dirty_abs_region.tLocation);
+    gui->lcd_area.xs = dirty_abs_region.iX;
+    gui->lcd_area.ys = dirty_abs_region.iY;
+    gui->lcd_area.xe = dirty_abs_region.iX + dirty_abs_region.iWidth - 1;
+    gui->lcd_area.ye = dirty_abs_region.iY + dirty_abs_region.iHeight - 1;
+}
+
 void vsf_tgui_control_v_draw_rect(  vsf_tgui_t* gui_ptr,
                                     const vsf_tgui_control_t* control_ptr,
                                     const vsf_tgui_region_t* dirty_region_ptr,
@@ -248,13 +260,9 @@ void vsf_tgui_control_v_draw_rect(  vsf_tgui_t* gui_ptr,
 {
     vsf_tgui_region_t control_abs_region = { 0 };
     vsf_tgui_control_calculate_absolute_location(control_ptr, &control_abs_region.tLocation);
-    vsf_tgui_region_t dirty_abs_region = *dirty_region_ptr;
-    vsf_tgui_control_calculate_absolute_location(control_ptr, &dirty_abs_region.tLocation);
 
-    gui->lcd_area.xs = dirty_abs_region.iX;
-    gui->lcd_area.ys = dirty_abs_region.iY;
-    gui->lcd_area.xe = dirty_abs_region.iX + dirty_abs_region.iWidth - 1;
-    gui->lcd_area.ye = dirty_abs_region.iY + dirty_abs_region.iHeight - 1;
+    __vsf_tgui_v_update_dirty_region(gui_ptr, control_ptr, dirty_region_ptr);
+
     SC_pfb_DrawFill(&gui_ptr->cur_tile,
         control_abs_region.iX + region_ptr->iX, control_abs_region.iY + region_ptr->iY,
         control_abs_region.iX + region_ptr->iX + region_ptr->iWidth - 1,
@@ -285,12 +293,7 @@ void vsf_tgui_control_v_draw_text(  vsf_tgui_t* gui_ptr,
     text_abs_region.iX = 0;
     vsf_tgui_control_calculate_absolute_location(control_ptr, &text_abs_region.tLocation);
 
-    vsf_tgui_region_t dirty_abs_region = *dirty_region_ptr;
-    vsf_tgui_control_calculate_absolute_location(control_ptr, &dirty_abs_region.tLocation);
-    gui->lcd_area.xs = dirty_abs_region.iX;
-    gui->lcd_area.ys = dirty_abs_region.iY;
-    gui->lcd_area.xe = dirty_abs_region.iX + dirty_abs_region.iWidth - 1;
-    gui->lcd_area.ye = dirty_abs_region.iY + dirty_abs_region.iHeight - 1;
+    __vsf_tgui_v_update_dirty_region(gui_ptr, control_ptr, dirty_region_ptr);
 
     uint16_t alpha = gui->alpha;
     gui->alpha = 0;
@@ -326,12 +329,7 @@ void vsf_tgui_control_v_draw_tile(  vsf_tgui_t* gui_ptr,
     vsf_tgui_region_update_with_align(&image_abs_region, &resource_region, mode);
     vsf_tgui_control_calculate_absolute_location(control_ptr, &image_abs_region.tLocation);
 
-    vsf_tgui_region_t dirty_abs_region = *dirty_region_ptr;
-    vsf_tgui_control_calculate_absolute_location(control_ptr, &dirty_abs_region.tLocation);
-    gui->lcd_area.xs = dirty_abs_region.iX;
-    gui->lcd_area.ys = dirty_abs_region.iY;
-    gui->lcd_area.xe = dirty_abs_region.iX + dirty_abs_region.iWidth - 1;
-    gui->lcd_area.ye = dirty_abs_region.iY + dirty_abs_region.iHeight - 1;
+    __vsf_tgui_v_update_dirty_region(gui_ptr, control_ptr, dirty_region_ptr);
 
     uint16_t pixel_size = vsf_tgui_root_tile_get_pixel_bitsize(tile_ptr);
     SC_img_t img = {

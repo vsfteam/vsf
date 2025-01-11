@@ -81,6 +81,34 @@ end_def_structure(vsf_tgui_v_port_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
+extern void __vsf_tgui_v_update_dirty_region(vsf_tgui_t *gui_ptr,
+                                        const vsf_tgui_control_t* control_ptr,
+                                        const vsf_tgui_region_t* dirty_region_ptr);
+
+extern void vsf_tgui_control_v_draw_rect(vsf_tgui_t* gui_ptr,
+                                         const vsf_tgui_control_t* control_ptr,
+                                         const vsf_tgui_region_t* dirty_region_ptr,
+                                         const vsf_tgui_region_t* ptRectRegion,
+                                         const vsf_tgui_v_color_t color);
+
+extern void vsf_tgui_control_v_draw_text(vsf_tgui_t* gui_ptr,
+                                         const vsf_tgui_control_t* control_ptr,
+                                         const vsf_tgui_region_t* dirty_region_ptr,
+                                         vsf_tgui_text_info_t *ptStringInfo,
+                                         const uint8_t font_index,
+                                         const vsf_tgui_v_color_t color,
+                                         const vsf_tgui_align_mode_t mode);
+
+extern void vsf_tgui_control_v_draw_tile(vsf_tgui_t* gui_ptr,
+                                         const vsf_tgui_control_t* control_ptr,
+                                         const vsf_tgui_region_t* dirty_region_ptr,
+                                         const vsf_tgui_tile_t* tile_ptr,
+                                         const vsf_tgui_align_mode_t mode,
+                                         const uint8_t trans_rate,
+                                         vsf_tgui_region_t* ptPlacedRegion,
+                                         vsf_tgui_v_color_t color,
+                                         vsf_tgui_v_color_t bg_color);
+
 #endif
 #endif
 /* EOF */
