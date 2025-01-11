@@ -216,21 +216,18 @@ static void __vsf_tgui_on_disp_inited(vk_disp_t *disp)
 void vsf_tgui_v_bind_disp(vsf_tgui_t *gui_ptr, vk_disp_t *disp, void *pfb, size_t pfb_size)
 {
     VSF_TGUI_ASSERT(disp != NULL);
-    VSF_TGUI_ASSERT(pfb != NULL);
-    VSF_TGUI_ASSERT(pfb_size >= VSF_TGUI_HOR_MAX);
-
-    extern lv_font_t lv_font_14;
-    SC_GUI_Init(0,C_WHITE,C_RED);
-
     if ((pfb != NULL) && (pfb_size > 0)) {
         vsf_trace_warning("pdf not necessary for scgui view" VSF_TRACE_CFG_LINEEND);
     }
+
+    SC_GUI_Init(0,C_WHITE,C_RED);
 
     gui_ptr->disp = disp;
     // refresh_pending_cnt will be decreased once in __vsf_tgui_on_inited
     gui_ptr->refresh_pending_cnt = 1;
     gui_ptr->refresh_pending_notify = false;
     gui_ptr->refresh_pending = false;
+    memset(&gui_ptr->cur_tile, 0, sizeof(gui_ptr->cur_tile));
 
     gui_ptr->is_disp_inited = false;
     disp->ui_data = gui_ptr;
