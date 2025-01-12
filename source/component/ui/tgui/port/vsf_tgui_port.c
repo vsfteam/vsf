@@ -212,8 +212,11 @@ static void __vsf_tgui_on_mouse_evt(vsf_tgui_t *tgui_ptr, vk_mouse_evt_t *mouse_
                     },
                 };
 
-                vsf_tgui_control_set_active(vsf_tgui_pointed_control_get(tgui_ptr));
-                vk_tgui_send_message(tgui_ptr, event);
+                vsf_tgui_control_t *control_ptr = (vsf_tgui_control_t *)vsf_tgui_pointed_control_get(tgui_ptr);
+                if (control_ptr != NULL) {
+                    vsf_tgui_control_set_active(control_ptr);
+                    vk_tgui_send_message(tgui_ptr, event);
+                }
                 break;
             }
 

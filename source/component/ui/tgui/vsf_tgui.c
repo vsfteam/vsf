@@ -763,25 +763,14 @@ loop_start:
                         }
 
         #   if   VSF_TGUI_CFG_SUPPORT_TRANSPARENT_CONTROL == ENABLED
-                        if (NULL != vsf_this.node_ptr->parent_ptr) {
-                            bool bIsRequestRefreshParent = vsf_this.Attribute.is_dirty_region_include_transparent_area;
-
-                            //! if the target control is transparent, refresh its parent
-                            if (!bIsRequestRefreshParent) {
-                                vsf_tgui_control_t * node_ptr = (vsf_tgui_control_t *)vsf_this.node_ptr;
-                                if (node_ptr->Status.Values.bIsTransparent) {
-                                    //! try to fetch its parent
-                                    bIsRequestRefreshParent = true;
-                                }
-                            }
-
-                            if (bIsRequestRefreshParent) {
-                                vsf_this.node_ptr = (const vsf_msgt_node_t*)vsf_this.node_ptr->parent_ptr;
-                                const vsf_tgui_container_t *container_ptr = (const vsf_tgui_container_t *)vsf_this.node_ptr;
-                                if (container_ptr->ContainerAttribute.is_forced_to_refresh_whole_background) {
-                                    if (!__vk_tgui_decide_refresh_region(&vsf_this, (const vsf_tgui_control_t *)container_ptr)) {
-                                        goto loop_start;
-                                    }
+                        if (    (NULL != vsf_this.node_ptr->parent_ptr)
+                            &&  (   vsf_this.Attribute.is_dirty_region_include_transparent_area
+                                ||  (((vsf_tgui_control_t *)vsf_this.node_ptr)->Status.Values.bIsTransparent))) {
+                            vsf_this.node_ptr = (const vsf_msgt_node_t*)vsf_this.node_ptr->parent_ptr;
+                            const vsf_tgui_container_t *container_ptr = (const vsf_tgui_container_t *)vsf_this.node_ptr;
+                            if (container_ptr->ContainerAttribute.is_forced_to_refresh_whole_background) {
+                                if (!__vk_tgui_decide_refresh_region(&vsf_this, (const vsf_tgui_control_t *)container_ptr)) {
+                                    goto loop_start;
                                 }
                             }
                         }
