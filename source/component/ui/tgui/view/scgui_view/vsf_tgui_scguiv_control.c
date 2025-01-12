@@ -40,8 +40,6 @@
 
 fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_control_t* control_ptr)
 {
-    // NOTE: If bIsTransparent is set, parent control will be rendered first
-    control_ptr->bIsTransparent = true;
     return fsm_rt_cpl;
 }
 
@@ -85,12 +83,21 @@ fsm_rt_t vsf_tgui_control_v_render(     vsf_tgui_t* gui_ptr,
 
     __vsf_tgui_v_update_dirty_region(gui_ptr, control_ptr, dirty_region_ptr);
 
-    SC_pfb_RoundFrame(&gui_ptr->cur_tile,
-        draw_abs_region.iX, draw_abs_region.iY,
-        draw_abs_region.iX + control_ptr->iWidth - 1,
-        draw_abs_region.iY + control_ptr->iHeight - 1,
-        control_ptr->border_radius - 1, control_ptr->border_radius - control_ptr->border_width - 1,
-        border_color, bg_color);
+    if (control_ptr->border_radius > 0) {
+        SC_pfb_RoundFrame(&gui_ptr->cur_tile,
+            draw_abs_region.iX, draw_abs_region.iY,
+            draw_abs_region.iX + control_ptr->iWidth - 1,
+            draw_abs_region.iY + control_ptr->iHeight - 1,
+            control_ptr->border_radius - 1, control_ptr->border_radius - control_ptr->border_width - 1,
+            border_color, bg_color);
+    } else {
+        SC_pfb_DrawFill(&gui_ptr->cur_tile,
+            draw_abs_region.iX, draw_abs_region.iY,
+            draw_abs_region.iX + control_ptr->iWidth - 1,
+            draw_abs_region.iY + control_ptr->iHeight - 1,
+            bg_color
+        );
+    }
 
     const vsf_tgui_tile_t* ptTile = control_ptr->tBackground.ptTile;
     if (ptTile != NULL) {
@@ -121,6 +128,16 @@ fsm_rt_t vsf_tgui_control_v_depose(vsf_tgui_t* gui_ptr, vsf_tgui_control_t* cont
 fsm_rt_t vsf_tgui_control_v_update(vsf_tgui_t* gui_ptr, vsf_tgui_control_t* control_ptr)
 {
     return fsm_rt_cpl;
+}
+
+bool __vk_tgui_control_v_is_transparent_in_region(vsf_tgui_control_t *control_ptr, vsf_tgui_region_t* region_ptr)
+{
+    // TODO:
+#if VSF_TGUI_CFG_V_SUPPORT_ROUND_BORDER == ENABLED
+    return control_ptr->border_radius > 0;
+#else
+    return false;
+#endif
 }
 
 #endif

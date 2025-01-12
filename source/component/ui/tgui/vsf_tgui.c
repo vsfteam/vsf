@@ -555,6 +555,7 @@ static bool __vk_tgui_decide_refresh_region(vsf_pt(__vsf_tgui_evt_shooter_t) *th
         return false;
     }
 
+#if VSF_TGUI_CFG_SUPPORT_DIRTY_REGION == ENABLED
     vsf_tgui_region_t tmp_region;
     if (this.event.RefreshEvt.refresh_dirty) {
         this.event.RefreshEvt.refresh_dirty = false;
@@ -562,11 +563,18 @@ static bool __vk_tgui_decide_refresh_region(vsf_pt(__vsf_tgui_evt_shooter_t) *th
         this.event.RefreshEvt.region_ptr = &tmp_region;
         control_ptr->tDirtyRegion.iWidth = 0;
     }
+#endif
     if (NULL != this.event.RefreshEvt.region_ptr) {
         __vk_tgui_calculate_control_location_from_parent(control_ptr, NULL, this.event.RefreshEvt.region_ptr);
         result = vsf_tgui_region_intersect(&this.temp_region, &this.temp_region, this.event.RefreshEvt.region_ptr);
+    } else {
+        this.event.RefreshEvt.region_ptr = &control_ptr->tRegion;
     }
 
+#if VSF_TGUI_CFG_SUPPORT_TRANSPARENT_CONTROL == ENABLED
+    this.Attribute.is_dirty_region_include_transparent_area =
+        __vk_tgui_control_v_is_transparent_in_region(control_ptr, this.event.RefreshEvt.region_ptr);
+#endif
     this.region_ptr = &this.temp_region;
     return result;
 }
@@ -755,27 +763,25 @@ loop_start:
                         }
 
         #   if   VSF_TGUI_CFG_SUPPORT_TRANSPARENT_CONTROL == ENABLED
-                        bool bIsRequestRefreshParent = false;
+                        if (NULL != vsf_this.node_ptr->parent_ptr) {
+                            bool bIsRequestRefreshParent = vsf_this.Attribute.is_dirty_region_include_transparent_area;
 
-                        //! if the target control is transparent, refresh its parent
-                        do {
-                            vsf_tgui_control_t * node_ptr = (vsf_tgui_control_t *)vsf_this.node_ptr;
-                            if (node_ptr->Status.Values.bIsTransparent) {
-                                //! try to fetch its parent
-                                if (NULL != vsf_this.node_ptr->parent_ptr) {
-                                    vsf_this.node_ptr = (const vsf_msgt_node_t*)vsf_this.node_ptr->parent_ptr;
+                            //! if the target control is transparent, refresh its parent
+                            if (!bIsRequestRefreshParent) {
+                                vsf_tgui_control_t * node_ptr = (vsf_tgui_control_t *)vsf_this.node_ptr;
+                                if (node_ptr->Status.Values.bIsTransparent) {
+                                    //! try to fetch its parent
                                     bIsRequestRefreshParent = true;
-                                    continue;
                                 }
                             }
-                            break;
-                        } while (true);
 
-                        if (bIsRequestRefreshParent) {
-                            const vsf_tgui_container_t *container_ptr = (const vsf_tgui_container_t *)vsf_this.node_ptr;
-                            if (container_ptr->ContainerAttribute.is_forced_to_refresh_whole_background) {
-                                if (!__vk_tgui_decide_refresh_region(&vsf_this, (const vsf_tgui_control_t *)container_ptr)) {
-                                    goto loop_start;
+                            if (bIsRequestRefreshParent) {
+                                vsf_this.node_ptr = (const vsf_msgt_node_t*)vsf_this.node_ptr->parent_ptr;
+                                const vsf_tgui_container_t *container_ptr = (const vsf_tgui_container_t *)vsf_this.node_ptr;
+                                if (container_ptr->ContainerAttribute.is_forced_to_refresh_whole_background) {
+                                    if (!__vk_tgui_decide_refresh_region(&vsf_this, (const vsf_tgui_control_t *)container_ptr)) {
+                                        goto loop_start;
+                                    }
                                 }
                             }
                         }

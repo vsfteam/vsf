@@ -60,6 +60,8 @@ extern const vsf_tgui_tile_t* vsf_tgui_control_v_get_corner_tile(vsf_tgui_contro
 extern const char* vsf_tgui_control_get_node_name(vsf_tgui_control_t* control_ptr);
 #endif
 
+extern bool __vk_tgui_control_v_is_transparent_in_region(vsf_tgui_control_t *control_ptr, vsf_tgui_region_t* region_ptr);
+
 #endif
 
 #endif

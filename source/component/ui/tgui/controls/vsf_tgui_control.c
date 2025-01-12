@@ -407,7 +407,7 @@ bool vsf_tgui_control_shoot(    const vsf_tgui_control_t* control_ptr,
  *  Status and Attributes                                                     *
  *----------------------------------------------------------------------------*/
 
- /*! \brief update is_control_transparent bit in control status
+ /*! \brief update bIsTransparent bit in control status
   *! \parame control_ptr target control address
   *! \retval true the original value of is_control_transparent is changed
   *! \retval false the set value is the same as the original value, no change is

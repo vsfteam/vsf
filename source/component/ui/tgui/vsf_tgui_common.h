@@ -556,7 +556,9 @@ typedef struct vsf_tgui_msg_t {
 
 typedef struct vsf_tgui_refresh_evt_t {
     implement(vsf_tgui_msg_t)
+#if VSF_TGUI_CFG_SUPPORT_DIRTY_REGION == ENABLED
     bool refresh_dirty;
+#endif
     vsf_tgui_region_t *region_ptr;
 } vsf_tgui_refresh_evt_t;
 

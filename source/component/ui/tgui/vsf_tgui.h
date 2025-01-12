@@ -105,6 +105,10 @@ def_vsf_pt(__vsf_tgui_evt_shooter_t,
         struct {
             //uint8_t bIsActivatedControlChanged  : 1;
             uint8_t is_queue_drain               : 1;
+#if     VSF_TGUI_CFG_SUPPORT_DIRTY_REGION == ENABLED                            \
+    &&  VSF_TGUI_CFG_SUPPORT_TRANSPARENT_CONTROL == ENABLED
+            uint8_t is_dirty_region_include_transparent_area : 1;
+#endif
         } Attribute;
         
     ))
