@@ -27,20 +27,16 @@
 #include "./vsf_tgui_scguiv_label.h"
 
 /*============================ MACROS ========================================*/
+
+#define vsf_tgui_button_v_init              vsf_tgui_label_v_init
+#define vsf_tgui_button_v_rendering         vsf_tgui_label_v_rendering
+#define vsf_tgui_button_v_depose            vsf_tgui_label_v_depose
+#define vsf_tgui_button_v_update            vsf_tgui_label_v_update
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
-
-extern fsm_rt_t vsf_tgui_button_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_button_t* button_ptr);
-
-extern fsm_rt_t vsf_tgui_button_v_rendering(vsf_tgui_t *gui_ptr,
-                                            vsf_tgui_button_t* button_ptr,
-                                            vsf_tgui_region_t* dirty_region_ptr,
-                                            vsf_tgui_control_refresh_mode_t mode);
-
-extern fsm_rt_t vsf_tgui_button_v_depose(vsf_tgui_t* gui_ptr, vsf_tgui_button_t* button_ptr);
-extern fsm_rt_t vsf_tgui_button_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_button_t* button_ptr);
 
 #endif
 

@@ -73,24 +73,6 @@ fsm_rt_t vsf_tgui_text_list_v_rendering(vsf_tgui_t *gui_ptr,
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_text_list_v_post_rendering(vsf_tgui_t *gui_ptr,
-                                        vsf_tgui_text_list_t* text_list_ptr,
-                                        vsf_tgui_region_t* dirty_region_ptr,
-                                        vsf_tgui_control_refresh_mode_t mode)
-{
-    return vsf_tgui_container_v_post_rendering(gui_ptr, &text_list_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
-}
-
-fsm_rt_t vsf_tgui_text_list_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_text_list_t* text_list_ptr)
-{
-    return fsm_rt_cpl;
-}
-
-fsm_rt_t vsf_tgui_text_list_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_text_list_t* text_list_ptr)
-{
-    return fsm_rt_cpl;
-}
-
 #endif
 
 

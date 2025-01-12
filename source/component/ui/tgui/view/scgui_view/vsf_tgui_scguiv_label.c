@@ -35,12 +35,6 @@ declare_class(vsf_tgui_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-
-fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr)
-{
-    return vsf_tgui_control_v_init(gui_ptr, &label_ptr->use_as__vsf_tgui_control_t);
-}
-
 VSF_CAL_WEAK(vsf_tgui_sv_get_text_color)
 vsf_tgui_v_color_t vsf_tgui_v_get_text_color(vsf_tgui_label_t* label_ptr)
 {
@@ -79,16 +73,6 @@ fsm_rt_t vsf_tgui_label_v_rendering(vsf_tgui_t* gui_ptr,
                                      label_ptr->tLabel.u4Align);
     }
 
-    return fsm_rt_cpl;
-}
-
-fsm_rt_t vsf_tgui_label_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr)
-{
-    return fsm_rt_cpl;
-}
-
-fsm_rt_t vsf_tgui_label_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr)
-{
     return fsm_rt_cpl;
 }
 

@@ -27,24 +27,18 @@
 #include "./vsf_tgui_scguiv_container.h"
 
 /*============================ MACROS ========================================*/
+
+#define vsf_tgui_list_v_rendering           vsf_tgui_container_v_rendering
+#define vsf_tgui_list_v_post_rendering      vsf_tgui_container_v_post_rendering
+#define vsf_tgui_list_v_depose              vsf_tgui_container_v_depose
+#define vsf_tgui_list_v_update              vsf_tgui_container_v_update
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
 extern fsm_rt_t vsf_tgui_list_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_list_t* list_ptr);
-
-extern fsm_rt_t vsf_tgui_list_v_rendering(vsf_tgui_t *gui_ptr,
-                                            vsf_tgui_list_t* list_ptr,
-                                            vsf_tgui_region_t* dirty_region_ptr,
-                                            vsf_tgui_control_refresh_mode_t mode);
-extern fsm_rt_t vsf_tgui_list_v_post_rendering(vsf_tgui_t *gui_ptr,
-                                        vsf_tgui_list_t* list_ptr,
-                                        vsf_tgui_region_t* dirty_region_ptr,
-                                        vsf_tgui_control_refresh_mode_t mode);
-
-extern fsm_rt_t vsf_tgui_list_v_depose(vsf_tgui_t* gui_ptr, vsf_tgui_list_t* list_ptr);
-extern fsm_rt_t vsf_tgui_list_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_list_t* list_ptr);
 
 #endif
 

@@ -28,20 +28,21 @@
 #include "../../utilities/vsf_tgui_text.h"
 
 /*============================ MACROS ========================================*/
+
+#define vsf_tgui_label_v_init                   vsf_tgui_control_v_init
+#define vsf_tgui_label_v_post_rendering         vsf_tgui_control_v_post_rendering
+#define vsf_tgui_label_v_depose                 vsf_tgui_control_v_depose
+#define vsf_tgui_label_v_update                 vsf_tgui_control_v_update
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern fsm_rt_t vsf_tgui_label_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_label_t* ptLabel);
-
 extern fsm_rt_t vsf_tgui_label_v_rendering( vsf_tgui_t *gui_ptr,
                                             vsf_tgui_label_t* label_ptr,
                                             vsf_tgui_region_t* dirty_region_ptr,
                                             vsf_tgui_control_refresh_mode_t mode);
-
-extern fsm_rt_t vsf_tgui_label_v_depose(vsf_tgui_t* gui_ptr, vsf_tgui_label_t* ptLabel);
-extern fsm_rt_t vsf_tgui_label_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_label_t* label_ptr);
 
 extern uint8_t __vk_tgui_label_v_get_font(vsf_tgui_label_t* label_ptr);
 extern vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* label_ptr);
