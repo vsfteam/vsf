@@ -46,15 +46,7 @@ fsm_rt_t vsf_tgui_text_list_v_rendering(vsf_tgui_t *gui_ptr,
                                         vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
                                         vsf_tgui_control_refresh_mode_t mode)
 {
-    return vsf_tgui_container_v_rendering(gui_ptr, &text_list_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
-}
-
-fsm_rt_t vsf_tgui_text_list_v_post_rendering(vsf_tgui_t *gui_ptr,
-                                        vsf_tgui_text_list_t* text_list_ptr,
-                                        vsf_tgui_region_t* dirty_region_ptr,
-                                        vsf_tgui_control_refresh_mode_t mode)
-{
-    vsf_tgui_container_v_post_rendering(gui_ptr, &text_list_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
+    vsf_tgui_container_v_rendering(gui_ptr, &text_list_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
 #if VSF_TGUI_CFG_V_SUPPORT_ROUND_BORDER == ENABLED
     int16_t height = text_list_ptr->iHeight - 2 * text_list_ptr->border_radius;
 #else
@@ -79,6 +71,14 @@ fsm_rt_t vsf_tgui_text_list_v_post_rendering(vsf_tgui_t *gui_ptr,
             dirty_region_ptr, &indicator_region, VSF_TGUI_CFG_V_TEXT_LIST_INDICATOR_COLOR);
     }
     return fsm_rt_cpl;
+}
+
+fsm_rt_t vsf_tgui_text_list_v_post_rendering(vsf_tgui_t *gui_ptr,
+                                        vsf_tgui_text_list_t* text_list_ptr,
+                                        vsf_tgui_region_t* dirty_region_ptr,
+                                        vsf_tgui_control_refresh_mode_t mode)
+{
+    return vsf_tgui_container_v_post_rendering(gui_ptr, &text_list_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
 }
 
 fsm_rt_t vsf_tgui_text_list_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_text_list_t* text_list_ptr)
