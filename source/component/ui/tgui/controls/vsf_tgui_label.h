@@ -161,6 +161,10 @@ fsm_rt_t vk_tgui_label_init(vsf_tgui_label_t* ptLabel);
 extern
 fsm_rt_t vk_tgui_label_update(vsf_tgui_label_t* ptLabel);
 
+extern
+void vsf_tgui_label_set_text(   vsf_tgui_label_t* ptLabel,
+                                VSF_TGUI_CFG_STRING_TYPE *pstrText);
+
 #endif
 /* EOF */
 

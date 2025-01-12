@@ -288,7 +288,6 @@ bool vk_tgui_refresh_ex(vsf_tgui_t* gui_ptr,
                         const vsf_tgui_control_t* target_ptr,
                         const vsf_tgui_region_t* region_ptr)
 {
-
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
     vsf_tgui_evt_t event = { { {VSF_TGUI_EVT_REFRESH} } };
     event.use_as__vsf_tgui_msg_t.target_ptr = (vsf_tgui_control_t*)target_ptr;
@@ -302,6 +301,27 @@ bool vk_tgui_refresh_ex(vsf_tgui_t* gui_ptr,
             .msg = VSF_TGUI_EVT_REFRESH,
             .target_ptr = (vsf_tgui_control_t*)target_ptr,
             .region_ptr = (vsf_tgui_region_t*)region_ptr,
+        },
+    });
+#endif
+}
+
+bool vk_tgui_refresh_dirty(vsf_tgui_t* gui_ptr,
+                            vsf_tgui_control_t* target_ptr)
+{
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+    vsf_tgui_evt_t event = { { {VSF_TGUI_EVT_REFRESH} } };
+    event.use_as__vsf_tgui_msg_t.target_ptr = (vsf_tgui_control_t*)target_ptr;
+    event.RefreshEvt.refresh_dirty = true;
+    return vk_tgui_send_message(gui_ptr, event);
+
+#else
+    return vk_tgui_send_message(gui_ptr,
+        (vsf_tgui_evt_t) {
+        .RefreshEvt = {
+            .msg = VSF_TGUI_EVT_REFRESH,
+            .target_ptr = (vsf_tgui_control_t*)target_ptr,
+            .refresh_dirty = true,
         },
     });
 #endif
@@ -526,7 +546,7 @@ void vsf_tgui_low_level_refresh_ready(vsf_tgui_t *gui_ptr)
 }
 
 static bool __vk_tgui_decide_refresh_region(vsf_pt(__vsf_tgui_evt_shooter_t) *this_ptr,
-                                            const vsf_tgui_control_t *control_ptr)
+                                            vsf_tgui_control_t *control_ptr)
 {
     bool result = true;
     this.region_ptr = NULL;
@@ -535,7 +555,15 @@ static bool __vk_tgui_decide_refresh_region(vsf_pt(__vsf_tgui_evt_shooter_t) *th
         return false;
     }
 
+    vsf_tgui_region_t tmp_region;
+    if (this.event.RefreshEvt.refresh_dirty) {
+        this.event.RefreshEvt.refresh_dirty = false;
+        tmp_region = control_ptr->tDirtyRegion;
+        this.event.RefreshEvt.region_ptr = &tmp_region;
+        control_ptr->tDirtyRegion.iWidth = 0;
+    }
     if (NULL != this.event.RefreshEvt.region_ptr) {
+        __vk_tgui_calculate_control_location_from_parent(control_ptr, NULL, this.event.RefreshEvt.region_ptr);
         result = vsf_tgui_region_intersect(&this.temp_region, &this.temp_region, this.event.RefreshEvt.region_ptr);
     }
 

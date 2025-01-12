@@ -217,7 +217,7 @@ void vsf_tgui_v_bind_disp(vsf_tgui_t *gui_ptr, vk_disp_t *disp, void *pfb, size_
 {
     VSF_TGUI_ASSERT(disp != NULL);
     if ((pfb != NULL) && (pfb_size > 0)) {
-        vsf_trace_warning("pdf not necessary for scgui view" VSF_TRACE_CFG_LINEEND);
+        vsf_trace_warning("pfb not necessary for scgui view" VSF_TRACE_CFG_LINEEND);
     }
 
     SC_GUI_Init(0,C_WHITE,C_RED);

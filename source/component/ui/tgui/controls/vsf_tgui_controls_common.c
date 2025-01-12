@@ -66,6 +66,25 @@ c_tControlInterfaces[__VSF_TGUI_COMPONENT_TYPE_NUM] = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+void vsf_tgui_region_unite(     vsf_tgui_region_t* ptRegionOut,
+                                const vsf_tgui_region_t* ptRegionIn0,
+                                const vsf_tgui_region_t* ptRegionIn1)
+{
+    VSF_TGUI_ASSERT(ptRegionOut != NULL);
+    VSF_TGUI_ASSERT(ptRegionIn0 != NULL);
+    VSF_TGUI_ASSERT(ptRegionIn1 != NULL);
+
+    if (ptRegionIn0->iWidth <= 0 || ptRegionIn0->iHeight <= 0) {
+        *ptRegionOut = *ptRegionIn1;
+    } else if (ptRegionIn1->iWidth <= 0 || ptRegionIn1->iHeight <= 0) {
+        *ptRegionOut = *ptRegionIn0;
+    }
+
+    ptRegionOut->iX = vsf_min(ptRegionIn0->iX, ptRegionIn1->iX);
+    ptRegionOut->iY = vsf_min(ptRegionIn0->iY, ptRegionIn1->iY);
+    ptRegionOut->iWidth = vsf_max(ptRegionIn0->iX + ptRegionIn0->iWidth, ptRegionIn1->iX + ptRegionIn1->iWidth) - ptRegionOut->iX;
+    ptRegionOut->iHeight = vsf_max(ptRegionIn0->iY + ptRegionIn0->iHeight, ptRegionIn1->iY + ptRegionIn1->iHeight) - ptRegionOut->iY;
+}
 
 bool vsf_tgui_region_intersect( vsf_tgui_region_t* ptRegionOut,
                                 const vsf_tgui_region_t* ptRegionIn0,

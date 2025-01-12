@@ -183,37 +183,36 @@ bool vsf_tgui_timer_is_working(vsf_tgui_timer_t *ptTimer)
  *  Region                                                                    *
  *----------------------------------------------------------------------------*/
 
-/*! \brief get the absolute location information base on the location information
- *!        of or derived from target control.
+/*! \brief get the relative location information base on the location information
+ *!        of or derived from target control till parent control.
  *! \param control_ptr    the Target Control Address
+ *! \param parent_ptr     the Parent Control Address, absolute location will be return if NULL
  *! \param ptLocation   the Location buffer which has already stored the location
  *!                     information of or derived from the target control
  *! \return the location buffer address passed with ptLocation
  */
-vsf_tgui_location_t* __vk_tgui_calculate_absolute_location_from_control_location(
+vsf_tgui_location_t* __vk_tgui_calculate_control_location_from_parent(
                                                 const vsf_tgui_control_t *control_ptr,
+                                                const vsf_tgui_control_t *parent_ptr,
                                                 vsf_tgui_location_t *ptLocation)
 {
-    const vsf_msgt_node_t *node_ptr = &control_ptr->use_as__vsf_msgt_node_t;
-    const vsf_msgt_container_t* parent_ptr = NULL;
     VSF_TGUI_ASSERT(NULL != control_ptr && NULL != ptLocation);
 
     do {
-        parent_ptr = (const vsf_msgt_container_t *)node_ptr->parent_ptr;
-        if (NULL == parent_ptr) {
+        control_ptr = (const vsf_tgui_control_t *)control_ptr->parent_ptr;
+        if (control_ptr == NULL) {
             break;
         }
-        node_ptr = (const vsf_msgt_node_t*)parent_ptr;
-        if (node_ptr->Attribute._.is_container) {
-            vsf_tgui_container_t *container_ptr = (vsf_tgui_container_t*)node_ptr;
-            ptLocation->iX += container_ptr->tRegion.tLocation.iX;
-            ptLocation->iY += container_ptr->tRegion.tLocation.iY;
-        #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
-            ptLocation->iX += container_ptr->tContainerPadding.chLeft;
-            ptLocation->iY += container_ptr->tContainerPadding.chTop;
-        #endif
-        }
-    } while(1);
+        VSF_TGUI_ASSERT(control_ptr->Attribute._.is_container);
+
+        vsf_tgui_container_t *container_ptr = (vsf_tgui_container_t*)control_ptr;
+        ptLocation->iX += container_ptr->tRegion.tLocation.iX;
+        ptLocation->iY += container_ptr->tRegion.tLocation.iY;
+#if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
+        ptLocation->iX += container_ptr->tContainerPadding.chLeft;
+        ptLocation->iY += container_ptr->tContainerPadding.chTop;
+#endif
+    } while (control_ptr != parent_ptr);
 
     return ptLocation;
 }
@@ -239,7 +238,7 @@ vsf_tgui_location_t * vsf_tgui_control_calculate_absolute_location(
     ptOffset->iX += control_ptr->tRegion.tLocation.iX;
     ptOffset->iY += control_ptr->tRegion.tLocation.iY;
 
-    return __vk_tgui_calculate_absolute_location_from_control_location(control_ptr, ptOffset);
+    return __vk_tgui_calculate_control_location_from_parent(control_ptr, NULL, ptOffset);
 }
 
 
@@ -275,7 +274,7 @@ vsf_tgui_region_t * vsf_tgui_get_absolute_control_region(
 
     *ptRegionBuffer = control_ptr->tRegion;
 
-    __vk_tgui_calculate_absolute_location_from_control_location(control_ptr, &(ptRegionBuffer->tLocation));
+    __vk_tgui_calculate_control_location_from_parent(control_ptr, NULL, &(ptRegionBuffer->tLocation));
     return ptRegionBuffer;
 }
 
@@ -318,22 +317,22 @@ bool vsf_tgui_control_get_visible_region(   const vsf_tgui_control_t* control_pt
 {
     bool bHasIntersect = true;
 
-    vsf_tgui_get_absolute_control_region(control_ptr, ptRegionBuffer);
+    *ptRegionBuffer = control_ptr->tRegion;
 
 #if VSF_TGUI_CFG_SUPPORT_DIRTY_REGION == ENABLED
     do {
         const vsf_tgui_container_t* parent_ptr =
             (const vsf_tgui_container_t*)control_ptr->use_as__vsf_msgt_node_t.parent_ptr;
-        vsf_tgui_region_t tParentRegion;
 
         while (NULL != parent_ptr) {
-            tParentRegion = parent_ptr->tRegion;
-            __vk_tgui_calculate_absolute_location_from_control_location((vsf_tgui_control_t*)parent_ptr, &(tParentRegion.tLocation));
-            bHasIntersect = vsf_tgui_region_intersect(ptRegionBuffer, ptRegionBuffer, &tParentRegion);
+            __vk_tgui_calculate_control_location_from_parent(control_ptr,
+                    (vsf_tgui_control_t *)parent_ptr, &ptRegionBuffer->tLocation);
+            bHasIntersect = vsf_tgui_region_intersect(ptRegionBuffer, ptRegionBuffer, &parent_ptr->tRegion);
             if (!bHasIntersect) {
                 break;
             }
-            parent_ptr = (const vsf_tgui_container_t *)parent_ptr->use_as__vsf_msgt_container_t.use_as__vsf_msgt_node_t.parent_ptr;
+            control_ptr = &parent_ptr->use_as__vsf_tgui_control_t;
+            parent_ptr = (const vsf_tgui_container_t *)control_ptr->use_as__vsf_msgt_node_t.parent_ptr;
         }
     } while (0);
 #endif
@@ -349,7 +348,7 @@ vsf_tgui_region_t* vsf_tgui_control_get_relative_region(
 
     VSF_TGUI_ASSERT(NULL != control_ptr && NULL != ptAbsoluteRegion);
 
-    __vk_tgui_calculate_absolute_location_from_control_location(control_ptr, &(tRegion.tLocation));
+    __vk_tgui_calculate_control_location_from_parent(control_ptr, NULL, &(tRegion.tLocation));
 
     vsf_tgui_region_get_relative_region(ptAbsoluteRegion, &tRegion, ptAbsoluteRegion);
 

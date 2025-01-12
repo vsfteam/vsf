@@ -58,6 +58,10 @@
 extern bool vsf_tgui_region_intersect(  vsf_tgui_region_t* ptRegionOut,
                                         const vsf_tgui_region_t* ptRegionIn0,
                                         const vsf_tgui_region_t* ptRegionIn1);
+extern void vsf_tgui_region_unite(      vsf_tgui_region_t* ptRegionOut,
+                                        const vsf_tgui_region_t* ptRegionIn0,
+                                        const vsf_tgui_region_t* ptRegionIn1);
+
 extern
 vsf_tgui_region_t * vsf_tgui_region_get_relative_region(
                                         vsf_tgui_region_t *ptOutRegion,

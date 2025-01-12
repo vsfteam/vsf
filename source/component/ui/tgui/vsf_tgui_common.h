@@ -556,6 +556,7 @@ typedef struct vsf_tgui_msg_t {
 
 typedef struct vsf_tgui_refresh_evt_t {
     implement(vsf_tgui_msg_t)
+    bool refresh_dirty;
     vsf_tgui_region_t *region_ptr;
 } vsf_tgui_refresh_evt_t;
 
@@ -605,7 +606,7 @@ bool vsf_tgui_tile_is_root(const vsf_tgui_tile_t* ptTile);
 
 extern
 void vsf_tgui_text_set( vsf_tgui_text_info_t *ptTextInfo,
-                        const vsf_tgui_string_t *pstrNew);
+                        VSF_TGUI_CFG_STRING_TYPE *pstrNew);
 
 #endif
 

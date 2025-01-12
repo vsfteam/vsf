@@ -455,10 +455,15 @@ static fsm_rt_t __on_top_panel_time(vsf_tgui_control_t* node_ptr,
     sprintf(ptPanel->chTimeBuffer, "%02d:%02d:%02d",  chMinute, chSecond, ch10Ms);
 
     //! update existing text content
-    vsf_tgui_text_set(&(ptPanel->tLeftContainer.tTime.tLabel), &(ptPanel->tLeftContainer.tTime.tLabel.tString));
+    vsf_tgui_label_set_text(&(ptPanel->tLeftContainer.tTime), ptPanel->chTimeBuffer);
 
+#if VSF_TGUI_CFG_SUPPORT_DIRTY_REGION == ENABLED
+    vk_tgui_refresh_dirty(ptPanel->use_as__vsf_tgui_panel_t.gui_ptr,
+                        (vsf_tgui_control_t *)&(ptPanel->tLeftContainer.tTime));
+#else
     vk_tgui_refresh_ex(ptPanel->use_as__vsf_tgui_panel_t.gui_ptr,
                         (vsf_tgui_control_t *)&(ptPanel->tLeftContainer.tTime), NULL);
+#endif
 
     vsf_tgui_timer_enable(&ptPanel->tTimer);
 

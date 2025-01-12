@@ -38,6 +38,8 @@
 #if VSF_USE_TINY_GUI == ENABLED
 
 #define __VSF_TGUI_CONTROLS_LABEL_CLASS_IMPLEMENT
+// for tDirtyRegion is enabled
+#define __VSF_TGUI_CONTROLS_CONTROL_CLASS_INHERIT
 declare_class(vsf_tgui_t)
 #include "./vsf_tgui_label.h"
 #include "../view/vsf_tgui_v.h"
@@ -133,6 +135,33 @@ fsm_rt_t vk_tgui_label_init(vsf_tgui_label_t* ptLabel)
     return vk_tgui_control_init((vsf_tgui_control_t*)ptLabel);
 }
 
+void vsf_tgui_label_set_text(   vsf_tgui_label_t* ptLabel,
+                                VSF_TGUI_CFG_STRING_TYPE *pstrText)
+{
+#if VSF_TGUI_CFG_SUPPORT_DIRTY_REGION == ENABLED
+    vsf_tgui_region_t temp_region = {
+        .tSize      = vsf_tgui_label_text_get_size(ptLabel, NULL, NULL),
+    };
+    vsf_tgui_region_t text_dirty_region = {
+        .tSize      = ptLabel->tSize,
+    };
+    vsf_tgui_region_update_with_align(&text_dirty_region, &temp_region, ptLabel->tLabel.u4Align);
+    vsf_tgui_region_unite(&ptLabel->tDirtyRegion, &ptLabel->tDirtyRegion, &text_dirty_region);
+#endif
+
+    vsf_tgui_text_set(&ptLabel->tLabel, pstrText);
+
+#if VSF_TGUI_CFG_SUPPORT_DIRTY_REGION == ENABLED
+    temp_region = (vsf_tgui_region_t) {
+        .tSize      = vsf_tgui_label_text_get_size(ptLabel, NULL, NULL),
+    };
+    text_dirty_region = (vsf_tgui_region_t) {
+        .tSize      = ptLabel->tSize,
+    };
+    vsf_tgui_region_update_with_align(&text_dirty_region, &temp_region, ptLabel->tLabel.u4Align);
+    vsf_tgui_region_unite(&ptLabel->tDirtyRegion, &ptLabel->tDirtyRegion, &text_dirty_region);
+#endif
+}
 
 #endif
 

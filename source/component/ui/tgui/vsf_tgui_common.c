@@ -114,12 +114,15 @@ bool vsf_tgui_tile_is_root(const vsf_tgui_tile_t* ptTile)
 
 
 void vsf_tgui_text_set( vsf_tgui_text_info_t *ptTextInfo,
-                        const vsf_tgui_string_t *pstrNew)
+                        VSF_TGUI_CFG_STRING_TYPE *pstrNew)
 {
     VSF_TGUI_ASSERT(NULL != ptTextInfo);
     VSF_TGUI_ASSERT(NULL != pstrNew);
 
-    ptTextInfo->tString = (*pstrNew);
+    ptTextInfo->tString.pstrText = pstrNew;
+#if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
+    ptTextInfo->tString.s16_size = strlen(pstrNew);
+#endif
 #if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING
     ptTextInfo->bIsChanged = true;
 #endif

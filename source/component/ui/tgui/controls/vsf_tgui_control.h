@@ -546,6 +546,11 @@ def_class(vsf_tgui_control_t,
         };
     };
 
+#if VSF_TGUI_CFG_SUPPORT_DIRTY_REGION == ENABLED
+    protected_member(
+        vsf_tgui_region_t tDirtyRegion;
+    )
+#endif
     implement(vsf_tgui_v_control_t)
 )
 end_def_class(vsf_tgui_control_t)
@@ -685,9 +690,10 @@ extern
 bool vsf_tgui_control_is_in_range(  const vsf_tgui_region_t *region_ptr,
                                     const vsf_tgui_location_t *ptLocation);
 
-/*! \brief get the absolute location information base on the location information
- *!        of or derived from target control.
+/*! \brief get the relative location information base on the location information
+ *!        of or derived from target control till parent control.
  *! \param control_ptr    the Target Control Address
+ *! \param parent_ptr     the Parent Control Address, absolute location will be return if NULL
  *! \param ptLocation   the Location buffer which has already stored the location
  *!                     information of or derived from the target control
  *! \return the location buffer address passed with ptLocation
@@ -695,8 +701,9 @@ bool vsf_tgui_control_is_in_range(  const vsf_tgui_region_t *region_ptr,
  *! \note DO NOT USE THIS FUNCTION UNLESS YOU KNOW WHAT YOU ARE DOING!!!
  */
 extern
-vsf_tgui_location_t* __vk_tgui_calculate_absolute_location_from_control_location(
+vsf_tgui_location_t* __vk_tgui_calculate_control_location_from_parent(
                                                 const vsf_tgui_control_t *control_ptr,
+                                                const vsf_tgui_control_t *parent_ptr,
                                                 vsf_tgui_location_t *ptLocation);
 
 extern
