@@ -53,12 +53,12 @@ vsf_tgui_v_color_t vsf_tgui_v_get_text_color(vsf_tgui_label_t* label_ptr)
 #endif
 }
 
-fsm_rt_t vsf_tgui_label_v_rendering(vsf_tgui_t* gui_ptr,
+fsm_rt_t vsf_tgui_label_v_render(   vsf_tgui_t* gui_ptr,
                                     vsf_tgui_label_t* label_ptr,
                                     vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
                                     vsf_tgui_control_refresh_mode_t mode)
 {
-    vsf_tgui_control_v_rendering(gui_ptr, (vsf_tgui_control_t *)label_ptr, dirty_region_ptr, mode);
+    vsf_tgui_control_v_render(gui_ptr, (vsf_tgui_control_t *)label_ptr, dirty_region_ptr, mode);
     if (    (label_ptr->tLabel.tString.pstrText != NULL)
 #if VSF_TGUI_CFG_SAFE_STRING_MODE == ENABLED
         &&  (label_ptr->tLabel.tString.s16_size > 0)

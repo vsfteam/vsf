@@ -43,10 +43,10 @@ fsm_rt_t vsf_tgui_button_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_button_t* button_p
     return vsf_tgui_label_v_init(gui_ptr, &(button_ptr->use_as__vsf_tgui_label_t));
 }
 
-fsm_rt_t vsf_tgui_button_v_rendering(   vsf_tgui_t *gui_ptr,
-                                        vsf_tgui_button_t* button_ptr,
-                                        vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
-                                        vsf_tgui_control_refresh_mode_t mode)
+fsm_rt_t vsf_tgui_button_v_render(  vsf_tgui_t *gui_ptr,
+                                    vsf_tgui_button_t* button_ptr,
+                                    vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
+                                    vsf_tgui_control_refresh_mode_t mode)
 {
 
     VSF_TGUI_ASSERT(button_ptr != NULL);
@@ -54,7 +54,7 @@ fsm_rt_t vsf_tgui_button_v_rendering(   vsf_tgui_t *gui_ptr,
     VSF_TGUI_ASSERT(dirty_region_ptr != NULL);
 
 
-    vsf_tgui_label_v_rendering(gui_ptr, (vsf_tgui_label_t *)button_ptr, dirty_region_ptr, mode);
+    vsf_tgui_label_v_render(gui_ptr, (vsf_tgui_label_t *)button_ptr, dirty_region_ptr, mode);
 
     return fsm_rt_cpl;
 }

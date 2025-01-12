@@ -58,8 +58,8 @@ static const i_tgui_control_methods_t c_tVList = {
     .tView = {
         .Init = (vsf_tgui_v_method_t *)&vsf_tgui_list_v_init,
         .Depose = (vsf_tgui_v_method_t *)&vsf_tgui_list_v_depose,
-        .Render = (vsf_tgui_v_method_render_t *)&vsf_tgui_list_v_rendering,
-        .ContainerPostRender = (vsf_tgui_v_method_render_t *)&vsf_tgui_list_v_post_rendering,
+        .Render = (vsf_tgui_v_method_render_t *)&vsf_tgui_list_v_render,
+        .ContainerPostRender = (vsf_tgui_v_method_render_t *)&vsf_tgui_list_v_post_render,
         .Update = (vsf_tgui_v_method_t *)&vsf_tgui_list_v_update,
     },
     .Init =     (vsf_tgui_control_method_t *)&vk_tgui_list_init,

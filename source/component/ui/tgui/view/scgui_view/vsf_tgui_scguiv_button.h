@@ -29,7 +29,7 @@
 /*============================ MACROS ========================================*/
 
 #define vsf_tgui_button_v_init              vsf_tgui_label_v_init
-#define vsf_tgui_button_v_rendering         vsf_tgui_label_v_rendering
+#define vsf_tgui_button_v_render            vsf_tgui_label_v_render
 #define vsf_tgui_button_v_depose            vsf_tgui_label_v_depose
 #define vsf_tgui_button_v_update            vsf_tgui_label_v_update
 

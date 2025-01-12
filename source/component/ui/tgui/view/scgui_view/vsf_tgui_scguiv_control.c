@@ -64,7 +64,7 @@ vsf_tgui_v_color_t vsf_tgui_v_get_background_color(vsf_tgui_control_t* control_p
 #endif
 }
 
-fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
+fsm_rt_t vsf_tgui_control_v_render(     vsf_tgui_t* gui_ptr,
                                         vsf_tgui_control_t* control_ptr,
                                         vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
                                         vsf_tgui_control_refresh_mode_t mode)
@@ -104,7 +104,7 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_control_v_post_rendering(vsf_tgui_t *gui_ptr,
+fsm_rt_t vsf_tgui_control_v_post_render(vsf_tgui_t *gui_ptr,
                                         vsf_tgui_control_t* control_ptr,
                                         vsf_tgui_region_t* dirty_region_ptr,
                                         vsf_tgui_control_refresh_mode_t mode)

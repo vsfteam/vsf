@@ -41,12 +41,12 @@ fsm_rt_t vsf_tgui_text_list_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_text_list_t* te
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_text_list_v_rendering(vsf_tgui_t *gui_ptr,
+fsm_rt_t vsf_tgui_text_list_v_render(   vsf_tgui_t *gui_ptr,
                                         vsf_tgui_text_list_t* text_list_ptr,
                                         vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
                                         vsf_tgui_control_refresh_mode_t mode)
 {
-    vsf_tgui_container_v_rendering(gui_ptr, &text_list_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
+    vsf_tgui_container_v_render(gui_ptr, &text_list_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
 #if VSF_TGUI_CFG_V_SUPPORT_ROUND_BORDER == ENABLED
     int16_t height = text_list_ptr->iHeight - 2 * text_list_ptr->border_radius;
 #else

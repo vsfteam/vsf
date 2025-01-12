@@ -39,15 +39,15 @@ fsm_rt_t vsf_tgui_container_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_container_t* co
     return vsf_tgui_control_v_init(gui_ptr, &container_ptr->use_as__vsf_tgui_control_t);
 }
 
-fsm_rt_t vsf_tgui_container_v_rendering(vsf_tgui_t* gui_ptr,
+fsm_rt_t vsf_tgui_container_v_render(   vsf_tgui_t* gui_ptr,
                                         vsf_tgui_container_t* container_ptr,
                                         vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
                                         vsf_tgui_control_refresh_mode_t mode)
 {
-    return vsf_tgui_control_v_rendering(gui_ptr, (vsf_tgui_control_t *)container_ptr, dirty_region_ptr, mode);
+    return vsf_tgui_control_v_render(gui_ptr, (vsf_tgui_control_t *)container_ptr, dirty_region_ptr, mode);
 }
 
-fsm_rt_t vsf_tgui_container_v_post_rendering(vsf_tgui_t* gui_ptr,
+fsm_rt_t vsf_tgui_container_v_post_render(  vsf_tgui_t* gui_ptr,
                                             vsf_tgui_container_t* container_ptr,
                                             vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
                                             vsf_tgui_control_refresh_mode_t mode)

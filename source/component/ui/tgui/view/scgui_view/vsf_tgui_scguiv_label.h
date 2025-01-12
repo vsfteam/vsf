@@ -30,7 +30,7 @@
 /*============================ MACROS ========================================*/
 
 #define vsf_tgui_label_v_init                   vsf_tgui_control_v_init
-#define vsf_tgui_label_v_post_rendering         vsf_tgui_control_v_post_rendering
+#define vsf_tgui_label_v_post_render            vsf_tgui_control_v_post_render
 #define vsf_tgui_label_v_depose                 vsf_tgui_control_v_depose
 #define vsf_tgui_label_v_update                 vsf_tgui_control_v_update
 
@@ -39,7 +39,7 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern fsm_rt_t vsf_tgui_label_v_rendering( vsf_tgui_t *gui_ptr,
+extern fsm_rt_t vsf_tgui_label_v_render( vsf_tgui_t *gui_ptr,
                                             vsf_tgui_label_t* label_ptr,
                                             vsf_tgui_region_t* dirty_region_ptr,
                                             vsf_tgui_control_refresh_mode_t mode);

@@ -61,7 +61,7 @@ static const i_tgui_control_methods_t c_tVControl= {
     .tView = {
         .Init =     &vsf_tgui_control_v_init,
         .Depose =   &vsf_tgui_control_v_depose,
-        .Render =   &vsf_tgui_control_v_rendering,
+        .Render =   &vsf_tgui_control_v_render,
         .Update =   &vsf_tgui_control_v_update,
     },
     .Update =   &vk_tgui_control_update,
@@ -74,8 +74,8 @@ static const i_tgui_control_methods_t c_tVContainer= {
     .tView = {
         .Init =     (vsf_tgui_v_method_t *)&vsf_tgui_container_v_init,
         .Depose =   (vsf_tgui_v_method_t *)&vsf_tgui_container_v_depose,
-        .Render =   (vsf_tgui_v_method_render_t *)&vsf_tgui_container_v_rendering,
-        .ContainerPostRender = (vsf_tgui_v_method_render_t *)&vsf_tgui_container_v_post_rendering,
+        .Render =   (vsf_tgui_v_method_render_t *)&vsf_tgui_container_v_render,
+        .ContainerPostRender = (vsf_tgui_v_method_render_t *)&vsf_tgui_container_v_post_render,
         .Update =   (vsf_tgui_v_method_t *)&vsf_tgui_container_v_update,
     },
     .Update =   (vsf_tgui_control_method_t *)&vk_tgui_container_update,

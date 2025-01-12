@@ -41,20 +41,20 @@ fsm_rt_t vsf_tgui_list_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_list_t* list_ptr)
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_tgui_list_v_rendering(     vsf_tgui_t *gui_ptr,
-                                        vsf_tgui_list_t* list_ptr,
-                                        vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
-                                        vsf_tgui_control_refresh_mode_t mode)
+fsm_rt_t vsf_tgui_list_v_render(    vsf_tgui_t *gui_ptr,
+                                    vsf_tgui_list_t* list_ptr,
+                                    vsf_tgui_region_t* dirty_region_ptr,       //!< you can ignore the tDirtyRegion for simplicity
+                                    vsf_tgui_control_refresh_mode_t mode)
 {
-    return vsf_tgui_container_v_rendering(gui_ptr, &list_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
+    return vsf_tgui_container_v_render(gui_ptr, &list_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
 }
 
-fsm_rt_t vsf_tgui_list_v_post_rendering(vsf_tgui_t *gui_ptr,
+fsm_rt_t vsf_tgui_list_v_post_render(   vsf_tgui_t *gui_ptr,
                                         vsf_tgui_list_t* list_ptr,
                                         vsf_tgui_region_t* dirty_region_ptr,
                                         vsf_tgui_control_refresh_mode_t mode)
 {
-    return vsf_tgui_container_v_post_rendering(gui_ptr, &list_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
+    return vsf_tgui_container_v_post_render(gui_ptr, &list_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
 }
 
 fsm_rt_t vsf_tgui_list_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_list_t* list_ptr)

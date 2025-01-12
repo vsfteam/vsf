@@ -28,11 +28,11 @@
 
 /*============================ MACROS ========================================*/
 
-#define vsf_tgui_container_v_init               vsf_tgui_control_v_init
-#define vsf_tgui_container_v_rendering          vsf_tgui_control_v_rendering
-#define vsf_tgui_container_v_post_rendering     vsf_tgui_control_v_post_rendering
-#define vsf_tgui_container_v_depose             vsf_tgui_control_v_depose
-#define vsf_tgui_container_v_update             vsf_tgui_control_v_update
+#define vsf_tgui_container_v_init           vsf_tgui_control_v_init
+#define vsf_tgui_container_v_render         vsf_tgui_control_v_render
+#define vsf_tgui_container_v_post_render    vsf_tgui_control_v_post_render
+#define vsf_tgui_container_v_depose         vsf_tgui_control_v_depose
+#define vsf_tgui_container_v_update         vsf_tgui_control_v_update
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
