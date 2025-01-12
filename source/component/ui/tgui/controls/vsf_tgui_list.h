@@ -97,7 +97,7 @@
                             .list.id = VSF_TGUI_COMPONENT_ID_CONTAINER,         \
                             .list.Offset = {0},                                 \
                             .list.is_container = true,                          \
-                            .list.is_control_transparent = true,                \
+                            .list.bIsTransparent = true,                        \
                             .list.ContainerAttribute                            \
                                 .bIsAutoSize = true,                            \
                             .list.bIsEnabled = true,                            \
@@ -126,8 +126,8 @@
 #   define tgui_list_items(...)                                                 \
                     .list = {                                                   \
                         VSF_TGUI_V_CONTAINER_STATIC_INIT_DEFAULT                \
-                        .is_container = 0,                                      \
-                        .is_control_transparent = 0,                            \
+                        .is_container = false,                                  \
+                        .bIsTransparent = false,                                \
                         __VA_ARGS__                                             \
                         VSF_TGUI_V_CONTAINER_STATIC_INIT_OVERRIDE               \
                     },

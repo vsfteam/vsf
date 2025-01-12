@@ -67,6 +67,7 @@
 #include "utilities/ooc_class.h"
 
 /*============================ MACROS ========================================*/
+
 #define __VSF_TGUI_INTERFACE_CONTROLS_CONTROL         {                         \
             .msg_handler = {                                                    \
                 VSF_MSGT_NODE_HANDLER_TYPE_FSM,                                 \
@@ -414,7 +415,7 @@ typedef union vsf_tgui_status_t {
         uint8_t bIsVisible                      : 1;
         uint8_t bIsActive                       : 1;
         uint8_t bIsHideContentInsideContainer   : 1;
-        uint8_t is_control_transparent          : 1;
+        uint8_t bIsTransparent                  : 1;
         uint8_t                                 : 2;
         //! @}
 
@@ -538,7 +539,8 @@ def_class(vsf_tgui_control_t,
             uint8_t bIsVisible                      : 1;
             uint8_t                                 : 1;
             uint8_t bIsHideContentInsideContainer   : 1;
-            uint8_t is_control_transparent          : 1;
+            // NOTE: If bIsTransparent is set, parent control will be rendered first
+            uint8_t bIsTransparent                  : 1;
             uint8_t dummy_bits                      : 2;
             //! @}
         };

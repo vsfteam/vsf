@@ -92,7 +92,7 @@
                 .tList.id = (VSF_TGUI_COMPONENT_ID_CONTAINER),                  \
                 .tList                                                          \
                     __tgui_name_string_tag(__NAME.tList, vsf_tgui_text_list_t)  \
-                .tList.is_control_transparent = true,                           \
+                .tList.bIsTransparent = true,                                   \
                 .tList.bIsEnabled = true,                                       \
                 .tList.bIsVisible = true,                                       \
                 .tList.ContainerAttribute                                       \

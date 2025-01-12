@@ -421,10 +421,10 @@ bool vsf_tgui_control_set_is_transparent_bit(vsf_tgui_control_t* control_ptr,
     VSF_TGUI_ASSERT(NULL != control_ptr);
 
     result =       is_control_transparent
-                !=  (control_ptr->Status.Values.is_control_transparent);
+                !=  (control_ptr->Status.Values.bIsTransparent);
 
     if (result) {
-        control_ptr->Status.Values.is_control_transparent = is_control_transparent;
+        control_ptr->Status.Values.bIsTransparent = is_control_transparent;
     }
 
     return result;

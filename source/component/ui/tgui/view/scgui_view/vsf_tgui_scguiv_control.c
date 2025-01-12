@@ -40,7 +40,8 @@
 
 fsm_rt_t vsf_tgui_control_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_control_t* control_ptr)
 {
-    control_ptr->is_control_transparent = true;
+    // NOTE: If bIsTransparent is set, parent control will be rendered first
+    control_ptr->bIsTransparent = true;
     return fsm_rt_cpl;
 }
 

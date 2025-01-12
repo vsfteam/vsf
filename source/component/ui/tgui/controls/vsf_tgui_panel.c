@@ -39,6 +39,7 @@
 #include "osa_service/vsf_osa_service.h"
 
 #define __VSF_TGUI_CONTROLS_PANEL_CLASS_IMPLEMENT
+#define __VSF_TGUI_CONTROLS_CONTROL_CLASS_INHERIT
 declare_class(vsf_tgui_t)
 #include "./vsf_tgui_panel.h"
 #include "../view/vsf_tgui_v.h"
@@ -103,10 +104,6 @@ fsm_rt_t vk_tgui_panel_init(vsf_tgui_panel_t* ptPanel)
     if (fsm_rt_cpl == vk_tgui_container_init(
             &(ptPanel->use_as__vsf_tgui_root_container_t.use_as__vsf_tgui_container_t))) {
 
-    #if VSF_TGUI_CFG_PANEL_HAS_LABEL == ENABLED
-        vk_tgui_label_init(&(ptPanel->tTitleLabel));
-    #endif
-
         do {
             vsf_tgui_status_t Status = vsf_tgui_control_status_get((vsf_tgui_control_t*)ptPanel);
             Status.Values.__does_contain_builtin_structure = true;
@@ -118,6 +115,7 @@ fsm_rt_t vk_tgui_panel_init(vsf_tgui_panel_t* ptPanel)
         tgui_set_priv_label(ptPanel, tTitleLabel,
             tgui_attribute(tLabel, ptPanel->tTitle),
         );
+        vk_tgui_label_init(&(ptPanel->tTitleLabel));
     #endif
 
         return fsm_rt_cpl;

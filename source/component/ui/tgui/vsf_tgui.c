@@ -732,7 +732,7 @@ loop_start:
                         //! if the target control is transparent, refresh its parent
                         do {
                             vsf_tgui_control_t * node_ptr = (vsf_tgui_control_t *)vsf_this.node_ptr;
-                            if (node_ptr->Status.Values.is_control_transparent) {
+                            if (node_ptr->Status.Values.bIsTransparent) {
                                 //! try to fetch its parent
                                 if (NULL != vsf_this.node_ptr->parent_ptr) {
                                     vsf_this.node_ptr = (const vsf_msgt_node_t*)vsf_this.node_ptr->parent_ptr;
