@@ -121,6 +121,27 @@ static void __vsf_tgui_v_disp_refresh(vsf_tgui_t *gui_ptr, vk_disp_area_t *area,
     if(++gui_ptr->cur_tile.stup >= gui_ptr->cur_tile.num) {
         gui_ptr->cur_tile.stup = 0;
     }
+#if VSF_TGUI_CFG_V_TRACE_REFRESH_AREA == ENABLED
+    uint16_t *ptr;
+    if (area->pos.y == gui_ptr->request_region.iY) {
+        for (int i = 0; i < area->size.x; i++) {
+            buffer[i] = VSF_TGUI_COLOR_RED;
+        }
+    }
+    if (    area->pos.y + area->size.y
+        ==  gui_ptr->request_region.iY + gui_ptr->request_region.iHeight) {
+        ptr = buffer + area->size.x * (area->size.y - 1);
+        for (int i = 0; i < area->size.x; i++) {
+            ptr[i] = VSF_TGUI_COLOR_RED;
+        }
+    }
+    ptr = buffer;
+    for (int i = 0; i < area->size.y; i++) {
+        ptr[0] = VSF_TGUI_COLOR_RED;
+        ptr[area->size.x - 1] = VSF_TGUI_COLOR_RED;
+        ptr += area->size.x;
+    }
+#endif
     vk_disp_refresh(gui_ptr->disp, area, buffer);
 
     vsf_protect_t orig = vsf_protect_int();
@@ -178,7 +199,7 @@ bool vsf_tgui_v_refresh_loop_end(vsf_tgui_t *gui_ptr)
         current_region_ptr->tSize.iHeight = height;
         return true;
     } else {
-        memset(current_region_ptr, 0, sizeof(*current_region_ptr));
+        current_region_ptr->tSize.iHeight = 0;
         VSF_TGUI_LOG(VSF_TRACE_INFO, "[SCgui View Port]End Refresh Loop." VSF_TRACE_CFG_LINEEND);
         return false;
     }
