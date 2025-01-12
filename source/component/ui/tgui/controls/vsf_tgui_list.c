@@ -417,6 +417,7 @@ fsm_rt_t vk_tgui_list_init(vsf_tgui_list_t* ptList)
 #endif
 
     vk_tgui_container_init(&(ptList->use_as__vsf_tgui_container_t));
+    ptList->ptList->Status.Values.__skip_render_frame = true;
 
     do {
         vsf_tgui_status_t Status = vsf_tgui_control_status_get((vsf_tgui_control_t*)ptList);

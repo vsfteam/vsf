@@ -117,6 +117,10 @@ fsm_rt_t vsf_tgui_control_v_rendering(  vsf_tgui_t* gui_ptr,
     VSF_TGUI_ASSERT(control_ptr != NULL);
     VSF_TGUI_ASSERT(dirty_region_ptr != NULL);
 
+    if (control_ptr->Status.Values.__skip_render_frame) {
+        return fsm_rt_cpl;
+    }
+
 #if (VSF_TGUI_CFG_V_RENDERING_LOG == ENABLED) && (VSF_TGUI_CFG_SUPPORT_NAME_STRING == ENABLED)
     VSF_TGUI_LOG(VSF_TRACE_INFO, "[Simple View]%s(%p) control view rendering" VSF_TRACE_CFG_LINEEND, vsf_tgui_control_get_node_name(control_ptr), control_ptr);
 #endif

@@ -114,6 +114,12 @@ fsm_rt_t vk_tgui_panel_init(vsf_tgui_panel_t* ptPanel)
             vsf_tgui_control_status_set((vsf_tgui_control_t*)ptPanel, Status);
         } while(0);
 
+    #if VSF_TGUI_CFG_PANEL_HAS_LABEL == ENABLED
+        tgui_set_priv_label(ptPanel, tTitleLabel,
+            tgui_attribute(tLabel, ptPanel->tTitle),
+        );
+    #endif
+
         return fsm_rt_cpl;
     }
 

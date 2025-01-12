@@ -423,7 +423,8 @@ typedef union vsf_tgui_status_t {
         uint8_t __is_the_first_node_for_refresh : 1;
         uint8_t __does_contain_builtin_structure: 1;
         uint8_t __skip_render                   : 1;
-        uint8_t                                 : 5;
+        uint8_t __skip_render_frame             : 1;
+        uint8_t                                 : 4;
         //! @}
     } Values;
 }vsf_tgui_status_t;

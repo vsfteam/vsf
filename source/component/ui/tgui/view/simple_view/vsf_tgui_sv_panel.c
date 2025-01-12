@@ -49,14 +49,8 @@ fsm_rt_t vsf_tgui_panel_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* panel_ptr)
         int16_t iWidth = panel_ptr->iWidth;
     #endif
 
-        tgui_set_priv_label(panel_ptr, tTitleLabel,
-            tgui_attribute(tLabel, panel_ptr->tTitle),
-            tgui_region(
-                tgui_location(0, 0),
-                tgui_size(iWidth, 32),
-            )
-        );
-
+        panel_ptr->tTitleLabel.iWidth = iWidth;
+        panel_ptr->tTitleLabel.iHeight = 32;
         vk_tgui_label_init(&(panel_ptr->tTitleLabel));
 #endif
 

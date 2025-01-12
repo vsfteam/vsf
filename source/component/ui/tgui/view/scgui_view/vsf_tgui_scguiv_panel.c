@@ -38,19 +38,13 @@ fsm_rt_t vsf_tgui_panel_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* panel_ptr)
 {
     if (fsm_rt_cpl == vsf_tgui_container_v_init(gui_ptr, &(panel_ptr->use_as__vsf_tgui_container_t))) {
 #if VSF_TGUI_CFG_PANEL_HAS_LABEL == ENABLED
-    #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
+#   if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_PADDING == ENABLED
         int16_t iWidth = panel_ptr->iWidth - panel_ptr->tContainerPadding.chLeft - panel_ptr->tContainerPadding.chRight;
-    #else
+#   else
         int16_t iWidth = panel_ptr->iWidth;
-    #endif
-
-        tgui_set_priv_label(panel_ptr, tTitleLabel,
-            tgui_attribute(tLabel, panel_ptr->tTitle),
-            tgui_region(
-                tgui_location(0, 0),
-                tgui_size(iWidth, 32),
-            )
-        );
+#   endif
+        panel_ptr->tTitleLabel.iWidth = iWidth;
+        panel_ptr->tTitleLabel.iHeight = 32;
 
         return vk_tgui_label_init(&(panel_ptr->tTitleLabel));
 #elif
