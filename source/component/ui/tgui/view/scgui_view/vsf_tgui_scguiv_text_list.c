@@ -54,7 +54,31 @@ fsm_rt_t vsf_tgui_text_list_v_post_rendering(vsf_tgui_t *gui_ptr,
                                         vsf_tgui_region_t* dirty_region_ptr,
                                         vsf_tgui_control_refresh_mode_t mode)
 {
-    return vsf_tgui_container_v_post_rendering(gui_ptr, &text_list_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
+    vsf_tgui_container_v_post_rendering(gui_ptr, &text_list_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
+#if VSF_TGUI_CFG_V_SUPPORT_ROUND_BORDER == ENABLED
+    int16_t height = text_list_ptr->iHeight - 2 * text_list_ptr->border_radius;
+#else
+    int16_t height = text_list_ptr->iHeight;
+#endif
+    vsf_tgui_label_t *label_ptr = &text_list_ptr->tList.tContent;
+    extern uint8_t vsf_tgui_font_get_char_height(const uint8_t font_index);
+    int16_t text_height = vsf_tgui_font_get_char_height(label_ptr->font_index) + label_ptr->tLabel.chInterLineSpace;
+    height = vsf_min(height, text_height);
+    if (height > 0) {
+        const vsf_tgui_region_t indicator_region = {
+            .tSize          = {
+                .iWidth     = text_list_ptr->iWidth,
+                .iHeight    = height,
+            },
+            .tLocation      = {
+                .iX         = 0,
+                .iY         = (text_list_ptr->iHeight - height) >> 1,
+            },
+        };
+        vsf_tgui_control_v_draw_rect(gui_ptr, &text_list_ptr->use_as__vsf_tgui_control_t,
+            dirty_region_ptr, &indicator_region, VSF_TGUI_CFG_V_TEXT_LIST_INDICATOR_COLOR);
+    }
+    return fsm_rt_cpl;
 }
 
 fsm_rt_t vsf_tgui_text_list_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_text_list_t* text_list_ptr)

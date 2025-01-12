@@ -30,6 +30,8 @@
 
 #include "./scgui.h"
 
+declare_class(vsf_tgui_t)
+
 /*============================ MACROS ========================================*/
 
 #if VSF_TGUI_CFG_COLOR_MODE != VSF_TGUI_COLOR_MODE_RGB565

@@ -26,8 +26,17 @@
 #include "../tgui_custom.h"
 
 /*============================ MACROS ========================================*/
+
 #undef base
 #define base        (*ptBase)
+
+#if VSF_TGUI_CFG_FONT_USE_FREETYPE == ENABLED
+#   define __TGUI_DEFAULT_FONT                  VSF_TGUI_FONT_WQY_MICROHEI_S20
+#elif VSF_TGUI_CFG_FONT_USE_LVGL == ENABLED
+#   define __TGUI_DEFAULT_FONT                  VSF_TGUI_FONT_LVGL_14
+#else
+#   error plase enable VSF_TGUI_CFG_FONT_USE_FREETYPE or VSF_TGUI_CFG_FONT_USE_LVGL
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -60,10 +69,6 @@ static fsm_rt_t __on_button_ok_click(   vsf_tgui_control_t* node_ptr,
 
 static fsm_rt_t __on_button_lap_all_pointer_evt(vsf_tgui_control_t* node_ptr,
                                                 vsf_msgt_msg_t* ptMSG);
-#if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
-static fsm_rt_t __on_text_list_post_refresh(    vsf_tgui_control_t* node_ptr,
-                                                vsf_msgt_msg_t* ptMSG);
-#endif
 #if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
 static fsm_rt_t __on_list_post_refresh( vsf_tgui_list_t* ptList,
                                         vsf_tgui_refresh_evt_t* event_ptr);
@@ -173,7 +178,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                 tgui_size(228, 32),
                 tgui_margin(0, 0, 0, 4),
                 tgui_text(tLabel, "", false),
-                tgui_v_font(VSF_TGUI_FONT_WQY_MICROHEI_S20),
+                tgui_v_font(__TGUI_DEFAULT_FONT),
                 tgui_background((vsf_tgui_tile_t*)&ic_settings_phone_RGBA, VSF_TGUI_ALIGN_LEFT),
                 ),
 
@@ -226,9 +231,6 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
 #if VSF_TGUI_CFG_TEXT_LIST_SUPPORT_SLIDE == ENABLED
                         //tgui_attribute(tSlider, 400),
 #endif
-                        tgui_msgmap(
-                            tgui_msg_handler(VSF_TGUI_EVT_POST_REFRESH, __on_text_list_post_refresh),
-                        ),
 
                         tgui_text_list_content(
 
@@ -532,35 +534,6 @@ static fsm_rt_t __on_button_lap_all_pointer_evt(vsf_tgui_control_t* node_ptr,
     VSF_TGUI_LOG(VSF_TRACE_WARNING, "\t User Handler\r\n");
     return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
 }
-
-
-#if VSF_TGUI_CFG_SUPPORT_TEXT_LIST == ENABLED
-static fsm_rt_t __on_text_list_post_refresh(vsf_tgui_control_t* control_ptr,
-                                            vsf_msgt_msg_t* ptMSG)
-{
-    vsf_tgui_t *gui_ptr = vsf_tgui_control_get_gui_instance(control_ptr);
-    vsf_tgui_refresh_evt_t *event_ptr = (vsf_tgui_refresh_evt_t *)ptMSG;
-    const vsf_tgui_region_t *ptDirtyRegion = (const vsf_tgui_region_t *)(event_ptr->region_ptr);
-    do {
-        vsf_tgui_v_color_t tColor = VSF_TGUI_CFG_V_TEXT_LIST_INDICATOR_COLOR;
-        vsf_tgui_region_t tRegion = {0};
-
-        tRegion.tSize = *vsf_tgui_control_get_size(control_ptr);
-
-        tRegion.tLocation.iY = tRegion.tSize.iHeight / 2 - 1;
-        tRegion.tLocation.iX = 4;
-        tRegion.tSize.iHeight = 2;
-        tRegion.tSize.iWidth -= 8;
-
-        vsf_tgui_control_v_draw_rect(   gui_ptr,
-                                        control_ptr,
-                                        ptDirtyRegion,
-                                        &tRegion,
-                                        tColor);
-    } while(0);
-    return (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
-}
-#endif
 
 #if VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
 static volatile bool s_bShowProgressbar = false;
