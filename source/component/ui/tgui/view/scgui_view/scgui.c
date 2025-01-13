@@ -131,6 +131,21 @@ void SC_pfb_DrawFill(SC_tile *dest,int xs,int ys,int xe,int ye,uint16_t fc)
     }
 }
 
+/**fun: ©уп╬╬ьпн*/
+void SC_pfb_DrawFrame(SC_tile *dest, int xs, int ys, int xe, int ye, int width, uint16_t fc)
+{
+    SC_pfb_DrawFill(dest, xs, ys, xe, ys+width-1,fc);  //ио
+    SC_pfb_DrawFill(dest, xs, ye-width+1, xe, ye,fc);  //об
+    SC_pfb_DrawFill(dest, xs, ys+width, xs+width-1, ye-width,fc);  //вС
+    SC_pfb_DrawFill(dest, xe-width+1, ys+width, xe, ye-width,fc);  //ср
+}
+
+void SC_pfb_RectFrame(SC_tile *dest,int xs,int ys,int xe,int ye, int width, uint16_t ac,uint16_t bc)
+{
+    SC_pfb_DrawFrame(dest, xs, ys, xe, ye, width, ac);
+    SC_pfb_DrawFill(dest, xs+width, ys+width, xe-width, ye-width,bc);
+}
+
 /**fun: отй╬м╪ф╛*/
 void SC_pfb_Image(SC_tile *dest,int xs,int ys,uint8_t alpha,SC_img_t *src)
 {

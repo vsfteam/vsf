@@ -81,9 +81,11 @@ uint16_t alphaBlend( uint16_t fc, uint16_t bc,uint8_t alpha);
 void SC_GUI_Init(uint16_t bkc,uint16_t bc,uint16_t fc);
 void SC_pfb_clip(SC_tile *clip, int xs,int ys,int xe,int ye,uint16_t colour);
 void SC_pfb_DrawFill(SC_tile *dest,int xs,int ys,int xe,int ye,uint16_t fc);
+void SC_pfb_DrawFrame(SC_tile *dest, int xs, int ys, int xe, int ye, int width, uint16_t fc);
 void SC_pfb_Image(SC_tile *dest,int xs,int ys,uint8_t alpha,SC_img_t *src);
 
 void SC_pfb_RoundFrame(SC_tile *dest,int xs,int ys,int xe,int ye, int r,int ir, uint16_t ac,uint16_t bc);
+void SC_pfb_RectFrame(SC_tile *dest,int xs,int ys,int xe,int ye, int width, uint16_t ac,uint16_t bc);
 int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_t bc, lv_font_t* font, int width, int line_space, SC_ALIGN align);
 
 ///-----------------------------------------------------

@@ -91,12 +91,12 @@ fsm_rt_t vsf_tgui_control_v_render(     vsf_tgui_t* gui_ptr,
             control_ptr->border_radius - 1, control_ptr->border_radius - control_ptr->border_width - 1,
             border_color, bg_color);
     } else {
-        SC_pfb_DrawFill(&gui_ptr->cur_tile,
+        SC_pfb_RectFrame(&gui_ptr->cur_tile,
             draw_abs_region.iX, draw_abs_region.iY,
             draw_abs_region.iX + control_ptr->iWidth - 1,
             draw_abs_region.iY + control_ptr->iHeight - 1,
-            bg_color
-        );
+            control_ptr->border_width,
+            border_color, bg_color);
     }
 
     const vsf_tgui_tile_t* ptTile = control_ptr->tBackground.ptTile;
