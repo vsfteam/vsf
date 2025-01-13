@@ -309,13 +309,14 @@ bool vk_tgui_refresh_ex(vsf_tgui_t* gui_ptr,
 bool vk_tgui_refresh_dirty(vsf_tgui_t* gui_ptr,
                             vsf_tgui_control_t* target_ptr)
 {
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if VSF_TGUI_CFG_SUPPORT_DIRTY_REGION == ENABLED
+#   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
     vsf_tgui_evt_t event = { { {VSF_TGUI_EVT_REFRESH} } };
     event.use_as__vsf_tgui_msg_t.target_ptr = (vsf_tgui_control_t*)target_ptr;
     event.RefreshEvt.refresh_dirty = true;
     return vk_tgui_send_message(gui_ptr, event);
 
-#else
+#   else
     return vk_tgui_send_message(gui_ptr,
         (vsf_tgui_evt_t) {
         .RefreshEvt = {
@@ -324,6 +325,9 @@ bool vk_tgui_refresh_dirty(vsf_tgui_t* gui_ptr,
             .refresh_dirty = true,
         },
     });
+#   endif
+#else
+    return vk_tgui_refresh_dirty(gui_ptr, target_ptr, NULL);
 #endif
 }
 

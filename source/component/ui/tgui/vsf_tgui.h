@@ -204,11 +204,9 @@ bool vk_tgui_refresh_ex(    vsf_tgui_t *gui_ptr,
                             const vsf_tgui_control_t *target_ptr, 
                             const vsf_tgui_region_t *region_ptr);
 
-#if VSF_TGUI_CFG_SUPPORT_DIRTY_REGION == ENABLED
 extern
 bool vk_tgui_refresh_dirty( vsf_tgui_t* gui_ptr,
                             vsf_tgui_control_t* target_ptr);
-#endif
 
 
 /*! \brief begin a refresh loop
