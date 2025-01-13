@@ -571,8 +571,6 @@ static bool __vk_tgui_decide_refresh_region(vsf_pt(__vsf_tgui_evt_shooter_t) *th
     if (NULL != this.event.RefreshEvt.region_ptr) {
         __vk_tgui_calculate_control_location_from_parent(control_ptr, NULL, this.event.RefreshEvt.region_ptr);
         result = vsf_tgui_region_intersect(&this.temp_region, &this.temp_region, this.event.RefreshEvt.region_ptr);
-    } else {
-        this.event.RefreshEvt.region_ptr = &control_ptr->tRegion;
     }
 
 #if VSF_TGUI_CFG_SUPPORT_TRANSPARENT_CONTROL == ENABLED

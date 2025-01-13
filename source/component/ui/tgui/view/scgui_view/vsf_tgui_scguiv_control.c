@@ -134,6 +134,9 @@ bool __vk_tgui_control_v_is_transparent_in_region(vsf_tgui_control_t *control_pt
 {
     // TODO:
 #if VSF_TGUI_CFG_V_SUPPORT_ROUND_BORDER == ENABLED
+    if (NULL == region_ptr) {
+        return control_ptr->border_radius > 0;
+    }
     return      (   (region_ptr->iX > control_ptr->border_radius)
                 &&  (region_ptr->iX + region_ptr->iWidth) < (control_ptr->iX + control_ptr->iWidth - control_ptr->border_radius))
             ||  (   (region_ptr->iY > control_ptr->border_radius)
