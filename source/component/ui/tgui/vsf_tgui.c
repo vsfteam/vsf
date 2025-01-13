@@ -568,15 +568,17 @@ static bool __vk_tgui_decide_refresh_region(vsf_pt(__vsf_tgui_evt_shooter_t) *th
         control_ptr->tDirtyRegion.iWidth = 0;
     }
 #endif
-    if (NULL != this.event.RefreshEvt.region_ptr) {
-        __vk_tgui_calculate_control_location_from_parent(control_ptr, NULL, this.event.RefreshEvt.region_ptr);
-        result = vsf_tgui_region_intersect(&this.temp_region, &this.temp_region, this.event.RefreshEvt.region_ptr);
-    }
 
 #if VSF_TGUI_CFG_SUPPORT_TRANSPARENT_CONTROL == ENABLED
     this.Attribute.is_dirty_region_include_transparent_area =
         __vk_tgui_control_v_is_transparent_in_region(control_ptr, this.event.RefreshEvt.region_ptr);
 #endif
+
+    if (NULL != this.event.RefreshEvt.region_ptr) {
+        __vk_tgui_calculate_control_location_from_parent(control_ptr, NULL, this.event.RefreshEvt.region_ptr);
+        result = vsf_tgui_region_intersect(&this.temp_region, &this.temp_region, this.event.RefreshEvt.region_ptr);
+    }
+
     this.region_ptr = &this.temp_region;
     return result;
 }
