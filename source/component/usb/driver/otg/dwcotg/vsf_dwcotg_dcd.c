@@ -350,6 +350,10 @@ vsf_err_t vk_dwcotg_dcd_ep_set_stall(vk_dwcotg_dcd_t *dwcotg_dcd, uint_fast8_t e
     *ep_ctrl |= USB_OTG_DIEPCTL_STALL;
 
     if (ep == 0) {
+        if (dwcotg_dcd->dma_en) {
+            dwcotg_dcd->ctrl_transfer_state = DWCOTG_STATUS_STAGE;
+            vk_dwcotg_dcd_ep_transfer_recv(dwcotg_dcd, 0, (uint8_t *)&dwcotg_dcd->setup, 8);
+        }
         dwcotg_dcd->ctrl_transfer_state = DWCOTG_SETUP_STAGE;
     }
 
