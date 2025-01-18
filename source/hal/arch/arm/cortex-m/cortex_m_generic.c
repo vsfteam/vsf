@@ -404,7 +404,7 @@ void vsf_arch_shutdown(void)
     VSF_ARCH_ASSERT(false);
 }
 
-#if __MPU_PRESENT
+#if __MPU_PRESENT && __ARM_ARCH == 7
 void vsf_arch_mpu_disable(void)
 {
     ARM_MPU_Disable();

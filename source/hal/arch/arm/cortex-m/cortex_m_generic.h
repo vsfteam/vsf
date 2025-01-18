@@ -135,6 +135,7 @@ extern "C" {
 
 typedef uint64_t vsf_systimer_tick_t;
 
+#if __MPU_PRESENT && __ARM_ARCH == 7
 typedef enum vsf_arch_mpu_feature_t {
     // compatible with MPU_RASR definitation
     //                                            MPU_RASR.S
@@ -157,6 +158,7 @@ typedef enum vsf_arch_mpu_feature_t {
     VSF_ARCH_MPU_CACHABLE_WRITE_BACK_ALLOC      = (1ul << 17) | (1ul << 16) | (1ul << 19),
     VSF_ARCH_MPU_NON_CACHABLE                   = 0ul << 17,
 } vsf_arch_mpu_feature_t;
+#endif
 
 #define __VSF_ARCH_PRI_INDEX(__N, __UNUSED)                                     \
             __vsf_arch_prio_index_##__N = (__N),
@@ -297,8 +299,7 @@ extern void vsf_arch_add_text_region(vsf_arch_text_region_t *region);
 extern uint_fast16_t vsf_arch_get_callstack(uintptr_t sp, uintptr_t *callstack, uint_fast16_t callstack_num);
 #endif
 
-// __MPU_PRESENT is maybe not available here
-//#if __MPU_PRESENT
+#if __MPU_PRESENT && __ARM_ARCH == 7
 // if size is 0, means 4G
 extern void vsf_arch_mpu_disable(void);
 extern void vsf_arch_mpu_enable(void);
@@ -308,7 +309,7 @@ extern void vsf_arch_mpu_clear_region(uint32_t idx);
 // the region added later will have higher priority
 // if size is 0, means 4G
 extern void vsf_arch_mpu_add_region(uint32_t baseaddr, uint32_t size, vsf_arch_mpu_feature_t feature);
-//#endif
+#endif
 
 #ifdef __cplusplus
 }
