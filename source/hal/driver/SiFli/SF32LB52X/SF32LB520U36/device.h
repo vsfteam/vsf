@@ -24,12 +24,12 @@
 #ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
 /*\note first define basic info for arch. */
-#define VSF_ARCH_PRI_NUM            16
-#define VSF_ARCH_PRI_BIT            4
+#define VSF_ARCH_PRI_NUM            8
+#define VSF_ARCH_PRI_BIT            3
 
 // software interrupt provided by a dedicated device
 #ifndef VSF_DEV_SWI_NUM
-#   define VSF_DEV_SWI_NUM          5
+#   define VSF_DEV_SWI_NUM          8
 #endif
 #if VSF_DEV_SWI_NUM > VSF_ARCH_PRI_NUM
 #   warning too many VSF_DEV_SWI_NUM, max is VSF_ARCH_PRI_NUM
@@ -40,7 +40,7 @@
 #elif defined(__VSF_HAL_SHOW_VENDOR_INFO__)
 
 #define __VSF_HEADER_ONLY_SHOW_VENDOR_INFO__
-#include "../common/vendor/Include/sf32.h"
+#include "register.h"
 
 #else
 
