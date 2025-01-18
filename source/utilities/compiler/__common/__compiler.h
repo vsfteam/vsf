@@ -321,6 +321,9 @@ extern "C" {
 //! label was declared but never referenced
 #pragma diag_suppress=pe177
 
+//!	struct or union declares no named members
+#pragma diag_suppress=pe618
+
 //,Pe186,Pe111,,pe128,,,Pe1866,Pe064,Pa039
 
 #endif
