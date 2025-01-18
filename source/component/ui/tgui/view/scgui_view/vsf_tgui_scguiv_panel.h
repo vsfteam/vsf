@@ -29,7 +29,6 @@
 
 /*============================ MACROS ========================================*/
 
-#define vsf_tgui_panel_v_render             vsf_tgui_container_v_render
 #define vsf_tgui_panel_v_post_render        vsf_tgui_container_v_post_render
 #define vsf_tgui_panel_v_depose             vsf_tgui_container_v_depose
 
@@ -37,6 +36,14 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+static inline fsm_rt_t vsf_tgui_panel_v_render(vsf_tgui_t *gui_ptr,
+                                    vsf_tgui_panel_t* panel_ptr,
+                                    vsf_tgui_region_t* dirty_region_ptr,
+                                    vsf_tgui_control_refresh_mode_t mode)
+{
+    return vsf_tgui_container_v_render(gui_ptr, &panel_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
+}
 
 extern fsm_rt_t vsf_tgui_panel_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* ptPanel);
 extern fsm_rt_t vsf_tgui_panel_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* panel_ptr);
