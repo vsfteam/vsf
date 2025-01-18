@@ -79,7 +79,7 @@ typedef struct VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) {
 
 // HW
 
-static void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_set_baudrate)(
+static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_set_baudrate)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     USART_TypeDef *reg = usart_ptr->reg;
@@ -142,7 +142,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
 
     if (enabled) {
         reg->CR1 |= USART_CR1_UE;
-        VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_set_baudrate)(usart_ptr);
+        VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_set_baudrate)(usart_ptr);
     }
 
     // configure according to cfg_ptr
@@ -171,7 +171,7 @@ fsm_rt_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_enable)(
     VSF_HAL_ASSERT(NULL != usart_ptr);
     usart_ptr->reg->CR1 |= USART_CR1_UE;
     if (!usart_ptr->__baudrate_set) {
-        VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_set_baudrate)(usart_ptr);
+        VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_set_baudrate)(usart_ptr);
     }
     return fsm_rt_cpl;
 }
