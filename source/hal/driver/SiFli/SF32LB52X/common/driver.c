@@ -30,8 +30,25 @@
 #   define RCC                  LPSYS_RCC_BASE
 #endif
 
+#define ATTR_CODE               ARM_MPU_ATTR(ARM_MPU_ATTR_MEMORY_(0, 0, 1, 0), ARM_MPU_ATTR_MEMORY_(0, 0, 1, 0))
+#define ATTR_RAM                ARM_MPU_ATTR(ARM_MPU_ATTR_NON_CACHEABLE, ARM_MPU_ATTR_NON_CACHEABLE)
+#define ATTR_DEVICE             ARM_MPU_ATTR(ARM_MPU_ATTR_DEVICE, ARM_MPU_ATTR_DEVICE_nGnRnE)
+/* write back */
+#define ATTR_PSRAM_WB           ARM_MPU_ATTR(ARM_MPU_ATTR_MEMORY_(0, 1, 1, 1), ARM_MPU_ATTR_MEMORY_(0, 1, 1, 1))
+/* write through */
+#define ATTR_PSRAM_WT           ARM_MPU_ATTR(ARM_MPU_ATTR_MEMORY_(0, 0, 1, 1), ARM_MPU_ATTR_MEMORY_(0, 0, 1, 1))
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+enum {
+    ATTR_CODE_IDX,
+    ATTR_RAM_IDX,
+    ATTR_DEVICE_IDX,
+    ATTR_PSRAM_WB_IDX,
+    ATTR_PSRAM_WT_IDX,
+};
+
 /*============================ PROTOTYPES ====================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -175,55 +192,134 @@ void BusFault_Handler(void)
 #endif
 
 
-// the region added later will have higher priority
-VSF_CAL_WEAK(vsf_hw_mpu_add_basic_resgions)
-void vsf_hw_mpu_add_basic_resgions(void)
+
+static void mpu_clear_region(void)
 {
-    vsf_arch_mpu_disable();
+    for (uint32_t i = 0; i < MPU_REGION_NUM; i++) {
+        ARM_MPU_ClrRegion(i);
+    }
+}
 
-    // background, 4G from 0x00000000
-    vsf_arch_mpu_add_region(0x00000000, 0,
-                            VSF_ARCH_MPU_NON_SHARABLE       |
-                            VSF_ARCH_MPU_NON_EXECUTABLE     |
-                            VSF_ARCH_MPU_ACCESS_NO          |
-                            VSF_ARCH_MPU_NON_CACHABLE);
+VSF_CAL_WEAK(mpu_config)
+void mpu_config(void)
+{
+    uint32_t rnr, rbar, rlar;
 
-    // System Memory, 64K from 0x1FF00000
-    vsf_arch_mpu_add_region(0x1FF00000, 64 * 1024,
-                            VSF_ARCH_MPU_NON_SHARABLE       |
-                            VSF_ARCH_MPU_NON_EXECUTABLE     |
-                            VSF_ARCH_MPU_ACCESS_READONLY    |
-                            VSF_ARCH_MPU_NON_CACHABLE);
+#if defined(SOC_BF0_HCPU)
+    SCB_InvalidateDCache();
+    SCB_InvalidateICache();
 
-    // AHBs & APBs, 512M from 0x40000000
-    vsf_arch_mpu_add_region(0x40000000, 512 * 1024 * 1024,
-                            VSF_ARCH_MPU_SHARABLE           |
-                            VSF_ARCH_MPU_NON_EXECUTABLE     |
-                            VSF_ARCH_MPU_ACCESS_FULL        |
-                            VSF_ARCH_MPU_NON_CACHABLE);
+    ARM_MPU_Disable();
 
-    // AXI SRAM, 512K from 0x24000000
-    vsf_arch_mpu_add_region(0x24000000, 1 * 1024 * 1024,
-                            VSF_ARCH_MPU_NON_SHARABLE       |
-                            VSF_ARCH_MPU_EXECUTABLE         |
-                            VSF_ARCH_MPU_ACCESS_FULL        |
-                            VSF_ARCH_MPU_CACHABLE_WRITE_THROUGH_NOALLOC);
+    mpu_clear_region();
 
-    // AHB SRAM, 32K from 0x30000000
-    vsf_arch_mpu_add_region(0x30000000, 32 * 1024,
-                            VSF_ARCH_MPU_NON_SHARABLE       |
-                            VSF_ARCH_MPU_EXECUTABLE         |
-                            VSF_ARCH_MPU_ACCESS_FULL        |
-                            VSF_ARCH_MPU_CACHABLE_WRITE_BACK_NOALLOC);
+    ARM_MPU_SetMemAttr(ATTR_CODE_IDX, ATTR_CODE);
+    ARM_MPU_SetMemAttr(ATTR_RAM_IDX, ATTR_RAM);
+    ARM_MPU_SetMemAttr(ATTR_DEVICE_IDX, ATTR_DEVICE);
+    ARM_MPU_SetMemAttr(ATTR_PSRAM_WB_IDX, ATTR_PSRAM_WB);
+    ARM_MPU_SetMemAttr(ATTR_PSRAM_WT_IDX, ATTR_PSRAM_WT);
 
-    // User FLASH, 4M from 0x08000000
-    vsf_arch_mpu_add_region(0x08000000, 4 * 1024 * 1024,
-                            VSF_ARCH_MPU_NON_SHARABLE       |
-                            VSF_ARCH_MPU_EXECUTABLE         |
-                            VSF_ARCH_MPU_ACCESS_FULL        |
-                            VSF_ARCH_MPU_CACHABLE_WRITE_THROUGH_NOALLOC);
+    rnr = 0;
 
-    vsf_arch_mpu_enable();
+    //  hpsys rom
+    rbar = ARM_MPU_RBAR(0x0, ARM_MPU_SH_NON, 1, 1, 1); //Non-shareable,RO,any privilege,executable
+    rlar = ARM_MPU_RLAR(0x0000ffff, ATTR_CODE_IDX);
+    ARM_MPU_SetRegion(rnr++, rbar, rlar);
+
+    // hpsys RETM/ITCM ram disable sram cache
+    rbar = ARM_MPU_RBAR(0x00010000, ARM_MPU_SH_NON, 0, 1, 0); //Non-shareable,RW,any privilege,executable
+    rlar = ARM_MPU_RLAR(0x0002ffff, ATTR_RAM_IDX);
+    ARM_MPU_SetRegion(rnr++, rbar, rlar);
+
+    //  flash1, region 1
+    rbar = ARM_MPU_RBAR(0x10000000, ARM_MPU_SH_NON, 1, 1, 0); //Non-shareable,RO,any privilege,executable
+    rlar = ARM_MPU_RLAR(0x1fffffff, ATTR_CODE_IDX);
+    ARM_MPU_SetRegion(rnr++, rbar, rlar);
+
+    // hpsys ram, disable sram cache
+    rbar = ARM_MPU_RBAR(0x20000000, ARM_MPU_SH_NON, 0, 1, 0); //Non-shareable,RW,any privilege,executable
+    rlar = ARM_MPU_RLAR(0x2027ffff, ATTR_RAM_IDX);
+    ARM_MPU_SetRegion(rnr++, rbar, rlar);
+
+    // peripheral
+    rbar = ARM_MPU_RBAR(0x40000000, ARM_MPU_SH_NON, 0, 1, 1); //Non-shareable,RW,any privilege,non-executable
+    rlar = ARM_MPU_RLAR(0x5fffffff, ATTR_DEVICE_IDX);
+    ARM_MPU_SetRegion(rnr++, rbar, rlar);
+
+    // psram
+    rbar = ARM_MPU_RBAR(0x60000000, ARM_MPU_SH_NON, 0, 1, 0); //Non-shareable,RW,any privilege,executable
+#ifdef PSRAM_CACHE_WB
+    rlar = ARM_MPU_RLAR(0x61ffffff, ATTR_PSRAM_WB_IDX);
+#else
+    rlar = ARM_MPU_RLAR(0x61ffffff, ATTR_PSRAM_WT_IDX);
+#endif
+
+    ARM_MPU_SetRegion(rnr++, rbar, rlar);
+
+    // lpsys ram
+    rbar = ARM_MPU_RBAR(0x203fc000, ARM_MPU_SH_NON, 0, 1, 0); //Non-shareable,RW,any privilege,executable
+    rlar = ARM_MPU_RLAR(0x204fffff, ATTR_RAM_IDX);
+    ARM_MPU_SetRegion(rnr++, rbar, rlar);
+
+    // lpsys ITCM and CBUS
+    rbar = ARM_MPU_RBAR(0x20bfc000, ARM_MPU_SH_NON, 0, 1, 0); //Non-shareable,RW,any privilege,executable
+    rlar = ARM_MPU_RLAR(0x20cbffff, ATTR_RAM_IDX);
+    ARM_MPU_SetRegion(rnr++, rbar, rlar);
+
+    // ble rom
+    rbar = ARM_MPU_RBAR(0x20800000, ARM_MPU_SH_NON, 0, 1, 0); //Non-shareable,RW,any privilege,executable
+    rlar = ARM_MPU_RLAR(0x208fffff, ATTR_CODE_IDX);
+    ARM_MPU_SetRegion(rnr++, rbar, rlar);
+
+    // nand 2
+    rbar = ARM_MPU_RBAR(0x62000000, ARM_MPU_SH_NON, 1, 1, 0); //Non-shareable,RO,any privilege,executable
+    rlar = ARM_MPU_RLAR(0x6FFFFFFF, ATTR_RAM_IDX);
+    ARM_MPU_SetRegion(rnr++, rbar, rlar);
+
+    VSF_HAL_ASSERT(rnr <= MPU_REGION_NUM);
+    ARM_MPU_Enable(MPU_CTRL_HFNMIENA_Msk);
+#else
+    ARM_MPU_Disable();
+
+    mpu_clear_region();
+
+    ARM_MPU_SetMemAttr(ATTR_CODE_IDX, ATTR_CODE);
+    ARM_MPU_SetMemAttr(ATTR_RAM_IDX, ATTR_RAM);
+    ARM_MPU_SetMemAttr(ATTR_DEVICE_IDX, ATTR_DEVICE);
+
+    rnr  = 0;
+
+    // LPSYS ROM, ITCM and C-BUS RAM space
+    rbar = ARM_MPU_RBAR(0x0, ARM_MPU_SH_NON, 1, 1, 0); //Non-shareable,RO,any privilege,executable
+    rlar = ARM_MPU_RLAR(0x004bffff, ATTR_CODE_IDX);
+    ARM_MPU_SetRegion(rnr++, rbar, rlar);
+
+    //mpi1 and mpi2
+    rbar = ARM_MPU_RBAR(0x60000000, ARM_MPU_SH_NON, 0, 1, 0); //Non-shareable,RO,any privilege,executable
+    rlar = ARM_MPU_RLAR(0x9FFFFFFF, ATTR_RAM_IDX);
+    ARM_MPU_SetRegion(rnr++, rbar, rlar);
+
+    // HPSYS RAM
+    /* disable cache */
+    rbar = ARM_MPU_RBAR(0x2A000000, ARM_MPU_SH_NON, 0, 1, 0); //Non-shareable,RW,any privilege,executable
+    rlar = ARM_MPU_RLAR(0x2A27FFFF, ATTR_RAM_IDX);
+    ARM_MPU_SetRegion(rnr++, rbar, rlar);
+
+    // peripheral
+    rbar = ARM_MPU_RBAR(0x40000000, ARM_MPU_SH_NON, 0, 1, 1); //Non-shareable,RW,any privilege,non-executable
+    rlar = ARM_MPU_RLAR(0x5FFFFFFF, ATTR_DEVICE_IDX);
+    ARM_MPU_SetRegion(rnr++, rbar, rlar);
+
+    // LPSYS DTCM and RAM
+    // disable cache
+    rbar = ARM_MPU_RBAR(0x203fc000, ARM_MPU_SH_NON, 0, 1, 0); //Non-shareable,RW,any privilege,executable
+    rlar = ARM_MPU_RLAR(0x204FFFFF, ATTR_RAM_IDX);
+    ARM_MPU_SetRegion(rnr++, rbar, rlar);
+
+    HAL_ASSERT(rnr <= MPU_REGION_NUM);
+
+    ARM_MPU_Enable(MPU_CTRL_HFNMIENA_Msk);
+#endif
 }
 
 
@@ -239,7 +335,7 @@ bool vsf_driver_init(void)
     SCB_EnableICache();
     SCB_EnableDCache();
 
-    vsf_hw_mpu_add_basic_resgions();
+    mpu_config();
     return true;
 }
 
