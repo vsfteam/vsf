@@ -36,7 +36,7 @@
 #   include "hal/driver/common/swi/vsf_swi_template.h"
 
 //#   include "../common/gpio/gpio.h"
-//#   include "../common/usart/usart.h"
+#   include "../../common/SF32LB5XX/usart/vsf_usart.h"
 //#   include "../common/flash/flash.h"
 //#   include "../common/sdio/sdio.h"
 //#   include "../common/usb/usb.h"

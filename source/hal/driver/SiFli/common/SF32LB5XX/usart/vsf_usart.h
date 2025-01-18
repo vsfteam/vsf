@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_GIGADEVICE_GD32H7XX_USART_H__
-#define __HAL_DRIVER_GIGADEVICE_GD32H7XX_USART_H__
+#ifndef __HAL_DRIVER_SIFLI_SF32LB5XX_USART_H__
+#define __HAL_DRIVER_SIFLI_SF32LB5XX_USART_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -24,7 +24,7 @@
 
 #if VSF_HAL_USE_USART == ENABLED
 
-#include "../../__device.h"
+#include "../../../__device.h"
 
 /*\note Refer to template/README.md for usage cases.
  *      For peripheral drivers, blackbox mode is recommended but not required, reimplementation part MUST be open.
@@ -84,72 +84,72 @@ extern "C" {
 
 // HW/IPCore, not for emulated drivers
 typedef enum vsf_usart_mode_t {
-    // 0..1: STB(13:12) in USART_CTL1, shift right by 12 to avoid conflict with BIT_LENGTH
+    // 0..1: STOP(13:12) in USART_CR2, shift right by 12
     VSF_USART_0_5_STOPBIT               = (1 << 12) >> 12,
     VSF_USART_1_STOPBIT                 = (0 << 12) >> 12,
     VSF_USART_1_5_STOPBIT               = (3 << 12) >> 12,
     VSF_USART_2_STOPBIT                 = (2 << 12) >> 12,
 
-    // 2..3: TEN(3)/REN(2) in USART_CTL0
+    // 2..3: TE(3)/RE(2) in USART_CR1
     VSF_USART_TX_ENABLE                 = (1 << 3),
     VSF_USART_TX_DISABLE                = (0 << 3),
     VSF_USART_RX_ENABLE                 = (1 << 2),
     VSF_USART_RX_DISABLE                = (0 << 2),
 
-    // 4..5: CTSEN(9)/RTSEN(8) in USART_CTL2, shift right by 4 to void conflict with PARITY
+    // 4..5: CTSE(9)/RTSE(8) in USART_CR3, shift right by 4 to void conflict with PARITY
     VSF_USART_NO_HWCONTROL              = (0),
     VSF_USART_RTS_HWCONTROL             = (1 << 8) >> 4,
     VSF_USART_CTS_HWCONTROL             = (1 << 9) >> 4,
     VSF_USART_RTS_CTS_HWCONTROL         = VSF_USART_RTS_HWCONTROL
                                         | VSF_USART_CTS_HWCONTROL,
 
-    // 6: HDEN(3) in USART_CTL2, shift left by 3
+    // 6: HDSEL(3) in USART_CR3, shift left by 3
     VSF_USART_HALF_DUPLEX_ENABLE        = (1 << 3) << 3,
     VSF_USART_HALF_DUPLEX_DISABLE       = 0,
 
-    // 9..10: PCEN(10)/PM(9) in USART_CTL0
+    // 9..10: PCE(10)/PS(9) in USART_CR1
     VSF_USART_NO_PARITY                 = (0 << 10),
     VSF_USART_ODD_PARITY                = (1 << 10) | (1 << 9),
     VSF_USART_EVEN_PARITY               = (1 << 10),
 
-    // 23: CKEN(11) in USART_CTL1, shift left by 12
+    // 23: CLKEN(11) in USART_CR2, shift left by 12
     VSF_USART_SYNC_CLOCK_ENABLE         = (1 << 11) << 12,
     VSF_USART_SYNC_CLOCK_DISABLE        = (0 << 11) << 12,
-    // 22: CPL(10) in USART_CTL1, shift left by 12
+    // 22: CPOL(10) in USART_CR2, shift left by 12
     VSF_USART_SYNC_CLOCK_POLARITY_LOW   = (0 << 10) << 12,
     VSF_USART_SYNC_CLOCK_POLARITY_HIGH  = (1 << 10) << 12,
-    // 21: CPH(9) in USART_CTL1, shift left by 12
+    // 21: CPHA(9) in USART_CR2, shift left by 12
     VSF_USART_SYNC_CLOCK_PHASE_1_EDGE   = (0 << 9) << 12,
     VSF_USART_SYNC_CLOCK_PHASE_2_EDGE   = (1 << 9) << 12,
-    // 20: CLEN(8) in USART_CTL1, shift left by 12
+    // 20: LBCL(8) in USART_CR2, shift left by 12
     VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE        = (1 << 8) << 12,
     VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE       = (0 << 8) << 12,
 #define VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE    VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE
 #define VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE   VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE
 #define VSF_USART_SYNC_CLOCK_LAST_BIT_MASK      VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE | VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE
 
-    // 12&28: WL1(28):WL0(12) in USART_CTL0
-    VSF_USART_10_BIT_LENGTH             = (1 << 12) | (1 << 28),
-    VSF_USART_9_BIT_LENGTH              = (1 << 12),
-    VSF_USART_8_BIT_LENGTH              = (0),
-    VSF_USART_7_BIT_LENGTH              = (1 << 28),
+    // 27..28: M(27..28) in USART_CR1
+    VSF_USART_6_BIT_LENGTH              = (0 << 27),
+    VSF_USART_7_BIT_LENGTH              = (1 << 27),
+    VSF_USART_8_BIT_LENGTH              = (2 << 27),
+    VSF_USART_9_BIT_LENGTH              = (3 << 27),
 
     // more vendor specified modes can be added here
 
-    // 13: MEN(13) in USART_CTL0
+    // 13: CMIE(13) in USART_CR1
     VSF_USART_MUTE                      = (1 << 13),
-    // 15: STRP(15) in USART_CTL1
+    // 15: SWAP(15) in USART_CR2
     VSF_USART_SWAP                      = (1 << 15),
-    // 16..17: TINV(17)/RINV(16) in USART_CTL1
+    // 16..17: TXINV(17)/RXINV(16) in USART_CR2
     VSF_USART_TX_INV                    = (1 << 17),
     VSF_USART_RX_INV                    = (1 << 16),
-    // 18: OVER8(15) in USART_CTL0
-    VSF_USART_OVERSAMPLE_8              = (1 << 18),
-    VSF_USART_OVERSAMPLE_16             = (0 << 18),
-    VSF_USART_OVERSAMPLE_MASK           = (1 << 18),
+    // 14: OVER8(14) in USART_CR1
+    VSF_USART_OVERSAMPLE_8              = (1 << 14),
+    VSF_USART_OVERSAMPLE_16             = (0 << 14),
+    VSF_USART_OVERSAMPLE_MASK           = (1 << 14),
 
 
-    __VSF_HW_USART_CTL0_MASK            = VSF_USART_10_BIT_LENGTH
+    __VSF_HW_USART_CR1_MASK             = VSF_USART_6_BIT_LENGTH
                                         | VSF_USART_9_BIT_LENGTH
                                         | VSF_USART_8_BIT_LENGTH
                                         | VSF_USART_7_BIT_LENGTH
@@ -160,7 +160,7 @@ typedef enum vsf_usart_mode_t {
                                         | VSF_USART_RX_ENABLE
                                         | VSF_USART_OVERSAMPLE_MASK
                                         | VSF_USART_MUTE,
-    __VSF_HW_USART_CTL1_MASK            = VSF_USART_SYNC_CLOCK_ENABLE
+    __VSF_HW_USART_CR2_MASK             = VSF_USART_SYNC_CLOCK_ENABLE
                                         | VSF_USART_SYNC_CLOCK_DISABLE
                                         | VSF_USART_SYNC_CLOCK_POLARITY_LOW
                                         | VSF_USART_SYNC_CLOCK_POLARITY_HIGH
@@ -175,27 +175,27 @@ typedef enum vsf_usart_mode_t {
                                         | VSF_USART_TX_INV
                                         | VSF_USART_RX_INV
                                         | VSF_USART_SWAP,
-    __VSF_HW_USART_CTL2_MASK            = VSF_USART_RTS_CTS_HWCONTROL
+    __VSF_HW_USART_CR3_MASK             = VSF_USART_RTS_CTS_HWCONTROL
                                         | VSF_USART_HALF_DUPLEX_ENABLE,
 
     // not supported, allocate unused bits
-    // 7..8
-    VSF_USART_6_BIT_LENGTH              = (1 << 7),
-    VSF_USART_5_BIT_LENGTH              = (0 << 7),
+    // 6..8
+    VSF_USART_10_BIT_LENGTH             = (1 << 6),
+    VSF_USART_5_BIT_LENGTH              = (2 << 6),
     VSF_USART_FORCE_0_PARITY            = (0 << 8),
     VSF_USART_FORCE_1_PARITY            = (1 << 8),
 
     VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL
-                                        = (0 << 24),
+                                        = (0 << 20),
     VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY
-                                        = (1 << 24),
-    VSF_USART_TX_FIFO_THRESHOLD_EMPTY   = (2 << 24),
+                                        = (1 << 20),
+    VSF_USART_TX_FIFO_THRESHOLD_EMPTY   = (2 << 20),
 
     VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
-                                        = (0 << 26),
+                                        = (0 << 22),
     VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL
-                                        = (1 << 26),
-    VSF_USART_RX_FIFO_THRESHOLD_FULL    = (2 << 26),
+                                        = (1 << 22),
+    VSF_USART_RX_FIFO_THRESHOLD_FULL    = (2 << 22),
 
     __VSF_HW_USART_NOT_SUPPORT_MASK     = VSF_USART_5_BIT_LENGTH
                                         | VSF_USART_5_BIT_LENGTH
@@ -233,13 +233,13 @@ typedef enum vsf_usart_irq_mask_t {
                                         | VSF_USART_IRQ_MASK_TX_CPL
                                         | VSF_USART_IRQ_MASK_PARITY_ERR
                                         | VSF_USART_IRQ_MASK_CTS,
-    __VSF_HW_USART_CTL0_IRQ_MASK        = VSF_USART_IRQ_MASK_RX
+    __VSF_HW_USART_CR1_IRQ_MASK         = VSF_USART_IRQ_MASK_RX
                                         | VSF_USART_IRQ_MASK_TX
                                         | VSF_USART_IRQ_MASK_RX_TIMEOUT
                                         | VSF_USART_IRQ_MASK_RX_CPL
                                         | VSF_USART_IRQ_MASK_TX_CPL
                                         | VSF_USART_IRQ_MASK_PARITY_ERR,
-    __VSF_HW_USART_CTL2_IRQ_MASK        = VSF_USART_IRQ_MASK_CTS,
+    __VSF_HW_USART_CR3_IRQ_MASK         = VSF_USART_IRQ_MASK_CTS,
 
     // not supported
     // 0..2
@@ -306,5 +306,5 @@ typedef struct vsf_usart_status_t {
 // IPCore end
 
 #endif      // VSF_HAL_USE_USART
-#endif      // __HAL_DRIVER_GIGADEVICE_GD32H7XX_USART_H__
+#endif      // __HAL_DRIVER_SIFLI_SF32LB5XX_USART_H__
 /* EOF */

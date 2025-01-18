@@ -353,7 +353,6 @@ extern const vsf_hw_clk_t VSF_HW_CLK_TLI;
 extern const vsf_hw_clk_t VSF_HW_CLK_EXMC;
 
 /*============================ LOCAL VARIABLES ===============================*/
-/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
 extern void vsf_hw_clkrst_region_set(uint32_t region, uint_fast8_t value);

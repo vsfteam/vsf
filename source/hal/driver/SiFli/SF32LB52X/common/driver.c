@@ -20,9 +20,16 @@
 #include "hal/vsf_hal_cfg.h"
 #include "../__device.h"
 
-// TODO: include vendor header
+#include "register.h"
 
 /*============================ MACROS ========================================*/
+
+#ifdef SOC_BF0_HCPU
+#   define RCC                  HPSYS_RCC_BASE
+#else
+#   define RCC                  LPSYS_RCC_BASE
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ PROTOTYPES ====================================*/
@@ -31,6 +38,39 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #include "hal/driver/common/swi/arm/vsf_swi_template.inc"
+
+void vsf_hw_clkrst_region_set_bit(uint32_t region)
+{
+    VSF_HAL_ASSERT(1 == ((region >> 8) & 0x07));
+    uint8_t bit_offset = (region >> 0) & 0x1F;
+    uint8_t reg_word_offset = region >> 16;
+
+    vsf_atom_or(32,
+        &(((uint32_t *)RCC)[reg_word_offset]),
+        (1 << bit_offset)
+    );
+}
+
+void vsf_hw_clkrst_region_clear_bit(uint32_t region)
+{
+    VSF_HAL_ASSERT(1 == ((region >> 8) & 0x07));
+    uint8_t bit_offset = (region >> 0) & 0x1F;
+    uint8_t reg_word_offset = region >> 16;
+
+    vsf_atom_and(32,
+        &(((uint32_t *)RCC)[reg_word_offset]),
+        ~(1 << bit_offset)
+    );
+}
+
+uint_fast8_t vsf_hw_clkrst_region_get_bit(uint32_t region)
+{
+    VSF_HAL_ASSERT(1 == ((region >> 8) & 0x07));
+    uint8_t bit_offset = (region >> 0) & 0x1F;
+    uint8_t reg_word_offset = region >> 16;
+
+    return (((uint32_t *)RCC)[reg_word_offset] >> bit_offset) & 1;
+}
 
 #if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
 
@@ -135,6 +175,58 @@ void BusFault_Handler(void)
 #endif
 
 
+// the region added later will have higher priority
+VSF_CAL_WEAK(vsf_hw_mpu_add_basic_resgions)
+void vsf_hw_mpu_add_basic_resgions(void)
+{
+    vsf_arch_mpu_disable();
+
+    // background, 4G from 0x00000000
+    vsf_arch_mpu_add_region(0x00000000, 0,
+                            VSF_ARCH_MPU_NON_SHARABLE       |
+                            VSF_ARCH_MPU_NON_EXECUTABLE     |
+                            VSF_ARCH_MPU_ACCESS_NO          |
+                            VSF_ARCH_MPU_NON_CACHABLE);
+
+    // System Memory, 64K from 0x1FF00000
+    vsf_arch_mpu_add_region(0x1FF00000, 64 * 1024,
+                            VSF_ARCH_MPU_NON_SHARABLE       |
+                            VSF_ARCH_MPU_NON_EXECUTABLE     |
+                            VSF_ARCH_MPU_ACCESS_READONLY    |
+                            VSF_ARCH_MPU_NON_CACHABLE);
+
+    // AHBs & APBs, 512M from 0x40000000
+    vsf_arch_mpu_add_region(0x40000000, 512 * 1024 * 1024,
+                            VSF_ARCH_MPU_SHARABLE           |
+                            VSF_ARCH_MPU_NON_EXECUTABLE     |
+                            VSF_ARCH_MPU_ACCESS_FULL        |
+                            VSF_ARCH_MPU_NON_CACHABLE);
+
+    // AXI SRAM, 512K from 0x24000000
+    vsf_arch_mpu_add_region(0x24000000, 1 * 1024 * 1024,
+                            VSF_ARCH_MPU_NON_SHARABLE       |
+                            VSF_ARCH_MPU_EXECUTABLE         |
+                            VSF_ARCH_MPU_ACCESS_FULL        |
+                            VSF_ARCH_MPU_CACHABLE_WRITE_THROUGH_NOALLOC);
+
+    // AHB SRAM, 32K from 0x30000000
+    vsf_arch_mpu_add_region(0x30000000, 32 * 1024,
+                            VSF_ARCH_MPU_NON_SHARABLE       |
+                            VSF_ARCH_MPU_EXECUTABLE         |
+                            VSF_ARCH_MPU_ACCESS_FULL        |
+                            VSF_ARCH_MPU_CACHABLE_WRITE_BACK_NOALLOC);
+
+    // User FLASH, 4M from 0x08000000
+    vsf_arch_mpu_add_region(0x08000000, 4 * 1024 * 1024,
+                            VSF_ARCH_MPU_NON_SHARABLE       |
+                            VSF_ARCH_MPU_EXECUTABLE         |
+                            VSF_ARCH_MPU_ACCESS_FULL        |
+                            VSF_ARCH_MPU_CACHABLE_WRITE_THROUGH_NOALLOC);
+
+    vsf_arch_mpu_enable();
+}
+
+
 
 /*! \note initialize device driver
  *  \param none
@@ -144,6 +236,10 @@ void BusFault_Handler(void)
 VSF_CAL_WEAK(vsf_driver_init)
 bool vsf_driver_init(void)
 {
+    SCB_EnableICache();
+    SCB_EnableDCache();
+
+    vsf_hw_mpu_add_basic_resgions();
     return true;
 }
 

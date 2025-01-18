@@ -155,7 +155,6 @@ typedef enum vsf_usart_mode_t {
 
 
     // not supported, allocate unused bits
-    // 6..8
     VSF_USART_6_BIT_LENGTH              = (1 << 20),
     VSF_USART_5_BIT_LENGTH              = (2 << 20),
     VSF_USART_10_BIT_LENGTH             = (3 << 20),

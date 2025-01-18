@@ -59,7 +59,38 @@
 
 /*============================ MACROS ========================================*/
 
-// TODO:
+#define VSF_HW_USART_COUNT              5
+#define VSF_HW_USART_MASK               0x03E
+#define VSF_HW_USART1_REG_BASE          USART1_BASE
+#define VSF_HW_USART1_EN                VSF_HW_EN_USART1
+#define VSF_HW_USART1_RST               VSF_HW_RST_USART1
+#define VSF_HW_USART1_SYNC              true
+#define VSF_HW_USART1_IRQN              USART1_IRQn
+#define VSF_HW_USART1_IRQHandler        USART1_IRQHandler
+#define VSF_HW_USART2_REG_BASE          USART2_BASE
+#define VSF_HW_USART2_EN                VSF_HW_EN_USART2
+#define VSF_HW_USART2_RST               VSF_HW_RST_USART2
+#define VSF_HW_USART2_SYNC              true
+#define VSF_HW_USART2_IRQN              USART2_IRQn
+#define VSF_HW_USART2_IRQHandler        USART2_IRQHandler
+#define VSF_HW_USART3_REG_BASE          USART3_BASE
+#define VSF_HW_USART3_EN                VSF_HW_EN_USART3
+#define VSF_HW_USART3_RST               VSF_HW_RST_USART3
+#define VSF_HW_USART3_SYNC              true
+#define VSF_HW_USART3_IRQN              USART3_IRQn
+#define VSF_HW_USART3_IRQHandler        USART3_IRQHandler
+#define VSF_HW_USART4_REG_BASE          USART4_BASE
+#define VSF_HW_USART4_EN                VSF_HW_EN_USART4
+#define VSF_HW_USART4_RST               VSF_HW_RST_USART4
+#define VSF_HW_USART4_SYNC              true
+#define VSF_HW_USART4_IRQN              USART4_IRQn
+#define VSF_HW_USART4_IRQHandler        USART4_IRQHandler
+#define VSF_HW_USART5_REG_BASE          USART5_BASE
+#define VSF_HW_USART5_EN                0
+#define VSF_HW_USART5_RST               0
+#define VSF_HW_USART5_SYNC              true
+#define VSF_HW_USART5_IRQN              USART5_IRQn
+#define VSF_HW_USART5_IRQHandler        USART5_IRQHandler
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
