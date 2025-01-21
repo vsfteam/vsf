@@ -135,7 +135,7 @@ extern "C" {
 
 typedef uint64_t vsf_systimer_tick_t;
 
-#if __MPU_PRESENT && __ARM_ARCH == 7
+#if /*__MPU_PRESENT && */__ARM_ARCH == 7
 typedef enum vsf_arch_mpu_feature_t {
     // compatible with MPU_RASR definitation
     //                                            MPU_RASR.S
@@ -299,7 +299,7 @@ extern void vsf_arch_add_text_region(vsf_arch_text_region_t *region);
 extern uint_fast16_t vsf_arch_get_callstack(uintptr_t sp, uintptr_t *callstack, uint_fast16_t callstack_num);
 #endif
 
-#if __MPU_PRESENT && __ARM_ARCH == 7
+#if /*__MPU_PRESENT && */__ARM_ARCH == 7
 // if size is 0, means 4G
 extern void vsf_arch_mpu_disable(void);
 extern void vsf_arch_mpu_enable(void);
