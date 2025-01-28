@@ -996,6 +996,29 @@ int time_main(int argc, char *argv[])
     return ret;
 }
 
+int sleep_main(int argc, char *argv[])
+{
+    if (argc != 2) {
+        printf("format: sleep [X[s]/Xm/Xh/Xd]" VSH_LINEEND);
+        return -1;
+    }
+
+    char *unit = NULL;
+    vsf_systimer_tick_t ms = strtoull((const char *)argv[1], &unit, 0) * 1000;
+    switch (unit[0]) {
+    case '\0':
+    case 's':                       break;
+    case 'm':   ms *= 60;           break;
+    case 'h':   ms *= 60 * 60;      break;
+    case 'd':   ms *= 60 * 60 * 24; break;
+    default:
+        fprintf(stderr, "unsupported unit: %s\n", unit);
+        return -1;
+    }
+    vsf_thread_delay_ms(ms);
+    return 0;
+}
+
 #if VSF_LINUX_CFG_SUPPORT_SIG == ENABLED
 int kill_main(int argc, char *argv[])
 {
