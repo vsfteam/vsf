@@ -53,8 +53,6 @@ typedef struct VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) {
     vsf_sdio_isr_t          isr;
     void                   *buf;
     uint32_t                bufsiz;
-    uint32_t                bufpos;
-    uint16_t                block_size;
     bool                    is_to_sync_cache;
 } VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t);
 
@@ -71,17 +69,6 @@ static void VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_irqhandler)(
 
     if (sts & SDIO_STAT_IDMERR) {
         VSF_HAL_ASSERT(false);
-    } else if (sts & SDIO_STAT_IDMAEND) {
-        if (SDIO_IDMACTL(reg) & SDIO_IDMACTL_BUFSEL) {
-            SDIO_IDMAADDR0(reg) = (uint32_t)sdio_ptr->buf + sdio_ptr->bufpos;
-        } else {
-            SDIO_IDMAADDR1(reg) = (uint32_t)sdio_ptr->buf + sdio_ptr->bufpos;
-        }
-        sdio_ptr->bufpos += sdio_ptr->block_size;
-        if (sdio_ptr->bufpos >= sdio_ptr->bufsiz) {
-            SDIO_INTEN(reg) &= ~(SDIO_STAT_IDMERR | SDIO_STAT_IDMAEND);
-        }
-        sts &= ~SDIO_STAT_IDMAEND;
     }
 
     if (sdio_ptr->isr.handler_fn != NULL) {
@@ -109,6 +96,8 @@ vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_init)(
     uint32_t reg = sdio_ptr->reg;
 
     vsf_hw_peripheral_enable(sdio_ptr->en);
+    vsf_hw_peripheral_rst_set(sdio_ptr->rst);
+    vsf_hw_peripheral_rst_clear(sdio_ptr->rst);
 
     SDIO_CLKCTL(reg) &= ~(SDIO_CLKCTL_HWEN | SDIO_CLKCTL_CLKEDGE | SDIO_CLKCTL_BUSMODE | SDIO_CLKCTL_CLKPWRSAV);
     vsf_hw_sdio_set_clock(sdio_ptr, 400000, false);
@@ -241,36 +230,10 @@ vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_request)(
 
         SDIO_DATALEN(reg) = req->count;
         SDIO_DATATO(reg) = 0xFFFFFFFF;
-
-        if (req->count <= (0xFF << 5)) {
-            SDIO_IDMASIZE(reg) = req->count;
-            SDIO_IDMAADDR0(reg) = (uint32_t)req->buffer;
-            SDIO_IDMACTL(reg) = SDIO_IDMA_SINGLE_BUFFER | SDIO_IDMACTL_IDMAEN;
-        } else {
-            if (req->count > 0xFF * 64) {
-                // need IDMA switch, interrupt MUST be enabled
-                VSF_HAL_ASSERT(sdio_ptr->isr.handler_fn != NULL);
-            }
-
-            // calculate a more sutiable block_size
-            block_size <<= 1;
-            while (block_size < (0xFF << 5)) {
-                block_size <<= 1;
-            }
-            block_size >>= 1;
-            sdio_ptr->block_size = block_size;
-            sdio_ptr->bufpos = block_size << 1;
-
-            SDIO_IDMASIZE(reg) = block_size;
-            SDIO_IDMAADDR0(reg) = (uint32_t)req->buffer;
-            SDIO_IDMAADDR1(reg) = (uint32_t)req->buffer + block_size;
-            SDIO_IDMACTL(reg) = SDIO_IDMA_DOUBLE_BUFFER | SDIO_IDMACTL_IDMAEN;
-
-            if (req->count > sdio_ptr->bufpos) {
-                // need buffer switch
-                SDIO_INTEN(reg) |= SDIO_INT_IDMAERR | SDIO_INT_IDMAEND;
-            }
-        }
+        SDIO_IDMASIZE(reg) = block_size;
+        SDIO_IDMAADDR0(reg) = (uint32_t)req->buffer;
+        SDIO_IDMACTL(reg) = SDIO_IDMA_SINGLE_BUFFER | SDIO_IDMACTL_IDMAEN;
+        SDIO_INTEN(reg) |= SDIO_INT_IDMAERR;
 
         datactl |= req->block_size_bits << 4;
     } else {
