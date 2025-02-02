@@ -28,6 +28,10 @@
 #define __VSF_DISP_CLASS_INHERIT__
 #include "component/ui/disp/vsf_disp.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_TGUI_CFG_SV_REFRESH_RATE
@@ -82,7 +86,10 @@ end_def_structure(vsf_tgui_v_port_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

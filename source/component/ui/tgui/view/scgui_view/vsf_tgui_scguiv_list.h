@@ -26,6 +26,10 @@
 
 #include "./vsf_tgui_scguiv_container.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define vsf_tgui_list_v_render              vsf_tgui_container_v_render
@@ -40,7 +44,10 @@
 
 extern fsm_rt_t vsf_tgui_list_v_init(vsf_tgui_t* gui_ptr, vsf_tgui_list_t* list_ptr);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

@@ -30,6 +30,10 @@
 
 #include "./scgui.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 declare_class(vsf_tgui_t)
 
 /*============================ MACROS ========================================*/
@@ -110,6 +114,10 @@ extern void vsf_tgui_control_v_draw_tile(vsf_tgui_t* gui_ptr,
                                          vsf_tgui_region_t* ptPlacedRegion,
                                          vsf_tgui_v_color_t color,
                                          vsf_tgui_v_color_t bg_color);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

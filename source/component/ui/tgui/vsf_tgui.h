@@ -69,6 +69,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -266,6 +270,10 @@ bool __vk_tgui_send_gesture_evt(vsf_tgui_t *tgui_ptr,
                                 vsf_evt_t   msg,
                                 vsf_tgui_location_t delta,
                                 int32_t duration );
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 /*============================ INCLUDES ======================================*/

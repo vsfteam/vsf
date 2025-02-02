@@ -53,6 +53,10 @@
 
 #include VSF_TGUI_V_TEMPLATE_HEADER_FILE
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -115,7 +119,10 @@ extern uint8_t vsf_tgui_font_get_char_width(const uint8_t font_index, uint32_t c
 extern void vsf_tgui_font_release_char(const uint8_t font_index, uint32_t char_u32, void *bitmap);
 extern void * vsf_tgui_font_get_char(const uint8_t font_index, uint32_t char_u32, vsf_tgui_region_t *char_region_ptr);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

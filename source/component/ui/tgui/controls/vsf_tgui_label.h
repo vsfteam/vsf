@@ -54,6 +54,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #   define __VSF_TGUI_INTERFACE_CONTROLS_LABEL           {                      \
@@ -164,6 +168,10 @@ fsm_rt_t vk_tgui_label_update(vsf_tgui_label_t* ptLabel);
 extern
 void vsf_tgui_label_set_text(   vsf_tgui_label_t* ptLabel,
                                 VSF_TGUI_CFG_STRING_TYPE *pstrText);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

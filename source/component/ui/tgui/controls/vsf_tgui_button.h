@@ -53,6 +53,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 
@@ -157,6 +161,10 @@ fsm_rt_t vk_tgui_button_update(vsf_tgui_button_t* ptButton);
 extern
 fsm_rt_t vsf_tgui_button_msg_handler(   vsf_tgui_button_t* control_ptr,
                                         vsf_tgui_msg_t* ptMSG);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

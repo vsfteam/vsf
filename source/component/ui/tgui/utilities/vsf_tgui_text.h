@@ -19,10 +19,17 @@
 #define __VSF_TINY_GUI_V_TEXT_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "../vsf_tgui_cfg.h"
 
 #if VSF_USE_TINY_GUI == ENABLED
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
+
 #ifndef VSF_TGUI_CFG_SUPPORT_SV_MULTI_LINE_TEXT
 #   define VSF_TGUI_CFG_SUPPORT_SV_MULTI_LINE_TEXT           ENABLED
 #endif
@@ -52,7 +59,10 @@ vsf_tgui_size_t vsf_tgui_text_get_size( const uint8_t font_index,
 extern
 uint32_t vsf_tgui_text_get_next(const char* pchString, size_t* ptSize);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

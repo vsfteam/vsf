@@ -56,6 +56,9 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 
@@ -258,6 +261,10 @@ int_fast16_t vk_tgui_list_selected_item_get(vsf_tgui_list_t* ptList);
 extern
 int_fast16_t vk_tgui_list_selected_item_set(vsf_tgui_list_t* ptList,
                                             uint_fast8_t chSelectIndex);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

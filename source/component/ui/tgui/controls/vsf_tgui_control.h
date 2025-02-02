@@ -66,6 +66,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define __VSF_TGUI_INTERFACE_CONTROLS_CONTROL         {                         \
@@ -857,6 +861,10 @@ fsm_rt_t vk_tgui_control_update(vsf_tgui_control_t* control_ptr);
 
 extern
 fsm_rt_t vk_tgui_container_update(vsf_tgui_container_t* container_ptr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

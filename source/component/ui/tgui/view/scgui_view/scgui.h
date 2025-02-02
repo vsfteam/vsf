@@ -4,6 +4,10 @@
 #include "vsf_cfg.h"
 #include "./lvgl.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef LCD_SCREEN_WIDTH
 #   define  LCD_SCREEN_WIDTH   1024
 #endif
@@ -232,4 +236,7 @@ int SC_pfb_printf(SC_tile *dest, int x,int y,const char* txt,uint16_t fc,uint16_
 #define C_WHITE                        0xFFFF
 #define C_BLACK                        0x0000
 
+#ifdef __cplusplus
+}
+#endif
 #endif

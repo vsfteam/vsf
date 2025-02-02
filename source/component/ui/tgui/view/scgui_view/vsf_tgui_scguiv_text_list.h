@@ -27,6 +27,10 @@
 #include "./vsf_tgui_scguiv_container.h"
 #include "./vsf_tgui_scguiv_label.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define vsf_tgui_text_list_v_post_render    vsf_tgui_container_v_post_render
@@ -44,7 +48,10 @@ extern fsm_rt_t vsf_tgui_text_list_v_render(vsf_tgui_t *gui_ptr,
                                             vsf_tgui_region_t* dirty_region_ptr,
                                             vsf_tgui_control_refresh_mode_t mode);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

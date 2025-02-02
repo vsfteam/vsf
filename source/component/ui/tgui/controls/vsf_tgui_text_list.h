@@ -58,6 +58,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define __VSF_TGUI_INTERFACE_CONTROLS_TEXT_LIST           {                     \
@@ -190,6 +194,10 @@ int_fast16_t vsf_tgui_text_list_select_get(vsf_tgui_text_list_t* ptTextList);
 extern
 void vsf_tgui_text_list_select_set( vsf_tgui_text_list_t* ptTextList,
                                     int_fast16_t iSelect);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

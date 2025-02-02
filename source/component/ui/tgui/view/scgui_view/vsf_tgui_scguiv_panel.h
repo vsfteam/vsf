@@ -27,6 +27,10 @@
 #include "./vsf_tgui_scguiv_label.h"
 #include "./vsf_tgui_scguiv_container.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define vsf_tgui_panel_v_post_render        vsf_tgui_container_v_post_render
@@ -42,13 +46,16 @@ static inline fsm_rt_t vsf_tgui_panel_v_render(vsf_tgui_t *gui_ptr,
                                     vsf_tgui_region_t* dirty_region_ptr,
                                     vsf_tgui_control_refresh_mode_t mode)
 {
-    return vsf_tgui_container_v_render(gui_ptr, &panel_ptr->use_as__vsf_tgui_container_t, dirty_region_ptr, mode);
+    return vsf_tgui_container_v_render(gui_ptr, (vsf_tgui_container_t *)panel_ptr, dirty_region_ptr, mode);
 }
 
 extern fsm_rt_t vsf_tgui_panel_v_init(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* ptPanel);
 extern fsm_rt_t vsf_tgui_panel_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* panel_ptr);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

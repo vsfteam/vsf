@@ -26,6 +26,10 @@
 
 #include "../../controls/vsf_tgui_controls.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -48,6 +52,10 @@ extern fsm_rt_t vsf_tgui_control_v_update(vsf_tgui_t* gui_ptr, vsf_tgui_control_
 
 extern bool __vk_tgui_control_v_is_transparent_in_region(
             vsf_tgui_control_t *control_ptr, vsf_tgui_region_t* region_ptr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

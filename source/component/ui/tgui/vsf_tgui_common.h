@@ -39,7 +39,13 @@
 
 #if VSF_USE_TINY_GUI == ENABLED
 #include "osa_service/vsf_osa_service.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
+
 #define VSF_TGUI_COLORSIZE_1BIT     0
 #define VSF_TGUI_COLORSIZE_4BIT     2
 #define VSF_TGUI_COLORSIZE_8BIT     3
@@ -610,7 +616,10 @@ extern
 void vsf_tgui_text_set( vsf_tgui_text_info_t *ptTextInfo,
                         VSF_TGUI_CFG_STRING_TYPE *pstrNew);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

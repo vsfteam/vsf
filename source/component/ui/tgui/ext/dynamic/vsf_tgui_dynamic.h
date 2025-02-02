@@ -22,6 +22,10 @@
 
 #if VSF_TGUI_CFG_DYNAMIC == ENABLED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -109,6 +113,10 @@ extern vsf_tgui_button_t * vsf_tgui_button_new(char *name);
 
 #define vsf_tgui_list_get_child(__list)                                         \
         ((vsf_tgui_control_t *) (((vsf_tgui_container_t *)((__list)->node_ptr))->node_ptr) )
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

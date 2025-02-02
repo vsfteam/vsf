@@ -36,11 +36,17 @@
 #define __VSF_MSG_TREE_USER_CFG_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "osa_service/vsf_osa_service.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
 typedef enum vsf_msgt_node_id_t {
 /*-------------Add your own gui element below-------------*/
     VSF_TGUI_COMPONENT_ID_CONTROL   = 0,
@@ -56,12 +62,16 @@ typedef enum vsf_msgt_node_id_t {
 
 
 /*============================ GLOBAL VARIABLES ==============================*/
+
 extern
 const i_msg_tree_node_t
 c_tControlInterfaces[__VSF_TGUI_COMPONENT_TYPE_NUM];
 
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 /* EOF */

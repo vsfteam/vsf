@@ -49,6 +49,10 @@
 #include "vsf_tgui_list.h"
 #include "vsf_tgui_text_list.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -72,7 +76,11 @@ vsf_tgui_location_t * vsf_tgui_region_get_relative_location(
                                         vsf_tgui_location_t *ptOutLocation,
                                         vsf_tgui_location_t *ptReferenceLocation,
                                         vsf_tgui_location_t *ptAbsoluteLocation);
+
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

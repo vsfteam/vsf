@@ -26,6 +26,10 @@
 
 #include "./vsf_tgui_scguiv_label.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define vsf_tgui_button_v_init              vsf_tgui_label_v_init
@@ -38,7 +42,10 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

@@ -27,6 +27,10 @@
 #include "./vsf_tgui_scguiv_control.h"
 #include "../../utilities/vsf_tgui_text.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #define vsf_tgui_label_v_init                   vsf_tgui_control_v_init
@@ -48,7 +52,10 @@ extern uint8_t __vk_tgui_label_v_get_font(vsf_tgui_label_t* label_ptr);
 extern vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* label_ptr);
 extern int_fast16_t __vk_tgui_label_get_line_height( const vsf_tgui_label_t* label_ptr);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

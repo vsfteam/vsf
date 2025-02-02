@@ -56,7 +56,12 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
+
 #if VSF_TGUI_CFG_SUPPORT_TIMER == DISABLED
 #   error tgui_slider depends on tgui_timer service, please either enable \
 tgui_timer by setting VSF_TGUI_CFG_SUPPORT_TIMER to ENABLED or disable \
@@ -137,6 +142,10 @@ int_fast16_t vk_tgui_slider_location_get_distance( __vk_tgui_slider_t *ptSlider)
 
 extern
 int_fast16_t vk_tgui_slider_reset(__vk_tgui_slider_t *ptSlider);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif

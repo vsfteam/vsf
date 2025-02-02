@@ -30,6 +30,10 @@
 
 #include "component/ui/disp/vsf_disp.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -101,6 +105,10 @@ extern bool vsf_tgui_fonts_init(vsf_tgui_font_t *font_ptr, size_t font_num, cons
 // common APIs for view
 
 extern void vsf_tgui_v_bind_disp(vsf_tgui_t *gui_ptr, vk_disp_t *disp, void *pfb, size_t pfb_size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 #endif
