@@ -34,7 +34,7 @@ extern int export_main(int argc, char *argv[]);
 #endif
 #if     (VSF_LINUX_CFG_HEAP_SIZE > 0)                                           \
     ||  (   (VSF_HEAP_CFG_STATISTICS == ENABLED)                                \
-        &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                              \
+        &&  (   (VSF_USE_ARCH_HEAP != ENABLED)                                  \
             ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED)))
 extern int free_main(int argc, char *argv[]);
 #endif
@@ -101,7 +101,7 @@ int busybox_install(void)
 #   endif
 #   if (VSF_LINUX_CFG_HEAP_SIZE > 0)                                            \
     ||  (   (VSF_HEAP_CFG_STATISTICS == ENABLED)                                \
-        &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                              \
+        &&  (   (VSF_USE_ARCH_HEAP != ENABLED)                                  \
             ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED)))
         ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/free", free_main) < 0
 #   endif

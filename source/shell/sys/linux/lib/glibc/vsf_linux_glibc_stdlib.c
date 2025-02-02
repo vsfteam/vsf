@@ -163,6 +163,14 @@ void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size,
         void *new_buff;
 
         if (total_size > size) {
+#if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
+            if (NULL == process) {
+                process = vsf_linux_get_cur_process();
+            }
+//            vsf_trace_debug("0x%p: -%d 0x%p\n", process, node->size, p);
+//            vsf_trace_debug("0x%p: +%d 0x%p\n", process, size, p);
+            process->heap_monitor.usage += size - node->size;
+#endif
             node->size = size;
             new_buff = p;
         } else {

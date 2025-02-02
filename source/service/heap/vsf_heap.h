@@ -51,13 +51,25 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#if !defined(VSF_HEAP_SIZE) && VSF_ARCH_PROVIDE_HEAP != ENABLED && !defined(__VSF_APPLET__)
+#if VSF_ARCH_PROVIDE_HEAP == ENABLED
+#   ifndef VSF_USE_ARCH_HEAP
+#       define VSF_USE_ARCH_HEAP            ENABLED
+#   endif
+#else
+#   if VSF_USE_ARCH_HEAP == ENABLED
+#       warning VSF_USE_ARCH_HEAP is enabled, but arch does not provide heap
+#       undef VSF_USE_ARCH_HEAP
+#   endif
+#   define VSF_USE_ARCH_HEAP                DISABLED
+#endif
+
+#if !defined(VSF_HEAP_SIZE) && VSF_USE_ARCH_HEAP != ENABLED && !defined(__VSF_APPLET__)
 #   warning VSF_HEAP_SIZE is not defined, use 128K as default
-#   define VSF_HEAP_SIZE    (128 * 1024)
+#   define VSF_HEAP_SIZE                    (128 * 1024)
 #endif
 
 #ifndef VSF_HEAP_ALIGN
-#   define VSF_HEAP_ALIGN   (2 * sizeof(uintalu_t))
+#   define VSF_HEAP_ALIGN                   (2 * sizeof(uintalu_t))
 #endif
 
 #if VSF_HEAP_CFG_TRACE == ENABLED
@@ -127,7 +139,7 @@ declare_interface(i_heap_t)
 //! \name vsf heap interface
 //! @{
 def_interface(i_heap_t)
-#if VSF_ARCH_PROVIDE_HEAP != ENABLED
+#if VSF_USE_ARCH_HEAP != ENABLED
     void (*Init)            (void);
     void (*AddBuffer)       (uint8_t *buffer, uint_fast32_t size);
     void (*AddMemory)       (vsf_mem_t mem);
@@ -138,7 +150,7 @@ def_interface(i_heap_t)
     void *(*Realloc)        (void *buffer, uint_fast32_t size);
     void (*Free)            (void *buffer);
 #if     (VSF_HEAP_CFG_STATISTICS == ENABLED)                                    \
-    &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                                  \
+    &&  (   (VSF_USE_ARCH_HEAP != ENABLED)                                      \
         ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED))
     void (*Statistics)      (vsf_heap_statistics_t *statistics);
 #endif
@@ -161,7 +173,7 @@ extern uint_fast32_t __vsf_heap_size(vsf_heap_t *heap, void *buffer);
 extern void __vsf_heap_statistics(vsf_heap_t *heap, vsf_heap_statistics_t *statistics);
 #endif
 
-#if VSF_ARCH_PROVIDE_HEAP != ENABLED
+#if VSF_USE_ARCH_HEAP != ENABLED
 // default heap
 extern void vsf_heap_init(void);
 /*!\note: vsf_heap_add_buffer and vsf_heap_add_memory cannot add misaligned memory spaces.
@@ -172,7 +184,7 @@ extern void vsf_heap_add_buffer(uint8_t *buffer, uint_fast32_t size);
 extern void vsf_heap_add_memory(vsf_mem_t mem);
 #endif
 #if     (VSF_HEAP_CFG_STATISTICS == ENABLED)                                    \
-    &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                                  \
+    &&  (   (VSF_USE_ARCH_HEAP != ENABLED)                                      \
         ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED))
 extern void vsf_heap_statistics(vsf_heap_statistics_t *statistics);
 #endif

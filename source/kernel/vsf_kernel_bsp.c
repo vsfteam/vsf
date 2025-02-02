@@ -290,7 +290,7 @@ will be forced to DISABLED.
 #endif
 }
 
-#if VSF_USE_HEAP == ENABLED && VSF_ARCH_PROVIDE_HEAP != ENABLED
+#if VSF_USE_HEAP == ENABLED && VSF_USE_ARCH_HEAP != ENABLED
 VSF_CAL_WEAK(vsf_service_req___heap_memory_buffer___from_usr)
 vsf_mem_t vsf_service_req___heap_memory_buffer___from_usr(void)
 {
@@ -394,7 +394,7 @@ void __cmain(void)
     ||  __IS_COMPILER_ARM_COMPILER_5__                                          \
     ||  __IS_COMPILER_ARM_COMPILER_6__
 
-#if defined(__VSF_CPP__) && VSF_USE_HEAP == ENABLED && VSF_ARCH_PROVIDE_HEAP != ENABLED
+#if defined(__VSF_CPP__) && VSF_USE_HEAP == ENABLED && VSF_USE_ARCH_HEAP != ENABLED
 #   if __IS_COMPILER_SUPPORT_GNUC_EXTENSION__
 __attribute__((constructor(0)))
 #   endif

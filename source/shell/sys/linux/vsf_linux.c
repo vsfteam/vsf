@@ -4720,7 +4720,7 @@ int sysinfo(struct sysinfo *info)
     vsf_heap_statistics_t heap_statistics;
 #   if VSF_LINUX_CFG_HEAP_SIZE > 0
     __vsf_heap_statistics(&__vsf_linux_heap.use_as__vsf_heap_t, &heap_statistics);
-#   elif VSF_ARCH_PROVIDE_HEAP != ENABLED || VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED
+#   elif VSF_USE_ARCH_HEAP != ENABLED || VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED
     vsf_heap_statistics(&heap_statistics);
 #   endif
     info->totalram = heap_statistics.all_size;

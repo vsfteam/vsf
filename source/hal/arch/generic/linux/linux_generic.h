@@ -66,9 +66,7 @@ extern "C" {
 
 #define VSF_ARCH_STACK_PAGE_SIZE        4096
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
-#ifndef VSF_ARCH_PROVIDE_HEAP
-#   define VSF_ARCH_PROVIDE_HEAP        ENABLED
-#endif
+#define VSF_ARCH_PROVIDE_HEAP           ENABLED
 #define VSF_ARCH_PROVIDE_ARGU           ENABLED
 #define VSF_ARCH_PROVIDE_EXE            ENABLED
 

@@ -14,7 +14,7 @@
 #   include "../../../include/linux/limits.h"
 #   if  (VSF_LINUX_CFG_HEAP_SIZE > 0)                                           \
     ||  (   (VSF_HEAP_CFG_STATISTICS == ENABLED)                                \
-        &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                              \
+        &&  (   (VSF_USE_ARCH_HEAP != ENABLED)                                  \
             ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED)))
 #       include "../../../include/sys/sysinfo.h"
 #   endif
@@ -29,7 +29,7 @@
 #   include <linux/limits.h>
 #   if  (VSF_LINUX_CFG_HEAP_SIZE > 0)                                           \
     ||  (   (VSF_HEAP_CFG_STATISTICS == ENABLED)                                \
-        &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                              \
+        &&  (   (VSF_USE_ARCH_HEAP != ENABLED)                                  \
             ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED)))
 // for sysinfo to get heap usage
 #       include <sys/sysinfo.h>
@@ -1052,7 +1052,7 @@ int kill_main(int argc, char *argv[])
 
 #if     (VSF_LINUX_CFG_HEAP_SIZE > 0)                                           \
     ||  (   (VSF_HEAP_CFG_STATISTICS == ENABLED)                                \
-        &&  (   (VSF_ARCH_PROVIDE_HEAP != ENABLED)                              \
+        &&  (   (VSF_USE_ARCH_HEAP != ENABLED)                                  \
             ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED)))
 int free_main(int argc, char *argv[])
 {

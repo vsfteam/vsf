@@ -1188,7 +1188,6 @@ void vsf_arch_reset(void)
  * Heap Implementation                                                        *
  *----------------------------------------------------------------------------*/
 
-#if VSF_ARCH_PROVIDE_HEAP == ENABLED
 typedef struct vsf_arch_heap_mcb_t {
     void *ptr;
     uint_fast32_t alignment;
@@ -1260,7 +1259,6 @@ uint_fast32_t vsf_arch_heap_size(void *buffer)
     vsf_arch_heap_mcb_t *mcb = &((vsf_arch_heap_mcb_t *)buffer)[-1];
     return mcb->memory_size;
 }
-#endif
 
 /*----------------------------------------------------------------------------*
  * Execute                                                                    *

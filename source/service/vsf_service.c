@@ -52,7 +52,7 @@ extern vsf_mem_t vsf_service_req___heap_memory_buffer___from_usr(void);
 VSF_CAL_WEAK(vsf_service_init)
 void vsf_service_init(void)
 {
-#if VSF_USE_HEAP == ENABLED && VSF_ARCH_PROVIDE_HEAP != ENABLED
+#if VSF_USE_HEAP == ENABLED && VSF_USE_ARCH_HEAP != ENABLED
 // if cpp is supported, vsf_heap_init should be called before static c++ instances are created
 #   ifndef __VSF_CPP__
     vsf_heap_init();
