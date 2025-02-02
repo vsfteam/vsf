@@ -19,6 +19,7 @@
 #define __VSF_TINY_GUI_V_PANEL_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "../../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
@@ -26,6 +27,10 @@
 
 #include "./vsf_tgui_sv_label.h"
 #include "./vsf_tgui_sv_container.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -52,7 +57,10 @@ extern fsm_rt_t vsf_tgui_panel_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* p
 
 extern fsm_rt_t vsf_tgui_panel_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_panel_t* panel_ptr);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

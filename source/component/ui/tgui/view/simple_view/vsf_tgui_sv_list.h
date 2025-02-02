@@ -19,6 +19,7 @@
 #define __VSF_TINY_GUI_V_LIST_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "../../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
@@ -26,6 +27,10 @@
     &&  VSF_TGUI_CFG_SUPPORT_LIST == ENABLED
 
 #include "./vsf_tgui_sv_container.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -51,7 +56,10 @@ extern fsm_rt_t vsf_tgui_list_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_list_t* lis
 
 extern fsm_rt_t vsf_tgui_list_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_list_t* list_ptr);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

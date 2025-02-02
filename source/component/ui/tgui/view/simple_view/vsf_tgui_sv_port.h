@@ -19,12 +19,17 @@
 #define __VSF_TINY_GUI_V_PORT_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "../../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 
 #include "./vsf_tgui_sv_color.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 
@@ -66,7 +71,10 @@ void vsf_tgui_sv_port_draw_root_tile(vsf_tgui_t* gui_ptr,
                         vsf_tgui_v_color_t color,
                         vsf_tgui_v_color_t bg_color);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

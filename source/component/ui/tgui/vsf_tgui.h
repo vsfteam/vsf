@@ -36,6 +36,7 @@
 #define __VSF_TINY_GUI_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "./vsf_tgui_cfg.h"
 
 #if VSF_USE_TINY_GUI == ENABLED

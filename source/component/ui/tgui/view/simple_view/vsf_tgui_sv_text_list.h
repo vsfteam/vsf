@@ -19,6 +19,7 @@
 #define __VSF_TINY_GUI_V_TEXT_LIST_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "../../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
@@ -27,6 +28,10 @@
 
 #include "./vsf_tgui_sv_container.h"
 #include "./vsf_tgui_sv_label.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -55,7 +60,10 @@ fsm_rt_t vsf_tgui_text_list_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_text_list_t* 
 extern
 fsm_rt_t vsf_tgui_text_list_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_text_list_t* text_list_ptr);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

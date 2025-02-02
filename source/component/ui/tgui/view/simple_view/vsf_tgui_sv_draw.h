@@ -19,6 +19,7 @@
 #define __VSF_TINY_GUI_V_DRAW_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "../../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
@@ -27,6 +28,9 @@
 #include "../../controls/vsf_tgui_controls.h"
 #include "./vsf_tgui_sv_control.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -58,7 +62,10 @@ extern void vsf_tgui_control_v_draw_text(vsf_tgui_t* gui_ptr,
                                          const vsf_tgui_v_color_t color,
                                          const vsf_tgui_align_mode_t mode);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

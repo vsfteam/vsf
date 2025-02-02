@@ -19,9 +19,15 @@
 #define __VSF_TINY_GUI_COLOR_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "../../vsf_tgui_cfg.h"
 
 #if VSF_USE_TINY_GUI == ENABLED
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_TGUI_SV_CFG_COLOR_HAS_ALPHA
@@ -211,7 +217,10 @@ extern vsf_tgui_sv_color_rgb565_t   vsf_tgui_sv_color_to_rgb565(vsf_tgui_v_color
 extern vsf_tgui_sv_color_bgr565_t   vsf_tgui_sv_color_to_bgr565(vsf_tgui_v_color_t color);
 #endif
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

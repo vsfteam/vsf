@@ -33,6 +33,7 @@
 ****************************************************************************/
 
  /*============================ INCLUDES ======================================*/
+
 //! \note do not move this pre-processor statement to other places
 #include "../vsf_ui_cfg.h"
 
@@ -40,6 +41,7 @@
 #define __VSF_TINY_GUI_CFG_H__
 
 #if VSF_USE_TINY_GUI == ENABLED
+
 /*============================ MACROS ========================================*/
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L

@@ -19,6 +19,7 @@
 #define __VSF_TINY_GUI_V_LABEL_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "../../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
@@ -26,6 +27,10 @@
 
 #include "./vsf_tgui_sv_control.h"
 #include "../../utilities/vsf_tgui_text.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -48,7 +53,10 @@ extern uint8_t __vk_tgui_label_v_get_font(vsf_tgui_label_t* label_ptr);
 extern vsf_tgui_size_t __vk_tgui_label_v_get_minimal_rendering_size(vsf_tgui_label_t* label_ptr);
 extern int_fast16_t __vk_tgui_label_get_line_height( const vsf_tgui_label_t* label_ptr);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

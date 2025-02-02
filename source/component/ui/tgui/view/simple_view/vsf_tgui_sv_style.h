@@ -19,11 +19,16 @@
 #define __VSF_TINY_GUI_V_STYLE_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "../../vsf_tgui_cfg.h"
 
 #if VSF_USE_TINY_GUI == ENABLED
 
 #include "./vsf_tgui_sv_color.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -31,7 +36,10 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

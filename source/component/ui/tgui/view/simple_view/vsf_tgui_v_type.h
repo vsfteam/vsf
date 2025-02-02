@@ -19,6 +19,7 @@
 #define __VSF_TINY_GUI_V_TMPLATE_TYPE_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "../../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
@@ -27,6 +28,10 @@
 #include "./vsf_tgui_sv_color.h"
 
 #include "../../port/view/vsf_tgui_sv_port.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 
@@ -297,7 +302,10 @@ end_def_structure(vsf_tgui_v_text_list_t)
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

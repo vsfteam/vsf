@@ -371,7 +371,8 @@ static fsm_rt_t __on_top_panel_time(vsf_tgui_control_t* node_ptr,
     sprintf(ptPanel->chTimeBuffer, "%02d:%02d:%02d",  chMinute, chSecond, ch10Ms);
 
     //! update existing text content
-    vsf_tgui_text_set(&(ptPanel->tLeftContainer.tTime.tLabel), &(ptPanel->tLeftContainer.tTime.tLabel.tString));
+    vsf_tgui_text_set(&(ptPanel->tLeftContainer.tTime.tLabel),
+                        (const char *)&(ptPanel->tLeftContainer.tTime.tLabel.tString));
 
     vk_tgui_refresh_ex(ptPanel->use_as__vsf_tgui_panel_t.gui_ptr,
                         (vsf_tgui_control_t *)&(ptPanel->tLeftContainer.tTime), NULL);

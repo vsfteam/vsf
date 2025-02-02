@@ -19,12 +19,17 @@
 #define __VSF_TINY_GUI_V_CONTAINER_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "../../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SIMPLE_VIEW
 
 #include "./vsf_tgui_sv_control.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -52,7 +57,10 @@ fsm_rt_t vsf_tgui_container_v_depose(vsf_tgui_t* gui_ptr, vsf_tgui_container_t* 
 extern
 fsm_rt_t vsf_tgui_container_v_update(vsf_tgui_t* gui_ptr, vsf_tgui_container_t* container_ptr);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */

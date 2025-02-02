@@ -26,6 +26,10 @@
 
 #include "./vsf_tgui_sv_label.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -43,7 +47,10 @@ extern fsm_rt_t vsf_tgui_button_v_depose(vsf_tgui_t *gui_ptr, vsf_tgui_button_t*
 
 extern fsm_rt_t vsf_tgui_button_v_update(vsf_tgui_t *gui_ptr, vsf_tgui_button_t* button_ptr);
 
+#ifdef __cplusplus
+}
 #endif
 
+#endif
 #endif
 /* EOF */
