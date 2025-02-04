@@ -155,18 +155,42 @@ extern "C" {
 #define bswap32                             bswap_32
 #define bswap64                             bswap_64
 #if __BYTE_ORDER == __BIG_ENDIAN
-#   define htobe16
-#   define htole16                          bswap_16
-#   define be16toh
-#   define le16toh                          bswap_16
-#   define htobe32
-#   define htole32                          bswap_32
-#   define be32toh
-#   define le32toh                          bswap_32
-#   define htobe64
-#   define htole64                          bswap_64
-#   define be64toh
-#   define le64toh                          bswap_64
+#   ifndef htobe16
+#       define htobe16
+#   endif
+#   ifndef htole16
+#       define htole16                      bswap_16
+#   endif
+#   ifndef be16toh
+#       define be16toh
+#   endif
+#   ifndef le16toh
+#       define le16toh                      bswap_16
+#   endif
+#   ifndef htobe32
+#       define htobe32
+#   endif
+#   ifndef htole32
+#       define htole32                      bswap_32
+#   endif
+#   ifndef be32toh
+#       define be32toh
+#   endif
+#   ifndef le32toh
+#       define le32toh                      bswap_32
+#   endif
+#   ifndef htobe64
+#       define htobe64
+#   endif
+#   ifndef htole64
+#       define htole64                      bswap_64
+#   endif
+#   ifndef be64toh
+#       define be64toh
+#   endif
+#   ifndef le64toh
+#       define le64toh                      bswap_64
+#   endif
 
 #   define cpu_to_le16                      bswap_16
 #   define cpu_to_le32                      bswap_32
@@ -194,18 +218,42 @@ extern "C" {
 #   define __constant_cpu_to_be64
 #   define __constant_be64_to_cpu
 #else
-#   define htobe16                          bswap_16
-#   define htole16
-#   define be16toh                          bswap_16
-#   define le16toh
-#   define htobe32                          bswap_32
-#   define htole32
-#   define be32toh                          bswap_32
-#   define le32toh
-#   define htobe64                          bswap_64
-#   define htole64
-#   define be64toh                          bswap_64
-#   define le64toh
+#   ifndef htobe16
+#       define htobe16                      bswap_16
+#   endif
+#   ifndef htole16
+#       define htole16
+#   endif
+#   ifndef be16toh
+#       define be16toh                      bswap_16
+#   endif
+#   ifndef le16toh
+#       define le16toh
+#   endif
+#   ifndef htobe32
+#       define htobe32                      bswap_32
+#   endif
+#   ifndef htole32
+#       define htole32
+#   endif
+#   ifndef be32toh
+#       define be32toh                      bswap_32
+#   endif
+#   ifndef le32toh
+#       define le32toh
+#   endif
+#   ifndef htobe64
+#       define htobe64                      bswap_64
+#   endif
+#   ifndef htole64
+#       define htole64
+#   endif
+#   ifndef be64toh
+#       define be64toh                      bswap_64
+#   endif
+#   ifndef le64toh
+#       define le64toh
+#   endif
 
 #   define cpu_to_le16
 #   define cpu_to_le32
