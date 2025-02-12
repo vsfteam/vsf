@@ -29,20 +29,47 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-// multi-class support enabled by default for maximum availability.
+/**
+ * \~english
+ * @brief Enable multi-class support by default for maximum availability
+ *
+ * \~chinese
+ * @brief 默认启用多类特性支持以获得最大可用性
+ */
 #ifndef VSF_SDIO_CFG_MULTI_CLASS
-#   define VSF_SDIO_CFG_MULTI_CLASS                 ENABLED
+#   define VSF_SDIO_CFG_MULTI_CLASS              ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Define SDIO hardware mask if count is defined
+ *
+ * \~chinese
+ * @brief 如果定义了SDIO硬件数量,则定义对应的掩码
+ */
 #if defined(VSF_HW_SDIO_COUNT) && !defined(VSF_HW_SDIO_MASK)
-#   define VSF_HW_SDIO_MASK                         VSF_HAL_COUNT_TO_MASK(VSF_HW_SDIO_COUNT)
+#   define VSF_HW_SDIO_MASK             VSF_HAL_COUNT_TO_MASK(VSF_HW_SDIO_COUNT)
 #endif
 
+/**
+ * \~english
+ * @brief Define SDIO hardware count if mask is defined
+ *
+ * \~chinese
+ * @brief 如果定义了SDIO硬件掩码，则定义对应的数量
+ */
 #if defined(VSF_HW_SDIO_MASK) && !defined(VSF_HW_SDIO_COUNT)
-#   define VSF_HW_SDIO_COUNT                        VSF_HAL_MASK_TO_COUNT(VSF_HW_SDIO_MASK)
+#   define VSF_HW_SDIO_COUNT            VSF_HAL_MASK_TO_COUNT(VSF_HW_SDIO_MASK)
 #endif
 
-// application code can redefine it
+/**
+ * \~english
+ * @brief We can redefine macro VSF_SDIO_CFG_PREFIX to specify a prefix
+ * to call a specific driver directly in the application code.
+ * \~chinese
+ * @brief 可重新定义宏 VSF_SDIO_CFG_PREFIX，以在应用代码中直接调用
+ * 特定驱动。
+ */
 #ifndef VSF_SDIO_CFG_PREFIX
 #   if VSF_SDIO_CFG_MULTI_CLASS == ENABLED
 #       define VSF_SDIO_CFG_PREFIX                  vsf
@@ -53,38 +80,104 @@ extern "C" {
 #   endif
 #endif
 
+/**
+ * \~english
+ * @brief Disable VSF_SDIO_CFG_FUNCTION_RENAME to use the original function
+ * names (e.g., vsf_sdio_init()).
+ *
+ * \~chinese
+ * @brief 禁用 VSF_SDIO_CFG_FUNCTION_RENAME 以使用原始函数名
+ * (例如 vsf_sdio_init())
+ */
 #ifndef VSF_SDIO_CFG_FUNCTION_RENAME
 #   define VSF_SDIO_CFG_FUNCTION_RENAME             ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable macro VSF_SDIO_CFG_REIMPLEMENT_TYPE_MODE in specific hardware
+ * drivers to redefine enum @ref vsf_sdio_mode_t.
+ *
+ * \~chinese
+ * @brief 在具体硬件驱动中，我们可以启用宏 VSF_SDIO_CFG_REIMPLEMENT_TYPE_MODE
+ * 来重新定义枚举 @ref vsf_sdio_mode_t
+ */
 #ifndef VSF_SDIO_CFG_REIMPLEMENT_TYPE_MODE
 #   define VSF_SDIO_CFG_REIMPLEMENT_TYPE_MODE       DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief In specific hardware driver, we can enable macro
+ * VSF_SDIO_CFG_REIMPLEMENT_TYPE_IRQ_MASK to redefine enum
+ * @ref vsf_sdio_irq_mask_t.
+ *
+ * \~chinese
+ * @brief 在具体硬件驱动中，我们可以启用宏 VSF_SDIO_CFG_REIMPLEMENT_TYPE_IRQ_MASK
+ * 来重新定义枚举 @ref vsf_sdio_irq_mask_t。
+ */
 #ifndef VSF_SDIO_CFG_REIMPLEMENT_TYPE_IRQ_MASK
 #   define VSF_SDIO_CFG_REIMPLEMENT_TYPE_IRQ_MASK   DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief In specific hardware driver, we can enable macro
+ * VSF_SDIO_CFG_REIMPLEMENT_TYPE_STATUS to redefine struct
+ * @ref vsf_sdio_status_t.
+ *
+ * \~chinese
+ * @brief 在具体硬件驱动中，我们可以启用宏 VSF_SDIO_CFG_REIMPLEMENT_TYPE_STATUS
+ * 来重新定义结构体 @ref vsf_sdio_status_t。
+ */
 #ifndef VSF_SDIO_CFG_REIMPLEMENT_TYPE_STATUS
 #   define VSF_SDIO_CFG_REIMPLEMENT_TYPE_STATUS     DISABLED
 #endif
 
-//! Redefine struct vsf_sdio_cfg_t. The vsf_sdio_isr_handler_t type also needs to
-//! be redefined For compatibility, members should not be deleted when struct
-//! @ref vsf_sdio_cfg_t redefining.
+/**
+ * \~english
+ * @brief In specific hardware driver, we can enable macro
+ * VSF_SDIO_CFG_REIMPLEMENT_TYPE_CFG to redefine struct
+ * @ref vsf_sdio_cfg_t. For compatibility, members should not be deleted
+ * when redefining.
+ *
+ * \~chinese
+ * @brief 在具体硬件驱动中，我们可以启用宏 VSF_SDIO_CFG_REIMPLEMENT_TYPE_CFG
+ * 来重新定义结构体 @ref vsf_sdio_cfg_t。为保证兼容性，
+ * 重新定义时不应删除成员。
+ */
 #if VSF_SDIO_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 #    define VSF_SDIO_CFG_REIMPLEMENT_TYPE_CFG DISABLED
 #endif
 
-//! Redefine struct vsf_sdio_capability_t.
-//! For compatibility, members should not be deleted when struct @ref
-//! vsf_sdio_capability_t redefining.
+/**
+ * \~english
+ * @brief In specific hardware driver, we can enable macro
+ * VSF_SDIO_CFG_REIMPLEMENT_TYPE_CAPABILITY to redefine struct
+ * @ref vsf_sdio_capability_t. For compatibility, members should not be
+ * deleted when redefining.
+ *
+ * \~chinese
+ * @brief 在具体硬件驱动中，我们可以启用宏 VSF_SDIO_CFG_REIMPLEMENT_TYPE_CAPABILITY
+ * 来重新定义结构体 @ref vsf_sdio_capability_t。为保证兼容性，
+ * 重新定义时不应删除成员。
+ */
 #if VSF_SDIO_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 #    define VSF_SDIO_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
-#ifndef VSF_SDIO_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_SDIO_CFG_INHERT_HAL_CAPABILITY       ENABLED
+/**
+ * \~english
+ * @brief In specific hardware driver, we can enable macro
+ * VSF_SDIO_CFG_INHERIT_HAL_CAPABILITY to inherit the structure
+ * @ref vsf_peripheral_capability_t.
+ *
+ * \~chinese
+ * @brief 在具体硬件驱动中，我们可以启用宏 VSF_SDIO_CFG_INHERIT_HAL_CAPABILITY
+ * 来继承结构体 @ref vsf_peripheral_capability_t。
+ */
+#ifndef VSF_SDIO_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_SDIO_CFG_INHERIT_HAL_CAPABILITY       ENABLED
 #endif
 
 /* SD commands                                  type  argument     response */
@@ -349,6 +442,15 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+/**
+ * \~english
+ * @brief SDIO API template, used to generate SDIO type, specific prefix
+ * function declarations, etc.
+ * @param[in] __prefix The prefix used for generating SDIO functions.
+ * \~chinese
+ * @brief SDIO API 模板，用于生成 SDIO 类型、特定前缀的函数声明等。
+ * @param[in] __prefix 用于生成 SDIO 函数的前缀。
+ */
 #define VSF_SDIO_APIS(__prefix)                                                                                                                                     \
     __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             sdio, init,                 VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, vsf_sdio_cfg_t *cfg_ptr)         \
     __VSF_HAL_TEMPLATE_API(__prefix, void,                  sdio, fini,                 VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr)                                  \
@@ -462,7 +564,7 @@ typedef union vsf_sdio_csd_t {
         uint32_t TAAC               : 8;        //  112
 
         // different part from mmc
-        uint32_t                    : 6;        //  120
+        uint32_t                    : 2;        //  120
 
         uint32_t CSD_STRUCTURE      : 2;        //  126
     } VSF_CAL_PACKED sd_v2;
@@ -637,7 +739,7 @@ typedef struct vsf_sdio_status_t {
 #endif
 
 typedef struct vsf_sdio_capability_t {
-#if VSF_SDIO_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_SDIO_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
     enum {
@@ -676,7 +778,7 @@ typedef struct vsf_sdio_t vsf_sdio_t;
  @param irq_mask 一个或者多个枚举 vsf_sdio_irq_mask_t 的值的按位或
  @param status 传输状态
  @param resp 应答
- @return 无。
+ @return 无
 
  \~
  \code {.c}
@@ -727,8 +829,10 @@ typedef struct vsf_sdio_cfg_t {
 #endif
 
 typedef struct vsf_sdio_op_t {
+/// @cond
 #undef __VSF_HAL_TEMPLATE_API
 #define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
+/// @endcond
 
     VSF_SDIO_APIS(vsf)
 } vsf_sdio_op_t;
@@ -744,7 +848,7 @@ struct vsf_sdio_t  {
 
 /**
  \~english
- @brief initialize a sdio instance.
+ @brief Initialize a sdio instance.
  @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
  @param[in] cfg_ptr: a pointer to structure @ref vsf_sdio_cfg_t
  @return vsf_err_t: VSF_ERR_NONE if sdio was initialized, or a negative error code
@@ -754,9 +858,9 @@ struct vsf_sdio_t  {
 
  \~chinese
  @brief 初始化一个 sdio 实例
- @param[in] sdio_ptr: 结构体 vsf_sdio_t 的指针，参考 @ref vsf_sdio_t
- @param[in] cfg_ptr: 结构体 vsf_sdio_cfg_t 的指针，参考 @ref vsf_sdio_cfg_t
- @return vsf_err_t: 如果 sdio 初始化成功返回 VSF_ERR_NONE , 失败返回负数。
+ @param[in] sdio_ptr: 指向结构体 @ref vsf_sdio_t 的指针
+ @param[in] cfg_ptr: 指向结构体 @ref vsf_sdio_cfg_t 的指针
+ @return vsf_err_t: 如果 sdio 初始化成功返回 VSF_ERR_NONE , 失败返回负数
 
  @note 失败后不需要调用 vsf_sdio_fini() 反初始化。
        vsf_sdio_init() 应该在除 vsf_sdio_capability() 之外的其他 sdio API 之前调用。
@@ -765,78 +869,78 @@ extern vsf_err_t vsf_sdio_init(vsf_sdio_t *sdio_ptr, vsf_sdio_cfg_t *cfg_ptr);
 
 /**
  \~english
- @brief finalize a sdio instance.
+ @brief Finalize a sdio instance.
  @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
  @return none
 
  \~chinese
  @brief 结束一个 sdio 实例
- @param[in] sdio_ptr: 结构体 vsf_sdio_t 的指针，参考 @ref vsf_sdio_t
- @return none
+ @param[in] sdio_ptr: 指向结构体 @ref vsf_sdio_t 的指针
+ @return 无
  */
 extern void vsf_sdio_fini(vsf_sdio_t *sdio_ptr);
 
 /**
  \~english
- @brief enable interrupt masks of sdio instance.
+ @brief Enable interrupt masks of sdio instance.
  @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
  @param[in] irq_mask: one or more value of enum @ref vsf_sdio_irq_mask_t
  @return none.
  @note All pending interrupts should be cleared before interrupts are enabled.
 
  \~chinese
- @brief 使能 sdio 实例的中断
- @param[in] sdio_ptr: 结构体 vsf_sdio_t 的指针，参考 @ref vsf_sdio_t
+ @brief 启用 sdio 实例的中断
+ @param[in] sdio_ptr: 指向结构体 @ref vsf_sdio_t 的指针
  @param[in] irq_mask: 一个或者多个枚举 vsf_i2c_irq_mask_t 的值的按位或，@ref vsf_sdio_irq_mask_t
- @return 无。
- @note 在中断使能之前，应该清除所有悬挂的中断。
+ @return 无
+ @note 在中断启用之前，应该清除所有挂起的中断。
  */
 extern void vsf_sdio_irq_enable(vsf_sdio_t *sdio_ptr, vsf_sdio_irq_mask_t irq_mask);
 
 /**
  \~english
- @brief disable interrupt masks of sdio instance.
+ @brief Disable interrupt masks of sdio instance.
  @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
  @param[in] irq_mask: one or more value of enum vsf_sdio_irq_mask_t, @ref vsf_sdio_irq_mask_t
  @return none.
 
  \~chinese
- @brief 禁能 sdio 实例的中断
- @param[in] sdio_ptr: 结构体 vsf_sdio_t 的指针，参考 @ref vsf_sdio_t
+ @brief 禁用 sdio 实例的中断
+ @param[in] sdio_ptr: 指向结构体 @ref vsf_sdio_t 的指针
  @param[in] irq_mask: 一个或者多个枚举 vsf_sdio_irq_mask_t 的值的按位或，@ref vsf_sdio_irq_mask_t
- @return 无。
+ @return 无
  */
 extern void vsf_sdio_irq_disable(vsf_sdio_t *sdio_ptr, vsf_sdio_irq_mask_t irq_mask);
 
 /**
  \~english
- @brief get the status of sdio instance.
+ @brief Get the status of sdio instance.
  @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
  @return vsf_sdio_status_t: return all status of current sdio
 
  \~chinese
  @brief 获取 sdio 实例状态
- @param[in] sdio_ptr: 结构体 vsf_sdio_t 的指针，参考 @ref vsf_sdio_t
+ @param[in] sdio_ptr: 指向结构体 @ref vsf_sdio_t 的指针
  @return vsf_sdio_status_t: 返回当前 sdio 的所有状态
  */
 extern vsf_sdio_status_t vsf_sdio_status(vsf_sdio_t *sdio_ptr);
 
 /**
  \~english
- @brief get the capability of sdio instance.
+ @brief Get the capability of sdio instance.
  @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
  @return vsf_sdio_capability_t: return all capability of current sdio @ref vsf_sdio_capability_t
 
  \~chinese
  @brief 获取 sdio 实例能力
- @param[in] sdio_ptr: 结构体 vsf_sdio_t 的指针，参考 @ref vsf_sdio_t
+ @param[in] sdio_ptr: 指向结构体 @ref vsf_sdio_t 的指针
  @return vsf_sdio_capability_t: 返回当前 sdio 的所有能力 @ref vsf_sdio_capability_t
  */
 extern vsf_sdio_capability_t vsf_sdio_capability(vsf_sdio_t *sdio_ptr);
 
 /**
  \~english
- @brief set the clock of sdio instance.
+ @brief Set the clock of sdio instance.
  @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
  @param[in] clock_hz: clock in Hz
  @param[in] is_ddr: is DDR mode, true means DDR mode while false means SDR mode
@@ -844,62 +948,63 @@ extern vsf_sdio_capability_t vsf_sdio_capability(vsf_sdio_t *sdio_ptr);
 
  \~chinese
  @brief 设置 sdio 时钟
- @param[in] sdio_ptr: 结构体 vsf_sdio_t 的指针，参考 @ref vsf_sdio_t
- @param[in] clock_hz: 时钟速度 (单位：赫兹)
- @param[in] is_ddr: 是否是 DDR 模式，true 代表 DDR 模式，falsh 代表 SDR 模式
- @return vsf_err_t: 如果 sdio 设置时钟成功返回 VSF_ERR_NONE , 否则返回负数。
+ @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
+ @param[in] clock_hz: 时钟速度（单位：赫兹）
+ @param[in] is_ddr: 是否是 DDR 模式，true 代表 DDR 模式，false 代表 SDR 模式
+ @return vsf_err_t: 如果 sdio 设置时钟成功返回 VSF_ERR_NONE，否则返回负数
  */
 extern vsf_err_t vsf_sdio_set_clock(vsf_sdio_t *sdio_ptr, uint32_t clock_hz, bool is_ddr);
 
 /**
  \~english
- @brief set the bus width of sdio instance.
+ @brief Set the bus width of sdio instance.
  @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
  @param[in] bus_width: bus width in 1, 4, 8
  @return vsf_err_t: VSF_ERR_NONE if sdio was successfully, or a negative error code
 
  \~chinese
  @brief 设置 sdio 总线位宽
- @param[in] sdio_ptr: 结构体 vsf_sdio_t 的指针，参考 @ref vsf_sdio_t
+ @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
  @param[in] bus_width: 总线位宽，范围：1, 4, 8
- @return vsf_err_t: 如果 sdio 设置总线宽度成功返回 VSF_ERR_NONE , 否则返回负数。
+ @return vsf_err_t: 如果 sdio 设置总线宽度成功返回 VSF_ERR_NONE，否则返回负数
  */
 extern vsf_err_t vsf_sdio_set_bus_width(vsf_sdio_t *sdio_ptr, uint8_t bus_width);
 
 /**
  \~english
- @brief set the bus width of sdio instance.
+ @brief Start a new request for sdio instance.
+ @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
+ @param[in] req: pointer to structure @ref vsf_sdio_req_t
+ @return vsf_err_t: VSF_ERR_NONE if sdio was successfully, or a negative error code
+
+ \~chinese
+ @brief 启动 sdio 请求
+ @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
+ @param[in] req: sdio 请求结构指针
+ @return vsf_err_t: 如果 sdio 主机传输开始返回 VSF_ERR_NONE，否则返回负数
+ */
+extern vsf_err_t vsf_sdio_host_request(vsf_sdio_t *sdio_ptr, vsf_sdio_req_t *req);
+
+/**
+ \~english
+ @brief Set the single voltage mode of sdio instance.
  @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
  @param[in] bus_width: bus width in 1, 4, 8
  @return vsf_err_t: VSF_ERR_NONE if sdio was successfully, or a negative error code
 
  \~chinese
- @brief 设置 sdio 总线位宽
- @param[in] sdio_ptr: 结构体 vsf_sdio_t 的指针，参考 @ref vsf_sdio_t
+ @brief 设置 sdio 单电压模式
+ @param[in] sdio_ptr: 指向结构体 @ref vsf_sdio_t 的指针
  @param[in] bus_width: 总线位宽，范围：1, 4, 8
- @return vsf_err_t: 如果 sdio 设置总线宽度成功返回 VSF_ERR_NONE , 否则返回负数。
+ @return vsf_err_t: 如果 sdio 设置成功返回 VSF_ERR_NONE，否则返回负数
  */
 extern vsf_err_t vsf_sdio_single_voltage(vsf_sdio_t *sdio_ptr, uint8_t bus_width);
-
-/**
- \~english
- @brief request sdio operation in host mode.
- @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
- @param[in] req: a pointer to sdio rqeust structure
- @return vsf_err_t: VSF_ERR_NONE if sdio was successfully, or a negative error code
-
- \~chinese
- @brief 启动 sdio 请求
- @param[in] sdio_ptr: 结构体 vsf_sdio_t 的指针，参考 @ref vsf_sdio_t
- @param[in] req: sdio 请求结构指针
- @return vsf_err_t: 如果 sdio 主机传输开始返回 VSF_ERR_NONE , 否则返回负数。
- */
-extern vsf_err_t vsf_sdio_host_request(vsf_sdio_t *sdio_ptr, vsf_sdio_req_t *req);
 
 // TODO: add APIs for stream mode
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+/// @cond
 #if VSF_SDIO_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_sdio_t                             VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_t)
 #   define vsf_sdio_init(__SDIO, ...)               VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_init)           ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
@@ -913,6 +1018,7 @@ extern vsf_err_t vsf_sdio_host_request(vsf_sdio_t *sdio_ptr, vsf_sdio_req_t *req
 #   define vsf_sdio_set_bus_width(__SDIO, ...)      VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_set_bus_width)  ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
 #   define vsf_sdio_host_request(__SDIO, ...)       VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_host_request)   ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
 #endif
+/// @endcond
 
 #ifdef __cplusplus
 }
