@@ -64,7 +64,7 @@ vsf_err_t vsf_timer_gpio_multi_pwm_init(vsf_timer_gpio_multi_pwm_t *pwm_ptr, vsf
     pwm_ptr->enabled = false;
     pwm_ptr->freq = cfg_ptr->freq;
     return vsf_timer_init(pwm_ptr->timer, &(vsf_timer_cfg_t){
-        .mode           = VSF_TIMER_MODE_ONESHOT,
+        .mode           = VSF_TIMER_BASE_ONESHOT,
         .period         = 0,
         .freq           = cfg_ptr->freq,
         .isr            = {
@@ -171,7 +171,7 @@ vsf_err_t vsf_timer_gpio_single_pwm_init(vsf_timer_gpio_single_pwm_t *pwm_ptr, v
     pwm_ptr->freq = cfg_ptr->freq;
     pwm_ptr->timer_started = false;
     vsf_err_t err = vsf_timer_init(pwm_ptr->timer, &(vsf_timer_cfg_t){
-        .mode           = VSF_TIMER_MODE_ONESHOT,
+        .mode           = VSF_TIMER_BASE_ONESHOT,
         .period         = 0,
         .freq           = cfg_ptr->freq,
         .isr            = {
