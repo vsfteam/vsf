@@ -154,7 +154,7 @@ uint32_t VSF_MCONNECT(VSF_PWM_GET_CFG_IMP_PREFIX, _pwm_get_freq)(
 #define VSF_PWM_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t)                                \
         VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm, __IDX) = {                   \
-        .reg                = VSF_MCONNECT(VSF_PWM_CFG_IMP_UPCASE_PREFIX, _PWM, __IDX,_REG_),\
+        .reg                = VSF_MCONNECT(VSF_PWM_CFG_IMP_UPCASE_PREFIX, _PWM, __IDX, _REG),\
         __HAL_OP                                                                \
     };                                                                          \
     VSF_CAL_ROOT void VSF_MCONNECT(VSF_PWM_CFG_IMP_UPCASE_PREFIX, _PWM, __IDX, _IRQHandler)(void)\
