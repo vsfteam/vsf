@@ -31,97 +31,98 @@ extern "C" {
 
 // multi-class support enabled by default for maximum availability.
 #ifndef VSF_TIMER_CFG_MULTI_CLASS
-#   define VSF_TIMER_CFG_MULTI_CLASS                ENABLED
+#   define VSF_TIMER_CFG_MULTI_CLASS                        ENABLED
 #endif
 
 #if defined(VSF_HW_TIMER_COUNT) && !defined(VSF_HW_TIMER_MASK)
-#   define VSF_HW_TIMER_MASK                        VSF_HAL_COUNT_TO_MASK(VSF_HW_TIMER_COUNT)
+#   define VSF_HW_TIMER_MASK                                VSF_HAL_COUNT_TO_MASK(VSF_HW_TIMER_COUNT)
 #endif
 
 #if defined(VSF_HW_TIMER_MASK) && !defined(VSF_HW_TIMER_COUNT)
-#   define VSF_HW_TIMER_COUNT                       VSF_HAL_MASK_TO_COUNT(VSF_HW_TIMER_MASK)
+#   define VSF_HW_TIMER_COUNT                               VSF_HAL_MASK_TO_COUNT(VSF_HW_TIMER_MASK)
 #endif
 
 // application code can redefine it
 #ifndef VSF_TIMER_CFG_PREFIX
 #   if VSF_TIMER_CFG_MULTI_CLASS == ENABLED
-#       define VSF_TIMER_CFG_PREFIX                 vsf
+#       define VSF_TIMER_CFG_PREFIX                         vsf
 #   elif defined(VSF_HW_TIMER_COUNT) && (VSF_HW_TIMER_COUNT != 0)
-#       define VSF_TIMER_CFG_PREFIX                 vsf_hw
+#       define VSF_TIMER_CFG_PREFIX                         vsf_hw
 #   else
-#       define VSF_TIMER_CFG_PREFIX                 vsf
+#       define VSF_TIMER_CFG_PREFIX                         vsf
 #   endif
 #endif
 
 #ifndef VSF_TIMER_CFG_FUNCTION_RENAME
-#   define VSF_TIMER_CFG_FUNCTION_RENAME            ENABLED
+#   define VSF_TIMER_CFG_FUNCTION_RENAME                    ENABLED
 #endif
 
 #ifndef VSF_TIMER_CFG_REIMPLEMENT_TYPE_IRQ_MASK
-#   define VSF_TIMER_CFG_REIMPLEMENT_TYPE_IRQ_MASK  DISABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_TYPE_IRQ_MASK          DISABLED
 #endif
 
 //! Redefine struct vsf_timer_cfg_t. The vsf_timer_isr_handler_t type also needs to
 //! be redefined For compatibility, members should not be deleted when struct
 //! @ref vsf_timer_cfg_t redefining.
 #if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
-#    define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CFG DISABLED
+#    define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CFG              DISABLED
+#endif
+
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNAL_MODE == DISABLED
+#    define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNAL_MODE     DISABLED
+#endif
+
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNAL_CFG == DISABLED
+#    define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNAL_CFG     DISABLED
 #endif
 
 //! Redefine struct vsf_timer_capability_t.
 //! For compatibility, members should not be deleted when struct @ref
 //! vsf_timer_capability_t redefining.
 #if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
-#    define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
+#    define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY   DISABLED
 #endif
 
-#ifndef VSF_TIMER_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_TIMER_CFG_INHERT_HAL_CAPABILITY       ENABLED
+#ifndef VSF_TIMER_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_TIMER_CFG_INHERIT_HAL_CAPABILITY          ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_TIMER_APIS(__prefix_name) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, init,        VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, vsf_timer_cfg_t *cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, fini,        VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               timer, enable,      VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               timer, disable,     VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_enable,  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_disable, VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_timer_capability_t, timer, capability,  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, set_period,  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, uint32_t period) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, pwm_set,     VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr,  uint8_t channel, uint32_t period, uint32_t pulse)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, init,                  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, vsf_timer_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, fini,                  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               timer, enable,                VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               timer, disable,               VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_enable,            VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_disable,           VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_timer_capability_t, timer, capability,            VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, set_period,            VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, uint32_t period) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_config,        VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, uint8_t channel, vsf_timer_channel_cfg_t *channel_cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_start,         VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, uint8_t channel) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_stop,          VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, uint8_t channel) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_request_start, VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, uint8_t channel, vsf_timer_channel_request_t *request_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_request_stop,  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, uint8_t channel)
 
 /*============================ TYPES =========================================*/
-
-// TODO: Add more feature support, for example match interrupt
-
-#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE == DISABLED
-typedef enum vsf_timer_mode_t {
-    VSF_TIMER_MODE_ONESHOT      = (0x00 << 0),
-    VSF_TIMER_MODE_CONTINUES    = (0x01 << 0),
-
-    VSF_TIMER_MODE_PWM          = (0x01 << 1),
-    VSF_TIMER_MODE_NO_PWM       = (0x00 << 1),
-} vsf_timer_mode_t;
-#endif
-
-enum {
-    VSF_TIMER_MODE_RESTART_COUNT = 2,
-    VSF_TIMER_MODE_RESTART_MASK  = VSF_TIMER_MODE_ONESHOT |
-                                   VSF_TIMER_MODE_CONTINUES,
-
-    VSF_TIMER_MODE_PWM_COUNT     = 2,
-    VSF_TIMER_MODE_PWM_MASK      = VSF_TIMER_MODE_PWM |
-                                   VSF_TIMER_MODE_NO_PWM,
-
-    VSF_TIMER_MODE_MASK_COUNT    = 3,
-    VSF_TIMER_MODE_ALL_BITS_MASK = VSF_TIMER_MODE_RESTART_MASK,
-};
 
 #if VSF_TIMER_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
 typedef enum vsf_timer_irq_mask_t {
     VSF_TIMER_IRQ_MASK_OVERFLOW = (0x01 << 0),
+
+    VSF_TIMER_IRQ_MASK_CHANNEL_0_INPUT_CAPTURE = (0x01 << 1),
+    VSF_TIMER_IRQ_MASK_CHANNEL_0_OUTPUT_COMPARE = (0x01 << 2),
+    /*
+    // We can define more channel irq mask here
+    VSF_TIMER_IRQ_MASK_CHANNEL_1_INPUT_CAPTURE = (0x01 << 3),
+    #define VSF_TIMER_IRQ_MASK_CHANNEL_1_INPUT_CAPTURE  VSF_TIMER_IRQ_MASK_CHANNEL_1_INPUT_CAPTURE
+    VSF_TIMER_IRQ_MASK_CHANNEL_1_OUTPUT_COMPARE = (0x01 << 4),
+    #define VSF_TIMER_IRQ_MASK_CHANNEL_1_OUTPUT_COMPARE  VSF_TIMER_IRQ_MASK_CHANNEL_1_OUTPUT_COMPARE
+    VSF_TIMER_IRQ_MASK_CHANNEL_2_INPUT_CAPTURE = (0x01 << 5),
+    #define VSF_TIMER_IRQ_MASK_CHANNEL_2_INPUT_CAPTURE  VSF_TIMER_IRQ_MASK_CHANNEL_2_INPUT_CAPTURE
+    VSF_TIMER_IRQ_MASK_CHANNEL_2_OUTPUT_COMPARE = (0x01 << 6),
+    #define VSF_TIMER_IRQ_MASK_CHANNEL_2_OUTPUT_COMPARE  VSF_TIMER_IRQ_MASK_CHANNEL_2_OUTPUT_COMPARE
+    */
 } vsf_timer_irq_mask_t;
 #endif
 
@@ -145,31 +146,167 @@ typedef struct vsf_timer_isr_t {
 
 //! timer configuration
 typedef struct vsf_timer_cfg_t {
-    vsf_timer_mode_t mode;
     // counting period
     uint32_t period;
     union {
         uint32_t freq;
         uint32_t min_freq;
     };
-
     vsf_timer_isr_t isr;
 } vsf_timer_cfg_t;
 #endif
 
-#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
-typedef struct vsf_timer_capability_t {
-#if VSF_TIMER_CFG_INHERT_HAL_CAPABILITY == ENABLED
-    inherit(vsf_peripheral_capability_t)
+
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNAL_MODE == DISABLED
+typedef enum vsf_timer_channel_mode_t {
+    // channel mode : different timer channel may support different mode
+    // Base Mode : The timer channel will be used as a base timer
+    VSF_TIMER_CHANNEL_MODE_BASE             = (0x00 << 0),
+    // PWM(Pulse Width Modulation) Mode : The timer channel will be used as a
+    // PWM output, all channels's period should be the same
+    VSF_TIMER_CHANNEL_MODE_PWM = (0x01 << 0),
+    // Output Compare Mode: The timer channel will be used as a output compare,
+    // different channels can have different period (change pin level in
+    // interrupt)
+    VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE = (0x02 << 0),
+    // Input Capture Mode : The timer channel will be used as a input capture
+    VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE    = (0x03 << 0),
+    // Encoder Mode : The timer channel will be used as a encoder
+    VSF_TIMER_CHANNEL_MODE_ENCODER          = (0x04 << 0),
+    /*
+    // Some timer may support more channel mode like one pulse or hall encoder etc.
+    VSF_TIMER_CHANNEL_MODE_ONE_PULSE        = (0x05 << 0),
+    #define VSF_TIMER_CHANNEL_MODE_ONE_PULSE  VSF_TIMER_CHANNEL_MODE_ONE_PULSE
+    VSF_TIMER_CHANNEL_MODE_HALL_ENCODER     = (0x06 << 0),
+    #define VSF_TIMER_CHANNEL_MODE_HALL_ENCODER  VSF_TIMER_CHANNEL_MODE_HALL_ENCODER
+    */
+
+    /********************************************************************************/
+    // The following mode only valid for VSF_TIMER_CHANNEL_MODE_BASE
+    // Counter Direction
+    // Counter Up : The timer will count up
+    VSF_TIMER_BASE_COUNTER_UP               = (0x00 << 4),
+    // Counter Down : The timer will count down
+    VSF_TIMER_BASE_COUNTER_DOWN             = (0x01 << 4),
+    /*
+    // Some timer may support more counter mode like center-aligned etc.
+    VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED1  = (0x02 << 4),
+    #define VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED1  VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED1
+    VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED2  = (0x03 << 4),
+    #define VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED2  VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED2
+    VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED3  = (0x04 << 4),
+    #define VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED3  VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED3
+    */
+
+    // Counter Mode
+    // Oneshot : The timer will stop after the first overflow
+    VSF_TIMER_BASE_ONESHOT                    = (0x00 << 5),
+    // Continues : The timer will continue to count after overflow
+    VSF_TIMER_BASE_CONTINUES                  = (0x01 << 5),
+
+
+    /********************************************************************************/
+    // The following mode only valid for VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE
+    // Output Compare Mode
+    VSF_TIMER_CHANNEL_OUTPUT_COMPARE_ACTIVE             = (0x00 << 4),
+    VSF_TIMER_CHANNEL_OUTPUT_COMPARE_INACTIVE           = (0x01 << 4),
+    VSF_TIMER_CHANNEL_OUTPUT_COMPARE_TOGGLE             = (0x02 << 4),
+    /*
+    // Some timer may support more output compare mode like PWM etc.
+    VSF_TIMER_CHANNEL_OUTPUT_COMPARE_PWM1               = (0x03 << 4),
+    #define VSF_TIMER_CHANNEL_OUTPUT_COMPARE_PWM1  VSF_TIMER_CHANNEL_OUTPUT_COMPARE_PWM1
+    VSF_TIMER_CHANNEL_OUTPUT_COMPARE_PWM2               = (0x04 << 4),
+    #define VSF_TIMER_CHANNEL_OUTPUT_COMPARE_PWM2  VSF_TIMER_CHANNEL_OUTPUT_COMPARE_PWM2
+    VSF_TIMER_CHANNEL_OUTPUT_COMPARE_FORCED_ACTIVE      = (0x05 << 4),
+    #define VSF_TIMER_CHANNEL_OUTPUT_COMPARE_FORCED_ACTIVE  VSF_TIMER_CHANNEL_OUTPUT_COMPARE_FORCED_ACTIVE
+    VSF_TIMER_CHANNEL_OUTPUT_COMPARE_FORCED_INACTIVE    = (0x06 << 4),
+    #define VSF_TIMER_CHANNEL_OUTPUT_COMPARE_FORCED_INACTIVE  VSF_TIMER_CHANNEL_OUTPUT_COMPARE_FORCED_INACTIVE
+    */
+
+    /*
+    // Output Compare Polarity and N Polarity
+    VSF_TIMER_CHANNEL_OUTPUT_COMPARE_POLARITY_HIGH      = (0x00 << 8),
+    #define VSF_TIMER_CHANNEL_OUTPUT_COMPARE_POLARITY_HIGH  VSF_TIMER_CHANNEL_OUTPUT_COMPARE_POLARITY_HIGH
+    VSF_TIMER_CHANNEL_OUTPUT_COMPARE_POLARITY_LOW       = (0x01 << 8),
+    #define VSF_TIMER_CHANNEL_OUTPUT_COMPARE_POLARITY_LOW   VSF_TIMER_CHANNEL_OUTPUT_COMPARE_POLARITY_LOW
+    VSF_TIMER_CHANNEL_OUTPUT_COMPARE_N_POLARITY_HIGH    = (0x00 << 8),
+    #define VSF_TIMER_CHANNEL_OUTPUT_COMPARE_N_POLARITY_HIGH  VSF_TIMER_CHANNEL_OUTPUT_COMPARE_N_POLARITY_HIGH
+    VSF_TIMER_CHANNEL_OUTPUT_COMPARE_N_POLARITY_LOW     = (0x01 << 8),
+    #define VSF_TIMER_CHANNEL_OUTPUT_COMPARE_N_POLARITY_LOW   VSF_TIMER_CHANNEL_OUTPUT_COMPARE_N_POLARITY_LOW
+    */
+
+    /********************************************************************************/
+    // The following mode only valid for VSF_TIMER_CHANNEL_MODE_PWM
+    // PWM Mode
+    VSF_TIMER_PWM_OUTPUT_POLARITY_HIGH                  = (0x00 << 4),
+    VSF_TIMER_PWM_OUTPUT_POLARITY_LOW                   = (0x01 << 4),
+
+
+    /********************************************************************************/
+    // The following mode only valid for VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE
+    VSF_TIMER_CHANNEL_INPUT_CAPTURE_POLARITY_RISING     = (0x00 << 4),
+    VSF_TIMER_CHANNEL_INPUT_CAPTURE_POLARITY_FALLING    = (0x01 << 4),
+    VSF_TIMER_CHANNEL_INPUT_CAPTURE_POLARITY_BOTH       = (0x02 << 4),
+
+    /*
+    VSF_TIMER_CHANNEL_INPUT_CAPTURE_FILTER_MASK = (0x0F << 4),
+    VSF_TIMER_CHANNEL_INPUT_CAPTURE_FILTER_OFFSET = 4,
+    */
+
+    /********************************************************************************/
+    // The following mode only valid for VSF_TIMER_CHANNEL_MODE_ENCODER
+    // Encoder Mode
+    VSF_TIMER_CHANNEL_ENCODER_CHANNEL_A_POLARITY_RISING = (0x00 << 3),
+    VSF_TIMER_CHANNEL_ENCODER_CHANNEL_A_POLARITY_FALLING = (0x01 << 3),
+    VSF_TIMER_CHANNEL_ENCODER_CHANNEL_A_POLARITY_BOTH = (0x02 << 3),
+} vsf_timer_channel_mode_t;
 #endif
 
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNAL_CFG == DISABLED
+typedef struct vsf_timer_channel_cfg_t {
+    vsf_timer_channel_mode_t mode;
+    uint32_t                 pulse;
+} vsf_timer_channel_cfg_t;
+#endif
+
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNAL_CFG == DISABLED
+typedef struct vsf_timer_channel_request_t {
+    uint16_t length;
+    union {
+        // for VSF_TIMER_CHANNEL_MODE_BASE mode
+        uint32_t *period_buffer;
+        // for VSF_TIMER_CHANNEL_MODE_PWM mode and VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE mode
+        uint32_t *pulse_buffer;
+        // for VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE mode
+        uint32_t *input_capture_buffer;
+        // for VSF_TIMER_CHANNEL_MODE_ENCODER mode
+        struct {
+            uint32_t *channal_a_buffer;
+            uint32_t *channal_b_buffer;
+        };
+    };
+} vsf_timer_channel_request_t;
+#endif
+
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+typedef struct vsf_timer_capability_t {
+#if VSF_TIMER_CFG_INHERIT_HAL_CAPABILITY == ENABLED
+    inherit(vsf_peripheral_capability_t)
+#endif
+    // support interrupt for timer
     vsf_timer_irq_mask_t irq_mask;
 
+    // timer bit length, like 16bit, 32bit etc.
     uint8_t timer_bitlen;
+    // timer channel count, like 1, 2, 4 etc.
+    uint8_t channel_cnt;
 
-    uint8_t support_pwm   : 1;
-    uint8_t pwm_channel_cnt;
-
+    // support different channel mode
+    // we can redefine it if different channel support different mode.
+    uint8_t support_pwm : 1;
+    uint8_t support_output_compare : 1;
+    uint8_t support_input_capture : 1;
+    uint8_t support_one_pulse : 1;
 } vsf_timer_capability_t;
 #endif
 
@@ -225,46 +362,29 @@ extern void vsf_timer_fini(vsf_timer_t *timer_ptr);
 
 /**
  \~english
- @brief enable interrupt masks of timer instance.
+ @brief enable a timer instance.
  @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
- @param[in] irq_mask: one or more value of enum @ref vsf_timer_irq_mask_t
- @return none.
+ @return fsm_rt_t: return FSM_RT_CPL if timer was enabled, return FSM_RT_ONGOING if timer is enabling
 
  \~chinese
- @brief 使能 timer 实例的中断
+ @brief 使能一个 timer 实例
  @param[in] timer_ptr: 结构体 vsf_timer_t 的指针，参考 @ref vsf_timer_t
- @param[in] irq_mask: 一个或者多个枚举 vsf_timer_irq_mask_t 的值的按位或，@ref vsf_timer_irq_mask_t
- @return 无。
+ @return fsm_rt_t: 返回 FSM_RT_CPL 如果 timer 实例被使能，返回 FSM_RT_ONGOING 如果 timer 实例正在使能
  */
 extern fsm_rt_t vsf_timer_enable(vsf_timer_t *timer_ptr);
 
 /**
  \~english
- @brief disable interrupt masks of timer instance.
+ @brief disable a timer instance.
  @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
- @param[in] irq_mask: one or more value of enum vsf_timer_irq_mask_t, @ref vsf_timer_irq_mask_t
- @return none.
+ @return fsm_rt_t: return FSM_RT_CPL if timer was disabled, return FSM_RT_ONGOING if timer is disabling
 
  \~chinese
- @brief 禁能 timer 实例的中断
+ @brief 禁能一个 timer 实例
  @param[in] timer_ptr: 结构体 vsf_timer_t 的指针，参考 @ref vsf_timer_t
- @param[in] irq_mask: 一个或者多个枚举 vsf_timer_irq_mask_t 的值的按位或，@ref vsf_timer_irq_mask_t
- @return 无。
+ @return fsm_rt_t: 返回 FSM_RT_CPL 如果 timer 实例被禁能，返回 FSM_RT_ONGOING 如果 timer 实例正在禁能
  */
 extern fsm_rt_t vsf_timer_disable(vsf_timer_t *timer_ptr);
-
-/**
- \~english
- @brief get the capability of timer instance.
- @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
- @return vsf_timer_capability_t: return all capability of current timer @ref vsf_timer_capability_t
-
- \~chinese
- @brief 获取 timer 实例的能力
- @param[in] timer_ptr: 结构体 vsf_timer_t 的指针，参考 @ref vsf_timer_t
- @return vsf_timer_capability_t: 返回当前 timer 的所有能力 @ref vsf_timer_capability_t
- */
-extern vsf_timer_capability_t vsf_timer_capability(vsf_timer_t *timer_ptr);
 
 /**
  \~english
@@ -279,7 +399,7 @@ extern vsf_timer_capability_t vsf_timer_capability(vsf_timer_t *timer_ptr);
  @param[in] timer_ptr: 结构体 vsf_timer_t 的指针，参考 @ref vsf_timer_t
  @param[in] irq_mask: 一个或者多个枚举 vsf_timer_irq_mask_t 的值的按位或，@ref vsf_timer_irq_mask_t
  @return 无。
- @note All pending interrupts should be cleared before interrupts are enabled.
+ @note 在中断使能之前，应该清除所有悬挂的中断。
  */
 extern void vsf_timer_irq_enable(vsf_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask);
 
@@ -300,13 +420,26 @@ extern void vsf_timer_irq_disable(vsf_timer_t *timer_ptr, vsf_timer_irq_mask_t i
 
 /**
  \~english
- @brief timer set period (maximum count)
+ @brief get the capability of timer instance.
+ @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
+ @return vsf_timer_capability_t: return all capability of current timer @ref vsf_timer_capability_t
+
+ \~chinese
+ @brief 获取 timer 实例的能力
+ @param[in] timer_ptr: 结构体 vsf_timer_t 的指针，参考 @ref vsf_timer_t
+ @return vsf_timer_capability_t: 返回当前 timer 的所有能力 @ref vsf_timer_capability_t
+ */
+extern vsf_timer_capability_t vsf_timer_capability(vsf_timer_t *timer_ptr);
+
+/**
+ \~english
+ @brief timer set period (maximum count), used for change the period of timer dynamically
  @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
  @param[in] period: timer period width (in clock counter)
  @return vsf_err_t: VSF_ERR_NONE if the timer set period was successfully, or a negative error code
 
  \~chinese
- @brief timer 设置一个定时器的周期（最大计数值）
+ @brief timer 设置一个定时器的周期（最大计数值）, 用于动态改变定时器的周期
  @param[in] timer_ptr: 结构体 vsf_timer_t 的指针，参考 @ref vsf_timer_t
  @param[in] period: timer 周期宽度 (时钟计数)
  @return vsf_err_t: 如果 timer 设置周期成功成功返回 VSF_ERR_NONE , 否则返回负数。
@@ -315,36 +448,117 @@ extern vsf_err_t vsf_timer_set_period(vsf_timer_t *timer_ptr, uint32_t period);
 
 /**
  \~english
- @brief timer pwm set the period width and pulse width for a channel
+ @brief timer set the period width and pulse width for a channel
  @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
- @param[in] channel: timer pwm channel
- @param[in] period: timer pwm period width (in clock counter)
- @param[in] pulse: timer pwm pulse width (in clock counter)
- @return vsf_err_t: VSF_ERR_NONE if the timer pwm  set was successfully, or a negative error code
+ @param[in] channel: timer channel
+ @param[in] channel_cfg_ptr: a pointer to structure @ref vsf_timer_channel_cfg_t
+ @return vsf_err_t: VSF_ERR_NONE if the timer channel set was successfully, or a negative error code
 
  \~chinese
- @brief timer pwm  设置一个通道的周期和宽度
+ @brief timer 通道 设置一个通道的周期和宽度
  @param[in] timer_ptr: 结构体 vsf_timer_t 的指针，参考 @ref vsf_timer_t
- @param[in] channel: timer pwm 通道
- @param[in] period: timer pwm 周期宽度 (时钟计数)
- @param[in] pulse: timer pwm 脉冲宽度 (时钟计数)
- @return vsf_err_t: 如果 timer pwm 设置成功成功返回 VSF_ERR_NONE , 否则返回负数。
+ @param[in] channel: timer 通道
+ @param[in] channel_cfg_ptr: a pointer to structure @ref vsf_timer_channel_cfg_t
+ @return vsf_err_t: 如果 timer 通道设置成功成功返回 VSF_ERR_NONE, 否则返回负数。
  */
-extern vsf_err_t vsf_timer_pwm_set(vsf_timer_t *timer_ptr, uint8_t channel, uint32_t period, uint32_t pulse);
+extern vsf_err_t vsf_timer_channel_config(vsf_timer_t             *timer_ptr,
+                                          uint8_t                 channel,
+                                          vsf_timer_channel_cfg_t *channel_cfg_ptr);
+
+/**
+ \~english
+ @brief start a timer channel
+ @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
+ @param[in] channel: timer channel
+ @return vsf_err_t: VSF_ERR_NONE if the timer channel start was successfully, or a negative error code
+
+ \~chinese
+ @brief 开始一个 timer 通道
+ @param[in] timer_ptr: 结构体 vsf_timer_t 的指针，参考 @ref vsf_timer_t
+ @param[in] channel: timer 通道
+ @return vsf_err_t: 如果 timer 通道开始成功返回 VSF_ERR_NONE, 否则返回负数。
+ */
+extern vsf_err_t vsf_timer_channel_start(vsf_timer_t *timer_ptr, uint8_t channel);
+
+/**
+ \~english
+ @brief stop a timer channel
+ @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
+ @param[in] channel: timer channel
+ @return vsf_err_t: VSF_ERR_NONE if the timer channel stop was successfully, or a negative error code
+
+ \~chinese
+ @brief 停止一个 timer 通道
+ @param[in] timer_ptr: 结构体 vsf_timer_t 的指针，参考 @ref vsf_timer_t
+ @param[in] channel: timer 通道
+ @return vsf_err_t: 如果 timer 通道停止成功返回 VSF_ERR_NONE, 否则返回负数。
+ */
+extern vsf_err_t vsf_timer_channel_stop(vsf_timer_t *timer_ptr, uint8_t channel);
+
+/**
+ \~english
+ @brief start a timer channel request (usually based on DMA)
+ @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
+ @param[in] channel: timer channel
+ @param[in] request_ptr: a pointer to request structure @ref vsf_timer_channel_request_t
+            For VSF_TIMER_CHANNEL_MODE_BASE mode, period_buffer in structure
+            @ref vsf_timer_channel_request_t is array of period value to be set after each overflow.
+            For VSF_TIMER_CHANNEL_MODE_PWM mode, pwm_buffer in structure
+            @ref vsf_timer_channel_request_t is array of pulse value to be set after each overflow.
+            For VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE mode, pulse_buffer in structure
+            @ref vsf_timer_channel_request_t is array of pulse value to be set after each overflow.
+            For VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE mode, input_capture_buffer in structure
+            @ref vsf_timer_channel_request_t is array of input capture value.
+            For VSF_TIMER_CHANNEL_MODE_ENCODER mode, channal_a_buffer and channal_b_buffer in structure
+            @ref vsf_timer_channel_request_t is array of encoder value for channel A and channel B.
+ @return vsf_err_t: VSF_ERR_NONE if the timer channel start was successfully, or a negative error code
+
+ \~chinese
+ @brief 开始一个 timer 通道的请求 (通常基于 DMA)
+ @param[in] timer_ptr: 结构体 vsf_timer_t 的指针，参考 @ref vsf_timer_t
+ @param[in] channel: timer 通道
+ @param[in] request_ptr: 结构体 vsf_timer_channel_request_t 的指针，参考 @ref vsf_timer_channel_request_t
+            对于 VSF_TIMER_CHANNEL_MODE_BASE 模式, @ref vsf_timer_channel_request_t 中的 period_buffer 是每次溢出后要设置的周期值数组。
+            对于 VSF_TIMER_CHANNEL_MODE_PWM 模式, @ref vsf_timer_channel_request_t 中的 pwm_buffer 是每次溢出后要设置的脉冲值数组。
+            对于 VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE 模式, @ref vsf_timer_channel_request_t 中的 pulse_buffer 是每次溢出后要设置的脉冲值数组。
+            对于 VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE 模式, @ref vsf_timer_channel_request_t 中的 input_capture_buffer 是输入捕获值数组。
+            对于 VSF_TIMER_CHANNEL_MODE_ENCODER 模式, @ref vsf_timer_channel_request_t 中的 channal_a_buffer 和 channal_b_buffer 是通道 A 和通道 B 的编码器值数组。
+ @return vsf_err_t: 如果 timer 通道开始成功返回 VSF_ERR_NONE, 否则返回负数。
+ */
+extern vsf_err_t vsf_timer_channel_request_start(vsf_timer_t *timer_ptr, uint8_t channel, vsf_timer_channel_request_t *request_ptr);
+
+/**
+ \~english
+ @brief stop a timer channel request.
+ @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
+ @param[in] channel: timer channel
+ @return vsf_err_t: VSF_ERR_NONE if the timer channel stop was successfully, or a negative error code
+
+ \~chinese
+ @brief 停止一个 timer 通道的请求
+ @param[in] timer_ptr: 结构体 vsf_timer_t 的指针，参考 @ref vsf_timer_t
+ @param[in] channel: timer 通道
+ @return vsf_err_t: 如果 timer 通道停止成功返回 VSF_ERR_NONE, 否则返回负数。
+ */
+extern vsf_err_t vsf_timer_channel_request_stop(vsf_timer_t *timer_ptr, uint8_t channel);
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_TIMER_CFG_FUNCTION_RENAME == ENABLED
-#   define __vsf_timer_t                      VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t)
-#   define vsf_timer_init(__TIME, ...)        VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_init)        ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
-#   define vsf_timer_fini(__TIME, ...)        VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_fini)        ((__vsf_timer_t *)(__TIME))
-#   define vsf_timer_enable(__TIME)           VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_enable)      ((__vsf_timer_t *)(__TIME))
-#   define vsf_timer_disable(__TIME)          VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_disable)     ((__vsf_timer_t *)(__TIME))
-#   define vsf_timer_capability(__TIME)       VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_capability)  ((__vsf_timer_t *)(__TIME))
-#   define vsf_timer_irq_enable(__TIME, ...)  VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_enable)  ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
-#   define vsf_timer_irq_disable(__TIME, ...) VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_disable) ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
-#   define vsf_timer_set_period(__TIME, ...)  VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_set_period)  ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
-#   define vsf_timer_pwm_set(__TIME, ...)     VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_pwm_set)     ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
+#   define __vsf_timer_t                                VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_t)
+#   define vsf_timer_init(__TIME, ...)                  VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_init)                 ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
+#   define vsf_timer_fini(__TIME, ...)                  VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_fini)                 ((__vsf_timer_t *)(__TIME))
+#   define vsf_timer_enable(__TIME)                     VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_enable)               ((__vsf_timer_t *)(__TIME))
+#   define vsf_timer_disable(__TIME)                    VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_disable)              ((__vsf_timer_t *)(__TIME))
+#   define vsf_timer_capability(__TIME)                 VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_capability)           ((__vsf_timer_t *)(__TIME))
+#   define vsf_timer_irq_enable(__TIME, ...)            VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_enable)           ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
+#   define vsf_timer_irq_disable(__TIME, ...)           VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_disable)          ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
+#   define vsf_timer_set_period(__TIME, ...)            VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_set_period)           ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
+#   define vsf_timer_channel_config(__TIME, ...)        VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_channel_config)       ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
+#   define vsf_timer_channel_start(__TIME, ...)         VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_channel_start)        ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
+#   define vsf_timer_channel_stop(__TIME, ...)          VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_channel_stop)         ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
+#   define vsf_timer_channel_request_start(__TIME, ...) VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_channel_request_start)((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
+#   define vsf_timer_channel_request_stop(__TIME, ...)  VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_channel_request_stop) ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus
