@@ -120,7 +120,7 @@ static void __vsf_hw_i2c_irq_handler(vsf_hw_i2c_t *hw_i2c_ptr)
 
     vsf_i2c_irq_mask_t irq_mask;
     if (0 != hw_i2c_const->reg->LR) {
-        irq_mask = VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT;
+        irq_mask = VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT;
     } else {
         irq_mask = VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
     }
@@ -232,6 +232,20 @@ vsf_i2c_status_t vsf_hw_i2c_status(vsf_hw_i2c_t *hw_i2c_ptr)
     return status;
 }
 
+void vsf_hw_i2c_master_fifo_transfer(vsf_hw_i2c_t *hw_i2c_ptr,
+                                    uint16_t address,
+                                    vsf_i2c_cmd_t cmd,
+                                    uint_fast16_t count,
+                                    uint8_t *buffer_ptr,
+                                    vsf_i2c_cmd_t *cur_cmd_ptr,
+                                    uint_fast16_t *offset_ptr)
+{
+    VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
+
+    // TODO: add fifo transfer
+    VSF_HAL_ASSERT(0);
+}
+
 static void __i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
                                  uint16_t address,
                                  vsf_i2c_cmd_t cmd,
@@ -266,7 +280,7 @@ static void __i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
 vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
                                     uint16_t address,
                                     vsf_i2c_cmd_t cmd,
-                                    uint16_t count,
+                                    uint_fast16_t count,
                                     uint8_t *buffer)
 {
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
@@ -344,12 +358,43 @@ vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
     }
 }
 
-uint_fast32_t vsf_hw_i2c_get_transferred_count(vsf_hw_i2c_t *hw_i2c_ptr)
+uint_fast32_t vsf_hw_i2c_master_get_transferred_count(vsf_hw_i2c_t *hw_i2c_ptr)
 {
     VSF_HAL_ASSERT(hw_i2c_ptr != NULL);
 
 	// TODO
     VSF_HAL_ASSERT(0);
+    return 0;
+}
+
+uint_fast16_t vsf_hw_i2c_slave_fifo_transfer(vsf_hw_i2c_t    *i2c_ptr,
+                                             bool          transmit_or_receive,
+                                             uint_fast16_t count,
+                                             uint8_t      *buffer_ptr)
+{
+    VSF_HAL_ASSERT(i2c_ptr != NULL);
+
+    // TODO: add slave fifo transfer
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
+vsf_err_t vsf_hw_i2c_slave_request(vsf_hw_i2c_t *i2c_ptr,
+                                  bool transmit_or_receive,
+                                  uint_fast16_t count,
+                                  uint8_t *buffer_ptr)
+{
+    VSF_HAL_ASSERT(i2c_ptr != NULL);
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+
+uint_fast16_t vsf_hw_i2c_slave_get_transferred_count(vsf_hw_i2c_t *i2c_ptr)
+{
+    VSF_HAL_ASSERT(i2c_ptr != NULL);
+    VSF_HAL_ASSERT(0);
+
     return 0;
 }
 
@@ -359,7 +404,7 @@ vsf_i2c_capability_t vsf_hw_i2c_capability(vsf_hw_i2c_t *i2c_ptr)
         .irq_mask = 1,
         .support_restart = 1,
         .support_no_start = 0,
-        .support_no_stop_restart = 1,
+        .support_no_stop = 1,
         .max_transfer_size = 0xFFFF,
     };
     return i2c_capability;
@@ -368,6 +413,7 @@ vsf_i2c_capability_t vsf_hw_i2c_capability(vsf_hw_i2c_t *i2c_ptr)
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY  ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_API_CTRL        DISABLED
 #define VSF_I2C_CFG_IMP_PREFIX                  vsf_hw
 #define VSF_I2C_CFG_IMP_UPCASE_PREFIX           VSF_HW
 #define VSF_I2C_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \

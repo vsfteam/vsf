@@ -140,15 +140,15 @@ vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)(
     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr,
     uint16_t address,
     vsf_i2c_cmd_t cmd,
-    uint16_t count,
-    uint8_t *buffer
+    uint_fast16_t count,
+    uint8_t *buffer_ptr
 ) {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     VSF_HAL_ASSERT(0 != count);
     return VSF_ERR_NONE;
 }
 
-uint_fast32_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_get_transferred_count)(
+uint_fast16_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_get_transferred_count)(
     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
 ) {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
@@ -162,9 +162,16 @@ vsf_i2c_capability_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)(
         .irq_mask                   = 0,
         .support_restart            = 0,
         .support_no_start           = 0,
-        .support_no_stop_restart    = 0,
+        .support_no_stop    = 0,
         .max_transfer_size          = 0,
     };
+}
+
+vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_ctrl)(
+    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) * i2c_ptr,
+    vsf_i2c_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(NULL != i2c_ptr);
 }
 
 static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _i2c_irqhandler)(
@@ -187,13 +194,18 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _i2c_irqhandler)(
  */
 
 // HW
+#define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_API_CTRL              ENABLED
+
 #define VSF_I2C_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t)                                \
          VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c, __IDX) = {                  \
-        .reg                = VSF_MCONNECT(VSF_I2C_CFG_IMP_UPCASE_PREFIX, _I2C, __IDX, _REG),\
+        .reg                = VSF_MCONNECT(VSF_I2C_CFG_IMP_UPCASE_PREFIX,       \
+                                           _I2C, __IDX, _REG),                  \
         __HAL_OP                                                                \
     };                                                                          \
-    VSF_CAL_ROOT void VSF_MCONNECT(VSF_I2C_CFG_IMP_UPCASE_PREFIX, _I2C, __IDX, _IRQHandler)(void)\
+    VSF_CAL_ROOT void VSF_MCONNECT(VSF_I2C_CFG_IMP_UPCASE_PREFIX,               \
+                                   _I2C, __IDX, _IRQHandler)(void)              \
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
         VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_irqhandler)(              \

@@ -172,6 +172,25 @@ static uint8_t __vsf_gpio_i2c_in(vsf_gpio_i2c_t *gpio_i2c_ptr, bool ack)
     return data;
 }
 
+void vsf_gpio_i2c_master_fifo_transfer(vsf_gpio_i2c_t *gpio_i2c_ptr,
+                                       uint16_t address, vsf_i2c_cmd_t cmd,
+                                       uint_fast16_t count, uint8_t *buffer_ptr,
+                                       vsf_i2c_cmd_t *cur_cmd_ptr,
+                                       uint_fast16_t *offset_ptr)
+{
+    // do something
+}
+
+uint_fast16_t vsf_gpio_i2c_slave_fifo_transfer(vsf_gpio_i2c_t *gpio_i2c_ptr,
+                                               bool transmit_or_receive,
+                                               uint_fast16_t count,
+                                               uint8_t *buffer_ptr) {
+  VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
+  VSF_HAL_ASSERT(0);
+
+  return 0;
+}
+
 static void __vsf_gpio_i2c_isrhandler(vsf_gpio_i2c_t *gpio_i2c_ptr)
 {
     if (gpio_i2c_ptr->cfg.isr.handler_fn != NULL) {
@@ -184,7 +203,7 @@ static void __vsf_gpio_i2c_isrhandler(vsf_gpio_i2c_t *gpio_i2c_ptr)
 vsf_err_t vsf_gpio_i2c_master_request(vsf_gpio_i2c_t *gpio_i2c_ptr,
                                     uint16_t address,
                                     vsf_i2c_cmd_t cmd,
-                                    uint16_t count,
+                                    uint_fast16_t count,
                                     uint8_t *buffer)
 {
     bool is_read = (cmd & VSF_I2C_CMD_RW_MASK) == VSF_I2C_CMD_READ;
@@ -198,7 +217,7 @@ vsf_err_t vsf_gpio_i2c_master_request(vsf_gpio_i2c_t *gpio_i2c_ptr,
         uint32_t rw_mask = is_read ? 1 : 0;
         uint8_t bits = ((cmd & VSF_I2C_CMD_BITS_MASK) == VSF_I2C_CMD_7_BITS) ? 8 : 11;
         bool acked = __vsf_gpio_i2c_out(gpio_i2c_ptr, (address << 1) | rw_mask, bits);
-        gpio_i2c_ptr->irq_mask = VSF_I2C_IRQ_MASK_MASTER_STARTED;
+        gpio_i2c_ptr->irq_mask = VSF_I2C_IRQ_MASK_MASTER_START_OR_RESTART_DETECT;
         if (!acked) {
             gpio_i2c_ptr->irq_mask |= VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK;
             goto check_stop;
@@ -230,9 +249,28 @@ check_stop:
     return VSF_ERR_NONE;
 }
 
-uint_fast32_t vsf_gpio_i2c_get_transferred_count(vsf_gpio_i2c_t *gpio_i2c_ptr)
+vsf_err_t vsf_gpio_i2c_slave_request(vsf_gpio_i2c_t *gpio_i2c_ptr,
+                                     bool transmit_or_receive,
+                                     uint_fast16_t count,
+                                     uint8_t *buffer_ptr)
 {
+    VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+
+uint_fast16_t vsf_gpio_i2c_master_get_transferred_count(vsf_gpio_i2c_t *gpio_i2c_ptr)
+{
+    VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
     return gpio_i2c_ptr->transferred_count;
+}
+
+uint_fast16_t vsf_gpio_i2c_slave_get_transferred_count(vsf_gpio_i2c_t *gpio_i2c_ptr)
+{
+    VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
+    VSF_HAL_ASSERT(0);
+
+    return 0;
 }
 
 vsf_i2c_capability_t vsf_gpio_i2c_capability(vsf_gpio_i2c_t *gpio_i2c_ptr)
@@ -240,7 +278,7 @@ vsf_i2c_capability_t vsf_gpio_i2c_capability(vsf_gpio_i2c_t *gpio_i2c_ptr)
     vsf_i2c_capability_t capability = {
         .irq_mask = VSF_I2C_IRQ_ALL_BITS_MASK,
         .support_no_start = 1,
-        .support_no_stop_restart = 1,
+        .support_no_stop = 1,
         .support_restart = 1,
         .max_transfer_size = 0xFFFF,
         .min_transfer_size = 0,
@@ -248,11 +286,19 @@ vsf_i2c_capability_t vsf_gpio_i2c_capability(vsf_gpio_i2c_t *gpio_i2c_ptr)
     return capability;
 }
 
+vsf_err_t vsf_gpio_i2c_ctrl(vsf_gpio_i2c_t *gpio_i2c_ptr, vsf_i2c_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
 #define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_API_CTRL            ENABLED
 #define VSF_I2C_CFG_IMP_EXTERN_OP                   ENABLED
 #include "hal/driver/common/i2c/i2c_template.inc"
 

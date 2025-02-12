@@ -23,12 +23,18 @@
 #if VSF_HAL_USE_I2C == ENABLED
 
 #ifndef VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY
-#   define  VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
+#   define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY               DISABLED
+#endif
+
+#ifndef VSF_I2C_CFG_REIMPLEMENT_API_CTRL
+#   define VSF_I2C_CFG_REIMPLEMENT_API_CTRL                     DISABLED
 #endif
 
 #ifdef VSF_I2C_CFG_IMP_REMAP_PREFIX
 #   undef VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY
+#   undef VSF_I2C_CFG_REIMPLEMENT_API_CTRL
 #   define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY               ENABLED
+#   define VSF_I2C_CFG_REIMPLEMENT_API_CTRL                     ENABLED
 #endif
 
 #if VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -55,6 +61,7 @@
 #define vsf_real_i2c_t              VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t)
 #define vsf_real_master_request     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)
 #define vsf_real_i2c_capability     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)
+#define vsf_real_i2c_ctrl           VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_ctrl)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -84,6 +91,14 @@ vsf_i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
 }
 #endif
 
+#if VSF_I2C_CFG_REIMPLEMENT_API_CTRL == DISABLED
+vsf_err_t vsf_real_i2c_ctrl(vsf_real_i2c_t *i2c_ptr, vsf_i2c_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(NULL != i2c_ptr);
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY
@@ -96,6 +111,7 @@ vsf_i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
 
 #undef vsf_real_i2c_t
 #undef vsf_real_i2c_capability
+#undef vsf_real_i2c_ctrl
 
 /*============================ MACROS ========================================*/
 
@@ -111,6 +127,7 @@ vsf_i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
 #   define vsf_imp_i2c_capability               VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)
 #   define vsf_imp_i2c_master_request           VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)
 #   define vsf_imp_i2c_get_transferred_count    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_get_transferred_count)
+#   define vsf_imp_i2c_ctrl                     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_ctrl)
 
 #   define vsf_remap_i2c_t                      VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_t)
 #   define vsf_remap_i2c_init                   VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_init)
@@ -123,6 +140,7 @@ vsf_i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
 #   define vsf_remap_i2c_capability             VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_capability)
 #   define vsf_remap_i2c_master_request         VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_master_request)
 #   define vsf_remap_i2c_get_transferred_count  VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_get_transferred_count)
+#   define vsf_remap_i2c_ctrl                   VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_ctrl)
 
 #   define VSF_I2C_CFG_IMP_REMAP_FUNCTIONS                                                         \
         vsf_err_t vsf_imp_i2c_init(vsf_imp_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)                 \
@@ -179,6 +197,11 @@ vsf_i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
             VSF_HAL_ASSERT(i2c_ptr != NULL);                                                       \
             VSF_HAL_ASSERT(vsf_remap_i2c_get_transferred_count!= NULL);                            \
             return vsf_remap_i2c_get_transferred_count(i2c_ptr);                                   \
+        }                                                                                          \
+        vsf_err_t vsf_imp_i2c_ctrl(vsf_imp_i2c_t *i2c_ptr, vsf_i2c_ctrl_t ctrl, void *param)       \
+        {                                                                                          \
+            VSF_HAL_ASSERT(i2c_ptr != NULL);                                                       \
+            return vsf_remap_i2c_ctrl(i2c_ptr, ctrl, param);                                       \
         }
 #endif
 
@@ -224,6 +247,7 @@ vsf_i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
 #undef vsf_imp_i2c_capability
 #undef vsf_imp_i2c_master_request
 #undef vsf_imp_i2c_get_transferred_count
+#undef vsf_imp_i2c_ctrl
 
 #undef vsf_remap_i2c_t
 #undef vsf_remap_i2c_init
@@ -236,5 +260,6 @@ vsf_i2c_capability_t vsf_real_i2c_capability(vsf_real_i2c_t *i2c_ptr)
 #undef vsf_remap_i2c_capability
 #undef vsf_remap_i2c_master_request
 #undef vsf_remap_i2c_get_transferred_count
+#undef vsf_remap_i2c_ctrl
 
 #endif  /* VSF_HAL_USE_I2C */

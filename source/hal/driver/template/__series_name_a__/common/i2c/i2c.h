@@ -24,6 +24,13 @@
 
 #if VSF_HAL_USE_I2C == ENABLED
 
+// HW/IPCore
+/**
+ * \note When vsf_peripheral_status_t is inherited, vsf_template_hal_driver.h needs to be included
+ */
+#include "hal/driver/common/template/vsf_template_hal_driver.h"
+// HW/IPCore end
+
 #include "../../__device.h"
 
 /*\note Refer to template/README.md for usage cases.
@@ -62,20 +69,26 @@ extern "C" {
 // IPCore end
 
 // HW
-/*\note hw I2C driver can reimplement vsf_i2c_mode_t/vsf_i2c_cmd_t/vsf_i2c_irq_mask_t/vsf_i2c_status_t.
+/*\note hw I2C driver can reimplement following types:
  *      To enable reimplementation, please enable macro below:
  *          VSF_I2C_CFG_REIMPLEMENT_TYPE_MODE for vsf_i2c_mode_t
- *          VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD for vsf_i2c_cmd_t
  *          VSF_I2C_CFG_REIMPLEMENT_TYPE_STATUS for vsf_i2c_status_t
  *          VSF_I2C_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_i2c_irq_mask_t
+ *          VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD for vsf_i2c_cmd_t
+ *          VSF_I2C_CFG_REIMPLEMENT_TYPE_CTRL for vsf_i2c_ctrl_t
+ *          VSF_I2C_CFG_REIMPLEMENT_TYPE_CFG for vsf_i2c_cfg_t
+ *          VSF_I2C_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_i2c_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
 
-#define VSF_I2C_CFG_REIMPLEMENT_TYPE_MODE       ENABLED
-#define VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD        ENABLED
-#define VSF_I2C_CFG_REIMPLEMENT_TYPE_STATUS     ENABLED
-#define VSF_I2C_CFG_REIMPLEMENT_TYPE_IRQ_MASK   ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD          ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end
 
 /*============================ TYPES =========================================*/
@@ -101,6 +114,7 @@ vsf_class(vsf_${i2c_ip}_i2c_t) {
 // IPCore end
 
 // HW/IPCore, not for emulated drivers
+#if VSF_I2C_CFG_REIMPLEMENT_TYPE_MODE == ENABLED
 typedef enum vsf_i2c_mode_t {
     VSF_I2C_MODE_MASTER                         = (0x1ul << 28),
     VSF_I2C_MODE_SLAVE                          = (0x0ul << 28),
@@ -115,7 +129,9 @@ typedef enum vsf_i2c_mode_t {
 
     // more vendor specified irq_mask can be added here
 } vsf_i2c_mode_t;
+#endif
 
+#if VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD == ENABLED
 typedef enum vsf_i2c_cmd_t {
     VSF_I2C_CMD_WRITE                           = (0x00ul << 0),
     VSF_I2C_CMD_READ                            = (0x01ul << 0),
@@ -132,22 +148,31 @@ typedef enum vsf_i2c_cmd_t {
 
     // more vendor specified commands can be added here
 } vsf_i2c_cmd_t;
+#endif
 
+#if VSF_I2C_CFG_REIMPLEMENT_TYPE_IRQ_MASK == ENABLED
 typedef enum vsf_i2c_irq_mask_t {
-    VSF_I2C_IRQ_MASK_MASTER_STARTED             = (0x1ul <<  0),
-    VSF_I2C_IRQ_MASK_MASTER_STOPPED             = (0x1ul <<  1),
-    VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT         = (0x1ul <<  2),    // for multi master
-    VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT         = (0x1ul <<  4),
-    VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST    = (0x1ul <<  5),
-    VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY            = (0x1ul <<  6),
-    VSF_I2C_IRQ_MASK_MASTER_ERROR               = (0x1ul <<  7),
-
-    VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE   = (0x1ul <<  8),
-    VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK        = (0x1ul <<  9),
+    VSF_I2C_IRQ_MASK_MASTER_TX                      = (0x1ul << 0),
+    VSF_I2C_IRQ_MASK_MASTER_RX                      = (0x1ul << 1),
+    VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE       = (0x1ul << 2),
+    VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST        = (0x1ul << 3),
+    VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK            = (0x1ul << 4),
+    VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT          = (0x1ul << 5),
+    VSF_I2C_IRQ_MASK_MASTER_ERR                     = (0x1ul << 6),
+    VSF_I2C_IRQ_MASK_MASTER_START_OR_RESTART_DETECT = (0x1ul << 7),
+    VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT             = (0x1ul << 8),
+    VSF_I2C_IRQ_MASK_SLAVE_START_OR_RESTART_DETECT  = (0x1ul << 9),
+    VSF_I2C_IRQ_MASK_SLAVE_STOP_DETECT              = (0x1ul << 10),
+    VSF_I2C_IRQ_MASK_SLAVE_TX                       = (0x1ul << 11),
+    VSF_I2C_IRQ_MASK_SLAVE_RX                       = (0x1ul << 12),
+    VSF_I2C_IRQ_MASK_SLAVE_TRANSFER_COMPLETE        = (0x1ul << 13),
+    VSF_I2C_IRQ_MASK_SLAVE_ERR                      = (0x1ul << 14),
 
     // more vendor specified irq_masks can be added here
 } vsf_i2c_irq_mask_t;
+#endif
 
+#if VSF_I2C_CFG_REIMPLEMENT_TYPE_STATUS == ENABLED
 /*\note It's not obligated to inherit from vsf_peripheral_status_t.
  *      If not, there MUST be a is_busy bit in vsf_i2c_status_t.
  */
@@ -155,9 +180,51 @@ typedef enum vsf_i2c_irq_mask_t {
 typedef struct vsf_i2c_status_t {
     union {
         inherit(vsf_peripheral_status_t)
+        struct {
+            uint32_t is_busy    : 1;
+        };
         uint32_t value;
     };
 } vsf_i2c_status_t;
+#endif
+
+#if VSF_I2C_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
+typedef enum vsf_i2c_ctrl_t {
+    __VSF_I2C_CTRL_DUMMP = 0,
+} vsf_i2c_ctrl_t;
+#endif
+
+#if VSF_I2C_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
+typedef struct vsf_i2c_t vsf_i2c_t;
+typedef void vsf_i2c_isr_handler_t(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask);
+typedef struct vsf_i2c_isr_t {
+    vsf_i2c_isr_handler_t *handler_fn;
+    void *target_ptr;
+    vsf_arch_prio_t prio;
+} vsf_i2c_isr_t;
+typedef struct vsf_i2c_cfg_t {
+    vsf_i2c_mode_t mode;
+    uint32_t clock_hz;
+    vsf_i2c_isr_t isr;
+    uint_fast16_t slave_addr;
+} vsf_i2c_cfg_t;
+#endif
+
+#if VSF_I2C_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED
+typedef struct vsf_i2c_capability_t {
+#if VSF_I2C_CFG_INHERIT_HAL_CAPABILITY == ENABLED
+    inherit(vsf_peripheral_capability_t)
+#endif
+    vsf_i2c_irq_mask_t irq_mask;
+    uint8_t support_no_start        : 1;
+    uint8_t support_no_stop : 1;
+    uint8_t support_restart         : 1;
+    uint_fast16_t max_transfer_size;
+    uint_fast16_t min_transfer_size;
+
+    // more vendor specified capability can be added here
+} vsf_i2c_capability_t;
+#endif
 // HW/IPCore end
 
 /*============================ GLOBAL VARIABLES ==============================*/
