@@ -39,8 +39,8 @@
 #   ifndef VSF_WDT_CFG_CAPABILITY_SUPPORT_RESET_NONE
 #       define  VSF_WDT_CFG_CAPABILITY_SUPPORT_RESET_NONE               1
 #   endif
-#   ifndef VSF_WDT_CFG_CAPABILITY_SUPPORT_RESET_CORE
-#       define  VSF_WDT_CFG_CAPABILITY_SUPPORT_RESET_CORE               1
+#   ifndef VSF_WDT_CFG_CAPABILITY_support_reset_cpu
+#       define  VSF_WDT_CFG_CAPABILITY_support_reset_cpu               1
 #   endif
 #   ifndef VSF_WDT_CFG_CAPABILITY_SUPPORT_RESET_SOC
 #       define  VSF_WDT_CFG_CAPABILITY_SUPPORT_RESET_SOC                1
@@ -62,7 +62,7 @@ vsf_wdt_capability_t vsf_real_wdt_capability(vsf_real_wdt_t *wdt_ptr)
     vsf_wdt_capability_t wdt_capability = {
         .support_early_wakeup   = VSF_WDT_CFG_CAPABILITY_SUPPORT_EARLY_WAKEUP,
         .support_reset_none     = VSF_WDT_CFG_CAPABILITY_SUPPORT_RESET_NONE,
-        .support_reset_core     = VSF_WDT_CFG_CAPABILITY_SUPPORT_RESET_CORE,
+        .support_reset_cpu     = VSF_WDT_CFG_CAPABILITY_support_reset_cpu,
         .support_reset_soc      = VSF_WDT_CFG_CAPABILITY_SUPPORT_RESET_SOC,
         .support_disable        = VSF_WDT_CFG_CAPABILITY_SUPPORT_DISABLE,
         .max_timeout_ms         = VSF_WDT_CFG_CAPABILITY_MAX_TIMEOUT_MS,
@@ -77,7 +77,7 @@ vsf_wdt_capability_t vsf_real_wdt_capability(vsf_real_wdt_t *wdt_ptr)
 #undef VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_WDT_CFG_CAPABILITY_SUPPORT_EARLY_WAKEUP
 #undef VSF_WDT_CFG_CAPABILITY_SUPPORT_RESET_NONE
-#undef VSF_WDT_CFG_CAPABILITY_SUPPORT_RESET_CORE
+#undef VSF_WDT_CFG_CAPABILITY_support_reset_cpu
 #undef VSF_WDT_CFG_CAPABILITY_SUPPORT_RESET_SOC
 #undef VSF_WDT_CFG_CAPABILITY_SUPPORT_DISABLE
 #undef VSF_WDT_CFG_CAPABILITY_MAX_TIMEOUT_MS

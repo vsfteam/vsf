@@ -121,7 +121,7 @@ vsf_wdt_capability_t vsf_hw_wdt_capability(vsf_hw_wdt_t *wdt_ptr)
     vsf_wdt_capability_t cap = {
         .support_early_wakeup = 1,
         .support_reset_soc    = 1,
-        .support_reset_core   = 0,
+        .support_reset_cpu   = 0,
         .support_reset_none   = 0,
         .support_disable      = 1,
         .max_timeout_ms       = (uint64_t)0x100000000ull * 1000 / 32768,
