@@ -29,20 +29,43 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-// multi-class support enabled by default for maximum availability.
+/**
+ * \~english
+ * @brief Enable multi-class support by default for maximum availability..
+ * \~chinese
+ * @brief 默认启用多类支持，以获得最大可用性。
+ */
 #ifndef VSF_I2S_CFG_MULTI_CLASS
-#   define VSF_I2S_CFG_MULTI_CLASS                  ENABLED
+#   define VSF_I2S_CFG_MULTI_CLASS                      ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Define I2S hardware mask if count is defined.
+ * \~chinese
+ * @brief 如果定义了I2S硬件数量，则定义对应的掩码。
+ */
 #if defined(VSF_HW_I2S_COUNT) && !defined(VSF_HW_I2S_MASK)
-#   define VSF_HW_I2S_MASK                          VSF_HAL_COUNT_TO_MASK(VSF_HW_I2S_COUNT)
+#   define VSF_HW_I2S_MASK                              VSF_HAL_COUNT_TO_MASK(VSF_HW_I2S_COUNT)
 #endif
 
+/**
+ * \~english
+ * @brief Define I2S hardware count if mask is defined.
+ * \~chinese
+ * @brief 如果定义了I2S硬件掩码，则定义对应的数量。
+ */
 #if defined(VSF_HW_I2S_MASK) && !defined(VSF_HW_I2S_COUNT)
-#   define VSF_HW_I2S_COUNT                         VSF_HAL_MASK_TO_COUNT(VSF_HW_I2S_MASK)
+#   define VSF_HW_I2S_COUNT                             VSF_HAL_MASK_TO_COUNT(VSF_HW_I2S_MASK)
 #endif
 
-// application code can redefine it
+/**
+ * \~english
+ * @brief We can redefine macro VSF_I2S_CFG_PREFIX to specify a prefix
+ * to call a specific driver directly in the application code.
+ * \~chinese
+ * @brief 可重新定义宏 VSF_I2S_CFG_PREFIX，以在应用代码中直接调用特定驱动。
+ */
 #ifndef VSF_I2S_CFG_PREFIX
 #   if VSF_I2S_CFG_MULTI_CLASS == ENABLED
 #       define VSF_I2S_CFG_PREFIX                   vsf
@@ -53,42 +76,103 @@ extern "C" {
 #   endif
 #endif
 
+
+/**
+ * \~english
+ * @brief Disable VSF_I2S_CFG_FUNCTION_RENAME to use the original function names
+ * (e.g., vsf_i2s_init()).
+ * \~chinese
+ * @brief 禁用 VSF_I2S_CFG_FUNCTION_RENAME 以使用原始函数名(例如 vsf_i2s_init())。
+ */
 #ifndef VSF_I2S_CFG_FUNCTION_RENAME
 #   define VSF_I2S_CFG_FUNCTION_RENAME              ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief In specific hardware driver, we can enable macro
+ * VSF_I2S_CFG_REIMPLEMENT_MODE to redefine enum @ref vsf_i2s_mode_t.
+ * \~chinese
+ * @brief 在具体硬件驱动中，我们可以启用宏 VSF_I2S_CFG_REIMPLEMENT_MODE 来重新定义枚举
+ * @ref vsf_i2s_mode_t。
+ */
 #ifndef VSF_I2S_CFG_REIMPLEMENT_TYPE_MODE
 #   define VSF_I2S_CFG_REIMPLEMENT_TYPE_MODE        DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief In specific hardware driver, we can enable macro
+ * VSF_I2S_CFG_REIMPLEMENT_IRQ_MASK to redefine enum @ref vsf_i2s_irq_mask_t.
+ * \~chinese
+ * @brief 在具体硬件驱动中，我们可以启用宏 VSF_I2S_CFG_REIMPLEMENT_IRQ_MASK 来重新定义枚举
+ * @ref vsf_i2s_irq_mask_t。
+ */
 #ifndef VSF_I2S_CFG_REIMPLEMENT_TYPE_IRQ_MASK
 #   define VSF_I2S_CFG_REIMPLEMENT_TYPE_IRQ_MASK    DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief In specific hardware driver, we can enable macro
+ * VSF_I2S_CFG_REIMPLEMENT_STATUS to redefine struct @ref vsf_i2s_status_t.
+ * \~chinese
+ * @brief 在具体硬件驱动中，我们可以启用宏 VSF_I2S_CFG_REIMPLEMENT_STATUS 来重新定义结构体
+ * @ref vsf_i2s_status_t。
+ */
 #ifndef VSF_I2S_CFG_REIMPLEMENT_TYPE_STATUS
 #   define VSF_I2S_CFG_REIMPLEMENT_TYPE_STATUS      DISABLED
 #endif
 
-//! Redefine struct vsf_i2s_cfg_t. The vsf_i2s_isr_handler_t type also needs to
-//! be redefined For compatibility, members should not be deleted when struct
-//! @ref vsf_i2s_cfg_t redefining.
+
+
+/**
+ * \~english @brief In specific hardware driver, we can enable macro
+ * VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG to redefine struct @ref vsf_i2s_cfg_t. For
+ * compatibility, members should not be deleted when redefining.
+ * \~chinese @brief 在具体的硬件驱动中，可以启用宏
+ * VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG 来重新定义结构体 @ref
+ * vsf_i2s_cfg_t。为了保证兼容性，重新定义时不应删除成员。
+ */
 #if VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 #    define VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG DISABLED
 #endif
 
-//! Redefine struct vsf_i2s_capability_t.
-//! For compatibility, members should not be deleted when struct @ref
-//! vsf_i2s_capability_t redefining.
+/**
+ * \~english @brief In specific hardware driver, we can enable macro
+ * VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY to redefine struct @ref
+ * vsf_i2s_capability_t. For compatibility, members should not be deleted when
+ * struct @ref vsf_i2s_capability_t redefining.
+ * \~chinese @brief 在具体的硬件驱动中，可以启用宏
+ * VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY 来重新定义结构体 @ref
+ * vsf_i2s_capability_t。为了保证兼容性，重新定义时不应删除成员。
+ */
 #if VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 #    define VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
-#ifndef VSF_I2S_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_I2S_CFG_INHERT_HAL_CAPABILITY       ENABLED
+/**
+ * \~english @brief In specific hardware driver, we can enable macro
+ * VSF_I2S_CFG_INHERIT_HAL_CAPABILITY to inherit structure @ref
+ * vsf_peripheral_capability_t.
+ * \~chinse @brief 在具体的硬件驱动中，可以启用宏
+ * VSF_I2S_CFG_INHERIT_HAL_CAPABILITY 来继承结构体 @ref
+ * vsf_peripheral_capability_t。
+ */
+#ifndef VSF_I2S_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_I2S_CFG_INHERIT_HAL_CAPABILITY       ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+/**
+ * \~english
+ * @brief I2S API template, used to generate I2S type, specific prefix function declarations, etc.
+ * @param[in] __prefix_name The prefix used for generating I2S functions.
+ * \~chinese
+ * @brief I2S API 模板，用于生成 I2S 类型、特定前缀的函数声明等。
+ * @param[in] __prefix_name 用于生成 I2S 函数的前缀。
+ */
 #define VSF_I2S_APIS(__prefix_name)                                                                                                                         \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, init,          VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)   \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, tx_init,       VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)   \
@@ -179,7 +263,7 @@ typedef struct vsf_i2s_status_t {
 
 #if VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_i2s_capability_t {
-#if VSF_I2S_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_I2S_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
     struct {
@@ -273,8 +357,10 @@ typedef struct vsf_i2s_cfg_t {
 #endif
 
 typedef struct vsf_i2s_op_t {
+/// @cond
 #undef __VSF_HAL_TEMPLATE_API
 #define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
+/// @endcond
 
     VSF_I2S_APIS(vsf)
 } vsf_i2s_op_t;
@@ -289,175 +375,175 @@ struct vsf_i2s_t  {
 /*============================ PROTOTYPES ====================================*/
 
 /**
- \~english
- @brief initialize a i2s instance.
- @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
- @param[in] cfg_ptr: a pointer to structure @ref vsf_i2s_cfg_t
- @return vsf_err_t: VSF_ERR_NONE if i2s was initialized, or a negative error code
-
- @note It is not necessary to call vsf_i2s_fini() to deinitialization.
-       vsf_i2s_init() should be called before any other i2s API except vsf_i2s_capability().
-
- \~chinese
- @brief 初始化一个 i2s 实例
- @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
- @param[in] cfg_ptr: 结构体 vsf_i2s_cfg_t 的指针，参考 @ref vsf_i2s_cfg_t
- @return vsf_err_t: 如果 i2s 初始化成功返回 VSF_ERR_NONE , 失败返回负数。
-
- @note 失败后不需要调用 vsf_i2s_fini() 反初始化。
-       vsf_i2s_init() 应该在除 vsf_i2s_capability() 之外的其他 i2s API 之前调用。
+ * \~english
+ * @brief Initialize an I2S instance
+ * @param[in] i2s_ptr: pointer to structure @ref vsf_i2s_t
+ * @param[in] cfg_ptr: pointer to configuration structure @ref vsf_i2s_cfg_t
+ * @return vsf_err_t: VSF_ERR_NONE if initialization successful, otherwise return error code
+ *
+ *  @note It is not necessary to call vsf_i2s_fini() to deinitialization.
+ *     vsf_i2s_init() should be called before any other I2S API except vsf_i2s_capability().
+ * \~chinese
+ * @brief 初始化一个 I2S 实例
+ * @param[in] i2s_ptr: 指向结构体 @ref vsf_i2s_t 的指针
+ * @param[in] cfg_ptr: 指向配置结构体 @ref vsf_i2s_cfg_t 的指针
+ * @return vsf_err_t: 如果初始化成功返回 VSF_ERR_NONE，否则返回错误码
+ *
+ * @note 失败后不需要调用 vsf_i2s_fini() 反初始化。
+ *       vsf_i2s_init() 应该在除 vsf_i2s_capability() 之外的其他 I2S API 之前调用。
  */
 extern vsf_err_t vsf_i2s_init(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *i2s_cfg);
 
 /**
  \~english
- @brief initialize i2s tx channel.
+ @brief Initialize i2s tx channel.
  @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
  @param[in] cfg_ptr: a pointer to structure @ref vsf_i2s_cfg_t
  @return vsf_err_t: VSF_ERR_NONE if i2s initialized successfully, or a negative error code
 
  \~chinese
  @brief 初始化 i2s 发送通道
- @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
- @param[in] cfg_ptr: 结构体 vsf_i2s_cfg_t 的指针，参考 @ref vsf_i2s_cfg_t
+ @param[in] i2s_ptr: 指向结构体 @ref vsf_i2s_t 的指针
+ @param[in] cfg_ptr: 指向结构体 @ref vsf_i2s_cfg_t 的指针
  @return vsf_err_t: 如果 i2s 初始化完成返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_i2s_tx_init(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *i2s_cfg);
 
 /**
  \~english
- @brief finalize i2s tx channel.
+ @brief Finalize i2s tx channel.
  @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
  @return void
 
  \~chinese
  @brief 终止化 i2s 发送通道
- @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
- @return 无。
+ @param[in] i2s_ptr: 指向结构体 @ref vsf_i2s_t 的指针
+ @return 无
  */
 extern void vsf_i2s_tx_fini(vsf_i2s_t *i2s_ptr);
 
 /**
  \~english
- @brief start i2s tx channel.
+ @brief Start i2s tx channel.
  @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
  @return vsf_err_t: VSF_ERR_NONE if i2s started successfully, or a negative error code
 
  \~chinese
  @brief 启动 i2s 发送通道
- @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
+ @param[in] i2s_ptr: 指向结构体 @ref vsf_i2s_t 的指针
  @return vsf_err_t: 如果 i2s 启动完成返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_i2s_tx_start(vsf_i2s_t *i2s_ptr);
 
 /**
  \~english
- @brief initialize i2s rx channel.
+ @brief Initialize i2s rx channel.
  @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
  @param[in] cfg_ptr: a pointer to structure @ref vsf_i2s_cfg_t
  @return vsf_err_t: VSF_ERR_NONE if i2s initialized successfully, or a negative error code
 
  \~chinese
  @brief 初始化 i2s 接收通道
- @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
- @param[in] cfg_ptr: 结构体 vsf_i2s_cfg_t 的指针，参考 @ref vsf_i2s_cfg_t
+ @param[in] i2s_ptr: 指向结构体 @ref vsf_i2s_t 的指针
+ @param[in] cfg_ptr: 指向结构体 @ref vsf_i2s_cfg_t 的指针
  @return vsf_err_t: 如果 i2s 初始化完成返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_i2s_rx_init(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *i2s_cfg);
 
 /**
  \~english
- @brief finalize i2s rx channel.
+ @brief Finalize i2s rx channel.
  @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
  @return void
 
  \~chinese
  @brief 终止化 i2s 接收通道
- @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
- @return 无。
+ @param[in] i2s_ptr: 指向结构体 @ref vsf_i2s_t 的指针
+ @return 无
  */
 extern void vsf_i2s_rx_fini(vsf_i2s_t *i2s_ptr);
 
 /**
  \~english
- @brief start i2s rx channel.
+ @brief Start i2s rx channel.
  @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
  @return vsf_err_t: VSF_ERR_NONE if i2s started successfully, or a negative error code
 
  \~chinese
  @brief 启动 i2s 接收通道
- @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
+ @param[in] i2s_ptr: 指向结构体 @ref vsf_i2s_t 的指针
  @return vsf_err_t: 如果 i2s 启动完成返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_i2s_rx_start(vsf_i2s_t *i2s_ptr);
 
 /**
  \~english
- @brief finalize a i2s instance.
+ @brief Finalize a i2s instance.
  @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
  @return none
 
  \~chinese
  @brief 结束一个 i2s 实例
- @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
- @return none
+ @param[in] i2s_ptr: 指向结构体 @ref vsf_i2s_t 的指针
+ @return 无
  */
 extern void vsf_i2s_fini(vsf_i2s_t *i2s_ptr);
 
 /**
- \~english
- @brief enable i2s instance.
- @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
- @return fsm_rt_t: fsm_rt_cpl if enable complete, else return fsm_rt_onging
-
- \~chinese
- @brief 使能 i2s 实例
- @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
- @return fsm_rt_t: 如果使能成功，返回 fsm_rt_cpl, 未完成初始化返回 fsm_rt_onging
+ * \~english
+ * @brief Enable I2S instance
+ * @param[in] i2s_ptr: pointer to structure @ref vsf_i2s_t
+ * @return fsm_rt_t: return fsm_rt_cpl if enabled, fsm_rt_onging if waiting to be enabled
+ *
+ * \~chinese
+ * @brief 启用 I2S 实例
+ * @param[in] i2s_ptr: 指向结构体 @ref vsf_i2s_t 的指针
+ * @return fsm_rt_t: 如果已经启用返回 fsm_rt_cpl，如果等待启用返回 fsm_rt_onging
  */
 extern fsm_rt_t vsf_i2s_enable(vsf_i2s_t *i2s_ptr);
 
 /**
  \~english
- @brief disable i2s instance.
+ @brief Disable i2s instance.
  @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
  @return fsm_rt_t: fsm_rt_cpl if disable complete, else return fsm_rt_onging
 
  \~chinese
- @brief禁能 i2s 实例
- @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
- @return fsm_rt_t: 如果禁能成功，返回 fsm_rt_cpl, 未完成初始化返回 fsm_rt_onging
+ @brief 禁用 i2s 实例
+ @param[in] i2s_ptr: 指向结构体 @ref vsf_i2s_t 的指针
+ @return fsm_rt_t: 如果禁用成功，返回 fsm_rt_cpl, 未完成初始化返回 fsm_rt_onging
  */
 extern fsm_rt_t vsf_i2s_disable(vsf_i2s_t *i2s_ptr);
 
 /**
  \~english
- @brief get the status of i2s instance.
+ @brief Get the status of i2s instance.
  @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
  @return vsf_i2s_status_t: return all status of current i2s
 
  \~chinese
  @brief 获取 i2s 实例的状态
- @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
+ @param[in] i2s_ptr: 指向结构体 @ref vsf_i2s_t 的指针
  @return vsf_i2s_status_t: 返回当前i2s的所有状态
  */
 extern vsf_i2s_status_t vsf_i2s_status(vsf_i2s_t *i2s_ptr);
 
 /**
  \~english
- @brief get the capability of i2s instance.
+ @brief Get the capability of i2s instance.
  @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
  @return vsf_i2s_capability_t: return all capability of current i2s @ref vsf_i2s_capability_t
 
  \~chinese
  @brief 获取 i2s 实例的能力
- @param[in] i2s_ptr: 结构体 vsf_i2s_t 的指针，参考 @ref vsf_i2s_t
+ @param[in] i2s_ptr: 指向结构体 @ref vsf_i2s_t 的指针
  @return vsf_i2s_capability_t: 返回当前 i2s 的所有能力 @ref vsf_i2s_capability_t
  */
 extern vsf_i2s_capability_t vsf_i2s_capability(vsf_i2s_t *i2s_ptr);
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+/// @cond
 #if VSF_I2S_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_i2s_t                      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_t)
 #   define vsf_i2s_init(__i2s, ...)         VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_init)         ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
@@ -474,6 +560,7 @@ extern vsf_i2s_capability_t vsf_i2s_capability(vsf_i2s_t *i2s_ptr);
 #   define vsf_i2s_rx_fini(__i2s, ...)      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_fini)      ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
 #   define vsf_i2s_rx_start(__i2s)          VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_start)     ((__vsf_i2s_t *)(__i2s))
 #endif
+/// @endcond
 
 #ifdef __cplusplus
 }
