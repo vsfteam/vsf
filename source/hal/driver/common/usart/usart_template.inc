@@ -28,17 +28,17 @@
 #   define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY                 DISABLED
 #endif
 
-#ifndef VSF_USART_CFG_REIMPLEMENT_API_CMD
-#   define VSF_USART_CFG_REIMPLEMENT_API_CMD                        DISABLED
+#ifndef VSF_USART_CFG_REIMPLEMENT_API_CTRL
+#   define VSF_USART_CFG_REIMPLEMENT_API_CTRL                       DISABLED
 #endif
 
 #ifdef VSF_USART_CFG_IMP_REMAP_PREFIX
 #   undef VSF_USART_CFG_REIMPLEMENT_API_REQUEST
 #   undef VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY
-#   undef VSF_USART_CFG_REIMPLEMENT_API_CMD
+#   undef VSF_USART_CFG_REIMPLEMENT_API_CTRL
 #   define VSF_USART_CFG_REIMPLEMENT_API_REQUEST                    ENABLED
 #   define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY                 ENABLED
-#   define VSF_USART_CFG_REIMPLEMENT_API_CMD                        ENABLED
+#   define VSF_USART_CFG_REIMPLEMENT_API_CTRL                       ENABLED
 #endif
 
 #if VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -82,7 +82,7 @@
 #define vsf_real_usart_cancel_tx            VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cancel_tx)
 #define vsf_real_usart_get_tx_count         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)
 #define vsf_real_usart_capability           VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
-#define vsf_real_usart_cmd                  VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cmd)
+#define vsf_real_usart_ctrl                 VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_ctrl)
 #define vsf_real_usart_tx_send_break        VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_tx_send_break)
 
 /*============================ IMPLEMENTATION ================================*/
@@ -147,8 +147,8 @@ vsf_usart_capability_t vsf_real_usart_capability(vsf_real_usart_t *usart_ptr)
 }
 #endif
 
-#if VSF_USART_CFG_REIMPLEMENT_API_CMD == DISABLED
-vsf_err_t vsf_real_usart_cmd(vsf_real_usart_t *usart_ptr, vsf_usart_cmd_t cmd, void * param)
+#if VSF_USART_CFG_REIMPLEMENT_API_CTRL == DISABLED
+vsf_err_t vsf_real_usart_ctrl(vsf_real_usart_t *usart_ptr, vsf_usart_ctrl_t ctrl, void * param)
 {
     VSF_HAL_ASSERT(0);
 
@@ -168,7 +168,7 @@ vsf_err_t vsf_real_usart_cmd(vsf_real_usart_t *usart_ptr, vsf_usart_cmd_t cmd, v
 #undef VSF_USART_CFG_CAPABILITY_MIN_DATA_BITS
 #undef VSF_USART_CFG_CAPABILITY_SUPPORT_RX_TIMEOUT
 #undef VSF_USART_CFG_REIMPLEMENT_API_REQUEST
-#undef VSF_USART_CFG_REIMPLEMENT_API_CMD
+#undef VSF_USART_CFG_REIMPLEMENT_API_CTRL
 #undef vsf_real_usart_t
 #undef vsf_real_usart_init
 #undef vsf_real_usart_fini
@@ -183,7 +183,7 @@ vsf_err_t vsf_real_usart_cmd(vsf_real_usart_t *usart_ptr, vsf_usart_cmd_t cmd, v
 #undef vsf_real_usart_cancel_tx
 #undef vsf_real_usart_get_tx_count
 #undef vsf_real_usart_capability
-#undef vsf_real_usart_cmd
+#undef vsf_real_usart_ctrl
 #undef vsf_real_usart_tx_send_break
 
 /*============================ IMPLEMENTATION ================================*/
@@ -209,7 +209,7 @@ vsf_err_t vsf_real_usart_cmd(vsf_real_usart_t *usart_ptr, vsf_usart_cmd_t cmd, v
 #   define vsf_imp_usart_cancel_tx                  VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cancel_tx)
 #   define vsf_imp_usart_get_rx_count               VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_rx_count)
 #   define vsf_imp_usart_get_tx_count               VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)
-#   define vsf_imp_usart_cmd                        VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cmd)
+#   define vsf_imp_usart_ctrl                       VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_ctrl)
 
 #   define vsf_remap_usart_t                        VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_t)
 #   define vsf_remap_usart_init                     VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_init)
@@ -230,7 +230,7 @@ vsf_err_t vsf_real_usart_cmd(vsf_real_usart_t *usart_ptr, vsf_usart_cmd_t cmd, v
 #   define vsf_remap_usart_cancel_tx                VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_cancel_tx)
 #   define vsf_remap_usart_get_rx_count             VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_get_rx_count)
 #   define vsf_remap_usart_get_tx_count             VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_get_tx_count)
-#   define vsf_remap_usart_cmd                      VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_cmd)
+#   define vsf_remap_usart_ctrl                     VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_ctrl)
 #   define VSF_USART_CFG_IMP_REMAP_FUNCTIONS                                                                        \
         vsf_err_t vsf_imp_usart_init(vsf_imp_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr)                          \
         {                                                                                                           \
@@ -322,10 +322,10 @@ vsf_err_t vsf_real_usart_cmd(vsf_real_usart_t *usart_ptr, vsf_usart_cmd_t cmd, v
             VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
             return vsf_remap_usart_get_tx_count(usart_ptr);                                                         \
         }                                                                                                           \
-        vsf_err_t vsf_imp_usart_cmd(vsf_imp_usart_t *usart_ptr, vsf_usart_cmd_t cmd, void *param)                   \
+        vsf_err_t vsf_imp_usart_ctrl(vsf_imp_usart_t *usart_ptr, vsf_usart_ctrl_t ctrl, void *param)                \
         {                                                                                                           \
             VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
-            return vsf_remap_usart_cmd(usart_ptr, cmd, param);                                                      \
+            return vsf_remap_usart_ctrl(usart_ptr, ctrl, param);                                                    \
         }
 #endif
 
@@ -380,7 +380,7 @@ vsf_err_t vsf_real_usart_cmd(vsf_real_usart_t *usart_ptr, vsf_usart_cmd_t cmd, v
 #undef vsf_imp_usart_cancel_tx
 #undef vsf_imp_usart_get_rx_count
 #undef vsf_imp_usart_get_tx_count
-#undef vsf_imp_usart_cmd
+#undef vsf_imp_usart_ctrl
 #undef vsf_imp_usart_tx_send_break
 
 #undef vsf_remap_usart_t
@@ -402,7 +402,7 @@ vsf_err_t vsf_real_usart_cmd(vsf_real_usart_t *usart_ptr, vsf_usart_cmd_t cmd, v
 #undef vsf_remap_usart_cancel_tx
 #undef vsf_remap_usart_get_rx_count
 #undef vsf_remap_usart_get_tx_count
-#undef vsf_remap_usart_cmd
+#undef vsf_remap_usart_ctrl
 #undef vsf_remap_usart_tx_send_break
 
 #endif  /* VSF_HAL_USE_USART */
