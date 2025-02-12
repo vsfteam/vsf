@@ -90,8 +90,8 @@ extern "C" {
 #    define VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
-#ifndef VSF_ADC_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_ADC_CFG_INHERT_HAL_CAPABILITY            ENABLED
+#ifndef VSF_ADC_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_ADC_CFG_INHERIT_HAL_CAPABILITY            ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -246,7 +246,7 @@ typedef struct vsf_adc_status_t {
 
 #if VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_adc_capability_t {
-#if VSF_ADC_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_ADC_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
     vsf_adc_irq_mask_t irq_mask;
@@ -301,7 +301,6 @@ extern vsf_err_t vsf_adc_init(vsf_adc_t *adc_ptr, vsf_adc_cfg_t *cfg_ptr);
  \~chinese
  @brief 终止一个 adc 实例
  @param[in] adc_ptr: 结构体 vsf_adc_t 的指针，参考 @ref vsf_adc_t
- @param[in] cfg_ptr: 结构体 vsf_adc_cfg_t 的指针，参考 @ref vsf_adc_cfg_t
  @return 无。
  */
 extern void vsf_adc_fini(vsf_adc_t *adc_ptr);
@@ -418,7 +417,7 @@ extern vsf_err_t vsf_adc_channel_request_once(vsf_adc_t *adc_ptr,
  @brief adc channel configuration
  @param[in] adc_ptr: a pointer to structure @ref vsf_adc_t
  @param[in] channel_cfgs_ptr: sampling channel configuration array
- @param[in] channel_cfgs_ptr: the length of sampling channel configuration array
+ @param[in] channel_cfgs_cnt: the length of sampling channel configuration array
  @param[in] buffer_ptr: data buffer
  @return vsf_err_t: VSF_ERR_NONE if the adc request was successfully, or a negative error code
 
@@ -443,10 +442,10 @@ extern vsf_err_t vsf_adc_channel_config(vsf_adc_t *adc_ptr,
  @return vsf_err_t: VSF_ERR_NONE if the adc request was successfully, or a negative error code
 
  \~chinese
- @brief adc通道配置
+ @brief adc通道请求
  @param[in] adc_ptr: 结构体 vsf_adc_t 的指针，参考 @ref vsf_adc_t
- @param[out] buffer_ptr: 采样通道配置数据数组
- @param[in] count: 采样通道配置数据数组的长度
+ @param[out] buffer_ptr: 采样通道数据数组
+ @param[in] count: 采样通道数据数组的长度
  @return vsf_err_t: 如果 adc 请求成功返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr,
