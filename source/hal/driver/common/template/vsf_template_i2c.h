@@ -77,6 +77,12 @@ extern "C" {
 #   define VSF_I2C_CFG_REIMPLEMENT_TYPE_STATUS      DISABLED
 #endif
 
+//! In the specific hardware driver, we can enable
+//! VSF_I2C_CFG_REIMPLEMENT_TYPE_CTRL to redefine vsf_i2c_ctrl_t as needed.
+#ifndef VSF_I2C_CFG_REIMPLEMENT_TYPE_CTRL
+#   define VSF_I2C_CFG_REIMPLEMENT_TYPE_CTRL        DISABLED
+#endif
+
 //! Redefine struct vsf_i2c_cfg_t. The vsf_i2c_isr_handler_t type also needs to
 //! be redefined For compatibility, members should not be deleted when struct
 //! @ref vsf_i2c_cfg_t redefining.
@@ -92,8 +98,8 @@ extern "C" {
 #endif
 
 
-#ifndef VSF_I2C_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_I2C_CFG_INHERT_HAL_CAPABILITY       ENABLED
+#ifndef VSF_I2C_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_I2C_CFG_INHERIT_HAL_CAPABILITY       ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -107,8 +113,17 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, void,                 i2c, irq_disable,           VSF_MCONNECT(__PREFIX_NAME, _i2c_t) *i2c_ptr, vsf_i2c_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, vsf_i2c_status_t,     i2c, status,                VSF_MCONNECT(__PREFIX_NAME, _i2c_t) *i2c_ptr)                              \
     __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, vsf_i2c_capability_t, i2c, capability,            VSF_MCONNECT(__PREFIX_NAME, _i2c_t) *i2c_ptr)                              \
-    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, uint_fast32_t,        i2c, get_transferred_count, VSF_MCONNECT(__PREFIX_NAME, _i2c_t) *i2c_ptr)                              \
-    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, vsf_err_t,            i2c, master_request,        VSF_MCONNECT(__PREFIX_NAME, _i2c_t) *i2c_ptr, uint16_t address, vsf_i2c_cmd_t cmd, uint16_t count, uint8_t* buffer_ptr)
+    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, uint_fast32_t,        i2c, master_get_transferred_count, VSF_MCONNECT(__PREFIX_NAME, _i2c_t) *i2c_ptr)                       \
+    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, vsf_err_t,            i2c, master_fifo_transfer,  VSF_MCONNECT(__PREFIX_NAME, _i2c_t) *i2c_ptr, uint16_t address,            \
+        vsf_i2c_cmd_t cmd, uint16_t count, uint8_t* buffer_ptr, vsf_i2c_cmd_t *cur_cmd_ptr, uint16_t *offset_ptr)                                                      \
+    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, vsf_err_t,            i2c, master_request,        VSF_MCONNECT(__PREFIX_NAME, _i2c_t) *i2c_ptr, uint16_t address,            \
+        vsf_i2c_cmd_t cmd, uint16_t count, uint8_t* buffer_ptr)                                                                                                        \
+    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, uint_fast32_t,        i2c, slave_get_transferred_count, VSF_MCONNECT(__PREFIX_NAME, _i2c_t) *i2c_ptr)                        \
+    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, vsf_err_t,            i2c, slave_fifo_transfer,   VSF_MCONNECT(__PREFIX_NAME, _i2c_t) *i2c_ptr, bool transmit_or_receive,    \
+        uint16_t count, uint8_t* buffer_ptr)                                                                                                                           \
+    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, vsf_err_t,            i2c, slave_request,         VSF_MCONNECT(__PREFIX_NAME, _i2c_t) *i2c_ptr, bool transmit_or_receive,    \
+        uint16_t count, uint8_t* buffer_ptr)                                                                                                                           \
+    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, vsf_err_t,            i2c, ctrl,                  VSF_MCONNECT(__PREFIX_NAME, _i2c_t) *i2c_ptr, vsf_i2c_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
 
@@ -155,11 +170,8 @@ typedef enum vsf_i2c_cmd_t {
     VSF_I2C_CMD_READ            = (0x01ul << 0),
 
     VSF_I2C_CMD_START           = (0x00ul << 28),
-    VSF_I2C_CMD_NO_START        = (0x01ul << 28),
-
     VSF_I2C_CMD_STOP            = (0x00ul << 29),
     VSF_I2C_CMD_RESTART         = (0x01ul << 30),
-    VSF_I2C_CMD_NO_STOP_RESTART = (0x01ul << 30),
 
     VSF_I2C_CMD_7_BITS          = (0x00ul << 31),
     VSF_I2C_CMD_10_BITS         = (0x01ul << 31),
@@ -174,14 +186,6 @@ enum {
     VSF_I2C_CMD_BITS_MASK           = VSF_I2C_CMD_7_BITS |
                                       VSF_I2C_CMD_10_BITS,
 
-    VSF_I2C_CMD_START_COUNT         = 2,
-    VSF_I2C_CMD_START_MASK          = VSF_I2C_CMD_START | VSF_I2C_CMD_NO_START,
-
-    VSF_I2C_CMD_STOP_RESTART_COUNT  = 3,
-    VSF_I2C_CMD_STOP_RESTART_MASK   = VSF_I2C_CMD_STOP
-                                    | VSF_I2C_CMD_RESTART
-                                    | VSF_I2C_CMD_NO_STOP_RESTART,
-
     VSF_I2C_CMD_MASK_COUNT          = 5,
     VSF_I2C_CMD_ALL_BITS_MASK       = VSF_I2C_CMD_RW_MASK
                                     | VSF_I2C_CMD_START
@@ -192,16 +196,30 @@ enum {
 
 #if VSF_I2C_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
 typedef enum vsf_i2c_irq_mask_t {
+    // issued if VSF_I2C_CMD_START is set in cmd for vsf_i2c_master_request
     VSF_I2C_IRQ_MASK_MASTER_STARTED                 = (0x1ul <<  0),
+    // issued if VSF_I2C_CMD_STOP is set in cmd for vsf_i2c_master_request
     VSF_I2C_IRQ_MASK_MASTER_STOPPED                 = (0x1ul <<  1),
-    VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT             = (0x1ul <<  2),    // for multi master
-    VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT             = (0x1ul <<  4),
-    VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST        = (0x1ul <<  5),
-    VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY                = (0x1ul <<  6),
-    VSF_I2C_IRQ_MASK_MASTER_ERROR                   = (0x1ul <<  7),
+    // TX/RX reach fifo threshold, threshold on some devices is bound to 1
+    VSF_I2C_IRQ_MASK_MASTER_TX                      = (0x1ul <<  2),
+    VSF_I2C_IRQ_MASK_MASTER_RX                      = (0x1ul <<  3),
+    VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE       = (0x1ul <<  4),
+    // Hardware detects STOP signal (useful for multiple master)
+    VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT             = (0x1ul <<  5),
+    VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST        = (0x1ul <<  6),
+    VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT             = (0x1ul <<  7),
+    VSF_I2C_IRQ_MASK_MASTER_ERR                     = (0x1ul <<  8),
 
-    VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE       = (0x1ul <<  8),
-    VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK            = (0x1ul <<  9),
+    VSF_I2C_IRQ_MASK_SLAVE_ADDRESS_WRITE            = (0x1ul << 9),
+    VSF_I2C_IRQ_MASK_SLAVE_ADDRESS_READ             = (0x1ul << 10),
+    VSF_I2C_IRQ_MASK_SLAVE_START_DETECT             = (0x1ul << 11),
+    VSF_I2C_IRQ_MASK_SLAVE_RESTART_DETECT           = (0x1ul << 12),
+    VSF_I2C_IRQ_MASK_SLAVE_STOP_DETECT              = (0x1ul << 13),
+    // TX/RX reach fifo threshold, threshold on some devices is bound to 1
+    VSF_I2C_IRQ_MASK_SLAVE_TX                       = (0x1ul << 14),
+    VSF_I2C_IRQ_MASK_SLAVE_RX                       = (0x1ul << 15),
+    VSF_I2C_IRQ_MASK_SLAVE_TRANSFER_COMPLETE        = (0x1ul << 16),
+    VSF_I2C_IRQ_MASK_SLAVE_ERR                      = (0x1ul << 17),
 } vsf_i2c_irq_mask_t;
 #endif
 
@@ -229,7 +247,7 @@ typedef struct vsf_i2c_status_t {
 
 #if VSF_I2C_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_i2c_capability_t {
-#if VSF_I2C_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_I2C_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
     vsf_i2c_irq_mask_t irq_mask;
@@ -301,7 +319,7 @@ typedef struct vsf_i2c_isr_t {
     void                  *target_ptr;      //!< \~english pointer of user target
                                             //!< \~chinese 用户传入的指针
     vsf_arch_prio_t        prio;            //!< \~english interrupt priority
-                                            //!< \~chinesh 中断优先级
+                                            //!< \~chinese 中断优先级
 } vsf_i2c_isr_t;
 
 /**
@@ -321,6 +339,33 @@ typedef struct vsf_i2c_cfg_t {
     uint16_t slave_addr;                    //!< \~english i2c slave address, only valid in slave mode
                                             //!< \~chinese i2c 从机地址，仅在从机模式下有效
 } vsf_i2c_cfg_t;
+#endif
+
+#if VSF_I2C_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED
+/**
+ * \~english
+ * @brief Predefined VSF I2C control command that can be reimplemented in specific hal drivers.
+ *
+ * \~chinese
+ * @brief 预定义的 VSF I2C 控制命令，可以在具体的 HAL 驱动重新实现。
+ *
+ */
+typedef enum vsf_i2c_ctrl_t {
+    /*
+    VSF_I2C_CTRL_MASTER_ABORT                     = (0x1ul << 3),
+    #define VSF_I2C_CTRL_MASTER_ABORT VSF_I2C_CTRL_MASTER_ABORT
+    VSF_I2C_CTRL_SLAVE_ABORT                      = (0x1ul << 4),
+    #define VSF_I2C_CTRL_SLAVE_ABORT VSF_I2C_CTRL_SLAVE_ABORT
+
+    VSF_I2C_CTRL_ANALOG_FILTER                     = (0x1ul << 5)
+    #define VSF_I2C_CTRL_ANALOG_FILTER VSF_I2C_CTRL_ANALOG_FILTER
+    VSF_I2C_CTRL_DIGITAL_FILTER                    = (0x1ul << 6)
+    #define VSF_I2C_CTRL_DIGITAL_FILTER VSF_I2C_CTRL_DIGITAL_FILTER
+    */
+
+    // dummy for compile pass
+    __VSF_I2C_CTRL_DUMMP = 0,
+} vsf_i2c_ctrl_t;
 #endif
 
 typedef struct vsf_i2c_op_t {
@@ -400,7 +445,7 @@ extern fsm_rt_t vsf_i2c_enable(vsf_i2c_t *i2c_ptr);
        is working without calling vsf_i2c_init()
 
  \~chinese
- @brief禁能 i2c 实例
+ @brief 禁能 i2c 实例
  @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
  @return fsm_rt_t: 如果禁能成功，返回 fsm_rt_cpl, 未完成初始化返回 fsm_rt_onging
  @note 需要确保在 vsf_i2c_disable() 之后调用 vsf_i2c_enable() 是可以正常工作的，
@@ -429,7 +474,7 @@ extern void vsf_i2c_irq_enable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask);
  \~english
  @brief disable interrupt masks of i2c instance.
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
- @param[in] irq_mask: one or more value of enum vsf_i2c_irq_mask_t, @ref vsf_i2c_irq_mask_t
+ @param[in] irq_mask: one or more value of enum @ref vsf_i2c_irq_mask_t, @ref vsf_i2c_irq_mask_t
  @return none.
 
  \~chinese
@@ -468,8 +513,60 @@ extern vsf_i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr);
 
 /**
  \~english
+ @brief i2c instance as master mode performs a FIFO transfer
+ @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
+ @param[in] address: address of i2c transfer
+ @param[in] cmd: i2c cmd
+ @param[in] count: i2c transfer buffer count (in byte)
+ @param[in] buffer_ptr: i2c transfer buffer
+ @param[in] cur_cmd_ptr: i2c current cmd pointer, the caller needs to maintain the value
+ @param[in] offset_ptr: i2c current offset pointer, the caller needs to maintain the value
+ @return vsf_err_t: VSF_ERR_NONE if i2c was successfully, or a negative error code
+
+ \~chinese
+ @brief i2c主机进行一次 FIFO 传输
+ @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
+ @param[in] address: i2c 传输的地址
+ @param[in] cmd: i2c 命令
+ @param[in] count: i2c 传输缓冲区长度 (单位：字节)
+ @param[in] buffer_ptr: i2c 传输缓冲区
+ @param[in] cur_cmd_ptr: i2c 当前命令指针，调用者需要维护这个值
+ @param[in] offset_ptr: i2c 当前偏移指针，调用者需要维护这个值
+ @return vsf_err_t: 如果 i2c 主机请求成功完成返回 VSF_ERR_NONE , 否则返回负数。
+ */
+extern vsf_err_t vsf_i2c_master_fifo_transfer(vsf_i2c_t *i2c_ptr,
+                                              uint16_t address,
+                                              vsf_i2c_cmd_t cmd,
+                                              uint16_t count,
+                                              uint8_t *buffer_ptr,
+                                              vsf_i2c_cmd_t *cur_cmd_ptr,
+                                              uint16_t *offset_ptr);
+
+/**
+ \~english
+ @brief i2c instance as slave mode performs a FIFO transfer
+ @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
+ @param[in] transmit_or_receive: slave transmit if true, slave receive if false
+ @param[in] count: i2c transfer buffer count (in byte)
+ @param[in] buffer_ptr: i2c transfer buffer
+ @return vsf_err_t: VSF_ERR_NONE if i2c was successfully, or a negative error code
+
+ \~chinese
+ @brief i2c从机进行一次 FIFO 传输
+ @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
+ @param[in] transmit_or_receive: true 表示从机发送数据，false 表示从机接收数据
+ @param[in] count: i2c 传输缓冲区长度 (单位：字节)
+ @param[in] buffer_ptr: i2c 传输缓冲区
+ @return vsf_err_t: 如果 i2c 从机请求成功完成返回 VSF_ERR_NONE , 否则返回负数。
+ */
+extern vsf_err_t vsf_i2c_slave_fifo_transfer(vsf_i2c_t *i2c_ptr,
+                                             bool transmit_or_receive,
+                                             uint16_t count,
+                                             uint8_t *buffer_ptr);
+
+/**
+ \~english
  @brief i2c instance as master mode request a transfer
- @note i2c_msg_ptr can be a local variable.
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
  @param[in] address: address of i2c transfer
  @param[in] cmd: i2c cmd
@@ -479,7 +576,6 @@ extern vsf_i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr);
 
  \~chinese
  @brief i2c主机请求一次传输
- @note i2c_msg_ptr可以是局部变量。
  @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
  @param[in] address: i2c 传输的地址
  @param[in] cmd: i2c 命令
@@ -495,7 +591,29 @@ extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
 
 /**
  \~english
- @brief get the counter of transfers for current request  by the i2c master
+ @brief i2c instance as slave mode request a transfer
+ @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
+ @param[in] transmit_or_receive: slave transmit if true, slave receive if false
+ @param[in] count: i2c transfer buffer count (in byte)
+ @param[in] buffer_ptr: i2c transfer buffer
+ @return vsf_err_t: VSF_ERR_NONE if i2c was successfully, or a negative error code
+
+ \~chinese
+ @brief i2c从机请求一次传输
+ @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
+ @param[in] transmit_or_receive: true 表示从机发送数据，false 表示从机接收数据
+ @param[in] count: i2c 传输缓冲区长度 (单位：字节)
+ @param[in] buffer_ptr: i2c 传输缓冲区
+ @return vsf_err_t: 如果 i2c 从机请求成功完成返回 VSF_ERR_NONE , 否则返回负数。
+ */
+extern vsf_err_t vsf_i2c_slave_request(vsf_i2c_t *i2c_ptr,
+                                       bool transmit_or_receive,
+                                       uint16_t count,
+                                       uint8_t *buffer_ptr);
+
+/**
+ \~english
+ @brief get the counter of transfers for current request by the i2c master
  @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
  @return uint_fast32_t: counter of transferred
  @note This API can be used after the slave NAK and until the next transmission
@@ -506,7 +624,38 @@ extern vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
  @return uint_fast32_t: 已传输的数量
  @note 在从机 NAK 的后到下一次传输之前都可以使用这个API
  */
-extern uint_fast32_t vsf_i2c_get_transferred_count(vsf_i2c_t *i2c_ptr);
+extern uint_fast32_t vsf_i2c_master_get_transferred_count(vsf_i2c_t *i2c_ptr);
+
+/**
+ \~english
+ @brief get the counter of transfers for current request by the i2c slave
+ @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
+ @return uint_fast32_t: counter of transferred
+
+ \~chinese
+ @brief 获取 i2c 从机当前请求已经传输的数量
+ @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
+ @return uint_fast32_t: 已传输的数量
+ */
+extern uint_fast32_t vsf_i2c_slave_get_transferred_count(vsf_i2c_t *i2c_ptr);
+
+/**
+ \~english
+ @brief Calls the specified i2c command
+ @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
+ @param[in] ctrl: i2c control command @ref vsf_i2c_ctrl_t.
+ @param[in] param: the parameter of the command, its use is determined by the command
+ @return vsf_err_t: returns the result of the i2c command when it is invoked,
+        success returns VSF_ERR_NONE
+
+ \~chinese
+ @brief 调用指定的 i2c 命令
+ @param[in] i2c_ptr: 结构体 vsf_i2c_t 的指针，参考 @ref vsf_i2c_t
+ @param[in] ctrl: i2c 控制命令，参考 @ref vsf_i2c_ctrl_t
+ @param[in] param: 命令的参数，其用途由命令决定
+ @return vsf_err_t: 返回调用 i2c 命令的结果，成功返回 VSF_ERR_NONE
+ */
+extern vsf_err_t vsf_i2c_ctrl(vsf_i2c_t *i2c_ptr, vsf_i2c_ctrl_t ctrl, void * param);
 
 /*============================ INCLUDES ======================================*/
 
@@ -515,17 +664,22 @@ extern uint_fast32_t vsf_i2c_get_transferred_count(vsf_i2c_t *i2c_ptr);
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #if VSF_I2C_CFG_FUNCTION_RENAME == ENABLED
-#   define __vsf_i2c_t                              VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t)
-#   define vsf_i2c_init(__I2C, ...)                 VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_init)                 ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
-#   define vsf_i2c_fini(__I2C)                      VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_fini)                 ((__vsf_i2c_t *)(__I2C))
-#   define vsf_i2c_enable(__I2C)                    VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_enable)               ((__vsf_i2c_t *)(__I2C))
-#   define vsf_i2c_disable(__I2C)                   VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_disable)              ((__vsf_i2c_t *)(__I2C))
-#   define vsf_i2c_irq_enable(__I2C, ...)           VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_enable)           ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
-#   define vsf_i2c_irq_disable(__I2C, ...)          VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_disable)          ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
-#   define vsf_i2c_status(__I2C)                    VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_status)               ((__vsf_i2c_t *)(__I2C))
-#   define vsf_i2c_capability(__I2C)                VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_capability)           ((__vsf_i2c_t *)(__I2C))
-#   define vsf_i2c_master_request(__I2C, ...)       VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_request)       ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
-#   define vsf_i2c_get_transferred_count(__I2C, ...) VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_get_transferred_count) ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
+#   define __vsf_i2c_t                                      VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t)
+#   define vsf_i2c_init(__I2C, ...)                         VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_init)                     ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
+#   define vsf_i2c_fini(__I2C)                              VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_fini)                     ((__vsf_i2c_t *)(__I2C))
+#   define vsf_i2c_enable(__I2C)                            VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_enable)                   ((__vsf_i2c_t *)(__I2C))
+#   define vsf_i2c_disable(__I2C)                           VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_disable)                  ((__vsf_i2c_t *)(__I2C))
+#   define vsf_i2c_irq_enable(__I2C, ...)                   VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_enable)               ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
+#   define vsf_i2c_irq_disable(__I2C, ...)                  VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_disable)              ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
+#   define vsf_i2c_status(__I2C)                            VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_status)                   ((__vsf_i2c_t *)(__I2C))
+#   define vsf_i2c_capability(__I2C)                        VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_capability)               ((__vsf_i2c_t *)(__I2C))
+#   define vsf_i2c_master_fifo_transfer(__I2C, ...)         VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_fifo_transfer)     ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
+#   define vsf_i2c_master_request(__I2C, ...)               VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_request)           ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
+#   define vsf_i2c_master_get_transferred_count(__I2C, ...) VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_get_transferred_count)    ((__vsf_i2c_t *)(__I2C))
+#   define vsf_i2c_slave_fifo_transfer(__I2C, ...)          VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_slave_fifo_transfer)      ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
+#   define vsf_i2c_slave_request(__I2C, ...)                VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_slave_request)            ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
+#   define vsf_i2c_slave_get_transferred_count(__I2C, ...)  VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_get_transferred_count)    ((__vsf_i2c_t *)(__I2C))
+#   define vsf_i2c_ctrl(__I2C, ...)                         VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_ctrl)                     ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus
