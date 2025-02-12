@@ -29,65 +29,135 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-// multi-class support enabled by default for maximum availability.
+/**
+ * \~english
+ * @brief Enable multi-class support by default for maximum availability.
+ *
+ * \~chinese
+ * @brief 默认启用多类支持，以获得最大可用性。
+ */
 #ifndef VSF_DMA_CFG_MULTI_CLASS
-#   define VSF_DMA_CFG_MULTI_CLASS                      ENABLED
+#   define VSF_DMA_CFG_MULTI_CLASS                        ENABLED
 #endif
 
-// application code can redefine it
+/**
+ * \~english
+ * @brief We can redefine macro VSF_DMA_CFG_PREFIX to specify a prefix
+ * to call a specific driver directly in the application code.
+ *
+ * \~chinese
+ * @brief 可重新定义宏 VSF_DMA_CFG_PREFIX，以在应用代码中直接调用
+ * 特定驱动。
+ */
 #ifndef VSF_DMA_CFG_PREFIX
 #   if VSF_DMA_CFG_MULTI_CLASS == ENABLED
-#       define VSF_DMA_CFG_PREFIX                       vsf
+#       define VSF_DMA_CFG_PREFIX                         vsf
 #   elif defined(VSF_HW_DMA_COUNT) && (VSF_HW_DMA_COUNT != 0)
-#       define VSF_DMA_CFG_PREFIX                       vsf_hw
+#       define VSF_DMA_CFG_PREFIX                         vsf_hw
 #   else
-#       define VSF_DMA_CFG_PREFIX                       vsf
+#       define VSF_DMA_CFG_PREFIX                         vsf
 #   endif
 #endif
 
+/**
+ * \~english
+ * @brief Disable VSF_DMA_CFG_FUNCTION_RENAME to use the original function
+ * names (e.g., vsf_dma_init()).
+ *
+ * \~chinese
+ * @brief 禁用 VSF_DMA_CFG_FUNCTION_RENAME 以使用原始函数名
+ * (例如 vsf_dma_init())。
+ */
 #ifndef VSF_DMA_CFG_FUNCTION_RENAME
 #   define VSF_DMA_CFG_FUNCTION_RENAME                  ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable the option to reimplement channel mode type in specific hardware drivers
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现通道模式类型的选项
+ */
 #ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE
 #   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE    DISABLED
 #endif
 
-#ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE
-#   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE    DISABLED
-#endif
-
+/**
+ * \~english
+ * @brief Enable the option to reimplement interrupt mask type in specific hardware drivers
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现中断掩码类型的选项
+ */
 #ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_IRQ_MASK
 #   define VSF_DMA_CFG_REIMPLEMENT_TYPE_IRQ_MASK        DISABLED
 #endif
 
-//! Redefine struct vsf_dma_channel_cfg_t.
-//! For compatibility, members should not be deleted when struct @ref
-//! vsf_dma_channel_cfg_t redefining.
+/**
+ * \~english
+ * @brief Enable the option to reimplement channel configuration type.
+ * For compatibility, do not delete members when redefining vsf_dma_channel_cfg_t
+ *
+ * \~chinese
+ * @brief 启用重新实现通道配置类型的选项。
+ * 为保证兼容性，重新定义vsf_dma_channel_cfg_t时不要删除成员
+ */
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == DISABLED
 #   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG     DISABLED
 #endif
 
-//! Redefine struct vsf_dma_cfg_t. The vsf_dma_isr_handler_t type also needs to
-//! be redefined For compatibility, members should not be deleted when struct
-//! @ref vsf_dma_cfg_t redefining.
+/**
+ * \~english
+ * @brief Enable the option to reimplement DMA configuration type.
+ * For compatibility, do not delete members when redefining vsf_dma_cfg_t
+ * The vsf_dma_isr_handler_t type also needs to be redefined
+ *
+ * \~chinese
+ * @brief 启用重新实现DMA配置类型的选项。
+ * 为保证兼容性，重新定义vsf_dma_cfg_t时不要删除成员
+ * 同时也需要重新定义vsf_dma_isr_handler_t类型
+ */
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 #   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG             DISABLED
 #endif
 
-//! Redefine struct vsf_dma_capability_t.
-//! For compatibility, members should not be deleted when struct @ref
-//! vsf_dma_capability_t redefining.
+/**
+ * \~english
+ * @brief Enable the option to reimplement capability type.
+ * For compatibility, do not delete members when redefining vsf_dma_capability_t
+ *
+ * \~chinese
+ * @brief 启用重新实现能力类型的选项。
+ * 为保证兼容性，重新定义vsf_dma_capability_t时不要删除成员
+ */
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 #   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY     DISABLED
 #endif
 
-#ifndef VSF_DMA_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_DMA_CFG_INHERT_HAL_CAPABILITY            ENABLED
+/**
+ * \~english
+ * @brief Enable inheriting HAL capability to reuse common capability definitions
+ *
+ * \~chinese
+ * @brief 启用继承HAL能力以重用通用能力定义
+ */
+#ifndef VSF_DMA_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_DMA_CFG_INHERIT_HAL_CAPABILITY            ENABLED
 #endif
+
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+/**
+ * \~english
+ * @brief DMA API template, used to generate DMA type, specific prefix function declarations, etc.
+ * @param[in] __prefix_name The prefix used for generating DMA functions.
+ *
+ * \~chinese
+ * @brief DMA API 模板，用于生成 DMA 类型、特定前缀的函数声明等。
+ * @param[in] __prefix_name 用于生成 DMA 函数的前缀。
+ */
 #define VSF_DMA_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, init,                          VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, fini,                          VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr) \
@@ -138,7 +208,7 @@ typedef enum vsf_dma_channel_mode_t {
     VSF_DMA_SRC_BURST_LENGTH_16      = (0x04 << 14),
     VSF_DMA_SRC_BURST_LENGTH_32      = (0x05 << 14),
     VSF_DMA_SRC_BURST_LENGTH_64      = (0x05 << 14),
-    VSF_DMA_SRC_BURST_LENGTH_128     = (0x05 << 14),
+    VSF_DMA_SRC_BURST_LENGTH_128     = (0x06 << 14),
 
     VSF_DMA_DST_BURST_LENGTH_1       = (0x00 << 18),
     VSF_DMA_DST_BURST_LENGTH_2       = (0x01 << 18),
@@ -147,11 +217,11 @@ typedef enum vsf_dma_channel_mode_t {
     VSF_DMA_DST_BURST_LENGTH_16      = (0x04 << 18),
     VSF_DMA_DST_BURST_LENGTH_32      = (0x05 << 18),
     VSF_DMA_DST_BURST_LENGTH_64      = (0x05 << 18),
-    VSF_DMA_DST_BURST_LENGTH_128     = (0x05 << 18),
+    VSF_DMA_DST_BURST_LENGTH_128     = (0x06 << 18),
 
     //prio
     VSF_DMA_PRIOPIRY_LOW             = (0x00 << 22),
-    VSF_DMA_PRIOPIRY_MIDIUM          = (0x01 << 22),
+    VSF_DMA_PRIOPIRY_MEDIUM          = (0x01 << 22),
     VSF_DMA_PRIOPIRY_HIGH            = (0x02 << 22),
     VSF_DMA_PRIOPIRY_VERY_HIGH       = (0x03 << 22),
 
@@ -214,7 +284,7 @@ enum {
 
     VSF_DMA_PRIOPIRY_COUNT            = 4,
     VSF_DMA_PRIOPIRY_MASK             = VSF_DMA_PRIOPIRY_LOW       |
-                                        VSF_DMA_PRIOPIRY_MIDIUM    |
+                                        VSF_DMA_PRIOPIRY_MEDIUM    |
                                         VSF_DMA_PRIOPIRY_HIGH      |
                                         VSF_DMA_PRIOPIRY_VERY_HIGH,
 
@@ -279,7 +349,7 @@ typedef struct vsf_dma_channel_status_t {
 
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_dma_capability_t {
-#if VSF_DMA_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_DMA_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
     vsf_dma_irq_mask_t irq_mask;
@@ -290,8 +360,10 @@ typedef struct vsf_dma_capability_t {
 #endif
 
 typedef struct vsf_dma_op_t {
+/// @cond
 #undef  __VSF_HAL_TEMPLATE_API
 #define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
+/// @endcond
 
     VSF_DMA_APIS(vsf)
 } vsf_dma_op_t;
@@ -306,17 +378,17 @@ struct vsf_dma_t  {
 
 /**
  \~english
- @brief initialize a dma instance.
+ @brief Initialize a DMA instance
  @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
- @return vsf_err_t: VSF_ERR_NONE if dma was initialized, or a negative error code
+ @return vsf_err_t: VSF_ERR_NONE if initialization successful, otherwise returns error code
 
  @note It is not necessary to call vsf_dma_fini() to deinitialization.
        vsf_dma_init() should be called before any other DMA API except vsf_dma_capability().
 
  \~chinese
- @brief 初始化一个 dma 实例
- @param[in] dma_ptr: 结构体 vsf_dma_t 的指针，参考 @ref vsf_dma_t
- @return vsf_err_t: 如果 dma 初始化成功返回 VSF_ERR_NONE , 失败返回负数。
+ @brief 初始化一个 DMA 实例
+ @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
+ @return vsf_err_t: 如果初始化成功返回 VSF_ERR_NONE，否则返回错误码
 
  @note 失败后不需要调用 vsf_dma_fini() 反初始化。
        vsf_dma_init() 应该在除 vsf_dma_capability() 之外的其他 DMA API 之前调用。
@@ -325,158 +397,162 @@ extern vsf_err_t vsf_dma_init(vsf_dma_t *dma_ptr);
 
 /**
  \~english
- @brief finalize a dma instance.
+ @brief Finalize a DMA instance
  @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
  @return none
 
  \~chinese
- @brief 终止一个 dma 实例
- @param[in] dma_ptr: 结构体 vsf_dma_t 的指针，参考 @ref vsf_dma_t
- @param[in] cfg_ptr: 结构体 vsf_dma_cfg_t 的指针，参考 @ref vsf_dma_cfg_t
- @return 无。
+ @brief 终止一个 DMA 实例
+ @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
+ @return 无
  */
 extern void vsf_dma_fini(vsf_dma_t *dma_ptr);
 
 /**
  \~english
- @brief get the capability of dma instance.
+ @brief Get the capabilities of DMA instance
  @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
- @return vsf_dma_capability_t: return all capability of current dma @ref vsf_dma_capability_t
+ @return vsf_dma_capability_t: All capabilities of current DMA @ref vsf_dma_capability_t
 
  \~chinese
- @brief 获取 dma 实例的能力
- @param[in] dma_ptr: 结构体 vsf_dma_t 的指针，参考 @ref vsf_dma_t
- @return vsf_dma_capability_t: 返回当前 dma 的所有能力 @ref vsf_dma_capability_t
+ @brief 获取 DMA 实例的能力
+ @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
+ @return vsf_dma_capability_t: 返回当前 DMA 的所有能力 @ref vsf_dma_capability_t
  */
 extern vsf_dma_capability_t vsf_dma_capability(vsf_dma_t *dma_ptr);
 
 /**
  \~english
- @brief dma request new channel
+ @brief DMA request a new channel
  @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
- @return int8_t: positive number or 0 if the dma request was successfully, or a negative error code
+ @return int8_t: Positive number or 0 if the request was successful, otherwise returns error code
 
  \~chinese
- @brief dma 请求一个新的通道
- @param[in] dma_ptr: 结构体 vsf_dma_t 的指针，参考 @ref vsf_dma_t
- @return int8_t: 如果 dma 请求成功返回正数或者 0 , 否则返回负数。
+ @brief DMA 请求一个新的通道
+ @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
+ @return int8_t: 如果请求成功返回正数或者 0，否则返回错误码
  */
 extern int8_t vsf_dma_channel_request(vsf_dma_t *dma_ptr);
 
 /**
  \~english
- @brief dma release channel
+ @brief Release a DMA channel
  @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
  @param[in] channel: channel number
+ @return none
 
  \~chinese
- @brief dma 释放一个通道
- @param[in] dma_ptr: 结构体 vsf_dma_t 的指针，参考 @ref vsf_dma_t
+ @brief DMA 释放一个通道
+ @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
  @param[in] channel: 通道序号
+ @return 无
  */
 extern void vsf_dma_channel_release(vsf_dma_t *dma_ptr, int8_t channel);
 
 /**
  \~english
- @brief dma channel configuration
+ @brief Configure a DMA channel
  @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
+ @param[in] channel: channel number
  @param[in] cfg_ptr: a pointer to DMA channel configuration
- @return vsf_err_t: VSF_ERR_NONE if the dma request was successfully, or a negative error code
+ @return vsf_err_t: VSF_ERR_NONE if the configuration was successful, otherwise returns error code
 
  \~chinese
  @brief DMA 通道配置
- @param[in] dma_ptr: 结构体 vsf_dma_t 的指针，参考 @ref vsf_dma_t
- @param[in] cfg_ptr: DMA 通道配置的指针
- @return vsf_err_t: 如果 dma 请求成功返回 VSF_ERR_NONE , 否则返回负数。
+ @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
+ @param[in] channel: 通道序号
+ @param[in] cfg_ptr: 指向 DMA 通道配置的指针
+ @return vsf_err_t: 如果配置成功返回 VSF_ERR_NONE，否则返回错误码
  */
 extern vsf_err_t vsf_dma_channel_config(vsf_dma_t *dma_ptr, int8_t channel, vsf_dma_channel_cfg_t *cfg_ptr);
 
 /**
- \~english
- @brief DMA starts a channel transfer
- @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
- @param[in] channel: channel number
- @param[in] src_address: source address
- @param[in] dst_address: destination address
- @param[in] count: counter of data to be transferred (in byte)
- @return vsf_err_t: VSF_ERR_NONE if the dma start request was successfully, or a negative error code
-
- \~chinese
- @brief dma 开始一个通道的传输
- @param[in] dma_ptr: 结构体 vsf_dma_t 的指针，参考 @ref vsf_dma_t
- @param[in] channel: 通道序号
- @param[in] src_address: 源地址
- @param[in] dst_address: 目标地址
- @param[in] count: 将要传输的数据的个数 (字节单位)
- @return vsf_err_t: 如果开始 dma 传输成功返回 VSF_ERR_NONE , 否则返回负数。
+ * \~english
+ * @brief Start a DMA channel transfer
+ * @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
+ * @param[in] channel: channel number
+ * @param[in] src_address: source address
+ * @param[in] dst_address: destination address
+ * @param[in] count: counter of data to be transferred (in byte)
+ * @return vsf_err_t: VSF_ERR_NONE if the start request was successful, otherwise returns error code
+ *
+ * \~chinese
+ * @brief DMA 开始一个通道的传输
+ * @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
+ * @param[in] channel: 通道序号
+ * @param[in] src_address: 源地址
+ * @param[in] dst_address: 目标地址
+ * @param[in] count: 将要传输的数据的字节数
+ * @return vsf_err_t: 如果开始传输成功返回 VSF_ERR_NONE，否则返回错误码
  */
 extern vsf_err_t vsf_dma_channel_start(vsf_dma_t *dma_ptr, int8_t channel, uint32_t src_address, uint32_t dst_address, uint32_t count);
 
 /**
  \~english
- @brief DMA cancels the transmission of a specific channel
+ @brief Cancel the transmission of a specific DMA channel
  @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
  @param[in] channel: channel number
- @return vsf_err_t: VSF_ERR_NONE if the dma cancel request was successfully, or a negative error code
+ @return vsf_err_t: VSF_ERR_NONE if the cancel request was successful, otherwise returns error code
 
  \~chinese
- @brief dma 取消特定通道的传输
- @param[in] dma_ptr: 结构体 vsf_dma_t 的指针，参考 @ref vsf_dma_t
+ @brief DMA 取消特定通道的传输
+ @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
  @param[in] channel: 通道序号
- @return vsf_err_t: 如果 dma 传输取消成功返回 VSF_ERR_NONE , 否则返回负数。
+ @return vsf_err_t: 如果传输取消成功返回 VSF_ERR_NONE，否则返回错误码
  */
 extern vsf_err_t vsf_dma_channel_cancel(vsf_dma_t *dma_ptr, int8_t channel);
 
-
 /**
- \~english
- @brief DMA get counter of specific channel that have been transferred
- @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
- @param[in] channel: channel number
- @return uint32_t: transferred counter
- @note: If called after VSF_DMA_IRQ_MASK_CPL interrupt trigger, it should return 0.
- @note: It is usually called after call vsf_dma_channel_cancel() to get the counter that has been transferred.
-
- \~chinese
- @brief dma 获取特定通道已经传输的数量
- @param[in] dma_ptr: 结构体 vsf_dma_t 的指针，参考 @ref vsf_dma_t
- @param[in] channel: 通道序号
- @return uint32_t: 已经传输的数量
- @note: 如果在VSF_DMA_IRQ_MASK_CPL中断触发之后调用，它应该返回 0.
- @note: 它应该在调用 vsf_dma_channel_cancel() 之后调用，用来获取已经传输的数量。
+ * \~english
+ * @brief Get the counter of bytes transferred for a specific DMA channel
+ * @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
+ * @param[in] channel: channel number
+ * @return uint32_t: Number of bytes transferred
+ * @note: If called after VSF_DMA_IRQ_MASK_CPL interrupt trigger, it should return 0.
+ * @note: It is usually called after call vsf_dma_channel_cancel() to get the counter that has been transferred.
+ *
+ * \~chinese
+ * @brief DMA 获取特定通道已经传输的数量
+ * @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
+ * @param[in] channel: 通道序号
+ * @return uint32_t: 已传输的字节数
+ * @note: 如果在 VSF_DMA_IRQ_MASK_CPL 中断触发之后调用，它应该返回 0。
+ * @note: 它通常在调用 vsf_dma_channel_cancel() 之后调用，用于获取已经传输的数量。
  */
 extern uint32_t vsf_dma_channel_get_transferred_count(vsf_dma_t *dma_ptr, int8_t channel);
 
 /**
  \~english
- @brief dma release channel
+ @brief Get status of a DMA channel
  @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
  @param[in] channel: channel number
- @return vsf_dma_channel_status_t: dma channel status
+ @return vsf_dma_channel_status_t: Status of the DMA channel
 
  \~chinese
- @brief dma 释放一个通道
- @param[in] dma_ptr: 结构体 vsf_dma_t 的指针，参考 @ref vsf_dma_t
+ @brief 获取 DMA 通道状态
+ @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
  @param[in] channel: 通道序号
- @return vsf_dma_channel_status_t: dma 通道状态
+ @return vsf_dma_channel_status_t: DMA 通道状态
  */
 extern vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr, int8_t channel);
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+/// @cond
 #if VSF_DMA_CFG_FUNCTION_RENAME == ENABLED
-#   define __vsf_dma_t                                          VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_t)
-#   define vsf_dma_init(__DMA, ...)                             VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_init)                             ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
-#   define vsf_dma_fini(__DMA)                                  VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_fini)                             ((__vsf_dma_t *)(__DMA))
-#   define vsf_dma_capability(__DMA)                            VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_capability)                       ((__vsf_dma_t *)(__DMA))
-#   define vsf_dma_channel_request(__DMA, ...)                  VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_request)                  ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
-#   define vsf_dma_channel_release(__DMA, ...)                  VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_release)                  ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
-#   define vsf_dma_channel_config(__DMA, ...)                   VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_config)                   ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
-#   define vsf_dma_channel_start(__DMA, ...)                    VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_start)                    ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
-#   define vsf_dma_channel_cancel(__DMA, ...)                   VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_cancel)                   ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
-#   define vsf_dma_channel_get_transferred_count(__DMA, ...)    VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_get_transferred_count)    ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
-#   define vsf_dma_channel_status(__DMA, ...)                   VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_status)                   ((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define __vsf_dma_t                                      VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_t)
+#   define vsf_dma_init(__DMA)                              VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_init)((__vsf_dma_t *)(__DMA))
+#   define vsf_dma_fini(__DMA)                              VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_fini)((__vsf_dma_t *)(__DMA))
+#   define vsf_dma_capability(__DMA)                        VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_capability)((__vsf_dma_t *)(__DMA))
+#   define vsf_dma_channel_request(__DMA)                   VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_request)((__vsf_dma_t *)(__DMA))
+#   define vsf_dma_channel_release(__DMA, ...)              VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_release)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_config(__DMA, ...)               VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_config)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_start(__DMA, ...)                VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_start)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_cancel(__DMA, ...)               VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_cancel)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_get_transferred_count(__DMA, ...) VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_get_transferred_count)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_status(__DMA, ...)               VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_status)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #endif
+/// @endcond
 
 #ifdef __cplusplus
 }
