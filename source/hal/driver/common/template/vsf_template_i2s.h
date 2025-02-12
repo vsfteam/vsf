@@ -83,8 +83,8 @@ extern "C" {
 #    define VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
-#ifndef VSF_I2S_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_I2S_CFG_INHERT_HAL_CAPABILITY       ENABLED
+#ifndef VSF_I2S_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_I2S_CFG_INHERIT_HAL_CAPABILITY       ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -179,7 +179,7 @@ typedef struct vsf_i2s_status_t {
 
 #if VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_i2s_capability_t {
-#if VSF_I2S_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_I2S_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
     struct {
