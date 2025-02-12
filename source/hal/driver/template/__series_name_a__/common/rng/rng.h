@@ -24,6 +24,13 @@
 
 #if VSF_HAL_USE_RNG == ENABLED
 
+// HW/IPCore
+/**
+ * \note When vsf_peripheral_status_t is inherited, vsf_template_hal_driver.h needs to be included
+ */
+#include "hal/driver/common/template/vsf_template_hal_driver.h"
+// HW/IPCore end
+
 #include "../../__device.h"
 
 /*\note Refer to template/README.md for usage cases.
@@ -61,6 +68,27 @@ extern "C" {
 #endif
 // IPCore end
 
+// HW
+/*\note hw RNG driver can reimplement following types:
+ *      To enable reimplementation, please enable macro below:
+ *          VSF_RNG_CFG_REIMPLEMENT_TYPE_MODE for vsf_rng_mode_t
+ *          VSF_RNG_CFG_REIMPLEMENT_TYPE_STATUS for vsf_rng_status_t
+ *          VSF_RNG_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_rng_irq_mask_t
+ *          VSF_RNG_CFG_REIMPLEMENT_TYPE_CTRL for vsf_rng_ctrl_t
+ *          VSF_RNG_CFG_REIMPLEMENT_TYPE_CFG for vsf_rng_cfg_t
+ *          VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_rng_capability_t
+ *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
+ *      *** DO NOT reimplement these in emulated drivers. ***
+ */
+
+#define VSF_RNG_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
+#define VSF_RNG_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
+#define VSF_RNG_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
+#define VSF_RNG_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
+#define VSF_RNG_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
+// HW end
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -82,7 +110,7 @@ vsf_class(vsf_${rng_ip}_rng_t) {
         vsf_rng_isr_t           isr;
     )
 };
-// IPCore end
+
 
 /*============================ INCLUDES ======================================*/
 
