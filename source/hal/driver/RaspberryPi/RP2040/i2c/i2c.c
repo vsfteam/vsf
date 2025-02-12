@@ -103,7 +103,7 @@ vsf_i2c_status_t vsf_hw_i2c_status(vsf_hw_i2c_t *hw_i2c_ptr)
 }
 
 vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr, uint16_t address,
-        vsf_i2c_cmd_t cmd, uint16_t count, uint8_t *buffer)
+        vsf_i2c_cmd_t cmd, uint_fast16_t count, uint8_t *buffer)
 {
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
     VSF_HAL_ASSERT(0 != count);
@@ -112,7 +112,7 @@ vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr, uint16_t address,
         address, cmd, count, buffer);
 }
 
-uint_fast32_t vsf_hw_i2c_get_transferred_count(vsf_hw_i2c_t *hw_i2c_ptr)
+uint_fast16_t vsf_hw_i2c_get_transferred_count(vsf_hw_i2c_t *hw_i2c_ptr)
 {
     VSF_HAL_ASSERT(hw_i2c_ptr != NULL);
     return vsf_dw_apb_i2c_get_transferred_count(&hw_i2c_ptr->use_as__vsf_dw_apb_i2c_t);

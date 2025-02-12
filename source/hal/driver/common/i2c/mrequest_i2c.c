@@ -61,11 +61,11 @@ static void __i2c_next_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq
     if (m_i2c_ptr->request.count != 0) {        // buffer is empty
         // Because the completion interrupt of the first request has been returned.
         // if the first request returns other interrupts, only assertions can be made here.
-        VSF_HAL_ASSERT((irq_mask & ~(VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE | VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY)) == 0);
+        VSF_HAL_ASSERT((irq_mask & ~(VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE | VSF_I2C_IRQ_MASK_MASTER_TX)) == 0);
 
-        if (irq_mask & VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY) {
+        if (irq_mask & VSF_I2C_IRQ_MASK_MASTER_TX) {
             // Request type is write then write, first write complete
-            vsf_i2c_irq_disable(m_i2c_ptr->i2c_ptr, VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY);
+            vsf_i2c_irq_disable(m_i2c_ptr->i2c_ptr, VSF_I2C_IRQ_MASK_MASTER_TX);
         }
 
         vsf_err_t result = vsf_i2c_master_request(m_i2c_ptr->i2c_ptr,
@@ -153,10 +153,25 @@ vsf_i2c_status_t vsf_mrequest_i2c_status(vsf_mrequest_i2c_t *m_i2c_ptr)
     return vsf_i2c_status(real_i2c_ptr);
 }
 
+void vsf_mrequest_i2c_master_fifo_transfer(vsf_mrequest_i2c_t *m_i2c_ptr,
+                                                uint16_t address,
+                                                vsf_i2c_cmd_t cmd,
+                                                uint_fast16_t count,
+                                                uint8_t *buffer,
+                                                vsf_i2c_cmd_t *cur_cmd_ptr,
+                                                uint_fast16_t *offset_ptr)
+{
+    VSF_HAL_ASSERT(NULL != m_i2c_ptr);
+    vsf_i2c_t * real_i2c_ptr = m_i2c_ptr->i2c_ptr;
+    VSF_HAL_ASSERT(NULL != real_i2c_ptr);
+
+    vsf_i2c_master_fifo_transfer(real_i2c_ptr, address, cmd, count, buffer, cur_cmd_ptr, offset_ptr);
+}
+
 vsf_err_t vsf_mrequest_i2c_master_request(vsf_mrequest_i2c_t *m_i2c_ptr,
                                           uint16_t address,
                                           vsf_i2c_cmd_t cmd,
-                                          uint16_t count,
+                                          uint_fast16_t count,
                                           uint8_t *buffer_ptr)
 {
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
@@ -198,7 +213,7 @@ vsf_err_t vsf_mrequest_i2c_master_request(vsf_mrequest_i2c_t *m_i2c_ptr,
             vsf_err_t result = vsf_i2c_master_request(real_i2c_ptr, address, first_cmd, first_count, first_buffer_ptr);
 
             if (!is_read) {
-                vsf_i2c_irq_enable(real_i2c_ptr, VSF_I2C_IRQ_MASK_MASTER_TX_EMPTY);
+                vsf_i2c_irq_enable(real_i2c_ptr, VSF_I2C_IRQ_MASK_MASTER_TX);
             }
 
             return result;
@@ -208,13 +223,61 @@ vsf_err_t vsf_mrequest_i2c_master_request(vsf_mrequest_i2c_t *m_i2c_ptr,
     return VSF_ERR_NOT_SUPPORT;
 }
 
-uint_fast32_t vsf_mrequest_i2c_get_transferred_count(vsf_mrequest_i2c_t *i2c_ptr)
+vsf_err_t vsf_mrequest_i2c_slave_request(vsf_mrequest_i2c_t *m_i2c_ptr,
+                                         bool transmit_or_receive,
+                                         uint_fast16_t count,
+                                         uint8_t *buffer_ptr)
+{
+    VSF_HAL_ASSERT(NULL != m_i2c_ptr);
+    vsf_i2c_t * real_i2c_ptr = m_i2c_ptr->i2c_ptr;
+    VSF_HAL_ASSERT(NULL != real_i2c_ptr);
+
+    return vsf_i2c_slave_request(real_i2c_ptr, transmit_or_receive, count, buffer_ptr);
+}
+
+uint_fast16_t vsf_mrequest_i2c_master_get_transferred_count(vsf_mrequest_i2c_t *i2c_ptr)
 {
     VSF_HAL_ASSERT(i2c_ptr != NULL);
     VSF_HAL_ASSERT(i2c_ptr->op != NULL);
-    VSF_HAL_ASSERT(i2c_ptr->op->get_transferred_count!= NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op->master_get_transferred_count!= NULL);
 
 	// TODO
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
+uint_fast16_t vsf_mrequest_i2c_slave_get_transferred_count(vsf_mrequest_i2c_t *i2c_ptr)
+{
+    VSF_HAL_ASSERT(i2c_ptr != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op->slave_get_transferred_count != NULL);
+
+    // TODO
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
+uint_fast16_t vsf_mrequest_i2c_slave_fifo_transfer(vsf_mrequest_i2c_t *i2c_ptr,
+                                                   bool transmit_or_receive,
+                                                   uint_fast16_t count,
+                                                   uint8_t *buffer_ptr)
+{
+    VSF_HAL_ASSERT(i2c_ptr != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op->slave_fifo_transfer != NULL);
+
+    // TODO
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
+vsf_err_t vsf_mrequest_i2c_ctrl(vsf_mrequest_i2c_t *i2c_ptr, vsf_i2c_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(i2c_ptr != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op->ctrl != NULL);
+
+    // TODO
     VSF_HAL_ASSERT(0);
     return 0;
 }
@@ -226,7 +289,7 @@ vsf_i2c_capability_t vsf_mrequest_i2c_capability(vsf_mrequest_i2c_t *m_i2c_ptr)
     VSF_HAL_ASSERT(NULL != real_i2c_ptr);
 
     vsf_i2c_capability_t i2c_capability = vsf_i2c_capability(real_i2c_ptr);
-    i2c_capability.support_no_stop_restart = 1;
+    i2c_capability.support_no_stop = 1;
     return i2c_capability;
 }
 

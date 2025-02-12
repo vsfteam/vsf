@@ -387,7 +387,7 @@ static ssize_t __vsf_linux_i2c_master_request(vsf_linux_i2c_priv_t *priv,
     }
     vsf_thread_wfe(VSF_EVT_USER);
     if (priv->i2c.irq_mask & VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
-        return vsf_i2c_get_transferred_count(i2c);
+        return vsf_i2c_master_get_transferred_count(i2c);
     }
     errno = EIO;
     return -1;
@@ -518,7 +518,7 @@ static void __vsf_linux_i2c_init(vsf_linux_fd_t *sfd)
     while (fsm_rt_cpl != vsf_i2c_enable(i2c));
     vsf_i2c_irq_enable(i2c, VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE
                         |   VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK
-                        |   VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT);
+                        |   VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT);
 }
 
 static const vsf_linux_fd_op_t __vsf_linux_i2c_fdop = {

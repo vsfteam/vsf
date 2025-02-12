@@ -120,7 +120,7 @@ static void __vsf_hw_i2c_irq_handler(vsf_hw_i2c_t *hw_i2c_ptr)
 
     vsf_i2c_irq_mask_t irq_mask;
     if (0 != hw_i2c_const->reg->LR) {
-        irq_mask = VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT;
+        irq_mask = VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT;
     } else {
         irq_mask = VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
     }
@@ -266,7 +266,7 @@ static void __i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
 vsf_err_t vsf_hw_i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,
                                     uint16_t address,
                                     vsf_i2c_cmd_t cmd,
-                                    uint16_t count,
+                                    uint_fast16_t count,
                                     uint8_t *buffer)
 {
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
@@ -359,7 +359,7 @@ vsf_i2c_capability_t vsf_hw_i2c_capability(vsf_hw_i2c_t *i2c_ptr)
         .irq_mask = 1,
         .support_restart = 1,
         .support_no_start = 0,
-        .support_no_stop_restart = 1,
+        .support_no_stop = 1,
         .max_transfer_size = 0xFFFF,
     };
     return i2c_capability;
