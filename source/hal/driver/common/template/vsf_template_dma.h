@@ -82,8 +82,8 @@ extern "C" {
 #   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY     DISABLED
 #endif
 
-#ifndef VSF_DMA_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_DMA_CFG_INHERT_HAL_CAPABILITY            ENABLED
+#ifndef VSF_DMA_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_DMA_CFG_INHERIT_HAL_CAPABILITY            ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -138,7 +138,7 @@ typedef enum vsf_dma_channel_mode_t {
     VSF_DMA_SRC_BURST_LENGTH_16      = (0x04 << 14),
     VSF_DMA_SRC_BURST_LENGTH_32      = (0x05 << 14),
     VSF_DMA_SRC_BURST_LENGTH_64      = (0x05 << 14),
-    VSF_DMA_SRC_BURST_LENGTH_128     = (0x05 << 14),
+    VSF_DMA_SRC_BURST_LENGTH_128     = (0x06 << 14),
 
     VSF_DMA_DST_BURST_LENGTH_1       = (0x00 << 18),
     VSF_DMA_DST_BURST_LENGTH_2       = (0x01 << 18),
@@ -147,11 +147,11 @@ typedef enum vsf_dma_channel_mode_t {
     VSF_DMA_DST_BURST_LENGTH_16      = (0x04 << 18),
     VSF_DMA_DST_BURST_LENGTH_32      = (0x05 << 18),
     VSF_DMA_DST_BURST_LENGTH_64      = (0x05 << 18),
-    VSF_DMA_DST_BURST_LENGTH_128     = (0x05 << 18),
+    VSF_DMA_DST_BURST_LENGTH_128     = (0x06 << 18),
 
     //prio
     VSF_DMA_PRIOPIRY_LOW             = (0x00 << 22),
-    VSF_DMA_PRIOPIRY_MIDIUM          = (0x01 << 22),
+    VSF_DMA_PRIOPIRY_MEDIUM          = (0x01 << 22),
     VSF_DMA_PRIOPIRY_HIGH            = (0x02 << 22),
     VSF_DMA_PRIOPIRY_VERY_HIGH       = (0x03 << 22),
 
@@ -214,7 +214,7 @@ enum {
 
     VSF_DMA_PRIOPIRY_COUNT            = 4,
     VSF_DMA_PRIOPIRY_MASK             = VSF_DMA_PRIOPIRY_LOW       |
-                                        VSF_DMA_PRIOPIRY_MIDIUM    |
+                                        VSF_DMA_PRIOPIRY_MEDIUM    |
                                         VSF_DMA_PRIOPIRY_HIGH      |
                                         VSF_DMA_PRIOPIRY_VERY_HIGH,
 
@@ -279,7 +279,7 @@ typedef struct vsf_dma_channel_status_t {
 
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_dma_capability_t {
-#if VSF_DMA_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_DMA_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
     vsf_dma_irq_mask_t irq_mask;
