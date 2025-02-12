@@ -24,6 +24,13 @@
 
 #if VSF_HAL_USE_GPIO == ENABLED
 
+// HW/IPCore
+/**
+ * \note When vsf_peripheral_status_t is inherited, vsf_template_hal_driver.h needs to be included
+ */
+#include "hal/driver/common/template/vsf_template_hal_driver.h"
+// HW/IPCore end
+
 #include "../../__device.h"
 
 /*\note Refer to template/README.md for usage cases.
@@ -43,24 +50,31 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 // HW
-/*\note hw GPIO driver can reimplement vsf_gpio_mode_t/vsf_gpio_interrupt_mode_t.
+/*\note hw GPIO driver can reimplement following types:
  *      To enable reimplementation, please enable macro below:
- *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE for vsf_gpio_mode_t, mutually exclusive with VSF_GPIO_USE_IO_MODE_TYPE
+ *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE for vsf_gpio_mode_t
+ *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_STATUS for vsf_gpio_status_t
+ *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_gpio_irq_mask_t
+ *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_CTRL for vsf_gpio_ctrl_t
  *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG for vsf_gpio_cfg_t
  *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_gpio_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
 
-#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE        ENABLED
-//#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG         ENABLED
-//#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY  ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-// HW, not for emulated drivers
+// HW/IPCore, not for emulated drivers
+#if VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE == ENABLED
 typedef enum vsf_gpio_mode_t {
     VSF_GPIO_INPUT                      = (0 << 0),
     VSF_GPIO_ANALOG                     = (1 << 0),
@@ -79,10 +93,37 @@ typedef enum vsf_gpio_mode_t {
     VSF_GPIO_EXTI_MODE_RISING           = (3 << 6),
     VSF_GPIO_EXTI_MODE_FALLING          = (4 << 6),
     VSF_GPIO_EXTI_MODE_RISING_FALLING   = (5 << 6),
-
-    // more vendor specified modes can be added here
 } vsf_gpio_mode_t;
-// HW end
+#endif
+
+#if VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
+typedef struct vsf_gpio_t vsf_gpio_t;
+typedef void vsf_gpio_exti_isr_handler_t(void *target_ptr, vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
+typedef struct vsf_gpio_exti_irq_cfg_t {
+    vsf_gpio_exti_isr_handler_t *handler_fn;
+    void                        *target_ptr;
+    vsf_arch_prio_t              prio;
+} vsf_gpio_exti_irq_cfg_t;
+typedef struct vsf_gpio_cfg_t {
+    vsf_gpio_mode_t     mode;
+    uint16_t            alternate_function;
+} vsf_gpio_cfg_t;
+#endif
+
+#if VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED
+typedef struct vsf_gpio_capability_t {
+#if VSF_GPIO_CFG_INHERIT_HAL_CAPABILITY == ENABLED
+    inherit(vsf_peripheral_capability_t)
+#endif
+    uint8_t is_async                     : 1;
+    uint8_t support_output_and_set       : 1;
+    uint8_t support_output_and_clear     : 1;
+    uint8_t support_interrupt            : 1;
+    uint8_t pin_count;
+    vsf_gpio_pin_mask_t pin_mask;
+} vsf_gpio_capability_t;
+#endif
+// HW/IPCore end
 
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
