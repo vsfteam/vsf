@@ -197,13 +197,13 @@ int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart_ptr)
     return usart_ptr->op->get_tx_count(usart_ptr);
 }
 
-vsf_err_t vsf_usart_cmd(vsf_usart_t *usart_ptr, vsf_usart_cmd_t cmd, void *param)
+vsf_err_t vsf_usart_ctrl(vsf_usart_t *usart_ptr, vsf_usart_ctrl_t ctrl, void *param)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr->op != NULL);
-    VSF_HAL_ASSERT(usart_ptr->op->cmd != NULL);
+    VSF_HAL_ASSERT(usart_ptr->op->ctrl != NULL);
 
-    return usart_ptr->op->cmd(usart_ptr, cmd, param);
+    return usart_ptr->op->ctrl(usart_ptr, ctrl, param);
 }
 
 #endif /* VSF_USART_CFG_MULTI_CLASS == ENABLED */

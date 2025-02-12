@@ -310,12 +310,12 @@ int_fast32_t vsf_fifo2req_usart_get_tx_count(vsf_fifo2req_usart_t *fifo2req_usar
     return fifo2req_usart_ptr->tx.count;
 }
 
-vsf_err_t vsf_fifo2req_usart_cmd(vsf_fifo2req_usart_t *fifo2req_usart_ptr, vsf_usart_cmd_t cmd, void *param)
+vsf_err_t vsf_fifo2req_usart_ctrl(vsf_fifo2req_usart_t *fifo2req_usart_ptr, vsf_usart_ctrl_t ctrl, void *param)
 {
     VSF_HAL_ASSERT(fifo2req_usart_ptr != NULL);
     VSF_HAL_ASSERT(fifo2req_usart_ptr->usart != NULL);
 
-    return vsf_usart_cmd(fifo2req_usart_ptr->usart, cmd, param);
+    return vsf_usart_ctrl(fifo2req_usart_ptr->usart, ctrl, param);
 }
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -325,7 +325,7 @@ vsf_err_t vsf_fifo2req_usart_cmd(vsf_fifo2req_usart_t *fifo2req_usart_ptr, vsf_u
 #define VSF_USART_CFG_IMP_EXTERN_OP                   ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_REQUEST         ENABLED
-#define VSF_USART_CFG_REIMPLEMENT_API_CMD             ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_CTRL            ENABLED
 #include "hal/driver/common/usart/usart_template.inc"
 
 #endif      // VSF_HAL_USE_USART
