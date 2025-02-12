@@ -198,10 +198,9 @@ vsf_err_t vsf_hw_timer_set_period(vsf_hw_timer_t *timer_ptr, uint32_t period)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#   define VSF_TIMER_CFG_CAPABILITY_IRQ_MASK        VSF_TIMER_IRQ_ALL_BITS_MASK
-#   define VSF_TIMER_CFG_CAPABILITY_TIMER_BITLEN    32
-#   define VSF_TIMER_CFG_CAPABILITY_SUPPORT_PWM     0
-#   define VSF_TIMER_CFG_CAPABILITY_PWM_CHANNEL_CNT 0
+#define VSF_TIMER_CFG_CAPABILITY_IRQ_MASK           VSF_TIMER_IRQ_ALL_BITS_MASK
+#define VSF_TIMER_CFG_CAPABILITY_TIMER_BITLEN       32
+#define VSF_TIMER_CFG_CAPABILITY_SUPPORT_PWM        0
 #define VSF_TIMER_CFG_IMP_PREFIX                    vsf_hw
 #define VSF_TIMER_CFG_IMP_UPCASE_PREFIX             VSF_HW
 #define VSF_TIMER_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \

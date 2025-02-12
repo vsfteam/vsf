@@ -24,6 +24,13 @@
 
 #if VSF_HAL_USE_TIMER == ENABLED
 
+// HW/IPCore
+/**
+ * \note When vsf_peripheral_status_t is inherited, vsf_template_hal_driver.h needs to be included
+ */
+#include "hal/driver/common/template/vsf_template_hal_driver.h"
+// HW/IPCore end
+
 #include "../../__device.h"
 
 /*\note Refer to template/README.md for usage cases.
@@ -62,16 +69,31 @@ extern "C" {
 // IPCore end
 
 // HW
-/*\note hw TIMER driver can reimplement vsf_usart_mode_t/vsf_usart_irq_mask_t/vsf_usart_status_t.
+/*\note hw TIMER driver can reimplement following types:
  *      To enable reimplementation, please enable macro below:
- *          VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE for vsf_timer_mode_t
+ *          VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE for vsf_timer_channel_mode_t
  *          VSF_TIMER_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_timer_irq_mask_t
+ *          VSF_TIMER_CFG_REIMPLEMENT_TYPE_STATUS for vsf_timer_status_t
+ *          VSF_TIMER_CFG_REIMPLEMENT_TYPE_CFG for vsf_timer_cfg_t
+ *          VSF_TIMER_CFG_REIMPLEMENT_TYPE_CTRL for vsf_timer_ctrl_t
+ *          VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG for vsf_timer_channel_cfg_t
+ *          VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_CTRL for vsf_timer_channel_ctrl_t
+ *          VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_REQUEST for vsf_timer_channel_request_t
+ *          VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_timer_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
 
 #define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE     ENABLED
+#define VSF_TIMER_CFG_REIMPLEMENT_TYPE_STATUS           ENABLED
 #define VSF_TIMER_CFG_REIMPLEMENT_TYPE_IRQ_MASK         ENABLED
+#define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CFG              ENABLED
+#define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG      ENABLED
+#define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CTRL             ENABLED
+#define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG      ENABLED
+#define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_CTRL     ENABLED
+#define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_REQUEST  ENABLED
+#define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY       ENABLED
 // HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -98,21 +120,128 @@ vsf_class(vsf_${timer_ip}_timer_t) {
 // IPCore end
 
 // HW/IPCore, not for emulated drivers
-typedef enum vsf_timer_mode_t {
-    VSF_TIMER_MODE_ONESHOT      = (0x00 << 0),
-    VSF_TIMER_MODE_CONTINUES    = (0x01 << 0),
-
-    VSF_TIMER_MODE_PWM          = (0x01 << 1),
-    VSF_TIMER_MODE_NO_PWM       = (0x00 << 1),
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE == ENABLED
+typedef enum vsf_timer_channel_mode_t {
+    VSF_TIMER_CHANNEL_MODE_BASE = (0x00 << 0),
+    VSF_TIMER_BASE_ONESHOT = (0x00 << 1),
+    VSF_TIMER_BASE_CONTINUES = (0x01 << 1),
 
     // more vendor specified modes can be added here
-} vsf_timer_mode_t;
+} vsf_timer_channel_mode_t;
+#endif
 
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_IRQ_MASK == ENABLED
 typedef enum vsf_timer_irq_mask_t {
     VSF_TIMER_IRQ_MASK_OVERFLOW = (0x01 << 0),
 
     // more vendor specified irq_masks can be added here
 } vsf_timer_irq_mask_t;
+#endif
+
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
+typedef enum vsf_timer_ctrl_t {
+    __VSF_TIMER_CTRL_DUMMY = 0,
+
+    // more vendor specified ctrl can be added here
+} vsf_timer_ctrl_t;
+#endif
+
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_CTRL == ENABLED
+typedef enum vsf_timer_channel_ctrl_t {
+    __VSF_TIMER_CHANNEL_CTRL_DUMMY = 0,
+
+    // more vendor specified channel ctrl can be added here
+} vsf_timer_channel_ctrl_t;
+#endif
+
+/** \note These types usually don't need to be reimplemented in hardware drivers.
+ * They can be reimplemented when existing configuration types don't meet requirements.
+ */
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
+typedef struct vsf_timer_t vsf_timer_t;
+typedef void vsf_timer_isr_handler_t(void *target_ptr,
+                                     vsf_timer_t *timer_ptr,
+                                     vsf_timer_irq_mask_t irq_mask);
+
+typedef struct vsf_timer_isr_t {
+    vsf_timer_isr_handler_t *handler_fn;
+    void *target_ptr;
+    vsf_arch_prio_t prio;
+} vsf_timer_isr_t;
+typedef struct vsf_timer_cfg_t {
+    uint32_t period;
+    union {
+        uint32_t freq;
+        uint32_t min_freq;
+    };
+    vsf_timer_isr_t isr;
+} vsf_timer_cfg_t;
+#endif
+
+/** \note These types usually don't need to be reimplemented in hardware drivers.
+ * They can be reimplemented when existing channel configuration types don't meet requirements.
+ */
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == ENABLED
+typedef struct vsf_timer_channel_cfg_t {
+    vsf_timer_channel_mode_t mode;
+    uint32_t                 pulse;
+
+    // more vendor specified channel cfg can be added here
+} vsf_timer_channel_cfg_t;
+#endif
+
+/** \note These types usually don't need to be reimplemented in hardware drivers.
+ * They can be reimplemented when existing channel request types don't meet requirements.
+ */
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_REQUEST == ENABLED
+typedef struct vsf_timer_channel_request_t {
+    uint16_t length;
+    union {
+        uint32_t *period_buffer;
+        uint32_t *pulse_buffer;
+        uint32_t *input_capture_buffer;
+        struct {
+            uint32_t *channel_a_buffer;
+            uint32_t *channel_b_buffer;
+        };
+    };
+
+    // more vendor specified channel request can be added here
+} vsf_timer_channel_request_t;
+#endif
+
+/** \note These types usually don't need to be reimplemented in hardware drivers.
+ * They can be reimplemented when existing status types don't meet requirements.
+ */
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_STATUS == ENABLED
+typedef struct vsf_timer_status_t {
+    union {
+        struct {
+            uint32_t is_busy         : 1;
+        };
+        uint32_t value;
+    };
+
+    // more vendor specified status can be added here
+} vsf_timer_status_t;
+#endif
+
+/** \note These types usually don't need to be reimplemented in hardware drivers.
+ * They can be reimplemented when existing capability types don't meet requirements.
+ */
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED
+typedef struct vsf_timer_capability_t {
+    vsf_timer_irq_mask_t irq_mask;
+    uint8_t timer_bitlen;
+    uint8_t channel_cnt;
+    uint8_t support_pwm : 1;
+    uint8_t support_output_compare : 1;
+    uint8_t support_input_capture : 1;
+    uint8_t support_one_pulse : 1;
+
+    // more vendor specified capability can be added here
+} vsf_timer_capability_t;
+#endif
 // HW/IPCore end
 
 /*============================ INCLUDES ======================================*/

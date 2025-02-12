@@ -141,7 +141,7 @@ uint32_t vsf_aic_pwm_get_freq(vsf_aic_pwm_t *hw_pwm_ptr)
 #define VSF_PWM_CFG_IMP_UPCASE_PREFIX           VSF_AIC
 #define VSF_PWM_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     static const vsf_aic_pwm_const_t vsf_aic_pwm ## __IDX ## _const= {          \
-        .max_chn_cnt = VSF_AIC_PWM ## __IDX ## _CHANNAL_COUNT,                  \
+        .max_chn_cnt = VSF_AIC_PWM ## __IDX ## _CHANNEL_COUNT,                  \
         .pclk_mask   = CSC_PCLKME_PWM_EN_BIT,                                   \
         .oclk_mask   = CSC_OCLKME_PWM_EN_BIT,                                   \
     };                                                                          \
