@@ -83,8 +83,8 @@ extern "C" {
 #    define VSF_SDIO_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
-#ifndef VSF_SDIO_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_SDIO_CFG_INHERT_HAL_CAPABILITY       ENABLED
+#ifndef VSF_SDIO_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_SDIO_CFG_INHERIT_HAL_CAPABILITY       ENABLED
 #endif
 
 /* SD commands                                  type  argument     response */
@@ -637,7 +637,7 @@ typedef struct vsf_sdio_status_t {
 #endif
 
 typedef struct vsf_sdio_capability_t {
-#if VSF_SDIO_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_SDIO_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
     enum {
