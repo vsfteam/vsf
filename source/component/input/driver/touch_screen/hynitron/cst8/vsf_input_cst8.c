@@ -117,7 +117,7 @@ vsf_err_t vk_input_cst8_init(vk_input_cst8_t *cst8, vsf_arch_prio_t prio)
     });
     vsf_i2c_irq_enable(cst8->i2c_ptr, VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE
                                 |   VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK
-                                |   VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT);
+                                |   VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT);
     vsf_i2c_enable(cst8->i2c_ptr);
 
     vsf_gpio_cfg_t cfg = {
