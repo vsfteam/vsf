@@ -24,6 +24,13 @@
 
 #if VSF_HAL_USE_USART == ENABLED
 
+// HW/IPCore
+/**
+ * \note When vsf_peripheral_status_t is inherited, vsf_template_hal_driver.h needs to be included
+ */
+#include "hal/driver/common/template/vsf_template_hal_driver.h"
+// HW/IPCore end
+
 #include "../../__device.h"
 
 /*\note Refer to template/README.md for usage cases.
@@ -62,12 +69,14 @@ extern "C" {
 // IPCore end
 
 // HW
-/*\note hw USART driver can reimplement vsf_usart_mode_t/vsf_usart_irq_mask_t/vsf_usart_status_t.
+/*\note hw USART driver can reimplement following types:
  *      To enable reimplementation, please enable macro below:
  *          VSF_USART_CFG_REIMPLEMENT_TYPE_MODE for vsf_usart_mode_t
  *          VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS for vsf_usart_status_t
  *          VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_usart_irq_mask_t
- *          VSF_USART_CFG_REIMPLEMENT_TYPE_CMD for vsf_usart_cmd_t
+ *          VSF_USART_CFG_REIMPLEMENT_TYPE_CTRL for vsf_usart_ctrl_t
+ *          VSF_USART_CFG_REIMPLEMENT_TYPE_CFG for vsf_usart_cfg_t
+ *          VSF_USART_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_usart_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
@@ -75,7 +84,7 @@ extern "C" {
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
-#define VSF_USART_CFG_REIMPLEMENT_TYPE_CMD          ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end
@@ -105,6 +114,7 @@ vsf_class(vsf_${usart_ip}_usart_t) {
 // IPCore end
 
 // HW/IPCore, not for emulated drivers
+#if VSF_USART_CFG_REIMPLEMENT_TYPE_MODE == ENABLED
 typedef enum vsf_usart_mode_t {
     VSF_USART_NO_PARITY                 = (0x0ul << 0),
     VSF_USART_EVEN_PARITY               = (0x1ul << 0),
@@ -160,7 +170,9 @@ typedef enum vsf_usart_mode_t {
 
     // more vendor specified modes can be added here
 } vsf_usart_mode_t;
+#endif
 
+#if VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK == ENABLED
 typedef enum vsf_usart_irq_mask_t {
     // request_rx/request_tx complete
     VSF_USART_IRQ_MASK_TX_CPL           = (0x1ul << 0),
@@ -182,27 +194,83 @@ typedef enum vsf_usart_irq_mask_t {
 
     // more vendor specified irq_masks can be added here
 } vsf_usart_irq_mask_t;
+#endif
 
-
-typedef enum vsf_usart_cmd_t {
+#if VSF_USART_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
+typedef enum vsf_usart_ctrl_t {
     // usart default command
-    VSF_USART_CMD_SEND_BREAK    = (0x01ul << 0),
-    VSF_USART_CMD_SET_BREAK     = (0x01ul << 1),
-    VSF_USART_CMD_CLEAR_BREAK   = (0x01ul << 2),
+    VSF_USART_CTRL_SEND_BREAK    = (0x01ul << 0),
+    VSF_USART_CTRL_SET_BREAK     = (0x01ul << 1),
+    VSF_USART_CTRL_CLEAR_BREAK   = (0x01ul << 2),
 
     // more vendor specified commnad can be added here
-} vsf_usart_cmd_t;
+} vsf_usart_ctrl_t;
+#endif
 
-/*\note It's not obligated to inherit from vsf_peripheral_status_t.
+/** \note It's not obligated to inherit from vsf_peripheral_status_t.
  *      If not, there MUST be a is_busy bit in vsf_usart_status_t.
  */
 
+#if VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS == ENABLED
 typedef struct vsf_usart_status_t {
     union {
         inherit(vsf_peripheral_status_t)
         uint32_t value;
+        struct {
+            uint32_t is_busy         : 1;
+            uint32_t is_tx_busy      : 1;
+            uint32_t is_rx_busy      : 1;
+            uint32_t tx_fifo_thresh  : 8;
+            uint32_t rx_fifo_thresh  : 8;
+        };
     };
 } vsf_usart_status_t;
+#endif
+
+/** \note Redefining vsf_usart_cfg_t usually requires declaring vsf_usart_t
+ *        and vsf_usart_isr_handler_t types and define vsf_usart_isr_t.
+ */
+
+#if VSF_USART_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
+typedef struct vsf_usart_t vsf_usart_t;
+typedef void vsf_usart_isr_handler_t(void *target_ptr,
+                                     vsf_usart_t *usart_ptr,
+                                     vsf_usart_irq_mask_t irq_mask);
+typedef struct vsf_usart_isr_t {
+    vsf_usart_isr_handler_t *handler_fn;
+    void                    *target_ptr;
+    vsf_arch_prio_t         prio;
+} vsf_usart_isr_t;
+typedef struct vsf_usart_cfg_t {
+    uint32_t                mode;
+    uint32_t                baudrate;
+    uint32_t                rx_timeout;
+    vsf_usart_isr_t         isr;
+
+    // more vendor specified cfg can be added here
+} vsf_usart_cfg_t;
+#endif
+
+#if VSF_USART_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED
+typedef struct vsf_usart_capability_t {
+    vsf_usart_irq_mask_t irq_mask;
+
+    uint32_t max_baudrate;
+    uint32_t min_baudrate;
+
+    uint8_t txfifo_depth;
+    uint8_t rxfifo_depth;
+
+    uint8_t max_data_bits;
+    uint8_t min_data_bits;
+
+    uint8_t support_rx_timeout          : 1;
+    uint8_t support_send_break          : 1;
+    uint8_t support_set_and_clear_break : 1;
+
+    // more vendor specified capability can be added here
+} vsf_usart_capability_t;
+#endif
 // HW/IPCore end
 
 /*============================ GLOBAL VARIABLES ==============================*/

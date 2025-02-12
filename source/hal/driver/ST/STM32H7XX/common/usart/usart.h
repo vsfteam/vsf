@@ -67,7 +67,7 @@ extern "C" {
  *          VSF_USART_CFG_REIMPLEMENT_TYPE_MODE for vsf_usart_mode_t
  *          VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS for vsf_usart_status_t
  *          VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_usart_irq_mask_t
- *          VSF_USART_CFG_REIMPLEMENT_TYPE_CMD for vsf_usart_cmd_t
+ *          VSF_USART_CFG_REIMPLEMENT_TYPE_CTRL for vsf_usart_ctrl_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
@@ -75,7 +75,7 @@ extern "C" {
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
-#define VSF_USART_CFG_REIMPLEMENT_TYPE_CMD          ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_TYPE_CTRL          ENABLED
 // HW end
 
 // TODO: add comments about fifo2req
@@ -225,14 +225,14 @@ typedef enum vsf_usart_irq_mask_t {
                                         | VSF_USART_IRQ_MASK_OVERFLOW_ERR,
 } vsf_usart_irq_mask_t;
 
-typedef enum vsf_usart_cmd_t {
-    VSF_USART_CMD_SEND_BREAK            = (1 << 1),
+typedef enum vsf_usart_ctrl_t {
+    VSF_USART_CTRL_SEND_BREAK            = (1 << 1),
 
-    VSF_USART_CMD_SET_BREAK             = (1 << 8),
-    VSF_USART_CMD_CLEAR_BREAK           = (1 << 9),
+    VSF_USART_CTRL_SET_BREAK             = (1 << 8),
+    VSF_USART_CTRL_CLEAR_BREAK           = (1 << 9),
 
-    __VSF_HW_USART_SUPPORT_CMD_MASK     = VSF_USART_CMD_SEND_BREAK,
-} vsf_usart_cmd_t;
+    __VSF_HW_USART_SUPPORT_CTRL_MASK     = VSF_USART_CTRL_SEND_BREAK,
+} vsf_usart_ctrl_t;
 
 typedef struct vsf_usart_status_t {
     union {

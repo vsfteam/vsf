@@ -153,9 +153,9 @@ int_fast32_t vsf_remapped_usart_get_tx_count(vsf_remapped_usart_t *usart)
     return vsf_usart_get_tx_count(usart->target);
 }
 
-vsf_err_t vsf_remapped_usart_cmd(vsf_remapped_usart_t *usart_ptr, vsf_usart_cmd_t cmd, void *param)
+vsf_err_t vsf_remapped_usart_ctrl(vsf_remapped_usart_t *usart_ptr, vsf_usart_ctrl_t ctrl, void *param)
 {
-    return vsf_usart_cmd(usart_ptr, cmd, param);
+    return vsf_usart_ctrl(usart_ptr, ctrl, param);
 }
 
 
