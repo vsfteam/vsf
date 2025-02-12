@@ -39,7 +39,7 @@
 #endif
 
 #ifndef APP_TIMER_DEMO_CFG_MODE
-#   define APP_TIMER_DEMO_CFG_MODE                      VSF_TIMER_MODE_CONTINUES
+#   define APP_TIMER_DEMO_CFG_MODE                      VSF_TIMER_BASE_CONTINUES
 #endif
 
 #ifndef APP_TIMER_DEMO_CFG_FREQ
@@ -91,8 +91,8 @@ typedef struct timer_demo_const_t {
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const hal_option_t __mode_options[] = {
-    HAL_DEMO_OPTION(VSF_TIMER_MODE_RESTART_MASK, VSF_TIMER_MODE_ONESHOT),
-    HAL_DEMO_OPTION(VSF_TIMER_MODE_RESTART_MASK, VSF_TIMER_MODE_CONTINUES),
+    HAL_DEMO_OPTION(VSF_TIMER_MODE_RESTART_MASK, VSF_TIMER_BASE_ONESHOT),
+    HAL_DEMO_OPTION(VSF_TIMER_MODE_RESTART_MASK, VSF_TIMER_BASE_CONTINUES),
 
     HAL_DEMO_OPTION(VSF_TIMER_MODE_PWM_MASK, VSF_TIMER_MODE_PWM),
     HAL_DEMO_OPTION(VSF_TIMER_MODE_PWM_MASK, VSF_TIMER_MODE_NO_PWM),
@@ -124,7 +124,7 @@ HAL_DEMO_INIT(timer, APP_TIMER,
 
     .test.method = METHOD_OVERFLOW_ISR,
 
-    .test.cfg.mode          = VSF_TIMER_MODE_ONESHOT,
+    .test.cfg.mode          = VSF_TIMER_BASE_ONESHOT,
     .test.cfg.period        = APP_TIMER_DEMO_CFG_MAX_COUNT,
     .test.cfg.freq          = APP_TIMER_DEMO_CFG_FREQ,
 

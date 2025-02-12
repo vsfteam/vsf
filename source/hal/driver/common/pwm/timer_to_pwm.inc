@@ -15,10 +15,11 @@
  *                                                                           *
  ****************************************************************************/
 
-#if VSF_HAL_USE_PWM == ENABLED
+#if VSF_HAL_USE_PWM == ENABLED && VSF_HAL_USE_TIMER == ENABLED
+
+#ifdef VSF_TIMER_CHANNEL_MODE_PWM
 
 /*============================ INCLUDES ======================================*/
-
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -36,7 +37,6 @@ vsf_err_t vsf_hw_pwm_init(vsf_hw_pwm_t *hw_pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)
     hw_pwm_ptr->cfg = *cfg_ptr;
 
     vsf_timer_cfg_t timer_cfg = {
-        .mode = VSF_TIMER_MODE_PWM,
         .min_freq = cfg_ptr->mini_clock_freq,
     };
 
@@ -63,14 +63,51 @@ vsf_err_t vsf_hw_pwm_set(vsf_hw_pwm_t *hw_pwm_ptr, uint8_t channel, uint32_t per
 {
     VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
     VSF_HAL_ASSERT(NULL != hw_pwm_ptr->timer);
+    vsf_err_t err;
 
-    return vsf_hw_timer_pwm_set(hw_pwm_ptr->timer, channel, period, pulse);
+    err = vsf_hw_timer_channel_stop(hw_pwm_ptr->timer, channel);
+    if (err != VSF_ERR_NONE) {
+        return err;
+    }
+
+    err = vsf_hw_timer_set_period(hw_pwm_ptr->timer, period);
+    if (err != VSF_ERR_NONE) {
+        return err;
+    }
+
+    vsf_timer_channel_cfg_t cfg = {
+        .mode = VSF_TIMER_CHANNEL_MODE_PWM,
+        .pulse = pulse,
+    };
+    err = vsf_hw_timer_channel_config(hw_pwm_ptr->timer, channel, &cfg);
+    if (err != VSF_ERR_NONE) {
+        return err;
+    }
+
+    return vsf_hw_timer_channel_start(hw_pwm_ptr->timer, channel);
 }
 
 uint32_t vsf_hw_pwm_get_freq(vsf_hw_pwm_t *hw_pwm_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
-    return vsf_hw_timer_get_freq(hw_pwm_ptr->timer);
+#ifdef VSF_TIMER_CTRL_GET_FREQ
+    VSF_HAL_ASSERT(NULL != hw_pwm_ptr->timer);
+
+    vsf_err_t err;
+    uint32_t freq = 0;
+    err = vsf_hw_timer_ctrll(hw_pwm_ptr->timer, VSF_TIMER_CTRL_GET_FREQ, freq);
+    if (err == VSF_ERR_NONE) {
+        VSF_HAL_ASSERT(0);
+        return 0;
+    } else {
+        return freq;
+    }
+#else
+    VSF_HAL_ASSERT(0);
+    return 0;
+#endif
 }
 
-#endif  /* VSF_HAL_USE_PWM */
+#endif  /* VSF_TIMER_CHANNEL_MODE_PWM */
+
+#endif  /* VSF_HAL_USE_PWM == ENABLED && VSF_HAL_USE_TIMER == ENABLED */
