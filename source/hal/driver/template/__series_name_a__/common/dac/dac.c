@@ -208,7 +208,7 @@ static void VSF_MCONNECT(__, VSF_DAC_CFG_IMP_PREFIX, _dac_irqhandler)(
 #define VSF_DAC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t)                                \
         VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac, __IDX) = {                   \
-        .reg                = VSF_MCONNECT(VSF_DAC_CFG_IMP_UPCASE_PREFIX, _DAC, __IDX,_REG_),\
+        .reg                = VSF_MCONNECT(VSF_DAC_CFG_IMP_UPCASE_PREFIX, _DAC, __IDX,_REG),\
         __HAL_OP                                                                \
     };                                                                          \
     VSF_CAL_ROOT void VSF_MCONNECT(VSF_DAC_CFG_IMP_UPCASE_PREFIX, _DAC, __IDX, _IRQHandler)(void)\
