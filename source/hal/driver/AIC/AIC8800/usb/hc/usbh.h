@@ -34,6 +34,8 @@
 
 extern vsf_err_t aic8800_usbh_init(aic8800_usb_t *hc, usb_hc_ip_cfg_t *cfg);
 extern void aic8800_usbh_get_info(aic8800_usb_t *hc, usb_hc_ip_info_t *info);
+extern void aic8800_usbh_irq_enable(aic8800_usb_t *hc);
+extern void aic8800_usbh_irq_disable(aic8800_usb_t *hc);
 extern void aic8800_usbh_irq(aic8800_usb_t *hc);
 
 #endif

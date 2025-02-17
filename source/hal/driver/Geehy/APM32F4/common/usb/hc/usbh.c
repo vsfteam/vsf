@@ -32,6 +32,8 @@
 
 extern vsf_err_t __vsf_hw_usb_init(vsf_hw_usb_t *usb, vsf_arch_prio_t priority,
                 bool is_fs_phy, usb_ip_irqhandler_t handler, void *param);
+extern void __vsf_hw_usb_irq_enable(vsf_hw_usb_t *usb);
+extern void __vsf_hw_usb_irq_disable(vsf_hw_usb_t *usb);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -43,6 +45,16 @@ vsf_err_t vsf_hw_usbh_init(vsf_hw_usb_t *hc, usb_hc_ip_cfg_t *cfg)
     hc->is_host = true;
 
     return __vsf_hw_usb_init(hc, cfg->priority, is_fs_phy, cfg->irqhandler, cfg->param);
+}
+
+void vsf_hw_usbh_irq_enable(vsf_hw_usb_t *hc)
+{
+    __vsf_hw_usb_irq_enable(hc);
+}
+
+void vsf_hw_usbh_irq_disable(vsf_hw_usb_t *hc)
+{
+    __vsf_hw_usb_irq_disable(hc);
 }
 
 void vsf_hw_usbh_get_info(vsf_hw_usb_t *hc, usb_hc_ip_info_t *info)

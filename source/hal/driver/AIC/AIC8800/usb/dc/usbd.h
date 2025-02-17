@@ -37,6 +37,8 @@ extern void aic8800_usbd_fini(aic8800_usb_t *dc);
 extern void aic8800_usbd_get_info(aic8800_usb_t *dc, usb_dc_ip_info_t *info);
 extern void aic8800_usbd_connect(aic8800_usb_t *dc);
 extern void aic8800_usbd_disconnect(aic8800_usb_t *dc);
+extern void aic8800_usbd_irq_enable(aic8800_usb_t *dc);
+extern void aic8800_usbd_irq_disable(aic8800_usb_t *dc);
 extern void aic8800_usbd_irq(aic8800_usb_t *dc);
 
 #endif

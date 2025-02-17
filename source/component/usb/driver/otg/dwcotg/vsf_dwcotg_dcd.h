@@ -104,6 +104,9 @@ extern vsf_err_t vk_dwcotg_dcd_init(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *c
 extern void vk_dwcotg_dcd_fini(vk_dwcotg_dcd_t *dwcotg_dcd);
 extern void vk_dwcotg_dcd_reset(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg);
 
+extern void vk_dwcotg_dcd_irq_enable(vk_dwcotg_dcd_t *dwcotg_dcd);
+extern void vk_dwcotg_dcd_irq_disable(vk_dwcotg_dcd_t *dwcotg_dcd);
+
 extern void vk_dwcotg_dcd_connect(vk_dwcotg_dcd_t *dwcotg_dcd);
 extern void vk_dwcotg_dcd_disconnect(vk_dwcotg_dcd_t *dwcotg_dcd);
 extern void vk_dwcotg_dcd_wakeup(vk_dwcotg_dcd_t *dwcotg_dcd);

@@ -38,6 +38,8 @@
 
 extern vsf_err_t vsf_hw_usbh_init(vsf_hw_usb_t *hc, usb_hc_ip_cfg_t *cfg);
 extern void vsf_hw_usbh_get_info(vsf_hw_usb_t *hc, usb_hc_ip_info_t *info);
+extern void vsf_hw_usbh_irq_enable(vsf_hw_usb_t *hc);
+extern void vsf_hw_usbh_irq_disable(vsf_hw_usb_t *hc);
 extern void vsf_hw_usbh_irq(vsf_hw_usb_t *hc);
 
 #endif

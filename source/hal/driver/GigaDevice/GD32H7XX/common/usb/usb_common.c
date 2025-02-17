@@ -51,6 +51,16 @@ vsf_err_t __vsf_hw_usb_init(vsf_hw_usb_t *usb, vsf_arch_prio_t priority)
     return VSF_ERR_NONE;
 }
 
+void __vsf_hw_usb_irq_enable(vsf_hw_usb_t *usb)
+{
+    NVIC_EnableIRQ(usb->param->irq);
+}
+
+void __vsf_hw_usb_irq_disable(vsf_hw_usb_t *usb)
+{
+    NVIC_DisableIRQ(usb->param->irq);
+}
+
 void __vsf_hw_usb_irq(vsf_hw_usb_t *usb)
 {
     if (usb->callback.irqhandler != NULL) {

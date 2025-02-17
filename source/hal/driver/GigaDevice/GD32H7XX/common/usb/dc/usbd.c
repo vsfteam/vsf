@@ -40,6 +40,8 @@
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t __vsf_hw_usb_init(vsf_hw_usb_t *usb, vsf_arch_prio_t priority);
+extern void __vsf_hw_usb_irq_enable(vsf_hw_usb_t *usb);
+extern void __vsf_hw_usb_irq_disable(vsf_hw_usb_t *usb);
 extern void __vsf_hw_usb_irq(vsf_hw_usb_t *usb);
 
 /*============================ IMPLEMENTATION ================================*/
@@ -73,6 +75,16 @@ vsf_err_t vsf_hw_usbd_init(vsf_hw_usb_t *dc, usb_dc_ip_cfg_t *cfg)
 
 void vsf_hw_usbd_fini(vsf_hw_usb_t *dc)
 {
+}
+
+void vsf_hw_usbd_irq_enable(vsf_hw_usb_t *dc)
+{
+    __vsf_hw_usb_irq_enable(dc);
+}
+
+void vsf_hw_usbd_irq_disable(vsf_hw_usb_t *dc)
+{
+    __vsf_hw_usb_irq_disable(dc);
 }
 
 void vsf_hw_usbd_get_info(vsf_hw_usb_t *dc, usb_dc_ip_info_t *info)

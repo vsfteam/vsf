@@ -620,6 +620,7 @@ static vsf_err_t __vk_dwcotg_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t evt, 
                 };
                 // interrupt is disabled after init
                 param->op->Init(&cfg);
+                param->op->IrqEnable();
             }
 
             dwcotg_hcd->feature = info.feature;

@@ -101,6 +101,7 @@ vsf_err_t vk_dwcotg_dcd_init(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
             .param          = dwcotg_dcd,
         };
         dwcotg_dcd->param->op->Init(&ip_cfg);
+        dwcotg_dcd->param->op->IrqEnable();
     }
 
     if (info.vendor.phy_init != NULL) {
@@ -156,6 +157,16 @@ vsf_err_t vk_dwcotg_dcd_init(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)
 void vk_dwcotg_dcd_fini(vk_dwcotg_dcd_t *dwcotg_dcd)
 {
     dwcotg_dcd->param->op->Fini();
+}
+
+void vk_dwcotg_dcd_irq_enable(vk_dwcotg_dcd_t *dwcotg_dcd)
+{
+    dwcotg_dcd->param->op->IrqEnable();
+}
+
+void vk_dwcotg_dcd_irq_disable(vk_dwcotg_dcd_t *dwcotg_dcd)
+{
+    dwcotg_dcd->param->op->IrqDisable();
 }
 
 void vk_dwcotg_dcd_reset(vk_dwcotg_dcd_t *dwcotg_dcd, usb_dc_cfg_t *cfg)

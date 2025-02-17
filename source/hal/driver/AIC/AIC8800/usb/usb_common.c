@@ -84,8 +84,17 @@ vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority,
 
     NVIC_SetPriority(USBDMA_IRQn, priority);
     NVIC_ClearPendingIRQ(USBDMA_IRQn);
-    NVIC_EnableIRQ(USBDMA_IRQn);
     return VSF_ERR_NONE;
+}
+
+void __aic8800_usb_irq_enable(aic8800_usb_t *usb)
+{
+    NVIC_EnableIRQ(USBDMA_IRQn);
+}
+
+void __aic8800_usb_irq_disable(aic8800_usb_t *usb)
+{
+    NVIC_DisableIRQ(USBDMA_IRQn);
 }
 
 #endif

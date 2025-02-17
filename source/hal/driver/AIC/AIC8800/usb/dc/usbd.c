@@ -36,6 +36,8 @@
 
 extern vsf_err_t __aic8800_usb_init(aic8800_usb_t *usb, vsf_arch_prio_t priority,
                 bool is_fs_phy, usb_ip_irqhandler_t handler, void *param);
+extern void __aic8800_usb_irq_enable(aic8800_usb_t *usb);
+extern void __aic8800_usb_irq_disable(aic8800_usb_t *usb);
 
 /*============================ IMPLEMENTATION ================================*/
 
@@ -72,6 +74,16 @@ vsf_err_t aic8800_usbd_init(aic8800_usb_t *dc, usb_dc_ip_cfg_t *cfg)
 
 void aic8800_usbd_fini(aic8800_usb_t *dc)
 {
+}
+
+void aic8800_usbd_irq_enable(aic8800_usb_t *dc)
+{
+    __aic8800_usb_irq_enable(dc);
+}
+
+void aic8800_usbd_irq_disable(aic8800_usb_t *dc)
+{
+    __aic8800_usb_irq_disable(dc);
 }
 
 static void __aic8800_usbd_phy_init(void *param, vk_dwcotg_dcd_param_t *dcd_param)

@@ -36,6 +36,8 @@ extern void vsf_hw_usbd_fini(vsf_hw_usb_t *dc);
 extern void vsf_hw_usbd_get_info(vsf_hw_usb_t *dc, usb_dc_ip_info_t *info);
 extern void vsf_hw_usbd_connect(vsf_hw_usb_t *dc);
 extern void vsf_hw_usbd_disconnect(vsf_hw_usb_t *dc);
+extern void vsf_hw_usbd_irq_enable(vsf_hw_usb_t *dc);
+extern void vsf_hw_usbd_irq_disable(vsf_hw_usb_t *dc);
 extern void vsf_hw_usbd_irq(vsf_hw_usb_t *dc);
 
 #endif
