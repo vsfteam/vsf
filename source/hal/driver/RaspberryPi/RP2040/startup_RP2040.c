@@ -26,8 +26,6 @@
 
 // for WEAK in compiler
 #include "utilities/vsf_utilities.h"
-// for vsf_arch_set_stack in case bootloader does not set the SP register
-#include "hal/arch/vsf_arch.h"
 
 // header which will include core_cm0plus.h
 #include "RP2040.h"
@@ -156,14 +154,14 @@ void _entry_point(void)
     SCB->VTOR = (uint32_t)vtab;
 
     // call reset handler
-    vsf_arch_set_stack((uintptr_t)vtab[0]);
+    __set_MSP((uintptr_t)vtab[0]);
     // code below maybe buggy, if vtab is in original stack, will cause error because SP register is updated
     ((void (*)(void))(vtab[1]))();
 }
 
 void Reset_Handler(void)
 {
-    vsf_arch_set_stack((uintptr_t)&__INITIAL_SP);
+    __set_MSP((uintptr_t)&__INITIAL_SP);
     vsf_hal_pre_startup_init();
 
     memcpy(ram_vector_table, __VECTOR_TABLE, sizeof(ram_vector_table));

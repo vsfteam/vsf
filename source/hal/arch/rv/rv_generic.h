@@ -107,7 +107,7 @@ static VSF_CAL_ALWAYS_INLINE void vsf_arch_sleep(uint_fast32_t mode)
     __asm volatile("wfi" : :);
 }
 
-static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
+static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack, uint32_t stack_size)
 {
     __asm volatile("mv sp, %0" : : "r"(stack) : );
 }

@@ -30,19 +30,18 @@
 // for VSF_MFOREACH
 #include "utilities/vsf_utilities.h"
 
-#define __imp_blocked_weak_handler(__name)                                      \
-            VSF_CAL_WEAK(__name)                                                \
-            void __name(void){while(1);}
-
 /*----------------------------------------------------------------------------
   Exception / Interrupt Handler Function Prototype
  *----------------------------------------------------------------------------*/
+
 typedef void( *pFunc )( void );
 
 /*----------------------------------------------------------------------------
   External References
  *----------------------------------------------------------------------------*/
+
 extern uint32_t __INITIAL_SP;
+extern uint32_t __STACK_LIMIT;
 
 extern __NO_RETURN void __PROGRAM_START(void);
 
@@ -50,7 +49,11 @@ extern __NO_RETURN void __PROGRAM_START(void);
   Internal References
  *----------------------------------------------------------------------------*/
 
-void __NO_RETURN Reset_Handler(void);
+void
+#if __IS_COMPILER_IAR__ && __VER__ < 9060003
+__attribute__((naked))
+#endif
+__NO_RETURN Reset_Handler(void);
 
 /*----------------------------------------------------------------------------
   Exception / Interrupt Handler
@@ -157,12 +160,16 @@ void __NO_RETURN Reset_Handler(void);
     SWI28_IRQHandler,                                                           \
     SECU1_IRQHandler
 
+#define __imp_blocked_weak_handler(__name)                                      \
+            __WEAK void __name(void){while(1);}
+
 VSF_MFOREACH(__imp_blocked_weak_handler,
     NMI_Handler,
     HardFault_Handler,
     MemManage_Handler,
     BusFault_Handler,
     UsageFault_Handler,
+    SecureFault_Handler,
     SVC_Handler,
     DebugMon_Handler,
     PendSV_Handler,
@@ -180,7 +187,7 @@ VSF_MFOREACH(__imp_blocked_weak_handler,
 #pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 
-VSF_CAL_ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
+__USED const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
     (pFunc)(&__INITIAL_SP),                   /*     Initial Stack Pointer */
     Reset_Handler,                            /*     Reset Handler */
     NMI_Handler,                              /* -14 NMI Handler */
@@ -188,7 +195,7 @@ VSF_CAL_ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
     MemManage_Handler,                        /* -12 MPU Fault Handler */
     BusFault_Handler,                         /* -11 Bus Fault Handler */
     UsageFault_Handler,                       /* -10 Usage Fault Handler */
-    0,                                        /*     Reserved */
+    SecureFault_Handler,                      /* -9  Secure Fault Handler */
     0,                                        /*     Reserved */
     0,                                        /*     Reserved */
     0,                                        /*     Reserved */
@@ -206,17 +213,26 @@ VSF_CAL_ROOT const pFunc __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
 #pragma GCC diagnostic pop
 #endif
 
-VSF_CAL_WEAK(vsf_hal_pre_startup_init)
-void vsf_hal_pre_startup_init(void)
+__WEAK void vsf_hal_pre_startup_init(void)
 {
 }
 
 /*----------------------------------------------------------------------------
   Reset Handler called on controller reset
  *----------------------------------------------------------------------------*/
-void Reset_Handler(void)
+void
+#if __IS_COMPILER_IAR__ && __VER__ < 9060003
+__attribute__((naked))
+#endif
+__NO_RETURN Reset_Handler(void)
 {
-    vsf_arch_set_stack((uintptr_t)&__INITIAL_SP);
+    __set_MSP((uintptr_t)&__INITIAL_SP);
+    __set_MSPLIM((uintptr_t)&__STACK_LIMIT);
+
+#if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
+//    __TZ_set_STACKSEAL_S((uint32_t *)(&__STACK_SEAL));
+#endif
+
     //! enable FPU before vsf_hal_pre_startup_init, in case vsf_hal_pre_startup_init uses FPU
     SCB->CPACR |= ((3U << 0U * 2U)
                   |(3U << 1U * 2U)

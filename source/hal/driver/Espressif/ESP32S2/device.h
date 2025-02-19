@@ -51,7 +51,7 @@ typedef int                                     intalu_t;
 
 // SET_STACK will fail to pass stack check
 //#include "xt_instr_macros.h"
-//#define VSF_ARCH_RTOS_CFG_SET_STACK(__STACK)    SET_STACK(__STACK)
+//#define VSF_ARCH_RTOS_CFG_SET_STACK(__STACK, __SIZE)      SET_STACK(__STACK)
 
 // 16-byte align, necessary if > 8
 #define VSF_ARCH_STACK_ALIGN_BIT                4

@@ -59,7 +59,7 @@
 #define mscboot_boot()                                                          \
     do {                                                                        \
         uint32_t *image = (uint32_t *)(0x08000000 + MSCBOOT_CFG_FW_ADDR);       \
-        vsf_arch_set_stack(image[0]);                                           \
+        vsf_arch_set_stack(image[0], 0);                                        \
         ((void (*)(void))(image[1]))();                                         \
     } while (0)
 

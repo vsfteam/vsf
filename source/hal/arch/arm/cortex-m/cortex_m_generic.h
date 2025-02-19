@@ -274,9 +274,10 @@ extern __VSF_VPLT_DECORATOR__ vsf_arch_abi_vplt_t vsf_arch_abi_vplt;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
+static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack, uint32_t stack_size)
 {
     __set_MSP(stack);
+    __set_MSPLIM(stack - stack_size);
 }
 
 static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_get_stack(void)

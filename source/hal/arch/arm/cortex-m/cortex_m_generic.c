@@ -23,6 +23,15 @@
 #include "hal/arch/__vsf_arch_interface.h"
 
 /*============================ MACROS ========================================*/
+
+#if __ARM_ARCH == 8
+#   if __IS_COMPILER_IAR__ && __VER__ < 9060003
+#       warning IAR 9.60.3 has bug on __NO_RETURN implementation, which may add PUSH instruction(s).\
+In Reset_Handler, if PUSH instruction is executed before setting MSPLIM, bus will hang.\
+Workaround: add __attribute__((naked)) to Reset_Handler for __IS_COMPILER_IAR__ && __VER__ < 9060003
+#   endif
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

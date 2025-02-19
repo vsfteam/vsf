@@ -99,7 +99,7 @@ typedef enum vsf_arch_prio_t {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack)
+static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack, uint32_t stack_size)
 {
     VSF_HAL_ASSERT(false);
 }

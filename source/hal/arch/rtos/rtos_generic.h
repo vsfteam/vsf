@@ -179,9 +179,9 @@ extern vsf_arch_prio_t __vsf_arch_irq_get_priority(vsf_arch_irq_thread_t *irq_th
 extern void vsf_arch_wakeup(void);
 
 #ifndef VSF_ARCH_LIMIT_NO_SET_STACK
-static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack)
+static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack, uint32_t stack_size)
 {
-    VSF_ARCH_RTOS_CFG_SET_STACK(stack);
+    VSF_ARCH_RTOS_CFG_SET_STACK(stack, stack_size);
 }
 #endif
 

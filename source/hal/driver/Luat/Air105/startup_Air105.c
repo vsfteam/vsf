@@ -201,7 +201,7 @@ void vsf_hal_pre_startup_init(void)
  *----------------------------------------------------------------------------*/
 void Reset_Handler(void)
 {
-    vsf_arch_set_stack((uintptr_t)&__INITIAL_SP);
+    __set_MSP((uintptr_t)&__INITIAL_SP);
     vsf_hal_pre_startup_init();
 
     //! enable FPU

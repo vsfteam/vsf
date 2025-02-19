@@ -248,7 +248,7 @@ extern vsf_err_t __vsf_arch_irq_restart(vsf_arch_irq_thread_t *irq_thread,
 extern vsf_systimer_tick_t __vsf_systimer_get(void);
 
 #ifndef VSF_ARCH_LIMIT_NO_SET_STACK
-static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack)
+static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack, uint32_t stack_size)
 {
 #if     defined(__CPU_X86__)
     __asm__("movl %0, %%esp" : : "r"(stack));

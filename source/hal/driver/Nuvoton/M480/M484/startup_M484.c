@@ -499,7 +499,7 @@ void vsf_hal_pre_startup_init(void)
  *----------------------------------------------------------------------------*/
 void Reset_Handler(void)
 {
-    vsf_arch_set_stack((uintptr_t)&__INITIAL_SP);
+    __set_MSP((uintptr_t)&__INITIAL_SP);
     bool orig = m480_reg_unlock();
 
     vsf_hal_pre_startup_init();

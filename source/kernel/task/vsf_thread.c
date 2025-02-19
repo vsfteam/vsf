@@ -390,7 +390,7 @@ static void __vsf_thread_evthandler(uintptr_t local, vsf_evt_t evt)
     pthis->ret = &ret;
     if (!setjmp(ret)) {
         if (VSF_EVT_INIT == evt) {
-            vsf_arch_set_stack((uintptr_t)(&pthis->stack[(pthis->stack_size >> 3)]));
+            vsf_arch_set_stack((uintptr_t)(&pthis->stack[(pthis->stack_size >> 3)]), pthis->stack_size);
             __vsf_thread_entry();
         } else {
 #if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED
@@ -450,7 +450,7 @@ static void __vsf_thread_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     pthis->ret = &ret;
     if (!setjmp(ret)) {
         if (VSF_EVT_INIT == evt) {
-            vsf_arch_set_stack((uintptr_t)(&pthis->stack[(pthis->stack_size >> 3)]));
+            vsf_arch_set_stack((uintptr_t)(&pthis->stack[(pthis->stack_size >> 3)]), pthis->stack_size);
             __vsf_thread_entry();
         } else {
 #if VSF_KERNEL_CFG_THREAD_STACK_CHECK == ENABLED

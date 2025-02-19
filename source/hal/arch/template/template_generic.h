@@ -80,7 +80,7 @@ typedef enum vsf_arch_prio_t vsf_arch_prio_t;
 /*============================ PROTOTYPES ====================================*/
 
 // implement vsf_arch_set_stack to use vsf_thread_t
-static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack)
+static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uint32_t stack, uint32_t stack_size)
 {
     VSF_HAL_ASSERT(false);
 }

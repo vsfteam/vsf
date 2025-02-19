@@ -189,7 +189,7 @@ void vsf_hal_pre_startup_init(void)
  *----------------------------------------------------------------------------*/
 void Reset_Handler(void)
 {
-  vsf_arch_set_stack((uintptr_t)&__INITIAL_SP);
+  __set_MSP((uintptr_t)&__INITIAL_SP);
   vsf_hal_pre_startup_init();
   SCB->CPACR |= ((3U << 10U*2U) |           /* enable CP10 Full Access */
                  (3U << 11U*2U)  );         /* enable CP11 Full Access */
