@@ -109,8 +109,8 @@ Dependency: VSF_USART_CFG_FUNCTION_RENAME enable
 #    define VSF_USART_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
-#ifndef VSF_USART_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_USART_CFG_INHERT_HAL_CAPABILITY      ENABLED
+#ifndef VSF_USART_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_USART_CFG_INHERIT_HAL_CAPABILITY      ENABLED
 #endif
 
 #ifndef VSF_USART_CFG_REQUEST_API
@@ -341,8 +341,8 @@ typedef enum vsf_usart_mode_t {
         VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY          = VSF_USART_TX_FIFO_THRESHOLD_4,
         VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL            = VSF_USART_TX_FIFO_THRESHOLD_8,
     */
-    VSF_USART_TX_FIFO_THRESHOLD_EMPTY                   = (0x0ul << 15),    //!< TX FIFO becomes emtpy
-    VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY              = (0x1ul << 15),    //!< TX FIFO becomes half emtpy
+    VSF_USART_TX_FIFO_THRESHOLD_EMPTY                   = (0x0ul << 15),    //!< TX FIFO becomes empty
+    VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY              = (0x1ul << 15),    //!< TX FIFO becomes half empty
     //! TX FIFO maximum non-full threshold value, it can send at least one data.
     //! If the TX FIFO threshold cannot be set to the fifo maximum minus 1,
     //! then we can use the tx not full interrupt to accomplish this.
@@ -384,7 +384,7 @@ typedef enum vsf_usart_mode_t {
     */
     //! RX FIFO Minimum non-empty threshold, which should contain at least one data.
     //! If the threshold value of RX FIFO cannot be set to 1, then we can use the RX FIFO not empty interrupt to accomplish this.
-    VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY               = (0x0ul << 17),
+    VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY               = (0x0ul << 17),    //!< RX FIFO Minimum non-empty threshold, which should contain at least one data.
     VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL               = (0x1ul << 17),    //!< Half of the threshold for RX FIFO
     VSF_USART_RX_FIFO_THRESHOLD_FULL                    = (0x2ul << 17),    //!< Full of the threshold for RX FIFO
 
@@ -693,7 +693,7 @@ typedef struct vsf_usart_status_t {
 #endif
 
 typedef struct vsf_usart_capability_t {
-#if VSF_USART_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_USART_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
     vsf_usart_irq_mask_t irq_mask;
@@ -766,27 +766,27 @@ extern void vsf_usart_fini(vsf_usart_t *usart_ptr);
 
 /**
  \~english
- @brief enable interrupt masks of usart instance.
+ @brief enable a usart instance.
  @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
- @return none.
+ @return fsm_rt_t: return FSM_RT_CPL if usart was enabled, return FSM_RT_ON_GOING if usart is enabling
 
  \~chinese
- @brief 使能 usart 实例的中断
+ @brief 使能一个 usart 实例
  @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
- @return 无。
+ @return fsm_rt_t: 返回 FSM_RT_CPL 如果 usart 实例被使能，返回 FSM_RT_ON_GOING 如果 usart 实例正在使能
  */
 extern fsm_rt_t vsf_usart_enable(vsf_usart_t *usart_ptr);
 
 /**
  \~english
- @brief disable interrupt masks of usart instance.
+ @brief disable a usart instance.
  @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
- @return none.
+ @return fsm_rt_t: return FSM_RT_CPL if usart was disabled, return FSM_RT_ON_GOING if usart is disabling
 
  \~chinese
- @brief 禁能 usart 实例的中断
+ @brief 禁能一个 usart 实例
  @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
- @return 无。
+ @return fsm_rt_t: 返回 FSM_RT_CPL 如果 usart 实例被禁能，返回 FSM_RT_ON_GOING 如果 usart 实例正在禁能
  */
 extern fsm_rt_t vsf_usart_disable(vsf_usart_t *usart_ptr);
 
@@ -811,7 +811,7 @@ extern void vsf_usart_irq_enable(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t ir
  \~english
  @brief disable interrupt masks of usart instance.
  @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
- @param[in] irq_mask: one or more value of enum vsf_usart_irq_mask_t, @ref vsf_usart_irq_mask_t
+ @param[in] irq_mask: one or more value of enum @ref vsf_usart_irq_mask_t, @ref vsf_usart_irq_mask_t
  @return none.
 
  \~chinese
@@ -909,8 +909,8 @@ extern uint_fast16_t vsf_usart_txfifo_get_free_count(vsf_usart_t *usart_ptr);
  @brief 尝试从 usart 发送队列里写入指定最大长度的数据
  @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
  @param[in] buffer_ptr: 数据缓冲区
- @param[in] count: 最大读取数量
- @return uint_fast16_t: 返回当前 usart 接收队列的实际读到的数量
+ @param[in] count: 最大写入数量
+ @return uint_fast16_t: 返回当前 usart 发送队列的实际写入数量
  */
 extern uint_fast16_t vsf_usart_txfifo_write(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count);
 
@@ -952,13 +952,14 @@ extern vsf_err_t vsf_usart_request_tx(vsf_usart_t *usart_ptr, void *buffer_ptr, 
 
 /**
  \~english
- @brief cancel current current receive request
+ @brief cancel current receive request
  @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
  @return vsf_err_t: VSF_ERR_NONE if the usart request was successfully, or a negative error code
  @note: The request interface is usually implemented via DMA.
 
  \~chinese
  @brief 取消当前接收请求
+ @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
  @return vsf_err_t: 如果 usart 请求成功返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_usart_cancel_rx(vsf_usart_t *usart_ptr);
@@ -971,6 +972,7 @@ extern vsf_err_t vsf_usart_cancel_rx(vsf_usart_t *usart_ptr);
 
  \~chinese
  @brief 取消当前发送请求
+ @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
  @return vsf_err_t: 如果 usart 请求成功返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_usart_cancel_tx(vsf_usart_t *usart_ptr);
@@ -984,6 +986,7 @@ extern vsf_err_t vsf_usart_cancel_tx(vsf_usart_t *usart_ptr);
 
  \~chinese
  @brief 获取接收请求已经接收到的数量
+ @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
  @return int_fast32_t: 已经接收到的数量
  @note: 只在当前接收请求没完成之前是有效的。
  */
@@ -991,13 +994,14 @@ extern int_fast32_t vsf_usart_get_rx_count(vsf_usart_t *usart_ptr);
 
 /**
  \~english
- @brief get the number of current send requests that have been sended
+ @brief get the number of current send requests that have been sent
  @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
- @return int_fast32_t: number already send
+ @return int_fast32_t: number already sent
  @note: only valid until the current send request is completed.
 
  \~chinese
  @brief 获取发送请求已经发送到的数量
+ @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
  @return int_fast32_t: 已经发送到的数量
  @note: 只在当前发送请求没完成之前是有效的。
  */
@@ -1013,10 +1017,11 @@ extern int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart_ptr);
         success returns VSF_ERR_NONE
 
  \~chinese
- @brief 获取 usart 实例的状态
+ @brief 调用指定的 usart 命令
  @param[in] usart_ptr: 结构体 vsf_usart_t 的指针，参考 @ref vsf_usart_t
- @param[in] duration: usart 传输一位的时间的倍数，如果 duration 等于0，表示使用硬件默认的时间
- @return vsf_err_t: 返回当调用 uart 命令的结果，成功返回 VSF_ERR_NONE
+ @param[in] cmd: usart 命令，参考 @ref vsf_usart_cmd_t
+ @param[in] param: 命令的参数，其用途由命令决定
+ @return vsf_err_t: 返回调用 usart 命令的结果，成功返回 VSF_ERR_NONE
  */
 extern vsf_err_t vsf_usart_cmd(vsf_usart_t *usart_ptr, vsf_usart_cmd_t cmd, void * param);
 

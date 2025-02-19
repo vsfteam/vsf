@@ -77,14 +77,20 @@ extern "C" {
 //! be redefined For compatibility, members should not be deleted when struct
 //! @ref vsf_spi_cfg_t redefining.
 #if VSF_SPI_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
-#    define VSF_SPI_CFG_REIMPLEMENT_TYPE_CFG DISABLED
+#    define VSF_SPI_CFG_REIMPLEMENT_TYPE_CFG            DISABLED
+#endif
+
+//! In the specific hardware driver, we can enable
+//! VSF_SPI_CFG_REIMPLEMENT_TYPE_CTRL to redefine vsf_spi_ctrl_t as needed.
+#ifndef VSF_SPI_CFG_REIMPLEMENT_TYPE_CTRL
+#   define VSF_SPI_CFG_REIMPLEMENT_TYPE_CTRL            DISABLED
 #endif
 
 //! Redefine struct vsf_spi_capability_t.
 //! For compatibility, members should not be deleted when struct @ref
 //! vsf_spi_capability_t redefining.
 #if VSF_SPI_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
-#    define VSF_SPI_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
+#    define VSF_SPI_CFG_REIMPLEMENT_TYPE_CAPABILITY     DISABLED
 #endif
 
 //! In the specific hardware driver, we can enable
@@ -108,30 +114,37 @@ extern "C" {
 #   define VSF_SPI_CFG_REIMPLEMENT_DATA_BITS_TO_BYTES   DISABLED
 #endif
 
-#ifndef VSF_SPI_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_SPI_CFG_INHERT_HAL_CAPABILITY            ENABLED
+#ifndef VSF_SPI_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_SPI_CFG_INHERIT_HAL_CAPABILITY            ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_SPI_APIS(__prefix_name) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, init,                 VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, vsf_spi_cfg_t *cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, fini,                 VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             spi, enable,               VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             spi, disable,              VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, irq_enable,           VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, vsf_spi_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, irq_disable,          VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, vsf_spi_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_spi_status_t,     spi, status,               VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_spi_capability_t, spi, capability,           VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, cs_active,            VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, uint_fast8_t index) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, cs_inactive,          VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, uint_fast8_t index) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, fifo_transfer,        VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, \
-                                                                                           void *out_buffer_ptr, uint_fast32_t *out_offset_ptr, \
-                                                                                           void *in_buffer_ptr, uint_fast32_t *in_offset_ptr, uint_fast32_t cnt) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, request_transfer,     VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, void *out_buffer_ptr, \
-                                                                                           void *in_buffer_ptr, uint_fast32_t count) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, cancel_transfer,      VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, get_transferred_count, VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, init,                  VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr,   \
+        vsf_spi_cfg_t *cfg_ptr)                                                                                                             \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, fini,                  VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr)   \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             spi, enable,                VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr)   \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             spi, disable,               VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr)   \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, irq_enable,            VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr,   \
+        vsf_spi_irq_mask_t irq_mask)                                                                                                        \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, irq_disable,           VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr,   \
+        vsf_spi_irq_mask_t irq_mask)                                                                                                        \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_spi_status_t,     spi, status,                VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr)   \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_spi_capability_t, spi, capability,            VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr)   \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, cs_active,             VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr,   \
+        uint_fast8_t index)                                                                                                                 \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, cs_inactive,           VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr,   \
+        uint_fast8_t index)                                                                                                                 \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, fifo_transfer,         VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr,   \
+        void *out_buffer_ptr, uint_fast32_t *out_offset_ptr, void *in_buffer_ptr, uint_fast32_t *in_offset_ptr, uint_fast32_t cnt)          \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, request_transfer,      VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr,   \
+        void *out_buffer_ptr, void *in_buffer_ptr, uint_fast32_t count)                                                                     \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, cancel_transfer,       VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr)   \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, get_transferred_count, VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr,   \
+        uint_fast32_t * tx_count, uint_fast32_t *rx_count)                                                                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, ctrl,                  VSF_MCONNECT(__prefix_name, _spi_t) *spi_ptr,   \
+        vsf_spi_ctrl_t ctrl, void* param)
 
 
 /*============================ TYPES =========================================*/
@@ -315,12 +328,14 @@ typedef enum vsf_spi_mode_t {
     /*
     // Some hardware supports a different number of data line
     VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX    = (0x00ul << 16),    // 2 line, full-duplex, standard spi
-    VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX    = (0x01ul << 16),    // 1 line, half-duplex
-    VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX    = (0x02ul << 16),    // 2 line, half-duplex, dual spi
-    VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX    = (0x03ul << 16),    // 4 line, half-duplex, qual spi
-    VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX    = (0x04ul << 16),    // 8 line, half-duplex, octal spi
+    VSF_SPI_DATALINE_2_LINE_RX_ONLY        = (0x01ul << 16),    // 2 line, but rx only
+    VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX    = (0x02ul << 16),    // 1 line, half-duplex
+    VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX    = (0x03ul << 16),    // 2 line, half-duplex, dual spi
+    VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX    = (0x04ul << 16),    // 4 line, half-duplex, qual spi
+    VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX    = (0x05ul << 16),    // 8 line, half-duplex, octal spi
 
     #define VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX     VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX
+    #define VSF_SPI_DATALINE_2_LINE_RX_ONLY         VSF_SPI_DATALINE_2_LINE_RX_ONLY
     #define VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX     VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX
     #define VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX     VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX
     #define VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX     VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX
@@ -461,7 +476,6 @@ typedef enum vsf_spi_irq_mask_t {
     VSF_SPI_IRQ_MASK_CPL            = 0x01ul << 3,
 
     VSF_SPI_IRQ_MASK_OVERFLOW_ERR   = 0x01ul << 4,
-    VSF_SPI_IRQ_MASK_ERROR          = 0x01ul << 5,
 } vsf_spi_irq_mask_t;
 #endif
 
@@ -472,12 +486,15 @@ enum {
     //! For SPI transfers, send completion is definitely earlier than receive completion.
     VSF_SPI_IRQ_MASK_RX_CPL             = VSF_SPI_IRQ_MASK_CPL,
 
+#ifndef VSF_SPI_IRQ_MASK_ERR
+    VSF_SPI_IRQ_MASK_ERR                = VSF_SPI_IRQ_MASK_OVERFLOW_ERR,
+#endif
+
     VSF_SPI_IRQ_ALL_BITS_MASK           = VSF_SPI_IRQ_MASK_TX
                                         | VSF_SPI_IRQ_MASK_RX
                                         | VSF_SPI_IRQ_MASK_TX_CPL
                                         | VSF_SPI_IRQ_MASK_CPL
-                                        | VSF_SPI_IRQ_MASK_OVERFLOW_ERR
-                                        | VSF_SPI_IRQ_MASK_ERROR,
+                                        | VSF_SPI_IRQ_MASK_OVERFLOW_ERR,
 };
 
 #if VSF_SPI_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
@@ -493,7 +510,7 @@ typedef struct vsf_spi_status_t {
 
 #if VSF_SPI_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_spi_capability_t {
-#if VSF_SPI_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_SPI_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
     vsf_spi_irq_mask_t irq_mask;
@@ -528,6 +545,30 @@ typedef struct vsf_spi_cfg_t {
     vsf_spi_isr_t    isr;
     uint8_t          auto_cs_index;     //!< spi auto chip select of pin when multiple cs are supported
 } vsf_spi_cfg_t;
+#endif
+
+
+#if VSF_SPI_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED
+/**
+ * \~english
+ * @brief Predefined VSF SPI control command that can be reimplemented in specific hal drivers.
+ *
+ * \~chinese
+ * @brief 预定义的 VSF SPI 控制命令，可以在具体的 HAL 驱动重新实现。
+ *
+ */
+typedef enum vsf_spi_ctrl_t {
+    /*
+    VSF_SPI_CTRL_REQUEST_PAUSE  = (0x1ul << 0),
+    #define VSF_SPI_CTRL_REQUEST_PAUSE VSF_SPI_CTRL_REQUEST_PAUSE
+
+    VSF_SPI_CTRL_REQUEST_RESUME = (0x1ul << 1),
+    #define VSF_SPI_CTRL_REQUEST_RESUME VSF_SPI_CTRL_REQUEST_RESUME
+    */
+
+    // dummy for compile pass
+    __VSF_SPI_CTRL_DUMMP = 0,
+} vsf_spi_ctrl_t;
 #endif
 
 typedef struct vsf_spi_op_t {
@@ -569,7 +610,6 @@ extern vsf_err_t vsf_spi_init(vsf_spi_t *spi_ptr, vsf_spi_cfg_t *cfg_ptr);
  \~chinese
  @brief 终止一个 spi 实例
  @param[in] spi_ptr: 结构体 vsf_spi_t 的指针，参考 @ref vsf_spi_t
- @param[in] cfg_ptr: 结构体 vsf_spi_cfg_t 的指针，参考 @ref vsf_spi_cfg_t
  @return 无。
  */
 extern void vsf_spi_fini(vsf_spi_t *spi_ptr);
@@ -578,12 +618,12 @@ extern void vsf_spi_fini(vsf_spi_t *spi_ptr);
  \~english
  @brief enable interrupt masks of spi instance.
  @param[in] spi_ptr: a pointer to structure @ref vsf_spi_t
- @return none.
+ @return fsm_rt_t: return FSM_RT_CPL if spi was enabled, return FSM_RT_ON_GOING if spi wait for enable
 
  \~chinese
  @brief 使能 spi 实例的中断
  @param[in] spi_ptr: 结构体 vsf_spi_t 的指针，参考 @ref vsf_spi_t
- @return 无。
+ @return fsm_rt_t: 返回 FSM_RT_CPL 如果 spi 已经使能，返回 FSM_RT_ON_GOING 如果 spi 等待使能
  */
 extern fsm_rt_t vsf_spi_enable(vsf_spi_t *spi_ptr);
 
@@ -591,12 +631,12 @@ extern fsm_rt_t vsf_spi_enable(vsf_spi_t *spi_ptr);
  \~english
  @brief disable interrupt masks of spi instance.
  @param[in] spi_ptr: a pointer to structure @ref vsf_spi_t
- @return none.
+ @return fsm_rt_t: return FSM_RT_CPL if spi was disabled, return FSM_RT_ON_GOING if spi wait for disable
 
  \~chinese
  @brief 禁能 spi 实例的中断
  @param[in] spi_ptr: 结构体 vsf_spi_t 的指针，参考 @ref vsf_spi_t
- @return 无。
+ @return fsm_rt_t: 返回 FSM_RT_CPL 如果 spi 已经禁能，返回 FSM_RT_ON_GOING 如果 spi 等待禁能
  */
 extern fsm_rt_t vsf_spi_disable(vsf_spi_t *spi_ptr);
 
@@ -744,12 +784,13 @@ extern vsf_err_t vsf_spi_request_transfer(vsf_spi_t *spi_ptr, void *out_buffer_p
  \~english
  @brief spi cancel transfer
  @param[in] spi_ptr: a pointer to structure @ref vsf_spi_t
- @return vsf_err_t: VSF_ERR_NONE if spi cancel transfer successfully, or a negative error code
+ @return vsf_err_t: VSF_ERR_NONE if spi cancel transfer successfully,
+    VSF_ERR_NOT_READY if spi is not transmittingor, or a negative error code
 
  \~chinese
  @brief spi 取消传输
  @param[in] spi_ptr: @ref vsf_spi_t 传输结构指针
- @return vsf_err_t: 如果 spi 取消传输成功返回 VSF_ERR_NONE, 否则返回负数
+ @return vsf_err_t: 如果 spi 取消传输成功返回 VSF_ERR_NONE, 没有在传输返回 VSF_ERR_NOT_READY, 否则返回负数
  */
 extern vsf_err_t vsf_spi_cancel_transfer(vsf_spi_t *spi_ptr);
 
@@ -757,18 +798,33 @@ extern vsf_err_t vsf_spi_cancel_transfer(vsf_spi_t *spi_ptr);
  \~english
  @brief spi get transferred counter
  @param[in] spi_ptr: a pointer to structure @ref vsf_spi_t
- @param[out] send_count: a pointer to the number of spi data already sent
+ @param[out] sent_count: a pointer to the number of spi data already sent
  @param[out] received_count: a pointer to the number of spi data already received
- @return vsf_err_t: VSF_ERR_NONE if spi cancel transfer successfully, or a negative error code
 
  \~chinese
  @brief spi 获取已传输的个数
  @param[in] spi_ptr: @ref vsf_spi_t 传输结构指针
- @param[out] send_count: 已经发送的数据数量的指针
+ @param[out] sent_count: 已经发送的数据数量的指针
  @param[out] received_count: 已经接收的数据数量的指针
- @return vsf_err_t: 如果 spi 取消传输成功返回 VSF_ERR_NONE, 否则返回负数
  */
-extern void vsf_spi_get_transferred_count(vsf_spi_t *spi_ptr, uint_fast32_t * sent_count, uint_fast32_t *received_count);
+extern void vsf_spi_get_transferred_count(vsf_spi_t *spi_ptr, uint_fast32_t *sent_count, uint_fast32_t *received_count);
+
+/**
+ \~english
+ @brief Calls the specified spi command
+ @param[in] spi_ptr: a pointer to structure @ref vsf_spi_t
+ @param[in] ctrl: spi control command @ref vsf_spi_cmd_t.
+ @param[in] param: the parameter of the command, its use is determined by the command
+ @return vsf_err_t: returns the result of the spi command when it is invoked,
+        success returns VSF_ERR_NONE
+
+ \~chinese
+ @brief 获取 spi 实例的状态
+ @param[in] spi_ptr: 结构体 vsf_spi_t 的指针，参考 @ref vsf_spi_t
+ @param[in] ctrl: spi 控制命令，参考 @ref vsf_spi_cmd_t
+ @return vsf_err_t: 返回当调用 uart 命令的结果，成功返回 VSF_ERR_NONE
+ */
+extern vsf_err_t vsf_spi_ctrl(vsf_spi_t *spi_ptr, vsf_spi_ctrl_t ctrl, void * param);
 
 
 /*============================ INLINE FUNCTIONS ==============================*/
@@ -1059,7 +1115,8 @@ static inline uint8_t vsf_spi_mode_to_data_bytes(vsf_spi_mode_t mode)
 #   define vsf_spi_fifo_transfer(__SPI, ...)            VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_fifo_transfer)        ((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
 #   define vsf_spi_request_transfer(__SPI, ...)         VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_request_transfer)     ((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
 #   define vsf_spi_cancel_transfer(__SPI)               VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cancel_transfer)      ((__vsf_spi_t *)(__SPI))
-#   define vsf_spi_get_transferred_count(__SPI, ...)    VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_get_transferred_count) ((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
+#   define vsf_spi_get_transferred_count(__SPI, ...)    VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_get_transferred_count)((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
+#   define vsf_spi_ctrl(__SPI, ...)                     VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_ctrl)                 ((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

@@ -82,8 +82,8 @@ extern "C" {
 #   define VSF_DAC_CFG_REIMPLEMENT_TYPE_CAPABILITY     DISABLED
 #endif
 
-#ifndef VSF_DAC_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_DAC_CFG_INHERT_HAL_CAPABILITY            ENABLED
+#ifndef VSF_DAC_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_DAC_CFG_INHERIT_HAL_CAPABILITY            ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -152,7 +152,7 @@ typedef struct vsf_dac_status_t {
 
 #if VSF_DAC_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_dac_capability_t {
-#if VSF_DAC_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_DAC_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
     vsf_dac_irq_mask_t irq_mask;
@@ -349,9 +349,9 @@ extern vsf_err_t vsf_dac_channel_config(vsf_dac_t *dac_ptr,
  @return vsf_err_t: VSF_ERR_NONE if the dac request was successfully, or a negative error code
 
  \~chinese
- @brief dac 通道配置
+ @brief dac 通道请求
  @param[in] dac_ptr: 结构体 vsf_dac_t 的指针，参考 @ref vsf_dac_t
- @param[out] buffer_ptr: 转换通道配置数据数组
+ @param[out] buffer_ptr: 转换通道数据数组
  @param[in] count: 转换通道配置数据数组的长度
  @return vsf_err_t: 如果 dac 请求成功返回 VSF_ERR_NONE , 否则返回负数。
  */

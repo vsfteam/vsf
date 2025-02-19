@@ -21,7 +21,7 @@
 //  #define VSF_HAL_TEMPLATE_DEC_NAME                       adc
 //  #define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME                ADC
 
-/**************************** prefex *******************************************/
+/**************************** prefix *******************************************/
 
 #ifndef VSF_HAL_TEMPLATE_DEC_PREFIX
 #   define VSF_HAL_TEMPLATE_DEC_PREFIX                      VSF_MCONNECT(VSF, VSF_HAL_TEMPLATE_DEC_UPCASE_NAME, _CFG_DEC_PREFIX)
