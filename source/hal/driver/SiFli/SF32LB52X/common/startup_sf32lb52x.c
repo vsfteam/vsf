@@ -50,7 +50,7 @@ extern __NO_RETURN void __PROGRAM_START(void);
  *----------------------------------------------------------------------------*/
 
 void
-#if __IS_COMPILER_IAR__ && __VER__ < 9060003
+#if __IS_COMPILER_IAR__
 __attribute__((naked))
 #endif
 __NO_RETURN Reset_Handler(void);
@@ -221,13 +221,13 @@ __WEAK void vsf_hal_pre_startup_init(void)
   Reset Handler called on controller reset
  *----------------------------------------------------------------------------*/
 void
-#if __IS_COMPILER_IAR__ && __VER__ < 9060003
+#if __IS_COMPILER_IAR__
 __attribute__((naked))
 #endif
 __NO_RETURN Reset_Handler(void)
 {
     __set_MSP((uintptr_t)&__INITIAL_SP);
-    __set_MSPLIM((uintptr_t)&__STACK_LIMIT);
+    __set_MSPLIM(0);
 
 #if defined (__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
 //    __TZ_set_STACKSEAL_S((uint32_t *)(&__STACK_SEAL));

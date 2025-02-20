@@ -165,6 +165,9 @@ void HardFault_Handler(void)
         if (cfsr & SCB_CFSR_NOCP_Msk) {
             vsf_trace_error("No coprocessor" VSF_TRACE_CFG_LINEEND);
         }
+        if (cfsr & SCB_CFSR_STKOF_Msk) {
+            vsf_trace_error("Stack Overflow" VSF_TRACE_CFG_LINEEND);
+        }
         if (cfsr & SCB_CFSR_UNALIGNED_Msk) {
             vsf_trace_error("Unaligned access" VSF_TRACE_CFG_LINEEND);
         }

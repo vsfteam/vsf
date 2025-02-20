@@ -277,9 +277,11 @@ extern __VSF_VPLT_DECORATOR__ vsf_arch_abi_vplt_t vsf_arch_abi_vplt;
 static VSF_CAL_ALWAYS_INLINE void vsf_arch_set_stack(uintptr_t stack, uint32_t stack_size)
 {
     __set_MSP(stack);
-#ifdef __set_MSPLIM
-    __set_MSPLIM(stack - stack_size);
-#endif
+// SPLIM MUST be set to 0 in Reset_Handler, so stack overflow check will be bypassed.
+// setjmp/longjmp may not save SPLIM register, so it should be disabled.
+//#ifdef __set_MSPLIM
+//    __set_MSPLIM(stack - stack_size);
+//#endif
 }
 
 static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_get_stack(void)

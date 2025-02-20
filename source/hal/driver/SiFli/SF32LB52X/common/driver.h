@@ -144,6 +144,9 @@
 #   define VSF_USART_CFG_DEC_PREFIX                         vsf_hw
 #   define VSF_USART_CFG_DEC_UPCASE_PREFIX                  VSF_HW
 #   include "hal/driver/common/usart/usart_template.h"
+
+// __vsf_hw_usart_config_isr is only used for debug usart
+extern vsf_err_t __vsf_hw_usart_config_isr(vsf_hw_usart_t *usart_ptr, vsf_usart_isr_t *isr_ptr);
 #endif
 
 #if VSF_HAL_USE_WDT == ENABLED

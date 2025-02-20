@@ -99,6 +99,20 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_set_baudrate)(
     }
 }
 
+vsf_err_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_config_isr)(
+    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,
+    vsf_usart_isr_t *isr_ptr
+) {
+    usart_ptr->isr = *isr_ptr;
+    if (isr_ptr->handler_fn != NULL) {
+        NVIC_SetPriority(usart_ptr->irqn, (uint32_t)isr_ptr->prio);
+        NVIC_EnableIRQ(usart_ptr->irqn);
+    } else {
+        NVIC_DisableIRQ(usart_ptr->irqn);
+    }
+    return VSF_ERR_NONE;
+}
+
 // TODO: support tx_timeout
 vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,
@@ -145,16 +159,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
         VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_set_baudrate)(usart_ptr);
     }
 
-    // configure according to cfg_ptr
-    vsf_usart_isr_t *isr_ptr = &cfg_ptr->isr;
-    usart_ptr->isr = *isr_ptr;
-    if (isr_ptr->handler_fn != NULL) {
-        NVIC_SetPriority(usart_ptr->irqn, (uint32_t)isr_ptr->prio);
-        NVIC_EnableIRQ(usart_ptr->irqn);
-    } else {
-        NVIC_DisableIRQ(usart_ptr->irqn);
-    }
-    return VSF_ERR_NONE;
+    return VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_config_isr)(usart_ptr, &cfg_ptr->isr);
 }
 
 void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_fini)(
