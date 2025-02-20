@@ -335,10 +335,10 @@ void mpu_config(void)
 VSF_CAL_WEAK(vsf_driver_init)
 bool vsf_driver_init(void)
 {
+    // mpu_config MUST be called before enable cache
+    mpu_config();
     SCB_EnableICache();
     SCB_EnableDCache();
-
-    mpu_config();
     return true;
 }
 

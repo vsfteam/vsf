@@ -402,8 +402,9 @@ static int __vsf_elfloader_rel_rela(vsf_elfloader_t *elfloader, vsf_loader_targe
                 if (parse_only) { continue; }
 
                 if (vsf_elfloader_arch_link(elfloader, symname, &tgtvalue) < 0) {
-                    vsf_trace_error("fail to locate %s" VSF_TRACE_CFG_LINEEND, symname);
-                    linfo->link_fail = true;
+                    vsf_trace_warning("fail to locate %s, application will hang if this API is called" VSF_TRACE_CFG_LINEEND, symname);
+                    // do not issue error, because if application maybe not call these APIs
+                    // linfo->link_fail = true;
                     continue;
                 }
             } else if (__vsf_elfloader_is_vaddr_loaded(elfloader, u.rel->r_offset)) {
