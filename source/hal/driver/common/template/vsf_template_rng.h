@@ -71,8 +71,8 @@ extern "C" {
 #    define VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
-#ifndef VSF_RNG_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_RNG_CFG_INHERT_HAL_CAPABILITY       ENABLED
+#ifndef VSF_RNG_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_RNG_CFG_INHERIT_HAL_CAPABILITY       ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -90,7 +90,7 @@ typedef struct vsf_rng_t vsf_rng_t;
 typedef void vsf_rng_on_ready_callback_t(void *param, uint32_t *buffer, uint32_t num);
 
 typedef struct vsf_rng_capability_t {
-#if VSF_RNG_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_RNG_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
 } vsf_rng_capability_t;

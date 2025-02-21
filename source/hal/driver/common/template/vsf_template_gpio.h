@@ -196,8 +196,8 @@ extern "C" {
 #endif
 
 
-#ifndef VSF_GPIO_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_GPIO_CFG_INHERT_HAL_CAPABILITY       ENABLED
+#ifndef VSF_GPIO_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_GPIO_CFG_INHERIT_HAL_CAPABILITY       ENABLED
 #endif
 
 #ifndef vsf_gpio_pin_mask_t
@@ -440,7 +440,7 @@ typedef struct vsf_gpio_port_cfg_pins_t {
 
 #if VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_gpio_capability_t {
-#if VSF_GPIO_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_GPIO_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
     //! Asynchronous GPIO
@@ -611,7 +611,6 @@ typedef enum vsf_io_port_pin_no_t {
  @param[in] cfg: a pointer to structure @ref vsf_gpio_cfg_t
  @return vsf_err_t: VSF_ERR_NONE if GPIO Configuration Successful, or a negative error code
 
-
  \~chinese
  @brief 配置 gpio 实例的一个或者多个引脚
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
@@ -699,7 +698,7 @@ extern vsf_gpio_pin_mask_t vsf_gpio_get_direction(vsf_gpio_t *gpio_ptr,
  \~english
  @brief Set the direction of one or more pins of the gpio instance to input
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
- @param[in] Pin mask, each pin corresponds to one bit, the value of the bit 1
+ @param[in] pin_mask: pin mask, each pin corresponds to one bit, the value of the bit 1
             indicates the need to set to input
 
  \~chinese
@@ -713,7 +712,7 @@ extern void vsf_gpio_set_input(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mas
  \~english
  @brief Set the direction of one or more pins of the gpio instance to output
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
- @param[in] Pin mask, each pin corresponds to one bit, the value of the bit 1
+ @param[in] pin_mask: pin mask, each pin corresponds to one bit, the value of the bit 1
             indicates the need to set to output
 
  \~chinese
@@ -727,7 +726,7 @@ extern void vsf_gpio_set_output(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_ma
  \~english
  @brief Toggle the orientation of one or more pins of a gpio instance
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
- @param[in] Pin mask, each pin corresponds to one bit, the value of the bit 1
+ @param[in] pin_mask: pin mask, each pin corresponds to one bit, the value of the bit 1
             indicates the need to set to output
 
  \~chinese
@@ -754,7 +753,7 @@ extern vsf_gpio_pin_mask_t vsf_gpio_read(vsf_gpio_t *gpio_ptr);
  \~english
  @brief set the value of one or more of the gpio instances
  @param[in] gpio_ptr: pointer to the structure vsf_gpio_t, refer to @ref vsf_gpio_t
- @param[in] value: value of the pin, each pin corresponds to a bit, 1 means high, 0 means high
+ @param[in] value: value of the pin, each pin corresponds to a bit, 1 means high, 0 means low
  @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the bit
             needs to be written, 0 means the bit does not need to be updated
 
@@ -762,7 +761,7 @@ extern vsf_gpio_pin_mask_t vsf_gpio_read(vsf_gpio_t *gpio_ptr);
  @brief 设置 gpio 实例的一个或者多个的值
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，1表示该位需要写入，0表示该位不需要更新
- @param[in] value: 引脚的值，每一个引脚对应一个位，1 表示高电平，0 表示高电平
+ @param[in] value: 引脚的值，每一个引脚对应一个位，1 表示高电平，0 表示低电平
  */
 extern void vsf_gpio_write(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask,
                            vsf_gpio_pin_mask_t value);
@@ -818,7 +817,7 @@ extern void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
  @note This API can be used when modifying the IO direction to output and set to
        high in order to avoid possible pulses. Note that it is not supported by all hardware.
        You can get if this mode is supported with vsf_gpio_capability()
-       (is_support_output_and_set)
+       (support_output_and_set)
 
  \~chinese
  @brief 设置 gpio 实例的一个或者多个引脚的方向为输出高电平
@@ -826,7 +825,7 @@ extern void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，1表示该位需要写入，0表示该位不需要更新
  @note 修改IO方向为输出并且设置成高电平的时候，为了避免可能的脉冲，可以使用这个API。
        需要注意的是，并不是所有硬件都支持。可以通过 vsf_gpio_capability() 获取是否支持该特性
-      （ is_support_output_and_set ）
+      (support_output_and_set)
  */
 extern void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 
@@ -839,7 +838,7 @@ extern void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pi
  @note This API can be used when modifying the IO direction to output and set to
        low in order to avoid possible pulses. Note that it is not supported by all hardware.
        You can get if this mode is supported with vsf_gpio_capability()
-       (is_support_output_and_set)
+       (support_output_and_clear)
 
  \~chinese
  @brief 设置 gpio 实例的一个或者多个引脚的方向为输出低电平
@@ -847,7 +846,7 @@ extern void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pi
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，1表示该位需要写入，0表示该位不需要更新
  @note 修改IO方向为输出并且设置成低电平的时候，为了避免可能的脉冲，可以使用这个API。
        需要注意的是，并不是所有硬件都支持。可以通过 vsf_gpio_capability() 获取是否支持该特性
-      （ is_support_output_and_set ）
+      (support_output_and_clear)
  */
 extern void vsf_gpio_output_and_clear(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 
