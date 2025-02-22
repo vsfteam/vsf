@@ -496,25 +496,20 @@ static void board_pinmux_mpi1_none(int func)
 }
 
 typedef struct {
-    uint8_t mode        : 3;
-    uint8_t size_mb     : 5;
-
-    struct {
-        union {
-            void (*func)(int);
-        };
-    } pinmux;
-} VSF_CAL_PACKED mpi1_info_t;
+    uint8_t mode;
+    uint16_t size_mb;
+    void (*pinmux_fn)(int);
+} mpi1_info_t;
 
 static const mpi1_info_t __mpi1_info[] = {
-    [BOOT_FLASH_PUYA]       = { SPI_MODE_NOR,       0, board_pinmux_flash_puya },
-    [BOOT_FLASH_GD]         = { SPI_MODE_NOR,       0, board_pinmux_flash_gd },
-    [BOOT_PSRAM_APS_128P]   = { SPI_MODE_OPSRAM,    8, board_pinmux_psram_func0 },
-    [BOOT_PSRAM_APS_64P]    = { SPI_MODE_OPSRAM,    8, board_pinmux_psram_func1_2_4 },
-    [BOOT_PSRAM_APS_32P]    = { SPI_MODE_LEGPSRAM,  4, board_pinmux_psram_func1_2_4 },
-    [BOOT_PSRAM_APS_16P]    = { SPI_MODE_PSRAM,     2, board_pinmux_psram_func3 },
-    [BOOT_PSRAM_WINBOND]    = { SPI_MODE_HBPSRAM,   0, board_pinmux_psram_func1_2_4 },
-    [7]                     = { 0,                  0, board_pinmux_mpi1_none },
+    [BOOT_FLASH_PUYA]       = { SPI_MODE_NOR,       0,  board_pinmux_flash_puya },
+    [BOOT_FLASH_GD]         = { SPI_MODE_NOR,       0,  board_pinmux_flash_gd },
+    [BOOT_PSRAM_APS_128P]   = { SPI_MODE_OPSRAM,    8,  board_pinmux_psram_func0 },
+    [BOOT_PSRAM_APS_64P]    = { SPI_MODE_OPSRAM,    8,  board_pinmux_psram_func1_2_4 },
+    [BOOT_PSRAM_APS_32P]    = { SPI_MODE_LEGPSRAM,  4,  board_pinmux_psram_func1_2_4 },
+    [BOOT_PSRAM_APS_16P]    = { SPI_MODE_PSRAM,     2,  board_pinmux_psram_func3 },
+    [BOOT_PSRAM_WINBOND]    = { SPI_MODE_HBPSRAM,   0,  board_pinmux_psram_func1_2_4 },
+    [7]                     = { 0,                  0,  board_pinmux_mpi1_none },
 };
 
 
@@ -548,8 +543,8 @@ bool vsf_driver_init(void)
     const mpi1_info_t *mpi_info = &__mpi1_info[pid];
 
     // pin mux
-    if (mpi_info->pinmux.func != NULL) {
-        mpi_info->pinmux.func(pid);
+    if (mpi_info->pinmux_fn != NULL) {
+        mpi_info->pinmux_fn(pid);
     }
 
     if ((mpi_info->mode != SPI_MODE_NOR) && (mpi_info->size_mb > 0)) {
