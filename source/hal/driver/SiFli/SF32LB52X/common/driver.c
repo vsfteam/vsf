@@ -22,6 +22,8 @@
 
 #include "register.h"
 
+#include "bf0_hal_rcc.h"
+
 /*============================ MACROS ========================================*/
 
 #ifdef SOC_BF0_HCPU
@@ -327,6 +329,42 @@ void mpu_config(void)
 
 
 
+
+// HAL wrapper
+
+VSF_CAL_WEAK(SystemCoreClock) uint32_t SystemCoreClock;
+
+void HAL_Delay_us2_(__IO uint32_t us)
+{
+    VSF_HAL_ASSERT(false);
+    while (1);
+}
+
+#define WAIT_US_LOOP_CYCLE 12
+__weak void HAL_Delay_us_(__IO uint32_t us)
+{
+    static uint32_t __hal_sysclk_mhz;
+    if (0 == us) {
+        __hal_sysclk_mhz = HAL_RCC_GetHCLKFreq(CORE_ID_DEFAULT) / 1000000;
+        return;
+    }
+    if (us > 0) {
+        volatile uint32_t i = __hal_sysclk_mhz * (us - 1) / WAIT_US_LOOP_CYCLE;
+        while (i-- > 0);
+    }
+}
+
+void HAL_Delay_us(uint32_t us)
+{
+    HAL_Delay_us_(us);
+}
+
+// ms delay
+void HAL_Delay(__IO uint32_t Delay)
+{
+    HAL_Delay_us(1000 * Delay);
+}
+
 /*! \note initialize device driver
  *  \param none
  *  \retval true initialization succeeded.
@@ -339,6 +377,12 @@ bool vsf_driver_init(void)
     mpu_config();
     SCB_EnableICache();
     SCB_EnableDCache();
+
+    SystemCoreClock = HAL_RCC_GetHCLKFreq(CORE_ID_HCPU);
+    HAL_Delay_us(0);
+    if (SystemCoreClock != 240000000) {
+        HAL_RCC_HCPU_ConfigHCLK(240);
+    }
     return true;
 }
 
