@@ -20,9 +20,7 @@
 #include "hal/vsf_hal_cfg.h"
 #include "../__device.h"
 
-#include "register.h"
-
-#include "bf0_hal_rcc.h"
+#include "bf0_hal.h"
 
 /*============================ MACROS ========================================*/
 
@@ -330,7 +328,7 @@ void mpu_config(void)
 
 
 
-// HAL wrapper
+// HAL wrapper for bf0_hal.c
 
 VSF_CAL_WEAK(SystemCoreClock) uint32_t SystemCoreClock;
 
@@ -365,6 +363,164 @@ void HAL_Delay(__IO uint32_t Delay)
     HAL_Delay_us(1000 * Delay);
 }
 
+
+
+
+
+// psram & flash
+
+#define BOOT_FLASH_PUYA     0
+#define BOOT_FLASH_GD       1
+#define BOOT_PSRAM_APS_128P 2
+#define BOOT_PSRAM_APS_64P  3
+#define BOOT_PSRAM_APS_32P  4
+#define BOOT_PSRAM_APS_16P  5
+#define BOOT_PSRAM_WINBOND  6
+
+
+
+/* APS 128p*/
+static void board_pinmux_psram_func0(int func)
+{
+    HAL_PIN_Set(PAD_SA01, MPI1_DIO0, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA02, MPI1_DIO1, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA03, MPI1_DIO2, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA04, MPI1_DIO3, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA05, MPI1_DIO4, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA06, MPI1_DIO5, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA07, MPI1_DIO6, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA08, MPI1_DIO7, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA09, MPI1_DQSDM, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA10, MPI1_CLK,  PIN_NOPULL, 1);
+    HAL_PIN_Set(PAD_SA11, MPI1_CS,   PIN_NOPULL, 1);
+
+    HAL_PIN_Set_Analog(PAD_SA00, 1);
+    HAL_PIN_Set_Analog(PAD_SA12, 1);
+}
+
+/* APS 1:64p 2:32P, 4:Winbond 32/64/128p*/
+static void board_pinmux_psram_func1_2_4(int func)
+{
+    HAL_PIN_Set(PAD_SA01, MPI1_DIO0, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA02, MPI1_DIO1, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA03, MPI1_DIO2, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA04, MPI1_DIO3, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA08, MPI1_DIO4, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA09, MPI1_DIO5, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA10, MPI1_DIO6, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA11, MPI1_DIO7, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA07, MPI1_CLK,  PIN_NOPULL, 1);
+    HAL_PIN_Set(PAD_SA05, MPI1_CS,   PIN_NOPULL, 1);
+
+#ifdef FPGA
+    HAL_PIN_Set(PAD_SA00, MPI1_DM, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA06, MPI1_CLKB, PIN_NOPULL, 1);
+    HAL_PIN_Set(PAD_SA12, MPI1_DQSDM, PIN_PULLDOWN, 1);
+#else
+    switch (func)
+    {
+    case BOOT_PSRAM_APS_64P:
+        HAL_PIN_Set(PAD_SA12, MPI1_DQSDM, PIN_PULLDOWN, 1);
+        HAL_PIN_Set_Analog(PAD_SA00, 1);
+        HAL_PIN_Set_Analog(PAD_SA06, 1);
+        break;
+    case BOOT_PSRAM_APS_32P:
+        HAL_PIN_Set(PAD_SA00, MPI1_DM, PIN_PULLDOWN, 1);
+        HAL_PIN_Set(PAD_SA12, MPI1_DQS, PIN_PULLDOWN, 1);
+        HAL_PIN_Set(PAD_SA06, MPI1_CLKB, PIN_NOPULL, 1);
+        break;
+    case BOOT_PSRAM_WINBOND:
+        //HAL_PIN_Set(PAD_SA06, MPI1_CLKB, PIN_NOPULL, 1);
+        HAL_PIN_Set(PAD_SA12, MPI1_DQSDM, PIN_NOPULL, 1);
+        HAL_PIN_Set_Analog(PAD_SA00, 1);
+        HAL_PIN_Set_Analog(PAD_SA06, 1);
+        break;
+    }
+#endif
+}
+
+/* APS 16p*/
+static void board_pinmux_psram_func3(int func)
+{
+    HAL_PIN_Set(PAD_SA09, MPI1_CLK, PIN_NOPULL, 1);
+    HAL_PIN_Set(PAD_SA08, MPI1_CS,  PIN_NOPULL, 1);
+    HAL_PIN_Set(PAD_SA05, MPI1_DIO0, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA07, MPI1_DIO1, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA06, MPI1_DIO2, PIN_PULLUP, 1);
+    HAL_PIN_Set(PAD_SA10, MPI1_DIO3, PIN_PULLUP, 1);
+
+    HAL_PIN_Set_Analog(PAD_SA00, 1);
+    HAL_PIN_Set_Analog(PAD_SA01, 1);
+    HAL_PIN_Set_Analog(PAD_SA02, 1);
+    HAL_PIN_Set_Analog(PAD_SA03, 1);
+    HAL_PIN_Set_Analog(PAD_SA04, 1);
+    HAL_PIN_Set_Analog(PAD_SA11, 1);
+    HAL_PIN_Set_Analog(PAD_SA12, 1);
+}
+
+static void board_pinmux_flash_puya(int func)
+{
+    HAL_PIN_Set(PAD_SA01, MPI1_CS,   PIN_NOPULL, 1);
+    HAL_PIN_Set(PAD_SA09, MPI1_CLK,  PIN_NOPULL, 1);
+    HAL_PIN_Set(PAD_SA07, MPI1_DIO0, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA02, MPI1_DIO1, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA10, MPI1_DIO3, PIN_NOPULL, 1);
+}
+
+static void board_pinmux_flash_gd(int func)
+{
+    HAL_PIN_Set(PAD_SA04, MPI1_CS,   PIN_NOPULL, 1);
+    HAL_PIN_Set(PAD_SA09, MPI1_CLK,  PIN_NOPULL, 1);
+    HAL_PIN_Set(PAD_SA11, MPI1_DIO0, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA02, MPI1_DIO1, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_SA00, MPI1_DIO2, PIN_PULLUP, 1);
+    HAL_PIN_Set(PAD_SA08, MPI1_DIO3, PIN_PULLUP, 1);
+
+    HAL_PIN_Set_Analog(PAD_SA01, 1);
+    HAL_PIN_Set_Analog(PAD_SA03, 1);
+    HAL_PIN_Set_Analog(PAD_SA05, 1);
+    HAL_PIN_Set_Analog(PAD_SA06, 1);
+    HAL_PIN_Set_Analog(PAD_SA07, 1);
+    HAL_PIN_Set_Analog(PAD_SA10, 1);
+    HAL_PIN_Set_Analog(PAD_SA12, 1);
+}
+
+static void board_pinmux_mpi1_none(int func)
+{
+    uint32_t i;
+
+    for (i = 0; i <= 12; i++)
+    {
+        HAL_PIN_Set_Analog(PAD_SA00 + i, 1);
+    }
+}
+
+typedef struct {
+    uint8_t mode        : 3;
+    uint8_t size_mb     : 5;
+
+    struct {
+        union {
+            void (*func)(int);
+        };
+    } pinmux;
+} VSF_CAL_PACKED mpi1_info_t;
+
+static const mpi1_info_t __mpi1_info[] = {
+    [BOOT_FLASH_PUYA]       = { SPI_MODE_NOR,       0, board_pinmux_flash_puya },
+    [BOOT_FLASH_GD]         = { SPI_MODE_NOR,       0, board_pinmux_flash_gd },
+    [BOOT_PSRAM_APS_128P]   = { SPI_MODE_OPSRAM,    8, board_pinmux_psram_func0 },
+    [BOOT_PSRAM_APS_64P]    = { SPI_MODE_OPSRAM,    8, board_pinmux_psram_func1_2_4 },
+    [BOOT_PSRAM_APS_32P]    = { SPI_MODE_LEGPSRAM,  4, board_pinmux_psram_func1_2_4 },
+    [BOOT_PSRAM_APS_16P]    = { SPI_MODE_PSRAM,     2, board_pinmux_psram_func3 },
+    [BOOT_PSRAM_WINBOND]    = { SPI_MODE_HBPSRAM,   0, board_pinmux_psram_func1_2_4 },
+    [7]                     = { 0,                  0, board_pinmux_mpi1_none },
+};
+
+
+
+
+
 /*! \note initialize device driver
  *  \param none
  *  \retval true initialization succeeded.
@@ -378,11 +534,41 @@ bool vsf_driver_init(void)
     SCB_EnableICache();
     SCB_EnableDCache();
 
+#ifdef SOC_BF0_HCPU
     SystemCoreClock = HAL_RCC_GetHCLKFreq(CORE_ID_HCPU);
     HAL_Delay_us(0);
-    if (SystemCoreClock != 240000000) {
+    if (SystemCoreClock != 240 * 1000 * 1000) {
         HAL_RCC_HCPU_ConfigHCLK(240);
     }
+    if (HAL_RCC_HCPU_GetDLL2Freq() != 288 * 1000 * 1000) {
+        HAL_RCC_HCPU_EnableDLL2(288000000);
+    }
+
+    uint32_t pid = ((hwp_hpsys_cfg->IDR & HPSYS_CFG_IDR_PID_Msk) >> HPSYS_CFG_IDR_PID_Pos) & 7;
+    const mpi1_info_t *mpi_info = &__mpi1_info[pid];
+
+    // pin mux
+    if (mpi_info->pinmux.func != NULL) {
+        mpi_info->pinmux.func(pid);
+    }
+
+    if ((mpi_info->mode != SPI_MODE_NOR) && (mpi_info->size_mb > 0)) {
+        // only set 1.8 for PSRAM, do NOT set if no psram !!!
+        HAL_PMU_ConfigPeriLdo(PMU_PERI_LDO_1V8, true, true);
+        HAL_RCC_HCPU_ClockSelect(RCC_CLK_MOD_PSRAM1, RCC_CLK_PSRAM_DLL2);
+
+        qspi_configure_t qspi_cfg = {
+            .Instance = hwp_qspi1,
+            .SpiMode = mpi_info->mode,
+            .msize = mpi_info->size_mb,
+            .base = QSPI1_MEM_BASE,
+        };
+        static FLASH_HandleTypeDef f_handle;
+        HAL_MPI_PSRAM_Init(&f_handle, &qspi_cfg, 2);
+    } else if ((mpi_info->mode == SPI_MODE_NOR) && (mpi_info->size_mb > 0)) {
+        // TODO: intialize flash if necessary
+    }
+#endif
     return true;
 }
 
