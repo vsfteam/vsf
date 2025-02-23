@@ -21,6 +21,14 @@
 #include "../__device.h"
 
 #include "bf0_hal.h"
+#include "sifli_bbm.h"
+
+// for vsf_systimer_get_ms
+#if VSF_USE_KERNEL != ENABLED
+#   error VSF_USE_KERNEL MUST be enabled, bacause SF32 HAL need systimer
+#else
+#   include "kernel/vsf_kernel.h"
+#endif
 
 /*============================ MACROS ========================================*/
 
@@ -363,14 +371,31 @@ void HAL_Delay(__IO uint32_t Delay)
     HAL_Delay_us(1000 * Delay);
 }
 
+uint32_t HAL_GetTick(void)
+{
+    if ((SysTick->CTRL & SysTick_CTRL_ENABLE_Msk) == 0) {
+        VSF_HAL_ASSERT(false);
+        while (1);
+    }
+
+    return vsf_systimer_get_ms();
+}
 
 
 
 
-// psram & flash
 
-#define BOOT_FLASH_PUYA     0
-#define BOOT_FLASH_GD       1
+// Boot source
+#define BOOT_FROM_SIP_PUYA  1
+#define BOOT_FROM_SIP_GD    2
+#define BOOT_FROM_NOR       3
+#define BOOT_FROM_NAND      4
+#define BOOT_FROM_SD        5
+#define BOOT_FROM_EMMC      6
+
+// MPI1 SIP
+#define BOOT_SIP_PUYA       0
+#define BOOT_SIP_GD         1
 #define BOOT_PSRAM_APS_128P 2
 #define BOOT_PSRAM_APS_64P  3
 #define BOOT_PSRAM_APS_32P  4
@@ -468,6 +493,27 @@ static void board_pinmux_flash_puya(int func)
     HAL_PIN_Set(PAD_SA10, MPI1_DIO3, PIN_NOPULL, 1);
 }
 
+static void board_pinmux_mpi1_puya_ext(int is64Mb)
+{
+    HAL_PIN_Set_Analog(PAD_SA04, 1);
+    HAL_PIN_Set_Analog(PAD_SA05, 1);
+    HAL_PIN_Set_Analog(PAD_SA06, 1);
+    HAL_PIN_Set_Analog(PAD_SA08, 1);
+    HAL_PIN_Set_Analog(PAD_SA11, 1);
+    HAL_PIN_Set_Analog(PAD_SA12, 1);
+
+    if (is64Mb)
+    {
+        HAL_PIN_Set_Analog(PAD_SA00, 1);
+        HAL_PIN_Set(PAD_SA03, MPI1_DIO2, PIN_PULLUP, 1);
+    }
+    else
+    {
+        HAL_PIN_Set_Analog(PAD_SA03, 1);
+        HAL_PIN_Set(PAD_SA00, MPI1_DIO2, PIN_PULLUP, 1);
+    }
+}
+
 static void board_pinmux_flash_gd(int func)
 {
     HAL_PIN_Set(PAD_SA04, MPI1_CS,   PIN_NOPULL, 1);
@@ -484,6 +530,28 @@ static void board_pinmux_flash_gd(int func)
     HAL_PIN_Set_Analog(PAD_SA07, 1);
     HAL_PIN_Set_Analog(PAD_SA10, 1);
     HAL_PIN_Set_Analog(PAD_SA12, 1);
+}
+
+static void board_pinmux_mpi2(void)
+{
+    HAL_PIN_Set(PAD_PA16, MPI2_CLK, PIN_NOPULL, 1);
+    HAL_PIN_Set(PAD_PA12, MPI2_CS,  PIN_NOPULL, 1);
+    HAL_PIN_Set(PAD_PA15, MPI2_DIO0, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_PA13, MPI2_DIO1, PIN_PULLDOWN, 1);
+    HAL_PIN_Set(PAD_PA14, MPI2_DIO2, PIN_PULLUP, 1);
+    HAL_PIN_Set(PAD_PA17, MPI2_DIO3, PIN_PULLUP, 1);
+}
+
+static void board_pinmux_sd(void)
+{
+    HAL_PIN_Set(PAD_PA15, SD1_CMD, PIN_PULLUP, 1);
+    HAL_Delay_us(20);   // add a delay before clock setting to avoid wrong cmd happen
+
+    HAL_PIN_Set(PAD_PA14, SD1_CLK,  PIN_NOPULL, 1);
+    HAL_PIN_Set(PAD_PA16, SD1_DIO0, PIN_PULLUP, 1);
+    HAL_PIN_Set(PAD_PA17, SD1_DIO1, PIN_PULLUP, 1);
+    HAL_PIN_Set(PAD_PA12, SD1_DIO2, PIN_PULLUP, 1);
+    HAL_PIN_Set(PAD_PA13, SD1_DIO3, PIN_PULLUP, 1);
 }
 
 static void board_pinmux_mpi1_none(int func)
@@ -503,8 +571,8 @@ typedef struct {
 } mpi1_info_t;
 
 static const mpi1_info_t __mpi1_info[] = {
-    [BOOT_FLASH_PUYA]       = { SPI_MODE_NOR,       0,  board_pinmux_flash_puya },
-    [BOOT_FLASH_GD]         = { SPI_MODE_NOR,       0,  board_pinmux_flash_gd },
+    [BOOT_SIP_PUYA]         = { SPI_MODE_NOR,       4,  board_pinmux_flash_puya },
+    [BOOT_SIP_GD]           = { SPI_MODE_NOR,       4,  board_pinmux_flash_gd },
     [BOOT_PSRAM_APS_128P]   = { SPI_MODE_OPSRAM,    8,  board_pinmux_psram_func0 },
     [BOOT_PSRAM_APS_64P]    = { SPI_MODE_OPSRAM,    8,  board_pinmux_psram_func1_2_4 },
     [BOOT_PSRAM_APS_32P]    = { SPI_MODE_LEGPSRAM,  4,  board_pinmux_psram_func1_2_4 },
@@ -512,6 +580,136 @@ static const mpi1_info_t __mpi1_info[] = {
     [BOOT_PSRAM_WINBOND]    = { SPI_MODE_HBPSRAM,   0,  board_pinmux_psram_func1_2_4 },
     [BOOT_SIP_NONE]         = { 0xFF,               0,  board_pinmux_mpi1_none },
 };
+
+__HAL_ROM_USED uint32_t HAL_Get_backup(uint8_t idx)
+{
+    volatile uint32_t *p = &hwp_rtc->BKP0R;
+    return *(p + idx);
+}
+
+
+
+
+
+// flash driver
+
+#define INIT_FLASH 0
+#if INIT_FLASH
+static uint8_t board_boot_src;
+static QSPI_FLASH_CTX_T spi_flash_handle[FLASH_MAX_INSTANCE];
+static DMA_HandleTypeDef spi_flash_dma_handle[FLASH_MAX_INSTANCE];
+
+typedef int (*flash_read_func)(uint32_t addr, const int8_t *buf, uint32_t size);
+typedef int (*flash_write_func)(uint32_t addr, const int8_t *buf, uint32_t size);
+typedef int (*flash_erase_func)(uint32_t addr, uint32_t size);
+static flash_read_func g_flash_read;
+static flash_write_func g_flash_write;
+static flash_erase_func g_flash_erase;
+
+static QSPI_FLASH_CTX_T *flash_ctx = NULL;
+uint32_t g_config_addr;
+#ifdef HAL_USE_NAND
+static uint32_t nand_pagesize = 2048;
+static uint32_t nand_blksize = 0x20000;
+#endif
+
+static int read_nor(uint32_t addr, const int8_t *buf, uint32_t size)
+{
+    memcpy((void *)buf, (uint8_t *)addr, size);
+    return size;
+}
+
+static int write_nor(uint32_t addr, const int8_t *buf, uint32_t size)
+{
+    FLASH_HandleTypeDef *hflash;
+    uint32_t taddr, start, remain, fill;
+    uint8_t *tbuf;
+    int res;
+
+    if (addr >= MPI2_MEM_BASE)
+    {
+        hflash = &(spi_flash_handle[1].handle);
+    }
+    else
+    {
+        hflash = &(spi_flash_handle[0].handle);
+    }
+
+    if ((addr < hflash->base) || (addr > (hflash->base + hflash->size)))
+        return 0;
+
+    taddr = addr - hflash->base;
+    tbuf = (uint8_t *)buf;
+    remain = size;
+
+    start = taddr & (QSPI_NOR_PAGE_SIZE - 1);
+    if (start > 0)    // start address not page aligned
+    {
+        fill = QSPI_NOR_PAGE_SIZE - start;   // remained size in one page
+        if (fill > size)    // not over one page
+        {
+            fill = size;
+        }
+        res = HAL_QSPIEX_WRITE_PAGE(hflash, taddr, tbuf, fill);
+        if (res != fill)
+            return 0;
+        taddr += fill;
+        tbuf += fill;
+        remain -= fill;
+    }
+    while (remain > 0)
+    {
+        fill = remain > QSPI_NOR_PAGE_SIZE ? QSPI_NOR_PAGE_SIZE : remain;
+        res = HAL_QSPIEX_WRITE_PAGE(hflash, taddr, tbuf, fill);
+        if (res != fill)
+            return 0;
+        taddr += fill;
+        tbuf += fill;
+        remain -= fill;
+    }
+
+    return size;
+}
+
+static int erase_nor(uint32_t addr, uint32_t size)
+{
+    FLASH_HandleTypeDef *hflash;
+    uint32_t taddr, remain;
+    int res;
+
+    if (addr >= MPI2_MEM_BASE)
+    {
+        hflash = &(spi_flash_handle[1].handle);
+    }
+    else
+    {
+        hflash = &(spi_flash_handle[0].handle);
+    }
+
+    if ((addr < hflash->base) || (addr > (hflash->base + hflash->size)))
+        return 1;
+
+    taddr = addr - hflash->base;
+    remain = size;
+
+    if ((taddr & (QSPI_NOR_SECT_SIZE - 1)) != 0)
+        return -1;
+    if ((remain & (QSPI_NOR_SECT_SIZE - 1)) != 0)
+        return -2;
+
+    while (remain > 0)
+    {
+        res = HAL_QSPIEX_SECT_ERASE(hflash, taddr);
+        if (res != 0)
+            return 1;
+
+        remain -= QSPI_NOR_SECT_SIZE;
+        taddr += QSPI_NOR_SECT_SIZE;
+    }
+
+    return 0;
+}
+#endif
 
 
 
@@ -541,30 +739,133 @@ bool vsf_driver_init(void)
     }
 
     uint32_t pid = ((hwp_hpsys_cfg->IDR & HPSYS_CFG_IDR_PID_Msk) >> HPSYS_CFG_IDR_PID_Pos) & 7;
-    const mpi1_info_t *mpi_info = &__mpi1_info[pid];
+#if INIT_FLASH
+    board_boot_src = HAL_Get_backup(RTC_BACKUP_BOOTOPT);
+#endif
 
-    // pin mux
+    const mpi1_info_t *mpi_info = &__mpi1_info[pid];
+    qspi_configure_t qspi_cfg;
+    struct dma_config flash_dma;
+
     if (mpi_info->pinmux_fn != NULL) {
         mpi_info->pinmux_fn(pid);
     }
-
     if ((mpi_info->mode != SPI_MODE_NOR) && (mpi_info->size_mb > 0)) {
         // only set 1.8 for PSRAM, do NOT set if no psram !!!
         HAL_PMU_ConfigPeriLdo(PMU_PERI_LDO_1V8, true, true);
         HAL_RCC_HCPU_ClockSelect(RCC_CLK_MOD_PSRAM1, RCC_CLK_PSRAM_DLL2);
 
-        qspi_configure_t qspi_cfg = {
-            .Instance = hwp_qspi1,
-            .SpiMode = mpi_info->mode,
-            .msize = mpi_info->size_mb,
-            .base = QSPI1_MEM_BASE,
-        };
+        qspi_cfg.Instance = hwp_qspi1;
+        qspi_cfg.SpiMode = mpi_info->mode;
+        qspi_cfg.msize = mpi_info->size_mb;
+        qspi_cfg.base = QSPI1_MEM_BASE;
+
         static FLASH_HandleTypeDef f_handle;
         HAL_MPI_PSRAM_Init(&f_handle, &qspi_cfg, 2);
     } else if ((mpi_info->mode == SPI_MODE_NOR) && (mpi_info->size_mb > 0)) {
-        // TODO: intialize flash if necessary
-    }
+#if INIT_FLASH
+        VSF_HAL_ASSERT(pid == board_boot_src);
+        HAL_RCC_HCPU_ClockSelect(RCC_CLK_MOD_FLASH1, RCC_CLK_FLASH_DLL2);
+
+        qspi_cfg.Instance = FLASH1;
+        qspi_cfg.line = (board_boot_src == BOOT_FROM_SIP_PUYA) ? HAL_FLASH_NOR_MODE : HAL_FLASH_QMODE;
+        qspi_cfg.SpiMode = mpi_info->mode;
+        qspi_cfg.msize = mpi_info->size_mb;
+        qspi_cfg.base = FLASH_BASE_ADDR;
+
+        flash_dma.dma_irq_prio = 0;
+        flash_dma.Instance = DMA1_Channel1;
+        flash_dma.dma_irq = DMAC1_CH1_IRQn;
+        flash_dma.request = DMA_REQUEST_0;
+
+        spi_flash_handle[0].dual_mode = 1;
+        HAL_FLASH_Init(&spi_flash_handle[0], &qspi_cfg, &spi_flash_dma_handle[0], &flash_dma, 6);
+
+        if (board_boot_src == BOOT_FROM_SIP_PUYA) {
+            board_pinmux_mpi1_puya_ext(spi_flash_handle[0].dev_id == 0x176085);
+            HAL_FLASH_SET_QUAL_SPI((FLASH_HandleTypeDef *) & (spi_flash_handle[0].handle), true);
+            spi_flash_handle[0].handle.Mode = HAL_FLASH_QMODE;
+        }
 #endif
+    }
+
+#if INIT_FLASH
+    switch (board_boot_src) {
+    case BOOT_FROM_SIP_PUYA:
+    case BOOT_FROM_SIP_GD:
+        flash_ctx = &spi_flash_handle[0];
+        g_flash_read = read_nor;
+        g_flash_write = write_nor;
+        g_flash_erase = erase_nor;
+        break;
+    case BOOT_FROM_NAND:
+#ifndef HAL_USE_NAND
+        break;
+#endif
+    case BOOT_FROM_NOR:
+        board_pinmux_mpi2();
+        HAL_RCC_HCPU_ClockSelect(RCC_CLK_MOD_FLASH2, RCC_CLK_FLASH_DLL2);
+
+#ifdef HAL_USE_NAND
+        bool is_nand = BOOT_FROM_NAND == board_boot_src;
+#endif
+        qspi_cfg.Instance = FLASH2;
+        qspi_cfg.line = HAL_FLASH_QMODE;
+        qspi_cfg.msize = 4;
+        qspi_cfg.base = FLASH2_BASE_ADDR;
+#ifdef HAL_USE_NAND
+        if (is_nand) {
+            g_flash_read = read_nand;
+            static uint32_t nand_cache[(4096 + 128) / 4];
+
+            qspi_cfg.base += HPSYS_MPI_MEM_CBUS_2_SBUS_OFFSET;
+            qspi_cfg.SpiMode = SPI_MODE_NAND;
+            spi_flash_handle[1].handle.data_buf = (uint8_t *)nand_cache;
+        } else
+#endif
+        {
+            g_flash_read = read_nor;
+            qspi_cfg.SpiMode = SPI_MODE_NOR;
+        }
+
+        flash_dma.dma_irq_prio = 0;
+        flash_dma.Instance = DMA1_Channel2;
+        flash_dma.dma_irq = DMAC1_CH2_IRQn;
+        flash_dma.request = DMA_REQUEST_1;
+
+        spi_flash_handle[1].dual_mode = 1;
+#ifdef HAL_USE_NAND
+        spi_flash_handle[1].flash_mode = is_nand;
+#endif
+        HAL_StatusTypeDef res = HAL_FLASH_Init(&spi_flash_handle[1], &qspi_cfg, &spi_flash_dma_handle[1], &flash_dma, 6);
+#ifdef HAL_USE_NAND
+        if ((HAL_OK == res) && is_nand) {
+            nand_pagesize = HAL_NAND_PAGE_SIZE(&spi_flash_handle[1].handle);
+            nand_blksize = HAL_NAND_BLOCK_SIZE(&spi_flash_handle[1].handle);
+
+            spi_flash_handle[1].handle.buf_mode = 1;    // default set to buffer mode for nand
+            HAL_NAND_CONF_ECC(&spi_flash_handle[1].handle, 1); // default enable ECC if support !
+            bbm_set_page_size(nand_pagesize);
+            bbm_set_blk_size(nand_blksize);
+
+            static uint32_t bbm_cache_buf[(4096 + 128) / 4];
+            sif_bbm_init(spi_flash_handle[1].total_size, (uint8_t *)bbm_cache_buf);
+        }
+#else
+        VSF_HAL_ASSERT(HAL_OK == res);
+#endif
+
+        flash_ctx = &spi_flash_handle[1];
+        break;
+    case BOOT_FROM_SD:
+    case BOOT_FROM_EMMC:
+        break;
+    default:
+        VSF_HAL_ASSERT(false);
+        break;
+    }
+#endif      // INIT_FLASH
+#endif      // SOC_BF0_HCPU
     return true;
 }
 
