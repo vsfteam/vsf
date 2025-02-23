@@ -224,8 +224,6 @@ uint_fast16_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_rxfifo_get_data_coun
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
     return (usart_ptr->reg->ISR & USART_ISR_RXNE) ? 1 : 0;
-//    uint32_t cnt = USART_FCS(usart_ptr->reg);
-//    return ((cnt & USART_FCS_RFCNT3_4) << 2) | ((cnt & USART_FCS_RFCNT0_2) >> 12);
 }
 
 uint_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_rxfifo_read)(
