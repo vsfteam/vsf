@@ -376,6 +376,7 @@ void HAL_Delay(__IO uint32_t Delay)
 #define BOOT_PSRAM_APS_32P  4
 #define BOOT_PSRAM_APS_16P  5
 #define BOOT_PSRAM_WINBOND  6
+#define BOOT_SIP_NONE       7
 
 
 
@@ -509,7 +510,7 @@ static const mpi1_info_t __mpi1_info[] = {
     [BOOT_PSRAM_APS_32P]    = { SPI_MODE_LEGPSRAM,  4,  board_pinmux_psram_func1_2_4 },
     [BOOT_PSRAM_APS_16P]    = { SPI_MODE_PSRAM,     2,  board_pinmux_psram_func3 },
     [BOOT_PSRAM_WINBOND]    = { SPI_MODE_HBPSRAM,   0,  board_pinmux_psram_func1_2_4 },
-    [7]                     = { 0,                  0,  board_pinmux_mpi1_none },
+    [BOOT_SIP_NONE]         = { 0xFF,               0,  board_pinmux_mpi1_none },
 };
 
 
