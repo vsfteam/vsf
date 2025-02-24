@@ -141,13 +141,20 @@ vsf_err_t vsf_hw_flash_init(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_cfg_t *cfg_p
     HAL_RCC_HCPU_ClockSelect(flash_mod, RCC_CLK_FLASH_DLL2);
 
     vsf_protect_t org = __vsf_hw_flash_protect();
-        HAL_StatusTypeDef res = HAL_FLASH_Init(&hw_flash_ptr->flash_ctx,
-            &qspi_cfg, &hw_flash_ptr->flash_dma_handle, &flash_dma, div);
+        HAL_StatusTypeDef res = HAL_FLASH_Init(&hw_flash_ptr->flash_ctx, &qspi_cfg,
+#if 0
+                &hw_flash_ptr->flash_dma_handle, &flash_dma,
+#else
+                NULL, NULL,
+#endif
+                div);
     __vsf_hw_flash_unprotect(org);
 
     if (res == HAL_OK) {
-        vsf_trace_debug("flash: devid 0x%08X, %d" VSF_TRACE_CFG_LINEEND,
+        vsf_trace_debug("flash: devid 0x%08X, %d@0x%08X %d" VSF_TRACE_CFG_LINEEND,
             hw_flash_ptr->flash_ctx.dev_id,
+            hw_flash_ptr->flash_ctx.handle.size,
+            hw_flash_ptr->flash_ctx.handle.base,
             hw_flash_ptr->flash_ctx.handle.ctable->erase_base_size);
     }
 
@@ -195,19 +202,45 @@ void vsf_hw_flash_irq_disable(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_irq_mask_t
 
 vsf_err_t vsf_hw_flash_erase_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offset, vsf_flash_size_t size)
 {
-    vsf_flash_size_t ret;
+    int ret = -1;
 
     VSF_HAL_ASSERT(hw_flash_ptr != NULL);
-#if 0
     VSF_HAL_ASSERT(hw_flash_ptr->is_enabled);
-    VSF_HAL_ASSERT(offset + size <= hw_flash_ptr->flash_size);
-    VSF_HAL_ASSERT(0 == (offset % VSF_HW_FLASH_CFG_ERASE_SECTORE_SIZE));
-    VSF_HAL_ASSERT(0 == (size % VSF_HW_FLASH_CFG_ERASE_SECTORE_SIZE));
+    VSF_HAL_ASSERT(offset + size <= hw_flash_ptr->flash_ctx.handle.size);
+
+    uint32_t block_size = QSPI_NOR_SECT_SIZE << hw_flash_ptr->flash_ctx.handle.dualFlash;
 
     vsf_protect_t org = __vsf_hw_flash_protect();
-        ret = __ROM_FlashErase(__aic8800_flash_address_get(offset), size);//offset:4k * n
+        if (hw_flash_ptr->flash_ctx.flash_mode == 0) {
+            // nor
+            VSF_HAL_ASSERT(IS_ALIGNED(block_size, size));
+            VSF_HAL_ASSERT(IS_ALIGNED(block_size, offset));
+
+            if ((0 == offset) && (size == hw_flash_ptr->flash_ctx.handle.size)) {
+                ret = HAL_QSPIEX_CHIP_ERASE(&hw_flash_ptr->flash_ctx.handle);
+            } else {
+                uint32_t block64_size = QSPI_NOR_BLK64_SIZE << hw_flash_ptr->flash_ctx.handle.dualFlash;
+                if (IS_ALIGNED(block64_size, offset) && (size >= block64_size)) {
+                    while (size >= block64_size) {
+                        ret = HAL_QSPIEX_BLK64_ERASE(&hw_flash_ptr->flash_ctx.handle, offset);
+                        if (ret != 0) { break; }
+                        size -= block64_size;
+                        offset += block64_size;
+                    }
+                }
+                while (size >= 0) {
+                    ret = HAL_QSPIEX_SECT_ERASE(&hw_flash_ptr->flash_ctx.handle, offset);
+                    if (ret != 0) { break; }
+                    size -= block_size;
+                    offset += block_size;
+                }
+            }
+        } else if (hw_flash_ptr->flash_ctx.flash_mode == 1) {
+            // nand, TODO:
+        } else {
+            VSF_HAL_ASSERT(false);
+        }
     __vsf_hw_flash_unprotect(org);
-    __ROM_FlashCacheInvalidRange(__aic8800_flash_address_get(offset), size);
 
     if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
         vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_ERASE_MASK : VSF_FLASH_IRQ_ERASE_ERROR_MASK;
@@ -215,23 +248,38 @@ vsf_err_t vsf_hw_flash_erase_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flas
             hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, (vsf_flash_t *)hw_flash_ptr, mask);
         }
     }
-#endif
+
     return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
 vsf_err_t vsf_hw_flash_write_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offset, uint8_t* buffer, vsf_flash_size_t size)
 {
-    vsf_flash_size_t ret;
-#if 0
+    int ret = -1;
+
     VSF_HAL_ASSERT(hw_flash_ptr != NULL);
     VSF_HAL_ASSERT(hw_flash_ptr->is_enabled);
-    VSF_HAL_ASSERT(offset + size <= hw_flash_ptr->flash_size);
-    VSF_HAL_ASSERT(0 == (offset % VSF_HW_FLASH_CFG_WRITE_SECTORE_SIZE));
+    VSF_HAL_ASSERT(offset + size <= hw_flash_ptr->flash_ctx.handle.size);
+
+    uint32_t block_size = QSPI_NOR_PAGE_SIZE << hw_flash_ptr->flash_ctx.handle.dualFlash;
 
     vsf_protect_t org = __vsf_hw_flash_protect();
-        ret = __ROM_FlashWrite(__aic8800_flash_address_get(offset), size, (unsigned int)buffer);
+        if (hw_flash_ptr->flash_ctx.flash_mode == 0) {
+            // nor
+            VSF_HAL_ASSERT(IS_ALIGNED(block_size, size));
+            VSF_HAL_ASSERT(IS_ALIGNED(block_size, offset));
+
+            while (size > 0) {
+                ret = HAL_QSPIEX_WRITE_PAGE(&hw_flash_ptr->flash_ctx.handle, offset, buffer, block_size);
+                if (ret != 0) { break; }
+                size -= block_size;
+                offset += block_size;
+            }
+        } else if (hw_flash_ptr->flash_ctx.flash_mode == 1) {
+            // nand, TODO:
+        } else {
+            VSF_HAL_ASSERT(false);
+        }
     __vsf_hw_flash_unprotect(org);
-    __ROM_FlashCacheInvalidRange(__aic8800_flash_address_get(offset), size);
 
     if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
         vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_WRITE_MASK : VSF_FLASH_IRQ_WRITE_ERROR_MASK;
@@ -239,31 +287,25 @@ vsf_err_t vsf_hw_flash_write_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flas
             hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, (vsf_flash_t *)hw_flash_ptr, mask);
         }
     }
-#endif
+
     return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
 vsf_err_t vsf_hw_flash_read_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offset, uint8_t* buffer, vsf_flash_size_t size)
 {
-    vsf_flash_size_t ret;
-#if 0
     VSF_HAL_ASSERT(hw_flash_ptr != NULL);
     VSF_HAL_ASSERT(NULL != buffer);
     VSF_HAL_ASSERT(hw_flash_ptr->is_enabled);
-    VSF_HAL_ASSERT(offset + size <= hw_flash_ptr->flash_size);
+    VSF_HAL_ASSERT(offset + size <= hw_flash_ptr->flash_ctx.handle.size);
 
-    vsf_protect_t org = __vsf_hw_flash_protect();
-        ret = __ROM_FlashRead(__aic8800_flash_address_get(offset), size, (unsigned int)buffer);
-    __vsf_hw_flash_unprotect(org);
+    memcpy(buffer, (void *)(hw_flash_ptr->flash_ctx.handle.base + offset), size);
 
-    if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
-        vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_READ_MASK : VSF_FLASH_IRQ_READ_ERROR_MASK;
-        if (hw_flash_ptr->irq_mask & mask) {
-            hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, (vsf_flash_t *)hw_flash_ptr, mask);
-        }
+    if ((NULL != hw_flash_ptr->cfg.isr.handler_fn) && (hw_flash_ptr->irq_mask & VSF_FLASH_IRQ_READ_MASK)) {
+        hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr,
+                (vsf_flash_t *)hw_flash_ptr, VSF_FLASH_IRQ_READ_MASK);
     }
-#endif
-    return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
+
+    return VSF_ERR_NONE;
 }
 
 vsf_flash_status_t vsf_hw_flash_status(vsf_hw_flash_t *hw_flash_ptr)
@@ -281,11 +323,19 @@ vsf_flash_capability_t vsf_hw_flash_capability(vsf_hw_flash_t *hw_flash_ptr)
         .irq_mask              = VSF_FLASH_IRQ_ALL_BITS_MASK,
         .base_address          = hw_flash_ptr->flash_ctx.handle.base,
         .max_size              = hw_flash_ptr->flash_ctx.handle.size,
-//        .erase_sector_size     = VSF_HW_FLASH_CFG_ERASE_SECTORE_SIZE,
-//        .write_sector_size     = VSF_HW_FLASH_CFG_WRITE_SECTORE_SIZE,
         .none_sector_aligned_write = 0,
         .none_sector_aligned_read  = 1,
     };
+
+    if (hw_flash_ptr->flash_ctx.flash_mode == 0) {
+        // nor
+        flash_capability.erase_sector_size = QSPI_NOR_SECT_SIZE;
+        flash_capability.write_sector_size = QSPI_NOR_PAGE_SIZE;
+    } else if (hw_flash_ptr->flash_ctx.flash_mode == 1) {
+        // nand, TODO:
+    } else {
+        VSF_HAL_ASSERT(false);
+    }
 
     return flash_capability;
 }
