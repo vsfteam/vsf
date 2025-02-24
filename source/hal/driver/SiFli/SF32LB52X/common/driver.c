@@ -347,7 +347,7 @@ void HAL_Delay_us2_(__IO uint32_t us)
 }
 
 #define WAIT_US_LOOP_CYCLE 12
-__weak void HAL_Delay_us_(__IO uint32_t us)
+VSF_CAL_RAMFUNC void HAL_Delay_us_(uint32_t us)
 {
     static uint32_t __hal_sysclk_mhz;
     if (0 == us) {
@@ -360,13 +360,13 @@ __weak void HAL_Delay_us_(__IO uint32_t us)
     }
 }
 
-void HAL_Delay_us(uint32_t us)
+VSF_CAL_RAMFUNC void HAL_Delay_us(uint32_t us)
 {
     HAL_Delay_us_(us);
 }
 
 // ms delay
-void HAL_Delay(__IO uint32_t Delay)
+void HAL_Delay(uint32_t Delay)
 {
     HAL_Delay_us(1000 * Delay);
 }
@@ -384,14 +384,6 @@ uint32_t HAL_GetTick(void)
 
 
 
-
-// Boot source
-#define BOOT_FROM_SIP_PUYA  1
-#define BOOT_FROM_SIP_GD    2
-#define BOOT_FROM_NOR       3
-#define BOOT_FROM_NAND      4
-#define BOOT_FROM_SD        5
-#define BOOT_FROM_EMMC      6
 
 // MPI1 SIP
 #define BOOT_SIP_PUYA       0
@@ -484,76 +476,6 @@ static void board_pinmux_psram_func3(int func)
     HAL_PIN_Set_Analog(PAD_SA12, 1);
 }
 
-static void board_pinmux_flash_puya(int func)
-{
-    HAL_PIN_Set(PAD_SA01, MPI1_CS,   PIN_NOPULL, 1);
-    HAL_PIN_Set(PAD_SA09, MPI1_CLK,  PIN_NOPULL, 1);
-    HAL_PIN_Set(PAD_SA07, MPI1_DIO0, PIN_PULLDOWN, 1);
-    HAL_PIN_Set(PAD_SA02, MPI1_DIO1, PIN_PULLDOWN, 1);
-    HAL_PIN_Set(PAD_SA10, MPI1_DIO3, PIN_NOPULL, 1);
-}
-
-static void board_pinmux_mpi1_puya_ext(int is64Mb)
-{
-    HAL_PIN_Set_Analog(PAD_SA04, 1);
-    HAL_PIN_Set_Analog(PAD_SA05, 1);
-    HAL_PIN_Set_Analog(PAD_SA06, 1);
-    HAL_PIN_Set_Analog(PAD_SA08, 1);
-    HAL_PIN_Set_Analog(PAD_SA11, 1);
-    HAL_PIN_Set_Analog(PAD_SA12, 1);
-
-    if (is64Mb)
-    {
-        HAL_PIN_Set_Analog(PAD_SA00, 1);
-        HAL_PIN_Set(PAD_SA03, MPI1_DIO2, PIN_PULLUP, 1);
-    }
-    else
-    {
-        HAL_PIN_Set_Analog(PAD_SA03, 1);
-        HAL_PIN_Set(PAD_SA00, MPI1_DIO2, PIN_PULLUP, 1);
-    }
-}
-
-static void board_pinmux_flash_gd(int func)
-{
-    HAL_PIN_Set(PAD_SA04, MPI1_CS,   PIN_NOPULL, 1);
-    HAL_PIN_Set(PAD_SA09, MPI1_CLK,  PIN_NOPULL, 1);
-    HAL_PIN_Set(PAD_SA11, MPI1_DIO0, PIN_PULLDOWN, 1);
-    HAL_PIN_Set(PAD_SA02, MPI1_DIO1, PIN_PULLDOWN, 1);
-    HAL_PIN_Set(PAD_SA00, MPI1_DIO2, PIN_PULLUP, 1);
-    HAL_PIN_Set(PAD_SA08, MPI1_DIO3, PIN_PULLUP, 1);
-
-    HAL_PIN_Set_Analog(PAD_SA01, 1);
-    HAL_PIN_Set_Analog(PAD_SA03, 1);
-    HAL_PIN_Set_Analog(PAD_SA05, 1);
-    HAL_PIN_Set_Analog(PAD_SA06, 1);
-    HAL_PIN_Set_Analog(PAD_SA07, 1);
-    HAL_PIN_Set_Analog(PAD_SA10, 1);
-    HAL_PIN_Set_Analog(PAD_SA12, 1);
-}
-
-static void board_pinmux_mpi2(void)
-{
-    HAL_PIN_Set(PAD_PA16, MPI2_CLK, PIN_NOPULL, 1);
-    HAL_PIN_Set(PAD_PA12, MPI2_CS,  PIN_NOPULL, 1);
-    HAL_PIN_Set(PAD_PA15, MPI2_DIO0, PIN_PULLDOWN, 1);
-    HAL_PIN_Set(PAD_PA13, MPI2_DIO1, PIN_PULLDOWN, 1);
-    HAL_PIN_Set(PAD_PA14, MPI2_DIO2, PIN_PULLUP, 1);
-    HAL_PIN_Set(PAD_PA17, MPI2_DIO3, PIN_PULLUP, 1);
-}
-
-static void board_pinmux_sd(void)
-{
-    HAL_PIN_Set(PAD_PA15, SD1_CMD, PIN_PULLUP, 1);
-    HAL_Delay_us(20);   // add a delay before clock setting to avoid wrong cmd happen
-
-    HAL_PIN_Set(PAD_PA14, SD1_CLK,  PIN_NOPULL, 1);
-    HAL_PIN_Set(PAD_PA16, SD1_DIO0, PIN_PULLUP, 1);
-    HAL_PIN_Set(PAD_PA17, SD1_DIO1, PIN_PULLUP, 1);
-    HAL_PIN_Set(PAD_PA12, SD1_DIO2, PIN_PULLUP, 1);
-    HAL_PIN_Set(PAD_PA13, SD1_DIO3, PIN_PULLUP, 1);
-}
-
 static void board_pinmux_mpi1_none(int func)
 {
     uint32_t i;
@@ -571,8 +493,8 @@ typedef struct {
 } mpi1_info_t;
 
 static const mpi1_info_t __mpi1_info[] = {
-    [BOOT_SIP_PUYA]         = { SPI_MODE_NOR,       4,  board_pinmux_flash_puya },
-    [BOOT_SIP_GD]           = { SPI_MODE_NOR,       4,  board_pinmux_flash_gd },
+    [BOOT_SIP_PUYA]         = { SPI_MODE_NOR,       4,  NULL },
+    [BOOT_SIP_GD]           = { SPI_MODE_NOR,       4,  NULL },
     [BOOT_PSRAM_APS_128P]   = { SPI_MODE_OPSRAM,    8,  board_pinmux_psram_func0 },
     [BOOT_PSRAM_APS_64P]    = { SPI_MODE_OPSRAM,    8,  board_pinmux_psram_func1_2_4 },
     [BOOT_PSRAM_APS_32P]    = { SPI_MODE_LEGPSRAM,  4,  board_pinmux_psram_func1_2_4 },
@@ -591,59 +513,6 @@ __HAL_ROM_USED uint32_t HAL_Get_backup(uint8_t idx)
 
 
 
-// flash driver
-
-static VSF_CAL_NO_INIT QSPI_FLASH_CTX_T spi_flash_ctx;
-static VSF_CAL_NO_INIT DMA_HandleTypeDef spi_flash_dma_handle;
-
-uint32_t flash_get_freq(int clk_module, uint16_t clk_div, uint8_t hcpu)
-{
-    int src;
-    uint32_t freq;
-
-    if (clk_div <= 0)
-        return 0;
-
-    if (hcpu == 0)
-    {
-        freq = HAL_RCC_GetSysCLKFreq(CORE_ID_LCPU);
-        return freq / clk_div;
-    }
-
-    src = HAL_RCC_HCPU_GetClockSrc(clk_module);
-#ifdef SOC_SF32LB52X
-    if (RCC_CLK_FLASH_DLL2 == src)
-    {
-        freq = HAL_RCC_HCPU_GetDLL2Freq();
-    }
-    else if (RCC_CLK_SRC_DLL1 == src)
-    {
-        freq = HAL_RCC_HCPU_GetDLL1Freq();
-    }
-    else if (3 == src)  // DBL96
-    {
-        freq = 96000000;
-    }
-    else    // CLK_PERI, RC48/XTAL48
-    {
-        freq = 48000000;
-    }
-#else
-    if (RCC_CLK_FLASH_DLL2 == src)
-    {
-        freq = HAL_RCC_HCPU_GetDLL2Freq();
-    }
-    else if (RCC_CLK_FLASH_DLL3 == src)
-    {
-        freq = HAL_RCC_HCPU_GetDLL3Freq();
-    }
-    else
-    {
-        freq = HAL_RCC_GetSysCLKFreq(CORE_ID_HCPU);
-    }
-#endif
-    return freq / clk_div;;
-}
 
 /*! \note initialize device driver
  *  \param none
@@ -671,14 +540,14 @@ bool vsf_driver_init(void)
     uint32_t pid = ((hwp_hpsys_cfg->IDR & HPSYS_CFG_IDR_PID_Msk) >> HPSYS_CFG_IDR_PID_Pos) & 7;
     uint32_t boot_src = HAL_Get_backup(RTC_BACKUP_BOOTOPT);
 
-    const mpi1_info_t *mpi_info = &__mpi1_info[pid], *mpi_flash_info = NULL;
+    const mpi1_info_t *mpi_info = &__mpi1_info[pid];
     qspi_configure_t qspi_cfg;
-    struct dma_config flash_dma = { 0 };
 
-    if (mpi_info->pinmux_fn != NULL) {
-        mpi_info->pinmux_fn(pid);
-    }
     if ((mpi_info->mode != SPI_MODE_NOR) && (mpi_info->size_mb > 0)) {
+        if (mpi_info->pinmux_fn != NULL) {
+            mpi_info->pinmux_fn(pid);
+        }
+
         // only set 1.8 for PSRAM, do NOT set if no psram !!!
         HAL_PMU_ConfigPeriLdo(PMU_PERI_LDO_1V8, true, true);
         HAL_RCC_HCPU_ClockSelect(RCC_CLK_MOD_PSRAM1, RCC_CLK_PSRAM_DLL2);
@@ -692,60 +561,6 @@ bool vsf_driver_init(void)
         static FLASH_HandleTypeDef f_handle;
         // 288MHz / 2 = 144MHz
         HAL_MPI_PSRAM_Init(&f_handle, &qspi_cfg, 2);
-    } else if ((mpi_info->mode == SPI_MODE_NOR) && (mpi_info->size_mb > 0)) {
-        VSF_HAL_ASSERT(pid == boot_src);
-        mpi_flash_info = mpi_info;
-    }
-
-    memset(&spi_flash_ctx, 0, sizeof(spi_flash_ctx));
-    memset(&spi_flash_dma_handle, 0, sizeof(spi_flash_dma_handle));
-    int flash_mod = -1;
-    switch (boot_src) {
-    case BOOT_FROM_SIP_PUYA:
-    case BOOT_FROM_SIP_GD:
-        VSF_HAL_ASSERT(mpi_flash_info != NULL);
-
-        qspi_cfg.Instance = FLASH1;
-        qspi_cfg.line = 2;
-        qspi_cfg.base = FLASH_BASE_ADDR;
-        qspi_cfg.SpiMode = mpi_flash_info->mode;
-        qspi_cfg.msize = mpi_flash_info->size_mb;
-
-        flash_dma.Instance = DMA1_Channel1;
-        flash_dma.dma_irq_prio = 0;
-        flash_dma.dma_irq = DMAC1_CH1_IRQn;
-        flash_dma.request = DMA_REQUEST_0;
-
-        flash_mod = RCC_CLK_MOD_FLASH1;
-        break;
-    case BOOT_FROM_NAND:
-    case BOOT_FROM_NOR:
-        qspi_cfg.Instance = FLASH2;
-        qspi_cfg.line = 2;
-        qspi_cfg.base = FLASH2_BASE_ADDR;
-        qspi_cfg.SpiMode = 0;
-        qspi_cfg.msize = 32;
-
-        flash_dma.Instance = DMA1_Channel2;
-        flash_dma.dma_irq_prio = 0;
-        flash_dma.dma_irq = DMAC1_CH2_IRQn;
-        flash_dma.request = DMA_REQUEST_1;
-
-        flash_mod = RCC_CLK_MOD_FLASH2;
-        break;
-    case BOOT_FROM_SD:
-    case BOOT_FROM_EMMC:
-        break;
-    default:
-        VSF_HAL_ASSERT(false);
-        break;
-    }
-    if (flash_mod >= 0) {
-        spi_flash_ctx.handle.freq = flash_get_freq(flash_mod, 5, 1);
-        spi_flash_ctx.handle.buf_mode = 0;
-
-        HAL_StatusTypeDef res = HAL_FLASH_Init(&spi_flash_ctx, &qspi_cfg, &spi_flash_dma_handle, &flash_dma, 5);
-        VSF_HAL_ASSERT(res == HAL_OK);
     }
 #endif      // SOC_BF0_HCPU
     return true;

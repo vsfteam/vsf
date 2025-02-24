@@ -37,7 +37,7 @@
 
 //#   include "../common/gpio/gpio.h"
 #   include "../../common/SF32LB5XX/usart/vsf_usart.h"
-//#   include "../common/flash/flash.h"
+#   include "./flash/flash.h"
 //#   include "../common/sdio/sdio.h"
 //#   include "../common/usb/usb.h"
 //#   include "../common/fb/fb.h"

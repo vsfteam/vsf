@@ -92,6 +92,8 @@
 #define VSF_HW_USART5_IRQN              USART5_IRQn
 #define VSF_HW_USART5_IRQHandler        USART5_IRQHandler
 
+#define VSF_HW_FLASH_COUNT              1
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
