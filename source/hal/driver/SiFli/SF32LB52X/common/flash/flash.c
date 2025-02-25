@@ -210,29 +210,30 @@ vsf_err_t vsf_hw_flash_erase_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flas
 
     uint32_t block_size = QSPI_NOR_SECT_SIZE << hw_flash_ptr->flash_ctx.handle.dualFlash;
 
+    vsf_flash_size_t cur_offset = offset, remain_size = size;
     vsf_protect_t org = __vsf_hw_flash_protect();
         if (hw_flash_ptr->flash_ctx.flash_mode == 0) {
             // nor
-            VSF_HAL_ASSERT(IS_ALIGNED(block_size, size));
-            VSF_HAL_ASSERT(IS_ALIGNED(block_size, offset));
+            VSF_HAL_ASSERT(IS_ALIGNED(block_size, remain_size));
+            VSF_HAL_ASSERT(IS_ALIGNED(block_size, cur_offset));
 
-            if ((0 == offset) && (size == hw_flash_ptr->flash_ctx.handle.size)) {
+            if ((0 == cur_offset) && (remain_size == hw_flash_ptr->flash_ctx.handle.size)) {
                 ret = HAL_QSPIEX_CHIP_ERASE(&hw_flash_ptr->flash_ctx.handle);
             } else {
                 uint32_t block64_size = QSPI_NOR_BLK64_SIZE << hw_flash_ptr->flash_ctx.handle.dualFlash;
-                if (IS_ALIGNED(block64_size, offset) && (size >= block64_size)) {
-                    while (size >= block64_size) {
-                        ret = HAL_QSPIEX_BLK64_ERASE(&hw_flash_ptr->flash_ctx.handle, offset);
+                if (IS_ALIGNED(block64_size, cur_offset) && (remain_size >= block64_size)) {
+                    while (remain_size >= block64_size) {
+                        ret = HAL_QSPIEX_BLK64_ERASE(&hw_flash_ptr->flash_ctx.handle, cur_offset);
                         if (ret != 0) { break; }
-                        size -= block64_size;
-                        offset += block64_size;
+                        remain_size -= block64_size;
+                        cur_offset += block64_size;
                     }
                 }
-                while (size >= 0) {
-                    ret = HAL_QSPIEX_SECT_ERASE(&hw_flash_ptr->flash_ctx.handle, offset);
+                while (remain_size > 0) {
+                    ret = HAL_QSPIEX_SECT_ERASE(&hw_flash_ptr->flash_ctx.handle, cur_offset);
                     if (ret != 0) { break; }
-                    size -= block_size;
-                    offset += block_size;
+                    remain_size -= block_size;
+                    cur_offset += block_size;
                 }
             }
         } else if (hw_flash_ptr->flash_ctx.flash_mode == 1) {
@@ -242,6 +243,9 @@ vsf_err_t vsf_hw_flash_erase_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flas
         }
     __vsf_hw_flash_unprotect(org);
 
+    offset += hw_flash_ptr->flash_ctx.handle.base;
+    SCB_CleanInvalidateDCache_by_Addr((void *)offset, size);
+    SCB_InvalidateICache_by_Addr((void *)offset, size);
     if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
         vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_ERASE_MASK : VSF_FLASH_IRQ_ERASE_ERROR_MASK;
         if (hw_flash_ptr->irq_mask & mask) {
@@ -262,17 +266,19 @@ vsf_err_t vsf_hw_flash_write_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flas
 
     uint32_t block_size = QSPI_NOR_PAGE_SIZE << hw_flash_ptr->flash_ctx.handle.dualFlash;
 
+    vsf_flash_size_t cur_offset = offset, remain_size = size;
     vsf_protect_t org = __vsf_hw_flash_protect();
         if (hw_flash_ptr->flash_ctx.flash_mode == 0) {
             // nor
-            VSF_HAL_ASSERT(IS_ALIGNED(block_size, size));
-            VSF_HAL_ASSERT(IS_ALIGNED(block_size, offset));
+            VSF_HAL_ASSERT(IS_ALIGNED(block_size, remain_size));
+            VSF_HAL_ASSERT(IS_ALIGNED(block_size, cur_offset));
 
-            while (size > 0) {
-                ret = HAL_QSPIEX_WRITE_PAGE(&hw_flash_ptr->flash_ctx.handle, offset, buffer, block_size);
-                if (ret != 0) { break; }
-                size -= block_size;
-                offset += block_size;
+            while (remain_size > 0) {
+                ret = HAL_QSPIEX_WRITE_PAGE(&hw_flash_ptr->flash_ctx.handle, cur_offset, buffer, block_size);
+                if (ret != block_size) { break; }
+                remain_size -= block_size;
+                cur_offset += block_size;
+                buffer += block_size;
             }
         } else if (hw_flash_ptr->flash_ctx.flash_mode == 1) {
             // nand, TODO:
@@ -281,14 +287,17 @@ vsf_err_t vsf_hw_flash_write_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flas
         }
     __vsf_hw_flash_unprotect(org);
 
+    offset += hw_flash_ptr->flash_ctx.handle.base;
+    SCB_CleanInvalidateDCache_by_Addr((void *)offset, size);
+    SCB_InvalidateICache_by_Addr((void *)offset, size);
     if (NULL != hw_flash_ptr->cfg.isr.handler_fn) {
-        vsf_flash_irq_mask_t mask = (0 == ret) ? VSF_FLASH_IRQ_WRITE_MASK : VSF_FLASH_IRQ_WRITE_ERROR_MASK;
+        vsf_flash_irq_mask_t mask = (block_size == ret) ? VSF_FLASH_IRQ_WRITE_MASK : VSF_FLASH_IRQ_WRITE_ERROR_MASK;
         if (hw_flash_ptr->irq_mask & mask) {
             hw_flash_ptr->cfg.isr.handler_fn(hw_flash_ptr->cfg.isr.target_ptr, (vsf_flash_t *)hw_flash_ptr, mask);
         }
     }
 
-    return (0 == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
+    return (block_size == ret) ? VSF_ERR_NONE : VSF_ERR_FAIL;
 }
 
 vsf_err_t vsf_hw_flash_read_multi_sector(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_size_t offset, uint8_t* buffer, vsf_flash_size_t size)
