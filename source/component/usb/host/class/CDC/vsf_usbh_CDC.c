@@ -157,9 +157,9 @@ vsf_err_t vk_usbh_cdc_init(vk_usbh_cdc_t *pthis, vk_usbh_t *usbh,
 
             if (    (desc_ifs->bDescriptorType == USB_DT_INTERFACE)
                 &&  (desc_ifs->bInterfaceClass == USB_CLASS_CDC_DATA)
-                &&  (desc_ifs->bInterfaceSubClass == 0)
-                &&  (desc_ifs->bInterfaceProtocol == 0)) {
+                &&  (desc_ifs->bInterfaceSubClass == 0)) {
 
+                pthis->data_protocol = desc_ifs->bInterfaceProtocol;
                 if (desc_ifs->bNumEndpoints == 0) {
                     continue;
                 }

@@ -18,13 +18,13 @@
 #ifndef __VSF_USBH_CDCECM_H__
 #define __VSF_USBH_CDCECM_H__
 
-
 /*============================ INCLUDES ======================================*/
+
 #include "component/usb/vsf_usb_cfg.h"
 
 #if     VSF_USE_USB_HOST == ENABLED                                             \
-    &&  VSF_USBH_USE_ECM == ENABLED                                             \
-    &&  VSF_USE_TCPIP == ENABLED
+    &&  VSF_USE_TCPIP == ENABLED                                                \
+    &&  ((VSF_USBH_USE_ECM == ENABLED) || (VSF_USBH_USE_NCM == ENABLED))
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,10 +35,18 @@ extern "C" {
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if VSF_USBH_USE_ECM == ENABLED
 extern const vk_usbh_class_drv_t vk_usbh_ecm_drv;
-
-#if VSF_USBH_USE_LIBUSB == ENABLED
+#   if VSF_USBH_USE_LIBUSB == ENABLED
 extern const vk_usbh_class_drv_t vk_usbh_ecm_block_libusb_drv;
+#   endif
+#endif
+
+#if VSF_USBH_USE_NCM == ENABLED
+extern const vk_usbh_class_drv_t vk_usbh_ncm_drv;
+#   if VSF_USBH_USE_LIBUSB == ENABLED
+extern const vk_usbh_class_drv_t vk_usbh_ncm_block_libusb_drv;
+#   endif
 #endif
 
 /*============================ PROTOTYPES ====================================*/

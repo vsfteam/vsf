@@ -32,6 +32,9 @@ extern "C" {
 #define USB_CDCNCM_CAP_CrcMode                  (1 << 4)
 #define USB_CDCNCM_CAP_NtbInputSize8            (1 << 5)
 
+#define USB_CDCNCM_NTB16                        (1 << 0)
+#define USB_CDCNCM_NTB32                        (1 << 1)
+
 #define USB_CDCNCM_NTH16_SIG                    0x484D434E
 #define USB_CDCNCM_NTH32_SIG                    0x686D636E
 #define USB_CDCNCM_NDP16_SIG_NOCRC              0x304D434E
@@ -39,8 +42,21 @@ extern "C" {
 #define USB_CDCNCM_NDP32_SIG_NOCRC              0x306D636E
 #define USB_CDCNCM_NDP32_SIG_CRC                0x316D636E
 
+#define USB_CDCNCM_NTH16_LEN                    12
+#define USB_CDCNCM_NTH32_LEN                    16
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+typedef struct usb_cdc_ncm_descriptor_t usb_cdc_ncm_descriptor_t;
+struct usb_cdc_ncm_descriptor_t {
+    uint8_t bLength;
+    uint8_t bDescriptorType;
+    uint8_t bDescriptorSubType;
+
+    uint16_t bcdNcmVersion;
+    uint8_t bmNetworkCapabilities;
+} VSF_CAL_PACKED;
 
 typedef struct usb_cdcncm_ntb_param_t usb_cdcncm_ntb_param_t;
 struct usb_cdcncm_ntb_param_t {

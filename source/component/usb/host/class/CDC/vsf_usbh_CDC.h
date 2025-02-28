@@ -68,6 +68,7 @@ vsf_class(vk_usbh_cdc_t) {
 
         int8_t ctrl_ifs;
         int8_t data_ifs;
+        uint8_t data_protocol;
 
         vsf_eda_t eda;
     )

@@ -654,9 +654,10 @@ extern usb_endpoint_desc_t * vk_usbh_get_next_ep_descriptor(
 #endif
 #if VSF_USBH_USE_CDC == ENABLED
 #   include "./class/CDC/vsf_usbh_CDC.h"
-#endif
-#if VSF_USBH_USE_ECM == ENABLED
-#   include "./class/CDC/vsf_usbh_CDCECM.h"
+
+#   if VSF_USBH_USE_ECM == ENABLED || VSF_USBH_USE_NCM == ENABLED
+#       include "./class/CDC/vsf_usbh_CDCECM.h"
+#   endif
 #endif
 #if VSF_USBH_USE_BTHCI == ENABLED
 #   include "./class/BTHCI/vsf_usbh_BTHCI.h"

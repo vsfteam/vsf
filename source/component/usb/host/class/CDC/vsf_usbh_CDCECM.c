@@ -20,8 +20,8 @@
 #include "component/usb/vsf_usb_cfg.h"
 
 #if     VSF_USE_USB_HOST == ENABLED                                             \
-    &&  VSF_USBH_USE_ECM == ENABLED                                             \
-    &&  VSF_USE_TCPIP == ENABLED
+    &&  VSF_USE_TCPIP == ENABLED                                                \
+    &&  ((VSF_USBH_USE_ECM == ENABLED) || (VSF_USBH_USE_NCM == ENABLED))
 
 #define __VSF_EDA_CLASS_INHERIT__
 #define __VSF_NETDRV_CLASS_INHERIT_NETLINK__
@@ -34,6 +34,14 @@
 #include "../../vsf_usbh.h"
 #include "./vsf_usbh_CDCECM.h"
 #include "component/tcpip/vsf_tcpip.h"
+
+#include "component/usb/common/class/CDC/vsf_usb_CDC.h"
+#if VSF_USBH_USE_ECM == ENABLED
+#   include "component/usb/common/class/CDC/vsf_usb_CDCECM.h"
+#endif
+#if VSF_USBH_USE_NCM == ENABLED
+#   include "component/usb/common/class/CDC/vsf_usb_CDCNCM.h"
+#endif
 
 /*============================ MACROS ========================================*/
 
@@ -63,6 +71,9 @@
 #   define VSF_USBH_CDCECM_SUPPORT_THREAD   ENABLED
 #endif
 
+#if VSF_USBH_USE_NCM == ENABLED && VSF_USBH_CDCECM_SUPPORT_PBUF != ENABLED
+#   error VSF_USBH_CDCECM_SUPPORT_PBUF is necessary for ncm support
+#endif
 
 #define VSF_USBH_ECM_ETH_HEADER_SIZE        6
 #define VSF_USBH_ECM_MAC_STRING_SIZE        (2 + 2 * 2 * VSF_USBH_ECM_ETH_HEADER_SIZE)
@@ -84,7 +95,7 @@ typedef struct vk_usbh_ecm_iocb_t {
     vk_usbh_urb_t urb;
     int_fast32_t size;
 #if VSF_USBH_CDCECM_SUPPORT_PBUF == ENABLED
-    uint8_t buffer[1500 + TCPIP_ETH_HEADSIZE];
+    uint8_t *buffer;
 #endif
 } vk_usbh_ecm_iocb_t;
 
@@ -105,17 +116,33 @@ typedef struct vk_usbh_ecm_t {
     vk_usbh_ecm_icb_t icb[VSF_USBH_CDCECM_CFG_NUM_OF_ICB];
 
     uint8_t evt[16];
+    uint16_t netbuf_size;
     uint16_t max_segment_size;
     uint8_t iMAC;
     enum {
         VSF_USBH_ECM_INIT_START,
         VSF_USBH_ECM_INIT_WAIT_CRIT,
         VSF_USBH_ECM_INIT_WAIT_MAC,
-        VSF_USBH_ECM_INIT_WAIT_SET_IF1,
+#if VSF_USBH_USE_NCM == ENABLED
+        VSF_USBH_NCM_INIT_WAIT_GET_NTB_PARAMETERS,
+        VSF_USBH_NCM_INIT_WAIT_SET_CRC_MODE,
+        VSF_USBH_NCM_INIT_WAIT_SET_NTB_FORMAT,
+        VSF_USBH_NCM_INIT_WAIT_GET_NTB_INPUT_SIZE,
+#endif
+        VSF_USBH_ECM_INIT_SET_DATA_IFS,
+        VSF_USBH_ECM_INIT_WAIT_SET_DATA_IFS,
         VSF_USBH_ECM_INIT_WAIT_SET_FILTER,
     } init_state;
 #if VSF_USBH_CDCECM_SUPPORT_THREAD == ENABLED
     bool is_connected;
+#endif
+#if VSF_USBH_USE_NCM == ENABLED
+    bool is_ncm;
+    struct {
+        uint16_t bmNetworkCapabilities;
+        uint16_t seq;
+        usb_cdcncm_ntb_param_t *ntb_param;
+    } ncm;
 #endif
 } vk_usbh_ecm_t;
 
@@ -136,9 +163,30 @@ extern void __vk_usbh_libusb_block_dev(vk_usbh_dev_t *dev);
 
 /*============================ LOCAL VARIABLES ===============================*/
 
+#if VSF_USBH_USE_ECM == ENABLED
 static const vk_usbh_dev_id_t __vk_usbh_ecm_dev_id[] = {
     { VSF_USBH_MATCH_IFS_CLASS(USB_CLASS_COMM, 6, 0) },
 };
+#   if VSF_USBH_USE_LIBUSB == ENABLED
+static const vk_usbh_dev_id_t __vk_usbh_ecm_block_libusb_dev_id[] = {
+    { VSF_USBH_MATCH_VID_PID(0x0BDA, 0x8152) },     // RTL8152 series
+    { VSF_USBH_MATCH_VID_PID(0x0BDA, 0x8153) },     // RTL8153 series
+    { VSF_USBH_MATCH_VID_PID(0x0FE6, 0x9900) },     // SR9900 series
+};
+#   endif
+#endif
+
+#if VSF_USBH_USE_NCM == ENABLED
+static const vk_usbh_dev_id_t __vk_usbh_ncm_dev_id[] = {
+    { VSF_USBH_MATCH_IFS_CLASS(USB_CLASS_COMM, 13, 0) },
+};
+#   if VSF_USBH_USE_LIBUSB == ENABLED
+static const vk_usbh_dev_id_t __vk_usbh_ncm_block_libusb_dev_id[] = {
+    { VSF_USBH_MATCH_VID_PID(0x0BDA, 0x8156) },     // RTL8156 series
+    { VSF_USBH_MATCH_VID_PID(0x0BDA, 0x8157) },     // RTL8157 series
+};
+#   endif
+#endif
 
 static const struct vk_netlink_op_t __vk_usbh_ecm_netlink_op =
 {
@@ -148,16 +196,9 @@ static const struct vk_netlink_op_t __vk_usbh_ecm_netlink_op =
     .output     = __vk_usbh_ecm_netlink_output,
 };
 
-#if VSF_USBH_USE_LIBUSB == ENABLED
-static const vk_usbh_dev_id_t __vk_usbh_ecm_block_libusb_dev_id[] = {
-    { VSF_USBH_MATCH_VID_PID(0x0BDA, 0x8152) },     // RTL8152 series
-    { VSF_USBH_MATCH_VID_PID(0x0BDA, 0x8153) },     // RTL8153 series
-    { VSF_USBH_MATCH_VID_PID(0x0FE6, 0x9900) },     // SR9900 series
-};
-#endif
-
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if VSF_USBH_USE_ECM == ENABLED
 const vk_usbh_class_drv_t vk_usbh_ecm_drv = {
     .name       = "cdc_ecm",
     .dev_id_num = dimof(__vk_usbh_ecm_dev_id),
@@ -166,13 +207,33 @@ const vk_usbh_class_drv_t vk_usbh_ecm_drv = {
     .disconnect = __vk_usbh_ecm_disconnect,
 };
 
-#if VSF_USBH_USE_LIBUSB == ENABLED
+#   if VSF_USBH_USE_LIBUSB == ENABLED
 const vk_usbh_class_drv_t vk_usbh_ecm_block_libusb_drv = {
     .name       = "cdc_ecm_block_libusb",
     .dev_id_num = dimof(__vk_usbh_ecm_block_libusb_dev_id),
     .dev_ids    = __vk_usbh_ecm_block_libusb_dev_id,
     .probe      = __vk_usbh_ecm_block_libusb_probe,
 };
+#   endif
+#endif
+
+#if VSF_USBH_USE_NCM == ENABLED
+const vk_usbh_class_drv_t vk_usbh_ncm_drv = {
+    .name       = "cdc_ncm",
+    .dev_id_num = dimof(__vk_usbh_ncm_dev_id),
+    .dev_ids    = __vk_usbh_ncm_dev_id,
+    .probe      = __vk_usbh_ecm_probe,
+    .disconnect = __vk_usbh_ecm_disconnect,
+};
+
+#   if VSF_USBH_USE_LIBUSB == ENABLED
+const vk_usbh_class_drv_t vk_usbh_ncm_block_libusb_drv = {
+    .name       = "cdc_ncm_block_libusb",
+    .dev_id_num = dimof(__vk_usbh_ncm_block_libusb_dev_id),
+    .dev_ids    = __vk_usbh_ncm_block_libusb_dev_id,
+    .probe      = __vk_usbh_ecm_block_libusb_probe,
+};
+#   endif
 #endif
 
 /*============================ PROTOTYPES ====================================*/
@@ -230,7 +291,7 @@ static void __vk_usbh_ecm_recv(vk_usbh_ecm_t *ecm, vk_usbh_ecm_icb_t *icb)
         }
 
 #if VSF_USBH_CDCECM_SUPPORT_PBUF == ENABLED
-        vk_usbh_urb_set_buffer(&icb->urb, icb->buffer, sizeof(icb->buffer));
+        vk_usbh_urb_set_buffer(&icb->urb, icb->buffer, ecm->netbuf_size);
 #else
         vsf_mem_t mem;
         void *netbuf = vk_netdrv_read_buf(&ecm->netdrv, icb->netbuf, &mem);
@@ -285,10 +346,32 @@ static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *slot, v
 
     VSF_USB_ASSERT(ocb != NULL);
     ocb->netbuf = netbuf;
+
 #if VSF_USBH_CDCECM_SUPPORT_PBUF == ENABLED
+
+#if VSF_USBH_USE_NCM == ENABLED
+    usb_cdcncm_nth_t *nth = (usb_cdcncm_nth_t *)ocb->buffer;
+    usb_cdcncm_ndp_t *ndp = (usb_cdcncm_ndp_t *)(ocb->buffer + USB_CDCNCM_NTH16_LEN);
+    if (ecm->data_protocol == 1) {
+        nth->nth16.dwSignature = __constant_cpu_to_le32(USB_CDCNCM_NTH16_SIG);
+        nth->nth16.wHeaderLength = __constant_cpu_to_le16(USB_CDCNCM_NTH16_LEN);
+        nth->nth16.wSequence = cpu_to_le16(ecm->ncm.seq);
+        ecm->ncm.seq++;
+        nth->nth16.wNdpIndex = cpu_to_le16(12);
+
+        ndp->ndp16.dwSignature = __constant_cpu_to_le32(USB_CDCNCM_NDP16_SIG_NOCRC);
+        ndp->ndp16.wLength = __constant_cpu_to_le16(16);
+        ndp->ndp16.dwNextNdpIndex = 0;
+        pos = 32;
+        ndp->ndp16.indexes[0].wDatagramIndex = le16_to_cpu(pos);
+        ndp->ndp16.indexes[1].wDatagramIndex = 0;
+        ndp->ndp16.indexes[1].wDatagramLength = 0;
+    }
+#endif
+
     void *netbuf_tmp = vk_netdrv_read_buf(netdrv, netbuf, &mem);
     while (true) {
-        VSF_USB_ASSERT((mem.size + pos) <= sizeof(ocb->buffer));
+        VSF_USB_ASSERT((mem.size + pos) <= ecm->netbuf_size);
         memcpy(&ocb->buffer[pos], mem.buffer, mem.size);
         pos += mem.size;
 
@@ -297,6 +380,12 @@ static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *slot, v
         }
         netbuf_tmp = vk_netdrv_read_buf(netdrv, netbuf_tmp, &mem);
     }
+#if VSF_USBH_USE_NCM == ENABLED
+    if (ecm->data_protocol == 1) {
+        nth->nth16.wBlockLength = cpu_to_le16(pos);
+        ndp->ndp16.indexes[0].wDatagramLength = cpu_to_le16(pos - 32);
+    }
+#endif
     mem.buffer = ocb->buffer;
     mem.size = pos;
 #else
@@ -306,7 +395,7 @@ static vsf_err_t __vk_usbh_ecm_netlink_output(vk_netdrv_t *netdrv, void *slot, v
 #endif
 
 #if VSF_USBH_CDCECM_CFG_TRACE_DATA_EN == ENABLED
-    vsf_trace_debug("ecm_output :" VSF_TRACE_CFG_LINEEND);
+    vsf_trace_debug("cdc_network_output :" VSF_TRACE_CFG_LINEEND);
     vsf_trace_buffer(VSF_TRACE_DEBUG, mem.buffer, mem.size, VSF_TRACE_DF_DEFAULT);
 #endif
     vk_usbh_urb_set_buffer(&ocb->urb, mem.buffer, mem.size);
@@ -409,13 +498,26 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
         }
         break;
     case VSF_USBH_CDC_ON_DESC: {
-            usb_cdc_ecm_descriptor_t *ecm_desc = param;
-
-            switch (ecm_desc->bDescriptorSubType) {
-            case 0x0F:        // Ethernet Networking Functional Descriptor
-                ecm->iMAC = ecm_desc->iMACAddress;
-                ecm->max_segment_size = le16_to_cpu(ecm_desc->wMaxSegmentSize);
+            usb_class_interface_desc_t *ifs_desc = param;
+            switch (ifs_desc->bDescriptorSubType) {
+            case USB_CDCDESC_ETHERNET: {
+                    usb_cdc_ethernet_descriptor_t *ethernet_desc = param;
+                    ecm->iMAC = ethernet_desc->iMACAddress;
+                    ecm->max_segment_size = le16_to_cpu(ethernet_desc->wMaxSegmentSize);
+                }
                 break;
+#if VSF_USBH_USE_NCM == ENABLED
+            case USB_CDCDESC_NCM: {
+                    if (ifs_desc->bLength < sizeof(usb_cdc_ncm_descriptor_t)) {
+                        break;
+                    }
+                    usb_cdc_ncm_descriptor_t *ncm_desc = param;
+                    ecm->ncm.bmNetworkCapabilities = ncm_desc->bmNetworkCapabilities;
+                }
+                break;
+            case USB_CDCDESC_MBIM:
+                break;
+#endif
             }
         }
         break;
@@ -430,7 +532,7 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
                 bool connected = vk_netdrv_is_connected(netdrv);
 #endif
                 if (connected && ecm->evt[2] == 0) {
-                    vsf_trace_info("ecm_event: NETWORK_CONNECTION Disconnected" VSF_TRACE_CFG_LINEEND);
+                    vsf_trace_info("cdc_network_event: NETWORK_CONNECTION Disconnected" VSF_TRACE_CFG_LINEEND);
 
 #if VSF_USBH_CDCECM_SUPPORT_THREAD == ENABLED
                     if (vk_netdrv_feature(netdrv) & VSF_NETDRV_FEATURE_THREAD) {
@@ -440,7 +542,7 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
 #endif
                         __vk_usbh_ecm_netdrv_evthandler(ecm, VSF_USBH_CDCECM_ON_CONNECT, NULL);
                 } else if (!connected && (ecm->evt[2] != 0)) {
-                    vsf_trace_info("ecm_event: NETWORK_CONNECTION Connected" VSF_TRACE_CFG_LINEEND);
+                    vsf_trace_info("cdc_network_event: NETWORK_CONNECTION Connected" VSF_TRACE_CFG_LINEEND);
                     vk_netdrv_prepare(netdrv);
 
 #if VSF_USBH_CDCECM_SUPPORT_THREAD == ENABLED
@@ -457,10 +559,10 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
             }
             break;
         case 0x2A:            // CONNECTION_SPEED_CHANGE
-//            vsf_trace_info("ecm_event: CONNECTION_SPEED_CHANGE" VSF_TRACE_CFG_LINEEND);
+//            vsf_trace_info("cdc_network_event: CONNECTION_SPEED_CHANGE" VSF_TRACE_CFG_LINEEND);
             break;
         default:
-            vsf_trace_error("ecm_event: unknown(%d)" VSF_TRACE_CFG_LINEEND, ecm->evt[0]);
+            vsf_trace_error("cdc_network_event: unknown(%d)" VSF_TRACE_CFG_LINEEND, ecm->evt[0]);
             break;
         }
         break;
@@ -475,19 +577,41 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
             }
 
             if (size > 0) {
+                void *netbuf = icb->netbuf;
+                uint8_t *buffer = icb->buffer;
                 vsf_mem_t mem;
+                size_t cur_size;
+
+#if VSF_USBH_USE_NCM == ENABLED
+                if (ecm->data_protocol == 1) {
+                    usb_cdcncm_nth_t *nth = (usb_cdcncm_nth_t *)buffer;
+                    usb_cdcncm_ndp_t *ndp;
+
+                    bool is16 = *(char *)nth == 'N';
+                    if (is16) {
+                        ndp = (usb_cdcncm_ndp_t *)(buffer + nth->nth16.wNdpIndex);
+                    } else {
+                        ndp = (usb_cdcncm_ndp_t *)(buffer + nth->nth32.dwNdpIndex);
+                    }
+
+                    is16 = *(char *)ndp == 'N';
+                    if (is16) {
+                        buffer += ndp->ndp16.indexes[0].wDatagramIndex;
+                        size = ndp->ndp16.indexes[0].wDatagramLength;
+                    } else {
+                        buffer += ndp->ndp32.indexes[0].dwDatagramIndex;
+                        size = ndp->ndp32.indexes[0].dwDatagramLength;
+                    }
+                }
+#endif
 
 #if VSF_USBH_CDCECM_SUPPORT_PBUF == ENABLED
-                void *netbuf = icb->netbuf;
-                uint_fast32_t remain = size;
-                size_t cur_size;
-                uint8_t *buffer = icb->buffer;
-
 #   if VSF_USBH_CDCECM_CFG_TRACE_DATA_EN == ENABLED
-                vsf_trace_debug("ecm_input :" VSF_TRACE_CFG_LINEEND);
-                vsf_trace_buffer(VSF_TRACE_DEBUG, buffer, remain, VSF_TRACE_DF_DEFAULT);
+                vsf_trace_debug("cdc_network_input :" VSF_TRACE_CFG_LINEEND);
+                vsf_trace_buffer(VSF_TRACE_DEBUG, buffer, size, VSF_TRACE_DF_DEFAULT);
 #   endif
 
+                uint_fast32_t remain = size;
                 do {
                     netbuf = vk_netdrv_read_buf(netdrv, netbuf, &mem);
                     cur_size = vsf_min(mem.size, remain);
@@ -496,10 +620,10 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
                     buffer += cur_size;
                 } while ((netbuf != NULL) && (remain > 0));
 #else
-                if (!vk_netdrv_read_buf(netdrv, icb->netbuf, &mem)) {
+                if (!vk_netdrv_read_buf(netdrv, netbuf, &mem)) {
 #   if VSF_USBH_CDCECM_CFG_TRACE_DATA_EN == ENABLED
-                    vsf_trace_debug("ecm_input :" VSF_TRACE_CFG_LINEEND);
-                    vsf_trace_buffer(VSF_TRACE_DEBUG, mem.buffer, size, VSF_TRACE_DF_DEFAULT);
+                    vsf_trace_debug("cdc_network_input :" VSF_TRACE_CFG_LINEEND);
+                    vsf_trace_buffer(VSF_TRACE_DEBUG, buffer, size, VSF_TRACE_DF_DEFAULT);
 #   endif
                 }
 #endif
@@ -546,6 +670,71 @@ static vsf_err_t __vk_usbh_ecm_set_filter(vk_usbh_ecm_t *ecm, uint_fast16_t filt
     return vk_usbh_control_msg(ecm->usbh, ecm->dev, &req);
 }
 
+#if VSF_USBH_USE_NCM == ENABLED
+static vsf_err_t __vk_usbh_ncm_get_ntb_param(vk_usbh_ecm_t *ncm)
+{
+    struct usb_ctrlrequest_t req = {
+        .bRequestType    =  USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_IN,
+        .bRequest        =  USB_CDCNCM_REQ_GET_NTB_PARAMETERS,
+        .wValue          =  0,
+        .wIndex          =  ncm->ifs->no,
+        .wLength         =  sizeof(usb_cdcncm_ntb_param_t),
+    };
+    return vk_usbh_control_msg(ncm->usbh, ncm->dev, &req);
+}
+
+static vsf_err_t __vk_usbh_ncm_set_crcmode(vk_usbh_ecm_t *ncm, bool on)
+{
+    struct usb_ctrlrequest_t req = {
+        .bRequestType    =  USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_OUT,
+        .bRequest        =  0x8A,       // SET_CRC_MODE
+        .wValue          =  !!on,
+        .wIndex          =  ncm->ifs->no,
+        .wLength         =  0,
+    };
+    return vk_usbh_control_msg(ncm->usbh, ncm->dev, &req);
+}
+
+static vsf_err_t __vk_usbh_ncm_set_ntbformat(vk_usbh_ecm_t *ncm, uint8_t ntb_format)
+{
+    struct usb_ctrlrequest_t req = {
+        .bRequestType    =  USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_OUT,
+        .bRequest        =  0x84,       // SET_NTB_FORMAT
+        .wValue          =  ntb_format,
+        .wIndex          =  ncm->ifs->no,
+        .wLength         =  0,
+    };
+    return vk_usbh_control_msg(ncm->usbh, ncm->dev, &req);
+}
+
+static vsf_err_t __vk_usbh_ncm_get_ntb_input_size(vk_usbh_ecm_t *ncm)
+{
+    struct usb_ctrlrequest_t req = {
+        .bRequestType    =  USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_IN,
+        .bRequest        =  0x85,       // GET_NTB_INPUT_SIZE
+        .wValue          =  0,
+        .wIndex          =  ncm->ifs->no,
+        .wLength         =  8,
+    };
+    return vk_usbh_control_msg(ncm->usbh, ncm->dev, &req);
+}
+
+static vsf_err_t __vk_usbh_ncm_set_ntb_input_size(vk_usbh_ecm_t *ncm, void *data)
+{
+    struct usb_ctrlrequest_t req = {
+        .bRequestType    =  USB_TYPE_CLASS | USB_RECIP_INTERFACE | USB_DIR_OUT,
+        .bRequest        =  0x86,       // SET_NTB_INPUT_SIZE
+        .wValue          =  0,
+        .wIndex          =  ncm->ifs->no,
+        .wLength         =  8,
+    };
+    if (data != NULL) {
+        vk_usbh_urb_set_buffer(&ncm->dev->ep0.urb, data, 8);
+    }
+    return vk_usbh_control_msg(ncm->usbh, ncm->dev, &req);
+}
+#endif
+
 static void __vk_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vk_usbh_cdc_t *cdc = vsf_container_of(eda, vk_usbh_cdc_t, eda);
@@ -554,6 +743,7 @@ static void __vk_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     vk_usbh_t *usbh = cdc->usbh;
     vk_usbh_urb_t *urb = &dev->ep0.urb;
     vsf_err_t err = VSF_ERR_NONE;
+    uint8_t *urb_buffer;
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -585,23 +775,75 @@ static void __vk_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 break;
             }
 
-            {
-                char *str = (char *)vk_usbh_urb_take_buffer(urb) + 2;
-                for (uint_fast8_t i = 0; i < VSF_USBH_ECM_ETH_HEADER_SIZE; i++, str += 4) {
-                    ecm->netdrv.macaddr.addr_buf[i] = (vsf_usb_hex_to_bin(str[0]) << 4) | (vsf_usb_hex_to_bin(str[2]) << 0);
-                }
-                ecm->netdrv.macaddr.size = VSF_USBH_ECM_ETH_HEADER_SIZE;
+            urb_buffer = vk_usbh_urb_peek_buffer(urb) + 2;
+            for (uint_fast8_t i = 0; i < VSF_USBH_ECM_ETH_HEADER_SIZE; i++, urb_buffer += 4) {
+                ecm->netdrv.macaddr.addr_buf[i] = (vsf_usb_hex_to_bin(urb_buffer[0]) << 4) | (vsf_usb_hex_to_bin(urb_buffer[2]) << 0);
             }
+            ecm->netdrv.macaddr.size = VSF_USBH_ECM_ETH_HEADER_SIZE;
             vk_usbh_urb_free_buffer(urb);
 
-            vsf_trace_info("cdc_cdc: MAC is %02X:%02X:%02X:%02X:%02X:%02X" VSF_TRACE_CFG_LINEEND,
+            vsf_trace_info("cdc_network: MAC is %02X:%02X:%02X:%02X:%02X:%02X" VSF_TRACE_CFG_LINEEND,
                     ecm->netdrv.macaddr.addr_buf[0], ecm->netdrv.macaddr.addr_buf[1],
                     ecm->netdrv.macaddr.addr_buf[2], ecm->netdrv.macaddr.addr_buf[3],
                     ecm->netdrv.macaddr.addr_buf[4], ecm->netdrv.macaddr.addr_buf[5]);
 
+#if VSF_USBH_USE_NCM == ENABLED
+            if (ecm->is_ncm) {
+                err = __vk_usbh_ncm_get_ntb_param(ecm);
+            } else
+#endif
+            {
+                ecm->init_state = VSF_USBH_ECM_INIT_SET_DATA_IFS;
+                goto __set_data_ifs;
+            }
+            break;
+#if VSF_USBH_USE_NCM == ENABLED
+        case VSF_USBH_NCM_INIT_WAIT_GET_NTB_PARAMETERS:
+            if (vk_usbh_urb_get_actual_length(urb) != sizeof(usb_cdcncm_ntb_param_t)) {
+                err = VSF_ERR_FAIL;
+                break;
+            }
+
+            ecm->ncm.ntb_param = vk_usbh_urb_take_buffer(urb);
+            ecm->ncm.ntb_param->bmNtbFormatsSupported = le16_to_cpu(ecm->ncm.ntb_param->bmNtbFormatsSupported);
+            ecm->ncm.ntb_param->dwNtbInMaxSize = le32_to_cpu(ecm->ncm.ntb_param->dwNtbInMaxSize);
+            ecm->ncm.ntb_param->wNdpInDivisor = le16_to_cpu(ecm->ncm.ntb_param->wNdpInDivisor);
+            ecm->ncm.ntb_param->wNdpInPayloadRemainder = le16_to_cpu(ecm->ncm.ntb_param->wNdpInPayloadRemainder);
+            ecm->ncm.ntb_param->wNdpInAlignment = le16_to_cpu(ecm->ncm.ntb_param->wNdpInAlignment);
+            ecm->ncm.ntb_param->dwNtbOutMaxSize = le32_to_cpu(ecm->ncm.ntb_param->dwNtbOutMaxSize);
+            ecm->ncm.ntb_param->wNdpOutDivisor = le16_to_cpu(ecm->ncm.ntb_param->wNdpOutDivisor);
+            ecm->ncm.ntb_param->wNdpOutAlignment = le16_to_cpu(ecm->ncm.ntb_param->wNdpOutAlignment);
+            ecm->ncm.ntb_param->wNtbOutMaxDatagrams = le16_to_cpu(ecm->ncm.ntb_param->wNtbOutMaxDatagrams);
+            if (ecm->ncm.bmNetworkCapabilities & USB_CDCNCM_CAP_CrcMode) {
+                err = __vk_usbh_ncm_set_crcmode(ecm, false);
+                break;
+            }
+            ecm->init_state++;
+            // fall through
+        case VSF_USBH_NCM_INIT_WAIT_SET_CRC_MODE:
+            if (ecm->ncm.ntb_param->bmNtbFormatsSupported & USB_CDCNCM_NTB32) {
+                err = __vk_usbh_ncm_set_ntbformat(ecm, USB_CDCNCM_NTB16);
+                break;
+            }
+            ecm->init_state++;
+            // fall through
+        case VSF_USBH_NCM_INIT_WAIT_SET_NTB_FORMAT:
+            err = __vk_usbh_ncm_get_ntb_input_size(ecm);
+            break;
+        case VSF_USBH_NCM_INIT_WAIT_GET_NTB_INPUT_SIZE:
+            urb_buffer = vk_usbh_urb_peek_buffer(urb);
+            *(uint32_t *)urb_buffer = cpu_to_le32(2048);
+            ecm->ncm.ntb_param->dwNtbInMaxSize = 2048;
+            urb_buffer[4] = 1;
+            urb_buffer[5] = 0;
+            err = __vk_usbh_ncm_set_ntb_input_size(ecm, NULL);
+            break;
+#endif
+        case VSF_USBH_ECM_INIT_SET_DATA_IFS:
+        __set_data_ifs:
             err = vk_usbh_set_interface(usbh, dev, cdc->data_ifs, 1);
             break;
-        case VSF_USBH_ECM_INIT_WAIT_SET_IF1:
+        case VSF_USBH_ECM_INIT_WAIT_SET_DATA_IFS:
             err = __vk_usbh_ecm_set_filter(ecm, 0x0E);
             break;
         case VSF_USBH_ECM_INIT_WAIT_SET_FILTER:
@@ -609,6 +851,18 @@ static void __vk_usbh_ecm_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
             ecm->netdrv.netlink.op = &__vk_usbh_ecm_netlink_op;
             vsf_pnp_on_netdrv_new(&ecm->netdrv);
+
+            ecm->netbuf_size =
+#if VSF_USBH_USE_NCM == ENABLED
+                        ecm->is_ncm ? ecm->ncm.ntb_param->dwNtbInMaxSize :
+#endif
+                        ecm->max_segment_size;
+            for (int i = 0; i < dimof(ecm->icb); i++) {
+                ecm->icb[i].buffer = vsf_usbh_malloc(ecm->netbuf_size);
+            }
+            for (int i = 0; i < dimof(ecm->ocb); i++) {
+                ecm->ocb[i].buffer = vsf_usbh_malloc(ecm->netbuf_size);
+            }
 
             eda->fn.evthandler = vk_usbh_cdc_evthandler;
             vsf_eda_post_evt(eda, VSF_EVT_INIT);
@@ -654,7 +908,17 @@ static void *__vk_usbh_ecm_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_if
         cdc->evthandler = __vk_usbh_ecm_on_cdc_evt;
         cdc->evt_buffer = ecm->evt;
         cdc->evt_size = sizeof(ecm->evt);
-        if (VSF_ERR_NONE != vk_usbh_cdc_init(cdc, usbh, dev, parser_ifs)) {
+#if VSF_USBH_USE_NCM == ENABLED
+        ecm->ncm.seq = 0;
+        ecm->is_ncm =   (parser_ifs->id >= &__vk_usbh_ncm_dev_id[0])
+                    &&  (parser_ifs->id <= &__vk_usbh_ncm_dev_id[dimof(__vk_usbh_ncm_dev_id) - 1]);
+#endif
+        if (    (VSF_ERR_NONE != vk_usbh_cdc_init(cdc, usbh, dev, parser_ifs))
+            ||  (   (cdc->data_protocol != 0)
+#if VSF_USBH_USE_NCM == ENABLED
+                 && (cdc->data_protocol != 1)
+#endif
+                )) {
             vsf_usbh_free(ecm);
             ecm = NULL;
         } else {
@@ -678,9 +942,17 @@ static void __vk_usbh_ecm_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *
     vk_usbh_ecm_t *ecm = (vk_usbh_ecm_t *)param;
 
     for (int i = 0; i < dimof(ecm->icb); i++) {
+        if (ecm->icb[i].buffer != NULL) {
+            vsf_usbh_free(ecm->icb[i].buffer);
+            ecm->icb[i].buffer = NULL;
+        }
         vk_usbh_cdc_free_urb(&ecm->use_as__vk_usbh_cdc_t, &ecm->icb[i].urb);
     }
     for (int i = 0; i < dimof(ecm->ocb); i++) {
+        if (ecm->ocb[i].buffer != NULL) {
+            vsf_usbh_free(ecm->ocb[i].buffer);
+            ecm->ocb[i].buffer = NULL;
+        }
         vk_usbh_cdc_free_urb(&ecm->use_as__vk_usbh_cdc_t, &ecm->ocb[i].urb);
     }
 

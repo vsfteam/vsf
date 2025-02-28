@@ -38,6 +38,13 @@ typedef enum usb_cdc_req_t {
     USB_CDCREQ_CLEAR_COMM_FEATURE           = 0x04,
 } usb_cdc_req_t;
 
+typedef enum usb_cdc_desc_type_t {
+    USB_CDCDESC_ETHERNET                    = 0x0F,
+    USB_CDCDESC_NCM                         = 0x1A,
+    USB_CDCDESC_MBIM                        = 0x1B,
+    USB_CDCDESC_MBIM_EXT                    = 0x1C,
+} usb_cdc_desc_type_t;
+
 typedef struct usb_cdc_union_descriptor_t usb_cdc_union_descriptor_t;
 struct usb_cdc_union_descriptor_t {
     uint8_t bLength;
@@ -48,8 +55,8 @@ struct usb_cdc_union_descriptor_t {
     uint8_t bSubordinateInterface[1];
 } VSF_CAL_PACKED;
 
-typedef struct usb_cdc_ecm_descriptor_t usb_cdc_ecm_descriptor_t;
-struct usb_cdc_ecm_descriptor_t {
+typedef struct usb_cdc_ethernet_descriptor_t usb_cdc_ethernet_descriptor_t;
+struct usb_cdc_ethernet_descriptor_t {
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubType;
