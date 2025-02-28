@@ -2110,7 +2110,7 @@ ssize_t sendfile(int out_fd, int in_fd, off_t *offset, size_t count)
 off64_t lseek64(int fd, off64_t offset, int whence)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
-    if (sfd->op != &__vsf_linux_fs_fdop) {
+    if ((NULL == sfd) || (sfd->op != &__vsf_linux_fs_fdop)) {
         return (off64_t)-1;
     }
 
