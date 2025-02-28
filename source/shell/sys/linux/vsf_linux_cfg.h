@@ -279,6 +279,9 @@
 #   ifndef VSF_LINUX_APPLET_USE_SYS_TIMES
 #       define VSF_LINUX_APPLET_USE_SYS_TIMES   ENABLED
 #   endif
+#   ifndef VSF_LINUX_APPLET_USE_SYS_TIMEB
+#       define VSF_LINUX_APPLET_USE_SYS_TIMEB   ENABLED
+#   endif
 #   ifndef VSF_LINUX_APPLET_USE_SYS_STATFS
 #       define VSF_LINUX_APPLET_USE_SYS_STATFS  ENABLED
 #   endif
@@ -468,7 +471,7 @@ typedef struct vsf_linux_vplt_t {
     void *sys_sem_vplt;
     void *sys_ioctl_vplt;
     void *sys_xattr_vplt;
-    void *sys_res0_vplt;
+    void *sys_timeb_vplt;
     void *sys_res1_vplt;
     void *sys_res2_vplt;
     void *sys_res3_vplt;

@@ -52,6 +52,7 @@
 #   include "./include/sys/resource.h"
 #   include "./include/sys/sysinfo.h"
 #   include "./include/sys/xattr.h"
+#   include "./include/sys/timeb.h"
 #   include "./include/fcntl.h"
 #   include "./include/errno.h"
 #   include "./include/termios.h"
@@ -87,6 +88,7 @@
 #   include <sys/resource.h>
 #   include <sys/sysinfo.h>
 #   include <sys/xattr.h>
+#   include <sys/timeb.h>
 #   include <fcntl.h>
 #   include <errno.h>
 #   include <termios.h>
@@ -3374,6 +3376,22 @@ clock_t times(struct tms *buf)
     return (clock_t)(vsf_systimer_get_tick() * sysconf(_SC_CLK_TCK) / vsf_systimer_get_freq());
 }
 
+// sys/timeb.h
+
+int ftime(struct timeb *timebuf)
+{
+    if (timebuf != NULL) {
+        struct timeval tv;
+        gettimeofday(&tv, NULL);
+
+        timebuf->time = tv.tv_sec;
+        timebuf->millitm = tv.tv_usec / 1000;
+        timebuf->timezone = 0;
+        timebuf->dstflag = 0;
+    }
+    return 0;
+}
+
 // sys/reboot.h
 
 int reboot(int howto)
@@ -4788,6 +4806,14 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_times_vplt_t vsf_linux_sys_times_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(times),
 };
 #endif
+
+#if VSF_LINUX_APPLET_USE_SYS_TIMEB == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_sys_timeb_vplt_t vsf_linux_sys_timeb_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_sys_timeb_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(ftime),
+};
+#endif
 #endif
 
 #if VSF_LINUX_APPLET_USE_SYS_TIMEX == ENABLED && !defined(__VSF_APPLET__)
@@ -5406,6 +5432,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #   endif
 #   if VSF_LINUX_APPLET_USE_SYS_TIMES == ENABLED
     .sys_times_vplt     = (void *)&vsf_linux_sys_times_vplt,
+#   endif
+#   if VSF_LINUX_APPLET_USE_SYS_TIMEB == ENABLED
+    .sys_timeb_vplt     = (void *)&vsf_linux_sys_timeb_vplt,
 #   endif
 #endif
 #if VSF_LINUX_APPLET_USE_SYS_WAIT == ENABLED
