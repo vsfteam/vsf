@@ -578,11 +578,17 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
 
             if (size > 0) {
                 void *netbuf = icb->netbuf;
-                uint8_t *buffer = icb->buffer;
                 vsf_mem_t mem;
-                size_t cur_size;
 
-#if VSF_USBH_USE_NCM == ENABLED
+#if VSF_USBH_CDCECM_SUPPORT_PBUF == ENABLED
+                uint8_t *buffer = icb->buffer;
+
+#   if VSF_USBH_CDCECM_CFG_TRACE_DATA_EN == ENABLED
+                vsf_trace_debug("cdc_network_input :" VSF_TRACE_CFG_LINEEND);
+                vsf_trace_buffer(VSF_TRACE_DEBUG, buffer, size, VSF_TRACE_DF_DEFAULT);
+#   endif
+
+#   if VSF_USBH_USE_NCM == ENABLED
                 if (ecm->data_protocol == 1) {
                     usb_cdcncm_nth_t *nth = (usb_cdcncm_nth_t *)buffer;
                     usb_cdcncm_ndp_t *ndp;
@@ -603,15 +609,10 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
                         size = ndp->ndp32.indexes[0].dwDatagramLength;
                     }
                 }
-#endif
-
-#if VSF_USBH_CDCECM_SUPPORT_PBUF == ENABLED
-#   if VSF_USBH_CDCECM_CFG_TRACE_DATA_EN == ENABLED
-                vsf_trace_debug("cdc_network_input :" VSF_TRACE_CFG_LINEEND);
-                vsf_trace_buffer(VSF_TRACE_DEBUG, buffer, size, VSF_TRACE_DF_DEFAULT);
 #   endif
 
                 uint_fast32_t remain = size;
+                size_t cur_size;
                 do {
                     netbuf = vk_netdrv_read_buf(netdrv, netbuf, &mem);
                     cur_size = vsf_min(mem.size, remain);
@@ -623,7 +624,7 @@ static vsf_err_t __vk_usbh_ecm_on_cdc_evt(vk_usbh_cdc_t *cdc, vk_usbh_cdc_evt_t 
                 if (!vk_netdrv_read_buf(netdrv, netbuf, &mem)) {
 #   if VSF_USBH_CDCECM_CFG_TRACE_DATA_EN == ENABLED
                     vsf_trace_debug("cdc_network_input :" VSF_TRACE_CFG_LINEEND);
-                    vsf_trace_buffer(VSF_TRACE_DEBUG, buffer, size, VSF_TRACE_DF_DEFAULT);
+                    vsf_trace_buffer(VSF_TRACE_DEBUG, mem.buffer, size, VSF_TRACE_DF_DEFAULT);
 #   endif
                 }
 #endif
