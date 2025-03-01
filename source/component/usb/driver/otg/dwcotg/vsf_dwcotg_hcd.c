@@ -123,8 +123,10 @@ typedef struct vk_dwcotg_hcd_urb_t {
 
 #ifdef VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE
     uint32_t buffer[VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE / sizeof(uint32_t)];
-    void *orig_buffer;
+#else
+    void *buffer;
 #endif
+    void *orig_buffer;
 } vk_dwcotg_hcd_urb_t;
 
 typedef union vk_dwcotg_fifo_status_t {
@@ -377,13 +379,15 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
         } else {
             is_addr_valid = true;
         }
-#ifndef VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE
-        VSF_USB_ASSERT(!((uintptr_t)buffer & 0x03));
-        VSF_USB_ASSERT(is_addr_valid);
-        channel_regs->hcdma = (uint32_t)buffer;
-#else
+
         if (((uintptr_t)buffer & 0x03) || !is_addr_valid) {
+#ifdef VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE
             VSF_USB_ASSERT(size <= sizeof(dwcotg_urb->buffer));
+#else
+            VSF_USB_ASSERT((NULL == dwcotg_urb->buffer) && (NULL == dwcotg_urb->orig_buffer));
+            dwcotg_urb->buffer = vsf_usbh_malloc(size);
+            VSF_USB_ASSERT(dwcotg_urb->buffer != NULL);
+#endif
             if (!pipe.dir_in1out0) {
                 memcpy(&dwcotg_urb->buffer, buffer, size);
             }
@@ -392,7 +396,6 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
         } else {
             channel_regs->hcdma = (uint32_t)buffer;
         }
-#endif
     }
 
     channel_regs->hcchar |= ((dwcotg_hcd->reg.host.global_regs->hfnum & 1) ^ 1) << 29;
@@ -960,12 +963,16 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
         urb_fail:
             urb->status = URB_FAIL;
         urb_done:
-#ifdef VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE
-            if (urb->pipe.dir_in1out0 && (dwcotg_urb->orig_buffer != NULL)) {
-                memcpy(dwcotg_urb->orig_buffer, dwcotg_urb->buffer, urb->transfer_length);
+            if (dwcotg_urb->orig_buffer != NULL) {
+                if (urb->pipe.dir_in1out0) {
+                    memcpy(dwcotg_urb->orig_buffer, dwcotg_urb->buffer, urb->transfer_length);
+                }
                 dwcotg_urb->orig_buffer = NULL;
-            }
+#ifndef VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE
+                vsf_usbh_free(dwcotg_urb->buffer);
+                dwcotg_urb->buffer = NULL;
 #endif
+            }
             urb->pipe.last_frame = dwcotg_hcd->reg.host.global_regs->hfnum & 0xFFFF;
             is_to_notify = true;
         } else if (channel_intsts & (USB_OTG_HCINT_XFRC | USB_OTG_HCINT_STALL)) {
