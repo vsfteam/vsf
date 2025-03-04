@@ -216,6 +216,9 @@ char *vsf_json_get(const char *json, const char *key)
             if (e.type == VSF_JSON_TYPE_ARRAY) {
                 if (curidx++ == idx) {
                     json = cur;
+                    if (*key) {
+                        key++;
+                    }
                     break;
                 }
             } else {
