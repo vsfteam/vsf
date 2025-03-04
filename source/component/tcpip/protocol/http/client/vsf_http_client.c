@@ -95,7 +95,7 @@ User-Agent: %s\r\n\
 Connection: close\r\n\
 Content-Length: %d\r\n\
 %s\
-\r\n", NULL == req->verb ? "POST" : req->verb, req->path, req->host, "vsf", (int)req->txdata_len, req->txdata);
+\r\n", NULL == req->verb ? "POST" : req->verb, req->path, req->host, "vsf", (int)req->txdata_len, req->header);
         vsf_http_trace("http request:\n%s", http->buffer);
     } else {
         result = sprintf((char *)http->buffer, "\
