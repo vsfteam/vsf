@@ -172,6 +172,9 @@ read_more:
             }
             continue;
         }
+        if (req->on_response_header != NULL) {
+            req->on_response_header(http, req, line);
+        }
         if (*line == '\0' || *line == '\r') {
             break;
         }

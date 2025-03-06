@@ -34,6 +34,8 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+vsf_declare_class(vsf_http_client_t)
+
 vsf_class(vsf_http_op_t) {
     protected_member(
         int (*fn_connect)(void *param, const char *host, const char *port);
@@ -43,7 +45,8 @@ vsf_class(vsf_http_op_t) {
     )
 };
 
-typedef struct vsf_http_client_req_t {
+typedef struct vsf_http_client_req_t vsf_http_client_req_t;
+struct vsf_http_client_req_t {
     const char *host;
     const char *port;
     const char *verb;
@@ -54,7 +57,10 @@ typedef struct vsf_http_client_req_t {
 
     uint8_t *txdata;
     size_t txdata_len;
-} vsf_http_client_req_t;
+
+    // IMPORTANT: line is NULL terminated string ending with \r
+    void (*on_response_header)(vsf_http_client_t *http, vsf_http_client_req_t *req, char *line);
+};
 
 vsf_class(vsf_http_client_t) {
     public_member(
