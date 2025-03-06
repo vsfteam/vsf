@@ -47,6 +47,7 @@ typedef struct vsf_http_client_req_t {
     const char *host;
     const char *port;
     const char *verb;
+    const char *connect_mode;
 
     char *header;
     char *path;
@@ -86,5 +87,6 @@ extern void vsf_http_client_close(vsf_http_client_t *http);
 extern void vsf_http_client_init(vsf_http_client_t *http);
 extern int vsf_http_client_request(vsf_http_client_t *http, vsf_http_client_req_t *req);
 extern int vsf_http_client_read(vsf_http_client_t *http, uint8_t *buf, uint16_t len);
+extern int vsf_http_client_write(vsf_http_client_t *http, uint8_t *buf, uint16_t len);
 
 #endif      // __VSF_HTTP_CLIENT_H__

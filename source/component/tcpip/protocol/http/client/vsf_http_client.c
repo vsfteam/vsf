@@ -86,25 +86,28 @@ int vsf_http_client_request(vsf_http_client_t *http, vsf_http_client_req_t *req)
     if (NULL == req->header) {
         req->header = (char *)"Accept: */*\r\n";
     }
+    if (NULL == req->connect_mode) {
+        req->connect_mode = "close";
+    }
 
     if ((req->txdata_len > 0) && (req->txdata != NULL)) {
         result = sprintf((char *)http->buffer, "\
 %s %s HTTP/1.1\r\n\
 Host: %s\r\n\
 User-Agent: %s\r\n\
-Connection: close\r\n\
+Connection: %s\r\n\
 Content-Length: %d\r\n\
 %s\
-\r\n", NULL == req->verb ? "POST" : req->verb, req->path, req->host, "vsf", (int)req->txdata_len, req->header);
+\r\n", NULL == req->verb ? "POST" : req->verb, req->path, req->host, "vsf", req->connect_mode, (int)req->txdata_len, req->header);
         vsf_http_trace("http request:\n%s", http->buffer);
     } else {
         result = sprintf((char *)http->buffer, "\
 %s %s HTTP/1.1\r\n\
 Host: %s\r\n\
 User-Agent: %s\r\n\
-Connection: close\r\n\
+Connection: %s\r\n\
 %s\
-\r\n", NULL == req->verb ? "GET" : req->verb, req->path, req->host, "vsf", req->header);
+\r\n", NULL == req->verb ? "GET" : req->verb, req->path, req->host, "vsf", req->connect_mode, req->header);
         vsf_http_trace("http request:\n%s", http->buffer);
     }
     result = http->op->fn_write(http->param, http->buffer, result);
@@ -160,7 +163,7 @@ read_more:
             continue;
         }
         if (strstr(line, "Transfer-Encoding:")) {
-            line += sizeof("Content-Length:") - 1;
+            line += sizeof("Transfer-Encoding:") - 1;
             while (*line && isspace(*line)) { line++; }
 
             if (strstr(line, "chunked")) {
@@ -238,6 +241,21 @@ do_read:
         goto again;
     }
     return result;
+}
+
+int vsf_http_client_write(vsf_http_client_t *http, uint8_t *buf, uint16_t len)
+{
+    int result = len, cur_txlen;
+
+    while (len > 0) {
+        cur_txlen = http->op->fn_write(http->param, buf, len);
+        if (cur_txlen <= 0) {
+            break;
+        }
+        len -= cur_txlen;
+        buf += cur_txlen;
+    }
+    return result - len;
 }
 
 #endif
