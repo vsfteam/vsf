@@ -310,7 +310,7 @@ int vsf_linux_httpd_websocket_write(vsf_linux_httpd_request_t *req, uint8_t *buf
         return 0;
     }
 
-    uint8_t header[8];
+    uint8_t header[10];
     header[0] = is_string ? 0x81 : 0x82;
 __again:
     switch (len_size) {
