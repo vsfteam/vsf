@@ -78,7 +78,7 @@ static void __vsf_linux_httpd_urihandler_socket_stream_evthandler(vsf_stream_t *
         parse_header:
             if (size >= 2) {
                 size -= vsf_stream_read(stream, header, 2);
-                urihandler_websocket->is_fin = !!(header[0] * 0x80);
+                urihandler_websocket->is_fin = !!(header[0] & 0x80);
                 urihandler_websocket->opcode = header[0] & 0x0F;
                 switch (urihandler_websocket->opcode) {
                 case 0:
