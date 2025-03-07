@@ -137,6 +137,9 @@ extern "C" {
 #   define __VSF_CAL_ALIGN(__N)         __attribute__((aligned(__N)))
 #   define __VSF_CAL_AT_ADDR(__ADDR)    Not Supported by GCC
 #   define __VSF_CAL_SECTION(__SEC)     __attribute__((section(__SEC)))
+#   define __VSF_CAL_SECTION_START(__SEC)   __start_ ## __SEC
+#   define __VSF_CAL_SECTION_END(__SEC)     __stop_ ## __SEC
+#   define __VSF_CAL_SECTION_SIZE(__SEC)    (__VSF_CAL_SECTION_END(__SEC) - __VSF_CAL_SECTION_START(__SEC))
 #   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS) \
                                         __attribute__((weakref(__VSF_STR(__ORIGIN))))
 
