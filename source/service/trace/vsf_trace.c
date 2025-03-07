@@ -149,6 +149,8 @@ static void __vsf_trace_arg(const char *format, va_list arg)
                                         sizeof(__vsf_trace.print_buffer),
                                         format,
                                         arg);
+        // increase VSF_TRACE_CFG_BUFSIZE if assert here
+        VSF_SERVICE_ASSERT(size < sizeof(__vsf_trace.print_buffer));
         __vsf_trace_output((const char *)__vsf_trace.print_buffer, size);
     //)
     vsf_trace_unprotect(origlevel);
