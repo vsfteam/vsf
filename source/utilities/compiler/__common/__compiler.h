@@ -182,6 +182,9 @@ extern "C" {
 #define VSF_CAL_ALIGN(__N)              __VSF_CAL_ALIGN(__N)
 
 #define VSF_CAL_SECTION(__SEC)          __VSF_CAL_SECTION(__SEC)
+#define VSF_CAL_SECTION_START(__SEC)    __VSF_CAL_SECTION_START(__SEC)
+#define VSF_CAL_SECTION_END(__SEC)      __VSF_CAL_SECTION_END(__SEC)
+#define VSF_CAL_SECTION_SIZE(__SEC)     __VSF_CAL_SECTION_SIZE(__SEC)
 
 #ifdef __VSF_CAL_WRAPPER
 #   define VSF_CAL_WRAPPER(__API)      __VSF_CAL_WRAPPER(__API)
