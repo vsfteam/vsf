@@ -123,6 +123,7 @@ extern "C" {
 #   define __VSF_CAL_ALIGN(__N)         __attribute__((aligned (__N)))
 #   define __VSF_CAL_AT_ADDR(__ADDR)    @ __ADDR
 #   define __VSF_CAL_SECTION(__SEC)     __attribute__((section (__SEC)))
+#   define __VSF_CAL_SECTION_DECLARE(__SEC)
 #   define __VSF_CAL_SECTION_START(__SEC)   __section_begin(#__SEC)
 #   define __VSF_CAL_SECTION_END(__SEC)     __section_end(#__SEC)
 #   define __VSF_CAL_SECTION_SIZE(__SEC)    __section_size(#__SEC)

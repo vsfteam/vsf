@@ -137,6 +137,8 @@ extern "C" {
 #   define __VSF_CAL_ALIGN(__N)         __attribute__((aligned(__N)))
 #   define __VSF_CAL_AT_ADDR(__ADDR)    Not Supported by GCC
 #   define __VSF_CAL_SECTION(__SEC)     __attribute__((section(__SEC)))
+#   define __VSF_CAL_SECTION_DECLARE(__SEC) extern void *__start_ ## __SEC;\
+                                            extern void *__stop_ ## __SEC;
 #   define __VSF_CAL_SECTION_START(__SEC)   __start_ ## __SEC
 #   define __VSF_CAL_SECTION_END(__SEC)     __stop_ ## __SEC
 #   define __VSF_CAL_SECTION_SIZE(__SEC)    (__VSF_CAL_SECTION_END(__SEC) - __VSF_CAL_SECTION_START(__SEC))
@@ -182,6 +184,7 @@ extern "C" {
 #define VSF_CAL_ALIGN(__N)              __VSF_CAL_ALIGN(__N)
 
 #define VSF_CAL_SECTION(__SEC)          __VSF_CAL_SECTION(__SEC)
+#define VSF_CAL_SECTION_DECLARE(__SEC)  __VSF_CAL_SECTION_DECLARE(__SEC)
 #define VSF_CAL_SECTION_START(__SEC)    __VSF_CAL_SECTION_START(__SEC)
 #define VSF_CAL_SECTION_END(__SEC)      __VSF_CAL_SECTION_END(__SEC)
 #define VSF_CAL_SECTION_SIZE(__SEC)     __VSF_CAL_SECTION_SIZE(__SEC)
