@@ -270,15 +270,11 @@ vsf_class(vk_disp_mipi_spi_lcd_t) {
 
     private_member(
         vsf_teda_t           teda;
-        vsf_eda_evthandler_t evthandler;
 
         vk_disp_area_t      area;
         uint8_t             *cur_buffer;
 
         uint8_t             refresh_seq[VSF_DISP_MIPI_SPI_LCD_REFRESH_SEQ_LEN];
-#if VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
-        uint8_t             reset_state : 1;
-#endif
 
         struct {
             const uint8_t   *buf;
@@ -300,11 +296,9 @@ extern const vk_disp_drv_t vk_disp_drv_mipi_spi_lcd;
 
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_disp_mipi_spi_lcd_wait_te_line_ready(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd);
-
-#if VSF_DISP_MIPI_SPI_LCD_SPI_MODE == VSF_DISP_MIPI_SPI_LCD_SPI_8BITS_MODE
-extern void vsf_disp_mipi_spi_lcd_dcx_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd, bool state);
-#endif
+// return true if te is not supported, or return false and call vsf_disp_mipi_te_line_ready when te is ready
+extern bool vsf_disp_mipi_spi_lcd_wait_te_line_ready(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd);
+extern void vsf_disp_mipi_te_line_ready(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd);
 
 #ifdef __cplusplus
 }
