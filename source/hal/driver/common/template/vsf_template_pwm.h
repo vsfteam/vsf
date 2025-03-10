@@ -71,8 +71,8 @@ extern "C" {
 #    define VSF_PWM_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
-#ifndef VSF_PWM_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_PWM_CFG_INHERT_HAL_CAPABILITY       ENABLED
+#ifndef VSF_PWM_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_PWM_CFG_INHERIT_HAL_CAPABILITY       ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -99,7 +99,7 @@ typedef struct vsf_pwm_cfg_t {
 
 #if VSF_PWM_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_pwm_capability_t {
-#if VSF_PWM_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_PWM_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
 

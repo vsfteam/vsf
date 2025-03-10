@@ -84,8 +84,8 @@ extern "C" {
 #   define VSF_FLASH_CFG_REIMPLEMENT_TYPE_CAPABILITY        DISABLED
 #endif
 
-#ifndef VSF_FLASH_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_FLASH_CFG_INHERT_HAL_CAPABILITY              ENABLED
+#ifndef VSF_FLASH_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_FLASH_CFG_INHERIT_HAL_CAPABILITY              ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -162,7 +162,7 @@ typedef struct vsf_flash_status_t {
 
 #if VSF_FLASH_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_flash_capability_t {
-#if VSF_FLASH_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_FLASH_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
     vsf_flash_irq_mask_t irq_mask;
@@ -269,7 +269,7 @@ extern fsm_rt_t vsf_flash_disable(vsf_flash_t *flash_ptr);
  \~chinese
  @brief 获取 flash 实例的状态
  @param[in] flash_ptr: 结构体 vsf_flash_t 的指针，参考 @ref vsf_flash_t
- @return vsf_flash_status_t: 返回当前 flash 的所有能力 @ref vsf_flash_status_t
+ @return vsf_flash_status_t: 返回当前 flash 的所有状态 @ref vsf_flash_status_t
  */
 extern vsf_flash_status_t vsf_flash_status(vsf_flash_t *flash_ptr);
 
@@ -330,7 +330,7 @@ extern void vsf_flash_irq_disable(vsf_flash_t *flash_ptr, vsf_flash_irq_mask_t i
  \~chinese
  @brief flash 擦除一块扇区
  @param[in] flash_ptr: 结构体 vsf_flash_t 的指针，参考 @ref vsf_flash_t
- @param[in] offset_of_bytes: 被除扇区的地址，需要是最小可擦除扇区的整数倍
+ @param[in] offset_of_bytes: 被擦除扇区的地址，需要是最小可擦除扇区的整数倍
  @return  如果 flash 开始执行擦除返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_flash_erase_one_sector(vsf_flash_t *flash_ptr,
@@ -383,9 +383,9 @@ extern vsf_err_t vsf_flash_erase_all(vsf_flash_t *flash_ptr);
  \~chinese
  @brief flash 写一个扇区
  @param[in] flash_ptr: 结构体 vsf_flash_t 的指针，参考 @ref vsf_flash_t
- @param[in] offset_of_bytes: 被写入扇区的地址, 部分 flash 需要是最小可擦除扇区大小的整数倍
+ @param[in] offset_of_bytes: 被写入扇区的地址, 部分 flash 需要是最小可写入扇区大小的整数倍
  @param[in] buffer: 数据的指针
- @param[in] size_of_bytes: 被写入扇区的长度，部分 flash 需要是最小可擦除扇区大小的整数倍
+ @param[in] size_of_bytes: 被写入扇区的长度，部分 flash 需要是最小可写入扇区大小的整数倍
  @return  如果 flash 开始执行写入返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_flash_write_one_sector(vsf_flash_t *flash_ptr,
@@ -429,9 +429,9 @@ extern vsf_err_t vsf_flash_write_multi_sector(vsf_flash_t *flash_ptr,
  \~chinese
  @brief flash 读一个扇区
  @param[in] flash_ptr: 结构体 vsf_flash_t 的指针，参考 @ref vsf_flash_t
- @param[in] offset_of_bytes: 被读入扇区的地址, 部分 flash 需要是最小可擦除扇区大小的整数倍
+ @param[in] offset_of_bytes: 被读入扇区的地址, 部分 flash 需要是最小可读入扇区大小的整数倍
  @param[in] buffer: 数据的指针
- @param[in] size_of_bytes: 被读入扇区的长度，部分 flash 需要是最小可擦除扇区大小的整数倍
+ @param[in] size_of_bytes: 被读入扇区的长度，部分 flash 需要是最小可读入扇区大小的整数倍
  @return  如果 flash 开始执行读入返回 VSF_ERR_NONE , 否则返回负数。
  */
 extern vsf_err_t vsf_flash_read_one_sector(vsf_flash_t *flash_ptr,

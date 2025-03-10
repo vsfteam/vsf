@@ -79,8 +79,8 @@ extern "C" {
 #    define VSF_RTC_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
-#ifndef VSF_RTC_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_RTC_CFG_INHERT_HAL_CAPABILITY        ENABLED
+#ifndef VSF_RTC_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_RTC_CFG_INHERIT_HAL_CAPABILITY        ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -141,7 +141,7 @@ typedef struct vsf_rtc_cfg_t {
 
 #if VSF_RTC_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_rtc_capability_t {
-#if VSF_RTC_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_RTC_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
 
