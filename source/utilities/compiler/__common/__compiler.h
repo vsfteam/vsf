@@ -107,9 +107,9 @@ extern "C" {
 #   define __VSF_CAL_ALIGN(__N)         __attribute__((__aligned__(__N)))
 #   define __VSF_CAL_AT_ADDR(__ADDR)    Not Supported by LLVM
 #   ifdef __APPLE__
-#       define __VSF_CAL_SECTION(__SEC)
+#       define __VSF_CAL_SECTION(__SEC_STR)
 #   else
-#       define __VSF_CAL_SECTION(__SEC) __attribute__((__section__(__SEC)))
+#       define __VSF_CAL_SECTION(__SEC_STR) __attribute__((__section__(__SEC_STR)))
 #   endif
 #   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS)                              \
                                         __asm__(".weak " #__ALIAS);             \
@@ -136,12 +136,12 @@ extern "C" {
 #   define __asm__                      __asm
 #   define __VSF_CAL_ALIGN(__N)         __attribute__((aligned(__N)))
 #   define __VSF_CAL_AT_ADDR(__ADDR)    Not Supported by GCC
-#   define __VSF_CAL_SECTION(__SEC)     __attribute__((section(__SEC)))
-#   define __VSF_CAL_SECTION_DECLARE(__SEC) extern void *__start_ ## __SEC;\
+#   define __VSF_CAL_SECTION(__SEC_STR) __attribute__((section(__SEC_STR)))
+#   define VSF_CAL_SECTION_DECLARE(__SEC)   extern void *__start_ ## __SEC;\
                                             extern void *__stop_ ## __SEC;
-#   define __VSF_CAL_SECTION_START(__SEC)   __start_ ## __SEC
-#   define __VSF_CAL_SECTION_END(__SEC)     __stop_ ## __SEC
-#   define __VSF_CAL_SECTION_SIZE(__SEC)    (__VSF_CAL_SECTION_END(__SEC) - __VSF_CAL_SECTION_START(__SEC))
+#   define VSF_CAL_SECTION_START(__SEC) __start_ ## __SEC
+#   define VSF_CAL_SECTION_END(__SEC)   __stop_ ## __SEC
+#   define VSF_CAL_SECTION_SIZE(__SEC)    (__VSF_CAL_SECTION_END(__SEC) - __VSF_CAL_SECTION_START(__SEC))
 #   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS) \
                                         __attribute__((weakref(__VSF_STR(__ORIGIN))))
 
@@ -165,7 +165,7 @@ extern "C" {
 #   define __asm__                      __asm
 #   define __VSF_CAL_ALIGN(__N)         __attribute__((aligned (__N)))
 #   define __VSF_CAL_AT_ADDR(__ADDR)    Not Supported by TCC
-#   define __VSF_CAL_SECTION(__SEC)
+#   define __VSF_CAL_SECTION(__SEC_STR)
 #   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS) \
                                         __attribute__((weakref(__VSF_STR(__ORIGIN))))
 
@@ -183,11 +183,7 @@ extern "C" {
 #define VSF_CAL_AT_ADDR(__ADDR)         __VSF_CAL_AT_ADDR(__ADDR)
 #define VSF_CAL_ALIGN(__N)              __VSF_CAL_ALIGN(__N)
 
-#define VSF_CAL_SECTION(__SEC)          __VSF_CAL_SECTION(__SEC)
-#define VSF_CAL_SECTION_DECLARE(__SEC)  __VSF_CAL_SECTION_DECLARE(__SEC)
-#define VSF_CAL_SECTION_START(__SEC)    __VSF_CAL_SECTION_START(__SEC)
-#define VSF_CAL_SECTION_END(__SEC)      __VSF_CAL_SECTION_END(__SEC)
-#define VSF_CAL_SECTION_SIZE(__SEC)     __VSF_CAL_SECTION_SIZE(__SEC)
+#define VSF_CAL_SECTION(__SEC_STR)      __VSF_CAL_SECTION(__SEC_STR)
 
 #ifdef __VSF_CAL_WRAPPER
 #   define VSF_CAL_WRAPPER(__API)      __VSF_CAL_WRAPPER(__API)

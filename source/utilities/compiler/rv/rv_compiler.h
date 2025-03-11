@@ -74,7 +74,7 @@ extern "C" {
 #   define __asm__                      __asm
 #   define __VSF_CAL_ALIGN(__N)         __attribute__((aligned (__N)))
 #   define __VSF_CAL_AT_ADDR(__ADDR)    @ __ADDR
-#   define __VSF_CAL_SECTION(__SEC)     __attribute__((section (__SEC)))
+#   define __VSF_CAL_SECTION(__SEC_STR) __attribute__((section (__SEC_STR)))
 #   define __VSF_CAL_WEAK_ALIAS(__ORIGIN, __ALIAS) \
                                         _Pragma(__VSF_STR(weak __ORIGIN=__ALIAS))
 #   define VSF_CAL_PACKED               __attribute__((packed))
