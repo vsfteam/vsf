@@ -1038,7 +1038,7 @@ struct libusb_transfer * libusb_alloc_transfer(int iso_packets)
     return NULL;
 }
 
-static void __vsf_linux_libusb_submit_transfer_next(vsf_linux_libusb_pipe_t *pipe)
+static bool __vsf_linux_libusb_submit_transfer_next(vsf_linux_libusb_pipe_t *pipe)
 {
     vsf_linux_libusb_transfer_t *ltransfer;
     vsf_protect_t orig;
@@ -1078,7 +1078,9 @@ try_next:
 
             goto try_next;
         }
+        return true;
     }
+    return false;
 }
 
 static void __vsf_libusb_transfer_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
@@ -1094,14 +1096,15 @@ static void __vsf_libusb_transfer_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         ltransfer->transfer.actual_length = vk_usbh_urb_get_actual_length(urb);
         ltransfer->transfer.status = vk_usbh_urb_get_status(urb) == URB_OK ?
                 LIBUSB_TRANSFER_COMPLETED : LIBUSB_TRANSFER_ERROR;
-        vk_usbh_free_urb(ldev->libusb_dev->usbh, urb);
 
         orig = vsf_protect_sched();
             vsf_dlist_add_to_tail(vsf_linux_libusb_transfer_t, transnode, &__vsf_libusb.translist_done, ltransfer);
         vsf_unprotect_sched(orig);
         vsf_eda_trig_set(&__vsf_libusb.trans_trig);
 
-        __vsf_linux_libusb_submit_transfer_next(pipe);
+        if (!__vsf_linux_libusb_submit_transfer_next(pipe)) {
+            vk_usbh_free_urb(ldev->libusb_dev->usbh, urb);
+        }
         break;
     }
 }
@@ -1190,8 +1193,6 @@ void libusb_free_transfer(struct libusb_transfer *transfer)
     if (transfer != NULL) {
         vsf_linux_libusb_transfer_t *ltransfer = vsf_container_of(transfer, vsf_linux_libusb_transfer_t, transfer);
         vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)transfer->dev_handle;
-        vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, ltransfer->transfer.endpoint);
-        VSF_LINUX_ASSERT(!vk_usbh_urb_is_alloced(&pipe->urb));
 
         if (ltransfer->transfer.flags & LIBUSB_TRANSFER_FREE_BUFFER) {
             free(ltransfer->transfer.buffer);
