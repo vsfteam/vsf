@@ -51,6 +51,10 @@ struct vsf_linux_glibc_time_t {
     struct tm tm;
 } static __vsf_linux_glibc_time;
 
+typedef struct vsf_linux_time_thread_priv_t {
+    vsf_linux_timer_t *timer;
+} vsf_linux_time_thread_priv_t;
+
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -453,6 +457,15 @@ static void __vsf_linux_prepare_timer(vsf_linux_timer_t *linux_timer)
     }
 }
 
+static void __vsf_linux_timer_thread_on_run(vsf_thread_cb_t *cb)
+{
+    vsf_linux_thread_t *thread = vsf_container_of(cb, vsf_linux_thread_t, use_as__vsf_thread_cb_t);
+    vsf_linux_time_thread_priv_t *priv = vsf_linux_thread_get_priv(thread);
+    if (priv->timer->evt.sigev_notify_function != NULL) {
+        priv->timer->evt.sigev_notify_function(priv->timer->evt.sigev_value);
+    }
+}
+
 static void __vsf_linux_on_timer(vsf_callback_timer_t *timer)
 {
     vsf_linux_timer_t *linux_timer = vsf_container_of(timer, vsf_linux_timer_t, timer);
@@ -462,9 +475,22 @@ static void __vsf_linux_on_timer(vsf_callback_timer_t *timer)
     case SIGEV_SIGNAL:
         kill(linux_timer->evt.sigev_notify_thread_id, linux_timer->evt.sigev_signo);
         break;
-    case SIGEV_THREAD:
-        // TODO: add support
-        VSF_LINUX_ASSERT(false);
+    case SIGEV_THREAD: {
+            static const vsf_linux_thread_op_t __vsf_linux_timer_thread_op = {
+                .priv_size              = sizeof(vsf_linux_time_thread_priv_t),
+                .on_run                 = __vsf_linux_timer_thread_on_run,
+                .on_terminate           = vsf_linux_thread_on_terminate,
+            };
+            vsf_linux_process_t *process = vsf_linux_get_process(linux_timer->evt.sigev_notify_thread_id);
+            VSF_LINUX_ASSERT(process != NULL);
+            vsf_linux_thread_t *thread = vsf_linux_create_thread(process, &__vsf_linux_timer_thread_op, 0, NULL);
+            VSF_LINUX_ASSERT(thread != NULL);
+
+            vsf_linux_time_thread_priv_t *priv = vsf_linux_thread_get_priv(thread);
+            priv->timer = linux_timer;
+
+            vsf_linux_start_thread(thread, vsf_prio_inherit);
+        }
         break;
     }
 
