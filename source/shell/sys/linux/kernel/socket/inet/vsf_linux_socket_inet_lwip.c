@@ -1554,12 +1554,12 @@ ssize_t recvfrom(int sockfd, void *buffer, size_t size, int flags,
 
 // /proc/net binds, TODO
 
-int vsf_linux_bind_netdrv(vk_netdrv_t *netdrv)
+int vsf_linux_bind_netif(void *netif)
 {
     return VSF_ERR_NOT_SUPPORT;
 }
 
-int vsf_linux_unbind_netdrv(vk_netdrv_t *netdrv)
+int vsf_linux_unbind_netif(void *netif)
 {
     return VSF_ERR_NOT_SUPPORT;
 }

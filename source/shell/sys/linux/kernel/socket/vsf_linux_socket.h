@@ -30,9 +30,6 @@
 #   include <sys/socket.h>
 #endif
 
-// for vk_netdrv_t
-#include "component/vsf_component.h"
-
 #if     defined(__VSF_LINUX_SOCKET_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_LINUX_SOCKET_CLASS_INHERIT__)
@@ -101,8 +98,8 @@ extern const vsf_linux_socket_op_t vsf_linux_socket_netlink_op;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-int vsf_linux_bind_netdrv(vk_netdrv_t *netdrv);
-int vsf_linux_unbind_netdrv(vk_netdrv_t *netdrv);
+extern int vsf_linux_bind_netif(void *netif);
+extern int vsf_linux_unbind_netif(void *netif);
 
 #ifdef __cplusplus
 }
