@@ -1960,15 +1960,24 @@ static const vsf_loader_op_t * __vsf_linux_get_applet_loader(uint8_t *header, in
 
 static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd, vsf_linux_main_entry_t *entry, char *path)
 {
-    char pathname_local[PATH_MAX], pathname_dir[PATH_MAX], *path_end;
-    int exefd = -1, pathlen;
+    char pathname_local[PATH_MAX], pathname_tmp[PATH_MAX], *path_end, *pathname_dir, *cmdname = pathname_tmp;
+    int exefd = -1, pathlen, pathname_dir_len;
     uint_fast32_t feature;
 
-    if ((NULL == path) || (strchr(cmd, '\\') || strchr(cmd, '/'))) {
+    // skip parameters in cmd, leave command name only
+    int pos = 0;
+    for (pos = 0; (cmd[pos] != '\0') && !isspace(cmd[pos]) && (pos < (sizeof(pathname_tmp) - 1)); pos++) {
+        cmdname[pos] = cmd[pos];
+    }
+    cmdname[pos] = '\0';
+    pathname_dir = &cmdname[pos + 1];
+    pathname_dir_len = sizeof(pathname_tmp) - pos  - 1;
+
+    if ((NULL == path) || (strchr(cmdname, '\\') || strchr(cmdname, '/'))) {
         if (pathname != NULL) {
-            strncpy(pathname, cmd, pathname_len);
+            strncpy(pathname, cmdname, pathname_len);
         } else {
-            pathname = cmd;
+            pathname = cmdname;
         }
         path = "";
         goto try_open;
@@ -1980,7 +1989,7 @@ static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd,
     while (*path != '\0') {
         path_end = strchr(path, ':');
         pathlen = (path_end != NULL) ?  path_end - path : strlen(path);
-        VSF_LINUX_ASSERT(pathlen < sizeof(pathname_dir) - 1);
+        VSF_LINUX_ASSERT(pathlen < pathname_dir_len - 1);
         memcpy(pathname_dir, path, pathlen);
         pathname_dir[pathlen] = '\0';
         path += pathlen;
@@ -1988,7 +1997,7 @@ static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd,
             path++;
         }
 
-        if (!vsf_linux_generate_path(pathname, pathname_len, pathname_dir, cmd)) {
+        if (!vsf_linux_generate_path(pathname, pathname_len, pathname_dir, cmdname)) {
         try_open:
             exefd = open(pathname, 0);
             if (exefd >= 0) {
