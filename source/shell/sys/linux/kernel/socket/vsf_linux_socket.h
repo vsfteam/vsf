@@ -30,6 +30,9 @@
 #   include <sys/socket.h>
 #endif
 
+// for vk_netdrv_t
+#include "component/vsf_component.h"
+
 #if     defined(__VSF_LINUX_SOCKET_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_LINUX_SOCKET_CLASS_INHERIT__)
