@@ -98,6 +98,9 @@ extern const vsf_linux_socket_op_t vsf_linux_socket_netlink_op;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+int vsf_linux_bind_netdrv(vk_netdrv_t *netdrv);
+int vsf_linux_unbind_netdrv(vk_netdrv_t *netdrv);
+
 #ifdef __cplusplus
 }
 #endif

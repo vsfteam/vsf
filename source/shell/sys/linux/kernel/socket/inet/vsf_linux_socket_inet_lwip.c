@@ -162,6 +162,24 @@ typedef union vsf_linux_sockaddr_t {
     struct sockaddr_in6     in6;
 } vsf_linux_sockaddr_t;
 
+#if VSF_LINUX_SOCKET_USE_ROUTE == ENABLED
+#   if LWIP_IPV4
+typedef struct vsf_linux_ip4_route_table_t {
+    vsf_dlist_node_t node;
+    ip4_addr_t src;
+    ip4_addr_t dest;
+} vsf_linux_ip4_route_table_t;
+#   endif
+
+#   if LWIP_IPV6
+typedef struct vsf_linux_ip6_route_table_t {
+    vsf_dlist_node_t node;
+    ip6_addr_t src;
+    ip6_addr_t dest;
+} vsf_linux_ip6_route_table_t;
+#   endif
+#endif
+
 #if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
 typedef struct vsf_linux_socket_netlink_msg_t {
     vsf_slist_node_t node;
@@ -181,6 +199,8 @@ typedef struct vsf_linux_socket_netlink_priv_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern int lwip_inet_pton(int af, const char *src, void *dst);
 
 int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
@@ -217,6 +237,15 @@ static int __vsf_linux_socket_netlink_bind(vsf_linux_socket_priv_t *socket_priv,
 static bool __vsf_linux_netlink_is_callback_installed = false;
 static vsf_dlist_t __vsf_linux_netlink_priv_list = { 0 };
 static netif_ext_callback_t __vsf_linux_netlink_lwip_netif_cb;
+#endif
+
+#if VSF_LINUX_SOCKET_USE_ROUTE == ENABLED
+#   if LWIP_IPV4
+static vsf_dlist_t vsf_linux_ip4_route_table;
+#   endif
+#   if LWIP_IPV6
+static vsf_dlist_t vsf_linux_ip6_route_table;
+#   endif
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -1523,6 +1552,18 @@ ssize_t recvfrom(int sockfd, void *buffer, size_t size, int flags,
                     buffer, size, flags, src_addr, addrlen);
 }
 
+// /proc/net binds, TODO
+
+int vsf_linux_bind_netdrv(vk_netdrv_t *netdrv)
+{
+    return VSF_ERR_NOT_SUPPORT;
+}
+
+int vsf_linux_unbind_netdrv(vk_netdrv_t *netdrv)
+{
+    return VSF_ERR_NOT_SUPPORT;
+}
+
 // netlink
 
 #if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
@@ -1743,6 +1784,335 @@ again:
 }
 
 #endif
+
+#if VSF_LINUX_SOCKET_USE_ROUTE == ENABLED
+// define LWIP_HOOK_IP4_ROUTE_SRC to __vsf_linux_ip4_route to enable ip4 route
+struct netif * __vsf_linux_ip4_route(const ip4_addr_t *src, const ip4_addr_t *dest)
+{
+}
+
+// define LWIP_HOOK_IP6_ROUTE to __vsf_linux_ip6_route to enable ip6 route
+struct netif * __vsf_linux_ip6_route(const ip6_addr_t *src, const ip6_addr_t *dest)
+{
+}
+
+int __vsf_linux_ip_main(int argc, char **argv)
+{
+    bool is_ipv6 = false;
+
+    argc--;
+    argv++;
+    while (argc && *argv[0] == '-') {
+        if (!strcmp(*argv, "-n")) {
+            // default option, do nothing
+        } else if (!strcmp(*argv, "-V") || !strcmp(*argv, "--version")) {
+            printf("ip 0.0.1-alpha\n");
+            return 0;
+        } else if (!strcmp(*argv, "-4")) {
+            is_ipv6 = false;
+        } else if (!strcmp(*argv, "-6")) {
+            is_ipv6 = true;
+        } else if (!strcmp(*argv, "-?") || !strcmp(*argv, "-h") || !strcmp(*argv, "--help")) {
+        help:
+            printf("Usage: ip [-4|-6] [-V|--version] [route add]\n");
+            return 0;
+        } else if (!strcmp(*argv, "route")) {
+            argc--;
+            argv++;
+
+            if (!strcmp(*argv, "add")) {
+                LOCK_TCPIP_CORE();
+                UNLOCK_TCPIP_CORE();
+            }
+        } else {
+            printf("invalid commandline\n");
+            goto help;
+        }
+        argc--;
+        argv++;
+    }
+    return 0;
+}
+
+int __vsf_linux_route_main(int argc, char **argv)
+{
+    bool is_ipv6 = false;
+
+    argc--;
+    argv++;
+    while (argc && *argv[0] == '-') {
+        if (!strcmp(*argv, "-n")) {
+            // default option, do nothing
+        } else if (!strcmp(*argv, "-V") || !strcmp(*argv, "--version")) {
+            printf("route 0.0.1-alpha\n");
+            return 0;
+        } else if (!strcmp(*argv, "-4")) {
+            is_ipv6 = false;
+        } else if (!strcmp(*argv, "-6")) {
+            is_ipv6 = true;
+        } else if (!strcmp(*argv, "-?") || !strcmp(*argv, "-h") || !strcmp(*argv, "--help")) {
+        help:
+            printf("Usage: route [-4|-6] [-n] [-V|--version] [add [NETIF|default] gw GW|del [NETIF|default]]\n");
+            return 0;
+        } else if (!strcmp(*argv, "add")) {
+            if (argc < 3) {
+                goto invalid_commandline;
+            }
+
+            LOCK_TCPIP_CORE();
+            struct netif *netif;
+            if (!strcmp(argv[1], "default")) {
+                extern struct netif *netif_default;
+                netif = netif_default;
+            } else {
+                netif = netif_find(argv[1]);
+            }
+            if (NULL == netif) {
+                UNLOCK_TCPIP_CORE();
+                printf("invalid netif %s\n", argv[1]);
+                return -1;
+            }
+
+            if (!strcmp(argv[2], "gw")) {
+                if (argc < 4) {
+                    UNLOCK_TCPIP_CORE();
+                    goto invalid_commandline;
+                }
+
+                if (is_ipv6) {
+                } else {
+                    ip4_addr_t addr;
+                    if (lwip_inet_pton(AF_INET6, argv[3], &addr) <= 0) {
+                        UNLOCK_TCPIP_CORE();
+                        printf("invalid addr %s\n", argv[3]);
+                        return -1;
+                    }
+
+                    netif_set_gw(netif, &addr);
+                }
+            }
+            UNLOCK_TCPIP_CORE();
+        } else if (!strcmp(*argv, "del")) {
+            printf("not supported\n");
+            return -1;
+        } else {
+        invalid_commandline:
+            printf("invalid commandline\n");
+            goto help;
+        }
+        argc--;
+        argv++;
+    }
+
+    if (is_ipv6) {
+#if LWIP_IPV6
+        __vsf_dlist_foreach_unsafe(vsf_linux_ip4_route_table_t, node, &vsf_linux_ip4_route_table) {
+
+        }
+#else
+        printf("ipv6 not enabled\n");
+        return -1;
+#endif
+    } else {
+#if LWIP_IPV4
+        __vsf_dlist_foreach_unsafe(vsf_linux_ip4_route_table_t, node, &vsf_linux_ip4_route_table) {
+        }
+#else
+        printf("ipv4 not enabled\n");
+        return -1;
+#endif
+    }
+
+    return 0;
+}
+#endif
+
+int __vsf_linux_ifconfig_main(int argc, char **argv)
+{
+    bool has_opt_a = false;
+    char *ifname = NULL;
+
+    argc--;
+    argv++;
+    while (argc && *argv[0] == '-') {
+        if (!strcmp(*argv, "-a")) {
+            has_opt_a = true;
+        } else if (!strcmp(*argv, "-V") || !strcmp(*argv, "-version") || !strcmp(*argv, "--version")) {
+            printf("ifconfig 0.0.1-alpha\n");
+            return 0;
+        } else if (!strcmp(*argv, "-?") || !strcmp(*argv, "-h") || !strcmp(*argv, "-help") || !strcmp(*argv, "--help")) {
+        help:
+            printf("Usage: ifconfig [-a] [-V|-version|--version] <interface> [up|down|hw ether MAC|add IPv6_ADDR|del IPv6_ADDR|netmask MASK|mtu MTU]\n");
+            return 0;
+        }
+        argc--;
+        argv++;
+    }
+    if (argc > 0) {
+        ifname = *argv;
+        argc--;
+        argv++;
+    }
+
+    LOCK_TCPIP_CORE();
+    extern struct netif *netif_list;
+    struct netif *netif = !ifname ? netif_list : netif_find(ifname);
+    if (!netif) {
+        UNLOCK_TCPIP_CORE();
+        printf("%s: Device not found\n", ifname);
+        return -1;
+    }
+
+    if (argc > 0) {
+        VSF_LINUX_ASSERT(ifname != NULL);
+    parse_next:
+        if (!strcmp(argv[0], "up")) {
+            netif_set_up(netif);
+        } else if (!strcmp(argv[0], "down")) {
+            netif_set_down(netif);
+#if LWIP_IPV6
+        } else if (!strcmp(argv[0], "add")) {
+            if (argc < 2) {
+                goto invalid_commandline;
+            }
+            ip6_addr_t ip6addr;
+            char *prefix = strchr(argv[1], '/');
+            if (prefix != NULL) {
+                *prefix = '\0';
+            }
+            if (lwip_inet_pton(AF_INET6, argv[1], &ip6addr) <= 0) {
+                UNLOCK_TCPIP_CORE();
+                printf("invalid ip6 addr %s\n", argv[1]);
+                return -1;
+            }
+            if (ERR_OK != netif_add_ip6_address(netif, &ip6addr, NULL)) {
+                UNLOCK_TCPIP_CORE();
+                printf("fail to add ip6 address\n");
+                return -1;
+            }
+        } else if (!strcmp(argv[0], "del")) {
+            if (argc < 2) {
+                goto invalid_commandline;
+            }
+            ip6_addr_t ip6addr;
+            char *prefix = strchr(argv[1], '/');
+            if (prefix != NULL) {
+                *prefix = '\0';
+            }
+            if (lwip_inet_pton(AF_INET6, argv[1], &ip6addr) <= 0) {
+                UNLOCK_TCPIP_CORE();
+                printf("invalid ip6 addr %s\n", argv[1]);
+                return -1;
+            }
+            s8_t index = netif_get_ip6_addr_match(netif, &ip6addr);
+            if (index < 0) {
+                UNLOCK_TCPIP_CORE();
+                printf("ip6 address %s not found\n", argv[1]);
+                return -1;
+            }
+            netif_ip6_addr_set_state(netif, index, IP6_ADDR_INVALID);
+#endif
+        } else if (!strcmp(argv[0], "mtu")) {
+            if (argc < 2) {
+                goto invalid_commandline;
+            }
+            netif->mtu = strtoul(argv[1], NULL, 0);
+            netif->mtu6 = netif->mtu;
+
+            argc -= 2;
+            argv += 2;
+            goto parse_next;
+        } else if (!strcmp(argv[0], "netmask")) {
+            if (argc < 2) {
+                goto invalid_commandline;
+            }
+            ip_addr_t addr;
+            if (lwip_inet_pton(AF_INET, argv[1], &addr) <= 0) {
+                UNLOCK_TCPIP_CORE();
+                printf("invalid netmask %s\n", argv[1]);
+                return -1;
+            }
+            netif->netmask = addr;
+
+            argc -= 2;
+            argv += 2;
+            goto parse_next;
+        } else if (!strcmp(argv[0], "hw")) {
+            if (argc < 2) {
+                goto invalid_commandline;
+            }
+
+            if (!strcmp(argv[1], "ether")) {
+                if (argc < 3) {
+                    goto invalid_commandline;
+                }
+                uint8_t mac[TCPIP_ETH_ADDRLEN];
+                char *mac_str = argv[2], *mac_str_end;
+                for (int i = 0; i < TCPIP_ETH_ADDRLEN; i++) {
+                    mac[i] = strtoul(mac_str, &mac_str_end, 16);
+                    if (    ((mac_str_end - mac_str) > 2)
+                        ||  ((i < TCPIP_ETH_ADDRLEN - 1) && (*mac_str_end != ':'))) {
+                        goto invalid_commandline;
+                    }
+                    mac_str = &mac_str_end[1];
+                }
+                memcpy(netif->hwaddr, mac, sizeof(netif->hwaddr));
+
+                argc -= 3;
+                argv += 3;
+                goto parse_next;
+            } else {
+                UNLOCK_TCPIP_CORE();
+                printf("not supported hw subcommand %s\n", argv[1]);
+                return -1;
+            }
+        } else {
+            if (argc > 0) {
+                ip_addr_t addr;
+                if (lwip_inet_pton(AF_INET, argv[1], &addr) > 0) {
+                    netif->ip_addr = addr;
+                    argc--;
+                    argv++;
+                    goto parse_next;
+                }
+            }
+
+        invalid_commandline:
+            UNLOCK_TCPIP_CORE();
+            printf("command %s not supported\n", argv[0]);
+            goto help;
+        }
+        UNLOCK_TCPIP_CORE();
+        return 0;
+    }
+    UNLOCK_TCPIP_CORE();
+
+    char ipaddr_buff[32], netmask_buff[32], gateway_buff[32];
+    for (; netif != NULL; netif = !ifname ? netif->next : NULL) {
+        if (!(netif->flags & NETIF_FLAG_UP || has_opt_a)) {
+            continue;
+        }
+
+        printf("%c%c(0x%p): flags=%d<%s,%s>  mtu %d\n", netif->name[0], netif->name[1],
+                netif, netif->flags,
+                netif->flags & NETIF_FLAG_UP ? "UP" : "DOWN",
+                netif->flags & NETIF_FLAG_BROADCAST ? "BROADCAST" : "NO_BROADCAST",
+                netif->mtu);
+
+#if LWIP_IPV4
+        ipaddr_ntoa_r(&netif->ip_addr, ipaddr_buff, sizeof(ipaddr_buff));
+        ipaddr_ntoa_r(&netif->netmask, netmask_buff, sizeof(netmask_buff));
+        ipaddr_ntoa_r(&netif->gw, gateway_buff, sizeof(gateway_buff));
+        printf("\tinet %s  netmask %s  gateway %s\n", ipaddr_buff, netmask_buff, gateway_buff);
+#endif
+#if LWIP_IPV6
+        ipaddr_ntoa_r(&netif->ip6_addr[0], ipaddr_buff, sizeof(ipaddr_buff));
+        printf("\tinet %s\n", ipaddr_buff);
+#endif
+        printf("\n");
+    }
+    return 0;
+}
 
 // ifaddrs.h
 int getifaddrs(struct ifaddrs **ifaddrs)

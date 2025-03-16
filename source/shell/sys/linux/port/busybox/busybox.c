@@ -38,6 +38,15 @@ extern int export_main(int argc, char *argv[]);
             ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED)))
 extern int free_main(int argc, char *argv[]);
 #endif
+#if     VSF_LINUX_USE_SOCKET == ENABLED && VSF_LINUX_SOCKET_USE_INET == ENABLED
+#   if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
+extern int __vsf_linux_ifconfig_main(int argc, char **argv);
+#   endif
+#   if VSF_LINUX_SOCKET_USE_ROUTE == ENABLED
+extern int __vsf_linux_ip_main(int argc, char **argv);
+extern int __vsf_linux_route_main(int argc, char **argv);
+#   endif
+#endif
 
 extern int vsf_linux_init_main(int argc, char *argv[]);
 
@@ -105,6 +114,15 @@ int busybox_install(void)
             ||  (VSF_ARCH_HEAP_HAS_STATISTICS == ENABLED)))
         ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/free", free_main) < 0
 #   endif
+#if     VSF_LINUX_USE_SOCKET == ENABLED && VSF_LINUX_SOCKET_USE_INET == ENABLED
+#   if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
+        ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/ifconfig", __vsf_linux_ifconfig_main) < 0
+#   endif
+#   if VSF_LINUX_SOCKET_USE_ROUTE == ENABLED
+        ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/ip", __vsf_linux_ip_main) < 0
+        ||  busybox_bind(VSF_LINUX_CFG_BIN_PATH "/route", __vsf_linux_route_main) < 0
+#   endif
+#endif
         ) {
         return -1;
     }
