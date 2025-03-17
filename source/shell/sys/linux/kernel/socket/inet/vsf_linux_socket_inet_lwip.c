@@ -1929,7 +1929,7 @@ int __vsf_linux_route_main(int argc, char **argv)
 
 int __vsf_linux_ifconfig_main(int argc, char **argv)
 {
-    bool has_opt_a = false;
+    bool has_opt_a = false, print_netlink = true;
     char *ifname = NULL;
 
     argc--;
@@ -1963,9 +1963,10 @@ int __vsf_linux_ifconfig_main(int argc, char **argv)
         return -1;
     }
 
+parse_next:
     if (argc > 0) {
+        print_netlink = false;
         VSF_LINUX_ASSERT(ifname != NULL);
-    parse_next:
         if (!strcmp(argv[0], "up")) {
             netif_set_up(netif);
         } else if (!strcmp(argv[0], "down")) {
@@ -2069,7 +2070,7 @@ int __vsf_linux_ifconfig_main(int argc, char **argv)
         } else {
             if (argc > 0) {
                 ip_addr_t addr;
-                if (lwip_inet_pton(AF_INET, argv[1], &addr) > 0) {
+                if (lwip_inet_pton(AF_INET, argv[0], &addr) > 0) {
                     netif->ip_addr = addr;
                     argc--;
                     argv++;
@@ -2086,6 +2087,9 @@ int __vsf_linux_ifconfig_main(int argc, char **argv)
         return 0;
     }
     UNLOCK_TCPIP_CORE();
+    if (!print_netlink) {
+        return 0;
+    }
 
     char ipaddr_buff[32], netmask_buff[32], gateway_buff[32];
     for (; netif != NULL; netif = !ifname ? netif->next : NULL) {
