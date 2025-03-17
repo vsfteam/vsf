@@ -2018,7 +2018,6 @@ parse_next:
                 goto invalid_commandline;
             }
             netif->mtu = strtoul(argv[1], NULL, 0);
-            netif->mtu6 = netif->mtu;
 
             argc -= 2;
             argv += 2;
