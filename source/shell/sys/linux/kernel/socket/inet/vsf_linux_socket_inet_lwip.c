@@ -2106,8 +2106,12 @@ int __vsf_linux_ifconfig_main(int argc, char **argv)
         printf("\tinet %s  netmask %s  gateway %s\n", ipaddr_buff, netmask_buff, gateway_buff);
 #endif
 #if LWIP_IPV6
-        ipaddr_ntoa_r(&netif->ip6_addr[0], ipaddr_buff, sizeof(ipaddr_buff));
-        printf("\tinet %s\n", ipaddr_buff);
+        for (int i = 0; i < dimof(netif->ip6_addr); i++) {
+            if (ip6_addr_isvalid(netif_ip6_addr_state(netif, i))) {
+                ipaddr_ntoa_r(&netif->ip6_addr[i], ipaddr_buff, sizeof(ipaddr_buff));
+                printf("\tinet %s\n", ipaddr_buff);
+            }
+        }
 #endif
         printf("\n");
     }
