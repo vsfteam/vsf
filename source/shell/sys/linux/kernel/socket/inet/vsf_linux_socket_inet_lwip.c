@@ -25,6 +25,8 @@
 #define __VSF_LINUX_FS_CLASS_INHERIT__
 #define __VSF_LINUX_SOCKET_CLASS_INHERIT__
 #define __VSF_LINUX_CLASS_INHERIT__
+#include "vsf.h"
+
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
 #   include "../../../include/unistd.h"
 #   include "../../../include/errno.h"
@@ -123,6 +125,10 @@
         }
 #endif /* LWIP_IPV6 */
 
+#ifndef udp_is_flag_set
+#   define udp_is_flag_set(__pcb, __flag)   (((__pcb)->flags & (__flag)) != 0)
+#endif
+
 /*============================ TYPES =========================================*/
 
 typedef struct vsf_linux_socket_group_t {
@@ -199,8 +205,6 @@ typedef struct vsf_linux_socket_netlink_priv_t {
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
-
-extern int lwip_inet_pton(int af, const char *src, void *dst);
 
 int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
@@ -337,6 +341,36 @@ VSF_CAL_WEAK(netconn_prepare_delete)
 err_t netconn_prepare_delete(struct netconn *conn)
 {
     return netconn_delete(conn);
+}
+
+VSF_CAL_WEAK(lwip_inet_pton)
+int lwip_inet_pton(int af, const char *src, void *dst)
+{
+    int err;
+    switch (af) {
+#if LWIP_IPV4
+    case AF_INET:
+        err = ip4addr_aton(src, (ip4_addr_t *)dst);
+        break;
+#endif
+#if LWIP_IPV6
+    case AF_INET6: {
+        /* convert into temporary variable since ip6_addr_t might be larger
+            than in6_addr when scopes are enabled */
+        ip6_addr_t addr;
+        err = ip6addr_aton(src, &addr);
+        if (err) {
+            memcpy(dst, &addr.addr, sizeof(addr.addr));
+        }
+        break;
+    }
+#endif
+    default:
+        err = -1;
+        errno = EAFNOSUPPORT;
+        break;
+    }
+    return err;
 }
 
 // helper
