@@ -736,7 +736,11 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
         break;
 #if LWIP_IPV6
     case IPPROTO_IPV6:
+        // refer to https://github.com/lwip-tcpip/lwip/pull/22 for UNICAST/MULTICAST options
         switch (optname) {
+        case IPV6_UNICAST_HOPS:
+            conn->pcb.ip->ttl = *(int *)optval;
+            break;
         case IPV6_V6ONLY:
             if (*(const int *)optval) {
                 netconn_set_ipv6only(conn, 1);
@@ -744,6 +748,21 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
                 netconn_set_ipv6only(conn, 0);
             }
             break;
+#   if LWIP_MULTICAST_TX_OPTIONS
+        case IPV6_MULTICAST_IF:
+            udp_set_multicast_netif_index(conn->pcb.udp, (u8_t)(*(int *)optval));
+            break;
+        case IPV6_MULTICAST_HOPS:
+            udp_set_multicast_ttl(conn->pcb.udp, (u8_t)(*(const u8_t *)optval));
+            break;
+        case IPV6_MULTICAST_LOOP:
+            if (*(const u8_t *)optval) {
+                udp_set_flags(conn->pcb.udp, UDP_FLAGS_MULTICAST_LOOP);
+            } else {
+                udp_clear_flags(conn->pcb.udp, UDP_FLAGS_MULTICAST_LOOP);
+            }
+            break;
+#   endif
 #   if LWIP_IPV6_MLD
         case IPV6_JOIN_GROUP:
         case IPV6_LEAVE_GROUP: {
@@ -926,11 +945,7 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
             inet_addr_from_ip4addr((struct in_addr*)optval, udp_get_multicast_netif_addr(conn->pcb.udp));
             break;
         case IP_MULTICAST_LOOP:
-            if ((conn->pcb.udp->flags & UDP_FLAGS_MULTICAST_LOOP) != 0) {
-                *(u8_t*)optval = 1;
-            } else {
-                *(u8_t*)optval = 0;
-            }
+            *(u8_t*)optval = udp_is_flag_set(conn->pcb.udp, UDP_FLAGS_MULTICAST_LOOP) ? 1 : 0;
             break;
 #endif /* LWIP_MULTICAST_TX_OPTIONS */
         }
@@ -950,13 +965,28 @@ static int __vsf_linux_socket_inet_getsockopt(vsf_linux_socket_priv_t *socket_pr
         break;
 #if LWIP_IPV6
     case IPPROTO_IPV6:
-      switch (optname) {
+        // refer to https://github.com/lwip-tcpip/lwip/pull/22 for UNICAST/MULTICAST options
+        switch (optname) {
+        case IPV6_UNICAST_HOPS:
+            *(int *)optval = conn->pcb.ip->ttl;
+            break;
         case IPV6_V6ONLY:
-          *(int *)optval = (netconn_get_ipv6only(conn) ? 1 : 0);
-          break;
+            *(int *)optval = (netconn_get_ipv6only(conn) ? 1 : 0);
+            break;
+#   if LWIP_MULTICAST_TX_OPTIONS
+        case IPV6_MULTICAST_IF:
+            *(int *)optval = udp_get_multicast_netif_index(conn->pcb.udp);
+            break;
+        case IPV6_MULTICAST_HOPS:
+            *(u8_t *)optval = udp_get_multicast_ttl(conn->pcb.udp);
+            break;
+        case IPV6_MULTICAST_LOOP:
+            *(u8_t *)optval = udp_is_flag_set(conn->pcb.udp, UDP_FLAGS_MULTICAST_LOOP) ? 1 : 0;
+            break;
+#   endif
         default:
-          VSF_LINUX_ASSERT(false);
-          break;
+            VSF_LINUX_ASSERT(false);
+            break;
       }
       break;
 #endif
