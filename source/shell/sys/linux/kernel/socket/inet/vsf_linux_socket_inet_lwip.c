@@ -489,7 +489,7 @@ static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
 
     switch (socket_priv->type) {
     case SOCK_DGRAM:
-        if (socket_priv->protocol != IPPROTO_UDP) {
+        if ((socket_priv->protocol != 0) && (socket_priv->protocol != IPPROTO_UDP)) {
             return INVALID_SOCKET;
         }
         conn_type = NETCONN_UDP;
@@ -499,9 +499,8 @@ static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
         use_protocol = true;
         break;
     case SOCK_STREAM:
-        if (socket_priv->protocol != IPPROTO_TCP) {
-            // some user code will call socket to create STREAM sock with protocol 0
-//            return INVALID_SOCKET;
+        if ((socket_priv->protocol != 0) && (socket_priv->protocol != IPPROTO_TCP)) {
+            return INVALID_SOCKET;
         }
         conn_type = NETCONN_TCP;
         break;

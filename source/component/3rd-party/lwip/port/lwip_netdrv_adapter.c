@@ -237,33 +237,15 @@ static void __lwip_netdrv_adapter_on_inputted(void *netif, void *netbuf, uint_fa
     VSF_ASSERT(vsf_eda_is_stack_owner(vsf_eda_get_cur()));
     struct netif *lwip_netif = netif;
     struct pbuf *pbuf = netbuf;
-    struct eth_hdr *ethhdr;
 
 #if ETH_PAD_SIZE
     pbuf_header(pbuf, ETH_PAD_SIZE); /* reclaim the padding word */
 #endif
-    ethhdr = pbuf->payload;
-    switch (htons(ethhdr->type)) {
-    /* IP or ARP packet? */
-    case ETHTYPE_IP:
-    case ETHTYPE_ARP:
-#if PPPOE_SUPPORT
-    /* PPPoE packet? */
-    case ETHTYPE_PPPOEDISC:
-    case ETHTYPE_PPPOE:
-#endif /* PPPOE_SUPPORT */
-    /* full packet send to tcpip_thread to process */
-    if (lwip_netif->input(pbuf, lwip_netif) != ERR_OK) {
-        LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: IP input error\n"));
-        pbuf_free(pbuf);
-        pbuf = NULL;
-    }
-    break;
 
-    default:
+    if (lwip_netif->input(pbuf, lwip_netif) != ERR_OK) {
+        LWIP_DEBUGF(NETIF_DEBUG, ("ethernetif_input: input error\n"));
         pbuf_free(pbuf);
         pbuf = NULL;
-        break;
     }
 }
 
