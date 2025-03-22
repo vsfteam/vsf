@@ -568,6 +568,10 @@ static int __vsf_linux_socket_inet_setsockopt(vsf_linux_socket_priv_t *socket_pr
                 ip_reset_option(conn->pcb.ip, optname);
             }
             break;
+        case SO_REUSEPORT:
+            // refer to https://lwip-users.nongnu.narkive.com/XR3iL7wL/supporting-so-reuseaddr-and-so-reuseport
+            //  lwip support this by default, so do nothing here and returns good
+            break;
         case SO_SNDBUF:
             // ignore without error
             break;
