@@ -1575,8 +1575,8 @@ static int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uint
         broadcast_addr.u_addr.ip4.addr &= netif->netmask.u_addr.ip4.addr;
         broadcast_addr.u_addr.ip4.addr |= ~netif->netmask.u_addr.ip4.addr;
 #else
-        broadcast_addr.addr &= netif->netmask..addr;
-        broadcast_addr.ip4.addr |= ~netif->netmask.addr;
+        broadcast_addr.addr &= netif->netmask.addr;
+        broadcast_addr.addr |= ~netif->netmask.addr;
 #endif
         __ipaddr_port_to_sockaddr(&u.ifr->ifr_broadaddr, &broadcast_addr, 0);
         result = 0;
