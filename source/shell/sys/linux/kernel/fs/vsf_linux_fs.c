@@ -1892,6 +1892,7 @@ int close(int fd)
 int __fcntl_va(int fd, int cmd, va_list ap)
 {
     vsf_linux_fd_t *sfd = vsf_linux_fd_get(fd);
+    int result = -1;
     uintptr_t arg;
 
     if (!sfd) { return -1; }
@@ -1925,6 +1926,7 @@ int __fcntl_va(int fd, int cmd, va_list ap)
             long tmp_arg = arg;
             arg = arg ^ sfd->fd_flags;
             sfd->fd_flags |= tmp_arg;
+            result = 0;
         }
         break;
     case F_GETFL:
@@ -1934,11 +1936,12 @@ int __fcntl_va(int fd, int cmd, va_list ap)
             long tmp_arg = arg;
             arg = arg ^ sfd->priv->flags;
             sfd->priv->flags = tmp_arg;
+            result = 0;
         }
         break;
     }
 
-    return sfd->op->fn_fcntl(sfd, cmd, arg);
+    return NULL == sfd->op->fn_fcntl ? result : sfd->op->fn_fcntl(sfd, cmd, arg);
 }
 
 int fcntl(int fd, int cmd, ...)
