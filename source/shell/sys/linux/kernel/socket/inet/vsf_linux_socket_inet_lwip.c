@@ -1036,10 +1036,10 @@ static int __vsf_linux_socket_inet_getpeername(vsf_linux_socket_priv_t *socket_p
     vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)socket_priv;
     struct netconn *conn = priv->conn;
 
-    ip_addr_t localaddr;
+    ip_addr_t remoteaddr;
     u16_t port;
-    netconn_peer(conn, &localaddr, &port);
-    __ipaddr_port_to_sockaddr(addr, &localaddr, port);
+    netconn_peer(conn, &remoteaddr, &port);
+    __ipaddr_port_to_sockaddr(addr, &remoteaddr, port);
     return 0;
 }
 
@@ -1459,6 +1459,7 @@ static short __vsf_linux_lwip_netif_flags_to_ifr_flags(struct netif *netif)
 static int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     struct netif *netif;
+    int result = -1;
 
     union {
         uintptr_t arg;
@@ -1479,7 +1480,7 @@ static int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uint
         u.ifr->ifr_name[0] = netif->name[0];
         u.ifr->ifr_name[1] = netif->name[1];
         u.ifr->ifr_name[2] = '\0';
-        return 0;
+        result = 0;
         break;
     case SIOCGIFCONF: {
             struct ifreq *ifr = u.ifconf->ifc_req;
@@ -1518,7 +1519,8 @@ static int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uint
         }
 
         u.ifr->ifr_flags = __vsf_linux_lwip_netif_flags_to_ifr_flags(netif);
-        return 0;
+        result = 0;
+        break;
     case SIOCGIFADDR:
         netif = __vsf_linux_lwip_get_netif_by_ifreq(u.ifr);
         if (NULL == netif) {
@@ -1526,7 +1528,77 @@ static int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uint
         }
 
         __ipaddr_port_to_sockaddr(&u.ifr->ifr_addr, &netif->ip_addr, 0);
-        return 0;
+        result = 0;
+        break;
+    case SIOCSIFADDR:
+        netif = __vsf_linux_lwip_get_netif_by_ifreq(u.ifr);
+        if (NULL == netif) {
+            break;
+        }
+
+        __sockaddr_to_ipaddr_port(&u.ifr->ifr_addr, &netif->ip_addr, 0);
+        break;
+    case SIOCGIFDSTADDR: {
+            vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
+            struct netconn *conn = priv->conn;
+
+            ip_addr_t remoteaddr;
+            u16_t port;
+            netconn_peer(conn, &remoteaddr, &port);
+            __ipaddr_port_to_sockaddr(&u.ifr->ifr_dstaddr, &remoteaddr, port);
+        }
+        break;
+    case SIOCSIFDSTADDR: {
+            vsf_linux_socket_inet_priv_t *priv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
+            struct netconn *conn = priv->conn;
+
+            ip_addr_t remoteaddr;
+            u16_t port;
+            __sockaddr_to_ipaddr_port(&u.ifr->ifr_dstaddr, &remoteaddr, &port);
+
+            ip_addr_set(&conn->pcb.ip->remote_ip, &remoteaddr);
+            if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_UDP) {
+                conn->pcb.udp->remote_port = port;
+            } else if (NETCONNTYPE_GROUP(netconn_type(conn)) == NETCONN_TCP) {
+                conn->pcb.tcp->remote_port = port;
+            }
+        }
+        break;
+    case SIOCGIFBRDADDR:
+        netif = __vsf_linux_lwip_get_netif_by_ifreq(u.ifr);
+        if (NULL == netif) {
+            break;
+        }
+
+        ip_addr_t broadcast_addr = netif->ip_addr;
+#if LWIP_IPV4 && LWIP_IPV6
+        broadcast_addr.u_addr.ip4.addr &= netif->netmask.u_addr.ip4.addr;
+        broadcast_addr.u_addr.ip4.addr |= ~netif->netmask.u_addr.ip4.addr;
+#else
+        broadcast_addr.addr &= netif->netmask..addr;
+        broadcast_addr.ip4.addr |= ~netif->netmask.addr;
+#endif
+        __ipaddr_port_to_sockaddr(&u.ifr->ifr_broadaddr, &broadcast_addr, 0);
+        result = 0;
+        break;
+    case SIOCGIFNETMASK:
+        netif = __vsf_linux_lwip_get_netif_by_ifreq(u.ifr);
+        if (NULL == netif) {
+            break;
+        }
+
+        __ipaddr_port_to_sockaddr(&u.ifr->ifr_netmask, &netif->netmask, 0);
+        result = 0;
+        break;
+    case SIOCSIFNETMASK:
+        netif = __vsf_linux_lwip_get_netif_by_ifreq(u.ifr);
+        if (NULL == netif) {
+            break;
+        }
+
+        __sockaddr_to_ipaddr_port(&u.ifr->ifr_netmask, &netif->netmask, 0);
+        result = 0;
+        break;
     case SIOCGIFHWADDR:
         netif = __vsf_linux_lwip_get_netif_by_ifreq(u.ifr);
         if (NULL == netif) {
@@ -1534,13 +1606,14 @@ static int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uint
         }
 
         memcpy(u.ifr->ifr_hwaddr.sa_data, netif->hwaddr, NETIF_MAX_HWADDR_LEN);
-        return 0;
-    case SIOCSIFADDR:
+        result = 0;
+        break;
     case SIOCSIFFLAGS:
+    case SIOCSIFBRDADDR:
         // not supported
         break;
     }
-    return -1;
+    return result;
 }
 
 static ssize_t __vsf_linux_socket_inet_read(vsf_linux_fd_t *sfd, void *buf, size_t count)

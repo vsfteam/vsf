@@ -41,6 +41,7 @@ struct ifreq {
 #define	ifr_addr                ifr_ifru.ifru_addr
 #define	ifr_dstaddr             ifr_ifru.ifru_dstaddr
 #define	ifr_broadaddr           ifr_ifru.ifru_broadaddr
+#define ifr_brdaddr             ifr_broadaddr
 #define	ifr_netmask             ifr_ifru.ifru_netmask
 #define	ifr_flags               ifr_ifru.ifru_flags
 #define	ifr_metric              ifr_ifru.ifru_ivalue
