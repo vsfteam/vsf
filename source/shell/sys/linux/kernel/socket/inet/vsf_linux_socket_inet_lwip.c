@@ -2330,16 +2330,16 @@ static ssize_t __vsf_linux_proc_net_if_inet6_read(vsf_linux_fd_t *sfd, void *buf
 {
     char *curbuf = (char *)buf;
     size_t remain = count, curlen;
-    ip6_addr_t *ip6addr;
+    const ip6_addr_t *ip6addr;
     uint8_t flag, state;
     char name[3];
 
     for (struct netif *netif = netif_list; netif != NULL; netif = netif->next) {
         for (int i = 0; i < dimof(netif->ip6_addr); i++) {
             if (!ip6_addr_isinvalid(netif_ip6_addr_state(netif, i))) {
-                ip6addr = &netif->ip6_addr[i].u_addr.ip6;
-
+                ip6addr = netif_ip6_addr(netif, i);
                 state = netif_ip6_addr_state(netif, i);
+
                 flag = 0x80;
                 if (ip6_addr_isvalid(state)) {
                     flag |= 0x80;
@@ -2379,6 +2379,7 @@ static ssize_t __vsf_linux_proc_net_if_inet6_read(vsf_linux_fd_t *sfd, void *buf
                     break;
                 }
                 remain -= curlen;
+                curbuf += curlen;
             }
         }
     }
