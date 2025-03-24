@@ -1496,7 +1496,6 @@ static int __vsf_linux_lwip_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uint
                 u.ifconf->ifc_len = INT_MAX;
             }
 
-            extern struct netif *netif_list;
             for (struct netif *netif = netif_list; netif != NULL; netif = netif->next) {
                 if (netif_is_up(netif) && (u.ifconf->ifc_len >= sizeof(*ifr))) {
                     if (ifr != NULL) {
@@ -2095,7 +2094,6 @@ int __vsf_linux_ifconfig_main(int argc, char **argv)
     }
 
     LOCK_TCPIP_CORE();
-    extern struct netif *netif_list;
     struct netif *netif = !ifname ? netif_list : netif_find(ifname);
     if (!netif) {
         UNLOCK_TCPIP_CORE();
@@ -2322,5 +2320,99 @@ int __inet_gethostbyname(const char *name, in_addr_t *addr)
     }
     return 0;
 }
+
+// procfs
+
+#if VSF_LINUX_USE_PROCFS == ENABLED
+
+#   if LWIP_IPV6
+static ssize_t __vsf_linux_proc_net_if_inet6_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    char *curbuf = (char *)buf;
+    size_t remain = count, curlen;
+    ip6_addr_t *ip6addr;
+    uint8_t flag, state;
+    char name[3];
+
+    for (struct netif *netif = netif_list; netif != NULL; netif = netif->next) {
+        for (int i = 0; i < dimof(netif->ip6_addr); i++) {
+            if (!ip6_addr_isinvalid(netif_ip6_addr_state(netif, i))) {
+                ip6addr = &netif->ip6_addr[i].u_addr.ip6;
+
+                state = netif_ip6_addr_state(netif, i);
+                flag = 0x80;
+                if (ip6_addr_isvalid(state)) {
+                    flag |= 0x80;
+                }
+                if (ip6_addr_istentative(state)) {
+                    flag |= 0x20;
+                }
+                if (ip6_addr_isdeprecated(state)) {
+                    flag |= 0x10;
+                }
+                name[0] = netif->name[0];
+                name[1] = netif->name[1];
+                name[2] = '\0';
+
+                curlen = snprintf(curbuf, remain,
+                    "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X %02X %02X %02X %02X %8s\n",
+                    ((uint8_t *)ip6addr->addr)[0], ((uint8_t *)ip6addr->addr)[1],
+                    ((uint8_t *)ip6addr->addr)[2], ((uint8_t *)ip6addr->addr)[3],
+                    ((uint8_t *)ip6addr->addr)[4], ((uint8_t *)ip6addr->addr)[5],
+                    ((uint8_t *)ip6addr->addr)[6], ((uint8_t *)ip6addr->addr)[7],
+                    ((uint8_t *)ip6addr->addr)[8], ((uint8_t *)ip6addr->addr)[9],
+                    ((uint8_t *)ip6addr->addr)[10], ((uint8_t *)ip6addr->addr)[11],
+                    ((uint8_t *)ip6addr->addr)[12], ((uint8_t *)ip6addr->addr)[13],
+                    ((uint8_t *)ip6addr->addr)[14], ((uint8_t *)ip6addr->addr)[15],
+                    i + 1,              // ifindex
+                    0,                  // prefixlen
+#       if LWIP_IPV6_SCOPES
+                    ip6_addr_zone(ip6addr),
+#       else
+                    0x00,
+#       endif
+                    0x80,
+                    name
+                );
+                if (curlen >= remain) {
+                    remain = 0;
+                    break;
+                }
+                remain -= curlen;
+            }
+        }
+    }
+    return count - remain;
+}
+
+static const vsf_linux_fd_op_t __vsf_linux_proc_net_if_inet6_fdop = {
+    .priv_size          = 0,
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
+    .fn_read            = __vsf_linux_proc_net_if_inet6_read,
+};
+#   endif
+
+int __vsf_linux_socket_inet_procfs_bind(void)
+{
+    int err;
+
+    err = mkdir("/proc/net", 0);
+    if (err != 0) {
+        fprintf(stderr, "fail to mkdir /proc/net\n");
+        return err;
+    }
+
+#   if LWIP_IPV6
+    err = vsf_linux_fs_bind_target_ex("/proc/net/if_inet6", NULL, &__vsf_linux_proc_net_if_inet6_fdop,
+        NULL, NULL, VSF_FILE_ATTR_READ, 0);
+    if (err != 0) {
+        fprintf(stderr, "fail to create /proc/net/if_inet6\n");
+        return err;
+    }
+#   endif
+
+    return err;
+}
+#endif      // VSF_LINUX_USE_PROCFS
 
 #endif

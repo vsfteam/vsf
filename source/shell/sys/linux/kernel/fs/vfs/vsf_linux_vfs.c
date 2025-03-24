@@ -172,6 +172,14 @@ static const vsf_linux_fd_op_t __vsf_linux_proc_meminfo_fdop = {
     .fn_read            = __vsf_linux_proc_meminfo_read,
     .fn_stat            = __vsf_linux_proc_meminfo_stat,
 };
+
+#   if VSF_LINUX_USE_SOCKET == ENABLED && VSF_LINUX_SOCKET_USE_INET == ENABLED
+VSF_CAL_WEAK(__vsf_linux_socket_inet_procfs_bind)
+int __vsf_linux_socket_inet_procfs_bind(void)
+{
+    return 0;
+}
+#   endif
 #endif
 
 int vsf_linux_vfs_init(void)
@@ -202,6 +210,13 @@ int vsf_linux_vfs_init(void)
         fprintf(stderr, "fail to create /proc/meminfo\n");
         return err;
     }
+#   if VSF_LINUX_USE_SOCKET == ENABLED && VSF_LINUX_SOCKET_USE_INET == ENABLED
+    err = __vsf_linux_socket_inet_procfs_bind();
+    if (err != 0) {
+        fprintf(stderr, "fail to bind /proc/net\n");
+        return err;
+    }
+#   endif
 #endif
 
 #if VSF_LINUX_USE_DEVFS == ENABLED
