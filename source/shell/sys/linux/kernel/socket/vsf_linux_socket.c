@@ -193,6 +193,8 @@ in_addr_t inet_network(const char *cp)
     return ntohl(inet_addr(cp));
 }
 
+// for full inet_pton support, please reimplement it
+VSF_CAL_WEAK(inet_pton)
 int inet_pton(int af, const char *src, void *dst)
 {
     switch (af) {
@@ -211,6 +213,8 @@ int inet_pton(int af, const char *src, void *dst)
     }
 }
 
+// for full inet_ntop support, please reimplement it
+VSF_CAL_WEAK(inet_ntop)
 const char * inet_ntop(int af, const void *src, char *dst, socklen_t size)
 {
     switch (af) {
@@ -258,39 +262,53 @@ const char * gai_strerror(int errcode)
     return (const char *)"unknown error";
 }
 
+// for full gethostbyaddr support, please reimplement it
+VSF_CAL_WEAK(gethostbyaddr)
 struct hostent * gethostbyaddr(const void *addr, socklen_t len, int type)
 {
     return NULL;
 }
 
+// for full getservbyname support, please reimplement it
+VSF_CAL_WEAK(getservbyname)
 struct servent * getservbyname(const char *name, const char *proto)
 {
     VSF_LINUX_ASSERT(false);
     return NULL;
 }
 
+// for full getservbyport support, please reimplement it
+VSF_CAL_WEAK(getservbyport)
 struct servent * getservbyport(int port, const char *proto)
 {
     VSF_LINUX_ASSERT(false);
     return NULL;
 }
 
+// for full setservent support, please reimplement it
+VSF_CAL_WEAK(setservent)
 void setservent(int stayopen)
 {
     VSF_LINUX_ASSERT(false);
 }
 
+// for full endservent support, please reimplement it
+VSF_CAL_WEAK(endservent)
 void endservent(void)
 {
     VSF_LINUX_ASSERT(false);
 }
 
+// for full getservent support, please reimplement it
+VSF_CAL_WEAK(getservent)
 struct servent * getservent(void)
 {
     VSF_LINUX_ASSERT(false);
     return NULL;
 }
 
+// for full gethostbyname support, please reimplement it
+VSF_CAL_WEAK(gethostbyname)
 struct hostent * gethostbyname(const char *name)
 {
 #if VSF_LINUX_SOCKET_USE_INET == ENABLED
@@ -316,6 +334,8 @@ struct hostent * gethostbyname(const char *name)
 #endif
 }
 
+// for full getnameinfo support, please reimplement it
+VSF_CAL_WEAK(getnameinfo)
 int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
                         char *host, socklen_t hostlen,
                         char *serv, socklen_t servlen, int flags)
@@ -357,6 +377,8 @@ int getnameinfo(const struct sockaddr *addr, socklen_t addrlen,
     }
 }
 
+// for full getaddrinfo support, please reimplement it
+VSF_CAL_WEAK(getaddrinfo)
 int getaddrinfo(const char *name, const char *service, const struct addrinfo *hints,
                         struct addrinfo **pai)
 {
@@ -433,6 +455,8 @@ int getaddrinfo(const char *name, const char *service, const struct addrinfo *hi
     return 0;
 }
 
+// for full freeaddrinfo support, please reimplement it
+VSF_CAL_WEAK(freeaddrinfo)
 void freeaddrinfo(struct addrinfo *ai)
 {
     struct addrinfo *p;

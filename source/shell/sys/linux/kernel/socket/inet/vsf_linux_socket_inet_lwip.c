@@ -2322,6 +2322,43 @@ int __inet_gethostbyname(const char *name, in_addr_t *addr)
     return 0;
 }
 
+// replacement for weak APIs in socket
+
+// IMORTANT, addrinfo here MUST be compatible with addrinfo in lwip and addrinfo in linux netdb
+struct addrinfo {
+    int               ai_flags;      /* Input flags. */
+    int               ai_family;     /* Address family of socket. */
+    int               ai_socktype;   /* Socket type. */
+    int               ai_protocol;   /* Protocol of socket. */
+    socklen_t         ai_addrlen;    /* Length of socket address. */
+    struct sockaddr  *ai_addr;       /* Socket address of socket. */
+    char             *ai_canonname;  /* Canonical name of service location. */
+    struct addrinfo  *ai_next;       /* Pointer to next in list. */
+};
+
+extern struct hostent *lwip_gethostbyname(const char *name);
+extern void lwip_freeaddrinfo(struct addrinfo *ai);
+extern int lwip_getaddrinfo(const char *nodename,
+       const char *servname,
+       const struct addrinfo *hints,
+       struct addrinfo **res);
+
+int getaddrinfo(const char *name, const char *service, const struct addrinfo *hints,
+                        struct addrinfo **pai)
+{
+    return lwip_getaddrinfo(name, service, hints, pai);
+}
+
+struct hostent * gethostbyname(const char *name)
+{
+    return lwip_gethostbyname(name);
+}
+
+void freeaddrinfo(struct addrinfo *ai)
+{
+    lwip_freeaddrinfo(ai);
+}
+
 // procfs
 
 #if VSF_LINUX_USE_PROCFS == ENABLED
