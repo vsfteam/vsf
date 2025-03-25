@@ -2343,6 +2343,9 @@ extern int lwip_getaddrinfo(const char *nodename,
        const struct addrinfo *hints,
        struct addrinfo **res);
 
+extern int lwip_inet_pton(int af, const char *src, void *dst);
+extern const char *lwip_inet_ntop(int af, const void *src, char *dst, socklen_t size);
+
 int getaddrinfo(const char *name, const char *service, const struct addrinfo *hints,
                         struct addrinfo **pai)
 {
@@ -2357,6 +2360,16 @@ struct hostent * gethostbyname(const char *name)
 void freeaddrinfo(struct addrinfo *ai)
 {
     lwip_freeaddrinfo(ai);
+}
+
+int inet_pton(int af, const char *src, void *dst)
+{
+    return lwip_inet_pton(af, src, dst);
+}
+
+const char * inet_ntop(int af, const void *src, char *dst, socklen_t size)
+{
+    return lwip_inet_ntop(af, src, dst, size);
 }
 
 // procfs
