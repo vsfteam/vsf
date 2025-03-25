@@ -305,7 +305,7 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f)
 {
     vsf_linux_fd_t *sfd = (vsf_linux_fd_t *)f;
     ssize_t bytes_requested = size * nmemb;
-    ssize_t ret;
+    ssize_t ret = 0;
     if (0 == bytes_requested) {
         return 0;
     }
@@ -323,14 +323,17 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f)
         sfd->unget_buff = EOF;
     }
 
-    bytes_requested -= pre_read;
-    ret = read(fd, (void *)ptr, bytes_requested);
-    if (ret < 0) {
-        return 0;
+    if (bytes_requested > pre_read) {
+        ret = read(fd, (void *)ptr, bytes_requested - pre_read);
+        if (ret < 0) {
+            return 0;
+        }
     }
 
-    bytes_requested += pre_read;
     ret += pre_read;
+    if (0 == ret) {
+        return EOF;
+    }
     return (size_t)(bytes_requested == ret ? nmemb : ret / size);
 }
 
@@ -705,8 +708,7 @@ int vfscanf(FILE *f, const char *format, va_list ap)
                     break;
                 case 's': {
                         char *ptr = va_arg(ap, char *);
-                        if (width) { width--; /* reserved for '\0' */ }
-                        else { width = -1; }
+                        if (!width) { width = -1; }
 
                         while ((width < 0) || (width-- > 0)) {
                             ch_tmp = fgetc(f); if (ch_tmp == EOF) { break; }

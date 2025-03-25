@@ -25,6 +25,7 @@
 #define __VSF_LINUX_FS_CLASS_INHERIT__
 #define __VSF_LINUX_SOCKET_CLASS_INHERIT__
 #define __VSF_LINUX_CLASS_INHERIT__
+#define __VSF_FS_CLASS_INHERIT__
 #include "vsf.h"
 
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED
@@ -2326,19 +2327,59 @@ int __inet_gethostbyname(const char *name, in_addr_t *addr)
 #if VSF_LINUX_USE_PROCFS == ENABLED
 
 #   if LWIP_IPV6
+
+typedef struct vsf_linux_procfs_if_inet6_t {
+    implement(vsf_linux_fs_priv_t)
+
+    //        ADDR      ' '     ifidx   ' '     prefix  ' '     scope   ' '     flag    ' '     ifname  '\n'    '\0'
+    char line[16 * 2    + 1     + 2     + 1     + 2     + 1     + 2     + 1     + 2     + 1     + 8     + 1     + 1];
+    uint8_t cur_ip6addr;
+    uint8_t netif_idx;
+} vsf_linux_procfs_if_inet6_t;
+
 static ssize_t __vsf_linux_proc_net_if_inet6_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
+    vsf_linux_procfs_if_inet6_t *priv = (vsf_linux_procfs_if_inet6_t *)sfd->priv;
+    uint64_t pos_orig = priv->file->pos;
+
+    struct netif *netif;
     char *curbuf = (char *)buf;
-    size_t remain = count, curlen;
+    size_t remain, curlen, lineoffset;
     const ip6_addr_t *ip6addr;
     uint8_t flag, state;
     char name[3];
 
-    for (struct netif *netif = netif_list; netif != NULL; netif = netif->next) {
-        for (int i = 0; i < dimof(netif->ip6_addr); i++) {
-            if (!ip6_addr_isinvalid(netif_ip6_addr_state(netif, i))) {
-                ip6addr = netif_ip6_addr(netif, i);
-                state = netif_ip6_addr_state(netif, i);
+    if (0 == priv->netif_idx) {
+        priv->netif_idx = 1;
+    }
+
+    lineoffset = pos_orig % (sizeof(priv->line) - 1);
+    if (lineoffset) {
+        remain = sizeof(priv->line) - 1 - lineoffset;
+        curlen = vsf_min(remain, count);
+        priv->file->pos += curlen;
+        if (curlen == remain) {
+            priv->cur_ip6addr++;
+        }
+
+        memcpy(curbuf, priv->line + lineoffset, curlen);
+        curbuf += curlen;
+        remain = count - curlen;
+        if (0 == remain) {
+            goto done;
+        }
+    } else {
+        remain = count;
+    }
+
+    for (   netif = netif_get_by_index(priv->netif_idx);
+            netif != NULL;
+            priv->netif_idx += 1, netif = netif_get_by_index(priv->netif_idx), priv->cur_ip6addr = 0) {
+
+        for (; priv->cur_ip6addr < dimof(netif->ip6_addr); priv->cur_ip6addr++) {
+            if (!ip6_addr_isinvalid(netif_ip6_addr_state(netif, priv->cur_ip6addr))) {
+                ip6addr = netif_ip6_addr(netif, priv->cur_ip6addr);
+                state = netif_ip6_addr_state(netif, priv->cur_ip6addr);
 
                 flag = 0x80;
                 if (ip6_addr_isvalid(state)) {
@@ -2354,7 +2395,7 @@ static ssize_t __vsf_linux_proc_net_if_inet6_read(vsf_linux_fd_t *sfd, void *buf
                 name[1] = netif->name[1];
                 name[2] = '\0';
 
-                curlen = snprintf(curbuf, remain,
+                curlen = snprintf(priv->line, sizeof(priv->line),
                     "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X %02X %02X %02X %02X %8s\n",
                     ((uint8_t *)ip6addr->addr)[0], ((uint8_t *)ip6addr->addr)[1],
                     ((uint8_t *)ip6addr->addr)[2], ((uint8_t *)ip6addr->addr)[3],
@@ -2364,30 +2405,34 @@ static ssize_t __vsf_linux_proc_net_if_inet6_read(vsf_linux_fd_t *sfd, void *buf
                     ((uint8_t *)ip6addr->addr)[10], ((uint8_t *)ip6addr->addr)[11],
                     ((uint8_t *)ip6addr->addr)[12], ((uint8_t *)ip6addr->addr)[13],
                     ((uint8_t *)ip6addr->addr)[14], ((uint8_t *)ip6addr->addr)[15],
-                    i + 1,              // ifindex
-                    0,                  // prefixlen
-#       if LWIP_IPV6_SCOPES
+                    netif_get_index(netif), // ifindex
+                    0,                      // prefixlen
+#       if LWIP_IPV6_SCOPES                 // scope
                     ip6_addr_zone(ip6addr),
 #       else
                     0x00,
 #       endif
-                    0x80,
+                    0x80,                   // flag
                     name
                 );
-                if (curlen >= remain) {
-                    remain = 0;
-                    break;
-                }
-                remain -= curlen;
+
+                curlen = vsf_min(curlen, remain);
+                priv->file->pos += curlen;
+                memcpy(curbuf, priv->line, curlen);
                 curbuf += curlen;
+                remain -= curlen;
+                if (0 == remain) {
+                    goto done;
+                }
             }
         }
     }
+done:
     return count - remain;
 }
 
 static const vsf_linux_fd_op_t __vsf_linux_proc_net_if_inet6_fdop = {
-    .priv_size          = 0,
+    .priv_size          = sizeof(vsf_linux_procfs_if_inet6_t),
     .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_read            = __vsf_linux_proc_net_if_inet6_read,
 };
