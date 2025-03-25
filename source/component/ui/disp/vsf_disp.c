@@ -47,14 +47,20 @@ static vsf_err_t __vk_reentrant_disp_init(vk_disp_t *pthis);
 static vsf_err_t __vk_reentrant_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 #endif
 
+static vsf_err_t __vk_dummy_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 const vk_disp_drv_t vk_reentrant_disp_drv = {
-    .init                   = __vk_reentrant_disp_init,
-    .refresh                = __vk_reentrant_disp_refresh,
+    .init           = __vk_reentrant_disp_init,
+    .refresh        = __vk_reentrant_disp_refresh,
 };
 #endif
+
+const vk_disp_drv_t vk_dummy_disp_drv = {
+    .refresh        = __vk_dummy_disp_refresh,
+};
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -95,6 +101,12 @@ vsf_err_t vk_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buf
         area_tmp.size.y = pthis->param.height;
     }
     return drv->refresh(pthis, area, disp_buff);
+}
+
+static vsf_err_t __vk_dummy_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff)
+{
+    vk_disp_on_ready(pthis);
+    return VSF_ERR_NONE;
 }
 
 /*******************************************************************************

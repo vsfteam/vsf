@@ -202,11 +202,17 @@ vsf_class(vk_reentrant_disp_t) {
 };
 #endif
 
+vsf_class(vk_dummy_disp_t) {
+    implement(vk_disp_t)
+};
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
 extern const vk_disp_drv_t vk_reentrant_disp_drv;
 #endif
+
+extern const vk_disp_drv_t vk_dummy_disp_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
