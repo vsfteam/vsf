@@ -37,6 +37,8 @@ jobs:
             cc: 7-2018-q2
           - os: ubuntu-latest
             cc: 5-2016-q3
+          - os: ubuntu-latest
+            cc: 4.9-2015-q3
 
     runs-on: ${{matrix.os}}
 
