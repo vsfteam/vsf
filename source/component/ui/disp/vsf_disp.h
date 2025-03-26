@@ -181,9 +181,9 @@ vsf_class(vk_disp_t) {
 };
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
-// vk_reentrant_disp_t can be used to make a vk_disp_t reentrant
-//  by implementint multiple vk_reentrant_disp_t with same mutex
-vsf_class(vk_reentrant_disp_t) {
+// vk_disp_reentrant_t can be used to make a vk_disp_t reentrant
+//  by implementint multiple vk_disp_reentrant_t with same mutex
+vsf_class(vk_disp_reentrant_t) {
     public_member(
         implement(vk_disp_t)
 
@@ -202,17 +202,17 @@ vsf_class(vk_reentrant_disp_t) {
 };
 #endif
 
-vsf_class(vk_dummy_disp_t) {
+vsf_class(vk_disp_dummy_t) {
     implement(vk_disp_t)
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
-extern const vk_disp_drv_t vk_reentrant_disp_drv;
+extern const vk_disp_drv_t vk_disp_reentrant_drv;
 #endif
 
-extern const vk_disp_drv_t vk_dummy_disp_drv;
+extern const vk_disp_drv_t vk_disp_dummy_drv;
 
 /*============================ PROTOTYPES ====================================*/
 

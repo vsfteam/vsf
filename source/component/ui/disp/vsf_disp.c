@@ -28,7 +28,7 @@
 /*============================ MACROS ========================================*/
 
 #if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED && VSF_SYNC_CFG_SUPPORT_ISR != ENABLED
-#   error VSF_SYNC_CFG_SUPPORT_ISR is needed for reentrant_disp
+#   error VSF_SYNC_CFG_SUPPORT_ISR is needed for disp_reentrant
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -43,23 +43,23 @@ enum {
 /*============================ PROTOTYPES ====================================*/
 
 #if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
-static vsf_err_t __vk_reentrant_disp_init(vk_disp_t *pthis);
-static vsf_err_t __vk_reentrant_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
+static vsf_err_t __vk_disp_reentrant_init(vk_disp_t *pthis);
+static vsf_err_t __vk_disp_reentrant_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 #endif
 
-static vsf_err_t __vk_dummy_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
+static vsf_err_t __vk_disp_dummy_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 #if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
-const vk_disp_drv_t vk_reentrant_disp_drv = {
-    .init           = __vk_reentrant_disp_init,
-    .refresh        = __vk_reentrant_disp_refresh,
+const vk_disp_drv_t vk_disp_reentrant_drv = {
+    .init           = __vk_disp_reentrant_init,
+    .refresh        = __vk_disp_reentrant_refresh,
 };
 #endif
 
-const vk_disp_drv_t vk_dummy_disp_drv = {
-    .refresh        = __vk_dummy_disp_refresh,
+const vk_disp_drv_t vk_disp_dummy_drv = {
+    .refresh        = __vk_disp_dummy_refresh,
 };
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -103,7 +103,7 @@ vsf_err_t vk_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buf
     return drv->refresh(pthis, area, disp_buff);
 }
 
-static vsf_err_t __vk_dummy_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff)
+static vsf_err_t __vk_disp_dummy_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff)
 {
     vk_disp_on_ready(pthis);
     return VSF_ERR_NONE;
@@ -112,25 +112,26 @@ static vsf_err_t __vk_dummy_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area,
 /*******************************************************************************
 * reentrant disp                                                               *
 *******************************************************************************/
+
 #if VSF_USE_KERNEL == ENABLED && VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
-static void __vk_reentrant_disp_on_ready(vk_disp_t *disp)
+static void __vk_disp_reentrant_on_ready(vk_disp_t *disp)
 {
-    vk_reentrant_disp_t *pthis = (vk_reentrant_disp_t *)disp->ui_data;
+    vk_disp_reentrant_t *pthis = (vk_disp_reentrant_t *)disp->ui_data;
     vk_disp_on_ready(&pthis->use_as__vk_disp_t);
     if (pthis->mutex != NULL) {
-        // use vsf_eda_mutex_leave_isr in case __vk_reentrant_disp_on_ready is called in isr
+        // use vsf_eda_mutex_leave_isr in case __vk_disp_reentrant_on_ready is called in isr
         vsf_eda_mutex_leave_isr(pthis->mutex);
     }
 }
 
-static void __vk_reentrant_disp_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+static void __vk_disp_reentrant_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_reentrant_disp_t *pthis = vsf_container_of(eda, vk_reentrant_disp_t, eda);
+    vk_disp_reentrant_t *pthis = vsf_container_of(eda, vk_disp_reentrant_t, eda);
     vsf_err_t err;
 
     switch (evt) {
     case VSF_EVT_INIT:
-        pthis->disp->ui_on_ready = __vk_reentrant_disp_on_ready;
+        pthis->disp->ui_on_ready = __vk_disp_reentrant_on_ready;
         pthis->disp->ui_data = pthis;
         vk_disp_on_ready(&pthis->use_as__vk_disp_t);
         break;
@@ -150,9 +151,9 @@ static void __vk_reentrant_disp_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     }
 }
 
-static vsf_err_t __vk_reentrant_disp_init(vk_disp_t *disp)
+static vsf_err_t __vk_disp_reentrant_init(vk_disp_t *disp)
 {
-    vk_reentrant_disp_t *pthis = (vk_reentrant_disp_t *)disp;
+    vk_disp_reentrant_t *pthis = (vk_disp_reentrant_t *)disp;
     disp = pthis->disp;
 
     if (    ((pthis->pos.x + pthis->param.width) > disp->param.width)
@@ -160,16 +161,16 @@ static vsf_err_t __vk_reentrant_disp_init(vk_disp_t *disp)
         return VSF_ERR_FAIL;
     }
 
-    pthis->eda.fn.evthandler = __vk_reentrant_disp_evthandler;
+    pthis->eda.fn.evthandler = __vk_disp_reentrant_evthandler;
 #if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
     pthis->eda.on_terminate = NULL;
 #endif
     return vsf_eda_init(&pthis->eda);
 }
 
-static vsf_err_t __vk_reentrant_disp_refresh(vk_disp_t *disp, vk_disp_area_t *area, void *disp_buff)
+static vsf_err_t __vk_disp_reentrant_refresh(vk_disp_t *disp, vk_disp_area_t *area, void *disp_buff)
 {
-    vk_reentrant_disp_t *pthis = (vk_reentrant_disp_t *)disp;
+    vk_disp_reentrant_t *pthis = (vk_disp_reentrant_t *)disp;
 
     pthis->area = *area;
     pthis->area.pos.x += pthis->pos.x;
