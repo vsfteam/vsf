@@ -374,6 +374,31 @@ int lwip_inet_pton(int af, const char *src, void *dst)
     return err;
 }
 
+VSF_CAL_WEAK(lwip_inet_ntop)
+const char * lwip_inet_ntop(int af, const void *src, char *dst, socklen_t size)
+{
+    const char *ret = NULL;
+    int size_int = (int)size;
+    if (size_int < 0) {
+        return NULL;
+    }
+    switch (af) {
+#if LWIP_IPV4
+    case AF_INET:
+        ret = ip4addr_ntoa_r((const ip4_addr_t *)src, dst, size_int);
+        break;
+#endif
+#if LWIP_IPV6
+    case AF_INET6:
+        ret = ip6addr_ntoa_r((const ip6_addr_t *)src, dst, size_int);
+        break;
+#endif
+    default:
+        break;
+  }
+  return ret;
+}
+
 // helper
 static void __sockaddr_to_ipaddr_port(const struct sockaddr *sockaddr, ip_addr_t *ipaddr, u16_t *port)
 {
@@ -2342,9 +2367,6 @@ extern int lwip_getaddrinfo(const char *nodename,
        const char *servname,
        const struct addrinfo *hints,
        struct addrinfo **res);
-
-extern int lwip_inet_pton(int af, const char *src, void *dst);
-extern const char *lwip_inet_ntop(int af, const void *src, char *dst, socklen_t size);
 
 int getaddrinfo(const char *name, const char *service, const struct addrinfo *hints,
                         struct addrinfo **pai)
