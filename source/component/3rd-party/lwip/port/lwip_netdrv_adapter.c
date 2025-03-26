@@ -32,6 +32,7 @@
 #include "lwip/def.h"
 #include "lwip/mem.h"
 #include "lwip/pbuf.h"
+#include "lwip/ethip6.h"
 #include <lwip/stats.h>
 #include <lwip/snmp.h>
 #include "netif/etharp.h"
@@ -152,7 +153,12 @@ err_t ethernetif_init(struct netif *netif)
      * You can instead declare your own function an call etharp_output()
      * from it if you have to do some checks before sending (e.g. if link
      * is available...) */
+#if LWIP_IPV4
     netif->output = etharp_output;
+#endif
+#if LWIP_IPV6
+    netif->output_ip6 = ethip6_output;
+#endif
     netif->linkoutput = __ethernetif_low_level_output;
 
     /* initialize the hardware */
