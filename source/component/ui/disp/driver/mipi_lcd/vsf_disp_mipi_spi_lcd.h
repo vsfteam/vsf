@@ -30,8 +30,6 @@
 #   define __VSF_CLASS_IMPLEMENT__
 #endif
 
-#include "./vsf_disp_mipi_lcd_dcs.h"
-
 #include "utilities/ooc_class.h"
 
 #ifdef __cplusplus

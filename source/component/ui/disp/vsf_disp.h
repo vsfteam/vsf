@@ -236,6 +236,12 @@ extern void vk_disp_on_ready(vk_disp_t *pthis);
 #include "./driver/solomon-systech/ssd1306/vsf_disp_ssd1306.h"
 #include "./driver/vga/m480/vsf_disp_vga_m480.h"
 #include "./driver/fb/vsf_disp_fb.h"
+#if VSF_DISP_USE_MIPI_SPI_LCD == ENABLED
+#   define VSF_DISP_USE_MIPI_LCD            ENABLED
+#endif
+#if VSF_DISP_USE_MIPI_LCD == ENABLED
+#   include "./driver/mipi_lcd/vsf_disp_mipi_lcd_dcs.h"
+#endif
 #include "./driver/mipi_lcd/vsf_disp_mipi_spi_lcd.h"
 #include "./driver/did/vsf_disp_did.h"
 #if VSF_DISP_USE_WINGDI == ENABLED && defined(__WIN__)

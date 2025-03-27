@@ -20,7 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#if VSF_USE_UI == ENABLED && VSF_DISP_USE_MIPI_SPI_LCD == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_DISP_USE_MIPI_LCD == ENABLED
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,6 +30,9 @@ extern "C" {
 
 #define VSF_DISP_MIPI_LCD_WRITE(__CMD, __PARAM_LEN, ...)                        \
             (__CMD), (__PARAM_LEN),  ##__VA_ARGS__
+
+#define VSF_DISP_MIPI_LCD_DELAY_MS(__MS)                                        \
+            (0), (__MS)
 
 /*============================ MACROS ========================================*/
 
