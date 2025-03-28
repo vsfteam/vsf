@@ -165,8 +165,12 @@ typedef struct vsf_linux_socket_inet_priv_t {
 
 typedef union vsf_linux_sockaddr_t {
     struct sockaddr         sa;
+#if LWIP_IPV4
     struct sockaddr_in      in;
+#endif
+#if LWIP_IPV6
     struct sockaddr_in6     in6;
+#endif
 } vsf_linux_sockaddr_t;
 
 #if VSF_LINUX_SOCKET_USE_ROUTE == ENABLED
@@ -433,7 +437,7 @@ static void __sockaddr_to_ipaddr_port(const struct sockaddr *sockaddr, ip_addr_t
     }
 }
 
-static void __ipaddr_port_to_sockaddr(struct sockaddr *sockaddr, ip_addr_t *ipaddr, u16_t port)
+static socklen_t __ipaddr_port_to_sockaddr(struct sockaddr *sockaddr, ip_addr_t *ipaddr, u16_t port)
 {
 #if LWIP_IPV6
     if (IP_IS_ANY_TYPE_VAL(*ipaddr) || IP_IS_V6_VAL(*ipaddr)) {
@@ -449,6 +453,7 @@ static void __ipaddr_port_to_sockaddr(struct sockaddr *sockaddr, ip_addr_t *ipad
 #   if LWIP_IPV6_SCOPES
         sockaddr_in6->sin6_scope_id = ip6_addr_zone(ip_2_ip6(ipaddr));
 #   endif
+        return sizeof(struct sockaddr_in6);
     } else
 #endif
     {
@@ -458,7 +463,33 @@ static void __ipaddr_port_to_sockaddr(struct sockaddr *sockaddr, ip_addr_t *ipad
         sockaddr_in->sin_port = lwip_htons((port));
         sockaddr_in->sin_addr.s_addr = ip4_addr_get_u32(ip_2_ip4(ipaddr));
         memset(sockaddr_in->sin_zero, 0, SIN_ZERO_LEN);
+        return sizeof(struct sockaddr_in);
     }
+}
+
+static int __netbuf_addr_to_sockaddr(struct netconn *conn, struct netbuf *buf,
+                                    struct sockaddr *sockaddr, socklen_t *sockaddr_len)
+{
+    ip_addr_t *ipaddr = netbuf_fromaddr(buf);
+    u16_t port = netbuf_fromport(buf);
+    int truncated = 0;
+    vsf_linux_sockaddr_t saddr;
+
+#if LWIP_IPV4 && LWIP_IPV6
+    if (NETCONNTYPE_ISIPV6(netconn_type(conn)) && IP_IS_V4(ipaddr)) {
+        ip4_2_ipv4_mapped_ipv6(ip_2_ip6(ipaddr), ip_2_ip4(ipaddr));
+        IP_SET_TYPE(ipaddr, IPADDR_TYPE_V6);
+    }
+#endif
+
+    socklen_t addrlen = __ipaddr_port_to_sockaddr(&saddr.sa, ipaddr, port);
+    if (*sockaddr_len < addrlen) {
+        truncated = 1;
+    } else if (*sockaddr_len > addrlen) {
+        *sockaddr_len = addrlen;
+    }
+    memcpy(sockaddr, &saddr, *sockaddr_len);
+    return truncated;
 }
 
 static int __netconn_return(err_t err)
@@ -1195,6 +1226,7 @@ static int __vsf_linux_socket_inet_listen(vsf_linux_socket_priv_t *socket_priv, 
 static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, const void *buffer, size_t size, int flags,
                     const struct sockaddr *dst_addr, socklen_t addrlen)
 {
+    const struct msghdr *msg = priv->msg_tx;
     struct netconn *conn = priv->conn;
     enum netconn_type type = NETCONNTYPE_GROUP(netconn_type(conn));
 
@@ -1217,11 +1249,15 @@ static ssize_t __vsf_linux_socket_inet_send(vsf_linux_socket_inet_priv_t *priv, 
 
         struct netbuf buf = { 0 };
         uint16_t remote_port;
-        if (dst_addr) {
-            __sockaddr_to_ipaddr_port(dst_addr, &buf.addr, &remote_port);
+        if ((msg != NULL) && (msg->msg_name != NULL)) {
+            __sockaddr_to_ipaddr_port((const struct sockaddr *)msg->msg_name, &buf.addr, &remote_port);
         } else {
-            remote_port = 0;
-            ip_addr_set_any(NETCONNTYPE_ISIPV6(netconn_type(conn)), &buf.addr);
+            if (dst_addr) {
+                __sockaddr_to_ipaddr_port(dst_addr, &buf.addr, &remote_port);
+            } else {
+                remote_port = 0;
+                ip_addr_set_any(NETCONNTYPE_ISIPV6(netconn_type(conn)), &buf.addr);
+            }
         }
         netbuf_fromport(&buf) = remote_port;
 
@@ -1329,29 +1365,37 @@ static ssize_t __vsf_linux_socket_inet_recv(vsf_linux_socket_inet_priv_t *priv, 
     pos += curlen;
 
     struct netbuf *netbuf = priv->last.netbuf;
-    if ((type == NETCONN_UDP) && (netbuf != NULL) && (msg != NULL) && (msg->msg_control != NULL)) {
-        u8_t wrote_msg = 0;
-#if LWIP_NETBUF_RECVINFO
-        if ((netbuf->flags & NETBUF_FLAG_DESTADDR) && IP_IS_V4(&netbuf->toaddr)) {
-#   if LWIP_IPV4
-            if (msg->msg_controllen >= CMSG_SPACE(sizeof(struct in_pktinfo))) {
-                struct cmsghdr *chdr = CMSG_FIRSTHDR(msg);
-                struct in_pktinfo *pkti = (struct in_pktinfo *)CMSG_DATA(chdr);
-                chdr->cmsg_level = IPPROTO_IP;
-                chdr->cmsg_type = IP_PKTINFO;
-                chdr->cmsg_len = CMSG_LEN(sizeof(struct in_pktinfo));
-                pkti->ipi_ifindex = netbuf->p->if_idx;
-                inet_addr_from_ip4addr(&pkti->ipi_addr, ip_2_ip4(netbuf_destaddr(netbuf)));
-                msg->msg_controllen = CMSG_SPACE(sizeof(struct in_pktinfo));
-                wrote_msg = 1;
-            } else {
-                msg->msg_flags |= MSG_CTRUNC;
+    if (msg != NULL) {
+        if ((type == NETCONN_UDP) && (netbuf != NULL)) {
+            if ((msg->msg_name != NULL) && (msg->msg_namelen > 0)) {
+                __netbuf_addr_to_sockaddr(conn, netbuf,
+                          (struct sockaddr *)msg->msg_name, &msg->msg_namelen);
             }
+            if (msg->msg_control != NULL) {
+                u8_t wrote_msg = 0;
+#if LWIP_NETBUF_RECVINFO
+                if ((netbuf->flags & NETBUF_FLAG_DESTADDR) && IP_IS_V4(&netbuf->toaddr)) {
+#   if LWIP_IPV4
+                    if (msg->msg_controllen >= CMSG_SPACE(sizeof(struct in_pktinfo))) {
+                        struct cmsghdr *chdr = CMSG_FIRSTHDR(msg);
+                        struct in_pktinfo *pkti = (struct in_pktinfo *)CMSG_DATA(chdr);
+                        chdr->cmsg_level = IPPROTO_IP;
+                        chdr->cmsg_type = IP_PKTINFO;
+                        chdr->cmsg_len = CMSG_LEN(sizeof(struct in_pktinfo));
+                        pkti->ipi_ifindex = netbuf->p->if_idx;
+                        inet_addr_from_ip4addr(&pkti->ipi_addr, ip_2_ip4(netbuf_destaddr(netbuf)));
+                        msg->msg_controllen = CMSG_SPACE(sizeof(struct in_pktinfo));
+                        wrote_msg = 1;
+                    } else {
+                        msg->msg_flags |= MSG_CTRUNC;
+                    }
 #   endif
-        }
+                }
 #endif
-        if (!wrote_msg) {
-            msg->msg_controllen = 0;
+                if (!wrote_msg) {
+                    msg->msg_controllen = 0;
+                }
+            }
         }
     }
 
