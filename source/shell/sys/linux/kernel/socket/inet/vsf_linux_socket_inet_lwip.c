@@ -165,12 +165,8 @@ typedef struct vsf_linux_socket_inet_priv_t {
 
 typedef union vsf_linux_sockaddr_t {
     struct sockaddr         sa;
-#if LWIP_IPV4
     struct sockaddr_in      in;
-#endif
-#if LWIP_IPV6
     struct sockaddr_in6     in6;
-#endif
 } vsf_linux_sockaddr_t;
 
 #if VSF_LINUX_SOCKET_USE_ROUTE == ENABLED
