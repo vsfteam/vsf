@@ -68,12 +68,10 @@ extern "C" {
 #   error "TODO: support 9bit spi mode"
 #endif
 
-#define #define VSF_DISP_MIPI_SPI_LCD_INITSEQ           VSF_DISP_MIPI_LCD_INITSEQ
-
 /**
  \~chinese
- @def VSF_DISP_MIPI_SPI_LCD_INIT(__LCD_SEQ, __PIXEL_FORMAT, __MODE, ...)
- @brief 一个简化 LCD 配置的宏
+ @def VSF_DISP_MIPI_SPI_LCD_INITSEQ(__LCD_SEQ, __PIXEL_FORMAT, __MODE, ...)
+ @brief 一个简化 LCD 初始化序列的宏
  @param[in] __LCD_SEQ: 包含一堆预定义命令的宏, 增加新的 LCD 支持应该定义类似的命令，部分现在提供的预定义命令：
             VSF_DISP_MIPI_SPI_LCD_S6D05A1_BASE, VSF_DISP_MIPI_SPI_LCD_ILI9488_BASE, VSF_DISP_MIPI_SPI_LCD_ILI9341_BASE, ...
 
