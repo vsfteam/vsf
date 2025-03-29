@@ -378,7 +378,7 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #      define APP_DISP_DEMO_COLOR                       VSF_DISP_COLOR_RGB565
 #      define APP_DISP_DEMO_MIPI_SPI_LCD_SEQ            {                       \
                 VSF_DISP_MIPI_SPI_LCD_INITSEQ(                                  \
-                    VSF_DISP_MIPI_SPI_LCD_ST7789V_BASE,                         \
+                    VSF_DISP_MIPI_LCD_ST7789V_BASE,                             \
                     16,                                                         \
                     MIPI_MODE_RGB,                                              \
                 )                                                               \

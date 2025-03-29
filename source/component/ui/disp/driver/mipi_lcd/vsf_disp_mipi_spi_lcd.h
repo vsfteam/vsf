@@ -133,18 +133,20 @@ extern "C" {
     VSF_DISP_MIPI_LCD_INITSEQ(__LCD_SEQ,                                        \
         MIPI_DCS_CMD_SET_ADDRESS_MODE(__MODE),                                  \
         MIPI_DCS_CMD_SET_PIXEL_FORMAT(__PIXEL_FORMAT),                          \
-        ##__VA_ARGS__
+        ##__VA_ARGS__                                                           \
     )
-
-#define VSF_DISP_ST7789V_SPI_INITSEQ(__MODE, __PIXEL_FORMAT, ...)               \
-    VSF_DISP_MIPI_LCD_ST7789V_BASE,                                             \
-    MIPI_DCS_CMD_SET_ADDRESS_MODE(__MODE),                                      \
-    MIPI_DCS_CMD_SET_PIXEL_FORMAT(__PIXEL_FORMAT),                              \
-    MIPI_DCS_CMD_SET_DISPLAY_ON,                                                \
-    ##__VA_ARGS__
 
 #define VSF_DISP_MIPI_SPI_LCD_REFRESH_SEQ_LEN                                   \
     (1 + 1 + 4) + (1 + 1 + 4) + (1 + 1 + 4 + 4)
+
+
+// MACROs for specified LCD
+
+#define VSF_DISP_ST7789V_SPI_INITSEQ(__MODE, __PIXEL_FORMAT, ...)               \
+    VSF_DISP_MIPI_SPI_LCD_INITSEQ(VSF_DISP_MIPI_LCD_ST7789V_BASE,               \
+        __MODE, __PIXEL_FORMAT,                                                 \
+        ##__VA_ARGS__                                                           \
+    )
 
 /*============================ TYPES =========================================*/
 
