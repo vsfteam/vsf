@@ -142,9 +142,9 @@ extern "C" {
 
 // MACROs for specified LCD
 
-#define VSF_DISP_ST7789V_SPI_INITSEQ(__MODE, __PIXEL_FORMAT, ...)               \
+#define VSF_DISP_ST7789V_SPI_INITSEQ(__PIXEL_FORMAT, __MODE, ...)               \
     VSF_DISP_MIPI_SPI_LCD_INITSEQ(VSF_DISP_MIPI_LCD_ST7789V_BASE,               \
-        __MODE, __PIXEL_FORMAT,                                                 \
+        __PIXEL_FORMAT, __MODE,                                                 \
         ##__VA_ARGS__                                                           \
     )
 
