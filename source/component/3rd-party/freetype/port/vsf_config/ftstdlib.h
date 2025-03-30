@@ -139,7 +139,8 @@ static VSF_CAL_ALWAYS_INLINE int ft_fseek(FT_FILE *f, long offset, int fromwhere
         new_pos = vk_memfs_tell(&f->use_as__vk_memfs_file_t);
         break;
     case SEEK_END:
-        new_pos = f->size;
+        // DO NOT use f->size, which will fail when ft_fseek is called in cpp code
+        new_pos = f->use_as__vk_memfs_file_t.use_as__vk_file_t.size;
         break;
     default:
         VSF_FS_ASSERT(false);
@@ -147,7 +148,8 @@ static VSF_CAL_ALWAYS_INLINE int ft_fseek(FT_FILE *f, long offset, int fromwhere
     }
 
     new_pos += offset;
-    if (new_pos > f->size) {
+    // DO NOT use f->size, which will fail when ft_fseek is called in cpp code
+    if (new_pos > f->use_as__vk_memfs_file_t.use_as__vk_file_t.size) {
         return -1;
     }
     vk_memfs_setpos(&f->use_as__vk_memfs_file_t, new_pos);

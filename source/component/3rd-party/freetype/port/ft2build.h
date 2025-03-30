@@ -36,6 +36,11 @@
 #ifndef FT2BUILD_H_
 #define FT2BUILD_H_
 
+#ifdef __VSF__
+// freetype will check _MSC_VER to decide whether to use windows APIs
+# undef _MSC_VER
+#endif
+
 #include "./vsf_config/ftheader.h"
 
 #endif /* FT2BUILD_H_ */
