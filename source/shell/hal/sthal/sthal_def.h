@@ -31,32 +31,28 @@ extern "C" {
 
 #define HAL_MAX_DELAY 0xFFFFFFFFU
 
-#if (USE_RTOS == 1U)
-#    error "USE_RTOS should be 0 in the current HAL release"
-#else
-#    define __HAL_LOCK(__HANDLE__)                                             \
-        do {                                                                   \
-            if ((__HANDLE__)->Lock == HAL_LOCKED) {                            \
-                return HAL_BUSY;                                               \
-            } else {                                                           \
-                (__HANDLE__)->Lock = HAL_LOCKED;                               \
-            }                                                                  \
-        } while (0U)
+#define VSF_STHAL_LOCK(__HANDLE__)                                             \
+    do {                                                                       \
+        if ((__HANDLE__)->Lock == HAL_LOCKED) {                                \
+            return HAL_BUSY;                                                   \
+        } else {                                                               \
+            (__HANDLE__)->Lock = HAL_LOCKED;                                   \
+        }                                                                      \
+    } while (0U)
 
-#    define __HAL_UNLOCK(__HANDLE__)                                           \
-        do {                                                                   \
-            (__HANDLE__)->Lock = HAL_UNLOCKED;                                 \
-        } while (0U)
-#endif
+#define VSF_STHAL_UNLOCK(__HANDLE__)                                           \
+    do {                                                                       \
+        (__HANDLE__)->Lock = HAL_UNLOCKED;                                     \
+    } while (0U)
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#    ifndef VSF_STHAL_ASSERT
-#        define VSF_STHAL_ASSERT(__CON) VSF_ASSERT(__CON)
-#    endif
+#   ifndef VSF_STHAL_ASSERT
+#      define VSF_STHAL_ASSERT(__CON) VSF_ASSERT(__CON)
+#   endif
 #else
-#    ifndef VSF_STHAL_ASSERT
-#        define VSF_STHAL_ASSERT(...) VSF_ASSERT(__VA_ARGS__)
-#    endif
+#   ifndef VSF_STHAL_ASSERT
+#      define VSF_STHAL_ASSERT(...) VSF_ASSERT(__VA_ARGS__)
+#   endif
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
