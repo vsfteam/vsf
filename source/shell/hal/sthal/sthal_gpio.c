@@ -50,7 +50,6 @@ static void __sthal_gpio_isr_handler(void *target_ptr,
                                      vsf_gpio_t *gpio_ptr,
                                      vsf_gpio_pin_mask_t pin_mask)
 {
-    // TODO: multi port f
     HAL_GPIO_EXTI_Callback(pin_mask);
 }
 
