@@ -28,17 +28,13 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#define WWDG_IT_EWI WWDG_CFR_EWI
+#define WWDG_PRESCALER_1 1
+#define WWDG_PRESCALER_2 2
+#define WWDG_PRESCALER_4 4
+#define WWDG_PRESCALER_8 8
 
-#define WWDG_FLAG_EWIF WWDG_SR_EWIF
-
-#define WWDG_PRESCALER_1 0x00000000u
-#define WWDG_PRESCALER_2 WWDG_CFR_WDGTB_0
-#define WWDG_PRESCALER_4 WWDG_CFR_WDGTB_1
-#define WWDG_PRESCALER_8 (WWDG_CFR_WDGTB_1 | WWDG_CFR_WDGTB_0)
-
-#define WWDG_EWI_DISABLE 0x00000000u
-#define WWDG_EWI_ENABLE  WWDG_CFR_EWI
+#define WWDG_EWI_DISABLE VSF_WDT_MODE_NO_EARLY_WAKEUP
+#define WWDG_EWI_ENABLE  VSF_WDT_MODE_EARLY_WAKEUP
 
 #define IS_WWDG_PRESCALER(__PRESCALER__)                                       \
     (((__PRESCALER__) == WWDG_PRESCALER_1) ||                                  \
@@ -46,35 +42,23 @@ extern "C" {
      ((__PRESCALER__) == WWDG_PRESCALER_4) ||                                  \
      ((__PRESCALER__) == WWDG_PRESCALER_8))
 
-#define IS_WWDG_WINDOW(__WINDOW__)                                             \
-    (((__WINDOW__) >= WWDG_CFR_W_6) && ((__WINDOW__) <= WWDG_CFR_W))
+#ifndef VSF_STHAL_CFG_WWDT_MIN_WINDOW
+#   define VSF_STHAL_CFG_WWDT_MIN_WINDOW 0x40
+#endif
 
+#ifndef VSF_STHAL_CFG_WWDT_MAX_WINDOW
+#   define VSF_STHAL_CFG_WWDT_MAX_WINDOW 0x7F
+#endif
+
+#define IS_WWDG_WINDOW(__WINDOW__)                                             \
+    (((__WINDOW__) >= VSF_STHAL_CFG_WWDT_MIN_WINDOW) && ((__WINDOW__) <= VSF_STHAL_CFG_WWDT_MAX_WINDOW))
 #define IS_WWDG_COUNTER(__COUNTER__)                                           \
-    (((__COUNTER__) >= WWDG_CR_T_6) && ((__COUNTER__) <= WWDG_CR_T))
+    (((__COUNTER__) >= VSF_STHAL_CFG_WWDT_MIN_WINDOW) && ((__COUNTER__) <= VSF_STHAL_CFG_WWDT_MAX_WINDOW))
 
 #define IS_WWDG_EWI_MODE(__MODE__)                                             \
     (((__MODE__) == WWDG_EWI_ENABLE) || ((__MODE__) == WWDG_EWI_DISABLE))
 
-#define __HAL_WWDG_ENABLE(__HANDLE__)                                          \
-    SET_BIT((__HANDLE__)->Instance->CR, WWDG_CR_WDGA)
-
-#define __HAL_WWDG_ENABLE_IT(__HANDLE__, __INTERRUPT__)                        \
-    SET_BIT((__HANDLE__)->Instance->CFR, (__INTERRUPT__))
-
-#define __HAL_WWDG_GET_IT(__HANDLE__, __INTERRUPT__)                           \
-    __HAL_WWDG_GET_FLAG((__HANDLE__), (__INTERRUPT__))
-
-#define __HAL_WWDG_CLEAR_IT(__HANDLE__, __INTERRUPT__)                         \
-    __HAL_WWDG_CLEAR_FLAG((__HANDLE__), (__INTERRUPT__))
-
-#define __HAL_WWDG_GET_FLAG(__HANDLE__, __FLAG__)                              \
-    (((__HANDLE__)->Instance->SR & (__FLAG__)) == (__FLAG__))
-
-#define __HAL_WWDG_CLEAR_FLAG(__HANDLE__, __FLAG__)                            \
-    ((__HANDLE__)->Instance->SR = ~(__FLAG__))
-
-#define __HAL_WWDG_GET_IT_SOURCE(__HANDLE__, __INTERRUPT__)                    \
-    (((__HANDLE__)->Instance->CFR & (__INTERRUPT__)) == (__INTERRUPT__))
+#define IS_WWDG_ALL_INSTANCE(__INSTANCE__) 1
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -86,7 +70,6 @@ typedef struct {
     uint32_t Window;
     uint32_t Counter;
     uint32_t EWIMode;
-
 } WWDG_InitTypeDef;
 
 #if (USE_HAL_WWDG_REGISTER_CALLBACKS == 1)
@@ -105,14 +88,11 @@ typedef struct
 } WWDG_HandleTypeDef;
 
 #if (USE_HAL_WWDG_REGISTER_CALLBACKS == 1)
-
 typedef enum {
     HAL_WWDG_EWI_CB_ID     = 0x00U,
     HAL_WWDG_MSPINIT_CB_ID = 0x01U,
 } HAL_WWDG_CallbackIDTypeDef;
-
 typedef void (*pWWDG_CallbackTypeDef)(WWDG_HandleTypeDef *hppp);
-
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
