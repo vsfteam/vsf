@@ -22,14 +22,19 @@
 
 #define vsf_real_spi_t          VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t)
 #define vsf_real_spi_capability VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_capability)
+#define vsf_real_spi_ctrl       VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_ctrl)
 
 #ifndef VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY
 #   define  VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
 #endif
 
+#ifndef VSF_SPI_CFG_REIMPLEMENT_API_CTRL
+#   define  VSF_SPI_CFG_REIMPLEMENT_API_CTRL                    DISABLED
+#endif
+
 #ifdef VSF_SPI_CFG_IMP_REMAP_PREFIX
 #   undef VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY
-#   define VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY                ENABLED
+#   define VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY               ENABLED
 #endif
 
 #if VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -67,6 +72,13 @@ vsf_spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
 }
 #endif
 
+#if VSF_SPI_CFG_REIMPLEMENT_API_CTRL == DISABLED
+vsf_err_t vsf_real_spi_ctrl(vsf_real_spi_t *spi_ptr, vsf_spi_ctrl_t ctrl, void *param)
+{
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef VSF_SPI_CFG_CAPABILITY_SUPPORT_AUTO_CS
@@ -76,10 +88,10 @@ vsf_spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
 #undef VSF_SPI_CFG_CAPABILITY_MIN_CLOCK_HZ
 #undef vsf_real_spi_t
 #undef vsf_real_spi_capability
+#undef vsf_real_spi_ctrl
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
-
 /*============================ MACROS ========================================*/
 /*============================ MACROS ========================================*/
 
@@ -99,6 +111,7 @@ vsf_spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
 #   define vsf_imp_spi_request_transfer         VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_request_transfer)
 #   define vsf_imp_spi_cancel_transfer          VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_cancel_transfer)
 #   define vsf_imp_spi_get_transferred_count    VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_get_transferred_count)
+#   define vsf_imp_spi_ctrl                     VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_ctrl)
 
 #   define vsf_remap_spi_t                      VSF_MCONNECT(VSF_SPI_CFG_IMP_REMAP_PREFIX, _spi_t)
 #   define vsf_remap_spi_init                   VSF_MCONNECT(VSF_SPI_CFG_IMP_REMAP_PREFIX, _spi_init)
@@ -114,6 +127,7 @@ vsf_spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
 #   define vsf_remap_spi_request_transfer       VSF_MCONNECT(VSF_SPI_CFG_IMP_REMAP_PREFIX, _spi_request_transfer)
 #   define vsf_remap_spi_cancel_transfer        VSF_MCONNECT(VSF_SPI_CFG_IMP_REMAP_PREFIX, _spi_cancel_transfer)
 #   define vsf_remap_spi_get_transferred_count  VSF_MCONNECT(VSF_SPI_CFG_IMP_REMAP_PREFIX, _spi_get_transferred_count)
+#   define vsf_remap_spi_ctrl                   VSF_MCONNECT(VSF_SPI_CFG_IMP_REMAP_PREFIX, _spi_ctrl)
 
 #   define VSF_SPI_CFG_IMP_REMAP_FUNCTIONS                                                        \
         vsf_err_t vsf_imp_spi_init(vsf_imp_spi_t *spi_ptr, vsf_spi_cfg_t *cfg_ptr)                \
@@ -151,15 +165,15 @@ vsf_spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
             VSF_HAL_ASSERT(spi_ptr != NULL);                                                      \
             return vsf_remap_spi_status(spi_ptr);                                                 \
         }                                                                                         \
-        void vsf_imp_spi_cs_active(vsf_imp_spi_t *spi_ptr, uint_fast8_t index)                    \
+        vsf_err_t vsf_imp_spi_cs_active(vsf_imp_spi_t *spi_ptr, uint_fast8_t index)               \
         {                                                                                         \
             VSF_HAL_ASSERT(spi_ptr != NULL);                                                      \
-            vsf_remap_spi_cs_active(spi_ptr, index);                                              \
+            return vsf_remap_spi_cs_active(spi_ptr, index);                                       \
         }                                                                                         \
-        void vsf_imp_spi_cs_inactive(vsf_imp_spi_t *spi_ptr, uint_fast8_t index)                  \
+        vsf_err_t vsf_imp_spi_cs_inactive(vsf_imp_spi_t *spi_ptr, uint_fast8_t index)             \
         {                                                                                         \
             VSF_HAL_ASSERT(spi_ptr != NULL);                                                      \
-            vsf_remap_spi_cs_inactive(spi_ptr, index);                                            \
+            return vsf_remap_spi_cs_inactive(spi_ptr, index);                                     \
         }                                                                                         \
         void vsf_imp_spi_fifo_transfer(vsf_imp_spi_t *spi_ptr,                                    \
                                    void *out_buffer_ptr,                                          \
@@ -196,6 +210,11 @@ vsf_spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
         {                                                                                         \
             VSF_HAL_ASSERT(spi_ptr != NULL);                                                      \
             return vsf_remap_spi_capability(spi_ptr);                                             \
+        }                                                                                         \
+        vsf_err_t vsf_imp_spi_ctrl(vsf_imp_spi_t *spi_ptr, vsf_spi_ctrl_t ctrl, void *param)      \
+        {                                                                                         \
+            VSF_HAL_ASSERT(spi_ptr != NULL);                                                      \
+            return vsf_remap_spi_ctrl(spi_ptr, ctrl, param);                                      \
         }
 #endif
 
@@ -245,6 +264,7 @@ vsf_spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
 #undef vsf_imp_spi_request_transfer
 #undef vsf_imp_spi_cancel_transfer
 #undef vsf_imp_spi_get_transferred_count
+#undef vsf_imp_spi_ctrl
 
 #undef vsf_remap_spi_t
 #undef vsf_remap_spi_init
@@ -260,6 +280,7 @@ vsf_spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
 #undef vsf_remap_spi_request_transfer
 #undef vsf_remap_spi_cancel_transfer
 #undef vsf_remap_spi_get_transferred_count
+#undef vsf_remap_spi_ctrl
 
 #endif  /* VSF_HAL_USE_SPI */
 

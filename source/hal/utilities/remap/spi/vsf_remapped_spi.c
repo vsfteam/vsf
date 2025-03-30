@@ -81,16 +81,16 @@ void vsf_remapped_spi_irq_disable(vsf_remapped_spi_t *spi, vsf_spi_irq_mask_t ir
     vsf_spi_irq_disable(spi->target, irq_mask);
 }
 
-void vsf_remapped_spi_cs_active(vsf_remapped_spi_t *spi, uint_fast8_t index)
+vsf_err_t vsf_remapped_spi_cs_active(vsf_remapped_spi_t *spi, uint_fast8_t index)
 {
     VSF_HAL_ASSERT((spi != NULL) && (spi->target != NULL));
-    vsf_spi_cs_active(spi->target, index);
+    return vsf_spi_cs_active(spi->target, index);
 }
 
-void vsf_remapped_spi_cs_inactive(vsf_remapped_spi_t *spi, uint_fast8_t index)
+vsf_err_t vsf_remapped_spi_cs_inactive(vsf_remapped_spi_t *spi, uint_fast8_t index)
 {
     VSF_HAL_ASSERT((spi != NULL) && (spi->target != NULL));
-    vsf_spi_cs_inactive(spi->target, index);
+    return vsf_spi_cs_inactive(spi->target, index);
 }
 
 vsf_spi_status_t vsf_remapped_spi_status(vsf_remapped_spi_t *spi)
@@ -131,6 +131,12 @@ void vsf_remapped_spi_get_transferred_count(vsf_remapped_spi_t *spi, uint_fast32
 {
     VSF_HAL_ASSERT((spi != NULL) && (spi->target != NULL));
     vsf_spi_get_transferred_count(spi->target, tx_count, rx_count);
+}
+
+vsf_err_t vsf_remapped_spi_ctrl(vsf_remapped_spi_t *spi, vsf_spi_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT((spi != NULL) && (spi->target != NULL));
+    return vsf_spi_ctrl(spi->target, ctrl, param);
 }
 
 #endif
