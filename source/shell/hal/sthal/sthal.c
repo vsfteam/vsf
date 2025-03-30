@@ -42,6 +42,17 @@ HAL_TickFreqTypeDef uwTickFreq = HAL_TICK_FREQ_DEFAULT;
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+bool __sthal_check_timeout(uint32_t start, uint32_t timeout)
+{
+    if (timeout == HAL_MAX_DELAY) {
+        return false;
+    } else if (timeout == 0U) {
+        return true;
+    }
+
+    return (HAL_GetTick() - start) > timeout;
+}
+
 
 VSF_CAL_WEAK(HAL_InitTick)
 HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
@@ -137,6 +148,7 @@ HAL_StatusTypeDef HAL_Init(void)
 #endif
 
     HAL_MspInit();
+    
     return HAL_OK;
 }
 

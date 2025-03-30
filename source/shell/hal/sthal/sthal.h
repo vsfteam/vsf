@@ -85,6 +85,8 @@ void                HAL_ResumeTick(void);
 uint32_t            HAL_GetHalVersion(void);
 uint32_t            HAL_GetUIDw2(void);
 
+bool __sthal_check_timeout(uint32_t start, uint32_t timeout);
+
 /*============================ INCLUDES ======================================*/
 
 #ifdef HAL_GPIO_MODULE_ENABLED
