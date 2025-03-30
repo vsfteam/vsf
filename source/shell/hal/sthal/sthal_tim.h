@@ -28,11 +28,132 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
+// The timer interface of vsf-hal does not currently support the channel feature
 #define TIM_CHANNEL_1   0x00000000U
 #define TIM_CHANNEL_2   0x00000004U
 #define TIM_CHANNEL_3   0x00000008U
 #define TIM_CHANNEL_4   0x0000000CU
 #define TIM_CHANNEL_ALL 0x0000003CU
+
+#ifdef VSF_TIMER_BASE_COUNTER_UP
+#   define TIM_COUNTERMODE_UP              VSF_TIMER_BASE_COUNTER_UP
+#else
+#   define TIM_COUNTERMODE_UP              0x00000000U
+#endif
+#ifdef VSF_TIMER_BASE_COUNTER_DOWN
+#   define TIM_COUNTERMODE_DOWN            VSF_TIMER_BASE_COUNTER_DOWN
+#else
+#   define TIM_COUNTERMODE_DOWN            0x00000000U
+#endif
+#ifdef VSF_TIMER_BASE_COUNTER_CENTERALIGNED1
+#   define TIM_COUNTERMODE_CENTERALIGNED1  VSF_TIMER_BASE_COUNTER_CENTERALIGNED1
+#else
+#   define TIM_COUNTERMODE_CENTERALIGNED1  0x00000000U
+#endif
+#ifdef VSF_TIMER_BASE_COUNTER_CENTERALIGNED2
+#   define TIM_COUNTERMODE_CENTERALIGNED2  VSF_TIMER_BASE_COUNTER_CENTERALIGNED2
+#else
+#   define TIM_COUNTERMODE_CENTERALIGNED2  0x00000000U
+#endif
+#ifdef VSF_TIMER_BASE_COUNTER_CENTERALIGNED3
+#   define TIM_COUNTERMODE_CENTERALIGNED3  VSF_TIMER_BASE_COUNTER_CENTERALIGNED3
+#else
+#   define TIM_COUNTERMODE_CENTERALIGNED3  0x00000000U
+#endif
+
+
+#define TIM_CLOCKDIVISION_DIV1              1
+#define TIM_CLOCKDIVISION_DIV2              2
+#define TIM_CLOCKDIVISION_DIV4              4
+
+#define TIM_AUTORELOAD_PRELOAD_DISABLE     VSF_TIMER_BASE_ONESHOT
+#define TIM_AUTORELOAD_PRELOAD_ENABLE      VSF_TIMER_BASE_CONTINUES
+
+
+// TODO: implement the following macros
+#define IS_TIM_INSTANCE(INSTANCE)               1
+#define IS_TIM_CCX_INSTANCE(INSTANCE, CHANNEL)  1
+#define IS_TIM_DMABURST_INSTANCE(INSTANCE)      1
+#define IS_TIM_DMABURST_INSTANCE(INSTANCE)      1
+#define IS_TIM_OCXREF_CLEAR_INSTANCE(INSTANCE)  1
+#define IS_TIM_SLAVE_INSTANCE(INSTANCE)         1
+#define IS_TIM_SYNCHRO_INSTANCE(INSTANCE)       1
+#define IS_TIM_BREAK_INSTANCE(INSTANCE)         1
+#if 0
+#define IS_TIM_CCXN_INSTANCE(INSTANCE, CHANNEL) 1
+#define IS_TIM_CLOCKSOURCE_INSTANCE(INSTANCE)   1
+#define IS_TIM_CLOCKPOLARITY_INSTANCE(INSTANCE) 1
+#define IS_TIM_CLOCKPRESCALER_INSTANCE(INSTANCE)1
+#define IS_TIM_CLOCKFILTER_INSTANCE(INSTANCE)   1
+#define IS_TIM_CLEARINPUT_SOURCE_INSTANCE(INSTANCE) 1
+#define IS_TIM_CLEARINPUT_POLARITY_INSTANCE(INSTANCE) 1
+#define IS_TIM_CLEARINPUT_PRESCALER_INSTANCE(INSTANCE) 1
+#define IS_TIM_CLEARINPUT_FILTER_INSTANCE(INSTANCE) 1
+#define IS_TIM_OSSR_INSTANCE(INSTANCE)          1
+#define IS_TIM_OSSI_INSTANCE(INSTANCE)          1
+#define IS_TIM_LOCK_LEVEL_INSTANCE(INSTANCE)    1
+#define IS_TIM_BREAK_INSTANCE(INSTANCE)         1
+#define IS_TIM_BREAK_POLARITY_INSTANCE(INSTANCE)1
+#define IS_TIM_AUTOMATIC_OUTPUT_INSTANCE(INSTANCE) 1
+#define IS_TIM_TRGO_SOURCE_INSTANCE(INSTANCE)   1
+#define IS_TIM_SLAVE_INSTANCE(INSTANCE)         1
+#define IS_TIM_SLAVE_MODE_INSTANCE(INSTANCE)    1
+#define IS_TIM_TRIGGER_SELECTION_INSTANCE(INSTANCE) 1
+#define IS_TIM_DMA_INSTANCE(INSTANCE)           1
+#define IS_TIM_DMA_CC_INSTANCE(INSTANCE)        1
+#define IS_TIM_DMA_CCX_INSTANCE(INSTANCE, CHANNEL) 1
+#define IS_TIM_DMA_COM_INSTANCE(INSTANCE)       1
+#define IS_TIM_DMA_TRIGGER_INSTANCE(INSTANCE)   1
+#define IS_TIM_DMA_REMAP_INSTANCE(INSTANCE)     1
+#define IS_TIM_DMA_CC_REMAP_INSTANCE(INSTANCE)  1
+#define IS_TIM_DMA_CCX_REMAP_INSTANCE(INSTANCE, CHANNEL) 1
+#define IS_TIM_DMA_COM_REMAP_INSTANCE(INSTANCE) 1
+#define IS_TIM_REMAP_INSTANCE(INSTANCE)         1
+#define IS_TIM_REMAP_CC_INSTANCE(INSTANCE)      1
+#define IS_TIM_REMAP_CCX_INSTANCE(INSTANCE, CHANNEL) 1
+#define IS_TIM_REMAP_COM_INSTANCE(INSTANCE)     1
+#define IS_TIM_REMAP_DMA_INSTANCE(INSTANCE)     1
+#define IS_TIM_REMAP_DMA_CC_INSTANCE(INSTANCE)  1
+#define IS_TIM_REMAP_DMA_CCX_INSTANCE(INSTANCE, CHANNEL) 1
+#define IS_TIM_REMAP_DMA_COM_INSTANCE(INSTANCE) 1
+#endif
+
+#define IS_TIM_COUNTER_MODE(__MODE__)      (((__MODE__) == TIM_COUNTERMODE_UP)              || \
+                                            ((__MODE__) == TIM_COUNTERMODE_DOWN)            || \
+                                            ((__MODE__) == TIM_COUNTERMODE_CENTERALIGNED1)  || \
+                                            ((__MODE__) == TIM_COUNTERMODE_CENTERALIGNED2)  || \
+                                            ((__MODE__) == TIM_COUNTERMODE_CENTERALIGNED3))
+#define IS_TIM_CLOCKDIVISION_DIV(__DIV__)  (((__DIV__) == TIM_CLOCKDIVISION_DIV1) || \
+                                            ((__DIV__) == TIM_CLOCKDIVISION_DIV2) || \
+                                            ((__DIV__) == TIM_CLOCKDIVISION_DIV4))
+#define IS_TIM_AUTORELOAD_PRELOAD(PRELOAD) (((PRELOAD) == TIM_AUTORELOAD_PRELOAD_DISABLE) || \
+                                            ((PRELOAD) == TIM_AUTORELOAD_PRELOAD_ENABLE))
+
+#define IS_TIM_DMA_BASE(BASE)               1
+#define IS_TIM_DMA_LENGTH(LENGTH)           1
+#define IS_TIM_DMA_SOURCE(SOURCE)           1
+#define IS_TIM_EVENT_SOURCE(SOURCE)         1
+#define IS_TIM_CLEARINPUT_SOURCE(SOURCE)    1
+#define IS_TIM_CLOCKSOURCE(SOURCE)          1
+#define IS_TIM_SLAVE_MODE(MODE)             1
+#define IS_TIM_TRIGGER_SELECTION(SELECTION) 1
+#define IS_TIM_COMMUTATION_EVENT_INSTANCE(INSTANCE) 1
+#define IS_TIM_INTERNAL_TRIGGEREVENT_SELECTION(SELECTION) 1
+#define IS_TIM_TRGO_SOURCE(SOURCE)          1
+#define IS_TIM_MSM_STATE(STATE)             1
+#define IS_TIM_OSSR_STATE(STATE)            1
+#define IS_TIM_OSSI_STATE(STATE)            1
+#define IS_TIM_DEADTIME(DTIME)              1
+#define IS_TIM_LOCK_LEVEL(LEVEL)            1
+#define IS_TIM_BREAK_STATE(STATE)           1
+#define IS_TIM_BREAK_POLARITY(POLARITY)     1
+#define IS_TIM_AUTOMATIC_OUTPUT_STATE(STATE) 1
+#define IS_TIM_REMAP(REMAP, INSTANCE)       1
+
+#define TIM_TS_ITR0                          0x00000000U
+#define TIM_TS_ITR1                          0x00000010U
+#define TIM_TS_ITR2                          0x00000020U
+#define TIM_TS_ITR3                          0x00000030U
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -127,7 +248,6 @@ typedef struct {
     uint32_t BreakPolarity;
     uint32_t BreakFilter;
     uint32_t AutomaticOutput;
-
 } TIM_BreakDeadTimeConfigTypeDef;
 
 typedef enum {
@@ -236,9 +356,7 @@ typedef enum {
     HAL_TIM_COMMUTATION_HALF_CB_ID        = 0x19U,
     HAL_TIM_BREAK_CB_ID                   = 0x1AU,
 } HAL_TIM_CallbackIDTypeDef;
-
 typedef void (*pTIM_CallbackTypeDef)(TIM_HandleTypeDef *htim);
-
 #endif
 
 typedef struct {
