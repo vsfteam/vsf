@@ -57,7 +57,7 @@ HAL_StatusTypeDef HAL_RTC_RegisterCallback(RTC_HandleTypeDef        *hrtc,
         return HAL_ERROR;
     }
 
-    __HAL_LOCK(hrtc);
+    VSF_STHAL_LOCK(hrtc);
     if (HAL_RTC_STATE_READY == hrtc->State) {
         switch (CallbackID) {
         case HAL_RTC_ALARM_A_EVENT_CB_ID:
@@ -109,7 +109,7 @@ HAL_StatusTypeDef HAL_RTC_RegisterCallback(RTC_HandleTypeDef        *hrtc,
         status = HAL_ERROR;
     }
 
-    __HAL_UNLOCK(hrtc);
+    VSF_STHAL_UNLOCK(hrtc);
     return status;
 }
 
@@ -117,7 +117,7 @@ HAL_StatusTypeDef HAL_RTC_UnRegisterCallback(
     RTC_HandleTypeDef *hrtc, HAL_RTC_CallbackIDTypeDef CallbackID)
 {
     HAL_StatusTypeDef status = HAL_OK;
-    __HAL_LOCK(hrtc);
+    VSF_STHAL_LOCK(hrtc);
     if (HAL_RTC_STATE_READY == hrtc->State) {
         switch (CallbackID) {
         case HAL_RTC_ALARM_A_EVENT_CB_ID:
@@ -168,7 +168,7 @@ HAL_StatusTypeDef HAL_RTC_UnRegisterCallback(
         status = HAL_ERROR;
     }
 
-    __HAL_UNLOCK(hrtc);
+    VSF_STHAL_UNLOCK(hrtc);
     return status;
 }
 #    endif
