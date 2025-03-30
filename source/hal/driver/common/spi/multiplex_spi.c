@@ -67,12 +67,12 @@ static bool __spi_cs_pin_is_hardware(vsf_multiplex_spi_t *m_spi_ptr)
     return (m_spi_ptr->cs_index < spi_capability.cs_count);
 }
 
-static void __spi_cs_active(vsf_multiplex_spi_t *m_spi_ptr)
+static vsf_err_t __spi_cs_active(vsf_multiplex_spi_t *m_spi_ptr)
 {
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
 
     if (__spi_cs_pin_is_hardware(m_spi_ptr)) {
-        vsf_spi_cs_active(m_spi_ptr->spi_info_ptr->spi, m_spi_ptr->cs_index);
+        return vsf_spi_cs_active(m_spi_ptr->spi_info_ptr->spi, m_spi_ptr->cs_index);
     } else {
 #if VSF_HAL_USE_GPIO == ENABLED
         VSF_HAL_ASSERT(m_spi_ptr->gpio != NULL);
@@ -81,15 +81,16 @@ static void __spi_cs_active(vsf_multiplex_spi_t *m_spi_ptr)
 #else
         VSF_HAL_ASSERT(0);
 #endif
+        return VSF_ERR_NONE;
     }
 }
 
-static void __spi_cs_inactive(vsf_multiplex_spi_t *m_spi_ptr)
+static vsf_err_t __spi_cs_inactive(vsf_multiplex_spi_t *m_spi_ptr)
 {
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
 
     if (__spi_cs_pin_is_hardware(m_spi_ptr)) {
-        vsf_spi_cs_inactive(m_spi_ptr->spi_info_ptr->spi, m_spi_ptr->cs_index);
+        return vsf_spi_cs_inactive(m_spi_ptr->spi_info_ptr->spi, m_spi_ptr->cs_index);
     } else {
 #if VSF_HAL_USE_GPIO == ENABLED
         VSF_HAL_ASSERT(m_spi_ptr->gpio != NULL);
@@ -98,6 +99,7 @@ static void __spi_cs_inactive(vsf_multiplex_spi_t *m_spi_ptr)
 #else
         VSF_HAL_ASSERT(0);
 #endif
+        return VSF_ERR_NONE;
     }
 }
 
@@ -327,7 +329,7 @@ void vsf_multiplex_spi_irq_disable(vsf_multiplex_spi_t *m_spi_ptr, vsf_spi_irq_m
     vsf_multiplex_spi_unprotect(state);
 }
 
-void vsf_multiplex_spi_cs_active(vsf_multiplex_spi_t *m_spi_ptr, uint_fast8_t cs_index)
+vsf_err_t vsf_multiplex_spi_cs_active(vsf_multiplex_spi_t *m_spi_ptr, uint_fast8_t cs_index)
 {
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
 
@@ -344,9 +346,11 @@ void vsf_multiplex_spi_cs_active(vsf_multiplex_spi_t *m_spi_ptr, uint_fast8_t cs
     vsf_protect_t state = vsf_multiplex_spi_protect();
         spi_info_ptr->cs_mask |= 1 << cs_index;
     vsf_multiplex_spi_unprotect(state);
+
+    return VSF_ERR_NONE;
 }
 
-void vsf_multiplex_spi_cs_inactive(vsf_multiplex_spi_t *m_spi_ptr, uint_fast8_t cs_index)
+vsf_err_t vsf_multiplex_spi_cs_inactive(vsf_multiplex_spi_t *m_spi_ptr, uint_fast8_t cs_index)
 {
     VSF_HAL_ASSERT(m_spi_ptr != NULL);
 
@@ -370,6 +374,8 @@ void vsf_multiplex_spi_cs_inactive(vsf_multiplex_spi_t *m_spi_ptr, uint_fast8_t 
         spi_info_ptr->cs_mask &= ~(1 << cs_index);
         __spi_start_next(spi_info_ptr);    // call next if not empty
     vsf_multiplex_spi_unprotect(state);
+
+    return VSF_ERR_NONE;
 }
 
 
@@ -459,6 +465,24 @@ vsf_spi_status_t vsf_multiplex_spi_status(vsf_multiplex_spi_t *m_spi_ptr)
     if (spi_info_ptr->cfg_spi_ptr == m_spi_ptr) {
         vsf_protect_t state = vsf_multiplex_spi_protect();
             result = vsf_spi_status(spi_info_ptr->spi);
+        vsf_multiplex_spi_unprotect(state);
+    }
+
+    return result;
+}
+
+vsf_err_t vsf_multiplex_spi_ctrl(vsf_multiplex_spi_t *m_spi_ptr, vsf_spi_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(m_spi_ptr != NULL);
+
+    vsf_multiplex_spi_info_t *spi_info_ptr = m_spi_ptr->spi_info_ptr;
+    VSF_HAL_ASSERT(spi_info_ptr != NULL);
+
+    vsf_err_t result = VSF_ERR_NOT_SUPPORT;
+
+    if (spi_info_ptr->cfg_spi_ptr == m_spi_ptr) {
+        vsf_protect_t state = vsf_multiplex_spi_protect();
+            result = vsf_spi_ctrl(spi_info_ptr->spi, ctrl, param);
         vsf_multiplex_spi_unprotect(state);
     }
 

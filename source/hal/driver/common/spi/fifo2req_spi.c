@@ -20,10 +20,10 @@
 #define __VSF_HAL_USE_FIFO2REQ_SPI_CLASS_IMPLEMENT  ENABLED
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_SPI == ENABLED
+#if (VSF_HAL_USE_SPI == ENABLED) && (VSF_HAL_USE_FIFO2REQ_SPI == ENABLED)
 
 #include "hal/driver/driver.h"
-#include "fifo2req_spi.h"
+#include "./fifo2req_spi.h"
 
 /*============================ MACROS ========================================*/
 
@@ -169,34 +169,47 @@ vsf_spi_status_t vsf_fifo2req_spi_status(vsf_fifo2req_spi_t *fifo2req_spi_ptr)
     return vsf_spi_status(fifo2req_spi_ptr->spi);
 }
 
-void vsf_fifo2req_spi_cs_active(vsf_fifo2req_spi_t *fifo2req_spi_ptr, uint_fast8_t index)
+vsf_err_t vsf_fifo2req_spi_cs_active(vsf_fifo2req_spi_t *fifo2req_spi_ptr, uint_fast8_t index)
 {
     VSF_HAL_ASSERT(fifo2req_spi_ptr != NULL);
     VSF_HAL_ASSERT(fifo2req_spi_ptr->spi != NULL);
 
-    vsf_spi_cs_active(fifo2req_spi_ptr->spi, index);
+    return vsf_spi_cs_active(fifo2req_spi_ptr->spi, index);
 }
 
-void vsf_fifo2req_spi_cs_inactive(vsf_fifo2req_spi_t *fifo2req_spi_ptr, uint_fast8_t index)
+vsf_err_t vsf_fifo2req_spi_cs_inactive(vsf_fifo2req_spi_t *fifo2req_spi_ptr, uint_fast8_t index)
 {
     VSF_HAL_ASSERT(fifo2req_spi_ptr != NULL);
     VSF_HAL_ASSERT(fifo2req_spi_ptr->spi != NULL);
 
-    vsf_spi_cs_inactive(fifo2req_spi_ptr->spi, index);
+    return vsf_spi_cs_inactive(fifo2req_spi_ptr->spi, index);
 }
 
 void vsf_fifo2req_spi_fifo_transfer(vsf_fifo2req_spi_t *fifo2req_spi_ptr,
-                           void *out_buffer_ptr,
-                           uint_fast32_t* out_offset_ptr,
-                           void *in_buffer_ptr,
-                           uint_fast32_t* in_offset_ptr,
-                           uint_fast32_t  out_cnt)
+                                    void               *out_buffer_ptr,
+                                    uint_fast32_t      *out_offset_ptr,
+                                    void               *in_buffer_ptr,
+                                    uint_fast32_t      *in_offset_ptr,
+                                    uint_fast32_t       count)
 {
     VSF_HAL_ASSERT(fifo2req_spi_ptr != NULL);
     VSF_HAL_ASSERT(fifo2req_spi_ptr->spi != NULL);
 
-    // use vsf_fifo2req_spi, fifo api is unavailable
+    // TODO
     VSF_HAL_ASSERT(0);
+}
+
+uint_fast16_t vsf_fifo2req_spi_slave_fifo_transfer(vsf_fifo2req_spi_t *fifo2req_spi_ptr,
+                                                   bool transmit_or_receive,
+                                                   uint_fast16_t count,
+                                                   uint8_t *buffer_ptr)
+{
+    VSF_HAL_ASSERT(fifo2req_spi_ptr != NULL);
+    VSF_HAL_ASSERT(fifo2req_spi_ptr->spi != NULL);
+
+    // TODO
+    VSF_HAL_ASSERT(0);
+    return 0;
 }
 
 vsf_err_t vsf_fifo2req_spi_request_transfer(vsf_fifo2req_spi_t *fifo2req_spi_ptr, void *out_buffer_ptr,
@@ -243,6 +256,14 @@ void vsf_fifo2req_spi_get_transferred_count(vsf_fifo2req_spi_t *fifo2req_spi_ptr
     if (rx_count != NULL) {
         *rx_count = fifo2req_spi_ptr->in.offset;
     }
+}
+
+vsf_err_t vsf_fifo2req_spi_ctrl(vsf_fifo2req_spi_t *fifo2req_spi_ptr, vsf_spi_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(fifo2req_spi_ptr != NULL);
+    VSF_HAL_ASSERT(fifo2req_spi_ptr->spi != NULL);
+
+    return vsf_spi_ctrl(fifo2req_spi_ptr->spi, ctrl, param);
 }
 
 vsf_spi_capability_t vsf_fifo2req_spi_capability(vsf_fifo2req_spi_t *fifo2req_spi_ptr)
