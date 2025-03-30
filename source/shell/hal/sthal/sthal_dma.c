@@ -105,7 +105,7 @@ HAL_StatusTypeDef HAL_DMA_UnRegisterCallback(
     DMA_HandleTypeDef *hdma, HAL_DMA_CallbackIDTypeDef CallbackID)
 {
     HAL_StatusTypeDef status = HAL_OK;
-    __HAL_LOCK(hdma);
+    VSF_STHAL_LOCK(hdma);
     if (HAL_DMA_STATE_READY == hdma->State) {
         switch (CallbackID) {
         case HAL_DMA_XFER_CPLT_CB_ID:
@@ -142,7 +142,7 @@ HAL_StatusTypeDef HAL_DMA_UnRegisterCallback(
         status = HAL_ERROR;
     }
 
-    __HAL_UNLOCK(hdma);
+    VSF_STHAL_UNLOCK(hdma);
     return status;
 }
 
