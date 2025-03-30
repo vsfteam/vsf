@@ -30,6 +30,7 @@
 #   include <errno.h>
 #endif
 #include <stdio.h>
+#include <stdatomic.h>
 
 #if VSF_LINUX_APPLET_USE_LIBC_SETJMP == ENABLED && !defined(__VSF_APPLET__)
 #   include <setjmp.h>
@@ -347,6 +348,18 @@ int b64_pton(char *src, unsigned char *dst, size_t dstlen)
         return (-1);
 
     return (k);
+}
+
+// atomic
+
+VSF_CAL_WEAK(atomic_thread_fence)
+void atomic_thread_fence(enum memory_order order)
+{
+}
+
+VSF_CAL_WEAK(atomic_signal_fence)
+void atomic_signal_fence(enum memory_order m)
+{
 }
 
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC

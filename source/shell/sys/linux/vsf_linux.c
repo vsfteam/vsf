@@ -5095,7 +5095,6 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(unlink),
     VSF_APPLET_VPLT_ENTRY_FUNC(unlinkat),
     VSF_APPLET_VPLT_ENTRY_FUNC(link),
-    VSF_APPLET_VPLT_ENTRY_FUNC(mkdir),
     VSF_APPLET_VPLT_ENTRY_FUNC(mkdirat),
     VSF_APPLET_VPLT_ENTRY_FUNC(rmdir),
     VSF_APPLET_VPLT_ENTRY_FUNC(dup),

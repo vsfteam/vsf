@@ -100,6 +100,11 @@ time_t time(time_t *t)
     return tv.tv_sec;
 }
 
+time_t timegm(struct tm *tm)
+{
+    return mktime(tm);
+}
+
 void tzset(void)
 {
     // TODO

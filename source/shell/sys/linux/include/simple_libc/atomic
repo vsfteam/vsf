@@ -4,6 +4,23 @@
 // for vsf_protect
 #include "hal/arch/vsf_arch.h"
 
+#include <stdatomic.h>
+#undef atomic_exchange
+#undef atomic_load
+#undef atomic_load_explicit
+#undef atomic_store
+#undef atomic_store_explicit
+#undef atomic_fetch_add
+#undef atomic_fetch_add_explicit
+#undef atomic_fetch_sub
+#undef atomic_fetch_sub_explicit
+#undef atomic_fetch_and
+#undef atomic_fetch_and_explicit
+#undef atomic_fetch_or
+#undef atomic_fetch_or_explicit
+#undef atomic_fetch_xor
+#undef atomic_fetch_xor_explicit
+
 namespace std {
     template<typename T>
     struct atomic_base {
@@ -398,8 +415,10 @@ namespace std {
         return atomic_fetch_xor_explicit(obj, value, memory_order_seq_cst);
     }
 
-    void atomic_thread_fence(memory_order order) noexcept;
-    void atomic_signal_fence(memory_order m) noexcept;
+    extern "C" {
+        void atomic_thread_fence(memory_order order) noexcept;
+        void atomic_signal_fence(memory_order m) noexcept;
+    }
 }
 
 #endif

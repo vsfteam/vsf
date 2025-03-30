@@ -129,13 +129,6 @@ namespace std {
     }
 }
 
-// atomic
-namespace std {
-    void atomic_thread_fence(std::memory_order order) noexcept
-    {
-    }
-}
-
 void *operator new(size_t size)
 {
     return malloc(size);

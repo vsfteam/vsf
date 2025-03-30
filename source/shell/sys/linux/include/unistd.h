@@ -116,7 +116,6 @@ extern "C" {
 #   define unlink           VSF_LINUX_WRAPPER(unlink)
 #   define unlinkat         VSF_LINUX_WRAPPER(unlinkat)
 #   define link             VSF_LINUX_WRAPPER(link)
-#   define mkdir            VSF_LINUX_WRAPPER(mkdir)
 #   define mkdirat          VSF_LINUX_WRAPPER(mkdirat)
 #   define rmdir            VSF_LINUX_WRAPPER(rmdir)
 #   define close            VSF_LINUX_WRAPPER(close)
@@ -296,7 +295,6 @@ typedef struct vsf_linux_unistd_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(unlink);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(unlinkat);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(link);
-    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkdir);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkdirat);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(rmdir);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(dup);
@@ -550,10 +548,6 @@ VSF_LINUX_APPLET_UNISTD_IMP(unlinkat, int, int dirfd, const char *pathname, int 
 VSF_LINUX_APPLET_UNISTD_IMP(link, int, const char *oldpath, const char *newpath) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_UNISTD_ENTRY(link)(oldpath, newpath);
-}
-VSF_LINUX_APPLET_UNISTD_IMP(mkdir, int, const char *pathname, mode_t mode) {
-    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
-    return VSF_LINUX_APPLET_UNISTD_ENTRY(mkdir)(pathname, mode);
 }
 VSF_LINUX_APPLET_UNISTD_IMP(mkdirat, int, int dirfd, const char *pathname, mode_t mode) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -844,7 +838,6 @@ int access(const char *pathname, int mode);
 int unlink(const char *pathname);
 int unlinkat(int dirfd, const char *pathname, int flags);
 int link(const char *oldpath, const char *newpath);
-int mkdir(const char *pathname, mode_t mode);
 int mkdirat(int dirfd, const char *pathname, mode_t mode);
 int mkdirs(const char *pathname, mode_t mode);
 int rmdir(const char *pathname);

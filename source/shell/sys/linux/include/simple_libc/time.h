@@ -45,6 +45,7 @@ extern "C" {
 #define strftime            VSF_LINUX_LIBC_WRAPPER(strftime)
 #define strptime            VSF_LINUX_LIBC_WRAPPER(strptime)
 #define tzset               VSF_LINUX_LIBC_WRAPPER(tzset)
+#define timegm              VSF_LINUX_LIBC_WRAPPER(timegm)
 #endif
 
 #define TIMER_ABSTIME       1
@@ -103,6 +104,7 @@ typedef struct vsf_linux_libc_time_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(ctime_r);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(gmtime);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(gmtime_r);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(timegm);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(localtime);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(localtime_r);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mktime);
@@ -242,6 +244,10 @@ VSF_LINUX_APPLET_LIBC_TIME_IMP(tzset, void, void) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     VSF_LINUX_APPLET_LIBC_TIME_ENTRY(tzset)();
 }
+VSF_LINUX_APPLET_LIBC_TIME_IMP(timegm, time_t, struct tm *tm) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_TIME_ENTRY(timegm)(tm);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_TIME
 
@@ -270,6 +276,8 @@ char *ctime_r(const time_t *t, char *buf);
 
 struct tm *gmtime(const time_t *t);
 struct tm *gmtime_r(const time_t *t, struct tm *result);
+
+time_t timegm(struct tm *tm);
 
 struct tm *localtime(const time_t *t);
 struct tm *localtime_r(const time_t *t, struct tm *result);

@@ -28,6 +28,7 @@ extern "C" {
 #define fchmod                  VSF_LINUX_WRAPPER(fchmod)
 #define futimens                VSF_LINUX_WRAPPER(futimens)
 #define utimensat               VSF_LINUX_WRAPPER(utimensat)
+#define mkdir                   VSF_LINUX_WRAPPER(mkdir)
 #define mkfifo                  VSF_LINUX_WRAPPER(mkfifo)
 #define mkfifoat                VSF_LINUX_WRAPPER(mkfifoat)
 #define mknod                   VSF_LINUX_WRAPPER(mknod)
@@ -154,6 +155,7 @@ typedef struct vsf_linux_sys_stat_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fstatat);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(chmod);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fchmod);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkdir);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkfifo);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mkfifoat);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(mknod);
@@ -213,6 +215,10 @@ VSF_LINUX_APPLET_SYS_STAT_IMP(fchmod, int, int fd, mode_t mode) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_STAT_ENTRY(fchmod)(fd, mode);
 }
+VSF_LINUX_APPLET_SYS_STAT_IMP(mkdir, int, const char *pathname, mode_t mode) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SYS_STAT_ENTRY(mkdir)(pathname, mode);
+}
 VSF_LINUX_APPLET_SYS_STAT_IMP(mkfifo, int, const char *pathname, mode_t mode) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SYS_STAT_ENTRY(mkfifo)(pathname, mode);
@@ -249,6 +255,7 @@ int futimens(int fd, const struct timespec times[2]);
 int utimensat(int dirfd, const char *pathname, const struct timespec times[2], int flags);
 int chmod(const char *pathname, mode_t mode);
 int fchmod(int fd, mode_t mode);
+int mkdir(const char *pathname, mode_t mode);
 int mkfifo(const char *pathname, mode_t mode);
 int mkfifoat(int dirfd, const char *pathname, mode_t mode);
 int mknod(const char *pathname, mode_t mode, dev_t dev);

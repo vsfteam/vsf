@@ -3671,6 +3671,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sys_stat_vplt_t vsf_linux_sys_stat_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(fstatat),
     VSF_APPLET_VPLT_ENTRY_FUNC(chmod),
     VSF_APPLET_VPLT_ENTRY_FUNC(fchmod),
+    VSF_APPLET_VPLT_ENTRY_FUNC(mkdir),
     VSF_APPLET_VPLT_ENTRY_FUNC(mkfifo),
     VSF_APPLET_VPLT_ENTRY_FUNC(mkfifoat),
     VSF_APPLET_VPLT_ENTRY_FUNC(mknod),
