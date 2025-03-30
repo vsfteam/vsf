@@ -39,22 +39,135 @@ extern "C" {
 #define HAL_I2C_ERROR_DMA_PARAM 0x00000080U
 #define HAL_I2C_WRONG_START     0x00000200U
 
+#define I2C_DUTYCYCLE_2          0x00000000U
+#define I2C_DUTYCYCLE_16_9       0
+#define I2C_ADDRESSINGMODE_7BIT  VSF_I2C_ADDR_7_BITS
+#define I2C_ADDRESSINGMODE_10BIT VSF_I2C_ADDR_10_BITS
+#define I2C_MEMADD_SIZE_8BIT     1
+#define I2C_MEMADD_SIZE_16BIT    2
+
+#ifdef VSF_I2C_DUAL_ADDRESS_DISABLE
+#   define I2C_DUALADDRESS_DISABLE VSF_I2C_DUAL_ADDRESS_DISABLE
+#else
+#   define I2C_DUALADDRESS_DISABLE 0x00000000U
+#endif
+#ifdef VSF_I2C_DUAL_ADDRESS_ENABLE
+#   define I2C_DUALADDRESS_ENABLE VSF_I2C_DUAL_ADDRESS_ENABLE
+#else
+#   define I2C_DUALADDRESS_ENABLE 0x00000000U
+#endif
+#ifdef VSF_I2C_GENERALCALL_DISABLE
+#   define I2C_GENERALCALL_DISABLE VSF_I2C_GENERALCALL_DISABLE
+#else
+#   define I2C_GENERALCALL_DISABLE 0x00000000U
+#endif
+#ifdef VSF_I2C_GENERALCALL_ENABLE
+#   define I2C_GENERALCALL_ENABLE I2C_GENERALCALL_ENABLE
+#else
+#   define I2C_GENERALCALL_ENABLE 0x00000000U
+#endif
+
+#ifdef VSF_I2C_NO_STRETCH_DISABLE
+#   define I2C_NOSTRETCH_DISABLE VSF_I2C_NO_STRETCH_DISABLE
+#else
+#   define I2C_NOSTRETCH_DISABLE 0x00000000U
+#endif
+#ifdef VSF_I2C_NO_STRETCH_ENABLE
+#   define I2C_NOSTRETCH_ENABLE I2C_NO_STRETCH_ENABLE
+#else
+#   define I2C_NOSTRETCH_ENABLE 0x00000000U
+#endif
+
+#ifdef VSF_DIRECTION_RECEIVE
+#   define I2C_DIRECTION_RECEIVE VSF_DIRECTION_RECEIVE
+#else
+#   define I2C_DIRECTION_RECEIVE 0x00000000U
+#endif
+#ifdef VSF_I2C_DIRECTION_RECEIVE
+#   define I2C_DIRECTION_TRANSMIT VSF_I2C_DIRECTION_RECEIVE
+#else
+#   define I2C_DIRECTION_TRANSMIT 0x00000000U
+#endif
+
+#ifdef VSF_I2C_FRAME_EXTEND_MASK
+#   ifdef VSF_I2C_FIRST_FRAME
+#      define I2C_FIRST_FRAME VSF_I2C_FIRST_FRAME
+#   endif
+#   ifdef VSF_I2C_FIRST_AND_NEXT_FRAME
+#      define I2C_FIRST_AND_NEXT_FRAME 0x00000002U
+#   endif
+#   ifdef VSF_I2C_NEXT_FRAME
+#      define I2C_NEXT_FRAME 0x00000004U
+#   endif
+#   ifdef VSF_I2C_FIRST_AND_LAST_FRAME
+#      define I2C_FIRST_AND_LAST_FRAME 0x00000008U
+#   endif
+#   ifdef VSF_I2C_LAST_FRAME_NO_STOP
+#      define I2C_LAST_FRAME_NO_STOP 0x00000010U
+#   endif
+#   ifdef VSF_I2C_LAST_FRAME
+#      define I2C_LAST_FRAME 0x00000020U
+#   endif
+#endif
+
+#define I2C_FIRST_FRAME          0x00000001U
+#define I2C_FIRST_AND_NEXT_FRAME 0x00000002U
+#define I2C_NEXT_FRAME           0x00000004U
+#define I2C_FIRST_AND_LAST_FRAME 0x00000008U
+#define I2C_LAST_FRAME_NO_STOP   0x00000010U
+#define I2C_LAST_FRAME           0x00000020U
+
+#define I2C_OTHER_FRAME          (0x00AA0000U)
+#define I2C_OTHER_AND_LAST_FRAME (0xAA000000U)
+
 #if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)
-#    define HAL_I2C_ERROR_INVALID_CALLBACK 0x00000100U
+#   define HAL_I2C_ERROR_INVALID_CALLBACK 0x00000100U
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+// TODO: support check all instance
+#define IS_I2C_ALL_INSTANCE(INSTANCE) 1
+
+#define IS_I2C_DUTY_CYCLE(CYCLE)                                               \
+    (((CYCLE) == I2C_DUTYCYCLE_2) || ((CYCLE) == I2C_DUTYCYCLE_16_9))
+#define IS_I2C_ADDRESSING_MODE(ADDRESS)                                        \
+    (((ADDRESS) == I2C_ADDRESSINGMODE_7BIT) ||                                 \
+     ((ADDRESS) == I2C_ADDRESSINGMODE_10BIT))
+#define IS_I2C_DUAL_ADDRESS(ADDRESS)                                           \
+    (((ADDRESS) == I2C_DUALADDRESS_DISABLE) ||                                 \
+     ((ADDRESS) == I2C_DUALADDRESS_ENABLE))
+#define IS_I2C_GENERAL_CALL(CALL)                                              \
+    (((CALL) == I2C_GENERALCALL_DISABLE) || ((CALL) == I2C_GENERALCALL_ENABLE))
+#define IS_I2C_NO_STRETCH(STRETCH)                                             \
+    (((STRETCH) == I2C_NOSTRETCH_DISABLE) ||                                   \
+     ((STRETCH) == I2C_NOSTRETCH_ENABLE))
+#define IS_I2C_MEMADD_SIZE(SIZE)                                               \
+    (((SIZE) == I2C_MEMADD_SIZE_8BIT) || ((SIZE) == I2C_MEMADD_SIZE_16BIT))
+#define IS_I2C_CLOCK_SPEED(SPEED)     (((SPEED) > 0U) && ((SPEED) <= 400000U))
+#define IS_I2C_OWN_ADDRESS1(ADDRESS1) (((ADDRESS1) & 0xFFFFFC00U) == 0U)
+#define IS_I2C_OWN_ADDRESS2(ADDRESS2) (((ADDRESS2) & 0xFFFFFF01U) == 0U)
+#define IS_I2C_TRANSFER_OPTIONS_REQUEST(REQUEST)                               \
+    (((REQUEST) == I2C_FIRST_FRAME) ||                                         \
+     ((REQUEST) == I2C_FIRST_AND_NEXT_FRAME) ||                                \
+     ((REQUEST) == I2C_NEXT_FRAME) ||                                          \
+     ((REQUEST) == I2C_FIRST_AND_LAST_FRAME) ||                                \
+     ((REQUEST) == I2C_LAST_FRAME) || ((REQUEST) == I2C_LAST_FRAME_NO_STOP) || \
+     IS_I2C_TRANSFER_OTHER_OPTIONS_REQUEST(REQUEST))
+
+#define IS_I2C_TRANSFER_OTHER_OPTIONS_REQUEST(REQUEST)                         \
+    (((REQUEST) == I2C_OTHER_FRAME) || ((REQUEST) == I2C_OTHER_AND_LAST_FRAME))
+
 #if (USE_HAL_I2C_REGISTER_CALLBACKS == 1)
-#    define __HAL_I2C_RESET_HANDLE_STATE(__HANDLE__)                           \
-        do {                                                                   \
-            (__HANDLE__)->State             = HAL_I2C_STATE_RESET;             \
-            (__HANDLE__)->MspInitCallback   = NULL;                            \
-            (__HANDLE__)->MspDeInitCallback = NULL;                            \
-        } while (0)
+#   define __HAL_I2C_RESET_HANDLE_STATE(__HANDLE__)                            \
+       do {                                                                    \
+           (__HANDLE__)->State             = HAL_I2C_STATE_RESET;              \
+           (__HANDLE__)->MspInitCallback   = NULL;                             \
+           (__HANDLE__)->MspDeInitCallback = NULL;                             \
+       } while (0)
 #else
-#    define __HAL_I2C_RESET_HANDLE_STATE(__HANDLE__)                           \
-        ((__HANDLE__)->State = HAL_I2C_STATE_RESET)
+#   define __HAL_I2C_RESET_HANDLE_STATE(__HANDLE__)                            \
+       ((__HANDLE__)->State = HAL_I2C_STATE_RESET)
 #endif
 
 /*============================ TYPES =========================================*/
@@ -98,16 +211,16 @@ typedef struct __I2C_HandleTypeDef {
 #else
 typedef struct {
 #endif
-    I2C_TypeDef              *Instance;
-    I2C_InitTypeDef           Init;
-    uint8_t                  *pBuffPtr;
-    uint16_t                  XferSize;
+    I2C_TypeDef                  *Instance;
+    I2C_InitTypeDef               Init;
+    uint8_t                      *pBuffPtr;
+    uint16_t                      XferSize;
     volatile uint16_t             XferCount;
     volatile uint32_t             XferOptions;
     volatile uint32_t             PreviousState;
-    DMA_HandleTypeDef        *hdmatx;
-    DMA_HandleTypeDef        *hdmarx;
-    HAL_LockTypeDef           Lock;
+    DMA_HandleTypeDef            *hdmatx;
+    DMA_HandleTypeDef            *hdmarx;
+    HAL_LockTypeDef               Lock;
     volatile HAL_I2C_StateTypeDef State;
     volatile HAL_I2C_ModeTypeDef  Mode;
     volatile uint32_t             ErrorCode;
