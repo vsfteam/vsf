@@ -99,7 +99,7 @@
    */
 
 
-#if (VSF_USE_FS == ENABLED && VSF_FS_USE_MEMFS == ENABLED) && (VSF_USE_LINUX != ENABLED)
+#if VSF_USE_FS == ENABLED && VSF_FS_USE_MEMFS == ENABLED && VSF_FREETYPE_USE_STDIO != ENABLED
 
 #include "component/fs/vsf_fs.h"
 #include "utilities/vsf_utilities.h"
