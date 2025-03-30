@@ -99,12 +99,11 @@
    */
 
 
+#if (VSF_USE_FS == ENABLED && VSF_FS_USE_MEMFS == ENABLED) && (VSF_USE_LINUX != ENABLED)
 
 #include "component/fs/vsf_fs.h"
 #include "utilities/vsf_utilities.h"
 #include "utilities/ooc_class.h"
-
-#if VSF_USE_FS == ENABLED && VSF_FS_USE_MEMFS == ENABLED
 
 typedef struct FT_FILE {
     implement(vk_memfs_file_t)
@@ -176,6 +175,8 @@ static VSF_CAL_ALWAYS_INLINE size_t ft_fwrite(const void *ptr, size_t size, size
 #define ft_sprintf  sprintf
 
 #else
+
+#include <stdio.h>
 
 #define FT_FILE     FILE
 #define ft_fclose   fclose
