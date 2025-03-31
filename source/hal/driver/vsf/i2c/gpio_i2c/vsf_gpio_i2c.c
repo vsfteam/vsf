@@ -174,10 +174,11 @@ static uint8_t __vsf_gpio_i2c_in(vsf_gpio_i2c_t *gpio_i2c_ptr, bool ack)
 
 void vsf_gpio_i2c_master_fifo_transfer(vsf_gpio_i2c_t *gpio_i2c_ptr,
                                        uint16_t address, vsf_i2c_cmd_t cmd,
-                                       uint_fast16_t count,
-                                       uint8_t *buffer_ptr)
+                                       uint_fast16_t count, uint8_t *buffer_ptr,
+                                       vsf_i2c_cmd_t *cur_cmd_ptr,
+                                       uint_fast16_t *offset_ptr)
 {
-
+    // do something
 }
 
 uint_fast16_t vsf_gpio_i2c_slave_fifo_transfer(vsf_gpio_i2c_t *gpio_i2c_ptr,
