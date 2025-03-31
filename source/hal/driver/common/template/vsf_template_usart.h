@@ -457,14 +457,6 @@ enum {
     VSF_USART_HALF_DUPLEX_MASK          = VSF_USART_HALF_DUPLEX_DISABLE
                                         | VSF_USART_HALF_DUPLEX_ENABLE,
 
-    VSF_USART_SYNC_CLOCK_POLARITY_MASK  = VSF_USART_SYNC_CLOCK_POLARITY_LOW
-                                        | VSF_USART_SYNC_CLOCK_POLARITY_HIGH,
-
-    VSF_USART_SYNC_CLOCK_PHASE_MASK     = VSF_USART_SYNC_CLOCK_PHASE_1_EDGE
-                                        | VSF_USART_SYNC_CLOCK_PHASE_2_EDGE,
-
-
-
     VSF_USART_MODE_ALL_BITS_MASK        = VSF_USART_PARITY_MASK
                                         | VSF_USART_STOPBIT_MASK
                                         | VSF_USART_BIT_LENGTH_MASK
@@ -475,8 +467,6 @@ enum {
                                         | VSF_USART_RX_MASK
                                         | VSF_USART_SYNC_CLOCK_MASK
                                         | VSF_USART_HALF_DUPLEX_MASK
-                                        | VSF_USART_SYNC_CLOCK_POLARITY_MASK
-                                        | VSF_USART_SYNC_CLOCK_PHASE_MASK
 #ifdef VSF_USART_SYNC_CLOCK_LAST_BIT_MASK
                                         | VSF_USART_SYNC_CLOCK_LAST_BIT_MASK
 #endif
