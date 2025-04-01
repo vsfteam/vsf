@@ -104,10 +104,6 @@ uint_fast8_t vsf_hw_clkrst_region_get_bit(uint32_t region)
 // re-write HardFault_Handler to dump stack
 void HardFault_Handler(void)
 {
-    uintptr_t stack = vsf_arch_get_stack();
-    uintptr_t callstack[16] = { 0 };
-    uint_fast16_t num = vsf_arch_get_callstack(stack, callstack, dimof(callstack));
-
     vsf_trace_error("Hardfault:" VSF_TRACE_CFG_LINEEND);
 
     uint32_t cfsr = SCB->CFSR;
@@ -539,6 +535,7 @@ bool vsf_driver_init(void)
 
     uint32_t pid = ((hwp_hpsys_cfg->IDR & HPSYS_CFG_IDR_PID_Msk) >> HPSYS_CFG_IDR_PID_Pos) & 7;
     uint32_t boot_src = HAL_Get_backup(RTC_BACKUP_BOOTOPT);
+    VSF_UNUSED_PARAM(boot_src);
 
     const mpi1_info_t *mpi_info = &__mpi1_info[pid];
     qspi_configure_t qspi_cfg;
