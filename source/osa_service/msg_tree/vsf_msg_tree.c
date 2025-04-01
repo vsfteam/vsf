@@ -939,7 +939,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* obj_ptr,
                 }
                 break;
 
-            } else if (VSF_MSGT_ERR_REQUEST_VISIT_PARENT == fsm_rt) {
+            } else if (VSF_MSGT_ERR_REQUEST_VISIT_PARENT == (vsf_msgt_err_t)fsm_rt) {
                 THIS_FSM_STATE = FETCH_ITEM;
 
                 //! visit parent is requested
@@ -964,7 +964,7 @@ fsm_rt_t vsf_msgt_forward_propagate_msg_bfs(vsf_msgt_t* obj_ptr,
 
                 break;
 
-            } else if (VSF_MSGT_ERR_REUQEST_VISIT_AGAIN == fsm_rt) {
+            } else if (VSF_MSGT_ERR_REUQEST_VISIT_AGAIN == (vsf_msgt_err_t)fsm_rt) {
                 THIS_FSM_STATE = FETCH_ITEM;
 
                 const vsf_msgt_node_t* temp_ptr = vsf_this.FWBFS.msg_handling.node_ptr;
