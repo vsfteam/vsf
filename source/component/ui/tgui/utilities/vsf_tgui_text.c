@@ -191,7 +191,7 @@ static vsf_tgui_size_t __vsf_tgui_text_get_size( const uint8_t font_index,
 {
     vsf_tgui_size_t tSize = {0, 0};
     int16_t width = 0;
-    int16_t font_height;
+    int16_t font_height = 0;
     uint32_t char_u32;
     size_t char_offset = 0;
     uint8_t char_width;

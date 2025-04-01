@@ -20,7 +20,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "../vsf_tgui_cfg.h"
+#include "../../vsf_tgui_cfg.h"
 
 #if     VSF_USE_TINY_GUI == ENABLED                                             \
     &&  VSF_TGUI_CFG_RENDERING_TEMPLATE_SEL == VSF_TGUI_V_TEMPLATE_SCGUI_VIEW

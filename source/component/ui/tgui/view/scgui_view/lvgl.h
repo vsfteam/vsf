@@ -27,6 +27,7 @@ extern "C" {
 #endif
 
 #include <stdbool.h>
+#include <stdint.h>
 
 #define FALSE   0
 #define TRUE    1
@@ -35,13 +36,12 @@ extern "C" {
 
 //typedef unsigned char   u8, bool, BOOL, bit1, uint8_t, BaseType_t;
 
-typedef signed char    int8_t;
 //typedef unsigned char   bool;
-typedef unsigned char   u8,  uint8_t;
-typedef unsigned short  u16, uint16_t;
-typedef signed short    s16, int16_t;
-typedef unsigned int    u32, tu8, tu16, tbool, tu32, uint32_t;
-typedef signed int      s32,int32_t;
+typedef uint8_t     u8;
+typedef uint16_t    u16;
+typedef int16_t     s16;
+typedef uint32_t    u32, tu8, tu16, tbool, tu32;
+typedef int32_t     s32;
 /* -------------------------------------------------------------------------------- */
 /* -- TYPEDEFS                                                                   -- */
 /* -------------------------------------------------------------------------------- */
