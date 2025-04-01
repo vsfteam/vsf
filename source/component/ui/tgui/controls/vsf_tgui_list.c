@@ -303,7 +303,7 @@ fsm_rt_t vsf_tgui_list_msg_handler(vsf_tgui_list_t* ptList, vsf_tgui_msg_t* ptMS
 
     if (VSF_TGUI_EVT_LIST_SELECTION_CHANGED == ptMSG->use_as__vsf_msgt_msg_t.msg) {
         //! block backward propagation
-        if (VSF_TGUI_MSG_RT_UNHANDLED == fsm) {
+        if ((fsm_rt_t)VSF_TGUI_MSG_RT_UNHANDLED == fsm) {
             fsm = (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
         }
     }

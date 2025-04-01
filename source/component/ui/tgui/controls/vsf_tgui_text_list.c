@@ -177,7 +177,7 @@ static void __vk_tgui_text_list_update_line_selection(
     }
 
     /*! \NOTE IMPORTANT  Please do NOT set ptTextList->iLineSelect with iLineSelect
-     *!                  in this function. Its value is deliberately allowed to be 
+     *!                  in this function. Its value is deliberately allowed to be
      *!                  out of the legal range, i.e. to be negative or larger than
      *!                  the  ptTextList->hwLineCount.
      *!                  The range validation work is done in other place.
@@ -194,7 +194,7 @@ static void __vk_tgui_text_list_update_line_selection(
                     iLineDif,
                     ptTextList->tList.tContent.tLabel.chInterLineSpace);
             vk_tgui_slider_location_target_increase( &(ptTextList->tSlider), iYOffset);
-            
+
         //}
     } while(0);
 
@@ -232,12 +232,12 @@ static void __vk_tgui_text_list_internal_update(vsf_tgui_text_list_t* ptTextList
 #endif
 
 
-    ptTextList->tList.tBuffer.iY = ptTextList->tList.tContent.iHeight 
+    ptTextList->tList.tBuffer.iY = ptTextList->tList.tContent.iHeight
                                  + ptTextList->tList.tContent.tLabel.chInterLineSpace;
 
 #if VSF_TGUI_CFG_SUPPORT_CONTROL_LAYOUT_MARGIN == ENABLED
     ptTextList->tList.tBuffer.tMargin.chTop = ptTextList->tList.tContent.tLabel.chInterLineSpace;
-#endif 
+#endif
 #if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
     ptTextList->hwLineCount = ptTextList->tList.tContent.tLabel.tInfoCache.hwLines;
 #else
@@ -298,7 +298,7 @@ fsm_rt_t vsf_tgui_text_list_msg_handler(vsf_tgui_text_list_t* ptTextList,
             ptTextList->iOldLineSelect = ptTextList->iLineSelect;
 
             __vk_tgui_text_list_use_minimal_position(ptTextList);
-            
+
         }
 
         return (fsm_rt_t)VSF_TGUI_MSG_RT_REFRESH;
@@ -311,7 +311,7 @@ fsm_rt_t vsf_tgui_text_list_msg_handler(vsf_tgui_text_list_t* ptTextList,
 
     if (VSF_TGUI_EVT_LIST_SELECTION_CHANGED == ptMSG->use_as__vsf_msgt_msg_t.msg) {
         //! block backward propagation
-        if (VSF_TGUI_MSG_RT_UNHANDLED == fsm) {
+        if ((fsm_rt_t)VSF_TGUI_MSG_RT_UNHANDLED == fsm) {
             fsm = (fsm_rt_t)VSF_TGUI_MSG_RT_DONE;
         }
     }
@@ -368,8 +368,8 @@ fsm_rt_t vk_tgui_text_list_update(vsf_tgui_text_list_t* ptTextList)
               updated with TREE_UPDATE message
      */
     __vk_tgui_text_list_internal_update(ptTextList);
-    
-    
+
+
     if (__is_auto_size) {
         /*! text list doesn't support autosize, let's fix this */
         ptTextList->ContainerAttribute.bIsAutoSize = false;
@@ -377,11 +377,11 @@ fsm_rt_t vk_tgui_text_list_update(vsf_tgui_text_list_t* ptTextList)
         ptTextList->iWidth = vsf_max(ptTextList->tList.iWidth, ptTextList->iWidth);
     } else {
         if (0 == ptTextList->iHeight) {
-            
+
         #if VSF_TGUI_CFG_TEXT_SIZE_INFO_CACHING == ENABLED
             int16_t __char_height = ptTextList->tList.tContent.tLabel.tInfoCache.chCharHeight;
         #else
-            int16_t __char_height = 0; 
+            int16_t __char_height = 0;
             uint8_t __temp;
             vsf_tgui_label_text_get_size(&(ptTextList->tList.tContent.tLabel), NULL, &__temp);
             __char_height = __temp;
@@ -389,7 +389,7 @@ fsm_rt_t vk_tgui_text_list_update(vsf_tgui_text_list_t* ptTextList)
             int16_t __line_height = __char_height + ptTextList->tList.tContent.tLabel.chInterLineSpace;
 
             ptTextList->iHeight = vsf_max(__char_height, __line_height);
-        }  
+        }
         if (0 == ptTextList->iWidth) {
             ptTextList->iWidth = vsf_max(ptTextList->tList.iWidth, ptTextList->iWidth);
         }
@@ -442,10 +442,10 @@ int_fast16_t vsf_tgui_text_list_select_get(vsf_tgui_text_list_t* ptTextList)
 }
 
 /*! \brief set the index of selection
- *! 
+ *!
  *! \note if the input number is out of the valid range, the text list will automatically
  *!       correct it to the valid range.
- *! 
+ *!
  *! \param ptTextList the target text list object
  *! \param iSelect user specified selection number
  *! \return none

@@ -75,7 +75,7 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
     //! some message has to be handled before calling user handler
     switch(ptMSG->use_as__vsf_msgt_msg_t.msg) {
     #if VSF_TGUI_CFG_SUPPORT_KEY_EVENTS == ENABLED
-        case VSF_TGUI_EVT_KEY_DOWN: 
+        case VSF_TGUI_EVT_KEY_DOWN:
             if (VSF_TGUI_KEY_OK != key_evt_ptr->hwKeyValue) {
                 break;
             }
@@ -88,7 +88,7 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
             break;
 
     #if VSF_TGUI_CFG_SUPPORT_KEY_EVENTS == ENABLED
-        case VSF_TGUI_EVT_KEY_UP: 
+        case VSF_TGUI_EVT_KEY_UP:
             if (VSF_TGUI_KEY_OK != key_evt_ptr->hwKeyValue) {
                 break;
             }
@@ -138,7 +138,7 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
     //if (fsm != VSF_MSGT_ERR_MSG_NOT_HANDLED) {
         switch (ptMSG->use_as__vsf_msgt_msg_t.msg){
         #if VSF_TGUI_CFG_SUPPORT_KEY_EVENTS == ENABLED
-            case VSF_TGUI_EVT_KEY_DOWN: 
+            case VSF_TGUI_EVT_KEY_DOWN:
                 if (VSF_TGUI_KEY_OK != key_evt_ptr->hwKeyValue) {
                     break;
                 }
@@ -146,7 +146,7 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
         #endif
             case VSF_TGUI_EVT_POINTER_DOWN:
                 if (!ptButton->_.bIsCheckButton) {
-                    if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
+                    if (fsm != (fsm_rt_t)VSF_TGUI_MSG_RT_REFRESH) {
                     #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh");
                     #endif
@@ -156,7 +156,7 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
                 }
                 break;
         #if VSF_TGUI_CFG_SUPPORT_KEY_EVENTS == ENABLED
-            case VSF_TGUI_EVT_KEY_UP: 
+            case VSF_TGUI_EVT_KEY_UP:
                 if (VSF_TGUI_KEY_OK != key_evt_ptr->hwKeyValue) {
                     break;
                 }
@@ -164,7 +164,7 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
         #endif
             case VSF_TGUI_EVT_POINTER_UP:
                 if (!ptButton->_.bIsCheckButton) {
-                    if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
+                    if (fsm != (fsm_rt_t)VSF_TGUI_MSG_RT_REFRESH) {
                     #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh");
                     #endif
@@ -173,9 +173,9 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
 
                 }
                 break;
-        
+
         #if VSF_TGUI_CFG_SUPPORT_KEY_EVENTS == ENABLED
-            case VSF_TGUI_EVT_KEY_PRESSED: 
+            case VSF_TGUI_EVT_KEY_PRESSED:
                 if (VSF_TGUI_KEY_OK != key_evt_ptr->hwKeyValue) {
                     break;
                 }
@@ -183,7 +183,7 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
         #endif
             case VSF_TGUI_EVT_POINTER_CLICK:
                 if (ptButton->_.bIsCheckButton) {
-                    if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
+                    if (fsm != (fsm_rt_t)VSF_TGUI_MSG_RT_REFRESH) {
                     #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh");
                     #endif
@@ -195,7 +195,7 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
         #if VSF_TGUI_CFG_SUPPORT_MOUSE_LIKE_EVENTS == ENABLED
             case VSF_TGUI_EVT_POINTER_ENTER:
                 if (ptButton->_.bIsAllowEmphasize) {
-                    if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
+                    if (fsm != (fsm_rt_t)VSF_TGUI_MSG_RT_REFRESH) {
                     #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh");
                     #endif
@@ -206,7 +206,7 @@ fsm_rt_t vsf_tgui_button_msg_handler(vsf_tgui_button_t* ptButton, vsf_tgui_msg_t
 
             case VSF_TGUI_EVT_POINTER_LEFT:
                 if (ptButton->_.bIsAllowEmphasize) {
-                    if (fsm != VSF_TGUI_MSG_RT_REFRESH) {
+                    if (fsm != (fsm_rt_t)VSF_TGUI_MSG_RT_REFRESH) {
                     #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
                         VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh");
                     #endif
