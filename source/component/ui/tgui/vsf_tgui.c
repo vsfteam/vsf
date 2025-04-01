@@ -366,12 +366,12 @@ static fsm_rt_t __vsf_tgui_send_msg(vsf_tgui_t* gui_ptr,
         control_ptr = (const vsf_tgui_control_t* )
         vsf_msgt_backward_propagate_msg_get_last_node(msg_tree_ptr);
 
-        if (VSF_TGUI_MSG_RT_REFRESH == fsm_rt) {
+        if ((fsm_rt_t)VSF_TGUI_MSG_RT_REFRESH == fsm_rt) {
         #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
             VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh\r\n");
         #endif
             vk_tgui_refresh_ex(gui_ptr, control_ptr, NULL);
-        } else if (VSF_TGUI_MSG_RT_REFRESH_PARENT == fsm_rt) {
+        } else if ((fsm_rt_t)VSF_TGUI_MSG_RT_REFRESH_PARENT == fsm_rt) {
         #if VSF_TGUI_CFG_SHOW_REFRESH_EVT_LOG == ENABLED
             VSF_TGUI_LOG(VSF_TRACE_WARNING, " \tRequest Refresh Parent\r\n");
         #endif

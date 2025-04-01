@@ -370,7 +370,7 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
 
     char *nextnext;
     bool is_out, is_append;
-    int redir_fd, cur_redir_mask;
+    int redir_fd, cur_redir_mask = 0;
     while (*next != '\0') {
         nextnext = __vsh_get_next_arg(&next);
         arg_expanded = __vsh_expand_arg(process, next);
