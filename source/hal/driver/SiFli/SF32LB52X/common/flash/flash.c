@@ -33,6 +33,7 @@
 #endif
 
 #define __VSF_HW_FLASH_CFG_PROTECT                  interrupt
+#define __VSF_HW_FLASH_USE_DMA                      DISABLED
 
 // Boot source
 #define BOOT_FROM_SIP_PUYA                          1
@@ -61,7 +62,9 @@ typedef struct vsf_hw_flash_t {
     vsf_flash_irq_mask_t irq_mask;
 
     QSPI_FLASH_CTX_T flash_ctx;
+#if __VSF_HW_FLASH_USE_DMA == ENABLED
     DMA_HandleTypeDef flash_dma_handle;
+#endif
 } vsf_hw_flash_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -81,11 +84,15 @@ vsf_err_t vsf_hw_flash_init(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_cfg_t *cfg_p
     }
 
     memset(&hw_flash_ptr->flash_ctx, 0, sizeof(hw_flash_ptr->flash_ctx));
+#if __VSF_HW_FLASH_USE_DMA == ENABLED
     memset(&hw_flash_ptr->flash_dma_handle, 0, sizeof(hw_flash_ptr->flash_dma_handle));
+#endif
 
     int flash_mod;
     qspi_configure_t qspi_cfg;
+#if __VSF_HW_FLASH_USE_DMA == ENABLED
     struct dma_config flash_dma = { 0 };
+#endif
 
     switch (HAL_Get_backup(RTC_BACKUP_BOOTOPT)) {
     case BOOT_FROM_SIP_PUYA:
@@ -96,10 +103,12 @@ vsf_err_t vsf_hw_flash_init(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_cfg_t *cfg_p
         qspi_cfg.SpiMode = SPI_MODE_NOR;
         qspi_cfg.msize = 4;
 
+#if __VSF_HW_FLASH_USE_DMA == ENABLED
         flash_dma.Instance = DMA1_Channel1;
         flash_dma.dma_irq_prio = 0;
         flash_dma.dma_irq = DMAC1_CH1_IRQn;
         flash_dma.request = DMA_REQUEST_0;
+#endif
 
         flash_mod = RCC_CLK_MOD_FLASH1;
         break;
@@ -118,10 +127,12 @@ vsf_err_t vsf_hw_flash_init(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_cfg_t *cfg_p
         qspi_cfg.base = FLASH2_BASE_ADDR;
         qspi_cfg.msize = 32;
 
+#if __VSF_HW_FLASH_USE_DMA == ENABLED
         flash_dma.Instance = DMA1_Channel2;
         flash_dma.dma_irq_prio = 0;
         flash_dma.dma_irq = DMAC1_CH2_IRQn;
         flash_dma.request = DMA_REQUEST_1;
+#endif
 
         flash_mod = RCC_CLK_MOD_FLASH2;
         break;
@@ -142,7 +153,7 @@ vsf_err_t vsf_hw_flash_init(vsf_hw_flash_t *hw_flash_ptr, vsf_flash_cfg_t *cfg_p
 
     vsf_protect_t org = __vsf_hw_flash_protect();
         HAL_StatusTypeDef res = HAL_FLASH_Init(&hw_flash_ptr->flash_ctx, &qspi_cfg,
-#if 0
+#if __VSF_HW_FLASH_USE_DMA == ENABLED
                 &hw_flash_ptr->flash_dma_handle, &flash_dma,
 #else
                 NULL, NULL,
