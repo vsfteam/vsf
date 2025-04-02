@@ -406,10 +406,10 @@ static void __sockaddr_to_ipaddr_port(const struct sockaddr *sockaddr, ip_addr_t
     if (AF_INET6 == sockaddr->sa_family) {
         const struct sockaddr_in6 *sockaddr_in6 = (const struct sockaddr_in6 *)sockaddr;
 
-        ip_2_ip6(ipaddr)->addr[0] = sockaddr_in6->sin6_addr.s6_addr[0];
-        ip_2_ip6(ipaddr)->addr[1] = sockaddr_in6->sin6_addr.s6_addr[1];
-        ip_2_ip6(ipaddr)->addr[2] = sockaddr_in6->sin6_addr.s6_addr[2];
-        ip_2_ip6(ipaddr)->addr[3] = sockaddr_in6->sin6_addr.s6_addr[3];
+        ip_2_ip6(ipaddr)->addr[0] = sockaddr_in6->sin6_addr.s6_addr32[0];
+        ip_2_ip6(ipaddr)->addr[1] = sockaddr_in6->sin6_addr.s6_addr32[1];
+        ip_2_ip6(ipaddr)->addr[2] = sockaddr_in6->sin6_addr.s6_addr32[2];
+        ip_2_ip6(ipaddr)->addr[3] = sockaddr_in6->sin6_addr.s6_addr32[3];
 
 #   if LWIP_IPV6_SCOPES
         ip6_addr_clear_zone(ip_2_ip6(ipaddr));
@@ -442,10 +442,10 @@ static socklen_t __ipaddr_port_to_sockaddr(struct sockaddr *sockaddr, ip_addr_t 
         sockaddr_in6->sin6_family = AF_INET6;
         sockaddr_in6->sin6_port = lwip_htons((port));
         sockaddr_in6->sin6_flowinfo = 0;
-        sockaddr_in6->sin6_addr.s6_addr[0] = ip_2_ip6(ipaddr)->addr[0];
-        sockaddr_in6->sin6_addr.s6_addr[1] = ip_2_ip6(ipaddr)->addr[1];
-        sockaddr_in6->sin6_addr.s6_addr[2] = ip_2_ip6(ipaddr)->addr[2];
-        sockaddr_in6->sin6_addr.s6_addr[3] = ip_2_ip6(ipaddr)->addr[3];
+        sockaddr_in6->sin6_addr.s6_addr32[0] = ip_2_ip6(ipaddr)->addr[0];
+        sockaddr_in6->sin6_addr.s6_addr32[1] = ip_2_ip6(ipaddr)->addr[1];
+        sockaddr_in6->sin6_addr.s6_addr32[2] = ip_2_ip6(ipaddr)->addr[2];
+        sockaddr_in6->sin6_addr.s6_addr32[3] = ip_2_ip6(ipaddr)->addr[3];
 #   if LWIP_IPV6_SCOPES
         sockaddr_in6->sin6_scope_id = ip6_addr_zone(ip_2_ip6(ipaddr));
 #   endif
