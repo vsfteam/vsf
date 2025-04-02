@@ -131,6 +131,8 @@ static int __vsf_linux_term_fcntl_common(vsf_linux_fd_t *sfd, int cmd, uintptr_t
         uintptr_t arg;
     } arg_union;
     arg_union.arg = arg;
+    VSF_UNUSED_PARAM(priv);
+    VSF_UNUSED_PARAM(arg_union);
 
     switch (cmd) {
     case TCSETS:
@@ -679,6 +681,7 @@ static int __vsf_linux_spi_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
     arg_union.arg = arg;
 
     int cmd_nr = _IOC_NR(cmd);
+    VSF_UNUSED_PARAM(cmd_nr);
     switch (cmd) {
     case SPI_IOC_RD_MODE:
         *arg_union.mode_u8 = priv->mode;
@@ -1327,6 +1330,7 @@ static ssize_t __vsf_linux_input_write(vsf_linux_fd_t *sfd, const void *buf, siz
 {
     VSF_LINUX_ASSERT(!(count % sizeof(struct input_event)));
     struct input_event *linux_input_event = (struct input_event *)buf;
+    VSF_UNUSED_PARAM(linux_input_event);
     size_t written_count = 0;
     vk_input_type_t vsf_input_type = VSF_INPUT_TYPE_UNKNOWN;
     vk_input_evt_t vsf_input_event;

@@ -369,7 +369,7 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
     ctx->arg.argv[ctx->arg.argc++] = arg_expanded;
 
     char *nextnext;
-    bool is_out, is_append;
+    bool is_out = false, is_append = false;
     int redir_fd, cur_redir_mask = 0;
     while (*next != '\0') {
         nextnext = __vsh_get_next_arg(&next);
