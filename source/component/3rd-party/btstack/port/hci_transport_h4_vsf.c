@@ -34,6 +34,7 @@
 #include "btstack_debug.h"
 #include "hci.h"
 #include "hci_transport.h"
+#include "btstack_uart_block.h"
 #include "bluetooth.h"
 
 /*============================ MACROS ========================================*/
