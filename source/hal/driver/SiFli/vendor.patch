@@ -1,0 +1,1139 @@
+ drivers/Include/bf0_hal.h        |  2 +-
+ drivers/Include/bf0_hal_mpi.h    | 67 +++++++++++++++++++-------------------
+ drivers/Include/bf0_hal_mpi_ex.h | 20 ++++++------
+ drivers/Include/bf0_hal_qspi.h   |  2 +-
+ drivers/Include/bf0_hal_rcc.h    | 12 +++----
+ drivers/Include/flash_table.h    | 10 +++---
+ drivers/hal/bf0_hal_mpi.c        | 70 ++++++++++++++++++++--------------------
+ drivers/hal/bf0_hal_mpi_ex.c     | 28 ++++++++--------
+ drivers/hal/bf0_hal_qspi.c       |  2 +-
+ drivers/hal/bf0_hal_rcc.c        | 14 ++++----
+ drivers/hal/flash_table.c        | 24 +++++++-------
+ 11 files changed, 127 insertions(+), 124 deletions(-)
+
+diff --git a/drivers/Include/bf0_hal.h b/drivers/Include/bf0_hal.h
+index 60ae28d..7a07493 100644
+--- a/drivers/Include/bf0_hal.h
++++ b/drivers/Include/bf0_hal.h
+@@ -387,7 +387,7 @@ void HAL_IncTick(void);
+   * @retval None
+   */
+ void HAL_Delay(uint32_t Delay);
+-void HAL_Delay_us(uint32_t us);
++VSF_CAL_RAMFUNC void HAL_Delay_us(uint32_t us);
+ void HAL_Delay_us_(__IO uint32_t us);
+ 
+ /**
+diff --git a/drivers/Include/bf0_hal_mpi.h b/drivers/Include/bf0_hal_mpi.h
+index a585740..8ea5d01 100644
+--- a/drivers/Include/bf0_hal_mpi.h
++++ b/drivers/Include/bf0_hal_mpi.h
+@@ -54,6 +54,7 @@ extern "C" {
+ 
+ /* Includes ------------------------------------------------------------------*/
+ #include "bf0_hal_def.h"
++#include "bf0_hal_dma.h"
+ 
+ #include "mpi.h"
+ 
+@@ -364,7 +365,7 @@ typedef struct __FLASH_HandleTypeDef
+   * @param  cmd read command index
+   * @retval HAL status
+   */
+-HAL_StatusTypeDef HAL_FLASH_SET_AHB_RCMD(FLASH_HandleTypeDef *hflash, uint8_t cmd);
++ VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_FLASH_SET_AHB_RCMD(FLASH_HandleTypeDef *hflash, uint8_t cmd);
+ 
+ /**
+   * @brief  SPI_FLASH set ahb write command
+@@ -386,7 +387,7 @@ HAL_StatusTypeDef HAL_FLASH_SET_AHB_WCMD(FLASH_HandleTypeDef *hflash, uint8_t cm
+   * @param  cmd_mode  command mode, it should be 1
+   * @retval None
+   */
+-void HAL_FLASH_CFG_AHB_RCMD(FLASH_HandleTypeDef *hflash, int8_t data_mod,
++ VSF_CAL_RAMFUNC void HAL_FLASH_CFG_AHB_RCMD(FLASH_HandleTypeDef *hflash, int8_t data_mod,
+                             int8_t dum_cyc, int8_t ab_size, int8_t ab_mod,
+                             int8_t addr_size, int8_t addr_mod, int8_t cmd_mode);
+ 
+@@ -412,7 +413,7 @@ void HAL_FLASH_CFG_AHB_WCMD(FLASH_HandleTypeDef *hflash, int8_t data_mod,
+   * @param  en enable QSPI mode
+   * @retval HAL status
+   */
+-HAL_StatusTypeDef HAL_FLASH_ENABLE_QSPI(FLASH_HandleTypeDef *hflash, uint8_t en);
++ VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_FLASH_ENABLE_QSPI(FLASH_HandleTypeDef *hflash, uint8_t en);
+ 
+ /**
+   * @brief  SPI_FLASH enable OPI mode
+@@ -437,7 +438,7 @@ HAL_StatusTypeDef HAL_FLASH_ENABLE_HYPER(FLASH_HandleTypeDef *hflash, uint8_t en
+   * @param  addr address
+   * @retval HAL status
+   */
+-HAL_StatusTypeDef HAL_FLASH_SET_CMD(FLASH_HandleTypeDef *hflash, uint8_t cmd, uint32_t addr);
++ VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_FLASH_SET_CMD(FLASH_HandleTypeDef *hflash, uint8_t cmd, uint32_t addr);
+ 
+ /**
+   * @brief  Configure FLASH command but do not need wait TCF.
+@@ -455,7 +456,7 @@ HAL_StatusTypeDef HAL_FLASH_CFG_CMD(FLASH_HandleTypeDef *hflash, uint8_t cmd, ui
+   * @param  len data length
+   * @retval HAL status
+ */
+-HAL_StatusTypeDef HAL_FLASH_WRITE_DLEN(FLASH_HandleTypeDef *hflash, uint32_t len);
++VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_FLASH_WRITE_DLEN(FLASH_HandleTypeDef *hflash, uint32_t len);
+ 
+ /**
+   * @brief  SPI_FLASH write data length to command 2
+@@ -463,7 +464,7 @@ HAL_StatusTypeDef HAL_FLASH_WRITE_DLEN(FLASH_HandleTypeDef *hflash, uint32_t len
+   * @param  len data length
+   * @retval HAL status
+ */
+-HAL_StatusTypeDef HAL_FLASH_WRITE_DLEN2(FLASH_HandleTypeDef *hflash, uint16_t len);
++VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_FLASH_WRITE_DLEN2(FLASH_HandleTypeDef *hflash, uint16_t len);
+ 
+ /**
+   * @brief  SPI_FLASH write a word to fifo
+@@ -471,7 +472,7 @@ HAL_StatusTypeDef HAL_FLASH_WRITE_DLEN2(FLASH_HandleTypeDef *hflash, uint16_t le
+   * @param  data u32 data
+   * @retval HAL status
+ */
+-HAL_StatusTypeDef HAL_FLASH_WRITE_WORD(FLASH_HandleTypeDef *hflash, uint32_t data);
++VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_FLASH_WRITE_WORD(FLASH_HandleTypeDef *hflash, uint32_t data);
+ 
+ /**
+   * @brief  SPI_FLASH write alternate byte
+@@ -514,7 +515,7 @@ bool HAL_FLASH_IS_BUSY(FLASH_HandleTypeDef *hflash);
+   * @param  hflash  FLASH handle
+   * @retval flash status
+ */
+-bool HAL_FLASH_STATUS_MATCH(FLASH_HandleTypeDef *hflash);
++VSF_CAL_RAMFUNC bool HAL_FLASH_STATUS_MATCH(FLASH_HandleTypeDef *hflash);
+ 
+ /**
+   * @brief  SPI_FLASH if command finish
+@@ -522,28 +523,28 @@ bool HAL_FLASH_STATUS_MATCH(FLASH_HandleTypeDef *hflash);
+   * @retval flash status
+ */
+ 
+-bool HAL_FLASH_IS_CMD_DONE(FLASH_HandleTypeDef *hflash);
++VSF_CAL_RAMFUNC bool HAL_FLASH_IS_CMD_DONE(FLASH_HandleTypeDef *hflash);
+ 
+ /**
+   * @brief  SPI_FLASH clear command done status
+   * @param  hflash  FLASH handle
+   * @retval none
+ */
+-void HAL_FLASH_CLR_CMD_DONE(FLASH_HandleTypeDef *hflash);
++VSF_CAL_RAMFUNC void HAL_FLASH_CLR_CMD_DONE(FLASH_HandleTypeDef *hflash);
+ 
+ /**
+   * @brief  SPI_FLASH check if program done
+   * @param  hflash  FLASH handle
+   * @retval flash status
+ */
+-bool HAL_FLASH_IS_PROG_DONE(FLASH_HandleTypeDef *hflash);
++VSF_CAL_RAMFUNC bool HAL_FLASH_IS_PROG_DONE(FLASH_HandleTypeDef *hflash);
+ 
+ /**
+   * @brief  SPI_FLASH read 32 bits data from fifo
+   * @param  hflash  FLASH handle
+   * @retval data in fifo
+ */
+-uint32_t HAL_FLASH_READ32(FLASH_HandleTypeDef *hflash);
++VSF_CAL_RAMFUNC uint32_t HAL_FLASH_READ32(FLASH_HandleTypeDef *hflash);
+ 
+ /**
+   * @brief  SPI_FLASH get received count
+@@ -558,7 +559,7 @@ uint8_t HAL_FLASH_GET_RX_CNT(FLASH_HandleTypeDef *hflash);
+   * @param  div clock divider
+   * @retval none
+ */
+-void HAL_FLASH_SET_CLK_rom(FLASH_HandleTypeDef *hflash, uint8_t div);
++VSF_CAL_RAMFUNC void HAL_FLASH_SET_CLK_rom(FLASH_HandleTypeDef *hflash, uint8_t div);
+ 
+ /**
+   * @brief  SPI_FLASH flush flash fifo
+@@ -574,7 +575,7 @@ void HAL_FLASH_CLEAR_FIFO(FLASH_HandleTypeDef *hflash, HAL_FLASH_ClearFifo mode)
+   * @param  slot burst width
+   * @retval none
+ */
+-void HAL_FLASH_SET_TXSLOT(FLASH_HandleTypeDef *hflash, uint8_t slot);
++VSF_CAL_RAMFUNC void HAL_FLASH_SET_TXSLOT(FLASH_HandleTypeDef *hflash, uint8_t slot);
+ 
+ 
+ /**
+@@ -590,7 +591,7 @@ void HAL_FLASH_SET_TXSLOT(FLASH_HandleTypeDef *hflash, uint8_t slot);
+   * @param  cmd_mode  command mode, it should be 1
+   * @retval None
+   */
+-void HAL_FLASH_MANUAL_CMD(FLASH_HandleTypeDef *hflash, int8_t func_mod, int8_t data_mod,
++ VSF_CAL_RAMFUNC void HAL_FLASH_MANUAL_CMD(FLASH_HandleTypeDef *hflash, int8_t func_mod, int8_t data_mod,
+                           int8_t dum_cyc, int8_t ab_size, int8_t ab_mod,
+                           int8_t addr_size, int8_t addr_mod, int8_t cmd_mode);
+ 
+@@ -608,7 +609,7 @@ void HAL_FLASH_MANUAL_CMD(FLASH_HandleTypeDef *hflash, int8_t func_mod, int8_t d
+     * @param  cmd_mode  command mode, it should be 1
+     * @retval None
+   */
+-void HAL_FLASH_MANUAL_CMD2(FLASH_HandleTypeDef *hflash, int8_t func_mod, int8_t data_mod,
++ VSF_CAL_RAMFUNC void HAL_FLASH_MANUAL_CMD2(FLASH_HandleTypeDef *hflash, int8_t func_mod, int8_t data_mod,
+                            int8_t dum_cyc, int8_t ab_size, int8_t ab_mod,
+                            int8_t addr_size, int8_t addr_mod, int8_t cmd_mode);
+ 
+@@ -618,7 +619,7 @@ void HAL_FLASH_MANUAL_CMD2(FLASH_HandleTypeDef *hflash, int8_t func_mod, int8_t
+  * @param  en enable
+  * @retval HAL status
+ */
+-HAL_StatusTypeDef HAL_FLASH_ENABLE_CMD2(FLASH_HandleTypeDef *hflash, uint8_t en);
++VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_FLASH_ENABLE_CMD2(FLASH_HandleTypeDef *hflash, uint8_t en);
+ 
+ /**
+  * @brief  SPI_FLASH command 2 match status en
+@@ -626,7 +627,7 @@ HAL_StatusTypeDef HAL_FLASH_ENABLE_CMD2(FLASH_HandleTypeDef *hflash, uint8_t en)
+  * @param  en enable
+  * @retval HAL status
+ */
+-HAL_StatusTypeDef HAL_FLASH_STAUS_MATCH_CMD2(FLASH_HandleTypeDef *hflash, uint8_t en);
++VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_FLASH_STAUS_MATCH_CMD2(FLASH_HandleTypeDef *hflash, uint8_t en);
+ 
+ /**
+   * @brief  SPI_FLASH clear flash status
+@@ -634,7 +635,7 @@ HAL_StatusTypeDef HAL_FLASH_STAUS_MATCH_CMD2(FLASH_HandleTypeDef *hflash, uint8_
+   * @param  status value
+   * @retval none
+ */
+-void HAL_FLASH_CLR_STATUS(FLASH_HandleTypeDef *hflash, uint32_t status);
++VSF_CAL_RAMFUNC void HAL_FLASH_CLR_STATUS(FLASH_HandleTypeDef *hflash, uint32_t status);
+ 
+ /**
+   * @}
+@@ -714,7 +715,7 @@ HAL_StatusTypeDef HAL_FLASH_SET_CS_TIME(FLASH_HandleTypeDef *hflash,
+  * @param  rb_size row boundary
+  * @retval HAL status
+ */
+-HAL_StatusTypeDef HAL_FLASH_SET_ROW_BOUNDARY(FLASH_HandleTypeDef *hflash, uint8_t rb_size);
++VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_FLASH_SET_ROW_BOUNDARY(FLASH_HandleTypeDef *hflash, uint8_t rb_size);
+ 
+ /**
+  * @brief  SPI_FLASH for legacy psram
+@@ -737,7 +738,7 @@ uint8_t HAL_FLASH_GET_DIV(FLASH_HandleTypeDef *hflash);
+  * @param  dual 1 for dual flash, 0 for single
+  * @retval HAL status
+ */
+-HAL_StatusTypeDef HAL_FLASH_SET_DUAL_MODE(FLASH_HandleTypeDef *hflash, uint8_t dual);
++VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_FLASH_SET_DUAL_MODE(FLASH_HandleTypeDef *hflash, uint8_t dual);
+ 
+ /**
+  * @brief  SPI_FLASH get dual flash mode
+@@ -802,7 +803,7 @@ HAL_StatusTypeDef HAL_MPI_SET_SCK(FLASH_HandleTypeDef *hflash, uint8_t delay, ui
+  * @param  rclk_inv_delay high 4 bits for rx clock invert, low 4 bits for rx clock delay
+  * @retval HAL status
+ */
+-HAL_StatusTypeDef HAL_MPI_CFG_DTR(FLASH_HandleTypeDef *hflash, uint8_t en, uint8_t rclk_inv_delay);
++VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_MPI_CFG_DTR(FLASH_HandleTypeDef *hflash, uint8_t en, uint8_t rclk_inv_delay);
+ 
+ /**
+  * @brief  MPI modify AHB read delay cycle
+@@ -848,7 +849,7 @@ int HAL_FLASH_GET_WDT_STATUS(FLASH_HandleTypeDef *hflash);
+  * @param  qmode qual spi mode
+  * @retval HAL status
+ */
+-HAL_StatusTypeDef HAL_FLASH_CONFIG_AHB_READ(FLASH_HandleTypeDef *hflash, bool qmode);
++VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_FLASH_CONFIG_AHB_READ(FLASH_HandleTypeDef *hflash, bool qmode);
+ 
+ /**
+  * @brief  SPI_FLASH set command parameter but not set command
+@@ -856,7 +857,7 @@ HAL_StatusTypeDef HAL_FLASH_CONFIG_AHB_READ(FLASH_HandleTypeDef *hflash, bool qm
+  * @param  cmd flash command
+  * @retval 0 if success
+ */
+-int HAL_FLASH_PRE_CMD(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_E cmd);
++VSF_CAL_RAMFUNC int HAL_FLASH_PRE_CMD(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_E cmd);
+ 
+ /**
+  * @brief  SPI_FLASH issue flash command
+@@ -865,7 +866,7 @@ int HAL_FLASH_PRE_CMD(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_E cmd);
+  * @param  addr flash address
+  * @retval 0 if success
+ */
+-int HAL_FLASH_ISSUE_CMD(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_E cmd, uint32_t addr);
++VSF_CAL_RAMFUNC int HAL_FLASH_ISSUE_CMD(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_E cmd, uint32_t addr);
+ 
+ /**
+  * @brief  SPI_FLASH issue command 1 and command 2 in sequence
+@@ -876,7 +877,7 @@ int HAL_FLASH_ISSUE_CMD(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_E cmd, uint32
+  * @param  param status mask value
+  * @retval 0 if success
+ */
+-int HAL_FLASH_ISSUE_CMD_SEQ(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_E cmd1, uint32_t addr, SPI_FLASH_CMD_E cmd2, uint32_t param);
++VSF_CAL_RAMFUNC int HAL_FLASH_ISSUE_CMD_SEQ(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_E cmd1, uint32_t addr, SPI_FLASH_CMD_E cmd2, uint32_t param);
+ 
+ /**
+   * @}
+@@ -892,7 +893,7 @@ int HAL_FLASH_ISSUE_CMD_SEQ(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_E cmd1, u
+  * @param  en enable qual spi
+  * @retval none
+ */
+-void HAL_FLASH_SET_QUAL_SPI(FLASH_HandleTypeDef *hflash, bool en);
++VSF_CAL_RAMFUNC void HAL_FLASH_SET_QUAL_SPI(FLASH_HandleTypeDef *hflash, bool en);
+ 
+ /**
+  * @brief  SPI_FLASH set qual spi mode for 4 bytes address mode
+@@ -901,14 +902,14 @@ void HAL_FLASH_SET_QUAL_SPI(FLASH_HandleTypeDef *hflash, bool en);
+  * @retval none
+ */
+ 
+-void HAL_FLASH_FADDR_SET_QSPI(FLASH_HandleTypeDef *hflash, bool en);
++VSF_CAL_RAMFUNC void HAL_FLASH_FADDR_SET_QSPI(FLASH_HandleTypeDef *hflash, bool en);
+ 
+ /**
+  * @brief  SPI_FLASH get nor flash device id
+  * @param  hflash  FLASH handle
+  * @retval nor flash device id
+ */
+-int HAL_FLASH_GET_NOR_ID(FLASH_HandleTypeDef *hflash);
++VSF_CAL_RAMFUNC int HAL_FLASH_GET_NOR_ID(FLASH_HandleTypeDef *hflash);
+ 
+ /**
+  * @brief  SPI_FLASH check if duall flash mode by check flash id
+@@ -922,7 +923,7 @@ int HAL_FLASH_ID_DUAL_ID(FLASH_HandleTypeDef *hflash);
+  * @param  hflash  FLASH handle
+  * @retval none
+ */
+-void HAL_FLASH_CLR_PROTECT(FLASH_HandleTypeDef *hflash);
++VSF_CAL_RAMFUNC void HAL_FLASH_CLR_PROTECT(FLASH_HandleTypeDef *hflash);
+ 
+ /**
+  * @brief  SPI_FLASH initial controller
+@@ -930,7 +931,7 @@ void HAL_FLASH_CLR_PROTECT(FLASH_HandleTypeDef *hflash);
+  * @param  cfg configurations
+  * @retval HAL status
+ */
+-HAL_StatusTypeDef HAL_QSPI_Init(FLASH_HandleTypeDef *hflash, qspi_configure_t *cfg);
++VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_QSPI_Init(FLASH_HandleTypeDef *hflash, qspi_configure_t *cfg);
+ 
+ /**
+  * @brief  SPI_FLASH pre initial, force set to NOR flash single mode.
+@@ -964,7 +965,7 @@ void HAL_QSPI_SET_RXDELAY(uint8_t qspi_id, uint8_t sen_delay, uint8_t clk_delay)
+  * @param[in]  clk_delay Select delayed version of Rx clock in order to achieve higher operating frequency
+  * @retval none
+ */
+-void HAL_QSPI_SET_CLK_INV(FLASH_HandleTypeDef *hflash, uint8_t clk_inv, uint8_t clk_delay);
++VSF_CAL_RAMFUNC void HAL_QSPI_SET_CLK_INV(FLASH_HandleTypeDef *hflash, uint8_t clk_inv, uint8_t clk_delay);
+ 
+ /**
+  * @brief  FLASH into deep power down mode
+@@ -978,7 +979,7 @@ int HAL_FLASH_DEEP_PWRDOWN(FLASH_HandleTypeDef *hflash);
+  * @param  hflash  flash handle
+  * @retval 0 if success
+ */
+-int HAL_FLASH_RELEASE_DPD(FLASH_HandleTypeDef *hflash);
++VSF_CAL_RAMFUNC int HAL_FLASH_RELEASE_DPD(FLASH_HandleTypeDef *hflash);
+ 
+ 
+ /**
+diff --git a/drivers/Include/bf0_hal_mpi_ex.h b/drivers/Include/bf0_hal_mpi_ex.h
+index ef648c4..6528dde 100644
+--- a/drivers/Include/bf0_hal_mpi_ex.h
++++ b/drivers/Include/bf0_hal_mpi_ex.h
+@@ -348,7 +348,7 @@ typedef enum
+   * @param  clk_div clock divider
+   * @retval HAL status
+   */
+-HAL_StatusTypeDef HAL_FLASH_Init(QSPI_FLASH_CTX_T *ctx, qspi_configure_t *cfg,
++VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_FLASH_Init(QSPI_FLASH_CTX_T *ctx, qspi_configure_t *cfg,
+                                  DMA_HandleTypeDef *dma, struct dma_config *dma_cfg, uint16_t clk_div);
+ 
+ 
+@@ -466,7 +466,7 @@ int HAL_NAND_ERASE_BLK(FLASH_HandleTypeDef *handle, uint32_t addr);
+   * @param  size data length
+   * @retval write data length, 0 if write fail
+ */
+-int HAL_QSPIEX_WRITE_PAGE(FLASH_HandleTypeDef *hflash, uint32_t addr, const uint8_t *buf, uint32_t size);
++VSF_CAL_RAMFUNC int HAL_QSPIEX_WRITE_PAGE(FLASH_HandleTypeDef *hflash, uint32_t addr, const uint8_t *buf, uint32_t size);
+ 
+ /**
+   * @brief  fill one bye to flash to make remain size or address aligned
+@@ -484,7 +484,7 @@ int HAL_QSPIEX_FILL_EVEN(FLASH_HandleTypeDef *hflash, uint32_t addr, uint8_t *bu
+   * @param  addr start address
+   * @retval 0 if success
+ */
+-int HAL_QSPIEX_SECT_ERASE(FLASH_HandleTypeDef *hflash, uint32_t addr);
++VSF_CAL_RAMFUNC int HAL_QSPIEX_SECT_ERASE(FLASH_HandleTypeDef *hflash, uint32_t addr);
+ 
+ /**
+   * @brief  nor flash block32 erase
+@@ -492,7 +492,7 @@ int HAL_QSPIEX_SECT_ERASE(FLASH_HandleTypeDef *hflash, uint32_t addr);
+   * @param  addr start address
+   * @retval 0 if success
+ */
+-int HAL_QSPIEX_BLK32_ERASE(FLASH_HandleTypeDef *hflash, uint32_t addr);
++VSF_CAL_RAMFUNC int HAL_QSPIEX_BLK32_ERASE(FLASH_HandleTypeDef *hflash, uint32_t addr);
+ 
+ /**
+   * @brief  nor flash block 64 erase
+@@ -500,14 +500,14 @@ int HAL_QSPIEX_BLK32_ERASE(FLASH_HandleTypeDef *hflash, uint32_t addr);
+   * @param  addr start address
+   * @retval 0 if success
+ */
+-int HAL_QSPIEX_BLK64_ERASE(FLASH_HandleTypeDef *hflash, uint32_t addr);
++VSF_CAL_RAMFUNC int HAL_QSPIEX_BLK64_ERASE(FLASH_HandleTypeDef *hflash, uint32_t addr);
+ 
+ /**
+   * @brief  nor flash chip erase
+   * @param  hflash  FLASH handle
+   * @retval 0 if success
+ */
+-int HAL_QSPIEX_CHIP_ERASE(FLASH_HandleTypeDef *hflash);
++VSF_CAL_RAMFUNC int HAL_QSPIEX_CHIP_ERASE(FLASH_HandleTypeDef *hflash);
+ 
+ /**
+   * @}
+@@ -530,7 +530,7 @@ uint32_t HAL_QSPI_GET_CLK(FLASH_HandleTypeDef *fhandle);
+   * @param  fhandle  FLASH handle
+   * @retval device id
+ */
+-int HAL_QSPI_READ_ID(FLASH_HandleTypeDef *fhandle);
++VSF_CAL_RAMFUNC int HAL_QSPI_READ_ID(FLASH_HandleTypeDef *fhandle);
+ 
+ /**
+   * @brief  flash write
+@@ -837,7 +837,7 @@ int HAL_FLASH_READ_SFDP(FLASH_HandleTypeDef *hflash, uint32_t *buf, uint32_t sta
+  * @param  en enable DTR mode.
+  * @retval HAL_OK if success.
+ */
+-HAL_StatusTypeDef HAL_NOR_CFG_DTR(FLASH_HandleTypeDef *hflash, uint8_t en);
++VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_NOR_CFG_DTR(FLASH_HandleTypeDef *hflash, uint8_t en);
+ 
+ /**
+   * @brief  Initial legacy opi psram
+@@ -1069,9 +1069,9 @@ int HAL_MPI_OPSRAM_AUTO_CAL(FLASH_HandleTypeDef *hflash, uint8_t *sck, uint8_t *
+ 
+ void HAL_RAM_FLASH_INIT(void);
+ 
+-uint32_t HAL_GET_FLASH_MID(MPI_TypeDef *fhandle);
++VSF_CAL_RAMFUNC uint32_t HAL_GET_FLASH_MID(MPI_TypeDef *fhandle);
+ 
+-uint8_t HAL_NOR_DTR_CAL(FLASH_HandleTypeDef *hflash);
++VSF_CAL_RAMFUNC uint8_t HAL_NOR_DTR_CAL(FLASH_HandleTypeDef *hflash);
+ 
+ #endif
+ /**
+diff --git a/drivers/Include/bf0_hal_qspi.h b/drivers/Include/bf0_hal_qspi.h
+index f21797e..7964b9e 100644
+--- a/drivers/Include/bf0_hal_qspi.h
++++ b/drivers/Include/bf0_hal_qspi.h
+@@ -502,7 +502,7 @@ uint8_t HAL_FLASH_GET_RX_CNT(FLASH_HandleTypeDef *hflash);
+   * @param  div clock divider
+   * @retval none
+ */
+-void HAL_FLASH_SET_CLK_rom(FLASH_HandleTypeDef *hflash, uint8_t div);
++VSF_CAL_RAMFUNC void HAL_FLASH_SET_CLK_rom(FLASH_HandleTypeDef *hflash, uint8_t div);
+ 
+ /**
+   * @brief  SPI_FLASH flush flash fifo
+diff --git a/drivers/Include/bf0_hal_rcc.h b/drivers/Include/bf0_hal_rcc.h
+index 7d23a5d..872b14d 100644
+--- a/drivers/Include/bf0_hal_rcc.h
++++ b/drivers/Include/bf0_hal_rcc.h
+@@ -513,14 +513,14 @@ HAL_StatusTypeDef HAL_RCC_HCPU_DisableDLL1(void);
+   * @brief  Get DLL1 freqency
+   * @retval Frequency of DLL1, 0 if not enabled
+   */
+-uint32_t HAL_RCC_HCPU_GetDLL1Freq(void);
++ VSF_CAL_RAMFUNC uint32_t HAL_RCC_HCPU_GetDLL1Freq(void);
+ 
+ /**
+   * @brief  Enable DLL2
+   * @param  freq Freqency of DLL2
+   * @retval HAL_OK if successful, Otherwise HAL_ERROR
+   */
+-HAL_StatusTypeDef HAL_RCC_HCPU_EnableDLL2(uint32_t freq);
++VSF_CAL_RAMFUNC HAL_StatusTypeDef HAL_RCC_HCPU_EnableDLL2(uint32_t freq);
+ 
+ /**
+   * @brief  Disable DLL2
+@@ -532,10 +532,10 @@ HAL_StatusTypeDef HAL_RCC_HCPU_DisableDLL2(void);
+   * @brief  Get DLL2 freqency
+   * @retval Frequency of DLL2, 0 if not enabled
+   */
+-uint32_t HAL_RCC_HCPU_GetDLL2Freq(void);
++ VSF_CAL_RAMFUNC uint32_t HAL_RCC_HCPU_GetDLL2Freq(void);
+ 
+ 
+-uint32_t HAL_RCC_HCPU_GetDLL3Freq(void);
++ VSF_CAL_RAMFUNC uint32_t HAL_RCC_HCPU_GetDLL3Freq(void);
+ 
+ /**
+   * @brief  Enable DLL3
+@@ -705,14 +705,14 @@ void HAL_RCC_BCPU_SetDiv(int div, int pdiv, int macdiv, int macfreq);
+  * @param  core_id Core ID
+  * @retval HCLK Frequency for Core ID
+  */
+-uint32_t HAL_RCC_GetHCLKFreq(int core_id);
++VSF_CAL_RAMFUNC uint32_t HAL_RCC_GetHCLKFreq(int core_id);
+ 
+ /**
+  * @brief  Get SYSCLK freq.
+  * @param  core_id Core ID,
+  * @retval SYSCLK Frequency for Core ID
+  */
+-uint32_t HAL_RCC_GetSysCLKFreq(int core_id);
++VSF_CAL_RAMFUNC uint32_t HAL_RCC_GetSysCLKFreq(int core_id);
+ 
+ /**
+  * @brief  Get PCLK freq.
+diff --git a/drivers/Include/flash_table.h b/drivers/Include/flash_table.h
+index 7937688..dcd968c 100644
+--- a/drivers/Include/flash_table.h
++++ b/drivers/Include/flash_table.h
+@@ -48,9 +48,9 @@ typedef struct FLASH_FULL_CHIP_ID
+ } FLASH_RDID_TYPE_T;
+ 
+ 
+-const SPI_FLASH_FACT_CFG_T *spi_flash_get_cmd_by_id(uint8_t fid, uint8_t did, uint8_t type);
+-int spi_flash_get_size_by_id(uint8_t fid, uint8_t did, uint8_t type);
+-int spi_flash_is_support_dtr(uint8_t fid, uint8_t did, uint8_t type);
++VSF_CAL_RAMFUNC const SPI_FLASH_FACT_CFG_T *spi_flash_get_cmd_by_id(uint8_t fid, uint8_t did, uint8_t type);
++VSF_CAL_RAMFUNC int spi_flash_get_size_by_id(uint8_t fid, uint8_t did, uint8_t type);
++VSF_CAL_RAMFUNC int spi_flash_is_support_dtr(uint8_t fid, uint8_t did, uint8_t type);
+ 
+ const SPI_FLASH_FACT_CFG_T *spi_nand_get_cmd_by_id(uint8_t fid, uint8_t did, uint8_t type);
+ const SPI_FLASH_FACT_CFG_T *spi_nand_get_default_ctable(void);
+@@ -59,8 +59,8 @@ int spi_nand_get_plane_select_flag(uint8_t fid, uint8_t did, uint8_t type);
+ int spi_nand_get_big_page_flag(uint8_t fid, uint8_t did, uint8_t type);
+ int spi_nand_get_ecc_mode(uint8_t fid, uint8_t did, uint8_t type);
+ 
+-extern FT_CONST FLASH_RDID_TYPE_T *FT_CONST flash_cmd_id_pool[];
+-extern FT_CONST SPI_FLASH_FACT_CFG_T flash_cmd_table_list[];
++extern FLASH_RDID_TYPE_T * flash_cmd_id_pool[];
++extern SPI_FLASH_FACT_CFG_T flash_cmd_table_list[];
+ 
+ extern FT_CONST SPI_FLASH_FACT_CFG_T nand_cmd_table_list[];
+ extern FT_CONST FLASH_RDID_TYPE_T   *FT_CONST nand_cmd_id_pool[];
+diff --git a/drivers/hal/bf0_hal_mpi.c b/drivers/hal/bf0_hal_mpi.c
+index abc3767..8987fdb 100644
+--- a/drivers/hal/bf0_hal_mpi.c
++++ b/drivers/hal/bf0_hal_mpi.c
+@@ -63,7 +63,7 @@
+ 
+ #include "flash_table.h"
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_QSPI_Init(FLASH_HandleTypeDef *hflash, qspi_configure_t *cfg)
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_QSPI_Init(FLASH_HandleTypeDef *hflash, qspi_configure_t *cfg)
+ {
+     if (hflash == NULL || cfg == NULL)
+         return HAL_ERROR;
+@@ -165,7 +165,7 @@ __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_PreInit(FLASH_HandleTypeDef *hflash)
+     return HAL_OK;
+ }
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_SET_AHB_RCMD(FLASH_HandleTypeDef *hflash, uint8_t cmd)
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_SET_AHB_RCMD(FLASH_HandleTypeDef *hflash, uint8_t cmd)
+ {
+     uint32_t value;
+     if (hflash == NULL)
+@@ -179,7 +179,7 @@ __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_SET_AHB_RCMD(FLASH_HandleTypeDef *hfl
+     return HAL_OK;
+ }
+ 
+-__HAL_ROM_USED void HAL_FLASH_CFG_AHB_RCMD(FLASH_HandleTypeDef *hflash, int8_t data_mod,
++VSF_CAL_RAMFUNC __HAL_ROM_USED void HAL_FLASH_CFG_AHB_RCMD(FLASH_HandleTypeDef *hflash, int8_t data_mod,
+         int8_t dum_cyc, int8_t ab_size, int8_t ab_mod,
+         int8_t addr_size, int8_t addr_mod, int8_t cmd_mode)
+ {
+@@ -235,7 +235,7 @@ __HAL_ROM_USED void HAL_FLASH_CFG_AHB_WCMD(FLASH_HandleTypeDef *hflash, int8_t d
+     hflash->Instance->HWCCR = value;
+ }
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_SET_CMD(FLASH_HandleTypeDef *hflash, uint8_t cmd, uint32_t addr)
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_SET_CMD(FLASH_HandleTypeDef *hflash, uint8_t cmd, uint32_t addr)
+ {
+ 
+     HAL_StatusTypeDef res = HAL_OK;
+@@ -283,7 +283,7 @@ __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_CFG_CMD(FLASH_HandleTypeDef *hflash,
+ }
+ 
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_WRITE_WORD(FLASH_HandleTypeDef *hflash, uint32_t data)
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_WRITE_WORD(FLASH_HandleTypeDef *hflash, uint32_t data)
+ {
+     if (hflash == NULL)
+         return HAL_ERROR;
+@@ -293,7 +293,7 @@ __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_WRITE_WORD(FLASH_HandleTypeDef *hflas
+     return HAL_OK;
+ }
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_WRITE_DLEN(FLASH_HandleTypeDef *hflash, uint32_t len)
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_WRITE_DLEN(FLASH_HandleTypeDef *hflash, uint32_t len)
+ {
+     if (hflash == NULL)
+         return HAL_ERROR;
+@@ -303,7 +303,7 @@ __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_WRITE_DLEN(FLASH_HandleTypeDef *hflas
+     return HAL_OK;
+ }
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_WRITE_DLEN2(FLASH_HandleTypeDef *hflash, uint16_t len)
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_WRITE_DLEN2(FLASH_HandleTypeDef *hflash, uint16_t len)
+ {
+     if (hflash == NULL)
+         return HAL_ERROR;
+@@ -321,7 +321,7 @@ __HAL_ROM_USED void HAL_FLASH_WRITE_ABYTE(FLASH_HandleTypeDef *hflash, uint32_t
+     hflash->Instance->ABR1 = ab;
+ }
+ 
+-__HAL_ROM_USED bool HAL_FLASH_IS_CMD_DONE(FLASH_HandleTypeDef *hflash)
++VSF_CAL_RAMFUNC __HAL_ROM_USED bool HAL_FLASH_IS_CMD_DONE(FLASH_HandleTypeDef *hflash)
+ {
+     if (hflash == NULL)
+         return false;
+@@ -329,7 +329,7 @@ __HAL_ROM_USED bool HAL_FLASH_IS_CMD_DONE(FLASH_HandleTypeDef *hflash)
+     return (hflash->Instance->SR & MPI_SR_TCF);
+ }
+ 
+-__HAL_ROM_USED void HAL_FLASH_CLR_CMD_DONE(FLASH_HandleTypeDef *hflash)
++VSF_CAL_RAMFUNC __HAL_ROM_USED void HAL_FLASH_CLR_CMD_DONE(FLASH_HandleTypeDef *hflash)
+ {
+     if (hflash == NULL)
+         return ;
+@@ -337,7 +337,7 @@ __HAL_ROM_USED void HAL_FLASH_CLR_CMD_DONE(FLASH_HandleTypeDef *hflash)
+     hflash->Instance->SCR |= MPI_SCR_TCFC;
+ }
+ 
+-__HAL_ROM_USED void HAL_FLASH_CLR_STATUS(FLASH_HandleTypeDef *hflash, uint32_t status)
++VSF_CAL_RAMFUNC __HAL_ROM_USED void HAL_FLASH_CLR_STATUS(FLASH_HandleTypeDef *hflash, uint32_t status)
+ {
+     if (hflash == NULL)
+         return ;
+@@ -353,7 +353,7 @@ __HAL_ROM_USED bool HAL_FLASH_IS_BUSY(FLASH_HandleTypeDef *hflash)
+     return (hflash->Instance->SR & MPI_SR_BUSY);
+ }
+ 
+-__HAL_ROM_USED bool HAL_FLASH_STATUS_MATCH(FLASH_HandleTypeDef *hflash)
++VSF_CAL_RAMFUNC __HAL_ROM_USED bool HAL_FLASH_STATUS_MATCH(FLASH_HandleTypeDef *hflash)
+ {
+     if (hflash == NULL)
+         return false;
+@@ -384,7 +384,7 @@ __HAL_ROM_USED bool HAL_FLASH_IS_TX_EMPTY(FLASH_HandleTypeDef *hflash)
+     return (hflash->Instance->SR & MPI_SR_FUF);
+ }
+ 
+-__HAL_ROM_USED bool HAL_FLASH_IS_PROG_DONE(FLASH_HandleTypeDef *hflash)
++VSF_CAL_RAMFUNC __HAL_ROM_USED bool HAL_FLASH_IS_PROG_DONE(FLASH_HandleTypeDef *hflash)
+ {
+     if (hflash == NULL)
+         return true;
+@@ -394,7 +394,7 @@ __HAL_ROM_USED bool HAL_FLASH_IS_PROG_DONE(FLASH_HandleTypeDef *hflash)
+     return !(hflash->Instance->DR & 0X01);
+ }
+ 
+-__HAL_ROM_USED uint32_t HAL_FLASH_READ32(FLASH_HandleTypeDef *hflash)
++VSF_CAL_RAMFUNC __HAL_ROM_USED uint32_t HAL_FLASH_READ32(FLASH_HandleTypeDef *hflash)
+ {
+     if (hflash == NULL)
+         return 0;
+@@ -424,7 +424,7 @@ __HAL_ROM_USED void HAL_FLASH_CLEAR_FIFO(FLASH_HandleTypeDef *hflash, HAL_FLASH_
+     //while (HAL_FLASH_IS_BUSY(hflash));
+ }
+ 
+-__HAL_ROM_USED void HAL_FLASH_SET_TXSLOT(FLASH_HandleTypeDef *hflash, uint8_t slot)
++VSF_CAL_RAMFUNC __HAL_ROM_USED void HAL_FLASH_SET_TXSLOT(FLASH_HandleTypeDef *hflash, uint8_t slot)
+ {
+     if (hflash == NULL)
+         return ;
+@@ -434,7 +434,7 @@ __HAL_ROM_USED void HAL_FLASH_SET_TXSLOT(FLASH_HandleTypeDef *hflash, uint8_t sl
+     hflash->Instance->FIFOCR = value | ((slot & 0x1f) << MPI_FIFOCR_TXSLOTS_Pos);
+ }
+ 
+-__WEAK void HAL_FLASH_SET_CLK_rom(FLASH_HandleTypeDef *hflash, uint8_t div)
++VSF_CAL_RAMFUNC __WEAK void HAL_FLASH_SET_CLK_rom(FLASH_HandleTypeDef *hflash, uint8_t div)
+ {
+     if (hflash == NULL)
+         return;
+@@ -457,7 +457,7 @@ __HAL_ROM_USED uint8_t HAL_FLASH_GET_DIV(FLASH_HandleTypeDef *hflash)
+     return div;
+ }
+ 
+-__HAL_ROM_USED void HAL_FLASH_MANUAL_CMD(FLASH_HandleTypeDef *hflash, int8_t func_mod, int8_t data_mod,
++VSF_CAL_RAMFUNC __HAL_ROM_USED void HAL_FLASH_MANUAL_CMD(FLASH_HandleTypeDef *hflash, int8_t func_mod, int8_t data_mod,
+         int8_t dum_cyc, int8_t ab_size, int8_t ab_mod,
+         int8_t addr_size, int8_t addr_mod, int8_t cmd_mode)
+ {
+@@ -478,7 +478,7 @@ __HAL_ROM_USED void HAL_FLASH_MANUAL_CMD(FLASH_HandleTypeDef *hflash, int8_t fun
+     hflash->Instance->CCR1 = value;
+ }
+ 
+-__HAL_ROM_USED void HAL_FLASH_MANUAL_CMD2(FLASH_HandleTypeDef *hflash, int8_t func_mod, int8_t data_mod,
++VSF_CAL_RAMFUNC __HAL_ROM_USED void HAL_FLASH_MANUAL_CMD2(FLASH_HandleTypeDef *hflash, int8_t func_mod, int8_t data_mod,
+         int8_t dum_cyc, int8_t ab_size, int8_t ab_mod,
+         int8_t addr_size, int8_t addr_mod, int8_t cmd_mode)
+ {
+@@ -582,7 +582,7 @@ __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_ENABLE_AES(FLASH_HandleTypeDef *hflas
+     return HAL_OK;
+ }
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_ENABLE_QSPI(FLASH_HandleTypeDef *hflash, uint8_t en)
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_ENABLE_QSPI(FLASH_HandleTypeDef *hflash, uint8_t en)
+ {
+     if (hflash == NULL)
+         return HAL_ERROR;
+@@ -633,7 +633,7 @@ __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_ENABLE_HYPER(FLASH_HandleTypeDef *hfl
+     return HAL_OK;
+ }
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_ENABLE_CMD2(FLASH_HandleTypeDef *hflash, uint8_t en)
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_ENABLE_CMD2(FLASH_HandleTypeDef *hflash, uint8_t en)
+ {
+     if (hflash == NULL)
+         return HAL_ERROR;
+@@ -650,7 +650,7 @@ __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_ENABLE_CMD2(FLASH_HandleTypeDef *hfla
+     return HAL_OK;
+ }
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_STAUS_MATCH_CMD2(FLASH_HandleTypeDef *hflash, uint8_t en)
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_STAUS_MATCH_CMD2(FLASH_HandleTypeDef *hflash, uint8_t en)
+ {
+     if (hflash == NULL)
+         return HAL_ERROR;
+@@ -684,7 +684,7 @@ __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_SET_CS_TIME(FLASH_HandleTypeDef *hfla
+     return HAL_OK;
+ }
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_SET_ROW_BOUNDARY(FLASH_HandleTypeDef *hflash, uint8_t rb_size)
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_SET_ROW_BOUNDARY(FLASH_HandleTypeDef *hflash, uint8_t rb_size)
+ {
+     if (hflash == NULL)
+         return HAL_ERROR;
+@@ -708,7 +708,7 @@ __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_SET_LEGACY(FLASH_HandleTypeDef *hflas
+ }
+ 
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_SET_DUAL_MODE(FLASH_HandleTypeDef *hflash, uint8_t dual)
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_SET_DUAL_MODE(FLASH_HandleTypeDef *hflash, uint8_t dual)
+ {
+     if (hflash == NULL)
+         return HAL_ERROR;
+@@ -810,7 +810,7 @@ __HAL_ROM_USED HAL_StatusTypeDef HAL_MPI_SET_SCK(FLASH_HandleTypeDef *hflash, ui
+     return HAL_OK;
+ }
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_MPI_CFG_DTR(FLASH_HandleTypeDef *hflash, uint8_t en, uint8_t rclk_inv_delay)
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_MPI_CFG_DTR(FLASH_HandleTypeDef *hflash, uint8_t en, uint8_t rclk_inv_delay)
+ {
+     uint32_t value;
+     if (hflash == NULL)
+@@ -952,7 +952,7 @@ __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_SET_LOOP(FLASH_HandleTypeDef *hflash,
+ }
+ #endif
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_CONFIG_AHB_READ(FLASH_HandleTypeDef *hflash, bool qmode)
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_CONFIG_AHB_READ(FLASH_HandleTypeDef *hflash, bool qmode)
+ {
+     if (hflash == NULL)
+         return HAL_ERROR;
+@@ -981,7 +981,7 @@ __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_CONFIG_AHB_READ(FLASH_HandleTypeDef *
+     return HAL_OK;
+ }
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_CONFIG_FULL_AHB_READ(FLASH_HandleTypeDef *hflash, bool qmode)
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_CONFIG_FULL_AHB_READ(FLASH_HandleTypeDef *hflash, bool qmode)
+ {
+     if (hflash == NULL)
+         return HAL_ERROR;
+@@ -1006,7 +1006,7 @@ __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_CONFIG_FULL_AHB_READ(FLASH_HandleType
+     return HAL_OK;
+ }
+ 
+-__HAL_ROM_USED int HAL_FLASH_PRE_CMD(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_E cmd)
++VSF_CAL_RAMFUNC __HAL_ROM_USED int HAL_FLASH_PRE_CMD(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_E cmd)
+ {
+     if ((handle->ctable == NULL) || (cmd >= SPI_FLASH_CMD_COUNT)
+             || (handle->ctable->cmd_cfg[cmd].cmd == 0))
+@@ -1022,7 +1022,7 @@ __HAL_ROM_USED int HAL_FLASH_PRE_CMD(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_
+     return 0;
+ }
+ 
+-__HAL_ROM_USED int HAL_FLASH_ISSUE_CMD(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_E cmd, uint32_t addr)
++VSF_CAL_RAMFUNC __HAL_ROM_USED int HAL_FLASH_ISSUE_CMD(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_E cmd, uint32_t addr)
+ {
+     HAL_StatusTypeDef res;
+     if ((handle->ctable == NULL) || (cmd >= SPI_FLASH_CMD_COUNT)
+@@ -1043,7 +1043,7 @@ __HAL_ROM_USED int HAL_FLASH_ISSUE_CMD(FLASH_HandleTypeDef *handle, SPI_FLASH_CM
+     return 0;
+ }
+ 
+-__HAL_ROM_USED int HAL_FLASH_ISSUE_CMD_SEQ(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_E cmd1, uint32_t addr, SPI_FLASH_CMD_E cmd2, uint32_t param)
++VSF_CAL_RAMFUNC __HAL_ROM_USED int HAL_FLASH_ISSUE_CMD_SEQ(FLASH_HandleTypeDef *handle, SPI_FLASH_CMD_E cmd1, uint32_t addr, SPI_FLASH_CMD_E cmd2, uint32_t param)
+ {
+     //HAL_StatusTypeDef res;
+     if ((handle->ctable == NULL) || (cmd1 >= SPI_FLASH_CMD_COUNT) || (handle->ctable->cmd_cfg[cmd1].cmd == 0)
+@@ -1087,7 +1087,7 @@ __HAL_ROM_USED int HAL_FLASH_ISSUE_CMD_SEQ(FLASH_HandleTypeDef *handle, SPI_FLAS
+     return 0;
+ }
+ 
+-__HAL_ROM_USED void nor_qspi_switch(FLASH_HandleTypeDef *hflash, bool en)
++VSF_CAL_RAMFUNC __HAL_ROM_USED void nor_qspi_switch(FLASH_HandleTypeDef *hflash, bool en)
+ {
+     //bool res;
+     uint8_t srl, srh;
+@@ -1243,21 +1243,21 @@ __HAL_ROM_USED void nor_qspi_switch(FLASH_HandleTypeDef *hflash, bool en)
+ 
+ }
+ 
+-__HAL_ROM_USED void HAL_FLASH_SET_QUAL_SPI(FLASH_HandleTypeDef *hflash, bool en)
++VSF_CAL_RAMFUNC __HAL_ROM_USED void HAL_FLASH_SET_QUAL_SPI(FLASH_HandleTypeDef *hflash, bool en)
+ {
+     nor_qspi_switch(hflash, en);
+ 
+     HAL_FLASH_CONFIG_AHB_READ(hflash, en);
+ }
+ 
+-__HAL_ROM_USED void HAL_FLASH_FADDR_SET_QSPI(FLASH_HandleTypeDef *hflash, bool en)
++VSF_CAL_RAMFUNC __HAL_ROM_USED void HAL_FLASH_FADDR_SET_QSPI(FLASH_HandleTypeDef *hflash, bool en)
+ {
+     nor_qspi_switch(hflash, en);
+ 
+     HAL_FLASH_CONFIG_FULL_AHB_READ(hflash, en);
+ }
+ 
+-__HAL_ROM_USED int HAL_FLASH_GET_NOR_ID(FLASH_HandleTypeDef *hflash)
++VSF_CAL_RAMFUNC __HAL_ROM_USED int HAL_FLASH_GET_NOR_ID(FLASH_HandleTypeDef *hflash)
+ {
+     uint32_t id;
+     uint32_t dlen = 0;
+@@ -1319,7 +1319,7 @@ __HAL_ROM_USED int HAL_FLASH_ID_DUAL_ID(FLASH_HandleTypeDef *hflash)
+     return 0;
+ }
+ 
+-__HAL_ROM_USED void HAL_FLASH_CLR_PROTECT(FLASH_HandleTypeDef *hflash)
++VSF_CAL_RAMFUNC __HAL_ROM_USED void HAL_FLASH_CLR_PROTECT(FLASH_HandleTypeDef *hflash)
+ {
+     uint8_t srl, srh;
+     uint32_t dlen;
+@@ -1455,7 +1455,7 @@ __HAL_ROM_USED void HAL_QSPI_SET_RXDELAY(uint8_t qspi_id, uint8_t clk_inv, uint8
+     }
+ }
+ 
+-__HAL_ROM_USED void HAL_QSPI_SET_CLK_INV(FLASH_HandleTypeDef *hflash, uint8_t clk_inv, uint8_t clk_delay)
++VSF_CAL_RAMFUNC __HAL_ROM_USED void HAL_QSPI_SET_CLK_INV(FLASH_HandleTypeDef *hflash, uint8_t clk_inv, uint8_t clk_delay)
+ {
+     uint32_t value;
+     if (hflash == NULL)
+@@ -1657,7 +1657,7 @@ __HAL_ROM_USED int HAL_FLASH_DEEP_PWRDOWN(FLASH_HandleTypeDef *hflash)
+     return res;
+ }
+ 
+-__HAL_ROM_USED int HAL_FLASH_RELEASE_DPD(FLASH_HandleTypeDef *hflash)
++VSF_CAL_RAMFUNC __HAL_ROM_USED int HAL_FLASH_RELEASE_DPD(FLASH_HandleTypeDef *hflash)
+ {
+     int res = 1;
+     uint32_t qspi_en = 0;
+diff --git a/drivers/hal/bf0_hal_mpi_ex.c b/drivers/hal/bf0_hal_mpi_ex.c
+index 8af4858..483a144 100644
+--- a/drivers/hal/bf0_hal_mpi_ex.c
++++ b/drivers/hal/bf0_hal_mpi_ex.c
+@@ -110,12 +110,12 @@ __weak void HAL_RAM_FLASH_INIT(void)
+ {
+ }
+ 
+-__weak uint32_t HAL_GET_FLASH_MID(MPI_TypeDef *fhandle)
++VSF_CAL_RAMFUNC __weak uint32_t HAL_GET_FLASH_MID(MPI_TypeDef *fhandle)
+ {
+     return 0;
+ }
+ 
+-static inline int HAL_IS_ID_VALID(uint32_t mid)
++VSF_CAL_RAMFUNC static inline int HAL_IS_ID_VALID(uint32_t mid)
+ {
+     if (mid == 0 || mid == 0xffffff)
+         return 0;
+@@ -125,7 +125,7 @@ static inline int HAL_IS_ID_VALID(uint32_t mid)
+ 
+ int nand_clear_status(FLASH_HandleTypeDef *handle);
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_Init(QSPI_FLASH_CTX_T *ctx, qspi_configure_t *cfg,
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_FLASH_Init(QSPI_FLASH_CTX_T *ctx, qspi_configure_t *cfg,
+         DMA_HandleTypeDef *dma, struct dma_config *dma_cfg, uint16_t clk_div)
+ {
+     FLASH_HandleTypeDef *hflash = NULL;
+@@ -499,7 +499,7 @@ __HAL_ROM_USED void HAL_FLASH_AES_CFG(FLASH_HandleTypeDef *fhandle, uint8_t aes2
+ }
+ 
+ 
+-static int flash_handle_valid(FLASH_HandleTypeDef *handle)
++VSF_CAL_RAMFUNC static int flash_handle_valid(FLASH_HandleTypeDef *handle)
+ {
+     if ((handle == NULL) || (handle->ctable == NULL))
+         return 0;
+@@ -1652,7 +1652,7 @@ __HAL_ROM_USED uint32_t HAL_NAND_BLOCK_SIZE(FLASH_HandleTypeDef *handle)
+ /***************** Interface for nor flash ********************************/
+ 
+ 
+-__HAL_ROM_USED int HAL_QSPIEX_WRITE_PAGE(FLASH_HandleTypeDef *hflash, uint32_t addr, const uint8_t *buf, uint32_t size)
++VSF_CAL_RAMFUNC __HAL_ROM_USED int HAL_QSPIEX_WRITE_PAGE(FLASH_HandleTypeDef *hflash, uint32_t addr, const uint8_t *buf, uint32_t size)
+ {
+     HAL_StatusTypeDef ret;
+     int i, aligned_size;
+@@ -1670,6 +1670,7 @@ __HAL_ROM_USED int HAL_QSPIEX_WRITE_PAGE(FLASH_HandleTypeDef *hflash, uint32_t a
+     if (size > aligned_size)
+         size = aligned_size;
+     //level = rt_hw_interrupt_disable();
++#if 0
+     if (hflash->dma != NULL)
+     {
+         if (hflash->size > NOR_FLASH_MAX_3B_SIZE)
+@@ -1734,6 +1735,7 @@ __HAL_ROM_USED int HAL_QSPIEX_WRITE_PAGE(FLASH_HandleTypeDef *hflash, uint32_t a
+         hflash->Instance->CR &= ~MPI_CR_DMAE;
+     }
+     else
++#endif
+     {
+         int i, cnt, res;
+         int remain = size;
+@@ -1957,7 +1959,7 @@ __HAL_ROM_USED int nor_page_erase(FLASH_HandleTypeDef *hflash, uint32_t addr)
+ 
+     return 0;
+ }
+-__HAL_ROM_USED int HAL_QSPIEX_SECT_ERASE(FLASH_HandleTypeDef *hflash, uint32_t addr)
++VSF_CAL_RAMFUNC __HAL_ROM_USED int HAL_QSPIEX_SECT_ERASE(FLASH_HandleTypeDef *hflash, uint32_t addr)
+ {
+     uint16_t dlen;
+     uint32_t param;
+@@ -2004,7 +2006,7 @@ exit:
+     return ret;
+ }
+ 
+-__HAL_ROM_USED int HAL_QSPIEX_BLK32_ERASE(FLASH_HandleTypeDef *hflash, uint32_t addr)
++VSF_CAL_RAMFUNC __HAL_ROM_USED int HAL_QSPIEX_BLK32_ERASE(FLASH_HandleTypeDef *hflash, uint32_t addr)
+ {
+     uint16_t dlen;
+     uint32_t param;
+@@ -2048,7 +2050,7 @@ exit:
+     return ret;
+ }
+ 
+-__HAL_ROM_USED int HAL_QSPIEX_BLK64_ERASE(FLASH_HandleTypeDef *hflash, uint32_t addr)
++VSF_CAL_RAMFUNC __HAL_ROM_USED int HAL_QSPIEX_BLK64_ERASE(FLASH_HandleTypeDef *hflash, uint32_t addr)
+ {
+     uint16_t dlen;
+     uint32_t param;
+@@ -2095,7 +2097,7 @@ exit:
+     return ret;
+ }
+ 
+-__HAL_ROM_USED int HAL_QSPIEX_CHIP_ERASE(FLASH_HandleTypeDef *hflash)
++VSF_CAL_RAMFUNC __HAL_ROM_USED int HAL_QSPIEX_CHIP_ERASE(FLASH_HandleTypeDef *hflash)
+ {
+     uint16_t dlen;
+     uint32_t param;
+@@ -2347,7 +2349,7 @@ __HAL_ROM_USED uint32_t HAL_QSPI_GET_CLK(FLASH_HandleTypeDef *fhandle)
+     return freq;
+ }
+ 
+-__HAL_ROM_USED int HAL_QSPI_READ_ID(FLASH_HandleTypeDef *fhandle)
++VSF_CAL_RAMFUNC __HAL_ROM_USED int HAL_QSPI_READ_ID(FLASH_HandleTypeDef *fhandle)
+ {
+     if (fhandle == NULL)
+         return FLASH_UNKNOW_ID;
+@@ -2669,8 +2671,8 @@ __HAL_ROM_USED int HAL_FLASH_READ_SFDP(FLASH_HandleTypeDef *hflash, uint32_t *bu
+     return len;
+ }
+ 
+-extern HAL_StatusTypeDef HAL_FLASH_CONFIG_FULL_AHB_READ(FLASH_HandleTypeDef *hflash, bool qmode);
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_NOR_CFG_DTR(FLASH_HandleTypeDef *hflash, uint8_t en)
++VSF_CAL_RAMFUNC extern HAL_StatusTypeDef HAL_FLASH_CONFIG_FULL_AHB_READ(FLASH_HandleTypeDef *hflash, bool qmode);
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_NOR_CFG_DTR(FLASH_HandleTypeDef *hflash, uint8_t en)
+ {
+     if (en)
+     {
+@@ -2838,7 +2840,7 @@ __HAL_ROM_USED HAL_StatusTypeDef HAL_MPI_QUIT_CONTINUE(FLASH_HandleTypeDef *hand
+     return HAL_OK;
+ }
+ 
+-__HAL_ROM_USED uint8_t HAL_NOR_DTR_CAL(FLASH_HandleTypeDef *hflash)
++VSF_CAL_RAMFUNC __HAL_ROM_USED uint8_t HAL_NOR_DTR_CAL(FLASH_HandleTypeDef *hflash)
+ {
+     uint8_t dtr_dly;
+     if (hflash == NULL)
+diff --git a/drivers/hal/bf0_hal_qspi.c b/drivers/hal/bf0_hal_qspi.c
+index 904a9e4..d88a064 100644
+--- a/drivers/hal/bf0_hal_qspi.c
++++ b/drivers/hal/bf0_hal_qspi.c
+@@ -429,7 +429,7 @@ __HAL_ROM_USED void HAL_FLASH_SET_TXSLOT(FLASH_HandleTypeDef *hflash, uint8_t sl
+     hflash->Instance->FIFOCR = value | ((slot & 0x1f) << QSPI_FIFOCR_TXSLOTS_Pos);
+ }
+ 
+-__WEAK void HAL_FLASH_SET_CLK_rom(FLASH_HandleTypeDef *hflash, uint8_t div)
++VSF_CAL_RAMFUNC __WEAK void HAL_FLASH_SET_CLK_rom(FLASH_HandleTypeDef *hflash, uint8_t div)
+ {
+     if (hflash == NULL)
+         return;
+diff --git a/drivers/hal/bf0_hal_rcc.c b/drivers/hal/bf0_hal_rcc.c
+index 8d0f85d..c3564ae 100644
+--- a/drivers/hal/bf0_hal_rcc.c
++++ b/drivers/hal/bf0_hal_rcc.c
+@@ -1483,7 +1483,7 @@ __HAL_ROM_USED int HAL_RCC_HCPU_GetClockSrc(int clk_module)
+ 
+ #endif /* SF32LB55X */
+ 
+-__HAL_ROM_USED uint32_t HAL_RCC_HCPU_GetDLLFreq(int dll)
++VSF_CAL_RAMFUNC __HAL_ROM_USED uint32_t HAL_RCC_HCPU_GetDLLFreq(int dll)
+ {
+     uint32_t cr;
+     uint32_t freq;
+@@ -1538,17 +1538,17 @@ __HAL_ROM_USED uint32_t HAL_RCC_HCPU_GetDLLFreq(int dll)
+ }
+ 
+ 
+-__HAL_ROM_USED uint32_t HAL_RCC_HCPU_GetDLL1Freq(void)
++VSF_CAL_RAMFUNC __HAL_ROM_USED uint32_t HAL_RCC_HCPU_GetDLL1Freq(void)
+ {
+     return (HAL_RCC_HCPU_GetDLLFreq(1));
+ }
+ 
+-__HAL_ROM_USED uint32_t HAL_RCC_HCPU_GetDLL2Freq(void)
++VSF_CAL_RAMFUNC __HAL_ROM_USED uint32_t HAL_RCC_HCPU_GetDLL2Freq(void)
+ {
+     return (HAL_RCC_HCPU_GetDLLFreq(2));
+ }
+ 
+-__HAL_ROM_USED uint32_t HAL_RCC_HCPU_GetDLL3Freq(void)
++VSF_CAL_RAMFUNC __HAL_ROM_USED uint32_t HAL_RCC_HCPU_GetDLL3Freq(void)
+ {
+     return (HAL_RCC_HCPU_GetDLLFreq(3));
+ }
+@@ -1670,7 +1670,7 @@ __EXIT:
+ }
+ #else
+ 
+-__HAL_ROM_USED HAL_StatusTypeDef HAL_RCC_HCPU_EnableDLL(int dll, uint32_t freq)
++VSF_CAL_RAMFUNC __HAL_ROM_USED HAL_StatusTypeDef HAL_RCC_HCPU_EnableDLL(int dll, uint32_t freq)
+ {
+     HAL_StatusTypeDef status;
+     uint32_t stg;
+@@ -1870,7 +1870,7 @@ __HAL_ROM_USED int HAL_RCC_LCPU_GetClockSrc(int clk_module)
+ }
+ 
+ 
+-__HAL_ROM_USED uint32_t HAL_RCC_GetSysCLKFreq(int core_id)
++VSF_CAL_RAMFUNC __HAL_ROM_USED uint32_t HAL_RCC_GetSysCLKFreq(int core_id)
+ {
+     uint32_t r = 48000000;
+ 
+@@ -1886,7 +1886,7 @@ __HAL_ROM_USED uint32_t HAL_RCC_GetSysCLKFreq(int core_id)
+     return r;
+ }
+ 
+-__HAL_ROM_USED uint32_t HAL_RCC_GetHCLKFreq(int core_id)
++VSF_CAL_RAMFUNC __HAL_ROM_USED uint32_t HAL_RCC_GetHCLKFreq(int core_id)
+ {
+     uint32_t r;
+     int div = 1;
+diff --git a/drivers/hal/flash_table.c b/drivers/hal/flash_table.c
+index d0d2d4c..2df184d 100644
+--- a/drivers/hal/flash_table.c
++++ b/drivers/hal/flash_table.c
+@@ -23,7 +23,7 @@ typedef enum
+ #define FLASH_DEFAULT_CMD_TABLE         (NOR_TYPE0)
+ 
+ /* For bootloader, need compress to reduce code size */
+-__weak FT_CONST SPI_FLASH_FACT_CFG_T flash_cmd_table_list[] =
++__weak SPI_FLASH_FACT_CFG_T flash_cmd_table_list[] =
+ {
+     {
+         // type 0
+@@ -480,7 +480,7 @@ __weak FT_CONST SPI_FLASH_FACT_CFG_T flash_cmd_table_list[] =
+ #endif
+ };
+ 
+-FT_CONST FLASH_RDID_TYPE_T flash_cmd_id_pool_typ0[] =
++FLASH_RDID_TYPE_T flash_cmd_id_pool_typ0[] =
+ {
+     {0x85, 0x60, 0x15, 1, 0x200000},    //P25Q16LE_RDID
+     {0x85, 0x60, 0x14, 1, 0x100000},    //P25Q80LE_RDID
+@@ -506,7 +506,7 @@ FT_CONST FLASH_RDID_TYPE_T flash_cmd_id_pool_typ0[] =
+     {FLASH_INVALID_ID, 0, 0, 0, 0},      //last one
+ };
+ 
+-FT_CONST FLASH_RDID_TYPE_T flash_cmd_id_pool_typ1[] =
++FLASH_RDID_TYPE_T flash_cmd_id_pool_typ1[] =
+ {
+     {0x85, 0x60, 0x16, 1, 0x400000},    //P25Q32L_RDID
+     {0x85, 0x60, 0x17, 1, 0x800000},    //P25Q64H_RDID, P25Q64SH
+@@ -531,7 +531,7 @@ FT_CONST FLASH_RDID_TYPE_T flash_cmd_id_pool_typ1[] =
+     {FLASH_INVALID_ID, 0, 0, 0, 0},      //last one
+ };
+ 
+-FT_CONST FLASH_RDID_TYPE_T flash_cmd_id_pool_typ2[] =
++FLASH_RDID_TYPE_T flash_cmd_id_pool_typ2[] =
+ {
+     {0xef, 0x60, 0x19, 0, 0x2000000},   //W25Q256JW_RDID
+     {0xef, 0x70, 0x19, 1, 0x2000000},   //W25Q256JV_RDID
+@@ -541,14 +541,14 @@ FT_CONST FLASH_RDID_TYPE_T flash_cmd_id_pool_typ2[] =
+     {0x5e, 0x40, 0x19, 0, 0x2000000},   //ZQ25Q256AW1G
+     {FLASH_INVALID_ID, 0, 0, 0, 0},      //last one
+ };
+-FT_CONST FLASH_RDID_TYPE_T flash_cmd_id_pool_typ3[] =
++FLASH_RDID_TYPE_T flash_cmd_id_pool_typ3[] =
+ {
+     {0xc8, 0x60, 0x19, 0, 0x2000000},   //GD25LQ256D_RDID
+     {0x0B, 0x40, 0X19, 0, 0x2000000},   //XT25F256BW_RDID
+     {0xc8, 0x40, 0x19, 0, 0x2000000},   //GD25Q256E
+     {FLASH_INVALID_ID, 0, 0, 0, 0},      //last one
+ };
+-FT_CONST FLASH_RDID_TYPE_T flash_cmd_id_pool_typ4[] =
++FLASH_RDID_TYPE_T flash_cmd_id_pool_typ4[] =
+ {
+     {0x20, 0x41, 0x19, 0, 0x2000000},   //XM25QU256C_RDID
+     {0x20, 0x40, 0x19, 0, 0x2000000},   //XM25QH256C_RDID
+@@ -557,7 +557,7 @@ FT_CONST FLASH_RDID_TYPE_T flash_cmd_id_pool_typ4[] =
+     {0x85, 0x20, 0x1a, 1, 0x4000000},   //PY25Q512HB_RDID
+     {FLASH_INVALID_ID, 0, 0, 0, 0},      //last one
+ };
+-FT_CONST FLASH_RDID_TYPE_T flash_cmd_id_pool_typ5[] =
++FLASH_RDID_TYPE_T flash_cmd_id_pool_typ5[] =
+ {
+     {0xc2, 0x25, 0x39, 0, 0x2000000},   //MX25U25643G_RDID
+     {0x25, 0x70, 0x18, 0, 0x1000000},   //SK25LP128_RDID
+@@ -568,7 +568,7 @@ FT_CONST FLASH_RDID_TYPE_T flash_cmd_id_pool_typ5[] =
+ #if defined(JLINK) || defined(KEIL)
+ FLASH_RDID_TYPE_T *flash_cmd_id_pool[NOR_CMD_TABLE_CNT];
+ #else
+-__weak FT_CONST FLASH_RDID_TYPE_T *FT_CONST flash_cmd_id_pool[] =
++__weak FLASH_RDID_TYPE_T * flash_cmd_id_pool[] =
+ {
+     &flash_cmd_id_pool_typ0[0], // type 0, < 32m
+     &flash_cmd_id_pool_typ1[0], // type 1, < 32m
+@@ -605,7 +605,7 @@ __WEAK void *get_user_flash_cfg(uint8_t isnand, uint8_t fid, uint8_t did, uint8_
+ }
+ #endif
+ 
+-FT_CONST FLASH_RDID_TYPE_T *spi_flash_get_rdid(uint8_t fid, uint8_t did, uint8_t type, uint8_t *flash_type)
++VSF_CAL_RAMFUNC FT_CONST FLASH_RDID_TYPE_T *spi_flash_get_rdid(uint8_t fid, uint8_t did, uint8_t type, uint8_t *flash_type)
+ {
+     int i;
+     FT_CONST FLASH_RDID_TYPE_T *res;
+@@ -645,7 +645,7 @@ FT_CONST FLASH_RDID_TYPE_T *spi_flash_get_rdid(uint8_t fid, uint8_t did, uint8_t
+ }
+ 
+ // get command table by index from register table
+-const SPI_FLASH_FACT_CFG_T *spi_flash_get_cmd_by_id(uint8_t fid, uint8_t did, uint8_t type)
++VSF_CAL_RAMFUNC const SPI_FLASH_FACT_CFG_T *spi_flash_get_cmd_by_id(uint8_t fid, uint8_t did, uint8_t type)
+ {
+     uint8_t i;
+     const SPI_FLASH_FACT_CFG_T *res = NULL;
+@@ -659,7 +659,7 @@ const SPI_FLASH_FACT_CFG_T *spi_flash_get_cmd_by_id(uint8_t fid, uint8_t did, ui
+     return res;
+ }
+ 
+-int spi_flash_get_size_by_id(uint8_t fid, uint8_t did, uint8_t type)
++VSF_CAL_RAMFUNC int spi_flash_get_size_by_id(uint8_t fid, uint8_t did, uint8_t type)
+ {
+     int res = 0x80000;
+ 
+@@ -670,7 +670,7 @@ int spi_flash_get_size_by_id(uint8_t fid, uint8_t did, uint8_t type)
+     return res;
+ }
+ 
+-int spi_flash_is_support_dtr(uint8_t fid, uint8_t did, uint8_t type)
++VSF_CAL_RAMFUNC int spi_flash_is_support_dtr(uint8_t fid, uint8_t did, uint8_t type)
+ {
+     int res = 0;
+ 
