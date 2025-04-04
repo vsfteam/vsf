@@ -101,7 +101,7 @@ extern "C" {
 #   ifdef __APPLE__
 #       define VSF_CAL_RAMFUNC          Not Supported by Apple LLVM
 #   else
-#       define VSF_CAL_RAMFUNC          __attribute__((__section__(".textrw")))
+#       define VSF_CAL_RAMFUNC          __attribute__((__section__(".ramfunc")))
 #   endif
 #   define __asm__                      __asm
 #   define __VSF_CAL_ALIGN(__N)         __attribute__((__aligned__(__N)))
@@ -132,7 +132,7 @@ extern "C" {
 #   define VSF_CAL_NO_INLINE            __attribute__((noinline))
 #   define VSF_CAL_ALWAYS_INLINE        inline __attribute__((always_inline))
 #   define VSF_CAL_WEAK(...)            __attribute__((weak))
-#   define VSF_CAL_RAMFUNC              __attribute__((section(".textrw")))
+#   define VSF_CAL_RAMFUNC              __attribute__((section(".ramfunc")))
 #   define __asm__                      __asm
 #   define __VSF_CAL_ALIGN(__N)         __attribute__((aligned(__N)))
 #   define __VSF_CAL_AT_ADDR(__ADDR)    Not Supported by GCC
