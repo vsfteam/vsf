@@ -100,6 +100,7 @@ typedef enum vk_disp_color_idx_t {
     VSF_DISP_COLOR_IDX_DEF(PALETTE),
     VSF_DISP_COLOR_IDX_DEF(RGB332),
     VSF_DISP_COLOR_IDX_DEF(RGB565),
+    VSF_DISP_COLOR_IDX_DEF(RGB888),
     VSF_DISP_COLOR_IDX_DEF(RGBA8888),
     VSF_DISP_COLOR_IDX_DEF(ARGB8888),
     VSF_DISP_COLOR_IDX_DEF(ABGR8888),
@@ -122,6 +123,7 @@ typedef enum vk_disp_color_type_t {
     VSF_DISP_COLOR_DEF(PALETTE, 8, 1, 0),
     VSF_DISP_COLOR_DEF(RGB332, 8, 1, 0),
     VSF_DISP_COLOR_DEF(RGB565, 16, 2, 0),
+    VSF_DISP_COLOR_DEF(RGB888, 24, 3, 0),
     VSF_DISP_COLOR_DEF(RGBA8888, 32, 4, 1),
     VSF_DISP_COLOR_DEF(ARGB8888, 32, 4, 1),
     VSF_DISP_COLOR_DEF(ABGR8888, 32, 4, 1),
@@ -149,6 +151,7 @@ typedef struct vk_disp_area_t {
 vsf_class(vk_disp_drv_t) {
     protected_member(
         vsf_err_t (*init)(vk_disp_t *pthis);
+        vsf_err_t (*set_refresh_format)(vk_disp_t *pthis, vk_disp_color_type_t type);
         vsf_err_t (*refresh)(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 
         // interfaces for gpu acceleration
@@ -217,6 +220,7 @@ extern const vk_disp_drv_t vk_disp_dummy_drv;
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vk_disp_init(vk_disp_t *pthis);
+extern vsf_err_t vk_disp_set_refresh_format(vk_disp_t *pthis, vk_disp_color_type_t type);
 extern vsf_err_t vk_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 
 #ifdef __VSF_DISP_CLASS_INHERIT__
