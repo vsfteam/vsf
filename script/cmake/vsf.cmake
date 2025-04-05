@@ -51,7 +51,7 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC
 if(VSF_APPLET)
     target_compile_definitions(${CMAKE_PROJECT_NAME} PUBLIC
         __VSF_APPLET__
-        __OOC_CPP__
+        __VSF_CPP__
     )
 endif()
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC

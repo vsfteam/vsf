@@ -15,12 +15,12 @@ set(CMAKE_OBJCOPY ${GCC_PREFIX}-objcopy CACHE INTERNAL "objcopy")
 set(CMAKE_OBJDUMP ${GCC_PREFIX}-objdump CACHE INTERNAL "objdump")
 set(CMAKE_SIZE ${GCC_PREFIX}-size CACHE INTERNAL "size")
 
-set(CMAKE_C_FLAGS 
-    "${CMAKE_C_FLAGS} -std=gnu11 -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -ffunction-sections"
+set(CMAKE_C_FLAGS
+    "${CMAKE_C_FLAGS} -std=gnu11 -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -ffunction-sections -fms-extensions"
     CACHE INTERNAL "C compiler common flags"
 )
-set(CMAKE_CXX_FLAGS 
-    "${CMAKE_CXX_FLAGS} -fpermissive -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -ffunction-sections"
+set(CMAKE_CXX_FLAGS
+    "${CMAKE_CXX_FLAGS} -fpermissive -Wall -fno-builtin -fno-strict-aliasing -fdata-sections -ffunction-sections -fms-extensions"
     CACHE INTERNAL "C++ compiler common flags"
 )
 
