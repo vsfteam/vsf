@@ -40,6 +40,107 @@ extern "C" {
 #    define HAL_SPI_ERROR_INVALID_CALLBACK (0x00000080U)
 #endif
 
+#define SPI_MODE_SLAVE      VSF_SPI_SLAVE
+#define SPI_MODE_MASTER     VSF_SPI_MASTER
+#define SPI_DATASIZE_8BIT   VSF_SPI_DATASIZE_8
+#define SPI_DATASIZE_16BIT  VSF_SPI_DATASIZE_16
+#define SPI_POLARITY_LOW    VSF_SPI_CPOL_LOW
+#define SPI_POLARITY_HIGH   VSF_SPI_CPOL_HIGH
+#define SPI_PHASE_1EDGE     VSF_SPI_CPHA_LOW
+#define SPI_PHASE_2EDGE     VSF_SPI_CPHA_HIGH
+#define SPI_FIRSTBIT_MSB    VSF_SPI_MSB_FIRST
+#define SPI_FIRSTBIT_LSB    VSF_SPI_LSB_FIRST
+#define SPI_NSS_SOFT        VSF_SPI_CS_SOFTWARE_MODE
+#define SPI_NSS_HARD_OUTPUT VSF_SPI_CS_HARDWARE_MODE
+#ifdef VSF_SPI_CS_HARDWARE_INPUT_MODE
+#    define SPI_NSS_HARD_INPUT VSF_SPI_CS_HARDWARE_INPUT_MODE
+#else
+#    define SPI_NSS_HARD_INPUT 0
+#endif
+#ifdef VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX
+#    define SPI_DIRECTION_2LINES VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX
+#else
+#    define SPI_DIRECTION_2LINES 0
+#endif
+
+#ifdef VSF_SPI_DATALINE_2_LINE_RX_ONLY
+#    define SPI_DIRECTION_2LINES_RXONLY VSF_SPI_DATALINE_2_LINE_RX_ONLY
+#else
+#    define SPI_DIRECTION_2LINES_RXONLY 0
+#endif
+
+#ifdef VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX
+#    define SPI_DIRECTION_1LINE VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX
+#else
+#    define SPI_DIRECTION_1LINE 0
+#endif
+#    define SPI_BAUDRATEPRESCALER_2 2
+#    define SPI_BAUDRATEPRESCALER_4 4
+#    define SPI_BAUDRATEPRESCALER_8 8
+#    define SPI_BAUDRATEPRESCALER_16 16
+#    define SPI_BAUDRATEPRESCALER_32 32
+#    define SPI_BAUDRATEPRESCALER_64 64
+#    define SPI_BAUDRATEPRESCALER_128 128
+#    define SPI_BAUDRATEPRESCALER_256 256
+#ifdef VSF_SPI_TI_MODE_DISABLE
+#    define SPI_TIMODE_DISABLE VSF_SPI_TI_MODE_DISABLE
+#else
+#    define SPI_TIMODE_DISABLE (0x00000000U)
+#endif
+#ifdef VSF_SPI_TI_MMOE_ENABLE
+#    define SPI_TIMODE_ENABLE VSF_SPI_TI_MMOE_ENABLE
+#else
+#    define SPI_TIMODE_ENABLE (0x00000000U)
+#endif
+#ifdef VSF_SPI_CRCCALCULATION_DISABLE
+#    define SPI_CRCCALCULATION_DISABLE VSF_SPI_CRCCALCULATION_DISABLE
+#else
+#    define SPI_CRCCALCULATION_DISABLE (0x00000000U)
+#endif
+
+// TODO: need vsf-hal support
+#define IS_SPI_ALL_INSTANCE(INSTANCE) 1
+#define IS_SPI_MODE(__MODE__)                                                  \
+    (((__MODE__) == SPI_MODE_SLAVE) || ((__MODE__) == SPI_MODE_MASTER))
+
+#define IS_SPI_DIRECTION(__MODE__)                                             \
+    (((__MODE__) == SPI_DIRECTION_2LINES) ||                                   \
+     ((__MODE__) == SPI_DIRECTION_2LINES_RXONLY) ||                            \
+     ((__MODE__) == SPI_DIRECTION_1LINE))
+#define IS_SPI_DIRECTION_2LINES(__MODE__) ((__MODE__) == SPI_DIRECTION_2LINES)
+#define IS_SPI_DIRECTION_2LINES_OR_1LINE(__MODE__)                             \
+    (((__MODE__) == SPI_DIRECTION_2LINES) ||                                   \
+     ((__MODE__) == SPI_DIRECTION_1LINE))
+#define IS_SPI_DATASIZE(__DATASIZE__)                                          \
+    (((__DATASIZE__) == SPI_DATASIZE_16BIT) ||                                 \
+     ((__DATASIZE__) == SPI_DATASIZE_8BIT))
+#define IS_SPI_CPOL(__CPOL__)                                                  \
+    (((__CPOL__) == SPI_POLARITY_LOW) || ((__CPOL__) == SPI_POLARITY_HIGH))
+#define IS_SPI_CPHA(__CPHA__)                                                  \
+    (((__CPHA__) == SPI_PHASE_1EDGE) || ((__CPHA__) == SPI_PHASE_2EDGE))
+#define IS_SPI_NSS(__NSS__)                                                    \
+    (((__NSS__) == SPI_NSS_SOFT) || ((__NSS__) == SPI_NSS_HARD_INPUT) ||       \
+     ((__NSS__) == SPI_NSS_HARD_OUTPUT))
+#define IS_SPI_BAUDRATE_PRESCALER(__PRESCALER__)                               \
+    (((__PRESCALER__) == SPI_BAUDRATEPRESCALER_2) ||                           \
+     ((__PRESCALER__) == SPI_BAUDRATEPRESCALER_4) ||                           \
+     ((__PRESCALER__) == SPI_BAUDRATEPRESCALER_8) ||                           \
+     ((__PRESCALER__) == SPI_BAUDRATEPRESCALER_16) ||                          \
+     ((__PRESCALER__) == SPI_BAUDRATEPRESCALER_32) ||                          \
+     ((__PRESCALER__) == SPI_BAUDRATEPRESCALER_64) ||                          \
+     ((__PRESCALER__) == SPI_BAUDRATEPRESCALER_128) ||                         \
+     ((__PRESCALER__) == SPI_BAUDRATEPRESCALER_256))
+#define IS_SPI_FIRST_BIT(__BIT__)                                              \
+    (((__BIT__) == SPI_FIRSTBIT_MSB) || ((__BIT__) == SPI_FIRSTBIT_LSB))
+#define IS_SPI_TIMODE(__MODE__)                                                \
+    (((__MODE__) == SPI_TIMODE_DISABLE) || ((__MODE__) == SPI_TIMODE_ENABLE))
+#define IS_SPI_CRC_CALCULATION(__CALCULATION__)                                \
+    (((__CALCULATION__) == SPI_CRCCALCULATION_DISABLE) ||                      \
+     ((__CALCULATION__) == SPI_CRCCALCULATION_ENABLE))
+#define IS_SPI_CRC_POLYNOMIAL(__POLYNOMIAL__)                                  \
+    (((__POLYNOMIAL__) >= 0x1U) && ((__POLYNOMIAL__) <= 0xFFFFU) &&            \
+     (((__POLYNOMIAL__) & 0x1U) != 0U))
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -71,19 +172,19 @@ typedef enum {
 } HAL_SPI_StateTypeDef;
 
 typedef struct __SPI_HandleTypeDef {
-    SPI_TypeDef    *Instance;
-    SPI_InitTypeDef Init;
-    uint8_t        *pTxBuffPtr;
-    uint16_t        TxXferSize;
-    volatile uint16_t   TxXferCount;
-    uint8_t        *pRxBuffPtr;
-    uint16_t        RxXferSize;
-    volatile uint16_t   RxXferCount;
+    SPI_TypeDef      *Instance;
+    SPI_InitTypeDef   Init;
+    uint8_t          *pTxBuffPtr;
+    uint16_t          TxXferSize;
+    volatile uint16_t TxXferCount;
+    uint8_t          *pRxBuffPtr;
+    uint16_t          RxXferSize;
+    volatile uint16_t RxXferCount;
     void (*RxISR)(struct __SPI_HandleTypeDef *hspi);
     void (*TxISR)(struct __SPI_HandleTypeDef *hspi);
-    DMA_HandleTypeDef        *hdmatx;
-    DMA_HandleTypeDef        *hdmarx;
-    HAL_LockTypeDef           Lock;
+    DMA_HandleTypeDef            *hdmatx;
+    DMA_HandleTypeDef            *hdmarx;
+    HAL_LockTypeDef               Lock;
     volatile HAL_SPI_StateTypeDef State;
     volatile uint32_t             ErrorCode;
 #if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)
@@ -102,7 +203,6 @@ typedef struct __SPI_HandleTypeDef {
 } SPI_HandleTypeDef;
 
 #if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)
-
 typedef enum {
     HAL_SPI_TX_COMPLETE_CB_ID         = 0x00U,
     HAL_SPI_RX_COMPLETE_CB_ID         = 0x01U,
@@ -116,9 +216,7 @@ typedef enum {
     HAL_SPI_MSPDEINIT_CB_ID           = 0x09U
 
 } HAL_SPI_CallbackIDTypeDef;
-
 typedef void (*pSPI_CallbackTypeDef)(SPI_HandleTypeDef *hspi);
-
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/

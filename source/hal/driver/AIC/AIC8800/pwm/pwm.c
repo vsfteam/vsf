@@ -47,7 +47,7 @@ typedef struct vsf_hw_pwm_t {
     uint32_t freq;
 
     uint8_t timer_mask;
-    int8_t pwm_map[VSF_HW_PWM0_CHANNAL_COUNT];
+    int8_t pwm_map[VSF_HW_PWM0_CHANNEL_COUNT];
 } vsf_hw_pwm_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -100,7 +100,7 @@ fsm_rt_t vsf_hw_pwm_disable(vsf_hw_pwm_t *hw_pwm_ptr)
 vsf_err_t vsf_hw_pwm_set(vsf_hw_pwm_t *hw_pwm_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
 {
     VSF_HAL_ASSERT(NULL != hw_pwm_ptr);
-    VSF_HAL_ASSERT(channel < VSF_HW_PWM0_CHANNAL_COUNT);
+    VSF_HAL_ASSERT(channel < VSF_HW_PWM0_CHANNEL_COUNT);
 
     // TODO: support free timer
     // TODO: support same period

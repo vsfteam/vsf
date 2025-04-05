@@ -24,6 +24,13 @@
 
 #if VSF_HAL_USE_DAC == ENABLED
 
+// HW/IPCore
+/**
+ * \note When vsf_peripheral_status_t is inherited, vsf_template_hal_driver.h needs to be included
+ */
+#include "hal/driver/common/template/vsf_template_hal_driver.h"
+// HW/IPCore end
+
 #include "../../__device.h"
 
 /*\note Refer to template/README.md for usage cases.
@@ -61,6 +68,23 @@ extern "C" {
 #endif
 // IPCore end
 
+// HW
+/*\note hw DAC driver can reimplement following types:
+ *      To enable reimplementation, please enable macro below:
+ *          VSF_DAC_CFG_REIMPLEMENT_TYPE_STATUS for vsf_dac_status_t
+ *          VSF_DAC_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_dac_irq_mask_t
+ *          VSF_DAC_CFG_REIMPLEMENT_TYPE_CFG for vsf_dac_cfg_t
+ *          VSF_DAC_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_dac_capability_t
+ *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
+ *      *** DO NOT reimplement these in emulated drivers. ***
+ */
+
+#define VSF_DAC_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
+#define VSF_DAC_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
+#define VSF_DAC_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_DAC_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
+// HW end
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -83,6 +107,51 @@ vsf_class(vsf_${dac_ip}_dac_t) {
     )
 };
 // IPCore end
+
+// HW/IPCore, not for emulated drivers
+#if VSF_DAC_CFG_REIMPLEMENT_TYPE_IRQ_MASK == ENABLED
+typedef enum vsf_dac_irq_mask_t {
+    VSF_DAC_IRQ_MASK_IDLE = (0x01ul << 0),
+    VSF_DAC_IRQ_MASK_CPL  = (0x1ul << 0),
+} vsf_dac_irq_mask_t;
+#endif
+
+#if VSF_DAC_CFG_REIMPLEMENT_TYPE_STATUS == ENABLED
+typedef struct vsf_dac_status_t {
+    union {
+        inherit(vsf_peripheral_status_t)
+        struct {
+            uint32_t is_busy : 1;
+        };
+    };
+} vsf_dac_status_t;
+#endif
+
+#if VSF_DAC_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
+typedef struct vsf_dac_t vsf_dac_t;
+typedef void vsf_dac_isr_handler_t(void *target_ptr, vsf_dac_t *dac_ptr, vsf_dac_irq_mask_t irq_mask);
+typedef struct vsf_dac_isr_t {
+    vsf_dac_isr_handler_t  *handler_fn;
+    void                   *target_ptr;
+    vsf_arch_prio_t         prio;
+} vsf_dac_isr_t;
+typedef struct vsf_dac_cfg_t {
+    vsf_dac_isr_t   isr;
+} vsf_dac_cfg_t;
+#endif
+
+#if VSF_DAC_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED
+typedef struct vsf_dac_capability_t {
+#if VSF_DAC_CFG_INHERIT_HAL_CAPABILITY == ENABLED
+    inherit(vsf_peripheral_capability_t)
+#endif
+    vsf_dac_irq_mask_t irq_mask;
+    uint8_t max_resolution_bits;
+    uint8_t min_resolution_bits;
+    uint8_t channel_count;
+} vsf_dac_capability_t;
+#endif
+// HW/IPCore end
 
 /*============================ INCLUDES ======================================*/
 

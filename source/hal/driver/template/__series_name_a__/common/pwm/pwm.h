@@ -24,6 +24,13 @@
 
 #if VSF_HAL_USE_PWM == ENABLED
 
+// HW/IPCore
+/**
+ * \note When vsf_peripheral_status_t is inherited, vsf_template_hal_driver.h needs to be included
+ */
+#include "hal/driver/common/template/vsf_template_hal_driver.h"
+// HW/IPCore end
+
 #include "../../__device.h"
 
 /*\note Refer to template/README.md for usage cases.
@@ -61,6 +68,27 @@ extern "C" {
 #endif
 // IPCore end
 
+// HW
+/*\note hw PWM driver can reimplement following types:
+ *      To enable reimplementation, please enable macro below:
+ *          VSF_PWM_CFG_REIMPLEMENT_TYPE_MODE for vsf_pwm_mode_t
+ *          VSF_PWM_CFG_REIMPLEMENT_TYPE_STATUS for vsf_pwm_status_t
+ *          VSF_PWM_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_pwm_irq_mask_t
+ *          VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL for vsf_pwm_ctrl_t
+ *          VSF_PWM_CFG_REIMPLEMENT_TYPE_CFG for vsf_pwm_cfg_t
+ *          VSF_PWM_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_pwm_capability_t
+ *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
+ *      *** DO NOT reimplement these in emulated drivers. ***
+ */
+
+#define VSF_PWM_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
+#define VSF_PWM_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
+#define VSF_PWM_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
+#define VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
+#define VSF_PWM_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_PWM_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
+// HW end
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -83,6 +111,27 @@ vsf_class(vsf_${pwm_ip}_pwm_t) {
     )
 };
 // IPCore end
+
+// HW/IPCore, not for emulated drivers
+#if VSF_PWM_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
+typedef struct vsf_pwm_cfg_t {
+    union {
+        uint32_t freq;
+        uint32_t min_freq;
+    };
+} vsf_pwm_cfg_t;
+#endif
+
+#if VSF_PWM_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED
+typedef struct vsf_pwm_capability_t {
+#if VSF_PWM_CFG_INHERIT_HAL_CAPABILITY == ENABLED
+    inherit(vsf_peripheral_capability_t)
+#endif
+    uint32_t max_freq;
+    uint32_t min_freq;
+} vsf_pwm_capability_t;
+#endif
+// HW/IPCore end
 
 /*============================ INCLUDES ======================================*/
 

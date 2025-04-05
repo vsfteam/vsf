@@ -24,6 +24,13 @@
 
 #if VSF_HAL_USE_I2S == ENABLED
 
+// HW/IPCore
+/**
+ * \note When vsf_peripheral_status_t is inherited, vsf_template_hal_driver.h needs to be included
+ */
+#include "hal/driver/common/template/vsf_template_hal_driver.h"
+// HW/IPCore end
+
 #include "../../__device.h"
 
 /*\note Refer to template/README.md for usage cases.
@@ -60,6 +67,27 @@ extern "C" {
 #   define VSF_${I2S_IP}_I2S_CFG_MULTI_CLASS    VSF_I2S_CFG_MULTI_CLASS
 #endif
 // IPCore end
+
+// HW
+/*\note hw I2S driver can reimplement following types:
+ *      To enable reimplementation, please enable macro below:
+ *          VSF_I2S_CFG_REIMPLEMENT_TYPE_MODE for vsf_i2s_mode_t
+ *          VSF_I2S_CFG_REIMPLEMENT_TYPE_STATUS for vsf_i2s_status_t
+ *          VSF_I2S_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_i2s_irq_mask_t
+ *          VSF_I2S_CFG_REIMPLEMENT_TYPE_CTRL for vsf_i2s_ctrl_t
+ *          VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG for vsf_i2s_cfg_t
+ *          VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_i2s_capability_t
+ *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
+ *      *** DO NOT reimplement these in emulated drivers. ***
+ */
+
+#define VSF_I2S_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
+#define VSF_I2S_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
+#define VSF_I2S_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
+#define VSF_I2S_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
+#define VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
+// HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -101,6 +129,78 @@ vsf_class(vsf_${i2s_ip}_i2s_t) {
 #undef __VSF_HAL_${I2S_IP}_I2S_CLASS_IMPLEMENT
 #undef __VSF_HAL_${I2S_IP}_I2S_CLASS_INHERIT__
 // IPCore end
+
+// HW/IPCore, not for emulated drivers
+#if VSF_I2S_CFG_REIMPLEMENT_TYPE_MODE == ENABLED
+typedef enum vsf_i2s_mode_t {
+    VSF_I2S_MODE_MASTER             = (0x01ul << 0),
+    VSF_I2S_MODE_SLAVE              = (0x00ul << 0),
+
+    VSF_I2S_DATA_BITLEN_16          = (0x01ul << 1),
+    VSF_I2S_DATA_BITLEN_24          = (0x02ul << 1),
+    VSF_I2S_DATA_BITLEN_32          = (0x03ul << 1),
+
+    VSF_I2S_FRAME_BITLEN_16         = (0x01ul << 3),
+    VSF_I2S_FRAME_BITLEN_24         = (0x02ul << 3),
+    VSF_I2S_FRAME_BITLEN_32         = (0x03ul << 3),
+
+    VSF_I2S_STANDARD_PHILIPS        = (0x01ul << 5),
+    VSF_I2S_STANDARD_MSB            = (0x02ul << 5),
+    VSF_I2S_STANDARD_LSB            = (0x03ul << 5),
+
+    VSF_I2S_LRCK_POL                = (0x01ul << 7),
+    VSF_I2S_BCK_POL                 = (0x01ul << 8),
+    VSF_I2S_MCLK_OUTPUT             = (0x01ul << 9),
+} vsf_i2s_mode_t;
+#endif
+
+#if VSF_I2S_CFG_REIMPLEMENT_TYPE_IRQ_MASK == ENABLED
+typedef enum vsf_i2s_irq_mask_t {
+    VSF_I2S_IRQ_MASK_TX_TGL_BUFFER  = (0x1ul <<  0),
+    VSF_I2S_IRQ_MASK_RX_TGL_BUFFER  = (0x1ul <<  1),
+} vsf_i2s_irq_mask_t;
+#endif
+
+#if VSF_I2S_CFG_REIMPLEMENT_TYPE_STATUS == ENABLED
+typedef struct vsf_i2s_status_t {
+    union {
+        inherit(vsf_peripheral_status_t)
+        uint32_t value;
+    };
+} vsf_i2s_status_t;
+#endif
+
+#if VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED
+typedef struct vsf_i2s_capability_t {
+#if VSF_I2S_CFG_INHERIT_HAL_CAPABILITY == ENABLED
+    inherit(vsf_peripheral_capability_t)
+#endif
+    struct {
+        bool is_src_supported;
+        bool is_dbuffer_supported;
+    } i2s_capability;
+} vsf_i2s_capability_t;
+#endif
+
+#if VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
+typedef struct vsf_i2s_t vsf_i2s_t;
+typedef void vsf_i2s_isr_handler_t(void *target_ptr, vsf_i2s_t *i2s_ptr, vsf_i2s_irq_mask_t irq_mask);
+typedef struct vsf_i2s_isr_t {
+    vsf_i2s_isr_handler_t *handler_fn;
+    void                  *target_ptr;
+    vsf_arch_prio_t        prio;
+} vsf_i2s_isr_t;
+typedef struct vsf_i2s_cfg_t {
+    vsf_i2s_mode_t mode;
+    uint32_t data_sample_rate;
+    uint32_t hw_sample_rate;
+    uint8_t *buffer;
+    uint16_t buffer_size;
+    uint8_t channel_num;
+    vsf_i2s_isr_t isr;
+} vsf_i2s_cfg_t;
+#endif
+// HW/IPCore end
 
 #endif      // VSF_HAL_USE_I2S
 #endif      // __HAL_DRIVER_${SERIES/I2S_IP}_I2S_H__

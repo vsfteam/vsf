@@ -202,7 +202,7 @@ vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_init)(
     });
     vsf_i2c_irq_enable(i2c, VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE
                         |   VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK
-                        |   VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT);
+                        |   VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT);
     vsf_i2c_enable(i2c);
 
     adc_ptr->cur_reg = ADC128D818_REG_BUSY_STATUS;

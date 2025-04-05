@@ -142,17 +142,6 @@ static void __uart_init_default_cb(struct __UART_HandleTypeDef *huart)
     }
 }
 
-bool __uart_is_timeout(uint32_t start, uint32_t timeout)
-{
-    if (timeout == HAL_MAX_DELAY) {
-        return false;
-    } else if (timeout == 0U) {
-        return true;
-    }
-
-    return (HAL_GetTick() - start) > timeout;
-}
-
 static void __usart_tx_isr_handler(struct __UART_HandleTypeDef *huart,
                                    vsf_usart_t *usart, uint32_t data_len)
 {
@@ -169,7 +158,8 @@ static void __usart_tx_isr_handler(struct __UART_HandleTypeDef *huart,
             } else {
                 uint16_t dump_data = DUMMY_DATA;
                 while (huart->TxXferCount) {
-                    uint16_t write_size = vsf_usart_txfifo_write(usart, (void *)&dump_data, 1);
+                    uint16_t write_size =
+                        vsf_usart_txfifo_write(usart, (void *)&dump_data, 1);
                     if (write_size) {
                         huart->TxXferCount -= write_size;
                     } else {
@@ -276,10 +266,10 @@ static void __usart_rx_cpl_isr_handler(struct __UART_HandleTypeDef *huart,
                                        vsf_usart_t                 *usart)
 {
     VSF_STHAL_ASSERT(huart->pRxBuffPtr != NULL);
-    
+
     vsf_usart_irq_disable(usart, VSF_USART_IRQ_MASK_RX_CPL |
                                      STHAL_USART_RX_ERR_IRQ_MASK);
-        
+
     huart->RxCpltCallback(huart);
 }
 
@@ -388,7 +378,7 @@ HAL_StatusTypeDef __HAL_UART_DeInit(struct __UART_HandleTypeDef *huart)
     huart->ReceptionType = HAL_UART_RECEPTION_STANDARD;
     huart->RxEventType   = HAL_UART_RXEVENT_TC;
 
-    __HAL_UNLOCK(huart);
+    VSF_STHAL_UNLOCK(huart);
 
     return HAL_OK;
 }
@@ -472,14 +462,14 @@ HAL_StatusTypeDef __HAL_UART_Transmit(struct __UART_HandleTypeDef *huart,
             return HAL_ERROR;
         }
 
-        __HAL_LOCK(huart);
+        VSF_STHAL_LOCK(huart);
 
         huart->TxXferSize  = Size;
         huart->TxXferCount = Size;
         huart->gState      = HAL_UART_STATE_BUSY_TX;
         huart->ErrorCode   = HAL_UART_ERROR_NONE;
 
-        __HAL_UNLOCK(huart);
+        VSF_STHAL_UNLOCK(huart);
 
         uint32_t data_len =
             (huart->Init.WordLength == UART_WORDLENGTH_9B) ? 2 : 1;
@@ -493,7 +483,7 @@ HAL_StatusTypeDef __HAL_UART_Transmit(struct __UART_HandleTypeDef *huart,
                 Size);
             huart->TxXferCount -= write_size;
 
-            if (__uart_is_timeout(tickstart, Timeout)) {
+            if (__sthal_check_timeout(tickstart, Timeout)) {
                 if (ready_when_timeout) {
                     huart->gState = HAL_UART_STATE_READY;
                 }
@@ -524,7 +514,7 @@ HAL_StatusTypeDef __HAL_UART_Receive(struct __UART_HandleTypeDef *huart,
             return HAL_ERROR;
         }
 
-        __HAL_LOCK(huart);
+        VSF_STHAL_LOCK(huart);
 
         huart->RxXferSize    = Size;
         huart->RxXferCount   = Size;
@@ -534,7 +524,7 @@ HAL_StatusTypeDef __HAL_UART_Receive(struct __UART_HandleTypeDef *huart,
 
         huart->__RxDMA = false;
 
-        __HAL_UNLOCK(huart);
+        VSF_STHAL_UNLOCK(huart);
 
         uint32_t data_len =
             (huart->Init.WordLength == UART_WORDLENGTH_9B) ? 2 : 1;
@@ -547,7 +537,7 @@ HAL_StatusTypeDef __HAL_UART_Receive(struct __UART_HandleTypeDef *huart,
                 Size);
             huart->RxXferCount -= read_size;
 
-            if (__uart_is_timeout(tickstart, Timeout)) {
+            if (__sthal_check_timeout(tickstart, Timeout)) {
                 if (ready_when_timeout) {
                     huart->RxState = HAL_UART_STATE_READY;
                 }
@@ -613,7 +603,8 @@ HAL_StatusTypeDef __HAL_UART_TransmitReceive(USART_HandleTypeDef *huart,
                 } else {
                     uint16_t dump_data = DUMMY_DATA;
                     while (huart->TxXferCount) {
-                        uint16_t write_size = vsf_usart_txfifo_write(usart, (void *)&dump_data, 1);
+                        uint16_t write_size = vsf_usart_txfifo_write(
+                            usart, (void *)&dump_data, 1);
                         if (write_size) {
                             huart->TxXferCount -= write_size;
                         } else {
@@ -632,10 +623,10 @@ HAL_StatusTypeDef __HAL_UART_TransmitReceive(USART_HandleTypeDef *huart,
                 huart->RxXferCount -= read_size;
             }
 
-            if (__uart_is_timeout(tickstart, Timeout)) {
+            if (__sthal_check_timeout(tickstart, Timeout)) {
                 huart->gState  = HAL_UART_STATE_READY;
                 huart->RxState = HAL_UART_STATE_READY;
-                __HAL_UNLOCK(huart);
+                VSF_STHAL_UNLOCK(huart);
                 return HAL_TIMEOUT;
             }
         }
@@ -663,7 +654,7 @@ HAL_StatusTypeDef __HAL_UART_Transmit_IT(struct __UART_HandleTypeDef *huart,
             return HAL_ERROR;
         }
 
-        __HAL_LOCK(huart);
+        VSF_STHAL_LOCK(huart);
 
         huart->pTxBuffPtr  = pData;
         huart->TxXferSize  = Size;
@@ -677,7 +668,7 @@ HAL_StatusTypeDef __HAL_UART_Transmit_IT(struct __UART_HandleTypeDef *huart,
         huart->TxXferCount -= writed_cnt;
         vsf_usart_irq_enable(usart, VSF_USART_IRQ_MASK_TX);
 
-        __HAL_UNLOCK(huart);
+        VSF_STHAL_UNLOCK(huart);
 
         return HAL_OK;
     } else {
@@ -700,7 +691,7 @@ HAL_StatusTypeDef __HAL_UART_Receive_IT(struct __UART_HandleTypeDef *huart,
             return HAL_ERROR;
         }
 
-        __HAL_UNLOCK(huart);
+        VSF_STHAL_UNLOCK(huart);
 
         huart->pRxBuffPtr    = pData;
         huart->RxXferSize    = Size;
@@ -713,7 +704,7 @@ HAL_StatusTypeDef __HAL_UART_Receive_IT(struct __UART_HandleTypeDef *huart,
         vsf_usart_irq_enable(usart, VSF_USART_IRQ_MASK_RX |
                                         STHAL_USART_RX_ERR_IRQ_MASK);
 
-        __HAL_UNLOCK(huart);
+        VSF_STHAL_UNLOCK(huart);
 
         return HAL_OK;
     } else {
@@ -731,7 +722,7 @@ HAL_StatusTypeDef __HAL_UART_TransmitReceive_IT(USART_HandleTypeDef *huart,
             return HAL_ERROR;
         }
 
-        __HAL_LOCK(huart);
+        VSF_STHAL_LOCK(huart);
 
         huart->pRxBuffPtr  = pRxData;
         huart->RxXferSize  = Size;
@@ -739,7 +730,8 @@ HAL_StatusTypeDef __HAL_UART_TransmitReceive_IT(USART_HandleTypeDef *huart,
         huart->pTxBuffPtr  = pTxData;
         huart->TxXferSize  = Size;
         huart->TxXferCount = Size;
-        huart->RxState     = (pTxData == NULL) ? HAL_UART_STATE_BUSY_RX : HAL_USART_STATE_BUSY_TX_RX;
+        huart->RxState     = (pTxData == NULL) ? HAL_UART_STATE_BUSY_RX
+                                               : HAL_USART_STATE_BUSY_TX_RX;
         huart->gState      = HAL_UART_STATE_BUSY_TX;
         huart->ErrorCode   = HAL_USART_ERROR_NONE;
         huart->__RxDMA     = false;
@@ -753,7 +745,7 @@ HAL_StatusTypeDef __HAL_UART_TransmitReceive_IT(USART_HandleTypeDef *huart,
                                         VSF_USART_IRQ_MASK_RX |
                                         STHAL_USART_RX_ERR_IRQ_MASK);
 
-        __HAL_UNLOCK(huart);
+        VSF_STHAL_UNLOCK(huart);
         return HAL_OK;
     } else {
         return HAL_BUSY;
@@ -770,7 +762,7 @@ HAL_StatusTypeDef __HAL_UART_Transmit_DMA(struct __UART_HandleTypeDef *huart,
             return HAL_ERROR;
         }
 
-        __HAL_LOCK(huart);
+        VSF_STHAL_LOCK(huart);
 
         huart->pTxBuffPtr  = pData;
         huart->TxXferSize  = Size;
@@ -778,7 +770,7 @@ HAL_StatusTypeDef __HAL_UART_Transmit_DMA(struct __UART_HandleTypeDef *huart,
         huart->gState      = HAL_UART_STATE_BUSY_TX;
         huart->ErrorCode   = HAL_UART_ERROR_NONE;
 
-        __HAL_UNLOCK(huart);
+        VSF_STHAL_UNLOCK(huart);
 
         vsf_usart_irq_enable(usart, VSF_USART_IRQ_MASK_TX_CPL);
 
@@ -806,7 +798,7 @@ HAL_StatusTypeDef __HAL_UART_Receive_DMA(struct __UART_HandleTypeDef *huart,
             return HAL_ERROR;
         }
 
-        __HAL_LOCK(huart);
+        VSF_STHAL_LOCK(huart);
 
         huart->pRxBuffPtr    = pData;
         huart->RxXferSize    = Size;
@@ -816,13 +808,13 @@ HAL_StatusTypeDef __HAL_UART_Receive_DMA(struct __UART_HandleTypeDef *huart,
         huart->ErrorCode     = HAL_UART_ERROR_NONE;
         huart->__RxDMA       = true;
 
-        __HAL_UNLOCK(huart);
+        VSF_STHAL_UNLOCK(huart);
 
         vsf_usart_irq_enable(usart, VSF_USART_IRQ_MASK_RX_CPL |
                                         STHAL_USART_RX_ERR_IRQ_MASK);
 
         if (VSF_ERR_NONE != vsf_usart_request_rx(usart, (void *)pData, Size)) {
-            __HAL_UNLOCK(huart);
+            VSF_STHAL_UNLOCK(huart);
             return HAL_ERROR;
         }
 
@@ -849,7 +841,7 @@ HAL_StatusTypeDef __HAL_UART_TransmitReceive_DMA(USART_HandleTypeDef *huart,
         if ((pRxData == NULL) || (Size == 0)) {
             return HAL_ERROR;
         }
-        __HAL_LOCK(huart);
+        VSF_STHAL_LOCK(huart);
 
         huart->pRxBuffPtr = pRxData;
         huart->RxXferSize = Size;
@@ -866,17 +858,19 @@ HAL_StatusTypeDef __HAL_UART_TransmitReceive_DMA(USART_HandleTypeDef *huart,
 
         if (VSF_ERR_NONE !=
             vsf_usart_request_rx(usart, (void *)pRxData, Size)) {
-            __HAL_UNLOCK(huart);
+            VSF_STHAL_UNLOCK(huart);
             return HAL_ERROR;
         }
 
         if (VSF_ERR_NONE !=
-            vsf_usart_request_tx(usart, (pTxData == NULL) ? (void *)pRxData : (void *)pTxData, Size)) {
-            __HAL_UNLOCK(huart);
+            vsf_usart_request_tx(
+                usart, (pTxData == NULL) ? (void *)pRxData : (void *)pTxData,
+                Size)) {
+            VSF_STHAL_UNLOCK(huart);
             return HAL_ERROR;
         }
 
-        __HAL_UNLOCK(huart);
+        VSF_STHAL_UNLOCK(huart);
 
         return HAL_OK;
     } else {
@@ -1122,7 +1116,7 @@ HAL_StatusTypeDef __HAL_UARTEx_ReceiveToIdle(struct __UART_HandleTypeDef *huart,
                 Size);
             huart->RxXferCount -= read_size;
 
-            if (__uart_is_timeout(tickstart, Timeout)) {
+            if (__sthal_check_timeout(tickstart, Timeout)) {
                 huart->RxState = HAL_UART_STATE_READY;
                 return HAL_TIMEOUT;
             }
@@ -1178,7 +1172,7 @@ HAL_StatusTypeDef __HAL_UARTEx_ReceiveToIdle_DMA(
         if ((pData == NULL) || (Size == 0U)) {
             return HAL_ERROR;
         }
-        __HAL_LOCK(huart);
+        VSF_STHAL_LOCK(huart);
 
         huart->pRxBuffPtr    = pData;
         huart->RxXferSize    = Size;
@@ -1194,11 +1188,11 @@ HAL_StatusTypeDef __HAL_UARTEx_ReceiveToIdle_DMA(
                                         STHAL_USART_RX_ERR_IRQ_MASK);
 
         if (VSF_ERR_NONE != vsf_usart_request_rx(usart, (void *)pData, Size)) {
-            __HAL_UNLOCK(huart);
+            VSF_STHAL_UNLOCK(huart);
             return HAL_ERROR;
         }
 
-        __HAL_LOCK(huart);
+        VSF_STHAL_LOCK(huart);
         return HAL_OK;
     } else {
         return HAL_BUSY;
@@ -1207,16 +1201,16 @@ HAL_StatusTypeDef __HAL_UARTEx_ReceiveToIdle_DMA(
 
 HAL_StatusTypeDef __HAL_HalfDuplex_EnableTransmitter(UART_HandleTypeDef *huart)
 {
-#    if defined(VSF_USART_CMD_HALF_DUPLEX_ENABLE_TRANSMITTER)
-    vsf_usart_cmd(usart, VSF_USART_CMD_HALF_DUPLEX_ENABLE_TRANSMITTER, NULL);
+#    if defined(VSF_USART_CTRL_HALF_DUPLEX_ENABLE_TRANSMITTER)
+    vsf_usart_ctrl(usart, VSF_USART_CTRL_HALF_DUPLEX_ENABLE_TRANSMITTER, NULL);
 #    endif
     return HAL_OK;
 }
 
 HAL_StatusTypeDef __HAL_HalfDuplex_EnableReceiver(UART_HandleTypeDef *huart)
 {
-#    if defined(VSF_USART_CMD_HALF_DUPLEX_ENABLE_RECEIVER)
-    vsf_usart_cmd(usart, VSF_USART_CMD_HALF_DUPLEX_ENABLE_RECEIVER, NULL);
+#    if defined(VSF_USART_CTRL_HALF_DUPLEX_ENABLE_RECEIVER)
+    vsf_usart_ctrl(usart, VSF_USART_CTRL_HALF_DUPLEX_ENABLE_RECEIVER, NULL);
 #    endif
     return HAL_OK;
 }
@@ -1247,10 +1241,10 @@ HAL_StatusTypeDef __HAL_UART_DMAPause(struct __UART_HandleTypeDef *huart)
     vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
     VSF_STHAL_ASSERT(usart != NULL);
 
-#    if defined(VSF_USART_CMD_REQUEST_RX_PAUSE) &&                             \
-        defined(VSF_USART_CMD_REQUEST_TX_PAUSE)
-    vsf_usart_cmd(usart, VSF_USART_CMD_REQUEST_RX_PAUSE, NULL);
-    vsf_usart_cmd(usart, VSF_USART_CMD_REQUEST_TX_PAUSE, NULL);
+#    if defined(VSF_USART_CTRL_REQUEST_RX_PAUSE) &&                             \
+        defined(VSF_USART_CTRL_REQUEST_TX_PAUSE)
+    vsf_usart_ctrl(usart, VSF_USART_CTRL_REQUEST_RX_PAUSE, NULL);
+    vsf_usart_ctrl(usart, VSF_USART_CTRL_REQUEST_TX_PAUSE, NULL);
     return HAL_OK;
 #    else
     return HAL_ERROR;
@@ -1263,10 +1257,10 @@ HAL_StatusTypeDef __HAL_UART_DMAResume(struct __UART_HandleTypeDef *huart)
     vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
     VSF_STHAL_ASSERT(usart != NULL);
 
-#    if defined(VSF_USART_CMD_REQUEST_RX_RESUME) &&                            \
-        defined(VSF_USART_CMD_REQUEST_TX_RESUME)
-    vsf_usart_cmd(usart, VSF_USART_CMD_REQUEST_RX_RESUME, NULL);
-    vsf_usart_cmd(usart, VSF_USART_CMD_REQUEST_TX_RESUME, NULL);
+#    if defined(VSF_USART_CTRL_REQUEST_RX_RESUME) &&                            \
+        defined(VSF_USART_CTRL_REQUEST_TX_RESUME)
+    vsf_usart_ctrl(usart, VSF_USART_CTRL_REQUEST_RX_RESUME, NULL);
+    vsf_usart_ctrl(usart, VSF_USART_CTRL_REQUEST_TX_RESUME, NULL);
     return HAL_OK;
 #    else
     return HAL_ERROR;
@@ -1277,10 +1271,10 @@ HAL_StatusTypeDef __HAL_LIN_Init(UART_HandleTypeDef *huart,
                                  uint32_t            BreakDetectLength)
 {
 #    if defined(VSF_USART_LIN_ENABLE) &&                                       \
-        defined(VSF_USART_CMD_LIN_SET_BREAK_DETECT_LENGTH)
+        defined(VSF_USART_CTRL_LIN_SET_BREAK_DETECT_LENGTH)
     HAL_StatusTypeDef status = __HAL_UART_Init(huart, 0);
     if (status == HAL_OK) {
-        vsf_usart_cmd(usart, VSF_USART_CMD_REQUEST_TX_RESUME,
+        vsf_usart_ctrl(usart, VSF_USART_CTRL_REQUEST_TX_RESUME,
                       (void *)BreakDetectLength);
     }
     return status;
@@ -1294,13 +1288,13 @@ HAL_StatusTypeDef __HAL_MultiProcessor_Init(UART_HandleTypeDef *huart,
                                             uint32_t            WakeUpMethod)
 {
 #    if defined(VSF_USART_MULTI_PROCESSOR_ENABLE) &&                           \
-        defined(VSF_USART_CMD_MULTI_PROCESSOR_SET_ADDRESS) &&                  \
-        defined(VSF_USART_CMD_MULTI_PROCESSOR_SET_WAKEUP_METHOD)
+        defined(VSF_USART_CTRL_MULTI_PROCESSOR_SET_ADDRESS) &&                  \
+        defined(VSF_USART_CTRL_MULTI_PROCESSOR_SET_WAKEUP_METHOD)
     HAL_StatusTypeDef status = __HAL_UART_Init(huart, 0);
     if (status == HAL_OK) {
-        vsf_usart_cmd(usart, VSF_USART_CMD_MULTI_PROCESSOR_SET_ADDRESS,
+        vsf_usart_ctrl(usart, VSF_USART_CTRL_MULTI_PROCESSOR_SET_ADDRESS,
                       (void *)Address);
-        vsf_usart_cmd(usart, VSF_USART_CMD_MULTI_PROCESSOR_SET_WAKEUP_METHOD,
+        vsf_usart_ctrl(usart, VSF_USART_CTRL_MULTI_PROCESSOR_SET_WAKEUP_METHOD,
                       (void *)WakeUpMethod);
     }
     return status;
@@ -1311,8 +1305,8 @@ HAL_StatusTypeDef __HAL_MultiProcessor_Init(UART_HandleTypeDef *huart,
 
 HAL_StatusTypeDef __HAL_MultiProcessor_EnterMuteMode(UART_HandleTypeDef *huart)
 {
-#    if defined(VSF_USART_CMD_MULTI_PROCESSOR_ENTER_MUTE_MODE)
-    vsf_usart_cmd(usart, VSF_USART_CMD_MULTI_PROCESSOR_ENTER_MUTE_MODE,
+#    if defined(VSF_USART_CTRL_MULTI_PROCESSOR_ENTER_MUTE_MODE)
+    vsf_usart_ctrl(usart, VSF_USART_CTRL_MULTI_PROCESSOR_ENTER_MUTE_MODE,
                   (void *)Address);
     return HAL_OK;
 #    else
@@ -1322,8 +1316,8 @@ HAL_StatusTypeDef __HAL_MultiProcessor_EnterMuteMode(UART_HandleTypeDef *huart)
 
 HAL_StatusTypeDef __HAL_MultiProcessor_ExitMuteMode(UART_HandleTypeDef *huart)
 {
-#    if defined(VSF_USART_CMD_MULTI_PROCESSOR_EXIT_MUTE_MODE)
-    vsf_usart_cmd(usart, VSF_USART_CMD_MULTI_PROCESSOR_ENTER_MUTE_MODE,
+#    if defined(VSF_USART_CTRL_MULTI_PROCESSOR_EXIT_MUTE_MODE)
+    vsf_usart_ctrl(usart, VSF_USART_CTRL_MULTI_PROCESSOR_ENTER_MUTE_MODE,
                   (void *)Address);
     return HAL_OK;
 #    else
@@ -1340,7 +1334,7 @@ HAL_StatusTypeDef __HAL_LIN_SendBreak(UART_HandleTypeDef *huart)
     vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
     VSF_STHAL_ASSERT(usart != NULL);
 
-    __HAL_LOCK(huart);
+    VSF_STHAL_LOCK(huart);
 
     huart->gState = HAL_UART_STATE_BUSY;
 
@@ -1356,7 +1350,7 @@ HAL_StatusTypeDef __HAL_LIN_SendBreak(UART_HandleTypeDef *huart)
             1 + vsf_usart_mode_to_data_bits(huart->Init.WordLength) + 2;
         uint32_t timeout = (bit_cnt * 1000000 + huart->Init.BaudRate - 1) /
                            huart->Init.BaudRate;
-        while (!__uart_is_timeout(tickstart, timeout));
+        while (!__sthal_check_timeout(tickstart, timeout));
 
         vsf_usart_clear_break(usart);
     } else {
@@ -1365,7 +1359,7 @@ HAL_StatusTypeDef __HAL_LIN_SendBreak(UART_HandleTypeDef *huart)
 
     huart->gState = HAL_UART_STATE_READY;
 
-    __HAL_UNLOCK(huart);
+    VSF_STHAL_UNLOCK(huart);
 
     return status;
 }

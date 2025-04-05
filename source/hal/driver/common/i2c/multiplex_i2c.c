@@ -142,8 +142,8 @@ static void __i2c_isr_handler(void *target_ptr, vsf_i2c_t *i2c_ptr, vsf_i2c_irq_
     //
     // The current request may end without generating a STOP when the NAK is received.
     // So the next request must have START.
-    vsf_i2c_irq_mask_t cpl_irq_mask = VSF_I2C_IRQ_MASK_MASTER_STOPPED
-                                    | VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT
+    vsf_i2c_irq_mask_t cpl_irq_mask = VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT
+                                    | VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT
                                     | VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK
                                     | VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
                                     | VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
@@ -318,10 +318,56 @@ vsf_i2c_status_t vsf_multiplex_i2c_status(vsf_multiplex_i2c_t *m_i2c_ptr)
     return status;
 }
 
+void vsf_multiplex_i2c_master_fifof_transfer(vsf_multiplex_i2c_t *m_i2c_ptr,
+                                           uint16_t address,
+                                           vsf_i2c_cmd_t cmd,
+                                           uint_fast16_t count,
+                                           uint8_t *buffer,
+                                           vsf_i2c_cmd_t *cur_cmd_ptr,
+                                           uint_fast16_t *offset_ptr)
+{
+    VSF_HAL_ASSERT(NULL != m_i2c_ptr);
+    vsf_multiplexer_i2c_t * const multiplexer = m_i2c_ptr->multiplexer;
+    VSF_HAL_ASSERT(NULL != multiplexer);
+    VSF_HAL_ASSERT(multiplexer->en_mask & (1 << m_i2c_ptr->id));
+
+    VSF_HAL_ASSERT(0);
+}
+
+void vsf_multiplex_i2c_master_fifo_transfer(vsf_multiplex_i2c_t *m_i2c_ptr,
+                                            uint16_t address,
+                                            vsf_i2c_cmd_t cmd,
+                                            uint_fast16_t count,
+                                            uint8_t *buffer,
+                                            vsf_i2c_cmd_t *cur_cmd_ptr,
+                                            uint_fast16_t *offset_ptr)
+{
+    VSF_HAL_ASSERT(NULL != m_i2c_ptr);
+    vsf_multiplexer_i2c_t * const multiplexer = m_i2c_ptr->multiplexer;
+    VSF_HAL_ASSERT(NULL != multiplexer);
+    VSF_HAL_ASSERT(multiplexer->en_mask & (1 << m_i2c_ptr->id));
+
+    VSF_HAL_ASSERT(0);
+}
+
+uint_fast16_t vsf_multiplex_i2c_slave_fifo_transfer(vsf_multiplex_i2c_t *m_i2c_ptr,
+                                                    bool transmit_or_receive,
+                                                    uint_fast16_t count,
+                                                    uint8_t *buffer_ptr)
+{
+    VSF_HAL_ASSERT(NULL != m_i2c_ptr);
+    vsf_multiplexer_i2c_t * const multiplexer = m_i2c_ptr->multiplexer;
+    VSF_HAL_ASSERT(NULL != multiplexer);
+    VSF_HAL_ASSERT(multiplexer->en_mask & (1 << m_i2c_ptr->id));
+
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
 vsf_err_t vsf_multiplex_i2c_master_request(vsf_multiplex_i2c_t *m_i2c_ptr,
                                            uint16_t address,
                                            vsf_i2c_cmd_t cmd,
-                                           uint16_t count,
+                                           uint_fast16_t count,
                                            uint8_t *buffer_ptr)
 {
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
@@ -367,7 +413,16 @@ vsf_err_t vsf_multiplex_i2c_master_request(vsf_multiplex_i2c_t *m_i2c_ptr,
     return result;
 }
 
-uint_fast32_t vsf_multiplex_i2c_get_transferred_count(vsf_multiplex_i2c_t *m_i2c_ptr)
+vsf_err_t vsf_multiplex_i2c_slave_request(vsf_multiplex_i2c_t *m_i2c_ptr,
+                                         bool transmit_or_receive,
+                                         uint_fast16_t count,
+                                         uint8_t *buffer_ptr)
+{
+    VSF_HAL_ASSERT(0);
+    return VSF_ERR_NOT_SUPPORT;
+}
+
+uint_fast16_t vsf_multiplex_i2c_master_get_transferred_count(vsf_multiplex_i2c_t *m_i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
     vsf_multiplexer_i2c_t * const multiplexer = m_i2c_ptr->multiplexer;
@@ -381,12 +436,31 @@ uint_fast32_t vsf_multiplex_i2c_get_transferred_count(vsf_multiplex_i2c_t *m_i2c
         }
     vsf_multiplex_i2c_unprotect(state);
 
-    uint_fast32_t count = 0;
+    uint_fast16_t count = 0;
     if (need) {
-        count = vsf_i2c_get_transferred_count(multiplexer->i2c_ptr);
+        count = vsf_i2c_master_get_transferred_count(multiplexer->i2c_ptr);
     }
 
     return count;
+}
+
+uint_fast16_t vsf_multiplex_i2c_slave_get_transferred_count(vsf_multiplex_i2c_t *m_i2c_ptr)
+{
+    VSF_HAL_ASSERT(NULL != m_i2c_ptr);
+    vsf_multiplexer_i2c_t * const multiplexer = m_i2c_ptr->multiplexer;
+    VSF_HAL_ASSERT(NULL != multiplexer);
+
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
+vsf_err_t vsf_multiplex_i2c_ctrl(vsf_multiplex_i2c_t *m_i2c_ptr, vsf_i2c_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(NULL != m_i2c_ptr);
+    vsf_multiplexer_i2c_t * const multiplexer = m_i2c_ptr->multiplexer;
+    VSF_HAL_ASSERT(NULL != multiplexer);
+
+    return vsf_i2c_ctrl(multiplexer->i2c_ptr, ctrl, param);
 }
 
 vsf_i2c_capability_t vsf_multiplex_i2c_capability(vsf_multiplex_i2c_t *m_i2c_ptr)

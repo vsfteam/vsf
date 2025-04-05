@@ -15,7 +15,6 @@
  *                                                                           *
  ****************************************************************************/
 
-
 /*============================ INCLUDES ======================================*/
 
 #define VSF_I2C_CFG_FUNCTION_RENAME DISABLED
@@ -33,7 +32,7 @@
 
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_I2C_CFG_MULTI_CLASS == ENABLED
+#   if VSF_I2C_CFG_MULTI_CLASS == ENABLED
 
 vsf_err_t vsf_i2c_init(vsf_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)
 {
@@ -107,27 +106,82 @@ vsf_i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr)
     return i2c_ptr->op->capability(i2c_ptr);
 }
 
-vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr,
-                                 uint16_t address,
-                                 vsf_i2c_cmd_t cmd,
-                                 uint16_t count,
+void vsf_i2c_master_fifo_transfer(vsf_i2c_t *i2c_ptr, uint16_t address,
+                                  vsf_i2c_cmd_t cmd, uint_fast16_t count,
+                                  uint8_t       *buffer_ptr,
+                                  vsf_i2c_cmd_t *cur_cmd_ptr,
+                                  uint_fast16_t *offset_ptr)
+{
+    VSF_HAL_ASSERT(i2c_ptr != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op->master_fifo_transfer != NULL);
+
+    i2c_ptr->op->master_fifo_transfer(i2c_ptr, address, cmd, count, buffer_ptr,
+                                      cur_cmd_ptr, offset_ptr);
+}
+
+uint_fast16_t vsf_i2c_slave_fifo_transfer(vsf_i2c_t    *i2c_ptr,
+                                          bool          transmit_or_receive,
+                                          uint_fast16_t count,
+                                          uint8_t      *buffer_ptr)
+{
+    VSF_HAL_ASSERT(i2c_ptr != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op->slave_fifo_transfer != NULL);
+
+    return i2c_ptr->op->slave_fifo_transfer(i2c_ptr, transmit_or_receive, count,
+                                            buffer_ptr);
+}
+
+vsf_err_t vsf_i2c_master_request(vsf_i2c_t *i2c_ptr, uint16_t address,
+                                 vsf_i2c_cmd_t cmd, uint_fast16_t count,
                                  uint8_t *buffer_ptr)
 {
     VSF_HAL_ASSERT(i2c_ptr != NULL);
     VSF_HAL_ASSERT(i2c_ptr->op != NULL);
     VSF_HAL_ASSERT(i2c_ptr->op->master_request != NULL);
 
-    return i2c_ptr->op->master_request(i2c_ptr, address, cmd, count, buffer_ptr);
+    return i2c_ptr->op->master_request(i2c_ptr, address, cmd, count,
+                                       buffer_ptr);
 }
 
-uint_fast32_t vsf_i2c_get_transferred_count(vsf_i2c_t *i2c_ptr)
+vsf_err_t vsf_i2c_slave_request(vsf_i2c_t *i2c_ptr, bool transmit_or_receive,
+                                uint_fast16_t count, uint8_t *buffer_ptr)
 {
     VSF_HAL_ASSERT(i2c_ptr != NULL);
     VSF_HAL_ASSERT(i2c_ptr->op != NULL);
-    VSF_HAL_ASSERT(i2c_ptr->op->get_transferred_count!= NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op->slave_request != NULL);
 
-    return i2c_ptr->op->get_transferred_count(i2c_ptr);
+    return i2c_ptr->op->slave_request(i2c_ptr, transmit_or_receive, count,
+                                      buffer_ptr);
 }
 
-#endif /* VSF_I2C_CFG_MULTI_CLASS == ENABLED */
-#endif /* VSF_HAL_USE_I2C == ENABLED */
+uint_fast32_t vsf_i2c_master_get_transferred_count(vsf_i2c_t *i2c_ptr)
+{
+    VSF_HAL_ASSERT(i2c_ptr != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op->master_get_transferred_count != NULL);
+
+    return i2c_ptr->op->master_get_transferred_count(i2c_ptr);
+}
+
+uint_fast32_t vsf_i2c_slave_get_transferred_count(vsf_i2c_t *i2c_ptr)
+{
+    VSF_HAL_ASSERT(i2c_ptr != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op->slave_get_transferred_count != NULL);
+
+    return i2c_ptr->op->slave_get_transferred_count(i2c_ptr);
+}
+
+vsf_err_t vsf_i2c_ctrl(vsf_i2c_t *i2c_ptr, vsf_i2c_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(i2c_ptr != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op->ctrl != NULL);
+
+    return i2c_ptr->op->ctrl(i2c_ptr, ctrl, param);
+}
+
+#   endif /* VSF_I2C_CFG_MULTI_CLASS == ENABLED */
+#endif    /* VSF_HAL_USE_I2C == ENABLED */

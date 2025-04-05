@@ -159,12 +159,6 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
     VSF_UNUSED_PARAM(Size);
 }
 
-VSF_CAL_WEAK(HAL_USART_TxRxCpltCallback)
-void HAL_USART_TxRxCpltCallback(USART_HandleTypeDef *huart)
-{
-    VSF_UNUSED_PARAM(huart);
-}
-
 VSF_CAL_WEAK(HAL_UARTEx_WakeupCallback)
 void HAL_UARTEx_WakeupCallback(UART_HandleTypeDef *huart)
 {
@@ -512,7 +506,7 @@ HAL_StatusTypeDef HAL_UART_RegisterRxEventCallback(
         return HAL_ERROR;
     }
 
-    __HAL_LOCK(huart);
+    VSF_STHAL_LOCK(huart);
     if (huart->gState == HAL_UART_STATE_READY) {
         huart->RxEventCallback = pCallback;
     } else {
@@ -520,14 +514,14 @@ HAL_StatusTypeDef HAL_UART_RegisterRxEventCallback(
         status = HAL_ERROR;
     }
 
-    __HAL_UNLOCK(huart);
+    VSF_STHAL_UNLOCK(huart);
     return status;
 }
 
 HAL_StatusTypeDef HAL_UART_UnRegisterRxEventCallback(UART_HandleTypeDef *huart)
 {
     HAL_StatusTypeDef status = HAL_OK;
-    __HAL_LOCK(huart);
+    VSF_STHAL_LOCK(huart);
     if (huart->gState == HAL_UART_STATE_READY) {
         huart->RxEventCallback = HAL_UARTEx_RxEventCallback;
     } else {
@@ -535,7 +529,7 @@ HAL_StatusTypeDef HAL_UART_UnRegisterRxEventCallback(UART_HandleTypeDef *huart)
         status = HAL_ERROR;
     }
 
-    __HAL_UNLOCK(huart);
+    VSF_STHAL_UNLOCK(huart);
     return status;
 }
 #        endif

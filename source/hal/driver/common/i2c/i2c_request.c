@@ -61,8 +61,8 @@ void vsf_i2c_request_irq_handler(vsf_i2c_t *i2c_ptr,
     vsf_i2c_cfg_t *cfg = &i2c_request_ptr->cfg;
     uint32_t cur_interrupt_mask = 0;
 
-    if (interrupt_mask & VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT) {
-        cur_interrupt_mask |= VSF_I2C_IRQ_MASK_MASTER_NACK_DETECT;
+    if (interrupt_mask & VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT) {
+        cur_interrupt_mask |= VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT;
     } else {
         if (++i2c_request_ptr->idx <= i2c_request_ptr->count) {
             vsf_i2c_cmd_t temp_cmd = i2c_request_ptr->cmd & ~(VSF_I2C_CMD_START | VSF_I2C_CMD_RESTART);

@@ -32,22 +32,22 @@
 
 HAL_StatusTypeDef HAL_ADC_Init(ADC_HandleTypeDef *hadc)
 {
-    HAL_StatusTypeDef tmp_hal_status = HAL_OK;
+    HAL_StatusTypeDef status = HAL_OK;
     if (hadc == NULL) {
         return HAL_ERROR;
     }
 
-    return tmp_hal_status;
+    return status;
 }
 
 HAL_StatusTypeDef HAL_ADC_DeInit(ADC_HandleTypeDef *hadc)
 {
-    HAL_StatusTypeDef tmp_hal_status = HAL_OK;
+    HAL_StatusTypeDef status = HAL_OK;
     if (hadc == NULL) {
         return HAL_ERROR;
     }
 
-    return tmp_hal_status;
+    return status;
 }
 
 #    if (USE_HAL_ADC_REGISTER_CALLBACKS == 1)

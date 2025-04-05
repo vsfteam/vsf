@@ -52,17 +52,8 @@ extern "C" {
 #define GPIO_MODE_OUTPUT_PP VSF_GPIO_OUTPUT_PUSH_PULL
 #define GPIO_MODE_OUTPUT_OD VSF_GPIO_OUTPUT_OPEN_DRAIN
 
-#ifdef VSF_GPIO_AF_PUSH_PULL
-#    define GPIO_MODE_AF_PP VSF_GPIO_AF_PUSH_PULL
-#else
-#    define GPIO_MODE_AF_PP VSF_GPIO_AF
-#endif
-
-#ifdef VSF_GPIO_AF_OPEN_DRAIN
-#    define GPIO_MODE_AF_OD VSF_GPIO_AF_OPEN_DRAIN
-#else
-#    define GPIO_MODE_AF_OD VSF_GPIO_AF
-#endif
+#define GPIO_MODE_AF_PP VSF_GPIO_AF_PUSH_PULL
+#define GPIO_MODE_AF_OD VSF_GPIO_AF_OPEN_DRAIN
 
 #define GPIO_MODE_ANALOG VSF_GPIO_ANALOG
 
@@ -108,7 +99,7 @@ extern "C" {
 
 typedef vsf_gpio_t GPIO_TypeDef;
 
-typedef struct {
+typedef struct GPIO_InitTypeDef {
     uint32_t Pin;
     uint32_t Mode;
     uint32_t Pull;

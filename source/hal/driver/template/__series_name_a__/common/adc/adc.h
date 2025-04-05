@@ -24,6 +24,13 @@
 
 #if VSF_HAL_USE_ADC == ENABLED
 
+// HW/IPCore
+/**
+ * \note When vsf_peripheral_status_t is inherited, vsf_template_hal_driver.h needs to be included
+ */
+#include "hal/driver/common/template/vsf_template_hal_driver.h"
+// HW/IPCore end
+
 #include "../../__device.h"
 
 /*\note Refer to template/README.md for usage cases.
@@ -61,6 +68,25 @@ extern "C" {
 #endif
 // IPCore end
 
+// HW
+/*\note hw ADC driver can reimplement following types:
+ *      To enable reimplementation, please enable macro below:
+ *          VSF_ADC_CFG_REIMPLEMENT_TYPE_MODE for vsf_adc_mode_t
+ *          VSF_ADC_CFG_REIMPLEMENT_TYPE_STATUS for vsf_adc_status_t
+ *          VSF_ADC_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_adc_irq_mask_t
+ *          VSF_ADC_CFG_REIMPLEMENT_TYPE_CFG for vsf_adc_cfg_t
+ *          VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_adc_capability_t
+ *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
+ *      *** DO NOT reimplement these in emulated drivers. ***
+ */
+
+#define VSF_ADC_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
+#define VSF_ADC_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
+#define VSF_ADC_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
+#define VSF_ADC_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
+// HW end
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -83,6 +109,71 @@ vsf_class(vsf_${adc_ip}_adc_t) {
     )
 };
 // IPCore end
+
+// HW/IPCore, not for emulated drivers
+
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_MODE == ENABLED
+typedef enum vsf_adc_mode_t {
+    VSF_ADC_REF_VDD_1               = (0 << 0),
+    VSF_ADC_REF_VDD_1_2             = (1 << 0),
+    VSF_ADC_REF_VDD_1_3             = (2 << 0),
+    VSF_ADC_REF_VDD_1_4             = (3 << 0),
+    VSF_ADC_DATA_ALIGN_RIGHT        = (0 << 2),
+    VSF_ADC_DATA_ALIGN_LEFT         = (1 << 2),
+    VSF_ADC_SCAN_CONV_SINGLE_MODE   = (0 << 3),
+    VSF_ADC_SCAN_CONV_SEQUENCE_MODE = (1 << 3),
+    VSF_ADC_EXTERN_TRIGGER_0        = (0 << 4),
+    VSF_ADC_EXTERN_TRIGGER_1        = (1 << 4),
+    VSF_ADC_EXTERN_TRIGGER_2        = (2 << 4),
+} vsf_adc_mode_t;
+#endif
+
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_IRQ_MASK == ENABLED
+typedef enum vsf_adc_irq_mask_t {
+    VSF_ADC_IRQ_MASK_CPL = (0x1ul << 0),
+} vsf_adc_irq_mask_t;
+#endif
+
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_STATUS == ENABLED
+typedef struct vsf_adc_status_t {
+    union {
+        inherit(vsf_peripheral_status_t)
+        struct {
+            uint32_t is_busy : 1;
+        };
+        uint32_t value;
+    };
+} vsf_adc_status_t;
+#endif
+
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
+typedef struct vsf_adc_t vsf_adc_t;
+typedef void vsf_adc_isr_handler_t(void *target_ptr,
+                                   vsf_adc_t *adc_ptr,
+                                   vsf_adc_irq_mask_t irq_mask);
+typedef struct vsf_adc_isr_t {
+    vsf_adc_isr_handler_t  *handler_fn;
+    void                   *target_ptr;
+    vsf_arch_prio_t         prio;
+} vsf_adc_isr_t;
+typedef struct vsf_adc_cfg_t {
+    vsf_adc_mode_t  mode;
+    vsf_adc_isr_t   isr;
+    uint32_t        clock_hz;
+} vsf_adc_cfg_t;
+#endif
+
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED
+typedef struct vsf_adc_capability_t {
+#if VSF_ADC_CFG_INHERIT_HAL_CAPABILITY == ENABLED
+    inherit(vsf_peripheral_capability_t)
+#endif
+    vsf_adc_irq_mask_t irq_mask;
+    uint8_t max_data_bits;
+    uint8_t channel_count;
+} vsf_adc_capability_t;
+#endif
+// HW/IPCore end
 
 /*============================ INCLUDES ======================================*/
 

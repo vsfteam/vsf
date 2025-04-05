@@ -15,7 +15,6 @@
  *                                                                           *
  ****************************************************************************/
 
-
 /*============================ INCLUDES ======================================*/
 
 #define VSF_TIMER_CFG_FUNCTION_RENAME DISABLED
@@ -33,7 +32,7 @@
 
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_TIMER_CFG_MULTI_CLASS == ENABLED
+#    if VSF_TIMER_CFG_MULTI_CLASS == ENABLED
 
 vsf_err_t vsf_timer_init(vsf_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr)
 {
@@ -79,13 +78,23 @@ void vsf_timer_irq_enable(vsf_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask)
     timer_ptr->op->irq_enable(timer_ptr, irq_mask);
 }
 
-void vsf_timer_irq_disable(vsf_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask)
+void vsf_timer_irq_disable(vsf_timer_t         *timer_ptr,
+                           vsf_timer_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(timer_ptr != NULL);
     VSF_HAL_ASSERT(timer_ptr->op != NULL);
     VSF_HAL_ASSERT(timer_ptr->op->irq_disable != NULL);
 
     timer_ptr->op->irq_disable(timer_ptr, irq_mask);
+}
+
+vsf_timer_status_t vsf_timer_status(vsf_timer_t *timer_ptr)
+{
+    VSF_HAL_ASSERT(timer_ptr != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->status != NULL);
+
+    return timer_ptr->op->status(timer_ptr);
 }
 
 vsf_timer_capability_t vsf_timer_capability(vsf_timer_t *timer_ptr)
@@ -101,19 +110,57 @@ vsf_err_t vsf_timer_set_period(vsf_timer_t *timer_ptr, uint32_t period)
 {
     VSF_HAL_ASSERT(NULL != timer_ptr);
     VSF_HAL_ASSERT(timer_ptr->op != NULL);
-    VSF_HAL_ASSERT(timer_ptr->op->pwm_set != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->set_period != NULL);
 
     return timer_ptr->op->set_period(timer_ptr, period);
 }
 
-vsf_err_t vsf_timer_pwm_set(vsf_timer_t *timer_ptr, uint8_t channel, uint32_t period, uint32_t pulse)
+vsf_err_t vsf_timer_ctrl(vsf_timer_t *timer_ptr, vsf_timer_ctrl_t ctrl, void *param)
 {
     VSF_HAL_ASSERT(NULL != timer_ptr);
     VSF_HAL_ASSERT(timer_ptr->op != NULL);
-    VSF_HAL_ASSERT(timer_ptr->op->pwm_set != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->ctrl != NULL);
 
-    return timer_ptr->op->pwm_set(timer_ptr, channel, period, pulse);
+    return timer_ptr->op->ctrl(timer_ptr, ctrl, param);
 }
 
-#endif /* VSF_TIMER_CFG_MULTI_CLASS == ENABLED */
-#endif /* VSF_HAL_USE_TIMER == ENABLED */
+vsf_err_t vsf_timer_channel_config(vsf_timer_t *timer_ptr, uint8_t channel,
+                                   vsf_timer_channel_cfg_t *channel_ptr)
+{
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+    VSF_HAL_ASSERT(timer_ptr->op != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->channel_config != NULL);
+
+    return timer_ptr->op->channel_config(timer_ptr, channel, channel_ptr);
+}
+
+vsf_err_t vsf_timer_channel_start(vsf_timer_t *timer_ptr, uint8_t channel)
+{
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+    VSF_HAL_ASSERT(timer_ptr->op != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->channel_start != NULL);
+
+    return timer_ptr->op->channel_start(timer_ptr, channel);
+}
+
+vsf_err_t vsf_timer_channel_stop(vsf_timer_t *timer_ptr, uint8_t channel)
+{
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+    VSF_HAL_ASSERT(timer_ptr->op != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->channel_stop != NULL);
+
+    return timer_ptr->op->channel_stop(timer_ptr, channel);
+}
+
+vsf_err_t vsf_timer_channel_ctrl(vsf_timer_t *timer_ptr, uint8_t channel,
+                                 vsf_timer_channel_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+    VSF_HAL_ASSERT(timer_ptr->op != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->channel_ctrl != NULL);
+
+    return timer_ptr->op->channel_ctrl(timer_ptr, channel, ctrl, param);
+}
+
+#    endif /* VSF_TIMER_CFG_MULTI_CLASS == ENABLED */
+#endif     /* VSF_HAL_USE_TIMER == ENABLED */

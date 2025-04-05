@@ -128,7 +128,7 @@ vsf_rng_capability_t VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_capability)(
 #define VSF_RNG_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_t)                                \
         VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng, __IDX) = {                   \
-        .reg                = VSF_MCONNECT(VSF_RNG_CFG_IMP_UPCASE_PREFIX, _RNG, __IDX,_REG_),\
+        .reg                = VSF_MCONNECT(VSF_RNG_CFG_IMP_UPCASE_PREFIX, _RNG, __IDX, _REG),\
         __HAL_OP                                                                \
     };                                                                          \
     VSF_CAL_ROOT void VSF_MCONNECT(VSF_RNG_CFG_IMP_UPCASE_PREFIX, _RNG, __IDX, _IRQHandler)(void)\

@@ -29,7 +29,14 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-// application code can redefine it
+/**
+ * \~english
+ * @brief Application code can redefine this prefix to specify a 
+ * different driver implementation.
+ *
+ * \~chinese
+ * @brief 应用代码可以重新定义此前缀以指定不同的驱动实现。
+ */
 #ifndef VSF_PM_CFG_PREFIX
 #   if defined(VSF_HW_PM_COUNT) && (VSF_HW_PM_COUNT != 0)
 #       define VSF_PM_CFG_PREFIX                    vsf_hw
@@ -40,102 +47,270 @@ extern "C" {
 
 #define __PM_DIV_(_N, _D)     VSF ## _D ## DIV_ ## _N = (_N),
 
+/**
+ * \~english
+ * @brief Enable PLL (Phase-Locked Loop) support by default.
+ *
+ * \~chinese
+ * @brief 默认启用 PLL（锁相环）支持。
+ */
 #ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_PLL
 #   define VSF_HAL_DRV_PM_CFG_SUPPORT_PLL           ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable LPOSC (Low Power Oscillator) support by default.
+ *
+ * \~chinese
+ * @brief 默认启用 LPOSC（低功耗振荡器）支持。
+ */
 #ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_LPOSC
 #   define VSF_HAL_DRV_PM_CFG_SUPPORT_LPOSC         ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable clock output support by default.
+ *
+ * \~chinese
+ * @brief 默认启用时钟输出支持。
+ */
 #ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_CLK_OUT
 #   define VSF_HAL_DRV_PM_CFG_SUPPORT_CLK_OUT       ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable peripheral clock (PCLK) support by default.
+ *
+ * \~chinese
+ * @brief 默认启用外设时钟（PCLK）支持。
+ */
 #ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_PCLK
 #   define VSF_HAL_DRV_PM_CFG_SUPPORT_PCLK          ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable system clock (SCLK) support by default.
+ *
+ * \~chinese
+ * @brief 默认启用系统时钟（SCLK）支持。
+ */
 #ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_SCLK
 #   define VSF_HAL_DRV_PM_CFG_SUPPORT_SCLK          ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable power control support by default.
+ *
+ * \~chinese
+ * @brief 默认启用电源控制支持。
+ */
 #ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_PWR_CTRL
 #   define VSF_HAL_DRV_PM_CFG_SUPPORT_PWR_CTRL      ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable sleep control support by default.
+ *
+ * \~chinese
+ * @brief 默认启用睡眠控制支持。
+ */
 #ifndef VSF_HAL_DRV_PM_CFG_SUPPORT_SLEEP_CTRL
 #   define VSF_HAL_DRV_PM_CFG_SUPPORT_SLEEP_CTRL    ENABLED
 #endif
 
 /********************* REIMPLEMENT ***************************/
 
+/**
+ * \~english
+ * @brief Enable to reimplement power number type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现电源编号类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_POWER_NUMBER
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_POWER_NUMBER      DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable to reimplement power number mask type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现电源编号掩码类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_POWER_NUMBER_MASK
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_POWER_NUMBER_MASK DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable to reimplement sleep mode type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现睡眠模式类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_SLEEP_MODE
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_SLEEP_MODE        DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable to reimplement peripheral clock number type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现外设时钟编号类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_PCLK_NUMBER
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_PCLK_NUMBER       DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable to reimplement peripheral clock configuration type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现外设时钟配置类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_PCLK_CFG
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_PCLK_CFG          DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable to reimplement system clock number type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现系统时钟编号类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_NUMBER
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_NUMBER       DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable to reimplement system clock number mask type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现系统时钟编号掩码类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_NUMBER_MASK
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_NUMBER_MASK  DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable to reimplement system clock selection type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现系统时钟选择类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_SEL
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_SEL          DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable to reimplement system clock division type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现系统时钟分频类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_DIV
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_SCLK_DIV          DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable to reimplement main clock configuration type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现主时钟配置类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_CFG
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_CFG          DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable to reimplement main clock number type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现主时钟编号类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_NO
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_MCLK_NO           DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable to reimplement PLL selection type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现PLL选择类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_PLL_SEL
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_PLL_SEL           DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable to reimplement PLL configuration type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现PLL配置类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_PLL_CFG
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_PLL_CFG           DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable to reimplement post division type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现后分频类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_POST_DIV
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_POST_DIV          DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable to reimplement low power oscillator selection type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现低功耗振荡器选择类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_LPOSC_SEL
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_LPOSC_SEL         DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable to reimplement clock output configuration type in specific hardware drivers.
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现时钟输出配置类型。
+ */
 #ifndef VSF_PM_CFG_REIMPLEMENT_TYPE_CLOCK_OUT_CFG
 #   define VSF_PM_CFG_REIMPLEMENT_TYPE_CLOCK_OUT_CFG     DISABLED
 #endif
 
-#ifndef VSF_PM_CFG_INHERT_HAL_CAPABILITY
-#   define VSF_PM_CFG_INHERT_HAL_CAPABILITY       ENABLED
+/**
+ * \~english
+ * @brief Enable to inherit HAL capability in PM capability structure.
+ *
+ * \~chinese
+ * @brief 启用在PM能力结构中继承HAL能力。
+ */
+#ifndef VSF_PM_CFG_INHERIT_HAL_CAPABILITY
+#   define VSF_PM_CFG_INHERIT_HAL_CAPABILITY       ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -424,7 +599,7 @@ typedef struct vsf_pm_clock_out_cfg_t {
 #endif
 
 typedef struct vsf_pm_capability_t {
-#if VSF_PM_CFG_INHERT_HAL_CAPABILITY == ENABLED
+#if VSF_PM_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
 } vsf_pm_capability_t;

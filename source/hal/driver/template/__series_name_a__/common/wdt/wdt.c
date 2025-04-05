@@ -122,12 +122,12 @@ vsf_wdt_capability_t VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_capability)(
     VSF_HAL_ASSERT(wdt_ptr != NULL);
 
     return (vsf_wdt_capability_t) {
-        .support_early_wakeup = 1;
-        .support_reset_none   = 1;
-        .support_reset_core   = 1;
-        .support_reset_soc    = 1;
-        .support_disable      = 1;
-        .max_timeout_ms       = 100 * 1000
+        .support_early_wakeup = 1,
+        .support_reset_none   = 1,
+        .support_reset_cpu   = 1,
+        .support_reset_soc    = 1,
+        .support_disable      = 1,
+        .max_timeout_ms       = 100 * 1000,
     };
 }
 
@@ -142,10 +142,9 @@ static void VSF_MCONNECT(__, VSF_WDT_CFG_IMP_PREFIX, _wdt_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != wdt_ptr);
 
-    vsf_wdt_irq_mask_t irq_mask = GET_IRQ_MASK(wdt_ptr);
     vsf_wdt_isr_t *isr_ptr = &wdt_ptr->isr;
-    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_wdt_t *)wdt_ptr, irq_mask);
+    if (isr_ptr->handler_fn != NULL) {
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_wdt_t *)wdt_ptr);
     }
 }
 // HW end
@@ -157,10 +156,11 @@ static void VSF_MCONNECT(__, VSF_WDT_CFG_IMP_PREFIX, _wdt_irqhandler)(
  */
 
 // HW
+#define VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
 #define VSF_WDT_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t)                                \
         VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt, __IDX) = {                   \
-        .reg                = VSF_MCONNECT(VSF_WDT_CFG_IMP_UPCASE_PREFIX, _WDT, __IDX,_REG_),\
+        .reg                = VSF_MCONNECT(VSF_WDT_CFG_IMP_UPCASE_PREFIX, _WDT, __IDX,_REG),\
         __HAL_OP                                                                \
     };                                                                          \
     VSF_CAL_ROOT void VSF_MCONNECT(VSF_WDT_CFG_IMP_UPCASE_PREFIX, _WDT, __IDX, _IRQHandler)(void)\

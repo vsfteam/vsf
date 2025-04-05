@@ -61,6 +61,26 @@ extern "C" {
 #endif
 // IPCore end
 
+// HW
+/** \note hw RTC driver can reimplement following types:
+ *      To enable reimplementation, please enable macro below:
+ *          VSF_RTC_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_rtc_irq_mask_t
+ *          VSF_RTC_CFG_REIMPLEMENT_TYPE_CFG for vsf_rtc_cfg_t
+ *          VSF_RTC_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_rtc_capability_t
+ *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
+ *      *** DO NOT reimplement these in emulated drivers. ***
+ */
+
+#define VSF_RTC_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
+#define VSF_RTC_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_RTC_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
+
+/**
+ * \note VSF_RTC_CFG_TIME_TYPE can be implemented for hw drivers.
+ */
+#define VSF_RTC_CFG_TIME_TYPE                     uint64_t
+// HW end
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -83,6 +103,39 @@ vsf_class(vsf_${rtc_ip}_rtc_t) {
     )
 };
 // IPCore end
+
+// HW/IPCore, not for emulated drivers
+#if VSF_RTC_CFG_REIMPLEMENT_TYPE_IRQ_MASK == ENABLED
+typedef enum vsf_rtc_irq_mask_t {
+    VSF_RTC_IRQ_MASK_ALARM = (0x1ul << 0),
+
+    // more vendor-specific irq mask
+} vsf_rtc_irq_mask_t;
+#endif
+
+#if VSF_RTC_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
+typedef struct vsf_rtc_t vsf_rtc_t;
+typedef void vsf_rtc_isr_handler_t(void *target_ptr, vsf_rtc_t *rtc_ptr, vsf_rtc_irq_mask_t irq_mask);
+typedef struct vsf_rtc_isr_t {
+    vsf_rtc_isr_handler_t *handler_fn;
+    void *target_ptr;
+    vsf_arch_prio_t prio;
+} vsf_rtc_isr_t;
+typedef struct vsf_rtc_cfg_t {
+    vsf_rtc_isr_t isr;
+} vsf_rtc_cfg_t;
+#endif
+
+#if VSF_RTC_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED
+typedef struct vsf_rtc_capability_t {
+#if VSF_RTC_CFG_INHERIT_HAL_CAPABILITY == ENABLED
+    inherit(vsf_peripheral_capability_t)
+#endif
+    vsf_rtc_irq_mask_t irq_mask;
+} vsf_rtc_capability_t;
+#endif
+
+// HW/IPCore end
 
 /*============================ INCLUDES ======================================*/
 

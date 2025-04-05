@@ -448,7 +448,7 @@ vsf_err_t vsf_hw_spi_cancel_transfer(vsf_hw_spi_t *hw_spi_ptr)
     return VSF_ERR_NOT_SUPPORT;
 }
 
-void vsf_hw_spi_cs_active(vsf_hw_spi_t *hw_spi_ptr, uint_fast8_t index)
+vsf_err_t vsf_hw_spi_cs_active(vsf_hw_spi_t *hw_spi_ptr, uint_fast8_t index)
 {
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
     const vsf_hw_spi_const_t *spi_const = hw_spi_ptr->spi_const;
@@ -457,9 +457,11 @@ void vsf_hw_spi_cs_active(vsf_hw_spi_t *hw_spi_ptr, uint_fast8_t index)
     VSF_HAL_ASSERT(reg != NULL);
 
     reg->CR[0] &= ~(1 << 8);
+
+    return VSF_ERR_NONE;
 }
 
-void vsf_hw_spi_cs_inactive(vsf_hw_spi_t *hw_spi_ptr, uint_fast8_t index)
+vsf_err_t vsf_hw_spi_cs_inactive(vsf_hw_spi_t *hw_spi_ptr, uint_fast8_t index)
 {
     VSF_HAL_ASSERT(hw_spi_ptr != NULL);
     const vsf_hw_spi_const_t *spi_const = hw_spi_ptr->spi_const;
@@ -468,6 +470,8 @@ void vsf_hw_spi_cs_inactive(vsf_hw_spi_t *hw_spi_ptr, uint_fast8_t index)
     VSF_HAL_ASSERT(reg != NULL);
 
     reg->CR[0] |= (1 << 8);
+
+    return VSF_ERR_NONE;
 }
 
 vsf_spi_status_t vsf_hw_spi_status(vsf_hw_spi_t *hw_spi_ptr)

@@ -93,17 +93,51 @@ vsf_i2c_capability_t vsf_remapped_i2c_capability(vsf_remapped_i2c_t *i2c)
     return vsf_i2c_capability(i2c->target);
 }
 
+void vsf_remapped_i2c_master_fifo_transfer(vsf_remapped_i2c_t *i2c,
+        uint16_t address, vsf_i2c_cmd_t cmd, uint_fast16_t count, uint8_t *buffer,
+        vsf_i2c_cmd_t *cur_cmd_ptr, uint_fast16_t *offset_ptr)
+{
+    VSF_HAL_ASSERT((i2c != NULL) && (i2c->target != NULL));
+    vsf_i2c_master_fifo_transfer(i2c->target, address, cmd, count, buffer, cur_cmd_ptr, offset_ptr);
+}
+
+uint_fast16_t vsf_remapped_i2c_slave_fifo_transfer(vsf_remapped_i2c_t *i2c,
+        bool transmit_or_receive, uint_fast16_t count, uint8_t *buffer)
+{
+    VSF_HAL_ASSERT((i2c != NULL) && (i2c->target != NULL));
+    return vsf_i2c_slave_fifo_transfer(i2c->target, transmit_or_receive, count, buffer);
+}
+
 vsf_err_t vsf_remapped_i2c_master_request(vsf_remapped_i2c_t *i2c,
-        uint16_t address, vsf_i2c_cmd_t cmd, uint16_t count, uint8_t *buffer)
+        uint16_t address, vsf_i2c_cmd_t cmd, uint_fast16_t count, uint8_t *buffer)
 {
     VSF_HAL_ASSERT((i2c != NULL) && (i2c->target != NULL));
     return vsf_i2c_master_request(i2c->target, address, cmd, count, buffer);
 }
 
-uint_fast32_t vsf_remapped_i2c_get_transferred_count(vsf_remapped_i2c_t *i2c)
+vsf_err_t vsf_remapped_i2c_slave_request(vsf_remapped_i2c_t *i2c,
+        bool transmit_or_receive, uint_fast16_t count, uint8_t *buffer)
 {
     VSF_HAL_ASSERT((i2c != NULL) && (i2c->target != NULL));
-    return vsf_i2c_get_transferred_count(i2c->target);
+    return vsf_i2c_slave_request(i2c->target, transmit_or_receive, count, buffer);
+}
+
+uint_fast32_t vsf_remapped_i2c_master_get_transferred_count(vsf_remapped_i2c_t *i2c)
+{
+    VSF_HAL_ASSERT((i2c != NULL) && (i2c->target != NULL));
+    return vsf_i2c_master_get_transferred_count(i2c->target);
+}
+
+uint_fast32_t vsf_remapped_i2c_slave_get_transferred_count(vsf_remapped_i2c_t *i2c)
+{
+    VSF_HAL_ASSERT((i2c != NULL) && (i2c->target != NULL));
+    return vsf_i2c_slave_get_transferred_count(i2c->target);
+}
+
+vsf_err_t vsf_remapped_i2c_ctrl(vsf_remapped_i2c_t *i2c, vsf_i2c_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT((i2c != NULL) && (i2c->target != NULL));
+    return vsf_i2c_ctrl(i2c->target, ctrl, param);
 }
 
 #endif

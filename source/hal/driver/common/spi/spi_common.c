@@ -15,7 +15,6 @@
  *                                                                           *
  ****************************************************************************/
 
-
 /*============================ INCLUDES ======================================*/
 
 #define VSF_SPI_CFG_FUNCTION_RENAME DISABLED
@@ -33,7 +32,7 @@
 
 /*============================ IMPLEMENTATION ================================*/
 
-#if VSF_SPI_CFG_MULTI_CLASS == ENABLED
+#   if VSF_SPI_CFG_MULTI_CLASS == ENABLED
 
 vsf_err_t vsf_spi_init(vsf_spi_t *spi_ptr, vsf_spi_cfg_t *cfg_ptr)
 {
@@ -98,39 +97,34 @@ vsf_spi_status_t vsf_spi_status(vsf_spi_t *spi_ptr)
     return spi_ptr->op->status(spi_ptr);
 }
 
-void vsf_spi_cs_active(vsf_spi_t *spi_ptr, uint_fast8_t index)
+vsf_err_t vsf_spi_cs_active(vsf_spi_t *spi_ptr, uint_fast8_t index)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->op != NULL);
     VSF_HAL_ASSERT(spi_ptr->op->cs_active != NULL);
 
-    spi_ptr->op->cs_active(spi_ptr, index);
+    return spi_ptr->op->cs_active(spi_ptr, index);
 }
 
-void vsf_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index)
+vsf_err_t vsf_spi_cs_inactive(vsf_spi_t *spi_ptr, uint_fast8_t index)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->op != NULL);
     VSF_HAL_ASSERT(spi_ptr->op->cs_inactive != NULL);
 
-    spi_ptr->op->cs_inactive(spi_ptr, index);
+    return spi_ptr->op->cs_inactive(spi_ptr, index);
 }
 
-void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr,
-                           void *out_buffer_ptr,
-                           uint_fast32_t* out_offset_ptr,
-                           void *in_buffer_ptr,
-                           uint_fast32_t* in_offset_ptr,
-                           uint_fast32_t cnt)
+void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr,
+                           uint_fast32_t *out_offset_ptr, void *in_buffer_ptr,
+                           uint_fast32_t *in_offset_ptr, uint_fast32_t cnt)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->op != NULL);
     VSF_HAL_ASSERT(spi_ptr->op->fifo_transfer != NULL);
 
-    spi_ptr->op->fifo_transfer(spi_ptr,
-                               out_buffer_ptr, out_offset_ptr,
-                               in_buffer_ptr, in_offset_ptr,
-                               cnt);
+    spi_ptr->op->fifo_transfer(spi_ptr, out_buffer_ptr, out_offset_ptr,
+                               in_buffer_ptr, in_offset_ptr, cnt);
 }
 
 vsf_err_t vsf_spi_request_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr,
@@ -140,8 +134,8 @@ vsf_err_t vsf_spi_request_transfer(vsf_spi_t *spi_ptr, void *out_buffer_ptr,
     VSF_HAL_ASSERT(spi_ptr->op != NULL);
     VSF_HAL_ASSERT(spi_ptr->op->request_transfer != NULL);
 
-    return spi_ptr->op->request_transfer(spi_ptr, out_buffer_ptr,
-                                         in_buffer_ptr, count);
+    return spi_ptr->op->request_transfer(spi_ptr, out_buffer_ptr, in_buffer_ptr,
+                                         count);
 }
 
 vsf_err_t vsf_spi_cancel_transfer(vsf_spi_t *spi_ptr)
@@ -153,7 +147,8 @@ vsf_err_t vsf_spi_cancel_transfer(vsf_spi_t *spi_ptr)
     return spi_ptr->op->cancel_transfer(spi_ptr);
 }
 
-void vsf_spi_get_transferred_count(vsf_spi_t *spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count)
+void vsf_spi_get_transferred_count(vsf_spi_t *spi_ptr, uint_fast32_t *tx_count,
+                                   uint_fast32_t *rx_count)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
     VSF_HAL_ASSERT(spi_ptr->op != NULL);
@@ -171,5 +166,14 @@ vsf_spi_capability_t vsf_spi_capability(vsf_spi_t *spi_ptr)
     return spi_ptr->op->capability(spi_ptr);
 }
 
-#endif /* VSF_SPI_CFG_MULTI_CLASS == ENABLED */
-#endif /* VSF_HAL_USE_SPI == ENABLED */
+vsf_err_t vsf_spi_ctrl(vsf_spi_t *spi_ptr, vsf_spi_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(spi_ptr != NULL);
+    VSF_HAL_ASSERT(spi_ptr->op != NULL);
+    VSF_HAL_ASSERT(spi_ptr->op->ctrl != NULL);
+
+    return spi_ptr->op->ctrl(spi_ptr, ctrl, param);
+}
+
+#   endif /* VSF_SPI_CFG_MULTI_CLASS == ENABLED */
+#endif    /* VSF_HAL_USE_SPI == ENABLED */
