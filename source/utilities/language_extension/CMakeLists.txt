@@ -5,4 +5,5 @@ vsf_add_sources(
     delegate.c
     simple_sprintf.c
     simple_sscanf.c
+    simple_swprintf.c
 )
