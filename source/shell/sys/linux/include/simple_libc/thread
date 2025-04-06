@@ -3,6 +3,7 @@
 
 #include <unistd.h>
 #include <pthread.h>
+#include <functional>
 
 #include <chrono>
 #include <memory>

@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <thread>
+#include <cmath>
 
 #ifndef __VSF_CPP__
 #   error Please define __VSF_CPP__ to support cpp
