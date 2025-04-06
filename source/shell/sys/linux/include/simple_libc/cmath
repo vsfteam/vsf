@@ -1,7 +1,11 @@
 #include <cstdlib>
+// for compilers
+#include "utilities/vsf_utilities.h"
 
-// for c++, math.h will include cmath, so avoid to include math.h in cmath for c++
-#if !defined(__cplusplus)
+// on some platform, math.h will include cmath in c++,
+//  so avoid to include math.h in cmath for c++ in these platforms listed below
+// 1. GCC
+#if !__IS_COMPILER_GCC__
 #   include <math.h>
 
 // APIs not in math.h
@@ -401,11 +405,14 @@ namespace std {
     using ::erfl;
     using ::erfcl;
 
-// APIs below is MACROs in math.h
-//    using ::fpclassify;
-//    using ::isnan;
-//    using ::isinf;
-//    using ::isfinite;
+// APIs below is MACROs in math.h, so only include when necessary
+// windows xlocnum need this
+#ifdef __WIN__
+    using ::fpclassify;
+    using ::isnan;
+    using ::isinf;
+    using ::isfinite;
+#endif
 
     float hypot(float x, float y, float z);
     double hypot(double x, double y, double z);
