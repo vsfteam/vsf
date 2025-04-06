@@ -233,6 +233,10 @@
 #       define VSF_LINUX_USE_SIMPLE_STDLIB              ENABLED
 #       define VSF_LINUX_USE_SIMPLE_CTYPE               ENABLED
 
+#       define VSF_USE_SIMPLE_SSCANF                    ENABLED
+#       define VSF_USE_SIMPLE_SPRINTF                   ENABLED
+#       define VSF_USE_SIMPLE_SWPRINTF                  ENABLED
+
 #ifndef USRAPP_CFG_LINUX_TTY_DEBUG_STREAM
 #   define USRAPP_CFG_LINUX_TTY_DEBUG_STREAM            0
 #   define USRAPP_CFG_LINUX_TTY_UART                    1
