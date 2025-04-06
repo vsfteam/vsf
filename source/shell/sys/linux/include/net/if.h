@@ -3,6 +3,8 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 #include <linux/sockios.h>
+// for sockaddr
+#include <sys/socket.h>
 
 #define IFNAMSIZ                16
 #define	IFALIASZ                256
