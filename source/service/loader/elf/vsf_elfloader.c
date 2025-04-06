@@ -326,7 +326,7 @@ static int __vsf_elfloader_load_cb(vsf_elfloader_t *elfloader, vsf_loader_target
             if (target->support_xip && ((header->p_flags & PF_W) != 0)) {
                 if (linfo->memstart_xip != (Elf_Word)-1) {
                     uintptr_t offset = header->p_vaddr - (linfo->memstart_xip + linfo->memsz_xip);
-                    if (offset > 4) {
+                    if (offset > 32) {
                         vsf_trace_error("load memory not consequent in space" VSF_TRACE_CFG_LINEEND);
                         return VSF_ELFLOADER_CB_FAIL;
                     }
