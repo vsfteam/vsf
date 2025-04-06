@@ -1,4 +1,4 @@
-// for VSF_ASSERT
+// for VSF_ASSERT and compiler info
 #include "utilities/compiler/compiler.h"
 
 #ifdef __cplusplus
@@ -15,7 +15,8 @@ extern "C" {
 
 // Win SDK xkercheck.h will not be happy if static_assert is a MACRO in c++
 #if !defined(__WIN__) || !defined(__cplusplus)
-#   define _Static_assert(__expr, ...)  VSF_STATIC_ASSERT(__expr)
+// _Static_assert is keyword, not MACRO
+//#   define _Static_assert(__expr, ...)  VSF_STATIC_ASSERT(__expr)
 #   define static_assert                _Static_assert
 #endif
 
