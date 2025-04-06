@@ -5216,6 +5216,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #       define __SIMPLE_LIBC_MATH_VPLT_ONLY__
 #       include "./include/simple_libc/math/math.h"
 #   endif
+#   if VSF_LINUX_APPLET_USE_LIBC_WCHAR == ENABLED
+#       include "./include/simple_libc/wchar.h"
+#   endif
 #else
 #   if VSF_LINUX_APPLET_USE_PTHREAD == ENABLED
 #       include <pthread.h>
@@ -5282,6 +5285,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_unistd_vplt_t vsf_linux_unistd_vplt = {
 #   if VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED
 #       define __SIMPLE_LIBC_MATH_VPLT_ONLY__
 #       include <math/math.h>
+#   endif
+#   if VSF_LINUX_APPLET_USE_LIBC_WCHAR == ENABLED
+#       include <wchar.h>
 #   endif
 #endif
 
@@ -5408,6 +5414,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
 #endif
 #if VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED
     .libc_math_vplt     = (void *)&vsf_linux_libc_math_vplt,
+#endif
+#if VSF_LINUX_APPLET_USE_LIBC_WCHAR == ENABLED
+    .libc_wchar_vplt    = (void *)&vsf_linux_libc_wchar_vplt,
 #endif
 
 #if VSF_LINUX_APPLET_USE_MNTENT == ENABLED

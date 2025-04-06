@@ -391,6 +391,9 @@
 #       if (VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED) && !defined(VSF_LINUX_APPLET_LIBC_MATH_LONG_DOULBE)
 #           define VSF_LINUX_APPLET_LIBC_MATH_LONG_DOULBE   ENABLED
 #       endif
+#       ifndef VSF_LINUX_APPLET_USE_LIBC_WCHAR
+#           define VSF_LINUX_APPLET_USE_LIBC_WCHAR  ENABLED
+#       endif
 #   endif
 
 #   ifndef VSF_LINUX_APPLET_VPLT
@@ -430,6 +433,7 @@ typedef struct vsf_linux_vplt_t {
     void *libc_setjmp_vplt;
     void *libc_assert_vplt;
     void *libc_math_vplt;
+    void *libc_wchar_vplt;
     void *libc_res0_vplt;
     void *libc_res1_vplt;
     void *libc_res2_vplt;
@@ -437,7 +441,6 @@ typedef struct vsf_linux_vplt_t {
     void *libc_res4_vplt;
     void *libc_res5_vplt;
     void *libc_res6_vplt;
-    void *libc_res7_vplt;
 
     // sys
     void *sys_epoll_vplt;

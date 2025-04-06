@@ -42,6 +42,10 @@
 #   define __SIMPLE_LIBC_MATH_VPLT_ONLY__
 #   include "../../include/simple_libc/math/math.h"
 #endif
+#if VSF_LINUX_APPLET_USE_LIBC_WCHAR == ENABLED && !defined(__VSF_APPLET__)
+#   include <wchar.h>
+#   include <wctype.h>
+#endif
 
 #include <resolv.h>
 
@@ -249,6 +253,77 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(floorl),
     VSF_APPLET_VPLT_ENTRY_FUNC(acosl),
     VSF_APPLET_VPLT_ENTRY_FUNC(asinl),
+#endif
+};
+#endif
+
+#if VSF_LINUX_APPLET_USE_LIBC_WCHAR == ENABLED && !defined(__VSF_APPLET__)
+__VSF_VPLT_DECORATOR__ vsf_linux_libc_wchar_vplt_t vsf_linux_libc_wchar_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_linux_libc_wchar_vplt_t, 0, 0, true),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcslen),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcscat),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcsncat),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcschr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcsrchr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcscmp),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcsncmp),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcscoll),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcscpy),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcsncpy),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcsstr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcstok),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(wmemset),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wmemchr),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wmemcmp),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wmemcpy),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wmemmove),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcstol),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcstoll),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcstoull),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcstoul),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcspbrk),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcsspn),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcscspn),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcsxfrm),
+
+    VSF_APPLET_VPLT_ENTRY_FUNC(swprintf),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vswprintf),
+
+    // wctype.h
+    VSF_APPLET_VPLT_ENTRY_FUNC(iswalnum),
+    VSF_APPLET_VPLT_ENTRY_FUNC(iswalpha),
+    VSF_APPLET_VPLT_ENTRY_FUNC(iswlower),
+    VSF_APPLET_VPLT_ENTRY_FUNC(iswupper),
+    VSF_APPLET_VPLT_ENTRY_FUNC(iswdigit),
+    VSF_APPLET_VPLT_ENTRY_FUNC(iswxdigit),
+    VSF_APPLET_VPLT_ENTRY_FUNC(iswcntrl),
+    VSF_APPLET_VPLT_ENTRY_FUNC(iswgraph),
+    VSF_APPLET_VPLT_ENTRY_FUNC(iswspace),
+    VSF_APPLET_VPLT_ENTRY_FUNC(iswblank),
+    VSF_APPLET_VPLT_ENTRY_FUNC(iswprint),
+    VSF_APPLET_VPLT_ENTRY_FUNC(iswpunct),
+    VSF_APPLET_VPLT_ENTRY_FUNC(iswctype),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wctype),
+    VSF_APPLET_VPLT_ENTRY_FUNC(towlower),
+    VSF_APPLET_VPLT_ENTRY_FUNC(towupper),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wctrans),
+    // towctrans will introduce other internal APIs in gcc
+#if !__IS_COMPILER_GCC__
+    VSF_APPLET_VPLT_ENTRY_FUNC(towctrans),
+#endif
+
+    // If APIs below are included, there will conflict with APIs implemented
+    //  when VSF_LINUX_SIMPLE_STDLIB_USE_STRTOXX is set.
+    // TODO: implement these APIs
+#if VSF_LINUX_SIMPLE_STDLIB_USE_STRTOXX != ENABLED
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcstof),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcstod),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcstold),
+    VSF_APPLET_VPLT_ENTRY_FUNC(wcsftime),
 #endif
 };
 #endif
