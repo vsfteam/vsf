@@ -1,7 +1,7 @@
 #include <cstdlib>
 
-// on some platform, math.h depends on cmath, so DO NOT include math.h
-#if 1
+// for c++, math.h will include cmath, so avoid to include math.h in cmath for c++
+#if !defined(__cplusplus)
 #   include <math.h>
 
 // APIs not in math.h
@@ -204,10 +204,6 @@ extern long double remainderl(long double, long double);
 extern long double lgammal(long double);
 extern long double erfl(long double);
 extern long double erfcl(long double);
-
-extern long double hypotl(long double, long double);
-extern long double sqrtl(long double);
-
 }
 #endif
 
@@ -405,13 +401,11 @@ namespace std {
     using ::erfl;
     using ::erfcl;
 
-    using ::hypotl;
-    using ::sqrtl;
-
-    using ::fpclassify;
-    using ::isnan;
-    using ::isinf;
-    using ::isfinite;
+// APIs below is MACROs in math.h
+//    using ::fpclassify;
+//    using ::isnan;
+//    using ::isinf;
+//    using ::isfinite;
 
     float hypot(float x, float y, float z);
     double hypot(double x, double y, double z);
