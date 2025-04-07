@@ -42,6 +42,12 @@
 //#   include "../common/usb/usb.h"
 //#   include "../common/fb/fb.h"
 
+// TODO: vsf_template_usb.h should be included in usb/usb.h
+//  vsf_template_usb.h is included only for compilation
+#if VSF_USE_USB_DEVICE == ENABLED || VSF_USE_USB_HOST == ENABLED
+#   include "hal/driver/common/template/vsf_template_usb.h"
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
