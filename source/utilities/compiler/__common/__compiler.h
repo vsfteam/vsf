@@ -226,6 +226,7 @@ extern "C" {
 #pragma clang diagnostic ignored "-Wnewline-eof"
 #pragma clang diagnostic ignored "-Wduplicate-enum"
 #pragma clang diagnostic ignored "-Wextra-semi"
+#pragma clang diagnostic ignored "-Wunknown-warning-option"
 #pragma clang diagnostic ignored "-Wextra-semi-stmt"
 #pragma clang diagnostic ignored "-Wzero-length-array"
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
