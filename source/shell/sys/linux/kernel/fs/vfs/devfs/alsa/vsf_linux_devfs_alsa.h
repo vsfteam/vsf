@@ -24,6 +24,9 @@
 
 #if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_DEVFS == ENABLED && VSF_LINUX_DEVFS_USE_ALSA == ENABLED && VSF_USE_AUDIO == ENABLED
 
+// for vk_audio_dev_t
+#include "component/vsf_component.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
