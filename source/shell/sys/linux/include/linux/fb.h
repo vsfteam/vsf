@@ -97,7 +97,9 @@ struct fb_fix_screeninfo {
     __u32 visual;
 
     // for vsf only
+#if VSF_USE_UI == ENABLED
     vk_disp_color_type_t __color;
+#endif
 };
 
 struct fb_bitfield {
