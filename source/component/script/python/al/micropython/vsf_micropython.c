@@ -17,6 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
+#define __VSF_LINUX_FS_CLASS_INHERIT__
 #include "component/script/python/vsf_python.h"
 
 #if VSF_USE_MICROPYTHON == ENABLED
