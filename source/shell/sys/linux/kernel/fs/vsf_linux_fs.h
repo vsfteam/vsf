@@ -274,6 +274,7 @@ extern vsf_linux_fd_t * vsf_linux_tx_pipe(vsf_linux_pipe_priv_t *priv_rx);
 
 extern int vsf_linux_fs_bind_buffer(const char *pathname, void *buffer,
         uint_fast32_t feature, uint64_t size);
+extern int vsf_linux_fs_bind_stream(const char *pathname, vsf_stream_t *stream_rx, vsf_stream_t *stream_tx);
 
 #ifdef __cplusplus
 }

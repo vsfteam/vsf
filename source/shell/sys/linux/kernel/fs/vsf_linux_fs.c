@@ -3130,6 +3130,15 @@ void __vsf_linux_rx_stream_drop(vsf_linux_stream_priv_t *priv_rx)
 static void __vsf_linux_stream_init(vsf_linux_fd_t *sfd)
 {
     vsf_linux_stream_priv_t *priv = (vsf_linux_stream_priv_t *)sfd->priv;
+
+    if (priv->file != NULL) {
+        vsf_stream_t **streams = (vsf_stream_t **)(((vk_vfs_file_t *)(priv->file))->f.param);
+        VSF_LINUX_ASSERT(streams != NULL);
+
+        priv->stream_rx = streams[0];
+        priv->stream_tx = streams[1];
+    }
+
     if (priv->stream_rx != NULL) {
         __vsf_linux_rx_stream_init(priv);
     }
@@ -3187,6 +3196,24 @@ vsf_linux_fd_t * vsf_linux_rx_stream(vsf_stream_t *stream)
 vsf_linux_fd_t * vsf_linux_tx_stream(vsf_stream_t *stream)
 {
     return vsf_linux_stream(NULL, stream);
+}
+
+int vsf_linux_fs_bind_stream(const char *pathname, vsf_stream_t *stream_rx, vsf_stream_t *stream_tx)
+{
+    vsf_stream_t **stream_ctx = vsf_linux_malloc_res(2 * sizeof(vsf_stream_t *));
+    if (NULL == stream_ctx) {
+        return -1;
+    }
+
+    stream_ctx[0] = stream_rx;
+    stream_ctx[1] = stream_tx;
+    int result = vsf_linux_fs_bind_target_ex(pathname, stream_ctx, &__vsf_linux_stream_fdop,
+                NULL, NULL,
+                VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
+    if (result) {
+        vsf_linux_free_res(stream_ctx);
+    }
+    return result;
 }
 
 // pipe
