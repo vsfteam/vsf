@@ -103,19 +103,6 @@ vsf_err_t vk_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buf
     return drv->refresh(pthis, area, disp_buff);
 }
 
-vsf_err_t vk_disp_set_refresh_format(vk_disp_t *pthis, vk_disp_color_type_t type)
-{
-    VSF_UI_ASSERT(pthis != NULL);
-    const vk_disp_drv_t *drv = pthis->param.drv;
-    VSF_UI_ASSERT(drv != NULL);
-
-    if (drv->set_refresh_format != NULL) {
-        return drv->set_refresh_format(pthis, type);
-    } else {
-        return type == pthis->param.color ? VSF_ERR_NONE : VSF_ERR_NOT_SUPPORT;
-    }
-}
-
 static vsf_err_t __vk_disp_dummy_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff)
 {
     vk_disp_on_ready(pthis);
