@@ -205,7 +205,19 @@ vsf_class(vk_disp_reentrant_t) {
 #endif
 
 vsf_class(vk_disp_dummy_t) {
-    implement(vk_disp_t)
+    public_member(
+        implement(vk_disp_t)
+    )
+};
+
+// vk_disp_cvrt_t/vk_disp_cvrt_drv is used to convert color format
+vsf_class(vk_disp_cvrt_t) {
+    public_member(
+        implement(vk_disp_t)
+        vk_disp_t *disp_real;
+        void *pixel_buffer;
+        uint32_t pixel_buffer_size;
+    )
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -215,6 +227,8 @@ extern const vk_disp_drv_t vk_disp_reentrant_drv;
 #endif
 
 extern const vk_disp_drv_t vk_disp_dummy_drv;
+// vk_disp_cvrt_t/vk_disp_cvrt_drv is used to convert color format
+extern const vk_disp_drv_t vk_disp_cvrt_drv;
 
 /*============================ PROTOTYPES ====================================*/
 
