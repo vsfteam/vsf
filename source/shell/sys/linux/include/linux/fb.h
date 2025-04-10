@@ -4,6 +4,9 @@
 #include <linux/types.h>
 #include <stdint.h>
 
+// for display color
+#include <component/vsf_component.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -92,6 +95,9 @@ struct fb_fix_screeninfo {
     __u32 line_length;
     __u32 type;
     __u32 visual;
+
+    // for vsf only
+    vk_disp_color_type_t __color;
 };
 
 struct fb_bitfield {

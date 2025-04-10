@@ -1605,9 +1605,14 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
                     bitfields = __bitfiled_rgb565;
                 }
                 break;
+            case VSF_DISP_COLOR_RGB888: {
+                    static const struct fb_bitfield __bitfield_rg888[4] = {{16, 8, 0}, {8, 8, 0}, {0, 8, 0}, {0, 0, 0}};
+                    bitfields = __bitfield_rg888;
+                }
+                break;
             case VSF_DISP_COLOR_ARGB8888: {
-                    static const struct fb_bitfield __bitfield_arg8888[4] = {{16, 8, 0}, {8, 8, 0}, {0, 8, 0}, {24, 8, 0}};
-                    bitfields = __bitfield_arg8888;
+                    static const struct fb_bitfield __bitfield_argb8888[4] = {{16, 8, 0}, {8, 8, 0}, {0, 8, 0}, {24, 8, 0}};
+                    bitfields = __bitfield_argb8888;
                 }
                 break;
             default:
@@ -1660,6 +1665,7 @@ static int __vsf_linux_fb_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
             }
             info->line_length = pitch_size;
             info->visual = FB_VISUAL_TRUECOLOR;
+            info->__color = disp->param.color;
         }
         break;
     case FBIOPAN_DISPLAY: {
