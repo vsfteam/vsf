@@ -15,9 +15,12 @@ jobs:
 
       - name: update version
         run: |
-          COMMIT_HASH=$(git rev-parse --short HEAD)
-          sed -i "s/^PROJECT_NUMBER.*/PROJECT_NUMBER = $COMMIT_HASH/" doxygen/vsf_doxygen_en.conf
-          sed -i "s/^PROJECT_NUMBER.*/PROJECT_NUMBER = $COMMIT_HASH/" doxygen/vsf_doxygen_zh.conf
+          COMMIT_SHORT_HASH=$(git rev-parse --short HEAD)
+          COMMIT_FULL_HASH=$(git rev-parse HEAD)
+          sed -i "s/COMMIT_SHORT_HASH/${COMMIT_SHORT_HASH}/" doxygen/footer_zh.html
+          sed -i "s/COMMIT_FULL_HASH/${COMMIT_FULL_HASH}/" doxygen/footer_zh.html
+          sed -i "s/COMMIT_SHORT_HASH/${COMMIT_SHORT_HASH}/" doxygen/footer_en.html
+          sed -i "s/COMMIT_FULL_HASH/${COMMIT_FULL_HASH}/" doxygen/footer_en.html
 
       - name: doxygen-en
         uses: mattnotmitt/doxygen-action@v1.9
