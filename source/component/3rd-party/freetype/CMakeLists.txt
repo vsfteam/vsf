@@ -54,3 +54,11 @@ vsf_add_sources(
     ${VSF_FREETYPE_PATH}/src/type42/type42.c
     ${VSF_FREETYPE_PATH}/src/winfonts/winfnt.c
 )
+
+# vplt
+vsf_add_compile_definitions(
+    VSF_USE_FREETYPE=ENABLED
+)
+vsf_add_sources(
+    extension/vplt/freetype_vplt.c
+)
