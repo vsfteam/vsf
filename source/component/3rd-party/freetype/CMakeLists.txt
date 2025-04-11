@@ -9,11 +9,6 @@ vsf_add_include_directories(
 vsf_add_compile_definitions(
     "FT2_BUILD_LIBRARY"
 )
-if(VSF_USE_LINUX)
-    vsf_add_compile_definitions(
-        VSF_FREETYPE_USE_STDIO=ENABLED
-    )
-endif()
 
 vsf_add_sources(
     ${VSF_FREETYPE_PATH}/src/base/ftbase.c
