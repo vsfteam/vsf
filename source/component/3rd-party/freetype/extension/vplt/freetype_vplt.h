@@ -129,6 +129,66 @@ typedef struct vsf_freetype_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FTC_CMapCache_Lookup);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FTC_ImageCache_LookupScaler);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FTC_SBitCache_LookupScaler);
+
+    // Support API
+    //  Computations
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_MulDiv);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_MulFix);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_DivFix);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_RoundFix);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_CeilFix);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_FloorFix);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Vector_Transform);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Matrix_Multiply);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Matrix_Invert);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Sin);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Cos);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Tan);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Atan2);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Angle_Diff);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Vector_Unit);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Vector_Rotate);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Vector_Length);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Vector_Polarize);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Vector_From_Polar);
+    //  List
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_List_Add);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_List_Insert);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_List_Find);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_List_Remove);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_List_Up);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_List_Iterate);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_List_Finalize);
+    //  Outline
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Outline_New);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Outline_Done);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Outline_Copy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Outline_Translate);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Outline_Transform);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Outline_Embolden);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Outline_EmboldenXY);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Outline_Reverse);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Outline_Check);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Outline_Get_CBox);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Outline_Get_BBox);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Outline_Get_Bitmap);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Outline_Render);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Outline_Decompose);
+    //  Advance
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Get_Advance);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Get_Advances);
+    // Bitmap
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Bitmap_Init);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Bitmap_Copy);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Bitmap_Embolden);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Bitmap_Convert);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Bitmap_Blend);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_GlyphSlot_Own_Bitmap);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Bitmap_Done);
+    // TODO: more APIs
+
+    // Error
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(FT_Error_String);
 } vsf_freetype_vplt_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
