@@ -13,6 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: update version
+        run: |
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          sed -i "s/^PROJECT_NUMBER.*/PROJECT_NUMBER = $COMMIT_HASH/" doxygen/vsf_doxygen_en.conf
+          sed -i "s/^PROJECT_NUMBER.*/PROJECT_NUMBER = $COMMIT_HASH/" doxygen/vsf_doxygen_zh.conf
+
       - name: doxygen-en
         uses: mattnotmitt/doxygen-action@v1.9
         with:
