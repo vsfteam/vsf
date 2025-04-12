@@ -155,6 +155,8 @@ int vsf_elfloader_arch_relocate_sym(vsf_elfloader_t *elfloader, Elf_Addr tgtaddr
     switch (type) {
     // (S + A) | T
     case R_ARM_ABS32:
+        *(uint32_t *)tgtaddr += tgtvalue;
+        return 0;
     case R_ARM_GLOB_DAT:
     case R_ARM_JUMP_SLOT:
         *(uint32_t *)tgtaddr = tgtvalue;
