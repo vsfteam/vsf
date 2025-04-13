@@ -434,7 +434,10 @@ static int __vsf_linux_fs_stat(vsf_linux_fd_t *sfd, struct stat *buf)
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     vk_file_t *file = priv->file;
 
-    if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
+    // in VSF, VSF_FILE_ATTR_LNK is a standalone bit, so MUST be checked first
+    if (file->attr & VSF_FILE_ATTR_LNK) {
+        buf->st_mode = S_IFLNK;
+    } else if (file->attr & VSF_FILE_ATTR_DIRECTORY) {
         buf->st_mode = S_IFDIR;
     } else if (file->attr & VSF_FILE_ATTR_CHR) {
         buf->st_mode = S_IFCHR;
@@ -442,8 +445,6 @@ static int __vsf_linux_fs_stat(vsf_linux_fd_t *sfd, struct stat *buf)
         buf->st_mode = S_IFBLK;
     } else if (file->attr & VSF_FILE_ATTR_SOCK) {
         buf->st_mode = S_IFSOCK;
-    } else if (file->attr & VSF_FILE_ATTR_LNK) {
-        buf->st_mode = S_IFLNK;
     } else {
         buf->st_mode = S_IFREG;
     }
