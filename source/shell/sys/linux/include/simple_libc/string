@@ -148,6 +148,10 @@ namespace std {
             : array_base<T>(nullptr, num) { }
         array_base<T>(const array_base &arr)
             : array_base<T>(arr.__array, arr.__length) { }
+        array_base<T>(initializer_list<T> list)
+        {
+            array_base<T>(list.begin(), list.size());
+        }
         ~array_base<T>()
         {
             __length = 0;
@@ -294,6 +298,10 @@ namespace std {
             __length = newlen;
             return (*this);
         }
+        array_base<T> & replace(size_t pos, size_t len, const array_base<T> & arr)
+        {
+            return replace(pos, len, arr.begin(), arr.length());
+        }
         array_base<T> & insert(size_t pos, const T *arr, size_t sublen)
         {
             return replace(pos, 0, arr, sublen);
@@ -305,6 +313,10 @@ namespace std {
         array_base<T> & insert(size_t pos, const T *s)
         {
             return replace(pos, 0, s, strlen(s));
+        }
+        array_base<T> & insert(size_t pos, const array_base<T> & s)
+        {
+            return replace(pos, 0, s);
         }
         iterator insert(const_iterator pos, T t)
         {
