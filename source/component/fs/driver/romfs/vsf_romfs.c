@@ -122,9 +122,16 @@ vk_romfs_header_t * vsf_romfs_chain_get_next(vk_romfs_info_t *fsinfo, vk_romfs_h
     return NULL;
 }
 
+static void * __vsf_romfs_get_content(vk_romfs_header_t *header)
+{
+    size_t namelen = strlen((const char *)header->name) + 1;
+    namelen = (namelen + 15) & ~15;
+    return (void *)((uintptr_t)&header[1] + namelen);
+}
+
 static vk_romfs_header_t * __vsf_romfs_lookup_in_dir(vk_romfs_header_t *image, vk_romfs_header_t *dir, char *name)
 {
-    vk_romfs_header_t *header = dir + 1;
+    vk_romfs_header_t *header = (vk_romfs_header_t *)__vsf_romfs_get_content(dir);
     uint32_t nextfh = be32_to_cpu(header->nextfh);
 
     while (true) {
@@ -208,7 +215,7 @@ __vsf_component_peda_ifs_entry(__vk_romfs_lookup, vk_file_lookup)
     vk_romfs_file_t *dir = (vk_romfs_file_t *)&vsf_this;
     vk_romfs_info_t *fsinfo = (vk_romfs_info_t *)dir->fsinfo;
     vk_romfs_header_t *image = dir->image;
-    vk_romfs_header_t *header = (vk_romfs_header_t *)&dir->header[1];
+    vk_romfs_header_t *header = (vk_romfs_header_t *)__vsf_romfs_get_content(dir->header);
 
     const char *name = vsf_local.name;
     bool found = false;
@@ -288,9 +295,9 @@ lookup_next_image:
             }
 
             if (!dir->level) {
-                header = image + 1;
+                header = __vsf_romfs_get_content(image);
             } else if ((header = __vsf_romfs_lookup_in_image(image, dir)) != NULL) {
-                header++;
+                header = __vsf_romfs_get_content(header);
             }
             if (header != NULL) {
                 goto lookup_next_image;
@@ -321,7 +328,7 @@ __vsf_component_peda_ifs_entry(__vk_romfs_read, vk_file_read)
     }
     int_fast32_t rsize = file->size - file->pos;
     rsize = vsf_min(size, rsize);
-    memcpy(buff, (uint8_t *)&header[1] + file->pos, rsize);
+    memcpy(buff, (uint8_t *)__vsf_romfs_get_content(header) + file->pos, rsize);
     vsf_eda_return(rsize);
     vsf_peda_end();
 }
@@ -341,7 +348,7 @@ __vsf_component_peda_ifs_entry(__vk_romfs_setpos, vk_file_setpos)
 static void * __vk_romfs_direct_access(vk_file_t *file)
 {
     vk_romfs_file_t *romfs_file = (vk_romfs_file_t *)file;
-    return &romfs_file->header[1];
+    return __vsf_romfs_get_content(romfs_file->header);
 }
 
 #endif
