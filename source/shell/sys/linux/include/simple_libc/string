@@ -518,6 +518,10 @@ namespace std {
         {
             __memset((T *)c_str(), c, n);
         }
+        basic_string<T, Traits, Alloc>(initializer_list<T> list)
+        {
+            basic_string<T, Traits, Alloc>(list.begin(), list.size());
+        }
         explicit basic_string<T, Traits, Alloc>(const Alloc &a)
             : array_base<T>(nullptr, 0) { }
 
