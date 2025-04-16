@@ -909,6 +909,11 @@ namespace std {
         {
             return operator +=(s.c_str());
         }
+        basic_string<T, Traits, Alloc> & operator +=(const T &c)
+        {
+            const T tmp[2] = { c, '\0' };
+            return operator +=(tmp);
+        }
         basic_string<T, Traits, Alloc> & operator +(const T *s) const
         {
             size_t curlen = length(), appendlen = s != nullptr ? __strlen(s) : 0;
