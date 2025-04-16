@@ -167,7 +167,6 @@ namespace std {
         }
         const T & at(size_t pos) const
         {
-            VSF_ASSERT(pos < __length);
             return __array[pos];
         }
         const T & back() const
@@ -525,6 +524,14 @@ namespace std {
         explicit basic_string<T, Traits, Alloc>(const Alloc &a)
             : array_base<T>(nullptr, 0) { }
 
+        const T & back() const
+        {
+            return at(length() - 1);
+        }
+        const T & front() const
+        {
+            return at(0);
+        }
         iterator begin() const
         {
             return array_base<T>::begin();
