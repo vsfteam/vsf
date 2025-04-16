@@ -721,6 +721,7 @@ ssize_t getline(char **lineptr, size_t *n, FILE *f);
 #define _get_stream_buffer_pointers VSF_LINUX_LIBC_WRAPPER(_get_stream_buffer_pointers)
 void _lock_file(FILE *f);
 void _unlock_file(FILE *f);
+typedef int errno_t;
 errno_t _get_stream_buffer_pointers(FILE *f, char ***base, char ***ptr, int **cnt);
 int _fseeki64(FILE *f, uint64_t offset, int origin);
 #endif

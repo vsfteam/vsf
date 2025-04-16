@@ -265,6 +265,11 @@ typedef struct {
 #define fgetws_unlocked         fgetws
 #define fputws_unlocked         fputws
 
+#ifdef __WIN__
+typedef struct _Mbstatet _Mbstatet;
+typedef _Mbstatet mbstate_t;
+#endif
+
 int mbsinit(const mbstate_t *ps);
 size_t mbrlen(const char *str, size_t n, mbstate_t *ps);
 size_t mbrtowc(wchar_t *pwc, const char *str, size_t n, mbstate_t *ps);
