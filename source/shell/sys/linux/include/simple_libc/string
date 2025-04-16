@@ -51,7 +51,7 @@ namespace std {
     {
         T *tmp = dst;
         while (n--) {
-            *tmp++ = n;
+            *tmp++ = t;
         }
         return dst;
     }
@@ -538,8 +538,7 @@ namespace std {
         }
         iterator end() const
         {
-            iterator it = array_base<T>::end();
-            return it != nullptr ? it - 1 : nullptr;
+            return array_base<T>::end();
         }
         const_iterator cbegin() const
         {
@@ -551,8 +550,7 @@ namespace std {
         }
         iterator rbegin() const
         {
-            iterator it = array_base<T>::rbegin();
-            return it != nullptr ? it - 1 : nullptr;
+            return array_base<T>::rbegin();
         }
         iterator rend() const
         {
@@ -586,7 +584,9 @@ namespace std {
             array_base<T>::resize(n + 1);
             T *s = (T *)c_str();
             s[n] = T(0);
-            __memset(&s[origlen], c, n);
+            if (n > origlen) {
+                __memset(&s[origlen], c, n - origlen);
+            }
         }
         void reserve(size_t n = 0)
         {
