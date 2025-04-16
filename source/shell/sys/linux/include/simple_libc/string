@@ -485,7 +485,7 @@ namespace std {
         basic_string<T, Traits, Alloc>(size_t len)
             : array_base<T>(nullptr, len + 1) { }
         basic_string<T, Traits, Alloc>()
-            : array_base<T>(nullptr, 0) { }
+            : array_base<T>(nullptr, 1) { }
         basic_string<T, Traits, Alloc>(const T *arr, size_t num)
             : array_base<T>(nullptr, num + 1)
         {
@@ -507,7 +507,7 @@ namespace std {
             }
         }
         basic_string<T, Traits, Alloc>(size_t n, T c, const allocator_type &a = allocator_type())
-            : array_base<T>(n)
+            : array_base<T>(0 == n ? 1 : n)
         {
             __memset((T *)c_str(), c, n);
         }
