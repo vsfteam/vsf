@@ -37,13 +37,7 @@ namespace std {
     // avoid to use memcmp in constexpr function
     constexpr int __memcmp(const T *dst, const T *src, size_t count)
     {
-        int res = 0;
-        for (; count > 0; dst++, src++, count--) {
-            if ((res = *dst - *src) != 0) {
-                break;
-            }
-        }
-        return res;
+        return memcmp((const void *)dst, (const void *)src, count * sizeof(T));
     }
 
     template <class T>
@@ -902,7 +896,7 @@ namespace std {
             if (0 == len) {
                 return assign(s);
             } else {
-                return (basic_string<T, Traits, Alloc> &)(array_base<T>::insert(len - 1, s, inslen));
+                return (basic_string<T, Traits, Alloc> &)(array_base<T>::insert(len, s, inslen));
             }
         }
         basic_string<T, Traits, Alloc> & operator +=(const basic_string<T, Traits, Alloc> &s)
@@ -954,7 +948,7 @@ namespace std {
         {
             size_t slen = str != nullptr ? __strlen(str) : 0;
             size_t arrlen = vsf_min(slen, length());
-            return __memcmp(c_str(), str, arrlen) > 0;
+            return __memcmp(c_str(), str, arrlen + 1) > 0;
         }
         bool operator >(const basic_string<T, Traits, Alloc> &str) const
         {
@@ -964,7 +958,7 @@ namespace std {
         {
             size_t slen = str != nullptr ? __strlen(str) : 0;
             size_t arrlen = vsf_min(slen, length());
-            return __memcmp(c_str(), str, arrlen) < 0;
+            return __memcmp(c_str(), str, arrlen + 1) < 0;
         }
         bool operator <(const basic_string<T, Traits, Alloc> &str) const
         {
