@@ -19,6 +19,7 @@
 #define __WIN_GENERIC_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "hal/vsf_hal_cfg.h"
 #include "utilities/vsf_utilities.h"
 
@@ -69,6 +70,10 @@ extern "C" {
 #define VSF_ARCH_PROVIDE_HEAP           ENABLED
 #define VSF_ARCH_PROVIDE_ARGU           ENABLED
 #define VSF_ARCH_PROVIDE_EXE            ENABLED
+// there will be memory allocation before entering vsf.
+//  if VSF_USE_LINUX is enabled, and if these memories are handled(realloc, etc),
+//  there will be problem because of different process context in vsf linux subsystem.
+#define VSF_ARCH_ALLOC_BEFORE_ENTRY
 // define VSF_ARCH_LIMIT_NO_SET_STACK to remove dependency of setjmp/longjmp
 //  and use stack of thread in windows for the best compatibility
 //  note that VSF_ARCH_PRI_NUM MUST defined to 1 and VSF_ARCH_SWI_NUM to 0
@@ -219,6 +224,8 @@ vsf_class(vsf_arch_irq_thread_t) {
 
 // this API is implement in driver
 extern int __vsf_arch_trace(int level, const char *format, ...);
+
+extern bool __vsf_arch_before_entry(void);
 
 extern void __vsf_arch_irq_sleep(uint_fast32_t ms);
 extern int vsf_arch_argu(char ***argv);

@@ -258,6 +258,9 @@ typedef struct vsf_liunx_heap_node_t {
     void *ptr;
     size_t size;
 
+#ifdef VSF_ARCH_ALLOC_BEFORE_ENTRY
+    int before_entry;
+#endif
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED
     int line;
     const char *file;

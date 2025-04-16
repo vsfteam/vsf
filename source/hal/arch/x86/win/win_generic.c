@@ -1330,6 +1330,16 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 }
 
 /*----------------------------------------------------------------------------*
+ * before entry                                                               *
+ *----------------------------------------------------------------------------*/
+
+static bool __vsf_before_entry = true;
+bool __vsf_arch_before_entry(void)
+{
+    return __vsf_before_entry;
+}
+
+/*----------------------------------------------------------------------------*
  * cpp startup                                                                *
  *----------------------------------------------------------------------------*/
 
@@ -1404,6 +1414,7 @@ void _initterm(cpp_init_func_t * const first, cpp_init_func_t * const last)
     }
 
     __vsf_arch_cpp_init_range(funcs, &funcs[count - 1], false);
+    __vsf_before_entry = false;
     __vsf_main_entry();
 }
 

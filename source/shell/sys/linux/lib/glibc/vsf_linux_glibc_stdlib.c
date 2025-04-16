@@ -123,6 +123,12 @@ void __free_ex(vsf_linux_process_t *process, void *ptr)
 {
     if (ptr != NULL) {
         vsf_liunx_heap_node_t *node = (vsf_liunx_heap_node_t *)((char *)ptr - sizeof(vsf_liunx_heap_node_t));
+#ifdef VSF_ARCH_ALLOC_BEFORE_ENTRY
+        if (node->before_entry) {
+            vsf_heap_free(node);
+            return;
+        }
+#endif
         __vsf_linux_heap_trace_free(process, node, ptr);
         vsf_linux_process_heap_free(process, (void *)node);
     }
@@ -136,6 +142,9 @@ void * ____malloc_ex(vsf_linux_process_t *process, size_t size,
     if (node != NULL) {
         void *buffer = (void *)((char *)node + sizeof(vsf_liunx_heap_node_t));
         __vsf_linux_heap_trace_alloc(process, node, buffer, size, file, func, line);
+#ifdef VSF_ARCH_ALLOC_BEFORE_ENTRY
+        node->before_entry = __vsf_arch_before_entry();
+#endif
         return buffer;
     } else {
         errno = ENOMEM;
@@ -159,17 +168,33 @@ void * ____realloc_ex(vsf_linux_process_t *process, void *p, size_t size,
         return NULL;
     } else {
         vsf_liunx_heap_node_t *node = (vsf_liunx_heap_node_t *)((uint8_t *)p - sizeof(vsf_liunx_heap_node_t));
-        size_t total_size = vsf_linux_process_heap_size(process, node) - sizeof(vsf_liunx_heap_node_t);
+        size_t total_size;
         void *new_buff;
+
+#ifdef VSF_ARCH_ALLOC_BEFORE_ENTRY
+        if (node->before_entry) {
+            total_size = vsf_heap_size((uint8_t *)node) - sizeof(vsf_liunx_heap_node_t);
+        } else {
+            total_size = vsf_linux_process_heap_size(process, node) - sizeof(vsf_liunx_heap_node_t);
+        }
+#else
+        total_size = vsf_linux_process_heap_size(process, node) - sizeof(vsf_liunx_heap_node_t);
+#endif
 
         if (total_size > size) {
 #if VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED
-            if (NULL == process) {
-                process = vsf_linux_get_cur_process();
+#   ifdef VSF_ARCH_ALLOC_BEFORE_ENTRY
+            if (!node->before_entry) {
+#   endif
+                if (NULL == process) {
+                    process = vsf_linux_get_cur_process();
+                }
+//                vsf_trace_debug("0x%p: -%d 0x%p\n", process, node->size, p);
+//                vsf_trace_debug("0x%p: +%d 0x%p\n", process, size, p);
+                process->heap_monitor.usage += size - node->size;
+#   ifdef VSF_ARCH_ALLOC_BEFORE_ENTRY
             }
-//            vsf_trace_debug("0x%p: -%d 0x%p\n", process, node->size, p);
-//            vsf_trace_debug("0x%p: +%d 0x%p\n", process, size, p);
-            process->heap_monitor.usage += size - node->size;
+#   endif
 #endif
             node->size = size;
             new_buff = p;
