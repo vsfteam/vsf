@@ -194,10 +194,12 @@ void vsh_set_path(char *path)
 #endif
 }
 
-static char * __vsh_get_next_arg(char **cmd)
+// return true if remaining command is string between '' and ""
+static bool __vsh_get_next_arg(char **cmd, char **next)
 {
     VSF_LINUX_ASSERT((cmd != NULL) && (*cmd != NULL));
     char *cmd_cur = *cmd;
+    bool is_string = false;
     int ch;
 
     while ((*cmd_cur != '\0') && isspace((int)*cmd_cur)) { cmd_cur++; }
@@ -210,13 +212,17 @@ static char * __vsh_get_next_arg(char **cmd)
         } else {
             cmd_cur++;
             if ((ch == '\"') || (ch == '\'')) {
+                is_string = true;
                 while ((*cmd_cur != '\0') && (*cmd_cur != ch)) { cmd_cur++; }
                 if (*cmd_cur != '\0') { cmd_cur++; }
             }
         }
     }
     while ((*cmd_cur != '\0') && isspace((int)*cmd_cur)) { *cmd_cur++ = '\0'; }
-    return cmd_cur;
+    if (next != NULL) {
+        *next = cmd_cur;
+    }
+    return is_string;
 }
 
 static int __vsh_expand_arg_section(vsf_linux_process_t *process, char *arg_sec, char **output)
@@ -312,6 +318,7 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
     char *env[2], *arg_expanded;
     vsf_linux_process_ctx_t *ctx;
     int redir_state = -1, redir_mask = 0, fd_err = -1, argc_allocated = 16;
+    bool is_string;
 
     // skip spaces
     while ((*cmd != '\0') && isspace((int)*cmd)) { cmd++; }
@@ -324,7 +331,7 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
 
     env[1] = NULL;
     for (;;) {
-        next = __vsh_get_next_arg(&cmd);
+        __vsh_get_next_arg(&cmd, &next);
         if (!strchr(cmd, '=')) {
             break;
         }
@@ -372,7 +379,7 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
     bool is_out = false, is_append = false;
     int redir_fd, cur_redir_mask = 0;
     while (*next != '\0') {
-        nextnext = __vsh_get_next_arg(&next);
+        is_string = __vsh_get_next_arg(&next, &nextnext);
         arg_expanded = __vsh_expand_arg(process, next);
         if (arg_expanded == next) {
             arg_expanded = __strdup_ex(process, next);
@@ -381,7 +388,7 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
         }
 
         // check if redirect operations
-        if (    (redir_state < 0)
+        if (    !is_string && (redir_state < 0)
             &&  (   ((arg_expanded[0] == '<') || (arg_expanded[1] == '<'))
                 ||  ((arg_expanded[0] == '>') || (arg_expanded[1] == '>'))
                 )
