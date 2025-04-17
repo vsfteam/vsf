@@ -35,9 +35,16 @@ namespace std {
 
     template <class T>
     // avoid to use memcmp in constexpr function
-    constexpr int __memcmp(const T *dst, const T *src, size_t count)
+    constexpr int __memcmp(const T *str1, const T *str2, size_t count)
     {
-        return memcmp((const void *)dst, (const void *)src, count * sizeof(T));
+        while (count-- > 0) {
+            if (*str1 != *str2) {
+                return *str1 > *str2 ? 1 : -1;
+            }
+            str1++;
+            str2++;
+        }
+        return 0;
     }
 
     template <class T>
@@ -143,8 +150,15 @@ namespace std {
         array_base<T>(const array_base &arr)
             : array_base<T>(arr.__array, arr.__length) { }
         array_base<T>(initializer_list<T> list)
+            : __length(list.size())
         {
-            array_base<T>(list.begin(), list.size());
+            if (__length > 0) {
+                __array = (T *)malloc(__length * sizeof(T));
+                VSF_ASSERT(__array != nullptr);
+                __memcpy<T>(__array, list.begin(), __length);
+            } else {
+                __array = nullptr;
+            }
         }
         ~array_base<T>()
         {
@@ -512,8 +526,13 @@ namespace std {
             __memset((T *)c_str(), c, n);
         }
         basic_string<T, Traits, Alloc>(initializer_list<T> list)
+            : array_base<T>(nullptr, list.size() + 1)
         {
-            basic_string<T, Traits, Alloc>(list.begin(), list.size());
+            T *str = (T *)c_str();
+            __memcpy(str, list.begin(), list.size());
+            if (array_base<T>::length() > list.size()) {
+                str[array_base<T>::length() - 1] = T(0);
+            }
         }
         explicit basic_string<T, Traits, Alloc>(const Alloc &a)
             : array_base<T>(nullptr, 0) { }
@@ -532,7 +551,8 @@ namespace std {
         }
         iterator end() const
         {
-            return array_base<T>::end();
+            iterator it = array_base<T>::end();
+            return it != nullptr ? it - 1 : nullptr;
         }
         const_iterator cbegin() const
         {
@@ -544,7 +564,8 @@ namespace std {
         }
         iterator rbegin() const
         {
-            return array_base<T>::rbegin();
+            iterator it = array_base<T>::rbegin();
+            return it != nullptr ? it - 1 : nullptr;
         }
         iterator rend() const
         {
