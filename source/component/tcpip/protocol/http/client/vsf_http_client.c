@@ -32,9 +32,15 @@
 #endif
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HTTP_CLIENT_CFG_USER_AGENT
+// for some website, not all user agent are accepted, so use fake curl here
+#   define VSF_HTTP_CLIENT_CFG_USER_AGENT   "curl/8.5.0"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-//#define vsf_http_trace(...)           printf(__VA_ARGS__)
+//#define vsf_http_trace(...)                 printf(__VA_ARGS__)
 #ifndef vsf_http_trace
 #   define vsf_http_trace(...)
 #endif
@@ -98,7 +104,7 @@ User-Agent: %s\r\n\
 Connection: %s\r\n\
 Content-Length: %d\r\n\
 %s\
-\r\n", NULL == req->verb ? "POST" : req->verb, req->path, req->host, "vsf", req->connect_mode, (int)req->txdata_len, req->header);
+\r\n", NULL == req->verb ? "POST" : req->verb, req->path, req->host, VSF_HTTP_CLIENT_CFG_USER_AGENT, req->connect_mode, (int)req->txdata_len, req->header);
         vsf_http_trace("http request:\n%s", http->buffer);
     } else {
         result = sprintf((char *)http->buffer, "\
@@ -107,7 +113,7 @@ Host: %s\r\n\
 User-Agent: %s\r\n\
 Connection: %s\r\n\
 %s\
-\r\n", NULL == req->verb ? "GET" : req->verb, req->path, req->host, "vsf", req->connect_mode, req->header);
+\r\n", NULL == req->verb ? "GET" : req->verb, req->path, req->host, VSF_HTTP_CLIENT_CFG_USER_AGENT, req->connect_mode, req->header);
         vsf_http_trace("http request:\n%s", http->buffer);
     }
     result = http->op->fn_write(http->param, http->buffer, result);
