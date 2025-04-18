@@ -30,6 +30,10 @@
 
 #include "utilities/ooc_class.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -94,5 +98,9 @@ extern void vsf_http_client_init(vsf_http_client_t *http);
 extern int vsf_http_client_request(vsf_http_client_t *http, vsf_http_client_req_t *req);
 extern int vsf_http_client_read(vsf_http_client_t *http, uint8_t *buf, uint16_t len);
 extern int vsf_http_client_write(vsf_http_client_t *http, uint8_t *buf, uint16_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif      // __VSF_HTTP_CLIENT_H__
