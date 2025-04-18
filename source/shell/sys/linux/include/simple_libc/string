@@ -497,9 +497,17 @@ namespace std {
         basic_string<T, Traits, Alloc>(const basic_string<T, Traits, Alloc> &s)
             : array_base<T>(s) { }
         basic_string<T, Traits, Alloc>(size_t len)
-            : array_base<T>(nullptr, len + 1) { }
+            : array_base<T>(nullptr, len + 1)
+        {
+            T *str = (T *)c_str();
+            str[0] = T(0);
+        }
         basic_string<T, Traits, Alloc>()
-            : array_base<T>(nullptr, 1) { }
+            : array_base<T>(nullptr, 1)
+        {
+            T *str = (T *)c_str();
+            str[0] = T(0);
+        }
         basic_string<T, Traits, Alloc>(const T *arr, size_t num)
             : array_base<T>(nullptr, num + 1)
         {
