@@ -78,6 +78,7 @@ void vsf_http_client_close(vsf_http_client_t *http)
 
 int vsf_http_client_request(vsf_http_client_t *http, vsf_http_client_req_t *req)
 {
+    http->redirect_path = NULL;
     int result = http->op->fn_connect(http->param, req->host, req->port);
     if (result != 0) {
         return result;
@@ -170,6 +171,22 @@ read_more:
                 http->is_chunked = true;
                 http->cur_chunk_size = 0;
             }
+            continue;
+        }
+        if (    ((301 == http->resp_status) || (302 == http->resp_status))
+            &&  strstr(line, "Location:")) {
+            line += sizeof("Location:") - 1;
+            while (*line && isspace(*line)) { line++; }
+
+            // 1. remove last \r
+            if (line[strlen(line) - 1] == '\r') {
+                line[strlen(line) - 1] = '\0';
+            }
+            // 2. remove possible '/'
+            if (line[strlen(line) - 1] == '/') {
+                line[strlen(line) - 1] = '\0';
+            }
+            http->redirect_path = line;
             continue;
         }
         if (req->on_response_header != NULL) {

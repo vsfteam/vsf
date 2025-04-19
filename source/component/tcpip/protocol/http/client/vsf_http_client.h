@@ -22,6 +22,10 @@
 
 #include "component/vsf_component_cfg.h"
 
+#if VSF_USE_MBEDTLS == ENABLED
+#   include "component/3rd-party/mbedtls/extension/tls_session/mbedtls_tls_session.h"
+#endif
+
 #if     defined(__VSF_HTTP_CLIENT_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_HTTP_CLIENT_CLASS_INHERIT__)
@@ -82,6 +86,7 @@ vsf_class(vsf_http_client_t) {
         void *param;
         int resp_status;
         int content_length;
+        char *redirect_path;
     )
     private_member(
         uint16_t cur_size;
