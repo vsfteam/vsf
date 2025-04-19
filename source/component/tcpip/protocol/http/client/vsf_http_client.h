@@ -35,6 +35,16 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+#ifndef VSF_HTTP_CLIENT_CFG_BUFFER_SIZE
+#   define VSF_HTTP_CLIENT_CFG_BUFFER_SIZE      4096
+#endif
+
+#ifndef VSF_HTTP_CLIENT_CFG_USER_AGENT
+// for some website, not all user agent are accepted, so use fake curl here
+#   define VSF_HTTP_CLIENT_CFG_USER_AGENT       "curl/8.5.0"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
@@ -78,7 +88,7 @@ vsf_class(vsf_http_client_t) {
         bool is_chunked;
         int cur_chunk_size;
         uint8_t *cur_buffer;
-        uint8_t buffer[1024];
+        uint8_t buffer[VSF_HTTP_CLIENT_CFG_BUFFER_SIZE];
     )
 };
 

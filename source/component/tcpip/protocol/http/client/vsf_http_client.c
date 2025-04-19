@@ -32,12 +32,6 @@
 #endif
 
 /*============================ MACROS ========================================*/
-
-#ifndef VSF_HTTP_CLIENT_CFG_USER_AGENT
-// for some website, not all user agent are accepted, so use fake curl here
-#   define VSF_HTTP_CLIENT_CFG_USER_AGENT   "curl/8.5.0"
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 //#define vsf_http_trace(...)                 printf(__VA_ARGS__)
