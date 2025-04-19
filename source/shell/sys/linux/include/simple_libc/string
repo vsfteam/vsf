@@ -319,7 +319,7 @@ namespace std {
         }
         array_base<T> & insert(size_t pos, const T *s)
         {
-            return replace(pos, 0, s, strlen(s));
+            return replace(pos, 0, s, __strlen(s));
         }
         array_base<T> & insert(size_t pos, const array_base<T> & s)
         {
@@ -778,6 +778,30 @@ namespace std {
         {
             size_t pos = first - begin(), len = last - first + 1;
             return replace(pos, len, str);
+        }
+        basic_string<T, Traits, Alloc> & insert(size_t pos, const basic_string<T, Traits, Alloc> & s)
+        {
+            return replace(pos, 0, s);
+        }
+        basic_string<T, Traits, Alloc> & insert(size_t pos, const T *arr, size_t sublen)
+        {
+            return replace(pos, 0, arr, sublen);
+        }
+        basic_string<T, Traits, Alloc> & insert(size_t pos, size_t n, T t)
+        {
+            return replace(pos, 0, n, t);
+        }
+        basic_string<T, Traits, Alloc> & insert(size_t pos, const T *s)
+        {
+            return replace(pos, 0, s, __strlen(s));
+        }
+        iterator insert(const_iterator pos, T t)
+        {
+            if ((const_iterator)nullptr == pos) {
+                return (iterator)nullptr;
+            }
+            replace(pos - &__array[0], 0, 1, t);
+            return (iterator)(pos + 1);
         }
         basic_string<T, Traits, Alloc> & erase(size_t pos = 0, size_t len = npos)
         {
