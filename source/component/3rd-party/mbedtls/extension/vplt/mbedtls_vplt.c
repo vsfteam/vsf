@@ -501,23 +501,25 @@ __VSF_VPLT_DECORATOR__ vsf_mbedtls_vplt_t vsf_mbedtls_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_net_free),
 
     // <mbedtls/entropy.h>
+#if defined(MBEDTLS_ENTROPY_C)
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_entropy_init),
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_entropy_free),
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_entropy_add_source),
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_entropy_gather),
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_entropy_func),
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_entropy_update_manual),
-#if defined(MBEDTLS_ENTROPY_NV_SEED)
+#   if defined(MBEDTLS_ENTROPY_NV_SEED)
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_entropy_update_nv_seed),
-#endif
-#if defined(MBEDTLS_FS_IO)
+#   endif
+#   if defined(MBEDTLS_FS_IO)
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_entropy_write_seed_file),
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_entropy_update_seed_file),
-#endif
-#if defined(MBEDTLS_SELF_TEST)
+#   endif
+#   if defined(MBEDTLS_SELF_TEST)
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_entropy_self_test),
-#   if defined(MBEDTLS_ENTROPY_HARDWARE_ALT)
+#       if defined(MBEDTLS_ENTROPY_HARDWARE_ALT)
     VSF_APPLET_VPLT_ENTRY_FUNC(mbedtls_entropy_source_self_test),
+#       endif
 #   endif
 #endif
 

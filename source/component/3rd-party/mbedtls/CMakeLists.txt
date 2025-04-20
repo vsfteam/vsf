@@ -16,6 +16,10 @@ if(VSF_MBEDTLS_CONFIG_PATH)
     vsf_add_include_directories(
         ${VSF_MBEDTLS_CONFIG_PATH}
     )
+else()
+    vsf_add_include_directories(
+        port
+    )
 endif()
 vsf_add_include_directories(
     ${VSF_MBEDTLS_PATH}/include

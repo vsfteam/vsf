@@ -24,7 +24,8 @@
 
 #if VSF_USE_MBEDTLS == ENABLED
 
-#include "utilities/vsf_utilities.h"
+// for VSF_HAL_USE_RNG && VSF_HW_RNG_COUNT
+#include "hal/vsf_hal.h"
 
 /*============================ MACROS ========================================*/
 
