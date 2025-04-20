@@ -24,7 +24,7 @@
 
 #if VSF_USE_MBEDTLS == ENABLED
 
-#include "vsf.h"
+#include "utilities/vsf_utilities.h"
 
 /*============================ MACROS ========================================*/
 

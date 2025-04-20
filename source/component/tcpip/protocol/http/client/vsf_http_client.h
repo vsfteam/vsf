@@ -23,7 +23,9 @@
 #include "component/vsf_component_cfg.h"
 
 #if VSF_USE_MBEDTLS == ENABLED
-#   include "component/3rd-party/mbedtls/extension/tls_session/mbedtls_tls_session.h"
+// DO NOT include mbedtls_tls_session.h here, because it will undefine _WIN32 for VSF,
+//  but some windows based environment will need this
+//#   include "component/3rd-party/mbedtls/extension/tls_session/mbedtls_tls_session.h"
 #endif
 
 #if     defined(__VSF_HTTP_CLIENT_CLASS_IMPLEMENT)

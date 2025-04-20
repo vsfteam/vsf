@@ -30,6 +30,8 @@
 #ifdef __VSF__
 #undef _MSC_VER
 #undef _WIN32
+// __unix__/unix is required by net_socket
+#define __unix__
 #endif
 
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_DEPRECATE)
