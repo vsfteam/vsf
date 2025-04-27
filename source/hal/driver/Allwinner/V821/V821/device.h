@@ -19,29 +19,42 @@
 
 #include "hal/vsf_hal_cfg.h"
 
-#undef VSF_ALLWINNER_DRIVER_SERIES_HEADER
+/*============================ MACROS ========================================*/
 
-#if     defined(__F1C100S__)
-#   define  VSF_ALLWINNER_DRIVER_SERIES_HEADER      "./F1CX00S/driver.h"
-#elif   defined(__V821__)
-#   define  VSF_ALLWINNER_DRIVER_SERIES_HEADER      "./V821/driver.h"
-#else
-#   error No supported device found.
-#endif
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
-/* include specified device driver header file */
-#include VSF_ALLWINNER_DRIVER_SERIES_HEADER
+/*\note first define basic info for arch. */
+//! arch info
+#define VSF_ARCH_PRI_NUM            4
+#define VSF_ARCH_PRI_BIT            2
 
-#ifndef __HAL_DRIVER_ALLWINNER_H__
-#define __HAL_DRIVER_ALLWINNER_H__
+// software interrupt provided by a dedicated device
+#define VSF_DEV_SWI_NUM             4
+
+#else       // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+
+#ifndef __HAL_DEVICE_ALLWINNER_V821_H__
+#define __HAL_DEVICE_ALLWINNER_V821_H__
+
+// software interrupt provided by a dedicated device
+#define VSF_DEV_SWI_LIST            60, 61, 62, 63
+
+/*============================ INCLUDES ======================================*/
+
+/*\note this is should be the only place where __common.h is included.*/
+#include "../common/__common.h"
 
 /*============================ MACROS ========================================*/
+
+#define V821_DRAM_ADDR              0x80000000
+
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-
-#endif      // __HAL_DRIVER_ALLWINNER_H__
+#endif      // __HAL_DEVICE_ALLWINNER_V821_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

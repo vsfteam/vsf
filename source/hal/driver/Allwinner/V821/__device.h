@@ -19,21 +19,16 @@
 
 #include "hal/vsf_hal_cfg.h"
 
-#undef VSF_ALLWINNER_DRIVER_SERIES_HEADER
+#undef VSF_DEVICE_HEADER
 
-#if     defined(__F1C100S__)
-#   define  VSF_ALLWINNER_DRIVER_SERIES_HEADER      "./F1CX00S/driver.h"
-#elif   defined(__V821__)
-#   define  VSF_ALLWINNER_DRIVER_SERIES_HEADER      "./V821/driver.h"
+#if     defined(__V821__)
+#   define  VSF_DEVICE_HEADER       "./V821/device.h"
 #else
 #   error No supported device found.
 #endif
 
 /* include specified device driver header file */
-#include VSF_ALLWINNER_DRIVER_SERIES_HEADER
-
-#ifndef __HAL_DRIVER_ALLWINNER_H__
-#define __HAL_DRIVER_ALLWINNER_H__
+#include VSF_DEVICE_HEADER
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -43,5 +38,4 @@
 /*============================ PROTOTYPES ====================================*/
 
 
-#endif      // __HAL_DRIVER_ALLWINNER_H__
 /* EOF */
