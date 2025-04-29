@@ -391,6 +391,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\SystemView</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nuconsole\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\include</state>
                 </option>
                 <option>
@@ -1540,6 +1541,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\zlib\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\include</state>
                 </option>
                 <option>
@@ -4991,6 +4993,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\zlib\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\include</state>
                 </option>
                 <option>
@@ -6132,6 +6135,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\raw</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\zlib\raw</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\port</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\include</state>
                 </option>
                 <option>
