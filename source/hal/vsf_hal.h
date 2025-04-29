@@ -63,6 +63,13 @@ extern "C" {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+/*! \note prepare to initialize level 0/1 hardware abstract layer
+ *  \param none
+ *  \retval true early init succeeded.
+ *  \retval false early init failed
+ */
+ extern bool vsf_hal_init_early(void);
+
 /*! \note initialize level 0/1 hardware abstract layer
  *  \param none
  *  \retval true initialization succeeded.

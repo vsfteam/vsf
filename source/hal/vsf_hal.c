@@ -81,6 +81,21 @@ void vsf_hal_irq_leave(uintptr_t ctx)
 #endif
 }
 
+VSF_CAL_WEAK(vsf_driver_init_early)
+bool vsf_driver_init_early( void )
+{
+    return false;
+}
+
+VSF_CAL_WEAK(vsf_hal_init_early)
+bool vsf_hal_init_early( void )
+{
+    if (!vsf_driver_init_early()) {
+        return false;
+    }
+    return true;
+}
+
 /*! \note initialize level 0/1 hardware abstract layer
  *  \param none
  *  \retval true initialization succeeded.
