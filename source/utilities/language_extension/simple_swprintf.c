@@ -299,14 +299,14 @@ int vswprintf(wchar_t *str, size_t size, const wchar_t *format, va_list ap)
                     format++;
                     if (format[0] == 'R') {
                         format++;
-                        radix = swprintf(curpos, width, u"%02X:%02X:%02X:%02X:%02X:%02X",
+                        radix = swprintf(curpos, width, (const wchar_t *)u"%02X:%02X:%02X:%02X:%02X:%02X",
                             arg.pu8[5], arg.pu8[4], arg.pu8[3], arg.pu8[2], arg.pu8[1], arg.pu8[0]);
                     } else if (format[0] == 'F') {
                         format++;
-                        radix = swprintf(curpos, width, u"%02X-%02X-%02X-%02X-%02X-%02X",
+                        radix = swprintf(curpos, width, (const wchar_t *)u"%02X-%02X-%02X-%02X-%02X-%02X",
                             arg.pu8[0], arg.pu8[1], arg.pu8[2], arg.pu8[3], arg.pu8[4], arg.pu8[5]);
                     } else {
-                        radix = swprintf(curpos, width, u"%02X:%02X:%02X:%02X:%02X:%02X",
+                        radix = swprintf(curpos, width, (const wchar_t *)u"%02X:%02X:%02X:%02X:%02X:%02X",
                             arg.pu8[0], arg.pu8[1], arg.pu8[2], arg.pu8[3], arg.pu8[4], arg.pu8[5]);
                     }
                     realsize += radix;
@@ -317,10 +317,10 @@ int vswprintf(wchar_t *str, size_t size, const wchar_t *format, va_list ap)
                     format++;
                     if (format[0] == 'R') {
                         format++;
-                        radix = swprintf(curpos, width, u"%02X%02X%02X%02X%02X%02X",
+                        radix = swprintf(curpos, width, (const wchar_t *)u"%02X%02X%02X%02X%02X%02X",
                             arg.pu8[5], arg.pu8[4], arg.pu8[3], arg.pu8[2], arg.pu8[1], arg.pu8[0]);
                     } else {
-                        radix = swprintf(curpos, width, u"%02X%02X%02X%02X%02X%02X",
+                        radix = swprintf(curpos, width, (const wchar_t *)u"%02X%02X%02X%02X%02X%02X",
                             arg.pu8[0], arg.pu8[1], arg.pu8[2], arg.pu8[3], arg.pu8[4], arg.pu8[5]);
                     }
                     realsize += radix;
@@ -331,7 +331,7 @@ int vswprintf(wchar_t *str, size_t size, const wchar_t *format, va_list ap)
                     if (format[1] == '4') {
                         // %pI4 : printf IPv4, x.x.x.x
                         format += 2;
-                        radix = swprintf(curpos, width, u"%d.%d.%d.%d",
+                        radix = swprintf(curpos, width, (const wchar_t *)u"%d.%d.%d.%d",
                             arg.pu8[0], arg.pu8[1], arg.pu8[2], arg.pu8[3]);
                         realsize += radix;
                         // even if curpos overflows, realsize will protect it
@@ -340,7 +340,7 @@ int vswprintf(wchar_t *str, size_t size, const wchar_t *format, va_list ap)
                     } else if (format[1] == '6') {
                         // %pI6 : printf IPv6, xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
                         format += 2;
-                        radix = swprintf(curpos, width, u"%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
+                        radix = swprintf(curpos, width, (const wchar_t *)u"%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
                             arg.pu16[0], arg.pu16[1], arg.pu16[2], arg.pu16[3],
                             arg.pu16[4], arg.pu16[5], arg.pu16[6], arg.pu16[7]);
                         realsize += radix;
@@ -352,7 +352,7 @@ int vswprintf(wchar_t *str, size_t size, const wchar_t *format, va_list ap)
                     if (format[1] == '4') {
                         // %pI4 : printf IPv4, x.x.x.x
                         format += 2;
-                        radix = swprintf(curpos, width, u"%03d.%03d.%03d.%03d",
+                        radix = swprintf(curpos, width, (const wchar_t *)u"%03d.%03d.%03d.%03d",
                             arg.pu8[0], arg.pu8[1], arg.pu8[2], arg.pu8[3]);
                         realsize += radix;
                         // even if curpos overflows, realsize will protect it
@@ -361,7 +361,7 @@ int vswprintf(wchar_t *str, size_t size, const wchar_t *format, va_list ap)
                     } else if (format[1] == '6') {
                         // %pI6 : printf IPv6, xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
                         format += 2;
-                        radix = swprintf(curpos, width, u"%02X%02X%02X%02X%02X%02X%02X%02X",
+                        radix = swprintf(curpos, width, (const wchar_t *)u"%02X%02X%02X%02X%02X%02X%02X%02X",
                             arg.pu16[0], arg.pu16[1], arg.pu16[2], arg.pu16[3],
                             arg.pu16[4], arg.pu16[5], arg.pu16[6], arg.pu16[7]);
                         realsize += radix;
