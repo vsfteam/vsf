@@ -28,7 +28,7 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if __IS_COMPILER_IAR__ && (defined(__VSF_CPP__) || defined(__OOC_CPP__)) && VSF_USE_LINUX == ENABLED
+#if __IS_COMPILER_IAR__ && (defined(__VSF_CPP__) || defined(__OOC_CPP__))
 // if linux is enabled, _exit will be implemented in vsf linux layer
 // if __cexit_call_dtors is not over-written, compiler will introduce cexit.o in iar libc
 // cexit.o contains _exit which will conflict with _exit implemented in vsf linux layer

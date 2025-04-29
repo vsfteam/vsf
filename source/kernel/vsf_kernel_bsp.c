@@ -362,27 +362,8 @@ __stackless
 void __cmain(void)
 {
     if (__low_level_init() != 0) {
-
-        // __IAR_STARTUP_DATA_INIT will call __iar_cstart_call_ctors to create
-        //  some cpp instances if eg. file stream(including stdout/stdin/stderr)
-        //  is used, this will need malloc.
-        // So if malloc is implemented in VSF simple libc, define __VSF_CPP__
-        // Note that if headers of simple libc is used, malloc is actually __vsf_linux_malloc
-#ifdef __VSF_CPP__
-        vsf_disable_interrupt();
-        vsf_heap_init();
-
-#   if __VSF_OS_SWI_NUM > 0
-        // vsf_heap_add_memory will need scheduler protection, which is not available here
-        //  call __vsf_kernel_os_raw_init to disable scheduler protection before DATA_INIT
-        void __vsf_kernel_os_raw_init(void);
-        __vsf_kernel_os_raw_init();
-#   endif
-
-        extern vsf_mem_t vsf_service_req___heap_memory_buffer___from_usr(void);
-        vsf_heap_add_memory(vsf_service_req___heap_memory_buffer___from_usr());
-#endif
-
+        // no need to initialize heap here anymore, call vsf_arch_cpp_startup when suitable,
+        //  which will can cpp_ctors securely
         __IAR_STARTUP_DATA_INIT();
     }
     vsf_main_entry();

@@ -608,6 +608,9 @@ void __vsf_kernel_os_raw_init(void)
 }
 #endif
 
+VSF_CAL_WEAK(vsf_driver_init_early)
+void vsf_driver_init_early(void) {}
+
 void __vsf_kernel_os_start(void)
 {
     // arch should be initialized here because service can depend on arch
@@ -622,6 +625,7 @@ void __vsf_kernel_os_start(void)
     // vsf_disable_interrupt depend on arch, so it's called after vsf_arch_init
     vsf_disable_interrupt();
 
+    vsf_driver_init_early();
     vsf_service_init();
     // hal, actually driver in hal, can depend on service, so it's called after vsf_service_init
     vsf_hal_init();
