@@ -547,11 +547,11 @@ namespace std {
 
         const T & back() const
         {
-            return at(length() - 1);
+            return array_base<T>::at(length() - 1);
         }
         const T & front() const
         {
-            return at(0);
+            return array_base<T>::at(0);
         }
         iterator begin() const
         {
