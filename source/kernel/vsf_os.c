@@ -69,9 +69,6 @@ typedef struct vsf_os_t {
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-#if __VSF_OS_SWI_NUM > 0
-static bool __vsf_os_is_inited = false;
-#endif
 static VSF_CAL_NO_INIT vsf_os_t __vsf_os;
 
 /*============================ PROTOTYPES ====================================*/
@@ -425,19 +422,14 @@ void __vsf_os_free_evt_node(vsf_evt_node_t *pnode)
 #if __VSF_OS_SWI_NUM > 0
 vsf_sched_lock_status_t vsf_forced_sched_lock(void)
 {
-    if (__vsf_os_is_inited) {
-        return vsf_set_base_priority(
-            __vsf_os.res_ptr->arch.os_swi_priorities_ptr[
-                __vsf_os.res_ptr->arch.swi_priority_cnt - 1]);
-    }
-    return vsf_arch_prio_0;
+    return vsf_set_base_priority(
+        __vsf_os.res_ptr->arch.os_swi_priorities_ptr[
+            __vsf_os.res_ptr->arch.swi_priority_cnt - 1]);
 }
 
 void vsf_forced_sched_unlock(vsf_sched_lock_status_t origlevel)
 {
-    if (__vsf_os_is_inited) {
-        vsf_set_base_priority(origlevel);
-    }
+    vsf_set_base_priority(origlevel);
 }
 
 static void __vsf_code_region_forced_sched_on_enter(void *pobj, void *plocal)
@@ -598,26 +590,10 @@ void __vsf_kernel_os_run_priority(vsf_prio_t priority)
 #endif
 }
 
-#if defined(__VSF_CPP__) && (__VSF_OS_SWI_NUM > 0)
-// if __VSF_CPP__ is defined,
-//  vsf_heap_add will be called before __vsf_os_is_inited is initlailized,
-//  and vsf_heap_add will call scheduler_protect, which need __vsf_os_is_inited
-void __vsf_kernel_os_raw_init(void)
-{
-    __vsf_os_is_inited = false;
-}
-#endif
-
 void __vsf_kernel_os_start(void)
 {
     // arch should be initialized here because service can depend on arch
     vsf_arch_init();
-
-    /*
-     *    Some code will require scheduler protect, which is not available
-     *  before __vsf_os_is_inited is being set to true. So disable interrupt
-     *  here, and enable after __vsf_os_is_inited is set.
-     */
 
     // vsf_disable_interrupt depend on arch, so it's called after vsf_arch_init
     vsf_disable_interrupt();
@@ -628,10 +604,6 @@ void __vsf_kernel_os_start(void)
     vsf_hal_init();
 
     __vsf_kernel_os_init();
-    // resources for scheduler protect is ready, set __vsf_os_is_inited and enable interrupt
-#if __VSF_OS_SWI_NUM > 0
-    __vsf_os_is_inited = true;
-#endif
     vsf_enable_interrupt();
 
 #if __VSF_KERNEL_CFG_EVTQ_EN == ENABLED
