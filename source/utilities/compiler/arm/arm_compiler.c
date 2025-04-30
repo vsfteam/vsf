@@ -28,7 +28,10 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if __IS_COMPILER_IAR__ && (defined(__VSF_CPP__) || defined(__OOC_CPP__))
+#if defined(__VSF_CPP__) || defined(__OOC_CPP__)
+
+#   if __IS_COMPILER_IAR__
+#       if VSF_USE_LINUX == ENABLED
 // if linux is enabled, _exit will be implemented in vsf linux layer
 // if __cexit_call_dtors is not over-written, compiler will introduce cexit.o in iar libc
 // cexit.o contains _exit which will conflict with _exit implemented in vsf linux layer
@@ -37,24 +40,25 @@ void __cexit_call_dtors(void)
     // Please provide test case to author if asserted here
     VSF_ASSERT(false);
 }
+#       endif
 
 // To avoid initialization of c++ static instance on startup, rewrite IAR_DATA_INIT to bypass __iar_cstart_call_ctors
 // code below are copied from isr startup file, data_init
-#if     !defined(_DLIB_ELF_INIT_INTERFACE_VERSION) || !defined(_DLIB_ELF_INIT_TABLE_MEMORY)\
-    ||  !defined(_DLIB_ELF_INIT_SOURCE_MEMORY) || !defined(_DLIB_ELF_INIT_DESTINATION_MEMORY)\
-    ||  !defined(_DLIB_ELF_INIT_FUNCTION_ATTRIBUTES)
-#   error IAR dlib version not supported
-#endif
+#       if     !defined(_DLIB_ELF_INIT_INTERFACE_VERSION) || !defined(_DLIB_ELF_INIT_TABLE_MEMORY)\
+            ||  !defined(_DLIB_ELF_INIT_SOURCE_MEMORY) || !defined(_DLIB_ELF_INIT_DESTINATION_MEMORY)\
+            ||  !defined(_DLIB_ELF_INIT_FUNCTION_ATTRIBUTES)
+#           error IAR dlib version not supported
+#       endif
 
-#ifndef _GLUE
-#   define _GLUE                    VSF_MCONNECT
-#endif
+#       ifndef _GLUE
+#           define _GLUE                    VSF_MCONNECT
+#       endif
 
-#define TABLE_MEM                   _DLIB_ELF_INIT_TABLE_MEMORY
-#define SRC_MEM                     _DLIB_ELF_INIT_SOURCE_MEMORY
-#define DEST_MEM                    _DLIB_ELF_INIT_DESTINATION_MEMORY
+#       define TABLE_MEM                    _DLIB_ELF_INIT_TABLE_MEMORY
+#       define SRC_MEM                      _DLIB_ELF_INIT_SOURCE_MEMORY
+#       define DEST_MEM                     _DLIB_ELF_INIT_DESTINATION_MEMORY
 
-#define IAR_DATA_INIT _GLUE(__iar_data_init, _DLIB_ELF_INIT_INTERFACE_VERSION)
+#       define IAR_DATA_INIT                _GLUE(__iar_data_init, _DLIB_ELF_INIT_INTERFACE_VERSION)
 
 typedef ptrdiff_t                   __data_ptrdiff_t;
 
@@ -68,11 +72,11 @@ typedef uint8_t DEST_MEM      *     dest_ptr_t;
 
 typedef struct
 {
-#if _DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
+#       if _DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
   src_index_t  mOff;
-#else // !_DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
+#       else // !_DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
   init_fun_t * mFun;
-#endif // _DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
+#       endif // _DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
 } FAddr;
 
 typedef void _DLIB_ELF_INIT_TABLE_MEMORY const * table_ptr_t;
@@ -87,14 +91,14 @@ static VSF_CAL_NO_INIT FAddr TABLE_MEM const * __iar_cstart_ctors_pi;
 _DLIB_ELF_INIT_FUNCTION_ATTRIBUTES
 static init_fun_t * FAddr_GetPtr(FAddr const TABLE_MEM * me)
 {
-#if _DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
+#       if _DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
   return (init_fun_t *)((src_ptr_t)me + me->mOff);
-#else // !_DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
+#       else // !_DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
   return me->mFun;
-#endif // _DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
+#       endif // _DLIB_ELF_INIT_USE_RELATIVE_ROM_ADDRESSES
 }
 
-#pragma section = "Region$$Table" const TABLE_MEM
+#       pragma section = "Region$$Table" const TABLE_MEM
 _DLIB_ELF_INIT_FUNCTION_ATTRIBUTES
 void IAR_DATA_INIT(void)
 {
@@ -123,6 +127,9 @@ void vsf_arch_cpp_startup(void)
         fun(__iar_cstart_ctors_pi);
     }
 }
+#   else
+// TODO: implement vsf_arch_cpp_startup for compilers other than IAR
+#   endif
 #endif
 
 #if __IS_COMPILER_IAR__ || __IS_COMILER_GCC__
