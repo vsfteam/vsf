@@ -83,7 +83,10 @@ enum usb_dir_t {
 };
 
 typedef struct usb_ctrlrequest_t {
-    uint8_t  bRequestType;
+    union {
+        uint8_t  bRequestType;
+        uint8_t  bmRequestType;
+    } VSF_CAL_PACKED;
     uint8_t  bRequest;
     uint16_t wValue;
     uint16_t wIndex;
