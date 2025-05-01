@@ -330,14 +330,8 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     }
                 }
                 if (flags.has_prefix) {
-                    if (flags.is_upper) {
-                        EMIT('0');
-                        EMIT('X');
-                    }
-                    else {
-                        EMIT('0');
-                        EMIT('x');
-                    }
+                    EMIT('0');
+                    EMIT(flags.is_upper ? 'X' : 'x');
                 }
 
             print_integer_do: {
