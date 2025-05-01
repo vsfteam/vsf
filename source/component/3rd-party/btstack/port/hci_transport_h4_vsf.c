@@ -170,7 +170,7 @@ static void __hci_transport_h4_on_out(vsf_stream_t *stream, void *param, vsf_str
 
 static void __hci_transport_h4_evt_handler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    hci_transport_h4_param_t *h4param = container_of(eda, hci_transport_h4_param_t, eda);
+    hci_transport_h4_param_t *h4param = vsf_container_of(eda, hci_transport_h4_param_t, eda);
     vsf_mem_stream_t *stream;
     uint8_t *ptr;
 
