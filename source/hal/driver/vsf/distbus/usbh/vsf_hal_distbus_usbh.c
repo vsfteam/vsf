@@ -51,6 +51,8 @@ static bool __vsf_hal_distbus_usbh_msghandler(vsf_distbus_t *distbus, vsf_distbu
 {
     vsf_hal_distbus_usbh_t *usbh = vsf_container_of(service, vsf_hal_distbus_usbh_t, service);
     uint8_t *data = (uint8_t *)&msg->header + sizeof(msg->header);
+    VSF_UNUSED_PARAM(usbh);
+    VSF_UNUSED_PARAM(data);
     bool retain_msg = false;
 
     switch (msg->header.addr) {

@@ -48,6 +48,8 @@ static bool __vsf_hal_distbus_i2s_msghandler(vsf_distbus_t *distbus, vsf_distbus
 {
     vsf_hal_distbus_i2s_t *i2s = vsf_container_of(service, vsf_hal_distbus_i2s_t, service);
     uint8_t *data = (uint8_t *)&msg->header + sizeof(msg->header);
+    VSF_UNUSED_PARAM(i2s);
+    VSF_UNUSED_PARAM(data);
     bool retain_msg = false;
 
     switch (msg->header.addr) {
