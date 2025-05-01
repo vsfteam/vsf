@@ -210,16 +210,19 @@ int vswprintf(wchar_t *str, size_t size, const wchar_t *format, va_list ap)
         case '%':
             flags.all = 0;
             rank = 0;
+        next_flag:
             switch (*format) {
-            case '0':   flags.has_prefix0 = 1;      format++;   break;
-            case '-':   flags.align_left = 1;       format++;   break;
-            case '+':   flags.has_plus_minus = 1;   format++;   break;
-            case ' ':                               format++;   break;
-            case '#':   flags.has_prefix = 1;       format++;   break;
+            case '0':   flags.has_prefix0 = 1;      format++;   goto next_flag;
+            case '-':   flags.align_left = 1;       format++;   goto next_flag;
+            case '+':   flags.has_plus_minus = 1;   format++;   goto next_flag;
+            case ' ':                               format++;   goto next_flag;
+            case '#':   flags.has_prefix = 1;       format++;   goto next_flag;
             case '%':
                 EMIT('%');
                 format++;
                 goto next_char;
+            default:
+                break;
             }
 
             if ('*' == *format) {
@@ -399,6 +402,16 @@ int vswprintf(wchar_t *str, size_t size, const wchar_t *format, va_list ap)
                     case rank_int:      arg.val = (unsigned long long)va_arg(ap, unsigned int);                                 break;
                     case rank_long:     arg.val = (unsigned long long)va_arg(ap, unsigned long);                                break;
                     case rank_longlong: arg.val = (unsigned long long)va_arg(ap, unsigned long long);                           break;
+                    }
+                }
+                if (flags.has_prefix) {
+                    if (flags.is_upper) {
+                        EMIT('0');
+                        EMIT('X');
+                    }
+                    else {
+                        EMIT('0');
+                        EMIT('x');
                     }
                 }
 
