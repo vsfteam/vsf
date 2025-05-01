@@ -40,6 +40,10 @@ extern "C" {
 #define libusb_get_device_descriptor                    VSF_LINUX_LIBUSB_WRAPPER(libusb_get_device_descriptor)
 #define libusb_get_device_address                       VSF_LINUX_LIBUSB_WRAPPER(libusb_get_device_address)
 #define libusb_get_bus_number                           VSF_LINUX_LIBUSB_WRAPPER(libusb_get_bus_number)
+#define libusb_get_port_number                          VSF_LINUX_LIBUSB_WRAPPER(libusb_get_port_number)
+#define libusb_get_parent                               VSF_LINUX_LIBUSB_WRAPPER(libusb_get_parent)
+#define libusb_reset_device                             VSF_LINUX_LIBUSB_WRAPPER(libusb_reset_device)
+#define libusb_clear_halt                               VSF_LINUX_LIBUSB_WRAPPER(libusb_clear_halt)
 #define libusb_alloc_transfer                           VSF_LINUX_LIBUSB_WRAPPER(libusb_alloc_transfer)
 #define libusb_fill_control_transfer                    VSF_LINUX_LIBUSB_WRAPPER(libusb_fill_control_transfer)
 #define libusb_fill_control_setup                       VSF_LINUX_LIBUSB_WRAPPER(libusb_fill_control_setup)
@@ -90,6 +94,7 @@ extern "C" {
 
 #define LIBUSB_CALL
 #define LIBUSB_HOTPLUG_MATCH_ANY        -1
+#define LIBUSB_PACKED                   VSF_CAL_PACKED
 
 #define libusb_device_descriptor        usb_device_desc_t
 
@@ -125,10 +130,11 @@ enum libusb_speed {
     LIBUSB_SPEED_SUPER                  = USB_SPEED_SUPER,
 };
 
+#define LIBUSB_ENDPOINT_ADDRESS_MASK    0x0F
+#define LIBUSB_ENDPOINT_DIR_MASK        USB_DIR_MASK
 enum libusb_endpoint_direction {
     LIBUSB_ENDPOINT_IN                  = USB_DIR_IN,
     LIBUSB_ENDPOINT_OUT                 = USB_DIR_OUT,
-    LIBUSB_ENDPOINT_DIR_MASK            = USB_DIR_MASK,
 };
 
 enum libusb_request_type {
@@ -249,7 +255,7 @@ struct libusb_config_descriptor {
 
 struct libusb_control_setup {
     implement(usb_ctrlrequest_t)
-};
+} LIBUSB_PACKED;
 
 #define LIBUSB_CONTROL_SETUP_SIZE       (sizeof(struct libusb_control_setup))
 
@@ -294,12 +300,13 @@ enum libusb_transfer_status {
     LIBUSB_TRANSFER_OVERFLOW,
 };
 
+#define LIBUSB_TRANSFER_TYPE_MASK       USB_ENDPOINT_XFERTYPE_MASK
 enum libusb_transfer_type {
     LIBUSB_TRANSFER_TYPE_CONTROL        = USB_ENDPOINT_XFER_CONTROL,
     LIBUSB_TRANSFER_TYPE_ISOCHRONOUS    = USB_ENDPOINT_XFER_ISOC,
     LIBUSB_TRANSFER_TYPE_BULK           = USB_ENDPOINT_XFER_BULK,
     LIBUSB_TRANSFER_TYPE_INTERRUPT      = USB_ENDPOINT_XFER_INT,
-    LIBUSB_TRANSFER_TYPE_MASK           = USB_ENDPOINT_XFERTYPE_MASK,
+    LIBUSB_TRANSFER_TYPE_BULK_STREAM    = USB_ENDPOINT_XFER_BULK_STREAM,
 };
 
 enum libusb_transfer_flags {
@@ -339,7 +346,10 @@ struct libusb_ss_endpoint_companion_descriptor {
     uint8_t  bMaxBurst;
     uint8_t  bmAttributes;
     uint16_t wBytesPerInterval;
-} PACKED;
+} VSF_CAL_PACKED;
+
+#define libusb_cpu_to_le16                  cpu_to_le16
+#define libusb_le16_to_cpu                  le16_to_cpu
 
 static inline void libusb_fill_control_transfer(
     struct libusb_transfer *transfer, libusb_device_handle *dev_handle,
@@ -376,6 +386,12 @@ static inline unsigned char *libusb_control_transfer_get_data(
     struct libusb_transfer *transfer)
 {
     return transfer->buffer + LIBUSB_CONTROL_SETUP_SIZE;
+}
+
+static inline struct libusb_control_setup * libusb_control_transfer_get_setup(
+    struct libusb_transfer *transfer)
+{
+    return (struct libusb_control_setup *)transfer->buffer;
 }
 
 static inline void libusb_fill_bulk_transfer(struct libusb_transfer *transfer,
@@ -465,6 +481,8 @@ typedef struct vsf_linux_libusb_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_close);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_get_device_address);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_get_bus_number);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_get_port_number);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_get_parent);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_release_interface);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_claim_interface);
 
@@ -514,6 +532,7 @@ typedef struct vsf_linux_libusb_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_free_pollfds);
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_reset_device);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_clear_halt);
 } vsf_linux_libusb_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libusb_vplt_t vsf_linux_libusb_vplt;
@@ -597,6 +616,14 @@ VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_device_address, uint8_t, libusb_device *d
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_bus_number, uint8_t, libusb_device *dev) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_bus_number)(dev);
+}
+VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_port_number, uint8_t, libusb_device *dev) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_port_number)(dev);
+}
+VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_parent, libusb_device *, libusb_device *dev) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_parent)(dev);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_release_interface, int, libusb_device_handle *dev_handle, int interface_number) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -754,6 +781,10 @@ VSF_LINUX_APPLET_LIBUSB_IMP(libusb_reset_device, int, libusb_device_handle *dev_
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_reset_device)(dev_handle);
 }
+VSF_LINUX_APPLET_LIBUSB_IMP(libusb_clear_halt, int, libusb_device_handle *dev_handle, unsigned char endpoint) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_clear_halt)(dev_handle, endpoint);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBUSB
 
@@ -773,6 +804,8 @@ libusb_device_handle * libusb_open_device_with_vid_pid(libusb_context *ctx,
 void libusb_close(libusb_device_handle *dev_handle);
 uint8_t libusb_get_device_address(libusb_device *dev);
 uint8_t libusb_get_bus_number(libusb_device *dev);
+uint8_t libusb_get_port_number(libusb_device *dev);
+libusb_device * libusb_get_parent(libusb_device *dev);
 int libusb_release_interface(libusb_device_handle *dev_handle, int interface_number);
 int libusb_claim_interface(libusb_device_handle *dev_handle, int interface_number);
 
@@ -852,6 +885,7 @@ void libusb_free_pollfds(const struct libusb_pollfd **pollfds);
 void vsf_linux_libusb_startup(void);
 
 int libusb_reset_device(libusb_device_handle *dev_handle);
+int libusb_clear_halt(libusb_device_handle *dev_handle, unsigned char endpoint);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBUSB
 

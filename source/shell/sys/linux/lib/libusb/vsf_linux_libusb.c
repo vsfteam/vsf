@@ -587,6 +587,18 @@ uint8_t libusb_get_bus_number(libusb_device *dev)
     return 0;
 }
 
+uint8_t libusb_get_port_number(libusb_device *dev)
+{
+    vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)dev;
+    return ldev->libusb_dev->dev->index;
+}
+
+libusb_device * libusb_get_parent(libusb_device *dev)
+{
+    // hubs are not handled in libusb
+    return NULL;
+}
+
 libusb_device * libusb_ref_device(libusb_device *dev)
 {
     return dev;
@@ -619,6 +631,12 @@ int libusb_get_device_speed(libusb_device *dev)
 {
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)dev;
     return ldev->libusb_dev->dev->speed;
+}
+
+int libusb_clear_halt(libusb_device_handle *dev_handle, unsigned char endpoint)
+{
+    return libusb_control_transfer(dev_handle, LIBUSB_RECIPIENT_ENDPOINT | LIBUSB_ENDPOINT_OUT,
+        USB_REQ_CLEAR_FEATURE, USB_ENDPOINT_HALT, endpoint, NULL, 0, 1000);
 }
 
 static void __libusb_transfer_cb(struct libusb_transfer *ltransfer)
