@@ -23,6 +23,9 @@
 #define __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
 #include "utilities/compiler/compiler.h"
 
+// for uint8_t, uint16_t, uint32_t, uint64_t
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -80,6 +83,11 @@ typedef unsigned char       unchar;
 typedef	unsigned short      ushort;
 typedef	unsigned int        uint;
 typedef unsigned long       ulong;
+
+typedef uint8_t             u_int8_t;
+typedef uint16_t            u_int16_t;
+typedef uint32_t            u_int32_t;
+typedef uint64_t            u_int64_t;
 
 typedef int                 key_t;
 typedef int                 pid_t;
