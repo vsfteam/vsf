@@ -290,6 +290,7 @@ enum usb_endpoint_xfer_t {
     USB_ENDPOINT_XFER_ISOC      = 1,
     USB_ENDPOINT_XFER_BULK      = 2,
     USB_ENDPOINT_XFER_INT       = 3,
+    USB_ENDPOINT_XFER_BULK_STREAM = 4,
     USB_ENDPOINT_MAX_ADJUSTABLE = 0x80,
 };
 
