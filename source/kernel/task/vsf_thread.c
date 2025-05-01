@@ -175,7 +175,7 @@ static vsf_evt_t __vsf_thread_wait(vsf_thread_t *pthis, vsf_thread_cb_t *cb)
             break;
         }
         if (pthis->sighandler != NULL) {
-            pthis->sighandler(pthis, (int)vsf_eda_get_cur_msg());
+            pthis->sighandler(pthis, (int)(uintptr_t)vsf_eda_get_cur_msg());
         }
     }
 #       endif
@@ -817,7 +817,7 @@ void vsf_thread_signal(vsf_thread_t *thread, int sig)
         ||  (frame->next != NULL)) {
         thread->sig_pending |= 1ULL << sig;
     } else {
-        vsf_eda_post_evt_msg((vsf_eda_t *)thread, VSF_EVT_SIGNAL, (void *)sig);
+        vsf_eda_post_evt_msg((vsf_eda_t *)thread, VSF_EVT_SIGNAL, (void *)(uintptr_t)sig);
     }
     vsf_unprotect_int(orig);
 #   endif
