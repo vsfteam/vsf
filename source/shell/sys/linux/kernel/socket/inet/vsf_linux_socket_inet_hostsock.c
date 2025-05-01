@@ -906,6 +906,35 @@ static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv,
         return VSF_LINUX_SOCKET_INVALID_SOCKET;
     }
 
+    if ((addr != NULL) && (addrlen != NULL)) {
+        union {
+            struct vsf_linux_socket_sockaddr *addr;
+            struct vsf_linux_socket_sockaddr_in *in;
+            struct vsf_linux_socket_sockaddr_in6 *in6;
+        } u;
+        u.addr = addr;
+
+        switch (hsockaddr.sa.sa_family) {
+        case AF_INET:
+            VSF_LINUX_ASSERT(*addrlen >= sizeof(*u.in));
+            u.in->sin_family = hsockaddr.sa.sa_family;
+            u.in->sin_port = hsockaddr.si.sin_port;
+            memcpy(&u.in->sin_addr, &hsockaddr.si.sin_addr, sizeof(hsockaddr.si.sin_addr));
+            *addrlen = sizeof(*u.in);
+            break;
+        case AF_INET6:
+            VSF_LINUX_ASSERT(*addrlen >= sizeof(*u.in6));
+            u.in6->sin6_family = hsockaddr.sa.sa_family;
+            u.in6->sin6_port = hsockaddr.si6.sin6_port;
+            memcpy(&u.in6->sin6_addr, &hsockaddr.si6.sin6_addr, sizeof(hsockaddr.si6.sin6_addr));
+            *addrlen = sizeof(*u.in6);
+            break;
+        default:
+            VSF_LINUX_ASSERT(false);
+            return VSF_LINUX_SOCKET_SOCKET_ERROR;
+        }
+    }
+
     vsf_linux_socket_inet_priv_t *newpriv = (vsf_linux_socket_inet_priv_t *)sfd->priv;
     newpriv->sockop = priv->sockop;
     newpriv->domain = priv->domain;
