@@ -100,7 +100,7 @@ static const hci_transport_t __hci_transport_aic8800 = {
     .send_packet                = __hci_transport_aic8800_send_packet,
 };
 
-static btstack_chipset_t __btstack_chipset_aic8800 = {
+static const btstack_chipset_t __btstack_chipset_aic8800 = {
     .name                       = "AIC8800",
     .init                       = __btstack_chipset_aic8800_init,
     .next_command               = __btstack_chipset_aic8800_next_command,
@@ -666,13 +666,16 @@ static void __hci_transport_aic8800_init(const void *transport_config)
 
     aic_bt_start();
     bt_launch();
-
-    hci_set_chipset(&__btstack_chipset_aic8800);
 }
 
 const hci_transport_t * hci_transport_aic8800_instance(void)
 {
     return &__hci_transport_aic8800;
+}
+
+const btstack_chipset_t * btstack_chipset_aic8800_instance(void)
+{
+    return &__btstack_chipset_aic8800;
 }
 
 // chipset driver implementation
