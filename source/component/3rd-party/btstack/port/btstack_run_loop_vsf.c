@@ -85,6 +85,27 @@ void btstack_assert_failed(const char * file, uint16_t line_nr)
 }
 #endif
 
+// weak functions to remove dependency on btstack source code
+VSF_CAL_WEAK(btstack_linked_list_get_first_item)
+btstack_linked_item_t * btstack_linked_list_get_first_item(btstack_linked_list_t *list)
+{
+    return *list;
+}
+
+VSF_CAL_WEAK(btstack_linked_list_remove)
+bool btstack_linked_list_remove(btstack_linked_list_t *list, btstack_linked_item_t *item)
+{
+    if (!item) return false;
+    btstack_linked_item_t *it;
+    for (it = (btstack_linked_item_t *) list; it != NULL; it = it->next) {
+        if (it->next == item) {
+            it->next = item->next;
+            return true;
+        }
+    }
+    return false;
+}
+
 static uint32_t __btstack_run_loop_vsf_get_time_ms(void)
 {
     return vsf_systimer_get_ms();
