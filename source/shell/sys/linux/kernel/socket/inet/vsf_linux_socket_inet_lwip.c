@@ -2411,17 +2411,28 @@ extern int lwip_getaddrinfo(const char *nodename,
 int getaddrinfo(const char *name, const char *service, const struct addrinfo *hints,
                         struct addrinfo **pai)
 {
-    return lwip_getaddrinfo(name, service, hints, pai);
-}
-
-struct hostent * gethostbyname(const char *name)
-{
-    return lwip_gethostbyname(name);
+    int result = lwip_getaddrinfo(name, service, hints, pai);
+    // convert lwip sockaddr to linux sockaddr,
+    //  for lwip: first byte in sockaddr is sa_len, next byte is sa_family
+    //  for linux: first 2-byte in sockaddr is sa_family
+    struct addrinfo *tmp = *pai;
+    while (tmp != NULL) {
+        if (tmp->ai_addr != NULL) {
+            tmp->ai_addr->sa_family = ((uint8_t *)&tmp->ai_addr->sa_family)[1];
+        }
+        tmp = tmp->ai_next;
+    }
+    return result;
 }
 
 void freeaddrinfo(struct addrinfo *ai)
 {
     lwip_freeaddrinfo(ai);
+}
+
+struct hostent * gethostbyname(const char *name)
+{
+    return lwip_gethostbyname(name);
 }
 
 int inet_pton(int af, const char *src, void *dst)
