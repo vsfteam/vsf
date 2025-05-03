@@ -8,11 +8,11 @@ endif()
 # compiler configurations
 # arm-none-eabi-gcc will not pass compiler checker of cmake, so include before project
 set(CMAKE_C_FLAGS
-    "-Oz"
+    "-Os"
     CACHE INTERNAL "C compiler common flags"
 )
 set(CMAKE_CXX_FLAGS
-    "-Oz"
+    "-Os"
     CACHE INTERNAL "C++ compiler common flags"
 )
 if(NOT CMAKE_C_COMPILER)
