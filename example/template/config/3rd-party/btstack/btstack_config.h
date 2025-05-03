@@ -3,7 +3,7 @@
 
 // BTstack features that can be enabled
 #define ENABLE_BLE
-//#define ENABLE_LE_PERIPHERAL
+#define ENABLE_LE_PERIPHERAL
 #define ENABLE_LE_CENTRAL
 //#define ENABLE_LE_DATA_LENGTH_EXTENSION
 #define ENABLE_CLASSIC

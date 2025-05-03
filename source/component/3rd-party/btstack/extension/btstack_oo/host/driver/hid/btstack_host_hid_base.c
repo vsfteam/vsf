@@ -57,10 +57,10 @@ int btstack_host_hid_base_disconnect(btstack_dev_t *dev)
 {
     btstack_host_hid_base_t *hid_dev = (btstack_host_hid_base_t *)btstack_host_get_priv_dev(dev);
     if (hid_dev->l2cap_interrupt_cid) {
-        l2cap_disconnect(hid_dev->l2cap_interrupt_cid, 0);
+        l2cap_disconnect(hid_dev->l2cap_interrupt_cid);
     }
     if (hid_dev->l2cap_control_cid) {
-        l2cap_disconnect(hid_dev->l2cap_control_cid, 0);
+        l2cap_disconnect(hid_dev->l2cap_control_cid);
     }
     return 0;
 }

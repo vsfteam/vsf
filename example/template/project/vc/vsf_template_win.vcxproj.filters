@@ -2412,9 +2412,6 @@
     <ClInclude Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.h">
       <Filter>usrapp\demo\tgui_demo\tgui_demo\tgui_designer</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\raw\src\ble\ancs_client.h">
-      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\raw\src\ble\att_db.h">
       <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
     </ClInclude>
@@ -3474,6 +3471,15 @@
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\port\vsf_tgui_port.h">
       <Filter>vsf\component\ui\tgui\port</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\raw\src\hci_event_builder.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\raw\src\hci_event.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\raw\src\hci_dump.h">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
@@ -4420,9 +4426,6 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\tgui_demo\tgui_demo\tgui_designer\tgui_designer_common.c">
       <Filter>usrapp\demo\tgui_demo\tgui_demo\tgui_designer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\raw\src\ble\ancs_client.c">
-      <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\raw\src\ble\att_db.c">
       <Filter>vsf\component\3rd-party\btstack\raw\src\ble</Filter>
@@ -6031,6 +6034,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\ui\tgui\port\vsf_tgui_port.c">
       <Filter>vsf\component\ui\tgui\port</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\raw\src\hci_event_builder.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\raw\src\hci_event.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\raw\src\hci_dump.c">
+      <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

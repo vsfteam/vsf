@@ -25,29 +25,29 @@
 
 #include "hci_dump.h"
 #include "hci.h"
-#include "hci_transport.h"
-#include "hci_cmd.h"
-#include "btstack_run_loop.h"
 
+// for vsf_trace
 #include "service/vsf_service.h"
-#include "utilities/vsf_utilities.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+static void __hcp_dump_vsf_log_packet(uint8_t packet_type, uint8_t in, uint8_t *packet, uint16_t len);
+static void __hci_dump_vsf_log_message(int log_level, const char * format, va_list argptr);
+
+/*============================ GLOBAL VARIABLES ==============================*/
+
+const hci_dump_t hci_dump_vsf_impl = {
+    .log_packet         = __hcp_dump_vsf_log_packet,
+    .log_message        = __hci_dump_vsf_log_message,
+};
+
+/*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#if defined(ENABLE_LOG_INFO) || defined(ENABLE_LOG_ERROR) || defined(ENABLE_LOG_DEBUG)
-static void __hci_printf_timestamp(void)
-{
-    uint32_t time_ms = btstack_run_loop_get_time_ms();
-    vsf_trace_debug("[%04ums] ", time_ms);
-}
-
-static void __hci_printf_packet(uint8_t packet_type, uint8_t in, uint8_t * packet, uint16_t len)
+static void __hcp_dump_vsf_log_packet(uint8_t packet_type, uint8_t in, uint8_t *packet, uint16_t len)
 {
     switch (packet_type) {
     case HCI_COMMAND_DATA_PACKET:
@@ -79,33 +79,9 @@ static void __hci_printf_packet(uint8_t packet_type, uint8_t in, uint8_t * packe
     vsf_trace_buffer(VSF_TRACE_DEBUG, packet, len, VSF_TRACE_DF_DEFAULT);
 }
 
-void hci_dump_packet(uint8_t packet_type, uint8_t in, uint8_t *packet, uint16_t len)
+static void __hci_dump_vsf_log_message(int log_level, const char * format, va_list argptr)
 {
-    __hci_printf_timestamp();
-    __hci_printf_packet(packet_type, in, packet, len);
+    vsf_trace_arg(VSF_TRACE_DEBUG, format, argptr);
 }
-
-void hci_dump_log(int log_level, const char * format, ...)
-{
-    char log_message_buffer[256];
-
-    va_list argptr;
-    va_start(argptr, format);
-    int len = vsnprintf(log_message_buffer, sizeof(log_message_buffer), format, argptr);
-    va_end(argptr);
-
-    hci_dump_packet(LOG_MESSAGE_PACKET, 0, (uint8_t*)log_message_buffer, len);
-}
-#else
-void hci_dump_packet(uint8_t packet_type, uint8_t in, uint8_t *packet, uint16_t len)
-{
-
-}
-
-void hci_dump_log(int log_level, const char * format, ...)
-{
-
-}
-#endif
 
 #endif      // VSF_USE_BTSTACK

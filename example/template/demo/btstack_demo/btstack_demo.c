@@ -23,6 +23,9 @@
 #include "btstack_run_loop.h"
 #include "btstack_memory.h"
 #include "hci.h"
+#if VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_BTHCI == ENABLED
+#   include "hci_transport_usb.h"
+#endif
 #include "csr/btstack_chipset_csr.h"
 #include "bcm/btstack_chipset_bcm.h"
 #include "component/3rd-party/btstack/port/btstack_run_loop_vsf.h"
