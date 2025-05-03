@@ -297,6 +297,12 @@ static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_set_thread_reg(uintptr_t value)
     __asm__ __volatile__ ("MOV r9, %0" : : "r"(value));
     return result;
 }
+static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_get_thread_reg(void)
+{
+    register uintptr_t result;
+    __asm__ __volatile__ ("MOV %0, r9" : "=r"(result));
+    return result;
+}
 #endif
 
 #if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
