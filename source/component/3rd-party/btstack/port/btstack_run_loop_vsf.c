@@ -36,12 +36,23 @@
 #   define VSF_BTSTACK_CFG_PRIORITY         vsf_prio_inherit
 #endif
 
+#ifndef VSF_BTSTACK_CFG_THREAD_REG
+#   define VSF_BTSTACK_CFG_THREAD_REG       VSF_ARCH_USE_THREAD_REG
+#endif
+#if VSF_BTSTACK_CFG_THREAD_REG == ENABLED && VSF_ARCH_USE_THREAD_REG != ENABLED
+#   warning VSF_BTSTACK_CFG_THREAD_REG is enabled, but arch does not support thread reg
+#   undef VSF_BTSTACK_CFG_THREAD_REG
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
 typedef struct btstack_vsf_t {
     btstack_linked_list_t timers;
     vsf_teda_t task;
+#if VSF_BTSTACK_CFG_THREAD_REG == ENABLED
+    uintptr_t thread_reg;
+#endif
 } btstack_vsf_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -182,13 +193,24 @@ static void __btstack_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     switch (evt) {
     case VSF_EVT_TIMER: {
             uint32_t now = __btstack_run_loop_vsf_get_time_ms();
+#if VSF_BTSTACK_CFG_THREAD_REG == ENABLED
+            uintptr_t orig;
+#endif
+
             while (__btstack_vsf.timers) {
                 btstack_timer_source_t *ts = (btstack_timer_source_t *)__btstack_vsf.timers;
                 if (ts->timeout > now) {
                     break;
                 }
                 __btstack_run_loop_vsf_remove_timer(ts);
+
+#if VSF_BTSTACK_CFG_THREAD_REG == ENABLED
+                orig = vsf_arch_set_thread_reg(__btstack_vsf.thread_reg);
+#endif
                 ts->process(ts);
+#if VSF_BTSTACK_CFG_THREAD_REG == ENABLED
+                vsf_arch_set_thread_reg(orig);
+#endif
             }
 
             __btstaci_run_loop_vsf_update_timer(NULL);
@@ -201,6 +223,9 @@ static void __btstack_run_loop_vsf_init(void)
 {
     memset(&__btstack_vsf, 0, sizeof(__btstack_vsf));
 
+#if VSF_BTSTACK_CFG_THREAD_REG == ENABLED
+    __btstack_vsf.thread_reg = vsf_arch_get_thread_reg();
+#endif
     __btstack_vsf.task.fn.evthandler = __btstack_evthandler;
     vsf_teda_init(&__btstack_vsf.task, VSF_BTSTACK_CFG_PRIORITY);
 }
