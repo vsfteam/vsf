@@ -54,6 +54,7 @@ vsf_add_sources(
     ${VSF_BTSTACK_PATH}/src/btstack_util.c
     ${VSF_BTSTACK_PATH}/src/hci.c
     ${VSF_BTSTACK_PATH}/src/hci_cmd.c
+    ${VSF_BTSTACK_PATH}/src/hci_dump.c
     ${VSF_BTSTACK_PATH}/src/l2cap.c
     ${VSF_BTSTACK_PATH}/src/l2cap_signaling.c
 )
