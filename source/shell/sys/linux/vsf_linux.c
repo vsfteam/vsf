@@ -5371,6 +5371,10 @@ __VSF_VPLT_DECORATOR__ vsf_linux_fnmatch_vplt_t vsf_linux_fnmatch_vplt = {
 };
 #endif
 
+#if VSF_APPLET_USE_KERNEL == ENABLED
+extern __VSF_VPLT_DECORATOR__ vsf_kernel_vplt_t vsf_kernel_vplt;
+#endif
+
 __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_vplt_t, 0, 0, false),
 
@@ -5387,6 +5391,9 @@ __VSF_VPLT_DECORATOR__ vsf_linux_vplt_t vsf_linux_vplt = {
     .dynamic_vplt       = (void *)&vsf_dynamic_vplt,
 #if VSF_APPLET_USE_COMPILER == ENABLED
     .compiler_vplt      = (void *)&vsf_compiler_vplt,
+#endif
+#if VSF_APPLET_USE_KERNEL == ENABLED
+    .kernel_vplt        = (void *)&vsf_kernel_vplt,
 #endif
 
     .fundmental_vplt    = (void *)&vsf_linux_fundmental_vplt,

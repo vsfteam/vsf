@@ -368,6 +368,9 @@ static void vsf_vplt_trace(const char *format, ...)
 #   ifndef VSF_APPLET_USE_ARCH
 #       define VSF_APPLET_USE_ARCH          ENABLED
 #   endif
+#   ifndef VSF_APPLET_USE_KERNEL
+#       define VSF_APPLET_USE_KERNEL        ENABLED
+#   endif
 #   ifndef VSF_APPLET_USE_SERVICE
 #       define VSF_APPLET_USE_SERVICE       ENABLED
 #   endif

@@ -35,6 +35,24 @@
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
+
+#if (VSF_USE_APPLET == ENABLED || VSF_LINUX_USE_APPLET == ENABLED) && VSF_APPLET_USE_KERNEL == ENABLED
+// TODO: add more kernel APIs
+typedef struct vsf_kernel_vplt_t {
+    vsf_vplt_info_t info;
+
+    // eda
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_eda_get_cur);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_eda_post_evt);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_eda_post_msg);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_eda_post_evt_msg);
+
+    // thread
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_thread_wait_for_evt);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vsf_thread_wait_for_msg);
+} vsf_kernel_vplt_t;
+#endif
+
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/

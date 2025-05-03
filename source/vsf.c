@@ -31,6 +31,24 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#if (VSF_USE_APPLET == ENABLED || VSF_LINUX_USE_APPLET == ENABLED) && VSF_APPLET_USE_KERNEL == ENABLED
+__VSF_VPLT_DECORATOR__ vsf_kernel_vplt_t vsf_kernel_vplt = {
+    VSF_APPLET_VPLT_INFO(vsf_kernel_vplt_t, 0, 0, true),
+
+    // eda
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_eda_get_cur),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_eda_post_evt),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_eda_post_msg),
+#   if VSF_KERNEL_CFG_SUPPORT_EVT_MESSAGE == ENABLED
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_eda_post_evt_msg),
+#   endif
+
+    // thread
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_thread_wait_for_evt),
+    VSF_APPLET_VPLT_ENTRY_FUNC(vsf_thread_wait_for_msg),
+};
+#endif
+
 #if VSF_USE_APPLET == ENABLED
 VSF_CAL_WEAK(vsf_vplt)
 __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt = {
@@ -48,6 +66,9 @@ __VSF_VPLT_DECORATOR__ vsf_vplt_t vsf_vplt = {
 #   endif
 #   if VSF_APPLET_USE_COMPILER == ENABLED
     .compiler_vplt      = (void *)&vsf_compiler_vplt,
+#   endif
+#   if VSF_APPLET_USE_KERNEL == ENABLED
+    .kernel_vplt        = (void *)&vsf_kernel_vplt,
 #   endif
 
 #   if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_APPLET == ENABLED
