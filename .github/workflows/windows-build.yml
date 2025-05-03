@@ -55,12 +55,12 @@ jobs:
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: msbuild /m /p:Configuration=${{matrix.build_config}} ${{matrix.solution_path}}
 
-    - name: Prepare Test
-      if : ${{ matrix. solution_path == './example/template/project/vc/vsf_template.sln' }}
-      run: |
-        cp example/template/project/vc/lib/{SDL2/lib/x86/SDL2.dll,libwdi/libwdi.dll} example/template/project/vc/vsf_template_win/Debug
-        pip install pytest pytest-bdd wexpect simple-hexdump
-      shell: bash
+    #- name: Prepare Test
+    #  if : ${{ matrix. solution_path == './example/template/project/vc/vsf_template.sln' }}
+    #  run: |
+    #    cp example/template/project/vc/lib/{SDL2/lib/x86/SDL2.dll,libwdi/libwdi.dll} example/template/project/vc/vsf_template_win/Debug
+    #    pip install pytest pytest-bdd wexpect simple-hexdump
+    #  shell: bash
 
     #- name: Test
     #  if : ${{ matrix. solution_path == './example/template/project/vc/vsf_template.sln' }}
