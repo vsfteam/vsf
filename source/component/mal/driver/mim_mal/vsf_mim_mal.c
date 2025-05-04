@@ -113,6 +113,7 @@ __vsf_component_peda_ifs_entry(__vk_mim_mal_read, vk_mal_read)
 
     switch (evt) {
     case VSF_EVT_INIT:
+        VSF_MAL_ASSERT((vsf_local.size > 0) && ((vsf_local.addr + vsf_local.size) <= pthis->size));
         vk_mal_read(pthis->host_mal, vsf_local.addr + pthis->offset, vsf_local.size, vsf_local.buff);
         break;
     case VSF_EVT_RETURN:
@@ -129,6 +130,7 @@ __vsf_component_peda_ifs_entry(__vk_mim_mal_write, vk_mal_write)
 
     switch (evt) {
     case VSF_EVT_INIT:
+        VSF_MAL_ASSERT((vsf_local.size > 0) && ((vsf_local.addr + vsf_local.size) <= pthis->size));
         vk_mal_write(pthis->host_mal, vsf_local.addr + pthis->offset, vsf_local.size, vsf_local.buff);
         break;
     case VSF_EVT_RETURN:
