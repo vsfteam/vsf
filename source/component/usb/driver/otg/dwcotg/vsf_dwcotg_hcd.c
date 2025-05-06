@@ -389,7 +389,7 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
             VSF_USB_ASSERT(dwcotg_urb->buffer != NULL);
 #endif
             if (!pipe.dir_in1out0) {
-                memcpy(&dwcotg_urb->buffer, buffer, size);
+                memcpy(dwcotg_urb->buffer, buffer, size);
             }
             dwcotg_urb->orig_buffer = buffer;
             channel_regs->hcdma = (uint32_t)dwcotg_urb->buffer;
