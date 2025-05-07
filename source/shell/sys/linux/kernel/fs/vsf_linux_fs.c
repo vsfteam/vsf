@@ -180,6 +180,7 @@ static int __vsf_linux_pipe_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 static int __vsf_linux_pipe_close(vsf_linux_fd_t *sfd);
 
 static void __vsf_linux_term_init(vsf_linux_fd_t *sfd);
+static void __vsf_linux_term_fini(vsf_linux_fd_t *sfd);
 static int __vsf_linux_term_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static int __vsf_linux_term_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 static ssize_t __vsf_linux_term_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
@@ -253,6 +254,7 @@ const vsf_linux_fd_op_t vsf_linux_term_fdop = {
     .priv_size          = sizeof(vsf_linux_term_priv_t),
     .feature            = VSF_LINUX_FDOP_FEATURE_FS,
     .fn_init            = __vsf_linux_term_init,
+    .fn_fini            = __vsf_linux_term_fini,
     .fn_fcntl           = __vsf_linux_term_fcntl,
     .fn_read            = __vsf_linux_term_read,
     .fn_write           = __vsf_linux_term_write,
@@ -3435,8 +3437,7 @@ static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
     vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
     if (priv->file != NULL) {
         // excl should be forced on terminals
-        priv->file->attr |= VSF_FILE_ATTR_EXCL | __VSF_FILE_ATTR_SHARE_PRIV;
-        priv->flags |= __VSF_FILE_ATTR_SHARE_PRIV;
+        priv->file->attr |= VSF_FILE_ATTR_EXCL;
     }
     // default is 115200_8N1
     static const struct termios __default_term = {
@@ -3457,6 +3458,16 @@ static void __vsf_linux_term_init(vsf_linux_fd_t *sfd)
     if ((subop != NULL) && (subop->fn_init != NULL) && !priv->subop_inited) {
         subop->fn_init(sfd);
         priv->subop_inited = true;
+    }
+}
+
+static void __vsf_linux_term_fini(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_term_priv_t *priv = (vsf_linux_term_priv_t *)sfd->priv;
+    const vsf_linux_fd_op_t *subop = priv->subop;
+    if ((subop != NULL) && (subop->fn_fini != NULL) && priv->subop_inited) {
+        subop->fn_fini(sfd);
+        priv->subop_inited = false;
     }
 }
 
