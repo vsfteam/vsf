@@ -29,12 +29,14 @@
 #   include "../../include/pthread.h"
 #   include "../../include/signal.h"
 #   include "../../include/errno.h"
+#   include "../../include/sys/wait.h"
 #else
 #   include <unistd.h>
 #   include <time.h>
 #   include <pthread.h>
 #   include <signal.h>
 #   include <errno.h>
+#   include <sys/wait.h>
 #endif
 
 #if __IS_COMPILER_IAR__
@@ -157,10 +159,17 @@ int pthread_join(pthread_t tid, void **retval)
 
 void pthread_exit(void *retval)
 {
+    extern const vsf_linux_thread_op_t __vsf_linux_main_op;
     vsf_linux_thread_t *thread = vsf_linux_get_cur_thread();
     if (thread != NULL) {
-        thread->retval = (int)(uintptr_t)retval;
-        vsf_thread_exit();
+        if (thread->op == &__vsf_linux_pthread_op) {
+            thread->retval = (int)(uintptr_t)retval;
+            vsf_thread_exit();
+        } else if (thread->op == &__vsf_linux_main_op) {
+            // pthread_exit called in main thread, keep resources and wait all other threads before exit
+            while (wait(NULL) != (pid_t)-1);
+            exit(0);
+        }
     }
     VSF_LINUX_ASSERT(false);
 }

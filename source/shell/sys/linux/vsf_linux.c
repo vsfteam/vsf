@@ -321,7 +321,7 @@ static vsf_linux_t __vsf_linux = {
 #endif
 };
 
-static const vsf_linux_thread_op_t __vsf_linux_main_op = {
+const vsf_linux_thread_op_t __vsf_linux_main_op = {
     .priv_size              = 0,
     .on_run                 = __vsf_linux_main_on_run,
     .on_terminate           = vsf_linux_thread_on_terminate,
@@ -2687,9 +2687,9 @@ static pid_t __vsf_linux_wait_any(int *status, int options)
 
     VSF_LINUX_ASSERT(cur_process != NULL);
     vsf_protect_t orig = vsf_protect_sched();
-        if ((options & WNOHANG) && vsf_dlist_is_empty(&cur_process->child_list)) {
+        if (vsf_dlist_is_empty(&cur_process->child_list)) {
             vsf_unprotect_sched(orig);
-            return (pid_t)0;
+            return (options & WNOHANG) ? (pid_t)0 : (pid_t)-1;
         }
         __vsf_dlist_foreach_unsafe(vsf_linux_process_t, child_node, &cur_process->child_list) {
             if (0 == _->status) {
