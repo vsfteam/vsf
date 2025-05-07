@@ -236,18 +236,22 @@ static void __btstack_run_loop_vsf_init(void)
 
 static void __btstack_run_loop_vsf_execute(void)
 {
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     __btstack_vsf.eda_pending = vsf_eda_get_cur();
     if ((__btstack_vsf.eda_pending != NULL) && vsf_eda_is_stack_owner(__btstack_vsf.eda_pending)) {
         vsf_thread_wfe(VSF_EVT_USER);
     }
     __btstack_vsf.eda_pending = NULL;
+#endif
 }
 
 static void __btstack_run_loop_vsf_trigger_exit(void)
 {
+#if VSF_KERNEL_CFG_SUPPORT_THREAD == ENABLED
     if (__btstack_vsf.eda_pending != NULL) {
         vsf_eda_post_evt(__btstack_vsf.eda_pending, VSF_EVT_USER);
     }
+#endif
 }
 
 const btstack_run_loop_t * btstack_run_loop_vsf_get_instance(void)
