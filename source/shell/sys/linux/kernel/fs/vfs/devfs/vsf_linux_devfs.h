@@ -29,10 +29,6 @@
 // for hardware info
 #include "hal/vsf_hal.h"
 
-#if VSF_USE_BTSTACK == ENABLED
-#   include <btstack.h>
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -61,9 +57,9 @@ typedef struct vsf_linux_terminal_keyboard_t {
 
 #if VSF_USE_BTSTACK == ENABLED
 typedef struct vsf_linux_bthci_t {
-    const hci_transport_t *hci_transport_instance;
+    const void *hci_transport_instance; // hci_transport_t
     void *hci_transport_config;
-    const btstack_chipset_t *chipset_instance;
+    const void *chipset_instance;       // btstack_chipset_t
 
     void *__priv;
 } vsf_linux_bthci_t;

@@ -71,6 +71,9 @@
 #else
 #   include <stdio.h>
 #endif
+#if VSF_USE_BTSTACK == ENABLED
+#   include <btstack.h>
+#endif
 
 /*============================ MACROS ========================================*/
 
@@ -394,7 +397,7 @@ static vsf_linux_bthci_t *__vsf_linux_bthci = NULL;
 
 static void __vsf_linux_bthci_update_tx(void)
 {
-    const hci_transport_t *hci_transport_instance = __vsf_linux_bthci->hci_transport_instance;
+    const hci_transport_t *hci_transport_instance = (const hci_transport_t *)__vsf_linux_bthci->hci_transport_instance;
     if (    hci_transport_instance->can_send_packet_now(HCI_COMMAND_DATA_PACKET)
         &&  hci_transport_instance->can_send_packet_now(HCI_ACL_DATA_PACKET)
         &&  hci_transport_instance->can_send_packet_now(HCI_SCO_DATA_PACKET)
@@ -430,7 +433,7 @@ static void __vsf_linux_bthci_init(vsf_linux_fd_t *sfd)
 
     vsf_linux_bthci_t *bthci = (vsf_linux_bthci_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
     VSF_LINUX_ASSERT(__vsf_linux_bthci == bthci);
-    const hci_transport_t *hci_transport_instance = bthci->hci_transport_instance;
+    const hci_transport_t *hci_transport_instance = (const hci_transport_t *)bthci->hci_transport_instance;
 
     __vsf_linux_bthci->__priv = sfd->priv;
     hci_transport_instance->init(bthci->hci_transport_config);
@@ -467,7 +470,7 @@ static ssize_t __vsf_linux_bthci_write(vsf_linux_fd_t *sfd, const void *buf, siz
     vsf_linux_bthci_priv_t *priv = (vsf_linux_bthci_priv_t *)sfd->priv;
     vsf_linux_bthci_t *bthci = (vsf_linux_bthci_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
     VSF_LINUX_ASSERT(__vsf_linux_bthci == bthci);
-    const hci_transport_t *hci_transport_instance = bthci->hci_transport_instance;
+    const hci_transport_t *hci_transport_instance = (const hci_transport_t *)bthci->hci_transport_instance;
 
     uint8_t packet_type = ((uint8_t *)buf)[0];
     while (!hci_transport_instance->can_send_packet_now(packet_type)) {
