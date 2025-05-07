@@ -53,6 +53,7 @@ typedef struct btstack_vsf_t {
 #if VSF_BTSTACK_CFG_THREAD_REG == ENABLED
     uintptr_t thread_reg;
 #endif
+    vsf_eda_t *eda_pending;
 } btstack_vsf_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -65,6 +66,7 @@ static bool __btstack_run_loop_vsf_remove_timer(btstack_timer_source_t *ts);
 static void __btstack_run_loop_vsf_dump_timer(void);
 static void __btstack_run_loop_vsf_init(void);
 static void __btstack_run_loop_vsf_execute(void);
+static void __btstack_run_loop_vsf_trigger_exit(void);
 
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -82,6 +84,7 @@ static const btstack_run_loop_t __btstack_run_loop_vsf = {
     .execute = __btstack_run_loop_vsf_execute,
     .dump_timer = __btstack_run_loop_vsf_dump_timer,
     .get_time_ms = __btstack_run_loop_vsf_get_time_ms,
+    .trigger_exit = __btstack_run_loop_vsf_trigger_exit,
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -233,6 +236,18 @@ static void __btstack_run_loop_vsf_init(void)
 
 static void __btstack_run_loop_vsf_execute(void)
 {
+    __btstack_vsf.eda_pending = vsf_eda_get_cur();
+    if ((__btstack_vsf.eda_pending != NULL) && vsf_eda_is_stack_owner(__btstack_vsf.eda_pending)) {
+        vsf_thread_wfe(VSF_EVT_USER);
+    }
+    __btstack_vsf.eda_pending = NULL;
+}
+
+static void __btstack_run_loop_vsf_trigger_exit(void)
+{
+    if (__btstack_vsf.eda_pending != NULL) {
+        vsf_eda_post_evt(__btstack_vsf.eda_pending, VSF_EVT_USER);
+    }
 }
 
 const btstack_run_loop_t * btstack_run_loop_vsf_get_instance(void)
