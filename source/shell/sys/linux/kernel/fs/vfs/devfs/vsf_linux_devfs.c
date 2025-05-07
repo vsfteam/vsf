@@ -72,6 +72,12 @@
 #   include <stdio.h>
 #endif
 #if VSF_USE_BTSTACK == ENABLED
+#   ifdef open
+#       undef open
+#   endif
+#   ifdef close
+#       undef close
+#   endif
 #   include <btstack.h>
 #endif
 
@@ -437,10 +443,6 @@ static void __vsf_linux_bthci_init(vsf_linux_fd_t *sfd)
 
     __vsf_linux_bthci->__priv = sfd->priv;
     hci_transport_instance->init(bthci->hci_transport_config);
-// TODO:
-#ifdef open
-#   undef open
-#endif
     hci_transport_instance->open();
     hci_transport_instance->register_packet_handler(__vsf_linux_bthci_pkthandler);
 
@@ -457,10 +459,6 @@ static void __vsf_linux_bthci_fini(vsf_linux_fd_t *sfd)
 
     __vsf_linux_bthci->__priv = NULL;
     hci_transport_instance->register_packet_handler(NULL);
-// TODO:
-#ifdef close
-#   undef close
-#endif
     hci_transport_instance->close();
 }
 
