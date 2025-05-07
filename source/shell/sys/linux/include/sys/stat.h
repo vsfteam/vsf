@@ -55,6 +55,7 @@ extern "C" {
 #define VSF_FILE_ATTR_TTY       (VSF_FILE_ATTR_USER << 5)
 #define VSF_FILE_ATTR_FIFO      (VSF_FILE_ATTR_USER << 6)
 // internal use, indicating priv of sfd is shared, do not free
+//  normally, vsf_linux_fs_bind_fdpriv is used to do binding for __VSF_FILE_ATTR_SHARE_PRIV
 #define __VSF_FILE_ATTR_SHARE_PRIV      (VSF_FILE_ATTR_USER << 16)
 
 #define UTIME_NOW	            ((1l << 30) - 1l)
