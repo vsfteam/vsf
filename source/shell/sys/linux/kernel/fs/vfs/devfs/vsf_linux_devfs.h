@@ -29,6 +29,10 @@
 // for hardware info
 #include "hal/vsf_hal.h"
 
+#if VSF_USE_BTSTACK == ENABLED
+#   include <btstack.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -53,6 +57,16 @@ typedef struct vsf_linux_mouse_t {
 typedef struct vsf_linux_terminal_keyboard_t {
     vk_input_notifier_t notifier;
 } vsf_linux_terminal_keyboard_t;
+#endif
+
+#if VSF_USE_BTSTACK == ENABLED
+typedef struct vsf_linux_bthci_t {
+    const hci_transport_t *hci_transport_instance;
+    void *hci_transport_config;
+    const btstack_chipset_t *chipset_instance;
+
+    void *__priv;
+} vsf_linux_bthci_t;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -91,6 +105,10 @@ extern int vsf_linux_fs_bind_terminal_keyboard(char *path, vsf_linux_terminal_ke
 #if VSF_USE_UI == ENABLED
 typedef struct vk_disp_t vk_disp_t;
 extern int vsf_linux_fs_bind_disp(char *path, vk_disp_t *disp);
+#endif
+
+#if VSF_USE_BTSTACK == ENABLED
+extern int vsf_linux_fs_bind_bthci(char *path, vsf_linux_bthci_t *bthci);
 #endif
 
 extern int vsf_linux_devfs_init(void);

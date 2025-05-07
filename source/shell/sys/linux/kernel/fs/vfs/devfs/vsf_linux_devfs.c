@@ -86,6 +86,7 @@
 extern int __vsf_linux_default_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 extern void __vsf_linux_term_notify_rx(vsf_linux_term_priv_t *priv);
 extern ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
+extern ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -143,26 +144,56 @@ static int __vsf_linux_term_fcntl_common(vsf_linux_fd_t *sfd, int cmd, uintptr_t
     return 0;
 }
 
-#if VSF_HAL_USE_USART == ENABLED
+#if VSF_HAL_USE_USART == ENABLED || VSF_USE_BTSTACK == ENABLED
 
 #   if VSF_USE_SIMPLE_STREAM != ENABLED
 #       error VSF_USE_SIMPLE_STREAM MUST be enabled to support uart dev
-#   endif
-#   ifndef VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE
-#       define VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE          64
 #   endif
 #   ifndef VSF_LINUX_DEVFS_UART_CFG_PRIO
 #       define VSF_LINUX_DEVFS_UART_CFG_PRIO                vsf_arch_prio_0
 #   endif
 
-typedef struct vsf_linux_uart_priv_t {
+typedef struct vsf_linux_uart_stream_priv_t {
     implement(vsf_linux_term_priv_t)
-    struct serial_struct ss;
     vsf_eda_t *eda_pending_tx;
 
-    // use vsf_fifo_stream_t because it doesn't need protect.
+    // use vsf_fifo_stream_t because it doesn't need protection.
     //  so stream APIs can be called directly in isr
     implement(vsf_fifo_stream_t)
+    uint8_t *__rx_buffer;
+    uint32_t __rx_buffer_size;
+} vsf_linux_uart_stream_priv_t;
+
+static void __vsf_linux_uart_init_stream_rx(vsf_linux_fd_t *sfd)
+{
+    vsf_linux_uart_stream_priv_t *priv = (vsf_linux_uart_stream_priv_t *)sfd->priv;
+
+    priv->subop = sfd->op;
+    priv->subop_inited = true;
+    sfd->op = &vsf_linux_term_fdop;
+    vsf_linux_term_fdop.fn_init(sfd);
+
+    priv->op = &vsf_fifo_stream_op;
+    priv->buffer = priv->__rx_buffer;
+    priv->size = priv->__rx_buffer_size;
+    priv->stream_rx = &priv->use_as__vsf_stream_t;
+
+    vsf_stream_connect_tx(priv->stream_rx);
+
+    // DO NOT call __vsf_linux_rx_stream_init
+    //  event is trigger in __vsf_linux_term_notify_rx, not in stream evthandler
+    vsf_stream_connect_rx(priv->stream_rx);
+    __vsf_linux_term_notify_rx(&priv->use_as__vsf_linux_term_priv_t);
+}
+
+#   if VSF_HAL_USE_USART == ENABLED
+
+#       ifndef VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE
+#           define VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE      64
+#       endif
+typedef struct vsf_linux_uart_priv_t {
+    implement(vsf_linux_uart_stream_priv_t)
+    struct serial_struct ss;
     uint8_t __buffer[VSF_LINUX_DEVFS_UART_CFG_RX_BUFSIZE];
 } vsf_linux_uart_priv_t;
 
@@ -285,23 +316,9 @@ static void __vsf_linux_uart_config(vsf_linux_uart_priv_t *priv)
 static void __vsf_linux_uart_init(vsf_linux_fd_t *sfd)
 {
     vsf_linux_uart_priv_t *priv = (vsf_linux_uart_priv_t *)sfd->priv;
-
-    priv->subop = sfd->op;
-    priv->subop_inited = true;
-    sfd->op = &vsf_linux_term_fdop;
-    vsf_linux_term_fdop.fn_init(sfd);
-
-    priv->op = &vsf_fifo_stream_op;
-    priv->buffer = priv->__buffer;
-    priv->size = sizeof(priv->__buffer);
-    priv->stream_rx = &priv->use_as__vsf_stream_t;
-
-    vsf_stream_connect_tx(priv->stream_rx);
-
-    // DO NOT call __vsf_linux_rx_stream_init
-    //  event is trigger in __vsf_linux_term_notify_rx, not in stream evthandler
-    vsf_stream_connect_rx(priv->stream_rx);
-    __vsf_linux_term_notify_rx(&priv->use_as__vsf_linux_term_priv_t);
+    priv->__rx_buffer = priv->__buffer;
+    priv->__rx_buffer_size = sizeof(priv->__buffer);
+    __vsf_linux_uart_init_stream_rx(sfd);
     __vsf_linux_uart_config(priv);
 }
 
@@ -360,7 +377,121 @@ int vsf_linux_fs_bind_uart(char *path, vsf_usart_t *uart)
                 NULL, NULL,
                 VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_TTY, 0);
 }
-#endif
+#   endif   // VSF_HAL_USE_USART
+
+#   if VSF_USE_BTSTACK == ENABLED
+
+#       ifndef VSF_LINUX_DEVFS_BTHCI_CFG_RX_BUFSIZE
+#           define VSF_LINUX_DEVFS_BTHCI_CFG_RX_BUFSIZE     4096
+#       endif
+typedef struct vsf_linux_bthci_priv_t {
+    implement(vsf_linux_uart_stream_priv_t)
+    uint8_t __buffer[VSF_LINUX_DEVFS_BTHCI_CFG_RX_BUFSIZE];
+} vsf_linux_bthci_priv_t;
+
+// btstack pkthandler is not OO based, so MUST use singleton mode
+static vsf_linux_bthci_t *__vsf_linux_bthci = NULL;
+
+static void __vsf_linux_bthci_update_tx(void)
+{
+    const hci_transport_t *hci_transport_instance = __vsf_linux_bthci->hci_transport_instance;
+    if (    hci_transport_instance->can_send_packet_now(HCI_COMMAND_DATA_PACKET)
+        &&  hci_transport_instance->can_send_packet_now(HCI_ACL_DATA_PACKET)
+        &&  hci_transport_instance->can_send_packet_now(HCI_SCO_DATA_PACKET)
+        &&  hci_transport_instance->can_send_packet_now(HCI_ISO_DATA_PACKET)) {
+        vsf_linux_fd_set_status((vsf_linux_fd_priv_t *)__vsf_linux_bthci->__priv, POLLOUT, vsf_protect_sched());
+    } else {
+        vsf_linux_fd_clear_status((vsf_linux_fd_priv_t *)__vsf_linux_bthci->__priv, POLLOUT, vsf_protect_sched());
+    }
+}
+
+static void __vsf_linux_bthci_pkthandler(uint8_t packet_type, uint8_t *packet, uint16_t size)
+{
+    VSF_LINUX_ASSERT((__vsf_linux_bthci != NULL) && (__vsf_linux_bthci->__priv != NULL));
+    vsf_linux_bthci_priv_t *priv = __vsf_linux_bthci->__priv;
+
+    if ((packet_type == HCI_EVENT_PACKET) && (packet[0] == HCI_EVENT_TRANSPORT_PACKET_SENT)) {
+        __vsf_linux_bthci_update_tx();
+    }
+    uint32_t written = vsf_stream_write(&priv->use_as__vsf_stream_t, &packet_type, 1);
+    written += vsf_stream_write(&priv->use_as__vsf_stream_t, packet, size);
+    // if assert here try increasing VSF_LINUX_DEVFS_BTHCI_CFG_RX_BUFSIZE
+    VSF_LINUX_ASSERT(written == size + 1);
+    __vsf_linux_term_notify_rx(&priv->use_as__vsf_linux_term_priv_t);
+}
+
+static void __vsf_linux_bthci_init(vsf_linux_fd_t *sfd)
+{
+    VSF_LINUX_ASSERT((__vsf_linux_bthci != NULL) && (__vsf_linux_bthci->__priv == NULL));
+    vsf_linux_bthci_priv_t *priv = (vsf_linux_bthci_priv_t *)sfd->priv;
+    priv->__rx_buffer = priv->__buffer;
+    priv->__rx_buffer_size = sizeof(priv->__buffer);
+    __vsf_linux_uart_init_stream_rx(sfd);
+
+    vsf_linux_bthci_t *bthci = (vsf_linux_bthci_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+    VSF_LINUX_ASSERT(__vsf_linux_bthci == bthci);
+    const hci_transport_t *hci_transport_instance = bthci->hci_transport_instance;
+
+    __vsf_linux_bthci->__priv = sfd->priv;
+    hci_transport_instance->init(bthci->hci_transport_config);
+    hci_transport_instance->open();
+    hci_transport_instance->register_packet_handler(__vsf_linux_bthci_pkthandler);
+
+    vsf_linux_fd_set_status(sfd->priv, POLLOUT, vsf_protect_sched());
+}
+
+static void __vsf_linux_bthci_fini(vsf_linux_fd_t *sfd)
+{
+    VSF_LINUX_ASSERT((__vsf_linux_bthci != NULL) && (__vsf_linux_bthci->__priv != NULL));
+    vsf_linux_bthci_priv_t *priv = (vsf_linux_bthci_priv_t *)sfd->priv;
+    vsf_linux_bthci_t *bthci = (vsf_linux_bthci_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+    VSF_LINUX_ASSERT(__vsf_linux_bthci == bthci);
+    const hci_transport_t *hci_transport_instance = bthci->hci_transport_instance;
+
+    __vsf_linux_bthci->__priv = NULL;
+    hci_transport_instance->register_packet_handler(NULL);
+    hci_transport_instance->close();
+}
+
+static ssize_t __vsf_linux_bthci_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
+{
+    VSF_LINUX_ASSERT((__vsf_linux_bthci != NULL) && (__vsf_linux_bthci->__priv != NULL) && (__vsf_linux_bthci->__priv == sfd->priv));
+    vsf_linux_bthci_priv_t *priv = (vsf_linux_bthci_priv_t *)sfd->priv;
+    vsf_linux_bthci_t *bthci = (vsf_linux_bthci_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+    VSF_LINUX_ASSERT(__vsf_linux_bthci == bthci);
+    const hci_transport_t *hci_transport_instance = bthci->hci_transport_instance;
+
+    uint8_t packet_type = ((uint8_t *)buf)[0];
+    while (!hci_transport_instance->can_send_packet_now(packet_type)) {
+        usleep(1000);
+    }
+    hci_transport_instance->send_packet(packet_type, &((uint8_t *)buf)[1], count - 1);
+
+    __vsf_linux_bthci_update_tx();
+    return count;
+}
+
+static const vsf_linux_fd_op_t __vsf_linux_bthci_fdop = {
+    .priv_size          = sizeof(vsf_linux_bthci_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
+    .fn_init            = __vsf_linux_bthci_init,
+    .fn_fini            = __vsf_linux_bthci_fini,
+    .fn_read            = __vsf_linux_stream_read,
+    .fn_write           = __vsf_linux_bthci_write,
+};
+
+int vsf_linux_fs_bind_bthci(char *path, vsf_linux_bthci_t *bthci)
+{
+    if (__vsf_linux_bthci != NULL) {
+        return -1;
+    }
+    __vsf_linux_bthci = bthci;
+    return vsf_linux_fs_bind_target_ex(path, bthci, &__vsf_linux_bthci_fdop,
+                NULL, NULL,
+                VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE | VSF_FILE_ATTR_TTY | VSF_FILE_ATTR_EXCL, 0);
+}
+#   endif
+#endif      // VSF_HAL_USE_USART || VSF_USE_BTSTACK
 
 #if VSF_HAL_USE_I2C == ENABLED
 
@@ -646,6 +777,7 @@ static void __vsf_linux_spi_init(vsf_linux_fd_t *sfd)
 {
     vsf_linux_spi_priv_t *priv = (vsf_linux_spi_priv_t *)sfd->priv;
     vsf_spi_t *spi = (vsf_spi_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
+    VSF_UNUSED_PARAM(spi);
 
     priv->mode = SPI_MODE_3 | SPI_LSB_FIRST | SPI_CS_HIGH;
     priv->speed = 1 * 1000 * 1000;
