@@ -64,6 +64,7 @@ static void __btstack_run_loop_vsf_add_timer(btstack_timer_source_t *ts);
 static bool __btstack_run_loop_vsf_remove_timer(btstack_timer_source_t *ts);
 static void __btstack_run_loop_vsf_dump_timer(void);
 static void __btstack_run_loop_vsf_init(void);
+static void __btstack_run_loop_vsf_execute(void);
 
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -78,7 +79,7 @@ static const btstack_run_loop_t __btstack_run_loop_vsf = {
     .set_timer = __btstack_run_loop_vsf_set_timer,
     .add_timer = __btstack_run_loop_vsf_add_timer,
     .remove_timer = __btstack_run_loop_vsf_remove_timer,
-    .execute = NULL,
+    .execute = __btstack_run_loop_vsf_execute,
     .dump_timer = __btstack_run_loop_vsf_dump_timer,
     .get_time_ms = __btstack_run_loop_vsf_get_time_ms,
 };
@@ -228,6 +229,10 @@ static void __btstack_run_loop_vsf_init(void)
 #endif
     __btstack_vsf.task.fn.evthandler = __btstack_evthandler;
     vsf_teda_init(&__btstack_vsf.task, VSF_BTSTACK_CFG_PRIORITY);
+}
+
+static void __btstack_run_loop_vsf_execute(void)
+{
 }
 
 const btstack_run_loop_t * btstack_run_loop_vsf_get_instance(void)
