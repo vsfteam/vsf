@@ -406,8 +406,7 @@ static void __vsf_linux_bthci_update_tx(void)
     const hci_transport_t *hci_transport_instance = (const hci_transport_t *)__vsf_linux_bthci->hci_transport_instance;
     if (    hci_transport_instance->can_send_packet_now(HCI_COMMAND_DATA_PACKET)
         &&  hci_transport_instance->can_send_packet_now(HCI_ACL_DATA_PACKET)
-        &&  hci_transport_instance->can_send_packet_now(HCI_SCO_DATA_PACKET)
-        &&  hci_transport_instance->can_send_packet_now(HCI_ISO_DATA_PACKET)) {
+        &&  hci_transport_instance->can_send_packet_now(HCI_SCO_DATA_PACKET)) {
         vsf_linux_fd_set_status((vsf_linux_fd_priv_t *)__vsf_linux_bthci->__priv, POLLOUT, vsf_protect_sched());
     } else {
         vsf_linux_fd_clear_status((vsf_linux_fd_priv_t *)__vsf_linux_bthci->__priv, POLLOUT, vsf_protect_sched());
@@ -417,16 +416,17 @@ static void __vsf_linux_bthci_update_tx(void)
 static void __vsf_linux_bthci_pkthandler(uint8_t packet_type, uint8_t *packet, uint16_t size)
 {
     VSF_LINUX_ASSERT((__vsf_linux_bthci != NULL) && (__vsf_linux_bthci->__priv != NULL));
-    vsf_linux_bthci_priv_t *priv = __vsf_linux_bthci->__priv;
 
     if ((packet_type == HCI_EVENT_PACKET) && (packet[0] == HCI_EVENT_TRANSPORT_PACKET_SENT)) {
         __vsf_linux_bthci_update_tx();
+    } else {
+        vsf_linux_bthci_priv_t *priv = __vsf_linux_bthci->__priv;
+        uint32_t written = vsf_stream_write(&priv->use_as__vsf_stream_t, &packet_type, 1);
+        written += vsf_stream_write(&priv->use_as__vsf_stream_t, packet, size);
+        // if assert here try increasing VSF_LINUX_DEVFS_BTHCI_CFG_RX_BUFSIZE
+        VSF_LINUX_ASSERT(written == size + 1);
+        __vsf_linux_term_notify_rx(&priv->use_as__vsf_linux_term_priv_t);
     }
-    uint32_t written = vsf_stream_write(&priv->use_as__vsf_stream_t, &packet_type, 1);
-    written += vsf_stream_write(&priv->use_as__vsf_stream_t, packet, size);
-    // if assert here try increasing VSF_LINUX_DEVFS_BTHCI_CFG_RX_BUFSIZE
-    VSF_LINUX_ASSERT(written == size + 1);
-    __vsf_linux_term_notify_rx(&priv->use_as__vsf_linux_term_priv_t);
 }
 
 static void __vsf_linux_bthci_init(vsf_linux_fd_t *sfd)
