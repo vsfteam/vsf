@@ -800,7 +800,7 @@ namespace std {
             if ((const_iterator)nullptr == pos) {
                 return (iterator)nullptr;
             }
-            replace(pos - &__array[0], 0, 1, t);
+            replace(pos - array_base<T>::begin(), 0, 1, t);
             return (iterator)(pos + 1);
         }
         basic_string<T, Traits, Alloc> & erase(size_t pos = 0, size_t len = npos)
