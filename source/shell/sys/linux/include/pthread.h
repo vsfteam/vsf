@@ -66,6 +66,7 @@ extern "C" {
 #define pthread_mutex_init              VSF_LINUX_WRAPPER(pthread_mutex_init)
 #define pthread_mutex_destroy           VSF_LINUX_WRAPPER(pthread_mutex_destroy)
 #define pthread_mutex_lock              VSF_LINUX_WRAPPER(pthread_mutex_lock)
+#define pthread_mutex_timedlock         VSF_LINUX_WRAPPER(pthread_mutex_timedlock)
 #define pthread_mutex_trylock           VSF_LINUX_WRAPPER(pthread_mutex_trylock)
 #define pthread_mutex_unlock            VSF_LINUX_WRAPPER(pthread_mutex_unlock)
 #define pthread_mutexattr_init          VSF_LINUX_WRAPPER(pthread_mutexattr_init)
@@ -248,6 +249,7 @@ typedef struct vsf_linux_pthread_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutex_init);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutex_destroy);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutex_lock);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutex_timedlock);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutex_trylock);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutex_unlock);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_mutexattr_init);
@@ -380,6 +382,10 @@ VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutex_destroy, int, pthread_mutex_t *mutex)
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutex_lock, int, pthread_mutex_t *mutex) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutex_lock)(mutex);
+}
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutex_timedlock, int, pthread_mutex_t *mutex, const struct timespec *abstime) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_mutex_timedlock)(mutex, abstime);
 }
 VSF_LINUX_APPLET_PTHREAD_IMP(pthread_mutex_trylock, int, pthread_mutex_t *mutex) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -694,6 +700,7 @@ void * pthread_getspecific(pthread_key_t key);
 int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *mattr);
 int pthread_mutex_destroy(pthread_mutex_t *mutex);
 int pthread_mutex_lock(pthread_mutex_t *mutex);
+int pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime);
 int pthread_mutex_trylock(pthread_mutex_t *mutex);
 int pthread_mutex_unlock(pthread_mutex_t *mutex);
 int pthread_mutexattr_init(pthread_mutexattr_t *mattr);

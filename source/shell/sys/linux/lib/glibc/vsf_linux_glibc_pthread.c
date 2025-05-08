@@ -504,7 +504,7 @@ int pthread_mutex_destroy(pthread_mutex_t *mutex)
     return 0;
 }
 
-int pthread_mutex_lock(pthread_mutex_t *mutex)
+int pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime)
 {
     vsf_eda_t *eda = vsf_eda_get_cur();
     VSF_LINUX_ASSERT(eda != NULL);
@@ -513,7 +513,8 @@ int pthread_mutex_lock(pthread_mutex_t *mutex)
         return 0;
     }
 
-    if (vsf_eda_mutex_enter(&mutex->use_as__vsf_mutex_t)) {
+    vsf_timeout_tick_t timeout = __vsf_linux_abstimespec_to_timeout(abstime);
+    if (vsf_eda_mutex_enter(&mutex->use_as__vsf_mutex_t, timeout)) {
         vsf_sync_reason_t reason = vsf_eda_sync_get_reason(&mutex->use_as__vsf_sync_t, vsf_thread_wait());
         VSF_UNUSED_PARAM(reason);
         VSF_LINUX_ASSERT(VSF_SYNC_GET == reason);
@@ -521,6 +522,11 @@ int pthread_mutex_lock(pthread_mutex_t *mutex)
 
     mutex->recursive_cnt = 1;
     return 0;
+}
+
+int pthread_mutex_lock(pthread_mutex_t *mutex)
+{
+    return pthread_mutex_timedlock(mutex, NULL);
 }
 
 int pthread_mutex_trylock(pthread_mutex_t *mutex)
@@ -1146,6 +1152,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_mutex_init),
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_mutex_destroy),
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_mutex_lock),
+    VSF_APPLET_VPLT_ENTRY_FUNC(pthread_mutex_timedlock),
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_mutex_trylock),
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_mutex_unlock),
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_mutexattr_init),
