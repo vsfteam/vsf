@@ -378,6 +378,7 @@ clock_t clock(void)
 int clock_getres(clockid_t clockid, struct timespec *res)
 {
     switch (clockid) {
+    case CLOCK_REALTIME:
     case CLOCK_MONOTONIC:
         if (res != NULL) {
             res->tv_sec = 0;
@@ -392,6 +393,7 @@ int clock_getres(clockid_t clockid, struct timespec *res)
 int clock_gettime(clockid_t clockid, struct timespec *tp)
 {
     switch (clockid) {
+    case CLOCK_REALTIME:
     case CLOCK_MONOTONIC: {
             vsf_systimer_tick_t us = vsf_systimer_get_us();
             time_t sec = us / 1000000;
