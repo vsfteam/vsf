@@ -51,8 +51,8 @@ typedef struct vsf_linux_socket_bluetooth_priv_t {
 
     union {
         struct {
-            vsf_linux_fd_t      *dev_sfd;
-            bool                inited;
+            vsf_linux_fd_t                  *dev_sfd;
+            vsf_linux_fd_priv_callback_t    *callback;
         } hci;
     };
 } vsf_linux_socket_bluetooth_priv_t;
@@ -132,6 +132,10 @@ static int __vsf_linux_socket_bluetooth_close(vsf_linux_fd_t *sfd)
     switch (bt_priv->protocol) {
     case BTPROTO_HCI:
         if (bt_priv->hci.dev_sfd != NULL) {
+            if (bt_priv->hci.callback != NULL) {
+                vsf_linux_fd_release_calback(bt_priv->hci.dev_sfd->priv, bt_priv->hci.callback);
+                bt_priv->hci.callback = NULL;
+            }
             close(bt_priv->hci.dev_sfd->fd);
             bt_priv->hci.dev_sfd = NULL;
         }
@@ -144,6 +148,12 @@ void __vsf_linux_bthci_on_events(vsf_linux_fd_priv_t *priv, void *param, short e
 {
     vsf_linux_socket_bluetooth_priv_t *bt_priv = (vsf_linux_socket_bluetooth_priv_t *)param;
     vsf_linux_fd_set_status(&bt_priv->use_as__vsf_linux_fd_priv_t,  priv->status, orig);
+
+    if ((priv->events_callback[1].cb != NULL) && (events & priv->events_callback[1].pendind_events))  {
+        priv->events_callback[1].cb(priv, priv->events_callback[1].param, events, orig);
+    } else {
+        priv->events &= ~(events & ~priv->sticky_events);
+    }
 }
 
 static int __vsf_linux_socket_bluetooth_bind(vsf_linux_socket_priv_t *socket_priv, const struct sockaddr *addr, socklen_t addrlen)
@@ -178,7 +188,8 @@ static int __vsf_linux_socket_bluetooth_bind(vsf_linux_socket_priv_t *socket_pri
             }
 
             bt_priv->hci.dev_sfd = vsf_linux_fd_get(dev_fd);
-            vsf_linux_fd_priv_callback_t * callback = vsf_linux_fd_claim_calback(bt_priv->hci.dev_sfd->priv);
+            bt_priv->hci.callback = vsf_linux_fd_claim_calback(bt_priv->hci.dev_sfd->priv);
+            vsf_linux_fd_priv_callback_t *callback = bt_priv->hci.callback;
             callback->pendind_events = 0xFFFF;
             callback->param = bt_priv;
             callback->cb = __vsf_linux_bthci_on_events;
