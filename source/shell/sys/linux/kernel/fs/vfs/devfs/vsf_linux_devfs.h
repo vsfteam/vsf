@@ -34,6 +34,11 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+#if VSF_USE_BTSTACK == ENABLED
+#   define VSF_LINUX_BTHCI_PATH_PREFIX              "/dev/ttyhci"
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 

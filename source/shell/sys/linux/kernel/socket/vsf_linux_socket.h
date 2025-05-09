@@ -94,6 +94,9 @@ extern const vsf_linux_socket_op_t vsf_linux_socket_inet_op;
 #if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
 extern const vsf_linux_socket_op_t vsf_linux_socket_netlink_op;
 #endif
+#if VSF_LINUX_SOCKET_USE_BLUETOOTH == ENABLED
+extern const vsf_linux_socket_op_t vsf_linux_socket_bluetooth_op;
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/

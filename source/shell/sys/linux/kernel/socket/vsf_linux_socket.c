@@ -39,6 +39,7 @@
 #   endif
 #   include "../../include/errno.h"
 #   include "../../include/sys/stat.h"
+#   include "../../include/sys/ioctl.h"
 #else
 #   include <unistd.h>
 #   include <stdio.h>
@@ -52,6 +53,7 @@
 #   endif
 #   include <errno.h>
 #   include <sys/stat.h>
+#   include <sys/ioctl.h>
 #endif
 #include "./vsf_linux_socket.h"
 
@@ -60,11 +62,7 @@
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#if VSF_LINUX_SOCKET_USE_UNIX == ENABLED
-extern const vsf_linux_socket_op_t vsf_linux_socket_unix_op;
-#endif
 #if VSF_LINUX_SOCKET_USE_INET == ENABLED
-extern const vsf_linux_socket_op_t vsf_linux_socket_inet_op;
 // use weak implementation because lower implementation(eg: lwip) may implement the same variable
 VSF_CAL_WEAK(in6addr_any)
 const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;
@@ -232,9 +230,12 @@ int __vsf_linux_socket_inet_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     switch (cmd) {
     case F_SETFL:
-        if (arg & O_NONBLOCK) {
-            setsockopt(sfd->fd, SOL_SOCKET, SO_NONBLOCK, &arg, sizeof(arg));
+        if (!(arg & O_NONBLOCK)) {
+            break;
         }
+        // fall through
+    case FIONBIO:
+        setsockopt(sfd->fd, SOL_SOCKET, SO_NONBLOCK, &arg, sizeof(arg));
         break;
     }
     return 0;
@@ -491,6 +492,10 @@ int socket(int domain, int type, int protocol)
 #if VSF_LINUX_SOCKET_USE_NETLINK == ENABLED
     case AF_NETLINK:
         sockop = &vsf_linux_socket_netlink_op; break;
+#endif
+#if VSF_LINUX_SOCKET_USE_BLUETOOTH == ENABLED
+    case AF_BLUETOOTH:
+        sockop = &vsf_linux_socket_bluetooth_op; break;
 #endif
     default: return -1;
     }

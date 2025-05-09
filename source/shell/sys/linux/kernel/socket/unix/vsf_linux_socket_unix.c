@@ -443,4 +443,4 @@ static int __vsf_linux_socket_unix_socketpair(vsf_linux_fd_t *sfd1, vsf_linux_fd
 #   pragma clang diagnostic pop
 #endif
 
-#endif      // VSF_USE_LINUX && VSF_LINUX_USE_SOCKET
+#endif      // VSF_USE_LINUX && VSF_LINUX_USE_SOCKET && VSF_LINUX_SOCKET_USE_UNIX

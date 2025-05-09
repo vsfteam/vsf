@@ -329,6 +329,13 @@ ssize_t __vsf_linux_stdio_fallback_write(vsf_linux_fd_t *sfd, const void *buf, s
 int __vsf_linux_default_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     switch (cmd) {
+    case FIONBIO:
+        if (*(int *)arg) {
+            sfd->priv->flags |= O_NONBLOCK;
+        } else {
+            sfd->priv->flags &= ~O_NONBLOCK;
+        }
+        // fall through
     case F_SETFD:
     case F_SETFL:
         return 0;
