@@ -438,6 +438,7 @@ static void __vsf_linux_bthci_init(vsf_linux_fd_t *sfd)
     priv->__rx_buffer = priv->__buffer;
     priv->__rx_buffer_size = sizeof(priv->__buffer);
     __vsf_linux_uart_init_stream_rx(sfd);
+    sfd->fd_flags &= ~__FD_READALL;
 
     vsf_linux_bthci_t *bthci = (vsf_linux_bthci_t *)(((vk_vfs_file_t *)(priv->file))->f.param);
     VSF_LINUX_ASSERT(__vsf_linux_bthci == bthci);
