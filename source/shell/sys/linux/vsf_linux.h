@@ -188,6 +188,7 @@ vsf_class(vsf_linux_thread_t) {
     )
 
     protected_member(
+        vsf_dlist_node_t thread_node;
         pid_t pid_exited;     // used in wait
         int retval;
         pid_t tid;
@@ -211,7 +212,6 @@ vsf_class(vsf_linux_thread_t) {
 
     private_member(
         vsf_linux_process_t *process;
-        vsf_dlist_node_t thread_node;
         union {
             struct {
                 unsigned short wantval;
