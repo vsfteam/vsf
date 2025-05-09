@@ -396,6 +396,8 @@ int vsf_linux_fs_bind_uart(char *path, vsf_usart_t *uart)
 typedef struct vsf_linux_bthci_priv_t {
     implement(vsf_linux_uart_stream_priv_t)
     uint8_t __buffer[VSF_LINUX_DEVFS_BTHCI_CFG_RX_BUFSIZE];
+    uint8_t __tx_buffer[VSF_LINUX_DEVFS_BTHCI_CFG_RX_BUFSIZE];
+    uint32_t __tx_buffer_len;
 } vsf_linux_bthci_priv_t;
 
 // btstack pkthandler is not OO based, so MUST use singleton mode
@@ -462,6 +464,33 @@ static void __vsf_linux_bthci_fini(vsf_linux_fd_t *sfd)
     hci_transport_instance->close();
 }
 
+static ssize_t __vsf_linux_bthci_get_tx_packet_size(uint8_t *packet, size_t packet_len)
+{
+    uint8_t packet_type = packet[0];
+    uint16_t len;
+
+    switch (packet_type) {
+    case HCI_SCO_DATA_PACKET:
+    case HCI_COMMAND_DATA_PACKET:       len = 1;    break;
+    case HCI_ACL_DATA_PACKET:           len = 2;    break;
+    default:
+        return 0;
+    }
+    if (packet_len < 3 + len) {
+        return packet_len - 3 - len;
+    } else if (len == 1) {
+        len = 3 + len + packet[3];
+    } else if (len == 2) {
+        len = 3 + len + get_unaligned_le16(&packet[3]);
+    } else {
+        return 0;
+    }
+    if (packet_len >= len) {
+        return len;
+    }
+    return packet_len - len;
+}
+
 static ssize_t __vsf_linux_bthci_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
     VSF_LINUX_ASSERT((__vsf_linux_bthci != NULL) && (__vsf_linux_bthci->__priv != NULL) && (__vsf_linux_bthci->__priv == sfd->priv));
@@ -470,14 +499,58 @@ static ssize_t __vsf_linux_bthci_write(vsf_linux_fd_t *sfd, const void *buf, siz
     VSF_LINUX_ASSERT(__vsf_linux_bthci == bthci);
     const hci_transport_t *hci_transport_instance = (const hci_transport_t *)bthci->hci_transport_instance;
 
-    uint8_t packet_type = ((uint8_t *)buf)[0];
-    while (!hci_transport_instance->can_send_packet_now(packet_type)) {
-        usleep(1000);
-    }
-    hci_transport_instance->send_packet(packet_type, &((uint8_t *)buf)[1], count - 1);
+    uint8_t *bufptr = (uint8_t *)buf, *packet_buffer;
+    ssize_t packet_len, packet_buffer_len;
+    bool raw, trasnfered = false;
 
-    __vsf_linux_bthci_update_tx();
-    return count;
+    while (count > 0) {
+        raw = 0 == priv->__tx_buffer_len;
+        if (raw) {
+            packet_buffer = bufptr;
+            packet_buffer_len = count;
+        } else {
+            packet_buffer = priv->__tx_buffer;
+            packet_buffer_len = priv->__tx_buffer_len;
+        }
+
+        packet_len = __vsf_linux_bthci_get_tx_packet_size(packet_buffer, packet_buffer_len);
+        if (0 == packet_len) {
+            // packet not supported
+            VSF_LINUX_ASSERT(false);
+            return -1;
+        } else if (packet_len > 0) {
+            while (!hci_transport_instance->can_send_packet_now(packet_buffer[0])) {
+                usleep(1000);
+            }
+            hci_transport_instance->send_packet(packet_buffer[0], &packet_buffer[1], packet_len - 1);
+            trasnfered = true;
+
+            if (raw) {
+                bufptr += packet_len;
+                count -= packet_len;
+            } else {
+                priv->__tx_buffer_len = 0;
+            }
+        } else if (raw) {
+            memcpy(priv->__tx_buffer, bufptr, packet_buffer_len);
+            priv->__tx_buffer_len = packet_buffer_len;
+            bufptr += packet_buffer_len;
+            count -= packet_buffer_len;
+            break;
+        } else {
+            packet_len = -packet_len;
+            packet_len = vsf_min(packet_len, count);
+            memcpy(priv->__tx_buffer + priv->__tx_buffer_len, bufptr, packet_len);
+            priv->__tx_buffer_len += packet_len;
+            bufptr += packet_len;
+            count -= packet_len;
+        }
+    }
+
+    if (trasnfered) {
+        __vsf_linux_bthci_update_tx();
+    }
+    return bufptr - (uint8_t *)buf;
 }
 
 static const vsf_linux_fd_op_t __vsf_linux_bthci_fdop = {
