@@ -98,11 +98,22 @@ int sem_getvalue(sem_t *sem, int *value)
 {
     vsf_protect_t orig = vsf_protect_sched();
     int value_tmp = sem->cur_union.bits.cur;
+
+/*  If one or more processes or threads are blocked waiting to lock
+    the semaphore with sem_wait(3), POSIX.1 permits two possibilities
+    for the value returned in sval: either 0 is returned; or a
+    negative number whose absolute value is the count of the number of
+    processes and threads currently blocked in sem_wait(3).  Linux
+    adopts the former behavior.
+
+    TODO: if sem_timedwait is called on the sem, will value from sem_getvalue negetive before timeout?
+
     if (!value_tmp) {
         __vsf_dlist_foreach_unsafe(vsf_eda_t, pending_node, &sem->pending_list) {
             value_tmp--;
         }
     }
+*/
     vsf_unprotect_sched(orig);
 
     if (value != NULL) {
