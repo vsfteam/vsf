@@ -166,8 +166,20 @@ void pthread_exit(void *retval)
             thread->retval = (int)(uintptr_t)retval;
             vsf_thread_exit();
         } else if (thread->op == &__vsf_linux_main_op) {
-            // pthread_exit called in main thread, keep resources and wait all other threads before exit
-            while (wait(NULL) != (pid_t)-1);
+            vsf_linux_process_t *process = vsf_linux_get_cur_process();
+            vsf_linux_thread_t *child_thread;
+            pid_t tid;
+            vsf_protect_t orig;
+
+            while (true) {
+                orig = vsf_protect_sched();
+                vsf_dlist_peek_head(vsf_linux_thread_t, thread_node, &process->thread_list, child_thread);
+                tid = child_thread != NULL ? child_thread->tid : -1;
+                vsf_unprotect_sched(orig);
+                if (tid >= 0) {
+                    vsf_linux_wait_thread(tid, NULL);
+                }
+            }
             exit(0);
         }
     }
