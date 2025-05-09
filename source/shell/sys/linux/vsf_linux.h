@@ -324,11 +324,11 @@ vsf_class(vsf_linux_process_t) {
 #if VSF_USE_LOADER == ENABLED
         void *loader;
 #endif
+        vsf_dlist_t thread_list;
     )
 
     private_member(
         vsf_dlist_node_t process_node;
-        vsf_dlist_t thread_list;
         vsf_dlist_t fd_list;
         // thread pending this process
         vsf_linux_thread_t *thread_pending;
