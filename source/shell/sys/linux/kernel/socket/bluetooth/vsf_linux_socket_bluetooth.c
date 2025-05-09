@@ -19,7 +19,8 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
-#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SOCKET == ENABLED && VSF_LINUX_SOCKET_USE_BLUETOOTH == ENABLED
+#if     VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_SOCKET == ENABLED             \
+    &&  VSF_LINUX_SOCKET_USE_BLUETOOTH == ENABLED && VSF_USE_BTSTACK == ENABLED
 
 // for protected members in vsf_linux_socket_priv_t
 #define __VSF_LINUX_SOCKET_CLASS_INHERIT__
@@ -39,6 +40,8 @@
 #endif
 #include "../vsf_linux_socket.h"
 
+#include <btstack.h>
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -48,7 +51,8 @@ typedef struct vsf_linux_socket_bluetooth_priv_t {
 
     union {
         struct {
-            int             dev_fd;
+            vsf_linux_fd_t      *dev_sfd;
+            bool                inited;
         } hci;
     };
 } vsf_linux_socket_bluetooth_priv_t;
@@ -56,8 +60,6 @@ typedef struct vsf_linux_socket_bluetooth_priv_t {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern int vsf_linux_open(int dirfd, const char *pathname, int flags, mode_t mode);
-extern int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd);
 extern int __vsf_linux_pipe_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 extern int __vsf_linux_socket_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 
@@ -66,9 +68,9 @@ static int __vsf_linux_socket_bluetooth_close(vsf_linux_fd_t *sfd);
 
 static ssize_t __vsf_linux_socket_bluetooth_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 static ssize_t __vsf_linux_socket_bluetooth_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
-static int __vsf_linux_socket_bluetooth_init(vsf_linux_fd_t *sfd);
-static int __vsf_linux_socket_bluetooth_fini(vsf_linux_socket_priv_t *socket_priv, int how);
 static int __vsf_linux_socket_bluetooth_bind(vsf_linux_socket_priv_t *socket_priv, const struct sockaddr *addr, socklen_t addrlen);
+
+static int __vsf_linux_socket_bluetooth_init_chipset(int fd, const btstack_chipset_t *chipset_instance);
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -83,8 +85,6 @@ const vsf_linux_socket_op_t vsf_linux_socket_bluetooth_op = {
         .fn_stat        = __vsf_linux_socket_stat,
     },
 
-    .fn_init            = __vsf_linux_socket_bluetooth_init,
-    .fn_fini            = __vsf_linux_socket_bluetooth_fini,
     .fn_bind            = __vsf_linux_socket_bluetooth_bind,
 };
 
@@ -108,12 +108,22 @@ static int __vsf_linux_socket_bluetooth_fcntl(vsf_linux_fd_t *sfd, int cmd, uint
 
 static ssize_t __vsf_linux_socket_bluetooth_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
 {
-    return 0;
+    vsf_linux_socket_bluetooth_priv_t *bt_priv = (vsf_linux_socket_bluetooth_priv_t *)sfd->priv;
+    switch (bt_priv->protocol) {
+    case BTPROTO_HCI:
+        return read(bt_priv->hci.dev_sfd->fd, buf, count);
+    }
+    return -1;
 }
 
 static ssize_t __vsf_linux_socket_bluetooth_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
 {
-    return 0;
+    vsf_linux_socket_bluetooth_priv_t *bt_priv = (vsf_linux_socket_bluetooth_priv_t *)sfd->priv;
+    switch (bt_priv->protocol) {
+    case BTPROTO_HCI:
+        return write(bt_priv->hci.dev_sfd->fd, buf, count);
+    }
+    return -1;
 }
 
 static int __vsf_linux_socket_bluetooth_close(vsf_linux_fd_t *sfd)
@@ -121,29 +131,19 @@ static int __vsf_linux_socket_bluetooth_close(vsf_linux_fd_t *sfd)
     vsf_linux_socket_bluetooth_priv_t *bt_priv = (vsf_linux_socket_bluetooth_priv_t *)sfd->priv;
     switch (bt_priv->protocol) {
     case BTPROTO_HCI:
-        if (bt_priv->hci.dev_fd >= 0) {
-            __vsf_linux_fd_close_ex(NULL, bt_priv->hci.dev_fd);
-            bt_priv->hci.dev_fd = -1;
+        if (bt_priv->hci.dev_sfd != NULL) {
+            close(bt_priv->hci.dev_sfd->fd);
+            bt_priv->hci.dev_sfd = NULL;
         }
         break;
     }
     return 0;
 }
 
-static int __vsf_linux_socket_bluetooth_init(vsf_linux_fd_t *sfd)
+void __vsf_linux_bthci_on_events(vsf_linux_fd_priv_t *priv, void *param, short events, vsf_protect_t orig)
 {
-    vsf_linux_socket_bluetooth_priv_t *bt_priv = (vsf_linux_socket_bluetooth_priv_t *)sfd->priv;
-    switch (bt_priv->protocol) {
-    case BTPROTO_HCI:
-        bt_priv->hci.dev_fd = -1;
-        break;
-    }
-    return 0;
-}
-
-static int __vsf_linux_socket_bluetooth_fini(vsf_linux_socket_priv_t *socket_priv, int how)
-{
-    return 0;
+    vsf_linux_socket_bluetooth_priv_t *bt_priv = (vsf_linux_socket_bluetooth_priv_t *)param;
+    vsf_linux_fd_set_status(&bt_priv->use_as__vsf_linux_fd_priv_t,  priv->status, orig);
 }
 
 static int __vsf_linux_socket_bluetooth_bind(vsf_linux_socket_priv_t *socket_priv, const struct sockaddr *addr, socklen_t addrlen)
@@ -161,14 +161,27 @@ static int __vsf_linux_socket_bluetooth_bind(vsf_linux_socket_priv_t *socket_pri
             char devhci_path[sizeof(VSF_LINUX_BTHCI_PATH_PREFIX) + 16];
             snprintf(devhci_path, sizeof(devhci_path), VSF_LINUX_BTHCI_PATH_PREFIX"%d", sa_hci->hci_dev);
 
-            if (bt_priv->hci.dev_fd >= 0) {
-                __vsf_linux_fd_close_ex(NULL, bt_priv->hci.dev_fd);
-                bt_priv->hci.dev_fd = -1;
+            if (bt_priv->hci.dev_sfd != NULL) {
+                close(bt_priv->hci.dev_sfd->fd);
+                bt_priv->hci.dev_sfd = NULL;
             }
-            bt_priv->hci.dev_fd = vsf_linux_open(-1, devhci_path, O_EXCL, 0);
-            if (bt_priv->hci.dev_fd < 0) {
+            int dev_fd = open(devhci_path, O_EXCL | O_NOCTTY | O_RDWR);
+            if (dev_fd < 0) {
                 return -1;
             }
+
+            vsf_linux_bthci_t *bthci;
+            if (    (vsf_linux_fd_get_target(dev_fd, (void **)&bthci) < 0)
+                ||  (__vsf_linux_socket_bluetooth_init_chipset(dev_fd, bthci->chipset_instance) < 0)) {
+                close(dev_fd);
+                return -1;
+            }
+
+            bt_priv->hci.dev_sfd = vsf_linux_fd_get(dev_fd);
+            vsf_linux_fd_priv_callback_t * callback = vsf_linux_fd_claim_calback(bt_priv->hci.dev_sfd->priv);
+            callback->pendind_events = 0xFFFF;
+            callback->param = bt_priv;
+            callback->cb = __vsf_linux_bthci_on_events;
         }
         break;
     default:
@@ -177,4 +190,59 @@ static int __vsf_linux_socket_bluetooth_bind(vsf_linux_socket_priv_t *socket_pri
     return 0;
 }
 
-#endif      // VSF_USE_LINUX && VSF_LINUX_USE_SOCKET && VSF_LINUX_SOCKET_USE_BLUETOOTH
+static int __vsf_linux_socket_bluetooth_rxevt(int fd, uint8_t *buffer, uint16_t buffer_len)
+{
+    uint8_t *ptr = buffer;
+    int result = 0, total = 3;
+
+    while (result < total) {
+        result += read(fd, ptr, total - result);
+    }
+    total = 3 + buffer[2];
+    ptr += 3;
+    while (result < total) {
+        result += read(fd, ptr, total - result);
+    }
+    return result;
+}
+
+static int __vsf_linux_socket_bluetooth_init_chipset(int fd, const btstack_chipset_t *chipset_instance)
+{
+    uint8_t hci_buffer[4 + 255];
+
+    // hci_reset: 01 03 0c 00
+    static const uint8_t hci_reset[] = {0x01, 0x03, 0x0c, 0x00};
+    write(fd, hci_reset, sizeof(hci_reset));
+    // hci_reset response: 04 0e 04 05 03 0c 00
+    __vsf_linux_socket_bluetooth_rxevt(fd, hci_buffer, sizeof(hci_buffer));
+
+    // hci_read_local_version_information: 01 01 10 00
+    static const uint8_t hci_read_local_version_information[] = {0x01, 0x01, 0x10, 0x00};
+    write(fd, hci_read_local_version_information, sizeof(hci_read_local_version_information));
+    __vsf_linux_socket_bluetooth_rxevt(fd, hci_buffer, sizeof(hci_buffer));
+
+    // hci_read_local_name: 01 14 0c 00
+    static const uint8_t hci_read_local_name[] = {0x01, 0x14, 0x0c, 0x00};
+    write(fd, hci_read_local_name, sizeof(hci_read_local_name));
+    __vsf_linux_socket_bluetooth_rxevt(fd, hci_buffer, sizeof(hci_buffer));
+
+    if (chipset_instance != NULL && chipset_instance->next_command != NULL) {
+        btstack_chipset_result_t result;
+        while (true) {
+            result = chipset_instance->next_command(hci_buffer + 1);
+            if (BTSTACK_CHIPSET_VALID_COMMAND == result) {
+                hci_buffer[0] = HCI_COMMAND_DATA_PACKET;
+                write(fd, hci_buffer, 4 + hci_buffer[3]);
+                __vsf_linux_socket_bluetooth_rxevt(fd, hci_buffer, sizeof(hci_buffer));
+            } else if (BTSTACK_CHIPSET_WARMSTART_REQUIRED == result) {
+                VSF_LINUX_ASSERT(false);
+            } else {
+                break;
+            }
+        }
+    }
+
+    return 0;
+}
+
+#endif      // VSF_USE_LINUX && VSF_LINUX_USE_SOCKET && VSF_LINUX_SOCKET_USE_BLUETOOTH && VSF_USE_BTSTACK

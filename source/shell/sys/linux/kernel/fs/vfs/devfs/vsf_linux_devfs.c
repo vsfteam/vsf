@@ -513,6 +513,7 @@ static ssize_t __vsf_linux_bthci_write(vsf_linux_fd_t *sfd, const void *buf, siz
             packet_buffer_len = priv->__tx_buffer_len;
         }
 
+    check_packet:
         packet_len = __vsf_linux_bthci_get_tx_packet_size(packet_buffer, packet_buffer_len);
         if (0 == packet_len) {
             // packet not supported
@@ -537,13 +538,17 @@ static ssize_t __vsf_linux_bthci_write(vsf_linux_fd_t *sfd, const void *buf, siz
             bufptr += packet_buffer_len;
             count -= packet_buffer_len;
             break;
-        } else {
+        } else if (count > 0) {
             packet_len = -packet_len;
             packet_len = vsf_min(packet_len, count);
             memcpy(priv->__tx_buffer + priv->__tx_buffer_len, bufptr, packet_len);
             priv->__tx_buffer_len += packet_len;
             bufptr += packet_len;
             count -= packet_len;
+            packet_buffer_len = priv->__tx_buffer_len;
+            goto check_packet;
+        } else {
+            break;
         }
     }
 
