@@ -987,7 +987,16 @@ int libusb_get_active_config_descriptor(libusb_device *dev,
         }
         config_val = 1;
     }
-    return libusb_get_config_descriptor(dev, config_val - 1, config);
+    if (0 == config_val) {
+        // user want active config descriptor, but SET_CONFIGURATION is not called, use the first configuration
+        err = libusb_get_config_descriptor(dev, 0, config);
+        if (LIBUSB_SUCCESS == err) {
+            libusb_set_configuration((libusb_device_handle *)dev, (*config)->bConfigurationValue);
+        }
+        return err;
+    } else {
+        return libusb_get_config_descriptor(dev, config_val - 1, config);
+    }
 }
 
 int libusb_get_config_descriptor(libusb_device *dev, uint8_t config_index,
