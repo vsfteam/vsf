@@ -1096,7 +1096,13 @@ static int __vsf_linux_socket_inet_getpeername(vsf_linux_socket_priv_t *socket_p
     ip_addr_t remoteaddr;
     u16_t port;
     netconn_peer(conn, &remoteaddr, &port);
-    __ipaddr_port_to_sockaddr(addr, &remoteaddr, port);
+
+    struct sockaddr saddr;
+    int saddr_len = __ipaddr_port_to_sockaddr(&saddr, &remoteaddr, port);
+    if (*addrlen > saddr_len) {
+        *addrlen = saddr_len;
+    }
+    memcpy(addr, &saddr, *addrlen);
     return 0;
 }
 
@@ -1108,7 +1114,13 @@ static int __vsf_linux_socket_inet_getsockname(vsf_linux_socket_priv_t *socket_p
     ip_addr_t localaddr;
     u16_t port;
     netconn_addr(conn, &localaddr, &port);
-    __ipaddr_port_to_sockaddr(addr, &localaddr, port);
+
+    struct sockaddr saddr;
+    int saddr_len = __ipaddr_port_to_sockaddr(&saddr, &localaddr, port);
+    if (*addrlen > saddr_len) {
+        *addrlen = saddr_len;
+    }
+    memcpy(addr, &saddr, *addrlen);
     return 0;
 }
 
@@ -1144,11 +1156,13 @@ static int __vsf_linux_socket_inet_accept(vsf_linux_socket_priv_t *socket_priv, 
             return SOCKET_ERROR;
         }
 
-        // TODO: get addr and addrlen if addrlen is large enough
-//        __ipaddr_port_to_sockaddr(, &naddr, port);
-//        if (*addrlen >
+        struct sockaddr saddr;
+        int saddr_len = __ipaddr_port_to_sockaddr(&saddr, &naddr, port);
+        if (*addrlen > saddr_len) {
+            *addrlen = saddr_len;
+        }
+        memcpy(addr, &saddr, *addrlen);
     }
-
 
     newconn->callback = __vsf_linux_socket_inet_lwip_evthandler;
     LOCK_TCPIP_CORE();
