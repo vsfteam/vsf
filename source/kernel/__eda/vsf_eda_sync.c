@@ -188,7 +188,9 @@ vsf_err_t __vsf_eda_sync_increase_ex(vsf_sync_t *pthis, vsf_eda_t *eda, bool man
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
     if (pthis->cur_union.bits.has_owner) {
         eda = __vsf_eda_get_valid_eda(eda);
-        VSF_KERNEL_ASSERT(((vsf_sync_owner_t *)pthis)->eda_owner == eda);
+// although not good to remove the assertion below, 
+//  but some applications use mutex as sem or trigger, and will assert here
+//        VSF_KERNEL_ASSERT(((vsf_sync_owner_t *)pthis)->eda_owner == eda);
         ((vsf_sync_owner_t *)pthis)->eda_owner = NULL;
         if (eda->cur_priority != eda->priority) {
             __vsf_eda_set_priority(eda, (vsf_prio_t)eda->priority);
