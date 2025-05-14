@@ -116,9 +116,8 @@ typedef struct vk_dwcotg_hcd_urb_t {
     uint16_t holdoff_cnt    : 3;
 #endif
 
-    uint16_t current_size;
     uint16_t pos;
-
+    uint32_t current_size;
     uint32_t timeout;
 
 #ifdef VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE
@@ -315,7 +314,7 @@ static void __vk_dwcotg_hcd_halt_channel(vk_dwcotg_hcd_t *dwcotg_hcd, uint_fast8
 }
 
 static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_urb_t *urb,
-                        uint_fast8_t dpid, bool dir_in1out0, uint8_t *buffer, uint_fast16_t size)
+                        uint_fast8_t dpid, bool dir_in1out0, uint8_t *buffer, uint_fast32_t size)
 {
     static const uint8_t eptype_to_dwctype[4] = {
         [USB_ENDPOINT_XFER_CONTROL] = 0,

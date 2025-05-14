@@ -244,18 +244,18 @@ void vk_usbh_hcd_urb_free_buffer(vk_usbh_hcd_urb_t *urb_hcd)
     __vk_usbh_urb_reset_buffer(urb_hcd);
 }
 
-void vk_usbh_hcd_urb_complete(vk_usbh_hcd_urb_t *hcd_urb)
+void vk_usbh_hcd_urb_complete(vk_usbh_hcd_urb_t *urb_hcd)
 {
     // check complete first because eda_caller uses same ram space as param for complete
-    vsf_usbh_urb_complete_t complete = hcd_urb->complete;
+    vsf_usbh_urb_complete_t complete = urb_hcd->complete;
     if (complete != NULL) {
-        complete(hcd_urb->param, hcd_urb);
+        complete(urb_hcd->param, urb_hcd);
         return;
     }
 
-    vsf_eda_t *eda_caller = hcd_urb->eda_caller;
+    vsf_eda_t *eda_caller = urb_hcd->eda_caller;
     if (eda_caller != NULL) {
-        vsf_eda_post_msg(eda_caller, hcd_urb);
+        vsf_eda_post_msg(eda_caller, urb_hcd);
     }
 }
 
