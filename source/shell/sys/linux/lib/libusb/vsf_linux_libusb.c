@@ -534,7 +534,7 @@ int libusb_reset_device(libusb_device_handle *dev_handle)
 
     vk_usbh_reset_dev(usbh, dev);
     while (vk_usbh_is_dev_resetting(usbh, dev)) {
-        usleep(20);
+        usleep(20 * 1000);
     }
     return 0;
 }
