@@ -528,16 +528,39 @@ libusb_device * libusb_get_device(libusb_device_handle *dev_handle)
 
 int libusb_reset_device(libusb_device_handle *dev_handle)
 {
+    int result;
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)libusb_get_device(dev_handle);
     vk_usbh_t *usbh = ldev->libusb_dev->usbh;
     vk_usbh_dev_t *dev = ldev->libusb_dev->dev;
+
+    int config_val;
+    if (LIBUSB_SUCCESS != libusb_get_configuration(dev_handle, &config_val)) {
+        config_val = -1;
+    }
 
     vk_usbh_reset_dev(usbh, dev);
     while (vk_usbh_is_dev_resetting(usbh, dev)) {
         usleep(20 * 1000);
     }
+
+    // restore original address
+    VSF_LINUX_ASSERT(!vk_usbh_urb_is_alloced(&ldev->pipe_out[0].urb));
+    ldev->pipe_out[0].urb.pipe.address = 0;
+    result = libusb_control_transfer(dev_handle, LIBUSB_RECIPIENT_DEVICE | LIBUSB_ENDPOINT_OUT,
+                                USB_REQ_SET_ADDRESS, dev->devnum, 0, NULL, 0, 1000);
+    if (LIBUSB_SUCCESS != result) {
+        goto failed;
+    }
+    ldev->pipe_out[0].urb.pipe.address = dev->devnum;
+
+    // restore original configuration
+    if (config_val >= 0) {
+        result = libusb_set_configuration(dev_handle, config_val);
+    }
+
+failed:
     __vsf_linux_libusb_fd_trigger();
-    return 0;
+    return result;
 }
 
 libusb_device_handle * libusb_open_device_with_vid_pid(libusb_context *ctx,
