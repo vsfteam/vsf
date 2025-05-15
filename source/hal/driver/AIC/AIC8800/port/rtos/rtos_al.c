@@ -356,13 +356,12 @@ uint32_t rtos_task_wait_notification(int timeout)
         }
 
         eda->flag.state.is_sync_got = false;
-        eda->flag.state.is_limitted = true;
         eda->flag.feature.user_bits |= 1 << (VSF_KERNEL_CFG_EDA_USER_BITLEN - 1);
 
         // private kernel API, can only be used here, so declear here
-        extern vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_systimer_tick_t timeout);
+        extern vsf_eda_t * __vsf_eda_sync_set_timeout(vsf_eda_t *eda, vsf_systimer_tick_t timeout);
         vsf_timeout_tick_t timeout_tick = (timeout > 0) ? vsf_systimer_ms_to_tick(timeout) : -1;
-        __vsf_eda_set_timeout(eda, timeout_tick);
+        __vsf_eda_sync_set_timeout(eda, timeout_tick);
     vsf_unprotect_int(orig);
 
     while (1) {

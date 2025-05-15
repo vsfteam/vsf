@@ -327,20 +327,26 @@ vsf_err_t vsf_teda_start(vsf_teda_t *this_ptr, vsf_eda_cfg_t *cfg)
     return vsf_eda_start(&(this_ptr->use_as__vsf_eda_t), cfg);
 }
 
-VSF_CAL_SECTION(".text.vsf.kernel.vsf_teda_set_timer_ex")
-vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *this_ptr, vsf_systimer_tick_t tick)
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_teda_set_due_ex")
+vsf_err_t vsf_teda_set_due_ex(vsf_teda_t *this_ptr, vsf_systimer_tick_t due)
 {
     vsf_protect_t origlevel;
     vsf_err_t err;
 
+    origlevel = vsf_protect_sched();
+        err = __vsf_teda_set_timer_imp(this_ptr, due);
+    vsf_unprotect_sched(origlevel);
+    return err;
+}
+
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_teda_set_timer_ex")
+vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *this_ptr, vsf_systimer_tick_t tick)
+{
     if (0 == tick) {
         VSF_KERNEL_ASSERT(false);
         return VSF_ERR_NOT_AVAILABLE;
     }
-    origlevel = vsf_protect_sched();
-        err = __vsf_teda_set_timer_imp(this_ptr, vsf_systimer_get_tick() + tick);
-    vsf_unprotect_sched(origlevel);
-    return err;
+    return vsf_teda_set_due_ex(this_ptr, vsf_systimer_get_tick() + tick);
 }
 
 #if __IS_COMPILER_ARM_COMPILER_6__

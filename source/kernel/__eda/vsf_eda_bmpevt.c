@@ -376,7 +376,7 @@ vsf_err_t vsf_eda_bmpevt_pend(vsf_bmpevt_t *this_ptr, vsf_bmpevt_pender_t *pende
     }
 
     __vsf_dlist_add_to_tail_imp(&this_ptr->pending_list, &eda->pending_node);
-    __vsf_eda_set_timeout(eda, timeout);
+    __vsf_eda_sync_set_timeout(eda, timeout);
     vsf_unprotect_sched(orig);
 
     __vsf_eda_bmpevt_poll_start(this_ptr);

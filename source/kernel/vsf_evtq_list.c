@@ -30,6 +30,8 @@
 
 #ifdef __VSF_OS_CFG_EVTQ_LIST
 
+#include "./vsf_timq.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -360,6 +362,12 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
                     eda);
             if (NULL == eda->evt_list.head.next) {
                 eda->flag.state.is_ready = false;
+
+                // refer to comments of __vsf_eda_sync_set_timeout in vsf_eda_sync.c
+                if (eda->flag.state.is_to_set_time) {
+                    eda->flag.state.is_to_set_time = false;
+                    vsf_teda_set_due_ex((vsf_teda_t *)eda, ((vsf_teda_t *)eda)->due);
+                }
 #if VSF_KERNEL_CFG_TRACE == ENABLED
                 vsf_kernel_trace_eda_idle(eda);
 #endif

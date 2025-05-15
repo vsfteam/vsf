@@ -42,14 +42,23 @@ extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *pthis);
  *-----------------------------------------------------------------------------*/
 
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_sync")
-vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_timeout_tick_t timeout)
+vsf_eda_t * __vsf_eda_sync_set_timeout(vsf_eda_t *eda, vsf_timeout_tick_t timeout)
 {
     eda = __vsf_eda_get_valid_eda(eda);
 
     if (timeout > 0) {
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         eda->flag.state.is_limitted = true;
+#   ifdef __VSF_OS_CFG_EVTQ_LIST
+        // If timeout is too close, VSF_EVT_TIMER will be issued before eda->flag.state.is_ready cleared,
+        //  __vsf_evtq_post(evtq_list) will ignore the VSF_EVT_TIMER event.
+        // So just record due and set is_to_set_time,
+        //  timer will be set after eda->flag.state.is_ready cleared in vsf_evtq_poll(evtq_list).
+        eda->flag.state.is_to_set_time = true;
+        ((vsf_teda_t *)eda)->due = vsf_systimer_get_tick() + timeout;
+#   else
         vsf_teda_set_timer_ex((vsf_teda_t *)eda, timeout);
+#   endif
 #else
     #ifndef WEAK_VSF_KERNEL_ERR_REPORT
         vsf_kernel_err_report(VSF_KERNEL_ERR_EDA_DOES_NOT_SUPPORT_TIMER);
@@ -72,7 +81,7 @@ void __vsf_eda_sync_pend(vsf_sync_t *sync, vsf_eda_t *eda, vsf_timeout_tick_t ti
         &sync->pending_list,
         eda);
 
-    __vsf_eda_set_timeout(eda, timeout);
+    __vsf_eda_sync_set_timeout(eda, timeout);
 }
 
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_sync")
@@ -188,7 +197,7 @@ vsf_err_t __vsf_eda_sync_increase_ex(vsf_sync_t *pthis, vsf_eda_t *eda, bool man
 #if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY == ENABLED
     if (pthis->cur_union.bits.has_owner) {
         eda = __vsf_eda_get_valid_eda(eda);
-// although not good to remove the assertion below, 
+// although not good to remove the assertion below,
 //  but some applications use mutex as sem or trigger, and will assert here
 //        VSF_KERNEL_ASSERT(((vsf_sync_owner_t *)pthis)->eda_owner == eda);
         ((vsf_sync_owner_t *)pthis)->eda_owner = NULL;
@@ -294,7 +303,7 @@ vsf_err_t __vsf_eda_sync_decrease_ex(vsf_sync_t *pthis, vsf_timeout_tick_t timeo
                 &pthis->pending_list,
                 eda,
                 _->cur_priority < cur_priority);
-            __vsf_eda_set_timeout(eda, timeout);
+            __vsf_eda_sync_set_timeout(eda, timeout);
         } else
 #endif
         {

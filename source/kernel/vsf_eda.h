@@ -710,6 +710,9 @@ typedef union __vsf_eda_state_t {
         /* if is_limitted, eda can only receive 1 event */
         uint8_t                 is_limitted : 1;
         uint8_t                 is_sync_got : 1;
+#   ifdef __VSF_OS_CFG_EVTQ_LIST
+        uint8_t                 is_to_set_time : 1;
+#   endif
 #endif
 
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
@@ -1259,6 +1262,9 @@ extern vsf_err_t vsf_teda_start(vsf_teda_t *pthis, vsf_eda_cfg_t *cfg);
 
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_teda_set_timer")
 extern vsf_err_t vsf_teda_set_timer(vsf_systimer_tick_t tick);
+
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_teda_set_due_ex")
+extern vsf_err_t vsf_teda_set_due_ex(vsf_teda_t *this_ptr, vsf_systimer_tick_t due);
 
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_teda_set_timer_ex")
 extern vsf_err_t vsf_teda_set_timer_ex(vsf_teda_t *pthis, vsf_systimer_tick_t tick);

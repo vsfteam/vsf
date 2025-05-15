@@ -823,11 +823,11 @@ int SDL_WaitEventTimeout(SDL_Event * event, int timeout)
         is_empty = vsf_slist_queue_is_empty(&__vsf_sdl2_event.evt_list);
         if (is_empty && timeout > 0) {
             VSF_CAL_SECTION(".text.vsf.kernel.vsf_sync")
-            vsf_eda_t * __vsf_eda_set_timeout(vsf_eda_t *eda, vsf_timeout_tick_t timeout);
+            vsf_eda_t * __vsf_eda_sync_set_timeout(vsf_eda_t *eda, vsf_timeout_tick_t timeout);
 
             __vsf_sdl2_event.eda_pending = vsf_eda_get_cur();
             VSF_SDL2_ASSERT(__vsf_sdl2_event.eda_pending != NULL);
-            __vsf_eda_set_timeout(eda, vsf_systimer_ms_to_tick(timeout));
+            __vsf_eda_sync_set_timeout(eda, vsf_systimer_ms_to_tick(timeout));
         }
     vsf_unprotect_int(orig);
 

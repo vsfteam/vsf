@@ -241,7 +241,7 @@ vsf_err_t vsf_eda_queue_recv_ex(vsf_eda_queue_t *pthis, void **node, vsf_timeout
     } else {
         if (timeout != 0) {
             VSF_KERNEL_ASSERT(NULL == pthis->eda_rx);
-            pthis->eda_rx = __vsf_eda_set_timeout(eda, timeout);
+            pthis->eda_rx = __vsf_eda_sync_set_timeout(eda, timeout);
         }
         vsf_unprotect_sched(origlevel);
         return VSF_ERR_NOT_READY;
