@@ -1133,6 +1133,9 @@ try_next:
                 urb->urb_hcd->buffer = (uint8_t *)urb->urb_hcd->buffer + sizeof(struct usb_ctrlrequest_t);
                 urb->urb_hcd->transfer_length -= sizeof(struct usb_ctrlrequest_t);
                 urb->urb_hcd->pipe.dir_in1out0 = (request->bRequestType & USB_DIR_IN) > 0;
+
+//                vsf_trace_debug("ep0: %-5d: ", urb->urb_hcd->transfer_length);
+//                vsf_trace_buffer(VSF_TRACE_DEBUG, request, 8);
             }
             break;
         case LIBUSB_TRANSFER_TYPE_ISOCHRONOUS:
