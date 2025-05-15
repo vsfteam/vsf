@@ -363,11 +363,13 @@ vsf_err_t vsf_evtq_poll(vsf_evtq_t *pthis)
             if (NULL == eda->evt_list.head.next) {
                 eda->flag.state.is_ready = false;
 
+#if VSF_KERNEL_CFG_SUPPORT_SYNC == ENABLED
                 // refer to comments of __vsf_eda_sync_set_timeout in vsf_eda_sync.c
-                if (eda->flag.state.is_to_set_time) {
-                    eda->flag.state.is_to_set_time = false;
+                if (eda->flag.state.is_to_set_due && !eda->flag.state.is_to_exit) {
+                    eda->flag.state.is_to_set_due = false;
                     vsf_teda_set_due_ex((vsf_teda_t *)eda, ((vsf_teda_t *)eda)->due);
                 }
+#endif
 #if VSF_KERNEL_CFG_TRACE == ENABLED
                 vsf_kernel_trace_eda_idle(eda);
 #endif

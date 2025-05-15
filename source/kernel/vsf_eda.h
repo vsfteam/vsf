@@ -711,7 +711,7 @@ typedef union __vsf_eda_state_t {
         uint8_t                 is_limitted : 1;
         uint8_t                 is_sync_got : 1;
 #   ifdef __VSF_OS_CFG_EVTQ_LIST
-        uint8_t                 is_to_set_time : 1;
+        uint8_t                 is_to_set_due : 1;
 #   endif
 #endif
 

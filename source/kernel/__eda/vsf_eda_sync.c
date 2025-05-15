@@ -52,9 +52,9 @@ vsf_eda_t * __vsf_eda_sync_set_timeout(vsf_eda_t *eda, vsf_timeout_tick_t timeou
 #   ifdef __VSF_OS_CFG_EVTQ_LIST
         // If timeout is too close, VSF_EVT_TIMER will be issued before eda->flag.state.is_ready cleared,
         //  __vsf_evtq_post(evtq_list) will ignore the VSF_EVT_TIMER event.
-        // So just record due and set is_to_set_time,
+        // So just record due and set is_to_set_due,
         //  timer will be set after eda->flag.state.is_ready cleared in vsf_evtq_poll(evtq_list).
-        eda->flag.state.is_to_set_time = true;
+        eda->flag.state.is_to_set_due = true;
         ((vsf_teda_t *)eda)->due = vsf_systimer_get_tick() + timeout;
 #   else
         vsf_teda_set_timer_ex((vsf_teda_t *)eda, timeout);
