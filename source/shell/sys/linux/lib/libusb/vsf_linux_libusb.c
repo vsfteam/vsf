@@ -1107,16 +1107,37 @@ try_next:
         struct libusb_transfer *transfer = &ltransfer->transfer;
         vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)transfer->dev_handle;
 
+        if (!vk_usbh_urb_is_alloced(urb)) {
+            if (VSF_ERR_NONE != vk_usbh_alloc_urb(ldev->libusb_dev->usbh, ldev->libusb_dev->dev, urb)) {
+                VSF_LINUX_ASSERT(false);
+                goto failed;
+            }
+        }
+
+        urb->urb_hcd->buffer = transfer->buffer;
+        urb->urb_hcd->transfer_length = transfer->length;
+        urb->urb_hcd->timeout = transfer->timeout;
         switch (transfer->type) {
         case LIBUSB_TRANSFER_TYPE_CONTROL: {
                 struct usb_ctrlrequest_t *request = (struct usb_ctrlrequest_t *)transfer->buffer;
+                urb->urb_hcd->setup_packet = *request;
+                urb->urb_hcd->buffer = (uint8_t *)urb->urb_hcd->buffer + sizeof(struct usb_ctrlrequest_t);
+                urb->urb_hcd->transfer_length -= sizeof(struct usb_ctrlrequest_t);
                 urb->urb_hcd->pipe.dir_in1out0 = (request->bRequestType & USB_DIR_IN) > 0;
             }
             break;
+        case LIBUSB_TRANSFER_TYPE_ISOCHRONOUS:
+#if VSF_USBH_CFG_ISO_EN == ENABLED
+            urb->urb_hcd->iso_packet.number_of_packets = transfer->num_iso_packets;
+            break;
+#else
+            goto failed;
+#endif
         }
 
         if (    ldev->is_to_free
             ||  (VSF_ERR_NONE != vk_usbh_submit_urb_ex(ldev->libusb_dev->usbh, urb, 0, &ltransfer->eda))) {
+        failed:
             transfer->actual_length = 0;
             transfer->status = LIBUSB_TRANSFER_ERROR;
             vk_usbh_free_urb(ldev->libusb_dev->usbh, urb);
@@ -1165,36 +1186,6 @@ int libusb_submit_transfer(struct libusb_transfer *transfer)
     vsf_linux_libusb_transfer_t *ltransfer = vsf_container_of(transfer, vsf_linux_libusb_transfer_t, transfer);
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)transfer->dev_handle;
     vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, ltransfer->transfer.endpoint);
-    vk_usbh_urb_t *urb = &pipe->urb;
-
-    if (!vk_usbh_urb_is_alloced(urb)) {
-        if (VSF_ERR_NONE != vk_usbh_alloc_urb(ldev->libusb_dev->usbh, ldev->libusb_dev->dev, urb)) {
-            return -1;
-        }
-    }
-    urb->urb_hcd->buffer = transfer->buffer;
-    urb->urb_hcd->transfer_length = transfer->length;
-    urb->urb_hcd->timeout = transfer->timeout;
-
-    switch (transfer->type) {
-    case LIBUSB_TRANSFER_TYPE_CONTROL: {
-            struct usb_ctrlrequest_t *request = (struct usb_ctrlrequest_t *)transfer->buffer;
-            urb->urb_hcd->setup_packet = *request;
-            urb->urb_hcd->buffer = (uint8_t *)urb->urb_hcd->buffer + sizeof(struct usb_ctrlrequest_t);
-            urb->urb_hcd->transfer_length -= sizeof(struct usb_ctrlrequest_t);
-        }
-        break;
-    case LIBUSB_TRANSFER_TYPE_ISOCHRONOUS:
-#if VSF_USBH_CFG_ISO_EN == ENABLED
-        urb->urb_hcd->iso_packet.number_of_packets = transfer->num_iso_packets;
-        break;
-#else
-        return -1;
-#endif
-    case LIBUSB_TRANSFER_TYPE_BULK:
-    case LIBUSB_TRANSFER_TYPE_INTERRUPT:
-        break;
-    }
 
     ltransfer->eda.fn.evthandler = __vsf_libusb_transfer_evthandler;
     vsf_eda_init(&ltransfer->eda);
