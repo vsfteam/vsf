@@ -254,6 +254,14 @@ static void __vk_dwcotg_hcd_init_regs(vk_dwcotg_hcd_t *dwcotg_hcd, void *regbase
 
 static void __vk_dwcotg_hcd_free_urb_do(vk_usbh_hcd_urb_t *urb)
 {
+#ifndef VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE
+    vk_dwcotg_hcd_urb_t *dwcotg_urb = (vk_dwcotg_hcd_urb_t *)&urb->priv;
+    if (dwcotg_urb->buffer != NULL) {
+        vsf_usbh_free(dwcotg_urb->buffer);
+        dwcotg_urb->buffer = NULL;
+        dwcotg_urb->orig_buffer = NULL;
+    }
+#endif
     if (urb->transfer_flags & __URB_NEED_FREE) {
         vk_usbh_hcd_urb_free_buffer(urb);
         vsf_usbh_free(urb);
@@ -383,14 +391,21 @@ static void __vk_dwcotg_hcd_commit_urb(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_hcd_
 #ifdef VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE
             VSF_USB_ASSERT(size <= sizeof(dwcotg_urb->buffer));
 #else
-            VSF_USB_ASSERT((NULL == dwcotg_urb->buffer) && (NULL == dwcotg_urb->orig_buffer));
-            dwcotg_urb->buffer = vsf_usbh_malloc(size);
-            VSF_USB_ASSERT(dwcotg_urb->buffer != NULL);
+            if (NULL == dwcotg_urb->buffer) {
+                dwcotg_urb->buffer = vsf_usbh_malloc(size);
+                VSF_USB_ASSERT(dwcotg_urb->buffer != NULL);
 #endif
-            if (!pipe.dir_in1out0) {
-                memcpy(dwcotg_urb->buffer, buffer, size);
+                if (!pipe.dir_in1out0) {
+                    memcpy(dwcotg_urb->buffer, buffer, size);
+                }
+                dwcotg_urb->orig_buffer = buffer;
+#ifndef VSF_DWCOTG_HCD_WORKAROUND_ALIGN_BUFFER_SIZE
+            } else {
+                // dwcotg_urb->buffer is not freed when retry
+                // check retry count if retry count is implemented
+                VSF_USB_ASSERT(dwcotg_urb->orig_buffer != NULL);
             }
-            dwcotg_urb->orig_buffer = buffer;
+#endif
             channel_regs->hcdma = (uint32_t)dwcotg_urb->buffer;
         } else {
             channel_regs->hcdma = (uint32_t)buffer;

@@ -1145,6 +1145,10 @@ try_next:
 #else
             goto failed;
 #endif
+//        default:
+//            vsf_trace_debug("ep%s%d: %-5d" VSF_TRACE_CFG_LINEEND,
+//                            urb->urb_hcd->pipe.dir_in1out0 ? "IN" : "OUT",
+//                            urb->urb_hcd->pipe.endpoint, urb->urb_hcd->transfer_length);
         }
 
         if (VSF_ERR_NONE != vk_usbh_submit_urb_ex(ldev->libusb_dev->usbh, urb, 0, &ltransfer->eda)) {
