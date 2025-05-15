@@ -162,6 +162,15 @@ static const vsf_linux_fd_op_t __vsf_linux_libusb_fdop = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+static vsf_linux_libusb_pipe_t * __vsf_libusb_get_pipe(vsf_linux_libusb_dev_t *ldev, unsigned char endpoint)
+{
+    unsigned char epaddr = endpoint & 0x7F;
+    if (!epaddr) {
+        return &ldev->pipe[0];
+    }
+    return ((endpoint & USB_DIR_MASK) == USB_DIR_IN) ? &ldev->pipe_in[epaddr] : &ldev->pipe_out[epaddr];
+}
+
 static void __vsf_linux_libusb_on_event(void *param, vk_usbh_libusb_dev_t *dev, vk_usbh_libusb_evt_t evt)
 {
     vsf_linux_libusb_dev_t *ldev;
@@ -174,8 +183,7 @@ static void __vsf_linux_libusb_on_event(void *param, vk_usbh_libusb_dev_t *dev, 
             memset(ldev, 0, sizeof(*ldev));
             ldev->libusb_dev = dev;
             ldev->is_in_newlist = true;
-            ldev->pipe_in[0].urb.pipe = vk_usbh_get_pipe(dev->dev, 0x80, USB_ENDPOINT_XFER_CONTROL, dev->ep0size);
-            ldev->pipe_out[0].urb.pipe = vk_usbh_get_pipe(dev->dev, 0x00, USB_ENDPOINT_XFER_CONTROL, dev->ep0size);
+            ldev->pipe[0].urb.pipe = vk_usbh_get_pipe(dev->dev, 0x80, USB_ENDPOINT_XFER_CONTROL, dev->ep0size);
             dev->user_data = ldev;
             orig = vsf_protect_sched();
                 vsf_dlist_add_to_tail(vsf_linux_libusb_dev_t, devnode, &__vsf_libusb.devlist_new, ldev);
@@ -544,14 +552,15 @@ int libusb_reset_device(libusb_device_handle *dev_handle)
     }
 
     // restore original address
-    VSF_LINUX_ASSERT(!vk_usbh_urb_is_alloced(&ldev->pipe_out[0].urb));
-    ldev->pipe_out[0].urb.pipe.address = 0;
+    vsf_linux_libusb_pipe_t *pipe = __vsf_libusb_get_pipe(ldev, 0);
+    VSF_LINUX_ASSERT(!vk_usbh_urb_is_alloced(&pipe->urb));
+    pipe->urb.pipe.address = 0;
     result = libusb_control_transfer(dev_handle, LIBUSB_RECIPIENT_DEVICE | LIBUSB_ENDPOINT_OUT,
                                 USB_REQ_SET_ADDRESS, dev->devnum, 0, NULL, 0, 1000);
     if (LIBUSB_SUCCESS != result) {
         goto failed;
     }
-    ldev->pipe_out[0].urb.pipe.address = dev->devnum;
+    pipe->urb.pipe.address = dev->devnum;
 
     // restore original configuration
     if (config_val >= 0) {
@@ -636,12 +645,6 @@ uint8_t libusb_get_device_address(libusb_device *dev)
 {
     vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)dev;
     return ldev->libusb_dev->address;
-}
-
-static vsf_linux_libusb_pipe_t * __vsf_libusb_get_pipe(vsf_linux_libusb_dev_t *ldev, unsigned char endpoint)
-{
-    unsigned char epaddr = endpoint & 0x7F;
-    return ((endpoint & USB_DIR_MASK) == USB_DIR_IN) ? &ldev->pipe_in[epaddr] : &ldev->pipe_out[epaddr];
 }
 
 int libusb_get_max_packet_size(libusb_device *dev, unsigned char endpoint)
@@ -951,12 +954,15 @@ static int __raw_desc_to_config(vsf_linux_libusb_dev_t *ldev, unsigned char *buf
             reach_endpoint = true;
             if (endpoint_desc) {
                 endpoint_desc->use_as__usb_endpoint_desc_t = *(struct usb_endpoint_desc_t *)desc_header;
-                if ((endpoint_desc->bEndpointAddress & USB_DIR_MASK) == USB_DIR_IN) {
-                    ldev->pipe_in[endpoint_desc->bEndpointAddress & 0x0F].urb.pipe =
-                        vk_usbh_get_pipe_from_ep_desc(ldev->libusb_dev->dev, (struct usb_endpoint_desc_t *)&endpoint_desc->use_as__usb_endpoint_desc_t);
-                } else {
-                    ldev->pipe_out[endpoint_desc->bEndpointAddress & 0x0F].urb.pipe =
-                        vk_usbh_get_pipe_from_ep_desc(ldev->libusb_dev->dev, (struct usb_endpoint_desc_t *)&endpoint_desc->use_as__usb_endpoint_desc_t);
+                uint8_t epaddr = endpoint_desc->bEndpointAddress & 0x0F;
+                if (epaddr != 0) {
+                    if ((endpoint_desc->bEndpointAddress & USB_DIR_MASK) == USB_DIR_IN) {
+                        ldev->pipe_in[epaddr].urb.pipe =
+                            vk_usbh_get_pipe_from_ep_desc(ldev->libusb_dev->dev, (struct usb_endpoint_desc_t *)&endpoint_desc->use_as__usb_endpoint_desc_t);
+                    } else {
+                        ldev->pipe_out[epaddr].urb.pipe =
+                            vk_usbh_get_pipe_from_ep_desc(ldev->libusb_dev->dev, (struct usb_endpoint_desc_t *)&endpoint_desc->use_as__usb_endpoint_desc_t);
+                    }
                 }
                 endpoint_desc++;
             } else {
@@ -1107,6 +1113,9 @@ try_next:
         struct libusb_transfer *transfer = &ltransfer->transfer;
         vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)transfer->dev_handle;
 
+        if (ldev->is_to_free) {
+            goto failed;
+        }
         if (!vk_usbh_urb_is_alloced(urb)) {
             if (VSF_ERR_NONE != vk_usbh_alloc_urb(ldev->libusb_dev->usbh, ldev->libusb_dev->dev, urb)) {
                 VSF_LINUX_ASSERT(false);
@@ -1135,8 +1144,7 @@ try_next:
 #endif
         }
 
-        if (    ldev->is_to_free
-            ||  (VSF_ERR_NONE != vk_usbh_submit_urb_ex(ldev->libusb_dev->usbh, urb, 0, &ltransfer->eda))) {
+        if (VSF_ERR_NONE != vk_usbh_submit_urb_ex(ldev->libusb_dev->usbh, urb, 0, &ltransfer->eda)) {
         failed:
             transfer->actual_length = 0;
             transfer->status = LIBUSB_TRANSFER_ERROR;
