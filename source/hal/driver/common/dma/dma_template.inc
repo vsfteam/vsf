@@ -27,6 +27,14 @@
 #   define  VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY          DISABLED
 #endif
 
+#ifndef VSF_DMA_CFG_REIMPLEMENT_API_SCATTER_GATHER_CONFIG
+#   define VSF_DMA_CFG_REIMPLEMENT_API_SCATTER_GATHER_CONFIG DISABLED
+#endif
+
+#ifndef VSF_DMA_CFG_REIMPLEMENT_API_SCATTER_GATHER_START
+#   define VSF_DMA_CFG_REIMPLEMENT_API_SCATTER_GATHER_START DISABLED
+#endif
+
 #ifdef VSF_DMA_CFG_IMP_REMAP_PREFIX
 #   undef VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY
 #   define VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY           ENABLED
@@ -57,6 +65,37 @@ vsf_dma_capability_t vsf_real_dma_capability(vsf_real_dma_t *dma_ptr)
     };
 
     return dma_capability;
+}
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_API_SCATTER_GATHER_CONFIG == DISABLED
+vsf_err_t vsf_dma_channel_scatter_gather_config(vsf_dma_t *dma_ptr, uint8_t channel, vsf_dma_isr_t isr,
+            vsf_dma_channel_scatter_gather_desc_t *scatter_gather_desc_ptr, uint32_t scatter_gather_count)
+{
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+    VSF_HAL_ASSERT(scatter_gather_desc_ptr != NULL);
+    VSF_HAL_ASSERT(scatter_gather_count > 0);
+
+    if ((NULL == dma_ptr) || (NULL == scatter_gather_desc_ptr) || (scatter_gather_count == 0)) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+
+    // TODO
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_API_SCATTER_GATHER_START == DISABLED
+vsf_err_t vsf_dma_channel_scatter_gather_start(vsf_dma_t *dma_ptr, uint8_t channel)
+{
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+
+    if (NULL == dma_ptr) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+
+    // TODO
+    return VSF_ERR_NOT_SUPPORT;
 }
 #endif
 
