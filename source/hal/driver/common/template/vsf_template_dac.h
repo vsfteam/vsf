@@ -113,7 +113,7 @@ extern "C" {
  * @brief 在特定硬件驱动中，可启用宏 VSF_DAC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG 来重新定义通道配置类型 @ref vsf_dac_channel_cfg_t。
  * 为保证兼容性，重新定义vsf_dac_channel_cfg_t时不要删除成员
  */
-#if VSF_DAC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == DISABLED
+#ifndef VSF_DAC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG
 #   define VSF_DAC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG     DISABLED
 #endif
 
@@ -128,7 +128,7 @@ extern "C" {
  * 为保证兼容性，重新定义vsf_dac_cfg_t时不要删除成员。
  * 同时也需要重新定义vsf_dac_isr_handler_t类型。
  */
-#if VSF_DAC_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#ifndef VSF_DAC_CFG_REIMPLEMENT_TYPE_CFG
 #   define VSF_DAC_CFG_REIMPLEMENT_TYPE_CFG             DISABLED
 #endif
 
@@ -141,7 +141,7 @@ extern "C" {
  * @brief 在特定硬件驱动中，可启用宏 VSF_DAC_CFG_REIMPLEMENT_TYPE_CAPABILITY 来重新定义能力类型。
  * 为保证兼容性，重新定义vsf_dac_capability_t时不要删除成员
  */
-#if VSF_DAC_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#ifndef VSF_DAC_CFG_REIMPLEMENT_TYPE_CAPABILITY
 #   define VSF_DAC_CFG_REIMPLEMENT_TYPE_CAPABILITY     DISABLED
 #endif
 

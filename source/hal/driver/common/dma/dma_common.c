@@ -35,13 +35,13 @@
 
 #if VSF_DMA_CFG_MULTI_CLASS == ENABLED
 
-vsf_err_t vsf_dma_init(vsf_dma_t *dma_ptr)
+vsf_err_t vsf_dma_init(vsf_dma_t *dma_ptr, vsf_dma_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(dma_ptr != NULL);
     VSF_HAL_ASSERT(dma_ptr->op != NULL);
     VSF_HAL_ASSERT(dma_ptr->op->init != NULL);
 
-    return dma_ptr->op->init(dma_ptr);
+    return dma_ptr->op->init(dma_ptr, cfg_ptr);
 }
 
 void vsf_dma_fini(vsf_dma_t *dma_ptr)
@@ -62,16 +62,16 @@ vsf_dma_capability_t vsf_dma_capability(vsf_dma_t *dma_ptr)
     return dma_ptr->op->capability(dma_ptr);
 }
 
-int8_t vsf_dma_channel_request(vsf_dma_t *dma_ptr)
+int8_t vsf_dma_channel_request(vsf_dma_t *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr)
 {
     VSF_HAL_ASSERT(dma_ptr != NULL);
     VSF_HAL_ASSERT(dma_ptr->op != NULL);
     VSF_HAL_ASSERT(dma_ptr->op->channel_request != NULL);
 
-    return dma_ptr->op->channel_request(dma_ptr);
+    return dma_ptr->op->channel_request(dma_ptr, channel_hint_ptr);
 }
 
-void vsf_dma_channel_release(vsf_dma_t *dma_ptr, int8_t channel)
+void vsf_dma_channel_release(vsf_dma_t *dma_ptr, uint8_t channel)
 {
     VSF_HAL_ASSERT(dma_ptr != NULL);
     VSF_HAL_ASSERT(dma_ptr->op != NULL);
@@ -80,7 +80,7 @@ void vsf_dma_channel_release(vsf_dma_t *dma_ptr, int8_t channel)
     dma_ptr->op->channel_release(dma_ptr, channel);
 }
 
-vsf_err_t vsf_dma_channel_config(vsf_dma_t *dma_ptr, int8_t channel,
+vsf_err_t vsf_dma_channel_config(vsf_dma_t *dma_ptr, uint8_t channel,
                                  vsf_dma_channel_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT(dma_ptr != NULL);
@@ -90,7 +90,7 @@ vsf_err_t vsf_dma_channel_config(vsf_dma_t *dma_ptr, int8_t channel,
     return dma_ptr->op->channel_config(dma_ptr, channel, cfg_ptr);
 }
 
-vsf_err_t vsf_dma_channel_start(vsf_dma_t *dma_ptr, int8_t channel,
+vsf_err_t vsf_dma_channel_start(vsf_dma_t *dma_ptr, uint8_t channel,
                                 uint32_t src_address, uint32_t dst_address,
                                 uint32_t count)
 {
@@ -102,7 +102,27 @@ vsf_err_t vsf_dma_channel_start(vsf_dma_t *dma_ptr, int8_t channel,
                                       dst_address, count);
 }
 
-vsf_err_t vsf_dma_channel_cancel(vsf_dma_t *dma_ptr, int8_t channel)
+vsf_err_t vsf_dma_channel_scatter_gather_config_desc(vsf_dma_t *dma_ptr, uint8_t channel, vsf_dma_isr_t isr,
+    vsf_dma_channel_scatter_gather_desc_t *scatter_gather_desc_ptr, uint32_t scatter_gather_count)
+{
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+    VSF_HAL_ASSERT(dma_ptr->op != NULL);
+    VSF_HAL_ASSERT(dma_ptr->op->channel_scatter_gather_config_desc != NULL);
+
+    return dma_ptr->op->channel_scatter_gather_config_desc(dma_ptr, channel, isr,
+        scatter_gather_desc_ptr, scatter_gather_count);
+}
+
+vsf_err_t vsf_dma_channel_scatter_gather_start(vsf_dma_t *dma_ptr, uint8_t channel)
+{
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+    VSF_HAL_ASSERT(dma_ptr->op != NULL);
+    VSF_HAL_ASSERT(dma_ptr->op->channel_scatter_gather_start != NULL);
+
+    return dma_ptr->op->channel_scatter_gather_start(dma_ptr, channel);
+}
+
+vsf_err_t vsf_dma_channel_cancel(vsf_dma_t *dma_ptr, uint8_t channel)
 {
     VSF_HAL_ASSERT(dma_ptr != NULL);
     VSF_HAL_ASSERT(dma_ptr->op != NULL);
@@ -111,7 +131,7 @@ vsf_err_t vsf_dma_channel_cancel(vsf_dma_t *dma_ptr, int8_t channel)
     return dma_ptr->op->channel_cancel(dma_ptr, channel);
 }
 
-uint32_t vsf_dma_channel_get_transferred_count(vsf_dma_t *dma_ptr, int8_t channel)
+uint32_t vsf_dma_channel_get_transferred_count(vsf_dma_t *dma_ptr, uint8_t channel)
 {
     VSF_HAL_ASSERT(dma_ptr != NULL);
     VSF_HAL_ASSERT(dma_ptr->op != NULL);
@@ -120,8 +140,7 @@ uint32_t vsf_dma_channel_get_transferred_count(vsf_dma_t *dma_ptr, int8_t channe
     return dma_ptr->op->channel_get_transferred_count(dma_ptr, channel);
 }
 
-vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr,
-                                                     int8_t channel)
+vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr, uint8_t channel)
 {
     VSF_HAL_ASSERT(dma_ptr != NULL);
     VSF_HAL_ASSERT(dma_ptr->op != NULL);

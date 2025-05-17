@@ -130,7 +130,7 @@ extern "C" {
  * 来重新定义结构体 @ref vsf_wdt_cfg_t。为保证兼容性，重新定义时不应
  * 删除成员。
  */
-#if VSF_WDT_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#ifndef VSF_WDT_CFG_REIMPLEMENT_TYPE_CFG
 #    define VSF_WDT_CFG_REIMPLEMENT_TYPE_CFG DISABLED
 #endif
 
@@ -146,7 +146,7 @@ extern "C" {
  * VSF_WDT_CFG_REIMPLEMENT_TYPE_CAPABILITY 来重新定义结构体
  * @ref vsf_wdt_capability_t。为保证兼容性，重新定义时不应删除成员。
  */
-#if VSF_WDT_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#ifndef VSF_WDT_CFG_REIMPLEMENT_TYPE_CAPABILITY
 #    define VSF_WDT_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 

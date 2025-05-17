@@ -94,6 +94,29 @@ extern "C" {
 #   define VSF_DMA_CFG_REIMPLEMENT_TYPE_IRQ_MASK        DISABLED
 #endif
 
+
+/**
+ * \~english
+ * @brief Enable the option to reimplement CFG type configuration in specific hardware drivers
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现 CFG 类型配置的选项
+ */
+#ifndef VSF_DMA_CFG_REIMPLEMENT_CFG_TYPE_CFG
+#   define VSF_DMA_CFG_REIMPLEMENT_CFG_TYPE_CFG         DISABLED
+#endif
+
+/**
+ * \~english
+ * @brief Enable the option to reimplement Channal Hint type configuration in specific hardware drivers
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现 Channal Hint 类型配置的选项
+ */
+#ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT
+#   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT    DISABLED
+#endif
+
 /**
  * \~english
  * @brief Enable the option to reimplement channel configuration type.
@@ -103,8 +126,20 @@ extern "C" {
  * @brief 启用重新实现通道配置类型的选项。
  * 为保证兼容性，重新定义vsf_dma_channel_cfg_t时不要删除成员
  */
-#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == DISABLED
+#ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG
 #   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG     DISABLED
+#endif
+
+/**
+ * \~english
+ * @brief Enable the option to reimplement DMA channel scatter-gather configuration type.
+ *
+ * \~chinese
+ * @brief 启用重新实现DMA通道scatter-gather配置类型的选项。
+ */
+#ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SCATTER_GATHER_CFG
+#   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SCATTER_GATHER_CFG  \
+                                                        DISABLED
 #endif
 
 /**
@@ -118,7 +153,7 @@ extern "C" {
  * 为保证兼容性，重新定义vsf_dma_cfg_t时不要删除成员
  * 同时也需要重新定义vsf_dma_isr_handler_t类型
  */
-#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG
 #   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG             DISABLED
 #endif
 
@@ -131,7 +166,7 @@ extern "C" {
  * @brief 启用重新实现能力类型的选项。
  * 为保证兼容性，重新定义vsf_dma_capability_t时不要删除成员
  */
-#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY
 #   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY     DISABLED
 #endif
 
@@ -146,6 +181,40 @@ extern "C" {
 #   define VSF_DMA_CFG_INHERIT_HAL_CAPABILITY            ENABLED
 #endif
 
+/**
+ \~english
+ @brief DMA scatter-gather configuration macro
+
+ \~chinese
+ @brief DMA scatter-gather 配置宏
+ @note: 使用宏 VSF_DMA_CHANNEL_SCATTER_GATHER_ARRAY 来初始化 vsf_dma_channel_scatter_gather_desc_t 结构体数组以保证兼容性。
+ 在特定的硬件驱动中，可以根据传入的 __COUNT 重新指定结构体数组的大小，例如实际数组大小为 __COUNT+1。
+ */
+#ifndef VSF_DMA_CHANNEL_SCATTER_GATHER_ARRAY
+#   define VSF_DMA_CHANNEL_SCATTER_GATHER_ARRAY(__NAME, __COUNT, ...)   \
+    vsf_dma_channel_scatter_gather_desc_t __NAME[__COUNT] = {            \
+        __VA_ARGS__                                                     \
+    };
+#endif
+
+/**
+ \~english
+ @brief DMA scatter-gather item configuration macro
+
+ \~chinese
+ @brief DMA scatter-gather 项配置宏
+ @note: 使用宏 VSF_DMA_CHANNEL_SCATTER_GATHER_ITEM 来初始化 @ref vsf_dma_channel_scatter_gather_desc_t 对应的结构体以保证兼容性。
+ */
+#ifndef VSF_DMA_CHANNEL_SCATTER_GATHER_ITEM
+#   define VSF_DMA_CHANNEL_SCATTER_GATHER_ITEM(__MODE, __SRC_ADDR, __DST_ADDR, __CNT, ...) \
+    {                                                                    \
+        .mode = __MODE,                                                  \
+        .src_address = __SRC_ADDR,                                       \
+        .dst_address = __DST_ADDR,                                       \
+        .count = __CNT,                                                  \
+        __VA_ARGS__                                                      \
+    }
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -159,16 +228,18 @@ extern "C" {
  * @param[in] __prefix_name 用于生成 DMA 函数的前缀。
  */
 #define VSF_DMA_APIS(__prefix_name) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, init,                          VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, fini,                          VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_capability_t,     dma, capability,                    VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, int8_t,                   dma, channel_request,               VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, channel_release,               VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, int8_t) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_config,                VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, int8_t channel, vsf_dma_channel_cfg_t * cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_start,                 VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, int8_t channel, uint32_t src_address, uint32_t dst_address, uint32_t count) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_cancel,                VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, int8_t channel) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,                 dma, channel_get_transferred_count, VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, int8_t channel) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_channel_status_t, dma, channel_status,                VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, int8_t channel)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, init,                               VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, vsf_dma_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, fini,                               VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_capability_t,     dma, capability,                         VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, int8_t,                   dma, channel_request,                    VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, channel_release,                    VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_config,                     VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_start,                      VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel, uint32_t src_address, uint32_t dst_address, uint32_t count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_cancel,                     VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_scatter_gather_config_desc, VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel, vsf_dma_isr_t isr, vsf_dma_channel_scatter_gather_desc_t *scatter_gather_cfg, uint32_t scatter_gather_count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_scatter_gather_start,       VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,                 dma, channel_get_transferred_count,      VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_channel_status_t, dma, channel_status,                     VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel)
 
 /*============================ TYPES =========================================*/
 
@@ -315,6 +386,34 @@ enum {
                                       VSF_DMA_IRQ_MASK_ERROR,
 };
 
+
+#if VSF_DMA_CFG_REIMPLEMENT_CFG_TYPE_CFG == DISABLED
+/**
+ * \~english
+ * @brief Configuration structure for DMA.
+ *
+ * \~chinese
+ * @brief DMA 的配置结构体。
+ */
+typedef struct vsf_dma_cfg_t {
+    vsf_arch_prio_t         prio;
+} vsf_dma_cfg_t;
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT == DISABLED
+/**
+ * \~english
+ * @brief DMA channel hint structure
+ *
+ * \~chinese
+ * @brief DMA 通道提示结构体
+ */
+typedef struct vsf_dma_channel_hint_t {
+    uint8_t                 channel;
+    uint8_t                 request_line;
+} vsf_dma_channel_hint_t;
+#endif
+
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == DISABLED
 typedef struct vsf_dma_t vsf_dma_t;
 
@@ -334,6 +433,29 @@ typedef struct vsf_dma_channel_cfg_t {
     //! Index of the peripheral or memory corresponding to the destination address of the DMA
     uint8_t                 dst_idx;
 } vsf_dma_channel_cfg_t;
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SCATTER_GATHER_CFG == DISABLED
+/**
+ * \~english
+ * @brief DMA scatter-gather descriptor structure
+ * @note: The vsf_dma_channel_scatter_gather_desc_t structure can be redefined
+ * according to the descriptor structure required by DMA Scatter-Gather in
+ * specific hardware drivers.
+ *
+ * \~chinese
+ * @brief DMA scatter-gather 描述符结构体
+ * @note: vsf_dma_channel_scatter_gather_desc_t
+ * 结构体，在特定的硬件驱动中可以根据 DMA Scatter-Gather
+ * 需要的描述符结构体重新定义。
+ */
+typedef struct vsf_dma_channel_scatter_gather_desc_t {
+    vsf_dma_channel_mode_t mode;    //!< DMA channel mode
+    uint32_t src_address;           //!< Source address
+    uint32_t dst_address;           //!< Destination address
+    uint32_t count;                 //!< Number of bytes to be transferred
+    uint32_t next;                  //!< Next descriptor address
+} vsf_dma_channel_scatter_gather_desc_t;
 #endif
 
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
@@ -380,6 +502,7 @@ struct vsf_dma_t  {
  \~english
  @brief Initialize a DMA instance
  @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
+ @param[in] cfg_ptr: a pointer to structure @ref vsf_dma_cfg_t
  @return vsf_err_t: VSF_ERR_NONE if initialization successful, otherwise returns error code
 
  @note It is not necessary to call vsf_dma_fini() to deinitialization.
@@ -388,12 +511,13 @@ struct vsf_dma_t  {
  \~chinese
  @brief 初始化一个 DMA 实例
  @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
+ @param[in] cfg_ptr: 指向结构体 @ref vsf_dma_cfg_t 的指针
  @return vsf_err_t: 如果初始化成功返回 VSF_ERR_NONE，否则返回错误码
 
  @note 失败后不需要调用 vsf_dma_fini() 反初始化。
        vsf_dma_init() 应该在除 vsf_dma_capability() 之外的其他 DMA API 之前调用。
  */
-extern vsf_err_t vsf_dma_init(vsf_dma_t *dma_ptr);
+extern vsf_err_t vsf_dma_init(vsf_dma_t *dma_ptr, vsf_dma_cfg_t *cfg_ptr);
 
 /**
  \~english
@@ -425,14 +549,16 @@ extern vsf_dma_capability_t vsf_dma_capability(vsf_dma_t *dma_ptr);
  \~english
  @brief DMA request a new channel
  @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
- @return int8_t: Positive number or 0 if the request was successful, otherwise returns error code
+ @param[in] channel_hint_ptr: a pointer to DMA channel hint
+ @return int8_t: if request was successful, return non-negative channel number, otherwise return error code
 
  \~chinese
  @brief DMA 请求一个新的通道
  @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
- @return int8_t: 如果请求成功返回正数或者 0，否则返回错误码
+ @param[in] channel_hint_ptr: 指向 DMA 通道提示的指针
+ @return int8_t: 如果请求成功返回非负数的通道号，否则返回错误码
  */
-extern int8_t vsf_dma_channel_request(vsf_dma_t *dma_ptr);
+extern int8_t vsf_dma_channel_request(vsf_dma_t *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr);
 
 /**
  \~english
@@ -444,10 +570,10 @@ extern int8_t vsf_dma_channel_request(vsf_dma_t *dma_ptr);
  \~chinese
  @brief DMA 释放一个通道
  @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
- @param[in] channel: 通道序号
+ @param[in] channel: 通道号
  @return 无
  */
-extern void vsf_dma_channel_release(vsf_dma_t *dma_ptr, int8_t channel);
+extern void vsf_dma_channel_release(vsf_dma_t *dma_ptr, uint8_t channel);
 
 /**
  \~english
@@ -464,7 +590,7 @@ extern void vsf_dma_channel_release(vsf_dma_t *dma_ptr, int8_t channel);
  @param[in] cfg_ptr: 指向 DMA 通道配置的指针
  @return vsf_err_t: 如果配置成功返回 VSF_ERR_NONE，否则返回错误码
  */
-extern vsf_err_t vsf_dma_channel_config(vsf_dma_t *dma_ptr, int8_t channel, vsf_dma_channel_cfg_t *cfg_ptr);
+extern vsf_err_t vsf_dma_channel_config(vsf_dma_t *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr);
 
 /**
  * \~english
@@ -485,7 +611,7 @@ extern vsf_err_t vsf_dma_channel_config(vsf_dma_t *dma_ptr, int8_t channel, vsf_
  * @param[in] count: 将要传输的数据的字节数
  * @return vsf_err_t: 如果开始传输成功返回 VSF_ERR_NONE，否则返回错误码
  */
-extern vsf_err_t vsf_dma_channel_start(vsf_dma_t *dma_ptr, int8_t channel, uint32_t src_address, uint32_t dst_address, uint32_t count);
+extern vsf_err_t vsf_dma_channel_start(vsf_dma_t *dma_ptr, uint8_t channel, uint32_t src_address, uint32_t dst_address, uint32_t count);
 
 /**
  \~english
@@ -500,7 +626,48 @@ extern vsf_err_t vsf_dma_channel_start(vsf_dma_t *dma_ptr, int8_t channel, uint3
  @param[in] channel: 通道序号
  @return vsf_err_t: 如果传输取消成功返回 VSF_ERR_NONE，否则返回错误码
  */
-extern vsf_err_t vsf_dma_channel_cancel(vsf_dma_t *dma_ptr, int8_t channel);
+extern vsf_err_t vsf_dma_channel_cancel(vsf_dma_t *dma_ptr, uint8_t channel);
+
+/**
+ \~english
+ @brief Configure a DMA channel for scatter-gather transfer
+ @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
+ @param[in] channel: channel number
+ @param[in] isr: DMA interrupt handler
+ @param[in] cfg_ptr: a pointer to DMA channel scatter-gather configuration
+ @param[in] scatter_gather_count: number of scatter-gather configurations
+ @return vsf_err_t: VSF_ERR_NONE if the configuration was successful, otherwise returns error code
+
+ \~chinese
+ @brief DMA 通道配置为 scatter-gather 传输
+ @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
+ @param[in] channel: 通道序号
+ @param[in] isr: DMA 中断处理函数
+ @param[in] cfg_ptr: 指向 DMA 通道 scatter-gather 配置的指针
+ @param[in] scatter_gather_count: scatter-gather 配置的数量
+ @return vsf_err_t: 如果配置成功返回 VSF_ERR_NONE，否则返回错误码
+ @note: scatter_gather_cfg 指向的结构体应该使用宏 VSF_DMA_CHANNEL_SCATTER_GATHER_ARRAY 来初始化，以保证更好的兼容性。
+ @note: scatter_gather_cfg 指向的结构体需要是可以被 DMA 直接访问的内存区域，
+ @note: scatter_gather_cfg 指向的结构体需要调用者确保在 DMA 传输完成之前不会被释放。
+ @note: scatter_gather_cfg 指向的结构体的内容可能在配置后被修改成 DMA 实际需要的 Scatter-Gather 描述符结构。
+ */
+extern vsf_err_t vsf_dma_channel_scatter_gather_config_desc(vsf_dma_t *dma_ptr, uint8_t channel, vsf_dma_isr_t isr,
+            vsf_dma_channel_scatter_gather_desc_t *scatter_gather_desc_ptr, uint32_t scatter_gather_count);
+
+/**
+ \~english
+ @brief Start a DMA scatter-gather transfer
+ @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
+ @param[in] channel: channel number
+ @return vsf_err_t: VSF_ERR_NONE if the start request was successful, otherwise returns error code
+
+ \~chinese
+ @brief DMA 开始一个 scatter-gather 传输
+ @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
+ @param[in] channel: 通道序号
+ @return vsf_err_t: 如果开始传输成功返回 VSF_ERR_NONE，否则返回错误码
+ */
+extern vsf_err_t vsf_dma_channel_scatter_gather_start(vsf_dma_t *dma_ptr, uint8_t channel);
 
 /**
  * \~english
@@ -519,7 +686,7 @@ extern vsf_err_t vsf_dma_channel_cancel(vsf_dma_t *dma_ptr, int8_t channel);
  * @note: 如果在 VSF_DMA_IRQ_MASK_CPL 中断触发之后调用，它应该返回 0。
  * @note: 它通常在调用 vsf_dma_channel_cancel() 之后调用，用于获取已经传输的数量。
  */
-extern uint32_t vsf_dma_channel_get_transferred_count(vsf_dma_t *dma_ptr, int8_t channel);
+extern uint32_t vsf_dma_channel_get_transferred_count(vsf_dma_t *dma_ptr, uint8_t channel);
 
 /**
  \~english
@@ -534,23 +701,25 @@ extern uint32_t vsf_dma_channel_get_transferred_count(vsf_dma_t *dma_ptr, int8_t
  @param[in] channel: 通道序号
  @return vsf_dma_channel_status_t: DMA 通道状态
  */
-extern vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr, int8_t channel);
+extern vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr, uint8_t channel);
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /// @cond
 #if VSF_DMA_CFG_FUNCTION_RENAME == ENABLED
-#   define __vsf_dma_t                                      VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_t)
-#   define vsf_dma_init(__DMA)                              VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_init)((__vsf_dma_t *)(__DMA))
-#   define vsf_dma_fini(__DMA)                              VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_fini)((__vsf_dma_t *)(__DMA))
-#   define vsf_dma_capability(__DMA)                        VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_capability)((__vsf_dma_t *)(__DMA))
-#   define vsf_dma_channel_request(__DMA)                   VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_request)((__vsf_dma_t *)(__DMA))
-#   define vsf_dma_channel_release(__DMA, ...)              VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_release)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
-#   define vsf_dma_channel_config(__DMA, ...)               VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_config)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
-#   define vsf_dma_channel_start(__DMA, ...)                VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_start)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
-#   define vsf_dma_channel_cancel(__DMA, ...)               VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_cancel)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
-#   define vsf_dma_channel_get_transferred_count(__DMA, ...) VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_get_transferred_count)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
-#   define vsf_dma_channel_status(__DMA, ...)               VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_status)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define __vsf_dma_t                                              VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_t)
+#   define vsf_dma_init(__DMA)                                      VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_init)((__vsf_dma_t *)(__DMA))
+#   define vsf_dma_fini(__DMA)                                      VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_fini)((__vsf_dma_t *)(__DMA))
+#   define vsf_dma_capability(__DMA)                                VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_capability)((__vsf_dma_t *)(__DMA))
+#   define vsf_dma_channel_request(__DMA)                           VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_request)((__vsf_dma_t *)(__DMA))
+#   define vsf_dma_channel_release(__DMA, ...)                      VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_release)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_config(__DMA, ...)                       VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_config)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_start(__DMA, ...)                        VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_start)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_scatter_gather_config_desc(__DMA, ...)   VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_scatter_gather_config)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_scatter_gather_start(__DMA, ...)         VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_scatter_gather_start)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_cancel(__DMA, ...)                       VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_cancel)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_get_transferred_count(__DMA, ...)        VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_get_transferred_count)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_status(__DMA, ...)                       VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_status)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #endif
 /// @endcond
 
