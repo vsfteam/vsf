@@ -22,9 +22,19 @@
 
 #define vsf_real_dma_t                                      VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t)
 #define vsf_real_dma_capability                             VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_capability)
+#define vsf_real_dma_channel_sg_config_desc                 VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_sg_config_desc)
+#define vsf_real_dma_channel_sg_start                       VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_sg_start)
 
 #ifndef VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY
 #   define  VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY          DISABLED
+#endif
+
+#ifndef VSF_DMA_CFG_REIMPLEMENT_API_SG_CONFIG_DESC
+#   define VSF_DMA_CFG_REIMPLEMENT_API_SG_CONFIG_DESC       DISABLED
+#endif
+
+#ifndef VSF_DMA_CFG_REIMPLEMENT_API_SG_START
+#   define VSF_DMA_CFG_REIMPLEMENT_API_SG_START             DISABLED
 #endif
 
 #ifdef VSF_DMA_CFG_IMP_REMAP_PREFIX
@@ -57,6 +67,37 @@ vsf_dma_capability_t vsf_real_dma_capability(vsf_real_dma_t *dma_ptr)
     };
 
     return dma_capability;
+}
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_API_SG_CONFIG == DISABLED
+vsf_err_t vsf_real_dma_channel_sg_config_desc(vsf_real_dma_t *dma_ptr, uint8_t channel, vsf_dma_isr_t isr,
+            vsf_dma_channel_sg_desc_t *sg_desc_ptr, uint32_t sg_count)
+{
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+    VSF_HAL_ASSERT(sg_desc_ptr != NULL);
+    VSF_HAL_ASSERT(sg_count > 0);
+
+    if ((NULL == dma_ptr) || (NULL == sg_desc_ptr) || (sg_count == 0)) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+
+    // TODO
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_API_SG_START == DISABLED
+vsf_err_t vsf_real_dma_channel_sg_start(vsf_real_dma_t *dma_ptr, uint8_t channel)
+{
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+
+    if (NULL == dma_ptr) {
+        return VSF_ERR_INVALID_PARAMETER;
+    }
+
+    // TODO
+    return VSF_ERR_NOT_SUPPORT;
 }
 #endif
 
