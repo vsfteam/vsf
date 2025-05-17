@@ -103,7 +103,7 @@ extern "C" {
  * vsf_timer_cfg_t。vsf_timer_isr_handler_t 类型也需要重新定义。为了保持兼容性，
  * 重新定义时不应删除成员。
  */
-#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#ifndef VSF_TIMER_CFG_REIMPLEMENT_TYPE_CFG
 #    define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CFG          DISABLED
 #endif
 
@@ -115,7 +115,7 @@ extern "C" {
  * @brief 在具体硬件驱动中启用宏 VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE 来重新定义枚举
  * vsf_timer_channel_mode_t。
  */
-#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE == DISABLED
+#ifndef VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE
 #   define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE  DISABLED
 #endif
 
@@ -128,7 +128,7 @@ extern "C" {
  * @brief 在具体硬件驱动中启用宏 VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG 来重新定义
  * 结构体 vsf_timer_channel_cfg_t。为了保持兼容性,重新定义时不应删除成员。
  */
-#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == DISABLED
+#ifndef VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG
 #   define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG   DISABLED
 #endif
 
@@ -141,7 +141,7 @@ extern "C" {
  * @brief 在具体硬件驱动中启用宏 VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_REQUEST 来重新定义
  * 结构体 vsf_timer_channel_request_t。为了保持兼容性,重新定义时不应删除成员。
  */
-#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_REQUEST == DISABLED
+#ifndef VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_REQUEST
 #   define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_REQUEST   DISABLED
 #endif
 
@@ -190,7 +190,7 @@ extern "C" {
  * @brief 在具体硬件驱动中启用宏 VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY 来重新定义
  * 结构体 vsf_timer_capability_t。为了保持兼容性,重新定义时不应删除成员。
  */
-#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#ifndef VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY
 #   define VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY   DISABLED
 #endif
 

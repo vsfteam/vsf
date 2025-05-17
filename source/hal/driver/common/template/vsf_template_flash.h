@@ -137,7 +137,7 @@ extern "C" {
  * @brief 启用重新实现配置类型的选项。
  * 为保证兼容性，重新定义时不应删除成员。
  */
-#if VSF_FLASH_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#ifndef VSF_FLASH_CFG_REIMPLEMENT_TYPE_CFG
 #   define VSF_FLASH_CFG_REIMPLEMENT_TYPE_CFG               DISABLED
 #endif
 
@@ -150,7 +150,7 @@ extern "C" {
  * @brief 启用重新实现能力类型的选项。
  * 为保证兼容性，重新定义时不应删除成员。
  */
-#if VSF_FLASH_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#ifndef VSF_FLASH_CFG_REIMPLEMENT_TYPE_CAPABILITY
 #   define VSF_FLASH_CFG_REIMPLEMENT_TYPE_CAPABILITY        DISABLED
 #endif
 

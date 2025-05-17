@@ -170,7 +170,7 @@ extern "C" {
  * 来重新定义结构体 @ref vsf_i2c_cfg_t。这允许在保持与基础结构兼容性
  * 的同时添加特定硬件的配置选项。
  */
-#if VSF_I2C_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#ifndef VSF_I2C_CFG_REIMPLEMENT_TYPE_CFG
 #    define VSF_I2C_CFG_REIMPLEMENT_TYPE_CFG DISABLED
 #endif
 

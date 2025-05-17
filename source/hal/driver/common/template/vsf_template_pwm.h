@@ -92,7 +92,7 @@ extern "C" {
  * 重新定义结构体 @ref vsf_pwm_cfg_t。为保证兼容性，重新定义时不应删除成员。
  * 同时需要重新定义类型 vsf_pwm_isr_handler_t。
  */
-#if VSF_PWM_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#ifndef VSF_PWM_CFG_REIMPLEMENT_TYPE_CFG
 #    define VSF_PWM_CFG_REIMPLEMENT_TYPE_CFG DISABLED
 #endif
 
@@ -103,7 +103,7 @@ extern "C" {
  * \~chinese
  * @brief 重新定义结构体 vsf_pwm_capability_t。为保证兼容性，重新定义时不应删除成员。
  */
-#if VSF_PWM_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#ifndef VSF_PWM_CFG_REIMPLEMENT_TYPE_CAPABILITY
 #    define VSF_PWM_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
@@ -162,7 +162,7 @@ typedef struct vsf_pwm_cfg_t {
          * 确定 PWM 发生器的基本时间周期。
          */
         uint32_t freq;
-        
+
         /**
          * \~english
          * @brief The minimum allowed PWM clock frequency in Hz.
@@ -199,7 +199,7 @@ typedef struct vsf_pwm_capability_t {
      * PWM 发生器频率范围的上限。
      */
     uint32_t max_freq;
-    
+
     /**
      * \~english
      * @brief Minimum supported PWM frequency in Hz.

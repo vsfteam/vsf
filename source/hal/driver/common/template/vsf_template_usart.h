@@ -173,7 +173,7 @@ extern "C" {
  * @brief 重新定义结构体 vsf_usart_cfg_t。vsf_usart_isr_handler_t 类型也需要重新定义。
  * 为了兼容性，在重新定义结构体 @ref vsf_usart_cfg_t 时不应删除成员。
  */
-#if VSF_USART_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_CFG
 #    define VSF_USART_CFG_REIMPLEMENT_TYPE_CFG DISABLED
 #endif
 
@@ -187,7 +187,7 @@ extern "C" {
  * @brief 重新定义结构体 vsf_usart_capability_t。
  * 为了兼容性，在重新定义结构体 @ref vsf_usart_capability_t 时不应删除成员。
  */
-#if VSF_USART_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_CAPABILITY
 #    define VSF_USART_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
@@ -199,7 +199,7 @@ extern "C" {
  * @brief 在特定硬件驱动中，可以启用宏 VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS
  * 来重新定义结构体 vsf_usart_status_t。
  */
-#if VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
+#ifndef VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS
 #    define VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS DISABLED
 #endif
 
