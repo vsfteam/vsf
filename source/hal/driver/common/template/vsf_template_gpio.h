@@ -256,14 +256,14 @@ extern "C" {
 //! Redefine struct vsf_gpio_cfg_t. The vsf_gpio_exti_isr_handler_t type also needs to
 //! be redefined For compatibility, members should not be deleted when struct
 //! @ref vsf_gpio_cfg_t redefining.
-#if VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG
 #    define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG DISABLED
 #endif
 
 //! Redefine struct vsf_gpio_capability_t.
 //! For compatibility, members should not be deleted when struct @ref
 //! vsf_gpio_capability_t redefining.
-#if VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY
 #    define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 

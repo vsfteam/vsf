@@ -141,7 +141,7 @@ extern "C" {
  * 来重新定义通道配置类型 @ref vsf_adc_channel_cfg_t。为保证兼容性，重新定义
  * vsf_adc_channel_cfg_t 时不要删除成员
  */
-#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == DISABLED
+#ifndef VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG
 #    define VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG DISABLED
 #endif
 
@@ -157,7 +157,7 @@ extern "C" {
  * 为保证兼容性，重新定义 vsf_adc_cfg_t 时不要删除成员。
  * 同时也需要重新定义 vsf_adc_isr_handler_t 类型
  */
-#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#ifndef VSF_ADC_CFG_REIMPLEMENT_TYPE_CFG
 #    define VSF_ADC_CFG_REIMPLEMENT_TYPE_CFG DISABLED
 #endif
 
@@ -170,7 +170,7 @@ extern "C" {
  * 来重新定义能力类型 @ref vsf_adc_capability_t。
  * 为保证兼容性，重新定义 vsf_adc_capability_t 时不要删除成员
  */
-#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#ifndef VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY
 #    define VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
