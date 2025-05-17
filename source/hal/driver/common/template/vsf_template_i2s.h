@@ -134,7 +134,7 @@ extern "C" {
  * VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG 来重新定义结构体 @ref
  * vsf_i2s_cfg_t。为了保证兼容性，重新定义时不应删除成员。
  */
-#if VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#ifndef VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG
 #    define VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG DISABLED
 #endif
 
@@ -147,7 +147,7 @@ extern "C" {
  * VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY 来重新定义结构体 @ref
  * vsf_i2s_capability_t。为了保证兼容性，重新定义时不应删除成员。
  */
-#if VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#ifndef VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY
 #    define VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 

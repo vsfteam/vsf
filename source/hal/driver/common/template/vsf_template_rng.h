@@ -100,7 +100,7 @@ extern "C" {
  * 重新定义结构体 @ref vsf_rng_cfg_t。为保证兼容性，重新定义时不应删除成员。
  * 同时需要重新定义类型 vsf_rng_isr_handler_t。
  */
-#if VSF_RNG_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#ifndef VSF_RNG_CFG_REIMPLEMENT_TYPE_CFG
 #    define VSF_RNG_CFG_REIMPLEMENT_TYPE_CFG DISABLED
 #endif
 
@@ -114,7 +114,7 @@ extern "C" {
  * 来重新定义结构体 @ref vsf_rng_capability_t。为保证兼容性，重新定义时
  * 不应删除成员。
  */
-#if VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
+#ifndef VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY
 #    define VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
