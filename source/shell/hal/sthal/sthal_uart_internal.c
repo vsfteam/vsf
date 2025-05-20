@@ -321,7 +321,7 @@ static void __usart_isr_handler(void *target_ptr, vsf_usart_t *usart,
         }
     }
 
-    if (irq_mask) {
+    if (irq_mask & VSF_USART_IRQ_MASK_TX) {
         __usart_tx_isr_handler(huart, usart, data_len);
     }
 
@@ -662,11 +662,11 @@ HAL_StatusTypeDef __HAL_UART_Transmit_IT(struct __UART_HandleTypeDef *huart,
         huart->gState      = HAL_UART_STATE_BUSY_TX;
         huart->ErrorCode   = HAL_UART_ERROR_NONE;
 
+        vsf_usart_irq_enable(usart, VSF_USART_IRQ_MASK_TX);
         vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
         uint32_t     writed_cnt =
             vsf_usart_txfifo_write(usart, (void *)pData, Size);
         huart->TxXferCount -= writed_cnt;
-        vsf_usart_irq_enable(usart, VSF_USART_IRQ_MASK_TX);
 
         VSF_STHAL_UNLOCK(huart);
 
