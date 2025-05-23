@@ -38,10 +38,6 @@
 #   define VSF_EXTI_GPIO_CFG_MULTI_CLASS   VSF_GPIO_CFG_MULTI_CLASS
 #endif
 
-#define vsf_gpio_exti_irq_pin_config(__GPIO, ...)                               \
-    vsf_exti_gpio_exti_irq_pin_config((vsf_exti_gpio_t *)(__GPIO), ##__VA_ARGS__)
-
-
 #if VSF_EXTI_GPIO_CFG_MULTI_CLASS == ENABLED
 #   define __describe_exti_gpio_op()        .vsf_gpio.op = &vsf_exti_gpio_op,
 #else
