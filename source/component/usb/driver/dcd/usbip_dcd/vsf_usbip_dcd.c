@@ -27,6 +27,9 @@
 #include "kernel/vsf_kernel.h"
 #include "./vsf_usbip_dcd.h"
 
+// for VSF_USBD_CFG_USE_EDA
+#include "component/usb/device/vsf_usbd.h"
+
 /*============================ MACROS ========================================*/
 
 #define VSF_USBIP_VERSION                       0x0111
