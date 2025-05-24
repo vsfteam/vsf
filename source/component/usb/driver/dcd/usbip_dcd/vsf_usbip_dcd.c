@@ -190,6 +190,10 @@ vsf_err_t __vk_usbip_server_done_urb(vk_usbip_server_t *server, vk_usbip_urb_t *
 {
     if (urb->is_unlinked) {
         __vk_usbip_server_trace_urb_unlink(urb);
+        if ((urb->unlink.command = cpu_to_be32(USBIP_RET_UNLINK)) && (0 == urb->unlink.status)) {
+            vsf_heap_free(urb);
+            return VSF_ERR_NONE;
+        }
     } else {
         __vk_usbip_server_trace_urb_done(urb);
     }
@@ -361,8 +365,18 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                             break;
                         }
                     }
-                    // TODO: if USBIP_RET_SUBMIT is returned, status should be 0 for USBIP_RET_UNLINK
-                    VSF_USB_ASSERT(urb != NULL);
+                    if (NULL == urb) {
+                        vk_usbip_urb_t *urb = vsf_heap_malloc(sizeof(vk_usbip_urb_t));
+                        VSF_LINUX_ASSERT(urb != NULL);
+
+                        urb->is_unlinked = true;
+                        urb->unlink.command = cpu_to_be32(USBIP_RET_UNLINK);
+                        urb->unlink.seqnum = server->req.unlink.seqnum;
+                        urb->unlink.ep = 0;
+                        urb->unlink.status = 0;
+                        memset(urb->unlink.zero, 0, sizeof(urb->unlink.zero));
+                        __vk_usbip_server_backend_send_urb(urb);
+                    }
 
                     bool is_to_commit;
                     bool is_to_dequeue;
@@ -378,8 +392,8 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
                         urb->unlink.command = cpu_to_be32(USBIP_RET_UNLINK);
                         urb->unlink.seqnum = server->req.unlink.seqnum;
-                        urb->unlink.ep = cpu_to_be32(urb->req.ep);
-                        urb->unlink.status = cpu_to_be32(-104);     // -ECONNRESET
+                        urb->unlink.ep = 0;
+                        urb->unlink.status = cpu_to_be32((uint_fast32_t)-104);     // -ECONNRESET
                         memset(urb->unlink.zero, 0, sizeof(urb->unlink.zero));
                         __vk_usbip_server_backend_send_urb(urb);
 
