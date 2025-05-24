@@ -111,11 +111,12 @@ extern "C" {
 
 #   define __vk_usbip_server_trace_urb_done(__urb)                              \
         do {                                                                    \
-            __vk_usbip_server_trace("done urb%d %s%d " VSF_TRACE_CFG_LINEEND,   \
+            uint_fast32_t actual_length = be32_to_cpu((__urb)->rep.actual_length);\
+            __vk_usbip_server_trace("done urb%d %s%d %d bytes" VSF_TRACE_CFG_LINEEND,\
                                     (__urb)->req.seqnum,                        \
                                     (__urb)->req.direction ? "IN" : "OUT",      \
-                                    (__urb)->req.ep);                           \
-            uint_fast32_t actual_length = be32_to_cpu((__urb)->rep.actual_length);\
+                                    (__urb)->req.ep,                            \
+                                    actual_length);                             \
             if ((__urb)->req.direction && actual_length) {                      \
                 __vk_usbip_server_trace_buffer((__urb)->dynmem.buffer, actual_length);\
             }                                                                   \
@@ -321,6 +322,7 @@ typedef struct vk_usbip_rep_unlink_t {
     uint32_t    direction;          // 0: OUT, 1: IN
     uint32_t    ep;
     uint32_t    status;
+    uint32_t    zero[6];
 } VSF_CAL_PACKED vk_usbip_rep_unlink_t;
 
 typedef struct vk_usbip_urb_t {

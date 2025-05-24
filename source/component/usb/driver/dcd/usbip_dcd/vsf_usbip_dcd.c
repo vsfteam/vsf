@@ -61,7 +61,7 @@ static void __vk_usbip_usbd_notify(vk_usbip_dcd_t *usbd, usb_evt_t evt, uint_fas
 static vk_usbip_dcd_ep_t * __vk_usbip_usbd_get_ep(vk_usbip_dcd_t *usbd, uint_fast8_t ep)
 {
     vk_usbip_dcd_ep_t *dcd_ep;
-    if ((ep & USB_DIR_MASK) == USB_DIR_IN) {
+    if (((ep & USB_DIR_MASK) == USB_DIR_IN) || !(ep & 0x0F)) {
         ep &= ~USB_DIR_MASK;
         dcd_ep = usbd->ep_in;
     } else {
@@ -215,7 +215,7 @@ static vsf_err_t __vk_usbip_server_submit_urb(vk_usbip_server_t *server, vk_usbi
     urb->rep.status = 0;
     vsf_dlist_init_node(vk_usbip_urb_t, urb_node, urb);
     vsf_dlist_init_node(vk_usbip_urb_t, urb_node_ep, urb);
-    if (urb->req.direction) {
+    if (urb->req.direction || !ep) {
         dcd_ep = &server->usbd->ep_in[ep];
     } else {
         dcd_ep = &server->usbd->ep_out[ep];
@@ -328,7 +328,6 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             case VSF_USBIP_SERVER_REQ_PARAM:
                 switch (server->command) {
                 case USBIP_CMD_SUBMIT:
-                    __vk_usbip_server_trace("recv USBIP_CMD_SUBMIT" VSF_TRACE_CFG_LINEEND);
                     urb = vsf_heap_malloc(sizeof(vk_usbip_urb_t));
                     VSF_USB_ASSERT(urb != NULL);
 
@@ -343,6 +342,7 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                         VSF_USB_ASSERT(urb->dynmem.buffer != NULL);
                     }
                     urb->mem = urb->dynmem;
+                    __vk_usbip_server_trace("USBIP_CMD_SUBMIT %d" VSF_TRACE_CFG_LINEEND, urb->req.seqnum);
                     if (!urb->req.direction && urb->req.transfer_length) {
                         server->cur_urb = urb;
                         server->req_state = VSF_USBIP_SERVER_REQ_DATA;
@@ -352,8 +352,8 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     __vk_usbip_server_submit_urb(server, urb);
                     goto recv_command;
                 case USBIP_CMD_UNLINK:
-                    __vk_usbip_server_trace("recv USBIP_CMD_UNLINK" VSF_TRACE_CFG_LINEEND);
                     server->req.unlink.seqnum_to_unlink = be32_to_cpu(server->req.unlink.seqnum_to_unlink);
+                    __vk_usbip_server_trace("USBIP_CMD_UNLINK %d" VSF_TRACE_CFG_LINEEND, server->req.unlink.seqnum_to_unlink);
                     urb = NULL;
                     __vsf_dlist_foreach_unsafe(vk_usbip_urb_t, urb_node, &server->urb_list) {
                         if (server->req.unlink.seqnum_to_unlink == _->req.seqnum) {
@@ -361,6 +361,7 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                             break;
                         }
                     }
+                    // TODO: if USBIP_RET_SUBMIT is returned, status should be 0 for USBIP_RET_UNLINK
                     VSF_USB_ASSERT(urb != NULL);
 
                     bool is_to_commit;
@@ -372,14 +373,14 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     vsf_unprotect_int(orig);
 
                     if (is_to_dequeue) {
-                        uint_fast32_t status = urb->rep.status;
                         vk_usbip_dcd_ep_t *dcd_ep = __vk_usbip_usbd_get_ep_by_urb(usbd, urb);
                         vsf_dlist_remove(vk_usbip_urb_t, urb_node_ep, &dcd_ep->urb_list, urb);
 
                         urb->unlink.command = cpu_to_be32(USBIP_RET_UNLINK);
                         urb->unlink.seqnum = server->req.unlink.seqnum;
                         urb->unlink.ep = cpu_to_be32(urb->req.ep);
-                        urb->unlink.status = cpu_to_be32(status);
+                        urb->unlink.status = cpu_to_be32(-104);     // -ECONNRESET
+                        memset(urb->unlink.zero, 0, sizeof(urb->unlink.zero));
                         __vk_usbip_server_backend_send_urb(urb);
 
                         if (is_to_commit) {
@@ -389,7 +390,7 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     }
                     goto recv_command;
                 case USBIP_REQ_DEVLIST:
-                    __vk_usbip_server_trace("recv USBIP_REQ_DEVLIST" VSF_TRACE_CFG_LINEEND);
+                    __vk_usbip_server_trace("USBIP_REQ_DEVLIST" VSF_TRACE_CFG_LINEEND);
                     server->reply = USBIP_REP_DEVLIST;
                     server->rep.common.version_bcd = cpu_to_be16(VSF_USBIP_VERSION);
                     server->rep.common.code = cpu_to_be16(USBIP_REP_DEVLIST & ~0x8000);
@@ -405,7 +406,7 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                     }
                     goto recv_command;
                 case USBIP_REQ_IMPORT:
-                    __vk_usbip_server_trace("recv USBIP_REQ_IMPORT" VSF_TRACE_CFG_LINEEND);
+                    __vk_usbip_server_trace("USBIP_REQ_IMPORT" VSF_TRACE_CFG_LINEEND);
                     server->reply = USBIP_REP_IMPORT;
                     server->rep.common.version_bcd = cpu_to_be16(VSF_USBIP_VERSION);
                     server->rep.common.code = cpu_to_be16(USBIP_REP_IMPORT & ~0x8000);
@@ -506,7 +507,6 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 desc.ptr = (void *)&server->rep;
                 vk_usbip_rep_dev_t *dev = &server->dev;
 
-                // remove from server->urb_list, because urb will not be put into done_list and free_list
                 vsf_dlist_remove(vk_usbip_urb_t, urb_node, &server->urb_list, urb);
 
                 switch (server->rep_state) {
@@ -575,6 +575,7 @@ static void __vk_usbip_server_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
                 urb->rep.actual_length = cpu_to_be32(urb->rep.actual_length);
                 urb->rep.error_count = cpu_to_be32(urb->rep.error_count);
                 server->rep_state = VSF_USBIP_SERVER_REP_REPLY;
+                vsf_dlist_remove(vk_usbip_urb_t, urb_node, &server->urb_list, urb);
                 __vk_usbip_server_backend_send_urb(urb);
                 break;
             }
@@ -674,7 +675,7 @@ void vk_usbip_usbd_get_setup(vk_usbip_dcd_t *usbd, uint8_t *buffer)
 
 void vk_usbip_usbd_status_stage(vk_usbip_dcd_t *usbd, bool is_in)
 {
-    vk_usbip_dcd_ep_t *dcd_ep = is_in ? &usbd->ep_out[0] : &usbd->ep_in[0];
+    vk_usbip_dcd_ep_t *dcd_ep = &usbd->ep_in[0];
     vk_usbip_urb_t *urb = NULL;
 
     vsf_dlist_remove_head(vk_usbip_urb_t, urb_node_ep, &dcd_ep->urb_list, urb);
@@ -707,7 +708,16 @@ uint_fast16_t vk_usbip_usbd_ep_get_size(vk_usbip_dcd_t *usbd, uint_fast8_t ep)
 vsf_err_t vk_usbip_usbd_ep_set_stall(vk_usbip_dcd_t *usbd, uint_fast8_t ep)
 {
     vk_usbip_dcd_ep_t *dcd_ep = __vk_usbip_usbd_get_ep(usbd, ep);
-    dcd_ep->is_stalled = true;
+    if (!(ep & 0x0F)) {
+        vk_usbip_urb_t *urb = __vk_usbip_usbd_peek_urb(dcd_ep);
+        if (urb != NULL) {
+            urb->rep.status = 1;
+            vsf_dlist_remove(vk_usbip_urb_t, urb_node_ep, &dcd_ep->urb_list, urb);
+            vsf_eda_post_msg(&__vk_usbip_server.teda.use_as__vsf_eda_t, urb);
+        }
+    } else {
+        dcd_ep->is_stalled = true;
+    }
     return VSF_ERR_NONE;
 }
 
