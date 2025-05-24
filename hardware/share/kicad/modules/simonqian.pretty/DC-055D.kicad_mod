@@ -144,6 +144,17 @@
 		(layer "F.SilkS")
 		(uuid "1a7789fe-7139-43ab-9490-06e0d3f5d862")
 	)
+	(fp_circle
+		(center 6 0)
+		(end 6 -0.6)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "Edge.Cuts")
+		(uuid "00f9f3c7-d8ef-44c4-9dec-e3c5b8b6f5d0")
+	)
 	(fp_text user "${REFERENCE}"
 		(at 3.25 0 0)
 		(unlocked yes)
