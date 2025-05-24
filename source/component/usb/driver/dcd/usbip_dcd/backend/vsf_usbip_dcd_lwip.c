@@ -45,7 +45,13 @@ typedef struct vk_usbip_server_lwip_t {
     u16_t to_send_len;
     u16_t sent_len;
     bool is_to_exit;
+    bool is_pending_tx;
 } vk_usbip_server_lwip_t;
+
+enum {
+    USBIP_SERVER_LWIP_EVT_PEND_TX   = VSF_EVT_USER + 0,
+    USBIP_SERVER_LWIP_EVT_CLOSE     = VSF_EVT_USER + 1,
+};
 
 /*============================ PROTOTYPES ====================================*/
 
@@ -112,6 +118,11 @@ static err_t __vk_usbip_server_lwip_on_sent(void *arg, struct tcp_pcb *tpcb, u16
     while (1) {
         vsf_dlist_peek_head(vk_usbip_urb_t, urb_node_ep, &backend->urb_list, urb);
         if (urb != NULL) {
+            if (backend->is_pending_tx) {
+                vsf_eda_post_evt((vsf_eda_t *)backend->thread, USBIP_SERVER_LWIP_EVT_PEND_TX);
+                return ERR_OK;
+            }
+
             u16_t urb_len = 48 + (urb->req.direction ? be32_to_cpu(urb->rep.actual_length) : 0);
             if (backend->sent_len >= urb_len) {
                 backend->sent_len -= urb_len;
@@ -227,6 +238,7 @@ static void __vk_usbip_server_backend_thread(void *param)
         switch (evt) {
         case VSF_EVT_MESSAGE:
             if (backend->to_send_len > 0) {
+                VSF_USB_ASSERT(!backend->is_pending_tx);
                 char *buff = vsf_eda_get_cur_msg();
                 LOCK_TCPIP_CORE();
                     err = tcp_write(backend->work_pcb, buff, backend->to_send_len, 0);
@@ -237,15 +249,30 @@ static void __vk_usbip_server_backend_thread(void *param)
                 vk_usbip_urb_t *urb = vsf_eda_get_cur_msg();
                 uint_fast32_t actual_length = (urb->is_unlinked || !urb->req.direction) ?
                                                 0 : be32_to_cpu(urb->rep.actual_length);
+                u16_t curlen;
+                u8_t *curptr = urb->dynmem.buffer;
+
                 LOCK_TCPIP_CORE();
                     vsf_dlist_add_to_tail(vk_usbip_urb_t, urb_node_ep, &backend->urb_list, urb);
-                    err = tcp_write(backend->work_pcb, (char *)&urb->rep, 48, 0);
-                    if (actual_length > 0) {
-                        err += tcp_write(backend->work_pcb, (char *)urb->dynmem.buffer, actual_length, 0);
+                    err = tcp_write(backend->work_pcb, &urb->rep, 48, 0);
+                    VSF_USB_ASSERT(ERR_OK == err);
+                    while (actual_length > 0) {
+                        curlen = vsf_min(actual_length, 8192);
+                        while (ERR_OK != tcp_write(backend->work_pcb, curptr, curlen, 0)) {
+                            err = tcp_output(backend->work_pcb);
+                            VSF_USB_ASSERT(ERR_OK == err);
+
+                            backend->is_pending_tx = true;
+                            UNLOCK_TCPIP_CORE();
+                                vsf_thread_wfe(USBIP_SERVER_LWIP_EVT_PEND_TX);
+                            LOCK_TCPIP_CORE();
+                        }
+                        actual_length -= curlen;
+                        curptr += curlen;
                     }
-                    err += tcp_output(backend->work_pcb);
+                    err = tcp_output(backend->work_pcb);
+                    VSF_USB_ASSERT(ERR_OK == err);
                 UNLOCK_TCPIP_CORE();
-                VSF_USB_ASSERT(ERR_OK == err);
             }
             break;
         }
@@ -270,7 +297,7 @@ void __vk_usbip_server_backend_close(void)
 {
     vk_usbip_server_lwip_t *backend = &__vk_usbip_server_lwip;
     backend->is_to_exit = true;
-    vsf_eda_post_evt((vsf_eda_t *)backend->thread, VSF_EVT_USER);
+    vsf_eda_post_evt((vsf_eda_t *)backend->thread, USBIP_SERVER_LWIP_EVT_CLOSE);
 }
 
 void __vk_usbip_server_backend_recv(uint8_t *buff, uint_fast32_t size)
