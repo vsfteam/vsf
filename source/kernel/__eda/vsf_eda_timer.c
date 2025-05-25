@@ -398,6 +398,7 @@ vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *this_ptr)
             vsf_timq_remove(&__vsf_eda.timer.timq, this_ptr);
             this_ptr->use_as__vsf_eda_t.flag.state.is_timed = false;
         }
+        this_ptr->use_as__vsf_eda_t.flag.state.is_to_set_due = false;
     vsf_unprotect_sched(lock_status);
     return VSF_ERR_NONE;
 }
