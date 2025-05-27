@@ -88,6 +88,10 @@
 #   include "./vsf_template_usb.h"
 #endif
 
+#if defined(VSF_HAL_USE_ETH) && !defined(__VSF_TEMPLATE_ETH_H__)
+#   include "./vsf_template_eth.h"
+#endif
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

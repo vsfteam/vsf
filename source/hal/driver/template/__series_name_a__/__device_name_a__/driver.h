@@ -81,6 +81,9 @@
 #   if VSF_HAL_USE_WDT == ENABLED
 #       include "../common/wdt/wdt.h"
 #   endif
+#   if VSF_HAL_USE_ETH == ENABLED
+#       include "../common/mac/mac.h"
+#   endif
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
