@@ -67,95 +67,6 @@ static void __exti_gpio_isr_handler(void *target_ptr, vsf_gpio_t *gpio_ptr,
     }
 }
 
-vsf_err_t vsf_exti_gpio_port_config_pins(vsf_exti_gpio_t *exti_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_cfg_t *cfg_ptr)
-{
-    VSF_HAL_ASSERT(exti_gpio_ptr != NULL);
-    VSF_HAL_ASSERT(exti_gpio_ptr->gpio != NULL);
-    VSF_HAL_ASSERT(pin_mask != 0);
-    VSF_HAL_ASSERT(cfg_ptr != NULL);
-
-    return vsf_gpio_port_config_pins(exti_gpio_ptr->gpio, pin_mask, cfg_ptr);
-}
-
-void vsf_exti_gpio_set_direction(vsf_exti_gpio_t *exti_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)
-{
-    VSF_HAL_ASSERT(exti_gpio_ptr != NULL);
-    VSF_HAL_ASSERT(exti_gpio_ptr->gpio != NULL);
-    VSF_HAL_ASSERT(pin_mask != 0);
-
-    vsf_gpio_set_direction(exti_gpio_ptr->gpio, pin_mask, direction_mask);
-}
-
-vsf_gpio_pin_mask_t vsf_exti_gpio_get_direction(vsf_exti_gpio_t *exti_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
-{
-    VSF_HAL_ASSERT(exti_gpio_ptr != NULL);
-    VSF_HAL_ASSERT(exti_gpio_ptr->gpio != NULL);
-    VSF_HAL_ASSERT(pin_mask != 0);
-
-    return vsf_gpio_get_direction(exti_gpio_ptr->gpio, pin_mask);
-}
-
-vsf_gpio_pin_mask_t vsf_exti_gpio_read(vsf_exti_gpio_t *exti_gpio_ptr)
-{
-    VSF_HAL_ASSERT(exti_gpio_ptr != NULL);
-    VSF_HAL_ASSERT(exti_gpio_ptr->gpio != NULL);
-
-    return vsf_gpio_read(exti_gpio_ptr->gpio);
-}
-
-void vsf_exti_gpio_write(vsf_exti_gpio_t *exti_gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t value)
-{
-    VSF_HAL_ASSERT(exti_gpio_ptr != NULL);
-    VSF_HAL_ASSERT(exti_gpio_ptr->gpio != NULL);
-    VSF_HAL_ASSERT(pin_mask != 0);
-
-    vsf_gpio_write(exti_gpio_ptr->gpio, pin_mask, value);
-}
-
-void vsf_exti_gpio_toggle(vsf_exti_gpio_t *exti_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
-{
-    VSF_HAL_ASSERT(exti_gpio_ptr != NULL);
-    VSF_HAL_ASSERT(exti_gpio_ptr->gpio != NULL);
-    VSF_HAL_ASSERT(pin_mask != 0);
-
-    vsf_gpio_toggle(exti_gpio_ptr->gpio, pin_mask);
-}
-
-vsf_gpio_capability_t vsf_exti_gpio_capability(vsf_exti_gpio_t *exti_gpio_ptr)
-{
-    VSF_HAL_ASSERT(exti_gpio_ptr != NULL);
-    VSF_HAL_ASSERT(exti_gpio_ptr->gpio != NULL);
-
-    return vsf_gpio_capability(exti_gpio_ptr->gpio);
-}
-
-vsf_err_t vsf_exti_gpio_exti_irq_config(vsf_exti_gpio_t *exti_gpio_ptr, vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)
-{
-    VSF_HAL_ASSERT(exti_gpio_ptr != NULL);
-    VSF_HAL_ASSERT(exti_gpio_ptr->gpio != NULL);
-    VSF_HAL_ASSERT(irq_cfg_ptr != NULL);
-
-    return vsf_gpio_exti_irq_config(exti_gpio_ptr->gpio, irq_cfg_ptr);
-}
-
-vsf_err_t vsf_exti_gpio_exti_irq_enable(vsf_exti_gpio_t *exti_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
-{
-    VSF_HAL_ASSERT(exti_gpio_ptr != NULL);
-    VSF_HAL_ASSERT(exti_gpio_ptr->gpio != NULL);
-    VSF_HAL_ASSERT(pin_mask != 0);
-
-    return vsf_gpio_exti_irq_enable(exti_gpio_ptr->gpio, pin_mask);
-}
-
-vsf_err_t vsf_exti_gpio_exti_irq_disable(vsf_exti_gpio_t *exti_gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
-{
-    VSF_HAL_ASSERT(exti_gpio_ptr != NULL);
-    VSF_HAL_ASSERT(exti_gpio_ptr->gpio != NULL);
-    VSF_HAL_ASSERT(pin_mask != 0);
-
-    return vsf_gpio_exti_irq_disable(exti_gpio_ptr->gpio, pin_mask);
-}
-
 vsf_err_t vsf_exti_gpio_exti_irq_pin_config(vsf_exti_gpio_t *exti_gpio_ptr,
                                             vsf_gpio_pin_mask_t pin_mask,
                                             vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)
@@ -191,13 +102,5 @@ vsf_err_t vsf_exti_gpio_exti_irq_pin_config(vsf_exti_gpio_t *exti_gpio_ptr,
 }
 
 /*============================ LOCAL VARIABLES ===============================*/
-
-#define VSF_GPIO_CFG_IMP_PREFIX                         vsf_exti
-#define VSF_GPIO_CFG_IMP_UPCASE_PREFIX                  VSF_EXTI
-#define VSF_GPIO_CFG_IMP_EXTERN_OP                      ENABLED
-#define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY         ENABLED
-#define VSF_GPIO_CFG_REIMPLEMENT_API_PORTS_CONFIG_PIN   ENABLED
-#define VSF_GPIO_CFG_REIMPLEMENT_API_PORTS_CONFIG_PINS  ENABLED
-#include "hal/driver/common/gpio/gpio_template.inc"
 
 #endif      // VSF_HAL_USE_GPIO

@@ -67,11 +67,8 @@ typedef struct vsf_exti_gpio_irq_t {
 } vsf_exti_gpio_irq_t;
 
 typedef struct vsf_exti_gpio_t {
-#if VSF_EXTI_GPIO_CFG_MULTI_CLASS == ENABLED
-    vsf_gpio_t vsf_gpio;
-#endif
-    vsf_gpio_t * gpio;
-    vsf_arch_prio_t prio;
+    vsf_gpio_t          *gpio;
+    vsf_arch_prio_t      prio;
     vsf_exti_gpio_irq_t *exti_irq;
 } vsf_exti_gpio_t;
 
