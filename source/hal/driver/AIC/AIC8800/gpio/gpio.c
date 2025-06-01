@@ -200,6 +200,10 @@ vsf_err_t vsf_hw_gpio_port_config_pins(vsf_hw_gpio_t *hw_gpio_ptr, vsf_gpio_pin_
                 hw_gpio_ptr->GPIO->TELR &= ~pin_mask;
                 hw_gpio_ptr->GPIO->TER  |= pin_mask;
                 break;
+
+            default:
+                VSF_HAL_ASSERT(0);
+                break;
             }
 
             uint32_t fr_mask = 0;
