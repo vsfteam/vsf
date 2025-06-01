@@ -7870,6 +7870,9 @@
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\src\hci_cmd.c</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\src\hci_dump.c</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\src\l2cap.c</name>
                             </file>
                             <file>
