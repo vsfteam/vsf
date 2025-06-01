@@ -45,10 +45,10 @@ const vsf_dma_op_t vsf_remapped_dma_op = {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_remapped_dma_init(vsf_remapped_dma_t *dma)
+vsf_err_t vsf_remapped_dma_init(vsf_remapped_dma_t *dma, vsf_dma_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT((dma != NULL) && (dma->target != NULL));
-    return vsf_dma_init(dma->target);
+    return vsf_dma_init(dma->target, cfg_ptr);
 }
 
 void vsf_remapped_dma_fini(vsf_remapped_dma_t *dma)
@@ -63,26 +63,26 @@ vsf_dma_capability_t vsf_remapped_dma_capability(vsf_remapped_dma_t *dma)
     return vsf_dma_capability(dma->target);
 }
 
-int8_t vsf_remapped_dma_channel_request(vsf_remapped_dma_t *dma)
+int8_t vsf_remapped_dma_channel_request(vsf_remapped_dma_t *dma, vsf_dma_channel_hint_t *channel_hint_ptr)
 {
     VSF_HAL_ASSERT((dma != NULL) && (dma->target != NULL));
-    return vsf_dma_channel_request(dma->target);
+    return vsf_dma_channel_request(dma->target, channel_hint_ptr);
 }
 
-void vsf_remapped_dma_channel_release(vsf_remapped_dma_t *dma, int8_t channel)
+void vsf_remapped_dma_channel_release(vsf_remapped_dma_t *dma, uint8_t channel)
 {
     VSF_HAL_ASSERT((dma != NULL) && (dma->target != NULL));
     vsf_dma_channel_release(dma->target, channel);
 }
 
-vsf_err_t vsf_remapped_dma_channel_config(vsf_remapped_dma_t *dma, int8_t channel,
+vsf_err_t vsf_remapped_dma_channel_config(vsf_remapped_dma_t *dma, uint8_t channel,
                                  vsf_dma_channel_cfg_t *cfg_ptr)
 {
     VSF_HAL_ASSERT((dma != NULL) && (dma->target != NULL));
     return vsf_dma_channel_config(dma->target, channel, cfg_ptr);
 }
 
-vsf_err_t vsf_remapped_dma_channel_start(vsf_remapped_dma_t *dma, int8_t channel,
+vsf_err_t vsf_remapped_dma_channel_start(vsf_remapped_dma_t *dma, uint8_t channel,
                                          uint32_t src_address, uint32_t dst_address,
                                          uint32_t count)
 {
@@ -90,20 +90,33 @@ vsf_err_t vsf_remapped_dma_channel_start(vsf_remapped_dma_t *dma, int8_t channel
     return vsf_dma_channel_start(dma->target, channel, src_address, dst_address, count);
 }
 
-vsf_err_t vsf_remapped_dma_channel_cancel(vsf_remapped_dma_t *dma, int8_t channel)
+vsf_err_t vsf_remapped_dma_channel_sg_config_desc(vsf_remapped_dma_t *dma, uint8_t channel, vsf_dma_isr_t isr,
+                                         vsf_dma_channel_sg_desc_t *desc_ptr, uint32_t count)
+{
+    VSF_HAL_ASSERT((dma != NULL) && (dma->target != NULL));
+    return vsf_dma_channel_sg_config_desc(dma->target, channel, isr, desc_ptr, count);
+}
+
+vsf_err_t vsf_remapped_dma_channel_sg_start(vsf_remapped_dma_t *dma, uint8_t channel)
+{
+    VSF_HAL_ASSERT((dma != NULL) && (dma->target != NULL));
+    return vsf_dma_channel_sg_start(dma->target, channel);
+}
+
+vsf_err_t vsf_remapped_dma_channel_cancel(vsf_remapped_dma_t *dma, uint8_t channel)
 {
     VSF_HAL_ASSERT((dma != NULL) && (dma->target != NULL));
     return vsf_dma_channel_cancel(dma->target, channel);
 }
 
-uint32_t vsf_remapped_dma_channel_get_transferred_count(vsf_remapped_dma_t *dma, int8_t channel)
+uint32_t vsf_remapped_dma_channel_get_transferred_count(vsf_remapped_dma_t *dma, uint8_t channel)
 {
     VSF_HAL_ASSERT((dma != NULL) && (dma->target != NULL));
     return vsf_dma_channel_get_transferred_count(dma->target, channel);
 }
 
 vsf_dma_channel_status_t vsf_remapped_dma_channel_status(vsf_remapped_dma_t *dma,
-                                                     int8_t channel)
+                                                     uint8_t channel)
 {
     VSF_HAL_ASSERT((dma != NULL) && (dma->target != NULL));
     return vsf_dma_channel_status(dma->target, channel);
