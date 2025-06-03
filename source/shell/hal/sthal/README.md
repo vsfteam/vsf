@@ -13,6 +13,7 @@ STHAL是一个基于VSF HAL API的包装层，旨在尽可能实现与ST HAL API
 - SMARTCARD (智能卡接口)
 - IRDA (红外数据协会接口)
 - SPI (串行外设接口)
+- QSPI (四线串行外设接口)
 - I2C (内部集成电路总线)
 - FLASH (闪存)
 - TIM (定时器) (基本功能)
@@ -173,6 +174,34 @@ int main(void)
 | `HAL_SPI_RxCpltCallback()` | 接收完成回调 | ✅ 支持 |
 | `HAL_SPI_TxRxCpltCallback()` | 收发完成回调 | ✅ 支持 |
 | `HAL_SPI_ErrorCallback()` | 错误处理回调 | ✅ 支持 |
+
+### QSPI (四线串行外设接口)
+
+| API | 说明 | 支持状态 |
+| --- | --- | --- |
+| `HAL_QSPI_Init()` | 初始化QSPI | ✅ 支持 |
+| `HAL_QSPI_DeInit()` | 反初始化QSPI | ✅ 支持 |
+| `HAL_QSPI_Command()` | 发送QSPI命令 | ✅ 支持 |
+| `HAL_QSPI_Command_IT()` | 中断式发送QSPI命令 | ⚠️ 需改进 (目前使用模拟中断，应改用硬件中断) |
+| `HAL_QSPI_Transmit()` | 阻塞式数据发送 | ✅ 支持 |
+| `HAL_QSPI_Receive()` | 阻塞式数据接收 | ✅ 支持 |
+| `HAL_QSPI_Transmit_IT()` | 中断式数据发送 | ✅ 支持 |
+| `HAL_QSPI_Receive_IT()` | 中断式数据接收 | ✅ 支持 |
+| `HAL_QSPI_Transmit_DMA()` | DMA方式数据发送 | ✅ 支持 |
+| `HAL_QSPI_Receive_DMA()` | DMA方式数据接收 | ✅ 支持 |
+| `HAL_QSPI_AutoPolling()` | 自动轮询模式 | ⚠️ TODO (需要VSF_SPI_CTRL_QSPI_QSPI_AUTO_POLLING支持) |
+| `HAL_QSPI_AutoPolling_IT()` | 中断式自动轮询 | ⚠️ TODO (需要VSF_SPI_CTRL_QSPI_QSPI_AUTO_POLLING支持) |
+| `HAL_QSPI_MemoryMapped()` | 内存映射模式 | ⚠️ TODO (需要VSF_SPI_CTRL_QSPI_QSPI_MEMORY_MAP_SET支持) |
+| `HAL_QSPI_IRQHandler()` | QSPI中断处理 | ✅ 支持 |
+| `HAL_QSPI_CmdCpltCallback()` | 命令完成回调 | ✅ 支持 |
+| `HAL_QSPI_RxCpltCallback()` | 接收完成回调 | ✅ 支持 |
+| `HAL_QSPI_TxCpltCallback()` | 发送完成回调 | ✅ 支持 |
+| `HAL_QSPI_StatusMatchCallback()` | 状态匹配回调 | ⚠️ TODO |
+| `HAL_QSPI_TimeOutCallback()` | 超时回调 | ⚠️ TODO |
+| `HAL_QSPI_ErrorCallback()` | 错误处理回调 | ⚠️ TODO |
+| `HAL_QSPI_AbortCpltCallback()` | 中止完成回调 | ✅ 支持 |
+| `HAL_QSPI_Abort()` | 中止QSPI传输 | ✅ 支持 |
+| `HAL_QSPI_Abort_IT()` | 中断式中止QSPI传输 | ✅ 支持 |
 
 ### I2C
 
