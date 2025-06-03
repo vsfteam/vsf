@@ -38,16 +38,10 @@
 #   define VSF_EXTI_GPIO_CFG_MULTI_CLASS   VSF_GPIO_CFG_MULTI_CLASS
 #endif
 
-#if VSF_EXTI_GPIO_CFG_MULTI_CLASS == ENABLED
-#   define __describe_exti_gpio_op()        .vsf_gpio.op = &vsf_exti_gpio_op,
-#else
-#   define __describe_exti_gpio_op()
-#endif
 
 #define __describe_exti_gpio(__name, __gpio, __pin_count, ...)                  \
     static vsf_exti_gpio_irq_t VSF_MCONNECT(__name, _irqs)[__pin_count];        \
     vsf_exti_gpio_t __name = {                                                  \
-        __describe_exti_gpio_op()                                               \
         .gpio = (vsf_gpio_t *)&__gpio,                                          \
         .prio = vsf_arch_prio_invalid,                                          \
         .exti_irq = VSF_MCONNECT(__name, _irqs),                                \
