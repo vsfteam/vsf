@@ -22,6 +22,8 @@
 
 #ifdef HAL_I2C_MODULE_ENABLED
 
+#include "sthal_internal.h"
+
 /*============================ MACROS ========================================*/
 
 #   define I2C_STATE_MSK                                                       \

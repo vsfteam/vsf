@@ -20,7 +20,7 @@
 #include "hal/vsf_hal.h"
 #include "sthal.h"
 
-#ifdef HAL_QSPI_MODULE_ENABLED
+#if defined(HAL_QSPI_MODULE_ENABLED) && defined(VSF_SPI_CTRL_QSPI_ENABLE)
 
 #   include "sthal_internal.h"
 
@@ -41,13 +41,50 @@
 #      define VSF_STHAL_CFG_QSPI_DEFAULT_CLOCK (100 * 1000 * 1000)
 #   endif
 
-// TODO: 检查 SPI 驱动是否提供足够的支持
-#   ifndef VSF_STHAL_CFG_QSPI_SUPPORT_COMMAND
-#      define VSF_STHAL_CFG_QSPI_SUPPORT_COMMAND ENABLED
+#   ifndef VSF_SPI_CTRL_QSPI_CMD_PHASE_ENABLE
+#      error "VSF_SPI_CTRL_QSPI_CMD_PHASE_ENABLE is not defined"
+#   endif
+#   ifndef VSF_SPI_CTRL_QSPI_CMD_PHASE_DISABLE
+#      error "VSF_SPI_CTRL_QSPI_CMD_PHASE_DISABLE is not defined"
+#   endif
+#   ifndef VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_LINE_MODE
+#      error "VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_LINE_MODE is not defined"
+#   endif
+#   ifndef VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_LINE_MODE
+#      error "VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_LINE_MODE is not defined"
+#   endif
+#   ifndef VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_VALUE
+#      error "VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_VALUE is not defined"
 #   endif
 
-#   ifndef VSF_STHAL_CFG_QSPI_SUPPORT_COMMAND_IT
-#      define VSF_STHAL_CFG_QSPI_SUPPORT_COMMAND_IT ENABLED
+#   ifndef VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_ENABLE
+#      error "VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_ENABLE is not defined"
+#   endif
+#   ifndef VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_DISABLE
+#      error "VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_DISABLE is not defined"
+#   endif
+#   ifndef VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_GET_LINE_MODE
+#      error "VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_GET_LINE_MODE is not defined"
+#   endif
+#   ifndef VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_LINE_MODE
+#      error "VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_LINE_MODE is not defined"
+#   endif
+#   ifndef VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_SIZE
+#      error "VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_SIZE is not defined"
+#   endif
+
+#   ifndef VSF_SPI_CTRL_QSPI_DATA_PHASE_GET_LINE_MODE
+#      error "VSF_SPI_CTRL_QSPI_DATA_PHASE_GET_LINE_MODE is not defined"
+#   endif
+#   ifndef VSF_SPI_CTRL_QSPI_DATA_PHASE_SET_LINE_MODE
+#      error "VSF_SPI_CTRL_QSPI_DATA_PHASE_SET_LINE_MODE is not defined"
+#   endif
+
+#   ifndef VSF_SPI_CTRL_QSPI_TRANSFER_SET_MODE
+#      error "VSF_SPI_CTRL_QSPI_TRANSFER_SET_MODE is not defined"
+#   endif
+#   ifndef VSF_SPI_CTRL_QSPI_TRANSFER_GET_MODE
+#      error "VSF_SPI_CTRL_QSPI_TRANSFER_GET_MODE is not defined"
 #   endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -464,9 +501,9 @@ HAL_StatusTypeDef HAL_QSPI_Init(QSPI_HandleTypeDef *hqspi)
     }
     while (fsm_rt_cpl != vsf_spi_enable(spi));
 
-#   ifdef VSF_SPI_CTRL_QSPI_FLASH_SIZE_SET
+#   ifdef VSF_SPI_CTRL_QSPI_QSPI_FLASH_SIZE_SET
     uint32_t flash_size = hqspi->Init.FlashSize;
-    err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_FLASH_SIZE_SET, &flash_size);
+    err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_FLASH_SIZE_SET, &flash_size);
     if (err != VSF_ERR_NONE) {
         return HAL_ERROR;
     }
@@ -558,36 +595,33 @@ static HAL_StatusTypeDef __HAL_QSPI_Command(QSPI_HandleTypeDef  *hqspi,
     // modes, whether different line mode configurations for commands and
     // addresses are supported
     uint32_t data_phase;
-    err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_DATA_PHASE_GET_LINE_MODE, &data_phase);
+    err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_DATA_PHASE_GET_LINE_MODE,
+                       &data_phase);
     VSF_ASSERT(err == VSF_ERR_NONE);
     if (data_phase != cmd->DataMode) {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_DATA_PHASE_SET_LINE_MODE,
+        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_DATA_PHASE_SET_LINE_MODE,
                            &cmd->DataMode);
         VSF_ASSERT(err == VSF_ERR_NONE);
     }
 
-    /*
-    VSF_SPI_CTRL_DATA_PHASE_SET_SIZE
-    */
-
     // Command (Instruction) Phase
     if (cmd->InstructionMode == QSPI_INSTRUCTION_NONE) {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_CMD_PHASE_DISABLE, NULL);
+        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_CMD_PHASE_DISABLE, NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
     } else {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_CMD_PHASE_ENABLE, NULL);
+        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_CMD_PHASE_ENABLE, NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
 
         uint32_t inst_mode;
         switch (cmd->InstructionMode) {
         case QSPI_INSTRUCTION_1_LINE:
-            inst_mode = VSF_SPI_CTRL_CMD_SINGLE;
+            inst_mode = VSF_SPI_CTRL_QSPI_CMD_SINGLE;
             break;
         case QSPI_INSTRUCTION_2_LINES:
-            inst_mode = VSF_SPI_CTRL_CMD_DUAL;
+            inst_mode = VSF_SPI_CTRL_QSPI_CMD_DUAL;
             break;
         case QSPI_INSTRUCTION_4_LINES:
-            inst_mode = VSF_SPI_CTRL_CMD_QUAD;
+            inst_mode = VSF_SPI_CTRL_QSPI_CMD_QUAD;
             break;
         default:
             VSF_ASSERT(0);
@@ -595,70 +629,73 @@ static HAL_StatusTypeDef __HAL_QSPI_Command(QSPI_HandleTypeDef  *hqspi,
         }
 
         uint32_t cmd_line_mode;
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_CMD_PHASE_GET_LINE_MODE,
+        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_LINE_MODE,
                            &cmd_line_mode);
         VSF_ASSERT(err == VSF_ERR_NONE);
 
         if (cmd_line_mode != inst_mode) {
-            err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_CMD_PHASE_SET_LINE_MODE,
+            err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_LINE_MODE,
                                &inst_mode);
             VSF_ASSERT(err == VSF_ERR_NONE);
         }
 
         uint8_t instruction = cmd->Instruction;
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_CMD_PHASE_SET_VALUE, &instruction);
+        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_VALUE,
+                           &instruction);
         VSF_ASSERT(err == VSF_ERR_NONE);
     }
 
     // Address Phase
     if (cmd->AddressMode == QSPI_ADDRESS_NONE) {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_ADDRESS_PHASE_DISABLE, NULL);
+        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_DISABLE, NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
     } else {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_ADDRESS_PHASE_ENABLE, NULL);
+        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_ENABLE, NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
 
-        vsf_spi_ctrl_address_line_mode_t addr_line_mode = 0;
+        uint32_t addr_line_mode = 0;
         switch (cmd->AddressMode) {
         case QSPI_ADDRESS_1_LINE:
-            addr_line_mode = VSF_SPI_CTRL_ADDRESS_SINGLE;
+            addr_line_mode = VSF_SPI_CTRL_QSPI_ADDRESS_SINGLE;
             break;
         case QSPI_ADDRESS_2_LINES:
-            addr_line_mode = VSF_SPI_CTRL_ADDRESS_DUAL;
+            addr_line_mode = VSF_SPI_CTRL_QSPI_ADDRESS_DUAL;
             break;
         case QSPI_ADDRESS_4_LINES:
-            addr_line_mode = VSF_SPI_CTRL_ADDRESS_QUAD;
+            addr_line_mode = VSF_SPI_CTRL_QSPI_ADDRESS_QUAD;
             break;
         }
 
         uint32_t addr_line_mode_current;
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_ADDRESS_PHASE_GET_LINE_MODE,
+        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_GET_LINE_MODE,
                            &addr_line_mode_current);
         VSF_ASSERT(err == VSF_ERR_NONE);
         if (addr_line_mode_current != addr_line_mode) {
-            err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_ADDRESS_PHASE_SET_LINE_MODE,
-                               &addr_line_mode);
+            err =
+                vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_LINE_MODE,
+                             &addr_line_mode);
             VSF_ASSERT(err == VSF_ERR_NONE);
         }
 
         uint32_t addr = cmd->Address;
-        err           = vsf_spi_ctrl(spi, VSF_SPI_CTRL_ADDRESS_SET, &addr);
+        err           = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_SET, &addr);
         VSF_ASSERT(err == VSF_ERR_NONE);
 
         uint32_t address_size_mode = cmd->AddressSize;
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_ADDRESS_PHASE_SET_SIZE,
+        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_SIZE,
                            &address_size_mode);
         VSF_ASSERT(err == VSF_ERR_NONE);
     }
 
     // Alternate Bytes Phase
-#   ifdef VSF_SPI_CTRL_QSPI_ALATERNATE_BYTES_MODE
+#   ifdef VSF_SPI_CTRL_QSPI_QSPI_ALATERNATE_BYTES_MODE
     if (cmd->AlternateByteMode == QSPI_ALTERNATE_BYTES_NONE) {
-        err =
-            vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ALTERNATE_BYTES_DISABLE, NULL);
+        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_ALTERNATE_BYTES_DISABLE,
+                           NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
     } else {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ALTERNATE_BYTES_ENABLE, NULL);
+        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_ALTERNATE_BYTES_ENABLE,
+                           NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
     }
     // TODO: add more alternate bytes mode
@@ -668,37 +705,46 @@ static HAL_StatusTypeDef __HAL_QSPI_Command(QSPI_HandleTypeDef  *hqspi,
 #   endif
 
     // Dummy Cycles Phase
+#   if defined(VSF_SPI_CTRL_QSPI_DUMMY_PHASE_ENABLE) &&                        \
+       defined(VSF_SPI_CTRL_QSPI_DUMMY_PHASE_DISABLE) &&                       \
+       defined(VSF_SPI_CTRL_QSPI_DUMMY_PHASE_SET_CYCLES)
     hqspi->DummyCycles = cmd->DummyCycles;
     if (cmd->DummyCycles != 0) {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_DUMMY_PHASE_ENABLE, NULL);
+        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_DUMMY_PHASE_ENABLE, NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
 
         uint8_t dummy = cmd->DummyCycles;
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_DUMMY_PHASE_SET_CYCLES, &dummy);
+        err =
+            vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_DUMMY_PHASE_SET_CYCLES, &dummy);
         VSF_ASSERT(err == VSF_ERR_NONE);
     } else {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_DUMMY_PHASE_DISABLE, NULL);
+        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_DUMMY_PHASE_DISABLE, NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
     }
+#   endif
 
     // Miscellaneous
-#   ifdef VSF_SPI_CTRL_QSPI_DRR_MODE
+#   ifdef VSF_SPI_CTRL_QSPI_QSPI_DRR_MODE
     uint8_t dummy = cmd->DdrHoldHalfCycle;
     if (cmd->DdrMode == QSPI_DDR_MODE_ENABLE) {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_DRR_MODE_ENABLED, &dummy);
+        err =
+            vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_DRR_MODE_ENABLED, &dummy);
         VSF_ASSERT(err == VSF_ERR_NONE);
 
-#      ifdef VSF_SPI_CTRL_QSPI_DDR_HOLD_HALF_CYCLE
+#      ifdef VSF_SPI_CTRL_QSPI_QSPI_DDR_HOLD_HALF_CYCLE
         if (cmd->DdrHoldHalfCycle == QSPI_DDR_HHC_ENABLE) {
-            err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_DDR_HHC_ENABLED, NULL);
+            err =
+                vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_DDR_HHC_ENABLED, NULL);
             VSF_ASSERT(err == VSF_ERR_NONE);
         } else {
-            err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_DDR_HHC_DISABLED, NULL);
+            err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_DDR_HHC_DISABLED,
+                               NULL);
             VSF_ASSERT(err == VSF_ERR_NONE);
         }
 #      endif
     } else {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_DRR_MODE_DISABLED, &dummy);
+        err =
+            vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_DRR_MODE_DISABLED, &dummy);
         VSF_ASSERT(err == VSF_ERR_NONE);
     }
 #   endif
@@ -829,14 +875,14 @@ static HAL_StatusTypeDef __qspi_prepare(QSPI_HandleTypeDef   *hqspi,
     VSF_STHAL_ASSERT(spi != NULL);
 
     if (hqspi->DummyCycles > 0) {
-        vsf_spi_ctrl_transfer_mode_t trans_mode;
+        uint32_t trans_mode;
         if (is_transmit) {
-            trans_mode = VSF_SPI_CTRL_TRANSFER_MODE_DUMMY_WRITE;
+            trans_mode = VSF_SPI_CTRL_QSPI_TRANSFER_MODE_DUMMY_WRITE;
         } else {
-            trans_mode = VSF_SPI_CTRL_TRANSFER_MODE_DUMMY_READ;
+            trans_mode = VSF_SPI_CTRL_QSPI_TRANSFER_MODE_DUMMY_READ;
         }
         vsf_err_t err =
-            vsf_spi_ctrl(spi, VSF_SPI_CTRL_TRANSFER_SET_MODE, &trans_mode);
+            vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_TRANSFER_SET_MODE, &trans_mode);
         VSF_ASSERT(err == VSF_ERR_NONE);
     }
 
@@ -1018,7 +1064,7 @@ HAL_StatusTypeDef HAL_QSPI_AutoPolling(QSPI_HandleTypeDef      *hqspi,
                                        QSPI_AutoPollingTypeDef *cfg,
                                        uint32_t                 Timeout)
 {
-#   ifdef VSF_SPI_CTRL_QSPI_AUTO_POLLING
+#   ifdef VSF_SPI_CTRL_QSPI_QSPI_AUTO_POLLING
     HAL_StatusTypeDef status;
     uint32_t          tickstart = HAL_GetTick();
 
@@ -1059,7 +1105,8 @@ HAL_StatusTypeDef HAL_QSPI_AutoPolling(QSPI_HandleTypeDef      *hqspi,
     // TODO: add auto polling cfg
     vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
-    vsf_err_t err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_AUTO_POLLING, NULL);
+    vsf_err_t err =
+        vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_AUTO_POLLING, NULL);
 
     hqspi->State = HAL_QSPI_STATE_READY;
     VSF_STHAL_UNLOCK(hqspi);
@@ -1074,7 +1121,7 @@ HAL_StatusTypeDef HAL_QSPI_AutoPolling_IT(QSPI_HandleTypeDef      *hqspi,
                                           QSPI_CommandTypeDef     *cmd,
                                           QSPI_AutoPollingTypeDef *cfg)
 {
-#   ifdef VSF_SPI_CTRL_QSPI_AUTO_POLLING
+#   ifdef VSF_SPI_CTRL_QSPI_QSPI_AUTO_POLLING
     VSF_STHAL_ASSERT(IS_QSPI_INSTRUCTION_MODE(cmd->InstructionMode));
     if (cmd->InstructionMode != QSPI_INSTRUCTION_NONE) {
         VSF_STHAL_ASSERT(IS_QSPI_INSTRUCTION(cmd->Instruction));
@@ -1112,7 +1159,8 @@ HAL_StatusTypeDef HAL_QSPI_AutoPolling_IT(QSPI_HandleTypeDef      *hqspi,
     // TODO: add auto polling cfg
     vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
-    vsf_err_t err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_AUTO_POLLING, NULL);
+    vsf_err_t err =
+        vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_AUTO_POLLING, NULL);
 
     hqspi->State = HAL_QSPI_STATE_READY;
     VSF_STHAL_UNLOCK(hqspi);
@@ -1126,7 +1174,7 @@ HAL_StatusTypeDef HAL_QSPI_MemoryMapped(QSPI_HandleTypeDef       *hqspi,
                                         QSPI_CommandTypeDef      *cmd,
                                         QSPI_MemoryMappedTypeDef *cfg)
 {
-#   ifdef VSF_SPI_CTRL_QSPI_MEMORY_MAP_SET
+#   ifdef VSF_SPI_CTRL_QSPI_QSPI_MEMORY_MAP_SET
     HAL_StatusTypeDef status;
     uint32_t          tickstart = HAL_GetTick();
 
@@ -1160,10 +1208,11 @@ HAL_StatusTypeDef HAL_QSPI_MemoryMapped(QSPI_HandleTypeDef       *hqspi,
     // TODO: add memory map
     vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
-    vsf_spi_ctrl_qspi_memory_map_t *map = {
+    uint32_t *map = {
         // TODO
     };
-    vsf_err_t err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_MEMORY_MAP_SET, &map);
+    vsf_err_t err =
+        vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_MEMORY_MAP_SET, &map);
 
     hqspi->ErrorCode = HAL_QSPI_ERROR_NONE;
     hqspi->State     = HAL_QSPI_STATE_BUSY_AUTO_POLLING;
@@ -1271,10 +1320,10 @@ HAL_StatusTypeDef HAL_QSPI_SetFifoThreshold(QSPI_HandleTypeDef *hqspi,
         return HAL_BUSY;
     }
 
-#   ifdef VSF_SPI_CTRL_FIFO_THRESHOLD_SET
+#   ifdef VSF_SPI_CTRL_QSPI_FIFO_THRESHOLD_SET
     vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
-    vsf_err_t err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_FIFO_THRESHOLD_SET,
+    vsf_err_t err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_FIFO_THRESHOLD_SET,
                                  &hqspi->Init.FifoThreshold);
     if (err != VSF_ERR_NONE) {
         status = HAL_ERROR;
@@ -1296,12 +1345,12 @@ HAL_StatusTypeDef HAL_QSPI_SetFifoThreshold(QSPI_HandleTypeDef *hqspi,
 
 uint32_t HAL_QSPI_GetFifoThreshold(const QSPI_HandleTypeDef *hqspi)
 {
-#   ifdef VSF_SPI_CTRL_FIFO_THRESHOLD_GET
+#   ifdef VSF_SPI_CTRL_QSPI_FIFO_THRESHOLD_GET
     vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
     uint32_t  threshold = 0;
     vsf_err_t err =
-        vsf_spi_ctrl(spi, VSF_SPI_CTRL_FIFO_THRESHOLD_GET, &threshold);
+        vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_FIFO_THRESHOLD_GET, &threshold);
     if (err != VSF_ERR_NONE) {
         return 0;
     }
@@ -1326,10 +1375,11 @@ HAL_StatusTypeDef HAL_QSPI_SetFlashID(QSPI_HandleTypeDef *hqspi,
         return HAL_BUSY;
     }
 
-#   ifdef VSF_SPI_CTRL_QSPI_FLASH_ID_SET
+#   ifdef VSF_SPI_CTRL_QSPI_QSPI_FLASH_ID_SET
     vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
-    vsf_err_t err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_FLASH_ID_SET, &FlashID);
+    vsf_err_t err =
+        vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_FLASH_ID_SET, &FlashID);
     if (err != VSF_ERR_NONE) {
         status = HAL_ERROR;
     } else {

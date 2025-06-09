@@ -1,5 +1,5 @@
 /*****************************************************************************
- *   Copyright(C)2009-2024 by VSF Team                                       *
+ *   Copyright(C)2009-2022 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
@@ -15,46 +15,39 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __ST_HAL_CONF_H__
-#define __ST_HAL_CONF_H__
+/*============================ INCLUDES ======================================*/
+
+#ifndef __ST_HAL_INTERNAL_H__
+#define __ST_HAL_INTERNAL_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*============================ INCLUDES ======================================*/
+
+#include "hal/vsf_hal.h"
+
+#ifdef VSF_STHAL_CONF_HEADER
+#   include VSF_STHAL_CONF_HEADER
+#else
+#   include "sthal_conf_template.h"
+#endif
+
+#include "sthal_def.h"
+
 /*============================ MACROS ========================================*/
-
-#define HAL_MODULE_ENABLED
-#define HAL_ADC_MODULE_ENABLED
-#define HAL_DMA_MODULE_ENABLED
-#define HAL_FLASH_MODULE_ENABLED
-#define HAL_GPIO_MODULE_ENABLED
-#define HAL_I2C_MODULE_ENABLED
-#define HAL_RTC_MODULE_ENABLED
-#define HAL_SPI_MODULE_ENABLED
-#define HAL_QSPI_MODULE_ENABLED
-#define HAL_TIM_MODULE_ENABLED
-#define HAL_UART_MODULE_ENABLED
-#define HAL_USART_MODULE_ENABLED
-#define HAL_IRDA_MODULE_ENABLED
-#define HAL_SMARTCARD_MODULE_ENABLED
-#define HAL_WWDG_MODULE_ENABLED
-
-#define USE_HAL_ADC_REGISTER_CALLBACKS  1U
-#define USE_HAL_DAC_REGISTER_CALLBACKS  1U
-#define USE_HAL_I2C_REGISTER_CALLBACKS  1U
-#define USE_HAL_RTC_REGISTER_CALLBACKS  1U
-#define USE_HAL_SPI_REGISTER_CALLBACKS  1U
-#define USE_HAL_QSPI_REGISTER_CALLBACKS 1U
-#define USE_HAL_TIM_REGISTER_CALLBACKS  1U
-#define USE_HAL_UART_REGISTER_CALLBACKS 1U
-
-/*============================ INCLUDES ======================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+/*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern bool __sthal_check_timeout(uint32_t start, uint32_t timeout);
+extern bool __spi_is_idle(vsf_spi_t *spi, uint32_t Timeout, uint32_t Tickstart);
+
+/*============================ INCLUDES ======================================*/
+
 
 #ifdef __cplusplus
 }

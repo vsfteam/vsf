@@ -22,6 +22,8 @@
 
 #if VSF_HAL_USE_USART == ENABLED && defined(HAL_UART_MODULE_ENABLED)
 
+#include "sthal_internal.h"
+
 /*============================ MACROS ========================================*/
 
 #    ifdef VSF_STHAL_CFG_CALL_USART_PREFIX
