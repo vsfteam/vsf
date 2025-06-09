@@ -22,6 +22,8 @@
 
 #ifdef HAL_SPI_MODULE_ENABLED
 
+#include "sthal_internal.h"
+
 /*============================ MACROS ========================================*/
 
 #   ifndef SPI_DEFAULT_TIMEOUT
@@ -242,7 +244,7 @@ HAL_StatusTypeDef HAL_SPI_UnRegisterCallback(
 }
 #   endif
 
-static bool __spi_is_idle(vsf_spi_t *spi, uint32_t Timeout, uint32_t Tickstart)
+bool __spi_is_idle(vsf_spi_t *spi, uint32_t Timeout, uint32_t Tickstart)
 {
     while (1) {
         vsf_spi_status_t status = vsf_spi_status(spi);

@@ -148,7 +148,7 @@ HAL_StatusTypeDef HAL_Init(void)
 #endif
 
     HAL_MspInit();
-    
+
     return HAL_OK;
 }
 

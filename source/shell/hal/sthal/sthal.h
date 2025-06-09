@@ -121,6 +121,10 @@ bool __sthal_check_timeout(uint32_t start, uint32_t timeout);
 #    include "sthal_spi.h"
 #endif
 
+#ifdef HAL_QSPI_MODULE_ENABLED
+#    include "sthal_qspi.h"
+#endif
+
 #ifdef HAL_TIM_MODULE_ENABLED
 #    include "sthal_tim.h"
 #endif
