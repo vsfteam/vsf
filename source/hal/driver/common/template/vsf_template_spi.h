@@ -754,18 +754,24 @@ typedef enum vsf_spi_ctrl_t {
     //! @note QSPI transfer sequence typically includes: Command phase, Address phase, Dummy phase, and Data phase
     //! @note Data phase MUST be configured first, as its configuration directly determines which other phases can be used
     //! @note Some hardware may impose restrictions between data phase line mode and other phases' configurations
+    //! @warning Once QSPI mode is enabled, standard SPI mode operations are typically incompatible and unsupported
     //! \~chinese
     //! @brief 可选的四线 SPI 功能控制命令
     //! @note QSPI 传输序列通常包括: 命令阶段、地址阶段、空闲阶段和数据阶段
     //! @note 必须首先配置数据阶段，因为其配置直接决定了可以使用哪些其他阶段
     //! @note 某些硬件可能在数据阶段线模式与其他阶段配置之间施加限制
+    //! @warning 一旦启用 QSPI 模式，标准 SPI 模式操作通常不兼容且不受支持
     //!
 
     //! \~english Enable Quad SPI mode for enhanced data transfer (param: NULL)
+    //! \~english Note: After enabling QSPI mode, standard SPI operations are typically no longer available
     //! \~chinese 启用四线 SPI 模式以增强数据传输 (参数: NULL)
+    //! \~chinese 注意：启用 QSPI 模式后，标准 SPI 操作通常不再可用
     VSF_SPI_CTRL_QSPI_ENABLE                                = 0x00ul,
     //! \~english Disable Quad SPI mode and return to standard SPI operation (param: NULL)
+    //! \~english Note: This restores compatibility with standard SPI operations
     //! \~chinese 禁用四线 SPI 模式并恢复到标准 SPI 操作 (参数: NULL)
+    //! \~chinese 注意：这将恢复与标准 SPI 操作的兼容性
     VSF_SPI_CTRL_QSPI_DISABLE                               = 0x01ul,
     #define VSF_SPI_CTRL_QSPI_ENABLE                        VSF_SPI_CTRL_QSPI_ENABLE
     #define VSF_SPI_CTRL_QSPI_DISABLE                       VSF_SPI_CTRL_QSPI_DISABLE
@@ -1047,7 +1053,7 @@ extern fsm_rt_t vsf_spi_disable(vsf_spi_t *spi_ptr);
  * @brief Enable specific interrupts for a SPI instance
  * @param[in,out] spi_ptr: Pointer to SPI instance structure @ref vsf_spi_t
  * @param[in] irq_mask: Interrupt mask(s) to enable from @ref vsf_spi_irq_mask_t
- * @note Clear any pending interrupts before enabling new ones
+ * * @note Clear any pending interrupts before enabling new ones
  * @note Multiple interrupts can be enabled by OR-ing the masks
  * \~chinese
  * @brief 启用 SPI 实例的特定中断
