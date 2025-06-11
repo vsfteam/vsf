@@ -450,7 +450,7 @@ HAL_StatusTypeDef HAL_QSPI_Init(QSPI_HandleTypeDef *hqspi)
     VSF_STHAL_ASSERT(spi != NULL);
 
     if (hqspi->State == HAL_QSPI_STATE_RESET) {
-        hqspi->Lock = HAL_UNLOCKED;
+        VSF_STHAL_UNLOCK(hqspi);
 #   if (USE_HAL_QSPI_REGISTER_CALLBACKS == 1)
         hqspi->ErrorCallback         = HAL_QSPI_ErrorCallback;
         hqspi->AbortCpltCallback     = HAL_QSPI_AbortCpltCallback;
@@ -497,6 +497,9 @@ HAL_StatusTypeDef HAL_QSPI_Init(QSPI_HandleTypeDef *hqspi)
     };
     vsf_err_t err = vsf_spi_init(spi, &cfg);
     if (err != VSF_ERR_NONE) {
+        hqspi->ErrorCode |= HAL_QSPI_ERROR_INVALID_PARAM;
+        hqspi->State = HAL_QSPI_STATE_READY;
+        VSF_STHAL_UNLOCK(hqspi);
         return HAL_ERROR;
     }
     while (fsm_rt_cpl != vsf_spi_enable(spi));
@@ -505,9 +508,20 @@ HAL_StatusTypeDef HAL_QSPI_Init(QSPI_HandleTypeDef *hqspi)
     uint32_t flash_size = hqspi->Init.FlashSize;
     err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_FLASH_SIZE_SET, &flash_size);
     if (err != VSF_ERR_NONE) {
+        hqspi->ErrorCode |= HAL_QSPI_ERROR_INVALID_PARAM;
+        hqspi->State = HAL_QSPI_STATE_READY;
+        VSF_STHAL_UNLOCK(hqspi);
         return HAL_ERROR;
     }
 #   endif
+
+    err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ENABLE, NULL);
+    if (err != VSF_ERR_NONE) {
+        hqspi->ErrorCode |= HAL_QSPI_ERROR_INVALID_PARAM;
+        hqspi->State = HAL_QSPI_STATE_READY;
+        VSF_STHAL_UNLOCK(hqspi);
+        return HAL_ERROR;
+    }
 
     hqspi->ErrorCode = HAL_QSPI_ERROR_NONE;
     hqspi->State     = HAL_QSPI_STATE_READY;
