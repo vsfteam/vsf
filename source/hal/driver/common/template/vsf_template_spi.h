@@ -780,9 +780,15 @@ typedef enum vsf_spi_ctrl_t {
     //! \~english
     //! @brief Optional control commands for Quad SPI command phase
     //! @note Command phase typically sends instruction codes to the target device
+    //! @note IMPORTANT: Even if only command/address phases are used (no data phase),
+    //!       you must still call vsf_spi_fifo_transfer() or vsf_spi_request_transfer()
+    //!       with count=0 to execute the actual transaction
     //! \~chinese
     //! @brief 可选的四线 SPI 命令阶段操作控制命令
     //! @note 命令阶段通常向目标设备发送指令代码
+    //! @note 重要: 即使仅使用命令/地址阶段（无数据阶段），仍然必须调用
+    //!       vsf_spi_fifo_transfer() 或 vsf_spi_request_transfer()，
+    //!       并设置 count=0 来执行实际的传输
     //!
 
     //! \~english Enable command phase in Quad SPI transfer (param: NULL)
@@ -1587,6 +1593,7 @@ static inline uint8_t vsf_spi_mode_to_data_bytes(vsf_spi_mode_t mode)
 #if VSF_SPI_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_spi_t                                  VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t)
 #   define vsf_spi_init(__SPI, ...)                     VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_init)                 ((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
+#   define vsf_spi_fini(__SPI)                          VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_fini)                 ((__vsf_spi_t *)(__SPI))
 #   define vsf_spi_enable(__SPI)                        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_enable)               ((__vsf_spi_t *)(__SPI))
 #   define vsf_spi_disable(__SPI)                       VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_disable)              ((__vsf_spi_t *)(__SPI))
 #   define vsf_spi_irq_enable(__SPI, ...)               VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_irq_enable)           ((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
@@ -1600,6 +1607,33 @@ static inline uint8_t vsf_spi_mode_to_data_bytes(vsf_spi_mode_t mode)
 #   define vsf_spi_cancel_transfer(__SPI)               VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cancel_transfer)      ((__vsf_spi_t *)(__SPI))
 #   define vsf_spi_get_transferred_count(__SPI, ...)    VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_get_transferred_count)((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
 #   define vsf_spi_ctrl(__SPI, ...)                     VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_ctrl)                 ((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
+
+#   define vsf_qspi_t                                   vsf_spi_t
+#   define vsf_qspi_mode_t                              vsf_spi_mode_t
+#   define vsf_qspi_irq_mask_t                          vsf_spi_irq_mask_t
+#   define vsf_qspi_status_t                            vsf_spi_status_t
+#   define vsf_qspi_capability_t                        vsf_spi_capability_t
+#   define vsf_qspi_isr_handler_t                       vsf_spi_isr_handler_t
+#   define vsf_qspi_isr_t                               vsf_spi_isr_t
+#   define vsf_qspi_cfg_t                               vsf_spi_cfg_t
+#   define vsf_qspi_ctrl_t                              vsf_spi_ctrl_t
+#   define vsf_qspi_init(__SPI, ...)                    vsf_spi_init((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
+#   define vsf_qspi_fini(__SPI)                         vsf_spi_fini((__vsf_spi_t *)(__SPI))
+#   define vsf_qspi_enable(__SPI)                       vsf_spi_enable((__vsf_spi_t *)(__SPI))
+#   define vsf_qspi_disable(__SPI)                      vsf_spi_disable((__vsf_spi_t *)(__SPI))
+#   define vsf_qspi_irq_enable(__SPI, ...)              vsf_spi_irq_enable((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
+#   define vsf_qspi_irq_disable(__SPI, ...)             vsf_spi_irq_disable((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
+#   define vsf_qspi_status(__SPI)                       vsf_spi_status((__vsf_spi_t *)(__SPI))
+#   define vsf_qspi_capability(__SPI)                   vsf_spi_capability((__vsf_spi_t *)(__SPI))
+#   define vsf_qspi_cs_active(__SPI, ...)               vsf_spi_cs_active((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
+#   define vsf_qspi_cs_inactive(__SPI, ...)             vsf_spi_cs_inactive((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
+#   define vsf_qspi_fifo_write(__SPI, ...)              vsf_spi_fifo_transfer((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
+#   define vsf_qspi_fifo_read(__SPI, ...)               vsf_spi_fifo_transfer((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
+#   define vsf_qspi_request_tx(__SPI, __OUT_BUF, __CNT) vsf_spi_request_transfer((__vsf_spi_t *)(__SPI), __OUT_BUF, NULL, __CNT)
+#   define vsf_qspi_request_rx(__SPI, __IN_BUF, __CNT)  vsf_spi_request_transfer((__vsf_spi_t *)(__SPI), NULL, __IN_BUF, __CNT)
+#   define vsf_qspi_cancel_transfer(__SPI)              vsf_spi_cancel_transfer((__vsf_spi_t *)(__SPI))
+#   define vsf_qspi_get_transferred_count(__SPI, ...)   vsf_spi_get_transferred_count((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
+#   define vsf_qspi_ctrl(__SPI, ...)                    vsf_spi_ctrl((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
 #endif
 /// @endcond
 
