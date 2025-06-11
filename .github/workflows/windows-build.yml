@@ -18,13 +18,8 @@ jobs:
         build_config: [Debug]
         # https://docs.microsoft.com/en-us/visualstudio/install/visual-studio-build-numbers-and-release-dates?view=vs-2019
         # https://docs.microsoft.com/en-us/visualstudio/install/visual-studio-build-numbers-and-release-dates?view=vs-2022
-        vs-version: ['[16.0, 17)', '[17.0, 18)']
-        os: [windows-2019, windows-2022]
-        exclude:
-            - os: windows-2019
-              vs-version: '[17.0, 18)'
-            - os: windows-2022
-              vs-version: '[16.0, 17)'
+        vs-version: ['[17.0, 18)']
+        os: [windows-2022, windows-2025]
 
     runs-on: ${{ matrix.os }}
 
