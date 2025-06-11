@@ -350,7 +350,7 @@ HAL_StatusTypeDef HAL_QSPI_UnRegisterCallback(
 
 static bool __spi_fifo_transfer_continue(QSPI_HandleTypeDef *hqspi)
 {
-    vsf_spi_t     *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t     *spi = (vsf_qspi_t *)hqspi->Instance;
     uint_fast32_t *out_offset_ptr;
     uint_fast32_t *in_offset_ptr;
     uint_fast32_t  out_offset;
@@ -369,6 +369,7 @@ static bool __spi_fifo_transfer_continue(QSPI_HandleTypeDef *hqspi)
         in_offset_ptr = NULL;
     }
 
+    // 因为我们合并了 tx 和 rx 的 fifo 传输，所以在这里需要使用 vsf_spi_fifo_transfer
     vsf_spi_fifo_transfer(spi, (void *)hqspi->pTxBuffPtr, out_offset_ptr,
                           (void *)hqspi->pRxBuffPtr, in_offset_ptr, count);
 
@@ -382,8 +383,8 @@ static bool __spi_fifo_transfer_continue(QSPI_HandleTypeDef *hqspi)
     return (hqspi->TxXferCount > 0U) || (hqspi->RxXferCount > 0U);
 }
 
-static void __qspi_isr_handler(void *target_ptr, vsf_spi_t *spi_ptr,
-                               vsf_spi_irq_mask_t irq_mask)
+static void __qspi_isr_handler(void *target_ptr, vsf_qspi_t *spi_ptr,
+                               vsf_qspi_irq_mask_t irq_mask)
 {
 
     QSPI_HandleTypeDef *hqspi = (QSPI_HandleTypeDef *)target_ptr;
@@ -391,7 +392,7 @@ static void __qspi_isr_handler(void *target_ptr, vsf_spi_t *spi_ptr,
 
     if (irq_mask & VSF_SPI_IRQ_MASK_TX_CPL) {
         if (hqspi->State == HAL_QSPI_STATE_BUSY_INDIRECT_TX) {
-            vsf_spi_irq_disable(spi_ptr, VSF_SPI_IRQ_MASK_TX_CPL);
+            vsf_qspi_irq_disable(spi_ptr, VSF_SPI_IRQ_MASK_TX_CPL);
             hqspi->State = HAL_QSPI_STATE_READY;
 #   if USE_HAL_QSPI_REGISTER_CALLBACKS == 1U
             hqspi->TxCpltCallback(hqspi);
@@ -414,7 +415,7 @@ static void __qspi_isr_handler(void *target_ptr, vsf_spi_t *spi_ptr,
 
     if (irq_mask & VSF_SPI_IRQ_MASK_TX) {
         if (!__spi_fifo_transfer_continue(hqspi)) {
-            vsf_spi_irq_disable(spi_ptr, VSF_SPI_IRQ_MASK_TX);
+            vsf_qspi_irq_disable(spi_ptr, VSF_SPI_IRQ_MASK_TX);
             if (hqspi->State == HAL_QSPI_STATE_BUSY_INDIRECT_TX) {
                 hqspi->State = HAL_QSPI_STATE_READY;
 #   if USE_HAL_SPI_REGISTER_CALLBACKS == 1U
@@ -428,7 +429,7 @@ static void __qspi_isr_handler(void *target_ptr, vsf_spi_t *spi_ptr,
 
     if (irq_mask & VSF_SPI_IRQ_MASK_RX) {
         if (!__spi_fifo_transfer_continue(hqspi)) {
-            vsf_spi_irq_disable(spi_ptr, VSF_SPI_IRQ_MASK_RX);
+            vsf_qspi_irq_disable(spi_ptr, VSF_SPI_IRQ_MASK_RX);
             if (hqspi->State == HAL_QSPI_STATE_BUSY_INDIRECT_RX) {
                 hqspi->State = HAL_QSPI_STATE_READY;
 #   if USE_HAL_QSPI_REGISTER_CALLBACKS == 1U
@@ -446,7 +447,7 @@ HAL_StatusTypeDef HAL_QSPI_Init(QSPI_HandleTypeDef *hqspi)
     if (hqspi == NULL) {
         return HAL_ERROR;
     }
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
 
     if (hqspi->State == HAL_QSPI_STATE_RESET) {
@@ -476,7 +477,7 @@ HAL_StatusTypeDef HAL_QSPI_Init(QSPI_HandleTypeDef *hqspi)
         VSF_STHAL_CFG_QSPI_DEFAULT_CLOCK /
         (hqspi->Init.ClockPrescaler ? hqspi->Init.ClockPrescaler : 1);
 
-    vsf_spi_mode_t mode = VSF_SPI_MASTER | VSF_SPI_DATASIZE_8;
+    vsf_qspi_mode_t mode = VSF_SPI_MASTER | VSF_SPI_DATASIZE_8;
 
     mode |= hqspi->Init.FifoThreshold;
     mode |= hqspi->Init.SampleShifting;
@@ -485,7 +486,7 @@ HAL_StatusTypeDef HAL_QSPI_Init(QSPI_HandleTypeDef *hqspi)
     mode |= hqspi->Init.FlashID;
     mode |= hqspi->Init.DualFlash;
 
-    vsf_spi_cfg_t cfg = {
+    vsf_qspi_cfg_t cfg = {
         .mode     = mode,
         .clock_hz = div,
         .isr =
@@ -495,18 +496,18 @@ HAL_StatusTypeDef HAL_QSPI_Init(QSPI_HandleTypeDef *hqspi)
                 .prio       = vsf_arch_prio_0,
             },
     };
-    vsf_err_t err = vsf_spi_init(spi, &cfg);
+    vsf_err_t err = vsf_qspi_init(spi, &cfg);
     if (err != VSF_ERR_NONE) {
         hqspi->ErrorCode |= HAL_QSPI_ERROR_INVALID_PARAM;
         hqspi->State = HAL_QSPI_STATE_READY;
         VSF_STHAL_UNLOCK(hqspi);
         return HAL_ERROR;
     }
-    while (fsm_rt_cpl != vsf_spi_enable(spi));
+    while (fsm_rt_cpl != vsf_qspi_enable(spi));
 
 #   ifdef VSF_SPI_CTRL_QSPI_QSPI_FLASH_SIZE_SET
     uint32_t flash_size = hqspi->Init.FlashSize;
-    err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_FLASH_SIZE_SET, &flash_size);
+    err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_FLASH_SIZE_SET, &flash_size);
     if (err != VSF_ERR_NONE) {
         hqspi->ErrorCode |= HAL_QSPI_ERROR_INVALID_PARAM;
         hqspi->State = HAL_QSPI_STATE_READY;
@@ -515,7 +516,7 @@ HAL_StatusTypeDef HAL_QSPI_Init(QSPI_HandleTypeDef *hqspi)
     }
 #   endif
 
-    err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ENABLE, NULL);
+    err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_ENABLE, NULL);
     if (err != VSF_ERR_NONE) {
         hqspi->ErrorCode |= HAL_QSPI_ERROR_INVALID_PARAM;
         hqspi->State = HAL_QSPI_STATE_READY;
@@ -534,12 +535,12 @@ HAL_StatusTypeDef HAL_QSPI_DeInit(QSPI_HandleTypeDef *hqspi)
         return HAL_ERROR;
     }
 
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
 
     hqspi->State = HAL_QSPI_STATE_BUSY;
 
-    vsf_spi_fini(spi);
+    vsf_qspi_fini(spi);
 
 #   if (USE_HAL_QSPI_REGISTER_CALLBACKS == 1)
     if (hqspi->MspDeInitCallback == NULL) {
@@ -592,7 +593,7 @@ static HAL_StatusTypeDef __HAL_QSPI_Command(QSPI_HandleTypeDef  *hqspi,
     hqspi->ErrorCode = HAL_QSPI_ERROR_NONE;
     hqspi->State     = HAL_QSPI_STATE_BUSY;
 
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
     uint32_t tickstart = HAL_GetTick();
 
@@ -609,21 +610,21 @@ static HAL_StatusTypeDef __HAL_QSPI_Command(QSPI_HandleTypeDef  *hqspi,
     // modes, whether different line mode configurations for commands and
     // addresses are supported
     uint32_t data_phase;
-    err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_DATA_PHASE_GET_LINE_MODE,
+    err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_DATA_PHASE_GET_LINE_MODE,
                        &data_phase);
     VSF_ASSERT(err == VSF_ERR_NONE);
     if (data_phase != cmd->DataMode) {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_DATA_PHASE_SET_LINE_MODE,
+        err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_DATA_PHASE_SET_LINE_MODE,
                            &cmd->DataMode);
         VSF_ASSERT(err == VSF_ERR_NONE);
     }
 
     // Command (Instruction) Phase
     if (cmd->InstructionMode == QSPI_INSTRUCTION_NONE) {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_CMD_PHASE_DISABLE, NULL);
+        err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_CMD_PHASE_DISABLE, NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
     } else {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_CMD_PHASE_ENABLE, NULL);
+        err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_CMD_PHASE_ENABLE, NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
 
         uint32_t inst_mode;
@@ -643,28 +644,28 @@ static HAL_StatusTypeDef __HAL_QSPI_Command(QSPI_HandleTypeDef  *hqspi,
         }
 
         uint32_t cmd_line_mode;
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_LINE_MODE,
+        err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_LINE_MODE,
                            &cmd_line_mode);
         VSF_ASSERT(err == VSF_ERR_NONE);
 
         if (cmd_line_mode != inst_mode) {
-            err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_LINE_MODE,
+            err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_LINE_MODE,
                                &inst_mode);
             VSF_ASSERT(err == VSF_ERR_NONE);
         }
 
         uint8_t instruction = cmd->Instruction;
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_VALUE,
+        err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_VALUE,
                            &instruction);
         VSF_ASSERT(err == VSF_ERR_NONE);
     }
 
     // Address Phase
     if (cmd->AddressMode == QSPI_ADDRESS_NONE) {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_DISABLE, NULL);
+        err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_DISABLE, NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
     } else {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_ENABLE, NULL);
+        err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_ENABLE, NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
 
         uint32_t addr_line_mode = 0;
@@ -681,22 +682,22 @@ static HAL_StatusTypeDef __HAL_QSPI_Command(QSPI_HandleTypeDef  *hqspi,
         }
 
         uint32_t addr_line_mode_current;
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_GET_LINE_MODE,
+        err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_GET_LINE_MODE,
                            &addr_line_mode_current);
         VSF_ASSERT(err == VSF_ERR_NONE);
         if (addr_line_mode_current != addr_line_mode) {
             err =
-                vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_LINE_MODE,
+                vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_LINE_MODE,
                              &addr_line_mode);
             VSF_ASSERT(err == VSF_ERR_NONE);
         }
 
         uint32_t addr = cmd->Address;
-        err           = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_SET, &addr);
+        err           = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_SET, &addr);
         VSF_ASSERT(err == VSF_ERR_NONE);
 
         uint32_t address_size_mode = cmd->AddressSize;
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_SIZE,
+        err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_SIZE,
                            &address_size_mode);
         VSF_ASSERT(err == VSF_ERR_NONE);
     }
@@ -704,11 +705,11 @@ static HAL_StatusTypeDef __HAL_QSPI_Command(QSPI_HandleTypeDef  *hqspi,
     // Alternate Bytes Phase
 #   ifdef VSF_SPI_CTRL_QSPI_QSPI_ALATERNATE_BYTES_MODE
     if (cmd->AlternateByteMode == QSPI_ALTERNATE_BYTES_NONE) {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_ALTERNATE_BYTES_DISABLE,
+        err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_ALTERNATE_BYTES_DISABLE,
                            NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
     } else {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_ALTERNATE_BYTES_ENABLE,
+        err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_ALTERNATE_BYTES_ENABLE,
                            NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
     }
@@ -724,15 +725,15 @@ static HAL_StatusTypeDef __HAL_QSPI_Command(QSPI_HandleTypeDef  *hqspi,
        defined(VSF_SPI_CTRL_QSPI_DUMMY_PHASE_SET_CYCLES)
     hqspi->DummyCycles = cmd->DummyCycles;
     if (cmd->DummyCycles != 0) {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_DUMMY_PHASE_ENABLE, NULL);
+        err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_DUMMY_PHASE_ENABLE, NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
 
         uint8_t dummy = cmd->DummyCycles;
         err =
-            vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_DUMMY_PHASE_SET_CYCLES, &dummy);
+            vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_DUMMY_PHASE_SET_CYCLES, &dummy);
         VSF_ASSERT(err == VSF_ERR_NONE);
     } else {
-        err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_DUMMY_PHASE_DISABLE, NULL);
+        err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_DUMMY_PHASE_DISABLE, NULL);
         VSF_ASSERT(err == VSF_ERR_NONE);
     }
 #   endif
@@ -742,23 +743,23 @@ static HAL_StatusTypeDef __HAL_QSPI_Command(QSPI_HandleTypeDef  *hqspi,
     uint8_t dummy = cmd->DdrHoldHalfCycle;
     if (cmd->DdrMode == QSPI_DDR_MODE_ENABLE) {
         err =
-            vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_DRR_MODE_ENABLED, &dummy);
+            vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_DRR_MODE_ENABLED, &dummy);
         VSF_ASSERT(err == VSF_ERR_NONE);
 
 #      ifdef VSF_SPI_CTRL_QSPI_QSPI_DDR_HOLD_HALF_CYCLE
         if (cmd->DdrHoldHalfCycle == QSPI_DDR_HHC_ENABLE) {
             err =
-                vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_DDR_HHC_ENABLED, NULL);
+                vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_DDR_HHC_ENABLED, NULL);
             VSF_ASSERT(err == VSF_ERR_NONE);
         } else {
-            err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_DDR_HHC_DISABLED,
+            err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_DDR_HHC_DISABLED,
                                NULL);
             VSF_ASSERT(err == VSF_ERR_NONE);
         }
 #      endif
     } else {
         err =
-            vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_DRR_MODE_DISABLED, &dummy);
+            vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_DRR_MODE_DISABLED, &dummy);
         VSF_ASSERT(err == VSF_ERR_NONE);
     }
 #   endif
@@ -784,7 +785,7 @@ static bool __HAL_QSPI_Command_need_other_transfer(QSPI_CommandTypeDef *cmd)
 HAL_StatusTypeDef HAL_QSPI_Command(QSPI_HandleTypeDef  *hqspi,
                                    QSPI_CommandTypeDef *cmd, uint32_t Timeout)
 {
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
     HAL_StatusTypeDef status;
 
@@ -806,7 +807,7 @@ HAL_StatusTypeDef HAL_QSPI_Command(QSPI_HandleTypeDef  *hqspi,
 HAL_StatusTypeDef HAL_QSPI_Command_IT(QSPI_HandleTypeDef  *hqspi,
                                       QSPI_CommandTypeDef *cmd)
 {
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
     HAL_StatusTypeDef status;
 
@@ -843,7 +844,7 @@ static HAL_StatusTypeDef __spi_transfer_with_timeout(QSPI_HandleTypeDef *hqspi,
 
     uint32_t tickstart = HAL_GetTick();
 
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
 
     while ((hqspi->TxXferCount > 0U) || (hqspi->RxXferCount > 0U)) {
         __spi_fifo_transfer_continue(hqspi);
@@ -885,7 +886,7 @@ static HAL_StatusTypeDef __qspi_prepare(QSPI_HandleTypeDef   *hqspi,
         return HAL_ERROR;
     }
 
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
 
     if (hqspi->DummyCycles > 0) {
@@ -896,7 +897,7 @@ static HAL_StatusTypeDef __qspi_prepare(QSPI_HandleTypeDef   *hqspi,
             trans_mode = VSF_SPI_CTRL_QSPI_TRANSFER_MODE_DUMMY_READ;
         }
         vsf_err_t err =
-            vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_TRANSFER_SET_MODE, &trans_mode);
+            vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_TRANSFER_SET_MODE, &trans_mode);
         VSF_ASSERT(err == VSF_ERR_NONE);
     }
 
@@ -972,8 +973,8 @@ HAL_StatusTypeDef HAL_QSPI_Transmit_IT(QSPI_HandleTypeDef *hqspi,
 
     __spi_fifo_transfer_continue(hqspi);
 
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
-    vsf_spi_irq_enable(spi, VSF_SPI_IRQ_MASK_TX);
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
+    vsf_qspi_irq_enable(spi, VSF_SPI_IRQ_MASK_TX);
 
     VSF_STHAL_UNLOCK(hqspi);
 
@@ -999,8 +1000,8 @@ HAL_StatusTypeDef HAL_QSPI_Receive_IT(QSPI_HandleTypeDef *hqspi, uint8_t *pData)
 
     __spi_fifo_transfer_continue(hqspi);
 
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
-    vsf_spi_irq_enable(spi, VSF_SPI_IRQ_MASK_RX | VSF_SPI_IRQ_MASK_ERR);
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
+    vsf_qspi_irq_enable(spi, VSF_SPI_IRQ_MASK_RX | VSF_SPI_IRQ_MASK_ERR);
 
     VSF_STHAL_UNLOCK(hqspi);
 
@@ -1024,12 +1025,12 @@ HAL_StatusTypeDef HAL_QSPI_Transmit_DMA(QSPI_HandleTypeDef *hqspi,
         return status;
     }
 
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
 
-    vsf_spi_irq_enable(spi, VSF_SPI_IRQ_MASK_TX_CPL);
+    vsf_qspi_irq_enable(spi, VSF_SPI_IRQ_MASK_TX_CPL);
     vsf_err_t err =
-        vsf_spi_request_transfer(spi, (void *)pData, NULL, hqspi->NbData);
+        vsf_qspi_request_tx(spi, (void *)pData, hqspi->NbData);
     if (err != VSF_ERR_NONE) {
         hqspi->ErrorCode |= HAL_QSPI_ERROR_TRANSFER;
         VSF_STHAL_UNLOCK(hqspi);
@@ -1057,12 +1058,12 @@ HAL_StatusTypeDef HAL_QSPI_Receive_DMA(QSPI_HandleTypeDef *hqspi,
         return status;
     }
 
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
 
-    vsf_spi_irq_enable(spi, VSF_SPI_IRQ_MASK_CPL);
+    vsf_qspi_irq_enable(spi, VSF_SPI_IRQ_MASK_CPL);
     vsf_err_t err =
-        vsf_spi_request_transfer(spi, NULL, (void *)pData, hqspi->NbData);
+        vsf_qspi_request_rx(spi, (void *)pData, hqspi->NbData);
     if (err != VSF_ERR_NONE) {
         hqspi->ErrorCode |= HAL_QSPI_ERROR_TRANSFER;
         VSF_STHAL_UNLOCK(hqspi);
@@ -1117,10 +1118,10 @@ HAL_StatusTypeDef HAL_QSPI_AutoPolling(QSPI_HandleTypeDef      *hqspi,
     hqspi->State     = HAL_QSPI_STATE_BUSY_AUTO_POLLING;
 
     // TODO: add auto polling cfg
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
     vsf_err_t err =
-        vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_AUTO_POLLING, NULL);
+        vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_AUTO_POLLING, NULL);
 
     hqspi->State = HAL_QSPI_STATE_READY;
     VSF_STHAL_UNLOCK(hqspi);
@@ -1171,10 +1172,10 @@ HAL_StatusTypeDef HAL_QSPI_AutoPolling_IT(QSPI_HandleTypeDef      *hqspi,
     hqspi->State     = HAL_QSPI_STATE_BUSY_AUTO_POLLING;
 
     // TODO: add auto polling cfg
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
     vsf_err_t err =
-        vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_AUTO_POLLING, NULL);
+        vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_AUTO_POLLING, NULL);
 
     hqspi->State = HAL_QSPI_STATE_READY;
     VSF_STHAL_UNLOCK(hqspi);
@@ -1220,13 +1221,13 @@ HAL_StatusTypeDef HAL_QSPI_MemoryMapped(QSPI_HandleTypeDef       *hqspi,
     }
 
     // TODO: add memory map
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
     uint32_t *map = {
         // TODO
     };
     vsf_err_t err =
-        vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_MEMORY_MAP_SET, &map);
+        vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_MEMORY_MAP_SET, &map);
 
     hqspi->ErrorCode = HAL_QSPI_ERROR_NONE;
     hqspi->State     = HAL_QSPI_STATE_BUSY_AUTO_POLLING;
@@ -1257,14 +1258,14 @@ HAL_StatusTypeDef HAL_QSPI_Abort(QSPI_HandleTypeDef *hqspi)
 {
     HAL_StatusTypeDef status;
     VSF_STHAL_ASSERT(hqspi != NULL);
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
 
     status = HAL_OK;
 
-    vsf_spi_irq_disable(spi, VSF_SPI_IRQ_ALL_BITS_MASK);
+    vsf_qspi_irq_disable(spi, VSF_SPI_IRQ_ALL_BITS_MASK);
 
-    vsf_err_t err = vsf_spi_cancel_transfer(spi);
+    vsf_err_t err = vsf_qspi_cancel_transfer(spi);
     if (err < VSF_ERR_NONE) {
         return HAL_ERROR;
     }
@@ -1284,12 +1285,12 @@ HAL_StatusTypeDef HAL_QSPI_Abort(QSPI_HandleTypeDef *hqspi)
 HAL_StatusTypeDef HAL_QSPI_Abort_IT(QSPI_HandleTypeDef *hqspi)
 {
     VSF_STHAL_ASSERT(hqspi != NULL);
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
 
-    vsf_spi_irq_disable(spi, VSF_SPI_IRQ_ALL_BITS_MASK);
+    vsf_qspi_irq_disable(spi, VSF_SPI_IRQ_ALL_BITS_MASK);
 
-    vsf_err_t err = vsf_spi_cancel_transfer(spi);
+    vsf_err_t err = vsf_qspi_cancel_transfer(spi);
     if (err < VSF_ERR_NONE) {
         return HAL_ERROR;
     } else if (err == VSF_ERR_NOT_READY) {
@@ -1335,9 +1336,9 @@ HAL_StatusTypeDef HAL_QSPI_SetFifoThreshold(QSPI_HandleTypeDef *hqspi,
     }
 
 #   ifdef VSF_SPI_CTRL_QSPI_FIFO_THRESHOLD_SET
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
-    vsf_err_t err = vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_FIFO_THRESHOLD_SET,
+    vsf_err_t err = vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_FIFO_THRESHOLD_SET,
                                  &hqspi->Init.FifoThreshold);
     if (err != VSF_ERR_NONE) {
         status = HAL_ERROR;
@@ -1360,11 +1361,11 @@ HAL_StatusTypeDef HAL_QSPI_SetFifoThreshold(QSPI_HandleTypeDef *hqspi,
 uint32_t HAL_QSPI_GetFifoThreshold(const QSPI_HandleTypeDef *hqspi)
 {
 #   ifdef VSF_SPI_CTRL_QSPI_FIFO_THRESHOLD_GET
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
     uint32_t  threshold = 0;
     vsf_err_t err =
-        vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_FIFO_THRESHOLD_GET, &threshold);
+        vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_FIFO_THRESHOLD_GET, &threshold);
     if (err != VSF_ERR_NONE) {
         return 0;
     }
@@ -1390,10 +1391,10 @@ HAL_StatusTypeDef HAL_QSPI_SetFlashID(QSPI_HandleTypeDef *hqspi,
     }
 
 #   ifdef VSF_SPI_CTRL_QSPI_QSPI_FLASH_ID_SET
-    vsf_spi_t *spi = (vsf_spi_t *)hqspi->Instance;
+    vsf_qspi_t *spi = (vsf_qspi_t *)hqspi->Instance;
     VSF_STHAL_ASSERT(spi != NULL);
     vsf_err_t err =
-        vsf_spi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_FLASH_ID_SET, &FlashID);
+        vsf_qspi_ctrl(spi, VSF_SPI_CTRL_QSPI_QSPI_FLASH_ID_SET, &FlashID);
     if (err != VSF_ERR_NONE) {
         status = HAL_ERROR;
     } else {
