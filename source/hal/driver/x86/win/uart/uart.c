@@ -155,10 +155,11 @@ uint8_t vsf_win_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t devi
     char portName[256];
     char portFriendlyName[256];
     uint32_t mask = 0;
+    uint8_t usart_num = 0;
 
     vsf_win_usart_t * const (*ports)[VSF_WIN_USART_COUNT] = __vsf_win_usart_port.ports;
 
-    while ((result < device_num) && SetupDiEnumDeviceInfo(hDevInfo, result, &devInfoData)) {
+    while ((usart_num < device_num) && SetupDiEnumDeviceInfo(hDevInfo, result++, &devInfoData)) {
         hDevKey = SetupDiOpenDevRegKey(hDevInfo, &devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_READ);
         if (hDevKey != INVALID_HANDLE_VALUE) {
             dwCount = dimof(portName);
@@ -166,6 +167,7 @@ uint8_t vsf_win_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t devi
             RegCloseKey(hDevKey);
             SetupDiGetDeviceRegistryPropertyA(hDevInfo, &devInfoData, SPDRP_FRIENDLYNAME, NULL, (PBYTE)portFriendlyName, sizeof(portFriendlyName), NULL);
 
+            port_idx = 0;
             if (    (1 == sscanf(portName, "COM%d", &port_idx))
                 &&  (port_idx != 0) && (port_idx < dimof(*ports))) {
 
@@ -176,10 +178,10 @@ uint8_t vsf_win_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t devi
                 }
 
                 if (devices != NULL) {
-                    devices[result].instance = (vsf_usart_t *)(*__vsf_win_usart_port.fifo2req_ports)[port_idx];
-                    devices[result].port = port_idx;
+                    devices[usart_num].instance = (vsf_usart_t *)(*__vsf_win_usart_port.fifo2req_ports)[port_idx];
+                    devices[usart_num].port = port_idx;
+                    usart_num++;
                 }
-                result++;
             }
         }
     }
@@ -199,7 +201,7 @@ uint8_t vsf_win_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t devi
         }
     }
     __vsf_win_usart_port.ports_mask = mask;
-    return result;
+    return usart_num;
 }
 
 static void __vsf_win_usart_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
