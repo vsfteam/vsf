@@ -102,11 +102,11 @@ vsf_rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 #define VSF_HAL_TEMPLATE_IMP_NAME                   _rng
 #define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _RNG
 
-#ifndef VSF_RNG_CFG_IMP_PREFIX
+#if !defined(VSF_RNG_CFG_IMP_PREFIX) && !defined(VSF_RNG_CFG_IMP_DEVICE_PREFIX)
 #   error "Please define VSF_RNG_CFG_IMP_PREFIX in rng driver"
 #endif
 
-#ifndef VSF_RNG_CFG_IMP_UPCASE_PREFIX
+#if !defined(VSF_RNG_CFG_IMP_UPCASE_PREFIX) && !defined(VSF_RNG_CFG_IMP_DEVICE_UPCASE_PREFIX)
 #   error "Please define VSF_RNG_CFG_IMP_UPCASE_PREFIX in rng driver"
 #endif
 
@@ -123,6 +123,8 @@ vsf_rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 #undef VSF_RNG_CFG_IMP_PREFIX
 #undef VSF_RNG_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_RNG_CFG_IMP_UPCASE_PREFIX
+#undef VSF_RNG_CFG_IMP_DEVICE_PREFIX
+#undef VSF_RNG_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_RNG_CFG_IMP_LV0
 
 #undef vsf_imp_rng_t

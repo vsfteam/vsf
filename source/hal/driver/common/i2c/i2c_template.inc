@@ -210,11 +210,11 @@ vsf_err_t vsf_real_i2c_ctrl(vsf_real_i2c_t *i2c_ptr, vsf_i2c_ctrl_t ctrl, void *
 #define VSF_HAL_TEMPLATE_IMP_NAME                   _i2c
 #define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _I2C
 
-#ifndef VSF_I2C_CFG_IMP_PREFIX
+#if !defined(VSF_I2C_CFG_IMP_PREFIX) && !defined(VSF_I2C_CFG_IMP_DEVICE_PREFIX)
 #   error "Please define VSF_I2C_CFG_IMP_PREFIX in i2c driver"
 #endif
 
-#ifndef VSF_I2C_CFG_IMP_UPCASE_PREFIX
+#if !defined(VSF_I2C_CFG_IMP_UPCASE_PREFIX) && !defined(VSF_I2C_CFG_IMP_DEVICE_UPCASE_PREFIX)
 #   error "Please define VSF_I2C_CFG_IMP_UPCASE_PREFIX in i2c driver"
 #endif
 
@@ -231,6 +231,8 @@ vsf_err_t vsf_real_i2c_ctrl(vsf_real_i2c_t *i2c_ptr, vsf_i2c_ctrl_t ctrl, void *
 #undef VSF_I2C_CFG_IMP_PREFIX
 #undef VSF_I2C_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_I2C_CFG_IMP_UPCASE_PREFIX
+#undef VSF_I2C_CFG_IMP_DEVICE_PREFIX
+#undef VSF_I2C_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_I2C_CFG_IMP_LV0
 #undef VSF_I2C_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_I2C_CFG_IMP_HAS_OP

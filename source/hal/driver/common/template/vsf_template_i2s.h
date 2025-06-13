@@ -174,17 +174,17 @@ extern "C" {
  * @param[in] __prefix_name 用于生成 I2S 函数的前缀。
  */
 #define VSF_I2S_APIS(__prefix_name)                                                                                                                         \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, init,          VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)   \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, tx_init,       VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)   \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2s, tx_fini,       VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, tx_start,      VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, rx_init,       VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)   \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2s, rx_fini,       VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, rx_start,      VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2s, enable,        VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2s, disable,       VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2s_status_t,     i2s, status,        VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)                           \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2s_capability_t, i2s, capability,    VSF_MCONNECT(__prefix_name, _i2s_t) *i2s_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, init,          VSF_MCONNECT(__prefix_name, _t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)   \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, tx_init,       VSF_MCONNECT(__prefix_name, _t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)   \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2s, tx_fini,       VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, tx_start,      VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, rx_init,       VSF_MCONNECT(__prefix_name, _t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)   \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2s, rx_fini,       VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, rx_start,      VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2s, enable,        VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2s, disable,       VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2s_status_t,     i2s, status,        VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2s_capability_t, i2s, capability,    VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)
 
 /*============================ TYPES =========================================*/
 
@@ -362,7 +362,7 @@ typedef struct vsf_i2s_op_t {
 #define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
 /// @endcond
 
-    VSF_I2S_APIS(vsf)
+    VSF_I2S_APIS(vsf_i2s)
 } vsf_i2s_op_t;
 
 #if VSF_I2S_CFG_MULTI_CLASS == ENABLED

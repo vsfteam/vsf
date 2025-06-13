@@ -38,7 +38,7 @@ const vsf_dma_op_t vsf_remapped_dma_op = {
 #   undef __VSF_HAL_TEMPLATE_API
 #   define __VSF_HAL_TEMPLATE_API   VSF_HAL_TEMPLATE_API_OP
 
-    VSF_DMA_APIS(vsf_remapped)
+    VSF_DMA_APIS(vsf_remapped_dma)
 };
 #endif
 

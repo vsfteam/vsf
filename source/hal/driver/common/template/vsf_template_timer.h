@@ -214,22 +214,22 @@ extern "C" {
  * @brief 计时器 API 模板宏,用于生成计时器函数声明和实现。
  */
 #define VSF_TIMER_APIS(__prefix_name) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, init,                  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, vsf_timer_cfg_t *cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, fini,                  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               timer, enable,                VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               timer, disable,               VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_enable,            VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_disable,           VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_timer_status_t,     timer, status,                VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_timer_capability_t, timer, capability,            VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, set_period,            VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, uint32_t period) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, ctrl,                  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, vsf_timer_ctrl_t ctrl, void* param) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_config,        VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, uint8_t channel, vsf_timer_channel_cfg_t *channel_cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_start,         VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, uint8_t channel) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_stop,          VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, uint8_t channel) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_request_start, VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, uint8_t channel, vsf_timer_channel_request_t *request_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_request_stop,  VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, uint8_t channel) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_ctrl,          VSF_MCONNECT(__prefix_name, _timer_t) *timer_ptr, uint8_t channel, vsf_timer_channel_ctrl_t ctrl, void* param)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, init,                  VSF_MCONNECT(__prefix_name, _t) *timer_ptr, vsf_timer_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, fini,                  VSF_MCONNECT(__prefix_name, _t) *timer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               timer, enable,                VSF_MCONNECT(__prefix_name, _t) *timer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               timer, disable,               VSF_MCONNECT(__prefix_name, _t) *timer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_enable,            VSF_MCONNECT(__prefix_name, _t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_disable,           VSF_MCONNECT(__prefix_name, _t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_timer_status_t,     timer, status,                VSF_MCONNECT(__prefix_name, _t) *timer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_timer_capability_t, timer, capability,            VSF_MCONNECT(__prefix_name, _t) *timer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, set_period,            VSF_MCONNECT(__prefix_name, _t) *timer_ptr, uint32_t period) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, ctrl,                  VSF_MCONNECT(__prefix_name, _t) *timer_ptr, vsf_timer_ctrl_t ctrl, void* param) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_config,        VSF_MCONNECT(__prefix_name, _t) *timer_ptr, uint8_t channel, vsf_timer_channel_cfg_t *channel_cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_start,         VSF_MCONNECT(__prefix_name, _t) *timer_ptr, uint8_t channel) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_stop,          VSF_MCONNECT(__prefix_name, _t) *timer_ptr, uint8_t channel) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_request_start, VSF_MCONNECT(__prefix_name, _t) *timer_ptr, uint8_t channel, vsf_timer_channel_request_t *request_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_request_stop,  VSF_MCONNECT(__prefix_name, _t) *timer_ptr, uint8_t channel) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, channel_ctrl,          VSF_MCONNECT(__prefix_name, _t) *timer_ptr, uint8_t channel, vsf_timer_channel_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
 
@@ -622,7 +622,7 @@ typedef struct vsf_timer_op_t {
 #define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
 /// @endcond
 
-    VSF_TIMER_APIS(vsf)
+    VSF_TIMER_APIS(vsf_timer)
 } vsf_timer_op_t;
 
 #if VSF_TIMER_CFG_MULTI_CLASS == ENABLED

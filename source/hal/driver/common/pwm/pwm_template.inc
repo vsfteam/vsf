@@ -138,11 +138,11 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 #define VSF_HAL_TEMPLATE_IMP_NAME                   _pwm
 #define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _PWM
 
-#ifndef VSF_PWM_CFG_IMP_PREFIX
+#if !defined(VSF_PWM_CFG_IMP_PREFIX) && !defined(VSF_PWM_CFG_IMP_DEVICE_PREFIX)
 #   error "Please define VSF_PWM_CFG_IMP_PREFIX in pwm driver"
 #endif
 
-#ifndef VSF_PWM_CFG_IMP_UPCASE_PREFIX
+#if !defined(VSF_PWM_CFG_IMP_UPCASE_PREFIX) && !defined(VSF_PWM_CFG_IMP_DEVICE_UPCASE_PREFIX)
 #   error "Please define VSF_PWM_CFG_IMP_UPCASE_PREFIX in pwm driver"
 #endif
 
@@ -159,6 +159,8 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 #undef VSF_PWM_CFG_IMP_PREFIX
 #undef VSF_PWM_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_PWM_CFG_IMP_UPCASE_PREFIX
+#undef VSF_PWM_CFG_IMP_DEVICE_PREFIX
+#undef VSF_PWM_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_PWM_CFG_IMP_LV0
 #undef VSF_PWM_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_PWM_CFG_IMP_HAS_OP

@@ -29,16 +29,16 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_HAL_TEMPLATE_API_OP(__prefix_name, __return, __module__, __name, __first_args, ...)           \
-    .__name = (__return (*)( VSF_MCONNECT(vsf, _, __module__, _t) *, ##__VA_ARGS__ ))& VSF_MCONNECT(__prefix_name, _, __module__, _, __name),
+    .__name = (__return (*)( VSF_MCONNECT(vsf, _, __module__, _t) *, ##__VA_ARGS__ ))& VSF_MCONNECT(__prefix_name, _, __name),
 
 #define VSF_HAL_TEMPLATE_API_FP(__prefix_name, __return, __module__, __name, __first_args, ...)           \
     __return (* __name )( __first_args, ##__VA_ARGS__ );
 
 #define VSF_HAL_TEMPLATE_API_EXTERN(__prefix_name, __return, __module__, __name, __first_args, ...)       \
-    extern __return VSF_MCONNECT(__prefix_name, _, __module__, _, __name)( __first_args, ##__VA_ARGS__ );
+    extern __return VSF_MCONNECT(__prefix_name, _, __name)( __first_args, ##__VA_ARGS__ );
 
 #define VSF_HAL_TEMPLATE_API_DEFINE(__prefix_name, __return, __module__, __name, __first_args, ...)       \
-    __return VSF_MCONNECT(__prefix_name, _, __module__, _, __name)( __first_args, ##__VA_ARGS__ )
+    __return VSF_MCONNECT(__prefix_name, _, __name)( __first_args, ##__VA_ARGS__ )
 
 #define __VSF_HAL_COUNT_TO_MASK(__CNT)                                          \
     ((0x1ull << (__CNT > 0x00 ? 0x00 : 0)) |                                    \

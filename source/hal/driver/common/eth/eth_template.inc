@@ -195,11 +195,11 @@ vsf_eth_capability_t vsf_real_eth_capability(vsf_real_eth_t *eth_ptr)
 #define VSF_HAL_TEMPLATE_IMP_NAME                   _eth
 #define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _ETH
 
-#ifndef VSF_ETH_CFG_IMP_PREFIX
+#if !defined(VSF_ETH_CFG_IMP_PREFIX) && !defined(VSF_ETH_CFG_IMP_DEVICE_PREFIX)
 #   error "Please define VSF_ETH_CFG_IMP_PREFIX in eth driver"
 #endif
 
-#ifndef VSF_ETH_CFG_IMP_UPCASE_PREFIX
+#if !defined(VSF_ETH_CFG_IMP_UPCASE_PREFIX) && !defined(VSF_ETH_CFG_IMP_DEVICE_UPCASE_PREFIX)
 #   error "Please define VSF_ETH_CFG_IMP_UPCASE_PREFIX in eth driver"
 #endif
 
@@ -216,6 +216,8 @@ vsf_eth_capability_t vsf_real_eth_capability(vsf_real_eth_t *eth_ptr)
 #undef VSF_ETH_CFG_IMP_PREFIX
 #undef VSF_ETH_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_ETH_CFG_IMP_UPCASE_PREFIX
+#undef VSF_ETH_CFG_IMP_DEVICE_PREFIX
+#undef VSF_ETH_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_ETH_CFG_IMP_LV0
 #undef VSF_ETH_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_ETH_CFG_IMP_HAS_OP

@@ -31,7 +31,7 @@ extern "C" {
 
 /**
  * \~english
- * @brief Application code can redefine this prefix to specify a 
+ * @brief Application code can redefine this prefix to specify a
  * different driver implementation.
  *
  * \~chinese
@@ -355,7 +355,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast32_t,         pm, lposc_get_clock,        vsf_pm_lposc_sel_t lposc)
 
 #define VSF_PM_MISC_APIS(__prefix_name)                                                                                                             \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pm_capability_t,   pm, capability,             VSF_MCONNECT(__prefix_name, _pm_t) * pm_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pm_capability_t,   pm, capability,             VSF_MCONNECT(__prefix_name, _t) * pm_ptr)
 
 
 #define VSF_PM_APIS(__prefix_name)                                              \
@@ -366,7 +366,7 @@ extern "C" {
     VSF_PM_MCLK_APIS(__prefix_name)                                             \
     VSF_PM_PLL_APIS(__prefix_name)                                              \
     VSF_PM_LPOSC_APIS(__prefix_name)                                            \
-    VSF_PM_MISC_APIS(__prefix_name)
+    VSF_PM_MISC_APIS(__prefix_name_pm_misc)
 
 /*============================ TYPES =========================================*/
 

@@ -38,7 +38,7 @@ const vsf_pwm_op_t vsf_remapped_pwm_op = {
 #   undef __VSF_HAL_TEMPLATE_API
 #   define __VSF_HAL_TEMPLATE_API   VSF_HAL_TEMPLATE_API_OP
 
-    VSF_PWM_APIS(vsf_remapped)
+    VSF_PWM_APIS(vsf_remapped_pwm)
 };
 #endif
 

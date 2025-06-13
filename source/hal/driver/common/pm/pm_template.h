@@ -24,12 +24,12 @@
 #define VSF_HAL_TEMPLATE_DEC_NAME                     _pm
 #define VSF_HAL_TEMPLATE_DEC_UPCASE_NAME              _PM
 
-#ifndef VSF_PM_CFG_DEC_PREFIX
-#   error "Please define VSF_PM_CFG_DEC_PREFIX when using vsf_template_pm.h"
+#if !defined(VSF_PM_CFG_DEC_PREFIX) && !defined(VSF_PM_CFG_DEC_DEVICE_PREFIX)
+#   error "Please define VSF_PM_CFG_DEC_PREFIX or VSF_PM_CFG_DEC_DEVICE_PREFIX when using vsf_template_pm.h"
 #endif
 
-#ifdef VSF_PM_CFG_DEC_UPCASE_PREFIX
-#   define VSF_HAL_TEMPLATE_DEC_UPCASE_PREFIX         VSF_PM_CFG_DEC_UPCASE_PREFIX
+#if !defined(VSF_HAL_TEMPLATE_DEC_UPCASE_PREFIX) && !defined(VSF_PM_CFG_DEC_DEVICE_UPCASE_PREFIX)
+#   error "Please define VSF_HAL_TEMPLATE_DEC_UPCASE_PREFIX or VSF_PM_CFG_DEC_DEVICE_UPCASE_PREFIX when using vsf_template_pm.h"
 #endif
 
 // PM always is single instance
@@ -40,4 +40,6 @@
 
 #undef VSF_PM_CFG_DEC_PREFIX
 #undef VSF_PM_CFG_DEC_UPCASE_PREFIX
+#undef VSF_PM_CFG_DEC_DEVICE_PREFIX
+#undef VSF_PM_CFG_DEC_DEVICE_UPCASE_PREFIX
 

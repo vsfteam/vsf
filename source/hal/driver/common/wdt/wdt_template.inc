@@ -143,11 +143,11 @@ vsf_wdt_capability_t vsf_real_wdt_capability(vsf_real_wdt_t *wdt_ptr)
 #define VSF_HAL_TEMPLATE_IMP_NAME                   _wdt
 #define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _WDT
 
-#ifndef VSF_WDT_CFG_IMP_PREFIX
+#if !defined(VSF_WDT_CFG_IMP_PREFIX) && !defined(VSF_WDT_CFG_IMP_DEVICE_PREFIX)
 #   error "Please define VSF_WDT_CFG_IMP_PREFIX in wdt driver"
 #endif
 
-#ifndef VSF_WDT_CFG_IMP_UPCASE_PREFIX
+#if !defined(VSF_WDT_CFG_IMP_UPCASE_PREFIX) && !defined(VSF_WDT_CFG_IMP_DEVICE_UPCASE_PREFIX)
 #   error "Please define VSF_WDT_CFG_IMP_UPCASE_PREFIX in wdt driver"
 #endif
 
@@ -164,6 +164,8 @@ vsf_wdt_capability_t vsf_real_wdt_capability(vsf_real_wdt_t *wdt_ptr)
 #undef VSF_WDT_CFG_IMP_PREFIX
 #undef VSF_WDT_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_WDT_CFG_IMP_UPCASE_PREFIX
+#undef VSF_WDT_CFG_IMP_DEVICE_PREFIX
+#undef VSF_WDT_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_WDT_CFG_IMP_LV0
 #undef VSF_WDT_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_WDT_CFG_IMP_HAS_OP

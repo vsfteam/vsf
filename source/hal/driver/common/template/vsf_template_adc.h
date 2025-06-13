@@ -192,24 +192,24 @@ extern "C" {
 /**
  * \~english
  * @brief ADC API template, used to generate ADC type, specific prefix function declarations, etc.
- * @param[in] __PREFIX_NAME The prefix used for generating ADC functions.
+ * @param[in] __prefix_name The prefix used for generating ADC functions.
  *
  * \~chinese
  * @brief ADC API 模板，用于生成 ADC 类型、特定前缀的函数声明等。
- * @param[in] __PREFIX_NAME 用于生成 ADC 函数的前缀。
+ * @param[in] __prefix_name 用于生成 ADC 函数的前缀。
  */
-#define VSF_ADC_APIS(__PREFIX_NAME) \
-    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, vsf_err_t,            adc, init,                 VSF_MCONNECT(__PREFIX_NAME, _adc_t) *adc_ptr, vsf_adc_cfg_t *cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, void,                 adc, fini,                 VSF_MCONNECT(__PREFIX_NAME, _adc_t) *adc_ptr) \
-    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, fsm_rt_t,             adc, enable,               VSF_MCONNECT(__PREFIX_NAME, _adc_t) *adc_ptr) \
-    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, fsm_rt_t,             adc, disable,              VSF_MCONNECT(__PREFIX_NAME, _adc_t) *adc_ptr) \
-    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, vsf_adc_status_t,     adc, status,               VSF_MCONNECT(__PREFIX_NAME, _adc_t) *adc_ptr) \
-    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, vsf_adc_capability_t, adc, capability,           VSF_MCONNECT(__PREFIX_NAME, _adc_t) *adc_ptr) \
-    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, void,                 adc, irq_enable,           VSF_MCONNECT(__PREFIX_NAME, _adc_t) *adc_ptr, vsf_adc_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, void,                 adc, irq_disable,          VSF_MCONNECT(__PREFIX_NAME, _adc_t) *adc_ptr, vsf_adc_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, vsf_err_t,            adc, channel_request_once, VSF_MCONNECT(__PREFIX_NAME, _adc_t) *adc_ptr, vsf_adc_channel_cfg_t *channel_cfg, void *buffer_ptr) \
-    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, vsf_err_t,            adc, channel_config,       VSF_MCONNECT(__PREFIX_NAME, _adc_t) *adc_ptr, vsf_adc_channel_cfg_t *channel_cfgs_ptr, uint32_t channel_cfgs_cnt) \
-    __VSF_HAL_TEMPLATE_API(__PREFIX_NAME, vsf_err_t,            adc, channel_request,      VSF_MCONNECT(__PREFIX_NAME, _adc_t) *adc_ptr, void *buffer_ptr, uint_fast32_t count)
+#define VSF_ADC_APIS(__prefix_name) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, init,                 VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 adc, fini,                 VSF_MCONNECT(__prefix_name, _t) *adc_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             adc, enable,               VSF_MCONNECT(__prefix_name, _t) *adc_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             adc, disable,              VSF_MCONNECT(__prefix_name, _t) *adc_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_adc_status_t,     adc, status,               VSF_MCONNECT(__prefix_name, _t) *adc_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_adc_capability_t, adc, capability,           VSF_MCONNECT(__prefix_name, _t) *adc_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 adc, irq_enable,           VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 adc, irq_disable,          VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_request_once, VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_channel_cfg_t *channel_cfg, void *buffer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_config,       VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_channel_cfg_t *channel_cfgs_ptr, uint32_t channel_cfgs_cnt) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_request,      VSF_MCONNECT(__prefix_name, _t) *adc_ptr, void *buffer_ptr, uint_fast32_t count)
 
 /*============================ TYPES =========================================*/
 
@@ -702,7 +702,7 @@ typedef struct vsf_adc_op_t {
 #define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
 /// @endcond
 
-    VSF_ADC_APIS(vsf)
+    VSF_ADC_APIS(vsf_adc)
 } vsf_adc_op_t;
 
 #if VSF_ADC_CFG_MULTI_CLASS == ENABLED

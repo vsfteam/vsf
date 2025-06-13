@@ -131,14 +131,14 @@ extern "C" {
  * @brief PWM API 模板，用于生成 PWM 类型、特定前缀的函数声明等。
  * @param[in] __prefix_name 用于生成 PWM 函数的前缀。
  */
-#define VSF_PWM_APIS(__prefix_name)                                                                                                                            \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pwm, init,           VSF_MCONNECT(__prefix_name, _pwm_t) *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)                              \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  pwm, fini,           VSF_MCONNECT(__prefix_name, _pwm_t) *pwm_ptr)                              \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,              pwm, enable,         VSF_MCONNECT(__prefix_name, _pwm_t) *pwm_ptr)                                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,              pwm, disable,        VSF_MCONNECT(__prefix_name, _pwm_t) *pwm_ptr)                                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pwm_capability_t,  pwm, capability,     VSF_MCONNECT(__prefix_name, _pwm_t) *pwm_ptr)                                                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pwm, set,            VSF_MCONNECT(__prefix_name, _pwm_t) *pwm_ptr, uint8_t channel, uint32_t period, uint32_t pulse)\
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,              pwm, get_freq,       VSF_MCONNECT(__prefix_name, _pwm_t) *pwm_ptr)
+#define VSF_PWM_APIS(__prefix_name)                                                                                                                                             \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pwm, init,           VSF_MCONNECT(__prefix_name, _t) *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)                         \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  pwm, fini,           VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,              pwm, enable,         VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,              pwm, disable,        VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pwm_capability_t,  pwm, capability,     VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pwm, set,            VSF_MCONNECT(__prefix_name, _t) *pwm_ptr, uint8_t channel, uint32_t period, uint32_t pulse)\
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,              pwm, get_freq,       VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)
 
 /*============================ TYPES =========================================*/
 
@@ -220,7 +220,7 @@ typedef struct vsf_pwm_op_t {
 #define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
 /// @endcond
 
-    VSF_PWM_APIS(vsf)
+    VSF_PWM_APIS(vsf_pwm)
 } vsf_pwm_op_t;
 
 #if VSF_PWM_CFG_MULTI_CLASS == ENABLED

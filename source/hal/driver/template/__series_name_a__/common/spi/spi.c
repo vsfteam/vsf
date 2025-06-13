@@ -50,6 +50,16 @@
 // HW
 #define VSF_SPI_CFG_IMP_PREFIX                  vsf_hw
 #define VSF_SPI_CFG_IMP_UPCASE_PREFIX           VSF_HW
+
+// When it's not a standard SPI device, you can rename the device prefix. At the same time, you need to update:
+//  VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t)    -> VSF_MCONNECT(VSF_SPI_CFG_IMP_DEVICE_PREFIX, _t)
+//  VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_init) -> VSF_MCONNECT(VSF_SPI_CFG_IMP_DEVICE_PREFIX, _init)
+//  ....
+//
+//#define VSF_SPI_CFG_IMP_RENAME_DEVICE_PREFIX      ENABLED     // Enable renaming device prefix
+//#define VSF_SPI_CFG_IMP_DEVICE_PREFIX             vsf_hw_qspi // Custom device prefix when renaming
+//#define VSF_SPI_CFG_IMP_DEVICE_UPCASE_PREFIX      VSF_HW_QSPI // Uppercase version of custom device prefix
+
 // HW end
 // IPCore
 #define VSF_SPI_CFG_IMP_PREFIX                  vsf_${spi_ip}

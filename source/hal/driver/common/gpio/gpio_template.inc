@@ -495,11 +495,11 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #   define VSF_HAL_TEMPLATE_IMP_MASK_SUFFIX         _PORT_MASK
 #endif
 
-#ifndef VSF_GPIO_CFG_IMP_PREFIX
+#if !defined(VSF_GPIO_CFG_IMP_PREFIX) && !defined(VSF_GPIO_CFG_IMP_DEVICE_PREFIX)
 #   error "Please define VSF_GPIO_CFG_IMP_PREFIX in gpio driver"
 #endif
 
-#ifndef VSF_GPIO_CFG_IMP_UPCASE_PREFIX
+#if !defined(VSF_GPIO_CFG_IMP_UPCASE_PREFIX) && !defined(VSF_GPIO_CFG_IMP_DEVICE_UPCASE_PREFIX)
 #   error "Please define VSF_GPIO_CFG_IMP_UPCASE_PREFIX in gpio driver"
 #endif
 
@@ -516,6 +516,8 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #if VSF_GPIO_CFG_RETAIN_DEFINED_PREFIX == DISABLED
 #   undef VSF_GPIO_CFG_IMP_PREFIX
 #   undef VSF_GPIO_CFG_IMP_UPCASE_PREFIX
+#   undef VSF_GPIO_CFG_IMP_DEVICE_PREFIX
+#   undef VSF_GPIO_CFG_IMP_DEVICE_UPCASE_PREFIX
 #endif
 
 #undef VSF_GPIO_CFG_REAL_PREFIX

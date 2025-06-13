@@ -97,13 +97,22 @@
 
 // SPI0, SPI1
 
-#define VSF_HW_USART_COUNT                          2
-#define VSF_HW_USART0_IRQN                          UART0_IRQn
-#define VSF_HW_USART0_IRQHandler                    UART0_IRQHandler
-#define VSF_HW_USART0_REG                           UART0_BASE
-#define VSF_HW_USART1_IRQN                          UART1_IRQn
-#define VSF_HW_USART1_IRQHandler                    UART1_IRQHandler
-#define VSF_HW_USART1_REG                           UART1_BASE
+#define VSF_HW_SPI_COUNT                          2
+#define VSF_HW_SPI0_IRQN                          SPI0_IRQn
+#define VSF_HW_SPI0_IRQHandler                    SPI0_IRQHandler
+#define VSF_HW_SPI0_REG                           SPI0_BASE
+#define VSF_HW_SPI1_IRQN                          SPI1_IRQn
+#define VSF_HW_SPI1_IRQHandler                    SPI1_IRQHandler
+#define VSF_HW_SPI1_REG                           SPI1_BASE
+
+// QSPI0
+#define VSF_HW_QSPI_COUNT                          1
+#define VSF_HW_QSPI0_IRQN                          QSPI0_IRQn
+#define VSF_HW_QSPI0_IRQHandler                    QSPI0_IRQHandler
+#define VSF_HW_QSPI0_REG                           QSPI0_BASE
+#define VSF_HW_QSPI1_IRQN                          QSPI1_IRQn
+#define VSF_HW_QSPI1_IRQHandler                    QSPI1_IRQHandler
+#define VSF_HW_QSPI1_REG                           QSPI1_BASE
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

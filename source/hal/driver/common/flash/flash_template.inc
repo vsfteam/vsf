@@ -356,11 +356,11 @@ vsf_err_t vsf_real_flash_read_multi_sector(vsf_real_flash_t *real_flash_ptr, vsf
 #define VSF_HAL_TEMPLATE_IMP_NAME                   _flash
 #define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _FLASH
 
-#ifndef VSF_FLASH_CFG_IMP_PREFIX
+#if !defined(VSF_FLASH_CFG_IMP_PREFIX) && !defined(VSF_FLASH_CFG_IMP_DEVICE_PREFIX)
 #   error "Please define VSF_FLASH_CFG_IMP_PREFIX in flash driver"
 #endif
 
-#ifndef VSF_FLASH_CFG_IMP_UPCASE_PREFIX
+#if !defined(VSF_FLASH_CFG_IMP_UPCASE_PREFIX) && !defined(VSF_FLASH_CFG_IMP_DEVICE_UPCASE_PREFIX)
 #   error "Please define VSF_FLASH_CFG_IMP_UPCASE_PREFIX in flash driver"
 #endif
 
@@ -377,6 +377,8 @@ vsf_err_t vsf_real_flash_read_multi_sector(vsf_real_flash_t *real_flash_ptr, vsf
 #undef VSF_FLASH_CFG_IMP_PREFIX
 #undef VSF_FLASH_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_FLASH_CFG_IMP_UPCASE_PREFIX
+#undef VSF_FLASH_CFG_IMP_DEVICE_PREFIX
+#undef VSF_FLASH_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_FLASH_CFG_IMP_LV0
 #undef VSF_FLASH_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_FLASH_CFG_IMP_HAS_OP
