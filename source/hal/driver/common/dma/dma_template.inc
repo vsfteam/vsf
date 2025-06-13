@@ -205,11 +205,11 @@ vsf_err_t vsf_real_dma_channel_sg_start(vsf_real_dma_t *dma_ptr, uint8_t channel
 #define VSF_HAL_TEMPLATE_IMP_NAME                   _dma
 #define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _DMA
 
-#ifndef VSF_DMA_CFG_IMP_PREFIX
+#if !defined(VSF_DMA_CFG_IMP_PREFIX) && !defined(VSF_DMA_CFG_IMP_DEVICE_PREFIX)
 #   error "Please define VSF_DMA_CFG_IMP_PREFIX in dma driver"
 #endif
 
-#ifndef VSF_DMA_CFG_IMP_UPCASE_PREFIX
+#if !defined(VSF_DMA_CFG_IMP_UPCASE_PREFIX) && !defined(VSF_DMA_CFG_IMP_DEVICE_UPCASE_PREFIX)
 #   error "Please define VSF_DMA_CFG_IMP_UPCASE_PREFIX in dma driver"
 #endif
 
@@ -226,6 +226,8 @@ vsf_err_t vsf_real_dma_channel_sg_start(vsf_real_dma_t *dma_ptr, uint8_t channel
 #undef VSF_DMA_CFG_IMP_PREFIX
 #undef VSF_DMA_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_DMA_CFG_IMP_UPCASE_PREFIX
+#undef VSF_DMA_CFG_IMP_DEVICE_PREFIX
+#undef VSF_DMA_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_DMA_CFG_IMP_LV0
 #undef VSF_DMA_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_DMA_CFG_IMP_HAS_OP

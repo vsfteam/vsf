@@ -250,30 +250,30 @@ extern "C" {
 /**
  * \~english
  * @brief ETH API template, used to generate ETH type, specific prefix function declarations, etc.
- * @param[in] __prefix The prefix used for generating ETH functions.
+ * @param[in] __prefix_name The prefix used for generating ETH functions.
  *
  * \~chinese
  * @brief ETH API 模板，用于生成 ETH 类型、特定前缀的函数声明等。
- * @param[in] __prefix 用于生成 ETH 函数的前缀。
+ * @param[in] __prefix_name 用于生成 ETH 函数的前缀。
  */
-#define VSF_ETH_APIS(__prefix) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            eth, init,                   VSF_MCONNECT(__prefix, _eth_t) *eth_ptr, vsf_eth_cfg_t *cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                 eth, fini,                   VSF_MCONNECT(__prefix, _eth_t) *eth_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, fsm_rt_t,             eth, enable,                 VSF_MCONNECT(__prefix, _eth_t) *eth_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, fsm_rt_t,             eth, disable,                VSF_MCONNECT(__prefix, _eth_t) *eth_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                 eth, irq_enable,             VSF_MCONNECT(__prefix, _eth_t) *eth_ptr, vsf_eth_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                 eth, irq_disable,            VSF_MCONNECT(__prefix, _eth_t) *eth_ptr, vsf_eth_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            eth, send_request,           VSF_MCONNECT(__prefix, _eth_t) *eth_ptr, vsf_eth_send_buf_desc_t *buf_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            eth, recv_request,           VSF_MCONNECT(__prefix, _eth_t) *eth_ptr, vsf_eth_recv_buf_desc_t *buf_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            eth, send_sg_request,        VSF_MCONNECT(__prefix, _eth_t) *eth_ptr, vsf_eth_send_sg_buf_desc_t *buf_ptr, uint32_t sg_count) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            eth, recv_sg_request,        VSF_MCONNECT(__prefix, _eth_t) *eth_ptr, vsf_eth_recv_sg_buf_desc_t *buf_ptr, uint32_t sg_count) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            eth, ctrl,                   VSF_MCONNECT(__prefix, _eth_t) *eth_ptr, vsf_eth_ctrl_t ctrl, void *param) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_eth_status_t,     eth, status,                 VSF_MCONNECT(__prefix, _eth_t) *eth_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_eth_capability_t, eth, capability,             VSF_MCONNECT(__prefix, _eth_t) *eth_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            eth, phy_set_mode,     VSF_MCONNECT(__prefix, _eth_t) *eth_ptr, vsf_eth_phy_mode_t phy_mode) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            eth, phy_get_link_status,    VSF_MCONNECT(__prefix, _eth_t) *eth_ptr, vsf_eth_phy_mode_t *phy_mode_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            eth, phy_read_reg,           VSF_MCONNECT(__prefix, _eth_t) *eth_ptr, uint16_t reg_addr, uint32_t *value_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            eth, phy_write_reg,          VSF_MCONNECT(__prefix, _eth_t) *eth_ptr, uint16_t reg_addr, uint32_t value)
+#define VSF_ETH_APIS(__prefix_name) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, init,                   VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 eth, fini,                   VSF_MCONNECT(__prefix_name, _t) *eth_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             eth, enable,                 VSF_MCONNECT(__prefix_name, _t) *eth_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             eth, disable,                VSF_MCONNECT(__prefix_name, _t) *eth_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 eth, irq_enable,             VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 eth, irq_disable,            VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, send_request,           VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_send_buf_desc_t *buf_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, recv_request,           VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_recv_buf_desc_t *buf_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, send_sg_request,        VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_send_sg_buf_desc_t *buf_ptr, uint32_t sg_count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, recv_sg_request,        VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_recv_sg_buf_desc_t *buf_ptr, uint32_t sg_count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, ctrl,                   VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_ctrl_t ctrl, void *param) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_eth_status_t,     eth, status,                 VSF_MCONNECT(__prefix_name, _t) *eth_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_eth_capability_t, eth, capability,             VSF_MCONNECT(__prefix_name, _t) *eth_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, phy_set_mode,     VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_phy_mode_t phy_mode) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, phy_get_link_status,    VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_phy_mode_t *phy_mode_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, phy_read_reg,           VSF_MCONNECT(__prefix_name, _t) *eth_ptr, uint16_t reg_addr, uint32_t *value_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, phy_write_reg,          VSF_MCONNECT(__prefix_name, _t) *eth_ptr, uint16_t reg_addr, uint32_t value)
 
 
 /*============================ TYPES =========================================*/
@@ -699,7 +699,7 @@ typedef struct vsf_eth_op_t {
 #define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
 /// @endcond
 
-    VSF_ETH_APIS(vsf)
+    VSF_ETH_APIS(vsf_eth)
 } vsf_eth_op_t;
 
 

@@ -446,21 +446,21 @@ extern "C" {
  * \~english
  * @brief SDIO API template, used to generate SDIO type, specific prefix
  * function declarations, etc.
- * @param[in] __prefix The prefix used for generating SDIO functions.
+ * @param[in] __prefix_name The prefix used for generating SDIO functions.
  * \~chinese
  * @brief SDIO API 模板，用于生成 SDIO 类型、特定前缀的函数声明等。
- * @param[in] __prefix 用于生成 SDIO 函数的前缀。
+ * @param[in] __prefix_name 用于生成 SDIO 函数的前缀。
  */
-#define VSF_SDIO_APIS(__prefix)                                                                                                                                     \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             sdio, init,                 VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, vsf_sdio_cfg_t *cfg_ptr)         \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                  sdio, fini,                 VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                  sdio, irq_enable,           VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)    \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                  sdio, irq_disable,          VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)    \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_sdio_status_t,     sdio, status,               VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_sdio_capability_t, sdio, capability,           VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr)                                  \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             sdio, set_clock,            VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, uint32_t clock_hz, bool is_ddr)  \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             sdio, set_bus_width,        VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, uint8_t bus_width)               \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,             sdio, host_request,         VSF_MCONNECT(__prefix, _sdio_t) *sdio_ptr, vsf_sdio_req_t *req)
+#define VSF_SDIO_APIS(__prefix_name)                                                                                                                                     \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, init,                 VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_cfg_t *cfg_ptr)         \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  sdio, fini,                 VSF_MCONNECT(__prefix_name, _t) *sdio_ptr)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  sdio, irq_enable,           VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)    \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  sdio, irq_disable,          VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)    \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_sdio_status_t,     sdio, status,               VSF_MCONNECT(__prefix_name, _t) *sdio_ptr)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_sdio_capability_t, sdio, capability,           VSF_MCONNECT(__prefix_name, _t) *sdio_ptr)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, set_clock,            VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, uint32_t clock_hz, bool is_ddr)  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, set_bus_width,        VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, uint8_t bus_width)               \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, host_request,         VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_req_t *req)
 
 /*============================ TYPES =========================================*/
 
@@ -834,7 +834,7 @@ typedef struct vsf_sdio_op_t {
 #define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
 /// @endcond
 
-    VSF_SDIO_APIS(vsf)
+    VSF_SDIO_APIS(vsf_sdio)
 } vsf_sdio_op_t;
 
 #if VSF_SDIO_CFG_MULTI_CLASS == ENABLED

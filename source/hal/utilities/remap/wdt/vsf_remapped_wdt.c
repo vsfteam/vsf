@@ -38,7 +38,7 @@ const vsf_wdt_op_t vsf_remapped_wdt_op = {
 #   undef __VSF_HAL_TEMPLATE_API
 #   define __VSF_HAL_TEMPLATE_API   VSF_HAL_TEMPLATE_API_OP
 
-    VSF_WDT_APIS(vsf_remapped)
+    VSF_WDT_APIS(vsf_remapped_wdt)
 };
 #endif
 

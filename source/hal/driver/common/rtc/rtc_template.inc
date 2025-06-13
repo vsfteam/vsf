@@ -260,11 +260,11 @@ vsf_rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
 #define VSF_HAL_TEMPLATE_IMP_NAME                   _rtc
 #define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _RTC
 
-#ifndef VSF_RTC_CFG_IMP_PREFIX
+#if !defined(VSF_RTC_CFG_IMP_PREFIX) && !defined(VSF_RTC_CFG_IMP_DEVICE_PREFIX)
 #   error "Please define VSF_RTC_CFG_IMP_PREFIX in rtc driver"
 #endif
 
-#ifndef VSF_RTC_CFG_IMP_UPCASE_PREFIX
+#if !defined(VSF_RTC_CFG_IMP_UPCASE_PREFIX) && !defined(VSF_RTC_CFG_IMP_DEVICE_UPCASE_PREFIX)
 #   error "Please define VSF_RTC_CFG_IMP_UPCASE_PREFIX in rtc driver"
 #endif
 
@@ -281,6 +281,8 @@ vsf_rtc_capability_t vsf_real_rtc_capability(vsf_real_rtc_t *rtc_ptr)
 #undef VSF_RTC_CFG_IMP_PREFIX
 #undef VSF_RTC_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_RTC_CFG_IMP_UPCASE_PREFIX
+#undef VSF_RTC_CFG_IMP_DEVICE_PREFIX
+#undef VSF_RTC_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_RTC_CFG_IMP_LV0
 #undef VSF_RTC_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_RTC_CFG_IMP_HAS_OP

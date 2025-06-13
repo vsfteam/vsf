@@ -150,6 +150,12 @@
 #   define VSF_SPI_CFG_DEC_PREFIX                           vsf_hw
 #   define VSF_SPI_CFG_DEC_UPCASE_PREFIX                    VSF_HW
 #   include "hal/driver/common/spi/spi_template.h"
+
+// Optional: Add QSPI
+//#   define VSF_SPI_CFG_DEC_DEVICE_PREFIX                  vsf_hw_qspi
+//#   define VSF_SPI_CFG_DEC_DEVICE_UPCASE_PREFIX           VSF_HW_QSPI
+//#   define VSF_SPI_CFG_DEC_RENAME_DEVICE_PREFIX           ENABLED
+//#   include "hal/driver/common/spi/spi_template.h"
 #endif
 
 #if VSF_HAL_USE_TIMER == ENABLED

@@ -38,7 +38,7 @@ const vsf_usart_op_t vsf_remapped_usart_op = {
 #   undef __VSF_HAL_TEMPLATE_API
 #   define __VSF_HAL_TEMPLATE_API   VSF_HAL_TEMPLATE_API_OP
 
-    VSF_USART_APIS(vsf_remapped)
+    VSF_USART_APIS(vsf_remapped_usart)
 };
 #endif
 

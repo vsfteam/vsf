@@ -168,21 +168,21 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_FLASH_APIS(__prefix_name) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, init,                  VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_cfg_t *cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   flash, fini,                  VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptrr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               flash, enable,                VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               flash, disable,               VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_flash_status_t,     flash, status,                VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_flash_capability_t, flash, capability,            VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   flash, irq_enable,            VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   flash, irq_disable,           VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, erase_one_sector,      VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_size_t offset_of_bytes) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, erase_multi_sector,    VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_size_t offset_of_bytes, vsf_flash_size_t size_of_bytes) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, erase_all,             VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, write_one_sector,      VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_size_t offset_of_bytes, uint8_t* buffer, vsf_flash_size_t size_of_bytes) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, write_multi_sector,    VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_size_t offset_of_bytes, uint8_t* buffer, vsf_flash_size_t size_of_bytes) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, read_one_sector,       VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_size_t offset_of_bytes, uint8_t* buffer, vsf_flash_size_t size_of_bytes) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, read_multi_sector,     VSF_MCONNECT(__prefix_name, _flash_t) *flash_ptr, vsf_flash_size_t offset_of_bytes, uint8_t* buffer, vsf_flash_size_t size_of_bytes)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, init,                  VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   flash, fini,                  VSF_MCONNECT(__prefix_name, _t) *flash_ptrr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               flash, enable,                VSF_MCONNECT(__prefix_name, _t) *flash_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               flash, disable,               VSF_MCONNECT(__prefix_name, _t) *flash_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_flash_status_t,     flash, status,                VSF_MCONNECT(__prefix_name, _t) *flash_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_flash_capability_t, flash, capability,            VSF_MCONNECT(__prefix_name, _t) *flash_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   flash, irq_enable,            VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   flash, irq_disable,           VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, erase_one_sector,      VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_size_t offset_of_bytes) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, erase_multi_sector,    VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_size_t offset_of_bytes, vsf_flash_size_t size_of_bytes) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, erase_all,             VSF_MCONNECT(__prefix_name, _t) *flash_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, write_one_sector,      VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_size_t offset_of_bytes, uint8_t* buffer, vsf_flash_size_t size_of_bytes) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, write_multi_sector,    VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_size_t offset_of_bytes, uint8_t* buffer, vsf_flash_size_t size_of_bytes) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, read_one_sector,       VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_size_t offset_of_bytes, uint8_t* buffer, vsf_flash_size_t size_of_bytes) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, read_multi_sector,     VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_size_t offset_of_bytes, uint8_t* buffer, vsf_flash_size_t size_of_bytes)
 
 /*============================ TYPES =========================================*/
 
@@ -283,7 +283,7 @@ typedef struct vsf_flash_op_t {
 #define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
 /// @endcond
 
-    VSF_FLASH_APIS(vsf)
+    VSF_FLASH_APIS(vsf_flash)
 } vsf_flash_op_t;
 
 #if VSF_FLASH_CFG_MULTI_CLASS == ENABLED

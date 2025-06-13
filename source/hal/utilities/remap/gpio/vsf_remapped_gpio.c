@@ -38,7 +38,7 @@ const vsf_gpio_op_t vsf_remapped_gpio_op = {
 #   undef __VSF_HAL_TEMPLATE_API
 #   define __VSF_HAL_TEMPLATE_API   VSF_HAL_TEMPLATE_API_OP
 
-    VSF_GPIO_APIS(vsf_remapped)
+    VSF_GPIO_APIS(vsf_remapped_gpio)
 };
 #endif
 

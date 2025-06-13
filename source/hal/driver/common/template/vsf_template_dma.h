@@ -228,18 +228,18 @@ extern "C" {
  * @param[in] __prefix_name 用于生成 DMA 函数的前缀。
  */
 #define VSF_DMA_APIS(__prefix_name) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, init,                               VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, vsf_dma_cfg_t *cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, fini,                               VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_capability_t,     dma, capability,                         VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, int8_t,                   dma, channel_request,                    VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, channel_release,                    VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_config,                     VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_start,                      VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel, uint32_t src_address, uint32_t dst_address, uint32_t count) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_cancel,                     VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_sg_config_desc,             VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel, vsf_dma_isr_t isr, vsf_dma_channel_sg_desc_t *scatter_gather_cfg, uint32_t sg_count) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_sg_start,                   VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,                 dma, channel_get_transferred_count,      VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_channel_status_t, dma, channel_status,                     VSF_MCONNECT(__prefix_name, _dma_t) *dma_ptr, uint8_t channel)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, init,                               VSF_MCONNECT(__prefix_name, _t) *dma_ptr, vsf_dma_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, fini,                               VSF_MCONNECT(__prefix_name, _t) *dma_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_capability_t,     dma, capability,                         VSF_MCONNECT(__prefix_name, _t) *dma_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, int8_t,                   dma, channel_request,                    VSF_MCONNECT(__prefix_name, _t) *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, channel_release,                    VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_config,                     VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_start,                      VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, uint32_t src_address, uint32_t dst_address, uint32_t count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_cancel,                     VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_sg_config_desc,             VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_isr_t isr, vsf_dma_channel_sg_desc_t *scatter_gather_cfg, uint32_t sg_count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_sg_start,                   VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,                 dma, channel_get_transferred_count,      VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_channel_status_t, dma, channel_status,                     VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel)
 
 /*============================ TYPES =========================================*/
 
@@ -492,7 +492,7 @@ typedef struct vsf_dma_op_t {
 #define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
 /// @endcond
 
-    VSF_DMA_APIS(vsf)
+    VSF_DMA_APIS(vsf_dma)
 } vsf_dma_op_t;
 
 #if VSF_DMA_CFG_MULTI_CLASS == ENABLED

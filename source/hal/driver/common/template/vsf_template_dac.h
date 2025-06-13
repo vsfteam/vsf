@@ -167,17 +167,17 @@ extern "C" {
  * @param[in] __prefix_name 用于生成 DAC 函数的前缀。
  */
 #define VSF_DAC_APIS(__prefix_name) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, init,                 VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr, vsf_dac_cfg_t *cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 dac, fini,                 VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             dac, enable,               VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             dac, disable,              VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dac_status_t,     dac, status,               VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dac_capability_t, dac, capability,           VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 dac, irq_enable,           VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr, vsf_dac_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 dac, irq_disable,          VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr, vsf_dac_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request_once, VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr, vsf_dac_channel_cfg_t *cfg, uint_fast16_t value) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_config,       VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr, vsf_dac_channel_cfg_t *cfgs_ptr, uint_fast8_t cnt) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request,      VSF_MCONNECT(__prefix_name, _dac_t) *dac_ptr, void *values_ptr, uint_fast32_t cnt)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, init,                 VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 dac, fini,                 VSF_MCONNECT(__prefix_name, _t) *dac_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             dac, enable,               VSF_MCONNECT(__prefix_name, _t) *dac_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             dac, disable,              VSF_MCONNECT(__prefix_name, _t) *dac_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dac_status_t,     dac, status,               VSF_MCONNECT(__prefix_name, _t) *dac_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dac_capability_t, dac, capability,           VSF_MCONNECT(__prefix_name, _t) *dac_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 dac, irq_enable,           VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 dac, irq_disable,          VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request_once, VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_channel_cfg_t *cfg, uint_fast16_t value) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_config,       VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_channel_cfg_t *cfgs_ptr, uint_fast8_t cnt) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request,      VSF_MCONNECT(__prefix_name, _t) *dac_ptr, void *values_ptr, uint_fast32_t cnt)
 
 /*============================ TYPES =========================================*/
 
@@ -307,7 +307,7 @@ typedef struct vsf_dac_op_t {
 #define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
 /// @endcond
 
-    VSF_DAC_APIS(vsf)
+    VSF_DAC_APIS(vsf_dac)
 } vsf_dac_op_t;
 
 #if VSF_DAC_CFG_MULTI_CLASS == ENABLED

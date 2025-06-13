@@ -184,11 +184,11 @@ vsf_dac_capability_t vsf_real_dac_capability(vsf_real_dac_t *dac_ptr)
 #define VSF_HAL_TEMPLATE_IMP_NAME                   _dac
 #define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _DAC
 
-#ifndef VSF_DAC_CFG_IMP_PREFIX
+#if !defined(VSF_DAC_CFG_IMP_PREFIX) && !defined(VSF_DAC_CFG_IMP_DEVICE_PREFIX)
 #   error "Please define VSF_DAC_CFG_IMP_PREFIX in dac driver"
 #endif
 
-#ifndef VSF_DAC_CFG_IMP_UPCASE_PREFIX
+#if !defined(VSF_DAC_CFG_IMP_UPCASE_PREFIX) && !defined(VSF_DAC_CFG_IMP_DEVICE_UPCASE_PREFIX)
 #   error "Please define VSF_DAC_CFG_IMP_UPCASE_PREFIX in dac driver"
 #endif
 
@@ -205,6 +205,8 @@ vsf_dac_capability_t vsf_real_dac_capability(vsf_real_dac_t *dac_ptr)
 #undef VSF_DAC_CFG_IMP_PREFIX
 #undef VSF_DAC_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_DAC_CFG_IMP_UPCASE_PREFIX
+#undef VSF_DAC_CFG_IMP_DEVICE_PREFIX
+#undef VSF_DAC_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_DAC_CFG_IMP_LV0
 #undef VSF_DAC_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_DAC_CFG_IMP_HAS_OP

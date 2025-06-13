@@ -228,27 +228,27 @@ extern "C" {
 /**
  * \~english
  * @brief SPI API template, used to generate SPI type, specific prefix function declarations, etc.
- * @param[in] __prefix The prefix used for generating SPI functions.
+ * @param[in] __prefix_name The prefix used for generating SPI functions.
  * \~chinese
  * @brief SPI API 模板，用于生成 SPI 类型、特定前缀的函数声明等。
- * @param[in] __prefix 用于生成 SPI 函数的前缀。
+ * @param[in] __prefix_name 用于生成 SPI 函数的前缀。
  */
-#define VSF_SPI_APIS(__prefix) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            spi, init,                  VSF_MCONNECT(__prefix, _spi_t) *spi_ptr, vsf_spi_cfg_t *cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                 spi, fini,                  VSF_MCONNECT(__prefix, _spi_t) *spi_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, fsm_rt_t,             spi, enable,                VSF_MCONNECT(__prefix, _spi_t) *spi_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, fsm_rt_t,             spi, disable,               VSF_MCONNECT(__prefix, _spi_t) *spi_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                 spi, irq_enable,            VSF_MCONNECT(__prefix, _spi_t) *spi_ptr, vsf_spi_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                 spi, irq_disable,           VSF_MCONNECT(__prefix, _spi_t) *spi_ptr, vsf_spi_irq_mask_t irq_mask) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_spi_status_t,     spi, status,                VSF_MCONNECT(__prefix, _spi_t) *spi_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_spi_capability_t, spi, capability,            VSF_MCONNECT(__prefix, _spi_t) *spi_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            spi, cs_active,             VSF_MCONNECT(__prefix, _spi_t) *spi_ptr, uint_fast8_t index) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            spi, cs_inactive,           VSF_MCONNECT(__prefix, _spi_t) *spi_ptr, uint_fast8_t index) \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                 spi, fifo_transfer,         VSF_MCONNECT(__prefix, _spi_t) *spi_ptr, void *out_buffer_ptr, uint_fast32_t *out_offset_ptr, void *in_buffer_ptr, uint_fast32_t *in_offset_ptr, uint_fast32_t cnt) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            spi, request_transfer,      VSF_MCONNECT(__prefix, _spi_t) *spi_ptr, void *out_buffer_ptr, void *in_buffer_ptr, uint_fast32_t count) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            spi, cancel_transfer,       VSF_MCONNECT(__prefix, _spi_t) *spi_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                 spi, get_transferred_count, VSF_MCONNECT(__prefix, _spi_t) *spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            spi, ctrl,                  VSF_MCONNECT(__prefix, _spi_t) *spi_ptr, vsf_spi_ctrl_t ctrl, void* param)
+#define VSF_SPI_APIS(__prefix_name) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, init,                  VSF_MCONNECT(__prefix_name, _t) *spi_ptr, vsf_spi_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, fini,                  VSF_MCONNECT(__prefix_name, _t) *spi_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             spi, enable,                VSF_MCONNECT(__prefix_name, _t) *spi_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             spi, disable,               VSF_MCONNECT(__prefix_name, _t) *spi_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, irq_enable,            VSF_MCONNECT(__prefix_name, _t) *spi_ptr, vsf_spi_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, irq_disable,           VSF_MCONNECT(__prefix_name, _t) *spi_ptr, vsf_spi_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_spi_status_t,     spi, status,                VSF_MCONNECT(__prefix_name, _t) *spi_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_spi_capability_t, spi, capability,            VSF_MCONNECT(__prefix_name, _t) *spi_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, cs_active,             VSF_MCONNECT(__prefix_name, _t) *spi_ptr, uint_fast8_t index) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, cs_inactive,           VSF_MCONNECT(__prefix_name, _t) *spi_ptr, uint_fast8_t index) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, fifo_transfer,         VSF_MCONNECT(__prefix_name, _t) *spi_ptr, void *out_buffer_ptr, uint_fast32_t *out_offset_ptr, void *in_buffer_ptr, uint_fast32_t *in_offset_ptr, uint_fast32_t cnt) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, request_transfer,      VSF_MCONNECT(__prefix_name, _t) *spi_ptr, void *out_buffer_ptr, void *in_buffer_ptr, uint_fast32_t count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, cancel_transfer,       VSF_MCONNECT(__prefix_name, _t) *spi_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, get_transferred_count, VSF_MCONNECT(__prefix_name, _t) *spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, ctrl,                  VSF_MCONNECT(__prefix_name, _t) *spi_ptr, vsf_spi_ctrl_t ctrl, void* param)
 
 
 /*============================ TYPES =========================================*/
@@ -979,7 +979,7 @@ typedef struct vsf_spi_op_t {
 #   define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
 /// @endcond
 
-    VSF_SPI_APIS(vsf)
+    VSF_SPI_APIS(vsf_spi)
 } vsf_spi_op_t;
 
 #if VSF_SPI_CFG_MULTI_CLASS == ENABLED

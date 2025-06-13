@@ -38,7 +38,7 @@ const vsf_i2s_op_t vsf_remapped_i2s_op = {
 #   undef __VSF_HAL_TEMPLATE_API
 #   define __VSF_HAL_TEMPLATE_API   VSF_HAL_TEMPLATE_API_OP
 
-    VSF_I2S_APIS(vsf_remapped)
+    VSF_I2S_APIS(vsf_remapped_i2s)
 };
 #endif
 

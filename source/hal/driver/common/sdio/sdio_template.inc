@@ -146,11 +146,11 @@ vsf_sdio_capability_t vsf_real_sdio_capability(vsf_real_sdio_t *sdio_ptr)
 #define VSF_HAL_TEMPLATE_IMP_NAME                   _sdio
 #define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _SDIO
 
-#ifndef VSF_SDIO_CFG_IMP_PREFIX
+#if !defined(VSF_SDIO_CFG_IMP_PREFIX) && !defined(VSF_SDIO_CFG_IMP_DEVICE_PREFIX)
 #   error "Please define VSF_SDIO_CFG_IMP_PREFIX in sdio driver"
 #endif
 
-#ifndef VSF_SDIO_CFG_IMP_UPCASE_PREFIX
+#if !defined(VSF_SDIO_CFG_IMP_UPCASE_PREFIX) && !defined(VSF_SDIO_CFG_IMP_DEVICE_UPCASE_PREFIX)
 #   error "Please define VSF_SDIO_CFG_IMP_UPCASE_PREFIX in sdio driver"
 #endif
 
@@ -167,6 +167,8 @@ vsf_sdio_capability_t vsf_real_sdio_capability(vsf_real_sdio_t *sdio_ptr)
 #undef VSF_SDIO_CFG_IMP_PREFIX
 #undef VSF_SDIO_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_SDIO_CFG_IMP_UPCASE_PREFIX
+#undef VSF_SDIO_CFG_IMP_DEVICE_PREFIX
+#undef VSF_SDIO_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_SDIO_CFG_IMP_LV0
 #undef VSF_SDIO_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_SDIO_CFG_IMP_HAS_OP

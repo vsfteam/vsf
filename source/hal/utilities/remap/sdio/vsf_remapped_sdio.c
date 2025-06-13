@@ -38,7 +38,7 @@ const vsf_sdio_op_t vsf_remapped_sdio_op = {
 #   undef __VSF_HAL_TEMPLATE_API
 #   define __VSF_HAL_TEMPLATE_API   VSF_HAL_TEMPLATE_API_OP
 
-    VSF_SDIO_APIS(vsf_remapped)
+    VSF_SDIO_APIS(vsf_remapped_sdio)
 };
 #endif
 

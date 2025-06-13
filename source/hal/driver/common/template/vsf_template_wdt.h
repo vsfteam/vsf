@@ -169,19 +169,19 @@ extern "C" {
 /**
  * \~english
  * @brief WDT API template, used to generate WDT type, specific prefix function declarations, etc.
- * @param[in] __prefix The prefix used for generating WDT functions.
+ * @param[in] __prefix_name The prefix used for generating WDT functions.
  *
  * \~chinese
  * @brief WDT API 模板，用于生成 WDT 类型、特定前缀的函数声明等。
- * @param[in] __prefix 用于生成 WDT 函数的前缀。
+ * @param[in] __prefix_name 用于生成 WDT 函数的前缀。
  */
-#define VSF_WDT_APIS(__prefix) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_err_t,            wdt, init,        VSF_MCONNECT(__prefix, _wdt_t) *wdt_ptr, vsf_wdt_cfg_t *cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                 wdt, fini,        VSF_MCONNECT(__prefix, _wdt_t) *wdt_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, fsm_rt_t,             wdt, enable,      VSF_MCONNECT(__prefix, _wdt_t) *wdt_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, fsm_rt_t,             wdt, disable,     VSF_MCONNECT(__prefix, _wdt_t) *wdt_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, vsf_wdt_capability_t, wdt, capability,  VSF_MCONNECT(__prefix, _wdt_t) *wdt_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix, void,                 wdt, feed,        VSF_MCONNECT(__prefix, _wdt_t) *wdt_ptr)
+#define VSF_WDT_APIS(__prefix_name) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            wdt, init,        VSF_MCONNECT(__prefix_name, _t) *wdt_ptr, vsf_wdt_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 wdt, fini,        VSF_MCONNECT(__prefix_name, _t) *wdt_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             wdt, enable,      VSF_MCONNECT(__prefix_name, _t) *wdt_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             wdt, disable,     VSF_MCONNECT(__prefix_name, _t) *wdt_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_wdt_capability_t, wdt, capability,  VSF_MCONNECT(__prefix_name, _t) *wdt_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 wdt, feed,        VSF_MCONNECT(__prefix_name, _t) *wdt_ptr)
 
 /*============================ TYPES =========================================*/
 
@@ -351,7 +351,7 @@ typedef struct vsf_wdt_op_t {
 #define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
 /// @endcond
 
-    VSF_WDT_APIS(vsf)
+    VSF_WDT_APIS(vsf_wdt)
 } vsf_wdt_op_t;
 
 #if VSF_WDT_CFG_MULTI_CLASS == ENABLED

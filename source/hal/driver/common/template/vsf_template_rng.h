@@ -142,10 +142,10 @@ extern "C" {
  * @param[in] __prefix_name 用于生成 RNG 函数的前缀。
  */
 #define VSF_RNG_APIS(__prefix_name)                                                                                              \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rng, init,             VSF_MCONNECT(__prefix_name, _rng_t) *rng_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 rng, fini,             VSF_MCONNECT(__prefix_name, _rng_t) *rng_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_rng_capability_t, rng, capability,       VSF_MCONNECT(__prefix_name, _rng_t) *rng_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rng, generate_request, VSF_MCONNECT(__prefix_name, _rng_t) *rng_ptr, \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rng, init,             VSF_MCONNECT(__prefix_name, _t) *rng_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 rng, fini,             VSF_MCONNECT(__prefix_name, _t) *rng_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_rng_capability_t, rng, capability,       VSF_MCONNECT(__prefix_name, _t) *rng_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rng, generate_request, VSF_MCONNECT(__prefix_name, _t) *rng_ptr, \
                                 uint32_t *buffer, uint32_t num, void *param, vsf_rng_on_ready_callback_t * on_ready_cb)
 
 /*============================ TYPES =========================================*/
@@ -165,7 +165,7 @@ typedef struct vsf_rng_op_t {
 #define __VSF_HAL_TEMPLATE_API VSF_HAL_TEMPLATE_API_FP
 /// @endcond
 
-    VSF_RNG_APIS(vsf)
+    VSF_RNG_APIS(vsf_rng)
 } vsf_rng_op_t;
 
 #if VSF_RNG_CFG_MULTI_CLASS == ENABLED

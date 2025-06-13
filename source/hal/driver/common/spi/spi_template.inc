@@ -224,11 +224,11 @@ vsf_err_t vsf_real_spi_ctrl(vsf_real_spi_t *spi_ptr, vsf_spi_ctrl_t ctrl, void *
 #define VSF_HAL_TEMPLATE_IMP_NAME                   _spi
 #define VSF_HAL_TEMPLATE_IMP_UPCASE_NAME            _SPI
 
-#ifndef VSF_SPI_CFG_IMP_PREFIX
+#if !defined(VSF_SPI_CFG_IMP_PREFIX) && !defined(VSF_SPI_CFG_IMP_DEVICE_PREFIX)
 #   error "Please define VSF_SPI_CFG_IMP_PREFIX in spi driver"
 #endif
 
-#ifndef VSF_SPI_CFG_IMP_UPCASE_PREFIX
+#if !defined(VSF_SPI_CFG_IMP_UPCASE_PREFIX) && !defined(VSF_SPI_CFG_IMP_DEVICE_UPCASE_PREFIX)
 #   error "Please define VSF_SPI_CFG_IMP_UPCASE_PREFIX in spi driver"
 #endif
 
@@ -245,6 +245,8 @@ vsf_err_t vsf_real_spi_ctrl(vsf_real_spi_t *spi_ptr, vsf_spi_ctrl_t ctrl, void *
 #undef VSF_SPI_CFG_IMP_PREFIX
 #undef VSF_SPI_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_SPI_CFG_IMP_UPCASE_PREFIX
+#undef VSF_SPI_CFG_IMP_DEVICE_PREFIX
+#undef VSF_SPI_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_SPI_CFG_IMP_LV0
 #undef VSF_SPI_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_SPI_CFG_IMP_HAS_OP

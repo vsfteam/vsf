@@ -42,12 +42,12 @@
 #   error "Please include \"vsf_template_gpio.h\" before include gpio_template.h"
 #endif
 
-#ifndef VSF_GPIO_CFG_DEC_PREFIX
-#   error "Please define VSF_GPIO_CFG_DEC_PREFIX before include gpio_template.h"
+#if !defined(VSF_GPIO_CFG_DEC_PREFIX) && !defined(VSF_GPIO_CFG_DEC_DEVICE_PREFIX)
+#   error "Please define VSF_GPIO_CFG_DEC_PREFIX or VSF_GPIO_CFG_DEC_DEVICE_PREFIX before include gpio_template.h"
 #endif
 
-#ifndef VSF_GPIO_CFG_DEC_UPCASE_PREFIX
-#   error "Please define VSF_GPIO_CFG_DEC_UPCASE_PREFIX before include gpio_template.h"
+#if !defined(VSF_GPIO_CFG_DEC_UPCASE_PREFIX) && !defined(VSF_GPIO_CFG_DEC_DEVICE_UPCASE_PREFIX)
+#   error "Please define VSF_GPIO_CFG_DEC_UPCASE_PREFIX or VSF_GPIO_CFG_DEC_DEVICE_UPCASE_PREFIX before include gpio_template.h"
 #endif
 
 #ifndef VSF_GPIO_CFG_DEC_REMAP_PREFIX
@@ -60,7 +60,7 @@
 
 #define VSF_HAL_TEMPLATE_DEC_INSTANCE_API(__prefix_name)                        \
     VSF_GPIO_APIS(__prefix_name)                                                \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t, gpio, port_config_pin,   VSF_MCONNECT(__prefix_name, _gpio_t) *gpio_ptr, uint16_t pin_index, vsf_gpio_cfg_t * cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t, gpio, port_config_pin,   VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, uint16_t pin_index, vsf_gpio_cfg_t * cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t, gpio, ports_config_pin,  vsf_gpio_port_cfg_pin_t *cfg_ptr, uint_fast8_t count)                                         \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t, gpio, ports_config_pins, vsf_gpio_port_cfg_pins_t *cfg_ptr, uint_fast8_t count)
 
@@ -69,6 +69,8 @@
 #if VSF_HAL_TEMPLATE_DEC_RETAIN_DEFINED_PREFIX == DISABLED
 #   undef VSF_GPIO_CFG_DEC_PREFIX
 #   undef VSF_GPIO_CFG_DEC_UPCASE_PREFIX
+#   undef VSF_GPIO_CFG_DEC_DEVICE_PREFIX
+#   undef VSF_GPIO_CFG_DEC_DEVICE_UPCASE_PREFIX
 #endif
 
 #undef VSF_GPIO_CFG_DEC_REMAP_PREFIX

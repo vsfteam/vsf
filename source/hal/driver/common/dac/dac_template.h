@@ -25,12 +25,12 @@
 #   error "Please include \"vsf_template_dac.h\" before include dac_template.h"
 #endif
 
-#ifndef VSF_DAC_CFG_DEC_PREFIX
-#   error "Please define VSF_DAC_CFG_DEC_PREFIX before include dac_template.h"
+#if !defined(VSF_DAC_CFG_DEC_PREFIX) && !defined(VSF_DAC_CFG_DEC_DEVICE_PREFIX)
+#   error "Please define VSF_DAC_CFG_DEC_PREFIX or VSF_DAC_CFG_DEC_DEVICE_PREFIX before include dac_template.h"
 #endif
 
-#ifndef VSF_DAC_CFG_DEC_UPCASE_PREFIX
-#   error "Please define VSF_DAC_CFG_DEC_UPCASE_PREFIX before include dac_template.h"
+#if !defined(VSF_DAC_CFG_DEC_UPCASE_PREFIX) && !defined(VSF_DAC_CFG_DEC_DEVICE_UPCASE_PREFIX)
+#   error "Please define VSF_DAC_CFG_DEC_UPCASE_PREFIX or VSF_DAC_CFG_DEC_DEVICE_UPCASE_PREFIX before include dac_template.h"
 #endif
 
 #ifndef VSF_DAC_CFG_DEC_REMAP_PREFIX
@@ -45,6 +45,8 @@
 
 #undef VSF_DAC_CFG_DEC_PREFIX
 #undef VSF_DAC_CFG_DEC_UPCASE_PREFIX
+#undef VSF_DAC_CFG_DEC_DEVICE_PREFIX
+#undef VSF_DAC_CFG_DEC_DEVICE_UPCASE_PREFIX
 #undef VSF_DAC_CFG_DEC_COUNT_MASK_PREFIX
 #undef VSF_DAC_CFG_DEC_REMAP_PREFIX
 #undef VSF_DAC_CFG_DEC_EXTERN_OP

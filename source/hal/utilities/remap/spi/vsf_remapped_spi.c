@@ -38,7 +38,7 @@ const vsf_spi_op_t vsf_remapped_spi_op = {
 #   undef __VSF_HAL_TEMPLATE_API
 #   define __VSF_HAL_TEMPLATE_API   VSF_HAL_TEMPLATE_API_OP
 
-    VSF_SPI_APIS(vsf_remapped)
+    VSF_SPI_APIS(vsf_remapped_spi)
 };
 #endif
 
