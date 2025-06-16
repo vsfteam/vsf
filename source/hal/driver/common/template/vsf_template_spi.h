@@ -1617,23 +1617,261 @@ static inline uint8_t vsf_spi_mode_to_data_bytes(vsf_spi_mode_t mode)
 #   define vsf_qspi_isr_t                               vsf_spi_isr_t
 #   define vsf_qspi_cfg_t                               vsf_spi_cfg_t
 #   define vsf_qspi_ctrl_t                              vsf_spi_ctrl_t
-#   define vsf_qspi_init(__SPI, ...)                    vsf_spi_init((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
-#   define vsf_qspi_fini(__SPI)                         vsf_spi_fini((__vsf_spi_t *)(__SPI))
-#   define vsf_qspi_enable(__SPI)                       vsf_spi_enable((__vsf_spi_t *)(__SPI))
-#   define vsf_qspi_disable(__SPI)                      vsf_spi_disable((__vsf_spi_t *)(__SPI))
-#   define vsf_qspi_irq_enable(__SPI, ...)              vsf_spi_irq_enable((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
-#   define vsf_qspi_irq_disable(__SPI, ...)             vsf_spi_irq_disable((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
-#   define vsf_qspi_status(__SPI)                       vsf_spi_status((__vsf_spi_t *)(__SPI))
-#   define vsf_qspi_capability(__SPI)                   vsf_spi_capability((__vsf_spi_t *)(__SPI))
-#   define vsf_qspi_cs_active(__SPI, ...)               vsf_spi_cs_active((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
-#   define vsf_qspi_cs_inactive(__SPI, ...)             vsf_spi_cs_inactive((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
-#   define vsf_qspi_fifo_write(__SPI, ...)              vsf_spi_fifo_transfer((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
-#   define vsf_qspi_fifo_read(__SPI, ...)               vsf_spi_fifo_transfer((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
-#   define vsf_qspi_request_tx(__SPI, __OUT_BUF, __CNT) vsf_spi_request_transfer((__vsf_spi_t *)(__SPI), __OUT_BUF, NULL, __CNT)
-#   define vsf_qspi_request_rx(__SPI, __IN_BUF, __CNT)  vsf_spi_request_transfer((__vsf_spi_t *)(__SPI), NULL, __IN_BUF, __CNT)
-#   define vsf_qspi_cancel_transfer(__SPI)              vsf_spi_cancel_transfer((__vsf_spi_t *)(__SPI))
-#   define vsf_qspi_get_transferred_count(__SPI, ...)   vsf_spi_get_transferred_count((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
-#   define vsf_qspi_ctrl(__SPI, ...)                    vsf_spi_ctrl((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
+
+    /**
+     * \~english
+     * @brief Initialize a QSPI instance
+     * @param __SPI: QSPI instance pointer, converted to __vsf_spi_t* type for underlying SPI function
+     * @param __CFG_PTR: QSPI configuration structure pointer of type vsf_spi_cfg_t*, containing clock, mode, and interrupt settings
+     * @return Returns error code of type vsf_err_t
+     * @note Parameter meanings reference vsf_spi_init function
+     * \~chinese
+     * @brief 初始化 QSPI 实例
+     * @param __SPI: QSPI 实例指针，转换为 __vsf_spi_t* 类型传递给底层 SPI 函数
+     * @param __CFG_PTR: QSPI 配置结构体指针，类型为 vsf_spi_cfg_t*，包含时钟、模式和中断配置
+     * @return 返回 vsf_err_t 类型错误码
+     * @note 参数含义参考 vsf_spi_init 函数
+     */
+#   define vsf_qspi_init(__SPI, __CFG_PTR)                   vsf_spi_init((__vsf_spi_t *)(__SPI), (__CFG_PTR))
+
+    /**
+     * \~english
+     * @brief Finalize (deinitialize) a QSPI instance
+     * @param __SPI: QSPI instance pointer, converted to __vsf_spi_t* type for underlying SPI function
+     * @return No return value
+     * @note Parameter meanings reference vsf_spi_fini function
+     * \~chinese
+     * @brief 终止（反初始化）QSPI 实例
+     * @param __SPI: QSPI 实例指针，转换为 __vsf_spi_t* 类型传递给底层 SPI 函数
+     * @return 无返回值
+     * @note 参数含义参考 vsf_spi_fini 函数
+     */
+#   define vsf_qspi_fini(__SPI)                              vsf_spi_fini((__vsf_spi_t *)(__SPI))
+
+    /**
+     * \~english
+     * @brief Enable a QSPI instance for operation
+     * @param __SPI: QSPI instance pointer, converted to __vsf_spi_t* type for underlying SPI function
+     * @return Returns status code of type fsm_rt_t
+     * @note Parameter meanings reference vsf_spi_enable function
+     * \~chinese
+     * @brief 启用 QSPI 实例以进行操作
+     * @param __SPI: QSPI 实例指针，转换为 __vsf_spi_t* 类型传递给底层 SPI 函数
+     * @return 返回 fsm_rt_t 类型的状态码
+     * @note 参数含义参考 vsf_spi_enable 函数
+     */
+#   define vsf_qspi_enable(__SPI)                            vsf_spi_enable((__vsf_spi_t *)(__SPI))
+
+    /**
+     * \~english
+     * @brief Disable a QSPI instance from operation
+     * @param __SPI: QSPI instance pointer, converted to __vsf_spi_t* type for underlying SPI function
+     * @return Returns status code of type fsm_rt_t
+     * @note Parameter meanings reference vsf_spi_disable function
+     * \~chinese
+     * @brief 禁用 QSPI 实例
+     * @param __SPI: QSPI 实例指针，转换为 __vsf_spi_t* 类型传递给底层 SPI 函数
+     * @return 返回 fsm_rt_t 类型的状态码
+     * @note 参数含义参考 vsf_spi_disable 函数
+     */
+#   define vsf_qspi_disable(__SPI)                           vsf_spi_disable((__vsf_spi_t *)(__SPI))
+
+    /**
+     * \~english
+     * @brief Enable specific interrupts for a QSPI instance
+     * @param __SPI: QSPI instance pointer, converted to __vsf_spi_t* type for underlying SPI function
+     * @param __IRQ_MASK: Interrupt mask of type vsf_spi_irq_mask_t, indicating which interrupts to enable
+     * @return No return value
+     * @note Parameter meanings reference vsf_spi_irq_enable function
+     * \~chinese
+     * @brief 启用 QSPI 实例的特定中断
+     * @param __SPI: QSPI 实例指针，转换为 __vsf_spi_t* 类型传递给底层 SPI 函数
+     * @param __IRQ_MASK: 中断掩码，类型为 vsf_spi_irq_mask_t，指示要启用哪些中断
+     * @return 无返回值
+     * @note 参数含义参考 vsf_spi_irq_enable 函数
+     */
+#   define vsf_qspi_irq_enable(__SPI, __IRQ_MASK)            vsf_spi_irq_enable((__vsf_spi_t *)(__SPI), (__IRQ_MASK))
+
+    /**
+     * \~english
+     * @brief Disable specific interrupts for a QSPI instance
+     * @param __SPI: QSPI instance pointer, converted to __vsf_spi_t* type for underlying SPI function
+     * @param __IRQ_MASK: Interrupt mask of type vsf_spi_irq_mask_t, indicating which interrupts to disable
+     * @return No return value
+     * @note Parameter meanings reference vsf_spi_irq_disable function
+     * \~chinese
+     * @brief 禁用 QSPI 实例的特定中断
+     * @param __SPI: QSPI 实例指针，转换为 __vsf_spi_t* 类型传递给底层 SPI 函数
+     * @param __IRQ_MASK: 中断掩码，类型为 vsf_spi_irq_mask_t，指示要禁用哪些中断
+     * @return 无返回值
+     * @note 参数含义参考 vsf_spi_irq_disable 函数
+     */
+#   define vsf_qspi_irq_disable(__SPI, __IRQ_MASK)           vsf_spi_irq_disable((__vsf_spi_t *)(__SPI), (__IRQ_MASK))
+
+    /**
+     * \~english
+     * @brief Get the current status of a QSPI instance
+     * @param __SPI: QSPI instance pointer, converted to __vsf_spi_t* type for underlying SPI function
+     * @return Returns status information of type vsf_spi_status_t
+     * @note Parameter meanings reference vsf_spi_status function
+     * \~chinese
+     * @brief 获取 QSPI 实例的当前状态
+     * @param __SPI: QSPI 实例指针，转换为 __vsf_spi_t* 类型传递给底层 SPI 函数
+     * @return 返回 vsf_spi_status_t 类型状态信息
+     * @note 参数含义参考 vsf_spi_status 函数
+     */
+#   define vsf_qspi_status(__SPI)                            vsf_spi_status((__vsf_spi_t *)(__SPI))
+
+    /**
+     * \~english
+     * @brief Get the capabilities of a QSPI instance
+     * @param __SPI: QSPI instance pointer, converted to __vsf_spi_t* type for underlying SPI function
+     * @return Returns capability information of type vsf_spi_capability_t
+     * @note Parameter meanings reference vsf_spi_capability function
+     * \~chinese
+     * @brief 获取 QSPI 实例的能力
+     * @param __SPI: QSPI 实例指针，转换为 __vsf_spi_t* 类型传递给底层 SPI 函数
+     * @return 返回 vsf_spi_capability_t 类型能力信息
+     * @note 参数含义参考 vsf_spi_capability 函数
+     */
+#   define vsf_qspi_capability(__SPI)                        vsf_spi_capability((__vsf_spi_t *)(__SPI))
+
+    /**
+     * \~english
+     * @brief Perform FIFO write operation on a QSPI instance
+     * @param __SPI: QSPI instance pointer, converted to __vsf_spi_t* type for underlying SPI function
+     * @param __OUT_BUFFER_PTR: Pointer to output buffer containing data to be written
+     * @param __OUT_OFFSET_PTR: Pointer to output buffer offset, indicating current write position
+     * @param __COUNT: Number of data units to write
+     * @return No return value
+     * @note This macro sets in_buffer_ptr and in_offset_ptr to NULL to perform write-only operation
+     * @note Parameter meanings reference vsf_spi_fifo_transfer function
+     * \~chinese
+     * @brief 在 QSPI 实例上执行 FIFO 写入操作
+     * @param __SPI: QSPI 实例指针，转换为 __vsf_spi_t* 类型传递给底层 SPI 函数
+     * @param __OUT_BUFFER_PTR: 输出缓冲区指针，包含要写入的数据
+     * @param __OUT_OFFSET_PTR: 输出缓冲区偏移指针，指示当前写入位置
+     * @param __COUNT: 要写入的数据单元数量
+     * @return 无返回值
+     * @note 此宏设置 in_buffer_ptr 和 in_offset_ptr 为 NULL 以执行只写操作
+     * @note 参数含义参考 vsf_spi_fifo_transfer 函数
+     */
+#   define vsf_qspi_fifo_write(__SPI, __OUT_BUFFER_PTR, __OUT_OFFSET_PTR, __COUNT) \
+                                                             vsf_spi_fifo_transfer((__vsf_spi_t *)(__SPI), (__OUT_BUFFER_PTR), (__OUT_OFFSET_PTR), NULL, NULL, (__COUNT))
+
+    /**
+     * \~english
+     * @brief Perform FIFO read operation on a QSPI instance
+     * @param __SPI: QSPI instance pointer, converted to __vsf_spi_t* type for underlying SPI function
+     * @param __IN_BUFFER_PTR: Pointer to input buffer for storing read data
+     * @param __IN_OFFSET_PTR: Pointer to input buffer offset, indicating current read position
+     * @param __COUNT: Number of data units to read
+     * @return No return value
+     * @note This macro sets out_buffer_ptr and out_offset_ptr to NULL to perform read-only operation
+     * @note Parameter meanings reference vsf_spi_fifo_transfer function
+     * \~chinese
+     * @brief 在 QSPI 实例上执行 FIFO 读取操作
+     * @param __SPI: QSPI 实例指针，转换为 __vsf_spi_t* 类型传递给底层 SPI 函数
+     * @param __IN_BUFFER_PTR: 输入缓冲区指针，用于存储读取的数据
+     * @param __IN_OFFSET_PTR: 输入缓冲区偏移指针，指示当前读取位置
+     * @param __COUNT: 要读取的数据单元数量
+     * @return 无返回值
+     * @note 此宏设置 out_buffer_ptr 和 out_offset_ptr 为 NULL 以执行只读操作
+     * @note 参数含义参考 vsf_spi_fifo_transfer 函数
+     */
+#   define vsf_qspi_fifo_read(__SPI, __IN_BUFFER_PTR, __IN_OFFSET_PTR, __COUNT) \
+                                                             vsf_spi_fifo_transfer((__vsf_spi_t *)(__SPI), NULL, NULL, (__IN_BUFFER_PTR), (__IN_OFFSET_PTR), (__COUNT))
+
+    /**
+     * \~english
+     * @brief Request transmit transfer on a QSPI instance
+     * @param __SPI: QSPI instance pointer, converted to __vsf_spi_t* type for underlying SPI function
+     * @param __OUT_BUF: Pointer to output buffer containing data to be sent
+     * @param __CNT: Number of data units to transmit
+     * @return Returns error code of type vsf_err_t
+     * @note This macro sets in_buffer_ptr to NULL to perform transmit-only operation
+     * @note Parameter meanings reference vsf_spi_request_transfer function
+     * \~chinese
+     * @brief 请求 QSPI 实例执行发送传输
+     * @param __SPI: QSPI 实例指针，转换为 __vsf_spi_t* 类型传递给底层 SPI 函数
+     * @param __OUT_BUF: 输出缓冲区指针，包含要发送的数据
+     * @param __CNT: 要发送的数据单元数量
+     * @return 返回 vsf_err_t 类型错误码
+     * @note 此宏设置 in_buffer_ptr 为 NULL 以执行只发送操作
+     * @note 参数含义参考 vsf_spi_request_transfer 函数
+     */
+#   define vsf_qspi_request_tx(__SPI, __OUT_BUF, __CNT)      vsf_spi_request_transfer((__vsf_spi_t *)(__SPI), (__OUT_BUF), NULL, (__CNT))
+
+    /**
+     * \~english
+     * @brief Request receive transfer on a QSPI instance
+     * @param __SPI: QSPI instance pointer, converted to __vsf_spi_t* type for underlying SPI function
+     * @param __IN_BUF: Pointer to input buffer for storing received data
+     * @param __CNT: Number of data units to receive
+     * @return Returns error code of type vsf_err_t
+     * @note This macro sets out_buffer_ptr to NULL to perform receive-only operation
+     * @note Parameter meanings reference vsf_spi_request_transfer function
+     * \~chinese
+     * @brief 请求 QSPI 实例执行接收传输
+     * @param __SPI: QSPI 实例指针，转换为 __vsf_spi_t* 类型传递给底层 SPI 函数
+     * @param __IN_BUF: 输入缓冲区指针，用于存储接收的数据
+     * @param __CNT: 要接收的数据单元数量
+     * @return 返回 vsf_err_t 类型错误码
+     * @note 此宏设置 out_buffer_ptr 为 NULL 以执行只接收操作
+     * @note 参数含义参考 vsf_spi_request_transfer 函数
+     */
+#   define vsf_qspi_request_rx(__SPI, __IN_BUF, __CNT)       vsf_spi_request_transfer((__vsf_spi_t *)(__SPI), NULL, (__IN_BUF), (__CNT))
+
+    /**
+     * \~english
+     * @brief Cancel an ongoing QSPI transfer
+     * @param __SPI: QSPI instance pointer, converted to __vsf_spi_t* type for underlying SPI function
+     * @return Returns error code of type vsf_err_t
+     * @note Parameter meanings reference vsf_spi_cancel_transfer function
+     * \~chinese
+     * @brief 取消正在进行的 QSPI 传输
+     * @param __SPI: QSPI 实例指针，转换为 __vsf_spi_t* 类型传递给底层 SPI 函数
+     * @return 返回 vsf_err_t 类型错误码
+     * @note 参数含义参考 vsf_spi_cancel_transfer 函数
+     */
+#   define vsf_qspi_cancel_transfer(__SPI)                   vsf_spi_cancel_transfer((__vsf_spi_t *)(__SPI))
+
+    /**
+     * \~english
+     * @brief Get the number of data units transferred in the current or last QSPI operation
+     * @param __SPI: QSPI instance pointer, converted to __vsf_spi_t* type for underlying SPI function
+     * @param __TX_CNT: Pointer to store the number of transmitted data units
+     * @param __RX_CNT: Pointer to store the number of received data units
+     * @return No return value
+     * @note Parameter meanings reference vsf_spi_get_transferred_count function
+     * \~chinese
+     * @brief 获取当前或最后一次 QSPI 操作中已传输的数据单元数
+     * @param __SPI: QSPI 实例指针，转换为 __vsf_spi_t* 类型传递给底层 SPI 函数
+     * @param __TX_CNT: 存储已发送数据单元数的指针，类型为 uint_fast32_t*
+     * @param __RX_CNT: 存储已接收数据单元数的指针，类型为 uint_fast32_t*
+     * @return 无返回值
+     * @note 参数含义参考 vsf_spi_get_transferred_count 函数
+     */
+#   define vsf_qspi_get_transferred_count(__SPI, __TX_CNT, __RX_CNT) \
+                                                             vsf_spi_get_transferred_count((__vsf_spi_t *)(__SPI), (__TX_CNT), (__RX_CNT))
+
+    /**
+     * \~english
+     * @brief Execute a control command on the QSPI instance
+     * @param __SPI: QSPI instance pointer, converted to __vsf_spi_t* type for underlying SPI function
+     * @param __CTRL: Control command of type vsf_spi_ctrl_t, specifying the operation to perform
+     * @param __PARAM: Command parameter pointer, type depends on the specific control command
+     * @return Returns error code of type vsf_err_t
+     * @note Parameter meanings reference vsf_spi_ctrl function
+     * \~chinese
+     * @brief 执行 QSPI 实例的控制命令
+     * @param __SPI: QSPI 实例指针，转换为 __vsf_spi_t* 类型传递给底层 SPI 函数
+     * @param __CTRL: 控制命令，类型为 vsf_spi_ctrl_t，指定要执行的操作
+     * @param __PARAM: 命令参数指针，类型依赖于具体的控制命令
+     * @return 返回 vsf_err_t 类型错误码
+     * @note 参数含义参考 vsf_spi_ctrl 函数
+     */
+#   define vsf_qspi_ctrl(__SPI, __CTRL, __PARAM)             vsf_spi_ctrl((__vsf_spi_t *)(__SPI), (__CTRL), (__PARAM))
 #endif
 /// @endcond
 
