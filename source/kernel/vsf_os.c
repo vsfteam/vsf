@@ -144,6 +144,12 @@ __vsf_eda_frame_t * vsf_eda_new_frame(size_t local_size)
 
         frame->state.local_size = local_size;
         //vsf_slist_init_node(__vsf_eda_frame_t, use_as__vsf_slist_node_t, frame);
+    } else {
+#if __VSF_KERNEL_CFG_EDA_FRAME_POOL == ENABLED
+        vsf_trace_warning("fail to allocate stack frame, please increase VSF_OS_CFG_EDA_FRAME_POOL_SIZE" VSF_TRACE_CFG_LINEEND);
+#else
+        vsf_trace_warning("fail to allocate stack frame, please increase heap size" VSF_TRACE_CFG_LINEEND);
+#endif
     }
     return frame;
 }

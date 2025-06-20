@@ -646,6 +646,9 @@ vsf_err_t __vsf_eda_call_eda_ex_prepare(
     if (is_sub_call) {
         frame = vsf_eda_new_frame(state.local_size);
         if (NULL == frame) {
+            // If VSF_OS_CFG_EDA_FRAME_POOL_SIZE and VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE are both configured,
+            //  increase VSF_OS_CFG_EDA_FRAME_POOL_SIZE.
+            // Or increase heap size.
             VSF_KERNEL_ASSERT(false);
             return VSF_ERR_NOT_ENOUGH_RESOURCES;
         }
@@ -856,6 +859,9 @@ vsf_err_t vsf_eda_start(vsf_eda_t *pthis, vsf_eda_cfg_t *cfg_ptr)
 
     __vsf_eda_frame_t *frame = vsf_eda_new_frame(cfg_ptr->local_size);
     if (NULL == frame) {
+        // If VSF_OS_CFG_EDA_FRAME_POOL_SIZE and VSF_OS_CFG_EDA_FRAME_POOL_EXTRA_SIZE are both configured,
+        //  increase VSF_OS_CFG_EDA_FRAME_POOL_SIZE.
+        // Or increase heap size.
         VSF_KERNEL_ASSERT(false);
         return VSF_ERR_NOT_ENOUGH_RESOURCES;
     }
