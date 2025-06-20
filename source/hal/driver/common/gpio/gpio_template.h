@@ -58,7 +58,7 @@
 #   define VSF_GPIO_CFG_DEC_COUNT_MASK_PREFIX           VSF_GPIO_CFG_DEC_UPCASE_PREFIX
 #endif
 
-#define VSF_HAL_TEMPLATE_DEC_INSTANCE_API(__prefix_name)                        \
+#define VSF_HAL_TEMPLATE_DEC_INSTANCE_APIS(__prefix_name)                       \
     VSF_GPIO_APIS(__prefix_name)                                                \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t, gpio, port_config_pin,   VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, uint16_t pin_index, vsf_gpio_cfg_t * cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t, gpio, ports_config_pin,  vsf_gpio_port_cfg_pin_t *cfg_ptr, uint_fast8_t count)                                         \
