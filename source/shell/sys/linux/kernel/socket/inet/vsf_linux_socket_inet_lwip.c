@@ -2314,7 +2314,7 @@ parse_next:
             continue;
         }
 
-        printf("%c%c(0x%p): flags=%d<%s,%s>  mtu %d\n", netif->name[0], netif->name[1],
+        printf("%c%c%d(0x%p): flags=%d<%s,%s>  mtu %d\n", netif->name[0], netif->name[1], netif->num,
                 netif, netif->flags,
                 netif->flags & NETIF_FLAG_UP ? "UP" : "DOWN",
                 netif->flags & NETIF_FLAG_BROADCAST ? "BROADCAST" : "NO_BROADCAST",
