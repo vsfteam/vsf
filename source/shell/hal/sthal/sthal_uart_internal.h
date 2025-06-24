@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-#if VSF_HAL_USE_USART == ENABLED
+#if defined(HAL_UART_MODULE_ENABLED) && VSF_HAL_USE_USART == ENABLED
 
 /*============================ INCLUDES ======================================*/
 
@@ -109,7 +109,7 @@ extern HAL_StatusTypeDef __HAL_LIN_SendBreak(UART_HandleTypeDef *huart);
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#endif
+#endif /* defined(HAL_UART_MODULE_ENABLED) && VSF_HAL_USE_USART == ENABLED */
 
 #ifdef __cplusplus
 }

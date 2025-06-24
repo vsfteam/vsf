@@ -22,6 +22,8 @@
 extern "C" {
 #endif
 
+#if defined(HAL_I2C_MODULE_ENABLED) && VSF_HAL_USE_I2C == ENABLED
+
 /*============================ INCLUDES ======================================*/
 
 #include "sthal_def.h"
@@ -399,6 +401,8 @@ HAL_StatusTypeDef    HAL_I2CEx_ConfigAnalogFilter(I2C_HandleTypeDef *hi2c,
                                                   uint32_t           AnalogFilter);
 HAL_StatusTypeDef    HAL_I2CEx_ConfigDigitalFilter(I2C_HandleTypeDef *hi2c,
                                                    uint32_t DigitalFilter);
+
+#endif /* defined(HAL_I2C_MODULE_ENABLED) && VSF_HAL_USE_I2C == ENABLED */
 
 #ifdef __cplusplus
 }

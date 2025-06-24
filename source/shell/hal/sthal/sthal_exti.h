@@ -22,6 +22,8 @@
 extern "C" {
 #endif
 
+#if (VSF_HAL_USE_GPIO == ENABLED) && defined(HAL_EXTI_MODULE_ENABLED)
+
 /*============================ INCLUDES ======================================*/
 
 #include "sthal_def.h"
@@ -217,6 +219,8 @@ void     HAL_EXTI_IRQHandler(EXTI_HandleTypeDef *hexti);
 uint32_t HAL_EXTI_GetPending(EXTI_HandleTypeDef *hexti, uint32_t Edge);
 void     HAL_EXTI_ClearPending(EXTI_HandleTypeDef *hexti, uint32_t Edge);
 void     HAL_EXTI_GenerateSWI(EXTI_HandleTypeDef *hexti);
+
+#endif /* (VSF_HAL_USE_USART == ENABLED) && defined(HAL_EXTI_MODULE_ENABLED) */
 
 #ifdef __cplusplus
 }

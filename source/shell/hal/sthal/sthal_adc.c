@@ -20,7 +20,7 @@
 #include "hal/vsf_hal.h"
 #include "sthal.h"
 
-#ifdef HAL_ADC_MODULE_ENABLED
+#if defined(HAL_ADC_MODULE_ENABLED) && VSF_HAL_USE_ADC == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

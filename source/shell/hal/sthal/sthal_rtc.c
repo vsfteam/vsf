@@ -20,7 +20,7 @@
 #include "hal/vsf_hal.h"
 #include "sthal.h"
 
-#ifdef HAL_RTC_MODULE_ENABLED
+#if defined(HAL_RTC_MODULE_ENABLED) && VSF_HAL_USE_RTC == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/

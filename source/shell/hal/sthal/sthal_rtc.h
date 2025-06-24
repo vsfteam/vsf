@@ -22,6 +22,8 @@
 extern "C" {
 #endif
 
+#if defined(HAL_RTC_MODULE_ENABLED) && VSF_HAL_USE_RTC == ENABLED
+
 /*============================ INCLUDES ======================================*/
 
 #include "sthal_def.h"
@@ -252,6 +254,8 @@ HAL_StatusTypeDef HAL_RTCEx_DisableBypassShadow(RTC_HandleTypeDef *hrtc);
 void              HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc);
 HAL_StatusTypeDef HAL_RTCEx_PollForAlarmBEvent(RTC_HandleTypeDef *hrtc,
                                                uint32_t           Timeout);
+
+#endif /* defined(HAL_RTC_MODULE_ENABLED) && VSF_HAL_USE_RTC == ENABLED */
 
 #ifdef __cplusplus
 }

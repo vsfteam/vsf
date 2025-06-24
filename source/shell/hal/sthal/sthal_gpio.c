@@ -20,7 +20,7 @@
 #include "sthal.h"
 #include "hal/vsf_hal.h"
 
-#if (VSF_HAL_USE_GPIO == ENABLED) && defined(HAL_GPIO_MODULE_ENABLED)
+#if defined(HAL_GPIO_MODULE_ENABLED) && VSF_HAL_USE_GPIO == ENABLED
 
 /*============================ MACROS ========================================*/
 

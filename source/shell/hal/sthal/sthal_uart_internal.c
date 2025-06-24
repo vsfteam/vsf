@@ -20,7 +20,7 @@
 #include "hal/vsf_hal.h"
 #include "sthal.h"
 
-#if VSF_HAL_USE_USART == ENABLED && defined(HAL_UART_MODULE_ENABLED)
+#if defined(HAL_UART_MODULE_ENABLED) && VSF_HAL_USE_USART == ENABLED
 
 #include "sthal_internal.h"
 

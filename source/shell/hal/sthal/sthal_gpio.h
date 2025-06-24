@@ -22,6 +22,8 @@
 extern "C" {
 #endif
 
+#if defined(HAL_GPIO_MODULE_ENABLED) && VSF_HAL_USE_GPIO == ENABLED
+
 /*============================ INCLUDES ======================================*/
 
 #include "sthal_def.h"
@@ -124,6 +126,8 @@ void          HAL_GPIO_TogglePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 HAL_StatusTypeDef HAL_GPIO_LockPin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin);
 void              HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin);
 void              HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
+
+#endif /* defined(HAL_GPIO_MODULE_ENABLED) && VSF_HAL_USE_GPIO == ENABLED */
 
 #ifdef __cplusplus
 }

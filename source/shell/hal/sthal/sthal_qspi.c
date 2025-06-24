@@ -20,7 +20,7 @@
 #include "hal/vsf_hal.h"
 #include "sthal.h"
 
-#if defined(HAL_QSPI_MODULE_ENABLED) && defined(VSF_SPI_CTRL_QSPI_ENABLE)
+#if defined(HAL_QSPI_MODULE_ENABLED) && VSF_HAL_USE_SPI == ENABLED && defined(VSF_SPI_CTRL_QSPI_ENABLE)
 
 #   include "sthal_internal.h"
 

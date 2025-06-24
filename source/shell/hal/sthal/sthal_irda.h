@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-#if VSF_HAL_USE_USART == ENABLED && defined(HAL_IRDA_MODULE_ENABLED)
+#if defined(HAL_IRDA_MODULE_ENABLED) && VSF_HAL_USE_USART == ENABLED
 
 /*============================ INCLUDES ======================================*/
 
@@ -160,7 +160,7 @@ void HAL_IRDA_AbortReceiveCpltCallback(IRDA_HandleTypeDef *hirda);
 HAL_IRDA_StateTypeDef HAL_IRDA_GetState(const IRDA_HandleTypeDef *hirda);
 uint32_t              HAL_IRDA_GetError(const IRDA_HandleTypeDef *hirda);
 
-#endif
+#endif /* defined(HAL_IRDA_MODULE_ENABLED) && VSF_HAL_USE_USART == ENABLED */
 
 #ifdef __cplusplus
 }

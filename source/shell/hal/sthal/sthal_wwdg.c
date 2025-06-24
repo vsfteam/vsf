@@ -20,7 +20,7 @@
 #include "hal/vsf_hal.h"
 #include "./sthal.h"
 
-#ifdef HAL_WWDG_MODULE_ENABLED
+#if defined(HAL_WWDG_MODULE_ENABLED) && VSF_HAL_USE_WDT == ENABLED
 
 /*============================ MACROS ========================================*/
 

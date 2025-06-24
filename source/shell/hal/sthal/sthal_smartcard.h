@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-#if VSF_HAL_USE_USART == ENABLED && defined(HAL_SMARTCARD_MODULE_ENABLED)
+#if defined(HAL_SMARTCARD_MODULE_ENABLED) && VSF_HAL_USE_USART == ENABLED
 
 /*============================ INCLUDES ======================================*/
 
@@ -222,7 +222,7 @@ HAL_SMARTCARD_StateTypeDef HAL_SMARTCARD_GetState(
     const SMARTCARD_HandleTypeDef *hsc);
 uint32_t HAL_SMARTCARD_GetError(const SMARTCARD_HandleTypeDef *hsc);
 
-#endif
+#endif /* defined(HAL_SMARTCARD_MODULE_ENABLED) && VSF_HAL_USE_USART == ENABLED */
 
 #ifdef __cplusplus
 }

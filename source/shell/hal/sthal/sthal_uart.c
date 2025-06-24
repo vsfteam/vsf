@@ -21,8 +21,7 @@
 #include "sthal.h"
 #include "./sthal_uart_internal.h"
 
-#if VSF_HAL_USE_USART == ENABLED
-#    ifdef HAL_UART_MODULE_ENABLED
+#if defined(HAL_UART_MODULE_ENABLED) && VSF_HAL_USE_USART == ENABLED
 
 /*============================ MACROS ========================================*/
 
@@ -634,5 +633,4 @@ HAL_StatusTypeDef HAL_MultiProcessor_ExitMuteMode(UART_HandleTypeDef *huart)
     return __HAL_MultiProcessor_ExitMuteMode(huart);
 }
 
-#    endif
 #endif

@@ -20,7 +20,7 @@
 #include "sthal.h"
 #include "hal/vsf_hal.h"
 
-#if (VSF_HAL_USE_USART == ENABLED) && defined(HAL_EXTI_MODULE_ENABLED)
+#if (VSF_HAL_USE_GPIO == ENABLED) && defined(HAL_EXTI_MODULE_ENABLED)
 
 /*============================ MACROS ========================================*/
 
@@ -78,7 +78,7 @@ void HAL_EXTI_IRQHandler(EXTI_HandleTypeDef *hexti)
 }
 
 uint32_t HAL_EXTI_GetPending(EXTI_HandleTypeDef *hexti, uint32_t Edge)
-{   
+{
     return 0;
 }
 

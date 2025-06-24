@@ -248,7 +248,7 @@ HAL_StatusTypeDef UART_Start_Receive_IT(UART_HandleTypeDef *huart,
 HAL_StatusTypeDef UART_Start_Receive_DMA(UART_HandleTypeDef *huart,
                                          uint8_t *pData, uint16_t Size);
 
-#endif
+#endif /* VSF_HAL_USE_USART == ENABLED && defined(HAL_UART_MODULE_ENABLED) */
 
 #ifdef __cplusplus
 }

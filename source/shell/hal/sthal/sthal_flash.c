@@ -1,11 +1,9 @@
-
-
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal.h"
 #include "sthal.h"
 
-#ifdef HAL_FLASH_MODULE_ENABLED
+#if defined(HAL_FLASH_MODULE_ENABLED) && VSF_HAL_USE_FLASH == ENABLED
 
 /*============================ MACROS ========================================*/
 

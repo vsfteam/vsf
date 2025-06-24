@@ -22,7 +22,7 @@
 
 #include "./sthal_uart_internal.h"
 
-#if VSF_HAL_USE_USART == ENABLED && defined(HAL_IRDA_MODULE_ENABLED)
+#if defined(HAL_IRDA_MODULE_ENABLED) && VSF_HAL_USE_USART == ENABLED
 
 /*============================ MACROS ========================================*/
 

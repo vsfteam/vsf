@@ -22,6 +22,8 @@
 extern "C" {
 #endif
 
+#if defined(HAL_SPI_MODULE_ENABLED) && VSF_HAL_USE_SPI == ENABLED
+
 /*============================ INCLUDES ======================================*/
 
 #include "sthal_def.h"
@@ -272,6 +274,8 @@ void              HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi);
 void              HAL_SPI_AbortCpltCallback(SPI_HandleTypeDef *hspi);
 HAL_SPI_StateTypeDef HAL_SPI_GetState(SPI_HandleTypeDef *hspi);
 uint32_t             HAL_SPI_GetError(SPI_HandleTypeDef *hspi);
+
+#endif /* defined(HAL_SPI_MODULE_ENABLED) && VSF_HAL_USE_SPI == ENABLED */
 
 #ifdef __cplusplus
 }

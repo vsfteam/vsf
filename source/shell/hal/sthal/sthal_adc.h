@@ -22,6 +22,8 @@
 extern "C" {
 #endif
 
+#if defined(HAL_ADC_MODULE_ENABLED) && VSF_HAL_USE_ADC == ENABLED
+
 /*============================ INCLUDES ======================================*/
 
 #include "sthal_def.h"
@@ -201,6 +203,8 @@ HAL_StatusTypeDef HAL_ADCEx_InjectedConfigChannel(
     ADC_HandleTypeDef *hadc, ADC_InjectionConfTypeDef *sConfigInjected);
 HAL_StatusTypeDef HAL_ADCEx_MultiModeConfigChannel(
     ADC_HandleTypeDef *hadc, ADC_MultiModeTypeDef *multimode);
+
+#endif /* defined(HAL_ADC_MODULE_ENABLED) && VSF_HAL_USE_ADC == ENABLED */
 
 #ifdef __cplusplus
 }
