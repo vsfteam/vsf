@@ -20,8 +20,6 @@
 #include "sthal.h"
 #include "hal/vsf_hal.h"
 
-#if VSF_HAL_USE_USART == ENABLED
-
 /*============================ MACROS ========================================*/
 
 #define __ST_HAL_VERSION_MAIN (0x01U)
@@ -173,5 +171,3 @@ uint32_t HAL_GetHalVersion(void)
 {
     return __ST_HAL_VERSION;
 }
-
-#endif
