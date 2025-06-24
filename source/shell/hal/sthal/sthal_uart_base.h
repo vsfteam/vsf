@@ -136,7 +136,7 @@ typedef enum {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#endif
+#endif /* VSF_HAL_USE_USART == ENABLED */
 
 #ifdef __cplusplus
 }

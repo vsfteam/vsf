@@ -22,6 +22,8 @@
 extern "C" {
 #endif
 
+#if defined(HAL_WWDG_MODULE_ENABLED) && VSF_HAL_USE_WDT == ENABLED
+
 /*============================ INCLUDES ======================================*/
 
 #include "sthal_def.h"
@@ -110,6 +112,8 @@ HAL_StatusTypeDef HAL_WWDG_UnRegisterCallback(
 HAL_StatusTypeDef HAL_WWDG_Refresh(WWDG_HandleTypeDef *hwwdg);
 void              HAL_WWDG_IRQHandler(WWDG_HandleTypeDef *hwwdg);
 void              HAL_WWDG_EarlyWakeupCallback(WWDG_HandleTypeDef *hwwdg);
+
+#endif /* defined(HAL_WWDG_MODULE_ENABLED) && VSF_HAL_USE_WDT == ENABLED */
 
 #ifdef __cplusplus
 }

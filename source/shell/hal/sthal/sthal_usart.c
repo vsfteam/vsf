@@ -22,7 +22,7 @@
 
 #include "./sthal_uart_internal.h"
 
-#if VSF_HAL_USE_USART == ENABLED && 1 // defined(HAL_USART_MODULE_ENABLED)
+#if defined(HAL_USART_MODULE_ENABLED) && VSF_HAL_USE_USART == ENABLED
 
 /*============================ MACROS ========================================*/
 
@@ -351,11 +351,11 @@ HAL_StatusTypeDef HAL_USART_TransmitReceive_DMA(USART_HandleTypeDef *husart,
 {
     VSF_STHAL_ASSERT(husart != NULL);
     VSF_STHAL_ASSERT(husart->__Type == __HAL_UART_TYPE_USART);
-    
+
     if (pTxData == NULL) {
         return HAL_ERROR;
     }
-    
+
     return __HAL_UART_TransmitReceive_DMA(husart, pTxData, pRxData, Size);
 }
 

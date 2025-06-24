@@ -22,6 +22,8 @@
 extern "C" {
 #endif
 
+#if defined(HAL_DMA_MODULE_ENABLED) && VSF_HAL_USE_DMA == ENABLED
+
 /*============================ INCLUDES ======================================*/
 
 #include "sthal_def.h"
@@ -143,6 +145,8 @@ HAL_StatusTypeDef HAL_DMA_UnRegisterCallback(
 
 HAL_DMA_StateTypeDef HAL_DMA_GetState(DMA_HandleTypeDef *hdma);
 uint32_t             HAL_DMA_GetError(DMA_HandleTypeDef *hdma);
+
+#endif /* defined(HAL_DMA_MODULE_ENABLED) && VSF_HAL_USE_DMA == ENABLED */
 
 #ifdef __cplusplus
 }

@@ -20,7 +20,7 @@
 #include "hal/vsf_hal.h"
 #include "sthal.h"
 
-#ifdef HAL_SPI_MODULE_ENABLED
+#if defined(HAL_SPI_MODULE_ENABLED) && VSF_HAL_USE_SPI == ENABLED
 
 #include "sthal_internal.h"
 

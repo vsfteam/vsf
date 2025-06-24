@@ -22,6 +22,8 @@
 extern "C" {
 #endif
 
+#if defined(HAL_QSPI_MODULE_ENABLED) && VSF_HAL_USE_SPI == ENABLED && defined(VSF_SPI_CTRL_QSPI_ENABLE)
+
 /*============================ INCLUDES ======================================*/
 
 #include "sthal_def.h"
@@ -556,6 +558,8 @@ HAL_StatusTypeDef HAL_QSPI_SetFifoThreshold(QSPI_HandleTypeDef *hqspi,
 uint32_t          HAL_QSPI_GetFifoThreshold(const QSPI_HandleTypeDef *hqspi);
 HAL_StatusTypeDef HAL_QSPI_SetFlashID(QSPI_HandleTypeDef *hqspi,
                                       uint32_t            FlashID);
+
+#endif /* defined(HAL_QSPI_MODULE_ENABLED) && VSF_HAL_USE_SPI == ENABLED && defined(VSF_SPI_CTRL_QSPI_ENABLE) */
 
 #ifdef __cplusplus
 }

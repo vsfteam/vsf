@@ -20,7 +20,7 @@
 #include "hal/vsf_hal.h"
 #include "sthal.h"
 
-#ifdef HAL_I2C_MODULE_ENABLED
+#if defined(HAL_I2C_MODULE_ENABLED) && VSF_HAL_USE_I2C == ENABLED
 
 #include "sthal_internal.h"
 
@@ -1617,8 +1617,7 @@ HAL_StatusTypeDef HAL_I2C_Mem_Read_DMA(I2C_HandleTypeDef *hi2c,
 
     cmd = VSF_I2C_CMD_RESTART | VSF_I2C_CMD_READ | VSF_I2C_CMD_STOP;
 
-    vsf_err_t err = vsf_i2c_master_request(i2c_ptr, hi2c->Devaddress, cmd,
-                                           hi2c->XferCount, hi2c->pBuffPtr);
+    vsf_err_t err = vsf_i2c_master_request(i2c_ptr, hi2c->Devaddress, cmd, hi2c->XferCount, hi2c->pBuffPtr);
     VSF_STHAL_UNLOCK(hi2c);
     if (err != VSF_ERR_NONE) {
         hi2c->ErrorCode |= HAL_I2C_ERROR_DMA;

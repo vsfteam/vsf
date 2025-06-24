@@ -22,6 +22,8 @@
 extern "C" {
 #endif
 
+#if defined(HAL_TIM_MODULE_ENABLED) && VSF_HAL_USE_TIMER == ENABLED
+
 /*============================ INCLUDES ======================================*/
 
 #include "sthal_def.h"
@@ -648,6 +650,8 @@ HAL_TIM_ChannelStateTypeDef HAL_TIMEx_GetChannelNState(
     const TIM_HandleTypeDef *htim, uint32_t ChannelN);
 void TIMEx_DMACommutationCplt(DMA_HandleTypeDef *hdma);
 void TIMEx_DMACommutationHalfCplt(DMA_HandleTypeDef *hdma);
+
+#endif /* defined(HAL_TIM_MODULE_ENABLED) && VSF_HAL_USE_TIMER == ENABLED */
 
 #ifdef __cplusplus
 }

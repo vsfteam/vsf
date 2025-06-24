@@ -22,6 +22,8 @@
 extern "C" {
 #endif
 
+#if defined(HAL_FLASH_MODULE_ENABLED) && VSF_HAL_USE_FLASH == ENABLED
+
 /*============================ INCLUDES ======================================*/
 
 #include "sthal_def.h"
@@ -74,6 +76,8 @@ HAL_StatusTypeDef HAL_FLASH_OB_Lock(void);
 HAL_StatusTypeDef HAL_FLASH_OB_Launch(void);
 uint32_t          HAL_FLASH_GetError(void);
 HAL_StatusTypeDef FLASH_WaitForLastOperation(uint32_t Timeout);
+
+#endif /* defined(HAL_FLASH_MODULE_ENABLED) && VSF_HAL_USE_FLASH == ENABLED */
 
 #ifdef __cplusplus
 }
