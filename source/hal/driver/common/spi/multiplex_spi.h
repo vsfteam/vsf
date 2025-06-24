@@ -22,7 +22,7 @@
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_SPI == ENABLED
+#if (VSF_HAL_USE_SPI == ENABLED) && (VSF_HAL_USE_GPIO == ENABLED)
 
 #if     defined(__VSF_MULTIPLEX_SPI_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
@@ -103,6 +103,6 @@ vsf_class(vsf_multiplex_spi_t) {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-#endif  /*VSF_HAL_USE_SPI*/
+#endif  /*(VSF_HAL_USE_SPI == ENABLED) && (VSF_HAL_USE_GPIO == ENABLED)*/
 
 #endif  /*__HAL_DRIVER_COMMON_MULTIPLEX_SPI_H__*/
