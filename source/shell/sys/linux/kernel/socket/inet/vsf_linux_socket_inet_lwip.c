@@ -546,9 +546,11 @@ static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
             return INVALID_SOCKET;
         }
         conn_type = NETCONN_UDP;
+#if LWIP_IPV6
         if (AF_INET6 == socket_priv->domain) {
             conn_type |= NETCONN_TYPE_IPV6;
         }
+#endif
         break;
     case SOCK_RAW:
         conn_type = NETCONN_RAW;
@@ -559,9 +561,11 @@ static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
             return INVALID_SOCKET;
         }
         conn_type = NETCONN_TCP;
+#if LWIP_IPV6
         if (AF_INET6 == socket_priv->domain) {
             conn_type |= NETCONN_TYPE_IPV6;
         }
+#endif
         break;
     default:
         return INVALID_SOCKET;
