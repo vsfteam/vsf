@@ -1720,7 +1720,8 @@ static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd)
         ip_addr_t multi_addr, if_addr;
 
         __vsf_dlist_foreach_next_unsafe(vsf_linux_socket_group_t, node, &priv->group_list) {
-            LOCK_TCPIP_CORE();
+            // netconn_join_leave_group_netif and netconn_join_leave_group don't need lock
+//            LOCK_TCPIP_CORE();
 #if LWIP_IPV6
             if (AF_INET6 == _->family) {
                 ip_addr_copy_from_ip6(multi_addr, _->ip6.multi_addr);
@@ -1734,7 +1735,7 @@ static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd)
                 netconn_join_leave_group(conn, &multi_addr, &if_addr, NETCONN_LEAVE);
             }
 #endif
-            UNLOCK_TCPIP_CORE();
+//            UNLOCK_TCPIP_CORE();
 
             vsf_dlist_remove(vsf_linux_socket_group_t, node, &priv->group_list, _);
             vsf_heap_free(_);
