@@ -561,6 +561,9 @@ static int __vsf_linux_socket_inet_init(vsf_linux_fd_t *sfd)
         return INVALID_SOCKET;
     }
 
+    if (AF_INET6 == socket_priv->domain) {
+        conn_type |= NETCONN_TYPE_IPV6;
+    }
     if (use_protocol) {
         conn = netconn_new_with_proto_and_callback(conn_type, (u8_t)socket_priv->protocol,
                 __vsf_linux_socket_inet_lwip_evthandler);
