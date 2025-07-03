@@ -22,6 +22,10 @@
 #include "kernel/vsf_kernel.h"
 
 #if VSF_USE_POSIX == ENABLED
+
+// for posix APIs like open, etc
+#   include <fcntl.h>
+
 // __assert_func is necessary because original function in newlib has dependency issue
 //  __assert_func in newlib depends on fprintf, which is not usable outside vsf linux
 VSF_CAL_SECTION(".vsf.utilities.stdio.gcc.__assert_func")

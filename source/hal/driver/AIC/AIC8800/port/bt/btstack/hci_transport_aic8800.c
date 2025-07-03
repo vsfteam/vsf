@@ -29,6 +29,9 @@
 
 #include "hal/vsf_hal.h"
 
+// for ChipIdGet
+#include "system.h"
+
 #include "bt_user_driver.h"
 #include "bt_hci.h"
 
