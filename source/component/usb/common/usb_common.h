@@ -172,6 +172,7 @@ enum usb_desc_type_t {
     USB_DT_REPORT               = (USB_TYPE_CLASS | 0x02),
     USB_DT_PHYSICAL             = (USB_TYPE_CLASS | 0x03),
     USB_DT_HUB                  = (USB_TYPE_CLASS | 0x09),
+    USB_DT_SUPERSPEED_HUB       = (USB_TYPE_CLASS | 0x0a),
 };
 
 typedef struct usb_descriptor_header_t {

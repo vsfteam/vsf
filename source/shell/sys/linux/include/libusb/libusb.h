@@ -12,6 +12,7 @@
 #   include <sys/time.h>
 #   include <unistd.h>
 #endif
+#include <stdarg.h>
 
 // for USB constants
 #include "component/usb/common/usb_common.h"
@@ -90,6 +91,8 @@ extern "C" {
 #define libusb_get_device_speed                         VSF_LINUX_LIBUSB_WRAPPER(libusb_get_device_speed)
 #define libusb_set_configuration                        VSF_LINUX_LIBUSB_WRAPPER(libusb_set_configuration)
 #define libusb_get_configuration                        VSF_LINUX_LIBUSB_WRAPPER(libusb_get_configuration)
+#define libusb_set_option                               VSF_LINUX_LIBUSB_WRAPPER(libusb_set_option)
+
 #endif
 
 #define LIBUSB_CALL
@@ -194,8 +197,14 @@ enum libusb_descriptor_type {
     LIBUSB_DT_STRING                    = USB_DT_STRING,
     LIBUSB_DT_INTERFACE                 = USB_DT_INTERFACE,
     LIBUSB_DT_ENDPOINT                  = USB_DT_ENDPOINT,
+    LIBUSB_DT_INTERFACE_ASSOCIATION     = USB_DT_INTERFACE_ASSOCIATION,
     LIBUSB_DT_BOS                       = USB_DT_BOS,
     LIBUSB_DT_DEVICE_CAPABILITY         = USB_DT_DEVICE_CAPABILITY,
+    LIBUSB_DT_HID                       = USB_DT_HID,
+    LIBUSB_DT_REPORT                    = USB_DT_REPORT,
+    LIBUSB_DT_PHYSICAL                  = USB_DT_PHYSICAL,
+    LIBUSB_DT_HUB                       = USB_DT_HUB,
+    LIBUSB_DT_SUPERSPEED_HUB            = USB_DT_SUPERSPEED_HUB,
     LIBUSB_DT_SS_ENDPOINT_COMPANION     = USB_DT_SS_ENDPOINT_COMP,
 };
 
@@ -208,11 +217,16 @@ enum libusb_descriptor_size {
 };
 
 enum libusb_log_level {
-    LIBUSB_LOG_LEVEL_NONE = 0,
-    LIBUSB_LOG_LEVEL_ERROR = 1,
-    LIBUSB_LOG_LEVEL_WARNING = 2,
-    LIBUSB_LOG_LEVEL_INFO = 3,
-    LIBUSB_LOG_LEVEL_DEBUG = 4
+    LIBUSB_LOG_LEVEL_NONE               = 0,
+    LIBUSB_LOG_LEVEL_ERROR              = 1,
+    LIBUSB_LOG_LEVEL_WARNING            = 2,
+    LIBUSB_LOG_LEVEL_INFO               = 3,
+    LIBUSB_LOG_LEVEL_DEBUG              = 4
+};
+
+enum libusb_option {
+    LIBUSB_OPTION_LOG_LEVEL             = 0,
+    LIBUSB_OPTION_MAX                   = 1,
 };
 
 struct libusb_version {
@@ -533,6 +547,8 @@ typedef struct vsf_linux_libusb_vplt_t {
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_reset_device);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_clear_halt);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_set_option);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__libusb_set_option_va);
 } vsf_linux_libusb_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libusb_vplt_t vsf_linux_libusb_vplt;
@@ -785,6 +801,19 @@ VSF_LINUX_APPLET_LIBUSB_IMP(libusb_clear_halt, int, libusb_device_handle *dev_ha
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_clear_halt)(dev_handle, endpoint);
 }
+VSF_LINUX_APPLET_LIBUSB_IMP(__libusb_set_option_va, int, libusb_context *ctx, enum libusb_option option, va_list ap) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBUSB_ENTRY(__libusb_set_option_va)(ctx, option, ap);
+}
+
+VSF_APPLET_VPLT_FUNC_DECORATOR(libusb_set_option) int libusb_set_option(libusb_context *ctx, enum libusb_option option, ...) {
+    int result;
+    va_list ap;
+    va_start(ap, option);
+        result = __libusb_set_option_va(ctx, option, ap);
+    va_end(ap);
+    return result;
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBUSB
 
@@ -886,6 +915,9 @@ void vsf_linux_libusb_startup(void);
 
 int libusb_reset_device(libusb_device_handle *dev_handle);
 int libusb_clear_halt(libusb_device_handle *dev_handle, unsigned char endpoint);
+
+int __libusb_set_option_va(libusb_context *ctx, enum libusb_option option, va_list ap);
+int libusb_set_option(libusb_context *ctx, enum libusb_option option, ...);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBUSB
 

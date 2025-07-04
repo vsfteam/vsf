@@ -1317,6 +1317,21 @@ void libusb_free_pollfds(const struct libusb_pollfd **pollfds)
     }
 }
 
+int __libusb_set_option_va(libusb_context *ctx, enum libusb_option option, va_list ap)
+{
+    return 0;
+}
+
+int libusb_set_option(libusb_context *ctx, enum libusb_option option, ...)
+{
+    int result;
+    va_list ap;
+    va_start(ap, option);
+        result = __libusb_set_option_va(ctx, option, ap);
+    va_end(ap);
+    return result;
+}
+
 #if VSF_LINUX_APPLET_USE_LIBUSB == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_libusb_vplt_t vsf_linux_libusb_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libusb_vplt_t, 0, 0, true),
