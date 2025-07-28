@@ -289,7 +289,8 @@ static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_get_stack(void)
     return __get_MSP();
 }
 
-#if VSF_ARCH_USE_THREAD_REG == ENABLED
+#if VSF_ARCH_USE_THREAD_REG == ENABLED && !defined(__cplusplus)
+// for c++17, register storage class specifier is not supported
 static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_set_thread_reg(uintptr_t value)
 {
     register uintptr_t result;

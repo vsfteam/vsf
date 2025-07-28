@@ -293,7 +293,7 @@ int vswprintf(wchar_t *str, size_t size, const wchar_t *format, va_list ap)
             case 'P':
                 flags.is_upper = 1;
             case 'p':
-                arg.val = (unsigned long long)va_arg(ap, void *);
+                arg.val = (unsigned long long)(uintptr_t)va_arg(ap, void *);
 #if VSF_SIMPLE_SPRINTF_SUPPORT_IPMAC == ENABLED
                 // use width as size, containing 1-byte NULL terminator
                 width = size - realsize + 1;
