@@ -28,10 +28,10 @@ namespace std {
 
         static const size_t npos = -1;
 
-        constexpr basic_string_view<T, Traits>(const T *str) : __str(str), __length(__strlen(str)) { }
-        constexpr basic_string_view<T, Traits>(const basic_string_view<T, Traits> &s) : __str(s.cbegin()), __length(s.length()) { }
-        constexpr basic_string_view<T, Traits>() : __str(nullptr), __length(0) { }
-        constexpr basic_string_view<T, Traits>(const T *str, size_t num) : __str(str), __length(num) { }
+        constexpr basic_string_view(const T *str) : __str(str), __length(__strlen(str)) { }
+        constexpr basic_string_view(const basic_string_view<T, Traits> &s) : __str(s.cbegin()), __length(s.length()) { }
+        constexpr basic_string_view() : __str(nullptr), __length(0) { }
+        constexpr basic_string_view(const T *str, size_t num) : __str(str), __length(num) { }
 
         constexpr iterator begin() const
         {

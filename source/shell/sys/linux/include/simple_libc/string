@@ -4,6 +4,8 @@
 #include <string.h>
 #include <wchar.h>
 
+#include <initializer_list>
+
 // memroy depends on _MSC_VER on WIN platform
 #undef __WIN_STRING_DEF_MSC_VER
 #if defined(__WIN__) && !defined(_MSC_VER)
@@ -131,8 +133,8 @@ namespace std {
         typedef const T &const_reference;
         typedef size_t size_type;
 
-        array_base<T>() : __array(nullptr), __length(0) { }
-        array_base<T>(const T *arr, size_t num)
+        array_base() : __array(nullptr), __length(0) { }
+        array_base(const T *arr, size_t num)
             : __length(num)
         {
             if (__length > 0) {
@@ -145,11 +147,11 @@ namespace std {
                 __array = nullptr;
             }
         }
-        array_base<T>(size_t num)
+        array_base(size_t num)
             : array_base<T>(nullptr, num) { }
-        array_base<T>(const array_base &arr)
+        array_base(const array_base &arr)
             : array_base<T>(arr.__array, arr.__length) { }
-        array_base<T>(initializer_list<T> list)
+        array_base(initializer_list<T> list)
             : __length(list.size())
         {
             if (__length > 0) {
@@ -160,7 +162,7 @@ namespace std {
                 __array = nullptr;
             }
         }
-        ~array_base<T>()
+        ~array_base()
         {
             __length = 0;
             if (__array != nullptr) {
@@ -492,23 +494,23 @@ namespace std {
 
         static const size_t npos = -1;
 
-        basic_string<T, Traits, Alloc>(const T *str)
+        basic_string(const T *str)
             : array_base<T>(str, nullptr == str ? 0 : __strlen(str) + 1) { }
-        basic_string<T, Traits, Alloc>(const basic_string<T, Traits, Alloc> &s)
+        basic_string(const basic_string<T, Traits, Alloc> &s)
             : array_base<T>(s) { }
-        basic_string<T, Traits, Alloc>(size_t len)
+        basic_string(size_t len)
             : array_base<T>(nullptr, len + 1)
         {
             T *str = (T *)c_str();
             str[0] = T(0);
         }
-        basic_string<T, Traits, Alloc>()
+        basic_string()
             : array_base<T>(nullptr, 1)
         {
             T *str = (T *)c_str();
             str[0] = T(0);
         }
-        basic_string<T, Traits, Alloc>(const T *arr, size_t num)
+        basic_string(const T *arr, size_t num)
             : array_base<T>(nullptr, num + 1)
         {
             T *str = (T *)c_str();
@@ -517,7 +519,7 @@ namespace std {
                 str[array_base<T>::length() - 1] = T(0);
             }
         }
-        basic_string<T, Traits, Alloc>(const T *str_begin, const T *str_end)
+        basic_string(const T *str_begin, const T *str_end)
         {
             bool str_last_is_null = *str_end == T(0);
             array_base<T>::resize(str_end - str_begin + 1 + (str_last_is_null ? 0 : 1));
@@ -528,12 +530,12 @@ namespace std {
                 str[array_base<T>::length() - 1] = T(0);
             }
         }
-        basic_string<T, Traits, Alloc>(size_t n, T c, const allocator_type &a = allocator_type())
+        basic_string(size_t n, T c, const allocator_type &a = allocator_type())
             : array_base<T>(0 == n ? 1 : n)
         {
             __memset((T *)c_str(), c, n);
         }
-        basic_string<T, Traits, Alloc>(initializer_list<T> list)
+        basic_string(initializer_list<T> list)
             : array_base<T>(nullptr, list.size() + 1)
         {
             T *str = (T *)c_str();
@@ -542,7 +544,7 @@ namespace std {
                 str[array_base<T>::length() - 1] = T(0);
             }
         }
-        explicit basic_string<T, Traits, Alloc>(const Alloc &a)
+        explicit basic_string(const Alloc &a)
             : array_base<T>(nullptr, 0) { }
 
         const T & back() const
