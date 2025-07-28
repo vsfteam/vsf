@@ -347,7 +347,6 @@ static void __vk_usbd_cdcncm_netdrv_thread(void *param)
     vk_usbd_cdcncm_t *ncm = param;
     vk_netdrv_t *netdrv = &ncm->netdrv;
     vsf_sync_reason_t reason;
-    vsf_protect_t orig;
     vk_usbd_trans_t *trans;
 
     trans = &ncm->transact_in;

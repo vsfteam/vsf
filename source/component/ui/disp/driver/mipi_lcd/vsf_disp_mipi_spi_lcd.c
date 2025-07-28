@@ -237,7 +237,7 @@ static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_spi_lcd_t * disp_mipi_spi_lcd)
     VSF_UI_ASSERT(disp_mipi_spi_lcd->spi != NULL);
 
     vsf_spi_cfg_t spi_cfg = {
-        .mode = { MIPI_LCD_SPI_CFG },
+        .mode = MIPI_LCD_SPI_CFG,
         .clock_hz = disp_mipi_spi_lcd->clock_hz,
         .isr = {
             .handler_fn = __mipi_lcd_spi_req_cpl_handler,
