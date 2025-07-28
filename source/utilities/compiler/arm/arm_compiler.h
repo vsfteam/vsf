@@ -109,7 +109,11 @@ extern "C" {
 
 
 //! \brief none standard memory types
-#if __IS_COMPILER_IAR__
+
+#if __IS_COMPILER_GCC
+#   undef __VSF_CAL_AT_ADDR
+#   define __VSF_CAL_AT_ADDR(__ADDR)    __attribute__((section(".ARM.__at_" #__ADDR)))
+#elif __IS_COMPILER_IAR__
 #   define LOW_LEVEL_INIT_RET_T int
 #   define VSF_CAL_NO_INIT              __no_init
 #   define VSF_CAL_NO_RETURN            __attribute__((noreturn))
