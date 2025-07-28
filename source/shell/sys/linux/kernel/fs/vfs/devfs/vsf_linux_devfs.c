@@ -939,8 +939,7 @@ static int __vsf_linux_spi_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
         priv->speed = *arg_union.speed;
         break;
 
-    default:
-        if ((cmd & _IOC_TYPEMASK) == (SPI_IOC_MAGIC << _IOC_TYPESHIFT)) {
+    default: {
             uint8_t size = _IOC_SIZE(cmd);
             if (size >= 1) {
                 VSF_LINUX_ASSERT(priv->xfer_ptr == NULL);
@@ -960,8 +959,6 @@ static int __vsf_linux_spi_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
             } else {
                 return -1;
             }
-        } else {
-            return __vsf_linux_default_fcntl(sfd, cmd, arg);
         }
     }
 
