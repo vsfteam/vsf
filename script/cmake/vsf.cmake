@@ -36,7 +36,11 @@ if(DEFINED VSF_CONFIG_PATH)
     get_filename_component(VSF_CONFIG_PATH ${VSF_CONFIG_PATH} ABSOLUTE)
 endif()
 
-include(${VSF_CMAKE_ROOT}/targets.cmake)
+if(DEFINED VSF_CMAKE_TARGETS)
+    include(${VSF_CMAKE_TARGETS})
+else()
+    include(${VSF_CMAKE_ROOT}/targets.cmake)
+endif()
 
 set(VSF_COMMON_INCLUDE_DIRECTORIES
     ${VSF_CONFIG_PATH}
