@@ -687,8 +687,7 @@ vsf_err_t vk_file_open(vk_file_t *dir, const char *name, vk_file_t **file)
 {
     vsf_err_t err;
 #if VSF_FS_REF_TRACE == ENABLED
-    char intbuf[32];
-    vsf_trace_debug("open %s" VSF_TRACE_CFG_LINEEND, name ? name : itoa(idx, intbuf, 10));
+    vsf_trace_debug("open %s" VSF_TRACE_CFG_LINEEND, name);
 #endif
     VSF_FS_ASSERT(file != NULL);
 
