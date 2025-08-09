@@ -1198,7 +1198,8 @@ static vsf_dlist_t * __vsf_linux_process_heap_get_freelist(vsf_heap_t *heap, uin
 size_t vsf_linux_process_heap_size(vsf_linux_process_t *process, void *buffer)
 {
     process = vsf_linux_get_real_process(process);
-    if (NULL == process->heap) {
+    // if process is NULL, means not in linux environment, maybe allocating for C++ static instance
+    if (NULL == process || NULL == process->heap) {
         return vsf_heap_size(buffer);
     } else {
         return __vsf_heap_size(process->heap, buffer);
@@ -1208,7 +1209,8 @@ size_t vsf_linux_process_heap_size(vsf_linux_process_t *process, void *buffer)
 void * vsf_linux_process_heap_realloc(vsf_linux_process_t *process, void *buffer, uint_fast32_t size)
 {
     process = vsf_linux_get_real_process(process);
-    if (NULL == process->heap) {
+    // if process is NULL, means not in linux environment, maybe allocating for C++ static instance
+    if (NULL == process || NULL == process->heap) {
         return vsf_heap_realloc(buffer, size);
     } else {
         if (NULL == buffer) {
@@ -1228,7 +1230,8 @@ void * vsf_linux_process_heap_realloc(vsf_linux_process_t *process, void *buffer
 void * vsf_linux_process_heap_malloc_aligned(vsf_linux_process_t *process, uint_fast32_t size, uint_fast32_t alignment)
 {
     process = vsf_linux_get_real_process(process);
-    if (NULL == process->heap) {
+    // if process is NULL, means not in linux environment, maybe allocating for C++ static instance
+    if (NULL == process || NULL == process->heap) {
         return vsf_heap_malloc_aligned(size, alignment);
     } else {
         return __vsf_heap_malloc_aligned(process->heap, size, alignment);
