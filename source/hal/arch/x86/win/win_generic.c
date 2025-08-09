@@ -1333,6 +1333,15 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
  * before entry                                                               *
  *----------------------------------------------------------------------------*/
 
+#ifndef __VSF_CPP__
+
+bool __vsf_arch_before_entry(void)
+{
+    return false;
+}
+
+#else
+
 static bool __vsf_before_entry = true;
 bool __vsf_arch_before_entry(void)
 {
@@ -1344,8 +1353,6 @@ bool __vsf_arch_before_entry(void)
  *----------------------------------------------------------------------------*/
 
 // save cpp static initializer for app, and call after linux startup
-
-#ifdef __VSF_CPP__
 
 typedef int (* cpp_init_func_t)(void);
 typedef struct cpp_init_t {
