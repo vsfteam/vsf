@@ -404,6 +404,9 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         precision = 6;
                     }
                     d_fractpart = modf(arg.d, &d_intpart);
+                    if (d_fractpart < 0) {
+                        d_fractpart = -d_fractpart;
+                    }
                     flags.is_signed = d_intpart < 0;
 
                     pow = 10;
@@ -549,6 +552,9 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     dtmp = arg.d = va_arg(ap, double);
                 print_exp_do:
                     d_fractpart = modf(arg.d, &d_intpart);
+                    if (d_fractpart < 0) {
+                        d_fractpart = -d_fractpart;
+                    }
 
                     exp = 0;
                     if (d_intpart < 0) {
