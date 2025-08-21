@@ -223,8 +223,7 @@ VSF_CAL_WEAK(vsf_dwcotg_hcd_get_fifo_size)
 void vsf_dwcotg_hcd_get_fifo_size(vk_usbh_hcd_t *hcd,
         uint16_t *rx_fifo_size, uint16_t *non_periodic_tx_fifo_size, uint16_t *periodic_tx_fifo_size)
 {
-    vk_dwcotg_hcd_t *dwcotg_hcd = hcd->priv;
-    switch (dwcotg_hcd->speed) {
+    switch (vsf_dwcotg_get_cur_speed(hcd)) {
     case USB_SPEED_HIGH:
         *rx_fifo_size = 1024;
         *non_periodic_tx_fifo_size = 512;
@@ -237,6 +236,12 @@ void vsf_dwcotg_hcd_get_fifo_size(vk_usbh_hcd_t *hcd,
         *periodic_tx_fifo_size = 256;
         break;
     }
+}
+
+usb_device_speed_t vsf_dwcotg_get_cur_speed(vk_usbh_hcd_t *hcd)
+{
+    vk_dwcotg_hcd_t *dwcotg_hcd = hcd->priv;
+    return (usb_device_speed_t)dwcotg_hcd->speed;
 }
 
 static void __vk_dwcotg_hcd_init_regs(vk_dwcotg_hcd_t *dwcotg_hcd, void *regbase, uint_fast8_t ep_num)

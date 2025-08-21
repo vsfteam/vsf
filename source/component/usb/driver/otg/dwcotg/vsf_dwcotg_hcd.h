@@ -71,6 +71,9 @@ extern const vk_usbh_hcd_drv_t vk_dwcotg_hcd_drv;
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
+// APIs below CAN ONLY be called in vsf_dwcotg_hcd_get_fifo_size
+extern usb_device_speed_t vsf_dwcotg_get_cur_speed(vk_usbh_hcd_t *hcd);
+
 #ifdef __cplusplus
 }
 #endif
