@@ -141,7 +141,7 @@ void * vk_usbh_hid_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
     uint_fast8_t epaddr;
 
     if (has_hid_desc) {
-        if (0 <= vk_usbh_get_extra_descriptor((uint8_t *)desc_ifs,
+        if (0 > vk_usbh_get_extra_descriptor((uint8_t *)desc_ifs,
                 parser_alt->desc_size, USB_DT_HID, (void **)&desc_hid)) {
             return NULL;
         }

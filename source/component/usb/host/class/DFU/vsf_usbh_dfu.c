@@ -287,7 +287,7 @@ static void *__vk_usbh_dfu_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_if
     usb_dfu_functional_descriptor_t *functional_desc;
     vk_usbh_dfu_t *dfu;
 
-    if (0 <= vk_usbh_get_extra_descriptor((uint8_t *)desc_ifs, parser_alt->desc_size,
+    if (0 > vk_usbh_get_extra_descriptor((uint8_t *)desc_ifs, parser_alt->desc_size,
                             USB_DT_DFU_FUNCTIONAL, (void **)&functional_desc)) {
         return NULL;
     }
