@@ -232,6 +232,7 @@
     <strong>IO Type Qualifiers</strong> are used
     \li to specify the access to peripheral variables.
     \li for automatic generation of peripheral register debug information.
+*/
 #ifndef __I
   #ifdef __cplusplus
     #define   __I     volatile           /*!< Defines 'read only' permissions */
