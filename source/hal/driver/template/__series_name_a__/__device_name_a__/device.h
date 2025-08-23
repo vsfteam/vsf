@@ -40,7 +40,8 @@
  *      Usually these information are not visible from user side to avoid name-space pollution.
  */
 
-#include "vendor_header.h"
+#   define __VSF_HEADER_ONLY_SHOW_VENDOR_INFO__
+#   include "vendor_header.h"
 
 #else
 
