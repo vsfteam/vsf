@@ -21,7 +21,7 @@
 #define __VSF_MULTIPLEX_SPI_CLASS_IMPLEMENT
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_SPI == ENABLED && VSF_HAL_USE_MULTIPLEX_CS_SPI == ENABLED
+#if VSF_HAL_USE_SPI == ENABLED && VSF_HAL_USE_GPIO == ENABLED && VSF_HAL_USE_MULTIPLEX_CS_SPI == ENABLED
 
 #include "hal/driver/driver.h"
 
