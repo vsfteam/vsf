@@ -42,8 +42,8 @@
 
 /* below is vendor specified device part, put vendor-specified code(not vsf specified) here */
 
-#ifndef __VSF_HAL_DEVICE_NATIONS_N32H76X_H__
-#define __VSF_HAL_DEVICE_NATIONS_N32H76X_H__
+#ifndef __VSF_HAL_DEVICE_NATIONS_N32H76X_N32H78X_H__
+#define __VSF_HAL_DEVICE_NATIONS_N32H76X_N32H78X_H__
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -52,6 +52,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#endif      // __VSF_HAL_DEVICE_NATIONS_N32H76X_H__
+#endif      // __VSF_HAL_DEVICE_NATIONS_N32H76X_N32H78X_H__
 #endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_NATIONS_N32H76X_COMMON_H__
-#define __HAL_DRIVER_NATIONS_N32H76X_COMMON_H__
+#ifndef __HAL_DRIVER_NATIONS_N32H76X_N32H78X_COMMON_H__
+#define __HAL_DRIVER_NATIONS_N32H76X_N32H78X_COMMON_H__
 
 /* \note common.h should only be included by device.h */
 
@@ -44,7 +44,7 @@
 #define vsf_hw_peripheral_enable        vsf_hw_clkrst_region_set_bit
 #define vsf_hw_peripheral_disable       vsf_hw_clkrst_region_clear_bit
 
-#define VSF_SYSTIMER_FREQ               vsf_hw_clk_get_freq_hz(&VSF_HW_CLK_SYS)
+#define VSF_SYSTIMER_FREQ               vsf_hw_clk_get_freq_hz(&VSF_HW_CLK_SYSTICK)
 
 /*============================ TYPES =========================================*/
 
@@ -970,6 +970,44 @@ extern const vsf_hw_clk_t VSF_HW_CLK_MSI;
 extern const vsf_hw_clk_t VSF_HW_CLK_LSI;
 
 extern const vsf_hw_clk_t VSF_HW_CLK_SYS;
+extern const vsf_hw_clk_t VSF_HW_CLK_SYSBUS;
+extern const vsf_hw_clk_t VSF_HW_CLK_CPU;
+extern const vsf_hw_clk_t VSF_HW_CLK_SYSTICK;
+extern const vsf_hw_clk_t VSF_HW_CLK_AXI;
+#define VSF_HW_CLK_AHB1                 VSF_HW_CLK_SYSBUS
+#define VSF_HW_CLK_AHB2                 VSF_HW_CLK_SYSBUS
+#define VSF_HW_CLK_AHB5                 VSF_HW_CLK_SYSBUS
+#define VSF_HW_CLK_AHB6                 VSF_HW_CLK_AXI
+#define VSF_HW_CLK_AHB9                 VSF_HW_CLK_SYSBUS
+extern const vsf_hw_clk_t VSF_HW_CLK_APB1;
+extern const vsf_hw_clk_t VSF_HW_CLK_APB2;
+extern const vsf_hw_clk_t VSF_HW_CLK_APB5;
+extern const vsf_hw_clk_t VSF_HW_CLK_APB6;
+extern const vsf_hw_clk_t VSF_HW_CLK_PERI;
+
+extern const vsf_hw_clk_t VSF_HW_CLK_SDRAM;
+
+#if VSF_HAL_USE_SDIO == ENABLED
+#   define VSF_HW_CLK_SDMMC1_BUS        VSF_HW_CLK_AHB6
+extern const vsf_hw_clk_t VSF_HW_CLK_SDMMC1;
+
+#   define VSF_HW_CLK_SDMMC2_BUS        VSF_HW_CLK_AHB1
+extern const vsf_hw_clk_t VSF_HW_CLK_SDMMC2;
+#endif
+
+#if VSF_HAL_USE_USART == ENABLED
+extern const vsf_hw_clk_t VSF_HW_CLK_USART1_2;
+#   define VSF_HW_CLK_USART3_4          VSF_HW_CLK_APB1
+#   define VSF_HW_CLK_USART5_6_7_8      VSF_HW_CLK_APB2
+#   define VSF_HW_CLK_UART9_10_11_12    VSF_HW_CLK_APB1
+#   define VSF_HW_CLK_UART13_14_15      VSF_HW_CLK_APB2
+#endif
+
+#if VSF_HAL_USE_SPI == ENABLED
+#   define VSF_HW_CLK_SPI1_2            VSF_HW_CLK_APB2
+#   define VSF_HW_CLK_SPI3              VSF_HW_CLK_APB1
+#   define VSF_HW_CLK_SPI4_5_6_7        VSF_HW_CLK_APB5
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
@@ -992,23 +1030,23 @@ extern vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *
 /**
  \~english
  @brief configure frequency range of pll input/output clocks
- @param[in] clk: a pointer to PLL_VCO clock
-                VSF_HW_CLK_PLL0_VCO
-                VSF_HW_CLK_PLL1_VCO
-                VSF_HW_CLK_PLL2_VCO
+ @param[in] clk: a pointer to PLL clock
+                VSF_HW_CLK_PLL1
+                VSF_HW_CLK_PLL2
+                VSF_HW_CLK_PLL3
  @param[in] src_prescaler: prescaler of clock src, [1 .. 63]
- @param[in] vco_freq_hz: VCO frequency in Hz
+ @param[in] freq_hz_out: PLL output frequency in Hz
 
  \~chinese
  @brief 配置 PLL 输入输出时钟的频率范围
- @param[in] clk: 指向 PLL_VCO 的时钟
-                VSF_HW_CLK_PLL0_VCO
-                VSF_HW_CLK_PLL1_VCO
-                VSF_HW_CLK_PLL2_VCO
+ @param[in] clk: 指向 PLL 的时钟
+                VSF_HW_CLK_PLL1
+                VSF_HW_CLK_PLL2
+                VSF_HW_CLK_PLL3
  @param[in] src_prescaler: 时钟源分频系数，1 到 63
- @param[in] vco_freq_hz: VCO 时钟频率，单位 Hz
+ @param[in] freq_hz_out: PLL 输出时钟频率，单位 Hz
  */
-extern vsf_err_t vsf_hw_pll_vco_config(const vsf_hw_clk_t *clk, uint_fast8_t src_prescaler, uint32_t vco_freq_hz);
+extern vsf_err_t vsf_hw_pll_vco_config(const vsf_hw_clk_t *clk, uint_fast8_t src_prescaler, uint32_t freq_hz_out);
 
 #endif
 /* EOF */

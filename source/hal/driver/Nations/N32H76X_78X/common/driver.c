@@ -80,11 +80,11 @@ enum {
 struct vsf_hw_clk_t {
     union {
         uint32_t clksel_region;
-        uint32_t clkdly_region;         // for HSE/HSI/MSI/LISI/LSE/SECLSI constant clocks(clktype is VSF_HW_CLK_TYPE_CONST)
+        uint32_t clkdly_region;         // for HSE/HSI/MSI/LISI/LSE/SECLSI constant clocks(clksrc_type is VSF_HW_CLK_TYPE_CONST)
     };
     union {
         uint32_t clkprescaler_region;
-        uint32_t clkdly;                // for HSE/HSI/MSI/LISI/LSE/SECLSI constant clocks(clktype is VSF_HW_CLK_TYPE_CONST)
+        uint32_t clkdly;                // for HSE/HSI/MSI/LISI/LSE/SECLSI constant clocks(clksrc_type is VSF_HW_CLK_TYPE_CONST)
     };
     uint32_t clken_region;
     uint32_t clkrdy_region;
@@ -93,47 +93,71 @@ struct vsf_hw_clk_t {
         const vsf_hw_clk_t * const *clksel_mapper;
         uint32_t clk_freq_hz;
         const vsf_hw_clk_t *clksrc;
-        uint32_t clkbp_region;
     };
     union {
-        const uint8_t *clkprescaler_mapper;
+        const uint16_t *clkprescaler_mapper;
         uint32_t prescaler;
         uint32_t (*getclk)(const vsf_hw_clk_t *clk, uint32_t clksrc_freq_hz, uint32_t prescaler);
         uint32_t clkdly_en_region;
     };
 
-    uint8_t clktype;
+    uint8_t clksrc_type;
     uint8_t clkprescaler_type;
     uint8_t clkprescaler_min;
     uint8_t clkprescaler_max;
 };
 
 /*============================ PROTOTYPES ====================================*/
+
+static uint32_t __vsf_hw_pll_getclk(const vsf_hw_clk_t *clk, uint32_t clksrc_freq_hz, uint32_t prescaler);
+
 /*============================ GLOBAL VARIABLES ==============================*/
 
+#ifdef HSE_VALUE
 const vsf_hw_clk_t VSF_HW_CLK_HSE = {
     .clken_region               = VSF_HW_CLKRST_REGION(0x0C, 2, 1), // RCC_SRCCTRL1.HSEEN
     .clkrdy_region              = VSF_HW_CLKRST_REGION(0x0C, 3, 1), // RCC_SRCCTRL1.HSERDF
-    .clkdly_region              = VSF_HW_CLKRST_REGION(0x68, 0, 32),// RCC_HSERDDL.DELAY
-    .clkbp_region               = VSF_HW_CLKRST_REGION(0x0C, 4, 1), // RCC_SRCCTRL1.HSEBP
-    .clkdly_en_region           = VSF_HW_CLKRST_REGION(0x0C, 8, 1), // RCC_SRCCTRL1.HSERDCNTEN
 
     .clk_freq_hz                = HSE_VALUE,
-    .clktype                    = VSF_HW_CLK_TYPE_CONST,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CONST,
+#   ifdef HSE_STARTUP_TIMEOUT
     .clkdly                     = HSE_STARTUP_TIMEOUT,
+    .clkdly_en_region           = VSF_HW_CLKRST_REGION(0x0C, 8, 1), // RCC_SRCCTRL1.HSERDCNTEN
+    .clkdly_region              = VSF_HW_CLKRST_REGION(0x68, 0, 32),// RCC_HSERDDL.DELAY
+#   endif
 };
 
+// s_hse_rdy_cg_clk
+const vsf_hw_clk_t VSF_HW_CLK_HSE_CG = {
+    .clken_region               = VSF_HW_CLKRST_REGION(0x5A, 13, 1),// RCC_CFG4.HSECGEN
+
+    .clksrc                     = &VSF_HW_CLK_HSE,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+};
+
+// s_hse_rdy_ker_cg_clk
+const vsf_hw_clk_t VSF_HW_CLK_HSE_KER_CG = {
+    .clken_region               = VSF_HW_CLKRST_REGION(0x5A, 12, 1),// RCC_CFG4.HSEKERCGEN
+
+    .clksrc                     = &VSF_HW_CLK_HSE,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+};
+#endif
+
+#ifdef LSE_VALUE
 const vsf_hw_clk_t VSF_HW_CLK_LSE = {
     .clken_region               = VSF_HW_CLKRST_REGION(0x49, 4, 1), // RCC_BDCTRL.LSEEN
     .clkrdy_region              = VSF_HW_CLKRST_REGION(0x49, 5, 1), // RCC_BDCTRL.LSERDF
-    .clkdly_region              = VSF_HW_CLKRST_REGION(0x66, 0, 32),// RCC_LSERDDL.DELAY
-    .clkbp_region               = VSF_HW_CLKRST_REGION(0x49, 6, 1), // RCC_BDCTRL.LSEBP
-    .clkdly_en_region          = VSF_HW_CLKRST_REGION(0x49, 22, 1),// RCC_BDCTRL.LSERDCNTEN
 
-    .clk_freq_hz                = HSE_VALUE,
-    .clktype                    = VSF_HW_CLK_TYPE_CONST,
+    .clk_freq_hz                = LSE_VALUE,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CONST,
+#   ifdef LSE_STARTUP_TIMEOUT
     .clkdly                     = LSE_STARTUP_TIMEOUT,
+    .clkdly_region              = VSF_HW_CLKRST_REGION(0x66, 0, 32),// RCC_LSERDDL.DELAY
+    .clkdly_en_region          = VSF_HW_CLKRST_REGION(0x49, 22, 1),// RCC_BDCTRL.LSERDCNTEN
+#   endif
 };
+#endif
 
 const vsf_hw_clk_t VSF_HW_CLK_HSI = {
     .clken_region               = VSF_HW_CLKRST_REGION(0x0C, 0, 1), // RCC_SRCCTRL1.HSIEN
@@ -141,30 +165,472 @@ const vsf_hw_clk_t VSF_HW_CLK_HSI = {
     // hsi has no clock delay register
 
     .clk_freq_hz                = HSI_VALUE,
-    .clktype                    = VSF_HW_CLK_TYPE_CONST,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CONST,
+#   ifdef HSI_STARTUP_TIMEOUT
     .clkdly                     = HSI_STARTUP_TIMEOUT,
+#   endif
+};
+
+static const uint16_t __VSF_HW_CLK_SYSBUS_PRESCALER[16] = {
+    1, 2, 0, 8, 0, 0, 16, 32, 64, 128, 256, 512, 0, 0, 0
+};
+static const vsf_hw_clk_t __VSF_HW_CLK_HSI_RDY = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x10, 20, 4),// RCC_SYSBUSDIV1.HSIDIV
+
+    .clksrc                     = &VSF_HW_CLK_HSI,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+    .clkprescaler_mapper        = __VSF_HW_CLK_SYSBUS_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_SYSBUS_PRESCALER) - 1,
+};
+
+const vsf_hw_clk_t VSF_HW_CLK_HSI_CG = {
+    .clken_region               = VSF_HW_CLKRST_REGION(0x5A, 15, 1),// RCC_CFG4.HSICGEN
+
+    .clksrc                     = &__VSF_HW_CLK_HSI_RDY,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+};
+
+const vsf_hw_clk_t VSF_HW_CLK_HSI_KER_CG = {
+    .clken_region               = VSF_HW_CLKRST_REGION(0x5A, 14, 1),// RCC_CFG4.HSIKERCGEN
+
+    .clksrc                     = &__VSF_HW_CLK_HSI_RDY,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
 };
 
 const vsf_hw_clk_t VSF_HW_CLK_MSI = {
     .clken_region               = VSF_HW_CLKRST_REGION(0x0C, 6, 1), // RCC_SRCCTRL1.MSIEN
-    .clkrdy_region              = VSF_HW_CLKRST_REGION(0x0C, 7, 1), // RCC_SRCCTRL1.MSIRDF
     .clkdly_region              = VSF_HW_CLKRST_REGION(0x65, 0, 32),// RCC_MSIRDDL.DELAY
-    .clkdly_en_region           =VSF_HW_CLKRST_REGION(0x0C, 22, 1),// RCC_SRCCTRL1.MSIRDCNTEN
 
     .clk_freq_hz                = MSI_VALUE,
-    .clktype                    = VSF_HW_CLK_TYPE_CONST,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CONST,
+#   ifdef MSI_STARTUP_TIMEOUT
     .clkdly                     = MSI_STARTUP_TIMEOUT,
+    .clkrdy_region              = VSF_HW_CLKRST_REGION(0x0C, 7, 1), // RCC_SRCCTRL1.MSIRDF
+    .clkdly_en_region           = VSF_HW_CLKRST_REGION(0x0C, 22, 1),// RCC_SRCCTRL1.MSIRDCNTEN
+#   endif
+};
+
+static const vsf_hw_clk_t __VSF_HW_CLK_MSI_RDY = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x10, 4, 4), // RCC_SYSBUSDIV1.MSIDIV
+
+    .clksrc                     = &VSF_HW_CLK_MSI,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+    .clkprescaler_mapper        = __VSF_HW_CLK_SYSBUS_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_SYSBUS_PRESCALER) - 1,
+};
+
+const vsf_hw_clk_t VSF_HW_CLK_MSI_CG = {
+    .clken_region               = VSF_HW_CLKRST_REGION(0x5A, 11, 1),// RCC_CFG4.MSICGEN
+
+    .clksrc                     = &__VSF_HW_CLK_MSI_RDY,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+};
+
+const vsf_hw_clk_t VSF_HW_CLK_MSI_KER_CG = {
+    .clken_region               = VSF_HW_CLKRST_REGION(0x5A, 10, 1),// RCC_CFG4.MSIKERCGEN
+
+    .clksrc                     = &__VSF_HW_CLK_MSI_RDY,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
 };
 
 const vsf_hw_clk_t VSF_HW_CLK_LSI = {
     .clken_region               = VSF_HW_CLKRST_REGION(0x49, 0, 1), // RCC_BDCTRL.LSIEN
-    .clkrdy_region              = VSF_HW_CLKRST_REGION(0x49, 1, 1), // RCC_BDCTRL.LSIRDF
-    .clkbp_region               = VSF_HW_CLKRST_REGION(0x0C, 4, 1), // RCC_SRCCTRL1.HSEBP
 
     .clk_freq_hz                = LSI_VALUE,
-    .clktype                    = VSF_HW_CLK_TYPE_CONST,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CONST,
+#   ifdef LSI_STARTUP_TIMEOUT
     .clkdly                     = LSI_STARTUP_TIMEOUT,
+    .clkrdy_region              = VSF_HW_CLKRST_REGION(0x49, 1, 1), // RCC_BDCTRL.LSIRDF
+#   endif
 };
+
+static const vsf_hw_clk_t * const __VSF_HW_CLK_PLL_CLKSEL_MAPPER[4] = {
+    &VSF_HW_CLK_HSI, NULL, &VSF_HW_CLK_MSI, &VSF_HW_CLK_HSE,
+};
+
+const vsf_hw_clk_t VSF_HW_CLK_PLL1 = {
+    .clken_region               = VSF_HW_CLKRST_REGION(0x00, 0, 32),// RCC_PLL1CTRL1
+
+    .clksel_mapper              = __VSF_HW_CLK_PLL_CLKSEL_MAPPER,
+    .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
+
+    .getclk                     = __vsf_hw_pll_getclk,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_FUNC,
+};
+const vsf_hw_clk_t VSF_HW_CLK_PLL2 = {
+    .clken_region               = VSF_HW_CLKRST_REGION(0x04, 0, 32),// RCC_PLL2CTRL1
+
+    .clksel_mapper              = __VSF_HW_CLK_PLL_CLKSEL_MAPPER,
+    .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
+
+    .getclk                     = __vsf_hw_pll_getclk,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_FUNC,
+};
+const vsf_hw_clk_t VSF_HW_CLK_PLL3 = {
+    .clken_region               = VSF_HW_CLKRST_REGION(0x08, 0, 32),// RCC_PLL3CTRL1
+
+    .clksel_mapper              = __VSF_HW_CLK_PLL_CLKSEL_MAPPER,
+    .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
+
+    .getclk                     = __vsf_hw_pll_getclk,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_FUNC,
+};
+const vsf_hw_clk_t VSF_HW_CLK_SHRPLL = {
+    .clken_region               = VSF_HW_CLKRST_REGION(0x63, 0, 32),// RCC_SHRPLLCTRL1
+
+    .clksel_mapper              = __VSF_HW_CLK_PLL_CLKSEL_MAPPER,
+    .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
+
+    .getclk                     = __vsf_hw_pll_getclk,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_FUNC,
+};
+
+const vsf_hw_clk_t VSF_HW_CLK_PLL1A = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x0D, 0, 6), // RCC_PLL1DIV.PLL1ADIV
+
+    .clksrc                     = &VSF_HW_CLK_PLL1,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 1,
+    .clkprescaler_max           = 63,
+};
+const vsf_hw_clk_t VSF_HW_CLK_PLL1B = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x0D, 8, 6), // RCC_PLL1DIV.PLL1BDIV
+
+    .clksrc                     = &VSF_HW_CLK_PLL1,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 1,
+    .clkprescaler_max           = 63,
+};
+const vsf_hw_clk_t VSF_HW_CLK_PLL1C = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x0D, 16, 6),// RCC_PLL1DIV.PLL1CDIV
+
+    .clksrc                     = &VSF_HW_CLK_PLL1,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 1,
+    .clkprescaler_max           = 63,
+};
+
+const vsf_hw_clk_t VSF_HW_CLK_PLL2A = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x0E, 0, 6), // RCC_PLL2DIV.PLL2ADIV
+
+    .clksrc                     = &VSF_HW_CLK_PLL1,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 1,
+    .clkprescaler_max           = 63,
+};
+const vsf_hw_clk_t VSF_HW_CLK_PLL2B = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x0E, 8, 6), // RCC_PLL2DIV.PLL2BDIV
+
+    .clksrc                     = &VSF_HW_CLK_PLL1,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 1,
+    .clkprescaler_max           = 63,
+};
+const vsf_hw_clk_t VSF_HW_CLK_PLL2C = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x0E, 16, 6),// RCC_PLL2DIV.PLL2CDIV
+
+    .clksrc                     = &VSF_HW_CLK_PLL1,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 1,
+    .clkprescaler_max           = 63,
+};
+
+const vsf_hw_clk_t VSF_HW_CLK_PLL3A = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x0F, 0, 6), // RCC_PLL3DIV.PLL3ADIV
+
+    .clksrc                     = &VSF_HW_CLK_PLL1,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 1,
+    .clkprescaler_max           = 63,
+};
+const vsf_hw_clk_t VSF_HW_CLK_PLL3B = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x0F, 8, 6), // RCC_PLL3DIV.PLL3BDIV
+
+    .clksrc                     = &VSF_HW_CLK_PLL1,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 1,
+    .clkprescaler_max           = 63,
+};
+const vsf_hw_clk_t VSF_HW_CLK_PLL3C = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x0F, 16, 6),// RCC_PLL3DIV.PLL3CDIV
+
+    .clksrc                     = &VSF_HW_CLK_PLL1,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 1,
+    .clkprescaler_max           = 63,
+};
+
+static const vsf_hw_clk_t * const __VSF_HW_CLK_SYS_CLKSEL_MAPPER[4] = {
+    &VSF_HW_CLK_HSI_CG, &VSF_HW_CLK_MSI_CG, &VSF_HW_CLK_HSE_CG, &VSF_HW_CLK_PLL1A,
+};
+const vsf_hw_clk_t VSF_HW_CLK_SYS = {
+    .clksel_region              = VSF_HW_CLKRST_REGION(0x0C, 24, 2),// RCC_SRCCTRL1.SCLKSW
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x10, 0, 4), // RCC_SYSBUSDIV1.SCLKDIV
+
+    .clksel_mapper              = __VSF_HW_CLK_SYS_CLKSEL_MAPPER,
+    .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
+
+    .clkprescaler_mapper        = __VSF_HW_CLK_SYSBUS_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_SYSBUS_PRESCALER) - 1,
+};
+
+const vsf_hw_clk_t VSF_HW_CLK_SYSBUS = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x10, 8, 4), // RCC_SYSBUSDIV1.BUSDIV
+
+    .clksrc                     = &VSF_HW_CLK_SYS,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_mapper        = __VSF_HW_CLK_SYSBUS_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_SYSBUS_PRESCALER) - 1,
+};
+
+const vsf_hw_clk_t VSF_HW_CLK_AXISYS = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x10, 12, 4),// RCC_SYSBUSDIV1.AXIDIV
+
+    .clksrc                     = &VSF_HW_CLK_SYS,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_mapper        = __VSF_HW_CLK_SYSBUS_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_SYSBUS_PRESCALER) - 1,
+};
+
+const vsf_hw_clk_t VSF_HW_CLK_M7HYP = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x10, 16, 4),// RCC_SYSBUSDIV1.M7HYPDIV
+
+    .clksrc                     = &VSF_HW_CLK_PLL2A,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_mapper        = __VSF_HW_CLK_SYSBUS_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_SYSBUS_PRESCALER) - 1,
+};
+
+#if     defined(CORE_CM7)
+static const vsf_hw_clk_t * const __VSF_HW_CLK_CPU_CLKSEL_MAPPER[2] = {
+    &VSF_HW_CLK_SYS, &VSF_HW_CLK_M7HYP
+};
+const vsf_hw_clk_t VSF_HW_CLK_CPU = {
+    .clksel_region              = VSF_HW_CLKRST_REGION(0x5B, 17, 1),// RCC_SRCCTRL2.M7HYPSEL
+
+    .clksel_mapper              = __VSF_HW_CLK_CPU_CLKSEL_MAPPER,
+    .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
+};
+const vsf_hw_clk_t VSF_HW_CLK_SYSTICK = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x59, 4, 4), // RCC_CFG3.M7STCLKDIV
+
+    .clksrc                     = &VSF_HW_CLK_CPU,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_mapper        = __VSF_HW_CLK_SYSBUS_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_SYSBUS_PRESCALER) - 1,
+};
+#elif   defined(CORE_CM4)
+const vsf_hw_clk_t VSF_HW_CLK_CPU = {
+    .clksrc                     = &VSF_HW_CLK_SYSBUS,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+};
+const vsf_hw_clk_t VSF_HW_CLK_SYSTICK = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x59, 0, 4), // RCC_CFG3.M4STCLKDIV
+
+    .clksrc                     = &VSF_HW_CLK_CPU,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_mapper        = __VSF_HW_CLK_SYSBUS_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_SYSBUS_PRESCALER) - 1,
+};
+#endif
+
+const vsf_hw_clk_t VSF_HW_CLK_AXIHYP = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x10, 24, 4),// RCC_SYSBUSDIV1.AXIHYPDIV
+
+    .clksrc                     = &VSF_HW_CLK_M7HYP,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_mapper        = __VSF_HW_CLK_SYSBUS_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_SYSBUS_PRESCALER) - 1,
+};
+
+static const vsf_hw_clk_t * const __VSF_HW_CLK_AXI_CLKSEL_MAPPER[4] = {
+    &VSF_HW_CLK_AXISYS, &VSF_HW_CLK_AXIHYP,
+};
+const vsf_hw_clk_t VSF_HW_CLK_AXI = {
+    .clksel_region              = VSF_HW_CLKRST_REGION(0x5B, 16, 1),// RCC_SRCCTRL2.AXIHYPSEL
+
+    .clksel_mapper              = __VSF_HW_CLK_AXI_CLKSEL_MAPPER,
+    .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
+};
+
+static const uint16_t __VSF_HW_CLK_APB_PRESCALER[8] = {
+    [0]                         = 1,
+    [4]                         = 2,
+    [5]                         = 4,
+    [6]                         = 8,
+    [7]                         = 16,
+};
+const vsf_hw_clk_t VSF_HW_CLK_APB1 = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x11, 0, 3), // RCC_SYSBUSDIV2.APB1DIV
+
+    .clksrc                     = &VSF_HW_CLK_SYSBUS,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_mapper        = __VSF_HW_CLK_APB_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_APB_PRESCALER) - 1,
+};
+const vsf_hw_clk_t VSF_HW_CLK_APB2 = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x11, 8, 3), // RCC_SYSBUSDIV2.APB2DIV
+
+    .clksrc                     = &VSF_HW_CLK_SYSBUS,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_mapper        = __VSF_HW_CLK_APB_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_APB_PRESCALER) - 1,
+};
+const vsf_hw_clk_t VSF_HW_CLK_APB5 = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x11, 16, 3),// RCC_SYSBUSDIV2.APB5DIV
+
+    .clksrc                     = &VSF_HW_CLK_SYSBUS,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_mapper        = __VSF_HW_CLK_APB_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_APB_PRESCALER) - 1,
+};
+const vsf_hw_clk_t VSF_HW_CLK_APB6 = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x11, 24, 3),// RCC_SYSBUSDIV2.APB6DIV
+
+    .clksrc                     = &VSF_HW_CLK_AXI,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_mapper        = __VSF_HW_CLK_APB_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_APB_PRESCALER) - 1,
+};
+
+static const vsf_hw_clk_t * const __VSF_HW_CLK_PERI_CLKSEL_MAPPER[4] = {
+    &VSF_HW_CLK_HSI_KER_CG, NULL, &VSF_HW_CLK_MSI_KER_CG, &VSF_HW_CLK_HSE_KER_CG,
+};
+const vsf_hw_clk_t VSF_HW_CLK_PERI = {
+    .clksel_region              = VSF_HW_CLKRST_REGION(0x59, 12, 2),// RCC_CFG3.PERSW
+
+    .clksel_mapper              = __VSF_HW_CLK_PERI_CLKSEL_MAPPER,
+    .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
+};
+
+const vsf_hw_clk_t VSF_HW_CLK_SDRAM_AXI = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x5E, 8, 4), // RCC_AXIDIV2.SDRAMMEMDIV
+
+    .clksrc                     = &VSF_HW_CLK_AXI,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_mapper        = __VSF_HW_CLK_SYSBUS_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_SYSBUS_PRESCALER) - 1,
+    
+};
+static const vsf_hw_clk_t * const __VSF_HW_CLK_SDRAM_CLKSEL_MAPPER[8] = {
+    &VSF_HW_CLK_SDRAM_AXI, &VSF_HW_CLK_PERI, &VSF_HW_CLK_PLL2A, &VSF_HW_CLK_PLL3A, &VSF_HW_CLK_PLL1B,
+};
+const vsf_hw_clk_t VSF_HW_CLK_SDRAM = {
+    .clksel_region              = VSF_HW_CLKRST_REGION(0x5F, 8, 3), // RCC_AXISEL2.SDRAMMEMSEL
+
+    .clksel_mapper              = __VSF_HW_CLK_SDRAM_CLKSEL_MAPPER,
+    .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
+};
+
+#if VSF_HAL_USE_SDIO == ENABLED
+const vsf_hw_clk_t VSF_HW_CLK_SDMMC1_AXI = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x4E, 20, 4),// RCC_AXIDIV1.ADMMC1AXIDIV
+
+    .clksrc                     = &VSF_HW_CLK_AXI,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_mapper        = __VSF_HW_CLK_SYSBUS_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_SYSBUS_PRESCALER) - 1,
+    
+};
+static const vsf_hw_clk_t * const __VSF_HW_CLK_SDMMC1_CLKSEL_MAPPER[8] = {
+    &VSF_HW_CLK_SDMMC1_AXI, &VSF_HW_CLK_PERI, &VSF_HW_CLK_PLL2A, &VSF_HW_CLK_PLL3A, &VSF_HW_CLK_PLL1B,
+};
+const vsf_hw_clk_t VSF_HW_CLK_SDMMC1 = {
+    .clksel_region              = VSF_HW_CLKRST_REGION(0x4F, 20, 3),// RCC_AXISEL2.SDMMC1KERSEL
+
+    .clksel_mapper              = __VSF_HW_CLK_SDMMC1_CLKSEL_MAPPER,
+    .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
+};
+
+// todo:
+static const vsf_hw_clk_t * const __VSF_HW_CLK_SDMMC2_CLKSEL_MAPPER[8] = {
+    /*&VSF_HW_CLK_SDMMC2_AXI*/NULL, &VSF_HW_CLK_PERI, &VSF_HW_CLK_PLL2A, &VSF_HW_CLK_PLL3A, &VSF_HW_CLK_PLL1B,
+};
+const vsf_hw_clk_t VSF_HW_CLK_SDMMC2 = {
+    .clksel_region              = VSF_HW_CLKRST_REGION(0x14, 12, 3),// RCC_AHB1SEL1.SDMMC2KERSEL
+
+    .clksel_mapper              = __VSF_HW_CLK_SDMMC2_CLKSEL_MAPPER,
+    .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
+};
+#endif
+
+#if VSF_HAL_USE_I2C == ENABLED
+
+#endif
+
+#if VSF_HAL_USE_USART == ENABLED
+const vsf_hw_clk_t VSF_HW_CLK_USART1_2 = {
+    .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x1D, 28, 3),// RCC_APB1DIV1.APB1USARTDIV
+
+    .clksrc                     = &VSF_HW_CLK_APB1,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_mapper        = __VSF_HW_CLK_APB_PRESCALER,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_APB_PRESCALER) - 1,
+};
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -231,7 +697,7 @@ const vsf_hw_clk_t * vsf_hw_clk_get_src(const vsf_hw_clk_t *clk)
 {
     VSF_HAL_ASSERT(clk != NULL);
 
-    switch (clk->clktype) {
+    switch (clk->clksrc_type) {
     case VSF_HW_CLK_TYPE_CLK:
         return clk->clksrc;
     case VSF_HW_CLK_TYPE_SEL:
@@ -244,7 +710,7 @@ const vsf_hw_clk_t * vsf_hw_clk_get_src(const vsf_hw_clk_t *clk)
 static uint32_t __vsf_hw_clk_get_src_freq_hz(const vsf_hw_clk_t *clk)
 {
     VSF_HAL_ASSERT(clk != NULL);
-    switch (clk->clktype) {
+    switch (clk->clksrc_type) {
     case VSF_HW_CLK_TYPE_CONST:
         return clk->clk_freq_hz;
     case VSF_HW_CLK_TYPE_CLK:
@@ -351,7 +817,7 @@ vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc,
     VSF_HAL_ASSERT(clk != NULL);
     if (clksrc != NULL) {
         VSF_HAL_ASSERT(clk->clksel_region != 0);
-        if (clk->clktype != VSF_HW_CLK_TYPE_SEL) {
+        if (clk->clksrc_type != VSF_HW_CLK_TYPE_SEL) {
             VSF_HAL_ASSERT(false);
             return VSF_ERR_INVALID_PARAMETER;
         }
@@ -414,6 +880,16 @@ vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc,
         return vsf_hw_clk_config(clk, NULL, clk_freq_hz / freq_hz, 0);
     }
     return VSF_ERR_NONE;
+}
+
+
+
+static uint32_t __vsf_hw_pll_getclk(const vsf_hw_clk_t *clk, uint32_t clksrc_freq_hz, uint32_t prescaler)
+{
+    uint32_t *ctrl = &(((uint32_t *)RCC)[clk->clken_region >> 16]);
+    uint32_t clkr = ctrl[1] >> 26;
+    uint32_t clkf = ctrl[1] & ((1 << 26) - 1);
+    return (uint32_t)((((uint64_t)clksrc_freq_hz * clkf) >> 14) / (clkr + 1));
 }
 
 
