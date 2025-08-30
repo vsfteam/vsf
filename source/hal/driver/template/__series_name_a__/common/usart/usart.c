@@ -34,6 +34,11 @@
 
 #include "hal/vsf_hal.h"
 
+// HW
+// for vendor headers
+#include "hal/driver/vendor_driver.h"
+// HW end
+
 /*============================ MACROS ========================================*/
 
 /*\note VSF_HW_USART_CFG_MULTI_CLASS is only for drivers for specified device(hw drivers).

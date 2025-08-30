@@ -35,6 +35,11 @@
 
 #include "hal/vsf_hal.h"
 
+// HW
+// for vendor headers
+#include "hal/driver/vendor_driver.h"
+// HW end
+
 /*============================ ETHROS ========================================*/
 
 /*\note VSF_HW_ETH_CFG_MULTI_CLASS is only for drivers for specified device(hw drivers).
