@@ -194,12 +194,12 @@ typedef enum vsf_usart_irq_mask_t {
 
     // only include VSF_USART_IRQ_MASK_TX_IDLE if hardware supports TX_IDLE interrupt
 //    VSF_USART_IRQ_MASK_TX_IDLE          = (0x1ul << 10),
-//#define VSF_USART_IRQ_MASK_TX_IDLE
+//#define VSF_USART_IRQ_MASK_TX_IDLE      VSF_USART_IRQ_MASK_TX_IDLE
 
     // only include VSF_USART_IRQ_MASK_RX_IDLE if hardware supports configurable RX_IDLE count and RX_IDLE interrupt
     // or VSF_USART_IRQ_MASK_RX_IDLE will be mapped to VSF_USART_IRQ_MASK_RX_TIMEOUT
 //    VSF_USART_IRQ_MASK_RX_IDLE          = (0x1ul << 11),
-//#define VSF_USART_IRQ_MASK_RX_IDLE
+//#define VSF_USART_IRQ_MASK_RX_IDLE      VSF_USART_IRQ_MASK_RX_IDLE
 
     // more vendor specified irq_masks can be added here
 } vsf_usart_irq_mask_t;

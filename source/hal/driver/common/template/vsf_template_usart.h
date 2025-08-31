@@ -513,7 +513,7 @@ typedef enum vsf_usart_irq_mask_t {
      * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_TX_IDLE 并且实现同名宏
      */
     VSF_USART_IRQ_MASK_TX_IDLE          = (0x1ul << 10), //!< \~english TX idle(all data in fifo in TXed on the bus) interrupt \~chinese 发送空闲中断 (所有数据在总线上发送完成)
-#   define VSF_USART_IRQ_MASK_TX_IDLE
+#   define VSF_USART_IRQ_MASK_TX_IDLE   VSF_USART_IRQ_MASK_TX_IDLE
 
     /**
      * \~english
@@ -526,7 +526,7 @@ typedef enum vsf_usart_irq_mask_t {
      *      如果硬件不支持此中断，不要定义 VSF_USART_IRQ_MASK_RX_IDLE 宏， VSF_USART_IRQ_MASK_RX_IDLE 将会用 VSF_USART_IRQ_MASK_RX_TIMEOUT
      */
     VSF_USART_IRQ_MASK_RX_IDLE          = (0x1ul << 11), //!< \~english RX idle(rx_idle_cnt in vsf_usart_cfg_t passed and no data receivced) interrupt \~chinese 接收空闲中断 (vsf_usart_cfg_t 中的 rx_idle_cnt 时间内，未收到数据)
-#   define VSF_USART_IRQ_MASK_RX_IDLE
+#   define VSF_USART_IRQ_MASK_RX_IDLE   VSF_USART_IRQ_MASK_RX_IDLE
 } vsf_usart_irq_mask_t;
 #endif
 
