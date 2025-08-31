@@ -493,16 +493,40 @@ enum {
  * 这些中断提供 USART 操作的状态和事件通知
  */
 typedef enum vsf_usart_irq_mask_t {
-    VSF_USART_IRQ_MASK_TX_CPL         = (0x1ul << 0),  //!< \~english TX complete interrupt \~chinese 发送完成中断
-    VSF_USART_IRQ_MASK_RX_CPL         = (0x1ul << 1),  //!< \~english RX complete interrupt \~chinese 接收完成中断
-    VSF_USART_IRQ_MASK_TX             = (0x1ul << 2),  //!< \~english TX FIFO threshold interrupt \~chinese 发送 FIFO 阈值中断
-    VSF_USART_IRQ_MASK_RX             = (0x1ul << 3),  //!< \~english RX FIFO threshold interrupt \~chinese 接收 FIFO 阈值中断
-    VSF_USART_IRQ_MASK_RX_TIMEOUT     = (0x1ul << 4),  //!< \~english RX timeout interrupt \~chinese 接收超时中断
-    VSF_USART_IRQ_MASK_CTS            = (0x1ul << 5),  //!< \~english CTS change interrupt \~chinese CTS 变化中断
-    VSF_USART_IRQ_MASK_FRAME_ERR       = (0x1ul << 6),  //!< \~english Frame error interrupt \~chinese 帧错误中断
-    VSF_USART_IRQ_MASK_PARITY_ERR      = (0x1ul << 7),  //!< \~english Parity error interrupt \~chinese 奇偶校验错误中断
-    VSF_USART_IRQ_MASK_BREAK_ERR       = (0x1ul << 8),  //!< \~english Break error interrupt \~chinese BREAK 信号错误中断
+    VSF_USART_IRQ_MASK_TX_CPL           = (0x1ul << 0),  //!< \~english TX complete(for request_tx API, data is written to TX FIFO) interrupt \~chinese 发送完成中断 ( request_tx 完成，所有数据已写入 FIFO )
+    VSF_USART_IRQ_MASK_RX_CPL           = (0x1ul << 1),  //!< \~english RX complete(for request_rx API, data is read from RX FIFO) interrupt \~chinese 接收完成中断 ( request_rx 完成，需要的数据已从 FIFO 读取)
+    VSF_USART_IRQ_MASK_TX               = (0x1ul << 2),  //!< \~english TX FIFO threshold interrupt \~chinese 发送 FIFO 阈值中断
+    VSF_USART_IRQ_MASK_RX               = (0x1ul << 3),  //!< \~english RX FIFO threshold interrupt \~chinese 接收 FIFO 阈值中断
+    VSF_USART_IRQ_MASK_RX_TIMEOUT       = (0x1ul << 4),  //!< \~english RX timeout interrupt \~chinese 接收超时中断
+    VSF_USART_IRQ_MASK_CTS              = (0x1ul << 5),  //!< \~english CTS change interrupt \~chinese CTS 变化中断
+    VSF_USART_IRQ_MASK_FRAME_ERR        = (0x1ul << 6),  //!< \~english Frame error interrupt \~chinese 帧错误中断
+    VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 7),  //!< \~english Parity error interrupt \~chinese 奇偶校验错误中断
+    VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 8),  //!< \~english Break error interrupt \~chinese BREAK 信号错误中断
     VSF_USART_IRQ_MASK_OVERFLOW_ERR     = (0x1ul << 9),  //!< \~english Overflow error interrupt \~chinese 溢出错误中断
+
+    /**
+     * \~english
+     * @brief USART TX idle interrupt, all data is outputed on the TX line
+     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_TX_IDLE in vsf_usart_irq_mask_t and define a MACRO
+     * \~chinese
+     * @brief USART 发送空闲中断，所有数据已从 TX 脚发送完成
+     * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_TX_IDLE 并且实现同名宏
+     */
+    VSF_USART_IRQ_MASK_TX_IDLE          = (0x1ul << 10), //!< \~english TX idle(all data in fifo in TXed on the bus) interrupt \~chinese 发送空闲中断 (所有数据在总线上发送完成)
+#   define VSF_USART_IRQ_MASK_TX_IDLE
+
+    /**
+     * \~english
+     * @brief USART RX idle interrupt, dedicated and configurable usart clock passed and no data received
+     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_RX_IDLE in vsf_usart_irq_mask_t and define a MACRO
+     *       If hardware does not support this, no not implement VSF_USART_IRQ_MASK_RX_IDLE MACRO, and VSF_USART_IRQ_MASK_RX_IDLE will be VSF_USART_IRQ_MASK_RX_TIMEOUT
+     * \~chinese
+     * @brief USART 接受空闲中断，特定并且可配置的串口时钟后，仍旧未收到数据
+     * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_RX_IDLE 并且实现同名宏
+     *      如果硬件不支持此中断，不要定义 VSF_USART_IRQ_MASK_RX_IDLE 宏， VSF_USART_IRQ_MASK_RX_IDLE 将会用 VSF_USART_IRQ_MASK_RX_TIMEOUT
+     */
+    VSF_USART_IRQ_MASK_RX_IDLE          = (0x1ul << 11), //!< \~english RX idle(rx_idle_cnt in vsf_usart_cfg_t passed and no data receivced) interrupt \~chinese 接收空闲中断 (vsf_usart_cfg_t 中的 rx_idle_cnt 时间内，未收到数据)
+#   define VSF_USART_IRQ_MASK_RX_IDLE
 } vsf_usart_irq_mask_t;
 #endif
 
@@ -513,7 +537,9 @@ typedef enum vsf_usart_irq_mask_t {
  * @brief USART 中断和控制标志
  */
 enum {
+#ifndef VSF_USART_IRQ_MASK_RX_IDLE
     VSF_USART_IRQ_MASK_RX_IDLE              = VSF_USART_IRQ_MASK_RX_TIMEOUT,     //!< \~english RX idle timeout interrupt mask \~chinese RX 空闲超时中断掩码
+#endif
     VSF_USART_IRQ_MASK_TX_FIFO_THRESHOLD    = VSF_USART_IRQ_MASK_TX,            //!< \~english TX FIFO threshold interrupt mask \~chinese TX FIFO 阈值中断掩码
     VSF_USART_IRQ_MASK_RX_FIFO_THRESHOLD    = VSF_USART_IRQ_MASK_RX,            //!< \~english RX FIFO threshold interrupt mask \~chinese RX FIFO 阈值中断掩码
 
@@ -528,6 +554,12 @@ enum {
     VSF_USART_IRQ_ALL_BITS_MASK             = VSF_USART_IRQ_MASK_TX            //!< \~english All supported interrupt mask bits \~chinese 全部支持的中断掩码位
                                             | VSF_USART_IRQ_MASK_RX
                                             | VSF_USART_IRQ_MASK_RX_TIMEOUT
+#ifdef VSF_USART_IRQ_MASK_RX_IDLE
+                                            | VSF_USART_IRQ_MASK_RX_IDLE
+#endif
+#ifdef VSF_USART_IRQ_MASK_TX_IDLE
+                                            | VSF_USART_IRQ_MASK_TX_IDLE
+#endif
                                             | VSF_USART_IRQ_MASK_CTS
                                             | VSF_USART_IRQ_MASK_TX_CPL
                                             | VSF_USART_IRQ_MASK_RX_CPL
@@ -629,6 +661,9 @@ typedef struct vsf_usart_cfg_t {
     uint32_t                mode;           //!< \~english USART working mode \~chinese USART 工作模式
     uint32_t                baudrate;       //!< \~english Baudrate in Hz \~chinese 波特率(Hz)
     uint32_t                rx_timeout;     //!< \~english RX timeout in microseconds \~chinese 接收超时时间(微秒)
+#   ifdef VSF_USART_IRQ_MASK_RX_IDLE
+    uint32_t                rx_idle_cnt;
+#   endif
     vsf_usart_isr_t         isr;            //!< \~english Interrupt configuration \~chinese 中断配置
 } vsf_usart_cfg_t;
 #endif

@@ -192,6 +192,15 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 8),
     VSF_USART_IRQ_MASK_OVERFLOW_ERR     = (0x1ul << 9),
 
+    // only include VSF_USART_IRQ_MASK_TX_IDLE if hardware supports TX_IDLE interrupt
+//    VSF_USART_IRQ_MASK_TX_IDLE          = (0x1ul << 10),
+//#define VSF_USART_IRQ_MASK_TX_IDLE
+
+    // only include VSF_USART_IRQ_MASK_RX_IDLE if hardware supports configurable RX_IDLE count and RX_IDLE interrupt
+    // or VSF_USART_IRQ_MASK_RX_IDLE will be mapped to VSF_USART_IRQ_MASK_RX_TIMEOUT
+//    VSF_USART_IRQ_MASK_RX_IDLE          = (0x1ul << 11),
+//#define VSF_USART_IRQ_MASK_RX_IDLE
+
     // more vendor specified irq_masks can be added here
 } vsf_usart_irq_mask_t;
 #endif
@@ -199,9 +208,9 @@ typedef enum vsf_usart_irq_mask_t {
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
 typedef enum vsf_usart_ctrl_t {
     // usart default command
-    VSF_USART_CTRL_SEND_BREAK    = (0x01ul << 0),
-    VSF_USART_CTRL_SET_BREAK     = (0x01ul << 1),
-    VSF_USART_CTRL_CLEAR_BREAK   = (0x01ul << 2),
+    VSF_USART_CTRL_SEND_BREAK           = (0x01ul << 0),
+    VSF_USART_CTRL_SET_BREAK            = (0x01ul << 1),
+    VSF_USART_CTRL_CLEAR_BREAK          = (0x01ul << 2),
 
     // more vendor specified commnad can be added here
 } vsf_usart_ctrl_t;
@@ -245,6 +254,9 @@ typedef struct vsf_usart_cfg_t {
     uint32_t                mode;
     uint32_t                baudrate;
     uint32_t                rx_timeout;
+#   ifdef VSF_USART_IRQ_MASK_RX_IDLE
+    uint32_t                rx_idle_cnt;
+#   endif
     vsf_usart_isr_t         isr;
 
     // more vendor specified cfg can be added here
