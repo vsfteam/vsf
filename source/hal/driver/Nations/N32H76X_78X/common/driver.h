@@ -67,7 +67,7 @@
 //#       include "../common/trng/trng.h"
 #   endif
 #   if VSF_HAL_USE_USART == ENABLED
-//#       include "../common/uart/uart.h"
+#       include "../common/usart/usart.h"
 #   endif
 #   if VSF_HAL_USE_USB == ENABLED
 //#       include "../common/usb/usb.h"

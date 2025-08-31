@@ -1001,6 +1001,22 @@ extern const vsf_hw_clk_t VSF_HW_CLK_USART1_2;
 #   define VSF_HW_CLK_USART5_6_7_8      VSF_HW_CLK_APB2
 #   define VSF_HW_CLK_UART9_10_11_12    VSF_HW_CLK_APB1
 #   define VSF_HW_CLK_UART13_14_15      VSF_HW_CLK_APB2
+
+#   define VSF_HW_CLK_USART1            VSF_HW_CLK_USART1_2
+#   define VSF_HW_CLK_USART2            VSF_HW_CLK_USART1_2
+#   define VSF_HW_CLK_USART3            VSF_HW_CLK_USART3_4
+#   define VSF_HW_CLK_USART4            VSF_HW_CLK_USART3_4
+#   define VSF_HW_CLK_USART5            VSF_HW_CLK_USART5_6_7_8
+#   define VSF_HW_CLK_USART6            VSF_HW_CLK_USART5_6_7_8
+#   define VSF_HW_CLK_USART7            VSF_HW_CLK_USART5_6_7_8
+#   define VSF_HW_CLK_USART8            VSF_HW_CLK_USART5_6_7_8
+#   define VSF_HW_CLK_UART9             VSF_HW_CLK_UART9_10_11_12
+#   define VSF_HW_CLK_UART10            VSF_HW_CLK_UART9_10_11_12
+#   define VSF_HW_CLK_UART11            VSF_HW_CLK_UART9_10_11_12
+#   define VSF_HW_CLK_UART12            VSF_HW_CLK_UART9_10_11_12
+#   define VSF_HW_CLK_UART13            VSF_HW_CLK_UART13_14_15
+#   define VSF_HW_CLK_UART14            VSF_HW_CLK_UART13_14_15
+#   define VSF_HW_CLK_UART15            VSF_HW_CLK_UART13_14_15
 #endif
 
 #if VSF_HAL_USE_SPI == ENABLED
