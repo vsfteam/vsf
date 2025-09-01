@@ -109,11 +109,6 @@ VSF_CAL_WEAK(vsf_hal_pre_startup_init)
 void vsf_hal_pre_startup_init(void)
 {
 //    SystemInit();
-
-    while (1) {
-        GPIOA->PBSC = 1 << 0;
-        GPIOA->PBC = 1 << 0;
-    }
 }
 
 /*----------------------------------------------------------------------------
