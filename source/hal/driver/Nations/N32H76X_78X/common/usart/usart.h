@@ -104,14 +104,14 @@ typedef enum vsf_usart_mode_t {
 #define VSF_USART_SYNC_CLOCK_LAST_BIT_MASK      VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE | VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE
 
     // 12|14..19: RXFTCFG(5..7)/TXFTCFG(2..4)/EN(0) in USART_FIFO, left shifted by 12
-    VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL        = (7 << 2) << 12,
+    VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL        = ((7 << 2) | (1 << 0)) << 12,
     VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY      = ((2 << 2) | (1 << 0)) << 12,
     VSF_USART_TX_FIFO_THRESHOLD_ONE_EIGHTH      = ((0 << 2) | (1 << 0)) << 12,
     VSF_USART_TX_FIFO_THRESHOLD_QUARTER         = ((1 << 2) | (1 << 0)) << 12,
     VSF_USART_TX_FIFO_THRESHOLD_THREE_FOURTH    = ((1 << 2) | (1 << 0)) << 12,
     VSF_USART_TX_FIFO_THRESHOLD_EMPTY           = ((5 << 2) | (1 << 0)) << 12,
 
-    VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY       = (7 << 5) << 12,
+    VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY       = ((7 << 5) | (1 << 0)) << 12,
     VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL       = ((2 << 5) | (1 << 0)) << 12,
     VSF_USART_RX_FIFO_THRESHOLD_ONE_EIGHTH      = ((0 << 5) | (1 << 0)) << 12,
     VSF_USART_RX_FIFO_THRESHOLD_QUARTER         = ((1 << 5) | (1 << 0)) << 12,

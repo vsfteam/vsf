@@ -61,6 +61,7 @@ typedef struct VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) {
     bool                    is_rxne;
     bool                    is_txnf;
     IRQn_Type               irqn;
+    uint32_t                irq_mask;
     vsf_usart_isr_t         isr;
 } VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t);
 // HW end
@@ -85,17 +86,40 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     VSF_HAL_ASSERT(NULL != cfg_ptr);
 
     USART_Module *reg = usart_ptr->reg;
-    uint32_t uclk = vsf_hw_clk_get_freq_hz(usart_ptr->clk);
+    uint32_t pclk = vsf_hw_clk_get_freq_hz(usart_ptr->clk), intdiv, fradiv;
     uint32_t mode = cfg_ptr->mode;
     bool over8 = !!(mode & VSF_USART_OVERSAMPLE_MASK);
+    uint32_t baudval = cfg_ptr->baudrate;
+    uint32_t enabled = reg->CTRL1 & USART_CTRL1_UEN, ctrl;
 
-    // TODO: baudrate
+    vsf_hw_peripheral_enable(usart_ptr->en);
+    vsf_hw_peripheral_rst_set(usart_ptr->rst);
+    vsf_hw_peripheral_rst_clear(usart_ptr->rst);
+    usart_ptr->irq_mask = 0;
+
     if (over8) {
+        /* oversampling by 8, configure the value of USART_BAUD */
+        intdiv = ((25 * (pclk / 2)) / baudval);
     } else {
+        /* oversampling by 16, configure the value of USART_BAUD */
+        intdiv = ((25 * (pclk / 4)) / baudval);
     }
+    ctrl = intdiv / 100;
+    fradiv = intdiv - (100 * ctrl);
+    ctrl  <<= 4;
+    if (over8) {
+        fradiv = ((((fradiv * 8) + 50) / 100)) & ((uint8_t)0x0F);
+        if(fradiv == 0x08) {
+            ctrl = ctrl + 0x10; 
+        } else {
+            ctrl |= fradiv;
+        }
+    } else {
+        ctrl += ((((fradiv * 16) + 50) / 100)) & ((uint8_t)0x1F);
+    }
+    reg->BRCF = ctrl;
 
     // mode
-    uint32_t enabled = reg->CTRL1 & USART_CTRL1_UEN, ctrl;
     if (enabled) {
         reg->CTRL1 &= ~USART_CTRL1_UEN;
     }
@@ -130,14 +154,14 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     ctrl &= ~(  (__VSF_HW_USART_FIFO_MASK ^ __VSF_HW_USART_FIFO_SHIFT_MASK)
             |   (__VSF_HW_USART_FIFO_SHIFT_MASK >> __VSF_HW_USART_FIFO_SHIFT_BITS));
     mode = (mode & __VSF_HW_USART_FIFO_MASK) >> __VSF_HW_USART_FIFO_SHIFT_BITS;
-    if ((mode & USART_FIFO_RXFTCFG_MASK) != (3 << 5)) {
-        ctrl |= mode & (VSF_USART_TX_FIFO_THRESHOLD_MASK >> __VSF_HW_USART_FIFO_SHIFT_BITS);
+    if ((mode & USART_FIFO_RXFTCFG_MASK) != USART_FIFO_RXFTCFG_MASK) {
+        ctrl |= mode & (VSF_USART_RX_FIFO_THRESHOLD_MASK >> __VSF_HW_USART_FIFO_SHIFT_BITS);
         usart_ptr->is_rxne = false;
     } else {
         usart_ptr->is_rxne = true;
     }
-    if ((mode & USART_FIFO_TXFTCFG_MASK) != (3 << 2)) {
-        ctrl |= mode & (VSF_USART_RX_FIFO_THRESHOLD_MASK >> __VSF_HW_USART_FIFO_SHIFT_BITS);
+    if ((mode & USART_FIFO_TXFTCFG_MASK) != USART_FIFO_TXFTCFG_MASK) {
+        ctrl |= mode & (VSF_USART_TX_FIFO_THRESHOLD_MASK >> __VSF_HW_USART_FIFO_SHIFT_BITS);
         usart_ptr->is_txnf = false;
     } else {
         usart_ptr->is_txnf = true;
@@ -193,11 +217,12 @@ void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_enable)(
 
     USART_Module *reg = usart_ptr->reg;
 
-    if ((irq_mask & VSF_USART_IRQ_MASK_RX) && (usart_ptr->is_rxne)) {
+    usart_ptr->irq_mask |= irq_mask;
+    if ((irq_mask & VSF_USART_IRQ_MASK_RX) && !usart_ptr->is_rxne) {
         irq_mask &= ~VSF_USART_IRQ_MASK_RX;
         reg->FIFO |= USART_FIFO_RXFTIEN;
     }
-    if ((irq_mask & VSF_USART_IRQ_MASK_TX) && (usart_ptr->is_txnf)) {
+    if ((irq_mask & VSF_USART_IRQ_MASK_TX) && !usart_ptr->is_txnf) {
         irq_mask &= ~VSF_USART_IRQ_MASK_TX;
         reg->FIFO |= USART_FIFO_TXFTIEN;
     }
@@ -216,11 +241,12 @@ void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_disable)(
 
     USART_Module *reg = usart_ptr->reg;
 
-    if ((irq_mask & VSF_USART_IRQ_MASK_RX) && (usart_ptr->is_rxne)) {
+    usart_ptr->irq_mask &= ~irq_mask;
+    if ((irq_mask & VSF_USART_IRQ_MASK_RX) && !usart_ptr->is_rxne) {
         irq_mask &= ~VSF_USART_IRQ_MASK_RX;
         reg->FIFO &= ~USART_FIFO_RXFTIEN;
     }
-    if ((irq_mask & VSF_USART_IRQ_MASK_TX) && (usart_ptr->is_txnf)) {
+    if ((irq_mask & VSF_USART_IRQ_MASK_TX) && !usart_ptr->is_txnf) {
         irq_mask &= ~VSF_USART_IRQ_MASK_TX;
         reg->FIFO &= ~USART_FIFO_TXFTIEN;
     }
@@ -311,9 +337,8 @@ vsf_usart_capability_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
         .min_baudrate                = 0,
         .min_data_bits               = 8,
         .max_data_bits               = 9,
-        // TODO:
-        .txfifo_depth                = 0,
-        .rxfifo_depth                = 0,
+        .txfifo_depth                = 8,
+        .rxfifo_depth                = 8,
         .support_rx_timeout          = 1,
         .support_send_break          = 1,
         .support_set_and_clear_break = 0,
@@ -349,6 +374,7 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
         irq_mask_out |= VSF_USART_IRQ_MASK_RX_TIMEOUT;
     }
 
+    irq_mask_out &= usart_ptr->irq_mask;
     if ((irq_mask_out != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_usart_t *)usart_ptr, irq_mask_out);
     }
