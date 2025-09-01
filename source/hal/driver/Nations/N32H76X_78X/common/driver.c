@@ -172,7 +172,7 @@ const vsf_hw_clk_t VSF_HW_CLK_HSI = {
 };
 
 static const uint16_t __VSF_HW_CLK_SYSBUS_PRESCALER[16] = {
-    1, 2, 0, 8, 0, 0, 16, 32, 64, 128, 256, 512, 0, 0, 0
+    1, 2, 4, 0, 8, 0, 0, 16, 32, 64, 128, 256, 512, 0, 0, 0
 };
 static const vsf_hw_clk_t __VSF_HW_CLK_HSI_RDY = {
     .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x10, 20, 4),// RCC_SYSBUSDIV1.HSIDIV
