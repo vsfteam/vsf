@@ -105,25 +105,7 @@ vsf_err_t vsf_real_flash_erase_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_
 #endif
 
 #if VSF_FLASH_CFG_ERASE_MULTI_SECTOR_TEMPLATE == ENABLED
-vsf_err_t vsf_real_flash_erase_multi_sector(vsf_real_flash_t *real_flash_ptr, vsf_flash_size_t offset, vsf_flash_size_t size)
-{
-    VSF_ASSERT(real_flash_ptr != 0);
-
-    vsf_flash_capability_t flash_capability = vsf_real_flash_capability(real_flash_ptr);
-
-    VSF_ASSERT((offset % flash_capability.erase_sector_size) == 0);
-    VSF_ASSERT(flash_capability.erase_sector_size != 0);
-    VSF_ASSERT((size % flash_capability.erase_sector_size) == 0);
-
-    for (vsf_flash_size_t i = 0; i < size; i += flash_capability.erase_sector_size) {
-        vsf_err_t err = vsf_real_flash_erase_one_sector(real_flash_ptr, offset + i);
-        if (err != VSF_ERR_NONE) {
-            return err;
-        }
-    }
-
-    return VSF_ERR_NONE;
-}
+#   error not supported yet
 #endif
 
 #if VSF_FLASH_CFG_ERASE_ALL_TEMPLATE == ENABLED
@@ -154,24 +136,7 @@ vsf_err_t vsf_real_flash_write_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_
 #endif
 
 #if VSF_FLASH_CFG_WRITE_MULTI_SECTOR_TEMPLATE == ENABLED
-vsf_err_t vsf_real_flash_write_multi_sector(vsf_real_flash_t *real_flash_ptr, vsf_flash_size_t offset, uint8_t* buffer, vsf_flash_size_t size)
-{
-    VSF_ASSERT(real_flash_ptr != 0);
-
-    vsf_flash_capability_t flash_capability = vsf_real_flash_capability(real_flash_ptr);
-    VSF_ASSERT((size % flash_capability.write_sector_size) == 0);
-    VSF_ASSERT(flash_capability.none_sector_aligned_write || ((offset % flash_capability.write_sector_size) == 0));
-
-    for (vsf_flash_size_t i = 0; i < size; i += flash_capability.write_sector_size) {
-        vsf_flash_size_t current_size = vsf_min(flash_capability.write_sector_size, size - i);
-        vsf_err_t err = vsf_real_flash_write_one_sector(real_flash_ptr, offset + i, buffer + i, current_size);
-        if (err != VSF_ERR_NONE) {
-            return err;
-        }
-    }
-
-    return VSF_ERR_NONE;
-}
+#   error not supported yet
 #endif
 
 #if VSF_FLASH_CFG_READ_ONE_SECTOR_TEMPLATE == ENABLED
@@ -188,25 +153,7 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 #endif
 
 #if VSF_FLASH_CFG_READ_MULTI_SECTOR_TEMPLATE == ENABLED
-vsf_err_t vsf_real_flash_read_multi_sector(vsf_real_flash_t *real_flash_ptr, vsf_flash_size_t offset, uint8_t* buffer, vsf_flash_size_t size)
-{
-    VSF_ASSERT(real_flash_ptr != 0);
-
-    vsf_flash_capability_t flash_capability = vsf_real_flash_capability(real_flash_ptr);
-
-    VSF_ASSERT((size % flash_capability.write_sector_size) == 0);
-    VSF_ASSERT(flash_capability.can_read_any_address || ((offset % flash_capability.write_sector_size) == 0));
-
-    for (vsf_flash_size_t i = 0; i < size; i += flash_capability.write_sector_size) {
-        vsf_flash_size_t current_size = vsf_min(flash_capability.write_sector_size, size - i);
-        vsf_err_t err = vsf_real_flash_read_one_sector(real_flash_ptr, offset + i, buffer + i, current_size);
-        if (err != VSF_ERR_NONE) {
-            return err;
-        }
-    }
-
-    return VSF_ERR_NONE;
-}
+#   error not supported yet
 #endif
 
 /*============================ MACROS ========================================*/

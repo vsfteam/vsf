@@ -203,9 +203,6 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _flash_irqhandler)(
  *  VSF_FLASH_CFG_ERASE_ONE_SECTOR_TEMPLATE         implement erase_one_sector by erase_multi_sector in template
  *  VSF_FLASH_CFG_WRITE_ONE_SECTOR_TEMPLATE         implement write_one_sector by write_multi_sector in template
  *  VSF_FLASH_CFG_READ_ONE_SECTOR_TEMPLATE          implement read_one_sector by read_multi_sector in template
- *  VSF_FLASH_CFG_ERASE_MULTI_SECTOR_TEMPLATE       implement erase_multi_sector by erase_one_sector in template
- *  VSF_FLASH_CFG_WRITE_MULTI_SECTOR_TEMPLATE       implement write_multi_sector by write_one_sector in template
- *  VSF_FLASH_CFG_READ_MULTI_SECTOR_TEMPLATE        implement read_multi_sector by read_one_sector in template
  */
 
 // only define in source file

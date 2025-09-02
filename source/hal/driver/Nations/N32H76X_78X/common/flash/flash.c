@@ -196,8 +196,8 @@ vsf_flash_capability_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
     return (vsf_flash_capability_t) {
         .irq_mask              = VSF_FLASH_IRQ_ALL_BITS_MASK,
         .base_address          = FLASH_BASE,
-        // TODO:
-        .max_size              = 4 * 1024 * 1024,
+        // TODO: get real flash size
+        .max_size              = (4 * 1024 - 128) * 1024,
         .erase_sector_size     = 4096,
         .write_sector_size     = 256,
         .none_sector_aligned_write = 1,
@@ -213,9 +213,6 @@ vsf_flash_capability_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
  *  VSF_FLASH_CFG_ERASE_ONE_SECTOR_TEMPLATE         implement erase_one_sector by erase_multi_sector in template
  *  VSF_FLASH_CFG_WRITE_ONE_SECTOR_TEMPLATE         implement write_one_sector by write_multi_sector in template
  *  VSF_FLASH_CFG_READ_ONE_SECTOR_TEMPLATE          implement read_one_sector by read_multi_sector in template
- *  VSF_FLASH_CFG_ERASE_MULTI_SECTOR_TEMPLATE       implement erase_multi_sector by erase_one_sector in template
- *  VSF_FLASH_CFG_WRITE_MULTI_SECTOR_TEMPLATE       implement write_multi_sector by write_one_sector in template
- *  VSF_FLASH_CFG_READ_MULTI_SECTOR_TEMPLATE        implement read_multi_sector by read_one_sector in template
  */
 
 // only define in source file
