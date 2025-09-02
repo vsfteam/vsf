@@ -234,7 +234,7 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)(
     vsf_flash_isr_t *isr_ptr = &flash_ptr->isr;
     if (    (flash_ptr->irq_mask & VSF_FLASH_IRQ_READ_MASK)
         &&  (isr_ptr->handler_fn != NULL)) {
-        flash_ptr->isr.handler_fn(isr_ptr->target_ptr, (vsf_flash_t *)flash_ptr, VSF_FLASH_IRQ_READ_MASK);
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_flash_t *)flash_ptr, VSF_FLASH_IRQ_READ_MASK);
     }
     return VSF_ERR_NONE;
 }

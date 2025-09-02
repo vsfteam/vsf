@@ -346,11 +346,7 @@
 
 // FLASH
 
-#define VSF_HW_FLASH_COUNT                          0
-//#define VSF_HW_FLASH0_ADDR                          FLASH_BASE
-//#define VSF_HW_FLASH0_REG_BASE                      FMC
-//#define VSF_HW_FLASH0_IRQN                          FMC_IRQn
-//#define VSF_HW_FLASH0_IRQHandler                    FMC_IRQHandler
+#define VSF_HW_FLASH_COUNT                          1
 
 // GPIO
 

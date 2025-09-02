@@ -1029,14 +1029,26 @@ void vsf_hw_mpu_add_basic_resgions(void)
                             VSF_ARCH_MPU_CACHABLE_WRITE_THROUGH_NOALLOC);
 
     // AHB SRAM, 352K from 0x30000000
-    vsf_arch_mpu_add_region(0x30000000, 352 * 1024,
+    vsf_arch_mpu_add_region(0x30000000, 512 * 1024,
                             VSF_ARCH_MPU_NON_SHARABLE       |
                             VSF_ARCH_MPU_EXECUTABLE         |
                             VSF_ARCH_MPU_ACCESS_FULL        |
                             VSF_ARCH_MPU_CACHABLE_WRITE_BACK_NOALLOC);
 
-    // User FLASH, 4M from 0x08000000
-    vsf_arch_mpu_add_region(0x08000000, 4 * 1024 * 1024,
+    // ROM, 32K from 0x1FFFF0000
+    vsf_arch_mpu_add_region(0x1FFF0000, 32 * 1024,
+                            VSF_ARCH_MPU_NON_SHARABLE       |
+                            VSF_ARCH_MPU_EXECUTABLE         |
+                            VSF_ARCH_MPU_ACCESS_READONLY    |
+                            VSF_ARCH_MPU_CACHABLE_WRITE_THROUGH_NOALLOC);
+
+    // User FLASH, 32M from 0x08000000 and 0x15000000
+    vsf_arch_mpu_add_region(0x08000000, 32 * 1024 * 1024,
+                            VSF_ARCH_MPU_NON_SHARABLE       |
+                            VSF_ARCH_MPU_EXECUTABLE         |
+                            VSF_ARCH_MPU_ACCESS_FULL        |
+                            VSF_ARCH_MPU_CACHABLE_WRITE_THROUGH_NOALLOC);
+    vsf_arch_mpu_add_region(0x15000000, 32 * 1024 * 1024,
                             VSF_ARCH_MPU_NON_SHARABLE       |
                             VSF_ARCH_MPU_EXECUTABLE         |
                             VSF_ARCH_MPU_ACCESS_FULL        |
@@ -1061,8 +1073,30 @@ bool vsf_driver_init(void)
 //    SCB_EnableICache();
 //    SCB_EnableDCache();
 
-//    vsf_hw_mpu_add_basic_resgions();
+    vsf_hw_mpu_add_basic_resgions();
     return true;
+}
+
+
+
+
+
+// workarounds
+
+// no idea why after __WFE is called, SWD will fail
+void vsf_arch_sleep(uint_fast32_t mode)
+{
+    switch (mode) {
+    case 0:     SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;  break;
+    case 1:     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;  break;
+    default:
+        // arm core supports normalsleep(0) and deepsleep(1)
+        // for other vendor specified sleep modes,
+        //  chip vendor should rewrite vsf_arch_sleep in chip driver
+        VSF_ARCH_ASSERT(false);
+    }
+    __DSB();
+//    __WFE();
 }
 
 /* EOF */
