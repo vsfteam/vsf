@@ -38,7 +38,7 @@ extern "C" {
 #define USB_DESC_DFU_IAD(__IFS, __I_FUNC, __PROTOCOL, __DFU_ATTR, __DETACH_TIMEOUT, __TRANSFER_SIZE)\
             USB_DESC_IAD((__IFS), 1, 0xFE, 0x01, (__PROTOCOL), (__I_FUNC))      \
             USB_DESC_DFU((__IFS), (__I_FUNC), (__PROTOCOL), (__DFU_ATTR), (__DETACH_TIMEOUT), (__TRANSFER_SIZE))
-#define USB_DESC_HID_IAD_LEN                    (USB_DESC_IAD_LEN + USB_DESC_DFU_LEN)
+#define USB_DESC_DFU_IAD_LEN                    (USB_DESC_IAD_LEN + USB_DESC_DFU_LEN)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
