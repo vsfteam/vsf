@@ -43,7 +43,7 @@
 //#       include "../common/adc/adc.h"
 #   endif
 #   if VSF_HAL_USE_FLASH == ENABLED
-//#       include "../common/flash/flash.h"
+#       include "../common/flash/flash.h"
 #   endif
 #   if VSF_HAL_USE_GPIO == ENABLED
 //#       include "../common/gpio/gpio.h"

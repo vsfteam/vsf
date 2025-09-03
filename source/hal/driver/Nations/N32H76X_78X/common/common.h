@@ -964,10 +964,33 @@ typedef struct vsf_hw_clk_t vsf_hw_clk_t;
 /*============================ GLOBAL VARIABLES ==============================*/
 
 extern const vsf_hw_clk_t VSF_HW_CLK_HSE;
+    extern const vsf_hw_clk_t VSF_HW_CLK_HSE_CG;
+    extern const vsf_hw_clk_t VSF_HW_CLK_HSE_KER_CG;
 extern const vsf_hw_clk_t VSF_HW_CLK_LSE;
 extern const vsf_hw_clk_t VSF_HW_CLK_HSI;
+    extern const vsf_hw_clk_t VSF_HW_CLK_HSI_CG;
+    extern const vsf_hw_clk_t VSF_HW_CLK_HSI_KER_CG;
 extern const vsf_hw_clk_t VSF_HW_CLK_MSI;
+    extern const vsf_hw_clk_t VSF_HW_CLK_MSI_CG;
+    extern const vsf_hw_clk_t VSF_HW_CLK_MSI_KER_CG;
 extern const vsf_hw_clk_t VSF_HW_CLK_LSI;
+
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL1;
+    extern const vsf_hw_clk_t VSF_HW_CLK_PLL1A;
+    extern const vsf_hw_clk_t VSF_HW_CLK_PLL1B;
+    extern const vsf_hw_clk_t VSF_HW_CLK_PLL1C;
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL2;
+    extern const vsf_hw_clk_t VSF_HW_CLK_PLL2A;
+    extern const vsf_hw_clk_t VSF_HW_CLK_PLL2B;
+    extern const vsf_hw_clk_t VSF_HW_CLK_PLL2C;
+extern const vsf_hw_clk_t VSF_HW_CLK_PLL3;
+    extern const vsf_hw_clk_t VSF_HW_CLK_PLL3A;
+    extern const vsf_hw_clk_t VSF_HW_CLK_PLL3B;
+    extern const vsf_hw_clk_t VSF_HW_CLK_PLL3C;
+extern const vsf_hw_clk_t VSF_HW_CLK_SHRPLL;
+
+extern const vsf_hw_clk_t VSF_HW_CLK_AXISYS;
+extern const vsf_hw_clk_t VSF_HW_CLK_AXIHYP;
 
 extern const vsf_hw_clk_t VSF_HW_CLK_SYS;
 extern const vsf_hw_clk_t VSF_HW_CLK_SYSBUS;
@@ -1050,8 +1073,7 @@ extern vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *
                 VSF_HW_CLK_PLL1
                 VSF_HW_CLK_PLL2
                 VSF_HW_CLK_PLL3
- @param[in] src_prescaler: prescaler of clock src, [1 .. 63]
- @param[in] freq_hz_out: PLL output frequency in Hz
+ @param[in] out_freq_hz: PLL output frequency in Hz
 
  \~chinese
  @brief 配置 PLL 输入输出时钟的频率范围
@@ -1059,10 +1081,9 @@ extern vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *
                 VSF_HW_CLK_PLL1
                 VSF_HW_CLK_PLL2
                 VSF_HW_CLK_PLL3
- @param[in] src_prescaler: 时钟源分频系数，1 到 63
- @param[in] freq_hz_out: PLL 输出时钟频率，单位 Hz
+ @param[in] out_freq_hz: PLL 输出时钟频率，单位 Hz
  */
-extern vsf_err_t vsf_hw_pll_vco_config(const vsf_hw_clk_t *clk, uint_fast8_t src_prescaler, uint32_t freq_hz_out);
+extern vsf_err_t vsf_hw_pll_config(const vsf_hw_clk_t *clk, uint32_t out_freq_hz);
 
 #endif
 /* EOF */

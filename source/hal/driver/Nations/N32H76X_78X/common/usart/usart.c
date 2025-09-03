@@ -97,6 +97,13 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     vsf_hw_peripheral_rst_clear(usart_ptr->rst);
     usart_ptr->irq_mask = 0;
 
+    // pclk for USART is shared, so do not configure the pclk in usart module.
+    // User should have configured the USART clock.
+    if (0 == pclk) {
+        VSF_HAL_ASSERT(false);
+        return VSF_ERR_FAIL;
+    }
+
     if (over8) {
         /* oversampling by 8, configure the value of USART_BAUD */
         intdiv = ((25 * (pclk / 2)) / baudval);
@@ -106,7 +113,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     }
     ctrl = intdiv / 100;
     fradiv = intdiv - (100 * ctrl);
-    ctrl  <<= 4;
+    ctrl <<= 4;
     if (over8) {
         fradiv = ((((fradiv * 8) + 50) / 100)) & ((uint8_t)0x0F);
         if(fradiv == 0x08) {

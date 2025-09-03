@@ -744,7 +744,7 @@ vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc,
 
 vsf_err_t vsf_hw_pll_vco_config(const vsf_hw_clk_t *clk, uint_fast8_t src_prescaler, uint32_t vco_freq_hz)
 {
-    VSF_HAL_ASSERT((clk == &VSF_HW_CLK_PLL0_VCO) || (clk == &VSF_HW_CLK_PLL1_VCO) || (clk == &VSF_HW_CLK_PLL2_VCO));
+    VSF_HAL_ASSERT(clk->getclk == __vsf_hw_pll_get_vco);
     VSF_HAL_ASSERT((src_prescaler > 0) && (src_prescaler < 64));
     VSF_HAL_ASSERT((vco_freq_hz >= 150000000) && (vco_freq_hz <= 836000000));
 

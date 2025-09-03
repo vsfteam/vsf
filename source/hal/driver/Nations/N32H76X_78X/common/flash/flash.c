@@ -193,11 +193,16 @@ vsf_flash_status_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_status)(
 vsf_flash_capability_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)(
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr
 ) {
+    uint32_t flash_size = (DBG->ID >> 6) & 3;
+    flash_size =    (flash_size == 1) ? 2048
+                :   (flash_size == 2) ? 4096
+                :   0;
+    VSF_HAL_ASSERT(flash_size > 0);
+
     return (vsf_flash_capability_t) {
         .irq_mask              = VSF_FLASH_IRQ_ALL_BITS_MASK,
         .base_address          = FLASH_BASE,
-        // TODO: get real flash size
-        .max_size              = (4 * 1024 - 128) * 1024,
+        .max_size              = (flash_size - 128) * 1024,
         .erase_sector_size     = 4096,
         .write_sector_size     = 256,
         .none_sector_aligned_write = 1,

@@ -26,49 +26,10 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef enum vsf_hw_peripheral_clksel_t {
-    // RCU.CFG1
-    VSF_HW_CLKSEL_HPDF                  = VSF_HW_CLKRST_REGION(0x23, 31, 1),// HPDFSEL in RCU.CFG1
-    VSF_HW_CLKSEL_TIMER                 = VSF_HW_CLKRST_REGION(0x23, 24, 1),// TIMERSEL in RCU.CFG1
-    VSF_HW_CLKSEL_USART5                = VSF_HW_CLKRST_REGION(0x23, 22, 2),// USART5SEL in RCU.CFG1
-    VSF_HW_CLKSEL_USART2                = VSF_HW_CLKRST_REGION(0x23, 20, 2),// USART2SEL in RCU.CFG1
-    VSF_HW_CLKSEL_USART1                = VSF_HW_CLKRST_REGION(0x23, 18, 2),// USART1SEL in RCU.CFG1
-    VSF_HW_CLKSEL_PER                   = VSF_HW_CLKRST_REGION(0x23, 14, 2),// PERSEL in RCU.CFG1
-    VSF_HW_CLKSEL_CAN2                  = VSF_HW_CLKRST_REGION(0x23, 12, 2),// CAN2SEL in RCU.CFG1
-    VSF_HW_CLKSEL_CAN1                  = VSF_HW_CLKRST_REGION(0x23, 10, 2),// CAN1SEL in RCU.CFG1
-    VSF_HW_CLKSEL_CAN0                  = VSF_HW_CLKRST_REGION(0x23, 8, 2), // CAN0SEL in RCU.CFG1
-    VSF_HW_CLKSEL_RSPDIF                = VSF_HW_CLKRST_REGION(0x23, 4, 2), // RSPDIFSEL in RCU.CFG1
-    VSF_HW_CLKSEL_USART0                = VSF_HW_CLKRST_REGION(0x23, 0, 2), // USART0SEL in RCU.CFG1
-
-    // RCU.CFG2
-    VSF_HW_CLKSEL_SAI2B1                = VSF_HW_CLKRST_REGION(0x24, 28, 3),// SAI2B1SEL in RCU.CFG2
-    VSF_HW_CLKSEL_SAI2B0                = VSF_HW_CLKRST_REGION(0x24, 24, 3),// SAI2B0SEL in RCU.CFG2
-    VSF_HW_CLKSEL_SAI1                  = VSF_HW_CLKRST_REGION(0x24, 20, 3),// SAI1SEL in RCU.CFG2
-    VSF_HW_CLKSEL_SAI0                  = VSF_HW_CLKRST_REGION(0x24, 16, 3),// SAI0SEL in RCU.CFG2
-    VSF_HW_CLKSEL_CKOUT1                = VSF_HW_CLKRST_REGION(0x24, 12, 3),// CKOUT1SEL in RCU.CFG2
-    VSF_HW_CLKSEL_CKOUT0                = VSF_HW_CLKRST_REGION(0x24, 4, 3), // CKOUT0SEL in RCU.CFG2
-
-    // RCU.CFG3
-    VSF_HW_CLKSEL_ADC2                  = VSF_HW_CLKRST_REGION(0x25, 28, 2),// ADC2SEL in RCU.CFG3
-    VSF_HW_CLKSEL_ADC1                  = VSF_HW_CLKRST_REGION(0x25, 26, 2),// ADC1SEL in RCU.CFG3
-    VSF_HW_CLKSEL_DSPWUS                = VSF_HW_CLKRST_REGION(0x25, 24, 1),// DSPWUSSEL in RCU.CFG3
-    VSF_HW_CLKSEL_SDIO1                 = VSF_HW_CLKRST_REGION(0x25, 12, 1),// SDIO1SEL in RCU.CFG3
-    VSF_HW_CLKSEL_I2C3                  = VSF_HW_CLKRST_REGION(0x25, 4, 2), // I2C3SEL in RCU.CFG3
-    VSF_HW_CLKSEL_I2C2                  = VSF_HW_CLKRST_REGION(0x25, 2, 2), // I2C2SEL in RCU.CFG3
-    VSF_HW_CLKSEL_I2C1                  = VSF_HW_CLKRST_REGION(0x25, 0, 2), // I2C1SEL in RCU.CFG3
-
-    // RCU.CFG4
-    VSF_HW_CLKSEL_EXMC                  = VSF_HW_CLKRST_REGION(0x34, 8, 2), // EXMCSEL in RCU.CFG4
-    VSF_HW_CLKSEL_SDIO0                 = VSF_HW_CLKRST_REGION(0x34, 0, 1), // SDIO0SEL in RCU.CFG4
-} vsf_hw_peripheral_clksel_t;
-
 enum {
     VSF_HW_CLK_PRESCALER_NONE           = 0,
     VSF_HW_CLK_PRESCALER_CONST,
     VSF_HW_CLK_PRESCALER_DIV,
-    VSF_HW_CLK_PRESCALER_ADD1_DIV,
-    VSF_HW_CLK_PRESCALER_SFT,
-    VSF_HW_CLK_PRESCALER_ADD1_SFT,
     VSF_HW_CLK_PRESCALER_FUNC,
 };
 enum {
@@ -253,7 +214,8 @@ static const vsf_hw_clk_t * const __VSF_HW_CLK_PLL_CLKSEL_MAPPER[4] = {
 };
 
 const vsf_hw_clk_t VSF_HW_CLK_PLL1 = {
-    .clken_region               = VSF_HW_CLKRST_REGION(0x00, 0, 32),// RCC_PLL1CTRL1
+    .clken_region               = VSF_HW_CLKRST_REGION(0x00, 18, 1),// RCC_PLL1CTRL1
+    .clksel_region              = VSF_HW_CLKRST_REGION(0x00, 28, 2),// RCC_PLL1CTRL1.PLL1SRC
 
     .clksel_mapper              = __VSF_HW_CLK_PLL_CLKSEL_MAPPER,
     .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
@@ -262,7 +224,8 @@ const vsf_hw_clk_t VSF_HW_CLK_PLL1 = {
     .clkprescaler_type          = VSF_HW_CLK_PRESCALER_FUNC,
 };
 const vsf_hw_clk_t VSF_HW_CLK_PLL2 = {
-    .clken_region               = VSF_HW_CLKRST_REGION(0x04, 0, 32),// RCC_PLL2CTRL1
+    .clken_region               = VSF_HW_CLKRST_REGION(0x04, 18, 1),// RCC_PLL2CTRL1
+    .clksel_region              = VSF_HW_CLKRST_REGION(0x04, 28, 2),// RCC_PLL2CTRL1.PLL2SRC
 
     .clksel_mapper              = __VSF_HW_CLK_PLL_CLKSEL_MAPPER,
     .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
@@ -271,7 +234,8 @@ const vsf_hw_clk_t VSF_HW_CLK_PLL2 = {
     .clkprescaler_type          = VSF_HW_CLK_PRESCALER_FUNC,
 };
 const vsf_hw_clk_t VSF_HW_CLK_PLL3 = {
-    .clken_region               = VSF_HW_CLKRST_REGION(0x08, 0, 32),// RCC_PLL3CTRL1
+    .clken_region               = VSF_HW_CLKRST_REGION(0x08, 18, 1),// RCC_PLL3CTRL1
+    .clksel_region              = VSF_HW_CLKRST_REGION(0x08, 28, 2),// RCC_PLL3CTRL1.PLL3SRC
 
     .clksel_mapper              = __VSF_HW_CLK_PLL_CLKSEL_MAPPER,
     .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
@@ -280,7 +244,8 @@ const vsf_hw_clk_t VSF_HW_CLK_PLL3 = {
     .clkprescaler_type          = VSF_HW_CLK_PRESCALER_FUNC,
 };
 const vsf_hw_clk_t VSF_HW_CLK_SHRPLL = {
-    .clken_region               = VSF_HW_CLKRST_REGION(0x63, 0, 32),// RCC_SHRPLLCTRL1
+    .clken_region               = VSF_HW_CLKRST_REGION(0x63, 18, 1),// RCC_SHRPLLCTRL1
+    .clksel_region              = VSF_HW_CLKRST_REGION(0x63, 28, 2),// RCC_SHRPLLCTRL1.SHRPLLSRC
 
     .clksel_mapper              = __VSF_HW_CLK_PLL_CLKSEL_MAPPER,
     .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
@@ -622,7 +587,7 @@ const vsf_hw_clk_t VSF_HW_CLK_SDMMC2 = {
 const vsf_hw_clk_t VSF_HW_CLK_USART1_2 = {
     .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x1D, 28, 3),// RCC_APB1DIV1.APB1USARTDIV
 
-    .clksrc                     = &VSF_HW_CLK_APB1,
+    .clksrc                     = &VSF_HW_CLK_AHB1,
     .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
 
     .clkprescaler_mapper        = __VSF_HW_CLK_APB_PRESCALER,
@@ -746,32 +711,27 @@ uint32_t vsf_hw_clk_get_freq_hz(const vsf_hw_clk_t *clk)
         VSF_HAL_ASSERT(clk->prescaler > 0);
         clk_freq_hz /= clk->prescaler;
     } else if (clk->clkprescaler_type != VSF_HW_CLK_PRESCALER_NONE) {
-        VSF_HAL_ASSERT(clk->clkprescaler_region != 0);
         bool isfunc = clk->clkprescaler_type == VSF_HW_CLK_PRESCALER_FUNC;
-        uint32_t prescaler =  vsf_hw_clkrst_region_get(clk->clkprescaler_region);
-        if ((clk->clkprescaler_mapper != NULL) && !isfunc) {
-            prescaler = clk->clkprescaler_mapper[prescaler];
-        }
-        if ((prescaler < clk->clkprescaler_min) || (prescaler > clk->clkprescaler_max)) {
-            clk_freq_hz = 0;
-        } else {
-            switch (clk->clkprescaler_type) {
-            case VSF_HW_CLK_PRESCALER_ADD1_DIV:
-                prescaler++;
-                // fall through
-            case VSF_HW_CLK_PRESCALER_DIV:
-                VSF_HAL_ASSERT(prescaler > 0);
-                clk_freq_hz /= prescaler;
-                break;
-            case VSF_HW_CLK_PRESCALER_ADD1_SFT:
-                prescaler++;
-            case VSF_HW_CLK_PRESCALER_SFT:
-                clk_freq_hz >>= prescaler;
-                break;
-            case VSF_HW_CLK_PRESCALER_FUNC:
-                clk_freq_hz = clk->getclk(clk, clk_freq_hz, prescaler);
-                break;
+        uint32_t prescaler = 0;
+
+        if (clk->clkprescaler_region != 0) {
+            prescaler = vsf_hw_clkrst_region_get(clk->clkprescaler_region);
+            if ((clk->clkprescaler_mapper != NULL) && !isfunc) {
+                if ((prescaler < clk->clkprescaler_min) || (prescaler > clk->clkprescaler_max)) {
+                    return 0;
+                }
+                prescaler = clk->clkprescaler_mapper[prescaler];
             }
+        }
+
+        switch (clk->clkprescaler_type) {
+        case VSF_HW_CLK_PRESCALER_DIV:
+            VSF_HAL_ASSERT(prescaler > 0);
+            clk_freq_hz /= prescaler;
+            break;
+        case VSF_HW_CLK_PRESCALER_FUNC:
+            clk_freq_hz = clk->getclk(clk, clk_freq_hz, prescaler);
+            break;
         }
     }
     return clk_freq_hz;
@@ -846,17 +806,6 @@ vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc,
             break;
         case VSF_HW_CLK_PRESCALER_DIV:
             break;
-        case VSF_HW_CLK_PRESCALER_ADD1_SFT:
-            VSF_HAL_ASSERT(!(prescaler & (prescaler - 1)));
-            prescaler = vsf_msb32(prescaler);
-            // fall through
-        case VSF_HW_CLK_PRESCALER_ADD1_DIV:
-            prescaler--;
-            break;
-        case VSF_HW_CLK_PRESCALER_SFT:
-            VSF_HAL_ASSERT(!(prescaler & (prescaler - 1)));
-            prescaler = vsf_msb32(prescaler);
-            break;
         case VSF_HW_CLK_PRESCALER_FUNC:
             VSF_HAL_ASSERT(false);
             return VSF_ERR_INVALID_PARAMETER;
@@ -890,6 +839,177 @@ static uint32_t __vsf_hw_pll_getclk(const vsf_hw_clk_t *clk, uint32_t clksrc_fre
     uint32_t clkr = ctrl[1] >> 26;
     uint32_t clkf = ctrl[1] & ((1 << 26) - 1);
     return (uint32_t)((((uint64_t)clksrc_freq_hz * clkf) >> 14) / (clkr + 1));
+}
+
+// copy RCC_CalculatePLLParam from n32h76x_78x_rcc
+
+#include <math.h>
+
+#define VCO_MIN  300000000 //300M
+#define VCO_MAX  1250000000//1.25G
+#define REF_MIN  1000000   //1M
+#define REF_MAX  64000000  //64M
+#define NR_MIN   1
+#define NR_MAX   64
+#define NF_MIN   2
+#define NF_MAX   4095
+
+/** RCC R_BIT_MASK **/
+#define RCC_REG_BIT_MASK  ((uint32_t)0x00000000)
+
+/**  PLL_clock  **/
+#define RCC_PLL_BWAJ_MASK        (~RCC_PLL1CTRL1_PLL1BWAJ)
+#define RCC_PLL_CLKR_CLKF_MASK   (RCC_REG_BIT_MASK)
+#define RCC_PLL_SRC_MASK         (~RCC_PLL1CTRL1_PLL1SRC)
+#define RCC_PLL_LOCK_FLAG        (RCC_PLL1CTRL1_PLL1PHLK)
+#define RCC_PLL_LDO_ENABLE       (RCC_PLL1CTRL1_PLL1LDOEN)
+#define RCC_PLL_ENABLE           (RCC_PLL1CTRL1_PLL1EN   )
+#define RCC_PLL_RESET_ENABLE     (RCC_PLL1CTRL1_PLL1RST  )
+#define RCC_PLL_POWER_DOWN       (RCC_PLL1CTRL1_PLL1PD   )
+
+#define __RCC_DELAY_US(usec)     do{                                       \
+                                    uint32_t delay_end;                   \
+                                    CPU_DELAY_INTI();                     \
+                                    /* Delay*/                            \
+                                    delay_end = DWT_CYCCNT + (usec * (600000000/1000000)); \
+                                    while(DWT_CYCCNT < delay_end){};      \
+                                    CPU_DELAY_DISABLE();                  \
+                                  }while(0) 
+
+/**
+*\*\name    RCC_CalculatePLLParam.
+*\*\fun     Configures the SHRTPLL clock source and multiplication factor.
+*\*\param   fin(SHRTPLL input frequency):
+*\*\         1000000 ~ 64000000 (Hz)
+*\*\param   fout(SHRTPLL output frequency):
+*\*\         75000000 ~ 1250000000 (Hz)
+*\*\param   Cmd: 
+*\*\          - ENABLE  
+*\*\          - DISABLE 
+*\*\return  ErrorStatus:
+*\*\         - SUCCESS    
+*\*\         - ERROR     
+*\*\note    fout = fin*(CLKF[25:0]/16384)/(CLKR[5:0] +1)
+**/
+VSF_CAL_WEAK(RCC_CalculatePLLParam)
+ErrorStatus RCC_CalculatePLLParam(uint64_t fin, uint64_t fout, uint32_t* nr, uint32_t* nf, uint32_t* wb)
+{ 
+   ErrorStatus status;
+   uint64_t err_t;
+   uint32_t nr_t;
+   uint32_t nf_all;
+   uint32_t nf_int;
+   uint64_t err = (uint64_t)0xFFFFFFFFU;
+       
+   /* get NR NF WB parameter */
+   if ((fin > REF_MAX) || (fin < REF_MIN) || (fout > VCO_MAX) || (fout < VCO_MIN)) 
+   {
+       status = ERROR;
+   } 
+   else 
+   {
+       for ( nr_t = NR_MAX; nr_t >= NR_MIN; nr_t--) 
+       {
+           nf_all = (uint32_t)floor(fout * nr_t * 256 / fin);
+           nf_int = nf_all / 256;
+           if ((nf_int > NF_MAX) || (nf_int < NF_MIN)) 
+           {
+               continue;
+           }
+           if((fin * nf_all / nr_t / 256) > fout)
+           {
+               err_t = ((fin * nf_all / nr_t / 256) - fout);
+           }
+           else
+           {
+               err_t = (fout - (fin * nf_all / nr_t / 256));
+           }
+           if (err_t <= err) 
+           {
+               err = err_t;
+               *nr = nr_t;
+               *nf = nf_all;
+           }
+           else
+           {
+               /* In other cases, the cycle continues*/
+           }
+       }
+       *wb = (uint32_t)floor((*nf / 2 / 256) - 1);
+       if(*wb > 2047)
+       {
+           *wb = 2047;
+       }
+       *nr = *nr - 1;
+       *nf = *nf * 64;
+       status = SUCCESS;       
+   }
+               
+   return status;
+}
+
+vsf_err_t vsf_hw_pll_config(const vsf_hw_clk_t *clk, uint32_t out_freq_hz)
+{
+    VSF_HAL_ASSERT(clk->getclk == __vsf_hw_pll_getclk);
+
+    uint32_t *pll = &(((uint32_t *)RCC)[clk->clken_region >> 16]);
+    if (0 == out_freq_hz) {
+        /* Disable PLL */
+        pll[0] &= ~RCC_PLL_ENABLE;
+        /* Enable PLL reset */
+        pll[0] |= RCC_PLL_RESET_ENABLE;
+        while ((pll[0] & RCC_PLL_LOCK_FLAG) != RCC_REG_BIT_MASK);
+        /* Disable power to analog circuitry in PLL */
+        pll[0] |= RCC_PLL_POWER_DOWN;
+        /* Disable PLL module power */
+        pll[0] &= ~RCC_PLL_LDO_ENABLE;
+        return VSF_ERR_NONE;
+    }
+
+    const vsf_hw_clk_t *clksrc = vsf_hw_clk_get_src(clk);
+    VSF_HAL_ASSERT(clksrc != NULL);
+    uint32_t clksrc_freq_hz = vsf_hw_clk_get_freq_hz(clksrc);
+    VSF_HAL_ASSERT(clksrc_freq_hz != 0);
+    uint32_t nrtmp = 0, nftmp = 0, wbtmp = 0, temp_value1, temp_value2;
+
+    if (RCC_CalculatePLLParam(clksrc_freq_hz, out_freq_hz, &nrtmp, &nftmp, &wbtmp) == SUCCESS) {
+        /* get the register value */
+        temp_value1 = pll[0];
+        temp_value2 = pll[1];
+
+        /* Clear BWAJ[11:0] bits */
+        temp_value1 &= RCC_PLL_BWAJ_MASK;
+        /* Clear CLKF[25:0] and CLKR[5:0] bits */
+        temp_value2 &= RCC_PLL_CLKR_CLKF_MASK;
+
+        /* Set BWAJ[11:0] bits */
+        temp_value1 |= (uint32_t)(wbtmp & 0xFFF);
+        /* Set CLKF[25:0] and CLKR[5:0]  bits */
+        temp_value2 |= (uint32_t)((nrtmp << 26) | (nftmp & 0x3FFFFFF));
+
+        /* Store the new value */
+        pll[0]  = temp_value1;
+        pll[1]  = temp_value2;
+
+        /* Enable PLL module power */
+        pll[0] |= RCC_PLL_LDO_ENABLE;
+        __RCC_DELAY_US(10);//debug by dw
+
+        /* Enable power to analog circuitry in PLL */
+        pll[0] &= ~RCC_PLL_POWER_DOWN;
+
+        /* Select Clock Source */
+        // skip, clock source is configured by vsf_hw_clk_config with prescaler and freq_hz parameter as 0
+
+        /* Clear PLL reset */
+        pll[0] &= ~RCC_PLL_RESET_ENABLE;
+        while((pll[0] & RCC_PLL_LOCK_FLAG) != RCC_PLL_LOCK_FLAG);
+
+        /* Enable PLL */
+        pll[0] |= RCC_PLL_ENABLE;
+        return VSF_ERR_NONE;
+    }
+    return VSF_ERR_FAIL;
 }
 
 
