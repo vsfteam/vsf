@@ -53,19 +53,20 @@
 typedef struct VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) {
 #if VSF_HW_GPIO_CFG_MULTI_CLASS == ENABLED
     vsf_gpio_t                  vsf_gpio;
+    vsf_gpio_exti_irq_cfg_t     irq_cfg;
 #endif
-    vsf_gpio_isr_t              *isrs;
 } VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t);
 // HW end
 
 /*============================ IMPLEMENTATION ================================*/
 
-void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_port_config_pins)(
+vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_port_config_pins)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
     vsf_gpio_pin_mask_t pin_mask,
     vsf_gpio_cfg_t *cfg_ptr
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
+    return VSF_ERR_NONE;
 }
 
 void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_set_direction)(
@@ -108,8 +109,7 @@ void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_toggle)(
 
 vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_enable)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
-    vsf_gpio_pin_mask_t pin_mask,
-    vsf_arch_prio_t prio
+    vsf_gpio_pin_mask_t pin_mask
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     return VSF_ERR_NONE;
@@ -122,9 +122,9 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_disable)(
     return VSF_ERR_NONE;
 }
 
-vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_config)(
+vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_config)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
-    vsf_gpio_pin_irq_cfg_t *cfg_ptr
+    vsf_gpio_exti_irq_cfg_t *cfg_ptr
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);
@@ -138,17 +138,13 @@ static void VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_irqhandler)(
 
     uint32_t irq_pin_mask = GET_IRQ_MASK(gpio_ptr);
     CLEAR_IRQ_FLAG(gpio_ptr, irq_pin_mask);
-    while (irq_pin_mask != 0) {
-        uint32_t pin = 31 - vsf_clz32(irq_pin_mask);
-        uint32_t pin_mask = 0x01UL << pin;
 
-        VSF_HAL_ASSERT(NULL != gpio_ptr->isrs[pin].handler_fn);
-        gpio_ptr->isrs[pin].handler_fn(
-            gpio_ptr->isrs[pin].target_ptr,
-            (vsf_gpio_t *)gpio_ptr,
-            pin_mask
-        );
-    }
+    VSF_HAL_ASSERT(NULL != gpio_ptr->irq_cfg.handler_fn);
+    gpio_ptr->irq_cfg.handler_fn(
+        gpio_ptr->irq_cfg.target_ptr,
+        (vsf_gpio_t *)gpio_ptr,
+        irq_pin_mask
+    );
 }
 
 /*\note Implementation of APIs below is optional, because there is default implementation in gpio_template.inc.
@@ -218,10 +214,8 @@ vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
 #define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED
 
 #define VSF_GPIO_CFG_IMP_LV0(__IDX, __HAL_OP)                                   \
-    static vsf_gpio_isr_t VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio, __IDX, _isr)[VSF_HW_GPIO_PIN_COUNT];\
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t)                              \
         VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio, __IDX) = {                 \
-        .isrs = VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio, __IDX, _isr),  \
         __HAL_OP                                                                \
     };                                                                          \
     void VSF_MCONNECT(VSF_GPIO_CFG_IMP_UPCASE_PREFIX, _GPIO, __IDX,  _IRQHandler)(void)\

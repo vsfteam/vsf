@@ -70,6 +70,16 @@ extern "C" {
 #define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end
 
+// HW/IPCore
+/*\note To redefine these two macros, vsf_gpio_pin_mask_t type must be defined according to actual situation,
+ * and macro with the same name must be defined.
+ */
+#if (VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG == ENABLED) || (VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED)
+typedef uint32_t vsf_gpio_pin_mask_t;
+#define vsf_gpio_pin_mask_t vsf_gpio_pin_mask_t
+#endif
+// HW/IPCore end
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
