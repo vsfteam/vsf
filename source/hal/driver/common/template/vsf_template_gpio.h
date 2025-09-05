@@ -183,15 +183,12 @@ extern "C" {
 
 #ifndef VSF_GPIO_CFG_PIN_COUNT
 #   if defined(VSF_HW_GPIO_PIN_COUNT) && (VSF_HW_GPIO_PIN_COUNT > 32)
-#	    define vsf_io_pin_mask_t                    uint64_t
 #       define VSF_GPIO_CFG_PIN_COUNT               64
 #       define VSF_GPIO_CFG_PIN_MASK                0xFFFFFFFFFFFFFFFF
-#   elif defined(VSF_HW_GPIO_PIN_AMSK) && (VSF_HW_GPIO_PIN_MASK & 0xFFFFFFFF00000000)
-#	    define vsf_io_pin_mask_t                    uint64_t
+#   elif defined(VSF_HW_GPIO_PIN_MASK) && (VSF_HW_GPIO_PIN_MASK & 0xFFFFFFFF00000000)
 #       define VSF_GPIO_CFG_PIN_COUNT               64
 #       define VSF_GPIO_CFG_PIN_MASK                0xFFFFFFFFFFFFFFFF
 #   else
-#	    define vsf_io_pin_mask_t                    uint32_t
 #       define VSF_GPIO_CFG_PIN_COUNT               32
 #       define VSF_GPIO_CFG_PIN_MASK                0xFFFFFFFF
 #   endif
@@ -272,14 +269,6 @@ extern "C" {
 #   define VSF_GPIO_CFG_INHERIT_HAL_CAPABILITY       ENABLED
 #endif
 
-#ifndef vsf_gpio_pin_mask_t
-#   if defined(VSF_HW_GPIO_PIN_MASK) && (VSF_HW_GPIO_PIN_MASK & 0xFFFFFFFF00000000)
-#	    define vsf_gpio_pin_mask_t uint64_t
-#   else
-#	    define vsf_gpio_pin_mask_t uint32_t
-#   endif
-#endif
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define __VSF_GPIO_PORT_PIN_NUM(__PIN_NUM, __PORT_NUM)                            \
@@ -305,6 +294,17 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_disable,        VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 
 /*============================ TYPES =========================================*/
+
+#ifndef vsf_gpio_pin_mask_t
+#   if defined(VSF_HW_GPIO_PIN_COUNT) && (VSF_HW_GPIO_PIN_COUNT > 32)
+typedef uint64_t vsf_gpio_pin_mask_t;
+#   elif defined(VSF_HW_GPIO_PIN_AMSK) && (VSF_HW_GPIO_PIN_MASK & 0xFFFFFFFF00000000)
+typedef uint64_t vsf_gpio_pin_mask_t;
+#   else
+typedef uint32_t vsf_gpio_pin_mask_t;
+#   endif
+#   define vsf_gpio_pin_mask_t vsf_gpio_pin_mask_t
+#endif
 
 #if VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
 /**
