@@ -69,8 +69,8 @@
 #   if VSF_HAL_USE_USART == ENABLED
 #       include "../common/usart/usart.h"
 #   endif
-#   if VSF_HAL_USE_USB == ENABLED
-//#       include "../common/usb/usb.h"
+#   if VSF_HAL_USE_USBD == ENABLED || VSF_HAL_USE_USBH == ENABLED
+#       include "../common/usb/usb.h"
 #   endif
 #   if VSF_HAL_USE_SDIO == ENABLED
 //#       include "../common/sdio/sdio.h"

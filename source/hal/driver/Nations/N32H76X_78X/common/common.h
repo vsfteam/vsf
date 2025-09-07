@@ -29,8 +29,9 @@
 
 // CLK & RST REGION
 
-#define VSF_HW_CLKRST_REGION(__WORD_OFFSET, __BIT_OFFSET, __BIT_LENGTH)         \
+#define VSF_HW_REG_REGION(__WORD_OFFSET, __BIT_OFFSET, __BIT_LENGTH)            \
             (((__WORD_OFFSET) << 16) | ((__BIT_LENGTH) << 8) | ((__BIT_OFFSET) << 0))
+#define VSF_HW_CLKRST_REGION            VSF_HW_REG_REGION
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -919,35 +920,35 @@ typedef enum vsf_hw_peripheral_en_t {
     // Retention domain
     // RCC.RDEN1
 #if     defined(CORE_CM4)
-    VSF_HW_EN_LPTIM1                   = VSF_HW_CLKRST_REGION(0x45, 30, 1),// M4LPTIM1EN
-    VSF_HW_EN_LPTIM1LP                 = VSF_HW_CLKRST_REGION(0x45, 28, 1),// M4LPTIM1LPEN
-    VSF_HW_EN_LPTIM2                   = VSF_HW_CLKRST_REGION(0x45, 26, 1),// M4LPTIM2EN
-    VSF_HW_EN_LPTIM2LP                 = VSF_HW_CLKRST_REGION(0x45, 24, 1),// M4LPTIM2LPEN
-    VSF_HW_EN_LPTIM3                   = VSF_HW_CLKRST_REGION(0x45, 22, 1),// M4LPTIM3EN
-    VSF_HW_EN_LPTIM3LP                 = VSF_HW_CLKRST_REGION(0x45, 20, 1),// M4LPTIM3LPEN
-    VSF_HW_EN_LPTIM4                   = VSF_HW_CLKRST_REGION(0x45, 18, 1),// M4LPTIM4EN
-    VSF_HW_EN_LPTIM4LP                 = VSF_HW_CLKRST_REGION(0x45, 16, 1),// M4LPTIM4LPEN
-    VSF_HW_EN_LPTIM5                   = VSF_HW_CLKRST_REGION(0x45, 14, 1),// M4LPTIM5EN
-    VSF_HW_EN_LPTIM5LP                 = VSF_HW_CLKRST_REGION(0x45, 12, 1),// M4LPTIM5LPEN
-    VSF_HW_EN_LPUART1                  = VSF_HW_CLKRST_REGION(0x45, 10, 1),// M4LPUART1EN
-    VSF_HW_EN_LPUART1LP                = VSF_HW_CLKRST_REGION(0x45, 8,  1),// M4LPUART1LPEN
-    VSF_HW_EN_LPUART2                  = VSF_HW_CLKRST_REGION(0x45, 6,  1),// M4LPUART2EN
-    VSF_HW_EN_LPUART2LP                = VSF_HW_CLKRST_REGION(0x45, 4,  1),// M4LPUART2LPEN
+    VSF_HW_EN_LPTIM1                    = VSF_HW_CLKRST_REGION(0x45, 30, 1),// M4LPTIM1EN
+    VSF_HW_EN_LPTIM1LP                  = VSF_HW_CLKRST_REGION(0x45, 28, 1),// M4LPTIM1LPEN
+    VSF_HW_EN_LPTIM2                    = VSF_HW_CLKRST_REGION(0x45, 26, 1),// M4LPTIM2EN
+    VSF_HW_EN_LPTIM2LP                  = VSF_HW_CLKRST_REGION(0x45, 24, 1),// M4LPTIM2LPEN
+    VSF_HW_EN_LPTIM3                    = VSF_HW_CLKRST_REGION(0x45, 22, 1),// M4LPTIM3EN
+    VSF_HW_EN_LPTIM3LP                  = VSF_HW_CLKRST_REGION(0x45, 20, 1),// M4LPTIM3LPEN
+    VSF_HW_EN_LPTIM4                    = VSF_HW_CLKRST_REGION(0x45, 18, 1),// M4LPTIM4EN
+    VSF_HW_EN_LPTIM4LP                  = VSF_HW_CLKRST_REGION(0x45, 16, 1),// M4LPTIM4LPEN
+    VSF_HW_EN_LPTIM5                    = VSF_HW_CLKRST_REGION(0x45, 14, 1),// M4LPTIM5EN
+    VSF_HW_EN_LPTIM5LP                  = VSF_HW_CLKRST_REGION(0x45, 12, 1),// M4LPTIM5LPEN
+    VSF_HW_EN_LPUART1                   = VSF_HW_CLKRST_REGION(0x45, 10, 1),// M4LPUART1EN
+    VSF_HW_EN_LPUART1LP                 = VSF_HW_CLKRST_REGION(0x45, 8,  1),// M4LPUART1LPEN
+    VSF_HW_EN_LPUART2                   = VSF_HW_CLKRST_REGION(0x45, 6,  1),// M4LPUART2EN
+    VSF_HW_EN_LPUART2LP                 = VSF_HW_CLKRST_REGION(0x45, 4,  1),// M4LPUART2LPEN
 #elif   defined(CORE_CM7)
-    VSF_HW_EN_LPTIM1                   = VSF_HW_CLKRST_REGION(0x45, 31, 1),// M7LPTIM1EN
-    VSF_HW_EN_LPTIM1LP                 = VSF_HW_CLKRST_REGION(0x45, 29, 1),// M7LPTIM1LPEN
-    VSF_HW_EN_LPTIM2                   = VSF_HW_CLKRST_REGION(0x45, 27, 1),// M7LPTIM2EN
-    VSF_HW_EN_LPTIM2LP                 = VSF_HW_CLKRST_REGION(0x45, 25, 1),// M7LPTIM2LPEN
-    VSF_HW_EN_LPTIM3                   = VSF_HW_CLKRST_REGION(0x45, 23, 1),// M7LPTIM3EN
-    VSF_HW_EN_LPTIM3LP                 = VSF_HW_CLKRST_REGION(0x45, 21, 1),// M7LPTIM3LPEN
-    VSF_HW_EN_LPTIM4                   = VSF_HW_CLKRST_REGION(0x45, 19, 1),// M7LPTIM4EN
-    VSF_HW_EN_LPTIM4LP                 = VSF_HW_CLKRST_REGION(0x45, 17, 1),// M7LPTIM4LPEN
-    VSF_HW_EN_LPTIM5                   = VSF_HW_CLKRST_REGION(0x45, 15, 1),// M7LPTIM5EN
-    VSF_HW_EN_LPTIM5LP                 = VSF_HW_CLKRST_REGION(0x45, 13, 1),// M7LPTIM5LPEN
-    VSF_HW_EN_LPUART1                  = VSF_HW_CLKRST_REGION(0x45, 11, 1),// M7LPUART1EN
-    VSF_HW_EN_LPUART1LP                = VSF_HW_CLKRST_REGION(0x45, 9,  1),// M7LPUART1LPEN
-    VSF_HW_EN_LPUART2                  = VSF_HW_CLKRST_REGION(0x45, 7,  1),// M7LPUART2EN
-    VSF_HW_EN_LPUART2LP                = VSF_HW_CLKRST_REGION(0x45, 5,  1),// M7LPUART2LPEN
+    VSF_HW_EN_LPTIM1                    = VSF_HW_CLKRST_REGION(0x45, 31, 1),// M7LPTIM1EN
+    VSF_HW_EN_LPTIM1LP                  = VSF_HW_CLKRST_REGION(0x45, 29, 1),// M7LPTIM1LPEN
+    VSF_HW_EN_LPTIM2                    = VSF_HW_CLKRST_REGION(0x45, 27, 1),// M7LPTIM2EN
+    VSF_HW_EN_LPTIM2LP                  = VSF_HW_CLKRST_REGION(0x45, 25, 1),// M7LPTIM2LPEN
+    VSF_HW_EN_LPTIM3                    = VSF_HW_CLKRST_REGION(0x45, 23, 1),// M7LPTIM3EN
+    VSF_HW_EN_LPTIM3LP                  = VSF_HW_CLKRST_REGION(0x45, 21, 1),// M7LPTIM3LPEN
+    VSF_HW_EN_LPTIM4                    = VSF_HW_CLKRST_REGION(0x45, 19, 1),// M7LPTIM4EN
+    VSF_HW_EN_LPTIM4LP                  = VSF_HW_CLKRST_REGION(0x45, 17, 1),// M7LPTIM4LPEN
+    VSF_HW_EN_LPTIM5                    = VSF_HW_CLKRST_REGION(0x45, 15, 1),// M7LPTIM5EN
+    VSF_HW_EN_LPTIM5LP                  = VSF_HW_CLKRST_REGION(0x45, 13, 1),// M7LPTIM5LPEN
+    VSF_HW_EN_LPUART1                   = VSF_HW_CLKRST_REGION(0x45, 11, 1),// M7LPUART1EN
+    VSF_HW_EN_LPUART1LP                 = VSF_HW_CLKRST_REGION(0x45, 9,  1),// M7LPUART1LPEN
+    VSF_HW_EN_LPUART2                   = VSF_HW_CLKRST_REGION(0x45, 7,  1),// M7LPUART2EN
+    VSF_HW_EN_LPUART2LP                 = VSF_HW_CLKRST_REGION(0x45, 5,  1),// M7LPUART2LPEN
 #endif
     // RCC.RDEN1
 #if     defined(CORE_CM4)
@@ -960,6 +961,8 @@ typedef enum vsf_hw_peripheral_en_t {
 } vsf_hw_peripheral_en_t;
 
 typedef struct vsf_hw_clk_t vsf_hw_clk_t;
+typedef struct vsf_hw_pwr_domain_t vsf_hw_pwr_domain_t;
+typedef struct vsf_hw_pwr_t vsf_hw_pwr_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -1048,6 +1051,35 @@ extern const vsf_hw_clk_t VSF_HW_CLK_USART1_2;
 #   define VSF_HW_CLK_SPI4_5_6_7        VSF_HW_CLK_APB5
 #endif
 
+#if VSF_HAL_USE_USBD == ENABLED || VSF_HAL_USE_USBH == ENABLED
+extern const vsf_hw_clk_t VSF_HW_CLK_USBREF;
+#endif
+
+// power
+
+extern const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_HCS1;
+extern const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_HCS2;
+extern const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_GRC;
+extern const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_ESC;
+extern const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_MDMA;
+extern const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_SHRA;
+extern const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_SHR2;
+extern const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_SHR1;
+
+extern const vsf_hw_pwr_t VSF_HW_PWR_GPU;
+extern const vsf_hw_pwr_t VSF_HW_PWR_LCDC;
+extern const vsf_hw_pwr_t VSF_HW_PWR_JPEG;
+extern const vsf_hw_pwr_t VSF_HW_PWR_DSI;
+extern const vsf_hw_pwr_t VSF_HW_PWR_DVP;
+extern const vsf_hw_pwr_t VSF_HW_PWR_ETH2;
+extern const vsf_hw_pwr_t VSF_HW_PWR_USB2;
+extern const vsf_hw_pwr_t VSF_HW_PWR_SDMMC2;
+extern const vsf_hw_pwr_t VSF_HW_PWR_ETH1;
+extern const vsf_hw_pwr_t VSF_HW_PWR_USB1;
+extern const vsf_hw_pwr_t VSF_HW_PWR_SDMMC1;
+extern const vsf_hw_pwr_t VSF_HW_PWR_FMAC;
+extern const vsf_hw_pwr_t VSF_HW_PWR_ESC;
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
@@ -1084,6 +1116,15 @@ extern vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *
  @param[in] out_freq_hz: PLL 输出时钟频率，单位 Hz
  */
 extern vsf_err_t vsf_hw_pll_config(const vsf_hw_clk_t *clk, uint32_t out_freq_hz);
+
+// power
+
+extern void vsf_hw_power_domain_enable(const vsf_hw_pwr_domain_t *domain);
+extern void vsf_hw_power_domain_disable(const vsf_hw_pwr_domain_t *domain);
+extern bool vsf_hw_power_domain_is_ready(const vsf_hw_pwr_domain_t *domain);
+
+extern void vsf_hw_power_enable(const vsf_hw_pwr_t *pwr);
+extern void vsf_hw_power_disable(const vsf_hw_pwr_t *pwr);
 
 #endif
 /* EOF */

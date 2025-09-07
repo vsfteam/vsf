@@ -68,6 +68,21 @@ struct vsf_hw_clk_t {
     uint8_t clkprescaler_max;
 };
 
+struct vsf_hw_pwr_domain_t {
+    uint16_t mask;
+    uint8_t reg_word_offset;
+    uint8_t ack_offset : 6;
+    uint8_t en_offset : 6;
+    uint8_t rdy_offset : 6;
+    uint8_t iso_offset : 6;
+    uint8_t func_offset : 6;
+};
+
+struct vsf_hw_pwr_t {
+    const vsf_hw_pwr_domain_t *domain;
+    int8_t ipmem_bitoffset;
+};
+
 /*============================ PROTOTYPES ====================================*/
 
 static uint32_t __vsf_hw_pll_getclk(const vsf_hw_clk_t *clk, uint32_t clksrc_freq_hz, uint32_t prescaler);
@@ -597,6 +612,159 @@ const vsf_hw_clk_t VSF_HW_CLK_USART1_2 = {
 };
 #endif
 
+#if VSF_HAL_USE_USBD == ENABLED || VSF_HAL_USE_USBH == ENABLED
+static const uint16_t __VSF_HW_CLK_USBHSEDIV[16] = {
+    [0]                         = 1,
+    [1]                         = 2,
+};
+
+const vsf_hw_clk_t VSF_HW_CLK_USBREF = {
+    .clkprescaler_region        = VSF_HW_REG_REGION(0x2A, 9, 4),    // RCC_AHB2DIV1.USBHSEDIV
+
+    .clksrc                     = &VSF_HW_CLK_HSE,
+    .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
+
+    .clkprescaler_mapper        = __VSF_HW_CLK_USBHSEDIV,
+    .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .clkprescaler_min           = 0,
+    .clkprescaler_max           = dimof(__VSF_HW_CLK_USBHSEDIV) - 1,
+};
+#endif
+
+
+
+// power
+
+const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_HCS1 = {
+    .mask                       = PWR_IPMEMCTRL_ETH1_PWREN
+                                | PWR_IPMEMCTRL_USB1_PWREN
+                                | PWR_IPMEMCTRL_SDMMC1_PWREN,
+    .reg_word_offset            = 0x4C >> 2,        // PWR_SYSCTRL3
+    .ack_offset                 = 21,               // HSC1_PSWACK1
+    .en_offset                  = 1,                // HSC1_PGEN
+    .rdy_offset                 = 17,               // HSC1_PWRRDY
+    .iso_offset                 = 9,                // HSC1_ISNEN
+    .func_offset                = 5,                // HSC1_FUCEN
+};
+const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_HCS2 = {
+    .mask                       = PWR_IPMEMCTRL_ETH2_PWREN
+                                | PWR_IPMEMCTRL_USB2_PWREN
+                                | PWR_IPMEMCTRL_SDMMC2_PWREN,
+    .reg_word_offset            = 0x4C >> 2,        // PWR_SYSCTRL3
+    .ack_offset                 = 22,               // HSC2_PSWACK1
+    .en_offset                  = 2,                // HSC2_PGEN
+    .rdy_offset                 = 18,               // HSC2_PWRRDY
+    .iso_offset                 = 10,               // HSC2_ISNEN
+    .func_offset                = 6,                // HSC2_FUCEN
+};
+const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_GRC = {
+    .mask                       = PWR_IPMEMCTRL_GPU_PWREN
+                                | PWR_IPMEMCTRL_LCDC_PWREN
+                                | PWR_IPMEMCTRL_JPEG_PWREN
+                                | PWR_IPMEMCTRL_DSI_PWREN
+                                | PWR_IPMEMCTRL_DVP_PWREN,
+    .reg_word_offset            = 0x4C >> 2,        // PWR_SYSCTRL3
+    .ack_offset                 = 20,               // GRC_PSWACK1
+    .en_offset                  = 0,                // GRC_PGEN
+    .rdy_offset                 = 16,               // GRC_PWRRDY
+    .iso_offset                 = 8,                // GRC_ISNEN
+    .func_offset                = 4,                // GRC_FUCEN
+};
+const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_ESC = {
+    .mask                       = PWR_IPMEMCTRL_ESC_PWREN,
+    .reg_word_offset            = 0xB8 >> 2,        // PWR_ESCCTRL
+    .ack_offset                 = 4,                // ESC_PSWACK1
+    .en_offset                  = 0,                // ESC_PGEN
+    .rdy_offset                 = 3,                // ESC_PWRRDY
+    .iso_offset                 = 2,                // ESC_ISNEN
+    .func_offset                = 1,                // ESC_FUCEN
+};
+const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_MDMA = {
+    .reg_word_offset            = 0xB4 >> 2,        // PWR_MDMACTRL
+    .ack_offset                 = 4,                // MDMA_PSWACK1
+    .en_offset                  = 0,                // MDMA_PGEN
+    .rdy_offset                 = 3,                // MDMA_PWRRDY
+    .iso_offset                 = 2,                // MDMA_ISNEN
+    .func_offset                = 1,                // MDMA_FUCEN
+};
+const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_SHRA = {
+    .reg_word_offset            = 0xB0 >> 2,        // PWR_SHRTIMCTRL
+    .ack_offset                 = 20,               // SHRA_PSWACK1
+    .en_offset                  = 16,               // SHRA_PGEN
+    .rdy_offset                 = 19,               // SHRA_PWRRDY
+    .iso_offset                 = 18,               // SHRA_ISNEN
+    .func_offset                = 17,               // SHRA_FUCEN
+};
+const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_SHR2 = {
+    .reg_word_offset            = 0xB0 >> 2,        // PWR_SHRTIMCTRL
+    .ack_offset                 = 12,               // SHR2_PSWACK1
+    .en_offset                  = 8,                // SHR2_PGEN
+    .rdy_offset                 = 11,               // SHR2_PWRRDY
+    .iso_offset                 = 10,               // SHR2_ISNEN
+    .func_offset                = 9,                // SHR2_FUCEN
+};
+const vsf_hw_pwr_domain_t VSF_HW_PWR_DOMAIN_SHR1 = {
+    .reg_word_offset            = 0xB0 >> 2,        // PWR_SHRTIMCTRL
+    .ack_offset                 = 4,                // SHR1_PSWACK1
+    .en_offset                  = 0,                // SHR1_PGEN
+    .rdy_offset                 = 3,                // SHR1_PWRRDY
+    .iso_offset                 = 2,                // SHR1_ISNEN
+    .func_offset                = 1,                // SHR1_FUCEN
+};
+
+const vsf_hw_pwr_t VSF_HW_PWR_GPU = {
+    .domain                     = &VSF_HW_PWR_DOMAIN_GRC,
+    .ipmem_bitoffset            = 0,
+};
+const vsf_hw_pwr_t VSF_HW_PWR_LCDC = {
+    .domain                     = &VSF_HW_PWR_DOMAIN_GRC,
+    .ipmem_bitoffset            = 1,
+};
+const vsf_hw_pwr_t VSF_HW_PWR_JPEG = {
+    .domain                     = &VSF_HW_PWR_DOMAIN_GRC,
+    .ipmem_bitoffset            = 2,
+};
+const vsf_hw_pwr_t VSF_HW_PWR_DSI = {
+    .domain                     = &VSF_HW_PWR_DOMAIN_GRC,
+    .ipmem_bitoffset            = 3,
+};
+const vsf_hw_pwr_t VSF_HW_PWR_DVP = {
+    .domain                     = &VSF_HW_PWR_DOMAIN_GRC,
+    .ipmem_bitoffset            = 4,
+};
+const vsf_hw_pwr_t VSF_HW_PWR_ETH2 = {
+    .domain                     = &VSF_HW_PWR_DOMAIN_HCS2,
+    .ipmem_bitoffset            = 5,
+};
+const vsf_hw_pwr_t VSF_HW_PWR_USB2 = {
+    .domain                     = &VSF_HW_PWR_DOMAIN_HCS2,
+    .ipmem_bitoffset            = 6,
+};
+const vsf_hw_pwr_t VSF_HW_PWR_SDMMC2 = {
+    .domain                     = &VSF_HW_PWR_DOMAIN_HCS2,
+    .ipmem_bitoffset            = 7,
+};
+const vsf_hw_pwr_t VSF_HW_PWR_ETH1 = {
+    .domain                     = &VSF_HW_PWR_DOMAIN_HCS2,
+    .ipmem_bitoffset            = 8,
+};
+const vsf_hw_pwr_t VSF_HW_PWR_USB1 = {
+    .domain                     = &VSF_HW_PWR_DOMAIN_HCS2,
+    .ipmem_bitoffset            = 9,
+};
+const vsf_hw_pwr_t VSF_HW_PWR_SDMMC1 = {
+    .domain                     = &VSF_HW_PWR_DOMAIN_HCS2,
+    .ipmem_bitoffset            = 10,
+};
+const vsf_hw_pwr_t VSF_HW_PWR_FMAC = {
+    .domain                     = NULL,
+    .ipmem_bitoffset            = 11,
+};
+const vsf_hw_pwr_t VSF_HW_PWR_ESC = {
+    .domain                     = &VSF_HW_PWR_DOMAIN_ESC,
+    .ipmem_bitoffset            = 12,
+};
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -1010,6 +1178,61 @@ vsf_err_t vsf_hw_pll_config(const vsf_hw_clk_t *clk, uint32_t out_freq_hz)
         return VSF_ERR_NONE;
     }
     return VSF_ERR_FAIL;
+}
+
+
+
+
+
+// power
+
+void vsf_hw_power_domain_enable(const vsf_hw_pwr_domain_t *domain)
+{
+    volatile uint32_t *reg = &(((uint32_t *)PWR)[domain->reg_word_offset]);
+    *reg |= 1 << domain->ack_offset;
+    *reg |= 1 << domain->en_offset;
+    while (!(*reg & (1 << domain->rdy_offset)));
+    *reg |= 1 << domain->func_offset;
+    *reg |= 1 << domain->iso_offset;
+}
+
+void vsf_hw_power_domain_disable(const vsf_hw_pwr_domain_t *domain)
+{
+    volatile uint32_t *reg = &(((uint32_t *)PWR)[domain->reg_word_offset]);
+    *reg &= ~(1 << domain->iso_offset);
+    *reg &= ~(1 << domain->func_offset);
+    *reg &= ~(1 << domain->en_offset);
+    while (*reg & (1 << domain->rdy_offset));
+}
+
+bool vsf_hw_power_domain_is_ready(const vsf_hw_pwr_domain_t *domain)
+{
+    volatile uint32_t reg = ((uint32_t *)PWR)[domain->reg_word_offset];
+    return !!(reg & (1 << domain->rdy_offset));
+}
+
+void vsf_hw_power_enable(const vsf_hw_pwr_t *pwr)
+{
+    uint32_t pwr_module = 1 << pwr->ipmem_bitoffset;
+    const vsf_hw_pwr_domain_t *domain = pwr->domain;
+
+    PWR->IPMEMCTRL &= ~pwr_module;
+    while (!(PWR->IPMEMCTRLSTS & pwr_module));
+    if ((domain != NULL) && !vsf_hw_power_domain_is_ready(domain)) {
+        vsf_hw_power_domain_enable(domain);
+    }
+}
+
+void vsf_hw_power_disable(const vsf_hw_pwr_t *pwr)
+{
+    uint32_t pwr_module = 1 << pwr->ipmem_bitoffset;
+    const vsf_hw_pwr_domain_t *domain = pwr->domain;
+
+    if ((domain != NULL) && (!domain->mask || ((PWR->IPMEMCTRLSTS & domain->mask) == pwr_module))) {
+        vsf_hw_power_domain_disable(domain);
+    }
+    PWR->IPMEMCTRL |= pwr_module;
+    while (PWR->IPMEMCTRLSTS & pwr_module);
 }
 
 

@@ -508,6 +508,46 @@
 #define VSF_HW_USART15_IRQN                         UART15_IRQn
 #define VSF_HW_USART15_IRQHandler                   UART15_IRQHandler
 
+// USB OTG
+
+#define VSF_HW_USB_OTG_COUNT                        2
+// required by dwcotg, define the max ep number of dwcotg include ep0
+#define USB_DWCOTG_MAX_EP_NUM                       16
+
+#define VSF_HW_USB_OTG0_IRQHandler                  USB1_HS_IRQHandler
+#define VSF_HW_USB_OTG0_CONFIG                                                  \
+            .dc_ep_num                              = 9 << 1,                   \
+            .hc_ep_num                              = 16,                       \
+            .reg                                    = (void *)0x40100000,       \
+            .wrap_reg                               = (void *)0x40140000,       \
+            .irq                                    = USB1_HS_IRQn,             \
+            .en                                     = VSF_HW_EN_USB1,           \
+            .pwr                                    = 0,                        \
+            /* vk_dwcotg_hw_info_t */                                           \
+                .buffer_word_size                   = 1280,                     \
+                .speed                              = USB_SPEED_HIGH,           \
+                .dma_en                             = true,                     \
+                .ulpi_en                            = true,                     \
+                .utmi_en                            = false,                    \
+                .vbus_en                            = false,
+
+#define VSF_HW_USB_OTG1_IRQHandler                  USB2_HS_IRQHandler
+#define VSF_HW_USB_OTG1_CONFIG                                                  \
+            .dc_ep_num                              = 9 << 1,                   \
+            .hc_ep_num                              = 16,                       \
+            .reg                                    = (void *)0x40060000,       \
+            .wrap_reg                               = (void *)0x400A0000,       \
+            .irq                                    = USB1_HS_IRQn,             \
+            .en                                     = VSF_HW_EN_USB2,           \
+            .pwr                                    = 0,                        \
+            /* vk_dwcotg_hw_info_t */                                           \
+                .buffer_word_size                   = 1280,                     \
+                .speed                              = USB_SPEED_HIGH,           \
+                .dma_en                             = true,                     \
+                .ulpi_en                            = true,                     \
+                .utmi_en                            = false,                    \
+                .vbus_en                            = false,
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
