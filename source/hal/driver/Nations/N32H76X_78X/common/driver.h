@@ -46,7 +46,7 @@
 #       include "../common/flash/flash.h"
 #   endif
 #   if VSF_HAL_USE_GPIO == ENABLED
-//#       include "../common/gpio/gpio.h"
+#       include "../common/gpio/gpio.h"
 #   endif
 #   if VSF_HAL_USE_I2C == ENABLED
 //#       include "../common/i2c/i2c.h"

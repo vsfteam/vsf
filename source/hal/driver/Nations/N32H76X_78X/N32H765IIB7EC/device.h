@@ -348,39 +348,53 @@
 
 #define VSF_HW_FLASH_COUNT                          1
 
-// GPIO
+// GPIO, TODO: update VSF_HW_GPIO_PORTX_MASK
 
 #define VSF_HW_GPIO_PORT_COUNT                      11
 #define VSF_HW_GPIO_PIN_COUNT                       16
 #define VSF_HW_GPIO_FUNCTION_MAX                    16
 #define VSF_HW_GPIO_PORT0_REG                       GPIOA
+#define VSF_HW_GPIO_PORT0_MASK                      0xFFFF
 #define VSF_HW_GPIO_PORT0_EN                        VSF_HW_EN_GPIOA
 #define VSF_HW_GPIO_PORT0_RST                       VSF_HW_RST_GPIOA
 #define VSF_HW_GPIO_PORT1_REG                       GPIOB
+#define VSF_HW_GPIO_PORT1_MASK                      0xFFFF
 #define VSF_HW_GPIO_PORT1_EN                        VSF_HW_EN_GPIOB
 #define VSF_HW_GPIO_PORT1_RST                       VSF_HW_RST_GPIOB
 #define VSF_HW_GPIO_PORT2_REG                       GPIOC
+#define VSF_HW_GPIO_PORT2_MASK                      0xFFFF
 #define VSF_HW_GPIO_PORT2_EN                        VSF_HW_EN_GPIOC
 #define VSF_HW_GPIO_PORT2_RST                       VSF_HW_RST_GPIOC
 #define VSF_HW_GPIO_PORT3_REG                       GPIOD
+#define VSF_HW_GPIO_PORT3_MASK                      0xFFFF
 #define VSF_HW_GPIO_PORT3_EN                        VSF_HW_EN_GPIOD
 #define VSF_HW_GPIO_PORT3_RST                       VSF_HW_RST_GPIOD
 #define VSF_HW_GPIO_PORT4_REG                       GPIOE
+#define VSF_HW_GPIO_PORT4_MASK                      0xFFFF
 #define VSF_HW_GPIO_PORT4_EN                        VSF_HW_EN_GPIOE
 #define VSF_HW_GPIO_PORT4_RST                       VSF_HW_RST_GPIOE
 #define VSF_HW_GPIO_PORT5_REG                       GPIOF
+#define VSF_HW_GPIO_PORT5_MASK                      0xFFFF
 #define VSF_HW_GPIO_PORT5_EN                        VSF_HW_EN_GPIOF
 #define VSF_HW_GPIO_PORT5_RST                       VSF_HW_RST_GPIOF
 #define VSF_HW_GPIO_PORT6_REG                       GPIOG
+#define VSF_HW_GPIO_PORT6_MASK                      0xFFFF
 #define VSF_HW_GPIO_PORT6_EN                        VSF_HW_EN_GPIOG
 #define VSF_HW_GPIO_PORT6_RST                       VSF_HW_RST_GPIOG
 #define VSF_HW_GPIO_PORT7_REG                       GPIOH
+#define VSF_HW_GPIO_PORT7_MASK                      0xFFFF
 #define VSF_HW_GPIO_PORT7_EN                        VSF_HW_EN_GPIOH
 #define VSF_HW_GPIO_PORT7_RST                       VSF_HW_RST_GPIOH
+#define VSF_HW_GPIO_PORT8_REG                       GPIOI
+#define VSF_HW_GPIO_PORT8_MASK                      0xFFFF
+#define VSF_HW_GPIO_PORT8_EN                        VSF_HW_EN_GPIOI
+#define VSF_HW_GPIO_PORT8_RST                       VSF_HW_RST_GPIOI
 #define VSF_HW_GPIO_PORT9_REG                       GPIOJ
+#define VSF_HW_GPIO_PORT9_MASK                      0xFFFF
 #define VSF_HW_GPIO_PORT9_EN                        VSF_HW_EN_GPIOJ
 #define VSF_HW_GPIO_PORT9_RST                       VSF_HW_RST_GPIOJ
 #define VSF_HW_GPIO_PORT10_REG                      GPIOK
+#define VSF_HW_GPIO_PORT10_MASK                     0xFFFF
 #define VSF_HW_GPIO_PORT10_EN                       VSF_HW_EN_GPIOK
 #define VSF_HW_GPIO_PORT10_RST                      VSF_HW_RST_GPIOK
 

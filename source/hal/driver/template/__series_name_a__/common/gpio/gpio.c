@@ -53,8 +53,8 @@
 typedef struct VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) {
 #if VSF_HW_GPIO_CFG_MULTI_CLASS == ENABLED
     vsf_gpio_t                  vsf_gpio;
-    vsf_gpio_exti_irq_cfg_t     irq_cfg;
 #endif
+    vsf_gpio_exti_irq_cfg_t     irq_cfg;
 } VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t);
 // HW end
 

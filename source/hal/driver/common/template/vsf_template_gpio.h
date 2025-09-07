@@ -516,16 +516,24 @@ typedef enum vsf_gpio_mode_t {
     VSF_GPIO_AF                       = (5 << 0),
 
     VSF_GPIO_INVERT_INPUT             = (1 << 7),
-    #define VSF_GPIO_INVERT_INPUT VSF_GPIO_INVERT_INPUT
+    #define VSF_GPIO_INVERT_INPUT     VSF_GPIO_INVERT_INPUT
 
-    VSF_GPIO_HIGH_DRIVE_STRENGTH      = (1 << 8),
-    #define VSF_GPIO_HIGH_DRIVE_STRENGTH VSF_GPIO_HIGH_DRIVE_STRENGTH
+    VSF_GPIO_DRIVE_STRENGTH_LOW       = (0 << 8),
+    VSF_GPIO_DRIVE_STRENGTH_MEDIUM    = (1 << 8),
+    VSF_GPIO_DRIVE_STRENGTH_HIGH      = (2 << 8),
+    VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH = (3 << 8),
+    VSF_GPIO_DRIVE_STRENGTH_MASK      = (3 << 8),
+    #define VSF_GPIO_DRIVE_STRENGTH_LOW       VSF_GPIO_DRIVE_STRENGTH_LOW
+    #define VSF_GPIO_DRIVE_STRENGTH_MEDIUM    VSF_GPIO_DRIVE_STRENGTH_MEDIUM
+    #define VSF_GPIO_DRIVE_STRENGTH_HIGH      VSF_GPIO_DRIVE_STRENGTH_HIGH
+    #define VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH
+    #define VSF_GPIO_DRIVE_STRENGTH_MASK      VSF_GPIO_DRIVE_STRENGTH_MASK
 
-    VSF_GPIO_SPEED_LOW                = (0 << 9),
-    VSF_GPIO_SPEED_MEDIUM             = (1 << 9),
-    VSF_GPIO_SPEED_HIGH               = (2 << 9),
-    VSF_GPIO_SPEED_VERY_HIGH          = (3 << 9),
-    VSF_GPIO_SPEED_MASK               = (3 << 9),
+    VSF_GPIO_SPEED_LOW                = (0 << 10),
+    VSF_GPIO_SPEED_MEDIUM             = (1 << 10),
+    VSF_GPIO_SPEED_HIGH               = (2 << 10),
+    VSF_GPIO_SPEED_VERY_HIGH          = (3 << 10),
+    VSF_GPIO_SPEED_MASK               = (3 << 10),
     #define VSF_GPIO_SPEED_LOW        VSF_GPIO_SPEED_LOW
     #define VSF_GPIO_SPEED_MEDIUM     VSF_GPIO_SPEED_MEDIUM
     #define VSF_GPIO_SPEED_HIGH       VSF_GPIO_SPEED_HIGH
@@ -564,11 +572,8 @@ enum {
 #ifdef VSF_GPIO_INVERT_INPUT
                                     | VSF_GPIO_INVERT_INPUT
 #endif
-#ifdef VSF_GPIO_HIGH_DRIVE_STRENGTH
-                                    | VSF_GPIO_HIGH_DRIVE_STRENGTH
-#endif
-#ifdef VSF_GPIO_SPEED_MASK
-                                    | VSF_GPIO_SPEED_MASK
+#ifdef VSF_GPIO_DRIVE_STRENGTH_MASK
+                                    | VSF_GPIO_DRIVE_STRENGTH_MASK
 #endif
 #ifdef VSF_GPIO_SPEED_MASK
                                     | VSF_GPIO_SPEED_MASK
