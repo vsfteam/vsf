@@ -846,14 +846,13 @@ void vk_dwcotg_dcd_irq(vk_dwcotg_dcd_t *dwcotg_dcd)
         case 3: // RXSTAT_XFER_COMP
         case 4: // RXSTAT_SETUP_COMP
             break;
-        case 6: //RXSTAT_SETUP_UPDT:
-            if (!ep_idx && (8 == size) && (0/*DPID_DATA0*/ == pid)) {
-                // In some versions of dwcotg, We can't replace dfifo[0] with grxstsp[0]
-                ((uint32_t *)dwcotg_dcd->setup)[0] = *dwcotg_dcd->use_as__vk_dwcotg_t.reg.dfifo[0];
-                ((uint32_t *)dwcotg_dcd->setup)[1] = *dwcotg_dcd->use_as__vk_dwcotg_t.reg.dfifo[0];
-            }
+        case 6: // RXSTAT_SETUP_UPDT:
+            VSF_HAL_ASSERT(!ep_idx && (8 == size) && (0/*DPID_DATA0*/ == pid));
+            // In some versions of dwcotg, We can't replace dfifo[0] with grxstsp[0]
+            ((uint32_t *)dwcotg_dcd->setup)[0] = *dwcotg_dcd->use_as__vk_dwcotg_t.reg.dfifo[0];
+            ((uint32_t *)dwcotg_dcd->setup)[1] = *dwcotg_dcd->use_as__vk_dwcotg_t.reg.dfifo[0];
             break;
-        case 2: //RXSTAT_DATA_UPDT:
+        case 2: // RXSTAT_DATA_UPDT:
             __vk_dwcotg_dcd_ep_read(dwcotg_dcd, ep_idx, size);
             break;
         default:
