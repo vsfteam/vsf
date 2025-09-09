@@ -449,6 +449,39 @@ static vsf_err_t __vk_usbd_stdctrl_prepare(vk_usbd_dev_t *dev)
                 return VSF_ERR_FAIL;
             }
             dev->configured = false;
+
+            // Initialize configuration in SETUP stage to avoid USB cache conflict.
+            //  Adding USB ep will update USB cache, and maybe next transact is already started.
+            int_fast16_t config_idx = __vk_usbd_get_config(dev, request->wValue);
+            if (config_idx < 0) {
+                return VSF_ERR_FAIL;
+            }
+            __vk_usbd_cfg_fini(dev);
+            dev->configuration = (uint8_t)config_idx;
+            config = &dev->config[dev->configuration];
+
+#if VSF_USBD_CFG_AUTOSETUP == ENABLED
+            if (VSF_ERR_NONE != __vk_usbd_auto_init(dev)) {
+                return VSF_ERR_FAIL;
+            }
+#endif
+
+            // call user initialization
+            if ((config->init != NULL) && (VSF_ERR_NONE != config->init(dev))) {
+                return VSF_ERR_FAIL;
+            }
+
+            vk_usbd_ifs_t *ifs = config->ifs;
+            for (uint_fast8_t i = 0; i < config->num_of_ifs; i++, ifs++) {
+                ifs->alternate_setting = 0;
+
+                if (    (ifs->class_op != NULL)
+                    &&  (ifs->class_op->init != NULL)
+                    &&  (VSF_ERR_NONE != ifs->class_op->init(dev, ifs))) {
+                    return VSF_ERR_FAIL;
+                }
+                ifs->is_inited = true;
+            }
             break;
         default:
             return VSF_ERR_FAIL;
@@ -575,42 +608,8 @@ static vsf_err_t __vk_usbd_stdctrl_process(vk_usbd_dev_t *dev)
             dev->address = (uint8_t)request->wValue;
             vk_usbd_drv_set_address(dev->address);
             break;
-        case USB_REQ_SET_CONFIGURATION: {
-                int_fast16_t config_idx;
-
-                config_idx = __vk_usbd_get_config(dev, request->wValue);
-                if (config_idx < 0) {
-                    return VSF_ERR_FAIL;
-                }
-                __vk_usbd_cfg_fini(dev);
-                dev->configuration = (uint8_t)config_idx;
-                config = &dev->config[dev->configuration];
-
-#if VSF_USBD_CFG_AUTOSETUP == ENABLED
-                if (VSF_ERR_NONE != __vk_usbd_auto_init(dev)) {
-                    return VSF_ERR_FAIL;
-                }
-#endif
-
-                // call user initialization
-                if ((config->init != NULL) && (VSF_ERR_NONE != config->init(dev))) {
-                    return VSF_ERR_FAIL;
-                }
-
-                ifs = config->ifs;
-                for (uint_fast8_t i = 0; i < config->num_of_ifs; i++, ifs++) {
-                    ifs->alternate_setting = 0;
-
-                    if (    (ifs->class_op != NULL)
-                        &&  (ifs->class_op->init != NULL)
-                        &&  (VSF_ERR_NONE != ifs->class_op->init(dev, ifs))) {
-                        return VSF_ERR_FAIL;
-                    }
-                    ifs->is_inited = true;
-                }
-
-                dev->configured = true;
-            }
+        case USB_REQ_SET_CONFIGURATION:
+            dev->configured = true;
             break;
         }
     } else if (USB_RECIP_INTERFACE == recip) {
