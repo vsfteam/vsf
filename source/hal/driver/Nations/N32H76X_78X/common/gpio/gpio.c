@@ -70,6 +70,7 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_port_config_pins)(
     vsf_gpio_cfg_t *cfg_ptr
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
+    VSF_HAL_ASSERT(!(pin_mask & ~0xFFFF));
 
     GPIO_Module *reg = gpio_ptr->reg;
     uint32_t pmode = (cfg_ptr->mode >> 0) & 3;
@@ -130,6 +131,7 @@ vsf_gpio_pin_mask_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_get_direction)(
     vsf_gpio_pin_mask_t pin_mask
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
+    VSF_HAL_ASSERT(!(pin_mask & ~0xFFFF));
 
     uint32_t pmode = gpio_ptr->reg->PMODE, current_pin_mask;
     vsf_gpio_pin_mask_t direction = 0;
@@ -158,9 +160,10 @@ void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_write)(
     vsf_gpio_pin_mask_t value
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
+    VSF_HAL_ASSERT(!(pin_mask & ~0xFFFF));
+    VSF_HAL_ASSERT(!(value & ~0xFFFF));
 
-    value &= pin_mask;
-    vsf_atom32_op(&gpio_ptr->reg->POD, (_ & ~pin_mask) | value);
+    gpio_ptr->reg->PBSC = (value & pin_mask) | ((~value & pin_mask) << 16);
 }
 
 void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_toggle)(
@@ -168,7 +171,11 @@ void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_toggle)(
     vsf_gpio_pin_mask_t pin_mask
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
-    gpio_ptr->reg->POD ^= pin_mask;
+    VSF_HAL_ASSERT(!(pin_mask & ~0xFFFF));
+
+    GPIO_Module *reg = gpio_ptr->reg;
+    uint32_t pod = reg->POD & 0xFFFF;
+    reg->PBSC = ((pod & pin_mask) << 16) | (~pod & pin_mask);
 }
 
 vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_enable)(
@@ -176,6 +183,7 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_enable)(
     vsf_gpio_pin_mask_t pin_mask
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
+    VSF_HAL_ASSERT(!(pin_mask & ~0xFFFF));
     return VSF_ERR_NOT_SUPPORT;
 }
 
@@ -183,6 +191,7 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_disable)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
     vsf_gpio_pin_mask_t pin_mask) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
+    VSF_HAL_ASSERT(!(pin_mask & ~0xFFFF));
     return VSF_ERR_NOT_SUPPORT;
 }
 

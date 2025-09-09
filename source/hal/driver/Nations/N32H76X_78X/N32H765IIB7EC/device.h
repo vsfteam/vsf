@@ -522,12 +522,12 @@
             .wrap_reg                               = (void *)0x40140000,       \
             .irq                                    = USB1_HS_IRQn,             \
             .en                                     = VSF_HW_EN_USB1,           \
-            .pwr                                    = 0,                        \
+            .pwr                                    = &VSF_HW_PWR_USB1,         \
             /* vk_dwcotg_hw_info_t */                                           \
                 .buffer_word_size                   = 1280,                     \
                 .speed                              = USB_SPEED_HIGH,           \
                 .dma_en                             = true,                     \
-                .ulpi_en                            = true,                     \
+                .ulpi_en                            = false,                    \
                 .utmi_en                            = false,                    \
                 .vbus_en                            = false,
 
@@ -539,12 +539,12 @@
             .wrap_reg                               = (void *)0x400A0000,       \
             .irq                                    = USB1_HS_IRQn,             \
             .en                                     = VSF_HW_EN_USB2,           \
-            .pwr                                    = 0,                        \
+            .pwr                                    = &VSF_HW_PWR_USB2,         \
             /* vk_dwcotg_hw_info_t */                                           \
                 .buffer_word_size                   = 1280,                     \
                 .speed                              = USB_SPEED_HIGH,           \
                 .dma_en                             = true,                     \
-                .ulpi_en                            = true,                     \
+                .ulpi_en                            = false,                    \
                 .utmi_en                            = false,                    \
                 .vbus_en                            = false,
 

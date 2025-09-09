@@ -745,15 +745,15 @@ const vsf_hw_pwr_t VSF_HW_PWR_SDMMC2 = {
     .ipmem_bitoffset            = 7,
 };
 const vsf_hw_pwr_t VSF_HW_PWR_ETH1 = {
-    .domain                     = &VSF_HW_PWR_DOMAIN_HCS2,
+    .domain                     = &VSF_HW_PWR_DOMAIN_HCS1,
     .ipmem_bitoffset            = 8,
 };
 const vsf_hw_pwr_t VSF_HW_PWR_USB1 = {
-    .domain                     = &VSF_HW_PWR_DOMAIN_HCS2,
+    .domain                     = &VSF_HW_PWR_DOMAIN_HCS1,
     .ipmem_bitoffset            = 9,
 };
 const vsf_hw_pwr_t VSF_HW_PWR_SDMMC1 = {
-    .domain                     = &VSF_HW_PWR_DOMAIN_HCS2,
+    .domain                     = &VSF_HW_PWR_DOMAIN_HCS1,
     .ipmem_bitoffset            = 10,
 };
 const vsf_hw_pwr_t VSF_HW_PWR_FMAC = {

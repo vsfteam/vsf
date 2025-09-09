@@ -47,7 +47,7 @@ typedef struct vsf_hw_usb_const_t {
     uint8_t hc_ep_num;
     uint8_t irq;
     vsf_hw_peripheral_en_t en;
-    vsf_hw_pwr_t *pwr;
+    const vsf_hw_pwr_t *pwr;
     void *reg;
     void *wrap_reg;
 
