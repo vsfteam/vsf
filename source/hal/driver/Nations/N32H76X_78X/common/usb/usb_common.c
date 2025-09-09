@@ -70,15 +70,33 @@ vsf_err_t __vsf_hw_usb_init(vsf_hw_usb_t *usb, vsf_arch_prio_t priority,
     default:        return VSF_ERR_FAIL;
     }
     tmp32 |= USBHS_WRPCFG_PLLEN;
+    if (usb->is_host) {
+        // no id signal in host mode
+        tmp32 &= ~USBHS_WRPCFG_IDSIG;
+    }
     wrap_reg->WRPCFG = tmp32;
 
-    // PWRCTRL = 0;
-    ((uint32_t *)usb_hw_param->reg)[0xE00 >> 2] = 0;
+    USB_PWR_Registers *usb_pwr_reg = (USB_PWR_Registers *)((uintptr_t)usb_hw_param->reg + 0xE00);
+    usb_pwr_reg->PWRCTRL = 0;
 
     NVIC_SetPriority(usb_hw_param->irq, priority);
     NVIC_ClearPendingIRQ(usb_hw_param->irq);
     NVIC_EnableIRQ(usb_hw_param->irq);
     return VSF_ERR_NONE;
+}
+
+void __vsf_hw_usb_phy_init(vsf_hw_usb_t *usb)
+{
+    USB_Global_Registers *greg = (USB_Global_Registers *)((uintptr_t)usb->param->reg + 0);
+
+    greg->GCFG &= ~USBHS_GCFG_PHYSEL;
+    greg->GCFG |= USBHS_GCFG_PHYIF;
+
+    while (!(greg->GRSTCTRL & USBHS_GRSTCTRL_AHBIDLE));
+
+    greg->GRSTCTRL |= USBHS_GRSTCTRL_CSRST;
+    while (!(greg->GRSTCTRL & USBHS_GRSTCTRL_SRSTDNE));
+    greg->GRSTCTRL &= ~USBHS_GRSTCTRL_CSRST;
 }
 
 #endif

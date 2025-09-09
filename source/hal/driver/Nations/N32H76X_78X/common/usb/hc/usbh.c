@@ -35,21 +35,22 @@
 extern vsf_err_t __vsf_hw_usb_init(vsf_hw_usb_t *usb, vsf_arch_prio_t priority,
                 bool is_fs_phy, usb_ip_irqhandler_t handler, void *param);
 extern void __vsf_hw_usb_fini(vsf_hw_usb_t *usb);
+extern void __vsf_hw_usb_phy_init(vsf_hw_usb_t *usb);
 
-static uint_fast32_t __vsf_hw_usbh_workaround_reset_port(void *param);
+static void __vsf_hw_usbh_workaround_init_phy(void *param);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const vk_dwcotg_hcd_workaround_t __vsf_hw_usbh_workaround = {
-    .reset_port         = __vsf_hw_usbh_workaround_reset_port,
+    .init_phy           = __vsf_hw_usbh_workaround_init_phy,
 };
 
 /*============================ IMPLEMENTATION ================================*/
 
-static uint_fast32_t __vsf_hw_usbh_workaround_reset_port(void *param)
+static void __vsf_hw_usbh_workaround_init_phy(void *param)
 {
-    return 200;
+    __vsf_hw_usb_phy_init((vsf_hw_usb_t *)param);
 }
 
 vsf_err_t vsf_hw_usbh_init(vsf_hw_usb_t *hc, usb_hc_ip_cfg_t *cfg)
@@ -75,6 +76,7 @@ void vsf_hw_usbh_get_info(vsf_hw_usb_t *hc, usb_hc_ip_info_t *info)
     dwcotg_info->ep_num = param->hc_ep_num;
     dwcotg_info->is_dma = true;
     dwcotg_info->use_as__vk_dwcotg_hw_info_t = param->use_as__vk_dwcotg_hw_info_t;
+    dwcotg_info->workaround_param = hc;
     dwcotg_info->workaround = (vk_dwcotg_hcd_workaround_t *)&__vsf_hw_usbh_workaround;
 }
 

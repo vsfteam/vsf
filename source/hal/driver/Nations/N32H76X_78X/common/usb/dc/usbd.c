@@ -36,8 +36,14 @@
 extern vsf_err_t __vsf_hw_usb_init(vsf_hw_usb_t *usb, vsf_arch_prio_t priority,
                 bool is_fs_phy, usb_ip_irqhandler_t handler, void *param);
 extern void __vsf_hw_usb_fini(vsf_hw_usb_t *usb);
+extern void __vsf_hw_usb_phy_init(vsf_hw_usb_t *usb);
 
 /*============================ IMPLEMENTATION ================================*/
+
+static void __vsf_hw_usbd_phy_init(void *usb_param, vk_dwcotg_dcd_param_t *param)
+{
+    __vsf_hw_usb_phy_init((vsf_hw_usb_t *)usb_param);
+}
 
 vsf_err_t vsf_hw_usbd_init(vsf_hw_usb_t *dc, usb_dc_ip_cfg_t *cfg)
 {
@@ -61,6 +67,9 @@ void vsf_hw_usbd_get_info(vsf_hw_usb_t *dc, usb_dc_ip_info_t *info)
     dwcotg_info->ep_num = param->dc_ep_num;
     dwcotg_info->buffer_word_size = param->buffer_word_size;
     dwcotg_info->feature = param->feature;
+
+    dwcotg_info->vendor.param = dc;
+    dwcotg_info->vendor.phy_init = __vsf_hw_usbd_phy_init;
 }
 
 void vsf_hw_usbd_connect(vsf_hw_usb_t *dc)
