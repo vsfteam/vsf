@@ -524,7 +524,7 @@
             .en                                     = VSF_HW_EN_USB1,           \
             .pwr                                    = &VSF_HW_PWR_USB1,         \
             /* vk_dwcotg_hw_info_t */                                           \
-                .buffer_word_size                   = 1280,                     \
+                .buffer_word_size                   = 1024,                     \
                 .speed                              = USB_SPEED_HIGH,           \
                 .dma_en                             = true,                     \
                 .ulpi_en                            = false,                    \
@@ -541,7 +541,7 @@
             .en                                     = VSF_HW_EN_USB2,           \
             .pwr                                    = &VSF_HW_PWR_USB2,         \
             /* vk_dwcotg_hw_info_t */                                           \
-                .buffer_word_size                   = 1280,                     \
+                .buffer_word_size                   = 1024,                     \
                 .speed                              = USB_SPEED_HIGH,           \
                 .dma_en                             = true,                     \
                 .ulpi_en                            = false,                    \
