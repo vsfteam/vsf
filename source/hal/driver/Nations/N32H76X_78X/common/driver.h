@@ -49,7 +49,7 @@
 #       include "../common/gpio/gpio.h"
 #   endif
 #   if VSF_HAL_USE_I2C == ENABLED
-//#       include "../common/i2c/i2c.h"
+#       include "../common/i2c/i2c.h"
 #   endif
 #   if VSF_HAL_USE_PWM == ENABLED
 //#       include "../common/pwm/pwm.h"
@@ -58,7 +58,7 @@
 //#       include "../common/rtc/rtc.h"
 #   endif
 #   if VSF_HAL_USE_SPI == ENABLED
-//#       include "../common/spi/spi.h"
+#       include "../common/spi/spi.h"
 #   endif
 #   if VSF_HAL_USE_TIMER == ENABLED
 //#       include "../common/timer/timer.h"
@@ -73,7 +73,7 @@
 #       include "../common/usb/usb.h"
 #   endif
 #   if VSF_HAL_USE_SDIO == ENABLED
-//#       include "../common/sdio/sdio.h"
+#       include "../common/sdio/sdio.h"
 #   endif
 #   if VSF_HAL_USE_I2S == ENABLED
 //#       include "../common/i2s/i2s.h"
@@ -156,6 +156,14 @@
 //#   define VSF_SPI_CFG_DEC_DEVICE_UPCASE_PREFIX           VSF_HW_QSPI
 //#   define VSF_SPI_CFG_DEC_RENAME_DEVICE_PREFIX           ENABLED
 //#   include "hal/driver/common/spi/spi_template.h"
+#endif
+
+#if VSF_HAL_USE_SDIO == ENABLED
+#   include "hal/driver/common/template/vsf_template_sdio.h"
+
+#   define VSF_SDIO_CFG_DEC_PREFIX                          vsf_hw
+#   define VSF_SDIO_CFG_DEC_UPCASE_PREFIX                   VSF_HW
+#   include "hal/driver/common/sdio/sdio_template.h"
 #endif
 
 #if VSF_HAL_USE_TIMER == ENABLED

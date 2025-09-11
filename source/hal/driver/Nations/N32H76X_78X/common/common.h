@@ -1049,6 +1049,13 @@ extern const vsf_hw_clk_t VSF_HW_CLK_USART1_2;
 #   define VSF_HW_CLK_SPI1_2            VSF_HW_CLK_APB2
 #   define VSF_HW_CLK_SPI3              VSF_HW_CLK_APB1
 #   define VSF_HW_CLK_SPI4_5_6_7        VSF_HW_CLK_APB5
+
+#   define VSF_HW_CLK_SPI1              VSF_HW_CLK_SPI1_2
+#   define VSF_HW_CLK_SPI2              VSF_HW_CLK_SPI1_2
+#   define VSF_HW_CLK_SPI4              VSF_HW_CLK_SPI4_5_6_7
+#   define VSF_HW_CLK_SPI5              VSF_HW_CLK_SPI4_5_6_7
+#   define VSF_HW_CLK_SPI6              VSF_HW_CLK_SPI4_5_6_7
+#   define VSF_HW_CLK_SPI7              VSF_HW_CLK_SPI4_5_6_7
 #endif
 
 #if VSF_HAL_USE_USBD == ENABLED || VSF_HAL_USE_USBH == ENABLED

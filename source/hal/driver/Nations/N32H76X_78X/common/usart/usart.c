@@ -57,10 +57,10 @@ typedef struct VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) {
     const vsf_hw_clk_t      *clk;
     vsf_hw_peripheral_en_t  en;
     vsf_hw_peripheral_rst_t rst;
+    IRQn_Type               irqn;
     bool                    support_sync;
     bool                    is_rxne;
     bool                    is_txnf;
-    IRQn_Type               irqn;
     uint32_t                irq_mask;
     vsf_usart_isr_t         isr;
 } VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t);
