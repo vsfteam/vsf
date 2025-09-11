@@ -153,7 +153,49 @@ vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)(
     return VSF_ERR_NONE;
 }
 
-uint_fast16_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_get_transferred_count)(
+void VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_fifo_transfer)(
+    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr,
+    uint16_t address,
+    vsf_i2c_cmd_t cmd,
+    uint_fast16_t count,
+    uint8_t *buffer_ptr,
+    vsf_i2c_cmd_t *cur_cmd_ptr,
+    uint_fast16_t *offset_ptr
+) {
+    VSF_HAL_ASSERT(NULL != i2c_ptr);
+    VSF_HAL_ASSERT(0 != count);
+}
+
+uint_fast16_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_get_transferred_count)(
+    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
+) {
+    VSF_HAL_ASSERT(NULL != i2c_ptr);
+    return 0;
+}
+
+vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_slave_request)(
+    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr,
+    bool transmit_or_receive,
+    uint_fast16_t count,
+    uint8_t *buffer_ptr
+) {
+    VSF_HAL_ASSERT(NULL != i2c_ptr);
+    VSF_HAL_ASSERT(0 != count);
+    return VSF_ERR_NONE;
+}
+
+uint_fast16_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_slave_fifo_transfer)(
+    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr,
+    bool transmit_or_receive,
+    uint_fast16_t count,
+    uint8_t *buffer_ptr
+) {
+    VSF_HAL_ASSERT(NULL != i2c_ptr);
+    VSF_HAL_ASSERT(0 != count);
+    return 0;
+}
+
+uint_fast16_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_slave_get_transferred_count)(
     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
 ) {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
@@ -177,9 +219,11 @@ vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_ctrl)(
     vsf_i2c_ctrl_t ctrl, void *param)
 {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
+
+    return VSF_ERR_NONE;
 }
 
-static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _i2c_irqhandler)(
+static void VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_irqhandler)(
     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
 ) {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
@@ -199,8 +243,8 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _i2c_irqhandler)(
  */
 
 // HW
-#define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
-#define VSF_I2C_CFG_REIMPLEMENT_API_CTRL              ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY          ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_API_CTRL                ENABLED
 
 #define VSF_I2C_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t)                                \
