@@ -83,6 +83,7 @@ extern "C" {
 
 #define VSF_SDIO_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
 #define VSF_SDIO_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
+#define VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQSTS       ENABLED
 #define VSF_SDIO_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
 #define VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
 #define VSF_SDIO_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
@@ -115,9 +116,9 @@ vsf_class(vsf_${sdio_ip}_sdio_t) {
 // HW/IPCore, not for emulated drivers
 #if VSF_SDIO_CFG_REIMPLEMENT_TYPE_MODE == ENABLED
 typedef enum vsf_sdio_mode_t {
-    VSF_SDIO_MODE_HOST                  = (0x1ul << 0),
-    VSF_SDIO_MODE_SLAVE                 = (0x0ul << 0),
-    VSF_SDIO_MODE_MASK                  = (0x1ul << 0),
+    SDIO_MODE_HOST                  = (0x1ul << 0),
+    SDIO_MODE_SLAVE                 = (0x0ul << 0),
+    SDIO_MODE_MASK                  = (0x1ul << 0),
 } vsf_sdio_mode_t;
 #endif
 

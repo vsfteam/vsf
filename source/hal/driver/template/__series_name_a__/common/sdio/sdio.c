@@ -126,8 +126,8 @@ vsf_sdio_status_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_status)(
     VSF_HAL_ASSERT(sdio_ptr != NULL);
 
     return (vsf_sdio_status_t) {
-        transact_status = 0,
-        irq_status = 0,
+        .req_status     = 0,
+        .irq_status     = 0,
     };
 }
 
@@ -137,10 +137,8 @@ vsf_sdio_capability_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_capability)(
     VSF_HAL_ASSERT(sdio_ptr != NULL);
 
     return (vsf_sdio_capability_t) {
-        .sdio_capability = {
-            .max_freq_hz = 100 * 1000 * 1000,
-            .bus_width   = SDIO_CAP_BUS_WIDTH_8,
-        },
+        .max_freq_hz = 50 * 1000 * 1000,
+        .bus_width   = SDIO_CAP_BUS_WIDTH_8,
     };
 }
 
@@ -163,9 +161,9 @@ vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_set_bus_width)(
     return VSF_ERR_NONE;
 }
 
-vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_transact_start)(
+vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_request)(
     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr,
-    vsf_sdio_trans_t *trans
+    vsf_sdio_req_t *trans
 ) {
     VSF_HAL_ASSERT(sdio_ptr != NULL);
 
@@ -184,9 +182,11 @@ static void VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_irqhandler)(
     VSF_HAL_ASSERT(NULL != sdio_ptr);
 
     vsf_sdio_irq_mask_t irq_mask = GET_IRQ_MASK(sdio_ptr);
+    vsf_sdio_status_t sts = VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_status)(sdio_ptr);
+    uint32_t *resp = GET_SDIO_RESP(sdio_ptr);
     vsf_sdio_isr_t *isr_ptr = &sdio_ptr->isr;
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_sdio_t *)sdio_ptr, irq_mask);
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_sdio_t *)sdio_ptr, irq_mask, sts.req_status, resp);
     }
 }
 // HW end
@@ -197,11 +197,13 @@ static void VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_irqhandler)(
  *      Usage of VSF_MCONNECT is not a requirement, but for convenience only,
  */
 
+#define VSF_SDIO_CFG_REIMPLEMENT_API_CAPABILITY         ENABLED
+
 // HW
 #define VSF_SDIO_CFG_IMP_LV0(__IDX, __HAL_OP)                                   \
     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t)                              \
         VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio, __IDX) = {                 \
-        .reg                = VSF_MCONNECT(VSF_SDIO_CFG_IMP_UPCASE_PREFIX, _SDIO, __IDX,_REG_BASE),\
+        .reg                = VSF_MCONNECT(VSF_SDIO_CFG_IMP_UPCASE_PREFIX, _SDIO, __IDX, _REG),\
         __HAL_OP                                                                \
     };                                                                          \
     VSF_CAL_ROOT void VSF_MCONNECT(VSF_SDIO_CFG_IMP_UPCASE_PREFIX, _SDIO, __IDX, _IRQHandler)(void)\

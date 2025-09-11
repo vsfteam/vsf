@@ -738,6 +738,7 @@ typedef struct vsf_sdio_status_t {
 } vsf_sdio_status_t;
 #endif
 
+#if VSF_SDIO_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_sdio_capability_t {
 #if VSF_SDIO_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
@@ -753,8 +754,9 @@ typedef struct vsf_sdio_capability_t {
     uint16_t data_size_alignment;   // alignment of data size
     bool support_ddr;
 } vsf_sdio_capability_t;
+#endif
 
-#if VSF_STIO_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
+#if VSF_SDIO_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 typedef struct vsf_sdio_t vsf_sdio_t;
 
 /**
