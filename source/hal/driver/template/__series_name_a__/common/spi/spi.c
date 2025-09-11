@@ -227,6 +227,16 @@ vsf_spi_capability_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_capability)(
     };
 }
 
+vsf_err_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_ctrl)(
+    VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr,
+    vsf_spi_ctrl_t ctrl,
+    void *param
+) {
+    VSF_HAL_ASSERT(spi_ptr != NULL);
+
+    return VSF_ERR_NONE;
+}
+
 static void VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_irqhandler)(
     VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr
 ) {

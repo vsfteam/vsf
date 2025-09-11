@@ -92,6 +92,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
+// IPCore
 vsf_class(vsf_${spi_ip}_spi_t) {
 #if VSF_${SPI_IP}_CFG_MULTI_CLASS == ENABLED
     public_member(
