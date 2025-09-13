@@ -1,0 +1,1 @@
+#define VSF_ASSERT(...)
