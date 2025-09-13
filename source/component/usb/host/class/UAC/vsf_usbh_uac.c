@@ -97,6 +97,10 @@ typedef struct vk_usbh_uac_t {
 
     struct usb_ctrlrequest_t req;
     void *req_data;
+    struct {
+        void (*on_finish)(void *uac_ptr, void *param);
+        void *param;
+    } req_callback;
 
     vsf_usbh_uac_task_t task;
     vk_usbh_uac_stream_t streams[VSF_USBH_UAC_CFG_STREAM_NUM];
@@ -143,7 +147,8 @@ vk_usbh_uac_stream_t * vsf_usbh_uac_get_stream_info(void *param, uint_fast8_t st
     return &uac->streams[stream_idx];
 }
 
-vsf_err_t __vsf_usbh_uac_submit_req(void *uac_ptr, void *data, struct usb_ctrlrequest_t *req)
+vsf_err_t __vsf_usbh_uac_submit_req(void *uac_ptr, void *data, struct usb_ctrlrequest_t *req,
+                void (*on_finish)(void *uac_ptr, void *param), void *param)
 {
     vk_usbh_uac_t *uac = uac_ptr;
 
@@ -155,6 +160,8 @@ vsf_err_t __vsf_usbh_uac_submit_req(void *uac_ptr, void *data, struct usb_ctrlre
     uac->is_req_pending = true;
     uac->req = *req;
     uac->req_data = data;
+    uac->req_callback.param = param;
+    uac->req_callback.on_finish = on_finish;
     return vsf_eda_post_evt((vsf_eda_t *)&uac->task, VSF_USBH_UAC_EVT_SUBMIT_REQ);
 }
 
@@ -348,8 +355,10 @@ static void __vk_usbh_uac_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
             if (0 == pipe.endpoint) {
                 if (uac->is_cur_req) {
-                    // TODO: notify user
                     uac->is_req_pending = false;
+                    if (uac->req_callback.on_finish != NULL) {
+                        uac->req_callback.on_finish((void *)uac, uac->req_callback.param);
+                    }
                     goto check_next_ctrl_transfer;
                 }
 
