@@ -39,12 +39,12 @@ extern void vsf_usbd_uac_stop_stream(vk_usbd_uac_as_t *uac_as, uint_fast8_t ifs)
 extern void vsf_usbd_uac_start_stream(vk_usbd_uac_as_t *uac_as, uint_fast8_t ifs);
 
 static vsf_err_t __vk_usbd_uac_ac_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
-static vsf_err_t __vk_usbd_uac_ac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
-static vsf_err_t __vk_usbd_uac_ac_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+vsf_err_t __vk_usbd_uac_ac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+vsf_err_t __vk_usbd_uac_ac_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
 
 static vsf_err_t __vk_usbd_uac_as_class_init(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
-static vsf_err_t __vk_usbd_uac_as_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
-static vsf_err_t __vk_usbd_uac_as_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+vsf_err_t __vk_usbd_uac_as_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
+vsf_err_t __vk_usbd_uac_as_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
@@ -212,7 +212,8 @@ static vk_av_control_value_t *__vk_usbd_uac_get_value(vk_usbd_uac_ac_t *uac_ac,
     return value;
 }
 
-static vsf_err_t __vk_usbd_uac_ac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+VSF_CAL_WEAK(__vk_usbd_uac_ac_request_prepare)
+vsf_err_t __vk_usbd_uac_ac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_uac_ac_t *uac_ac = ifs->class_param;
     vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
@@ -300,7 +301,8 @@ static vsf_err_t __vk_usbd_uac_ac_request_prepare(vk_usbd_dev_t *dev, vk_usbd_if
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t __vk_usbd_uac_ac_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+VSF_CAL_WEAK(__vk_usbd_uac_ac_request_process)
+vsf_err_t __vk_usbd_uac_ac_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_uac_ac_t *uac_ac = ifs->class_param;
     vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
@@ -462,7 +464,8 @@ static void __vk_usbd_uac_as_on_finish(void *param)
     }
 }
 
-static vsf_err_t __vk_usbd_uac_as_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+VSF_CAL_WEAK(__vk_usbd_uac_as_request_prepare)
+vsf_err_t __vk_usbd_uac_as_request_prepare(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_uac_as_t *uac_as = ifs->class_param;
     vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
@@ -505,7 +508,8 @@ static vsf_err_t __vk_usbd_uac_as_request_prepare(vk_usbd_dev_t *dev, vk_usbd_if
     return VSF_ERR_NONE;
 }
 
-static vsf_err_t __vk_usbd_uac_as_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
+VSF_CAL_WEAK(__vk_usbd_uac_as_request_process)
+vsf_err_t __vk_usbd_uac_as_request_process(vk_usbd_dev_t *dev, vk_usbd_ifs_t *ifs)
 {
     vk_usbd_ctrl_handler_t *ctrl_handler = &dev->ctrl_handler;
     struct usb_ctrlrequest_t *request = &ctrl_handler->request;
