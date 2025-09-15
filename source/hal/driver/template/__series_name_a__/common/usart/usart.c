@@ -190,6 +190,13 @@ vsf_usart_capability_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
         .support_rx_timeout          = 0,
         .support_send_break          = 0,
         .support_set_and_clear_break = 0,
+        .support_sync_clock             = 0;
+#   ifdef VSF_USART_IRQ_MASK_TX_IDLE
+        .support_tx_idle                = 0,
+#   endif
+#   ifdef VSF_USART_IRQ_MASK_RX_IDLE
+        .support_rx_idle                = 0,
+#   endif
     };
 }
 

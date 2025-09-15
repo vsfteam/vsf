@@ -779,6 +779,13 @@ typedef struct vsf_usart_capability_t {
     uint8_t support_rx_timeout          : 1;//!< \~english Support receive timeout \~chinese 支持接收超时
     uint8_t support_send_break          : 1;//!< \~english Support send break \~chinese 支持发送 break 信号
     uint8_t support_set_and_clear_break : 1;//!< \~english Support set and clear break \~chinese 支持设置和清除 break 信号
+    uint8_t support_sync_clock          : 1;//!< \~english Support Synchronous clock \~chinese 支持同步时钟
+#   ifdef VSF_USART_IRQ_MASK_TX_IDLE
+    uint8_t support_tx_idle             : 1;//!< \~english Support TX idle interrupt \~chinese 支持发送空闲中断
+#   endif
+#   ifdef VSF_USART_IRQ_MASK_RX_IDLE
+    uint8_t support_rx_idle             : 1;//!< \~english Support RX idle interrupt \~chinese 支持接收空闲中断
+#   endif
 } vsf_usart_capability_t;
 #endif
 /**

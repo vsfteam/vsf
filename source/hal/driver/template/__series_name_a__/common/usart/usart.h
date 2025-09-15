@@ -279,6 +279,13 @@ typedef struct vsf_usart_capability_t {
     uint8_t support_rx_timeout          : 1;
     uint8_t support_send_break          : 1;
     uint8_t support_set_and_clear_break : 1;
+    uint8_t support_sync_clock          : 1;
+#   ifdef VSF_USART_IRQ_MASK_TX_IDLE
+    uint8_t support_tx_idle             : 1;
+#   endif
+#   ifdef VSF_USART_IRQ_MASK_RX_IDLE
+    uint8_t support_rx_idle             : 1;
+#   endif
 
     // more vendor specified capability can be added here
 } vsf_usart_capability_t;

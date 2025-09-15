@@ -339,16 +339,23 @@ vsf_usart_capability_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     return (vsf_usart_capability_t) {
-        .irq_mask                    = __VSF_HW_USART_IRQ_MASK,
-        .max_baudrate                = 0,
-        .min_baudrate                = 0,
-        .min_data_bits               = 8,
-        .max_data_bits               = 9,
-        .txfifo_depth                = 8,
-        .rxfifo_depth                = 8,
-        .support_rx_timeout          = 1,
-        .support_send_break          = 1,
-        .support_set_and_clear_break = 0,
+        .irq_mask                       = __VSF_HW_USART_IRQ_MASK,
+        .max_baudrate                   = 0,
+        .min_baudrate                   = 0,
+        .min_data_bits                  = 8,
+        .max_data_bits                  = 9,
+        .txfifo_depth                   = 8,
+        .rxfifo_depth                   = 8,
+        .support_rx_timeout             = 1,
+        .support_send_break             = 1,
+        .support_set_and_clear_break    = 0,
+        .support_sync_clock             = usart_ptr->support_sync;
+#   ifdef VSF_USART_IRQ_MASK_TX_IDLE
+        .support_tx_idle                = 1,
+#   endif
+#   ifdef VSF_USART_IRQ_MASK_RX_IDLE
+        .support_rx_idle                = 1,
+#   endif
     };
 }
 
