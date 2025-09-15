@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __VSF_TEMPLATE_H__
-#define __VSF_TEMPLATE_H__
+#ifndef __UTILITIES_TEMPLATE_H__
+#define __UTILITIES_TEMPLATE_H__
 
 /*============================ INCLUDES ======================================*/
 #include "./vsf_list.h"
