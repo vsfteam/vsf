@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_COMMON_I2C_MULTIPLEX_H__
-#define __HAL_DRIVER_COMMON_I2C_MULTIPLEX_H__
+#ifndef __HAL_DRIVER_COMMON_MULTIPLEX_I2C_H__
+#define __HAL_DRIVER_COMMON_MULTIPLEX_I2C_H__
 
 /*============================ INCLUDES ======================================*/
 
