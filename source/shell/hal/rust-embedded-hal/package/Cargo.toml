@@ -1,0 +1,46 @@
+[package]
+name = "vsf_hal"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+description = "VSF Hardware Abstraction Layer"
+keywords = ["embedded", "async", "hal", "embedded-hal"]
+categories = ["embedded", "hardware-support", "no-std", "asynchronous"]
+repository = "https://github.com/vsfteam/vsf"
+
+[dependencies]
+embassy-sync = "0.7.2"
+embassy-time = "0.5.0"
+embassy-time-driver = "0.2.1"
+embassy-time-queue-utils = "0.3.0"
+embassy-futures = "0.1.2"
+embassy-hal-internal = "0.3.0"
+embassy-embedded-hal = "0.5.0"
+embassy-net-driver = "0.2.0"
+embassy-usb-driver = "0.2.0"
+embassy-usb-synopsys-otg = "0.3.1"
+embassy-executor = "0.9.0"
+
+embedded-hal-02 = { package = "embedded-hal", version = "0.2.6", features = ["unproven"] }
+embedded-hal-1 = { package = "embedded-hal", version = "1.0" }
+embedded-hal-async = { version = "1.0" }
+embedded-hal-nb = { version = "1.0" }
+embedded-can = "0.4"
+
+defmt = "1.0.1"
+
+[build-dependencies]
+bindgen = "0.72.1"
+toml = "0.9.6"
+shellexpand = "1.0"
+
+[vsf]
+path = "${VSF_PATH}"
+
+[vsf.target]
+vendor = "Nations"
+model = "N32H765IIB7EC"
+flags = [
+    "--target=thumbv7m-none-eabihf",
+    "-I${VSF_PATH}/source/utilities/compiler/arm/3rd-party/CMSIS/CMSIS/Core/Include"
+]
