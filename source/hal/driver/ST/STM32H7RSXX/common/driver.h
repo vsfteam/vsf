@@ -35,7 +35,7 @@
 // For SWI
 #       include "hal/driver/common/swi/vsf_swi_template.h"
 
-// For peripherials
+// For peripherals
 #       include "./gpio/gpio.h"
 #       include "./flash/flash.h"
 #       include "./usart/usart.h"
