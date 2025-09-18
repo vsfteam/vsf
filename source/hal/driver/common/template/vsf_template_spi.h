@@ -249,7 +249,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, fifo_transfer,         VSF_MCONNECT(__prefix_name, _t) *spi_ptr, void *out_buffer_ptr, uint_fast32_t *out_offset_ptr, void *in_buffer_ptr, uint_fast32_t *in_offset_ptr, uint_fast32_t cnt) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, request_transfer,      VSF_MCONNECT(__prefix_name, _t) *spi_ptr, void *out_buffer_ptr, void *in_buffer_ptr, uint_fast32_t count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, cancel_transfer,       VSF_MCONNECT(__prefix_name, _t) *spi_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, get_transferred_count, VSF_MCONNECT(__prefix_name, _t) *spi_ptr, uint_fast32_t * tx_count, uint_fast32_t *rx_count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, get_transferred_count, VSF_MCONNECT(__prefix_name, _t) *spi_ptr, uint_fast32_t * sent_count, uint_fast32_t *received_count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, ctrl,                  VSF_MCONNECT(__prefix_name, _t) *spi_ptr, vsf_spi_ctrl_t ctrl, void* param)
 
 
@@ -314,8 +314,12 @@ typedef enum vsf_spi_mode_t {
     VSF_SPI_MODE_3                  = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_HIGH,    //! \~english Mode 3: CPOL=1 (idle high), CPHA=1 (sample on second edge) \~chinese 模式 3：CPOL=1（空闲高），CPHA=1（第二个边沿采样）
 
     // Chip select control (bit 4)
-    VSF_SPI_CS_SOFTWARE_MODE        = 0x00ul << 4,  //! \~english Software controlled chip select \~chinese 软件控制片选
-    VSF_SPI_CS_HARDWARE_MODE        = 0x01ul << 4,  //! \~english Hardware controlled chip select \~chinese 硬件控制片选
+    // \~english Software controlled chip select. The user must manually call vsf_spi_cs_active() and vsf_spi_cs_inactive() to control the CS line.
+    // \~chinese 软件控制片选。用户必须手动调用 vsf_spi_cs_active() 和 vsf_spi_cs_inactive() 来控制片选线。
+    VSF_SPI_CS_SOFTWARE_MODE        = 0x00ul << 4,
+    // \~english Hardware controlled chip select. The hardware automatically controls the CS line specified by `auto_cs_index` during a transfer.
+    // \~chinese 硬件控制片选。硬件在传输期间自动控制由 `auto_cs_index` 指定的片选线。
+    VSF_SPI_CS_HARDWARE_MODE        = 0x01ul << 4,
 
     // Data size control (bits 8-15)
     VSF_SPI_DATASIZE_8              = 0x00ul << 8,  //! \~english 8-bit data transfer size \~chinese 8 位数据传输大小
@@ -742,7 +746,9 @@ typedef struct vsf_spi_cfg_t {
     vsf_spi_mode_t   mode;          //! \~english SPI operating mode (master/slave, CPOL/CPHA, bit order, data size) \~chinese SPI 工作模式（主/从、CPOL/CPHA、位顺序、数据大小）
     uint32_t         clock_hz;      //! \~english SPI clock frequency in Hz (must be between min_clock_hz and max_clock_hz) \~chinese SPI 时钟频率（Hz）（必须在 min_clock_hz 和 max_clock_hz 之间）
     vsf_spi_isr_t    isr;           //! \~english Interrupt configuration (handler, target pointer, priority) \~chinese 中断配置（处理函数、目标指针、优先级）
-    uint8_t          auto_cs_index; //! \~english Hardware CS pin index (0 to cs_count-1) for auto chip select, if supported \~chinese 用于自动片选的硬件 CS 引脚索引（0 到 cs_count-1），如果支持
+    // \~english In hardware chip select mode (`VSF_SPI_CS_HARDWARE_MODE`), this specifies the hardware CS pin index (0 to cs_count-1) to be used for automatic chip select.
+    // \~chinese 在硬件片选模式 (`VSF_SPI_CS_HARDWARE_MODE`) 下，此成员指定用于自动片选的硬件 CS 引脚索引（0 到 cs_count-1）。在软件模式下，此成员被忽略。
+    uint8_t          auto_cs_index;
 } vsf_spi_cfg_t;
 #endif
 
@@ -1196,11 +1202,13 @@ extern vsf_spi_capability_t vsf_spi_capability(vsf_spi_t *spi_ptr);
  * @note In master mode, out_buffer_ptr data is sent through MOSI pin, in_buffer_ptr receives from MISO pin
  * @note In slave mode, out_buffer_ptr data is sent through MISO pin, in_buffer_ptr receives from MOSI pin
  * @note When using QSPI after configuring with vsf_spi_ctrl(), the count parameter refers to data phase units only
- * @note Nullability rules: Exactly one of out_buffer_ptr or in_buffer_ptr may be NULL, or both may be non-NULL.
+ * @note Nullability rules: At least one of out_buffer_ptr or in_buffer_ptr must be non-NULL.
  *       - If out_buffer_ptr is NULL (receive-only), out_offset_ptr must be NULL.
  *       - If in_buffer_ptr is NULL (transmit-only), in_offset_ptr must be NULL.
  *       - If a buffer pointer is non-NULL, its corresponding offset pointer must also be non-NULL.
  *       - It is invalid for both out_buffer_ptr and in_buffer_ptr to be NULL simultaneously.
+ * @note Driver implementers should validate the parameters and use an assertion
+ *       (e.g., VSF_HAL_ASSERT) to handle invalid arguments.
  * \~chinese
  * @brief 在 SPI 实例上执行基于 FIFO 的数据传输
  * @param[in,out] spi_ptr: 指向结构体 @ref vsf_spi_t 的指针
@@ -1217,6 +1225,8 @@ extern vsf_spi_capability_t vsf_spi_capability(vsf_spi_t *spi_ptr);
  *       - 若 out_buffer_ptr 为 NULL（仅接收），则 out_offset_ptr 必须为 NULL；
  *       - 若 in_buffer_ptr 为 NULL（仅读取），则 in_offset_ptr 必须为 NULL；
  *       - 若某个缓冲区指针非 NULL，其对应偏移指针也必须非 NULL。
+ * @note 驱动实现者应检查参数合法性，
+ *       并使用断言（例如 VSF_HAL_ASSERT）处理非法参数。
  */
 extern void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr,
                                   void *out_buffer_ptr, uint_fast32_t* out_offset_ptr,
@@ -1628,7 +1638,9 @@ static inline vsf_spi_mode_t vsf_spi_data_bits_to_mode(uint8_t data_bits)
 static inline uint8_t vsf_spi_mode_to_data_bytes(vsf_spi_mode_t mode)
 {
     uint8_t bits = vsf_spi_mode_to_data_bits(mode);
-    if (bits <= 8) {
+    if (bits == 0) {
+        return 0;   // Error: invalid data bits
+    } else if (bits <= 8) {
         return 1;
     } else if (bits <= 16) {
         return 2;
@@ -1872,6 +1884,17 @@ static inline uint8_t vsf_spi_mode_to_data_bytes(vsf_spi_mode_t mode)
      * @note 参数含义参考 vsf_spi_request_transfer 函数
      */
 #   define vsf_qspi_request_rx(__SPI, __IN_BUF, __CNT)       vsf_spi_request_transfer((__vsf_spi_t *)(__SPI), NULL, (__IN_BUF), (__CNT))
+
+    /**
+     * \~english
+     * @note QSPI transfers are typically half-duplex (transmit-only or receive-only).
+     *       Therefore, there are specific helper macros for TX and RX, but no direct
+     *       alias for a full-duplex transfer.
+     * \~chinese
+     * @note QSPI 传输通常是半双工的（只发送或只接收）。
+     *       因此，我们为发送和接收提供了专用的辅助宏，但没有为全双工传输
+     *       提供直接的别名。
+     */
 
     /**
      * \~english
