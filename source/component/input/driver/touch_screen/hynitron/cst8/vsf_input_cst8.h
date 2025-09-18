@@ -55,7 +55,7 @@ vsf_class(vk_input_cst8_t) {
             vsf_i2c_regacc_t;
         };
 
-        vsf_exti_gpio_t *gpio_int_port;
+        vsf_gpio_irq_distributor_t *gpio_int_port;
         uint8_t gpio_int_pin_idx;
 
         uint16_t width;

@@ -40,31 +40,32 @@
 
 
 #define __describe_exti_gpio(__name, __gpio, __pin_count, ...)                  \
-    static vsf_exti_gpio_irq_t VSF_MCONNECT(__name, _irqs)[__pin_count];        \
-    vsf_exti_gpio_t __name = {                                                  \
+    static vsf_gpio_irq_distributor_irq_t                                       \
+        VSF_MCONNECT(__name, _irqs)[__pin_count];                               \
+    vsf_gpio_irq_distributor_t __name = {                                       \
         .gpio = (vsf_gpio_t *)&__gpio,                                          \
         .prio = vsf_arch_prio_invalid,                                          \
         .exti_irq = VSF_MCONNECT(__name, _irqs),                                \
         __VA_ARGS__                                                             \
     };
 
-#define describe_exti_gpio(__name, __gpio, ...)                                 \
+#define describe_gpio_irq_distributor(__name, __gpio, ...)                      \
     __describe_exti_gpio(__name, __gpio, __VA_ARGS__)
 
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef struct vsf_exti_gpio_irq_t {
+typedef struct vsf_gpio_irq_distributor_irq_t {
     vsf_gpio_exti_isr_handler_t *handler_fn;
     void                        *target_ptr;
-} vsf_exti_gpio_irq_t;
+} vsf_gpio_irq_distributor_irq_t;
 
-typedef struct vsf_exti_gpio_t {
+typedef struct vsf_gpio_irq_distributor_t {
     vsf_gpio_t          *gpio;
     vsf_arch_prio_t      prio;
-    vsf_exti_gpio_irq_t *exti_irq;
-} vsf_exti_gpio_t;
+    vsf_gpio_irq_distributor_irq_t *exti_irq;
+} vsf_gpio_irq_distributor_t;
 
 /*============================ INCLUDES ======================================*/
 
@@ -75,8 +76,8 @@ typedef struct vsf_exti_gpio_t {
 
 /*============================ PROTOTYPES ====================================*/
 
-extern vsf_err_t vsf_exti_gpio_exti_irq_pin_config(
-    vsf_exti_gpio_t *hw_exti_gpio_ptr, vsf_gpio_pin_mask_t pin_mask,
+extern vsf_err_t vsf_gpio_irq_distributor_pin_config(
+    vsf_gpio_irq_distributor_t *hw_exti_gpio_ptr, vsf_gpio_pin_mask_t pin_mask,
     vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr);
 
 /*============================ IMPLEMENTATION ================================*/

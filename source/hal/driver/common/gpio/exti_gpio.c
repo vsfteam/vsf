@@ -43,13 +43,13 @@
 /*============================ TYPES =========================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __exti_gpio_isr_handler(void *target_ptr, vsf_gpio_t *gpio_ptr,
-                                         vsf_gpio_pin_mask_t pin_mask)
+static void __gpio_irq_distributor_handler(void *target_ptr, vsf_gpio_t *gpio_ptr,
+                                           vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
     VSF_HAL_ASSERT(pin_mask != 0);
 
-    vsf_exti_gpio_t *exti_gpio_ptr = (vsf_exti_gpio_t *)target_ptr;
+    vsf_gpio_irq_distributor_t *exti_gpio_ptr = (vsf_gpio_irq_distributor_t *)target_ptr;
     VSF_HAL_ASSERT(exti_gpio_ptr != NULL);
     VSF_HAL_ASSERT(exti_gpio_ptr->gpio != NULL);
     VSF_HAL_ASSERT(exti_gpio_ptr->exti_irq != NULL);
@@ -67,9 +67,9 @@ static void __exti_gpio_isr_handler(void *target_ptr, vsf_gpio_t *gpio_ptr,
     }
 }
 
-vsf_err_t vsf_exti_gpio_exti_irq_pin_config(vsf_exti_gpio_t *exti_gpio_ptr,
-                                            vsf_gpio_pin_mask_t pin_mask,
-                                            vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)
+vsf_err_t vsf_gpio_irq_distributor_pin_config(vsf_gpio_irq_distributor_t *exti_gpio_ptr,
+                                              vsf_gpio_pin_mask_t pin_mask,
+                                              vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)
 {
     VSF_HAL_ASSERT(exti_gpio_ptr != NULL);
     VSF_HAL_ASSERT(exti_gpio_ptr->gpio != NULL);
@@ -89,7 +89,7 @@ vsf_err_t vsf_exti_gpio_exti_irq_pin_config(vsf_exti_gpio_t *exti_gpio_ptr,
         exti_gpio_ptr->prio = irq_cfg_ptr->prio;
 
         vsf_gpio_exti_irq_cfg_t exti_irq_cfg = {
-            .handler_fn = __exti_gpio_isr_handler,
+            .handler_fn = __gpio_irq_distributor_handler,
             .target_ptr = exti_gpio_ptr,
             .prio = exti_gpio_ptr->prio,
         };
