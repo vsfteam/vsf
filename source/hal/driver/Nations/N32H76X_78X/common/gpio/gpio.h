@@ -106,11 +106,11 @@ typedef enum vsf_gpio_mode_t {
 #define VSF_GPIO_SPEED_MASK                     VSF_GPIO_SPEED_MASK
 
     // 6..7: GPIO_DS: LOW(0), MEDIUM(2), HIGH(1), VERY_HIGH(3)
-    VSF_GPIO_HIGH_DRIVE_STRENGTH_LOW            = (0 << 6),
-    VSF_GPIO_HIGH_DRIVE_STRENGTH_MEDIUM         = (2 << 6),
-    VSF_GPIO_HIGH_DRIVE_STRENGTH_HIGH           = (1 << 6),
-    VSF_GPIO_HIGH_DRIVE_STRENGTH_VERY_HIGH      = (3 << 6),
-    VSF_GPIO_HIGH_DRIVE_STRENGTH_MASK           = (3 << 6),
+    VSF_GPIO_DRIVE_STRENGTH_LOW                 = (0 << 6),
+    VSF_GPIO_DRIVE_STRENGTH_MEDIUM              = (2 << 6),
+    VSF_GPIO_DRIVE_STRENGTH_HIGH                = (1 << 6),
+    VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH           = (3 << 6),
+    VSF_GPIO_DRIVE_STRENGTH_MASK                = (3 << 6),
 #define VSF_GPIO_DRIVE_STRENGTH_LOW             VSF_GPIO_DRIVE_STRENGTH_LOW
 #define VSF_GPIO_DRIVE_STRENGTH_MEDIUM          VSF_GPIO_DRIVE_STRENGTH_MEDIUM
 #define VSF_GPIO_DRIVE_STRENGTH_HIGH            VSF_GPIO_DRIVE_STRENGTH_HIGH
