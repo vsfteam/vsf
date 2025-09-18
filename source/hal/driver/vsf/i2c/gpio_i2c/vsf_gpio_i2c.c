@@ -178,17 +178,34 @@ void vsf_gpio_i2c_master_fifo_transfer(vsf_gpio_i2c_t *gpio_i2c_ptr,
                                        vsf_i2c_cmd_t *cur_cmd_ptr,
                                        uint_fast16_t *offset_ptr)
 {
-    // do something
+
+    VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
+
+    if (count != 0) {
+        VSF_HAL_ASSERT(NULL != buffer_ptr);
+        VSF_HAL_ASSERT(NULL != cur_cmd_ptr);
+        VSF_HAL_ASSERT(NULL != offset_ptr);
+    }
+
+    vsf_err_t err = vsf_gpio_i2c_master_request(gpio_i2c_ptr, address, cmd, count, buffer_ptr);
+    if (VSF_ERR_NONE != err) {
+        return;
+    }
+
+    if (count != 0) {
+        *offset_ptr += count;
+    }
+    *cur_cmd_ptr = cmd;
 }
 
 uint_fast16_t vsf_gpio_i2c_slave_fifo_transfer(vsf_gpio_i2c_t *gpio_i2c_ptr,
                                                bool transmit_or_receive,
                                                uint_fast16_t count,
                                                uint8_t *buffer_ptr) {
-  VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
-  VSF_HAL_ASSERT(0);
+    VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
+    VSF_HAL_ASSERT(0);
 
-  return 0;
+    return 0;
 }
 
 static void __vsf_gpio_i2c_isrhandler(vsf_gpio_i2c_t *gpio_i2c_ptr)
