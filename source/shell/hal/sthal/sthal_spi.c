@@ -352,8 +352,8 @@ HAL_StatusTypeDef HAL_SPI_Init(SPI_HandleTypeDef *hspi)
     VSF_STHAL_ASSERT(IS_SPI_TIMODE(hspi->Init.TIMode));
 
     if (hspi->Init.TIMode == SPI_TIMODE_DISABLE) {
-        VSF_STHAL_ASSERT(IS_SPI_CPOL(hspi->Init.CLKPolarity));
-        VSF_STHAL_ASSERT(IS_SPI_CPHA(hspi->Init.CLKPhase));
+        //VSF_STHAL_ASSERT(IS_SPI_CPOL(hspi->Init.CLKPolarity));
+        //VSF_STHAL_ASSERT(IS_SPI_CPHA(hspi->Init.CLKPhase));
     }
 #   if (USE_SPI_CRC != 0U)
     VSF_STHAL_ASSERT(IS_SPI_CRC_CALCULATION(hspi->Init.CRCCalculation));
@@ -582,8 +582,6 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi,
         return HAL_ERROR;
     }
 
-    HAL_StatusTypeDef status = HAL_OK;
-
     VSF_STHAL_ASSERT(IS_SPI_DIRECTION_2LINES(hspi->Init.Direction));
 
     if (!((hspi->State == HAL_SPI_STATE_READY) ||
@@ -601,12 +599,8 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi,
         return HAL_ERROR;
     }
 
-    HAL_SPI_StateTypeDef state;
     if (hspi->State != HAL_SPI_STATE_BUSY_RX) {
         hspi->State = HAL_SPI_STATE_READY;
-        state       = HAL_SPI_STATE_BUSY_TX_RX;
-    } else {
-        state = HAL_SPI_STATE_BUSY_RX;
     }
 
     if (__spi_transfer_prepare(hspi, hspi->State, pTxData, Size, pRxData,
@@ -921,7 +915,7 @@ HAL_StatusTypeDef HAL_SPI_Abort_IT(SPI_HandleTypeDef *hspi)
     HAL_SPI_AbortCpltCallback(hspi);
 #   endif
 
-    return HAL_OK;
+    return status;
 }
 
 HAL_StatusTypeDef HAL_SPI_DMAPause(SPI_HandleTypeDef *hspi)

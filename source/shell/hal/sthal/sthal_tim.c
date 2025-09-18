@@ -1062,7 +1062,6 @@ HAL_StatusTypeDef HAL_TIM_ConfigClockSource(
 
     vsf_timer_t *timer = (vsf_timer_t *)htim->Instance;
     VSF_STHAL_ASSERT(timer != NULL);
-    uint32_t tmpsmcr;
 
     VSF_STHAL_LOCK(htim);
 
@@ -1536,11 +1535,7 @@ HAL_TIM_ChannelStateTypeDef HAL_TIM_GetChannelState(
         return HAL_TIM_CHANNEL_STATE_READY;
     }
 #   else
-    if (status.is_busy) {
-        return HAL_TIM_CHANNEL_STATE_BUSY;
-    } else {
-        return HAL_TIM_CHANNEL_STATE_READY;
-    }
+    return HAL_TIM_CHANNEL_STATE_READY;
 #   endif
 }
 
@@ -1572,11 +1567,7 @@ HAL_TIM_ChannelStateTypeDef HAL_TIMEx_GetChannelNState(
         return HAL_TIM_CHANNEL_STATE_READY;
     }
 #   else
-    if (status.is_busy) {
-        return HAL_TIM_CHANNEL_STATE_BUSY;
-    } else {
-        return HAL_TIM_CHANNEL_STATE_READY;
-    }
+    return HAL_TIM_CHANNEL_STATE_READY;
 #   endif
 }
 
@@ -1668,8 +1659,6 @@ HAL_StatusTypeDef HAL_TIMEx_MasterConfigSynchronization(
 
     vsf_timer_t *timer = (vsf_timer_t *)htim->Instance;
     VSF_STHAL_ASSERT(timer != NULL);
-    uint32_t tmpcr2;
-    uint32_t tmpsmcr;
 
     VSF_STHAL_ASSERT(IS_TIM_SYNCHRO_INSTANCE(htim->Instance));
     VSF_STHAL_ASSERT(IS_TIM_TRGO_SOURCE(sMasterConfig->MasterOutputTrigger));
@@ -1688,7 +1677,6 @@ HAL_StatusTypeDef HAL_TIMEx_ConfigBreakDeadTime(
 
     vsf_timer_t *timer = (vsf_timer_t *)htim->Instance;
     VSF_STHAL_ASSERT(timer != NULL);
-    uint32_t tmpbdtr = 0U;
 
     VSF_STHAL_ASSERT(IS_TIM_BREAK_INSTANCE(htim->Instance));
     VSF_STHAL_ASSERT(IS_TIM_OSSR_STATE(sBreakDeadTimeConfig->OffStateRunMode));

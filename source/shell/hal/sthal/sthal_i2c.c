@@ -995,8 +995,6 @@ HAL_StatusTypeDef HAL_I2C_Init(I2C_HandleTypeDef *hi2c)
     }
     vsf_i2c_t *i2c_ptr = (vsf_i2c_t *)hi2c->Instance;
     VSF_STHAL_ASSERT(i2c_ptr != NULL);
-    uint32_t freqrange;
-    uint32_t pclk1;
 
     VSF_STHAL_ASSERT(IS_I2C_ALL_INSTANCE(i2c_ptr));
     VSF_STHAL_ASSERT(IS_I2C_CLOCK_SPEED(hi2c->Init.ClockSpeed));
@@ -1632,7 +1630,6 @@ HAL_StatusTypeDef HAL_I2C_IsDeviceReady(I2C_HandleTypeDef *hi2c,
                                         uint32_t Timeout)
 {
     uint32_t Tickstart = HAL_GetTick();
-    uint8_t  data      = 0;
 
     uint32_t      i = 0;
     vsf_i2c_cmd_t cmd =
