@@ -1,9 +1,9 @@
 /*****************************************************************************
- *   Cop->right(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2022 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
- *  You may obtain a cop-> of the License at                                  *
+ *  You may obtain a copy of the License at                                  *
  *                                                                           *
  *     http://www.apache.org/licenses/LICENSE-2.0                            *
  *                                                                           *
@@ -176,14 +176,30 @@ void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_transact_stop)(
     VSF_HAL_ASSERT(sdio_ptr != NULL);
 }
 
+static vsf_sdio_irq_mask_t VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_irq_mask)(
+    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
+static uint32_t * VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_resp)(
+    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return NULL;
+}
+
 static void VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_irqhandler)(
     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
 ) {
     VSF_HAL_ASSERT(NULL != sdio_ptr);
 
-    vsf_sdio_irq_mask_t irq_mask = GET_IRQ_MASK(sdio_ptr);
+    vsf_sdio_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_irq_mask)(sdio_ptr);
     vsf_sdio_status_t sts = VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_status)(sdio_ptr);
-    uint32_t *resp = GET_SDIO_RESP(sdio_ptr);
+    uint32_t *resp = VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_resp)(sdio_ptr);
     vsf_sdio_isr_t *isr_ptr = &sdio_ptr->isr;
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_sdio_t *)sdio_ptr, irq_mask, sts.req_status, resp);
