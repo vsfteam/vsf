@@ -244,7 +244,7 @@ HAL_StatusTypeDef HAL_SPI_UnRegisterCallback(
 }
 #   endif
 
-bool __spi_is_idle(vsf_spi_t *spi, uint32_t Timeout, uint32_t Tickstart)
+HAL_StatusTypeDef __spi_is_idle(vsf_spi_t *spi, uint32_t Timeout, uint32_t Tickstart)
 {
     while (1) {
         vsf_spi_status_t status = vsf_spi_status(spi);

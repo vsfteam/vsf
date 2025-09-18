@@ -44,7 +44,7 @@ extern "C" {
 /*============================ PROTOTYPES ====================================*/
 
 extern bool __sthal_check_timeout(uint32_t start, uint32_t timeout);
-extern bool __spi_is_idle(vsf_spi_t *spi, uint32_t Timeout, uint32_t Tickstart);
+extern HAL_StatusTypeDef __spi_is_idle(vsf_spi_t *spi, uint32_t Timeout, uint32_t Tickstart);
 
 /*============================ INCLUDES ======================================*/
 

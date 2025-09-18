@@ -1634,7 +1634,7 @@ HAL_StatusTypeDef HAL_I2C_IsDeviceReady(I2C_HandleTypeDef *hi2c,
     uint32_t      i = 0;
     vsf_i2c_cmd_t cmd =
         VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP;
-    vsf_i2c_cmd_t current_cmd;
+    vsf_i2c_cmd_t current_cmd = 0;
 
     VSF_STHAL_ASSERT(IS_I2C_ALL_INSTANCE(hi2c->Instance));
     vsf_i2c_t *i2c_ptr = (vsf_i2c_t *)hi2c->Instance;

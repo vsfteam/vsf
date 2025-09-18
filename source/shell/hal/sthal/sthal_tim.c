@@ -425,6 +425,10 @@ HAL_StatusTypeDef HAL_TIM_Base_Stop_DMA(TIM_HandleTypeDef *htim)
 #   ifndef VSF_TIMER_IRQ_MASK_REQUEST_CPL
     return HAL_ERROR;
 #   else
+    vsf_timer_t *timer = (vsf_timer_t *)htim->Instance;
+    VSF_STHAL_ASSERT(timer != NULL);
+    VSF_STHAL_ASSERT(IS_TIM_INSTANCE(htim->Instance));
+
     vsf_timer_irq_enable(timer, VSF_TIMER_IRQ_MASK_REQUEST_CPL);
     vsf_err_t err = vsf_timer_channel_request_stop(timer, 0);
     htim->State   = HAL_TIM_STATE_READY;
