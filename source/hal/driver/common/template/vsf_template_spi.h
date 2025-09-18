@@ -259,8 +259,27 @@ extern "C" {
 /**
  * \~english
  * @brief Predefined VSF SPI modes that can be reimplemented in specific HAL drivers.
+ *
+ * SPI Mode Bit Field Layout (32-bit):
+ * Bits 31-16: Reserved for hardware-specific extensions
+ * Bits 15-8:  Data size configuration
+ * Bits 7-4:   Hardware/Software CS control and protocol modes
+ * Bit  3:     Clock phase (CPHA): 0=first edge, 1=second edge
+ * Bit  2:     Clock polarity (CPOL): 0=idle low, 1=idle high
+ * Bit  1:     Bit order: 0=MSB first, 1=LSB first
+ * Bit  0:     Direction: 0=master, 1=slave
+ *
  * \~chinese
  * @brief 预定义的 VSF SPI 模式，可以在具体的 HAL 驱动重新实现。
+ *
+ * SPI 模式位字段布局（32位）：
+ * 位 31-16: 为硬件特定扩展保留
+ * 位 15-8:  数据大小配置
+ * 位 7-4:   硬件/软件片选控制和协议模式
+ * 位 3:     时钟相位 (CPHA): 0=第一个边沿，1=第二个边沿
+ * 位 2:     时钟极性 (CPOL): 0=空闲低电平，1=空闲高电平
+ * 位 1:     位顺序: 0=MSB优先，1=LSB优先
+ * 位 0:     方向: 0=主机，1=从机
  *
  * \~english
  * If we want to add optional modes in the specific driver, we need to provide
@@ -273,13 +292,19 @@ extern "C" {
  * 如果该特性支持多个选项，那也需要提供对应的 MASK 选项，方便用户在运行时切换到不同的模式。
  */
 typedef enum vsf_spi_mode_t {
+    // Direction control (bit 0)
     VSF_SPI_MASTER                  = 0x00ul << 0,  //! \~english Master mode (controller) \~chinese 主机模式（控制器）
     VSF_SPI_SLAVE                   = 0x01ul << 0,  //! \~english Slave mode (peripheral) \~chinese 从机模式（外设）
+
+    // Bit order control (bit 1)
     VSF_SPI_MSB_FIRST               = 0x00ul << 1,  //! \~english Most Significant Bit (MSB) first \~chinese 最高有效位（MSB）优先
     VSF_SPI_LSB_FIRST               = 0x01ul << 1,  //! \~english Least Significant Bit (LSB) first \~chinese 最低有效位（LSB）优先
 
+    // Clock polarity control (bit 2)
     VSF_SPI_CPOL_LOW                = 0x00ul << 2,  //! \~english Clock polarity: idle state is low \~chinese 时钟极性：空闲状态为低电平
     VSF_SPI_CPOL_HIGH               = 0x01ul << 2,  //! \~english Clock polarity: idle state is high \~chinese 时钟极性：空闲状态为高电平
+
+    // Clock phase control (bit 3)
     VSF_SPI_CPHA_LOW                = 0x00ul << 3,  //! \~english Clock phase: sample on first edge \~chinese 时钟相位：第一个边沿采样
     VSF_SPI_CPHA_HIGH               = 0x01ul << 3,  //! \~english Clock phase: sample on second edge \~chinese 时钟相位：第二个边沿采样
 
@@ -288,9 +313,11 @@ typedef enum vsf_spi_mode_t {
     VSF_SPI_MODE_2                  = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_LOW,     //! \~english Mode 2: CPOL=1 (idle high), CPHA=0 (sample on first edge) \~chinese 模式 2：CPOL=1（空闲高），CPHA=0（第一个边沿采样）
     VSF_SPI_MODE_3                  = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_HIGH,    //! \~english Mode 3: CPOL=1 (idle high), CPHA=1 (sample on second edge) \~chinese 模式 3：CPOL=1（空闲高），CPHA=1（第二个边沿采样）
 
+    // Chip select control (bit 4)
     VSF_SPI_CS_SOFTWARE_MODE        = 0x00ul << 4,  //! \~english Software controlled chip select \~chinese 软件控制片选
     VSF_SPI_CS_HARDWARE_MODE        = 0x01ul << 4,  //! \~english Hardware controlled chip select \~chinese 硬件控制片选
 
+    // Data size control (bits 8-15)
     VSF_SPI_DATASIZE_8              = 0x00ul << 8,  //! \~english 8-bit data transfer size \~chinese 8 位数据传输大小
     VSF_SPI_DATASIZE_16             = 0x01ul << 8,  //! \~english 16-bit data transfer size \~chinese 16 位数据传输大小
     VSF_SPI_DATASIZE_32             = 0x02ul << 8,  //! \~english 32-bit data transfer size \~chinese 32 位数据传输大小
@@ -548,7 +575,6 @@ enum {
     VSF_SPI_MODE_ALL_BITS_MASK      = VSF_SPI_DIR_MODE_MASK
                                     | VSF_SPI_BIT_ORDER_MASK
                                     | VSF_SPI_MODE_MASK
-                                    | VSF_SPI_DIR_MODE_MASK
                                     | VSF_SPI_CS_MODE_MASK
                                     | VSF_SPI_DATASIZE_MASK
 #ifdef VSF_SPI_DATALINE_MASK
@@ -560,8 +586,8 @@ enum {
 #ifdef VSF_SPI_CRC_MASK
                                     | VSF_SPI_CRC_MASK
 #endif
-#ifdef VSF_SPI_CLOCK_PRESCLER_MASK
-                                    | VSF_SPI_CLOCK_PRESCLER_MASK
+#ifdef VSF_SPI_CLOCK_PRESCALER_MASK
+                                    | VSF_SPI_CLOCK_PRESCALER_MASK
 #endif
 #endif
 };
@@ -592,8 +618,8 @@ typedef enum vsf_spi_irq_mask_t {
  * \~chinese @brief SPI 中断的补全，用来简化 SPI 中断的定义
  */
 enum {
-    VSF_SPI_IRQ_MASK_TX_FIFO_THRESHOLD  = VSF_SPI_IRQ_MASK_TX,  //! \~english VSF_SPI_IRQ_MASK_TX 的别名 \~chinese VSF_SPI_IRQ_MASK_TX 的别名
-    VSF_SPI_IRQ_MASK_RX_FIFO_THRESHOLD  = VSF_SPI_IRQ_MASK_RX,  //! \~english VSF_SPI_IRQ_MASK_RX 的别名 \~chinese VSF_SPI_IRQ_MASK_RX 的别名
+    VSF_SPI_IRQ_MASK_TX_FIFO_THRESHOLD  = VSF_SPI_IRQ_MASK_TX,  //! \~english Alias for VSF_SPI_IRQ_MASK_TX \~chinese VSF_SPI_IRQ_MASK_TX 的别名
+    VSF_SPI_IRQ_MASK_RX_FIFO_THRESHOLD  = VSF_SPI_IRQ_MASK_RX,  //! \~english Alias for VSF_SPI_IRQ_MASK_RX \~chinese VSF_SPI_IRQ_MASK_RX 的别名
 
     /**
      * \~english For SPI transfer, if RX transfer is done, then TX is done too.
@@ -671,16 +697,20 @@ typedef struct vsf_spi_capability_t {
 
 #if VSF_SPI_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 /**
- * \~english @brief SPI forward declaration.
- * \~chinese @brief SPI 前置声明.
+ * \~english
+ * @brief SPI forward declaration.
+ * \~chinese
+ * @brief SPI 前置声明.
  */
 typedef struct vsf_spi_t vsf_spi_t;
 /**
- * \~english @brief SPI interrupt handler type declaration.
+ * \~english
+ * @brief SPI interrupt handler type declaration.
  * @param[in,out] target_ptr: User defined target pointer passed to the handler
  * @param[in,out] spi_ptr: SPI instance pointer @ref vsf_spi_t
  * @param[in] irq_mask: Interrupt mask indicating which events occurred
- * \~chinese @brief SPI 中断处理函数类型声明。
+ * \~chinese
+ * @brief SPI 中断处理函数类型声明。
  * @param[in,out] target_ptr: 传递给处理函数的用户自定义目标指针
  * @param[in,out] spi_ptr: SPI 实例指针 @ref vsf_spi_t
  * @param[in] irq_mask: 指示发生哪些事件的中断掩码
@@ -689,10 +719,11 @@ typedef void vsf_spi_isr_handler_t(void *target_ptr,
                                    vsf_spi_t *spi_ptr,
                                    vsf_spi_irq_mask_t irq_mask);
 /**
- * \~english @brief SPI interrupt service routine configuration structure
+ * \~english
+ * @brief SPI interrupt service routine configuration structure
  * @note The interrupt will not be enabled if handler_fn is NULL
- *
- * \~chinese @brief SPI 中断服务程序配置结构体
+ * \~chinese
+ * @brief SPI 中断服务程序配置结构体
  * @note 如果 handler_fn 为 NULL，中断将不会被启用
  */
 typedef struct vsf_spi_isr_t {
@@ -972,8 +1003,10 @@ typedef enum vsf_spi_ctrl_t {
 #endif
 
 /**
- * \~english @brief SPI operation function pointer type, used for SPI Multi Class support
- * \~chinese @brief SPI 操作函数指针类型，用于 SPI Multi Class 支持
+ * \~english
+ * @brief SPI operation function pointer type, used for SPI Multi Class support
+ * \~chinese
+ * @brief SPI 操作函数指针类型，用于 SPI Multi Class 支持
  */
 typedef struct vsf_spi_op_t {
 /// @cond
@@ -986,8 +1019,10 @@ typedef struct vsf_spi_op_t {
 
 #if VSF_SPI_CFG_MULTI_CLASS == ENABLED
 /**
- * \~english @brief SPI instance structure, used for SPI Multi Class support, not needed in non Multi Class mode
- * \~chinese @brief SPI 实例结构体，用于 SPI Multi Class 支持，在非 Multi Class 模式下不需要
+ * \~english
+ * @brief SPI instance structure, used for SPI Multi Class support, not needed in non Multi Class mode
+ * \~chinese
+ * @brief SPI 实例结构体，用于 SPI Multi Class 支持，在非 Multi Class 模式下不需要
  */
 struct vsf_spi_t {
     const vsf_spi_op_t * op;            //! \~english Pointer to operation table \~chinese 指向操作表的指针
@@ -1578,10 +1613,10 @@ static inline vsf_spi_mode_t vsf_spi_data_bits_to_mode(uint8_t bit)
  */
 static inline uint8_t vsf_spi_mode_to_data_bytes(vsf_spi_mode_t mode)
 {
-    int bits = (mode & VSF_SPI_DATASIZE_MASK);
-    if (bits <= VSF_SPI_DATASIZE_8) {
+    uint8_t bits = vsf_spi_mode_to_data_bits(mode);
+    if (bits <= 8) {
         return 1;
-    } else if (bits <= VSF_SPI_DATASIZE_16) {
+    } else if (bits <= 16) {
         return 2;
     } else {
         return 4;
