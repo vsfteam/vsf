@@ -405,7 +405,9 @@ HAL_StatusTypeDef __HAL_UART_Init(struct __UART_HandleTypeDef *huart,
     uint32_t mode = huart->Init.WordLength | huart->Init.StopBits |
                     huart->Init.Parity | huart->Init.Mode | append_mode;
     if (huart->__Type == __HAL_UART_TYPE_IRDA) {
+#    if defined(VSF_USART_IRDA_MASK)
         mode |= VSF_USART_IRDA_ENABLE;
+#    endif
 #    if defined(VSF_USART_IRDA_PRESCALER_MASK) &&                              \
         defined(VSF_USART_IRDA_PRESCALER_BIT_OFFSET)
         mode |= (huart->Prescaler << VSF_USART_IRDA_PRESCALER_BIT_OFFSET) &
@@ -938,7 +940,6 @@ HAL_StatusTypeDef __HAL_UART_Abort(struct __UART_HandleTypeDef *huart)
 
 HAL_StatusTypeDef __HAL_UART_AbortTransmit(struct __UART_HandleTypeDef *huart)
 {
-    HAL_StatusTypeDef status;
     VSF_STHAL_ASSERT(huart != NULL);
     vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
     VSF_STHAL_ASSERT(usart != NULL);
@@ -960,7 +961,6 @@ HAL_StatusTypeDef __HAL_UART_AbortTransmit(struct __UART_HandleTypeDef *huart)
 
 HAL_StatusTypeDef __HAL_UART_AbortReceive(struct __UART_HandleTypeDef *huart)
 {
-    HAL_StatusTypeDef status;
     VSF_STHAL_ASSERT(huart != NULL);
     vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
     VSF_STHAL_ASSERT(usart != NULL);
@@ -1077,8 +1077,6 @@ HAL_StatusTypeDef __HAL_UARTEx_ReceiveToIdle(struct __UART_HandleTypeDef *huart,
     VSF_STHAL_ASSERT(huart != NULL);
     vsf_usart_t *usart = (vsf_usart_t *)huart->Instance;
     VSF_STHAL_ASSERT(usart != NULL);
-    uint8_t  *pdata8bits;
-    uint16_t *pdata16bits;
     uint32_t  tickstart;
 
     if (huart->RxState == HAL_UART_STATE_READY) {

@@ -35,7 +35,6 @@
 
 HAL_StatusTypeDef HAL_DMA_Init(DMA_HandleTypeDef *hdma)
 {
-    uint32_t tmp       = 0U;
     uint32_t tickstart = HAL_GetTick();
 
     if (hdma == NULL) {
