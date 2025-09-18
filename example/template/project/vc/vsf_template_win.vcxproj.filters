@@ -1183,6 +1183,15 @@
     <Filter Include="vsf\component\ui\tgui\port\view">
       <UniqueIdentifier>{3f8c606e-acaa-45fc-9aca-d012d7dfb38a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\shell\hal">
+      <UniqueIdentifier>{33bb1b52-09ff-4cbd-afea-75c2b9e0ae55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\shell\hal\sthal">
+      <UniqueIdentifier>{a6d9244c-d990-4953-bfc1-4f753bb07ba0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\common\wdt">
+      <UniqueIdentifier>{a3f12652-fcbf-45d7-ae0a-74b83d5bdc2d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3479,6 +3488,75 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\component\3rd-party\btstack\raw\src\hci_dump.h">
       <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_adc.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_conf_template.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_def.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_dma.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_exti.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_flash.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_gpio.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_i2c.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_internal.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_irda.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_qspi.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_rtc.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_smartcard.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_spi.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_system.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_tim.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_uart.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_uart_base.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_uart_internal.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_usart.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\shell\hal\sthal\sthal_wwdg.h">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\common\wdt\wdt_template.h">
+      <Filter>vsf\hal\driver\common\wdt</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -6043,6 +6121,63 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\component\3rd-party\btstack\raw\src\hci_dump.c">
       <Filter>vsf\component\3rd-party\btstack\raw\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_adc.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_dma.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_exti.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_flash.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_gpio.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_i2c.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_irda.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_qspi.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_rtc.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_smartcard.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_spi.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_system.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_tim.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_uart.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_uart_internal.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_usart.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\shell\hal\sthal\sthal_wwdg.c">
+      <Filter>vsf\shell\hal\sthal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\common\wdt\wdt_common.c">
+      <Filter>vsf\hal\driver\common\wdt</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
