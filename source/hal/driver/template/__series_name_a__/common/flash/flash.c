@@ -183,12 +183,20 @@ vsf_flash_capability_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
     };
 }
 
-static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _flash_irqhandler)(
+static vsf_flash_irq_mask_t VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_get_irq_mask)(
+    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
+static void VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr
 ) {
     VSF_HAL_ASSERT(NULL != flash_ptr);
 
-    vsf_flash_irq_mask_t irq_mask = GET_IRQ_MASK(flash_ptr);
+    vsf_flash_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_get_irq_mask)(flash_ptr);
     vsf_flash_isr_t *isr_ptr = &flash_ptr->isr;
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_flash_t *)flash_ptr, irq_mask);
@@ -221,7 +229,7 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _flash_irqhandler)(
     VSF_CAL_ROOT void VSF_MCONNECT(VSF_FLASH_CFG_IMP_UPCASE_PREFIX, _FLASH, __IDX, _IRQHandler)(void)\
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
-        VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _flash_irqhandler)(          \
+        VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(          \
             &VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash, __IDX)              \
         );                                                                      \
         vsf_hal_irq_leave(ctx);                                                 \

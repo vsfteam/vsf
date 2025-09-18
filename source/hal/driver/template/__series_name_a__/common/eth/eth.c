@@ -1,9 +1,9 @@
 /*****************************************************************************
- *   Cop->right(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2022 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
- *  You may obtain a cop-> of the License at                                  *
+ *  You may obtain a copy of the License at                                  *
  *                                                                           *
  *     http://www.apache.org/licenses/LICENSE-2.0                            *
  *                                                                           *
@@ -142,13 +142,18 @@ vsf_eth_capability_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_capability)(
 ) {
     VSF_HAL_ASSERT(eth_ptr != NULL);
 
-    return (vsf_eth_capability_t) {
-        .support_early_wakeup = 1,
-        .support_reset_none   = 1,
-        .support_reset_cpu   = 1,
-        .support_reset_soc    = 1,
-        .support_disable      = 1,
-        .max_timeout_ms       = 100 * 1000,
+    return (vsf_eth_capability_t){
+        .support_modes                          = 0,
+        .support_phy_modes                      =
+            VSF_ETH_PHY_MODE_SPEED_10M | VSF_ETH_PHY_MODE_SPEED_100M |
+            VSF_ETH_PHY_MODE_SPEED_1000M | VSF_ETH_PHY_MODE_DUPLEX_HALF |
+            VSF_ETH_PHY_MODE_DUPLEX_FULL,
+        .support_irq_mask                       =
+            VSF_ETH_IRQ_MASK_RX_AVAILABLE | VSF_ETH_IRQ_MASK_TX_COMPLETE |
+            VSF_ETH_IRQ_MASK_SG_RX_AVAILABLE | VSF_ETH_IRQ_MASK_SG_TX_COMPLETE |
+            VSF_ETH_IRQ_MASK_PHY_LINK_CHANGE | VSF_ETH_IRQ_MASK_ERROR,
+        .is_send_buf_releasable_immediately     = 0,
+        .is_sg_send_buf_releasable_immediately  = 0,
     };
 }
 
@@ -156,12 +161,9 @@ vsf_eth_status_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_status)(
     VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t) *eth_ptr
 ) {
     vsf_eth_status_t status = {
-        .is_rx_available = eth_ptr->isr.is_rx_available,
+        .is_rx_available = 0,
+        .is_tx_ready = 0,
     };
-
-    if (eth_ptr->isr.is_rx_available) {
-        eth_ptr->isr.is_rx_available = false;
-    }
 
     return status;
 }

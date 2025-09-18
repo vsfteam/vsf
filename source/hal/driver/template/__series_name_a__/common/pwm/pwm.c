@@ -1,9 +1,9 @@
 /*****************************************************************************
- *   Cop->right(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2022 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
- *  You may obtain a cop-> of the License at                                  *
+ *  You may obtain a copy of the License at                                  *
  *                                                                           *
  *     http://www.apache.org/licenses/LICENSE-2.0                            *
  *                                                                           *
@@ -140,7 +140,7 @@ vsf_err_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set)(
     return VSF_ERR_NONE;
 }
 
-uint32_t VSF_MCONNECT(VSF_PWM_GET_CFG_IMP_PREFIX, _pwm_get_freq)(
+uint32_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_freq)(
     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t) *pwm_ptr
 ) {
     VSF_HAL_ASSERT(pwm_ptr != NULL);
@@ -156,6 +156,7 @@ uint32_t VSF_MCONNECT(VSF_PWM_GET_CFG_IMP_PREFIX, _pwm_get_freq)(
  */
 
 // HW
+#define VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED
 #define VSF_PWM_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t)                                \
         VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm, __IDX) = {                   \

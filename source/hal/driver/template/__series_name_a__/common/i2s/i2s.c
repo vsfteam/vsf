@@ -35,6 +35,8 @@
 
 #include "hal/vsf_hal.h"
 
+#include "../../__device.h"
+
 // HW
 // for vendor headers
 #include "hal/driver/vendor_driver.h"
@@ -99,7 +101,7 @@ vsf_err_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_init)(
     return VSF_ERR_NONE;
 }
 
-vsf_err_t VSF_MCONNECT(VSF_I2S_TX_CFG_IMP_PREFIX, _i2s_tx_init)(
+vsf_err_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_tx_init)(
     VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr,
     vsf_i2s_cfg_t *cfg_ptr
 ) {
@@ -108,13 +110,13 @@ vsf_err_t VSF_MCONNECT(VSF_I2S_TX_CFG_IMP_PREFIX, _i2s_tx_init)(
     return VSF_ERR_NONE;
 }
 
-void VSF_MCONNECT(VSF_I2S_TX_CFG_IMP_PREFIX, _i2s_tx_fini)(
+void VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_tx_fini)(
     VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr
 ) {
     VSF_HAL_ASSERT(i2s_ptr != NULL);
 }
 
-vsf_err_t VSF_MCONNECT(VSF_I2S_TX_CFG_IMP_PREFIX, _i2s_tx_start)(
+vsf_err_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_tx_start)(
     VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr
 ) {
     VSF_HAL_ASSERT(i2s_ptr != NULL);
@@ -122,7 +124,7 @@ vsf_err_t VSF_MCONNECT(VSF_I2S_TX_CFG_IMP_PREFIX, _i2s_tx_start)(
     return VSF_ERR_NONE;
 }
 
-vsf_err_t VSF_MCONNECT(VSF_I2S_RX_CFG_IMP_PREFIX, _i2s_rx_init)(
+vsf_err_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_rx_init)(
     VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr,
     vsf_i2s_cfg_t *cfg_ptr
 ) {
@@ -131,13 +133,13 @@ vsf_err_t VSF_MCONNECT(VSF_I2S_RX_CFG_IMP_PREFIX, _i2s_rx_init)(
     return VSF_ERR_NONE;
 }
 
-void VSF_MCONNECT(VSF_I2S_RX_CFG_IMP_PREFIX, _i2s_rx_fini)(
+void VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_rx_fini)(
     VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr
 ) {
     VSF_HAL_ASSERT(i2s_ptr != NULL);
 }
 
-vsf_err_t VSF_MCONNECT(VSF_I2S_RX_CFG_IMP_PREFIX, _i2s_rx_start)(
+vsf_err_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_rx_start)(
     VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr
 ) {
     VSF_HAL_ASSERT(i2s_ptr != NULL);
@@ -177,9 +179,17 @@ vsf_i2s_capability_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_capability)(
     VSF_HAL_ASSERT(i2s_ptr != NULL);
 
     return (vsf_i2s_capability_t) {
-        is_src_supported = true,
-        is_dbuffer_supported = true,
+        .i2s_capability.is_src_supported = true,
+        .i2s_capability.is_dbuffer_supported = true,
     };
+}
+
+static vsf_i2s_irq_mask_t VSF_MCONNECT(__, VSF_I2S_CFG_IMP_PREFIX, _i2s_get_irq_mask)(
+    VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return 0;
 }
 
 static void VSF_MCONNECT(__, VSF_I2S_CFG_IMP_PREFIX, _i2s_irqhandler)(
@@ -187,7 +197,7 @@ static void VSF_MCONNECT(__, VSF_I2S_CFG_IMP_PREFIX, _i2s_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != i2s_ptr);
 
-    vsf_i2s_irq_mask_t irq_mask = GET_IRQ_MASK(i2s_ptr);
+    vsf_i2s_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_I2S_CFG_IMP_PREFIX, _i2s_get_irq_mask)(i2s_ptr);
     vsf_i2s_isr_t *isr_ptr = &i2s_ptr->isr;
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_i2s_t *)i2s_ptr, irq_mask);
@@ -202,6 +212,7 @@ static void VSF_MCONNECT(__, VSF_I2S_CFG_IMP_PREFIX, _i2s_irqhandler)(
  */
 
 // HW
+#define VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED
 #define VSF_I2S_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t)                                \
         VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s, __IDX) = {                   \

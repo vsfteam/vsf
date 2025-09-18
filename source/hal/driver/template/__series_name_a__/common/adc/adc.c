@@ -175,12 +175,20 @@ vsf_adc_capability_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_capability)(
     };
 }
 
+static vsf_adc_irq_mask_t VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_get_irq_mask)(
+    VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
 static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_irqhandler)(
     VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr
 ) {
     VSF_HAL_ASSERT(NULL != adc_ptr);
 
-    vsf_adc_irq_mask_t irq_mask = GET_IRQ_MASK(adc_ptr);
+    vsf_adc_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_get_irq_mask)(adc_ptr);
     vsf_adc_isr_t *isr_ptr = &adc_ptr->isr;
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_adc_t *)adc_ptr, irq_mask);
@@ -195,6 +203,7 @@ static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_irqhandler)(
  */
 
 // HW
+#define VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
 #define VSF_ADC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t)                                \
         VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc, __IDX) = {                   \

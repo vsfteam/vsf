@@ -23,6 +23,8 @@
 
 #include "hal/vsf_hal.h"
 
+#include "../../__device.h"
+
 // HW
 // for vendor headers
 #include "hal/driver/vendor_driver.h"
@@ -131,13 +133,29 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_config)(
     return VSF_ERR_NONE;
 }
 
+static uint32_t VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_get_irq_mask)(
+    VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
+static void VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_clear_irq_flag)(
+    VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
+    uint32_t irq_pin_mask
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+}
+
 static void VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_irqhandler)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
 
-    uint32_t irq_pin_mask = GET_IRQ_MASK(gpio_ptr);
-    CLEAR_IRQ_FLAG(gpio_ptr, irq_pin_mask);
+    uint32_t irq_pin_mask = VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_get_irq_mask)(gpio_ptr);
+    VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_clear_irq_flag)(gpio_ptr, irq_pin_mask);
 
     VSF_HAL_ASSERT(NULL != gpio_ptr->irq_cfg.handler_fn);
     gpio_ptr->irq_cfg.handler_fn(
