@@ -73,6 +73,7 @@ HAL_StatusTypeDef HAL_WWDG_Init(WWDG_HandleTypeDef *hwwdg)
     if (hwwdg == NULL) {
         return HAL_ERROR;
     }
+
     vsf_wdt_t *wdt = (vsf_wdt_t *)hwwdg->Instance;
     VSF_STHAL_ASSERT(wdt != NULL);
 

@@ -35,11 +35,16 @@
 
 HAL_StatusTypeDef HAL_DMA_Init(DMA_HandleTypeDef *hdma)
 {
-    uint32_t tickstart = HAL_GetTick();
-
     if (hdma == NULL) {
         return HAL_ERROR;
     }
+
+    if (hdma->State == HAL_DMA_STATE_BUSY) {
+        return HAL_BUSY;
+    }
+
+    hdma->State = HAL_DMA_STATE_READY;
+    hdma->ErrorCode = HAL_DMA_ERROR_NONE;
 
     return HAL_OK;
 }
