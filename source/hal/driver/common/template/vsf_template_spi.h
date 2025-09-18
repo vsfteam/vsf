@@ -71,7 +71,9 @@ extern "C" {
  * 特定驱动函数。
  */
 #ifndef VSF_SPI_CFG_PREFIX
-#   if (VSF_SPI_CFG_MULTI_CLASS == DISABLED) && defined(VSF_HW_SPI_COUNT) && (VSF_HW_SPI_COUNT != 0)
+#   if VSF_SPI_CFG_MULTI_CLASS == ENABLED
+#       define VSF_SPI_CFG_PREFIX                       vsf
+#   elif defined(VSF_HW_SPI_COUNT) && (VSF_HW_SPI_COUNT != 0)
 #       define VSF_SPI_CFG_PREFIX                       vsf_hw
 #   else
 #       define VSF_SPI_CFG_PREFIX                       vsf
@@ -278,8 +280,8 @@ typedef enum vsf_spi_mode_t {
 
     VSF_SPI_CPOL_LOW                = 0x00ul << 2,  //! \~english Clock polarity: idle state is low \~chinese 时钟极性：空闲状态为低电平
     VSF_SPI_CPOL_HIGH               = 0x01ul << 2,  //! \~english Clock polarity: idle state is high \~chinese 时钟极性：空闲状态为高电平
-    VSF_SPI_CPHA_LOW                = 0x00ul << 2,  //! \~english Clock phase: sample on first edge \~chinese 时钟相位：第一个边沿采样
-    VSF_SPI_CPHA_HIGH               = 0x01ul << 2,  //! \~english Clock phase: sample on second edge \~chinese 时钟相位：第二个边沿采样
+    VSF_SPI_CPHA_LOW                = 0x00ul << 3,  //! \~english Clock phase: sample on first edge \~chinese 时钟相位：第一个边沿采样
+    VSF_SPI_CPHA_HIGH               = 0x01ul << 3,  //! \~english Clock phase: sample on second edge \~chinese 时钟相位：第二个边沿采样
 
     VSF_SPI_MODE_0                  = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_LOW,     //! \~english Mode 0: CPOL=0 (idle low), CPHA=0 (sample on first edge) \~chinese 模式 0：CPOL=0（空闲低），CPHA=0（第一个边沿采样）
     VSF_SPI_MODE_1                  = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_HIGH,    //! \~english Mode 1: CPOL=0 (idle low), CPHA=1 (sample on second edge) \~chinese 模式 1：CPOL=0（空闲低），CPHA=1（第二个边沿采样）
@@ -1181,7 +1183,7 @@ extern void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr,
  * \~english
  * @brief Request a SPI data transfer operation
  * @param[in,out] spi_ptr: Pointer to SPI instance structure @ref vsf_spi_t
- * @param[in] out_buffer_ptr: Pointer to output data buffer (NULL for receive-only)
+ * @param[out] out_buffer_ptr: Pointer to output data buffer (NULL for receive-only)
  * @param[in] in_buffer_ptr: Pointer to input data buffer (NULL for transmit-only)
  * @param[in] count: Number of data units to transfer (can be 0 for QSPI operations with only command/address phases)
  * @return vsf_err_t: VSF_ERR_NONE if transfer started successfully, or error code
@@ -1194,7 +1196,7 @@ extern void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr,
  * \~chinese
  * @brief 请求 SPI 数据传输操作
  * @param[in,out] spi_ptr: 指向 SPI 实例结构体 @ref vsf_spi_t 的指针
- * @param[in] out_buffer_ptr: 指向输出数据缓冲区的指针（仅接收时为 NULL）
+ * @param[out] out_buffer_ptr: 指向输出数据缓冲区的指针（仅接收时为 NULL）
  * @param[in] in_buffer_ptr: 指向输入数据缓冲区的指针（仅发送时为 NULL）
  * @param[in] count: 要传输的数据单元数量（对于仅有命令/地址阶段的 QSPI 操作可以为 0）
  * @return vsf_err_t: 如果传输成功启动则返回 VSF_ERR_NONE，否则返回错误码
