@@ -190,14 +190,22 @@ vsf_usart_capability_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
         .support_rx_timeout          = 0,
         .support_send_break          = 0,
         .support_set_and_clear_break = 0,
-        .support_sync_clock             = 0;
+        .support_sync_clock          = 0,
 #   ifdef VSF_USART_IRQ_MASK_TX_IDLE
-        .support_tx_idle                = 0,
+        .support_tx_idle             = 0,
 #   endif
 #   ifdef VSF_USART_IRQ_MASK_RX_IDLE
-        .support_rx_idle                = 0,
+        .support_rx_idle             = 0,
 #   endif
     };
+}
+
+static vsf_usart_irq_mask_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_get_irq_mask)(
+    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return 0;
 }
 
 static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
@@ -205,7 +213,7 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
 
-    vsf_usart_irq_mask_t irq_mask = GET_IRQ_MASK(usart_ptr);
+    vsf_usart_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_get_irq_mask)(usart_ptr);
     vsf_usart_isr_t *isr_ptr = &usart_ptr->isr;
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_usart_t *)usart_ptr, irq_mask);

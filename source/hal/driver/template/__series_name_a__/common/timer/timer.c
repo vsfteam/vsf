@@ -1,9 +1,9 @@
 /*****************************************************************************
- *   Cop->right(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2022 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
- *  You may obtain a cop-> of the License at                                  *
+ *  You may obtain a copy of the License at                                  *
  *                                                                           *
  *     http://www.apache.org/licenses/LICENSE-2.0                            *
  *                                                                           *
@@ -225,12 +225,20 @@ vsf_err_t VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_ctrl)(
     return VSF_ERR_NONE;
 }
 
+static vsf_timer_irq_mask_t VSF_MCONNECT(__, VSF_TIMER_CFG_IMP_PREFIX, _timer_get_irq_mask)(
+    VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t) *timer_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
 static void VSF_MCONNECT(__, VSF_TIMER_CFG_IMP_PREFIX, _timer_irqhandler)(
     VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t) * timer_ptr)
 {
     VSF_HAL_ASSERT(NULL != timer_ptr);
 
-    vsf_timer_irq_mask_t irq_mask = GET_IRQ_MASK(timer_ptr);
+    vsf_timer_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_TIMER_CFG_IMP_PREFIX, _timer_get_irq_mask)(timer_ptr);
     vsf_timer_isr_t     *isr_ptr  = &timer_ptr->isr;
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_timer_t *)timer_ptr,
@@ -246,9 +254,14 @@ static void VSF_MCONNECT(__, VSF_TIMER_CFG_IMP_PREFIX, _timer_irqhandler)(
  */
 
 // HW
-#   define VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY     ENABLED
-#   define VSF_TIMER_CFG_REIMPLEMENT_API_CTRL           ENABLED
-#   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_CTRL   ENABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY                 ENABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_CTRL                       ENABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_CTRL               ENABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_CONFIG             ENABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_START              ENABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_STOP               ENABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_REQUEST_START      ENABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_REQUEST_STOP       ENABLED
 
 #   define VSF_TIMER_CFG_IMP_LV0(__IDX, __HAL_OP)                              \
        VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t)                        \
