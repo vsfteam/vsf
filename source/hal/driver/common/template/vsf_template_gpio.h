@@ -614,6 +614,9 @@ typedef struct vsf_gpio_port_cfg_pin_t {
     uint16_t            alternate_function;
 } vsf_gpio_port_cfg_pin_t;
 
+/*! \note Memory layout is not optimal due to padding between members.
+ *        However, we keep current layout for compatibility reasons.
+ */
 typedef struct vsf_gpio_port_cfg_pins_t {
     uint16_t            port_index;
     vsf_gpio_pin_mask_t pin_mask;
