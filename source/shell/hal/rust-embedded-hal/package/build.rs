@@ -110,6 +110,7 @@ fn main() {
         }
     }
 
+    println!("cargo:rerun-if-changed={path}/src/vsf_hal.rs");
     println!("cargo:warning=path: {path}");
     println!("cargo:warning=target: {vendor}.{model}");
     println!("cargo:warning=flags:");
@@ -129,6 +130,9 @@ fn main() {
     let mut builder = bindgen::Builder::default()
                     .header("".to_string() + &path + "source/hal/driver/driver.h")
                     .raw_line("#![allow(non_camel_case_types)]")
+                    .raw_line("#![allow(non_upper_case_globals)]")
+                    .raw_line("#![allow(non_snake_case)]")
+                    .raw_line("#![allow(dead_code)]")
                     .use_core()
                     .default_enum_style(bindgen::EnumVariation::ModuleConsts)
                     .clang_arg("-D".to_string() + "__" + &vendor + "__")

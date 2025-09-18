@@ -47,5 +47,6 @@ vendor = "Nations"
 model = "N32H765IIB7EC"
 flags = [
     "--target=thumbv7m-none-eabihf",
-    "-I${VSF_PATH}/source/utilities/compiler/arm/3rd-party/CMSIS/CMSIS/Core/Include"
+    "-I${VSF_PATH}/source/utilities/compiler/arm/3rd-party/CMSIS/CMSIS/Core/Include",
+    "-D__OOC_CPP__"
 ]
