@@ -1516,7 +1516,13 @@ HAL_TIM_ChannelStateTypeDef HAL_TIM_GetChannelState(
 
     vsf_timer_t *timer = (vsf_timer_t *)htim->Instance;
     VSF_STHAL_ASSERT(timer != NULL);
+
+#   if (defined(VSF_TIMER_STATUS_INIT_OFFSET) &&                                \
+       defined(VSF_TIMER_STATUS_INIT_MASK)) ||                                  \
+       (defined(VSF_TIMER_STATUS_INIT_OFFSET) &&                                \
+        defined(VSF_TIMER_STATUS_INIT_MASK))
     vsf_timer_status_t status = vsf_timer_status(timer);
+#   endif
 
 #   if defined(VSF_TIMER_STATUS_BUSY_MASK) &&                                  \
        defined(VSF_TIMER_STATUS_BUSY_OFFSET)
@@ -1548,7 +1554,12 @@ HAL_TIM_ChannelStateTypeDef HAL_TIMEx_GetChannelNState(
 
     vsf_timer_t *timer = (vsf_timer_t *)htim->Instance;
     VSF_STHAL_ASSERT(timer != NULL);
+#   if (defined(VSF_TIMER_STATUS_INIT_OFFSET) &&                                \
+       defined(VSF_TIMER_STATUS_INIT_MASK)) ||                                  \
+       (defined(VSF_TIMER_STATUS_INIT_OFFSET) &&                                \
+        defined(VSF_TIMER_STATUS_INIT_MASK))
     vsf_timer_status_t status = vsf_timer_status(timer);
+#   endif
 
 #   if defined(VSF_TIMER_STATUS_N_BUSY_MASK) &&                                \
        defined(VSF_TIMER_STATUS_N_BUSY_OFFSET)
