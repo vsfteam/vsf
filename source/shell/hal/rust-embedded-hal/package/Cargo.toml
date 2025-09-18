@@ -30,6 +30,9 @@ defmt = "1.0.1"
 defmt-rtt = "1.0.0"
 panic-probe = { version = "1.0.0", features = ["print-defmt"] }
 
+[features]
+defmt = []
+
 [build-dependencies]
 bindgen = "0.72.1"
 toml = "0.9.6"

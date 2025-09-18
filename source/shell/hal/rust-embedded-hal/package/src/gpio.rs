@@ -644,8 +644,9 @@ pub trait Pin: PeripheralType + Into<AnyPin> + SealedPin + Sized + 'static {
     /// EXTI channel assigned to this pin.
     ///
     /// For example, PC4 uses EXTI4.
-    #[cfg(feature = "exti")]
-    type ExtiChannel: crate::exti::Channel;
+// TODO: add exti support
+//    #[cfg(feature = "exti")]
+//    type ExtiChannel: crate::exti::Channel;
 
     /// Number of the pin within the port (0..31)
     #[inline]

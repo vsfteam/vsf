@@ -185,12 +185,9 @@ fn main() {
 }
 
 fn enable_peripherial(lines: &Vec<&str>, name: &str) -> u32 {
-    let mut prefix_str = "VSF_HW_".to_string();
-    prefix_str.push_str(&String::from(name).to_uppercase());
-    let mut mask_str = String::from(&prefix_str);
-    mask_str.push_str("_MASK");
-    let mut count_str = String::from(&prefix_str);
-    count_str.push_str("_COUNT");
+    let prefix_str = "VSF_HW_".to_string() + &String::from(name).to_uppercase();
+    let mask_str = String::from(&prefix_str) + "_MASK";
+    let count_str = String::from(&prefix_str) + "_COUNT";
 
     let mask_option = extract_const_integer::<u32>(lines, &mask_str);
     if let Some(mask) = mask_option {
