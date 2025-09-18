@@ -11,8 +11,9 @@ const TOML_TARGET_MODEL_NODE: &str = "model";
 const TOML_TARGET_FLAGS_NODE: &str = "flags";
 
 const PERIPHERIALS: [&'static str; 2] = ["gpio", "usart"];
-const OPTIONS: [&'static str; 47] = [
+const OPTIONS: [&'static str; 48] = [
     // GPIO configurations
+    "VSF_HW_GPIO_PIN_COUNT",
     "VSF_GPIO_INPUT",
     "VSF_GPIO_OUTPUT",
     "VSF_GPIO_ANALOG",
@@ -115,7 +116,7 @@ fn main() {
         println!("cargo:warning=\t{flag}");
     }
 
-    path = shellexpand::full(&path).unwrap().into_owned();
+    path = shellexpand::full(&path).expect("Fail to expand for environment variables").into_owned();
     if path.starts_with(".") {
         path.insert(0, '/');
         path.insert_str(0, &manifest_dir);
@@ -148,11 +149,34 @@ fn main() {
 
     // parse peripherials
     for peripherial in PERIPHERIALS {
-        enable_peripherial(&bindings_lines, peripherial);
+        let mask = enable_peripherial(&bindings_lines, peripherial);
+        if peripherial == "gpio" && mask != 0 {
+            for index in 0..32 {
+                if mask & (1 << index) != 0 {
+                    if let Some(mut gpion_mask) = extract_const_integer::<u32>(&bindings_lines, &format!("VSF_HW_GPIO_PORT{index}_MASK")) {
+                        println!("cargo:warning=VSF_HW_GPIO_PORT{index}_MASK: 0x{gpion_mask:X}");
+                        println!("cargo::rustc-check-cfg=cfg(VSF_HW_GPIO_PORT{index}_MASK)");
+                        println!("cargo:rustc-cfg=VSF_HW_GPIO_PORT{index}_MASK");
+
+                        let mut gpion_pin_index = 0;
+                        while gpion_mask != 0 {
+                            if gpion_mask & 1 != 0 {
+                                println!("cargo:warning=VSF_HW_GPIO_PORT{index}_PIN{gpion_pin_index} enabled");
+                                println!("cargo::rustc-check-cfg=cfg(VSF_HW_GPIO_PORT{index}_PIN{gpion_pin_index})");
+                                println!("cargo:rustc-cfg=VSF_HW_GPIO_PORT{index}_PIN{gpion_pin_index}");
+                            }
+                            gpion_pin_index += 1;
+                            gpion_mask >>= 1;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     // parse options
     for option in OPTIONS {
+        println!("cargo::rustc-check-cfg=cfg({option})");
         if let Some(_cur_value) = extract_constant_value(&bindings_lines, option) {
             println!("cargo:warning=option: {option} enabled");
             println!("cargo:rustc-cfg={option}");
@@ -160,7 +184,7 @@ fn main() {
     }
 }
 
-fn enable_peripherial(lines: &Vec<&str>, name: &str) {
+fn enable_peripherial(lines: &Vec<&str>, name: &str) -> u32 {
     let mut prefix_str = "VSF_HW_".to_string();
     prefix_str.push_str(&String::from(name).to_uppercase());
     let mut mask_str = String::from(&prefix_str);
@@ -168,37 +192,51 @@ fn enable_peripherial(lines: &Vec<&str>, name: &str) {
     let mut count_str = String::from(&prefix_str);
     count_str.push_str("_COUNT");
 
-    let mask_option = extract_const_integer(lines, &mask_str);
+    let mask_option = extract_const_integer::<u32>(lines, &mask_str);
     if let Some(mask) = mask_option {
         println!("cargo:warning={name}_mask: 0x{mask:X}");
+        println!("cargo::rustc-check-cfg=cfg(vsf_{name}_enabled)");
         println!("cargo:rustc-cfg=vsf_{name}_enabled");
 
         for index in 0..32 {
             if mask & (1 << index) != 0 {
                 println!("cargo:warning={name}: enable {name}{index}");
+                println!("cargo::rustc-check-cfg=cfg(vsf_{name}{index}_enabled)");
                 println!("cargo:rustc-cfg=vsf_{name}{index}_enabled");
             }
         }
+        mask
     } else {
-        let count_option = extract_const_integer(lines, &count_str);
-        if let Some(mut count) = count_option {
+        let count_option = extract_const_integer::<u32>(lines, &count_str);
+        if let Some(count) = count_option {
+            if count >= 32 {
+                return 0u32;
+            }
+
             println!("cargo:warning={name}_count: {count}");
+            println!("cargo::rustc-check-cfg=cfg(vsf_{name}_enabled)");
             println!("cargo:rustc-cfg=vsf_{name}_enabled");
 
-            let mut index = 0;
-            while count != 0 {
+            for index in 0..count {
                 println!("cargo:warning={name}: enable {name}{index}");
+                println!("cargo::rustc-check-cfg=cfg(vsf_{name}{index}_enabled)");
                 println!("cargo:rustc-cfg=vsf_{name}{index}_enabled");
-                index += 1;
-                count -= 1;
             }
+
+            (1u32 << count) - 1
+        } else {
+            0u32
         }
     }
 }
 
-fn extract_const_integer(lines: &Vec<&str>, name: &str) -> Option<i32> {
+fn extract_const_integer<T>(lines: &Vec<&str>, name: &str) -> Option<T>
+where
+    T: std::str::FromStr,
+    <T as std::str::FromStr>::Err : std::fmt::Debug,
+{
     if let Some(cur_value) = extract_constant_value(lines, name) {
-        let value = String::from(cur_value).parse::<i32>().unwrap();
+        let value = String::from(cur_value).parse::<T>().unwrap();
         Some(value)
     } else {
         None

@@ -5,7 +5,7 @@ use core::convert::Infallible;
 
 use embassy_hal_internal::{impl_peripheral, Peri, PeripheralType};
 
-use crate::vsf_hal::vsf_gpio_mode_t::*;
+use crate::vsf_hal::{*};
 
 pub type PinPortType = u16;
 
@@ -14,22 +14,22 @@ pub type PinPortType = u16;
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Mode {
     #[cfg(VSF_GPIO_INPUT)]
-    INPUT = VSF_GPIO_INPUT,
+    Input = VSF_GPIO_INPUT,
     #[cfg(VSF_GPIO_OUTPUT_PUSH_PULL)]
-    OUTPUT = VSF_GPIO_OUTPUT_PUSH_PULL,
+    Output = VSF_GPIO_OUTPUT_PUSH_PULL,
     #[cfg(VSF_GPIO_OUTPUT_OPEN_DRAIN)]
-    OUTPUT_OD = VSF_GPIO_OUTPUT_OPEN_DRAIN,
+    OutputOd = VSF_GPIO_OUTPUT_OPEN_DRAIN,
     #[cfg(VSF_GPIO_ANALOG)]
-    ANALOG = VSF_GPIO_ANALOG,
+    Analog = VSF_GPIO_ANALOG,
 
     #[cfg(VSF_GPIO_SPEED_LOW)]
-    OUTPUT_SPEED_LOW = VSF_GPIO_OUTPUT_PUSH_PULL | VSF_GPIO_SPEED_LOW,
+    OutputSpeedLow = VSF_GPIO_OUTPUT_PUSH_PULL | VSF_GPIO_SPEED_LOW,
     #[cfg(VSF_GPIO_SPEED_MEDIUM)]
-    OUTPUT_SPEED_MEDIUM = VSF_GPIO_OUTPUT_PUSH_PULL | VSF_GPIO_SPEED_MEDIUM,
+    OutputSpeedMedium = VSF_GPIO_OUTPUT_PUSH_PULL | VSF_GPIO_SPEED_MEDIUM,
     #[cfg(VSF_GPIO_SPEED_HIGH)]
-    OUTPUT_SPEED_HIGH = VSF_GPIO_OUTPUT_PUSH_PULL | VSF_GPIO_SPEED_HIGH,
+    OutputSpeedHigh = VSF_GPIO_OUTPUT_PUSH_PULL | VSF_GPIO_SPEED_HIGH,
     #[cfg(VSF_GPIO_SPEED_VERY_HIGH)]
-    OUTPUT_SPEED_VERY_HIGH = VSF_GPIO_OUTPUT_PUSH_PULL | VSF_GPIO_SPEED_VERY_HIGH,
+    OutputSpeedVeryHigh = VSF_GPIO_OUTPUT_PUSH_PULL | VSF_GPIO_SPEED_VERY_HIGH,
 }
 
 /// GPIO output type
@@ -83,6 +83,19 @@ pub enum Drive {
     VeryHigh
 }
 
+embassy_hal_internal::peripherals_definition!(
+    #[cfg(VSF_HW_GPIO_PORT0_PIN0)]
+    PA0,
+    #[cfg(VSF_HW_GPIO_PORT0_PIN1)]
+    PA1,
+);
+embassy_hal_internal::peripherals_struct!(
+    #[cfg(VSF_HW_GPIO_PORT0_PIN0)]
+    PA0,
+    #[cfg(VSF_HW_GPIO_PORT0_PIN1)]
+    PA1,
+);
+
 /// GPIO flexible pin.
 ///
 /// This pin can either be a disconnected, input, or output pin, or both. The level register bit will remain
@@ -117,7 +130,10 @@ impl<'d> Flex<'d> {
             },
             alternate_function: 0
         };
-        vsf_gpio_port_config_pins(vsf_hw_gpios[self.pin._port()], 1u32 << self.pin._pin(), &mut mode);
+        unsafe {
+            let gpio_port = vsf_hw_gpios[self.pin._port() as usize] as *mut vsf_gpio_t;
+            vsf_gpio_port_config_pins(gpio_port, 1u32 << self.pin._pin(), &mut mode);
+        }
     }
 
     /// Put the pin into push-pull output mode.
@@ -133,7 +149,10 @@ impl<'d> Flex<'d> {
             mode: VSF_GPIO_OUTPUT,
             alternate_function: 0
         };
-        vsf_gpio_port_config_pins(vsf_hw_gpios[self.pin._port()], 1u32 << self.pin._pin(), &mut mode);
+        unsafe {
+            let gpio_port = vsf_hw_gpios[self.pin._port() as usize] as *mut vsf_gpio_t;
+            vsf_gpio_port_config_pins(gpio_port, 1u32 << self.pin._pin(), &mut mode);
+        }
     }
 
     /// Put the pin into input + open-drain output mode.
@@ -152,7 +171,10 @@ impl<'d> Flex<'d> {
             mode: VSF_GPIO_OUTPUT_OPEN_DRAIN,
             alternate_function: 0
         };
-        vsf_gpio_port_config_pins(vsf_hw_gpios[self.pin._port()], 1u32 << self.pin._pin(), &mut mode);
+        unsafe {
+            let gpio_port = vsf_hw_gpios[self.pin._port() as usize] as *mut vsf_gpio_t;
+            vsf_gpio_port_config_pins(gpio_port, 1u32 << self.pin._pin(), &mut mode);
+        }
     }
 
     /// Put the pin into input + open-drain output mode with internal pullup or pulldown.
@@ -169,7 +191,10 @@ impl<'d> Flex<'d> {
             },
             alternate_function: 0
         };
-        vsf_gpio_port_config_pins(vsf_hw_gpios[self.pin._port()], 1u32 << self.pin._pin(), &mut mode);
+        unsafe {
+            let gpio_port = vsf_hw_gpios[self.pin._port() as usize] as *mut vsf_gpio_t;
+            vsf_gpio_port_config_pins(gpio_port, 1u32 << self.pin._pin(), &mut mode);
+        }
     }
 
     /// Put the pin into analog mode
@@ -179,11 +204,12 @@ impl<'d> Flex<'d> {
     #[inline]
     pub fn set_as_analog(&mut self) {
         // TODO: does this also need a critical section, like other methods?
-        let mode = vsf_gpio_cfg_t {
+        let mut mode = vsf_gpio_cfg_t {
             mode: VSF_GPIO_ANALOG,
             alternate_function: 0
         };
-        vsf_gpio_port_config_pins(vsf_hw_gpios[self.pin._port()], 1u32 << self.pin._pin(), &mode);
+        let gpio_port = vsf_hw_gpios[self.pin._port() as usize] as *mut vsf_gpio_t;
+        vsf_gpio_port_config_pins(gpio_port, 1u32 << self.pin._pin(), &mut mode);
     }
 
     /// Put the pin into AF mode, unchecked.
@@ -207,7 +233,10 @@ impl<'d> Flex<'d> {
     /// Get whether the pin input level is low.
     #[inline]
     pub fn is_low(&self) -> bool {
-        vsf_gpio_read() & (1u32 << self.pin._pin()) == 0
+        unsafe {
+            let gpio_port = vsf_hw_gpios[self.pin._port() as usize] as *mut vsf_gpio_t;
+            vsf_gpio_read(gpio_port) & (1u32 << self.pin._pin()) == 0
+        }
     }
 
     /// Get the current pin input level.
@@ -522,9 +551,12 @@ impl AfType {
 fn set_as_af(pin_port: PinPortType, af_num: u8, af_type: AfType) {
     let mut mode = vsf_gpio_cfg_t {
         mode: af_type.pull as u32 | af_type.mode,
-        alternate_function: af_num,
+        alternate_function: af_num as u16,
     };
-    vsf_gpio_port_config_pins(vsf_hw_gpios[pin_port >> 8], 1u32 << (pin_port & 0xFF), &mut mode);
+    unsafe {
+        let gpio_port = vsf_hw_gpios[(pin_port >> 8) as usize] as *mut vsf_gpio_t;
+        vsf_gpio_port_config_pins(gpio_port, 1u32 << (pin_port & 0xFF), &mut mode);
+    }
 }
 
 #[inline(never)]
@@ -533,7 +565,10 @@ fn set_as_analog(pin_port: PinPortType) {
         mode: VSF_GPIO_ANALOG,
         alternate_function: 0,
     };
-    vsf_gpio_port_config_pins(vsf_hw_gpios[pin_port >> 8], 1u32 << (pin_port & 0xFF), &mut mode);
+    unsafe {
+        let gpio_port = vsf_hw_gpios[(pin_port >> 8) as usize] as *mut vsf_gpio_t;
+        vsf_gpio_port_config_pins(gpio_port, 1u32 << (pin_port & 0xFF), &mut mode);
+    }
 }
 
 /// Holds the AFIO remap value for a peripheral's pin
@@ -561,13 +596,19 @@ pub(crate) trait SealedPin {
     /// Set the output as high.
     #[inline]
     fn set_high(&self) {
-        vsf_gpio_set(vsf_hw_gpios[self._port()], 1u32 << self._pin());
+        unsafe {
+            let gpio_port = vsf_hw_gpios[self._port() as usize] as *mut vsf_gpio_t;
+            vsf_gpio_set(gpio_port, 1u32 << self._pin());
+        }
     }
 
     /// Set the output as low.
     #[inline]
     fn set_low(&self) {
-        vsf_gpio_clear(vsf_hw_gpios[self._port()], 1u32 << self._pin());
+        unsafe {
+            let gpio_port = vsf_hw_gpios[self._port() as usize] as *mut vsf_gpio_t;
+            vsf_gpio_clear(gpio_port, 1u32 << self._pin());
+        }
     }
 
     #[inline]
@@ -657,58 +698,16 @@ impl SealedPin for AnyPin {
 pub(crate) unsafe fn init(_cs: CriticalSection) {
     #[cfg(vsf_hw_clkrst_region_set_bit)]
     {
-        #[cfg(VSF_HW_EN_GPIOA)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOA as u32);
-        #[cfg(VSF_HW_EN_GPIOB)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOB as u32);
-        #[cfg(VSF_HW_EN_GPIOC)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOC as u32);
-        #[cfg(VSF_HW_EN_GPIOD)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOD as u32);
-        #[cfg(VSF_HW_EN_GPIOE)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOE as u32);
-        #[cfg(VSF_HW_EN_GPIOF)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOF as u32);
-        #[cfg(VSF_HW_EN_GPIOG)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOG as u32);
-        #[cfg(VSF_HW_EN_GPIOH)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOH as u32);
-        #[cfg(VSF_HW_EN_GPIOI)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOI as u32);
-        #[cfg(VSF_HW_EN_GPIOJ)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOJ as u32);
-        #[cfg(VSF_HW_EN_GPIOK)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOK as u32);
-        #[cfg(VSF_HW_EN_GPIOL)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOL as u32);
-        #[cfg(VSF_HW_EN_GPIOM)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOM as u32);
-        #[cfg(VSF_HW_EN_GPION)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPION as u32);
-        #[cfg(VSF_HW_EN_GPIOO)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOO as u32);
-        #[cfg(VSF_HW_EN_GPIOP)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOP as u32);
-        #[cfg(VSF_HW_EN_GPIOQ)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOQ as u32);
-        #[cfg(VSF_HW_EN_GPIOR)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOR as u32);
-        #[cfg(VSF_HW_EN_GPIOS)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOS as u32);
-        #[cfg(VSF_HW_EN_GPIOT)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOT as u32);
-        #[cfg(VSF_HW_EN_GPIOU)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOU as u32);
-        #[cfg(VSF_HW_EN_GPIOV)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOV as u32);
-        #[cfg(VSF_HW_EN_GPIOW)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOW as u32);
-        #[cfg(VSF_HW_EN_GPIOX)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOX as u32);
-        #[cfg(VSF_HW_EN_GPIOY)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOY as u32);
-        #[cfg(VSF_HW_EN_GPIOZ)]
-        vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOZ as u32);
+        macro_rules! enable_peripherals {
+            ( $($peripheral_name:ident),* ) => {
+                $(
+                    #[cfg($peripheral_name)]
+                    vsf_hw_clkrst_region_set_bit(concat!(VSF_HW_EN_, $peripheral_name) as u32);
+                )*
+            }
+        }
+        enable_peripherals!(GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI,
+            GPIOJ, GPIOK, GPIOL, GPIOM, GPION, GPIOO, GPIOP, GPIOQ, GPIOR, GPIOS, GPIOT, GPIOU, GPIOV, GPIOW, GPIOX, GPIOY, GPIOZ);
     }
 }
 
