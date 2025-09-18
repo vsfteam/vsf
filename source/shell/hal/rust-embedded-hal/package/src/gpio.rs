@@ -3,9 +3,10 @@
 #![macro_use]
 use core::convert::Infallible;
 
+use critical_section::CriticalSection;
 use embassy_hal_internal::{impl_peripheral, Peri, PeripheralType};
 
-use crate::vsf_hal::{*};
+use crate::vsf_hal::{vsf_gpio_mode_t::*, *};
 
 pub type PinPortType = u16;
 
@@ -14,22 +15,15 @@ pub type PinPortType = u16;
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Mode {
     #[cfg(VSF_GPIO_INPUT)]
-    Input = VSF_GPIO_INPUT,
-    #[cfg(VSF_GPIO_OUTPUT_PUSH_PULL)]
-    Output = VSF_GPIO_OUTPUT_PUSH_PULL,
-    #[cfg(VSF_GPIO_OUTPUT_OPEN_DRAIN)]
-    OutputOd = VSF_GPIO_OUTPUT_OPEN_DRAIN,
-    #[cfg(VSF_GPIO_ANALOG)]
-    Analog = VSF_GPIO_ANALOG,
+    Input = VSF_GPIO_INPUT as isize,
 
-    #[cfg(VSF_GPIO_SPEED_LOW)]
-    OutputSpeedLow = VSF_GPIO_OUTPUT_PUSH_PULL | VSF_GPIO_SPEED_LOW,
-    #[cfg(VSF_GPIO_SPEED_MEDIUM)]
-    OutputSpeedMedium = VSF_GPIO_OUTPUT_PUSH_PULL | VSF_GPIO_SPEED_MEDIUM,
-    #[cfg(VSF_GPIO_SPEED_HIGH)]
-    OutputSpeedHigh = VSF_GPIO_OUTPUT_PUSH_PULL | VSF_GPIO_SPEED_HIGH,
-    #[cfg(VSF_GPIO_SPEED_VERY_HIGH)]
-    OutputSpeedVeryHigh = VSF_GPIO_OUTPUT_PUSH_PULL | VSF_GPIO_SPEED_VERY_HIGH,
+    #[cfg(VSF_GPIO_OUTPUT_OPEN_DRAIN)]
+    OutputOd = VSF_GPIO_OUTPUT_OPEN_DRAIN as isize,
+    #[cfg(VSF_GPIO_OUTPUT_PUSH_PULL)]
+    OutputPushPull = VSF_GPIO_OUTPUT_PUSH_PULL as isize,
+
+    #[cfg(VSF_GPIO_ANALOG)]
+    Analog = VSF_GPIO_ANALOG as isize,
 }
 
 /// GPIO output type
@@ -37,9 +31,9 @@ pub enum Mode {
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum OutputType {
     /// Drive the pin both high or low.
-    PushPull = VSF_GPIO_OUTPUT_PUSH_PULL,
+    PushPull = VSF_GPIO_OUTPUT_PUSH_PULL as isize,
     /// Drive the pin low, or don't drive it at all if the output level is high.
-    OpenDrain = VSF_GPIO_OUTPUT_OPEN_DRAIN,
+    OpenDrain = VSF_GPIO_OUTPUT_OPEN_DRAIN as isize,
 }
 
 /// Pull setting for an input.
@@ -48,39 +42,43 @@ pub enum OutputType {
 pub enum Pull {
     /// No pull
     #[cfg(VSF_GPIO_NO_PULL_UP_DOWN)]
-    None,
+    None = VSF_GPIO_NO_PULL_UP_DOWN as isize,
     /// Pull up
     #[cfg(VSF_GPIO_PULL_UP)]
-    Up,
+    Up = VSF_GPIO_PULL_UP as isize,
     /// Pull down
     #[cfg(VSF_GPIO_PULL_DOWN)]
-    Down,
+    Down = VSF_GPIO_PULL_DOWN as isize,
 }
 
 /// Speed setting for an output.
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Speed {
+    #[cfg(not(any(VSF_GPIO_SPEED_LOW, VSF_GPIO_SPEED_MEDIUM, VSF_GPIO_SPEED_HIGH, VSF_GPIO_SPEED_VERY_HIGH)))]
+    None = 0,
     #[cfg(VSF_GPIO_SPEED_LOW)]
-    Low,
+    Low = VSF_GPIO_SPEED_LOW as isize,
     #[cfg(VSF_GPIO_SPEED_MEDIUM)]
-    Medium,
+    Medium = VSF_GPIO_SPEED_MEDIUM as isize,
     #[cfg(VSF_GPIO_SPEED_HIGH)]
-    High,
+    High = VSF_GPIO_SPEED_HIGH as isize,
     #[cfg(VSF_GPIO_SPEED_VERY_HIGH)]
-    VeryHigh,
+    VeryHigh = VSF_GPIO_SPEED_VERY_HIGH as isize,
 }
 
 /// Drive strength setting for an output.
-pub enum Drive {
+pub enum DriveStrength {
+    #[cfg(not(any(VSF_GPIO_HIGH_DRIVE_STRENGTH_LOW, VSF_GPIO_HIGH_DRIVE_STRENGTH_MEDIUM, VSF_GPIO_HIGH_DRIVE_STRENGTH_HIGH, VSF_GPIO_HIGH_DRIVE_STRENGTH_VERY_HIGH)))]
+    None = 0,
     #[cfg(VSF_GPIO_HIGH_DRIVE_STRENGTH_LOW)]
-    Low,
+    Low = VSF_GPIO_HIGH_DRIVE_STRENGTH_LOW as isize,
     #[cfg(VSF_GPIO_HIGH_DRIVE_STRENGTH_MEDIUM)]
-    Medium,
+    Medium = VSF_GPIO_HIGH_DRIVE_STRENGTH_MEDIUM as isize,
     #[cfg(VSF_GPIO_HIGH_DRIVE_STRENGTH_HIGH)]
-    High,
+    High = VSF_GPIO_HIGH_DRIVE_STRENGTH_HIGH as isize,
     #[cfg(VSF_GPIO_HIGH_DRIVE_STRENGTH_VERY_HIGH)]
-    VeryHigh
+    VeryHigh = VSF_GPIO_HIGH_DRIVE_STRENGTH_VERY_HIGH as isize,
 }
 
 embassy_hal_internal::peripherals_definition!(
@@ -143,10 +141,9 @@ impl<'d> Flex<'d> {
     ///
     /// The internal weak pull-up and pull-down resistors will be disabled.
     #[inline(never)]
-    pub fn set_as_output(&mut self, speed: Speed) {
+    pub fn set_as_output(&mut self, speed: Speed, strength: DriveStrength) {
         let mut mode = vsf_gpio_cfg_t {
-            // TODO: or speed into mode, check VSF_GPIO_SPEED_MASK, VSF_GPIO_SPEED_LOW, VSF_GPIO_SPEED_MEDIUM, VSF_GPIO_SPEED_HIGH, VSF_GPIO_SPEED_VERY_HIGH
-            mode: VSF_GPIO_OUTPUT,
+            mode: VSF_GPIO_OUTPUT_PUSH_PULL | speed as u32 | strength as u32,
             alternate_function: 0
         };
         unsafe {
@@ -168,7 +165,7 @@ impl<'d> Flex<'d> {
     #[inline(never)]
     pub fn set_as_input_output(&mut self, speed: Speed) {
         let mut mode = vsf_gpio_cfg_t {
-            mode: VSF_GPIO_OUTPUT_OPEN_DRAIN,
+            mode: VSF_GPIO_OUTPUT_OPEN_DRAIN | speed as u32,
             alternate_function: 0
         };
         unsafe {
@@ -184,11 +181,7 @@ impl<'d> Flex<'d> {
     #[inline(never)]
     pub fn set_as_input_output_pull(&mut self, speed: Speed, pull: Pull) {
         let mut mode = vsf_gpio_cfg_t {
-            mode: match pull {
-                Pull::Up => VSF_GPIO_OUTPUT_OPEN_DRAIN | VSF_GPIO_PULL_UP,
-                Pull::Down => VSF_GPIO_OUTPUT_OPEN_DRAIN | VSF_GPIO_PULL_DOWN,
-                Pull::None => VSF_GPIO_OUTPUT_OPEN_DRAIN | VSF_GPIO_NO_PULL_UP_DOWN,
-            },
+            mode: VSF_GPIO_OUTPUT_OPEN_DRAIN | speed as u32 | pull as u32,
             alternate_function: 0
         };
         unsafe {
@@ -203,13 +196,14 @@ impl<'d> Flex<'d> {
     /// as the mode change is handled by the driver.
     #[inline]
     pub fn set_as_analog(&mut self) {
-        // TODO: does this also need a critical section, like other methods?
         let mut mode = vsf_gpio_cfg_t {
             mode: VSF_GPIO_ANALOG,
             alternate_function: 0
         };
-        let gpio_port = vsf_hw_gpios[self.pin._port() as usize] as *mut vsf_gpio_t;
-        vsf_gpio_port_config_pins(gpio_port, 1u32 << self.pin._pin(), &mut mode);
+        unsafe {
+            let gpio_port = vsf_hw_gpios[self.pin._port() as usize] as *mut vsf_gpio_t;
+            vsf_gpio_port_config_pins(gpio_port, 1u32 << self.pin._pin(), &mut mode);
+        }
     }
 
     /// Put the pin into AF mode, unchecked.
@@ -288,10 +282,9 @@ impl<'d> Flex<'d> {
     /// Toggle the output level.
     #[inline]
     pub fn toggle(&mut self) {
-        if self.is_set_low() {
-            self.set_high()
-        } else {
-            self.set_low()
+        unsafe {
+            let gpio_port = vsf_hw_gpios[self.pin._port() as usize] as *mut vsf_gpio_t;
+            vsf_gpio_toggle(gpio_port, 1u32 << self.pin._pin());
         }
     }
 }
@@ -376,13 +369,13 @@ pub struct Output<'d> {
 impl<'d> Output<'d> {
     /// Create GPIO output driver for a [Pin] with the provided [Level] and [Speed] configuration.
     #[inline]
-    pub fn new(pin: Peri<'d, impl Pin>, initial_output: Level, speed: Speed) -> Self {
+    pub fn new(pin: Peri<'d, impl Pin>, initial_output: Level, speed: Speed, strength: DriveStrength) -> Self {
         let mut pin = Flex::new(pin);
         match initial_output {
             Level::High => pin.set_high(),
             Level::Low => pin.set_low(),
         }
-        pin.set_as_output(speed);
+        pin.set_as_output(speed, strength);
         Self { pin }
     }
 
@@ -515,12 +508,10 @@ impl<'d> OutputOpenDrain<'d> {
 /// Alternate function type settings.
 #[derive(Copy, Clone)]
 pub enum AfMode {
-    #[cfg(VSF_GPIO_INPUT)]
-    AfInput = VSF_GPIO_INPUT,
     #[cfg(VSF_GPIO_AF_PUSH_PULL)]
-    AfPushPull = VSF_GPIO_AF_PUSH_PULL,
+    AfPushPull = VSF_GPIO_AF_PUSH_PULL as isize,
     #[cfg(VSF_GPIO_AF_OPEN_DRAIN)]
-    AfOpenDrain = VSF_GPIO_AF_OPEN_DRAIN,
+    AfOpenDrain = VSF_GPIO_AF_OPEN_DRAIN as isize,
 }
 
 #[derive(Copy, Clone)]
@@ -533,15 +524,15 @@ impl AfType {
     /// Input with optional pullup or pulldown.
     pub const fn input(pull: Pull) -> Self {
         Self {
-            mode: AfMode::AfInput as u32,
+            mode: VSF_GPIO_AF | VSF_GPIO_INPUT,
             pull,
         }
     }
 
     /// Output with output type and speed and no pull-up or pull-down.
-    pub const fn output(output_type: OutputType, speed: Speed) -> Self {
+    pub const fn output(output_type: OutputType, speed: Speed, strength: DriveStrength) -> Self {
         Self {
-            mode: AfMode::AfPushPull as u32 | speed as u32 | output_type as u32,
+            mode: AfMode::AfPushPull as u32 | speed as u32 | strength as u32 | output_type as u32,
             pull: Pull::None,
         }
     }

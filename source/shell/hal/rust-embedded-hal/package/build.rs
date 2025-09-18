@@ -11,7 +11,7 @@ const TOML_TARGET_MODEL_NODE: &str = "model";
 const TOML_TARGET_FLAGS_NODE: &str = "flags";
 
 const PERIPHERIALS: [&'static str; 2] = ["gpio", "usart"];
-const OPTIONS: [&'static str; 48] = [
+const OPTIONS: [&'static str; 49] = [
     // GPIO configurations
     "VSF_HW_GPIO_PIN_COUNT",
     "VSF_GPIO_INPUT",
@@ -22,6 +22,7 @@ const OPTIONS: [&'static str; 48] = [
     "VSF_GPIO_AF",
     "VSF_GPIO_AF_PUSH_PULL",
     "VSF_GPIO_AF_OPEN_DRAIN",
+    "VSF_GPIO_SPEED_MASK",
     "VSF_GPIO_SPEED_LOW",
     "VSF_GPIO_SPEED_MEDIUM",
     "VSF_GPIO_SPEED_HIGH",
@@ -127,8 +128,8 @@ fn main() {
 
     let mut builder = bindgen::Builder::default()
                     .header("".to_string() + &path + "source/hal/driver/driver.h")
+                    .raw_line("#![allow(non_camel_case_types)]")
                     .use_core()
-                    .blocklist_item("__.*")
                     .default_enum_style(bindgen::EnumVariation::ModuleConsts)
                     .clang_arg("-D".to_string() + "__" + &vendor + "__")
                     .clang_arg("-D".to_string() + "__" + &model + "__")

@@ -32,6 +32,7 @@ panic-probe = { version = "1.0.0", features = ["print-defmt"] }
 
 [features]
 defmt = []
+log = []
 
 [build-dependencies]
 bindgen = "0.72.1"
