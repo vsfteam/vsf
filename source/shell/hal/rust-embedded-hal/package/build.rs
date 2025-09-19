@@ -152,6 +152,14 @@ fn main() {
     let bindings_content = fs::read_to_string(&pathbuf).unwrap();
     let bindings_lines = bindings_content.lines().collect();
 
+    // rustc-check all gpio possibile configs
+    for port_idx in 0..26 {
+        println!("cargo::rustc-check-cfg=cfg(VSF_HW_GPIO_PORT{port_idx}_MASK)");
+        for pin_idx in 0..64 {
+            println!("cargo::rustc-check-cfg=cfg(VSF_HW_GPIO_PORT{port_idx}_PIN{pin_idx})");
+        }
+    }
+
     // parse peripherials
     for peripherial in PERIPHERIALS {
         let mask = enable_peripherial(&bindings_lines, peripherial);
@@ -160,14 +168,12 @@ fn main() {
                 if mask & (1 << index) != 0 {
                     if let Some(mut gpion_mask) = extract_const_integer::<u32>(&bindings_lines, &format!("VSF_HW_GPIO_PORT{index}_MASK")) {
                         println!("cargo:warning=VSF_HW_GPIO_PORT{index}_MASK: 0x{gpion_mask:X}");
-                        println!("cargo::rustc-check-cfg=cfg(VSF_HW_GPIO_PORT{index}_MASK)");
                         println!("cargo:rustc-cfg=VSF_HW_GPIO_PORT{index}_MASK");
 
                         let mut gpion_pin_index = 0;
                         while gpion_mask != 0 {
                             if gpion_mask & 1 != 0 {
                                 println!("cargo:warning=VSF_HW_GPIO_PORT{index}_PIN{gpion_pin_index} enabled");
-                                println!("cargo::rustc-check-cfg=cfg(VSF_HW_GPIO_PORT{index}_PIN{gpion_pin_index})");
                                 println!("cargo:rustc-cfg=VSF_HW_GPIO_PORT{index}_PIN{gpion_pin_index}");
                             }
                             gpion_pin_index += 1;

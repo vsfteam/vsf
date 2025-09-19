@@ -8,6 +8,8 @@ use embassy_hal_internal::{impl_peripheral, Peri, PeripheralType};
 
 use crate::vsf_hal::{vsf_gpio_mode_t::*, *};
 
+vsf_hal_macros::bind_vsf_gpios!{}
+
 pub type PinPortType = u16;
 
 /// Mode setting for an gpio.
@@ -80,19 +82,6 @@ pub enum DriveStrength {
     #[cfg(VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH)]
     VeryHigh = VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH as isize,
 }
-
-embassy_hal_internal::peripherals_definition!(
-    #[cfg(VSF_HW_GPIO_PORT0_PIN0)]
-    PA0,
-    #[cfg(VSF_HW_GPIO_PORT0_PIN1)]
-    PA1,
-);
-embassy_hal_internal::peripherals_struct!(
-    #[cfg(VSF_HW_GPIO_PORT0_PIN0)]
-    PA0,
-    #[cfg(VSF_HW_GPIO_PORT0_PIN1)]
-    PA1,
-);
 
 /// GPIO flexible pin.
 ///
