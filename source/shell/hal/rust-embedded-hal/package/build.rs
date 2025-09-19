@@ -11,7 +11,7 @@ const TOML_TARGET_MODEL_NODE: &str = "model";
 const TOML_TARGET_FLAGS_NODE: &str = "flags";
 
 const PERIPHERIALS: [&'static str; 2] = ["gpio", "usart"];
-const OPTIONS: [&'static str; 49] = [
+const OPTIONS: [&'static str; 47] = [
     // GPIO configurations
     "VSF_HW_GPIO_PIN_COUNT",
     "VSF_GPIO_INPUT",
@@ -35,8 +35,6 @@ const OPTIONS: [&'static str; 49] = [
     "VSF_GPIO_DRIVE_STRENGTH_HIGH",
     "VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH",
     // peripherial enable/disable
-    "vsf_hw_clkrst_region_set_bit",
-    "vsf_hw_clkrst_region_clear_bit",
     "VSF_HW_EN_GPIOA",
     "VSF_HW_EN_GPIOB",
     "VSF_HW_EN_GPIOC",
@@ -63,6 +61,13 @@ const OPTIONS: [&'static str; 49] = [
     "VSF_HW_EN_GPIOX",
     "VSF_HW_EN_GPIOY",
     "VSF_HW_EN_GPIOZ",
+];
+const FUNCTIONS: [&'static str; 2] = [
+    "vsf_hw_clkrst_region_set_bit",
+    "vsf_hw_clkrst_region_clear_bit",
+];
+const MODULES: [&'static str; 1] = [
+    "vsf_hw_peripheral_en_t",
 ];
 
 fn main() {
@@ -189,6 +194,24 @@ fn main() {
             println!("cargo:rustc-cfg={option}");
         }
     }
+
+    // parse functions
+    for func in FUNCTIONS {
+        println!("cargo::rustc-check-cfg=cfg({func})");
+        if extract_function(&bindings_lines, func) {
+            println!("cargo:warning=function: {func} enabled");
+            println!("cargo:rustc-cfg={func}");
+        }
+    }
+
+    // parse modules
+    for module in MODULES {
+        println!("cargo::rustc-check-cfg=cfg({module})");
+        if extract_module(&bindings_lines, module) {
+            println!("cargo:warning=module: {module} enabled");
+            println!("cargo:rustc-cfg={module}");
+        }
+    }
 }
 
 fn enable_peripherial(lines: &Vec<&str>, name: &str) -> u32 {
@@ -227,6 +250,37 @@ fn extrace_peripheral_mask(lines: &Vec<&str>, name: &str) -> u32 {
             0u32
         }
     }
+}
+
+fn extract_function(lines: &Vec<&str>, name: &str) -> bool {
+    let mut matched = false;
+    let prefix = String::from(name) + "(";
+    for line in lines {
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        // pub fn FUNC_NAME(...);
+        if parts.len() >= 3 && parts[0] == "pub" && parts[1] == "fn" {
+            if parts[2].starts_with(&prefix) {
+                matched = true;
+                break;
+            }
+        }
+    }
+    return matched;
+}
+
+fn extract_module(lines: &Vec<&str>, name: &str) -> bool {
+    let mut matched = false;
+    for line in lines {
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        // pub mod MODULE_NAME {
+        if parts.len() >= 3 && parts[0] == "pub" && parts[1] == "mod" {
+            if parts[2] == name {
+                matched = true;
+                break;
+            }
+        }
+    }
+    return matched;
 }
 
 fn extract_const_integer<T>(lines: &Vec<&str>, name: &str) -> Option<T>

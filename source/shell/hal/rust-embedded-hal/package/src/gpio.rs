@@ -753,19 +753,66 @@ impl SealedPin for AnyPin {
 
 vsf_hal_macros::bind_vsf_gpio_pins!{}
 
+#[cfg(vsf_hw_peripheral_en_t)]
+use super::vsf_hal::{vsf_hw_peripheral_en_t::*};
+
 pub(crate) unsafe fn init(_cs: CriticalSection) {
-    #[cfg(vsf_hw_clkrst_region_set_bit)]
+    #[cfg(all(vsf_hw_clkrst_region_set_bit, vsf_hw_peripheral_en_t))]
     {
-        macro_rules! enable_peripherals {
-            ( $($peripheral_name:ident),* ) => {
-                $(
-                    #[cfg($peripheral_name)]
-                    vsf_hw_clkrst_region_set_bit(concat!(VSF_HW_EN_, $peripheral_name) as u32);
-                )*
-            }
+        unsafe {
+            #[cfg(VSF_HW_EN_GPIOA)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOA as u32);
+            #[cfg(VSF_HW_EN_GPIOB)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOB as u32);
+            #[cfg(VSF_HW_EN_GPIOC)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOC as u32);
+            #[cfg(VSF_HW_EN_GPIOD)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOD as u32);
+            #[cfg(VSF_HW_EN_GPIOE)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOE as u32);
+            #[cfg(VSF_HW_EN_GPIOF)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOF as u32);
+            #[cfg(VSF_HW_EN_GPIOG)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOG as u32);
+            #[cfg(VSF_HW_EN_GPIOH)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOH as u32);
+            #[cfg(VSF_HW_EN_GPIOI)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOI as u32);
+            #[cfg(VSF_HW_EN_GPIOJ)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOJ as u32);
+            #[cfg(VSF_HW_EN_GPIOK)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOK as u32);
+            #[cfg(VSF_HW_EN_GPIOL)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOL as u32);
+            #[cfg(VSF_HW_EN_GPIOM)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOM as u32);
+            #[cfg(VSF_HW_EN_GPION)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPION as u32);
+            #[cfg(VSF_HW_EN_GPIOO)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOO as u32);
+            #[cfg(VSF_HW_EN_GPIOP)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOP as u32);
+            #[cfg(VSF_HW_EN_GPIOQ)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOQ as u32);
+            #[cfg(VSF_HW_EN_GPIOR)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOR as u32);
+            #[cfg(VSF_HW_EN_GPIOS)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOS as u32);
+            #[cfg(VSF_HW_EN_GPIOT)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOT as u32);
+            #[cfg(VSF_HW_EN_GPIOU)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOU as u32);
+            #[cfg(VSF_HW_EN_GPIOV)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOV as u32);
+            #[cfg(VSF_HW_EN_GPIOW)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOW as u32);
+            #[cfg(VSF_HW_EN_GPIOX)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOX as u32);
+            #[cfg(VSF_HW_EN_GPIOY)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOY as u32);
+            #[cfg(VSF_HW_EN_GPIOZ)]
+            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIOZ as u32);
         }
-        enable_peripherals!(GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, GPIOH, GPIOI,
-            GPIOJ, GPIOK, GPIOL, GPIOM, GPION, GPIOO, GPIOP, GPIOQ, GPIOR, GPIOS, GPIOT, GPIOU, GPIOV, GPIOW, GPIOX, GPIOY, GPIOZ);
     }
 }
 
