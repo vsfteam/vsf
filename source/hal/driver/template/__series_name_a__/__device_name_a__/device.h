@@ -114,6 +114,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#endif      // __VSF_HAL_DEVICE_&{VENDOR}_${DEVICE}_H__
+#endif      // __VSF_HAL_DEVICE_${VENDOR}_${DEVICE}_H__
 #endif
 /* EOF */

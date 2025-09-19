@@ -27,6 +27,7 @@
 
 // HW
 // for vendor headers
+#define __VSF_HAL_SHOW_VENDOR_INFO__
 #include "hal/driver/vendor_driver.h"
 // HW end
 

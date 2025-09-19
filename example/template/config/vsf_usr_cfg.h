@@ -50,6 +50,8 @@
 #   include "./vsf_usr_cfg/vsf_usr_cfg_cmem7.h"
 #elif   defined(__STM32H743XI__)
 #   include "./vsf_usr_cfg/vsf_usr_cfg_stm32h743xi.h"
+#elif   defined(__FAKE_DEVICE__)
+#   include "./vsf_usr_cfg/vsf_usr_cfg_fake_device.h"
 #endif
 
 // kernel configurations

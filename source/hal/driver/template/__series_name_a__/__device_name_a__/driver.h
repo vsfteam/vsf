@@ -64,13 +64,16 @@
 #       include "../common/timer/timer.h"
 #   endif
 #   if VSF_HAL_USE_TRNG == ENABLED
-#       include "../common/trng/trng.h"
+#       include "../common/rng/rng.h"
 #   endif
 #   if VSF_HAL_USE_USART == ENABLED
-#       include "../common/uart/uart.h"
+#       include "../common/usart/usart.h"
 #   endif
 #   if VSF_HAL_USE_USB == ENABLED
-#       include "../common/usb/usb.h"
+// For non-IPCore devices, we usually use usb_otg.nonip.h
+// For IPCore devices, we usually use usb.h
+//#       include "../common/usb/usb.h"
+#       include "../common/usb_otg.nonip/usb_otg.nonip.h"
 #   endif
 #   if VSF_HAL_USE_SDIO == ENABLED
 #       include "../common/sdio/sdio.h"
@@ -82,7 +85,7 @@
 #       include "../common/wdt/wdt.h"
 #   endif
 #   if VSF_HAL_USE_ETH == ENABLED
-#       include "../common/mac/mac.h"
+#       include "../common/eth/eth.h"
 #   endif
 
 /*============================ MACROS ========================================*/
