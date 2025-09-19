@@ -16,6 +16,8 @@ jobs:
         target: [aic8800] # Removed: m484, mps2
         # all available releases in https://github.com/carlosperate/arm-none-eabi-gcc-action
         cc: [
+          'latest',
+          '14.3.Rel1',
           '13.3.Rel1',
           '12.3.Rel1',
           '11.3.Rel1',
