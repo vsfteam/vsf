@@ -8,8 +8,6 @@ use embassy_hal_internal::{impl_peripheral, Peri, PeripheralType};
 
 use super::vsf_hal::{vsf_gpio_mode_t::*, *};
 
-vsf_hal_macros::bind_vsf_gpios!{}
-
 pub type PinPortType = u16;
 
 /// Mode setting for an gpio.

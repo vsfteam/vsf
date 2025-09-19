@@ -36,3 +36,5 @@ pub mod mode {
 pub mod gpio;
 #[cfg(vsf_usart_enabled)]
 pub mod usart;
+
+vsf_hal_macros::bind_vsf_peripherials!{}
