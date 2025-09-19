@@ -1,0 +1,266 @@
+# VSF HAL Driver Template Test Configuration
+# 测试配置文件
+
+# 基本测试参数
+test_params:
+  vendor: "MyVendor"
+  series: "MySeries"
+  device: "MyDevice"
+  chip_name: "mychip"  # 用于项目名称
+
+# 外设配置数据
+# 格式:
+#   name: 外设名称
+#   count: 实例数量
+#   base_addr: 基地址起始 (十六进制)
+#   addr_offset: 地址偏移 (十六进制)
+#   irq_start: 中断起始号
+#   special_config: 特殊配置 (可选)
+#   comment: 注释说明
+peripherals:
+  - name: "ADC"
+    count: 3
+    base_addr: "0x40000000"
+    addr_offset: "0x400"
+    irq_start: 0
+    special_config: ""
+    comment: "ADC0-2"
+
+  - name: "DAC"
+    count: 2
+    base_addr: "0x40001000"
+    addr_offset: "0x400"
+    irq_start: 3
+    special_config: ""
+    comment: "DAC0-1"
+
+  - name: "DMA"
+    count: 4
+    base_addr: "0x40002000"
+    addr_offset: "0x400"
+    irq_start: 5
+    special_config: ""
+    comment: "DMA0-3"
+
+  - name: "ETH"
+    count: 1
+    base_addr: "0x40003000"
+    addr_offset: "0x400"
+    irq_start: 9
+    special_config: "WKUP"
+    comment: "ETH + ETH_WKUP"
+
+  - name: "FLASH"
+    count: 1
+    base_addr: "0x40004000"
+    addr_offset: "0x400"
+    irq_start: 11
+    special_config: ""
+    comment: "Flash Controller"
+
+  - name: "GPIO"
+    count: 4
+    base_addr: "0x40005000"
+    addr_offset: "0x400"
+    irq_start: 12
+    special_config: "EXTI"
+    comment: "GPIOA-D + EXTI0-4,9_5,15_10"
+
+  - name: "I2C"
+    count: 4
+    base_addr: "0x40008000"
+    addr_offset: "0x400"
+    irq_start: 23
+    special_config: ""
+    comment: "I2C0-3"
+
+  - name: "I2S"
+    count: 3
+    base_addr: "0x40009000"
+    addr_offset: "0x400"
+    irq_start: 27
+    special_config: ""
+    comment: "I2S0-2"
+
+  - name: "PWM"
+    count: 4
+    base_addr: "0x4000A000"
+    addr_offset: "0x400"
+    irq_start: 30
+    special_config: ""
+    comment: "PWM0-3"
+
+  - name: "RNG"
+    count: 1
+    base_addr: "0x4000B000"
+    addr_offset: "0x400"
+    irq_start: 34
+    special_config: ""
+    comment: "RNG"
+
+  - name: "RTC"
+    count: 1
+    base_addr: "0x4000C000"
+    addr_offset: "0x400"
+    irq_start: 35
+    special_config: "ALARM"
+    comment: "RTC + RTC_ALARM"
+
+  - name: "SDIO"
+    count: 2
+    base_addr: "0x4000D000"
+    addr_offset: "0x400"
+    irq_start: 37
+    special_config: ""
+    comment: "SDIO0-1"
+
+  - name: "SPI"
+    count: 4
+    base_addr: "0x4000E000"
+    addr_offset: "0x400"
+    irq_start: 39
+    special_config: ""
+    comment: "SPI0-3"
+
+  - name: "QSPI"
+    count: 2
+    base_addr: "0x4000F000"
+    addr_offset: "0x400"
+    irq_start: 43
+    special_config: ""
+    comment: "QSPI0-1"
+
+  - name: "TIMER"
+    count: 8
+    base_addr: "0x40010000"
+    addr_offset: "0x400"
+    irq_start: 45
+    special_config: ""
+    comment: "TIMER0-7"
+
+  - name: "USART"
+    count: 8
+    base_addr: "0x40012000"
+    addr_offset: "0x400"
+    irq_start: 53
+    special_config: "UART"
+    comment: "USART0-3, UART0-3"
+
+  - name: "USB_OTG"
+    count: 2
+    base_addr: "0x50000000"
+    addr_offset: "0x1000"
+    irq_start: 61
+    special_config: "FS_HS_WKUP"
+    comment: "USB_OTG_FS, USB_OTG_HS"
+
+  - name: "WDT"
+    count: 2
+    base_addr: "0x40014000"
+    addr_offset: "0x400"
+    irq_start: 65
+    special_config: "IWDT"
+    comment: "WDT, IWDT"
+
+# 构建配置
+build_config:
+  # 禁用的组件列表
+  disabled_components:
+    - "VSF_USE_LINUX"
+    - "VSF_USE_LVGL"
+    - "VSF_USE_FREETYPE"
+    - "VSF_USE_DISP"
+    - "VSF_USE_SDL2"
+    - "VSF_USE_LIBJPEG_TURBO"
+    - "VSF_USE_LIBPNG"
+    - "VSF_USE_ZLIB"
+    - "VSF_USE_LWIP"
+    - "VSF_USE_BTSTACK"
+    - "VSF_USE_COREMARK"
+    - "VSF_USE_LUA"
+
+  # 禁用的demo列表
+  disabled_demos:
+    - "APP_USE_LINUX_DEMO"
+    - "APP_USE_USBH_DEMO"
+    - "APP_USE_USBD_DEMO"
+    - "APP_USE_SCSI_DEMO"
+    - "APP_USE_AUDIO_DEMO"
+    - "APP_USE_TGUI_DEMO"
+    - "APP_USE_SDL2_DEMO"
+    - "APP_USE_CPP_DEMO"
+    - "APP_USE_NNOM_DEMO"
+    - "APP_USE_LVGL_DEMO"
+    - "APP_USE_BTSTACK_DEMO"
+    - "APP_USE_VSFVM_DEMO"
+    - "APP_USE_VSFIP_DEMO"
+    - "APP_USE_LWIP_DEMO"
+    - "APP_USE_LUA_DEMO"
+    - "APP_USE_COREMARK_DEMO"
+    - "APP_USE_EVM_DEMO"
+
+# 内存配置
+memory_config:
+  heap_size: "0x2000"
+  systimer_freq: "48000000ul"
+  flash_origin: "0x08000000"
+  flash_length: "512K"
+  ram_origin: "0x20000000"
+  ram_length: "128K"
+  heap_size_bytes: "0x1000"  # 4KB Heap
+  stack_size_bytes: "0x800"  # 2KB Stack
+
+# CMSIS 配置
+cmsis_config:
+  cm4_rev: "0x0001U"
+  mpu_present: "1U"
+  nvic_prio_bits: "4U"
+  vendor_systick_config: "0U"
+  fpu_present: "1U"
+  vtor_present: "1U"
+  arch_pri_num: 64
+  arch_pri_bit: 6
+
+# 模板文件配置
+template_config:
+  # 模板文件名配置
+  template_files:
+    target_cmake: "target.cmake.template"
+    project_cmake: "CMakeLists.txt.template"
+    linker: "linker_simple.ld.template"
+    vendor_cmake: "vendor_cmake.template"
+    vendor_driver_h: "vendor_driver.h.template"
+    series_cmake: "series_cmake.template"
+    common_cmake: "common_cmake.template"
+    device_cmake: "device_cmake.template"
+    startup: "startup.S.template"
+    driver_c: "driver.c.template"
+    device_h: "device.h.template"
+    vsf_usr_cfg: "vsf_usr_cfg.h.template"
+
+  # 文件命名模式配置
+  file_naming_patterns:
+    startup_file: "startup_{device_lower}.S"
+    driver_file: "driver.c"
+    device_header_file: "device.h"
+    linker_file: "linker.ld"
+    cmake_file: "CMakeLists.txt"
+
+  # 目录结构配置
+  directory_structure:
+    old_device_dir_pattern: "__device_name_a__"
+    new_device_dir_pattern: "{device}"
+    device_header_pattern: "__device.h"
+
+  # 文件处理规则配置
+  file_processing_rules:
+    search_patterns: ["*.h", "*.c"]
+    exclude_files: ["__device.h"]
+    ipcore_markers:
+      start: "// IPCore"
+      end: "// IPCore end"
+
+  # 构建选项配置
+  build_options:
+    default_generator: "Unix Makefiles"
+    available_generators: ["Ninja", "Unix Makefiles"]

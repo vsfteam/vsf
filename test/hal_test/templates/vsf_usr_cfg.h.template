@@ -1,0 +1,53 @@
+/*****************************************************************************
+ *   Copyright(C)2009-2022 by VSF Team                                       *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *     http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ ****************************************************************************/
+
+
+//! \note User Level Application Configuration
+
+#ifndef __VSF_USR_CFG_{{DEVICE}}_UPPER_H__
+#define __VSF_USR_CFG_{{DEVICE}}_UPPER_H__
+
+/*============================ INCLUDES ======================================*/
+/*============================ MACROS ========================================*/
+
+// Application configure - 禁用可能导致编译问题的demo
+{{DISABLED_DEMOS}}
+
+// component configure
+#define VSF_USE_HEAP                                    ENABLED
+#   define VSF_HEAP_CFG_MCB_MAGIC_EN                    ENABLED
+#   define VSF_HEAP_SIZE                                {{HEAP_SIZE}}
+#   define VSF_SYSTIMER_FREQ                            ({{SYSTIMER_FREQ}})
+
+// 禁用可能有问题的组件
+#define VSF_USE_VIDEO                                   DISABLED
+#define VSF_USE_AUDIO                                   DISABLED
+#define VSF_USE_INPUT                                   DISABLED
+#define VSF_USE_MAL                                     DISABLED
+#define VSF_USE_SCSI                                    DISABLED
+#define VSF_USE_FS                                      DISABLED
+
+// 只启用基本的HAL功能进行测试
+#define VSF_USE_SIMPLE_STREAM                           ENABLED
+
+/*============================ TYPES =========================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ PROTOTYPES ====================================*/
+
+#endif      // __VSF_USR_CFG_{{DEVICE}}_UPPER_H__
+/* EOF */

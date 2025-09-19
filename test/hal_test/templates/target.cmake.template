@@ -1,0 +1,21 @@
+set(VSF_HAL_CHIP_VENDOR     {{VENDOR}})
+set(VSF_HAL_CHIP_SERIES     {{SERIES}})
+set(VSF_HAL_CHIP_NAME       {{CHIP_NAME}})
+
+set(VSF_TARGET_DEFINITIONS
+    "__{{VENDOR_UPPER}}__"
+    "__{{SERIES_UPPER}}__"
+    "__{{DEVICE_UPPER}}__"
+
+    ${VSF_TARGET_DEFINITIONS}
+)
+
+# 使用通用的ARM Cortex-M4配置作为基础
+include(${VSF_CMAKE_ROOT}/targets/arm/__cortex_m4.cmake)
+
+set(VSF_TARGET_PATH ${VSF_SRC_PATH}/hal/driver/${VSF_HAL_CHIP_VENDOR}/${VSF_HAL_CHIP_SERIES})
+list(APPEND VSF_TARGET_INCLUDE_DIRECTORIES
+    ${VSF_TARGET_PATH}
+    ${VSF_TARGET_PATH}/common
+    ${VSF_TARGET_PATH}/{{DEVICE}}
+)
