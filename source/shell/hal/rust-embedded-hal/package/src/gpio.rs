@@ -6,7 +6,7 @@ use core::convert::Infallible;
 use critical_section::CriticalSection;
 use embassy_hal_internal::{impl_peripheral, Peri, PeripheralType};
 
-use crate::vsf_hal::{vsf_gpio_mode_t::*, *};
+use super::vsf_hal::{vsf_gpio_mode_t::*, *};
 
 vsf_hal_macros::bind_vsf_gpios!{}
 

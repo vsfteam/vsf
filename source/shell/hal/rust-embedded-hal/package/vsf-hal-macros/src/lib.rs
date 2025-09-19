@@ -2,7 +2,7 @@ extern crate proc_macro;
 use proc_macro::TokenStream;
 
 #[proc_macro]
-pub fn bind_vsf_gpios(item: TokenStream) -> TokenStream {
+pub fn bind_vsf_gpios(_item: TokenStream) -> TokenStream {
     let mut output_code = String::from("embassy_hal_internal::peripherals_definition!(");
     for gpio_port_idx in 0..26 {
         let port_ch: char = ('A' as u8 + gpio_port_idx) as char;
