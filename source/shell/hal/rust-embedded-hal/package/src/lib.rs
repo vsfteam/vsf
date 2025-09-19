@@ -38,3 +38,29 @@ pub mod gpio;
 pub mod usart;
 
 vsf_hal_macros::bind_vsf_peripherials!{}
+
+#[non_exhaustive]
+#[derive(Clone, Copy)]
+pub struct Config {
+
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+
+        }
+    }
+}
+
+pub fn init(config: Config) -> Peripherals {
+    critical_section::with(|cs| {
+        let p = Peripherals::take_with_cs(cs);
+
+        unsafe {
+            gpio::init(cs);
+        }
+
+        p
+    })
+}

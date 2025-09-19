@@ -1,10 +1,13 @@
 //! General-purpose Input/Output (GPIO)
 
 #![macro_use]
+#![allow(dead_code)]
+
 use core::convert::Infallible;
 
 use critical_section::CriticalSection;
 use embassy_hal_internal::{impl_peripheral, Peri, PeripheralType};
+use crate::peripherals;
 
 use super::vsf_hal::{vsf_gpio_mode_t::*, *};
 
@@ -67,6 +70,43 @@ pub enum Speed {
     VeryHigh = VSF_GPIO_SPEED_VERY_HIGH as isize,
 }
 
+impl Speed {
+    fn lowest() -> Self {
+        #[cfg(VSF_GPIO_SPEED_LOW)]
+        let result = Speed::Low;
+        #[cfg(all(not(VSF_GPIO_SPEED_LOW), VSF_GPIO_SPEED_MEDIUM))]
+        let result = Speed::Medium;
+        #[cfg(all(not(VSF_GPIO_SPEED_LOW), not(VSF_GPIO_SPEED_MEDIUM), VSF_GPIO_SPEED_HIGH))]
+        let result = Speed::High;
+        #[cfg(all(not(VSF_GPIO_SPEED_LOW), not(VSF_GPIO_SPEED_MEDIUM), not(VSF_GPIO_SPEED_HIGH), VSF_GPIO_SPEED_VERY_HIGH))]
+        let result = Speed::VeryHigh;
+        #[cfg(not(any(VSF_GPIO_SPEED_LOW, VSF_GPIO_SPEED_MEDIUM, VSF_GPIO_SPEED_HIGH, VSF_GPIO_SPEED_VERY_HIGH)))]
+        let result = Speed::None;
+
+        result
+    }
+    fn highest() -> Self {
+        #[cfg(VSF_GPIO_SPEED_VERY_HIGH)]
+        let result = Speed::VeryHigh;
+        #[cfg(all(not(VSF_GPIO_SPEED_VERY_HIGH), VSF_GPIO_SPEED_HIGH))]
+        let result = Speed::High;
+        #[cfg(all(not(VSF_GPIO_SPEED_VERY_HIGH), not(VSF_GPIO_SPEED_HIGH), VSF_GPIO_SPEED_MEDIUM))]
+        let result = Speed::Medium;
+        #[cfg(all(not(VSF_GPIO_SPEED_VERY_HIGH), not(VSF_GPIO_SPEED_HIGH), not(VSF_GPIO_SPEED_MEDIUM), VSF_GPIO_SPEED_LOW))]
+        let result = Speed::Low;
+        #[cfg(not(any(VSF_GPIO_SPEED_VERY_HIGH, VSF_GPIO_SPEED_HIGH, VSF_GPIO_SPEED_MEDIUM, VSF_GPIO_SPEED_LOW)))]
+        let result = Speed::None;
+
+        result
+    }
+}
+
+impl Default for Speed {
+    fn default() -> Self {
+        Speed::lowest()
+    }
+}
+
 /// Drive strength setting for an output.
 pub enum DriveStrength {
     #[cfg(not(any(VSF_GPIO_DRIVE_STRENGTH_LOW, VSF_GPIO_DRIVE_STRENGTH_MEDIUM, VSF_GPIO_DRIVE_STRENGTH_HIGH, VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH)))]
@@ -79,6 +119,43 @@ pub enum DriveStrength {
     High = VSF_GPIO_DRIVE_STRENGTH_HIGH as isize,
     #[cfg(VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH)]
     VeryHigh = VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH as isize,
+}
+
+impl DriveStrength {
+    fn lowest() -> Self {
+        #[cfg(VSF_GPIO_DRIVE_STRENGTH_LOW)]
+        let result = DriveStrength::Low;
+        #[cfg(all(not(VSF_GPIO_DRIVE_STRENGTH_LOW), VSF_GPIO_DRIVE_STRENGTH_MEDIUM))]
+        let result = DriveStrength::Medium;
+        #[cfg(all(not(VSF_GPIO_DRIVE_STRENGTH_LOW), not(VSF_GPIO_DRIVE_STRENGTH_MEDIUM), VSF_GPIO_DRIVE_STRENGTH_HIGH))]
+        let result = DriveStrength::High;
+        #[cfg(all(not(VSF_GPIO_DRIVE_STRENGTH_LOW), not(VSF_GPIO_DRIVE_STRENGTH_MEDIUM), not(VSF_GPIO_DRIVE_STRENGTH_HIGH), VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH))]
+        let result = DriveStrength::VeryHigh;
+        #[cfg(not(any(VSF_GPIO_DRIVE_STRENGTH_LOW, VSF_GPIO_DRIVE_STRENGTH_MEDIUM, VSF_GPIO_DRIVE_STRENGTH_HIGH, VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH)))]
+        let result = DriveStrength::None;
+
+        result
+    }
+    fn highest() -> Self {
+        #[cfg(VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH)]
+        let result = DriveStrength::VeryHigh;
+        #[cfg(all(not(VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH), VSF_GPIO_DRIVE_STRENGTH_HIGH))]
+        let result = DriveStrength::High;
+        #[cfg(all(not(VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH), not(VSF_GPIO_DRIVE_STRENGTH_HIGH), VSF_GPIO_DRIVE_STRENGTH_MEDIUM))]
+        let result = DriveStrength::Medium;
+        #[cfg(all(not(VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH), not(VSF_GPIO_DRIVE_STRENGTH_HIGH), not(VSF_GPIO_DRIVE_STRENGTH_MEDIUM), VSF_GPIO_DRIVE_STRENGTH_LOW))]
+        let result = DriveStrength::Low;
+        #[cfg(not(any(VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH, VSF_GPIO_DRIVE_STRENGTH_HIGH, VSF_GPIO_DRIVE_STRENGTH_MEDIUM, VSF_GPIO_DRIVE_STRENGTH_LOW)))]
+        let result = DriveStrength::None;
+
+        result
+    }
+}
+
+impl Default for DriveStrength {
+    fn default() -> Self {
+        DriveStrength::lowest()
+    }
 }
 
 /// GPIO flexible pin.
@@ -673,6 +750,8 @@ impl SealedPin for AnyPin {
 }
 
 // ====================
+
+vsf_hal_macros::bind_vsf_gpio_pins!{}
 
 pub(crate) unsafe fn init(_cs: CriticalSection) {
     #[cfg(vsf_hw_clkrst_region_set_bit)]
