@@ -11,7 +11,7 @@ const TOML_TARGET_MODEL_NODE: &str = "model";
 const TOML_TARGET_FLAGS_NODE: &str = "flags";
 
 const PERIPHERIALS: [&'static str; 2] = ["gpio", "usart"];
-const OPTIONS: [&'static str; 47] = [
+const CONSTANTS: [&'static str; 47] = [
     // GPIO configurations
     "VSF_HW_GPIO_PIN_COUNT",
     "VSF_GPIO_INPUT",
@@ -186,12 +186,12 @@ fn main() {
 */
     }
 
-    // parse options
-    for option in OPTIONS {
-        println!("cargo::rustc-check-cfg=cfg({option})");
-        if let Some(_cur_value) = extract_constant_value(&bindings_lines, option) {
-            println!("cargo:warning=option: {option} enabled");
-            println!("cargo:rustc-cfg={option}");
+    // parse constants
+    for constant in CONSTANTS {
+        println!("cargo::rustc-check-cfg=cfg({constant})");
+        if let Some(_cur_value) = extract_constant_value(&bindings_lines, constant) {
+            println!("cargo:warning=constant: {constant} enabled");
+            println!("cargo:rustc-cfg={constant}");
         }
     }
 
