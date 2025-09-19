@@ -154,10 +154,11 @@ fn main() {
 
     // parse peripherials
     for peripherial in PERIPHERIALS {
-        let mask = enable_peripherial(&bindings_lines, peripherial);
-        if peripherial == "gpio" && mask != 0 {
+        let _mask = enable_peripherial(&bindings_lines, peripherial);
+/*
+        if peripherial == "gpio" && _mask != 0 {
             for index in 0..32 {
-                if mask & (1 << index) != 0 {
+                if _mask & (1 << index) != 0 {
                     if let Some(mut gpio_pin_mask) = extract_const_integer::<u32>(&bindings_lines, &format!("VSF_HW_GPIO_PORT{index}_MASK")) {
                         println!("cargo:warning=VSF_HW_GPIO_PORT{index}_MASK: 0x{gpio_pin_mask:X}");
                         println!("cargo::rustc-check-cfg=cfg(VSF_HW_GPIO_PORT{index}_MASK)");
@@ -177,6 +178,7 @@ fn main() {
                 }
             }
         }
+*/
     }
 
     // parse options
