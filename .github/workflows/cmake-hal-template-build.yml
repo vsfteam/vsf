@@ -1,0 +1,45 @@
+name: vsf cmake hal template build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  hal-template-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        # all available releases in https://github.com/carlosperate/arm-none-eabi-gcc-action
+        cc: [
+          'latest',
+        ]
+        os: [ubuntu-latest]
+
+    runs-on: ${{matrix.os}}
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true # without recursive
+
+    - name: get latest cmake and ninja
+      uses: lukka/get-cmake@latest
+
+    - name: arm-none-eabi-gcc
+      uses: carlosperate/arm-none-eabi-gcc-action@v1
+      with:
+        release: ${{matrix.cc}}
+
+    - name: install depends
+      run: |
+          sudo apt-get update
+          sudo apt-get install -y libsdl2-dev
+      shell: bash
+
+    - name: run template validator
+      run: |
+        python3 ${{github.workspace}}/test/hal_test/hal_test.py
