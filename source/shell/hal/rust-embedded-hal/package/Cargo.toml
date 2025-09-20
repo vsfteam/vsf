@@ -36,6 +36,14 @@ vsf-hal-macros = { path = "./vsf-hal-macros" }
 defmt = []
 log = []
 
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+
+[profile.dev]
+opt-level = 0
+
 [build-dependencies]
 bindgen = "0.72.1"
 toml = "0.9.6"
