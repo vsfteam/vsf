@@ -31,12 +31,12 @@ if(ARCH_FOR_${VSF_ARCH_NAME})
 endif()
 
 
-target_compile_options( vsf
+target_compile_options( ${VSF_LIB_NAME}
     INTERFACE -mabi=aapcs
     INTERFACE ${ARCH_FLAG}
 )
 
-target_link_options( vsf
+target_link_options( ${VSF_LIB_NAME}
     INTERFACE -mabi=aapcs
     INTERFACE ${ARCH_FLAG}
 )
