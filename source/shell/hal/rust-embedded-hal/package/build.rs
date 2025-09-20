@@ -220,15 +220,17 @@ fn main() {
 fn enable_peripherial(lines: &Vec<&str>, name: &str) -> u32 {
     let mask = extrace_peripheral_mask(lines, name);
 
-    println!("cargo:warning={name}_mask: 0x{mask:X}");
-    println!("cargo::rustc-check-cfg=cfg(vsf_{name}_enabled)");
-    println!("cargo:rustc-cfg=vsf_{name}_enabled");
+    if mask != 0 {
+        println!("cargo:warning={name}_mask: 0x{mask:X}");
+        println!("cargo::rustc-check-cfg=cfg(vsf_{name}_enabled)");
+        println!("cargo:rustc-cfg=vsf_{name}_enabled");
 
-    for index in 0..32 {
-        if mask & (1 << index) != 0 {
-            println!("cargo:warning={name}: enable {name}{index}");
-            println!("cargo::rustc-check-cfg=cfg(vsf_{name}{index}_enabled)");
-            println!("cargo:rustc-cfg=vsf_{name}{index}_enabled");
+        for index in 0..32 {
+            if mask & (1 << index) != 0 {
+                println!("cargo:warning={name}: enable {name}{index}");
+                println!("cargo::rustc-check-cfg=cfg(vsf_{name}{index}_enabled)");
+                println!("cargo:rustc-cfg=vsf_{name}{index}_enabled");
+            }
         }
     }
     mask
