@@ -14,7 +14,7 @@ use super::vsf_hal::{vsf_gpio_mode_t::*, *};
 pub type PinPortType = u16;
 
 /// Mode setting for an gpio.
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Mode {
     #[cfg(VSF_GPIO_INPUT)]

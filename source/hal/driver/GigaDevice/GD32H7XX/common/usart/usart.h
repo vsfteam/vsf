@@ -141,8 +141,8 @@ typedef enum vsf_usart_mode_t {
     // 15: STRP(15) in USART_CTL1
     VSF_USART_SWAP                      = (1 << 15),
     // 16..17: TINV(17)/RINV(16) in USART_CTL1
-    VSF_USART_TX_INV                    = (1 << 17),
-    VSF_USART_RX_INV                    = (1 << 16),
+    VSF_USART_TX_INVERT                 = (1 << 17),
+    VSF_USART_RX_INVERT                 = (1 << 16),
     // 18: OVER8(15) in USART_CTL0
     VSF_USART_OVERSAMPLE_8              = (1 << 18),
     VSF_USART_OVERSAMPLE_16             = (0 << 18),
@@ -172,8 +172,8 @@ typedef enum vsf_usart_mode_t {
                                         | VSF_USART_1_STOPBIT
                                         | VSF_USART_1_5_STOPBIT
                                         | VSF_USART_2_STOPBIT
-                                        | VSF_USART_TX_INV
-                                        | VSF_USART_RX_INV
+                                        | VSF_USART_TX_INVERT
+                                        | VSF_USART_RX_INVERT
                                         | VSF_USART_SWAP,
     __VSF_HW_USART_CTL2_MASK            = VSF_USART_RTS_CTS_HWCONTROL
                                         | VSF_USART_HALF_DUPLEX_ENABLE,

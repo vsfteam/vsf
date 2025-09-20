@@ -11,8 +11,8 @@ const TOML_TARGET_MODEL_NODE: &str = "model";
 const TOML_TARGET_FLAGS_NODE: &str = "flags";
 
 const PERIPHERIALS: [&'static str; 2] = ["gpio", "usart"];
-const CONSTANTS: [&'static str; 47] = [
-    // GPIO configurations
+const CONSTANTS: [&'static str; 60] = [
+    // GPIO constants
     "VSF_HW_GPIO_PIN_COUNT",
     "VSF_GPIO_INPUT",
     "VSF_GPIO_OUTPUT",
@@ -34,6 +34,20 @@ const CONSTANTS: [&'static str; 47] = [
     "VSF_GPIO_DRIVE_STRENGTH_MEDIUM",
     "VSF_GPIO_DRIVE_STRENGTH_HIGH",
     "VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH",
+    // USART constants
+    "VSF_USART_7_BIT_LENGTH",
+    "VSF_USART_8_BIT_LENGTH",
+    "VSF_USART_9_BIT_LENGTH",
+    "VSF_USART_NO_PARITY",
+    "VSF_USART_ODD_PARITY",
+    "VSF_USART_EVEN_PARITY",
+    "VSF_USART_0_5_STOPBIT",
+    "VSF_USART_1_STOPBIT",
+    "VSF_USART_1_5_STOPBIT",
+    "VSF_USART_2_STOPBIT",
+    "VSF_USART_SWAP",
+    "VSF_USART_TX_INVERT",
+    "VSF_USART_RX_INVERT",
     // peripherial enable/disable
     "VSF_HW_EN_GPIOA",
     "VSF_HW_EN_GPIOB",
@@ -115,6 +129,10 @@ fn main() {
         }
     }
 
+    println!("cargo:rustc-link-arg-bins=--nmagic");
+    println!("cargo:rustc-link-arg-bins=-Tlink.x");
+    println!("cargo:rustc-link-arg-bins=-Tdefmt.x");
+
     println!("cargo:rerun-if-changed={path}/src/vsf_hal.rs");
     println!("cargo:warning=path: {path}");
     println!("cargo:warning=target: {vendor}.{model}");
@@ -159,31 +177,7 @@ fn main() {
 
     // parse peripherials
     for peripherial in PERIPHERIALS {
-        let _mask = enable_peripherial(&bindings_lines, peripherial);
-/*
-        if peripherial == "gpio" && _mask != 0 {
-            for index in 0..32 {
-                if _mask & (1 << index) != 0 {
-                    if let Some(mut gpio_pin_mask) = extract_const_integer::<u32>(&bindings_lines, &format!("VSF_HW_GPIO_PORT{index}_MASK")) {
-                        println!("cargo:warning=VSF_HW_GPIO_PORT{index}_MASK: 0x{gpio_pin_mask:X}");
-                        println!("cargo::rustc-check-cfg=cfg(VSF_HW_GPIO_PORT{index}_MASK)");
-                        println!("cargo:rustc-cfg=VSF_HW_GPIO_PORT{index}_MASK");
-
-                        let mut pin_index = 0;
-                        while gpio_pin_mask != 0 {
-                            if gpio_pin_mask & 1 != 0 {
-                                println!("cargo:warning=VSF_HW_GPIO_PORT{index}_PIN{pin_index} enabled");
-                                println!("cargo::rustc-check-cfg=cfg(VSF_HW_GPIO_PORT{index}_PIN{pin_index})");
-                                println!("cargo:rustc-cfg=VSF_HW_GPIO_PORT{index}_PIN{pin_index}");
-                            }
-                            pin_index += 1;
-                            gpio_pin_mask >>= 1;
-                        }
-                    }
-                }
-            }
-        }
-*/
+        enable_peripherial(&bindings_lines, peripherial);
     }
 
     // parse constants
