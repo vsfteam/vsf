@@ -1,9 +1,9 @@
 /*****************************************************************************
- *   Cop->right(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2022 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
- *  You may obtain a cop-> of the License at                                  *
+ *  You may obtain a copy of the License at                                  *
  *                                                                           *
  *     http://www.apache.org/licenses/LICENSE-2.0                            *
  *                                                                           *
@@ -139,7 +139,7 @@ vsf_err_t VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set)(
     return VSF_ERR_NONE;
 }
 
-vsf_err_t VSF_MCONNECT(VSF_RTC_GET_CFG_IMP_PREFIX, _rtc_get_time)(
+vsf_err_t VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_time)(
     VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t) *rtc_ptr,
     vsf_rtc_time_t *second_ptr,
     vsf_rtc_time_t *millisecond_ptr
@@ -149,7 +149,7 @@ vsf_err_t VSF_MCONNECT(VSF_RTC_GET_CFG_IMP_PREFIX, _rtc_get_time)(
     return VSF_ERR_NONE;
 }
 
-vsf_err_t VSF_MCONNECT(VSF_RTC_SET_CFG_IMP_PREFIX, _rtc_set_time)(
+vsf_err_t VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set_time)(
     VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t) *rtc_ptr,
     vsf_rtc_time_t second,
     vsf_rtc_time_t millisecond
@@ -164,9 +164,17 @@ vsf_rtc_capability_t VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_capability)(
 ) {
     VSF_HAL_ASSERT(rtc_ptr != NULL);
 
-    return (vsf_rtc_capability) {
+    return (vsf_rtc_capability_t) {
         .irq_mask = VSF_RTC_IRQ_MASK_ALARM,
     };
+}
+
+static vsf_rtc_irq_mask_t VSF_MCONNECT(__, VSF_RTC_CFG_IMP_PREFIX, _rtc_get_irq_mask)(
+    VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t) *rtc_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return 0;
 }
 
 static void VSF_MCONNECT(__, VSF_RTC_CFG_IMP_PREFIX, _rtc_irqhandler)(
@@ -174,7 +182,7 @@ static void VSF_MCONNECT(__, VSF_RTC_CFG_IMP_PREFIX, _rtc_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != rtc_ptr);
 
-    vsf_rtc_irq_mask_t irq_mask = GET_IRQ_MASK(rtc_ptr);
+    vsf_rtc_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_RTC_CFG_IMP_PREFIX, _rtc_get_irq_mask)(rtc_ptr);
     vsf_rtc_isr_t *isr_ptr = &rtc_ptr->isr;
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_rtc_t *)rtc_ptr, irq_mask);
@@ -189,6 +197,7 @@ static void VSF_MCONNECT(__, VSF_RTC_CFG_IMP_PREFIX, _rtc_irqhandler)(
  */
 
 // HW
+#define VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED
 #define VSF_RTC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t)                                \
         VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc, __IDX) = {                   \

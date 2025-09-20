@@ -1109,10 +1109,12 @@ extern vsf_i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr);
  * @param[in] address: address of I2C transfer
  * @param[in] cmd: I2C command
  * @param[in] count: number of data to transfer
- * @param[in,out] buffer_ptr: I2C transfer buffer
- * @param[in,out] cur_cmd_ptr: current I2C command pointer
- * @param[in,out] offset_ptr: current offset pointer
+ * @param[in,out] buffer_ptr: I2C transfer buffer (must not be NULL when count is non-zero)
+ * @param[in,out] cur_cmd_ptr: current I2C command pointer (must be cleared before first call)
+ * @param[in,out] offset_ptr: current offset pointer (must be cleared before first call)
  * @return uint_fast16_t: number of bytes transferred from current I2C
+ * @note When count is non-zero, buffer_ptr must not be NULL.
+ *       The variables pointed to by cur_cmd_ptr and offset_ptr must be cleared before the first call.
  *
  * \~chinese
  * @brief I2C 主机进行一次 FIFO 传输
@@ -1120,10 +1122,12 @@ extern vsf_i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr);
  * @param[in] address: I2C 传输的地址
  * @param[in] cmd: I2C 命令
  * @param[in] count: 要传输的数据数量
- * @param[in,out] buffer_ptr: I2C 传输缓冲区
- * @param[in,out] cur_cmd_ptr: 当前 I2C 命令指针
- * @param[in,out] offset_ptr: 当前偏移指针
+ * @param[in,out] buffer_ptr: I2C 传输缓冲区（当 count 不为 0 时，不能为空指针）
+ * @param[in,out] cur_cmd_ptr: 当前 I2C 命令指针（第一次调用前必须清零）
+ * @param[in,out] offset_ptr: 当前偏移指针（第一次调用前必须清零）
  * @return uint_fast16_t: 返回从当前 I2C 传输的字节数
+ * @note 当 count 不为 0 时，buffer_ptr 不能为空指针。
+ *       cur_cmd_ptr 和 offset_ptr 指向的变量在第一次调用之前必须清零。
  */
 extern void vsf_i2c_master_fifo_transfer(vsf_i2c_t *i2c_ptr,
                                          uint16_t address,

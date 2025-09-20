@@ -1,9 +1,9 @@
 /*****************************************************************************
- *   Cop->right(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2022 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
- *  You may obtain a cop-> of the License at                                  *
+ *  You may obtain a copy of the License at                                  *
  *                                                                           *
  *     http://www.apache.org/licenses/LICENSE-2.0                            *
  *                                                                           *
@@ -122,14 +122,14 @@ fsm_rt_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_disable)(
     return fsm_rt_cpl;
 }
 
-void VSF_MCONNECT(VSF_DAC_IRQ_CFG_IMP_PREFIX, _dac_irq_enable)(
+void VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_irq_enable)(
     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr,
     vsf_dac_irq_mask_t irq_mask
 ) {
     VSF_HAL_ASSERT(dac_ptr != NULL);
 }
 
-void VSF_MCONNECT(VSF_DAC_IRQ_CFG_IMP_PREFIX, _dac_irq_disable)(
+void VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_irq_disable)(
     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr,
     vsf_dac_irq_mask_t irq_mask
 ) {
@@ -155,7 +155,7 @@ vsf_dac_capability_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_capability)(
     };
 }
 
-vsf_err_t VSF_MCONNECT(VSF_DAC_CHANNEL_REQUEST_CFG_IMP_PREFIX, _dac_channel_request_once)(
+vsf_err_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_channel_request_once)(
     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr,
     vsf_dac_channel_cfg_t *channel_cfg,
     uint_fast16_t value
@@ -166,7 +166,7 @@ vsf_err_t VSF_MCONNECT(VSF_DAC_CHANNEL_REQUEST_CFG_IMP_PREFIX, _dac_channel_requ
     return VSF_ERR_NONE;
 }
 
-vsf_err_t VSF_MCONNECT(VSF_DAC_CHANNEL_CFG_IMP_PREFIX, _dac_channel_config)(
+vsf_err_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_channel_config)(
     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr,
     vsf_dac_channel_cfg_t *channel_cfgs_ptr,
     uint_fast8_t channel_cfgs_cnt
@@ -178,7 +178,7 @@ vsf_err_t VSF_MCONNECT(VSF_DAC_CHANNEL_CFG_IMP_PREFIX, _dac_channel_config)(
     return VSF_ERR_NONE;
 }
 
-vsf_err_t VSF_MCONNECT(VSF_DAC_CHANNEL_CFG_IMP_PREFIX, _dac_channel_request)(
+vsf_err_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_channel_request)(
     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr,
     void *buffer_ptr,
     uint_fast32_t count
@@ -190,15 +190,23 @@ vsf_err_t VSF_MCONNECT(VSF_DAC_CHANNEL_CFG_IMP_PREFIX, _dac_channel_request)(
     return VSF_ERR_NONE;
 }
 
+static vsf_dac_irq_mask_t VSF_MCONNECT(__, VSF_DAC_CFG_IMP_PREFIX, _dac_get_irq_mask)(
+    VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
 static void VSF_MCONNECT(__, VSF_DAC_CFG_IMP_PREFIX, _dac_irqhandler)(
     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr
 ) {
     VSF_HAL_ASSERT(NULL != dac_ptr);
 
-    vsf_dac_irq_mask_t irq_mask = GET_IRQ_MASK(dac_ptr);
+    vsf_dac_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_DAC_CFG_IMP_PREFIX, _dac_get_irq_mask)(dac_ptr);
     vsf_dac_isr_t *isr_ptr = &dac_ptr->isr;
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, ac_ptr, irq_mask);
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_dac_t *)dac_ptr, irq_mask);
     }
 }
 // HW end
@@ -210,6 +218,7 @@ static void VSF_MCONNECT(__, VSF_DAC_CFG_IMP_PREFIX, _dac_irqhandler)(
  */
 
 // HW
+#define VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
 #define VSF_DAC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t)                                \
         VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac, __IDX) = {                   \

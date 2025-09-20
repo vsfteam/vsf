@@ -114,10 +114,10 @@ typedef struct __UART_HandleTypeDef {
     volatile bool                        __RxDMA;
     volatile bool                        __TxCpltCallback;
     __UART_Typedef                       __Type;
-};
+} __UART_HandleTypeDef;
 
 #    if (USE_HAL_UART_REGISTER_CALLBACKS == 1)
-typedef enum {
+enum {
     __HAL_UART_TX_HALFCOMPLETE_CB_ID         = 0x00U,
     __HAL_UART_TX_COMPLETE_CB_ID             = 0x01U,
     __HAL_UART_RX_HALFCOMPLETE_CB_ID         = 0x02U,

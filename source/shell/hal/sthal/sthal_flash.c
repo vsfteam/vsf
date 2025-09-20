@@ -23,6 +23,14 @@ HAL_StatusTypeDef FLASH_WaitForLastOperation(uint32_t Timeout);
 HAL_StatusTypeDef HAL_FLASH_Program(uint32_t TypeProgram, uint32_t Address,
                                     uint64_t Data)
 {
+    if (TypeProgram == 0) {
+        return HAL_ERROR;
+    }
+
+    if (Address == 0) {
+        return HAL_ERROR;
+    }
+
     return HAL_OK;
 }
 

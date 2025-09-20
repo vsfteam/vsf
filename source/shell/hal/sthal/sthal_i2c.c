@@ -995,8 +995,6 @@ HAL_StatusTypeDef HAL_I2C_Init(I2C_HandleTypeDef *hi2c)
     }
     vsf_i2c_t *i2c_ptr = (vsf_i2c_t *)hi2c->Instance;
     VSF_STHAL_ASSERT(i2c_ptr != NULL);
-    uint32_t freqrange;
-    uint32_t pclk1;
 
     VSF_STHAL_ASSERT(IS_I2C_ALL_INSTANCE(i2c_ptr));
     VSF_STHAL_ASSERT(IS_I2C_CLOCK_SPEED(hi2c->Init.ClockSpeed));
@@ -1631,13 +1629,17 @@ HAL_StatusTypeDef HAL_I2C_IsDeviceReady(I2C_HandleTypeDef *hi2c,
                                         uint16_t DevAddress, uint32_t Trials,
                                         uint32_t Timeout)
 {
+    // 检查输入参数有效性
+    if (hi2c == NULL) {
+        return HAL_ERROR;
+    }
+
     uint32_t Tickstart = HAL_GetTick();
-    uint8_t  data      = 0;
 
     uint32_t      i = 0;
     vsf_i2c_cmd_t cmd =
         VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE | VSF_I2C_CMD_STOP;
-    vsf_i2c_cmd_t current_cmd;
+    vsf_i2c_cmd_t current_cmd = 0;
 
     VSF_STHAL_ASSERT(IS_I2C_ALL_INSTANCE(hi2c->Instance));
     vsf_i2c_t *i2c_ptr = (vsf_i2c_t *)hi2c->Instance;

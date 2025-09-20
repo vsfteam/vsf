@@ -97,6 +97,14 @@ GPIO_PinState HAL_GPIO_ReadPin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 void HAL_GPIO_WritePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin,
                        GPIO_PinState PinState)
 {
+    if (GPIOx == NULL) {
+        return;
+    }
+
+    if (GPIO_Pin == 0) {
+        return;
+    }
+
     VSF_STHAL_ASSERT(GPIOx != NULL);
     vsf_gpio_t *gpio = (vsf_gpio_t *)GPIOx;
 

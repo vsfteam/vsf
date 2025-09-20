@@ -112,15 +112,12 @@ void HAL_Delay(uint32_t Delay)
 }
 
 
-#if VSF_STHAL_TICK_USE_SYSTIMER == ENABLED
-
 VSF_CAL_WEAK(HAL_GetTick)
 uint32_t HAL_GetTick(void)
 {
     vsf_systimer_tick_t tick = vsf_systimer_get();
     return vsf_systimer_tick_to_ms(tick);
 }
-#endif
 
 HAL_StatusTypeDef HAL_Init(void)
 {

@@ -1,0 +1,133 @@
+/*****************************************************************************
+ *   Copyright(C)2009-2022 by VSF Team                                       *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *     http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ ****************************************************************************/
+
+/*============================ INCLUDES ======================================*/
+
+#include "./device.h"
+
+/*============================ MACROS ========================================*/
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ PROTOTYPES ====================================*/
+/*============================ IMPLEMENTATION ================================*/
+
+/*! \brief initialise device driver
+ *! \param none
+ *! \retval true initialization succeeded.
+ *! \retval false initialization failed
+ */
+VSF_CAL_ROOT bool vsf_driver_init(void)
+{
+    /* Basic initializations including clock, etc. */
+
+    // 简单的系统初始化示例
+    // 在实际应用中，这里应该包含：
+    // - 时钟配置
+    // - GPIO配置
+    // - 中断配置
+    // - 其他硬件初始化
+
+    return true;
+}
+
+// 简单的SystemInit实现
+VSF_CAL_WEAK(SystemInit)
+void SystemInit(void)
+{
+    // 基本的系统初始化
+    // 在实际应用中，这里应该配置：
+    // - 系统时钟
+    // - 内存控制器
+    // - 缓存设置等
+}
+
+#ifdef __{{DEVICE}}_UPPER__
+
+// {{DEVICE}}特定的UART函数声明（需要根据实际硬件实现）
+static void {{DEVICE_LOWER}}_uart_init(void);
+static void {{DEVICE_LOWER}}_uart_putc(char ch);
+static char {{DEVICE_LOWER}}_uart_getc(void);
+static bool {{DEVICE_LOWER}}_uart_tstc(void);
+
+// {{DEVICE}}特定的UART初始化（示例实现）
+static void {{DEVICE_LOWER}}_uart_init(void)
+{
+    // TODO: 在这里添加实际的UART初始化代码
+    // 例如：配置波特率、数据位、停止位等
+    // 这里只是一个占位符实现
+}
+
+// {{DEVICE}}特定的UART输出字符（示例实现）
+static void {{DEVICE_LOWER}}_uart_putc(char ch)
+{
+    // TODO: 在这里添加实际的UART输出代码
+    // 例如：等待发送缓冲区空，然后写入字符
+    // 这里只是一个占位符实现，实际上不输出任何内容
+    (void)ch;
+}
+
+// {{DEVICE}}特定的UART输入字符（示例实现）
+static char {{DEVICE_LOWER}}_uart_getc(void)
+{
+    // TODO: 在这里添加实际的UART输入代码
+    // 例如：等待接收缓冲区有数据，然后读取字符
+    // 这里只是一个占位符实现，总是返回0
+    return 0;
+}
+
+// {{DEVICE}}特定的UART测试是否有字符（示例实现）
+static bool {{DEVICE_LOWER}}_uart_tstc(void)
+{
+    // TODO: 在这里添加实际的UART状态检查代码
+    // 例如：检查接收缓冲区是否有数据
+    // 这里只是一个占位符实现，总是返回false
+    return false;
+}
+
+// VSF标准输出初始化函数实现（参考AIC8800方式）
+VSF_CAL_ROOT void vsf_stdout_init(void)
+{
+    {{DEVICE_LOWER}}_uart_init();
+}
+
+// VSF标准输入初始化函数实现（参考AIC8800方式）
+VSF_CAL_ROOT void vsf_stdin_init(void)
+{
+    // UART已经在vsf_stdout_init中初始化了
+}
+
+// VSF标准输出字符函数实现（参考AIC8800方式）
+VSF_CAL_ROOT int vsf_stdout_putchar(char ch)
+{
+    {{DEVICE_LOWER}}_uart_putc(ch);
+    return (int)ch;
+}
+
+// VSF标准输入字符函数实现（参考AIC8800方式）
+VSF_CAL_ROOT int vsf_stdin_getchar(void)
+{
+    if ({{DEVICE_LOWER}}_uart_tstc()) {
+        return (int){{DEVICE_LOWER}}_uart_getc();
+    }
+    return -1; // 没有字符可读
+}
+
+#endif // __{{DEVICE}}_UPPER__
+
+/* EOF */

@@ -1,9 +1,9 @@
 /*****************************************************************************
- *   Cop->right(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2022 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
- *  You may obtain a cop-> of the License at                                  *
+ *  You may obtain a copy of the License at                                  *
  *                                                                           *
  *     http://www.apache.org/licenses/LICENSE-2.0                            *
  *                                                                           *
@@ -237,12 +237,20 @@ vsf_err_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_ctrl)(
     return VSF_ERR_NONE;
 }
 
+static vsf_spi_irq_mask_t VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_get_irq_mask)(
+    VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
 static void VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_irqhandler)(
     VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr
 ) {
     VSF_HAL_ASSERT(NULL != spi_ptr);
 
-    vsf_spi_irq_mask_t irq_mask = GET_IRQ_MASK(spi_ptr);
+    vsf_spi_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_get_irq_mask)(spi_ptr);
     vsf_spi_isr_t *isr_ptr = &spi_ptr->isr;
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_spi_t *)spi_ptr, irq_mask);

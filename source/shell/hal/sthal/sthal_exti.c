@@ -27,6 +27,14 @@
 HAL_StatusTypeDef HAL_EXTI_SetConfigLine(EXTI_HandleTypeDef *hexti,
                                          EXTI_ConfigTypeDef *pExtiConfig)
 {
+    if (hexti == NULL || pExtiConfig == NULL) {
+        return HAL_ERROR;
+    }
+
+    if (pExtiConfig->Line == 0) {
+        return HAL_ERROR;
+    }
+
     return HAL_OK;
 }
 

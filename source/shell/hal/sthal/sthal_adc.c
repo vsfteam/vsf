@@ -178,6 +178,19 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef *hadc)
 
 HAL_StatusTypeDef HAL_ADC_Start(ADC_HandleTypeDef *hadc)
 {
+    if (hadc == NULL) {
+        return HAL_ERROR;
+    }
+
+    if (hadc->State == HAL_ADC_STATE_RESET) {
+        hadc->ErrorCode |= HAL_ADC_ERROR_INTERNAL;
+        return HAL_ERROR;
+    }
+
+    if (hadc->State != HAL_ADC_STATE_READY) {
+        return HAL_BUSY;
+    }
+
     return HAL_OK;
 }
 
