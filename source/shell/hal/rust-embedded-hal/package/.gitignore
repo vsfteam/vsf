@@ -3,3 +3,4 @@ src/vsf_hal.rs
 src/main.rs
 Cargo.lock
 memory.x
+vsf_hal_build
