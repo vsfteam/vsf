@@ -46,26 +46,26 @@ pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
             if let Some(mut pin_mask) = extract_const_integer::<u128>(&bindings_lines, &format!("VSF_HW_GPIO_PORT{index}_MASK")) {
                 let mut pin_index = 0;
                 while pin_mask != 0 {
-                if pin_mask & 1 != 0 {
-                    output_code.push_str(&format!("
-                        impl Pin for peripherals::P{port_ch}{pin_index} {{
-                        }}
-                        impl SealedPin for peripherals::P{port_ch}{pin_index} {{
-                            #[inline] fn pin_port(&self) -> PinPortType {{
-                                ({index} << 8) + {pin_index}
+                    if pin_mask & 1 != 0 {
+                        output_code.push_str(&format!("
+                            impl Pin for peripherals::P{port_ch}{pin_index} {{
                             }}
-                        }}
-                        impl From<peripherals::P{port_ch}{pin_index}> for AnyPin {{
-                            fn from(val: peripherals::P{port_ch}{pin_index}) -> Self {{
-                                Self {{
-                                    pin_port: val.pin_port(),
+                            impl SealedPin for peripherals::P{port_ch}{pin_index} {{
+                                #[inline] fn pin_port(&self) -> PinPortType {{
+                                    ({index} << 8) + {pin_index}
                                 }}
                             }}
-                        }}
-                    "));
-                }
-                pin_index += 1;
-                pin_mask >>= 1;
+                            impl From<peripherals::P{port_ch}{pin_index}> for AnyPin {{
+                                fn from(val: peripherals::P{port_ch}{pin_index}) -> Self {{
+                                    Self {{
+                                        pin_port: val.pin_port(),
+                                    }}
+                                }}
+                            }}
+                        "));
+                    }
+                    pin_index += 1;
+                    pin_mask >>= 1;
                 }
             }
         }
