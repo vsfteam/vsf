@@ -9,6 +9,7 @@ const TOML_TARGET_NODE: &str = "target";
 const TOML_TARGET_VENDOR_NODE: &str = "vendor";
 const TOML_TARGET_MODEL_NODE: &str = "model";
 const TOML_TARGET_FLAGS_NODE: &str = "flags";
+const TOML_TARGET_MEMORY_NODE: &str = "memory";
 
 const PERIPHERIALS: [&'static str; 2] = ["gpio", "usart"];
 const CONSTANTS: [&'static str; 60] = [
@@ -124,6 +125,13 @@ fn main() {
                             flags.push(String::from(flag_str));
                         }
                     }
+                }
+            }
+
+            if let Some(memory_node) = target_node.get(TOML_TARGET_MEMORY_NODE) {
+                if let Some(memory_str) = memory_node.as_str() {
+                    println!("cargo:rerun-if-changed={memory_str}");
+                    fs::copy(memory_str, "./memory.x").expect("Fail to copy memory.x, is memory setting in Cargo.toml correct?");
                 }
             }
         }
