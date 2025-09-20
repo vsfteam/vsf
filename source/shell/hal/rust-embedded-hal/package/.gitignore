@@ -1,4 +1,3 @@
-.cargo
 target
 src/vsf_hal.rs
 src/main.rs

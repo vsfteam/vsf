@@ -1,4 +1,5 @@
 use std::path::Path;
+use std::process::Command;
 use std::env;
 use std::fs;
 use shellexpand;
@@ -165,6 +166,18 @@ fn main() {
     }
     if !path.ends_with("/") {
         path.push('/');
+    }
+
+    {
+        let vsf_hal_build_path = Path::new("./vsf_hal_build");
+        if !vsf_hal_build_path.exists() {
+            fs::create_dir_all(&vsf_hal_build_path).unwrap();
+            Command::new("cmake").current_dir(&vsf_hal_build_path).arg("-GNinja").arg("-DVSF_TARGET=".to_string() + &model).arg(path.clone() + "source/shell/hal/rust-embedded-hal/").output().expect("Fail to run cmake");
+            Command::new("ninja").current_dir(&vsf_hal_build_path).output().expect("Fail to run ninja");
+        }
+
+        println!("cargo:rustc-link-search=native={}", vsf_hal_build_path.to_str().unwrap());
+        println!("cargo:rustc-link-lib=static=vsf_hal");
     }
 
     let mut builder = bindgen::Builder::default()

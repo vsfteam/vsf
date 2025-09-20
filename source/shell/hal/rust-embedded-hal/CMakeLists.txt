@@ -20,7 +20,9 @@ set(CMAKE_CXX_FLAGS
 include($ENV{VSF_PATH}/script/cmake/compilers/gnuarmemb.cmake)
 
 project(vsf_hal C CXX ASM)
-set(VSF_TARGET N32H765IIB7EC)
+# use commandline to pass VSF_TARGET:
+#   cmake -GNinja -DVSF_TARGET=TARGET PATH
+#set(VSF_TARGET N32H765IIB7EC)
 # add target definitions here
 #set(VSF_TARGET_DEFINITIONS
 #)
