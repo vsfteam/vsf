@@ -349,7 +349,7 @@ vsf_usart_capability_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
         .support_rx_timeout             = 1,
         .support_send_break             = 1,
         .support_set_and_clear_break    = 0,
-        .support_sync_clock             = usart_ptr->support_sync;
+        .support_sync_clock             = usart_ptr->support_sync,
 #   ifdef VSF_USART_IRQ_MASK_TX_IDLE
         .support_tx_idle                = 1,
 #   endif
