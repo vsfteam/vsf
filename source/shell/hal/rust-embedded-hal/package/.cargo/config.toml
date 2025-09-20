@@ -3,7 +3,7 @@
 #runner = "probe-rs run --chip STM32F103C8"
 
 [build]
-target = "thumbv7m-none-eabi"
+target = "thumbv7em-none-eabihf"
 
 [env]
 DEFMT_LOG = "trace"
