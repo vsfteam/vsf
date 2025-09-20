@@ -161,6 +161,7 @@ fn main() {
                     .clang_arg("-D".to_string() + "__" + &vendor + "__")
                     .clang_arg("-D".to_string() + "__" + &model + "__")
                     .clang_arg("-I".to_string() + &path + "source/shell/hal/rust-embedded-hal/inc")
+                    .clang_arg("-I".to_string() + &path + "source/shell/hal/rust-embedded-hal/inc/empty_libc")
                     .clang_arg("-I".to_string() + &path + "source");
 
     for flag in &flags {
