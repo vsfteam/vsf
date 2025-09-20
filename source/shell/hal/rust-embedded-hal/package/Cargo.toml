@@ -58,6 +58,6 @@ model = "N32H765IIB7EC"
 # if there is no ./memory.x, memory MUST be set so that build.rs will copy memory.x to the current directory
 memory = "./memory/N32H765IIB7EC/memory.x"
 flags = [
-    "--target=thumbv7m-none-eabihf",
+    "--target=thumbv7m-none-eabi",
     "-I${VSF_PATH}/source/utilities/compiler/arm/3rd-party/CMSIS/CMSIS/Core/Include",
 ]
