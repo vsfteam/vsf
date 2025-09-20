@@ -52,5 +52,4 @@ memory = "./memory/N32H765IIB7EC/memory.x"
 flags = [
     "--target=thumbv7m-none-eabihf",
     "-I${VSF_PATH}/source/utilities/compiler/arm/3rd-party/CMSIS/CMSIS/Core/Include",
-    "-D__OOC_CPP__"
 ]

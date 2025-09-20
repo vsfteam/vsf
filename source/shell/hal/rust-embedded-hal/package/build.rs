@@ -11,6 +11,15 @@ const TOML_TARGET_MODEL_NODE: &str = "model";
 const TOML_TARGET_FLAGS_NODE: &str = "flags";
 const TOML_TARGET_MEMORY_NODE: &str = "memory";
 
+const BINDGEN_DEFINITIONS: [&'static str; 6] = [
+    "__VSF__",
+    "__VSF_CPP__",
+    "__UTILITIES_TEMPLATE_H__",
+    "__UTILITIES_LANGUAGE_EXTENSION_H__",
+    "__HAL_DRIVER_COMMON_MULTIPLEX_I2C_H__",
+    "__HAL_DRIVER_COMMON_MULTIPLEX_SPI_H__",
+];
+
 const PERIPHERIALS: [&'static str; 2] = ["gpio", "usart"];
 const CONSTANTS: [&'static str; 60] = [
     // GPIO constants
@@ -172,6 +181,9 @@ fn main() {
                     .clang_arg("-I".to_string() + &path + "source/shell/hal/rust-embedded-hal/inc/empty_libc")
                     .clang_arg("-I".to_string() + &path + "source");
 
+    for definition in BINDGEN_DEFINITIONS {
+        builder = builder.clang_arg("-D".to_string() + definition);
+    }
     for flag in &flags {
         builder = builder.clang_arg(shellexpand::full(&flag).unwrap().into_owned());
     }
