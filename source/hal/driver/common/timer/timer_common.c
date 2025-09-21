@@ -162,5 +162,15 @@ vsf_err_t vsf_timer_channel_ctrl(vsf_timer_t *timer_ptr, uint8_t channel,
     return timer_ptr->op->channel_ctrl(timer_ptr, channel, ctrl, param);
 }
 
+vsf_err_t vsf_timer_get_configuration(vsf_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(timer_ptr != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->get_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return timer_ptr->op->get_configuration(timer_ptr, cfg_ptr);
+}
+
 #    endif /* VSF_TIMER_CFG_MULTI_CLASS == ENABLED */
 #endif     /* VSF_HAL_USE_TIMER == ENABLED */
