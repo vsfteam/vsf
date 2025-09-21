@@ -259,6 +259,7 @@ extern "C" {
 #define VSF_ETH_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, init,                   VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 eth, fini,                   VSF_MCONNECT(__prefix_name, _t) *eth_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, get_configuration,      VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             eth, enable,                 VSF_MCONNECT(__prefix_name, _t) *eth_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             eth, disable,                VSF_MCONNECT(__prefix_name, _t) *eth_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 eth, irq_enable,             VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_irq_mask_t irq_mask) \
@@ -751,6 +752,25 @@ extern void vsf_eth_fini(vsf_eth_t *eth_ptr);
 
 /**
  * \~english
+ * @brief Get current configuration of an ETH instance
+ * @param[in] eth_ptr Pointer to ETH instance
+ * @param[out] cfg_ptr Pointer to ETH configuration structure to store current settings
+ * @return vsf_err_t VSF_ERR_NONE if successful, otherwise an error code
+ *
+ * @note This function retrieves the current configuration of the ETH instance
+ *
+ * \~chinese
+ * @brief 获取 ETH 实例的当前配置
+ * @param[in] eth_ptr ETH 实例指针
+ * @param[out] cfg_ptr 用于存储当前设置的 ETH 配置结构体指针
+ * @return vsf_err_t 成功返回 VSF_ERR_NONE，否则返回错误码
+ *
+ * @note 此函数获取 ETH 实例的当前配置
+ */
+extern vsf_err_t vsf_eth_get_configuration(vsf_eth_t *eth_ptr, vsf_eth_cfg_t *cfg_ptr);
+
+/**
+ * \~english
  * @brief Enable a ETH instance.
  * @param[in] eth_ptr: a pointer to structure @ref vsf_eth_t
  * @return fsm_rt_t: FSM_RT_CPL if ETH was enabled, fsm_rt_on_going if ETH is still enabling
@@ -999,6 +1019,7 @@ extern vsf_err_t vsf_eth_phy_get_link_status(vsf_eth_t *eth_ptr, vsf_eth_phy_mod
 #   define __vsf_eth_t                              VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_t)
 #   define vsf_eth_init(__ETH, ...)                 VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_init)((__vsf_eth_t *)(__ETH), ##__VA_ARGS__)
 #   define vsf_eth_fini(__ETH)                      VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_fini)((__vsf_eth_t *)(__ETH))
+#   define vsf_eth_get_configuration(__ETH, ...)    VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_get_configuration)((__vsf_eth_t *)(__ETH), ##__VA_ARGS__)
 #   define vsf_eth_enable(__ETH)                    VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_enable)((__vsf_eth_t *)(__ETH))
 #   define vsf_eth_disable(__ETH)                   VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_disable)((__vsf_eth_t *)(__ETH))
 #   define vsf_eth_status(__ETH)                    VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_status)((__vsf_eth_t *)(__ETH))

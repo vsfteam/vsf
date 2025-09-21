@@ -106,6 +106,23 @@ void VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_fini)(
     VSF_HAL_ASSERT(eth_ptr != NULL);
 }
 
+vsf_err_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_get_configuration)(
+    VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t) *eth_ptr,
+    vsf_eth_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != eth_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current ETH configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = eth_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
+}
+
 fsm_rt_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_enable)(
     VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t) *eth_ptr
 ) {
@@ -285,6 +302,7 @@ vsf_err_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_phy_get_link_status)(
 
 // HW
 #define VSF_ETH_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
+#define VSF_ETH_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #define VSF_ETH_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t)                                \
         VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth, __IDX) = {                   \

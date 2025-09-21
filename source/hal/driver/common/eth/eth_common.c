@@ -53,6 +53,16 @@ void vsf_eth_fini(vsf_eth_t *eth_ptr)
     eth_ptr->op->fini(eth_ptr);
 }
 
+vsf_err_t vsf_eth_get_configuration(vsf_eth_t *eth_ptr, vsf_eth_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(eth_ptr != NULL);
+    VSF_HAL_ASSERT(eth_ptr->op != NULL);
+    VSF_HAL_ASSERT(eth_ptr->op->get_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return eth_ptr->op->get_configuration(eth_ptr, cfg_ptr);
+}
+
 fsm_rt_t vsf_eth_enable(vsf_eth_t *eth_ptr)
 {
     VSF_HAL_ASSERT(eth_ptr != NULL);
