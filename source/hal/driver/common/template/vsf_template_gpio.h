@@ -277,6 +277,7 @@ extern "C" {
 #define VSF_GPIO_APIS(__prefix_name)                                                                                                                                                                               \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_gpio_capability_t, gpio, capability,              VSF_MCONNECT(__prefix_name, _t) *gpio_ptr)                                                                    \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, port_config_pins,        VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_cfg_t * cfg_ptr)            \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, get_pin_configuration,   VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, uint16_t pin_index, vsf_gpio_cfg_t * cfg_ptr)                     \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set_direction,           VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_gpio_pin_mask_t,   gpio, get_direction,           VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set_input,               VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
@@ -859,6 +860,28 @@ extern vsf_err_t vsf_gpio_port_config_pins(vsf_gpio_t         *gpio_ptr,
                                            vsf_gpio_pin_mask_t pin_mask,
                                            vsf_gpio_cfg_t     *cfg_ptr);
 
+/**
+ \~english
+ @brief Get configuration of a specific pin of the gpio instance
+ @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
+ @param[in] pin_index: pin index (0-based), specifies which pin's configuration to retrieve
+ @param[out] cfg_ptr: a pointer to structure @ref vsf_gpio_cfg_t to store the configuration
+ @return vsf_err_t: VSF_ERR_NONE if GPIO Pin Configuration Retrieved Successfully, or a negative error code
+ @note This function retrieves the configuration of a single pin only.
+       To get configurations of multiple pins, call this function separately for each pin.
+
+ \~chinese
+ @brief 获取 gpio 实例的指定引脚的配置
+ @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
+ @param[in] pin_index: 引脚索引（从0开始），指定要获取配置的引脚
+ @param[out] cfg_ptr: 结构体 vsf_gpio_cfg_t 的指针，用于存储配置，参考 @ref vsf_gpio_cfg_t
+ @return vsf_err_t: 如果 GPIO 引脚配置获取成功返回 VSF_ERR_NONE，失败返回负数。
+ @note 此函数仅获取单个引脚的配置。要获取多个引脚的配置，请为每个引脚单独调用此函数。
+ */
+extern vsf_err_t vsf_gpio_get_pin_configuration(vsf_gpio_t    *gpio_ptr,
+                                                uint16_t       pin_index,
+                                                vsf_gpio_cfg_t *cfg_ptr);
+
 ///**
 // \~english
 // @brief Configure one or more ports and pin of the gpio instance
@@ -1167,6 +1190,7 @@ static inline vsf_err_t vsf_gpio_port_config_pin(vsf_gpio_t      *gpio_ptr,
     return vsf_gpio_port_config_pins(gpio_ptr, 1 << pin_index, cfg_ptr);
 }
 
+
 /*============================ MACROS ========================================*/
 
 /// @cond
@@ -1174,6 +1198,7 @@ static inline vsf_err_t vsf_gpio_port_config_pin(vsf_gpio_t      *gpio_ptr,
 #   define __vsf_gpio_t                                 VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_t)
 #   define vsf_gpio_capability(__GPIO)                  VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_capability)             ((__vsf_gpio_t *)(__GPIO))
 #   define vsf_gpio_port_config_pins(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_port_config_pins)       ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
+#   define vsf_gpio_get_pin_configuration(__GPIO, ...)  VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_get_pin_configuration)  ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_set_direction(__GPIO, ...)          VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_direction)          ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_get_direction(__GPIO, ...)          VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_get_direction)          ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_set_input(__GPIO, ...)              VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_input)              ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)

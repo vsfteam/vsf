@@ -120,6 +120,16 @@ vsf_err_t vsf_exti_gpio_port_config_pins(vsf_exti_gpio_t *exti_gpio_ptr,
     return vsf_gpio_port_config_pins(exti_gpio_ptr->irq_cfg.gpio, pin_mask, cfg_ptr);
 }
 
+vsf_err_t vsf_exti_gpio_get_pin_configuration(vsf_exti_gpio_t *exti_gpio_ptr,
+                                              uint16_t pin_index,
+                                              vsf_gpio_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(exti_gpio_ptr != NULL);
+    VSF_HAL_ASSERT(exti_gpio_ptr->irq_cfg.gpio != NULL);
+
+    return vsf_gpio_get_pin_configuration(exti_gpio_ptr->irq_cfg.gpio, pin_index, cfg_ptr);
+}
+
 void vsf_exti_gpio_set_direction(vsf_exti_gpio_t *exti_gpio_ptr,
                                 vsf_gpio_pin_mask_t pin_mask,
                                 vsf_gpio_pin_mask_t direction_mask)

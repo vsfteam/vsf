@@ -72,6 +72,21 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_port_config_pins)(
     return VSF_ERR_NONE;
 }
 
+vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_get_pin_configuration)(
+    VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
+    uint16_t pin_index,
+    vsf_gpio_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != gpio_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // For template implementation, return a default configuration
+    cfg_ptr->mode = VSF_GPIO_INPUT | VSF_GPIO_NO_PULL_UP_DOWN;
+    cfg_ptr->alternate_function = 0;
+
+    return VSF_ERR_NONE;
+}
+
 void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_set_direction)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
     vsf_gpio_pin_mask_t pin_mask,
@@ -170,6 +185,9 @@ static void VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_irqhandler)(
  *      VSF_GPIO_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
  *
  *      The list of APIs and configuration:
+ *      VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION for gpio_get_pin_configuration.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ *          Hardware drivers should implement this to read actual pin configuration from registers.
  *      VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET for gpio_output_and_set, *** glitchless ***
  *          If VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET is 0, default implementation will assert(false).
  *          If VSF_GPIO_CFG_CHANGE_DIR_FIRST is ENABLED, default implementation will call gpio_set_output and then gpio_clear.
@@ -228,6 +246,7 @@ vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
 
 /*============================ INCLUDES ======================================*/
 
+#define VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION  ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET         ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR       ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED

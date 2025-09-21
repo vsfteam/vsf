@@ -59,6 +59,10 @@
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR        DISABLED
 #endif
 
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION   DISABLED
+#endif
+
 #ifndef VSF_GPIO_CFG_REIMPLEMENT_API_PORTS_CONFIG_PIN
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_PORTS_CONFIG_PIN        DISABLED
 #endif
@@ -99,6 +103,7 @@
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_CLEAR
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR
+#   undef VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_SET_INPUT               ENABLED
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_SET_OUTPUT              ENABLED
@@ -107,6 +112,7 @@
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_CLEAR                   ENABLED
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET          ENABLED
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR        ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION   ENABLED
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY              ENABLED
 #endif
 
@@ -130,6 +136,7 @@
 #define vsf_real_gpios                  VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpios)
 #define vsf_real_gpio_t                 VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_t)
 #define vsf_real_gpio_port_config_pins  VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_port_config_pins)
+#define vsf_real_gpio_get_pin_configuration VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_get_pin_configuration)
 #define vsf_real_gpio_set_input         VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_set_input)
 #define vsf_real_gpio_set_output        VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_set_output)
 #define vsf_real_gpio_get_direction     VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_get_direction)
@@ -242,6 +249,19 @@ void vsf_real_gpio_output_and_clear(vsf_real_gpio_t *gpio_ptr, vsf_gpio_pin_mask
 }
 #endif
 
+#if VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION == DISABLED
+vsf_err_t vsf_real_gpio_get_pin_configuration(vsf_real_gpio_t *gpio_ptr, uint16_t pin_index, vsf_gpio_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(NULL != gpio_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
 #if VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 vsf_gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
 {
@@ -318,6 +338,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_CLEAR
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR
+#undef VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_PORTS_CONFIG_PIN
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_PORTS_CONFIG_PINS
@@ -330,6 +351,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef VSF_GPIO_CFG_CAPABILITY_PIN_COUNT
 #undef VSF_GPIO_CFG_CAPABILITY_PIN_MASK
 #undef vsf_real_gpio_t
+#undef vsf_real_gpio_get_pin_configuration
 #undef vsf_real_gpio_set_input
 #undef vsf_real_gpio_set_output
 #undef vsf_real_gpio_get_direction
@@ -352,6 +374,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #   define vsf_origin_gpio_t                    VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_t)
 #   define vsf_origin_gpio_capability           VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_capability)
 #   define vsf_origin_gpio_port_config_pins     VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_port_config_pins)
+#   define vsf_origin_gpio_get_pin_configuration VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_get_pin_configuration)
 #   define vsf_origin_gpio_set_direction        VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_set_direction)
 #   define vsf_origin_gpio_get_direction        VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_get_direction)
 #   define vsf_origin_gpio_set_input            VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_set_input)
@@ -371,6 +394,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #   define vsf_remap_gpio_t                     VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_t)
 #   define vsf_remap_gpio_capability            VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_capability)
 #   define vsf_remap_gpio_port_config_pins      VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_port_config_pins)
+#   define vsf_remap_gpio_get_pin_configuration VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_get_pin_configuration)
 #   define vsf_remap_gpio_set_direction         VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_set_direction)
 #   define vsf_remap_gpio_get_direction         VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_get_direction)
 #   define vsf_remap_gpio_set_input             VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_set_input)
@@ -394,6 +418,12 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
             VSF_HAL_ASSERT(pin_mask != 0);                                                                                                  \
             VSF_HAL_ASSERT(cfg != NULL);                                                                                                    \
             return vsf_remap_gpio_port_config_pins(gpio_ptr, pin_mask, cfg);                                                                \
+        }                                                                                                                                   \
+        vsf_err_t vsf_origin_gpio_get_pin_configuration(vsf_origin_gpio_t *gpio_ptr, uint16_t pin_index, vsf_gpio_cfg_t *cfg)             \
+        {                                                                                                                                   \
+            VSF_HAL_ASSERT(gpio_ptr != NULL);                                                                                               \
+            VSF_HAL_ASSERT(cfg != NULL);                                                                                                    \
+            return vsf_remap_gpio_get_pin_configuration(gpio_ptr, pin_index, cfg);                                                          \
         }                                                                                                                                   \
         void vsf_origin_gpio_set_direction(vsf_origin_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)   \
         {                                                                                                                                   \
@@ -533,6 +563,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef vsf_origin_gpio_t
 #undef vsf_origin_gpio_capability
 #undef vsf_origin_gpio_port_config_pins
+#undef vsf_origin_gpio_get_pin_configuration
 #undef vsf_origin_gpio_set_direction
 #undef vsf_origin_gpio_get_direction
 #undef vsf_origin_gpio_set_input
@@ -552,6 +583,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef vsf_remap_gpio_t
 #undef vsf_remap_gpio_capability
 #undef vsf_remap_gpio_port_config_pins
+#undef vsf_remap_gpio_get_pin_configuration
 #undef vsf_remap_gpio_set_direction
 #undef vsf_remap_gpio_get_direction
 #undef vsf_remap_gpio_set_input
