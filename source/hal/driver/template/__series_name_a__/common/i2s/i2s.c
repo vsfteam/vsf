@@ -102,6 +102,23 @@ vsf_err_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_init)(
     return VSF_ERR_NONE;
 }
 
+vsf_err_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_get_configuration)(
+    VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr,
+    vsf_i2s_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != i2s_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current I2S configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = i2s_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
+}
+
 vsf_err_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_tx_init)(
     VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr,
     vsf_i2s_cfg_t *cfg_ptr
@@ -115,6 +132,29 @@ void VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_tx_fini)(
     VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr
 ) {
     VSF_HAL_ASSERT(i2s_ptr != NULL);
+}
+
+vsf_err_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_tx_get_configuration)(
+    VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr,
+    vsf_i2s_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != i2s_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // For template implementation, return a default configuration
+    // In a real implementation, this should retrieve the actual hardware configuration
+    *cfg_ptr = (vsf_i2s_cfg_t) {
+        .mode = VSF_I2S_MODE_MASTER | VSF_I2S_STANDARD_PHILLIPS | VSF_I2S_DATASIZE_16_BITS,
+        .sample_rate = 44100,
+        .mclk_hz = 0,  // Use default MCLK
+        .isr = {
+            .handler_fn = NULL,
+            .target_ptr = NULL,
+            .prio       = vsf_arch_prio_0,
+        },
+    };
+
+    return VSF_ERR_NONE;
 }
 
 vsf_err_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_tx_start)(
@@ -138,6 +178,29 @@ void VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_rx_fini)(
     VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr
 ) {
     VSF_HAL_ASSERT(i2s_ptr != NULL);
+}
+
+vsf_err_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_rx_get_configuration)(
+    VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr,
+    vsf_i2s_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != i2s_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // For template implementation, return a default configuration
+    // In a real implementation, this should retrieve the actual hardware configuration
+    *cfg_ptr = (vsf_i2s_cfg_t) {
+        .mode = VSF_I2S_MODE_MASTER | VSF_I2S_STANDARD_PHILLIPS | VSF_I2S_DATASIZE_16_BITS,
+        .sample_rate = 44100,
+        .mclk_hz = 0,  // Use default MCLK
+        .isr = {
+            .handler_fn = NULL,
+            .target_ptr = NULL,
+            .prio       = vsf_arch_prio_0,
+        },
+    };
+
+    return VSF_ERR_NONE;
 }
 
 vsf_err_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_rx_start)(
@@ -214,6 +277,7 @@ static void VSF_MCONNECT(__, VSF_I2S_CFG_IMP_PREFIX, _i2s_irqhandler)(
 
 // HW
 #define VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED
+#define VSF_I2S_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #define VSF_I2S_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t)                                \
         VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s, __IDX) = {                   \

@@ -51,6 +51,12 @@ vsf_err_t vsf_remapped_i2s_init(vsf_remapped_i2s_t *i2s, vsf_i2s_cfg_t *i2s_cfg)
     return vsf_i2s_init(i2s->target, i2s_cfg);
 }
 
+vsf_err_t vsf_remapped_i2s_get_configuration(vsf_remapped_i2s_t *i2s, vsf_i2s_cfg_t *i2s_cfg)
+{
+    VSF_HAL_ASSERT((i2s != NULL) && (i2s->target != NULL));
+    return vsf_i2s_get_configuration(i2s->target, i2s_cfg);
+}
+
 vsf_err_t vsf_remapped_i2s_tx_init(vsf_remapped_i2s_t *i2s, vsf_i2s_cfg_t *i2s_cfg)
 {
     VSF_HAL_ASSERT((i2s != NULL) && (i2s->target != NULL));
@@ -61,6 +67,12 @@ void vsf_remapped_i2s_tx_fini(vsf_remapped_i2s_t *i2s)
 {
     VSF_HAL_ASSERT((i2s != NULL) && (i2s->target != NULL));
     vsf_i2s_tx_fini(i2s->target);
+}
+
+vsf_err_t vsf_remapped_i2s_tx_get_configuration(vsf_remapped_i2s_t *i2s, vsf_i2s_cfg_t *i2s_cfg)
+{
+    VSF_HAL_ASSERT((i2s != NULL) && (i2s->target != NULL));
+    return vsf_i2s_tx_get_configuration(i2s->target, i2s_cfg);
 }
 
 vsf_err_t vsf_remapped_i2s_tx_start(vsf_remapped_i2s_t *i2s)
@@ -79,6 +91,12 @@ void vsf_remapped_i2s_rx_fini(vsf_remapped_i2s_t *i2s)
 {
     VSF_HAL_ASSERT((i2s != NULL) && (i2s->target != NULL));
     vsf_i2s_rx_fini(i2s->target);
+}
+
+vsf_err_t vsf_remapped_i2s_rx_get_configuration(vsf_remapped_i2s_t *i2s, vsf_i2s_cfg_t *i2s_cfg)
+{
+    VSF_HAL_ASSERT((i2s != NULL) && (i2s->target != NULL));
+    return vsf_i2s_rx_get_configuration(i2s->target, i2s_cfg);
 }
 
 vsf_err_t vsf_remapped_i2s_rx_start(vsf_remapped_i2s_t *i2s)
