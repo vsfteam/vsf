@@ -201,6 +201,7 @@ extern "C" {
 #define VSF_ADC_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, init,                 VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 adc, fini,                 VSF_MCONNECT(__prefix_name, _t) *adc_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, get_configuration,    VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             adc, enable,               VSF_MCONNECT(__prefix_name, _t) *adc_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             adc, disable,              VSF_MCONNECT(__prefix_name, _t) *adc_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_adc_status_t,     adc, status,               VSF_MCONNECT(__prefix_name, _t) *adc_ptr) \
@@ -748,6 +749,25 @@ extern vsf_err_t vsf_adc_init(vsf_adc_t *adc_ptr, vsf_adc_cfg_t *cfg_ptr);
 extern void vsf_adc_fini(vsf_adc_t *adc_ptr);
 
 /**
+ * \~english
+ * @brief Get current configuration of an ADC instance
+ * @param[in] adc_ptr Pointer to ADC instance
+ * @param[out] cfg_ptr Pointer to ADC configuration structure to store current settings
+ * @return vsf_err_t VSF_ERR_NONE if successful, otherwise an error code
+ *
+ * @note This function retrieves the current configuration of the ADC instance
+ *
+ * \~chinese
+ * @brief 获取 ADC 实例的当前配置
+ * @param[in] adc_ptr ADC 实例指针
+ * @param[out] cfg_ptr 用于存储当前设置的 ADC 配置结构体指针
+ * @return vsf_err_t 成功返回 VSF_ERR_NONE，否则返回错误码
+ *
+ * @note 此函数获取 ADC 实例的当前配置
+ */
+extern vsf_err_t vsf_adc_get_configuration(vsf_adc_t *adc_ptr, vsf_adc_cfg_t *cfg_ptr);
+
+/**
  \~english
  @brief Enable an ADC instance
  @param[in] adc_ptr: a pointer to structure @ref vsf_adc_t
@@ -895,6 +915,7 @@ extern vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr,
 #   define __vsf_adc_t                              VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_t)
 #   define vsf_adc_init(__ADC, ...)                 VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_init)                 ((__vsf_adc_t *)(__ADC), ##__VA_ARGS__)
 #   define vsf_adc_fini(__ADC)                      VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_fini)                 ((__vsf_adc_t *)(__ADC))
+#   define vsf_adc_get_configuration(__ADC, ...)    VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_get_configuration)    ((__vsf_adc_t *)(__ADC), ##__VA_ARGS__)
 #   define vsf_adc_enable(__ADC)                    VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_enable)               ((__vsf_adc_t *)(__ADC))
 #   define vsf_adc_disable(__ADC)                   VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_disable)              ((__vsf_adc_t *)(__ADC))
 #   define vsf_adc_status(__ADC)                    VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_status)               ((__vsf_adc_t *)(__ADC))

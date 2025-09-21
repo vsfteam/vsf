@@ -57,6 +57,12 @@ void vsf_remapped_adc_fini(vsf_remapped_adc_t *adc)
     vsf_adc_fini(adc->target);
 }
 
+vsf_err_t vsf_remapped_adc_get_configuration(vsf_remapped_adc_t *adc, vsf_adc_cfg_t *cfg)
+{
+    VSF_HAL_ASSERT((adc != NULL) && (adc->target != NULL));
+    return vsf_adc_get_configuration(adc->target, cfg);
+}
+
 vsf_adc_status_t vsf_remapped_adc_status(vsf_remapped_adc_t *adc)
 {
     VSF_HAL_ASSERT((adc != NULL) && (adc->target != NULL));
