@@ -411,7 +411,7 @@ typedef enum vsf_i2c_cmd_t {
      * @brief 起始条件命令。
      * 在 I2C 总线上产生起始条件以开始新的传输。
      */
-    VSF_I2C_CMD_START           = (0x00ul << 28),
+    VSF_I2C_CMD_START           = (0x01ul << 28),
 
     /**
      * \~english
@@ -421,7 +421,7 @@ typedef enum vsf_i2c_cmd_t {
      * @brief 停止条件命令。
      * 在 I2C 总线上产生停止条件以结束当前传输。
      */
-    VSF_I2C_CMD_STOP            = (0x00ul << 29),
+    VSF_I2C_CMD_STOP            = (0x01ul << 29),
 
     /**
      * \~english
@@ -443,7 +443,7 @@ typedef enum vsf_i2c_cmd_t {
      * @brief 7 位地址模式命令。
      * 配置 I2C 传输使用 7 位从机寻址。
      */
-    VSF_I2C_CMD_7_BITS          = (0x00ul << 31),
+    VSF_I2C_CMD_7_BITS          = (0x0ul << 31),
 
     /**
      * \~english
