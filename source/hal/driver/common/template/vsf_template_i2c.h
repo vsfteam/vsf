@@ -204,7 +204,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2c, irq_disable,                   VSF_MCONNECT(__prefix_name, _t) *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2c_status_t,     i2c, status,                        VSF_MCONNECT(__prefix_name, _t) *i2c_ptr)                               \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2c_capability_t, i2c, capability,                    VSF_MCONNECT(__prefix_name, _t) *i2c_ptr)                               \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2c, master_fifo_transfer,          VSF_MCONNECT(__prefix_name, _t) *i2c_ptr, uint16_t address,             \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2c, master_fifo_transfer,          VSF_MCONNECT(__prefix_name, _t) *i2c_ptr, uint16_t address,             \
         vsf_i2c_cmd_t cmd, uint_fast16_t count, uint8_t* buffer_ptr, vsf_i2c_cmd_t *cur_cmd_ptr, uint_fast16_t *offset_ptr)                                                 \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2c, master_request,                VSF_MCONNECT(__prefix_name, _t) *i2c_ptr, uint16_t address,             \
         vsf_i2c_cmd_t cmd, uint_fast16_t count, uint8_t* buffer_ptr)                                                                                                        \
@@ -1132,9 +1132,13 @@ extern vsf_i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr);
  * @param[in,out] buffer_ptr: I2C transfer buffer (must not be NULL when count is non-zero)
  * @param[in,out] cur_cmd_ptr: current I2C command pointer (must be cleared before first call)
  * @param[in,out] offset_ptr: current offset pointer (must be cleared before first call)
- * @return uint_fast16_t: number of bytes transferred from current I2C
+ * @return fsm_rt_t: transfer status
+ *                   - fsm_rt_cpl: transfer completed successfully
+ *                   - fsm_rt_err: master write received NAK (Not Acknowledge)
+ *                   - fsm_rt_on_going: transfer in progress, need to call again
  * @note When count is non-zero, buffer_ptr must not be NULL.
  *       The variables pointed to by cur_cmd_ptr and offset_ptr must be cleared before the first call.
+ *       When fsm_rt_on_going is returned, continue calling this function until completion.
  *
  * \~chinese
  * @brief I2C 主机进行一次 FIFO 传输
@@ -1145,17 +1149,21 @@ extern vsf_i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr);
  * @param[in,out] buffer_ptr: I2C 传输缓冲区（当 count 不为 0 时，不能为空指针）
  * @param[in,out] cur_cmd_ptr: 当前 I2C 命令指针（第一次调用前必须清零）
  * @param[in,out] offset_ptr: 当前偏移指针（第一次调用前必须清零）
- * @return uint_fast16_t: 返回从当前 I2C 传输的字节数
+ * @return fsm_rt_t: 传输状态
+ *                   - fsm_rt_cpl: 传输成功完成
+ *                   - fsm_rt_err: 主机写操作收到 NAK (Not Acknowledge)
+ *                   - fsm_rt_on_going: 传输进行中，需要继续调用
  * @note 当 count 不为 0 时，buffer_ptr 不能为空指针。
  *       cur_cmd_ptr 和 offset_ptr 指向的变量在第一次调用之前必须清零。
+ *       当返回 fsm_rt_on_going 时，需要继续调用此函数直到完成。
  */
-extern void vsf_i2c_master_fifo_transfer(vsf_i2c_t *i2c_ptr,
-                                         uint16_t address,
-                                         vsf_i2c_cmd_t cmd,
-                                         uint_fast16_t count,
-                                         uint8_t *buffer_ptr,
-                                         vsf_i2c_cmd_t *cur_cmd_ptr,
-                                         uint_fast16_t *offset_ptr);
+extern fsm_rt_t vsf_i2c_master_fifo_transfer(vsf_i2c_t *i2c_ptr,
+                                             uint16_t address,
+                                             vsf_i2c_cmd_t cmd,
+                                             uint_fast16_t count,
+                                             uint8_t *buffer_ptr,
+                                             vsf_i2c_cmd_t *cur_cmd_ptr,
+                                             uint_fast16_t *offset_ptr);
 
 /**
  * \~english
@@ -1293,7 +1301,7 @@ extern vsf_err_t vsf_i2c_ctrl(vsf_i2c_t *i2c_ptr, vsf_i2c_ctrl_t ctrl, void * pa
 #   define vsf_i2c_capability(__I2C)                        VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_capability)                   ((__vsf_i2c_t *)(__I2C))
 #   define vsf_i2c_master_fifo_transfer(__I2C, ...)         VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_fifo_transfer)         ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
 #   define vsf_i2c_master_request(__I2C, ...)               VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_request)               ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
-#   define vsf_i2c_master_get_transferred_count(__I2C, ...)  VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_get_transferred_count) ((__vsf_i2c_t *)(__I2C))
+#   define vsf_i2c_master_get_transferred_count(__I2C, ...) VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_get_transferred_count) ((__vsf_i2c_t *)(__I2C))
 #   define vsf_i2c_slave_fifo_transfer(__I2C, ...)          VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_slave_fifo_transfer)          ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
 #   define vsf_i2c_slave_request(__I2C, ...)                VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_slave_request)                ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
 #   define vsf_i2c_slave_get_transferred_count(__I2C, ...)  VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_slave_get_transferred_count)  ((__vsf_i2c_t *)(__I2C))

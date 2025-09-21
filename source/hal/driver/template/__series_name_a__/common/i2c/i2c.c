@@ -171,7 +171,7 @@ vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)(
     return VSF_ERR_NONE;
 }
 
-void VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_fifo_transfer)(
+fsm_rt_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_fifo_transfer)(
     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr,
     uint16_t address,
     vsf_i2c_cmd_t cmd,
@@ -182,6 +182,7 @@ void VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_fifo_transfer)(
 ) {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
     VSF_HAL_ASSERT(0 != count);
+    return fsm_rt_err;
 }
 
 uint_fast16_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_get_transferred_count)(

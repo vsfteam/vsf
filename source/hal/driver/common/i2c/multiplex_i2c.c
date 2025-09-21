@@ -346,13 +346,13 @@ void vsf_multiplex_i2c_master_fifof_transfer(vsf_multiplex_i2c_t *m_i2c_ptr,
     VSF_HAL_ASSERT(0);
 }
 
-void vsf_multiplex_i2c_master_fifo_transfer(vsf_multiplex_i2c_t *m_i2c_ptr,
-                                            uint16_t address,
-                                            vsf_i2c_cmd_t cmd,
-                                            uint_fast16_t count,
-                                            uint8_t *buffer,
-                                            vsf_i2c_cmd_t *cur_cmd_ptr,
-                                            uint_fast16_t *offset_ptr)
+fsm_rt_t vsf_multiplex_i2c_master_fifo_transfer(vsf_multiplex_i2c_t *m_i2c_ptr,
+                                                uint16_t address,
+                                                vsf_i2c_cmd_t cmd,
+                                                uint_fast16_t count,
+                                                uint8_t *buffer,
+                                                vsf_i2c_cmd_t *cur_cmd_ptr,
+                                                uint_fast16_t *offset_ptr)
 {
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
     vsf_multiplexer_i2c_t * const multiplexer = m_i2c_ptr->multiplexer;
@@ -360,6 +360,7 @@ void vsf_multiplex_i2c_master_fifo_transfer(vsf_multiplex_i2c_t *m_i2c_ptr,
     VSF_HAL_ASSERT(multiplexer->en_mask & (1 << m_i2c_ptr->id));
 
     VSF_HAL_ASSERT(0);
+    return fsm_rt_err;
 }
 
 uint_fast16_t vsf_multiplex_i2c_slave_fifo_transfer(vsf_multiplex_i2c_t *m_i2c_ptr,

@@ -172,10 +172,10 @@ typedef enum vsf_i2c_ctrl_t {
 
     VSF_I2C_CTRL_SET_MODE,
     #define VSF_I2C_CTRL_SET_MODE           VSF_I2C_CTRL_SET_MODE
-    
+
     VSF_I2C_CTRL_SLAVE_GET_ADDRESS,
     #define VSF_I2C_CTRL_SLAVE_GET_ADDRESS  VSF_I2C_CTRL_SLAVE_GET_ADDRESS
-    
+
     VSF_I2C_CTRL_SLAVE_SET_ADDRESS,
     #define VSF_I2C_CTRL_SLAVE_SET_ADDRESS  VSF_I2C_CTRL_SLAVE_SET_ADDRESS
 } vsf_i2c_ctrl_t;
@@ -230,7 +230,7 @@ extern vsf_i2c_irq_mask_t vsf_dw_apb_i2c_irq_disable(vsf_dw_apb_i2c_t *dw_apb_i2
         vsf_i2c_irq_mask_t irq_mask);
 extern vsf_i2c_status_t vsf_dw_apb_i2c_status(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr);
 extern void vsf_dw_apb_i2c_isrhandler(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr);
-extern void vsf_dw_apb_i2c_master_fifo_transfer(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr,
+extern fsm_rt_t vsf_dw_apb_i2c_master_fifo_transfer(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr,
     uint16_t address, vsf_i2c_cmd_t cmd, uint_fast16_t count, uint8_t *buffer_ptr,
     vsf_i2c_cmd_t *cur_cmd_ptr, uint_fast16_t *offset_ptr);
 extern uint_fast16_t vsf_dw_apb_i2c_slave_fifo_transfer(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr,

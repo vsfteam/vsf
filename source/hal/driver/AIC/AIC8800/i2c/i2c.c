@@ -232,18 +232,19 @@ vsf_i2c_status_t vsf_hw_i2c_status(vsf_hw_i2c_t *hw_i2c_ptr)
     return status;
 }
 
-void vsf_hw_i2c_master_fifo_transfer(vsf_hw_i2c_t *hw_i2c_ptr,
-                                    uint16_t address,
-                                    vsf_i2c_cmd_t cmd,
-                                    uint_fast16_t count,
-                                    uint8_t *buffer_ptr,
-                                    vsf_i2c_cmd_t *cur_cmd_ptr,
-                                    uint_fast16_t *offset_ptr)
+fsm_rt_t vsf_hw_i2c_master_fifo_transfer(vsf_hw_i2c_t *hw_i2c_ptr,
+                                        uint16_t address,
+                                        vsf_i2c_cmd_t cmd,
+                                        uint_fast16_t count,
+                                        uint8_t *buffer_ptr,
+                                        vsf_i2c_cmd_t *cur_cmd_ptr,
+                                        uint_fast16_t *offset_ptr)
 {
     VSF_HAL_ASSERT(NULL != hw_i2c_ptr);
 
     // TODO: add fifo transfer
     VSF_HAL_ASSERT(0);
+    return fsm_rt_err;
 }
 
 static void __i2c_master_request(vsf_hw_i2c_t *hw_i2c_ptr,

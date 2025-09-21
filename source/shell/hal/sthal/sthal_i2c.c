@@ -716,26 +716,27 @@ static bool __i2c_check_timeout(I2C_HandleTypeDef *hi2c, uint32_t Tickstart,
     }
 }
 
-static bool __i2c_master_fifo_transnfer(I2C_HandleTypeDef *hi2c,
-                                        vsf_i2c_cmd_t      cmd,
-                                        vsf_i2c_cmd_t     *current_cmd)
+static fsm_rt_t __i2c_master_fifo_transnfer(I2C_HandleTypeDef *hi2c,
+                                            vsf_i2c_cmd_t      cmd,
+                                            vsf_i2c_cmd_t     *current_cmd)
 {
     VSF_STHAL_ASSERT(IS_I2C_ALL_INSTANCE(hi2c->Instance));
     vsf_i2c_t *i2c_ptr = (vsf_i2c_t *)hi2c->Instance;
     VSF_STHAL_ASSERT(i2c_ptr != NULL);
+    fsm_rt_t result;
 
     if (hi2c->Mode == HAL_I2C_MODE_MEM) {
         if (hi2c->EventCount != hi2c->MemaddSize) {
             vsf_i2c_cmd_t memaddr_cmd =
                 VSF_I2C_CMD_START | VSF_I2C_CMD_WRITE | VSF_I2C_CMD_7_BITS;
             vsf_i2c_cmd_t memaddr_current_cmd = 0;
-            vsf_i2c_master_fifo_transfer(
+            result = vsf_i2c_master_fifo_transfer(
                 i2c_ptr, hi2c->Devaddress, memaddr_cmd, hi2c->MemaddSize,
                 (uint8_t *)&hi2c->Memaddress, &memaddr_current_cmd,
                 (uint_fast16_t *)&hi2c->EventCount);
 
-            if (hi2c->EventCount != hi2c->MemaddSize) {
-                return true;
+            if (result != fsm_rt_cpl) {
+                return result;
             }
         }
     }
@@ -743,16 +744,15 @@ static bool __i2c_master_fifo_transnfer(I2C_HandleTypeDef *hi2c,
     uint_fast16_t offset = 0;
     if (((hi2c->XferCount > 0) && (hi2c->pBuffPtr != NULL)) ||
         (cmd != *current_cmd)) {
-        vsf_i2c_master_fifo_transfer(i2c_ptr, hi2c->Devaddress, cmd,
-                                     hi2c->XferCount, hi2c->pBuffPtr,
-                                     current_cmd, &offset);
-
+        result = vsf_i2c_master_fifo_transfer(i2c_ptr, hi2c->Devaddress, cmd,
+                                                       hi2c->XferCount, hi2c->pBuffPtr,
+                                                       current_cmd, &offset);
         hi2c->XferCount -= offset;
         hi2c->XferSize -= offset;
         hi2c->pBuffPtr += offset;
     }
 
-    return hi2c->XferCount != 0;
+    return fsm_rt_cpl;
 }
 
 static bool __i2c_master_fifo_transnfer_continue(I2C_HandleTypeDef *hi2c)
@@ -764,7 +764,8 @@ static bool __i2c_master_fifo_transnfer_continue(I2C_HandleTypeDef *hi2c)
     vsf_i2c_cmd_t cmd         = __i2c_get_cmd(hi2c);
     vsf_i2c_cmd_t current_cmd = 0;
 
-    return __i2c_master_fifo_transnfer(hi2c, cmd, &current_cmd);
+    fsm_rt_t result = __i2c_master_fifo_transnfer(hi2c, cmd, &current_cmd);
+    return (result == fsm_rt_on_going);
 }
 
 static HAL_StatusTypeDef __i2c_master_fifo_transnfer_with_timeout(
@@ -774,7 +775,13 @@ static HAL_StatusTypeDef __i2c_master_fifo_transnfer_with_timeout(
     vsf_i2c_cmd_t current_cmd = 0;
 
     while ((hi2c->XferCount > 0) || (cmd != current_cmd)) {
-        __i2c_master_fifo_transnfer(hi2c, cmd, &current_cmd);
+        fsm_rt_t result = __i2c_master_fifo_transnfer(hi2c, cmd, &current_cmd);
+
+        if (result == fsm_rt_err) {
+            return HAL_ERROR;
+        } else if (result == fsm_rt_cpl) {
+            break;
+        }
 
         if (__i2c_check_timeout(hi2c, Tickstart, Timeout)) {
             return HAL_TIMEOUT;
@@ -846,7 +853,8 @@ static HAL_StatusTypeDef __i2c_master_transfer_it(
     VSF_STHAL_ASSERT(i2c_ptr != NULL);
 
     vsf_i2c_cmd_t current_cmd = 0;
-    __i2c_master_fifo_transnfer(hi2c, cmd, &current_cmd);
+    fsm_rt_t result = __i2c_master_fifo_transnfer(hi2c, cmd, &current_cmd);
+    VSF_UNUSED_PARAM(result);
 
     VSF_STHAL_UNLOCK(hi2c);
     vsf_i2c_irq_enable(i2c_ptr, irq_mask);
@@ -1647,9 +1655,16 @@ HAL_StatusTypeDef HAL_I2C_IsDeviceReady(I2C_HandleTypeDef *hi2c,
 
     uint_fast16_t offset = 0;
     while (i < Trials) {
-        while (cmd != current_cmd) {
-            vsf_i2c_master_fifo_transfer(i2c_ptr, hi2c->Devaddress, cmd, 0,
-                                         NULL, &current_cmd, &offset);
+        fsm_rt_t result;
+        do {
+            result = vsf_i2c_master_fifo_transfer(i2c_ptr, hi2c->Devaddress, cmd, 0,
+                                                  NULL, &current_cmd, &offset);
+
+            if (result == fsm_rt_err) {
+                return HAL_ERROR;
+            } else if (result == fsm_rt_cpl) {
+                break;
+            }
 
             if (__i2c_check_timeout(hi2c, Tickstart, Timeout)) {
                 return HAL_ERROR;
@@ -1657,7 +1672,7 @@ HAL_StatusTypeDef HAL_I2C_IsDeviceReady(I2C_HandleTypeDef *hi2c,
                                            I2C_TIMEOUT_BUSY_FLAG)) {
                 i++;
             }
-        }
+        } while (result == fsm_rt_on_going);
     }
 
     return HAL_OK;
