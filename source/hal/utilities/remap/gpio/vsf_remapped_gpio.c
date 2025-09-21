@@ -51,6 +51,12 @@ vsf_err_t vsf_remapped_gpio_port_config_pins(vsf_remapped_gpio_t *gpio, vsf_gpio
     return vsf_gpio_port_config_pins(gpio->target, pin_mask, cfg);
 }
 
+vsf_err_t vsf_remapped_gpio_get_pin_configuration(vsf_remapped_gpio_t *gpio, uint16_t pin_index, vsf_gpio_cfg_t *cfg)
+{
+    VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));
+    return vsf_gpio_get_pin_configuration(gpio->target, pin_index, cfg);
+}
+
 void vsf_remapped_gpio_set_direction(vsf_remapped_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)
 {
     VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));

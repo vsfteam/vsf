@@ -41,6 +41,16 @@ vsf_err_t vsf_gpio_port_config_pins(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pi
     return gpio_ptr->op->port_config_pins(gpio_ptr, pin_mask, cfg_ptr);
 }
 
+vsf_err_t vsf_gpio_get_pin_configuration(vsf_gpio_t *gpio_ptr, uint16_t pin_index, vsf_gpio_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(gpio_ptr != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op->get_pin_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return gpio_ptr->op->get_pin_configuration(gpio_ptr, pin_index, cfg_ptr);
+}
+
 void vsf_gpio_set_direction(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)
 {
     VSF_HAL_ASSERT(gpio_ptr != NULL);
