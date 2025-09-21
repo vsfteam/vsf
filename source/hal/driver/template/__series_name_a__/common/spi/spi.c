@@ -117,6 +117,23 @@ void VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_fini)(
     VSF_HAL_ASSERT(spi_ptr != NULL);
 }
 
+vsf_err_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_get_configuration)(
+    VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr,
+    vsf_spi_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != spi_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // For template implementation, return a default configuration
+    cfg_ptr->mode = VSF_SPI_MASTER | VSF_SPI_MODE_0 | VSF_SPI_MSB_FIRST |
+                    VSF_SPI_DATASIZE_8 | VSF_SPI_CS_SOFTWARE_MODE;
+    cfg_ptr->clock_hz = 1000000; // 1MHz default
+    cfg_ptr->auto_cs_index = 0;
+    cfg_ptr->isr = spi_ptr->isr;
+
+    return VSF_ERR_NONE;
+}
+
 fsm_rt_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_enable)(
     VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr
 ) {
@@ -266,8 +283,9 @@ static void VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_irqhandler)(
  */
 
 // HW
-#define VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY  ENABLED
-#define VSF_SPI_CFG_REIMPLEMENT_API_CTRL        ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY          ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_API_CTRL                ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_API_GET_CONFIGURATION   ENABLED
 
 #define VSF_SPI_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t)                                \

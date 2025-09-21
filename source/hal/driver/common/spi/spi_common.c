@@ -52,6 +52,16 @@ void vsf_spi_fini(vsf_spi_t *spi_ptr)
     spi_ptr->op->fini(spi_ptr);
 }
 
+vsf_err_t vsf_spi_get_configuration(vsf_spi_t *spi_ptr, vsf_spi_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(spi_ptr != NULL);
+    VSF_HAL_ASSERT(spi_ptr->op != NULL);
+    VSF_HAL_ASSERT(spi_ptr->op->get_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return spi_ptr->op->get_configuration(spi_ptr, cfg_ptr);
+}
+
 fsm_rt_t vsf_spi_enable(vsf_spi_t *spi_ptr)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);

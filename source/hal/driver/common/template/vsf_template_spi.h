@@ -238,6 +238,7 @@ extern "C" {
 #define VSF_SPI_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, init,                  VSF_MCONNECT(__prefix_name, _t) *spi_ptr, vsf_spi_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, fini,                  VSF_MCONNECT(__prefix_name, _t) *spi_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, get_configuration,     VSF_MCONNECT(__prefix_name, _t) *spi_ptr, vsf_spi_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             spi, enable,                VSF_MCONNECT(__prefix_name, _t) *spi_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             spi, disable,               VSF_MCONNECT(__prefix_name, _t) *spi_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, irq_enable,            VSF_MCONNECT(__prefix_name, _t) *spi_ptr, vsf_spi_irq_mask_t irq_mask) \
@@ -1071,6 +1072,25 @@ extern void vsf_spi_fini(vsf_spi_t *spi_ptr);
 
 /**
  * \~english
+ * @brief Get current configuration of a SPI instance
+ * @param[in] spi_ptr Pointer to SPI instance
+ * @param[out] cfg_ptr Pointer to SPI configuration structure to store current settings
+ * @return vsf_err_t VSF_ERR_NONE if successful, otherwise an error code
+ *
+ * @note This function retrieves the current configuration of the SPI instance
+ *
+ * \~chinese
+ * @brief 获取 SPI 实例的当前配置
+ * @param[in] spi_ptr SPI 实例指针
+ * @param[out] cfg_ptr 用于存储当前设置的 SPI 配置结构体指针
+ * @return vsf_err_t 成功返回 VSF_ERR_NONE，否则返回错误码
+ *
+ * @note 此函数获取 SPI 实例的当前配置
+ */
+extern vsf_err_t vsf_spi_get_configuration(vsf_spi_t *spi_ptr, vsf_spi_cfg_t *cfg_ptr);
+
+/**
+ * \~english
  * @brief Enable a SPI instance for operation
  * @param[in,out] spi_ptr: Pointer to SPI instance structure @ref vsf_spi_t
  * @return fsm_rt_t: fsm_rt_cpl if SPI was enabled immediately, fsm_rt_on_going if enabling is in progress
@@ -1657,6 +1677,7 @@ static inline uint8_t vsf_spi_mode_to_data_bytes(vsf_spi_mode_t mode)
 #   define __vsf_spi_t                                  VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_t)
 #   define vsf_spi_init(__SPI, ...)                     VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_init)                 ((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
 #   define vsf_spi_fini(__SPI)                          VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_fini)                 ((__vsf_spi_t *)(__SPI))
+#   define vsf_spi_get_configuration(__SPI, ...)        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_get_configuration)    ((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
 #   define vsf_spi_enable(__SPI)                        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_enable)               ((__vsf_spi_t *)(__SPI))
 #   define vsf_spi_disable(__SPI)                       VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_disable)              ((__vsf_spi_t *)(__SPI))
 #   define vsf_spi_irq_enable(__SPI, ...)               VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_irq_enable)           ((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)

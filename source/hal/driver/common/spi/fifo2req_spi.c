@@ -114,6 +114,23 @@ void vsf_fifo2req_spi_fini(vsf_fifo2req_spi_t *fifo2req_spi_ptr)
     vsf_spi_fini(fifo2req_spi_ptr->spi);
 }
 
+vsf_err_t vsf_fifo2req_spi_get_configuration(vsf_fifo2req_spi_t *fifo2req_spi_ptr,
+                                             vsf_spi_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(fifo2req_spi_ptr != NULL);
+    VSF_HAL_ASSERT(fifo2req_spi_ptr->spi != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    vsf_err_t result = vsf_spi_get_configuration(fifo2req_spi_ptr->spi, cfg_ptr);
+
+    // Restore the original ISR configuration that was saved during init
+    if (result == VSF_ERR_NONE) {
+        cfg_ptr->isr = fifo2req_spi_ptr->isr;
+    }
+
+    return result;
+}
+
 fsm_rt_t vsf_fifo2req_spi_enable(vsf_fifo2req_spi_t *fifo2req_spi_ptr)
 {
     VSF_HAL_ASSERT(fifo2req_spi_ptr != NULL);
@@ -279,8 +296,9 @@ vsf_spi_capability_t vsf_fifo2req_spi_capability(vsf_fifo2req_spi_t *fifo2req_sp
 #define VSF_SPI_CFG_IMP_PREFIX                      vsf_fifo2req
 #define VSF_SPI_CFG_IMP_UPCASE_PREFIX               VSF_FIFO2REQ
 #define VSF_SPI_CFG_IMP_EXTERN_OP                   ENABLED
-#define VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
-#define VSF_SPI_CFG_REIMPLEMENT_API_CTRL            ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY          ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_API_CTRL                ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_API_GET_CONFIGURATION   ENABLED
 #include "hal/driver/common/spi/spi_template.inc"
 
 
