@@ -133,7 +133,7 @@ vsf_err_t vsf_dw_apb_i2c_init(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr, vsf_i2c_cfg_t *c
         *lcnt = cycles_per_bit - 1;
         *hcnt = cycles_per_bit - 7 - (*spklen & 0xFF);
     }
-    
+
     dw_apb_i2c_ptr->is_master_request   = 0;
     dw_apb_i2c_ptr->is_slave_request    = 0;
     dw_apb_i2c_ptr->master_fifo_started = 0;
@@ -399,7 +399,7 @@ void vsf_dw_apb_i2c_irqhandler(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr)
     }
 }
 
-void vsf_dw_apb_i2c_master_fifo_transfer(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr,
+fsm_rt_t vsf_dw_apb_i2c_master_fifo_transfer(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr,
             uint16_t address, vsf_i2c_cmd_t cmd, uint_fast16_t count, uint8_t *buffer,
             vsf_i2c_cmd_t *cur_cmd_ptr, uint_fast16_t *offset_ptr)
 {
@@ -413,7 +413,7 @@ void vsf_dw_apb_i2c_master_fifo_transfer(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr,
     uint32_t stop = 0;
 
     if ((count == *offset_ptr) && (cmd == *cur_cmd_ptr)) {
-        return ;
+        return fsm_rt_cpl;
     }
 
     if (dw_apb_i2c_ptr->master_fifo_started == 0) {
@@ -481,11 +481,13 @@ void vsf_dw_apb_i2c_master_fifo_transfer(vsf_dw_apb_i2c_t *dw_apb_i2c_ptr,
     bool stop_detect = dw_apb_i2c_ptr->stop_detect || (reg->IC_RAW_INTR_STAT.STOP_DET);
     if (dw_apb_i2c_ptr->need_stop && !stop_detect) {
         *cur_cmd_ptr = cmd & ~VSF_I2C_CMD_STOP;
+        return fsm_rt_on_going;
     } else {
         *cur_cmd_ptr = cmd;
         dw_apb_i2c_ptr->need_stop = 0;
         dw_apb_i2c_ptr->stop_detect = 0;
         dw_apb_i2c_ptr->master_fifo_started = 0;
+        return fsm_rt_cpl;
     }
 }
 

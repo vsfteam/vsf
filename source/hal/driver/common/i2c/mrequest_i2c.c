@@ -170,7 +170,7 @@ vsf_i2c_status_t vsf_mrequest_i2c_status(vsf_mrequest_i2c_t *m_i2c_ptr)
     return vsf_i2c_status(real_i2c_ptr);
 }
 
-void vsf_mrequest_i2c_master_fifo_transfer(vsf_mrequest_i2c_t *m_i2c_ptr,
+fsm_rt_t vsf_mrequest_i2c_master_fifo_transfer(vsf_mrequest_i2c_t *m_i2c_ptr,
                                                 uint16_t address,
                                                 vsf_i2c_cmd_t cmd,
                                                 uint_fast16_t count,
@@ -182,7 +182,7 @@ void vsf_mrequest_i2c_master_fifo_transfer(vsf_mrequest_i2c_t *m_i2c_ptr,
     vsf_i2c_t * real_i2c_ptr = m_i2c_ptr->i2c_ptr;
     VSF_HAL_ASSERT(NULL != real_i2c_ptr);
 
-    vsf_i2c_master_fifo_transfer(real_i2c_ptr, address, cmd, count, buffer, cur_cmd_ptr, offset_ptr);
+    return vsf_i2c_master_fifo_transfer(real_i2c_ptr, address, cmd, count, buffer, cur_cmd_ptr, offset_ptr);
 }
 
 vsf_err_t vsf_mrequest_i2c_master_request(vsf_mrequest_i2c_t *m_i2c_ptr,

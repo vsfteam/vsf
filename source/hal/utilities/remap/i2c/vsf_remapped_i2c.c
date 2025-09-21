@@ -99,12 +99,12 @@ vsf_i2c_capability_t vsf_remapped_i2c_capability(vsf_remapped_i2c_t *i2c)
     return vsf_i2c_capability(i2c->target);
 }
 
-void vsf_remapped_i2c_master_fifo_transfer(vsf_remapped_i2c_t *i2c,
+fsm_rt_t vsf_remapped_i2c_master_fifo_transfer(vsf_remapped_i2c_t *i2c,
         uint16_t address, vsf_i2c_cmd_t cmd, uint_fast16_t count, uint8_t *buffer,
         vsf_i2c_cmd_t *cur_cmd_ptr, uint_fast16_t *offset_ptr)
 {
     VSF_HAL_ASSERT((i2c != NULL) && (i2c->target != NULL));
-    vsf_i2c_master_fifo_transfer(i2c->target, address, cmd, count, buffer, cur_cmd_ptr, offset_ptr);
+    return vsf_i2c_master_fifo_transfer(i2c->target, address, cmd, count, buffer, cur_cmd_ptr, offset_ptr);
 }
 
 uint_fast16_t vsf_remapped_i2c_slave_fifo_transfer(vsf_remapped_i2c_t *i2c,

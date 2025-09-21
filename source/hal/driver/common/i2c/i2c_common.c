@@ -116,18 +116,18 @@ vsf_i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr)
     return i2c_ptr->op->capability(i2c_ptr);
 }
 
-void vsf_i2c_master_fifo_transfer(vsf_i2c_t *i2c_ptr, uint16_t address,
-                                  vsf_i2c_cmd_t cmd, uint_fast16_t count,
-                                  uint8_t       *buffer_ptr,
-                                  vsf_i2c_cmd_t *cur_cmd_ptr,
-                                  uint_fast16_t *offset_ptr)
+fsm_rt_t vsf_i2c_master_fifo_transfer(vsf_i2c_t *i2c_ptr, uint16_t address,
+                                      vsf_i2c_cmd_t cmd, uint_fast16_t count,
+                                      uint8_t       *buffer_ptr,
+                                      vsf_i2c_cmd_t *cur_cmd_ptr,
+                                      uint_fast16_t *offset_ptr)
 {
     VSF_HAL_ASSERT(i2c_ptr != NULL);
     VSF_HAL_ASSERT(i2c_ptr->op != NULL);
     VSF_HAL_ASSERT(i2c_ptr->op->master_fifo_transfer != NULL);
 
-    i2c_ptr->op->master_fifo_transfer(i2c_ptr, address, cmd, count, buffer_ptr,
-                                      cur_cmd_ptr, offset_ptr);
+    return i2c_ptr->op->master_fifo_transfer(i2c_ptr, address, cmd, count, buffer_ptr,
+                                             cur_cmd_ptr, offset_ptr);
 }
 
 uint_fast16_t vsf_i2c_slave_fifo_transfer(vsf_i2c_t    *i2c_ptr,

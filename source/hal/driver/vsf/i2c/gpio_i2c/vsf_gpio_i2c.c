@@ -172,11 +172,11 @@ static uint8_t __vsf_gpio_i2c_in(vsf_gpio_i2c_t *gpio_i2c_ptr, bool ack)
     return data;
 }
 
-void vsf_gpio_i2c_master_fifo_transfer(vsf_gpio_i2c_t *gpio_i2c_ptr,
-                                       uint16_t address, vsf_i2c_cmd_t cmd,
-                                       uint_fast16_t count, uint8_t *buffer_ptr,
-                                       vsf_i2c_cmd_t *cur_cmd_ptr,
-                                       uint_fast16_t *offset_ptr)
+fsm_rt_t vsf_gpio_i2c_master_fifo_transfer(vsf_gpio_i2c_t *gpio_i2c_ptr,
+                                           uint16_t address, vsf_i2c_cmd_t cmd,
+                                           uint_fast16_t count, uint8_t *buffer_ptr,
+                                           vsf_i2c_cmd_t *cur_cmd_ptr,
+                                           uint_fast16_t *offset_ptr)
 {
 
     VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
@@ -189,13 +189,17 @@ void vsf_gpio_i2c_master_fifo_transfer(vsf_gpio_i2c_t *gpio_i2c_ptr,
 
     vsf_err_t err = vsf_gpio_i2c_master_request(gpio_i2c_ptr, address, cmd, count, buffer_ptr);
     if (VSF_ERR_NONE != err) {
-        return;
+        return fsm_rt_err;
     }
 
-    if (count != 0) {
-        *offset_ptr += count;
-    }
     *cur_cmd_ptr = cmd;
+    if (gpio_i2c_ptr->irq_mask & VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK) {
+        *offset_ptr = 0;
+        return fsm_rt_err;
+    } else {
+        *offset_ptr = count;
+        return fsm_rt_cpl;
+    }
 }
 
 uint_fast16_t vsf_gpio_i2c_slave_fifo_transfer(vsf_gpio_i2c_t *gpio_i2c_ptr,
@@ -211,9 +215,12 @@ uint_fast16_t vsf_gpio_i2c_slave_fifo_transfer(vsf_gpio_i2c_t *gpio_i2c_ptr,
 static void __vsf_gpio_i2c_isrhandler(vsf_gpio_i2c_t *gpio_i2c_ptr)
 {
     if (gpio_i2c_ptr->cfg.isr.handler_fn != NULL) {
-        gpio_i2c_ptr->cfg.isr.handler_fn(gpio_i2c_ptr->cfg.isr.target_ptr,
-                (vsf_i2c_t *)gpio_i2c_ptr, gpio_i2c_ptr->irq_mask);
+        vsf_i2c_irq_mask_t irq_mask = gpio_i2c_ptr->irq_mask;
         gpio_i2c_ptr->irq_mask = 0;
+        if (irq_mask != 0) {
+            gpio_i2c_ptr->cfg.isr.handler_fn(gpio_i2c_ptr->cfg.isr.target_ptr,
+                    (vsf_i2c_t *)gpio_i2c_ptr, irq_mask);
+        }
     }
 }
 

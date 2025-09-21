@@ -147,6 +147,7 @@ vsf_err_t vsf_real_i2c_get_configuration(vsf_real_i2c_t *i2c_ptr, vsf_i2c_cfg_t 
 #   define vsf_imp_i2c_irq_disable              VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_irq_disable)
 #   define vsf_imp_i2c_status                   VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_status)
 #   define vsf_imp_i2c_capability               VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)
+#   define vsf_imp_i2c_master_fifo_transfer     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_fifo_transfer)
 #   define vsf_imp_i2c_master_request           VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)
 #   define vsf_imp_i2c_get_transferred_count    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_get_transferred_count)
 #   define vsf_imp_i2c_ctrl                     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_ctrl)
@@ -161,8 +162,9 @@ vsf_err_t vsf_real_i2c_get_configuration(vsf_real_i2c_t *i2c_ptr, vsf_i2c_cfg_t 
 #   define vsf_remap_i2c_irq_disable            VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_irq_disable)
 #   define vsf_remap_i2c_status                 VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_status)
 #   define vsf_remap_i2c_capability             VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_capability)
+#   define vsf_remap_i2c_master_fifo_transfer  VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_master_fifo_transfer)
 #   define vsf_remap_i2c_master_request         VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_master_request)
-#   define vsf_remap_i2c_get_transferred_count  VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_get_transferred_count)
+#   define vsf_remap_i2c_get_transferred_count VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_get_transferred_count)
 #   define vsf_remap_i2c_ctrl                   VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_ctrl)
 #   define vsf_remap_i2c_get_configuration      VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_get_configuration)
 
@@ -206,6 +208,18 @@ vsf_err_t vsf_real_i2c_get_configuration(vsf_real_i2c_t *i2c_ptr, vsf_i2c_cfg_t 
         {                                                                                          \
             VSF_HAL_ASSERT(i2c_ptr != NULL);                                                       \
             return vsf_remap_i2c_capability(i2c_ptr);                                              \
+        }                                                                                          \
+        fsm_rt_t vsf_imp_i2c_master_fifo_transfer(vsf_imp_i2c_t *i2c_ptr,                          \
+                                                   uint16_t address,                               \
+                                                   vsf_i2c_cmd_t cmd,                              \
+                                                   uint_fast16_t count,                            \
+                                                   uint8_t *buffer_ptr,                            \
+                                                   vsf_i2c_cmd_t *cur_cmd_ptr,                     \
+                                                   uint_fast16_t *offset_ptr)                      \
+        {                                                                                          \
+            VSF_HAL_ASSERT(i2c_ptr != NULL);                                                       \
+            return vsf_remap_i2c_master_fifo_transfer(i2c_ptr, address, cmd, count, buffer_ptr,    \
+                                                      cur_cmd_ptr, offset_ptr);                    \
         }                                                                                          \
         vsf_err_t vsf_imp_i2c_master_request(vsf_imp_i2c_t *i2c_ptr,                               \
                                          uint16_t address,                                         \
