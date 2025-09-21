@@ -106,6 +106,23 @@ void VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_fini)(
     VSF_HAL_ASSERT(wdt_ptr != NULL);
 }
 
+vsf_err_t VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_get_configuration)(
+    VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t) *wdt_ptr,
+    vsf_wdt_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != wdt_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current WDT configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = wdt_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
+}
+
 fsm_rt_t VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_enable)(
     VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t) *wdt_ptr
 ) {
@@ -163,6 +180,7 @@ static void VSF_MCONNECT(__, VSF_WDT_CFG_IMP_PREFIX, _wdt_irqhandler)(
 
 // HW
 #define VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
+#define VSF_WDT_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #define VSF_WDT_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t)                                \
         VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt, __IDX) = {                   \

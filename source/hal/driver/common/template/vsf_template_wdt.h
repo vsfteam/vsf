@@ -178,6 +178,7 @@ extern "C" {
 #define VSF_WDT_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            wdt, init,        VSF_MCONNECT(__prefix_name, _t) *wdt_ptr, vsf_wdt_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 wdt, fini,        VSF_MCONNECT(__prefix_name, _t) *wdt_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            wdt, get_configuration, VSF_MCONNECT(__prefix_name, _t) *wdt_ptr, vsf_wdt_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             wdt, enable,      VSF_MCONNECT(__prefix_name, _t) *wdt_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             wdt, disable,     VSF_MCONNECT(__prefix_name, _t) *wdt_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_wdt_capability_t, wdt, capability,  VSF_MCONNECT(__prefix_name, _t) *wdt_ptr) \
@@ -441,6 +442,27 @@ extern vsf_wdt_capability_t vsf_wdt_capability(vsf_wdt_t *wdt_ptr);
 
 /**
  * \~english
+ * @brief Get the current configuration of a WDT instance
+ * @param[in] wdt_ptr: pointer to structure @ref vsf_wdt_t
+ * @param[out] cfg_ptr: pointer to configuration structure @ref vsf_wdt_cfg_t to store the current configuration
+ * @return vsf_err_t: VSF_ERR_NONE if successful, otherwise return error code
+ *
+ * @note This function retrieves the current WDT configuration including timeout and interrupt settings.
+ *       The WDT instance should be initialized before calling this function.
+ *
+ * \~chinese
+ * @brief 获取 WDT 实例的当前配置
+ * @param[in] wdt_ptr: 指向结构体 @ref vsf_wdt_t 的指针
+ * @param[out] cfg_ptr: 指向配置结构体 @ref vsf_wdt_cfg_t 的指针，用于存储当前配置
+ * @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，否则返回错误码
+ *
+ * @note 此函数检索当前 WDT 配置，包括超时和中断设置。
+ *       调用此函数前应先初始化 WDT 实例。
+ */
+extern vsf_err_t vsf_wdt_get_configuration(vsf_wdt_t *wdt_ptr, vsf_wdt_cfg_t *cfg_ptr);
+
+/**
+ * \~english
  * @brief WDT feed operation
  * @param[in] wdt_ptr: a pointer to structure @ref vsf_wdt_t
  *
@@ -454,13 +476,14 @@ extern void vsf_wdt_feed(vsf_wdt_t *wdt_ptr);
 
 /// @cond
 #if VSF_WDT_CFG_FUNCTION_RENAME == ENABLED
-#   define __vsf_wdt_t                VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_t)
-#   define vsf_wdt_init(__WDT, ...)   VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_init)                 ((__vsf_wdt_t *)(__WDT), ##__VA_ARGS__)
-#   define vsf_wdt_fini(__WDT)        VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_fini)                 ((__vsf_wdt_t *)(__WDT))
-#   define vsf_wdt_enable(__WDT)      VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_enable)               ((__vsf_wdt_t *)(__WDT))
-#   define vsf_wdt_disable(__WDT)     VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_disable)              ((__vsf_wdt_t *)(__WDT))
-#   define vsf_wdt_capability(__WDT)  VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_capability)           ((__vsf_wdt_t *)(__WDT))
-#   define vsf_wdt_feed(__WDT, ...)   VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_feed)                 ((__vsf_wdt_t *)(__WDT))
+#   define __vsf_wdt_t                      VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_t)
+#   define vsf_wdt_init(__WDT, ...)         VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_init)                     ((__vsf_wdt_t *)(__WDT), ##__VA_ARGS__)
+#   define vsf_wdt_fini(__WDT)              VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_fini)                     ((__vsf_wdt_t *)(__WDT))
+#   define vsf_wdt_enable(__WDT)            VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_enable)                   ((__vsf_wdt_t *)(__WDT))
+#   define vsf_wdt_disable(__WDT)           VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_disable)                  ((__vsf_wdt_t *)(__WDT))
+#   define vsf_wdt_capability(__WDT)        VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_capability)               ((__vsf_wdt_t *)(__WDT))
+#   define vsf_wdt_get_configuration(__WDT, ...) VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_get_configuration)  ((__vsf_wdt_t *)(__WDT), ##__VA_ARGS__)
+#   define vsf_wdt_feed(__WDT, ...)         VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_feed)                     ((__vsf_wdt_t *)(__WDT))
 #endif
 /// @endcond
 

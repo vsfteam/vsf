@@ -53,6 +53,16 @@ void vsf_wdt_fini(vsf_wdt_t *wdt_ptr)
     wdt_ptr->op->fini(wdt_ptr);
 }
 
+vsf_err_t vsf_wdt_get_configuration(vsf_wdt_t *wdt_ptr, vsf_wdt_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(wdt_ptr != NULL);
+    VSF_HAL_ASSERT(wdt_ptr->op != NULL);
+    VSF_HAL_ASSERT(wdt_ptr->op->get_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return wdt_ptr->op->get_configuration(wdt_ptr, cfg_ptr);
+}
+
 fsm_rt_t vsf_wdt_enable(vsf_wdt_t *wdt_ptr)
 {
     VSF_HAL_ASSERT(wdt_ptr != NULL);
