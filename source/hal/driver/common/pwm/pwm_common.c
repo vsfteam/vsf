@@ -98,6 +98,16 @@ uint32_t vsf_pwm_get_freq(vsf_pwm_t *pwm_ptr)
     return pwm_ptr->op->get_freq(pwm_ptr);
 }
 
+vsf_err_t vsf_pwm_get_configuration(vsf_pwm_t *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(pwm_ptr != NULL);
+    VSF_HAL_ASSERT(pwm_ptr->op != NULL);
+    VSF_HAL_ASSERT(pwm_ptr->op->get_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return pwm_ptr->op->get_configuration(pwm_ptr, cfg_ptr);
+}
+
 #endif /* VSF_PWM_CFG_MULTI_CLASS == ENABLED */
 
 

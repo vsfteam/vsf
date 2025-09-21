@@ -103,6 +103,23 @@ void VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_fini)(
     VSF_HAL_ASSERT(pwm_ptr != NULL);
 }
 
+vsf_err_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_configuration)(
+    VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t) *pwm_ptr,
+    vsf_pwm_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != pwm_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current PWM configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = pwm_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
+}
+
 fsm_rt_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_enable)(
     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t) *pwm_ptr
 ) {
@@ -158,6 +175,7 @@ uint32_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_freq)(
 
 // HW
 #define VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED
+#define VSF_PWM_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #define VSF_PWM_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t)                                \
         VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm, __IDX) = {                   \

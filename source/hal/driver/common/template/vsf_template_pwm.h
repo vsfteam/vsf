@@ -132,13 +132,14 @@ extern "C" {
  * @param[in] __prefix_name 用于生成 PWM 函数的前缀。
  */
 #define VSF_PWM_APIS(__prefix_name)                                                                                                                                             \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pwm, init,           VSF_MCONNECT(__prefix_name, _t) *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)                         \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  pwm, fini,           VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,              pwm, enable,         VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,              pwm, disable,        VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pwm_capability_t,  pwm, capability,     VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pwm, set,            VSF_MCONNECT(__prefix_name, _t) *pwm_ptr, uint8_t channel, uint32_t period, uint32_t pulse)\
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,              pwm, get_freq,       VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pwm, init,                 VSF_MCONNECT(__prefix_name, _t) *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)                         \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  pwm, fini,                 VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pwm, get_configuration,    VSF_MCONNECT(__prefix_name, _t) *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)                     \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,              pwm, enable,               VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,              pwm, disable,              VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pwm_capability_t,  pwm, capability,           VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pwm, set,                  VSF_MCONNECT(__prefix_name, _t) *pwm_ptr, uint8_t channel, uint32_t period, uint32_t pulse)\
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,              pwm, get_freq,             VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)
 
 /*============================ TYPES =========================================*/
 
@@ -264,6 +265,27 @@ extern vsf_err_t vsf_pwm_init(vsf_pwm_t *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr);
  @return 无
  */
 extern void vsf_pwm_fini(vsf_pwm_t *pwm_ptr);
+
+/**
+ * \~english
+ * @brief Get the current configuration of a PWM instance
+ * @param[in] pwm_ptr: pointer to structure @ref vsf_pwm_t
+ * @param[out] cfg_ptr: pointer to configuration structure @ref vsf_pwm_cfg_t to store the current configuration
+ * @return vsf_err_t: VSF_ERR_NONE if successful, otherwise return error code
+ *
+ * @note This function retrieves the current PWM configuration including frequency settings.
+ *       The PWM instance should be initialized before calling this function.
+ *
+ * \~chinese
+ * @brief 获取 PWM 实例的当前配置
+ * @param[in] pwm_ptr: 指向结构体 @ref vsf_pwm_t 的指针
+ * @param[out] cfg_ptr: 指向配置结构体 @ref vsf_pwm_cfg_t 的指针，用于存储当前配置
+ * @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，否则返回错误码
+ *
+ * @note 此函数检索当前 PWM 配置，包括频率设置。
+ *       调用此函数前应先初始化 PWM 实例。
+ */
+extern vsf_err_t vsf_pwm_get_configuration(vsf_pwm_t *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr);
 
 /**
  * \~english
@@ -407,14 +429,15 @@ extern vsf_err_t vsf_pwm_set_ns(vsf_pwm_t *pwm_ptr,
 
 /// @cond
 #if VSF_PWM_CFG_FUNCTION_RENAME == ENABLED
-#   define __vsf_pwm_t               VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_t)
-#   define vsf_pwm_init(__PM, ...)   VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_init)       ((__vsf_pwm_t *)(__PM), ##__VA_ARGS__)
-#   define vsf_pwm_fini(__PM)        VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_fini)       ((__vsf_pwm_t *)(__PM))
-#   define vsf_pwm_enable(__PM)      VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_enable)     ((__vsf_pwm_t *)(__PM))
-#   define vsf_pwm_disable(__PM)     VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_disable)    ((__vsf_pwm_t *)(__PM))
-#   define vsf_pwm_capability(__PM)  VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_capability) ((__vsf_pwm_t *)(__PM))
-#   define vsf_pwm_set(__PM, ...)    VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_set)        ((__vsf_pwm_t *)(__PM), ##__VA_ARGS__)
-#   define vsf_pwm_get_freq(__PM)    VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_get_freq)   ((__vsf_pwm_t *)(__PM))
+#   define __vsf_pwm_t                      VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_t)
+#   define vsf_pwm_init(__PM, ...)          VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_init)             ((__vsf_pwm_t *)(__PM), ##__VA_ARGS__)
+#   define vsf_pwm_fini(__PM)               VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_fini)             ((__vsf_pwm_t *)(__PM))
+#   define vsf_pwm_get_configuration(__PM, ...) VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_get_configuration) ((__vsf_pwm_t *)(__PM), ##__VA_ARGS__)
+#   define vsf_pwm_enable(__PM)             VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_enable)           ((__vsf_pwm_t *)(__PM))
+#   define vsf_pwm_disable(__PM)            VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_disable)          ((__vsf_pwm_t *)(__PM))
+#   define vsf_pwm_capability(__PM)         VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_capability)       ((__vsf_pwm_t *)(__PM))
+#   define vsf_pwm_set(__PM, ...)           VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_set)              ((__vsf_pwm_t *)(__PM), ##__VA_ARGS__)
+#   define vsf_pwm_get_freq(__PM)           VSF_MCONNECT(VSF_PWM_CFG_PREFIX, _pwm_get_freq)         ((__vsf_pwm_t *)(__PM))
 #endif
 /// @endcond
 
