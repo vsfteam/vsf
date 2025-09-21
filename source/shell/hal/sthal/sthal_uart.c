@@ -25,10 +25,10 @@
 
 /*============================ MACROS ========================================*/
 
-#        define IS_UART_HALFDUPLEX_INSTANCE(INSTANCE) 1 // alway true
-#        define IS_UART_INSTANCE(INSTANCE)            1 // alway true
-#        define IS_UART_HWFLOW_INSTANCE(INSTANCE)     1 // alway true
-#        define IS_UART_LIN_INSTANCE(INSTANCE)        1 // alway true
+#        define IS_UART_HALFDUPLEX_INSTANCE(INSTANCE) 1 // always true
+#        define IS_UART_INSTANCE(INSTANCE)            1 // always true
+#        define IS_UART_HWFLOW_INSTANCE(INSTANCE)     1 // always true
+#        define IS_UART_LIN_INSTANCE(INSTANCE)        1 // always true
 
 #        define IS_UART_WORD_LENGTH(LENGTH)                                    \
             (((LENGTH) == UART_WORDLENGTH_8B) ||                               \

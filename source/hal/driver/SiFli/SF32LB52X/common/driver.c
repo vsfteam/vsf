@@ -25,7 +25,7 @@
 
 // for vsf_systimer_get_ms
 #if VSF_USE_KERNEL != ENABLED
-#   error VSF_USE_KERNEL MUST be enabled, bacause SF32 HAL need systimer
+#   error VSF_USE_KERNEL MUST be enabled, because SF32 HAL need systimer
 #else
 #   include "kernel/vsf_kernel.h"
 #endif

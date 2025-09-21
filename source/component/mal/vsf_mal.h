@@ -18,14 +18,14 @@
 #ifndef __VSF_MAL_H__
 #define __VSF_MAL_H__
 
-/*! \brief  This module provides MAL(Memory Abstraction Layser) device class.
+/*! \brief  This module provides MAL(Memory Abstraction Layer) device class.
  *! \author SimonQian
  *! \note   Supports read/write/erase operation in block granularity.
  *!         Enabled by VSF_USE_MAL. Drivers:
  *!         mim_mal(mim: mal in mal) by VSF_MAL_USE_MIM_MAL:
  *!             Used to derive a mal device from partial of another mal device.
  *!         fakefat32_mal by VSF_MAL_USE_FAKEFAT32_MAL, depends on VSF_USE_FS/VSF_FS_USE_MEMFS/VSF_FS_USE_FATFS:
- *!             Generate a vitual fat32 mal device.
+ *!             Generate a virtual fat32 mal device.
  *!         file_mal by VSF_MAL_USE_FILE_MAL, depends on VSF_USE_FS:
  *!             Generate a mal device from a file.
  *!         flash_mal by VSF_MAL_USE_FLASH_MAL, depends on VSF_HAL_USE_FLASH:
@@ -131,12 +131,12 @@ vsf_class(vk_mal_drv_t) {
         uint8_t read_local_size;
         uint8_t write_local_size;
         /**
-         \~english initialilze mal
+         \~english initialize mal
          \~chinese 执行初始化操作
         */
         vsf_peda_evthandler_t init;
         /**
-         \~english finilize mal
+         \~english finalize mal
          \~chinese 执行终止化操作
         */
         vsf_peda_evthandler_t fini;
@@ -319,7 +319,7 @@ extern vsf_err_t vk_mal_init(vk_mal_t *pthis);
 
 /**
  \~english
- @brief prepare subcall to finialize a mal instance.
+ @brief prepare subcall to finalize a mal instance.
  @note similar to vk_mal_init.
  @param[in] pthis: mal instance
  @return vsf_err_t: VSF_ERR_NONE if subcall is ready to start, or a negative error code

@@ -212,7 +212,7 @@ typedef enum vsf_usart_ctrl_t {
     VSF_USART_CTRL_SET_BREAK            = (0x01ul << 1),
     VSF_USART_CTRL_CLEAR_BREAK          = (0x01ul << 2),
 
-    // more vendor specified commnad can be added here
+    // more vendor specified command can be added here
 } vsf_usart_ctrl_t;
 #endif
 

@@ -38,7 +38,7 @@
 #include "GLCD_Config.h"
 #include "Board_GLCD.h"
 
-#define UNUSED(x) (void)(x)             /* macro to get rid of 'unused parameter' warning */ 
+#define UNUSED(x) (void)(x)             /* macro to get rid of 'unused parameter' warning */
 
   #define MPS2_FPGAIO_PORT   MPS2_FPGAIO
   #define MPS2_SSP_PORT      MPS2_SSP0

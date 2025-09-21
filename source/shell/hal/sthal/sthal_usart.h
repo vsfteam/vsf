@@ -30,7 +30,7 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-// alway true
+// always true
 #    define IS_USART_INSTANCE(INSTANCE) 1
 
 #    define HAL_USART_ERROR_NONE 0x00000000U

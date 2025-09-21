@@ -229,7 +229,7 @@ int rtos_task_create(   rtos_task_fct func,
                         rtos_prio prio,
                         rtos_task_handle * const task_handle)
 {
-    // fix priority dymanically, because the library from the vendor use hardcoded priorities
+    // fix priority dynamically, because the library from the vendor use hardcoded priorities
     // priority promotion MUST be supported, which is required by mutex if VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY is enabled
 #if     VSF_OS_CFG_ADD_EVTQ_TO_IDLE != ENABLED                                  \
     ||  VSF_KERNEL_CFG_SUPPORT_DYNAMIC_PRIOTIRY != ENABLED

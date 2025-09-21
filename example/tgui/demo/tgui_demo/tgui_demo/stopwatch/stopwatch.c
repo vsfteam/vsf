@@ -35,7 +35,7 @@
 #elif VSF_TGUI_CFG_FONT_USE_LVGL == ENABLED
 #   define __TGUI_DEFAULT_FONT                  VSF_TGUI_FONT_LVGL_14
 #else
-#   error plase enable VSF_TGUI_CFG_FONT_USE_FREETYPE or VSF_TGUI_CFG_FONT_USE_LVGL
+#   error please enable VSF_TGUI_CFG_FONT_USE_FREETYPE or VSF_TGUI_CFG_FONT_USE_LVGL
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -236,7 +236,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
 
                             tgui_size(100, 0),
 
-                            /*! \note as inside text_list, the autosize param will be overrided,
+                            /*! \note as inside text_list, the autosize param will be overridden,
                              *        so the true or false here doesn't really affect the result.
                              */
                             tgui_text(tLabel,
@@ -285,7 +285,7 @@ describ_tgui_panel(stopwatch_t, main_panel_descriptor,
                                 tgui_list(tHContainer, &(tgui_null_parent(stopwatch_t)->tLeftContainer.tContainerA.tVContainer.list), tButton2, tHistory,
                                     tgui_size(150, 32),
                                     tgui_margin(0, 2, 0, 2),
-#if VSF_TGUI_CFG_LIST_SUPPORT_SLIDE == ENABELD
+#if VSF_TGUI_CFG_LIST_SUPPORT_SLIDE == ENABLED
                                     //! set the sliding speed. Usually, you don't have to modify it.
                                     //tgui_attribute(tSlider, 500),
 #endif

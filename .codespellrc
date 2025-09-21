@@ -1,0 +1,25 @@
+[codespell]
+skip =
+    */[Vv]endor/*,
+    */3rd-party/*,
+    */raw/*,
+    */hardware/*,
+    */vc/lib/*,
+    */project/iar/*,
+    */project/mdk/*,
+    source/utilities/compiler/arm/CMSIS/*,
+    */CMSIS*,
+    *.patch,
+    *.diff,
+    */patch/*,
+    */diff/*,
+    */V2M-MPS2_CMx_BSP/*
+
+# Ignore words that are false positives - technical terms, abbreviations, and variable names
+# The ignore words file contains:
+# - STM32 and ARM hardware terminology (HSI, TE, DOUT, THRE, CLEN, SIE, MIS, PRIS, EMAC)
+# - Company and protocol names (Synopsys, servent, PENDIN, WONT)
+# - Hardware signal names (nCE, nOE)
+# - Variable names and code identifiers (htmp, fpr, inout, prefex, efine, procotol, numer, memroy, standalong)
+# - Acceptable alternative spellings (pre-emptive, re-use)
+ignore-words = .codespell-ignore-words

@@ -98,7 +98,7 @@ typedef enum vsf_gpio_mode_t {
     VSF_GPIO_EXTI_MODE_FALLING                  = (1 << 8),
     VSF_GPIO_EXTI_MODE_RISING_FALLING           = (1 << 7) | (1 << 8),
 
-    // TODO: add input fileter modes
+    // TODO: add input filter modes
 
 
     __VSF_HW_EXTI_MODE_ALL_BITS                 = VSF_GPIO_EXTI_MODE_NONE

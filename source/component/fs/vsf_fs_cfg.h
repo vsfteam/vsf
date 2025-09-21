@@ -95,7 +95,7 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-// for libc sorce codes which want types and consts below
+// for libc source codes which want types and consts below
 typedef enum vk_file_attr_t {
     VSF_FILE_ATTR_READ          = 1UL << 0,
     VSF_FILE_ATTR_WRITE         = 1UL << 1,

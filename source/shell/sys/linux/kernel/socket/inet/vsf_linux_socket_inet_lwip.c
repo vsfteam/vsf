@@ -2414,7 +2414,7 @@ int __inet_gethostbyname(const char *name, in_addr_t *addr)
 
 // replacement for weak APIs in socket
 
-// IMORTANT, addrinfo here MUST be compatible with addrinfo in lwip and addrinfo in linux netdb
+// IMPORTANT, addrinfo here MUST be compatible with addrinfo in lwip and addrinfo in linux netdb
 struct addrinfo {
     int               ai_flags;      /* Input flags. */
     int               ai_family;     /* Address family of socket. */

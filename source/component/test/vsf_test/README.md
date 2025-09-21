@@ -39,7 +39,7 @@
   - testcase_result     ：
     - 被测设备写入被测设备侧的测试结果, 辅助设备不需要回应
     - 第二个参数是 testcase 序号
-    - 第三个参数是 该 testcase 的结果（0： pass， 1: skip, 2-N : faild）
+    - 第三个参数是 该 testcase 的结果（0： pass， 1: skip, 2-N : failed）
     - 如果有第四个或者更多参数，都是错误信息
   - testcase_request
     - 被测设备请求进行测试，辅助设备根据请求信息判断是否可以完成测试，如果可以则辅助设备回复 "1\n"，不可以则返回 "0\n"

@@ -193,7 +193,7 @@ extern const vk_disp_drv_t vk_disp_drv_mipi_spi_lcd;
 
 /*============================ PROTOTYPES ====================================*/
 
-// return true if te is not supported, or return false and call vsf_disp_mipi_te_line_ready when te is ready
+// return true if TE is not supported, or return false and call vsf_disp_mipi_te_line_ready when TE is ready
 extern bool vsf_disp_mipi_spi_lcd_wait_te_line_ready(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd);
 extern void vsf_disp_mipi_te_line_ready(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd);
 

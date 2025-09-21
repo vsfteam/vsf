@@ -88,7 +88,7 @@ bool vsf_driver_init(void)
         CLK->PLLCTL |= CLK_PLLCTL_PD_Msk;
     }
 
-    // confiure hclk and pclk
+    // configure hclk and pclk
     {
         // TODO: get usr setting of HCLKSRC
         uint_fast8_t hclksrc = NUC500_HCLKSRC_PLLFOUT;

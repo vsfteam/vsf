@@ -96,7 +96,7 @@ extern "C" {
 #        endif
 #    endif
 
-// Unsupport Features
+// Unsupported Features
 #    ifndef UART_LINBREAKDETECTLENGTH_10B
 #        define UART_LINBREAKDETECTLENGTH_10B 0
 #    endif

@@ -43,7 +43,7 @@
 
 //extern uint32_t SystemCoreClock;
 // DO NOT use SystemCoreClock for VSF_SYSTIMER_FREQ, because systimer is initialized
-//  in vsf_arch_init, which is eariler than initialization of SystemCoreClock in
+//  in vsf_arch_init, which is earlier than initialization of SystemCoreClock in
 //  vsf_driver_init.
 #define VSF_SYSTIMER_FREQ                               (240UL * 1000 * 1000)
 // lwip APIs are protected by a mutex, so priority boost SHOULD be supported

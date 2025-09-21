@@ -26,7 +26,7 @@
 
 /*============================ MACROS ========================================*/
 
-// alway true
+// always true
 #define IS_SMARTCARD_INSTANCE(INSTANCE)         1
 
 /*============================ MACROFIED FUNCTIONS ===========================*/

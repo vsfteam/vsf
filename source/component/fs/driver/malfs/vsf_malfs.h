@@ -47,7 +47,7 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-// for deprecated API compatiblity
+// for deprecated API compatibility
 #define vk_malfs_mount_mbr                  vk_malfs_mount
 
 #define __implement_malfs_cache(__size, __number)                               \

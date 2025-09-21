@@ -46,7 +46,7 @@ declare_class(vsf_tgui_t)
 #   error "SCGui has internal font implementation, can not use freetype"
 #endif
 #if VSF_TGUI_CFG_FONT_USE_LVGL != ENABLED
-#   error "SCGui ues lvgl as internal font, please enable VSF_TGUI_CFG_FONT_USE_LVGL"
+#   error "SCGui uses lvgl as internal font, please enable VSF_TGUI_CFG_FONT_USE_LVGL"
 #endif
 
 #ifndef VSF_TGUI_HOR_MAX
