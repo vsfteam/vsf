@@ -57,6 +57,12 @@ void vsf_remapped_dac_fini(vsf_remapped_dac_t *dac)
     vsf_dac_fini(dac->target);
 }
 
+vsf_err_t vsf_remapped_dac_get_configuration(vsf_remapped_dac_t *dac, vsf_dac_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));
+    return vsf_dac_get_configuration(dac->target, cfg_ptr);
+}
+
 vsf_dac_status_t vsf_remapped_dac_status(vsf_remapped_dac_t *dac)
 {
     VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));

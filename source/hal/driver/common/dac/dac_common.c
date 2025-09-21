@@ -53,6 +53,16 @@ void vsf_dac_fini(vsf_dac_t *dac_ptr)
     dac_ptr->op->fini(dac_ptr);
 }
 
+vsf_err_t vsf_dac_get_configuration(vsf_dac_t *dac_ptr, vsf_dac_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(dac_ptr != NULL);
+    VSF_HAL_ASSERT(dac_ptr->op != NULL);
+    VSF_HAL_ASSERT(dac_ptr->op->get_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return dac_ptr->op->get_configuration(dac_ptr, cfg_ptr);
+}
+
 fsm_rt_t vsf_dac_enable(vsf_dac_t *dac_ptr)
 {
     VSF_HAL_ASSERT(dac_ptr != NULL);

@@ -169,6 +169,7 @@ extern "C" {
 #define VSF_DAC_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, init,                 VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 dac, fini,                 VSF_MCONNECT(__prefix_name, _t) *dac_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, get_configuration,    VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             dac, enable,               VSF_MCONNECT(__prefix_name, _t) *dac_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             dac, disable,              VSF_MCONNECT(__prefix_name, _t) *dac_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dac_status_t,     dac, status,               VSF_MCONNECT(__prefix_name, _t) *dac_ptr) \
@@ -353,6 +354,25 @@ extern vsf_err_t vsf_dac_init(vsf_dac_t *dac_ptr, vsf_dac_cfg_t *cfg_ptr);
 extern void vsf_dac_fini(vsf_dac_t *dac_ptr);
 
 /**
+ * \~english
+ * @brief Get current configuration of a DAC instance
+ * @param[in] dac_ptr Pointer to DAC instance
+ * @param[out] cfg_ptr Pointer to DAC configuration structure to store current settings
+ * @return vsf_err_t VSF_ERR_NONE if successful, otherwise an error code
+ *
+ * @note This function retrieves the current configuration of the DAC instance
+ *
+ * \~chinese
+ * @brief 获取 DAC 实例的当前配置
+ * @param[in] dac_ptr DAC 实例指针
+ * @param[out] cfg_ptr 用于存储当前设置的 DAC 配置结构体指针
+ * @return vsf_err_t 成功返回 VSF_ERR_NONE，否则返回错误码
+ *
+ * @note 此函数获取 DAC 实例的当前配置
+ */
+extern vsf_err_t vsf_dac_get_configuration(vsf_dac_t *dac_ptr, vsf_dac_cfg_t *cfg_ptr);
+
+/**
  \~english
  @brief Enable a DAC instance
  @param[in] dac_ptr: a pointer to structure @ref vsf_dac_t
@@ -501,6 +521,7 @@ extern vsf_err_t vsf_dac_channel_request(vsf_dac_t *dac_ptr,
 #   define __vsf_dac_t                              VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_t)
 #   define vsf_dac_init(__DAC, ...)                 VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_init)                 ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
 #   define vsf_dac_fini(__DAC)                      VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_fini)                 ((__vsf_dac_t *)(__DAC))
+#   define vsf_dac_get_configuration(__DAC, ...)    VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_get_configuration)    ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
 #   define vsf_dac_enable(__DAC)                    VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_enable)               ((__vsf_dac_t *)(__DAC))
 #   define vsf_dac_disable(__DAC)                   VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_disable)              ((__vsf_dac_t *)(__DAC))
 #   define vsf_dac_status(__DAC)                    VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_status)               ((__vsf_dac_t *)(__DAC))
