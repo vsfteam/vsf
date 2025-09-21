@@ -106,6 +106,23 @@ void VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_fini)(
     VSF_HAL_ASSERT(rtc_ptr != NULL);
 }
 
+vsf_err_t VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_configuration)(
+    VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t) *rtc_ptr,
+    vsf_rtc_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != rtc_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current RTC configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = rtc_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
+}
+
 fsm_rt_t VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_enable)(
     VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t) *rtc_ptr
 ) {
@@ -199,6 +216,7 @@ static void VSF_MCONNECT(__, VSF_RTC_CFG_IMP_PREFIX, _rtc_irqhandler)(
 
 // HW
 #define VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED
+#define VSF_RTC_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #define VSF_RTC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t)                                \
         VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc, __IDX) = {                   \
