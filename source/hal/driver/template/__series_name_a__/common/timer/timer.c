@@ -106,6 +106,23 @@ void VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_fini)(
     VSF_HAL_ASSERT(timer_ptr != NULL);
 }
 
+vsf_err_t VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_get_configuration)(
+    VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t) *timer_ptr,
+    vsf_timer_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current TIMER configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = timer_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
+}
+
 fsm_rt_t VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_enable)(
     VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t) * timer_ptr)
 {
@@ -255,6 +272,7 @@ static void VSF_MCONNECT(__, VSF_TIMER_CFG_IMP_PREFIX, _timer_irqhandler)(
 
 // HW
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY                 ENABLED
+#define VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CTRL                       ENABLED
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_CTRL               ENABLED
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_CONFIG             ENABLED

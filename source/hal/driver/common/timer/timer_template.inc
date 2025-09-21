@@ -21,6 +21,10 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY
+
+#ifndef VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION        DISABLED
+#endif
 #   define  VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY                DISABLED
 #endif
 
@@ -71,6 +75,8 @@
 #   undef VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_REQUEST_STOP
 #   undef VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_CTRL
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY                 ENABLED
+#   undef VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION        ENABLED
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CTRL                       ENABLED
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_STATUS                 ENABLED
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_CONFIG             ENABLED
@@ -103,6 +109,7 @@
 
 #define vsf_real_timer_t                        VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t)
 #define vsf_real_timer_capability               VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_capability)
+#define vsf_real_timer_get_configuration      VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_get_configuration)
 #define vsf_real_timer_ctrl                     VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_ctrl)
 #define vsf_real_timer_status                   VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_status)
 #define vsf_real_timer_channel_config           VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_config)
@@ -205,15 +212,30 @@ vsf_err_t vsf_real_timer_channel_ctrl(vsf_real_timer_t *timer_ptr, uint8_t chann
 }
 #endif
 
+#if VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION == DISABLED
+vsf_err_t vsf_real_timer_get_configuration(vsf_real_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_TIMER_CFG_CAPABILITY_IRQ_MASK
 #undef VSF_TIMER_CFG_CAPABILITY_TIMER_BITLEN
 #undef VSF_TIMER_CFG_CAPABILITY_SUPPORT_PWM
 #undef VSF_TIMER_CFG_CAPABILITY_PWM_CHANNEL_CNT
 #undef vsf_real_timer_t
 #undef vsf_real_timer_capability
+#undef vsf_real_timer_get_configuration
 #undef vsf_real_timer_ctrl
 #undef vsf_real_timer_channel_config
 #undef vsf_real_timer_channel_start
@@ -239,6 +261,7 @@ vsf_err_t vsf_real_timer_channel_ctrl(vsf_real_timer_t *timer_ptr, uint8_t chann
 #   define vsf_imp_timer_channel_stop       VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_stop)
 #   define vsf_imp_timer_channel_ctrl       VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_ctrl)
 #   define vsf_imp_timer_ctrl               VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_ctrl)
+#   define vsf_imp_timer_get_configuration  VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_get_configuration)
 
 #   define vsf_remap_timer_t                VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_t)
 #   define vsf_remap_timer_init             VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_init)
@@ -253,6 +276,7 @@ vsf_err_t vsf_real_timer_channel_ctrl(vsf_real_timer_t *timer_ptr, uint8_t chann
 #   define vsf_remap_timer_channel_stop     VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_channel_stop)
 #   define vsf_remap_timer_channel_ctrl     VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_channel_ctrl)
 #   define vsf_remap_timer_ctrl             VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_ctrl)
+#   define vsf_remap_timer_get_configuration VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_get_configuration)
 
 #   define VSF_TIMER_CFG_IMP_REMAP_FUNCTIONS                                                                          \
         vsf_err_t vsf_imp_timer_init(vsf_imp_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr)                            \
@@ -321,6 +345,12 @@ vsf_err_t vsf_real_timer_channel_ctrl(vsf_real_timer_t *timer_ptr, uint8_t chann
         {                                                                                                             \
             VSF_HAL_ASSERT(NULL != timer_ptr);                                                                        \
             vsf_remap_timer_ctrl(timer_ptr, ctrl_bit, level);                                                         \
+        }                                                                                                             \
+                                                                                                                      \
+        vsf_err_t vsf_imp_timer_get_configuration(vsf_imp_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr)              \
+        {                                                                                                             \
+            VSF_HAL_ASSERT(timer_ptr != NULL);                                                                        \
+            return vsf_remap_timer_get_configuration(timer_ptr, cfg_ptr);                                             \
         }
 #endif
 
@@ -370,6 +400,7 @@ vsf_err_t vsf_real_timer_channel_ctrl(vsf_real_timer_t *timer_ptr, uint8_t chann
 #undef vsf_imp_timer_channel_stop
 #undef vsf_imp_timer_channel_ctrl
 #undef vsf_imp_timer_ctrl
+#undef vsf_imp_timer_get_configuration
 
 #undef vsf_remap_timer_t
 #undef vsf_remap_timer_init
@@ -384,5 +415,6 @@ vsf_err_t vsf_real_timer_channel_ctrl(vsf_real_timer_t *timer_ptr, uint8_t chann
 #undef vsf_remap_timer_channel_stop
 #undef vsf_remap_timer_channel_ctrl
 #undef vsf_remap_timer_ctrl
+#undef vsf_remap_timer_get_configuration
 
 #endif  /* VSF_HAL_USE_TIEMR */

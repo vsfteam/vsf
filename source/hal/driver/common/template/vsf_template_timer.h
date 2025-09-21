@@ -216,6 +216,7 @@ extern "C" {
 #define VSF_TIMER_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, init,                  VSF_MCONNECT(__prefix_name, _t) *timer_ptr, vsf_timer_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, fini,                  VSF_MCONNECT(__prefix_name, _t) *timer_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, get_configuration,     VSF_MCONNECT(__prefix_name, _t) *timer_ptr, vsf_timer_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               timer, enable,                VSF_MCONNECT(__prefix_name, _t) *timer_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               timer, disable,               VSF_MCONNECT(__prefix_name, _t) *timer_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_enable,            VSF_MCONNECT(__prefix_name, _t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
@@ -753,6 +754,27 @@ extern vsf_timer_status_t vsf_timer_status(vsf_timer_t *timer_ptr);
 extern vsf_timer_capability_t vsf_timer_capability(vsf_timer_t *timer_ptr);
 
 /**
+ * \~english
+ * @brief Get the current configuration of a TIMER instance
+ * @param[in] timer_ptr: pointer to structure @ref vsf_timer_t
+ * @param[out] cfg_ptr: pointer to configuration structure @ref vsf_timer_cfg_t to store the current configuration
+ * @return vsf_err_t: VSF_ERR_NONE if successful, otherwise return error code
+ *
+ * @note This function retrieves the current TIMER configuration including interrupt settings and other parameters.
+ *       The TIMER instance should be initialized before calling this function.
+ *
+ * \~chinese
+ * @brief 获取 TIMER 实例的当前配置
+ * @param[in] timer_ptr: 指向结构体 @ref vsf_timer_t 的指针
+ * @param[out] cfg_ptr: 指向配置结构体 @ref vsf_timer_cfg_t 的指针，用于存储当前配置
+ * @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，否则返回错误码
+ *
+ * @note 此函数检索当前 TIMER 配置，包括中断设置和其他参数。
+ *       调用此函数前应先初始化 TIMER 实例。
+ */
+extern vsf_err_t vsf_timer_get_configuration(vsf_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr);
+
+/**
  \~english
  @brief TIMER set period (maximum count), used for change the period of TIMER dynamically
  @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
@@ -924,6 +946,7 @@ extern vsf_err_t vsf_timer_channel_ctrl(vsf_timer_t *timer_ptr, uint8_t channel,
 #   define vsf_timer_disable(__TIME)                    VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_disable)              ((__vsf_timer_t *)(__TIME))
 #   define vsf_timer_status(__TIMER)                    VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_status)               ((__vsf_timer_t *)(__TIMER))
 #   define vsf_timer_capability(__TIME)                 VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_capability)           ((__vsf_timer_t *)(__TIME))
+#   define vsf_timer_get_configuration(__TIME, ...)     VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_get_configuration)    ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
 #   define vsf_timer_irq_enable(__TIME, ...)            VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_enable)           ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
 #   define vsf_timer_irq_disable(__TIME, ...)           VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_disable)          ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
 #   define vsf_timer_set_period(__TIME, ...)            VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_set_period)           ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
