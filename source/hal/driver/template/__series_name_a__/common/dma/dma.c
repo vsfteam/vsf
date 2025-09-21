@@ -112,13 +112,6 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_get_configuration)(
 
     // For template implementation, return a default configuration
     // In a real implementation, this should retrieve the actual hardware configuration
-    *cfg_ptr = (vsf_dma_cfg_t) {
-        .isr = {
-            .handler_fn = NULL,
-            .target_ptr = NULL,
-            .prio       = vsf_arch_prio_0,
-        },
-    };
 
     return VSF_ERR_NONE;
 }
@@ -165,22 +158,6 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_get_configuration)(
 ) {
     VSF_HAL_ASSERT(NULL != dma_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);
-
-    // For template implementation, return a default configuration
-    // In a real implementation, this should retrieve the actual hardware configuration
-    *cfg_ptr = (vsf_dma_channel_cfg_t) {
-        .src_addr_inc = VSF_DMA_ADDR_INC_1X,
-        .dst_addr_inc = VSF_DMA_ADDR_INC_1X,
-        .src_data_size = VSF_DMA_DATA_SIZE_8,
-        .dst_data_size = VSF_DMA_DATA_SIZE_8,
-        .mode = VSF_DMA_MODE_NORMAL,
-        .priority = VSF_DMA_PRIORITY_MEDIUM,
-        .isr = {
-            .handler_fn = NULL,
-            .target_ptr = NULL,
-            .prio       = vsf_arch_prio_0,
-        },
-    };
 
     return VSF_ERR_NONE;
 }
@@ -262,7 +239,10 @@ static void VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_irqhandler)(
  */
 
 // HW
-#define VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY                  ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_API_GET_CONFIGURATION           ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION   ENABLED
+
 #define VSF_DMA_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t)                                \
         VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma, __IDX) = {                   \
