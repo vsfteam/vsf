@@ -227,7 +227,7 @@ vsf_err_t vsf_real_i2c_get_configuration(vsf_real_i2c_t *i2c_ptr, vsf_i2c_cfg_t 
             VSF_HAL_ASSERT(i2c_ptr != NULL);                                                       \
             return vsf_remap_i2c_ctrl(i2c_ptr, ctrl, param);                                       \
         }                                                                                          \
-        vsf_err_t vsf_imp_i2c_get_configuration(vsf_imp_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)  \
+        vsf_err_t vsf_imp_i2c_get_configuration(vsf_imp_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)    \
         {                                                                                          \
             VSF_HAL_ASSERT(i2c_ptr != NULL);                                                       \
             return vsf_remap_i2c_get_configuration(i2c_ptr, cfg_ptr);                              \

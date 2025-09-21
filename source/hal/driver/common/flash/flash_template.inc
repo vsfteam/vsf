@@ -23,7 +23,7 @@
 
 #define vsf_real_flash_t                                            VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t)
 #define vsf_real_flash_capability                                   VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
-#define vsf_real_flash_get_configuration      VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_get_configuration)
+#define vsf_real_flash_get_configuration                            VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_get_configuration)
 #define vsf_real_flash_erase_all                                    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_all)
 #define vsf_real_flash_erase_one_sector                             VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_one_sector)
 #define vsf_real_flash_erase_multi_sector                           VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_multi_sector)
@@ -324,7 +324,7 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
         vsf_err_t vsf_imp_flash_get_configuration(vsf_imp_flash_t *flash_ptr, vsf_flash_cfg_t *cfg_ptr)                                   \
         {                                                                                                                                 \
             VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
-            return vsf_remap_flash_get_configuration((vsf_remap_flash_t *)flash_ptr, cfg_ptr);                                           \
+            return vsf_remap_flash_get_configuration((vsf_remap_flash_t *)flash_ptr, cfg_ptr);                                            \
         }
 #endif
 

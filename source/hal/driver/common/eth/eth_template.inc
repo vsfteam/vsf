@@ -213,7 +213,8 @@ vsf_err_t vsf_real_eth_get_configuration(vsf_real_eth_t *eth_ptr, vsf_eth_cfg_t 
             return vsf_remap_eth_phy_get_link_status(eth_ptr, phy_mode_ptr);        \
         }                                                                           \
                                                                                     \
-        vsf_err_t vsf_imp_eth_get_configuration(vsf_imp_eth_t *eth_ptr, vsf_eth_cfg_t *cfg_ptr) \
+        vsf_err_t vsf_imp_eth_get_configuration(vsf_imp_eth_t *eth_ptr,             \
+                                                vsf_eth_cfg_t *cfg_ptr)             \
         {                                                                           \
             VSF_HAL_ASSERT(eth_ptr != NULL);                                        \
             return vsf_remap_eth_get_configuration(eth_ptr, cfg_ptr);               \

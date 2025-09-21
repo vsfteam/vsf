@@ -502,7 +502,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
             VSF_HAL_ASSERT(gpio_ptr != NULL);                                                                                               \
             return vsf_remap_gpio_read(gpio_ptr);                                                                                           \
         }                                                                                                                                   \
-        vsf_gpio_pin_mask_t vsf_origin_gpio_read_output_register(vsf_origin_gpio_t *gpio_ptr)                                             \
+        vsf_gpio_pin_mask_t vsf_origin_gpio_read_output_register(vsf_origin_gpio_t *gpio_ptr)                                               \
         {                                                                                                                                   \
             VSF_HAL_ASSERT(gpio_ptr != NULL);                                                                                               \
             return vsf_remap_gpio_read_output_register(gpio_ptr);                                                                           \
