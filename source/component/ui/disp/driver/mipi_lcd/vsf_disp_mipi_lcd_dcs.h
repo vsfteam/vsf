@@ -182,7 +182,7 @@ extern "C" {
             VSF_DISP_MIPI_LCD_WRITE(MIPI_DCS_CMD_HEX_CODE_SET_TEAR_ON, 0)
 
 #define MIPI_DCS_CMD_HEX_CODE_SET_ADDRESS_MODE          0x36
-// bits[7:5]: host processor to display module＊s frame memory
+// bits[7:5]: host processor to display modules frame memory
 // Page Address Order, 0 = Top to Bottom, 1 = Bottom to Top
 #define MIPI_DCS_PAGE_ADDRESS_TOP_TO_BOTTOM             (0 << 7)
 #define MIPI_DCS_PAGE_ADDRESS_BOTTOM_TO_TOP             (1 << 7)
@@ -194,7 +194,7 @@ extern "C" {
 // 1 = Reverse Mode, page register is first increment
 #define MIPI_DCS_PAGE_COLUMN_NORMAL_ORDER               (0 << 5)
 #define MIPI_DCS_PAGE_COLUMN_REVERSE_ORDER              (1 << 5)
-// bits[4:0]: display module＊s frame memory to the display device
+// bits[4:0]: display modules frame memory to the display device
 // Display Device Line Refresh Order, 0 = Top line to Bottom line, 1 = Bottom line to Top line
 #define MIPI_DCS_DEVICE_REFRESH_TOP_TO_BOTTOM           (0 << 4)
 #define MIPI_DCS_DEVICE_REFRESH_BOTTOM_TO_TOP           (1 << 4)
@@ -257,22 +257,22 @@ extern "C" {
 
 // 3D is used on the display panel
 #define MIPI_DCS_CMD_HEX_CODE_SET_3D_CONTROL            0x3D
-// 3DL/R 每 Left / Right Order, 0 = Data sent left eye first, 1 = Data sent right eye first.
+// 3DL/R Left / Right Order, 0 = Data sent left eye first, 1 = Data sent right eye first.
 #define MIPI_DCS_3D_CONTROL_LEFT_EYE_FIRST              (0 << 5)
 #define MIPI_DCS_3D_CONTROL_RIGHT_EYE_FIRST             (1 << 5)
-// 3DVSYNC 每 Second VSYNC Enabled between Left and Right images
+// 3DVSYNC Second VSYNC Enabled between Left and Right images
 // 0 = No sync pulses between left and right data.
 // 1 = Sync pulse (HSYNC, VSYNC, blanking) between left and right data.
 #define MIPI_DCS_3D_CONTROL_3DVSYNC_NO                  (0 << 4)
 #define MIPI_DCS_3D_CONTROL_3DVSYNC_SYNC                (1 << 4)
-// 3DFMT[1:0] 每 Stereoscopic Image Format
+// 3DFMT[1:0] Stereoscopic Image Format
 // 00 = Line (alternating lines of left and right data)
 // 01 = Frame (alternating frames of left and right data)
 // 10 = Pixel (alternating pixels of left and right data)
 #define MIPI_DCS_3D_CONTROL_3DFMT_LINE                  (0 << 2)
 #define MIPI_DCS_3D_CONTROL_3DFMT_FRAME                 (1 << 2)
 #define MIPI_DCS_3D_CONTROL_3DFMT_PIXEL                 (2 << 2)
-// 3DMODE[1:0] 每 3D Mode On / Off, Display Orientation
+// 3DMODE[1:0] 3D Mode On / Off, Display Orientation
 // 00 = 3D Mode Off (2D Mode On).
 // 01 = 3D Mode On, Portrait Orientation
 // 10 = 3D Mode On, Landscape Orientation
@@ -288,15 +288,15 @@ extern "C" {
 
 // Set VSYNC timing
 #define MIPI_DCS_CMD_HEX_CODE_SET_VSYNC_TIMING          0x40
-// RESET 每 Restart display update, 0 = No operation, 1 = Restart display update
+// RESET Restart display update, 0 = No operation, 1 = Restart display update
 #define MIPI_DCS_VSYNC_TIMING_NO_RESET                  (0 << 7)
 #define MIPI_DCS_VSYNC_TIMING_RESET                     (1 << 7)
-// DIR 每 Line Direction, 0 = Later (Down), 1 = Earlier (Up)
+// DIR Line Direction, 0 = Later (Down), 1 = Earlier (Up)
 #define MIPI_DCS_VSYNC_TIMING_LD_LATER                  (0 << 7)
 #define MIPI_DCS_VSYNC_TIMING_LD_EARLIER                (1 << 7)
-// LINES[4:0] 每 Number of Lines in Adjustment
+// LINES[4:0] Number of Lines in Adjustment
 #define MIPI_DCS_VSYNC_TIMING_LD_LINES(__L)             (__L << 1)
-// FRAME 每 Adjustment Frame, 0 = Next Frame, 1 = Frame After Next Frame
+// FRAME Adjustment Frame, 0 = Next Frame, 1 = Frame After Next Frame
 #define MIPI_DCS_VSYNC_TIMING_NEXT_FRAME                (0 << 0)
 #define MIPI_DCS_VSYNC_TIMING_FRAME_AFTER_NEXT_FRAME    (1 << 0)
 #define MIPI_DCS_CMD_SET_VSYNC_TIMING(__V) \

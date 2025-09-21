@@ -1705,7 +1705,7 @@ HAL_StatusTypeDef HAL_TIMEx_ConfigBreakDeadTime(
         IS_TIM_AUTOMATIC_OUTPUT_STATE(sBreakDeadTimeConfig->AutomaticOutput));
 
 #   ifdef VSF_TIMER_CTRL_BREAK_DEAD_TIME
-    // TODO: need daed time support in vsf_template_timer.h
+    // TODO: need dead time support in vsf_template_timer.h
     VSF_STHAL_ASSERT(IS_TIM_REMAP(htim->Instance, Remap));
     VSF_STHAL_LOCK(htim);
     vsf_err_t err = vsf_timer_ctrl(timer, VSF_TIMER_CTRL_BREAK_DEAD_TIME,

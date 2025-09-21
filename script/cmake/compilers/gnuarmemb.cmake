@@ -32,7 +32,7 @@ if(VSF_APPLET)
         )
     elseif(APPLET_COMPILER_EMBPI)
         # for embedded position independency, vsf_linux_applet_lib will be included,
-        #   so it's OK to use libs in compiler, bacause the API in these library are weak version,
+        #   so it's OK to use libs in compiler, because the API in these library are weak version,
         #   and will be over-written by the same strong APIs in VSF is required.
     endif()
 

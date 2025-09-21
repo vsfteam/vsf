@@ -507,7 +507,7 @@ typedef enum vsf_usart_irq_mask_t {
 
     /**
      * \~english
-     * @brief USART TX idle interrupt, all data is outputed on the TX line
+     * @brief USART TX idle interrupt, all data is outputted on the TX line
      * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_TX_IDLE in vsf_usart_irq_mask_t and define a MACRO
      * \~chinese
      * @brief USART 发送空闲中断，所有数据已从 TX 脚发送完成

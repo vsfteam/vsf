@@ -86,7 +86,7 @@ typedef enum vsf_gpio_mode_t {
 #define VSF_GPIO_SPEED_VERY_HIGH                VSF_GPIO_SPEED_VERY_HIGH
 #define VSF_GPIO_SPEED_MASK                     VSF_GPIO_SPEED_MASK
 
-    // TODO: add input fileter modes
+    // TODO: add input filter modes
 
     // TODO: add exti support
     VSF_GPIO_EXTI_MODE_NONE                     = 0,

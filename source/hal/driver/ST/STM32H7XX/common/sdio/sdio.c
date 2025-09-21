@@ -206,7 +206,7 @@ vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_request)(
         VSF_HAL_ASSERT(!(req->count % (1 << req->block_size_bits)));
         VSF_HAL_ASSERT(!((uint32_t)req->buffer & 3));
 
-        // Clean cache first even for read operation, because the cache maybe uncommited,
+        // Clean cache first even for read operation, because the cache maybe uncommitted,
         //  while SDIO DMA write to the same ram.
         SCB_CleanDCache_by_Addr(req->buffer, req->count);
         if (req->op & __SDIO_CMDOP_DTDIR) {

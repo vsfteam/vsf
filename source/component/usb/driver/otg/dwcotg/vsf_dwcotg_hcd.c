@@ -864,7 +864,7 @@ static bool __vk_dwcotg_hcd_is_period_hit(vk_dwcotg_hcd_t *dwcotg_hcd, vk_usbh_h
         interval <<= 3;
     }
 
-    // corrent me:
+    // correct me:
     // interrupt transaction will be queued at the next sof by hardware,
     //  so if interval is 1, issue hit instantly
     if ((USB_ENDPOINT_XFER_INT == pipe.type) && (1 == interval)) {

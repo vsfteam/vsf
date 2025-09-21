@@ -9,7 +9,7 @@
 int main(void)
 {
     // initialize debug stream before board_init,
-    //  bacause board_init will call printf, which depends on debug_stream by default
+    //  because board_init will call printf, which depends on debug_stream by default
     VSF_STREAM_INIT(&VSF_DEBUG_STREAM_RX);
     VSF_STREAM_INIT(&VSF_DEBUG_STREAM_TX);
 #if VSF_USE_TRACE == ENABLED

@@ -262,7 +262,7 @@ static void __vsf_linux_uart_config(vsf_linux_uart_priv_t *priv)
         baudrate = priv->ss.baud_base / priv->ss.custom_divisor;
     } else {
         if (term->c_ospeed != term->c_ispeed) {
-            vsf_trace_error("term: doesnot support different input/output speed\n");
+            vsf_trace_error("term: doesn't support different input/output speed\n");
             return;
         }
 
@@ -502,7 +502,7 @@ static ssize_t __vsf_linux_bthci_write(vsf_linux_fd_t *sfd, const void *buf, siz
 
     uint8_t *bufptr = (uint8_t *)buf, *packet_buffer;
     ssize_t packet_len, packet_buffer_len;
-    bool raw, trasnfered = false;
+    bool raw, transferred = false;
 
     while (count > 0) {
         raw = 0 == priv->__tx_buffer_len;
@@ -525,7 +525,7 @@ static ssize_t __vsf_linux_bthci_write(vsf_linux_fd_t *sfd, const void *buf, siz
                 usleep(1000);
             }
             hci_transport_instance->send_packet(packet_buffer[0], &packet_buffer[1], packet_len - 1);
-            trasnfered = true;
+            transferred = true;
 
             if (raw) {
                 bufptr += packet_len;
@@ -553,7 +553,7 @@ static ssize_t __vsf_linux_bthci_write(vsf_linux_fd_t *sfd, const void *buf, siz
         }
     }
 
-    if (trasnfered) {
+    if (transferred) {
         __vsf_linux_bthci_update_tx();
     }
     return bufptr - (uint8_t *)buf;

@@ -29,7 +29,7 @@
 /*============================ MACROS ========================================*/
 
 #if VSF_KERNEL_CFG_SUPPORT_SYNC != ENABLED
-#   warning Since VSF_KERNEL_CFG_SUPPORT_SYNC is not eanbled, partitions will be\
+#   warning Since VSF_KERNEL_CFG_SUPPORT_SYNC is not enabled, partitions will be\
             non-reentrant.
 #endif
 

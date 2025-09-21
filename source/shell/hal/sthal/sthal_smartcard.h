@@ -119,7 +119,7 @@ extern "C" {
 #    define SMARTCARD_PRESCALER_SYSCLK_DIV60 0x0000001EU
 #    define SMARTCARD_PRESCALER_SYSCLK_DIV62 0x0000001FU
 
-// Unsupport Features
+// Unsupported Features
 #    ifndef SMARTCARD_LASTBIT_DISABLE
 #        define SMARTCARD_LASTBIT_DISABLE 0
 #    endif

@@ -520,7 +520,7 @@ static void __code_dump(vsf_tgui_control_t* control_ptr, uint_fast8_t tab_cnt, b
     __control_gen_define_header(control_ptr, &current_tab_cnt, control_name, parent_name, previous_name, next_name);
     __control_gen_struct_init(control_ptr, current_tab_cnt, force, control_name);
 
-    // init childs
+    // init children
     do {
         vsf_msgt_node_t* node = &control_ptr->use_as__vsf_msgt_node_t;
         if (node->Attribute._.is_container) {

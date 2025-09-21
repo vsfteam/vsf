@@ -214,7 +214,7 @@ bool hal_options_get_value(int argc, char *argv[],
             }
         }
         if (j >= cnt) {
-            vsf_trace_error("unknow opitons: %s" VSF_TRACE_CFG_LINEEND, name);
+            vsf_trace_error("unknown options: %s" VSF_TRACE_CFG_LINEEND, name);
             return false;
         }
     }
@@ -250,7 +250,7 @@ void hal_options_trace(vsf_trace_level_t level, const char * prefix_str,
     }
 
     if (mode & ~mask) {
-        vsf_trace(level, "| 0x%08X /*unknow*/", mode & ~mask);
+        vsf_trace(level, "| 0x%08X /*unknown*/", mode & ~mask);
     } else if (is_first) {
         vsf_trace(level, "0");
     }
@@ -287,7 +287,7 @@ static void __hal_demo_fini(hal_test_t *test)
     VSF_ASSERT(test->demo != NULL);
 
     if (!test->test_pass) {
-        vsf_trace_error("%s test faild!", test->device_name);
+        vsf_trace_error("%s test failed!", test->device_name);
     }
 
     if (test->send.buffer) {
@@ -327,7 +327,7 @@ static vsf_err_t __hal_device_init(hal_test_t *test)
     }
 
     if (err != VSF_ERR_NONE) {
-        vsf_trace_error("%s init faild: %d" VSF_TRACE_CFG_LINEEND, demo_const_ptr->name, err);
+        vsf_trace_error("%s init failed: %d" VSF_TRACE_CFG_LINEEND, demo_const_ptr->name, err);
     }
 
     return err;
@@ -502,7 +502,7 @@ void hal_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             size_t size = test->send.size + test->recv.size;
             uint8_t *buffer = vsf_heap_malloc(size);
             if (buffer == NULL) {
-                vsf_trace_error("%s alloc buffer (size: 0x%08x bytes) faild!" VSF_TRACE_CFG_LINEEND, size);
+                vsf_trace_error("%s alloc buffer (size: 0x%08x bytes) failed!" VSF_TRACE_CFG_LINEEND, size);
                 vsf_eda_post_evt(eda, VSF_EVT_HAL_FREE_AND_REPORT);
                 break;
             }
@@ -682,7 +682,7 @@ vsf_err_t hal_test_evthandler(hal_test_t * test, int argc, char *argv[], char c)
         if (hal_options_get_value(argc, argv, demo_const_ptr->method.options, demo_const_ptr->method.cnt, &method_value, &method_mask)) {
             test->method = (test->method & ~method_mask) | method_value;
         } else {
-            vsf_trace_error("method config faild!" VSF_TRACE_CFG_LINEEND);
+            vsf_trace_error("method config failed!" VSF_TRACE_CFG_LINEEND);
             err = VSF_ERR_FAIL;
         }
         break;
@@ -698,7 +698,7 @@ vsf_err_t hal_test_evthandler(hal_test_t * test, int argc, char *argv[], char c)
     case 'd':
         device_ptr = hal_demo_find_device(test->demo, optarg);
         if (device_ptr == NULL) {
-            vsf_trace_error("unknow device: %s" VSF_TRACE_CFG_LINEEND, optarg);
+            vsf_trace_error("unknown device: %s" VSF_TRACE_CFG_LINEEND, optarg);
             err = VSF_ERR_FAIL;
         }
         strncpy(test->device_name, optarg, sizeof(test->device_name) - 1);
@@ -714,14 +714,14 @@ vsf_err_t hal_test_evthandler(hal_test_t * test, int argc, char *argv[], char c)
             test->mode_value = mode_value;
             test->mode_mask = mode_mask;
         } else {
-            vsf_trace_error("mode config faild!" VSF_TRACE_CFG_LINEEND);
+            vsf_trace_error("mode config failed!" VSF_TRACE_CFG_LINEEND);
             err = VSF_ERR_FAIL;
         }
         break;
 
     case 'p':
         if (0 == sscanf(optarg, "vsf_prio_%u", &prio)) {
-            vsf_trace_error("unknow prio: %s" VSF_TRACE_CFG_LINEEND, optarg);
+            vsf_trace_error("unknown prio: %s" VSF_TRACE_CFG_LINEEND, optarg);
             err = VSF_ERR_FAIL;
         } else {
             prio = hal_demo_num_to_prio(prio);
@@ -736,7 +736,7 @@ vsf_err_t hal_test_evthandler(hal_test_t * test, int argc, char *argv[], char c)
 
     case 'i':
         if (0 == sscanf(optarg, "vsf_arch_prio_%u", &arch_prio)) {
-            vsf_trace_error("unknow prio: %s" VSF_TRACE_CFG_LINEEND, optarg);
+            vsf_trace_error("unknown prio: %s" VSF_TRACE_CFG_LINEEND, optarg);
             err = VSF_ERR_FAIL;
         } else {
             arch_prio = hal_demo_num_to_arch_prio(arch_prio);
@@ -785,7 +785,7 @@ int hal_main(hal_demo_t * demo)
 
     hal_test_t *test = vsf_heap_malloc(demo_const_ptr->const_size);
     if (test == NULL) {
-        vsf_trace_error("%s alloc instance buffer faild" VSF_TRACE_CFG_LINEEND, demo_const_ptr->name);
+        vsf_trace_error("%s alloc instance buffer failed" VSF_TRACE_CFG_LINEEND, demo_const_ptr->name);
         return -1;
     }
     memset(test, 0, demo_const_ptr->const_size);

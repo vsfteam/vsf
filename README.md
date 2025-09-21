@@ -78,7 +78,7 @@ Pre-emptive kernel based on event-driven architecture, supporting mcs51, 8bit MC
 ## HAL -- hardware abstraction layer
 - standard hal interface and API -- eg: vsf_spi_init can be used with hardware SPI, GPIO emulated SPI, SPI from external usb device, etc
 - IP core driver -- simplify porting by implement clock, reset, interrupt functions which is not provided by IP core
-- template for different intefaces and functionalities
+- template for different interfaces and functionalities
 - interfaces
   - PM
   - GPIO

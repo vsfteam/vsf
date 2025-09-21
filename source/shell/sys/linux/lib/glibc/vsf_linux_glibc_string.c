@@ -182,7 +182,7 @@ const char * sigabbrev_np(int sig)
 
 #if     !(VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR == ENABLED)                  \
     ||  !(VSF_LINUX_SIMPLE_STDLIB_CFG_HEAP_MONITOR_TRACE_CALLER == ENABLED)
-// strdup will be wrappered to ____strdup_ex if condition not met
+// strdup will be wrapped to ____strdup_ex if condition not met
 char * strdup(const char *str)
 {
     return __strdup_ex(NULL, str);

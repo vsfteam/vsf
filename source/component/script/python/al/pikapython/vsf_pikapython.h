@@ -160,7 +160,7 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
 // instance
 
 #define vsf_pyal_inst_base_def()
-// do not use __vsf_pyal_newobj_inst directly, because users MUST find all parents class 
+// do not use __vsf_pyal_newobj_inst directly, because users MUST find all parents class
 //  and call init for all these parent classes
 #define __vsf_pyal_newobj_inst(__mod, __class)      newNormalObj(New_ ## __mod ## _ ## __class)
 #define vsf_pyal_newobj_inst(__mod, __class)        not supported
@@ -187,7 +187,7 @@ typedef PikaObj *                                   vsf_pyal_obj_t;
     ({                                                                          \
         vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(fileobj) = vsf_pyal_newobj_file((__file), (__is_text));\
         arg_newObj(VSF_MACRO_SAFE_NAME(fileobj));                               \
-    })   
+    })
 #define vsf_pyal_filearg_getfile(__filearg)                                     \
     ({                                                                          \
         vsf_pyal_obj_t VSF_MACRO_SAFE_NAME(fileobj) = arg_getObj(__filearg);    \
@@ -401,7 +401,7 @@ extern int __vsf_pyal_parse_tuple_keyword(__vsf_pyal_keyword_parser_arg(arg), co
         VSF_MACRO_SAFE_NAME(selfobj);                                           \
     })
 
-// vsf_pyal_class_newc will create class in C, user can set a exsize and get a C pinter
+// vsf_pyal_class_newc will create class in C, user can set a exsize and get a C pointer
 #define vsf_pyal_class_newc(__mod, __class, __exsize, __obj_ptr)                \
     ({                                                                          \
         vsf_pyal_arg_t VSF_MACRO_SAFE_NAME(instarg) = arg_newBytes(NULL, sizeof(__mod ## _ ## __class ## _t) + (__exsize));\

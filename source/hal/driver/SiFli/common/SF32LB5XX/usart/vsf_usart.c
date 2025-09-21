@@ -126,7 +126,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
 
     vsf_hw_peripheral_enable(usart_ptr->en);
 
-    // save boardrate, baudrate can only be set when USART is enalbed
+    // save boardrate, baudrate can only be set when USART is enabled
     usart_ptr->__baudrate = cfg_ptr->baudrate;
     usart_ptr->__baudrate_set = false;
     cfg_ptr->mode &= ~VSF_USART_OVERSAMPLE_MASK;
