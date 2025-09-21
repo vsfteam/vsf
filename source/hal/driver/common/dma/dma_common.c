@@ -53,6 +53,16 @@ void vsf_dma_fini(vsf_dma_t *dma_ptr)
     dma_ptr->op->fini(dma_ptr);
 }
 
+vsf_err_t vsf_dma_get_configuration(vsf_dma_t *dma_ptr, vsf_dma_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+    VSF_HAL_ASSERT(dma_ptr->op != NULL);
+    VSF_HAL_ASSERT(dma_ptr->op->get_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return dma_ptr->op->get_configuration(dma_ptr, cfg_ptr);
+}
+
 vsf_dma_capability_t vsf_dma_capability(vsf_dma_t *dma_ptr)
 {
     VSF_HAL_ASSERT(dma_ptr != NULL);
@@ -88,6 +98,17 @@ vsf_err_t vsf_dma_channel_config(vsf_dma_t *dma_ptr, uint8_t channel,
     VSF_HAL_ASSERT(dma_ptr->op->channel_config != NULL);
 
     return dma_ptr->op->channel_config(dma_ptr, channel, cfg_ptr);
+}
+
+vsf_err_t vsf_dma_channel_get_configuration(vsf_dma_t *dma_ptr, uint8_t channel,
+                                            vsf_dma_channel_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+    VSF_HAL_ASSERT(dma_ptr->op != NULL);
+    VSF_HAL_ASSERT(dma_ptr->op->channel_get_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return dma_ptr->op->channel_get_configuration(dma_ptr, channel, cfg_ptr);
 }
 
 vsf_err_t vsf_dma_channel_start(vsf_dma_t *dma_ptr, uint8_t channel,
