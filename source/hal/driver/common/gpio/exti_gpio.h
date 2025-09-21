@@ -15,76 +15,100 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_GPIO_EXTI_H__
-#define __HAL_DRIVER_GPIO_EXTI_H__
+ #ifndef __HAL_DRIVER_GPIO_EXTI_H__
+ #define __HAL_DRIVER_GPIO_EXTI_H__
 
-/*============================ INCLUDES ======================================*/
+ /*============================ INCLUDES ======================================*/
 
-#include "hal/vsf_hal_cfg.h"
+ #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_GPIO == ENABLED
+ #if VSF_HAL_USE_GPIO == ENABLED
 
-#if defined(__VSF_HAL_USE_GPIO_EXTI_CLASS_IMPLEMENT)
-#   undef __VSF_HAL_USE_GPIO_EXTI_CLASS_IMPLEMENT
-#   define __VSF_CLASS_IMPLEMENT__
-#endif
+ #if defined(__VSF_HAL_USE_GPIO_EXTI_CLASS_IMPLEMENT)
+ #   undef __VSF_HAL_USE_GPIO_EXTI_CLASS_IMPLEMENT
+ #   define __VSF_CLASS_IMPLEMENT__
+ #endif
 
-#include "utilities/ooc_class.h"
+ #include "utilities/ooc_class.h"
 
-/*============================ GLOBAL VARIABLES ==============================*/
-/*============================ MACROS ========================================*/
+ /*============================ GLOBAL VARIABLES ==============================*/
+ /*============================ MACROS ========================================*/
 
-#ifndef VSF_EXTI_GPIO_CFG_MULTI_CLASS
-#   define VSF_EXTI_GPIO_CFG_MULTI_CLASS   VSF_GPIO_CFG_MULTI_CLASS
-#endif
+ #ifndef VSF_EXTI_GPIO_CFG_MULTI_CLASS
+ #   define VSF_EXTI_GPIO_CFG_MULTI_CLASS        VSF_GPIO_CFG_MULTI_CLASS
+ #endif
 
+ #if VSF_EXTI_GPIO_CFG_MULTI_CLASS == ENABLED
+ #   define __describe_exti_gpio_op()            .op = &vsf_exti_gpio_op,
+ #else
+ #   define __describe_exti_gpio_op()
+ #endif
 
-#define __describe_exti_gpio(__name, __gpio, __pin_count, ...)                  \
-    static vsf_gpio_irq_distributor_irq_t                                       \
-        VSF_MCONNECT(__name, _irqs)[__pin_count];                               \
-    vsf_gpio_irq_distributor_t __name = {                                       \
-        .gpio = (vsf_gpio_t *)&__gpio,                                          \
-        .prio = vsf_arch_prio_invalid,                                          \
-        .exti_irq = VSF_MCONNECT(__name, _irqs),                                \
-        __VA_ARGS__                                                             \
-    };
+ #define __describe_gpio_irq_distributor(__name, __gpio, __pin_count, ...)       \
+     static vsf_gpio_irq_distributor_irq_t                                       \
+         VSF_MCONNECT(__name, _irqs)[__pin_count];                               \
+     vsf_gpio_irq_distributor_t __name = {                                       \
+         .gpio = (vsf_gpio_t *)&__gpio,                                          \
+         .prio = vsf_arch_prio_invalid,                                          \
+         .exti_irq = VSF_MCONNECT(__name, _irqs),                                \
+         __VA_ARGS__                                                             \
+     };
 
-#define describe_gpio_irq_distributor(__name, __gpio, ...)                      \
-    __describe_exti_gpio(__name, __gpio, __VA_ARGS__)
+ #define describe_gpio_irq_distributor(__name, __gpio, ...)                      \
+     __describe_gpio_irq_distributor(__name, __gpio, __VA_ARGS__)
 
+ #define __describe_exti_gpio(__name, __gpio, __pin_count, ...)                  \
+     static vsf_gpio_irq_distributor_irq_t                                       \
+         VSF_MCONNECT(__name, _distributor_irqs)[__pin_count];                   \
+     vsf_exti_gpio_t __name = {                                                  \
+         __describe_exti_gpio_op()                                               \
+         .distributor = {                                                        \
+             .gpio = (vsf_gpio_t *)&__gpio,                                      \
+             .prio = vsf_arch_prio_invalid,                                      \
+             .exti_irq = VSF_MCONNECT(__name, _distributor_irqs),                \
+             __VA_ARGS__                                                         \
+         },                                                                      \
+     };
 
-/*============================ MACROFIED FUNCTIONS ===========================*/
-/*============================ TYPES =========================================*/
+ #define describe_exti_gpio(__name, __gpio, ...)                                 \
+     __describe_exti_gpio(__name, __gpio, __VA_ARGS__)
 
-typedef struct vsf_gpio_irq_distributor_irq_t {
-    vsf_gpio_exti_isr_handler_t *handler_fn;
-    void                        *target_ptr;
-} vsf_gpio_irq_distributor_irq_t;
+ /*============================ MACROFIED FUNCTIONS ===========================*/
+ /*============================ TYPES =========================================*/
 
-typedef struct vsf_gpio_irq_distributor_t {
-    vsf_gpio_t          *gpio;
-    vsf_arch_prio_t      prio;
-    vsf_gpio_irq_distributor_irq_t *exti_irq;
-} vsf_gpio_irq_distributor_t;
+ typedef struct vsf_gpio_irq_distributor_irq_t {
+     vsf_gpio_exti_isr_handler_t *handler_fn;
+     void                        *target_ptr;
+ } vsf_gpio_irq_distributor_irq_t;
 
-typedef struct vsf_exti_gpio_t {
-#if VSF_EXTI_GPIO_CFG_MULTI_CLASS == ENABLED
-    vsf_gpio_t              vsf_gpio;
-#endif
-vsf_gpio_irq_distributor_t  irq_cfg;
-} vsf_exti_gpio_t;
+ typedef struct vsf_gpio_irq_distributor_t {
+     vsf_gpio_t          *gpio;
+     vsf_arch_prio_t      prio;
+     vsf_gpio_irq_distributor_irq_t *exti_irq;
+ } vsf_gpio_irq_distributor_t;
 
-/*============================ INCLUDES ======================================*/
+ vsf_class(vsf_exti_gpio_t) {
+ #if VSF_EXTI_GPIO_CFG_MULTI_CLASS == ENABLED
+     implement(vsf_gpio_t);
+ #endif
+     vsf_gpio_irq_distributor_t  distributor;
+ };
 
-#define VSF_GPIO_CFG_DEC_PREFIX              vsf_exti
-#define VSF_GPIO_CFG_DEC_UPCASE_PREFIX       vsf_exti
-#define VSF_GPIO_CFG_DEC_EXTERN_OP           ENABLED
-#include "hal/driver/common/gpio/gpio_template.h"
+ /*============================ INCLUDES ======================================*/
 
-/*============================ PROTOTYPES ====================================*/
-/*============================ IMPLEMENTATION ================================*/
+ #define VSF_GPIO_CFG_DEC_PREFIX              vsf_exti
+ #define VSF_GPIO_CFG_DEC_UPCASE_PREFIX       vsf_exti
+ #define VSF_GPIO_CFG_DEC_EXTERN_OP           ENABLED
+ #include "hal/driver/common/gpio/gpio_template.h"
 
-#endif
+ /*============================ PROTOTYPES ====================================*/
 
-#endif
-/* EOF */
+ vsf_err_t vsf_exti_gpio_config_pin(vsf_exti_gpio_t *exti_gpio_ptr, vsf_gpio_pin_mask_t pin_mask,
+     vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr);
+
+ /*============================ IMPLEMENTATION ================================*/
+
+ #endif
+
+ #endif
+ /* EOF */
