@@ -175,11 +175,14 @@ extern "C" {
  */
 #define VSF_I2S_APIS(__prefix_name)                                                                                                                         \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, init,          VSF_MCONNECT(__prefix_name, _t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)   \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, get_configuration, VSF_MCONNECT(__prefix_name, _t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, tx_init,       VSF_MCONNECT(__prefix_name, _t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)   \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2s, tx_fini,       VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, tx_get_configuration, VSF_MCONNECT(__prefix_name, _t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, tx_start,      VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, rx_init,       VSF_MCONNECT(__prefix_name, _t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)   \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2s, rx_fini,       VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, rx_get_configuration, VSF_MCONNECT(__prefix_name, _t) *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, rx_start,      VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2s, enable,        VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2s, disable,       VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
@@ -424,6 +427,21 @@ extern void vsf_i2s_tx_fini(vsf_i2s_t *i2s_ptr);
 
 /**
  \~english
+ @brief Get the current configuration of i2s tx channel.
+ @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
+ @param[out] cfg_ptr: a pointer to structure @ref vsf_i2s_cfg_t to store the current configuration
+ @return vsf_err_t: VSF_ERR_NONE if successful, or a negative error code
+
+ \~chinese
+ @brief 获取 i2s 发送通道的当前配置
+ @param[in] i2s_ptr: 指向结构体 @ref vsf_i2s_t 的指针
+ @param[out] cfg_ptr: 指向结构体 @ref vsf_i2s_cfg_t 的指针，用于存储当前配置
+ @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，否则返回负数
+ */
+extern vsf_err_t vsf_i2s_tx_get_configuration(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr);
+
+/**
+ \~english
  @brief Start i2s tx channel.
  @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
  @return vsf_err_t: VSF_ERR_NONE if i2s started successfully, or a negative error code
@@ -462,6 +480,21 @@ extern vsf_err_t vsf_i2s_rx_init(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *i2s_cfg);
  @return 无
  */
 extern void vsf_i2s_rx_fini(vsf_i2s_t *i2s_ptr);
+
+/**
+ \~english
+ @brief Get the current configuration of i2s rx channel.
+ @param[in] i2s_ptr: a pointer to structure @ref vsf_i2s_t
+ @param[out] cfg_ptr: a pointer to structure @ref vsf_i2s_cfg_t to store the current configuration
+ @return vsf_err_t: VSF_ERR_NONE if successful, or a negative error code
+
+ \~chinese
+ @brief 获取 i2s 接收通道的当前配置
+ @param[in] i2s_ptr: 指向结构体 @ref vsf_i2s_t 的指针
+ @param[out] cfg_ptr: 指向结构体 @ref vsf_i2s_cfg_t 的指针，用于存储当前配置
+ @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，否则返回负数
+ */
+extern vsf_err_t vsf_i2s_rx_get_configuration(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr);
 
 /**
  \~english
@@ -541,24 +574,48 @@ extern vsf_i2s_status_t vsf_i2s_status(vsf_i2s_t *i2s_ptr);
  */
 extern vsf_i2s_capability_t vsf_i2s_capability(vsf_i2s_t *i2s_ptr);
 
+/**
+ * \~english
+ * @brief Get the current configuration of an I2S instance
+ * @param[in] i2s_ptr: pointer to structure @ref vsf_i2s_t
+ * @param[out] cfg_ptr: pointer to configuration structure @ref vsf_i2s_cfg_t to store the current configuration
+ * @return vsf_err_t: VSF_ERR_NONE if successful, otherwise return error code
+ *
+ * @note This function retrieves the current I2S configuration including sample rate, data format, and other settings.
+ *       The I2S instance should be initialized before calling this function.
+ *
+ * \~chinese
+ * @brief 获取 I2S 实例的当前配置
+ * @param[in] i2s_ptr: 指向结构体 @ref vsf_i2s_t 的指针
+ * @param[out] cfg_ptr: 指向配置结构体 @ref vsf_i2s_cfg_t 的指针，用于存储当前配置
+ * @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，否则返回错误码
+ *
+ * @note 此函数检索当前 I2S 配置，包括采样率、数据格式和其他设置。
+ *       调用此函数前应先初始化 I2S 实例。
+ */
+extern vsf_err_t vsf_i2s_get_configuration(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr);
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /// @cond
 #if VSF_I2S_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_i2s_t                      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_t)
-#   define vsf_i2s_init(__i2s, ...)         VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_init)         ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
-#   define vsf_i2s_enable(__i2s)            VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_enable)       ((__vsf_i2s_t *)(__i2s))
-#   define vsf_i2s_disable(__i2s)           VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_disable)      ((__vsf_i2s_t *)(__i2s))
-#   define vsf_i2s_status(__i2s)            VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_status)       ((__vsf_i2s_t *)(__i2s))
-#   define vsf_i2s_capability(__i2s)        VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_capability)   ((__vsf_i2s_t *)(__i2s))
+#   define vsf_i2s_init(__i2s, ...)         VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_init)             ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
+#   define vsf_i2s_get_configuration(__i2s, ...) VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_get_configuration) ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
+#   define vsf_i2s_enable(__i2s)            VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_enable)           ((__vsf_i2s_t *)(__i2s))
+#   define vsf_i2s_disable(__i2s)           VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_disable)          ((__vsf_i2s_t *)(__i2s))
+#   define vsf_i2s_status(__i2s)            VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_status)           ((__vsf_i2s_t *)(__i2s))
+#   define vsf_i2s_capability(__i2s)        VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_capability)       ((__vsf_i2s_t *)(__i2s))
 
-#   define vsf_i2s_tx_init(__i2s, ...)      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_tx_init)      ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
-#   define vsf_i2s_tx_fini(__i2s, ...)      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_tx_fini)      ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
-#   define vsf_i2s_tx_start(__i2s)          VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_tx_start)     ((__vsf_i2s_t *)(__i2s))
+#   define vsf_i2s_tx_init(__i2s, ...)      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_tx_init)          ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
+#   define vsf_i2s_tx_fini(__i2s, ...)      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_tx_fini)          ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
+#   define vsf_i2s_tx_get_configuration(__i2s, ...) VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_tx_get_configuration) ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
+#   define vsf_i2s_tx_start(__i2s)          VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_tx_start)         ((__vsf_i2s_t *)(__i2s))
 
-#   define vsf_i2s_rx_init(__i2s, ...)      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_init)      ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
-#   define vsf_i2s_rx_fini(__i2s, ...)      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_fini)      ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
-#   define vsf_i2s_rx_start(__i2s)          VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_start)     ((__vsf_i2s_t *)(__i2s))
+#   define vsf_i2s_rx_init(__i2s, ...)      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_init)          ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
+#   define vsf_i2s_rx_fini(__i2s, ...)      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_fini)          ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
+#   define vsf_i2s_rx_get_configuration(__i2s, ...) VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_get_configuration) ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
+#   define vsf_i2s_rx_start(__i2s)          VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_start)         ((__vsf_i2s_t *)(__i2s))
 #endif
 /// @endcond
 

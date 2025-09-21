@@ -61,6 +61,16 @@ void vsf_i2s_tx_fini(vsf_i2s_t *i2s_ptr)
     i2s_ptr->op->tx_fini(i2s_ptr);
 }
 
+vsf_err_t vsf_i2s_tx_get_configuration(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(i2s_ptr != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op->tx_get_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return i2s_ptr->op->tx_get_configuration(i2s_ptr, cfg_ptr);
+}
+
 vsf_err_t vsf_i2s_tx_start(vsf_i2s_t *i2s_ptr)
 {
     VSF_HAL_ASSERT(i2s_ptr != NULL);
@@ -86,6 +96,16 @@ void vsf_i2s_rx_fini(vsf_i2s_t *i2s_ptr)
     VSF_HAL_ASSERT(i2s_ptr->op->rx_fini != NULL);
 
     i2s_ptr->op->rx_fini(i2s_ptr);
+}
+
+vsf_err_t vsf_i2s_rx_get_configuration(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(i2s_ptr != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op->rx_get_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return i2s_ptr->op->rx_get_configuration(i2s_ptr, cfg_ptr);
 }
 
 vsf_err_t vsf_i2s_rx_start(vsf_i2s_t *i2s_ptr)
@@ -131,6 +151,16 @@ vsf_i2s_capability_t vsf_i2s_capability(vsf_i2s_t *i2s_ptr)
     VSF_HAL_ASSERT(i2s_ptr->op->capability != NULL);
 
     return i2s_ptr->op->capability(i2s_ptr);
+}
+
+vsf_err_t vsf_i2s_get_configuration(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(i2s_ptr != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op->get_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return i2s_ptr->op->get_configuration(i2s_ptr, cfg_ptr);
 }
 
 #endif /* VSF_I2S_CFG_MULTI_CLASS == ENABLED */
