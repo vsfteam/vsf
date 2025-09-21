@@ -107,6 +107,23 @@ void VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_fini)(
     VSF_HAL_ASSERT(dac_ptr != NULL);
 }
 
+vsf_err_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_get_configuration)(
+    VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr,
+    vsf_dac_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != dac_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current DAC configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = dac_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
+}
+
 fsm_rt_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_enable)(
     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr
 ) {
@@ -220,6 +237,7 @@ static void VSF_MCONNECT(__, VSF_DAC_CFG_IMP_PREFIX, _dac_irqhandler)(
 
 // HW
 #define VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
+#define VSF_DAC_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #define VSF_DAC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t)                                \
         VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac, __IDX) = {                   \

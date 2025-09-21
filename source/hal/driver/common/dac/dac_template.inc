@@ -23,14 +23,21 @@
 
 #define vsf_real_dac_t                                          VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t)
 #define vsf_real_dac_capability                                 VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_capability)
+#define vsf_real_dac_get_configuration                          VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_get_configuration)
 
 #ifndef VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY
 #   define  VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
 #endif
 
+#ifndef VSF_DAC_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#   define VSF_DAC_CFG_REIMPLEMENT_API_GET_CONFIGURATION        DISABLED
+#endif
+
 #ifdef VSF_DAC_CFG_IMP_REMAP_PREFIX
 #   undef VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY
 #   define VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY               ENABLED
+#   undef VSF_DAC_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#   define VSF_DAC_CFG_REIMPLEMENT_API_GET_CONFIGURATION        ENABLED
 #endif
 
 #if VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -65,9 +72,23 @@ vsf_dac_capability_t vsf_real_dac_capability(vsf_real_dac_t *dac_ptr)
 }
 #endif
 
+#if VSF_DAC_CFG_REIMPLEMENT_API_GET_CONFIGURATION == DISABLED
+vsf_err_t vsf_real_dac_get_configuration(vsf_real_dac_t *dac_ptr, vsf_dac_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(NULL != dac_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_DAC_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_DAC_CFG_CAPABILITY_IRQ_MASK
 #undef VSF_DAC_CFG_CAPABILITY_MAX_RESOLUTION_BITS
 #undef VSF_DAC_CFG_CAPABILITY_MIN_RESOLUTION_BITS
@@ -75,6 +96,7 @@ vsf_dac_capability_t vsf_real_dac_capability(vsf_real_dac_t *dac_ptr)
 
 #undef vsf_real_dac_t
 #undef vsf_real_dac_capability
+#undef vsf_real_dac_get_configuration
 
 /*============================ MACROS ========================================*/
 
@@ -91,6 +113,7 @@ vsf_dac_capability_t vsf_real_dac_capability(vsf_real_dac_t *dac_ptr)
 #   define vsf_imp_dac_channel_request_once(__DAC, ...)     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_channel_request_once)
 #   define vsf_imp_dac_channel_config(__DAC, ...)           VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_channel_config)
 #   define vsf_imp_dac_channel_request(__DAC, ...)          VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_channel_request)
+#   define vsf_imp_dac_get_configuration                    VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_get_configuration)
 
 #   define vsf_remap_dac_t                                  VSF_MCONNECT(VSF_DAC_CFG_IMP_REMAP_PREFIX, _dac_t)
 #   define vsf_remap_dac_init(__DAC)                        VSF_MCONNECT(VSF_DAC_CFG_IMP_REMAP_PREFIX, _dac_init)
@@ -104,6 +127,7 @@ vsf_dac_capability_t vsf_real_dac_capability(vsf_real_dac_t *dac_ptr)
 #   define vsf_remap_dac_channel_request_once(__DAC, ...)   VSF_MCONNECT(VSF_DAC_CFG_IMP_REMAP_PREFIX, _dac_channel_request_once)
 #   define vsf_remap_dac_channel_config(__DAC, ...)         VSF_MCONNECT(VSF_DAC_CFG_IMP_REMAP_PREFIX, _dac_channel_config)
 #   define vsf_remap_dac_channel_request(__DAC, ...)        VSF_MCONNECT(VSF_DAC_CFG_IMP_REMAP_PREFIX, _dac_channel_request)
+#   define vsf_remap_dac_get_configuration                  VSF_MCONNECT(VSF_DAC_CFG_IMP_REMAP_PREFIX, _dac_get_configuration)
 
 #   define VSF_DAC_CFG_IMP_REMAP_FUNCTIONS                                                                            \
         vsf_err_t vsf_imp_dac_init(vsf_imp_dac_t *dac)                                                  \
@@ -173,6 +197,12 @@ vsf_dac_capability_t vsf_real_dac_capability(vsf_real_dac_t *dac_ptr)
         {                                                                                               \
             VSF_HAL_ASSERT(dac != NULL);                                                                \
             return vsf_remap_dac_channel_request((vsf_remap_dac_t *)dac, buffer, count);                \
+        }                                                                                               \
+                                                                                                        \
+        vsf_err_t vsf_imp_dac_get_configuration(vsf_imp_dac_t *dac, vsf_dac_cfg_t *cfg)                \
+        {                                                                                               \
+            VSF_HAL_ASSERT(dac != NULL);                                                                \
+            return vsf_remap_dac_get_configuration((vsf_remap_dac_t *)dac, cfg);                        \
         }
 #endif
 
@@ -224,6 +254,7 @@ vsf_dac_capability_t vsf_real_dac_capability(vsf_real_dac_t *dac_ptr)
 #undef vsf_imp_dac_channel_request_once
 #undef vsf_imp_dac_channel_config
 #undef vsf_imp_dac_channel_request
+#undef vsf_imp_dac_get_configuration
 
 #undef vsf_remap_dac_t
 #undef vsf_remap_dac_init
@@ -237,5 +268,6 @@ vsf_dac_capability_t vsf_real_dac_capability(vsf_real_dac_t *dac_ptr)
 #undef vsf_remap_dac_channel_request_once
 #undef vsf_remap_dac_channel_config
 #undef vsf_remap_dac_channel_request
+#undef vsf_remap_dac_get_configuration
 
 #endif  /* VSF_HAL_USE_DAC */
