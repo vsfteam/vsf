@@ -57,6 +57,12 @@ void vsf_remapped_pwm_fini(vsf_remapped_pwm_t *pwm)
     vsf_pwm_fini(pwm->target);
 }
 
+vsf_err_t vsf_remapped_pwm_get_configuration(vsf_remapped_pwm_t *pwm, vsf_pwm_cfg_t *cfg)
+{
+    VSF_HAL_ASSERT((pwm != NULL) && (pwm->target != NULL));
+    return vsf_pwm_get_configuration(pwm->target, cfg);
+}
+
 fsm_rt_t vsf_remapped_pwm_enable(vsf_remapped_pwm_t *pwm)
 {
     VSF_HAL_ASSERT((pwm != NULL) && (pwm->target != NULL));

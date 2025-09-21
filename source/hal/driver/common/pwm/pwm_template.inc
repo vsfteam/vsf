@@ -21,13 +21,19 @@
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_PWM_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#   define VSF_PWM_CFG_REIMPLEMENT_API_GET_CONFIGURATION        DISABLED
+#endif
+
 #ifndef VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY
-#   define  VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY  DISABLED
+#   define  VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
 #endif
 
 #ifdef VSF_PWM_CFG_IMP_REMAP_PREFIX
 #   undef VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY
-#   define VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY           ENABLED
+#   define VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY               ENABLED
+#   undef VSF_PWM_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#   define VSF_PWM_CFG_REIMPLEMENT_API_GET_CONFIGURATION        ENABLED
 #endif
 
 #if VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -43,6 +49,7 @@
 #define vsf_real_pwm_set        VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set)
 #define vsf_real_pwm_get_freq   VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_freq)
 #define vsf_real_pwm_capability VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_capability)
+#define vsf_real_pwm_get_configuration      VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_configuration)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -63,13 +70,25 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 }
 #endif
 
+#if VSF_PWM_CFG_REIMPLEMENT_API_GET_CONFIGURATION == DISABLED
+vsf_err_t vsf_real_pwm_get_configuration(vsf_real_pwm_t *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(NULL != pwm_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+    VSF_HAL_ASSERT(0); // Default implementation: not supported, trigger assertion
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_PWM_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_PWM_CFG_CAPABILITY_MAX_FREQ
 #undef VSF_PWM_CFG_CAPABILITY_MIN_FREQ
 #undef vsf_real_pwm_t
 #undef vsf_real_pwm_capability
+#undef vsf_real_pwm_get_configuration
 
 /*============================ MACROS ========================================*/
 
@@ -83,6 +102,7 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 #   define vsf_imp_pwm_capability   VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_capability)
 #   define vsf_imp_pwm_set          VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set)
 #   define vsf_imp_pwm_get_freq     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_freq)
+#   define vsf_imp_pwm_get_configuration    VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_configuration)
 
 #   define vsf_remap_pwm_t          VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_t)
 #   define vsf_remap_pwm_init       VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_init)
@@ -92,6 +112,7 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 #   define vsf_remap_pwm_capability VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_capability)
 #   define vsf_remap_pwm_set        VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_set)
 #   define vsf_remap_pwm_get_freq   VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_get_freq)
+#   define vsf_remap_pwm_get_configuration  VSF_MCONNECT(VSF_PWM_CFG_IMP_REMAP_PREFIX, _pwm_get_configuration)
 
 #   define VSF_PWM_CFG_IMP_REMAP_FUNCTIONS                                                       \
         vsf_err_t vsf_imp_pwm_init(vsf_imp_pwm_t *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr) \
@@ -129,6 +150,12 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
         {                                                                          \
             VSF_HAL_ASSERT(pwm_ptr != NULL);                                       \
             return vsf_remap_pwm_get_freq(pwm_ptr);                                \
+        }                                                                          \
+                                                                                   \
+        vsf_err_t vsf_imp_pwm_get_configuration(vsf_imp_pwm_t *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr) \
+        {                                                                          \
+            VSF_HAL_ASSERT(pwm_ptr != NULL);                                       \
+            return vsf_remap_pwm_get_configuration(pwm_ptr, cfg_ptr);              \
         }
 #endif
 
@@ -174,6 +201,7 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 #undef vsf_imp_pwm_capability
 #undef vsf_imp_pwm_set
 #undef vsf_imp_pwm_get_freq
+#undef vsf_imp_pwm_get_configuration
 
 #undef vsf_remap_pwm_t
 #undef vsf_remap_pwm_init
@@ -183,5 +211,6 @@ vsf_pwm_capability_t vsf_real_pwm_capability(vsf_real_pwm_t *pwm_ptr)
 #undef vsf_remap_pwm_capability
 #undef vsf_remap_pwm_set
 #undef vsf_remap_pwm_get_freq
+#undef vsf_remap_pwm_get_configuration
 
 #endif  /* VSF_HAL_USE_PWM */
