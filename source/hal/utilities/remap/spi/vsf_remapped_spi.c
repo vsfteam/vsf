@@ -57,6 +57,12 @@ void vsf_remapped_spi_fini(vsf_remapped_spi_t *spi)
     vsf_spi_fini(spi->target);
 }
 
+vsf_err_t vsf_remapped_spi_get_configuration(vsf_remapped_spi_t *spi, vsf_spi_cfg_t *cfg)
+{
+    VSF_HAL_ASSERT((spi != NULL) && (spi->target != NULL));
+    return vsf_spi_get_configuration(spi->target, cfg);
+}
+
 fsm_rt_t vsf_remapped_spi_enable(vsf_remapped_spi_t *spi)
 {
     VSF_HAL_ASSERT((spi != NULL) && (spi->target != NULL));
