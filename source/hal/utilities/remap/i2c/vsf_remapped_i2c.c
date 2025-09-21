@@ -57,6 +57,12 @@ void vsf_remapped_i2c_fini(vsf_remapped_i2c_t *i2c)
     vsf_i2c_fini(i2c->target);
 }
 
+vsf_err_t vsf_remapped_i2c_get_configuration(vsf_remapped_i2c_t *i2c, vsf_i2c_cfg_t *cfg)
+{
+    VSF_HAL_ASSERT((i2c != NULL) && (i2c->target != NULL));
+    return vsf_i2c_get_configuration(i2c->target, cfg);
+}
+
 fsm_rt_t vsf_remapped_i2c_enable(vsf_remapped_i2c_t *i2c)
 {
     VSF_HAL_ASSERT((i2c != NULL) && (i2c->target != NULL));

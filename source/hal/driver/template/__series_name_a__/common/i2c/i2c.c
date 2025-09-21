@@ -104,6 +104,24 @@ void VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_fini)(
     VSF_HAL_ASSERT(NULL != i2c_ptr);
 }
 
+vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_get_configuration)(
+    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr,
+    vsf_i2c_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != i2c_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // For template implementation, return a default configuration
+    cfg_ptr->mode = VSF_I2C_MODE_MASTER | VSF_I2C_SPEED_STANDARD_MODE | VSF_I2C_ADDR_7_BITS;
+    cfg_ptr->clock_hz = 100000; // 100kHz default
+    cfg_ptr->slave_addr = 0x00;
+
+    // Copy interrupt configuration from current instance
+    cfg_ptr->isr = i2c_ptr->isr;
+
+    return VSF_ERR_NONE;
+}
+
 fsm_rt_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_enable)(
     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
 ) {
@@ -254,6 +272,7 @@ static void VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_irqhandler)(
 // HW
 #define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY          ENABLED
 #define VSF_I2C_CFG_REIMPLEMENT_API_CTRL                ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_API_GET_CONFIGURATION   ENABLED
 
 #define VSF_I2C_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t)                                \

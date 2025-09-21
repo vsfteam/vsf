@@ -106,6 +106,23 @@ void vsf_mrequest_i2c_fini(vsf_mrequest_i2c_t *m_i2c_ptr)
     vsf_i2c_fini(real_i2c_ptr);
 }
 
+vsf_err_t vsf_mrequest_i2c_get_configuration(vsf_mrequest_i2c_t *m_i2c_ptr,
+                                             vsf_i2c_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(NULL != m_i2c_ptr);
+    VSF_HAL_ASSERT(NULL != m_i2c_ptr->i2c_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    vsf_err_t result = vsf_i2c_get_configuration(m_i2c_ptr->i2c_ptr, cfg_ptr);
+
+    // Override with the wrapper's configuration if successful
+    if (result == VSF_ERR_NONE) {
+        cfg_ptr->isr = m_i2c_ptr->cfg.isr;
+    }
+
+    return result;
+}
+
 fsm_rt_t vsf_mrequest_i2c_enable(vsf_mrequest_i2c_t *m_i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
@@ -295,10 +312,11 @@ vsf_i2c_capability_t vsf_mrequest_i2c_capability(vsf_mrequest_i2c_t *m_i2c_ptr)
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY  ENABLED
-#define VSF_I2C_CFG_REIMPLEMENT_API_CTRL        ENABLED
-#define VSF_I2C_CFG_IMP_PREFIX                  vsf_mrequest
-#define VSF_I2C_CFG_IMP_UPCASE_PREFIX           VSF_MREQUEST
+#define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY          ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_API_CTRL                ENABLED
+#define VSF_I2C_CFG_IMP_PREFIX                          vsf_mrequest
+#define VSF_I2C_CFG_IMP_UPCASE_PREFIX                   VSF_MREQUEST
+#define VSF_I2C_CFG_REIMPLEMENT_API_GET_CONFIGURATION   ENABLED
 #include "hal/driver/common/i2c/i2c_template.inc"
 
 #endif //!VSF_HAL_I2C_IMP_MULTIPLEX_I2C
