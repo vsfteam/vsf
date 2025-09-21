@@ -53,6 +53,16 @@ void vsf_adc_fini(vsf_adc_t *adc_ptr)
     adc_ptr->op->fini(adc_ptr);
 }
 
+vsf_err_t vsf_adc_get_configuration(vsf_adc_t *adc_ptr, vsf_adc_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(adc_ptr != NULL);
+    VSF_HAL_ASSERT(adc_ptr->op != NULL);
+    VSF_HAL_ASSERT(adc_ptr->op->get_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return adc_ptr->op->get_configuration(adc_ptr, cfg_ptr);
+}
+
 fsm_rt_t vsf_adc_enable(vsf_adc_t *adc_ptr)
 {
     VSF_HAL_ASSERT(adc_ptr != NULL);

@@ -22,14 +22,21 @@
 
 #define vsf_real_adc_t                                          VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t)
 #define vsf_real_adc_capability                                 VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_capability)
+#define vsf_real_adc_get_configuration                          VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_get_configuration)
 
 #ifndef VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY
 #   define  VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
 #endif
 
+#ifndef VSF_ADC_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#   define VSF_ADC_CFG_REIMPLEMENT_API_GET_CONFIGURATION        DISABLED
+#endif
+
 #ifdef VSF_ADC_CFG_IMP_REMAP_PREFIX
 #   undef VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY
 #   define VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY               ENABLED
+#   undef VSF_ADC_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#   define VSF_ADC_CFG_REIMPLEMENT_API_GET_CONFIGURATION        ENABLED
 #endif
 
 #if VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -60,15 +67,30 @@ vsf_adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
 }
 #endif
 
+#if VSF_ADC_CFG_REIMPLEMENT_API_GET_CONFIGURATION == DISABLED
+vsf_err_t vsf_real_adc_get_configuration(vsf_real_adc_t *adc_ptr, vsf_adc_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(NULL != adc_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_ADC_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_ADC_CFG_CAPABILITY_IRQ_MASK
 #undef VSF_ADC_CFG_CAPABILITY_MAX_DATA_BITS
 #undef VSF_ADC_CFG_CAPABILITY_CHANNEL_COUNT
 
 #undef vsf_real_adc_t
 #undef vsf_real_adc_capability
+#undef vsf_real_adc_get_configuration
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -87,6 +109,7 @@ vsf_adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
 #   define vsf_imp_adc_channel_request_once     VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_channel_request_once)
 #   define vsf_imp_adc_channel_config           VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_channel_config)
 #   define vsf_imp_adc_channel_request          VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_channel_request)
+#   define vsf_imp_adc_get_configuration        VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_get_configuration)
 
 #   define vsf_remap_adc_t                      VSF_MCONNECT(VSF_ADC_CFG_IMP_REMAP_PREFIX, _adc_t)
 #   define vsf_remap_adc_init                   VSF_MCONNECT(VSF_ADC_CFG_IMP_REMAP_PREFIX, _adc_init)
@@ -100,6 +123,7 @@ vsf_adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
 #   define vsf_remap_adc_channel_request_once   VSF_MCONNECT(VSF_ADC_CFG_IMP_REMAP_PREFIX, _adc_channel_request_once)
 #   define vsf_remap_adc_channel_config         VSF_MCONNECT(VSF_ADC_CFG_IMP_REMAP_PREFIX, _adc_channel_config)
 #   define vsf_remap_adc_channel_request        VSF_MCONNECT(VSF_ADC_CFG_IMP_REMAP_PREFIX, _adc_channel_request)
+#   define vsf_remap_adc_get_configuration      VSF_MCONNECT(VSF_ADC_CFG_IMP_REMAP_PREFIX, _adc_get_configuration)
 
 #   define VSF_ADC_CFG_IMP_REMAP_FUNCTIONS                                                            \
         vsf_err_t vsf_imp_adc_init(vsf_imp_adc_t *adc, vsf_adc_cfg_t *cfg)              \
@@ -171,6 +195,11 @@ vsf_adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
         {                                                                               \
             VSF_HAL_ASSERT(adc != NULL);                                                \
             return vsf_remap_adc_channel_request((vsf_remap_adc_t *)adc, buffer, count);\
+        }                                                                               \
+        vsf_err_t vsf_imp_adc_get_configuration(vsf_imp_adc_t *adc, vsf_adc_cfg_t *cfg) \
+        {                                                                               \
+            VSF_HAL_ASSERT(adc != NULL);                                                \
+            return vsf_remap_adc_get_configuration((vsf_remap_adc_t *)adc, cfg);        \
         }
 #endif
 
@@ -220,6 +249,7 @@ vsf_adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
 #undef vsf_imp_adc_channel_request_once
 #undef vsf_imp_adc_channel_config
 #undef vsf_imp_adc_channel_request
+#undef vsf_imp_adc_get_configuration
 
 #undef vsf_remap_adc_t
 #undef vsf_remap_adc_init
@@ -233,5 +263,6 @@ vsf_adc_capability_t vsf_real_adc_capability(vsf_real_adc_t *adc_ptr)
 #undef vsf_remap_adc_channel_request_once
 #undef vsf_remap_adc_channel_config
 #undef vsf_remap_adc_channel_request
+#undef vsf_remap_adc_get_configuration
 
 #endif  /* VSF_HAL_USE_ADC */

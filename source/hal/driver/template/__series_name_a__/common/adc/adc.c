@@ -101,6 +101,23 @@ void VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_fini)(
     VSF_HAL_ASSERT(adc_ptr != NULL);
 }
 
+vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_get_configuration)(
+    VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr,
+    vsf_adc_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != adc_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current ADC configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = adc_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
+}
+
 fsm_rt_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_enable)(
     VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr
 ) {
@@ -205,6 +222,7 @@ static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_irqhandler)(
 
 // HW
 #define VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
+#define VSF_ADC_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #define VSF_ADC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t)                                \
         VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc, __IDX) = {                   \
