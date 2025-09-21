@@ -197,6 +197,7 @@ extern "C" {
 #define VSF_I2C_APIS(__prefix_name)                                                                                                                                         \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2c, init,                          VSF_MCONNECT(__prefix_name, _t) *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)       \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2c, fini,                          VSF_MCONNECT(__prefix_name, _t) *i2c_ptr)                               \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2c, get_configuration,             VSF_MCONNECT(__prefix_name, _t) *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)       \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2c, enable,                        VSF_MCONNECT(__prefix_name, _t) *i2c_ptr)                               \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2c, disable,                       VSF_MCONNECT(__prefix_name, _t) *i2c_ptr)                               \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 i2c, irq_enable,                    VSF_MCONNECT(__prefix_name, _t) *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)  \
@@ -1019,6 +1020,25 @@ extern void vsf_i2c_fini(vsf_i2c_t *i2c_ptr);
 
 /**
  * \~english
+ * @brief Get current configuration of a I2C instance
+ * @param[in] i2c_ptr Pointer to I2C instance
+ * @param[out] cfg_ptr Pointer to I2C configuration structure to store current settings
+ * @return vsf_err_t VSF_ERR_NONE if successful, otherwise an error code
+ *
+ * @note This function retrieves the current configuration of the I2C instance
+ *
+ * \~chinese
+ * @brief 获取 I2C 实例的当前配置
+ * @param[in] i2c_ptr I2C 实例指针
+ * @param[out] cfg_ptr 用于存储当前设置的 I2C 配置结构体指针
+ * @return vsf_err_t 成功返回 VSF_ERR_NONE，否则返回错误码
+ *
+ * @note 此函数获取 I2C 实例的当前配置
+ */
+extern vsf_err_t vsf_i2c_get_configuration(vsf_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr);
+
+/**
+ * \~english
  * @brief Enable a I2C instance
  * @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
  * @return fsm_rt_t: fsm_rt_cpl if I2C was enabled, fsm_rt_on_going if I2C is still enabling
@@ -1264,6 +1284,7 @@ extern vsf_err_t vsf_i2c_ctrl(vsf_i2c_t *i2c_ptr, vsf_i2c_ctrl_t ctrl, void * pa
 #   define __vsf_i2c_t                                      VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_t)
 #   define vsf_i2c_init(__I2C, ...)                         VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_init)                         ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
 #   define vsf_i2c_fini(__I2C)                              VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_fini)                         ((__vsf_i2c_t *)(__I2C))
+#   define vsf_i2c_get_configuration(__I2C, ...)            VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_get_configuration)            ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
 #   define vsf_i2c_enable(__I2C)                            VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_enable)                       ((__vsf_i2c_t *)(__I2C))
 #   define vsf_i2c_disable(__I2C)                           VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_disable)                      ((__vsf_i2c_t *)(__I2C))
 #   define vsf_i2c_irq_enable(__I2C, ...)                   VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_enable)                   ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)

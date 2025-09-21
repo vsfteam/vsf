@@ -229,6 +229,18 @@ void vsf_multiplex_i2c_fini(vsf_multiplex_i2c_t *m_i2c_ptr)
     }
 }
 
+vsf_err_t vsf_multiplex_i2c_get_configuration(vsf_multiplex_i2c_t *m_i2c_ptr,
+                                              vsf_i2c_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(NULL != m_i2c_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // Return the stored configuration for this multiplexed instance
+    *cfg_ptr = m_i2c_ptr->cfg;
+
+    return VSF_ERR_NONE;
+}
+
 fsm_rt_t vsf_multiplex_i2c_enable(vsf_multiplex_i2c_t *m_i2c_ptr)
 {
     VSF_HAL_ASSERT(NULL != m_i2c_ptr);
@@ -474,11 +486,12 @@ vsf_i2c_capability_t vsf_multiplex_i2c_capability(vsf_multiplex_i2c_t *m_i2c_ptr
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
-#define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY  ENABLED
-#define VSF_I2C_CFG_REIMPLEMENT_API_CTRL        ENABLED
-#define VSF_I2C_CFG_IMP_PREFIX                  vsf_multiplex
-#define VSF_I2C_CFG_IMP_UPCASE_PREFIX           VSF_MULTIPLEX
-#define VSF_I2C_CFG_IMP_EXTERN_OP               ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY          ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_API_CTRL                ENABLED
+#define VSF_I2C_CFG_IMP_PREFIX                          vsf_multiplex
+#define VSF_I2C_CFG_IMP_UPCASE_PREFIX                   VSF_MULTIPLEX
+#define VSF_I2C_CFG_IMP_EXTERN_OP                       ENABLED
+#define VSF_I2C_CFG_REIMPLEMENT_API_GET_CONFIGURATION   ENABLED
 #include "hal/driver/common/i2c/i2c_template.inc"
 
 #endif //!VSF_HAL_I2C_IMP_MULTIPLEX_I2C
