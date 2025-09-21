@@ -228,6 +228,7 @@ extern "C" {
 #define VSF_USART_APIS(__prefix_name)                                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              usart, init,                  VSF_MCONNECT(__prefix_name, _t) *usart_ptr, vsf_usart_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   usart, fini,                  VSF_MCONNECT(__prefix_name, _t) *usart_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              usart, get_configuration,     VSF_MCONNECT(__prefix_name, _t) *usart_ptr, vsf_usart_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               usart, enable,                VSF_MCONNECT(__prefix_name, _t) *usart_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               usart, disable,               VSF_MCONNECT(__prefix_name, _t) *usart_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_usart_capability_t, usart, capability,            VSF_MCONNECT(__prefix_name, _t) *usart_ptr) \
@@ -855,6 +856,25 @@ extern void vsf_usart_fini(vsf_usart_t *usart_ptr);
 
 /**
  * \~english
+ * @brief Get current configuration of a USART instance
+ * @param[in] usart_ptr Pointer to USART instance
+ * @param[out] cfg_ptr Pointer to USART configuration structure to store current settings
+ * @return vsf_err_t VSF_ERR_NONE if successful, otherwise an error code
+ *
+ * @note This function retrieves the current configuration of the USART instance
+ *
+ * \~chinese
+ * @brief 获取 USART 实例的当前配置
+ * @param[in] usart_ptr USART 实例指针
+ * @param[out] cfg_ptr 用于存储当前设置的 USART 配置结构体指针
+ * @return vsf_err_t 成功返回 VSF_ERR_NONE，否则返回错误码
+ *
+ * @note 此函数获取 USART 实例的当前配置
+ */
+extern vsf_err_t vsf_usart_get_configuration(vsf_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr);
+
+/**
+ * \~english
  * @brief Enable a USART instance
  * @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
  * @return fsm_rt_t: fsm_rt_cpl if USART was enabled, fsm_rt_on_going if USART is still enabling
@@ -1205,6 +1225,7 @@ static inline vsf_err_t vsf_usart_clear_break(vsf_usart_t *usart_ptr)
 #   define __vsf_usart_t                                 VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_t)
 #   define vsf_usart_init(__USART, ...)                  VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_init)                  ((__vsf_usart_t *)(__USART), ##__VA_ARGS__)
 #   define vsf_usart_fini(__USART)                       VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_fini)                  ((__vsf_usart_t *)(__USART))
+#   define vsf_usart_get_configuration(__USART, ...)     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_get_configuration)     ((__vsf_usart_t *)(__USART), ##__VA_ARGS__)
 #   define vsf_usart_capability(__USART)                 VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_capability)            ((__vsf_usart_t *)(__USART))
 #   define vsf_usart_enable(__USART)                     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_enable)                ((__vsf_usart_t *)(__USART))
 #   define vsf_usart_disable(__USART)                    VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_disable)               ((__vsf_usart_t *)(__USART))

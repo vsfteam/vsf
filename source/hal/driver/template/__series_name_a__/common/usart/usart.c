@@ -105,6 +105,22 @@ void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_fini)(
     VSF_HAL_ASSERT(NULL != usart_ptr);
 }
 
+vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_configuration)(
+    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,
+    vsf_usart_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != usart_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // For template implementation, return a default configuration
+    cfg_ptr->mode = VSF_USART_8_BIT_LENGTH | VSF_USART_1_STOPBIT | VSF_USART_NO_PARITY;
+    cfg_ptr->baudrate = 115200;
+    cfg_ptr->rx_timeout = 0;
+    cfg_ptr->isr = usart_ptr->isr;
+
+    return VSF_ERR_NONE;
+}
+
 fsm_rt_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_enable)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
@@ -293,7 +309,8 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_ctrl)(
 // TODO: add comments about fifo2req
 #define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_REQUEST           ENABLED
-#define VSF_USART_CFG_REIMPLEMENT_API_CTRL               ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_CTRL              ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t)                            \
         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __IDX) = {               \

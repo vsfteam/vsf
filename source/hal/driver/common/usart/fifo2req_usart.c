@@ -144,6 +144,22 @@ void vsf_fifo2req_usart_fini(vsf_fifo2req_usart_t *fifo2req_usart_ptr)
     vsf_usart_fini(fifo2req_usart_ptr->usart);
 }
 
+vsf_err_t vsf_fifo2req_usart_get_configuration(vsf_fifo2req_usart_t *fifo2req_usart_ptr,
+                                               vsf_usart_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(fifo2req_usart_ptr != NULL);
+    VSF_HAL_ASSERT(fifo2req_usart_ptr->usart != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    vsf_err_t result = vsf_usart_get_configuration(fifo2req_usart_ptr->usart, cfg_ptr);
+
+    // Restore the original ISR configuration that was saved during init
+    if (result == VSF_ERR_NONE) {
+        cfg_ptr->isr = fifo2req_usart_ptr->isr;
+    }
+
+    return result;
+}
 
 fsm_rt_t vsf_fifo2req_usart_enable(vsf_fifo2req_usart_t *fifo2req_usart_ptr)
 {
@@ -320,12 +336,13 @@ vsf_err_t vsf_fifo2req_usart_ctrl(vsf_fifo2req_usart_t *fifo2req_usart_ptr, vsf_
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-#define VSF_USART_CFG_IMP_PREFIX                      vsf_fifo2req
-#define VSF_USART_CFG_IMP_UPCASE_PREFIX               VSF_FIFO2REQ
-#define VSF_USART_CFG_IMP_EXTERN_OP                   ENABLED
-#define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
-#define VSF_USART_CFG_REIMPLEMENT_API_REQUEST         ENABLED
-#define VSF_USART_CFG_REIMPLEMENT_API_CTRL            ENABLED
+#define VSF_USART_CFG_IMP_PREFIX                        vsf_fifo2req
+#define VSF_USART_CFG_IMP_UPCASE_PREFIX                 VSF_FIFO2REQ
+#define VSF_USART_CFG_IMP_EXTERN_OP                     ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_REQUEST           ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_CTRL              ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #include "hal/driver/common/usart/usart_template.inc"
 
 #endif      // VSF_HAL_USE_USART
