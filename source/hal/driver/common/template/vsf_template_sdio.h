@@ -454,6 +454,7 @@ extern "C" {
 #define VSF_SDIO_APIS(__prefix_name)                                                                                                                                     \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, init,                 VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_cfg_t *cfg_ptr)         \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  sdio, fini,                 VSF_MCONNECT(__prefix_name, _t) *sdio_ptr)                                  \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, get_configuration,    VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_cfg_t *cfg_ptr)         \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  sdio, irq_enable,           VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)    \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  sdio, irq_disable,          VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)    \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_sdio_status_t,     sdio, status,               VSF_MCONNECT(__prefix_name, _t) *sdio_ptr)                                  \
@@ -883,6 +884,27 @@ extern vsf_err_t vsf_sdio_init(vsf_sdio_t *sdio_ptr, vsf_sdio_cfg_t *cfg_ptr);
 extern void vsf_sdio_fini(vsf_sdio_t *sdio_ptr);
 
 /**
+ * \~english
+ * @brief Get the current configuration of an SDIO instance
+ * @param[in] sdio_ptr: pointer to structure @ref vsf_sdio_t
+ * @param[out] cfg_ptr: pointer to configuration structure @ref vsf_sdio_cfg_t to store the current configuration
+ * @return vsf_err_t: VSF_ERR_NONE if successful, otherwise return error code
+ *
+ * @note This function retrieves the current SDIO configuration including mode and interrupt settings.
+ *       The SDIO instance should be initialized before calling this function.
+ *
+ * \~chinese
+ * @brief 获取 SDIO 实例的当前配置
+ * @param[in] sdio_ptr: 指向结构体 @ref vsf_sdio_t 的指针
+ * @param[out] cfg_ptr: 指向配置结构体 @ref vsf_sdio_cfg_t 的指针，用于存储当前配置
+ * @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，否则返回错误码
+ *
+ * @note 此函数检索当前 SDIO 配置，包括模式和中断设置。
+ *       调用此函数前应先初始化 SDIO 实例。
+ */
+extern vsf_err_t vsf_sdio_get_configuration(vsf_sdio_t *sdio_ptr, vsf_sdio_cfg_t *cfg_ptr);
+
+/**
  \~english
  @brief Enable interrupt masks of sdio instance.
  @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
@@ -1009,16 +1031,17 @@ extern vsf_err_t vsf_sdio_single_voltage(vsf_sdio_t *sdio_ptr, uint8_t bus_width
 /// @cond
 #if VSF_SDIO_CFG_FUNCTION_RENAME == ENABLED
 #   define __vsf_sdio_t                             VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_t)
-#   define vsf_sdio_init(__SDIO, ...)               VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_init)           ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
-#   define vsf_sdio_enable(__SDIO)                  VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_enable)         ((__vsf_sdio_t *)(__SDIO))
-#   define vsf_sdio_disable(__SDIO)                 VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_disable)        ((__vsf_sdio_t *)(__SDIO))
-#   define vsf_sdio_irq_enable(__SDIO, ...)         VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_irq_enable)     ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
-#   define vsf_sdio_irq_disable(__SDIO, ...)        VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_irq_disable)    ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
-#   define vsf_sdio_status(__SDIO)                  VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_status)         ((__vsf_sdio_t *)(__SDIO))
-#   define vsf_sdio_capability(__SDIO)              VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_capability)     ((__vsf_sdio_t *)(__SDIO))
-#   define vsf_sdio_set_clock(__SDIO, ...)          VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_set_clock)      ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
-#   define vsf_sdio_set_bus_width(__SDIO, ...)      VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_set_bus_width)  ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
-#   define vsf_sdio_host_request(__SDIO, ...)       VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_host_request)   ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_init(__SDIO, ...)               VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_init)               ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_get_configuration(__SDIO, ...)  VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_get_configuration)  ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_enable(__SDIO)                  VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_enable)             ((__vsf_sdio_t *)(__SDIO))
+#   define vsf_sdio_disable(__SDIO)                 VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_disable)            ((__vsf_sdio_t *)(__SDIO))
+#   define vsf_sdio_irq_enable(__SDIO, ...)         VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_irq_enable)         ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_irq_disable(__SDIO, ...)        VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_irq_disable)        ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_status(__SDIO)                  VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_status)             ((__vsf_sdio_t *)(__SDIO))
+#   define vsf_sdio_capability(__SDIO)              VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_capability)         ((__vsf_sdio_t *)(__SDIO))
+#   define vsf_sdio_set_clock(__SDIO, ...)          VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_set_clock)          ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_set_bus_width(__SDIO, ...)      VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_set_bus_width)      ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_host_request(__SDIO, ...)       VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_host_request)       ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
 #endif
 /// @endcond
 

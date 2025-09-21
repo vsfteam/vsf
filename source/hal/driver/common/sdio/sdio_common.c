@@ -114,4 +114,14 @@ vsf_err_t vsf_sdio_host_request(vsf_sdio_t *sdio_ptr, vsf_sdio_req_t *req)
     return sdio_ptr->op->host_request(sdio_ptr, req);
 }
 
+vsf_err_t vsf_sdio_get_configuration(vsf_sdio_t *sdio_ptr, vsf_sdio_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(sdio_ptr != NULL);
+    VSF_HAL_ASSERT(sdio_ptr->op != NULL);
+    VSF_HAL_ASSERT(sdio_ptr->op->get_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return sdio_ptr->op->get_configuration(sdio_ptr, cfg_ptr);
+}
+
 #endif      // VSF_HAL_USE_SDIO && VSF_SDIO_CFG_MULTI_CLASS

@@ -107,6 +107,23 @@ void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_fini)(
     VSF_HAL_ASSERT(sdio_ptr != NULL);
 }
 
+vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_configuration)(
+    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr,
+    vsf_sdio_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != sdio_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current SDIO configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = sdio_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
+}
+
 void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_irq_enable)(
     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr,
     vsf_sdio_irq_mask_t irq_mask
@@ -215,6 +232,7 @@ static void VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_irqhandler)(
  */
 
 #define VSF_SDIO_CFG_REIMPLEMENT_API_CAPABILITY         ENABLED
+#define VSF_SDIO_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 
 // HW
 #define VSF_SDIO_CFG_IMP_LV0(__IDX, __HAL_OP)                                   \
