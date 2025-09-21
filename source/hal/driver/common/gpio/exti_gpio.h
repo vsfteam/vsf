@@ -67,6 +67,13 @@ typedef struct vsf_gpio_irq_distributor_t {
     vsf_gpio_irq_distributor_irq_t *exti_irq;
 } vsf_gpio_irq_distributor_t;
 
+typedef struct vsf_exti_gpio_t {
+#if VSF_EXTI_GPIO_CFG_MULTI_CLASS == ENABLED
+    vsf_gpio_t              vsf_gpio;
+#endif
+vsf_gpio_irq_distributor_t  irq_cfg;
+} vsf_exti_gpio_t;
+
 /*============================ INCLUDES ======================================*/
 
 #define VSF_GPIO_CFG_DEC_PREFIX              vsf_exti
@@ -75,11 +82,6 @@ typedef struct vsf_gpio_irq_distributor_t {
 #include "hal/driver/common/gpio/gpio_template.h"
 
 /*============================ PROTOTYPES ====================================*/
-
-extern vsf_err_t vsf_gpio_irq_distributor_pin_config(
-    vsf_gpio_irq_distributor_t *hw_exti_gpio_ptr, vsf_gpio_pin_mask_t pin_mask,
-    vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr);
-
 /*============================ IMPLEMENTATION ================================*/
 
 #endif
