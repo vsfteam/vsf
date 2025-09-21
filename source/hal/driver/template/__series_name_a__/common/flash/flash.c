@@ -103,6 +103,23 @@ void VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_fini)(
     VSF_HAL_ASSERT(flash_ptr != NULL);
 }
 
+vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_get_configuration)(
+    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr,
+    vsf_flash_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != flash_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current FLASH configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = flash_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
+}
+
 fsm_rt_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_enable)(
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr
 ) {
@@ -215,11 +232,12 @@ static void VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(
  */
 
 // only define in source file
-#define VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
-#define VSF_FLASH_CFG_ERASE_ALL_TEMPLATE            ENABLED
-#define VSF_FLASH_CFG_ERASE_ONE_SECTOR_TEMPLATE     ENABLED
-#define VSF_FLASH_CFG_WRITE_ONE_SECTOR_TEMPLATE     ENABLED
-#define VSF_FLASH_CFG_READ_ONE_SECTOR_TEMPLATE      ENABLED
+#define VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
+#define VSF_FLASH_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
+#define VSF_FLASH_CFG_ERASE_ALL_TEMPLATE                ENABLED
+#define VSF_FLASH_CFG_ERASE_ONE_SECTOR_TEMPLATE         ENABLED
+#define VSF_FLASH_CFG_WRITE_ONE_SECTOR_TEMPLATE         ENABLED
+#define VSF_FLASH_CFG_READ_ONE_SECTOR_TEMPLATE          ENABLED
 
 #define VSF_FLASH_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t)                            \

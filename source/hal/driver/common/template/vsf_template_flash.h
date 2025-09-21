@@ -169,7 +169,8 @@ extern "C" {
 
 #define VSF_FLASH_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, init,                  VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_cfg_t *cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   flash, fini,                  VSF_MCONNECT(__prefix_name, _t) *flash_ptrr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   flash, fini,                  VSF_MCONNECT(__prefix_name, _t) *flash_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, get_configuration,     VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               flash, enable,                VSF_MCONNECT(__prefix_name, _t) *flash_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               flash, disable,               VSF_MCONNECT(__prefix_name, _t) *flash_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_flash_status_t,     flash, status,                VSF_MCONNECT(__prefix_name, _t) *flash_ptr) \
@@ -328,6 +329,25 @@ extern vsf_err_t vsf_flash_init(vsf_flash_t *flash_ptr, vsf_flash_cfg_t *cfg_ptr
  @return 无
  */
 extern void vsf_flash_fini(vsf_flash_t *flash_ptr);
+
+/**
+ * \~english
+ * @brief Get current configuration of a FLASH instance
+ * @param[in] flash_ptr Pointer to FLASH instance
+ * @param[out] cfg_ptr Pointer to FLASH configuration structure to store current settings
+ * @return vsf_err_t VSF_ERR_NONE if successful, otherwise an error code
+ *
+ * @note This function retrieves the current configuration of the FLASH instance
+ *
+ * \~chinese
+ * @brief 获取 FLASH 实例的当前配置
+ * @param[in] flash_ptr FLASH 实例指针
+ * @param[out] cfg_ptr 用于存储当前设置的 FLASH 配置结构体指针
+ * @return vsf_err_t 成功返回 VSF_ERR_NONE，否则返回错误码
+ *
+ * @note 此函数获取 FLASH 实例的当前配置
+ */
+extern vsf_err_t vsf_flash_get_configuration(vsf_flash_t *flash_ptr, vsf_flash_cfg_t *cfg_ptr);
 
 /**
  \~english
@@ -565,6 +585,7 @@ extern vsf_err_t vsf_flash_read_multi_sector(vsf_flash_t *flash_ptr,
 #   define __vsf_flash_t                              VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_t)
 #   define vsf_flash_init(__FLASH, ...)               VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_init)               ((__vsf_flash_t *)(__FLASH), ##__VA_ARGS__)
 #   define vsf_flash_fini(__FLASH)                    VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_fini)               ((__vsf_flash_t *)(__FLASH))
+#   define vsf_flash_get_configuration(__FLASH, ...)  VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_get_configuration)  ((__vsf_flash_t *)(__FLASH), ##__VA_ARGS__)
 #   define vsf_flash_enable(__FLASH)                  VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_enable)             ((__vsf_flash_t *)(__FLASH))
 #   define vsf_flash_disable(__FLASH)                 VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_disable)            ((__vsf_flash_t *)(__FLASH))
 #   define vsf_flash_capability(__FLASH)              VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_capability)         ((__vsf_flash_t *)(__FLASH))
