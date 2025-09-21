@@ -57,6 +57,12 @@ void vsf_remapped_sdio_fini(vsf_remapped_sdio_t *sdio)
     vsf_sdio_fini(sdio->target);
 }
 
+vsf_err_t vsf_remapped_sdio_get_configuration(vsf_remapped_sdio_t *sdio, vsf_sdio_cfg_t *cfg)
+{
+    VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
+    return vsf_sdio_get_configuration(sdio->target, cfg);
+}
+
 void vsf_remapped_sdio_irq_enable(vsf_remapped_sdio_t *sdio, vsf_sdio_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
