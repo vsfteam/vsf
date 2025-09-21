@@ -199,7 +199,7 @@ vsf_err_t vsf_real_dac_get_configuration(vsf_real_dac_t *dac_ptr, vsf_dac_cfg_t 
             return vsf_remap_dac_channel_request((vsf_remap_dac_t *)dac, buffer, count);                \
         }                                                                                               \
                                                                                                         \
-        vsf_err_t vsf_imp_dac_get_configuration(vsf_imp_dac_t *dac, vsf_dac_cfg_t *cfg)                \
+        vsf_err_t vsf_imp_dac_get_configuration(vsf_imp_dac_t *dac, vsf_dac_cfg_t *cfg)                 \
         {                                                                                               \
             VSF_HAL_ASSERT(dac != NULL);                                                                \
             return vsf_remap_dac_get_configuration((vsf_remap_dac_t *)dac, cfg);                        \

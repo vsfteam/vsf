@@ -347,7 +347,7 @@ vsf_err_t vsf_real_timer_get_configuration(vsf_real_timer_t *timer_ptr, vsf_time
             vsf_remap_timer_ctrl(timer_ptr, ctrl_bit, level);                                                         \
         }                                                                                                             \
                                                                                                                       \
-        vsf_err_t vsf_imp_timer_get_configuration(vsf_imp_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr)              \
+        vsf_err_t vsf_imp_timer_get_configuration(vsf_imp_timer_t *timer_ptr, vsf_timer_cfg_t *cfg_ptr)               \
         {                                                                                                             \
             VSF_HAL_ASSERT(timer_ptr != NULL);                                                                        \
             return vsf_remap_timer_get_configuration(timer_ptr, cfg_ptr);                                             \
