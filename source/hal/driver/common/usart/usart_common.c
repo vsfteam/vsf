@@ -53,6 +53,16 @@ void vsf_usart_fini(vsf_usart_t *usart_ptr)
     usart_ptr->op->fini(usart_ptr);
 }
 
+vsf_err_t vsf_usart_get_configuration(vsf_usart_t *usart_ptr, vsf_usart_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(usart_ptr != NULL);
+    VSF_HAL_ASSERT(usart_ptr->op != NULL);
+    VSF_HAL_ASSERT(usart_ptr->op->get_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return usart_ptr->op->get_configuration(usart_ptr, cfg_ptr);
+}
+
 fsm_rt_t vsf_usart_enable(vsf_usart_t *usart_ptr)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
