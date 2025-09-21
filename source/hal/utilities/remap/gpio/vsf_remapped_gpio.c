@@ -93,6 +93,12 @@ vsf_gpio_pin_mask_t vsf_remapped_gpio_read(vsf_remapped_gpio_t *gpio)
     return vsf_gpio_read(gpio->target);
 }
 
+vsf_gpio_pin_mask_t vsf_remapped_gpio_read_output_register(vsf_remapped_gpio_t *gpio)
+{
+    VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));
+    return vsf_gpio_read_output_register(gpio->target);
+}
+
 void vsf_remapped_gpio_write(vsf_remapped_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t value)
 {
     VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));

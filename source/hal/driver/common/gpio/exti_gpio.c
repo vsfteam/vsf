@@ -184,6 +184,14 @@ vsf_gpio_pin_mask_t vsf_exti_gpio_read(vsf_exti_gpio_t *exti_gpio_ptr)
     return vsf_gpio_read(exti_gpio_ptr->irq_cfg.gpio);
 }
 
+vsf_gpio_pin_mask_t vsf_exti_gpio_read_output_register(vsf_exti_gpio_t *exti_gpio_ptr)
+{
+    VSF_HAL_ASSERT(exti_gpio_ptr != NULL);
+    VSF_HAL_ASSERT(exti_gpio_ptr->irq_cfg.gpio != NULL);
+
+    return vsf_gpio_read_output_register(exti_gpio_ptr->irq_cfg.gpio);
+}
+
 void vsf_exti_gpio_write(vsf_exti_gpio_t *exti_gpio_ptr,
                         vsf_gpio_pin_mask_t pin_mask,
                         vsf_gpio_pin_mask_t value)
