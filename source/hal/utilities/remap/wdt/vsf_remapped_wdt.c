@@ -57,6 +57,12 @@ void vsf_remapped_wdt_fini(vsf_remapped_wdt_t *wdt)
     vsf_wdt_fini(wdt->target);
 }
 
+vsf_err_t vsf_remapped_wdt_get_configuration(vsf_remapped_wdt_t *wdt, vsf_wdt_cfg_t *cfg)
+{
+    VSF_HAL_ASSERT((wdt != NULL) && (wdt->target != NULL));
+    return vsf_wdt_get_configuration(wdt->target, cfg);
+}
+
 vsf_wdt_capability_t vsf_remapped_wdt_capability(vsf_remapped_wdt_t *wdt)
 {
     VSF_HAL_ASSERT((wdt != NULL) && (wdt->target != NULL));
