@@ -170,5 +170,15 @@ vsf_err_t vsf_flash_read_multi_sector(vsf_flash_t *flash_ptr, uint_fast32_t offs
     return flash_ptr->op->read_multi_sector(flash_ptr, offset, buffer, size);
 }
 
+vsf_err_t vsf_flash_get_configuration(vsf_flash_t *flash_ptr, vsf_flash_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(flash_ptr != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op->get_configuration != NULL);
+    VSF_HAL_ASSERT(cfg_ptr != NULL);
+
+    return flash_ptr->op->get_configuration(flash_ptr, cfg_ptr);
+}
+
 #endif /* VSF_FLASH_CFG_MULTI_CLASS == ENABLED */
 #endif /* VSF_HAL_USE_FLASH == ENABLED */
