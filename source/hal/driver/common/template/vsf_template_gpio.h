@@ -292,6 +292,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_set,          VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, output_and_clear,        VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_config,         VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)                              \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_get_configuration, VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_enable,         VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_disable,        VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 
@@ -1161,6 +1162,21 @@ extern vsf_err_t vsf_gpio_exti_irq_config(vsf_gpio_t *gpio_ptr, vsf_gpio_exti_ir
 
 /**
  \~english
+ @brief Get the current external interrupt configuration of the gpio instance
+ @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
+ @param[out] cfg_ptr: a pointer to structure @ref vsf_gpio_exti_irq_cfg_t to store the current configuration
+ @return vsf_err_t: VSF_ERR_NONE if successful, or a negative error code
+
+ \~chinese
+ @brief 获取 gpio 实例的当前外部中断配置
+ @param[in] gpio_ptr: 指向结构体 @ref vsf_gpio_t 的指针
+ @param[out] cfg_ptr: 指向结构体 @ref vsf_gpio_exti_irq_cfg_t 的指针，用于存储当前配置
+ @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，失败返回负数
+ */
+extern vsf_err_t vsf_gpio_exti_irq_get_configuration(vsf_gpio_t *gpio_ptr, vsf_gpio_exti_irq_cfg_t *cfg_ptr);
+
+/**
+ \~english
  @brief Enable interrupt of one or more pins
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
  @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the bit
@@ -1239,6 +1255,7 @@ static inline vsf_err_t vsf_gpio_port_config_pin(vsf_gpio_t      *gpio_ptr,
 #   define vsf_gpio_output_and_clear(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_output_and_clear)       ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_toggle(__GPIO, ...)                 VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_toggle)                 ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_exti_irq_config(__GPIO, ...)        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_config)        ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
+#   define vsf_gpio_exti_irq_get_configuration(__GPIO, ...) VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_get_configuration) ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_exti_irq_enable(__GPIO, ...)        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_enable)        ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_exti_irq_disable(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_disable)       ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #endif

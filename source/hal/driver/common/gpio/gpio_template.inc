@@ -99,6 +99,10 @@
 #   define  VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY             DISABLED
 #endif
 
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION DISABLED
+#endif
+
 #ifdef VSF_GPIO_CFG_IMP_REMAP_PREFIX
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_SET_INPUT
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_SET_OUTPUT
@@ -110,6 +114,7 @@
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY
+#   undef VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_SET_INPUT               ENABLED
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_SET_OUTPUT              ENABLED
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_SWITCH_DIRECTION        ENABLED
@@ -120,6 +125,7 @@
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION   ENABLED
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER    ENABLED
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY              ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION ENABLED
 #endif
 
 #if VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -156,6 +162,7 @@
 #define vsf_real_gpio_output_and_set    VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_output_and_set)
 #define vsf_real_gpio_output_and_clear  VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_output_and_clear)
 #define vsf_real_gpio_capability        VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_capability)
+#define vsf_real_gpio_exti_irq_get_configuration VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_exti_irq_get_configuration)
 #define vsf_real_gpio_port_config_pin   VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_port_config_pin)
 #define vsf_real_gpio_ports_config_pin  VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_ports_config_pin)
 #define vsf_real_gpio_ports_config_pins VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_ports_config_pins)
@@ -298,6 +305,19 @@ vsf_gpio_capability_t vsf_real_gpio_capability(vsf_real_gpio_t *gpio_ptr)
 }
 #endif
 
+#if VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION == DISABLED
+vsf_err_t vsf_real_gpio_exti_irq_get_configuration(vsf_real_gpio_t *gpio_ptr, vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)
+{
+    VSF_HAL_ASSERT(NULL != gpio_ptr);
+    VSF_HAL_ASSERT(NULL != irq_cfg_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
 #if VSF_GPIO_CFG_REIMPLEMENT_API_PORTS_CONFIG_PIN == DISABLED
 vsf_err_t vsf_real_gpio_ports_config_pin(vsf_gpio_port_cfg_pin_t *cfg_ptr,
                                          uint_fast8_t             count)
@@ -361,6 +381,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_PORTS_CONFIG_PIN
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_PORTS_CONFIG_PINS
 #undef VSF_GPIO_CFG_CHANGE_DIR_FIRST
@@ -386,6 +407,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef vsf_real_gpio_output_and_set
 #undef vsf_real_gpio_output_and_clear
 #undef vsf_real_gpio_capability
+#undef vsf_real_gpio_exti_irq_get_configuration
 
 /*============================ MACROS ========================================*/
 
