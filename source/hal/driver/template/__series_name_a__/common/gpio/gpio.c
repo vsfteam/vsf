@@ -170,15 +170,6 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_get_configuration
 
     // For template implementation, return a default configuration
     // In a real implementation, this should retrieve the actual hardware configuration
-    *cfg_ptr = (vsf_gpio_exti_irq_cfg_t) {
-        .pin_mask = 0x0001,  // Default to pin 0
-        .mode = VSF_GPIO_EXTI_ON_RISING,
-        .isr = {
-            .handler_fn = NULL,
-            .target_ptr = NULL,
-            .prio       = vsf_arch_prio_0,
-        },
-    };
 
     return VSF_ERR_NONE;
 }
@@ -285,6 +276,7 @@ vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
 /*============================ INCLUDES ======================================*/
 
 #define VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION  ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER   ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET         ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR       ENABLED

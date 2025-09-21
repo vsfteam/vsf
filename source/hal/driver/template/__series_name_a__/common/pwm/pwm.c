@@ -113,10 +113,6 @@ vsf_err_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_configuration)(
     // TODO: Implement hardware-specific configuration reading
     // Read current PWM configuration from hardware registers
 
-    // Template implementation returns default configuration
-    cfg_ptr->isr = pwm_ptr->isr;
-    // Add other configuration fields as needed
-
     return VSF_ERR_NONE;
 }
 
