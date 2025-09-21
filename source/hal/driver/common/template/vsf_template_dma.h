@@ -230,10 +230,12 @@ extern "C" {
 #define VSF_DMA_APIS(__prefix_name) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, init,                               VSF_MCONNECT(__prefix_name, _t) *dma_ptr, vsf_dma_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, fini,                               VSF_MCONNECT(__prefix_name, _t) *dma_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, get_configuration,                  VSF_MCONNECT(__prefix_name, _t) *dma_ptr, vsf_dma_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_capability_t,     dma, capability,                         VSF_MCONNECT(__prefix_name, _t) *dma_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, int8_t,                   dma, channel_request,                    VSF_MCONNECT(__prefix_name, _t) *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, channel_release,                    VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_config,                     VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_get_configuration,          VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_start,                      VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, uint32_t src_address, uint32_t dst_address, uint32_t count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_cancel,                     VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_sg_config_desc,             VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_isr_t isr, vsf_dma_channel_sg_desc_t *scatter_gather_cfg, uint32_t sg_count) \
@@ -539,6 +541,21 @@ extern void vsf_dma_fini(vsf_dma_t *dma_ptr);
 
 /**
  \~english
+ @brief Get the current configuration of DMA instance
+ @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
+ @param[out] cfg_ptr: a pointer to structure @ref vsf_dma_cfg_t to store the current configuration
+ @return vsf_err_t: VSF_ERR_NONE if successful, otherwise returns error code
+
+ \~chinese
+ @brief 获取 DMA 实例的当前配置
+ @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
+ @param[out] cfg_ptr: 指向结构体 @ref vsf_dma_cfg_t 的指针，用于存储当前配置
+ @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，否则返回错误码
+ */
+extern vsf_err_t vsf_dma_get_configuration(vsf_dma_t *dma_ptr, vsf_dma_cfg_t *cfg_ptr);
+
+/**
+ \~english
  @brief Get the capabilities of DMA instance
  @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
  @return vsf_dma_capability_t: All capabilities of current DMA @ref vsf_dma_capability_t
@@ -599,6 +616,23 @@ extern void vsf_dma_channel_release(vsf_dma_t *dma_ptr, uint8_t channel);
         这两组API不能混用，只有在当前DMA传输完全结束后，才能切换到另一组API使用。
  */
 extern vsf_err_t vsf_dma_channel_config(vsf_dma_t *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr);
+
+/**
+ \~english
+ @brief Get the current configuration of a DMA channel
+ @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
+ @param[in] channel: channel number
+ @param[out] cfg_ptr: a pointer to structure @ref vsf_dma_channel_cfg_t to store the current configuration
+ @return vsf_err_t: VSF_ERR_NONE if successful, otherwise returns error code
+
+ \~chinese
+ @brief 获取 DMA 通道的当前配置
+ @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
+ @param[in] channel: 通道序号
+ @param[out] cfg_ptr: 指向结构体 @ref vsf_dma_channel_cfg_t 的指针，用于存储当前配置
+ @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，否则返回错误码
+ */
+extern vsf_err_t vsf_dma_channel_get_configuration(vsf_dma_t *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr);
 
 /**
  * \~english
@@ -727,10 +761,12 @@ extern vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr, uint8
 #   define __vsf_dma_t                                              VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_t)
 #   define vsf_dma_init(__DMA, ...)                                 VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_init)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_fini(__DMA)                                      VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_fini)((__vsf_dma_t *)(__DMA))
+#   define vsf_dma_get_configuration(__DMA, ...)                    VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_get_configuration)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_capability(__DMA)                                VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_capability)((__vsf_dma_t *)(__DMA))
 #   define vsf_dma_channel_request(__DMA, ...)                      VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_request)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_release(__DMA, ...)                      VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_release)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_config(__DMA, ...)                       VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_config)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_get_configuration(__DMA, ...)            VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_get_configuration)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_start(__DMA, ...)                        VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_start)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_sg_config_desc(__DMA, ...)               VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_sg_config_desc)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_sg_start(__DMA, ...)                     VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_sg_start)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)

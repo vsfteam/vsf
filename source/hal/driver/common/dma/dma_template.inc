@@ -22,6 +22,8 @@
 
 #define vsf_real_dma_t                                      VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t)
 #define vsf_real_dma_capability                             VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_capability)
+#define vsf_real_dma_get_configuration                      VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_get_configuration)
+#define vsf_real_dma_channel_get_configuration              VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_get_configuration)
 #define vsf_real_dma_channel_sg_config_desc                 VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_sg_config_desc)
 #define vsf_real_dma_channel_sg_start                       VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_sg_start)
 
@@ -37,9 +39,21 @@
 #   define VSF_DMA_CFG_REIMPLEMENT_API_SG_START             DISABLED
 #endif
 
+#ifndef VSF_DMA_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#   define VSF_DMA_CFG_REIMPLEMENT_API_GET_CONFIGURATION    DISABLED
+#endif
+
+#ifndef VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION
+#   define VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION DISABLED
+#endif
+
 #ifdef VSF_DMA_CFG_IMP_REMAP_PREFIX
 #   undef VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY
 #   define VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY           ENABLED
+#   undef VSF_DMA_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#   define VSF_DMA_CFG_REIMPLEMENT_API_GET_CONFIGURATION    ENABLED
+#   undef VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION
+#   define VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION ENABLED
 #endif
 
 #if VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -101,14 +115,44 @@ vsf_err_t vsf_real_dma_channel_sg_start(vsf_real_dma_t *dma_ptr, uint8_t channel
 }
 #endif
 
+#if VSF_DMA_CFG_REIMPLEMENT_API_GET_CONFIGURATION == DISABLED
+vsf_err_t vsf_real_dma_get_configuration(vsf_real_dma_t *dma_ptr, vsf_dma_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(NULL != dma_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION == DISABLED
+vsf_err_t vsf_real_dma_channel_get_configuration(vsf_real_dma_t *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT(NULL != dma_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_DMA_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#undef VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION
 #undef VSF_DMA_CFG_CAPABILITY_IRQ_MASK
 #undef VSF_DMA_CFG_CAPABILITY_MAX_REQUEST_COUNT
 #undef VSF_DMA_CFG_CAPABILITY_CHANNEL_COUNT
 #undef vsf_real_dma_t
 #undef vsf_real_dma_capability
+#undef vsf_real_dma_get_configuration
+#undef vsf_real_dma_channel_get_configuration
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -119,10 +163,12 @@ vsf_err_t vsf_real_dma_channel_sg_start(vsf_real_dma_t *dma_ptr, uint8_t channel
 #   define vsf_imp_dma_t                                VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t)
 #   define vsf_imp_dma_init                             VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_init)
 #   define vsf_imp_dma_fini                             VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_fini)
+#   define vsf_imp_dma_get_configuration                VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_get_configuration)
 #   define vsf_imp_dma_capability                       VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_capability)
 #   define vsf_imp_dma_channel_request                  VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_request)
 #   define vsf_imp_dma_channel_release                  VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_release)
 #   define vsf_imp_dma_channel_config                   VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_config)
+#   define vsf_imp_dma_channel_get_configuration        VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_get_configuration)
 #   define vsf_imp_dma_channel_start                    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_start)
 #   define vsf_imp_dma_channel_cancel                   VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_cancel)
 #   define vsf_imp_dma_channel_get_transferred_count    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_get_transferred_count)
@@ -131,10 +177,12 @@ vsf_err_t vsf_real_dma_channel_sg_start(vsf_real_dma_t *dma_ptr, uint8_t channel
 #   define vsf_remap_dma_t                              VSF_MCONNECT(VSF_DMA_CFG_IMP_REMAP_PREFIX, _dma_t)
 #   define vsf_remap_dma_init                           VSF_MCONNECT(VSF_DMA_CFG_IMP_REMAP_PREFIX, _dma_init)
 #   define vsf_remap_dma_fini                           VSF_MCONNECT(VSF_DMA_CFG_IMP_REMAP_PREFIX, _dma_fini)
+#   define vsf_remap_dma_get_configuration              VSF_MCONNECT(VSF_DMA_CFG_IMP_REMAP_PREFIX, _dma_get_configuration)
 #   define vsf_remap_dma_capability                     VSF_MCONNECT(VSF_DMA_CFG_IMP_REMAP_PREFIX, _dma_capability)
 #   define vsf_remap_dma_channel_request                VSF_MCONNECT(VSF_DMA_CFG_IMP_REMAP_PREFIX, _dma_channel_request)
 #   define vsf_remap_dma_channel_release                VSF_MCONNECT(VSF_DMA_CFG_IMP_REMAP_PREFIX, _dma_channel_release)
 #   define vsf_remap_dma_channel_config                 VSF_MCONNECT(VSF_DMA_CFG_IMP_REMAP_PREFIX, _dma_channel_config)
+#   define vsf_remap_dma_channel_get_configuration      VSF_MCONNECT(VSF_DMA_CFG_IMP_REMAP_PREFIX, _dma_channel_get_configuration)
 #   define vsf_remap_dma_channel_start                  VSF_MCONNECT(VSF_DMA_CFG_IMP_REMAP_PREFIX, _dma_channel_start)
 #   define vsf_remap_dma_channel_cancel                 VSF_MCONNECT(VSF_DMA_CFG_IMP_REMAP_PREFIX, _dma_channel_cancel)
 #   define vsf_remap_dma_channel_get_transferred_count  VSF_MCONNECT(VSF_DMA_CFG_IMP_REMAP_PREFIX, _dma_channel_get_transferred_count)
@@ -150,6 +198,12 @@ vsf_err_t vsf_real_dma_channel_sg_start(vsf_real_dma_t *dma_ptr, uint8_t channel
         {                                                                               \
             VSF_HAL_ASSERT(dma_ptr != NULL);                                            \
             vsf_remap_dma_fini(dma_ptr);                                                \
+        }                                                                               \
+        vsf_err_t vsf_imp_dma_get_configuration(vsf_imp_dma_t *dma_ptr, vsf_dma_cfg_t *cfg_ptr) \
+        {                                                                               \
+            VSF_HAL_ASSERT(dma_ptr != NULL);                                            \
+            VSF_HAL_ASSERT(cfg_ptr != NULL);                                            \
+            return vsf_remap_dma_get_configuration(dma_ptr, cfg_ptr);                   \
         }                                                                               \
         vsf_dma_capability_t vsf_imp_dma_capability(vsf_imp_dma_t *dma_ptr)             \
         {                                                                               \
@@ -171,6 +225,13 @@ vsf_err_t vsf_real_dma_channel_sg_start(vsf_real_dma_t *dma_ptr, uint8_t channel
         {                                                                               \
             VSF_HAL_ASSERT(dma_ptr != NULL);                                            \
             return vsf_remap_dma_channel_config(dma_ptr, channel, cfg_ptr);             \
+        }                                                                               \
+        vsf_err_t vsf_imp_dma_channel_get_configuration(vsf_imp_dma_t *dma_ptr, int8_t channel, \
+                                                        vsf_dma_channel_cfg_t *cfg_ptr) \
+        {                                                                               \
+            VSF_HAL_ASSERT(dma_ptr != NULL);                                            \
+            VSF_HAL_ASSERT(cfg_ptr != NULL);                                            \
+            return vsf_remap_dma_channel_get_configuration(dma_ptr, channel, cfg_ptr);  \
         }                                                                               \
         vsf_err_t vsf_imp_dma_channel_start(vsf_imp_dma_t *dma_ptr, int8_t channel,     \
                                             uint32_t src_address, uint32_t dst_address, \
@@ -236,10 +297,12 @@ vsf_err_t vsf_real_dma_channel_sg_start(vsf_real_dma_t *dma_ptr, uint8_t channel
 #undef vsf_imp_dma_t
 #undef vsf_imp_dma_init
 #undef vsf_imp_dma_fini
+#undef vsf_imp_dma_get_configuration
 #undef vsf_imp_dma_capability
 #undef vsf_imp_dma_channel_request
 #undef vsf_imp_dma_channel_release
 #undef vsf_imp_dma_channel_config
+#undef vsf_imp_dma_channel_get_configuration
 #undef vsf_imp_dma_channel_start
 #undef vsf_imp_dma_channel_cancel
 #undef vsf_imp_dma_channel_get_transferred_count
@@ -248,10 +311,12 @@ vsf_err_t vsf_real_dma_channel_sg_start(vsf_real_dma_t *dma_ptr, uint8_t channel
 #undef vsf_remap_dma_t
 #undef vsf_remap_dma_init
 #undef vsf_remap_dma_fini
+#undef vsf_remap_dma_get_configuration
 #undef vsf_remap_dma_capability
 #undef vsf_remap_dma_channel_request
 #undef vsf_remap_dma_channel_release
 #undef vsf_remap_dma_channel_config
+#undef vsf_remap_dma_channel_get_configuration
 #undef vsf_remap_dma_channel_start
 #undef vsf_remap_dma_channel_cancel
 #undef vsf_remap_dma_channel_get_transferred_count

@@ -57,6 +57,12 @@ void vsf_remapped_dma_fini(vsf_remapped_dma_t *dma)
     vsf_dma_fini(dma->target);
 }
 
+vsf_err_t vsf_remapped_dma_get_configuration(vsf_remapped_dma_t *dma, vsf_dma_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT((dma != NULL) && (dma->target != NULL));
+    return vsf_dma_get_configuration(dma->target, cfg_ptr);
+}
+
 vsf_dma_capability_t vsf_remapped_dma_capability(vsf_remapped_dma_t *dma)
 {
     VSF_HAL_ASSERT((dma != NULL) && (dma->target != NULL));
@@ -80,6 +86,13 @@ vsf_err_t vsf_remapped_dma_channel_config(vsf_remapped_dma_t *dma, uint8_t chann
 {
     VSF_HAL_ASSERT((dma != NULL) && (dma->target != NULL));
     return vsf_dma_channel_config(dma->target, channel, cfg_ptr);
+}
+
+vsf_err_t vsf_remapped_dma_channel_get_configuration(vsf_remapped_dma_t *dma, uint8_t channel,
+                                                    vsf_dma_channel_cfg_t *cfg_ptr)
+{
+    VSF_HAL_ASSERT((dma != NULL) && (dma->target != NULL));
+    return vsf_dma_channel_get_configuration(dma->target, channel, cfg_ptr);
 }
 
 vsf_err_t vsf_remapped_dma_channel_start(vsf_remapped_dma_t *dma, uint8_t channel,
