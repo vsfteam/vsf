@@ -284,6 +284,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set_output,              VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, switch_direction,        VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_gpio_pin_mask_t,   gpio, read,                    VSF_MCONNECT(__prefix_name, _t) *gpio_ptr)                                                                    \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_gpio_pin_mask_t,   gpio, read_output_register,    VSF_MCONNECT(__prefix_name, _t) *gpio_ptr)                                                                    \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, write,                   VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t value)           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set,                     VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, clear,                   VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
@@ -997,14 +998,39 @@ extern void vsf_gpio_switch_direction(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t 
  \~english
  @brief Read the values of all pins of the gpio instance
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
- @return vsf_gpio_pin_mask_t: Value of all pins, 1 for output, 0 for input
+ @return vsf_gpio_pin_mask_t: Value of all pins, 1 for high level, 0 for low level
+ @note This function reads the actual pin levels (input values). For pins configured as
+       output, this may differ from the output register value if the pin is driven
+       externally or has hardware issues.
 
  \~chinese
  @brief 读取 gpio 实例的所有引脚的值
  @param[in] gpio_ptr: 指向结构体 @ref vsf_gpio_t 的指针
- @return vsf_gpio_pin_mask_t: 所有引脚的值，1 表示输出，0 表示输入
+ @return vsf_gpio_pin_mask_t: 所有引脚的值，1 表示高电平，0 表示低电平
+ @note 此函数读取引脚的实际电平值（输入值）。对于配置为输出的引脚，如果引脚被外部驱动
+       或存在硬件问题，此值可能与输出寄存器值不同。
  */
 extern vsf_gpio_pin_mask_t vsf_gpio_read(vsf_gpio_t *gpio_ptr);
+
+/**
+ \~english
+ @brief Read the output register values of all pins of the gpio instance
+ @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
+ @return vsf_gpio_pin_mask_t: Output register values of all pins, 1 for high, 0 for low
+ @note This function reads the output register values, which represent what the GPIO
+       controller is trying to drive on the pins. This is different from vsf_gpio_read()
+       which reads the actual pin levels. For output pins, this shows the intended output
+       state regardless of external conditions.
+
+ \~chinese
+ @brief 读取 gpio 实例的所有引脚的输出寄存器值
+ @param[in] gpio_ptr: 指向结构体 @ref vsf_gpio_t 的指针
+ @return vsf_gpio_pin_mask_t: 所有引脚的输出寄存器值，1 表示高电平，0 表示低电平
+ @note 此函数读取输出寄存器值，表示 GPIO 控制器试图在引脚上驱动的值。这与 vsf_gpio_read()
+       不同，后者读取引脚的实际电平值。对于输出引脚，此函数显示预期的输出状态，
+       不受外部条件影响。
+ */
+extern vsf_gpio_pin_mask_t vsf_gpio_read_output_register(vsf_gpio_t *gpio_ptr);
 
 /**
  \~english
@@ -1205,6 +1231,7 @@ static inline vsf_err_t vsf_gpio_port_config_pin(vsf_gpio_t      *gpio_ptr,
 #   define vsf_gpio_set_output(__GPIO, ...)             VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set_output)             ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_switch_direction(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_switch_direction)       ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_read(__GPIO)                        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_read)                   ((__vsf_gpio_t *)(__GPIO))
+#   define vsf_gpio_read_output_register(__GPIO)        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_read_output_register)   ((__vsf_gpio_t *)(__GPIO))
 #   define vsf_gpio_write(__GPIO, ...)                  VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_write)                  ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_set(__GPIO, ...)                    VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_set)                    ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_clear(__GPIO, ...)                  VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_clear)                  ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)

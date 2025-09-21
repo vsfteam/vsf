@@ -107,6 +107,18 @@ vsf_gpio_pin_mask_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_read)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
+    // TODO: Read actual pin levels from input data register (IDR)
+    // Example: return gpio_ptr->registers->IDR;
+    return 0;
+}
+
+vsf_gpio_pin_mask_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_read_output_register)(
+    VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr
+) {
+    VSF_HAL_ASSERT(NULL != gpio_ptr);
+    // TODO: Read output register values from output data register (ODR)
+    // This reads what the GPIO controller is trying to drive, not the actual pin levels
+    // Example: return gpio_ptr->registers->ODR;
     return 0;
 }
 
@@ -188,6 +200,10 @@ static void VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_irqhandler)(
  *      VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION for gpio_get_pin_configuration.
  *          Default implementation will assert(false) to indicate the feature is not implemented.
  *          Hardware drivers should implement this to read actual pin configuration from registers.
+ *      VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER for gpio_read_output_register.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ *          Hardware drivers should implement this to read output register values (ODR).
+ *          This is different from gpio_read which reads actual pin levels (IDR).
  *      VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET for gpio_output_and_set, *** glitchless ***
  *          If VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET is 0, default implementation will assert(false).
  *          If VSF_GPIO_CFG_CHANGE_DIR_FIRST is ENABLED, default implementation will call gpio_set_output and then gpio_clear.
@@ -247,6 +263,7 @@ vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
 /*============================ INCLUDES ======================================*/
 
 #define VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION  ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER   ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET         ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR       ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED
