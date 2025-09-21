@@ -85,7 +85,7 @@ fsm_rt_t vsf_gpio_i2c_disable(vsf_gpio_i2c_t *gpio_i2c_ptr)
 void vsf_gpio_i2c_irq_enable(vsf_gpio_i2c_t *gpio_i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio_i2c_ptr);
-    gpio_i2c_ptr->enabled_irq_mask = irq_mask;
+    gpio_i2c_ptr->enabled_irq_mask |= irq_mask;
 }
 
 void vsf_gpio_i2c_irq_disable(vsf_gpio_i2c_t *gpio_i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
@@ -215,8 +215,7 @@ uint_fast16_t vsf_gpio_i2c_slave_fifo_transfer(vsf_gpio_i2c_t *gpio_i2c_ptr,
 static void __vsf_gpio_i2c_isrhandler(vsf_gpio_i2c_t *gpio_i2c_ptr)
 {
     if (gpio_i2c_ptr->cfg.isr.handler_fn != NULL) {
-        vsf_i2c_irq_mask_t irq_mask = gpio_i2c_ptr->irq_mask;
-        gpio_i2c_ptr->irq_mask = 0;
+        vsf_i2c_irq_mask_t irq_mask = gpio_i2c_ptr->irq_mask & gpio_i2c_ptr->enabled_irq_mask;
         if (irq_mask != 0) {
             gpio_i2c_ptr->cfg.isr.handler_fn(gpio_i2c_ptr->cfg.isr.target_ptr,
                     (vsf_i2c_t *)gpio_i2c_ptr, irq_mask);
@@ -246,7 +245,10 @@ vsf_err_t vsf_gpio_i2c_master_request(vsf_gpio_i2c_t *gpio_i2c_ptr,
             gpio_i2c_ptr->irq_mask |= VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK;
             goto check_stop;
         }
+    } else {
+        gpio_i2c_ptr->irq_mask = 0;
     }
+
 
     if (is_read) {
         for (; transferred_count < count; transferred_count++) {
