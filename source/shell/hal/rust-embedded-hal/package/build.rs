@@ -250,11 +250,11 @@ fn enable_peripherial(lines: &Vec<&str>, name: &str) -> u32 {
         println!("cargo::rustc-check-cfg=cfg(vsf_{name}_enabled)");
         println!("cargo:rustc-cfg=vsf_{name}_enabled");
 
-        for index in 0..32 {
-            if mask & (1 << index) != 0 {
-                println!("cargo:warning={name}: enable {name}{index}");
-                println!("cargo::rustc-check-cfg=cfg(vsf_{name}{index}_enabled)");
-                println!("cargo:rustc-cfg=vsf_{name}{index}_enabled");
+        for peripheral_index in 0..32 {
+            if mask & (1 << peripheral_index) != 0 {
+                println!("cargo:warning={name}: enable {name}{peripheral_index}");
+                println!("cargo::rustc-check-cfg=cfg(vsf_{name}{peripheral_index}_enabled)");
+                println!("cargo:rustc-cfg=vsf_{name}{peripheral_index}_enabled");
             }
         }
     }

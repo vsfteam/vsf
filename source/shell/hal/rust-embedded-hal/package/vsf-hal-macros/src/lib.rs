@@ -39,24 +39,24 @@ pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
 
     let mut output_code = String::from("");
     let mask = extrace_peripheral_mask(&bindings_lines, "gpio");
-    for index in 0..32 {
-        if mask & (1 << index) != 0 {
-            let port_ch: char = ('A' as u8 + index) as char;
-            // VSF_HW_GPIO_PORT{index}_MASK only the PIN_MASK in one dedicated port, pin number can exceed 32 or maybe 64, so use the largest unsigned integer supported.
-            if let Some(mut pin_mask) = extract_const_integer::<u128>(&bindings_lines, &format!("VSF_HW_GPIO_PORT{index}_MASK")) {
+    for port_index in 0..32 {
+        if mask & (1 << port_index) != 0 {
+            let port_char: char = ('A' as u8 + port_index) as char;
+            // VSF_HW_GPIO_PORT{port_index}_MASK only the PIN_MASK in one dedicated port, pin number can exceed 32 or maybe 64, so use the largest unsigned integer supported.
+            if let Some(mut pin_mask) = extract_const_integer::<u128>(&bindings_lines, &format!("VSF_HW_GPIO_PORT{port_index}_MASK")) {
                 let mut pin_index = 0;
                 while pin_mask != 0 {
                     if pin_mask & 1 != 0 {
                         output_code.push_str(&format!("
-                            impl Pin for peripherals::P{port_ch}{pin_index} {{
+                            impl Pin for peripherals::P{port_char}{pin_index} {{
                             }}
-                            impl SealedPin for peripherals::P{port_ch}{pin_index} {{
+                            impl SealedPin for peripherals::P{port_char}{pin_index} {{
                                 #[inline] fn pin_port(&self) -> PinPortType {{
-                                    ({index} << 8) + {pin_index}
+                                    ({port_index} << 8) + {pin_index}
                                 }}
                             }}
-                            impl From<peripherals::P{port_ch}{pin_index}> for AnyPin {{
-                                fn from(val: peripherals::P{port_ch}{pin_index}) -> Self {{
+                            impl From<peripherals::P{port_char}{pin_index}> for AnyPin {{
+                                fn from(val: peripherals::P{port_char}{pin_index}) -> Self {{
                                     Self {{
                                         pin_port: val.pin_port(),
                                     }}
@@ -77,14 +77,14 @@ pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
 fn bind_vsf_gpios(lines: &Vec<&str>, output_code: &mut String) {
     let mask = extrace_peripheral_mask(lines, "gpio");
 
-    for index in 0..32 {
-        if mask & (1 << index) != 0 {
-            let port_ch: char = ('A' as u8 + index) as char;
-            if let Some(mut pin_mask) = extract_const_integer::<u32>(&lines, &format!("VSF_HW_GPIO_PORT{index}_MASK")) {
+    for port_index in 0..32 {
+        if mask & (1 << port_index) != 0 {
+            let port_char: char = ('A' as u8 + port_index) as char;
+            if let Some(mut pin_mask) = extract_const_integer::<u32>(&lines, &format!("VSF_HW_GPIO_PORT{port_index}_MASK")) {
                 let mut pin_index = 0;
                 while pin_mask != 0 {
                 if pin_mask & 1 != 0 {
-                    output_code.push_str(&format!("P{port_ch}{pin_index},"));
+                    output_code.push_str(&format!("P{port_char}{pin_index},"));
                 }
                 pin_index += 1;
                 pin_mask >>= 1;
@@ -98,9 +98,9 @@ fn bind_vsf_peripheral(lines: &Vec<&str>, name: &str, output_code: &mut String) 
     let peripheral_name_upper = String::from(name).to_uppercase();
     let mask = extrace_peripheral_mask(lines, &peripheral_name_upper);
 
-    for index in 0..32 {
-        if mask & (1 << index) != 0 {
-            output_code.push_str(&format!("{peripheral_name_upper}{index},"));
+    for peripheral_index in 0..32 {
+        if mask & (1 << peripheral_index) != 0 {
+            output_code.push_str(&format!("{peripheral_name_upper}{peripheral_index},"));
         }
     }
 }
