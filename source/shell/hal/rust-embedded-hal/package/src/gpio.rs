@@ -312,8 +312,10 @@ impl<'d> Flex<'d> {
     /// Get whether the output level is set to low.
     #[inline]
     pub fn is_set_low(&self) -> bool {
-        // TODO: read saved output mask
-        false
+        unsafe {
+            let gpio_port = vsf_hw_gpios[self.pin._port() as usize] as *mut vsf_gpio_t;
+            vsf_gpio_read_output_register(gpio_port) & (1u32 << self.pin._pin()) == 0
+        }
     }
 
     /// Get the current output level.
