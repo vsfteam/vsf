@@ -31,8 +31,6 @@
 #include "hal/driver/common/template/vsf_template_hal_driver.h"
 // HW/IPCore end
 
-#include "../../__device.h"
-
 /*\note Refer to template/README.md for usage cases.
  *      For peripheral drivers, blackbox mode is recommended but not required, reimplementation part MUST be open.
  *      For IPCore drivers, class structure, MULTI_CLASS configuration, reimplementation and class APIs should be open to user.

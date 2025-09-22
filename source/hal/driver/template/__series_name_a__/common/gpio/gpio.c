@@ -23,8 +23,6 @@
 
 #include "hal/vsf_hal.h"
 
-#include "../../__device.h"
-
 // HW
 // for vendor headers
 #include "hal/driver/vendor_driver.h"
