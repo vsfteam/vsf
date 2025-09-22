@@ -5,3 +5,4 @@ Cargo.lock
 memory.x
 vsf_hal_build
 *.bin
+vsf_c.h

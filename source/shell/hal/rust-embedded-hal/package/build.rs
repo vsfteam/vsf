@@ -180,8 +180,13 @@ fn main() {
         println!("cargo:rustc-link-lib=static=vsf_hal");
     }
 
+    fs::write("./vsf_c.h", "
+        #include <service/vsf_service.h>
+        #include <hal/vsf_hal.h>
+    ").unwrap();
+
     let mut builder = bindgen::Builder::default()
-                    .header("".to_string() + &path + "source/hal/driver/driver.h")
+                    .header("./vsf_c.h")
                     .raw_line("#![allow(non_camel_case_types)]")
                     .raw_line("#![allow(non_upper_case_globals)]")
                     .raw_line("#![allow(non_snake_case)]")
