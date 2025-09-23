@@ -5,6 +5,7 @@
 mod fmt;
 
 // Utilities
+mod macros;
 
 // vsf_hal
 mod vsf_hal;
@@ -58,7 +59,7 @@ pub fn init(config: Config) -> Peripherals {
         let p = Peripherals::take_with_cs(cs);
 
         unsafe {
-            gpio::init(cs);
+            gpio::init();
         }
 
         p
