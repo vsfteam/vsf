@@ -41,24 +41,23 @@ pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
     let mask = extrace_peripheral_mask(&bindings_lines, "gpio");
     for port_index in 0..32 {
         if mask & (1 << port_index) != 0 {
-            let port_char: char = ('A' as u8 + port_index) as char;
             // VSF_HW_GPIO_PORT{port_index}_MASK only the PIN_MASK in one dedicated port, pin number can exceed 32 or maybe 64, so use the largest unsigned integer supported.
             if let Some(mut pin_mask) = extract_const_integer::<u128>(&bindings_lines, &format!("VSF_HW_GPIO_PORT{port_index}_MASK")) {
                 let mut pin_index = 0;
                 while pin_mask != 0 {
                     if pin_mask & 1 != 0 {
                         output_code.push_str(&format!("
-                            impl Pin for peripherals::P{port_char}{pin_index} {{
+                            impl crate::gpio::Pin for peripherals::P{port_index}_{pin_index} {{
                             }}
-                            impl SealedPin for peripherals::P{port_char}{pin_index} {{
+                            impl crate::gpio::SealedPin for peripherals::P{port_index}_{pin_index} {{
                                 #[inline] fn pin_port(&self) -> PinPortType {{
                                     ({port_index} << 8) + {pin_index}
                                 }}
                             }}
-                            impl From<peripherals::P{port_char}{pin_index}> for AnyPin {{
-                                fn from(val: peripherals::P{port_char}{pin_index}) -> Self {{
+                            impl From<peripherals::P{port_index}_{pin_index}> for crate::gpio::AnyPin {{
+                                fn from(_val: peripherals::P{port_index}_{pin_index}) -> Self {{
                                     Self {{
-                                        pin_port: val.pin_port(),
+                                        pin_port: ({port_index} << 8) + {pin_index},
                                     }}
                                 }}
                             }}
@@ -79,15 +78,14 @@ fn bind_vsf_gpios(lines: &Vec<&str>, output_code: &mut String) {
 
     for port_index in 0..32 {
         if mask & (1 << port_index) != 0 {
-            let port_char: char = ('A' as u8 + port_index) as char;
-            if let Some(mut pin_mask) = extract_const_integer::<u32>(&lines, &format!("VSF_HW_GPIO_PORT{port_index}_MASK")) {
+            if let Some(mut pin_mask) = extract_const_integer::<u128>(&lines, &format!("VSF_HW_GPIO_PORT{port_index}_MASK")) {
                 let mut pin_index = 0;
                 while pin_mask != 0 {
-                if pin_mask & 1 != 0 {
-                    output_code.push_str(&format!("P{port_char}{pin_index},"));
-                }
-                pin_index += 1;
-                pin_mask >>= 1;
+                    if pin_mask & 1 != 0 {
+                        output_code.push_str(&format!("P{port_index}_{pin_index},"));
+                    }
+                    pin_index += 1;
+                    pin_mask >>= 1;
                 }
             }
         }

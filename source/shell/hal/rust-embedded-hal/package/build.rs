@@ -18,7 +18,7 @@ const BINDGEN_DEFINITIONS: [&'static str; 2] = [
 ];
 
 const PERIPHERIALS: [&'static str; 2] = ["gpio", "usart"];
-const CONSTANTS: [&'static str; 60] = [
+const CONSTANTS: [&'static str; 67] = [
     // GPIO constants
     "VSF_HW_GPIO_PIN_COUNT",
     "VSF_GPIO_INPUT",
@@ -27,6 +27,7 @@ const CONSTANTS: [&'static str; 60] = [
     "VSF_GPIO_OUTPUT_PUSH_PULL",
     "VSF_GPIO_OUTPUT_OPEN_DRAIN",
     "VSF_GPIO_AF",
+    "VSF_GPIO_AF_INPUT",
     "VSF_GPIO_AF_PUSH_PULL",
     "VSF_GPIO_AF_OPEN_DRAIN",
     "VSF_GPIO_SPEED_MASK",
@@ -56,32 +57,38 @@ const CONSTANTS: [&'static str; 60] = [
     "VSF_USART_TX_INVERT",
     "VSF_USART_RX_INVERT",
     // peripherial enable/disable
-    "VSF_HW_EN_GPIOA",
-    "VSF_HW_EN_GPIOB",
-    "VSF_HW_EN_GPIOC",
-    "VSF_HW_EN_GPIOD",
-    "VSF_HW_EN_GPIOE",
-    "VSF_HW_EN_GPIOF",
-    "VSF_HW_EN_GPIOG",
-    "VSF_HW_EN_GPIOH",
-    "VSF_HW_EN_GPIOI",
-    "VSF_HW_EN_GPIOJ",
-    "VSF_HW_EN_GPIOK",
-    "VSF_HW_EN_GPIOL",
-    "VSF_HW_EN_GPIOM",
-    "VSF_HW_EN_GPION",
-    "VSF_HW_EN_GPIOO",
-    "VSF_HW_EN_GPIOP",
-    "VSF_HW_EN_GPIOQ",
-    "VSF_HW_EN_GPIOR",
-    "VSF_HW_EN_GPIOS",
-    "VSF_HW_EN_GPIOT",
-    "VSF_HW_EN_GPIOU",
-    "VSF_HW_EN_GPIOV",
-    "VSF_HW_EN_GPIOW",
-    "VSF_HW_EN_GPIOX",
-    "VSF_HW_EN_GPIOY",
-    "VSF_HW_EN_GPIOZ",
+    "VSF_HW_EN_GPIO0",
+    "VSF_HW_EN_GPIO1",
+    "VSF_HW_EN_GPIO2",
+    "VSF_HW_EN_GPIO3",
+    "VSF_HW_EN_GPIO4",
+    "VSF_HW_EN_GPIO5",
+    "VSF_HW_EN_GPIO6",
+    "VSF_HW_EN_GPIO7",
+    "VSF_HW_EN_GPIO8",
+    "VSF_HW_EN_GPIO9",
+    "VSF_HW_EN_GPIO10",
+    "VSF_HW_EN_GPIO11",
+    "VSF_HW_EN_GPIO12",
+    "VSF_HW_EN_GPIO13",
+    "VSF_HW_EN_GPIO14",
+    "VSF_HW_EN_GPIO15",
+    "VSF_HW_EN_GPIO16",
+    "VSF_HW_EN_GPIO17",
+    "VSF_HW_EN_GPIO18",
+    "VSF_HW_EN_GPIO19",
+    "VSF_HW_EN_GPIO20",
+    "VSF_HW_EN_GPIO21",
+    "VSF_HW_EN_GPIO22",
+    "VSF_HW_EN_GPIO23",
+    "VSF_HW_EN_GPIO24",
+    "VSF_HW_EN_GPIO25",
+    "VSF_HW_EN_GPIO26",
+    "VSF_HW_EN_GPIO27",
+    "VSF_HW_EN_GPIO28",
+    "VSF_HW_EN_GPIO29",
+    "VSF_HW_EN_GPIO30",
+    "VSF_HW_EN_GPIO31",
 ];
 const FUNCTIONS: [&'static str; 2] = [
     "vsf_hw_clkrst_region_set_bit",
@@ -244,17 +251,19 @@ fn main() {
 }
 
 fn enable_peripherial(lines: &Vec<&str>, name: &str) -> u32 {
-    let mask = extrace_peripheral_mask(lines, name);
+    println!("cargo::rustc-check-cfg=cfg(vsf_{name}_enabled)");
+    for peripheral_index in 0..32 {
+        println!("cargo::rustc-check-cfg=cfg(vsf_{name}{peripheral_index}_enabled)");
+    }
 
+    let mask = extrace_peripheral_mask(lines, name);
     if mask != 0 {
         println!("cargo:warning={name}_mask: 0x{mask:X}");
-        println!("cargo::rustc-check-cfg=cfg(vsf_{name}_enabled)");
         println!("cargo:rustc-cfg=vsf_{name}_enabled");
 
         for peripheral_index in 0..32 {
             if mask & (1 << peripheral_index) != 0 {
                 println!("cargo:warning={name}: enable {name}{peripheral_index}");
-                println!("cargo::rustc-check-cfg=cfg(vsf_{name}{peripheral_index}_enabled)");
                 println!("cargo:rustc-cfg=vsf_{name}{peripheral_index}_enabled");
             }
         }
