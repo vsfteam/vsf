@@ -232,7 +232,6 @@ typedef enum vsf_hw_peripheral_rst_t {
     VSF_HW_RST_COMP                     = VSF_HW_CLKRST_REGION(0x48, 28, 1),// COMPRST
 
     // GPIO0 .. GPIO10 are VSF standard, GPIOA .. GPIOK are vendor standard
-    // IMPORTANT: define vendor standard according to VSF standard
     VSF_HW_RST_GPIOA                    = VSF_HW_RST_GPIO0,
     VSF_HW_RST_GPIOB                    = VSF_HW_RST_GPIO1,
     VSF_HW_RST_GPIOC                    = VSF_HW_RST_GPIO2,
@@ -974,7 +973,6 @@ typedef enum vsf_hw_peripheral_en_t {
 #endif
 
     // GPIO0 .. GPIO10 are VSF standard, GPIOA .. GPIOK are vendor standard
-    // IMPORTANT: define vendor standard according to VSF standard
     VSF_HW_EN_GPIOA                     = VSF_HW_EN_GPIO0,
     VSF_HW_EN_GPIOALP                   = VSF_HW_EN_GPIO0LP,
     VSF_HW_EN_GPIOB                     = VSF_HW_EN_GPIO1,
