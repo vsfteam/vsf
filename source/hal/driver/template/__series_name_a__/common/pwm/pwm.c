@@ -102,19 +102,6 @@ void VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_fini)(
     VSF_HAL_ASSERT(pwm_ptr != NULL);
 }
 
-vsf_err_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_configuration)(
-    VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t) *pwm_ptr,
-    vsf_pwm_cfg_t *cfg_ptr
-) {
-    VSF_HAL_ASSERT(NULL != pwm_ptr);
-    VSF_HAL_ASSERT(NULL != cfg_ptr);
-
-    // TODO: Implement hardware-specific configuration reading
-    // Read current PWM configuration from hardware registers
-
-    return VSF_ERR_NONE;
-}
-
 fsm_rt_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_enable)(
     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t) *pwm_ptr
 ) {
@@ -129,17 +116,6 @@ fsm_rt_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_disable)(
     VSF_HAL_ASSERT(pwm_ptr != NULL);
 
     return fsm_rt_cpl;
-}
-
-vsf_pwm_capability_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_capability)(
-    VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t) *pwm_ptr
-) {
-    VSF_HAL_ASSERT(pwm_ptr != NULL);
-
-    return (vsf_pwm_capability_t) {
-        .max_freq = 100 * 1000 * 1000,
-        .min_freq = 100,
-    };
 }
 
 vsf_err_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_set)(
@@ -159,6 +135,40 @@ uint32_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_freq)(
     VSF_HAL_ASSERT(pwm_ptr != NULL);
 
     return 0;
+}
+
+/*\note Implementation of APIs below is optional, because there is default implementation in pwm_template.inc.
+ *      VSF_PWM_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_PWM_CFG_REIMPLEMENT_API_GET_CONFIGURATION for pwm_get_configuration.
+ *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ *      VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY for pwm_capability.
+ *          Default implementation will return capability structure using VSF_PWM_CFG_CAPABILITY_MIN_FREQ and VSF_PWM_CFG_CAPABILITY_MAX_FREQ.
+ */
+
+vsf_err_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_get_configuration)(
+    VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t) *pwm_ptr,
+    vsf_pwm_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != pwm_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current PWM configuration from hardware registers
+
+    return VSF_ERR_NONE;
+}
+
+vsf_pwm_capability_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_capability)(
+    VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t) *pwm_ptr
+) {
+    VSF_HAL_ASSERT(pwm_ptr != NULL);
+
+    return (vsf_pwm_capability_t) {
+        .max_freq = 100 * 1000 * 1000,
+        .min_freq = 100,
+    };
 }
 // HW end
 

@@ -105,23 +105,6 @@ void VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_fini)(
     VSF_HAL_ASSERT(wdt_ptr != NULL);
 }
 
-vsf_err_t VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_get_configuration)(
-    VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t) *wdt_ptr,
-    vsf_wdt_cfg_t *cfg_ptr
-) {
-    VSF_HAL_ASSERT(NULL != wdt_ptr);
-    VSF_HAL_ASSERT(NULL != cfg_ptr);
-
-    // TODO: Implement hardware-specific configuration reading
-    // Read current WDT configuration from hardware registers
-
-    // Template implementation returns default configuration
-    cfg_ptr->isr = wdt_ptr->isr;
-    // Add other configuration fields as needed
-
-    return VSF_ERR_NONE;
-}
-
 fsm_rt_t VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_enable)(
     VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t) *wdt_ptr
 ) {
@@ -136,21 +119,6 @@ fsm_rt_t VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_disable)(
     VSF_HAL_ASSERT(wdt_ptr != NULL);
 
     return fsm_rt_cpl;
-}
-
-vsf_wdt_capability_t VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_capability)(
-    VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t) *wdt_ptr
-) {
-    VSF_HAL_ASSERT(wdt_ptr != NULL);
-
-    return (vsf_wdt_capability_t) {
-        .support_early_wakeup = 1,
-        .support_reset_none   = 1,
-        .support_reset_cpu   = 1,
-        .support_reset_soc    = 1,
-        .support_disable      = 1,
-        .max_timeout_ms       = 100 * 1000,
-    };
 }
 
 void VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_feed)(
@@ -168,6 +136,54 @@ static void VSF_MCONNECT(__, VSF_WDT_CFG_IMP_PREFIX, _wdt_irqhandler)(
     if (isr_ptr->handler_fn != NULL) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_wdt_t *)wdt_ptr);
     }
+}
+
+/*\note Implementation of APIs below is optional, because there is default implementation in wdt_template.inc.
+ *      VSF_WDT_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY for wdt_capability.
+ *          Default implementation will use macros below to initialize capability structure:
+ *              VSF_WDT_CFG_CAPABILITY_SUPPORT_EARLY_WAKEUP
+ *              VSF_WDT_CFG_CAPABILITY_SUPPORT_RESET_NONE
+ *              VSF_WDT_CFG_CAPABILITY_support_reset_cpu
+ *              VSF_WDT_CFG_CAPABILITY_SUPPORT_RESET_SOC
+ *              VSF_WDT_CFG_CAPABILITY_SUPPORT_DISABLE
+ *              VSF_WDT_CFG_CAPABILITY_MAX_TIMEOUT_MS
+ *      VSF_WDT_CFG_REIMPLEMENT_API_GET_CONFIGURATION for wdt_get_configuration.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ */
+
+vsf_wdt_capability_t VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_capability)(
+    VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t) *wdt_ptr
+) {
+    VSF_HAL_ASSERT(wdt_ptr != NULL);
+
+    return (vsf_wdt_capability_t) {
+        .support_early_wakeup = 1,
+        .support_reset_none   = 1,
+        .support_reset_cpu   = 1,
+        .support_reset_soc    = 1,
+        .support_disable      = 1,
+        .max_timeout_ms       = 100 * 1000,
+    };
+}
+
+vsf_err_t VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_get_configuration)(
+    VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t) *wdt_ptr,
+    vsf_wdt_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != wdt_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current WDT configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = wdt_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
 }
 // HW end
 

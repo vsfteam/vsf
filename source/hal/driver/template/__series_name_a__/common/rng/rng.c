@@ -112,6 +112,14 @@ vsf_err_t VSF_MCONNECT(VSF_RNG_GENERATE_CFG_IMP_PREFIX, _rng_generate_request)(
     return VSF_ERR_NONE;
 }
 
+/*\note Implementation of APIs below is optional, because there is default implementation in rng_template.inc.
+ *      VSF_RNG_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY for rng_capability.
+ *          Default implementation will return an empty capability structure.
+ */
+
 vsf_rng_capability_t VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_capability)(
     VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_t) *rng_ptr
 ) {

@@ -104,22 +104,6 @@ void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_fini)(
     VSF_HAL_ASSERT(NULL != usart_ptr);
 }
 
-vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_configuration)(
-    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,
-    vsf_usart_cfg_t *cfg_ptr
-) {
-    VSF_HAL_ASSERT(NULL != usart_ptr);
-    VSF_HAL_ASSERT(NULL != cfg_ptr);
-
-    // For template implementation, return a default configuration
-    cfg_ptr->mode = VSF_USART_8_BIT_LENGTH | VSF_USART_1_STOPBIT | VSF_USART_NO_PARITY;
-    cfg_ptr->baudrate = 115200;
-    cfg_ptr->rx_timeout = 0;
-    cfg_ptr->isr = usart_ptr->isr;
-
-    return VSF_ERR_NONE;
-}
-
 fsm_rt_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_enable)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
@@ -192,30 +176,6 @@ uint_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_txfifo_write)(
     return 0;
 }
 
-vsf_usart_capability_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)(
-    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
-) {
-    return (vsf_usart_capability_t) {
-        .irq_mask                    = 0,
-        .max_baudrate                = 0,
-        .min_baudrate                = 0,
-        .min_data_bits               = 0,
-        .max_data_bits               = 0,
-        .txfifo_depth                = 0,
-        .rxfifo_depth                = 0,
-        .support_rx_timeout          = 0,
-        .support_send_break          = 0,
-        .support_set_and_clear_break = 0,
-        .support_sync_clock          = 0,
-#   ifdef VSF_USART_IRQ_MASK_TX_IDLE
-        .support_tx_idle             = 0,
-#   endif
-#   ifdef VSF_USART_IRQ_MASK_RX_IDLE
-        .support_rx_idle             = 0,
-#   endif
-    };
-}
-
 static vsf_usart_irq_mask_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_get_irq_mask)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
@@ -235,6 +195,30 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_usart_t *)usart_ptr, irq_mask);
     }
 }
+
+/*\note Implementation of APIs below is optional, because there is default implementation in usart_template.inc.
+ *      VSF_USART_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_USART_CFG_REIMPLEMENT_API_REQUEST for usart_request_rx, usart_request_tx, usart_cancel_rx, usart_cancel_tx, usart_get_rx_count, usart_get_tx_count.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ *      VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY for usart_capability.
+ *          Default implementation will use macros below to initialize capability structure:
+ *              VSF_USART_CFG_CAPABILITY_IRQ_MASK
+ *              VSF_USART_CFG_CAPABILITY_MAX_BAUDRATE
+ *              VSF_USART_CFG_CAPABILITY_MIN_BAUDRATE
+ *              VSF_USART_CFG_CAPABILITY_TXFIFO_DEPTH
+ *              VSF_USART_CFG_CAPABILITY_RXFIFO_DEPTH
+ *              VSF_USART_CFG_CAPABILITY_MAX_DATA_BITS
+ *              VSF_USART_CFG_CAPABILITY_MIN_DATA_BITS
+ *              VSF_USART_CFG_CAPABILITY_SUPPORT_RX_TIMEOUT
+ *              VSF_USART_CFG_CAPABILITY_SUPPORT_SEND_BREAK
+ *              VSF_USART_CFG_CAPABILITY_SUPPORT_SET_AND_CLEAR_BREAK
+ *      VSF_USART_CFG_REIMPLEMENT_API_CTRL for usart_ctrl.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ *      VSF_USART_CFG_REIMPLEMENT_API_GET_CONFIGURATION for usart_get_configuration.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ */
 
 /*\note DMA APIs below.
  *      If DMA is not supported, fifo2req template can be used,
@@ -287,12 +271,52 @@ int_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)(
     return 0;
 }
 
+vsf_usart_capability_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)(
+    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
+) {
+    return (vsf_usart_capability_t) {
+        .irq_mask                    = 0,
+        .max_baudrate                = 0,
+        .min_baudrate                = 0,
+        .min_data_bits               = 0,
+        .max_data_bits               = 0,
+        .txfifo_depth                = 0,
+        .rxfifo_depth                = 0,
+        .support_rx_timeout          = 0,
+        .support_send_break          = 0,
+        .support_set_and_clear_break = 0,
+        .support_sync_clock          = 0,
+#   ifdef VSF_USART_IRQ_MASK_TX_IDLE
+        .support_tx_idle             = 0,
+#   endif
+#   ifdef VSF_USART_IRQ_MASK_RX_IDLE
+        .support_rx_idle             = 0,
+#   endif
+    };
+}
+
 vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_ctrl)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,
     vsf_usart_ctrl_t ctrl,
     void * param
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
+    return VSF_ERR_NONE;
+}
+
+vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_configuration)(
+    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,
+    vsf_usart_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != usart_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // For template implementation, return a default configuration
+    cfg_ptr->mode = VSF_USART_8_BIT_LENGTH | VSF_USART_1_STOPBIT | VSF_USART_NO_PARITY;
+    cfg_ptr->baudrate = 115200;
+    cfg_ptr->rx_timeout = 0;
+    cfg_ptr->isr = usart_ptr->isr;
+
     return VSF_ERR_NONE;
 }
 
