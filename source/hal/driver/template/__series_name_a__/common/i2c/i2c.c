@@ -103,24 +103,6 @@ void VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_fini)(
     VSF_HAL_ASSERT(NULL != i2c_ptr);
 }
 
-vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_get_configuration)(
-    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr,
-    vsf_i2c_cfg_t *cfg_ptr
-) {
-    VSF_HAL_ASSERT(NULL != i2c_ptr);
-    VSF_HAL_ASSERT(NULL != cfg_ptr);
-
-    // For template implementation, return a default configuration
-    cfg_ptr->mode = VSF_I2C_MODE_MASTER | VSF_I2C_SPEED_STANDARD_MODE | VSF_I2C_ADDR_7_BITS;
-    cfg_ptr->clock_hz = 100000; // 100kHz default
-    cfg_ptr->slave_addr = 0x00;
-
-    // Copy interrupt configuration from current instance
-    cfg_ptr->isr = i2c_ptr->isr;
-
-    return VSF_ERR_NONE;
-}
-
 fsm_rt_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_enable)(
     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
 ) {
@@ -221,6 +203,56 @@ uint_fast16_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_slave_get_transferred_co
     return 0;
 }
 
+static vsf_i2c_irq_mask_t VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_get_irq_mask)(
+    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
+static void VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_irqhandler)(
+    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
+) {
+    VSF_HAL_ASSERT(NULL != i2c_ptr);
+
+    vsf_i2c_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_get_irq_mask)(i2c_ptr);
+    vsf_i2c_isr_t *isr_ptr = &i2c_ptr->isr;
+    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_i2c_t *)i2c_ptr, irq_mask);
+    }
+}
+
+/*\note Implementation of APIs below is optional, because there is default implementation in i2c_template.inc.
+ *      VSF_I2C_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_I2C_CFG_REIMPLEMENT_API_GET_CONFIGURATION for i2c_get_configuration.
+ *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ *      VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY for i2c_capability.
+ *          Default implementation will return capability structure using VSF_I2C_CFG_CAPABILITY_xxx configuration macros.
+ *      VSF_I2C_CFG_REIMPLEMENT_API_CTRL for i2c_ctrl.
+ *          Default implementation will return VSF_ERR_NOT_SUPPORT.
+ */
+
+vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_get_configuration)(
+    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr,
+    vsf_i2c_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != i2c_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // For template implementation, return a default configuration
+    cfg_ptr->mode = VSF_I2C_MODE_MASTER | VSF_I2C_SPEED_STANDARD_MODE | VSF_I2C_ADDR_7_BITS;
+    cfg_ptr->clock_hz = 100000; // 100kHz default
+    cfg_ptr->slave_addr = 0x00;
+
+    // Copy interrupt configuration from current instance
+    cfg_ptr->isr = i2c_ptr->isr;
+
+    return VSF_ERR_NONE;
+}
+
 vsf_i2c_capability_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)(
     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
 ) {
@@ -240,26 +272,6 @@ vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_ctrl)(
     VSF_HAL_ASSERT(NULL != i2c_ptr);
 
     return VSF_ERR_NONE;
-}
-
-static vsf_i2c_irq_mask_t VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_get_irq_mask)(
-    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
-) {
-    // implement this function in the device file
-    VSF_HAL_ASSERT(0);
-    return 0;
-}
-
-static void VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_irqhandler)(
-    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
-) {
-    VSF_HAL_ASSERT(NULL != i2c_ptr);
-
-    vsf_i2c_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_get_irq_mask)(i2c_ptr);
-    vsf_i2c_isr_t *isr_ptr = &i2c_ptr->isr;
-    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_i2c_t *)i2c_ptr, irq_mask);
-    }
 }
 // HW end
 

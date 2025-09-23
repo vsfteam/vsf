@@ -105,23 +105,6 @@ void VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_fini)(
     VSF_HAL_ASSERT(rtc_ptr != NULL);
 }
 
-vsf_err_t VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_configuration)(
-    VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t) *rtc_ptr,
-    vsf_rtc_cfg_t *cfg_ptr
-) {
-    VSF_HAL_ASSERT(NULL != rtc_ptr);
-    VSF_HAL_ASSERT(NULL != cfg_ptr);
-
-    // TODO: Implement hardware-specific configuration reading
-    // Read current RTC configuration from hardware registers
-
-    // Template implementation returns default configuration
-    cfg_ptr->isr = rtc_ptr->isr;
-    // Add other configuration fields as needed
-
-    return VSF_ERR_NONE;
-}
-
 fsm_rt_t VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_enable)(
     VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t) *rtc_ptr
 ) {
@@ -176,16 +159,6 @@ vsf_err_t VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set_time)(
     return VSF_ERR_NONE;
 }
 
-vsf_rtc_capability_t VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_capability)(
-    VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t) *rtc_ptr
-) {
-    VSF_HAL_ASSERT(rtc_ptr != NULL);
-
-    return (vsf_rtc_capability_t) {
-        .irq_mask = VSF_RTC_IRQ_MASK_ALARM,
-    };
-}
-
 static vsf_rtc_irq_mask_t VSF_MCONNECT(__, VSF_RTC_CFG_IMP_PREFIX, _rtc_get_irq_mask)(
     VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t) *rtc_ptr
 ) {
@@ -204,6 +177,43 @@ static void VSF_MCONNECT(__, VSF_RTC_CFG_IMP_PREFIX, _rtc_irqhandler)(
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_rtc_t *)rtc_ptr, irq_mask);
     }
+}
+
+/*\note Implementation of APIs below is optional, because there is default implementation in rtc_template.inc.
+ *      VSF_RTC_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY for rtc_capability.
+ *          Default implementation will return hardware capability structure.
+ *      VSF_RTC_CFG_REIMPLEMENT_API_GET_CONFIGURATION for rtc_get_configuration.
+ *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ */
+
+vsf_err_t VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_configuration)(
+    VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t) *rtc_ptr,
+    vsf_rtc_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != rtc_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current RTC configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = rtc_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
+}
+
+vsf_rtc_capability_t VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_capability)(
+    VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t) *rtc_ptr
+) {
+    VSF_HAL_ASSERT(rtc_ptr != NULL);
+
+    return (vsf_rtc_capability_t) {
+        .irq_mask = VSF_RTC_IRQ_MASK_ALARM,
+    };
 }
 // HW end
 

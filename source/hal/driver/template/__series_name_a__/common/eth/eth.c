@@ -105,23 +105,6 @@ void VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_fini)(
     VSF_HAL_ASSERT(eth_ptr != NULL);
 }
 
-vsf_err_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_get_configuration)(
-    VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t) *eth_ptr,
-    vsf_eth_cfg_t *cfg_ptr
-) {
-    VSF_HAL_ASSERT(NULL != eth_ptr);
-    VSF_HAL_ASSERT(NULL != cfg_ptr);
-
-    // TODO: Implement hardware-specific configuration reading
-    // Read current ETH configuration from hardware registers
-
-    // Template implementation returns default configuration
-    cfg_ptr->isr = eth_ptr->isr;
-    // Add other configuration fields as needed
-
-    return VSF_ERR_NONE;
-}
-
 fsm_rt_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_enable)(
     VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t) *eth_ptr
 ) {
@@ -152,26 +135,6 @@ void VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_irq_disable)(
 ) {
     VSF_HAL_ASSERT((NULL != eth_ptr) && (NULL != eth_ptr->reg));
     // disable interrupt according to irq_mask
-}
-
-vsf_eth_capability_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_capability)(
-    VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t) *eth_ptr
-) {
-    VSF_HAL_ASSERT(eth_ptr != NULL);
-
-    return (vsf_eth_capability_t){
-        .support_modes                          = 0,
-        .support_phy_modes                      =
-            VSF_ETH_PHY_MODE_SPEED_10M | VSF_ETH_PHY_MODE_SPEED_100M |
-            VSF_ETH_PHY_MODE_SPEED_1000M | VSF_ETH_PHY_MODE_DUPLEX_HALF |
-            VSF_ETH_PHY_MODE_DUPLEX_FULL,
-        .support_irq_mask                       =
-            VSF_ETH_IRQ_MASK_RX_AVAILABLE | VSF_ETH_IRQ_MASK_TX_COMPLETE |
-            VSF_ETH_IRQ_MASK_SG_RX_AVAILABLE | VSF_ETH_IRQ_MASK_SG_TX_COMPLETE |
-            VSF_ETH_IRQ_MASK_PHY_LINK_CHANGE | VSF_ETH_IRQ_MASK_ERROR,
-        .is_send_buf_releasable_immediately     = 0,
-        .is_sg_send_buf_releasable_immediately  = 0,
-    };
 }
 
 vsf_eth_status_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_status)(
@@ -223,18 +186,6 @@ vsf_err_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_recv_sg_request)(
     VSF_HAL_ASSERT((NULL != eth_ptr) && (NULL != buf_ptr));
 
     return VSF_ERR_NONE;
-}
-
-
-static void VSF_MCONNECT(__, VSF_ETH_CFG_IMP_PREFIX, _eth_irqhandler)(
-    VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t) *eth_ptr
-) {
-    VSF_HAL_ASSERT(NULL != eth_ptr);
-
-    vsf_eth_isr_t *isr_ptr = &eth_ptr->isr;
-    if (isr_ptr->handler_fn != NULL) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_eth_t *)eth_ptr, 0);
-    }
 }
 
 vsf_err_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_ctrl)(
@@ -290,6 +241,64 @@ vsf_err_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_phy_get_link_status)(
     VSF_HAL_ASSERT(NULL != eth_ptr);
 
     return VSF_ERR_NONE;
+}
+
+static void VSF_MCONNECT(__, VSF_ETH_CFG_IMP_PREFIX, _eth_irqhandler)(
+    VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t) *eth_ptr
+) {
+    VSF_HAL_ASSERT(NULL != eth_ptr);
+
+    vsf_eth_isr_t *isr_ptr = &eth_ptr->isr;
+    if (isr_ptr->handler_fn != NULL) {
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_eth_t *)eth_ptr, 0);
+    }
+}
+
+/*\note Implementation of APIs below is optional, because there is default implementation in eth_template.inc.
+ *      VSF_ETH_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_ETH_CFG_REIMPLEMENT_API_GET_CONFIGURATION for eth_get_configuration.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ *      VSF_ETH_CFG_REIMPLEMENT_API_CAPABILITY for eth_capability.
+ *          Default implementation will return zero-initialized capability structure.
+ */
+
+vsf_err_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_get_configuration)(
+    VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t) *eth_ptr,
+    vsf_eth_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != eth_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current ETH configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = eth_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
+}
+
+vsf_eth_capability_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_capability)(
+    VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t) *eth_ptr
+) {
+    VSF_HAL_ASSERT(eth_ptr != NULL);
+
+    return (vsf_eth_capability_t){
+        .support_modes                          = 0,
+        .support_phy_modes                      =
+            VSF_ETH_PHY_MODE_SPEED_10M | VSF_ETH_PHY_MODE_SPEED_100M |
+            VSF_ETH_PHY_MODE_SPEED_1000M | VSF_ETH_PHY_MODE_DUPLEX_HALF |
+            VSF_ETH_PHY_MODE_DUPLEX_FULL,
+        .support_irq_mask                       =
+            VSF_ETH_IRQ_MASK_RX_AVAILABLE | VSF_ETH_IRQ_MASK_TX_COMPLETE |
+            VSF_ETH_IRQ_MASK_SG_RX_AVAILABLE | VSF_ETH_IRQ_MASK_SG_TX_COMPLETE |
+            VSF_ETH_IRQ_MASK_PHY_LINK_CHANGE | VSF_ETH_IRQ_MASK_ERROR,
+        .is_send_buf_releasable_immediately     = 0,
+        .is_sg_send_buf_releasable_immediately  = 0,
+    };
 }
 // HW end
 

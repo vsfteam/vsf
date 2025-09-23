@@ -106,23 +106,6 @@ void VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_fini)(
     VSF_HAL_ASSERT(dac_ptr != NULL);
 }
 
-vsf_err_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_get_configuration)(
-    VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr,
-    vsf_dac_cfg_t *cfg_ptr
-) {
-    VSF_HAL_ASSERT(NULL != dac_ptr);
-    VSF_HAL_ASSERT(NULL != cfg_ptr);
-
-    // TODO: Implement hardware-specific configuration reading
-    // Read current DAC configuration from hardware registers
-
-    // Template implementation returns default configuration
-    cfg_ptr->isr = dac_ptr->isr;
-    // Add other configuration fields as needed
-
-    return VSF_ERR_NONE;
-}
-
 fsm_rt_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_enable)(
     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr
 ) {
@@ -159,16 +142,6 @@ vsf_dac_status_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_status)(
     VSF_HAL_ASSERT(NULL != dac_ptr);
     return (vsf_dac_status_t) {
         .is_busy = false,
-    };
-}
-
-vsf_dac_capability_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_capability)(
-    VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr
-) {
-    return (vsf_dac_capability_t) {
-        .max_resolution_bits = 8,
-        .min_resolution_bits = 4,
-        .channel_count       = 4,
     };
 }
 
@@ -225,6 +198,47 @@ static void VSF_MCONNECT(__, VSF_DAC_CFG_IMP_PREFIX, _dac_irqhandler)(
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_dac_t *)dac_ptr, irq_mask);
     }
+}
+
+/*\note Implementation of APIs below is optional, because there is default implementation in dac_template.inc.
+ *      VSF_DAC_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY for dac_capability.
+ *          Default implementation will use the following macros to initialize capability structure:
+ *              VSF_DAC_CFG_CAPABILITY_IRQ_MASK (default: VSF_DAC_IRQ_ALL_BITS_MASK)
+ *              VSF_DAC_CFG_CAPABILITY_MAX_RESOLUTION_BITS (default: 12)
+ *              VSF_DAC_CFG_CAPABILITY_MIN_RESOLUTION_BITS (default: 8)
+ *              VSF_DAC_CFG_CAPABILITY_CHANNEL_COUNT (default: 4)
+ *      VSF_DAC_CFG_REIMPLEMENT_API_GET_CONFIGURATION for dac_get_configuration.
+ *          Default implementation will trigger assertion failure and return VSF_ERR_NOT_SUPPORT.
+ */
+
+vsf_dac_capability_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_capability)(
+    VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr
+) {
+    return (vsf_dac_capability_t) {
+        .max_resolution_bits = 8,
+        .min_resolution_bits = 4,
+        .channel_count       = 4,
+    };
+}
+
+vsf_err_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_get_configuration)(
+    VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr,
+    vsf_dac_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != dac_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current DAC configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = dac_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
 }
 // HW end
 

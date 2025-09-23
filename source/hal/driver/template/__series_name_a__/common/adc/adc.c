@@ -100,23 +100,6 @@ void VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_fini)(
     VSF_HAL_ASSERT(adc_ptr != NULL);
 }
 
-vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_get_configuration)(
-    VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr,
-    vsf_adc_cfg_t *cfg_ptr
-) {
-    VSF_HAL_ASSERT(NULL != adc_ptr);
-    VSF_HAL_ASSERT(NULL != cfg_ptr);
-
-    // TODO: Implement hardware-specific configuration reading
-    // Read current ADC configuration from hardware registers
-
-    // Template implementation returns default configuration
-    cfg_ptr->isr = adc_ptr->isr;
-    // Add other configuration fields as needed
-
-    return VSF_ERR_NONE;
-}
-
 fsm_rt_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_enable)(
     VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr
 ) {
@@ -182,16 +165,6 @@ vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_channel_request)(
     return VSF_ERR_NONE;
 }
 
-vsf_adc_capability_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_capability)(
-    VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr
-) {
-    return (vsf_adc_capability_t) {
-        .irq_mask           = VSF_ADC_IRQ_MASK_CPL,
-        .max_data_bits      = 8,
-        .channel_count      = 1,
-    };
-}
-
 static vsf_adc_irq_mask_t VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_get_irq_mask)(
     VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr
 ) {
@@ -210,6 +183,46 @@ static void VSF_MCONNECT(__, VSF_ADC_CFG_IMP_PREFIX, _adc_irqhandler)(
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_adc_t *)adc_ptr, irq_mask);
     }
+}
+
+/*\note Implementation of APIs below is optional, because there is default implementation in adc_template.inc.
+ *      VSF_ADC_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY for adc_capability.
+ *          Default implementation will use the following macros to initialize capability structure:
+ *              VSF_ADC_CFG_CAPABILITY_IRQ_MASK (default: VSF_ADC_IRQ_ALL_BITS_MASK)
+ *              VSF_ADC_CFG_CAPABILITY_MAX_DATA_BITS (default: 12)
+ *              VSF_ADC_CFG_CAPABILITY_CHANNEL_COUNT (default: 4)
+ *      VSF_ADC_CFG_REIMPLEMENT_API_GET_CONFIGURATION for adc_get_configuration.
+ *          Default implementation will trigger assertion failure and return VSF_ERR_NOT_SUPPORT.
+ */
+
+vsf_adc_capability_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_capability)(
+    VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr
+) {
+    return (vsf_adc_capability_t) {
+        .irq_mask           = VSF_ADC_IRQ_MASK_CPL,
+        .max_data_bits      = 8,
+        .channel_count      = 1,
+    };
+}
+
+vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_get_configuration)(
+    VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr,
+    vsf_adc_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != adc_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current ADC configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = adc_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
 }
 // HW end
 

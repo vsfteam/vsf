@@ -106,23 +106,6 @@ void VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_fini)(
     VSF_HAL_ASSERT(timer_ptr != NULL);
 }
 
-vsf_err_t VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_get_configuration)(
-    VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t) *timer_ptr,
-    vsf_timer_cfg_t *cfg_ptr
-) {
-    VSF_HAL_ASSERT(NULL != timer_ptr);
-    VSF_HAL_ASSERT(NULL != cfg_ptr);
-
-    // TODO: Implement hardware-specific configuration reading
-    // Read current TIMER configuration from hardware registers
-
-    // Template implementation returns default configuration
-    cfg_ptr->isr = timer_ptr->isr;
-    // Add other configuration fields as needed
-
-    return VSF_ERR_NONE;
-}
-
 fsm_rt_t VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_enable)(
     VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t) * timer_ptr)
 {
@@ -151,6 +134,68 @@ void VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_irq_disable)(
     vsf_timer_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(timer_ptr != NULL);
+}
+
+static vsf_timer_irq_mask_t VSF_MCONNECT(__, VSF_TIMER_CFG_IMP_PREFIX, _timer_get_irq_mask)(
+    VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t) *timer_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
+static void VSF_MCONNECT(__, VSF_TIMER_CFG_IMP_PREFIX, _timer_irqhandler)(
+    VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t) * timer_ptr)
+{
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+
+    vsf_timer_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_TIMER_CFG_IMP_PREFIX, _timer_get_irq_mask)(timer_ptr);
+    vsf_timer_isr_t     *isr_ptr  = &timer_ptr->isr;
+    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_timer_t *)timer_ptr,
+                            irq_mask);
+    }
+}
+
+/*\note Implementation of APIs below is optional, because there is default implementation in timer_template.inc.
+ *      VSF_TIMER_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY for timer_capability.
+ *          Default implementation will return hardware capability structure.
+ *      VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION for timer_get_configuration.
+ *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ *      VSF_TIMER_CFG_REIMPLEMENT_API_CTRL for timer_ctrl.
+ *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ *      VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_CONFIG for timer_channel_config.
+ *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ *      VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_START for timer_channel_start.
+ *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ *      VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_STOP for timer_channel_stop.
+ *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ *      VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_REQUEST_START for timer_channel_request_start.
+ *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ *      VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_REQUEST_STOP for timer_channel_request_stop.
+ *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ *      VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_CTRL for timer_channel_ctrl.
+ *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ */
+
+vsf_err_t VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_get_configuration)(
+    VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t) *timer_ptr,
+    vsf_timer_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current TIMER configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = timer_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
 }
 
 vsf_timer_capability_t VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX,
@@ -240,27 +285,6 @@ vsf_err_t VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_ctrl)(
     VSF_HAL_ASSERT(timer_ptr != NULL);
 
     return VSF_ERR_NONE;
-}
-
-static vsf_timer_irq_mask_t VSF_MCONNECT(__, VSF_TIMER_CFG_IMP_PREFIX, _timer_get_irq_mask)(
-    VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t) *timer_ptr
-) {
-    // implement this function in the device file
-    VSF_HAL_ASSERT(0);
-    return 0;
-}
-
-static void VSF_MCONNECT(__, VSF_TIMER_CFG_IMP_PREFIX, _timer_irqhandler)(
-    VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t) * timer_ptr)
-{
-    VSF_HAL_ASSERT(NULL != timer_ptr);
-
-    vsf_timer_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_TIMER_CFG_IMP_PREFIX, _timer_get_irq_mask)(timer_ptr);
-    vsf_timer_isr_t     *isr_ptr  = &timer_ptr->isr;
-    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_timer_t *)timer_ptr,
-                            irq_mask);
-    }
 }
 // HW end
 

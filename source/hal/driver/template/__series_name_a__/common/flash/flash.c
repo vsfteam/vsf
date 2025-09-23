@@ -102,23 +102,6 @@ void VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_fini)(
     VSF_HAL_ASSERT(flash_ptr != NULL);
 }
 
-vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_get_configuration)(
-    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr,
-    vsf_flash_cfg_t *cfg_ptr
-) {
-    VSF_HAL_ASSERT(NULL != flash_ptr);
-    VSF_HAL_ASSERT(NULL != cfg_ptr);
-
-    // TODO: Implement hardware-specific configuration reading
-    // Read current FLASH configuration from hardware registers
-
-    // Template implementation returns default configuration
-    cfg_ptr->isr = flash_ptr->isr;
-    // Add other configuration fields as needed
-
-    return VSF_ERR_NONE;
-}
-
 fsm_rt_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_enable)(
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr
 ) {
@@ -186,20 +169,6 @@ vsf_flash_status_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_status)(
     };
 }
 
-vsf_flash_capability_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)(
-    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr
-) {
-    return (vsf_flash_capability_t) {
-        .irq_mask              = VSF_FLASH_IRQ_ALL_BITS_MASK,
-        .base_address          = 0,
-        .max_size              = 0,
-        .erase_sector_size     = 4096,
-        .write_sector_size     = 256,
-        .none_sector_aligned_write = 0,
-        .none_sector_aligned_read  = 0,
-    };
-}
-
 static vsf_flash_irq_mask_t VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_get_irq_mask)(
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr
 ) {
@@ -218,6 +187,54 @@ static void VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_flash_t *)flash_ptr, irq_mask);
     }
+}
+
+/*\note Implementation of APIs below is optional, because there is default implementation in flash_template.inc.
+ *      VSF_FLASH_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_FLASH_CFG_REIMPLEMENT_API_GET_CONFIGURATION for flash_get_configuration.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ *      VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY for flash_capability.
+ *          Default implementation will use macros below to initialize capability structure:
+ *              VSF_FLASH_CFG_CAPABILITY_IRQ_MASK (default: VSF_FLASH_IRQ_ALL_BITS_MASK)
+ *              VSF_FLASH_CFG_CAPABILITY_BASE_ADDRESS (default: 0)
+ *              VSF_FLASH_CFG_CAPABILITY_MAX_SIZE (default: error if not defined)
+ *              VSF_FLASH_CFG_CAPABILITY_ERASE_SECTORE_SIZE (default: 4096)
+ *              VSF_FLASH_CFG_CAPABILITY_WRITE_SECTORE_SIZE (default: 512)
+ *              VSF_FLASH_CFG_CAPABILITY_NONE_SECTOR_ALIGNED_WRITE (default: 0)
+ *              VSF_FLASH_CFG_CAPABILITY_NONE_SECTOR_ALIGNED_READ (default: 1)
+ */
+
+vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_get_configuration)(
+    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr,
+    vsf_flash_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != flash_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // TODO: Implement hardware-specific configuration reading
+    // Read current FLASH configuration from hardware registers
+
+    // Template implementation returns default configuration
+    cfg_ptr->isr = flash_ptr->isr;
+    // Add other configuration fields as needed
+
+    return VSF_ERR_NONE;
+}
+
+vsf_flash_capability_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)(
+    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr
+) {
+    return (vsf_flash_capability_t) {
+        .irq_mask              = VSF_FLASH_IRQ_ALL_BITS_MASK,
+        .base_address          = 0,
+        .max_size              = 0,
+        .erase_sector_size     = 4096,
+        .write_sector_size     = 256,
+        .none_sector_aligned_write = 0,
+        .none_sector_aligned_read  = 0,
+    };
 }
 // HW end
 

@@ -81,6 +81,11 @@ typedef struct VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) {
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+// Forward declaration for functions used in _sdio_irqhandler
+vsf_sdio_status_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_status)(
+    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
+);
+
 /*============================ IMPLEMENTATION ================================*/
 
 /*\note Implementation below is for hw sdio only, because there is no requirements
@@ -106,6 +111,60 @@ void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_fini)(
     VSF_HAL_ASSERT(sdio_ptr != NULL);
 }
 
+void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_irq_enable)(
+    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr,
+    vsf_sdio_irq_mask_t irq_mask
+) {
+    VSF_HAL_ASSERT(sdio_ptr != NULL);
+}
+
+void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_irq_disable)(
+    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr,
+    vsf_sdio_irq_mask_t irq_mask
+) {
+    VSF_HAL_ASSERT(sdio_ptr != NULL);
+}
+
+static vsf_sdio_irq_mask_t VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_irq_mask)(
+    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
+static uint32_t * VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_resp)(
+    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return NULL;
+}
+
+static void VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_irqhandler)(
+    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
+) {
+    VSF_HAL_ASSERT(NULL != sdio_ptr);
+
+    vsf_sdio_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_irq_mask)(sdio_ptr);
+    vsf_sdio_status_t sts = VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_status)(sdio_ptr);
+    uint32_t *resp = VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_resp)(sdio_ptr);
+    vsf_sdio_isr_t *isr_ptr = &sdio_ptr->isr;
+    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_sdio_t *)sdio_ptr, irq_mask, sts.req_status, resp);
+    }
+}
+
+/*\note Implementation of APIs below is optional, because there is default implementation in sdio_template.inc.
+ *      VSF_SDIO_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_SDIO_CFG_REIMPLEMENT_API_CAPABILITY for sdio_capability.
+ *          Default implementation will return hardware capability structure.
+ *      VSF_SDIO_CFG_REIMPLEMENT_API_GET_CONFIGURATION for sdio_get_configuration.
+ *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ */
+
 vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_configuration)(
     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr,
     vsf_sdio_cfg_t *cfg_ptr
@@ -121,20 +180,6 @@ vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_configuration)(
     // Add other configuration fields as needed
 
     return VSF_ERR_NONE;
-}
-
-void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_irq_enable)(
-    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr,
-    vsf_sdio_irq_mask_t irq_mask
-) {
-    VSF_HAL_ASSERT(sdio_ptr != NULL);
-}
-
-void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_irq_disable)(
-    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr,
-    vsf_sdio_irq_mask_t irq_mask
-) {
-    VSF_HAL_ASSERT(sdio_ptr != NULL);
 }
 
 vsf_sdio_status_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_status)(
@@ -191,36 +236,6 @@ void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_transact_stop)(
     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
 ) {
     VSF_HAL_ASSERT(sdio_ptr != NULL);
-}
-
-static vsf_sdio_irq_mask_t VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_irq_mask)(
-    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
-) {
-    // implement this function in the device file
-    VSF_HAL_ASSERT(0);
-    return 0;
-}
-
-static uint32_t * VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_resp)(
-    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
-) {
-    // implement this function in the device file
-    VSF_HAL_ASSERT(0);
-    return NULL;
-}
-
-static void VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_irqhandler)(
-    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
-) {
-    VSF_HAL_ASSERT(NULL != sdio_ptr);
-
-    vsf_sdio_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_irq_mask)(sdio_ptr);
-    vsf_sdio_status_t sts = VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_status)(sdio_ptr);
-    uint32_t *resp = VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_resp)(sdio_ptr);
-    vsf_sdio_isr_t *isr_ptr = &sdio_ptr->isr;
-    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_sdio_t *)sdio_ptr, irq_mask, sts.req_status, resp);
-    }
 }
 // HW end
 

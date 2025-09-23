@@ -102,30 +102,6 @@ void VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_fini)(
     VSF_HAL_ASSERT(dma_ptr != NULL);
 }
 
-vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_get_configuration)(
-    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
-    vsf_dma_cfg_t *cfg_ptr
-) {
-    VSF_HAL_ASSERT(NULL != dma_ptr);
-    VSF_HAL_ASSERT(NULL != cfg_ptr);
-
-    // For template implementation, return a default configuration
-    // In a real implementation, this should retrieve the actual hardware configuration
-
-    return VSF_ERR_NONE;
-}
-
-vsf_dma_capability_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_capability)(
-    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr
-) {
-    VSF_HAL_ASSERT(dma_ptr != NULL);
-    return (vsf_dma_capability_t) {
-        .irq_mask          = 0xff,
-        .max_request_count = 8,
-        .channel_count     = 16
-    };
-}
-
 int8_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_request)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
     void *filter_param
@@ -146,17 +122,6 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_config)(
                                  vsf_dma_channel_cfg_t *cfg_ptr
 ) {
     VSF_HAL_ASSERT(dma_ptr != NULL);
-
-    return VSF_ERR_NONE;
-}
-
-vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_get_configuration)(
-    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
-    uint8_t channel,
-    vsf_dma_channel_cfg_t *cfg_ptr
-) {
-    VSF_HAL_ASSERT(NULL != dma_ptr);
-    VSF_HAL_ASSERT(NULL != cfg_ptr);
 
     return VSF_ERR_NONE;
 }
@@ -228,6 +193,60 @@ static void VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_irqhandler)(
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_dma_t *)dma_ptr, channel, irq_mask);
     }
+}
+
+/*\note Implementation of APIs below is optional, because there is default implementation in dma_template.inc.
+ *      VSF_DMA_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_DMA_CFG_REIMPLEMENT_API_GET_CONFIGURATION for dma_get_configuration.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ *      VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY for dma_capability.
+ *          Default implementation will use macros below to initialize capability structure:
+ *              VSF_DMA_CFG_CAPABILITY_IRQ_MASK (default: VSF_DMA_IRQ_ALL_BITS_MASK)
+ *              VSF_DMA_CFG_CAPABILITY_MAX_REQUEST_COUNT (default: 0xFFFFFFFF)
+ *              VSF_DMA_CFG_CAPABILITY_CHANNEL_COUNT (default: 8)
+ *      VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION for dma_channel_get_configuration.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ *      VSF_DMA_CFG_REIMPLEMENT_API_SG_CONFIG_DESC for dma_channel_sg_config_desc.
+ *          Default implementation will return VSF_ERR_NOT_SUPPORT.
+ *      VSF_DMA_CFG_REIMPLEMENT_API_SG_START for dma_channel_sg_start.
+ *          Default implementation will return VSF_ERR_NOT_SUPPORT.
+ */
+
+vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_get_configuration)(
+    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
+    vsf_dma_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != dma_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // For template implementation, return a default configuration
+    // In a real implementation, this should retrieve the actual hardware configuration
+
+    return VSF_ERR_NONE;
+}
+
+vsf_dma_capability_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_capability)(
+    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr
+) {
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+    return (vsf_dma_capability_t) {
+        .irq_mask          = 0xff,
+        .max_request_count = 8,
+        .channel_count     = 16
+    };
+}
+
+vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_get_configuration)(
+    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
+    uint8_t channel,
+    vsf_dma_channel_cfg_t *cfg_ptr
+) {
+    VSF_HAL_ASSERT(NULL != dma_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    return VSF_ERR_NONE;
 }
 // HW end
 
