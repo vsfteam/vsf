@@ -10,7 +10,7 @@
 #define VSF_USE_JSON                                    DISABLED
 #define VSF_USE_LOADER                                  DISABLED
 #define VSF_USE_PBUF                                    DISABLED
-#define VSF_USE_POOL                                    DISABLED
+#define VSF_USE_POOL                                    ENABLED
 #define VSF_USE_STREAM                                  DISABLED
 #define VSF_USE_TRACE                                   DISABLED
 #define VSF_USE_SIMPLE_STREAM                           ENABLED
