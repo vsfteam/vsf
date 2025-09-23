@@ -111,18 +111,18 @@ typedef enum vsf_hw_peripheral_rst_t {
 
     // AHB5
     // RCC.AHB5RST1
-    VSF_HW_RST_GPIOA                    = VSF_HW_CLKRST_REGION(0x3B, 28, 1),// GPIOARST
-    VSF_HW_RST_GPIOB                    = VSF_HW_CLKRST_REGION(0x3B, 24, 1),// GPIOBRST
-    VSF_HW_RST_GPIOC                    = VSF_HW_CLKRST_REGION(0x3B, 20, 1),// GPIOCRST
-    VSF_HW_RST_GPIOD                    = VSF_HW_CLKRST_REGION(0x3B, 16, 1),// GPIODRST
-    VSF_HW_RST_GPIOE                    = VSF_HW_CLKRST_REGION(0x3B, 12, 1),// GPIOERST
-    VSF_HW_RST_GPIOF                    = VSF_HW_CLKRST_REGION(0x3B, 8,  1),// GPIOFRST
-    VSF_HW_RST_GPIOG                    = VSF_HW_CLKRST_REGION(0x3B, 4,  1),// GPIOGRST
-    VSF_HW_RST_GPIOH                    = VSF_HW_CLKRST_REGION(0x3B, 0,  1),// GPIOHRST
+    VSF_HW_RST_GPIO0                    = VSF_HW_CLKRST_REGION(0x3B, 28, 1),// GPIOARST
+    VSF_HW_RST_GPIO1                    = VSF_HW_CLKRST_REGION(0x3B, 24, 1),// GPIOBRST
+    VSF_HW_RST_GPIO2                    = VSF_HW_CLKRST_REGION(0x3B, 20, 1),// GPIOCRST
+    VSF_HW_RST_GPIO3                    = VSF_HW_CLKRST_REGION(0x3B, 16, 1),// GPIODRST
+    VSF_HW_RST_GPIO4                    = VSF_HW_CLKRST_REGION(0x3B, 12, 1),// GPIOERST
+    VSF_HW_RST_GPIO5                    = VSF_HW_CLKRST_REGION(0x3B, 8,  1),// GPIOFRST
+    VSF_HW_RST_GPIO6                    = VSF_HW_CLKRST_REGION(0x3B, 4,  1),// GPIOGRST
+    VSF_HW_RST_GPIO7                    = VSF_HW_CLKRST_REGION(0x3B, 0,  1),// GPIOHRST
     // RCC.AHB5RST2
-    VSF_HW_RST_GPIOI                    = VSF_HW_CLKRST_REGION(0x3C, 28, 1),// GPIOIRST
-    VSF_HW_RST_GPIOJ                    = VSF_HW_CLKRST_REGION(0x3C, 24, 1),// GPIOJRST
-    VSF_HW_RST_GPIOK                    = VSF_HW_CLKRST_REGION(0x3C, 20, 1),// GPIOKRST
+    VSF_HW_RST_GPIO8                    = VSF_HW_CLKRST_REGION(0x3C, 28, 1),// GPIOIRST
+    VSF_HW_RST_GPIO9                    = VSF_HW_CLKRST_REGION(0x3C, 24, 1),// GPIOJRST
+    VSF_HW_RST_GPIO10                   = VSF_HW_CLKRST_REGION(0x3C, 20, 1),// GPIOKRST
     VSF_HW_RST_ECCM3                    = VSF_HW_CLKRST_REGION(0x3C, 16, 1),// ECCM3RST
     VSF_HW_RST_PWR                      = VSF_HW_CLKRST_REGION(0x3C, 12, 1),// PWRRST
     VSF_HW_RST_CRC                      = VSF_HW_CLKRST_REGION(0x3C, 8,  1),// CRCRST
@@ -230,6 +230,20 @@ typedef enum vsf_hw_peripheral_rst_t {
     VSF_HW_RST_LPUART2                  = VSF_HW_CLKRST_REGION(0x47, 4,  1),// LPUART2RST
     // RCC.RDRST2
     VSF_HW_RST_COMP                     = VSF_HW_CLKRST_REGION(0x48, 28, 1),// COMPRST
+
+    // GPIO0 .. GPIO10 are VSF standard, GPIOA .. GPIOK are vendor standard
+    // IMPORTANT: define vendor standard according to VSF standard
+    VSF_HW_RST_GPIOA                    = VSF_HW_RST_GPIO0,
+    VSF_HW_RST_GPIOB                    = VSF_HW_RST_GPIO1,
+    VSF_HW_RST_GPIOC                    = VSF_HW_RST_GPIO2,
+    VSF_HW_RST_GPIOD                    = VSF_HW_RST_GPIO3,
+    VSF_HW_RST_GPIOE                    = VSF_HW_RST_GPIO4,
+    VSF_HW_RST_GPIOF                    = VSF_HW_RST_GPIO5,
+    VSF_HW_RST_GPIOG                    = VSF_HW_RST_GPIO6,
+    VSF_HW_RST_GPIOH                    = VSF_HW_RST_GPIO7,
+    VSF_HW_RST_GPIOI                    = VSF_HW_RST_GPIO8,
+    VSF_HW_RST_GPIOJ                    = VSF_HW_RST_GPIO9,
+    VSF_HW_RST_GPIOK                    = VSF_HW_RST_GPIO10,
 } vsf_hw_peripheral_rst_t;
 
 typedef enum vsf_hw_peripheral_en_t {
@@ -500,48 +514,48 @@ typedef enum vsf_hw_peripheral_en_t {
     // AHB5
     // RCC.AHB5EN1
 #if     defined(CORE_CM4)
-    VSF_HW_EN_GPIOA                     = VSF_HW_CLKRST_REGION(0x39, 30, 1),// M4GPIOAEN
-    VSF_HW_EN_GPIOALP                   = VSF_HW_CLKRST_REGION(0x39, 28, 1),// M4GPIOALPEN
-    VSF_HW_EN_GPIOB                     = VSF_HW_CLKRST_REGION(0x39, 26, 1),// M4GPIOBEN
-    VSF_HW_EN_GPIOBLP                   = VSF_HW_CLKRST_REGION(0x39, 24, 1),// M4GPIOBLPEN
-    VSF_HW_EN_GPIOC                     = VSF_HW_CLKRST_REGION(0x39, 22, 1),// M4GPIOCEN
-    VSF_HW_EN_GPIOCLP                   = VSF_HW_CLKRST_REGION(0x39, 20, 1),// M4GPIOCLPEN
-    VSF_HW_EN_GPIOD                     = VSF_HW_CLKRST_REGION(0x39, 18, 1),// M4GPIODEN
-    VSF_HW_EN_GPIODLP                   = VSF_HW_CLKRST_REGION(0x39, 16, 1),// M4GPIODLPEN
-    VSF_HW_EN_GPIOE                     = VSF_HW_CLKRST_REGION(0x39, 14, 1),// M4GPIOEEN
-    VSF_HW_EN_GPIOELP                   = VSF_HW_CLKRST_REGION(0x39, 12, 1),// M4GPIOELPEN
-    VSF_HW_EN_GPIOF                     = VSF_HW_CLKRST_REGION(0x39, 10, 1),// M4GPIOFEN
-    VSF_HW_EN_GPIOFLP                   = VSF_HW_CLKRST_REGION(0x39, 8,  1),// M4GPIOFLPEN
-    VSF_HW_EN_GPIOG                     = VSF_HW_CLKRST_REGION(0x39, 6,  1),// M4GPIOGEN
-    VSF_HW_EN_GPIOGLP                   = VSF_HW_CLKRST_REGION(0x39, 4,  1),// M4GPIOGLPEN
-    VSF_HW_EN_GPIOH                     = VSF_HW_CLKRST_REGION(0x39, 2,  1),// M4GPIOHEN
-    VSF_HW_EN_GPIOHLP                   = VSF_HW_CLKRST_REGION(0x39, 0,  1),// M4GPIOHLPEN
+    VSF_HW_EN_GPIO0                     = VSF_HW_CLKRST_REGION(0x39, 30, 1),// M4GPIOAEN
+    VSF_HW_EN_GPIO0LP                   = VSF_HW_CLKRST_REGION(0x39, 28, 1),// M4GPIOALPEN
+    VSF_HW_EN_GPIO1                     = VSF_HW_CLKRST_REGION(0x39, 26, 1),// M4GPIOBEN
+    VSF_HW_EN_GPIO1LP                   = VSF_HW_CLKRST_REGION(0x39, 24, 1),// M4GPIOBLPEN
+    VSF_HW_EN_GPIO2                     = VSF_HW_CLKRST_REGION(0x39, 22, 1),// M4GPIOCEN
+    VSF_HW_EN_GPIO2LP                   = VSF_HW_CLKRST_REGION(0x39, 20, 1),// M4GPIOCLPEN
+    VSF_HW_EN_GPIO3                     = VSF_HW_CLKRST_REGION(0x39, 18, 1),// M4GPIODEN
+    VSF_HW_EN_GPIO3LP                   = VSF_HW_CLKRST_REGION(0x39, 16, 1),// M4GPIODLPEN
+    VSF_HW_EN_GPIO4                     = VSF_HW_CLKRST_REGION(0x39, 14, 1),// M4GPIOEEN
+    VSF_HW_EN_GPIO4LP                   = VSF_HW_CLKRST_REGION(0x39, 12, 1),// M4GPIOELPEN
+    VSF_HW_EN_GPIO5                     = VSF_HW_CLKRST_REGION(0x39, 10, 1),// M4GPIOFEN
+    VSF_HW_EN_GPIO5LP                   = VSF_HW_CLKRST_REGION(0x39, 8,  1),// M4GPIOFLPEN
+    VSF_HW_EN_GPIO6                     = VSF_HW_CLKRST_REGION(0x39, 6,  1),// M4GPIOGEN
+    VSF_HW_EN_GPIO6LP                   = VSF_HW_CLKRST_REGION(0x39, 4,  1),// M4GPIOGLPEN
+    VSF_HW_EN_GPIO7                     = VSF_HW_CLKRST_REGION(0x39, 2,  1),// M4GPIOHEN
+    VSF_HW_EN_GPIO7LP                   = VSF_HW_CLKRST_REGION(0x39, 0,  1),// M4GPIOHLPEN
 #elif   defined(CORE_CM7)
-    VSF_HW_EN_GPIOA                     = VSF_HW_CLKRST_REGION(0x39, 31, 1),// M7GPIOAEN
-    VSF_HW_EN_GPIOALP                   = VSF_HW_CLKRST_REGION(0x39, 29, 1),// M7GPIOALPEN
-    VSF_HW_EN_GPIOB                     = VSF_HW_CLKRST_REGION(0x39, 27, 1),// M7GPIOBEN
-    VSF_HW_EN_GPIOBLP                   = VSF_HW_CLKRST_REGION(0x39, 25, 1),// M7GPIOBLPEN
-    VSF_HW_EN_GPIOC                     = VSF_HW_CLKRST_REGION(0x39, 23, 1),// M7GPIOCEN
-    VSF_HW_EN_GPIOCLP                   = VSF_HW_CLKRST_REGION(0x39, 21, 1),// M7GPIOCLPEN
-    VSF_HW_EN_GPIOD                     = VSF_HW_CLKRST_REGION(0x39, 19, 1),// M7GPIODEN
-    VSF_HW_EN_GPIODLP                   = VSF_HW_CLKRST_REGION(0x39, 17, 1),// M7GPIODLPEN
-    VSF_HW_EN_GPIOE                     = VSF_HW_CLKRST_REGION(0x39, 15, 1),// M7GPIOEEN
-    VSF_HW_EN_GPIOELP                   = VSF_HW_CLKRST_REGION(0x39, 13, 1),// M7GPIOELPEN
-    VSF_HW_EN_GPIOF                     = VSF_HW_CLKRST_REGION(0x39, 11, 1),// M7GPIOFEN
-    VSF_HW_EN_GPIOFLP                   = VSF_HW_CLKRST_REGION(0x39, 9,  1),// M7GPIOFLPEN
-    VSF_HW_EN_GPIOG                     = VSF_HW_CLKRST_REGION(0x39, 7,  1),// M7GPIOGEN
-    VSF_HW_EN_GPIOGLP                   = VSF_HW_CLKRST_REGION(0x39, 5,  1),// M7GPIOGLPEN
-    VSF_HW_EN_GPIOH                     = VSF_HW_CLKRST_REGION(0x39, 3,  1),// M7GPIOHEN
-    VSF_HW_EN_GPIOHLP                   = VSF_HW_CLKRST_REGION(0x39, 1,  1),// M7GPIOHLPEN
+    VSF_HW_EN_GPIO0                     = VSF_HW_CLKRST_REGION(0x39, 31, 1),// M7GPIOAEN
+    VSF_HW_EN_GPIO0LP                   = VSF_HW_CLKRST_REGION(0x39, 29, 1),// M7GPIOALPEN
+    VSF_HW_EN_GPIO1                     = VSF_HW_CLKRST_REGION(0x39, 27, 1),// M7GPIOBEN
+    VSF_HW_EN_GPIO1LP                   = VSF_HW_CLKRST_REGION(0x39, 25, 1),// M7GPIOBLPEN
+    VSF_HW_EN_GPIO2                     = VSF_HW_CLKRST_REGION(0x39, 23, 1),// M7GPIOCEN
+    VSF_HW_EN_GPIO2LP                   = VSF_HW_CLKRST_REGION(0x39, 21, 1),// M7GPIOCLPEN
+    VSF_HW_EN_GPIO3                     = VSF_HW_CLKRST_REGION(0x39, 19, 1),// M7GPIODEN
+    VSF_HW_EN_GPIO3LP                   = VSF_HW_CLKRST_REGION(0x39, 17, 1),// M7GPIODLPEN
+    VSF_HW_EN_GPIO4                     = VSF_HW_CLKRST_REGION(0x39, 15, 1),// M7GPIOEEN
+    VSF_HW_EN_GPIO4LP                   = VSF_HW_CLKRST_REGION(0x39, 13, 1),// M7GPIOELPEN
+    VSF_HW_EN_GPIO5                     = VSF_HW_CLKRST_REGION(0x39, 11, 1),// M7GPIOFEN
+    VSF_HW_EN_GPIO5LP                   = VSF_HW_CLKRST_REGION(0x39, 9,  1),// M7GPIOFLPEN
+    VSF_HW_EN_GPIO6                     = VSF_HW_CLKRST_REGION(0x39, 7,  1),// M7GPIOGEN
+    VSF_HW_EN_GPIO6LP                   = VSF_HW_CLKRST_REGION(0x39, 5,  1),// M7GPIOGLPEN
+    VSF_HW_EN_GPIO7                     = VSF_HW_CLKRST_REGION(0x39, 3,  1),// M7GPIOHEN
+    VSF_HW_EN_GPIO7LP                   = VSF_HW_CLKRST_REGION(0x39, 1,  1),// M7GPIOHLPEN
 #endif
     // RCC.AHB5EN2
 #if     defined(CORE_CM4)
-    VSF_HW_EN_GPIOI                     = VSF_HW_CLKRST_REGION(0x3A, 30, 1),// M4GPIOIEN
-    VSF_HW_EN_GPIOILP                   = VSF_HW_CLKRST_REGION(0x3A, 28, 1),// M4GPIOILPEN
-    VSF_HW_EN_GPIOJ                     = VSF_HW_CLKRST_REGION(0x3A, 26, 1),// M4GPIOJEN
-    VSF_HW_EN_GPIOJLP                   = VSF_HW_CLKRST_REGION(0x3A, 24, 1),// M4GPIOJLPEN
-    VSF_HW_EN_GPIOK                     = VSF_HW_CLKRST_REGION(0x3A, 22, 1),// M4GPIOKEN
-    VSF_HW_EN_GPIOKLP                   = VSF_HW_CLKRST_REGION(0x3A, 20, 1),// M4GPIOKLPEN
+    VSF_HW_EN_GPIO8                     = VSF_HW_CLKRST_REGION(0x3A, 30, 1),// M4GPIOIEN
+    VSF_HW_EN_GPIO8LP                   = VSF_HW_CLKRST_REGION(0x3A, 28, 1),// M4GPIOILPEN
+    VSF_HW_EN_GPIO9                     = VSF_HW_CLKRST_REGION(0x3A, 26, 1),// M4GPIOJEN
+    VSF_HW_EN_GPIO9LP                   = VSF_HW_CLKRST_REGION(0x3A, 24, 1),// M4GPIOJLPEN
+    VSF_HW_EN_GPIO10                    = VSF_HW_CLKRST_REGION(0x3A, 22, 1),// M4GPIOKEN
+    VSF_HW_EN_GPIO10LP                  = VSF_HW_CLKRST_REGION(0x3A, 20, 1),// M4GPIOKLPEN
     VSF_HW_EN_ECCM3                     = VSF_HW_CLKRST_REGION(0x3A, 18, 1),// M4ECCM3EN
     VSF_HW_EN_ECCM3LP                   = VSF_HW_CLKRST_REGION(0x3A, 16, 1),// M4ECCM3LPEN
 
@@ -552,12 +566,12 @@ typedef enum vsf_hw_peripheral_en_t {
     VSF_HW_EN_AFIO                      = VSF_HW_CLKRST_REGION(0x3A, 2,  1),// M4AFIOEN
     VSF_HW_EN_AFIOLP                    = VSF_HW_CLKRST_REGION(0x3A, 0,  1),// M4AFIOLPEN
 #elif   defined(CORE_CM7)
-    VSF_HW_EN_GPIOI                     = VSF_HW_CLKRST_REGION(0x3A, 31, 1),// M7GPIOIEN
-    VSF_HW_EN_GPIOILP                   = VSF_HW_CLKRST_REGION(0x3A, 29, 1),// M7GPIOILPEN
-    VSF_HW_EN_GPIOJ                     = VSF_HW_CLKRST_REGION(0x3A, 27, 1),// M7GPIOJEN
-    VSF_HW_EN_GPIOJLP                   = VSF_HW_CLKRST_REGION(0x3A, 25, 1),// M7GPIOJLPEN
-    VSF_HW_EN_GPIOK                     = VSF_HW_CLKRST_REGION(0x3A, 23, 1),// M7GPIOKEN
-    VSF_HW_EN_GPIOKLP                   = VSF_HW_CLKRST_REGION(0x3A, 21, 1),// M7GPIOKLPEN
+    VSF_HW_EN_GPIO8                     = VSF_HW_CLKRST_REGION(0x3A, 31, 1),// M7GPIOIEN
+    VSF_HW_EN_GPIO8LP                   = VSF_HW_CLKRST_REGION(0x3A, 29, 1),// M7GPIOILPEN
+    VSF_HW_EN_GPIO9                     = VSF_HW_CLKRST_REGION(0x3A, 27, 1),// M7GPIOJEN
+    VSF_HW_EN_GPIO9LP                   = VSF_HW_CLKRST_REGION(0x3A, 25, 1),// M7GPIOJLPEN
+    VSF_HW_EN_GPIO10                    = VSF_HW_CLKRST_REGION(0x3A, 23, 1),// M7GPIOKEN
+    VSF_HW_EN_GPIO10LP                  = VSF_HW_CLKRST_REGION(0x3A, 21, 1),// M7GPIOKLPEN
     VSF_HW_EN_ECCM3                     = VSF_HW_CLKRST_REGION(0x3A, 19, 1),// M7ECCM3EN
     VSF_HW_EN_ECCM3LP                   = VSF_HW_CLKRST_REGION(0x3A, 17, 1),// M7ECCM3LPEN
 
@@ -958,6 +972,31 @@ typedef enum vsf_hw_peripheral_en_t {
     VSF_HW_EN_COMP                     = VSF_HW_CLKRST_REGION(0x46, 31, 1),// M7COMPEN
     VSF_HW_EN_COMPLP                   = VSF_HW_CLKRST_REGION(0x46, 29, 1),// M7COMPLPEN
 #endif
+
+    // GPIO0 .. GPIO10 are VSF standard, GPIOA .. GPIOK are vendor standard
+    // IMPORTANT: define vendor standard according to VSF standard
+    VSF_HW_EN_GPIOA                     = VSF_HW_EN_GPIO0,
+    VSF_HW_EN_GPIOALP                   = VSF_HW_EN_GPIO0LP,
+    VSF_HW_EN_GPIOB                     = VSF_HW_EN_GPIO1,
+    VSF_HW_EN_GPIOBLP                   = VSF_HW_EN_GPIO1LP,
+    VSF_HW_EN_GPIOC                     = VSF_HW_EN_GPIO2,
+    VSF_HW_EN_GPIOCLP                   = VSF_HW_EN_GPIO2LP,
+    VSF_HW_EN_GPIOD                     = VSF_HW_EN_GPIO3,
+    VSF_HW_EN_GPIODLP                   = VSF_HW_EN_GPIO3LP,
+    VSF_HW_EN_GPIOE                     = VSF_HW_EN_GPIO4,
+    VSF_HW_EN_GPIOELP                   = VSF_HW_EN_GPIO4LP,
+    VSF_HW_EN_GPIOF                     = VSF_HW_EN_GPIO5,
+    VSF_HW_EN_GPIOFLP                   = VSF_HW_EN_GPIO5LP,
+    VSF_HW_EN_GPIOG                     = VSF_HW_EN_GPIO6,
+    VSF_HW_EN_GPIOGLP                   = VSF_HW_EN_GPIO6LP,
+    VSF_HW_EN_GPIOH                     = VSF_HW_EN_GPIO7,
+    VSF_HW_EN_GPIOHLP                   = VSF_HW_EN_GPIO7LP,
+    VSF_HW_EN_GPIOI                     = VSF_HW_EN_GPIO8,
+    VSF_HW_EN_GPIOILP                   = VSF_HW_EN_GPIO8LP,
+    VSF_HW_EN_GPIOJ                     = VSF_HW_EN_GPIO9,
+    VSF_HW_EN_GPIOJLP                   = VSF_HW_EN_GPIO9LP,
+    VSF_HW_EN_GPIOK                     = VSF_HW_EN_GPIO10,
+    VSF_HW_EN_GPIOKLP                   = VSF_HW_EN_GPIO10LP,
 } vsf_hw_peripheral_en_t;
 
 typedef struct vsf_hw_clk_t vsf_hw_clk_t;
