@@ -51,13 +51,13 @@ pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
                             }}
                             impl crate::gpio::SealedPin for peripherals::P{port_index}_{pin_index} {{
                                 #[inline] fn pin_port(&self) -> PinPortType {{
-                                    ({port_index} << 8) + {pin_index}
+                                    crate::vsf_hal::vsf_io_port_pin_no_t::VSF_P{port_index}_{pin_index} as PinPortType
                                 }}
                             }}
                             impl From<peripherals::P{port_index}_{pin_index}> for crate::gpio::AnyPin {{
                                 fn from(_val: peripherals::P{port_index}_{pin_index}) -> Self {{
                                     Self {{
-                                        pin_port: ({port_index} << 8) + {pin_index},
+                                        pin_port: crate::vsf_hal::vsf_io_port_pin_no_t::VSF_P{port_index}_{pin_index} as PinPortType,
                                     }}
                                 }}
                             }}
@@ -71,6 +71,11 @@ pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
     }
 
     output_code.parse().unwrap()
+}
+
+#[proc_macro]
+pub fn bind_vsf_interrupts(_item: TokenStream) -> TokenStream {
+    _item
 }
 
 fn bind_vsf_gpios(lines: &Vec<&str>, output_code: &mut String) {

@@ -18,7 +18,7 @@ const BINDGEN_DEFINITIONS: [&'static str; 2] = [
 ];
 
 const PERIPHERIALS: [&'static str; 2] = ["gpio", "usart"];
-const CONSTANTS: [&'static str; 67] = [
+const CONSTANTS: [&'static str; 77] = [
     // GPIO constants
     "VSF_HW_GPIO_PIN_COUNT",
     "VSF_GPIO_INPUT",
@@ -43,9 +43,12 @@ const CONSTANTS: [&'static str; 67] = [
     "VSF_GPIO_DRIVE_STRENGTH_HIGH",
     "VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH",
     // USART constants
+    "VSF_USART_5_BIT_LENGTH",
+    "VSF_USART_6_BIT_LENGTH",
     "VSF_USART_7_BIT_LENGTH",
     "VSF_USART_8_BIT_LENGTH",
     "VSF_USART_9_BIT_LENGTH",
+    "VSF_USART_10_BIT_LENGTH",
     "VSF_USART_NO_PARITY",
     "VSF_USART_ODD_PARITY",
     "VSF_USART_EVEN_PARITY",
@@ -53,9 +56,16 @@ const CONSTANTS: [&'static str; 67] = [
     "VSF_USART_1_STOPBIT",
     "VSF_USART_1_5_STOPBIT",
     "VSF_USART_2_STOPBIT",
+    "VSF_USART_SYNC_CLOCK_ENABLE",
+    "VSF_USART_HALF_DUPLEX_ENABLE",
     "VSF_USART_SWAP",
     "VSF_USART_TX_INVERT",
     "VSF_USART_RX_INVERT",
+    "VSF_USART_IRQ_MASK_FRAME_ERR",
+    "VSF_USART_IRQ_MASK_PARITY_ERR",
+    "VSF_USART_IRQ_MASK_BREAK_ERR",
+    "VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR",
+    "VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR",
     // peripherial enable/disable
     "VSF_HW_EN_GPIO0",
     "VSF_HW_EN_GPIO1",
