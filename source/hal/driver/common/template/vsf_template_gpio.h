@@ -114,68 +114,68 @@ extern "C" {
  *
  * @{
  */
-#if !defined(VSF_GPIO_CFG_PORTA) && (VSF_HW_GPIO_PORT_MASK & (1ul << 0))
-#   define VSF_GPIO_CFG_PORTA                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT0) && (VSF_HW_GPIO_PORT_MASK & (1ul << 0))
+#   define VSF_GPIO_CFG_PORT0                       ENABLED
 #endif
 
-#if !defined(VSF_GPIO_CFG_PORTB) && (VSF_HW_GPIO_PORT_MASK & (1ul << 1))
-#   define VSF_GPIO_CFG_PORTB                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT1) && (VSF_HW_GPIO_PORT_MASK & (1ul << 1))
+#   define VSF_GPIO_CFG_PORT1                       ENABLED
 #endif
 
-#if !defined(VSF_GPIO_CFG_PORTC) && (VSF_HW_GPIO_PORT_MASK & (1ul << 2))
-#   define VSF_GPIO_CFG_PORTC                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT2) && (VSF_HW_GPIO_PORT_MASK & (1ul << 2))
+#   define VSF_GPIO_CFG_PORT2                       ENABLED
 #endif
 
-#if !defined(VSF_GPIO_CFG_PORTD) && (VSF_HW_GPIO_PORT_MASK & (1ul << 3))
-#   define VSF_GPIO_CFG_PORTD                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT3) && (VSF_HW_GPIO_PORT_MASK & (1ul << 3))
+#   define VSF_GPIO_CFG_PORT3                       ENABLED
 #endif
 
-#if !defined(VSF_GPIO_CFG_PORTE) && (VSF_HW_GPIO_PORT_MASK & (1ul << 4))
-#   define VSF_GPIO_CFG_PORTE                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT4) && (VSF_HW_GPIO_PORT_MASK & (1ul << 4))
+#   define VSF_GPIO_CFG_PORT4                       ENABLED
 #endif
 
-#if !defined(VSF_GPIO_CFG_PORTF) && (VSF_HW_GPIO_PORT_MASK & (1ul << 5))
-#   define VSF_GPIO_CFG_PORTF                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT5) && (VSF_HW_GPIO_PORT_MASK & (1ul << 5))
+#   define VSF_GPIO_CFG_PORT5                       ENABLED
 #endif
 
-#if !defined(VSF_GPIO_CFG_PORTG) && (VSF_HW_GPIO_PORT_MASK & (1ul << 6))
-#   define VSF_GPIO_CFG_PORTG                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT6) && (VSF_HW_GPIO_PORT_MASK & (1ul << 6))
+#   define VSF_GPIO_CFG_PORT6                       ENABLED
 #endif
 
-#if !defined(VSF_GPIO_CFG_PORTH) && (VSF_HW_GPIO_PORT_MASK & (1ul << 7))
-#   define VSF_GPIO_CFG_PORTH                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT7) && (VSF_HW_GPIO_PORT_MASK & (1ul << 7))
+#   define VSF_GPIO_CFG_PORT7                       ENABLED
 #endif
 
-#if !defined(VSF_GPIO_CFG_PORTI) && (VSF_HW_GPIO_PORT_MASK & (1ul << 8))
-#   define VSF_GPIO_CFG_PORTI                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT8) && (VSF_HW_GPIO_PORT_MASK & (1ul << 8))
+#   define VSF_GPIO_CFG_PORT8                       ENABLED
 #endif
 
-#if !defined(VSF_GPIO_CFG_PORTJ) && (VSF_HW_GPIO_PORT_MASK & (1ul << 9))
-#   define VSF_GPIO_CFG_PORTJ                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT9) && (VSF_HW_GPIO_PORT_MASK & (1ul << 9))
+#   define VSF_GPIO_CFG_PORT9                       ENABLED
 #endif
 
-#if !defined(VSF_GPIO_CFG_PORTK) && (VSF_HW_GPIO_PORT_MASK & (1ul << 10))
-#   define VSF_GPIO_CFG_PORTK                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT10) && (VSF_HW_GPIO_PORT_MASK & (1ul << 10))
+#   define VSF_GPIO_CFG_PORT10                      ENABLED
 #endif
 
-#if !defined(VSF_GPIO_CFG_PORTL) && (VSF_HW_GPIO_PORT_MASK & (1ul << 11))
-#   define VSF_GPIO_CFG_PORTL                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT11) && (VSF_HW_GPIO_PORT_MASK & (1ul << 11))
+#   define VSF_GPIO_CFG_PORT11                      ENABLED
 #endif
 
-#if !defined(VSF_GPIO_CFG_PORTM) && (VSF_HW_GPIO_PORT_MASK & (1ul << 12))
-#   define VSF_GPIO_CFG_PORTM                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT12) && (VSF_HW_GPIO_PORT_MASK & (1ul << 12))
+#   define VSF_GPIO_CFG_PORT12                      ENABLED
 #endif
 
-#if !defined(VSF_GPIO_CFG_PORTN) && (VSF_HW_GPIO_PORT_MASK & (1ul << 13))
-#   define VSF_GPIO_CFG_PORTN                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT13) && (VSF_HW_GPIO_PORT_MASK & (1ul << 13))
+#   define VSF_GPIO_CFG_PORT13                      ENABLED
 #endif
 
-#if !defined(VSF_GPIO_CFG_PORTO) && (VSF_HW_GPIO_PORT_MASK & (1ul << 14))
-#   define VSF_GPIO_CFG_PORTO                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT14) && (VSF_HW_GPIO_PORT_MASK & (1ul << 14))
+#   define VSF_GPIO_CFG_PORT14                      ENABLED
 #endif
 
-#if !defined(VSF_GPIO_CFG_PORTP) && (VSF_HW_GPIO_PORT_MASK & (1ul << 15))
-#   define VSF_GPIO_CFG_PORTP                       ENABLED
+#if !defined(VSF_GPIO_CFG_PORT15) && (VSF_HW_GPIO_PORT_MASK & (1ul << 15))
+#   define VSF_GPIO_CFG_PORT15                      ENABLED
 #endif
 /**
  * @}
@@ -271,8 +271,9 @@ extern "C" {
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define __VSF_GPIO_PORT_PIN_NUM(__PIN_NUM, __PORT_NUM)                            \
-    VSF_P ## __PORT_NUM ## __PIN_NUM = ((VSF_PORT ##__PORT_NUM) << 8) | __PIN_NUM,
+#define __VSF_GPIO_PORT_PIN_NUM(__PIN_NUM, __PORT_NUM, __PORT_CHAR)             \
+    VSF_P ## __PORT_NUM ## _ ## __PIN_NUM = ((VSF_PORT ## __PORT_NUM) << 8) | __PIN_NUM,\
+    VSF_P ## __PORT_CHAR ## __PIN_NUM = ((VSF_PORT ## __PORT_NUM) << 8) | __PIN_NUM,
 
 #define VSF_GPIO_APIS(__prefix_name)                                                                                                                                                                               \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_gpio_capability_t, gpio, capability,              VSF_MCONNECT(__prefix_name, _t) *gpio_ptr)                                                                    \
@@ -736,104 +737,152 @@ struct vsf_gpio_t  {
 
 #if VSF_HW_GPIO_PORT_COUNT > 0
 typedef enum vsf_io_port_no_t {
-#if defined(VSF_GPIO_CFG_PORTA)
-    VSF_PORTA,
+#if defined(VSF_GPIO_CFG_PORT0)
+    VSF_PORT0,
 #endif
-#if defined(VSF_GPIO_CFG_PORTB)
-    VSF_PORTB,
+#if defined(VSF_GPIO_CFG_PORT1)
+    VSF_PORT1,
 #endif
-#if defined(VSF_GPIO_CFG_PORTC)
-    VSF_PORTC,
+#if defined(VSF_GPIO_CFG_PORT2)
+    VSF_PORT2,
 #endif
-#if defined(VSF_GPIO_CFG_PORTD)
-    VSF_PORTD,
+#if defined(VSF_GPIO_CFG_PORT3)
+    VSF_PORT3,
 #endif
-#if defined(VSF_GPIO_CFG_PORTE)
-    VSF_PORTE,
+#if defined(VSF_GPIO_CFG_PORT4)
+    VSF_PORT4,
 #endif
-#if defined(VSF_GPIO_CFG_PORTF)
-    VSF_PORTF,
+#if defined(VSF_GPIO_CFG_PORT5)
+    VSF_PORT5,
 #endif
-#if defined(VSF_GPIO_CFG_PORTG)
-    VSF_PORTG,
+#if defined(VSF_GPIO_CFG_PORT6)
+    VSF_PORT6,
 #endif
-#if defined(VSF_GPIO_CFG_PORTH)
-    VSF_PORTH,
+#if defined(VSF_GPIO_CFG_PORT7)
+    VSF_PORT7,
 #endif
-#if defined(VSF_GPIO_CFG_PORTI)
-    VSF_PORTI,
+#if defined(VSF_GPIO_CFG_PORT8)
+    VSF_PORT8,
 #endif
-#if defined(VSF_GPIO_CFG_PORTJ)
-    VSF_PORTJ,
+#if defined(VSF_GPIO_CFG_PORT9)
+    VSF_PORT9,
 #endif
-#if defined(VSF_GPIO_CFG_PORTK)
-    VSF_PORTK,
+#if defined(VSF_GPIO_CFG_PORT10)
+    VSF_PORT10,
 #endif
-#if defined(VSF_GPIO_CFG_PORTL)
-    VSF_PORTL,
+#if defined(VSF_GPIO_CFG_PORT11)
+    VSF_PORT11,
 #endif
-#if defined(VSF_GPIO_CFG_PORTM)
-    VSF_PORTM,
+#if defined(VSF_GPIO_CFG_PORT12)
+    VSF_PORT12,
 #endif
-#if defined(VSF_GPIO_CFG_PORTN)
-    VSF_PORTN,
+#if defined(VSF_GPIO_CFG_PORT13)
+    VSF_PORT13,
 #endif
-#if defined(VSF_GPIO_CFG_PORTO)
-    VSF_PORTO,
+#if defined(VSF_GPIO_CFG_PORT14)
+    VSF_PORT14,
 #endif
-#if defined(VSF_GPIO_CFG_PORTP)
-    VSF_PORTP,
+#if defined(VSF_GPIO_CFG_PORT15)
+    VSF_PORT15,
+#endif
+#if defined(VSF_GPIO_CFG_PORT0)
+    VSF_PORTA = VSF_PORT0,
+#endif
+#if defined(VSF_GPIO_CFG_PORT1)
+    VSF_PORTB = VSF_PORT1,
+#endif
+#if defined(VSF_GPIO_CFG_PORT2)
+    VSF_PORTC = VSF_PORT2,
+#endif
+#if defined(VSF_GPIO_CFG_PORT3)
+    VSF_PORTD = VSF_PORT3,
+#endif
+#if defined(VSF_GPIO_CFG_PORT4)
+    VSF_PORTE = VSF_PORT4,
+#endif
+#if defined(VSF_GPIO_CFG_PORT5)
+    VSF_PORTF = VSF_PORT5,
+#endif
+#if defined(VSF_GPIO_CFG_PORT6)
+    VSF_PORTG = VSF_PORT6,
+#endif
+#if defined(VSF_GPIO_CFG_PORT7)
+    VSF_PORTH = VSF_PORT7,
+#endif
+#if defined(VSF_GPIO_CFG_PORT8)
+    VSF_PORTI = VSF_PORT8,
+#endif
+#if defined(VSF_GPIO_CFG_PORT9)
+    VSF_PORTJ = VSF_PORT9,
+#endif
+#if defined(VSF_GPIO_CFG_PORT10)
+    VSF_PORTK = VSF_PORT10,
+#endif
+#if defined(VSF_GPIO_CFG_PORT11)
+    VSF_PORTL = VSF_PORT11,
+#endif
+#if defined(VSF_GPIO_CFG_PORT12)
+    VSF_PORTM = VSF_PORT12,
+#endif
+#if defined(VSF_GPIO_CFG_PORT13)
+    VSF_PORTN = VSF_PORT13,
+#endif
+#if defined(VSF_GPIO_CFG_PORT14)
+    VSF_PORTO = VSF_PORT14,
+#endif
+#if defined(VSF_GPIO_CFG_PORT15)
+    VSF_PORTP = VSF_PORT15,
 #endif
 } vsf_io_port_no_t;
 
 typedef enum vsf_io_port_pin_no_t {
-#if defined(VSF_GPIO_CFG_PORTA)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, A)
+#if defined(VSF_GPIO_CFG_PORT0)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 0, A)
 #endif
-#if defined(VSF_GPIO_CFG_PORTB)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, B)
+#if defined(VSF_GPIO_CFG_PORT1)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 1, B)
 #endif
-#if defined(VSF_GPIO_CFG_PORTC)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, C)
+#if defined(VSF_GPIO_CFG_PORT2)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 2, C)
 #endif
-#if defined(VSF_GPIO_CFG_PORTD)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, D)
+#if defined(VSF_GPIO_CFG_PORT3)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 3, D)
 #endif
-#if defined(VSF_GPIO_CFG_PORTE)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, E)
+#if defined(VSF_GPIO_CFG_PORT4)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 4, E)
 #endif
-#if defined(VSF_GPIO_CFG_PORTF)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, F)
+#if defined(VSF_GPIO_CFG_PORT5)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 5, F)
 #endif
-#if defined(VSF_GPIO_CFG_PORTG)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, G)
+#if defined(VSF_GPIO_CFG_PORT6)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 6, G)
 #endif
-#if defined(VSF_GPIO_CFG_PORTH)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, H)
+#if defined(VSF_GPIO_CFG_PORT7)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 7, H)
 #endif
-#if defined(VSF_GPIO_CFG_PORTI)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, I)
+#if defined(VSF_GPIO_CFG_PORT8)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 8, I)
 #endif
-#if defined(VSF_GPIO_CFG_PORTJ)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, J)
+#if defined(VSF_GPIO_CFG_PORT9)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 9, J)
 #endif
-#if defined(VSF_GPIO_CFG_PORTK)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, K)
+#if defined(VSF_GPIO_CFG_PORT10)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 10, K)
 #endif
-#if defined(VSF_GPIO_CFG_PORTL)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, L)
+#if defined(VSF_GPIO_CFG_PORT11)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 11, L)
 #endif
-#if defined(VSF_GPIO_CFG_PORTM)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, M)
+#if defined(VSF_GPIO_CFG_PORT12)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 12, M)
 #endif
-#if defined(VSF_GPIO_CFG_PORTN)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, N)
+#if defined(VSF_GPIO_CFG_PORT13)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 13, N)
 #endif
-#if defined(VSF_GPIO_CFG_PORTO)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, O)
+#if defined(VSF_GPIO_CFG_PORT14)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 14, O)
 #endif
-#if defined(VSF_GPIO_CFG_PORTP)
-    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, P)
+#if defined(VSF_GPIO_CFG_PORT15)
+    VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 15, P)
 #endif
 } vsf_io_port_pin_no_t;
 #endif
