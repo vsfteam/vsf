@@ -24,8 +24,7 @@
 
 #include "../__device.h"
 
-#define __VSF_HAL_SHOW_VENDOR_INFO__
-#include "hal/driver/driver.h"
+#include "hal/driver/vendor_driver.h"
 
 // for VSF_MFOREACH
 #include "utilities/vsf_utilities.h"
@@ -55,6 +54,12 @@ void __NO_RETURN Reset_Handler(void);
 /*----------------------------------------------------------------------------
   Exception / Interrupt Handler
  *----------------------------------------------------------------------------*/
+
+#if !defined(VSF_HW_INTERRUPTS) && defined(VSF_HW_INTERRUPTS_NUM)
+#   define DEFINE_VSF_HW_INTERRUPT(__N)     VSF_MCONNECT(VSF_HW_INTERRUPT, __N),
+#   define VSF_HW_INTERRUPTS                                                    \
+                        VSF_MREPEAT(VSF_HW_INTERRUPTS_NUM, DEFINE_VSF_HW_INTERRUPT)
+#endif
 
 VSF_MFOREACH(__imp_blocked_weak_handler,
     NMI_Handler,
