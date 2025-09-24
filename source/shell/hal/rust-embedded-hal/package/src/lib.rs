@@ -39,6 +39,7 @@ pub mod gpio;
 pub mod usart;
 
 vsf_hal_macros::bind_vsf_peripherials!{}
+vsf_hal_macros::bind_vsf_interrupts!{}
 
 #[non_exhaustive]
 #[derive(Clone, Copy)]
@@ -65,5 +66,3 @@ pub fn init(config: Config) -> Peripherals {
         p
     })
 }
-
-vsf_hal_macros::bind_vsf_interrupts!{}
