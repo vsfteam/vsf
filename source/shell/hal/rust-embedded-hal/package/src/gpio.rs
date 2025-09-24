@@ -536,7 +536,7 @@ pub(crate) trait SealedPin {
         };
         unsafe {
             let gpio_port = vsf_hw_gpios[self._port() as usize] as *mut vsf_gpio_t;
-            vsf_gpio_port_config_pins(gpio_port, 1u32 << self._pin(), &mut mode);
+            vsf_gpio_port_config_pins(gpio_port, (1 as vsf_gpio_pin_mask_t) << self._pin(), &mut mode);
         }
     }
 
@@ -545,7 +545,7 @@ pub(crate) trait SealedPin {
     fn set_high(&self) {
         unsafe {
             let gpio_port = vsf_hw_gpios[self._port() as usize] as *mut vsf_gpio_t;
-            vsf_gpio_set(gpio_port, 1u32 << self._pin());
+            vsf_gpio_set(gpio_port, (1 as vsf_gpio_pin_mask_t) << self._pin());
         }
     }
 
@@ -554,7 +554,7 @@ pub(crate) trait SealedPin {
     fn set_low(&self) {
         unsafe {
             let gpio_port = vsf_hw_gpios[self._port() as usize] as *mut vsf_gpio_t;
-            vsf_gpio_clear(gpio_port, 1u32 << self._pin());
+            vsf_gpio_clear(gpio_port, (1 as vsf_gpio_pin_mask_t) << self._pin());
         }
     }
 
@@ -569,7 +569,7 @@ pub(crate) trait SealedPin {
     fn is_set_low(&self) -> bool {
         unsafe {
             let gpio_port = vsf_hw_gpios[self._port() as usize] as *mut vsf_gpio_t;
-            vsf_gpio_read_output_register(gpio_port) & (1u32 << self._pin()) == 0
+            vsf_gpio_read_output_register(gpio_port) & ((1 as vsf_gpio_pin_mask_t) << self._pin()) == 0
         }
     }
 
@@ -578,7 +578,7 @@ pub(crate) trait SealedPin {
     fn toggle(&self) {
         unsafe {
             let gpio_port = vsf_hw_gpios[self._port() as usize] as *mut vsf_gpio_t;
-            vsf_gpio_toggle(gpio_port, 1u32 << self._pin());
+            vsf_gpio_toggle(gpio_port, (1 as vsf_gpio_pin_mask_t) << self._pin());
         }
     }
 
@@ -593,7 +593,7 @@ pub(crate) trait SealedPin {
     fn is_low(&self) -> bool {
         unsafe {
             let gpio_port = vsf_hw_gpios[self._port() as usize] as *mut vsf_gpio_t;
-            vsf_gpio_read(gpio_port) & (1u32 << self._pin()) == 0
+            vsf_gpio_read(gpio_port) & ((1 as vsf_gpio_pin_mask_t) << self._pin()) == 0
         }
     }
 }

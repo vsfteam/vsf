@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 cmake_policy(SET CMP0076 NEW)
 
 #if(NOT DEFINED ENV{VSF_PATH})
-    get_filename_component(__VSF_PATH ../../../.. ABSOLUTE)
+    get_filename_component(__VSF_PATH ../../../../.. ABSOLUTE)
     set(ENV{VSF_PATH} ${__VSF_PATH})
 #endif()
 message(STATUS "VSF_PATH: $ENV{VSF_PATH}")
@@ -35,4 +35,7 @@ include($ENV{VSF_PATH}/script/cmake/vsf_hal.cmake)
 vsf_add_compile_definitions(
     __VSF__
     __VSF_OOC__
+)
+vsf_add_sources(
+    hal.c
 )

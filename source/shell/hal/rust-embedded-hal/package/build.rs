@@ -185,7 +185,7 @@ fn main() {
         let vsf_hal_build_path = Path::new("./vsf_hal_build");
         if !vsf_hal_build_path.exists() {
             fs::create_dir_all(&vsf_hal_build_path).unwrap();
-            Command::new("cmake").current_dir(&vsf_hal_build_path).arg("-GNinja").arg("-DVSF_TARGET=".to_string() + &model).arg(path.clone() + "source/shell/hal/rust-embedded-hal/").output().expect("Fail to run cmake");
+            Command::new("cmake").current_dir(&vsf_hal_build_path).arg("-GNinja").arg("-DVSF_TARGET=".to_string() + &model).arg(path.clone() + "source/shell/hal/rust-embedded-hal/lib").output().expect("Fail to run cmake");
             Command::new("ninja").current_dir(&vsf_hal_build_path).output().expect("Fail to run ninja");
         }
 
@@ -208,8 +208,8 @@ fn main() {
                     .default_enum_style(bindgen::EnumVariation::ModuleConsts)
                     .clang_arg("-D".to_string() + "__" + &vendor + "__")
                     .clang_arg("-D".to_string() + "__" + &model + "__")
-                    .clang_arg("-I".to_string() + &path + "source/shell/hal/rust-embedded-hal/inc")
-                    .clang_arg("-I".to_string() + &path + "source/shell/hal/rust-embedded-hal/inc/empty_libc")
+                    .clang_arg("-I".to_string() + &path + "source/shell/hal/rust-embedded-hal/lib/inc")
+                    .clang_arg("-I".to_string() + &path + "source/shell/hal/rust-embedded-hal/lib/inc/empty_libc")
                     .clang_arg("-I".to_string() + &path + "source");
 
     for definition in BINDGEN_DEFINITIONS {
