@@ -4,6 +4,7 @@
 
 [build]
 target = "thumbv7em-none-eabihf"
+rustflags = ["-Clink-args=-Map=embassy-vsf.map"]
 
 [env]
 DEFMT_LOG = "trace"
