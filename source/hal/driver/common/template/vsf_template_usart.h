@@ -768,8 +768,8 @@ typedef struct vsf_usart_capability_t {
 #endif
     vsf_usart_irq_mask_t irq_mask;          //!< \~english Supported interrupt mask bits \~chinese 支持的中断掩码位
 
-    uint32_t max_baudrate;                  //!< \~english Maximum supported baudrate (bps) \~chinese 支持的最大波特率(bps)
-    uint32_t min_baudrate;                  //!< \~english Minimum supported baudrate (bps) \~chinese 支持的最小波特率(bps)
+    uint32_t max_baudrate;                  //!< \~english Maximum supported baudrate (bps) according to current clock configurations \~chinese 当前时钟配置下支持的最大波特率(bps)
+    uint32_t min_baudrate;                  //!< \~english Minimum supported baudrate (bps) according to current clock configurations \~chinese 当前时钟配置下支持的最小波特率(bps)
 
     uint8_t txfifo_depth;                   //!< \~english TX FIFO depth in data frames (0 means no FIFO) \~chinese TX FIFO 深度(数据帧数，0表示无FIFO)
     uint8_t rxfifo_depth;                   //!< \~english RX FIFO depth in data frames (0 means no FIFO) \~chinese RX FIFO 深度(数据帧数，0表示无FIFO)
