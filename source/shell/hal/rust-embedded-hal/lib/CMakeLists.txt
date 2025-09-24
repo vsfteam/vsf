@@ -36,6 +36,3 @@ vsf_add_compile_definitions(
     __VSF__
     __VSF_OOC__
 )
-vsf_add_sources(
-    hal.c
-)

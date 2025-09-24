@@ -14,3 +14,5 @@
 #define VSF_USE_STREAM                                  DISABLED
 #define VSF_USE_TRACE                                   DISABLED
 #define VSF_USE_SIMPLE_STREAM                           ENABLED
+
+#define VSF_HW_INTERRUPTS_EXPORT

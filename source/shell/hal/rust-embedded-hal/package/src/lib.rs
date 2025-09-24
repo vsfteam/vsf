@@ -65,3 +65,5 @@ pub fn init(config: Config) -> Peripherals {
         p
     })
 }
+
+vsf_hal_macros::bind_vsf_interrupts!{}

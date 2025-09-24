@@ -75,7 +75,43 @@ pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
 
 #[proc_macro]
 pub fn bind_vsf_interrupts(_item: TokenStream) -> TokenStream {
-    _item
+    let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+    let pathbuf = Path::new(&manifest_dir).join("./src/vsf_hal.rs");
+    let bindings_content = fs::read_to_string(&pathbuf).unwrap();
+    let bindings_lines = bindings_content.lines().collect();
+
+    let mut interrupts_num: u8 = 0;
+    if let Some(tmp) = extract_const_integer::<u8>(&bindings_lines, "VSF_HW_INTERRUPTS_NUM") {
+        interrupts_num = tmp;
+    } else {
+        return "".parse().unwrap();
+    }
+
+    let mut output_code = String::from("unsafe extern \"C\" {");
+    for interrupt_index in 0 .. interrupts_num {
+        if extract_function(&bindings_lines, &format!("VSF_HW_IRQHandler{interrupt_index}")) {
+            output_code.push_str(&format!("unsafe fn VSF_HW_IRQHandler{interrupt_index}();"));
+        }
+    }
+    output_code.push_str(&format!("}}
+        pub union Vector {{
+            _handler: unsafe extern \"C\" fn(),
+            _reserved: u32,
+        }}
+        #[unsafe(link_section = \".vector_table.interrupts\")]
+        #[unsafe(no_mangle)]
+        pub static __INTERRUPTS: [Vector; {interrupts_num}] = [
+    "));
+    for interrupt_index in 0 .. interrupts_num {
+        if extract_function(&bindings_lines, &format!("VSF_HW_IRQHandler{interrupt_index}")) {
+            output_code.push_str(&format!("Vector {{ _handler: VSF_HW_IRQHandler{interrupt_index} }},"));
+        } else {
+            output_code.push_str("Vector { _reserved: 0 },");
+        }
+    }
+    output_code.push_str("];");
+
+    output_code.parse().unwrap()
 }
 
 fn bind_vsf_gpios(lines: &Vec<&str>, output_code: &mut String) {
@@ -127,6 +163,22 @@ fn extrace_peripheral_mask(lines: &Vec<&str>, name: &str) -> u32 {
             0u32
         }
     }
+}
+
+fn extract_function(lines: &Vec<&str>, name: &str) -> bool {
+    let mut matched = false;
+    let prefix = String::from(name) + "(";
+    for line in lines {
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        // pub fn FUNC_NAME(...);
+        if parts.len() >= 3 && parts[0] == "pub" && parts[1] == "fn" {
+            if parts[2].starts_with(&prefix) {
+                matched = true;
+                break;
+            }
+        }
+    }
+    return matched;
 }
 
 fn extract_const_integer<T>(lines: &Vec<&str>, name: &str) -> Option<T>
