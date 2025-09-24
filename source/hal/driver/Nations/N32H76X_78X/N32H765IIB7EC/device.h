@@ -90,6 +90,15 @@
 
 // SWI, use unexisted DSI and ETHERCAT as SWI
 #if     defined(CORE_CM4)
+
+#   ifdef VSF_HW_INTERRUPTS_EXPORT
+#       define SWI3_IRQHandler                      VSF_HW_IRQHandler166
+#       define SWI4_IRQHandler                      VSF_HW_IRQHandler187
+#       define SWI5_IRQHandler                      VSF_HW_IRQHandler188
+#       define SWI6_IRQHandler                      VSF_HW_IRQHandler189
+#       define SWI7_IRQHandler                      VSF_HW_IRQHandler190
+#   endif
+
 #   define SWI3_IRQn                                166
 #   undef VSF_HW_INTERRUPT166
 #   define VSF_HW_INTERRUPT166                      SWI3_IRQHandler
@@ -109,7 +118,17 @@
 #   define SWI7_IRQn                                190
 #   undef VSF_HW_INTERRUPT190
 #   define VSF_HW_INTERRUPT190                      SWI7_IRQHandler
+
 #else
+
+#   ifdef VSF_HW_INTERRUPTS_EXPORT
+#       define SWI6_IRQHandler                      VSF_HW_IRQHandler166
+#       define SWI7_IRQHandler                      VSF_HW_IRQHandler187
+#       define SWI8_IRQHandler                      VSF_HW_IRQHandler188
+#       define SWI9_IRQHandler                      VSF_HW_IRQHandler189
+#       define SWI10_IRQHandler                     VSF_HW_IRQHandler190
+#   endif
+
 #   define SWI6_IRQn                                166
 #   undef VSF_HW_INTERRUPT166
 #   define VSF_HW_INTERRUPT166                      SWI6_IRQHandler
@@ -129,11 +148,15 @@
 #   define SWI10_IRQn                               190
 #   undef VSF_HW_INTERRUPT190
 #   define VSF_HW_INTERRUPT190                      SWI10_IRQHandler
+
 #endif
 
-// extern interrupt handlers
-#define DECLARE_VSF_HW_INTERRUPT(__N)               extern void VSF_MCONNECT(VSF_HW_INTERRUPT, __N)(void);
+#ifdef VSF_HW_INTERRUPTS_EXPORT
+// export interrupt handlers
+#define DECLARE_VSF_HW_INTERRUPT(__N)                                           \
+            extern void VSF_MCONNECT(VSF_HW_INTERRUPT, __N)(void);
 VSF_MREPEAT(VSF_HW_INTERRUPTS_NUM, DECLARE_VSF_HW_INTERRUPT)
+#endif
 
 /*============================ MACROS ========================================*/
 

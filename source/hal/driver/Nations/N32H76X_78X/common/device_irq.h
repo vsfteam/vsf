@@ -1,6 +1,260 @@
 
 #define VSF_HW_INTERRUPTS_NUM           234
 
+#ifdef VSF_HW_INTERRUPTS_EXPORT
+
+#if     defined(CORE_CM4)
+#   define WWDG2_IRQHandler             VSF_HW_IRQHandler0
+#   define AHB_ICACHE_IRQHandler        VSF_HW_IRQHandler53
+#   define AHB_DCACHE_IRQHandler        VSF_HW_IRQHandler54
+#   define FPU_CPU2_IRQHandler          VSF_HW_IRQHandler55
+#   define SWI0_IRQHandler              VSF_HW_IRQHandler134
+#   define AHB_CACHE_PARMON_IRQHandler  VSF_HW_IRQHandler167
+#   define SWI1_IRQHandler              VSF_HW_IRQHandler172
+#   define SEMA4_INT2_IRQHandler        VSF_HW_IRQHandler173
+#   define WWDG1_RST_IRQHandler         VSF_HW_IRQHandler174
+#   define DCMUA_IRQHandler             VSF_HW_IRQHandler177
+#   define SWI2_IRQHandler              VSF_HW_IRQHandler191
+#else
+#   define WWDG1_IRQHandler             VSF_HW_IRQHandler0
+#   define SWI0_IRQHandler              VSF_HW_IRQHandler53
+#   define SWI1_IRQHandler              VSF_HW_IRQHandler54
+#   define FPU_CPU1_IRQHandler          VSF_HW_IRQHandler55
+#   define SWI2_IRQHandler              VSF_HW_IRQHandler134
+#   define SWI3_IRQHandler              VSF_HW_IRQHandler167
+#   define SEMA4_INT1_IRQHandler        VSF_HW_IRQHandler172
+#   define SWI4_IRQHandler              VSF_HW_IRQHandler173
+#   define WWDG2_RST_IRQHandler         VSF_HW_IRQHandler174
+#   define DCMUB_IRQHandler             VSF_HW_IRQHandler177
+#   define SWI5_IRQHandler              VSF_HW_IRQHandler191
+#endif
+
+#define PVD_IRQHandler                  VSF_HW_IRQHandler1
+#define RTC_TAMPER_IRQHandler           VSF_HW_IRQHandler2
+#define RTC_WKUP_IRQHandler             VSF_HW_IRQHandler3
+#define RCC_IRQHandler                  VSF_HW_IRQHandler4
+#define EXTI0_IRQHandler                VSF_HW_IRQHandler5
+#define EXTI1_IRQHandler                VSF_HW_IRQHandler6
+#define EXTI2_IRQHandler                VSF_HW_IRQHandler7
+#define EXTI3_IRQHandler                VSF_HW_IRQHandler8
+#define EXTI4_IRQHandler                VSF_HW_IRQHandler9
+#define EXTI9_5_IRQHandler              VSF_HW_IRQHandler10
+#define EXTI15_10_IRQHandler            VSF_HW_IRQHandler11
+#define DMA1_Channel0_IRQHandler        VSF_HW_IRQHandler12
+#define DMA1_Channel1_IRQHandler        VSF_HW_IRQHandler13
+#define DMA1_Channel2_IRQHandler        VSF_HW_IRQHandler14
+#define DMA1_Channel3_IRQHandler        VSF_HW_IRQHandler15
+#define DMA1_Channel4_IRQHandler        VSF_HW_IRQHandler16
+#define DMA1_Channel5_IRQHandler        VSF_HW_IRQHandler17
+#define DMA1_Channel6_IRQHandler        VSF_HW_IRQHandler18
+#define DMA1_Channel7_IRQHandler        VSF_HW_IRQHandler19
+#define DMA2_Channel0_IRQHandler        VSF_HW_IRQHandler20
+#define DMA2_Channel1_IRQHandler        VSF_HW_IRQHandler21
+#define DMA2_Channel2_IRQHandler        VSF_HW_IRQHandler22
+#define DMA2_Channel3_IRQHandler        VSF_HW_IRQHandler23
+#define DMA2_Channel4_IRQHandler        VSF_HW_IRQHandler24
+#define DMA2_Channel5_IRQHandler        VSF_HW_IRQHandler25
+#define DMA2_Channel6_IRQHandler        VSF_HW_IRQHandler26
+#define DMA2_Channel7_IRQHandler        VSF_HW_IRQHandler27
+#define DMA3_Channel0_IRQHandler        VSF_HW_IRQHandler28
+#define DMA3_Channel1_IRQHandler        VSF_HW_IRQHandler29
+#define DMA3_Channel2_IRQHandler        VSF_HW_IRQHandler30
+#define DMA3_Channel3_IRQHandler        VSF_HW_IRQHandler31
+#define DMA3_Channel4_IRQHandler        VSF_HW_IRQHandler32
+#define DMA3_Channel5_IRQHandler        VSF_HW_IRQHandler33
+#define DMA3_Channel6_IRQHandler        VSF_HW_IRQHandler34
+#define DMA3_Channel7_IRQHandler        VSF_HW_IRQHandler35
+#define MDMA_Channel0_IRQHandler        VSF_HW_IRQHandler36
+#define MDMA_Channel1_IRQHandler        VSF_HW_IRQHandler37
+#define MDMA_Channel2_IRQHandler        VSF_HW_IRQHandler38
+#define MDMA_Channel3_IRQHandler        VSF_HW_IRQHandler39
+#define MDMA_Channel4_IRQHandler        VSF_HW_IRQHandler40
+#define MDMA_Channel5_IRQHandler        VSF_HW_IRQHandler41
+#define MDMA_Channel6_IRQHandler        VSF_HW_IRQHandler42
+#define MDMA_Channel7_IRQHandler        VSF_HW_IRQHandler43
+#define MDMA_Channel8_IRQHandler        VSF_HW_IRQHandler44
+#define MDMA_Channel9_IRQHandler        VSF_HW_IRQHandler45
+#define MDMA_Channel10_IRQHandler       VSF_HW_IRQHandler46
+#define MDMA_Channel11_IRQHandler       VSF_HW_IRQHandler47
+#define MDMA_Channel12_IRQHandler       VSF_HW_IRQHandler48
+#define MDMA_Channel13_IRQHandler       VSF_HW_IRQHandler49
+#define MDMA_Channel14_IRQHandler       VSF_HW_IRQHandler50
+#define MDMA_Channel15_IRQHandler       VSF_HW_IRQHandler51
+#define SDPU_IRQHandler                 VSF_HW_IRQHandler52
+#define ECCMON_IRQHandler               VSF_HW_IRQHandler56
+#define RTC_ALARM_IRQHandler            VSF_HW_IRQHandler57
+#define I2C1_EV_IRQHandler              VSF_HW_IRQHandler58
+#define I2C1_ER_IRQHandler              VSF_HW_IRQHandler59
+#define I2C2_EV_IRQHandler              VSF_HW_IRQHandler60
+#define I2C2_ER_IRQHandler              VSF_HW_IRQHandler61
+#define I2C3_EV_IRQHandler              VSF_HW_IRQHandler62
+#define I2C3_ER_IRQHandler              VSF_HW_IRQHandler63
+#define I2C4_EV_IRQHandler              VSF_HW_IRQHandler64
+#define I2C4_ER_IRQHandler              VSF_HW_IRQHandler65
+#define I2C5_EV_IRQHandler              VSF_HW_IRQHandler66
+#define I2C5_ER_IRQHandler              VSF_HW_IRQHandler67
+#define I2C6_EV_IRQHandler              VSF_HW_IRQHandler68
+#define I2C6_ER_IRQHandler              VSF_HW_IRQHandler69
+#define I2C7_EV_IRQHandler              VSF_HW_IRQHandler70
+#define I2C7_ER_IRQHandler              VSF_HW_IRQHandler71
+#define I2C8_EV_IRQHandler              VSF_HW_IRQHandler72
+#define I2C8_ER_IRQHandler              VSF_HW_IRQHandler73
+#define I2C9_EV_IRQHandler              VSF_HW_IRQHandler74
+#define I2C9_ER_IRQHandler              VSF_HW_IRQHandler75
+#define I2C10_EV_IRQHandler             VSF_HW_IRQHandler76
+#define I2C10_ER_IRQHandler             VSF_HW_IRQHandler77
+#define I2S1_IRQHandler                 VSF_HW_IRQHandler78
+#define I2S2_IRQHandler                 VSF_HW_IRQHandler79
+#define I2S3_IRQHandler                 VSF_HW_IRQHandler80
+#define I2S4_IRQHandler                 VSF_HW_IRQHandler81
+#define xSPI1_IRQHandler                VSF_HW_IRQHandler82
+#define xSPI2_IRQHandler                VSF_HW_IRQHandler83
+#define SPI1_IRQHandler                 VSF_HW_IRQHandler84
+#define SPI2_IRQHandler                 VSF_HW_IRQHandler85
+#define SPI3_IRQHandler                 VSF_HW_IRQHandler86
+#define SPI4_IRQHandler                 VSF_HW_IRQHandler87
+#define SPI5_IRQHandler                 VSF_HW_IRQHandler88
+#define SPI6_IRQHandler                 VSF_HW_IRQHandler89
+#define SPI7_IRQHandler                 VSF_HW_IRQHandler90
+#define LCD_EV_IRQHandler               VSF_HW_IRQHandler91
+#define LCD_ER_IRQHandler               VSF_HW_IRQHandler92
+#define DVP1_IRQHandler                 VSF_HW_IRQHandler93
+#define DVP2_IRQHandler                 VSF_HW_IRQHandler94
+#define DMAMUX2_IRQHandler              VSF_HW_IRQHandler95
+#define USB1_HS_EPx_OUT_IRQHandler      VSF_HW_IRQHandler96
+#define USB1_HS_EPx_IN_IRQHandler       VSF_HW_IRQHandler97
+#define USB1_HS_WKUP_IRQHandler         VSF_HW_IRQHandler98
+#define USB1_HS_IRQHandler              VSF_HW_IRQHandler99
+#define USB2_HS_EPx_OUT_IRQHandler      VSF_HW_IRQHandler100
+#define USB2_HS_EPx_IN_IRQHandler       VSF_HW_IRQHandler101
+#define USB2_HS_WKUP_IRQHandler         VSF_HW_IRQHandler102
+#define USB2_HS_IRQHandler              VSF_HW_IRQHandler103
+#define ETH1_IRQHandler                 VSF_HW_IRQHandler104
+#define ETH1_PMT_LPI_IRQHandler         VSF_HW_IRQHandler105
+#define ETH2_IRQHandler                 VSF_HW_IRQHandler106
+#define ETH2_PMT_LPI_IRQHandler         VSF_HW_IRQHandler107
+#define FDCAN1_INT0_IRQHandler          VSF_HW_IRQHandler108
+#define FDCAN2_INT0_IRQHandler          VSF_HW_IRQHandler109
+#define FDCAN3_INT0_IRQHandler          VSF_HW_IRQHandler110
+#define FDCAN4_INT0_IRQHandler          VSF_HW_IRQHandler111
+#define FDCAN1_INT1_IRQHandler          VSF_HW_IRQHandler112
+#define FDCAN2_INT1_IRQHandler          VSF_HW_IRQHandler113
+#define FDCAN3_INT1_IRQHandler          VSF_HW_IRQHandler114
+#define FDCAN4_INT1_IRQHandler          VSF_HW_IRQHandler115
+#define USART1_IRQHandler               VSF_HW_IRQHandler116
+#define USART2_IRQHandler               VSF_HW_IRQHandler117
+#define USART3_IRQHandler               VSF_HW_IRQHandler118
+#define USART4_IRQHandler               VSF_HW_IRQHandler119
+#define USART5_IRQHandler               VSF_HW_IRQHandler120
+#define USART6_IRQHandler               VSF_HW_IRQHandler121
+#define USART7_IRQHandler               VSF_HW_IRQHandler122
+#define USART8_IRQHandler               VSF_HW_IRQHandler123
+#define UART9_IRQHandler                VSF_HW_IRQHandler124
+#define UART10_IRQHandler               VSF_HW_IRQHandler125
+#define UART11_IRQHandler               VSF_HW_IRQHandler126
+#define UART12_IRQHandler               VSF_HW_IRQHandler127
+#define UART13_IRQHandler               VSF_HW_IRQHandler128
+#define UART14_IRQHandler               VSF_HW_IRQHandler129
+#define UART15_IRQHandler               VSF_HW_IRQHandler130
+#define LPUART1_IRQHandler              VSF_HW_IRQHandler131
+#define LPUART2_IRQHandler              VSF_HW_IRQHandler132
+#define GPU_IRQHandler                  VSF_HW_IRQHandler133
+#define SDMMC1_IRQHandler               VSF_HW_IRQHandler135
+#define SDMMC2_IRQHandler               VSF_HW_IRQHandler136
+#define ADC1_IRQHandler                 VSF_HW_IRQHandler137
+#define ADC2_IRQHandler                 VSF_HW_IRQHandler138
+#define ADC3_IRQHandler                 VSF_HW_IRQHandler139
+#define COMP1_2_IRQHandler              VSF_HW_IRQHandler140
+#define COMP3_4_IRQHandler              VSF_HW_IRQHandler141
+#define SHRTIM1_INT1_IRQHandler         VSF_HW_IRQHandler142
+#define SHRTIM1_INT2_IRQHandler         VSF_HW_IRQHandler143
+#define SHRTIM1_INT3_IRQHandler         VSF_HW_IRQHandler144
+#define SHRTIM1_INT4_IRQHandler         VSF_HW_IRQHandler145
+#define SHRTIM1_INT5_IRQHandler         VSF_HW_IRQHandler146
+#define SHRTIM1_INT6_IRQHandler         VSF_HW_IRQHandler147
+#define SHRTIM1_INT7_IRQHandler         VSF_HW_IRQHandler148
+#define SHRTIM1_INT8_IRQHandler         VSF_HW_IRQHandler149
+#define SHRTIM2_INT1_IRQHandler         VSF_HW_IRQHandler150
+#define SHRTIM2_INT2_IRQHandler         VSF_HW_IRQHandler151
+#define SHRTIM2_INT3_IRQHandler         VSF_HW_IRQHandler152
+#define SHRTIM2_INT4_IRQHandler         VSF_HW_IRQHandler153
+#define SHRTIM2_INT5_IRQHandler         VSF_HW_IRQHandler154
+#define SHRTIM2_INT6_IRQHandler         VSF_HW_IRQHandler155
+#define SHRTIM2_INT7_IRQHandler         VSF_HW_IRQHandler156
+#define SHRTIM2_INT8_IRQHandler         VSF_HW_IRQHandler157
+#define FDCAN5_INT0_IRQHandler          VSF_HW_IRQHandler158
+#define FDCAN6_INT0_IRQHandler          VSF_HW_IRQHandler159
+#define FDCAN7_INT0_IRQHandler          VSF_HW_IRQHandler160
+#define FDCAN8_INT0_IRQHandler          VSF_HW_IRQHandler161
+#define FDCAN5_INT1_IRQHandler          VSF_HW_IRQHandler162
+#define FDCAN6_INT1_IRQHandler          VSF_HW_IRQHandler163
+#define FDCAN7_INT1_IRQHandler          VSF_HW_IRQHandler164
+#define FDCAN8_INT1_IRQHandler          VSF_HW_IRQHandler165
+#define DSI_IRQHandler                  VSF_HW_IRQHandler166
+#define LPTIM5_WKUP_IRQHandler          VSF_HW_IRQHandler168
+#define JPEG_SGDMA_H2P_IRQHandler       VSF_HW_IRQHandler169
+#define JPEG_SGDMA_P2H_IRQHandler       VSF_HW_IRQHandler170
+#define WAKEUP_IO_IRQHandler            VSF_HW_IRQHandler171
+#define OTPC_IRQHandler                 VSF_HW_IRQHandler175
+#define FEMC_IRQHandler                 VSF_HW_IRQHandler176
+#define DAC1_IRQHandler                 VSF_HW_IRQHandler178
+#define DAC2_IRQHandler                 VSF_HW_IRQHandler179
+#define MDMA_AHBS_ER_IRQHandler         VSF_HW_IRQHandler180
+#define CM7_CATCH_READ_ER_IRQHandler    VSF_HW_IRQHandler181
+#define DAC3_IRQHandler                 VSF_HW_IRQHandler182
+#define DAC4_IRQHandler                 VSF_HW_IRQHandler183
+#define EMC_IRQHandler                  VSF_HW_IRQHandler184
+#define DAC5_IRQHandler                 VSF_HW_IRQHandler185
+#define DAC6_IRQHandler                 VSF_HW_IRQHandler186
+#define ESC_OPB_IRQHandler              VSF_HW_IRQHandler187
+#define ESC_SYNC0_IRQHandler            VSF_HW_IRQHandler188
+#define ESC_SYNC1_IRQHandler            VSF_HW_IRQHandler189
+#define ESC_WRP_IRQHandler              VSF_HW_IRQHandler190
+#define ATIM1_BRK_IRQHandler            VSF_HW_IRQHandler192
+#define ATIM1_TRG_COM_IRQHandler        VSF_HW_IRQHandler193
+#define ATIM1_CC_IRQHandler             VSF_HW_IRQHandler194
+#define ATIM1_UP_IRQHandler             VSF_HW_IRQHandler195
+#define ATIM2_BRK_IRQHandler            VSF_HW_IRQHandler196
+#define ATIM2_TRG_COM_IRQHandler        VSF_HW_IRQHandler197
+#define ATIM2_CC_IRQHandler             VSF_HW_IRQHandler198
+#define ATIM2_UP_IRQHandler             VSF_HW_IRQHandler199
+#define ATIM3_BRK_IRQHandler            VSF_HW_IRQHandler200
+#define ATIM3_TRG_COM_IRQHandler        VSF_HW_IRQHandler201
+#define ATIM3_CC_IRQHandler             VSF_HW_IRQHandler202
+#define ATIM3_UP_IRQHandler             VSF_HW_IRQHandler203
+#define ATIM4_BRK_IRQHandler            VSF_HW_IRQHandler204
+#define ATIM4_TRG_COM_IRQHandler        VSF_HW_IRQHandler205
+#define ATIM4_CC_IRQHandler             VSF_HW_IRQHandler206
+#define ATIM4_UP_IRQHandler             VSF_HW_IRQHandler207
+#define GTIMA1_IRQHandler               VSF_HW_IRQHandler208
+#define GTIMA2_IRQHandler               VSF_HW_IRQHandler209
+#define GTIMA3_IRQHandler               VSF_HW_IRQHandler210
+#define GTIMA4_IRQHandler               VSF_HW_IRQHandler211
+#define GTIMA5_IRQHandler               VSF_HW_IRQHandler212
+#define GTIMA6_IRQHandler               VSF_HW_IRQHandler213
+#define GTIMA7_IRQHandler               VSF_HW_IRQHandler214
+#define GTIMB1_IRQHandler               VSF_HW_IRQHandler215
+#define GTIMB2_IRQHandler               VSF_HW_IRQHandler216
+#define GTIMB3_IRQHandler               VSF_HW_IRQHandler217
+#define BTIM1_IRQHandler                VSF_HW_IRQHandler218
+#define BTIM2_IRQHandler                VSF_HW_IRQHandler219
+#define BTIM3_IRQHandler                VSF_HW_IRQHandler220
+#define BTIM4_IRQHandler                VSF_HW_IRQHandler221
+#define LPTIM1_WKUP_IRQHandler          VSF_HW_IRQHandler222
+#define LPTIM2_WKUP_IRQHandler          VSF_HW_IRQHandler223
+#define LPTIM3_WKUP_IRQHandler          VSF_HW_IRQHandler224
+#define LPTIM4_WKUP_IRQHandler          VSF_HW_IRQHandler225
+#define DSMU_FLT0_IRQHandler            VSF_HW_IRQHandler226
+#define DSMU_FLT1_IRQHandler            VSF_HW_IRQHandler227
+#define DSMU_FLT2_IRQHandler            VSF_HW_IRQHandler228
+#define DSMU_FLT3_IRQHandler            VSF_HW_IRQHandler229
+#define FMAC_IRQHandler                 VSF_HW_IRQHandler230
+#define CORDIC_IRQHandler               VSF_HW_IRQHandler231
+#define DMAMUX1_IRQHandler              VSF_HW_IRQHandler232
+#define MMU_IRQHandler                  VSF_HW_IRQHandler233
+
+#endif
+
 #if     defined(CORE_CM4)
 #   define VSF_HW_SWI_NUM               3
 
