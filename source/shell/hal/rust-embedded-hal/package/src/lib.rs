@@ -33,13 +33,13 @@ pub mod mode {
     impl_mode!(Async);
 }
 
+pub mod interrupts;
 #[cfg(vsf_gpio_enabled)]
 pub mod gpio;
 #[cfg(vsf_usart_enabled)]
 pub mod usart;
 
 vsf_hal_macros::bind_vsf_peripherials!{}
-vsf_hal_macros::bind_vsf_interrupts!{}
 
 #[non_exhaustive]
 #[derive(Clone, Copy)]

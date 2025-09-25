@@ -262,17 +262,59 @@ fn main() {
     let bindings_lines = bindings_content.lines().collect();
 
     // parse interrupts
-    let interrupt_vec = GLOBAL_MAP.lock().unwrap();
     let mut device_x_str = String::from("");
-    for interrupt_index in 0..interrupt_vec.len() {
-        if interrupt_vec[interrupt_index].len() > 0 {
-            let interrupt_name = interrupt_vec[interrupt_index].strip_suffix("_IRQHandler").unwrap();
+    let mut interrupt_str = String::from("");
+    let mut interrupt_func_dec_str = String::from("");
+    let mut interrupt_vecotr_str = String::from("");
+    let mut interrupt_num: u8 = 0;
+    if let Some(interrupt_num_tmp) = extract_const_integer::<u8>(&bindings_lines, "VSF_HW_INTERRUPTS_NUM") {
+        interrupt_num = interrupt_num_tmp;
+        let interrupt_vec = GLOBAL_MAP.lock().unwrap();
+        for interrupt_index in 0..interrupt_vec.len() {
+            if interrupt_vec[interrupt_index].len() > 0 {
+                let interrupt_name = interrupt_vec[interrupt_index].strip_suffix("_IRQHandler").unwrap();
 
-            println!("cargo:warning=irq{interrupt_index}: {interrupt_name}");
-            device_x_str.push_str(&format!("PROVIDE({interrupt_name} = DefaultHandler);\n"));
+                println!("cargo:warning=irq{interrupt_index}: {interrupt_name}");
+                device_x_str.push_str(&format!("PROVIDE({interrupt_name} = DefaultHandler);\n"));
+                interrupt_str.push_str(&format!("{interrupt_name} = {interrupt_index},\n"));
+                interrupt_func_dec_str.push_str(&format!("fn {interrupt_name}();\n"));
+                interrupt_vecotr_str.push_str(&format!("Vector {{ _handler: {interrupt_name} }},\n"));
+            } else {
+                interrupt_vecotr_str.push_str("Vector { _reserved: 0: {interrupt_name} },\n");
+            }
         }
     }
     fs::write("./device.x", device_x_str).unwrap();
+    fs::write("./src/interrupts.rs", &format!("
+        #[derive(Copy, Clone, Debug, PartialEq, Eq)]
+        #[cfg_attr(feature = \"defmt\", derive(defmt::Format))]
+        #[allow(non_camel_case_types)]
+        pub enum Interrupt {{
+            {interrupt_str}
+        }}
+        unsafe impl cortex_m::interrupt::InterruptNumber for Interrupt {{
+            #[inline(always)]
+            fn number(self) -> u16 {{
+                self as u16
+            }}
+        }}
+        mod _vectors {{
+            unsafe extern \"C\" {{
+                {interrupt_func_dec_str}
+            }}
+
+            pub union Vector {{
+                _handler: unsafe extern \"C\" fn(),
+                _reserved: u32,
+            }}
+            #[unsafe(link_section = \".vector_table.interrupts\")]
+            #[unsafe(no_mangle)]
+            #[allow(non_camel_case_types)]
+            pub static __INTERRUPTS: [Vector; {interrupt_num}] = [
+                {interrupt_vecotr_str}
+            ];
+        }}
+    ")).unwrap();
 
     // parse peripherials
     for peripherial in PERIPHERIALS {
