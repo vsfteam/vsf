@@ -188,7 +188,7 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_FRAME_ERR        = (0x1ul << 6),
     VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 7),
     VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 8),
-    VSF_USART_IRQ_MASK_OVERFLOW_ERR     = (0x1ul << 9),
+    VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  = (0x1ul << 9),
 
     // only include VSF_USART_IRQ_MASK_TX_IDLE if hardware supports TX_IDLE interrupt
 //    VSF_USART_IRQ_MASK_TX_IDLE          = (0x1ul << 10),

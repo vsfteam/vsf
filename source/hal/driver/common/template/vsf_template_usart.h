@@ -503,7 +503,7 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_FRAME_ERR        = (0x1ul << 6),  //!< \~english Frame error interrupt \~chinese 帧错误中断
     VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 7),  //!< \~english Parity error interrupt \~chinese 奇偶校验错误中断
     VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 8),  //!< \~english Break error interrupt \~chinese BREAK 信号错误中断
-    VSF_USART_IRQ_MASK_OVERFLOW_ERR     = (0x1ul << 9),  //!< \~english Overflow error interrupt \~chinese 溢出错误中断
+    VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  = (0x1ul << 9),  //!< \~english Overflow error interrupt \~chinese 溢出错误中断
 
     /**
      * \~english
@@ -548,7 +548,7 @@ enum {
     VSF_USART_IRQ_MASK_ERR                  = VSF_USART_IRQ_MASK_FRAME_ERR       //!< \~english Combined error interrupt mask \~chinese 组合错误中断掩码
                                             | VSF_USART_IRQ_MASK_PARITY_ERR
                                             | VSF_USART_IRQ_MASK_BREAK_ERR
-                                            | VSF_USART_IRQ_MASK_OVERFLOW_ERR,
+                                            | VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR,
 #endif
 
 #ifndef VSF_USART_IRQ_ALL_BITS_MASK

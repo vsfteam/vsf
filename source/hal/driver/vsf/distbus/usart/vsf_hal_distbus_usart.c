@@ -143,8 +143,8 @@ static bool __vsf_hal_distbus_usart_msghandler(vsf_distbus_t *distbus, vsf_distb
     case VSF_HAL_DISTBUS_USART_CMD_RX:
         VSF_HAL_ASSERT(datalen > 0);
         if (datalen < vsf_stream_write(&usart->fifo.rx.stream.use_as__vsf_stream_t, data, datalen)) {
-            if ((usart->irq.handler != NULL) && (usart->irq.mask & VSF_USART_IRQ_MASK_OVERFLOW_ERR)) {
-                usart->irq.handler(usart->irq.target, (vsf_usart_t *)&usart, VSF_USART_IRQ_MASK_OVERFLOW_ERR);
+            if ((usart->irq.handler != NULL) && (usart->irq.mask & VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)) {
+                usart->irq.handler(usart->irq.target, (vsf_usart_t *)&usart, VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR);
             }
         }
         break;

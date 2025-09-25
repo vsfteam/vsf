@@ -32,7 +32,7 @@
 #    endif
 
 #    define STHAL_USART_RX_ERR_IRQ_MASK                                        \
-        (VSF_USART_IRQ_MASK_OVERFLOW_ERR | VSF_USART_IRQ_MASK_FRAME_ERR |      \
+        (VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR | VSF_USART_IRQ_MASK_FRAME_ERR |      \
          VSF_USART_IRQ_MASK_BREAK_ERR | VSF_USART_IRQ_MASK_PARITY_ERR)
 
 #    define DUMMY_DATA 0xFFFFU
@@ -281,7 +281,7 @@ static void __usart_err_isr_handler(struct __UART_HandleTypeDef *huart,
 {
     vsf_usart_irq_disable(usart, VSF_USART_IRQ_MASK_RX_CPL);
 
-    if (irq_mask & VSF_USART_IRQ_MASK_OVERFLOW_ERR) {
+    if (irq_mask & VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) {
         huart->ErrorCode |= HAL_UART_ERROR_ORE;
     }
     if (irq_mask & VSF_USART_IRQ_MASK_FRAME_ERR) {

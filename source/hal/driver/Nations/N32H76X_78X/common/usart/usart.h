@@ -267,11 +267,11 @@ typedef enum vsf_usart_irq_mask_t {
     // 0..2
     VSF_USART_IRQ_MASK_FRAME_ERR        = (1 << 0),
     VSF_USART_IRQ_MASK_BREAK_ERR        = (1 << 1),
-    VSF_USART_IRQ_MASK_OVERFLOW_ERR     = (1 << 2),
+    VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  = (1 << 2),
 
     __VSF_HW_USART_NOT_SUPPORT_IRQ_MASK = VSF_USART_IRQ_MASK_FRAME_ERR
                                         | VSF_USART_IRQ_MASK_BREAK_ERR
-                                        | VSF_USART_IRQ_MASK_OVERFLOW_ERR,
+                                        | VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR,
 } vsf_usart_irq_mask_t;
 #endif
 

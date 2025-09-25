@@ -140,11 +140,12 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_FRAME_ERR    = (0x1ul << 28),
     VSF_USART_IRQ_MASK_PARITY_ERR   = (0x1ul << 29),
     VSF_USART_IRQ_MASK_BREAK_ERR    = (0x1ul << 30),
-    VSF_USART_IRQ_MASK_OVERFLOW_ERR = (0x1ul << 31),
+    VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR
+                                    = (0x1ul << 31),
     VSF_USART_IRQ_MASK_ERR          = VSF_USART_IRQ_MASK_FRAME_ERR |
                                       VSF_USART_IRQ_MASK_PARITY_ERR |
                                       VSF_USART_IRQ_MASK_BREAK_ERR |
-                                      VSF_USART_IRQ_MASK_OVERFLOW_ERR,
+                                      VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR,
 
     VSF_USART_IRQ_ALL_BITS_MASK     = F1C100S_USART_IRQ_ALL_BITS_MASK |
                                       VSF_USART_IRQ_MASK_RX_TIMEOUT |

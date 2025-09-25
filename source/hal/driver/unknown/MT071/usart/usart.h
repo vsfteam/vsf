@@ -114,11 +114,11 @@ enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_FRAME_ERR        = USART_INTR_FEIS,
     VSF_USART_IRQ_MASK_PARITY_ERR       = USART_INTR_PEIS,
     VSF_USART_IRQ_MASK_BREAK_ERR        = USART_INTR_BEIS,
-    VSF_USART_IRQ_MASK_OVERFLOW_ERR     = USART_INTR_OEIS,
+    VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  = USART_INTR_OEIS,
     VSF_USART_IRQ_MASK_ERROR            = VSF_USART_IRQ_MASK_FRAME_ERR |
                                           VSF_USART_IRQ_MASK_PARITY_ERR |
                                           VSF_USART_IRQ_MASK_BREAK_ERR |
-                                          VSF_USART_IRQ_MASK_OVERFLOW_ERR,
+                                          VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR,
 
     // FIFO
     VSF_USART_IRQ_MASK_TX_FIFO_EMPTY    = USART_INTR_TFEIS,
