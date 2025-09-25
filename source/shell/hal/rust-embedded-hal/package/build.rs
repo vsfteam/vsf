@@ -383,11 +383,8 @@ fn main() {
     "));
 
     // parse alternate functions
-    #[cfg(false)]
     let af_map = GLOBAL_AF_MAP.lock().unwrap();
-    #[cfg(false)]
     let afs_info = GLOBAL_AF_INFO.lock().unwrap();
-    #[cfg(false)]
     for af in af_map.iter() {
         let str = af.0;
         let mut gpio_pos = str.rfind('_').unwrap();
@@ -403,7 +400,6 @@ fn main() {
         if let Some(af_info) = afs_info.get(peripheral_type_str) {
             if let Some(af_pin) = af_info.pins.get(pin_str) {
                 println!("cargo:warning={}::{peripheral_type_str}{peripheral_index_str}: {pin_str} on {gpio_str} ==> AF{af}", af_info.module);
-                println!("cargo:warning=pin_trait_impl!(crate::{}::{}, {peripheral_str}, {pin_str}, {af}u8);", af_info.module, *af_pin);
                 generated_rs_str.push_str(&format!("pin_trait_impl!(crate::{}::{}, {peripheral_str}, {gpio_str}, {af}u8);\n", af_info.module, *af_pin));
             }
         }
