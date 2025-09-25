@@ -17,7 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__) || defined(__VSF_HAL_SHOW_VENDOR_INFO__)
 #   include "../__device.h"
 #else
 

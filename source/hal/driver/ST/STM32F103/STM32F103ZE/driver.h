@@ -15,7 +15,7 @@
  *                                                                           *
  ****************************************************************************/
 
-#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__)
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__) || defined(__VSF_HAL_SHOW_VENDOR_INFO__)
 
 #   include "../__device.h"
 
@@ -25,7 +25,7 @@
 #       define __HAL_DRIVER_ARM_MPS2_CMSDK_CM3_H__
 
 /*============================ INCLUDES ======================================*/
-#       include "hal/vsf_hal_cfg.h"   
+#       include "hal/vsf_hal_cfg.h"
 #       include "./device.h"
 //#       include "../common/io/io.h"
 //#       include "../common/pm/pm.h"

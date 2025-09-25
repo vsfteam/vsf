@@ -17,6 +17,8 @@
 
 /*============================ INCLUDES ======================================*/
 
+// To correctly provide information to the upper layer for arch or vendor,
+// it is necessary to check whether __VSF_HEADER_ONLY_SHOW_ARCH_INFO__ or __VSF_HAL_SHOW_VENDOR_INFO__ is defined
 #if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__) || defined(__VSF_HAL_SHOW_VENDOR_INFO__)
 
 #   include "../__device.h"
