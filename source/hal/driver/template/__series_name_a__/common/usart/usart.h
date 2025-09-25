@@ -190,14 +190,18 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 8),
     VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  = (0x1ul << 9),
 
+    // only include VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR if hardware supports TX_OVERFLOW_ERR interrupt
+    //VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR  = (0x1ul << 10),
+    //#define VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR
+
     // only include VSF_USART_IRQ_MASK_TX_IDLE if hardware supports TX_IDLE interrupt
-//    VSF_USART_IRQ_MASK_TX_IDLE          = (0x1ul << 10),
-//#define VSF_USART_IRQ_MASK_TX_IDLE      VSF_USART_IRQ_MASK_TX_IDLE
+    //VSF_USART_IRQ_MASK_TX_IDLE          = (0x1ul << 11),
+    //#define VSF_USART_IRQ_MASK_TX_IDLE      VSF_USART_IRQ_MASK_TX_IDLE
 
     // only include VSF_USART_IRQ_MASK_RX_IDLE if hardware supports configurable RX_IDLE count and RX_IDLE interrupt
     // or VSF_USART_IRQ_MASK_RX_IDLE will be mapped to VSF_USART_IRQ_MASK_RX_TIMEOUT
-//    VSF_USART_IRQ_MASK_RX_IDLE          = (0x1ul << 11),
-//#define VSF_USART_IRQ_MASK_RX_IDLE      VSF_USART_IRQ_MASK_RX_IDLE
+    //VSF_USART_IRQ_MASK_RX_IDLE          = (0x1ul << 12),
+     //#define VSF_USART_IRQ_MASK_RX_IDLE      VSF_USART_IRQ_MASK_RX_IDLE
 
     // more vendor specified irq_masks can be added here
 } vsf_usart_irq_mask_t;

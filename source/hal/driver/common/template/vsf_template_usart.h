@@ -503,7 +503,19 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_FRAME_ERR        = (0x1ul << 6),  //!< \~english Frame error interrupt \~chinese 帧错误中断
     VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 7),  //!< \~english Parity error interrupt \~chinese 奇偶校验错误中断
     VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 8),  //!< \~english Break error interrupt \~chinese BREAK 信号错误中断
-    VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  = (0x1ul << 9),  //!< \~english Overflow error interrupt \~chinese 溢出错误中断
+    VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  = (0x1ul << 9),  //!< \~english RX overflow error interrupt \~chinese 接收溢出错误中断
+
+
+    /**
+     * \~english
+     * @brief USART TX overflow error interrupt
+     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR in vsf_usart_irq_mask_t and define a MACRO
+     * \~chinese
+     * @brief USART 发送溢出错误中断
+     * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR 并且实现同名宏
+     */
+    VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR  = (0x1ul << 10), //!< \~english TX overflow error interrupt \~chinese 发送溢出错误中断
+#   define VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR
 
     /**
      * \~english
@@ -513,7 +525,7 @@ typedef enum vsf_usart_irq_mask_t {
      * @brief USART 发送空闲中断，所有数据已从 TX 脚发送完成
      * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_TX_IDLE 并且实现同名宏
      */
-    VSF_USART_IRQ_MASK_TX_IDLE          = (0x1ul << 10), //!< \~english TX idle(all data in fifo in TXed on the bus) interrupt \~chinese 发送空闲中断 (所有数据在总线上发送完成)
+    VSF_USART_IRQ_MASK_TX_IDLE          = (0x1ul << 11), //!< \~english TX idle(all data in fifo in TXed on the bus) interrupt \~chinese 发送空闲中断 (所有数据在总线上发送完成)
 #   define VSF_USART_IRQ_MASK_TX_IDLE   VSF_USART_IRQ_MASK_TX_IDLE
 
     /**
@@ -526,7 +538,7 @@ typedef enum vsf_usart_irq_mask_t {
      * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_RX_IDLE 并且实现同名宏
      *      如果硬件不支持此中断，不要定义 VSF_USART_IRQ_MASK_RX_IDLE 宏， VSF_USART_IRQ_MASK_RX_IDLE 将会用 VSF_USART_IRQ_MASK_RX_TIMEOUT
      */
-    VSF_USART_IRQ_MASK_RX_IDLE          = (0x1ul << 11), //!< \~english RX idle(rx_idle_cnt in vsf_usart_cfg_t passed and no data receivced) interrupt \~chinese 接收空闲中断 (vsf_usart_cfg_t 中的 rx_idle_cnt 时间内，未收到数据)
+    VSF_USART_IRQ_MASK_RX_IDLE          = (0x1ul << 12), //!< \~english RX idle(rx_idle_cnt in vsf_usart_cfg_t passed and no data receivced) interrupt \~chinese 接收空闲中断 (vsf_usart_cfg_t 中的 rx_idle_cnt 时间内，未收到数据)
 #   define VSF_USART_IRQ_MASK_RX_IDLE   VSF_USART_IRQ_MASK_RX_IDLE
 } vsf_usart_irq_mask_t;
 #endif
