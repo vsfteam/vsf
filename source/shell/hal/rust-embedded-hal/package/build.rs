@@ -1,6 +1,7 @@
 use std::path::Path;
 use std::process::Command;
 use std::sync::Mutex;
+use std::collections::HashMap;
 use std::env;
 use std::fs;
 use shellexpand;
@@ -111,9 +112,13 @@ const MODULES: [&'static str; 1] = [
 
 use lazy_static::lazy_static;
 lazy_static! {
-    static ref GLOBAL_MAP: Mutex<Vec<String>> = Mutex::new({
+    static ref GLOBAL_INTERRUPT_VEC: Mutex<Vec<String>> = Mutex::new({
         let v = Vec::new();
         v
+    });
+    static ref GLOBAL_AF_MAP: Mutex<HashMap<String, u8>> = Mutex::new({
+        let m = HashMap::new();
+        m
     });
 }
 
@@ -126,17 +131,21 @@ struct Callbacks {}
 
 impl ParseCallbacks for Callbacks {
     fn modify_macro(&self, name: &str, tokens: &mut Vec<Token>) {
-        let mut interrupt_vec = GLOBAL_MAP.lock().unwrap();
         let name_str = String::from(name);
         if name_str.starts_with("VSF_HW_INTERRUPT") && tokens.len() == 2 {
             if let Ok(interrupt_index) = String::from(&name_str[16..]).parse::<u8>() {
                 let value_str = String::from_utf8_lossy(&tokens[1].raw).into_owned();
+                let mut interrupt_vec = GLOBAL_INTERRUPT_VEC.lock().unwrap();
 
                 if interrupt_index as usize >= interrupt_vec.len() {
                     interrupt_vec.resize(interrupt_index as usize + 1, String::from(""));
                 }
-                interrupt_vec[interrupt_index as usize] = value_str.into();
+                interrupt_vec[interrupt_index as usize] = value_str.clone();
             }
+        } else if name_str.starts_with("VSF_HW_AF_") && tokens.len() == 2 {
+            let value: u8 = String::from_utf8_lossy(&tokens[1].raw).parse().unwrap();
+            let mut af_map = GLOBAL_AF_MAP.lock().unwrap();
+            af_map.insert(String::from(name_str.strip_prefix("VSF_HW_AF_").unwrap()), value);
         }
     }
 }
@@ -269,7 +278,7 @@ fn main() {
     let mut interrupt_num: u8 = 0;
     if let Some(interrupt_num_tmp) = extract_const_integer::<u8>(&bindings_lines, "VSF_HW_INTERRUPTS_NUM") {
         interrupt_num = interrupt_num_tmp;
-        let interrupt_vec = GLOBAL_MAP.lock().unwrap();
+        let interrupt_vec = GLOBAL_INTERRUPT_VEC.lock().unwrap();
         for interrupt_index in 0..interrupt_vec.len() {
             if interrupt_vec[interrupt_index].len() > 0 {
                 let interrupt_name = interrupt_vec[interrupt_index].strip_suffix("_IRQHandler").unwrap();
@@ -315,6 +324,12 @@ fn main() {
             ];
         }}
     ")).unwrap();
+
+    // parse alternate functions
+    let af_map = GLOBAL_AF_MAP.lock().unwrap();
+    for af in af_map.iter() {
+        println!("cargo:warning=af: {} {}", af.0, af.1);
+    }
 
     // parse peripherials
     for peripherial in PERIPHERIALS {
