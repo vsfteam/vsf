@@ -6,4 +6,5 @@ memory.x
 vsf_hal_build
 *.bin
 *.map
+*.x
 vsf_c.h

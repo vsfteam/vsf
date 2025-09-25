@@ -1,5 +1,6 @@
 use std::path::Path;
 use std::process::Command;
+use std::sync::Mutex;
 use std::env;
 use std::fs;
 use shellexpand;
@@ -108,6 +109,38 @@ const MODULES: [&'static str; 1] = [
     "vsf_hw_peripheral_en_t",
 ];
 
+use lazy_static::lazy_static;
+lazy_static! {
+    static ref GLOBAL_MAP: Mutex<Vec<String>> = Mutex::new({
+        let v = Vec::new();
+        v
+    });
+}
+
+use bindgen::callbacks::{
+    Token, ParseCallbacks,
+};
+
+#[derive(Debug)]
+struct Callbacks {}
+
+impl ParseCallbacks for Callbacks {
+    fn modify_macro(&self, name: &str, tokens: &mut Vec<Token>) {
+        let mut interrupt_vec = GLOBAL_MAP.lock().unwrap();
+        let name_str = String::from(name);
+        if name_str.starts_with("VSF_HW_INTERRUPT") && tokens.len() == 2 {
+            if let Ok(interrupt_index) = String::from(&name_str[16..]).parse::<u8>() {
+                let value_str = String::from_utf8_lossy(&tokens[1].raw).into_owned();
+
+                if interrupt_index as usize >= interrupt_vec.len() {
+                    interrupt_vec.resize(interrupt_index as usize + 1, String::from(""));
+                }
+                interrupt_vec[interrupt_index as usize] = value_str.into();
+            }
+        }
+    }
+}
+
 fn main() {
     let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
     let manifest_path = Path::new(&manifest_dir).join("Cargo.toml");
@@ -200,6 +233,7 @@ fn main() {
 
     let mut builder = bindgen::Builder::default()
                     .header("./vsf_c.h")
+                    .parse_callbacks(Box::new(Callbacks{}))
                     .raw_line("#![allow(non_camel_case_types)]")
                     .raw_line("#![allow(non_upper_case_globals)]")
                     .raw_line("#![allow(non_snake_case)]")
@@ -226,6 +260,19 @@ fn main() {
 
     let bindings_content = fs::read_to_string(&pathbuf).unwrap();
     let bindings_lines = bindings_content.lines().collect();
+
+    // parse interrupts
+    let interrupt_vec = GLOBAL_MAP.lock().unwrap();
+    let mut device_x_str = String::from("");
+    for interrupt_index in 0..interrupt_vec.len() {
+        if interrupt_vec[interrupt_index].len() > 0 {
+            let interrupt_name = interrupt_vec[interrupt_index].strip_suffix("_IRQHandler").unwrap();
+
+            println!("cargo:warning=irq{interrupt_index}: {interrupt_name}");
+            device_x_str.push_str(&format!("PROVIDE({interrupt_name} = DefaultHandler);\n"));
+        }
+    }
+    fs::write("./device.x", device_x_str).unwrap();
 
     // parse peripherials
     for peripherial in PERIPHERIALS {
