@@ -85,78 +85,6 @@
 #   define CORE_CM7
 #endif
 #include "../common/common.h"
-#include "../common/device_irq.h"
-#include "../common/device_af.h"
-
-// SWI, use unexisted DSI and ETHERCAT as SWI
-#if     defined(CORE_CM4)
-
-#   ifdef VSF_HW_INTERRUPTS_EXPORT
-#       define SWI3_IRQHandler                      VSF_HW_IRQHandler166
-#       define SWI4_IRQHandler                      VSF_HW_IRQHandler187
-#       define SWI5_IRQHandler                      VSF_HW_IRQHandler188
-#       define SWI6_IRQHandler                      VSF_HW_IRQHandler189
-#       define SWI7_IRQHandler                      VSF_HW_IRQHandler190
-#   endif
-
-#   define SWI3_IRQn                                166
-#   undef VSF_HW_INTERRUPT166
-#   define VSF_HW_INTERRUPT166                      SWI3_IRQHandler
-
-#   define SWI4_IRQn                                187
-#   undef VSF_HW_INTERRUPT187
-#   define VSF_HW_INTERRUPT187                      SWI4_IRQHandler
-
-#   define SWI5_IRQn                                188
-#   undef VSF_HW_INTERRUPT188
-#   define VSF_HW_INTERRUPT188                      SWI5_IRQHandler
-
-#   define SWI6_IRQn                                189
-#   undef VSF_HW_INTERRUPT189
-#   define VSF_HW_INTERRUPT189                      SWI6_IRQHandler
-
-#   define SWI7_IRQn                                190
-#   undef VSF_HW_INTERRUPT190
-#   define VSF_HW_INTERRUPT190                      SWI7_IRQHandler
-
-#else
-
-#   ifdef VSF_HW_INTERRUPTS_EXPORT
-#       define SWI6_IRQHandler                      VSF_HW_IRQHandler166
-#       define SWI7_IRQHandler                      VSF_HW_IRQHandler187
-#       define SWI8_IRQHandler                      VSF_HW_IRQHandler188
-#       define SWI9_IRQHandler                      VSF_HW_IRQHandler189
-#       define SWI10_IRQHandler                     VSF_HW_IRQHandler190
-#   endif
-
-#   define SWI6_IRQn                                166
-#   undef VSF_HW_INTERRUPT166
-#   define VSF_HW_INTERRUPT166                      SWI6_IRQHandler
-
-#   define SWI7_IRQn                                187
-#   undef VSF_HW_INTERRUPT187
-#   define VSF_HW_INTERRUPT187                      SWI7_IRQHandler
-
-#   define SWI8_IRQn                                188
-#   undef VSF_HW_INTERRUPT188
-#   define VSF_HW_INTERRUPT188                      SWI8_IRQHandler
-
-#   define SWI9_IRQn                                189
-#   undef VSF_HW_INTERRUPT189
-#   define VSF_HW_INTERRUPT189                      SWI9_IRQHandler
-
-#   define SWI10_IRQn                               190
-#   undef VSF_HW_INTERRUPT190
-#   define VSF_HW_INTERRUPT190                      SWI10_IRQHandler
-
-#endif
-
-#ifdef VSF_HW_INTERRUPTS_EXPORT
-// export interrupt handlers
-#define DECLARE_VSF_HW_INTERRUPT(__N)                                           \
-            extern void VSF_MCONNECT(VSF_HW_INTERRUPT, __N)(void);
-VSF_MREPEAT(VSF_HW_INTERRUPTS_NUM, DECLARE_VSF_HW_INTERRUPT)
-#endif
 
 /*============================ MACROS ========================================*/
 
@@ -230,7 +158,11 @@ VSF_MREPEAT(VSF_HW_INTERRUPTS_NUM, DECLARE_VSF_HW_INTERRUPT)
 // USART UART
 
 #define VSF_HW_USART_COUNT                          15
-#define VSF_HW_USART_MASK                           0xFFFE
+#ifndef VSF_HW_USART_MASK
+#   define VSF_HW_USART_MASK                        0xFFFE
+#elif VSF_HW_USART_MASK & ~0xFFFE
+#   error VSF_HW_USART_MASK defines a usart not supported
+#endif
 #define VSF_HW_USART1_REG                           USART1
 #define VSF_HW_USART1_CLK                           VSF_HW_CLK_USART1
 #define VSF_HW_USART1_EN                            VSF_HW_EN_USART1
@@ -508,11 +440,75 @@ VSF_MREPEAT(VSF_HW_INTERRUPTS_NUM, DECLARE_VSF_HW_INTERRUPT)
                 .utmi_en                            = false,                    \
                 .vbus_en                            = false,
 
+/*============================ INCLUDES ======================================*/
+
+// Include common irq and af headers after peripherals are defined, so that
+//  irq and af can be adjusted according to the dedicated device configuration.
+
+#include "../common/device_irq.h"
+#include "../common/device_af.h"
+
+/*============================ MACROS ========================================*/
+
+// MACROs here is only used to over-write MACROs defined in device_irq
+
+// SWI, use unexisted DSI and ETHERCAT as SWI
+
+#if     defined(CORE_CM4)
+
+#   define SWI3_IRQn                                166
+#   undef VSF_HW_INTERRUPT166
+#   define VSF_HW_INTERRUPT166                      SWI3_IRQHandler
+
+#   define SWI4_IRQn                                187
+#   undef VSF_HW_INTERRUPT187
+#   define VSF_HW_INTERRUPT187                      SWI4_IRQHandler
+
+#   define SWI5_IRQn                                188
+#   undef VSF_HW_INTERRUPT188
+#   define VSF_HW_INTERRUPT188                      SWI5_IRQHandler
+
+#   define SWI6_IRQn                                189
+#   undef VSF_HW_INTERRUPT189
+#   define VSF_HW_INTERRUPT189                      SWI6_IRQHandler
+
+#   define SWI7_IRQn                                190
+#   undef VSF_HW_INTERRUPT190
+#   define VSF_HW_INTERRUPT190                      SWI7_IRQHandler
+
+#else
+
+#   define SWI6_IRQn                                166
+#   undef VSF_HW_INTERRUPT166
+#   define VSF_HW_INTERRUPT166                      SWI6_IRQHandler
+
+#   define SWI7_IRQn                                187
+#   undef VSF_HW_INTERRUPT187
+#   define VSF_HW_INTERRUPT187                      SWI7_IRQHandler
+
+#   define SWI8_IRQn                                188
+#   undef VSF_HW_INTERRUPT188
+#   define VSF_HW_INTERRUPT188                      SWI8_IRQHandler
+
+#   define SWI9_IRQn                                189
+#   undef VSF_HW_INTERRUPT189
+#   define VSF_HW_INTERRUPT189                      SWI9_IRQHandler
+
+#   define SWI10_IRQn                               190
+#   undef VSF_HW_INTERRUPT190
+#   define VSF_HW_INTERRUPT190                      SWI10_IRQHandler
+
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+#define DECLARE_VSF_HW_INTERRUPT(__N)                                           \
+            extern void VSF_MCONNECT(VSF_HW_INTERRUPT, __N)(void);
+VSF_MREPEAT(VSF_HW_INTERRUPTS_NUM, DECLARE_VSF_HW_INTERRUPT)
 
 #endif      // __VSF_HAL_DEVICE_NATIONS_N32H765IIB7EC_H__
 #endif
