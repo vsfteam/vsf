@@ -33,7 +33,7 @@ pub mod mode {
     impl_mode!(Async);
 }
 
-pub mod interrupts;
+pub mod _generated;
 #[cfg(vsf_gpio_enabled)]
 pub mod gpio;
 #[cfg(vsf_usart_enabled)]

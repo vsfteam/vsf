@@ -110,6 +110,12 @@ const MODULES: [&'static str; 1] = [
     "vsf_hw_peripheral_en_t",
 ];
 
+struct PeripheralAfInfo {
+    module: &'static str,
+    name: &'static str,
+    pins: HashMap<&'static str, &'static str>,
+}
+
 use lazy_static::lazy_static;
 lazy_static! {
     static ref GLOBAL_INTERRUPT_VEC: Mutex<Vec<String>> = Mutex::new({
@@ -118,6 +124,22 @@ lazy_static! {
     });
     static ref GLOBAL_AF_MAP: Mutex<HashMap<String, u8>> = Mutex::new({
         let m = HashMap::new();
+        m
+    });
+    static ref GLOBAL_AF_INFO: Mutex<HashMap<&'static str, PeripheralAfInfo>> = Mutex::new({
+        let mut m = HashMap::new();
+        m.insert("USART", PeripheralAfInfo {
+            module: "usart",
+            name: "Usart",
+            pins: HashMap::from([
+                ("TX", "TxPin"),
+                ("RX", "RxPin"),
+                ("DE", "DePin"),
+                ("CTS", "CtsPin"),
+                ("RTS", "RtsPin"),
+                ("CK", "CkPin"),
+            ]),
+        });
         m
     });
 }
@@ -270,67 +292,6 @@ fn main() {
     let bindings_content = fs::read_to_string(&pathbuf).unwrap();
     let bindings_lines = bindings_content.lines().collect();
 
-    // parse interrupts
-    let mut device_x_str = String::from("");
-    let mut interrupt_str = String::from("");
-    let mut interrupt_func_dec_str = String::from("");
-    let mut interrupt_vecotr_str = String::from("");
-    let mut interrupt_num: u8 = 0;
-    if let Some(interrupt_num_tmp) = extract_const_integer::<u8>(&bindings_lines, "VSF_HW_INTERRUPTS_NUM") {
-        interrupt_num = interrupt_num_tmp;
-        let interrupt_vec = GLOBAL_INTERRUPT_VEC.lock().unwrap();
-        for interrupt_index in 0..interrupt_vec.len() {
-            if interrupt_vec[interrupt_index].len() > 0 {
-                let interrupt_name = interrupt_vec[interrupt_index].strip_suffix("_IRQHandler").unwrap();
-
-                println!("cargo:warning=irq{interrupt_index}: {interrupt_name}");
-                device_x_str.push_str(&format!("PROVIDE({interrupt_name} = DefaultHandler);\n"));
-                interrupt_str.push_str(&format!("{interrupt_name} = {interrupt_index},\n"));
-                interrupt_func_dec_str.push_str(&format!("fn {interrupt_name}();\n"));
-                interrupt_vecotr_str.push_str(&format!("Vector {{ _handler: {interrupt_name} }},\n"));
-            } else {
-                interrupt_vecotr_str.push_str("Vector { _reserved: 0: {interrupt_name} },\n");
-            }
-        }
-    }
-    fs::write("./device.x", device_x_str).unwrap();
-    fs::write("./src/interrupts.rs", &format!("
-        #[derive(Copy, Clone, Debug, PartialEq, Eq)]
-        #[cfg_attr(feature = \"defmt\", derive(defmt::Format))]
-        #[allow(non_camel_case_types)]
-        pub enum Interrupt {{
-            {interrupt_str}
-        }}
-        unsafe impl cortex_m::interrupt::InterruptNumber for Interrupt {{
-            #[inline(always)]
-            fn number(self) -> u16 {{
-                self as u16
-            }}
-        }}
-        mod _vectors {{
-            unsafe extern \"C\" {{
-                {interrupt_func_dec_str}
-            }}
-
-            pub union Vector {{
-                _handler: unsafe extern \"C\" fn(),
-                _reserved: u32,
-            }}
-            #[unsafe(link_section = \".vector_table.interrupts\")]
-            #[unsafe(no_mangle)]
-            #[allow(non_camel_case_types)]
-            pub static __INTERRUPTS: [Vector; {interrupt_num}] = [
-                {interrupt_vecotr_str}
-            ];
-        }}
-    ")).unwrap();
-
-    // parse alternate functions
-    let af_map = GLOBAL_AF_MAP.lock().unwrap();
-    for af in af_map.iter() {
-        println!("cargo:warning=af: {} {}", af.0, af.1);
-    }
-
     // parse peripherials
     for peripherial in PERIPHERIALS {
         enable_peripherial(&bindings_lines, peripherial);
@@ -362,6 +323,93 @@ fn main() {
             println!("cargo:rustc-cfg={module}");
         }
     }
+
+    // generate _generated.rs, for interrupts and alternate functions
+    let mut generated_rs_str = String::from("");
+
+    // parse interrupts
+    let mut device_x_str = String::from("");
+    let mut interrupt_str = String::from("");
+    let mut interrupt_func_dec_str = String::from("");
+    let mut interrupt_vecotr_str = String::from("");
+    let mut interrupt_num: u8 = 0;
+    if let Some(interrupt_num_tmp) = extract_const_integer::<u8>(&bindings_lines, "VSF_HW_INTERRUPTS_NUM") {
+        interrupt_num = interrupt_num_tmp;
+        let interrupt_vec = GLOBAL_INTERRUPT_VEC.lock().unwrap();
+        for interrupt_index in 0..interrupt_vec.len() {
+            if interrupt_vec[interrupt_index].len() > 0 {
+                let interrupt_name = interrupt_vec[interrupt_index].strip_suffix("_IRQHandler").unwrap();
+
+                println!("cargo:warning=irq{interrupt_index}: {interrupt_name}");
+                device_x_str.push_str(&format!("PROVIDE({interrupt_name} = DefaultHandler);\n"));
+                interrupt_str.push_str(&format!("{interrupt_name} = {interrupt_index},\n"));
+                interrupt_func_dec_str.push_str(&format!("fn {interrupt_name}();\n"));
+                interrupt_vecotr_str.push_str(&format!("Vector {{ _handler: {interrupt_name} }},\n"));
+            } else {
+                interrupt_vecotr_str.push_str("Vector { _reserved: 0: {interrupt_name} },\n");
+            }
+        }
+    }
+    fs::write("./device.x", device_x_str).unwrap();
+    generated_rs_str.push_str(&format!("
+        #[derive(Copy, Clone, Debug, PartialEq, Eq)]
+        #[cfg_attr(feature = \"defmt\", derive(defmt::Format))]
+        #[allow(non_camel_case_types)]
+        pub enum Interrupt {{
+            {interrupt_str}
+        }}
+        unsafe impl cortex_m::interrupt::InterruptNumber for Interrupt {{
+            #[inline(always)]
+            fn number(self) -> u16 {{
+                self as u16
+            }}
+        }}
+        mod _vectors {{
+            unsafe extern \"C\" {{
+                {interrupt_func_dec_str}
+            }}
+
+            pub union Vector {{
+                _handler: unsafe extern \"C\" fn(),
+                _reserved: u32,
+            }}
+            #[unsafe(link_section = \".vector_table.interrupts\")]
+            #[unsafe(no_mangle)]
+            #[allow(non_camel_case_types)]
+            pub static __INTERRUPTS: [Vector; {interrupt_num}] = [
+                {interrupt_vecotr_str}
+            ];
+        }}
+    "));
+
+    // parse alternate functions
+    #[cfg(false)]
+    let af_map = GLOBAL_AF_MAP.lock().unwrap();
+    #[cfg(false)]
+    let afs_info = GLOBAL_AF_INFO.lock().unwrap();
+    #[cfg(false)]
+    for af in af_map.iter() {
+        let str = af.0;
+        let mut gpio_pos = str.rfind('_').unwrap();
+        gpio_pos = str[..gpio_pos].rfind('_').unwrap();
+        let gpio_str = &str[gpio_pos + 1 ..];
+        let pin_pos = str.find('_').unwrap();
+        let pin_str = &str[pin_pos + 1 .. gpio_pos];
+        let peripheral_str = &str[..pin_pos];
+        let peripheral_type_str = peripheral_str.trim_end_matches(|c: char| c.is_ascii_digit());
+        let peripheral_index_str = &peripheral_str[peripheral_type_str.len()..];
+        let af = af.1;
+
+        if let Some(af_info) = afs_info.get(peripheral_type_str) {
+            if let Some(af_pin) = af_info.pins.get(pin_str) {
+                println!("cargo:warning={}::{peripheral_type_str}{peripheral_index_str}: {pin_str} on {gpio_str} ==> AF{af}", af_info.module);
+                println!("cargo:warning=pin_trait_impl!(crate::{}::{}, {peripheral_str}, {pin_str}, {af}u8);", af_info.module, *af_pin);
+                generated_rs_str.push_str(&format!("pin_trait_impl!(crate::{}::{}, {peripheral_str}, {gpio_str}, {af}u8);\n", af_info.module, *af_pin));
+            }
+        }
+    }
+
+    fs::write("./src/_generated.rs", generated_rs_str).unwrap();
 }
 
 fn enable_peripherial(lines: &Vec<&str>, name: &str) -> u32 {

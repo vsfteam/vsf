@@ -1,7 +1,7 @@
 target
 src/vsf_hal.rs
 src/main.rs
-src/interrupts.rs
+src/_generated.rs
 Cargo.lock
 memory.x
 vsf_hal_build
