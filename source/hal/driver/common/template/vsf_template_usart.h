@@ -560,6 +560,9 @@ enum {
     VSF_USART_IRQ_MASK_ERR                  = VSF_USART_IRQ_MASK_FRAME_ERR       //!< \~english Combined error interrupt mask \~chinese 组合错误中断掩码
                                             | VSF_USART_IRQ_MASK_PARITY_ERR
                                             | VSF_USART_IRQ_MASK_BREAK_ERR
+#   ifdef VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR
+                                            | VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR
+#   endif
                                             | VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR,
 #endif
 
