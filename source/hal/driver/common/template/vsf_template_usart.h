@@ -700,6 +700,7 @@ typedef enum vsf_usart_ctrl_t {
      * BREAK 信号将在若干位时间后自动清除
      */
     VSF_USART_CTRL_SEND_BREAK    = (0x01ul << 0),
+#   define VSF_USART_CTRL_SEND_BREAK VSF_USART_CTRL_SEND_BREAK
 
     /**
      * \~english
@@ -710,6 +711,7 @@ typedef enum vsf_usart_ctrl_t {
      * BREAK 信号将保持直到显式清除
      */
     VSF_USART_CTRL_SET_BREAK     = (0x01ul << 1),
+#   define VSF_USART_CTRL_SET_BREAK VSF_USART_CTRL_SET_BREAK
 
     /**
      * \~english
@@ -720,6 +722,7 @@ typedef enum vsf_usart_ctrl_t {
      * 清除之前设置的 BREAK 信号
      */
     VSF_USART_CTRL_CLEAR_BREAK   = (0x01ul << 2),
+#   define VSF_USART_CTRL_CLEAR_BREAK VSF_USART_CTRL_CLEAR_BREAK
 
     /*
     VSF_USART_CTRL_REQUEST_RX_RESUME                     = (0x1ul << 3),
@@ -738,6 +741,9 @@ typedef enum vsf_usart_ctrl_t {
     VSF_USART_CTRL_HALF_DUPLEX_ENABLE_RECEIVER           = (0x1ul << 8),
     #define VSF_USART_CTRL_HALF_DUPLEX_ENABLE_RECEIVER VSF_USART_CTRL_HALF_DUPLEX_ENABLE_RECEIVER
     */
+
+    // Ensure compilation passes when there are no commands
+    __VSF_USART_CTRL_DUMMY_MASK     = (0x1ul << 3),
 } vsf_usart_ctrl_t;
 #endif
 
