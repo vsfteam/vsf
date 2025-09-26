@@ -208,11 +208,19 @@ typedef enum vsf_usart_irq_mask_t {
 #endif
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
+// By default, the template contains two control commands:
+// - send BREAK signal (self-clearing)
+// - set and clear BREAK signal
+// The driver needs to select and implement according to the hardware support situation.
 typedef enum vsf_usart_ctrl_t {
     // usart default command
     VSF_USART_CTRL_SEND_BREAK           = (0x01ul << 0),
+    #define VSF_USART_CTRL_SEND_BREAK VSF_USART_CTRL_SEND_BREAK
+
     VSF_USART_CTRL_SET_BREAK            = (0x01ul << 1),
+    #define VSF_USART_CTRL_SET_BREAK VSF_USART_CTRL_SET_BREAK
     VSF_USART_CTRL_CLEAR_BREAK          = (0x01ul << 2),
+    #define VSF_USART_CTRL_CLEAR_BREAK VSF_USART_CTRL_CLEAR_BREAK
 
     // more vendor specified command can be added here
 } vsf_usart_ctrl_t;
