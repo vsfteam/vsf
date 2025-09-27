@@ -421,7 +421,7 @@ fn main() {
         if let Some(af_info) = afs_info.get(peripheral_type_str) {
             if let Some(af_pin) = af_info.pins.get(pin_str) {
                 println!("cargo:warning={}::{peripheral_type_str}{peripheral_index_str}: {pin_str} on {gpio_str} ==> AF{af}", af_info.module);
-                af_str.push_str(&format!("pin_trait_impl!(crate::{}::{}, {peripheral_str}, {gpio_str}, {af}u8);\n", af_info.module, *af_pin));
+                af_str.push_str(&format!("pin_trait_impl!(crate::{}::{}, {peripheral_str}, {gpio_str}, {af}u16);\n", af_info.module, *af_pin));
             }
         }
     }

@@ -14,7 +14,7 @@ macro_rules! new_pin {
 macro_rules! pin_trait {
     ($signal:ident, $instance:path) => {
         pub trait $signal<T: $instance>: crate::gpio::Pin {
-            fn af_num(&self) -> u8;
+            fn af_num(&self) -> crate::gpio::AfNumType;
         }
     };
 }
@@ -22,7 +22,7 @@ macro_rules! pin_trait {
 macro_rules! pin_trait_impl {
     (crate::$mod:ident::$trait:ident$(<$mode:ident>)?, $instance:ident, $pin:ident, $af:expr) => {
         impl crate::$mod::$trait<crate::peripherals::$instance> for crate::peripherals::$pin {
-            fn af_num(&self) -> u8 {
+            fn af_num(&self) -> crate::gpio::AfNumType {
                 $af
             }
         }

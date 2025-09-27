@@ -395,8 +395,8 @@ impl<'d, T: Instance> Usart<'d, T> {
 
     fn new_inner(
         usart: Peri<'d, T>,
-        _rxd: Peri<'d, impl TxPin<T>>,
-        _txd: Peri<'d, impl TxPin<T>>,
+        _rxd: Option<Peri<'d, impl TxPin<T>>>,
+        _txd: Option<Peri<'d, impl TxPin<T>>>,
         _ck: Option<Peri<'d, impl CkPin<T>>>,
         _cts: Option<Peri<'d, impl CtsPin<T>>>,
         _rts: Option<Peri<'d, impl RtsPin<T>>>,
@@ -540,7 +540,7 @@ impl<'d, T: Instance> UsartTx<'d, T> {
 
     fn new_inner(
         usart: Peri<'d, T>,
-        _txd: Peri<'d, impl TxPin<T>>,
+        _txd: Option<Peri<'d, impl TxPin<T>>>,
         _ck: Option<Peri<'d, impl CkPin<T>>>,
         _cts: Option<Peri<'d, impl CtsPin<T>>>,
         config: Config
@@ -679,7 +679,7 @@ impl<'d, T: Instance> UsartRx<'d, T> {
 
     fn new_inner(
         usart: Peri<'d, T>,
-        _rxd: Peri<'d, impl TxPin<T>>,
+        _rxd: Option<Peri<'d, impl TxPin<T>>>,
         _rts: Option<Peri<'d, impl RtsPin<T>>>,
         config: Config
     ) -> Self {
@@ -915,7 +915,7 @@ impl<'d, T: Instance> UsartRx<'d, T> {
         if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
             return Err(Error::RxOverrun);
         }
-        Ok({unsafe { vsf_usart_get_rx_count(vsf_usart) as usize }})
+        Ok(unsafe { vsf_usart_get_rx_count(vsf_usart) as usize })
     }
 }
 
@@ -952,7 +952,7 @@ impl State {
 }
 
 pub(crate) trait SealedInstance {
-    fn info() -> &'static Info;
+    fn info() -> &'static mut Info;
     fn state() -> &'static mut State;
 }
 
@@ -973,13 +973,15 @@ pin_trait!(DePin, Instance);
 macro_rules! impl_usart {
     ($type:ident, $irq:ident, $vsf_usart:ident, $vsf_irqhandler:ident) => {
         impl crate::usart::SealedInstance for crate::peripherals::$type {
-            fn info() -> &'static crate::usart::Info {
-                static INFO: crate::usart::Info = crate::usart::Info {
-                    vsf_usart: unsafe { ptr::from_ref(&$vsf_usart) } as *mut vsf_usart_t,
-                    vsf_usart_irqhandler: $vsf_irqhandler,
-                    interrupt: crate::interrupt::typelevel::$irq::IRQ,
-                };
-                &INFO
+            fn info() -> &'static mut crate::usart::Info {
+                unsafe {
+                    static mut INFO: crate::usart::Info = crate::usart::Info {
+                        vsf_usart: unsafe { ptr::from_ref(&$vsf_usart) } as *mut vsf_usart_t,
+                        vsf_usart_irqhandler: $vsf_irqhandler,
+                        interrupt: crate::interrupt::typelevel::$irq::IRQ,
+                    };
+                    &mut INFO
+                }
             }
             fn state() -> &'static mut crate::usart::State {
                 unsafe {

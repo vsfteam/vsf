@@ -426,7 +426,7 @@ impl<'d> Flex<'d> {
     #[inline]
     #[cfg(any(VSF_GPIO_AF, VSF_GPIO_AF_PUSH_PULL, VSF_GPIO_AF_OPEN_DRAIN))]
     pub fn set_as_af(&mut self, af_num: AfNumType, af_type: AfType) {
-        self.pin.config(into_vsf_gpio_mode_t!(VSF_GPIO_AF) | af_type.mode as u32 | af_type.pull as u32 | af_type.speed as u32 | af_type.drive as u32, af_num);
+        self.pin.set_as_af(af_num, af_type);
     }
 
     /// Put the pin into disconnected mode.
@@ -525,6 +525,11 @@ pub(crate) trait SealedPin {
     #[inline]
     fn _port(&self) -> u8 {
         (self.pin_port() >> 8) as u8
+    }
+
+    #[inline]
+    fn set_as_af(&self, af_num: AfNumType, af_type: AfType) {
+        self.config(into_vsf_gpio_mode_t!(VSF_GPIO_AF) | af_type.mode as u32 | af_type.pull as u32 | af_type.speed as u32 | af_type.drive as u32, af_num);
     }
 
     /// Put the pin into input mode.
