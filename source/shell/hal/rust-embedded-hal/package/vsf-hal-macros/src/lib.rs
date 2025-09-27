@@ -6,31 +6,6 @@ use std::env;
 use std::fs;
 
 #[proc_macro]
-pub fn bind_vsf_peripherials(_item: TokenStream) -> TokenStream {
-    let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-    let pathbuf = Path::new(&manifest_dir).join("./src/vsf_hal.rs");
-    let bindings_content = fs::read_to_string(&pathbuf).unwrap();
-    let bindings_lines = bindings_content.lines().collect();
-
-    let mut gpio_output_code = String::from("");
-    bind_vsf_gpios(&bindings_lines, &mut gpio_output_code);
-    let mut usart_output_code = String::from("");
-    bind_vsf_peripheral(&bindings_lines, "usart", &mut usart_output_code);
-
-    let mut output_code = String::from("embassy_hal_internal::peripherals_definition!(");
-    output_code.push_str(&gpio_output_code);
-    output_code.push_str(&usart_output_code);
-    output_code.push_str(");");
-
-    output_code.push_str("embassy_hal_internal::peripherals_struct!(");
-    output_code.push_str(&gpio_output_code);
-    output_code.push_str(&usart_output_code);
-    output_code.push_str(");");
-
-    output_code.parse().unwrap()
-}
-
-#[proc_macro]
 pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
     let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
     let pathbuf = Path::new(&manifest_dir).join("./src/vsf_hal.rs");
@@ -51,13 +26,13 @@ pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
                             }}
                             impl crate::gpio::SealedPin for peripherals::P{port_index}_{pin_index} {{
                                 #[inline] fn pin_port(&self) -> PinPortType {{
-                                    crate::vsf_hal::vsf_io_port_pin_no_t::VSF_P{port_index}_{pin_index} as PinPortType
+                                    into_vsf_io_port_pin_no_t!(VSF_P{port_index}_{pin_index}) as PinPortType
                                 }}
                             }}
                             impl From<peripherals::P{port_index}_{pin_index}> for crate::gpio::AnyPin {{
                                 fn from(_val: peripherals::P{port_index}_{pin_index}) -> Self {{
                                     Self {{
-                                        pin_port: crate::vsf_hal::vsf_io_port_pin_no_t::VSF_P{port_index}_{pin_index} as PinPortType,
+                                        pin_port: into_vsf_io_port_pin_no_t!(VSF_P{port_index}_{pin_index}) as PinPortType,
                                     }}
                                 }}
                             }}
@@ -71,36 +46,6 @@ pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
     }
 
     output_code.parse().unwrap()
-}
-
-fn bind_vsf_gpios(lines: &Vec<&str>, output_code: &mut String) {
-    let mask = extrace_peripheral_mask(lines, "gpio");
-
-    for port_index in 0..32 {
-        if mask & (1 << port_index) != 0 {
-            if let Some(mut pin_mask) = extract_const_integer::<u128>(&lines, &format!("VSF_HW_GPIO_PORT{port_index}_MASK")) {
-                let mut pin_index = 0;
-                while pin_mask != 0 {
-                    if pin_mask & 1 != 0 {
-                        output_code.push_str(&format!("P{port_index}_{pin_index},"));
-                    }
-                    pin_index += 1;
-                    pin_mask >>= 1;
-                }
-            }
-        }
-    }
-}
-
-fn bind_vsf_peripheral(lines: &Vec<&str>, name: &str, output_code: &mut String) {
-    let peripheral_name_upper = String::from(name).to_uppercase();
-    let mask = extrace_peripheral_mask(lines, &peripheral_name_upper);
-
-    for peripheral_index in 0..32 {
-        if mask & (1 << peripheral_index) != 0 {
-            output_code.push_str(&format!("{peripheral_name_upper}{peripheral_index},"));
-        }
-    }
 }
 
 fn extrace_peripheral_mask(lines: &Vec<&str>, name: &str) -> u32 {

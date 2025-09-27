@@ -20,93 +20,96 @@ const BINDGEN_DEFINITIONS: [&'static str; 2] = [
 ];
 
 const PERIPHERIALS: [&'static str; 2] = ["gpio", "usart"];
-const CONSTANTS: [&'static str; 77] = [
+
+const CONSTANTS: [(&'static str, &'static str); 79] = [
     // GPIO constants
-    "VSF_HW_GPIO_PIN_COUNT",
-    "VSF_GPIO_INPUT",
-    "VSF_GPIO_OUTPUT",
-    "VSF_GPIO_ANALOG",
-    "VSF_GPIO_OUTPUT_PUSH_PULL",
-    "VSF_GPIO_OUTPUT_OPEN_DRAIN",
-    "VSF_GPIO_AF",
-    "VSF_GPIO_AF_INPUT",
-    "VSF_GPIO_AF_PUSH_PULL",
-    "VSF_GPIO_AF_OPEN_DRAIN",
-    "VSF_GPIO_SPEED_MASK",
-    "VSF_GPIO_SPEED_LOW",
-    "VSF_GPIO_SPEED_MEDIUM",
-    "VSF_GPIO_SPEED_HIGH",
-    "VSF_GPIO_SPEED_VERY_HIGH",
-    "VSF_GPIO_PULL_UP",
-    "VSF_GPIO_PULL_DOWN",
-    "VSF_GPIO_NO_PULL_UP_DOWN",
-    "VSF_GPIO_DRIVE_STRENGTH_LOW",
-    "VSF_GPIO_DRIVE_STRENGTH_MEDIUM",
-    "VSF_GPIO_DRIVE_STRENGTH_HIGH",
-    "VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH",
+    ("", "VSF_HW_GPIO_PIN_COUNT"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_INPUT"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_OUTPUT"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_ANALOG"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_OUTPUT_PUSH_PULL"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_OUTPUT_OPEN_DRAIN"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_AF"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_AF_INPUT"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_AF_PUSH_PULL"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_AF_OPEN_DRAIN"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_SPEED_MASK"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_SPEED_LOW"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_SPEED_MEDIUM"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_SPEED_HIGH"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_SPEED_VERY_HIGH"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_PULL_UP"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_PULL_DOWN"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_NO_PULL_UP_DOWN"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_DRIVE_STRENGTH_LOW"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_DRIVE_STRENGTH_MEDIUM"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_DRIVE_STRENGTH_HIGH"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH"),
     // USART constants
-    "VSF_USART_5_BIT_LENGTH",
-    "VSF_USART_6_BIT_LENGTH",
-    "VSF_USART_7_BIT_LENGTH",
-    "VSF_USART_8_BIT_LENGTH",
-    "VSF_USART_9_BIT_LENGTH",
-    "VSF_USART_10_BIT_LENGTH",
-    "VSF_USART_NO_PARITY",
-    "VSF_USART_ODD_PARITY",
-    "VSF_USART_EVEN_PARITY",
-    "VSF_USART_0_5_STOPBIT",
-    "VSF_USART_1_STOPBIT",
-    "VSF_USART_1_5_STOPBIT",
-    "VSF_USART_2_STOPBIT",
-    "VSF_USART_SYNC_CLOCK_ENABLE",
-    "VSF_USART_HALF_DUPLEX_ENABLE",
-    "VSF_USART_SWAP",
-    "VSF_USART_TX_INVERT",
-    "VSF_USART_RX_INVERT",
-    "VSF_USART_IRQ_MASK_FRAME_ERR",
-    "VSF_USART_IRQ_MASK_PARITY_ERR",
-    "VSF_USART_IRQ_MASK_BREAK_ERR",
-    "VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR",
-    "VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR",
+    ("vsf_usart_mode_t", "VSF_USART_5_BIT_LENGTH"),
+    ("vsf_usart_mode_t", "VSF_USART_6_BIT_LENGTH"),
+    ("vsf_usart_mode_t", "VSF_USART_7_BIT_LENGTH"),
+    ("vsf_usart_mode_t", "VSF_USART_8_BIT_LENGTH"),
+    ("vsf_usart_mode_t", "VSF_USART_9_BIT_LENGTH"),
+    ("vsf_usart_mode_t", "VSF_USART_10_BIT_LENGTH"),
+    ("vsf_usart_mode_t", "VSF_USART_NO_PARITY"),
+    ("vsf_usart_mode_t", "VSF_USART_ODD_PARITY"),
+    ("vsf_usart_mode_t", "VSF_USART_EVEN_PARITY"),
+    ("vsf_usart_mode_t", "VSF_USART_0_5_STOPBIT"),
+    ("vsf_usart_mode_t", "VSF_USART_1_STOPBIT"),
+    ("vsf_usart_mode_t", "VSF_USART_1_5_STOPBIT"),
+    ("vsf_usart_mode_t", "VSF_USART_2_STOPBIT"),
+    ("vsf_usart_mode_t", "VSF_USART_SYNC_CLOCK_ENABLE"),
+    ("vsf_usart_mode_t", "VSF_USART_HALF_DUPLEX_ENABLE"),
+    ("vsf_usart_mode_t", "VSF_USART_HALF_DUPLEX_DISABLE"),
+    ("vsf_usart_mode_t", "VSF_USART_SWAP"),
+    ("vsf_usart_mode_t", "VSF_USART_TX_INVERT"),
+    ("vsf_usart_mode_t", "VSF_USART_RX_INVERT"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_FRAME_ERR"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_PARITY_ERR"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_BREAK_ERR"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_IDLE"),
     // peripherial enable/disable
-    "VSF_HW_EN_GPIO0",
-    "VSF_HW_EN_GPIO1",
-    "VSF_HW_EN_GPIO2",
-    "VSF_HW_EN_GPIO3",
-    "VSF_HW_EN_GPIO4",
-    "VSF_HW_EN_GPIO5",
-    "VSF_HW_EN_GPIO6",
-    "VSF_HW_EN_GPIO7",
-    "VSF_HW_EN_GPIO8",
-    "VSF_HW_EN_GPIO9",
-    "VSF_HW_EN_GPIO10",
-    "VSF_HW_EN_GPIO11",
-    "VSF_HW_EN_GPIO12",
-    "VSF_HW_EN_GPIO13",
-    "VSF_HW_EN_GPIO14",
-    "VSF_HW_EN_GPIO15",
-    "VSF_HW_EN_GPIO16",
-    "VSF_HW_EN_GPIO17",
-    "VSF_HW_EN_GPIO18",
-    "VSF_HW_EN_GPIO19",
-    "VSF_HW_EN_GPIO20",
-    "VSF_HW_EN_GPIO21",
-    "VSF_HW_EN_GPIO22",
-    "VSF_HW_EN_GPIO23",
-    "VSF_HW_EN_GPIO24",
-    "VSF_HW_EN_GPIO25",
-    "VSF_HW_EN_GPIO26",
-    "VSF_HW_EN_GPIO27",
-    "VSF_HW_EN_GPIO28",
-    "VSF_HW_EN_GPIO29",
-    "VSF_HW_EN_GPIO30",
-    "VSF_HW_EN_GPIO31",
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO0"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO1"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO2"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO3"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO4"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO5"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO6"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO7"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO8"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO9"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO10"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO11"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO12"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO13"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO14"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO15"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO16"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO17"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO18"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO19"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO20"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO21"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO22"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO23"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO24"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO25"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO26"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO27"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO28"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO29"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO30"),
+    ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO31"),
 ];
 const FUNCTIONS: [&'static str; 2] = [
     "vsf_hw_clkrst_region_set_bit",
     "vsf_hw_clkrst_region_clear_bit",
 ];
-const MODULES: [&'static str; 1] = [
+const TYPES: [&'static str; 1] = [
     "vsf_hw_peripheral_en_t",
 ];
 
@@ -270,7 +273,7 @@ fn main() {
                     .raw_line("#![allow(non_snake_case)]")
                     .raw_line("#![allow(dead_code)]")
                     .use_core()
-                    .default_enum_style(bindgen::EnumVariation::ModuleConsts)
+                    .default_enum_style(bindgen::EnumVariation::Consts)
                     .clang_arg("-D".to_string() + "__" + &vendor + "__")
                     .clang_arg("-D".to_string() + "__" + &model + "__")
                     .clang_arg("-I".to_string() + &path + "source/shell/hal/rust-embedded-hal/lib/inc")
@@ -299,10 +302,10 @@ fn main() {
 
     // parse constants
     for constant in CONSTANTS {
-        println!("cargo::rustc-check-cfg=cfg({constant})");
-        if let Some(_cur_value) = extract_constant_value(&bindings_lines, constant) {
-            println!("cargo:warning=constant: {constant} enabled");
-            println!("cargo:rustc-cfg={constant}");
+        println!("cargo::rustc-check-cfg=cfg({})", constant.1);
+        if let Some(_cur_value) = extract_constant_value(&bindings_lines, &(String::from(constant.0) + "_" + constant.1)) {
+            println!("cargo:warning=constant: {}::{} enabled", constant.0, constant.1);
+            println!("cargo:rustc-cfg={}", constant.1);
         }
     }
 
@@ -315,23 +318,21 @@ fn main() {
         }
     }
 
-    // parse modules
-    for module in MODULES {
-        println!("cargo::rustc-check-cfg=cfg({module})");
-        if extract_module(&bindings_lines, module) {
-            println!("cargo:warning=module: {module} enabled");
-            println!("cargo:rustc-cfg={module}");
+    // parse types
+    for _type in TYPES {
+        println!("cargo::rustc-check-cfg=cfg({_type})");
+        if extract_type(&bindings_lines, _type) {
+            println!("cargo:warning=type: {_type} enabled");
+            println!("cargo:rustc-cfg={_type}");
         }
     }
 
-    // generate _generated.rs, for interrupts and alternate functions
-    let mut generated_rs_str = String::from("");
-
-    // parse interrupts
+    // parse interrupts and generate device.x and pac.rs
     let mut device_x_str = String::from("");
     let mut interrupt_str = String::from("");
     let mut interrupt_func_dec_str = String::from("");
     let mut interrupt_vecotr_str = String::from("");
+    let mut interrupt_name_str = String::from("");
     let mut interrupt_num: u8 = 0;
     if let Some(interrupt_num_tmp) = extract_const_integer::<u8>(&bindings_lines, "VSF_HW_INTERRUPTS_NUM") {
         interrupt_num = interrupt_num_tmp;
@@ -341,6 +342,7 @@ fn main() {
                 let interrupt_name = interrupt_vec[interrupt_index].strip_suffix("_IRQHandler").unwrap();
 
                 println!("cargo:warning=irq{interrupt_index}: {interrupt_name}");
+                interrupt_name_str.push_str(&format!("{interrupt_name},\n"));
                 device_x_str.push_str(&format!("PROVIDE({interrupt_name} = DefaultHandler);\n"));
                 interrupt_str.push_str(&format!("{interrupt_name} = {interrupt_index},\n"));
                 interrupt_func_dec_str.push_str(&format!("fn {interrupt_name}();\n"));
@@ -351,7 +353,7 @@ fn main() {
         }
     }
     fs::write("./device.x", device_x_str).unwrap();
-    generated_rs_str.push_str(&format!("
+    let pac_rs_str = String::from(&format!("
         #[derive(Copy, Clone, Debug, PartialEq, Eq)]
         #[cfg_attr(feature = \"defmt\", derive(defmt::Format))]
         #[allow(non_camel_case_types)]
@@ -381,8 +383,10 @@ fn main() {
             ];
         }}
     "));
+    fs::write("./src/pac.rs", pac_rs_str).unwrap();
 
-    // parse alternate functions
+    // parse alternate functions and generate _generated.rs
+    let mut af_str = String::from("");
     let af_map = GLOBAL_AF_MAP.lock().unwrap();
     let afs_info = GLOBAL_AF_INFO.lock().unwrap();
     for af in af_map.iter() {
@@ -400,11 +404,32 @@ fn main() {
         if let Some(af_info) = afs_info.get(peripheral_type_str) {
             if let Some(af_pin) = af_info.pins.get(pin_str) {
                 println!("cargo:warning={}::{peripheral_type_str}{peripheral_index_str}: {pin_str} on {gpio_str} ==> AF{af}", af_info.module);
-                generated_rs_str.push_str(&format!("pin_trait_impl!(crate::{}::{}, {peripheral_str}, {gpio_str}, {af}u8);\n", af_info.module, *af_pin));
+                af_str.push_str(&format!("pin_trait_impl!(crate::{}::{}, {peripheral_str}, {gpio_str}, {af}u8);\n", af_info.module, *af_pin));
             }
         }
     }
 
+    // bind vsf peripherals
+    let mut generated_rs_str = String::from("");
+    let mut gpio_output_code = String::from("");
+    bind_vsf_gpios(&bindings_lines, &mut gpio_output_code);
+    let mut usart_output_code = String::from("");
+    bind_vsf_peripheral(&bindings_lines, "usart", &mut usart_output_code);
+
+    generated_rs_str.push_str(&format!("
+        embassy_hal_internal::peripherals_definition!(
+            {gpio_output_code}
+            {usart_output_code}
+        );
+        embassy_hal_internal::peripherals_struct!(
+            {gpio_output_code}
+            {usart_output_code}
+        );
+        embassy_hal_internal::interrupt_mod!(
+            {interrupt_name_str}
+        );
+        {af_str}
+    "));
     fs::write("./src/_generated.rs", generated_rs_str).unwrap();
 }
 
@@ -427,6 +452,36 @@ fn enable_peripherial(lines: &Vec<&str>, name: &str) -> u32 {
         }
     }
     mask
+}
+
+fn bind_vsf_gpios(lines: &Vec<&str>, output_code: &mut String) {
+    let mask = extrace_peripheral_mask(lines, "gpio");
+
+    for port_index in 0..32 {
+        if mask & (1 << port_index) != 0 {
+            if let Some(mut pin_mask) = extract_const_integer::<u128>(&lines, &format!("VSF_HW_GPIO_PORT{port_index}_MASK")) {
+                let mut pin_index = 0;
+                while pin_mask != 0 {
+                    if pin_mask & 1 != 0 {
+                        output_code.push_str(&format!("P{port_index}_{pin_index},"));
+                    }
+                    pin_index += 1;
+                    pin_mask >>= 1;
+                }
+            }
+        }
+    }
+}
+
+fn bind_vsf_peripheral(lines: &Vec<&str>, name: &str, output_code: &mut String) {
+    let peripheral_name_upper = String::from(name).to_uppercase();
+    let mask = extrace_peripheral_mask(lines, &peripheral_name_upper);
+
+    for peripheral_index in 0..32 {
+        if mask & (1 << peripheral_index) != 0 {
+            output_code.push_str(&format!("{peripheral_name_upper}{peripheral_index},"));
+        }
+    }
 }
 
 fn extrace_peripheral_mask(lines: &Vec<&str>, name: &str) -> u32 {
@@ -466,12 +521,12 @@ fn extract_function(lines: &Vec<&str>, name: &str) -> bool {
     return matched;
 }
 
-fn extract_module(lines: &Vec<&str>, name: &str) -> bool {
+fn extract_type(lines: &Vec<&str>, name: &str) -> bool {
     let mut matched = false;
     for line in lines {
         let parts: Vec<&str> = line.split_whitespace().collect();
-        // pub mod MODULE_NAME {
-        if parts.len() >= 3 && parts[0] == "pub" && parts[1] == "mod" {
+        // pub type TYPE_NAME = 
+        if parts.len() >= 3 && parts[0] == "pub" && parts[1] == "type" {
             if parts[2] == name {
                 matched = true;
                 break;

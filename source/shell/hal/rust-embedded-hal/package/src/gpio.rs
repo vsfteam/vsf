@@ -3,10 +3,11 @@
 #![allow(dead_code)]
 
 use core::convert::Infallible;
+use paste::paste;
 
 use embassy_hal_internal::{impl_peripheral, Peri, PeripheralType};
 
-use super::vsf_hal::{vsf_gpio_mode_t::*, *};
+use crate::vsf_hal::{*};
 
 pub type PinPortType = u16;
 pub type AfNumType = u16;
@@ -16,14 +17,13 @@ pub type AfNumType = u16;
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Pull {
     /// No pull.
-    #[cfg(VSF_GPIO_NO_PULL_UP_DOWN)]
-    None = VSF_GPIO_NO_PULL_UP_DOWN as isize,
+    None = into_vsf_gpio_mode_t!(VSF_GPIO_NO_PULL_UP_DOWN) as isize,
     /// Internal pull-up resistor.
     #[cfg(VSF_GPIO_PULL_UP)]
-    Up = VSF_GPIO_PULL_UP as isize,
+    Up = into_vsf_gpio_mode_t!(VSF_GPIO_PULL_UP) as isize,
     /// Internal pull-down resistor.
     #[cfg(VSF_GPIO_PULL_DOWN)]
-    Down = VSF_GPIO_PULL_DOWN as isize,
+    Down = into_vsf_gpio_mode_t!(VSF_GPIO_PULL_DOWN) as isize,
 }
 
 /// Speed setting for an output.
@@ -33,17 +33,17 @@ pub enum Speed {
     #[cfg(not(any(VSF_GPIO_SPEED_LOW, VSF_GPIO_SPEED_MEDIUM, VSF_GPIO_SPEED_HIGH, VSF_GPIO_SPEED_VERY_HIGH)))]
     None = 0,
     #[cfg(VSF_GPIO_SPEED_LOW)]
-    Low = VSF_GPIO_SPEED_LOW as isize,
+    Low = into_vsf_gpio_mode_t!(VSF_GPIO_SPEED_LOW) as isize,
     #[cfg(VSF_GPIO_SPEED_MEDIUM)]
-    Medium = VSF_GPIO_SPEED_MEDIUM as isize,
+    Medium = into_vsf_gpio_mode_t!(VSF_GPIO_SPEED_MEDIUM) as isize,
     #[cfg(VSF_GPIO_SPEED_HIGH)]
-    High = VSF_GPIO_SPEED_HIGH as isize,
+    High = into_vsf_gpio_mode_t!(VSF_GPIO_SPEED_HIGH) as isize,
     #[cfg(VSF_GPIO_SPEED_VERY_HIGH)]
-    VeryHigh = VSF_GPIO_SPEED_VERY_HIGH as isize,
+    VeryHigh = into_vsf_gpio_mode_t!(VSF_GPIO_SPEED_VERY_HIGH) as isize,
 }
 
 impl Speed {
-    fn lowest() -> Self {
+    pub fn lowest() -> Self {
         #[cfg(VSF_GPIO_SPEED_LOW)]
         let result = Speed::Low;
         #[cfg(all(not(VSF_GPIO_SPEED_LOW), VSF_GPIO_SPEED_MEDIUM))]
@@ -57,7 +57,7 @@ impl Speed {
 
         result
     }
-    fn highest() -> Self {
+    pub fn highest() -> Self {
         #[cfg(VSF_GPIO_SPEED_VERY_HIGH)]
         let result = Speed::VeryHigh;
         #[cfg(all(not(VSF_GPIO_SPEED_VERY_HIGH), VSF_GPIO_SPEED_HIGH))]
@@ -89,17 +89,17 @@ pub enum OutputDrive {
     #[cfg(not(any(VSF_GPIO_DRIVE_STRENGTH_LOW, VSF_GPIO_DRIVE_STRENGTH_MEDIUM, VSF_GPIO_DRIVE_STRENGTH_HIGH, VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH)))]
     None = 0,
     #[cfg(VSF_GPIO_DRIVE_STRENGTH_LOW)]
-    Low = VSF_GPIO_DRIVE_STRENGTH_LOW as isize,
+    Low = into_vsf_gpio_mode_t!(VSF_GPIO_DRIVE_STRENGTH_LOW) as isize,
     #[cfg(VSF_GPIO_DRIVE_STRENGTH_MEDIUM)]
-    Medium = VSF_GPIO_DRIVE_STRENGTH_MEDIUM as isize,
+    Medium = into_vsf_gpio_mode_t!(VSF_GPIO_DRIVE_STRENGTH_MEDIUM) as isize,
     #[cfg(VSF_GPIO_DRIVE_STRENGTH_HIGH)]
-    High = VSF_GPIO_DRIVE_STRENGTH_HIGH as isize,
+    High = into_vsf_gpio_mode_t!(VSF_GPIO_DRIVE_STRENGTH_HIGH) as isize,
     #[cfg(VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH)]
-    VeryHigh = VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH as isize,
+    VeryHigh = into_vsf_gpio_mode_t!(VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH) as isize,
 }
 
 impl OutputDrive {
-    fn lowest() -> Self {
+    pub fn lowest() -> Self {
         #[cfg(VSF_GPIO_DRIVE_STRENGTH_LOW)]
         let result = OutputDrive::Low;
         #[cfg(all(not(VSF_GPIO_DRIVE_STRENGTH_LOW), VSF_GPIO_DRIVE_STRENGTH_MEDIUM))]
@@ -113,7 +113,7 @@ impl OutputDrive {
 
         result
     }
-    fn highest() -> Self {
+    pub fn highest() -> Self {
         #[cfg(VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH)]
         let result = OutputDrive::VeryHigh;
         #[cfg(all(not(VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH), VSF_GPIO_DRIVE_STRENGTH_HIGH))]
@@ -140,11 +140,11 @@ impl Default for OutputDrive {
 #[cfg(any(VSF_GPIO_AF_INPUT, VSF_GPIO_AF_PUSH_PULL, VSF_GPIO_AF_OPEN_DRAIN))]
 pub enum AfMode {
     #[cfg(VSF_GPIO_AF_INPUT)]
-    AfInput = VSF_GPIO_AF_INPUT as isize,
+    AfInput = into_vsf_gpio_mode_t!(VSF_GPIO_AF_INPUT) as isize,
     #[cfg(VSF_GPIO_AF_PUSH_PULL)]
-    AfPushPull = VSF_GPIO_AF_PUSH_PULL as isize,
+    AfPushPull = into_vsf_gpio_mode_t!(VSF_GPIO_AF_PUSH_PULL) as isize,
     #[cfg(VSF_GPIO_AF_OPEN_DRAIN)]
-    AfOpenDrain = VSF_GPIO_AF_OPEN_DRAIN as isize,
+    AfOpenDrain = into_vsf_gpio_mode_t!(VSF_GPIO_AF_OPEN_DRAIN) as isize,
     #[cfg(not(any(VSF_GPIO_AF, VSF_GPIO_AF_PUSH_PULL, VSF_GPIO_AF_OPEN_DRAIN)))]
     None = 0,
 }
@@ -167,7 +167,7 @@ impl AfType {
             #[cfg(VSF_GPIO_AF_INPUT)]
             mode: AfMode::AfInput as u32,
             #[cfg(all(not(VSF_GPIO_AF_INPUT), VSF_GPIO_AF))]
-            mode: (VSF_GPIO_AF | VSF_GPIO_INPUT) as u32,
+            mode: (into_vsf_gpio_mode_t!(VSF_GPIO_AF) | into_vsf_gpio_mode_t!(VSF_GPIO_INPUT)) as u32,
 
             pull: pull,
 
@@ -383,7 +383,7 @@ impl<'d> Flex<'d> {
     /// Put the pin into input mode.
     #[inline]
     pub fn set_as_input(&mut self, pull: Pull) {
-        self.pin.config(VSF_GPIO_INPUT | pull as u32, 0);
+        self.pin.config(into_vsf_gpio_mode_t!(VSF_GPIO_INPUT) | pull as u32, 0);
     }
 
     /// Put the pin into output mode.
@@ -392,7 +392,7 @@ impl<'d> Flex<'d> {
     /// at a specific level, call `set_high`/`set_low` on the pin first.
     #[inline]
     pub fn set_as_output(&mut self, speed: Speed, drive: OutputDrive) {
-        self.pin.config(VSF_GPIO_OUTPUT_PUSH_PULL | speed as u32 | drive as u32, 0);
+        self.pin.config(into_vsf_gpio_mode_t!(VSF_GPIO_OUTPUT_PUSH_PULL) | speed as u32 | drive as u32, 0);
     }
 
     /// Put the pin into input + output mode.
@@ -406,7 +406,7 @@ impl<'d> Flex<'d> {
     /// at a specific level, call `set_high`/`set_low` on the pin first.
     #[inline]
     pub fn set_as_input_output(&mut self, pull: Pull, speed: Speed, drive: OutputDrive) {
-        self.pin.config(VSF_GPIO_OUTPUT_OPEN_DRAIN | pull as u32 | speed as u32 | drive as u32, 0);
+        self.pin.config(into_vsf_gpio_mode_t!(VSF_GPIO_OUTPUT_OPEN_DRAIN) | pull as u32 | speed as u32 | drive as u32, 0);
     }
 
     /// Put the pin into analog mode
@@ -416,7 +416,7 @@ impl<'d> Flex<'d> {
     #[inline]
     #[cfg(VSF_GPIO_ANALOG)]
     pub fn set_as_analog(&mut self) {
-        self.pin.config(VSF_GPIO_ANALOG, 0);
+        self.pin.config(into_vsf_gpio_mode_t!(VSF_GPIO_ANALOG), 0);
     }
 
     /// Put the pin into AF mode, unchecked.
@@ -426,7 +426,7 @@ impl<'d> Flex<'d> {
     #[inline]
     #[cfg(any(VSF_GPIO_AF, VSF_GPIO_AF_PUSH_PULL, VSF_GPIO_AF_OPEN_DRAIN))]
     pub fn set_as_af(&mut self, af_num: AfNumType, af_type: AfType) {
-        self.pin.config(VSF_GPIO_AF | af_type.mode as u32 | af_type.pull as u32 | af_type.speed as u32 | af_type.drive as u32, af_num);
+        self.pin.config(into_vsf_gpio_mode_t!(VSF_GPIO_AF) | af_type.mode as u32 | af_type.pull as u32 | af_type.speed as u32 | af_type.drive as u32, af_num);
     }
 
     /// Put the pin into disconnected mode.
@@ -647,77 +647,74 @@ use crate::peripherals;
 
 vsf_hal_macros::bind_vsf_gpio_pins!{}
 
-#[cfg(vsf_hw_peripheral_en_t)]
-use super::vsf_hal::{vsf_hw_peripheral_en_t::*};
-
 pub(crate) unsafe fn init() {
     #[cfg(all(vsf_hw_clkrst_region_set_bit, vsf_hw_peripheral_en_t))]
     {
         unsafe {
             #[cfg(VSF_HW_EN_GPIO0)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO0 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO0) as u32);
             #[cfg(VSF_HW_EN_GPIO1)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO1 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO1) as u32);
             #[cfg(VSF_HW_EN_GPIO2)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO2 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO2) as u32);
             #[cfg(VSF_HW_EN_GPIO3)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO3 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO3) as u32);
             #[cfg(VSF_HW_EN_GPIO4)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO4 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO4) as u32);
             #[cfg(VSF_HW_EN_GPIO5)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO5 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO5) as u32);
             #[cfg(VSF_HW_EN_GPIO6)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO6 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO6) as u32);
             #[cfg(VSF_HW_EN_GPIO7)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO7 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO7) as u32);
             #[cfg(VSF_HW_EN_GPIO8)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO8 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO8) as u32);
             #[cfg(VSF_HW_EN_GPIO9)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO9 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO9) as u32);
             #[cfg(VSF_HW_EN_GPIO10)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO10 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO10) as u32);
             #[cfg(VSF_HW_EN_GPIO11)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO11 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO11) as u32);
             #[cfg(VSF_HW_EN_GPIO12)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO12 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO12) as u32);
             #[cfg(VSF_HW_EN_GPIO13)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO13 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO13) as u32);
             #[cfg(VSF_HW_EN_GPIO14)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO14 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO14) as u32);
             #[cfg(VSF_HW_EN_GPIO15)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO15 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO15) as u32);
             #[cfg(VSF_HW_EN_GPIO16)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO16 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO16) as u32);
             #[cfg(VSF_HW_EN_GPIO17)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO17 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO17) as u32);
             #[cfg(VSF_HW_EN_GPIO18)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO18 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO18) as u32);
             #[cfg(VSF_HW_EN_GPIO19)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO19 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO19) as u32);
             #[cfg(VSF_HW_EN_GPIO20)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO20 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO20) as u32);
             #[cfg(VSF_HW_EN_GPIO21)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO21 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO21) as u32);
             #[cfg(VSF_HW_EN_GPIO22)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO22 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO22) as u32);
             #[cfg(VSF_HW_EN_GPIO23)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO23 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO23) as u32);
             #[cfg(VSF_HW_EN_GPIO24)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO24 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO24) as u32);
             #[cfg(VSF_HW_EN_GPIO25)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO25 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO25) as u32);
             #[cfg(VSF_HW_EN_GPIO26)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO26 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO26) as u32);
             #[cfg(VSF_HW_EN_GPIO27)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO27 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO27) as u32);
             #[cfg(VSF_HW_EN_GPIO28)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO28 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO28) as u32);
             #[cfg(VSF_HW_EN_GPIO29)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO29 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO29) as u32);
             #[cfg(VSF_HW_EN_GPIO30)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO30 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO30) as u32);
             #[cfg(VSF_HW_EN_GPIO31)]
-            vsf_hw_clkrst_region_set_bit(VSF_HW_EN_GPIO31 as u32);
+            vsf_hw_clkrst_region_set_bit(into_vsf_hw_peripheral_en_t!(VSF_HW_EN_GPIO31) as u32);
         }
     }
 }

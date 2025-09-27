@@ -33,13 +33,42 @@ pub mod mode {
     impl_mode!(Async);
 }
 
-pub mod _generated;
+//macro_rules! into_enum_type {($type:ident) => { $type::Type }}
+//macro_rules! into_vsf_gpio_mode_t {($mode:ident) => { vsf_gpio_mode_t::$mode }}
+//#[cfg(vsf_hw_peripheral_en_t)]
+//macro_rules! into_vsf_hw_peripheral_en_t {($mode:ident) => { vsf_hw_peripheral_en_t::$mode }}
+//macro_rules! into_vsf_io_port_pin_no_t {($pin:ident) => { vsf_io_port_pin_no_t::$pin }}
+//macro_rules! into_vsf_usart_mode_t {($mode:ident) => { vsf_usart_mode_t::$mode }}
+//macro_rules! into_vsf_usart_irq_mask_t {($mode:ident) => { vsf_usart_irq_mask_t::$mode }}
+
+macro_rules! into_enum_type {($type:ident) => { $type }}
+macro_rules! into_vsf_gpio_mode_t {($mode:ident) => { paste!{[<vsf_gpio_mode_t_ $mode>]} }}
+#[cfg(vsf_hw_peripheral_en_t)]
+macro_rules! into_vsf_hw_peripheral_en_t {($mode:ident) => { paste!{[<vsf_hw_peripheral_en_t_ $mode>]} }}
+macro_rules! into_vsf_io_port_pin_no_t {($pin:ident) => { paste!{[<vsf_io_port_pin_no_t_ $pin>]} }}
+macro_rules! into_vsf_usart_mode_t {($mode:ident) => { paste!{[<vsf_usart_mode_t_ $mode>]} }}
+macro_rules! into_vsf_usart_irq_mask_t {($mode:ident) => { paste!{[<vsf_usart_irq_mask_t_ $mode>]} }}
+
 #[cfg(vsf_gpio_enabled)]
 pub mod gpio;
 #[cfg(vsf_usart_enabled)]
 pub mod usart;
 
-vsf_hal_macros::bind_vsf_peripherials!{}
+// This must go last, so that it sees all the impl_foo! macros defined earlier.
+pub(crate) mod _generated {
+    #![allow(dead_code)]
+    #![allow(unused_imports)]
+    #![allow(non_snake_case)]
+    #![allow(missing_docs)]
+
+    include!("./_generated.rs");
+}
+
+pub use crate::_generated::interrupt;
+
+pub use _generated::{peripherals, Peripherals};
+pub use embassy_hal_internal::{Peri, PeripheralType};
+pub mod pac;
 
 #[non_exhaustive]
 #[derive(Clone, Copy)]

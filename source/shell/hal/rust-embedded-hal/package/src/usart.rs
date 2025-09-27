@@ -1,0 +1,1049 @@
+//! Universal Synchronous/Asynchronous Receiver Transmitter (USART/UART) driver.
+//!
+//! The USART/UART driver is provided in two flavors - this one and also [crate::buffered_usarte::BufferedUsarte].
+//! The [Usarte] here is useful for those use-cases where reading the USART/UART peripheral is
+//! exclusively awaited on. If the [Usart/Uart] is required to be awaited on with some other future,
+//! for example when using `futures_util::future::select`, then you should consider
+//! [crate::buffered_usart::BufferedUsart] so that reads may continue while processing these
+//! other futures. If you do not then you may lose data between reads.
+//!
+//! An advantage of the [Usart/Uart] has over [crate::buffered_usart::BufferedUsart] is that less
+//! memory may be used given that buffers are passed in directly to its read and write
+//! methods.
+
+#![macro_use]
+
+use core::future::poll_fn;
+use core::marker::PhantomData;
+use core::sync::atomic::{compiler_fence, Ordering};
+use core::task::Poll;
+use paste::paste;
+
+use embassy_hal_internal::drop::OnDrop;
+use embassy_hal_internal::{Peri, PeripheralType};
+use embassy_sync::waitqueue::AtomicWaker;
+
+use crate::gpio::{AfType, Pull, Speed, OutputDrive};
+//use crate::interrupt::typelevel::Interrupt as _;
+use crate::interrupt::{self};
+use crate::vsf_hal::{*};
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+/// Number of data bits
+pub enum DataBits {
+    /// 5 Data Bits
+    #[cfg(VSF_USART_5_BIT_LENGTH)]
+    DataBits5 = into_vsf_usart_mode_t!(VSF_USART_5_BIT_LENGTH) as isize,
+    /// 6 Data Bits
+    #[cfg(VSF_USART_6_BIT_LENGTH)]
+    DataBits6 = into_vsf_usart_mode_t!(VSF_USART_6_BIT_LENGTH) as isize,
+    /// 7 Data Bits
+    #[cfg(VSF_USART_7_BIT_LENGTH)]
+    DataBits7 = into_vsf_usart_mode_t!(VSF_USART_7_BIT_LENGTH) as isize,
+    /// 8 Data Bits
+    #[cfg(VSF_USART_8_BIT_LENGTH)]
+    DataBits8 = into_vsf_usart_mode_t!(VSF_USART_8_BIT_LENGTH) as isize,
+    /// 9 Data Bits
+    #[cfg(VSF_USART_9_BIT_LENGTH)]
+    DataBits9 = into_vsf_usart_mode_t!(VSF_USART_9_BIT_LENGTH) as isize,
+    /// 10 Data Bits
+    #[cfg(VSF_USART_9_BIT_LENGTH)]
+    DataBits10 = into_vsf_usart_mode_t!(VSF_USART_10_BIT_LENGTH) as isize,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+/// Parity
+pub enum Parity {
+    /// No parity
+    #[cfg(VSF_USART_NO_PARITY)]
+    ParityNone = into_vsf_usart_mode_t!(VSF_USART_NO_PARITY) as isize,
+    /// Even Parity
+    #[cfg(VSF_USART_EVEN_PARITY)]
+    ParityEven = into_vsf_usart_mode_t!(VSF_USART_EVEN_PARITY) as isize,
+    /// Odd Parity
+    #[cfg(VSF_USART_ODD_PARITY)]
+    ParityOdd = into_vsf_usart_mode_t!(VSF_USART_ODD_PARITY) as isize,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+/// Number of stop bits
+pub enum StopBits {
+    #[doc = "1 stop bit"]
+    #[cfg(VSF_USART_1_STOPBIT)]
+    STOP1 = into_vsf_usart_mode_t!(VSF_USART_1_STOPBIT) as isize,
+    #[doc = "0.5 stop bits"]
+    #[cfg(VSF_USART_0_5_STOPBIT)]
+    STOP0P5 = into_vsf_usart_mode_t!(VSF_USART_0_5_STOPBIT) as isize,
+    #[doc = "2 stop bits"]
+    #[cfg(VSF_USART_2_STOPBIT)]
+    STOP2 = into_vsf_usart_mode_t!(VSF_USART_2_STOPBIT) as isize,
+    #[doc = "1.5 stop bits"]
+    #[cfg(VSF_USART_1_5_STOPBIT)]
+    STOP1P5 = into_vsf_usart_mode_t!(VSF_USART_1_5_STOPBIT) as isize,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+/// Duplex mode
+pub enum Duplex {
+    /// Full duplex
+    #[cfg(VSF_USART_HALF_DUPLEX_DISABLE)]
+    Full = into_vsf_usart_mode_t!(VSF_USART_HALF_DUPLEX_DISABLE) as isize,
+    /// Half duplex
+    #[cfg(VSF_USART_HALF_DUPLEX_ENABLE)]
+    Half = into_vsf_usart_mode_t!(VSF_USART_HALF_DUPLEX_ENABLE) as isize,
+
+    #[cfg(not(any(VSF_USART_HALF_DUPLEX_ENABLE, VSF_USART_HALF_DUPLEX_DISABLE)))]
+    Full = 0,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+/// Half duplex IO mode
+pub enum OutputConfig {
+    /// Push pull allows for faster baudrates, no internal pullup
+    PushPull,
+    /// Open drain output (external pull up needed)
+    OpenDrain,
+    /// Open drain output with internal pull up resistor
+    OpenDrainPullUp,
+}
+
+impl OutputConfig {
+    const fn af_type(self) -> AfType {
+        match self {
+            OutputConfig::PushPull => AfType::output(Speed::default(), OutputDrive::default()),
+            OutputConfig::OpenDrain => AfType::output(Speed::default(), OutputDrive::default()),
+            OutputConfig::OpenDrainPullUp => AfType::input_output(Pull::Up, Speed::default(), OutputDrive::default()),
+        }
+    }
+}
+
+/// USART config.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[non_exhaustive]
+pub struct Config {
+    /// Baud rate.
+    pub baudrate: u32,
+    /// Number of data bits
+    pub data_bits: DataBits,
+    /// Number of stop bits
+    pub stop_bits: StopBits,
+    /// Parity type
+    pub parity: Parity,
+
+    /// Set this to true to swap the RX and TX pins.
+    #[cfg(VSF_USART_SWAP)]
+    pub swap_rx_tx: bool,
+
+    /// Set this to true to invert TX pin signal values (V<sub>DD</sub> = 0/mark, Gnd = 1/idle).
+    #[cfg(VSF_USART_TX_INVERT)]
+    pub invert_tx: bool,
+
+    /// Set this to true to invert RX pin signal values (V<sub>DD</sub> = 0/mark, Gnd = 1/idle).
+    #[cfg(VSF_USART_RX_INVERT)]
+    pub invert_rx: bool,
+
+    /// Set this to true to invert RX pin signal values (V<sub>DD</sub> = 0/mark, Gnd = 1/idle).
+    #[cfg(VSF_USART_SYNC_CLOCK_ENABLE)]
+    pub enable_sync_clock: bool,
+
+    /// Set the pull configuration for the RX pin.
+    pub rx_pull: Pull,
+
+    /// Set the pull configuration for the CTS pin.
+    pub cts_pull: Pull,
+
+    /// Set the pin configuration for the TX pin.
+    pub tx_config: OutputConfig,
+
+    /// Set the pin configuration for the RTS pin.
+    pub rts_config: OutputConfig,
+
+    /// Set the pin configuration for the DE pin.
+    pub de_config: OutputConfig,
+
+    /// Set the pin configuration for the CK pin.
+    pub ck_config: OutputConfig,
+
+    rx_timeout: u32,
+
+    #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
+    rx_idle_cnt: u32,
+
+    // private: set by internal API, not by the user.
+    #[cfg(VSF_USART_HALF_DUPLEX_ENABLE)]
+    duplex: Duplex,
+}
+
+#[non_exhaustive]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+/// Config Error
+pub enum ConfigError {
+    /// Baudrate too low
+    BaudrateTooLow,
+    /// Baudrate too high
+    BaudrateTooHigh,
+    /// Data bits not supported
+    DatabitsNotSupported,
+    /// Parity combination not supported
+    ParityNotSupported,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            parity: 115200,
+            data_bits: DataBits::DataBits8,
+            stop_bits: StopBits::STOP1,
+            parity: Parity::ParityNone,
+            #[cfg(VSF_USART_SWAP)]
+            swap_rx_tx: false,
+            #[cfg(VSF_USART_TX_INVERT)]
+            invert_tx: false,
+            #[cfg(VSF_USART_RX_INVERT)]
+            invert_rx: false,
+            #[cfg(VSF_USART_SYNC_CLOCK_ENABLE)]
+            enable_sync_clock: false,
+            #[cfg(VSF_USART_HALF_DUPLEX_ENABLE)]
+            duplex: Duplex::Full,
+            rx_pull: Pull::None,
+            cts_pull: Pull::None,
+            tx_config: OutputConfig::PushPull,
+            rts_config: OutputConfig::PushPull,
+            de_config: OutputConfig::PushPull,
+            ck_config: OutputConfig::PushPull,
+            rx_timeout: 0,
+            #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
+            rx_idle_cnt: 0,
+        }
+    }
+}
+
+impl Config {
+    fn tx_af(&self) -> AfType {
+        #[cfg(VSF_USART_SWAP)]
+        if self.swap_rx_tx {
+            return AfType::input(Pull::None);
+        };
+        self.tx_config.af_type()
+    }
+
+    fn rx_af(&self) -> AfType {
+        #[cfg(VSF_USART_SWAP)]
+        if self.swap_rx_tx {
+            return self.tx_config.af_type();
+        };
+        AfType::input(Pull::None)
+    }
+}
+
+/// USART error.
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[non_exhaustive]
+pub enum Error {
+    /// Tx Buffer overrun
+    #[cfg(VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR)]
+    TxOverrun = into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR) as isize,
+    /// Rx Buffer overrun
+    #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
+    RxOverrun = into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) as isize,
+    /// Parity error
+    #[cfg(VSF_USART_IRQ_MASK_PARITY_ERR)]
+    Parity = into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) as isize,
+    /// Framing error
+    #[cfg(VSF_USART_IRQ_MASK_FRAME_ERR)]
+    Framing = into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) as isize,
+    /// Break condition
+    #[cfg(VSF_USART_IRQ_MASK_BREAK_ERR)]
+    Break = into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) as isize,
+}
+
+impl core::fmt::Display for Error {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        let message = match self {
+            Self::Framing => "Framing Error",
+            Self::RxOverrun => "RX Buffer Overrun",
+            Self::TxOverrun => "TX Buffer Overrun",
+            Self::Parity => "Parity Check Error",
+            Self::Break => "Break signal received",
+        };
+
+        write!(f, "{}", message)
+    }
+}
+
+/// Interrupt handler.
+pub struct InterruptHandler<T: Instance> {
+    _phantom: PhantomData<T>,
+}
+
+impl<T: Instance> interrupt::typelevel::Handler<T::Interrupt> for InterruptHandler<T> {
+    unsafe fn on_interrupt() {
+        T::info().vsf_usart_irqhandler();
+    }
+}
+
+unsafe extern "C" fn vsf_usart_on_interrupt(
+    target_ptr: *mut ::core::ffi::c_void,
+    vsf_usart: *mut vsf_usart_t,
+    irq_mask: into_enum_type!(vsf_usart_irq_mask_t),
+) {
+    let s: State = target_ptr as &'static State;
+
+    
+    let mut rx_irq_mask = irq_mask & (VSF_USART_IRQ_MASK_ERR | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL));
+    #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
+    if s.rx_exit_on_idle {
+        rx_irq_mask |= into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_IDLE);
+    }
+    if rx_irq_mask != 0 {
+        #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
+        vsf_usart_irq_disable(vsf_usart, VSF_USART_IRQ_MASK_ERR | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_IDLE));
+        #[cfg(not(VSF_USART_IRQ_MASK_RX_IDLE))]
+        vsf_usart_irq_disable(vsf_usart, VSF_USART_IRQ_MASK_ERR | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL));
+        s.rx_irq_mask = rx_irq_mask;
+        s.rx_waker.wake();
+    }
+
+    let tx_irq_mask = irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL);
+    if tx_irq_mask != 0 {
+        vsf_usart_irq_disable(vsf_usart, into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL));
+        s.tx_irq_mask = tx_irq_mask;
+        s.tx_waker.wake();
+    }
+}
+
+/// USART driver.
+pub struct Usart<'d, T: Instance> {
+    tx: UsartTx<'d, T>,
+    rx: UsartRx<'d, T>,
+}
+
+/// Transmitter part of the USART driver.
+///
+/// This can be obtained via [`Usart::split`], or created directly.
+pub struct UsartTx<'d, T: Instance> {
+    _p: Peri<'d, T>,
+    stat: &'static State,
+}
+
+/// Receiver part of the USART driver.
+///
+/// This can be obtained via [`Usart::split`], or created directly.
+pub struct UsartRx<'d, T: Instance> {
+    _p: Peri<'d, T>,
+    stat: &'static State,
+}
+
+impl<'d, T: Instance> Usart<'d, T> {
+    /// Create a new USART without hardware flow control
+    pub fn new(
+        usart: Peri<'d, T>,
+        rxd: Peri<'d, impl TxPin<T>>,
+        txd: Peri<'d, impl TxPin<T>>,
+        ck: Option<Peri<'d, impl CkPin<T>>>,
+        _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
+        config: Config,
+    ) -> Self {
+        Self::new_inner(usart,
+            new_pin!(rxd, config.rx_af()),
+            new_pin!(txd, config.rx_af()),
+            if let Some(ck_pin) = ck {
+                new_pin!(ck, AfType::output(Speed::highest(), OutputDrive::default()))
+            } else {
+                None
+            },
+            None, None,
+            config
+        )
+    }
+
+    /// Create a new USART with hardware flow control (RTS/CTS)
+    pub fn new_with_rtscts(
+        usart: Peri<'d, T>,
+        rxd: Peri<'d, impl RxPin<T>>,
+        txd: Peri<'d, impl TxPin<T>>,
+        ck: Option<Peri<'d, impl CkPin<T>>>,
+        cts: Peri<'d, impl CtsPin<T>>,
+        rts: Peri<'d, impl RtsPin<T>>,
+        _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
+        config: Config,
+    ) -> Self {
+        Self::new_inner(
+            usart,
+            new_pin!(rxd, config.rx_af()),
+            new_pin!(txd, config.rx_af()),
+            if let Some(ck_pin) = ck {
+                new_pin!(ck, AfType::output(Speed::highest(), OutputDrive::default()))
+            } else {
+                None
+            },
+            new_pin!(rts, config.rts_config.af_type()),
+            new_pin!(cts, AfType::input(config.cts_pull)),
+            config,
+        )
+    }
+
+    fn new_inner(
+        usart: Peri<'d, T>,
+        rxd: Peri<'d, impl TxPin<T>>,
+        txd: Peri<'d, impl TxPin<T>>,
+        ck: Option<Peri<'d, impl CkPin<T>>>,
+        cts: Option<Peri<'d, impl CtsPin<T>>>,
+        rts: Option<Peri<'d, impl RtsPin<T>>>,
+        de: Option<Peri<'d, impl DePin<T>>>,
+        config: Config,
+    ) -> Self {
+        unsafe {
+            let mut vsf_usart = usart.get_vsf_usart();
+            let mut usart_config = vsf_usart_cfg_t {
+                mode: config.databits as u32 | config.stop_bits as u32 | config.parity as u32 | config.duplex as u32 | {
+                    let mode: u32 = 0;
+                    #[cfg(VSF_USART_SWAP)]
+                    if config.swap_rx_tx {
+                        mode |= into_vsf_usart_mode_t!(VSF_USART_SWAP);
+                    }
+                    #[cfg(VSF_USART_TX_INVERT)]
+                    if config.invert_tx {
+                        mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT);
+                    }
+                    #[cfg(VSF_USART_RX_INVERT)]
+                    if config.invert_rx {
+                        mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT);
+                    }
+                    #[cfg(VSF_USART_SYNC_CLOCK_ENABLE)]
+                    if config.enable_sync_clock {
+                        mode |= into_vsf_usart_mode_t!(VSF_USART_SYNC_CLOCK_ENABLE);
+                    }
+                    mode
+                },
+                baudrate: config.baudrate,
+                rx_timeout: config.rx_timeout,
+                #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
+                rx_idle_cnt: config.rx_idle_cnt,
+
+                isr: vsf_usart_isr_t {
+                    handler_fn: Some(vsf_usart_on_interrupt),
+                    target_ptr: T::info() as *mut ::core::ffi::c_void,
+                    prio: 0,
+                },
+            };
+            vsf_usart_init(vsf_usart, &mut usart_config);
+            vsf_usart_enable(vsf_usart);
+        }
+
+        Self {
+            tx: UsartTx {
+                _p: unsafe { usart.clone_unchecked() },
+            },
+            rx: UsartRx { _p: usart },
+        }
+    }
+
+    /// Split the Usart into the transmitter and receiver parts.
+    ///
+    /// This is useful to concurrently transmit and receive from independent tasks.
+    pub fn split(self) -> (UsartTx<'d, T>, UsartRx<'d, T>) {
+        (self.tx, self.rx)
+    }
+
+    /// Split the USART in reader and writer parts, by reference.
+    ///
+    /// The returned halves borrow from `self`, so you can drop them and go back to using
+    /// the "un-split" `self`. This allows temporarily splitting the USART.
+    pub fn split_by_ref(&mut self) -> (&mut UsartTx<'d, T>, &mut UsartRx<'d, T>) {
+        (&mut self.tx, &mut self.rx)
+    }
+
+    /// Read bytes until the buffer is filled.
+    pub async fn read(&mut self, buffer: &mut [u8]) -> Result<(), Error> {
+        self.rx.read(buffer).await
+    }
+
+    /// Write all bytes in the buffer.
+    pub async fn write(&mut self, buffer: &[u8]) -> Result<(), Error> {
+        self.tx.write(buffer).await
+    }
+
+    /// Read bytes until the buffer is filled.
+    pub fn blocking_read(&mut self, buffer: &mut [u8]) -> Result<(), Error> {
+        self.rx.blocking_read(buffer)
+    }
+
+    /// Write all bytes in the buffer.
+    pub fn blocking_write(&mut self, buffer: &[u8]) -> Result<(), Error> {
+        self.tx.blocking_write(buffer)
+    }
+
+    /// Block until transmission complete
+    pub fn blocking_flush(&mut self) -> Result<(), Error> {
+        self.tx.blocking_flush()
+    }
+
+    /// Send break character
+    pub fn send_break(&self) {
+        self.tx.send_break();
+    }
+}
+
+impl<'d, T: Instance> UsartTx<'d, T> {
+    /// Create a new tx-only USART without hardware flow control
+    pub fn new(
+        usart: Peri<'d, T>,
+        _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
+        txd: Peri<'d, impl TxPin<T>>,
+        ck: Option<Peri<'d, impl CkPin<T>>>,
+        config: Config,
+    ) -> Self {
+        Self::new_inner(usart,
+            new_pin!(txd, config.tx_af()),
+            if let Some(ck_pin) = ck {
+                new_pin!(ck, AfType::output(Speed::highest(), OutputDrive::default()))
+            } else {
+                None
+            },
+            None,
+            config
+        )
+    }
+
+    /// Create a new tx-only USART with hardware flow control (RTS/CTS)
+    pub fn new_with_cts(
+        usart: Peri<'d, T>,
+        _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
+        txd: Peri<'d, impl TxPin<T>>,
+        ck: Option<Peri<'d, impl CkPin<T>>>,
+        cts: Peri<'d, impl CtsPin<T>>,
+        config: Config,
+    ) -> Self {
+        Self::new_inner(usart,
+            new_pin!(txd, config.tx_af()),
+            if let Some(ck_pin) = ck {
+                new_pin!(ck, AfType::output(Speed::highest(), OutputDrive::default()))
+            } else {
+                None
+            },
+            new_pin!(cts, AfType::input(config.cts_pull)),
+            config
+        )
+    }
+
+    fn new_inner(
+        usart: Peri<'d, T>,
+        txd: Peri<'d, impl TxPin<T>>,
+        cts: Option<Peri<'d, impl CtsPin<T>>>,
+        config: Config
+    ) -> Self {
+        unsafe {
+            let mut vsf_usart = usart.get_vsf_usart();
+            let mut usart_config = vsf_usart_cfg_t {
+                mode: config.databits as u32 | config.stop_bits as u32 | config.parity as u32 | config.duplex as u32 | {
+                    let mode: u32 = 0;
+                    #[cfg(VSF_USART_SWAP)]
+                    if config.swap_rx_tx {
+                        mode |= into_vsf_usart_mode_t!(VSF_USART_SWAP);
+                    }
+                    #[cfg(VSF_USART_TX_INVERT)]
+                    if config.invert_tx {
+                        mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT);
+                    }
+                    #[cfg(VSF_USART_SYNC_CLOCK_ENABLE)]
+                    if config.enable_sync_clock {
+                        mode |= into_vsf_usart_mode_t!(VSF_USART_SYNC_CLOCK_ENABLE);
+                    }
+                    mode
+                },
+                baudrate: config.baudrate,
+                rx_timeout: config.rx_timeout,
+                #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
+                rx_idle_cnt: config.rx_idle_cnt,
+
+                isr: vsf_usart_isr_t {
+                    handler_fn: Some(vsf_usart_on_interrupt),
+                    target_ptr: T::info() as *mut ::core::ffi::c_void,
+                    prio: 0,
+                },
+            };
+            vsf_usart_init(vsf_usart, &mut usart_config);
+            vsf_usart_enable(vsf_usart);
+        }
+
+        Self { _p: usart }
+    }
+
+    /// Write all bytes in the buffer.
+    pub async fn write(&mut self, buffer: &[u8]) -> Result<(), Error> {
+        if buffer.is_empty() {
+            return Ok(());
+        }
+
+        let s = T::state();
+        s.tx_irq_mask = 0;
+        compiler_fence(Ordering::SeqCst);
+
+        unsafe {
+            let mut vsf_usart = self._p.get_vsf_usart();
+            let ptr = buffer.as_ptr();
+            let len = buffer.len();
+
+            vsf_usart_irq_enable(vsf_usart, into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL));
+            vsf_usart_request_tx(vsf_usart, ptr as *mut ::core::ffi::c_void, len as uint_fast32_t);
+        }
+
+        poll_fn(|cx| {
+            s.tx_waker.register(cx.waker());
+            if s.tx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL) != 0 {
+                return Poll::Ready(());
+            }
+            Poll::Pending
+        }).await;
+
+        Ok(())
+    }
+
+    /// Write all bytes in the buffer.
+    pub fn blocking_write(&mut self, buffer: &[u8]) -> Result<(), Error> {
+        if buffer.is_empty() {
+            return Ok(());
+        }
+
+        let s = T::state();
+        s.tx_irq_mask = 0;
+        compiler_fence(Ordering::SeqCst);
+
+        unsafe {
+            let mut vsf_usart = self._p.get_vsf_usart();
+            let ptr = buffer.as_ptr();
+            let len = buffer.len();
+
+            vsf_usart_irq_enable(vsf_usart, into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL));
+            vsf_usart_request_tx(vsf_usart, ptr as *mut ::core::ffi::c_void, len as uint_fast32_t);
+        }
+
+        while s.tx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL) == 0 {}
+        Ok(())
+    }
+}
+
+impl<'a, T: Instance> Drop for UsartTx<'a, T> {
+    fn drop(&mut self) {
+        // TODO
+    }
+}
+
+impl<'d, T: Instance> UsartRx<'d, T> {
+    /// Create a new rx-only USART without hardware flow control
+    pub fn new(
+        usart: Peri<'d, T>,
+        _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
+        rxd: Peri<'d, impl TxPin<T>>,
+        config: Config,
+    ) -> Self {
+        Self::new_inner(
+            usart,
+            new_pin!(rxd, config.rx_af()),
+            None,
+            config
+        )
+    }
+
+    /// Create a new rx-only USART with hardware flow control (RTS/CTS)
+    pub fn new_with_rts(
+        usart: Peri<'d, T>,
+        _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
+        rxd: Peri<'d, impl TxPin<T>>,
+        rts: Peri<'d, impl RtsPin<T>>,
+        config: Config,
+    ) -> Self {
+        Self::new_inner(
+            usart,
+            new_pin!(rxd, config.rx_af()),
+            new_pin!(rts, config.rts_config.af_type()),
+            config
+        )
+    }
+
+    fn new_inner(
+        usart: Peri<'d, T>,
+        rxd: Peri<'d, impl TxPin<T>>,
+        rts: Option<Peri<'d, impl RtsPin<T>>>,
+        config: Config
+    ) -> Self {
+        unsafe {
+            let mut vsf_usart = usart.get_vsf_usart();
+            let mut usart_config = vsf_usart_cfg_t {
+                mode: config.databits as u32 | config.stop_bits as u32 | config.parity as u32 | config.duplex as u32 | {
+                    let mode: u32 = 0;
+                    #[cfg(VSF_USART_SWAP)]
+                    if config.swap_rx_tx {
+                        mode |= into_vsf_usart_mode_t!(VSF_USART_SWAP);
+                    }
+                    #[cfg(VSF_USART_RX_INVERT)]
+                    if config.invert_rx {
+                        mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT);
+                    }
+                    #[cfg(VSF_USART_SYNC_CLOCK_ENABLE)]
+                    if config.enable_sync_clock {
+                        mode |= into_vsf_usart_mode_t!(VSF_USART_SYNC_CLOCK_ENABLE);
+                    }
+                    mode
+                },
+                baudrate: config.baudrate,
+                rx_timeout: config.rx_timeout,
+                #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
+                rx_idle_cnt: config.rx_idle_cnt,
+
+                isr: vsf_usart_isr_t {
+                    handler_fn: Some(vsf_usart_on_interrupt),
+                    target_ptr: T::info() as *mut ::core::ffi::c_void,
+                    prio: 0,
+                },
+            };
+            vsf_usart_init(vsf_usart, &mut usart_config);
+            vsf_usart_enable(vsf_usart);
+        }
+
+        Self { _p: usart }
+    }
+
+    /// Read bytes until the buffer is filled.
+    pub async fn read(&mut self, buffer: &mut [u8]) -> Result<(), Error> {
+        if buffer.is_empty() {
+            return Ok(());
+        }
+
+        let s = T::state();
+        s.rx_irq_mask = 0;
+        s.rx_exit_on_idle = false;
+        compiler_fence(Ordering::SeqCst);
+
+        unsafe {
+            let mut vsf_usart = self._p.get_vsf_usart();
+            let ptr = buffer.as_ptr();
+            let len = buffer.len();
+
+            vsf_usart_irq_enable(vsf_usart, into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL));
+            vsf_usart_request_rx(vsf_usart, ptr as *mut ::core::ffi::c_void, len as uint_fast32_t);
+        }
+
+        let result = poll_fn(|cx| {
+            s.rx_waker.register(cx.waker());
+            let irq_mask = s.rx_irq_mask;
+
+            #[cfg(VSF_USART_IRQ_MASK_FRAME_ERR)]
+            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
+                return Poll::Ready(Err(Error::Framing));
+            }
+            #[cfg(VSF_USART_IRQ_MASK_PARITY_ERR)]
+            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) != 0 {
+                return Poll::Ready(Err(Error::Parity));
+            }
+            #[cfg(VSF_USART_IRQ_MASK_BREAK_ERR)]
+            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) != 0 {
+                return Poll::Ready(Err(Error::Break));
+            }
+            #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
+            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
+                return Poll::Ready(Err(Error::RxOverrun));
+            }
+            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) != 0 {
+                return Poll::Ready(Ok(()));
+            }
+            Poll::Pending
+        }).await;
+        result
+    }
+
+    /// Read bytes until the buffer is filled.
+    pub fn blocking_read(&mut self, buffer: &mut [u8]) -> Result<(), Error> {
+        if buffer.is_empty() {
+            return Ok(());
+        }
+
+        let s = T::state();
+        s.rx_irq_mask = 0;
+        s.rx_exit_on_idle = false;
+        compiler_fence(Ordering::SeqCst);
+
+        unsafe {
+            let mut vsf_usart = self._p.get_vsf_usart();
+            let ptr = buffer.as_ptr();
+            let len = buffer.len();
+
+            vsf_usart_irq_enable(vsf_usart, into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | VSF_USART_IRQ_MASK_ERR);
+            vsf_usart_request_rx(vsf_usart, ptr as *mut ::core::ffi::c_void, len as uint_fast32_t);
+        }
+
+        while s.rx_irq_mask & () == 0 {}
+
+        let irq_mask = s.rx_irq_mask;
+        #[cfg(VSF_USART_IRQ_MASK_FRAME_ERR)]
+        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
+            return Err(Error::Framing);
+        }
+        #[cfg(VSF_USART_IRQ_MASK_PARITY_ERR)]
+        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) != 0 {
+            return Err(Error::Parity);
+        }
+        #[cfg(VSF_USART_IRQ_MASK_BREAK_ERR)]
+        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) != 0 {
+            return Err(Error::Break);
+        }
+        #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
+        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
+            return Err(Error::RxOverrun);
+        }
+        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) != 0 {
+            return OK(());
+        }
+        // TODO: should not run here
+    }
+
+    /// Read bytes until the buffer is filled, or the line becomes idle.
+    ///
+    /// Returns the amount of bytes read.
+    pub async fn read_until_idle(&mut self, buffer: &mut [u8]) -> Result<usize, Error> {
+        if buffer.is_empty() {
+            return Ok(0);
+        }
+
+        let mut vsf_usart = self._p.get_vsf_usart();
+        let s = T::state();
+        s.rx_irq_mask = 0;
+        s.rx_exit_on_idle = true;
+        compiler_fence(Ordering::SeqCst);
+
+        unsafe {
+            let ptr = buffer.as_ptr();
+            let len = buffer.len();
+
+            vsf_usart_irq_enable(vsf_usart, VSF_USART_IRQ_MASK_ERR | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_IDLE));
+            vsf_usart_request_rx(vsf_usart, ptr as *mut ::core::ffi::c_void, len as uint_fast32_t);
+        }
+
+        let result = poll_fn(|cx| {
+            s.rx_waker.register(cx.waker());
+
+            let irq_mask = s.rx_irq_mask;
+            #[cfg(VSF_USART_IRQ_MASK_FRAME_ERR)]
+            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
+                return Poll::Ready(Err(Error::Framing));
+            }
+            #[cfg(VSF_USART_IRQ_MASK_PARITY_ERR)]
+            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) != 0 {
+                return Poll::Ready(Err(Error::Parity));
+            }
+            #[cfg(VSF_USART_IRQ_MASK_BREAK_ERR)]
+            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) != 0 {
+                return Poll::Ready(Err(Error::Break));
+            }
+            #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
+            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
+                return Poll::Ready(Err(Error::RxOverrun));
+            }
+            if irq_mask & (into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_IDLE)) != 0 {
+                return Poll::Ready(OK(()));
+            }
+
+            Poll::Pending
+        }).await;
+
+        let n: usize = 0;
+        unsafe {
+            n = vsf_usart_get_rx_count(vsf_usart);
+        }
+
+        result.map(|_| n)
+    }
+
+    /// Read bytes until the buffer is filled, or the line becomes idle.
+    ///
+    /// Returns the amount of bytes read.
+    pub fn blocking_read_until_idle(&mut self, buffer: &mut [u8]) -> Result<usize, Error> {
+        if buffer.is_empty() {
+            return Ok(0);
+        }
+
+        let mut vsf_usart = self._p.get_vsf_usart();
+        let s = T::state();
+        s.rx_irq_mask = 0;
+        s.rx_exit_on_idle = true;
+        compiler_fence(Ordering::SeqCst);
+
+        unsafe {
+            let ptr = buffer.as_ptr();
+            let len = buffer.len();
+
+            vsf_usart_irq_enable(vsf_usart, VSF_USART_IRQ_MASK_ERR | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_IDLE));
+            vsf_usart_request_rx(vsf_usart, ptr as *mut ::core::ffi::c_void, len as uint_fast32_t);
+        }
+
+        while s.rx_irq_mask & () == 0 {}
+
+        let n: usize = 0;
+        unsafe {
+            n = vsf_usart_get_rx_count(vsf_usart);
+        }
+
+        let irq_mask = s.rx_irq_mask;
+        #[cfg(VSF_USART_IRQ_MASK_FRAME_ERR)]
+        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
+            return Err(Error::Framing).map(|_| n);
+        }
+        #[cfg(VSF_USART_IRQ_MASK_PARITY_ERR)]
+        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) != 0 {
+            return Err(Error::Parity).map(|_| n);
+        }
+        #[cfg(VSF_USART_IRQ_MASK_BREAK_ERR)]
+        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) != 0 {
+            return Err(Error::Break).map(|_| n);
+        }
+        #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
+        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
+            return Err(Error::RxOverrun).map(|_| n);
+        }
+        return OK(()).map(|_| n);
+    }
+}
+
+impl<'a, T: Instance> Drop for UsartRx<'a, T> {
+    fn drop(&mut self) {
+        // TODO
+    }
+}
+
+struct Info {
+    vsf_usart: *mut vsf_usart_t,
+    vsf_usart_irqhandler: unsafe extern "C" fn(),
+}
+
+struct State {
+    rx_waker: AtomicWaker,
+    tx_waker: AtomicWaker,
+    rx_irq_mask: into_enum_type!(vsf_usart_irq_mask_t),
+    tx_irq_mask: into_enum_type!(vsf_usart_irq_mask_t),
+    rx_exit_on_idle: bool,
+}
+
+impl State {
+    const fn new() -> Self {
+        Self {
+            rx_waker: AtomicWaker::new(),
+            tx_waker: AtomicWaker::new(),
+            rx_irq_mask: 0,
+            tx_irq_mask: 0,
+            rx_exit_on_idle: false,
+        }
+    }
+}
+
+pub(crate) trait SealedInstance {
+    fn info() -> &'static Info;
+    fn state() -> &'static State;
+}
+
+/// USART peripheral instance.
+#[allow(private_bounds)]
+pub trait Instance: SealedInstance + PeripheralType + 'static + Send {
+    /// Interrupt for this peripheral.
+    type Interrupt: interrupt::typelevel::Interrupt;
+}
+
+pin_trait!(RxPin, Instance);
+pin_trait!(TxPin, Instance);
+pin_trait!(CtsPin, Instance);
+pin_trait!(RtsPin, Instance);
+pin_trait!(CkPin, Instance);
+pin_trait!(DePin, Instance);
+
+macro_rules! impl_usart {
+    ($type:ident, $pac_type:ident, $irq:ident) => {
+        impl crate::usart::SealedInstance for peripherals::$type {
+            fn info() -> 'static crate::usart::Info {
+                static INFO: crate::usart::Info = crate::usart::Indo::new();
+                &INFO
+            }
+            fn state() -> &'static crate::usart::State {
+                static STATE: crate::usart::State = crate::usart::State::new();
+                &STATE
+            }
+            fn buffered_state() -> &'static crate::buffered_usart::State {
+                static STATE: crate::buffered_usart::State = crate::buffered_usart::State::new();
+                &STATE
+            }
+        }
+        impl crate::usart::Instance for peripherals::$type {
+            type Interrupt = crate::interrupt::typelevel::$irq;
+        }
+    };
+}
+
+// ====================
+
+mod eh02 {
+    use super::*;
+
+    impl<'d, T: Instance> embedded_hal_02::blocking::serial::Write<u8> for Usart<'d, T> {
+        type Error = Error;
+
+        fn bwrite_all(&mut self, buffer: &[u8]) -> Result<(), Self::Error> {
+            self.blocking_write(buffer)
+        }
+
+        fn bflush(&mut self) -> Result<(), Self::Error> {
+            Ok(())
+        }
+    }
+
+    impl<'d, T: Instance> embedded_hal_02::blocking::serial::Write<u8> for UsartTx<'d, T> {
+        type Error = Error;
+
+        fn bwrite_all(&mut self, buffer: &[u8]) -> Result<(), Self::Error> {
+            self.blocking_write(buffer)
+        }
+
+        fn bflush(&mut self) -> Result<(), Self::Error> {
+            Ok(())
+        }
+    }
+}
+
+mod _embedded_io {
+    use super::*;
+
+    impl embedded_io_async::Error for Error {
+        fn kind(&self) -> embedded_io_async::ErrorKind {
+            match *self {
+                Error::BufferTooLong => embedded_io_async::ErrorKind::InvalidInput,
+                Error::BufferNotInRAM => embedded_io_async::ErrorKind::Unsupported,
+                Error::Framing => embedded_io_async::ErrorKind::InvalidData,
+                Error::Parity => embedded_io_async::ErrorKind::InvalidData,
+                Error::RxOverrun => embedded_io_async::ErrorKind::OutOfMemory,
+                Error::Break => embedded_io_async::ErrorKind::ConnectionAborted,
+            }
+        }
+    }
+
+    impl<'d, U: Instance> embedded_io_async::ErrorType for Usart<'d, U> {
+        type Error = Error;
+    }
+
+    impl<'d, U: Instance> embedded_io_async::ErrorType for UsartTx<'d, U> {
+        type Error = Error;
+    }
+
+    impl<'d, U: Instance> embedded_io_async::Write for Usart<'d, U> {
+        async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
+            self.write(buf).await?;
+            Ok(buf.len())
+        }
+    }
+
+    impl<'d: 'd, U: Instance> embedded_io_async::Write for UsartTx<'d, U> {
+        async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
+            self.write(buf).await?;
+            Ok(buf.len())
+        }
+    }
+}
