@@ -6,6 +6,8 @@ use std::env;
 use std::fs;
 use shellexpand;
 
+const BINDGEN_ENUM_VAR: bindgen::EnumVariation = bindgen::EnumVariation::Consts;
+
 const TOML_VSF_NODE: &str = "vsf"; 
 const TOML_VSF_PATH_NODE: &str = "path";
 const TOML_TARGET_NODE: &str = "target";
@@ -267,7 +269,12 @@ fn main() {
 
     println!("cargo::rustc-check-cfg=cfg(bindgen_enum_type_consts)");
     println!("cargo::rustc-check-cfg=cfg(bindgen_enum_type_moduleconsts)");
-    println!("cargo:rustc-cfg=bindgen_enum_type_consts");
+    if BINDGEN_ENUM_VAR == bindgen::EnumVariation::Consts {
+        println!("cargo:rustc-cfg=bindgen_enum_type_consts");
+    } else if BINDGEN_ENUM_VAR == bindgen::EnumVariation::ModuleConsts {
+        println!("cargo:rustc-cfg=bindgen_enum_type_moduleconsts");
+    }
+
     let mut builder = bindgen::Builder::default()
                     .header("./vsf_c.h")
                     .parse_callbacks(Box::new(Callbacks{}))
@@ -276,7 +283,7 @@ fn main() {
                     .raw_line("#![allow(non_snake_case)]")
                     .raw_line("#![allow(dead_code)]")
                     .use_core()
-                    .default_enum_style(bindgen::EnumVariation::Consts)
+                    .default_enum_style(BINDGEN_ENUM_VAR)
                     .clang_arg("-D".to_string() + "__" + &vendor + "__")
                     .clang_arg("-D".to_string() + "__" + &model + "__")
                     .clang_arg("-I".to_string() + &path + "source/shell/hal/rust-embedded-hal/lib/inc")
@@ -324,9 +331,16 @@ fn main() {
     // parse types
     for _type in TYPES {
         println!("cargo::rustc-check-cfg=cfg({_type})");
-        if extract_type(&bindings_lines, _type) {
-            println!("cargo:warning=type: {_type} enabled");
-            println!("cargo:rustc-cfg={_type}");
+        if BINDGEN_ENUM_VAR == bindgen::EnumVariation::Consts {
+            if extract_type(&bindings_lines, _type) {
+                println!("cargo:warning=type: {_type} enabled");
+                println!("cargo:rustc-cfg={_type}");
+            }
+        } else if BINDGEN_ENUM_VAR == bindgen::EnumVariation::ModuleConsts {
+            if extract_module(&bindings_lines, _type) {
+                println!("cargo:warning=type: {_type} enabled");
+                println!("cargo:rustc-cfg={_type}");
+            }
         }
     }
 
@@ -528,8 +542,23 @@ fn extract_type(lines: &Vec<&str>, name: &str) -> bool {
     let mut matched = false;
     for line in lines {
         let parts: Vec<&str> = line.split_whitespace().collect();
-        // pub type TYPE_NAME = 
+        // pub type TYPE_NAME =
         if parts.len() >= 3 && parts[0] == "pub" && parts[1] == "type" {
+            if parts[2] == name {
+                matched = true;
+                break;
+            }
+        }
+    }
+    return matched;
+}
+
+fn extract_module(lines: &Vec<&str>, name: &str) -> bool {
+    let mut matched = false;
+    for line in lines {
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        // pub mod MODULE_NAME {
+        if parts.len() >= 3 && parts[0] == "pub" && parts[1] == "mod" {
             if parts[2] == name {
                 matched = true;
                 break;
