@@ -265,6 +265,9 @@ fn main() {
         #include <hal/vsf_hal.h>
     ").unwrap();
 
+    println!("cargo::rustc-check-cfg=cfg(bindgen_enum_type_consts)");
+    println!("cargo::rustc-check-cfg=cfg(bindgen_enum_type_moduleconsts)");
+    println!("cargo:rustc-cfg=bindgen_enum_type_consts");
     let mut builder = bindgen::Builder::default()
                     .header("./vsf_c.h")
                     .parse_callbacks(Box::new(Callbacks{}))

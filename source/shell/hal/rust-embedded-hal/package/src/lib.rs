@@ -33,20 +33,30 @@ pub mod mode {
     impl_mode!(Async);
 }
 
-//macro_rules! into_enum_type {($type:ident) => { $type::Type }}
-//macro_rules! into_vsf_gpio_mode_t {($mode:ident) => { vsf_gpio_mode_t::$mode }}
-//#[cfg(vsf_hw_peripheral_en_t)]
-//macro_rules! into_vsf_hw_peripheral_en_t {($mode:ident) => { vsf_hw_peripheral_en_t::$mode }}
-//macro_rules! into_vsf_io_port_pin_no_t {($pin:ident) => { vsf_io_port_pin_no_t::$pin }}
-//macro_rules! into_vsf_usart_mode_t {($mode:ident) => { vsf_usart_mode_t::$mode }}
-//macro_rules! into_vsf_usart_irq_mask_t {($mode:ident) => { vsf_usart_irq_mask_t::$mode }}
+#[cfg(bindgen_enum_type_moduleconsts)]
+macro_rules! into_enum_type {($type:ident) => { $type::Type }}
+#[cfg(bindgen_enum_type_moduleconsts)]
+macro_rules! into_vsf_gpio_mode_t {($mode:ident) => { vsf_gpio_mode_t::$mode }}
+#[cfg(bindgen_enum_type_moduleconsts)]
+macro_rules! into_vsf_hw_peripheral_en_t {($mode:ident) => { vsf_hw_peripheral_en_t::$mode }}
+#[cfg(bindgen_enum_type_moduleconsts)]
+macro_rules! into_vsf_io_port_pin_no_t {($pin:ident) => { vsf_io_port_pin_no_t::$pin }}
+#[cfg(bindgen_enum_type_moduleconsts)]
+macro_rules! into_vsf_usart_mode_t {($mode:ident) => { vsf_usart_mode_t::$mode }}
+#[cfg(bindgen_enum_type_moduleconsts)]
+macro_rules! into_vsf_usart_irq_mask_t {($mode:ident) => { vsf_usart_irq_mask_t::$mode }}
 
+#[cfg(bindgen_enum_type_consts)]
 macro_rules! into_enum_type {($type:ident) => { $type }}
+#[cfg(bindgen_enum_type_consts)]
 macro_rules! into_vsf_gpio_mode_t {($mode:ident) => { paste!{[<vsf_gpio_mode_t_ $mode>]} }}
-#[cfg(vsf_hw_peripheral_en_t)]
+#[cfg(bindgen_enum_type_consts)]
 macro_rules! into_vsf_hw_peripheral_en_t {($mode:ident) => { paste!{[<vsf_hw_peripheral_en_t_ $mode>]} }}
+#[cfg(bindgen_enum_type_consts)]
 macro_rules! into_vsf_io_port_pin_no_t {($pin:ident) => { paste!{[<vsf_io_port_pin_no_t_ $pin>]} }}
+#[cfg(bindgen_enum_type_consts)]
 macro_rules! into_vsf_usart_mode_t {($mode:ident) => { paste!{[<vsf_usart_mode_t_ $mode>]} }}
+#[cfg(bindgen_enum_type_consts)]
 macro_rules! into_vsf_usart_irq_mask_t {($mode:ident) => { paste!{[<vsf_usart_irq_mask_t_ $mode>]} }}
 
 #[cfg(vsf_gpio_enabled)]
