@@ -24,7 +24,7 @@ use embassy_hal_internal::drop::OnDrop;
 use embassy_hal_internal::{Peri, PeripheralType};
 use embassy_sync::waitqueue::AtomicWaker;
 
-use crate::gpio::{AfType, Pull, Speed, OutputDrive};
+use crate::gpio::{AnyPin, AfType, Pull, Speed, OutputDrive};
 use crate::interrupt::typelevel::Interrupt as _;
 use crate::interrupt::{self, Interrupt};
 use crate::vsf_hal::{*};
@@ -395,12 +395,12 @@ impl<'d, T: Instance> Usart<'d, T> {
 
     fn new_inner(
         usart: Peri<'d, T>,
-        _rxd: Option<Peri<'d, impl TxPin<T>>>,
-        _txd: Option<Peri<'d, impl TxPin<T>>>,
-        _ck: Option<Peri<'d, impl CkPin<T>>>,
-        _cts: Option<Peri<'d, impl CtsPin<T>>>,
-        _rts: Option<Peri<'d, impl RtsPin<T>>>,
-        _de: Option<Peri<'d, impl DePin<T>>>,
+        _rxd: Option<Peri<'d, AnyPin>>,
+        _txd: Option<Peri<'d, AnyPin>>,
+        _ck: Option<Peri<'d, AnyPin>>,
+        _cts: Option<Peri<'d, AnyPin>>,
+        _rts: Option<Peri<'d, AnyPin>>,
+        _de: Option<Peri<'d, AnyPin>>,
         config: Config,
     ) -> Self {
         unsafe {
@@ -540,9 +540,9 @@ impl<'d, T: Instance> UsartTx<'d, T> {
 
     fn new_inner(
         usart: Peri<'d, T>,
-        _txd: Option<Peri<'d, impl TxPin<T>>>,
-        _ck: Option<Peri<'d, impl CkPin<T>>>,
-        _cts: Option<Peri<'d, impl CtsPin<T>>>,
+        _txd: Option<Peri<'d, AnyPin>>,
+        _ck: Option<Peri<'d, AnyPin>>,
+        _cts: Option<Peri<'d, AnyPin>>,
         config: Config
     ) -> Self {
         unsafe {
@@ -692,8 +692,8 @@ impl<'d, T: Instance> UsartRx<'d, T> {
 
     fn new_inner(
         usart: Peri<'d, T>,
-        _rxd: Option<Peri<'d, impl TxPin<T>>>,
-        _rts: Option<Peri<'d, impl RtsPin<T>>>,
+        _rxd: Option<Peri<'d, AnyPin>>,
+        _rts: Option<Peri<'d, AnyPin>>,
         config: Config
     ) -> Self {
         unsafe {
@@ -964,7 +964,7 @@ impl State {
     }
 }
 
-pub(crate) trait SealedInstance {
+trait SealedInstance {
     fn info() -> &'static mut Info;
     fn state() -> &'static mut State;
 }
