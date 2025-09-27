@@ -456,7 +456,7 @@ fn enable_peripherial(lines: &Vec<&str>, name: &str) -> u32 {
         println!("cargo::rustc-check-cfg=cfg(vsf_{name}{peripheral_index}_enabled)");
     }
 
-    let mask = extrace_peripheral_mask(lines, name);
+    let mask = extract_peripheral_mask(lines, name);
     if mask != 0 {
         println!("cargo:warning={name}_mask: 0x{mask:X}");
         println!("cargo:rustc-cfg=vsf_{name}_enabled");
@@ -472,7 +472,7 @@ fn enable_peripherial(lines: &Vec<&str>, name: &str) -> u32 {
 }
 
 fn bind_vsf_gpios(lines: &Vec<&str>, output_code: &mut String) {
-    let mask = extrace_peripheral_mask(lines, "gpio");
+    let mask = extract_peripheral_mask(lines, "gpio");
 
     for port_index in 0..32 {
         if mask & (1 << port_index) != 0 {
@@ -492,7 +492,7 @@ fn bind_vsf_gpios(lines: &Vec<&str>, output_code: &mut String) {
 
 fn bind_vsf_peripheral(lines: &Vec<&str>, name: &str, output_code: &mut String) {
     let peripheral_name_upper = String::from(name).to_uppercase();
-    let mask = extrace_peripheral_mask(lines, &peripheral_name_upper);
+    let mask = extract_peripheral_mask(lines, &peripheral_name_upper);
 
     for peripheral_index in 0..32 {
         if mask & (1 << peripheral_index) != 0 {
@@ -501,7 +501,7 @@ fn bind_vsf_peripheral(lines: &Vec<&str>, name: &str, output_code: &mut String) 
     }
 }
 
-fn extrace_peripheral_mask(lines: &Vec<&str>, name: &str) -> u32 {
+fn extract_peripheral_mask(lines: &Vec<&str>, name: &str) -> u32 {
     let prefix_str = "VSF_HW_".to_string() + &String::from(name).to_uppercase();
     let mask_str = String::from(&prefix_str) + "_MASK";
     let count_str = String::from(&prefix_str) + "_COUNT";

@@ -43,7 +43,7 @@ pub enum Speed {
 }
 
 impl Speed {
-    pub fn lowest() -> Self {
+    pub const fn lowest() -> Self {
         #[cfg(VSF_GPIO_SPEED_LOW)]
         let result = Speed::Low;
         #[cfg(all(not(VSF_GPIO_SPEED_LOW), VSF_GPIO_SPEED_MEDIUM))]
@@ -57,7 +57,7 @@ impl Speed {
 
         result
     }
-    pub fn highest() -> Self {
+    pub const fn highest() -> Self {
         #[cfg(VSF_GPIO_SPEED_VERY_HIGH)]
         let result = Speed::VeryHigh;
         #[cfg(all(not(VSF_GPIO_SPEED_VERY_HIGH), VSF_GPIO_SPEED_HIGH))]
@@ -99,7 +99,7 @@ pub enum OutputDrive {
 }
 
 impl OutputDrive {
-    pub fn lowest() -> Self {
+    pub const fn lowest() -> Self {
         #[cfg(VSF_GPIO_DRIVE_STRENGTH_LOW)]
         let result = OutputDrive::Low;
         #[cfg(all(not(VSF_GPIO_DRIVE_STRENGTH_LOW), VSF_GPIO_DRIVE_STRENGTH_MEDIUM))]
@@ -113,7 +113,7 @@ impl OutputDrive {
 
         result
     }
-    pub fn highest() -> Self {
+    pub const fn highest() -> Self {
         #[cfg(VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH)]
         let result = OutputDrive::VeryHigh;
         #[cfg(all(not(VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH), VSF_GPIO_DRIVE_STRENGTH_HIGH))]
@@ -644,7 +644,6 @@ impl SealedPin for AnyPin {
 // ====================
 
 use crate::peripherals;
-
 vsf_hal_macros::bind_vsf_gpio_pins!{}
 
 pub(crate) unsafe fn init() {

@@ -13,7 +13,7 @@ pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
     let bindings_lines = bindings_content.lines().collect();
 
     let mut output_code = String::from("");
-    let mask = extrace_peripheral_mask(&bindings_lines, "gpio");
+    let mask = extract_peripheral_mask(&bindings_lines, "gpio");
     for port_index in 0..32 {
         if mask & (1 << port_index) != 0 {
             // VSF_HW_GPIO_PORT{port_index}_MASK only the PIN_MASK in one dedicated port, pin number can exceed 32 or maybe 64, so use the largest unsigned integer supported.
@@ -48,7 +48,33 @@ pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
     output_code.parse().unwrap()
 }
 
-fn extrace_peripheral_mask(lines: &Vec<&str>, name: &str) -> u32 {
+#[proc_macro]
+pub fn bind_vsf_usarts(_item: TokenStream) -> TokenStream {
+    let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+    let pathbuf = Path::new(&manifest_dir).join("./src/vsf_hal.rs");
+    let bindings_content = fs::read_to_string(&pathbuf).unwrap();
+    let bindings_lines = bindings_content.lines().collect();
+
+    let mut output_code = String::from("");
+    let mask = extract_peripheral_mask(&bindings_lines, "usart");
+    for usart_index in 0..32 {
+        if mask & (1 << usart_index) != 0 {
+            if let Some(sync_support) = extract_const_integer::<u8>(&bindings_lines, &format!("VSF_HW_USART{usart_index}_SYNC")) {
+                if sync_support != 0 {
+                    output_code.push_str(&format!("impl_usart!(USART{usart_index}, USART{usart_index}, vsf_hw_usart{usart_index}, USART{usart_index}_IRQHandler);\n"));
+                } else {
+                    output_code.push_str(&format!("impl_usart!(USART{usart_index}, UART{usart_index}, vsf_hw_usart{usart_index}, UART{usart_index}_IRQHandler);\n"));
+                }
+            } else {
+                output_code.push_str(&format!("impl_usart!(USART{usart_index}, USART{usart_index}, vsf_hw_usart{usart_index}, USART{usart_index}_IRQHandler);\n"));
+            }
+        }
+    }
+
+    output_code.parse().unwrap()
+}
+
+fn extract_peripheral_mask(lines: &Vec<&str>, name: &str) -> u32 {
     let prefix_str = "VSF_HW_".to_string() + &String::from(name).to_uppercase();
     let mask_str = String::from(&prefix_str) + "_MASK";
     let count_str = String::from(&prefix_str) + "_COUNT";
