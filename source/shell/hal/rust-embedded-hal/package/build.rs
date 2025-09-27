@@ -23,7 +23,7 @@ const BINDGEN_DEFINITIONS: [&'static str; 2] = [
 
 const PERIPHERIALS: [&'static str; 2] = ["gpio", "usart"];
 
-const CONSTANTS: [(&'static str, &'static str); 79] = [
+const CONSTANTS: [(&'static str, &'static str); 82] = [
     // GPIO constants
     ("", "VSF_HW_GPIO_PIN_COUNT"),
     ("vsf_gpio_mode_t", "VSF_GPIO_INPUT"),
@@ -73,6 +73,9 @@ const CONSTANTS: [(&'static str, &'static str); 79] = [
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_IDLE"),
+    ("vsf_usart_ctrl_t", "VSF_USART_CTRL_SEND_BREAK"),
+    ("vsf_usart_ctrl_t", "VSF_USART_CTRL_SET_BREAK"),
+    ("vsf_usart_ctrl_t", "VSF_USART_CTRL_CLEAR_BREAK"),
     // peripherial enable/disable
     ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO0"),
     ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO1"),

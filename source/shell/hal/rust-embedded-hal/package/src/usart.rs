@@ -637,6 +637,19 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         while s.tx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL) == 0 {}
         Ok(())
     }
+
+    /// Block until transmission complete
+    pub fn blocking_flush(&mut self) -> Result<(), Error> {
+        // TODO:
+        Ok(())
+    }
+
+    /// Send break character
+    pub fn send_break(&self) {
+        // TODO: implement send_break with VSF_USART_CTRL_SEND_BREAK or with VSF_USART_CTRL_SET_BREAK and VSF_USART_CTRL_CLEAR_BREAK
+//        #[cfg(VSF_USART_CTRL_SEND_BREAK)]
+//        #[cfg(all(VSF_USART_CTRL_SET_BREAK, VSF_USART_CTRL_CLEAR_BREAK))]
+    }
 }
 
 impl<'a, T: Instance> Drop for UsartTx<'a, T> {
