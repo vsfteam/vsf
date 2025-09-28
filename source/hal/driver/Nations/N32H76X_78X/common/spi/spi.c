@@ -1,9 +1,9 @@
 /*****************************************************************************
- *   Cop->right(C)2009-2019 by VSF Team                                       *
+ *   Copyright(C)2009-2019 by VSF Team                                       *
  *                                                                           *
  *  Licensed under the Apache License, Version 2.0 (the "License");          *
  *  you may not use this file except in compliance with the License.         *
- *  You may obtain a cop-> of the License at                                  *
+ *  You may obtain a copy of the License at                                  *
  *                                                                           *
  *     http://www.apache.org/licenses/LICENSE-2.0                            *
  *                                                                           *
@@ -201,6 +201,38 @@ void VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_get_transferred_count)(
     VSF_HAL_ASSERT(spi_ptr != NULL);
 }
 
+static vsf_spi_irq_mask_t VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_get_irq_mask)(
+    VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
+static void VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_irqhandler)(
+    VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr
+) {
+    VSF_HAL_ASSERT(NULL != spi_ptr);
+
+    vsf_spi_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_get_irq_mask)(spi_ptr);
+    vsf_spi_isr_t *isr_ptr = &spi_ptr->isr;
+    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_spi_t *)spi_ptr, irq_mask);
+    }
+}
+
+/*\note Implementation of APIs below is optional, because there is default implementation in spi_template.inc.
+ *      VSF_SPI_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY for spi_capability.
+ *          Default implementation will return hardware capability structure.
+ *      VSF_SPI_CFG_REIMPLEMENT_API_GET_CONFIGURATION for spi_get_configuration.
+ *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ *      VSF_SPI_CFG_REIMPLEMENT_API_CTRL for spi_ctrl.
+ *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ */
+
 vsf_spi_capability_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_capability)(
     VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr
 ) {
@@ -224,18 +256,6 @@ vsf_err_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_ctrl)(
     VSF_HAL_ASSERT(spi_ptr != NULL);
 
     return VSF_ERR_NONE;
-}
-
-static void VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_irqhandler)(
-    VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr
-) {
-    VSF_HAL_ASSERT(NULL != spi_ptr);
-
-    vsf_spi_irq_mask_t irq_mask = GET_IRQ_MASK(spi_ptr);
-    vsf_spi_isr_t *isr_ptr = &spi_ptr->isr;
-    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_spi_t *)spi_ptr, irq_mask);
-    }
 }
 // HW end
 

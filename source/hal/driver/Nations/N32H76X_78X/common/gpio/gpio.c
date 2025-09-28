@@ -154,6 +154,13 @@ vsf_gpio_pin_mask_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_read)(
     return gpio_ptr->reg->PID;
 }
 
+vsf_gpio_pin_mask_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_read_output_register)(
+    VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr
+) {
+    VSF_HAL_ASSERT(NULL != gpio_ptr);
+    return (vsf_gpio_pin_mask_t)gpio_ptr->reg->POD;
+}
+
 void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_write)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
     vsf_gpio_pin_mask_t pin_mask,
@@ -208,6 +215,13 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_config)(
  *      VSF_GPIO_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
  *
  *      The list of APIs and configuration:
+ *      VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION for gpio_get_pin_configuration.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ *          Hardware drivers should implement this to read actual pin configuration from registers.
+ *      VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER for gpio_read_output_register.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ *          Hardware drivers should implement this to read output register values (ODR).
+ *          This is different from gpio_read which reads actual pin levels (IDR).
  *      VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET for gpio_output_and_set, *** glitchless ***
  *          If VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET is 0, default implementation will assert(false).
  *          If VSF_GPIO_CFG_CHANGE_DIR_FIRST is ENABLED, default implementation will call gpio_set_output and then gpio_clear.
@@ -252,8 +266,9 @@ vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET      1
-#define VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_CLEAR    1
+#define VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER   ENABLED
+#define VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET      ENABLED
+#define VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_CLEAR    ENABLED
 #define VSF_GPIO_CFG_CHANGE_DIR_FIRST                       DISABLED
 
 #define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED

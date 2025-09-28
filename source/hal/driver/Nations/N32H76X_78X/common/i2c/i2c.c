@@ -188,6 +188,38 @@ uint_fast16_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_slave_get_transferred_co
     return 0;
 }
 
+static vsf_i2c_irq_mask_t VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_get_irq_mask)(
+    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
+) {
+    // implement this function in the device file
+    VSF_HAL_ASSERT(0);
+    return 0;
+}
+
+static void VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_irqhandler)(
+    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
+) {
+    VSF_HAL_ASSERT(NULL != i2c_ptr);
+
+    vsf_i2c_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_get_irq_mask)(i2c_ptr);
+    vsf_i2c_isr_t *isr_ptr = &i2c_ptr->isr;
+    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_i2c_t *)i2c_ptr, irq_mask);
+    }
+}
+
+/*\note Implementation of APIs below is optional, because there is default implementation in i2c_template.inc.
+ *      VSF_I2C_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_I2C_CFG_REIMPLEMENT_API_GET_CONFIGURATION for i2c_get_configuration.
+ *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ *      VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY for i2c_capability.
+ *          Default implementation will return capability structure using VSF_I2C_CFG_CAPABILITY_xxx configuration macros.
+ *      VSF_I2C_CFG_REIMPLEMENT_API_CTRL for i2c_ctrl.
+ *          Default implementation will return VSF_ERR_NOT_SUPPORT.
+ */
+
 vsf_i2c_capability_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)(
     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
 ) {
@@ -195,7 +227,7 @@ vsf_i2c_capability_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)(
         .irq_mask                   = 0,
         .support_restart            = 0,
         .support_no_start           = 0,
-        .support_no_stop    = 0,
+        .support_no_stop            = 0,
         .max_transfer_size          = 0,
     };
 }
@@ -207,18 +239,6 @@ vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_ctrl)(
     VSF_HAL_ASSERT(NULL != i2c_ptr);
 
     return VSF_ERR_NONE;
-}
-
-static void VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_irqhandler)(
-    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
-) {
-    VSF_HAL_ASSERT(NULL != i2c_ptr);
-
-    vsf_i2c_irq_mask_t irq_mask = GET_IRQ_MASK(i2c_ptr);
-    vsf_i2c_isr_t *isr_ptr = &i2c_ptr->isr;
-    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_i2c_t *)i2c_ptr, irq_mask);
-    }
 }
 // HW end
 

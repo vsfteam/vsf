@@ -190,6 +190,23 @@ vsf_flash_status_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_status)(
     };
 }
 
+/*\note Implementation of APIs below is optional, because there is default implementation in flash_template.inc.
+ *      VSF_FLASH_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_FLASH_CFG_REIMPLEMENT_API_GET_CONFIGURATION for flash_get_configuration.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ *      VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY for flash_capability.
+ *          Default implementation will use macros below to initialize capability structure:
+ *              VSF_FLASH_CFG_CAPABILITY_IRQ_MASK (default: VSF_FLASH_IRQ_ALL_BITS_MASK)
+ *              VSF_FLASH_CFG_CAPABILITY_BASE_ADDRESS (default: 0)
+ *              VSF_FLASH_CFG_CAPABILITY_MAX_SIZE (default: error if not defined)
+ *              VSF_FLASH_CFG_CAPABILITY_ERASE_SECTORE_SIZE (default: 4096)
+ *              VSF_FLASH_CFG_CAPABILITY_WRITE_SECTORE_SIZE (default: 512)
+ *              VSF_FLASH_CFG_CAPABILITY_NONE_SECTOR_ALIGNED_WRITE (default: 0)
+ *              VSF_FLASH_CFG_CAPABILITY_NONE_SECTOR_ALIGNED_READ (default: 1)
+ */
+
 vsf_flash_capability_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)(
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr
 ) {
@@ -221,11 +238,11 @@ vsf_flash_capability_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
  */
 
 // only define in source file
-#define VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
-#define VSF_FLASH_CFG_ERASE_ALL_TEMPLATE            ENABLED
-#define VSF_FLASH_CFG_ERASE_ONE_SECTOR_TEMPLATE     ENABLED
-#define VSF_FLASH_CFG_WRITE_ONE_SECTOR_TEMPLATE     ENABLED
-#define VSF_FLASH_CFG_READ_ONE_SECTOR_TEMPLATE      ENABLED
+#define VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
+#define VSF_FLASH_CFG_ERASE_ALL_TEMPLATE                ENABLED
+#define VSF_FLASH_CFG_ERASE_ONE_SECTOR_TEMPLATE         ENABLED
+#define VSF_FLASH_CFG_WRITE_ONE_SECTOR_TEMPLATE         ENABLED
+#define VSF_FLASH_CFG_READ_ONE_SECTOR_TEMPLATE          ENABLED
 
 #define VSF_FLASH_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t)                            \
