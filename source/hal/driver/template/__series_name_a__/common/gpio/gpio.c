@@ -210,6 +210,9 @@ static void VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_irqhandler)(
  *      VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION for gpio_get_pin_configuration.
  *          Default implementation will assert(false) to indicate the feature is not implemented.
  *          Hardware drivers should implement this to read actual pin configuration from registers.
+ *      VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION for gpio_exti_irq_get_configuration.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ *          Hardware drivers should implement this to read actual exti irq configuration from registers.
  *      VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER for gpio_read_output_register.
  *          Default implementation will assert(false) to indicate the feature is not implemented.
  *          Hardware drivers should implement this to read output register values (ODR).
