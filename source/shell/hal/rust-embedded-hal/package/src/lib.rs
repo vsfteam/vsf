@@ -10,29 +10,6 @@ mod macros;
 // vsf_hal
 mod vsf_hal;
 
-pub mod mode {
-    trait SealedMode {}
-
-    /// Operating mode for a peripheral.
-    #[allow(private_bounds)]
-    pub trait Mode: SealedMode {}
-
-    macro_rules! impl_mode {
-        ($name:ident) => {
-            impl SealedMode for $name {}
-            impl Mode for $name {}
-        };
-    }
-
-    /// Blocking mode.
-    pub struct Blocking;
-    /// Async mode.
-    pub struct Async;
-
-    impl_mode!(Blocking);
-    impl_mode!(Async);
-}
-
 #[cfg(bindgen_enum_type_moduleconsts)]
 macro_rules! into_enum_type {($type:ident) => { $type::Type }}
 #[cfg(bindgen_enum_type_moduleconsts)]

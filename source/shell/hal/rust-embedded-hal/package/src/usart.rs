@@ -362,6 +362,7 @@ impl<'d, T: Instance> SetConfig for Usart<'d, T> {
 /// This can be obtained via [`Usart::split`], or created directly.
 pub struct UsartTx<'d, T: Instance> {
     _p: Peri<'d, T>,
+    baudrate: u32,
 }
 
 impl<'d, T: Instance> SetConfig for UsartTx<'d, T> {
@@ -535,6 +536,7 @@ impl<'d, T: Instance> Usart<'d, T> {
         Ok(Self {
             tx: UsartTx {
                 _p: unsafe { usart.clone_unchecked() },
+                baudrate: config.baudrate,
             },
             rx: UsartRx { _p: usart },
         })
@@ -584,6 +586,11 @@ impl<'d, T: Instance> Usart<'d, T> {
     /// Write all bytes in the buffer.
     pub async fn write(&mut self, buffer: &[u8]) -> Result<(), Error> {
         self.tx.write(buffer).await
+    }
+
+    /// Wait until transmission complete
+    pub async fn flush(&mut self) -> Result<(), Error> {
+        self.tx.flush().await
     }
 
     /// Read bytes until the buffer is filled.
@@ -677,7 +684,8 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         _vsf_usart_config_and_enable(vsf_usart, &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)?;
 
         Ok(Self {
-            _p: usart
+            _p: usart,
+            baudrate: config.baudrate,
         })
     }
 
@@ -726,6 +734,12 @@ impl<'d, T: Instance> UsartTx<'d, T> {
             Poll::Pending
         }).await;
 
+        Ok(())
+    }
+
+    /// Wait until transmission complete
+    pub async fn flush(&mut self) -> Result<(), Error> {
+        // TODO:
         Ok(())
     }
 
@@ -778,10 +792,8 @@ impl<'d, T: Instance> UsartTx<'d, T> {
             let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
 
             // 1. calculate duration for break condition for at least 2 frames
-            let mut usart_config = Config::default();
-            vsf_hw_usart_get_configuration(vsf_usart, &usart_config);
             let bits = 2 * (1 + 10 + 1 + 1);
-            let wait_usec = 1_000_000 * bits as u64 / usart_config.baudrate;
+            let wait_usec = 1_000_000 * bits as u64 / self.baudrate;
 
             // 2. wait tx fifo empty
             self.blocking_flush().unwrap();
@@ -1189,9 +1201,13 @@ mod _embedded_io {
     impl embedded_io_async::Error for Error {
         fn kind(&self) -> embedded_io_async::ErrorKind {
             match *self {
+                #[cfg(VSF_USART_IRQ_MASK_FRAME_ERR)]
                 Error::Framing => embedded_io_async::ErrorKind::InvalidData,
+                #[cfg(VSF_USART_IRQ_MASK_PARITY_ERR)]
                 Error::Parity => embedded_io_async::ErrorKind::InvalidData,
+                #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
                 Error::RxOverrun => embedded_io_async::ErrorKind::OutOfMemory,
+                #[cfg(VSF_USART_IRQ_MASK_RX_BREAK_ERR)]
                 Error::Break => embedded_io_async::ErrorKind::ConnectionAborted,
             }
         }

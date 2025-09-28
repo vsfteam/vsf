@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::process::Command;
 use std::sync::Mutex;
-use std::collections::HashMap;
+use std::collections::{HashMap, BTreeMap};
 use std::env;
 use std::fs;
 use shellexpand;
@@ -23,7 +23,39 @@ const BINDGEN_DEFINITIONS: [&'static str; 2] = [
 
 const PERIPHERIALS: [&'static str; 2] = ["gpio", "usart"];
 
-const CONSTANTS: [(&'static str, &'static str); 82] = [
+const CONSTANTS_MACRO: [(&'static str, &'static str); 28] = [
+    // USART constants
+    ("vsf_usart_mode_t", "VSF_USART_5_BIT_LENGTH"),
+    ("vsf_usart_mode_t", "VSF_USART_6_BIT_LENGTH"),
+    ("vsf_usart_mode_t", "VSF_USART_7_BIT_LENGTH"),
+    ("vsf_usart_mode_t", "VSF_USART_8_BIT_LENGTH"),
+    ("vsf_usart_mode_t", "VSF_USART_9_BIT_LENGTH"),
+    ("vsf_usart_mode_t", "VSF_USART_10_BIT_LENGTH"),
+    ("vsf_usart_mode_t", "VSF_USART_NO_PARITY"),
+    ("vsf_usart_mode_t", "VSF_USART_ODD_PARITY"),
+    ("vsf_usart_mode_t", "VSF_USART_EVEN_PARITY"),
+    ("vsf_usart_mode_t", "VSF_USART_0_5_STOPBIT"),
+    ("vsf_usart_mode_t", "VSF_USART_1_STOPBIT"),
+    ("vsf_usart_mode_t", "VSF_USART_1_5_STOPBIT"),
+    ("vsf_usart_mode_t", "VSF_USART_2_STOPBIT"),
+    ("vsf_usart_mode_t", "VSF_USART_SYNC_CLOCK_ENABLE"),
+    ("vsf_usart_mode_t", "VSF_USART_HALF_DUPLEX_ENABLE"),
+    ("vsf_usart_mode_t", "VSF_USART_HALF_DUPLEX_DISABLE"),
+    ("vsf_usart_mode_t", "VSF_USART_SWAP"),
+    ("vsf_usart_mode_t", "VSF_USART_TX_INVERT"),
+    ("vsf_usart_mode_t", "VSF_USART_RX_INVERT"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_FRAME_ERR"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_PARITY_ERR"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_BREAK_ERR"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_IDLE"),
+    ("vsf_usart_ctrl_t", "VSF_USART_CTRL_SEND_BREAK"),
+    ("vsf_usart_ctrl_t", "VSF_USART_CTRL_SET_BREAK"),
+    ("vsf_usart_ctrl_t", "VSF_USART_CTRL_CLEAR_BREAK"),
+];
+
+const CONSTANTS_ENUM: [(&'static str, &'static str); 82] = [
     // GPIO constants
     ("", "VSF_HW_GPIO_PIN_COUNT"),
     ("vsf_gpio_mode_t", "VSF_GPIO_INPUT"),
@@ -110,6 +142,12 @@ const CONSTANTS: [(&'static str, &'static str); 82] = [
     ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO30"),
     ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO31"),
 ];
+
+/// if constants conflicts, {1.1} will be removed, and {1.1}__IS__{1.0} configuration will be valid
+const CONSTANTS_CONFLICT: [(&'static str, (&'static str, &'static str)); 1] = [
+    ("vsf_usart_irq_mask_t", ("VSF_USART_IRQ_MASK_FRAME_ERR", "VSF_USART_IRQ_MASK_BREAK_ERR")),
+];
+
 const FUNCTIONS: [&'static str; 2] = [
     "vsf_hw_clkrst_region_set_bit",
     "vsf_hw_clkrst_region_clear_bit",
@@ -150,6 +188,10 @@ lazy_static! {
         });
         m
     });
+    static ref GLOBAL_CONSTANTS_VEC: Mutex<Vec<(&'static str, &'static str)>> = Mutex::new({
+        let v = Vec::new();
+        v
+    });
 }
 
 use bindgen::callbacks::{
@@ -176,6 +218,13 @@ impl ParseCallbacks for Callbacks {
             let value: u8 = String::from_utf8_lossy(&tokens[1].raw).parse().unwrap();
             let mut af_map = GLOBAL_AF_MAP.lock().unwrap();
             af_map.insert(String::from(name_str.strip_prefix("VSF_HW_AF_").unwrap()), value);
+        } else {
+            let mut constants_vec = GLOBAL_CONSTANTS_VEC.lock().unwrap();
+            for constant in CONSTANTS_MACRO {
+                if constant.1 == name {
+                    constants_vec.push((constant.0, constant.1));
+                }
+            }
         }
     }
 }
@@ -314,12 +363,34 @@ fn main() {
     }
 
     // parse constants
-    for constant in CONSTANTS {
-        println!("cargo::rustc-check-cfg=cfg({})", constant.1);
-        if let Some(_cur_value) = extract_constant_value(&bindings_lines, &(String::from(constant.0) + "_" + constant.1)) {
-            println!("cargo:warning=constant: {}::{} enabled", constant.0, constant.1);
-            println!("cargo:rustc-cfg={}", constant.1);
+    let mut constants_cfg: BTreeMap<(&'static str, &'static str), u64> = BTreeMap::new();
+    let constants_vec = GLOBAL_CONSTANTS_VEC.lock().unwrap();
+    'outer: for constant_enum in CONSTANTS_ENUM {
+        println!("cargo::rustc-check-cfg=cfg({})", constant_enum.1);
+        if let Some(cur_value) = extract_const_integer::<u64>(&bindings_lines, &(String::from(constant_enum.0) + "_" + constant_enum.1)) {
+            for constant_macro in CONSTANTS_MACRO {
+                if constant_macro.1 == constant_enum.1 && !constants_vec.contains(&constant_macro) {
+                    continue 'outer;
+                }
+            }
+            constants_cfg.insert((constant_enum.0, constant_enum.1), cur_value);
         }
+    }
+    for constant_conflict in CONSTANTS_CONFLICT {
+        println!("cargo::rustc-check-cfg=cfg({}__IS__{})", constant_conflict.1.1, constant_conflict.1.0);
+        if let Some(constant_conflict0) = constants_cfg.get(&(constant_conflict.0, constant_conflict.1.0)) {
+            if let Some(constant_conflict1) = constants_cfg.get(&(constant_conflict.0, constant_conflict.1.1)) {
+                if *constant_conflict0 == *constant_conflict1 {
+                    constants_cfg.remove(&(constant_conflict.0, constant_conflict.1.1));
+                    println!("cargo:rustc-cfg={}__IS__{}", constant_conflict.1.1, constant_conflict.1.0);
+                }
+            }
+        }
+    }
+
+    for constant in constants_cfg {
+        println!("cargo:warning=constant: {}::{} enabled", constant.0.0, constant.0.1);
+        println!("cargo:rustc-cfg={}", constant.0.1);
     }
 
     // parse functions
