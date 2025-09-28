@@ -509,7 +509,7 @@ typedef enum vsf_usart_irq_mask_t {
     /**
      * \~english
      * @brief USART TX overflow error interrupt
-     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR in vsf_usart_irq_mask_t and define a MACRO
+     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR in vsf_usart_irq_mask_t and define a MACRO with same name
      * \~chinese
      * @brief USART 发送溢出错误中断
      * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR 并且实现同名宏
@@ -520,7 +520,7 @@ typedef enum vsf_usart_irq_mask_t {
     /**
      * \~english
      * @brief USART TX idle interrupt, all data is outputted on the TX line
-     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_TX_IDLE in vsf_usart_irq_mask_t and define a MACRO
+     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_TX_IDLE in vsf_usart_irq_mask_t and define a MACRO with same name
      * \~chinese
      * @brief USART 发送空闲中断，所有数据已从 TX 脚发送完成
      * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_TX_IDLE 并且实现同名宏
@@ -531,7 +531,7 @@ typedef enum vsf_usart_irq_mask_t {
     /**
      * \~english
      * @brief USART RX idle interrupt, dedicated and configurable usart clock passed and no data received
-     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_RX_IDLE in vsf_usart_irq_mask_t and define a MACRO
+     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_RX_IDLE in vsf_usart_irq_mask_t and define a MACRO with same name
      *       If hardware does not support this, no not implement VSF_USART_IRQ_MASK_RX_IDLE MACRO, and VSF_USART_IRQ_MASK_RX_IDLE will be VSF_USART_IRQ_MASK_RX_TIMEOUT
      * \~chinese
      * @brief USART 接受空闲中断，特定并且可配置的串口时钟后，仍旧未收到数据
@@ -540,6 +540,17 @@ typedef enum vsf_usart_irq_mask_t {
      */
     VSF_USART_IRQ_MASK_RX_IDLE          = (0x1ul << 12), //!< \~english RX idle(rx_idle_cnt in vsf_usart_cfg_t passed and no data receivced) interrupt \~chinese 接收空闲中断 (vsf_usart_cfg_t 中的 rx_idle_cnt 时间内，未收到数据)
 #   define VSF_USART_IRQ_MASK_RX_IDLE   VSF_USART_IRQ_MASK_RX_IDLE
+
+    /**
+     * \~english
+     * @brief USART RX noise error interrupt, noise is detected in the received frame
+     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_NOISE_ERR in vsf_usart_irq_mask_t and define a MACRO with same name
+     * \~chinese
+     * @brief USART 噪音中断，接收的数据帧中检测到噪音
+     * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_NOISE_ERR 并且实现同名宏
+     */
+    VSF_USART_IRQ_MASK_NOISE_ERR        = (0x1UL << 13)
+#   define VSF_USART_IRQ_MASK_NOISE_ERR VSF_USART_IRQ_MASK_NOISE_ERR
 } vsf_usart_irq_mask_t;
 #endif
 
