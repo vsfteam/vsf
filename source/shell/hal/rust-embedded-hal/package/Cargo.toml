@@ -9,6 +9,7 @@ categories = ["embedded", "hardware-support", "no-std", "asynchronous"]
 repository = "https://github.com/vsfteam/vsf"
 
 [dependencies]
+embassy-embedded-hal = "0.5"
 embassy-sync = { version = "0.7.2", git = "https://github.com/embassy-rs/embassy", features = ["defmt"] }
 embassy-executor = { version = "0.9.0", git = "https://github.com/embassy-rs/embassy", features = ["arch-cortex-m", "executor-thread", "defmt"] }
 embassy-time = { version = "0.5.0", git = "https://github.com/embassy-rs/embassy", features = ["defmt", "defmt-timestamp-uptime", "tick-hz-32_768"] }

@@ -20,7 +20,8 @@ use core::task::Poll;
 use core::ptr;
 use paste::paste;
 
-use embassy_hal_internal::drop::OnDrop;
+use embassy_embedded_hal::SetConfig;
+//use embassy_hal_internal::drop::OnDrop;
 use embassy_hal_internal::{Peri, PeripheralType};
 use embassy_sync::waitqueue::AtomicWaker;
 
@@ -48,8 +49,27 @@ pub enum DataBits {
     #[cfg(VSF_USART_9_BIT_LENGTH)]
     DataBits9 = into_vsf_usart_mode_t!(VSF_USART_9_BIT_LENGTH) as isize,
     /// 10 Data Bits
-    #[cfg(VSF_USART_9_BIT_LENGTH)]
+    #[cfg(VSF_USART_10_BIT_LENGTH)]
     DataBits10 = into_vsf_usart_mode_t!(VSF_USART_10_BIT_LENGTH) as isize,
+}
+
+impl DataBits {
+    pub fn into_value(&self) -> u8 {
+        match self {
+            #[cfg(VSF_USART_5_BIT_LENGTH)]
+            DataBits::DataBits5 => 5,
+            #[cfg(VSF_USART_6_BIT_LENGTH)]
+            DataBits::DataBits6 => 6,
+            #[cfg(VSF_USART_7_BIT_LENGTH)]
+            DataBits::DataBits7 => 7,
+            #[cfg(VSF_USART_8_BIT_LENGTH)]
+            DataBits::DataBits8 => 8,
+            #[cfg(VSF_USART_9_BIT_LENGTH)]
+            DataBits::DataBits9 => 9,
+            #[cfg(VSF_USART_10_BIT_LENGTH)]
+            DataBits::DataBits10 => 10,
+        }
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -220,9 +240,9 @@ impl Default for Config {
     }
 }
 
+#[cfg(VSF_USART_SWAP)]
 impl Config {
     fn tx_af(&self) -> AfType {
-        #[cfg(VSF_USART_SWAP)]
         if self.swap_rx_tx {
             return AfType::input(Pull::None);
         };
@@ -230,7 +250,6 @@ impl Config {
     }
 
     fn rx_af(&self) -> AfType {
-        #[cfg(VSF_USART_SWAP)]
         if self.swap_rx_tx {
             return self.tx_config.af_type();
         };
@@ -329,6 +348,15 @@ pub struct Usart<'d, T: Instance> {
     rx: UsartRx<'d, T>,
 }
 
+impl<'d, T: Instance> SetConfig for Usart<'d, T> {
+    type Config = Config;
+    type ConfigError = ConfigError;
+
+    fn set_config(&mut self, config: &Self::Config) -> Result<(), Self::ConfigError> {
+        self.set_config(config)
+    }
+}
+
 /// Transmitter part of the USART driver.
 ///
 /// This can be obtained via [`Usart::split`], or created directly.
@@ -336,11 +364,83 @@ pub struct UsartTx<'d, T: Instance> {
     _p: Peri<'d, T>,
 }
 
+impl<'d, T: Instance> SetConfig for UsartTx<'d, T> {
+    type Config = Config;
+    type ConfigError = ConfigError;
+
+    fn set_config(&mut self, config: &Self::Config) -> Result<(), Self::ConfigError> {
+        self.set_config(config)
+    }
+}
+
 /// Receiver part of the USART driver.
 ///
 /// This can be obtained via [`Usart::split`], or created directly.
 pub struct UsartRx<'d, T: Instance> {
     _p: Peri<'d, T>,
+}
+
+impl<'d, T: Instance> SetConfig for UsartRx<'d, T> {
+    type Config = Config;
+    type ConfigError = ConfigError;
+
+    fn set_config(&mut self, config: &Self::Config) -> Result<(), Self::ConfigError> {
+        self.set_config(config)
+    }
+}
+
+/// Configure vsf_usart.
+/// 
+/// config_fix is set by caller with Tx/Rx related configurations
+fn _vsf_usart_config(vsf_usart: *mut vsf_usart_t, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void) -> Result<(), ConfigError> {
+    unsafe {
+        let cap = vsf_usart_capability(vsf_usart);
+        if (cap.min_baudrate != 0) && (config.baudrate < cap.min_baudrate) {
+            return Err(ConfigError::BaudrateTooLow);
+        }
+        if (cap.max_baudrate != 0) && (config.baudrate > cap.max_baudrate) {
+            return Err(ConfigError::BaudrateTooHigh);
+        }
+        let data_bits_value = config.data_bits.into_value();
+        if data_bits_value < cap.min_data_bits || data_bits_value > cap.max_data_bits {
+            return Err(ConfigError::DatabitsNotSupported);
+        }
+
+        let mut usart_config = vsf_usart_cfg_t {
+            mode: config.data_bits as u32 | config.stop_bits as u32 | config.parity as u32 | config.duplex as u32 | config_fix | {
+                let mut mode: u32 = 0;
+                #[cfg(VSF_USART_SWAP)]
+                if config.swap_rx_tx {
+                    mode |= into_vsf_usart_mode_t!(VSF_USART_SWAP) as u32;
+                }
+                #[cfg(VSF_USART_SYNC_CLOCK_ENABLE)]
+                if config.enable_sync_clock {
+                    mode |= into_vsf_usart_mode_t!(VSF_USART_SYNC_CLOCK_ENABLE) as u32;
+                }
+                mode
+            },
+            baudrate: config.baudrate,
+            rx_timeout: config.rx_timeout,
+            #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
+            rx_idle_cnt: config.rx_idle_cnt,
+
+            isr: vsf_usart_isr_t {
+                handler_fn: Some(vsf_usart_on_interrupt),
+                target_ptr: target_ptr,
+                prio: 0,
+            },
+        };
+        vsf_usart_init(vsf_usart, &mut usart_config);
+    }
+    Ok(())
+}
+
+fn _vsf_usart_config_and_enable(vsf_usart: *mut vsf_usart_t, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void) -> Result<(), ConfigError> {
+    _vsf_usart_config(vsf_usart, config, config_fix, target_ptr)?;
+    unsafe {
+        vsf_usart_enable(vsf_usart);
+    }
+    Ok(())
 }
 
 impl<'d, T: Instance> Usart<'d, T> {
@@ -352,10 +452,16 @@ impl<'d, T: Instance> Usart<'d, T> {
         ck: Option<Peri<'d, impl CkPin<T>>>,
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
         config: Config,
-    ) -> Self {
+    ) -> Result<Self, ConfigError> {
         Self::new_inner(usart,
+            #[cfg(VSF_USART_SWAP)]
             new_pin!(rxd, config.rx_af()),
-            new_pin!(txd, config.rx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(rxd, AfType::input(Pull::None)),
+            #[cfg(VSF_USART_SWAP)]
+            new_pin!(txd, config.tx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(txd, config.tx_config.af_type()),
             if let Some(ck_pin) = ck {
                 new_pin!(ck_pin, AfType::output(Speed::highest(), OutputDrive::default()))
             } else {
@@ -376,11 +482,16 @@ impl<'d, T: Instance> Usart<'d, T> {
         rts: Peri<'d, impl RtsPin<T>>,
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
         config: Config,
-    ) -> Self {
-        Self::new_inner(
-            usart,
+    ) -> Result<Self, ConfigError> {
+        Self::new_inner(usart,
+            #[cfg(VSF_USART_SWAP)]
             new_pin!(rxd, config.rx_af()),
-            new_pin!(txd, config.rx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(rxd, AfType::input(Pull::None)),
+            #[cfg(VSF_USART_SWAP)]
+            new_pin!(txd, config.tx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(txd, config.tx_config.af_type()),
             if let Some(ck_pin) = ck {
                 new_pin!(ck_pin, AfType::output(Speed::highest(), OutputDrive::default()))
             } else {
@@ -402,52 +513,52 @@ impl<'d, T: Instance> Usart<'d, T> {
         _rts: Option<Peri<'d, AnyPin>>,
         _de: Option<Peri<'d, AnyPin>>,
         config: Config,
-    ) -> Self {
-        unsafe {
-            let info = T::info();
-            let mut usart_config = vsf_usart_cfg_t {
-                mode: config.data_bits as u32 | config.stop_bits as u32 | config.parity as u32 | config.duplex as u32 | {
-                    let mut mode: u32 = 0;
-                    #[cfg(VSF_USART_SWAP)]
-                    if config.swap_rx_tx {
-                        mode |= into_vsf_usart_mode_t!(VSF_USART_SWAP) as u32;
-                    }
-                    #[cfg(VSF_USART_TX_INVERT)]
-                    if config.invert_tx {
-                        mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
-                    }
-                    #[cfg(VSF_USART_RX_INVERT)]
-                    if config.invert_rx {
-                        mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
-                    }
-                    #[cfg(VSF_USART_SYNC_CLOCK_ENABLE)]
-                    if config.enable_sync_clock {
-                        mode |= into_vsf_usart_mode_t!(VSF_USART_SYNC_CLOCK_ENABLE) as u32;
-                    }
-                    mode
-                },
-                baudrate: config.baudrate,
-                rx_timeout: config.rx_timeout,
-                #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
-                rx_idle_cnt: config.rx_idle_cnt,
+    ) -> Result<Self, ConfigError> {
+        #[cfg(all(not(VSF_USART_TX_INVERT), not(VSF_USART_RX_INVERT)))]
+        let mode = 0;
+        #[cfg(any(VSF_USART_TX_INVERT, VSF_USART_RX_INVERT))]
+        let mode = {
+            let mut mode: u32 = 0;
+            #[cfg(VSF_USART_TX_INVERT)]
+            if config.invert_tx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
+            }
+            #[cfg(VSF_USART_RX_INVERT)]
+            if config.invert_rx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
+            }
+            mode
+        };
+        let vsf_usart = T::info().vsf_usart.load(Ordering::Relaxed);
+        _vsf_usart_config_and_enable(vsf_usart, &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)?;
 
-                isr: vsf_usart_isr_t {
-                    handler_fn: Some(vsf_usart_on_interrupt),
-                    target_ptr: ptr::from_ref(info) as *mut ::core::ffi::c_void,
-                    prio: 0,
-                },
-            };
-            let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
-            vsf_usart_init(vsf_usart, &mut usart_config);
-            vsf_usart_enable(vsf_usart);
-        }
-
-        Self {
+        Ok(Self {
             tx: UsartTx {
                 _p: unsafe { usart.clone_unchecked() },
             },
             rx: UsartRx { _p: usart },
-        }
+        })
+    }
+
+    /// Set configuration
+    pub fn set_config(&mut self, config: &Config) -> Result<(), ConfigError> {
+        #[cfg(all(not(VSF_USART_TX_INVERT), not(VSF_USART_RX_INVERT)))]
+        let mode = 0;
+        #[cfg(any(VSF_USART_TX_INVERT, VSF_USART_RX_INVERT))]
+        let mode = {
+            let mut mode: u32 = 0;
+            #[cfg(VSF_USART_TX_INVERT)]
+            if config.invert_tx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
+            }
+            #[cfg(VSF_USART_RX_INVERT)]
+            if config.invert_rx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
+            }
+            mode
+        };
+        let vsf_usart = T::info().vsf_usart.load(Ordering::Relaxed);
+        _vsf_usart_config(vsf_usart, config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)
     }
 
     /// Split the Usart into the transmitter and receiver parts.
@@ -491,7 +602,7 @@ impl<'d, T: Instance> Usart<'d, T> {
     }
 
     /// Send break character
-    pub fn send_break(&self) {
+    pub fn send_break(&mut self) {
         self.tx.send_break();
     }
 }
@@ -504,9 +615,12 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         txd: Peri<'d, impl TxPin<T>>,
         ck: Option<Peri<'d, impl CkPin<T>>>,
         config: Config,
-    ) -> Self {
+    ) -> Result<Self, ConfigError> {
         Self::new_inner(usart,
+            #[cfg(VSF_USART_SWAP)]
             new_pin!(txd, config.tx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(txd, config.tx_config.af_type()),
             if let Some(ck_pin) = ck {
                 new_pin!(ck_pin, AfType::output(Speed::highest(), OutputDrive::default()))
             } else {
@@ -525,9 +639,12 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         ck: Option<Peri<'d, impl CkPin<T>>>,
         cts: Peri<'d, impl CtsPin<T>>,
         config: Config,
-    ) -> Self {
+    ) -> Result<Self, ConfigError> {
         Self::new_inner(usart,
+            #[cfg(VSF_USART_SWAP)]
             new_pin!(txd, config.tx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(txd, config.tx_config.af_type()),
             if let Some(ck_pin) = ck {
                 new_pin!(ck_pin, AfType::output(Speed::highest(), OutputDrive::default()))
             } else {
@@ -544,43 +661,41 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         _ck: Option<Peri<'d, AnyPin>>,
         _cts: Option<Peri<'d, AnyPin>>,
         config: Config
-    ) -> Self {
-        unsafe {
-            let info = T::info();
-            let mut usart_config = vsf_usart_cfg_t {
-                mode: config.data_bits as u32 | config.stop_bits as u32 | config.parity as u32 | config.duplex as u32 | {
-                    let mut mode: u32 = 0;
-                    #[cfg(VSF_USART_SWAP)]
-                    if config.swap_rx_tx {
-                        mode |= into_vsf_usart_mode_t!(VSF_USART_SWAP) as u32;
-                    }
-                    #[cfg(VSF_USART_TX_INVERT)]
-                    if config.invert_tx {
-                        mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
-                    }
-                    #[cfg(VSF_USART_SYNC_CLOCK_ENABLE)]
-                    if config.enable_sync_clock {
-                        mode |= into_vsf_usart_mode_t!(VSF_USART_SYNC_CLOCK_ENABLE) as u32;
-                    }
-                    mode
-                },
-                baudrate: config.baudrate,
-                rx_timeout: config.rx_timeout,
-                #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
-                rx_idle_cnt: config.rx_idle_cnt,
+    ) -> Result<Self, ConfigError> {
+        #[cfg(not(VSF_USART_TX_INVERT))]
+        let mode = 0;
+        #[cfg(VSF_USART_TX_INVERT)]
+        let mode = {
+            let mut mode: u32 = 0;
+            #[cfg(VSF_USART_TX_INVERT)]
+            if config.invert_tx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
+            }
+            mode
+        };
+        let vsf_usart = T::info().vsf_usart.load(Ordering::Relaxed);
+        _vsf_usart_config_and_enable(vsf_usart, &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)?;
 
-                isr: vsf_usart_isr_t {
-                    handler_fn: Some(vsf_usart_on_interrupt),
-                    target_ptr: ptr::from_ref(info) as *mut ::core::ffi::c_void,
-                    prio: 0,
-                },
-            };
-            let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
-            vsf_usart_init(vsf_usart, &mut usart_config);
-            vsf_usart_enable(vsf_usart);
-        }
+        Ok(Self {
+            _p: usart
+        })
+    }
 
-        Self { _p: usart }
+    /// Set configuration
+    pub fn set_config(&mut self, config: &Config) -> Result<(), ConfigError> {
+        #[cfg(not(VSF_USART_TX_INVERT))]
+        let mode = 0;
+        #[cfg(VSF_USART_TX_INVERT)]
+        let mode = {
+            let mut mode: u32 = 0;
+            #[cfg(VSF_USART_TX_INVERT)]
+            if config.invert_tx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
+            }
+            mode
+        };
+        let vsf_usart = T::info().vsf_usart.load(Ordering::Relaxed);
+        _vsf_usart_config(vsf_usart, config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)
     }
 
     /// Write all bytes in the buffer.
@@ -645,10 +760,40 @@ impl<'d, T: Instance> UsartTx<'d, T> {
     }
 
     /// Send break character
-    pub fn send_break(&self) {
+    pub fn send_break(&mut self) {
         // TODO: implement send_break with VSF_USART_CTRL_SEND_BREAK or with VSF_USART_CTRL_SET_BREAK and VSF_USART_CTRL_CLEAR_BREAK
-//        #[cfg(VSF_USART_CTRL_SEND_BREAK)]
-//        #[cfg(all(VSF_USART_CTRL_SET_BREAK, VSF_USART_CTRL_CLEAR_BREAK))]
+        #[cfg(VSF_USART_CTRL_SEND_BREAK)]
+        unsafe {
+            let info = T::info();
+            let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
+            // 1. wait tx fifo empty
+            self.blocking_flush().unwrap();
+            // 2. TODO: wait previous send_break done
+            // 3. send current break
+            vsf_usart_ctrl(vsf_usart, into_vsf_usart_ctrl_t!(VSF_USART_CTRL_SEND_BREAK), 0 as *mut ::core::ffi::c_void);
+        }
+        #[cfg(all(not(VSF_USART_CTRL_SEND_BREAK), all(VSF_USART_CTRL_SET_BREAK, VSF_USART_CTRL_CLEAR_BREAK)))]
+        unsafe {
+            let info = T::info();
+            let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
+
+            // 1. calculate duration for break condition for at least 2 frames
+            let mut usart_config = Config::default();
+            vsf_hw_usart_get_configuration(vsf_usart, &usart_config);
+            let bits = 2 * (1 + 10 + 1 + 1);
+            let wait_usec = 1_000_000 * bits as u64 / usart_config.baudrate;
+
+            // 2. wait tx fifo empty
+            self.blocking_flush().unwrap();
+
+            // 3. set break
+            vsf_usart_ctrl(vsf_usart, into_vsf_usart_ctrl_t!(VSF_USART_CTRL_SET_BREAK), 0 as *mut ::core::ffi::c_void);
+
+            Timer::after_Micros(wait_usec).await;
+
+            // 5. clear break
+            vsf_usart_ctrl(vsf_usart, into_vsf_usart_ctrl_t!(VSF_USART_CTRL_CLEAR_BREAK), 0 as *mut ::core::ffi::c_void);
+        }
     }
 }
 
@@ -665,10 +810,12 @@ impl<'d, T: Instance> UsartRx<'d, T> {
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
         rxd: Peri<'d, impl TxPin<T>>,
         config: Config,
-    ) -> Self {
-        Self::new_inner(
-            usart,
+    ) -> Result<Self, ConfigError> {
+        Self::new_inner(usart,
+            #[cfg(VSF_USART_SWAP)]
             new_pin!(rxd, config.rx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(rxd, AfType::input(Pull::None)),
             None,
             config
         )
@@ -681,10 +828,12 @@ impl<'d, T: Instance> UsartRx<'d, T> {
         rxd: Peri<'d, impl TxPin<T>>,
         rts: Peri<'d, impl RtsPin<T>>,
         config: Config,
-    ) -> Self {
-        Self::new_inner(
-            usart,
+    ) -> Result<Self, ConfigError> {
+        Self::new_inner(usart,
+            #[cfg(VSF_USART_SWAP)]
             new_pin!(rxd, config.rx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(rxd, AfType::input(Pull::None)),
             new_pin!(rts, config.rts_config.af_type()),
             config
         )
@@ -695,43 +844,39 @@ impl<'d, T: Instance> UsartRx<'d, T> {
         _rxd: Option<Peri<'d, AnyPin>>,
         _rts: Option<Peri<'d, AnyPin>>,
         config: Config
-    ) -> Self {
-        unsafe {
-            let info = T::info();
-            let mut usart_config = vsf_usart_cfg_t {
-                mode: config.data_bits as u32 | config.stop_bits as u32 | config.parity as u32 | config.duplex as u32 | {
-                    let mut mode: u32 = 0;
-                    #[cfg(VSF_USART_SWAP)]
-                    if config.swap_rx_tx {
-                        mode |= into_vsf_usart_mode_t!(VSF_USART_SWAP) as u32;
-                    }
-                    #[cfg(VSF_USART_RX_INVERT)]
-                    if config.invert_rx {
-                        mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
-                    }
-                    #[cfg(VSF_USART_SYNC_CLOCK_ENABLE)]
-                    if config.enable_sync_clock {
-                        mode |= into_vsf_usart_mode_t!(VSF_USART_SYNC_CLOCK_ENABLE) as u32;
-                    }
-                    mode
-                },
-                baudrate: config.baudrate,
-                rx_timeout: config.rx_timeout,
-                #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
-                rx_idle_cnt: config.rx_idle_cnt,
+    ) -> Result<Self, ConfigError> {
+        #[cfg(not(VSF_USART_RX_INVERT))]
+        let mode = 0;
+        #[cfg(VSF_USART_RX_INVERT)]
+        let mode = {
+            let mut mode: u32 = 0;
+            #[cfg(VSF_USART_RX_INVERT)]
+            if config.invert_rx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
+            }
+            mode
+        };
+        let vsf_usart = T::info().vsf_usart.load(Ordering::Relaxed);
+        _vsf_usart_config_and_enable(vsf_usart, &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)?;
 
-                isr: vsf_usart_isr_t {
-                    handler_fn: Some(vsf_usart_on_interrupt),
-                    target_ptr: ptr::from_ref(info) as *mut ::core::ffi::c_void,
-                    prio: 0,
-                },
-            };
-            let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
-            vsf_usart_init(vsf_usart, &mut usart_config);
-            vsf_usart_enable(vsf_usart);
-        }
+        Ok(Self { _p: usart })
+    }
 
-        Self { _p: usart }
+    /// Set configuration
+    pub fn set_config(&mut self, config: &Config) -> Result<(), ConfigError> {
+        #[cfg(not(VSF_USART_RX_INVERT))]
+        let mode = 0;
+        #[cfg(VSF_USART_RX_INVERT)]
+        let mode = {
+            let mut mode: u32 = 0;
+            #[cfg(VSF_USART_RX_INVERT)]
+            if config.invert_rx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
+            }
+            mode
+        };
+        let vsf_usart = T::info().vsf_usart.load(Ordering::Relaxed);
+        _vsf_usart_config(vsf_usart, config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)
     }
 
     /// Read bytes until the buffer is filled.
