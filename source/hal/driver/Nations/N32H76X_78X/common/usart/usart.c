@@ -182,7 +182,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     // configure according to cfg_ptr
     vsf_usart_isr_t *isr_ptr = &cfg_ptr->isr;
     usart_ptr->isr = *isr_ptr;
-    if (isr_ptr->handler_fn != NULL) {
+    if ((isr_ptr->handler_fn != NULL) && (isr_ptr->prio != VSF_ARCH_PRIO_INVALID)) {
         NVIC_SetPriority(usart_ptr->irqn, (uint32_t)isr_ptr->prio);
         NVIC_EnableIRQ(usart_ptr->irqn);
     } else {
@@ -237,6 +237,9 @@ void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_enable)(
     reg->CTRL1 |= irq_mask & __VSF_HW_USART_CTRL1_IRQ_MASK;
     reg->CTRL2 |= irq_mask & __VSF_HW_USART_CTRL2_IRQ_MASK;
     reg->CTRL3 |= irq_mask & __VSF_HW_USART_CTRL3_IRQ_MASK;
+    if (usart_ptr->irq_mask & __VSF_HW_USART_STS_IRQ_MASK) {
+        reg->CTRL3 |= USART_CTRL3_ERRIEN;
+    }
 }
 
 void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_disable)(
@@ -261,6 +264,9 @@ void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_disable)(
     reg->CTRL1 &= ~(irq_mask & __VSF_HW_USART_CTRL1_IRQ_MASK);
     reg->CTRL2 &= ~(irq_mask & __VSF_HW_USART_CTRL2_IRQ_MASK);
     reg->CTRL3 &= ~(irq_mask & __VSF_HW_USART_CTRL3_IRQ_MASK);
+    if (!(usart_ptr->irq_mask & __VSF_HW_USART_STS_IRQ_MASK)) {
+        reg->CTRL3 &= ~USART_CTRL3_ERRIEN;
+    }
 }
 
 vsf_usart_status_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_status)(
@@ -335,30 +341,6 @@ uint_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_txfifo_write)(
     return cnt;
 }
 
-vsf_usart_capability_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)(
-    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
-) {
-    return (vsf_usart_capability_t) {
-        .irq_mask                       = __VSF_HW_USART_IRQ_MASK,
-        .max_baudrate                   = 0,
-        .min_baudrate                   = 0,
-        .min_data_bits                  = 8,
-        .max_data_bits                  = 9,
-        .txfifo_depth                   = 8,
-        .rxfifo_depth                   = 8,
-        .support_rx_timeout             = 1,
-        .support_send_break             = 1,
-        .support_set_and_clear_break    = 0,
-        .support_sync_clock             = usart_ptr->support_sync,
-#   ifdef VSF_USART_IRQ_MASK_TX_IDLE
-        .support_tx_idle                = 1,
-#   endif
-#   ifdef VSF_USART_IRQ_MASK_RX_IDLE
-        .support_rx_idle                = 1,
-#   endif
-    };
-}
-
 static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
@@ -387,12 +369,36 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
     if (irq_mask & USART_STS_RTOF) {
         irq_mask_out |= VSF_USART_IRQ_MASK_RX_TIMEOUT;
     }
+    irq_mask_out |= (irq_mask & (__VSF_HW_USART_STS_IRQ_MASK >> 5)) << 5;
 
     irq_mask_out &= usart_ptr->irq_mask;
     if ((irq_mask_out != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_usart_t *)usart_ptr, irq_mask_out);
     }
 }
+
+/*\note Implementation of APIs below is optional, because there is default implementation in usart_template.inc.
+ *      VSF_USART_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
+ *
+ *      The list of APIs and configuration:
+ *      VSF_USART_CFG_REIMPLEMENT_API_REQUEST for usart_request_rx, usart_request_tx, usart_cancel_rx, usart_cancel_tx, usart_get_rx_count, usart_get_tx_count.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ *      VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY for usart_capability.
+ *          Default implementation will use macros below to initialize capability structure:
+ *              VSF_USART_CFG_CAPABILITY_IRQ_MASK
+ *              VSF_USART_CFG_CAPABILITY_MAX_BAUDRATE
+ *              VSF_USART_CFG_CAPABILITY_MIN_BAUDRATE
+ *              VSF_USART_CFG_CAPABILITY_TXFIFO_DEPTH
+ *              VSF_USART_CFG_CAPABILITY_RXFIFO_DEPTH
+ *              VSF_USART_CFG_CAPABILITY_MAX_DATA_BITS
+ *              VSF_USART_CFG_CAPABILITY_MIN_DATA_BITS
+ *              VSF_USART_CFG_CAPABILITY_SUPPORT_RX_TIMEOUT
+ *              VSF_USART_CFG_CAPABILITY_SUPPORT_SEND_BREAK
+ *              VSF_USART_CFG_CAPABILITY_SUPPORT_SET_AND_CLEAR_BREAK
+ *      VSF_USART_CFG_REIMPLEMENT_API_CTRL for usart_ctrl.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
+ *      VSF_USART_CFG_REIMPLEMENT_API_GET_CONFIGURATION for usart_get_configuration.
+ *       
 
 /*\note DMA APIs below.
  *      If DMA is not supported, fifo2req template can be used,
@@ -445,6 +451,30 @@ int_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)(
     return 0;
 }
 
+vsf_usart_capability_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)(
+    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
+) {
+    return (vsf_usart_capability_t) {
+        .irq_mask                       = __VSF_HW_USART_IRQ_MASK,
+        .max_baudrate                   = 0,
+        .min_baudrate                   = 0,
+        .min_data_bits                  = 8,
+        .max_data_bits                  = 9,
+        .txfifo_depth                   = 8,
+        .rxfifo_depth                   = 8,
+        .support_rx_timeout             = 1,
+        .support_send_break             = 1,
+        .support_set_and_clear_break    = 0,
+        .support_sync_clock             = usart_ptr->support_sync,
+#   ifdef VSF_USART_IRQ_MASK_TX_IDLE
+        .support_tx_idle                = 1,
+#   endif
+#   ifdef VSF_USART_IRQ_MASK_RX_IDLE
+        .support_rx_idle                = 1,
+#   endif
+    };
+}
+
 vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_ctrl)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,
     vsf_usart_ctrl_t ctrl,
@@ -467,7 +497,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_ctrl)(
 // TODO: add comments about fifo2req
 #define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_REQUEST           ENABLED
-#define VSF_USART_CFG_REIMPLEMENT_API_CTRL               ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_CTRL              ENABLED
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t)                            \
         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __IDX) = {               \

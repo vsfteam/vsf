@@ -68,34 +68,53 @@ extern "C" {
 typedef enum vsf_usart_mode_t {
     // 1..2: TXEN(2)/RXEN(1) in USART_CTRL1
     VSF_USART_TX_ENABLE                 = (1 << 2),
+#define VSF_USART_TX_ENABLE             VSF_USART_TX_ENABLE
     VSF_USART_TX_DISABLE                = (0 << 2),
+#define VSF_USART_TX_DISABLE            VSF_USART_TX_DISABLE
     VSF_USART_RX_ENABLE                 = (1 << 1),
+#define VSF_USART_RX_ENABLE             VSF_USART_RX_ENABLE
     VSF_USART_RX_DISABLE                = (0 << 1),
+#define VSF_USART_RX_DISABLE            VSF_USART_RX_DISABLE
 
     // 3..4: PCEN(4)/PSEL(3) in USART_CTRL1
     VSF_USART_NO_PARITY                 = (0 << 4),
+#define VSF_USART_NO_PARITY             VSF_USART_NO_PARITY
     VSF_USART_ODD_PARITY                = (1 << 4) | (1 << 3),
+#define VSF_USART_ODD_PARITY            VSF_USART_ODD_PARITY
     VSF_USART_EVEN_PARITY               = (1 << 4),
+#define VSF_USART_EVEN_PARITY           VSF_USART_EVEN_PARITY
 
     // 5: WL(5) in USART_CTRL1
     VSF_USART_9_BIT_LENGTH              = (1 << 5),
+#define VSF_USART_9_BIT_LENGTH          VSF_USART_9_BIT_LENGTH
     VSF_USART_8_BIT_LENGTH              = (0 << 5),
+#define VSF_USART_8_BIT_LENGTH          VSF_USART_8_BIT_LENGTH
 
     // 6..7: STPB(5:6) in USART_CTRL2, left shifted by 1
     VSF_USART_0_5_STOPBIT               = (1 << 5) << 1,
+#define VSF_USART_0_5_STOPBIT           VSF_USART_0_5_STOPBIT
     VSF_USART_1_STOPBIT                 = (0 << 5) << 1,
+#define VSF_USART_1_STOPBIT             VSF_USART_1_STOPBIT
     VSF_USART_1_5_STOPBIT               = (3 << 5) << 1,
+#define VSF_USART_1_5_STOPBIT           VSF_USART_1_5_STOPBIT
     VSF_USART_2_STOPBIT                 = (2 << 5) << 1,
+#define VSF_USART_2_STOPBIT             VSF_USART_2_STOPBIT
 
     // 8: CLKEN(8) in USART_CTRL2
     VSF_USART_SYNC_CLOCK_ENABLE         = (8 << 11),
+#define VSF_USART_SYNC_CLOCK_ENABLE     VSF_USART_SYNC_CLOCK_ENABLE
     VSF_USART_SYNC_CLOCK_DISABLE        = (8 << 11),
+#define VSF_USART_SYNC_CLOCK_DISABLE    VSF_USART_SYNC_CLOCK_DISABLE
     // 9: CLKPOL(9) in USART_CTRL2
-    VSF_USART_SYNC_CLOCK_POLARITY_LOW   = (0 << 9),
-    VSF_USART_SYNC_CLOCK_POLARITY_HIGH  = (1 << 9),
+    VSF_USART_SYNC_CLOCK_POLARITY_LOW           = (0 << 9),
+#define VSF_USART_SYNC_CLOCK_POLARITY_LOW       VSF_USART_SYNC_CLOCK_POLARITY_LOW
+    VSF_USART_SYNC_CLOCK_POLARITY_HIGH          = (1 << 9),
+#define VSF_USART_SYNC_CLOCK_POLARITY_HIGH      VSF_USART_SYNC_CLOCK_POLARITY_HIGH
     // 10: CLKPHA(9) in USART_CTRL2
-    VSF_USART_SYNC_CLOCK_PHASE_1_EDGE   = (0 << 10),
-    VSF_USART_SYNC_CLOCK_PHASE_2_EDGE   = (1 << 10),
+    VSF_USART_SYNC_CLOCK_PHASE_1_EDGE           = (0 << 10),
+#define VSF_USART_SYNC_CLOCK_PHASE_1_EDGE       VSF_USART_SYNC_CLOCK_PHASE_1_EDGE
+    VSF_USART_SYNC_CLOCK_PHASE_2_EDGE           = (1 << 10),
+#define VSF_USART_SYNC_CLOCK_PHASE_2_EDGE       VSF_USART_SYNC_CLOCK_PHASE_2_EDGE
     // 11: LBCLK(11) in USART_CTRL2
     VSF_USART_SYNC_CLOCK_LAST_BIT_ENABLE        = (1 << 11),
     VSF_USART_SYNC_CLOCK_LAST_BIT_DISABLE       = (0 << 11),
@@ -105,18 +124,30 @@ typedef enum vsf_usart_mode_t {
 
     // 12|14..19: RXFTCFG(5..7)/TXFTCFG(2..4)/EN(0) in USART_FIFO, left shifted by 12
     VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL        = ((7 << 2) | (1 << 0)) << 12,
+#define VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL    VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL
     VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY      = ((2 << 2) | (1 << 0)) << 12,
+#define VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY  VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY
     VSF_USART_TX_FIFO_THRESHOLD_ONE_EIGHTH      = ((0 << 2) | (1 << 0)) << 12,
+#define VSF_USART_TX_FIFO_THRESHOLD_ONE_EIGHTH  VSF_USART_TX_FIFO_THRESHOLD_ONE_EIGHTH
     VSF_USART_TX_FIFO_THRESHOLD_QUARTER         = ((1 << 2) | (1 << 0)) << 12,
+#define VSF_USART_TX_FIFO_THRESHOLD_QUARTER     VSF_USART_TX_FIFO_THRESHOLD_QUARTER
     VSF_USART_TX_FIFO_THRESHOLD_THREE_FOURTH    = ((1 << 2) | (1 << 0)) << 12,
+#define VSF_USART_TX_FIFO_THRESHOLD_THREE_FOURTH    VSF_USART_TX_FIFO_THRESHOLD_THREE_FOURTH
     VSF_USART_TX_FIFO_THRESHOLD_EMPTY           = ((5 << 2) | (1 << 0)) << 12,
+#define VSF_USART_TX_FIFO_THRESHOLD_EMPTY       VSF_USART_TX_FIFO_THRESHOLD_EMPTY
 
     VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY       = ((7 << 5) | (1 << 0)) << 12,
+#define VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY   VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
     VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL       = ((2 << 5) | (1 << 0)) << 12,
+#define VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL   VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL
     VSF_USART_RX_FIFO_THRESHOLD_ONE_EIGHTH      = ((0 << 5) | (1 << 0)) << 12,
+#define VSF_USART_RX_FIFO_THRESHOLD_ONE_EIGHTH  VSF_USART_RX_FIFO_THRESHOLD_ONE_EIGHTH
     VSF_USART_RX_FIFO_THRESHOLD_QUARTER         = ((1 << 5) | (1 << 0)) << 12,
+#define VSF_USART_RX_FIFO_THRESHOLD_QUARTER     VSF_USART_RX_FIFO_THRESHOLD_QUARTER
     VSF_USART_RX_FIFO_THRESHOLD_THREE_FOURTH    = ((1 << 5) | (1 << 0)) << 12,
+#define VSF_USART_RX_FIFO_THRESHOLD_THREE_FOURTH    VSF_USART_RX_FIFO_THRESHOLD_THREE_FOURTH
     VSF_USART_RX_FIFO_THRESHOLD_FULL            = ((5 << 5) | (1 << 0)) << 12,
+#define VSF_USART_RX_FIFO_THRESHOLD_FULL        VSF_USART_RX_FIFO_THRESHOLD_FULL
 
 #define VSF_USART_TX_FIFO_THRESHOLD_MASK    ( VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL\
                                             | VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY\
@@ -133,14 +164,20 @@ typedef enum vsf_usart_mode_t {
 
     // 20|22: RTSEN(2)/CTSEN(0) in USART_CTRL3, right shifted by 20
     VSF_USART_NO_HWCONTROL              = (0) << 16,
+#define VSF_USART_NO_HWCONTROL          VSF_USART_NO_HWCONTROL
     VSF_USART_RTS_HWCONTROL             = (1 << 2) << 20,
+#define VSF_USART_RTS_HWCONTROL         VSF_USART_RTS_HWCONTROL
     VSF_USART_CTS_HWCONTROL             = (1 << 0) << 20,
+#define VSF_USART_CTS_HWCONTROL         VSF_USART_CTS_HWCONTROL
     VSF_USART_RTS_CTS_HWCONTROL         = VSF_USART_RTS_HWCONTROL
                                         | VSF_USART_CTS_HWCONTROL,
+#define VSF_USART_RTS_CTS_HWCONTROL     VSF_USART_RTS_CTS_HWCONTROL
 
     // 24: HDMEN(4) in USART_CTRL3, right shifted by 20
     VSF_USART_HALF_DUPLEX_ENABLE        = (1 << 4) << 20,
+#define VSF_USART_HALF_DUPLEX_ENABLE    VSF_USART_HALF_DUPLEX_ENABLE
     VSF_USART_HALF_DUPLEX_DISABLE       = 0,
+#define VSF_USART_HALF_DUPLEX_DISABLE   VSF_USART_HALF_DUPLEX_DISABLE
 
     // more vendor specified modes can be added here
 
@@ -150,6 +187,7 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_OVERSAMPLE_MASK           = (1 << 26),
     // 27: SWAP(27) in USART_CTRL1
     VSF_USART_SWAP                      = (1 << 27),
+#define VSF_USART_SWAP                  VSF_USART_SWAP
 
 
     __VSF_HW_USART_CTRL1_MASK           = VSF_USART_9_BIT_LENGTH
@@ -213,6 +251,7 @@ typedef enum vsf_usart_mode_t {
 typedef enum vsf_usart_irq_mask_t {
     // 3: CTSIEN(1) in USART_CTRL3
     VSF_USART_IRQ_MASK_CTS              = (1 << 3),
+#define VSF_USART_IRQ_MASK_CTS          VSF_USART_IRQ_MASK_CTS
 
     // usart request interrupt
     // TODO: add DMA support
@@ -221,25 +260,40 @@ typedef enum vsf_usart_irq_mask_t {
 
     // 7: TXDE(7) in USART_CTTL1
     VSF_USART_IRQ_MASK_TX               = (1 << 7),
+#define VSF_USART_IRQ_MASK_TX           VSF_USART_IRQ_MASK_TX
 
     // 8: IDLEIEN(8) in USART_CTRL1
     VSF_USART_IRQ_MASK_RX_IDLE          = (1 << 8),
-#   define VSF_USART_IRQ_MASK_RX_IDLE   VSF_USART_IRQ_MASK_RX_IDLE
+#define VSF_USART_IRQ_MASK_RX_IDLE      VSF_USART_IRQ_MASK_RX_IDLE
 
     // 9: RXDNEIE(9) in USART_CTRL1
     VSF_USART_IRQ_MASK_RX               = (1 << 9),
+#define VSF_USART_IRQ_MASK_RX           VSF_USART_IRQ_MASK_RX
 
     // 11: TXCIEN(11) in USART_CTRL1
     VSF_USART_IRQ_MASK_TX_IDLE          = (1 << 11),
-#   define VSF_USART_IRQ_MASK_TX_IDLE   VSF_USART_IRQ_MASK_TX_IDLE
+#define VSF_USART_IRQ_MASK_TX_IDLE      VSF_USART_IRQ_MASK_TX_IDLE
 
     // usart error interrupt
     // 12: PEIEN(12) in USART_CTRL1
     VSF_USART_IRQ_MASK_PARITY_ERR       = (1 << 12),
+#define VSF_USART_IRQ_MASK_PARITY_ERR   VSF_USART_IRQ_MASK_PARITY_ERR
 
     // 15|17: RTOIEN(17)/RTOEN(15) in USART_CTRL2
     VSF_USART_IRQ_MASK_RX_TIMEOUT       = (1 << 15) | (1 << 17),
+#define VSF_USART_IRQ_MASK_RX_TIMEOUT   VSF_USART_IRQ_MASK_RX_TIMEOUT
 
+    // 18: OREF(13) in USART_STS
+    VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  = (1 << 18),
+#define VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR
+    // 19: OREF(14) in USART_STS
+    VSF_USART_IRQ_MASK_NOISE_ERR        = (1 << 19),
+#define VSF_USART_IRQ_MASK_NOISE_ERR    VSF_USART_IRQ_MASK_NOISE_ERR
+    // 20: FEF(15) in USART_STS
+    VSF_USART_IRQ_MASK_FRAME_ERR        = (1 << 18),
+#define VSF_USART_IRQ_MASK_FRAME_ERR    VSF_USART_IRQ_MASK_FRAME_ERR
+    VSF_USART_IRQ_MASK_BREAK_ERR        = VSF_USART_IRQ_MASK_FRAME_ERR,
+#define VSF_USART_IRQ_MASK_BREAK_ERR    VSF_USART_IRQ_MASK_BREAK_ERR
 
     // more vendor specified irq_masks can be added here
 
@@ -262,16 +316,9 @@ typedef enum vsf_usart_irq_mask_t {
                                         | VSF_USART_IRQ_MASK_PARITY_ERR,
     __VSF_HW_USART_CTRL2_IRQ_MASK       = VSF_USART_IRQ_MASK_RX_TIMEOUT,
     __VSF_HW_USART_CTRL3_IRQ_MASK       = VSF_USART_IRQ_MASK_CTS,
-
-    // not supported
-    // 0..2
-    VSF_USART_IRQ_MASK_FRAME_ERR        = (1 << 0),
-    VSF_USART_IRQ_MASK_BREAK_ERR        = (1 << 1),
-    VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  = (1 << 2),
-
-    __VSF_HW_USART_NOT_SUPPORT_IRQ_MASK = VSF_USART_IRQ_MASK_FRAME_ERR
-                                        | VSF_USART_IRQ_MASK_BREAK_ERR
-                                        | VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR,
+    __VSF_HW_USART_STS_IRQ_MASK         = VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR
+                                        | VSF_USART_IRQ_MASK_NOISE_ERR
+                                        | VSF_USART_IRQ_MASK_FRAME_ERR,
 } vsf_usart_irq_mask_t;
 #endif
 
@@ -279,6 +326,7 @@ typedef enum vsf_usart_irq_mask_t {
 typedef enum vsf_usart_ctrl_t {
     // 13: SDBRK in USART_CTRL1
     VSF_USART_CTRL_SEND_BREAK           = (1 << 13),
+#define VSF_USART_CTRL_SEND_BREAK       VSF_USART_CTRL_SEND_BREAK
 
     __VSF_HW_USART_SUPPORT_CMD_MASK     = VSF_USART_CTRL_SEND_BREAK,
 
