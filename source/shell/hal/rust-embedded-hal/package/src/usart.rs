@@ -362,6 +362,7 @@ impl<'d, T: Instance> SetConfig for Usart<'d, T> {
 /// This can be obtained via [`Usart::split`], or created directly.
 pub struct UsartTx<'d, T: Instance> {
     _p: Peri<'d, T>,
+    #[cfg(all(not(VSF_USART_CTRL_SEND_BREAK), all(VSF_USART_CTRL_SET_BREAK, VSF_USART_CTRL_CLEAR_BREAK)))]
     baudrate: u32,
 }
 
@@ -536,6 +537,7 @@ impl<'d, T: Instance> Usart<'d, T> {
         Ok(Self {
             tx: UsartTx {
                 _p: unsafe { usart.clone_unchecked() },
+                #[cfg(all(not(VSF_USART_CTRL_SEND_BREAK), all(VSF_USART_CTRL_SET_BREAK, VSF_USART_CTRL_CLEAR_BREAK)))]
                 baudrate: config.baudrate,
             },
             rx: UsartRx { _p: usart },
@@ -685,6 +687,7 @@ impl<'d, T: Instance> UsartTx<'d, T> {
 
         Ok(Self {
             _p: usart,
+            #[cfg(all(not(VSF_USART_CTRL_SEND_BREAK), all(VSF_USART_CTRL_SET_BREAK, VSF_USART_CTRL_CLEAR_BREAK)))]
             baudrate: config.baudrate,
         })
     }
