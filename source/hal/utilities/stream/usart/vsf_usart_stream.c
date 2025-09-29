@@ -57,6 +57,9 @@ static void __vsf_usart_stream_evthandler(vsf_stream_t *stream, void *param, vsf
         }
         __vsf_usart_stream_tx(usart_stream, orig);
         break;
+    default:
+        VSF_HAL_ASSERT(false);
+        break;
     }
 }
 
@@ -90,10 +93,14 @@ static void vsf_usart_stream_isrhandler(void *target, vsf_usart_t *usart, vsf_us
             }
             vsf_stream_write(usart_stream->stream_rx, NULL, total_size);
         }
-    } else {
+    } 
+    if (irq_mask & VSF_USART_IRQ_MASK_TX_CPL) {
         VSF_HAL_ASSERT(usart_stream->tx.size > 0);
         vsf_stream_read(usart_stream->stream_tx, NULL, usart_stream->tx.size);
         __vsf_usart_stream_tx(usart_stream, vsf_protect_int());
+    }
+    if ((irq_mask & VSF_USART_IRQ_MASK_ERR) && (usart_stream->on_error)) {
+        usart_stream->on_error(usart_stream, irq_mask);
     }
 }
 
@@ -109,7 +116,7 @@ vsf_err_t vsf_usart_stream_init(vsf_usart_stream_t *usart_stream, vsf_usart_cfg_
     cfg->isr.handler_fn = vsf_usart_stream_isrhandler;
     cfg->isr.target_ptr = usart_stream;
     vsf_usart_init(usart_stream->usart, cfg);
-    vsf_usart_irq_enable(usart_stream->usart, VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_TX_CPL);
+    vsf_usart_irq_enable(usart_stream->usart, VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_TX_CPL | VSF_USART_IRQ_MASK_ERR);
     vsf_usart_enable(usart_stream->usart);
 
     VSF_STREAM_CONNECT_TX(usart_stream->stream_rx);

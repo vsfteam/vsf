@@ -54,6 +54,7 @@ vsf_class(vsf_usart_stream_t) {
         // usart_tx <-- stream_tx.rx
         vsf_stream_t *stream_rx;
         vsf_stream_t *stream_tx;
+        void (*on_error)(vsf_usart_stream_t *stream, vsf_usart_irq_mask_t irq_mask_err);
     )
     private_member(
         struct {
