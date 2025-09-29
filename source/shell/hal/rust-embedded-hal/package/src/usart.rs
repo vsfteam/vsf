@@ -451,17 +451,13 @@ pub struct BufferedUsart<'d, T: Instance> {
 
 /// Buffered UART RX handle.
 pub struct BufferedUsartRx<'d, T: Instance> {
-    p: Peri<'d, T>,
-    info: &'static Info,
-    state: &'static State,
+    usart: UsartRx<'d, T>,
     buffered_state: &'static BufferedState,
 }
 
 /// Buffered UART TX handle.
 pub struct BufferedUsartTx<'d, T: Instance> {
-    p: Peri<'d, T>,
-    info: &'static Info,
-    state: &'static State,
+    usart: UsartTx<'d, T>,
     buffered_state: &'static BufferedState,
 }
 
@@ -664,39 +660,37 @@ impl<'d, T: Instance> Usart<'d, T> {
         let s = T::state();
         let bs = T::buffered_state();
 
-        bs.usart_stream.store(&bs._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
-        let usart_stream = &bs._usart_stream_instance as *const UsartStream as *mut UsartStream;
-        unsafe {
-            (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
-            (*usart_stream).usart_stream.target = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
+        if bs.usart_stream.load(Ordering::Relaxed) == 0 as *mut UsartStream {
+            bs.usart_stream.store(&bs._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
+            let usart_stream = &bs._usart_stream_instance as *const UsartStream as *mut UsartStream;
+            unsafe {
+                (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
+                (*usart_stream).usart_stream.target = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
 
-            (*usart_stream).usart_stream.stream_rx = &bs._usart_stream_instance.stream_rx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
-            (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.param = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
-            (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.evthandler = Some(vsf_usart_stream_rx_evthandler);
-            (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = rx_buffer.as_mut_ptr();
-            (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = rx_buffer.len() as u32;
+                (*usart_stream).usart_stream.stream_rx = &bs._usart_stream_instance.stream_rx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
+                (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.param = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
+                (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.evthandler = Some(vsf_usart_stream_rx_evthandler);
+                (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = rx_buffer.as_mut_ptr();
+                (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = rx_buffer.len() as u32;
 
-            (*usart_stream).usart_stream.stream_tx = &bs._usart_stream_instance.stream_tx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
-            (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.param = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
-            (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.evthandler = Some(vsf_usart_stream_tx_evthandler);
-            (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = tx_buffer.as_mut_ptr();
-            (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = tx_buffer.len() as u32;
+                (*usart_stream).usart_stream.stream_tx = &bs._usart_stream_instance.stream_tx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
+                (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.param = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
+                (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.evthandler = Some(vsf_usart_stream_tx_evthandler);
+                (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = tx_buffer.as_mut_ptr();
+                (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = tx_buffer.len() as u32;
 
-            let usart_config = s.config.load(Ordering::Relaxed);
-            vsf_usart_stream_init(&((*usart_stream).usart_stream) as *const vsf_usart_stream_t as *mut vsf_usart_stream_t, usart_config);
+                let usart_config = s.config.load(Ordering::Relaxed);
+                vsf_usart_stream_init(&((*usart_stream).usart_stream) as *const vsf_usart_stream_t as *mut vsf_usart_stream_t, usart_config);
+            }
         }
 
         BufferedUsart {
             rx: BufferedUsartRx {
-                p: unsafe { self.rx.p.clone_unchecked() },
-                info: info,
-                state: s,
+                usart: self.rx,
                 buffered_state: bs,
             },
             tx: BufferedUsartTx {
-                p: unsafe { self.tx.p.clone_unchecked() },
-                info: info,
-                state: s,
+                usart: self.tx,
                 buffered_state: bs,
             },
         }
@@ -860,28 +854,28 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         let s = T::state();
         let bs = T::buffered_state();
 
-        bs.usart_stream.store(&bs._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
-        let usart_stream = &bs._usart_stream_instance as *const UsartStream as *mut UsartStream;
-        unsafe {
-            (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
-            (*usart_stream).usart_stream.target = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
+        if bs.usart_stream.load(Ordering::Relaxed) == 0 as *mut UsartStream {
+            bs.usart_stream.store(&bs._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
+            let usart_stream = &bs._usart_stream_instance as *const UsartStream as *mut UsartStream;
+            unsafe {
+                (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
+                (*usart_stream).usart_stream.target = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
 
-            (*usart_stream).usart_stream.stream_tx = &bs._usart_stream_instance.stream_tx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
-            (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.param = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
-            (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.evthandler = Some(vsf_usart_stream_tx_evthandler);
-            (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = tx_buffer.as_mut_ptr();
-            (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = tx_buffer.len() as u32;
+                (*usart_stream).usart_stream.stream_tx = &bs._usart_stream_instance.stream_tx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
+                (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.param = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
+                (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.evthandler = Some(vsf_usart_stream_tx_evthandler);
+                (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = tx_buffer.as_mut_ptr();
+                (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = tx_buffer.len() as u32;
 
-            (*usart_stream).usart_stream.stream_rx = 0 as *mut vsf_stream_t;
+                (*usart_stream).usart_stream.stream_rx = 0 as *mut vsf_stream_t;
 
-            let usart_config = s.config.load(Ordering::Relaxed);
-            vsf_usart_stream_init(&((*usart_stream).usart_stream) as *const vsf_usart_stream_t as *mut vsf_usart_stream_t, usart_config);
+                let usart_config = s.config.load(Ordering::Relaxed);
+                vsf_usart_stream_init(&((*usart_stream).usart_stream) as *const vsf_usart_stream_t as *mut vsf_usart_stream_t, usart_config);
+            }
         }
 
         BufferedUsartTx {
-            p: unsafe { self.p.clone_unchecked() },
-            info: info,
-            state: s,
+            usart: self,
             buffered_state: bs,
         }
     }
@@ -1085,28 +1079,28 @@ impl<'d, T: Instance> UsartRx<'d, T> {
         let s = self.state;
         let bs = T::buffered_state();
 
-        bs.usart_stream.store(&bs._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
-        let usart_stream = &bs._usart_stream_instance as *const UsartStream as *mut UsartStream;
-        unsafe {
-            (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
-            (*usart_stream).usart_stream.target = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
+        if bs.usart_stream.load(Ordering::Relaxed) == 0 as *mut UsartStream {
+            bs.usart_stream.store(&bs._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
+            let usart_stream = &bs._usart_stream_instance as *const UsartStream as *mut UsartStream;
+            unsafe {
+                (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
+                (*usart_stream).usart_stream.target = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
 
-            (*usart_stream).usart_stream.stream_rx = &bs._usart_stream_instance.stream_rx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
-            (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.param = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
-            (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.evthandler = Some(vsf_usart_stream_rx_evthandler);
-            (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = rx_buffer.as_mut_ptr();
-            (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = rx_buffer.len() as u32;
+                (*usart_stream).usart_stream.stream_rx = &bs._usart_stream_instance.stream_rx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
+                (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.param = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
+                (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.evthandler = Some(vsf_usart_stream_rx_evthandler);
+                (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = rx_buffer.as_mut_ptr();
+                (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = rx_buffer.len() as u32;
 
-            (*usart_stream).usart_stream.stream_tx = 0 as *mut vsf_stream_t;
+                (*usart_stream).usart_stream.stream_tx = 0 as *mut vsf_stream_t;
 
-            let usart_config = s.config.load(Ordering::Relaxed);
-            vsf_usart_stream_init(&((*usart_stream).usart_stream) as *const vsf_usart_stream_t as *mut vsf_usart_stream_t, usart_config);
+                let usart_config = s.config.load(Ordering::Relaxed);
+                vsf_usart_stream_init(&((*usart_stream).usart_stream) as *const vsf_usart_stream_t as *mut vsf_usart_stream_t, usart_config);
+            }
         }
 
         BufferedUsartRx {
-            p: unsafe { self.p.clone_unchecked() },
-            info: info,
-            state: s,
+            usart: self,
             buffered_state: bs,
         }
     }
@@ -1287,16 +1281,8 @@ impl<'d, T: Instance> BufferedUsart<'d, T> {
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
     ) -> Usart<'d, T> {
         Usart {
-            tx: UsartTx {
-                p: unsafe { self.tx.p.clone_unchecked() },
-                info: self.tx.info,
-                state: self.tx.state,
-            },
-            rx: UsartRx {
-                p: unsafe { self.rx.p.clone_unchecked() },
-                info: self.rx.info,
-                state: self.rx.state,
-            },
+            tx: self.tx.usart,
+            rx: self.rx.usart,
         }
     }
 
@@ -1332,11 +1318,7 @@ impl<'d, T: Instance> BufferedUsartRx<'d, T> {
     pub fn into_normal(self, 
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
     ) -> UsartRx<'d, T> {
-        UsartRx {
-            p: unsafe { self.p.clone_unchecked() },
-            info: self.info,
-            state: self.state,
-        }
+        self.usart
     }
 
     async fn read(&self, buffer: &'d mut [u8]) -> impl Future<Output = Result<usize, Error>> + 'd {
@@ -1420,11 +1402,7 @@ impl<'d, T: Instance> BufferedUsartTx<'d, T> {
     pub fn into_normal(self, 
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
     ) -> UsartTx<'d, T> {
-        UsartTx {
-            p: unsafe { self.p.clone_unchecked() },
-            info: self.info,
-            state: self.state,
-        }
+        self.usart
     }
 
     async fn write(&self, buffer: &'d [u8]) -> impl Future<Output = Result<usize, Error>> + 'd {
