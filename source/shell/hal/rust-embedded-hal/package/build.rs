@@ -23,7 +23,7 @@ const BINDGEN_DEFINITIONS: [&'static str; 2] = [
 
 const PERIPHERIALS: [&'static str; 2] = ["gpio", "usart"];
 
-const CONSTANTS_MACRO: [(&'static str, &'static str); 28] = [
+const CONSTANTS_MACRO: [(&'static str, &'static str); 35] = [
     // USART constants
     ("vsf_usart_mode_t", "VSF_USART_5_BIT_LENGTH"),
     ("vsf_usart_mode_t", "VSF_USART_6_BIT_LENGTH"),
@@ -44,18 +44,25 @@ const CONSTANTS_MACRO: [(&'static str, &'static str); 28] = [
     ("vsf_usart_mode_t", "VSF_USART_SWAP"),
     ("vsf_usart_mode_t", "VSF_USART_TX_INVERT"),
     ("vsf_usart_mode_t", "VSF_USART_RX_INVERT"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_TX"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_TX_CPL"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_CPL"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_TIMEOUT"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_CTS"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_FRAME_ERR"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_PARITY_ERR"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_BREAK_ERR"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_IDLE"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_TX_IDLE"),
     ("vsf_usart_ctrl_t", "VSF_USART_CTRL_SEND_BREAK"),
     ("vsf_usart_ctrl_t", "VSF_USART_CTRL_SET_BREAK"),
     ("vsf_usart_ctrl_t", "VSF_USART_CTRL_CLEAR_BREAK"),
 ];
 
-const CONSTANTS_ENUM: [(&'static str, &'static str); 82] = [
+const CONSTANTS_ENUM: [(&'static str, &'static str); 89] = [
     // GPIO constants
     ("", "VSF_HW_GPIO_PIN_COUNT"),
     ("vsf_gpio_mode_t", "VSF_GPIO_INPUT"),
@@ -99,12 +106,19 @@ const CONSTANTS_ENUM: [(&'static str, &'static str); 82] = [
     ("vsf_usart_mode_t", "VSF_USART_SWAP"),
     ("vsf_usart_mode_t", "VSF_USART_TX_INVERT"),
     ("vsf_usart_mode_t", "VSF_USART_RX_INVERT"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_TX"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_TX_CPL"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_CPL"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_TIMEOUT"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_CTS"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_FRAME_ERR"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_PARITY_ERR"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_BREAK_ERR"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_IDLE"),
+    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_TX_IDLE"),
     ("vsf_usart_ctrl_t", "VSF_USART_CTRL_SEND_BREAK"),
     ("vsf_usart_ctrl_t", "VSF_USART_CTRL_SET_BREAK"),
     ("vsf_usart_ctrl_t", "VSF_USART_CTRL_CLEAR_BREAK"),

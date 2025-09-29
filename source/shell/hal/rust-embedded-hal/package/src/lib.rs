@@ -13,6 +13,8 @@ mod vsf_hal;
 #[cfg(bindgen_enum_type_moduleconsts)]
 macro_rules! into_enum_type {($type:ident) => { $type::Type }}
 #[cfg(bindgen_enum_type_moduleconsts)]
+macro_rules! into_vsf_arch_prio_t {($mode:ident) => { vsf_arch_prio_t::$mode }}
+#[cfg(bindgen_enum_type_moduleconsts)]
 macro_rules! into_vsf_gpio_mode_t {($mode:ident) => { vsf_gpio_mode_t::$mode }}
 #[cfg(bindgen_enum_type_moduleconsts)]
 macro_rules! into_vsf_hw_peripheral_en_t {($mode:ident) => { vsf_hw_peripheral_en_t::$mode }}
@@ -27,6 +29,8 @@ macro_rules! into_vsf_usart_ctrl_t {($mode:ident) => { vsf_usart_ctrl_t::$mode }
 
 #[cfg(bindgen_enum_type_consts)]
 macro_rules! into_enum_type {($type:ident) => { $type }}
+#[cfg(bindgen_enum_type_consts)]
+macro_rules! into_vsf_arch_prio_t {($mode:ident) => { paste!{[<vsf_arch_prio_t_ $mode>]} }}
 #[cfg(bindgen_enum_type_consts)]
 macro_rules! into_vsf_gpio_mode_t {($mode:ident) => { paste!{[<vsf_gpio_mode_t_ $mode>]} }}
 #[cfg(bindgen_enum_type_consts)]

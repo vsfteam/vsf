@@ -27,7 +27,7 @@ use embassy_sync::waitqueue::AtomicWaker;
 
 use crate::gpio::{AnyPin, AfType, Pull, Speed, OutputDrive};
 use crate::interrupt::typelevel::Interrupt as _;
-use crate::interrupt::{self, Interrupt};
+use crate::interrupt::{self, Interrupt, InterruptExt};
 use crate::vsf_hal::{*};
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -321,14 +321,14 @@ unsafe extern "C" fn vsf_usart_on_interrupt(
 
     let mut rx_irq_mask = VSF_USART_IRQ_MASK_ERR | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL);
     #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
-    if s.rx_exit_on_idle.load(Ordering::Acquire) {
+    if s.rx_exit_on_idle.load(Ordering::Relaxed) {
         rx_irq_mask |= into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_IDLE);
     }
     if rx_irq_mask & irq_mask != 0 {
         unsafe {
             vsf_usart_irq_disable(vsf_usart, rx_irq_mask);
         }
-        s.rx_irq_mask.store(rx_irq_mask, Ordering::Release);
+        s.rx_irq_mask.fetch_or(rx_irq_mask, Ordering::Relaxed);
         s.rx_waker.wake();
     }
 
@@ -337,7 +337,7 @@ unsafe extern "C" fn vsf_usart_on_interrupt(
         unsafe {
             vsf_usart_irq_disable(vsf_usart, into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL));
         }
-        s.tx_irq_mask.store(tx_irq_mask, Ordering::Release);
+        s.tx_irq_mask.fetch_or(tx_irq_mask, Ordering::Relaxed);
         s.tx_waker.wake();
     }
 }
@@ -394,8 +394,9 @@ impl<'d, T: Instance> SetConfig for UsartRx<'d, T> {
 /// Configure vsf_usart.
 /// 
 /// config_fix is set by caller with Tx/Rx related configurations
-fn _vsf_usart_config(vsf_usart: *mut vsf_usart_t, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void) -> Result<(), ConfigError> {
+fn _vsf_usart_config(info: &Info, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void) -> Result<(), ConfigError> {
     unsafe {
+        let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
         let cap = vsf_usart_capability(vsf_usart);
         if (cap.min_baudrate != 0) && (config.baudrate < cap.min_baudrate) {
             return Err(ConfigError::BaudrateTooLow);
@@ -429,7 +430,7 @@ fn _vsf_usart_config(vsf_usart: *mut vsf_usart_t, config: &Config, config_fix: u
             isr: vsf_usart_isr_t {
                 handler_fn: Some(vsf_usart_on_interrupt),
                 target_ptr: target_ptr,
-                prio: 0,
+                prio: into_vsf_arch_prio_t!(VSF_ARCH_PRIO_INVALID),
             },
         };
         vsf_usart_init(vsf_usart, &mut usart_config);
@@ -437,10 +438,14 @@ fn _vsf_usart_config(vsf_usart: *mut vsf_usart_t, config: &Config, config_fix: u
     Ok(())
 }
 
-fn _vsf_usart_config_and_enable(vsf_usart: *mut vsf_usart_t, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void) -> Result<(), ConfigError> {
-    _vsf_usart_config(vsf_usart, config, config_fix, target_ptr)?;
+fn _vsf_usart_config_and_enable(info: &Info, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void) -> Result<(), ConfigError> {
+    _vsf_usart_config(info, config, config_fix, target_ptr)?;
     unsafe {
+        let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
         vsf_usart_enable(vsf_usart);
+
+        info.interrupt.unpend();
+        info.interrupt.enable();
     }
     Ok(())
 }
@@ -531,8 +536,7 @@ impl<'d, T: Instance> Usart<'d, T> {
             }
             mode
         };
-        let vsf_usart = T::info().vsf_usart.load(Ordering::Relaxed);
-        _vsf_usart_config_and_enable(vsf_usart, &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)?;
+        _vsf_usart_config_and_enable(T::info(), &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)?;
 
         Ok(Self {
             tx: UsartTx {
@@ -561,8 +565,7 @@ impl<'d, T: Instance> Usart<'d, T> {
             }
             mode
         };
-        let vsf_usart = T::info().vsf_usart.load(Ordering::Relaxed);
-        _vsf_usart_config(vsf_usart, config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)
+        _vsf_usart_config(T::info(), config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)
     }
 
     /// Split the Usart into the transmitter and receiver parts.
@@ -682,8 +685,7 @@ impl<'d, T: Instance> UsartTx<'d, T> {
             }
             mode
         };
-        let vsf_usart = T::info().vsf_usart.load(Ordering::Relaxed);
-        _vsf_usart_config_and_enable(vsf_usart, &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)?;
+        _vsf_usart_config_and_enable(T::info(), &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)?;
 
         Ok(Self {
             _p: usart,
@@ -705,8 +707,7 @@ impl<'d, T: Instance> UsartTx<'d, T> {
             }
             mode
         };
-        let vsf_usart = T::info().vsf_usart.load(Ordering::Relaxed);
-        _vsf_usart_config(vsf_usart, config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)
+        _vsf_usart_config(T::info(), config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)
     }
 
     /// Write all bytes in the buffer.
@@ -716,7 +717,6 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         }
 
         let s: &State = T::state();
-        s.tx_irq_mask.store(0, Ordering::Release);
         compiler_fence(Ordering::SeqCst);
 
         unsafe {
@@ -731,7 +731,7 @@ impl<'d, T: Instance> UsartTx<'d, T> {
 
         poll_fn(|cx| {
             s.tx_waker.register(cx.waker());
-            if s.tx_irq_mask.load(Ordering::Acquire) & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL) != 0 {
+            if s.tx_irq_mask.swap(0, Ordering::Relaxed) & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL) != 0 {
                 return Poll::Ready(());
             }
             Poll::Pending
@@ -753,7 +753,6 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         }
 
         let s: &State = T::state();
-        s.tx_irq_mask.store(0, Ordering::Release);
         compiler_fence(Ordering::SeqCst);
 
         unsafe {
@@ -766,7 +765,7 @@ impl<'d, T: Instance> UsartTx<'d, T> {
             vsf_usart_request_tx(vsf_usart, ptr as *mut ::core::ffi::c_void, len as uint_fast32_t);
         }
 
-        while s.tx_irq_mask.load(Ordering::Acquire) & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL) == 0 {}
+        while s.tx_irq_mask.swap(0, Ordering::Relaxed) & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL) == 0 {}
         Ok(())
     }
 
@@ -871,8 +870,7 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             }
             mode
         };
-        let vsf_usart = T::info().vsf_usart.load(Ordering::Relaxed);
-        _vsf_usart_config_and_enable(vsf_usart, &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)?;
+        _vsf_usart_config_and_enable(T::info(), &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)?;
 
         Ok(Self { _p: usart })
     }
@@ -890,8 +888,7 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             }
             mode
         };
-        let vsf_usart = T::info().vsf_usart.load(Ordering::Relaxed);
-        _vsf_usart_config(vsf_usart, config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)
+        _vsf_usart_config(T::info(), config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)
     }
 
     /// Read bytes until the buffer is filled.
@@ -901,8 +898,7 @@ impl<'d, T: Instance> UsartRx<'d, T> {
         }
 
         let s: &State = T::state();
-        s.rx_irq_mask.store(0, Ordering::Release);
-        s.rx_exit_on_idle.store(false, Ordering::Release);
+        s.rx_exit_on_idle.store(false, Ordering::Relaxed);
         compiler_fence(Ordering::SeqCst);
 
         unsafe {
@@ -917,25 +913,25 @@ impl<'d, T: Instance> UsartRx<'d, T> {
 
         let result = poll_fn(|cx| {
             s.rx_waker.register(cx.waker());
-            let irq_mask = s.rx_irq_mask.load(Ordering::Acquire);
+            let rx_irq_mask = s.rx_irq_mask.swap(0, Ordering::Relaxed);
 
             #[cfg(VSF_USART_IRQ_MASK_FRAME_ERR)]
-            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
+            if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
                 return Poll::Ready(Err(Error::Framing));
             }
             #[cfg(VSF_USART_IRQ_MASK_PARITY_ERR)]
-            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) != 0 {
+            if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) != 0 {
                 return Poll::Ready(Err(Error::Parity));
             }
             #[cfg(VSF_USART_IRQ_MASK_BREAK_ERR)]
-            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) != 0 {
+            if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) != 0 {
                 return Poll::Ready(Err(Error::Break));
             }
             #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
-            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
+            if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
                 return Poll::Ready(Err(Error::RxOverrun));
             }
-            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) != 0 {
+            if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) != 0 {
                 return Poll::Ready(Ok(()));
             }
             Poll::Pending
@@ -950,8 +946,7 @@ impl<'d, T: Instance> UsartRx<'d, T> {
         }
 
         let s: &State = T::state();
-        s.rx_irq_mask.store(0, Ordering::Release);
-        s.rx_exit_on_idle.store(false, Ordering::Release);
+        s.rx_exit_on_idle.store(false, Ordering::Relaxed);
         compiler_fence(Ordering::SeqCst);
 
         unsafe {
@@ -964,23 +959,28 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             vsf_usart_request_rx(vsf_usart, ptr as *mut ::core::ffi::c_void, len as uint_fast32_t);
         }
 
-        while s.rx_irq_mask.load(Ordering::Acquire) & (into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | VSF_USART_IRQ_MASK_ERR) == 0 {}
+        let mut rx_irq_mask: u32 = 0;
+        loop {
+            rx_irq_mask = s.rx_irq_mask.swap(0, Ordering::Relaxed);
+            if rx_irq_mask & (into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | VSF_USART_IRQ_MASK_ERR) != 0 {
+                break;
+            }
+        }
 
-        let irq_mask = s.rx_irq_mask.load(Ordering::Acquire);
         #[cfg(VSF_USART_IRQ_MASK_FRAME_ERR)]
-        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
+        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
             return Err(Error::Framing);
         }
         #[cfg(VSF_USART_IRQ_MASK_PARITY_ERR)]
-        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) != 0 {
+        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) != 0 {
             return Err(Error::Parity);
         }
         #[cfg(VSF_USART_IRQ_MASK_BREAK_ERR)]
-        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) != 0 {
+        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) != 0 {
             return Err(Error::Break);
         }
         #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
-        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
+        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
             return Err(Error::RxOverrun);
         }
 //        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) != 0 {
@@ -999,8 +999,7 @@ impl<'d, T: Instance> UsartRx<'d, T> {
         let s: &State = T::state();
         let info = T::info();
         let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
-        s.rx_irq_mask.store(0, Ordering::Release);
-        s.rx_exit_on_idle.store(true, Ordering::Release);
+        s.rx_exit_on_idle.store(true, Ordering::Relaxed);
         compiler_fence(Ordering::SeqCst);
 
         let irq_mask = VSF_USART_IRQ_MASK_ERR | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_IDLE);
@@ -1015,7 +1014,7 @@ impl<'d, T: Instance> UsartRx<'d, T> {
         let result = poll_fn(|cx| {
             s.rx_waker.register(cx.waker());
 
-            let irq_mask = s.rx_irq_mask.load(Ordering::Acquire);
+            let irq_mask = s.rx_irq_mask.swap(0, Ordering::Relaxed);
             #[cfg(VSF_USART_IRQ_MASK_FRAME_ERR)]
             if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
                 return Poll::Ready(Err(Error::Framing));
@@ -1056,8 +1055,7 @@ impl<'d, T: Instance> UsartRx<'d, T> {
         let s: &State = T::state();
         let info = T::info();
         let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
-        s.rx_irq_mask.store(0, Ordering::Release);
-        s.rx_exit_on_idle.store(true, Ordering::Release);
+        s.rx_exit_on_idle.store(true, Ordering::Relaxed);
         compiler_fence(Ordering::SeqCst);
 
         let irq_mask = VSF_USART_IRQ_MASK_ERR | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_IDLE);
@@ -1069,23 +1067,28 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             vsf_usart_request_rx(vsf_usart, ptr as *mut ::core::ffi::c_void, len as uint_fast32_t);
         }
 
-        while s.rx_irq_mask.load(Ordering::Acquire) & irq_mask == 0 {}
+        let mut rx_irq_mask: u32 = 0;
+        loop {
+            rx_irq_mask = s.rx_irq_mask.swap(0, Ordering::Relaxed);
+            if rx_irq_mask & irq_mask != 0 {
+                break;
+            }
+        }
 
-        let irq_mask = s.rx_irq_mask.load(Ordering::Acquire);
         #[cfg(VSF_USART_IRQ_MASK_FRAME_ERR)]
-        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
+        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
             return Err(Error::Framing);
         }
         #[cfg(VSF_USART_IRQ_MASK_PARITY_ERR)]
-        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) != 0 {
+        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) != 0 {
             return Err(Error::Parity);
         }
         #[cfg(VSF_USART_IRQ_MASK_BREAK_ERR)]
-        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) != 0 {
+        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) != 0 {
             return Err(Error::Break);
         }
         #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
-        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
+        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
             return Err(Error::RxOverrun);
         }
         Ok(unsafe { vsf_usart_get_rx_count(vsf_usart) as usize })
@@ -1210,7 +1213,7 @@ mod _embedded_io {
                 Error::Parity => embedded_io_async::ErrorKind::InvalidData,
                 #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
                 Error::RxOverrun => embedded_io_async::ErrorKind::OutOfMemory,
-                #[cfg(VSF_USART_IRQ_MASK_RX_BREAK_ERR)]
+                #[cfg(VSF_USART_IRQ_MASK_BREAK_ERR)]
                 Error::Break => embedded_io_async::ErrorKind::ConnectionAborted,
             }
         }
