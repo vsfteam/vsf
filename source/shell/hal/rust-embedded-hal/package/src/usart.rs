@@ -411,7 +411,7 @@ impl<'d, T: Instance> SetConfig for Usart<'d, T> {
 ///
 /// This can be obtained via [`Usart::split`], or created directly.
 pub struct UsartTx<'d, T: Instance> {
-    _p: Peri<'d, T>,
+    p: Peri<'d, T>,
     info: &'static Info,
     state: &'static State,
 }
@@ -429,7 +429,7 @@ impl<'d, T: Instance> SetConfig for UsartTx<'d, T> {
 ///
 /// This can be obtained via [`Usart::split`], or created directly.
 pub struct UsartRx<'d, T: Instance> {
-    _p: Peri<'d, T>,
+    p: Peri<'d, T>,
     info: &'static Info,
     state: &'static State,
 }
@@ -444,21 +444,23 @@ impl<'d, T: Instance> SetConfig for UsartRx<'d, T> {
 }
 
 /// Buffered UART driver.
-pub struct BufferedUsart {
-    rx: BufferedUsartRx,
-    tx: BufferedUsartTx,
+pub struct BufferedUsart<'d, T: Instance> {
+    rx: BufferedUsartRx<'d, T>,
+    tx: BufferedUsartTx<'d, T>,
 }
 
 /// Buffered UART RX handle.
-pub struct BufferedUsartRx {
-    _info: &'static Info,
+pub struct BufferedUsartRx<'d, T: Instance> {
+    p: Peri<'d, T>,
+    info: &'static Info,
     state: &'static State,
     buffered_state: &'static BufferedState,
 }
 
 /// Buffered UART TX handle.
-pub struct BufferedUsartTx {
-    _info: &'static Info,
+pub struct BufferedUsartTx<'d, T: Instance> {
+    p: Peri<'d, T>,
+    info: &'static Info,
     state: &'static State,
     buffered_state: &'static BufferedState,
 }
@@ -641,12 +643,12 @@ impl<'d, T: Instance> Usart<'d, T> {
 
         Ok(Self {
             tx: UsartTx {
-                _p: unsafe { usart.clone_unchecked() },
+                p: unsafe { usart.clone_unchecked() },
                 info: info,
                 state: s,
             },
             rx: UsartRx {
-                _p: usart,
+                p: usart,
                 info: info,
                 state: s,
             },
@@ -657,7 +659,7 @@ impl<'d, T: Instance> Usart<'d, T> {
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
         tx_buffer: &'d mut [u8],
         rx_buffer: &'d mut [u8],
-    ) -> BufferedUsart {
+    ) -> BufferedUsart<'d, T> {
         let info = T::info();
         let s = T::state();
         let bs = T::buffered_state();
@@ -683,12 +685,14 @@ impl<'d, T: Instance> Usart<'d, T> {
 
         BufferedUsart {
             rx: BufferedUsartRx {
-                _info: info,
+                p: unsafe { self.rx.p.clone_unchecked() },
+                info: info,
                 state: s,
                 buffered_state: bs,
             },
             tx: BufferedUsartTx {
-                _info: info,
+                p: unsafe { self.tx.p.clone_unchecked() },
+                info: info,
                 state: s,
                 buffered_state: bs,
             },
@@ -839,7 +843,7 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
 
         Ok(Self {
-            _p: usart,
+            p: usart,
             info: info,
             state: s,
         })
@@ -848,7 +852,7 @@ impl<'d, T: Instance> UsartTx<'d, T> {
     pub fn into_buffered(self, 
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
         tx_buffer: &'d mut [u8],
-    ) -> BufferedUsartTx {
+    ) -> BufferedUsartTx<'d, T> {
         let info = self.info;
         let bs = T::buffered_state();
 
@@ -866,7 +870,8 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         }
 
         BufferedUsartTx {
-            _info: info,
+            p: unsafe { self.p.clone_unchecked() },
+            info: info,
             state: T::state(),
             buffered_state: bs,
         }
@@ -1057,7 +1062,7 @@ impl<'d, T: Instance> UsartRx<'d, T> {
         _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
 
         Ok(Self {
-            _p: usart,
+            p: usart,
             info: info,
             state: s,
         })
@@ -1066,7 +1071,7 @@ impl<'d, T: Instance> UsartRx<'d, T> {
     pub fn into_buffered(self, 
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
         rx_buffer: &'d mut [u8],
-    ) -> BufferedUsartRx {
+    ) -> BufferedUsartRx<'d, T> {
         let info = self.info;
         let bs = T::buffered_state();
 
@@ -1084,7 +1089,8 @@ impl<'d, T: Instance> UsartRx<'d, T> {
         }
 
         BufferedUsartRx {
-            _info: info,
+            p: unsafe { self.p.clone_unchecked() },
+            info: info,
             state: T::state(),
             buffered_state: bs,
         }
@@ -1261,7 +1267,24 @@ impl<'a, T: Instance> Drop for UsartRx<'a, T> {
     }
 }
 
-impl BufferedUsart {
+impl<'d, T: Instance> BufferedUsart<'d, T> {
+    pub fn into_normal(self, 
+        _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
+    ) -> Usart<'d, T> {
+        Usart {
+            tx: UsartTx {
+                p: unsafe { self.tx.p.clone_unchecked() },
+                info: self.tx.info,
+                state: self.tx.state,
+            },
+            rx: UsartRx {
+                p: unsafe { self.rx.p.clone_unchecked() },
+                info: self.rx.info,
+                state: self.rx.state,
+            },
+        }
+    }
+
     /// Write to UART TX buffer blocking execution until done.
     pub fn blocking_write(&mut self, buffer: &[u8]) -> Result<usize, Error> {
         self.tx.blocking_write(buffer)
@@ -1273,25 +1296,35 @@ impl BufferedUsart {
     }
 
     /// Read from UART RX buffer blocking execution until done.
-    pub fn blocking_read(&mut self, buffer: &mut [u8]) -> Result<usize, Error> {
+    pub fn blocking_read(&mut self, buffer: &'d mut [u8]) -> Result<usize, Error> {
         self.rx.blocking_read(buffer)
     }
 
     /// Split into separate RX and TX handles.
-    pub fn split(self) -> (BufferedUsartTx, BufferedUsartRx) {
+    pub fn split(self) -> (BufferedUsartTx<'d, T>, BufferedUsartRx<'d, T>) {
         (self.tx, self.rx)
     }
 
     /// Split the Uart into a transmitter and receiver by mutable reference,
     /// which is particularly useful when having two tasks correlating to
     /// transmitting and receiving.
-    pub fn split_ref(&mut self) -> (&mut BufferedUsartTx, &mut BufferedUsartRx) {
+    pub fn split_ref(&mut self) -> (&mut BufferedUsartTx<'d, T>, &mut BufferedUsartRx<'d, T>) {
         (&mut self.tx, &mut self.rx)
     }
 }
 
-impl BufferedUsartRx {
-    async fn read<'d>(&self, buffer: &'d mut [u8]) -> impl Future<Output = Result<usize, Error>> + 'd {
+impl<'d, T: Instance> BufferedUsartRx<'d, T> {
+    pub fn into_normal(self, 
+        _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
+    ) -> UsartRx<'d, T> {
+        UsartRx {
+            p: unsafe { self.p.clone_unchecked() },
+            info: self.info,
+            state: self.state,
+        }
+    }
+
+    async fn read(&self, buffer: &'d mut [u8]) -> impl Future<Output = Result<usize, Error>> + 'd {
         let s = self.buffered_state;
         let usart_stream = s.usart_stream.load(Ordering::Relaxed);
         let stream_rx = unsafe { &((*usart_stream).stream_rx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
@@ -1311,7 +1344,7 @@ impl BufferedUsartRx {
     }
 
     /// Read from UART RX buffer blocking execution until done.
-    pub fn blocking_read<'d>(&mut self, buffer: &'d mut [u8]) -> Result<usize, Error> {
+    pub fn blocking_read(&mut self, buffer: &'d mut [u8]) -> Result<usize, Error> {
         let s = self.buffered_state;
         let usart_stream = s.usart_stream.load(Ordering::Relaxed);
         let stream_rx = unsafe { &((*usart_stream).stream_rx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
@@ -1330,7 +1363,7 @@ impl BufferedUsartRx {
         }}
     }
 
-    async fn fill_buf<'d>(&self) -> impl Future<Output = Result<&'d [u8], Error>> {
+    async fn fill_buf(&self) -> impl Future<Output = Result<&'d [u8], Error>> {
         let s = self.buffered_state;
         let usart_stream = s.usart_stream.load(Ordering::Relaxed);
         let stream_rx = unsafe { &((*usart_stream).stream_rx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
@@ -1368,8 +1401,18 @@ impl BufferedUsartRx {
     }
 }
 
-impl BufferedUsartTx {
-    async fn write<'d>(&self, buffer: &'d [u8]) -> impl Future<Output = Result<usize, Error>> + 'd {
+impl<'d, T: Instance> BufferedUsartTx<'d, T> {
+    pub fn into_normal(self, 
+        _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
+    ) -> UsartTx<'d, T> {
+        UsartTx {
+            p: unsafe { self.p.clone_unchecked() },
+            info: self.info,
+            state: self.state,
+        }
+    }
+
+    async fn write(&self, buffer: &'d [u8]) -> impl Future<Output = Result<usize, Error>> + 'd {
         let s = self.buffered_state;
         let usart_stream = s.usart_stream.load(Ordering::Relaxed);
         let stream_tx = unsafe { &((*usart_stream).stream_tx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
@@ -1401,7 +1444,7 @@ impl BufferedUsartTx {
         })
     }
 
-    fn blocking_write<'d>(&self, buffer: &'d [u8]) -> Result<usize, Error> {
+    fn blocking_write(&self, buffer: &'d [u8]) -> Result<usize, Error> {
         let s = self.buffered_state;
         let usart_stream = s.usart_stream.load(Ordering::Relaxed);
         let stream_tx = unsafe { &((*usart_stream).stream_tx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
