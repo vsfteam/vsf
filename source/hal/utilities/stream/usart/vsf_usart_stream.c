@@ -100,7 +100,7 @@ static void vsf_usart_stream_isrhandler(void *target, vsf_usart_t *usart, vsf_us
         __vsf_usart_stream_tx(usart_stream, vsf_protect_int());
     }
     if ((irq_mask & VSF_USART_IRQ_MASK_ERR) && (usart_stream->on_error)) {
-        usart_stream->on_error(usart_stream, irq_mask);
+        usart_stream->on_error(usart_stream->target, usart_stream, irq_mask);
     }
 }
 
