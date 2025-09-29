@@ -12,12 +12,15 @@
 //! methods.
 
 #![macro_use]
+#![allow(non_upper_case_globals)]
+#![allow(dead_code)]
 
 use core::future::poll_fn;
 use core::marker::PhantomData;
 use core::sync::atomic::{compiler_fence, Ordering, AtomicPtr, AtomicBool, AtomicU32};
 use core::task::Poll;
 use core::ptr;
+use core::slice;
 use paste::paste;
 
 use embassy_embedded_hal::SetConfig;
@@ -302,8 +305,18 @@ impl core::fmt::Display for Error {
 pub struct InterruptHandler<T: Instance> {
     _phantom: PhantomData<T>,
 }
+pub struct BufferedInterruptHandler<T: Instance> {
+    _uart: PhantomData<T>,
+}
 
 impl<T: Instance> interrupt::typelevel::Handler<T::Interrupt> for InterruptHandler<T> {
+    unsafe fn on_interrupt() {
+        unsafe {
+            (T::info().vsf_usart_irqhandler)();
+        }
+    }
+}
+impl<T: Instance> interrupt::typelevel::Handler<T::Interrupt> for BufferedInterruptHandler<T> {
     unsafe fn on_interrupt() {
         unsafe {
             (T::info().vsf_usart_irqhandler)();
@@ -339,6 +352,43 @@ unsafe extern "C" fn vsf_usart_on_interrupt(
         }
         s.tx_irq_mask.fetch_or(tx_irq_mask, Ordering::Relaxed);
         s.tx_waker.wake();
+    }
+}
+
+unsafe extern "C" fn vsf_usart_stream_on_error(
+    target: *mut ::core::ffi::c_void,
+    _stream: *mut vsf_usart_stream_t,
+    irq_mask_err: vsf_usart_irq_mask_t,
+) {
+    let s = unsafe { &*(target as *const BufferedState) };
+    s.rx_irq_mask.store(irq_mask_err, Ordering::Relaxed);
+}
+
+unsafe extern "C" fn vsf_usart_stream_rx_evthandler(
+    _stream: *mut vsf_stream_t,
+    param: *mut ::core::ffi::c_void,
+    evt: vsf_stream_evt_t,
+) {
+    let s = unsafe { &*(param as *const BufferedState) };
+    match evt {
+        into_vsf_stream_evt_t!(VSF_STREAM_ON_CONNECT) => s.rx_waker.wake(),
+        into_vsf_stream_evt_t!(VSF_STREAM_ON_DISCONNECT) => s.rx_waker.wake(),
+        into_vsf_stream_evt_t!(VSF_STREAM_ON_IN) => s.rx_waker.wake(),
+        _ => (),
+    }
+}
+
+unsafe extern "C" fn vsf_usart_stream_tx_evthandler(
+    _stream: *mut vsf_stream_t,
+    param: *mut ::core::ffi::c_void,
+    evt: vsf_stream_evt_t,
+) {
+    let s = unsafe { &*(param as *const BufferedState) };
+    match evt {
+        into_vsf_stream_evt_t!(VSF_STREAM_ON_CONNECT) => s.tx_waker.wake(),
+        into_vsf_stream_evt_t!(VSF_STREAM_ON_DISCONNECT) => s.tx_waker.wake(),
+        into_vsf_stream_evt_t!(VSF_STREAM_ON_OUT) => s.tx_waker.wake(),
+        _ => (),
     }
 }
 
@@ -391,10 +441,28 @@ impl<'d, T: Instance> SetConfig for UsartRx<'d, T> {
     }
 }
 
+/// Buffered UART driver.
+pub struct BufferedUsart {
+    rx: BufferedUsartRx,
+    tx: BufferedUsartTx,
+}
+
+/// Buffered UART RX handle.
+pub struct BufferedUsartRx {
+    _info: &'static Info,
+    state: &'static BufferedState,
+}
+
+/// Buffered UART TX handle.
+pub struct BufferedUsartTx {
+    _info: &'static Info,
+    state: &'static BufferedState,
+}
+
 /// Configure vsf_usart.
 /// 
 /// config_fix is set by caller with Tx/Rx related configurations
-fn _vsf_usart_config(info: &Info, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void) -> Result<(), ConfigError> {
+fn _vsf_usart_config(info: &Info, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void, irqhandler: vsf_usart_isr_handler_t) -> Result<(), ConfigError> {
     unsafe {
         let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
         let cap = vsf_usart_capability(vsf_usart);
@@ -428,7 +496,7 @@ fn _vsf_usart_config(info: &Info, config: &Config, config_fix: u32, target_ptr: 
             rx_idle_cnt: config.rx_idle_cnt,
 
             isr: vsf_usart_isr_t {
-                handler_fn: Some(vsf_usart_on_interrupt),
+                handler_fn: irqhandler,
                 target_ptr: target_ptr,
                 prio: into_vsf_arch_prio_t!(VSF_ARCH_PRIO_INVALID),
             },
@@ -438,8 +506,8 @@ fn _vsf_usart_config(info: &Info, config: &Config, config_fix: u32, target_ptr: 
     Ok(())
 }
 
-fn _vsf_usart_config_and_enable(info: &Info, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void) -> Result<(), ConfigError> {
-    _vsf_usart_config(info, config, config_fix, target_ptr)?;
+fn _vsf_usart_config_and_enable(info: &Info, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void, irqhandler: vsf_usart_isr_handler_t) -> Result<(), ConfigError> {
+    _vsf_usart_config(info, config, config_fix, target_ptr, irqhandler)?;
     unsafe {
         let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
         vsf_usart_enable(vsf_usart);
@@ -447,6 +515,31 @@ fn _vsf_usart_config_and_enable(info: &Info, config: &Config, config_fix: u32, t
         info.interrupt.unpend();
         info.interrupt.enable();
     }
+    Ok(())
+}
+
+fn _vsf_usart_check_error(irq_mask: vsf_usart_irq_mask_t) -> Result<(), Error> {
+    #[cfg(VSF_USART_IRQ_MASK_FRAME_ERR)]
+    if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
+        return Err(Error::Framing);
+    }
+    #[cfg(VSF_USART_IRQ_MASK_PARITY_ERR)]
+    if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) != 0 {
+        return Err(Error::Parity);
+    }
+    #[cfg(VSF_USART_IRQ_MASK_BREAK_ERR)]
+    if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) != 0 {
+        return Err(Error::Break);
+    }
+    #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
+    if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
+        return Err(Error::RxOverrun);
+    }
+    #[cfg(VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR)]
+    if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR) != 0 {
+        return Err(Error::TxOverrun);
+    }
+
     Ok(())
 }
 
@@ -536,7 +629,7 @@ impl<'d, T: Instance> Usart<'d, T> {
             }
             mode
         };
-        _vsf_usart_config_and_enable(T::info(), &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)?;
+        _vsf_usart_config_and_enable(T::info(), &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
 
         Ok(Self {
             tx: UsartTx {
@@ -546,6 +639,45 @@ impl<'d, T: Instance> Usart<'d, T> {
             },
             rx: UsartRx { _p: usart },
         })
+    }
+
+    pub fn into_buffered(self, 
+        _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
+        tx_buffer: &'d mut [u8],
+        rx_buffer: &'d mut [u8],
+    ) -> BufferedUsart {
+        let info = T::info();
+        let s = T::buffered_state();
+
+        s.usart_stream.store(&s._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
+        let usart_stream = &s._usart_stream_instance as *const UsartStream as *mut UsartStream;
+        unsafe {
+            (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
+            (*usart_stream).usart_stream.target = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
+
+            (*usart_stream).usart_stream.stream_rx = &s._usart_stream_instance.stream_rx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
+            (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.param = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
+            (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.evthandler = Some(vsf_usart_stream_rx_evthandler);
+            (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = rx_buffer.as_mut_ptr();
+            (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = rx_buffer.len() as u32;
+
+            (*usart_stream).usart_stream.stream_tx = &s._usart_stream_instance.stream_tx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
+            (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.param = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
+            (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.evthandler = Some(vsf_usart_stream_tx_evthandler);
+            (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = tx_buffer.as_mut_ptr();
+            (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = tx_buffer.len() as u32;
+        }
+
+        BufferedUsart {
+            rx: BufferedUsartRx {
+                _info: info,
+                state: s,
+            },
+            tx: BufferedUsartTx {
+                _info: info,
+                state: s,
+            },
+        }
     }
 
     /// Set configuration
@@ -565,7 +697,7 @@ impl<'d, T: Instance> Usart<'d, T> {
             }
             mode
         };
-        _vsf_usart_config(T::info(), config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)
+        _vsf_usart_config(T::info(), config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
     }
 
     /// Split the Usart into the transmitter and receiver parts.
@@ -685,13 +817,39 @@ impl<'d, T: Instance> UsartTx<'d, T> {
             }
             mode
         };
-        _vsf_usart_config_and_enable(T::info(), &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)?;
+        _vsf_usart_config_and_enable(T::info(), &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
 
         Ok(Self {
             _p: usart,
             #[cfg(all(not(VSF_USART_CTRL_SEND_BREAK), all(VSF_USART_CTRL_SET_BREAK, VSF_USART_CTRL_CLEAR_BREAK)))]
             baudrate: config.baudrate,
         })
+    }
+
+    pub fn into_buffered(self, 
+        _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
+        tx_buffer: &'d mut [u8],
+    ) -> BufferedUsartTx {
+        let info = T::info();
+        let s = T::buffered_state();
+
+        s.usart_stream.store(&s._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
+        let usart_stream = &s._usart_stream_instance as *const UsartStream as *mut UsartStream;
+        unsafe {
+            (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
+            (*usart_stream).usart_stream.target = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
+
+            (*usart_stream).usart_stream.stream_tx = &s._usart_stream_instance.stream_tx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
+            (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.param = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
+            (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.evthandler = Some(vsf_usart_stream_tx_evthandler);
+            (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = tx_buffer.as_mut_ptr();
+            (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = tx_buffer.len() as u32;
+        }
+
+        BufferedUsartTx {
+            _info: info,
+            state: s,
+        }
     }
 
     /// Set configuration
@@ -707,7 +865,7 @@ impl<'d, T: Instance> UsartTx<'d, T> {
             }
             mode
         };
-        _vsf_usart_config(T::info(), config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)
+        _vsf_usart_config(T::info(), config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
     }
 
     /// Write all bytes in the buffer.
@@ -870,9 +1028,35 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             }
             mode
         };
-        _vsf_usart_config_and_enable(T::info(), &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)?;
+        _vsf_usart_config_and_enable(T::info(), &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
 
         Ok(Self { _p: usart })
+    }
+
+    pub fn into_buffered(self, 
+        _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
+        rx_buffer: &'d mut [u8],
+    ) -> BufferedUsartRx {
+        let info = T::info();
+        let s = T::buffered_state();
+
+        s.usart_stream.store(&s._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
+        let usart_stream = &s._usart_stream_instance as *const UsartStream as *mut UsartStream;
+        unsafe {
+            (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
+            (*usart_stream).usart_stream.target = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
+
+            (*usart_stream).usart_stream.stream_rx = &s._usart_stream_instance.stream_rx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
+            (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.param = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
+            (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.evthandler = Some(vsf_usart_stream_rx_evthandler);
+            (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = rx_buffer.as_mut_ptr();
+            (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = rx_buffer.len() as u32;
+        }
+
+        BufferedUsartRx {
+            _info: info,
+            state: s,
+        }
     }
 
     /// Set configuration
@@ -888,7 +1072,7 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             }
             mode
         };
-        _vsf_usart_config(T::info(), config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void)
+        _vsf_usart_config(T::info(), config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
     }
 
     /// Read bytes until the buffer is filled.
@@ -914,24 +1098,9 @@ impl<'d, T: Instance> UsartRx<'d, T> {
         let result = poll_fn(|cx| {
             s.rx_waker.register(cx.waker());
             let rx_irq_mask = s.rx_irq_mask.swap(0, Ordering::Relaxed);
-
-            #[cfg(VSF_USART_IRQ_MASK_FRAME_ERR)]
-            if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
-                return Poll::Ready(Err(Error::Framing));
-            }
-            #[cfg(VSF_USART_IRQ_MASK_PARITY_ERR)]
-            if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) != 0 {
-                return Poll::Ready(Err(Error::Parity));
-            }
-            #[cfg(VSF_USART_IRQ_MASK_BREAK_ERR)]
-            if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) != 0 {
-                return Poll::Ready(Err(Error::Break));
-            }
-            #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
-            if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
-                return Poll::Ready(Err(Error::RxOverrun));
-            }
-            if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) != 0 {
+            if let Err(error) = _vsf_usart_check_error(rx_irq_mask) {
+                return Poll::Ready(Err(error));
+            } else if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) != 0 {
                 return Poll::Ready(Ok(()));
             }
             Poll::Pending
@@ -967,25 +1136,10 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             }
         }
 
-        #[cfg(VSF_USART_IRQ_MASK_FRAME_ERR)]
-        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
-            return Err(Error::Framing);
+        if let Err(error) = _vsf_usart_check_error(rx_irq_mask) {
+            return Err(error);
         }
-        #[cfg(VSF_USART_IRQ_MASK_PARITY_ERR)]
-        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) != 0 {
-            return Err(Error::Parity);
-        }
-        #[cfg(VSF_USART_IRQ_MASK_BREAK_ERR)]
-        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) != 0 {
-            return Err(Error::Break);
-        }
-        #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
-        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
-            return Err(Error::RxOverrun);
-        }
-//        if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) != 0 {
-            return Ok(());
-//        }
+        return Ok(());
     }
 
     /// Read bytes until the buffer is filled, or the line becomes idle.
@@ -1014,24 +1168,10 @@ impl<'d, T: Instance> UsartRx<'d, T> {
         let result = poll_fn(|cx| {
             s.rx_waker.register(cx.waker());
 
-            let irq_mask = s.rx_irq_mask.swap(0, Ordering::Relaxed);
-            #[cfg(VSF_USART_IRQ_MASK_FRAME_ERR)]
-            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
-                return Poll::Ready(Err(Error::Framing));
-            }
-            #[cfg(VSF_USART_IRQ_MASK_PARITY_ERR)]
-            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) != 0 {
-                return Poll::Ready(Err(Error::Parity));
-            }
-            #[cfg(VSF_USART_IRQ_MASK_BREAK_ERR)]
-            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) != 0 {
-                return Poll::Ready(Err(Error::Break));
-            }
-            #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
-            if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
-                return Poll::Ready(Err(Error::RxOverrun));
-            }
-            if irq_mask & (into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_IDLE)) != 0 {
+            let rx_irq_mask = s.rx_irq_mask.swap(0, Ordering::Relaxed);
+            if let Err(error) = _vsf_usart_check_error(rx_irq_mask) {
+                return Poll::Ready(Err(error));
+            } else if rx_irq_mask & (into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_IDLE)) != 0 {
                 return Poll::Ready(Ok(()));
             }
 
@@ -1075,21 +1215,8 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             }
         }
 
-        #[cfg(VSF_USART_IRQ_MASK_FRAME_ERR)]
-        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_FRAME_ERR) != 0 {
-            return Err(Error::Framing);
-        }
-        #[cfg(VSF_USART_IRQ_MASK_PARITY_ERR)]
-        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_PARITY_ERR) != 0 {
-            return Err(Error::Parity);
-        }
-        #[cfg(VSF_USART_IRQ_MASK_BREAK_ERR)]
-        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_BREAK_ERR) != 0 {
-            return Err(Error::Break);
-        }
-        #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
-        if rx_irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
-            return Err(Error::RxOverrun);
+        if let Err(error) = _vsf_usart_check_error(rx_irq_mask) {
+            return Err(error);
         }
         Ok(unsafe { vsf_usart_get_rx_count(vsf_usart) as usize })
     }
@@ -1098,6 +1225,174 @@ impl<'d, T: Instance> UsartRx<'d, T> {
 impl<'a, T: Instance> Drop for UsartRx<'a, T> {
     fn drop(&mut self) {
         // TODO
+    }
+}
+
+impl BufferedUsart {
+    /// Write to UART TX buffer blocking execution until done.
+    pub fn blocking_write(&mut self, buffer: &[u8]) -> Result<usize, Error> {
+        self.tx.blocking_write(buffer)
+    }
+
+    /// Flush UART TX blocking execution until done.
+    pub fn blocking_flush(&mut self) -> Result<(), Error> {
+        self.tx.blocking_flush()
+    }
+
+    /// Read from UART RX buffer blocking execution until done.
+    pub fn blocking_read(&mut self, buffer: &mut [u8]) -> Result<usize, Error> {
+        self.rx.blocking_read(buffer)
+    }
+
+    /// Split into separate RX and TX handles.
+    pub fn split(self) -> (BufferedUsartTx, BufferedUsartRx) {
+        (self.tx, self.rx)
+    }
+
+    /// Split the Uart into a transmitter and receiver by mutable reference,
+    /// which is particularly useful when having two tasks correlating to
+    /// transmitting and receiving.
+    pub fn split_ref(&mut self) -> (&mut BufferedUsartTx, &mut BufferedUsartRx) {
+        (&mut self.tx, &mut self.rx)
+    }
+}
+
+impl BufferedUsartRx {
+    async fn read<'d>(&self, buffer: &'d mut [u8]) -> impl Future<Output = Result<usize, Error>> + 'd {
+        let s = self.state;
+        let usart_stream = s.usart_stream.load(Ordering::Relaxed);
+        let stream_rx = unsafe { &((*usart_stream).stream_rx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
+
+        poll_fn(move |cx| {
+            let n = unsafe { vsf_stream_read(stream_rx, buffer.as_mut_ptr(), buffer.len() as u32) };
+            if n == 0 {
+                let rx_irq_mask = (*s).rx_irq_mask.load(Ordering::Relaxed);
+                return match _vsf_usart_check_error(rx_irq_mask) {
+                    Err(e) => Poll::Ready(Err(e)),
+                    Ok(()) => { s.rx_waker.register(cx.waker()); Poll::Pending },
+                }
+            } else {
+                Poll::Ready(Ok(n as usize))
+            }
+        })
+    }
+
+    /// Read from UART RX buffer blocking execution until done.
+    pub fn blocking_read<'d>(&mut self, buffer: &'d mut [u8]) -> Result<usize, Error> {
+        let s = self.state;
+        let usart_stream = s.usart_stream.load(Ordering::Relaxed);
+        let stream_rx = unsafe { &((*usart_stream).stream_rx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
+
+        loop { unsafe {
+            let n = vsf_stream_read(stream_rx, buffer.as_mut_ptr(), buffer.len() as u32);
+            if n == 0 {
+                let rx_irq_mask = s.rx_irq_mask.load(Ordering::Relaxed);
+                match _vsf_usart_check_error(rx_irq_mask) {
+                    Err(e) => return Err(e),
+                    Ok(()) => continue,
+                }
+            } else {
+                return Ok(n as usize);
+            }
+        }}
+    }
+
+    async fn fill_buf<'d>(&self) -> impl Future<Output = Result<&'d [u8], Error>> {
+        let s = self.state;
+        let usart_stream = s.usart_stream.load(Ordering::Relaxed);
+        let stream_rx = unsafe { &((*usart_stream).stream_rx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
+
+        poll_fn(move |cx| {
+            let mut ptr: *mut u8 = ptr::null_mut();
+            let n = unsafe { vsf_stream_get_rbuf(stream_rx, &mut ptr) };
+            if n == 0 {
+                let rx_irq_mask = s.rx_irq_mask.load(Ordering::Relaxed);
+                return match _vsf_usart_check_error(rx_irq_mask) {
+                    Err(e) => Poll::Ready(Err(e)),
+                    Ok(()) => { s.rx_waker.register(cx.waker()); Poll::Pending },
+                }
+            } else {
+                let buf = unsafe { slice::from_raw_parts(ptr, n as usize) };
+                return Poll::Ready(Ok(buf));
+            }
+        })
+    }
+
+    fn consume(&self, amt: usize) {
+        let s = self.state;
+        let usart_stream = s.usart_stream.load(Ordering::Relaxed);
+        let stream_rx = unsafe { &((*usart_stream).stream_rx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
+
+        unsafe { vsf_stream_read(stream_rx, ptr::null_mut() as *mut u8, amt as u32); }
+    }
+
+    fn read_ready(&mut self) -> Result<bool, Error> {
+        let s = self.state;
+        let usart_stream = s.usart_stream.load(Ordering::Relaxed);
+        let stream_rx = unsafe { &((*usart_stream).stream_rx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
+
+        Ok(unsafe {vsf_stream_get_data_size(stream_rx) > 0 })
+    }
+}
+
+impl BufferedUsartTx {
+    async fn write<'d>(&self, buffer: &'d [u8]) -> impl Future<Output = Result<usize, Error>> + 'd {
+        let s = self.state;
+        let usart_stream = s.usart_stream.load(Ordering::Relaxed);
+        let stream_tx = unsafe { &((*usart_stream).stream_tx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
+
+        poll_fn(move |cx| {
+            let n = unsafe { vsf_stream_write(stream_tx, buffer.as_ptr() as *mut u8, buffer.len() as u32) };
+            if n == 0 {
+                s.tx_waker.register(cx.waker());
+                Poll::Pending
+            } else {
+                Poll::Ready(Ok(n as usize))
+            }
+        })
+    }
+
+    async fn flush(&self) -> impl Future<Output = Result<(), Error>> {
+        let s = self.state;
+        let usart_stream = s.usart_stream.load(Ordering::Relaxed);
+        let stream_tx = unsafe { &((*usart_stream).stream_tx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
+
+        poll_fn(move |cx| {
+            let n = unsafe { vsf_stream_get_data_size(stream_tx) };
+            if n == 0 {
+                Poll::Ready(Ok(()))
+            } else {
+                s.tx_waker.register(cx.waker());
+                Poll::Pending
+            }
+        })
+    }
+
+    fn blocking_write<'d>(&self, buffer: &'d [u8]) -> Result<usize, Error> {
+        let s = self.state;
+        let usart_stream = s.usart_stream.load(Ordering::Relaxed);
+        let stream_tx = unsafe { &((*usart_stream).stream_tx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
+
+        loop { unsafe {
+            let n = vsf_stream_write(stream_tx, buffer.as_ptr() as *mut u8, buffer.len() as u32);
+            if n == 0 {
+                continue;
+            } else {
+                return Ok(n as usize);
+            }
+        }}
+    }
+
+    fn blocking_flush(&self) -> Result<(), Error> {
+        let s = self.state;
+        let usart_stream = s.usart_stream.load(Ordering::Relaxed);
+        let stream_tx = unsafe { &((*usart_stream).stream_tx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
+
+        loop { unsafe {
+            if 0 == vsf_stream_get_data_size(stream_tx) {
+                return Ok(());
+            }
+        }}
     }
 }
 
@@ -1127,9 +1422,124 @@ impl State {
     }
 }
 
+struct UsartStream {
+    usart_stream: vsf_usart_stream_t,
+    stream_rx: vsf_fifo_stream_t,
+    stream_tx: vsf_fifo_stream_t,
+}
+
+impl UsartStream {
+    const fn new() -> Self {
+        Self {
+            usart_stream: vsf_usart_stream_t {
+                usart: 0 as *mut vsf_usart_t,
+                stream_rx: 0 as *mut vsf_stream_t,
+                stream_tx: 0 as *mut vsf_stream_t,
+                target: 0 as *mut ::core::ffi::c_void,
+                on_error: Some(vsf_usart_stream_on_error),
+                tx: vsf_usart_stream_t__bindgen_ty_1 {
+                    size: 0,
+                },
+            },
+            stream_rx: vsf_fifo_stream_t {
+                __bindgen_anon_1: vsf_fifo_stream_t__bindgen_ty_1 {
+                    use_as__vsf_stream_t: vsf_stream_t {
+                        op: unsafe { &vsf_fifo_stream_op as *const vsf_stream_op_t },
+                        is_ticktock_read: false,
+                        is_ticktock_write: false,
+                        __bindgen_anon_1: vsf_stream_t__bindgen_ty_1 {
+                            __bindgen_anon_1: vsf_stream_t__bindgen_ty_1__bindgen_ty_1 {
+                                tx: vsf_stream_terminal_t {
+                                    param: 0 as *mut ::core::ffi::c_void,
+                                    evthandler: None,
+                                    threshold: 0,
+                                    ready: false,
+                                    data_notified: false,
+                                },
+                                rx: vsf_stream_terminal_t {
+                                    param: 0 as *mut ::core::ffi::c_void,
+                                    evthandler: None,
+                                    threshold: 0,
+                                    ready: false,
+                                    data_notified: false,
+                                },
+                            },
+                        },
+                    },
+                },
+                __bindgen_anon_2: vsf_fifo_stream_t__bindgen_ty_2 {
+                    use_as__vsf_byte_fifo_t: vsf_byte_fifo_t {
+                        buffer: 0 as *mut u8,
+                        size: 0,
+                        head: 0,
+                        tail: 0,
+                    },
+                },
+            },
+            stream_tx: vsf_fifo_stream_t {
+                __bindgen_anon_1: vsf_fifo_stream_t__bindgen_ty_1 {
+                    use_as__vsf_stream_t: vsf_stream_t {
+                        op: unsafe{ &vsf_fifo_stream_op as *const vsf_stream_op_t },
+                        is_ticktock_read: false,
+                        is_ticktock_write: false,
+                        __bindgen_anon_1: vsf_stream_t__bindgen_ty_1 {
+                            __bindgen_anon_1: vsf_stream_t__bindgen_ty_1__bindgen_ty_1 {
+                                tx: vsf_stream_terminal_t {
+                                    param: 0 as *mut ::core::ffi::c_void,
+                                    evthandler: None,
+                                    threshold: 0,
+                                    ready: false,
+                                    data_notified: false,
+                                },
+                                rx: vsf_stream_terminal_t {
+                                    param: 0 as *mut ::core::ffi::c_void,
+                                    evthandler: None,
+                                    threshold: 0,
+                                    ready: false,
+                                    data_notified: false,
+                                },
+                            },
+                        },
+                    },
+                },
+                __bindgen_anon_2: vsf_fifo_stream_t__bindgen_ty_2 {
+                    use_as__vsf_byte_fifo_t: vsf_byte_fifo_t {
+                        buffer: 0 as *mut u8,
+                        size: 0,
+                        head: 0,
+                        tail: 0,
+                    },
+                },
+            },
+        }
+    }
+}
+
+struct BufferedState {
+    rx_waker: AtomicWaker,
+    tx_waker: AtomicWaker,
+    rx_irq_mask: AtomicU32,
+    usart_stream: AtomicPtr<UsartStream>,
+    _usart_stream_instance: UsartStream,
+}
+
+unsafe impl Sync for BufferedState {}
+impl BufferedState {
+    const fn new() -> Self {
+        Self {
+            rx_waker: AtomicWaker::new(),
+            tx_waker: AtomicWaker::new(),
+            rx_irq_mask: AtomicU32::new(0),
+            usart_stream: AtomicPtr::new(ptr::null_mut()),
+            _usart_stream_instance: UsartStream::new(),
+        }
+    }
+}
+
 trait SealedInstance {
     fn info() -> &'static Info;
     fn state() -> &'static State;
+    fn buffered_state() -> &'static BufferedState;
 }
 
 /// USART peripheral instance.
@@ -1159,6 +1569,10 @@ macro_rules! impl_usart {
             }
             fn state() -> &'static crate::usart::State {
                 static STATE: crate::usart::State = crate::usart::State::new();
+                &STATE
+            }
+            fn buffered_state() -> &'static crate::usart::BufferedState {
+                static STATE: crate::usart::BufferedState = crate::usart::BufferedState::new();
                 &STATE
             }
         }
