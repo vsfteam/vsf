@@ -412,8 +412,8 @@ impl<'d, T: Instance> SetConfig for Usart<'d, T> {
 /// This can be obtained via [`Usart::split`], or created directly.
 pub struct UsartTx<'d, T: Instance> {
     _p: Peri<'d, T>,
-    #[cfg(all(not(VSF_USART_CTRL_SEND_BREAK), all(VSF_USART_CTRL_SET_BREAK, VSF_USART_CTRL_CLEAR_BREAK)))]
-    baudrate: u32,
+    info: &'static Info,
+    state: &'static State,
 }
 
 impl<'d, T: Instance> SetConfig for UsartTx<'d, T> {
@@ -430,6 +430,8 @@ impl<'d, T: Instance> SetConfig for UsartTx<'d, T> {
 /// This can be obtained via [`Usart::split`], or created directly.
 pub struct UsartRx<'d, T: Instance> {
     _p: Peri<'d, T>,
+    info: &'static Info,
+    state: &'static State,
 }
 
 impl<'d, T: Instance> SetConfig for UsartRx<'d, T> {
@@ -450,19 +452,21 @@ pub struct BufferedUsart {
 /// Buffered UART RX handle.
 pub struct BufferedUsartRx {
     _info: &'static Info,
-    state: &'static BufferedState,
+    state: &'static State,
+    buffered_state: &'static BufferedState,
 }
 
 /// Buffered UART TX handle.
 pub struct BufferedUsartTx {
     _info: &'static Info,
-    state: &'static BufferedState,
+    state: &'static State,
+    buffered_state: &'static BufferedState,
 }
 
 /// Configure vsf_usart.
 /// 
 /// config_fix is set by caller with Tx/Rx related configurations
-fn _vsf_usart_config(info: &Info, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void, irqhandler: vsf_usart_isr_handler_t) -> Result<(), ConfigError> {
+fn _vsf_usart_config(info: &Info, state: &State, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void, irqhandler: vsf_usart_isr_handler_t) -> Result<(), ConfigError> {
     unsafe {
         let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
         let cap = vsf_usart_capability(vsf_usart);
@@ -477,8 +481,11 @@ fn _vsf_usart_config(info: &Info, config: &Config, config_fix: u32, target_ptr: 
             return Err(ConfigError::DatabitsNotSupported);
         }
 
-        let mut usart_config = vsf_usart_cfg_t {
-            mode: config.data_bits as u32 | config.stop_bits as u32 | config.parity as u32 | config.duplex as u32 | config_fix | {
+        let usart_config = &state._config as *const vsf_usart_cfg_t as *mut vsf_usart_cfg_t;
+        state.config.store(&state._config as *const vsf_usart_cfg_t as *mut vsf_usart_cfg_t, Ordering::Relaxed);
+
+        (*usart_config).mode = {
+            config.data_bits as u32 | config.stop_bits as u32 | config.parity as u32 | config.duplex as u32 | config_fix | {
                 let mut mode: u32 = 0;
                 #[cfg(VSF_USART_SWAP)]
                 if config.swap_rx_tx {
@@ -489,25 +496,24 @@ fn _vsf_usart_config(info: &Info, config: &Config, config_fix: u32, target_ptr: 
                     mode |= into_vsf_usart_mode_t!(VSF_USART_SYNC_CLOCK_ENABLE) as u32;
                 }
                 mode
-            },
-            baudrate: config.baudrate,
-            rx_timeout: config.rx_timeout,
-            #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
-            rx_idle_cnt: config.rx_idle_cnt,
-
-            isr: vsf_usart_isr_t {
-                handler_fn: irqhandler,
-                target_ptr: target_ptr,
-                prio: into_vsf_arch_prio_t!(VSF_ARCH_PRIO_INVALID),
-            },
+            }
         };
-        vsf_usart_init(vsf_usart, &mut usart_config);
+        (*usart_config).baudrate = config.baudrate;
+        (*usart_config).rx_timeout = config.rx_timeout;
+        #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
+        {
+            (*usart_config).rx_idle_cnt = config.rx_idle_cnt;
+        }
+        (*usart_config).isr.handler_fn = irqhandler;
+        (*usart_config).isr.target_ptr = target_ptr;
+
+        vsf_usart_init(vsf_usart, usart_config);
     }
     Ok(())
 }
 
-fn _vsf_usart_config_and_enable(info: &Info, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void, irqhandler: vsf_usart_isr_handler_t) -> Result<(), ConfigError> {
-    _vsf_usart_config(info, config, config_fix, target_ptr, irqhandler)?;
+fn _vsf_usart_config_and_enable(info: &Info, state: &State, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void, irqhandler: vsf_usart_isr_handler_t) -> Result<(), ConfigError> {
+    _vsf_usart_config(info, state, config, config_fix, target_ptr, irqhandler)?;
     unsafe {
         let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
         vsf_usart_enable(vsf_usart);
@@ -629,15 +635,21 @@ impl<'d, T: Instance> Usart<'d, T> {
             }
             mode
         };
-        _vsf_usart_config_and_enable(T::info(), &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
+        let info = T::info();
+        let s = T::state();
+        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
 
         Ok(Self {
             tx: UsartTx {
                 _p: unsafe { usart.clone_unchecked() },
-                #[cfg(all(not(VSF_USART_CTRL_SEND_BREAK), all(VSF_USART_CTRL_SET_BREAK, VSF_USART_CTRL_CLEAR_BREAK)))]
-                baudrate: config.baudrate,
+                info: info,
+                state: s,
             },
-            rx: UsartRx { _p: usart },
+            rx: UsartRx {
+                _p: usart,
+                info: info,
+                state: s,
+            },
         })
     }
 
@@ -647,21 +659,22 @@ impl<'d, T: Instance> Usart<'d, T> {
         rx_buffer: &'d mut [u8],
     ) -> BufferedUsart {
         let info = T::info();
-        let s = T::buffered_state();
+        let s = T::state();
+        let bs = T::buffered_state();
 
-        s.usart_stream.store(&s._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
-        let usart_stream = &s._usart_stream_instance as *const UsartStream as *mut UsartStream;
+        bs.usart_stream.store(&bs._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
+        let usart_stream = &bs._usart_stream_instance as *const UsartStream as *mut UsartStream;
         unsafe {
             (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
-            (*usart_stream).usart_stream.target = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
+            (*usart_stream).usart_stream.target = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
 
-            (*usart_stream).usart_stream.stream_rx = &s._usart_stream_instance.stream_rx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
+            (*usart_stream).usart_stream.stream_rx = &bs._usart_stream_instance.stream_rx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
             (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.param = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
             (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.evthandler = Some(vsf_usart_stream_rx_evthandler);
             (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = rx_buffer.as_mut_ptr();
             (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = rx_buffer.len() as u32;
 
-            (*usart_stream).usart_stream.stream_tx = &s._usart_stream_instance.stream_tx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
+            (*usart_stream).usart_stream.stream_tx = &bs._usart_stream_instance.stream_tx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
             (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.param = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
             (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.evthandler = Some(vsf_usart_stream_tx_evthandler);
             (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = tx_buffer.as_mut_ptr();
@@ -672,10 +685,12 @@ impl<'d, T: Instance> Usart<'d, T> {
             rx: BufferedUsartRx {
                 _info: info,
                 state: s,
+                buffered_state: bs,
             },
             tx: BufferedUsartTx {
                 _info: info,
                 state: s,
+                buffered_state: bs,
             },
         }
     }
@@ -697,7 +712,9 @@ impl<'d, T: Instance> Usart<'d, T> {
             }
             mode
         };
-        _vsf_usart_config(T::info(), config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
+        let info = T::info();
+        let s = T::state();
+        _vsf_usart_config(info, s, config, mode, ptr::from_ref(s) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
     }
 
     /// Split the Usart into the transmitter and receiver parts.
@@ -817,12 +834,14 @@ impl<'d, T: Instance> UsartTx<'d, T> {
             }
             mode
         };
-        _vsf_usart_config_and_enable(T::info(), &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
+        let info = T::info();
+        let s = T::state();
+        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
 
         Ok(Self {
             _p: usart,
-            #[cfg(all(not(VSF_USART_CTRL_SEND_BREAK), all(VSF_USART_CTRL_SET_BREAK, VSF_USART_CTRL_CLEAR_BREAK)))]
-            baudrate: config.baudrate,
+            info: info,
+            state: s,
         })
     }
 
@@ -830,17 +849,17 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
         tx_buffer: &'d mut [u8],
     ) -> BufferedUsartTx {
-        let info = T::info();
-        let s = T::buffered_state();
+        let info = self.info;
+        let bs = T::buffered_state();
 
-        s.usart_stream.store(&s._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
-        let usart_stream = &s._usart_stream_instance as *const UsartStream as *mut UsartStream;
+        bs.usart_stream.store(&bs._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
+        let usart_stream = &bs._usart_stream_instance as *const UsartStream as *mut UsartStream;
         unsafe {
             (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
-            (*usart_stream).usart_stream.target = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
+            (*usart_stream).usart_stream.target = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
 
-            (*usart_stream).usart_stream.stream_tx = &s._usart_stream_instance.stream_tx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
-            (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.param = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
+            (*usart_stream).usart_stream.stream_tx = &bs._usart_stream_instance.stream_tx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
+            (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.param = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
             (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.evthandler = Some(vsf_usart_stream_tx_evthandler);
             (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = tx_buffer.as_mut_ptr();
             (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = tx_buffer.len() as u32;
@@ -848,7 +867,8 @@ impl<'d, T: Instance> UsartTx<'d, T> {
 
         BufferedUsartTx {
             _info: info,
-            state: s,
+            state: T::state(),
+            buffered_state: bs,
         }
     }
 
@@ -865,7 +885,9 @@ impl<'d, T: Instance> UsartTx<'d, T> {
             }
             mode
         };
-        _vsf_usart_config(T::info(), config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
+        let info = self.info;
+        let s = self.state;
+        _vsf_usart_config(info, s, config, mode, ptr::from_ref(s) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
     }
 
     /// Write all bytes in the buffer.
@@ -878,7 +900,7 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         compiler_fence(Ordering::SeqCst);
 
         unsafe {
-            let info = T::info();
+            let info = self.info;
             let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
             let ptr = buffer.as_ptr();
             let len = buffer.len();
@@ -914,7 +936,7 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         compiler_fence(Ordering::SeqCst);
 
         unsafe {
-            let info = T::info();
+            let info = self.info;
             let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
             let ptr = buffer.as_ptr();
             let len = buffer.len();
@@ -938,7 +960,7 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         // TODO: implement send_break with VSF_USART_CTRL_SEND_BREAK or with VSF_USART_CTRL_SET_BREAK and VSF_USART_CTRL_CLEAR_BREAK
         #[cfg(VSF_USART_CTRL_SEND_BREAK)]
         unsafe {
-            let info = T::info();
+            let info = self.info;
             let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
             // 1. wait tx fifo empty
             self.blocking_flush().unwrap();
@@ -948,12 +970,14 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         }
         #[cfg(all(not(VSF_USART_CTRL_SEND_BREAK), all(VSF_USART_CTRL_SET_BREAK, VSF_USART_CTRL_CLEAR_BREAK)))]
         unsafe {
-            let info = T::info();
+            let info = self.info;
+            let s = self.state;
             let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
+            let usart_config = s.config.load(Ordering::Relaxed);
 
             // 1. calculate duration for break condition for at least 2 frames
             let bits = 2 * (1 + 10 + 1 + 1);
-            let wait_usec = 1_000_000 * bits as u64 / self.baudrate;
+            let wait_usec = 1_000_000 * bits as u64 / usart_config.baudrate;
 
             // 2. wait tx fifo empty
             self.blocking_flush().unwrap();
@@ -1028,26 +1052,32 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             }
             mode
         };
-        _vsf_usart_config_and_enable(T::info(), &config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
+        let info = T::info();
+        let s = T::state();
+        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
 
-        Ok(Self { _p: usart })
+        Ok(Self {
+            _p: usart,
+            info: info,
+            state: s,
+        })
     }
 
     pub fn into_buffered(self, 
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
         rx_buffer: &'d mut [u8],
     ) -> BufferedUsartRx {
-        let info = T::info();
-        let s = T::buffered_state();
+        let info = self.info;
+        let bs = T::buffered_state();
 
-        s.usart_stream.store(&s._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
-        let usart_stream = &s._usart_stream_instance as *const UsartStream as *mut UsartStream;
+        bs.usart_stream.store(&bs._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
+        let usart_stream = &bs._usart_stream_instance as *const UsartStream as *mut UsartStream;
         unsafe {
             (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
-            (*usart_stream).usart_stream.target = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
+            (*usart_stream).usart_stream.target = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
 
-            (*usart_stream).usart_stream.stream_rx = &s._usart_stream_instance.stream_rx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
-            (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.param = ptr::addr_of!(*s) as *mut ::core::ffi::c_void;
+            (*usart_stream).usart_stream.stream_rx = &bs._usart_stream_instance.stream_rx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
+            (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.param = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
             (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.evthandler = Some(vsf_usart_stream_rx_evthandler);
             (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = rx_buffer.as_mut_ptr();
             (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = rx_buffer.len() as u32;
@@ -1055,7 +1085,8 @@ impl<'d, T: Instance> UsartRx<'d, T> {
 
         BufferedUsartRx {
             _info: info,
-            state: s,
+            state: T::state(),
+            buffered_state: bs,
         }
     }
 
@@ -1072,7 +1103,9 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             }
             mode
         };
-        _vsf_usart_config(T::info(), config, mode, ptr::from_ref(T::state()) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
+        let info = self.info;
+        let s = self.state;
+        _vsf_usart_config(info, s, config, mode, ptr::from_ref(s) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
     }
 
     /// Read bytes until the buffer is filled.
@@ -1081,12 +1114,12 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             return Ok(());
         }
 
-        let s: &State = T::state();
+        let s= self.state;
         s.rx_exit_on_idle.store(false, Ordering::Relaxed);
         compiler_fence(Ordering::SeqCst);
 
         unsafe {
-            let info = T::info();
+            let info = self.info;
             let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
             let ptr = buffer.as_ptr();
             let len = buffer.len();
@@ -1114,12 +1147,12 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             return Ok(());
         }
 
-        let s: &State = T::state();
+        let s = self.state;
         s.rx_exit_on_idle.store(false, Ordering::Relaxed);
         compiler_fence(Ordering::SeqCst);
 
         unsafe {
-            let info = T::info();
+            let info = self.info;
             let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
             let ptr = buffer.as_ptr();
             let len = buffer.len();
@@ -1150,8 +1183,8 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             return Ok(0);
         }
 
-        let s: &State = T::state();
-        let info = T::info();
+        let s = self.state;
+        let info = self.info;
         let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
         s.rx_exit_on_idle.store(true, Ordering::Relaxed);
         compiler_fence(Ordering::SeqCst);
@@ -1192,8 +1225,8 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             return Ok(0);
         }
 
-        let s: &State = T::state();
-        let info = T::info();
+        let s = self.state;
+        let info = self.info;
         let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
         s.rx_exit_on_idle.store(true, Ordering::Relaxed);
         compiler_fence(Ordering::SeqCst);
@@ -1259,7 +1292,7 @@ impl BufferedUsart {
 
 impl BufferedUsartRx {
     async fn read<'d>(&self, buffer: &'d mut [u8]) -> impl Future<Output = Result<usize, Error>> + 'd {
-        let s = self.state;
+        let s = self.buffered_state;
         let usart_stream = s.usart_stream.load(Ordering::Relaxed);
         let stream_rx = unsafe { &((*usart_stream).stream_rx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
 
@@ -1279,7 +1312,7 @@ impl BufferedUsartRx {
 
     /// Read from UART RX buffer blocking execution until done.
     pub fn blocking_read<'d>(&mut self, buffer: &'d mut [u8]) -> Result<usize, Error> {
-        let s = self.state;
+        let s = self.buffered_state;
         let usart_stream = s.usart_stream.load(Ordering::Relaxed);
         let stream_rx = unsafe { &((*usart_stream).stream_rx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
 
@@ -1298,7 +1331,7 @@ impl BufferedUsartRx {
     }
 
     async fn fill_buf<'d>(&self) -> impl Future<Output = Result<&'d [u8], Error>> {
-        let s = self.state;
+        let s = self.buffered_state;
         let usart_stream = s.usart_stream.load(Ordering::Relaxed);
         let stream_rx = unsafe { &((*usart_stream).stream_rx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
 
@@ -1319,7 +1352,7 @@ impl BufferedUsartRx {
     }
 
     fn consume(&self, amt: usize) {
-        let s = self.state;
+        let s = self.buffered_state;
         let usart_stream = s.usart_stream.load(Ordering::Relaxed);
         let stream_rx = unsafe { &((*usart_stream).stream_rx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
 
@@ -1327,7 +1360,7 @@ impl BufferedUsartRx {
     }
 
     fn read_ready(&mut self) -> Result<bool, Error> {
-        let s = self.state;
+        let s = self.buffered_state;
         let usart_stream = s.usart_stream.load(Ordering::Relaxed);
         let stream_rx = unsafe { &((*usart_stream).stream_rx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
 
@@ -1337,7 +1370,7 @@ impl BufferedUsartRx {
 
 impl BufferedUsartTx {
     async fn write<'d>(&self, buffer: &'d [u8]) -> impl Future<Output = Result<usize, Error>> + 'd {
-        let s = self.state;
+        let s = self.buffered_state;
         let usart_stream = s.usart_stream.load(Ordering::Relaxed);
         let stream_tx = unsafe { &((*usart_stream).stream_tx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
 
@@ -1353,7 +1386,7 @@ impl BufferedUsartTx {
     }
 
     async fn flush(&self) -> impl Future<Output = Result<(), Error>> {
-        let s = self.state;
+        let s = self.buffered_state;
         let usart_stream = s.usart_stream.load(Ordering::Relaxed);
         let stream_tx = unsafe { &((*usart_stream).stream_tx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
 
@@ -1369,7 +1402,7 @@ impl BufferedUsartTx {
     }
 
     fn blocking_write<'d>(&self, buffer: &'d [u8]) -> Result<usize, Error> {
-        let s = self.state;
+        let s = self.buffered_state;
         let usart_stream = s.usart_stream.load(Ordering::Relaxed);
         let stream_tx = unsafe { &((*usart_stream).stream_tx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
 
@@ -1384,7 +1417,7 @@ impl BufferedUsartTx {
     }
 
     fn blocking_flush(&self) -> Result<(), Error> {
-        let s = self.state;
+        let s = self.buffered_state;
         let usart_stream = s.usart_stream.load(Ordering::Relaxed);
         let stream_tx = unsafe { &((*usart_stream).stream_tx) as *const vsf_fifo_stream_t as *mut vsf_fifo_stream_t as *mut vsf_stream_t };
 
@@ -1408,6 +1441,27 @@ struct State {
     rx_irq_mask: AtomicU32,
     tx_irq_mask: AtomicU32,
     rx_exit_on_idle: AtomicBool,
+    config: AtomicPtr<vsf_usart_cfg_t>,
+    _config: vsf_usart_cfg_t,
+}
+
+unsafe impl Sync for State {}
+
+impl vsf_usart_cfg_t {
+    const fn new() -> Self {
+        Self {
+            mode: 0,
+            baudrate: 0,
+            rx_timeout: 0,
+            #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
+            rx_idle_cnt: 0,
+            isr: vsf_usart_isr_t {
+                handler_fn: Some(vsf_usart_on_interrupt),
+                target_ptr: 0 as *mut ::core::ffi::c_void,
+                prio: into_vsf_arch_prio_t!(VSF_ARCH_PRIO_INVALID),
+            },
+        }
+    }
 }
 
 impl State {
@@ -1418,6 +1472,8 @@ impl State {
             rx_irq_mask: AtomicU32::new(0),
             tx_irq_mask: AtomicU32::new(0),
             rx_exit_on_idle: AtomicBool::new(false),
+            config: AtomicPtr::new(ptr::null_mut()),
+            _config: vsf_usart_cfg_t::new(),
         }
     }
 }

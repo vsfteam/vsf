@@ -67,7 +67,7 @@ static void vsf_usart_stream_isrhandler(void *target, vsf_usart_t *usart, vsf_us
 {
     vsf_usart_stream_t *usart_stream = target;
 
-    if (irq_mask & VSF_USART_IRQ_MASK_RX) {
+    if ((irq_mask & VSF_USART_IRQ_MASK_RX) && (usart_stream->stream_rx != NULL)) {
         uint32_t size, total_size, cur_size;
         uint8_t *buffer;
         uint32_t bufsize;
@@ -94,7 +94,7 @@ static void vsf_usart_stream_isrhandler(void *target, vsf_usart_t *usart, vsf_us
             vsf_stream_write(usart_stream->stream_rx, NULL, total_size);
         }
     } 
-    if (irq_mask & VSF_USART_IRQ_MASK_TX_CPL) {
+    if ((irq_mask & VSF_USART_IRQ_MASK_TX_CPL) && (usart_stream->stream_tx != NULL)) {
         VSF_HAL_ASSERT(usart_stream->tx.size > 0);
         vsf_stream_read(usart_stream->stream_tx, NULL, usart_stream->tx.size);
         __vsf_usart_stream_tx(usart_stream, vsf_protect_int());
@@ -108,8 +108,6 @@ vsf_err_t vsf_usart_stream_init(vsf_usart_stream_t *usart_stream, vsf_usart_cfg_
 {
     VSF_HAL_ASSERT((usart_stream != NULL) && (cfg != NULL));
     VSF_HAL_ASSERT((usart_stream->usart != NULL));
-    VSF_HAL_ASSERT((usart_stream->stream_tx != NULL));
-    VSF_HAL_ASSERT((usart_stream->stream_rx != NULL));
 
     usart_stream->tx.size = 0;
 
@@ -119,11 +117,15 @@ vsf_err_t vsf_usart_stream_init(vsf_usart_stream_t *usart_stream, vsf_usart_cfg_
     vsf_usart_irq_enable(usart_stream->usart, VSF_USART_IRQ_MASK_RX | VSF_USART_IRQ_MASK_TX_CPL | VSF_USART_IRQ_MASK_ERR);
     vsf_usart_enable(usart_stream->usart);
 
-    VSF_STREAM_CONNECT_TX(usart_stream->stream_rx);
+    if (usart_stream->stream_rx != NULL) {
+        VSF_STREAM_CONNECT_TX(usart_stream->stream_rx);
+    }
 
-    usart_stream->stream_tx->rx.param = usart_stream;
-    usart_stream->stream_tx->rx.evthandler = __vsf_usart_stream_evthandler;
-    VSF_STREAM_CONNECT_RX(usart_stream->stream_tx);
+    if (usart_stream->stream_tx != NULL) {
+        usart_stream->stream_tx->rx.param = usart_stream;
+        usart_stream->stream_tx->rx.evthandler = __vsf_usart_stream_evthandler;
+        VSF_STREAM_CONNECT_RX(usart_stream->stream_tx);
+    }
     return VSF_ERR_NONE;
 }
 
