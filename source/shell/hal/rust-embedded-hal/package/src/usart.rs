@@ -31,6 +31,8 @@ use embassy_sync::waitqueue::AtomicWaker;
 use crate::gpio::{AnyPin, AfType, Pull, Speed, OutputDrive};
 use crate::interrupt::typelevel::Interrupt as _;
 use crate::interrupt::{self, Interrupt, InterruptExt};
+use crate::mode::{Async, Blocking, Mode};
+
 use crate::vsf_hal::{*};
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -393,71 +395,73 @@ unsafe extern "C" fn vsf_usart_stream_tx_evthandler(
 }
 
 /// USART driver.
-pub struct Usart<'d, T: Instance> {
-    tx: UsartTx<'d, T>,
-    rx: UsartRx<'d, T>,
+pub struct Usart<M: Mode> {
+    tx: UsartTx<M>,
+    rx: UsartRx<M>,
 }
 
-impl<'d, T: Instance> SetConfig for Usart<'d, T> {
+impl<M: Mode> SetConfig for Usart<M> {
     type Config = Config;
     type ConfigError = ConfigError;
 
     fn set_config(&mut self, config: &Self::Config) -> Result<(), Self::ConfigError> {
-        self.set_config(config)
+        self._set_config(config)
     }
 }
 
 /// Transmitter part of the USART driver.
 ///
 /// This can be obtained via [`Usart::split`], or created directly.
-pub struct UsartTx<'d, T: Instance> {
-    p: Peri<'d, T>,
+pub struct UsartTx<M: Mode> {
     info: &'static Info,
     state: &'static State,
+    p: PhantomData<M>,
 }
 
-impl<'d, T: Instance> SetConfig for UsartTx<'d, T> {
+impl<M: Mode> SetConfig for UsartTx<M> {
     type Config = Config;
     type ConfigError = ConfigError;
 
     fn set_config(&mut self, config: &Self::Config) -> Result<(), Self::ConfigError> {
-        self.set_config(config)
+        self._set_config(config)
     }
 }
 
 /// Receiver part of the USART driver.
 ///
 /// This can be obtained via [`Usart::split`], or created directly.
-pub struct UsartRx<'d, T: Instance> {
-    p: Peri<'d, T>,
+pub struct UsartRx<M: Mode> {
     info: &'static Info,
     state: &'static State,
+    p: PhantomData<M>,
 }
 
-impl<'d, T: Instance> SetConfig for UsartRx<'d, T> {
+impl<M: Mode> SetConfig for UsartRx<M> {
     type Config = Config;
     type ConfigError = ConfigError;
 
     fn set_config(&mut self, config: &Self::Config) -> Result<(), Self::ConfigError> {
-        self.set_config(config)
+        self._set_config(config)
     }
 }
 
 /// Buffered UART driver.
-pub struct BufferedUsart<'d, T: Instance> {
-    rx: BufferedUsartRx<'d, T>,
-    tx: BufferedUsartTx<'d, T>,
+pub struct BufferedUsart {
+    rx: BufferedUsartRx,
+    tx: BufferedUsartTx,
 }
 
 /// Buffered UART RX handle.
-pub struct BufferedUsartRx<'d, T: Instance> {
-    usart: UsartRx<'d, T>,
+pub struct BufferedUsartRx {
+    info: &'static Info,
+    state: &'static State,
     buffered_state: &'static BufferedState,
 }
 
 /// Buffered UART TX handle.
-pub struct BufferedUsartTx<'d, T: Instance> {
-    usart: UsartTx<'d, T>,
+pub struct BufferedUsartTx {
+    info: &'static Info,
+    state: &'static State,
     buffered_state: &'static BufferedState,
 }
 
@@ -547,17 +551,17 @@ fn _vsf_usart_check_error(irq_mask: vsf_usart_irq_mask_t) -> Result<(), Error> {
     Ok(())
 }
 
-impl<'d, T: Instance> Usart<'d, T> {
+impl<'d> Usart<Async> {
     /// Create a new USART without hardware flow control
-    pub fn new(
-        usart: Peri<'d, T>,
+    pub fn new<T: Instance>(
+        _usart: Peri<'d, T>,
         rxd: Peri<'d, impl TxPin<T>>,
         txd: Peri<'d, impl TxPin<T>>,
         ck: Option<Peri<'d, impl CkPin<T>>>,
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
         config: Config,
     ) -> Result<Self, ConfigError> {
-        Self::new_inner(usart,
+        Self::new_inner::<T>(
             #[cfg(VSF_USART_SWAP)]
             new_pin!(rxd, config.rx_af()),
             #[cfg(not(VSF_USART_SWAP))]
@@ -577,8 +581,8 @@ impl<'d, T: Instance> Usart<'d, T> {
     }
 
     /// Create a new USART with hardware flow control (RTS/CTS)
-    pub fn new_with_rtscts(
-        usart: Peri<'d, T>,
+    pub fn new_with_rtscts<T: Instance>(
+        _usart: Peri<'d, T>,
         rxd: Peri<'d, impl RxPin<T>>,
         txd: Peri<'d, impl TxPin<T>>,
         ck: Option<Peri<'d, impl CkPin<T>>>,
@@ -587,7 +591,7 @@ impl<'d, T: Instance> Usart<'d, T> {
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
         config: Config,
     ) -> Result<Self, ConfigError> {
-        Self::new_inner(usart,
+        Self::new_inner::<T>(
             #[cfg(VSF_USART_SWAP)]
             new_pin!(rxd, config.rx_af()),
             #[cfg(not(VSF_USART_SWAP))]
@@ -604,12 +608,93 @@ impl<'d, T: Instance> Usart<'d, T> {
             new_pin!(rts, config.rts_config.af_type()),
             new_pin!(cts, AfType::input(config.cts_pull)),
             None,
-            config,
+            config
         )
     }
 
-    fn new_inner(
-        usart: Peri<'d, T>,
+    /// Write all bytes in the buffer.
+    pub async fn write(&mut self, buffer: &[u8]) -> Result<(), Error> {
+        self.tx.write(buffer).await
+    }
+
+    /// Wait until transmission complete
+    pub async fn flush(&mut self) -> Result<(), Error> {
+        self.tx.flush().await
+    }
+
+    /// Read bytes until the buffer is filled.
+    pub async fn read(&mut self, buffer: &mut [u8]) -> Result<(), Error> {
+        self.rx.read(buffer).await
+    }
+
+    /// Perform an an asynchronous read with idle line detection enabled
+    pub async fn read_until_idle(&mut self, buffer: &mut [u8]) -> Result<usize, Error> {
+        self.rx.read_until_idle(buffer).await
+    }
+}
+
+impl<'d> Usart<Blocking> {
+    /// Create a new USART without hardware flow control
+    pub fn new_blocking<T: Instance>(
+        _usart: Peri<'d, T>,
+        rxd: Peri<'d, impl TxPin<T>>,
+        txd: Peri<'d, impl TxPin<T>>,
+        ck: Option<Peri<'d, impl CkPin<T>>>,
+        config: Config,
+    ) -> Result<Self, ConfigError> {
+        Self::new_inner::<T>(
+            #[cfg(VSF_USART_SWAP)]
+            new_pin!(rxd, config.rx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(rxd, AfType::input(Pull::None)),
+            #[cfg(VSF_USART_SWAP)]
+            new_pin!(txd, config.tx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(txd, config.tx_config.af_type()),
+            if let Some(ck_pin) = ck {
+                new_pin!(ck_pin, AfType::output(Speed::highest(), OutputDrive::default()))
+            } else {
+                None
+            },
+            None, None, None,
+            config
+        )
+    }
+
+    /// Create a new USART with hardware flow control (RTS/CTS)
+    pub fn new_blocking_with_rtscts<T: Instance>(
+        _usart: Peri<'d, T>,
+        rxd: Peri<'d, impl RxPin<T>>,
+        txd: Peri<'d, impl TxPin<T>>,
+        ck: Option<Peri<'d, impl CkPin<T>>>,
+        cts: Peri<'d, impl CtsPin<T>>,
+        rts: Peri<'d, impl RtsPin<T>>,
+        config: Config,
+    ) -> Result<Self, ConfigError> {
+        Self::new_inner::<T>(
+            #[cfg(VSF_USART_SWAP)]
+            new_pin!(rxd, config.rx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(rxd, AfType::input(Pull::None)),
+            #[cfg(VSF_USART_SWAP)]
+            new_pin!(txd, config.tx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(txd, config.tx_config.af_type()),
+            if let Some(ck_pin) = ck {
+                new_pin!(ck_pin, AfType::output(Speed::highest(), OutputDrive::default()))
+            } else {
+                None
+            },
+            new_pin!(rts, config.rts_config.af_type()),
+            new_pin!(cts, AfType::input(config.cts_pull)),
+            None,
+            config
+        )
+    }
+}
+
+impl<'d, M: Mode> Usart<M> {
+    fn new_inner<T: Instance>(
         _rxd: Option<Peri<'d, AnyPin>>,
         _txd: Option<Peri<'d, AnyPin>>,
         _ck: Option<Peri<'d, AnyPin>>,
@@ -639,23 +724,23 @@ impl<'d, T: Instance> Usart<'d, T> {
 
         Ok(Self {
             tx: UsartTx {
-                p: unsafe { usart.clone_unchecked() },
                 info: info,
                 state: s,
+                p: PhantomData,
             },
             rx: UsartRx {
-                p: usart,
                 info: info,
                 state: s,
+                p: PhantomData,
             },
         })
     }
 
-    pub fn into_buffered(self, 
+    pub fn into_buffered<T: Instance>(self, 
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
         tx_buffer: &'d mut [u8],
         rx_buffer: &'d mut [u8],
-    ) -> BufferedUsart<'d, T> {
+    ) -> BufferedUsart {
         let info = T::info();
         let s = T::state();
         let bs = T::buffered_state();
@@ -686,18 +771,20 @@ impl<'d, T: Instance> Usart<'d, T> {
 
         BufferedUsart {
             rx: BufferedUsartRx {
-                usart: self.rx,
+                info: info,
+                state: s,
                 buffered_state: bs,
             },
             tx: BufferedUsartTx {
-                usart: self.tx,
+                info: info,
+                state: s,
                 buffered_state: bs,
             },
         }
     }
 
     /// Set configuration
-    pub fn set_config(&mut self, config: &Config) -> Result<(), ConfigError> {
+    pub fn _set_config(&mut self, config: &Config) -> Result<(), ConfigError> {
         #[cfg(all(not(VSF_USART_TX_INVERT), not(VSF_USART_RX_INVERT)))]
         let mode = 0;
         #[cfg(any(VSF_USART_TX_INVERT, VSF_USART_RX_INVERT))]
@@ -713,39 +800,9 @@ impl<'d, T: Instance> Usart<'d, T> {
             }
             mode
         };
-        let info = T::info();
-        let s = T::state();
+        let info = self.tx.info;
+        let s = self.tx.state;
         _vsf_usart_config(info, s, config, mode, ptr::from_ref(s) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
-    }
-
-    /// Split the Usart into the transmitter and receiver parts.
-    ///
-    /// This is useful to concurrently transmit and receive from independent tasks.
-    pub fn split(self) -> (UsartTx<'d, T>, UsartRx<'d, T>) {
-        (self.tx, self.rx)
-    }
-
-    /// Split the USART in reader and writer parts, by reference.
-    ///
-    /// The returned halves borrow from `self`, so you can drop them and go back to using
-    /// the "un-split" `self`. This allows temporarily splitting the USART.
-    pub fn split_by_ref(&mut self) -> (&mut UsartTx<'d, T>, &mut UsartRx<'d, T>) {
-        (&mut self.tx, &mut self.rx)
-    }
-
-    /// Read bytes until the buffer is filled.
-    pub async fn read(&mut self, buffer: &mut [u8]) -> Result<(), Error> {
-        self.rx.read(buffer).await
-    }
-
-    /// Write all bytes in the buffer.
-    pub async fn write(&mut self, buffer: &[u8]) -> Result<(), Error> {
-        self.tx.write(buffer).await
-    }
-
-    /// Wait until transmission complete
-    pub async fn flush(&mut self) -> Result<(), Error> {
-        self.tx.flush().await
     }
 
     /// Read bytes until the buffer is filled.
@@ -767,18 +824,33 @@ impl<'d, T: Instance> Usart<'d, T> {
     pub fn send_break(&mut self) {
         self.tx.send_break();
     }
+
+    /// Split the Usart into the transmitter and receiver parts.
+    ///
+    /// This is useful to concurrently transmit and receive from independent tasks.
+    pub fn split(self) -> (UsartTx<M>, UsartRx<M>) {
+        (self.tx, self.rx)
+    }
+
+    /// Split the USART in reader and writer parts, by reference.
+    ///
+    /// The returned halves borrow from `self`, so you can drop them and go back to using
+    /// the "un-split" `self`. This allows temporarily splitting the USART.
+    pub fn split_by_ref(&mut self) -> (&mut UsartTx<M>, &mut UsartRx<M>) {
+        (&mut self.tx, &mut self.rx)
+    }
 }
 
-impl<'d, T: Instance> UsartTx<'d, T> {
+impl<'d> UsartTx<Async> {
     /// Create a new tx-only USART without hardware flow control
-    pub fn new(
-        usart: Peri<'d, T>,
+    pub fn new<T: Instance>(
+        _usart: Peri<'d, T>,
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
         txd: Peri<'d, impl TxPin<T>>,
         ck: Option<Peri<'d, impl CkPin<T>>>,
         config: Config,
     ) -> Result<Self, ConfigError> {
-        Self::new_inner(usart,
+        Self::new_inner::<T>(
             #[cfg(VSF_USART_SWAP)]
             new_pin!(txd, config.tx_af()),
             #[cfg(not(VSF_USART_SWAP))]
@@ -794,15 +866,15 @@ impl<'d, T: Instance> UsartTx<'d, T> {
     }
 
     /// Create a new tx-only USART with hardware flow control (RTS/CTS)
-    pub fn new_with_cts(
-        usart: Peri<'d, T>,
+    pub fn new_with_cts<T: Instance>(
+        _usart: Peri<'d, T>,
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
         txd: Peri<'d, impl TxPin<T>>,
         ck: Option<Peri<'d, impl CkPin<T>>>,
         cts: Peri<'d, impl CtsPin<T>>,
         config: Config,
     ) -> Result<Self, ConfigError> {
-        Self::new_inner(usart,
+        Self::new_inner::<T>(
             #[cfg(VSF_USART_SWAP)]
             new_pin!(txd, config.tx_af()),
             #[cfg(not(VSF_USART_SWAP))]
@@ -817,94 +889,13 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         )
     }
 
-    fn new_inner(
-        usart: Peri<'d, T>,
-        _txd: Option<Peri<'d, AnyPin>>,
-        _ck: Option<Peri<'d, AnyPin>>,
-        _cts: Option<Peri<'d, AnyPin>>,
-        config: Config
-    ) -> Result<Self, ConfigError> {
-        #[cfg(not(VSF_USART_TX_INVERT))]
-        let mode = 0;
-        #[cfg(VSF_USART_TX_INVERT)]
-        let mode = {
-            let mut mode: u32 = 0;
-            #[cfg(VSF_USART_TX_INVERT)]
-            if config.invert_tx {
-                mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
-            }
-            mode
-        };
-        let info = T::info();
-        let s = T::state();
-        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
-
-        Ok(Self {
-            p: usart,
-            info: info,
-            state: s,
-        })
-    }
-
-    pub fn into_buffered(self, 
-        _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
-        tx_buffer: &'d mut [u8],
-    ) -> BufferedUsartTx<'d, T> {
-        let info = self.info;
-        let s = T::state();
-        let bs = T::buffered_state();
-
-        if bs.usart_stream.load(Ordering::Relaxed) == 0 as *mut UsartStream {
-            bs.usart_stream.store(&bs._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
-            let usart_stream = &bs._usart_stream_instance as *const UsartStream as *mut UsartStream;
-            unsafe {
-                (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
-                (*usart_stream).usart_stream.target = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
-
-                (*usart_stream).usart_stream.stream_tx = &bs._usart_stream_instance.stream_tx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
-                (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.param = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
-                (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.evthandler = Some(vsf_usart_stream_tx_evthandler);
-                (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = tx_buffer.as_mut_ptr();
-                (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = tx_buffer.len() as u32;
-
-                (*usart_stream).usart_stream.stream_rx = 0 as *mut vsf_stream_t;
-
-                let usart_config = s.config.load(Ordering::Relaxed);
-                vsf_usart_stream_init(&((*usart_stream).usart_stream) as *const vsf_usart_stream_t as *mut vsf_usart_stream_t, usart_config);
-            }
-        }
-
-        BufferedUsartTx {
-            usart: self,
-            buffered_state: bs,
-        }
-    }
-
-    /// Set configuration
-    pub fn set_config(&mut self, config: &Config) -> Result<(), ConfigError> {
-        #[cfg(not(VSF_USART_TX_INVERT))]
-        let mode = 0;
-        #[cfg(VSF_USART_TX_INVERT)]
-        let mode = {
-            let mut mode: u32 = 0;
-            #[cfg(VSF_USART_TX_INVERT)]
-            if config.invert_tx {
-                mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
-            }
-            mode
-        };
-        let info = self.info;
-        let s = self.state;
-        _vsf_usart_config(info, s, config, mode, ptr::from_ref(s) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
-    }
-
     /// Write all bytes in the buffer.
     pub async fn write(&mut self, buffer: &[u8]) -> Result<(), Error> {
         if buffer.is_empty() {
             return Ok(());
         }
 
-        let s: &State = T::state();
+        let s = self.state;
         compiler_fence(Ordering::SeqCst);
 
         unsafe {
@@ -933,6 +924,136 @@ impl<'d, T: Instance> UsartTx<'d, T> {
         // TODO:
         Ok(())
     }
+}
+
+impl<'d> UsartTx<Blocking> {
+    /// Create a new tx-only USART without hardware flow control
+    pub fn new_blocking<T: Instance>(
+        _usart: Peri<'d, T>,
+        txd: Peri<'d, impl TxPin<T>>,
+        ck: Option<Peri<'d, impl CkPin<T>>>,
+        config: Config,
+    ) -> Result<Self, ConfigError> {
+        Self::new_inner::<T>(
+            #[cfg(VSF_USART_SWAP)]
+            new_pin!(txd, config.tx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(txd, config.tx_config.af_type()),
+            if let Some(ck_pin) = ck {
+                new_pin!(ck_pin, AfType::output(Speed::highest(), OutputDrive::default()))
+            } else {
+                None
+            },
+            None,
+            config
+        )
+    }
+
+    /// Create a new tx-only USART with hardware flow control (RTS/CTS)
+    pub fn new_blocking_with_cts<T: Instance>(
+        _usart: Peri<'d, T>,
+        txd: Peri<'d, impl TxPin<T>>,
+        ck: Option<Peri<'d, impl CkPin<T>>>,
+        cts: Peri<'d, impl CtsPin<T>>,
+        config: Config,
+    ) -> Result<Self, ConfigError> {
+        Self::new_inner::<T>(
+            #[cfg(VSF_USART_SWAP)]
+            new_pin!(txd, config.tx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(txd, config.tx_config.af_type()),
+            if let Some(ck_pin) = ck {
+                new_pin!(ck_pin, AfType::output(Speed::highest(), OutputDrive::default()))
+            } else {
+                None
+            },
+            new_pin!(cts, AfType::input(config.cts_pull)),
+            config
+        )
+    }
+}
+
+impl<'d, M: Mode> UsartTx<M> {
+    fn new_inner<T: Instance>(
+        _txd: Option<Peri<'d, AnyPin>>,
+        _ck: Option<Peri<'d, AnyPin>>,
+        _cts: Option<Peri<'d, AnyPin>>,
+        config: Config
+    ) -> Result<Self, ConfigError> {
+        #[cfg(not(VSF_USART_TX_INVERT))]
+        let mode = into_vsf_usart_mode_t!(VSF_USART_TX_ENABLE) as u32;
+        #[cfg(VSF_USART_TX_INVERT)]
+        let mode = {
+            let mut mode: u32 = into_vsf_usart_mode_t!(VSF_USART_TX_ENABLE) as u32;
+            #[cfg(VSF_USART_TX_INVERT)]
+            if config.invert_tx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
+            }
+            mode
+        };
+        let info = T::info();
+        let s = T::state();
+        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
+
+        Ok(Self {
+            info: info,
+            state: s,
+            p: PhantomData,
+        })
+    }
+
+    pub fn into_buffered<T: Instance>(self, 
+        _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
+        tx_buffer: &'d mut [u8],
+    ) -> BufferedUsartTx {
+        let info = self.info;
+        let s = T::state();
+        let bs = T::buffered_state();
+
+        if bs.usart_stream.load(Ordering::Relaxed) == 0 as *mut UsartStream {
+            bs.usart_stream.store(&bs._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
+            let usart_stream = &bs._usart_stream_instance as *const UsartStream as *mut UsartStream;
+            unsafe {
+                (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
+                (*usart_stream).usart_stream.target = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
+
+                (*usart_stream).usart_stream.stream_tx = &bs._usart_stream_instance.stream_tx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
+                (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.param = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
+                (*usart_stream).stream_tx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.tx.evthandler = Some(vsf_usart_stream_tx_evthandler);
+                (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = tx_buffer.as_mut_ptr();
+                (*usart_stream).stream_tx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = tx_buffer.len() as u32;
+
+                (*usart_stream).usart_stream.stream_rx = 0 as *mut vsf_stream_t;
+
+                let usart_config = s.config.load(Ordering::Relaxed);
+                vsf_usart_stream_init(&((*usart_stream).usart_stream) as *const vsf_usart_stream_t as *mut vsf_usart_stream_t, usart_config);
+            }
+        }
+
+        BufferedUsartTx {
+            info: info,
+            state: s,
+            buffered_state: bs,
+        }
+    }
+
+    /// Set configuration
+    pub fn _set_config(&mut self, config: &Config) -> Result<(), ConfigError> {
+        #[cfg(not(VSF_USART_TX_INVERT))]
+        let mode = into_vsf_usart_mode_t!(VSF_USART_TX_ENABLE) as u32;
+        #[cfg(VSF_USART_TX_INVERT)]
+        let mode = {
+            let mut mode: u32 = into_vsf_usart_mode_t!(VSF_USART_TX_ENABLE) as u32;
+            #[cfg(VSF_USART_TX_INVERT)]
+            if config.invert_tx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
+            }
+            mode
+        };
+        let info = self.info;
+        let s = self.state;
+        _vsf_usart_config(info, s, config, mode, ptr::from_ref(s) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
+    }
 
     /// Write all bytes in the buffer.
     pub fn blocking_write(&mut self, buffer: &[u8]) -> Result<(), Error> {
@@ -940,7 +1061,7 @@ impl<'d, T: Instance> UsartTx<'d, T> {
             return Ok(());
         }
 
-        let s: &State = T::state();
+        let s = self.state;
         compiler_fence(Ordering::SeqCst);
 
         unsafe {
@@ -1001,21 +1122,21 @@ impl<'d, T: Instance> UsartTx<'d, T> {
     }
 }
 
-impl<'a, T: Instance> Drop for UsartTx<'a, T> {
+impl<M: Mode> Drop for UsartTx<M> {
     fn drop(&mut self) {
         // TODO
     }
 }
 
-impl<'d, T: Instance> UsartRx<'d, T> {
+impl<'d> UsartRx<Async> {
     /// Create a new rx-only USART without hardware flow control
-    pub fn new(
-        usart: Peri<'d, T>,
+    pub fn new<T: Instance>(
+        _usart: Peri<'d, T>,
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
         rxd: Peri<'d, impl TxPin<T>>,
         config: Config,
     ) -> Result<Self, ConfigError> {
-        Self::new_inner(usart,
+        Self::new_inner::<T>(
             #[cfg(VSF_USART_SWAP)]
             new_pin!(rxd, config.rx_af()),
             #[cfg(not(VSF_USART_SWAP))]
@@ -1026,14 +1147,14 @@ impl<'d, T: Instance> UsartRx<'d, T> {
     }
 
     /// Create a new rx-only USART with hardware flow control (RTS/CTS)
-    pub fn new_with_rts(
-        usart: Peri<'d, T>,
+    pub fn new_with_rts<T: Instance>(
+        _usart: Peri<'d, T>,
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
         rxd: Peri<'d, impl TxPin<T>>,
         rts: Peri<'d, impl RtsPin<T>>,
         config: Config,
     ) -> Result<Self, ConfigError> {
-        Self::new_inner(usart,
+        Self::new_inner::<T>(
             #[cfg(VSF_USART_SWAP)]
             new_pin!(rxd, config.rx_af()),
             #[cfg(not(VSF_USART_SWAP))]
@@ -1041,86 +1162,6 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             new_pin!(rts, config.rts_config.af_type()),
             config
         )
-    }
-
-    fn new_inner(
-        usart: Peri<'d, T>,
-        _rxd: Option<Peri<'d, AnyPin>>,
-        _rts: Option<Peri<'d, AnyPin>>,
-        config: Config
-    ) -> Result<Self, ConfigError> {
-        #[cfg(not(VSF_USART_RX_INVERT))]
-        let mode = 0;
-        #[cfg(VSF_USART_RX_INVERT)]
-        let mode = {
-            let mut mode: u32 = 0;
-            #[cfg(VSF_USART_RX_INVERT)]
-            if config.invert_rx {
-                mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
-            }
-            mode
-        };
-        let info = T::info();
-        let s = T::state();
-        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
-
-        Ok(Self {
-            p: usart,
-            info: info,
-            state: s,
-        })
-    }
-
-    pub fn into_buffered(self, 
-        _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
-        rx_buffer: &'d mut [u8],
-    ) -> BufferedUsartRx<'d, T> {
-        let info = self.info;
-        let s = self.state;
-        let bs = T::buffered_state();
-
-        if bs.usart_stream.load(Ordering::Relaxed) == 0 as *mut UsartStream {
-            bs.usart_stream.store(&bs._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
-            let usart_stream = &bs._usart_stream_instance as *const UsartStream as *mut UsartStream;
-            unsafe {
-                (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
-                (*usart_stream).usart_stream.target = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
-
-                (*usart_stream).usart_stream.stream_rx = &bs._usart_stream_instance.stream_rx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
-                (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.param = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
-                (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.evthandler = Some(vsf_usart_stream_rx_evthandler);
-                (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = rx_buffer.as_mut_ptr();
-                (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = rx_buffer.len() as u32;
-
-                (*usart_stream).usart_stream.stream_tx = 0 as *mut vsf_stream_t;
-
-                let usart_config = s.config.load(Ordering::Relaxed);
-                vsf_usart_stream_init(&((*usart_stream).usart_stream) as *const vsf_usart_stream_t as *mut vsf_usart_stream_t, usart_config);
-            }
-        }
-
-        BufferedUsartRx {
-            usart: self,
-            buffered_state: bs,
-        }
-    }
-
-    /// Set configuration
-    pub fn set_config(&mut self, config: &Config) -> Result<(), ConfigError> {
-        #[cfg(not(VSF_USART_RX_INVERT))]
-        let mode = 0;
-        #[cfg(VSF_USART_RX_INVERT)]
-        let mode = {
-            let mut mode: u32 = 0;
-            #[cfg(VSF_USART_RX_INVERT)]
-            if config.invert_rx {
-                mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
-            }
-            mode
-        };
-        let info = self.info;
-        let s = self.state;
-        _vsf_usart_config(info, s, config, mode, ptr::from_ref(s) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
     }
 
     /// Read bytes until the buffer is filled.
@@ -1154,40 +1195,6 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             Poll::Pending
         }).await;
         result
-    }
-
-    /// Read bytes until the buffer is filled.
-    pub fn blocking_read(&mut self, buffer: &mut [u8]) -> Result<(), Error> {
-        if buffer.is_empty() {
-            return Ok(());
-        }
-
-        let s = self.state;
-        s.rx_exit_on_idle.store(false, Ordering::Relaxed);
-        compiler_fence(Ordering::SeqCst);
-
-        unsafe {
-            let info = self.info;
-            let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
-            let ptr = buffer.as_ptr();
-            let len = buffer.len();
-
-            vsf_usart_irq_enable(vsf_usart, into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | VSF_USART_IRQ_MASK_ERR);
-            vsf_usart_request_rx(vsf_usart, ptr as *mut ::core::ffi::c_void, len as uint_fast32_t);
-        }
-
-        let mut rx_irq_mask: u32 = 0;
-        loop {
-            rx_irq_mask = s.rx_irq_mask.swap(0, Ordering::Relaxed);
-            if rx_irq_mask & (into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | VSF_USART_IRQ_MASK_ERR) != 0 {
-                break;
-            }
-        }
-
-        if let Err(error) = _vsf_usart_check_error(rx_irq_mask) {
-            return Err(error);
-        }
-        return Ok(());
     }
 
     /// Read bytes until the buffer is filled, or the line becomes idle.
@@ -1231,6 +1238,157 @@ impl<'d, T: Instance> UsartRx<'d, T> {
             result.map(|_| n)
         }
     }
+}
+
+impl<'d> UsartRx<Blocking> {
+    /// Create a new rx-only USART without hardware flow control
+    pub fn new_blocking<T: Instance>(
+        _usart: Peri<'d, T>,
+        rxd: Peri<'d, impl TxPin<T>>,
+        config: Config,
+    ) -> Result<Self, ConfigError> {
+        Self::new_inner::<T>(
+            #[cfg(VSF_USART_SWAP)]
+            new_pin!(rxd, config.rx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(rxd, AfType::input(Pull::None)),
+            None,
+            config
+        )
+    }
+
+    /// Create a new rx-only USART with hardware flow control (RTS/CTS)
+    pub fn new_blocking_with_rts<T: Instance>(
+        _usart: Peri<'d, T>,
+        rxd: Peri<'d, impl TxPin<T>>,
+        rts: Peri<'d, impl RtsPin<T>>,
+        config: Config,
+    ) -> Result<Self, ConfigError> {
+        Self::new_inner::<T>(
+            #[cfg(VSF_USART_SWAP)]
+            new_pin!(rxd, config.rx_af()),
+            #[cfg(not(VSF_USART_SWAP))]
+            new_pin!(rxd, AfType::input(Pull::None)),
+            new_pin!(rts, config.rts_config.af_type()),
+            config
+        )
+    }
+}
+
+impl<'d, M: Mode> UsartRx<M> {
+    fn new_inner<T: Instance>(
+        _rxd: Option<Peri<'d, AnyPin>>,
+        _rts: Option<Peri<'d, AnyPin>>,
+        config: Config
+    ) -> Result<Self, ConfigError> {
+        #[cfg(not(VSF_USART_RX_INVERT))]
+        let mode = into_vsf_usart_mode_t!(VSF_USART_RX_ENABLE) as u32;
+        #[cfg(VSF_USART_RX_INVERT)]
+        let mode = {
+            let mut mode: u32 = into_vsf_usart_mode_t!(VSF_USART_RX_ENABLE) as u32;
+            #[cfg(VSF_USART_RX_INVERT)]
+            if config.invert_rx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
+            }
+            mode
+        };
+        let info = T::info();
+        let s = T::state();
+        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
+
+        Ok(Self {
+            info: info,
+            state: s,
+            p: PhantomData,
+        })
+    }
+
+    pub fn into_buffered<T: Instance>(self, 
+        _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
+        rx_buffer: &'d mut [u8],
+    ) -> BufferedUsartRx {
+        let info = self.info;
+        let s = self.state;
+        let bs = T::buffered_state();
+
+        if bs.usart_stream.load(Ordering::Relaxed) == 0 as *mut UsartStream {
+            bs.usart_stream.store(&bs._usart_stream_instance as *const UsartStream as *mut UsartStream, Ordering::Relaxed);
+            let usart_stream = &bs._usart_stream_instance as *const UsartStream as *mut UsartStream;
+            unsafe {
+                (*usart_stream).usart_stream.usart = info.vsf_usart.load(Ordering::Relaxed);
+                (*usart_stream).usart_stream.target = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
+
+                (*usart_stream).usart_stream.stream_rx = &bs._usart_stream_instance.stream_rx as *const vsf_fifo_stream_t as *const vsf_stream_t as *mut vsf_stream_t;
+                (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.param = ptr::addr_of!(*bs) as *mut ::core::ffi::c_void;
+                (*usart_stream).stream_rx.__bindgen_anon_1.use_as__vsf_stream_t.__bindgen_anon_1.__bindgen_anon_1.rx.evthandler = Some(vsf_usart_stream_rx_evthandler);
+                (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.buffer = rx_buffer.as_mut_ptr();
+                (*usart_stream).stream_rx.__bindgen_anon_2.use_as__vsf_byte_fifo_t.size = rx_buffer.len() as u32;
+
+                (*usart_stream).usart_stream.stream_tx = 0 as *mut vsf_stream_t;
+
+                let usart_config = s.config.load(Ordering::Relaxed);
+                vsf_usart_stream_init(&((*usart_stream).usart_stream) as *const vsf_usart_stream_t as *mut vsf_usart_stream_t, usart_config);
+            }
+        }
+
+        BufferedUsartRx {
+            info: info,
+            state: s,
+            buffered_state: bs,
+        }
+    }
+
+    /// Set configuration
+    pub fn _set_config(&mut self, config: &Config) -> Result<(), ConfigError> {
+        #[cfg(not(VSF_USART_RX_INVERT))]
+        let mode = into_vsf_usart_mode_t!(VSF_USART_RX_ENABLE) as u32;
+        #[cfg(VSF_USART_RX_INVERT)]
+        let mode = {
+            let mut mode: u32 = into_vsf_usart_mode_t!(VSF_USART_RX_ENABLE) as u32;
+            #[cfg(VSF_USART_RX_INVERT)]
+            if config.invert_rx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
+            }
+            mode
+        };
+        let info = self.info;
+        let s = self.state;
+        _vsf_usart_config(info, s, config, mode, ptr::from_ref(s) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
+    }
+
+    /// Read bytes until the buffer is filled.
+    pub fn blocking_read(&mut self, buffer: &mut [u8]) -> Result<(), Error> {
+        if buffer.is_empty() {
+            return Ok(());
+        }
+
+        let s = self.state;
+        s.rx_exit_on_idle.store(false, Ordering::Relaxed);
+        compiler_fence(Ordering::SeqCst);
+
+        unsafe {
+            let info = self.info;
+            let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
+            let ptr = buffer.as_ptr();
+            let len = buffer.len();
+
+            vsf_usart_irq_enable(vsf_usart, into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | VSF_USART_IRQ_MASK_ERR);
+            vsf_usart_request_rx(vsf_usart, ptr as *mut ::core::ffi::c_void, len as uint_fast32_t);
+        }
+
+        let mut rx_irq_mask: u32 = 0;
+        loop {
+            rx_irq_mask = s.rx_irq_mask.swap(0, Ordering::Relaxed);
+            if rx_irq_mask & (into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | VSF_USART_IRQ_MASK_ERR) != 0 {
+                break;
+            }
+        }
+
+        if let Err(error) = _vsf_usart_check_error(rx_irq_mask) {
+            return Err(error);
+        }
+        return Ok(());
+    }
 
     /// Read bytes until the buffer is filled, or the line becomes idle.
     ///
@@ -1270,19 +1428,27 @@ impl<'d, T: Instance> UsartRx<'d, T> {
     }
 }
 
-impl<'a, T: Instance> Drop for UsartRx<'a, T> {
+impl<M: Mode> Drop for UsartRx<M> {
     fn drop(&mut self) {
         // TODO
     }
 }
 
-impl<'d, T: Instance> BufferedUsart<'d, T> {
-    pub fn into_normal(self, 
+impl<'d> BufferedUsart {
+    pub fn into_normal<T: Instance>(self, 
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
-    ) -> Usart<'d, T> {
+    ) -> Usart<Async> {
         Usart {
-            tx: self.tx.usart,
-            rx: self.rx.usart,
+            tx: UsartTx {
+                info: self.tx.info,
+                state: self.tx.state,
+                p: PhantomData,
+            },
+            rx: UsartRx {
+                info: self.rx.info,
+                state: self.rx.state,
+                p: PhantomData,
+            },
         }
     }
 
@@ -1302,23 +1468,27 @@ impl<'d, T: Instance> BufferedUsart<'d, T> {
     }
 
     /// Split into separate RX and TX handles.
-    pub fn split(self) -> (BufferedUsartTx<'d, T>, BufferedUsartRx<'d, T>) {
+    pub fn split(self) -> (BufferedUsartTx, BufferedUsartRx) {
         (self.tx, self.rx)
     }
 
     /// Split the Uart into a transmitter and receiver by mutable reference,
     /// which is particularly useful when having two tasks correlating to
     /// transmitting and receiving.
-    pub fn split_ref(&mut self) -> (&mut BufferedUsartTx<'d, T>, &mut BufferedUsartRx<'d, T>) {
+    pub fn split_ref(&mut self) -> (&mut BufferedUsartTx, &mut BufferedUsartRx) {
         (&mut self.tx, &mut self.rx)
     }
 }
 
-impl<'d, T: Instance> BufferedUsartRx<'d, T> {
-    pub fn into_normal(self, 
+impl<'d> BufferedUsartRx {
+    pub fn into_normal<T: Instance>(self, 
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
-    ) -> UsartRx<'d, T> {
-        self.usart
+    ) -> UsartRx<Async> {
+        UsartRx {
+            info: self.info,
+            state: self.state,
+            p: PhantomData,
+        }
     }
 
     async fn read(&self, buffer: &'d mut [u8]) -> impl Future<Output = Result<usize, Error>> + 'd {
@@ -1398,11 +1568,15 @@ impl<'d, T: Instance> BufferedUsartRx<'d, T> {
     }
 }
 
-impl<'d, T: Instance> BufferedUsartTx<'d, T> {
-    pub fn into_normal(self, 
+impl<'d> BufferedUsartTx {
+    pub fn into_normal<T: Instance>(self, 
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, InterruptHandler<T>> + 'd,
-    ) -> UsartTx<'d, T> {
-        self.usart
+    ) -> UsartTx<Async> {
+        UsartTx {
+            info: self.info,
+            state: self.state,
+            p: PhantomData,
+        }
     }
 
     async fn write(&self, buffer: &'d [u8]) -> impl Future<Output = Result<usize, Error>> + 'd {
@@ -1682,7 +1856,7 @@ vsf_hal_macros::bind_vsf_usarts!{}
 mod eh02 {
     use super::*;
 
-    impl<'d, T: Instance> embedded_hal_02::blocking::serial::Write<u8> for Usart<'d, T> {
+    impl embedded_hal_02::blocking::serial::Write<u8> for Usart<Blocking> {
         type Error = Error;
 
         fn bwrite_all(&mut self, buffer: &[u8]) -> Result<(), Self::Error> {
@@ -1694,7 +1868,7 @@ mod eh02 {
         }
     }
 
-    impl<'d, T: Instance> embedded_hal_02::blocking::serial::Write<u8> for UsartTx<'d, T> {
+    impl embedded_hal_02::blocking::serial::Write<u8> for UsartTx<Blocking> {
         type Error = Error;
 
         fn bwrite_all(&mut self, buffer: &[u8]) -> Result<(), Self::Error> {
@@ -1725,22 +1899,22 @@ mod _embedded_io {
         }
     }
 
-    impl<'d, U: Instance> embedded_io_async::ErrorType for Usart<'d, U> {
+    impl embedded_io_async::ErrorType for Usart<Async> {
         type Error = Error;
     }
 
-    impl<'d, U: Instance> embedded_io_async::ErrorType for UsartTx<'d, U> {
+    impl embedded_io_async::ErrorType for UsartTx<Async> {
         type Error = Error;
     }
 
-    impl<'d, U: Instance> embedded_io_async::Write for Usart<'d, U> {
+    impl embedded_io_async::Write for Usart<Async> {
         async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
             self.write(buf).await?;
             Ok(buf.len())
         }
     }
 
-    impl<'d: 'd, U: Instance> embedded_io_async::Write for UsartTx<'d, U> {
+    impl embedded_io_async::Write for UsartTx<Async> {
         async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
             self.write(buf).await?;
             Ok(buf.len())
