@@ -23,7 +23,6 @@ use core::ptr;
 use core::slice;
 use paste::paste;
 
-use embassy_embedded_hal::SetConfig;
 //use embassy_hal_internal::drop::OnDrop;
 use embassy_hal_internal::{Peri, PeripheralType};
 use embassy_sync::waitqueue::AtomicWaker;
@@ -400,15 +399,6 @@ pub struct Usart<M: Mode> {
     rx: UsartRx<M>,
 }
 
-impl<M: Mode> SetConfig for Usart<M> {
-    type Config = Config;
-    type ConfigError = ConfigError;
-
-    fn set_config(&mut self, config: &Self::Config) -> Result<(), Self::ConfigError> {
-        self._set_config(config)
-    }
-}
-
 /// Transmitter part of the USART driver.
 ///
 /// This can be obtained via [`Usart::split`], or created directly.
@@ -418,15 +408,6 @@ pub struct UsartTx<M: Mode> {
     p: PhantomData<M>,
 }
 
-impl<M: Mode> SetConfig for UsartTx<M> {
-    type Config = Config;
-    type ConfigError = ConfigError;
-
-    fn set_config(&mut self, config: &Self::Config) -> Result<(), Self::ConfigError> {
-        self._set_config(config)
-    }
-}
-
 /// Receiver part of the USART driver.
 ///
 /// This can be obtained via [`Usart::split`], or created directly.
@@ -434,15 +415,6 @@ pub struct UsartRx<M: Mode> {
     info: &'static Info,
     state: &'static State,
     p: PhantomData<M>,
-}
-
-impl<M: Mode> SetConfig for UsartRx<M> {
-    type Config = Config;
-    type ConfigError = ConfigError;
-
-    fn set_config(&mut self, config: &Self::Config) -> Result<(), Self::ConfigError> {
-        self._set_config(config)
-    }
 }
 
 /// Buffered UART driver.
@@ -783,28 +755,6 @@ impl<'d, M: Mode> Usart<M> {
         }
     }
 
-    /// Set configuration
-    pub fn _set_config(&mut self, config: &Config) -> Result<(), ConfigError> {
-        #[cfg(all(not(VSF_USART_TX_INVERT), not(VSF_USART_RX_INVERT)))]
-        let mode = 0;
-        #[cfg(any(VSF_USART_TX_INVERT, VSF_USART_RX_INVERT))]
-        let mode = {
-            let mut mode: u32 = 0;
-            #[cfg(VSF_USART_TX_INVERT)]
-            if config.invert_tx {
-                mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
-            }
-            #[cfg(VSF_USART_RX_INVERT)]
-            if config.invert_rx {
-                mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
-            }
-            mode
-        };
-        let info = self.tx.info;
-        let s = self.tx.state;
-        _vsf_usart_config(info, s, config, mode, ptr::from_ref(s) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
-    }
-
     /// Read bytes until the buffer is filled.
     pub fn blocking_read(&mut self, buffer: &mut [u8]) -> Result<(), Error> {
         self.rx.blocking_read(buffer)
@@ -1037,44 +987,25 @@ impl<'d, M: Mode> UsartTx<M> {
         }
     }
 
-    /// Set configuration
-    pub fn _set_config(&mut self, config: &Config) -> Result<(), ConfigError> {
-        #[cfg(not(VSF_USART_TX_INVERT))]
-        let mode = into_vsf_usart_mode_t!(VSF_USART_TX_ENABLE) as u32;
-        #[cfg(VSF_USART_TX_INVERT)]
-        let mode = {
-            let mut mode: u32 = into_vsf_usart_mode_t!(VSF_USART_TX_ENABLE) as u32;
-            #[cfg(VSF_USART_TX_INVERT)]
-            if config.invert_tx {
-                mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
-            }
-            mode
-        };
-        let info = self.info;
-        let s = self.state;
-        _vsf_usart_config(info, s, config, mode, ptr::from_ref(s) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
-    }
-
     /// Write all bytes in the buffer.
     pub fn blocking_write(&mut self, buffer: &[u8]) -> Result<(), Error> {
         if buffer.is_empty() {
             return Ok(());
         }
 
-        let s = self.state;
-        compiler_fence(Ordering::SeqCst);
+        let info = self.info;
+        let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
+        let mut ptr = buffer.as_ptr();
+        let mut len = buffer.len() as uint_fast32_t;
 
         unsafe {
-            let info = self.info;
-            let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
-            let ptr = buffer.as_ptr();
-            let len = buffer.len();
+            while len > 0 {
+                let curlen = vsf_usart_txfifo_write(vsf_usart, ptr as *mut ::core::ffi::c_void, len);
+                len -= curlen;
+                ptr = ptr.wrapping_add(curlen as usize);
+            }
 
-            vsf_usart_irq_enable(vsf_usart, into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL));
-            vsf_usart_request_tx(vsf_usart, ptr as *mut ::core::ffi::c_void, len as uint_fast32_t);
         }
-
-        while s.tx_irq_mask.swap(0, Ordering::Relaxed) & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL) == 0 {}
         Ok(())
     }
 
@@ -1338,56 +1269,27 @@ impl<'d, M: Mode> UsartRx<M> {
         }
     }
 
-    /// Set configuration
-    pub fn _set_config(&mut self, config: &Config) -> Result<(), ConfigError> {
-        #[cfg(not(VSF_USART_RX_INVERT))]
-        let mode = into_vsf_usart_mode_t!(VSF_USART_RX_ENABLE) as u32;
-        #[cfg(VSF_USART_RX_INVERT)]
-        let mode = {
-            let mut mode: u32 = into_vsf_usart_mode_t!(VSF_USART_RX_ENABLE) as u32;
-            #[cfg(VSF_USART_RX_INVERT)]
-            if config.invert_rx {
-                mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
-            }
-            mode
-        };
-        let info = self.info;
-        let s = self.state;
-        _vsf_usart_config(info, s, config, mode, ptr::from_ref(s) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))
-    }
-
     /// Read bytes until the buffer is filled.
     pub fn blocking_read(&mut self, buffer: &mut [u8]) -> Result<(), Error> {
         if buffer.is_empty() {
             return Ok(());
         }
 
-        let s = self.state;
-        s.rx_exit_on_idle.store(false, Ordering::Relaxed);
-        compiler_fence(Ordering::SeqCst);
+        let info = self.info;
+        let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
+        let mut ptr = buffer.as_ptr();
+        let mut len = buffer.len() as uint_fast32_t;
 
         unsafe {
-            let info = self.info;
-            let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
-            let ptr = buffer.as_ptr();
-            let len = buffer.len();
+            while len > 0 {
+                let curlen = vsf_usart_rxfifo_read(vsf_usart, ptr as *mut ::core::ffi::c_void, len);
+                len -= curlen;
+                ptr = ptr.wrapping_add(curlen as usize);
 
-            vsf_usart_irq_enable(vsf_usart, into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | VSF_USART_IRQ_MASK_ERR);
-            vsf_usart_request_rx(vsf_usart, ptr as *mut ::core::ffi::c_void, len as uint_fast32_t);
-        }
-
-        let mut rx_irq_mask: u32 = 0;
-        loop {
-            rx_irq_mask = s.rx_irq_mask.swap(0, Ordering::Relaxed);
-            if rx_irq_mask & (into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | VSF_USART_IRQ_MASK_ERR) != 0 {
-                break;
+                // TODO: check error
             }
         }
-
-        if let Err(error) = _vsf_usart_check_error(rx_irq_mask) {
-            return Err(error);
-        }
-        return Ok(());
+        Ok(())
     }
 
     /// Read bytes until the buffer is filled, or the line becomes idle.
@@ -1398,33 +1300,23 @@ impl<'d, M: Mode> UsartRx<M> {
             return Ok(0);
         }
 
-        let s = self.state;
         let info = self.info;
         let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
-        s.rx_exit_on_idle.store(true, Ordering::Relaxed);
-        compiler_fence(Ordering::SeqCst);
+        let mut ptr = buffer.as_ptr();
+        let mut len = buffer.len() as uint_fast32_t;
+        let mut total_len: usize = 0;
 
-        let irq_mask = VSF_USART_IRQ_MASK_ERR | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_CPL) | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_IDLE);
         unsafe {
-            let ptr = buffer.as_ptr();
-            let len = buffer.len();
+            while len > 0 {
+                let curlen = vsf_usart_rxfifo_read(vsf_usart, ptr as *mut ::core::ffi::c_void, len);
+                total_len += curlen as usize;
+                len -= curlen;
+                ptr = ptr.wrapping_add(curlen as usize);
 
-            vsf_usart_irq_enable(vsf_usart, irq_mask);
-            vsf_usart_request_rx(vsf_usart, ptr as *mut ::core::ffi::c_void, len as uint_fast32_t);
-        }
-
-        let mut rx_irq_mask: u32 = 0;
-        loop {
-            rx_irq_mask = s.rx_irq_mask.swap(0, Ordering::Relaxed);
-            if rx_irq_mask & irq_mask != 0 {
-                break;
+                // TODO: check error and idle
             }
         }
-
-        if let Err(error) = _vsf_usart_check_error(rx_irq_mask) {
-            return Err(error);
-        }
-        Ok(unsafe { vsf_usart_get_rx_count(vsf_usart) as usize })
+        Ok(total_len)
     }
 }
 
