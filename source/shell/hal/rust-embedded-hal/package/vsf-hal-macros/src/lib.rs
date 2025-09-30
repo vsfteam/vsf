@@ -63,7 +63,7 @@ pub fn bind_vsf_usarts(_item: TokenStream) -> TokenStream {
                 if sync_support != 0 {
                     output_code.push_str(&format!("impl_usart!(USART{usart_index}, USART{usart_index}, vsf_hw_usart{usart_index}, USART{usart_index}_IRQHandler);\n"));
                 } else {
-                    output_code.push_str(&format!("impl_usart!(USART{usart_index}, UART{usart_index}, vsf_hw_usart{usart_index}, UART{usart_index}_IRQHandler);\n"));
+                    output_code.push_str(&format!("impl_usart!(UART{usart_index}, UART{usart_index}, vsf_hw_usart{usart_index}, UART{usart_index}_IRQHandler);\n"));
                 }
             } else {
                 output_code.push_str(&format!("impl_usart!(USART{usart_index}, USART{usart_index}, vsf_hw_usart{usart_index}, USART{usart_index}_IRQHandler);\n"));

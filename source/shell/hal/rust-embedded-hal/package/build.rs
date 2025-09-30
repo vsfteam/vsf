@@ -490,6 +490,13 @@ fn main() {
     "));
     fs::write("./src/pac.rs", pac_rs_str).unwrap();
 
+    // bind vsf peripherals
+    let mut generated_rs_str = String::from("");
+    let mut gpio_output_code = String::from("");
+    bind_vsf_gpios(&bindings_lines, &mut gpio_output_code);
+    let mut usarts_sync_support: [bool; 32] = [false; 32];
+    bind_vsf_usarts(&bindings_lines, &mut gpio_output_code, &mut usarts_sync_support);
+
     // parse alternate functions and generate _generated.rs
     let mut af_str = String::from("");
     let af_map = GLOBAL_AF_MAP.lock().unwrap();
@@ -502,33 +509,35 @@ fn main() {
         let pin_pos = str.find('_').unwrap();
         let pin_str = &str[pin_pos + 1 .. gpio_pos];
         let peripheral_str = &str[..pin_pos];
-        let peripheral_type_str = peripheral_str.trim_end_matches(|c: char| c.is_ascii_digit());
+        let mut peripheral_type_str = peripheral_str.trim_end_matches(|c: char| c.is_ascii_digit());
         let peripheral_index_str = &peripheral_str[peripheral_type_str.len()..];
+        let peripheral_index: usize = peripheral_index_str.parse::<usize>().unwrap();
         let af = af.1;
+
+        if peripheral_index >= 32 {
+            println!("cargo:error={peripheral_type_str}{peripheral_index_str}: not supported because peripheral index >= 32");
+            continue;
+        }
+
+        // patch peripheral_str, eg USART without sync support => UART
+        if peripheral_type_str == "USART" && !usarts_sync_support.get(peripheral_index).unwrap() {
+            peripheral_type_str = "UART";
+        }
 
         if let Some(af_info) = afs_info.get(peripheral_type_str) {
             if let Some(af_pin) = af_info.pins.get(pin_str) {
                 println!("cargo:warning={}::{peripheral_type_str}{peripheral_index_str}: {pin_str} on {gpio_str} ==> AF{af}", af_info.module);
-                af_str.push_str(&format!("pin_trait_impl!(crate::{}::{}, {peripheral_str}, {gpio_str}, {af}u16);\n", af_info.module, *af_pin));
+                af_str.push_str(&format!("pin_trait_impl!(crate::{}::{}, {peripheral_type_str}{peripheral_index_str}, {gpio_str}, {af}u16);\n", af_info.module, *af_pin));
             }
         }
     }
 
-    // bind vsf peripherals
-    let mut generated_rs_str = String::from("");
-    let mut gpio_output_code = String::from("");
-    bind_vsf_gpios(&bindings_lines, &mut gpio_output_code);
-    let mut usart_output_code = String::from("");
-    bind_vsf_peripheral(&bindings_lines, "usart", &mut usart_output_code);
-
     generated_rs_str.push_str(&format!("
         embassy_hal_internal::peripherals_definition!(
             {gpio_output_code}
-            {usart_output_code}
         );
         embassy_hal_internal::peripherals_struct!(
             {gpio_output_code}
-            {usart_output_code}
         );
         embassy_hal_internal::interrupt_mod!(
             {interrupt_name_str}
@@ -573,6 +582,27 @@ fn bind_vsf_gpios(lines: &Vec<&str>, output_code: &mut String) {
                     pin_index += 1;
                     pin_mask >>= 1;
                 }
+            }
+        }
+    }
+}
+
+fn bind_vsf_usarts(lines: &Vec<&str>, output_code: &mut String, support_sync: &mut [bool; 32]) {
+    let mask: u32 = extract_peripheral_mask(lines, "USART");
+
+    for usart_index in 0..32 {
+        if mask & (1 << usart_index) != 0 {
+            if let Some(sync_support) = extract_const_integer::<u8>(lines, &format!("VSF_HW_USART{usart_index}_SYNC")) {
+                if sync_support != 0 {
+                    support_sync[usart_index] = true;
+                    output_code.push_str(&format!("USART{usart_index},"));
+                } else {
+                    support_sync[usart_index] = false;
+                    output_code.push_str(&format!("UART{usart_index},"));
+                }
+            } else {
+                support_sync[usart_index] = true;
+                output_code.push_str(&format!("USART{usart_index},"));
             }
         }
     }
