@@ -314,7 +314,7 @@ vsf_usart_status_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_status)(
     uint32_t fifo_info = ((reg->FIFO & USART_FIFO_RXCNT_MASK) << 10) | ((reg->FIFO & USART_FIFO_TXCNT_MASK) >> 2);
     return (vsf_usart_status_t) {
         .value  = ((reg->STS ^ __VSF_HW_USART_STS_XOR_MASK) & ~(1 << 11))
-                | ((reg->CTRL1 & USART_CTRL1_SDBRK) >> 2)
+                | (((reg->CTRL1 & USART_CTRL1_SDBRK) ^ USART_CTRL1_SDBRK) >> 2)
                 | fifo_info,
     };
 }
