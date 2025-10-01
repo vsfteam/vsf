@@ -845,9 +845,6 @@ impl<'d> UsartTx<Async> {
             return Ok(());
         }
 
-        let s = self.state;
-        compiler_fence(Ordering::SeqCst);
-
         unsafe {
             let info = self.info;
             let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
@@ -858,6 +855,7 @@ impl<'d> UsartTx<Async> {
             vsf_usart_request_tx(vsf_usart, ptr as *mut ::core::ffi::c_void, len as uint_fast32_t);
         }
 
+        let s = self.state;
         poll_fn(|cx| {
             s.tx_waker.register(cx.waker());
             if s.tx_irq_mask.swap(0, Ordering::Relaxed) & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_CPL) != 0 {
@@ -871,7 +869,20 @@ impl<'d> UsartTx<Async> {
 
     /// Wait until transmission complete
     pub async fn flush(&mut self) -> Result<(), Error> {
-        // TODO:
+        unsafe {
+            let vsf_usart = self.info.vsf_usart.load(Ordering::Relaxed);
+            vsf_usart_irq_enable(vsf_usart, into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_IDLE));
+        }
+
+        let s = self.state;
+        poll_fn(|cx| {
+            s.tx_waker.register(cx.waker());
+            if s.tx_irq_mask.swap(0, Ordering::Relaxed) & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_IDLE) != 0 {
+                return Poll::Ready(());
+            }
+            Poll::Pending
+        }).await;
+
         Ok(())
     }
 }
@@ -993,12 +1004,11 @@ impl<'d, M: Mode> UsartTx<M> {
             return Ok(());
         }
 
-        let info = self.info;
-        let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
-        let mut ptr = buffer.as_ptr();
-        let mut len = buffer.len() as uint_fast32_t;
-
         unsafe {
+            let vsf_usart = self.info.vsf_usart.load(Ordering::Relaxed);
+            let mut ptr = buffer.as_ptr();
+            let mut len = buffer.len() as uint_fast32_t;
+
             while len > 0 {
                 let curlen = vsf_usart_txfifo_write(vsf_usart, ptr as *mut ::core::ffi::c_void, len);
                 len -= curlen;
@@ -1011,28 +1021,31 @@ impl<'d, M: Mode> UsartTx<M> {
 
     /// Block until transmission complete
     pub fn blocking_flush(&mut self) -> Result<(), Error> {
-        // TODO:
+        #[cfg(all(VSF_USART_IRQ_MASK_TX_IDLE))]
+        unsafe {
+            let vsf_usart = self.info.vsf_usart.load(Ordering::Relaxed);
+            while vsf_usart_irq_clear(vsf_usart, into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_TX_IDLE)) == 0  {}
+        }
         Ok(())
     }
 
     /// Send break character
     pub fn send_break(&mut self) {
-        // TODO: implement send_break with VSF_USART_CTRL_SEND_BREAK or with VSF_USART_CTRL_SET_BREAK and VSF_USART_CTRL_CLEAR_BREAK
+        let vsf_usart = self.info.vsf_usart.load(Ordering::Relaxed);
+
         #[cfg(VSF_USART_CTRL_SEND_BREAK)]
         unsafe {
-            let info = self.info;
-            let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
             // 1. wait tx fifo empty
             self.blocking_flush().unwrap();
-            // 2. TODO: wait previous send_break done
+            // 2. wait previous send_break done
+            #[cfg(VSF_USART_STATUS_BREAK_SENT)]
+            while vsf_usart_status(vsf_usart).__bindgen_anon_1.value & (1 << VSF_USART_STATUS_BREAK_SENT) == 0 {}
             // 3. send current break
             vsf_usart_ctrl(vsf_usart, into_vsf_usart_ctrl_t!(VSF_USART_CTRL_SEND_BREAK), 0 as *mut ::core::ffi::c_void);
         }
         #[cfg(all(not(VSF_USART_CTRL_SEND_BREAK), all(VSF_USART_CTRL_SET_BREAK, VSF_USART_CTRL_CLEAR_BREAK)))]
         unsafe {
-            let info = self.info;
             let s = self.state;
-            let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
             let usart_config = s.config.load(Ordering::Relaxed);
 
             // 1. calculate duration for break condition for at least 2 frames
@@ -1281,12 +1294,16 @@ impl<'d, M: Mode> UsartRx<M> {
         let mut len = buffer.len() as uint_fast32_t;
 
         unsafe {
+            vsf_usart_irq_clear(vsf_usart, VSF_USART_IRQ_MASK_ERR);
             while len > 0 {
                 let curlen = vsf_usart_rxfifo_read(vsf_usart, ptr as *mut ::core::ffi::c_void, len);
                 len -= curlen;
                 ptr = ptr.wrapping_add(curlen as usize);
 
-                // TODO: check error
+                let irq_mask = vsf_usart_irq_clear(vsf_usart, VSF_USART_IRQ_MASK_ERR);
+                if let Err(error) = _vsf_usart_check_error(irq_mask) {
+                    return Err(error);
+                }
             }
         }
         Ok(())
@@ -1307,13 +1324,24 @@ impl<'d, M: Mode> UsartRx<M> {
         let mut total_len: usize = 0;
 
         unsafe {
+            #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
+            vsf_usart_irq_clear(vsf_usart, VSF_USART_IRQ_MASK_ERR | into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_IDLE));
+            #[cfg(not(VSF_USART_IRQ_MASK_RX_IDLE))]
+            vsf_usart_irq_clear(vsf_usart, VSF_USART_IRQ_MASK_ERR);
             while len > 0 {
                 let curlen = vsf_usart_rxfifo_read(vsf_usart, ptr as *mut ::core::ffi::c_void, len);
                 total_len += curlen as usize;
                 len -= curlen;
                 ptr = ptr.wrapping_add(curlen as usize);
 
-                // TODO: check error and idle
+                let irq_mask = vsf_usart_irq_clear(vsf_usart, VSF_USART_IRQ_MASK_ERR);
+                if let Err(error) = _vsf_usart_check_error(irq_mask) {
+                    return Err(error);
+                }
+                #[cfg(VSF_USART_IRQ_MASK_RX_IDLE)]
+                if irq_mask & into_vsf_usart_irq_mask_t!(VSF_USART_IRQ_MASK_RX_IDLE) {
+                    break;
+                }
             }
         }
         Ok(total_len)

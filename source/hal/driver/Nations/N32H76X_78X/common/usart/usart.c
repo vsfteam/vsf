@@ -61,7 +61,7 @@ typedef struct VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) {
     bool                    support_sync;
     bool                    is_rxne;
     bool                    is_txnf;
-    uint32_t                irq_mask;
+    uint32_t                irq_enable_mask;
     vsf_usart_isr_t         isr;
 } VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t);
 // HW end
@@ -95,7 +95,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     vsf_hw_peripheral_enable(usart_ptr->en);
     vsf_hw_peripheral_rst_set(usart_ptr->rst);
     vsf_hw_peripheral_rst_clear(usart_ptr->rst);
-    usart_ptr->irq_mask = 0;
+    usart_ptr->irq_enable_mask = 0;
 
     // pclk for USART is shared, so do not configure the pclk in usart module.
     // User should have configured the USART clock.
@@ -173,7 +173,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     } else {
         usart_ptr->is_txnf = true;
     }
-    reg->FIFO = ctrl;
+    reg->FIFO = ctrl | USART_FIFO_EN;
 
     if (enabled) {
         reg->CTRL1 |= USART_CTRL1_UEN;
@@ -224,7 +224,7 @@ void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_enable)(
 
     USART_Module *reg = usart_ptr->reg;
 
-    usart_ptr->irq_mask |= irq_mask;
+    usart_ptr->irq_enable_mask |= irq_mask;
     if ((irq_mask & VSF_USART_IRQ_MASK_RX) && !usart_ptr->is_rxne) {
         irq_mask &= ~VSF_USART_IRQ_MASK_RX;
         reg->FIFO |= USART_FIFO_RXFTIEN;
@@ -237,7 +237,7 @@ void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_enable)(
     reg->CTRL1 |= irq_mask & __VSF_HW_USART_CTRL1_IRQ_MASK;
     reg->CTRL2 |= irq_mask & __VSF_HW_USART_CTRL2_IRQ_MASK;
     reg->CTRL3 |= irq_mask & __VSF_HW_USART_CTRL3_IRQ_MASK;
-    if (usart_ptr->irq_mask & __VSF_HW_USART_STS_IRQ_MASK) {
+    if (usart_ptr->irq_enable_mask & __VSF_HW_USART_STS_IRQ_MASK) {
         reg->CTRL3 |= USART_CTRL3_ERRIEN;
     }
 }
@@ -251,7 +251,7 @@ void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_disable)(
 
     USART_Module *reg = usart_ptr->reg;
 
-    usart_ptr->irq_mask &= ~irq_mask;
+    usart_ptr->irq_enable_mask &= ~irq_mask;
     if ((irq_mask & VSF_USART_IRQ_MASK_RX) && !usart_ptr->is_rxne) {
         irq_mask &= ~VSF_USART_IRQ_MASK_RX;
         reg->FIFO &= ~USART_FIFO_RXFTIEN;
@@ -264,17 +264,58 @@ void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_disable)(
     reg->CTRL1 &= ~(irq_mask & __VSF_HW_USART_CTRL1_IRQ_MASK);
     reg->CTRL2 &= ~(irq_mask & __VSF_HW_USART_CTRL2_IRQ_MASK);
     reg->CTRL3 &= ~(irq_mask & __VSF_HW_USART_CTRL3_IRQ_MASK);
-    if (!(usart_ptr->irq_mask & __VSF_HW_USART_STS_IRQ_MASK)) {
+    if (!(usart_ptr->irq_enable_mask & __VSF_HW_USART_STS_IRQ_MASK)) {
         reg->CTRL3 &= ~USART_CTRL3_ERRIEN;
     }
+}
+
+vsf_usart_irq_mask_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_clear)(
+    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,
+    vsf_usart_irq_mask_t irq_mask
+) {
+    USART_Module *reg = usart_ptr->reg;
+    vsf_usart_irq_mask_t irq_mask_cur = reg->STS, irq_mask_out = irq_mask_cur & VSF_USART_IRQ_MASK_PARITY_ERR;
+
+    if (irq_mask_cur & USART_STS_CTSF) {
+        irq_mask_out |= VSF_USART_IRQ_MASK_CTS;
+    }
+    if (    (usart_ptr->is_rxne && (irq_mask & USART_STS_RXDNE))
+        ||  (!usart_ptr->is_rxne && (irq_mask & USART_STS_RXFT))) {
+        irq_mask_out |= VSF_USART_IRQ_MASK_RX;
+    }
+    if (    (usart_ptr->is_txnf && (irq_mask_cur & USART_STS_TXDE))
+        ||  (!usart_ptr->is_txnf && (irq_mask_cur & USART_STS_TXFT))) {
+        irq_mask_out |= VSF_USART_IRQ_MASK_TX;
+    }
+    if (irq_mask_cur & USART_STS_IDLEF) {
+        irq_mask_out |= VSF_USART_IRQ_MASK_RX_IDLE;
+    }
+    if (irq_mask_cur & USART_STS_TXC) {
+        irq_mask_out |= VSF_USART_IRQ_MASK_TX_IDLE;
+    }
+    if (irq_mask_cur & USART_STS_RTOF) {
+        irq_mask_out |= VSF_USART_IRQ_MASK_RX_TIMEOUT;
+    }
+    irq_mask_out |= (irq_mask_cur & (__VSF_HW_USART_STS_IRQ_MASK >> 5)) << 5;
+    irq_mask_out &= irq_mask;
+
+    // clear CTSF if set
+    if (irq_mask_out & VSF_USART_IRQ_MASK_CTS) {
+        reg->STS = 0xFFFFF & ~USART_STS_CTSF;
+    }
+    return irq_mask_out;
 }
 
 vsf_usart_status_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_status)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
+    USART_Module *reg = usart_ptr->reg;
+    uint32_t fifo_info = ((reg->FIFO & USART_FIFO_RXCNT_MASK) << 10) | ((reg->FIFO & USART_FIFO_TXCNT_MASK) >> 2);
     return (vsf_usart_status_t) {
-        .value                  = usart_ptr->reg->STS,
+        .value  = ((reg->STS ^ __VSF_HW_USART_STS_XOR_MASK) & ~(1 << 11))
+                | ((reg->CTRL1 & USART_CTRL1_SDBRK) >> 2)
+                | fifo_info,
     };
 }
 
@@ -346,34 +387,11 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
 
-    vsf_usart_irq_mask_t irq_mask = usart_ptr->reg->STS, irq_mask_out = irq_mask & VSF_USART_IRQ_MASK_PARITY_ERR;
+    vsf_usart_irq_mask_t irq_status = VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_clear)(usart_ptr, usart_ptr->irq_enable_mask);
     vsf_usart_isr_t *isr_ptr = &usart_ptr->isr;
 
-    if (irq_mask & USART_STS_CTSF) {
-        irq_mask_out |= VSF_USART_IRQ_MASK_CTS;
-    }
-    if (    (usart_ptr->is_rxne && (irq_mask & USART_STS_RXDNE))
-        ||  (!usart_ptr->is_rxne && (irq_mask & USART_STS_RXFT))) {
-        irq_mask_out |= VSF_USART_IRQ_MASK_RX;
-    }
-    if (    (usart_ptr->is_txnf && (irq_mask & USART_STS_TXDE))
-        ||  (!usart_ptr->is_txnf && (irq_mask & USART_STS_TXFT))) {
-        irq_mask_out |= VSF_USART_IRQ_MASK_TX;
-    }
-    if (irq_mask & USART_STS_IDLEF) {
-        irq_mask_out |= VSF_USART_IRQ_MASK_RX_IDLE;
-    }
-    if (irq_mask & USART_STS_TXC) {
-        irq_mask_out |= VSF_USART_IRQ_MASK_TX_IDLE;
-    }
-    if (irq_mask & USART_STS_RTOF) {
-        irq_mask_out |= VSF_USART_IRQ_MASK_RX_TIMEOUT;
-    }
-    irq_mask_out |= (irq_mask & (__VSF_HW_USART_STS_IRQ_MASK >> 5)) << 5;
-
-    irq_mask_out &= usart_ptr->irq_mask;
-    if ((irq_mask_out != 0) && (isr_ptr->handler_fn != NULL)) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_usart_t *)usart_ptr, irq_mask_out);
+    if ((irq_status != 0) && (isr_ptr->handler_fn != NULL)) {
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_usart_t *)usart_ptr, irq_status);
     }
 }
 

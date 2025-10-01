@@ -23,19 +23,15 @@ const BINDGEN_DEFINITIONS: [&'static str; 2] = [
 
 const PERIPHERIALS: [&'static str; 2] = ["gpio", "usart"];
 
-const CONSTANTS_MACRO: [(&'static str, &'static str); 35] = [
+const CONSTANTS_MACRO: [(&'static str, &'static str); 24] = [
     // USART constants
+    ("vsf_usart_status_t", "VSF_USART_STATUS_BREAK_SENT"),
     ("vsf_usart_mode_t", "VSF_USART_5_BIT_LENGTH"),
     ("vsf_usart_mode_t", "VSF_USART_6_BIT_LENGTH"),
     ("vsf_usart_mode_t", "VSF_USART_7_BIT_LENGTH"),
-    ("vsf_usart_mode_t", "VSF_USART_8_BIT_LENGTH"),
     ("vsf_usart_mode_t", "VSF_USART_9_BIT_LENGTH"),
     ("vsf_usart_mode_t", "VSF_USART_10_BIT_LENGTH"),
-    ("vsf_usart_mode_t", "VSF_USART_NO_PARITY"),
-    ("vsf_usart_mode_t", "VSF_USART_ODD_PARITY"),
-    ("vsf_usart_mode_t", "VSF_USART_EVEN_PARITY"),
     ("vsf_usart_mode_t", "VSF_USART_0_5_STOPBIT"),
-    ("vsf_usart_mode_t", "VSF_USART_1_STOPBIT"),
     ("vsf_usart_mode_t", "VSF_USART_1_5_STOPBIT"),
     ("vsf_usart_mode_t", "VSF_USART_2_STOPBIT"),
     ("vsf_usart_mode_t", "VSF_USART_SYNC_CLOCK_ENABLE"),
@@ -44,16 +40,9 @@ const CONSTANTS_MACRO: [(&'static str, &'static str); 35] = [
     ("vsf_usart_mode_t", "VSF_USART_SWAP"),
     ("vsf_usart_mode_t", "VSF_USART_TX_INVERT"),
     ("vsf_usart_mode_t", "VSF_USART_RX_INVERT"),
-    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_TX"),
-    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX"),
-    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_TX_CPL"),
-    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_CPL"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_TIMEOUT"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_CTS"),
-    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_FRAME_ERR"),
-    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_PARITY_ERR"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_BREAK_ERR"),
-    ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_RX_IDLE"),
     ("vsf_usart_irq_mask_t", "VSF_USART_IRQ_MASK_TX_IDLE"),
@@ -202,7 +191,7 @@ lazy_static! {
         });
         m
     });
-    static ref GLOBAL_CONSTANTS_VEC: Mutex<Vec<(&'static str, &'static str)>> = Mutex::new({
+    static ref GLOBAL_CONSTANTS_MACRO_VEC: Mutex<Vec<(&'static str, &'static str)>> = Mutex::new({
         let v = Vec::new();
         v
     });
@@ -233,10 +222,10 @@ impl ParseCallbacks for Callbacks {
             let mut af_map = GLOBAL_AF_MAP.lock().unwrap();
             af_map.insert(String::from(name_str.strip_prefix("VSF_HW_AF_").unwrap()), value);
         } else {
-            let mut constants_vec = GLOBAL_CONSTANTS_VEC.lock().unwrap();
+            let mut constants_macro = GLOBAL_CONSTANTS_MACRO_VEC.lock().unwrap();
             for constant in CONSTANTS_MACRO {
                 if constant.1 == name {
-                    constants_vec.push((constant.0, constant.1));
+                    constants_macro.push((constant.0, constant.1));
                 }
             }
         }
@@ -378,16 +367,26 @@ fn main() {
 
     // parse constants
     let mut constants_cfg: BTreeMap<(&'static str, &'static str), u64> = BTreeMap::new();
-    let constants_vec = GLOBAL_CONSTANTS_VEC.lock().unwrap();
+    let constants_macro = GLOBAL_CONSTANTS_MACRO_VEC.lock().unwrap();
+    // add constants in CONSTANTS_ENUM
     'outer: for constant_enum in CONSTANTS_ENUM {
         println!("cargo::rustc-check-cfg=cfg({})", constant_enum.1);
         if let Some(cur_value) = extract_const_integer::<u64>(&bindings_lines, &(String::from(constant_enum.0) + "_" + constant_enum.1)) {
             for constant_macro in CONSTANTS_MACRO {
-                if constant_macro.1 == constant_enum.1 && !constants_vec.contains(&constant_macro) {
+                if constant_macro.1 == constant_enum.1 && !constants_macro.contains(&constant_macro) {
                     continue 'outer;
                 }
             }
             constants_cfg.insert((constant_enum.0, constant_enum.1), cur_value);
+        }
+    }
+    // add constants in CONSTANTS_MACRO
+    for constant_macro in CONSTANTS_MACRO {
+        if !CONSTANTS_ENUM.contains(&constant_macro) {
+            println!("cargo::rustc-check-cfg=cfg({})", constant_macro.1);
+            if constants_macro.contains(&constant_macro) {
+                constants_cfg.insert((constant_macro.0, constant_macro.1), 0);
+            }
         }
     }
     for constant_conflict in CONSTANTS_CONFLICT {

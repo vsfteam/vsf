@@ -68,33 +68,24 @@ extern "C" {
 typedef enum vsf_usart_mode_t {
     // 1..2: TXEN(2)/RXEN(1) in USART_CTRL1
     VSF_USART_TX_ENABLE                 = (1 << 2),
-#define VSF_USART_TX_ENABLE             VSF_USART_TX_ENABLE
     VSF_USART_TX_DISABLE                = (0 << 2),
-#define VSF_USART_TX_DISABLE            VSF_USART_TX_DISABLE
     VSF_USART_RX_ENABLE                 = (1 << 1),
-#define VSF_USART_RX_ENABLE             VSF_USART_RX_ENABLE
     VSF_USART_RX_DISABLE                = (0 << 1),
-#define VSF_USART_RX_DISABLE            VSF_USART_RX_DISABLE
 
     // 3..4: PCEN(4)/PSEL(3) in USART_CTRL1
     VSF_USART_NO_PARITY                 = (0 << 4),
-#define VSF_USART_NO_PARITY             VSF_USART_NO_PARITY
     VSF_USART_ODD_PARITY                = (1 << 4) | (1 << 3),
-#define VSF_USART_ODD_PARITY            VSF_USART_ODD_PARITY
     VSF_USART_EVEN_PARITY               = (1 << 4),
-#define VSF_USART_EVEN_PARITY           VSF_USART_EVEN_PARITY
 
     // 5: WL(5) in USART_CTRL1
+    VSF_USART_8_BIT_LENGTH              = (0 << 5),
     VSF_USART_9_BIT_LENGTH              = (1 << 5),
 #define VSF_USART_9_BIT_LENGTH          VSF_USART_9_BIT_LENGTH
-    VSF_USART_8_BIT_LENGTH              = (0 << 5),
-#define VSF_USART_8_BIT_LENGTH          VSF_USART_8_BIT_LENGTH
 
     // 6..7: STPB(5:6) in USART_CTRL2, left shifted by 1
+    VSF_USART_1_STOPBIT                 = (0 << 5) << 1,
     VSF_USART_0_5_STOPBIT               = (1 << 5) << 1,
 #define VSF_USART_0_5_STOPBIT           VSF_USART_0_5_STOPBIT
-    VSF_USART_1_STOPBIT                 = (0 << 5) << 1,
-#define VSF_USART_1_STOPBIT             VSF_USART_1_STOPBIT
     VSF_USART_1_5_STOPBIT               = (3 << 5) << 1,
 #define VSF_USART_1_5_STOPBIT           VSF_USART_1_5_STOPBIT
     VSF_USART_2_STOPBIT                 = (2 << 5) << 1,
@@ -260,7 +251,6 @@ typedef enum vsf_usart_irq_mask_t {
 
     // 7: TXDE(7) in USART_CTTL1
     VSF_USART_IRQ_MASK_TX               = (1 << 7),
-#define VSF_USART_IRQ_MASK_TX           VSF_USART_IRQ_MASK_TX
 
     // 8: IDLEIEN(8) in USART_CTRL1
     VSF_USART_IRQ_MASK_RX_IDLE          = (1 << 8),
@@ -268,7 +258,6 @@ typedef enum vsf_usart_irq_mask_t {
 
     // 9: RXDNEIE(9) in USART_CTRL1
     VSF_USART_IRQ_MASK_RX               = (1 << 9),
-#define VSF_USART_IRQ_MASK_RX           VSF_USART_IRQ_MASK_RX
 
     // 11: TXCIEN(11) in USART_CTRL1
     VSF_USART_IRQ_MASK_TX_IDLE          = (1 << 11),
@@ -277,7 +266,6 @@ typedef enum vsf_usart_irq_mask_t {
     // usart error interrupt
     // 12: PEIEN(12) in USART_CTRL1
     VSF_USART_IRQ_MASK_PARITY_ERR       = (1 << 12),
-#define VSF_USART_IRQ_MASK_PARITY_ERR   VSF_USART_IRQ_MASK_PARITY_ERR
 
     // 15|17: RTOIEN(17)/RTOEN(15) in USART_CTRL2
     VSF_USART_IRQ_MASK_RX_TIMEOUT       = (1 << 15) | (1 << 17),
@@ -285,13 +273,11 @@ typedef enum vsf_usart_irq_mask_t {
 
     // 18: OREF(13) in USART_STS
     VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  = (1 << 18),
-#define VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR
     // 19: OREF(14) in USART_STS
     VSF_USART_IRQ_MASK_NOISE_ERR        = (1 << 19),
 #define VSF_USART_IRQ_MASK_NOISE_ERR    VSF_USART_IRQ_MASK_NOISE_ERR
     // 20: FEF(15) in USART_STS
     VSF_USART_IRQ_MASK_FRAME_ERR        = (1 << 20),
-#define VSF_USART_IRQ_MASK_FRAME_ERR    VSF_USART_IRQ_MASK_FRAME_ERR
     VSF_USART_IRQ_MASK_BREAK_ERR        = VSF_USART_IRQ_MASK_FRAME_ERR,
 #define VSF_USART_IRQ_MASK_BREAK_ERR    VSF_USART_IRQ_MASK_BREAK_ERR
 
@@ -343,25 +329,31 @@ typedef enum vsf_usart_ctrl_t {
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS == ENABLED
 typedef struct vsf_usart_status_t {
     union {
+// bits to be inverted:
+//  TXC(is_tx_complete) => is_tx_busy
+#define __VSF_HW_USART_STS_XOR_MASK     (1 << 8)
+#define __VSF_HW_USART_STS_MASK         0xF7FF
         struct {
-            uint32_t txff               : 1;    // TXFF(0) in USART_STS
-            uint32_t rxff               : 1;    // RXFF(1) in USART_STS
-            uint32_t txfe               : 1;    // TXFE(2) in USART_STS
-            uint32_t rxfe               : 1;    // RXFE(3) in USART_STS
-            uint32_t rxft               : 1;    // RXFT(4) in USART_STS
-            uint32_t txft               : 1;    // TXFT(5) in USART_STS
-            uint32_t idle               : 1;    // IDLE(6) in USART_STS
+            uint32_t is_txfifo_full     : 1;    // TXFF(0) in USART_STS
+            uint32_t is_rxfifo_full     : 1;    // RXFF(1) in USART_STS
+            uint32_t is_txfifo_empty    : 1;    // TXFE(2) in USART_STS
+            uint32_t is_rxfifo_empty    : 1;    // RXFE(3) in USART_STS
+            uint32_t is_rxfifo_threshold: 1;    // RXFT(4) in USART_STS
+            uint32_t is_txfifo_threahold: 1;    // TXFT(5) in USART_STS
+            uint32_t is_rx_idle         : 1;    // IDLE(6) in USART_STS
             uint32_t txde               : 1;    // TXDEF(7) in USART_STS
-            uint32_t trans_complete     : 1;    // TXC(8) in USART_STS
-            uint32_t rxne               : 1;    // RXDNE(9) in USART_STS
-            uint32_t cts_level          : 1;    // CTSF(10) in USART_STS
-            uint32_t __dummy1           : 1;
+            uint32_t is_tx_busy         : 1;    // TXC(8) in USART_STS
+            uint32_t rxdne              : 1;    // RXDNE(9) in USART_STS
+            uint32_t cts_changed        : 1;    // CTSF(10) in USART_STS
+            uint32_t break_sent         : 1;
+#define VSF_USART_STATUS_BREAK_SENT     11
             uint32_t parity_err         : 1;    // PEF(12) in USART_STS
             uint32_t overrun_err        : 1;    // OREF(13) in USART_STS
             uint32_t noise_err          : 1;    // NEF(14) in USART_STS
             uint32_t frame_err          : 1;    // FEF(15) in USART_STS
-            uint32_t rx_timeouted       : 1;    // RTOF(16) in USART_STS
-            uint32_t __dummy2           : 16;
+            uint32_t rx_timeout         : 1;    // RTOF(16) in USART_STS
+            uint32_t tx_fifo_data       : 8;
+            uint32_t rx_fifo_data       : 8;
         };
         uint32_t value;
     };
