@@ -197,6 +197,7 @@ void VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_fini)(
     VSF_HAL_ASSERT(NULL != usart_ptr);
     vsf_hw_peripheral_rst_set(usart_ptr->rst);
     vsf_hw_peripheral_rst_clear(usart_ptr->rst);
+    vsf_hw_peripheral_disable(usart_ptr->en);
 }
 
 fsm_rt_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_enable)(

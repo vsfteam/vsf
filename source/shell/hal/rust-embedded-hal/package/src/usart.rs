@@ -17,13 +17,13 @@
 
 use core::future::poll_fn;
 use core::marker::PhantomData;
-use core::sync::atomic::{compiler_fence, Ordering, AtomicPtr, AtomicBool, AtomicU32};
+use core::sync::atomic::{compiler_fence, Ordering, AtomicPtr, AtomicBool, AtomicU8, AtomicU32};
 use core::task::Poll;
 use core::ptr;
 use core::slice;
 use paste::paste;
 
-//use embassy_hal_internal::drop::OnDrop;
+use embassy_hal_internal::drop::OnDrop;
 use embassy_hal_internal::{Peri, PeripheralType};
 use embassy_sync::waitqueue::AtomicWaker;
 
@@ -490,12 +490,22 @@ fn _vsf_usart_config_and_enable(info: &Info, state: &State, config: &Config, con
     _vsf_usart_config(info, state, config, config_fix, target_ptr, irqhandler)?;
     unsafe {
         let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
-        vsf_usart_enable(vsf_usart);
+        while vsf_usart_enable(vsf_usart) != into_fsm_rt_t!(fsm_rt_cpl) {}
 
         info.interrupt.unpend();
         info.interrupt.enable();
     }
     Ok(())
+}
+
+fn _vsf_usart_drop(info: &Info, state: &State) {
+    if state.refcnt.fetch_sub(1, Ordering::Relaxed) == 1 {
+        unsafe {
+            let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
+            while vsf_usart_disable(vsf_usart) != into_fsm_rt_t!(fsm_rt_cpl) {}
+            vsf_usart_fini(vsf_usart);
+        }
+    }
 }
 
 fn _vsf_usart_check_error(irq_mask: vsf_usart_irq_mask_t) -> Result<(), Error> {
@@ -692,6 +702,7 @@ impl<'d, M: Mode> Usart<M> {
         };
         let info = T::info();
         let s = T::state();
+        s.refcnt.store(2, Ordering::Relaxed);
         _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
 
         Ok(Self {
@@ -846,8 +857,7 @@ impl<'d> UsartTx<Async> {
         }
 
         unsafe {
-            let info = self.info;
-            let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
+            let vsf_usart = self.info.vsf_usart.load(Ordering::Relaxed);
             let ptr = buffer.as_ptr();
             let len = buffer.len();
 
@@ -954,6 +964,7 @@ impl<'d, M: Mode> UsartTx<M> {
         };
         let info = T::info();
         let s = T::state();
+        s.refcnt.store(1, Ordering::Relaxed);
         _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
 
         Ok(Self {
@@ -1068,7 +1079,11 @@ impl<'d, M: Mode> UsartTx<M> {
 
 impl<M: Mode> Drop for UsartTx<M> {
     fn drop(&mut self) {
-        // TODO
+        unsafe {
+            let vsf_usart = self.info.vsf_usart.load(Ordering::Relaxed);
+            vsf_usart_cancel_tx(vsf_usart);
+        }
+        _vsf_usart_drop(self.info, self.state);
     }
 }
 
@@ -1119,8 +1134,7 @@ impl<'d> UsartRx<Async> {
         compiler_fence(Ordering::SeqCst);
 
         unsafe {
-            let info = self.info;
-            let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
+            let vsf_usart = self.info.vsf_usart.load(Ordering::Relaxed);
             let ptr = buffer.as_ptr();
             let len = buffer.len();
 
@@ -1150,8 +1164,7 @@ impl<'d> UsartRx<Async> {
         }
 
         let s = self.state;
-        let info = self.info;
-        let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
+        let vsf_usart = self.info.vsf_usart.load(Ordering::Relaxed);
         s.rx_exit_on_idle.store(true, Ordering::Relaxed);
         compiler_fence(Ordering::SeqCst);
 
@@ -1238,6 +1251,7 @@ impl<'d, M: Mode> UsartRx<M> {
         };
         let info = T::info();
         let s = T::state();
+        s.refcnt.store(1, Ordering::Relaxed);
         _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
 
         Ok(Self {
@@ -1288,8 +1302,7 @@ impl<'d, M: Mode> UsartRx<M> {
             return Ok(());
         }
 
-        let info = self.info;
-        let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
+        let vsf_usart = self.info.vsf_usart.load(Ordering::Relaxed);
         let mut ptr = buffer.as_ptr();
         let mut len = buffer.len() as uint_fast32_t;
 
@@ -1317,8 +1330,7 @@ impl<'d, M: Mode> UsartRx<M> {
             return Ok(0);
         }
 
-        let info = self.info;
-        let vsf_usart = info.vsf_usart.load(Ordering::Relaxed);
+        let vsf_usart = self.info.vsf_usart.load(Ordering::Relaxed);
         let mut ptr = buffer.as_ptr();
         let mut len = buffer.len() as uint_fast32_t;
         let mut total_len: usize = 0;
@@ -1350,7 +1362,11 @@ impl<'d, M: Mode> UsartRx<M> {
 
 impl<M: Mode> Drop for UsartRx<M> {
     fn drop(&mut self) {
-        // TODO
+        unsafe {
+            let vsf_usart = self.info.vsf_usart.load(Ordering::Relaxed);
+            vsf_usart_cancel_rx(vsf_usart);
+        }
+        _vsf_usart_drop(self.info, self.state);
     }
 }
 
@@ -1571,6 +1587,7 @@ struct State {
     rx_irq_mask: AtomicU32,
     tx_irq_mask: AtomicU32,
     rx_exit_on_idle: AtomicBool,
+    refcnt: AtomicU8,
     config: AtomicPtr<vsf_usart_cfg_t>,
     _config: vsf_usart_cfg_t,
 }
@@ -1602,6 +1619,7 @@ impl State {
             rx_irq_mask: AtomicU32::new(0),
             tx_irq_mask: AtomicU32::new(0),
             rx_exit_on_idle: AtomicBool::new(false),
+            refcnt: AtomicU8::new(0),
             config: AtomicPtr::new(ptr::null_mut()),
             _config: vsf_usart_cfg_t::new(),
         }
