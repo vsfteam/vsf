@@ -1119,10 +1119,14 @@ extern vsf_err_t vsf_usart_cancel_tx(vsf_usart_t *usart_ptr);
  * @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
  * @return int_fast32_t: Number of received bytes, negative value for error
  *
+ * @note the API is valid on VSF_USART_IRQ_MASK_RX_CPL event or call vsf_usart_cancel_rx, until next vsf_usart_cancel_rx
+ *
  * \~chinese
  * @brief 获取当前或最后一次 USART 操作中接收的字节数
  * @param[in] usart_ptr: 指向结构体 @ref vsf_usart_t 的指针
  * @return int_fast32_t: 已接收的字节数，负值表示错误
+ *
+ * @note 本函数在 VSF_USART_IRQ_MASK_RX_CPL 事件或者调用 vsf_usart_cancel_rx 之后有效，直到下一次调用 vsf_usart_cancel_rx
  */
 extern int_fast32_t vsf_usart_get_rx_count(vsf_usart_t *usart_ptr);
 
@@ -1132,10 +1136,14 @@ extern int_fast32_t vsf_usart_get_rx_count(vsf_usart_t *usart_ptr);
  * @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
  * @return int_fast32_t: Number of transmitted bytes, negative value for error
  *
+ * @note the API is valid on VSF_USART_IRQ_MASK_TX_CPL event or call vsf_usart_cancel_tx, until next vsf_usart_cancel_tx
+ *
  * \~chinese
  * @brief 获取当前或最后一次 USART 操作中发送的字节数
  * @param[in] usart_ptr: 指向结构体 @ref vsf_usart_t 的指针
  * @return int_fast32_t: 已发送的字节数，负值表示错误
+ *
+ * @note 本函数在 VSF_USART_IRQ_MASK_TX_CPL 事件或者调用 vsf_usart_cancel_tx 之后有效，直到下一次调用 vsf_usart_cancel_tx
  */
 extern int_fast32_t vsf_usart_get_tx_count(vsf_usart_t *usart_ptr);
 
