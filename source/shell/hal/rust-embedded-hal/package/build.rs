@@ -189,6 +189,25 @@ lazy_static! {
                 ("CK", "CkPin"),
             ]),
         });
+        m.insert("SPI", PeripheralAfInfo {
+            module: "spi",
+            name: "Spi",
+            pins: HashMap::from([
+                ("SCK", "SckPin"),
+                ("NSS", "CsPin"),
+                ("MISO", "MisoPin"),
+                ("MOSI", "MosiPin"),
+            ]),
+        });
+        m.insert("I2C", PeripheralAfInfo {
+            module: "i2c",
+            name: "I2c",
+            pins: HashMap::from([
+                ("SCL", "SclPin"),
+                ("SDA", "SdaPin"),
+                ("SMBA", "SmbaPin"),
+            ]),
+        });
         m
     });
     static ref GLOBAL_CONSTANTS_MACRO_VEC: Mutex<Vec<(&'static str, &'static str)>> = Mutex::new({
