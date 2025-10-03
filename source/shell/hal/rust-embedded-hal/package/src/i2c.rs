@@ -127,5 +127,4 @@ macro_rules! impl_i2c_irq_type {
     }}
 }
 
-use crate::peripherals;
 vsf_hal_macros::bind_vsf_peripheral!{i2c impl_i2c_info impl_i2c_irq_type}

@@ -25,5 +25,4 @@ pin_trait!(MisoPin, Instance);
 pin_trait!(MosiPin, Instance);
 pin_trait!(CsPin, Instance);
 
-use crate::peripherals;
 vsf_hal_macros::bind_vsf_peripheral!{spi}
