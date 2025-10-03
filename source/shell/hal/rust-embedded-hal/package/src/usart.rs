@@ -673,51 +673,6 @@ impl<'d> Usart<Blocking> {
             config
         )
     }
-}
-
-impl<'d, M: Mode> Usart<M> {
-    fn new_inner<T: Instance>(
-        _rxd: Option<Peri<'d, AnyPin>>,
-        _txd: Option<Peri<'d, AnyPin>>,
-        _ck: Option<Peri<'d, AnyPin>>,
-        _cts: Option<Peri<'d, AnyPin>>,
-        _rts: Option<Peri<'d, AnyPin>>,
-        _de: Option<Peri<'d, AnyPin>>,
-        config: Config,
-    ) -> Result<Self, ConfigError> {
-        #[cfg(all(not(VSF_USART_TX_INVERT), not(VSF_USART_RX_INVERT)))]
-        let mode = 0;
-        #[cfg(any(VSF_USART_TX_INVERT, VSF_USART_RX_INVERT))]
-        let mode = {
-            let mut mode: u32 = 0;
-            #[cfg(VSF_USART_TX_INVERT)]
-            if config.invert_tx {
-                mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
-            }
-            #[cfg(VSF_USART_RX_INVERT)]
-            if config.invert_rx {
-                mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
-            }
-            mode
-        };
-        let info = T::info();
-        let s = T::state();
-        s.refcnt.store(2, Ordering::Relaxed);
-        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
-
-        Ok(Self {
-            tx: UsartTx {
-                info: info,
-                state: s,
-                p: PhantomData,
-            },
-            rx: UsartRx {
-                info: info,
-                state: s,
-                p: PhantomData,
-            },
-        })
-    }
 
     pub fn into_buffered<T: Instance>(self, 
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
@@ -764,6 +719,51 @@ impl<'d, M: Mode> Usart<M> {
                 buffered_state: bs,
             },
         }
+    }
+}
+
+impl<'d, M: Mode> Usart<M> {
+    fn new_inner<T: Instance>(
+        _rxd: Option<Peri<'d, AnyPin>>,
+        _txd: Option<Peri<'d, AnyPin>>,
+        _ck: Option<Peri<'d, AnyPin>>,
+        _cts: Option<Peri<'d, AnyPin>>,
+        _rts: Option<Peri<'d, AnyPin>>,
+        _de: Option<Peri<'d, AnyPin>>,
+        config: Config,
+    ) -> Result<Self, ConfigError> {
+        #[cfg(all(not(VSF_USART_TX_INVERT), not(VSF_USART_RX_INVERT)))]
+        let mode = 0;
+        #[cfg(any(VSF_USART_TX_INVERT, VSF_USART_RX_INVERT))]
+        let mode = {
+            let mut mode: u32 = 0;
+            #[cfg(VSF_USART_TX_INVERT)]
+            if config.invert_tx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
+            }
+            #[cfg(VSF_USART_RX_INVERT)]
+            if config.invert_rx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
+            }
+            mode
+        };
+        let info = T::info();
+        let s = T::state();
+        s.refcnt.store(2, Ordering::Relaxed);
+        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
+
+        Ok(Self {
+            tx: UsartTx {
+                info: info,
+                state: s,
+                p: PhantomData,
+            },
+            rx: UsartRx {
+                info: info,
+                state: s,
+                p: PhantomData,
+            },
+        })
     }
 
     /// Read bytes until the buffer is filled.
@@ -942,37 +942,6 @@ impl<'d> UsartTx<Blocking> {
             config
         )
     }
-}
-
-impl<'d, M: Mode> UsartTx<M> {
-    fn new_inner<T: Instance>(
-        _txd: Option<Peri<'d, AnyPin>>,
-        _ck: Option<Peri<'d, AnyPin>>,
-        _cts: Option<Peri<'d, AnyPin>>,
-        config: Config
-    ) -> Result<Self, ConfigError> {
-        #[cfg(not(VSF_USART_TX_INVERT))]
-        let mode = into_vsf_usart_mode_t!(VSF_USART_TX_ENABLE) as u32;
-        #[cfg(VSF_USART_TX_INVERT)]
-        let mode = {
-            let mut mode: u32 = into_vsf_usart_mode_t!(VSF_USART_TX_ENABLE) as u32;
-            #[cfg(VSF_USART_TX_INVERT)]
-            if config.invert_tx {
-                mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
-            }
-            mode
-        };
-        let info = T::info();
-        let s = T::state();
-        s.refcnt.store(1, Ordering::Relaxed);
-        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
-
-        Ok(Self {
-            info: info,
-            state: s,
-            p: PhantomData,
-        })
-    }
 
     pub fn into_buffered<T: Instance>(self, 
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
@@ -1007,6 +976,37 @@ impl<'d, M: Mode> UsartTx<M> {
             state: s,
             buffered_state: bs,
         }
+    }
+}
+
+impl<'d, M: Mode> UsartTx<M> {
+    fn new_inner<T: Instance>(
+        _txd: Option<Peri<'d, AnyPin>>,
+        _ck: Option<Peri<'d, AnyPin>>,
+        _cts: Option<Peri<'d, AnyPin>>,
+        config: Config
+    ) -> Result<Self, ConfigError> {
+        #[cfg(not(VSF_USART_TX_INVERT))]
+        let mode = into_vsf_usart_mode_t!(VSF_USART_TX_ENABLE) as u32;
+        #[cfg(VSF_USART_TX_INVERT)]
+        let mode = {
+            let mut mode: u32 = into_vsf_usart_mode_t!(VSF_USART_TX_ENABLE) as u32;
+            #[cfg(VSF_USART_TX_INVERT)]
+            if config.invert_tx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_TX_INVERT) as u32;
+            }
+            mode
+        };
+        let info = T::info();
+        let s = T::state();
+        s.refcnt.store(1, Ordering::Relaxed);
+        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
+
+        Ok(Self {
+            info: info,
+            state: s,
+            p: PhantomData,
+        })
     }
 
     /// Write all bytes in the buffer.
@@ -1230,36 +1230,6 @@ impl<'d> UsartRx<Blocking> {
             config
         )
     }
-}
-
-impl<'d, M: Mode> UsartRx<M> {
-    fn new_inner<T: Instance>(
-        _rxd: Option<Peri<'d, AnyPin>>,
-        _rts: Option<Peri<'d, AnyPin>>,
-        config: Config
-    ) -> Result<Self, ConfigError> {
-        #[cfg(not(VSF_USART_RX_INVERT))]
-        let mode = into_vsf_usart_mode_t!(VSF_USART_RX_ENABLE) as u32;
-        #[cfg(VSF_USART_RX_INVERT)]
-        let mode = {
-            let mut mode: u32 = into_vsf_usart_mode_t!(VSF_USART_RX_ENABLE) as u32;
-            #[cfg(VSF_USART_RX_INVERT)]
-            if config.invert_rx {
-                mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
-            }
-            mode
-        };
-        let info = T::info();
-        let s = T::state();
-        s.refcnt.store(1, Ordering::Relaxed);
-        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
-
-        Ok(Self {
-            info: info,
-            state: s,
-            p: PhantomData,
-        })
-    }
 
     pub fn into_buffered<T: Instance>(self, 
         _irq: impl interrupt::typelevel::Binding<T::Interrupt, BufferedInterruptHandler<T>> + 'd,
@@ -1294,6 +1264,36 @@ impl<'d, M: Mode> UsartRx<M> {
             state: s,
             buffered_state: bs,
         }
+    }
+}
+
+impl<'d, M: Mode> UsartRx<M> {
+    fn new_inner<T: Instance>(
+        _rxd: Option<Peri<'d, AnyPin>>,
+        _rts: Option<Peri<'d, AnyPin>>,
+        config: Config
+    ) -> Result<Self, ConfigError> {
+        #[cfg(not(VSF_USART_RX_INVERT))]
+        let mode = into_vsf_usart_mode_t!(VSF_USART_RX_ENABLE) as u32;
+        #[cfg(VSF_USART_RX_INVERT)]
+        let mode = {
+            let mut mode: u32 = into_vsf_usart_mode_t!(VSF_USART_RX_ENABLE) as u32;
+            #[cfg(VSF_USART_RX_INVERT)]
+            if config.invert_rx {
+                mode |= into_vsf_usart_mode_t!(VSF_USART_RX_INVERT) as u32;
+            }
+            mode
+        };
+        let info = T::info();
+        let s = T::state();
+        s.refcnt.store(1, Ordering::Relaxed);
+        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
+
+        Ok(Self {
+            info: info,
+            state: s,
+            p: PhantomData,
+        })
     }
 
     /// Read bytes until the buffer is filled.

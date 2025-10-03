@@ -80,6 +80,10 @@ macro_rules! into_vsf_usart_ctrl_t {($mode:ident) => { paste!{[<vsf_usart_ctrl_t
 pub mod gpio;
 #[cfg(vsf_usart_enabled)]
 pub mod usart;
+#[cfg(vsf_spi_enabled)]
+pub mod spi;
+#[cfg(vsf_i2c_enabled)]
+pub mod i2c;
 
 // This must go last, so that it sees all the impl_foo! macros defined earlier.
 pub(crate) mod _generated {

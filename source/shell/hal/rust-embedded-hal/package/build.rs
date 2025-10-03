@@ -5,6 +5,7 @@ use std::collections::{HashMap, BTreeMap};
 use std::env;
 use std::fs;
 use shellexpand;
+use regex::Regex;
 
 const BINDGEN_ENUM_VAR: bindgen::EnumVariation = bindgen::EnumVariation::Consts;
 
@@ -21,7 +22,7 @@ const BINDGEN_DEFINITIONS: [&'static str; 2] = [
     "__VSF_CPP__",
 ];
 
-const PERIPHERIALS: [&'static str; 2] = ["gpio", "usart"];
+const PERIPHERIALS: [&'static str; 4] = ["gpio", "usart", "spi", "i2c"];
 
 const CONSTANTS_MACRO: [(&'static str, &'static str); 24] = [
     // USART constants
@@ -159,6 +160,11 @@ const TYPES: [&'static str; 1] = [
     "vsf_hw_peripheral_en_t",
 ];
 
+const INTERRUPT_CFG: [(&'static str, &'static str); 2] = [
+    (r"^I2C[0-9]+_EV$", "I2C_IRQ_EV"),
+    (r"^I2C[0-9]+_ER$", "I2C_IRQ_ER"),
+];
+
 struct PeripheralAfInfo {
     module: &'static str,
     name: &'static str,
@@ -177,37 +183,43 @@ lazy_static! {
     });
     static ref GLOBAL_AF_INFO: Mutex<HashMap<&'static str, PeripheralAfInfo>> = Mutex::new({
         let mut m = HashMap::new();
-        m.insert("USART", PeripheralAfInfo {
-            module: "usart",
-            name: "Usart",
-            pins: HashMap::from([
-                ("TX", "TxPin"),
-                ("RX", "RxPin"),
-                ("DE", "DePin"),
-                ("CTS", "CtsPin"),
-                ("RTS", "RtsPin"),
-                ("CK", "CkPin"),
-            ]),
-        });
-        m.insert("SPI", PeripheralAfInfo {
-            module: "spi",
-            name: "Spi",
-            pins: HashMap::from([
-                ("SCK", "SckPin"),
-                ("NSS", "CsPin"),
-                ("MISO", "MisoPin"),
-                ("MOSI", "MosiPin"),
-            ]),
-        });
-        m.insert("I2C", PeripheralAfInfo {
-            module: "i2c",
-            name: "I2c",
-            pins: HashMap::from([
-                ("SCL", "SclPin"),
-                ("SDA", "SdaPin"),
-                ("SMBA", "SmbaPin"),
-            ]),
-        });
+        if PERIPHERIALS.contains(&"usart") {
+            m.insert("USART", PeripheralAfInfo {
+                module: "usart",
+                name: "Usart",
+                pins: HashMap::from([
+                    ("TX", "TxPin"),
+                    ("RX", "RxPin"),
+                    ("DE", "DePin"),
+                    ("CTS", "CtsPin"),
+                    ("RTS", "RtsPin"),
+                    ("CK", "CkPin"),
+                ]),
+            });
+        }
+        if PERIPHERIALS.contains(&"spi") {
+            m.insert("SPI", PeripheralAfInfo {
+                module: "spi",
+                name: "Spi",
+                pins: HashMap::from([
+                    ("SCK", "SckPin"),
+                    ("NSS", "CsPin"),
+                    ("MISO", "MisoPin"),
+                    ("MOSI", "MosiPin"),
+                ]),
+            });
+        }
+        if PERIPHERIALS.contains(&"i2c") {
+            m.insert("I2C", PeripheralAfInfo {
+                module: "i2c",
+                name: "I2c",
+                pins: HashMap::from([
+                    ("SCL", "SclPin"),
+                    ("SDA", "SdaPin"),
+                    ("SMBA", "SmbaPin"),
+                ]),
+            });
+        }
         m
     });
     static ref GLOBAL_CONSTANTS_MACRO_VEC: Mutex<Vec<(&'static str, &'static str)>> = Mutex::new({
@@ -379,11 +391,6 @@ fn main() {
     let bindings_content = fs::read_to_string(&pathbuf).unwrap();
     let bindings_lines = bindings_content.lines().collect();
 
-    // parse peripherials
-    for peripherial in PERIPHERIALS {
-        enable_peripherial(&bindings_lines, peripherial);
-    }
-
     // parse constants
     let mut constants_cfg: BTreeMap<(&'static str, &'static str), u64> = BTreeMap::new();
     let constants_macro = GLOBAL_CONSTANTS_MACRO_VEC.lock().unwrap();
@@ -451,18 +458,30 @@ fn main() {
     }
 
     // parse interrupts and generate device.x and pac.rs
+    for interrupt in INTERRUPT_CFG {
+        println!("cargo::rustc-check-cfg=cfg({})", interrupt.1);
+    }
+
     let mut device_x_str = String::from("");
     let mut interrupt_str = String::from("");
     let mut interrupt_func_dec_str = String::from("");
     let mut interrupt_vecotr_str = String::from("");
     let mut interrupt_name_str = String::from("");
     let mut interrupt_num: u8 = 0;
+    let mut interrupt_cfg_map: Vec<&'static str> = Vec::new();
     if let Some(interrupt_num_tmp) = extract_const_integer::<u8>(&bindings_lines, "VSF_HW_INTERRUPTS_NUM") {
         interrupt_num = interrupt_num_tmp;
         let interrupt_vec = GLOBAL_INTERRUPT_VEC.lock().unwrap();
         for interrupt_index in 0..interrupt_vec.len() {
             if interrupt_vec[interrupt_index].len() > 0 {
                 let interrupt_name = interrupt_vec[interrupt_index].strip_suffix("_IRQHandler").unwrap();
+
+                for interrupt in INTERRUPT_CFG {
+                    if !interrupt_cfg_map.contains(&interrupt.1) && Regex::new(interrupt.0).unwrap().is_match(interrupt_name) {
+                        interrupt_cfg_map.push(&interrupt.1);
+                        println!("cargo::rustc-cfg={}", interrupt.1);
+                    }
+                }
 
                 println!("cargo:warning=irq{interrupt_index}: {interrupt_name}");
                 interrupt_name_str.push_str(&format!("{interrupt_name},\n"));
@@ -510,10 +529,20 @@ fn main() {
 
     // bind vsf peripherals
     let mut generated_rs_str = String::from("");
-    let mut gpio_output_code = String::from("");
-    bind_vsf_gpios(&bindings_lines, &mut gpio_output_code);
+    let mut peripheral_list = String::from("");
+    if PERIPHERIALS.contains(&"gpio") {
+        bind_vsf_gpios(&bindings_lines, &mut peripheral_list);
+    }
     let mut usarts_sync_support: [bool; 32] = [false; 32];
-    bind_vsf_usarts(&bindings_lines, &mut gpio_output_code, &mut usarts_sync_support);
+    if PERIPHERIALS.contains(&"usart") {
+        bind_vsf_usarts(&bindings_lines, &mut peripheral_list, &mut usarts_sync_support);
+    }
+    if PERIPHERIALS.contains(&"spi") {
+        bind_vsf_peripheral(&bindings_lines, "spi", &mut peripheral_list);
+    }
+    if PERIPHERIALS.contains(&"i2c") {
+        bind_vsf_peripheral(&bindings_lines, "i2c", &mut peripheral_list);
+    }
 
     // parse alternate functions and generate _generated.rs
     let mut af_str = String::from("");
@@ -552,10 +581,10 @@ fn main() {
 
     generated_rs_str.push_str(&format!("
         embassy_hal_internal::peripherals_definition!(
-            {gpio_output_code}
+            {peripheral_list}
         );
         embassy_hal_internal::peripherals_struct!(
-            {gpio_output_code}
+            {peripheral_list}
         );
         embassy_hal_internal::interrupt_mod!(
             {interrupt_name_str}
@@ -565,13 +594,12 @@ fn main() {
     fs::write("./src/_generated.rs", generated_rs_str).unwrap();
 }
 
-fn enable_peripherial(lines: &Vec<&str>, name: &str) -> u32 {
+fn enable_peripherial(name: &str, mask: u32) {
     println!("cargo::rustc-check-cfg=cfg(vsf_{name}_enabled)");
     for peripheral_index in 0..32 {
         println!("cargo::rustc-check-cfg=cfg(vsf_{name}{peripheral_index}_enabled)");
     }
 
-    let mask = extract_peripheral_mask(lines, name);
     if mask != 0 {
         println!("cargo:warning={name}_mask: 0x{mask:X}");
         println!("cargo:rustc-cfg=vsf_{name}_enabled");
@@ -583,11 +611,12 @@ fn enable_peripherial(lines: &Vec<&str>, name: &str) -> u32 {
             }
         }
     }
-    mask
 }
 
 fn bind_vsf_gpios(lines: &Vec<&str>, output_code: &mut String) {
     let mask = extract_peripheral_mask(lines, "gpio");
+
+    enable_peripherial("gpio", mask);
 
     for port_index in 0..32 {
         if mask & (1 << port_index) != 0 {
@@ -607,6 +636,8 @@ fn bind_vsf_gpios(lines: &Vec<&str>, output_code: &mut String) {
 
 fn bind_vsf_usarts(lines: &Vec<&str>, output_code: &mut String, support_sync: &mut [bool; 32]) {
     let mask: u32 = extract_peripheral_mask(lines, "USART");
+
+    enable_peripherial("usart", mask);
 
     for usart_index in 0..32 {
         if mask & (1 << usart_index) != 0 {
@@ -629,6 +660,8 @@ fn bind_vsf_usarts(lines: &Vec<&str>, output_code: &mut String, support_sync: &m
 fn bind_vsf_peripheral(lines: &Vec<&str>, name: &str, output_code: &mut String) {
     let peripheral_name_upper = String::from(name).to_uppercase();
     let mask = extract_peripheral_mask(lines, &peripheral_name_upper);
+
+    enable_peripherial(name, mask);
 
     for peripheral_index in 0..32 {
         if mask & (1 << peripheral_index) != 0 {

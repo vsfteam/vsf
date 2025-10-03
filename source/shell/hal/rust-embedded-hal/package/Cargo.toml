@@ -51,10 +51,11 @@ codegen-units = 1
 opt-level = 0
 
 [build-dependencies]
-bindgen = "0.72.1"
-toml = "0.9.6"
-shellexpand = "3.1.1"
+bindgen = "0.72"
+toml = "0.9"
+shellexpand = "3.1"
 lazy_static = "1.4"
+regex = "1.11"
 
 [vsf]
 path = "${VSF_PATH}"

@@ -1,5 +1,6 @@
 extern crate proc_macro;
-use proc_macro::TokenStream;
+use proc_macro::{TokenStream, TokenTree};
+use proc_macro2;
 
 use std::path::Path;
 use std::env;
@@ -67,6 +68,86 @@ pub fn bind_vsf_usarts(_item: TokenStream) -> TokenStream {
                 }
             } else {
                 output_code.push_str(&format!("impl_usart!(USART{usart_index}, USART{usart_index}, vsf_hw_usart{usart_index}, USART{usart_index}_IRQHandler);\n"));
+            }
+        }
+    }
+
+    output_code.parse().unwrap()
+}
+
+#[proc_macro]
+pub fn bind_vsf_peripheral(item: TokenStream) -> TokenStream {
+    let mut tokens = item.into_iter();
+    let peripheral_name = match tokens.next() {
+        Some(TokenTree::Ident(ident)) => {
+            ident.to_string()
+        },
+        Some(TokenTree::Literal(literal)) => {
+            let peripheral_str = literal.to_string();
+            peripheral_str.trim_matches('\"').to_string()
+        },
+        _ => {
+            return syn::Error::new(
+                proc_macro2::Span::call_site(),
+                "invalid parameter"
+            ).to_compile_error().into();
+        },
+    };
+    let info_macro = match tokens.next() {
+        Some(TokenTree::Ident(ident)) => {
+            ident.to_string()
+        },
+        _ => "".to_string(),
+    };
+    let irq_type_macro = match tokens.next() {
+        Some(TokenTree::Ident(ident)) => {
+            ident.to_string()
+        },
+        _ => "".to_string(),
+    };
+
+    let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+    let pathbuf = Path::new(&manifest_dir).join("./src/vsf_hal.rs");
+    let bindings_content = fs::read_to_string(&pathbuf).unwrap();
+    let bindings_lines = bindings_content.lines().collect();
+
+    let name_upper = peripheral_name.to_ascii_uppercase();
+    let name_lower= peripheral_name.to_ascii_lowercase();
+    let mask = extract_peripheral_mask(&bindings_lines, &name_upper);
+    let mut output_code = String::from("");
+
+    if info_macro != "" {
+        for peripheral_index in 0..32 {
+            if mask & (1 << peripheral_index) != 0 {
+                if irq_type_macro != "" {
+                    output_code.push_str(&format!("
+                        peri_trait_impl!({name_upper}{peripheral_index}, {info_macro}! {{ {name_lower}, {name_upper}, {peripheral_index} }}, {irq_type_macro}! {{{name_lower}, {name_upper}, {peripheral_index} }});
+                    "));
+                } else {
+                    output_code.push_str(&format!("
+                        peri_trait_impl!({name_upper}{peripheral_index}, {info_macro}! {{ {name_lower}, {name_upper}, {peripheral_index} }});
+                    "));
+                }
+            }
+        }
+    } else {
+        output_code.push_str(&format!("
+            pub struct Info {{
+                vsf_{name_lower}: AtomicPtr<vsf_{name_lower}_t>,
+                vsf_{name_lower}_irqhandler: unsafe extern \"C\" fn(),
+                interrupt: Interrupt,
+            }}"
+        ));
+
+        for peripheral_index in 0..32 {
+            if mask & (1 << peripheral_index) != 0 {
+                output_code.push_str(&format!("
+                    peri_trait_impl!({name_upper}{peripheral_index}, Info {{
+                        vsf_{name_lower}: AtomicPtr::new(ptr::addr_of_mut!(vsf_hw_{name_lower}{peripheral_index}) as *mut vsf_hw_{name_lower}_t as *mut vsf_{name_lower}_t),
+                        vsf_{name_lower}_irqhandler: {name_upper}{peripheral_index}_IRQHandler,
+                        interrupt: crate::interrupt::typelevel::{name_upper}{peripheral_index}::IRQ,
+                    }});
+                "));
             }
         }
     }
