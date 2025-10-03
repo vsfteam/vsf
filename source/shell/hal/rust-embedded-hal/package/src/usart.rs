@@ -1865,12 +1865,20 @@ mod _embedded_io {
             self.write(buf).await?;
             Ok(buf.len())
         }
+
+        async fn flush(&mut self) -> Result<(), Self::Error> {
+            self.flush().await
+        }
     }
 
     impl embedded_io_async::Write for UsartTx<Async> {
         async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
             self.write(buf).await?;
             Ok(buf.len())
+        }
+
+        async fn flush(&mut self) -> Result<(), Self::Error> {
+            self.flush().await
         }
     }
 }
