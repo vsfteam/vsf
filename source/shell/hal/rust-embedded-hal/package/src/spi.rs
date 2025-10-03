@@ -1,6 +1,8 @@
 
+use core::future::poll_fn;
 use core::marker::PhantomData;
-use core::sync::atomic::{Ordering, AtomicPtr};
+use core::sync::atomic::{Ordering, AtomicPtr, AtomicU32};
+use core::task::Poll;
 use core::ptr;
 use paste::paste;
 
@@ -19,9 +21,13 @@ use crate::vsf_hal::{*};
 
 #[cfg(bindgen_enum_type_moduleconsts)]
 macro_rules! into_vsf_spi_mode_t {($mode:ident) => { vsf_spi_mode_t::$mode }}
+#[cfg(bindgen_enum_type_moduleconsts)]
+macro_rules! into_vsf_spi_irq_mask_t {($irq:ident) => { vsf_spi_irq_mask_t::$irq }}
 
 #[cfg(bindgen_enum_type_consts)]
 macro_rules! into_vsf_spi_mode_t {($mode:ident) => { paste!{[<vsf_spi_mode_t_ $mode>]} }}
+#[cfg(bindgen_enum_type_consts)]
+macro_rules! into_vsf_spi_irq_mask_t {($irq:ident) => { paste!{[<vsf_spi_irq_mask_t_ $irq>]} }}
 
 /// SPI error
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -110,7 +116,7 @@ impl Config {
     }
 
     fn sck_af(&self) -> AfType {
-        AfType::output(self.gpio_speed, OutputDrive::default())
+        AfType::output(self.gpio_speed, OutputDrive::highest())
     }
 }
 
@@ -154,17 +160,36 @@ fn _vsf_spi_config_and_enable(info: &Info, state: &State, config: &Config, confi
     Ok(())
 }
 
+fn _vsf_spi_drop(info: &Info) {
+    unsafe {
+        let vsf_spi = info.vsf_spi.load(Ordering::Relaxed);
+        while vsf_spi_disable(vsf_spi) != into_fsm_rt_t!(fsm_rt_cpl) {}
+        vsf_spi_fini(vsf_spi);
+    }
+}
+
 unsafe extern "C" fn vsf_spi_on_interrupt(
     target_ptr: *mut ::core::ffi::c_void,
     vsf_spi: *mut vsf_spi_t,
     irq_mask: into_enum_type!(vsf_spi_irq_mask_t),
 ) {
-    // TODO
+    let s = target_ptr as *const State;
+    let s = unsafe { &*s };
+
+    let mut transfer_irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) | into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_CPL);
+    if transfer_irq_mask & irq_mask != 0 {
+        unsafe {
+            vsf_spi_irq_disable(vsf_spi, transfer_irq_mask);
+        }
+        s.irq_mask.fetch_or(transfer_irq_mask, Ordering::Relaxed);
+        s.waker.wake();
+    }
 }
 
 /// SPI driver.
 pub struct Spi<M: PeriMode> {
     pub(crate) info: &'static Info,
+    pub(crate) state: &'static State,
     _phantom: PhantomData<M>,
 }
 
@@ -178,10 +203,11 @@ impl<'d, M: PeriMode> Spi<M> {
     ) -> Result<Self, ConfigError> {
         let info = T::info();
         let s = T::state();
-        _vsf_spi_config_and_enable(info, s, &config, 0, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_spi_on_interrupt))?;
+        _vsf_spi_config_and_enable(info, s, &config, 0, ptr::from_ref(s) as *mut ::core::ffi::c_void, Some(vsf_spi_on_interrupt))?;
 
         Ok(Self {
             info: info,
+            state: s,
             _phantom: PhantomData,
         })
     }
@@ -235,15 +261,14 @@ impl<'d, M: PeriMode> Spi<M> {
             let mut rx_offset_ptr = &rx_offset as *const uint_fast32_t as *mut uint_fast32_t;
             let mut xfered_len = 0;
 
-            while rx_offset < read.len() as uint_fast32_t {
+            while xfered_len < xfer_len {
                 let cur_len = if xfered_len < xfer_common_len {
                     xfer_common_len
                 } else {
                     if xfered_len >= read.len() {
                         rx_offset_ptr = 0 as *mut uint_fast32_t;
                         rx_ptr = 0 as *mut ::core::ffi::c_void;
-                    }
-                    if xfered_len >= write.len() {
+                    } else if xfered_len >= write.len() {
                         tx_offset_ptr = 0 as *mut uint_fast32_t;
                         tx_ptr = 0 as *mut ::core::ffi::c_void;
                     }
@@ -253,8 +278,13 @@ impl<'d, M: PeriMode> Spi<M> {
                 vsf_spi_fifo_transfer(vsf_spi,
                     tx_ptr, tx_offset_ptr,
                     rx_ptr, rx_offset_ptr,
-                    xfer_len as uint_fast32_t
+                    cur_len as uint_fast32_t
                 );
+                if tx_offset_ptr != 0 as *mut uint_fast32_t {
+                    xfered_len = *tx_offset_ptr as usize;
+                } else {
+                    xfered_len = *rx_offset_ptr  as usize;
+                }
             }
         }
         Ok(())
@@ -281,14 +311,266 @@ impl<'d, M: PeriMode> Spi<M> {
     }
 }
 
+impl<M: PeriMode> Drop for Spi<M> {
+    fn drop(&mut self) {
+        _vsf_spi_drop(self.info)
+    }
+}
+
+impl<'d> Spi<Blocking> {
+    /// Create a new blocking SPI driver.
+    pub fn new_blocking<T: Instance>(
+        peri: Peri<'d, T>,
+        sck: Peri<'d, impl SckPin<T>>,
+        mosi: Peri<'d, impl MosiPin<T>>,
+        miso: Peri<'d, impl MisoPin<T>>,
+        config: Config,
+    ) -> Result<Self, ConfigError> {
+        Self::new_inner(
+            peri,
+            new_pin!(sck, config.sck_af()),
+            new_pin!(mosi, AfType::output(config.gpio_speed, OutputDrive::highest())),
+            new_pin!(miso, AfType::input(config.miso_pull)),
+            config,
+        )
+    }
+
+    /// Create a new blocking SPI driver, in RX-only mode (only MISO pin, no MOSI).
+    pub fn new_blocking_rxonly<T: Instance>(
+        peri: Peri<'d, T>,
+        sck: Peri<'d, impl SckPin<T>>,
+        miso: Peri<'d, impl MisoPin<T>>,
+        config: Config,
+    ) -> Result<Self, ConfigError> {
+        Self::new_inner(
+            peri,
+            new_pin!(sck, config.sck_af()),
+            None,
+            new_pin!(miso, AfType::input(config.miso_pull)),
+            config,
+        )
+    }
+
+    /// Create a new blocking SPI driver, in TX-only mode (only MOSI pin, no MISO).
+    pub fn new_blocking_txonly<T: Instance>(
+        peri: Peri<'d, T>,
+        sck: Peri<'d, impl SckPin<T>>,
+        mosi: Peri<'d, impl MosiPin<T>>,
+        config: Config,
+    ) -> Result<Self, ConfigError> {
+        Self::new_inner(
+            peri,
+            new_pin!(sck, config.sck_af()),
+            new_pin!(mosi, AfType::output(config.gpio_speed, OutputDrive::highest())),
+            None,
+            config,
+        )
+    }
+}
+
+impl<'d> Spi<Async> {
+    /// Create a new SPI driver.
+    pub fn new<T: Instance>(
+        peri: Peri<'d, T>,
+        sck: Peri<'d, impl SckPin<T>>,
+        mosi: Peri<'d, impl MosiPin<T>>,
+        miso: Peri<'d, impl MisoPin<T>>,
+        config: Config,
+    ) -> Result<Self, ConfigError> {
+        Self::new_inner(
+            peri,
+            new_pin!(sck, config.sck_af()),
+            new_pin!(mosi, AfType::output(config.gpio_speed, OutputDrive::highest())),
+            new_pin!(miso, AfType::input(config.miso_pull)),
+            config,
+        )
+    }
+
+    /// Create a new SPI driver, in RX-only mode (only MISO pin, no MOSI).
+    pub fn new_rxonly<T: Instance>(
+        peri: Peri<'d, T>,
+        sck: Peri<'d, impl SckPin<T>>,
+        miso: Peri<'d, impl MisoPin<T>>,
+        config: Config,
+    ) -> Result<Self, ConfigError> {
+        Self::new_inner(
+            peri,
+            new_pin!(sck, config.sck_af()),
+            None,
+            new_pin!(miso, AfType::input(config.miso_pull)),
+            config,
+        )
+    }
+
+    /// Create a new SPI driver, in TX-only mode (only MOSI pin, no MISO).
+    pub fn new_txonly<T: Instance>(
+        peri: Peri<'d, T>,
+        sck: Peri<'d, impl SckPin<T>>,
+        mosi: Peri<'d, impl MosiPin<T>>,
+        config: Config,
+    ) -> Result<Self, ConfigError> {
+        Self::new_inner(
+            peri,
+            new_pin!(sck, config.sck_af()),
+            new_pin!(mosi, AfType::output(config.gpio_speed, OutputDrive::highest())),
+            None,
+            config,
+        )
+    }
+
+    /// SPI write, using DMA.
+    pub async fn write(&mut self, data: &[u8]) -> Result<(), Error> {
+        if data.is_empty() {
+            return Ok(());
+        }
+
+        unsafe {
+            let vsf_spi = self.info.vsf_spi.load(Ordering::Relaxed);
+            let ptr = data.as_ptr();
+            let len = data.len();
+
+            vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL));
+            vsf_spi_request_transfer(vsf_spi,
+                ptr as *mut ::core::ffi::c_void,
+                0 as *mut ::core::ffi::c_void,
+                len as uint_fast32_t);
+        }
+
+        let s = self.state;
+        poll_fn(|cx| {
+            s.waker.register(cx.waker());
+            if s.irq_mask.swap(0, Ordering::Relaxed) & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) != 0 {
+                return Poll::Ready(());
+            }
+            Poll::Pending
+        }).await;
+
+        Ok(())
+    }
+
+    pub async fn read(&mut self, data: &mut [u8]) -> Result<(), Error> {
+        if data.is_empty() {
+            return Ok(());
+        }
+
+        unsafe {
+            let vsf_spi = self.info.vsf_spi.load(Ordering::Relaxed);
+            let ptr = data.as_ptr();
+            let len = data.len();
+
+            vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_CPL));
+            vsf_spi_request_transfer(vsf_spi,
+                ptr as *mut ::core::ffi::c_void,
+                0 as *mut ::core::ffi::c_void,
+                len as uint_fast32_t);
+        }
+
+        let s = self.state;
+        poll_fn(|cx| {
+            s.waker.register(cx.waker());
+            if s.irq_mask.swap(0, Ordering::Relaxed) & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_CPL) != 0 {
+                return Poll::Ready(());
+            }
+            Poll::Pending
+        }).await;
+
+        Ok(())
+    }
+
+    /// Bidirectional transfer, using DMA.
+    ///
+    /// This transfers both buffers at the same time, so it is NOT equivalent to `write` followed by `read`.
+    ///
+    /// The transfer runs for `max(read.len(), write.len())` bytes. If `read` is shorter extra bytes are ignored.
+    /// If `write` is shorter it is padded with zero bytes.
+    pub async fn transfer(&mut self, read: &mut [u8], write: &[u8]) -> Result<(), Error> {
+        unsafe {
+            let vsf_spi = self.info.vsf_spi.load(Ordering::Relaxed);
+            let xfer_len = core::cmp::max(read.len(), write.len());
+            let xfer_common_len = core::cmp::min(read.len(), write.len());
+            let mut tx_ptr = write.as_ptr() as *mut ::core::ffi::c_void;
+            let mut rx_ptr = read.as_ptr() as *mut ::core::ffi::c_void;
+            let mut xfered_len = 0;
+            let mut irq_mask: u32 = 0;
+
+            while xfered_len < xfer_len {
+                let cur_len = if xfered_len < xfer_common_len {
+                    irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_CPL);
+                    xfer_common_len
+                } else {
+                    if xfered_len >= read.len() {
+                        irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL);
+                        rx_ptr = 0 as *mut ::core::ffi::c_void;
+                    } else if xfered_len >= write.len() {
+                        irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_CPL);
+                        tx_ptr = 0 as *mut ::core::ffi::c_void;
+                    }
+                    xfer_len - xfered_len
+                };
+
+                vsf_spi_irq_enable(vsf_spi, irq_mask);
+                vsf_spi_request_transfer(vsf_spi,
+                    tx_ptr, rx_ptr,
+                    cur_len as uint_fast32_t
+                );
+
+                let s = self.state;
+                poll_fn(|cx| {
+                    s.waker.register(cx.waker());
+                    if s.irq_mask.swap(0, Ordering::Relaxed) & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_CPL) != 0 {
+                        return Poll::Ready(());
+                    }
+                    Poll::Pending
+                }).await;
+
+                xfered_len += cur_len as usize;
+            }
+        }
+
+        Ok(())
+    }
+
+    /// In-place bidirectional transfer, using DMA.
+    ///
+    /// This writes the contents of `data` on MOSI, and puts the received data on MISO in `data`, at the same time.
+    pub async fn transfer_in_place(&mut self, data: &mut [u8]) -> Result<(), Error> {
+        if data.is_empty() {
+            return Ok(());
+        }
+
+        unsafe {
+            let vsf_spi = self.info.vsf_spi.load(Ordering::Relaxed);
+            let ptr = data.as_ptr();
+            let len = data.len();
+
+            vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_CPL));
+            vsf_spi_request_transfer(vsf_spi,
+                ptr as *mut ::core::ffi::c_void,
+                ptr as *mut ::core::ffi::c_void,
+                len as uint_fast32_t);
+        }
+
+        let s = self.state;
+        poll_fn(|cx| {
+            s.waker.register(cx.waker());
+            if s.irq_mask.swap(0, Ordering::Relaxed) & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_CPL) != 0 {
+                return Poll::Ready(());
+            }
+            Poll::Pending
+        }).await;
+
+        Ok(())
+    }
+}
+
 
 
 
 
 
 struct State {
-    rx_waker: AtomicWaker,
-    tx_waker: AtomicWaker,
+    waker: AtomicWaker,
+    irq_mask: AtomicU32,
     config: AtomicPtr<vsf_spi_cfg_t>,
     _config: vsf_spi_cfg_t,
 }
@@ -311,8 +593,8 @@ impl vsf_spi_cfg_t {
 impl State {
     const fn new() -> Self {
         Self {
-            rx_waker: AtomicWaker::new(),
-            tx_waker: AtomicWaker::new(),
+            waker: AtomicWaker::new(),
+            irq_mask: AtomicU32::new(0),
             config: AtomicPtr::new(ptr::null_mut()),
             _config: vsf_spi_cfg_t::new(),
         }

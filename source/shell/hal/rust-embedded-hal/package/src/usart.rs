@@ -23,7 +23,6 @@ use core::ptr;
 use core::slice;
 use paste::paste;
 
-use embassy_hal_internal::drop::OnDrop;
 use embassy_hal_internal::{Peri, PeripheralType};
 use embassy_sync::waitqueue::AtomicWaker;
 
@@ -766,7 +765,7 @@ impl<'d, M: Mode> Usart<M> {
         let info = T::info();
         let s = T::state();
         s.refcnt.store(2, Ordering::Relaxed);
-        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
+        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(s) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
 
         Ok(Self {
             tx: UsartTx {
@@ -1016,7 +1015,7 @@ impl<'d, M: Mode> UsartTx<M> {
         let info = T::info();
         let s = T::state();
         s.refcnt.store(1, Ordering::Relaxed);
-        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
+        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(s) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
 
         Ok(Self {
             info: info,
@@ -1303,7 +1302,7 @@ impl<'d, M: Mode> UsartRx<M> {
         let info = T::info();
         let s = T::state();
         s.refcnt.store(1, Ordering::Relaxed);
-        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(info) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
+        _vsf_usart_config_and_enable(info, s, &config, mode, ptr::from_ref(s) as *mut ::core::ffi::c_void, Some(vsf_usart_on_interrupt))?;
 
         Ok(Self {
             info: info,
