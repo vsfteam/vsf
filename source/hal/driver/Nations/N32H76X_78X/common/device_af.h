@@ -566,7 +566,7 @@
 #   define VSF_HW_AF_I2C3_SDA_P10_1         6
 #   define VSF_HW_AF_I2C3_SMBA_P10_2        5
 
-#endiF
+#endif
 
 #if VSF_HW_I2C_MASK & (1 << 4)
 
