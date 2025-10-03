@@ -93,13 +93,13 @@ pub fn bind_vsf_peripheral(item: TokenStream) -> TokenStream {
             ).to_compile_error().into();
         },
     };
-    let info_macro = match tokens.next() {
+    let irq_type_macro = match tokens.next() {
         Some(TokenTree::Ident(ident)) => {
             ident.to_string()
         },
         _ => "".to_string(),
     };
-    let irq_type_macro = match tokens.next() {
+    let info_macro = match tokens.next() {
         Some(TokenTree::Ident(ident)) => {
             ident.to_string()
         },
@@ -141,13 +141,23 @@ pub fn bind_vsf_peripheral(item: TokenStream) -> TokenStream {
 
         for peripheral_index in 0..32 {
             if mask & (1 << peripheral_index) != 0 {
-                output_code.push_str(&format!("
-                    peri_trait_impl!({name_upper}{peripheral_index}, Info {{
-                        vsf_{name_lower}: AtomicPtr::new(ptr::addr_of_mut!(vsf_hw_{name_lower}{peripheral_index}) as *mut vsf_hw_{name_lower}_t as *mut vsf_{name_lower}_t),
-                        vsf_{name_lower}_irqhandler: {name_upper}{peripheral_index}_IRQHandler,
-                        interrupt: crate::interrupt::typelevel::{name_upper}{peripheral_index}::IRQ,
-                    }});
-                "));
+                if irq_type_macro != "" {
+                    output_code.push_str(&format!("
+                        peri_trait_impl!({name_upper}{peripheral_index}, Info {{
+                            vsf_{name_lower}: AtomicPtr::new(ptr::addr_of_mut!(vsf_hw_{name_lower}{peripheral_index}) as *mut vsf_hw_{name_lower}_t as *mut vsf_{name_lower}_t),
+                            vsf_{name_lower}_irqhandler: {name_upper}{peripheral_index}_IRQHandler,
+                            interrupt: crate::interrupt::typelevel::{name_upper}{peripheral_index}::IRQ,
+                        }}, {irq_type_macro}! {{{name_lower}, {name_upper}, {peripheral_index} }});
+                    "));
+                } else {
+                    output_code.push_str(&format!("
+                        peri_trait_impl!({name_upper}{peripheral_index}, Info {{
+                            vsf_{name_lower}: AtomicPtr::new(ptr::addr_of_mut!(vsf_hw_{name_lower}{peripheral_index}) as *mut vsf_hw_{name_lower}_t as *mut vsf_{name_lower}_t),
+                            vsf_{name_lower}_irqhandler: {name_upper}{peripheral_index}_IRQHandler,
+                            interrupt: crate::interrupt::typelevel::{name_upper}{peripheral_index}::IRQ,
+                        }});
+                    "));
+                }
             }
         }
     }

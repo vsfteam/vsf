@@ -41,7 +41,7 @@ peri_trait!(
 
 #[cfg(not(any(I2C_IRQ_EV, I2C_IRQ_ER)))]
 peri_trait!(
-    irqs: [Interrupt]
+    irqs: [Interrupt],
 );
 
 /// Event interrupt handler.
@@ -80,7 +80,7 @@ pub struct InterruptHandler<T: Instance> {
 }
 
 #[cfg(not(any(I2C_IRQ_ER, I2C_IRQ_EV)))]
-impl<T: Instance> interrupt::typelevel::Handler<T::ErrorInterrupt> for InterruptHandler<T> {
+impl<T: Instance> interrupt::typelevel::Handler<T::Interrupt> for InterruptHandler<T> {
     unsafe fn on_interrupt() {
         unsafe {
             (T::info().vsf_i2c_irqhandler)();
@@ -127,4 +127,4 @@ macro_rules! impl_i2c_irq_type {
     }}
 }
 
-vsf_hal_macros::bind_vsf_peripheral!{i2c impl_i2c_info impl_i2c_irq_type}
+vsf_hal_macros::bind_vsf_peripheral!{i2c impl_i2c_irq_type impl_i2c_info}
