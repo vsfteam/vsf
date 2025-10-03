@@ -24,8 +24,8 @@ critical-section = "1.1"
 embedded-hal-02 = { package = "embedded-hal", version = "0.2.6", features = ["unproven"] }
 embedded-hal-1 = { package = "embedded-hal", version = "1.0" }
 embedded-hal-bus = { version = "0.3", features = ["async"] }
-embedded-io = { version = "0.6.0" }
-embedded-io-async = { version = "0.6" }
+embedded-io = { version = "0.7.0" }
+embedded-io-async = { version = "0.7" }
 embedded-hal-async = { version = "1.0" }
 embedded-hal-nb = { version = "1.0" }
 embedded-can = "0.4"

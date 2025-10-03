@@ -264,6 +264,11 @@ impl ParseCallbacks for Callbacks {
 }
 
 fn main() {
+     if let Err(_error) = env::var("VSF_PATH") {
+        println!("VSF_PATH not defined: set to ../../../../../");
+        unsafe { env::set_var("VSF_PATH", "../../../../../"); }
+    }
+
     let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
     let manifest_path = Path::new(&manifest_dir).join("Cargo.toml");
 

@@ -31,6 +31,106 @@ pub mod mode {
     impl_mode!(Async);
 }
 
+// Hertz
+#[derive(Eq, PartialEq, Ord, PartialOrd, Clone, Copy, Debug)]
+pub struct Hertz(pub u32);
+
+impl core::fmt::Display for Hertz {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{} Hz", self.0)
+    }
+}
+
+#[cfg(feature = "defmt")]
+impl defmt::Format for Hertz {
+    fn format(&self, f: defmt::Formatter) {
+        defmt::write!(f, "{=u32} Hz", self.0)
+    }
+}
+
+impl Hertz {
+    /// Create a `Hertz` from the given hertz.
+    pub const fn hz(hertz: u32) -> Self {
+        Self(hertz)
+    }
+
+    /// Create a `Hertz` from the given kilohertz.
+    pub const fn khz(kilohertz: u32) -> Self {
+        Self(kilohertz * 1_000)
+    }
+
+    /// Create a `Hertz` from the given megahertz.
+    pub const fn mhz(megahertz: u32) -> Self {
+        Self(megahertz * 1_000_000)
+    }
+}
+
+/// This is a convenience shortcut for [`Hertz::hz`]
+pub const fn hz(hertz: u32) -> Hertz {
+    Hertz::hz(hertz)
+}
+
+/// This is a convenience shortcut for [`Hertz::khz`]
+pub const fn khz(kilohertz: u32) -> Hertz {
+    Hertz::khz(kilohertz)
+}
+
+/// This is a convenience shortcut for [`Hertz::mhz`]
+pub const fn mhz(megahertz: u32) -> Hertz {
+    Hertz::mhz(megahertz)
+}
+
+use core::ops::{Div, Mul};
+
+impl Mul<u32> for Hertz {
+    type Output = Hertz;
+    fn mul(self, rhs: u32) -> Self::Output {
+        Hertz(self.0 * rhs)
+    }
+}
+
+impl Div<u32> for Hertz {
+    type Output = Hertz;
+    fn div(self, rhs: u32) -> Self::Output {
+        Hertz(self.0 / rhs)
+    }
+}
+
+impl Mul<u16> for Hertz {
+    type Output = Hertz;
+    fn mul(self, rhs: u16) -> Self::Output {
+        self * (rhs as u32)
+    }
+}
+
+impl Div<u16> for Hertz {
+    type Output = Hertz;
+    fn div(self, rhs: u16) -> Self::Output {
+        self / (rhs as u32)
+    }
+}
+
+impl Mul<u8> for Hertz {
+    type Output = Hertz;
+    fn mul(self, rhs: u8) -> Self::Output {
+        self * (rhs as u32)
+    }
+}
+
+impl Div<u8> for Hertz {
+    type Output = Hertz;
+    fn div(self, rhs: u8) -> Self::Output {
+        self / (rhs as u32)
+    }
+}
+
+impl Div<Hertz> for Hertz {
+    type Output = u32;
+    fn div(self, rhs: Hertz) -> Self::Output {
+        self.0 / rhs.0
+    }
+}
+
 // vsf_hal
 mod vsf_hal;
 
@@ -43,17 +143,7 @@ macro_rules! into_vsf_stream_evt_t {($evt:ident) => { vsf_stream_evt_t::$evt }}
 #[cfg(bindgen_enum_type_moduleconsts)]
 macro_rules! into_vsf_arch_prio_t {($prio:ident) => { vsf_arch_prio_t::$prio }}
 #[cfg(bindgen_enum_type_moduleconsts)]
-macro_rules! into_vsf_gpio_mode_t {($mode:ident) => { vsf_gpio_mode_t::$mode }}
-#[cfg(bindgen_enum_type_moduleconsts)]
 macro_rules! into_vsf_hw_peripheral_en_t {($mode:ident) => { vsf_hw_peripheral_en_t::$mode }}
-#[cfg(bindgen_enum_type_moduleconsts)]
-macro_rules! into_vsf_io_port_pin_no_t {($pin:ident) => { vsf_io_port_pin_no_t::$pin }}
-#[cfg(bindgen_enum_type_moduleconsts)]
-macro_rules! into_vsf_usart_mode_t {($mode:ident) => { vsf_usart_mode_t::$mode }}
-#[cfg(bindgen_enum_type_moduleconsts)]
-macro_rules! into_vsf_usart_irq_mask_t {($mode:ident) => { vsf_usart_irq_mask_t::$mode }}
-#[cfg(bindgen_enum_type_moduleconsts)]
-macro_rules! into_vsf_usart_ctrl_t {($mode:ident) => { vsf_usart_ctrl_t::$mode }}
 
 #[cfg(bindgen_enum_type_consts)]
 macro_rules! into_enum_type {($type:ident) => { $type }}
@@ -64,17 +154,7 @@ macro_rules! into_vsf_stream_evt_t {($evt:ident) => { paste!{[<vsf_stream_evt_t_
 #[cfg(bindgen_enum_type_consts)]
 macro_rules! into_vsf_arch_prio_t {($prio:ident) => { paste!{[<vsf_arch_prio_t_ $prio>]} }}
 #[cfg(bindgen_enum_type_consts)]
-macro_rules! into_vsf_gpio_mode_t {($mode:ident) => { paste!{[<vsf_gpio_mode_t_ $mode>]} }}
-#[cfg(bindgen_enum_type_consts)]
 macro_rules! into_vsf_hw_peripheral_en_t {($mode:ident) => { paste!{[<vsf_hw_peripheral_en_t_ $mode>]} }}
-#[cfg(bindgen_enum_type_consts)]
-macro_rules! into_vsf_io_port_pin_no_t {($pin:ident) => { paste!{[<vsf_io_port_pin_no_t_ $pin>]} }}
-#[cfg(bindgen_enum_type_consts)]
-macro_rules! into_vsf_usart_mode_t {($mode:ident) => { paste!{[<vsf_usart_mode_t_ $mode>]} }}
-#[cfg(bindgen_enum_type_consts)]
-macro_rules! into_vsf_usart_irq_mask_t {($mode:ident) => { paste!{[<vsf_usart_irq_mask_t_ $mode>]} }}
-#[cfg(bindgen_enum_type_consts)]
-macro_rules! into_vsf_usart_ctrl_t {($mode:ident) => { paste!{[<vsf_usart_ctrl_t_ $mode>]} }}
 
 #[cfg(vsf_gpio_enabled)]
 pub mod gpio;

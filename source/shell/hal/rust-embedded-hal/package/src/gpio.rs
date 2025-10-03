@@ -12,6 +12,16 @@ use crate::vsf_hal::{*};
 pub type PinPortType = u16;
 pub type AfNumType = u16;
 
+#[cfg(bindgen_enum_type_moduleconsts)]
+macro_rules! into_vsf_gpio_mode_t {($mode:ident) => { vsf_gpio_mode_t::$mode }}
+#[cfg(bindgen_enum_type_moduleconsts)]
+macro_rules! into_vsf_io_port_pin_no_t {($pin:ident) => { vsf_io_port_pin_no_t::$pin }}
+
+#[cfg(bindgen_enum_type_consts)]
+macro_rules! into_vsf_gpio_mode_t {($mode:ident) => { paste!{[<vsf_gpio_mode_t_ $mode>]} }}
+#[cfg(bindgen_enum_type_consts)]
+macro_rules! into_vsf_io_port_pin_no_t {($pin:ident) => { paste!{[<vsf_io_port_pin_no_t_ $pin>]} }}
+
 /// Pull setting for an input.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]

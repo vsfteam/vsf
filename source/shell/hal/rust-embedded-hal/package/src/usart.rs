@@ -34,6 +34,20 @@ use crate::mode::{Async, Blocking, Mode};
 
 use crate::vsf_hal::{*};
 
+#[cfg(bindgen_enum_type_moduleconsts)]
+macro_rules! into_vsf_usart_mode_t {($mode:ident) => { vsf_usart_mode_t::$mode }}
+#[cfg(bindgen_enum_type_moduleconsts)]
+macro_rules! into_vsf_usart_irq_mask_t {($mode:ident) => { vsf_usart_irq_mask_t::$mode }}
+#[cfg(bindgen_enum_type_moduleconsts)]
+macro_rules! into_vsf_usart_ctrl_t {($mode:ident) => { vsf_usart_ctrl_t::$mode }}
+
+#[cfg(bindgen_enum_type_consts)]
+macro_rules! into_vsf_usart_mode_t {($mode:ident) => { paste!{[<vsf_usart_mode_t_ $mode>]} }}
+#[cfg(bindgen_enum_type_consts)]
+macro_rules! into_vsf_usart_irq_mask_t {($mode:ident) => { paste!{[<vsf_usart_irq_mask_t_ $mode>]} }}
+#[cfg(bindgen_enum_type_consts)]
+macro_rules! into_vsf_usart_ctrl_t {($mode:ident) => { paste!{[<vsf_usart_ctrl_t_ $mode>]} }}
+
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 /// Number of data bits
 pub enum DataBits {
@@ -301,6 +315,8 @@ impl core::fmt::Display for Error {
         write!(f, "{}", message)
     }
 }
+
+impl core::error::Error for Error {}
 
 /// Interrupt handler.
 pub struct InterruptHandler<T: Instance> {
