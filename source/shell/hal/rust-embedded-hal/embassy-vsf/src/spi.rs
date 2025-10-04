@@ -257,11 +257,10 @@ impl<'d, M: PeriMode> Spi<M> {
                 into_vsf_spi_ctrl_t!(VSF_SPI_CTRL_SET_DATASIZE), 
                 &config as *const ::core::ffi::c_void as *mut ::core::ffi::c_void
             );
+            self.current_word_size = word_size;
         }
         #[cfg(not(VSF_SPI_CTRL_SET_DATASIZE))]
         unreachable!("dynamic word_size not supported");
-
-        self.current_word_size = word_size;
     }
 
     /// Blocking write
@@ -687,7 +686,7 @@ macro_rules! impl_word {
 mod word_impl {
     use super::*;
 
-    #[derive(Copy, Clone, Debug)]
+    #[derive(Copy, Clone, Debug, Eq, PartialEq)]
     enum WordConfig {
         #[cfg(VSF_SPI_DATASIZE_4)]
         BITS4 = into_vsf_spi_mode_t!(VSF_SPI_DATASIZE_4) as isize,
@@ -874,3 +873,90 @@ macro_rules! impl_spi_irq_type {
 }
 
 vsf_hal_macros::bind_vsf_peripheral!{spi impl_spi_irq_type}
+
+
+
+macro_rules! impl_blocking {
+    ($w:ident) => {
+        impl<M: PeriMode> embedded_hal_02::blocking::spi::Write<$w> for Spi<M> {
+            type Error = Error;
+
+            fn write(&mut self, words: &[$w]) -> Result<(), Self::Error> {
+                self.blocking_write(words)
+            }
+        }
+
+        impl<M: PeriMode> embedded_hal_02::blocking::spi::Transfer<$w> for Spi<M> {
+            type Error = Error;
+
+            fn transfer<'w>(&mut self, words: &'w mut [$w]) -> Result<&'w [$w], Self::Error> {
+                self.blocking_transfer_in_place(words)?;
+                Ok(words)
+            }
+        }
+    };
+}
+
+impl_blocking!(u8);
+#[cfg(VSF_SPI_DATASIZE_16)]
+impl_blocking!(u16);
+#[cfg(VSF_SPI_DATASIZE_32)]
+impl_blocking!(u32);
+
+impl<M: PeriMode> embedded_hal_1::spi::ErrorType for Spi<M> {
+    type Error = Error;
+}
+
+impl<W: Word, M: PeriMode> embedded_hal_1::spi::SpiBus<W> for Spi<M> {
+    fn flush(&mut self) -> Result<(), Self::Error> {
+        Ok(())
+    }
+
+    fn read(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
+        self.blocking_read(words)
+    }
+
+    fn write(&mut self, words: &[W]) -> Result<(), Self::Error> {
+        self.blocking_write(words)
+    }
+
+    fn transfer(&mut self, read: &mut [W], write: &[W]) -> Result<(), Self::Error> {
+        self.blocking_transfer(read, write)
+    }
+
+    fn transfer_in_place(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
+        self.blocking_transfer_in_place(words)
+    }
+}
+
+impl embedded_hal_1::spi::Error for Error {
+    fn kind(&self) -> embedded_hal_1::spi::ErrorKind {
+        match *self {
+            #[cfg(VSF_SPI_IRQ_MASK_CRC_ERR)]
+            Self::Crc => embedded_hal_1::spi::ErrorKind::Other,
+            Self::RxOverrun => embedded_hal_1::spi::ErrorKind::Overrun,
+        }
+    }
+}
+
+impl<W: Word> embedded_hal_async::spi::SpiBus<W> for Spi<Async> {
+    async fn flush(&mut self) -> Result<(), Self::Error> {
+        Ok(())
+    }
+
+    async fn write(&mut self, words: &[W]) -> Result<(), Self::Error> {
+        self.write(words).await
+    }
+
+    async fn read(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
+        self.read(words).await
+    }
+
+    async fn transfer(&mut self, read: &mut [W], write: &[W]) -> Result<(), Self::Error> {
+        self.transfer(read, write).await
+    }
+
+    async fn transfer_in_place(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
+        self.transfer_in_place(words).await
+    }
+}
