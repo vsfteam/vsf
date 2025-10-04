@@ -103,7 +103,7 @@ impl Default for Config {
             frequency: Hertz(1_000_000),
             miso_pull: Pull::None,
             gpio_speed: Speed::highest(),
-            is_master: false,
+            is_master: true,
         }
     }
 }
