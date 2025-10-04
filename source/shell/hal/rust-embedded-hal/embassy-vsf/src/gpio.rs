@@ -171,7 +171,7 @@ pub struct AfType {
 #[cfg(any(VSF_GPIO_AF, VSF_GPIO_AF_PUSH_PULL, VSF_GPIO_AF_OPEN_DRAIN))]
 impl AfType {
     /// Input with optional pullup or pulldown.
-    #[cfg(all(VSF_GPIO_AF, VSF_GPIO_INPUT))]
+    #[cfg(all(VSF_GPIO_AF))]
     pub const fn input(pull: Pull) -> Self {
         Self {
             #[cfg(VSF_GPIO_AF_INPUT)]

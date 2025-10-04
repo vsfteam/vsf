@@ -60,7 +60,6 @@ pub enum DataBits {
     #[cfg(VSF_USART_7_BIT_LENGTH)]
     DataBits7 = into_vsf_usart_mode_t!(VSF_USART_7_BIT_LENGTH) as isize,
     /// 8 Data Bits
-    #[cfg(VSF_USART_8_BIT_LENGTH)]
     DataBits8 = into_vsf_usart_mode_t!(VSF_USART_8_BIT_LENGTH) as isize,
     /// 9 Data Bits
     #[cfg(VSF_USART_9_BIT_LENGTH)]
@@ -79,7 +78,6 @@ impl DataBits {
             DataBits::DataBits6 => 6,
             #[cfg(VSF_USART_7_BIT_LENGTH)]
             DataBits::DataBits7 => 7,
-            #[cfg(VSF_USART_8_BIT_LENGTH)]
             DataBits::DataBits8 => 8,
             #[cfg(VSF_USART_9_BIT_LENGTH)]
             DataBits::DataBits9 => 9,
@@ -93,13 +91,10 @@ impl DataBits {
 /// Parity
 pub enum Parity {
     /// No parity
-    #[cfg(VSF_USART_NO_PARITY)]
     ParityNone = into_vsf_usart_mode_t!(VSF_USART_NO_PARITY) as isize,
     /// Even Parity
-    #[cfg(VSF_USART_EVEN_PARITY)]
     ParityEven = into_vsf_usart_mode_t!(VSF_USART_EVEN_PARITY) as isize,
     /// Odd Parity
-    #[cfg(VSF_USART_ODD_PARITY)]
     ParityOdd = into_vsf_usart_mode_t!(VSF_USART_ODD_PARITY) as isize,
 }
 
@@ -107,7 +102,6 @@ pub enum Parity {
 /// Number of stop bits
 pub enum StopBits {
     #[doc = "1 stop bit"]
-    #[cfg(VSF_USART_1_STOPBIT)]
     STOP1 = into_vsf_usart_mode_t!(VSF_USART_1_STOPBIT) as isize,
     #[doc = "0.5 stop bits"]
     #[cfg(VSF_USART_0_5_STOPBIT)]
@@ -1795,13 +1789,12 @@ macro_rules! impl_usart {
                 &STATE
             }
         }
-        impl crate::usart::Instance for peripherals::$type {
+        impl crate::usart::Instance for crate::peripherals::$type {
             type Interrupt = crate::interrupt::typelevel::$irq;
         }
     };
 }
 
-use crate::peripherals;
 vsf_hal_macros::bind_vsf_usarts!{}
 
 // ====================
