@@ -57,12 +57,3 @@ shellexpand = "3.1"
 lazy_static = "1.4"
 regex = "1.11"
 serde = { version = "1.0", features = ["derive"] }
-
-[package.metadata.embassy-vsf]
-path = "${VSF_PATH}"
-vendor = "Nations"
-model = "N32H765IIB7EC"
-flags = [
-    "--target=thumbv7em-none-eabihf",
-    "-I${VSF_PATH}/source/utilities/compiler/arm/3rd-party/CMSIS/CMSIS/Core/Include",
-]
