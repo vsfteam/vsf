@@ -1,0 +1,28 @@
+[package]
+name = "embassy-n32h7"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+description = "embassy support for N32H7 series"
+keywords = ["embedded", "async", "hal", "embedded-hal"]
+categories = ["embedded", "hardware-support", "no-std", "asynchronous"]
+repository = "https://github.com/vsfteam/vsf"
+
+[dependencies]
+embassy-vsf = { path = "../embassy-vsf", features = ["defmt"] }
+
+cortex-m = { version = "0.7", features = ["inline-asm", "critical-section-single-core"] }
+cortex-m-rt = { version = "0.7", features = ["device"] }
+
+[features]
+defmt = []
+log = []
+rt = []
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+
+[profile.dev]
+opt-level = 0

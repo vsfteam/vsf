@@ -9,14 +9,6 @@ use regex::Regex;
 
 const BINDGEN_ENUM_VAR: bindgen::EnumVariation = bindgen::EnumVariation::Consts;
 
-const TOML_VSF_NODE: &str = "vsf"; 
-const TOML_VSF_PATH_NODE: &str = "path";
-const TOML_TARGET_NODE: &str = "target";
-const TOML_TARGET_VENDOR_NODE: &str = "vendor";
-const TOML_TARGET_MODEL_NODE: &str = "model";
-const TOML_TARGET_FLAGS_NODE: &str = "flags";
-const TOML_TARGET_MEMORY_NODE: &str = "memory";
-
 const BINDGEN_DEFINITIONS: [&'static str; 2] = [
     "__VSF__",
     "__VSF_CPP__",
@@ -340,64 +332,18 @@ impl ParseCallbacks for Callbacks {
 
 fn main() {
      if let Err(_error) = env::var("VSF_PATH") {
-        println!("VSF_PATH not defined: set to ../../../../../");
-        unsafe { env::set_var("VSF_PATH", "../../../../../"); }
+        let path_relative = "../../../../../";
+        let path_absolute = env::current_dir().unwrap().join(path_relative);
+        println!("VSF_PATH not defined: set to {path_absolute:?}");
+        unsafe { env::set_var("VSF_PATH", path_absolute); }
     }
 
     let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-    let manifest_path = Path::new(&manifest_dir).join("Cargo.toml");
-
-    let cargo_toml_content = fs::read_to_string(manifest_path).unwrap();
-    let cargo_toml: toml::Value = toml::from_str(&cargo_toml_content).unwrap();
-
-    let mut path = String::from("");
-    let mut vendor = String::from("");
-    let mut model = String::from("");
-    let mut flags:Vec<String> = vec![];
-
-    if let Some(vsf_node) = cargo_toml.get(TOML_VSF_NODE) {
-        if let Some(path_node) = vsf_node.get(TOML_VSF_PATH_NODE) {
-            if let Some(path_str) = path_node.as_str() {
-                path = String::from(path_str);
-            }
-        }
-
-        if let Some(target_node) = vsf_node.get(TOML_TARGET_NODE) {
-            if let Some(vendor_node) = target_node.get(TOML_TARGET_VENDOR_NODE) {
-                if let Some(vendor_str) = vendor_node.as_str() {
-                    vendor = String::from(vendor_str);
-                }
-            }
-
-            if let Some(model_node) = target_node.get(TOML_TARGET_MODEL_NODE) {
-                if let Some(model_str) = model_node.as_str() {
-                    model = String::from(model_str);
-                }
-            }
-
-            if let Some(flags_node) = target_node.get(TOML_TARGET_FLAGS_NODE) {
-                if let Some(flags_arr) = flags_node.as_array() {
-                    for flag in flags_arr {
-                        let flag_option_str = flag.as_str();
-                        if let Some(flag_str) = flag_option_str {
-                            flags.push(String::from(flag_str));
-                        }
-                    }
-                }
-            }
-
-            if let Some(memory_node) = target_node.get(TOML_TARGET_MEMORY_NODE) {
-                if let Some(memory_str) = memory_node.as_str() {
-                    println!("cargo:rerun-if-changed={memory_str}");
-                    fs::copy(memory_str, "./memory.x").expect("Fail to copy memory.x, is memory setting in Cargo.toml correct?");
-                }
-            }
-        }
-    }
-
-    println!("cargo:rustc-link-arg-bins=--nmagic");
-    println!("cargo:rustc-link-arg-bins=-Tlink.x");
-    println!("cargo:rustc-link-arg-bins=-Tdefmt.x");
+    let mut path = env::var("VSF_PATH").unwrap();
+    let vendor = env::var("VSF_VENDOR").expect("please define VSF_VENDOR in config.toml [env] section");
+    let model = env::var("VSF_MODEL").expect("please define VSF_MODEL in config.toml [env] section");
+    let flags_str = env::var("VSF_FLAGS").unwrap_or("".to_string());
+    let flags: Vec<String> = flags_str.split(';').map(|s| s.to_string()).collect();
 
     println!("cargo:rerun-if-changed={path}/src/vsf_hal.rs");
     println!("cargo:warning=path: {path}");

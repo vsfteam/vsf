@@ -19,7 +19,6 @@ embassy-hal-internal = { version = "0.3.0", git = "https://github.com/embassy-rs
 
 cortex-m = { version = "0.7", features = ["inline-asm", "critical-section-single-core"] }
 cortex-m-rt = { version = "0.7", features = ["device"] }
-critical-section = "1.1"
 
 embedded-hal-02 = { package = "embedded-hal", version = "0.2.6", features = ["unproven"] }
 embedded-hal-1 = { package = "embedded-hal", version = "1.0" }
@@ -30,6 +29,7 @@ embedded-hal-async = { version = "1.0" }
 embedded-hal-nb = { version = "1.0" }
 embedded-can = "0.4"
 
+critical-section = "1.1"
 defmt = "1.0"
 defmt-rtt = "1.0"
 panic-probe = { version = "1.0", features = ["print-defmt"] }
@@ -56,15 +56,12 @@ toml = "0.9"
 shellexpand = "3.1"
 lazy_static = "1.4"
 regex = "1.11"
+serde = { version = "1.0", features = ["derive"] }
 
-[vsf]
+[package.metadata.embassy-vsf]
 path = "${VSF_PATH}"
-
-[vsf.target]
 vendor = "Nations"
 model = "N32H765IIB7EC"
-# if there is no ./memory.x, memory MUST be set so that build.rs will copy memory.x to the current directory
-memory = "./memory/N32H765IIB7EC/memory.x"
 flags = [
     "--target=thumbv7em-none-eabihf",
     "-I${VSF_PATH}/source/utilities/compiler/arm/3rd-party/CMSIS/CMSIS/Core/Include",

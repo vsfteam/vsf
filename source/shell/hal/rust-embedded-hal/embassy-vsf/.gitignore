@@ -1,12 +1,8 @@
 target
 src/vsf_hal.rs
-src/main.rs
 src/_generated.rs
 src/pac.rs
 Cargo.lock
-memory.x
 vsf_hal_build
-*.bin
-*.map
-*.x
+device.x
 vsf_c.h
