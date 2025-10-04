@@ -24,11 +24,15 @@ use crate::vsf_hal::{*};
 macro_rules! into_vsf_spi_mode_t {($mode:ident) => { vsf_spi_mode_t::$mode }}
 #[cfg(bindgen_enum_type_moduleconsts)]
 macro_rules! into_vsf_spi_irq_mask_t {($irq:ident) => { vsf_spi_irq_mask_t::$irq }}
+#[cfg(bindgen_enum_type_moduleconsts)]
+macro_rules! into_vsf_spi_ctrl_t {($ctrl:ident) => { vsf_spi_ctrl_t::$ctrl }}
 
 #[cfg(bindgen_enum_type_consts)]
 macro_rules! into_vsf_spi_mode_t {($mode:ident) => { paste!{[<vsf_spi_mode_t_ $mode>]} }}
 #[cfg(bindgen_enum_type_consts)]
 macro_rules! into_vsf_spi_irq_mask_t {($irq:ident) => { paste!{[<vsf_spi_irq_mask_t_ $irq>]} }}
+#[cfg(bindgen_enum_type_consts)]
+macro_rules! into_vsf_spi_ctrl_t {($ctrl:ident) => { paste!{[<vsf_spi_ctrl_t_ $ctrl>]} }}
 
 /// SPI error
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -216,6 +220,7 @@ unsafe extern "C" fn vsf_spi_on_interrupt(
 pub struct Spi<M: PeriMode> {
     pub(crate) info: &'static Info,
     pub(crate) state: &'static State,
+    current_word_size: word_impl::Config,
     _phantom: PhantomData<M>,
 }
 
@@ -234,8 +239,29 @@ impl<'d, M: PeriMode> Spi<M> {
         Ok(Self {
             info: info,
             state: s,
+            current_word_size: <u8 as SealedWord>::CONFIG,
             _phantom: PhantomData,
         })
+    }
+
+    pub(crate) fn set_word_size(&mut self, word_size: word_impl::Config) {
+        if self.current_word_size == word_size {
+            return;
+        }
+
+        #[cfg(VSF_SPI_CTRL_SET_DATASIZE)]
+        unsafe {
+            let vsf_spi = self.info.vsf_spi.load(Ordering::Relaxed);
+            let mut config = word_size as u32;
+            vsf_spi_ctrl(vsf_spi,
+                into_vsf_spi_ctrl_t!(VSF_SPI_CTRL_SET_DATASIZE), 
+                &config as *const ::core::ffi::c_void as *mut ::core::ffi::c_void
+            );
+        }
+        #[cfg(not(VSF_SPI_CTRL_SET_DATASIZE))]
+        unreachable!("dynamic word_size not supported");
+
+        self.current_word_size = word_size;
     }
 
     /// Blocking write
@@ -244,6 +270,7 @@ impl<'d, M: PeriMode> Spi<M> {
             let vsf_spi = self.info.vsf_spi.load(Ordering::Relaxed);
             let tx_offset: uint_fast32_t = 0 as uint_fast32_t;
 
+            self.set_word_size(W::CONFIG);
             while tx_offset < data.len() as uint_fast32_t {
                 vsf_spi_fifo_transfer(vsf_spi,
                     data.as_ptr() as *mut ::core::ffi::c_void, &tx_offset as *const uint_fast32_t as *mut uint_fast32_t,
@@ -261,6 +288,7 @@ impl<'d, M: PeriMode> Spi<M> {
             let vsf_spi = self.info.vsf_spi.load(Ordering::Relaxed);
             let rx_offset: uint_fast32_t = 0 as uint_fast32_t;
 
+            self.set_word_size(W::CONFIG);
             while rx_offset < data.len() as uint_fast32_t {
                 vsf_spi_fifo_transfer(vsf_spi,
                     0 as *mut ::core::ffi::c_void, 0 as *mut uint_fast32_t,
@@ -295,6 +323,7 @@ impl<'d, M: PeriMode> Spi<M> {
             let mut xfered_len = 0;
             let mut err_mask = 0 as u32;
 
+            self.set_word_size(W::CONFIG);
             while xfered_len < xfer_len {
                 let cur_len = if xfered_len < xfer_common_len {
                     err_mask = VSF_SPI_IRQ_MASK_ERR;
@@ -339,6 +368,7 @@ impl<'d, M: PeriMode> Spi<M> {
             let tx_offset: uint_fast32_t = 0 as uint_fast32_t;
             let rx_offset: uint_fast32_t = 0 as uint_fast32_t;
 
+            self.set_word_size(W::CONFIG);
             while rx_offset < data.len() as uint_fast32_t {
                 vsf_spi_fifo_transfer(vsf_spi,
                     data_ptr, &tx_offset as *const uint_fast32_t as *mut uint_fast32_t,
@@ -472,6 +502,7 @@ impl<'d> Spi<Async> {
             let ptr = data.as_ptr();
             let len = data.len();
 
+            self.set_word_size(W::CONFIG);
             vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL));
             vsf_spi_request_transfer(vsf_spi,
                 ptr as *mut ::core::ffi::c_void,
@@ -502,6 +533,7 @@ impl<'d> Spi<Async> {
             let ptr = data.as_ptr();
             let len = data.len();
 
+            self.set_word_size(W::CONFIG);
             vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL));
             vsf_spi_request_transfer(vsf_spi,
                 ptr as *mut ::core::ffi::c_void,
@@ -550,6 +582,7 @@ impl<'d> Spi<Async> {
             let mut xfered_len = 0;
             let mut irq_mask: u32 = 0;
 
+            self.set_word_size(W::CONFIG);
             while xfered_len < xfer_len {
                 let cur_len = if xfered_len < xfer_common_len {
                     irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) | VSF_SPI_IRQ_MASK_ERR;
@@ -605,6 +638,7 @@ impl<'d> Spi<Async> {
             let ptr = data.as_ptr();
             let len = data.len();
 
+            self.set_word_size(W::CONFIG);
             vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL));
             vsf_spi_request_transfer(vsf_spi,
                 ptr as *mut ::core::ffi::c_void,
@@ -653,6 +687,7 @@ macro_rules! impl_word {
 mod word_impl {
     use super::*;
 
+    #[derive(Copy, Clone, Debug)]
     enum WordConfig {
         #[cfg(VSF_SPI_DATASIZE_4)]
         BITS4 = into_vsf_spi_mode_t!(VSF_SPI_DATASIZE_4) as isize,

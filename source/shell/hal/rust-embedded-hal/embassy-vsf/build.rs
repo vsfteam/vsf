@@ -24,7 +24,7 @@ const BINDGEN_DEFINITIONS: [&'static str; 2] = [
 
 const PERIPHERIALS: [&'static str; 4] = ["gpio", "usart", "spi", "i2c"];
 
-const CONSTANTS_MACRO: [(&'static str, &'static str); 64] = [
+const CONSTANTS_MACRO: [(&'static str, &'static str); 65] = [
     // USART optional constants defined in MACRO
     ("vsf_usart_status_t", "VSF_USART_STATUS_BREAK_SENT"),
     ("vsf_usart_mode_t", "VSF_USART_5_BIT_LENGTH"),
@@ -91,9 +91,10 @@ const CONSTANTS_MACRO: [(&'static str, &'static str); 64] = [
     ("vsf_spi_mode_t", "VSF_SPI_TI_MODE"),
     ("vsf_spi_mode_t", "VSF_SPI_CRC_ENABLED"),
     ("vsf_spi_mode_t", "VSF_SPI_CRC_DISABLED"),
+    ("vsf_spi_ctrl_t", "VSF_SPI_CTRL_SET_DATASIZE"),
 ];
 
-const CONSTANTS_ENUM: [(&'static str, &'static str); 120] = [
+const CONSTANTS_ENUM: [(&'static str, &'static str); 121] = [
     // GPIO constants
     ("", "VSF_HW_GPIO_PIN_COUNT"),
     ("vsf_gpio_mode_t", "VSF_GPIO_ANALOG"),
@@ -185,6 +186,7 @@ const CONSTANTS_ENUM: [(&'static str, &'static str); 120] = [
     ("vsf_spi_mode_t", "VSF_SPI_TI_MODE"),
     ("vsf_spi_mode_t", "VSF_SPI_CRC_ENABLED"),
     ("vsf_spi_mode_t", "VSF_SPI_CRC_DISABLED"),
+    ("vsf_spi_ctrl_t", "VSF_SPI_CTRL_SET_DATASIZE"),
     // peripherial enable/disable
     ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO0"),
     ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO1"),
