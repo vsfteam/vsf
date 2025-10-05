@@ -8,8 +8,7 @@ use std::fs;
 
 #[proc_macro]
 pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
-    let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-    let pathbuf = Path::new(&manifest_dir).join("./src/vsf_hal.rs");
+    let pathbuf = Path::new(&env::var("OUT_DIR").unwrap()).join("vsf_hal.rs");
     let bindings_content = fs::read_to_string(&pathbuf).unwrap();
     let bindings_lines = bindings_content.lines().collect();
 
@@ -51,8 +50,7 @@ pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
 
 #[proc_macro]
 pub fn bind_vsf_usarts(_item: TokenStream) -> TokenStream {
-    let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-    let pathbuf = Path::new(&manifest_dir).join("./src/vsf_hal.rs");
+    let pathbuf = Path::new(&env::var("OUT_DIR").unwrap()).join("vsf_hal.rs");
     let bindings_content = fs::read_to_string(&pathbuf).unwrap();
     let bindings_lines = bindings_content.lines().collect();
 
@@ -106,8 +104,7 @@ pub fn bind_vsf_peripheral(item: TokenStream) -> TokenStream {
         _ => "".to_string(),
     };
 
-    let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
-    let pathbuf = Path::new(&manifest_dir).join("./src/vsf_hal.rs");
+    let pathbuf = Path::new(&env::var("OUT_DIR").unwrap()).join("vsf_hal.rs");
     let bindings_content = fs::read_to_string(&pathbuf).unwrap();
     let bindings_lines = bindings_content.lines().collect();
 

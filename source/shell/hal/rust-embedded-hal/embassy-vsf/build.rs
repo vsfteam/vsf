@@ -338,14 +338,17 @@ fn main() {
         unsafe { env::set_var("VSF_PATH", path_absolute); }
     }
 
-    let manifest_dir = env::var("CARGO_MANIFEST_DIR").unwrap();
+    let out_dir = env::var_os("OUT_DIR").unwrap();
+    let out_path = Path::new(&out_dir);
+    println!("cargo:rustc-link-search={}", out_path.to_str().unwrap());
+
     let mut path = env::var("VSF_PATH").unwrap();
     let vendor = env::var("VSF_VENDOR").expect("please define VSF_VENDOR in config.toml [env] section");
     let model = env::var("VSF_MODEL").expect("please define VSF_MODEL in config.toml [env] section");
     let flags_str = env::var("VSF_FLAGS").unwrap_or("".to_string());
     let flags: Vec<String> = flags_str.split(';').map(|s| s.to_string()).collect();
 
-    println!("cargo:rerun-if-changed={path}/src/vsf_hal.rs");
+    println!("cargo:rerun-if-changed={}/vsf_hal.rs", out_path.to_str().unwrap());
     println!("cargo:warning=path: {path}");
     println!("cargo:warning=target: {vendor}.{model}");
     println!("cargo:warning=flags:");
@@ -356,14 +359,14 @@ fn main() {
     path = shellexpand::full(&path).expect("Fail to expand for environment variables").into_owned();
     if path.starts_with(".") {
         path.insert(0, '/');
-        path.insert_str(0, &manifest_dir);
+        path.insert_str(0, &env::var("CARGO_MANIFEST_DIR").unwrap());
     }
     if !path.ends_with("/") {
         path.push('/');
     }
 
     {
-        let vsf_hal_build_path = Path::new("./vsf_hal_build");
+        let vsf_hal_build_path = out_path.join("vsf_hal_build");
         if !vsf_hal_build_path.exists() {
             fs::create_dir_all(&vsf_hal_build_path).unwrap();
             Command::new("cmake").current_dir(&vsf_hal_build_path).arg("-GNinja").arg("-DVSF_TARGET=".to_string() + &model).arg(path.clone() + "source/shell/hal/rust-embedded-hal/lib").output().expect("Fail to run cmake");
@@ -374,7 +377,8 @@ fn main() {
         println!("cargo:rustc-link-lib=static=vsf_hal");
     }
 
-    fs::write("./vsf_c.h", "
+    let vsf_c_path = out_path.join("vsf_c.h");
+    fs::write(&vsf_c_path, "
         #include <service/vsf_service.h>
         #include <hal/vsf_hal.h>
     ").unwrap();
@@ -388,12 +392,12 @@ fn main() {
     }
 
     let mut builder = bindgen::Builder::default()
-                    .header("./vsf_c.h")
+                    .header(vsf_c_path.to_str().unwrap())
                     .parse_callbacks(Box::new(Callbacks{}))
-                    .raw_line("#![allow(non_camel_case_types)]")
-                    .raw_line("#![allow(non_upper_case_globals)]")
-                    .raw_line("#![allow(non_snake_case)]")
-                    .raw_line("#![allow(dead_code)]")
+                    .raw_line("#[allow(non_camel_case_types)]")
+                    .raw_line("#[allow(non_upper_case_globals)]")
+                    .raw_line("#[allow(non_snake_case)]")
+                    .raw_line("#[allow(dead_code)]")
                     .use_core()
                     .default_enum_style(BINDGEN_ENUM_VAR)
                     .clang_arg("-D".to_string() + "__" + &vendor + "__")
@@ -411,7 +415,7 @@ fn main() {
 
     let bindings = builder.generate().expect("Failed to generate rust bindings");
 
-    let pathbuf = Path::new(&manifest_dir).join("./src/vsf_hal.rs");
+    let pathbuf = out_path.join("vsf_hal.rs");
     bindings.write_to_file(&pathbuf).unwrap();
 
     let bindings_content = fs::read_to_string(&pathbuf).unwrap();
@@ -520,7 +524,8 @@ fn main() {
             }
         }
     }
-    fs::write("./device.x", device_x_str).unwrap();
+
+    fs::write(out_path.join("device.x"), device_x_str).unwrap();
     let pac_rs_str = String::from(&format!("
         #[derive(Copy, Clone, Debug, PartialEq, Eq)]
         #[cfg_attr(feature = \"defmt\", derive(defmt::Format))]
@@ -551,7 +556,7 @@ fn main() {
             ];
         }}
     "));
-    fs::write("./src/pac.rs", pac_rs_str).unwrap();
+    fs::write(out_path.join("pac.rs"), pac_rs_str).unwrap();
 
     // bind vsf peripherals
     let mut generated_rs_str = String::from("");
@@ -617,7 +622,7 @@ fn main() {
         );
         {af_str}
     "));
-    fs::write("./src/_generated.rs", generated_rs_str).unwrap();
+    fs::write(out_path.join("_generated.rs"), generated_rs_str).unwrap();
 }
 
 fn enable_peripherial(name: &str, mask: u32) {

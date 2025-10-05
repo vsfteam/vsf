@@ -220,7 +220,9 @@ mod word {
 }
 
 // vsf_hal
-mod vsf_hal;
+mod vsf_hal {
+    include!(concat!(env!("OUT_DIR"), "/vsf_hal.rs"));
+}
 
 // basic vsf type conversion
 
@@ -264,14 +266,16 @@ pub(crate) mod _generated {
     #![allow(non_snake_case)]
     #![allow(missing_docs)]
 
-    include!("./_generated.rs");
+    include!(concat!(env!("OUT_DIR"), "/_generated.rs"));
 }
 
 pub use crate::_generated::interrupt;
 
 pub use _generated::{peripherals, Peripherals};
 pub use embassy_hal_internal::{Peri, PeripheralType};
-pub mod pac;
+pub mod pac {
+    include!(concat!(env!("OUT_DIR"), "/pac.rs"));
+}
 
 #[non_exhaustive]
 #[derive(Clone, Copy)]
