@@ -289,8 +289,8 @@ lazy_static! {
         }
         m
     });
-    static ref GLOBAL_CONSTANTS_MACRO_VEC: Mutex<Vec<(&'static str, &'static str)>> = Mutex::new({
-        let v = Vec::new();
+    static ref GLOBAL_CONSTANTS_MACRO_VEC: Mutex<HashMap<(&'static str, &'static str), Option<String>>> = Mutex::new({
+        let v = HashMap::new();
         v
     });
 }
@@ -323,7 +323,13 @@ impl ParseCallbacks for Callbacks {
             let mut constants_macro = GLOBAL_CONSTANTS_MACRO_VEC.lock().unwrap();
             for constant in CONSTANTS_MACRO {
                 if constant.1 == name {
-                    constants_macro.push((constant.0, constant.1));
+                    if tokens.len() == 1 {
+                        constants_macro.insert((constant.0, constant.1), None);
+                    } else {
+                        constants_macro.insert((constant.0, constant.1),
+                            Some(String::from_utf8_lossy(&tokens[1].raw).into_owned()));
+                    }
+                    break;
                 }
             }
         }
@@ -346,7 +352,8 @@ fn main() {
     let vendor = env::var("VSF_VENDOR").expect("please define VSF_VENDOR in config.toml [env] section");
     let model = env::var("VSF_MODEL").expect("please define VSF_MODEL in config.toml [env] section");
     let flags_str = env::var("VSF_FLAGS").unwrap_or("".to_string());
-    let flags: Vec<String> = flags_str.split(';').map(|s| s.to_string()).collect();
+    let mut flags: Vec<String> = flags_str.split(';').map(|s| s.to_string()).collect();
+    flags.insert(0, format!("--target={}", env::var("TARGET").unwrap()));
 
     println!("cargo:rerun-if-changed={}/vsf_hal.rs", out_path.to_str().unwrap());
     println!("cargo:warning=path: {path}");
@@ -420,16 +427,16 @@ fn main() {
 
     let bindings_content = fs::read_to_string(&pathbuf).unwrap();
     let bindings_lines = bindings_content.lines().collect();
+    let constants_macro = GLOBAL_CONSTANTS_MACRO_VEC.lock().unwrap();
 
     // parse constants
     let mut constants_cfg: BTreeMap<(&'static str, &'static str), u64> = BTreeMap::new();
-    let constants_macro = GLOBAL_CONSTANTS_MACRO_VEC.lock().unwrap();
     // add constants in CONSTANTS_ENUM
     'outer: for constant_enum in CONSTANTS_ENUM {
         println!("cargo::rustc-check-cfg=cfg({})", constant_enum.1);
         if let Some(cur_value) = extract_const_integer::<u64>(&bindings_lines, &(String::from(constant_enum.0) + "_" + constant_enum.1)) {
             for constant_macro in CONSTANTS_MACRO {
-                if constant_macro.1 == constant_enum.1 && !constants_macro.contains(&constant_macro) {
+                if constant_macro.1 == constant_enum.1 && !constants_macro.contains_key(&constant_macro) {
                     continue 'outer;
                 }
             }
@@ -440,7 +447,7 @@ fn main() {
     for constant_macro in CONSTANTS_MACRO {
         if !CONSTANTS_ENUM.contains(&constant_macro) {
             println!("cargo::rustc-check-cfg=cfg({})", constant_macro.1);
-            if constants_macro.contains(&constant_macro) {
+            if constants_macro.contains_key(&constant_macro) {
                 constants_cfg.insert((constant_macro.0, constant_macro.1), 0);
             }
         }

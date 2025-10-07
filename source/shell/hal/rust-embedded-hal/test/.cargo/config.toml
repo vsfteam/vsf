@@ -11,4 +11,4 @@ DEFMT_LOG = "trace"
 
 VSF_VENDOR = "Nations"
 VSF_MODEL = "N32H765IIB7EC"
-VSF_FLAGS = "--target=thumbv7em-none-eabihf;-I${VSF_PATH}/source/utilities/compiler/arm/3rd-party/CMSIS/CMSIS/Core/Include"
+VSF_FLAGS = "-I${VSF_PATH}/source/utilities/compiler/arm/3rd-party/CMSIS/CMSIS/Core/Include"
