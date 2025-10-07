@@ -14,7 +14,6 @@ embassy-vsf = { path = "../embassy-vsf", features = ["defmt"] }
 [features]
 defmt = []
 log = []
-rt = []
 
 [profile.release]
 opt-level = 3
