@@ -238,6 +238,13 @@ struct PeripheralAfInfo {
     pins: HashMap<&'static str, &'static str>,
 }
 
+struct ArchInfo {
+    name: &'static str,
+    detect: Box<dyn Fn() -> bool + Send>,
+    features: Vec<&'static str>,
+    cflags: Vec<&'static str>,
+}
+
 use lazy_static::lazy_static;
 lazy_static! {
     static ref GLOBAL_INTERRUPT_VEC: Mutex<Vec<String>> = Mutex::new({
@@ -293,6 +300,43 @@ lazy_static! {
         let v = HashMap::new();
         v
     });
+
+    static ref GLOBAL_ARCH_INFO: Mutex<Vec<ArchInfo>> = Mutex::new(vec![
+        ArchInfo {
+            name: "Cortex-M",
+            detect: Box::new(|| -> bool {
+                env::var("TARGET").unwrap().starts_with("thumb")
+            }),
+            features: Vec::from([]),
+            cflags: Vec::from([
+                "-I${VSF_PATH}/source/utilities/compiler/arm/3rd-party/CMSIS/CMSIS/Core/Include",
+            ]),
+        },
+        ArchInfo {
+            name: "RiscV",
+            detect: Box::new(|| -> bool {
+                env::var("TARGET").unwrap().starts_with("riscv")
+            }),
+            features: Vec::from([]),
+            cflags: Vec::from([]),
+        },
+        ArchInfo {
+            name: "Windows",
+            detect: Box::new(|| -> bool {
+                env::var("CARGO_CFG_WINDOWS").is_ok()
+            }),
+            features: Vec::from([]),
+            cflags: Vec::from([]),
+        },
+        ArchInfo {
+            name: "Linux/Unix/Macos",
+            detect: Box::new(|| -> bool {
+                env::var("CARGO_CFG_UNIX").is_ok()
+            }),
+            features: Vec::from([]),
+            cflags: Vec::from([]),
+        },
+    ]);
 }
 
 use bindgen::callbacks::{
@@ -354,6 +398,21 @@ fn main() {
     let flags_str = env::var("VSF_FLAGS").unwrap_or("".to_string());
     let mut flags: Vec<String> = flags_str.split(';').map(|s| s.to_string()).collect();
     flags.insert(0, format!("--target={}", env::var("TARGET").unwrap()));
+
+    // arch
+    let arch_infos = GLOBAL_ARCH_INFO.lock().unwrap();
+    for arch in arch_infos.iter() {
+        if (arch.detect)() {
+            println!("cargo:warning=ARCH: {}", arch.name);
+            for feature in arch.features.iter() {
+                println!("{feature}");
+            }
+            for cflag in arch.cflags.iter() {
+                flags.push(cflag.to_string());
+            }
+            break;
+        }
+    }
 
     println!("cargo:rerun-if-changed={}/vsf_hal.rs", out_path.to_str().unwrap());
     println!("cargo:warning=path: {path}");
