@@ -100,10 +100,17 @@
 // Interrupts
 //  Defined in common/device_irq.h
 
+// RAM
+
+#define VSF_HW_RAM_COUNT                            1
+#define VSF_HW_RAM0_ADDR                            0x24000000
+#define VSF_HW_RAM0_SIZE                            (1152 * 1024)
 
 // FLASH
 
 #define VSF_HW_FLASH_COUNT                          1
+#define VSF_HW_FLASH0_ADDR                          0x15000000
+#define VSF_HW_FLASH0_SIZE                          ((2048 - 128) * 1024)
 
 // GPIO, TODO: update VSF_HW_GPIO_PORTX_MASK
 

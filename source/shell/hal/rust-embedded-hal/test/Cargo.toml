@@ -11,9 +11,6 @@ repository = "https://github.com/vsfteam/vsf"
 [dependencies]
 embassy-vsf = { path = "../embassy-vsf", features = ["defmt"] }
 
-cortex-m = { version = "0.7", features = ["inline-asm", "critical-section-single-core"] }
-cortex-m-rt = { version = "0.7", features = ["device"] }
-
 [features]
 defmt = []
 log = []

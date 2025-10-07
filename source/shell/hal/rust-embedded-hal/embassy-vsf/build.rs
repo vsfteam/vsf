@@ -525,8 +525,9 @@ fn main() {
         }
     }
 
+    // generate device.x
     fs::write(out_path.join("device.x"), device_x_str).unwrap();
-    let pac_rs_str = String::from(&format!("
+    fs::write(out_path.join("pac.rs"), String::from(&format!("
         #[derive(Copy, Clone, Debug, PartialEq, Eq)]
         #[cfg_attr(feature = \"defmt\", derive(defmt::Format))]
         #[allow(non_camel_case_types)]
@@ -555,8 +556,43 @@ fn main() {
                 {interrupt_vecotr_str}
             ];
         }}
-    "));
-    fs::write(out_path.join("pac.rs"), pac_rs_str).unwrap();
+    "))).unwrap();
+
+    // generate memory.x
+    let mut flash_addr = 0u64;
+    let mut flash_size = 0u32;
+    let mut ram_addr = 0u64;
+    let mut ram_size = 0u32;
+    let flash_mask = extract_peripheral_mask(&bindings_lines, "flash");
+    if flash_mask != 0 {
+        for flash_index in 0..32 {
+            if  flash_mask & (1 << flash_index) != 0
+            &&  let Some(flash_addr_tmp) = extract_const_integer::<u64>(&bindings_lines, &format!("VSF_HW_FLASH{flash_index}_ADDR"))
+            &&  let Some(flash_size_tmp) = extract_const_integer::<u32>(&bindings_lines, &format!("VSF_HW_FLASH{flash_index}_SIZE")) {
+                flash_addr = flash_addr_tmp;
+                flash_size = flash_size_tmp;
+            }
+        }
+    }
+    let ram_mask = extract_peripheral_mask(&bindings_lines, "ram");
+    if ram_mask != 0 {
+        for ram_index in 0..32 {
+            if  ram_mask & (1 << ram_index) != 0
+            &&  let Some(ram_addr_tmp) = extract_const_integer::<u64>(&bindings_lines, &format!("VSF_HW_RAM{ram_index}_ADDR"))
+            &&  let Some(ram_size_tmp) = extract_const_integer::<u32>(&bindings_lines, &format!("VSF_HW_RAM{ram_index}_SIZE")) {
+                ram_addr = ram_addr_tmp;
+                ram_size = ram_size_tmp;
+            }
+        }
+    }
+
+    fs::write(out_path.join("memory.x"), String::from(&format!("
+        MEMORY
+        {{
+            FLASH (rx) : ORIGIN = 0x{flash_addr:X}, LENGTH = 0x{flash_size:X}
+            RAM (xrw)  : ORIGIN = 0x{ram_addr:X}, LENGTH = 0x{ram_size:X}
+        }}
+    "))).unwrap();
 
     // bind vsf peripherals
     let mut generated_rs_str = String::from("");
