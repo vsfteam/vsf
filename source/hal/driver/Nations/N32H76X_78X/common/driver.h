@@ -23,8 +23,8 @@
 
 #else
 
-#ifndef __VSF_HAL_DRIVER_NATION_N32H76X_N32H78X_H__
-#define __VSF_HAL_DRIVER_NATION_N32H76X_N32H78X_H__
+#ifndef __VSF_HAL_DRIVER_NATIONS_N32H76X_N32H78X_H__
+#define __VSF_HAL_DRIVER_NATIONS_N32H76X_N32H78X_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -198,6 +198,6 @@
 #   include "hal/driver/common/wdt/wdt_template.h"
 #endif
 
-#endif      // __VSF_HAL_DRIVER_NATION_N32H76X_N32H78X_H__
+#endif      // __VSF_HAL_DRIVER_NATIONS_N32H76X_N32H78X_H__
 #endif      // !__VSF_HEADER_ONLY_SHOW_ARCH_INFO__ && !__VSF_HAL_SHOW_VENDOR_INFO__
 /* EOF */

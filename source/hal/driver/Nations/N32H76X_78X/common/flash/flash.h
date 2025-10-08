@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_N32H76X_N32H78X_FLASH_H__
-#define __HAL_DRIVER_N32H76X_N32H78X_FLASH_H__
+#ifndef __HAL_DRIVER_NATIONS_N32H76X_N32H78X_FLASH_H__
+#define __HAL_DRIVER_NATIONS_N32H76X_N32H78X_FLASH_H__
 
 /*============================ INCLUDES ======================================*/
 
@@ -130,5 +130,5 @@ typedef struct vsf_flash_capability_t {
 #endif
 
 #endif      // VSF_HAL_USE_FLASH
-#endif      // __HAL_DRIVER_N32H76X_N32H78X_FLASH_H__
+#endif      // __HAL_DRIVER_NATIONS_N32H76X_N32H78X_FLASH_H__
 /* EOF */
