@@ -24,8 +24,6 @@
 
 #if VSF_HAL_USE_FLASH == ENABLED
 
-#include "../../__device.h"
-
 /*\note Refer to template/README.md for usage cases.
  *      For peripheral drivers, blackbox mode is recommended but not required, reimplementation part MUST be open.
  *      For IPCore drivers, class structure, MULTI_CLASS configuration, reimplementation and class APIs should be open to user.
