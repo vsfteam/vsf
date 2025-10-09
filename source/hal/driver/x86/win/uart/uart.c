@@ -138,6 +138,19 @@ static vsf_hostos_usart_port_t __vsf_hostos_usart_port = {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
+static char *__ansi_to_utf8(const char *ansiStr, int ansiLen) {
+    int wideLen = MultiByteToWideChar(CP_ACP, 0, ansiStr, ansiLen, NULL, 0);
+    wchar_t *wideStr = (wchar_t *)malloc(wideLen * sizeof(wchar_t));
+    MultiByteToWideChar(CP_ACP, 0, ansiStr, ansiLen, wideStr, wideLen);
+
+    int utf8Len = WideCharToMultiByte(CP_UTF8, 0, wideStr, -1, NULL, 0, NULL, NULL);
+    char *utf8Str = (char *)malloc(utf8Len);
+    WideCharToMultiByte(CP_UTF8, 0, wideStr, -1, utf8Str, utf8Len, NULL, NULL);
+
+    free(wideStr);
+    return utf8Str;
+}
+
 uint8_t vsf_hostos_usart_scan_devices(vsf_hostos_usart_device_t *devices, uint8_t device_num)
 {
     HDEVINFO hDevInfo = SetupDiGetClassDevs(&GUID_DEVINTERFACE_COMPORT, NULL, NULL, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
@@ -174,13 +187,20 @@ uint8_t vsf_hostos_usart_scan_devices(vsf_hostos_usart_device_t *devices, uint8_
                 mask |= 1 << port_idx;
                 if (0 == (*ports)[port_idx]->port_idx) {
                      (*ports)[port_idx]->port_idx = port_idx;
-                    __vsf_arch_trace(0, "[hal_win] usart%-2d 0x%p %s\n", port_idx,  (*ports)[port_idx], portFriendlyName);
                 }
 
                 if (devices != NULL) {
                     devices[usart_num].instance = (vsf_usart_t *)(*__vsf_hostos_usart_port.fifo2req_ports)[port_idx];
-                    strncpy(devices[usart_num].name, portName, sizeof(devices[usart_num].name));
-                    strncpy(devices[usart_num].friendly_name, portFriendlyName, sizeof(devices[usart_num].friendly_name));
+
+                    char *name_utf8 = __ansi_to_utf8(portName, sizeof(portName));
+                    strncpy(devices[usart_num].name, name_utf8, sizeof(devices[usart_num].name));
+                    free(name_utf8);
+
+                    name_utf8 = __ansi_to_utf8(portFriendlyName, sizeof(portFriendlyName));
+                    strncpy(devices[usart_num].friendly_name, name_utf8, sizeof(devices[usart_num].friendly_name));
+                    __vsf_arch_trace(0, "[hal_win] usart%-2d 0x%p %s\n", port_idx, (*ports)[port_idx], name_utf8);
+                    free(name_utf8);
+
                     usart_num++;
                 }
             }
@@ -322,7 +342,7 @@ exit_rx:
 static void __vsf_hostos_usart_tx_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vsf_hostos_usart_t * hostos_usart = vsf_container_of(irq_thread, vsf_hostos_usart_t, tx.irq_thread);
+    vsf_hostos_usart_t *hostos_usart = vsf_container_of(irq_thread, vsf_hostos_usart_t, tx.irq_thread);
 
     OVERLAPPED overlapped = {
         .hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL),
