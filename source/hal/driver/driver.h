@@ -32,6 +32,8 @@
 
 #   if      defined(__VSF_APPLET__)
 // no hw driver for __VSF_APPLET__
+#   elif    defined(__Emulation__)
+#       define  VSF_DRIVER_HEADER       "./Emulation/driver.h"
 #   elif    defined(__STMicro__)
 #       define  VSF_DRIVER_HEADER       "./ST/driver.h"
 #   elif    defined(__NXP__)

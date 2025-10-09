@@ -52,15 +52,17 @@ extern "C" {
 #   include "hal/driver/common/usart/usart_template.h"
 
 #    ifndef VSF_HOSTOS_USART_PREFIX
-#        define VSF_HOSTOS_USART_PREFIX                 vsf_hw
-#        define VSF_HOSTOS_USART_UNCASE_PREFIX          VSF_HW
+#       define VSF_HOSTOS_USART_PREFIX                  vsf_hw
+#       define VSF_HOSTOS_USART_UNCASE_PREFIX           VSF_HW
+#       ifndef VSF_HW_USART_COUNT
+#           define VSF_HW_USART_COUNT                   VSF_HOSTOS_USART_COUNT
+#       endif
 #    endif
 
 #   define VSF_USART_CFG_DEC_PREFIX                     VSF_HOSTOS_USART_PREFIX
 #   define VSF_USART_CFG_DEC_UPCASE_PREFIX              VSF_HOSTOS_USART_UNCASE_PREFIX
 #   define VSF_USART_CFG_DEC_REMAP                      ENABLED
 #   define VSF_USART_CFG_DEC_REMAP_PREFIX               vsf_fifo2req
-#   define VSF_HW_USART_COUNT                           VSF_HOSTOS_USART_COUNT
 #   include "hal/driver/common/usart/usart_template.h"
 #endif
 
@@ -93,6 +95,8 @@ extern vsf_mem_stream_t VSF_DEBUG_STREAM_RX;
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern bool vsf_hostos_driver_init(void);
 
 #ifdef __cplusplus
 }

@@ -115,6 +115,21 @@ int __vsf_arch_trace(int level, const char *format, ...)
 #endif
 }
 
+int __vsf_arch_console_readline(char *buf, int bufsize)
+{
+    HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD chars_to_read = bufsize;
+    DWORD chars_read = 0, mode;
+
+    GetConsoleMode(hIn, &mode);
+    SetConsoleMode(hIn, mode | ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT);
+
+    ReadConsoleA(GetStdHandle(STD_INPUT_HANDLE), buf, chars_to_read, &chars_read, NULL);
+
+    SetConsoleMode(hIn, mode);
+    return (int)chars_read;
+}
+
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED
 #   if VSF_USE_SIMPLE_STREAM == ENABLED
 static void __vsf_x86_debug_stream_tx_init(vsf_stream_t *stream)
@@ -202,7 +217,7 @@ static void __vsf_x86_debug_stream_init(void)
 #   endif
 #endif
 
-bool vsf_driver_init(void)
+bool vsf_hostos_driver_init(void)
 {
 #if VSF_HAL_USE_DEBUG_STREAM == ENABLED && VSF_ARCH_CFG_HIDE_CONSOLE != ENABLED
     __vsf_x86_debug_stream_init();
@@ -216,5 +231,12 @@ bool vsf_driver_init(void)
 #endif
     return true;
 }
+
+#ifndef __VSF_HOSTOS_BYPASS__
+bool vsf_driver_init(void)
+{
+    return vsf_hostos_driver_init();
+}
+#endif
 
 /* EOF */

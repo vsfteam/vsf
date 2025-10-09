@@ -224,6 +224,7 @@ vsf_class(vsf_arch_irq_thread_t) {
 
 // this API is implement in driver
 extern int __vsf_arch_trace(int level, const char *format, ...);
+extern int __vsf_arch_console_readline(char *buf, int bufsize);
 
 extern bool __vsf_arch_before_entry(void);
 

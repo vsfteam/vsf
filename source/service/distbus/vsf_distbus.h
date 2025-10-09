@@ -19,6 +19,7 @@
 #define __VSF_DISTBUS_H__
 
 /*============================ INCLUDES ======================================*/
+
 #include "service/vsf_service_cfg.h"
 
 #if VSF_USE_DISTBUS == ENABLED
@@ -153,6 +154,10 @@ extern void vsf_distbus_register_service(vsf_distbus_t *distbus, vsf_distbus_ser
 
 #undef __VSF_DISTBUS_CLASS_IMPLEMENT
 #undef __VSF_DISTBUS_CLASS_INHERIT__
+
+/*============================ INCLUDES ======================================*/
+
+#include "./transport/stream/vsf_distbus_transport_stream.h"
 
 #endif      // VSF_USE_DISTBUS
 #endif      // __VSF_DISTBUS_H__

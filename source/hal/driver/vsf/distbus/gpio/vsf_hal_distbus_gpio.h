@@ -101,6 +101,7 @@ typedef struct vsf_hal_distbus_gpio_info_t {
 
     vsf_gpio_pin_mask_t direction;
     vsf_gpio_pin_mask_t value;
+    vsf_gpio_pin_mask_t output_value;
 } VSF_CAL_PACKED vsf_hal_distbus_gpio_info_t;
 
 vsf_class(vsf_hal_distbus_gpio_t) {

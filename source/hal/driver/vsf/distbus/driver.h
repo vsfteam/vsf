@@ -88,8 +88,7 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 typedef enum vsf_hal_distbus_type_t {
-    VSF_HAL_DISTBUS_IO = 0,
-    VSF_HAL_DISTBUS_GPIO,
+    VSF_HAL_DISTBUS_GPIO = 0,
     VSF_HAL_DISTBUS_I2C,
     VSF_HAL_DISTBUS_SPI,
     VSF_HAL_DISTBUS_USART,
@@ -102,7 +101,6 @@ typedef enum vsf_hal_distbus_type_t {
     VSF_HAL_DISTBUS_USBH,
 
     // for MACRO usage only
-    VSF_HAL_DISTBUS_io      = VSF_HAL_DISTBUS_IO,
     VSF_HAL_DISTBUS_gpio    = VSF_HAL_DISTBUS_GPIO,
     VSF_HAL_DISTBUS_i2c     = VSF_HAL_DISTBUS_I2C,
     VSF_HAL_DISTBUS_spi     = VSF_HAL_DISTBUS_SPI,
@@ -134,6 +132,7 @@ typedef struct __vsf_hal_distbus_enum_t {
 
 #define __VSF_HAL_DISTBUS_ENUM      VSF_HAL_DISTBUS_DEFINE
 #include "vsf_hal_distbus_enum.inc"
+#undef VSF_HAL_DISTBUS_DEFINE
 } __vsf_hal_distbus_enum_t;
 
 vsf_class(vsf_hal_distbus_t) {

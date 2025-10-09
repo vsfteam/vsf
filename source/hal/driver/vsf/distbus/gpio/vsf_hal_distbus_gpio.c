@@ -131,6 +131,15 @@ vsf_err_t vsf_hal_distbus_gpio_port_config_pins(vsf_hal_distbus_gpio_t *gpio, vs
     return VSF_ERR_NONE;
 }
 
+vsf_err_t vsf_hal_distbus_gpio_get_pin_configuration(vsf_hal_distbus_gpio_t *gpio, uint16_t pin_index, vsf_gpio_cfg_t *cfg)
+{
+    VSF_HAL_ASSERT(NULL != gpio);
+    VSF_HAL_ASSERT(NULL != cfg);
+
+    // TODO: add commands for initializing pin_configurations and returns here if necessary
+    return VSF_ERR_NOT_SUPPORT;
+}
+
 void vsf_hal_distbus_gpio_set_direction(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio);
@@ -156,6 +165,11 @@ vsf_err_t vsf_hal_distbus_gpio_exti_irq_config(vsf_hal_distbus_gpio_t *gpio, vsf
     return VSF_ERR_NOT_SUPPORT;
 }
 
+vsf_err_t vsf_hal_distbus_gpio_exti_irq_get_configuration(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_exti_irq_cfg_t *cfg)
+{
+    return VSF_ERR_NOT_SUPPORT;
+}
+
 vsf_err_t vsf_hal_distbus_gpio_exti_irq_enable(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask)
 {
     return VSF_ERR_NOT_SUPPORT;
@@ -177,7 +191,7 @@ void vsf_hal_distbus_gpio_switch_direction(vsf_hal_distbus_gpio_t *gpio, vsf_gpi
     VSF_HAL_ASSERT(NULL != gpio);
     VSF_HAL_ASSERT(0 != pin_mask);
 
-    uint32_t ret = ~vsf_hal_distbus_gpio_get_direction(gpio, pin_mask);
+    vsf_gpio_pin_mask_t ret = ~vsf_hal_distbus_gpio_get_direction(gpio, pin_mask);
     vsf_hal_distbus_gpio_set_direction(gpio, pin_mask, ret);
 }
 
@@ -191,10 +205,17 @@ void vsf_hal_distbus_gpio_set_output(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_
     vsf_hal_distbus_gpio_set_direction(gpio, pin_mask, pin_mask);
 }
 
-uint32_t vsf_hal_distbus_gpio_read(vsf_hal_distbus_gpio_t *gpio)
+vsf_gpio_pin_mask_t vsf_hal_distbus_gpio_read(vsf_hal_distbus_gpio_t *gpio)
 {
     VSF_HAL_ASSERT(NULL != gpio);
     return gpio->info.value;
+}
+
+vsf_gpio_pin_mask_t vsf_hal_distbus_gpio_read_output_register(vsf_hal_distbus_gpio_t *gpio)
+{
+    VSF_HAL_ASSERT(NULL != gpio);
+    // TODO: initialize output_value
+    return gpio->info.output_value;
 }
 
 void vsf_hal_distbus_gpio_write(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t value)
