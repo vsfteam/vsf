@@ -45,19 +45,22 @@ extern "C" {
 /*============================ INCLUDES ======================================*/
 
 #if VSF_HAL_USE_USART == ENABLED
-#   define VSF_USART_CFG_REIMPLEMENT_TYPE_MODE          ENABLED
-#   define VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK      ENABLED
 #   include "hal/driver/common/template/vsf_template_usart.h"
 
-#   define VSF_USART_CFG_DEC_PREFIX                     vsf_win
-#   define VSF_USART_CFG_DEC_UPCASE_PREFIX              VSF_WIN
+#   define VSF_USART_CFG_DEC_PREFIX                     vsf_hostos
+#   define VSF_USART_CFG_DEC_UPCASE_PREFIX              VSF_HOSTOS
 #   include "hal/driver/common/usart/usart_template.h"
 
-#   define VSF_USART_CFG_DEC_PREFIX                     vsf_hw
-#   define VSF_USART_CFG_DEC_UPCASE_PREFIX              VSF_HW
+#    ifndef VSF_HOSTOS_USART_PREFIX
+#        define VSF_HOSTOS_USART_PREFIX                 vsf_hw
+#        define VSF_HOSTOS_USART_UNCASE_PREFIX          VSF_HW
+#    endif
+
+#   define VSF_USART_CFG_DEC_PREFIX                     VSF_HOSTOS_USART_PREFIX
+#   define VSF_USART_CFG_DEC_UPCASE_PREFIX              VSF_HOSTOS_USART_UNCASE_PREFIX
 #   define VSF_USART_CFG_DEC_REMAP                      ENABLED
 #   define VSF_USART_CFG_DEC_REMAP_PREFIX               vsf_fifo2req
-#   define VSF_HW_USART_COUNT                           VSF_WIN_USART_COUNT
+#   define VSF_HW_USART_COUNT                           VSF_HOSTOS_USART_COUNT
 #   include "hal/driver/common/usart/usart_template.h"
 #endif
 

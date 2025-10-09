@@ -31,20 +31,20 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_WIN_USART_CFG_MULTI_CLASS
-#   define VSF_WIN_USART_CFG_MULTI_CLASS             VSF_USART_CFG_MULTI_CLASS
+#ifndef VSF_HOSTOS_USART_CFG_MULTI_CLASS
+#   define VSF_HOSTOS_USART_CFG_MULTI_CLASS         VSF_USART_CFG_MULTI_CLASS
 #endif
 
-#ifndef VSF_WIN_USART_CFG_TX_BLOCK
+#ifndef VSF_HOSTOS_USART_CFG_TX_BLOCK
 #   ifdef VSF_USART_CFG_TX_BLOCK
-#       define VSF_WIN_USART_CFG_TX_BLOCK           VSF_USART_CFG_TX_BLOCK
+#       define VSF_HOSTOS_USART_CFG_TX_BLOCK        VSF_USART_CFG_TX_BLOCK
 #   else
-#       define VSF_WIN_USART_CFG_TX_BLOCK           DISABLED
+#       define VSF_HOSTOS_USART_CFG_TX_BLOCK        DISABLED
 #   endif
 #endif
 
-#ifndef VSF_WIN_USART_CFG_FIFO_SIZE
-#   define VSF_WIN_USART_CFG_FIFO_SIZE              1024
+#ifndef VSF_HOSTOS_USART_CFG_FIFO_SIZE
+#   define VSF_HOSTOS_USART_CFG_FIFO_SIZE           1024
 #endif
 
 #ifndef VSF_HAL_DISTBUS_USART_CFG_PROTECT_LEVEL
@@ -58,8 +58,8 @@
 
 /*============================ TYPES =========================================*/
 
-typedef struct vsf_win_usart_t {
-#if VSF_WIN_USART_CFG_MULTI_CLASS == ENABLED
+typedef struct vsf_hostos_usart_t {
+#if VSF_HOSTOS_USART_CFG_MULTI_CLASS == ENABLED
     vsf_usart_t                         vsf_usart;
 #endif
 
@@ -79,7 +79,7 @@ typedef struct vsf_win_usart_t {
         vsf_arch_irq_thread_t           irq_thread;
         vsf_arch_irq_request_t          irq_request;
         vsf_mem_stream_t                stream;
-        uint8_t                         buffer[VSF_WIN_USART_CFG_FIFO_SIZE];
+        uint8_t                         buffer[VSF_HOSTOS_USART_CFG_FIFO_SIZE];
         bool                            exited;
     } rx;
     struct {
@@ -87,28 +87,28 @@ typedef struct vsf_win_usart_t {
         vsf_arch_irq_request_t          irq_request;
         vsf_arch_irq_request_t          *irq_request_notifier;
         vsf_mem_stream_t                stream;
-        uint8_t                         buffer[VSF_WIN_USART_CFG_FIFO_SIZE];
+        uint8_t                         buffer[VSF_HOSTOS_USART_CFG_FIFO_SIZE];
         bool                            is_pending;
         bool                            need_tx_irq;
         bool                            exited;
     } tx;
-} vsf_win_usart_t;
+} vsf_hostos_usart_t;
 
-typedef struct vsf_win_usart_port_t {
+typedef struct vsf_hostos_usart_port_t {
     uint32_t                            ports_mask;
-    vsf_win_usart_t                     * const (*ports)[VSF_WIN_USART_COUNT];
-    vsf_fifo2req_usart_t                * const (*fifo2req_ports)[VSF_WIN_USART_COUNT];
-} vsf_win_usart_port_t;
+    vsf_hostos_usart_t                  * const (*ports)[VSF_HOSTOS_USART_COUNT];
+    vsf_fifo2req_usart_t                * const (*fifo2req_ports)[VSF_HOSTOS_USART_COUNT];
+} vsf_hostos_usart_port_t;
 
 /*============================ PROTOTYPES ====================================*/
 
 /*============================ INCLUDES ======================================*/
 
-#define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
-#define VSF_USART_CFG_IMP_PREFIX                        vsf_win
-#define VSF_USART_CFG_IMP_UPCASE_PREFIX                 VSF_WIN
+#define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
+#define VSF_USART_CFG_IMP_PREFIX                    vsf_hostos
+#define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_HOSTOS
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
-    vsf_win_usart_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __IDX) = {   \
+    vsf_hostos_usart_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __IDX) = {\
         .handle                            = INVALID_HANDLE_VALUE,              \
         __HAL_OP                                                                \
     };
@@ -116,29 +116,29 @@ typedef struct vsf_win_usart_port_t {
 
 #define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY    ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_REQUEST       ENABLED
-#define VSF_USART_CFG_IMP_PREFIX                    vsf_hw
-#define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_HW
-#define VSF_USART_CFG_IMP_COUNT_MASK_PREFIX         VSF_WIN
+#define VSF_USART_CFG_IMP_PREFIX                    VSF_HOSTOS_USART_PREFIX
+#define VSF_USART_CFG_IMP_UPCASE_PREFIX             VSF_HOSTOS_USART_UNCASE_PREFIX
+#define VSF_USART_CFG_IMP_COUNT_MASK_PREFIX         VSF_HOSTOS
 #define VSF_USART_CFG_IMP_REMAP_PREFIX              vsf_fifo2req
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     describe_fifo2req_usart(                                                    \
         VSF_USART_CFG_IMP_PREFIX,                                               \
         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __IDX),                  \
-        VSF_MCONNECT(vsf_win_usart, __IDX))
+        VSF_MCONNECT(vsf_hostos_usart, __IDX))
 #include "hal/driver/common/usart/usart_template.inc"
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-static vsf_win_usart_port_t __vsf_win_usart_port = {
+static vsf_hostos_usart_port_t __vsf_hostos_usart_port = {
     .ports_mask = 0,
-    .ports = &vsf_win_usarts,
-    .fifo2req_ports = (vsf_fifo2req_usart_t * const (*)[32])&vsf_win_usarts,
+    .ports = &vsf_hostos_usarts,
+    .fifo2req_ports = (vsf_fifo2req_usart_t * const (*)[32])&vsf_hostos_usarts,
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-uint8_t vsf_win_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t device_num)
+uint8_t vsf_hostos_usart_scan_devices(vsf_hostos_usart_device_t *devices, uint8_t device_num)
 {
     HDEVINFO hDevInfo = SetupDiGetClassDevs(&GUID_DEVINTERFACE_COMPORT, NULL, NULL, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
     if (INVALID_HANDLE_VALUE == hDevInfo) {
@@ -157,7 +157,7 @@ uint8_t vsf_win_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t devi
     uint32_t mask = 0;
     uint8_t usart_num = 0;
 
-    vsf_win_usart_t * const (*ports)[VSF_WIN_USART_COUNT] = __vsf_win_usart_port.ports;
+    vsf_hostos_usart_t * const (*ports)[VSF_HOSTOS_USART_COUNT] = __vsf_hostos_usart_port.ports;
 
     while ((usart_num < device_num) && SetupDiEnumDeviceInfo(hDevInfo, result++, &devInfoData)) {
         hDevKey = SetupDiOpenDevRegKey(hDevInfo, &devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_READ);
@@ -178,8 +178,9 @@ uint8_t vsf_win_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t devi
                 }
 
                 if (devices != NULL) {
-                    devices[usart_num].instance = (vsf_usart_t *)(*__vsf_win_usart_port.fifo2req_ports)[port_idx];
-                    devices[usart_num].port = port_idx;
+                    devices[usart_num].instance = (vsf_usart_t *)(*__vsf_hostos_usart_port.fifo2req_ports)[port_idx];
+                    strncpy(devices[usart_num].name, portName, sizeof(devices[usart_num].name));
+                    strncpy(devices[usart_num].friendly_name, portFriendlyName, sizeof(devices[usart_num].friendly_name));
                     usart_num++;
                 }
             }
@@ -187,7 +188,7 @@ uint8_t vsf_win_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t devi
     }
     SetupDiDestroyDeviceInfoList(hDevInfo);
 
-    uint32_t changed_mask = __vsf_win_usart_port.ports_mask ^ mask;
+    uint32_t changed_mask = __vsf_hostos_usart_port.ports_mask ^ mask;
     while (changed_mask) {
         port_idx = vsf_ffs32(changed_mask);
         changed_mask &= ~(1 << port_idx);
@@ -200,24 +201,24 @@ uint8_t vsf_win_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t devi
             }
         }
     }
-    __vsf_win_usart_port.ports_mask = mask;
+    __vsf_hostos_usart_port.ports_mask = mask;
     return usart_num;
 }
 
-static void __vsf_win_usart_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
+static void __vsf_hostos_usart_evthandler(vsf_stream_t *stream, void *param, vsf_stream_evt_t evt)
 {
-    vsf_win_usart_t *win_usart = param;
+    vsf_hostos_usart_t *hostos_usart = param;
     if (VSF_STREAM_ON_IN == evt) {
-        __vsf_arch_irq_request_send(&win_usart->tx.irq_request);
+        __vsf_arch_irq_request_send(&hostos_usart->tx.irq_request);
     } else if (VSF_STREAM_ON_OUT == evt) {
-        __vsf_arch_irq_request_send(&win_usart->rx.irq_request);
+        __vsf_arch_irq_request_send(&hostos_usart->rx.irq_request);
     }
 }
 
-static void __vsf_win_usart_rx_thread(void *arg)
+static void __vsf_hostos_usart_rx_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vsf_win_usart_t *win_usart = vsf_container_of(irq_thread, vsf_win_usart_t, rx.irq_thread);
+    vsf_hostos_usart_t *hostos_usart = vsf_container_of(irq_thread, vsf_hostos_usart_t, rx.irq_thread);
 
     OVERLAPPED overlapped = {
         .hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL),
@@ -228,12 +229,12 @@ static void __vsf_win_usart_rx_thread(void *arg)
     uint8_t *buffer;
 
     __vsf_arch_irq_set_background(irq_thread);
-    while (!win_usart->is_to_exit) {
+    while (!hostos_usart->is_to_exit) {
         __vsf_arch_irq_start(irq_thread);
-        size = vsf_stream_get_wbuf(&win_usart->rx.stream.use_as__vsf_stream_t, &buffer);
+        size = vsf_stream_get_wbuf(&hostos_usart->rx.stream.use_as__vsf_stream_t, &buffer);
         __vsf_arch_irq_end(irq_thread, false);
         if (0 == size) {
-            __vsf_arch_irq_request_send(&win_usart->rx.irq_request);
+            __vsf_arch_irq_request_send(&hostos_usart->rx.irq_request);
             continue;
         }
 
@@ -244,17 +245,17 @@ static void __vsf_win_usart_rx_thread(void *arg)
         overlapped.OffsetHigh = 0;
 
     check_comm_stat:
-        if (!ClearCommError(win_usart->handle, NULL, &comstat)) {
+        if (!ClearCommError(hostos_usart->handle, NULL, &comstat)) {
             goto fail_and_exit;
         }
         if (0 == comstat.cbInQue) {
-            result = WaitCommEvent(win_usart->handle, &evt_mask, &overlapped);
+            result = WaitCommEvent(hostos_usart->handle, &evt_mask, &overlapped);
             if (!result && (GetLastError() != ERROR_IO_PENDING)) {
                 goto fail_and_exit;
             }
             while (true) {
-                result = GetOverlappedResultEx(win_usart->handle, &overlapped, &actual_size, 100, FALSE);
-                if (win_usart->is_to_exit) {
+                result = GetOverlappedResultEx(hostos_usart->handle, &overlapped, &actual_size, 100, FALSE);
+                if (hostos_usart->is_to_exit) {
                     goto exit_rx;
                 }
 
@@ -278,13 +279,13 @@ static void __vsf_win_usart_rx_thread(void *arg)
         overlapped.InternalHigh = 0;
         overlapped.Offset = 0;
         overlapped.OffsetHigh = 0;
-        result = ReadFile(win_usart->handle, buffer, size, &actual_size, &overlapped);
+        result = ReadFile(hostos_usart->handle, buffer, size, &actual_size, &overlapped);
         if (!result && (GetLastError() != ERROR_IO_PENDING)) {
             goto fail_and_exit;
         }
         while (true) {
-            result = GetOverlappedResultEx(win_usart->handle, &overlapped, &actual_size, 100, FALSE);
-            if (win_usart->is_to_exit) {
+            result = GetOverlappedResultEx(hostos_usart->handle, &overlapped, &actual_size, 100, FALSE);
+            if (hostos_usart->is_to_exit) {
                 goto exit_rx;
             }
 
@@ -301,27 +302,27 @@ static void __vsf_win_usart_rx_thread(void *arg)
         }
 
         __vsf_arch_irq_start(irq_thread);
-        vsf_stream_write(&win_usart->rx.stream.use_as__vsf_stream_t, NULL, actual_size);
-        if ((win_usart->irq.isrhandler != NULL) && (win_usart->irq_mask & VSF_USART_IRQ_MASK_RX)) {
-            win_usart->irq.isrhandler(win_usart->irq.param, (vsf_usart_t *)win_usart, VSF_USART_IRQ_MASK_RX);
+        vsf_stream_write(&hostos_usart->rx.stream.use_as__vsf_stream_t, NULL, actual_size);
+        if ((hostos_usart->irq.isrhandler != NULL) && (hostos_usart->irq_mask & VSF_USART_IRQ_MASK_RX)) {
+            hostos_usart->irq.isrhandler(hostos_usart->irq.param, (vsf_usart_t *)hostos_usart, VSF_USART_IRQ_MASK_RX);
         }
         __vsf_arch_irq_end(irq_thread, false);
     }
 
 fail_and_exit:
-    vsf_trace_error("win_usart: failed while receiving data\n");
-    vsf_win_usart_scan_devices(NULL, VSF_WIN_USART_COUNT);
+    vsf_trace_error("hostos_usart: failed while receiving data\n");
+    vsf_hostos_usart_scan_devices(NULL, VSF_HOSTOS_USART_COUNT);
 exit_rx:
     CloseHandle(overlapped.hEvent);
     __vsf_arch_irq_fini(irq_thread);
-    win_usart->rx.exited = true;
-    win_usart->is_to_exit = true;
+    hostos_usart->rx.exited = true;
+    hostos_usart->is_to_exit = true;
 }
 
-static void __vsf_win_usart_tx_thread(void *arg)
+static void __vsf_hostos_usart_tx_thread(void *arg)
 {
     vsf_arch_irq_thread_t *irq_thread = arg;
-    vsf_win_usart_t *win_usart = vsf_container_of(irq_thread, vsf_win_usart_t, tx.irq_thread);
+    vsf_hostos_usart_t * hostos_usart = vsf_container_of(irq_thread, vsf_hostos_usart_t, tx.irq_thread);
 
     OVERLAPPED overlapped = {
         .hEvent     = CreateEvent(NULL, TRUE, FALSE, NULL),
@@ -332,18 +333,18 @@ static void __vsf_win_usart_tx_thread(void *arg)
 
     __vsf_arch_irq_set_background(irq_thread);
     while (1) {
-        __vsf_arch_irq_request_pend(&win_usart->tx.irq_request);
-        if (win_usart->is_to_exit) {
+        __vsf_arch_irq_request_pend(&hostos_usart->tx.irq_request);
+        if (hostos_usart->is_to_exit) {
             goto exit_tx;
         }
-        if (win_usart->tx.need_tx_irq) {
-            win_usart->tx.need_tx_irq = false;
+        if (hostos_usart->tx.need_tx_irq) {
+            hostos_usart->tx.need_tx_irq = false;
             goto run_tx_irq;
         }
 
     get_rbuf:
         __vsf_arch_irq_start(irq_thread);
-        size = vsf_stream_get_rbuf(&win_usart->tx.stream.use_as__vsf_stream_t, &buffer);
+        size = vsf_stream_get_rbuf(&hostos_usart->tx.stream.use_as__vsf_stream_t, &buffer);
         __vsf_arch_irq_end(irq_thread, false);
 
         if (size > 0) {
@@ -352,13 +353,13 @@ static void __vsf_win_usart_tx_thread(void *arg)
             overlapped.InternalHigh = 0;
             overlapped.Offset = 0;
             overlapped.OffsetHigh = 0;
-            result = WriteFile(win_usart->handle, buffer, size, &actual_size, &overlapped);
+            result = WriteFile(hostos_usart->handle, buffer, size, &actual_size, &overlapped);
             if (!result && (GetLastError() != ERROR_IO_PENDING)) {
                 goto fail_and_exit;
             }
             while (true) {
-                result = GetOverlappedResultEx(win_usart->handle, &overlapped, &actual_size, 100, FALSE);
-                if (win_usart->is_to_exit) {
+                result = GetOverlappedResultEx(hostos_usart->handle, &overlapped, &actual_size, 100, FALSE);
+                if (hostos_usart->is_to_exit) {
                     goto exit_tx;
                 }
                 if (result != 0) {
@@ -374,67 +375,67 @@ static void __vsf_win_usart_tx_thread(void *arg)
             }
 
             __vsf_arch_irq_start(irq_thread);
-            vsf_stream_read(&win_usart->tx.stream.use_as__vsf_stream_t, NULL, actual_size);
+            vsf_stream_read(&hostos_usart->tx.stream.use_as__vsf_stream_t, NULL, actual_size);
             __vsf_arch_irq_end(irq_thread, false);
 
             goto get_rbuf;
         } else {
-            if (win_usart->irq_mask & VSF_USART_IRQ_MASK_TX) {
+            if (hostos_usart->irq_mask & VSF_USART_IRQ_MASK_TX) {
         run_tx_irq:
-                win_usart->tx.is_pending = false;
+                hostos_usart->tx.is_pending = false;
                 __vsf_arch_irq_start(irq_thread);
-                if (win_usart->irq.isrhandler != NULL) {
-                    win_usart->irq.isrhandler(win_usart->irq.param, (vsf_usart_t *)win_usart, VSF_USART_IRQ_MASK_TX);
+                if (hostos_usart->irq.isrhandler != NULL) {
+                    hostos_usart->irq.isrhandler(hostos_usart->irq.param, (vsf_usart_t *)hostos_usart, VSF_USART_IRQ_MASK_TX);
                 }
                 __vsf_arch_irq_end(irq_thread, false);
             } else {
-                win_usart->tx.is_pending = true;
+                hostos_usart->tx.is_pending = true;
             }
 
-            if (win_usart->tx.irq_request_notifier != NULL) {
-                __vsf_arch_irq_request_send(win_usart->tx.irq_request_notifier);
+            if (hostos_usart->tx.irq_request_notifier != NULL) {
+                __vsf_arch_irq_request_send(hostos_usart->tx.irq_request_notifier);
             }
         }
     }
 
 fail_and_exit:
-    vsf_trace_error("win_usart: failed while sending data\n");
-    vsf_win_usart_scan_devices(NULL, VSF_WIN_USART_COUNT);
+    vsf_trace_error("hostos_usart: failed while sending data\n");
+    vsf_hostos_usart_scan_devices(NULL, VSF_HOSTOS_USART_COUNT);
 exit_tx:
     __vsf_arch_irq_fini(irq_thread);
-    win_usart->tx.exited = true;
-    win_usart->is_to_exit = true;
+    hostos_usart->tx.exited = true;
+    hostos_usart->is_to_exit = true;
 }
 
-vsf_err_t vsf_win_usart_init(vsf_win_usart_t *win_usart, vsf_usart_cfg_t *cfg)
+vsf_err_t vsf_hostos_usart_init(vsf_hostos_usart_t *hostos_usart, vsf_usart_cfg_t *cfg)
 {
     VSF_HAL_ASSERT(cfg != NULL);
-    VSF_HAL_ASSERT(win_usart != NULL);
+    VSF_HAL_ASSERT(hostos_usart != NULL);
 
-    if (0 == win_usart->port_idx) {
+    if (0 == hostos_usart->port_idx) {
         return VSF_ERR_NOT_AVAILABLE;
     }
 
-    if (win_usart->handle != INVALID_HANDLE_VALUE) {
-        CloseHandle(win_usart->handle);
-        win_usart->handle = INVALID_HANDLE_VALUE;
+    if (hostos_usart->handle != INVALID_HANDLE_VALUE) {
+        CloseHandle(hostos_usart->handle);
+        hostos_usart->handle = INVALID_HANDLE_VALUE;
     }
 
     char file[16];
-    snprintf(file, sizeof(file), "\\\\.\\COM%d", win_usart->port_idx);
-    win_usart->handle = CreateFileA(file, GENERIC_WRITE | GENERIC_READ, 0, NULL,
+    snprintf(file, sizeof(file), "\\\\.\\COM%d", hostos_usart->port_idx);
+    hostos_usart->handle = CreateFileA(file, GENERIC_WRITE | GENERIC_READ, 0, NULL,
                 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, NULL);
-    if (INVALID_HANDLE_VALUE == win_usart->handle) {
+    if (INVALID_HANDLE_VALUE == hostos_usart->handle) {
         return VSF_ERR_NOT_ACCESSIBLE;
     }
 
-    win_usart->prio = cfg->isr.prio;
-    win_usart->irq.param = cfg->isr.target_ptr;
-    win_usart->irq.isrhandler = cfg->isr.handler_fn;
-    win_usart->irq_mask = 0;
+    hostos_usart->prio = cfg->isr.prio;
+    hostos_usart->irq.param = cfg->isr.target_ptr;
+    hostos_usart->irq.isrhandler = cfg->isr.handler_fn;
+    hostos_usart->irq_mask = 0;
 
     DCB dcb;
-    if (!GetCommState(win_usart->handle, &dcb)) {
+    if (!GetCommState(hostos_usart->handle, &dcb)) {
         goto close_and_fail;
     }
     dcb.fAbortOnError = FALSE;
@@ -465,210 +466,210 @@ vsf_err_t vsf_win_usart_init(vsf_win_usart_t *win_usart, vsf_usart_cfg_t *cfg)
         VSF_HAL_ASSERT(false);
         goto close_and_fail;
     }
-    if (!SetCommState(win_usart->handle, &dcb)) {
+    if (!SetCommState(hostos_usart->handle, &dcb)) {
         goto close_and_fail;
     }
 
-    PurgeComm(win_usart->handle, PURGE_TXCLEAR | PURGE_RXCLEAR);
-    ClearCommError(win_usart->handle, NULL, NULL);
-    SetCommMask(win_usart->handle, EV_RXCHAR);
+    PurgeComm(hostos_usart->handle, PURGE_TXCLEAR | PURGE_RXCLEAR);
+    ClearCommError(hostos_usart->handle, NULL, NULL);
+    SetCommMask(hostos_usart->handle, EV_RXCHAR);
     return VSF_ERR_NONE;
 
 close_and_fail:
-    CloseHandle(win_usart->handle);
-    win_usart->handle = INVALID_HANDLE_VALUE;
+    CloseHandle(hostos_usart->handle);
+    hostos_usart->handle = INVALID_HANDLE_VALUE;
     return VSF_ERR_FAIL;
 }
 
-void vsf_win_usart_fini(vsf_win_usart_t *win_usart)
+void vsf_hostos_usart_fini(vsf_hostos_usart_t *hostos_usart)
 {
-    VSF_HAL_ASSERT(win_usart != NULL);
-    VSF_HAL_ASSERT(win_usart->handle != INVALID_HANDLE_VALUE);
+    VSF_HAL_ASSERT(hostos_usart != NULL);
+    VSF_HAL_ASSERT(hostos_usart->handle != INVALID_HANDLE_VALUE);
 
-    CloseHandle(win_usart->handle);
-    win_usart->handle = INVALID_HANDLE_VALUE;
+    CloseHandle(hostos_usart->handle);
+    hostos_usart->handle = INVALID_HANDLE_VALUE;
 }
 
-vsf_usart_capability_t vsf_win_usart_capability(vsf_win_usart_t *win_usart)
+vsf_usart_capability_t vsf_hostos_usart_capability(vsf_hostos_usart_t *hostos_usart)
 {
     vsf_usart_capability_t usart_capability = {
-        .irq_mask = WIN_USART_IRQ_ALL_BITS_MASK,
+        .irq_mask = HOSTFS_USART_IRQ_ALL_BITS_MASK,
         .max_baudrate = 4000000,
         .min_baudrate = 50,
         .min_data_bits = 8,
         .max_data_bits = 9,
-        .txfifo_depth = dimof(win_usart->tx.buffer),
-        .rxfifo_depth = dimof(win_usart->rx.buffer),
+        .txfifo_depth = dimof(hostos_usart->tx.buffer),
+        .rxfifo_depth = dimof(hostos_usart->rx.buffer),
         .support_rx_timeout = 0,
     };
 
     return usart_capability;
 }
 
-fsm_rt_t vsf_win_usart_enable(vsf_win_usart_t *win_usart)
+fsm_rt_t vsf_hostos_usart_enable(vsf_hostos_usart_t *hostos_usart)
 {
-    VSF_HAL_ASSERT(win_usart != NULL);
-    if (0 == win_usart->port_idx) {
+    VSF_HAL_ASSERT(hostos_usart != NULL);
+    if (0 == hostos_usart->port_idx) {
         return fsm_rt_err;
     }
 
-    if (!win_usart->irq_started) {
-        win_usart->rx.stream.op = &vsf_mem_stream_op;
-        win_usart->rx.stream.buffer = win_usart->rx.buffer;
-        win_usart->rx.stream.size = dimof(win_usart->rx.buffer);
-        win_usart->rx.stream.tx.evthandler = __vsf_win_usart_evthandler;
-        win_usart->rx.stream.tx.param = win_usart;
-        win_usart->tx.stream.op = &vsf_mem_stream_op;
-        win_usart->tx.stream.buffer = win_usart->tx.buffer;
-        win_usart->tx.stream.size = dimof(win_usart->tx.buffer);
-        win_usart->tx.stream.rx.evthandler = __vsf_win_usart_evthandler;
-        win_usart->tx.stream.rx.param = win_usart;
-        vsf_stream_init(&win_usart->rx.stream.use_as__vsf_stream_t);
-        vsf_stream_init(&win_usart->tx.stream.use_as__vsf_stream_t);
-        vsf_stream_connect_rx(&win_usart->tx.stream.use_as__vsf_stream_t);
+    if (!hostos_usart->irq_started) {
+        hostos_usart->rx.stream.op = &vsf_mem_stream_op;
+        hostos_usart->rx.stream.buffer = hostos_usart->rx.buffer;
+        hostos_usart->rx.stream.size = dimof(hostos_usart->rx.buffer);
+        hostos_usart->rx.stream.tx.evthandler = __vsf_hostos_usart_evthandler;
+        hostos_usart->rx.stream.tx.param = hostos_usart;
+        hostos_usart->tx.stream.op = &vsf_mem_stream_op;
+        hostos_usart->tx.stream.buffer = hostos_usart->tx.buffer;
+        hostos_usart->tx.stream.size = dimof(hostos_usart->tx.buffer);
+        hostos_usart->tx.stream.rx.evthandler = __vsf_hostos_usart_evthandler;
+        hostos_usart->tx.stream.rx.param = hostos_usart;
+        vsf_stream_init(&hostos_usart->rx.stream.use_as__vsf_stream_t);
+        vsf_stream_init(&hostos_usart->tx.stream.use_as__vsf_stream_t);
+        vsf_stream_connect_rx(&hostos_usart->tx.stream.use_as__vsf_stream_t);
 
-        win_usart->irq_started = true;
-        win_usart->is_to_exit = false;
-        win_usart->tx.exited = false;
-        win_usart->rx.exited = false;
-        __vsf_arch_irq_request_init(&win_usart->rx.irq_request);
-        __vsf_arch_irq_request_init(&win_usart->tx.irq_request);
-        __vsf_arch_irq_init(&win_usart->rx.irq_thread, "win_usart_rx", __vsf_win_usart_rx_thread, win_usart->prio);
-        __vsf_arch_irq_init(&win_usart->tx.irq_thread, "win_usart_tx", __vsf_win_usart_tx_thread, win_usart->prio);
+        hostos_usart->irq_started = true;
+        hostos_usart->is_to_exit = false;
+        hostos_usart->tx.exited = false;
+        hostos_usart->rx.exited = false;
+        __vsf_arch_irq_request_init(&hostos_usart->rx.irq_request);
+        __vsf_arch_irq_request_init(&hostos_usart->tx.irq_request);
+        __vsf_arch_irq_init(&hostos_usart->rx.irq_thread, "hostos_usart_rx", __vsf_hostos_usart_rx_thread, hostos_usart->prio);
+        __vsf_arch_irq_init(&hostos_usart->tx.irq_thread, "hostos_usart_tx", __vsf_hostos_usart_tx_thread, hostos_usart->prio);
     }
     return fsm_rt_cpl;
 }
 
-fsm_rt_t vsf_win_usart_disable(vsf_win_usart_t *win_usart)
+fsm_rt_t vsf_hostos_usart_disable(vsf_hostos_usart_t *hostos_usart)
 {
-    VSF_HAL_ASSERT(win_usart != NULL);
-    if (0 == win_usart->port_idx) {
+    VSF_HAL_ASSERT(hostos_usart != NULL);
+    if (0 == hostos_usart->port_idx) {
         return fsm_rt_err;
     }
-    if (!win_usart->irq_started) {
+    if (!hostos_usart->irq_started) {
         return fsm_rt_err;
     }
 
-    win_usart->irq_started = false;
-    win_usart->is_to_exit = true;
+    hostos_usart->irq_started = false;
+    hostos_usart->is_to_exit = true;
 
-    __vsf_arch_irq_request_send(&win_usart->tx.irq_request);
-    while (!win_usart->tx.exited);
-    while (!win_usart->rx.exited);
+    __vsf_arch_irq_request_send(&hostos_usart->tx.irq_request);
+    while (!hostos_usart->tx.exited);
+    while (!hostos_usart->rx.exited);
 
-    __vsf_arch_irq_request_fini(&win_usart->tx.irq_request);
-    __vsf_arch_irq_request_fini(&win_usart->rx.irq_request);
+    __vsf_arch_irq_request_fini(&hostos_usart->tx.irq_request);
+    __vsf_arch_irq_request_fini(&hostos_usart->rx.irq_request);
 
-    vsf_stream_fini(&win_usart->tx.stream.use_as__vsf_stream_t);
-    vsf_stream_fini(&win_usart->rx.stream.use_as__vsf_stream_t);
+    vsf_stream_fini(&hostos_usart->tx.stream.use_as__vsf_stream_t);
+    vsf_stream_fini(&hostos_usart->rx.stream.use_as__vsf_stream_t);
 
     return fsm_rt_cpl;
 }
 
-void vsf_win_usart_irq_enable(vsf_win_usart_t *win_usart, vsf_usart_irq_mask_t irq_mask)
+void vsf_hostos_usart_irq_enable(vsf_hostos_usart_t *hostos_usart, vsf_usart_irq_mask_t irq_mask)
 {
-    VSF_HAL_ASSERT(win_usart != NULL);
-    VSF_HAL_ASSERT((irq_mask & ~WIN_USART_IRQ_ALL_BITS_MASK) == 0);
+    VSF_HAL_ASSERT(hostos_usart != NULL);
+    VSF_HAL_ASSERT((irq_mask & ~HOSTFS_USART_IRQ_ALL_BITS_MASK) == 0);
 
-    if (0 == win_usart->port_idx) {
+    if (0 == hostos_usart->port_idx) {
         return;
     }
 
-    if (win_usart->tx.is_pending && (irq_mask & VSF_USART_IRQ_MASK_TX) && !(win_usart->irq_mask & VSF_USART_IRQ_MASK_TX)) {
-        win_usart->tx.need_tx_irq = true;
-        __vsf_arch_irq_request_send(&win_usart->tx.irq_request);
+    if (hostos_usart->tx.is_pending && (irq_mask & VSF_USART_IRQ_MASK_TX) && !(hostos_usart->irq_mask & VSF_USART_IRQ_MASK_TX)) {
+        hostos_usart->tx.need_tx_irq = true;
+        __vsf_arch_irq_request_send(&hostos_usart->tx.irq_request);
     }
 
-    win_usart->irq_mask |= irq_mask;
+    hostos_usart->irq_mask |= irq_mask;
 }
 
-void vsf_win_usart_irq_disable(vsf_win_usart_t *win_usart, vsf_usart_irq_mask_t irq_mask)
+void vsf_hostos_usart_irq_disable(vsf_hostos_usart_t *hostos_usart, vsf_usart_irq_mask_t irq_mask)
 {
-    VSF_HAL_ASSERT(win_usart != NULL);
-    VSF_HAL_ASSERT((irq_mask & ~WIN_USART_IRQ_ALL_BITS_MASK) == 0);
+    VSF_HAL_ASSERT(hostos_usart != NULL);
+    VSF_HAL_ASSERT((irq_mask & ~HOSTFS_USART_IRQ_ALL_BITS_MASK) == 0);
 
-    if (0 == win_usart->port_idx) {
+    if (0 == hostos_usart->port_idx) {
         return;
     }
 
-    if (win_usart->tx.is_pending && (irq_mask & VSF_USART_IRQ_MASK_TX)) {
-        win_usart->tx.need_tx_irq = false;
-        win_usart->tx.is_pending = false;
-        __vsf_arch_irq_request_send(&win_usart->tx.irq_request);
+    if (hostos_usart->tx.is_pending && (irq_mask & VSF_USART_IRQ_MASK_TX)) {
+        hostos_usart->tx.need_tx_irq = false;
+        hostos_usart->tx.is_pending = false;
+        __vsf_arch_irq_request_send(&hostos_usart->tx.irq_request);
     }
 
-    win_usart->irq_mask &= ~irq_mask;
+    hostos_usart->irq_mask &= ~irq_mask;
 }
 
-vsf_usart_status_t vsf_win_usart_status(vsf_win_usart_t *win_usart)
+vsf_usart_status_t vsf_hostos_usart_status(vsf_hostos_usart_t *hostos_usart)
 {
-    VSF_HAL_ASSERT(win_usart != NULL);
+    VSF_HAL_ASSERT(hostos_usart != NULL);
 
     return (vsf_usart_status_t){ 0 };
 }
 
-uint_fast16_t vsf_win_usart_rxfifo_get_data_count(vsf_win_usart_t *win_usart)
+uint_fast16_t vsf_hostos_usart_rxfifo_get_data_count(vsf_hostos_usart_t *hostos_usart)
 {
-    VSF_HAL_ASSERT(win_usart != NULL);
-    if (0 == win_usart->port_idx) {
+    VSF_HAL_ASSERT(hostos_usart != NULL);
+    if (0 == hostos_usart->port_idx) {
         return 0;
     }
-    return vsf_stream_get_data_size(&win_usart->rx.stream.use_as__vsf_stream_t);
+    return vsf_stream_get_data_size(&hostos_usart->rx.stream.use_as__vsf_stream_t);
 }
 
-uint_fast16_t vsf_win_usart_rxfifo_read(vsf_win_usart_t *win_usart, void *buffer, uint_fast16_t size)
+uint_fast16_t vsf_hostos_usart_rxfifo_read(vsf_hostos_usart_t *hostos_usart, void *buffer, uint_fast16_t size)
 {
-    VSF_HAL_ASSERT(win_usart != NULL);
+    VSF_HAL_ASSERT(hostos_usart != NULL);
     VSF_HAL_ASSERT(buffer != NULL);
     VSF_HAL_ASSERT(size > 0);
 
-    if (0 == win_usart->port_idx) {
+    if (0 == hostos_usart->port_idx) {
         return 0;
     }
-    return vsf_stream_read(&win_usart->rx.stream.use_as__vsf_stream_t, buffer, size);
+    return vsf_stream_read(&hostos_usart->rx.stream.use_as__vsf_stream_t, buffer, size);
 }
 
-uint_fast16_t vsf_win_usart_txfifo_get_free_count(vsf_win_usart_t *win_usart)
+uint_fast16_t vsf_hostos_usart_txfifo_get_free_count(vsf_hostos_usart_t *hostos_usart)
 {
-    VSF_HAL_ASSERT(win_usart != NULL);
-    if (0 == win_usart->port_idx) {
+    VSF_HAL_ASSERT(hostos_usart != NULL);
+    if (0 == hostos_usart->port_idx) {
         return 0;
     }
-    return vsf_stream_get_free_size(&win_usart->tx.stream.use_as__vsf_stream_t);;
+    return vsf_stream_get_free_size(&hostos_usart->tx.stream.use_as__vsf_stream_t);;
 }
 
-uint_fast16_t vsf_win_usart_txfifo_write(vsf_win_usart_t *win_usart, void *buffer, uint_fast16_t size)
+uint_fast16_t vsf_hostos_usart_txfifo_write(vsf_hostos_usart_t *hostos_usart, void *buffer, uint_fast16_t size)
 {
-    VSF_HAL_ASSERT(win_usart != NULL);
+    VSF_HAL_ASSERT(hostos_usart != NULL);
     VSF_HAL_ASSERT(buffer != NULL);
     VSF_HAL_ASSERT(size > 0);
 
-    if (0 == win_usart->port_idx) {
+    if (0 == hostos_usart->port_idx) {
         return 0;
     }
 
-#if VSF_WIN_USART_CFG_TX_BLOCK == ENABLED
+#if VSF_HOSTOS_USART_CFG_TX_BLOCK == ENABLED
     vsf_arch_irq_request_t notifier_request = { 0 };
     __vsf_arch_irq_request_init(&notifier_request);
-    win_usart->tx.irq_request_notifier = &notifier_request;
+    hostos_usart->tx.irq_request_notifier = &notifier_request;
 
     vsf_arch_irq_thread_t *irq_thread = __vsf_arch_irq_get_cur();
     uint_fast16_t total_written_size = 0, cur_written_size;
     while (size > 0) {
-        cur_written_size = vsf_stream_write(&win_usart->tx.stream.use_as__vsf_stream_t, buffer, size);
+        cur_written_size = vsf_stream_write(&hostos_usart->tx.stream.use_as__vsf_stream_t, buffer, size);
         buffer += cur_written_size;
         size -= cur_written_size;
         total_written_size += cur_written_size;
 
         __vsf_arch_irq_end(irq_thread, false);
-        __vsf_arch_irq_request_pend(win_usart->tx.irq_request_notifier);
+        __vsf_arch_irq_request_pend(hostos_usart->tx.irq_request_notifier);
         __vsf_arch_irq_start(irq_thread);
     }
-    __vsf_arch_irq_request_fini(win_usart->tx.irq_request_notifier);
-    win_usart->tx.irq_request_notifier = NULL;
+    __vsf_arch_irq_request_fini(hostos_usart->tx.irq_request_notifier);
+    hostos_usart->tx.irq_request_notifier = NULL;
     return total_written_size;
 #else
-    return vsf_stream_write(&win_usart->tx.stream.use_as__vsf_stream_t, buffer, size);
+    return vsf_stream_write(&hostos_usart->tx.stream.use_as__vsf_stream_t, buffer, size);
 #endif
 }
 

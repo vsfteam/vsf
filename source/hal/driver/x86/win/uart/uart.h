@@ -95,23 +95,23 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_IRDA_ENABLE               = (0x01ul << 23),
     VSF_USART_IRDA_DISABLE              = (0x01ul << 23),
 
-    WIN_USART_BIT_LENGTH_MASK           = VSF_USART_8_BIT_LENGTH |
-                                          VSF_USART_9_BIT_LENGTH,
-    WIN_USART_STOPBIT_MASK              = VSF_USART_1_STOPBIT |
-                                          VSF_USART_1_5_STOPBIT |
-                                          VSF_USART_2_STOPBIT,
-    WIN_USART_PARITY_MASK               = VSF_USART_NO_PARITY |
-                                          VSF_USART_EVEN_PARITY |
-                                          VSF_USART_ODD_PARITY,
-    WIN_USART_HWCONTROL_MASK            = VSF_USART_NO_HWCONTROL |
-                                          VSF_USART_RTS_HWCONTROL |
-                                          VSF_USART_CTS_HWCONTROL |
-                                          VSF_USART_RTS_CTS_HWCONTROL,
+    HOSTFS_USART_BIT_LENGTH_MASK        = VSF_USART_8_BIT_LENGTH
+                                        | VSF_USART_9_BIT_LENGTH,
+    HOSTFS_USART_STOPBIT_MASK           = VSF_USART_1_STOPBIT
+                                        | VSF_USART_1_5_STOPBIT
+                                        | VSF_USART_2_STOPBIT,
+    HOSTFS_USART_PARITY_MASK            = VSF_USART_NO_PARITY
+                                        | VSF_USART_EVEN_PARITY
+                                        | VSF_USART_ODD_PARITY,
+    HOSTFS_USART_HWCONTROL_MASK         = VSF_USART_NO_HWCONTROL
+                                        | VSF_USART_RTS_HWCONTROL
+                                        | VSF_USART_CTS_HWCONTROL
+                                        | VSF_USART_RTS_CTS_HWCONTROL,
 
-    WIN_USART_MODE_ALL_BITS_MASK        = WIN_USART_BIT_LENGTH_MASK |
-                                          WIN_USART_STOPBIT_MASK |
-                                          WIN_USART_PARITY_MASK |
-                                          WIN_USART_HWCONTROL_MASK,
+    HOSTFS_USART_MODE_ALL_BITS_MASK     = HOSTFS_USART_BIT_LENGTH_MASK
+                                        | HOSTFS_USART_STOPBIT_MASK
+                                        | HOSTFS_USART_PARITY_MASK
+                                        | HOSTFS_USART_HWCONTROL_MASK,
 } vsf_usart_mode_t;
 
 typedef enum vsf_usart_irq_mask_t {
@@ -131,8 +131,8 @@ typedef enum vsf_usart_irq_mask_t {
 
     VSF_USART_IRQ_MASK_CTS              = VSF_BIT(10),
 
-    WIN_USART_IRQ_ALL_BITS_MASK         = VSF_USART_IRQ_MASK_RX |
-                                          VSF_USART_IRQ_MASK_TX,
+    HOSTFS_USART_IRQ_ALL_BITS_MASK      = VSF_USART_IRQ_MASK_RX
+                                        | VSF_USART_IRQ_MASK_TX,
 } vsf_usart_irq_mask_t;
 
 /*============================ INCLUDES ======================================*/
@@ -140,15 +140,17 @@ typedef enum vsf_usart_irq_mask_t {
 
 typedef struct vsf_usart_t vsf_usart_t;
 
-typedef struct vsf_usart_win_device_t {
+typedef struct vsf_hostos_usart_device_t {
     vsf_usart_t                         *instance;
     uint8_t                             port;
-} vsf_usart_win_device_t;
+    char                                name[256];
+    char                                friendly_name[256];
+} vsf_hostos_usart_device_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern uint8_t vsf_win_usart_scan_devices(vsf_usart_win_device_t *devices, uint8_t device_num);
+extern uint8_t vsf_hostos_usart_scan_devices(vsf_hostos_usart_device_t *devices, uint8_t device_num);
 
 #endif
 #endif      // __OSA_HAL_X86_WIN_USART_H__
