@@ -127,12 +127,15 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_PARITY_ERR       = VSF_BIT(6),
     VSF_USART_IRQ_MASK_BREAK_ERR        = VSF_BIT(7),
     VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  = VSF_BIT(8),
-    VSF_USART_IRQ_MASK_TX_ERR           = VSF_BIT(9),
 
-    VSF_USART_IRQ_MASK_CTS              = VSF_BIT(10),
+    VSF_USART_IRQ_MASK_CTS              = VSF_BIT(9),
 
     HOSTFS_USART_IRQ_ALL_BITS_MASK      = VSF_USART_IRQ_MASK_RX
-                                        | VSF_USART_IRQ_MASK_TX,
+                                        | VSF_USART_IRQ_MASK_TX
+                                        | VSF_USART_IRQ_MASK_FRAME_ERR
+                                        | VSF_USART_IRQ_MASK_PARITY_ERR
+                                        | VSF_USART_IRQ_MASK_BREAK_ERR
+                                        | VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR,
 } vsf_usart_irq_mask_t;
 
 /*============================ INCLUDES ======================================*/

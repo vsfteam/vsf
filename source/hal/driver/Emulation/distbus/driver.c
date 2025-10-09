@@ -79,6 +79,7 @@ typedef struct vsf_hal_distbus_ctx_t {
 static void * __vsf_hal_distbus_alloc_msg(uint_fast32_t size);
 static void __vsf_hal_distbus_free_msg(void *msg);
 
+static void __vsf_hal_distbus_on_error(vsf_distbus_t *distbus);
 static void __vsf_hal_distbus_on_remote_connected(vsf_hal_distbus_t *hal_distbus);
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -97,6 +98,7 @@ static vsf_hal_distbus_ctx_t __vsf_hal_distbus_ctx = {
                 .send           = vsf_distbus_transport_stream_send,
                 .recv           = vsf_distbus_transport_stream_recv,
             },
+            .on_error           = __vsf_hal_distbus_on_error,
         },
     },
     .hal                        = {
@@ -252,6 +254,7 @@ void vsf_hal_distbus_on_new(vsf_hal_distbus_t *hal_distbus, vsf_hal_distbus_type
 #include "./vsf_hal_distbus_enum_with_peripheral_count.inc"
     }
 
+    __vsf_arch_trace(0, "distbus slave connected\n");
     __vsf_arch_irq_request_send(&__vsf_hal_distbus_ctx.irq_request);
 }
 
@@ -308,16 +311,16 @@ bool vsf_driver_init(void)
     VSF_STREAM_INIT(&vsf_distbus_transport_stream_rx);
     VSF_STREAM_INIT(&vsf_distbus_transport_stream_tx);
 
-    __vsf_arch_irq_request_init(&__vsf_hal_distbus_ctx.irq_request);
-
     vsf_usart_stream_init(&__vsf_hal_distbus_ctx.usart_stream, &(vsf_usart_cfg_t) {
         .mode               = VSF_USART_8_BIT_LENGTH | VSF_USART_NO_PARITY | VSF_USART_1_STOPBIT | VSF_USART_TX_ENABLE | VSF_USART_RX_ENABLE,
         .baudrate           = 921600,
     });
     vsf_distbus_init(&__vsf_hal_distbus_ctx.distbus);
     vsf_hal_distbus_register(&__vsf_hal_distbus_ctx.distbus, &__vsf_hal_distbus_ctx.hal);
-    vsf_distbus_start(&__vsf_hal_distbus_ctx.distbus);
 
+    __vsf_arch_irq_request_init(&__vsf_hal_distbus_ctx.irq_request);
+    vsf_distbus_start(&__vsf_hal_distbus_ctx.distbus);
+    __vsf_arch_trace(0, "waiting for distbus slave...\n");
     __vsf_arch_irq_request_pend(&__vsf_hal_distbus_ctx.irq_request);
     return true;
 }

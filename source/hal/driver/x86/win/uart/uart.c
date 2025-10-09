@@ -132,7 +132,7 @@ typedef struct vsf_hostos_usart_port_t {
 static vsf_hostos_usart_port_t __vsf_hostos_usart_port = {
     .ports_mask = 0,
     .ports = &vsf_hostos_usarts,
-    .fifo2req_ports = (vsf_fifo2req_usart_t * const (*)[32])&vsf_hostos_usarts,
+    .fifo2req_ports = (vsf_fifo2req_usart_t * const (*)[32])&VSF_MCONNECT(VSF_HOSTOS_USART_PREFIX, _usarts),
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
