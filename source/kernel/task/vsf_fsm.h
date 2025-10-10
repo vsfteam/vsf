@@ -41,7 +41,7 @@
 #include "utilities/vsf_utilities.h"
 /*============================ MACROS ========================================*/
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #   undef VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM
 #   define VSF_KERNEL_CFG_EDA_SUPPORT_SIMPLE_FSM        DISABLED
 #endif
@@ -61,7 +61,7 @@ extern "C" {
 #endif
 
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #   error simple_fsm require at least ANSI-C99 support
 #endif
 

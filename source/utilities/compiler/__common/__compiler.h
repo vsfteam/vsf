@@ -189,7 +189,7 @@ extern "C" {
 #   define VSF_CAL_WRAPPER(__API)      __VSF_CAL_WRAPPER(__API)
 #endif
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #define VSF_CAL_ALIGN_OF(__TYPE)        __VSF_CAL_ALIGN_OF(__TYPE)
 #define VSF_CAL_ALIGN_WITH(__TYPE)      VSF_CAL_ALIGN(VSF_CAL_ALIGN_OF(__TYPE))
 #define VSF_CAL_ISR(__VECT)             __VSF_CAL_ISR(__VECT)

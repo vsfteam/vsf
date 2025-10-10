@@ -283,7 +283,7 @@ __implement_vsf_pool_tag(__name)
                      __type)            /* the type of the unit */              \
             implement_vsf_pool(__name, __type)
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #define VSF_POOL_INIT(__NAME,       /* the name of the pool */                  \
                       __VSF_POOL,   /* the address of the pool */               \
                       __SIZE)       /* the total size of the pool */            \
@@ -319,7 +319,7 @@ __implement_vsf_pool_tag(__name)
             } while(0)
 #endif
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #define VSF_POOL_PREPARE(__NAME,    /* the name of the pool */                  \
                       __VSF_POOL)   /* the address of the pool */               \
                                     /* the address of the code region obj_ptr */\
@@ -348,7 +348,7 @@ __implement_vsf_pool_tag(__name)
             } while(0)
 #endif
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #define VSF_POOL_INIT_EX(                                                       \
                     __NAME,         /* the name of the pool */                  \
                     __VSF_POOL,     /* the address of the pool */               \
@@ -390,7 +390,7 @@ __implement_vsf_pool_tag(__name)
             } while(0)
 #endif
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #define VSF_POOL_PREPARE_EX(                                                    \
                     __NAME,         /* the name of the pool */                  \
                     __VSF_POOL,     /* the address of the pool */               \

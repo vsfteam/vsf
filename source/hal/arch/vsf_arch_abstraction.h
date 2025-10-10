@@ -323,7 +323,7 @@ extern void put_unaligned_be##__bitlen(uint_fast##__bitlen##_t, void *);
 // Usage:
 //  __vsf_interrupt_safe(code)
 #ifndef __vsf_interrupt_safe
-#   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #       define __vsf_interrupt_safe(__code)                                     \
         {                                                                       \
             vsf_gint_state_t VSF_MACRO_SAFE_NAME(gint_state) = vsf_disable_interrupt();\

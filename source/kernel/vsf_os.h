@@ -59,7 +59,7 @@ extern "C" {
 #   define vsf_sched_lock()                 0
 #   define vsf_sched_unlock(__level)        VSF_UNUSED_PARAM(__level)
 #   define vsf_sched_safe()                 if (1)
-#   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #       define __vsf_sched_safe(__code)     __code
 #   else
 #       define __vsf_sched_safe(...)        __VA_ARGS__

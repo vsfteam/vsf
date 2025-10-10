@@ -46,7 +46,7 @@ extern "C" {
 #define VSF_MREPEAT_LIMIT                       256
 
 // BUG in tcc compiler, remove __IS_COMPILER_TCC__ and compiler_detect.h after the bug fixed
-#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) || __IS_COMPILER_TCC__
+#if ((!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) || __IS_COMPILER_TCC__) && !defined(__cplusplus)
 
 #define VSF_MREPEAT(__COUNT, __MACRO, __PARAM)  VSF_MCONNECT(VSF_MREPEAT, __COUNT)(__MACRO, __PARAM)
 

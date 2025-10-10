@@ -175,7 +175,7 @@ extern "C" {
 #define declare_vsf_rng_buf(__name)       __declare_vsf_rng_buf(__name)
 
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 
 #   define NO_RNG_BUF_PROTECT(__CODE)               __CODE
 #   define no_rng_buf_protect(__code)               __code
@@ -520,7 +520,7 @@ int32_t __name##_peek_multiple( __name * queue_ptr,                             
 
 
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 
 #define __vsf_rng_buf_prepare(__name, __qaddr, __buffer, __size)                \
     do {                                                                        \
@@ -570,7 +570,7 @@ int32_t __name##_peek_multiple( __name * queue_ptr,                             
 #define __vsf_rng_buf_peek_2(__name, __qaddr, __buffer, __size)                 \
             __name##_peek_multiple((__qaddr), (__buffer), (__size))
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || defined(__cplusplus)
 #   define vsf_rng_buf_send(__name, __qaddr, ...)                               \
             __PLOOC_EVAL(__VSF_RNG_BUF_SEND_, __VA_ARGS__)                      \
                 (__name, __qaddr, __VA_ARGS__)

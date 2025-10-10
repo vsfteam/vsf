@@ -31,7 +31,7 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #ifndef VSF_HAL_ASSERT
 #   define VSF_HAL_ASSERT(__CON)            VSF_ASSERT(__CON)
 #endif

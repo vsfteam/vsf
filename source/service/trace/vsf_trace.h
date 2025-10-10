@@ -257,7 +257,7 @@ extern void vsf_bgtrace_append(vsf_bgtrace_t *bgtrace, void *element);
 extern void vsf_bgtrace_print(vsf_bgtrace_t *bgtrace, int cnt);
 
 #else
-#   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #       define vsf_trace_init(__arg)
 #       define vsf_trace_fini(__arg)
 #       define vsf_trace(__arg)

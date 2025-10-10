@@ -106,7 +106,7 @@ extern "C" {
 
 
 
-#if __STDC_VERSION__ >= 201112L
+#if __STDC_VERSION__ >= 201112L || defined(__cplusplus)
 #   define usb_unicode_t        char16_t
 #else
 #   define usb_unicode_t        wchar_t

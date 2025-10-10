@@ -146,7 +146,7 @@ def_structure(vsf_msgt_node_t)
 
     uint8_t         id;                                                       //!< node ID for lookup table
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || defined(__cplusplus)
     union {
         union {
             struct {
@@ -179,7 +179,7 @@ def_structure(vsf_msgt_node_t)
             uint8_t     value;
         } Attribute;
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || defined(__cplusplus)
     };
 #endif
 

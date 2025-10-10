@@ -27,7 +27,7 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #define __vsf_when(__cond)                      (__cond)
 #define vsf_when(__cond)                        __vsf_when(__cond)
 #else
@@ -96,7 +96,7 @@ extern "C" {
     } while (0)
 
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #   define __vsf_slist_insert(  __host_type,  /* type of the host object */     \
                                 __member,     /* the name of the list */        \
                                 __list_ptr,   /* the address of the list */     \
@@ -378,7 +378,7 @@ extern "C" {
         }                                                                       \
     } while (0)
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #   define __vsf_dlist_insert(  __host_type,/* type of the host object */       \
                                 __member,   /* the name of the list */          \
                                 __list_ptr, /* the address of the list */       \
@@ -528,7 +528,7 @@ extern "C" {
             __vsf_slist_remove_imp(                                             \
                 (__list_ptr), (__item_ptr), vsf_offset_of(__host_type, __member))
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #   define vsf_slist_insert(__host_type,    /* the type of the host type */     \
                             __member,       /* the member name of the list */   \
                             __list_ptr,     /* the address of the list */       \
@@ -765,7 +765,7 @@ NULL<---|backward|<-----|backward|<----------
             __vsf_dlist_remove_tail(                                            \
                     __host_type, __member, (__list_ptr), (__item_ref_ptr))
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #   define vsf_dlist_insert(    __host_type,/* the type of the host type */     \
                                 __member,   /* the member name of the list */   \
                                 __list_ptr, /* the address of the list */       \

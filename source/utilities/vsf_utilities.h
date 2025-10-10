@@ -46,7 +46,7 @@ extern "C" {
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 typedef struct vsf_mem_t vsf_mem_t;
 struct vsf_mem_t {
     union {
@@ -55,16 +55,13 @@ struct vsf_mem_t {
         uint8_t *src;
         void *obj;
 
-        uint8_t *buffer_ptr;         //!< stream buffer
+        uint8_t *buffer_ptr;
         uint8_t *src_ptr;
         void *obj_ptr;
     } ptr;
     int32_t size;
 };
-//! @}
 #else
-//! \name stream
-//! @{
 typedef struct vsf_mem_t vsf_mem_t;
 struct vsf_mem_t {
     union {
@@ -74,12 +71,12 @@ struct vsf_mem_t {
             uint8_t *src;
             void *obj;
 
-            uint8_t *buffer_ptr;         //!< stream buffer
+            uint8_t *buffer_ptr;
             uint8_t *src_ptr;
             void *obj_ptr;
         };
         union {
-            uint8_t *buffer_ptr;         //!< stream buffer
+            uint8_t *buffer_ptr;
             uint8_t *src_ptr;
             void *obj_ptr;
         } ptr;
@@ -87,10 +84,9 @@ struct vsf_mem_t {
     union {
         // implement linux-style variable
         int32_t size;
-        int32_t s32_size;                  //!< stream size
+        int32_t s32_size;
     };
 };
-//! @}
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/

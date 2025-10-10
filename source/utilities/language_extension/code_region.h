@@ -160,7 +160,7 @@ extern "C" {
 #else
 
 
-#   if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#   if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #       define __CODE_REGION_SIMPLE(__REGION_ADDR, __CODE)                      \
     do {if (NULL != (__REGION_ADDR)) {                                          \
         code_region_t *code_region_ptr = (code_region_t *)(__REGION_ADDR);      \
@@ -239,7 +239,7 @@ extern "C" {
 #define CODE_REGION_START(__REGION_ADDR)    __CODE_REGION_START((__REGION_ADDR))
 #define CODE_REGION_END()                   __CODE_REGION_END()
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #define CODE_REGION_SIMPLE(__REGION_ADDR, __CODE)                               \
             __CODE_REGION_SIMPLE((__REGION_ADDR), __CODE)
 #define code_region_simple(__REGION_ADDR, __CODE)                               \

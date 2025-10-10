@@ -44,7 +44,7 @@
 
 /*============================ MACROS ========================================*/
 
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+#if (!defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L) && !defined(__cplusplus)
 #    error tGUI requires ANSI-C99 and above
 #endif
 
@@ -335,7 +335,7 @@ as VSF_USE_TRACE is ENABLED. You can remove the log output by putting following\
  code in vsf_usr_cfg.h:   #define VSF_TGUI_LOG'
 
 #       define VSF_TGUI_LOG         vsf_trace
-#   elif defined(__STDC_VERSION__) && __STDC_VERSION__ > 199901L
+#   elif (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || defined(__cplusplus)
 
 #       warning 'macro VSF_TGUI_LOG() is not defined. Use printf() by default \
 as VSF_USE_TRACE is DISABLED.You can remove the log output by putting following\
