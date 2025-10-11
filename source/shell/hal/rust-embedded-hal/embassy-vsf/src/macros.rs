@@ -90,6 +90,14 @@ macro_rules! __interrupt_mod {
                 #[inline]
                 unsafe fn unpend(self) {}
             }
+            unsafe impl<T: InterruptNumber + Copy> InterruptExt for T {}
+
+            unsafe impl InterruptNumber for crate::pac::Interrupt {
+                #[inline(always)]
+                fn number(self) -> u16 {
+                    self as u16
+                }
+            }
 
             pub mod typelevel {
                 use super::InterruptExt;
