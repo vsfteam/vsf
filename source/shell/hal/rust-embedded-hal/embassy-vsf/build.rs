@@ -243,6 +243,7 @@ struct ArchInfo {
     detect: Box<dyn Fn() -> bool + Send>,
     features: Vec<&'static str>,
     bindgen_cflags: Vec<&'static str>,
+    bindgen_model: Box<dyn Fn(&str) -> &str + Send>,
     cmake_arch: &'static str,
 }
 
@@ -308,6 +309,9 @@ lazy_static! {
             detect: Box::new(|| -> bool {
                 env::var("TARGET").unwrap().starts_with("thumb")
             }),
+            bindgen_model: Box::new(|cmake_model| {
+                cmake_model
+            }),
             features: Vec::from([]),
             bindgen_cflags: Vec::from([
                 "-I${VSF_PATH}/source/utilities/compiler/arm/3rd-party/CMSIS/CMSIS/Core/Include",
@@ -319,6 +323,9 @@ lazy_static! {
             detect: Box::new(|| -> bool {
                 env::var("TARGET").unwrap().starts_with("riscv")
             }),
+            bindgen_model: Box::new(|cmake_model| {
+                cmake_model
+            }),
             features: Vec::from([]),
             bindgen_cflags: Vec::from([]),
             cmake_arch: "Riscv",
@@ -328,14 +335,32 @@ lazy_static! {
             detect: Box::new(|| -> bool {
                 env::var("CARGO_CFG_WINDOWS").is_ok()
             }),
+            bindgen_model: Box::new(|_cmake_model| {
+                "EMULATION_DISTBUS"
+            }),
             features: Vec::from([]),
-            bindgen_cflags: Vec::from([]),
+            bindgen_cflags: Vec::from([
+                "-D__WIN__",
+                {
+                    let target = env::var("TARGET").unwrap();
+                    if target == "i686-pc-windows-msvc" {
+                        "-D__CPU_X86__"
+                    } else if target == "x86_64-pc-windows-msvc" {
+                        "-D__CPU_X64__"
+                    } else {
+                        panic!("{target} not supported for windows");
+                    }
+                },
+            ]),
             cmake_arch: "Windows",
         },
         ArchInfo {
             name: "Linux/Unix/Macos",
             detect: Box::new(|| -> bool {
                 env::var("CARGO_CFG_UNIX").is_ok()
+            }),
+            bindgen_model: Box::new(|_cmake_model| {
+                "EMULATION_DISTBUS"
             }),
             features: Vec::from([]),
             bindgen_cflags: Vec::from([]),
@@ -399,7 +424,8 @@ fn main() {
 
     let mut path = env::var("VSF_PATH").unwrap();
     let vendor = env::var("VSF_VENDOR").expect("please define VSF_VENDOR in config.toml [env] section");
-    let model = env::var("VSF_MODEL").expect("please define VSF_MODEL in config.toml [env] section");
+    let cmake_model = env::var("VSF_MODEL").expect("please define VSF_MODEL in config.toml [env] section");
+    let mut bindgen_model: String = String::new();
     let bindgen_cflags_str = env::var("VSF_FLAGS").unwrap_or("".to_string());
     let mut bindgen_cflags: Vec<String> = bindgen_cflags_str.split(';').map(|s| s.to_string()).collect();
     bindgen_cflags.insert(0, format!("--target={}", env::var("TARGET").unwrap()));
@@ -417,13 +443,14 @@ fn main() {
                 bindgen_cflags.push(bindgen_cflag.to_string());
             }
             cmake_arch = arch.cmake_arch;
+            bindgen_model = String::from((arch.bindgen_model)(&cmake_model));
             break;
         }
     }
 
     println!("cargo:rerun-if-changed={}/vsf_hal.rs", out_path.to_str().unwrap());
     println!("cargo:warning=path: {path}");
-    println!("cargo:warning=target: {vendor}.{model}");
+    println!("cargo:warning=target: {vendor}.{bindgen_model}");
     println!("cargo:warning=flags:");
     for flag in &bindgen_cflags {
         if flag != "" {
@@ -444,10 +471,10 @@ fn main() {
         let vsf_hal_build_path = out_path.join("vsf_hal_build");
         if !vsf_hal_build_path.exists() {
             fs::create_dir_all(&vsf_hal_build_path).unwrap();
-            println!("cargo:warning=cmd: cmake -GNinja -DVSF_TARGET={model} {path}source/shell/hal/rust-embedded-hal/lib");
+            println!("cargo:warning=cmd: cmake -GNinja -DVSF_TARGET={cmake_model} {path}source/shell/hal/rust-embedded-hal/lib");
             Command::new("cmake").current_dir(&vsf_hal_build_path)
                         .arg("-GNinja")
-                        .arg("-DVSF_TARGET=".to_string() + &model)
+                        .arg("-DVSF_TARGET=".to_string() + &cmake_model)
                         .arg("-DVSF_ARCH=".to_string() + &cmake_arch)
                         .arg(path.clone() + "source/shell/hal/rust-embedded-hal/lib")
                         .output().expect("Fail to run cmake");
@@ -479,7 +506,7 @@ fn main() {
                     .use_core()
                     .default_enum_style(BINDGEN_ENUM_VAR)
                     .clang_arg("-D".to_string() + "__" + &vendor + "__")
-                    .clang_arg("-D".to_string() + "__" + &model + "__")
+                    .clang_arg("-D".to_string() + "__" + &bindgen_model + "__")
                     .clang_arg("-I".to_string() + &path + "source/shell/hal/rust-embedded-hal/lib/inc")
                     .clang_arg("-I".to_string() + &path + "source/shell/hal/rust-embedded-hal/lib/inc/empty_libc")
                     .clang_arg("-I".to_string() + &path + "source");
