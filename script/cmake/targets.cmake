@@ -3,7 +3,10 @@ if(NOT DEFINED VSF_CMAKE_ROOT)
 endif()
 
 if(VSF_TARGET)
-    file(GLOB_RECURSE __targets_cmake ${VSF_CMAKE_ROOT}/targets*/${VSF_TARGET}.cmake)
+    file(GLOB_RECURSE __targets_cmake
+        ${VSF_CMAKE_ROOT}/targets/${VSF_TARGET}.cmake
+        ${VSF_CMAKE_ROOT}/targets/*/${VSF_TARGET}.cmake
+    )
     list(LENGTH __targets_cmake __targets_number)
     if(__targets_number EQUAL 0)
         message(FATAL_ERROR "${VSF_TARGET} not found")
