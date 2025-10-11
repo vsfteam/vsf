@@ -393,7 +393,9 @@ impl<'d> Flex<'d> {
     /// Put the pin into input mode.
     #[inline]
     pub fn set_as_input(&mut self, pull: Pull) {
-        self.pin.config(into_vsf_gpio_mode_t!(VSF_GPIO_INPUT) | pull as u32, 0);
+        self.pin.config(into_vsf_gpio_mode_t!(VSF_GPIO_INPUT) as into_enum_type!(vsf_gpio_mode_t) 
+                        |   pull as into_enum_type!(vsf_gpio_mode_t),
+                        0);
     }
 
     /// Put the pin into output mode.
@@ -402,7 +404,10 @@ impl<'d> Flex<'d> {
     /// at a specific level, call `set_high`/`set_low` on the pin first.
     #[inline]
     pub fn set_as_output(&mut self, speed: Speed, drive: OutputDrive) {
-        self.pin.config(into_vsf_gpio_mode_t!(VSF_GPIO_OUTPUT_PUSH_PULL) | speed as u32 | drive as u32, 0);
+        self.pin.config(into_vsf_gpio_mode_t!(VSF_GPIO_OUTPUT_PUSH_PULL) as into_enum_type!(vsf_gpio_mode_t)
+                        |   speed as into_enum_type!(vsf_gpio_mode_t)
+                        |   drive as into_enum_type!(vsf_gpio_mode_t),
+                        0);
     }
 
     /// Put the pin into input + output mode.
@@ -416,7 +421,11 @@ impl<'d> Flex<'d> {
     /// at a specific level, call `set_high`/`set_low` on the pin first.
     #[inline]
     pub fn set_as_input_output(&mut self, pull: Pull, speed: Speed, drive: OutputDrive) {
-        self.pin.config(into_vsf_gpio_mode_t!(VSF_GPIO_OUTPUT_OPEN_DRAIN) | pull as u32 | speed as u32 | drive as u32, 0);
+        self.pin.config(into_vsf_gpio_mode_t!(VSF_GPIO_OUTPUT_OPEN_DRAIN) as into_enum_type!(vsf_gpio_mode_t)
+                        |   pull as into_enum_type!(vsf_gpio_mode_t)
+                        |   speed as into_enum_type!(vsf_gpio_mode_t)
+                        |   drive as into_enum_type!(vsf_gpio_mode_t),
+                        0);
     }
 
     /// Put the pin into analog mode
@@ -426,7 +435,7 @@ impl<'d> Flex<'d> {
     #[inline]
     #[cfg(VSF_GPIO_ANALOG)]
     pub fn set_as_analog(&mut self) {
-        self.pin.config(into_vsf_gpio_mode_t!(VSF_GPIO_ANALOG), 0);
+        self.pin.config(into_vsf_gpio_mode_t!(VSF_GPIO_ANALOG) as into_enum_type!(vsf_gpio_mode_t), 0);
     }
 
     /// Put the pin into AF mode, unchecked.
@@ -539,12 +548,17 @@ pub(crate) trait SealedPin {
 
     #[inline]
     fn set_as_af(&self, af_num: AfNumType, af_type: AfType) {
-        self.config(into_vsf_gpio_mode_t!(VSF_GPIO_AF) | af_type.mode as u32 | af_type.pull as u32 | af_type.speed as u32 | af_type.drive as u32, af_num);
+        self.config(into_vsf_gpio_mode_t!(VSF_GPIO_AF) as into_enum_type!(vsf_gpio_mode_t)
+                    |   af_type.mode as into_enum_type!(vsf_gpio_mode_t)
+                    |   af_type.pull as into_enum_type!(vsf_gpio_mode_t)
+                    |   af_type.speed as into_enum_type!(vsf_gpio_mode_t)
+                    |   af_type.drive as into_enum_type!(vsf_gpio_mode_t),
+                    af_num);
     }
 
     /// Put the pin into input mode.
     #[inline]
-    fn config(&self, mode: u32, af: AfNumType) {
+    fn config(&self, mode: into_enum_type!(vsf_gpio_mode_t), af: AfNumType) {
         let mut mode = vsf_gpio_cfg_t {
             mode: mode,
             alternate_function: af,

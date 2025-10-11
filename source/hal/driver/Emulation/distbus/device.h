@@ -107,6 +107,10 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#define DECLARE_VSF_HW_INTERRUPT(__N)                                           \
+            extern void VSF_MCONNECT(VSF_HW_INTERRUPT, __N)(void);
+VSF_MREPEAT(VSF_HW_INTERRUPTS_NUM, DECLARE_VSF_HW_INTERRUPT)
+
 #endif      // __VSF_HAL_DEVICE_EMULATION_DISTBUS_H__
 #endif
 /* EOF */

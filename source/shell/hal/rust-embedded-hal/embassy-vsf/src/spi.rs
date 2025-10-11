@@ -151,9 +151,9 @@ fn _vsf_spi_config(info: &Info, state: &State, config: &Config, config_fix: u32,
 
         (*spi_config).mode = config.bit_order as u32 | config_fix | config.raw_phase() | config.raw_polarity() | {
             if config.is_master {
-                into_vsf_spi_mode_t!(VSF_SPI_MASTER)
+                into_vsf_spi_mode_t!(VSF_SPI_MASTER) as u32
             } else {
-                into_vsf_spi_mode_t!(VSF_SPI_SLAVE)
+                into_vsf_spi_mode_t!(VSF_SPI_SLAVE) as u32
             }
         };
         (*spi_config).clock_hz = config.frequency.0;
@@ -186,12 +186,12 @@ fn _vsf_spi_drop(info: &Info) {
     }
 }
 
-fn _vsf_spi_check_error(irq_mask: vsf_spi_irq_mask_t) -> Result<(), Error> {
+fn _vsf_spi_check_error(irq_mask: into_enum_type!(vsf_spi_irq_mask_t)) -> Result<(), Error> {
     #[cfg(VSF_SPI_IRQ_MASK_CRC_ERR)]
-    if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_CRC_ERR) != 0 {
+    if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_CRC_ERR) as into_enum_type!(vsf_spi_irq_mask_t) != 0 {
         return Err(Error::Crc);
     }
-    if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
+    if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_OVERFLOW_ERR) as into_enum_type!(vsf_spi_irq_mask_t) != 0 {
         return Err(Error::RxOverrun);
     }
 
@@ -206,10 +206,10 @@ unsafe extern "C" fn vsf_spi_on_interrupt(
     let s = target_ptr as *const State;
     let s = unsafe { &*s };
 
-    let mut transfer_irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) | into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL);
-    if transfer_irq_mask & irq_mask != 0 {
+    let mut transfer_irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) as u32 | into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as u32;
+    if transfer_irq_mask & irq_mask as u32 != 0 {
         unsafe {
-            vsf_spi_irq_disable(vsf_spi, transfer_irq_mask);
+            vsf_spi_irq_disable(vsf_spi, transfer_irq_mask as into_enum_type!(vsf_spi_irq_mask_t));
         }
         s.irq_mask.fetch_or(transfer_irq_mask, Ordering::Relaxed);
         s.waker.wake();
@@ -294,7 +294,7 @@ impl<'d, M: PeriMode> Spi<M> {
                     data.as_ptr() as *mut ::core::ffi::c_void, &rx_offset as *const uint_fast32_t as *mut uint_fast32_t,
                     data.len() as uint_fast32_t
                 );
-                if let Err(error) = _vsf_spi_irq_clear(vsf_spi_irq_clear(vsf_spi, VSF_SPI_IRQ_MASK_ERR)) {
+                if let Err(error) = _vsf_spi_check_error(vsf_spi_irq_clear(vsf_spi, VSF_SPI_IRQ_MASK_ERR as into_enum_type!(vsf_spi_irq_mask_t))) {
                     return Err(error);
                 }
             }
@@ -325,7 +325,7 @@ impl<'d, M: PeriMode> Spi<M> {
             self.set_word_size(W::CONFIG);
             while xfered_len < xfer_len {
                 let cur_len = if xfered_len < xfer_common_len {
-                    err_mask = VSF_SPI_IRQ_MASK_ERR;
+                    err_mask = VSF_SPI_IRQ_MASK_ERR as u32;
                     xfer_common_len
                 } else {
                     if xfered_len >= read_len {
@@ -333,7 +333,7 @@ impl<'d, M: PeriMode> Spi<M> {
                         rx_offset_ptr = 0 as *mut uint_fast32_t;
                         read_ptr = 0 as *mut ::core::ffi::c_void;
                     } else if xfered_len >= write_len {
-                        err_mask = VSF_SPI_IRQ_MASK_ERR;
+                        err_mask = VSF_SPI_IRQ_MASK_ERR as u32;
                         tx_offset_ptr = 0 as *mut uint_fast32_t;
                         write_ptr = 0 as *mut ::core::ffi::c_void;
                     }
@@ -345,7 +345,7 @@ impl<'d, M: PeriMode> Spi<M> {
                     read_ptr, rx_offset_ptr,
                     cur_len as uint_fast32_t
                 );
-                if let Err(error) = _vsf_spi_check_error(vsf_spi_irq_clear(vsf_spi, err_mask)) {
+                if let Err(error) = _vsf_spi_check_error(vsf_spi_irq_clear(vsf_spi, err_mask as into_enum_type!(vsf_spi_irq_mask_t))) {
                     return Err(error);
                 }
                 if tx_offset_ptr != 0 as *mut uint_fast32_t {
@@ -374,7 +374,7 @@ impl<'d, M: PeriMode> Spi<M> {
                     data_ptr, &rx_offset as *const uint_fast32_t as *mut uint_fast32_t,
                     data.len() as uint_fast32_t
                 );
-                if let Err(error) = _vsf_spi_irq_clear(vsf_spi_irq_clear(vsf_spi, VSF_SPI_IRQ_MASK_ERR)) {
+                if let Err(error) = _vsf_spi_check_error(vsf_spi_irq_clear(vsf_spi, VSF_SPI_IRQ_MASK_ERR as into_enum_type!(vsf_spi_irq_mask_t))) {
                     return Err(error);
                 }
             }
@@ -502,7 +502,7 @@ impl<'d> Spi<Async> {
             let len = data.len();
 
             self.set_word_size(W::CONFIG);
-            vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL));
+            vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
             vsf_spi_request_transfer(vsf_spi,
                 ptr as *mut ::core::ffi::c_void,
                 0 as *mut ::core::ffi::c_void,
@@ -511,8 +511,8 @@ impl<'d> Spi<Async> {
 
             let s = self.state;
             poll_fn(|cx| -> Poll<Result<(), Error>> {
-                if s.irq_mask.swap(0, Ordering::Relaxed) & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) != 0 {
-                    vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL));
+                if s.irq_mask.swap(0, Ordering::Relaxed) & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) as u32 != 0 {
+                    vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
                     Poll::Ready(Ok(()))
                 } else {
                     s.waker.register(cx.waker());
@@ -533,7 +533,7 @@ impl<'d> Spi<Async> {
             let len = data.len();
 
             self.set_word_size(W::CONFIG);
-            vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL));
+            vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
             vsf_spi_request_transfer(vsf_spi,
                 ptr as *mut ::core::ffi::c_void,
                 0 as *mut ::core::ffi::c_void,
@@ -543,13 +543,13 @@ impl<'d> Spi<Async> {
             let s = self.state;
             poll_fn(|cx| -> Poll<Result<(), Error>> {
                 let irq_mask = s.irq_mask.swap(0, Ordering::Relaxed);
-                if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) != 0 {
-                    vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL));
+                if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as u32 != 0 {
+                    vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
                     Poll::Ready(Ok(()))
                 } else {
-                    match _vsf_spi_check_error(irq_mask) {
+                    match _vsf_spi_check_error(irq_mask as into_enum_type!(vsf_spi_irq_mask_t)) {
                         Err(e) => {
-                            vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL));
+                            vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
                             Poll::Ready(Err(e))
                         },
                         Ok(()) => {
@@ -584,20 +584,20 @@ impl<'d> Spi<Async> {
             self.set_word_size(W::CONFIG);
             while xfered_len < xfer_len {
                 let cur_len = if xfered_len < xfer_common_len {
-                    irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) | VSF_SPI_IRQ_MASK_ERR;
+                    irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as u32 | VSF_SPI_IRQ_MASK_ERR as u32;
                     xfer_common_len
                 } else {
                     if xfered_len >= read_len {
-                        irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL);
+                        irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) as u32;
                         read_ptr = 0 as *mut ::core::ffi::c_void;
                     } else if xfered_len >= write_len {
-                        irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) | VSF_SPI_IRQ_MASK_ERR;
+                        irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as u32 | VSF_SPI_IRQ_MASK_ERR as u32;
                         write_ptr = 0 as *mut ::core::ffi::c_void;
                     }
                     xfer_len - xfered_len
                 };
 
-                vsf_spi_irq_enable(vsf_spi, irq_mask);
+                vsf_spi_irq_enable(vsf_spi, irq_mask as into_enum_type!(vsf_spi_irq_mask_t));
                 vsf_spi_request_transfer(vsf_spi,
                     write_ptr, read_ptr,
                     cur_len as uint_fast32_t
@@ -606,17 +606,17 @@ impl<'d> Spi<Async> {
                 let s = self.state;
                 poll_fn(|cx| {
                     let irq_mask = s.irq_mask.swap(0, Ordering::Relaxed);
-                    if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) != 0 {
+                    if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as u32 != 0 {
                         Poll::Ready(Ok(()))
                     } else {
-                        match _vsf_spi_check_error(irq_mask) {
-                            Err(e) => { vsf_spi_irq_disable(vsf_spi, irq_mask); return Poll::Ready(Err(e)) },
+                        match _vsf_spi_check_error(irq_mask as into_enum_type!(vsf_spi_irq_mask_t)) {
+                            Err(e) => { vsf_spi_irq_disable(vsf_spi, irq_mask as into_enum_type!(vsf_spi_irq_mask_t)); return Poll::Ready(Err(e)) },
                             Ok(()) => { s.waker.register(cx.waker()); Poll::Pending },
                         }
                     }
                 }).await?;
 
-                vsf_spi_irq_disable(vsf_spi, irq_mask);
+                vsf_spi_irq_disable(vsf_spi, irq_mask as into_enum_type!(vsf_spi_irq_mask_t));
                 xfered_len += cur_len as usize;
             }
         }
@@ -638,7 +638,7 @@ impl<'d> Spi<Async> {
             let len = data.len();
 
             self.set_word_size(W::CONFIG);
-            vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL));
+            vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
             vsf_spi_request_transfer(vsf_spi,
                 ptr as *mut ::core::ffi::c_void,
                 ptr as *mut ::core::ffi::c_void,
@@ -648,13 +648,13 @@ impl<'d> Spi<Async> {
             let s = self.state;
             poll_fn(|cx| -> Poll<Result<(), Error>> {
                 let irq_mask = s.irq_mask.swap(0, Ordering::Relaxed);
-                if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) != 0 {
-                    vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL));
+                if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as u32 != 0 {
+                    vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
                     Poll::Ready(Ok(()))
                 } else {
-                    match _vsf_spi_check_error(irq_mask) {
+                    match _vsf_spi_check_error(irq_mask as into_enum_type!(vsf_spi_irq_mask_t)) {
                         Err(e) => {
-                            vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL));
+                            vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
                             Poll::Ready(Err(e))
                         },
                         Ok(()) => {

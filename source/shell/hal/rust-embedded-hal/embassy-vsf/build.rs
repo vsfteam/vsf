@@ -305,7 +305,7 @@ lazy_static! {
 
     static ref GLOBAL_ARCH_INFO: Mutex<Vec<ArchInfo>> = Mutex::new(vec![
         ArchInfo {
-            name: "Cortex-M",
+            name: "CortexM",
             detect: Box::new(|| -> bool {
                 env::var("TARGET").unwrap().starts_with("thumb")
             }),
@@ -355,7 +355,7 @@ lazy_static! {
             cmake_arch: "Windows",
         },
         ArchInfo {
-            name: "Linux/Unix/Macos",
+            name: "Unix",          // for Linux, Unix, MacOS
             detect: Box::new(|| -> bool {
                 env::var("CARGO_CFG_UNIX").is_ok()
             }),
@@ -433,6 +433,7 @@ fn main() {
     // arch
     let arch_infos = GLOBAL_ARCH_INFO.lock().unwrap();
     let mut cmake_arch: &'static str = "";
+    let mut arch_name: &'static str = "";
     for arch in arch_infos.iter() {
         if (arch.detect)() {
             println!("cargo:warning=ARCH: {}", arch.name);
@@ -445,6 +446,7 @@ fn main() {
                 }
             }
             cmake_arch = arch.cmake_arch;
+            arch_name = arch.name;
             bindgen_model = String::from((arch.bindgen_model)(&cmake_model));
             break;
         }
@@ -646,12 +648,6 @@ fn main() {
         pub enum Interrupt {{
             {interrupt_str}
         }}
-        unsafe impl cortex_m::interrupt::InterruptNumber for Interrupt {{
-            #[inline(always)]
-            fn number(self) -> u16 {{
-                self as u16
-            }}
-        }}
         mod _vectors {{
             unsafe extern \"C\" {{
                 {interrupt_func_dec_str}
@@ -765,7 +761,7 @@ fn main() {
         embassy_hal_internal::peripherals_struct!(
             {peripheral_list}
         );
-        embassy_hal_internal::interrupt_mod!(
+        interrupt_mod!({arch_name},
             {interrupt_name_str}
         );
         {af_str}
