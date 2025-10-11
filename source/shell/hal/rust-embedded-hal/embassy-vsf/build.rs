@@ -348,7 +348,7 @@ lazy_static! {
                     } else if target == "x86_64-pc-windows-msvc" {
                         "-D__CPU_X64__"
                     } else {
-                        panic!("{target} not supported for windows");
+                        ""
                     }
                 },
             ]),
@@ -440,7 +440,9 @@ fn main() {
                 println!("{feature}");
             }
             for bindgen_cflag in arch.bindgen_cflags.iter() {
-                bindgen_cflags.push(bindgen_cflag.to_string());
+                if !bindgen_cflag.is_empty() {
+                    bindgen_cflags.push(bindgen_cflag.to_string());
+                }
             }
             cmake_arch = arch.cmake_arch;
             bindgen_model = String::from((arch.bindgen_model)(&cmake_model));
@@ -453,7 +455,7 @@ fn main() {
     println!("cargo:warning=target: {vendor}.{bindgen_model}");
     println!("cargo:warning=flags:");
     for flag in &bindgen_cflags {
-        if flag != "" {
+        if !flag.is_empty() {
             println!("cargo:warning=\t{flag}");
         }
     }
@@ -515,7 +517,7 @@ fn main() {
         builder = builder.clang_arg("-D".to_string() + definition);
     }
     for flag in &bindgen_cflags {
-        if flag != "" {
+        if !flag.is_empty() {
             builder = builder.clang_arg(shellexpand::full(&flag).unwrap().into_owned());
         }
     }

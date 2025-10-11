@@ -3,6 +3,7 @@ runner = "probe-rs run --chip N32H765IIB7EC"
 
 [build]
 target = "thumbv7em-none-eabihf"
+#target = "i686-pc-windows-msvc"
 rustflags = ["-Clink-args=-Map=embassy-vsf.map"]
 
 [env]
@@ -10,3 +11,5 @@ DEFMT_LOG = "trace"
 
 VSF_VENDOR = "Nations"
 VSF_MODEL = "N32H765IIB7EC"
+#VSF_VENDOR = "Emulation"
+#VSF_MODEL = "distbus/win/x86"

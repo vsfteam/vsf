@@ -41,9 +41,13 @@ defmt-rtt = { version = "1.0" }
 
 [target.'cfg(all(target_arch = "riscv32", target_os = "none"))'.dependencies]
 embassy-executor = { version = "0.9", git = "https://github.com/embassy-rs/embassy", features = ["arch-riscv32", "executor-thread", "defmt"] }
+embassy-hal-internal = { version = "0.3", git = "https://github.com/embassy-rs/embassy", features = [] }
 
 riscv-rt = { version = "0.13" }
 defmt-rtt = { version = "1.0" }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+embassy-hal-internal = { version = "0.3", git = "https://github.com/embassy-rs/embassy", features = [] }
 
 [features]
 defmt = []
