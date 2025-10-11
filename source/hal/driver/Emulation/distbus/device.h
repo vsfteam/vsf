@@ -99,6 +99,7 @@
 //  irq and af can be adjusted according to the dedicated device configuration.
 
 #include "./device_irq.h"
+#include "./device_af.h"
 
 // for VSF_MREPEAT used below
 #include "utilities/vsf_utilities.h"

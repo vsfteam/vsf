@@ -790,27 +790,31 @@ fn enable_peripherial(name: &str, mask: u32) {
 
 fn bind_vsf_gpios(lines: &Vec<&str>, output_code: &mut String) {
     let mask = extract_peripheral_mask(lines, "gpio");
+    let pin_count = extract_const_integer::<u32>(&lines, "VSF_HW_GPIO_PIN_COUNT").unwrap_or(0);
 
     enable_peripherial("gpio", mask);
 
     for port_index in 0..32 {
         if mask & (1 << port_index) != 0 {
-            if let Some(mut pin_mask) = extract_const_integer::<u128>(&lines, &format!("VSF_HW_GPIO_PORT{port_index}_MASK")) {
-                let mut pin_index = 0;
-                while pin_mask != 0 {
-                    if pin_mask & 1 != 0 {
-                        output_code.push_str(&format!("P{port_index}_{pin_index},"));
-                    }
-                    pin_index += 1;
-                    pin_mask >>= 1;
+            let mut port_pin_mask = (1 << pin_count) - 1;
+            if let Some(pin_mask) = extract_const_integer::<u128>(&lines, &format!("VSF_HW_GPIO_PORT{port_index}_MASK")) {
+                port_pin_mask = pin_mask;
+            }
+
+            let mut pin_index = 0;
+            while port_pin_mask != 0 {
+                if port_pin_mask & 1 != 0 {
+                    output_code.push_str(&format!("P{port_index}_{pin_index},"));
                 }
+                pin_index += 1;
+                port_pin_mask >>= 1;
             }
         }
     }
 }
 
 fn bind_vsf_usarts(lines: &Vec<&str>, output_code: &mut String, support_sync: &mut [bool; 32]) {
-    let mask: u32 = extract_peripheral_mask(lines, "USART");
+    let mask: u32 = extract_peripheral_mask(lines, "usart");
 
     enable_peripherial("usart", mask);
 

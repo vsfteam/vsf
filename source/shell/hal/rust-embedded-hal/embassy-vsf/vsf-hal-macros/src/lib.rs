@@ -14,33 +14,37 @@ pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
 
     let mut output_code = String::from("");
     let mask = extract_peripheral_mask(&bindings_lines, "gpio");
+    let pin_count = extract_const_integer::<u32>(&bindings_lines, "VSF_HW_GPIO_PIN_COUNT").unwrap_or(0);
     for port_index in 0..32 {
         if mask & (1 << port_index) != 0 {
+            let mut port_pin_mask = (1 << pin_count) - 1;
             // VSF_HW_GPIO_PORT{port_index}_MASK only the PIN_MASK in one dedicated port, pin number can exceed 32 or maybe 64, so use the largest unsigned integer supported.
-            if let Some(mut pin_mask) = extract_const_integer::<u128>(&bindings_lines, &format!("VSF_HW_GPIO_PORT{port_index}_MASK")) {
-                let mut pin_index = 0;
-                while pin_mask != 0 {
-                    if pin_mask & 1 != 0 {
-                        output_code.push_str(&format!("
-                            impl crate::gpio::Pin for peripherals::P{port_index}_{pin_index} {{
+            if let Some(pin_mask) = extract_const_integer::<u128>(&bindings_lines, &format!("VSF_HW_GPIO_PORT{port_index}_MASK")) {
+                port_pin_mask = pin_mask;
+            }
+
+            let mut pin_index = 0;
+            while port_pin_mask != 0 {
+                if port_pin_mask & 1 != 0 {
+                    output_code.push_str(&format!("
+                        impl crate::gpio::Pin for peripherals::P{port_index}_{pin_index} {{
+                        }}
+                        impl crate::gpio::SealedPin for peripherals::P{port_index}_{pin_index} {{
+                            #[inline] fn pin_port(&self) -> PinPortType {{
+                                into_vsf_io_port_pin_no_t!(VSF_P{port_index}_{pin_index}) as PinPortType
                             }}
-                            impl crate::gpio::SealedPin for peripherals::P{port_index}_{pin_index} {{
-                                #[inline] fn pin_port(&self) -> PinPortType {{
-                                    into_vsf_io_port_pin_no_t!(VSF_P{port_index}_{pin_index}) as PinPortType
+                        }}
+                        impl From<peripherals::P{port_index}_{pin_index}> for crate::gpio::AnyPin {{
+                            fn from(_val: peripherals::P{port_index}_{pin_index}) -> Self {{
+                                Self {{
+                                    pin_port: into_vsf_io_port_pin_no_t!(VSF_P{port_index}_{pin_index}) as PinPortType,
                                 }}
                             }}
-                            impl From<peripherals::P{port_index}_{pin_index}> for crate::gpio::AnyPin {{
-                                fn from(_val: peripherals::P{port_index}_{pin_index}) -> Self {{
-                                    Self {{
-                                        pin_port: into_vsf_io_port_pin_no_t!(VSF_P{port_index}_{pin_index}) as PinPortType,
-                                    }}
-                                }}
-                            }}
-                        "));
-                    }
-                    pin_index += 1;
-                    pin_mask >>= 1;
+                        }}
+                    "));
                 }
+                pin_index += 1;
+                port_pin_mask >>= 1;
             }
         }
     }

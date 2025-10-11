@@ -320,9 +320,9 @@
 
 #endif
 
-#if VSF_HW_USART_MASK & (1 << 14)
+#if VSF_HW_USART_MASK & (1 << 15)
 
-// remap for USART14
+// remap for USART15
 
 #   define VSF_HW_AF_USART15_RX_P7_2        9
 #   define VSF_HW_AF_USART15_TX_P7_3        8
