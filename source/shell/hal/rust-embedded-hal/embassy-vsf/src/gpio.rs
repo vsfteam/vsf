@@ -171,13 +171,46 @@ pub struct AfType {
 #[cfg(any(VSF_GPIO_AF, VSF_GPIO_AF_PUSH_PULL, VSF_GPIO_AF_OPEN_DRAIN))]
 impl AfType {
     /// Input with optional pullup or pulldown.
-    #[cfg(all(VSF_GPIO_AF))]
+    #[cfg(VSF_GPIO_AF)]
     pub const fn input(pull: Pull) -> Self {
         Self {
             #[cfg(VSF_GPIO_AF_INPUT)]
             mode: AfMode::AfInput as u32,
             #[cfg(all(not(VSF_GPIO_AF_INPUT), VSF_GPIO_AF))]
             mode: (into_vsf_gpio_mode_t!(VSF_GPIO_AF) | into_vsf_gpio_mode_t!(VSF_GPIO_INPUT)) as u32,
+
+            pull: pull,
+
+            #[cfg(VSF_GPIO_SPEED_LOW)]
+            speed: Speed::Low,
+            #[cfg(all(not(VSF_GPIO_SPEED_LOW), VSF_GPIO_SPEED_MEDIUM))]
+            speed: Speed::Medium,
+            #[cfg(all(not(VSF_GPIO_SPEED_LOW), not(VSF_GPIO_SPEED_MEDIUM), VSF_GPIO_SPEED_HIGH))]
+            speed: Speed::High,
+            #[cfg(all(not(VSF_GPIO_SPEED_LOW), not(VSF_GPIO_SPEED_MEDIUM), not(VSF_GPIO_SPEED_HIGH), VSF_GPIO_SPEED_VERY_HIGH))]
+            speed: Speed::VeryHigh,
+            #[cfg(not(any(VSF_GPIO_SPEED_LOW, VSF_GPIO_SPEED_MEDIUM, VSF_GPIO_SPEED_HIGH, VSF_GPIO_SPEED_VERY_HIGH)))]
+            speed: Speed::None,
+
+            #[cfg(VSF_GPIO_DRIVE_STRENGTH_LOW)]
+            drive: OutputDrive::Low,
+            #[cfg(all(not(VSF_GPIO_DRIVE_STRENGTH_LOW), VSF_GPIO_DRIVE_STRENGTH_MEDIUM))]
+            drive: OutputDrive::Medium,
+            #[cfg(all(not(VSF_GPIO_DRIVE_STRENGTH_LOW), not(VSF_GPIO_DRIVE_STRENGTH_MEDIUM), VSF_GPIO_DRIVE_STRENGTH_HIGH))]
+            drive: OutputDrive::High,
+            #[cfg(all(not(VSF_GPIO_DRIVE_STRENGTH_LOW), not(VSF_GPIO_DRIVE_STRENGTH_MEDIUM), not(VSF_GPIO_DRIVE_STRENGTH_HIGH), VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH))]
+            drive: OutputDrive::VeryHigh,
+            #[cfg(not(any(VSF_GPIO_DRIVE_STRENGTH_LOW, VSF_GPIO_DRIVE_STRENGTH_MEDIUM, VSF_GPIO_DRIVE_STRENGTH_HIGH, VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH)))]
+            drive: OutputDrive::None,
+        }
+    }
+    #[cfg(not(VSF_GPIO_AF))]
+    pub const fn input(pull: Pull) -> Self {
+        Self {
+            #[cfg(VSF_GPIO_AF_INPUT)]
+            mode: AfMode::AfInput as u32,
+            #[cfg(not(VSF_GPIO_AF_INPUT))]
+            mode: into_vsf_gpio_mode_t!(VSF_GPIO_INPUT) as u32,
 
             pull: pull,
 
@@ -215,12 +248,30 @@ impl AfType {
             drive: drive,
         }
     }
+    #[cfg(not(VSF_GPIO_AF_PUSH_PULL))]
+    pub const fn output(speed: Speed, drive: OutputDrive) -> Self {
+        Self {
+            mode: into_vsf_gpio_mode_t!(VSF_GPIO_OUTPUT_PUSH_PULL) as u32,
+            pull: Pull::None,
+            speed: speed,
+            drive: drive,
+        }
+    }
 
     /// Input and output mode, commonly used for "open drain" mode.
     #[cfg(VSF_GPIO_AF_OPEN_DRAIN)]
     pub const fn input_output(pull: Pull, speed: Speed, drive: OutputDrive) -> Self {
         Self {
             mode: AfMode::AfOpenDrain as u32,
+            pull: pull,
+            speed: speed,
+            drive: drive,
+        }
+    }
+    #[cfg(not(VSF_GPIO_AF_OPEN_DRAIN))]
+    pub const fn input_output(pull: Pull, speed: Speed, drive: OutputDrive) -> Self {
+        Self {
+            mode: into_vsf_gpio_mode_t!(VSF_GPIO_OUTPUT_OPEN_DRAIN) as u32,
             pull: pull,
             speed: speed,
             drive: drive,
