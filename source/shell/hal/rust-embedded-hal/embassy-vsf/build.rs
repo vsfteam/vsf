@@ -629,8 +629,11 @@ fn main() {
                 interrupt_func_dec_str.push_str(&format!("fn {interrupt_name}();\n"));
                 interrupt_vecotr_str.push_str(&format!("Vector {{ _handler: {interrupt_name} }},\n"));
             } else {
-                interrupt_vecotr_str.push_str("Vector { _reserved: 0: {interrupt_name} },\n");
+                interrupt_vecotr_str.push_str("Vector { _reserved: 0 },\n");
             }
+        }
+        for _interrupt_index in interrupt_vec.len()..(interrupt_num as usize) {
+            interrupt_vecotr_str.push_str("Vector { _reserved: 0 },\n");
         }
     }
 

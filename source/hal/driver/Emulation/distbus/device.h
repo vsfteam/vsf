@@ -93,6 +93,13 @@
 #   define VSF_HW_SDIO_COUNT                        1
 #endif
 
+/*============================ INCLUDES ======================================*/
+
+// Include common irq and af headers after peripherals are defined, so that
+//  irq and af can be adjusted according to the dedicated device configuration.
+
+#include "./device_irq.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
