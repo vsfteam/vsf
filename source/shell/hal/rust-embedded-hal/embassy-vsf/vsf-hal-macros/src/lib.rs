@@ -19,7 +19,7 @@ pub fn bind_vsf_gpio_pins(_item: TokenStream) -> TokenStream {
         if mask & (1 << port_index) != 0 {
             let mut port_pin_mask = (1 << pin_count) - 1;
             // VSF_HW_GPIO_PORT{port_index}_MASK only the PIN_MASK in one dedicated port, pin number can exceed 32 or maybe 64, so use the largest unsigned integer supported.
-            if let Some(pin_mask) = extract_const_integer::<u128>(&bindings_lines, &format!("VSF_HW_GPIO_PORT{port_index}_MASK")) {
+            if let Some(mut pin_mask) = extract_const_integer::<u128>(&bindings_lines, &format!("VSF_HW_GPIO_PORT{port_index}_MASK")) {
                 port_pin_mask = pin_mask;
             }
 
