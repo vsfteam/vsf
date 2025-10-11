@@ -8,16 +8,32 @@ cmake_policy(SET CMP0076 NEW)
 message(STATUS "VSF_PATH: $ENV{VSF_PATH}")
 
 # compiler configurations
-# arm-none-eabi-gcc will not pass compiler checker of cmake, so include before project
-set(CMAKE_C_FLAGS 
-    "-Ofast -Wno-unused-variable"
-    CACHE INTERNAL "C compiler common flags"
-)
-set(CMAKE_CXX_FLAGS 
-    "-Ofast -Wno-unused-variable"
-    CACHE INTERNAL "C++ compiler common flags"
-)
-include($ENV{VSF_PATH}/script/cmake/compilers/gnuarmemb.cmake)
+message(STATUS "VSF_ARCH: ${VSF_ARCH}")
+if(VSF_ARCH STREQUAL "ARM")
+    # arm-none-eabi-gcc will not pass compiler checker of cmake, so include before project
+    set(CMAKE_C_FLAGS 
+        "-Ofast -Wno-unused-variable"
+        CACHE INTERNAL "C compiler common flags"
+    )
+    set(CMAKE_CXX_FLAGS 
+        "-Ofast -Wno-unused-variable"
+        CACHE INTERNAL "C++ compiler common flags"
+    )
+    include($ENV{VSF_PATH}/script/cmake/compilers/gnuarmemb.cmake)
+elseif(VSF_ARCH STREQUAL "Riscv")
+elseif(VSF_ARCH STREQUAL "Windows")
+    set(CMAKE_C_FLAGS 
+        "-Ofast -Wno-inconsistent-dllimport"
+        CACHE INTERNAL "C compiler common flags"
+    )
+    set(CMAKE_CXX_FLAGS 
+        "-Ofast -Wno-inconsistent-dllimport"
+        CACHE INTERNAL "C++ compiler common flags"
+    )
+elseif(VSF_ARCH STREQUAL "linux")
+else()
+    message(FATAL_ERROR "VSF_ARCH: '${VSF_ARCH}' not supported")
+endif()
 
 project(vsf_hal C CXX ASM)
 # use commandline to pass VSF_TARGET:
@@ -36,3 +52,23 @@ vsf_add_compile_definitions(
     __VSF__
     __VSF_OOC__
 )
+if(VSF_ARCH STREQUAL "ARM")
+elseif(VSF_ARCH STREQUAL "Riscv")
+elseif(VSF_ARCH STREQUAL "Windows")
+    vsf_add_compile_definitions(
+        VSF_HAL_USE_DISTBUS=ENABLED
+        VSF_USE_HEAP=ENABLED
+        VSF_USE_DISTBUS=ENABLED
+        VSF_HAL_DISTBUS_USE_GPIO=ENABLED
+        VSF_HAL_DISTBUS_USE_ADC=ENABLED
+        VSF_HAL_DISTBUS_USE_PWM=ENABLED
+        VSF_HAL_DISTBUS_USE_I2C=ENABLED
+        VSF_HAL_DISTBUS_USE_SPI=ENABLED
+        VSF_HAL_DISTBUS_USE_USART=ENABLED
+        VSF_HAL_DISTBUS_USE_SDIO=ENABLED
+        VSF_HAL_DISTBUS_USE_I2S=ENABLED
+        VSF_HAL_DISTBUS_USE_USBD=ENABLED
+        VSF_HAL_DISTBUS_USE_USBH=ENABLED
+    )
+elseif(VSF_ARCH STREQUAL "linux")
+endif()

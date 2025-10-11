@@ -242,7 +242,8 @@ struct ArchInfo {
     name: &'static str,
     detect: Box<dyn Fn() -> bool + Send>,
     features: Vec<&'static str>,
-    cflags: Vec<&'static str>,
+    bindgen_cflags: Vec<&'static str>,
+    cmake_arch: &'static str,
 }
 
 use lazy_static::lazy_static;
@@ -308,9 +309,10 @@ lazy_static! {
                 env::var("TARGET").unwrap().starts_with("thumb")
             }),
             features: Vec::from([]),
-            cflags: Vec::from([
+            bindgen_cflags: Vec::from([
                 "-I${VSF_PATH}/source/utilities/compiler/arm/3rd-party/CMSIS/CMSIS/Core/Include",
             ]),
+            cmake_arch: "ARM",
         },
         ArchInfo {
             name: "RiscV",
@@ -318,7 +320,8 @@ lazy_static! {
                 env::var("TARGET").unwrap().starts_with("riscv")
             }),
             features: Vec::from([]),
-            cflags: Vec::from([]),
+            bindgen_cflags: Vec::from([]),
+            cmake_arch: "Riscv",
         },
         ArchInfo {
             name: "Windows",
@@ -326,7 +329,8 @@ lazy_static! {
                 env::var("CARGO_CFG_WINDOWS").is_ok()
             }),
             features: Vec::from([]),
-            cflags: Vec::from([]),
+            bindgen_cflags: Vec::from([]),
+            cmake_arch: "Windows",
         },
         ArchInfo {
             name: "Linux/Unix/Macos",
@@ -334,7 +338,8 @@ lazy_static! {
                 env::var("CARGO_CFG_UNIX").is_ok()
             }),
             features: Vec::from([]),
-            cflags: Vec::from([]),
+            bindgen_cflags: Vec::from([]),
+            cmake_arch: "Linux",
         },
     ]);
 }
@@ -395,21 +400,23 @@ fn main() {
     let mut path = env::var("VSF_PATH").unwrap();
     let vendor = env::var("VSF_VENDOR").expect("please define VSF_VENDOR in config.toml [env] section");
     let model = env::var("VSF_MODEL").expect("please define VSF_MODEL in config.toml [env] section");
-    let flags_str = env::var("VSF_FLAGS").unwrap_or("".to_string());
-    let mut flags: Vec<String> = flags_str.split(';').map(|s| s.to_string()).collect();
-    flags.insert(0, format!("--target={}", env::var("TARGET").unwrap()));
+    let bindgen_cflags_str = env::var("VSF_FLAGS").unwrap_or("".to_string());
+    let mut bindgen_cflags: Vec<String> = bindgen_cflags_str.split(';').map(|s| s.to_string()).collect();
+    bindgen_cflags.insert(0, format!("--target={}", env::var("TARGET").unwrap()));
 
     // arch
     let arch_infos = GLOBAL_ARCH_INFO.lock().unwrap();
+    let mut cmake_arch: &'static str = "";
     for arch in arch_infos.iter() {
         if (arch.detect)() {
             println!("cargo:warning=ARCH: {}", arch.name);
             for feature in arch.features.iter() {
                 println!("{feature}");
             }
-            for cflag in arch.cflags.iter() {
-                flags.push(cflag.to_string());
+            for bindgen_cflag in arch.bindgen_cflags.iter() {
+                bindgen_cflags.push(bindgen_cflag.to_string());
             }
+            cmake_arch = arch.cmake_arch;
             break;
         }
     }
@@ -418,8 +425,10 @@ fn main() {
     println!("cargo:warning=path: {path}");
     println!("cargo:warning=target: {vendor}.{model}");
     println!("cargo:warning=flags:");
-    for flag in &flags {
-        println!("cargo:warning=\t{flag}");
+    for flag in &bindgen_cflags {
+        if flag != "" {
+            println!("cargo:warning=\t{flag}");
+        }
     }
 
     path = shellexpand::full(&path).expect("Fail to expand for environment variables").into_owned();
@@ -435,7 +444,14 @@ fn main() {
         let vsf_hal_build_path = out_path.join("vsf_hal_build");
         if !vsf_hal_build_path.exists() {
             fs::create_dir_all(&vsf_hal_build_path).unwrap();
-            Command::new("cmake").current_dir(&vsf_hal_build_path).arg("-GNinja").arg("-DVSF_TARGET=".to_string() + &model).arg(path.clone() + "source/shell/hal/rust-embedded-hal/lib").output().expect("Fail to run cmake");
+            println!("cargo:warning=cmd: cmake -GNinja -DVSF_TARGET={model} {path}source/shell/hal/rust-embedded-hal/lib");
+            Command::new("cmake").current_dir(&vsf_hal_build_path)
+                        .arg("-GNinja")
+                        .arg("-DVSF_TARGET=".to_string() + &model)
+                        .arg("-DVSF_ARCH=".to_string() + &cmake_arch)
+                        .arg(path.clone() + "source/shell/hal/rust-embedded-hal/lib")
+                        .output().expect("Fail to run cmake");
+            println!("cargo:warning=cmd: ninja");
             Command::new("ninja").current_dir(&vsf_hal_build_path).output().expect("Fail to run ninja");
         }
 
@@ -471,8 +487,10 @@ fn main() {
     for definition in BINDGEN_DEFINITIONS {
         builder = builder.clang_arg("-D".to_string() + definition);
     }
-    for flag in &flags {
-        builder = builder.clang_arg(shellexpand::full(&flag).unwrap().into_owned());
+    for flag in &bindgen_cflags {
+        if flag != "" {
+            builder = builder.clang_arg(shellexpand::full(&flag).unwrap().into_owned());
+        }
     }
 
     let bindings = builder.generate().expect("Failed to generate rust bindings");
