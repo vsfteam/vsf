@@ -837,8 +837,8 @@ typedef struct vsf_usart_status_t {
             uint32_t is_busy         : 1;    //!< \~english USART is busy with any operation \~chinese USART 正在进行任何操作
             uint32_t is_tx_busy      : 1;    //!< \~english TX is busy transmitting data \~chinese 发送正在进行
             uint32_t is_rx_busy      : 1;    //!< \~english RX is busy receiving data \~chinese 接收正在进行
-            uint32_t tx_fifo_thresh  : 8;    //!< \~english TX FIFO threshold level (0-255) \~chinese 发送 FIFO 阈值水平(0-255)
-            uint32_t rx_fifo_thresh  : 8;    //!< \~english RX FIFO threshold level (0-255) \~chinese 接收 FIFO 阈值水平(0-255)
+            uint32_t tx_fifo_level   : 8;    //!< \~english TX FIFO current data level (0-255) \~chinese 发送 FIFO 当前数据水平(0-255)
+            uint32_t rx_fifo_level   : 8;    //!< \~english RX FIFO current data level (0-255) \~chinese 接收 FIFO 当前数据水平(0-255)
             uint32_t break_sent      : 1;    //!< \~english BREAK signal sent \~chinese BREAK 信号已发送
         };
     };
