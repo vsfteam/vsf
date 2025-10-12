@@ -101,11 +101,11 @@ typedef enum vsf_spi_mode_t {
 
 #if VSF_SPI_CFG_REIMPLEMENT_TYPE_IRQ_MASK == ENABLED
 typedef enum vsf_spi_irq_mask_t {
-    VSF_SPI_IRQ_MASK_TX             = 0x01ul << 0,
-    VSF_SPI_IRQ_MASK_RX             = 0x01ul << 1,
-    VSF_SPI_IRQ_MASK_TX_CPL         = 0x01ul << 2,
-    VSF_SPI_IRQ_MASK_CPL            = 0x01ul << 3,
-    VSF_SPI_IRQ_MASK_OVERFLOW_ERR   = 0x01ul << 4,
+    VSF_SPI_IRQ_MASK_TX                 = 0x01ul << 0,
+    VSF_SPI_IRQ_MASK_RX                 = 0x01ul << 1,
+    VSF_SPI_IRQ_MASK_TX_CPL             = 0x01ul << 2,
+    VSF_SPI_IRQ_MASK_RX_CPL             = 0x01ul << 3,
+    VSF_SPI_IRQ_MASK_RX_OVERFLOW_ERR    = 0x01ul << 4,
 
     // more vendor specified irq_masks can be added here
 } vsf_spi_irq_mask_t;
