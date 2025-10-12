@@ -662,6 +662,10 @@ extern vsf_gint_state_t vsf_set_interrupt(vsf_gint_state_t level);
 extern vsf_gint_state_t vsf_disable_interrupt(void);
 extern vsf_gint_state_t vsf_enable_interrupt(void);
 
+// Use dedicated arch related APIs instead of vsf_irq_XXX APIs below.
+//  vsf_irq_XXX APIs are only used when there is no dedicated arch,
+//  eg: embassy-vsf support in Windows/Unix-Like systems implemented by hal_distbus.
+
 extern void vsf_irq_enable(int irqn);
 extern void vsf_irq_disable(int irqn);
 extern bool vsf_irq_is_enabled(int irqn);
