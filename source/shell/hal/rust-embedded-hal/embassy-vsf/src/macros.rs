@@ -77,18 +77,44 @@ macro_rules! __interrupt_mod {
             pub use crate::pac::Interrupt::*;
             pub use crate::pac::Interrupt;
 
+            type Priority = u32;
+
             pub unsafe trait InterruptNumber: Copy {
                 fn number(self) -> u16;
             }
             pub unsafe trait InterruptExt: InterruptNumber + Copy {
                 #[inline]
-                unsafe fn enable(self) {}
+                unsafe fn enable(self) {
+                    crate::vsf_hal::vsf_irq_enable(self.number().into())
+                }
                 #[inline]
-                unsafe fn disable(self) {}
+                unsafe fn disable(self) {
+                    crate::vsf_hal::vsf_irq_disable(self.number().into())
+                }
                 #[inline]
-                unsafe fn pend(self) {}
+                unsafe fn is_enabled(self) -> bool {
+                    crate::vsf_hal::vsf_irq_is_enabled(self.number().into())
+                }
                 #[inline]
-                unsafe fn unpend(self) {}
+                unsafe fn pend(self) {
+                    crate::vsf_hal::vsf_irq_pend(self.number().into())
+                }
+                #[inline]
+                unsafe fn unpend(self) {
+                    crate::vsf_hal::vsf_irq_unpend(self.number().into())
+                }
+                #[inline]
+                unsafe fn is_pending(self) -> bool {
+                    crate::vsf_hal::vsf_irq_is_pending(self.number().into())
+                }
+                #[inline]
+                unsafe fn get_priority(self) -> Priority {
+                    crate::vsf_hal::vsf_irq_get_priority(self.number().into()) as Priority
+                }
+                #[inline]
+                unsafe fn set_priority(self, prio: Priority) {
+                    crate::vsf_hal::vsf_irq_set_priority(self.number().into(), prio as u32)
+                }
             }
             unsafe impl<T: InterruptNumber + Copy> InterruptExt for T {}
 
@@ -100,18 +126,42 @@ macro_rules! __interrupt_mod {
             }
 
             pub mod typelevel {
-                use super::InterruptExt;
+                use super::{InterruptExt, Priority};
                 trait SealedInterrupt {}
                 pub trait Interrupt: SealedInterrupt {
                     const IRQ: super::Interrupt;
                     #[inline]
-                    unsafe fn enable() {}
+                    unsafe fn enable() {
+                        Self::IRQ.enable()
+                    }
                     #[inline]
-                    unsafe fn disable() {}
+                    unsafe fn disable() {
+                        Self::IRQ.disable()
+                    }
                     #[inline]
-                    unsafe fn pend() {}
+                    unsafe fn is_enabled() -> bool {
+                        Self::IRQ.is_enabled()
+                    }
                     #[inline]
-                    unsafe fn unpend() {}
+                    unsafe fn pend() {
+                        Self::IRQ.pend()
+                    }
+                    #[inline]
+                    unsafe fn unpend() {
+                        Self::IRQ.unpend()
+                    }
+                    #[inline]
+                    unsafe fn is_pending() -> bool {
+                        Self::IRQ.is_pending()
+                    }
+                    #[inline]
+                    unsafe fn get_priority() -> Priority {
+                        Self::IRQ.get_priority()
+                    }
+                    #[inline]
+                    unsafe fn set_priority(prio: Priority) {
+                        Self::IRQ.set_priority(prio)
+                    }
                 }
 
                 $(
