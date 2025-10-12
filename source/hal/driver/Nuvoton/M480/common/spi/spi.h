@@ -40,7 +40,7 @@
 
 typedef enum vsf_spi_irq_mask_t {
     VSF_SPI_IRQ_MASK_TX_CPL = 1 << 0,
-    VSF_SPI_IRQ_MASK_CPL    = 1 << 1,   // SPI completed recepiton and transmission
+    VSF_SPI_IRQ_MASK_RX_CPL = 1 << 1,   // SPI completed recepiton and transmission
 } vsf_spi_irq_mask_t;
 
 typedef enum vsf_spi_mode_t {

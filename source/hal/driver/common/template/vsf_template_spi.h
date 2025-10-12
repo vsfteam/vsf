@@ -613,7 +613,7 @@ typedef enum vsf_spi_irq_mask_t {
     VSF_SPI_IRQ_MASK_TX             = 0x01ul << 0,  //! \~english TX FIFO threshold interrupt (triggers when TX FIFO level is below threshold) \~chinese TX FIFO 阈值中断（当 TX FIFO 水平低于阈值时触发）
     VSF_SPI_IRQ_MASK_RX             = 0x01ul << 1,  //! \~english RX FIFO threshold interrupt (triggers when RX FIFO level is above threshold) \~chinese RX FIFO 阈值中断（当 RX FIFO 水平高于阈值时触发）
     VSF_SPI_IRQ_MASK_TX_CPL         = 0x01ul << 2,  //! \~english TX complete interrupt (triggers when all TX data has been sent) \~chinese TX 完成中断（当所有 TX 数据发送完成时触发）
-    VSF_SPI_IRQ_MASK_CPL            = 0x01ul << 3,  //! \~english Transfer complete interrupt (triggers when both TX and RX are complete) \~chinese 传输完成中断（当 TX 和 RX 都完成时触发）
+    VSF_SPI_IRQ_MASK_RX_CPL         = 0x01ul << 3,  //! \~english RX complete interrupt (triggers when RX transfer is complete) \~chinese RX 完成中断（当 RX 传输完成时触发）
     VSF_SPI_IRQ_MASK_OVERFLOW_ERR   = 0x01ul << 4,  //! \~english Overflow error interrupt (triggers when RX FIFO overflows) \~chinese 溢出错误中断（当 RX FIFO 溢出时触发）
 } vsf_spi_irq_mask_t;
 #endif
@@ -630,7 +630,7 @@ enum {
      * \~english For SPI transfer, if RX transfer is done, then TX is done too.
      * \~chinese 对于 SPI 传输，如果 RX 传输完成了，那么 TX 也肯定完成了。
      */
-    VSF_SPI_IRQ_MASK_RX_CPL             = VSF_SPI_IRQ_MASK_CPL,
+    VSF_SPI_IRQ_MASK_CPL                = VSF_SPI_IRQ_MASK_RX_CPL,
 
 #ifndef VSF_SPI_IRQ_MASK_ERR
     /**
@@ -649,7 +649,7 @@ enum {
     VSF_SPI_IRQ_ALL_BITS_MASK           = VSF_SPI_IRQ_MASK_TX
                                         | VSF_SPI_IRQ_MASK_RX
                                         | VSF_SPI_IRQ_MASK_TX_CPL
-                                        | VSF_SPI_IRQ_MASK_CPL
+                                        | VSF_SPI_IRQ_MASK_RX_CPL
                                         | VSF_SPI_IRQ_MASK_ERR,
 #endif
 };
