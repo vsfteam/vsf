@@ -87,6 +87,12 @@ void vsf_remapped_spi_irq_disable(vsf_remapped_spi_t *spi, vsf_spi_irq_mask_t ir
     vsf_spi_irq_disable(spi->target, irq_mask);
 }
 
+vsf_spi_irq_mask_t vsf_remapped_spi_irq_clear(vsf_remapped_spi_t *spi, vsf_spi_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT((spi != NULL) && (spi->target != NULL));
+    return vsf_spi_irq_clear(spi->target, irq_mask);
+}
+
 vsf_err_t vsf_remapped_spi_cs_active(vsf_remapped_spi_t *spi, uint_fast8_t index)
 {
     VSF_HAL_ASSERT((spi != NULL) && (spi->target != NULL));

@@ -243,6 +243,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             spi, disable,               VSF_MCONNECT(__prefix_name, _t) *spi_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, irq_enable,            VSF_MCONNECT(__prefix_name, _t) *spi_ptr, vsf_spi_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 spi, irq_disable,           VSF_MCONNECT(__prefix_name, _t) *spi_ptr, vsf_spi_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_spi_irq_mask_t,   spi, irq_clear,             VSF_MCONNECT(__prefix_name, _t) *spi_ptr, vsf_spi_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_spi_status_t,     spi, status,                VSF_MCONNECT(__prefix_name, _t) *spi_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_spi_capability_t, spi, capability,            VSF_MCONNECT(__prefix_name, _t) *spi_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            spi, cs_active,             VSF_MCONNECT(__prefix_name, _t) *spi_ptr, uint_fast8_t index) \
@@ -1149,6 +1150,33 @@ extern void vsf_spi_irq_disable(vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
 
 /**
  * \~english
+ * @brief Clear interrupt flags of SPI instance and return previous state
+ * @param[in] spi_ptr: a pointer to structure @ref vsf_spi_t
+ * @param[in] irq_mask: one or more values of enum @ref vsf_spi_irq_mask_t to clear
+ * @return vsf_spi_irq_mask_t: the interrupt mask state before clearing (0 if no flags were set)
+ *
+ * @note This function attempts to clear the specified interrupt flags if they are set,
+ *       and returns the state of those flags before clearing. This is useful for
+ *       polling operations and determining if interrupts occurred.
+ *       Note that if interrupts are enabled and an interrupt handler is active,
+ *       the interrupt handler may clear the interrupt flags automatically.
+ *       In such cases, this function will return 0 even if interrupts occurred.
+ *
+ * \~chinese
+ * @brief 清除 SPI 实例的中断标志并返回之前的状态
+ * @param[in] spi_ptr: 指向结构体 @ref vsf_spi_t 的指针
+ * @param[in] irq_mask: 要清除的一个或多个枚举 vsf_spi_irq_mask_t 值的按位或
+ * @return vsf_spi_irq_mask_t: 清除前的中断掩码状态（如果没有标志被设置则返回0）
+ *
+ * @note 此函数尝试清除指定的中断标志（如果它们已设置），并返回清除前这些标志的状态。
+ *       这对于轮询操作和确定是否发生了中断很有用。
+ *       注意：如果中断已启用且中断处理函数处于活动状态，中断处理函数可能会自动清除中断标志。
+ *       在这种情况下，即使发生了中断，此函数也会返回0。
+ */
+extern vsf_spi_irq_mask_t vsf_spi_irq_clear(vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask);
+
+/**
+ * \~english
  * @brief Activate (assert) a SPI chip select line.
  * @param[in,out] spi_ptr: Pointer to SPI instance structure @ref vsf_spi_t
  * @param[in] index: Chip select line index (0 to cs_count-1)
@@ -1682,6 +1710,7 @@ static inline uint8_t vsf_spi_mode_to_data_bytes(vsf_spi_mode_t mode)
 #   define vsf_spi_disable(__SPI)                       VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_disable)              ((__vsf_spi_t *)(__SPI))
 #   define vsf_spi_irq_enable(__SPI, ...)               VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_irq_enable)           ((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
 #   define vsf_spi_irq_disable(__SPI, ...)              VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_irq_disable)          ((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
+#   define vsf_spi_irq_clear(__SPI, ...)                VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_irq_clear)            ((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
 #   define vsf_spi_status(__SPI)                        VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_status)               ((__vsf_spi_t *)(__SPI))
 #   define vsf_spi_capability(__SPI)                    VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_capability)           ((__vsf_spi_t *)(__SPI))
 #   define vsf_spi_cs_active(__SPI, ...)                VSF_MCONNECT(VSF_SPI_CFG_PREFIX, _spi_cs_active)            ((__vsf_spi_t *)(__SPI), ##__VA_ARGS__)
