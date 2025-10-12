@@ -242,6 +242,8 @@ static void VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_irqhandler)(
  *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
  *      VSF_SPI_CFG_REIMPLEMENT_API_CTRL for spi_ctrl.
  *          Default implementation will trigger assertion and return VSF_ERR_NOT_SUPPORT.
+ *      VSF_SPI_CFG_REIMPLEMENT_API_IRQ_CLEAR for spi_irq_clear.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
  */
 
 vsf_err_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_get_configuration)(
@@ -285,6 +287,14 @@ vsf_err_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_ctrl)(
 
     return VSF_ERR_NONE;
 }
+
+vsf_spi_irq_mask_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_irq_clear)(
+    VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr,
+    vsf_spi_irq_mask_t irq_mask
+) {
+    VSF_HAL_ASSERT(NULL != spi_ptr);
+    return 0;
+}
 // HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -297,6 +307,7 @@ vsf_err_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_ctrl)(
 #define VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY          ENABLED
 #define VSF_SPI_CFG_REIMPLEMENT_API_CTRL                ENABLED
 #define VSF_SPI_CFG_REIMPLEMENT_API_GET_CONFIGURATION   ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_API_IRQ_CLEAR           ENABLED
 
 #define VSF_SPI_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t)                                \

@@ -24,6 +24,7 @@
 #define vsf_real_spi_capability         VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_capability)
 #define vsf_real_spi_ctrl               VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_ctrl)
 #define vsf_real_spi_get_configuration  VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_get_configuration)
+#define vsf_real_spi_irq_clear          VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_irq_clear)
 
 #ifndef VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY
 #   define  VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
@@ -37,11 +38,17 @@
 #   define  VSF_SPI_CFG_REIMPLEMENT_API_GET_CONFIGURATION       DISABLED
 #endif
 
+#ifndef VSF_SPI_CFG_REIMPLEMENT_API_IRQ_CLEAR
+#   define VSF_SPI_CFG_REIMPLEMENT_API_IRQ_CLEAR                DISABLED
+#endif
+
 #ifdef VSF_SPI_CFG_IMP_REMAP_PREFIX
 #   undef VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY
 #   undef VSF_SPI_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#   undef VSF_SPI_CFG_REIMPLEMENT_API_IRQ_CLEAR
 #   define VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY               ENABLED
 #   define VSF_SPI_CFG_REIMPLEMENT_API_GET_CONFIGURATION        ENABLED
+#   define VSF_SPI_CFG_REIMPLEMENT_API_IRQ_CLEAR                ENABLED
 #endif
 
 #if VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -99,6 +106,18 @@ vsf_err_t vsf_real_spi_get_configuration(vsf_real_spi_t *spi_ptr, vsf_spi_cfg_t 
 }
 #endif
 
+#if VSF_SPI_CFG_REIMPLEMENT_API_IRQ_CLEAR == DISABLED
+vsf_spi_irq_mask_t vsf_real_spi_irq_clear(vsf_real_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(NULL != spi_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return 0;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef VSF_SPI_CFG_CAPABILITY_SUPPORT_AUTO_CS
@@ -110,6 +129,7 @@ vsf_err_t vsf_real_spi_get_configuration(vsf_real_spi_t *spi_ptr, vsf_spi_cfg_t 
 #undef vsf_real_spi_capability
 #undef vsf_real_spi_ctrl
 #undef vsf_real_spi_get_configuration
+#undef vsf_real_spi_irq_clear
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -124,6 +144,7 @@ vsf_err_t vsf_real_spi_get_configuration(vsf_real_spi_t *spi_ptr, vsf_spi_cfg_t 
 #   define vsf_imp_spi_disable                  VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_disable)
 #   define vsf_imp_spi_irq_enable               VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_irq_enable)
 #   define vsf_imp_spi_irq_disable              VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_irq_disable)
+#   define vsf_imp_spi_irq_clear                VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_irq_clear)
 #   define vsf_imp_spi_status                   VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_status)
 #   define vsf_imp_spi_capability               VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_capability)
 #   define vsf_imp_spi_cs_active                VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_cs_active)
@@ -141,6 +162,7 @@ vsf_err_t vsf_real_spi_get_configuration(vsf_real_spi_t *spi_ptr, vsf_spi_cfg_t 
 #   define vsf_remap_spi_disable                VSF_MCONNECT(VSF_SPI_CFG_IMP_REMAP_PREFIX, _spi_disable)
 #   define vsf_remap_spi_irq_enable             VSF_MCONNECT(VSF_SPI_CFG_IMP_REMAP_PREFIX, _spi_irq_enable)
 #   define vsf_remap_spi_irq_disable            VSF_MCONNECT(VSF_SPI_CFG_IMP_REMAP_PREFIX, _spi_irq_disable)
+#   define vsf_remap_spi_irq_clear              VSF_MCONNECT(VSF_SPI_CFG_IMP_REMAP_PREFIX, _spi_irq_clear)
 #   define vsf_remap_spi_status                 VSF_MCONNECT(VSF_SPI_CFG_IMP_REMAP_PREFIX, _spi_status)
 #   define vsf_remap_spi_capability             VSF_MCONNECT(VSF_SPI_CFG_IMP_REMAP_PREFIX, _spi_capability)
 #   define vsf_remap_spi_cs_active              VSF_MCONNECT(VSF_SPI_CFG_IMP_REMAP_PREFIX, _spi_cs_active)
@@ -182,6 +204,11 @@ vsf_err_t vsf_real_spi_get_configuration(vsf_real_spi_t *spi_ptr, vsf_spi_cfg_t 
         {                                                                                         \
             VSF_HAL_ASSERT(spi_ptr != NULL);                                                      \
             vsf_remap_spi_irq_disable(spi_ptr, irq_mask);                                         \
+        }                                                                                         \
+        vsf_spi_irq_mask_t vsf_imp_spi_irq_clear(vsf_imp_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask) \
+        {                                                                                         \
+            VSF_HAL_ASSERT(spi_ptr != NULL);                                                      \
+            return vsf_remap_spi_irq_clear(spi_ptr, irq_mask);                                    \
         }                                                                                         \
         vsf_spi_status_t vsf_imp_spi_status(vsf_imp_spi_t *spi_ptr)                               \
         {                                                                                         \
@@ -287,6 +314,7 @@ vsf_err_t vsf_real_spi_get_configuration(vsf_real_spi_t *spi_ptr, vsf_spi_cfg_t 
 #undef vsf_imp_spi_disable
 #undef vsf_imp_spi_irq_enable
 #undef vsf_imp_spi_irq_disable
+#undef vsf_imp_spi_irq_clear
 #undef vsf_imp_spi_status
 #undef vsf_imp_spi_capability
 #undef vsf_imp_spi_cs_active
@@ -304,6 +332,7 @@ vsf_err_t vsf_real_spi_get_configuration(vsf_real_spi_t *spi_ptr, vsf_spi_cfg_t 
 #undef vsf_remap_spi_disable
 #undef vsf_remap_spi_irq_enable
 #undef vsf_remap_spi_irq_disable
+#undef vsf_remap_spi_irq_clear
 #undef vsf_remap_spi_status
 #undef vsf_remap_spi_capability
 #undef vsf_remap_spi_cs_active

@@ -98,6 +98,15 @@ void vsf_spi_irq_disable(vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
     spi_ptr->op->irq_disable(spi_ptr, irq_mask);
 }
 
+vsf_spi_irq_mask_t vsf_spi_irq_clear(vsf_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(spi_ptr != NULL);
+    VSF_HAL_ASSERT(spi_ptr->op != NULL);
+    VSF_HAL_ASSERT(spi_ptr->op->irq_clear != NULL);
+
+    return spi_ptr->op->irq_clear(spi_ptr, irq_mask);
+}
+
 vsf_spi_status_t vsf_spi_status(vsf_spi_t *spi_ptr)
 {
     VSF_HAL_ASSERT(spi_ptr != NULL);
