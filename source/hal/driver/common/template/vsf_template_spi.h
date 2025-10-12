@@ -324,43 +324,47 @@ typedef enum vsf_spi_mode_t {
     VSF_SPI_CS_HARDWARE_MODE        = 0x01ul << 4,
 
     // Data size control (bits 8-15)
-    VSF_SPI_DATASIZE_8              = 0x00ul << 8,  //! \~english 8-bit data transfer size \~chinese 8 位数据传输大小
-    VSF_SPI_DATASIZE_16             = 0x01ul << 8,  //! \~english 16-bit data transfer size \~chinese 16 位数据传输大小
-    VSF_SPI_DATASIZE_32             = 0x02ul << 8,  //! \~english 32-bit data transfer size \~chinese 32 位数据传输大小
+    // \~english Buffer size requirements: 4-8 bits = 1 byte, 9-16 bits = 2 bytes, 17-32 bits = 4 bytes
+    // \~chinese 缓冲区大小要求：4-8 位 = 1 字节，9-16 位 = 2 字节，17-32 位 = 4 字节
+    VSF_SPI_DATASIZE_8              = 0x00ul << 8,  //! \~english 8-bit data transfer size (requires 1-byte buffer) \~chinese 8 位数据传输大小（需要 1 字节缓冲区）
+    VSF_SPI_DATASIZE_16             = 0x01ul << 8,  //! \~english 16-bit data transfer size (requires 2-byte buffer) \~chinese 16 位数据传输大小（需要 2 字节缓冲区）
+    VSF_SPI_DATASIZE_32             = 0x02ul << 8,  //! \~english 32-bit data transfer size (requires 4-byte buffer) \~chinese 32 位数据传输大小（需要 4 字节缓冲区）
     /*
     //! \~english Optional data size, if the hardware supports more data bits, we can define it inside the specific driver
     //! \~chinese 可选数据位大小，如果硬件支持更多数据位，我们可以在特定驱动里定义它
+    //! \~english Buffer size requirements: 4-8 bits = 1 byte, 9-16 bits = 2 bytes, 17-32 bits = 4 bytes
+    //! \~chinese 缓冲区大小要求：4-8 位 = 1 字节，9-16 位 = 2 字节，17-32 位 = 4 字节
     VSF_SPI_DATASIZE_VALUE_OFFSET   = 1,
     VSF_SPI_DATASIZE_BIT_OFFSET     = 8,
-    VSF_SPI_DATASIZE_4              = ( 4ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_5              = ( 5ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_6              = ( 6ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_7              = ( 7ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_8              = ( 8ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_9              = ( 9ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_10             = (10ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_11             = (11ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_12             = (12ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_13             = (13ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_14             = (14ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_15             = (15ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_16             = (16ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_17             = (17ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_18             = (18ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_19             = (19ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_20             = (20ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_21             = (21ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_22             = (22ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_23             = (23ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_24             = (24ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_25             = (25ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_26             = (26ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_27             = (27ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_28             = (28ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_29             = (29ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_30             = (30ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_31             = (31ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
-    VSF_SPI_DATASIZE_32             = (32ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,
+    VSF_SPI_DATASIZE_4              = ( 4ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 4-bit data (1-byte buffer) \~chinese 4 位数据（1 字节缓冲区）
+    VSF_SPI_DATASIZE_5              = ( 5ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 5-bit data (1-byte buffer) \~chinese 5 位数据（1 字节缓冲区）
+    VSF_SPI_DATASIZE_6              = ( 6ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 6-bit data (1-byte buffer) \~chinese 6 位数据（1 字节缓冲区）
+    VSF_SPI_DATASIZE_7              = ( 7ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 7-bit data (1-byte buffer) \~chinese 7 位数据（1 字节缓冲区）
+    VSF_SPI_DATASIZE_8              = ( 8ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 8-bit data (1-byte buffer) \~chinese 8 位数据（1 字节缓冲区）
+    VSF_SPI_DATASIZE_9              = ( 9ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 9-bit data (2-byte buffer) \~chinese 9 位数据（2 字节缓冲区）
+    VSF_SPI_DATASIZE_10             = (10ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 10-bit data (2-byte buffer) \~chinese 10 位数据（2 字节缓冲区）
+    VSF_SPI_DATASIZE_11             = (11ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 11-bit data (2-byte buffer) \~chinese 11 位数据（2 字节缓冲区）
+    VSF_SPI_DATASIZE_12             = (12ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 12-bit data (2-byte buffer) \~chinese 12 位数据（2 字节缓冲区）
+    VSF_SPI_DATASIZE_13             = (13ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 13-bit data (2-byte buffer) \~chinese 13 位数据（2 字节缓冲区）
+    VSF_SPI_DATASIZE_14             = (14ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 14-bit data (2-byte buffer) \~chinese 14 位数据（2 字节缓冲区）
+    VSF_SPI_DATASIZE_15             = (15ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 15-bit data (2-byte buffer) \~chinese 15 位数据（2 字节缓冲区）
+    VSF_SPI_DATASIZE_16             = (16ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 16-bit data (2-byte buffer) \~chinese 16 位数据（2 字节缓冲区）
+    VSF_SPI_DATASIZE_17             = (17ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 17-bit data (4-byte buffer) \~chinese 17 位数据（4 字节缓冲区）
+    VSF_SPI_DATASIZE_18             = (18ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 18-bit data (4-byte buffer) \~chinese 18 位数据（4 字节缓冲区）
+    VSF_SPI_DATASIZE_19             = (19ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 19-bit data (4-byte buffer) \~chinese 19 位数据（4 字节缓冲区）
+    VSF_SPI_DATASIZE_20             = (20ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 20-bit data (4-byte buffer) \~chinese 20 位数据（4 字节缓冲区）
+    VSF_SPI_DATASIZE_21             = (21ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 21-bit data (4-byte buffer) \~chinese 21 位数据（4 字节缓冲区）
+    VSF_SPI_DATASIZE_22             = (22ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 22-bit data (4-byte buffer) \~chinese 22 位数据（4 字节缓冲区）
+    VSF_SPI_DATASIZE_23             = (23ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 23-bit data (4-byte buffer) \~chinese 23 位数据（4 字节缓冲区）
+    VSF_SPI_DATASIZE_24             = (24ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 24-bit data (4-byte buffer) \~chinese 24 位数据（4 字节缓冲区）
+    VSF_SPI_DATASIZE_25             = (25ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 25-bit data (4-byte buffer) \~chinese 25 位数据（4 字节缓冲区）
+    VSF_SPI_DATASIZE_26             = (26ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 26-bit data (4-byte buffer) \~chinese 26 位数据（4 字节缓冲区）
+    VSF_SPI_DATASIZE_27             = (27ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 27-bit data (4-byte buffer) \~chinese 27 位数据（4 字节缓冲区）
+    VSF_SPI_DATASIZE_28             = (28ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 28-bit data (4-byte buffer) \~chinese 28 位数据（4 字节缓冲区）
+    VSF_SPI_DATASIZE_29             = (29ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 29-bit data (4-byte buffer) \~chinese 29 位数据（4 字节缓冲区）
+    VSF_SPI_DATASIZE_30             = (30ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 30-bit data (4-byte buffer) \~chinese 30 位数据（4 字节缓冲区）
+    VSF_SPI_DATASIZE_31             = (31ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 31-bit data (4-byte buffer) \~chinese 31 位数据（4 字节缓冲区）
+    VSF_SPI_DATASIZE_32             = (32ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 32-bit data (4-byte buffer) \~chinese 32 位数据（4 字节缓冲区）
     #define VSF_SPI_DATASIZE_BIT_OFFSET     VSF_SPI_DATASIZE_BIT_OFFSET
     #define VSF_SPI_DATASIZE_VALUE_OFFSET   VSF_SPI_DATASIZE_VALUE_OFFSET
     #define VSF_SPI_DATASIZE_4              VSF_SPI_DATASIZE_4
@@ -1246,7 +1250,8 @@ extern vsf_spi_capability_t vsf_spi_capability(vsf_spi_t *spi_ptr);
  * @param[out] in_buffer_ptr: Pointer to buffer for received data (can be NULL for transmit-only)
  * @param[inout] in_offset_ptr: Pointer to receive buffer offset
  * @param[in] count: Number of data units to transfer (can be 0 for QSPI operations with only command/address phases)
- * @note Data unit size is determined by the configured data size in SPI mode
+ * @note Data unit size is determined by the configured data size in SPI mode (@ref vsf_spi_mode_t)
+ * @note Buffer size requirements: 4-8 bits = 1 byte, 9-16 bits = 2 bytes, 17-32 bits = 4 bytes per data unit
  * @note In master mode, out_buffer_ptr data is sent through MOSI pin, in_buffer_ptr receives from MISO pin
  * @note In slave mode, out_buffer_ptr data is sent through MISO pin, in_buffer_ptr receives from MOSI pin
  * @note When using QSPI after configuring with vsf_spi_ctrl(), the count parameter refers to data phase units only
@@ -1265,7 +1270,8 @@ extern vsf_spi_capability_t vsf_spi_capability(vsf_spi_t *spi_ptr);
  * @param[out] in_buffer_ptr: 指向用于接收数据的缓冲区指针（仅发送时可为 NULL）
  * @param[inout] in_offset_ptr: 指向接收缓冲区偏移的指针
  * @param[in] count: 要传输的数据单元数（对于仅有命令/地址阶段的 QSPI 操作可以为 0）
- * @note 数据单元大小由 SPI 模式中配置的数据大小决定
+ * @note 数据单元大小由 SPI 模式中配置的数据大小决定（@ref vsf_spi_mode_t）
+ * @note 缓冲区大小要求：4-8 位 = 1 字节，9-16 位 = 2 字节，17-32 位 = 4 字节每个数据单元
  * @note 在主机模式下，out_buffer_ptr 数据通过 MOSI 引脚发送，in_buffer_ptr 从 MISO 引脚接收
  * @note 在从机模式下，out_buffer_ptr 数据通过 MISO 引脚发送，in_buffer_ptr 从 MOSI 引脚接收
  * @note 使用 vsf_spi_ctrl() 配置 QSPI 后，count 参数仅指数据阶段的单元数
@@ -1290,6 +1296,8 @@ extern void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr,
  * @param[in] count: Number of data units to transfer (can be 0 for QSPI operations with only command/address phases)
  * @return vsf_err_t: VSF_ERR_NONE if transfer started successfully, or error code
  * @note This is an asynchronous operation, register for completion interrupts to be notified
+ * @note Data unit size is determined by the configured data size in SPI mode (@ref vsf_spi_mode_t)
+ * @note Buffer size requirements: 4-8 bits = 1 byte, 9-16 bits = 2 bytes, 17-32 bits = 4 bytes per data unit
  * @note If both out_buffer_ptr and in_buffer_ptr are not NULL, data is exchanged in full-duplex mode
  * @note In master mode, out_buffer_ptr data is sent through MOSI pin, in_buffer_ptr receives from MISO pin
  * @note In slave mode, out_buffer_ptr data is sent through MISO pin, in_buffer_ptr receives from MOSI pin
@@ -1306,6 +1314,8 @@ extern void vsf_spi_fifo_transfer(vsf_spi_t *spi_ptr,
  * @param[in] count: 要传输的数据单元数量（对于仅有命令/地址阶段的 QSPI 操作可以为 0）
  * @return vsf_err_t: 如果传输成功启动则返回 VSF_ERR_NONE，否则返回错误码
  * @note 这是一个异步操作，注册完成中断以获得通知
+ * @note 数据单元大小由 SPI 模式中配置的数据大小决定（@ref vsf_spi_mode_t）
+ * @note 缓冲区大小要求：4-8 位 = 1 字节，9-16 位 = 2 字节，17-32 位 = 4 字节每个数据单元
  * @note 如果 out_buffer_ptr 和 in_buffer_ptr 都不为 NULL，则以全双工模式交换数据
  * @note 在主机模式下，out_buffer_ptr 数据通过 MOSI 引脚发送，in_buffer_ptr 从 MISO 引脚接收
  * @note 在从机模式下，out_buffer_ptr 数据通过 MISO 引脚发送，in_buffer_ptr 从 MOSI 引脚接收
@@ -1337,14 +1347,16 @@ extern vsf_err_t vsf_spi_cancel_transfer(vsf_spi_t *spi_ptr);
  * @param[in,out] spi_ptr: Pointer to SPI instance structure @ref vsf_spi_t
  * @param[out] sent_count: Pointer to store the number of data units transmitted (can be NULL if not needed)
  * @param[out] received_count: Pointer to store the number of data units received (can be NULL if not needed)
- * @note Data unit count is based on the configured data size (e.g., for 16-bit data size, count is in 16-bit units)
+ * @note Data unit count is based on the configured data size in SPI mode (@ref vsf_spi_mode_t)
+ * @note Buffer size requirements: 4-8 bits = 1 byte, 9-16 bits = 2 bytes, 17-32 bits = 4 bytes per data unit
  * @note For ongoing transfers, returns the current progress; for completed transfers, returns final counts
  * \~chinese
  * @brief 获取当前或最后一次 SPI 操作中已传输的数据单元数
  * @param[in,out] spi_ptr: 指向结构体 @ref vsf_spi_t 的指针
  * @param[out] sent_count: 存储已发送数据单元数的指针（如果不需要可为 NULL）
  * @param[out] received_count: 存储已接收数据单元数的指针（如果不需要可为 NULL）
- * @note 数据单元计数基于配置的数据大小（例如，对于 16 位数据大小，计数以 16 位为单位）
+ * @note 数据单元计数基于 SPI 模式中配置的数据大小（@ref vsf_spi_mode_t）
+ * @note 缓冲区大小要求：4-8 位 = 1 字节，9-16 位 = 2 字节，17-32 位 = 4 字节每个数据单元
  * @note 对于正在进行的传输，返回当前进度；对于已完成的传输，返回最终计数
  */
 extern void vsf_spi_get_transferred_count(vsf_spi_t *spi_ptr, uint_fast32_t *sent_count, uint_fast32_t *received_count);
@@ -1672,15 +1684,15 @@ static inline vsf_spi_mode_t vsf_spi_data_bits_to_mode(uint8_t data_bits)
 /**
  * \~english
  * @brief Calculate the number of bytes needed for specified SPI mode
- * @param[in] mode: SPI mode containing data size configuration
+ * @param[in] mode: SPI mode containing data size configuration (@ref vsf_spi_mode_t)
  * @return uint8_t: Number of bytes (1, 2, or 4) needed to store one data unit
- * @note Returns 1 for 1-8 bits, 2 for 9-16 bits, 4 for 17-32 bits
+ * @note Buffer size requirements: 4-8 bits = 1 byte, 9-16 bits = 2 bytes, 17-32 bits = 4 bytes
  * @note Used for buffer size calculations and memory alignment
  * \~chinese
  * @brief 计算指定 SPI 模式所需的字节数
- * @param[in] mode: 包含数据大小配置的 SPI 模式
+ * @param[in] mode: 包含数据大小配置的 SPI 模式（@ref vsf_spi_mode_t）
  * @return uint8_t: 存储一个数据单元所需的字节数（1、2 或 4）
- * @note 1-8 位返回 1，9-16 位返回 2，17-32 位返回 4
+ * @note 缓冲区大小要求：4-8 位 = 1 字节，9-16 位 = 2 字节，17-32 位 = 4 字节
  * @note 用于缓冲区大小计算和内存对齐
  */
 static inline uint8_t vsf_spi_mode_to_data_bytes(vsf_spi_mode_t mode)
