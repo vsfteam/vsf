@@ -486,14 +486,12 @@ fn main() {
         let vsf_hal_build_path = out_path.join("vsf_hal_build");
         if !vsf_hal_build_path.exists() {
             fs::create_dir_all(&vsf_hal_build_path).unwrap();
-            println!("cargo:warning=cmd: cmake -GNinja -DVSF_TARGET={cmake_model} {path}source/shell/hal/rust-embedded-hal/lib");
             Command::new("cmake").current_dir(&vsf_hal_build_path)
                         .arg("-GNinja")
                         .arg("-DVSF_TARGET=".to_string() + &cmake_model)
                         .arg("-DVSF_ARCH=".to_string() + &cmake_arch)
                         .arg(path.clone() + "source/shell/hal/rust-embedded-hal/lib")
                         .output().expect("Fail to run cmake");
-            println!("cargo:warning=cmd: ninja");
             Command::new("ninja").current_dir(&vsf_hal_build_path).output().expect("Fail to run ninja");
         }
 

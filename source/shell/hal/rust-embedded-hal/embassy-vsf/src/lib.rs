@@ -1,6 +1,7 @@
 #![cfg_attr(not(test), no_std)]
 #![allow(async_fn_in_trait)]
 #![allow(unused_macros)]
+#![allow(dead_code)]
 
 // This must go FIRST so that all the other modules see its macros.
 mod fmt;

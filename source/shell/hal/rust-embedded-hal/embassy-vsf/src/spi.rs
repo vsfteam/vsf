@@ -692,7 +692,7 @@ mod word_impl {
     use super::*;
 
     #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-    enum WordConfig {
+    pub enum WordConfig {
         #[cfg(VSF_SPI_DATASIZE_4)]
         BITS4 = into_vsf_spi_mode_t!(VSF_SPI_DATASIZE_4) as isize,
         #[cfg(VSF_SPI_DATASIZE_5)]
