@@ -218,6 +218,8 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
  *          Default implementation will assert(false) to indicate the feature is not implemented.
  *      VSF_USART_CFG_REIMPLEMENT_API_GET_CONFIGURATION for usart_get_configuration.
  *          Default implementation will assert(false) to indicate the feature is not implemented.
+ *      VSF_USART_CFG_REIMPLEMENT_API_IRQ_CLEAR for usart_irq_clear.
+ *          Default implementation will assert(false) to indicate the feature is not implemented.
  */
 
 /*\note DMA APIs below.
@@ -320,6 +322,14 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_configuration)(
     return VSF_ERR_NONE;
 }
 
+vsf_usart_irq_mask_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_clear)(
+    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,
+    vsf_usart_irq_mask_t irq_mask
+) {
+    VSF_HAL_ASSERT(NULL != usart_ptr);
+    return 0;
+}
+
 // HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -334,6 +344,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_configuration)(
 #define VSF_USART_CFG_REIMPLEMENT_API_REQUEST           ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_CTRL              ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_IRQ_CLEAR         ENABLED
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t)                            \
         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __IDX) = {               \

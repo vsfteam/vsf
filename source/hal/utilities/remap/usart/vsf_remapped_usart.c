@@ -87,6 +87,12 @@ void vsf_remapped_usart_irq_disable(vsf_remapped_usart_t *usart, vsf_usart_irq_m
     vsf_usart_irq_disable(usart->target, irq_mask);
 }
 
+vsf_usart_irq_mask_t vsf_remapped_usart_irq_clear(vsf_remapped_usart_t *usart, vsf_usart_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT((usart != NULL) && (usart->target != NULL));
+    return vsf_usart_irq_clear(usart->target, irq_mask);
+}
+
 vsf_usart_status_t vsf_remapped_usart_status(vsf_remapped_usart_t *usart)
 {
     VSF_HAL_ASSERT((usart != NULL) && (usart->target != NULL));

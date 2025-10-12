@@ -36,15 +36,21 @@
 #   define VSF_USART_CFG_REIMPLEMENT_API_GET_CONFIGURATION          DISABLED
 #endif
 
+#ifndef VSF_USART_CFG_REIMPLEMENT_API_IRQ_CLEAR
+#   define VSF_USART_CFG_REIMPLEMENT_API_IRQ_CLEAR                  DISABLED
+#endif
+
 #ifdef VSF_USART_CFG_IMP_REMAP_PREFIX
 #   undef VSF_USART_CFG_REIMPLEMENT_API_REQUEST
 #   undef VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY
 #   undef VSF_USART_CFG_REIMPLEMENT_API_CTRL
 #   undef VSF_USART_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#   undef VSF_USART_CFG_REIMPLEMENT_API_IRQ_CLEAR
 #   define VSF_USART_CFG_REIMPLEMENT_API_REQUEST                    ENABLED
 #   define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY                 ENABLED
 #   define VSF_USART_CFG_REIMPLEMENT_API_CTRL                       ENABLED
 #   define VSF_USART_CFG_REIMPLEMENT_API_GET_CONFIGURATION          ENABLED
+#   define VSF_USART_CFG_REIMPLEMENT_API_IRQ_CLEAR                  ENABLED
 #endif
 
 #if VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -90,6 +96,7 @@
 #define vsf_real_usart_capability           VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
 #define vsf_real_usart_ctrl                 VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_ctrl)
 #define vsf_real_usart_get_configuration    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_configuration)
+#define vsf_real_usart_irq_clear            VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_clear)
 #define vsf_real_usart_tx_send_break        VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_tx_send_break)
 
 /*============================ IMPLEMENTATION ================================*/
@@ -187,6 +194,18 @@ vsf_err_t vsf_real_usart_get_configuration(vsf_real_usart_t *usart_ptr, vsf_usar
 }
 #endif
 
+#if VSF_USART_CFG_REIMPLEMENT_API_IRQ_CLEAR == DISABLED
+vsf_usart_irq_mask_t vsf_real_usart_irq_clear(vsf_real_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(NULL != usart_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return 0;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY
@@ -201,6 +220,7 @@ vsf_err_t vsf_real_usart_get_configuration(vsf_real_usart_t *usart_ptr, vsf_usar
 #undef VSF_USART_CFG_REIMPLEMENT_API_REQUEST
 #undef VSF_USART_CFG_REIMPLEMENT_API_CTRL
 #undef VSF_USART_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#undef VSF_USART_CFG_REIMPLEMENT_API_IRQ_CLEAR
 #undef vsf_real_usart_t
 #undef vsf_real_usart_init
 #undef vsf_real_usart_fini
@@ -217,6 +237,7 @@ vsf_err_t vsf_real_usart_get_configuration(vsf_real_usart_t *usart_ptr, vsf_usar
 #undef vsf_real_usart_capability
 #undef vsf_real_usart_ctrl
 #undef vsf_real_usart_get_configuration
+#undef vsf_real_usart_irq_clear
 #undef vsf_real_usart_tx_send_break
 
 /*============================ IMPLEMENTATION ================================*/
@@ -231,6 +252,7 @@ vsf_err_t vsf_real_usart_get_configuration(vsf_real_usart_t *usart_ptr, vsf_usar
 #   define vsf_imp_usart_disable                    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_disable)
 #   define vsf_imp_usart_irq_enable                 VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_enable)
 #   define vsf_imp_usart_irq_disable                VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_disable)
+#   define vsf_imp_usart_irq_clear                  VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_clear)
 #   define vsf_imp_usart_status                     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_status)
 #   define vsf_imp_usart_rxfifo_get_data_count      VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_rxfifo_get_data_count)
 #   define vsf_imp_usart_rxfifo_read                VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_rxfifo_read)
@@ -253,6 +275,7 @@ vsf_err_t vsf_real_usart_get_configuration(vsf_real_usart_t *usart_ptr, vsf_usar
 #   define vsf_remap_usart_disable                  VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_disable)
 #   define vsf_remap_usart_irq_enable               VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_irq_enable)
 #   define vsf_remap_usart_irq_disable              VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_irq_disable)
+#   define vsf_remap_usart_irq_clear                VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_irq_clear)
 #   define vsf_remap_usart_status                   VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_status)
 #   define vsf_remap_usart_rxfifo_get_data_count    VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_rxfifo_get_data_count)
 #   define vsf_remap_usart_rxfifo_read              VSF_MCONNECT(VSF_USART_CFG_IMP_REMAP_PREFIX, _usart_rxfifo_read)
@@ -296,6 +319,11 @@ vsf_err_t vsf_real_usart_get_configuration(vsf_real_usart_t *usart_ptr, vsf_usar
         {                                                                                                           \
             VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
             vsf_remap_usart_irq_disable(usart_ptr, irq_mask);                                                       \
+        }                                                                                                           \
+        vsf_usart_irq_mask_t vsf_imp_usart_irq_clear(vsf_imp_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)    \
+        {                                                                                                           \
+            VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
+            return vsf_remap_usart_irq_clear(usart_ptr, irq_mask);                                                  \
         }                                                                                                           \
         vsf_usart_status_t vsf_imp_usart_status(vsf_imp_usart_t *usart_ptr)                                         \
         {                                                                                                           \
@@ -412,6 +440,7 @@ vsf_err_t vsf_real_usart_get_configuration(vsf_real_usart_t *usart_ptr, vsf_usar
 #undef vsf_imp_usart_disable
 #undef vsf_imp_usart_irq_enable
 #undef vsf_imp_usart_irq_disable
+#undef vsf_imp_usart_irq_clear
 #undef vsf_imp_usart_status
 #undef vsf_imp_usart_rxfifo_get_data_count
 #undef vsf_imp_usart_rxfifo_read
@@ -435,6 +464,7 @@ vsf_err_t vsf_real_usart_get_configuration(vsf_real_usart_t *usart_ptr, vsf_usar
 #undef vsf_remap_usart_disable
 #undef vsf_remap_usart_irq_enable
 #undef vsf_remap_usart_irq_disable
+#undef vsf_remap_usart_irq_clear
 #undef vsf_remap_usart_status
 #undef vsf_remap_usart_rxfifo_get_data_count
 #undef vsf_remap_usart_rxfifo_read
