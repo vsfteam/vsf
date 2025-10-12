@@ -373,7 +373,7 @@ typedef struct vsf_usart_isr_t {
     vsf_arch_prio_t         prio;
 } vsf_usart_isr_t;
 typedef struct vsf_usart_cfg_t {
-    uint32_t                mode;
+    vsf_usart_mode_t        mode;
     uint32_t                baudrate;
     uint32_t                rx_timeout;
     vsf_usart_isr_t         isr;
