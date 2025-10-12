@@ -610,11 +610,11 @@ enum {
  * 如果支持多个选项，那需要提供对应的 MASK 选项，方便用户在运行时切换到不同的模式。
  */
 typedef enum vsf_spi_irq_mask_t {
-    VSF_SPI_IRQ_MASK_TX             = 0x01ul << 0,  //! \~english TX FIFO threshold interrupt (triggers when TX FIFO level is below threshold) \~chinese TX FIFO 阈值中断（当 TX FIFO 水平低于阈值时触发）
-    VSF_SPI_IRQ_MASK_RX             = 0x01ul << 1,  //! \~english RX FIFO threshold interrupt (triggers when RX FIFO level is above threshold) \~chinese RX FIFO 阈值中断（当 RX FIFO 水平高于阈值时触发）
-    VSF_SPI_IRQ_MASK_TX_CPL         = 0x01ul << 2,  //! \~english TX complete interrupt (triggers when all TX data has been sent) \~chinese TX 完成中断（当所有 TX 数据发送完成时触发）
-    VSF_SPI_IRQ_MASK_RX_CPL         = 0x01ul << 3,  //! \~english RX complete interrupt (triggers when RX transfer is complete) \~chinese RX 完成中断（当 RX 传输完成时触发）
-    VSF_SPI_IRQ_MASK_OVERFLOW_ERR   = 0x01ul << 4,  //! \~english Overflow error interrupt (triggers when RX FIFO overflows) \~chinese 溢出错误中断（当 RX FIFO 溢出时触发）
+    VSF_SPI_IRQ_MASK_TX                 = 0x01ul << 0,  //! \~english TX FIFO threshold interrupt (triggers when TX FIFO level is below threshold) \~chinese TX FIFO 阈值中断（当 TX FIFO 水平低于阈值时触发）
+    VSF_SPI_IRQ_MASK_RX                 = 0x01ul << 1,  //! \~english RX FIFO threshold interrupt (triggers when RX FIFO level is above threshold) \~chinese RX FIFO 阈值中断（当 RX FIFO 水平高于阈值时触发）
+    VSF_SPI_IRQ_MASK_TX_CPL             = 0x01ul << 2,  //! \~english TX complete interrupt (triggers when all TX data has been sent) \~chinese TX 完成中断（当所有 TX 数据发送完成时触发）
+    VSF_SPI_IRQ_MASK_RX_CPL             = 0x01ul << 3,  //! \~english RX complete interrupt (triggers when RX transfer is complete) \~chinese RX 完成中断（当 RX 传输完成时触发）
+    VSF_SPI_IRQ_MASK_RX_OVERFLOW_ERR    = 0x01ul << 4,  //! \~english Overflow error interrupt (triggers when RX FIFO overflows) \~chinese 溢出错误中断（当 RX FIFO 溢出时触发）
 } vsf_spi_irq_mask_t;
 #endif
 
@@ -637,7 +637,7 @@ enum {
      * \~english Some hardware supports more different error interrupts, we can redefine it inside the specific driver.
      * \~chinese 一些硬件支持更多不同类型的错误中断，可以在特定的驱动中重新定义此中断掩码。
      */
-    VSF_SPI_IRQ_MASK_ERR                = VSF_SPI_IRQ_MASK_OVERFLOW_ERR,
+    VSF_SPI_IRQ_MASK_ERR                = VSF_SPI_IRQ_MASK_RX_OVERFLOW_ERR,
 #endif
 
 
