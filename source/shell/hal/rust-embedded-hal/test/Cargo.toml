@@ -26,6 +26,10 @@ defmt-rtt = { version = "1.0" }
 embassy-executor = { version = "0.9", git = "https://github.com/embassy-rs/embassy", features = ["arch-riscv32", "executor-thread", "defmt"] }
 embassy-hal-internal = { version = "0.3", git = "https://github.com/embassy-rs/embassy", features = [] }
 
+[target.'cfg(any(target_os = "windows", target_os = "linux", target_os = "macos"))'.dependencies]
+embassy-executor = { version = "0.9", git = "https://github.com/embassy-rs/embassy", features = ["arch-std", "executor-thread", "defmt"] }
+embassy-hal-internal = { version = "0.3", git = "https://github.com/embassy-rs/embassy", features = [] }
+
 [features]
 defmt = []
 log = []

@@ -4,7 +4,7 @@
 use embassy_executor::Spawner;
 use embassy_vsf::gpio::{Level, Output, Speed, OutputDrive};
 
-#[cfg(debug_assertions)]
+#[cfg(all(debug_assertions, use_defmt_rtt))]
 use {defmt_rtt as _};
 #[cfg(debug_assertions)]
 use defmt::*;
@@ -18,7 +18,7 @@ async fn main(_spawner: Spawner) {
     #[cfg(debug_assertions)]
     info!("Hello World!");
 
-    let mut led = Output::new(p.P3_13, Level::High, Speed::default(), OutputDrive::default());
+    let mut led = Output::new(p.P0_13, Level::High, Speed::default(), OutputDrive::default());
     loop {
         #[cfg(debug_assertions)]
         info!("high");
