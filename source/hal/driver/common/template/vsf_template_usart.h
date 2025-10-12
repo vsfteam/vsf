@@ -557,12 +557,109 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_RX_CPL           = (0x1ul << 1),  //!< \~english RX complete(for request_rx API, data is read from RX FIFO) interrupt \~chinese 接收完成中断 ( request_rx 完成，需要的数据已从 FIFO 读取)
     VSF_USART_IRQ_MASK_TX               = (0x1ul << 2),  //!< \~english TX FIFO threshold interrupt \~chinese 发送 FIFO 阈值中断
     VSF_USART_IRQ_MASK_RX               = (0x1ul << 3),  //!< \~english RX FIFO threshold interrupt \~chinese 接收 FIFO 阈值中断
+
+    /**
+     * \~english
+     * @brief USART RX timeout interrupt
+     * This interrupt is triggered when no data is received within a specified timeout period.
+     * It is useful for detecting end of transmission or communication errors.
+     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_RX_TIMEOUT in vsf_usart_irq_mask_t and define a MACRO with same name
+     * \~chinese
+     * @brief USART 接收超时中断
+     * 当在指定超时时间内没有接收到数据时触发此中断。
+     * 用于检测传输结束或通信错误。
+     * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_RX_TIMEOUT 并且实现同名宏
+     */
     VSF_USART_IRQ_MASK_RX_TIMEOUT       = (0x1ul << 4),  //!< \~english RX timeout interrupt \~chinese 接收超时中断
+#   define VSF_USART_IRQ_MASK_RX_TIMEOUT VSF_USART_IRQ_MASK_RX_TIMEOUT
+
+    /**
+     * \~english
+     * @brief USART CTS (Clear To Send) change interrupt
+     * This interrupt is triggered when the CTS signal changes state, indicating
+     * whether the remote device is ready to receive data.
+     * Used for hardware flow control in RS-232 communication.
+     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_CTS in vsf_usart_irq_mask_t and define a MACRO with same name
+     * \~chinese
+     * @brief USART CTS (清除发送) 变化中断
+     * 当 CTS 信号状态发生变化时触发此中断，指示远程设备是否准备好接收数据。
+     * 用于 RS-232 通信中的硬件流控制。
+     * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_CTS 并且实现同名宏
+     */
     VSF_USART_IRQ_MASK_CTS              = (0x1ul << 5),  //!< \~english CTS change interrupt \~chinese CTS 变化中断
+#   define VSF_USART_IRQ_MASK_CTS VSF_USART_IRQ_MASK_CTS
+
+    /**
+     * \~english
+     * @brief USART Frame error and Break error interrupts
+     *
+     * Frame Error Interrupt:
+     * This interrupt is triggered when a frame error is detected in the received data.
+     * Frame errors occur when the stop bit is not detected as expected, indicating
+     * potential synchronization issues or transmission problems.
+     *
+     * Break Error Interrupt:
+     * This interrupt is triggered when a break condition is detected on the RX line.
+     * A break condition occurs when the RX line is held low for longer than a complete
+     * character frame, typically used for signaling or error indication.
+     *
+     * Note: When a break condition occurs, it will always trigger a frame error interrupt
+     * first, as the break condition violates the normal frame format. The break error
+     * interrupt provides additional specific information about the break condition.
+     * If hardware supports these interrupts, implement VSF_USART_IRQ_MASK_FRAME_ERR and
+     * VSF_USART_IRQ_MASK_BREAK_ERR in vsf_usart_irq_mask_t and define MACROs with same names.
+     * \~chinese
+     * @brief USART 帧错误和 BREAK 错误中断
+     *
+     * 帧错误中断：
+     * 当在接收数据中检测到帧错误时触发此中断。
+     * 帧错误发生在未按预期检测到停止位时，指示潜在的同步问题或传输问题。
+     *
+     * BREAK 错误中断：
+     * 当在 RX 线上检测到 BREAK 条件时触发此中断。
+     * BREAK 条件发生在 RX 线保持低电平的时间超过完整字符帧时，通常用于信号指示或错误指示。
+     *
+     * 注意：当发生 BREAK 条件时，总是会首先触发帧错误中断，因为 BREAK 条件违反了正常的帧格式。
+     * BREAK 错误中断提供了关于 BREAK 条件的额外特定信息。
+     * 如果硬件支持这些中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_FRAME_ERR 和
+     * VSF_USART_IRQ_MASK_BREAK_ERR 并且实现同名宏。
+     */
     VSF_USART_IRQ_MASK_FRAME_ERR        = (0x1ul << 6),  //!< \~english Frame error interrupt \~chinese 帧错误中断
-    VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 7),  //!< \~english Parity error interrupt \~chinese 奇偶校验错误中断
-    VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 8),  //!< \~english Break error interrupt \~chinese BREAK 信号错误中断
+#   define VSF_USART_IRQ_MASK_FRAME_ERR VSF_USART_IRQ_MASK_FRAME_ERR
+    VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 7),  //!< \~english Break error interrupt \~chinese BREAK 信号错误中断
+#   define VSF_USART_IRQ_MASK_BREAK_ERR VSF_USART_IRQ_MASK_BREAK_ERR
+
+    /**
+     * \~english
+     * @brief USART Parity error interrupt
+     * This interrupt is triggered when a parity error is detected in the received data.
+     * Parity errors occur when the calculated parity bit does not match the received
+     * parity bit, indicating potential data corruption during transmission.
+     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_PARITY_ERR in vsf_usart_irq_mask_t and define a MACRO with same name
+     * \~chinese
+     * @brief USART 奇偶校验错误中断
+     * 当在接收数据中检测到奇偶校验错误时触发此中断。
+     * 奇偶校验错误发生在计算的奇偶校验位与接收的奇偶校验位不匹配时，指示传输过程中可能存在数据损坏。
+     * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_PARITY_ERR 并且实现同名宏
+     */
+    VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 8),  //!< \~english Parity error interrupt \~chinese 奇偶校验错误中断
+#   define VSF_USART_IRQ_MASK_PARITY_ERR VSF_USART_IRQ_MASK_PARITY_ERR
+
+    /**
+     * \~english
+     * @brief USART RX overflow error interrupt
+     * This interrupt is triggered when the RX FIFO or buffer overflows due to
+     * incoming data arriving faster than it can be processed or read.
+     * This indicates that data has been lost and requires immediate attention.
+     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR in vsf_usart_irq_mask_t and define a MACRO with same name
+     * \~chinese
+     * @brief USART 接收溢出错误中断
+     * 当 RX FIFO 或缓冲区由于传入数据到达速度超过处理或读取速度而发生溢出时触发此中断。
+     * 这表示数据已丢失，需要立即处理。
+     * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR 并且实现同名宏
+     */
     VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  = (0x1ul << 9),  //!< \~english RX overflow error interrupt \~chinese 接收溢出错误中断
+#   define VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR
 
 
     /**
