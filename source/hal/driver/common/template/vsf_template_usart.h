@@ -284,6 +284,11 @@ extern "C" {
  * If the hardware supports more modes, e.g. more parity modes, more databits, more stopbits,
  * more FIFO threshold size, we can implement it in the hardware driver.
  *
+ * The macro definitions (e.g., #define VSF_USART_FORCE_0_PARITY VSF_USART_FORCE_0_PARITY)
+ * are added to enable compile-time feature detection when VSF HAL interfaces with other HAL
+ * implementations. These macros allow the compiler to determine which features are supported
+ * at compile time, enabling conditional compilation and optimization.
+ *
  * If more new modes are added to the driver, then the corresponding MASK macros need to
  * be defined to include the values of the new modes. For example:
  * - Adding new TX FIFO Threshold options requires VSF_USART_TX_FIFO_THRESHOLD_MASK
@@ -294,6 +299,10 @@ extern "C" {
  * @brief 预定义的 VSF USART 模式，可以在特定的 HAL 驱动中重新实现。
  * 即使硬件不支持这些功能，但以下的模式必须保留。如果硬件支持更多模式，例如更多的奇偶校验模式、
  * 数据位大小、停止位大小、FIFO 阈值，可以在硬件驱动中实现它。
+ *
+ * 宏定义（例如 #define VSF_USART_FORCE_0_PARITY VSF_USART_FORCE_0_PARITY）的添加是为了
+ * 让 VSF HAL 在对接其他 HAL 时能够在编译时判断哪些功能是支持的。这些宏允许编译器在编译时
+ * 确定哪些功能被支持，从而启用条件编译和优化。
  *
  * 如果在驱动中添加更多的新模式，则需要定义对应的 MASK 宏来包含新模式的值。例如：
  * - 添加新的 TX FIFO 阈值选项需要定义 VSF_USART_TX_FIFO_THRESHOLD_MASK
@@ -311,7 +320,9 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_EVEN_PARITY       = (0x1ul << 0),    //!< \~english Even parity \~chinese 偶校验
     VSF_USART_ODD_PARITY        = (0x2ul << 0),    //!< \~english Odd parity \~chinese 奇校验
     VSF_USART_FORCE_0_PARITY    = (0x3ul << 0),    //!< \~english Force 0 parity \~chinese 强制 0 校验
+#   define VSF_USART_FORCE_0_PARITY VSF_USART_FORCE_0_PARITY
     VSF_USART_FORCE_1_PARITY    = (0x4ul << 0),    //!< \~english Force 1 parity \~chinese 强制 1 校验
+#   define VSF_USART_FORCE_1_PARITY VSF_USART_FORCE_1_PARITY
 
     /**
      * \~english
@@ -321,8 +332,11 @@ typedef enum vsf_usart_mode_t {
      */
     VSF_USART_1_STOPBIT         = (0x0ul << 3),    //!< \~english 1 stop bit \~chinese 1 个停止位
     VSF_USART_1_5_STOPBIT       = (0x1ul << 3),    //!< \~english 1.5 stop bits \~chinese 1.5 个停止位
+#   define VSF_USART_1_5_STOPBIT VSF_USART_1_5_STOPBIT
     VSF_USART_0_5_STOPBIT       = (0x2ul << 3),    //!< \~english 0.5 stop bit \~chinese 0.5 个停止位
+#   define VSF_USART_0_5_STOPBIT VSF_USART_0_5_STOPBIT
     VSF_USART_2_STOPBIT         = (0x3ul << 3),    //!< \~english 2 stop bits \~chinese 2 个停止位
+#   define VSF_USART_2_STOPBIT VSF_USART_2_STOPBIT
 
     /**
      * \~english
@@ -330,12 +344,17 @@ typedef enum vsf_usart_mode_t {
      * \~chinese
      * @brief USART 数据位长度配置选项
      */
-    VSF_USART_5_BIT_LENGTH      = (0x0ul << 5),    //!< \~english 5-bit data length \~chinese 5 位数据长度
-    VSF_USART_6_BIT_LENGTH      = (0x1ul << 5),    //!< \~english 6-bit data length \~chinese 6 位数据长度
-    VSF_USART_7_BIT_LENGTH      = (0x2ul << 5),    //!< \~english 7-bit data length \~chinese 7 位数据长度
-    VSF_USART_8_BIT_LENGTH      = (0x3ul << 5),    //!< \~english 8-bit data length \~chinese 8 位数据长度
+    VSF_USART_8_BIT_LENGTH      = (0x0ul << 5),    //!< \~english 8-bit data length \~chinese 8 位数据长度
+    VSF_USART_5_BIT_LENGTH      = (0x1ul << 5),    //!< \~english 5-bit data length \~chinese 5 位数据长度
+#   define VSF_USART_5_BIT_LENGTH VSF_USART_5_BIT_LENGTH
+    VSF_USART_6_BIT_LENGTH      = (0x2ul << 5),    //!< \~english 6-bit data length \~chinese 6 位数据长度
+#   define VSF_USART_6_BIT_LENGTH VSF_USART_6_BIT_LENGTH
+    VSF_USART_7_BIT_LENGTH      = (0x3ul << 5),    //!< \~english 7-bit data length \~chinese 7 位数据长度
+#   define VSF_USART_7_BIT_LENGTH VSF_USART_7_BIT_LENGTH
     VSF_USART_9_BIT_LENGTH      = (0x4ul << 5),    //!< \~english 9-bit data length \~chinese 9 位数据长度
+#   define VSF_USART_9_BIT_LENGTH VSF_USART_9_BIT_LENGTH
     VSF_USART_10_BIT_LENGTH     = (0x5ul << 5),    //!< \~english 10-bit data length \~chinese 10 位数据长度
+#   define VSF_USART_10_BIT_LENGTH VSF_USART_10_BIT_LENGTH
 
     /**
      * \~english
@@ -345,8 +364,11 @@ typedef enum vsf_usart_mode_t {
      */
     VSF_USART_NO_HWCONTROL      = (0x0ul << 8),    //!< \~english No hardware flow control \~chinese 无硬件流控
     VSF_USART_RTS_HWCONTROL     = (0x1ul << 8),    //!< \~english RTS hardware flow control \~chinese RTS 硬件流控
+#   define VSF_USART_RTS_HWCONTROL VSF_USART_RTS_HWCONTROL
     VSF_USART_CTS_HWCONTROL     = (0x2ul << 8),    //!< \~english CTS hardware flow control \~chinese CTS 硬件流控
+#   define VSF_USART_CTS_HWCONTROL VSF_USART_CTS_HWCONTROL
     VSF_USART_RTS_CTS_HWCONTROL = (0x3ul << 8),    //!< \~english RTS/CTS hardware flow control \~chinese RTS/CTS 硬件流控
+#   define VSF_USART_RTS_CTS_HWCONTROL VSF_USART_RTS_CTS_HWCONTROL
 
     /**
      * \~english
@@ -355,9 +377,11 @@ typedef enum vsf_usart_mode_t {
      * @brief USART 发送/接收使能/禁用选项
      */
     VSF_USART_TX_ENABLE         = (0x0ul << 9),    //!< \~english TX enabled \~chinese 发送使能
-    VSF_USART_TX_DISABLE        = (0x1ul << 9),    //!< \~english TX disabled \~chinese 发送禁用
     VSF_USART_RX_ENABLE         = (0x0ul << 10),   //!< \~english RX enabled \~chinese 接收使能
+    VSF_USART_TX_DISABLE        = (0x1ul << 9),    //!< \~english TX disabled \~chinese 发送禁用
+#   define VSF_USART_TX_DISABLE VSF_USART_TX_DISABLE
     VSF_USART_RX_DISABLE        = (0x1ul << 10),   //!< \~english RX disabled \~chinese 接收禁用
+#   define VSF_USART_RX_DISABLE VSF_USART_RX_DISABLE
 
     /**
      * \~english
@@ -366,6 +390,7 @@ typedef enum vsf_usart_mode_t {
      * @brief USART 同步时钟配置选项
      */
     VSF_USART_SYNC_CLOCK_ENABLE  = (0x0ul << 11),  //!< \~english Sync clock enabled \~chinese 同步时钟使能
+#   define VSF_USART_SYNC_CLOCK_ENABLE VSF_USART_SYNC_CLOCK_ENABLE
     VSF_USART_SYNC_CLOCK_DISABLE = (0x1ul << 11),  //!< \~english Sync clock disabled \~chinese 同步时钟禁用
 
     /**
@@ -376,6 +401,7 @@ typedef enum vsf_usart_mode_t {
      */
     VSF_USART_HALF_DUPLEX_DISABLE = (0x0ul << 14), //!< \~english Half-duplex disabled \~chinese 半双工禁用
     VSF_USART_HALF_DUPLEX_ENABLE  = (0x1ul << 14), //!< \~english Half-duplex enabled \~chinese 半双工使能
+#   define VSF_USART_HALF_DUPLEX_ENABLE VSF_USART_HALF_DUPLEX_ENABLE
 
     /**
      * \~english
@@ -386,8 +412,11 @@ typedef enum vsf_usart_mode_t {
      * 注意：某些设备可能支持额外的阈值级别
      */
     VSF_USART_TX_FIFO_THRESHOLD_EMPTY      = (0x0ul << 15), //!< \~english TX FIFO empty \~chinese 发送 FIFO 空
+#   define VSF_USART_TX_FIFO_THRESHOLD_EMPTY VSF_USART_TX_FIFO_THRESHOLD_EMPTY
     VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY = (0x1ul << 15), //!< \~english TX FIFO half empty \~chinese 发送 FIFO 半空
+#   define VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY
     VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL   = (0x2ul << 15), //!< \~english TX FIFO not full \~chinese 发送 FIFO 未满
+#   define VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL
 
     /**
      * \~english
@@ -398,11 +427,40 @@ typedef enum vsf_usart_mode_t {
      * 注意：某些设备可能支持额外的阈值级别
      */
     VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY  = (0x0ul << 17), //!< \~english RX FIFO not empty \~chinese 接收 FIFO 非空
+#   define VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
     VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL  = (0x1ul << 17), //!< \~english RX FIFO half full \~chinese 接收 FIFO 半满
+#   define VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL
     VSF_USART_RX_FIFO_THRESHOLD_FULL       = (0x2ul << 17), //!< \~english RX FIFO full \~chinese 接收 FIFO 满
+#   define VSF_USART_RX_FIFO_THRESHOLD_FULL VSF_USART_RX_FIFO_THRESHOLD_FULL
+
+    /**
+     * \~english
+     * @brief USART Pin swap and signal inversion configuration options
+     * Note: These options are not defined in the template but can be implemented
+     *       in specific hardware drivers if supported. Hardware drivers should
+     *       define these with the same names and appropriate bit positions.
+     * \~chinese
+     * @brief USART 引脚交换和信号反转配置选项
+     * 注意：这些选项在模板中未定义，但如果硬件支持，可以在特定的硬件驱动中实现。
+     *       硬件驱动应使用相同的名称和适当的位位置来定义这些选项。
+     */
+    // VSF_USART_SWAP                 = (0x1ul << 16), //!< \~english Swap RX and TX pins \~chinese 交换 RX 和 TX 引脚
+    // VSF_USART_TX_INVERT            = (0x1ul << 17), //!< \~english Invert TX pin signal \~chinese 反转 TX 引脚信号
+    // VSF_USART_RX_INVERT            = (0x1ul << 18), //!< \~english Invert RX pin signal \~chinese 反转 RX 引脚信号
 } vsf_usart_mode_t;
 #endif
 
+/**
+ * \~english
+ * @brief USART mode mask definitions for compile-time feature detection
+ * These masks are used to determine which USART features are supported by the hardware
+ * at compile time. They enable conditional compilation and optimization when VSF HAL
+ * interfaces with other HAL implementations.
+ * \~chinese
+ * @brief USART 模式掩码定义，用于编译时功能检测
+ * 这些掩码用于在编译时确定硬件支持哪些 USART 功能。当 VSF HAL 与其他 HAL 实现对接时，
+ * 它们能够启用条件编译和优化。
+ */
 enum {
 #ifndef VSF_USART_PARITY_MASK
     VSF_USART_PARITY_MASK               = VSF_USART_NO_PARITY
@@ -781,6 +839,7 @@ typedef struct vsf_usart_status_t {
             uint32_t is_rx_busy      : 1;    //!< \~english RX is busy receiving data \~chinese 接收正在进行
             uint32_t tx_fifo_thresh  : 8;    //!< \~english TX FIFO threshold level (0-255) \~chinese 发送 FIFO 阈值水平(0-255)
             uint32_t rx_fifo_thresh  : 8;    //!< \~english RX FIFO threshold level (0-255) \~chinese 接收 FIFO 阈值水平(0-255)
+            uint32_t break_sent      : 1;    //!< \~english BREAK signal sent \~chinese BREAK 信号已发送
         };
     };
 } vsf_usart_status_t;
