@@ -613,17 +613,6 @@ typedef enum vsf_i2c_irq_mask_t {
      */
     VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT          = (0x1ul <<  5),
 
-    /**
-     * \~english
-     * @brief Master mode: Error interrupt.
-     * Triggered on any error condition in master mode.
-     * Only valid in master mode.
-     * \~chinese
-     * @brief 主机模式：错误中断。
-     * 在主机模式下发生任何错误条件时触发。
-     * 仅在主机模式下有效。
-     */
-    VSF_I2C_IRQ_MASK_MASTER_ERR                     = (0x1ul <<  6),
 
     /**
      * \~english
@@ -715,21 +704,26 @@ typedef enum vsf_i2c_irq_mask_t {
      */
     VSF_I2C_IRQ_MASK_SLAVE_TRANSFER_COMPLETE        = (0x1ul << 13),
 
-    /**
-     * \~english
-     * @brief Slave mode: Error interrupt.
-     * Triggered on any error condition in slave mode.
-     * Only valid in slave mode.
-     * \~chinese
-     * @brief 从机模式：错误中断。
-     * 在从机模式下发生任何错误条件时触发。
-     * 仅在从机模式下有效。
-     */
-    VSF_I2C_IRQ_MASK_SLAVE_ERR                      = (0x1ul << 14),
 } vsf_i2c_irq_mask_t;
 #endif
 
 enum {
+#ifndef VSF_I2C_IRQ_MASK_MASTER_ERR
+    VSF_I2C_IRQ_MASK_MASTER_ERR                     = VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
+                                                    | VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK
+                                                    | VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT,  //!< \~english Combined master error interrupt mask \~chinese 组合主机错误中断掩码
+#endif
+
+    // TODO: Add slave error interrupt mask
+#ifndef VSF_I2C_IRQ_MASK_SLAVE_ERR
+    VSF_I2C_IRQ_MASK_SLAVE_ERR                      = 0,  //!< \~english Combined slave error interrupt mask \~chinese 组合从机错误中断掩码
+#endif
+
+#ifndef VSF_I2C_IRQ_MASK_ERR
+    VSF_I2C_IRQ_MASK_ERR                            = VSF_I2C_IRQ_MASK_MASTER_ERR
+                                                    | VSF_I2C_IRQ_MASK_SLAVE_ERR,     //!< \~english Combined error interrupt mask \~chinese 组合错误中断掩码
+#endif
+
 #ifndef VSF_I2C_IRQ_ALL_BITS_MASK
     VSF_I2C_IRQ_ALL_BITS_MASK                       = VSF_I2C_IRQ_MASK_MASTER_TX
                                                     | VSF_I2C_IRQ_MASK_MASTER_RX
@@ -737,15 +731,13 @@ enum {
                                                     | VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
                                                     | VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK
                                                     | VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT
-                                                    | VSF_I2C_IRQ_MASK_MASTER_ERR
                                                     | VSF_I2C_IRQ_MASK_MASTER_START_OR_RESTART_DETECT
                                                     | VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT
                                                     | VSF_I2C_IRQ_MASK_SLAVE_START_OR_RESTART_DETECT
                                                     | VSF_I2C_IRQ_MASK_SLAVE_STOP_DETECT
                                                     | VSF_I2C_IRQ_MASK_SLAVE_TX
                                                     | VSF_I2C_IRQ_MASK_SLAVE_RX
-                                                    | VSF_I2C_IRQ_MASK_SLAVE_TRANSFER_COMPLETE
-                                                    | VSF_I2C_IRQ_MASK_SLAVE_ERR,
+                                                    | VSF_I2C_IRQ_MASK_SLAVE_TRANSFER_COMPLETE,
 #endif
 };
 
