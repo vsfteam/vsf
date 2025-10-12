@@ -99,6 +99,15 @@ void vsf_usart_irq_disable(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask
     usart_ptr->op->irq_disable(usart_ptr, irq_mask);
 }
 
+vsf_usart_irq_mask_t vsf_usart_irq_clear(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(usart_ptr != NULL);
+    VSF_HAL_ASSERT(usart_ptr->op != NULL);
+    VSF_HAL_ASSERT(usart_ptr->op->irq_clear != NULL);
+
+    return usart_ptr->op->irq_clear(usart_ptr, irq_mask);
+}
+
 vsf_usart_status_t vsf_usart_status(vsf_usart_t *usart_ptr)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);

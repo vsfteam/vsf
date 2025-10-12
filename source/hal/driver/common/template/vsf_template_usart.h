@@ -234,6 +234,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_usart_capability_t, usart, capability,            VSF_MCONNECT(__prefix_name, _t) *usart_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   usart, irq_enable,            VSF_MCONNECT(__prefix_name, _t) *usart_ptr, vsf_usart_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   usart, irq_disable,           VSF_MCONNECT(__prefix_name, _t) *usart_ptr, vsf_usart_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_usart_irq_mask_t,   usart, irq_clear,             VSF_MCONNECT(__prefix_name, _t) *usart_ptr, vsf_usart_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_usart_status_t,     usart, status,                VSF_MCONNECT(__prefix_name, _t) *usart_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast32_t,          usart, rxfifo_get_data_count, VSF_MCONNECT(__prefix_name, _t) *usart_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast32_t,          usart, rxfifo_read,           VSF_MCONNECT(__prefix_name, _t) *usart_ptr, void *buffer_ptr, uint_fast32_t count) \
@@ -965,6 +966,33 @@ extern void vsf_usart_irq_disable(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t i
 
 /**
  * \~english
+ * @brief Clear interrupt flags of USART instance and return previous state
+ * @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
+ * @param[in] irq_mask: one or more values of enum @ref vsf_usart_irq_mask_t to clear
+ * @return vsf_usart_irq_mask_t: the interrupt mask state before clearing (0 if no flags were set)
+ *
+ * @note This function attempts to clear the specified interrupt flags if they are set,
+ *       and returns the state of those flags before clearing. This is useful for
+ *       polling operations and determining if interrupts occurred.
+ *       Note that if interrupts are enabled and an interrupt handler is active,
+ *       the interrupt handler may clear the interrupt flags automatically.
+ *       In such cases, this function will return 0 even if interrupts occurred.
+ *
+ * \~chinese
+ * @brief 清除 USART 实例的中断标志并返回之前的状态
+ * @param[in] usart_ptr: 指向结构体 @ref vsf_usart_t 的指针
+ * @param[in] irq_mask: 要清除的一个或多个枚举 vsf_usart_irq_mask_t 值的按位或
+ * @return vsf_usart_irq_mask_t: 清除前的中断掩码状态（如果没有标志被设置则返回0）
+ *
+ * @note 此函数尝试清除指定的中断标志（如果它们已设置），并返回清除前这些标志的状态。
+ *       这对于轮询操作和确定是否发生了中断很有用。
+ *       注意：如果中断已启用且中断处理函数处于活动状态，中断处理函数可能会自动清除中断标志。
+ *       在这种情况下，即使发生了中断，此函数也会返回0。
+ */
+extern vsf_usart_irq_mask_t vsf_usart_irq_clear(vsf_usart_t *usart_ptr, vsf_usart_irq_mask_t irq_mask);
+
+/**
+ * \~english
  * @brief Get the status of USART instance
  * @param[in] usart_ptr: a pointer to structure @ref vsf_usart_t
  * @return vsf_usart_status_t: return all status of current USART
@@ -1271,6 +1299,7 @@ static inline vsf_err_t vsf_usart_clear_break(vsf_usart_t *usart_ptr)
 #   define vsf_usart_disable(__USART)                    VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_disable)               ((__vsf_usart_t *)(__USART))
 #   define vsf_usart_irq_enable(__USART, ...)            VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_enable)            ((__vsf_usart_t *)(__USART), ##__VA_ARGS__)
 #   define vsf_usart_irq_disable(__USART, ...)           VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_disable)           ((__vsf_usart_t *)(__USART), ##__VA_ARGS__)
+#   define vsf_usart_irq_clear(__USART, ...)             VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_irq_clear)             ((__vsf_usart_t *)(__USART), ##__VA_ARGS__)
 #   define vsf_usart_status(__USART)                     VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_status)                ((__vsf_usart_t *)(__USART))
 #   define vsf_usart_rxfifo_get_data_count(__USART, ...) VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_rxfifo_get_data_count) ((__vsf_usart_t *)(__USART), ##__VA_ARGS__)
 #   define vsf_usart_rxfifo_read(__USART, ...)           VSF_MCONNECT(VSF_USART_CFG_PREFIX, _usart_rxfifo_read)           ((__vsf_usart_t *)(__USART), ##__VA_ARGS__)
