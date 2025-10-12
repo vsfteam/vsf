@@ -517,6 +517,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_ctrl)(
 #define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_REQUEST           ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_CTRL              ENABLED
+#define VSF_USART_CFG_REIMPLEMENT_API_IRQ_CLEAR         ENABLED
 #define VSF_USART_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t)                            \
         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart, __IDX) = {               \
