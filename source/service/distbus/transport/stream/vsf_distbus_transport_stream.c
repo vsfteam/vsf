@@ -27,7 +27,7 @@
 #define __VSF_DISTBUS_TRANSPORT_STREAM_CLASS_IMPLEMENT
 #include "./vsf_distbus_transport_stream.h"
 
-#if VSF_USE_SIMPLE_STREAM == ENABLED
+#if VSF_USE_DISTBUS == ENABLED && VSF_USE_SIMPLE_STREAM == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
