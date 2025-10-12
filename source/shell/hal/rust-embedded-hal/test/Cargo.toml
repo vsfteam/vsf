@@ -11,6 +11,21 @@ repository = "https://github.com/vsfteam/vsf"
 [dependencies]
 embassy-vsf = { path = "../embassy-vsf", features = ["defmt"] }
 
+panic-probe = { version = "1.0", features = ["print-defmt"] }
+defmt = "1.0"
+
+[target.'cfg(all(target_arch = "arm", target_os = "none"))'.dependencies]
+embassy-executor = { version = "0.9", git = "https://github.com/embassy-rs/embassy", features = ["arch-cortex-m", "executor-thread", "defmt"] }
+embassy-hal-internal = { version = "0.3", git = "https://github.com/embassy-rs/embassy", features = ["cortex-m", "prio-bits-4"] }
+
+cortex-m = { version = "0.7", features = ["inline-asm", "critical-section-single-core"] }
+cortex-m-rt = { version = "0.7", features = ["device"] }
+defmt-rtt = { version = "1.0" }
+
+[target.'cfg(all(target_arch = "riscv32", target_os = "none"))'.dependencies]
+embassy-executor = { version = "0.9", git = "https://github.com/embassy-rs/embassy", features = ["arch-riscv32", "executor-thread", "defmt"] }
+embassy-hal-internal = { version = "0.3", git = "https://github.com/embassy-rs/embassy", features = [] }
+
 [features]
 defmt = []
 log = []
