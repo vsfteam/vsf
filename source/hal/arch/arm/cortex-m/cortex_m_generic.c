@@ -105,6 +105,58 @@ bool vsf_arch_low_level_init(void)
 }
 
 /*----------------------------------------------------------------------------*
+ * Irq Implementation                                                         *
+ *----------------------------------------------------------------------------*/
+
+VSF_CAL_WEAK(vsf_irq_enable)
+void vsf_irq_enable(int irqn)
+{
+    NVIC_EnableIRQ(irqn);
+}
+
+VSF_CAL_WEAK(vsf_irq_disable)
+void vsf_irq_disable(int irqn)
+{
+    NVIC_DisableIRQ(irqn);
+}
+
+VSF_CAL_WEAK(vsf_irq_is_enabled)
+bool vsf_irq_is_enabled(int irqn)
+{
+    return NVIC_GetEnableIRQ(irqn);
+}
+
+VSF_CAL_WEAK(vsf_irq_pend)
+void vsf_irq_pend(int irqn)
+{
+    NVIC_SetPendingIRQ(irqn);
+}
+
+VSF_CAL_WEAK(vsf_irq_unpend)
+void vsf_irq_unpend(int irqn)
+{
+    NVIC_ClearPendingIRQ(irqn);
+}
+
+VSF_CAL_WEAK(vsf_irq_is_pending)
+bool vsf_irq_is_pending(int irqn)
+{
+    return NVIC_GetPendingIRQ(irqn);
+}
+
+VSF_CAL_WEAK(vsf_irq_set_priority)
+void vsf_irq_set_priority(int irqn, uint32_t priority)
+{
+    NVIC_SetPriority(irqn, priority);
+}
+
+VSF_CAL_WEAK(vsf_irq_get_priority)
+uint32_t vsf_irq_get_priority(int irqn)
+{
+    return NVIC_GetPriority(irqn);
+}
+
+/*----------------------------------------------------------------------------*
  * System Timer Implementation                                                *
  *----------------------------------------------------------------------------*/
 

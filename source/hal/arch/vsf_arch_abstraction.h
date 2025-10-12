@@ -662,6 +662,15 @@ extern vsf_gint_state_t vsf_set_interrupt(vsf_gint_state_t level);
 extern vsf_gint_state_t vsf_disable_interrupt(void);
 extern vsf_gint_state_t vsf_enable_interrupt(void);
 
+extern void vsf_irq_enable(int irqn);
+extern void vsf_irq_disable(int irqn);
+extern bool vsf_irq_is_enabled(int irqn);
+extern void vsf_irq_pend(int irqn);
+extern void vsf_irq_unpend(int irqn);
+extern bool vsf_irq_is_pending(int irqn);
+extern void vsf_irq_set_priority(int irqn, uint32_t priority);
+extern uint32_t vsf_irq_get_priority(int irqn);
+
 extern void vsf_arch_sleep(uint_fast32_t mode);
 extern void vsf_arch_reset(void);
 extern void vsf_arch_shutdown(void);
