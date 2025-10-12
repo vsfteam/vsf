@@ -224,8 +224,8 @@ unsafe extern "C" fn vsf_spi_on_interrupt(
 
 /// SPI driver.
 pub struct Spi<M: PeriMode> {
-    pub(crate) info: &'static Info,
-    pub(crate) state: &'static State,
+    info: &'static Info,
+    state: &'static State,
     current_word_size: word_impl::Config,
     _phantom: PhantomData<M>,
 }
@@ -673,7 +673,7 @@ impl<'d> Spi<Async> {
     }
 }
 
-pub(crate) trait SealedWord {
+pub trait SealedWord {
     const CONFIG: word_impl::Config;
 }
 

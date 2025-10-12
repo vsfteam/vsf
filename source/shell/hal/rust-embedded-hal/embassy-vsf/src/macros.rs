@@ -127,7 +127,7 @@ macro_rules! __interrupt_mod {
 
             pub mod typelevel {
                 use super::{InterruptExt, Priority};
-                trait SealedInterrupt {}
+                pub trait SealedInterrupt {}
                 pub trait Interrupt: SealedInterrupt {
                     const IRQ: super::Interrupt;
                     #[inline]
