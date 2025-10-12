@@ -430,13 +430,14 @@ typedef enum vsf_spi_mode_t {
     /*
     //! \~english Optional data line, if the hardware supports more data lines, we can define it inside the specific driver
     //! \~chinese 可选数据线，如果硬件支持更多数据线，我们可以在特定驱动里定义它
-    VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX    = (0x00ul << 16),    // 2 line, full-duplex, standard spi
-    VSF_SPI_DATALINE_2_LINE_RX_ONLY        = (0x01ul << 16),    // 2 line, but rx only
-    VSF_SPI_DATALINE_2_LINE_TX_ONLY        = (0x02ul << 16),    // 2 line, but tx only
-    VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX    = (0x03ul << 16),    // 1 line, half-duplex
-    VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX    = (0x04ul << 16),    // 2 line, half-duplex, dual spi
-    VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX    = (0x05ul << 16),    // 4 line, half-duplex, quad spi
-    VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX    = (0x06ul << 16),    // 8 line, half-duplex, octal spi
+    VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX    = (0x00ul << 16),    // MOSI+MISO, full-duplex, standard spi
+    VSF_SPI_DATALINE_2_LINE_RX_ONLY        = (0x01ul << 16),    // MOSI+MISO, but rx only (MISO)
+    VSF_SPI_DATALINE_2_LINE_TX_ONLY        = (0x02ul << 16),    // MOSI+MISO, but tx only (MOSI)
+    VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX    = (0x03ul << 16),    // 1 line (MOSI or MISO), half-duplex
+    VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX    = (0x04ul << 16),    // 2 line (MOSI+MISO), half-duplex, dual spi
+    VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX    = (0x05ul << 16),    // 4 line (IO0+IO1+IO2+IO3), half-duplex, quad spi
+    VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX    = (0x06ul << 16),    // 8 line (IO0+IO1+IO2+IO3+IO4+IO5+IO6+IO7), half-duplex, octal spi
+    VSF_SPI_DATALINE_16_LINE_HALF_DUPLEX   = (0x07ul << 16),    // 16 line (IO0+IO1+IO2+IO3+IO4+IO5+IO6+IO7+IO8+IO9+IO10+IO11+IO12+IO13+IO14+IO15), half-duplex, hexadeca spi
     #define VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX     VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX
     #define VSF_SPI_DATALINE_2_LINE_RX_ONLY         VSF_SPI_DATALINE_2_LINE_RX_ONLY
     #define VSF_SPI_DATALINE_2_LINE_TX_ONLY         VSF_SPI_DATALINE_2_LINE_TX_ONLY
@@ -444,11 +445,13 @@ typedef enum vsf_spi_mode_t {
     #define VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX     VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX
     #define VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX     VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX
     #define VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX     VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX
+    #define VSF_SPI_DATALINE_16_LINE_HALF_DUPLEX    VSF_SPI_DATALINE_16_LINE_HALF_DUPLEX
     #define VSF_SPI_DATALINE_MASK                  (  VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX \
                                                     | VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX \
                                                     | VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX \
                                                     | VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX \
-                                                    | VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX)
+                                                    | VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX \
+                                                    | VSF_SPI_DATALINE_16_LINE_HALF_DUPLEX)
     */
 
     /*
@@ -620,6 +623,36 @@ typedef enum vsf_spi_irq_mask_t {
     VSF_SPI_IRQ_MASK_TX_CPL             = 0x01ul << 2,  //! \~english TX complete interrupt (triggers when all TX data has been sent) \~chinese TX 完成中断（当所有 TX 数据发送完成时触发）
     VSF_SPI_IRQ_MASK_RX_CPL             = 0x01ul << 3,  //! \~english RX complete interrupt (triggers when RX transfer is complete) \~chinese RX 完成中断（当 RX 传输完成时触发）
     VSF_SPI_IRQ_MASK_RX_OVERFLOW_ERR    = 0x01ul << 4,  //! \~english Overflow error interrupt (triggers when RX FIFO overflows) \~chinese 溢出错误中断（当 RX FIFO 溢出时触发）
+
+    /**
+     * \~english
+     * @brief SPI CRC error interrupt
+     * This interrupt is triggered when a CRC error is detected in the received data.
+     * CRC errors occur when the calculated CRC value does not match the received
+     * CRC value, indicating potential data corruption during transmission.
+     * Note: If hardware supports this interrupt, implement VSF_SPI_IRQ_MASK_CRC_ERR in vsf_spi_irq_mask_t and define a MACRO with same name
+     * \~chinese
+     * @brief SPI CRC 错误中断
+     * 当在接收数据中检测到 CRC 错误时触发此中断。
+     * CRC 错误发生在计算的 CRC 值与接收的 CRC 值不匹配时，指示传输过程中可能存在数据损坏。
+     * 注意：如果硬件支持此中断，在 vsf_spi_irq_mask_t 中定义 VSF_SPI_IRQ_MASK_CRC_ERR 并且实现同名宏
+     */
+    // VSF_SPI_IRQ_MASK_CRC_ERR          = 0x01ul << 5,  //! \~english CRC error interrupt \~chinese CRC 错误中断
+
+    /**
+     * \~english
+     * @brief SPI Frame error interrupt
+     * This interrupt is triggered when a frame error is detected in the SPI communication.
+     * Frame errors occur when the SPI frame format is violated, such as incorrect
+     * bit timing, unexpected clock edges, or protocol violations.
+     * Note: If hardware supports this interrupt, implement VSF_SPI_IRQ_MASK_FRAME_ERR in vsf_spi_irq_mask_t and define a MACRO with same name
+     * \~chinese
+     * @brief SPI 帧错误中断
+     * 当在 SPI 通信中检测到帧错误时触发此中断。
+     * 帧错误发生在 SPI 帧格式被违反时，例如错误的位时序、意外的时钟边沿或协议违规。
+     * 注意：如果硬件支持此中断，在 vsf_spi_irq_mask_t 中定义 VSF_SPI_IRQ_MASK_FRAME_ERR 并且实现同名宏
+     */
+    // VSF_SPI_IRQ_MASK_FRAME_ERR        = 0x01ul << 6,  //! \~english Frame error interrupt \~chinese 帧错误中断
 } vsf_spi_irq_mask_t;
 #endif
 
