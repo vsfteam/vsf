@@ -34,13 +34,19 @@
 #   define VSF_I2C_CFG_REIMPLEMENT_API_GET_CONFIGURATION        DISABLED
 #endif
 
+#ifndef VSF_I2C_CFG_REIMPLEMENT_API_IRQ_CLEAR
+#   define VSF_I2C_CFG_REIMPLEMENT_API_IRQ_CLEAR                DISABLED
+#endif
+
 #ifdef VSF_I2C_CFG_IMP_REMAP_PREFIX
 #   undef VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY
 #   undef VSF_I2C_CFG_REIMPLEMENT_API_CTRL
 #   undef VSF_I2C_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#   undef VSF_I2C_CFG_REIMPLEMENT_API_IRQ_CLEAR
 #   define VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY               ENABLED
 #   define VSF_I2C_CFG_REIMPLEMENT_API_GET_CONFIGURATION        ENABLED
 #   define VSF_I2C_CFG_REIMPLEMENT_API_CTRL                     ENABLED
+#   define VSF_I2C_CFG_REIMPLEMENT_API_IRQ_CLEAR                ENABLED
 #endif
 
 #if VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -69,6 +75,7 @@
 #define vsf_real_i2c_capability         VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)
 #define vsf_real_i2c_ctrl               VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_ctrl)
 #define vsf_real_i2c_get_configuration  VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_get_configuration)
+#define vsf_real_i2c_irq_clear          VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_irq_clear)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ LOCAL VARIABLES ===============================*/
@@ -119,10 +126,23 @@ vsf_err_t vsf_real_i2c_get_configuration(vsf_real_i2c_t *i2c_ptr, vsf_i2c_cfg_t 
 }
 #endif
 
+#if VSF_I2C_CFG_REIMPLEMENT_API_IRQ_CLEAR == DISABLED
+vsf_i2c_irq_mask_t vsf_real_i2c_irq_clear(vsf_real_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(NULL != i2c_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return 0;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_I2C_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#undef VSF_I2C_CFG_REIMPLEMENT_API_IRQ_CLEAR
 #undef VSF_I2C_CFG_CAPABILITY_IRQ_MASK
 #undef VSF_I2C_CFG_CAPABILITY_SUPPORT_NO_START
 #undef VSF_I2C_CFG_CAPABILITY_SUPPORT_NO_STOP_RESTART
@@ -134,6 +154,7 @@ vsf_err_t vsf_real_i2c_get_configuration(vsf_real_i2c_t *i2c_ptr, vsf_i2c_cfg_t 
 #undef vsf_real_i2c_capability
 #undef vsf_real_i2c_ctrl
 #undef vsf_real_i2c_get_configuration
+#undef vsf_real_i2c_irq_clear
 
 /*============================ MACROS ========================================*/
 
@@ -152,6 +173,7 @@ vsf_err_t vsf_real_i2c_get_configuration(vsf_real_i2c_t *i2c_ptr, vsf_i2c_cfg_t 
 #   define vsf_imp_i2c_get_transferred_count    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_get_transferred_count)
 #   define vsf_imp_i2c_ctrl                     VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_ctrl)
 #   define vsf_imp_i2c_get_configuration        VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_get_configuration)
+#   define vsf_imp_i2c_irq_clear                VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_irq_clear)
 
 #   define vsf_remap_i2c_t                      VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_t)
 #   define vsf_remap_i2c_init                   VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_init)
@@ -167,6 +189,7 @@ vsf_err_t vsf_real_i2c_get_configuration(vsf_real_i2c_t *i2c_ptr, vsf_i2c_cfg_t 
 #   define vsf_remap_i2c_get_transferred_count VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_get_transferred_count)
 #   define vsf_remap_i2c_ctrl                   VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_ctrl)
 #   define vsf_remap_i2c_get_configuration      VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_get_configuration)
+#   define vsf_remap_i2c_irq_clear              VSF_MCONNECT(VSF_I2C_CFG_IMP_REMAP_PREFIX, _i2c_irq_clear)
 
 #   define VSF_I2C_CFG_IMP_REMAP_FUNCTIONS                                                         \
         vsf_err_t vsf_imp_i2c_init(vsf_imp_i2c_t *i2c_ptr, vsf_i2c_cfg_t *cfg_ptr)                 \
@@ -245,6 +268,11 @@ vsf_err_t vsf_real_i2c_get_configuration(vsf_real_i2c_t *i2c_ptr, vsf_i2c_cfg_t 
         {                                                                                          \
             VSF_HAL_ASSERT(i2c_ptr != NULL);                                                       \
             return vsf_remap_i2c_get_configuration(i2c_ptr, cfg_ptr);                              \
+        }                                                                                          \
+        vsf_i2c_irq_mask_t vsf_imp_i2c_irq_clear(vsf_imp_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask) \
+        {                                                                                          \
+            VSF_HAL_ASSERT(i2c_ptr != NULL);                                                       \
+            return vsf_remap_i2c_irq_clear(i2c_ptr, irq_mask);                                     \
         }
 #endif
 
@@ -294,6 +322,7 @@ vsf_err_t vsf_real_i2c_get_configuration(vsf_real_i2c_t *i2c_ptr, vsf_i2c_cfg_t 
 #undef vsf_imp_i2c_get_transferred_count
 #undef vsf_imp_i2c_ctrl
 #undef vsf_imp_i2c_get_configuration
+#undef vsf_imp_i2c_irq_clear
 
 #undef vsf_remap_i2c_t
 #undef vsf_remap_i2c_init
@@ -308,5 +337,6 @@ vsf_err_t vsf_real_i2c_get_configuration(vsf_real_i2c_t *i2c_ptr, vsf_i2c_cfg_t 
 #undef vsf_remap_i2c_get_transferred_count
 #undef vsf_remap_i2c_ctrl
 #undef vsf_remap_i2c_get_configuration
+#undef vsf_remap_i2c_irq_clear
 
 #endif  /* VSF_HAL_USE_I2C */

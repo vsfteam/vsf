@@ -98,6 +98,15 @@ void vsf_i2c_irq_disable(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
     i2c_ptr->op->irq_disable(i2c_ptr, irq_mask);
 }
 
+vsf_i2c_irq_mask_t vsf_i2c_irq_clear(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(i2c_ptr != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2c_ptr->op->irq_clear != NULL);
+
+    return i2c_ptr->op->irq_clear(i2c_ptr, irq_mask);
+}
+
 vsf_i2c_status_t vsf_i2c_status(vsf_i2c_t *i2c_ptr)
 {
     VSF_HAL_ASSERT(i2c_ptr != NULL);
@@ -192,6 +201,7 @@ vsf_err_t vsf_i2c_ctrl(vsf_i2c_t *i2c_ptr, vsf_i2c_ctrl_t ctrl, void *param)
 
     return i2c_ptr->op->ctrl(i2c_ptr, ctrl, param);
 }
+
 
 #   endif /* VSF_I2C_CFG_MULTI_CLASS == ENABLED */
 #endif    /* VSF_HAL_USE_I2C == ENABLED */
