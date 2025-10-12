@@ -1,12 +1,12 @@
 
 use core::future::poll_fn;
 use core::marker::PhantomData;
-use core::sync::atomic::{Ordering, AtomicPtr, AtomicU32};
+use core::sync::atomic::{Ordering, AtomicPtr};
 use core::task::Poll;
 use core::ptr;
 use paste::paste;
 
-use embassy_hal_internal::{Peri, PeripheralType};
+use embassy_hal_internal::Peri;
 pub use embedded_hal_02::spi::{Mode, Phase, Polarity, MODE_0, MODE_1, MODE_2, MODE_3};
 use embassy_sync::waitqueue::AtomicWaker;
 
@@ -19,6 +19,11 @@ use crate::word;
 use super::Hertz;
 
 use crate::vsf_hal::{*};
+
+#[cfg(vsf_spi_irq_mask_t_is_u32)]
+type AtomicIrqMask = core::sync::atomic::AtomicU32;
+#[cfg(vsf_spi_irq_mask_t_is_i32)]
+type AtomicIrqMask = core::sync::atomic::AtomicI32;
 
 #[cfg(bindgen_enum_type_moduleconsts)]
 macro_rules! into_vsf_spi_mode_t {($mode:ident) => { vsf_spi_mode_t::$mode }}
@@ -113,17 +118,17 @@ impl Default for Config {
 }
 
 impl Config {
-    fn raw_phase(&self) -> u32 {
+    fn raw_phase(&self) -> into_enum_type!(vsf_spi_mode_t) {
         match self.mode.phase {
-            Phase::CaptureOnSecondTransition => into_vsf_spi_mode_t!(VSF_SPI_CPHA_HIGH) as u32,
-            Phase::CaptureOnFirstTransition => into_vsf_spi_mode_t!(VSF_SPI_CPHA_LOW) as u32,
+            Phase::CaptureOnSecondTransition => into_vsf_spi_mode_t!(VSF_SPI_CPHA_HIGH),
+            Phase::CaptureOnFirstTransition => into_vsf_spi_mode_t!(VSF_SPI_CPHA_LOW),
         }
     }
 
-    fn raw_polarity(&self) -> u32 {
+    fn raw_polarity(&self) -> into_enum_type!(vsf_spi_mode_t) {
         match self.mode.polarity {
-            Polarity::IdleHigh => into_vsf_spi_mode_t!(VSF_SPI_CPOL_HIGH) as u32,
-            Polarity::IdleLow => into_vsf_spi_mode_t!(VSF_SPI_CPOL_LOW) as u32,
+            Polarity::IdleHigh => into_vsf_spi_mode_t!(VSF_SPI_CPOL_HIGH),
+            Polarity::IdleLow => into_vsf_spi_mode_t!(VSF_SPI_CPOL_LOW),
         }
     }
 
@@ -135,7 +140,7 @@ impl Config {
 /// Configure vsf_spi.
 /// 
 /// config_fix is set by caller with Tx/Rx related configurations
-fn _vsf_spi_config(info: &Info, state: &State, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void, irqhandler: vsf_spi_isr_handler_t) -> Result<(), ConfigError> {
+fn _vsf_spi_config(info: &Info, state: &State, config: &Config, config_fix: into_enum_type!(vsf_spi_mode_t), target_ptr: *mut ::core::ffi::c_void, irqhandler: vsf_spi_isr_handler_t) -> Result<(), ConfigError> {
     unsafe {
         let vsf_spi = info.vsf_spi.load(Ordering::Relaxed);
         let cap = vsf_spi_capability(vsf_spi);
@@ -149,11 +154,12 @@ fn _vsf_spi_config(info: &Info, state: &State, config: &Config, config_fix: u32,
         let spi_config = &state._config as *const vsf_spi_cfg_t as *mut vsf_spi_cfg_t;
         state.config.store(&state._config as *const vsf_spi_cfg_t as *mut vsf_spi_cfg_t, Ordering::Relaxed);
 
-        (*spi_config).mode = config.bit_order as u32 | config_fix | config.raw_phase() | config.raw_polarity() | {
+        (*spi_config).mode = config.bit_order as into_enum_type!(vsf_spi_mode_t)
+        | config_fix | config.raw_phase() | config.raw_polarity() | {
             if config.is_master {
-                into_vsf_spi_mode_t!(VSF_SPI_MASTER) as u32
+                into_vsf_spi_mode_t!(VSF_SPI_MASTER)
             } else {
-                into_vsf_spi_mode_t!(VSF_SPI_SLAVE) as u32
+                into_vsf_spi_mode_t!(VSF_SPI_SLAVE)
             }
         };
         (*spi_config).clock_hz = config.frequency.0;
@@ -166,7 +172,7 @@ fn _vsf_spi_config(info: &Info, state: &State, config: &Config, config_fix: u32,
     Ok(())
 }
 
-fn _vsf_spi_config_and_enable(info: &Info, state: &State, config: &Config, config_fix: u32, target_ptr: *mut ::core::ffi::c_void, irqhandler: vsf_spi_isr_handler_t) -> Result<(), ConfigError> {
+fn _vsf_spi_config_and_enable(info: &Info, state: &State, config: &Config, config_fix: into_enum_type!(vsf_spi_mode_t), target_ptr: *mut ::core::ffi::c_void, irqhandler: vsf_spi_isr_handler_t) -> Result<(), ConfigError> {
     _vsf_spi_config(info, state, config, config_fix, target_ptr, irqhandler)?;
     unsafe {
         let vsf_spi = info.vsf_spi.load(Ordering::Relaxed);
@@ -188,10 +194,10 @@ fn _vsf_spi_drop(info: &Info) {
 
 fn _vsf_spi_check_error(irq_mask: into_enum_type!(vsf_spi_irq_mask_t)) -> Result<(), Error> {
     #[cfg(VSF_SPI_IRQ_MASK_CRC_ERR)]
-    if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_CRC_ERR) as into_enum_type!(vsf_spi_irq_mask_t) != 0 {
+    if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_CRC_ERR) != 0 {
         return Err(Error::Crc);
     }
-    if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_OVERFLOW_ERR) as into_enum_type!(vsf_spi_irq_mask_t) != 0 {
+    if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_OVERFLOW_ERR) != 0 {
         return Err(Error::RxOverrun);
     }
 
@@ -206,10 +212,10 @@ unsafe extern "C" fn vsf_spi_on_interrupt(
     let s = target_ptr as *const State;
     let s = unsafe { &*s };
 
-    let mut transfer_irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) as u32 | into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as u32;
-    if transfer_irq_mask & irq_mask as u32 != 0 {
+    let transfer_irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) | into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL);
+    if transfer_irq_mask & irq_mask != 0 {
         unsafe {
-            vsf_spi_irq_disable(vsf_spi, transfer_irq_mask as into_enum_type!(vsf_spi_irq_mask_t));
+            vsf_spi_irq_disable(vsf_spi, transfer_irq_mask);
         }
         s.irq_mask.fetch_or(transfer_irq_mask, Ordering::Relaxed);
         s.waker.wake();
@@ -294,7 +300,7 @@ impl<'d, M: PeriMode> Spi<M> {
                     data.as_ptr() as *mut ::core::ffi::c_void, &rx_offset as *const uint_fast32_t as *mut uint_fast32_t,
                     data.len() as uint_fast32_t
                 );
-                if let Err(error) = _vsf_spi_check_error(vsf_spi_irq_clear(vsf_spi, VSF_SPI_IRQ_MASK_ERR as into_enum_type!(vsf_spi_irq_mask_t))) {
+                if let Err(error) = _vsf_spi_check_error(vsf_spi_irq_clear(vsf_spi, VSF_SPI_IRQ_MASK_ERR)) {
                     return Err(error);
                 }
             }
@@ -306,26 +312,25 @@ impl<'d, M: PeriMode> Spi<M> {
     /// If necessary, the write buffer will be copied into RAM (see struct description for detail).
     pub fn blocking_transfer<W: Word>(&mut self, read: &mut [W], write: &[W]) -> Result<(), Error> {
         unsafe {
-            let mut read_len = read.len();
-            let mut write_len = write.len();
+            let read_len = read.len();
+            let write_len = write.len();
             let mut read_ptr = read.as_ptr() as *mut ::core::ffi::c_void;
             let mut write_ptr = write.as_ptr() as *mut ::core::ffi::c_void;
 
             let vsf_spi = self.info.vsf_spi.load(Ordering::Relaxed);
             let xfer_len = core::cmp::max(read_len, write_len);
             let xfer_common_len = core::cmp::min(read_len, write_len);
-            let mut irq_mask: u32 = 0;
             let tx_offset: uint_fast32_t = 0 as uint_fast32_t;
             let rx_offset: uint_fast32_t = 0 as uint_fast32_t;
             let mut tx_offset_ptr = &tx_offset as *const uint_fast32_t as *mut uint_fast32_t;
             let mut rx_offset_ptr = &rx_offset as *const uint_fast32_t as *mut uint_fast32_t;
             let mut xfered_len = 0;
-            let mut err_mask = 0 as u32;
+            let mut err_mask = 0 as into_enum_type!(vsf_spi_irq_mask_t);
 
             self.set_word_size(W::CONFIG);
             while xfered_len < xfer_len {
                 let cur_len = if xfered_len < xfer_common_len {
-                    err_mask = VSF_SPI_IRQ_MASK_ERR as u32;
+                    err_mask = VSF_SPI_IRQ_MASK_ERR;
                     xfer_common_len
                 } else {
                     if xfered_len >= read_len {
@@ -333,7 +338,7 @@ impl<'d, M: PeriMode> Spi<M> {
                         rx_offset_ptr = 0 as *mut uint_fast32_t;
                         read_ptr = 0 as *mut ::core::ffi::c_void;
                     } else if xfered_len >= write_len {
-                        err_mask = VSF_SPI_IRQ_MASK_ERR as u32;
+                        err_mask = VSF_SPI_IRQ_MASK_ERR;
                         tx_offset_ptr = 0 as *mut uint_fast32_t;
                         write_ptr = 0 as *mut ::core::ffi::c_void;
                     }
@@ -345,7 +350,7 @@ impl<'d, M: PeriMode> Spi<M> {
                     read_ptr, rx_offset_ptr,
                     cur_len as uint_fast32_t
                 );
-                if let Err(error) = _vsf_spi_check_error(vsf_spi_irq_clear(vsf_spi, err_mask as into_enum_type!(vsf_spi_irq_mask_t))) {
+                if let Err(error) = _vsf_spi_check_error(vsf_spi_irq_clear(vsf_spi, err_mask)) {
                     return Err(error);
                 }
                 if tx_offset_ptr != 0 as *mut uint_fast32_t {
@@ -374,7 +379,7 @@ impl<'d, M: PeriMode> Spi<M> {
                     data_ptr, &rx_offset as *const uint_fast32_t as *mut uint_fast32_t,
                     data.len() as uint_fast32_t
                 );
-                if let Err(error) = _vsf_spi_check_error(vsf_spi_irq_clear(vsf_spi, VSF_SPI_IRQ_MASK_ERR as into_enum_type!(vsf_spi_irq_mask_t))) {
+                if let Err(error) = _vsf_spi_check_error(vsf_spi_irq_clear(vsf_spi, VSF_SPI_IRQ_MASK_ERR)) {
                     return Err(error);
                 }
             }
@@ -502,7 +507,7 @@ impl<'d> Spi<Async> {
             let len = data.len();
 
             self.set_word_size(W::CONFIG);
-            vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
+            vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL));
             vsf_spi_request_transfer(vsf_spi,
                 ptr as *mut ::core::ffi::c_void,
                 0 as *mut ::core::ffi::c_void,
@@ -511,8 +516,8 @@ impl<'d> Spi<Async> {
 
             let s = self.state;
             poll_fn(|cx| -> Poll<Result<(), Error>> {
-                if s.irq_mask.swap(0, Ordering::Relaxed) & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) as u32 != 0 {
-                    vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
+                if s.irq_mask.swap(0, Ordering::Relaxed) & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) != 0 {
+                    vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL));
                     Poll::Ready(Ok(()))
                 } else {
                     s.waker.register(cx.waker());
@@ -533,7 +538,7 @@ impl<'d> Spi<Async> {
             let len = data.len();
 
             self.set_word_size(W::CONFIG);
-            vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
+            vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL));
             vsf_spi_request_transfer(vsf_spi,
                 ptr as *mut ::core::ffi::c_void,
                 0 as *mut ::core::ffi::c_void,
@@ -543,13 +548,13 @@ impl<'d> Spi<Async> {
             let s = self.state;
             poll_fn(|cx| -> Poll<Result<(), Error>> {
                 let irq_mask = s.irq_mask.swap(0, Ordering::Relaxed);
-                if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as u32 != 0 {
-                    vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
+                if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) != 0 {
+                    vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL));
                     Poll::Ready(Ok(()))
                 } else {
-                    match _vsf_spi_check_error(irq_mask as into_enum_type!(vsf_spi_irq_mask_t)) {
+                    match _vsf_spi_check_error(irq_mask) {
                         Err(e) => {
-                            vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
+                            vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL));
                             Poll::Ready(Err(e))
                         },
                         Ok(()) => {
@@ -570,8 +575,8 @@ impl<'d> Spi<Async> {
     /// If `write` is shorter it is padded with zero bytes.
     pub async fn transfer<W: Word>(&mut self, read: &mut [W], write: &[W]) -> Result<(), Error> {
         unsafe {
-            let mut read_len = read.len();
-            let mut write_len = write.len();
+            let read_len = read.len();
+            let write_len = write.len();
             let mut read_ptr = read.as_ptr() as *mut ::core::ffi::c_void;
             let mut write_ptr = write.as_ptr() as *mut ::core::ffi::c_void;
 
@@ -579,25 +584,25 @@ impl<'d> Spi<Async> {
             let xfer_len = core::cmp::max(read_len, write_len);
             let xfer_common_len = core::cmp::min(read_len, write_len);
             let mut xfered_len = 0;
-            let mut irq_mask: u32 = 0;
+            let mut irq_mask = 0 as into_enum_type!(vsf_spi_irq_mask_t);
 
             self.set_word_size(W::CONFIG);
             while xfered_len < xfer_len {
                 let cur_len = if xfered_len < xfer_common_len {
-                    irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as u32 | VSF_SPI_IRQ_MASK_ERR as u32;
+                    irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) | VSF_SPI_IRQ_MASK_ERR;
                     xfer_common_len
                 } else {
                     if xfered_len >= read_len {
-                        irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL) as u32;
+                        irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_TX_CPL);
                         read_ptr = 0 as *mut ::core::ffi::c_void;
                     } else if xfered_len >= write_len {
-                        irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as u32 | VSF_SPI_IRQ_MASK_ERR as u32;
+                        irq_mask = into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) | VSF_SPI_IRQ_MASK_ERR;
                         write_ptr = 0 as *mut ::core::ffi::c_void;
                     }
                     xfer_len - xfered_len
                 };
 
-                vsf_spi_irq_enable(vsf_spi, irq_mask as into_enum_type!(vsf_spi_irq_mask_t));
+                vsf_spi_irq_enable(vsf_spi, irq_mask);
                 vsf_spi_request_transfer(vsf_spi,
                     write_ptr, read_ptr,
                     cur_len as uint_fast32_t
@@ -606,17 +611,17 @@ impl<'d> Spi<Async> {
                 let s = self.state;
                 poll_fn(|cx| {
                     let irq_mask = s.irq_mask.swap(0, Ordering::Relaxed);
-                    if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as u32 != 0 {
+                    if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) != 0 {
                         Poll::Ready(Ok(()))
                     } else {
-                        match _vsf_spi_check_error(irq_mask as into_enum_type!(vsf_spi_irq_mask_t)) {
-                            Err(e) => { vsf_spi_irq_disable(vsf_spi, irq_mask as into_enum_type!(vsf_spi_irq_mask_t)); return Poll::Ready(Err(e)) },
+                        match _vsf_spi_check_error(irq_mask) {
+                            Err(e) => { vsf_spi_irq_disable(vsf_spi, irq_mask); return Poll::Ready(Err(e)) },
                             Ok(()) => { s.waker.register(cx.waker()); Poll::Pending },
                         }
                     }
                 }).await?;
 
-                vsf_spi_irq_disable(vsf_spi, irq_mask as into_enum_type!(vsf_spi_irq_mask_t));
+                vsf_spi_irq_disable(vsf_spi, irq_mask);
                 xfered_len += cur_len as usize;
             }
         }
@@ -638,7 +643,7 @@ impl<'d> Spi<Async> {
             let len = data.len();
 
             self.set_word_size(W::CONFIG);
-            vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
+            vsf_spi_irq_enable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL));
             vsf_spi_request_transfer(vsf_spi,
                 ptr as *mut ::core::ffi::c_void,
                 ptr as *mut ::core::ffi::c_void,
@@ -648,13 +653,13 @@ impl<'d> Spi<Async> {
             let s = self.state;
             poll_fn(|cx| -> Poll<Result<(), Error>> {
                 let irq_mask = s.irq_mask.swap(0, Ordering::Relaxed);
-                if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as u32 != 0 {
-                    vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
+                if irq_mask & into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) != 0 {
+                    vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL));
                     Poll::Ready(Ok(()))
                 } else {
-                    match _vsf_spi_check_error(irq_mask as into_enum_type!(vsf_spi_irq_mask_t)) {
+                    match _vsf_spi_check_error(irq_mask) {
                         Err(e) => {
-                            vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL) as into_enum_type!(vsf_spi_irq_mask_t));
+                            vsf_spi_irq_disable(vsf_spi, into_vsf_spi_irq_mask_t!(VSF_SPI_IRQ_MASK_RX_CPL));
                             Poll::Ready(Err(e))
                         },
                         Ok(()) => {
@@ -811,7 +816,7 @@ mod word_impl {
 
 struct State {
     waker: AtomicWaker,
-    irq_mask: AtomicU32,
+    irq_mask: AtomicIrqMask,
     config: AtomicPtr<vsf_spi_cfg_t>,
     _config: vsf_spi_cfg_t,
 }
@@ -835,7 +840,7 @@ impl State {
     const fn new() -> Self {
         Self {
             waker: AtomicWaker::new(),
-            irq_mask: AtomicU32::new(0),
+            irq_mask: AtomicIrqMask::new(0),
             config: AtomicPtr::new(ptr::null_mut()),
             _config: vsf_spi_cfg_t::new(),
         }

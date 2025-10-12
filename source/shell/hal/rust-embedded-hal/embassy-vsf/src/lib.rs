@@ -1,5 +1,6 @@
 #![cfg_attr(not(test), no_std)]
 #![allow(async_fn_in_trait)]
+#![allow(unused_macros)]
 
 // This must go FIRST so that all the other modules see its macros.
 mod fmt;
@@ -234,6 +235,8 @@ mod vsf_hal {
 #[cfg(bindgen_enum_type_moduleconsts)]
 macro_rules! into_enum_type {($type:ident) => { $type::Type }}
 #[cfg(bindgen_enum_type_moduleconsts)]
+macro_rules! into_vsf_err_t {($err:ident) => { vsf_err_t::$err }}
+#[cfg(bindgen_enum_type_moduleconsts)]
 macro_rules! into_fsm_rt_t {($state:ident) => { fsm_rt_t::$state }}
 #[cfg(bindgen_enum_type_moduleconsts)]
 macro_rules! into_vsf_stream_evt_t {($evt:ident) => { vsf_stream_evt_t::$evt }}
@@ -244,6 +247,8 @@ macro_rules! into_vsf_hw_peripheral_en_t {($mode:ident) => { vsf_hw_peripheral_e
 
 #[cfg(bindgen_enum_type_consts)]
 macro_rules! into_enum_type {($type:ident) => { $type }}
+#[cfg(bindgen_enum_type_consts)]
+macro_rules! into_vsf_err_t {($err:ident) => { paste!{[<vsf_err_t_ $err>]} }}
 #[cfg(bindgen_enum_type_consts)]
 macro_rules! into_fsm_rt_t {($state:ident) => { paste!{[<fsm_rt_t_ $state>]} }}
 #[cfg(bindgen_enum_type_consts)]

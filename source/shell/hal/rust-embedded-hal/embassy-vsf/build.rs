@@ -8,6 +8,7 @@ use shellexpand;
 use regex::Regex;
 
 const BINDGEN_ENUM_VAR: bindgen::EnumVariation = bindgen::EnumVariation::Consts;
+//const BINDGEN_ENUM_VAR: bindgen::EnumVariation = bindgen::EnumVariation::ModuleConsts;
 
 const BINDGEN_DEFINITIONS: [&'static str; 2] = [
     "__VSF__",
@@ -16,7 +17,7 @@ const BINDGEN_DEFINITIONS: [&'static str; 2] = [
 
 const PERIPHERIALS: [&'static str; 4] = ["gpio", "usart", "spi", "i2c"];
 
-const CONSTANTS_MACRO: [(&'static str, &'static str); 65] = [
+const CONSTANTS_MACRO: [(&'static str, &'static str); 66] = [
     // USART optional constants defined in MACRO
     ("vsf_usart_status_t", "VSF_USART_STATUS_BREAK_SENT"),
     ("vsf_usart_mode_t", "VSF_USART_5_BIT_LENGTH"),
@@ -84,9 +85,10 @@ const CONSTANTS_MACRO: [(&'static str, &'static str); 65] = [
     ("vsf_spi_mode_t", "VSF_SPI_CRC_ENABLED"),
     ("vsf_spi_mode_t", "VSF_SPI_CRC_DISABLED"),
     ("vsf_spi_ctrl_t", "VSF_SPI_CTRL_SET_DATASIZE"),
+    ("vsf_spi_irq_mask_t", "VSF_SPI_IRQ_MASK_CRC_ERR"),
 ];
 
-const CONSTANTS_ENUM: [(&'static str, &'static str); 121] = [
+const CONSTANTS_ENUM: [(&'static str, &'static str); 122] = [
     // GPIO constants
     ("", "VSF_HW_GPIO_PIN_COUNT"),
     ("vsf_gpio_mode_t", "VSF_GPIO_ANALOG"),
@@ -179,6 +181,7 @@ const CONSTANTS_ENUM: [(&'static str, &'static str); 121] = [
     ("vsf_spi_mode_t", "VSF_SPI_CRC_ENABLED"),
     ("vsf_spi_mode_t", "VSF_SPI_CRC_DISABLED"),
     ("vsf_spi_ctrl_t", "VSF_SPI_CTRL_SET_DATASIZE"),
+    ("vsf_spi_irq_mask_t", "VSF_SPI_IRQ_MASK_CRC_ERR"),
     // peripherial enable/disable
     ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO0"),
     ("vsf_hw_peripheral_en_t", "VSF_HW_EN_GPIO1"),
@@ -223,8 +226,16 @@ const FUNCTIONS: [&'static str; 2] = [
     "vsf_hw_clkrst_region_set_bit",
     "vsf_hw_clkrst_region_clear_bit",
 ];
-const TYPES: [&'static str; 1] = [
+const TYPES: [&'static str; 5] = [
     "vsf_hw_peripheral_en_t",
+    "vsf_usart_mode_t",
+    "vsf_usart_irq_mask_t",
+    "vsf_spi_mode_t",
+    "vsf_spi_irq_mask_t",
+];
+const CTYPES: [(&'static str, &'static str); 2] = [
+    ("::core::ffi::c_int", "i32"),
+    ("::core::ffi::c_uint", "u32"),
 ];
 
 const INTERRUPT_CFG: [(&'static str, &'static str); 2] = [
@@ -538,7 +549,19 @@ fn main() {
     // add constants in CONSTANTS_ENUM
     'outer: for constant_enum in CONSTANTS_ENUM {
         println!("cargo::rustc-check-cfg=cfg({})", constant_enum.1);
-        if let Some(cur_value) = extract_const_integer::<u64>(&bindings_lines, &(String::from(constant_enum.0) + "_" + constant_enum.1)) {
+        if let Some(cur_value) = {
+            if BINDGEN_ENUM_VAR == bindgen::EnumVariation::Consts {
+                if constant_enum.0 != "" {
+                    extract_const_integer::<u64>(&bindings_lines, &(String::from(constant_enum.0) + "_" + constant_enum.1))
+                } else {
+                    extract_const_integer::<u64>(&bindings_lines, &constant_enum.1)
+                }
+            } else if BINDGEN_ENUM_VAR == bindgen::EnumVariation::ModuleConsts {
+                extract_const_integer::<u64>(&bindings_lines, &constant_enum.1)
+            } else {
+                panic!("should not run till here");
+            }
+        } {
             for constant_macro in CONSTANTS_MACRO {
                 if constant_macro.1 == constant_enum.1 && !constants_macro.contains_key(&constant_macro) {
                     continue 'outer;
@@ -584,17 +607,28 @@ fn main() {
 
     // parse types
     for _type in TYPES {
+        let mut type_value = String::from("");
         println!("cargo::rustc-check-cfg=cfg({_type})");
         if BINDGEN_ENUM_VAR == bindgen::EnumVariation::Consts {
-            if extract_type(&bindings_lines, _type) {
-                println!("cargo:warning=type: {_type} enabled");
-                println!("cargo:rustc-cfg={_type}");
-            }
+            type_value = extract_type(&bindings_lines, _type);
         } else if BINDGEN_ENUM_VAR == bindgen::EnumVariation::ModuleConsts {
-            if extract_module(&bindings_lines, _type) {
-                println!("cargo:warning=type: {_type} enabled");
-                println!("cargo:rustc-cfg={_type}");
+            type_value = extract_enum_module_type(&bindings_lines, _type);
+        }
+
+        let mut type_value_short: &'static str = "";
+        for ctype in CTYPES {
+            println!("cargo::rustc-check-cfg=cfg({_type}_is_{})", ctype.1);
+        }
+        for ctype in CTYPES {
+            if type_value == ctype.0 {
+                type_value_short = ctype.1;
+                break;
             }
+        }
+        if type_value_short != "" {
+            println!("cargo:warning=type: {_type} enabled as type {type_value_short}");
+            println!("cargo:rustc-cfg={_type}");
+            println!("cargo:rustc-cfg={_type}_is_{type_value_short}");
         }
     }
 
@@ -886,34 +920,42 @@ fn extract_function(lines: &Vec<&str>, name: &str) -> bool {
     return matched;
 }
 
-fn extract_type(lines: &Vec<&str>, name: &str) -> bool {
-    let mut matched = false;
+fn extract_type(lines: &Vec<&str>, name: &str) -> String {
     for line in lines {
         let parts: Vec<&str> = line.split_whitespace().collect();
         // pub type TYPE_NAME =
-        if parts.len() >= 3 && parts[0] == "pub" && parts[1] == "type" {
+        if parts.len() == 5 && parts[0] == "pub" && parts[1] == "type" && parts[3] == "=" {
             if parts[2] == name {
-                matched = true;
-                break;
+                return String::from(parts[4].strip_suffix(";").unwrap());
             }
         }
     }
-    return matched;
+    "".to_string()
 }
 
-fn extract_module(lines: &Vec<&str>, name: &str) -> bool {
+fn extract_enum_module_type(lines: &Vec<&str>, name: &str) -> String {
     let mut matched = false;
     for line in lines {
         let parts: Vec<&str> = line.split_whitespace().collect();
+        let parts_len = parts.len();
         // pub mod MODULE_NAME {
-        if parts.len() >= 3 && parts[0] == "pub" && parts[1] == "mod" {
-            if parts[2] == name {
-                matched = true;
-                break;
+        //   pub type Type = ......;
+        // }
+        if !matched {
+            if parts_len == 4 && parts[0] == "pub" && parts[1] == "mod" && parts[3] == "{" {
+                if parts[2] == name {
+                    matched = true;
+                }
+            }
+        } else {
+            if parts_len == 1 && parts[0] == "}" {
+                matched = false;
+            } else if parts_len == 5 && parts[0] == "pub" && parts[1] == "type" && parts[2] == "Type" && parts[3] == "=" {
+                return String::from(parts[4].strip_suffix(";").unwrap());
             }
         }
     }
-    return matched;
+    "".to_string()
 }
 
 fn extract_const_integer<T>(lines: &Vec<&str>, name: &str) -> Option<T>
