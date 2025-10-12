@@ -685,7 +685,7 @@ typedef struct vsf_usart_isr_t {
  * 包含初始化和配置 USART 实例所需的所有参数
  */
 typedef struct vsf_usart_cfg_t {
-    uint32_t                mode;           //!< \~english USART working mode \~chinese USART 工作模式
+    vsf_usart_mode_t        mode;           //!< \~english USART working mode \~chinese USART 工作模式
     uint32_t                baudrate;       //!< \~english Baudrate in Hz \~chinese 波特率(Hz)
     uint32_t                rx_timeout;     //!< \~english RX timeout in microseconds \~chinese 接收超时时间(微秒)
 #   ifdef VSF_USART_IRQ_MASK_RX_IDLE
