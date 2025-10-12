@@ -84,36 +84,36 @@ macro_rules! __interrupt_mod {
             }
             pub unsafe trait InterruptExt: InterruptNumber + Copy {
                 #[inline]
-                unsafe fn enable(self) {
-                    crate::vsf_hal::vsf_irq_enable(self.number().into())
+                fn enable(self) {
+                    unsafe { crate::vsf_hal::vsf_irq_enable(self.number().into()) }
                 }
                 #[inline]
-                unsafe fn disable(self) {
-                    crate::vsf_hal::vsf_irq_disable(self.number().into())
+                fn disable(self) {
+                    unsafe { crate::vsf_hal::vsf_irq_disable(self.number().into()) }
                 }
                 #[inline]
-                unsafe fn is_enabled(self) -> bool {
-                    crate::vsf_hal::vsf_irq_is_enabled(self.number().into())
+                fn is_enabled(self) -> bool {
+                    unsafe { crate::vsf_hal::vsf_irq_is_enabled(self.number().into()) }
                 }
                 #[inline]
-                unsafe fn pend(self) {
-                    crate::vsf_hal::vsf_irq_pend(self.number().into())
+                fn pend(self) {
+                    unsafe { crate::vsf_hal::vsf_irq_pend(self.number().into()) }
                 }
                 #[inline]
-                unsafe fn unpend(self) {
-                    crate::vsf_hal::vsf_irq_unpend(self.number().into())
+                fn unpend(self) {
+                    unsafe { crate::vsf_hal::vsf_irq_unpend(self.number().into()) }
                 }
                 #[inline]
-                unsafe fn is_pending(self) -> bool {
-                    crate::vsf_hal::vsf_irq_is_pending(self.number().into())
+                fn is_pending(self) -> bool {
+                    unsafe { crate::vsf_hal::vsf_irq_is_pending(self.number().into()) }
                 }
                 #[inline]
-                unsafe fn get_priority(self) -> Priority {
-                    crate::vsf_hal::vsf_irq_get_priority(self.number().into()) as Priority
+                fn get_priority(self) -> Priority {
+                    unsafe { crate::vsf_hal::vsf_irq_get_priority(self.number().into()) as Priority }
                 }
                 #[inline]
-                unsafe fn set_priority(self, prio: Priority) {
-                    crate::vsf_hal::vsf_irq_set_priority(self.number().into(), prio as u32)
+                fn set_priority(self, prio: Priority) {
+                    unsafe { crate::vsf_hal::vsf_irq_set_priority(self.number().into(), prio as u32) }
                 }
             }
             unsafe impl<T: InterruptNumber + Copy> InterruptExt for T {}
@@ -131,35 +131,35 @@ macro_rules! __interrupt_mod {
                 pub trait Interrupt: SealedInterrupt {
                     const IRQ: super::Interrupt;
                     #[inline]
-                    unsafe fn enable() {
+                    fn enable() {
                         Self::IRQ.enable()
                     }
                     #[inline]
-                    unsafe fn disable() {
+                    fn disable() {
                         Self::IRQ.disable()
                     }
                     #[inline]
-                    unsafe fn is_enabled() -> bool {
+                    fn is_enabled() -> bool {
                         Self::IRQ.is_enabled()
                     }
                     #[inline]
-                    unsafe fn pend() {
+                    fn pend() {
                         Self::IRQ.pend()
                     }
                     #[inline]
-                    unsafe fn unpend() {
+                    fn unpend() {
                         Self::IRQ.unpend()
                     }
                     #[inline]
-                    unsafe fn is_pending() -> bool {
+                    fn is_pending() -> bool {
                         Self::IRQ.is_pending()
                     }
                     #[inline]
-                    unsafe fn get_priority() -> Priority {
+                    fn get_priority() -> Priority {
                         Self::IRQ.get_priority()
                     }
                     #[inline]
-                    unsafe fn set_priority(prio: Priority) {
+                    fn set_priority(prio: Priority) {
                         Self::IRQ.set_priority(prio)
                     }
                 }
