@@ -214,7 +214,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2c, slave_request,                 VSF_MCONNECT(__prefix_name, _t) *i2c_ptr, bool transmit_or_receive,     \
         uint_fast16_t count, uint8_t* buffer_ptr)                                                                                                                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, uint_fast16_t,        i2c, slave_get_transferred_count, VSF_MCONNECT(__prefix_name, _t) *i2c_ptr)                                 \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2c, ctrl,                          VSF_MCONNECT(__prefix_name, _t) *i2c_ptr, vsf_i2c_ctrl_t ctrl, void* param)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2c, ctrl,                          VSF_MCONNECT(__prefix_name, _t) *i2c_ptr, vsf_i2c_ctrl_t ctrl, void* param) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2c_irq_mask_t,   i2c, irq_clear,                     VSF_MCONNECT(__prefix_name, _t) *i2c_ptr, vsf_i2c_irq_mask_t irq_mask)
 
 /*============================ TYPES =========================================*/
 
@@ -1281,6 +1282,38 @@ extern uint_fast16_t vsf_i2c_slave_get_transferred_count(vsf_i2c_t *i2c_ptr);
  */
 extern vsf_err_t vsf_i2c_ctrl(vsf_i2c_t *i2c_ptr, vsf_i2c_ctrl_t ctrl, void * param);
 
+/**
+ * \~english
+ * @brief Clear interrupt flags of I2C instance and return previous state
+ * @param[in] i2c_ptr: a pointer to structure @ref vsf_i2c_t
+ * @param[in] irq_mask: one or more values of enum @ref vsf_i2c_irq_mask_t to clear
+ * @return vsf_i2c_irq_mask_t: the interrupt mask state before clearing
+ *
+ * @note This function attempts to clear the specified interrupt flags if they are set,
+ *       and returns the state of those flags before clearing. For each bit in irq_mask:
+ *       - If the corresponding bit in the return value is 1: the interrupt flag was set
+ *         and has been cleared by this function
+ *       - If the corresponding bit in the return value is 0: the interrupt flag was not set
+ *         (either no interrupt occurred, or it was already cleared by an interrupt handler)
+ *       This is useful for polling operations and determining if interrupts occurred.
+ *       Note that if interrupts are enabled and an interrupt handler is active,
+ *       the interrupt handler may clear the interrupt flags automatically.
+ *
+ * \~chinese
+ * @brief 清除 I2C 实例的中断标志并返回之前的状态
+ * @param[in] i2c_ptr: 指向结构体 @ref vsf_i2c_t 的指针
+ * @param[in] irq_mask: 要清除的一个或多个枚举 vsf_i2c_irq_mask_t 值的按位或
+ * @return vsf_i2c_irq_mask_t: 清除前的中断掩码状态
+ *
+ * @note 此函数尝试清除指定的中断标志（如果它们已设置），并返回清除前这些标志的状态。
+ *       对于 irq_mask 中的每一位：
+ *       - 如果返回值的对应位为1：该中断标志之前被设置，已被此函数清除
+ *       - 如果返回值的对应位为0：该中断标志之前未被设置（要么没有发生中断，要么已被中断处理函数清除）
+ *       这对于轮询操作和确定是否发生了中断很有用。
+ *       注意：如果中断已启用且中断处理函数处于活动状态，中断处理函数可能会自动清除中断标志。
+ */
+extern vsf_i2c_irq_mask_t vsf_i2c_irq_clear(vsf_i2c_t *i2c_ptr, vsf_i2c_irq_mask_t irq_mask);
+
 /*============================ INCLUDES ======================================*/
 
 #include "hal/driver/common/i2c/i2c_request.h"
@@ -1297,6 +1330,7 @@ extern vsf_err_t vsf_i2c_ctrl(vsf_i2c_t *i2c_ptr, vsf_i2c_ctrl_t ctrl, void * pa
 #   define vsf_i2c_disable(__I2C)                           VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_disable)                      ((__vsf_i2c_t *)(__I2C))
 #   define vsf_i2c_irq_enable(__I2C, ...)                   VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_enable)                   ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
 #   define vsf_i2c_irq_disable(__I2C, ...)                  VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_disable)                  ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
+#   define vsf_i2c_irq_clear(__I2C, ...)                    VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_irq_clear)                    ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)
 #   define vsf_i2c_status(__I2C)                            VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_status)                       ((__vsf_i2c_t *)(__I2C))
 #   define vsf_i2c_capability(__I2C)                        VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_capability)                   ((__vsf_i2c_t *)(__I2C))
 #   define vsf_i2c_master_fifo_transfer(__I2C, ...)         VSF_MCONNECT(VSF_I2C_CFG_PREFIX, _i2c_master_fifo_transfer)         ((__vsf_i2c_t *)(__I2C), ##__VA_ARGS__)

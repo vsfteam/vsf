@@ -87,6 +87,12 @@ void vsf_remapped_i2c_irq_disable(vsf_remapped_i2c_t *i2c, vsf_i2c_irq_mask_t ir
     vsf_i2c_irq_disable(i2c->target, irq_mask);
 }
 
+vsf_i2c_irq_mask_t vsf_remapped_i2c_irq_clear(vsf_remapped_i2c_t *i2c, vsf_i2c_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT((i2c != NULL) && (i2c->target != NULL));
+    return vsf_i2c_irq_clear(i2c->target, irq_mask);
+}
+
 vsf_i2c_status_t vsf_remapped_i2c_status(vsf_remapped_i2c_t *i2c)
 {
     VSF_HAL_ASSERT((i2c != NULL) && (i2c->target != NULL));
