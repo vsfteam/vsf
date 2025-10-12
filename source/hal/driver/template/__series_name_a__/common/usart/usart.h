@@ -239,8 +239,8 @@ typedef struct vsf_usart_status_t {
             uint32_t is_busy         : 1;
             uint32_t is_tx_busy      : 1;
             uint32_t is_rx_busy      : 1;
-            uint32_t tx_fifo_thresh  : 8;
-            uint32_t rx_fifo_thresh  : 8;
+            uint32_t tx_fifo_level   : 8;
+            uint32_t rx_fifo_level   : 8;
         };
     };
 } vsf_usart_status_t;
