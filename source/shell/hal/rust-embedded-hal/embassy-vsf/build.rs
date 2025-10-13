@@ -453,6 +453,7 @@ fn main() {
     let arch_infos = GLOBAL_ARCH_INFO.lock().unwrap();
     let mut cmake_arch: &'static str = "";
     let mut arch_name: &'static str = "";
+    let mut target_mcu = true;
     for arch in arch_infos.iter() {
         if (arch.detect)() {
             println!("cargo:warning=ARCH: {}", arch.name);
@@ -467,7 +468,8 @@ fn main() {
             cmake_arch = arch.cmake_arch;
             arch_name = arch.name;
             bindgen_model = String::from((arch.bindgen_model)(&cmake_model));
-            if arch.target_mcu {
+            target_mcu = arch.target_mcu;
+            if target_mcu {
                 println!("cargo:rustc-cfg=target_mcu");
             } else {
                 println!("cargo:rustc-cfg=target_hostos");
@@ -675,6 +677,16 @@ fn main() {
                 interrupt_str.push_str(&format!("{interrupt_name} = {interrupt_index},\n"));
                 interrupt_func_dec_str.push_str(&format!("fn {interrupt_name}();\n"));
                 interrupt_vecotr_str.push_str(&format!("Vector {{ _handler: {interrupt_name} }},\n"));
+
+                if !target_mcu {
+                    let isr_c = String::from(interrupt_name) + ".c";
+                    fs::write(out_path.join(&isr_c), &format!("void {interrupt_name}(void) {{
+                        while (1);
+                    }}\n")).unwrap();
+                    cc::Build::new()
+                        .file(out_path.join(&isr_c))
+                        .compile(interrupt_name);
+                }
             } else {
                 interrupt_vecotr_str.push_str("Vector { _reserved: 0 },\n");
             }
@@ -686,6 +698,7 @@ fn main() {
 
     // generate device.x
     fs::write(out_path.join("device.x"), device_x_str).unwrap();
+    // generate pac.rs
     fs::write(out_path.join("pac.rs"), String::from(&format!("
         #[derive(Copy, Clone, Debug, PartialEq, Eq)]
         #[cfg_attr(feature = \"defmt\", derive(defmt::Format))]
