@@ -10,9 +10,6 @@ repository = "https://github.com/vsfteam/vsf"
 
 [dependencies]
 embassy-embedded-hal = "0.5"
-embassy-sync = { version = "0.7", git = "https://github.com/embassy-rs/embassy", features = ["defmt"] }
-embassy-time = { version = "0.5", git = "https://github.com/embassy-rs/embassy", features = ["defmt", "defmt-timestamp-uptime", "tick-hz-32_768"] }
-embassy-usb = { version = "0.5", git = "https://github.com/embassy-rs/embassy", features = ["defmt"] }
 embassy-futures = { version = "0.1", git = "https://github.com/embassy-rs/embassy" }
 
 embedded-hal-02 = { package = "embedded-hal", version = "0.2.6", features = ["unproven"] }
@@ -25,8 +22,6 @@ embedded-hal-nb = { version = "1.0" }
 embedded-can = "0.4"
 
 critical-section = "1.1"
-defmt = "1.0"
-panic-probe = { version = "1.0", features = ["print-defmt"] }
 paste = "1.0"
 
 vsf-hal-macros = { path = "./vsf-hal-macros" }
@@ -34,6 +29,13 @@ vsf-hal-macros = { path = "./vsf-hal-macros" }
 [target.'cfg(all(target_arch = "arm", target_os = "none"))'.dependencies]
 embassy-executor = { version = "0.9", git = "https://github.com/embassy-rs/embassy", features = ["arch-cortex-m", "executor-thread", "defmt"] }
 embassy-hal-internal = { version = "0.3", git = "https://github.com/embassy-rs/embassy", features = ["cortex-m", "prio-bits-4"] }
+
+embassy-sync = { version = "0.7", git = "https://github.com/embassy-rs/embassy", features = ["defmt"] }
+embassy-time = { version = "0.5", git = "https://github.com/embassy-rs/embassy", features = ["defmt", "defmt-timestamp-uptime", "tick-hz-32_768"] }
+embassy-usb = { version = "0.5", git = "https://github.com/embassy-rs/embassy", features = ["defmt"] }
+
+defmt = "1.0"
+panic-probe = { version = "1.0", features = ["print-defmt"] }
 
 cortex-m = { version = "0.7", features = ["inline-asm", "critical-section-single-core"] }
 cortex-m-rt = { version = "0.7", features = ["device"] }
@@ -43,15 +45,29 @@ defmt-rtt = { version = "1.0" }
 embassy-executor = { version = "0.9", git = "https://github.com/embassy-rs/embassy", features = ["arch-riscv32", "executor-thread", "defmt"] }
 embassy-hal-internal = { version = "0.3", git = "https://github.com/embassy-rs/embassy", features = [] }
 
+embassy-sync = { version = "0.7", git = "https://github.com/embassy-rs/embassy", features = ["defmt"] }
+embassy-time = { version = "0.5", git = "https://github.com/embassy-rs/embassy", features = ["defmt", "defmt-timestamp-uptime", "tick-hz-32_768"] }
+embassy-usb = { version = "0.5", git = "https://github.com/embassy-rs/embassy", features = ["defmt"] }
+
+defmt = "1.0"
+panic-probe = { version = "1.0", features = ["print-defmt"] }
+
 riscv-rt = { version = "0.13" }
 defmt-rtt = { version = "1.0" }
 
 [target.'cfg(target_os = "windows")'.dependencies]
 embassy-hal-internal = { version = "0.3", git = "https://github.com/embassy-rs/embassy", features = [] }
 
+embassy-sync = { version = "0.7", git = "https://github.com/embassy-rs/embassy", features = ["log"] }
+embassy-time = { version = "0.5", git = "https://github.com/embassy-rs/embassy", features = ["log", "tick-hz-32_768"] }
+embassy-usb = { version = "0.5", git = "https://github.com/embassy-rs/embassy", features = ["log"] }
+
+log = "0.4"
+
 [features]
 defmt = []
 log = []
+rt = []
 
 [profile.release]
 opt-level = 3

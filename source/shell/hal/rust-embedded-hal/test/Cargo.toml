@@ -8,14 +8,11 @@ keywords = ["embedded", "async", "hal", "embedded-hal"]
 categories = ["embedded", "hardware-support", "no-std", "asynchronous"]
 repository = "https://github.com/vsfteam/vsf"
 
-[dependencies]
-embassy-vsf = { path = "../embassy-vsf", features = ["defmt"] }
-
-panic-probe = { version = "1.0", features = ["print-defmt"] }
-defmt = "1.0"
-
 [target.'cfg(all(target_arch = "arm", target_os = "none"))'.dependencies]
 embassy-executor = { version = "0.9", git = "https://github.com/embassy-rs/embassy", features = ["arch-cortex-m", "executor-thread", "defmt"] }
+embassy-vsf = { path = "../embassy-vsf", features = ["defmt"] }
+panic-probe = { version = "1.0", features = ["print-defmt"] }
+defmt = "1.0"
 
 cortex-m = { version = "0.7", features = ["inline-asm", "critical-section-single-core"] }
 cortex-m-rt = { version = "0.7", features = ["device"] }
@@ -23,10 +20,15 @@ defmt-rtt = "1.0"
 
 [target.'cfg(all(target_arch = "riscv32", target_os = "none"))'.dependencies]
 embassy-executor = { version = "0.9", git = "https://github.com/embassy-rs/embassy", features = ["arch-riscv32", "executor-thread", "defmt"] }
+embassy-vsf = { path = "../embassy-vsf", features = ["defmt"] }
+panic-probe = { version = "1.0", features = ["print-defmt"] }
+defmt = "1.0"
 defmt-rtt = "1.0"
 
 [target.'cfg(any(target_os = "windows", target_os = "linux", target_os = "macos"))'.dependencies]
-embassy-executor = { version = "0.9", git = "https://github.com/embassy-rs/embassy", features = ["arch-std", "executor-thread", "defmt"] }
+embassy-executor = { version = "0.9", git = "https://github.com/embassy-rs/embassy", features = ["arch-std", "executor-thread", "log"] }
+embassy-vsf = { path = "../embassy-vsf", features = ["log"] }
+log = "0.4"
 
 [features]
 defmt = []

@@ -256,6 +256,7 @@ struct ArchInfo {
     bindgen_cflags: Vec<&'static str>,
     bindgen_model: Box<dyn Fn(&str) -> &str + Send>,
     cmake_arch: &'static str,
+    target_mcu: bool,
 }
 
 use lazy_static::lazy_static;
@@ -328,6 +329,7 @@ lazy_static! {
                 "-I${VSF_PATH}/source/utilities/compiler/arm/3rd-party/CMSIS/CMSIS/Core/Include",
             ]),
             cmake_arch: "ARM",
+            target_mcu: true,
         },
         ArchInfo {
             name: "RiscV",
@@ -340,6 +342,7 @@ lazy_static! {
             features: Vec::from([]),
             bindgen_cflags: Vec::from([]),
             cmake_arch: "Riscv",
+            target_mcu: true,
         },
         ArchInfo {
             name: "Windows",
@@ -364,6 +367,7 @@ lazy_static! {
                 },
             ]),
             cmake_arch: "Windows",
+            target_mcu: false,
         },
         ArchInfo {
             name: "Unix",          // for Linux, Unix, MacOS
@@ -376,6 +380,7 @@ lazy_static! {
             features: Vec::from([]),
             bindgen_cflags: Vec::from([]),
             cmake_arch: "Linux",
+            target_mcu: false,
         },
     ]);
 }
@@ -442,6 +447,9 @@ fn main() {
     bindgen_cflags.insert(0, format!("--target={}", env::var("TARGET").unwrap()));
 
     // arch
+    println!("cargo::rustc-check-cfg=cfg(target_hostos)");
+    println!("cargo::rustc-check-cfg=cfg(target_mcu)");
+
     let arch_infos = GLOBAL_ARCH_INFO.lock().unwrap();
     let mut cmake_arch: &'static str = "";
     let mut arch_name: &'static str = "";
@@ -459,6 +467,11 @@ fn main() {
             cmake_arch = arch.cmake_arch;
             arch_name = arch.name;
             bindgen_model = String::from((arch.bindgen_model)(&cmake_model));
+            if arch.target_mcu {
+                println!("cargo:rustc-cfg=target_mcu");
+            } else {
+                println!("cargo:rustc-cfg=target_hostos");
+            }
             break;
         }
     }

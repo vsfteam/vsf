@@ -6,13 +6,15 @@ fn main() {
     println!("cargo:warning=target_arch: {arch}");
     println!("cargo:warning=target_os: {os}");
 
-    println!("cargo::rustc-check-cfg=cfg(use_defmt_rtt)");
+    println!("cargo::rustc-check-cfg=cfg(target_hostos)");
+    println!("cargo::rustc-check-cfg=cfg(target_mcu)");
 
     if os == "" || os == "none" {
         println!("cargo:rustc-link-arg-bins=--nmagic");
         println!("cargo:rustc-link-arg-bins=-Tlink.x");
         println!("cargo:rustc-link-arg-bins=-Tdefmt.x");
-
-        println!("cargo:rustc-cfg=use_defmt_rtt");
+        println!("cargo:rustc-cfg=target_mcu");
+    } else {
+        println!("cargo:rustc-cfg=target_hostos");
     }
 }

@@ -3,6 +3,13 @@
 #![allow(unused_macros)]
 #![allow(dead_code)]
 
+#[cfg(target_mcu)]
+use {defmt_rtt as _};
+#[cfg(target_mcu)]
+use {defmt as _};
+#[cfg(target_mcu)]
+use {panic_probe as _};
+
 // This must go FIRST so that all the other modules see its macros.
 mod fmt;
 
