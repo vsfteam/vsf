@@ -1,9 +1,10 @@
-set(VSF_HAL_CHIP_VENDOR     Emulation)
-set(VSF_HAL_CHIP_SERIES     distbus)
-set(VSF_ARCH_SERIES         x64)
+set(VSF_HAL_CHIP_VENDOR         Emulation)
+set(VSF_HAL_CHIP_SERIES         distbus)
+set(VSF_HAL_HOST_SYSTEM_VENDOR  x86)
+set(VSF_ARCH_SERIES             x86)
 
-set(VSF_HOST_SYSTEM         win)
-set(VSF_HOST_SYSTEM64       1)
+set(VSF_HOST_SYSTEM             win)
+set(VSF_HOST_SYSTEM64           1)
 
 set(VSF_TARGET_DEFINITIONS
     "__Emulation__"
