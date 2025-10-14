@@ -314,6 +314,8 @@ pub fn init(config: Config) -> Peripherals {
         let p = Peripherals::take_with_cs(cs);
 
         unsafe {
+            vsf_hal::vsf_arch_init();
+            vsf_hal::vsf_driver_init();
             gpio::init();
         }
 
