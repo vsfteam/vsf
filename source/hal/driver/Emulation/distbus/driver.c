@@ -119,10 +119,7 @@ static vsf_hal_distbus_ctx_t __vsf_hal_distbus_ctx = {
             ._                  = {                                             \
                 .op             = &VSF_MCONNECT(vsf_remapped_, VSF_HAL_CFG_IMP_TYPE, _op),\
             },                                                                  \
-        };                                                                      \
-        void VSF_MCONNECT(VSF_HAL_CFG_IMP_UPCASE_TYPE, __N, _IRQHandler)(void)  \
-        {                                                                       \
-        }
+        };
 #define VSF_HAL_HW_IMPLEMENT_ARRAY(__N, __VALUE)                                \
         &VSF_MCONNECT(vsf_hw_, VSF_HAL_CFG_IMP_TYPE, __N),
 #define VSF_HAL_HW_IMPLEMENT_MULTI()                                            \
@@ -130,6 +127,13 @@ static vsf_hal_distbus_ctx_t __vsf_hal_distbus_ctx = {
         VSF_MCONNECT(vsf_hw_, VSF_HAL_CFG_IMP_TYPE, _t) *const VSF_MCONNECT(vsf_hw_, VSF_HAL_CFG_IMP_TYPE, s)[VSF_MCONNECT(VSF_HW_, VSF_HAL_CFG_IMP_UPCASE_TYPE, _COUNT)] = {\
             VSF_MREPEAT(VSF_MCONNECT(VSF_HW_, VSF_HAL_CFG_IMP_UPCASE_TYPE, _COUNT), VSF_HAL_HW_IMPLEMENT_ARRAY, NULL)\
         };
+
+#define VSF_HAL_HW_IMPLEMENT_IRQ(__N, __VALUE)                                  \
+        void VSF_MCONNECT(VSF_HAL_CFG_IMP_UPCASE_TYPE, __N, _IRQHandler)(void)  \
+        {                                                                       \
+        }
+#define VSF_HAL_HW_IMPLEMENT_IRQ_MULTI()                                        \
+        VSF_MREPEAT(VSF_MCONNECT(VSF_HW_, VSF_HAL_CFG_IMP_UPCASE_TYPE, _COUNT), VSF_HAL_HW_IMPLEMENT_IRQ, NULL)
 
 #if VSF_HAL_USE_GPIO == ENABLED && VSF_HAL_DISTBUS_USE_GPIO == ENABLED && VSF_HW_GPIO_COUNT > 0
 #   undef VSF_HAL_CFG_IMP_TYPE
@@ -145,6 +149,7 @@ VSF_HAL_HW_IMPLEMENT_MULTI()
 #   define VSF_HAL_CFG_IMP_TYPE                 i2c
 #   define VSF_HAL_CFG_IMP_UPCASE_TYPE          I2C
 VSF_HAL_HW_IMPLEMENT_MULTI()
+VSF_HAL_HW_IMPLEMENT_IRQ_MULTI()
 #endif
 
 #if VSF_HAL_USE_SPI == ENABLED && VSF_HAL_DISTBUS_USE_SPI == ENABLED && VSF_HW_SPI_COUNT > 0
@@ -153,6 +158,7 @@ VSF_HAL_HW_IMPLEMENT_MULTI()
 #   define VSF_HAL_CFG_IMP_TYPE                 spi
 #   define VSF_HAL_CFG_IMP_UPCASE_TYPE          SPI
 VSF_HAL_HW_IMPLEMENT_MULTI()
+VSF_HAL_HW_IMPLEMENT_IRQ_MULTI()
 #endif
 
 #if VSF_HAL_USE_SDIO == ENABLED && VSF_HAL_DISTBUS_USE_SDIO == ENABLED && VSF_HW_SDIO_COUNT > 0
@@ -161,6 +167,7 @@ VSF_HAL_HW_IMPLEMENT_MULTI()
 #   define VSF_HAL_CFG_IMP_TYPE                 sdio
 #   define VSF_HAL_CFG_IMP_UPCASE_TYPE          SDIO
 VSF_HAL_HW_IMPLEMENT_MULTI()
+VSF_HAL_HW_IMPLEMENT_IRQ_MULTI()
 #endif
 
 #if VSF_HAL_USE_ADC == ENABLED && VSF_HAL_DISTBUS_USE_ADC == ENABLED && VSF_HW_ADC_COUNT > 0
@@ -169,6 +176,7 @@ VSF_HAL_HW_IMPLEMENT_MULTI()
 #   define VSF_HAL_CFG_IMP_TYPE                 adc
 #   define VSF_HAL_CFG_IMP_UPCASE_TYPE          ADC
 VSF_HAL_HW_IMPLEMENT_MULTI()
+VSF_HAL_HW_IMPLEMENT_IRQ_MULTI()
 #endif
 
 #if VSF_HAL_USE_DAC == ENABLED && VSF_HAL_DISTBUS_USE_DAC == ENABLED && VSF_HW_DAC_COUNT > 0
@@ -193,6 +201,7 @@ VSF_HAL_HW_IMPLEMENT_MULTI()
 #   define VSF_HAL_CFG_IMP_TYPE                 i2s
 #   define VSF_HAL_CFG_IMP_UPCASE_TYPE          I2S
 VSF_HAL_HW_IMPLEMENT_MULTI()
+VSF_HAL_HW_IMPLEMENT_IRQ_MULTI()
 #endif
 
 #if VSF_HAL_USE_USART == ENABLED && VSF_HAL_DISTBUS_USE_USART == ENABLED && VSF_HW_USART_COUNT > 0
@@ -201,6 +210,7 @@ VSF_HAL_HW_IMPLEMENT_MULTI()
 #   define VSF_HAL_CFG_IMP_TYPE                 usart
 #   define VSF_HAL_CFG_IMP_UPCASE_TYPE          USART
 VSF_HAL_HW_IMPLEMENT_MULTI()
+VSF_HAL_HW_IMPLEMENT_IRQ_MULTI()
 #endif
 
 /*============================ IMPLEMENTATION ================================*/
