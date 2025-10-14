@@ -3,7 +3,10 @@ if(IS_DIRECTORY ${VSF_PRIVATE_HAL_CHIP_VENDOR})
 else()
     add_subdirectory_existed(${VSF_HAL_CHIP_VENDOR})
 endif()
-add_subdirectory_existed(${VSF_HAL_HOST_SYSTEM_VENDOR})
+
+if(VSF_HAL_HOST_SYSTEM_VENDOR)
+    add_subdirectory_existed(${VSF_HAL_HOST_SYSTEM_VENDOR})
+endif()
 
 add_subdirectory(vsf)
 add_subdirectory(common)

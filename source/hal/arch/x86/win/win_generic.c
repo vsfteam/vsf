@@ -1354,6 +1354,7 @@ bool __vsf_arch_before_entry(void)
 
 // save cpp static initializer for app, and call after linux startup
 
+#if VSF_USE_LINUX == ENABLED
 typedef int (* cpp_init_func_t)(void);
 typedef struct cpp_init_t {
     bool returns_int;
@@ -1377,18 +1378,6 @@ static int __vsf_arch_cpp_init_range(cpp_init_func_t * const start, cpp_init_fun
         }
     }
     return 0;
-}
-
-void vsf_arch_cpp_startup(void)
-{
-    int result;
-    for (int i = 0; i < __vsf_cpp_init_cnt; i++) {
-        result = __vsf_cpp_init[i].func();
-        if (__vsf_cpp_init[i].returns_int && (result != 0)) {
-            VSF_ASSERT(false);
-            while (1);
-        }
-    }
 }
 
 void _initterm(cpp_init_func_t * const first, cpp_init_func_t * const last)
@@ -1429,6 +1418,21 @@ int _initterm_e(cpp_init_func_t * const first, cpp_init_func_t * const last)
 {
     __vsf_arch_cpp_init_range(first, last, true);
     return 0;
+}
+#endif
+
+void vsf_arch_cpp_startup(void)
+{
+#if VSF_USE_LINUX == ENABLED
+    int result;
+    for (int i = 0; i < __vsf_cpp_init_cnt; i++) {
+        result = __vsf_cpp_init[i].func();
+        if (__vsf_cpp_init[i].returns_int && (result != 0)) {
+            VSF_ASSERT(false);
+            while (1);
+        }
+    }
+#endif
 }
 
 #endif
