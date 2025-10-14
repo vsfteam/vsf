@@ -119,7 +119,10 @@ static vsf_hal_distbus_ctx_t __vsf_hal_distbus_ctx = {
             ._                  = {                                             \
                 .op             = &VSF_MCONNECT(vsf_remapped_, VSF_HAL_CFG_IMP_TYPE, _op),\
             },                                                                  \
-        };
+        };                                                                      \
+        void VSF_MCONNECT(VSF_HAL_CFG_IMP_UPCASE_TYPE, __N, _IRQHandler)(void)  \
+        {                                                                       \
+        }
 #define VSF_HAL_HW_IMPLEMENT_ARRAY(__N, __VALUE)                                \
         &VSF_MCONNECT(vsf_hw_, VSF_HAL_CFG_IMP_TYPE, __N),
 #define VSF_HAL_HW_IMPLEMENT_MULTI()                                            \
@@ -261,6 +264,43 @@ void vsf_hal_distbus_on_new(vsf_hal_distbus_t *hal_distbus, vsf_hal_distbus_type
 static void __user_hal_distbus_on_remote_connected(vsf_hal_distbus_t *hal_distbus)
 {
     vsf_hal_distbus_start(hal_distbus);
+}
+
+// IRQ: TODO
+
+void vsf_irq_enable(int irqn)
+{
+}
+
+void vsf_irq_disable(int irqn)
+{
+}
+
+bool vsf_irq_is_enabled(int irqn)
+{
+    return false;
+}
+
+void vsf_irq_pend(int irqn)
+{
+}
+
+void vsf_irq_unpend(int irqn)
+{
+}
+
+bool vsf_irq_is_pending(int irqn)
+{
+    return false;
+}
+
+void vsf_irq_set_priority(int irqn, uint32_t priority)
+{
+}
+
+uint32_t vsf_irq_get_priority(int irqn)
+{
+    return 0;
 }
 
 /*! \note initialize device driver
