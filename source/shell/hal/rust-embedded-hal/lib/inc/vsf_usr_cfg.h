@@ -4,6 +4,9 @@
 //  callstack trace will be unavailable
 #define VSF_ARCH_CFG_CALLSTACK_TRACE                    DISABLED
 
+#define VSF_HAL_USE_DEBUG_STREAM                        ENABLED
+#   define VSF_DEBUG_STREAM_CFG_HW_PRIORITY             vsf_arch_prio_0
+
 #define VSF_APPLET_USE_ARCH_ABI                         DISABLED
 #define VSF_APPLET_USE_COMPILER                         DISABLED
 
