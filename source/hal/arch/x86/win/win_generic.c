@@ -28,6 +28,8 @@
 
 #include <Windows.h>
 
+#pragma comment (lib, "shell32.lib")
+
 /*============================ MACROS ========================================*/
 
 // configuration start

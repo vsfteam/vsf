@@ -28,6 +28,7 @@
 #include <SetupAPI.h>
 
 #pragma comment (lib, "SetupAPI.lib")
+#pragma comment (lib, "advapi32.lib")
 
 /*============================ MACROS ========================================*/
 
