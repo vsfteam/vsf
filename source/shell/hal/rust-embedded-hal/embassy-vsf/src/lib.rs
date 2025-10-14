@@ -315,7 +315,11 @@ pub fn init(config: Config) -> Peripherals {
 
         unsafe {
             vsf_hal::vsf_arch_init();
-            vsf_hal::vsf_driver_init();
+
+            vsf_hal::vsf_hal_init_early();
+            vsf_hal::vsf_service_init();
+            vsf_hal::vsf_hal_init();
+
             gpio::init();
         }
 
