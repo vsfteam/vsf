@@ -501,6 +501,7 @@ fn main() {
         let vsf_hal_build_path = out_path.join("vsf_hal_build");
         if !vsf_hal_build_path.exists() {
             fs::create_dir_all(&vsf_hal_build_path).unwrap();
+            println!("cargo:warning=cmd: cmake -GNinja -DVSF_TARGET={cmake_model} -DVSF_ARCH={cmake_arch} {path}source/shell/hal/rust-embedded-hal/lib");
             Command::new("cmake").current_dir(&vsf_hal_build_path)
                         .arg("-GNinja")
                         .arg("-DVSF_TARGET=".to_string() + &cmake_model)
@@ -655,6 +656,7 @@ fn main() {
     let mut interrupt_func_dec_str = String::from("");
     let mut interrupt_vecotr_str = String::from("");
     let mut interrupt_name_str = String::from("");
+    let mut isrlib_str = String::from("");
     let mut interrupt_num: u8 = 0;
     let mut interrupt_cfg_map: Vec<&'static str> = Vec::new();
     if let Some(interrupt_num_tmp) = extract_const_integer::<u8>(&bindings_lines, "VSF_HW_INTERRUPTS_NUM") {
@@ -677,16 +679,11 @@ fn main() {
                 interrupt_str.push_str(&format!("{interrupt_name} = {interrupt_index},\n"));
                 interrupt_func_dec_str.push_str(&format!("fn {interrupt_name}();\n"));
                 interrupt_vecotr_str.push_str(&format!("Vector {{ _handler: {interrupt_name} }},\n"));
-
-                if !target_mcu {
-                    let isr_c = String::from(interrupt_name) + ".c";
-                    fs::write(out_path.join(&isr_c), &format!("void {interrupt_name}(void) {{
+                isrlib_str.push_str(&format!("
+                    __attribute__((weak)) void {interrupt_name}(void) {{
                         while (1);
-                    }}\n")).unwrap();
-                    cc::Build::new()
-                        .file(out_path.join(&isr_c))
-                        .compile(interrupt_name);
-                }
+                    }}
+                "));
             } else {
                 interrupt_vecotr_str.push_str("Vector { _reserved: 0 },\n");
             }
@@ -723,6 +720,13 @@ fn main() {
             ];
         }}
     "))).unwrap();
+    if !target_mcu {
+        fs::write(out_path.join("isrlib.c"), isrlib_str).unwrap();
+        cc::Build::new()
+            .file(out_path.join("isrlib.c"))
+            .prefer_clang_cl_over_msvc(true)
+            .compile("isrlib");
+    }
 
     // generate memory.x
     let mut flash_addr = 0u64;
