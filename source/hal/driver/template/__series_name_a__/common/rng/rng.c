@@ -90,7 +90,7 @@ typedef struct VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_t) {
 vsf_err_t VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_init)(
     VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_t) *rng_ptr
 ) {
-    VSF_HAL_ASSERT((NULL != rng_ptr) && (NULL != cfg_ptr));
+    VSF_HAL_ASSERT(NULL != rng_ptr);
     return VSF_ERR_NONE;
 }
 
