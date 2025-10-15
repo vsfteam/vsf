@@ -308,7 +308,6 @@ vsf_class(vsf_hal_distbus_usart_t) {
 /*============================ PROTOTYPES ====================================*/
 
 extern uint32_t vsf_hal_distbus_usart_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_usart_t *usart, void *info, uint32_t infolen);
-extern void vsf_hal_distbus_usart_irqhandler(vsf_hal_distbus_usart_t *usart);
 
 #ifdef __cplusplus
 }

@@ -44,13 +44,6 @@ static const vsf_distbus_service_info_t __vsf_hal_distbus_spi_info = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-void vsf_hal_distbus_spi_irqhandler(vsf_hal_distbus_spi_t *spi)
-{
-    if (spi->irq.handler != NULL) {
-        spi->irq.handler(spi->irq.target, (vsf_spi_t *)spi, spi->irq.triggered_mask);
-    }
-}
-
 static bool __vsf_hal_distbus_spi_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
     vsf_hal_distbus_spi_t *spi = vsf_container_of(service, vsf_hal_distbus_spi_t, service);

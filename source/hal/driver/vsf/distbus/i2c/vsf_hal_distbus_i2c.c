@@ -44,13 +44,6 @@ static const vsf_distbus_service_info_t __vsf_hal_distbus_i2c_info = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-void vsf_hal_distbus_i2c_irqhandler(vsf_hal_distbus_i2c_t *i2c)
-{
-    if (i2c->irq.handler != NULL) {
-        i2c->irq.handler(i2c->irq.target, (vsf_i2c_t *)i2c, i2c->irq.triggered_mask);
-    }
-}
-
 static bool __vsf_hal_distbus_i2c_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
     vsf_hal_distbus_i2c_t *i2c = vsf_container_of(service, vsf_hal_distbus_i2c_t, service);

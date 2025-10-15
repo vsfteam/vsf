@@ -85,7 +85,6 @@ vsf_class(vsf_hal_distbus_spi_t) {
 /*============================ PROTOTYPES ====================================*/
 
 extern uint32_t vsf_hal_distbus_spi_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_spi_t *spi, void *info, uint32_t infolen);
-extern void vsf_hal_distbus_spi_irqhandler(vsf_hal_distbus_spi_t *spi);
 
 #ifdef __cplusplus
 }

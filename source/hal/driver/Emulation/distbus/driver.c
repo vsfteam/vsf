@@ -139,8 +139,14 @@ static vsf_hal_distbus_ctx_t __vsf_hal_distbus_ctx = {
 #define VSF_HAL_HW_IMPLEMENT_IRQ(__N, __VALUE)                                  \
         void VSF_MCONNECT(VSF_HAL_CFG_IMP_UPCASE_TYPE, __N, _IRQHandler)(void)  \
         {                                                                       \
-            VSF_MCONNECT(vsf_hal_distbus_, VSF_HAL_CFG_IMP_TYPE, _irqhandler)(  \
-                    VSF_MCONNECT(vsf_hw_, VSF_HAL_CFG_IMP_TYPE, __N)._.target); \
+            VSF_MCONNECT(vsf_hal_distbus_, VSF_HAL_CFG_IMP_TYPE, _t) *target =  \
+                    (VSF_MCONNECT(vsf_hal_distbus_, VSF_HAL_CFG_IMP_TYPE, _t) *)\
+                    VSF_MCONNECT(vsf_hw_, VSF_HAL_CFG_IMP_TYPE, __N)._.target;  \
+            if (target->irq.handler != NULL) {                                  \
+                target->irq.handler(target->irq.target,                         \
+                    (VSF_MCONNECT(vsf_, VSF_HAL_CFG_IMP_TYPE, _t) *)target,     \
+                    target->irq.triggered_mask);                                \
+            }                                                                   \
         }
 #define VSF_HAL_HW_IMPLEMENT_IRQ_MULTI()                                        \
         VSF_MREPEAT(VSF_MCONNECT(VSF_HW_, VSF_HAL_CFG_IMP_UPCASE_TYPE, _COUNT), VSF_HAL_HW_IMPLEMENT_IRQ, NULL)
@@ -172,12 +178,29 @@ VSF_HAL_HW_IMPLEMENT_IRQ_MULTI()
 #endif
 
 #if VSF_HAL_USE_SDIO == ENABLED && VSF_HAL_DISTBUS_USE_SDIO == ENABLED && VSF_HW_SDIO_COUNT > 0
+
+#define VSF_HAL_HW_SDIO_IMPLEMENT_IRQ(__N, __VALUE)                             \
+        void VSF_MCONNECT(VSF_HAL_CFG_IMP_UPCASE_TYPE, __N, _IRQHandler)(void)  \
+        {                                                                       \
+            VSF_MCONNECT(vsf_hal_distbus_, VSF_HAL_CFG_IMP_TYPE, _t) *target =  \
+                    (VSF_MCONNECT(vsf_hal_distbus_, VSF_HAL_CFG_IMP_TYPE, _t) *)\
+                    VSF_MCONNECT(vsf_hw_, VSF_HAL_CFG_IMP_TYPE, __N)._.target;  \
+            if (target->irq.handler != NULL) {                                  \
+                target->irq.handler(target->irq.target,                         \
+                    (VSF_MCONNECT(vsf_, VSF_HAL_CFG_IMP_TYPE, _t) *)target,     \
+                    target->irq.triggered_mask, target->irq.status, target->irq.resp);\
+            }                                                                   \
+        }
+
+#define VSF_HAL_HW_SDIO_IMPLEMENT_IRQ_MULTI()                                   \
+        VSF_MREPEAT(VSF_MCONNECT(VSF_HW_, VSF_HAL_CFG_IMP_UPCASE_TYPE, _COUNT), VSF_HAL_HW_SDIO_IMPLEMENT_IRQ, NULL)
+
 #   undef VSF_HAL_CFG_IMP_TYPE
 #   undef VSF_HAL_CFG_IMP_UPCASE_TYPE
 #   define VSF_HAL_CFG_IMP_TYPE                 sdio
 #   define VSF_HAL_CFG_IMP_UPCASE_TYPE          SDIO
 VSF_HAL_HW_IMPLEMENT_MULTI()
-VSF_HAL_HW_IMPLEMENT_IRQ_MULTI()
+VSF_HAL_HW_SDIO_IMPLEMENT_IRQ_MULTI()
 #endif
 
 #if VSF_HAL_USE_ADC == ENABLED && VSF_HAL_DISTBUS_USE_ADC == ENABLED && VSF_HW_ADC_COUNT > 0

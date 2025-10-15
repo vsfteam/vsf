@@ -93,13 +93,6 @@ static void __vsf_hal_distbus_usart_txfifo(vsf_hal_distbus_usart_t *usart, vsf_p
     }
 }
 
-void vsf_hal_distbus_usart_irqhandler(vsf_hal_distbus_usart_t *usart)
-{
-    if (usart->irq.handler != NULL) {
-        usart->irq.handler(usart->irq.target, (vsf_usart_t *)usart, usart->irq.triggered_mask);
-    }
-}
-
 static bool __vsf_hal_distbus_usart_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
     vsf_hal_distbus_usart_t *usart = vsf_container_of(service, vsf_hal_distbus_usart_t, service);
@@ -129,16 +122,16 @@ static bool __vsf_hal_distbus_usart_msghandler(vsf_distbus_t *distbus, vsf_distb
         VSF_HAL_ASSERT(datalen > 0);
         if (datalen < vsf_stream_write(&usart->fifo.rx.stream.use_as__vsf_stream_t, data, datalen)) {
             usart->irq.triggered_mask = VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR & usart->irq.enabled_mask;
-            if (usart->irq.triggered_mask && !vsf_hal_distbus_on_irq(usart, usart->irq.no)) {
-                vsf_hal_distbus_usart_irqhandler(usart);
+            if (usart->irq.triggered_mask && !vsf_hal_distbus_on_irq(usart, usart->irq.no) && (usart->irq.handler != NULL)) {
+               usart->irq.handler(usart->irq.target, (vsf_usart_t *)usart, usart->irq.triggered_mask);
             }
         }
         break;
     case VSF_HAL_DISTBUS_USART_CMD_ISR:
         VSF_HAL_ASSERT(datalen == sizeof(*u_arg.isr));
         usart->irq.triggered_mask = le32_to_cpu(u_arg.isr->irq_mask) & usart->irq.enabled_mask;
-        if (usart->irq.triggered_mask && !vsf_hal_distbus_on_irq(usart, usart->irq.no)) {
-            vsf_hal_distbus_usart_irqhandler(usart);
+        if (usart->irq.triggered_mask && !vsf_hal_distbus_on_irq(usart, usart->irq.no) && (usart->irq.handler != NULL)) {
+            usart->irq.handler(usart->irq.target, (vsf_usart_t *)usart, usart->irq.triggered_mask);
         }
         break;
     default:
