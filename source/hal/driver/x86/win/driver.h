@@ -84,7 +84,7 @@ extern "C" {
 #   define VSF_RTC_CFG_DEC_PREFIX                       VSF_HOSTOS_RTC_PREFIX
 #   define VSF_RTC_CFG_DEC_UPCASE_PREFIX                VSF_HOSTOS_RTC_UPCASE_PREFIX
 #   define VSF_RTC_CFG_DEC_REMAP                        ENABLED
-#   define VSF_RTC_CFG_DEC_REMAP_PREFIX                 vsf_remap
+#   define VSF_RTC_CFG_DEC_REMAP_PREFIX                 vsf_remapped
 #   include "hal/driver/common/rtc/rtc_template.h"
 #endif
 
@@ -106,7 +106,7 @@ extern "C" {
 #   define VSF_RNG_CFG_DEC_PREFIX                       VSF_HOSTOS_RNG_PREFIX
 #   define VSF_RNG_CFG_DEC_UPCASE_PREFIX                VSF_HOSTOS_RNG_UPCASE_PREFIX
 #   define VSF_RND_CFG_DEC_REMAP                        ENABLED
-#   define VSF_RND_CFG_DEC_REMAP_PREFIX                 vsf_remap
+#   define VSF_RND_CFG_DEC_REMAP_PREFIX                 vsf_remapped
 #   include "hal/driver/common/rng/rng_template.h"
 #endif
 

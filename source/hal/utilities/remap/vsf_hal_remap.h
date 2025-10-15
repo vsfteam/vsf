@@ -29,6 +29,7 @@
 #include "./dac/vsf_remapped_dac.h"
 #include "./pwm/vsf_remapped_pwm.h"
 #include "./i2s/vsf_remapped_i2s.h"
+#include "./rtc/vsf_remapped_rtc.h"
 
 #ifdef __cplusplus
 extern "C" {

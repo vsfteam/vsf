@@ -109,5 +109,21 @@ vsf_err_t vsf_hostos_rtc_set(vsf_hostos_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_
         __HAL_OP                                                                \
     };
 #include "hal/driver/common/rtc/rtc_template.inc"
+#undef VSF_RTC_CFG_GET_TIME_API_TEMPLATE
+#undef VSF_RTC_CFG_SET_TIME_API_TEMPLATE
+#undef VSF_RTC_CFG_CAPABILITY_IRQ_MASK
+
+
+
+
+#define VSF_RTC_CFG_IMP_PREFIX                      VSF_HOSTOS_RTC_PREFIX
+#define VSF_RTC_CFG_IMP_UPCASE_PREFIX               VSF_HOSTOS_RTC_UPCASE_PREFIX
+#define VSF_RTC_CFG_IMP_COUNT_MASK_PREFIX           VSF_HOSTOS
+#define VSF_RTC_CFG_IMP_REMAP_PREFIX                vsf_remapped
+#define VSF_RTC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
+    describe_remapped_rtc(                                                      \
+        VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc, __IDX),                      \
+        VSF_MCONNECT(vsf_hostos_rtc, __IDX))
+#include "hal/driver/common/rtc/rtc_template.inc"
 
 #endif
