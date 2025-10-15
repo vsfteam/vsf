@@ -27,6 +27,14 @@
 // for distbus
 #include "service/vsf_service.h"
 
+#ifdef VSF_HAL_DISTBUS_AS_REAL_DRIVER
+#   define VSF_HAL_DISTBUS_ENUM(__ELEMENT)          __ELEMENT
+#   define VSF_HAL_DISTBUS_PREFIX                   vsf_
+#else
+#   define VSF_HAL_DISTBUS_ENUM(__ELEMENT)          VSF_HAL_DISTBUS_ ## __ELEMENT
+#   define VSF_HAL_DISTBUS_PREFIX                   vsf_hal_distbus_
+#endif
+
 #if VSF_HAL_DISTBUS_USE_GPIO == ENABLED && VSF_HAL_USE_GPIO == ENABLED
 #   include "./gpio/vsf_hal_distbus_gpio.h"
 #endif
@@ -34,7 +42,7 @@
 #   include "./i2c/vsf_hal_distbus_i2c.h"
 #endif
 #if VSF_HAL_DISTBUS_USE_SPI == ENABLED && VSF_HAL_USE_SPI == ENABLED
-#include "./spi/vsf_hal_distbus_spi.h"
+#   include "./spi/vsf_hal_distbus_spi.h"
 #endif
 #if VSF_HAL_DISTBUS_USE_USART == ENABLED && VSF_HAL_USE_USART == ENABLED
 #   include "./usart/vsf_hal_distbus_usart.h"
@@ -58,7 +66,7 @@
 #   include "./usbd/vsf_hal_distbus_usbd.h"
 #endif
 #if VSF_HAL_DISTBUS_USE_USBH == ENABLED && VSF_HAL_USE_USBH == ENABLED
-#include "./usbh/vsf_hal_distbus_usbh.h"
+#   include "./usbh/vsf_hal_distbus_usbh.h"
 #endif
 
 #undef PUBLIC_CONST
@@ -154,6 +162,112 @@ vsf_class(vsf_hal_distbus_t) {
 
 extern void vsf_hal_distbus_register(vsf_distbus_t *distbus, vsf_hal_distbus_t *hal_distbus);
 extern void vsf_hal_distbus_start(vsf_hal_distbus_t *hal_distbus);
+
+extern bool vsf_hal_distbus_on_irq(void *devs, uint16_t irqn);
+
+/*============================ INCLUDES ======================================*/
+
+#if VSF_HAL_USE_GPIO == ENABLED
+#   include "hal/driver/common/template/vsf_template_gpio.h"
+
+#   define VSF_GPIO_CFG_DEC_PREFIX                          vsf_hal_distbus
+#   define VSF_GPIO_CFG_DEC_UPCASE_PREFIX                   VSF_HAL_DISTBUS
+#   include "hal/driver/common/gpio/gpio_template.h"
+#endif
+
+#if VSF_HAL_USE_ADC == ENABLED
+#   include "hal/driver/common/template/vsf_template_adc.h"
+
+#   define VSF_ADC_CFG_DEC_PREFIX                           vsf_hal_distbus
+#   define VSF_ADC_CFG_DEC_UPCASE_PREFIX                    VSF_HAL_DISTBUS
+#   include "hal/driver/common/adc/adc_template.h"
+#endif
+
+#if VSF_HAL_USE_FLASH == ENABLED
+#   include "hal/driver/common/template/vsf_template_flash.h"
+
+#   define VSF_FLASH_CFG_DEC_PREFIX                         vsf_hal_distbus
+#   define VSF_FLASH_CFG_DEC_UPCASE_PREFIX                  VSF_HAL_DISTBUS
+#   include "hal/driver/common/flash/flash_template.h"
+#endif
+
+#if VSF_HAL_USE_I2C == ENABLED
+#   include "hal/driver/common/template/vsf_template_i2c.h"
+
+#   define VSF_I2C_CFG_DEC_PREFIX                           vsf_hal_distbus
+#   define VSF_I2C_CFG_DEC_UPCASE_PREFIX                    VSF_HAL_DISTBUS
+#   include "hal/driver/common/i2c/i2c_template.h"
+#endif
+
+#if VSF_HAL_USE_PWM == ENABLED
+#   include "hal/driver/common/template/vsf_template_pwm.h"
+
+#   define VSF_PWM_CFG_DEC_PREFIX                           vsf_hal_distbus
+#   define VSF_PWM_CFG_DEC_UPCASE_PREFIX                    VSF_HAL_DISTBUS
+#   include "hal/driver/common/pwm/pwm_template.h"
+#endif
+
+#if VSF_HAL_USE_RTC == ENABLED
+#   include "hal/driver/common/template/vsf_template_rtc.h"
+
+#   define VSF_RTC_CFG_DEC_PREFIX                           vsf_hal_distbus
+#   define VSF_RTC_CFG_DEC_UPCASE_PREFIX                    VSF_HAL_DISTBUS
+#   include "hal/driver/common/rtc/rtc_template.h"
+#endif
+
+#if VSF_HAL_USE_SPI == ENABLED
+#   include "hal/driver/common/template/vsf_template_spi.h"
+
+#   define VSF_SPI_CFG_DEC_PREFIX                           vsf_hal_distbus
+#   define VSF_SPI_CFG_DEC_UPCASE_PREFIX                    VSF_HAL_DISTBUS
+#   include "hal/driver/common/spi/spi_template.h"
+
+// Optional: Add QSPI
+//#   define VSF_SPI_CFG_DEC_DEVICE_PREFIX                  vsf_hal_distbus_qspi
+//#   define VSF_SPI_CFG_DEC_DEVICE_UPCASE_PREFIX           VSF_HAL_DISTBUS_QSPI
+//#   define VSF_SPI_CFG_DEC_RENAME_DEVICE_PREFIX           ENABLED
+//#   include "hal/driver/common/spi/spi_template.h"
+#endif
+
+#if VSF_HAL_USE_SDIO == ENABLED
+#   include "hal/driver/common/template/vsf_template_sdio.h"
+
+#   define VSF_SDIO_CFG_DEC_PREFIX                          vsf_hal_distbus
+#   define VSF_SDIO_CFG_DEC_UPCASE_PREFIX                   VSF_HAL_DISTBUS
+#   include "hal/driver/common/sdio/sdio_template.h"
+#endif
+
+#if VSF_HAL_USE_TIMER == ENABLED
+#   include "hal/driver/common/template/vsf_template_timer.h"
+
+#   define VSF_TIMER_CFG_DEC_PREFIX                         vsf_hal_distbus
+#   define VSF_TIMER_CFG_DEC_UPCASE_PREFIX                  VSF_HAL_DISTBUS
+#   include "hal/driver/common/timer/timer_template.h"
+#endif
+
+#if VSF_HAL_USE_RNG == ENABLED
+#   include "hal/driver/common/template/vsf_template_rng.h"
+
+#   define VSF_RNG_CFG_DEC_PREFIX                           vsf_hal_distbus
+#   define VSF_RNG_CFG_DEC_UPCASE_PREFIX                    VSF_HAL_DISTBUS
+#   include "hal/driver/common/rng/rng_template.h"
+#endif
+
+#if VSF_HAL_USE_USART == ENABLED
+#   include "hal/driver/common/template/vsf_template_usart.h"
+
+#   define VSF_USART_CFG_DEC_PREFIX                         vsf_hal_distbus
+#   define VSF_USART_CFG_DEC_UPCASE_PREFIX                  VSF_HAL_DISTBUS
+#   include "hal/driver/common/usart/usart_template.h"
+#endif
+
+#if VSF_HAL_USE_WDT == ENABLED
+#   include "hal/driver/common/template/vsf_template_wdt.h"
+
+#   define VSF_WDT_CFG_DEC_PREFIX                           vsf_hal_distbus
+#   define VSF_WDT_CFG_DEC_UPCASE_PREFIX                    VSF_HAL_DISTBUS
+#   include "hal/driver/common/wdt/wdt_template.h"
+#endif
 
 #ifdef __cplusplus
 }

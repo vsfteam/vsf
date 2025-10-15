@@ -17,8 +17,6 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "./hostos_driver.h"
-
 #if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__) || defined(__VSF_HAL_SHOW_VENDOR_INFO__)
 
 #   include "./device.h"
@@ -36,12 +34,18 @@
 // for common hal structure/enum/etc, include before user driver headers below.
 #   include "hal/driver/common/template/vsf_template_hal_driver.h"
 
+#   include "hal/driver/vsf/distbus/driver.h"
+#   include "./hostos_driver.h"
+
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
+
+extern void vsf_distbus_hal_set_vector_table(void (**vector_table)());
+
 /*============================ INCLUDES ======================================*/
 
 #if VSF_HAL_USE_GPIO == ENABLED

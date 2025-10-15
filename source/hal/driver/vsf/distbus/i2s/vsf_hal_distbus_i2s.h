@@ -59,6 +59,7 @@ vsf_class(vsf_hal_distbus_i2s_t) {
 #endif
     protected_member(
         vsf_distbus_service_t               service;
+        uint16_t                            irqn;
     )
     private_member(
         vsf_distbus_t                       *distbus;
@@ -70,12 +71,6 @@ vsf_class(vsf_hal_distbus_i2s_t) {
 /*============================ PROTOTYPES ====================================*/
 
 extern uint32_t vsf_hal_distbus_i2s_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_i2s_t *i2s, void *info, uint32_t infolen);
-
-/*============================ INCLUDES ======================================*/
-
-#define VSF_I2S_CFG_DEC_PREFIX              vsf_hal_distbus
-#define VSF_I2S_CFG_DEC_UPCASE_PREFIX       VSF_HAL_DISTBUS
-#include "hal/driver/common/i2s/i2s_template.h"
 
 #ifdef __cplusplus
 }

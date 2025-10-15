@@ -71,12 +71,6 @@ vsf_class(vsf_hal_distbus_pwm_t) {
 
 extern uint32_t vsf_hal_distbus_pwm_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_pwm_t *pwm, void *info, uint32_t infolen);
 
-/*============================ INCLUDES ======================================*/
-
-#define VSF_PWM_CFG_DEC_PREFIX              vsf_hal_distbus
-#define VSF_PWM_CFG_DEC_UPCASE_PREFIX       VSF_HAL_DISTBUS
-#include "hal/driver/common/pwm/pwm_template.h"
-
 #ifdef __cplusplus
 }
 #endif

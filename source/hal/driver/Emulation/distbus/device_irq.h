@@ -1,13 +1,16 @@
 
-#define VSF_HW_INTERRUPTS_NUM           128
+#define VSF_HW_INTERRUPTS_NUM           160
 
-// VSF_HW_INTERRUPT0 .. VSF_HW_INTERRUPT31 are reserved
+// VSF_HW_INTERRUPT0 .. VSF_HW_INTERRUPT31 are for GPIO/EXTI
+#define VSF_HW_gpio_IRQN                0
+#define VSF_HW_exti_IRQN                0
 
 #if !defined(VSF_HW_USART_MASK) && defined(VSF_HW_USART_COUNT)
 #   define VSF_HW_USART_MASK            ((1 << VSF_HW_USART_COUNT) - 1)
 #endif
 
 // VSF_HW_INTERRUPT32 .. VSF_HW_INTERRUPT63 are for USART
+#define VSF_HW_usart_IRQN               32
 #ifdef VSF_HW_USART_MASK
 #if VSF_HW_USART_MASK & (1 << 0)
 #   define VSF_HW_INTERRUPT32           USART0_IRQHandler
@@ -112,6 +115,7 @@
 #endif
 
 // VSF_HW_INTERRUPT64 .. VSF_HW_INTERRUPT95 are for SPI
+#define VSF_HW_spi_IRQN                 64
 #ifdef VSF_HW_SPI_MASK
 #if VSF_HW_SPI_MASK & (1 << 0)
 #   define VSF_HW_INTERRUPT64           SPI0_IRQHandler
@@ -216,6 +220,7 @@
 #endif
 
 // VSF_HW_INTERRUPT96 .. VSF_HW_INTERRUPT127 are for I2C
+#define VSF_HW_i2c_IRQN                 96
 #ifdef VSF_HW_I2C_MASK
 #if VSF_HW_I2C_MASK & (1 << 0)
 #   define VSF_HW_INTERRUPT96           I2C0_IRQHandler
@@ -314,3 +319,6 @@
 #   define VSF_HW_INTERRUPT127          I2C31_IRQHandler
 #endif
 #endif
+
+// VSF_HW_INTERRUPT128 .. VSF_HW_INTERRUPT159 are for SDIO
+#define VSF_HW_sdio_IRQN                128

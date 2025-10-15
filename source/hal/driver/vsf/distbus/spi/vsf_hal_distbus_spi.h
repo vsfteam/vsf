@@ -51,6 +51,14 @@ enum {
 };
 #endif
 
+/*============================ INCLUDES ======================================*/
+
+#ifdef VSF_HAL_DISTBUS_AS_REAL_DRIVER
+#   include "hal/driver/common/template/vsf_template_spi.h"
+#endif
+
+/*============================ TYPES =========================================*/
+
 vsf_class(vsf_hal_distbus_spi_t) {
 #if VSF_HAL_DISTBUS_SPI_CFG_MULTI_CLASS == ENABLED
     public_member(
@@ -59,6 +67,13 @@ vsf_class(vsf_hal_distbus_spi_t) {
 #endif
     protected_member(
         vsf_distbus_service_t               service;
+        struct {
+            vsf_spi_isr_handler_t           *handler;
+            void                            *target;
+            uint32_t                        enabled_mask;
+            uint32_t                        triggered_mask;
+            uint16_t                        no;
+        } irq;
     )
     private_member(
         vsf_distbus_t                       *distbus;
@@ -70,12 +85,7 @@ vsf_class(vsf_hal_distbus_spi_t) {
 /*============================ PROTOTYPES ====================================*/
 
 extern uint32_t vsf_hal_distbus_spi_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_spi_t *spi, void *info, uint32_t infolen);
-
-/*============================ INCLUDES ======================================*/
-
-#define VSF_SPI_CFG_DEC_PREFIX              vsf_hal_distbus
-#define VSF_SPI_CFG_DEC_UPCASE_PREFIX       VSF_HAL_DISTBUS
-#include "hal/driver/common/spi/spi_template.h"
+extern void vsf_hal_distbus_spi_irqhandler(vsf_hal_distbus_spi_t *spi);
 
 #ifdef __cplusplus
 }

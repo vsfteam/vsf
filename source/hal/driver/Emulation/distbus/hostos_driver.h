@@ -20,7 +20,11 @@
 
 #       define VSF_HOSTOS_USART_CFG_TX_BLOCK            ENABLED
 #       define VSF_HOSTOS_USART_PREFIX                  __vsf_hw
-#       define VSF_HOSTOS_USART_UNCASE_PREFIX           __VSF_HW
+#       define VSF_HOSTOS_USART_UPCASE_PREFIX           __VSF_HW
+#       define VSF_HOSTOS_RTC_PREFIX                    __vsf_hw
+#       define VSF_HOSTOS_RTC_UPCASE_PREFIX             __VSF_HW
+#       define VSF_HOSTOS_RNG_PREFIX                    __vsf_hw
+#       define VSF_HOSTOS_RNG_UPCASE_PREFIX             __VSF_HW
 #	    define __VSF_HW_USART_COUNT						32
 
 #       include "hal/driver/x86/driver.h"

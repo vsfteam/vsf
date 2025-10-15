@@ -51,6 +51,14 @@ enum {
 };
 #endif
 
+/*============================ INCLUDES ======================================*/
+
+#ifdef VSF_HAL_DISTBUS_AS_REAL_DRIVER
+#   include "hal/driver/common/template/vsf_template_i2c.h"
+#endif
+
+/*============================ TYPES =========================================*/
+
 vsf_class(vsf_hal_distbus_i2c_t) {
 #if VSF_HAL_DISTBUS_I2C_CFG_MULTI_CLASS == ENABLED
     public_member(
@@ -59,6 +67,13 @@ vsf_class(vsf_hal_distbus_i2c_t) {
 #endif
     protected_member(
         vsf_distbus_service_t               service;
+        struct {
+            vsf_i2c_isr_handler_t           *handler;
+            void                            *target;
+            uint32_t                        enabled_mask;
+            uint32_t                        triggered_mask;
+            uint16_t                        no;
+        } irq;
     )
     private_member(
         vsf_distbus_t                       *distbus;
@@ -70,12 +85,7 @@ vsf_class(vsf_hal_distbus_i2c_t) {
 /*============================ PROTOTYPES ====================================*/
 
 extern uint32_t vsf_hal_distbus_i2c_register_service(vsf_distbus_t *distbus, vsf_hal_distbus_i2c_t *i2c, void *info, uint32_t infolen);
-
-/*============================ INCLUDES ======================================*/
-
-#define VSF_I2C_CFG_DEC_PREFIX              vsf_hal_distbus
-#define VSF_I2C_CFG_DEC_UPCASE_PREFIX       VSF_HAL_DISTBUS
-#include "hal/driver/common/i2c/i2c_template.h"
+extern void vsf_hal_distbus_i2c_irqhandler(vsf_hal_distbus_i2c_t *i2c);
 
 #ifdef __cplusplus
 }

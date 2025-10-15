@@ -22,7 +22,9 @@
 
 #include "hal/vsf_hal_cfg.h"
 
-#if VSF_HAL_USE_DISTBUS == ENABLED
+// if VSF_HAL_DISTBUS_AS_REAL_DRIVER is defined, hal/driver/Emulation/distbus/driver.h is used
+//  which will include hal/vsf/distbus/driver.h
+#if VSF_HAL_USE_DISTBUS == ENABLED && !defined(VSF_HAL_DISTBUS_AS_REAL_DRIVER)
 #   include "./distbus/driver.h"
 #endif
 

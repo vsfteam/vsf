@@ -44,6 +44,13 @@ static const vsf_distbus_service_info_t __vsf_hal_distbus_sdio_info = {
 
 /*============================ IMPLEMENTATION ================================*/
 
+void vsf_hal_distbus_sdio_irqhandler(vsf_hal_distbus_sdio_t *sdio)
+{
+    if (sdio->irq.handler != NULL) {
+        sdio->irq.handler(sdio->irq.target, (vsf_sdio_t *)sdio, sdio->irq.triggered_mask);
+    }
+}
+
 static bool __vsf_hal_distbus_sdio_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
     vsf_hal_distbus_sdio_t *sdio = vsf_container_of(service, vsf_hal_distbus_sdio_t, service);

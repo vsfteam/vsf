@@ -65,30 +65,6 @@ static const vsf_distbus_service_info_t __vsf_hal_distbus_usart_info = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_usart_mode_t vsf_hal_distbus_usart_mode_to_generic_usart_mode(uint32_t hal_distbus_usart_mode)
-{
-    // TODO:
-    return 0;
-}
-
-uint32_t vsf_generic_usart_mode_to_hal_distbus_usart_mode(vsf_usart_mode_t generic_usart_mode)
-{
-    // TODO:
-    return 0;
-}
-
-vsf_usart_irq_mask_t vsf_hal_distbus_usart_irqmask_to_generic_usart_irqmask(uint32_t hal_distbus_usart_irqmask)
-{
-    // TODO:
-    return 0;
-}
-
-uint32_t vsf_generic_usart_irqmask_to_hal_distbus_usart_irqmask(vsf_usart_irq_mask_t generic_usart_irqmask)
-{
-    // TODO:
-    return 0;
-}
-
 static void __vsf_hal_distbus_usart_tx(vsf_hal_distbus_usart_t *usart, uint8_t *buffer, uint16_t size)
 {
     uint8_t *param;
@@ -117,6 +93,13 @@ static void __vsf_hal_distbus_usart_txfifo(vsf_hal_distbus_usart_t *usart, vsf_p
     }
 }
 
+void vsf_hal_distbus_usart_irqhandler(vsf_hal_distbus_usart_t *usart)
+{
+    if (usart->irq.handler != NULL) {
+        usart->irq.handler(usart->irq.target, (vsf_usart_t *)usart, usart->irq.triggered_mask);
+    }
+}
+
 static bool __vsf_hal_distbus_usart_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
     vsf_hal_distbus_usart_t *usart = vsf_container_of(service, vsf_hal_distbus_usart_t, service);
@@ -136,23 +119,26 @@ static bool __vsf_hal_distbus_usart_msghandler(vsf_distbus_t *distbus, vsf_distb
         VSF_HAL_ASSERT(datalen == sizeof(*u_arg.txed_cnt));
         vsf_stream_read(&usart->fifo.tx.stream.use_as__vsf_stream_t, NULL, le32_to_cpu(u_arg.txed_cnt->count));
 
-        vsf_protect_t orig = __vsf_usart_protect();
-        usart->fifo.tx.is_pending = false;
-        __vsf_hal_distbus_usart_txfifo(usart, orig);
+        {
+            vsf_protect_t orig = __vsf_usart_protect();
+            usart->fifo.tx.is_pending = false;
+            __vsf_hal_distbus_usart_txfifo(usart, orig);
+        }
         break;
     case VSF_HAL_DISTBUS_USART_CMD_RX:
         VSF_HAL_ASSERT(datalen > 0);
         if (datalen < vsf_stream_write(&usart->fifo.rx.stream.use_as__vsf_stream_t, data, datalen)) {
-            if ((usart->irq.handler != NULL) && (usart->irq.mask & VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)) {
-                usart->irq.handler(usart->irq.target, (vsf_usart_t *)&usart, VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR);
+            usart->irq.triggered_mask = VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR & usart->irq.enabled_mask;
+            if (usart->irq.triggered_mask && !vsf_hal_distbus_on_irq(usart, usart->irq.no)) {
+                vsf_hal_distbus_usart_irqhandler(usart);
             }
         }
         break;
     case VSF_HAL_DISTBUS_USART_CMD_ISR:
         VSF_HAL_ASSERT(datalen == sizeof(*u_arg.isr));
-        if (usart->irq.handler != NULL) {
-            usart->irq.handler(usart->irq.target, (vsf_usart_t *)&usart,
-                usart->irq.mask & vsf_hal_distbus_usart_irqmask_to_generic_usart_irqmask(le32_to_cpu(u_arg.isr->irq_mask)));
+        usart->irq.triggered_mask = le32_to_cpu(u_arg.isr->irq_mask) & usart->irq.enabled_mask;
+        if (usart->irq.triggered_mask && !vsf_hal_distbus_on_irq(usart, usart->irq.no)) {
+            vsf_hal_distbus_usart_irqhandler(usart);
         }
         break;
     default:
@@ -207,8 +193,11 @@ vsf_err_t vsf_hal_distbus_usart_init(vsf_hal_distbus_usart_t *usart, vsf_usart_c
     vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(usart->distbus, sizeof(*param), (uint8_t **)&param);
     VSF_HAL_ASSERT(msg != NULL);
 
+    usart->irq.handler = cfg->isr.handler_fn;
+    usart->irq.target = cfg->isr.target_ptr;
+
     msg->header.addr = VSF_HAL_DISTBUS_USART_CMD_INIT;
-    param->mode = cpu_to_le32(vsf_generic_usart_mode_to_hal_distbus_usart_mode(cfg->mode));
+    param->mode = cpu_to_le32(cfg->mode);
     param->baudrate = cpu_to_le32(cfg->baudrate);
     param->rx_timeout = cpu_to_le32(cfg->rx_timeout);
     vsf_distbus_send_msg(usart->distbus, &usart->service, msg);
@@ -248,7 +237,7 @@ void vsf_hal_distbus_usart_irq_enable(vsf_hal_distbus_usart_t *usart, vsf_usart_
 {
     VSF_HAL_ASSERT(NULL != usart);
     VSF_HAL_ASSERT(0 != irq_mask);
-    usart->irq.mask |= irq_mask;
+    usart->irq.enabled_mask |= irq_mask;
 
     vsf_hal_distbus_usart_isr_t *param;
     vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(usart->distbus, sizeof(*param), (uint8_t **)&param);
@@ -263,7 +252,7 @@ void vsf_hal_distbus_usart_irq_disable(vsf_hal_distbus_usart_t *usart, vsf_usart
 {
     VSF_HAL_ASSERT(NULL != usart);
     VSF_HAL_ASSERT(0 != irq_mask);
-    usart->irq.mask &= ~irq_mask;
+    usart->irq.enabled_mask &= ~irq_mask;
 
     vsf_hal_distbus_usart_isr_t *param;
     vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(usart->distbus, sizeof(*param), (uint8_t **)&param);

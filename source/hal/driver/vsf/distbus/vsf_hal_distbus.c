@@ -50,6 +50,12 @@ void vsf_hal_distbus_on_new(vsf_hal_distbus_t *hal_distbus, vsf_hal_distbus_type
 {
 }
 
+VSF_CAL_WEAK(vsf_hal_distbus_on_irq)
+bool vsf_hal_distbus_on_irq(void *devs, uint16_t irqn)
+{
+    return false;
+}
+
 static bool __vsf_hal_distbus_msghandler(vsf_distbus_t *distbus,
                         vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {

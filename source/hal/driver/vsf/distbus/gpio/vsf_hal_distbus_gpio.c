@@ -61,16 +61,6 @@ static const vsf_gpio_op_t __vsf_hal_distbus_gpio_op = {
 
 /*============================ IMPLEMENTATION ================================*/
 
-// TODO:
-vsf_gpio_mode_t vsf_hal_distbus_io_feature_to_generic_io_feature(uint32_t hal_distbus_io_feature)
-{
-    return (vsf_gpio_mode_t)0;
-}
-uint32_t vsf_generic_io_feature_to_hal_distbus_io_feature(vsf_gpio_mode_t generic_io_feature)
-{
-    return 0;
-}
-
 static bool __vsf_hal_distbus_gpio_msghandler(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg)
 {
     vsf_hal_distbus_gpio_t *gpio = vsf_container_of(service, vsf_hal_distbus_gpio_t, service);
@@ -117,15 +107,14 @@ vsf_err_t vsf_hal_distbus_gpio_port_config_pins(vsf_hal_distbus_gpio_t *gpio, vs
 {
     VSF_HAL_ASSERT(NULL != gpio);
     VSF_HAL_ASSERT(NULL != cfg);
-    VSF_HAL_ASSERT(gpio->info.support_config_pin);
 
     vsf_hal_distbus_gpio_port_config_pins_t *param;
     vsf_distbus_msg_t *msg = vsf_distbus_alloc_msg(gpio->distbus, sizeof(*param), (uint8_t **)&param);
     VSF_HAL_ASSERT(msg != NULL);
 
-    msg->header.addr = VSF_HAL_DISTBUS_GPIO_CMD_CONFIG_PIN;
+    msg->header.addr = VSF_HAL_DISTBUS_GPIO_CMD_PORT_CONFIG_PINS;
     param->pin_mask = cpu_to_le32(pin_mask);
-    param->mode = cpu_to_le32(vsf_generic_io_feature_to_hal_distbus_io_feature(cfg->mode));
+    param->mode = cpu_to_le32(cfg->mode);
     param->alternate_function = cpu_to_le32(cfg->alternate_function);
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
     return VSF_ERR_NONE;

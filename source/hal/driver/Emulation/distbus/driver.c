@@ -17,6 +17,13 @@
 
 /*============================ INCLUDES ======================================*/
 
+#define __VSF_HAL_DISTBUS_GPIO_CLASS_INHERIT__
+#define __VSF_HAL_DISTBUS_USART_CLASS_INHERIT__
+#define __VSF_HAL_DISTBUS_SPI_CLASS_INHERIT__
+#define __VSF_HAL_DISTBUS_I2C_CLASS_INHERIT__
+#define __VSF_HAL_DISTBUS_I2S_CLASS_INHERIT__
+#define __VSF_HAL_DISTBUS_SDIO_CLASS_INHERIT__
+
 #include "hal/vsf_hal_cfg.h"
 #include "./device.h"
 
@@ -65,6 +72,7 @@ typedef struct vsf_hal_distbus_ctx_t {
     } chip;
 
     vsf_arch_irq_request_t irq_request;
+    void (**vector_table)();
 } vsf_hal_distbus_ctx_t;
 
 #define VSF_HAL_DISTBUS_PERIPHERAL_TYPE_DEF(__TYPE)                             \
@@ -131,6 +139,8 @@ static vsf_hal_distbus_ctx_t __vsf_hal_distbus_ctx = {
 #define VSF_HAL_HW_IMPLEMENT_IRQ(__N, __VALUE)                                  \
         void VSF_MCONNECT(VSF_HAL_CFG_IMP_UPCASE_TYPE, __N, _IRQHandler)(void)  \
         {                                                                       \
+            VSF_MCONNECT(vsf_hal_distbus_, VSF_HAL_CFG_IMP_TYPE, _irqhandler)(  \
+                    VSF_MCONNECT(vsf_hw_, VSF_HAL_CFG_IMP_TYPE, __N)._.target); \
         }
 #define VSF_HAL_HW_IMPLEMENT_IRQ_MULTI()                                        \
         VSF_MREPEAT(VSF_MCONNECT(VSF_HW_, VSF_HAL_CFG_IMP_UPCASE_TYPE, _COUNT), VSF_HAL_HW_IMPLEMENT_IRQ, NULL)
@@ -251,11 +261,12 @@ void vsf_hal_distbus_on_new(vsf_hal_distbus_t *hal_distbus, vsf_hal_distbus_type
     u_devs.ptr = devs;
 
     switch (type) {
-#define VSF_HAL_DISTBUS_ENUM(__TYPE)                                            \
+#define VSF_HAL_DISTBUS_ON_NEW_DEFS(__TYPE)                                     \
     case VSF_MCONNECT(VSF_HAL_DISTBUS_, __TYPE):                                \
         if (!__vsf_hal_distbus_ctx.chip.__TYPE.dev_num) {                       \
             __vsf_hal_distbus_ctx.chip.__TYPE.dev_num = vsf_min(num, dimof(__vsf_hal_distbus_ctx.chip.__TYPE.dev));\
             for (uint8_t i = 0; i < __vsf_hal_distbus_ctx.chip.__TYPE.dev_num; i++) {\
+                u_devs.__TYPE[i].irq.no = i + VSF_MCONNECT(VSF_HW_, __TYPE, _IRQN);\
                 __vsf_hal_distbus_ctx.chip.__TYPE.dev[i] = (VSF_MCONNECT(vsf_, __TYPE, _t) *)&u_devs.__TYPE[i];\
                 VSF_MCONNECT(vsf_hw_, __TYPE, s)[i]->_.target = (VSF_MCONNECT(vsf_, __TYPE, _t) *)__vsf_hal_distbus_ctx.chip.__TYPE.dev[i];\
                 __vsf_arch_trace(0, "[hal_distbus] new " VSF_STR(__TYPE) "%d %p" VSF_TRACE_CFG_LINEEND, i, __vsf_hal_distbus_ctx.chip.__TYPE.dev[i]);\
@@ -263,12 +274,26 @@ void vsf_hal_distbus_on_new(vsf_hal_distbus_t *hal_distbus, vsf_hal_distbus_type
         }                                                                       \
         break;
 
-#define __VSF_HAL_DISTBUS_ENUM      VSF_HAL_DISTBUS_ENUM
+#define __VSF_HAL_DISTBUS_ENUM      VSF_HAL_DISTBUS_ON_NEW_DEFS
 #include "./vsf_hal_distbus_enum_with_peripheral_count.inc"
     }
 
     __vsf_arch_trace(0, "distbus slave connected\n");
     __vsf_arch_irq_request_send(&__vsf_hal_distbus_ctx.irq_request);
+}
+
+bool vsf_hal_distbus_on_irq(void *devs, uint16_t irqn)
+{
+    VSF_HAL_ASSERT(irqn < VSF_HW_INTERRUPTS_NUM);
+    VSF_HAL_ASSERT(__vsf_hal_distbus_ctx.vector_table != NULL);
+    VSF_HAL_ASSERT(__vsf_hal_distbus_ctx.vector_table[irqn] != NULL);
+    (__vsf_hal_distbus_ctx.vector_table[irqn])();
+    return true;
+}
+
+void vsf_distbus_hal_set_vector_table(void (**vector_table)())
+{
+    __vsf_hal_distbus_ctx.vector_table = vector_table;
 }
 
 static void __user_hal_distbus_on_remote_connected(vsf_hal_distbus_t *hal_distbus)
