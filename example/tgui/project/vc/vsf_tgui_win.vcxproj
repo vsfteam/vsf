@@ -241,6 +241,7 @@
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\driver.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\device.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\driver.h" />
+    <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rng\rng.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.h" />
     <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\uart\uart.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\adc\vsf_remapped_adc.h" />
@@ -249,6 +250,8 @@
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\i2c\vsf_remapped_i2c.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\i2s\vsf_remapped_i2s.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.h" />
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\rng\vsf_remapped_rng.h" />
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\rtc\vsf_remapped_rtc.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\sdio\vsf_remapped_sdio.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\spi\vsf_remapped_spi.h" />
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\usart\vsf_remapped_usart.h" />
@@ -477,6 +480,7 @@
     <ClCompile Include="..\..\..\..\source\hal\arch\x86\win\win_generic_simple.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\common\usart\usart_common.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\driver.c" />
+    <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rng\rng.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rtc\rtc.c" />
     <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\uart\uart.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\adc\vsf_remapped_adc.c" />
@@ -485,6 +489,8 @@
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\i2c\vsf_remapped_i2c.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\i2s\vsf_remapped_i2s.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\pwm\vsf_remapped_pwm.c" />
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\rng\vsf_remapped_rng.c" />
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\rtc\vsf_remapped_rtc.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\sdio\vsf_remapped_sdio.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\spi\vsf_remapped_spi.c" />
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\usart\vsf_remapped_usart.c" />

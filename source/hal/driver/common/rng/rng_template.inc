@@ -85,7 +85,7 @@ vsf_rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
         }                                                                                      \
         vsf_err_t vsf_imp_rng_generate_request(vsf_imp_rng_t *rng_ptr,                         \
                                                uint32_t *buffer, uint32_t num, void *param,    \
-                                               vsf_imp_rng_on_ready_callback_t * on_ready_cb)  \
+                                               vsf_rng_on_ready_callback_t * on_ready_cb)      \
         {                                                                                      \
             VSF_HAL_ASSERT(rng_ptr != NULL);                                                   \
             return vsf_remap_rng_generate_request(rng_ptr, buffer, num, param, on_ready_cb);   \

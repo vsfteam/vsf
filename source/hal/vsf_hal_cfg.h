@@ -137,6 +137,10 @@ extern "C" {
 #   define VSF_HAL_USE_FB                   ENABLED
 #endif
 
+#ifndef VSF_HAL_USE_RNG
+#   define VSF_HAL_USE_RNG                  ENABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

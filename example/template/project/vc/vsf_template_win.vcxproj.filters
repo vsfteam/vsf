@@ -1195,6 +1195,9 @@
     <Filter Include="vsf\hal\utilities\remap\rtc">
       <UniqueIdentifier>{afcc4cd1-f9e1-4e1a-ad17-2201b68d440c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\hal\utilities\remap\rng">
+      <UniqueIdentifier>{d08ece83-d562-4a35-87a6-750446eaeaa2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -3566,6 +3569,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\source\hal\utilities\remap\vsf_hal_remap.h">
       <Filter>vsf\hal\utilities\remap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\rng\vsf_remapped_rng.h">
+      <Filter>vsf\hal\utilities\remap\rng</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -6190,6 +6196,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\source\hal\utilities\remap\rtc\vsf_remapped_rtc.c">
       <Filter>vsf\hal\utilities\remap\rtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\rng\vsf_remapped_rng.c">
+      <Filter>vsf\hal\utilities\remap\rng</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

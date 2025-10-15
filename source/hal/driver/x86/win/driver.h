@@ -101,12 +101,15 @@ extern "C" {
 #       ifndef VSF_HW_RNG_COUNT
 #           define VSF_HW_RNG_COUNT                     VSF_HOSTOS_RNG_COUNT
 #       endif
+#       ifndef VSF_HW_RNG_BITLEN
+#           define VSF_HW_RNG_BITLEN                    VSF_HOSTOS_RNG_BITLEN
+#       endif
 #    endif
 
 #   define VSF_RNG_CFG_DEC_PREFIX                       VSF_HOSTOS_RNG_PREFIX
 #   define VSF_RNG_CFG_DEC_UPCASE_PREFIX                VSF_HOSTOS_RNG_UPCASE_PREFIX
-#   define VSF_RND_CFG_DEC_REMAP                        ENABLED
-#   define VSF_RND_CFG_DEC_REMAP_PREFIX                 vsf_remapped
+#   define VSF_RNG_CFG_DEC_REMAP                        ENABLED
+#   define VSF_RNG_CFG_DEC_REMAP_PREFIX                 vsf_remapped
 #   include "hal/driver/common/rng/rng_template.h"
 #endif
 

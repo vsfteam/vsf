@@ -30,6 +30,7 @@
 #include "./pwm/vsf_remapped_pwm.h"
 #include "./i2s/vsf_remapped_i2s.h"
 #include "./rtc/vsf_remapped_rtc.h"
+#include "./rng/vsf_remapped_rng.h"
 
 #ifdef __cplusplus
 extern "C" {

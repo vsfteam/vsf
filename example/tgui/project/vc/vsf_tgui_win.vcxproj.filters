@@ -394,6 +394,15 @@
     <Filter Include="usrapp\demo\lvgl_font">
       <UniqueIdentifier>{87816ed3-e6ab-4ddf-917f-fb550e1c444c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vsf\hal\utilities\remap\rtc">
+      <UniqueIdentifier>{15fdbf03-dd52-4e14-9199-74f5841eab03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\driver\x86\win\rng">
+      <UniqueIdentifier>{be23481e-c10c-4911-9b92-d40fc602ea2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vsf\hal\utilities\remap\rng">
+      <UniqueIdentifier>{d5328918-1a20-4732-83fe-0a60d3574925}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\source\vsf.h">
@@ -1368,6 +1377,15 @@
     <ClInclude Include="..\..\..\..\source\component\ui\tgui\view\scgui_view\scgui.h">
       <Filter>vsf\component\ui\tgui\view\scgui_view</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\rtc\vsf_remapped_rtc.h">
+      <Filter>vsf\hal\utilities\remap\rtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\driver\x86\win\rng\rng.h">
+      <Filter>vsf\hal\driver\x86\win\rng</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\source\hal\utilities\remap\rng\vsf_remapped_rng.h">
+      <Filter>vsf\hal\utilities\remap\rng</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\source\utilities\template\vsf_bitmap.c">
@@ -1978,6 +1996,15 @@
     </ClCompile>
     <ClCompile Include="..\..\demo\lvgl_font\lv_font_14.c">
       <Filter>usrapp\demo\lvgl_font</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\rtc\vsf_remapped_rtc.c">
+      <Filter>vsf\hal\utilities\remap\rtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\driver\x86\win\rng\rng.c">
+      <Filter>vsf\hal\driver\x86\win\rng</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\source\hal\utilities\remap\rng\vsf_remapped_rng.c">
+      <Filter>vsf\hal\utilities\remap\rng</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

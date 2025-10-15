@@ -95,4 +95,16 @@ vsf_err_t vsf_hostos_rng_generate_request(vsf_hostos_rng_t *rng, uint32_t *buffe
     };
 #include "hal/driver/common/rng/rng_template.inc"
 
+
+
+#define VSF_RNG_CFG_IMP_PREFIX                      VSF_HOSTOS_RNG_PREFIX
+#define VSF_RNG_CFG_IMP_UPCASE_PREFIX               VSF_HOSTOS_RNG_UPCASE_PREFIX
+#define VSF_RNG_CFG_IMP_COUNT_MASK_PREFIX           VSF_HOSTOS
+#define VSF_RNG_CFG_IMP_REMAP_PREFIX                vsf_remapped
+#define VSF_RNG_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
+    describe_remapped_rng(                                                      \
+        VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng, __IDX),                      \
+        VSF_MCONNECT(vsf_hostos_rng, __IDX))
+#include "hal/driver/common/rng/rng_template.inc"
+
 #endif /* VSF_HAL_USE_AD */
