@@ -59,6 +59,7 @@ if(VSF_ARCH STREQUAL "ARM")
 elseif(VSF_ARCH STREQUAL "Riscv")
 elseif(VSF_ARCH STREQUAL "Windows")
     vsf_add_compile_definitions(
+        VSF_HAL_DISTBUS_AS_REAL_DRIVER
         VSF_HAL_USE_DISTBUS=ENABLED
         VSF_USE_HEAP=ENABLED
         VSF_USE_DISTBUS=ENABLED

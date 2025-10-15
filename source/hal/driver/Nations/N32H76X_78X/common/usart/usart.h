@@ -67,8 +67,10 @@ typedef enum vsf_usart_mode_t {
     // 1..2: TXEN(2)/RXEN(1) in USART_CTRL1
     VSF_USART_TX_ENABLE                 = (1 << 2),
     VSF_USART_TX_DISABLE                = (0 << 2),
+#define VSF_USART_TX_DISABLE            VSF_USART_TX_DISABLE
     VSF_USART_RX_ENABLE                 = (1 << 1),
     VSF_USART_RX_DISABLE                = (0 << 1),
+#define VSF_USART_RX_DISABLE            VSF_USART_RX_DISABLE
 
     // 3..4: PCEN(4)/PSEL(3) in USART_CTRL1
     VSF_USART_NO_PARITY                 = (0 << 4),
@@ -153,7 +155,6 @@ typedef enum vsf_usart_mode_t {
 
     // 20|22: RTSEN(2)/CTSEN(0) in USART_CTRL3, right shifted by 20
     VSF_USART_NO_HWCONTROL              = (0) << 16,
-#define VSF_USART_NO_HWCONTROL          VSF_USART_NO_HWCONTROL
     VSF_USART_RTS_HWCONTROL             = (1 << 2) << 20,
 #define VSF_USART_RTS_HWCONTROL         VSF_USART_RTS_HWCONTROL
     VSF_USART_CTS_HWCONTROL             = (1 << 0) << 20,
@@ -166,7 +167,6 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_HALF_DUPLEX_ENABLE        = (1 << 4) << 20,
 #define VSF_USART_HALF_DUPLEX_ENABLE    VSF_USART_HALF_DUPLEX_ENABLE
     VSF_USART_HALF_DUPLEX_DISABLE       = 0,
-#define VSF_USART_HALF_DUPLEX_DISABLE   VSF_USART_HALF_DUPLEX_DISABLE
 
     // more vendor specified modes can be added here
 

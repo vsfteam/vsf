@@ -17,9 +17,11 @@ const BINDGEN_DEFINITIONS: [&'static str; 2] = [
 
 const PERIPHERIALS: [&'static str; 4] = ["gpio", "usart", "spi", "i2c"];
 
-const CONSTANTS_MACRO: [(&'static str, &'static str); 66] = [
+const CONSTANTS_MACRO: [(&'static str, &'static str); 67] = [
     // USART optional constants defined in MACRO
     ("vsf_usart_status_t", "VSF_USART_STATUS_BREAK_SENT"),
+    ("vsf_usart_mode_t", "VSF_USART_TX_DISABLE"),
+    ("vsf_usart_mode_t", "VSF_USART_RX_DISABLE"),
     ("vsf_usart_mode_t", "VSF_USART_5_BIT_LENGTH"),
     ("vsf_usart_mode_t", "VSF_USART_6_BIT_LENGTH"),
     ("vsf_usart_mode_t", "VSF_USART_7_BIT_LENGTH"),
@@ -30,7 +32,6 @@ const CONSTANTS_MACRO: [(&'static str, &'static str); 66] = [
     ("vsf_usart_mode_t", "VSF_USART_2_STOPBIT"),
     ("vsf_usart_mode_t", "VSF_USART_SYNC_CLOCK_ENABLE"),
     ("vsf_usart_mode_t", "VSF_USART_HALF_DUPLEX_ENABLE"),
-    ("vsf_usart_mode_t", "VSF_USART_HALF_DUPLEX_DISABLE"),
     ("vsf_usart_mode_t", "VSF_USART_SWAP"),
     ("vsf_usart_mode_t", "VSF_USART_TX_INVERT"),
     ("vsf_usart_mode_t", "VSF_USART_RX_INVERT"),
@@ -88,7 +89,7 @@ const CONSTANTS_MACRO: [(&'static str, &'static str); 66] = [
     ("vsf_spi_irq_mask_t", "VSF_SPI_IRQ_MASK_CRC_ERR"),
 ];
 
-const CONSTANTS_ENUM: [(&'static str, &'static str); 122] = [
+const CONSTANTS_ENUM: [(&'static str, &'static str); 123] = [
     // GPIO constants
     ("", "VSF_HW_GPIO_PIN_COUNT"),
     ("vsf_gpio_mode_t", "VSF_GPIO_ANALOG"),
@@ -109,6 +110,8 @@ const CONSTANTS_ENUM: [(&'static str, &'static str); 122] = [
     ("vsf_gpio_mode_t", "VSF_GPIO_DRIVE_STRENGTH_HIGH"),
     ("vsf_gpio_mode_t", "VSF_GPIO_DRIVE_STRENGTH_VERY_HIGH"),
     // USART constants
+    ("vsf_usart_mode_t", "VSF_USART_TX_DISABLE"),
+    ("vsf_usart_mode_t", "VSF_USART_RX_DISABLE"),
     ("vsf_usart_mode_t", "VSF_USART_5_BIT_LENGTH"),
     ("vsf_usart_mode_t", "VSF_USART_6_BIT_LENGTH"),
     ("vsf_usart_mode_t", "VSF_USART_7_BIT_LENGTH"),
@@ -119,7 +122,6 @@ const CONSTANTS_ENUM: [(&'static str, &'static str); 122] = [
     ("vsf_usart_mode_t", "VSF_USART_2_STOPBIT"),
     ("vsf_usart_mode_t", "VSF_USART_SYNC_CLOCK_ENABLE"),
     ("vsf_usart_mode_t", "VSF_USART_HALF_DUPLEX_ENABLE"),
-    ("vsf_usart_mode_t", "VSF_USART_HALF_DUPLEX_DISABLE"),
     ("vsf_usart_mode_t", "VSF_USART_SWAP"),
     ("vsf_usart_mode_t", "VSF_USART_TX_INVERT"),
     ("vsf_usart_mode_t", "VSF_USART_RX_INVERT"),

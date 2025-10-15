@@ -123,14 +123,10 @@ pub enum StopBits {
 /// Duplex mode
 pub enum Duplex {
     /// Full duplex
-    #[cfg(VSF_USART_HALF_DUPLEX_DISABLE)]
     Full = into_vsf_usart_mode_t!(VSF_USART_HALF_DUPLEX_DISABLE) as isize,
     /// Half duplex
     #[cfg(VSF_USART_HALF_DUPLEX_ENABLE)]
     Half = into_vsf_usart_mode_t!(VSF_USART_HALF_DUPLEX_ENABLE) as isize,
-
-    #[cfg(not(any(VSF_USART_HALF_DUPLEX_ENABLE, VSF_USART_HALF_DUPLEX_DISABLE)))]
-    Full = 0,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -1872,6 +1868,8 @@ mod _embedded_io {
                 Error::Parity => embedded_io_async::ErrorKind::InvalidData,
                 #[cfg(VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR)]
                 Error::RxOverrun => embedded_io_async::ErrorKind::OutOfMemory,
+                #[cfg(VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR)]
+                Error::TxOverrun => embedded_io_async::ErrorKind::OutOfMemory,
                 #[cfg(VSF_USART_IRQ_MASK_BREAK_ERR)]
                 Error::Break => embedded_io_async::ErrorKind::ConnectionAborted,
                 Error::NotSupport => embedded_io_async::ErrorKind::Unsupported,
