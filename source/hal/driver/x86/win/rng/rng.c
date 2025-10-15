@@ -15,12 +15,9 @@
  *                                                                           *
  ****************************************************************************/
 
-#define VSF_RNG_CFG_IMP_PREFIX                  vsf_hw
-#define VSF_RNG_CFG_IMP_UPCASE_PREFIX           VSF_HW
-
 /*============================ INCLUDES ======================================*/
 
-#include "../driver.h"
+#include "hal/vsf_hal.h"
 
 #if VSF_HAL_USE_RNG == ENABLED
 
@@ -33,18 +30,18 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef VSF_HW_RNG_CFG_MULTI_CLASS
-#   define VSF_HW_RNG_CFG_MULTI_CLASS           VSF_RNG_CFG_MULTI_CLASS
+#ifndef VSF_HOSTOS_RNG_CFG_MULTI_CLASS
+#   define VSF_HOSTOS_RNG_CFG_MULTI_CLASS           VSF_RNG_CFG_MULTI_CLASS
 #endif
 
 /*============================ TYPES =========================================*/
 
-typedef struct vsf_hw_rng_t {
-#if VSF_HW_RNG_CFG_MULTI_CLASS == ENABLED
+typedef struct vsf_hostos_rng_t {
+#if VSF_HOSTOS_RNG_CFG_MULTI_CLASS == ENABLED
     vsf_rng_t vsf_rng;
 #endif
     HCRYPTPROV hProv;
-} vsf_hw_rng_t;
+} vsf_hostos_rng_t;
 
 /*============================ INCLUDES ======================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -52,7 +49,7 @@ typedef struct vsf_hw_rng_t {
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-vsf_err_t vsf_hw_rng_init(vsf_hw_rng_t *rng)
+vsf_err_t vsf_hostos_rng_init(vsf_hostos_rng_t *rng)
 {
     if ((HCRYPTPROV)0 == rng->hProv) {
         if (!CryptAcquireContext(&rng->hProv, NULL, NULL, PROV_RSA_FULL, 0)) {
@@ -64,7 +61,7 @@ vsf_err_t vsf_hw_rng_init(vsf_hw_rng_t *rng)
     return VSF_ERR_NONE;
 }
 
-void vsf_hw_rng_fini(vsf_hw_rng_t *rng)
+void vsf_hostos_rng_fini(vsf_hostos_rng_t *rng)
 {
     if (rng->hProv != (HCRYPTPROV)0) {
         CryptReleaseContext(rng->hProv, 0);
@@ -72,7 +69,7 @@ void vsf_hw_rng_fini(vsf_hw_rng_t *rng)
     }
 }
 
-vsf_err_t vsf_hw_rng_generate_request(vsf_hw_rng_t *rng, uint32_t *buffer, uint32_t num,
+vsf_err_t vsf_hostos_rng_generate_request(vsf_hostos_rng_t *rng, uint32_t *buffer, uint32_t num,
             void *param, vsf_rng_on_ready_callback_t *on_ready)
 {
     VSF_HAL_ASSERT(rng->hProv != (HCRYPTPROV)0);
@@ -89,8 +86,11 @@ vsf_err_t vsf_hw_rng_generate_request(vsf_hw_rng_t *rng, uint32_t *buffer, uint3
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
+#define VSF_RNG_CFG_IMP_PREFIX                      vsf_hostos
+#define VSF_RNG_CFG_IMP_UPCASE_PREFIX               VSF_HOSTOS
+
 #define VSF_RNG_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
-    vsf_hw_rng_t VSF_MCONNECT(vsf_hw_rng, __IDX) = {                            \
+    vsf_hostos_rng_t VSF_MCONNECT(vsf_hostos_rng, __IDX) = {                    \
         __HAL_OP                                                                \
     };
 #include "hal/driver/common/rng/rng_template.inc"

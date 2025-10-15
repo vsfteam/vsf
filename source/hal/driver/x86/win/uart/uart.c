@@ -18,7 +18,7 @@
 /*============================ INCLUDES ======================================*/
 
 #define __VSF_SIMPLE_STREAM_CLASS_INHERIT__
-#include "../driver.h"
+#include "hal/vsf_hal.h"
 
 #if VSF_HAL_USE_USART == ENABLED
 
@@ -514,7 +514,7 @@ void vsf_hostos_usart_fini(vsf_hostos_usart_t *hostos_usart)
 vsf_usart_capability_t vsf_hostos_usart_capability(vsf_hostos_usart_t *hostos_usart)
 {
     vsf_usart_capability_t usart_capability = {
-        .irq_mask = HOSTFS_USART_IRQ_ALL_BITS_MASK,
+        .irq_mask = VSF_USART_IRQ_ALL_BITS_MASK,
         .max_baudrate = 4000000,
         .min_baudrate = 50,
         .min_data_bits = 8,
@@ -590,7 +590,7 @@ fsm_rt_t vsf_hostos_usart_disable(vsf_hostos_usart_t *hostos_usart)
 void vsf_hostos_usart_irq_enable(vsf_hostos_usart_t *hostos_usart, vsf_usart_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(hostos_usart != NULL);
-    VSF_HAL_ASSERT((irq_mask & ~HOSTFS_USART_IRQ_ALL_BITS_MASK) == 0);
+    VSF_HAL_ASSERT((irq_mask & ~VSF_USART_IRQ_ALL_BITS_MASK) == 0);
 
     if (0 == hostos_usart->port_idx) {
         return;
@@ -607,7 +607,7 @@ void vsf_hostos_usart_irq_enable(vsf_hostos_usart_t *hostos_usart, vsf_usart_irq
 void vsf_hostos_usart_irq_disable(vsf_hostos_usart_t *hostos_usart, vsf_usart_irq_mask_t irq_mask)
 {
     VSF_HAL_ASSERT(hostos_usart != NULL);
-    VSF_HAL_ASSERT((irq_mask & ~HOSTFS_USART_IRQ_ALL_BITS_MASK) == 0);
+    VSF_HAL_ASSERT((irq_mask & ~VSF_USART_IRQ_ALL_BITS_MASK) == 0);
 
     if (0 == hostos_usart->port_idx) {
         return;

@@ -223,11 +223,11 @@ bool vsf_hostos_driver_init(void)
     __vsf_x86_debug_stream_init();
 #endif
 #if VSF_HAL_USE_RTC == ENABLED
-    vsf_hw_rtc_init(&vsf_hw_rtc0, NULL);
-    vsf_hw_rtc_enable(&vsf_hw_rtc0);
+    vsf_hostos_rtc_init(&vsf_hostos_rtc0, NULL);
+    vsf_hostos_rtc_enable(&vsf_hostos_rtc0);
 #endif
 #if VSF_HAL_USE_RNG == ENABLED
-    vsf_hw_rng_init(&vsf_hw_rng0);
+    vsf_hostos_rng_init(&vsf_hostos_rng0);
 #endif
     return true;
 }

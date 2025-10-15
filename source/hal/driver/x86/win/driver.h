@@ -53,14 +53,14 @@ extern "C" {
 
 #    ifndef VSF_HOSTOS_USART_PREFIX
 #       define VSF_HOSTOS_USART_PREFIX                  vsf_hw
-#       define VSF_HOSTOS_USART_UNCASE_PREFIX           VSF_HW
+#       define VSF_HOSTOS_USART_UPCASE_PREFIX           VSF_HW
 #       ifndef VSF_HW_USART_COUNT
 #           define VSF_HW_USART_COUNT                   VSF_HOSTOS_USART_COUNT
 #       endif
 #    endif
 
 #   define VSF_USART_CFG_DEC_PREFIX                     VSF_HOSTOS_USART_PREFIX
-#   define VSF_USART_CFG_DEC_UPCASE_PREFIX              VSF_HOSTOS_USART_UNCASE_PREFIX
+#   define VSF_USART_CFG_DEC_UPCASE_PREFIX              VSF_HOSTOS_USART_UPCASE_PREFIX
 #   define VSF_USART_CFG_DEC_REMAP                      ENABLED
 #   define VSF_USART_CFG_DEC_REMAP_PREFIX               vsf_fifo2req
 #   include "hal/driver/common/usart/usart_template.h"
@@ -69,16 +69,44 @@ extern "C" {
 #if VSF_HAL_USE_RTC == ENABLED
 #   include "hal/driver/common/template/vsf_template_rtc.h"
 
-#   define VSF_RTC_CFG_DEC_PREFIX                       vsf_hw
-#   define VSF_RTC_CFG_DEC_UPCASE_PREFIX                VSF_HW
+#   define VSF_RTC_CFG_DEC_PREFIX                       vsf_hostos
+#   define VSF_RTC_CFG_DEC_UPCASE_PREFIX                VSF_HOSTOS
+#   include "hal/driver/common/rtc/rtc_template.h"
+
+#    ifndef VSF_HOSTOS_RTC_PREFIX
+#       define VSF_HOSTOS_RTC_PREFIX                    vsf_hw
+#       define VSF_HOSTOS_RTC_UPCASE_PREFIX             VSF_HW
+#       ifndef VSF_HW_RTC_COUNT
+#           define VSF_HW_RTC_COUNT                     VSF_HOSTOS_RTC_COUNT
+#       endif
+#    endif
+
+#   define VSF_RTC_CFG_DEC_PREFIX                       VSF_HOSTOS_RTC_PREFIX
+#   define VSF_RTC_CFG_DEC_UPCASE_PREFIX                VSF_HOSTOS_RTC_UPCASE_PREFIX
+#   define VSF_RTC_CFG_DEC_REMAP                        ENABLED
+#   define VSF_RTC_CFG_DEC_REMAP_PREFIX                 vsf_remap
 #   include "hal/driver/common/rtc/rtc_template.h"
 #endif
 
 #if VSF_HAL_USE_RNG == ENABLED
 #   include "hal/driver/common/template/vsf_template_rng.h"
 
-#   define VSF_RNG_CFG_DEC_PREFIX                       vsf_hw
-#   define VSF_RNG_CFG_DEC_UPCASE_PREFIX                VSF_HW
+#   define VSF_RNG_CFG_DEC_PREFIX                       vsf_hostos
+#   define VSF_RNG_CFG_DEC_UPCASE_PREFIX                VSF_HOSTOS
+#   include "hal/driver/common/rng/rng_template.h"
+
+#    ifndef VSF_HOSTOS_RNG_PREFIX
+#       define VSF_HOSTOS_RNG_PREFIX                    vsf_hw
+#       define VSF_HOSTOS_RNG_UPCASE_PREFIX             VSF_HW
+#       ifndef VSF_HW_RNG_COUNT
+#           define VSF_HW_RNG_COUNT                     VSF_HOSTOS_RNG_COUNT
+#       endif
+#    endif
+
+#   define VSF_RNG_CFG_DEC_PREFIX                       VSF_HOSTOS_RNG_PREFIX
+#   define VSF_RNG_CFG_DEC_UPCASE_PREFIX                VSF_HOSTOS_RNG_UPCASE_PREFIX
+#   define VSF_RND_CFG_DEC_REMAP                        ENABLED
+#   define VSF_RND_CFG_DEC_REMAP_PREFIX                 vsf_remap
 #   include "hal/driver/common/rng/rng_template.h"
 #endif
 
