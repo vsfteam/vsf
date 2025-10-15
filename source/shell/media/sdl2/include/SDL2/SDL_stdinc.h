@@ -88,7 +88,7 @@ extern "C" {
 
 #define SDL_getenv                          getenv
 
-#define SDL_COMPILE_TIME_ASSERT(__N, __X)   VSF_STATIC_ASSERT(__X)
+#define SDL_COMPILE_TIME_ASSERT(__N, __X)   VSF_STATIC_ASSERT(__X, __N)
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/

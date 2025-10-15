@@ -189,8 +189,15 @@ static inline int vsf_sign(int x)
 #define VSF_BITMASK(__N)                    (VSF_BIT(__N) - 1)
 #define VSF_UNUSED_PARAM(__VAL)             (void)(__VAL)
 
-#define VSF_STATIC_ASSERT(__COND)                                               \
+#define VSF_STATIC_ASSERT0(__COND)                                              \
             typedef int VSF_MACRO_SAFE_NAME(STATIC_ASSERT)[(__COND) * 2 - 1]
+#define VSF_STATIC_ASSERT1(__COND, __MSG)                                       \
+            typedef int VSF_MACRO_SAFE_NAME(VSF_MCONNECT(STATIC_ASSERT, ____, __MSG))[(__COND) * 2 - 1]
+
+// prototype: VSF_STATIC_ASSERT(__CONDITION);
+// prototype: VSF_STATIC_ASSERT(__CONDITION, __MESSAGE_NONE_STRING);
+#define VSF_STATIC_ASSERT(__COND, ...)                                          \
+            __PLOOC_EVAL(VSF_STATIC_ASSERT, __VA_ARGS__)((__COND), ##__VA_ARGS__)
 
 // will be removed later
 #ifdef __VSF_COMPAT__
