@@ -23,11 +23,11 @@ if(VSF_ARCH STREQUAL "ARM")
 elseif(VSF_ARCH STREQUAL "Riscv")
 elseif(VSF_ARCH STREQUAL "Windows")
     set(CMAKE_C_FLAGS 
-        "-Ofast -Wno-inconsistent-dllimport"
+        "-g -Ofast -Wno-inconsistent-dllimport"
         CACHE INTERNAL "C compiler common flags"
     )
     set(CMAKE_CXX_FLAGS 
-        "-Ofast -Wno-inconsistent-dllimport"
+        "-g -Ofast -Wno-inconsistent-dllimport"
         CACHE INTERNAL "C++ compiler common flags"
     )
 elseif(VSF_ARCH STREQUAL "linux")
