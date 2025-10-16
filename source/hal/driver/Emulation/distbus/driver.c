@@ -52,6 +52,12 @@ typedef struct __vsf_hal_distbus_msg_t {
 dcl_vsf_pool(__vsf_hal_distbus_msg_pool)
 def_vsf_pool(__vsf_hal_distbus_msg_pool, __vsf_hal_distbus_msg_t)
 
+typedef struct vsf_hal_distbus_irq_ctx_t {
+    bool enable;
+    bool pending;
+    uint32_t priority;
+} vsf_hal_distbus_irq_ctx_t;
+
 typedef struct vsf_hal_distbus_ctx_t {
     vsf_distbus_t distbus;
     vsf_distbus_transport_stream_t transport;
@@ -73,6 +79,7 @@ typedef struct vsf_hal_distbus_ctx_t {
 
     vsf_arch_irq_request_t irq_request;
     void (* const * vector_table)();
+    vsf_hal_distbus_irq_ctx_t irq_ctx[VSF_HW_INTERRUPTS_NUM];
 } vsf_hal_distbus_ctx_t;
 
 #define VSF_HAL_DISTBUS_PERIPHERAL_TYPE_DEF(__TYPE)                             \
@@ -142,7 +149,11 @@ static vsf_hal_distbus_ctx_t __vsf_hal_distbus_ctx = {
             VSF_MCONNECT(vsf_hal_distbus_, VSF_HAL_CFG_IMP_TYPE, _t) *target =  \
                     (VSF_MCONNECT(vsf_hal_distbus_, VSF_HAL_CFG_IMP_TYPE, _t) *)\
                     VSF_MCONNECT(vsf_hw_, VSF_HAL_CFG_IMP_TYPE, __N)._.target;  \
-            if (target->irq.handler != NULL) {                                  \
+            uint16_t irqn = target->irq.no;                                     \
+            __vsf_hal_distbus_ctx.irq_ctx[irqn].pending = true;                 \
+            if (    (__vsf_hal_distbus_ctx.irq_ctx[irqn].enable)                \
+                &&  (target->irq.handler != NULL)) {                            \
+                __vsf_hal_distbus_ctx.irq_ctx[irqn].pending = false;            \
                 target->irq.handler(target->irq.target,                         \
                     (VSF_MCONNECT(vsf_, VSF_HAL_CFG_IMP_TYPE, _t) *)target,     \
                     target->irq.triggered_mask);                                \
@@ -185,7 +196,11 @@ VSF_HAL_HW_IMPLEMENT_IRQ_MULTI()
             VSF_MCONNECT(vsf_hal_distbus_, VSF_HAL_CFG_IMP_TYPE, _t) *target =  \
                     (VSF_MCONNECT(vsf_hal_distbus_, VSF_HAL_CFG_IMP_TYPE, _t) *)\
                     VSF_MCONNECT(vsf_hw_, VSF_HAL_CFG_IMP_TYPE, __N)._.target;  \
-            if (target->irq.handler != NULL) {                                  \
+            uint16_t irqn = target->irq.no;                                     \
+            __vsf_hal_distbus_ctx.irq_ctx[irqn].pending = true;                 \
+            if (    (__vsf_hal_distbus_ctx.irq_ctx[irqn].enable)                \
+                &&  (target->irq.handler != NULL)) {                            \
+                __vsf_hal_distbus_ctx.irq_ctx[irqn].pending = false;            \
                 target->irq.handler(target->irq.target,                         \
                     (VSF_MCONNECT(vsf_, VSF_HAL_CFG_IMP_TYPE, _t) *)target,     \
                     target->irq.triggered_mask, target->irq.status, target->irq.resp);\
@@ -324,32 +339,48 @@ static void __user_hal_distbus_on_remote_connected(vsf_hal_distbus_t *hal_distbu
     vsf_hal_distbus_start(hal_distbus);
 }
 
-// IRQ: TODO
+// IRQ
 
 void vsf_irq_enable(int irqn)
 {
+    VSF_HAL_ASSERT(sizeof(__vsf_hal_distbus_ctx.irq_ctx) > irqn);
+    __vsf_hal_distbus_ctx.irq_ctx[irqn].enable = true;
+    if (__vsf_hal_distbus_ctx.irq_ctx[irqn].pending) {
+        (__vsf_hal_distbus_ctx.vector_table[irqn])();
+    }
 }
 
 void vsf_irq_disable(int irqn)
 {
+    VSF_HAL_ASSERT(sizeof(__vsf_hal_distbus_ctx.irq_ctx) > irqn);
+    __vsf_hal_distbus_ctx.irq_ctx[irqn].enable = false;
 }
 
 bool vsf_irq_is_enabled(int irqn)
 {
-    return false;
+    VSF_HAL_ASSERT(sizeof(__vsf_hal_distbus_ctx.irq_ctx) > irqn);
+    return __vsf_hal_distbus_ctx.irq_ctx[irqn].enable;
 }
 
 void vsf_irq_pend(int irqn)
 {
+    VSF_HAL_ASSERT(sizeof(__vsf_hal_distbus_ctx.irq_ctx) > irqn);
+    __vsf_hal_distbus_ctx.irq_ctx[irqn].pending = true;
+    if (__vsf_hal_distbus_ctx.irq_ctx[irqn].enable) {
+        (__vsf_hal_distbus_ctx.vector_table[irqn])();
+    }
 }
 
 void vsf_irq_unpend(int irqn)
 {
+    VSF_HAL_ASSERT(sizeof(__vsf_hal_distbus_ctx.irq_ctx) > irqn);
+    __vsf_hal_distbus_ctx.irq_ctx[irqn].pending = false;
 }
 
 bool vsf_irq_is_pending(int irqn)
 {
-    return false;
+    VSF_HAL_ASSERT(sizeof(__vsf_hal_distbus_ctx.irq_ctx) > irqn);
+    return __vsf_hal_distbus_ctx.irq_ctx[irqn].pending;
 }
 
 void vsf_irq_set_priority(int irqn, uint32_t priority)
