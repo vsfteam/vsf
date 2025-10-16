@@ -89,7 +89,8 @@ const CONSTANTS_MACRO: [(&'static str, &'static str); 67] = [
     ("vsf_spi_irq_mask_t", "VSF_SPI_IRQ_MASK_CRC_ERR"),
 ];
 
-const CONSTANTS_ENUM: [(&'static str, &'static str); 123] = [
+const CONSTANTS_ENUM: [(&'static str, &'static str); 124] = [
+    ("", "VSF_ARCH_SET_VECTOR_TABLE"),
     // GPIO constants
     ("", "VSF_HW_GPIO_PIN_COUNT"),
     ("vsf_gpio_mode_t", "VSF_GPIO_ANALOG"),

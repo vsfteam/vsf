@@ -38,13 +38,16 @@
 #   include "./hostos_driver.h"
 
 /*============================ MACROS ========================================*/
+
+#define VSF_ARCH_SET_VECTOR_TABLE                           1
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_distbus_hal_set_vector_table(void (* const * const vector_table)());
+extern void vsf_arch_set_vector_table(void (* const * const vector_table)());
 
 /*============================ INCLUDES ======================================*/
 

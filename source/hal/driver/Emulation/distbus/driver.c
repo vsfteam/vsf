@@ -314,7 +314,7 @@ bool vsf_hal_distbus_on_irq(void *devs, uint16_t irqn)
     return true;
 }
 
-void vsf_distbus_hal_set_vector_table(void (* const * const vector_table)())
+void vsf_arch_set_vector_table(void (* const * const vector_table)())
 {
     __vsf_hal_distbus_ctx.vector_table = vector_table;
 }
