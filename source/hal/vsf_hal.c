@@ -84,7 +84,7 @@ void vsf_hal_irq_leave(uintptr_t ctx)
 VSF_CAL_WEAK(vsf_driver_init_early)
 bool vsf_driver_init_early( void )
 {
-    return false;
+    return true;
 }
 
 VSF_CAL_WEAK(vsf_hal_init_early)

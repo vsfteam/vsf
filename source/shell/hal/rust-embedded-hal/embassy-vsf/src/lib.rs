@@ -316,9 +316,13 @@ pub fn init(config: Config) -> Peripherals {
         unsafe {
             vsf_hal::vsf_arch_init();
 
-            vsf_hal::vsf_hal_init_early();
+            if !vsf_hal::vsf_hal_init_early() {
+                panic!("fail to call vsf_hal_init_early");
+            }
             vsf_hal::vsf_service_init();
-            vsf_hal::vsf_hal_init();
+            if !vsf_hal::vsf_hal_init() {
+                panic!("fail to call vsf_hal_init");
+            }
 
             #[cfg(VSF_ARCH_SET_VECTOR_TABLE)]
             vsf_hal::vsf_arch_set_vector_table(
