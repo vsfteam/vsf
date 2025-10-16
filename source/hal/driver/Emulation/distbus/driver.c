@@ -72,7 +72,7 @@ typedef struct vsf_hal_distbus_ctx_t {
     } chip;
 
     vsf_arch_irq_request_t irq_request;
-    void (**vector_table)();
+    void (* const * vector_table)();
 } vsf_hal_distbus_ctx_t;
 
 #define VSF_HAL_DISTBUS_PERIPHERAL_TYPE_DEF(__TYPE)                             \
@@ -314,7 +314,7 @@ bool vsf_hal_distbus_on_irq(void *devs, uint16_t irqn)
     return true;
 }
 
-void vsf_distbus_hal_set_vector_table(void (**vector_table)())
+void vsf_distbus_hal_set_vector_table(void (* const * const vector_table)())
 {
     __vsf_hal_distbus_ctx.vector_table = vector_table;
 }

@@ -320,6 +320,12 @@ pub fn init(config: Config) -> Peripherals {
             vsf_hal::vsf_service_init();
             vsf_hal::vsf_hal_init();
 
+            #[cfg(not(target_mcu))]
+            vsf_hal::vsf_distbus_hal_set_vector_table(
+                pac::_vectors::__INTERRUPTS.as_ptr()
+                    as *const Option<unsafe extern "C" fn()>
+            );
+
             gpio::init();
         }
 

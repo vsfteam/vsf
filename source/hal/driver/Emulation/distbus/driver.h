@@ -44,7 +44,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-extern void vsf_distbus_hal_set_vector_table(void (**vector_table)());
+extern void vsf_distbus_hal_set_vector_table(void (* const * const vector_table)());
 
 /*============================ INCLUDES ======================================*/
 

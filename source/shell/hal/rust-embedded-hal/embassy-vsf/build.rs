@@ -698,6 +698,7 @@ fn main() {
     // generate device.x
     fs::write(out_path.join("device.x"), device_x_str).unwrap();
     // generate pac.rs
+    let vector_visibility = if target_mcu { "" } else { "pub" };
     fs::write(out_path.join("pac.rs"), String::from(&format!("
         #[derive(Copy, Clone, Debug, PartialEq, Eq)]
         #[cfg_attr(feature = \"defmt\", derive(defmt::Format))]
@@ -705,7 +706,7 @@ fn main() {
         pub enum Interrupt {{
             {interrupt_str}
         }}
-        mod _vectors {{
+        {vector_visibility} mod _vectors {{
             unsafe extern \"C\" {{
                 {interrupt_func_dec_str}
             }}
