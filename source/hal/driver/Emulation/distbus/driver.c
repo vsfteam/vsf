@@ -77,7 +77,7 @@ typedef struct vsf_hal_distbus_ctx_t {
 #include "./vsf_hal_distbus_enum_with_peripheral_count.inc"
     } chip;
 
-    vsf_arch_irq_request_t irq_request;
+    bool connected;
     void (* const * vector_table)();
     vsf_hal_distbus_irq_ctx_t irq_ctx[VSF_HW_INTERRUPTS_NUM];
 } vsf_hal_distbus_ctx_t;
@@ -127,6 +127,7 @@ static vsf_hal_distbus_ctx_t __vsf_hal_distbus_ctx = {
         .stream_rx              = &vsf_distbus_transport_stream_rx.use_as__vsf_stream_t,
         .stream_tx              = &vsf_distbus_transport_stream_tx.use_as__vsf_stream_t,
     },
+    .connected                  = false,
 };
 
 #define VSF_HAL_HW_IMPLEMENT(__N, __VALUE)                                      \
@@ -306,8 +307,10 @@ void vsf_hal_distbus_on_new(vsf_hal_distbus_t *hal_distbus, vsf_hal_distbus_type
             for (uint8_t i = 0; i < __vsf_hal_distbus_ctx.chip.__TYPE.dev_num; i++) {\
                 u_devs.__TYPE[i].irq.no = i + VSF_MCONNECT(VSF_HW_, __TYPE, _IRQN);\
                 __vsf_hal_distbus_ctx.chip.__TYPE.dev[i] = (VSF_MCONNECT(vsf_, __TYPE, _t) *)&u_devs.__TYPE[i];\
-                VSF_MCONNECT(vsf_hw_, __TYPE, s)[i]->_.target = (VSF_MCONNECT(vsf_, __TYPE, _t) *)__vsf_hal_distbus_ctx.chip.__TYPE.dev[i];\
-                __vsf_arch_trace(0, "[hal_distbus] new " VSF_STR(__TYPE) "%d %p" VSF_TRACE_CFG_LINEEND, i, __vsf_hal_distbus_ctx.chip.__TYPE.dev[i]);\
+                if (i < dimof(VSF_MCONNECT(vsf_hw_, __TYPE, s))) {              \
+                    VSF_MCONNECT(vsf_hw_, __TYPE, s)[i]->_.target = (VSF_MCONNECT(vsf_, __TYPE, _t) *)__vsf_hal_distbus_ctx.chip.__TYPE.dev[i];\
+                    __vsf_arch_trace(0, "[hal_distbus] new " VSF_STR(__TYPE) "%d %p" VSF_TRACE_CFG_LINEEND, i, __vsf_hal_distbus_ctx.chip.__TYPE.dev[i]);\
+                }                                                               \
             }                                                                   \
         }                                                                       \
         break;
@@ -317,7 +320,7 @@ void vsf_hal_distbus_on_new(vsf_hal_distbus_t *hal_distbus, vsf_hal_distbus_type
     }
 
     __vsf_arch_trace(0, "distbus slave connected\n");
-    __vsf_arch_irq_request_send(&__vsf_hal_distbus_ctx.irq_request);
+    __vsf_hal_distbus_ctx.connected = true;
 }
 
 bool vsf_hal_distbus_on_irq(void *devs, uint16_t irqn)
@@ -447,10 +450,11 @@ bool vsf_driver_init(void)
     vsf_distbus_init(&__vsf_hal_distbus_ctx.distbus);
     vsf_hal_distbus_register(&__vsf_hal_distbus_ctx.distbus, &__vsf_hal_distbus_ctx.hal);
 
-    __vsf_arch_irq_request_init(&__vsf_hal_distbus_ctx.irq_request);
     vsf_distbus_start(&__vsf_hal_distbus_ctx.distbus);
     __vsf_arch_trace(0, "waiting for distbus slave...\n");
-    __vsf_arch_irq_request_pend(&__vsf_hal_distbus_ctx.irq_request);
+    while (!__vsf_hal_distbus_ctx.connected) {
+        vsf_arch_sleep(0);
+    }
     return true;
 }
 
