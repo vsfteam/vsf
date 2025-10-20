@@ -101,6 +101,8 @@ typedef struct vsf_distbus_bus_op_t {
     bool (*send)(void *transport, uint8_t *buffer, uint_fast32_t size, void *p, void (*on_sent)(void *p));
     // returns true if received
     bool (*recv)(void *transport, uint8_t *buffer, uint_fast32_t size, void *p, void (*on_recv)(void *p));
+    // returns true if bus is sending data
+    bool (*is_sending)(void *target);
 } vsf_distbus_bus_op_t;
 
 typedef struct vsf_distbus_mem_op_t {
@@ -138,10 +140,11 @@ vsf_class(vsf_distbus_t) {
 #ifdef __VSF_DISTBUS_CLASS_INHERIT__
 // size is data size of message(excluding header)
 extern vsf_distbus_msg_t * vsf_distbus_alloc_msg(vsf_distbus_t *distbus, uint_fast32_t size, uint8_t **buf);
-// if user hold msg by returning turn in vsf_distbus_msghandler_t, user MUST free msg manually
+// if user hold msg by returning true in vsf_distbus_msghandler_t, user MUST free msg manually
 extern void vsf_distbus_free_msg(vsf_distbus_t *distbus, vsf_distbus_msg_t *msg);
 // after message is sent, it will be freed automatically
 extern void vsf_distbus_send_msg(vsf_distbus_t *distbus, vsf_distbus_service_t *service, vsf_distbus_msg_t *msg);
+extern bool vsf_distbus_is_sending(vsf_distbus_t *distbus);
 #endif
 
 extern vsf_err_t vsf_distbus_init(vsf_distbus_t *distbus);

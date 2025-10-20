@@ -168,4 +168,10 @@ bool vsf_distbus_transport_stream_recv(void *transport, uint8_t *buffer, uint_fa
     return __vsf_distbus_transport_try_recv(transport_stream) == size;
 }
 
+bool vsf_distbus_transport_stream_is_sending(void *transport)
+{
+    vsf_distbus_transport_stream_t *transport_stream = transport;
+    return VSF_STREAM_GET_DATA_SIZE(transport_stream->stream_tx) > 0;
+}
+
 #endif      // VSF_DISTBUS_TRANSPORT_USE_STREAM

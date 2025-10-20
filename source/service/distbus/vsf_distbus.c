@@ -142,6 +142,11 @@ void vsf_distbus_send_msg(vsf_distbus_t *distbus, vsf_distbus_service_t *service
     }
 }
 
+bool vsf_distbus_is_sending(vsf_distbus_t *distbus)
+{
+    return distbus->op.bus.is_sending(distbus->op.bus.transport);
+}
+
 static void __vsf_distbus_on_recv(void *p)
 {
     vsf_distbus_t *distbus = (vsf_distbus_t *)p;
