@@ -319,7 +319,6 @@ void vsf_hal_distbus_on_new(vsf_hal_distbus_t *hal_distbus, vsf_hal_distbus_type
 #include "./vsf_hal_distbus_enum_with_peripheral_count.inc"
     }
 
-    __vsf_arch_trace(0, "distbus slave connected\n");
     __vsf_hal_distbus_ctx.connected = true;
 }
 
@@ -455,6 +454,7 @@ bool vsf_driver_init(void)
     while (!__vsf_hal_distbus_ctx.connected) {
         vsf_arch_sleep(0);
     }
+    __vsf_arch_trace(0, "distbus slave connected\n");
     return true;
 }
 
