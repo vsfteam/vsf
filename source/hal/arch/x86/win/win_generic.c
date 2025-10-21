@@ -1211,7 +1211,7 @@ void * vsf_arch_heap_malloc(uint_fast32_t size, uint_fast32_t alignment)
         return NULL;
     }
 
-    aligned_buffer = (void *)(((uintptr_t)buffer + offset) & ~(alignment - 1));
+    aligned_buffer = (void *)(((uintptr_t)buffer + offset) & ~(uintptr_t)(alignment - 1));
     mcb = &((vsf_arch_heap_mcb_t *)aligned_buffer)[-1];
     mcb->ptr = buffer;
     mcb->alignment = alignment;
