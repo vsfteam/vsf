@@ -64,6 +64,7 @@ vsf_distbus_msg_t * vsf_distbus_alloc_msg(vsf_distbus_t *distbus, uint_fast32_t 
         msg->pos = 0;
         vsf_slist_init_node(vsf_distbus_msg_t, node, msg);
         msg->header.datalen = cpu_to_le32(size);
+        msg->header.flag = 0;
         if (buf != NULL) {
             *buf = (uint8_t *)&msg->header + sizeof(msg->header);
         }
