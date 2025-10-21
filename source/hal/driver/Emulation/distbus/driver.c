@@ -426,11 +426,27 @@ bool vsf_driver_init(void)
                 __vsf_arch_trace(0, "input enter to select the usart0:");
             }
 
-            char buf[32] = { 0 };
-            __vsf_arch_console_readline(buf, sizeof(buf));
-            int index = atoi(buf);
-            if ((index < 0) || (index >= usart_devnum)) {
-                continue;
+            int index = -1;
+            char **argv;
+            int argc = vsf_arch_argu(&argv);
+            if (argc == 2) {
+                for (uint8_t i = 0; i < usart_devnum; i++) {
+                    if (!strcmp(usart_devices[i].name, argv[1])) {
+                        index = i;
+                    }
+                }
+                if (index >= 0) {
+                    __vsf_arch_trace(0, "%d\n", index);
+                } else {
+                    return false;
+                }
+            } else {
+                char buf[32] = { 0 };
+                __vsf_arch_console_readline(buf, sizeof(buf));
+                index = atoi(buf);
+                if ((index < 0) || (index >= usart_devnum)) {
+                    continue;
+                }
             }
 
             __vsf_hal_distbus_ctx.usart_stream.usart = usart_devices[index].instance;
