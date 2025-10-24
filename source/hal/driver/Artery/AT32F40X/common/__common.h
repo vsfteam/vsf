@@ -15,34 +15,26 @@
  *                                                                           *
  ****************************************************************************/
 
+#ifndef __HAL_DRIVER_ARTERY_AT32F40X_COMMON_H__
+#define __HAL_DRIVER_ARTERY_AT32F40X_COMMON_H__
+
+/* \note __common.h should only be included by device.h */
+
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
+#include "hal/arch/vsf_arch.h"
 
-#undef VSF_ARTERY_DRIVER_HEADER
-
-#if   defined(__AT32F405__)
-#   define  VSF_ARTERY_DRIVER_HEADER        "./AT32F40X/AT32F405/driver.h"
-#elif defined(__AT32F435__)
-#   define  VSF_ARTERY_DRIVER_HEADER        "./AT32F43X/AT32F435/driver.h"
-#else
-#   error No supported device found.
-#endif
-
-/* include specified device driver header file */
-#include VSF_ARTERY_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_ARTERY_H__
-#define __HAL_DRIVER_ARTERY_H__
-
+// CMSIS headers which will not be included in core_xxx.h
+//  and arm_math.h CAN ONLY be included after core_xxx.h
+//#include "arm_math.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
+/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
 

@@ -15,28 +15,22 @@
  *                                                                           *
  ****************************************************************************/
 
+#if defined(__VSF_HEADER_ONLY_SHOW_ARCH_INFO__) || defined(__VSF_HAL_SHOW_VENDOR_INFO__)
+
+#   include "../__device.h"
+
+#else
+
+#   ifndef __HAL_DRIVER_ATTERY_AT32F405_H__
+#       define __HAL_DRIVER_ATTERY_AT32F405_H__
+
 /*============================ INCLUDES ======================================*/
 
-#include "hal/vsf_hal_cfg.h"
+#       include "hal/vsf_hal_cfg.h"
+#       include "./device.h"
+#       include "./interrupt_swi.h"
 
-#undef VSF_ARTERY_DRIVER_HEADER
-
-#if   defined(__AT32F405__)
-#   define  VSF_ARTERY_DRIVER_HEADER        "./AT32F40X/AT32F405/driver.h"
-#elif defined(__AT32F435__)
-#   define  VSF_ARTERY_DRIVER_HEADER        "./AT32F43X/AT32F435/driver.h"
-#else
-#   error No supported device found.
-#endif
-
-/* include specified device driver header file */
-#include VSF_ARTERY_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_ARTERY_H__
-#define __HAL_DRIVER_ARTERY_H__
-
+#       include "../common/usb/usb.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -45,6 +39,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
+#   endif
 
 #endif
 /* EOF */

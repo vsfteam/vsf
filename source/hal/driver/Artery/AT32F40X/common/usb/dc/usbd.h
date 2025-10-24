@@ -15,36 +15,30 @@
  *                                                                           *
  ****************************************************************************/
 
+#ifndef __OSA_HAL_DRIVER_ARTERY_AT32F4_USBD_H__
+#define __OSA_HAL_DRIVER_ARTERY_AT32F4_USBD_H__
+
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
+#include "../usb.h"
 
-#undef VSF_ARTERY_DRIVER_HEADER
-
-#if   defined(__AT32F405__)
-#   define  VSF_ARTERY_DRIVER_HEADER        "./AT32F40X/AT32F405/driver.h"
-#elif defined(__AT32F435__)
-#   define  VSF_ARTERY_DRIVER_HEADER        "./AT32F43X/AT32F435/driver.h"
-#else
-#   error No supported device found.
-#endif
-
-/* include specified device driver header file */
-#include VSF_ARTERY_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_ARTERY_H__
-#define __HAL_DRIVER_ARTERY_H__
-
+#if VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_USE_DCD_DWCOTG == ENABLED
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
-/*============================ LOCAL VARIABLES ===============================*/
+/*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
 
+extern vsf_err_t vsf_hw_usbd_init(vsf_hw_usb_t *dc, usb_dc_ip_cfg_t *cfg);
+extern void vsf_hw_usbd_fini(vsf_hw_usb_t *dc);
+extern void vsf_hw_usbd_get_info(vsf_hw_usb_t *dc, usb_dc_ip_info_t *info);
+extern void vsf_hw_usbd_connect(vsf_hw_usb_t *dc);
+extern void vsf_hw_usbd_disconnect(vsf_hw_usb_t *dc);
+extern void vsf_hw_usbd_irq(vsf_hw_usb_t *dc);
 
+#endif
 #endif
 /* EOF */
