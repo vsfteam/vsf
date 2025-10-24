@@ -18,25 +18,10 @@
 /*============================ INCLUDES ======================================*/
 
 #include "hal/vsf_hal_cfg.h"
+#include "./device.h"
+#include "hal/vsf_hal.h"
 
-#undef VSF_ARTERY_DRIVER_HEADER
-
-#if   defined(__AT32F405__)
-#   define  VSF_ARTERY_DRIVER_HEADER        "./AT32F40X/AT32F405/driver.h"
-#elif defined(__AT32F435__)
-#   define  VSF_ARTERY_DRIVER_HEADER        "./AT32F43X/AT32F435/driver.h"
-#else
-#   error No supported device found.
-#endif
-
-/* include specified device driver header file */
-#include VSF_ARTERY_DRIVER_HEADER
-
-
-
-#ifndef __HAL_DRIVER_ARTERY_H__
-#define __HAL_DRIVER_ARTERY_H__
-
+#include "hal/driver/common/swi/arm/vsf_swi_template.inc"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -44,7 +29,4 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
-
-#endif
-/* EOF */
+/*============================ IMPLEMENTATION ================================*/

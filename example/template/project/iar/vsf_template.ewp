@@ -6887,6 +6887,1119 @@
             <data />
         </settings>
     </configuration>
+    <configuration>
+        <name>vsf_template_at32f405</name>
+        <toolchain>
+            <name>ARM</name>
+        </toolchain>
+        <debug>1</debug>
+        <settings>
+            <name>General</name>
+            <archiveVersion>3</archiveVersion>
+            <data>
+                <version>37</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>BrowseInfoPath</name>
+                    <state>vsf_template_at32f405\BrowseInfo</state>
+                </option>
+                <option>
+                    <name>ExePath</name>
+                    <state>vsf_template_at32f405\Exe</state>
+                </option>
+                <option>
+                    <name>ObjPath</name>
+                    <state>vsf_template_at32f405\Obj</state>
+                </option>
+                <option>
+                    <name>ListPath</name>
+                    <state>vsf_template_at32f405\List</state>
+                </option>
+                <option>
+                    <name>GEndianMode</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>Input description</name>
+                    <state>Automatic choice of formatter, without multibyte support.</state>
+                </option>
+                <option>
+                    <name>Output description</name>
+                    <state>Automatic choice of formatter, without multibyte support.</state>
+                </option>
+                <option>
+                    <name>GOutputBinary</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGCoreOrChip</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>GRuntimeLibSelect</name>
+                    <version>0</version>
+                    <state>2</state>
+                </option>
+                <option>
+                    <name>GRuntimeLibSelectSlave</name>
+                    <version>0</version>
+                    <state>2</state>
+                </option>
+                <option>
+                    <name>RTDescription</name>
+                    <state>A complete configuration of the C/C++14 runtime library. Full locale interface, C locale, file descriptor support, multibytes in printf and scanf, and hex floats in strtod.</state>
+                </option>
+                <option>
+                    <name>OGProductVersion</name>
+                    <state>8.30.1.17146</state>
+                </option>
+                <option>
+                    <name>OGLastSavedByProductVersion</name>
+                    <state>9.60.3.7274</state>
+                </option>
+                <option>
+                    <name>OGChipSelectEditMenu</name>
+                    <state>AT32F405KCU7-4_v2	ArteryTek AT32F405KCU7-4</state>
+                </option>
+                <option>
+                    <name>GenLowLevelInterface</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GEndianModeBE</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OGBufferedTerminalOutput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GenStdoutInterface</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>RTConfigPath2</name>
+                    <state>$TOOLKIT_DIR$\inc\c\DLib_Config_Full.h</state>
+                </option>
+                <option>
+                    <name>GBECoreSlave</name>
+                    <version>34</version>
+                    <state>39</state>
+                </option>
+                <option>
+                    <name>OGUseCmsis</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGUseCmsisDspLib</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GRuntimeLibThreads</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CoreVariant</name>
+                    <version>34</version>
+                    <state>39</state>
+                </option>
+                <option>
+                    <name>GFPUDeviceSlave</name>
+                    <state>AT32F405KCU7-4_v2	ArteryTek AT32F405KCU7-4</state>
+                </option>
+                <option>
+                    <name>FPU2</name>
+                    <version>0</version>
+                    <state>4</state>
+                </option>
+                <option>
+                    <name>NrRegs</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>NEON</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GFPUCoreSlave2</name>
+                    <version>34</version>
+                    <state>39</state>
+                </option>
+                <option>
+                    <name>OGCMSISPackSelectDevice</name>
+                </option>
+                <option>
+                    <name>OgLibHeap</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGLibAdditionalLocale</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGPrintfVariant</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGPrintfMultibyteSupport</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGScanfVariant</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGScanfMultibyteSupport</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>GenLocaleTags</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>GenLocaleDisplayOnly</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>DSPExtension</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>TrustZone</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>TrustZoneModes</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OGAarch64Abi</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OG_32_64Device</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>BuildFilesPath</name>
+                    <state>vsf_template_at32f405\</state>
+                </option>
+                <option>
+                    <name>PointerAuthentication</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>FPU64</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OG_32_64DeviceCoreSlave</name>
+                    <version>34</version>
+                    <state>39</state>
+                </option>
+                <option>
+                    <name>GOutputSo</name>
+                    <state>0</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>ICCARM</name>
+            <archiveVersion>2</archiveVersion>
+            <data>
+                <version>39</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>CCDefines</name>
+                    <state>__VSF__</state>
+                    <state>__Artery__</state>
+                    <state>__AT32F405__</state>
+                    <state>AT32F405KCU7_4</state>
+                    <state>__OOC_CPP__</state>
+                    <state>AT_START_F405_V1</state>
+                    <state>USE_STDPERIPH_DRIVER</state>
+                </option>
+                <option>
+                    <name>CCPreprocFile</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPreprocComments</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPreprocLine</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCListCFile</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListCMnemonics</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListCMessages</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListAssFile</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCListAssSource</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCEnableRemarks</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCDiagSuppress</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCDiagRemark</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCDiagWarning</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCDiagError</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCObjPrefix</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCAllowList</name>
+                    <version>1</version>
+                    <state>11111110</state>
+                </option>
+                <option>
+                    <name>CCDebugInfo</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IEndianMode</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IExtraOptionsCheck</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IExtraOptions</name>
+                    <state>--no_unaligned_access --lock_regs=r9</state>
+                </option>
+                <option>
+                    <name>CCLangConformance</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCSignedPlainChar</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCRequirePrototypes</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCDiagWarnAreErr</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCCompilerRuntimeInfo</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IFpuProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OutputFile</name>
+                    <state>$FILE_BNAME$.o</state>
+                </option>
+                <option>
+                    <name>CCLibConfigHeader</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>PreInclude</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CCIncludePath2</name>
+                    <state>$PROJ_DIR$\..\..\config</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\btstack</state>
+                    <state>$PROJ_DIR$\..\..\config\3rd-party\lvgl</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\cmsis\cm4\device_support</state>
+                </option>
+                <option>
+                    <name>CCStdIncCheck</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCCodeSection</name>
+                    <state>.text</state>
+                </option>
+                <option>
+                    <name>IProcessorMode2</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCOptLevel</name>
+                    <state>3</state>
+                </option>
+                <option>
+                    <name>CCOptStrategy</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCOptLevelSlave</name>
+                    <state>3</state>
+                </option>
+                <option>
+                    <name>CCPosIndRopi</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPosIndRwpi</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPosIndNoDynInit</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccLang</name>
+                    <state>2</state>
+                </option>
+                <option>
+                    <name>IccCDialect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IccAllowVLA</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IccStaticDestr</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IccCppInlineSemantics</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccCmsis</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IccFloatSemantics</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCOptimizationNoSizeConstraints</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCNoLiteralPool</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCOptStrategySlave</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCGuardCalls</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCEncSource</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCEncOutput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCEncOutputBom</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCEncInput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccExceptions2</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IccRTTI2</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OICompilerExtraOption</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CCStackProtection</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPointerAutentiction</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCBranchTargetIdentification</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPosRadRwpi</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CCPosSharedSlave</name>
+                    <state>0</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>AARM</name>
+            <archiveVersion>2</archiveVersion>
+            <data>
+                <version>12</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>AObjPrefix</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AEndian</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>ACaseSensitivity</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>MacroChars</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AWarnEnable</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AWarnWhat</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AWarnOne</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AWarnRange1</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AWarnRange2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>ADebug</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AltRegisterNames</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>ADefines</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AList</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AListHeader</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AListing</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>Includes</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>MacDefs</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>MacExps</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>MacExec</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OnlyAssed</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>MultiLine</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>PageLengthCheck</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>PageLength</name>
+                    <state>80</state>
+                </option>
+                <option>
+                    <name>TabSpacing</name>
+                    <state>8</state>
+                </option>
+                <option>
+                    <name>AXRef</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AXRefDefines</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AXRefInternal</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AXRefDual</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AFpuProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>AOutputFile</name>
+                    <state>$FILE_BNAME$.o</state>
+                </option>
+                <option>
+                    <name>ALimitErrorsCheck</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>ALimitErrorsEdit</name>
+                    <state>100</state>
+                </option>
+                <option>
+                    <name>AIgnoreStdInclude</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AUserIncludes</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AExtraOptionsCheckV2</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>AExtraOptionsV2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>AsmNoLiteralPool</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>PreInclude</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>A_32_64Device</name>
+                    <state>1</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>OBJCOPY</name>
+            <archiveVersion>0</archiveVersion>
+            <data>
+                <version>1</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>OOCOutputFormat</name>
+                    <version>3</version>
+                    <state>3</state>
+                </option>
+                <option>
+                    <name>OCOutputOverride</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>OOCOutputFile</name>
+                    <state>vsf_template.bin</state>
+                </option>
+                <option>
+                    <name>OOCCommandLineProducer</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>OOCObjCopyEnable</name>
+                    <state>1</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>CUSTOM</name>
+            <archiveVersion>4</archiveVersion>
+            <data>
+                <extensions></extensions>
+                <cmdline></cmdline>
+                <buildSequence>inputOutputBased</buildSequence>
+            </data>
+        </settings>
+        <settings>
+            <name>ILINK</name>
+            <archiveVersion>0</archiveVersion>
+            <data>
+                <version>28</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>IlinkLibIOConfig</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkInputFileSlave</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOutputFile</name>
+                    <state>vsf_template_at32f405.out</state>
+                </option>
+                <option>
+                    <name>IlinkDebugInfoEnable</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkKeepSymbols</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySymbol</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySegment</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryAlign</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkDefines</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkConfigDefines</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkMapFile</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogFile</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogInitialization</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogModule</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogSection</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogVeneer</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkIcfOverride</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkIcfFile</name>
+                    <state>$TOOLKIT_DIR$/config/linker/ArteryTek/AT32F405xC.icf</state>
+                </option>
+                <option>
+                    <name>IlinkIcfFileSlave</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkEnableRemarks</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkSuppressDiags</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkTreatAsRem</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkTreatAsWarn</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkTreatAsErr</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkWarningsAreErrors</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkUseExtraOptions</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkExtraOptions</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkLowLevelInterfaceSlave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkAutoLibEnable</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkAdditionalLibs</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkOverrideProgramEntryLabel</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkProgramEntryLabelSelect</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkProgramEntryLabel</name>
+                    <state>__iar_program_start</state>
+                </option>
+                <option>
+                    <name>DoFill</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>FillerByte</name>
+                    <state>0xFF</state>
+                </option>
+                <option>
+                    <name>FillerStart</name>
+                    <state>0x0</state>
+                </option>
+                <option>
+                    <name>FillerEnd</name>
+                    <state>0x0</state>
+                </option>
+                <option>
+                    <name>CrcSize</name>
+                    <version>0</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcAlign</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcPoly</name>
+                    <state>0x11021</state>
+                </option>
+                <option>
+                    <name>CrcCompl</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CrcBitOrder</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>CrcInitialValue</name>
+                    <state>0x0</state>
+                </option>
+                <option>
+                    <name>DoCrc</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkBE8Slave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkBufferedTerminalOutput</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkStdoutInterfaceSlave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcFullSize</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkIElfToolPostProcess</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkLogAutoLibSelect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogRedirSymbols</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogUnusedFragments</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkCrcReverseByteOrder</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkCrcUseAsInput</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkOptInline</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOptExceptionsAllow</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOptExceptionsForce</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkCmsis</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkOptMergeDuplSections</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOptUseVfe</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkOptForceVfe</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkStackAnalysisEnable</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkStackControlFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkStackCallGraphFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>CrcAlgorithm</name>
+                    <version>1</version>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>CrcUnitSize</name>
+                    <version>0</version>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkThreadsSlave</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLogCallGraph</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkIcfFile_AltDefault</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkEncInput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkEncOutput</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkEncOutputBom</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkHeapSelect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkLocaleSelect</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkTrustzoneImportLibraryOut</name>
+                    <state>vsf_template_m484_import_lib.o</state>
+                </option>
+                <option>
+                    <name>OILinkExtraOption</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryFile2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySymbol2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinarySegment2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkRawBinaryAlign2</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkLogCrtRoutineSelection</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkLogFragmentInfo</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkLogInlining</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkLogMerging</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkDemangle</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkWrapperFileEnable</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IlinkWrapperFile</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IlinkProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkFpuProcessor</name>
+                    <state>1</state>
+                </option>
+                <option>
+                    <name>IlinkSharedSlave</name>
+                    <state>0</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>IARCHIVE</name>
+            <archiveVersion>0</archiveVersion>
+            <data>
+                <version>0</version>
+                <wantNonLocal>1</wantNonLocal>
+                <debug>1</debug>
+                <option>
+                    <name>IarchiveInputs</name>
+                    <state></state>
+                </option>
+                <option>
+                    <name>IarchiveOverride</name>
+                    <state>0</state>
+                </option>
+                <option>
+                    <name>IarchiveOutput</name>
+                    <state>###Unitialized###</state>
+                </option>
+            </data>
+        </settings>
+        <settings>
+            <name>BUILDACTION</name>
+            <archiveVersion>2</archiveVersion>
+            <data />
+        </settings>
+    </configuration>
     <group>
         <name>usrapp</name>
         <group>
@@ -6943,6 +8056,9 @@
                     </excluded>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\config\vsf_usr_cfg\vsf_usr_cfg_at32f405.h</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\config\vsf_usr_cfg\vsf_usr_cfg_f1c100s.h</name>
                     <excluded>
                         <configuration>vsf_template_m484</configuration>
@@ -6950,6 +8066,7 @@
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                 </file>
                 <file>
@@ -6960,6 +8077,7 @@
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                 </file>
                 <file>
@@ -6970,6 +8088,7 @@
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                 </file>
                 <file>
@@ -6980,6 +8099,7 @@
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                 </file>
                 <file>
@@ -6990,6 +8110,7 @@
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                 </file>
                 <file>
@@ -7001,6 +8122,7 @@
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                 </file>
             </group>
@@ -7045,6 +8167,9 @@
                 <name>audio_demo</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\audio_demo\audio_demo.c</name>
+                    <excluded>
+                        <configuration>vsf_template_at32f405</configuration>
+                    </excluded>
                 </file>
             </group>
             <group>
@@ -7057,6 +8182,7 @@
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>STM32H7xx_HAL_Driver</name>
@@ -7681,6 +8807,7 @@
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>extension</name>
@@ -7888,6 +9015,7 @@
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>port</name>
@@ -7927,6 +9055,7 @@
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>port</name>
@@ -8368,6 +9497,7 @@
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>port</name>
@@ -8653,6 +9783,7 @@
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>port</name>
@@ -8734,6 +9865,7 @@
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>extension</name>
@@ -8976,6 +10108,7 @@
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>extension</name>
@@ -9624,6 +10757,7 @@
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>port</name>
@@ -9631,6 +10765,7 @@
                             <name>vsf</name>
                             <excluded>
                                 <configuration>vsf_template_aic8800</configuration>
+                                <configuration>vsf_template_at32f405</configuration>
                             </excluded>
                             <group>
                                 <name>arch</name>
@@ -9662,6 +10797,7 @@
                         <name>raw</name>
                         <excluded>
                             <configuration>vsf_template_aic8800</configuration>
+                            <configuration>vsf_template_at32f405</configuration>
                         </excluded>
                         <group>
                             <name>src</name>
@@ -9828,6 +10964,7 @@
                     <name>mbedtls</name>
                     <excluded>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>port</name>
@@ -10164,6 +11301,7 @@
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>port</name>
@@ -10306,6 +11444,7 @@
                     <excluded>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>raw</name>
@@ -10322,6 +11461,9 @@
                 </group>
                 <group>
                     <name>segger</name>
+                    <excluded>
+                        <configuration>vsf_template_at32f405</configuration>
+                    </excluded>
                     <group>
                         <name>port</name>
                         <group>
@@ -10387,6 +11529,7 @@
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>raw</name>
@@ -10462,6 +11605,7 @@
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>extension</name>
@@ -10576,6 +11720,7 @@
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>raw</name>
@@ -11458,6 +12603,7 @@
                             <configuration>vsf_template_mt071</configuration>
                             <configuration>vsf_template_aic8800</configuration>
                             <configuration>vsf_template_stm32h743</configuration>
+                            <configuration>vsf_template_at32f405</configuration>
                         </excluded>
                         <group>
                             <name>startup</name>
@@ -12304,6 +13450,285 @@
                                     </data>
                                 </settings>
                             </configuration>
+                            <configuration>
+                                <name>vsf_template_at32f405</name>
+                                <settings>
+                                    <name>ICCARM</name>
+                                    <data>
+                                        <version>39</version>
+                                        <wantNonLocal>1</wantNonLocal>
+                                        <debug>1</debug>
+                                        <option>
+                                            <name>CCDefines</name>
+                                            <state>__CPU_ARM9__</state>
+                                            <state>__Allwinner__</state>
+                                            <state>__F1C100S__</state>
+                                            <state>__OOC_CPP__</state>
+                                            <state>_DLIB_FILE_DESCRIPTOR=1</state>
+                                            <state>LV_CONF_INCLUDE_SIMPLE</state>
+                                            <state>HAS_STD_MALLOC</state>
+                                            <state>HAS_AWTK_CONFIG</state>
+                                            <state>FT2_BUILD_LIBRARY</state>
+                                        </option>
+                                        <option>
+                                            <name>CCPreprocFile</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCPreprocComments</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCPreprocLine</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>CCListCFile</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCListCMnemonics</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCListCMessages</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCListAssFile</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCListAssSource</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCEnableRemarks</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCDiagSuppress</name>
+                                            <state></state>
+                                        </option>
+                                        <option>
+                                            <name>CCDiagRemark</name>
+                                            <state></state>
+                                        </option>
+                                        <option>
+                                            <name>CCDiagWarning</name>
+                                            <state></state>
+                                        </option>
+                                        <option>
+                                            <name>CCDiagError</name>
+                                            <state></state>
+                                        </option>
+                                        <option>
+                                            <name>CCObjPrefix</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>CCAllowList</name>
+                                            <version>1</version>
+                                            <state>11111110</state>
+                                        </option>
+                                        <option>
+                                            <name>CCDebugInfo</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>IEndianMode</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>IProcessor</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>IExtraOptionsCheck</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>IExtraOptions</name>
+                                            <state></state>
+                                        </option>
+                                        <option>
+                                            <name>CCLangConformance</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCSignedPlainChar</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>CCRequirePrototypes</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCDiagWarnAreErr</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCCompilerRuntimeInfo</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>IFpuProcessor</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>OutputFile</name>
+                                            <state>$FILE_BNAME$.o</state>
+                                        </option>
+                                        <option>
+                                            <name>CCLibConfigHeader</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>PreInclude</name>
+                                            <state></state>
+                                        </option>
+                                        <option>
+                                            <name>CCIncludePath2</name>
+                                            <state>$PROJ_DIR$\..\..\config</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\source</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\CMSIS\Core_Legacy\Include</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\src</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\chipset</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\vsfvm\raw</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nnom\raw\inc</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nnom\port</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\littlevgl\6.1.2\raw</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\freetype\2.10.1\port</state>
+                                            <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\freetype\2.10.1\raw\include</state>
+                                        </option>
+                                        <option>
+                                            <name>CCStdIncCheck</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCCodeSection</name>
+                                            <state>.text</state>
+                                        </option>
+                                        <option>
+                                            <name>IProcessorMode2</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>CCOptLevel</name>
+                                            <state>3</state>
+                                        </option>
+                                        <option>
+                                            <name>CCOptStrategy</name>
+                                            <version>0</version>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>CCOptLevelSlave</name>
+                                            <state>3</state>
+                                        </option>
+                                        <option>
+                                            <name>CCPosIndRopi</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCPosIndRwpi</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCPosIndNoDynInit</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>IccLang</name>
+                                            <state>2</state>
+                                        </option>
+                                        <option>
+                                            <name>IccCDialect</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>IccAllowVLA</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>IccStaticDestr</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>IccCppInlineSemantics</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>IccCmsis</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>IccFloatSemantics</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCOptimizationNoSizeConstraints</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCNoLiteralPool</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCOptStrategySlave</name>
+                                            <version>0</version>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>CCEncSource</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCEncOutput</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCEncOutputBom</name>
+                                            <state>1</state>
+                                        </option>
+                                        <option>
+                                            <name>CCEncInput</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>IccExceptions2</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>IccRTTI2</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCStackProtection</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCPointerAutentiction</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCBranchTargetIdentification</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCPosRadRwpi</name>
+                                            <state>0</state>
+                                        </option>
+                                        <option>
+                                            <name>CCPosSharedSlave</name>
+                                            <state>0</state>
+                                        </option>
+                                    </data>
+                                </settings>
+                            </configuration>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\arm\arm9\arm9_generic.h</name>
@@ -12318,6 +13743,7 @@
                             <configuration>vsf_template_mt071</configuration>
                             <configuration>vsf_template_aic8800</configuration>
                             <configuration>vsf_template_stm32h743</configuration>
+                            <configuration>vsf_template_at32f405</configuration>
                         </excluded>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\arch\arm\cortex-a\cortex_a_generic.c</name>
@@ -12380,6 +13806,7 @@
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>AIC8800</name>
@@ -13059,6 +14486,7 @@
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\gpio\gpio_api.c</name>
                                                     <excluded>
                                                         <configuration>vsf_template_aic8800</configuration>
+                                                        <configuration>vsf_template_at32f405</configuration>
                                                     </excluded>
                                                 </file>
                                                 <file>
@@ -13203,6 +14631,7 @@
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker\us_ticker.c</name>
                                                     <excluded>
                                                         <configuration>vsf_template_aic8800</configuration>
+                                                        <configuration>vsf_template_at32f405</configuration>
                                                     </excluded>
                                                 </file>
                                                 <file>
@@ -13922,6 +15351,359 @@
                                                             </data>
                                                         </settings>
                                                     </configuration>
+                                                    <configuration>
+                                                        <name>vsf_template_at32f405</name>
+                                                        <settings>
+                                                            <name>ICCARM</name>
+                                                            <data>
+                                                                <version>39</version>
+                                                                <wantNonLocal>1</wantNonLocal>
+                                                                <debug>1</debug>
+                                                                <option>
+                                                                    <name>CCDefines</name>
+                                                                    <state>__VSF__</state>
+                                                                    <state>__AIC__</state>
+                                                                    <state>__AIC8800__</state>
+                                                                    <state>__OOC_CPP__</state>
+                                                                    <state>MBEDTLS_USER_CONFIG_FILE="component/3rd-party/mbedtls/port/platform_vsf.h"</state>
+                                                                    <state>LV_CONF_INCLUDE_SIMPLE</state>
+                                                                    <state>FT2_BUILD_LIBRARY</state>
+                                                                    <state>CFG_HW_PLATFORM=2</state>
+                                                                    <state>CFG_RF_MODE=3</state>
+                                                                    <state>CFG_PMIC</state>
+                                                                    <state>CFG_PMIC_VER_LITE</state>
+                                                                    <state>CFG_PMIC_ITF_ASDMA</state>
+                                                                    <state>CFG_WIFI_STACK</state>
+                                                                    <state>CFG_RSSI_DATAPKT</state>
+                                                                    <state>CFG_DBG</state>
+                                                                    <state>CFG_IPERF</state>
+                                                                    <state>CFG_ROM_VER=255</state>
+                                                                    <state>CFG_DACL_MIXER_MODE=0</state>
+                                                                    <state>CFG_DACR_MIXER_MODE=0</state>
+                                                                    <state>CFG_AIC1000_MIC_MATRIX=0</state>
+                                                                    <state>CONFIG_RWNX</state>
+                                                                    <state>CONFIG_RWNX_LWIP</state>
+                                                                    <state>LWIP_NO_STDINT_H=1</state>
+                                                                    <state>LWIP_SO_RCVBUF=1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCPreprocFile</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCPreprocComments</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCPreprocLine</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCListCFile</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCListCMnemonics</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCListCMessages</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCListAssFile</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCListAssSource</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCEnableRemarks</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCDiagSuppress</name>
+                                                                    <state></state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCDiagRemark</name>
+                                                                    <state></state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCDiagWarning</name>
+                                                                    <state></state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCDiagError</name>
+                                                                    <state></state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCObjPrefix</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCAllowList</name>
+                                                                    <version>1</version>
+                                                                    <state>00000000</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCDebugInfo</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IEndianMode</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IProcessor</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IExtraOptionsCheck</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IExtraOptions</name>
+                                                                    <state>--no_unaligned_access</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCLangConformance</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCSignedPlainChar</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCRequirePrototypes</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCDiagWarnAreErr</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCCompilerRuntimeInfo</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IFpuProcessor</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>OutputFile</name>
+                                                                    <state>$FILE_BNAME$.o</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCLibConfigHeader</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>PreInclude</name>
+                                                                    <state></state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCIncludePath2</name>
+                                                                    <state>$PROJ_DIR$\..\..\config</state>
+                                                                    <state>$PROJ_DIR$\..\..\config\3rd-party</state>
+                                                                    <state>$PROJ_DIR$\..\..\config\3rd-party\awtk</state>
+                                                                    <state>$PROJ_DIR$\..\..\config\3rd-party\btstack</state>
+                                                                    <state>$PROJ_DIR$\..\..\config\3rd-party\lvgl</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
+                                                                    <state>//$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\files\terminfo</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\include\SDL2</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_ttf</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\shell\media\sdl2\3rd-party\SDL_image</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port\arch\ll</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\port\rtos</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\net_al</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\ports\rtos\include</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\include</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\lwip\lwip-STABLE-2_0_2_RELEASE_VER\src\include\lwip</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\boot</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\arch\cmsis</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\common</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\reg</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ipc</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\stdio_uart</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\iomux</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\dma</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ticker</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\flash</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\pmic</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sleep</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\aic1000lite_regs</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\sysctrl</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\asdma_mst</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\trng</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\ce</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\bt\patch\mcu</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\modules\common\api</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\modules\dbg\api</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\fhost</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\fhost\application</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\wlan</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\wifi\macif</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\src</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\btstack\raw\chipset</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\vsfvm\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nnom\raw\inc</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nnom\port</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lvgl\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\freetype\port</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\freetype\raw\include</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\port\Config</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\RTT</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\segger\raw\SystemView</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\nuconsole\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\port</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\coremark\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\extension\oo</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\extension\lovevsf</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\lua\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\port</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libjpeg-turbo\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\port</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\libpng\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\zlib\raw</state>
+                                                                    <state>$PROJ_DIR$\..\..\..\..\source\component\3rd-party\mbedtls\raw\include</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCStdIncCheck</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCCodeSection</name>
+                                                                    <state>.text</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IProcessorMode2</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCOptLevel</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCOptStrategy</name>
+                                                                    <version>0</version>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCOptLevelSlave</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCPosIndRopi</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCPosIndRwpi</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCPosIndNoDynInit</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccLang</name>
+                                                                    <state>2</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccCDialect</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccAllowVLA</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccStaticDestr</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccCppInlineSemantics</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccCmsis</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccFloatSemantics</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCOptimizationNoSizeConstraints</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCNoLiteralPool</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCOptStrategySlave</name>
+                                                                    <version>0</version>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCEncSource</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCEncOutput</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCEncOutputBom</name>
+                                                                    <state>1</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCEncInput</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccExceptions2</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>IccRTTI2</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCStackProtection</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCPointerAutentiction</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCBranchTargetIdentification</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCPosRadRwpi</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                                <option>
+                                                                    <name>CCPosSharedSlave</name>
+                                                                    <state>0</state>
+                                                                </option>
+                                                            </data>
+                                                        </settings>
+                                                    </configuration>
                                                 </file>
                                                 <file>
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\time\time_api.h</name>
@@ -13972,6 +15754,7 @@
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\uart1_api.c</name>
                                                     <excluded>
                                                         <configuration>vsf_template_aic8800</configuration>
+                                                        <configuration>vsf_template_at32f405</configuration>
                                                     </excluded>
                                                 </file>
                                                 <file>
@@ -13981,6 +15764,7 @@
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\uart\uart2_api.c</name>
                                                     <excluded>
                                                         <configuration>vsf_template_aic8800</configuration>
+                                                        <configuration>vsf_template_at32f405</configuration>
                                                     </excluded>
                                                 </file>
                                                 <file>
@@ -13996,6 +15780,7 @@
                                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\AIC\AIC8800\vendor\plf\aic8800\src\driver\wdt\wdt_api.c</name>
                                                     <excluded>
                                                         <configuration>vsf_template_aic8800</configuration>
+                                                        <configuration>vsf_template_at32f405</configuration>
                                                     </excluded>
                                                 </file>
                                                 <file>
@@ -14107,6 +15892,7 @@
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>F1CX00S</name>
@@ -14274,6 +16060,7 @@
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>mps2</name>
@@ -14325,6 +16112,251 @@
                     </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\arm\driver.h</name>
+                    </file>
+                </group>
+                <group>
+                    <name>Artery</name>
+                    <excluded>
+                        <configuration>vsf_template_m484</configuration>
+                        <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
+                        <configuration>vsf_template_stm32h743</configuration>
+                    </excluded>
+                    <group>
+                        <name>AT32F40X</name>
+                        <group>
+                            <name>AT32F405</name>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405\at32f402_405_conf.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405\device.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405\driver.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405\driver.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405\interrupt_swi.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405\interrupt_swi.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405\startup_AT32F405.c</name>
+                            </file>
+                        </group>
+                        <group>
+                            <name>common</name>
+                            <group>
+                                <name>usb</name>
+                                <group>
+                                    <name>dc</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\dc\usbd.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\dc\usbd.h</name>
+                                    </file>
+                                </group>
+                                <group>
+                                    <name>hc</name>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\hc\usbh.c</name>
+                                    </file>
+                                    <file>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\hc\usbh.h</name>
+                                    </file>
+                                </group>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\usb.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\usb.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\usb_common.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\usb_lv0.c</name>
+                                </file>
+                            </group>
+                            <group>
+                                <name>vendor</name>
+                                <group>
+                                    <name>libraries</name>
+                                    <group>
+                                        <name>cmsis</name>
+                                        <group>
+                                            <name>cm4</name>
+                                            <group>
+                                                <name>device_support</name>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\cmsis\cm4\device_support\system_at32f402_405.c</name>
+                                                </file>
+                                            </group>
+                                        </group>
+                                    </group>
+                                    <group>
+                                        <name>drivers</name>
+                                        <group>
+                                            <name>inc</name>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_acc.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_adc.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_can.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_crc.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_crm.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_debug.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_def.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_dma.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_ertc.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_exint.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_flash.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_gpio.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_i2c.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_misc.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_pwc.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_qspi.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_scfg.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_spi.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_tmr.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_usart.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_usb.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_wdt.h</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_wwdt.h</name>
+                                            </file>
+                                        </group>
+                                        <group>
+                                            <name>src</name>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_acc.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_adc.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_can.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_crc.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_crm.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_debug.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_dma.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_ertc.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_exint.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_flash.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_gpio.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_i2c.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_misc.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_pwc.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_qspi.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_scfg.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_spi.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_tmr.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_usart.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_usb.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_wdt.c</name>
+                                            </file>
+                                            <file>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_wwdt.c</name>
+                                            </file>
+                                        </group>
+                                    </group>
+                                </group>
+                            </group>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\__common.h</name>
+                            </file>
+                        </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\__device.h</name>
+                        </file>
+                    </group>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\driver.h</name>
                     </file>
                 </group>
                 <group>
@@ -14680,6 +16712,7 @@
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>GD32E10X</name>
@@ -14831,6 +16864,7 @@
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>M480</name>
@@ -15053,6 +17087,7 @@
                                             <configuration>vsf_template_mt071</configuration>
                                             <configuration>vsf_template_aic8800</configuration>
                                             <configuration>vsf_template_stm32h743</configuration>
+                                            <configuration>vsf_template_at32f405</configuration>
                                         </excluded>
                                     </file>
                                 </group>
@@ -15098,6 +17133,7 @@
                             <configuration>vsf_template_mt071</configuration>
                             <configuration>vsf_template_aic8800</configuration>
                             <configuration>vsf_template_stm32h743</configuration>
+                            <configuration>vsf_template_at32f405</configuration>
                         </excluded>
                         <group>
                             <name>common</name>
@@ -15163,6 +17199,7 @@
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>STM32F103</name>
@@ -15276,6 +17313,7 @@
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>__series_name__</name>
@@ -15311,6 +17349,7 @@
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>AM335X</name>
@@ -15342,6 +17381,7 @@
                         <configuration>vsf_template_gd32e103</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>MT071</name>
@@ -15485,6 +17525,7 @@
                         <configuration>vsf_template_mt071</configuration>
                         <configuration>vsf_template_aic8800</configuration>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>W60X</name>
@@ -16050,6 +18091,9 @@
                 <name>hal</name>
                 <group>
                     <name>sthal</name>
+                    <excluded>
+                        <configuration>vsf_template_at32f405</configuration>
+                    </excluded>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\source\shell\hal\sthal\sthal.c</name>
                     </file>
@@ -16178,6 +18222,7 @@
                     <name>sdl2</name>
                     <excluded>
                         <configuration>vsf_template_stm32h743</configuration>
+                        <configuration>vsf_template_at32f405</configuration>
                     </excluded>
                     <group>
                         <name>3rd-party</name>
@@ -16286,6 +18331,9 @@
                 <name>sys</name>
                 <group>
                     <name>linux</name>
+                    <excluded>
+                        <configuration>vsf_template_at32f405</configuration>
+                    </excluded>
                     <group>
                         <name>app</name>
                         <group>
@@ -16688,6 +18736,9 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\retarget_io.c</name>
+                    <excluded>
+                        <configuration>vsf_template_at32f405</configuration>
+                    </excluded>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\type.h</name>

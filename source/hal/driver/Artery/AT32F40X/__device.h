@@ -16,27 +16,27 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
 #include "hal/vsf_hal_cfg.h"
 
-#undef VSF_ARTERY_DRIVER_HEADER
+#undef VSF_DEVICE_HEADER
 
-#if   defined(__AT32F405__)
-#   define  VSF_ARTERY_DRIVER_HEADER        "./AT32F40X/AT32F405/driver.h"
-#elif defined(__AT32F435__)
-#   define  VSF_ARTERY_DRIVER_HEADER        "./AT32F43X/AT32F435/driver.h"
+#if     defined(__AT32F405__)
+#   define  VSF_DEVICE_HEADER       "./AT32F405/device.h"
 #else
 #   error No supported device found.
 #endif
 
 /* include specified device driver header file */
-#include VSF_ARTERY_DRIVER_HEADER
+#include VSF_DEVICE_HEADER
 
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#   ifndef __CPU_ARM__
+#       define __CPU_ARM__
+#   endif
+#else
 
-
-#ifndef __HAL_DRIVER_ARTERY_H__
-#define __HAL_DRIVER_ARTERY_H__
-
+#ifndef __HAL_DEVICE_ARTERY_AT32F40X_H__
+#define __HAL_DEVICE_ARTERY_AT32F40X_H__
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -46,5 +46,6 @@
 /*============================ PROTOTYPES ====================================*/
 
 
-#endif
+#endif      // __HAL_DEVICE_ARTERY_AT32F40X_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

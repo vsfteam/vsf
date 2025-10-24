@@ -70,3 +70,6 @@
 [submodule "source/hal/driver/ST/STM32H7XX/common/vendor/cmsis_device_h7"]
 	path = source/hal/driver/ST/STM32H7XX/common/vendor/cmsis_device_h7
 	url = https://github.com/STMicroelectronics/cmsis_device_h7
+[submodule "source/hal/driver/Artery/AT32F40X/common/vendor"]
+	path = source/hal/driver/Artery/AT32F40X/common/vendor
+	url = https://github.com/ArteryTek/AT32F402_405_Firmware_Library.git
