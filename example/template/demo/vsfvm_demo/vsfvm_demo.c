@@ -20,10 +20,11 @@
 // for vk_file_getfileext
 #include <vsf.h>
 
-#include <unistd.h>
-#include <stdio.h>
 
 #if APP_USE_VSFVM_DEMO == ENABLED
+
+#include <unistd.h>
+#include <stdio.h>
 
 #include "vsf_vm.h"
 
