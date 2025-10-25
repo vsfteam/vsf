@@ -21,8 +21,8 @@
 
 #else
 
-#   ifndef __HAL_DRIVER_ATTERY_AT32F405_H__
-#       define __HAL_DRIVER_ATTERY_AT32F405_H__
+#   ifndef __HAL_DRIVER_ATTERY_AT32F402_405_H__
+#       define __HAL_DRIVER_ATTERY_AT32F402_405_H__
 
 /*============================ INCLUDES ======================================*/
 

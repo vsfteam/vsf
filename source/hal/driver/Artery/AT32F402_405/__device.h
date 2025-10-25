@@ -35,8 +35,8 @@
 #   endif
 #else
 
-#ifndef __HAL_DEVICE_ARTERY_AT32F40X_H__
-#define __HAL_DEVICE_ARTERY_AT32F40X_H__
+#ifndef __HAL_DEVICE_ARTERY_AT32F402_405_H__
+#define __HAL_DEVICE_ARTERY_AT32F402_405_H__
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -46,6 +46,6 @@
 /*============================ PROTOTYPES ====================================*/
 
 
-#endif      // __HAL_DEVICE_ARTERY_AT32F40X_H__
+#endif      // __HAL_DEVICE_ARTERY_AT32F402_405_H__
 #endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

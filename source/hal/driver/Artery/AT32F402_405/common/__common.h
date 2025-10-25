@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __HAL_DRIVER_ARTERY_AT32F40X_COMMON_H__
-#define __HAL_DRIVER_ARTERY_AT32F40X_COMMON_H__
+#ifndef __HAL_DRIVER_ARTERY_AT32F402_405_COMMON_H__
+#define __HAL_DRIVER_ARTERY_AT32F402_405_COMMON_H__
 
 /* \note __common.h should only be included by device.h */
 

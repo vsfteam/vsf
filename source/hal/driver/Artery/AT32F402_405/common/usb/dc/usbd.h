@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __OSA_HAL_DRIVER_ARTERY_AT32F4_USBD_H__
-#define __OSA_HAL_DRIVER_ARTERY_AT32F4_USBD_H__
+#ifndef __OSA_HAL_DRIVER_ARTERY_AT32F402_405_USBD_H__
+#define __OSA_HAL_DRIVER_ARTERY_AT32F402_405_USBD_H__
 
 /*============================ INCLUDES ======================================*/
 

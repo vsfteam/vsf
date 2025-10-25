@@ -16342,6 +16342,9 @@
                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\at32f402_405_conf.h</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\device_irq.h</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\driver.c</name>
                             </file>
                             <file>

@@ -43,8 +43,8 @@
 
 #else
 
-#ifndef __HAL_DEVICE_ATTERY_AT32F405_H__
-#define __HAL_DEVICE_ATTERY_AT32F405_H__
+#ifndef __HAL_DEVICE_ATTERY_AT32F405KCU7_4_H__
+#define __HAL_DEVICE_ATTERY_AT32F405KCU7_4_H__
 
 // software interrupt provided by a dedicated device
 #define VSF_DEV_SWI_LIST                                                        \
@@ -100,6 +100,16 @@
                 .utmi_en            = false,                                    \
                 .vbus_en            = false,
 
+/*============================ INCLUDES ======================================*/
+
+// Include common irq and af headers after peripherals are defined, so that
+//  irq and af can be adjusted according to the dedicated device configuration.
+
+#include "../common/device_irq.h"
+//#include "../common/device_af.h"
+
+/*============================ MACROS ========================================*/
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -107,6 +117,6 @@
 /*============================ PROTOTYPES ====================================*/
 
 
-#endif      // __HAL_DEVICE_ATTERY_AT32F405_H__
+#endif      // __HAL_DEVICE_ATTERY_AT32F405KCU7_4_H__
 #endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 /* EOF */

@@ -15,8 +15,8 @@
  *                                                                           *
  ****************************************************************************/
 
-#ifndef __OSA_HAL_DRIVER_ARTERY_AT32F4_USB_H__
-#define __OSA_HAL_DRIVER_ARTERY_AT32F4_USB_H__
+#ifndef __OSA_HAL_DRIVER_ARTERY_AT32F402_405_USB_H__
+#define __OSA_HAL_DRIVER_ARTERY_AT32F402_405_USB_H__
 
 /*============================ INCLUDES ======================================*/
 #include "hal/vsf_hal.h"
