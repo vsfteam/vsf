@@ -1,6 +1,6 @@
 vsf_add_sources(
     driver.c
-    startup_n32h76x.c
+    startup_n32h76x_78x.c
 )
 
 add_subdirectory_existed(gpio)
