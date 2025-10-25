@@ -1,6 +1,6 @@
 # CMakeLists head
 
-target_sources( vsf
-    INTERFACE driver.c
-    INTERFACE startup_ARMCM0.c
+vsf_add_sources(
+    driver.c
+    startup_ARMCM0.c
 )

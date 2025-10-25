@@ -2372,7 +2372,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>9.60.2.5384</state>
+                    <state>9.60.3.7274</state>
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
@@ -2482,7 +2482,7 @@
                 </option>
                 <option>
                     <name>DSPExtension</name>
-                    <state>1</state>
+                    <state>0</state>
                 </option>
                 <option>
                     <name>TrustZone</name>
@@ -3100,7 +3100,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>$TOOLKIT_DIR$\config\linker\GD\GD32E103xB.icf</state>
+                    <state>$TOOLKIT_DIR$\config\generic.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>
@@ -4615,7 +4615,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>9.60.2.5384</state>
+                    <state>9.60.3.7274</state>
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
@@ -5814,7 +5814,7 @@
                 </option>
                 <option>
                     <name>OGLastSavedByProductVersion</name>
-                    <state>9.60.2.5384</state>
+                    <state>9.60.3.7274</state>
                 </option>
                 <option>
                     <name>OGChipSelectEditMenu</name>
@@ -6563,7 +6563,7 @@
                 </option>
                 <option>
                     <name>IlinkIcfFile</name>
-                    <state>$TOOLKIT_DIR$\config\linker\ST\stm32h743xI.icf</state>
+                    <state>$TOOLKIT_DIR$/config/linker/ST/stm32h743xI.icf</state>
                 </option>
                 <option>
                     <name>IlinkIcfFileSlave</name>
@@ -17605,6 +17605,9 @@
                 </group>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\driver.h</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\vendor_driver.h</name>
                 </file>
             </group>
             <group>
