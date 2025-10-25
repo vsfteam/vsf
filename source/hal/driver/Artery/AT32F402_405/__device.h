@@ -16,12 +16,27 @@
  ****************************************************************************/
 
 /*============================ INCLUDES ======================================*/
-
 #include "hal/vsf_hal_cfg.h"
-#include "./device.h"
-#include "hal/vsf_hal.h"
 
-#include "hal/driver/common/swi/arm/vsf_swi_template.inc"
+#undef VSF_DEVICE_HEADER
+
+#if     defined(__AT32F405KCU7_4__)
+#   define  VSF_DEVICE_HEADER       "./AT32F405KCU7_4/device.h"
+#else
+#   error No supported device found.
+#endif
+
+/* include specified device driver header file */
+#include VSF_DEVICE_HEADER
+
+#ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+#   ifndef __CPU_ARM__
+#       define __CPU_ARM__
+#   endif
+#else
+
+#ifndef __HAL_DEVICE_ARTERY_AT32F40X_H__
+#define __HAL_DEVICE_ARTERY_AT32F40X_H__
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -29,4 +44,8 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-/*============================ IMPLEMENTATION ================================*/
+
+
+#endif      // __HAL_DEVICE_ARTERY_AT32F40X_H__
+#endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
+/* EOF */

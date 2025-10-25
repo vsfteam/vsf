@@ -28,6 +28,8 @@
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
+#include "hal/driver/common/swi/arm/vsf_swi_template.inc"
+
 // TODO: if these initialization is implemented in startup file, remove here
 int __low_level_init(void)
 {

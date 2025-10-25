@@ -22,7 +22,7 @@
  * limitations under the License.
  */
 
-#include "./device.h"
+#include "../__device.h"
 
 /*----------------------------------------------------------------------------
   Exception / Interrupt Handler Function Prototype

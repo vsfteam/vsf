@@ -27,8 +27,7 @@
 /*============================ INCLUDES ======================================*/
 
 #       include "hal/vsf_hal_cfg.h"
-#       include "./device.h"
-#       include "./interrupt_swi.h"
+#       include "../__device.h"
 
 #       include "../common/usb/usb.h"
 

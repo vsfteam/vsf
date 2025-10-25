@@ -7119,7 +7119,7 @@
                     <name>CCDefines</name>
                     <state>__VSF__</state>
                     <state>__Artery__</state>
-                    <state>__AT32F405__</state>
+                    <state>__AT32F405KCU7_4__</state>
                     <state>AT32F405KCU7_4</state>
                     <state>__OOC_CPP__</state>
                     <state>AT_START_F405_V1</state>
@@ -7250,9 +7250,9 @@
                     <state>$PROJ_DIR$\..\..\config\3rd-party\lvgl</state>
                     <state>$PROJ_DIR$\..\..\..\..\source</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\3rd-party\CMSIS\CMSIS\Core\Include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405</state>
-                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\cmsis\cm4\device_support</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\cmsis\cm4\device_support</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -16125,29 +16125,11 @@
                         <configuration>vsf_template_stm32h743</configuration>
                     </excluded>
                     <group>
-                        <name>AT32F40X</name>
+                        <name>AT32F402_405</name>
                         <group>
-                            <name>AT32F405</name>
+                            <name>AT32F405KCU7_4</name>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405\at32f402_405_conf.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405\device.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405\driver.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405\driver.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405\interrupt_swi.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405\interrupt_swi.h</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\AT32F405\startup_AT32F405.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\AT32F405KCU7_4\device.h</name>
                             </file>
                         </group>
                         <group>
@@ -16157,32 +16139,32 @@
                                 <group>
                                     <name>dc</name>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\dc\usbd.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\usb\dc\usbd.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\dc\usbd.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\usb\dc\usbd.h</name>
                                     </file>
                                 </group>
                                 <group>
                                     <name>hc</name>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\hc\usbh.c</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\usb\hc\usbh.c</name>
                                     </file>
                                     <file>
-                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\hc\usbh.h</name>
+                                        <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\usb\hc\usbh.h</name>
                                     </file>
                                 </group>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\usb.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\usb\usb.c</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\usb.h</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\usb\usb.h</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\usb_common.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\usb\usb_common.c</name>
                                 </file>
                                 <file>
-                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\usb\usb_lv0.c</name>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\usb\usb_lv0.c</name>
                                 </file>
                             </group>
                             <group>
@@ -16196,7 +16178,13 @@
                                             <group>
                                                 <name>device_support</name>
                                                 <file>
-                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\cmsis\cm4\device_support\system_at32f402_405.c</name>
+                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\cmsis\cm4\device_support\at32f402_405.h</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\cmsis\cm4\device_support\system_at32f402_405.c</name>
+                                                </file>
+                                                <file>
+                                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\cmsis\cm4\device_support\system_at32f402_405.h</name>
                                                 </file>
                                             </group>
                                         </group>
@@ -16206,153 +16194,165 @@
                                         <group>
                                             <name>inc</name>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_acc.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_acc.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_adc.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_adc.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_can.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_can.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_crc.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_crc.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_crm.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_crm.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_debug.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_debug.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_def.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_def.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_dma.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_dma.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_ertc.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_ertc.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_exint.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_exint.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_flash.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_flash.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_gpio.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_gpio.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_i2c.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_i2c.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_misc.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_misc.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_pwc.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_pwc.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_qspi.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_qspi.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_scfg.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_scfg.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_spi.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_spi.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_tmr.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_tmr.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_usart.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_usart.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_usb.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_usb.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_wdt.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_wdt.h</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\inc\at32f402_405_wwdt.h</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc\at32f402_405_wwdt.h</name>
                                             </file>
                                         </group>
                                         <group>
                                             <name>src</name>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_acc.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_acc.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_adc.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_adc.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_can.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_can.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_crc.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_crc.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_crm.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_crm.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_debug.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_debug.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_dma.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_dma.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_ertc.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_ertc.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_exint.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_exint.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_flash.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_flash.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_gpio.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_gpio.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_i2c.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_i2c.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_misc.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_misc.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_pwc.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_pwc.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_qspi.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_qspi.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_scfg.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_scfg.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_spi.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_spi.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_tmr.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_tmr.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_usart.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_usart.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_usb.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_usb.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_wdt.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_wdt.c</name>
                                             </file>
                                             <file>
-                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\vendor\libraries\drivers\src\at32f402_405_wwdt.c</name>
+                                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\src\at32f402_405_wwdt.c</name>
                                             </file>
                                         </group>
                                     </group>
                                 </group>
                             </group>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\common\__common.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\__common.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\at32f402_405_conf.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\driver.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\driver.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\startup_AT32F402_405.c</name>
                             </file>
                         </group>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F40X\__device.h</name>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\__device.h</name>
                         </file>
                     </group>
                     <file>

@@ -21,8 +21,8 @@
 
 #undef VSF_ARTERY_DRIVER_HEADER
 
-#if   defined(__AT32F405__)
-#   define  VSF_ARTERY_DRIVER_HEADER        "./AT32F40X/AT32F405/driver.h"
+#if   defined(__AT32F405KCU7_4__)
+#   define  VSF_ARTERY_DRIVER_HEADER        "./AT32F402_405/common/driver.h"
 #elif defined(__AT32F435__)
 #   define  VSF_ARTERY_DRIVER_HEADER        "./AT32F43X/AT32F435/driver.h"
 #else
