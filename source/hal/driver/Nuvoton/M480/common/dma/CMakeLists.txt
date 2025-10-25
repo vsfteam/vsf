@@ -1,5 +1,5 @@
 # CMakeLists head
 
-target_sources(vsf INTERFACE
+vsf_add_sources(
     dma.c
 )

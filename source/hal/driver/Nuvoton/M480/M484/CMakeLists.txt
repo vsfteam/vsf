@@ -1,7 +1,7 @@
 # CMakeLists head
 
-target_sources(vsf 
-    INTERFACE driver.c
-    INTERFACE startup_M484.c
-    INTERFACE interrupt_swi.c
+vsf_add_sources(
+    driver.c
+    startup_M484.c
+    interrupt_swi.c
 )
