@@ -20,75 +20,75 @@
 
 /*============================ INCLUDES ======================================*/
 
-#if defined(VSF_HAL_USE_GPIO) && !defined(__VSF_TEMPLATE_GPIO_H__)
+#if (VSF_HAL_USE_GPIO != DISABLED) && !defined(__VSF_TEMPLATE_GPIO_H__)
 #   include "./vsf_template_gpio.h"
 #endif
 
-#if defined(VSF_HAL_USE_ADC) && !defined(__VSF_TEMPLATE_ADC_H__)
+#if (VSF_HAL_USE_ADC != DISABLED) && !defined(__VSF_TEMPLATE_ADC_H__)
 #   include "./vsf_template_adc.h"
 #endif
 
-#if defined(VSF_HAL_USE_DAC) && !defined(__VSF_TEMPLATE_DAC_H__)
+#if (VSF_HAL_USE_DAC != DISABLED) && !defined(__VSF_TEMPLATE_DAC_H__)
 #   include "./vsf_template_dac.h"
 #endif
 
-#if defined(VSF_HAL_USE_DMA) && !defined(__VSF_TEMPLATE_DMA_H__)
+#if (VSF_HAL_USE_DMA != DISABLED) && !defined(__VSF_TEMPLATE_DMA_H__)
 #   include "./vsf_template_dma.h"
 #endif
 
-#if defined(VSF_HAL_USE_WDT) && !defined(__VSF_TEMPLATE_WDT_H__)
+#if (VSF_HAL_USE_WDT != DISABLED) && !defined(__VSF_TEMPLATE_WDT_H__)
 #   include "./vsf_template_wdt.h"
 #endif
 
-#if defined(VSF_HAL_USE_FLASH) && !defined(__VSF_TEMPLATE_FLASH_H__)
+#if (VSF_HAL_USE_FLASH != DISABLED) && !defined(__VSF_TEMPLATE_FLASH_H__)
 #   include "./vsf_template_flash.h"
 #endif
 
-#if defined(VSF_HAL_USE_I2C) && !defined(__VSF_TEMPLATE_I2C_H__)
+#if (VSF_HAL_USE_I2C != DISABLED) && !defined(__VSF_TEMPLATE_I2C_H__)
 #   include "./vsf_template_i2c.h"
 #endif
 
-#if defined(VSF_HAL_USE_I2S) && !defined(__VSF_TEMPLATE_I2S_H__)
+#if (VSF_HAL_USE_I2S != DISABLED) && !defined(__VSF_TEMPLATE_I2S_H__)
 #   include "./vsf_template_i2s.h"
 #endif
 
-#if defined(VSF_HAL_USE_SDIO) && !defined(__VSF_TEMPLATE_SDIO_H__)
+#if (VSF_HAL_USE_SDIO != DISABLED) && !defined(__VSF_TEMPLATE_SDIO_H__)
 #   include "./vsf_template_sdio.h"
 #endif
 
-#if defined(VSF_HAL_USE_PM) && !defined(__VSF_TEMPLATE_PM_H__)
+#if (VSF_HAL_USE_PM != DISABLED) && !defined(__VSF_TEMPLATE_PM_H__)
 #   include "./vsf_template_pm.h"
 #endif
 
-#if defined(VSF_HAL_USE_PWM) && !defined(__VSF_TEMPLATE_PWM_H__)
+#if (VSF_HAL_USE_PWM != DISABLED) && !defined(__VSF_TEMPLATE_PWM_H__)
 #   include "./vsf_template_pwm.h"
 #endif
 
-#if defined(VSF_HAL_USE_RNG) && !defined(__VSF_TEMPLATE_RNG_H__)
+#if (VSF_HAL_USE_RNG != DISABLED) && !defined(__VSF_TEMPLATE_RNG_H__)
 #   include "./vsf_template_rng.h"
 #endif
 
-#if defined(VSF_HAL_USE_RTC) && !defined(__VSF_TEMPLATE_RTC_H__)
+#if (VSF_HAL_USE_RTC != DISABLED) && !defined(__VSF_TEMPLATE_RTC_H__)
 #   include "./vsf_template_rtc.h"
 #endif
 
-#if defined(VSF_HAL_USE_SPI) && !defined(__VSF_TEMPLATE_SPI_H__)
+#if (VSF_HAL_USE_SPI != DISABLED) && !defined(__VSF_TEMPLATE_SPI_H__)
 #   include "./vsf_template_spi.h"
 #endif
 
-#if defined(VSF_HAL_USE_TIMER) && !defined(__VSF_TEMPLATE_TIMER_H__)
+#if (VSF_HAL_USE_TIMER != DISABLED) && !defined(__VSF_TEMPLATE_TIMER_H__)
 #   include "./vsf_template_timer.h"
 #endif
 
-#if defined(VSF_HAL_USE_USART) && !defined(__VSF_TEMPLATE_USART_H__)
+#if (VSF_HAL_USE_USART != DISABLED) && !defined(__VSF_TEMPLATE_USART_H__)
 #   include "./vsf_template_usart.h"
 #endif
 
-#if defined(VSF_HAL_USE_USB) && !defined(__VSF_TEMPLATE_USB_H__)
+#if (VSF_HAL_USE_USB != DISABLED) && !defined(__VSF_TEMPLATE_USB_H__)
 #   include "./vsf_template_usb.h"
 #endif
 
-#if defined(VSF_HAL_USE_ETH) && !defined(__VSF_TEMPLATE_ETH_H__)
+#if (VSF_HAL_USE_ETH != DISABLED) && !defined(__VSF_TEMPLATE_ETH_H__)
 #   include "./vsf_template_eth.h"
 #endif
 
