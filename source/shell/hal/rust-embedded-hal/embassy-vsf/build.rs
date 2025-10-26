@@ -244,6 +244,8 @@ const CTYPES: [(&'static str, &'static str); 2] = [
 const INTERRUPT_CFG: [(&'static str, &'static str); 2] = [
     (r"^I2C[0-9]+_EV$", "I2C_IRQ_EV"),
     (r"^I2C[0-9]+_ER$", "I2C_IRQ_ER"),
+    (r"^I2C[0-9]+_EVT$", "I2C_IRQ_EVT"),
+    (r"^I2C[0-9]+_ERR$", "I2C_IRQ_ERR"),
 ];
 
 struct PeripheralAfInfo {
@@ -295,6 +297,7 @@ lazy_static! {
                 pins: HashMap::from([
                     ("SCK", "SckPin"),
                     ("NSS", "CsPin"),
+                    ("CS", "CsPin"),
                     ("MISO", "MisoPin"),
                     ("MOSI", "MosiPin"),
                 ]),

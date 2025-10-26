@@ -110,7 +110,7 @@
 //  irq and af can be adjusted according to the dedicated device configuration.
 
 #include "../common/device_irq.h"
-//#include "../common/device_af.h"
+#include "../common/device_af.h"
 
 /*============================ MACROS ========================================*/
 
