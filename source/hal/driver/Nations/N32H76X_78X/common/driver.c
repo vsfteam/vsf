@@ -424,7 +424,7 @@ const vsf_hw_clk_t VSF_HW_CLK_CPU = {
     .clksel_mapper              = __VSF_HW_CLK_CPU_CLKSEL_MAPPER,
     .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
 };
-const vsf_hw_clk_t VSF_HW_CLK_SYSTICK = {
+const vsf_hw_clk_t VSF_HW_CLK_SYSTICK_EXT = {
     .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x59, 4, 4), // RCC_CFG3.M7STCLKDIV
 
     .clksrc                     = &VSF_HW_CLK_CPU,
@@ -440,7 +440,7 @@ const vsf_hw_clk_t VSF_HW_CLK_CPU = {
     .clksrc                     = &VSF_HW_CLK_SYSBUS,
     .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
 };
-const vsf_hw_clk_t VSF_HW_CLK_SYSTICK = {
+const vsf_hw_clk_t VSF_HW_CLK_SYSTICK_EXT = {
     .clkprescaler_region        = VSF_HW_CLKRST_REGION(0x59, 0, 4), // RCC_CFG3.M4STCLKDIV
 
     .clksrc                     = &VSF_HW_CLK_CPU,

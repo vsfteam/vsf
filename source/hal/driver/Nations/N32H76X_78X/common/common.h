@@ -45,7 +45,7 @@
 #define vsf_hw_peripheral_enable        vsf_hw_clkrst_region_set_bit
 #define vsf_hw_peripheral_disable       vsf_hw_clkrst_region_clear_bit
 
-#define VSF_SYSTIMER_FREQ               vsf_hw_clk_get_freq_hz(&VSF_HW_CLK_SYSTICK)
+#define VSF_SYSTIMER_FREQ               vsf_hw_clk_get_freq_hz(&VSF_HW_CLK_CPU)
 
 /*============================ TYPES =========================================*/
 
@@ -1035,7 +1035,7 @@ extern const vsf_hw_clk_t VSF_HW_CLK_AXIHYP;
 extern const vsf_hw_clk_t VSF_HW_CLK_SYS;
 extern const vsf_hw_clk_t VSF_HW_CLK_SYSBUS;
 extern const vsf_hw_clk_t VSF_HW_CLK_CPU;
-extern const vsf_hw_clk_t VSF_HW_CLK_SYSTICK;
+extern const vsf_hw_clk_t VSF_HW_CLK_SYSTICK_EXT;
 extern const vsf_hw_clk_t VSF_HW_CLK_AXI;
 #define VSF_HW_CLK_AHB1                 VSF_HW_CLK_SYSBUS
 #define VSF_HW_CLK_AHB2                 VSF_HW_CLK_SYSBUS
