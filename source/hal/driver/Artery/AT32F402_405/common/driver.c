@@ -68,7 +68,8 @@ struct vsf_hw_clk_t {
     uint8_t clksrc_type;
     uint8_t clkprescaler_type;
     uint8_t clkrdy_type;
-    uint8_t clkprescaler_max;
+    uint8_t clkprescaler_max:7;
+    uint8_t update_flash_latency;
 };
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -87,6 +88,7 @@ const vsf_hw_clk_t VSF_HW_CLK_HSE_TO_SYS = {
     .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
     .clkprescaler_type          = VSF_HW_CLK_PRESCALER_RSHIFT,
     .clkprescaler_max           = 5,
+    .update_flash_latency       = 1,
 };
 
 const vsf_hw_clk_t VSF_HW_CLK_HSI48 = {
@@ -140,6 +142,7 @@ const vsf_hw_clk_t VSF_HW_CLK_HSI_TO_SYS = {
     .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
     .clkprescaler_type          = VSF_HW_CLK_PRESCALER_RSHIFT,
     .clkprescaler_max           = 4,
+    .update_flash_latency       = 1,
 };
 
 static const vsf_hw_clk_t * const __VSF_HW_CLK_PLL_CLKSEL_MAPPER[2] = {
@@ -155,6 +158,7 @@ const vsf_hw_clk_t VSF_HW_CLK_PLL = {
     .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
     .getclk                     = __vsf_hw_pll_getclk,
     .clkprescaler_type          = VSF_HW_CLK_PRESCALER_FUNC,
+    .update_flash_latency       = 1,
 };
 static const uint16_t __VSF_HW_CLK_PLLP_PRESCALER[16] = {
     1, 2, 4, 6, 8, 10 , 12, 14, 16, 18, 20, 22, 24, 26, 28, 30
@@ -165,6 +169,7 @@ const vsf_hw_clk_t VSF_HW_CLK_PLLP = {
     .clksrc_type                = VSF_HW_CLK_TYPE_CLK,
     .clkprescaler_mapper        = __VSF_HW_CLK_PLLP_PRESCALER,
     .clkprescaler_type          = VSF_HW_CLK_PRESCALER_DIV,
+    .update_flash_latency       = 1,
 };
 static const uint16_t __VSF_HW_CLK_PLLU_PRESCALER[8] = {
     11, 13, 12, 14, 16, 18, 20, 11
@@ -188,6 +193,7 @@ const vsf_hw_clk_t VSF_HW_CLK_SYS = {
     .clksel_mapper              = __VSF_HW_CLK_SYS_CLKSEL_MAPPER,
     .clksrc_type                = VSF_HW_CLK_TYPE_SEL,
     .clkrdy_type                = VSF_HW_CLK_RDY_MATCH_CLKSEL,
+    .update_flash_latency       = 1,
 };
 
 static const uint16_t __VSF_HW_CLK_AHB_PRESCALER[16] = {
@@ -301,6 +307,27 @@ uint_fast8_t vsf_hw_clkrst_region_get_bit(uint32_t region)
 
     return (((uint32_t *)CRM_BASE)[reg_word_offset] >> bit_offset) & 1;
 }
+
+
+
+
+
+static void __vsf_hw_clk_update_flash_latency(void)
+{
+    uint32_t clk = vsf_hw_clk_get_freq_hz(&VSF_HW_CLK_SYS);
+    uint32_t div = clk / (32 * 1000 * 10000);
+    uint32_t remain = clk % (32 * 1000 * 10000);
+
+    if ((div > 0) && !remain) {
+        div--;
+    }
+    VSF_HAL_ASSERT(div <= 6);
+    flash_psr_set(div);
+}
+
+
+
+
 
 const vsf_hw_clk_t * vsf_hw_clk_get_src(const vsf_hw_clk_t *clk)
 {
@@ -490,6 +517,9 @@ vsf_err_t vsf_hw_clk_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc,
             return VSF_ERR_INVALID_PARAMETER;
         }
         vsf_hw_clkrst_region_set(clk->clkprescaler_region, prescaler);
+        if (clk->update_flash_latency) {
+            __vsf_hw_clk_update_flash_latency();
+        }
     } else if (freq_hz != 0) {
         uint32_t clk_freq_hz = __vsf_hw_clk_get_src_freq_hz(clk);
         VSF_HAL_ASSERT(clk_freq_hz >= freq_hz);
@@ -521,6 +551,10 @@ vsf_err_t vsf_hw_pll_config(const vsf_hw_clk_t *clk, const vsf_hw_clk_t *clksrc,
     } else if (out_freq_hz != 0) {
         // TODO
         VSF_HAL_ASSERT(false);
+    }
+
+    if (clk->update_flash_latency) {
+        __vsf_hw_clk_update_flash_latency();
     }
 
     return VSF_ERR_NONE;
@@ -572,33 +606,6 @@ int __low_level_init(void)
  */
 bool vsf_driver_init(void)
 {
-    /* config flash psr register */
-    flash_psr_set(FLASH_WAIT_CYCLE_6);
-
-    vsf_hw_peripheral_enable(VSF_HW_EN_PWC);
-
-    /* set power ldo output voltage to 1.3v */
-    pwc_ldo_output_voltage_set(PWC_LDO_OUTPUT_1V3);
-
-    vsf_hw_clk_enable(&VSF_HW_CLK_HEXT);
-
-    // PLL: 12M * 72 / 1 = 864M
-    vsf_hw_pll_config(&VSF_HW_CLK_PLL, &VSF_HW_CLK_HEXT, 72, 1, 0);
-    // PLLP: PLL / 4 = 216M
-    vsf_hw_clk_config(&VSF_HW_CLK_PLLP, NULL, 4, 0);
-    vsf_hw_clk_enable(&VSF_HW_CLK_PLL);
-
-    vsf_hw_clk_config(&VSF_HW_CLK_SYS, &VSF_HW_CLK_PLLP, 1, 0);
-    vsf_hw_clk_config(&VSF_HW_CLK_AHB, NULL, 1, 0);
-    vsf_hw_clk_config(&VSF_HW_CLK_APB1, NULL, 1, 0);
-    vsf_hw_clk_config(&VSF_HW_CLK_APB2, NULL, 2, 0);
-    vsf_hw_clk_config(&VSF_HW_CLK_SCLK, &VSF_HW_CLK_PLLP, 0, 0);
-    vsf_hw_clk_config(&VSF_HW_CLK_PLLU, NULL, 18, 0);
-    vsf_hw_clk_enable(&VSF_HW_CLK_PLLU);
-    vsf_hw_clk_config(&VSF_HW_CLK_OTGFS1, &VSF_HW_CLK_PLLU, 0, 0);
-
-    system_core_clock_update();
-
     return true;
 }
 
