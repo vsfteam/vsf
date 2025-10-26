@@ -46,7 +46,9 @@ typedef struct vsf_hw_usb_const_t {
     uint8_t hc_ep_num;
     uint32_t irq;
     void *reg;
-    uint32_t clock;
+    uint32_t en;
+    const vsf_hw_clk_t *clk;
+    uint32_t clk_freq_required;
 
     implement(vk_dwcotg_hw_info_t)
 } vsf_hw_usb_const_t;

@@ -40,8 +40,12 @@ vsf_err_t __vsf_hw_usb_init(vsf_hw_usb_t *usb, vsf_arch_prio_t priority,
     usb->callback.irqhandler = handler;
     usb->callback.param = param;
 
-    vsf_hw_peripheral_enable(usb_hw_param->clock);
+    if (vsf_hw_clk_get_freq_hz(usb_hw_param->clk) != usb_hw_param->clk_freq_required) {
+        VSF_HAL_ASSERT(false);
+        return VSF_ERR_INVALID_PARAMETER;
+    }
 
+    vsf_hw_peripheral_enable(usb_hw_param->en);
     NVIC_SetPriority(usb_hw_param->irq, priority);
     NVIC_ClearPendingIRQ(usb_hw_param->irq);
     NVIC_EnableIRQ(usb_hw_param->irq);

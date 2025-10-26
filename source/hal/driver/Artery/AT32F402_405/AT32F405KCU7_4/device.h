@@ -75,7 +75,9 @@
             .hc_ep_num              = 16,                                       \
             .reg                    = (void *)OTGFS1_BASE,                      \
             .irq                    = OTGFS1_IRQn,                              \
-            .clock                  = VSF_HW_EN_OTGFS1,                         \
+            .en                     = VSF_HW_EN_OTGFS1,                         \
+            .clk                    = &VSF_HW_CLK_HICK,                         \
+            .clk_freq_required      = 48 * 1000 * 1000,                         \
             /* vk_dwcotg_hw_info_t */                                           \
                 .buffer_word_size   = 320,                                      \
                 .speed              = USB_SPEED_FULL,                           \
@@ -91,7 +93,9 @@
             .hc_ep_num              = 16,                                       \
             .reg                    = (void *)OTGHS_BASE,                       \
             .irq                    = OTGHS_IRQn,                               \
-            .clock                  = VSF_HW_EN_OTGHS,                          \
+            .en                     = VSF_HW_EN_OTGHS,                          \
+            .clk                    = &VSF_HW_CLK_HEXT,                         \
+            .clk_freq_required      = 12 * 1000 * 1000,                         \
             /* vk_dwcotg_hw_info_t */                                           \
                 .buffer_word_size   = 1024,                                     \
                 .speed              = USB_SPEED_HIGH,                           \
