@@ -911,9 +911,7 @@ void vsf_hw_clk_enable(const vsf_hw_clk_t *clk)
     if (clk->clken_region != 0) {
         vsf_hw_clkrst_region_set_bit(clk->clken_region);
     }
-    if (clk->clkrdy_region != 0) {
-        while (!vsf_hw_clkrst_region_get_bit(clk->clkrdy_region));
-    }
+    while (!vsf_hw_clk_is_ready(clk));
 }
 
 void vsf_hw_clk_disable(const vsf_hw_clk_t *clk)

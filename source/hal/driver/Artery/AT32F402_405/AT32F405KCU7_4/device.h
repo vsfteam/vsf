@@ -75,7 +75,7 @@
             .hc_ep_num              = 16,                                       \
             .reg                    = (void *)OTGFS1_BASE,                      \
             .irq                    = OTGFS1_IRQn,                              \
-            .clock                  = CRM_OTGFS1_PERIPH_CLOCK,                  \
+            .clock                  = VSF_HW_EN_OTGFS1,                         \
             /* vk_dwcotg_hw_info_t */                                           \
                 .buffer_word_size   = 320,                                      \
                 .speed              = USB_SPEED_FULL,                           \
@@ -91,7 +91,7 @@
             .hc_ep_num              = 16,                                       \
             .reg                    = (void *)OTGHS_BASE,                       \
             .irq                    = OTGHS_IRQn,                               \
-            .clock                  = CRM_OTGHS_PERIPH_CLOCK,                   \
+            .clock                  = VSF_HW_EN_OTGHS,                          \
             /* vk_dwcotg_hw_info_t */                                           \
                 .buffer_word_size   = 1024,                                     \
                 .speed              = USB_SPEED_HIGH,                           \

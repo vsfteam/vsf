@@ -16169,6 +16169,9 @@
                             </group>
                             <group>
                                 <name>vendor</name>
+                                <excluded>
+                                    <configuration>vsf_template_at32f405</configuration>
+                                </excluded>
                                 <group>
                                     <name>libraries</name>
                                     <group>

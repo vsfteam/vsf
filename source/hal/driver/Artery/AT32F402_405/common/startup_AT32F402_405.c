@@ -120,8 +120,10 @@ void Reset_Handler(void)
 {
     __set_MSP((uintptr_t)&__INITIAL_SP);
     //! enable FPU before vsf_hal_pre_startup_init, in case vsf_hal_pre_startup_init uses FPU
+#if defined (__FPU_USED) && (__FPU_USED == 1U)
     SCB->CPACR |= ((3U << 10U*2U) |           /* enable CP10 Full Access */
                    (3U << 11U*2U));           /* enable CP11 Full Access */
+#endif
     SCB->VTOR = (uint32_t)__VECTOR_TABLE;
 
     vsf_hal_pre_startup_init();

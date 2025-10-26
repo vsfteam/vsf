@@ -38,12 +38,6 @@
 #   define VSF_USE_SIMPLE_SSCANF                        ENABLED
 #endif
 
-//extern uint32_t SystemCoreClock;
-// DO NOT use SystemCoreClock for VSF_SYSTIMER_FREQ, because systimer is initialized
-//  in vsf_arch_init, which is earlier than initialization of SystemCoreClock in
-//  vsf_driver_init.
-#define VSF_SYSTIMER_FREQ                               (216UL * 1000 * 1000)
-
 // configure pool and heap to avoid heap allocating in interrupt
 #define VSF_OS_CFG_EVTQ_POOL_SIZE                       128
 #define VSF_POOL_CFG_FEED_ON_HEAP                       DISABLED

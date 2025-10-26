@@ -40,7 +40,7 @@ vsf_err_t __vsf_hw_usb_init(vsf_hw_usb_t *usb, vsf_arch_prio_t priority,
     usb->callback.irqhandler = handler;
     usb->callback.param = param;
 
-    crm_periph_clock_enable(usb_hw_param->clock, TRUE);
+    vsf_hw_peripheral_enable(usb_hw_param->clock);
 
     NVIC_SetPriority(usb_hw_param->irq, priority);
     NVIC_ClearPendingIRQ(usb_hw_param->irq);
