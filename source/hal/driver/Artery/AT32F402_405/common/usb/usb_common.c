@@ -40,7 +40,7 @@ vsf_err_t __vsf_hw_usb_init(vsf_hw_usb_t *usb, vsf_arch_prio_t priority,
     usb->callback.irqhandler = handler;
     usb->callback.param = param;
 
-    if (vsf_hw_clk_get_freq_hz(usb_hw_param->clk) != usb_hw_param->clk_freq_required) {
+    if (vsf_hw_clk_get_freq_hz(usb_hw_param->phyclk) != usb_hw_param->phyclk_freq_required) {
         VSF_HAL_ASSERT(false);
         return VSF_ERR_INVALID_PARAMETER;
     }
