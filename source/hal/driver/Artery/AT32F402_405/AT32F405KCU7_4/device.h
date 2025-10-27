@@ -67,6 +67,10 @@
 #define VSF_HW_GPIO_PORT0_MASK      0xF8FF
 #define VSF_HW_GPIO_PORT1_MASK      0x01FF
 
+// USART
+
+#define VSF_HW_USART_MASK           0x00FE
+
 // USB OTG
 
 #define VSF_HW_USB_OTG_COUNT        2

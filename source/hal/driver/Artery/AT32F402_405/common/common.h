@@ -55,42 +55,77 @@
 
 typedef enum vsf_hw_peripheral_rst_t {
     // CRM_AHBRST1
+#if defined(VSF_HW_USB_OTG_MASK) && (VSF_HW_USB_OTG_MASK & (1 << 1))
     VSF_HW_RST_OTGHS                    = VSF_HW_CLKRST_REGION(0x4,  29, 1),// OTGHSRST
+#endif
     VSF_HW_RST_DMA2                     = VSF_HW_CLKRST_REGION(0x4,  24, 1),// DMA2RST
     VSF_HW_RST_DMA1                     = VSF_HW_CLKRST_REGION(0x4,  22, 1),// DMA1RST
     VSF_HW_RST_CRC                      = VSF_HW_CLKRST_REGION(0x4,  12, 1),// CRCRST
+#if defined(VSF_HW_GPIO_PORT_MASK) && (VSF_HW_GPIO_PORT_MASK & (1 << 5))
     VSF_HW_RST_GPIO5                    = VSF_HW_CLKRST_REGION(0x4,  5,  1),// GPIOFRST
-    VSF_HW_RST_GPIO3                    = VSF_HW_CLKRST_REGION(0x4,  3,  1),// GPIODRST
-    VSF_HW_RST_GPIO2                    = VSF_HW_CLKRST_REGION(0x4,  2,  1),// GPIOCRST
-    VSF_HW_RST_GPIO1                    = VSF_HW_CLKRST_REGION(0x4,  1,  1),// GPIOBRST
-    VSF_HW_RST_GPIO0                    = VSF_HW_CLKRST_REGION(0x4,  0,  1),// GPIOARST
-
-    VSF_HW_RST_GPIOA                    = VSF_HW_RST_GPIO0,
-    VSF_HW_RST_GPIOB                    = VSF_HW_RST_GPIO1,
-    VSF_HW_RST_GPIOC                    = VSF_HW_RST_GPIO2,
-    VSF_HW_RST_GPIOD                    = VSF_HW_RST_GPIO3,
     VSF_HW_RST_GPIOF                    = VSF_HW_RST_GPIO5,
+#endif
+#if defined(VSF_HW_GPIO_PORT_MASK) && (VSF_HW_GPIO_PORT_MASK & (1 << 3))
+    VSF_HW_RST_GPIO3                    = VSF_HW_CLKRST_REGION(0x4,  3,  1),// GPIODRST
+    VSF_HW_RST_GPIOD                    = VSF_HW_RST_GPIO3,
+#endif
+#if defined(VSF_HW_GPIO_PORT_MASK) && (VSF_HW_GPIO_PORT_MASK & (1 << 2))
+    VSF_HW_RST_GPIO2                    = VSF_HW_CLKRST_REGION(0x4,  2,  1),// GPIOCRST
+    VSF_HW_RST_GPIOC                    = VSF_HW_RST_GPIO2,
+#endif
+#if defined(VSF_HW_GPIO_PORT_MASK) && (VSF_HW_GPIO_PORT_MASK & (1 << 1))
+    VSF_HW_RST_GPIO1                    = VSF_HW_CLKRST_REGION(0x4,  1,  1),// GPIOBRST
+    VSF_HW_RST_GPIOB                    = VSF_HW_RST_GPIO1,
+#endif
+#if defined(VSF_HW_GPIO_PORT_MASK) && (VSF_HW_GPIO_PORT_MASK & (1 << 0))
+    VSF_HW_RST_GPIO0                    = VSF_HW_CLKRST_REGION(0x4,  0,  1),// GPIOARST
+    VSF_HW_RST_GPIOA                    = VSF_HW_RST_GPIO0,
+#endif
 
     // CRM_AHBRST2
+#if defined(VSF_HW_USB_OTG_MASK) && (VSF_HW_USB_OTG_MASK & (1 << 0))
     VSF_HW_RST_OTGFS1                   = VSF_HW_CLKRST_REGION(0x5,  7,  1),// OTGFS1RST
+#endif
 
     // CRM_AHBRST3
     VSF_HW_RST_QSPI1                    = VSF_HW_CLKRST_REGION(0x6,  1,  1),// QSPI1RST
 
     // CRM_APB1RST
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 8))
     VSF_HW_RST_UART8                    = VSF_HW_CLKRST_REGION(0x7,  31,  1),// UART8RST
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 7))
     VSF_HW_RST_UART7                    = VSF_HW_CLKRST_REGION(0x7,  30,  1),// UART7RST
+#endif
     VSF_HW_RST_PWC                      = VSF_HW_CLKRST_REGION(0x7,  28,  1),// PWCRST
     VSF_HW_RST_CAN1                     = VSF_HW_CLKRST_REGION(0x7,  25,  1),// CAN1RST
+#if defined(VSF_HW_I2C_MASK) && (VSF_HW_I2C_MASK & (1 << 3))
     VSF_HW_RST_I2C3                     = VSF_HW_CLKRST_REGION(0x7,  23,  1),// I2C3RST
+#endif
+#if defined(VSF_HW_I2C_MASK) && (VSF_HW_I2C_MASK & (1 << 2))
     VSF_HW_RST_I2C2                     = VSF_HW_CLKRST_REGION(0x7,  22,  1),// I2C2RST
+#endif
+#if defined(VSF_HW_I2C_MASK) && (VSF_HW_I2C_MASK & (1 << 1))
     VSF_HW_RST_I2C1                     = VSF_HW_CLKRST_REGION(0x7,  21,  1),// I2C1RST
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 5))
     VSF_HW_RST_USART5                   = VSF_HW_CLKRST_REGION(0x7,  20,  1),// USART5RST
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 4))
     VSF_HW_RST_USART4                   = VSF_HW_CLKRST_REGION(0x7,  19,  1),// USART4RST
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 3))
     VSF_HW_RST_USART3                   = VSF_HW_CLKRST_REGION(0x7,  18,  1),// USART3RST
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 2))
     VSF_HW_RST_USART2                   = VSF_HW_CLKRST_REGION(0x7,  17,  1),// USART2RST
+#endif
+#if defined(VSF_HW_SPI_MASK) && (VSF_HW_SPI_MASK & (1 << 3))
     VSF_HW_RST_SPI3                     = VSF_HW_CLKRST_REGION(0x7,  15,  1),// SPI3RST
+#endif
+#if defined(VSF_HW_SPI_MASK) && (VSF_HW_SPI_MASK & (1 << 2))
     VSF_HW_RST_SPI2                     = VSF_HW_CLKRST_REGION(0x7,  14,  1),// SPI2RST
+#endif
     VSF_HW_RST_WWDT                     = VSF_HW_CLKRST_REGION(0x7,  11,  1),// WWDTRST
     VSF_HW_RST_TMR14                    = VSF_HW_CLKRST_REGION(0x7,   8,  1),// TMR14RST
     VSF_HW_RST_TMR13                    = VSF_HW_CLKRST_REGION(0x7,   7,  1),// TMR13RST
@@ -107,16 +142,24 @@ typedef enum vsf_hw_peripheral_rst_t {
     VSF_HW_RST_TMR10                    = VSF_HW_CLKRST_REGION(0x8,  17,  1),// TMR10RST
     VSF_HW_RST_TMR9                     = VSF_HW_CLKRST_REGION(0x8,  16,  1),// TMR9RST
     VSF_HW_RST_SCFG                     = VSF_HW_CLKRST_REGION(0x8,  14,  1),// SCFGRST
+#if defined(VSF_HW_SPI_MASK) && (VSF_HW_SPI_MASK & (1 << 1))
     VSF_HW_RST_SPI1                     = VSF_HW_CLKRST_REGION(0x8,  12,  1),// SPI1RST
+#endif
     VSF_HW_RST_ADC                      = VSF_HW_CLKRST_REGION(0x8,   8,  1),// ADCRST
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 6))
     VSF_HW_RST_USART6                   = VSF_HW_CLKRST_REGION(0x8,   5,  1),// USART6RST
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 1))
     VSF_HW_RST_USART1                   = VSF_HW_CLKRST_REGION(0x8,   4,  1),// USART1RST
+#endif
     VSF_HW_RST_TMR1                     = VSF_HW_CLKRST_REGION(0x8,   0,  1),// TMR1RST
 } vsf_hw_peripheral_rst_t;
 
 typedef enum vsf_hw_peripheral_en_t {
     // CRM_AHBEN1
+#if defined(VSF_HW_USB_OTG_MASK) && (VSF_HW_USB_OTG_MASK & (1 << 1))
     VSF_HW_EN_OTGHS                     = VSF_HW_CLKRST_REGION(0xC,  29, 1),// OTGHSEN
+#endif
     VSF_HW_EN_DMA2                      = VSF_HW_CLKRST_REGION(0xC,  24, 1),// DMA2EN
     VSF_HW_EN_DMA1                      = VSF_HW_CLKRST_REGION(0xC,  22, 1),// DMA1EN
     VSF_HW_EN_CRC                       = VSF_HW_CLKRST_REGION(0xC,  12, 1),// CRCEN
@@ -133,25 +176,49 @@ typedef enum vsf_hw_peripheral_en_t {
     VSF_HW_EN_GPIOF                     = VSF_HW_EN_GPIO5,
 
     // CRM_AHBEN2
+#if defined(VSF_HW_USB_OTG_MASK) && (VSF_HW_USB_OTG_MASK & (1 << 0))
     VSF_HW_EN_OTGFS1                    = VSF_HW_CLKRST_REGION(0xD,  7,  1),// OTGFS1EN
+#endif
 
     // CRM_AHBEN3
     VSF_HW_EN_QSPI1                     = VSF_HW_CLKRST_REGION(0xE,  1,  1),// QSPI1EN
 
     // CRM_APB1EN
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 8))
     VSF_HW_EN_UART8                     = VSF_HW_CLKRST_REGION(0x10, 31,  1),// UART8EN
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 7))
     VSF_HW_EN_UART7                     = VSF_HW_CLKRST_REGION(0x10, 30,  1),// UART7EN
+#endif
     VSF_HW_EN_PWC                       = VSF_HW_CLKRST_REGION(0x10, 28,  1),// PWCEN
     VSF_HW_EN_CAN1                      = VSF_HW_CLKRST_REGION(0x10, 25,  1),// CAN1EN
+#if defined(VSF_HW_I2C_MASK) && (VSF_HW_I2C_MASK & (1 << 3))
     VSF_HW_EN_I2C3                      = VSF_HW_CLKRST_REGION(0x10, 23,  1),// I2C3EN
+#endif
+#if defined(VSF_HW_I2C_MASK) && (VSF_HW_I2C_MASK & (1 << 2))
     VSF_HW_EN_I2C2                      = VSF_HW_CLKRST_REGION(0x10, 22,  1),// I2C2EN
+#endif
+#if defined(VSF_HW_I2C_MASK) && (VSF_HW_I2C_MASK & (1 << 1))
     VSF_HW_EN_I2C1                      = VSF_HW_CLKRST_REGION(0x10, 21,  1),// I2C1EN
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 5))
     VSF_HW_EN_USART5                    = VSF_HW_CLKRST_REGION(0x10, 20,  1),// USART5EN
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 4))
     VSF_HW_EN_USART4                    = VSF_HW_CLKRST_REGION(0x10, 19,  1),// USART4EN
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 3))
     VSF_HW_EN_USART3                    = VSF_HW_CLKRST_REGION(0x10, 18,  1),// USART3EN
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 2))
     VSF_HW_EN_USART2                    = VSF_HW_CLKRST_REGION(0x10, 17,  1),// USART2EN
+#endif
+#if defined(VSF_HW_SPI_MASK) && (VSF_HW_SPI_MASK & (1 << 3))
     VSF_HW_EN_SPI3                      = VSF_HW_CLKRST_REGION(0x10, 15,  1),// SPI3EN
+#endif
+#if defined(VSF_HW_SPI_MASK) && (VSF_HW_SPI_MASK & (1 << 2))
     VSF_HW_EN_SPI2                      = VSF_HW_CLKRST_REGION(0x10, 14,  1),// SPI2EN
+#endif
     VSF_HW_EN_WWDT                      = VSF_HW_CLKRST_REGION(0x10, 11,  1),// WWDTEN
     VSF_HW_EN_TMR14                     = VSF_HW_CLKRST_REGION(0x10,  8,  1),// TMR14EN
     VSF_HW_EN_TMR13                     = VSF_HW_CLKRST_REGION(0x10,  7,  1),// TMR13EN
@@ -168,14 +235,22 @@ typedef enum vsf_hw_peripheral_en_t {
     VSF_HW_EN_TMR10                     = VSF_HW_CLKRST_REGION(0x11, 17,  1),// TMR10EN
     VSF_HW_EN_TMR9                      = VSF_HW_CLKRST_REGION(0x11, 16,  1),// TMR9EN
     VSF_HW_EN_SCFG                      = VSF_HW_CLKRST_REGION(0x11, 14,  1),// SCFGEN
+#if defined(VSF_HW_SPI_MASK) && (VSF_HW_SPI_MASK & (1 << 1))
     VSF_HW_EN_SPI1                      = VSF_HW_CLKRST_REGION(0x11, 12,  1),// SPI1EN
+#endif
     VSF_HW_EN_ADC                       = VSF_HW_CLKRST_REGION(0x11,  8,  1),// ADCEN
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 6))
     VSF_HW_EN_USART6                    = VSF_HW_CLKRST_REGION(0x11,  5,  1),// USART6EN
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 1))
     VSF_HW_EN_USART1                    = VSF_HW_CLKRST_REGION(0x11,  4,  1),// USART1EN
+#endif
     VSF_HW_EN_TMR1                      = VSF_HW_CLKRST_REGION(0x11,  0,  1),// TMR1EN
 
     // CRM_AHBLPEN1
+#if defined(VSF_HW_USB_OTG_MASK) && (VSF_HW_USB_OTG_MASK & (1 << 1))
     VSF_HW_EN_OTGHSLP                   = VSF_HW_CLKRST_REGION(0x14, 29, 1),// OTGHSLPEN
+#endif
     VSF_HW_EN_DMA2LP                    = VSF_HW_CLKRST_REGION(0x14, 24, 1),// DMA2LPEN
     VSF_HW_EN_DMA1LP                    = VSF_HW_CLKRST_REGION(0x14, 22, 1),// DMA1LPEN
     VSF_HW_EN_CRCLP                     = VSF_HW_CLKRST_REGION(0x14, 12, 1),// CRCLPEN
@@ -192,25 +267,49 @@ typedef enum vsf_hw_peripheral_en_t {
     VSF_HW_EN_GPIOFLP                   = VSF_HW_EN_GPIO5LP,
 
     // CRM_AHBLPEN2
+#if defined(VSF_HW_USB_OTG_MASK) && (VSF_HW_USB_OTG_MASK & (1 << 0))
     VSF_HW_EN_OTGFS1LP                  = VSF_HW_CLKRST_REGION(0x15, 7,  1),// OTGFS1LPEN
+#endif
 
     // CRM_AHBLPEN3
     VSF_HW_EN_QSPI1LP                   = VSF_HW_CLKRST_REGION(0x16, 1,  1),// QSPI1LPEN
 
     // CRM_APB1LPEN
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 8))
     VSF_HW_EN_UART8LP                   = VSF_HW_CLKRST_REGION(0x18, 31,  1),// UART8LPEN
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 7))
     VSF_HW_EN_UART7LP                   = VSF_HW_CLKRST_REGION(0x18, 30,  1),// UART7LPEN
+#endif
     VSF_HW_EN_PWCLP                     = VSF_HW_CLKRST_REGION(0x18, 28,  1),// PWCLPEN
     VSF_HW_EN_CAN1LP                    = VSF_HW_CLKRST_REGION(0x18, 25,  1),// CAN1LPEN
+#if defined(VSF_HW_I2C_MASK) && (VSF_HW_I2C_MASK & (1 << 3))
     VSF_HW_EN_I2C3LP                    = VSF_HW_CLKRST_REGION(0x18, 23,  1),// I2C3LPEN
+#endif
+#if defined(VSF_HW_I2C_MASK) && (VSF_HW_I2C_MASK & (1 << 2))
     VSF_HW_EN_I2C2LP                    = VSF_HW_CLKRST_REGION(0x18, 22,  1),// I2C2LPEN
+#endif
+#if defined(VSF_HW_I2C_MASK) && (VSF_HW_I2C_MASK & (1 << 1))
     VSF_HW_EN_I2C1LP                    = VSF_HW_CLKRST_REGION(0x18, 21,  1),// I2C1LPEN
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 5))
     VSF_HW_EN_USART5LP                  = VSF_HW_CLKRST_REGION(0x18, 20,  1),// USART5LPEN
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 4))
     VSF_HW_EN_USART4LP                  = VSF_HW_CLKRST_REGION(0x18, 19,  1),// USART4LPEN
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 3))
     VSF_HW_EN_USART3LP                  = VSF_HW_CLKRST_REGION(0x18, 18,  1),// USART3LPEN
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 2))
     VSF_HW_EN_USART2LP                  = VSF_HW_CLKRST_REGION(0x18, 17,  1),// USART2LPEN
+#endif
+#if defined(VSF_HW_SPI_MASK) && (VSF_HW_SPI_MASK & (1 << 3))
     VSF_HW_EN_SPI3LP                    = VSF_HW_CLKRST_REGION(0x18, 15,  1),// SPI3LPEN
+#endif
+#if defined(VSF_HW_SPI_MASK) && (VSF_HW_SPI_MASK & (1 << 2))
     VSF_HW_EN_SPI2LP                    = VSF_HW_CLKRST_REGION(0x18, 14,  1),// SPI2LPEN
+#endif
     VSF_HW_EN_WWDTLP                    = VSF_HW_CLKRST_REGION(0x18, 11,  1),// WWDTLPEN
     VSF_HW_EN_TMR14LP                   = VSF_HW_CLKRST_REGION(0x18,  8,  1),// TMR14LPEN
     VSF_HW_EN_TMR13LP                   = VSF_HW_CLKRST_REGION(0x18,  7,  1),// TMR13LPEN
@@ -227,10 +326,16 @@ typedef enum vsf_hw_peripheral_en_t {
     VSF_HW_EN_TMR10LP                   = VSF_HW_CLKRST_REGION(0x19, 17,  1),// TMR10LPEN
     VSF_HW_EN_TMR9LP                    = VSF_HW_CLKRST_REGION(0x19, 16,  1),// TMR9LPEN
     VSF_HW_EN_SCFGLP                    = VSF_HW_CLKRST_REGION(0x19, 14,  1),// SCFGLPEN
+#if defined(VSF_HW_SPI_MASK) && (VSF_HW_SPI_MASK & (1 << 1))
     VSF_HW_EN_SPI1LP                    = VSF_HW_CLKRST_REGION(0x19, 12,  1),// SPI1LPEN
+#endif
     VSF_HW_EN_ADCLP                     = VSF_HW_CLKRST_REGION(0x19,  8,  1),// ADCLPEN
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 6))
     VSF_HW_EN_USART6LP                  = VSF_HW_CLKRST_REGION(0x19,  5,  1),// USART6LPEN
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 1))
     VSF_HW_EN_USART1LP                  = VSF_HW_CLKRST_REGION(0x19,  4,  1),// USART1LPEN
+#endif
     VSF_HW_EN_TMR1LP                    = VSF_HW_CLKRST_REGION(0x19,  0,  1),// TMR1LPEN
 } vsf_hw_peripheral_en_t;
 
@@ -266,6 +371,53 @@ extern const vsf_hw_clk_t VSF_HW_CLK_APB2;
 #define VSF_HW_CLK_I2S1                 VSF_HW_CLK_SYS
 #define VSF_HW_CLK_I2S2                 VSF_HW_CLK_SYS
 #define VSF_HW_CLK_I2S3                 VSF_HW_CLK_SYS
+
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 1))
+#   define VSF_HW_CLK_USART1            VSF_HW_CLK_APB2
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 2))
+#   define VSF_HW_CLK_USART2            VSF_HW_CLK_APB1
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 3))
+#   define VSF_HW_CLK_USART3            VSF_HW_CLK_APB1
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 4))
+#   define VSF_HW_CLK_USART4            VSF_HW_CLK_APB1
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 5))
+#   define VSF_HW_CLK_USART5            VSF_HW_CLK_APB1
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 6))
+#   define VSF_HW_CLK_USART6            VSF_HW_CLK_APB2
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 7))
+#   define VSF_HW_CLK_USART7            VSF_HW_CLK_APB1
+#   define VSF_HW_CLK_UART7             VSF_HW_CLK_USART7
+#endif
+#if defined(VSF_HW_USART_MASK) && (VSF_HW_USART_MASK & (1 << 8))
+#   define VSF_HW_CLK_USART8            VSF_HW_CLK_APB1
+#   define VSF_HW_CLK_UART8             VSF_HW_CLK_USART8
+#endif
+
+#if defined(VSF_HW_SPI_MASK) && (VSF_HW_SPI_MASK & (1 << 1))
+#   define VSF_HW_CLK_SPI1              VSF_HW_CLK_APB2
+#endif
+#if defined(VSF_HW_SPI_MASK) && (VSF_HW_SPI_MASK & (1 << 2))
+#   define VSF_HW_CLK_SPI2              VSF_HW_CLK_APB1
+#endif
+#if defined(VSF_HW_SPI_MASK) && (VSF_HW_SPI_MASK & (1 << 3))
+#   define VSF_HW_CLK_SPI3              VSF_HW_CLK_APB1
+#endif
+
+#if defined(VSF_HW_I2C_MASK) && (VSF_HW_I2C_MASK & (1 << 1))
+#   define VSF_HW_CLK_I2C1              VSF_HW_CLK_APB1
+#endif
+#if defined(VSF_HW_I2C_MASK) && (VSF_HW_I2C_MASK & (1 << 2))
+#   define VSF_HW_CLK_I2C2              VSF_HW_CLK_APB1
+#endif
+#if defined(VSF_HW_I2C_MASK) && (VSF_HW_I2C_MASK & (1 << 3))
+#   define VSF_HW_CLK_I2C3              VSF_HW_CLK_APB1
+#endif
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ INCLUDES ======================================*/

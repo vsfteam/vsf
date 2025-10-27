@@ -5,10 +5,6 @@
 //  SPI:                MISO/MOSI/SCK/CS(NSS)
 //  I2C:                SDA/SCL/SMBA
 
-#if !defined(VSF_HW_USART_MASK) && defined(VSF_HW_USART_COUNT)
-#   define VSF_HW_USART_MASK                ((1 << VSF_HW_USART_COUNT) - 1)
-#endif
-
 #ifdef VSF_HW_USART_MASK
 #if VSF_HW_USART_MASK & (1 << 1)
 
@@ -357,10 +353,6 @@
 
 #endif      // VSF_HW_USART_MASK
 
-#if !defined(VSF_HW_SPI_MASK) && defined(VSF_HW_SPI_COUNT)
-#   define VSF_HW_SPI_MASK                  ((1 << VSF_HW_SPI_COUNT) - 1)
-#endif
-
 #ifdef VSF_HW_SPI_MASK
 #if VSF_HW_SPI_MASK & (1 << 1)
 
@@ -509,10 +501,6 @@
 
 #endif
 
-#endif
-
-#if !defined(VSF_HW_I2C_MASK) && defined(VSF_HW_I2C_COUNT)
-#   define VSF_HW_I2C_MASK                  ((1 << VSF_HW_I2C_COUNT) - 1)
 #endif
 
 #ifdef VSF_HW_I2C_MASK
