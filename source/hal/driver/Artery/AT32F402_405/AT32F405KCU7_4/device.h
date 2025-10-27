@@ -69,7 +69,12 @@
 
 // USART
 
+// USART1..USART7
 #define VSF_HW_USART_MASK           0x00FE
+
+// SPI: use full support provided by common/device.h
+
+// I2C: use full support provided by common/device.h
 
 // USB OTG
 
