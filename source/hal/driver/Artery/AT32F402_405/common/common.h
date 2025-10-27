@@ -163,17 +163,26 @@ typedef enum vsf_hw_peripheral_en_t {
     VSF_HW_EN_DMA2                      = VSF_HW_CLKRST_REGION(0xC,  24, 1),// DMA2EN
     VSF_HW_EN_DMA1                      = VSF_HW_CLKRST_REGION(0xC,  22, 1),// DMA1EN
     VSF_HW_EN_CRC                       = VSF_HW_CLKRST_REGION(0xC,  12, 1),// CRCEN
+#if defined(VSF_HW_GPIO_PORT_MASK) && (VSF_HW_GPIO_PORT_MASK & (1 << 5))
     VSF_HW_EN_GPIO5                     = VSF_HW_CLKRST_REGION(0xC,  5,  1),// GPIOFEN
-    VSF_HW_EN_GPIO3                     = VSF_HW_CLKRST_REGION(0xC,  3,  1),// GPIODEN
-    VSF_HW_EN_GPIO2                     = VSF_HW_CLKRST_REGION(0xC,  2,  1),// GPIOCEN
-    VSF_HW_EN_GPIO1                     = VSF_HW_CLKRST_REGION(0xC,  1,  1),// GPIOBEN
-    VSF_HW_EN_GPIO0                     = VSF_HW_CLKRST_REGION(0xC,  0,  1),// GPIOAEN
-
-    VSF_HW_EN_GPIOA                     = VSF_HW_EN_GPIO0,
-    VSF_HW_EN_GPIOB                     = VSF_HW_EN_GPIO1,
-    VSF_HW_EN_GPIOC                     = VSF_HW_EN_GPIO2,
-    VSF_HW_EN_GPIOD                     = VSF_HW_EN_GPIO3,
     VSF_HW_EN_GPIOF                     = VSF_HW_EN_GPIO5,
+#endif
+#if defined(VSF_HW_GPIO_PORT_MASK) && (VSF_HW_GPIO_PORT_MASK & (1 << 3))
+    VSF_HW_EN_GPIO3                     = VSF_HW_CLKRST_REGION(0xC,  3,  1),// GPIODEN
+    VSF_HW_EN_GPIOD                     = VSF_HW_EN_GPIO3,
+#endif
+#if defined(VSF_HW_GPIO_PORT_MASK) && (VSF_HW_GPIO_PORT_MASK & (1 << 2))
+    VSF_HW_EN_GPIO2                     = VSF_HW_CLKRST_REGION(0xC,  2,  1),// GPIOCEN
+    VSF_HW_EN_GPIOC                     = VSF_HW_EN_GPIO2,
+#endif
+#if defined(VSF_HW_GPIO_PORT_MASK) && (VSF_HW_GPIO_PORT_MASK & (1 << 1))
+    VSF_HW_EN_GPIO1                     = VSF_HW_CLKRST_REGION(0xC,  1,  1),// GPIOBEN
+    VSF_HW_EN_GPIOB                     = VSF_HW_EN_GPIO1,
+#endif
+#if defined(VSF_HW_GPIO_PORT_MASK) && (VSF_HW_GPIO_PORT_MASK & (1 << 0))
+    VSF_HW_EN_GPIO0                     = VSF_HW_CLKRST_REGION(0xC,  0,  1),// GPIOAEN
+    VSF_HW_EN_GPIOA                     = VSF_HW_EN_GPIO0,
+#endif
 
     // CRM_AHBEN2
 #if defined(VSF_HW_USB_OTG_MASK) && (VSF_HW_USB_OTG_MASK & (1 << 0))
@@ -254,17 +263,26 @@ typedef enum vsf_hw_peripheral_en_t {
     VSF_HW_EN_DMA2LP                    = VSF_HW_CLKRST_REGION(0x14, 24, 1),// DMA2LPEN
     VSF_HW_EN_DMA1LP                    = VSF_HW_CLKRST_REGION(0x14, 22, 1),// DMA1LPEN
     VSF_HW_EN_CRCLP                     = VSF_HW_CLKRST_REGION(0x14, 12, 1),// CRCLPEN
+#if defined(VSF_HW_GPIO_PORT_MASK) && (VSF_HW_GPIO_PORT_MASK & (1 << 5))
     VSF_HW_EN_GPIO5LP                   = VSF_HW_CLKRST_REGION(0x14, 5,  1),// GPIOFLPEN
-    VSF_HW_EN_GPIO3LP                   = VSF_HW_CLKRST_REGION(0x14, 3,  1),// GPIODLPEN
-    VSF_HW_EN_GPIO2LP                   = VSF_HW_CLKRST_REGION(0x14, 2,  1),// GPIOCLPEN
-    VSF_HW_EN_GPIO1LP                   = VSF_HW_CLKRST_REGION(0x14, 1,  1),// GPIOBLPEN
-    VSF_HW_EN_GPIO0LP                   = VSF_HW_CLKRST_REGION(0x14, 0,  1),// GPIOALPEN
-
-    VSF_HW_EN_GPIOALP                   = VSF_HW_EN_GPIO0LP,
-    VSF_HW_EN_GPIOBLP                   = VSF_HW_EN_GPIO1LP,
-    VSF_HW_EN_GPIOCLP                   = VSF_HW_EN_GPIO2LP,
-    VSF_HW_EN_GPIODLP                   = VSF_HW_EN_GPIO3LP,
     VSF_HW_EN_GPIOFLP                   = VSF_HW_EN_GPIO5LP,
+#endif
+#if defined(VSF_HW_GPIO_PORT_MASK) && (VSF_HW_GPIO_PORT_MASK & (1 << 3))
+    VSF_HW_EN_GPIO3LP                   = VSF_HW_CLKRST_REGION(0x14, 3,  1),// GPIODLPEN
+    VSF_HW_EN_GPIODLP                   = VSF_HW_EN_GPIO3LP,
+#endif
+#if defined(VSF_HW_GPIO_PORT_MASK) && (VSF_HW_GPIO_PORT_MASK & (1 << 2))
+    VSF_HW_EN_GPIO2LP                   = VSF_HW_CLKRST_REGION(0x14, 2,  1),// GPIOCLPEN
+    VSF_HW_EN_GPIOCLP                   = VSF_HW_EN_GPIO2LP,
+#endif
+#if defined(VSF_HW_GPIO_PORT_MASK) && (VSF_HW_GPIO_PORT_MASK & (1 << 1))
+    VSF_HW_EN_GPIO1LP                   = VSF_HW_CLKRST_REGION(0x14, 1,  1),// GPIOBLPEN
+    VSF_HW_EN_GPIOBLP                   = VSF_HW_EN_GPIO1LP,
+#endif
+#if defined(VSF_HW_GPIO_PORT_MASK) && (VSF_HW_GPIO_PORT_MASK & (1 << 0))
+    VSF_HW_EN_GPIO0LP                   = VSF_HW_CLKRST_REGION(0x14, 0,  1),// GPIOALPEN
+    VSF_HW_EN_GPIOALP                   = VSF_HW_EN_GPIO0LP,
+#endif
 
     // CRM_AHBLPEN2
 #if defined(VSF_HW_USB_OTG_MASK) && (VSF_HW_USB_OTG_MASK & (1 << 0))
