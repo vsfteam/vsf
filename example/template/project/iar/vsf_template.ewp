@@ -16339,10 +16339,13 @@
                                 </group>
                             </group>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\__common.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\at32f402_405_conf.h</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\at32f402_405_conf.h</name>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\common.h</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\device.h</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\device_af.h</name>
