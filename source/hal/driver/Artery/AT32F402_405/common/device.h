@@ -163,9 +163,9 @@
 // Include common irq and af headers after peripherals are defined, so that
 //  irq and af can be adjusted according to the dedicated device configuration.
 
-#include "../common/common.h"
-#include "../common/device_irq.h"
-#include "../common/device_af.h"
+#include "./common.h"
+#include "./device_irq.h"
+#include "./device_af.h"
 
 /*============================ MACROS ========================================*/
 

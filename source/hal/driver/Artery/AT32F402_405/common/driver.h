@@ -29,7 +29,7 @@
 #       include "hal/vsf_hal_cfg.h"
 #       include "../__device.h"
 
-#       include "../common/usb/usb.h"
+#       include "./usb/usb.h"
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
