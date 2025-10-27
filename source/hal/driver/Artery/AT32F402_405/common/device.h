@@ -77,6 +77,9 @@
 #   error invalid VSF_HW_GPIO_PORT_MASK
 #endif
 
+#ifndef VSF_HW_GPIO_PIN_COUNT
+#   define VSF_HW_GPIO_PIN_COUNT        16
+#endif
 #ifndef VSF_HW_GPIO_FUNCTION_MAX
 #   define VSF_HW_GPIO_FUNCTION_MAX     16
 #endif

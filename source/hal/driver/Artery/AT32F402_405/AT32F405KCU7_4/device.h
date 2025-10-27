@@ -61,11 +61,9 @@
 #define VSF_HW_FLASH0_ADDR          0x08000000
 #define VSF_HW_FLASH0_SIZE          (256 * 1024)
 
-// GPIO
+// GPIO: PORT0, PORT1
 
 #define VSF_HW_GPIO_PORT_COUNT      2
-#define VSF_HW_GPIO_PIN_COUNT       16
-#define VSF_HW_GPIO_FUNCTION_MAX    16
 #define VSF_HW_GPIO_PORT0_MASK      0xF8FF
 #define VSF_HW_GPIO_PORT1_MASK      0x01FF
 
