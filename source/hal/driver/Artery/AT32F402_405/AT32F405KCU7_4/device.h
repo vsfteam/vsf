@@ -48,17 +48,15 @@
 
 // RAM
 
-#define VSF_HW_RAM_COUNT            1
-#define VSF_HW_RAM0_ADDR            0x20000000
 // user can define VSF_HW_RAM0_SIZE to 96KB if parity check is enabled
-#ifndef VSF_HW_RAM0_SIZE
+#if VSF_HW_CFG_RAM_PARITY_CHECK == ENABLED
+#   define VSF_HW_RAM0_SIZE         ((96 + 0) * 1024)
+#else
 #   define VSF_HW_RAM0_SIZE         ((96 + 6) * 1024)
 #endif
 
 // FLASH
 
-#define VSF_HW_FLASH_COUNT          1
-#define VSF_HW_FLASH0_ADDR          0x08000000
 #define VSF_HW_FLASH0_SIZE          (256 * 1024)
 
 // GPIO: PORT0, PORT1

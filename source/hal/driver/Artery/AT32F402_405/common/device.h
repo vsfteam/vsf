@@ -58,12 +58,18 @@
 
 // RAM
 
+#ifndef VSF_HW_RAM_COUNT
+#   define VSF_HW_RAM_COUNT             1
+#endif
 #if VSF_HW_RAM_COUNT >= 1 && !defined(VSF_HW_RAM0_ADDR)
 #   define VSF_HW_RAM0_ADDR             0x20000000
 #endif
 
 // FLASH
 
+#ifndef VSF_HW_FLASH_COUNT
+#   define VSF_HW_FLASH_COUNT           1
+#endif
 #if VSF_HW_FLASH_COUNT >= 1 && !defined(VSF_HW_FLASH0_ADDR)
 #   define VSF_HW_FLASH0_ADDR           0x08000000
 #endif
