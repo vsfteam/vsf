@@ -330,6 +330,7 @@ pub fn init(config: Config) -> Peripherals {
                     as *const Option<unsafe extern "C" fn()>
             );
 
+            #[cfg(vsf_gpio_enabled)]
             gpio::init();
         }
 

@@ -241,7 +241,7 @@ const CTYPES: [(&'static str, &'static str); 2] = [
     ("::core::ffi::c_uint", "u32"),
 ];
 
-const INTERRUPT_CFG: [(&'static str, &'static str); 2] = [
+const INTERRUPT_CFG: [(&'static str, &'static str); 4] = [
     (r"^I2C[0-9]+_EV$", "I2C_IRQ_EV"),
     (r"^I2C[0-9]+_ER$", "I2C_IRQ_ER"),
     (r"^I2C[0-9]+_EVT$", "I2C_IRQ_EVT"),

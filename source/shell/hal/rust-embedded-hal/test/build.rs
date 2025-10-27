@@ -17,4 +17,9 @@ fn main() {
     } else {
         println!("cargo:rustc-cfg=target_hostos");
     }
+
+    println!("cargo::rustc-check-cfg=cfg(vsf_gpio_enabled)");
+    println!("cargo::rustc-check-cfg=cfg(vsf_usart_enabled)");
+    println!("cargo::rustc-check-cfg=cfg(vsf_spi_enabled)");
+    println!("cargo::rustc-check-cfg=cfg(vsf_i2c_enabled)");
 }
