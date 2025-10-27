@@ -48,7 +48,6 @@
 
 // RAM
 
-// user can define VSF_HW_RAM0_SIZE to 96KB if parity check is enabled
 #if VSF_HW_CFG_RAM_PARITY_CHECK == ENABLED
 #   define VSF_HW_RAM0_SIZE         ((96 + 0) * 1024)
 #else
