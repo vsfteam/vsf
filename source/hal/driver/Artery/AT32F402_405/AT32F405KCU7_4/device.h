@@ -24,27 +24,27 @@
 #ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
 // software interrupt provided by a dedicated device
-#   define VSF_DEV_SWI_NUM          32
+#   define VSF_DEV_SWI_NUM          VSF_DEV_COMMON_SWI_NUM
+
+#   include "../common/device.h"
 
 #elif defined(__VSF_HAL_SHOW_VENDOR_INFO__)
+
+#   include "../common/device.h"
 
 #else
 
 #ifndef __HAL_DEVICE_ATTERY_AT32F405KCU7_4_H__
 #define __HAL_DEVICE_ATTERY_AT32F405KCU7_4_H__
 
-// software interrupt provided by a dedicated device
-#define VSF_DEV_SWI_LIST                                                        \
-    43, 46, 47, 48, 49,  50,  61,  62,                                          \
-    63, 64, 65, 66, 70,  78,  79,  80,                                          \
-    84, 86, 87, 88, 89,  90,  91,  93,                                          \
-    95, 96, 97, 98, 99, 100, 101, 102
-
 /*============================ MACROS ========================================*/
 
 // user configurations with default value
 
 // HW definition
+
+// software interrupt provided by a dedicated device
+#define VSF_DEV_SWI_LIST            VSF_DEV_COMMON_SWI_LIST
 
 // RAM
 
@@ -73,7 +73,18 @@
 
 #define VSF_HW_USB_OTG_COUNT        2
 
+/*============================ INCLUDES ======================================*/
+
+// Include common device header after peripherals are defined, so that
+//  common part can be adjusted according to the dedicated device configuration.
+
+#include "../common/device.h"
+
 /*============================ MACROS ========================================*/
+
+// Add code here to overwrite configurations from common device.h
+//  eg: add more swi by overwriting none-exist interrupt handler
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -83,7 +94,5 @@
 
 #endif      // __HAL_DEVICE_ATTERY_AT32F405KCU7_4_H__
 #endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
-
-#include "../common/device.h"
 
 /* EOF */

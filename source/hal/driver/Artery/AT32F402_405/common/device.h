@@ -25,6 +25,8 @@
 #   define VSF_ARCH_PRI_NUM         8
 #   define VSF_ARCH_PRI_BIT         3
 
+#   define VSF_DEV_COMMON_SWI_NUM   32
+
 #elif defined(__VSF_HAL_SHOW_VENDOR_INFO__)
 
 /*\note __VSF_HAL_SHOW_VENDOR_INFO__ is defined to include vendor information only.
@@ -45,6 +47,14 @@
 // user configurations with default value
 
 // HW definition
+
+// SWI
+
+#define VSF_DEV_COMMON_SWI_LIST                                                 \
+    43, 46, 47, 48, 49,  50,  61,  62,                                          \
+    63, 64, 65, 66, 70,  78,  79,  80,                                          \
+    84, 86, 87, 88, 89,  90,  91,  93,                                          \
+    95, 96, 97, 98, 99, 100, 101, 102
 
 // RAM
 
