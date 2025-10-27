@@ -69,8 +69,12 @@
 
 // USART
 
+#ifndef VSF_HW_USART_MASK
 // USART1..USART7
-#define VSF_HW_USART_MASK           0x00FE
+#   define VSF_HW_USART_MASK        0x00FE
+#elif VSF_HW_USART_MASK & ~0x00FE
+#   error invalid VSF_HW_USART_MASK
+#endif
 
 // SPI: use full support provided by common/device.h
 
