@@ -74,7 +74,7 @@
 #   define VSF_HW_FLASH0_ADDR           0x08000000
 #endif
 
-// GPIO, PORT0, PORT1, PORT2, PORT3, PORT5
+// GPIO: PORT0..PORT3, PORT5
 
 #ifndef VSF_HW_GPIO_PORT_MASK
 #   ifdef VSF_HW_GPIO_PORT_COUNT
@@ -135,7 +135,7 @@
 #   endif
 #endif
 
-// USART
+// USART: USART1..USART8
 
 #ifndef VSF_HW_USART_MASK
 #   ifdef VSF_HW_USART_COUNT
@@ -221,7 +221,7 @@
 #   define VSF_HW_USART8_IRQHandler     UART8_IRQHandler
 #endif
 
-// SPI
+// SPI: SPI1..SPI3
 
 #ifndef VSF_HW_SPI_MASK
 #   ifdef VSF_HW_SPI_COUNT
@@ -259,7 +259,7 @@
 #   define VSF_HW_SPI3_IRQ              SPI3_IRQHandler
 #endif
 
-// I2C
+// I2C: I2C1..I2C3
 
 #ifndef VSF_HW_I2C_MASK
 #   ifdef VSF_HW_I2C_COUNT
