@@ -24,7 +24,7 @@
 #ifdef __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
 // software interrupt provided by a dedicated device
-#   define VSF_DEV_SWI_NUM          VSF_DEV_COMMON_SWI_NUM
+#   define VSF_DEV_SWI_NUM          33
 
 #   include "../common/device.h"
 
@@ -44,7 +44,7 @@
 // HW definition
 
 // software interrupt provided by a dedicated device
-#define VSF_DEV_SWI_LIST            VSF_DEV_COMMON_SWI_LIST
+#define VSF_DEV_SWI_LIST            VSF_DEV_COMMON_SWI_LIST, 83
 
 // RAM
 
@@ -95,6 +95,12 @@
 
 // Add code here to overwrite configurations from common device.h
 //  eg: add more swi by overwriting none-exist interrupt handler
+
+// UART8 is not available, so use UART8_IRQHandler(VSF_HW_INTERRUPT83) as SWI
+#undef VSF_HW_INTERRUPT83
+#define VSF_HW_INTERRUPT83          SWI32_IRQHandler
+
+VSF_STATIC_ASSERT(VSF_DEV_SWI_NUM == VSF_DEV_COMMON_SWI_NUM + 1);
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
