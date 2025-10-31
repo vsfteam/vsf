@@ -98,8 +98,8 @@ const CONSTANTS_ENUM: [(&'static str, &'static str); 124] = [
     ("vsf_gpio_mode_t", "VSF_GPIO_ANALOG"),
     ("vsf_gpio_mode_t", "VSF_GPIO_AF"),
     ("vsf_gpio_mode_t", "VSF_GPIO_AF_INPUT"),
-    ("vsf_gpio_mode_t", "VSF_GPIO_AF_PUSH_PULL"),
-    ("vsf_gpio_mode_t", "VSF_GPIO_AF_OPEN_DRAIN"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_AF_OUTPUT_PUSH_PULL"),
+    ("vsf_gpio_mode_t", "VSF_GPIO_AF_OUTPUT_OPEN_DRAIN"),
     ("vsf_gpio_mode_t", "VSF_GPIO_SPEED_MASK"),
     ("vsf_gpio_mode_t", "VSF_GPIO_SPEED_LOW"),
     ("vsf_gpio_mode_t", "VSF_GPIO_SPEED_MEDIUM"),
@@ -272,7 +272,7 @@ lazy_static! {
         let v = Vec::new();
         v
     });
-    static ref GLOBAL_AF_MAP: Mutex<HashMap<String, u8>> = Mutex::new({
+    static ref GLOBAL_AF_MAP: Mutex<HashMap<String, u16>> = Mutex::new({
         let m = HashMap::new();
         m
     });
@@ -414,7 +414,7 @@ impl ParseCallbacks for Callbacks {
                 interrupt_vec[interrupt_index as usize] = value_str.clone();
             }
         } else if name_str.starts_with("VSF_HW_AF_") && tokens.len() == 2 {
-            let value: u8 = String::from_utf8_lossy(&tokens[1].raw).parse().unwrap();
+            let value: u16 = String::from_utf8_lossy(&tokens[1].raw).parse().unwrap();
             let mut af_map = GLOBAL_AF_MAP.lock().unwrap();
             af_map.insert(String::from(name_str.strip_prefix("VSF_HW_AF_").unwrap()), value);
         } else {
@@ -805,7 +805,9 @@ fn main() {
         let mut peripheral_type_str = peripheral_str.trim_end_matches(|c: char| c.is_ascii_digit());
         let peripheral_index_str = &peripheral_str[peripheral_type_str.len()..];
         let peripheral_index: usize = peripheral_index_str.parse::<usize>().unwrap();
-        let af = af.1;
+        // lower 8-bit is af value, higher 8-bit is af mode(af_input, af_output_push_pull, af_output_open_drain, ...)
+        // af mode is set in rust, so clear af mode in AF Macros from C source code
+        let af = af.1 & 0xFFu16;
 
         if peripheral_index >= 32 {
             println!("cargo:error={peripheral_type_str}{peripheral_index_str}: not supported because peripheral index >= 32");
