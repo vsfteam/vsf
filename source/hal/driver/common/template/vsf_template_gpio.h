@@ -310,6 +310,11 @@ typedef uint32_t vsf_gpio_pin_mask_t;
 #   define vsf_gpio_pin_mask_t vsf_gpio_pin_mask_t
 #endif
 
+#ifndef vsf_gpio_alternate_function_t
+typedef uint16_t vsf_gpio_alternate_function_t;
+#   define vsf_gpio_alternate_function_t vsf_gpio_alternate_function_t
+#endif
+
 #if VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE == DISABLED
 /**
  * \~english
@@ -320,14 +325,11 @@ typedef uint32_t vsf_gpio_pin_mask_t;
  *
  * \~english
  * Even if the hardware doesn't support these features, these modes must be implemented:
- * If the IO supports more modes, such as the alternative output push-pull and
- * the alternative open-drain output, We can implement it in the hardware driver.
- * However, VSF_GPIO_AF mode must be retained.
+ * If the IO supports more modes, We can implement it in the hardware driver.
  * If we add a new mode in the hardware driver, then we also need to define the
  * macro VSF_GPIO_MODE_MASK, whose value is the OR of the value of all modes.
  * \~chinese
- * 即使硬件不支持这些功能，但是这些模式是必须实现的。如果硬件支持更多模式，例如复用推挽输出或者
- * 复用开漏输出，我们可以在硬件驱动里实现它，但是 VSF_GPIO_AF 模式必须保留。
+ * 即使硬件不支持这些功能，但是这些模式是必须实现的。
  * 如果硬件驱动里我们添加了新的模式，那么也需要定义宏 VSF_GPIO_MODE_MASK，它的值是所有模式的值的或。
  *
  * - INPUT/OUTPUT
@@ -335,7 +337,6 @@ typedef uint32_t vsf_gpio_pin_mask_t;
  *  - VSF_GPIO_ANALOG
  *  - VSF_GPIO_OUTPUT_PUSH_PULL
  *  - VSF_GPIO_OUTPUT_OPEN_DRAIN
- *  - VSF_GPIO_AF
  *  - VSF_GPIO_EXTI
  * - PULL_UP_AND_DOWN:
  *  - VSF_GPIO_NO_PULL_UP_DOWN
@@ -431,11 +432,28 @@ typedef enum vsf_gpio_mode_t {
      * \~english
      * @brief Set GPIO pin to Alternative Function mode.
      * Configures pin for peripheral-specific functions like UART, SPI, etc.
+     * Hardware can implement one of the following ways based on hardware support:
+     *   1. Only VSF_GPIO_AF
+     *   2. VSF_GPIO_AF_OUTPUT_PUSH_PULL and VSF_GPIO_AF_OUTPUT_OPEN_DRAIN
+     *   3. VSF_GPIO_AF_OUTPUT_PUSH_PULL, VSF_GPIO_AF_OUTPUT_OPEN_DRAIN, and VSF_GPIO_AF_INPUT
      * \~chinese
      * @brief 将 GPIO 设置为替代功能模式。
      * 为外设特定功能（如 UART、SPI 等）配置引脚。
+     * 硬件可以根据硬件支持的情况采用以下方式之一实现：
+     *   1. 仅实现 VSF_GPIO_AF
+     *   2. 实现 VSF_GPIO_AF_OUTPUT_PUSH_PULL 和 VSF_GPIO_AF_OUTPUT_OPEN_DRAIN
+     *   3. 实现 VSF_GPIO_AF_OUTPUT_PUSH_PULL、VSF_GPIO_AF_OUTPUT_OPEN_DRAIN 和 VSF_GPIO_AF_INPUT
      */
-    VSF_GPIO_AF                       = (5 << 0),
+    /*
+    VSF_GPIO_AF                        = (5 << 0),
+    #define VSF_GPIO_AF                VSF_GPIO_AF
+    VSF_GPIO_AF_OUTPUT_PUSH_PULL       = (5 << 0),
+    #define VSF_GPIO_AF_OUTPUT_PUSH_PULL VSF_GPIO_AF_OUTPUT_PUSH_PULL
+    VSF_GPIO_AF_OUTPUT_OPEN_DRAIN      = (6 << 0),
+    #define VSF_GPIO_AF_OUTPUT_OPEN_DRAIN VSF_GPIO_AF_OUTPUT_OPEN_DRAIN
+    VSF_GPIO_AF_INPUT                  = (7 << 0),
+    #define VSF_GPIO_AF_INPUT            VSF_GPIO_AF_INPUT
+    */
 
     /**
      * \~english
@@ -516,9 +534,6 @@ typedef enum vsf_gpio_mode_t {
     VSF_GPIO_EXTI_MODE_RISING_FALLING = (5 << 6),
 
 /*
-    //! Set GPIO to alternative function
-    VSF_GPIO_AF                       = (5 << 0),
-
     VSF_GPIO_INVERT_INPUT             = (1 << 7),
     #define VSF_GPIO_INVERT_INPUT     VSF_GPIO_INVERT_INPUT
 
@@ -550,13 +565,30 @@ typedef enum vsf_gpio_mode_t {
 enum {
     VSF_GPIO_FLOATING               = VSF_GPIO_NO_PULL_UP_DOWN,
 
+#ifndef VSF_GPIO_MODE_AF_MASK
+    VSF_GPIO_MODE_AF_MASK           = 0
+#ifdef VSF_GPIO_AF
+                                    | VSF_GPIO_AF
+#endif
+#ifdef VSF_GPIO_AF_OUTPUT_PUSH_PULL
+                                    | VSF_GPIO_AF_OUTPUT_PUSH_PULL
+#endif
+#ifdef VSF_GPIO_AF_OUTPUT_OPEN_DRAIN
+                                    | VSF_GPIO_AF_OUTPUT_OPEN_DRAIN
+#endif
+#ifdef VSF_GPIO_AF_INPUT
+                                    | VSF_GPIO_AF_INPUT
+#endif
+                                    ,
+#endif
+
 #ifndef VSF_GPIO_MODE_MASK
     VSF_GPIO_MODE_MASK              = VSF_GPIO_INPUT
                                     | VSF_GPIO_EXTI
                                     | VSF_GPIO_ANALOG
                                     | VSF_GPIO_OUTPUT_PUSH_PULL
                                     | VSF_GPIO_OUTPUT_OPEN_DRAIN
-                                    | VSF_GPIO_AF,
+                                    | VSF_GPIO_MODE_AF_MASK,
 #endif
 
     VSF_GPIO_PULL_UP_DOWN_MASK      = VSF_GPIO_NO_PULL_UP_DOWN
@@ -602,33 +634,33 @@ typedef struct vsf_gpio_exti_irq_cfg_t {
 
 //! gpio channel configuration
 typedef struct vsf_gpio_cfg_t {
-    vsf_gpio_mode_t     mode;
+    vsf_gpio_mode_t                 mode;
     //! alternate function is only valid in GPIO_AF mode
-    uint16_t            alternate_function;
+    vsf_gpio_alternate_function_t   alternate_function;
 } vsf_gpio_cfg_t;
 #endif
 
 typedef struct vsf_gpio_port_cfg_pin_t {
-    uint16_t            port_pin_index;
+    uint16_t                        port_pin_index;
 
     //! For simplicity, the expansion of type vsf_gpio_cfg_t is used here instead
     //! of using type vsf_gpio_cfg_t directly
-    vsf_gpio_mode_t     mode;
+    vsf_gpio_mode_t                 mode;
     //! alternate function is only valid in GPIO_AF mode
-    uint16_t            alternate_function;
+    vsf_gpio_alternate_function_t   alternate_function;
 } vsf_gpio_port_cfg_pin_t;
 
 /*! \note Memory layout is not optimal due to padding between members.
  *        However, we keep current layout for compatibility reasons.
  */
 typedef struct vsf_gpio_port_cfg_pins_t {
-    uint16_t            port_index;
-    vsf_gpio_pin_mask_t pin_mask;
+    uint16_t                        port_index;
+    vsf_gpio_pin_mask_t             pin_mask;
     //! For simplicity, the expansion of type vsf_gpio_cfg_t is used here instead
     //! of using type vsf_gpio_cfg_t directly
-    vsf_gpio_mode_t     mode;
+    vsf_gpio_mode_t                 mode;
     //! alternate function is only valid in GPIO_AF mode
-    uint16_t            alternate_function;
+    vsf_gpio_alternate_function_t   alternate_function;
 } vsf_gpio_port_cfg_pins_t;
 
 #if VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
