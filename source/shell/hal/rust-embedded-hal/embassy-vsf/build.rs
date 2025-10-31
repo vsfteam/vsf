@@ -272,7 +272,7 @@ lazy_static! {
         let v = Vec::new();
         v
     });
-    static ref GLOBAL_AF_MAP: Mutex<HashMap<String, u16>> = Mutex::new({
+    static ref GLOBAL_AF_MAP: Mutex<HashMap<String, u128>> = Mutex::new({
         let m = HashMap::new();
         m
     });
@@ -414,7 +414,7 @@ impl ParseCallbacks for Callbacks {
                 interrupt_vec[interrupt_index as usize] = value_str.clone();
             }
         } else if name_str.starts_with("VSF_HW_AF_") && tokens.len() == 2 {
-            let value: u16 = String::from_utf8_lossy(&tokens[1].raw).parse().unwrap();
+            let value: u128 = String::from_utf8_lossy(&tokens[1].raw).parse().unwrap();
             let mut af_map = GLOBAL_AF_MAP.lock().unwrap();
             af_map.insert(String::from(name_str.strip_prefix("VSF_HW_AF_").unwrap()), value);
         } else {
@@ -794,6 +794,7 @@ fn main() {
     let mut af_str = String::from("");
     let af_map = GLOBAL_AF_MAP.lock().unwrap();
     let afs_info = GLOBAL_AF_INFO.lock().unwrap();
+    let af_value_bits = extract_const_integer::<u8>(&bindings_lines, "VSF_HW_GPIO_AF_VALUE_BITS");
     for af in af_map.iter() {
         let str = af.0;
         let mut gpio_pos = str.rfind('_').unwrap();
@@ -805,9 +806,12 @@ fn main() {
         let mut peripheral_type_str = peripheral_str.trim_end_matches(|c: char| c.is_ascii_digit());
         let peripheral_index_str = &peripheral_str[peripheral_type_str.len()..];
         let peripheral_index: usize = peripheral_index_str.parse::<usize>().unwrap();
-        // lower 8-bit is af value, higher 8-bit is af mode(af_input, af_output_push_pull, af_output_open_drain, ...)
+        // lower bits is af value, higher bits is af mode(af_input, af_output_push_pull, af_output_open_drain, ...)
         // af mode is set in rust, so clear af mode in AF Macros from C source code
-        let af = af.1 & 0xFFu16;
+        let af_value = match af_value_bits {
+            Some(bits) => (af.1 & ((1 << bits) - 1)) as u16,
+            None => *af.1 as u16,
+        };
 
         if peripheral_index >= 32 {
             println!("cargo:error={peripheral_type_str}{peripheral_index_str}: not supported because peripheral index >= 32");
@@ -821,8 +825,8 @@ fn main() {
 
         if let Some(af_info) = afs_info.get(peripheral_type_str) {
             if let Some(af_pin) = af_info.pins.get(pin_str) {
-                println!("cargo:warning={}::{peripheral_type_str}{peripheral_index_str}: {pin_str} on {gpio_str} ==> AF{af}", af_info.module);
-                af_str.push_str(&format!("pin_trait_impl!(crate::{}::{}, {peripheral_type_str}{peripheral_index_str}, {gpio_str}, {af}u16);\n", af_info.module, *af_pin));
+                println!("cargo:warning={}::{peripheral_type_str}{peripheral_index_str}: {pin_str} on {gpio_str} ==> AF{af_value}", af_info.module);
+                af_str.push_str(&format!("pin_trait_impl!(crate::{}::{}, {peripheral_type_str}{peripheral_index_str}, {gpio_str}, {af_value}u16);\n", af_info.module, *af_pin));
             }
         }
     }

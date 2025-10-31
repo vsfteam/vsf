@@ -147,20 +147,20 @@ impl Default for OutputDrive {
 
 /// Alternate function type settings.
 #[derive(Copy, Clone)]
-#[cfg(any(VSF_GPIO_AF_INPUT, VSF_GPIO_AF_PUSH_PULL, VSF_GPIO_AF_OPEN_DRAIN))]
+#[cfg(any(VSF_GPIO_AF_INPUT, VSF_GPIO_AF_OUTPUT_PUSH_PULL, VSF_GPIO_AF_OUTPUT_OPEN_DRAIN))]
 pub enum AfMode {
     #[cfg(VSF_GPIO_AF_INPUT)]
     AfInput = into_vsf_gpio_mode_t!(VSF_GPIO_AF_INPUT) as isize,
-    #[cfg(VSF_GPIO_AF_PUSH_PULL)]
-    AfPushPull = into_vsf_gpio_mode_t!(VSF_GPIO_AF_PUSH_PULL) as isize,
-    #[cfg(VSF_GPIO_AF_OPEN_DRAIN)]
-    AfOpenDrain = into_vsf_gpio_mode_t!(VSF_GPIO_AF_OPEN_DRAIN) as isize,
-    #[cfg(not(any(VSF_GPIO_AF, VSF_GPIO_AF_PUSH_PULL, VSF_GPIO_AF_OPEN_DRAIN)))]
+    #[cfg(VSF_GPIO_AF_OUTPUT_PUSH_PULL)]
+    AfPushPull = into_vsf_gpio_mode_t!(VSF_GPIO_AF_OUTPUT_PUSH_PULL) as isize,
+    #[cfg(VSF_GPIO_AF_OUTPUT_OPEN_DRAIN)]
+    AfOpenDrain = into_vsf_gpio_mode_t!(VSF_GPIO_AF_OUTPUT_OPEN_DRAIN) as isize,
+    #[cfg(not(any(VSF_GPIO_AF, VSF_GPIO_AF_OUTPUT_PUSH_PULL, VSF_GPIO_AF_OUTPUT_OPEN_DRAIN)))]
     None = 0,
 }
 
 #[derive(Copy, Clone)]
-#[cfg(any(VSF_GPIO_AF, VSF_GPIO_AF_PUSH_PULL, VSF_GPIO_AF_OPEN_DRAIN))]
+#[cfg(any(VSF_GPIO_AF, VSF_GPIO_AF_OUTPUT_PUSH_PULL, VSF_GPIO_AF_OUTPUT_OPEN_DRAIN))]
 pub struct AfType {
     mode: u32,
     pull: Pull,
@@ -168,7 +168,7 @@ pub struct AfType {
     drive: OutputDrive,
 }
 
-#[cfg(any(VSF_GPIO_AF, VSF_GPIO_AF_PUSH_PULL, VSF_GPIO_AF_OPEN_DRAIN))]
+#[cfg(any(VSF_GPIO_AF, VSF_GPIO_AF_OUTPUT_PUSH_PULL, VSF_GPIO_AF_OUTPUT_OPEN_DRAIN))]
 impl AfType {
     /// Input with optional pullup or pulldown.
     #[cfg(VSF_GPIO_AF)]
@@ -239,7 +239,7 @@ impl AfType {
     }
 
     /// Output with output type and speed and no pull-up or pull-down.
-    #[cfg(VSF_GPIO_AF_PUSH_PULL)]
+    #[cfg(VSF_GPIO_AF_OUTPUT_PUSH_PULL)]
     pub const fn output(speed: Speed, drive: OutputDrive) -> Self {
         Self {
             mode: AfMode::AfPushPull as u32,
@@ -248,7 +248,7 @@ impl AfType {
             drive: drive,
         }
     }
-    #[cfg(not(VSF_GPIO_AF_PUSH_PULL))]
+    #[cfg(not(VSF_GPIO_AF_OUTPUT_PUSH_PULL))]
     pub const fn output(speed: Speed, drive: OutputDrive) -> Self {
         Self {
             mode: into_vsf_gpio_mode_t!(VSF_GPIO_OUTPUT_PUSH_PULL) as u32,
@@ -259,7 +259,7 @@ impl AfType {
     }
 
     /// Input and output mode, commonly used for "open drain" mode.
-    #[cfg(VSF_GPIO_AF_OPEN_DRAIN)]
+    #[cfg(VSF_GPIO_AF_OUTPUT_OPEN_DRAIN)]
     pub const fn input_output(pull: Pull, speed: Speed, drive: OutputDrive) -> Self {
         Self {
             mode: AfMode::AfOpenDrain as u32,
@@ -268,7 +268,7 @@ impl AfType {
             drive: drive,
         }
     }
-    #[cfg(not(VSF_GPIO_AF_OPEN_DRAIN))]
+    #[cfg(not(VSF_GPIO_AF_OUTPUT_OPEN_DRAIN))]
     pub const fn input_output(pull: Pull, speed: Speed, drive: OutputDrive) -> Self {
         Self {
             mode: into_vsf_gpio_mode_t!(VSF_GPIO_OUTPUT_OPEN_DRAIN) as u32,
@@ -494,7 +494,7 @@ impl<'d> Flex<'d> {
     /// This puts the pin into the AF mode, with the requested number and AF type. This is
     /// completely unchecked, it can attach the pin to literally any peripheral, so use with care.
     #[inline]
-    #[cfg(any(VSF_GPIO_AF, VSF_GPIO_AF_PUSH_PULL, VSF_GPIO_AF_OPEN_DRAIN))]
+    #[cfg(any(VSF_GPIO_AF, VSF_GPIO_AF_OUTPUT_PUSH_PULL, VSF_GPIO_AF_OUTPUT_OPEN_DRAIN))]
     pub fn set_as_af(&mut self, af_num: AfNumType, af_type: AfType) {
         self.pin.set_as_af(af_num, af_type);
     }
