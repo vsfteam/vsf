@@ -264,12 +264,14 @@ vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr
 ) {
     return (vsf_gpio_capability_t){
-        .is_async                   = false,
-        .support_output_and_set     = true,
-        .support_output_and_clear   = true,
-        .support_interrupt          = 1,
-        .pin_count                  = 16,
-        .pin_mask                   = 0xFFFF,
+        .is_async                       = 1,
+        .support_output_and_set         = 1,
+        .support_output_and_clear       = 1,
+        .support_interrupt              = 1,
+        .can_read_in_gpio_output_mode   = 1,
+        .can_read_in_alternate_mode     = 1,
+        .pin_count                      = 16,
+        .pin_mask                       = 0xFFFF,
     };
 }
 
