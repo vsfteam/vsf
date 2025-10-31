@@ -62,18 +62,26 @@ extern "C" {
 #define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end
 
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
+
 // HW/IPCore
 /*\note To redefine these two macros, vsf_gpio_pin_mask_t type must be defined according to actual situation,
  * and macro with the same name must be defined.
  */
-#if (VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG == ENABLED) || (VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED)
-typedef uint32_t vsf_gpio_pin_mask_t;
-#define vsf_gpio_pin_mask_t vsf_gpio_pin_mask_t
-#endif
-// HW/IPCore end
+ #if (VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG == ENABLED) || (VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED)
+ typedef uint32_t vsf_gpio_pin_mask_t;
+ #define vsf_gpio_pin_mask_t vsf_gpio_pin_mask_t
+ #endif
 
-/*============================ MACROFIED FUNCTIONS ===========================*/
-/*============================ TYPES =========================================*/
+/*\note If the default uint16_t is not sufficient, we can redefine the type vsf_gpio_alternate_function_t,
+ * for example as uint32_t, and define a macro with the same name.
+ */
+//#ifndef vsf_gpio_alternate_function_t
+//typedef uint32_t vsf_gpio_alternate_function_t;
+//#   define vsf_gpio_alternate_function_t vsf_gpio_alternate_function_t
+//#endif
+// HW/IPCore end
 
 // HW/IPCore, not for emulated drivers
 #if VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE == ENABLED
