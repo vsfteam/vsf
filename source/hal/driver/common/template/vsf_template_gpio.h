@@ -703,6 +703,26 @@ typedef struct vsf_gpio_capability_t {
 
     /**
      * \~english
+     * @brief Indicates whether vsf_gpio_read is valid when configured as GPIO output mode.
+     * When set, reading pin state is supported in GPIO output mode (not alternate function output).
+     * \~chinese
+     * @brief 指示在配置为 GPIO 输出模式时 vsf_gpio_read 是否有效。
+     * 当设置此标志时，在 GPIO 输出模式下（非复用功能输出）支持读取引脚状态。
+     */
+    uint8_t can_read_in_gpio_output_mode : 1;
+
+    /**
+     * \~english
+     * @brief Indicates whether vsf_gpio_read is valid in alternate function mode.
+     * When set, reading pin state is supported when pin is in AF mode.
+     * \~chinese
+     * @brief 指示在复用模式下 vsf_gpio_read 是否有效。
+     * 当设置此标志时，引脚处于复用模式时也支持读取引脚状态。
+     */
+    uint8_t can_read_in_alternate_mode   : 1;
+
+    /**
+     * \~english
      * @brief Support for external interrupt functionality.
      * When set, the GPIO pins can be configured to generate interrupts.
      * \~chinese

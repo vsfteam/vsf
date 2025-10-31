@@ -129,6 +129,8 @@ typedef struct vsf_gpio_capability_t {
     uint8_t support_output_and_set       : 1;
     uint8_t support_output_and_clear     : 1;
     uint8_t support_interrupt            : 1;
+    uint8_t can_read_in_gpio_output_mode : 1;
+    uint8_t can_read_in_alternate_mode   : 1;
     uint8_t pin_count;
     vsf_gpio_pin_mask_t pin_mask;
 } vsf_gpio_capability_t;

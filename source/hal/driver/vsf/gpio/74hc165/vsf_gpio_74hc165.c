@@ -138,13 +138,14 @@ vsf_gpio_capability_t vsf_74hc165_gpio_capability(vsf_74hc165_gpio_t *gpio_ptr)
 {
     uint32_t pins = gpio_ptr->cascade_num << 3;
     return (vsf_gpio_capability_t){
-        .is_async                   = false,
-        .support_config_pin         = false,
-        .support_output_and_set     = false,
-        .support_output_and_clear   = false,
-        .support_interrupt          = false,
-        .pin_count                  = pins,
-        .pin_mask                   = (1ULL << pins) - 1,
+        .is_async                       = 0,
+        .support_output_and_set         = 0,
+        .support_output_and_clear       = 0,
+        .support_interrupt              = 0,
+        .can_read_in_gpio_output_mode   = 0,
+        .can_read_in_alternate_mode     = 0,
+        .pin_count                      = pins,
+        .pin_mask                       = (1ULL << pins) - 1,
     };
 }
 
