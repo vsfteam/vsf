@@ -266,23 +266,11 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_config)(
  *              VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET
  *              VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_CLEAR
  *              VSF_GPIO_CFG_CAPABILITY_SUPPORT_INTERRUPT
+ *              VSF_GPIO_CFG_CAPABILITY_CAN_READ_IN_GPIO_OUTPUT_MODE
+ *              VSF_GPIO_CFG_CAPABILITY_CAN_READ_IN_ALTERNATE_MODE
  *              VSF_GPIO_CFG_CAPABILITY_PIN_COUNT
  *              VSF_GPIO_CFG_CAPABILITY_PIN_MASK
  */
-
-void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_output_and_set)(
-    VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
-    vsf_gpio_pin_mask_t pin_mask
-) {
-    VSF_HAL_ASSERT(NULL != gpio_ptr);
-}
-
-void VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_output_and_clear)(
-    VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
-    vsf_gpio_pin_mask_t pin_mask
-) {
-    VSF_HAL_ASSERT(NULL != gpio_ptr);
-}
 
 vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr
@@ -302,9 +290,9 @@ vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
 /*============================ INCLUDES ======================================*/
 
 #define VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER   ENABLED
-#define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET         ENABLED
-#define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR       ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED
+#define VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_CLEAR    ENABLED
+#   define VSF_GPIO_CFG_CHANGE_DIR_FIRST                    DISABLED
 
 #define VSF_GPIO_CFG_IMP_LV0(__IDX, __HAL_OP)                                   \
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t)                              \

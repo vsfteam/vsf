@@ -84,7 +84,8 @@ typedef enum vsf_hw_peripheral_rst_t {
 
     // CRM_AHBRST2
 #if defined(VSF_HW_USB_OTG_MASK) && (VSF_HW_USB_OTG_MASK & (1 << 0))
-    VSF_HW_RST_OTGFS1                   = VSF_HW_CLKRST_REGION(0x5,  7,  1),// OTGFS1RST
+    VSF_HW_RST_USBOTG0                  = VSF_HW_CLKRST_REGION(0x5,  7,  1),// OTGFS1RST
+    VSF_HW_RST_OTGFS1                   = VSF_HW_RST_USBOTG0,
 #endif
 
     // CRM_AHBRST3
@@ -186,7 +187,8 @@ typedef enum vsf_hw_peripheral_en_t {
 
     // CRM_AHBEN2
 #if defined(VSF_HW_USB_OTG_MASK) && (VSF_HW_USB_OTG_MASK & (1 << 0))
-    VSF_HW_EN_OTGFS1                    = VSF_HW_CLKRST_REGION(0xD,  7,  1),// OTGFS1EN
+    VSF_HW_EN_USBOTG0                   = VSF_HW_CLKRST_REGION(0xD,  7,  1),// OTGFS1EN
+    VSF_HW_EN_OTGFS1                    = VSF_HW_EN_USBOTG0,
 #endif
 
     // CRM_AHBEN3
@@ -286,7 +288,8 @@ typedef enum vsf_hw_peripheral_en_t {
 
     // CRM_AHBLPEN2
 #if defined(VSF_HW_USB_OTG_MASK) && (VSF_HW_USB_OTG_MASK & (1 << 0))
-    VSF_HW_EN_OTGFS1LP                  = VSF_HW_CLKRST_REGION(0x15, 7,  1),// OTGFS1LPEN
+    VSF_HW_EN_USBOTG0LP                 = VSF_HW_CLKRST_REGION(0x15, 7,  1),// OTGFS1LPEN
+    VSF_HW_EN_OTGFS1LP                  = VSF_HW_EN_USBOTG0LP,
 #endif
 
     // CRM_AHBLPEN3
@@ -437,6 +440,11 @@ extern const vsf_hw_clk_t VSF_HW_CLK_APB2;
 #   define VSF_HW_CLK_I2C3              VSF_HW_CLK_APB1
 #endif
 
+#if defined(VSF_HW_USB_OTG_MASK) && (VSF_HW_USB_OTG_MASK & (1 << 0))
+extern const vsf_hw_clk_t VSF_HW_CLK_USBOTG0;
+#   define VSF_HW_CLK_OTGFS1            VSF_HW_CLK_USBOTG0
+#endif
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ INCLUDES ======================================*/
 /*============================ PROTOTYPES ====================================*/
@@ -447,6 +455,8 @@ extern uint_fast8_t vsf_hw_clkrst_region_get(uint32_t region);
 extern void vsf_hw_clkrst_region_set_bit(uint32_t region);
 extern void vsf_hw_clkrst_region_clear_bit(uint32_t region);
 extern uint_fast8_t vsf_hw_clkrst_region_get_bit(uint32_t region);
+
+extern void vsf_hw_update_flash_latency(uint32_t sys_clk_hz);
 
 extern const vsf_hw_clk_t * vsf_hw_clk_get_src(const vsf_hw_clk_t *clk);
 extern uint32_t vsf_hw_clk_get_freq_hz(const vsf_hw_clk_t *clk);
