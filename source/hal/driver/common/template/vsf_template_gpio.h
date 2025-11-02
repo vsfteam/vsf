@@ -361,19 +361,6 @@ typedef uint16_t vsf_gpio_alternate_function_t;
  * vsf_gpio_port_config_pins(&vsf_hw_gpi0, pin_mask, &cfg);
  * ```
  *
- * \~chinese
- * 考虑上面的代码，用户调用 vsf_io_cfg() API 的时候，提供的 vsf_io_mode_t 可能会省略很多选项。
- * 所以我们要求部分选项的值应该是 0。包括:
- * - VSF_GPIO_NO_PULL_UP_DOWN
- * - VSF_GPIO_INTERRUPT_DISABLED
- * 可选特性选项的值也应该考虑默认值的问题。
- *
- * \~english
- * Consider the code above. the vsf_io_mode_t provided when the user calls the vsf_io_cfg() API
- * may omit many options. So we require that some of the options should have a value of 0. Including:
- * - VSF_GPIO_NO_PULL_UP_DOWN
- * - VSF_GPIO_INTERRUPT_DISABLED
- * The values of the optional feature options should also be considered for the default values.
  */
 typedef enum vsf_gpio_mode_t {
     /**
@@ -788,7 +775,7 @@ struct vsf_gpio_t  {
 
 
 #if VSF_HW_GPIO_PORT_COUNT > 0
-typedef enum vsf_io_port_no_t {
+typedef enum vsf_gpio_port_no_t {
 #if defined(VSF_GPIO_CFG_PORT0)
     VSF_PORT0,
 #endif
@@ -885,9 +872,9 @@ typedef enum vsf_io_port_no_t {
 #if defined(VSF_GPIO_CFG_PORT15)
     VSF_PORTP = VSF_PORT15,
 #endif
-} vsf_io_port_no_t;
+} vsf_gpio_port_no_t;
 
-typedef enum vsf_io_port_pin_no_t {
+typedef enum vsf_gpio_port_pin_no_t {
 #if defined(VSF_GPIO_CFG_PORT0)
     VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 0, A)
 #endif
@@ -936,7 +923,7 @@ typedef enum vsf_io_port_pin_no_t {
 #if defined(VSF_GPIO_CFG_PORT15)
     VSF_MREPEAT(VSF_GPIO_CFG_PIN_COUNT, __VSF_GPIO_PORT_PIN_NUM, 15, P)
 #endif
-} vsf_io_port_pin_no_t;
+} vsf_gpio_port_pin_no_t;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
