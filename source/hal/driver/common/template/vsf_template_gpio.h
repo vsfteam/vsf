@@ -1126,8 +1126,8 @@ extern vsf_gpio_pin_mask_t vsf_gpio_read_output_register(vsf_gpio_t *gpio_ptr);
  @brief set the value of one or more of the gpio instances
  @param[in] gpio_ptr: pointer to the structure vsf_gpio_t, refer to @ref vsf_gpio_t
  @param[in] value: value of the pin, each pin corresponds to a bit, 1 means high, 0 means low
- @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the bit
-            needs to be written, 0 means the bit does not need to be updated
+ @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the corresponding pin
+            needs to be written, 0 means the corresponding pin does not need to be updated
 
  \~chinese
  @brief 设置 gpio 实例的一个或者多个的值
@@ -1142,8 +1142,8 @@ extern void vsf_gpio_write(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask,
  \~english
  @brief Set the value of one or more pins of the gpio instance to high
  @param[in] gpio_ptr: pointer to the structure vsf_gpio_t, refer to @ref vsf_gpio_t
- @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the bit
-            needs to be written, 0 means the bit does not need to be updated
+ @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the corresponding pin
+            needs to be written, 0 means the corresponding pin does not need to be updated
 
  \~chinese
  @brief 设置 gpio 实例的一个或者多个引脚的值为高电平
@@ -1156,8 +1156,8 @@ extern void vsf_gpio_set(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
  \~english
  @brief Set the value of one or more pins of the gpio instance to low
  @param[in] gpio_ptr: pointer to the structure vsf_gpio_t, refer to @ref vsf_gpio_t
- @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the bit
-            needs to be written, 0 means the bit does not need to be updated
+ @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the corresponding pin
+            needs to be written, 0 means the corresponding pin does not need to be updated
 
  \~chinese
  @brief 设置 gpio 实例的一个或者多个引脚的值为低电平
@@ -1170,8 +1170,8 @@ extern void vsf_gpio_clear(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
  \~english
  @brief Toggle the value of one or more pins of the gpio instance
  @param[in] gpio_ptr: pointer to the structure vsf_gpio_t, refer to @ref vsf_gpio_t
- @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the bit
-            needs to be written, 0 means the bit does not need to be updated
+ @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the corresponding pin
+            needs to be written, 0 means the corresponding pin does not need to be updated
 
  \~chinese
  @brief 反转 gpio 实例的一个或者多个引脚的值
@@ -1184,8 +1184,8 @@ extern void vsf_gpio_toggle(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
  \~english
  @brief Set the direction of one or more pins of the gpio instance to output high
  @param[in] gpio_ptr: pointer to the structure vsf_gpio_t, refer to @ref vsf_gpio_t
- @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the bit
-            needs to be written, 0 means the bit does not need to be updated
+ @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the corresponding pin
+            needs to be written, 0 means the corresponding pin does not need to be updated
  @note This API can be used when modifying the IO direction to output and set to
        high in order to avoid possible pulses. Note that it is not supported by all hardware.
        You can get if this mode is supported with vsf_gpio_capability()
@@ -1205,8 +1205,8 @@ extern void vsf_gpio_output_and_set(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pi
  \~english
  @brief Set the direction of one or more pins of the gpio instance to output low
  @param[in] gpio_ptr: pointer to the structure vsf_gpio_t, refer to @ref vsf_gpio_t
- @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the bit
-            needs to be written, 0 means the bit does not need to be updated
+ @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the corresponding pin
+            needs to be written, 0 means the corresponding pin does not need to be updated
  @note This API can be used when modifying the IO direction to output and set to
        low in order to avoid possible pulses. Note that it is not supported by all hardware.
        You can get if this mode is supported with vsf_gpio_capability()
@@ -1267,8 +1267,8 @@ extern vsf_err_t vsf_gpio_exti_irq_get_configuration(vsf_gpio_t *gpio_ptr, vsf_g
  \~english
  @brief Enable interrupt of one or more pins
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
- @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the bit
-            needs to be enabled, 0 means the bit does not need to be enabled
+ @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the corresponding pin
+            needs to be enabled, 0 means the corresponding pin does not need to be enabled
  @return vsf_err_t: VSF_ERR_NONE if successful, or a negative error code
  @note For some devices, the interrupt priority may be shared between pins on the gpio.
  @note All pending interrupts should be cleared before interrupts are enabled.
@@ -1287,8 +1287,8 @@ extern vsf_err_t vsf_gpio_exti_irq_enable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mas
  \~english
  @brief Disable interrupt of one or more pins
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
- @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the bit
-            needs to be disabled, 0 means the bit does not need to be disabled
+ @param[in] pin_mask: pin mask, each pin corresponds to one bit, 1 means the corresponding pin
+            needs to be disabled, 0 means the corresponding pin does not need to be disabled
  @return vsf_err_t: VSF_ERR_NONE if successful, or a negative error code
  @note For some devices, the interrupt settings may be shared between pins on the gpio.
 
