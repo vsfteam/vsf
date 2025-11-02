@@ -935,7 +935,7 @@ typedef enum vsf_gpio_port_pin_no_t {
  @brief Configure one or more pins of the gpio instance
  @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
  @param[in] pin_mask: pin mask, each pin corresponds to one bit, the value of
-            this bit 1 means configuration is required
+            this bit 1 means the configuration will be applied to the corresponding pin
  @param[in] cfg_ptr: a pointer to structure @ref vsf_gpio_cfg_t
  @return vsf_err_t: VSF_ERR_NONE if GPIO Configuration Successful, or a negative error code
 
