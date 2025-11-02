@@ -619,7 +619,7 @@ typedef struct vsf_gpio_exti_irq_cfg_t {
     vsf_arch_prio_t              prio;
 } vsf_gpio_exti_irq_cfg_t;
 
-//! gpio channel configuration
+//! gpio configuration
 typedef struct vsf_gpio_cfg_t {
     vsf_gpio_mode_t                 mode;
     //! alternate function is only valid in GPIO_AF mode
