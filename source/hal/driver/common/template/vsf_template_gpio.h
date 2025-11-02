@@ -275,10 +275,10 @@ extern "C" {
     VSF_P ## __PORT_NUM ## _ ## __PIN_NUM = ((VSF_PORT ## __PORT_NUM) << 8) | __PIN_NUM,\
     VSF_P ## __PORT_CHAR ## __PIN_NUM = ((VSF_PORT ## __PORT_NUM) << 8) | __PIN_NUM,
 
-#define VSF_GPIO_APIS(__prefix_name)                                                                                                                                                                               \
+#define VSF_GPIO_APIS(__prefix_name)                                                                                                                                                                          \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_gpio_capability_t, gpio, capability,              VSF_MCONNECT(__prefix_name, _t) *gpio_ptr)                                                                    \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, port_config_pins,        VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_cfg_t * cfg_ptr)            \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, get_pin_configuration,   VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, uint16_t pin_index, vsf_gpio_cfg_t * cfg_ptr)                     \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, get_pin_configuration,   VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, uint16_t pin_index, vsf_gpio_cfg_t * cfg_ptr)                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set_direction,           VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_pin_mask_t direction_mask)  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_gpio_pin_mask_t,   gpio, get_direction,           VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  gpio, set_input,               VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
@@ -302,7 +302,7 @@ extern "C" {
 #ifndef vsf_gpio_pin_mask_t
 #   if defined(VSF_HW_GPIO_PIN_COUNT) && (VSF_HW_GPIO_PIN_COUNT > 32)
 typedef uint64_t vsf_gpio_pin_mask_t;
-#   elif defined(VSF_HW_GPIO_PIN_AMSK) && (VSF_HW_GPIO_PIN_MASK & 0xFFFFFFFF00000000)
+#   elif defined(VSF_HW_GPIO_PIN_MASK) && (VSF_HW_GPIO_PIN_MASK & 0xFFFFFFFF00000000)
 typedef uint64_t vsf_gpio_pin_mask_t;
 #   else
 typedef uint32_t vsf_gpio_pin_mask_t;
