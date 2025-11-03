@@ -31,6 +31,7 @@
 
 #       include "./gpio/gpio.h"
 #       include "./exti/exti.h"
+#       include "./usart/usart.h"
 #       include "./usb/usb.h"
 
 /*============================ MACROS ========================================*/
