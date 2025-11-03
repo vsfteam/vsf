@@ -85,6 +85,17 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     usart_type *reg = usart_ptr->reg;
 
     // baudrate
+    uint32_t clk_hz = vsf_hw_clk_get_freq_hz(usart_ptr->clk);
+    if (!clk_hz) {
+        VSF_HAL_ASSERT(false);
+        return VSF_ERR_BUG;
+    }
+    clk_hz /= cfg_ptr->baudrate;
+    if (clk_hz >= 0x10000) {
+        VSF_HAL_ASSERT(false);
+        return VSF_ERR_NOT_SUPPORT;
+    }
+    reg->baudr = clk_hz;
 
     uint32_t enabled = reg->ctrl1_bit.uen;
     if (enabled) {
@@ -95,6 +106,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
                 |   ((cfg_ptr->mode & __VSF_HW_USART_CTRL2_MASK) >> __VSF_HW_USART_CTRL2_SHIFT_BITS);
     reg->ctrl3 =    (reg->ctrl3 & ~(__VSF_HW_USART_CTRL3_MASK << __VSF_HW_USART_CTRL3_SHIFT_BITS))
                 |   ((cfg_ptr->mode & __VSF_HW_USART_CTRL3_MASK) << __VSF_HW_USART_CTRL3_SHIFT_BITS);
+    reg->rtov = cfg_ptr->rx_timeout;
     if (enabled) {
         reg->ctrl1_bit.uen = 1;
     }
@@ -263,6 +275,8 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
     vsf_usart_isr_t *isr_ptr = &usart_ptr->isr;
     vsf_usart_irq_mask_t irq_mask = reg->sts & usart_ptr->irq_mask;
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
+        reg->sts &= ~irq_mask;
+        reg->ifc |= irq_mask;
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_usart_t *)usart_ptr, irq_mask);
     }
 }
@@ -387,7 +401,10 @@ vsf_usart_irq_mask_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_clear)(
     vsf_usart_irq_mask_t irq_mask
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
-    usart_ptr->reg->sts &= ~irq_mask;
+
+    usart_type *reg = usart_ptr->reg;
+    reg->sts &= ~irq_mask;
+    reg->ifc |= irq_mask;
     return 0;
 }
 
