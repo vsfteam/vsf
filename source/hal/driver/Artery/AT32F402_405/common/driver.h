@@ -30,6 +30,7 @@
 #       include "../__device.h"
 
 #       include "./gpio/gpio.h"
+#       include "./exti/exti.h"
 #       include "./usb/usb.h"
 
 /*============================ MACROS ========================================*/
@@ -50,6 +51,14 @@
 #   define VSF_GPIO_CFG_DEC_PREFIX                          vsf_hw
 #   define VSF_GPIO_CFG_DEC_UPCASE_PREFIX                   VSF_HW
 #   include "hal/driver/common/gpio/gpio_template.h"
+#endif
+
+#if VSF_HAL_USE_EXTI == ENABLED
+#   include "hal/driver/common/template/vsf_template_exti.h"
+
+#   define VSF_EXTI_CFG_DEC_PREFIX                          vsf_hw
+#   define VSF_EXTI_CFG_DEC_UPCASE_PREFIX                   VSF_HW
+#   include "hal/driver/common/exti/exti_template.h"
 #endif
 
 #if VSF_HAL_USE_ADC == ENABLED

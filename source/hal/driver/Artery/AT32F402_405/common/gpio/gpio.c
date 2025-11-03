@@ -56,6 +56,7 @@ typedef struct VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) {
 #endif
     gpio_type                   *reg;
     vsf_gpio_pin_mask_t         pin_mask;
+    uint8_t                     idx;
 } VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t);
 // HW end
 
@@ -99,6 +100,7 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_port_config_pins)(
     uint32_t pull = (mode >> 3) & 3;
     uint32_t odrvr = (mode >> 5) & 3;
     uint32_t hdrv = (mode >> 7) & 1;
+    uint32_t exti = (mode >> 8) & 1;
     uint8_t af_value = cfg_ptr->alternate_function & ((1 << VSF_HW_GPIO_AF_VALUE_BITS) - 1);
     uint32_t current_pin_mask, offset_len2, offset_len4;
 
@@ -115,6 +117,11 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_port_config_pins)(
                     offset_len4 = (pin - 8) << 2;
                     vsf_atom32_op(&reg->muxh, (_ & ~(15 << offset_len4)) | (af_value << offset_len4));
                 }
+            } else if (exti) {
+                uint32_t offset = ((pin & 3) << 2);
+                vsf_atom32_op(&((&SCFG->exintc1)[pin >> 2]),
+                    (_ & ~(0xF << offset)) | (gpio_ptr->idx << offset)
+                );
             }
             vsf_atom32_op(&reg->pull, (_ & ~(3 << offset_len2)) | (pull << offset_len2));
             vsf_atom32_op(&reg->cfgr, (_ & ~(3 << offset_len2)) | (cfgr << offset_len2));
@@ -299,6 +306,7 @@ vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
         VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio, __IDX) = {                 \
         .reg = VSF_MCONNECT(VSF_GPIO_CFG_IMP_UPCASE_PREFIX, _GPIO_PORT, __IDX, _REG),\
         .pin_mask = VSF_MCONNECT(VSF_GPIO_CFG_IMP_UPCASE_PREFIX, _GPIO_PORT, __IDX, _MASK),\
+        .idx = __IDX,                                                           \
         __HAL_OP                                                                \
     };
 

@@ -140,6 +140,47 @@
 #   endif
 #endif
 
+// EXTI
+
+#define VSF_HW_EXTI_COUNT               1
+#define VSF_HW_EXTI_MASK                1
+#ifndef VSF_HW_EXTI_CHANNEL_COUNT
+#   define VSF_HW_EXTI_CHANNEL_COUNT    22
+#endif
+#ifndef VSF_HW_EXTI_CHANNEL_MASK
+#   define VSF_HW_EXTI_CHANNEL_MASK     0x77FFFF
+#endif
+#ifndef VSF_HW_EXTI_IRQ_NUM
+#   define VSF_HW_EXTI_IRQ_NUM          11
+#endif
+
+#if VSF_HW_EXTI_MASK & (1 << 0)
+#   define VSF_HW_EXTI0_REG             EXINT
+#   define VSF_HW_EXTI0_IRQ_NUM         11
+#       define VSF_HW_EXTI0_IRQ0_MASK   (1 << 0)
+#       define VSF_HW_EXTI0_IRQ0_IRQN   6       // EXINT0_IRQn
+#       define VSF_HW_EXTI0_IRQ1_MASK   (1 << 1)
+#       define VSF_HW_EXTI0_IRQ1_IRQN   7       // EXINT1_IRQn
+#       define VSF_HW_EXTI0_IRQ2_MASK   (1 << 2)
+#       define VSF_HW_EXTI0_IRQ2_IRQN   8       // EXINT1_IRQn
+#       define VSF_HW_EXTI0_IRQ3_MASK   (1 << 3)
+#       define VSF_HW_EXTI0_IRQ3_IRQN   9       // EXINT1_IRQn
+#       define VSF_HW_EXTI0_IRQ4_MASK   (1 << 4)
+#       define VSF_HW_EXTI0_IRQ4_IRQN   10       // EXINT1_IRQn
+#       define VSF_HW_EXTI0_IRQ5_MASK   (0x1F << 5)
+#       define VSF_HW_EXTI0_IRQ5_IRQN   23       // EXINT9_5_IRQn
+#       define VSF_HW_EXTI0_IRQ6_MASK   (0x3F << 9)
+#       define VSF_HW_EXTI0_IRQ6_IRQN   40       // EXINT15_10_IRQn
+#       define VSF_HW_EXTI0_IRQ7_MASK   (1 << 16)
+#       define VSF_HW_EXTI0_IRQ7_IRQN   1        // PVM_IRQn
+#       define VSF_HW_EXTI0_IRQ8_MASK   (1 << 17)
+#       define VSF_HW_EXTI0_IRQ8_IRQN   41       // ERTCAlarm_IRQn
+#       define VSF_HW_EXTI0_IRQ9_MASK   (1 << 18)
+#       define VSF_HW_EXTI0_IRQ9_IRQN   42       // OTGFS1_WKUP_IRQn
+#       define VSF_HW_EXTI0_IRQ10_MASK  (1 << 20)
+#       define VSF_HW_EXTI0_IRQ10_IRQN  76       // OTGHS_WKUP_IRQn
+#endif
+
 // USART: USART1..USART8
 
 #ifndef VSF_HW_USART_MASK
@@ -159,8 +200,7 @@
 #   define VSF_HW_USART1_EN             VSF_HW_EN_USART1
 #   define VSF_HW_USART1_RST            VSF_HW_RST_USART1
 #   define VSF_HW_USART1_SYNC           true
-#   define VSF_HW_USART1_IRQN           USART1_IRQn
-#   define VSF_HW_USART1_IRQHandler     USART1_IRQHandler
+#   define VSF_HW_USART1_IRQN           37      // USART1_IRQn
 #endif
 #if VSF_HW_USART_MASK & (1 << 2)
 #   define VSF_HW_USART2_REG            USART2
@@ -168,8 +208,7 @@
 #   define VSF_HW_USART2_EN             VSF_HW_EN_USART2
 #   define VSF_HW_USART2_RST            VSF_HW_RST_USART2
 #   define VSF_HW_USART2_SYNC           true
-#   define VSF_HW_USART2_IRQN           USART2_IRQn
-#   define VSF_HW_USART2_IRQHandler     USART2_IRQHandler
+#   define VSF_HW_USART2_IRQN           38      // USART2_IRQn
 #endif
 #if VSF_HW_USART_MASK & (1 << 3)
 #   define VSF_HW_USART3_REG            USART3
@@ -177,8 +216,7 @@
 #   define VSF_HW_USART3_EN             VSF_HW_EN_USART3
 #   define VSF_HW_USART3_RST            VSF_HW_RST_USART3
 #   define VSF_HW_USART3_SYNC           true
-#   define VSF_HW_USART3_IRQN           USART3_IRQn
-#   define VSF_HW_USART3_IRQHandler     USART3_IRQHandler
+#   define VSF_HW_USART3_IRQN           39      // USART3_IRQn
 #endif
 #if VSF_HW_USART_MASK & (1 << 4)
 #   define VSF_HW_USART4_REG            USART4
@@ -186,8 +224,7 @@
 #   define VSF_HW_USART4_EN             VSF_HW_EN_USART4
 #   define VSF_HW_USART4_RST            VSF_HW_RST_USART4
 #   define VSF_HW_USART4_SYNC           true
-#   define VSF_HW_USART4_IRQN           USART4_IRQn
-#   define VSF_HW_USART4_IRQHandler     USART4_IRQHandler
+#   define VSF_HW_USART4_IRQN           52      // USART4_IRQn
 #endif
 #if VSF_HW_USART_MASK & (1 << 5)
 #   define VSF_HW_USART5_REG            USART5
@@ -195,8 +232,7 @@
 #   define VSF_HW_USART5_EN             VSF_HW_EN_USART5
 #   define VSF_HW_USART5_RST            VSF_HW_RST_USART5
 #   define VSF_HW_USART5_SYNC           true
-#   define VSF_HW_USART5_IRQN           USART5_IRQn
-#   define VSF_HW_USART5_IRQHandler     USART5_IRQHandler
+#   define VSF_HW_USART5_IRQN           53      // USART5_IRQn
 #endif
 #if VSF_HW_USART_MASK & (1 << 6)
 #   define VSF_HW_USART6_REG            USART6
@@ -204,8 +240,7 @@
 #   define VSF_HW_USART6_EN             VSF_HW_EN_USART6
 #   define VSF_HW_USART6_RST            VSF_HW_RST_USART6
 #   define VSF_HW_USART6_SYNC           true
-#   define VSF_HW_USART6_IRQN           USART6_IRQn
-#   define VSF_HW_USART6_IRQHandler     USART6_IRQHandler
+#   define VSF_HW_USART6_IRQN           71      // USART6_IRQn
 #endif
 #if VSF_HW_USART_MASK & (1 << 7)
 #   define VSF_HW_USART7_REG            UART7
@@ -213,8 +248,7 @@
 #   define VSF_HW_USART7_EN             VSF_HW_EN_UART7
 #   define VSF_HW_USART7_RST            VSF_HW_RST_UART7
 #   define VSF_HW_USART7_SYNC           false
-#   define VSF_HW_USART7_IRQN           UART7_IRQn
-#   define VSF_HW_USART7_IRQHandler     UART7_IRQHandler
+#   define VSF_HW_USART7_IRQN           82      // UART7_IRQn
 #endif
 #if VSF_HW_USART_MASK & (1 << 8)
 #   define VSF_HW_USART8_REG            UART8
@@ -222,8 +256,7 @@
 #   define VSF_HW_USART8_EN             VSF_HW_EN_UART8
 #   define VSF_HW_USART8_RST            VSF_HW_RST_UART8
 #   define VSF_HW_USART8_SYNC           false
-#   define VSF_HW_USART8_IRQN           UART8_IRQn
-#   define VSF_HW_USART8_IRQHandler     UART8_IRQHandler
+#   define VSF_HW_USART8_IRQN           83      // UART8_IRQn
 #endif
 
 // SPI: SPI1..SPI3
@@ -244,24 +277,21 @@
 #   define VSF_HW_SPI1_CLK              VSF_HW_CLK_SPI1
 #   define VSF_HW_SPI1_EN               VSF_HW_EN_SPI1
 #   define VSF_HW_SPI1_RST              VSF_HW_RST_SPI1
-#   define VSF_HW_SPI1_IRQN             SPI1_IRQn
-#   define VSF_HW_SPI1_IRQ              SPI1_IRQHandler
+#   define VSF_HW_SPI1_IRQN             35      // SPI1_IRQn
 #endif
 #if VSF_HW_SPI_MASK & (1 << 2)
 #   define VSF_HW_SPI2_REG              SPI2
 #   define VSF_HW_SPI2_CLK              VSF_HW_CLK_SPI2
 #   define VSF_HW_SPI2_EN               VSF_HW_EN_SPI2
 #   define VSF_HW_SPI2_RST              VSF_HW_RST_SPI2
-#   define VSF_HW_SPI2_IRQN             SPI2_IRQn
-#   define VSF_HW_SPI2_IRQ              SPI2_IRQHandler
+#   define VSF_HW_SPI2_IRQN             36      // SPI2_IRQn
 #endif
 #if VSF_HW_SPI_MASK & (1 << 3)
 #   define VSF_HW_SPI3_REG              SPI3
 #   define VSF_HW_SPI3_CLK              VSF_HW_CLK_SPI3
 #   define VSF_HW_SPI3_EN               VSF_HW_EN_SPI3
 #   define VSF_HW_SPI3_RST              VSF_HW_RST_SPI3
-#   define VSF_HW_SPI3_IRQN             SPI3_IRQn
-#   define VSF_HW_SPI3_IRQ              SPI3_IRQHandler
+#   define VSF_HW_SPI3_IRQN             51      // SPI3_IRQn
 #endif
 
 // I2C: I2C1..I2C3
@@ -282,30 +312,24 @@
 #   define VSF_HW_I2C1_CLK              VSF_HW_CLK_I2C1
 #   define VSF_HW_I2C1_EN               VSF_HW_EN_I2C1
 #   define VSF_HW_I2C1_RST              VSF_HW_RST_I2C1
-#   define VSF_HW_I2C1_EVENT_IRQN       I2C1_EVT_IRQn
-#   define VSF_HW_I2C1_EVENT_IRQHandler I2C1_EVT_IRQHandler
-#   define VSF_HW_I2C1_ERROR_IRQN       I2C1_ERR_IRQn
-#   define VSF_HW_I2C1_ERROR_IRQHandler I2C1_ERR_IRQHandler
+#   define VSF_HW_I2C1_EVENT_IRQN       31      // I2C1_EVT_IRQn
+#   define VSF_HW_I2C1_ERROR_IRQN       32      // I2C1_ERR_IRQn
 #endif
 #if VSF_HW_I2C_MASK & (1 << 2)
 #   define VSF_HW_I2C2_REG              I2C2
 #   define VSF_HW_I2C2_CLK              VSF_HW_CLK_I2C2
 #   define VSF_HW_I2C2_EN               VSF_HW_EN_I2C2
 #   define VSF_HW_I2C2_RST              VSF_HW_RST_I2C2
-#   define VSF_HW_I2C2_EVENT_IRQN       I2C2_EVT_IRQn
-#   define VSF_HW_I2C2_EVENT_IRQHandler I2C2_EVT_IRQHandler
-#   define VSF_HW_I2C2_ERROR_IRQN       I2C2_ERR_IRQn
-#   define VSF_HW_I2C2_ERROR_IRQHandler I2C2_ERR_IRQHandler
+#   define VSF_HW_I2C2_EVENT_IRQN       33      // I2C2_EVT_IRQn
+#   define VSF_HW_I2C2_ERROR_IRQN       34      // I2C2_ERR_IRQn
 #endif
 #if VSF_HW_I2C_MASK & (1 << 3)
 #   define VSF_HW_I2C3_REG              I2C3
 #   define VSF_HW_I2C3_CLK              VSF_HW_CLK_I2C3
 #   define VSF_HW_I2C3_EN               VSF_HW_EN_I2C3
 #   define VSF_HW_I2C3_RST              VSF_HW_RST_I2C3
-#   define VSF_HW_I2C3_EVENT_IRQN       I2C3_EVT_IRQn
-#   define VSF_HW_I2C3_EVENT_IRQHandler I2C3_EVT_IRQHandler
-#   define VSF_HW_I2C3_ERROR_IRQN       I2C3_ERR_IRQn
-#   define VSF_HW_I2C3_ERROR_IRQHandler I2C3_ERR_IRQHandler
+#   define VSF_HW_I2C3_EVENT_IRQN       72      // I2C3_EVT_IRQn
+#   define VSF_HW_I2C3_ERROR_IRQN       73      // I2C3_ERR_IRQn
 #endif
 
 // USB OTG
@@ -324,12 +348,12 @@
 #endif
 
 #if VSF_HW_USB_OTG_MASK & (1 << 0)
-#   define VSF_HW_USB_OTG0_IRQHandler   OTGFS1_IRQHandler
+#   define VSF_HW_USB_OTG0_IRQN         67      // OTGFS1_IRQn
 #   define VSF_HW_USB_OTG0_CONFIG                                               \
             .dc_ep_num                  = 8 << 1,                               \
             .hc_ep_num                  = 16,                                   \
             .reg                        = (void *)OTGFS1_BASE,                  \
-            .irq                        = OTGFS1_IRQn,                          \
+            .irq                        = VSF_HW_USB_OTG0_IRQN,                 \
             .en                         = VSF_HW_EN_OTGFS1,                     \
             .phyclk                     = &VSF_HW_CLK_HICK,                     \
             .phyclk_freq_required       = 48 * 1000 * 1000,                     \
@@ -344,12 +368,12 @@
 
 #if VSF_HW_USB_OTG_MASK & (1 << 1)
 // TODO: 修复DMA模式BUG， 修复高速模式的BUG
-#   define VSF_HW_USB_OTG1_IRQHandler   OTGHS_IRQHandler
+#   define VSF_HW_USB_OTG1_IRQN         77      // OTGHS_IRQn
 #   define VSF_HW_USB_OTG1_CONFIG                                               \
             .dc_ep_num                  = 8 << 1,                               \
             .hc_ep_num                  = 16,                                   \
             .reg                        = (void *)OTGHS_BASE,                   \
-            .irq                        = OTGHS_IRQn,                           \
+            .irq                        = VSF_HW_USB_OTG1_IRQN,                 \
             .en                         = VSF_HW_EN_OTGHS,                      \
             .phyclk                     = &VSF_HW_CLK_HEXT,                     \
             .phyclk_freq_required       = 12 * 1000 * 1000,                     \
