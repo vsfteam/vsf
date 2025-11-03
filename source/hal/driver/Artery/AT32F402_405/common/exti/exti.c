@@ -55,6 +55,7 @@ typedef struct VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_irq_t) {
     vsf_exti_channel_mask_t channel_mask;
     vsf_exti_isr_handler_t  *handler_fn;
     void                    *target_ptr;
+    uint8_t                 irqn;
 } VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_irq_t);
 
 typedef struct VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_t) {
@@ -91,6 +92,20 @@ vsf_err_t VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_config_channels)(
     } else {
         vsf_atom32_op(&reg->polcfg2, _ & ~channel_mask);
     }
+
+    VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_irq_t) *irq = exti_ptr->irq;
+    for (int i = 0; i < dimof(exti_ptr->irq); i++, irq++) {
+        if (irq->channel_mask & channel_mask) {
+            irq->handler_fn = cfg_ptr->handler_fn;
+            irq->target_ptr = cfg_ptr->target_ptr;
+            if (irq->handler_fn != NULL) {
+                NVIC_SetPriority(irq->irqn, (uint32_t)cfg_ptr->prio);
+                NVIC_EnableIRQ(irq->irqn);
+            } else {
+                NVIC_DisableIRQ(irq->irqn);
+            }
+        }
+    }
     return VSF_ERR_NONE;
 }
 
@@ -98,6 +113,7 @@ vsf_err_t VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_init)(
     VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_t) *exti_ptr
 ) {
     VSF_HAL_ASSERT(NULL != exti_ptr);
+    vsf_hw_peripheral_enable(VSF_HW_EN_SCFG);
     return VSF_ERR_NONE;
 }
 
@@ -116,6 +132,16 @@ vsf_exti_status_t VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_status)(
         .enable_mask        = reg->inten,
         .status_mask        = reg->intsts,
     };
+}
+
+vsf_err_t VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_trigger)(
+    VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_t) *exti_ptr,
+    vsf_exti_channel_mask_t channel_mask
+) {
+    VSF_HAL_ASSERT(NULL != exti_ptr);
+    vsf_atom32_op(&exti_ptr->reg->swtrg,  _ | channel_mask);
+    vsf_atom32_op(&exti_ptr->reg->swtrg,  _ & ~channel_mask);
+    return VSF_ERR_NONE;
 }
 
 vsf_err_t VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_irq_enable)(
@@ -160,6 +186,8 @@ vsf_exti_capability_t VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_capability)(
 ) {
     vsf_exti_capability_t cap = {
         .support_level_trigger          = false,
+        .support_edge_trigger           = true,
+        .support_sw_trigger             = true,
         .irq_num                        = dimof(exti_ptr->irq),
     };
     for (int i = 0; i < dimof(exti_ptr->irq); i++) {
@@ -184,6 +212,7 @@ vsf_exti_capability_t VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_capability)(
 #define VSF_EXTI_IMP_IRQ(__IRQ_IDX, __EXTI_IDX)                                 \
         [__IRQ_IDX] = {                                                         \
             .channel_mask = VSF_MCONNECT(VSF_EXTI_CFG_IMP_UPCASE_PREFIX, _EXTI, __EXTI_IDX, _IRQ, __IRQ_IDX, _MASK),\
+            .irqn = VSF_MCONNECT(VSF_EXTI_CFG_IMP_UPCASE_PREFIX, _EXTI, __EXTI_IDX, _IRQ, __IRQ_IDX, _IRQN),\
         },
 
 #define VSF_EXTI_CFG_IMP_LV0(__IDX, __HAL_OP)                                   \

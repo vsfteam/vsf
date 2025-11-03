@@ -166,6 +166,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     exti, fini,             VSF_MCONNECT(__prefix_name, _t) *exti_ptr)                                                              \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_exti_status_t,        exti, status,           VSF_MCONNECT(__prefix_name, _t) *exti_ptr)                                                              \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_exti_capability_t,    exti, capability,       VSF_MCONNECT(__prefix_name, _t) *exti_ptr)                                                              \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                exti, trigger,          VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_channel_mask_t channel_mask)                        \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                exti, config_channels,  VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_channel_mask_t channel_mask, vsf_exti_channel_cfg_t * cfg_ptr)\
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                exti, irq_enable,       VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_channel_mask_t channel_mask)                        \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                exti, irq_disable,      VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_channel_mask_t channel_mask)
@@ -335,6 +336,22 @@ typedef struct vsf_exti_capability_t {
 
     /**
      * \~english
+     * @brief Support for edge trigger.
+     * \~chinese
+     * @brief 支持边沿触发模式。
+     */
+    uint8_t support_edge_trigger    : 1;
+
+    /**
+     * \~english
+     * @brief Support for software trigger provided by vsf_exti_trigger.
+     * \~chinese
+     * @brief 支持由 vsf_exti_trigger 提供的软件触发模式。
+     */
+    uint8_t support_sw_trigger      : 1;
+
+    /**
+     * \~english
      * @brief interrupt number for exti.
      * Some EXTI supports multiple interrupt, and the actual length of irq_channel_mask MUST be irq_num
      * \~chinese
@@ -424,6 +441,22 @@ extern void vsf_exti_fini(vsf_exti_t *exti_ptr);
 
 /**
  * \~english
+ * @brief Trigger EXTI channels
+ * @param[in] exti_ptr: a pointer to structure @ref vsf_exti_t
+ * @param[in] channel_mask: channel mask, each channel corresponds to one bit, the value of
+ *            this bit 1 means the configuration will be applied to the corresponding channel
+ * @return vsf_err_t: VSF_ERR_NONE if required channels Triggered, or a negative error code
+ *
+ * \~chinese
+ * @brief 触发 EXTI 通道中断
+ * @param[in] exti_ptr: 指向结构体 @ref vsf_exti_t 的指针
+ * @param[in] channel_mask: 通道掩码，每一个通道对应一个位，该 bit 的值位 1 表示需要配置
+ * @return vsf_err_t: 如果指定通道正常触发，返回 VSF_ERR_NONE，否则返回负值错误码。
+ */
+extern vsf_err_t vsf_exti_trigger(vsf_exti_t *exti_ptr, vsf_exti_channel_mask_t  channel_mask);
+
+/**
+ * \~english
  * @brief Get the status of EXTI instance
  * @param[in] exti_ptr: a pointer to structure @ref vsf_exti_t
  * @return vsf_exti_status_t: all status of current EXTI
@@ -449,7 +482,7 @@ extern vsf_exti_status_t vsf_exti_status(vsf_exti_t *exti_ptr);
  @param[in] exti_ptr: 结构体 vsf_exti_t 的指针，参考 @ref vsf_exti_t
  @param[in] channel_mask: 通道掩码，每一个通道对应一个位，该 bit 的值位 1 表示需要配置
  @param[in] cfg_ptr: 结构体 vsf_exti_channel_cfg_t 的指针，参考 @ref vsf_exti_channel_cfg_t
- @return vsf_err_t: 如果 EXTI 配置成功返回 VSF_ERR_NONE，失败返回负数。
+ @return vsf_err_t: 如果 EXTI 配置成功返回 VSF_ERR_NONE，失败返回负值错误码。
  */
 extern vsf_err_t vsf_exti_config_channels(vsf_exti_t                *exti_ptr,
                                            vsf_exti_channel_mask_t  channel_mask,
@@ -482,7 +515,7 @@ extern vsf_exti_capability_t vsf_exti_capability(vsf_exti_t *exti_ptr);
  @brief 使能指定的一个或者多个通道的中断
  @param[in] exti_ptr: 指向结构体 @ref vsf_exti_t 的指针
  @param[in] channel_mask: 通道掩码，每一个通道对应一个位，1 表示该位需要使能，0 表示该位不需要使能
- @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，失败返回负数
+ @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，失败返回负值错误码
  @note 对于一些芯片，中断优先级可能是 exti 上所有通道共用的。
  @note 在中断使能之前，应该清除所有悬挂的中断。
  */
@@ -501,7 +534,7 @@ extern vsf_err_t vsf_exti_irq_enable(vsf_exti_t *exti_ptr, vsf_exti_channel_mask
  @brief 禁能指定通道的中断
  @param[in] exti_ptr: 指向结构体 @ref vsf_exti_t 的指针
  @param[in] channel_mask: 通道掩码，每一个通道对应一个位，1 表示该位需要禁能，0 表示该位不需要禁能
- @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，失败返回负数
+ @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，失败返回负值错误码
  @note 对于一些芯片，中断设置可能是 exti 上所有通道共用的。
  */
 extern vsf_err_t vsf_exti_irq_disable(vsf_exti_t *exti_ptr, vsf_exti_channel_mask_t channel_mask);
@@ -515,6 +548,7 @@ extern vsf_err_t vsf_exti_irq_disable(vsf_exti_t *exti_ptr, vsf_exti_channel_mas
 #   define vsf_exti_fini(__EXTI)                        VSF_MCONNECT(VSF_EXTI_CFG_PREFIX, _exti_fini)                   ((__vsf_exti_t *)(__EXTI))
 #   define vsf_exti_status(__EXTI)                      VSF_MCONNECT(VSF_EXTI_CFG_PREFIX, _exti_status)                 ((__vsf_exti_t *)(__EXTI))
 #   define vsf_exti_capability(__EXTI)                  VSF_MCONNECT(VSF_EXTI_CFG_PREFIX, _exti_capability)             ((__vsf_exti_t *)(__EXTI))
+#   define vsf_exti_trigger(__EXTI, ...)                VSF_MCONNECT(VSF_EXTI_CFG_PREFIX, _exti_trigger)                ((__vsf_exti_t *)(__EXTI), ##__VA_ARGS__)
 #   define vsf_exti_config_channels(__EXTI, ...)        VSF_MCONNECT(VSF_EXTI_CFG_PREFIX, _exti_config_channels)        ((__vsf_exti_t *)(__EXTI), ##__VA_ARGS__)
 #   define vsf_exti_irq_enable(__EXTI, ...)             VSF_MCONNECT(VSF_EXTI_CFG_PREFIX, _exti_irq_enable)             ((__vsf_exti_t *)(__EXTI), ##__VA_ARGS__)
 #   define vsf_exti_irq_disable(__EXTI, ...)            VSF_MCONNECT(VSF_EXTI_CFG_PREFIX, _exti_irq_disable)            ((__vsf_exti_t *)(__EXTI), ##__VA_ARGS__)

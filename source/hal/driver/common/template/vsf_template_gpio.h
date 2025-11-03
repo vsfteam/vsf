@@ -944,7 +944,7 @@ typedef enum vsf_gpio_port_pin_no_t {
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，该 bit 的值位 1 表示需要配置
  @param[in] cfg_ptr: 结构体 vsf_gpio_cfg_t 的指针，参考 @ref vsf_gpio_cfg_t
- @return vsf_err_t: 如果 GPIO 配置成功返回 VSF_ERR_NONE，失败返回负数。
+ @return vsf_err_t: 如果 GPIO 配置成功返回 VSF_ERR_NONE，失败返回负值错误码。
  */
 extern vsf_err_t vsf_gpio_port_config_pins(vsf_gpio_t         *gpio_ptr,
                                            vsf_gpio_pin_mask_t pin_mask,
@@ -965,7 +965,7 @@ extern vsf_err_t vsf_gpio_port_config_pins(vsf_gpio_t         *gpio_ptr,
  @param[in] gpio_ptr: 结构体 vsf_gpio_t 的指针，参考 @ref vsf_gpio_t
  @param[in] pin_index: 引脚索引（从0开始），指定要获取配置的引脚
  @param[out] cfg_ptr: 结构体 vsf_gpio_cfg_t 的指针，用于存储配置，参考 @ref vsf_gpio_cfg_t
- @return vsf_err_t: 如果 GPIO 引脚配置获取成功返回 VSF_ERR_NONE，失败返回负数。
+ @return vsf_err_t: 如果 GPIO 引脚配置获取成功返回 VSF_ERR_NONE，失败返回负值错误码。
  @note 此函数仅获取单个引脚的配置。要获取多个引脚的配置，请为每个引脚单独调用此函数。
  */
 extern vsf_err_t vsf_gpio_get_pin_configuration(vsf_gpio_t    *gpio_ptr,
@@ -984,7 +984,7 @@ extern vsf_err_t vsf_gpio_get_pin_configuration(vsf_gpio_t    *gpio_ptr,
 // @brief 配置 gpio 的一个或者多个端口和引脚
 // @param[in] cfg: vsf_gpio_port_cfg_pins_t 结构体数组，参考 @ref vsf_gpio_port_cfg_pins_t
 // @param[in] count: 结构体数组 vsf_gpio_port_cfg_pins_t 的数量
-// @return vsf_err_t: 如果 GPIO 配置成功返回 VSF_ERR_NONE，失败返回负数。
+// @return vsf_err_t: 如果 GPIO 配置成功返回 VSF_ERR_NONE，失败返回负值错误码。
 // @note VSF_PREFIX 前缀可以替换成实际的前缀，例如 vsf_hw
 // */
 //extern vsf_err_t VSF_PREFIX_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
@@ -1002,7 +1002,7 @@ extern vsf_err_t vsf_gpio_get_pin_configuration(vsf_gpio_t    *gpio_ptr,
 // @brief 配置 gpio 的一个或者多个端口的一个引脚
 // @param[in] cfg: 结构体 vsf_gpio_port_cfg_pin_t 的指针，参考 @ref vsf_gpio_port_cfg_pin_t
 // @param[in] count: 结构体数组 vsf_gpio_port_cfg_pin_t 的数量
-// @return vsf_err_t: 如果 GPIO 配置成功返回 VSF_ERR_NONE，失败返回负数。
+// @return vsf_err_t: 如果 GPIO 配置成功返回 VSF_ERR_NONE，失败返回负值错误码。
 // @note VSF_PREFIX 前缀可以替换成实际的前缀，例如 vsf_hw
 // */
 //extern vsf_err_t VSF_PREFIX_gpio_ports_config_pin(vsf_gpio_port_cfg_pin_t *cfg_ptr,
@@ -1244,7 +1244,7 @@ extern vsf_gpio_capability_t vsf_gpio_capability(vsf_gpio_t *gpio_ptr);
  @brief 配置 gpio 实例的外部中断
  @param[in] gpio_ptr: 指向结构体 @ref vsf_gpio_t 的指针
  @param[in] cfg_ptr: 指向结构体 @ref vsf_gpio_exti_irq_cfg_t 的指针
- @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，失败返回负数
+ @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，失败返回负值错误码
  */
 extern vsf_err_t vsf_gpio_exti_irq_config(vsf_gpio_t *gpio_ptr, vsf_gpio_exti_irq_cfg_t *cfg_ptr);
 
@@ -1259,7 +1259,7 @@ extern vsf_err_t vsf_gpio_exti_irq_config(vsf_gpio_t *gpio_ptr, vsf_gpio_exti_ir
  @brief 获取 gpio 实例的当前外部中断配置
  @param[in] gpio_ptr: 指向结构体 @ref vsf_gpio_t 的指针
  @param[out] cfg_ptr: 指向结构体 @ref vsf_gpio_exti_irq_cfg_t 的指针，用于存储当前配置
- @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，失败返回负数
+ @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，失败返回负值错误码
  */
 extern vsf_err_t vsf_gpio_exti_irq_get_configuration(vsf_gpio_t *gpio_ptr, vsf_gpio_exti_irq_cfg_t *cfg_ptr);
 
@@ -1277,7 +1277,7 @@ extern vsf_err_t vsf_gpio_exti_irq_get_configuration(vsf_gpio_t *gpio_ptr, vsf_g
  @brief 使能指定的一个或者多个引脚的中断
  @param[in] gpio_ptr: 指向结构体 @ref vsf_gpio_t 的指针
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，1 表示该位需要使能，0 表示该位不需要使能
- @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，失败返回负数
+ @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，失败返回负值错误码
  @note 对于一些芯片，中断优先级可能是 gpio 上所有引脚共用的。
  @note 在中断使能之前，应该清除所有悬挂的中断。
  */
@@ -1296,7 +1296,7 @@ extern vsf_err_t vsf_gpio_exti_irq_enable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mas
  @brief 禁能指定引脚的中断
  @param[in] gpio_ptr: 指向结构体 @ref vsf_gpio_t 的指针
  @param[in] pin_mask: 引脚掩码，每一个引脚对应一个位，1 表示该位需要禁能，0 表示该位不需要禁能
- @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，失败返回负数
+ @return vsf_err_t: 如果成功返回 VSF_ERR_NONE，失败返回负值错误码
  @note 对于一些芯片，中断设置可能是 gpio 上所有引脚共用的。
  */
 extern vsf_err_t vsf_gpio_exti_irq_disable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
