@@ -84,8 +84,9 @@ typedef enum vsf_gpio_mode_t {
     __VSF_GPIO_AF                       = (2 << 0),
     VSF_GPIO_OUTPUT_PUSH_PULL           = (1 << 0) | (0 << 2),
     VSF_GPIO_OUTPUT_OPEN_DRAIN          = (1 << 0) | (1 << 2),
-    __VSF_GPIO_EXTI                     = (1 << 8),
-    VSF_GPIO_EXTI                       = VSF_GPIO_INPUT | __VSF_GPIO_EXTI,
+
+    // virtual bit
+    VSF_GPIO_EXTI                       = (1 << 8),
 
     VSF_GPIO_AF_OUTPUT_PUSH_PULL        = __VSF_GPIO_AF | (0 << 2),
     VSF_GPIO_AF_OUTPUT_OPEN_DRAIN       = __VSF_GPIO_AF | (1 << 2),
