@@ -169,7 +169,7 @@ static void VSF_MCONNECT(__, VSF_EXTI_CFG_IMP_PREFIX, _exti_irqhandler)(
     unsigned int irq_idx
 ) {
     VSF_HAL_ASSERT(NULL != exti_ptr);
-    VSF_HAL_ASSERT(irq_idx < dimof(exti_ptr->irq))
+    VSF_HAL_ASSERT(irq_idx < dimof(exti_ptr->irq));
 
     VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_irq_t) *irq = &exti_ptr->irq[irq_idx];
     exint_type *reg = exti_ptr->reg;
