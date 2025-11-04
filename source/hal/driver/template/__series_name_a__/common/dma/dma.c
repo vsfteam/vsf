@@ -174,32 +174,6 @@ vsf_dma_channel_status_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_statu
     };
 }
 
-vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_sg_config_desc)(
-    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
-    uint8_t channel,
-    vsf_dma_isr_t isr,
-    vsf_dma_channel_sg_desc_t *scatter_gather_cfg,
-    uint32_t sg_count
-) {
-    VSF_HAL_ASSERT(dma_ptr != NULL);
-    VSF_HAL_ASSERT(scatter_gather_cfg != NULL);
-
-    // If hardware doesn't support scatter-gather, return not supported
-    // Otherwise, configure scatter-gather descriptors
-    return VSF_ERR_NOT_SUPPORT;
-}
-
-vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_sg_start)(
-    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
-    uint8_t channel
-) {
-    VSF_HAL_ASSERT(dma_ptr != NULL);
-
-    // If hardware doesn't support scatter-gather, return not supported
-    // Otherwise, start scatter-gather transfer
-    return VSF_ERR_NOT_SUPPORT;
-}
-
 static vsf_dma_irq_mask_t VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_get_irq_mask)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr
 ) {
@@ -283,6 +257,32 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_get_configuration)(
     VSF_HAL_ASSERT(NULL != cfg_ptr);
 
     return VSF_ERR_NONE;
+}
+
+vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_sg_config_desc)(
+    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
+    uint8_t channel,
+    vsf_dma_isr_t isr,
+    vsf_dma_channel_sg_desc_t *scatter_gather_cfg,
+    uint32_t sg_count
+) {
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+    VSF_HAL_ASSERT(scatter_gather_cfg != NULL);
+
+    // If hardware doesn't support scatter-gather, return not supported
+    // Otherwise, configure scatter-gather descriptors
+    return VSF_ERR_NOT_SUPPORT;
+}
+
+vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_sg_start)(
+    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
+    uint8_t channel
+) {
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+
+    // If hardware doesn't support scatter-gather, return not supported
+    // Otherwise, start scatter-gather transfer
+    return VSF_ERR_NOT_SUPPORT;
 }
 // HW end
 
