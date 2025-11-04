@@ -90,9 +90,14 @@ typedef struct VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) {
 
 // HW
 vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_init)(
-    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr
+    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
+    vsf_dma_cfg_t *cfg_ptr
 ) {
     VSF_HAL_ASSERT(NULL != dma_ptr);
+    VSF_HAL_ASSERT(NULL != cfg_ptr);
+    // configure according to cfg_ptr
+    dma_ptr->isr = cfg_ptr->isr;
+    // configure interrupt according to cfg_ptr->isr
     return VSF_ERR_NONE;
 }
 
@@ -104,22 +109,25 @@ void VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_fini)(
 
 int8_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_request)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
-    void *filter_param
+    vsf_dma_channel_hint_t *channel_hint_ptr
 ) {
+    VSF_HAL_ASSERT(NULL != dma_ptr);
+    // Use channel_hint_ptr to select appropriate channel
+    // For template implementation, just return channel 0
     return 0;
 }
 
 void VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_release)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
-    int8_t channel
+    uint8_t channel
 ) {
     VSF_HAL_ASSERT(dma_ptr != NULL);
 }
 
 vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_config)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
-    int8_t channel,
-                                 vsf_dma_channel_cfg_t *cfg_ptr
+    uint8_t channel,
+    vsf_dma_channel_cfg_t *cfg_ptr
 ) {
     VSF_HAL_ASSERT(dma_ptr != NULL);
 
@@ -128,7 +136,7 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_config)(
 
 vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_start)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
-    int8_t channel,
+    uint8_t channel,
     uint32_t src_address,
     uint32_t dst_address,
     uint32_t count
@@ -140,7 +148,7 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_start)(
 
 vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_cancel)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
-    int8_t channel
+    uint8_t channel
 ) {
     VSF_HAL_ASSERT(dma_ptr != NULL);
 
@@ -149,7 +157,7 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_cancel)(
 
 uint32_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_get_transferred_count)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
-    int8_t channel
+    uint8_t channel
 ) {
     VSF_HAL_ASSERT(dma_ptr != NULL);
     return 0;
@@ -157,13 +165,39 @@ uint32_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_get_transferred_count
 
 vsf_dma_channel_status_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_status)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
-    int8_t channel)
+    uint8_t channel)
 {
     VSF_HAL_ASSERT(dma_ptr != NULL);
 
     return (vsf_dma_channel_status_t) {
         .is_busy = 1,
     };
+}
+
+vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_sg_config_desc)(
+    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
+    uint8_t channel,
+    vsf_dma_isr_t isr,
+    vsf_dma_channel_sg_desc_t *scatter_gather_cfg,
+    uint32_t sg_count
+) {
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+    VSF_HAL_ASSERT(scatter_gather_cfg != NULL);
+
+    // If hardware doesn't support scatter-gather, return not supported
+    // Otherwise, configure scatter-gather descriptors
+    return VSF_ERR_NOT_SUPPORT;
+}
+
+vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_sg_start)(
+    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
+    uint8_t channel
+) {
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+
+    // If hardware doesn't support scatter-gather, return not supported
+    // Otherwise, start scatter-gather transfer
+    return VSF_ERR_NOT_SUPPORT;
 }
 
 static vsf_dma_irq_mask_t VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_get_irq_mask)(
@@ -210,8 +244,10 @@ static void VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_irqhandler)(
  *          Default implementation will assert(false) to indicate the feature is not implemented.
  *      VSF_DMA_CFG_REIMPLEMENT_API_SG_CONFIG_DESC for dma_channel_sg_config_desc.
  *          Default implementation will return VSF_ERR_NOT_SUPPORT.
+ *          This implementation provides basic template that returns VSF_ERR_NOT_SUPPORT.
  *      VSF_DMA_CFG_REIMPLEMENT_API_SG_START for dma_channel_sg_start.
  *          Default implementation will return VSF_ERR_NOT_SUPPORT.
+ *          This implementation provides basic template that returns VSF_ERR_NOT_SUPPORT.
  */
 
 vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_get_configuration)(
@@ -260,6 +296,8 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_get_configuration)(
 #define VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY                  ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_API_GET_CONFIGURATION           ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION   ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_API_SG_CONFIG_DESC              ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_API_SG_START                    ENABLED
 
 #define VSF_DMA_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t)                                \
