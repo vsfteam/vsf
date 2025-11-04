@@ -68,8 +68,8 @@ extern "C" {
 
 // HW
 /*\note hw ETH driver can reimplement following types:
- *      To enable reimplementation, please enable ethro below:
- *          VSF_ETH_CFG_REIMPLEMENT_TYPE_PHY_MODE for vsf_eth_mode_t
+ *      To enable reimplementation, please enable macro below:
+ *          VSF_ETH_CFG_REIMPLEMENT_TYPE_PHY_MODE for vsf_eth_phy_mode_t
  *          VSF_ETH_CFG_REIMPLEMENT_TYPE_MODE for vsf_eth_mode_t
  *          VSF_ETH_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_eth_irq_mask_t
  *          VSF_ETH_CFG_REIMPLEMENT_TYPE_CTRL for vsf_eth_ctrl_t

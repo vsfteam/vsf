@@ -67,14 +67,14 @@ extern "C" {
 
 /**
  * \~english
- * @brief We can redefine ethro VSF_ETH_CFG_PREFIX to specify a prefix
+ * @brief We can redefine macro VSF_ETH_CFG_PREFIX to specify a prefix
  * to call a specific driver directly in the application code.
  * Example:
  * @code
  * #define VSF_ETH_CFG_PREFIX    my_device    // Use my device hardware ETH driver
  * vsf_eth_init()                             // Will be expanded to my_device_eth_init()
  * @endcode
- * @note This ethro is only valid when VSF_ETH_CFG_FUNCTION_RENAME is ENABLED.
+ * @note This macro is only valid when VSF_ETH_CFG_FUNCTION_RENAME is ENABLED.
  *
  * \~chinese
  * @brief 可重新定义宏 VSF_ETH_CFG_PREFIX，以在应用代码中直接调用
@@ -110,7 +110,7 @@ extern "C" {
 
 /**
  * \~english
- * @brief In specific hardware driver, we can enable ethro
+ * @brief In specific hardware driver, we can enable macro
  * VSF_ETH_CFG_REIMPLEMENT_TYPE_PHY_MODE to redefine enum @ref vsf_eth_mode_t.
  *
  * \~chinese
@@ -123,7 +123,7 @@ extern "C" {
 
 /**
  * \~english
- * @brief In specific hardware driver, we can enable ethro
+ * @brief In specific hardware driver, we can enable macro
  * VSF_ETH_CFG_REIMPLEMENT_TYPE_MODE to redefine enum @ref vsf_eth_mode_t.
  *
  * \~chinese
@@ -136,7 +136,7 @@ extern "C" {
 
 /**
  * \~english
- * @brief In specific hardware driver, we can enable ethro
+ * @brief In specific hardware driver, we can enable macro
  * VSF_ETH_CFG_REIMPLEMENT_TYPE_CFG to redefine struct
  * @ref vsf_eth_cfg_t. For compatibility, members should not be
  * deleted when redefining it.
@@ -164,7 +164,7 @@ extern "C" {
 
 /**
  * \~english
- * @brief In specific hardware driver, we can enable ethro
+ * @brief In specific hardware driver, we can enable macro
  * VSF_ETH_CFG_REIMPLEMENT_TYPE_CAPABILITY to redefine struct
  * @ref vsf_eth_capability_t. For compatibility, members should not
  * be deleted when redefining it.
@@ -180,7 +180,7 @@ extern "C" {
 
 /**
  * \~english
- * @brief In specific hardware driver, we can enable ethro
+ * @brief In specific hardware driver, we can enable macro
  * VSF_ETH_CFG_REIMPLEMENT_TYPE_BUF_MODE to redefine struct
  * @ref vsf_eth_buf_mode_t.
  *
@@ -206,7 +206,7 @@ extern "C" {
 
 /**
  * \~english
- * @brief In specific hardware driver, we can enable ethro
+ * @brief In specific hardware driver, we can enable macro
  * VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_BUF_DESC to redefine struct @ref vsf_eth_buf_desc_t.
  *
  * \~chinese
@@ -220,20 +220,33 @@ extern "C" {
 
 /**
  * \~english
- * @brief In specific hardware driver, we can enable ethro
+ * @brief In specific hardware driver, we can enable macro
  * VSF_ETH_CFG_REIMPLEMENT_TYPE_IRQ_MASK to redefine struct @ref vsf_eth_irq_mask_t.
  *
  * \~chinese
  * @brief 在具体硬件驱动中，我们可以启用宏 VSF_ETH_CFG_REIMPLEMENT_TYPE_IRQ_MASK
  * 来重新定义结构体 @ref vsf_eth_irq_mask_t。
  */
-#if VSF_ETH_CFG_REIMPLEMENT_TYPE_IRQ_MASK == DISABLED
-#    define VSF_ETH_CFG_REIMPLEMENT_TYPE_IRQ_MASK DISABLED
+#ifndef VSF_ETH_CFG_REIMPLEMENT_TYPE_IRQ_MASK
+#   define VSF_ETH_CFG_REIMPLEMENT_TYPE_IRQ_MASK            DISABLED
 #endif
 
 /**
  * \~english
- * @brief In specific hardware driver, we can enable ethro
+ * @brief In specific hardware driver, we can enable macro
+ * VSF_ETH_CFG_REIMPLEMENT_TYPE_CTRL to redefine enum @ref vsf_eth_ctrl_t.
+ *
+ * \~chinese
+ * @brief 在特定硬件驱动中，启用宏 VSF_ETH_CFG_REIMPLEMENT_TYPE_CTRL
+ * 来重新定义枚举 @ref vsf_eth_ctrl_t。
+ */
+#ifndef VSF_ETH_CFG_REIMPLEMENT_TYPE_CTRL
+#   define VSF_ETH_CFG_REIMPLEMENT_TYPE_CTRL                DISABLED
+#endif
+
+/**
+ * \~english
+ * @brief In specific hardware driver, we can enable macro
  * VSF_ETH_CFG_INHERIT_HAL_CAPABILITY to inherit the structure
  * @ref vsf_peripheral_capability_t.
  *
@@ -307,7 +320,7 @@ extern "C" {
  *
  * \~english
  * In specific drivers, we can implement optional modes. Optional modes require
- * the driver to provide one or more enumeration options, and provide ethros
+ * the driver to provide one or more enumeration options, and provide macros
  * with the same name (users can determine whether to support the mode at
  * compile time). If these options are N to 1, the corresponding MASK option is
  * also required (users can select different modes at runtime).

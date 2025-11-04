@@ -70,8 +70,6 @@ extern "C" {
 /*\note hw WDT driver can reimplement following types:
  *      To enable reimplementation, please enable macro below:
  *          VSF_WDT_CFG_REIMPLEMENT_TYPE_MODE for vsf_wdt_mode_t
- *          VSF_WDT_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_wdt_irq_mask_t
- *          VSF_WDT_CFG_REIMPLEMENT_TYPE_CTRL for vsf_wdt_ctrl_t
  *          VSF_WDT_CFG_REIMPLEMENT_TYPE_CFG for vsf_wdt_cfg_t
  *          VSF_WDT_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_wdt_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
@@ -79,8 +77,6 @@ extern "C" {
  */
 
 #define VSF_WDT_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
-#define VSF_WDT_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
-#define VSF_WDT_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
 #define VSF_WDT_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
 #define VSF_WDT_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end

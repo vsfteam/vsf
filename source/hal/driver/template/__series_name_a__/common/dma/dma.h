@@ -69,20 +69,24 @@ extern "C" {
 // HW
 /*\note hw DMA driver can reimplement following types:
  *      To enable reimplementation, please enable macro below:
- *          VSF_DMA_CFG_REIMPLEMENT_TYPE_MODE for vsf_dma_mode_t
- *          VSF_DMA_CFG_REIMPLEMENT_TYPE_STATUS for vsf_dma_status_t
+ *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE for vsf_dma_channel_mode_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_dma_irq_mask_t
- *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CTRL for vsf_dma_ctrl_t
+ *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT for vsf_dma_channel_hint_t
+ *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG for vsf_dma_channel_cfg_t
+ *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG for vsf_dma_channel_sg_cfg_t
+ *          VSF_DMA_CFG_REIMPLEMENT_TYPE_STATUS for vsf_dma_status_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG for vsf_dma_cfg_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_dma_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
 
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG  ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 
