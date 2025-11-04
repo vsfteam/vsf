@@ -198,7 +198,7 @@ extern "C" {
  */
 typedef enum vsf_dac_irq_mask_t {
     VSF_DAC_IRQ_MASK_IDLE = (0x01ul << 0),    //!< \~english DAC is idle \~chinese DAC 处于空闲状态
-    VSF_DAC_IRQ_MASK_CPL  = (0x1ul << 0),     //!< \~english DAC transfer complete \~chinese DAC 传输完成
+    VSF_DAC_IRQ_MASK_CPL  = (0x01ul << 1),    //!< \~english DAC transfer complete \~chinese DAC 传输完成
 } vsf_dac_irq_mask_t;
 #endif
 
