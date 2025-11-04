@@ -616,28 +616,28 @@ typedef enum vsf_i2c_irq_mask_t {
 
     /**
      * \~english
-     * @brief Slave mode: START or RESTART condition detection interrupt.
-     * Triggered when START condition is detected while in slave mode.
-     * Only valid in slave mode.
+     * @brief Master mode: START or RESTART condition detection interrupt.
+     * Triggered when START or RESTART condition is detected while in master mode.
+     * Only valid in master mode.
      * \~chinese
      * @brief 主机模式：起始条件或者重复起始条件检测中断。
      * 当主机模式下检测到起始条件或者重复起始条件时触发。
      * 仅在主机模式下有效。
      */
-    VSF_I2C_IRQ_MASK_MASTER_START_OR_RESTART_DETECT = (0x1ul << 7),
+    VSF_I2C_IRQ_MASK_MASTER_START_OR_RESTART_DETECT = (0x1ul <<  6),
 
 
     /**
      * \~english
-     * @brief Master mode: Start condition detection interrupt.
-     * Triggered when the master device generates a START condition on the I2C bus.
+     * @brief Master mode: STOP condition detection interrupt.
+     * Triggered when STOP condition is detected while in master mode.
      * Only valid in master mode.
      * \~chinese
-     * @brief 主机模式：起始条件检测中断。
-     * 当主机设备在 I2C 总线上产生起始条件时触发。
+     * @brief 主机模式：停止条件检测中断。
+     * 当主机模式下检测到停止条件时触发。
      * 仅在主机模式下有效。
      */
-    VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT            = (0x1ul << 8),
+    VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT            = (0x1ul <<  7),
 
 
     /**
@@ -650,7 +650,7 @@ typedef enum vsf_i2c_irq_mask_t {
      * 当从机模式下检测到起始条件或者重复起始条件时触发。
      * 仅在从机模式下有效。
      */
-    VSF_I2C_IRQ_MASK_SLAVE_START_OR_RESTART_DETECT  = (0x1ul << 9),
+    VSF_I2C_IRQ_MASK_SLAVE_START_OR_RESTART_DETECT  = (0x1ul <<  8),
 
     /**
      * \~english
@@ -662,7 +662,7 @@ typedef enum vsf_i2c_irq_mask_t {
      * 当从机模式下检测到停止条件时触发。
      * 仅在从机模式下有效。
      */
-    VSF_I2C_IRQ_MASK_SLAVE_STOP_DETECT              = (0x1ul << 10),
+    VSF_I2C_IRQ_MASK_SLAVE_STOP_DETECT              = (0x1ul <<  9),
 
     /**
      * \~english
@@ -676,7 +676,7 @@ typedef enum vsf_i2c_irq_mask_t {
      * 注意：某些设备的阈值固定为 1。
      * 仅在从机模式下有效。
      */
-    VSF_I2C_IRQ_MASK_SLAVE_TX                       = (0x1ul << 11),
+    VSF_I2C_IRQ_MASK_SLAVE_TX                       = (0x1ul << 10),
 
     /**
      * \~english
@@ -690,7 +690,7 @@ typedef enum vsf_i2c_irq_mask_t {
      * 注意：某些设备的阈值固定为 1。
      * 仅在从机模式下有效。
      */
-    VSF_I2C_IRQ_MASK_SLAVE_RX                       = (0x1ul << 12),
+    VSF_I2C_IRQ_MASK_SLAVE_RX                       = (0x1ul << 11),
 
     /**
      * \~english
@@ -702,7 +702,7 @@ typedef enum vsf_i2c_irq_mask_t {
      * 当从机模式下当前传输操作完成时触发。
      * 仅在从机模式下有效。
      */
-    VSF_I2C_IRQ_MASK_SLAVE_TRANSFER_COMPLETE        = (0x1ul << 13),
+    VSF_I2C_IRQ_MASK_SLAVE_TRANSFER_COMPLETE        = (0x1ul << 12),
 
 } vsf_i2c_irq_mask_t;
 #endif
