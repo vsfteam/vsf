@@ -70,9 +70,10 @@ extern "C" {
 /*\note hw SDIO driver can reimplement following types:
  *      To enable reimplementation, please enable macro below:
  *          VSF_SDIO_CFG_REIMPLEMENT_TYPE_MODE for vsf_sdio_mode_t
+ *          VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQOP for vsf_sdio_reqop_t
  *          VSF_SDIO_CFG_REIMPLEMENT_TYPE_STATUS for vsf_sdio_status_t
  *          VSF_SDIO_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_sdio_irq_mask_t
- *          VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL for vsf_sdio_ctrl_t
+ *          VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQSTS for vsf_sdio_reqsts_t
  *          VSF_SDIO_CFG_REIMPLEMENT_TYPE_CFG for vsf_sdio_cfg_t
  *          VSF_SDIO_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_sdio_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
@@ -80,10 +81,10 @@ extern "C" {
  */
 
 #define VSF_SDIO_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
+#define VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQOP       ENABLED
 #define VSF_SDIO_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
-#define VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQSTS       ENABLED
 #define VSF_SDIO_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
-#define VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
+#define VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQSTS       ENABLED
 #define VSF_SDIO_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
 #define VSF_SDIO_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end

@@ -180,5 +180,14 @@ vsf_err_t vsf_flash_get_configuration(vsf_flash_t *flash_ptr, vsf_flash_cfg_t *c
     return flash_ptr->op->get_configuration(flash_ptr, cfg_ptr);
 }
 
+vsf_err_t vsf_flash_ctrl(vsf_flash_t *flash_ptr, vsf_flash_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(flash_ptr != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op->ctrl != NULL);
+
+    return flash_ptr->op->ctrl(flash_ptr, ctrl, param);
+}
+
 #endif /* VSF_FLASH_CFG_MULTI_CLASS == ENABLED */
 #endif /* VSF_HAL_USE_FLASH == ENABLED */
