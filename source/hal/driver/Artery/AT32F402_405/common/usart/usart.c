@@ -408,9 +408,12 @@ vsf_usart_irq_mask_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_clear)(
     VSF_HAL_ASSERT(NULL != usart_ptr);
 
     usart_type *reg = usart_ptr->reg;
-    reg->sts &= ~irq_mask;
+    vsf_usart_irq_mask_t irq_mask_out = reg->sts & irq_mask;
+
+    // DO NOT clear VSF_USART_IRQ_MASK_RX, it should be set/cleared according rxfifo status by hardware.
+    reg->sts &= ~irq_mask | VSF_USART_IRQ_MASK_RX;
     reg->ifc |= irq_mask;
-    return 0;
+    return irq_mask_out;
 }
 
 // HW end
