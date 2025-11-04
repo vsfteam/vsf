@@ -269,6 +269,7 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_ctrl)(
 #define VSF_FLASH_CFG_ERASE_ONE_SECTOR_TEMPLATE         ENABLED
 #define VSF_FLASH_CFG_WRITE_ONE_SECTOR_TEMPLATE         ENABLED
 #define VSF_FLASH_CFG_READ_ONE_SECTOR_TEMPLATE          ENABLED
+#define VSF_FLASH_CFG_REIMPLEMENT_API_CTRL              ENABLED
 
 #define VSF_FLASH_CFG_IMP_LV0(__IDX, __HAL_OP)                                  \
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t)                            \
