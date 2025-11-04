@@ -41,11 +41,17 @@
 #   define  VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY                DISABLED
 #endif
 
+#ifndef VSF_FLASH_CFG_REIMPLEMENT_API_CTRL
+#   define VSF_FLASH_CFG_REIMPLEMENT_API_CTRL                       DISABLED
+#endif
+
 #ifdef VSF_FLASH_CFG_IMP_REMAP_PREFIX
 #   undef VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY
 #   define VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY                 ENABLED
 #   undef VSF_FLASH_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #   define VSF_FLASH_CFG_REIMPLEMENT_API_GET_CONFIGURATION          ENABLED
+#   undef VSF_FLASH_CFG_REIMPLEMENT_API_CTRL
+#   define VSF_FLASH_CFG_REIMPLEMENT_API_CTRL                       ENABLED
 #endif
 
 #if VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -103,6 +109,18 @@ vsf_err_t vsf_real_flash_get_configuration(vsf_real_flash_t *flash_ptr, vsf_flas
 {
     VSF_HAL_ASSERT(NULL != flash_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
+#if VSF_FLASH_CFG_REIMPLEMENT_API_CTRL == DISABLED
+vsf_err_t vsf_real_flash_ctrl(vsf_real_flash_t *flash_ptr, vsf_flash_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(NULL != flash_ptr);
 
     // Default implementation: not supported, trigger assertion
     VSF_HAL_ASSERT(0);
@@ -181,6 +199,7 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 
 #undef VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_FLASH_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#undef VSF_FLASH_CFG_REIMPLEMENT_API_CTRL
 #undef VSF_FLASH_CFG_CAPABILITY_IRQ_MASK
 #undef VSF_FLASH_CFG_CAPABILITY_BASE_ADDRESS
 #undef VSF_FLASH_CFG_CAPABILITY_MAX_SIZE
