@@ -165,6 +165,19 @@ extern "C" {
 #   define VSF_FLASH_CFG_INHERIT_HAL_CAPABILITY              ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief In specific hardware driver, enable macro
+ * VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL to redefine enum
+ * @ref vsf_flash_ctrl_t.
+ * \~chinese
+ * @brief 在特定硬件驱动中，启用宏 VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL
+ * 来重新定义枚举 @ref vsf_flash_ctrl_t。
+ */
+#ifndef VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL
+#   define VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL              DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_FLASH_APIS(__prefix_name) \
@@ -183,7 +196,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, write_one_sector,      VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_size_t offset_of_bytes, uint8_t* buffer, vsf_flash_size_t size_of_bytes) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, write_multi_sector,    VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_size_t offset_of_bytes, uint8_t* buffer, vsf_flash_size_t size_of_bytes) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, read_one_sector,       VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_size_t offset_of_bytes, uint8_t* buffer, vsf_flash_size_t size_of_bytes) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, read_multi_sector,     VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_size_t offset_of_bytes, uint8_t* buffer, vsf_flash_size_t size_of_bytes)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, read_multi_sector,     VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_size_t offset_of_bytes, uint8_t* buffer, vsf_flash_size_t size_of_bytes) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, ctrl,                  VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
 
@@ -276,6 +290,66 @@ typedef struct vsf_flash_capability_t {
         uint8_t none_sector_aligned_read  : 1;
     };
 } vsf_flash_capability_t;
+#endif
+
+#if VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED
+/**
+ * \~english
+ * @brief Predefined VSF Flash control commands that can be reimplemented in specific HAL drivers.
+ * @note Used as the 'ctrl' parameter (second parameter) in vsf_flash_ctrl(vsf_flash_t *flash_ptr, vsf_flash_ctrl_t ctrl, void *param) function
+ * @note The 'param' parameter (third parameter) type depends on the specific control command
+ * \~chinese
+ * @brief 预定义的 VSF Flash 控制命令，可以在特定的 HAL 驱动中重新实现。
+ * @note 作为 vsf_flash_ctrl(vsf_flash_t *flash_ptr, vsf_flash_ctrl_t ctrl, void *param) 函数中的 'ctrl' 参数（第二个参数）
+ * @note 'param' 参数（第三个参数）的类型取决于具体的控制命令
+ *
+ * \~english
+ * Optional control commands require one or more enumeration options and a macro with the same
+ * name to determine if they are supported at runtime. If the feature supports more than
+ * one option, it is recommended to provide the corresponding MASK option, so that the
+ * user can check for supported features at compile-time.
+ * \~chinese
+ * 可选控制命令需要提供一个或多个枚举选项，还需要提供同名的宏，以便用户在运行时判断是否支持。
+ * 如果该功能支持多个选项，建议提供相应的 MASK 选项，以便用户在编译时检查支持的功能。
+ */
+typedef enum vsf_flash_ctrl_t {
+    //! \~english
+    //! @brief Dummy value for compilation, required when no actual control commands are defined.
+    //! @note This value is needed only when using the template default enum definition
+    //!       (VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) and all optional control
+    //!       commands are commented out. It ensures the enum has at least one member
+    //!       to avoid compilation errors with some C compilers that don't allow empty enums.
+    //! @note If you enable any control commands below (uncomment them), or if you
+    //!       redefine the enum in a specific hardware driver (VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED),
+    //!       you can remove this DUMMY value as long as at least one actual command is defined.
+    //! \~chinese
+    //! @brief 编译占位值，当没有定义实际控制命令时需要。
+    //! @note 此值仅在以下情况需要：使用模板默认枚举定义
+    //!       (VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) 且所有可选控制命令都被注释掉时。
+    //!       它确保枚举至少有一个成员，以避免某些不允许空枚举的 C 编译器报错。
+    //! @note 如果启用了以下任何控制命令（取消注释），或者在特定硬件驱动中重新定义了枚举
+    //!       (VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED)，只要定义了至少一个实际命令，
+    //!       就可以删除此 DUMMY 值。
+    __VSF_FLASH_CTRL_DUMMY = 0,
+
+    /*
+    //! \~english Optional control commands for pause/resume functionality
+    //! \~chinese 可选的暂停/恢复控制命令
+    VSF_FLASH_CTRL_REQUEST_PAUSE  = (0x1ul << 0),    //! \~english Request to pause Flash operation \~chinese 请求暂停 Flash 操作
+    VSF_FLASH_CTRL_REQUEST_RESUME = (0x1ul << 1),    //! \~english Request to resume Flash operation \~chinese 请求恢复 Flash 操作
+    #define VSF_FLASH_CTRL_REQUEST_PAUSE VSF_FLASH_CTRL_REQUEST_PAUSE
+    #define VSF_FLASH_CTRL_REQUEST_RESUME VSF_FLASH_CTRL_REQUEST_RESUME
+    */
+
+    /*
+    //! \~english Optional control commands for power management
+    //! \~chinese 可选的电源管理控制命令
+    VSF_FLASH_CTRL_POWER_DOWN    = (0x1ul << 2),    //! \~english Put Flash into power down mode \~chinese 使 Flash 进入掉电模式
+    VSF_FLASH_CTRL_POWER_UP      = (0x1ul << 3),    //! \~english Wake Flash from power down mode \~chinese 从掉电模式唤醒 Flash
+    #define VSF_FLASH_CTRL_POWER_DOWN VSF_FLASH_CTRL_POWER_DOWN
+    #define VSF_FLASH_CTRL_POWER_UP VSF_FLASH_CTRL_POWER_UP
+    */
+} vsf_flash_ctrl_t;
 #endif
 
 typedef struct vsf_flash_op_t {
@@ -578,6 +652,30 @@ extern vsf_err_t vsf_flash_read_multi_sector(vsf_flash_t *flash_ptr,
                                              uint8_t* buffer,
                                              vsf_flash_size_t size_of_bytes);
 
+/**
+ * \~english
+ * @brief Execute a control command on the Flash instance
+ * @param[in,out] flash_ptr: Pointer to Flash instance structure @ref vsf_flash_t
+ * @param[in] ctrl: Control command from @ref vsf_flash_ctrl_t enumeration
+ * @param[in] param: Command-specific parameter (can be NULL depending on command)
+ * @return vsf_err_t: VSF_ERR_NONE if command executed successfully,
+ *                    VSF_ERR_NOT_SUPPORT if command is not supported,
+ *                    other error codes defined by vsf_err_t for specific failures
+ * @note Available commands and their parameters are hardware-dependent
+ * @note Some commands may not be supported on all hardware platforms
+ * \~chinese
+ * @brief 对 Flash 实例执行控制命令
+ * @param[in,out] flash_ptr: 指向 Flash 实例结构体 @ref vsf_flash_t 的指针
+ * @param[in] ctrl: 控制命令，取值来自 @ref vsf_flash_ctrl_t 枚举
+ * @param[in] param: 命令专用参数（根据命令类型可为 NULL）
+ * @return vsf_err_t: 命令执行成功返回 VSF_ERR_NONE，
+ *                    命令不支持返回 VSF_ERR_NOT_SUPPORT，
+ *                    其他特定失败返回 vsf_err_t 定义的错误码
+ * @note 可用命令及其参数依赖于具体硬件
+ * @note 某些命令可能并非所有硬件平台都支持
+ */
+extern vsf_err_t vsf_flash_ctrl(vsf_flash_t *flash_ptr, vsf_flash_ctrl_t ctrl, void *param);
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /// @cond
@@ -602,6 +700,7 @@ extern vsf_err_t vsf_flash_read_multi_sector(vsf_flash_t *flash_ptr,
 #   define vsf_flash_read_one_sector(__FLASH, ...)    VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_read_one_sector)    ((__vsf_flash_t *)(__FLASH), ##__VA_ARGS__)
 #   define vsf_flash_read_multi_sector(__FLASH, ...)  VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_read_multi_sector)  ((__vsf_flash_t *)(__FLASH), ##__VA_ARGS__)
 #   define vsf_flash_read(__FLASH, ...)               VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_read_multi_sector)  ((__vsf_flash_t *)(__FLASH), ##__VA_ARGS__)
+#   define vsf_flash_ctrl(__FLASH, ...)               VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_ctrl)               ((__vsf_flash_t *)(__FLASH), ##__VA_ARGS__)
 #endif
 /// @endcond
 

@@ -31,6 +31,7 @@
 #define vsf_real_flash_write_multi_sector                           VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)
 #define vsf_real_flash_read_one_sector                              VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_one_sector)
 #define vsf_real_flash_read_multi_sector                            VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)
+#define vsf_real_flash_ctrl                                         VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_ctrl)
 
 #ifndef VSF_FLASH_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #   define VSF_FLASH_CFG_REIMPLEMENT_API_GET_CONFIGURATION          DISABLED
@@ -198,6 +199,7 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 #undef vsf_real_flash_read_multi_sector
 #undef vsf_real_flash_capability
 #undef vsf_real_flash_get_configuration
+#undef vsf_real_flash_ctrl
 
 /*============================ MACROS ========================================*/
 
@@ -222,6 +224,7 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 #   define vsf_imp_flash_read_multi_sector    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)
 #   define vsf_imp_flash_read                 VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)
 #   define vsf_imp_flash_get_configuration    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_get_configuration)
+#   define vsf_imp_flash_ctrl                 VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_ctrl)
 
 #   define vsf_remap_flash_t                  VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_t)
 #   define vsf_remap_flash_init               VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_init)
@@ -243,6 +246,7 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 #   define vsf_remap_flash_read_multi_sector  VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_read_multi_sector)
 #   define vsf_remap_flash_read               VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_read_multi_sector)
 #   define vsf_remap_flash_get_configuration  VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_get_configuration)
+#   define vsf_remap_flash_ctrl               VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_ctrl)
 
 #   define VSF_FLASH_CFG_IMP_REMAP_FUNCTIONS                                                                                              \
         vsf_err_t vsf_imp_flash_init(vsf_imp_flash_t *flash_ptr, vsf_flash_cfg_t *cfg_ptr)                                                \
@@ -325,6 +329,11 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
         {                                                                                                                                 \
             VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
             return vsf_remap_flash_get_configuration((vsf_remap_flash_t *)flash_ptr, cfg_ptr);                                            \
+        }                                                                                                                                 \
+        vsf_err_t vsf_imp_flash_ctrl(vsf_imp_flash_t *flash_ptr, vsf_flash_ctrl_t ctrl, void *param)                                      \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            return vsf_remap_flash_ctrl((vsf_remap_flash_t *)flash_ptr, ctrl, param);                                                      \
         }
 #endif
 
@@ -381,6 +390,7 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 #undef vsf_imp_flash_read_multi_sector
 #undef vsf_imp_flash_read
 #undef vsf_imp_flash_get_configuration
+#undef vsf_imp_flash_ctrl
 
 #undef vsf_remap_flash_t
 #undef vsf_remap_flash_init
@@ -402,5 +412,6 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 #undef vsf_remap_flash_read_multi_sector
 #undef vsf_remap_flash_read
 #undef vsf_remap_flash_get_configuration
+#undef vsf_remap_flash_ctrl
 
 #endif  /* VSF_HAL_USE_FLASH */

@@ -69,7 +69,6 @@ extern "C" {
 // HW
 /*\note hw FLASH driver can reimplement following types:
  *      To enable reimplementation, please enable macro below:
- *          VSF_FLASH_CFG_REIMPLEMENT_TYPE_MODE for vsf_flash_mode_t
  *          VSF_FLASH_CFG_REIMPLEMENT_TYPE_STATUS for vsf_flash_status_t
  *          VSF_FLASH_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_flash_irq_mask_t
  *          VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL for vsf_flash_ctrl_t
@@ -79,7 +78,6 @@ extern "C" {
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
 
-#define VSF_FLASH_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
 #define VSF_FLASH_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
 #define VSF_FLASH_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
 #define VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
@@ -170,6 +168,12 @@ typedef struct vsf_flash_capability_t {
         uint8_t none_sector_aligned_read  : 1;
     };
 } vsf_flash_capability_t;
+#endif
+
+#if VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
+typedef enum vsf_flash_ctrl_t {
+    __VSF_FLASH_CTRL_DUMMY = 0,
+} vsf_flash_ctrl_t;
 #endif
 // HW/IPCore end
 
