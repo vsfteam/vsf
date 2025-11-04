@@ -71,12 +71,9 @@
 #   define VSF_HW_FLASH_COUNT           1
 #endif
 #if VSF_HW_FLASH_COUNT >= 1
-#   ifndef VSF_HW_FLASH0_ADDR
-#       define VSF_HW_FLASH0_ADDR       0x08000000
-#   endif
-#   ifndef VSF_HW_FLASH0_REG
-#       define VSF_HW_FLASH0_REG        FLASH
-#   endif
+#   define VSF_HW_FLASH0_ADDR           0x08000000
+#   define VSF_HW_FLASH0_REG            FLASH
+#   define VSF_HW_FLASH0_IRQN           4       // FLASH_IRQn
 #endif
 
 // GPIO: PORT0..PORT3, PORT5

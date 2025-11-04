@@ -29,6 +29,7 @@
 #       include "hal/vsf_hal_cfg.h"
 #       include "../__device.h"
 
+#       include "./flash/flash.h"
 #       include "./gpio/gpio.h"
 #       include "./exti/exti.h"
 #       include "./usart/usart.h"
@@ -40,10 +41,6 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
-
-
-
 /*============================ INCLUDES ======================================*/
 
 #if VSF_HAL_USE_GPIO == ENABLED
