@@ -7118,11 +7118,10 @@
                 <option>
                     <name>CCDefines</name>
                     <state>__VSF__</state>
+                    <state>__VSF_CPP__</state>
                     <state>__Artery__</state>
                     <state>__AT32F405KCU7_4__</state>
                     <state>AT32F405KCU7_4</state>
-                    <state>__OOC_CPP__</state>
-                    <state>AT_START_F405_V1</state>
                     <state>USE_STDPERIPH_DRIVER</state>
                 </option>
                 <option>
@@ -16135,6 +16134,60 @@
                         <group>
                             <name>common</name>
                             <group>
+                                <name>exti</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\exti\exti.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\exti\exti.h</name>
+                                </file>
+                            </group>
+                            <group>
+                                <name>flash</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\flash\flash.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\flash\flash.h</name>
+                                </file>
+                            </group>
+                            <group>
+                                <name>gpio</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\gpio\gpio.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\gpio\gpio.h</name>
+                                </file>
+                            </group>
+                            <group>
+                                <name>i2c</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\i2c\i2c.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\i2c\i2c.h</name>
+                                </file>
+                            </group>
+                            <group>
+                                <name>spi</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\spi\spi.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\spi\spi.h</name>
+                                </file>
+                            </group>
+                            <group>
+                                <name>usart</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\usart\usart.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\usart\usart.h</name>
+                                </file>
+                            </group>
+                            <group>
                                 <name>usb</name>
                                 <group>
                                     <name>dc</name>
@@ -16419,6 +16472,12 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\dma\dma_template.inc</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>exti</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\common\exti\exti_common.c</name>
                         </file>
                     </group>
                     <group>
