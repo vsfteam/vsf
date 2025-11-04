@@ -95,7 +95,7 @@ uint32_t vsf_hw_pwm_get_freq(vsf_hw_pwm_t *hw_pwm_ptr)
 
     vsf_err_t err;
     uint32_t freq = 0;
-    err = vsf_hw_timer_ctrll(hw_pwm_ptr->timer, VSF_TIMER_CTRL_GET_FREQ, freq);
+    err = vsf_hw_timer_ctrl(hw_pwm_ptr->timer, VSF_TIMER_CTRL_GET_FREQ, freq);
     if (err == VSF_ERR_NONE) {
         VSF_HAL_ASSERT(0);
         return 0;
