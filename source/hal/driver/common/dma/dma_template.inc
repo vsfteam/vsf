@@ -84,7 +84,7 @@ vsf_dma_capability_t vsf_real_dma_capability(vsf_real_dma_t *dma_ptr)
 }
 #endif
 
-#if VSF_DMA_CFG_REIMPLEMENT_API_SG_CONFIG == DISABLED
+#if VSF_DMA_CFG_REIMPLEMENT_API_SG_CONFIG_DESC == DISABLED
 vsf_err_t vsf_real_dma_channel_sg_config_desc(vsf_real_dma_t *dma_ptr, uint8_t channel, vsf_dma_isr_t isr,
             vsf_dma_channel_sg_desc_t *sg_desc_ptr, uint32_t sg_count)
 {
