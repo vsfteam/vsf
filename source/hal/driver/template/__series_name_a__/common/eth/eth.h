@@ -153,7 +153,6 @@ typedef enum vsf_eth_irq_mask_t {
     VSF_ETH_IRQ_MASK_SG_TX_COMPLETE  = (1 << 3),
     VSF_ETH_IRQ_MASK_PHY_LINK_CHANGE = (1 << 4),
     VSF_ETH_IRQ_MASK_ERROR           = (1 << 5),
-    VSF_ETH_IRQ_MASK_OVERFLOW        = (1 << 6),
 
     // Add more vendor-specific interrupt masks here
 } vsf_eth_irq_mask_t;
