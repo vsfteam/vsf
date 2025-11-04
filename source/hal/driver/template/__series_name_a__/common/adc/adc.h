@@ -128,6 +128,22 @@ typedef enum vsf_adc_mode_t {
 } vsf_adc_mode_t;
 #endif
 
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE == ENABLED
+typedef enum vsf_adc_channel_mode_t {
+    VSF_ADC_CHANNEL_GAIN_1_6        = (0 << 0),
+    VSF_ADC_CHANNEL_GAIN_1_5        = (1 << 0),
+    VSF_ADC_CHANNEL_GAIN_1_4        = (2 << 0),
+    VSF_ADC_CHANNEL_GAIN_1_3        = (3 << 0),
+    VSF_ADC_CHANNEL_GAIN_1_2        = (4 << 0),
+    VSF_ADC_CHANNEL_GAIN_1          = (5 << 0),
+    VSF_ADC_CHANNEL_REF_VDD_1       = (0 << 4),
+    VSF_ADC_CHANNEL_REF_VDD_1_2     = (1 << 4),
+    VSF_ADC_CHANNEL_REF_VDD_1_3     = (2 << 4),
+    VSF_ADC_CHANNEL_REF_VDD_1_4     = (3 << 4),
+    // more vendor specified channel mode can be added here
+} vsf_adc_channel_mode_t;
+#endif
+
 #if VSF_ADC_CFG_REIMPLEMENT_TYPE_IRQ_MASK == ENABLED
 typedef enum vsf_adc_irq_mask_t {
     VSF_ADC_IRQ_MASK_CPL = (0x1ul << 0),
@@ -144,6 +160,15 @@ typedef struct vsf_adc_status_t {
         uint32_t value;
     };
 } vsf_adc_status_t;
+#endif
+
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == ENABLED
+typedef struct vsf_adc_channel_cfg_t {
+    uint32_t channel;
+    vsf_adc_channel_mode_t mode;
+    uint32_t sample_cycles;
+    // more vendor specified channel cfg can be added here
+} vsf_adc_channel_cfg_t;
 #endif
 
 #if VSF_ADC_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
