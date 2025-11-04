@@ -39,7 +39,6 @@ extern "C" {
 // HW
 /*\note hw FLASH driver can reimplement following types:
  *      To enable reimplementation, please enable macro below:
- *          VSF_FLASH_CFG_REIMPLEMENT_TYPE_MODE for vsf_flash_mode_t
  *          VSF_FLASH_CFG_REIMPLEMENT_TYPE_STATUS for vsf_flash_status_t
  *          VSF_FLASH_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_flash_irq_mask_t
  *          VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL for vsf_flash_ctrl_t
@@ -49,7 +48,6 @@ extern "C" {
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
 
-#define VSF_FLASH_CFG_REIMPLEMENT_TYPE_MODE         DISABLED
 #define VSF_FLASH_CFG_REIMPLEMENT_TYPE_STATUS       DISABLED
 #define VSF_FLASH_CFG_REIMPLEMENT_TYPE_IRQ_MASK     DISABLED
 #define VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL         DISABLED

@@ -204,6 +204,9 @@ static void VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(
  *              VSF_FLASH_CFG_CAPABILITY_WRITE_SECTORE_SIZE (default: 512)
  *              VSF_FLASH_CFG_CAPABILITY_NONE_SECTOR_ALIGNED_WRITE (default: 0)
  *              VSF_FLASH_CFG_CAPABILITY_NONE_SECTOR_ALIGNED_READ (default: 1)
+ *      VSF_FLASH_CFG_REIMPLEMENT_API_CTRL for flash_ctrl.
+ *          Default implementation will return VSF_ERR_NOT_SUPPORT for all control commands.
+ *          Hardware drivers should implement specific control commands based on hardware capabilities.
  */
 
 vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_get_configuration)(
@@ -235,6 +238,18 @@ vsf_flash_capability_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
         .none_sector_aligned_write = 0,
         .none_sector_aligned_read  = 0,
     };
+}
+
+vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_ctrl)(
+    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr,
+    vsf_flash_ctrl_t ctrl,
+    void *param
+) {
+    VSF_HAL_ASSERT(flash_ptr != NULL);
+
+    // Template implementation: return VSF_ERR_NOT_SUPPORT for all control commands
+    // Hardware drivers should implement specific control commands based on hardware capabilities
+    return VSF_ERR_NOT_SUPPORT;
 }
 // HW end
 
