@@ -72,13 +72,13 @@ typedef enum vsf_flash_irq_mask_t {
     // 3: RESERVED in FLASH_STS
     VSF_FLASH_IRQ_WRITE_MASK        = (1 << 3),
     // 6: RESERVED in FLASH_STS
-    VSF_FLASH_IRQ_READ_MASK         = (1 << 2),
+    VSF_FLASH_IRQ_READ_MASK         = (1 << 6),
     // 4: EPPERR(4) in FLASH_STS
     VSF_FLASH_IRQ_ERASE_ERROR_MASK  = (1 << 4),
     // 2|4: PRGMERR(2)|EPPERR(4) in FLASH_STS
     VSF_FLASH_IRQ_WRITE_ERROR_MASK  = (1 << 2) | (1 << 4),
     // 7: RESERVED in FLASH_STS
-    VSF_FLASH_IRQ_READ_ERROR_MASK   = (1 << 5),
+    VSF_FLASH_IRQ_READ_ERROR_MASK   = (1 << 7),
 } vsf_flash_irq_mask_t;
 #endif
 

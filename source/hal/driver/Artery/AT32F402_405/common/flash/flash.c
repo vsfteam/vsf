@@ -160,7 +160,6 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_multi_sector)(
     flash_ptr->cur_size = size;
     flash_ptr->cur_addr = offset;
     flash_ptr->erase0_write1 = 0;
-    reg->addr = flash_ptr->cur_addr + flash_ptr->addr;
 
     VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_unlock)(reg);
     if (flash_ptr->irq_mask & (VSF_FLASH_IRQ_ERASE_MASK | VSF_FLASH_IRQ_WRITE_MASK)) {
@@ -169,6 +168,7 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_multi_sector)(
     if (flash_ptr->irq_mask & (VSF_FLASH_IRQ_ERASE_MASK | VSF_FLASH_IRQ_WRITE_MASK)) {
         reg->ctrl_bit.errie = 1;
     }
+    reg->addr = flash_ptr->cur_addr + flash_ptr->addr;
     reg->ctrl |= (1 << 1) | (1 << 6);
     return VSF_ERR_NONE;
 }
@@ -204,7 +204,7 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)(
     reg->ctrl_bit.fprgm = 1;
     *(uint32_t *)flash_ptr->cur_addr = get_unaligned_le32(flash_ptr->cur_buffer);
 
-    return VSF_ERR_FAIL;
+    return VSF_ERR_NONE;
 }
 
 vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)(
@@ -221,7 +221,7 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)(
     if ((flash_ptr->irq_mask & VSF_FLASH_IRQ_READ_MASK) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_flash_t *)flash_ptr, VSF_FLASH_IRQ_READ_MASK);
     }
-    return VSF_ERR_FAIL;
+    return VSF_ERR_NONE;
 }
 
 vsf_flash_status_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_status)(
@@ -239,6 +239,7 @@ static void VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(
 
     flash_type *reg = flash_ptr->reg;
     vsf_flash_irq_mask_t irq_mask = reg->sts;
+    reg->sts = irq_mask;
     if (irq_mask & (1 << 5)) {
         irq_mask |= 1 << ((flash_ptr->erase0_write1 << 1) + 1);
     }
