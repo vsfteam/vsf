@@ -71,6 +71,7 @@ extern "C" {
  *      To enable reimplementation, please enable macro below:
  *          VSF_DAC_CFG_REIMPLEMENT_TYPE_STATUS for vsf_dac_status_t
  *          VSF_DAC_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_dac_irq_mask_t
+ *          VSF_DAC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG for vsf_dac_channel_cfg_t
  *          VSF_DAC_CFG_REIMPLEMENT_TYPE_CFG for vsf_dac_cfg_t
  *          VSF_DAC_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_dac_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
@@ -79,6 +80,7 @@ extern "C" {
 
 #define VSF_DAC_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
 #define VSF_DAC_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
+#define VSF_DAC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG  ENABLED
 #define VSF_DAC_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
 #define VSF_DAC_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end
@@ -123,6 +125,14 @@ typedef struct vsf_dac_status_t {
         };
     };
 } vsf_dac_status_t;
+#endif
+
+#if VSF_DAC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == ENABLED
+typedef struct vsf_dac_channel_cfg_t {
+    uint8_t channel;      //!< \~english Channel index \~chinese 通道索引
+    uint8_t resolution;   //!< \~english Channel resolution \~chinese 通道分辨率
+    // more vendor specified channel cfg can be added here
+} vsf_dac_channel_cfg_t;
 #endif
 
 #if VSF_DAC_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
