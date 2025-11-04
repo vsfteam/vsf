@@ -277,7 +277,8 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
     vsf_usart_isr_t *isr_ptr = &usart_ptr->isr;
     vsf_usart_irq_mask_t irq_mask = reg->sts & usart_ptr->irq_mask;
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
-        reg->sts &= ~irq_mask;
+        // DO NOT clear VSF_USART_IRQ_MASK_RX, it should be set/cleared according rxfifo status by hardware.
+        reg->sts &= ~irq_mask | VSF_USART_IRQ_MASK_RX;
         reg->ifc |= irq_mask;
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_usart_t *)usart_ptr, irq_mask);
     }
