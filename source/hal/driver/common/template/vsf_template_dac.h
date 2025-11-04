@@ -208,7 +208,7 @@ enum {
 };
 
 //! dac channel configuration
-#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == DISABLED
+#if VSF_DAC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == DISABLED
 /**
  * \~english
  * @brief Configuration structure for DAC channel
