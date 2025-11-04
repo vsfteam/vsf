@@ -135,7 +135,7 @@ typedef enum vsf_timer_irq_mask_t {
 } vsf_timer_irq_mask_t;
 #endif
 
-#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
+#if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
 typedef enum vsf_timer_ctrl_t {
     __VSF_TIMER_CTRL_DUMMY = 0,
 

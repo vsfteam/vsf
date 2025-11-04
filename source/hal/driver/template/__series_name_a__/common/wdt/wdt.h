@@ -117,14 +117,6 @@ typedef enum vsf_wdt_mode_t {
 } vsf_wdt_mode_t;
 #endif
 
-#if VSF_WDT_CFG_REIMPLEMENT_TYPE_IRQ_MASK == ENABLED
-typedef enum vsf_wdt_irq_mask_t {
-    VSF_WDT_IRQ_MASK_OVERFLOW = (0x01 << 0),
-
-    // more vendor specified irq_masks can be added here
-} vsf_wdt_irq_mask_t;
-#endif
-
 #if VSF_WDT_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
 typedef enum vsf_wdt_ctrl_t {
     __VSF_WDT_CTRL_DUMMY = 0,

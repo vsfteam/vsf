@@ -105,7 +105,7 @@ vsf_class(vsf_${usart_ip}_usart_t) {
  */
 
     protected_member(
-        vsf_${usart_ip}_iwc_reg_t  *reg;
+        vsf_${usart_ip}_usart_reg_t *reg;
         vsf_usart_isr_t             isr;
     )
 };
@@ -202,6 +202,10 @@ typedef enum vsf_usart_irq_mask_t {
     // or VSF_USART_IRQ_MASK_RX_IDLE will be mapped to VSF_USART_IRQ_MASK_RX_TIMEOUT
     //VSF_USART_IRQ_MASK_RX_IDLE          = (0x1ul << 12),
     //#define VSF_USART_IRQ_MASK_RX_IDLE      VSF_USART_IRQ_MASK_RX_IDLE
+
+    // only include VSF_USART_IRQ_MASK_NOISE_ERR if hardware supports NOISE_ERR interrupt
+    //VSF_USART_IRQ_MASK_NOISE_ERR        = (0x1UL << 13),
+    //#define VSF_USART_IRQ_MASK_NOISE_ERR VSF_USART_IRQ_MASK_NOISE_ERR
 
     // more vendor specified irq_masks can be added here
 } vsf_usart_irq_mask_t;
