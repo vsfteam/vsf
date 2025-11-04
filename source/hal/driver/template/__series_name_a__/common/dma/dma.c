@@ -95,8 +95,6 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_init)(
 ) {
     VSF_HAL_ASSERT(NULL != dma_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);
-    // configure according to cfg_ptr
-    dma_ptr->isr = cfg_ptr->isr;
     // configure interrupt according to cfg_ptr->isr
     return VSF_ERR_NONE;
 }
