@@ -84,6 +84,8 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
 
     usart_type *reg = usart_ptr->reg;
 
+    vsf_hw_peripheral_enable(usart_ptr->en);
+
     // baudrate
     uint32_t clk_hz = vsf_hw_clk_get_freq_hz(usart_ptr->clk);
     if (!clk_hz) {
@@ -91,11 +93,10 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
         return VSF_ERR_BUG;
     }
     clk_hz /= cfg_ptr->baudrate;
-    if (clk_hz >= 0x10000) {
+    if (clk_hz < 16 || clk_hz >= 0x10000) {
         VSF_HAL_ASSERT(false);
         return VSF_ERR_NOT_SUPPORT;
     }
-    reg->baudr = clk_hz;
 
     uint32_t enabled = reg->ctrl1_bit.uen;
     if (enabled) {
@@ -107,6 +108,7 @@ vsf_err_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_init)(
     reg->ctrl3 =    (reg->ctrl3 & ~(__VSF_HW_USART_CTRL3_MASK << __VSF_HW_USART_CTRL3_SHIFT_BITS))
                 |   ((cfg_ptr->mode & __VSF_HW_USART_CTRL3_MASK) << __VSF_HW_USART_CTRL3_SHIFT_BITS);
     reg->rtov = cfg_ptr->rx_timeout;
+    reg->baudr = clk_hz;
     if (enabled) {
         reg->ctrl1_bit.uen = 1;
     }
@@ -361,10 +363,12 @@ int_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)(
 vsf_usart_capability_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
+    VSF_HAL_ASSERT(NULL != usart_ptr);
+    uint32_t clk_hz = vsf_hw_clk_get_freq_hz(usart_ptr->clk);
     return (vsf_usart_capability_t) {
         .irq_mask                    = VSF_USART_IRQ_ALL_BITS_MASK,
-        .max_baudrate                = 0,
-        .min_baudrate                = 0,
+        .max_baudrate                = clk_hz >> 4,
+        .min_baudrate                = clk_hz >> 16,
         .min_data_bits               = 7,
         .max_data_bits               = 8,
         .txfifo_depth                = 1,
