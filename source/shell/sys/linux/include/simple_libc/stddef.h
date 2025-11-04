@@ -64,13 +64,17 @@ typedef unsigned short              wint_t;
 extern "C" {
 #endif
 
+// DO not define BOOL, it will conflict with system headers in some platforms
+// TRUE and FALSE maybe conflict with headers from chip vendor,
+//  so only define them only when necessary for some platform/arch.
+#if 0
 #ifndef TRUE
 #   define TRUE                     1
 #endif
 #ifndef FALSE
 #   define FALSE                    0
 #endif
-// DO not define BOOL, it will conflict with system headers in some platform
+#endif
 
 #ifndef offsetof
 // use offsetof from compiler if available for constexpr feature in cpp
