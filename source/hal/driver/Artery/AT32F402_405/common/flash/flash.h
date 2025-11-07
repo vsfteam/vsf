@@ -51,6 +51,7 @@ extern "C" {
  *      To enable reimplementation, please enable macro below:
  *          VSF_FLASH_CFG_REIMPLEMENT_TYPE_STATUS for vsf_flash_status_t
  *          VSF_FLASH_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_flash_irq_mask_t
+ *          VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL for vsf_flash_ctrl_t
  *          VSF_FLASH_CFG_REIMPLEMENT_TYPE_CFG for vsf_flash_cfg_t
  *          VSF_FLASH_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_flash_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
