@@ -80,7 +80,8 @@ extern "C" {
  *          VSF_ETH_CFG_REIMPLEMENT_TYPE_BUF_DESC for vsf_eth_buf_desc_t
  *          VSF_ETH_CFG_REIMPLEMENT_TYPE_SEND_BUF_DESC for vsf_eth_send_buf_desc_t
  *          VSF_ETH_CFG_REIMPLEMENT_TYPE_RECV_BUF_DESC for vsf_eth_recv_buf_desc_t
- *          VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_BUF_DESC for vsf_eth_sg_buf_desc_t
+ *          VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_SEND_BUF for vsf_eth_send_sg_buf_desc_t
+ *          VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_RECV_BUF for vsf_eth_recv_sg_buf_desc_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
@@ -96,7 +97,8 @@ extern "C" {
 #define VSF_ETH_CFG_REIMPLEMENT_TYPE_BUF_DESC       ENABLED
 #define VSF_ETH_CFG_REIMPLEMENT_TYPE_SEND_BUF_DESC  ENABLED
 #define VSF_ETH_CFG_REIMPLEMENT_TYPE_RECV_BUF_DESC  ENABLED
-#define VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_BUF_DESC    ENABLED
+#define VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_SEND_BUF   ENABLED
+#define VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_RECV_BUF   ENABLED
 // HW end
 
 /*============================ ETHROFIED FUNCTIONS ===========================*/
@@ -243,11 +245,11 @@ typedef vsf_eth_buf_desc_t vsf_eth_send_buf_desc_t;
 typedef vsf_eth_buf_desc_t vsf_eth_recv_buf_desc_t;
 #endif
 
-#if VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_SEND_BUF == DISABLED
+#if VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_SEND_BUF == ENABLED
 typedef vsf_eth_buf_desc_t vsf_eth_send_sg_buf_desc_t;
 #endif
 
-#if VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_RECV_BUF == DISABLED
+#if VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_RECV_BUF == ENABLED
 typedef vsf_eth_buf_desc_t vsf_eth_recv_sg_buf_desc_t;
 #endif
 // HW/IPCore end

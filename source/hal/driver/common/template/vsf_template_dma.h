@@ -159,6 +159,16 @@ extern "C" {
 
 /**
  * \~english
+ * @brief Enable the option to reimplement DMA channel status type.
+ * \~chinese
+ * @brief 启用重新实现DMA通道状态类型的选项。
+ */
+#ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS
+#   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS          DISABLED
+#endif
+
+/**
+ * \~english
  * @brief Enable the option to reimplement capability type.
  * For compatibility, do not delete members when redefining vsf_dma_capability_t
  *
@@ -465,7 +475,7 @@ typedef struct vsf_dma_channel_sg_desc_t {
 } vsf_dma_channel_sg_desc_t;
 #endif
 
-#if VSF_DMA_CFG_REIMPLEMENT_TYPE_STATUS == DISABLED
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS == DISABLED
 typedef struct vsf_dma_channel_status_t {
     union {
         inherit(vsf_peripheral_status_t)

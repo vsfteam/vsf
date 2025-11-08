@@ -74,6 +74,7 @@ extern "C" {
  *          VSF_ADC_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_adc_irq_mask_t
  *          VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG for vsf_adc_channel_cfg_t
  *          VSF_ADC_CFG_REIMPLEMENT_TYPE_CFG for vsf_adc_cfg_t
+ *          VSF_ADC_CFG_REIMPLEMENT_TYPE_STATUS for vsf_adc_status_t
  *          VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_adc_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
@@ -84,6 +85,7 @@ extern "C" {
 #define VSF_ADC_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
 #define VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG  ENABLED
 #define VSF_ADC_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_ADC_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
 #define VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end
 
@@ -159,6 +161,8 @@ typedef struct vsf_adc_status_t {
         };
         uint32_t value;
     };
+
+    // more vendor specified status can be added here
 } vsf_adc_status_t;
 #endif
 

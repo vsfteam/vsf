@@ -176,6 +176,19 @@ extern "C" {
 
 /**
  * \~english
+ * @brief Enable macro VSF_I2C_CFG_REIMPLEMENT_TYPE_CAPABILITY in specific hardware
+ * drivers to redefine struct @ref vsf_i2c_capability_t. For compatibility, members should not
+ * be deleted when redefining.
+ * \~chinese
+ * @brief 在特定硬件驱动中启用宏 VSF_I2C_CFG_REIMPLEMENT_TYPE_CAPABILITY
+ * 来重新定义结构体 @ref vsf_i2c_capability_t。为保证兼容性，重新定义时不应删除成员。
+ */
+#ifndef VSF_I2C_CFG_REIMPLEMENT_TYPE_CAPABILITY
+#    define VSF_I2C_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
+#endif
+
+/**
+ * \~english
  * @brief Enable macro VSF_I2C_CFG_INHERIT_HAL_CAPABILITY in specific hardware
  * drivers to incorporate HAL capability structure into @ref vsf_i2c_capability_t.
  * \~chinese

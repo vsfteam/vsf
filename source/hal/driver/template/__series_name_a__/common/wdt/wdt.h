@@ -117,14 +117,6 @@ typedef enum vsf_wdt_mode_t {
 } vsf_wdt_mode_t;
 #endif
 
-#if VSF_WDT_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
-typedef enum vsf_wdt_ctrl_t {
-    __VSF_WDT_CTRL_DUMMY = 0,
-
-    // more vendor specified ctrl can be added here
-} vsf_wdt_ctrl_t;
-#endif
-
 #if VSF_WDT_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
 typedef struct vsf_wdt_t vsf_wdt_t;
 typedef void vsf_wdt_isr_handler_t(void *target_ptr, vsf_wdt_t *wdt_ptr);
