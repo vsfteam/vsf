@@ -1352,14 +1352,14 @@ vsf_linux_process_t * vsf_linux_create_process(int stack_size, int heap_size, in
         process->parent_process = cur_process;
         process->shell_process = cur_process->shell_process;
 
+        vsf_protect_t orig = vsf_protect_sched();
+            vsf_dlist_add_to_tail(vsf_linux_process_t, child_node, &cur_process->child_list, process);
+        vsf_unprotect_sched(orig);
+
         process->working_dir = __strdup_ex(process, cur_process->working_dir);
         if (NULL == process->working_dir) {
             goto delete_process_and_fail;
         }
-
-        vsf_protect_t orig = vsf_protect_sched();
-            vsf_dlist_add_to_tail(vsf_linux_process_t, child_node, &cur_process->child_list, process);
-        vsf_unprotect_sched(orig);
 
 #if VSF_LINUX_LIBC_USE_ENVIRON == ENABLED
         if (vsf_linux_merge_env(process, cur_process->__environ) < 0) {
@@ -1451,12 +1451,21 @@ void vsf_linux_cleanup_process(vsf_linux_process_t *process)
 
 void vsf_linux_delete_process(vsf_linux_process_t *process)
 {
-    vsf_linux_cleanup_process(process);
+    VSF_LINUX_ASSERT(process != NULL);
+    VSF_LINUX_ASSERT(process->status == 0);
 
-    // DO NOT free process here, should be freed in waitpid in host process
-    if (NULL == process->parent_process) {
-        vsf_linux_free_res(process);
+    __vsf_dlist_foreach_unsafe(vsf_linux_thread_t, thread_node, &process->thread_list) {
+        vsf_dlist_remove(vsf_linux_thread_t, thread_node, &process->thread_list, _);
+        vsf_linux_process_heap_free(process, _);
     }
+
+    vsf_linux_cleanup_process(process);
+    vsf_linux_detach_process(process);
+    vsf_protect_t orig = vsf_protect_sched();
+        vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
+    vsf_unprotect_sched(orig);
+
+    vsf_linux_free_res(process);
 }
 
 VSF_CAL_NO_RETURN void vsf_linux_exit_process(int status, bool _exit)
@@ -1563,7 +1572,9 @@ VSF_CAL_NO_RETURN void vsf_linux_exit_process(int status, bool _exit)
 
     // 8. exit current thread
     if (PID_STATUS_DAEMON == process->status) {
-        vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
+        orig = vsf_protect_sched();
+            vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
+        vsf_unprotect_sched(orig);
     }
     cur_thread->process = NULL;
 end_no_return:
@@ -2718,7 +2729,9 @@ done:
     vsf_linux_process_t *process = vsf_linux_get_process(cur_thread->pid_exited);
     if (process->status != PID_STATUS_DAEMON) {
         vsf_linux_detach_process(process);
-        vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
+        vsf_protect_t orig = vsf_protect_sched();
+            vsf_dlist_remove(vsf_linux_process_t, process_node, &__vsf_linux.process_list, process);
+        vsf_unprotect_sched(orig);
         vsf_linux_free_res(process);
     }
     return cur_thread->pid_exited;

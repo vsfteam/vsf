@@ -73,28 +73,28 @@ extern "C" {
 #endif
 
 #if VSF_HEAP_CFG_TRACE == ENABLED
-#   define vsf_heap_malloc_aligned(...)                                         \
+#   define vsf_heap_malloc_aligned(__size, __alignment)                         \
     ({                                                                          \
-        void * ptr = vsf_heap_malloc_aligned_imp(__VA_ARGS__);                  \
-        vsf_trace_debug("%s: malloc_align 0x%p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ptr);\
+        void * ptr = vsf_heap_malloc_aligned_imp(__size, __alignment);          \
+        vsf_trace_debug("%s: malloc_align 0x%p %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ptr, __size);\
         ptr;                                                                    \
     })
-#   define vsf_heap_malloc(...)                                                 \
+#   define vsf_heap_malloc(__size)                                              \
     ({                                                                          \
-        void * ptr = vsf_heap_malloc_imp(__VA_ARGS__);                          \
-        vsf_trace_debug("%s: malloc 0x%p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ptr);\
+        void * ptr = vsf_heap_malloc_imp(__size);                               \
+        vsf_trace_debug("%s: malloc 0x%p %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ptr, __size);\
         ptr;                                                                    \
     })
-#   define vsf_heap_realloc_aligned(...)                                        \
+#   define vsf_heap_realloc_aligned(__buffer, __size, __alignment)              \
     ({                                                                          \
-        void * ptr = vsf_heap_realloc_aligned_imp(__VA_ARGS__);                 \
-        vsf_trace_debug("%s: realloc_align 0x%p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ptr);\
+        void * ptr = vsf_heap_realloc_aligned_imp(__buffer, __size, __alignment);\
+        vsf_trace_debug("%s: realloc_align 0x%p --> 0x%p %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, __buffer, ptr, __size);\
         ptr;                                                                    \
     })
-#   define vsf_heap_realloc(...)                                                \
+#   define vsf_heap_realloc(__buffer, __size)                                   \
     ({                                                                          \
-        void * ptr = vsf_heap_realloc_imp(__VA_ARGS__);                         \
-        vsf_trace_debug("%s: realloc 0x%p" VSF_TRACE_CFG_LINEEND, __FUNCTION__, ptr);\
+        void * ptr = vsf_heap_realloc_imp(__buffer, __size);                    \
+        vsf_trace_debug("%s: realloc 0x%p --> 0x%p %d" VSF_TRACE_CFG_LINEEND, __FUNCTION__, __buffer, ptr, __size);\
         ptr;                                                                    \
     })
 #   define vsf_heap_free(__ptr)                                                 \
