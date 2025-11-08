@@ -107,17 +107,20 @@ vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_init)(
     }
 
     uint32_t div = low_cycles >> 8;
-    if (!(low_cycles & 0xFF)) {
-        div--;
+    if (low_cycles & 0xFF) {
+        div++;
     }
-    if (div >= 0x100) {
+    if (div > 0x100) {
         // i2c clock is too low to support
         VSF_HAL_ASSERT(false);
         return VSF_ERR_NOT_SUPPORT;
     }
+    low_cycles /= div;
+    high_cycles /= div;
+    div--;
 
-    uint32_t scld = (low_cycles  + 1) / 2;
-    scld = vsf_max(scld, 16);
+    uint32_t scld = (low_cycles + 1) / 2;
+    scld = vsf_min(scld, 16) - 1;
     uint32_t enabled = reg->ctrl1_bit.i2cen;
 
     if (enabled) {
@@ -125,11 +128,13 @@ vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_init)(
     }
     reg->ctrl1 = 0xF << 8;      // I2C_CTRL1.DFLT = 0x0F, I2C_CTRL1.STRETCH = 0
     reg->clkctrl =  ((div & 0x0F) << 28) | ((div & 0xF0) << 20)     // div
-                |   ((scld - 1) << 20) | (0 << 16)                  // scld | sdad(0)
-                |   ((high_cycles - 1) << 8) | (low_cycles - 1);    // sclh | scld
-    reg->oaddr1 =   cfg_ptr->slave_addr
-                |   (((cfg_ptr->mode & VSF_I2C_ADDR_MASK) == VSF_I2C_ADDR_10_BITS) ? 1 << 10 : 0)
-                |   (1 << 15);
+                |   (scld << 20) | (0 << 16)                        // scld | sdad(0)
+                |   ((high_cycles - 1) << 8) | (low_cycles - 1);    // sclh | scll
+    if ((cfg_ptr->mode & VSF_I2C_MODE_MASK) == VSF_I2C_MODE_SLAVE) {
+        reg->oaddr1 =   cfg_ptr->slave_addr
+                    |   (((cfg_ptr->mode & VSF_I2C_ADDR_MASK) == VSF_I2C_ADDR_10_BITS) ? 1 << 10 : 0)
+                    |   (1 << 15);
+    }
     if (enabled) {
         reg->ctrl1_bit.i2cen = 1;
     }
@@ -222,7 +227,7 @@ vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)(
     uint8_t *buffer_ptr
 ) {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
-    VSF_HAL_ASSERT(0 == cmd );
+    VSF_HAL_ASSERT(cmd != 0);
 
     i2c_type *reg = i2c_ptr->reg;
     i2c_ptr->cmd = cmd;
@@ -240,15 +245,10 @@ vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)(
         i2c_ptr->cur_cmd &= ~VSF_I2C_CMD_RW_MASK;
     }
     bool rlden = !!(count > 255);
-    reg->ctrl2 =    address & 0x1F                                                          // SADDR
-                |   (is_read ? 1 << 10 : 0)                                                 // DIR
-                |   (((cmd & VSF_I2C_CMD_BITS_MASK) == VSF_I2C_CMD_10_BITS) ? 1 << 11 : 0)  // ADDR10
-                |   ((cmd & VSF_I2C_CMD_START) ? 1 << 13 : 0)                               // GENSTART
-                |   (set_stop_now ? 1 << 14 : 0)                                            // GENSTOP
-                |   (!set_stop_now && need_stop ? 1 << 25: 0)                               // ASTOPEN
-                |   ((rlden ? 255 : count) << 16)                                           // CNT
-                |   (rlden << 24);                                                          // RLDEN
 
+    if (need_stop) {
+        reg->ctrl1_bit.stopien = 1;
+    }
     // TODO: use DMA
     if (count && i2c_ptr->isr.handler_fn != NULL) {
         if (is_read) {
@@ -257,6 +257,16 @@ vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)(
             reg->ctrl1_bit.tdien = 1;
         }
     }
+
+    reg->ctrl2 =    address & 0x3FF                                                         // SADDR
+                |   (is_read ? 1 << 10 : 0)                                                 // DIR
+                |   (((cmd & VSF_I2C_CMD_BITS_MASK) == VSF_I2C_CMD_10_BITS) ? 1 << 11 : 0)  // ADDR10
+                |   ((cmd & VSF_I2C_CMD_START) ? 1 << 13 : 0)                               // GENSTART
+                |   (set_stop_now ? 1 << 14 : 0)                                            // GENSTOP
+                |   (!set_stop_now && need_stop ? 1 << 25: 0)                               // ASTOPEN
+                |   ((rlden ? 255 : count) << 16)                                           // CNT
+                |   (rlden << 24);                                                          // RLDEN
+
     return VSF_ERR_NONE;
 }
 
@@ -378,17 +388,22 @@ vsf_i2c_irq_mask_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_irq_clear)(
             } else {
                 virtual_irq_mask |= VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT;
             }
+            if (irq_mask & (VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK | VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT)) {
+                reg->clr = (1 << 4);
+            }
         } else if (irq_mask_orig & (1 << 1)) {      // TDIS
+            reg->clr |= 1 << 1;
             reg->txdt = *i2c_ptr->cur_buffer++;
             i2c_ptr->cur_count--;
         }
         if (irq_mask_orig & (1 << 2)) {             // RDBF
+            reg->clr |= 1 << 2;
             *i2c_ptr->cur_buffer++ = reg->rxdt;
             i2c_ptr->cur_count--;
         }
         if (irq_mask_orig & (1 << 6)) {             // TDC
+            reg->clr |= 1 << 6;
             if (i2c_ptr->cur_count) {
-                reg->clr |= 1 << 6;
                 if (i2c_ptr->cur_count > 255) {
                     reg->ctrl2_bit.cnt = 255;
                 } else {
@@ -405,6 +420,7 @@ vsf_i2c_irq_mask_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_irq_clear)(
         }
         if (irq_mask_orig & (1 << 5)) {             // STOPF
             virtual_irq_mask |= VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE;
+            reg->clr = 1 << 5;
         }
         if (virtual_irq_mask & VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE) {
             i2c_ptr->cmd = 0;

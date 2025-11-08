@@ -102,8 +102,8 @@ typedef enum vsf_i2c_irq_mask_t {
     VSF_I2C_IRQ_MASK_MASTER_TX                          = (1 << 1),
     // 2: I2C_STS.RDBF(2)
     VSF_I2C_IRQ_MASK_MASTER_RX                          = (1 << 2),
-    // 24: virtual, I2C_STS.TDC(6)
-    VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE           = (1 << 6),
+    // 24: virtual
+    VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE           = (1 << 24),
     // 9: I2C_STS.ARLOST(9)
     VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST            = (1 << 9),
     // 25: virtual, I2C_STS.ACKFAILF(4)|!I2C_STS.ADDRF(3)
