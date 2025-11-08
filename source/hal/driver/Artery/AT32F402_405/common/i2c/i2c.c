@@ -258,7 +258,7 @@ vsf_err_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)(
         }
     }
 
-    reg->ctrl2 =    address & 0x3FF                                                         // SADDR
+    reg->ctrl2 =    (address << 1) & 0x3FF                                                  // SADDR
                 |   (is_read ? 1 << 10 : 0)                                                 // DIR
                 |   (((cmd & VSF_I2C_CMD_BITS_MASK) == VSF_I2C_CMD_10_BITS) ? 1 << 11 : 0)  // ADDR10
                 |   ((cmd & VSF_I2C_CMD_START) ? 1 << 13 : 0)                               // GENSTART
