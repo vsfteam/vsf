@@ -74,8 +74,8 @@ extern "C" {
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT for vsf_dma_channel_hint_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG for vsf_dma_channel_cfg_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG for vsf_dma_channel_sg_cfg_t
- *          VSF_DMA_CFG_REIMPLEMENT_TYPE_STATUS for vsf_dma_status_t
- *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG for vsf_dma_cfg_t
+ *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS for vsf_dma_channel_status_t
+ *          VSF_DMA_CFG_REIMPLEMENT_CFG_TYPE_CFG for vsf_dma_cfg_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_dma_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
@@ -86,8 +86,8 @@ extern "C" {
 #define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG  ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG ENABLED
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_CFG_TYPE_CFG      ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 
 
@@ -182,6 +182,8 @@ typedef enum vsf_dma_irq_mask_t {
 typedef struct vsf_dma_channel_hint_t {
     uint8_t channel;
     uint8_t request_line;
+
+    // more vendor specified channel hint can be added here
 } vsf_dma_channel_hint_t;
 #endif
 
@@ -200,17 +202,7 @@ typedef struct vsf_dma_channel_cfg_t {
 } vsf_dma_channel_cfg_t;
 #endif
 
-#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG == ENABLED
-typedef struct vsf_dma_channel_sg_desc_t {
-    vsf_dma_channel_mode_t mode;
-    uint32_t src_address;
-    uint32_t dst_address;
-    uint32_t count;
-    uint32_t next;
-} vsf_dma_channel_sg_desc_t;
-#endif
-
-#if VSF_DMA_CFG_REIMPLEMENT_TYPE_STATUS == ENABLED
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS == ENABLED
 typedef struct vsf_dma_channel_status_t {
     union {
         inherit(vsf_peripheral_status_t)
@@ -218,7 +210,29 @@ typedef struct vsf_dma_channel_status_t {
             uint32_t is_busy : 1;
         };
     };
+
+    // more vendor specified status can be added here
 } vsf_dma_channel_status_t;
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG == ENABLED
+typedef struct vsf_dma_channel_sg_desc_t {
+    vsf_dma_channel_mode_t mode;
+    uint32_t src_address;
+    uint32_t dst_address;
+    uint32_t count;
+    uint32_t next;
+
+    // more vendor specified channel sg desc can be added here
+} vsf_dma_channel_sg_desc_t;
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_CFG_TYPE_CFG == ENABLED
+typedef struct vsf_dma_cfg_t {
+    vsf_arch_prio_t prio;
+
+    // more vendor specified cfg can be added here
+} vsf_dma_cfg_t;
 #endif
 
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED

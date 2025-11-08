@@ -169,6 +169,34 @@ extern "C" {
 /**
  * \~english
  * @brief In specific hardware driver, we can enable macro
+ * VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQOP to redefine enum
+ * @ref vsf_sdio_reqop_t.
+ *
+ * \~chinese
+ * @brief 在具体硬件驱动中，我们可以启用宏 VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQOP
+ * 来重新定义枚举 @ref vsf_sdio_reqop_t。
+ */
+#ifndef VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQOP
+#   define VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQOP       DISABLED
+#endif
+
+/**
+ * \~english
+ * @brief In specific hardware driver, we can enable macro
+ * VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQSTS to redefine enum
+ * @ref vsf_sdio_reqsts_t.
+ *
+ * \~chinese
+ * @brief 在具体硬件驱动中，我们可以启用宏 VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQSTS
+ * 来重新定义枚举 @ref vsf_sdio_reqsts_t。
+ */
+#ifndef VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQSTS
+#   define VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQSTS       DISABLED
+#endif
+
+/**
+ * \~english
+ * @brief In specific hardware driver, we can enable macro
  * VSF_SDIO_CFG_INHERIT_HAL_CAPABILITY to inherit the structure
  * @ref vsf_peripheral_capability_t.
  *

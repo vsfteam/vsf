@@ -171,6 +171,8 @@ typedef enum vsf_sdio_reqsts_t {
     SDIO_REQSTS_ERR_MASK            = SDIO_REQSTS_ERR_RESP_NONE
                                     | SDIO_REQSTS_ERR_RESP_CRC
                                     | SDIO_REQSTS_ERR_DATA_CRC,
+
+    // more vendor specified reqsts can be added here
 } vsf_sdio_reqsts_t;
 #endif
 
