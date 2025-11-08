@@ -176,6 +176,18 @@ extern "C" {
 
 /**
  * \~english
+ * @brief Enable VSF_ADC_CFG_REIMPLEMENT_TYPE_STATUS to reimplement status type @ref
+ * vsf_adc_status_t in specific hardware drivers
+ * \~chinese
+ * @brief 在特定硬件驱动中，可启用宏 VSF_ADC_CFG_REIMPLEMENT_TYPE_STATUS
+ * 来重新定义结构体 @ref vsf_adc_status_t。
+ */
+#ifndef VSF_ADC_CFG_REIMPLEMENT_TYPE_STATUS
+#   define VSF_ADC_CFG_REIMPLEMENT_TYPE_STATUS        DISABLED
+#endif
+
+/**
+ * \~english
  * @brief In specific hardware driver, we can enable macro
  * VSF_ADC_CFG_INHERIT_HAL_CAPABILITY to inherit structure @ref
  * vsf_peripheral_capability_t.

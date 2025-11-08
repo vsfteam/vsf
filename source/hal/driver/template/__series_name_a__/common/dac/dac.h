@@ -124,6 +124,8 @@ typedef struct vsf_dac_status_t {
             uint32_t is_busy : 1;
         };
     };
+
+    // more vendor specified status can be added here
 } vsf_dac_status_t;
 #endif
 
