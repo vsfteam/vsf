@@ -63,8 +63,13 @@ typedef struct VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) {
 #if VSF_HW_SPI_CFG_MULTI_CLASS == ENABLED
     vsf_spi_t               vsf_spi;
 #endif
-    void                    *reg;
+    spi_type                *reg;
     vsf_spi_isr_t           isr;
+    const vsf_hw_clk_t      *clk;
+    vsf_i2c_irq_mask_t      irq_mask;
+    vsf_hw_peripheral_en_t  en;
+    vsf_hw_peripheral_rst_t rst;
+    uint8_t                 irqn;
 } VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t);
 // HW end
 
@@ -75,7 +80,6 @@ typedef struct VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) {
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
-
 /*============================ IMPLEMENTATION ================================*/
 
 /*\note Implementation below is for hw spi only, because there is no requirements
@@ -89,9 +93,39 @@ vsf_err_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_init)(
     vsf_spi_cfg_t *cfg_ptr
 ) {
     VSF_HAL_ASSERT((NULL != spi_ptr) && (NULL != cfg_ptr));
-    // configure according to cfg_ptr
-    spi_ptr->isr = cfg_ptr->isr;
-    // configure interrupt according to cfg_ptr->isr
+
+    vsf_hw_peripheral_enable(spi_ptr->en);
+
+    spi_type *reg = spi_ptr->reg;
+    reg->i2sctrl_bit.i2smsel = 0;
+
+    uint32_t div = vsf_hw_clk_get_freq_hz(spi_ptr->clk) / cfg_ptr->clock_hz;
+    div = vsf_max(div, 2);
+    if (div > 1024) {
+        VSF_HAL_ASSERT(false);
+        return VSF_ERR_NOT_SUPPORT;
+    } else if (3 == div) {
+        reg->ctrl2_bit.mdiv3en = 1;
+    } else {
+        uint8_t msb = vsf_msb32(div) - 1;
+        if (div & ((1 << msb) - 1)) {
+            msb++;
+        }
+        reg->ctrl1_bit.mdiv_l = msb & 7;
+        reg->ctrl2_bit.mdiv_h = msb >> 3;
+    }
+
+    reg->ctrl1 = (reg->ctrl1 & ~__VSF_HW_SPI_CTRL1_MASK) | ((cfg_ptr->mode >>  0) & 0xFFFF);
+    reg->ctrl2 = (reg->ctrl2 & ~(__VSF_HW_SPI_CTRL2_MASK >> 16)) | ((cfg_ptr->mode >> 16) & 0xFFFF);
+
+    vsf_spi_isr_t *isr_ptr = &cfg_ptr->isr;
+    spi_ptr->isr = *isr_ptr;
+    if (cfg_ptr->isr.handler_fn != NULL) {
+        NVIC_SetPriority(spi_ptr->irqn, (uint32_t)isr_ptr->prio);
+        NVIC_EnableIRQ(spi_ptr->irqn);
+    } else {
+        NVIC_DisableIRQ(spi_ptr->irqn);
+    }
     return VSF_ERR_NONE;
 }
 
@@ -105,7 +139,6 @@ fsm_rt_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_enable)(
     VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr
 ) {
     VSF_HAL_ASSERT(spi_ptr != NULL);
-
     return fsm_rt_cpl;
 }
 
@@ -113,7 +146,6 @@ fsm_rt_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_disable)(
     VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr
 ) {
     VSF_HAL_ASSERT(spi_ptr != NULL);
-
     return fsm_rt_cpl;
 }
 
@@ -122,6 +154,18 @@ void VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_irq_enable)(
     vsf_spi_irq_mask_t irq_mask
 ) {
     VSF_HAL_ASSERT(spi_ptr != NULL);
+
+    spi_type *reg = spi_ptr->reg;
+    spi_ptr->irq_mask |= irq_mask;
+    if (irq_mask & VSF_SPI_IRQ_MASK_RX) {
+        reg->ctrl2_bit.rdbfie = 1;
+    }
+    if (irq_mask & VSF_SPI_IRQ_MASK_TX) {
+        reg->ctrl2_bit.tdbeie = 1;
+    }
+    if (spi_ptr->irq_mask & (VSF_SPI_IRQ_MASK_RX_OVERFLOW_ERR | VSF_SPI_IRQ_MASK_CRC_ERR)) {
+        reg->ctrl2_bit.errie = 1;
+    }
 }
 
 void VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_irq_disable)(
@@ -129,6 +173,18 @@ void VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_irq_disable)(
     vsf_spi_irq_mask_t irq_mask
 ) {
     VSF_HAL_ASSERT(spi_ptr != NULL);
+
+    spi_type *reg = spi_ptr->reg;
+    spi_ptr->irq_mask &= ~irq_mask;
+    if (irq_mask & VSF_SPI_IRQ_MASK_RX) {
+        reg->ctrl2_bit.rdbfie = 0;
+    }
+    if (irq_mask & VSF_SPI_IRQ_MASK_TX) {
+        reg->ctrl2_bit.tdbeie = 0;
+    }
+    if (!(spi_ptr->irq_mask & (VSF_SPI_IRQ_MASK_RX_OVERFLOW_ERR | VSF_SPI_IRQ_MASK_CRC_ERR))) {
+        reg->ctrl2_bit.errie = 0;
+    }
 }
 
 vsf_spi_status_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_status)(
@@ -137,7 +193,7 @@ vsf_spi_status_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_status)(
     VSF_HAL_ASSERT(spi_ptr != NULL);
 
     return (vsf_spi_status_t) {
-        .is_busy = 0,
+        .is_busy = !!spi_ptr->reg->sts_bit.bf,
     };
 }
 
@@ -146,7 +202,15 @@ vsf_err_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_cs_active)(
     uint_fast8_t index
 ) {
     VSF_HAL_ASSERT(spi_ptr != NULL);
+    VSF_HAL_ASSERT(index == 0);
 
+    spi_type *reg = spi_ptr->reg;
+    if (!reg->ctrl1_bit.spien) {
+        if (reg->ctrl1_bit.swcsen) {
+            reg->ctrl1_bit.swcsil = 1;
+        }
+        reg->ctrl1_bit.spien = 1;
+    }
     return VSF_ERR_NONE;
 }
 
@@ -155,7 +219,15 @@ vsf_err_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_cs_inactive)(
     uint_fast8_t index
 ) {
     VSF_HAL_ASSERT(spi_ptr != NULL);
+    VSF_HAL_ASSERT(index == 0);
 
+    spi_type *reg = spi_ptr->reg;
+    if (reg->ctrl1_bit.spien) {
+        reg->ctrl1_bit.spien = 0;
+        if (reg->ctrl1_bit.swcsen) {
+            reg->ctrl1_bit.swcsil = 0;
+        }
+    }
     return VSF_ERR_NONE;
 }
 
@@ -168,6 +240,42 @@ void VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_fifo_transfer)(
     uint_fast32_t cnt
 ) {
     VSF_HAL_ASSERT(spi_ptr != NULL);
+
+    spi_type *reg = spi_ptr->reg;
+    bool is_16bit = reg->ctrl1_bit.fbn;
+
+    if (!reg->ctrl1_bit.spien) {
+        VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_cs_active)(spi_ptr, 0);
+    }
+
+    if (reg->sts_bit.rdbf) {
+        uint32_t dt = reg->dt;
+        if ((in_buffer_ptr != NULL) && (*in_offset_ptr < cnt)) {
+            if (is_16bit) {
+                ((uint16_t *)in_buffer_ptr)[(*in_offset_ptr)++] = dt;
+            } else {
+                ((uint8_t *)in_buffer_ptr)[(*in_offset_ptr)++] = dt;
+            }
+        }
+    }
+    if (!reg->sts_bit.bf) {
+        if ((out_buffer_ptr != NULL)) {
+            if (*out_offset_ptr < cnt) {
+                if (is_16bit) {
+                    reg->dt = ((uint16_t *)out_buffer_ptr)[(*out_offset_ptr)++];
+                } else {
+                    reg->dt = ((uint8_t *)out_buffer_ptr)[(*out_offset_ptr)++];
+                }
+            }
+        } else /* if (in_buffer_ptr != NULL) */ {
+            reg->dt = 0;
+        }
+    }
+
+    if (    ((NULL == out_buffer_ptr) || (*out_offset_ptr == cnt))
+        &&  ((NULL == in_buffer_ptr) || (*in_offset_ptr == cnt))) {
+        VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_cs_inactive)(spi_ptr, 0);
+    }
 }
 
 vsf_err_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_request_transfer)(
@@ -197,20 +305,12 @@ void VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_get_transferred_count)(
     VSF_HAL_ASSERT(spi_ptr != NULL);
 }
 
-static vsf_spi_irq_mask_t VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_get_irq_mask)(
-    VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr
-) {
-    // implement this function in the device file
-    VSF_HAL_ASSERT(0);
-    return 0;
-}
-
 static void VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_irqhandler)(
     VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr
 ) {
     VSF_HAL_ASSERT(NULL != spi_ptr);
 
-    vsf_spi_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_get_irq_mask)(spi_ptr);
+    vsf_spi_irq_mask_t irq_mask = VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_irq_clear)(spi_ptr, spi_ptr->irq_mask);
     vsf_spi_isr_t *isr_ptr = &spi_ptr->isr;
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_spi_t *)spi_ptr, irq_mask);
@@ -231,35 +331,22 @@ static void VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_irqhandler)(
  *          Default implementation will assert(false) to indicate the feature is not implemented.
  */
 
-vsf_err_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_get_configuration)(
-    VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr,
-    vsf_spi_cfg_t *cfg_ptr
-) {
-    VSF_HAL_ASSERT(NULL != spi_ptr);
-    VSF_HAL_ASSERT(NULL != cfg_ptr);
-
-    // For template implementation, return a default configuration
-    cfg_ptr->mode = VSF_SPI_MASTER | VSF_SPI_MODE_0 | VSF_SPI_MSB_FIRST |
-                    VSF_SPI_DATASIZE_8 | VSF_SPI_CS_SOFTWARE_MODE;
-    cfg_ptr->clock_hz = 1000000; // 1MHz default
-    cfg_ptr->auto_cs_index = 0;
-    cfg_ptr->isr = spi_ptr->isr;
-
-    return VSF_ERR_NONE;
-}
-
 vsf_spi_capability_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_capability)(
     VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr
 ) {
     VSF_HAL_ASSERT(spi_ptr != NULL);
 
+    uint32_t clk_hz = vsf_hw_clk_get_freq_hz(spi_ptr->clk);
     return (vsf_spi_capability_t) {
-        .irq_mask = VSF_SPI_IRQ_MASK_TX | VSF_SPI_IRQ_MASK_RX,
-        .support_hardware_cs = 1,
-        .support_software_cs = 1,
-        .cs_count            = 1,
-        .max_clock_hz        = 100 * 1000 * 1000,
-        .min_clock_hz        = 100 * 1000,
+        .irq_mask               = VSF_SPI_IRQ_MASK_TX | VSF_SPI_IRQ_MASK_RX
+                                | VSF_SPI_IRQ_MASK_TX_CPL | VSF_SPI_IRQ_MASK_RX_CPL
+                                | VSF_SPI_IRQ_MASK_RX_OVERFLOW_ERR
+                                | VSF_SPI_IRQ_MASK_CRC_ERR,
+        .support_hardware_cs    = 1,
+        .support_software_cs    = 1,
+        .cs_count               = 1,
+        .max_clock_hz           = clk_hz / 2,
+        .min_clock_hz           = clk_hz / 1024,
     };
 }
 
@@ -270,7 +357,7 @@ vsf_err_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_ctrl)(
 ) {
     VSF_HAL_ASSERT(spi_ptr != NULL);
 
-    return VSF_ERR_NONE;
+    return VSF_ERR_NOT_SUPPORT;
 }
 
 vsf_spi_irq_mask_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_irq_clear)(
@@ -291,16 +378,19 @@ vsf_spi_irq_mask_t VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_irq_clear)(
 // HW
 #define VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY          ENABLED
 #define VSF_SPI_CFG_REIMPLEMENT_API_CTRL                ENABLED
-#define VSF_SPI_CFG_REIMPLEMENT_API_GET_CONFIGURATION   ENABLED
 #define VSF_SPI_CFG_REIMPLEMENT_API_IRQ_CLEAR           ENABLED
 
 #define VSF_SPI_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t)                                \
         VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi, __IDX) = {                   \
-        .reg                = VSF_MCONNECT(VSF_SPI_CFG_IMP_UPCASE_PREFIX, _SPI, __IDX,_REG),\
+        .reg            = VSF_MCONNECT(VSF_SPI_CFG_IMP_UPCASE_PREFIX, _SPI, __IDX,_REG),\
+        .en             = VSF_MCONNECT(VSF_SPI_CFG_IMP_UPCASE_PREFIX, _SPI, __IDX,_EN),\
+        .rst            = VSF_MCONNECT(VSF_SPI_CFG_IMP_UPCASE_PREFIX, _SPI, __IDX,_RST),\
+        .clk            = &VSF_MCONNECT(VSF_SPI_CFG_IMP_UPCASE_PREFIX, _SPI, __IDX,_CLK),\
+        .irqn           = VSF_MCONNECT(VSF_SPI_CFG_IMP_UPCASE_PREFIX, _SPI, __IDX,_IRQN),\
         __HAL_OP                                                                \
     };                                                                          \
-    VSF_CAL_ROOT void VSF_MCONNECT(VSF_SPI_CFG_IMP_UPCASE_PREFIX, _SPI, __IDX, _IRQHandler)(void)\
+    void VSF_MCONNECT(VSF_HW_INTERRUPT, VSF_MCONNECT(VSF_SPI_CFG_IMP_UPCASE_PREFIX, _SPI, __IDX, _IRQN))(void)\
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
         VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_irqhandler)(              \

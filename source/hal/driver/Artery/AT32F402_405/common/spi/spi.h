@@ -59,12 +59,8 @@ extern "C" {
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
 
-#define VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
-#define VSF_SPI_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
-#define VSF_SPI_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
-#define VSF_SPI_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
-#define VSF_SPI_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
-#define VSF_SPI_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE       ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_TYPE_IRQ_MASK   ENABLED
 // HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -73,93 +69,100 @@ extern "C" {
 // HW/IPCore, not for emulated drivers
 #if VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE == ENABLED
 typedef enum vsf_spi_mode_t {
-    VSF_SPI_MASTER                  = 0x00ul << 0,
-    VSF_SPI_SLAVE                   = 0x01ul << 0,
-    VSF_SPI_MSB_FIRST               = 0x00ul << 1,
-    VSF_SPI_LSB_FIRST               = 0x01ul << 1,
-    VSF_SPI_CPOL_LOW                = 0x00ul << 2,
-    VSF_SPI_CPOL_HIGH               = 0x01ul << 2,
-    VSF_SPI_CPHA_LOW                = 0x00ul << 2,
-    VSF_SPI_CPHA_HIGH               = 0x01ul << 2,
-    VSF_SPI_MODE_0                  = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_LOW,
-    VSF_SPI_MODE_1                  = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_HIGH,
-    VSF_SPI_MODE_2                  = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_LOW,
-    VSF_SPI_MODE_3                  = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_HIGH,
-    VSF_SPI_CS_SOFTWARE_MODE        = 0x00ul << 4,
-    VSF_SPI_CS_HARDWARE_MODE        = 0x01ul << 4,
-    VSF_SPI_DATASIZE_8              = 0x00ul << 8,
-    VSF_SPI_DATASIZE_16             = 0x01ul << 8,
-    VSF_SPI_DATASIZE_32             = 0x02ul << 8,
+    // 2: SPI_CTRL1.MSTEN(2)
+    VSF_SPI_MASTER                              = 1 << 2,
+    VSF_SPI_SLAVE                               = 0 << 2,
+
+    // 7: SPI_CTRL1.LTF(7)
+    VSF_SPI_MSB_FIRST                           = 0 << 7,
+    VSF_SPI_LSB_FIRST                           = 1 << 7,
+
+    // 1: SPI_CTRL1.CLKPOL(1)
+    VSF_SPI_CPOL_LOW                            = 0 << 1,
+    VSF_SPI_CPOL_HIGH                           = 1 << 1,
+    // 0: SPI_CTRL1.CLKPHA(0)
+    VSF_SPI_CPHA_LOW                            = 0 << 0,
+    VSF_SPI_CPHA_HIGH                           = 1 << 0,
+    VSF_SPI_MODE_0                              = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_LOW,
+    VSF_SPI_MODE_1                              = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_HIGH,
+    VSF_SPI_MODE_2                              = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_LOW,
+    VSF_SPI_MODE_3                              = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_HIGH,
+
+    // 26: virtual
+    VSF_SPI_CS_SOFTWARE_MODE                    = 1 << 26,
+    // 18: SPI_CTRL2.HWCSOE(2)
+    VSF_SPI_CS_HARDWARE_MODE                    = 1 << 18,
+
+    // 20: SPI_CTRL2.TIEN(4)
+    VSF_SPI_MOTOROLA_MODE                       = (0 << 20),
+    VSF_SPI_TI_MODE                             = (1 << 20),
+#define VSF_SPI_MOTOROLA_MODE                   VSF_SPI_MOTOROLA_MODE
+#define VSF_SPI_TI_MODE                         VSF_SPI_TI_MODE
+#define VSF_SPI_MOTOROLA_TI_MASK                (VSF_SPI_MOTOROLA_MODE | VSF_SPI_TI_MODE)
+
+    // 11: SPI_CTRL1.FBN(11)
+    VSF_SPI_DATASIZE_8                          = 0 << 11,
+    VSF_SPI_DATASIZE_16                         = 1 << 11,
+#define VSF_SPI_DATASIZE_16                     VSF_SPI_DATASIZE_16
+    // 27: not support
+    VSF_SPI_DATASIZE_32                         = 1 << 27,
+
+    VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX         = 0,
+    // 10: SPI_CTRL1.ORA(10)
+    VSF_SPI_DATALINE_2_LINE_RX_ONLY             = 1 << 10,
+    // 15: SPI_CTRL1.SLBEN(15)
+    VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX         = 1 << 15,
+#define VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX     VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX
+#define VSF_SPI_DATALINE_2_LINE_RX_ONLY         VSF_SPI_DATALINE_2_LINE_RX_ONLY
+#define VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX     VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX
+
+    // 13: SPI_CTRL1.CCEN(13)
+    VSF_SPI_CRC_DISABLED                        = 0 << 13,
+    VSF_SPI_CRC_ENABLED                         = 1 << 13,
 
     // more vendor specified modes can be added here
+
+    __VSF_HW_SPI_CTRL1_MASK                     = VSF_SPI_MASTER
+                                                | VSF_SPI_SLAVE
+                                                | VSF_SPI_MSB_FIRST
+                                                | VSF_SPI_LSB_FIRST
+                                                | VSF_SPI_CPOL_LOW
+                                                | VSF_SPI_CPOL_HIGH
+                                                | VSF_SPI_CPHA_LOW
+                                                | VSF_SPI_CPHA_HIGH
+                                                | VSF_SPI_DATASIZE_8
+                                                | VSF_SPI_DATASIZE_16
+                                                | VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX
+                                                | VSF_SPI_DATALINE_2_LINE_RX_ONLY
+                                                | VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX
+                                                | VSF_SPI_CRC_DISABLED
+                                                | VSF_SPI_CRC_ENABLED,
+    __VSF_HW_SPI_CTRL2_MASK                     = VSF_SPI_CS_HARDWARE_MODE
+                                                | VSF_SPI_TI_MODE
+                                                | VSF_SPI_MOTOROLA_MODE,
+    __VSF_HW_SPI_CS_MASK                        = VSF_SPI_CS_SOFTWARE_MODE,
 } vsf_spi_mode_t;
 #endif
 
 #if VSF_SPI_CFG_REIMPLEMENT_TYPE_IRQ_MASK == ENABLED
 typedef enum vsf_spi_irq_mask_t {
-    VSF_SPI_IRQ_MASK_TX                 = 0x01ul << 0,
-    VSF_SPI_IRQ_MASK_RX                 = 0x01ul << 1,
-    VSF_SPI_IRQ_MASK_TX_CPL             = 0x01ul << 2,
-    VSF_SPI_IRQ_MASK_RX_CPL             = 0x01ul << 3,
-    VSF_SPI_IRQ_MASK_RX_OVERFLOW_ERR    = 0x01ul << 4,
+    // 1: SPI_STS.TDBE(1)
+    VSF_SPI_IRQ_MASK_TX                         = 1 << 1,
+    // 0: SPI_STS.RDBF(0)
+    VSF_SPI_IRQ_MASK_RX                         = 1 << 0,
+    // 9: virtual, TODO: use DMA interrupt
+    VSF_SPI_IRQ_MASK_TX_CPL                     = 1 << 9,
+    // 10: virtual, TODO: use DMA interrupt
+    VSF_SPI_IRQ_MASK_RX_CPL                     = 1 << 10,
+    // 6: SPI_STS.ROERR(6)
+    VSF_SPI_IRQ_MASK_RX_OVERFLOW_ERR            = 1 << 6,
+    // 4: SPI_STS.CCERR(4)
+    VSF_SPI_IRQ_MASK_CRC_ERR                    = 1 << 4,
 
     // more vendor specified irq_masks can be added here
 } vsf_spi_irq_mask_t;
 #endif
 
-#if VSF_SPI_CFG_REIMPLEMENT_TYPE_STATUS == ENABLED
-typedef struct vsf_spi_status_t {
-    union {
-        struct {
-            uint32_t is_busy : 1;
-        };
-    };
-
-    // more vendor specified status can be added here
-} vsf_spi_status_t;
-#endif
-
-#if VSF_SPI_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED
-typedef struct vsf_spi_capability_t {
-    vsf_spi_irq_mask_t irq_mask;
-    uint8_t support_hardware_cs : 1;
-    uint8_t support_software_cs : 1;
-    uint8_t cs_count            : 6;
-    uint32_t max_clock_hz;
-    uint32_t min_clock_hz;
-
-    // more vendor specified capability can be added here
-} vsf_spi_capability_t;
-#endif
-
-#if VSF_SPI_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
-/** \note Redefining vsf_spi_cfg_t usually requires declaring vsf_spi_t
- *        and vsf_spi_isr_handler_t types and define vsf_spi_isr_t.
- */
-typedef struct vsf_spi_t vsf_spi_t;
-typedef void vsf_spi_isr_handler_t(void *target_ptr,
-                                   vsf_spi_t *spi_ptr,
-                                   vsf_spi_irq_mask_t irq_mask);
-typedef struct vsf_spi_isr_t {
-    vsf_spi_isr_handler_t *handler_fn;
-    void                  *target_ptr;
-    vsf_arch_prio_t        prio;
-} vsf_spi_isr_t;
-typedef struct vsf_spi_cfg_t {
-    vsf_spi_mode_t   mode;
-    uint32_t         clock_hz;
-    vsf_spi_isr_t    isr;
-    uint8_t          auto_cs_index;
-
-    // more vendor specified cfg can be added here
-} vsf_spi_cfg_t;
-#endif
-
-#if VSF_SPI_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
-typedef enum vsf_spi_ctrl_t {
-    __VSF_SPI_CTRL_DUMMY = 0,
-} vsf_spi_ctrl_t;
-#endif
 // HW/IPCore end
 
 /*============================ INCLUDES ======================================*/

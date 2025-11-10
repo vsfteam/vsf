@@ -33,6 +33,7 @@
 #       include "./gpio/gpio.h"
 #       include "./i2c/i2c.h"
 #       include "./exti/exti.h"
+#       include "./spi/spi.h"
 #       include "./usart/usart.h"
 #       include "./usb/usb.h"
 
