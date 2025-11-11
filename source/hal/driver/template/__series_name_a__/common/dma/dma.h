@@ -178,6 +178,13 @@ typedef enum vsf_dma_irq_mask_t {
 } vsf_dma_irq_mask_t;
 #endif
 
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT == ENABLED
+typedef struct vsf_dma_channel_hint_t {
+    uint8_t channel;
+    uint8_t request_line;
+} vsf_dma_channel_hint_t;
+#endif
+
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG == ENABLED
 typedef struct vsf_dma_t vsf_dma_t;
 typedef void vsf_dma_isr_handler_t(void *target_ptr, vsf_dma_t *dma_ptr, int8_t channel, vsf_dma_irq_mask_t irq_mask);
@@ -191,6 +198,16 @@ typedef struct vsf_dma_channel_cfg_t {
     uint8_t                 src_idx;
     uint8_t                 dst_idx;
 } vsf_dma_channel_cfg_t;
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG == ENABLED
+typedef struct vsf_dma_channel_sg_desc_t {
+    vsf_dma_channel_mode_t mode;
+    uint32_t src_address;
+    uint32_t dst_address;
+    uint32_t count;
+    uint32_t next;
+} vsf_dma_channel_sg_desc_t;
 #endif
 
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_STATUS == ENABLED
