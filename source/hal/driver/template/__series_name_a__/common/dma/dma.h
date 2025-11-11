@@ -120,8 +120,8 @@ vsf_class(vsf_${dma_ip}_dma_t) {
 typedef enum vsf_dma_channel_mode_t {
     VSF_DMA_MEMORY_TO_MEMORY        = (0x00 << 0),
     VSF_DMA_MEMORY_TO_PERIPHERAL    = (0x01 << 0),
-    VSF_DMA_PERIPHERA_TO_MEMORY     = (0x02 << 0),
-    VSF_DMA_PERIPHERA_TO_PERIPHERAL = (0x03 << 0),
+    VSF_DMA_PERIPHERAL_TO_MEMORY    = (0x02 << 0),
+    VSF_DMA_PERIPHERAL_TO_PERIPHERAL= (0x03 << 0),
 
     VSF_DMA_SRC_ADDR_INCREMENT      = (0x00 << 2),
     VSF_DMA_SRC_ADDR_DECREMENT      = (0x01 << 2),

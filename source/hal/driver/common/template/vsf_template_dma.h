@@ -249,8 +249,8 @@ extern "C" {
 typedef enum vsf_dma_channel_mode_t {
     VSF_DMA_MEMORY_TO_MEMORY        = (0x00 << 0),
     VSF_DMA_MEMORY_TO_PERIPHERAL    = (0x01 << 0),
-    VSF_DMA_PERIPHERA_TO_MEMORY     = (0x02 << 0),
-    VSF_DMA_PERIPHERA_TO_PERIPHERAL = (0x03 << 0),
+    VSF_DMA_PERIPHERAL_TO_MEMORY    = (0x02 << 0),
+    VSF_DMA_PERIPHERAL_TO_PERIPHERAL= (0x03 << 0),
 
     VSF_DMA_SRC_ADDR_INCREMENT      = (0x00 << 2),
     VSF_DMA_SRC_ADDR_DECREMENT      = (0x01 << 2),
@@ -305,8 +305,8 @@ enum {
     VSF_DMA_DIRECTION_COUNT           = 4,
     VSF_DMA_DIRECTION_MASK            = VSF_DMA_MEMORY_TO_MEMORY        |
                                         VSF_DMA_MEMORY_TO_PERIPHERAL    |
-                                        VSF_DMA_PERIPHERA_TO_MEMORY     |
-                                        VSF_DMA_PERIPHERA_TO_PERIPHERAL,
+                                        VSF_DMA_PERIPHERAL_TO_MEMORY    |
+                                        VSF_DMA_PERIPHERAL_TO_PERIPHERAL,
 
     VSF_DMA_SRC_ADDR_COUNT            = 3,
     VSF_DMA_SRC_ADDR_MASK             = VSF_DMA_SRC_ADDR_INCREMENT |
