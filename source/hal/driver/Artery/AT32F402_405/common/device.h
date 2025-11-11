@@ -137,6 +137,32 @@
 #   endif
 #endif
 
+// DMA
+
+#define VSF_HW_DMA_COUNT                2
+#define VSF_HW_DMA_MASK                 0x6
+#define VSF_HW_DMA_CHANNEL_NUM          7
+#define VSF_HW_DMA1_REG                 DMA1
+#define VSF_HW_DMA1_EN                  VSF_HW_EN_DMA1
+#define VSF_HW_DMA1_RST                 VSF_HW_RST_DMA1
+#   define VSF_HW_DMA1_CHANNEL0_IRQN    11
+#   define VSF_HW_DMA1_CHANNEL1_IRQN    12
+#   define VSF_HW_DMA1_CHANNEL2_IRQN    13
+#   define VSF_HW_DMA1_CHANNEL3_IRQN    14
+#   define VSF_HW_DMA1_CHANNEL4_IRQN    15
+#   define VSF_HW_DMA1_CHANNEL5_IRQN    16
+#   define VSF_HW_DMA1_CHANNEL6_IRQN    17
+#define VSF_HW_DMA2_REG                 DMA2
+#define VSF_HW_DMA2_EN                  VSF_HW_EN_DMA2
+#define VSF_HW_DMA2_RST                 VSF_HW_RST_DMA2
+#   define VSF_HW_DMA2_CHANNEL0_IRQN    56
+#   define VSF_HW_DMA2_CHANNEL1_IRQN    57
+#   define VSF_HW_DMA2_CHANNEL2_IRQN    58
+#   define VSF_HW_DMA2_CHANNEL3_IRQN    59
+#   define VSF_HW_DMA2_CHANNEL4_IRQN    60
+#   define VSF_HW_DMA2_CHANNEL5_IRQN    68
+#   define VSF_HW_DMA2_CHANNEL6_IRQN    69
+
 // EXTI
 
 #define VSF_HW_EXTI_COUNT               1
@@ -393,7 +419,6 @@
 #include "./device_af.h"
 
 /*============================ MACROS ========================================*/
-
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/

@@ -29,6 +29,7 @@
 #       include "hal/vsf_hal_cfg.h"
 #       include "../__device.h"
 
+#       include "./dma/dma.h"
 #       include "./flash/flash.h"
 #       include "./gpio/gpio.h"
 #       include "./i2c/i2c.h"
@@ -67,6 +68,22 @@
 #   define VSF_ADC_CFG_DEC_PREFIX                           vsf_hw
 #   define VSF_ADC_CFG_DEC_UPCASE_PREFIX                    VSF_HW
 #   include "hal/driver/common/adc/adc_template.h"
+#endif
+
+#if VSF_HAL_USE_DAC == ENABLED
+#   include "hal/driver/common/template/vsf_template_dac.h"
+
+#   define VSF_DAC_CFG_DEC_PREFIX                           vsf_hw
+#   define VSF_DAC_CFG_DEC_UPCASE_PREFIX                    VSF_HW
+#   include "hal/driver/common/dac/dac_template.h"
+#endif
+
+#if VSF_HAL_USE_DMA == ENABLED
+#   include "hal/driver/common/template/vsf_template_dma.h"
+
+#   define VSF_DMA_CFG_DEC_PREFIX                           vsf_hw
+#   define VSF_DMA_CFG_DEC_UPCASE_PREFIX                    VSF_HW
+#   include "hal/driver/common/dma/dma_template.h"
 #endif
 
 #if VSF_HAL_USE_FLASH == ENABLED
@@ -145,6 +162,30 @@
 #   define VSF_WDT_CFG_DEC_PREFIX                           vsf_hw
 #   define VSF_WDT_CFG_DEC_UPCASE_PREFIX                    VSF_HW
 #   include "hal/driver/common/wdt/wdt_template.h"
+#endif
+
+#if VSF_HAL_USE_SDIO == ENABLED
+#   include "hal/driver/common/template/vsf_template_sdio.h"
+
+#   define VSF_SDIO_CFG_DEC_PREFIX                          vsf_hw
+#   define VSF_SDIO_CFG_DEC_UPCASE_PREFIX                   VSF_HW
+#   include "hal/driver/common/sdio/sdio_template.h"
+#endif
+
+#if VSF_HAL_USE_I2S == ENABLED
+#   include "hal/driver/common/template/vsf_template_i2s.h"
+
+#   define VSF_I2S_CFG_DEC_PREFIX                           vsf_hw
+#   define VSF_I2S_CFG_DEC_UPCASE_PREFIX                    VSF_HW
+#   include "hal/driver/common/i2s/i2s_template.h"
+#endif
+
+#if VSF_HAL_USE_ETH == ENABLED
+#   include "hal/driver/common/template/vsf_template_eth.h"
+
+#   define VSF_ETH_CFG_DEC_PREFIX                           vsf_hw
+#   define VSF_ETH_CFG_DEC_UPCASE_PREFIX                    VSF_HW
+#   include "hal/driver/common/eth/eth_template.h"
 #endif
 
 #   endif
