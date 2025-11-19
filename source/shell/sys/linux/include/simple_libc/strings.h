@@ -1,0 +1,1 @@
+void bzero(void *, size_t);

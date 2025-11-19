@@ -8,6 +8,7 @@
 #else
 #   include <stddef.h>
 #endif
+#include "./strings.h"
 
 //! \note libc belongs to compiler layer in utilities, so only include compiler.h
 #include "utilities/compiler/compiler.h"
