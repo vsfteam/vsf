@@ -116,7 +116,7 @@ struct hlist_node {
 static inline int kstrtou8(const char *s, unsigned int base, u8 *res) {
     char *endptr;
     unsigned long long val = strtoull(s, &endptr, base);
-    if (endptr == s || *endptr != '\0' || val > U8_MAX) {
+    if (endptr == s || *endptr != '\0' || val != (u8)val) {
         return -ERANGE;
     }
     *res = (u8)val;
@@ -126,7 +126,7 @@ static inline int kstrtou8(const char *s, unsigned int base, u8 *res) {
 static inline int kstrtos8(const char *s, unsigned int base, s8 *res) {
     char *endptr;
     long long val = strtoll(s, &endptr, base);
-    if (endptr == s || *endptr != '\0' || val < S8_MIN || val > S8_MAX) {
+    if (endptr == s || *endptr != '\0' || val != (s8)val) {
         return -ERANGE;
     }
     *res = (s8)val;
@@ -136,7 +136,7 @@ static inline int kstrtos8(const char *s, unsigned int base, s8 *res) {
 static inline int kstrtou16(const char *s, unsigned int base, u16 *res) {
     char *endptr;
     unsigned long long val = strtoull(s, &endptr, base);
-    if (endptr == s || *endptr != '\0' || val > U16_MAX) {
+    if (endptr == s || *endptr != '\0' || val != (u16)val) {
         return -ERANGE;
     }
     *res = (u16)val;
@@ -146,7 +146,7 @@ static inline int kstrtou16(const char *s, unsigned int base, u16 *res) {
 static inline int kstrtos16(const char *s, unsigned int base, s16 *res) {
     char *endptr;
     long long val = strtoll(s, &endptr, base);
-    if (endptr == s || *endptr != '\0' || val < S16_MIN || val > S16_MAX) {
+    if (endptr == s || *endptr != '\0' || val != (s16)val) {
         return -ERANGE;
     }
     *res = (s16)val;
@@ -156,7 +156,7 @@ static inline int kstrtos16(const char *s, unsigned int base, s16 *res) {
 static inline int kstrtou32(const char *s, unsigned int base, u32 *res) {
     char *endptr;
     unsigned long long val = strtoull(s, &endptr, base);
-    if (endptr == s || *endptr != '\0' || val > U32_MAX) {
+    if (endptr == s || *endptr != '\0' || val != (u32)val) {
         return -ERANGE;
     }
     *res = (u32)val;
@@ -166,7 +166,7 @@ static inline int kstrtou32(const char *s, unsigned int base, u32 *res) {
 static inline int kstrtos32(const char *s, unsigned int base, s32 *res) {
     char *endptr;
     long long val = strtoll(s, &endptr, base);
-    if (endptr == s || *endptr != '\0' || val < S32_MIN || val > S32_MAX) {
+    if (endptr == s || *endptr != '\0' || val != (s32)val) {
         return -ERANGE;
     }
     *res = (s32)val;
