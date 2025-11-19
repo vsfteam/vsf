@@ -113,6 +113,86 @@ struct hlist_node {
 
 #define round_up(__x, __y)  ((((__x) - 1) | ((__y) - 1)) + 1)
 
+static inline int kstrtou8(const char *s, unsigned int base, u8 *res) {
+    char *endptr;
+    unsigned long long val = strtoull(s, &endptr, base);
+    if (endptr == s || *endptr != '\0' || val > U8_MAX) {
+        return -ERANGE;
+    }
+    *res = (u8)val;
+    return 0;
+}
+
+static inline int kstrtos8(const char *s, unsigned int base, s8 *res) {
+    char *endptr;
+    long long val = strtoll(s, &endptr, base);
+    if (endptr == s || *endptr != '\0' || val < S8_MIN || val > S8_MAX) {
+        return -ERANGE;
+    }
+    *res = (s8)val;
+    return 0;
+}
+
+static inline int kstrtou16(const char *s, unsigned int base, u16 *res) {
+    char *endptr;
+    unsigned long long val = strtoull(s, &endptr, base);
+    if (endptr == s || *endptr != '\0' || val > U16_MAX) {
+        return -ERANGE;
+    }
+    *res = (u16)val;
+    return 0;
+}
+
+static inline int kstrtos16(const char *s, unsigned int base, s16 *res) {
+    char *endptr;
+    long long val = strtoll(s, &endptr, base);
+    if (endptr == s || *endptr != '\0' || val < S16_MIN || val > S16_MAX) {
+        return -ERANGE;
+    }
+    *res = (s16)val;
+    return 0;
+}
+
+static inline int kstrtou32(const char *s, unsigned int base, u32 *res) {
+    char *endptr;
+    unsigned long long val = strtoull(s, &endptr, base);
+    if (endptr == s || *endptr != '\0' || val > U32_MAX) {
+        return -ERANGE;
+    }
+    *res = (u32)val;
+    return 0;
+}
+
+static inline int kstrtos32(const char *s, unsigned int base, s32 *res) {
+    char *endptr;
+    long long val = strtoll(s, &endptr, base);
+    if (endptr == s || *endptr != '\0' || val < S32_MIN || val > S32_MAX) {
+        return -ERANGE;
+    }
+    *res = (s32)val;
+    return 0;
+}
+
+static inline int kstrtou64(const char *s, unsigned int base, u64 *res) {
+    char *endptr;
+    unsigned long long val = strtoull(s, &endptr, base);
+    if (endptr == s || *endptr != '\0') {
+        return -ERANGE;
+    }
+    *res = (u64)val;
+    return 0;
+}
+
+static inline int kstrtos64(const char *s, unsigned int base, s64 *res) {
+    char *endptr;
+    long long val = strtoll(s, &endptr, base);
+    if (endptr == s || *endptr != '\0') {
+        return -ERANGE;
+    }
+    *res = (s64)val;
+    return 0;
+}
+
 #ifdef __cplusplus
 }
 #endif
