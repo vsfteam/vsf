@@ -232,8 +232,8 @@ void vsf_callback_timer_init(vsf_callback_timer_t *timer)
     timer->due = 0;
 }
 
-VSF_CAL_SECTION(".text.vsf.kernel.vsf_callback_timer_add")
-vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, vsf_systimer_tick_t tick)
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_callback_timer_add_due")
+vsf_err_t vsf_callback_timer_add_due(vsf_callback_timer_t *timer, vsf_systimer_tick_t due)
 {
     vsf_protect_t origlevel;
 #   if VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR == ENABLED
@@ -241,6 +241,7 @@ vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, vsf_systimer_tick_
 #   endif
     bool is_to_update = false;
     VSF_KERNEL_ASSERT(timer != NULL);
+    VSF_KERNEL_ASSERT(due != 0);
 
     if (timer->due != 0) {
         vsf_kernel_err_report(VSF_KERNEL_ERR_INVALID_USAGE);
@@ -251,7 +252,7 @@ vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, vsf_systimer_tick_
 #   if VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR == ENABLED
     lock_status = __vsf_callback_timer_protect();
 #   endif
-        timer->due = tick + vsf_systimer_get_tick();
+        timer->due = due;
         vsf_callback_timq_insert(&__vsf_eda.timer.callback_timq, timer);
         if (NULL == timer->timer_node.prev) {
             is_to_update = true;
@@ -265,6 +266,12 @@ vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, vsf_systimer_tick_
     }
     vsf_unprotect_sched(origlevel);
     return VSF_ERR_NONE;
+}
+
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_callback_timer_add")
+vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, vsf_systimer_tick_t tick)
+{
+    return vsf_callback_timer_add_due(timer, tick + vsf_systimer_get_tick());
 }
 
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_callback_timer_remove")
@@ -283,8 +290,8 @@ vsf_err_t vsf_callback_timer_remove(vsf_callback_timer_t *timer)
 }
 
 #    if VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR == ENABLED
-VSF_CAL_SECTION(".text.vsf.kernel.vsf_callback_timer_add_isr")
-vsf_err_t vsf_callback_timer_add_isr(vsf_callback_timer_t *timer, vsf_systimer_tick_t tick)
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_callback_timer_add_due_isr")
+vsf_err_t vsf_callback_timer_add_due_isr(vsf_callback_timer_t *timer, vsf_systimer_tick_t due)
 {
     VSF_KERNEL_ASSERT(timer != NULL);
     if (timer->due != 0) {
@@ -292,8 +299,14 @@ vsf_err_t vsf_callback_timer_add_isr(vsf_callback_timer_t *timer, vsf_systimer_t
         return VSF_ERR_FAIL;
     }
 
-    timer->due = tick + vsf_systimer_get_tick();
+    timer->due = due;
     return vsf_eda_post_evt_msg((vsf_eda_t *)&__vsf_eda.task, VSF_KERNEL_EVT_CALLBACK_TIMER_ADD, timer);
+}
+
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_callback_timer_add_isr")
+vsf_err_t vsf_callback_timer_add_isr(vsf_callback_timer_t *timer, vsf_systimer_tick_t tick)
+{
+    return vsf_callback_timer_add_due_isr(timer, tick + vsf_systimer_get_tick());
 }
 
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_callback_timer_remove_isr")

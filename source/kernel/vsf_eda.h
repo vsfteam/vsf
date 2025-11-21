@@ -1289,6 +1289,9 @@ extern vsf_err_t __vsf_teda_cancel_timer(vsf_teda_t *pthis);
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_callback_timer_init")
 extern void vsf_callback_timer_init(vsf_callback_timer_t *timer);
 
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_callback_timer_add_due")
+extern vsf_err_t vsf_callback_timer_add_due(vsf_callback_timer_t *timer, vsf_systimer_tick_t due);
+
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_callback_timer_add")
 extern vsf_err_t vsf_callback_timer_add(vsf_callback_timer_t *timer, vsf_systimer_tick_t tick);
 
@@ -1296,6 +1299,9 @@ VSF_CAL_SECTION(".text.vsf.kernel.vsf_callback_timer_remove")
 extern vsf_err_t vsf_callback_timer_remove(vsf_callback_timer_t *timer);
 
 #       if VSF_CALLBACK_TIMER_CFG_SUPPORT_ISR == ENABLED
+VSF_CAL_SECTION(".text.vsf.kernel.vsf_callback_timer_add_due_isr")
+extern vsf_err_t vsf_callback_timer_add_due_isr(vsf_callback_timer_t *timer, vsf_systimer_tick_t due);
+
 VSF_CAL_SECTION(".text.vsf.kernel.vsf_callback_timer_add_isr")
 extern vsf_err_t vsf_callback_timer_add_isr(vsf_callback_timer_t *timer, vsf_systimer_tick_t tick);
 
