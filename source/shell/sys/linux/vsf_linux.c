@@ -67,6 +67,7 @@
 #   include "./include/fnmatch.h"
 #   include "./include/linux/limits.h"
 #   include "./include/linux/futex.h"
+#   include "./include/linux/hrtimer.h"
 #else
 #   include <unistd.h>
 #   include <sched.h>
@@ -104,6 +105,7 @@
 // for PATH_MAX
 #   include <linux/limits.h>
 #   include <linux/futex.h>
+#   include <linux/hrtimer.h>
 #endif
 #include <stdarg.h>
 #if VSF_LINUX_CFG_RELATIVE_PATH == ENABLED && VSF_LINUX_USE_SIMPLE_STDLIB == ENABLED
@@ -3352,8 +3354,21 @@ int semop(int semid, struct sembuf *sops, size_t nsops)
 }
 #endif
 
-// sys/time.h
+// sys/time.h and linux/hrtimer.h
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
+
+#   if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
+void __hrtimer_on_timer(vsf_callback_timer_t *timer)
+{
+    struct hrtimer *hrtimer = container_of(timer, struct hrtimer, callback_timer);
+    if (hrtimer->function != NULL) {
+        if (hrtimer->function(hrtimer) == HRTIMER_RESTART) {
+            vsf_callback_timer_add_due(timer, hrtimer->due);
+        }
+    }
+}
+#   endif
+
 int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
     if (tz != NULL) {

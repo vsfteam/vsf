@@ -106,6 +106,7 @@ typedef long long           off64_t;
 typedef unsigned long       dev_t;
 typedef unsigned long       ino_t;
 typedef unsigned long long  ino64_t;
+typedef unsigned long long  sector_t;
 typedef unsigned int        blksiz_t;
 typedef unsigned long       blkcnt_t;
 typedef unsigned long long  blkcnt64_t;
@@ -114,6 +115,7 @@ typedef blkcnt_t            fsblkcnt_t;
 typedef blkcnt64_t          fsblkcnt64_t;
 typedef unsigned long       fsfilcnt_t;
 typedef unsigned long long  fsfilcnt64_t;
+typedef signed long long    ktime_t;
 
 typedef char *              caddr_t;
 
