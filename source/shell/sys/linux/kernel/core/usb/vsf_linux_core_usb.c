@@ -231,9 +231,6 @@ static void __vsf_linux_usb_disconnect_work(struct work_struct *work)
 static void * __vsf_linux_usb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs)
 {
     vk_usbh_ifs_t *ifs = parser_ifs->ifs;
-    vk_usbh_ifs_alt_parser_t *parser_alt = &parser_ifs->parser_alt[ifs->cur_alt];
-    struct usb_interface_desc_t *desc_ifs = parser_alt->desc_ifs;
-    struct usb_endpoint_desc_t *desc_ep = parser_alt->desc_ep;
 
     struct usb_driver_adapter_vsf *adapter = vsf_container_of(ifs->drv, struct usb_driver_adapter_vsf, vsf_drv);
     vsf_usbh_adapter_linux_t *usbh_linux = vsf_usbh_malloc(sizeof(*usbh_linux));
@@ -242,16 +239,24 @@ static void * __vsf_linux_usb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh
     }
     memset(usbh_linux, 0, sizeof(*usbh_linux));
 
-    struct usb_host_endpoint *ep;
+    uint8_t num_of_ep = 0;
+    for (int i = 0; i < ifs->num_of_alt; i++) {
+        num_of_ep += parser_ifs->parser_alt[i].num_of_ep;
+    }
+
+    struct usb_host_endpoint *usb_ep, *usb_ep_orig;
+    struct usb_host_interface *usb_host_ifs;
     struct usb_host_config *actconfig = vsf_usbh_malloc(
-            sizeof(*actconfig)                                      // adapter->device.actconfig
-        +   sizeof(*ep) * (1 + parser_ifs->parser_alt->num_of_ep)   // adapter->device.ep_in/ep_out
+            sizeof(*actconfig)                              // adapter->device.actconfig
+        +   sizeof(*usb_host_ifs) * ifs->num_of_alt
+        +   sizeof(*usb_ep) * (1 + num_of_ep)               // adapter->device.ep_in/ep_out
     );
     if (NULL == actconfig) {
         goto free_adapter_and_fail;
     }
     memset(actconfig, 0, sizeof(*actconfig));
-    ep = (struct usb_host_endpoint *)&actconfig[1];
+    usb_host_ifs = (struct usb_host_interface *)&actconfig[1];
+    usb_ep = (struct usb_host_endpoint *)&usb_host_ifs[ifs->num_of_alt];
 
     usbh_linux->id = (vk_usbh_dev_id_t *)parser_ifs->id;
     usbh_linux->device.__host = usbh;
@@ -259,7 +264,7 @@ static void * __vsf_linux_usb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh
     usbh_linux->device.actconfig = actconfig;
     usbh_linux->device.speed = dev->speed;
 
-    ep->desc = (usb_endpoint_descriptor){
+    usb_ep->desc = (usb_endpoint_descriptor){
         .bLength            = USB_DT_ENDPOINT_SIZE,
         .bDescriptorType    = USB_DT_ENDPOINT,
         .bEndpointAddress   = 0,
@@ -267,29 +272,68 @@ static void * __vsf_linux_usb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh
         .wMaxPacketSize     = vk_usbh_urb_get_pipe(&dev->ep0.urb).size,
         .bInterval          = 0,
     };
-    usbh_linux->device.ep_in[0] = usbh_linux->device.ep_out[0] = ep++;
+    usbh_linux->device.ep_in[0] = usbh_linux->device.ep_out[0] = usb_ep++;
+    usb_ep_orig = usb_ep;
+
+    usbh_linux->ifs.num_altsetting = ifs->num_of_alt;
+    usbh_linux->ifs.altsetting = usb_host_ifs;
+    usbh_linux->ifs.cur_altsetting = &usb_host_ifs[ifs->cur_alt];
 
     const struct usb_endpoint_descriptor *epd;
+    struct usb_endpoint_descriptor *epd_next;
     uint32_t size_remain;
-    for (int i = 0; i < desc_ifs->bNumEndpoints; i++, ep++) {
-        epd = (const struct usb_endpoint_descriptor *)desc_ep;
-        ep->desc = *epd;
+    vk_usbh_ifs_alt_parser_t *parser_alt_tmp;
+    int ep_no;
+    bool to_add_ep;
+    for (int i = 0; i < ifs->num_of_alt; i++) {
+        parser_alt_tmp = &parser_ifs->parser_alt[i];
+        epd = parser_alt_tmp->desc_ep;
 
-        if (usb_endpoint_dir_in(epd)) {
-            usbh_linux->device.ep_in[usb_endpoint_num(epd)] = ep;
-        } else {
-            usbh_linux->device.ep_out[usb_endpoint_num(epd)] = ep;
-        }
+        usb_host_ifs[i].desc = *parser_alt_tmp->desc_ifs;
+        usb_host_ifs[i].extra = (unsigned char *)&parser_alt_tmp->desc_ifs[1];
+        usb_host_ifs[i].extralen = parser_alt_tmp->desc_size - sizeof(struct usb_interface_desc_t);
+        usb_host_ifs[i].endpoint = (usb_host_ifs[i].desc.bNumEndpoints > 0) ? usb_ep : NULL;
+        usb_host_ifs[i].string = NULL;
 
-        size_remain = parser_alt->desc_size - ((uint8_t *)desc_ep - (uint8_t *)desc_ifs);
-        desc_ep = vk_usbh_get_next_ep_descriptor(desc_ep, size_remain);
+        for (int j = 0; j < usb_host_ifs[i].desc.bNumEndpoints; j++) {
+            ep_no = usb_endpoint_num(epd);
+            if (usb_endpoint_dir_in(epd)) {
+                to_add_ep = NULL == usbh_linux->device.ep_in[ep_no];
+                if (to_add_ep) {
+                    usbh_linux->device.ep_in[ep_no] = usb_ep;
+                }
+            } else {
+                to_add_ep = NULL == usbh_linux->device.ep_out[ep_no];
+                if (to_add_ep) {
+                    usbh_linux->device.ep_out[ep_no] = usb_ep;
+                }
+            }
 
-        if ((NULL == desc_ep) && (size_remain > epd->bLength)) {
-            ep->extra = (unsigned char *)epd + epd->bLength;
-            ep->extralen = size_remain - epd->bLength;
-        } else if ((desc_ep != NULL) && (((uint8_t *)desc_ep - (uint8_t *)epd) > epd->bLength)) {
-            ep->extra = (unsigned char *)epd + epd->bLength;
-            ep->extralen = ((uint8_t *)desc_ep - (uint8_t *)epd) - epd->bLength;
+            if (to_add_ep) {
+                if (usb_ep - usb_ep_orig >= num_of_ep) {
+                    goto free_config_and_fail;
+                }
+
+                size_remain = parser_alt_tmp->desc_size - ((uint8_t *)epd - (uint8_t *)parser_alt_tmp->desc_ifs);
+                epd_next = vk_usbh_get_next_ep_descriptor((usb_endpoint_desc_t *)epd, size_remain);
+
+                usb_ep->desc = *epd;
+                if ((NULL == epd_next) && (size_remain > epd->bLength)) {
+                    usb_ep->extra = (unsigned char *)epd + epd->bLength;
+                    usb_ep->extralen = size_remain - epd->bLength;
+                } else if ((epd_next != NULL) && (((uint8_t *)epd_next - (uint8_t *)epd) > epd->bLength)) {
+                    usb_ep->extra = (unsigned char *)epd + epd->bLength;
+                    usb_ep->extralen = ((uint8_t *)epd_next - (uint8_t *)epd) - epd->bLength;
+                } else {
+                    usb_ep->extra = NULL;
+                    usb_ep->extralen = 0;
+                }
+                epd = epd_next;
+                usb_ep++;
+            } else {
+                size_remain = parser_alt_tmp->desc_size - ((uint8_t *)epd - (uint8_t *)parser_alt_tmp->desc_ifs);
+                epd = (const struct usb_endpoint_descriptor *)vk_usbh_get_next_ep_descriptor((usb_endpoint_desc_t *)epd, size_remain);
+            }
         }
     }
 
@@ -302,6 +346,8 @@ static void * __vsf_linux_usb_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh
     schedule_work(&usbh_linux->probe_work);
     return usbh_linux;
 
+free_config_and_fail:
+    vsf_usbh_free(actconfig);
 free_adapter_and_fail:
     vsf_usbh_free(usbh_linux);
     return NULL;

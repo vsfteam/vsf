@@ -235,14 +235,14 @@ struct usb_driver {
 #define usb_pipebulk(__pipe)        (usb_pipetype(__pipe) == PIPE_BULK)
 
 extern uint32_t __vk_usbh_get_pipe_value(vk_usbh_dev_t *dev, uint8_t endpoint, uint8_t type, uint16_t size);
-#define usb_sndctrlpipe(__udev, __endpoint)         __vk_usbh_get_pipe_value((__udev)->__dev, __endpoint, PIPE_CONTROL, (__udev)->ep_out[__endpoint]->desc.wMaxPacketSize)
-#define usb_rcvctrlpipe(__udev, __endpoint)         __vk_usbh_get_pipe_value((__udev)->__dev, __endpoint | USB_DIR_IN, PIPE_CONTROL, (__udev)->ep_out[__endpoint]->desc.wMaxPacketSize)
-#define usb_sndisocpipe(__udev, __endpoint)         __vk_usbh_get_pipe_value((__udev)->__dev, __endpoint, PIPE_ISOCHRONOUS, (__udev)->ep_out[__endpoint]->desc.wMaxPacketSize)
-#define usb_rcvisocpipe(__udev, __endpoint)         __vk_usbh_get_pipe_value((__udev)->__dev, __endpoint | USB_DIR_IN, PIPE_ISOCHRONOUS, (__udev)->ep_out[__endpoint]->desc.wMaxPacketSize)
-#define usb_sndbulkpipe(__udev, __endpoint)         __vk_usbh_get_pipe_value((__udev)->__dev, __endpoint, PIPE_BULK, (__udev)->ep_out[__endpoint]->desc.wMaxPacketSize)
-#define usb_rcvbulkpipe(__udev, __endpoint)         __vk_usbh_get_pipe_value((__udev)->__dev, __endpoint | USB_DIR_IN, PIPE_BULK, (__udev)->ep_out[__endpoint]->desc.wMaxPacketSize)
-#define usb_sndintpipe(__udev, __endpoint)          __vk_usbh_get_pipe_value((__udev)->__dev, __endpoint, PIPE_INTERRUPT, (__udev)->ep_out[__endpoint]->desc.wMaxPacketSize)
-#define usb_rcvintpipe(__udev, __endpoint)          __vk_usbh_get_pipe_value((__udev)->__dev, __endpoint | USB_DIR_IN, PIPE_INTERRUPT, (__udev)->ep_out[__endpoint]->desc.wMaxPacketSize)
+#define usb_sndctrlpipe(__udev, __endpoint)         __vk_usbh_get_pipe_value((__udev)->__dev, (__endpoint), PIPE_CONTROL, (__udev)->ep_out[(__endpoint) & 15]->desc.wMaxPacketSize)
+#define usb_rcvctrlpipe(__udev, __endpoint)         __vk_usbh_get_pipe_value((__udev)->__dev, (__endpoint) | USB_DIR_IN, PIPE_CONTROL, (__udev)->ep_out[(__endpoint) & 15]->desc.wMaxPacketSize)
+#define usb_sndisocpipe(__udev, __endpoint)         __vk_usbh_get_pipe_value((__udev)->__dev, (__endpoint), PIPE_ISOCHRONOUS, (__udev)->ep_out[(__endpoint) & 15]->desc.wMaxPacketSize)
+#define usb_rcvisocpipe(__udev, __endpoint)         __vk_usbh_get_pipe_value((__udev)->__dev, (__endpoint) | USB_DIR_IN, PIPE_ISOCHRONOUS, (__udev)->ep_out[(__endpoint) & 15]->desc.wMaxPacketSize)
+#define usb_sndbulkpipe(__udev, __endpoint)         __vk_usbh_get_pipe_value((__udev)->__dev, (__endpoint), PIPE_BULK, (__udev)->ep_out[(__endpoint) & 15]->desc.wMaxPacketSize)
+#define usb_rcvbulkpipe(__udev, __endpoint)         __vk_usbh_get_pipe_value((__udev)->__dev, (__endpoint) | USB_DIR_IN, PIPE_BULK, (__udev)->ep_out[(__endpoint) & 15]->desc.wMaxPacketSize)
+#define usb_sndintpipe(__udev, __endpoint)          __vk_usbh_get_pipe_value((__udev)->__dev, (__endpoint), PIPE_INTERRUPT, (__udev)->ep_out[(__endpoint) & 15]->desc.wMaxPacketSize)
+#define usb_rcvintpipe(__udev, __endpoint)          __vk_usbh_get_pipe_value((__udev)->__dev, (__endpoint) | USB_DIR_IN, PIPE_INTERRUPT, (__udev)->ep_out[(__endpoint) & 15]->desc.wMaxPacketSize)
 static inline struct usb_host_endpoint * usb_pipe_endpoint(struct usb_device *udev, unsigned int pipe)
 {
     struct usb_host_endpoint **eps = usb_pipein(pipe) ? udev->ep_in : udev->ep_out;
