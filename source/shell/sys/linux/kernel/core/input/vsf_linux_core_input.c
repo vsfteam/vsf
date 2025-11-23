@@ -33,21 +33,33 @@
 
 struct input_dev * input_allocate_device(void)
 {
-    return NULL;
+    struct input_dev *dev = kzalloc(sizeof(*dev), GFP_KERNEL);
+    if (!dev) {
+        return NULL;
+    }
+
+    return dev;
 }
 
 struct input_dev * devm_input_allocate_device(struct device *dev)
 {
-    return NULL;
+    struct input_dev *input_dev = input_allocate_device();
+    if (input_dev != NULL) {
+        input_dev->dev.parent = dev;
+    }
+    return input_dev;
 }
 
 void input_free_device(struct input_dev *dev)
 {
+    if (dev) {
+        kfree(dev);
+    }
 }
 
 int input_register_device(struct input_dev *dev)
 {
-    return -1;
+    return 0;
 }
 
 void input_unregister_device(struct input_dev *dev)
@@ -76,7 +88,7 @@ void input_copy_abs(struct input_dev *dst, unsigned int dst_axis, const struct i
 
 int input_ff_create(struct input_dev *dev, unsigned int max_effects)
 {
-    return -1;
+    return 0;
 }
 
 void input_ff_destroy(struct input_dev *dev)
@@ -85,12 +97,12 @@ void input_ff_destroy(struct input_dev *dev)
 
 int input_ff_event(struct input_dev *dev, unsigned int type, unsigned int code, int value)
 {
-    return -1;
+    return 0;
 }
 
 int input_ff_create_memless(struct input_dev *dev, void *data, int (*play_effect)(struct input_dev *, void *, struct ff_effect *))
 {
-    return -1;
+    return 0;
 }
 
 #endif

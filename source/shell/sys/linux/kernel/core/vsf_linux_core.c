@@ -659,6 +659,7 @@ void bus_probe_device(struct device *dev)
             if (driver_match_device(_->driver, dev) > 0) {
                 dev->driver = _->driver;
                 driver_probe_device(_->driver, dev);
+                break;
             }
         }
     }

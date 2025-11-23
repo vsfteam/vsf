@@ -33,7 +33,7 @@
 
 int devm_led_classdev_register(struct device *parent, struct led_classdev *led_cdev)
 {
-    return -1;
+    return 0;
 }
 
 #endif
