@@ -39,8 +39,14 @@ struct device_driver {
     int (*resume)(struct device *dev);
 };
 
+static inline int driver_match_device(const struct device_driver *drv, struct device *dev)
+{
+    return drv->bus->match ? drv->bus->match(dev, (struct device_driver *)drv) : 1;
+}
+
 extern int driver_register(struct device_driver *drv);
 extern void driver_unregister(struct device_driver *drv);
+extern int driver_probe_device(const struct device_driver *drv, struct device *dev);
 
 #ifdef __cplusplus
 }

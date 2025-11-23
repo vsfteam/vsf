@@ -58,10 +58,12 @@ int kobject_set_name_vargs(struct kobject *kobj, const char *fmt, va_list ap)
         if (kobj->name != NULL) {
             vsf_heap_free((void *)kobj->name);
         }
+        size++;
         kobj->name = vsf_heap_malloc(size);
         if (NULL == kobj->name) {
             return -ENOMEM;
         }
+        vsnprintf(kobj->name, size, fmt, ap);
         return 0;
     }
     return -EINVAL;
@@ -517,6 +519,12 @@ void init_wait_queue_head(struct wait_queue_head *wqh)
 * linux/device.h                                                               *
 *******************************************************************************/
 
+static vsf_dlist_t __vsf_linux_driver_list;
+typedef struct vsf_linux_driver_t {
+    vsf_dlist_node_t                node;
+    const struct device_driver      *driver;
+} vsf_linux_driver_t;
+
 struct device * get_device(struct device *dev)
 {
     if (dev) {
@@ -567,6 +575,7 @@ int device_add(struct device *dev)
         dev->kobj.parent = &parent->kobj;
     }
 
+    bus_probe_device(dev);
     put_device(dev);
     return 0;
 }
@@ -593,11 +602,39 @@ void device_unregister(struct device *dev)
 
 int driver_register(struct device_driver *drv)
 {
+    vsf_linux_driver_t *driver = kzalloc(sizeof(*driver), GFP_KERNEL);
+    if (!driver) {
+        return -ENOMEM;
+    }
+    vsf_dlist_init_node(vsf_linux_driver_t, node, driver);
+    driver->driver = (const struct device_driver *)drv;
+
+    vsf_protect_t orig = vsf_protect_sched();
+        vsf_dlist_add_to_head(vsf_linux_driver_t, node, &__vsf_linux_driver_list, driver);
+    vsf_unprotect_sched(orig);
+
     return 0;
 }
 
 void driver_unregister(struct device_driver *drv)
 {
+    vsf_protect_t orig;
+    __vsf_dlist_foreach_next_unsafe(vsf_linux_driver_t, node, &__vsf_linux_driver_list) {
+        if (_->driver == drv) {
+            orig = vsf_protect_sched();
+                vsf_dlist_remove(vsf_linux_driver_t, node, &__vsf_linux_driver_list, _);
+            vsf_unprotect_sched(orig);
+            kfree(_);
+            break;
+        }
+    }
+}
+
+int driver_probe_device(const struct device_driver *drv, struct device *dev)
+{
+    return  dev->bus->probe ? dev->bus->probe(dev)
+        :   drv->probe ? drv->probe(dev)
+        :   0;
 }
 
 int bus_register(struct bus_type *bus)
@@ -612,6 +649,19 @@ void bus_unregister(struct bus_type *bus)
 int bus_rescan_devices(struct bus_type *bus)
 {
     return 0;
+}
+
+void bus_probe_device(struct device *dev)
+{
+    if (dev->driver) {
+    } else if (dev->bus) {
+        __vsf_dlist_foreach_next_unsafe(vsf_linux_driver_t, node, &__vsf_linux_driver_list) {
+            if (driver_match_device(_->driver, dev) > 0) {
+                dev->driver = _->driver;
+                driver_probe_device(_->driver, dev);
+            }
+        }
+    }
 }
 
 /*******************************************************************************
