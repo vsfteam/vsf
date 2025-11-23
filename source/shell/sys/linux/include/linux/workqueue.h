@@ -70,6 +70,9 @@ extern bool flush_delayed_work(struct delayed_work *dwork);
 extern bool cancel_delayed_work(struct delayed_work *dwork);
 extern bool cancel_delayed_work_sync(struct delayed_work *dwork);
 
+// call workqueue_init_early before workqueue is used
+extern void workqueue_init_early(void);
+
 #ifdef __cplusplus
 }
 #endif

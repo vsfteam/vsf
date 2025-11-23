@@ -31,6 +31,7 @@
 #include <linux/slab.h>
 #include <linux/device.h>
 
+#include <pthread.h>
 #include <stdio.h>
 
 /*============================ MACROS ========================================*/
@@ -136,7 +137,6 @@ struct workqueue_struct {
 
     char                            name[16];
 
-    vsf_linux_process_t             *process;
     bool                            is_to_exit;
 };
 
@@ -150,10 +150,9 @@ struct workqueue_struct *system_wq;
 #   pragma clang diagnostic ignored "-Wcast-align"
 #endif
 
-static int __workqueue_thread(int argc, char **argv)
+static void * __workqueue_thread(void *arg)
 {
-    VSF_LINUX_ASSERT(1 == argc);
-    struct workqueue_struct *wq = (struct workqueue_struct *)argv[0];
+    struct workqueue_struct *wq = (struct workqueue_struct *)arg;
     union {
         struct delayed_work *dwork;
         struct work_struct *work;
@@ -220,7 +219,7 @@ static int __workqueue_thread(int argc, char **argv)
             }
         }
     }
-    return 0;
+    return NULL;
 }
 
 #if __IS_COMPILER_GCC__
@@ -245,10 +244,7 @@ struct workqueue_struct * alloc_workqueue(const char *fmt, unsigned int flags, i
     vsf_eda_sem_init(&wq->sem);
     wq->is_to_exit = false;
 
-    wq->process = vsf_linux_start_process_internal(__workqueue_thread);
-    wq->process->ctx.arg.argc = 1;
-    wq->process->ctx.arg.argv[0] = (const char *)wq;
-    if (NULL == wq->process) {
+    if (pthread_create(NULL, NULL, __workqueue_thread, wq) != 0) {
         kfree(wq);
         return NULL;
     }
@@ -436,6 +432,11 @@ bool cancel_delayed_work_sync(struct delayed_work *dwork)
     }
 
     return __queue_cancel_delayed_work(wq, dwork, true, vsf_protect_int());
+}
+
+void workqueue_init_early(void)
+{
+    system_wq = alloc_workqueue("events", 0, 0);
 }
 
 /*******************************************************************************
