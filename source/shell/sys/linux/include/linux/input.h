@@ -237,7 +237,7 @@ extern "C" {
 #define KEY_CHANNELUP               (VSF_KB_USER + 18)
 #define KEY_CHANNELDOWN             (VSF_KB_USER + 19)
 
-#define KEY_MAX                     0x2ff
+#define KEY_MAX                     0x3ff
 #define KEY_CNT                     (KEY_MAX + 1)
 
 // rel
@@ -258,40 +258,42 @@ extern "C" {
 
 // btn
 
-#define BTN_GAMEPAD
-#define BTN_SOUTH                   GAMEPAD_ID_R_DOWN
+#define BTN_GAMEPAD                 0x400
+#define BTN_SOUTH                   (BTN_GAMEPAD | GAMEPAD_ID_R_DOWN)
 #define BTN_A                       BTN_SOUTH
-#define BTN_EAST                    GAMEPAD_ID_R_RIGHT
+#define BTN_EAST                    (BTN_GAMEPAD | GAMEPAD_ID_R_RIGHT)
 #define BTN_B                       BTN_EAST
-#define BTN_NORTH                   GAMEPAD_ID_R_UP
+#define BTN_NORTH                   (BTN_GAMEPAD | GAMEPAD_ID_R_UP)
 #define BTN_X                       BTN_NORTH
-#define BTN_WEST                    GAMEPAD_ID_R_LEFT
+#define BTN_WEST                    (BTN_GAMEPAD | GAMEPAD_ID_R_LEFT)
 #define BTN_Y                       BTN_WEST
-#define BTN_TL                      GAMEPAD_ID_LT
-#define BTN_TR                      GAMEPAD_ID_RT
-#define BTN_SELECT                  GAMEPAD_ID_MENU_LEFT
-#define BTN_MODE                    GAMEPAD_ID_MENU_MAIN
-#define BTN_START                   GAMEPAD_ID_MENU_RIGHT
-#define BTN_THUMBL                  (GAMEPAD_ID_USER + 0)
-#define BTN_THUMBR                  (GAMEPAD_ID_USER + 1)
-#define BTN_TRIGGER_HAPPY           (GAMEPAD_ID_USER + 2)
-#define BTN_TRIGGER_HAPPY1          (GAMEPAD_ID_USER + 2)
-#define BTN_TRIGGER_HAPPY2          (GAMEPAD_ID_USER + 3)
-#define BTN_TRIGGER_HAPPY3          (GAMEPAD_ID_USER + 4)
-#define BTN_TRIGGER_HAPPY4          (GAMEPAD_ID_USER + 5)
-#define BTN_TRIGGER_HAPPY5          (GAMEPAD_ID_USER + 6)
-#define BTN_TRIGGER_HAPPY6          (GAMEPAD_ID_USER + 7)
-#define BTN_TRIGGER_HAPPY7          (GAMEPAD_ID_USER + 8)
-#define BTN_TRIGGER_HAPPY8          (GAMEPAD_ID_USER + 9)
-#define BTN_TRIGGER_HAPPY9          (GAMEPAD_ID_USER + 10)
-#define BTN_TRIGGER_HAPPY10         (GAMEPAD_ID_USER + 11)
+#define BTN_TL                      (BTN_GAMEPAD | GAMEPAD_ID_LT)
+#define BTN_TR                      (BTN_GAMEPAD | GAMEPAD_ID_RT)
+#define BTN_SELECT                  (BTN_GAMEPAD | GAMEPAD_ID_MENU_LEFT)
+#define BTN_MODE                    (BTN_GAMEPAD | GAMEPAD_ID_MENU_MAIN)
+#define BTN_START                   (BTN_GAMEPAD | GAMEPAD_ID_MENU_RIGHT)
+#define BTN_THUMBL                  (BTN_GAMEPAD | GAMEPAD_ID_L_STICK)
+#define BTN_THUMBR                  (BTN_GAMEPAD | GAMEPAD_ID_R_STICK)
+#define BTN_TRIGGER_HAPPY           (BTN_GAMEPAD | (GAMEPAD_ID_USER + 0))
+#define BTN_TRIGGER_HAPPY1          (BTN_GAMEPAD | (GAMEPAD_ID_USER + 0))
+#define BTN_TRIGGER_HAPPY2          (BTN_GAMEPAD | (GAMEPAD_ID_USER + 1))
+#define BTN_TRIGGER_HAPPY3          (BTN_GAMEPAD | (GAMEPAD_ID_USER + 2))
+#define BTN_TRIGGER_HAPPY4          (BTN_GAMEPAD | (GAMEPAD_ID_USER + 3))
+#define BTN_TRIGGER_HAPPY5          (BTN_GAMEPAD | (GAMEPAD_ID_USER + 4))
+#define BTN_TRIGGER_HAPPY6          (BTN_GAMEPAD | (GAMEPAD_ID_USER + 5))
+#define BTN_TRIGGER_HAPPY7          (BTN_GAMEPAD | (GAMEPAD_ID_USER + 6))
+#define BTN_TRIGGER_HAPPY8          (BTN_GAMEPAD | (GAMEPAD_ID_USER + 7))
+#define BTN_TRIGGER_HAPPY9          (BTN_GAMEPAD | (GAMEPAD_ID_USER + 8))
+#define BTN_TRIGGER_HAPPY10         (BTN_GAMEPAD | (GAMEPAD_ID_USER + 9))
+#define BTN_GAMEPAD_MAX             BTN_TRIGGER_HAPPY10
 
-#define BTN_MOUSE                   0x410
+#define BTN_MOUSE                   0x420
 #define BTN_LEFT                    (BTN_MOUSE + VSF_INPUT_MOUSE_BUTTON_LEFT)
 #define BTN_RIGHT                   (BTN_MOUSE + VSF_INPUT_MOUSE_BUTTON_RIGHT)
 #define BTN_MIDDLE                  (BTN_MOUSE + VSF_INPUT_MOUSE_BUTTON_MIDDLE)
+#define BTN_MOUSE_MAX               0x422
 
-#define BTN_JOYSTICK                0x420
+#define BTN_JOYSTICK                0x430
 #define BTN_TRIGGER                 BTN_JOYSTICK
 
 #define BTN_DIGI                    0x440
@@ -328,6 +330,11 @@ extern "C" {
 #define ABS_TOOL_WIDTH              0x1c
 #define ABS_VOLUME                  0x20
 #define ABS_MISC                    0x28
+
+#define ABS_MT_POSITION_X           0x35
+#define ABS_MT_POSITION_Y           0x36
+#define ABS_MT_TRACKING_ID          0x39
+#define ABS_MT_PRESSURE             0x3a
 
 #define ABS_MAX                     0x3f
 #define ABS_CNT                     (ABS_MAX + 1)
@@ -385,6 +392,7 @@ struct input_id {
     __u16                           version;
 };
 
+dcl_vsf_bitmap(input_dev_bitmap, 0x450)
 struct input_dev {
     const char                      *name;
     const char                      *phys;
@@ -392,6 +400,14 @@ struct input_dev {
     struct input_id                 id;
 
     struct device                   dev;
+    vk_input_notifier_t             notifier;
+
+    uint64_t                        abs_msk;
+    int                             abs_value[ABS_CNT];
+    uint64_t                        rel_msk;
+    int                             rel_value[REL_CNT];
+
+    vsf_bitmap(input_dev_bitmap)    key_bitmap;
 };
 #define to_input_dev(__dev)         vsf_container_of((__dev), struct input_dev, dev)
 
