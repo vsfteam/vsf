@@ -403,8 +403,8 @@ struct input_dev {
     vk_input_notifier_t             notifier;
 
     uint64_t                        abs_msk;
-    int                             abs_value[ABS_CNT];
     uint64_t                        rel_msk;
+    struct input_absinfo            *absinfo;
     int                             rel_value[REL_CNT];
 
     vsf_bitmap(input_dev_bitmap)    key_bitmap;

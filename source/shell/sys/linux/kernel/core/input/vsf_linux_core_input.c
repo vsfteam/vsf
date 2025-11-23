@@ -57,6 +57,10 @@ struct input_dev * devm_input_allocate_device(struct device *dev)
 void input_free_device(struct input_dev *dev)
 {
     if (dev) {
+        if (dev->absinfo) {
+            kfree(dev->absinfo);
+            dev->absinfo = NULL;
+        }
         kfree(dev);
     }
 }
@@ -108,11 +112,11 @@ void input_event(struct input_dev *dev, unsigned int type, unsigned int code, in
         if (dev->notifier.mask & (1 << VSF_INPUT_TYPE_TOUCHSCREEN)) {
             if (dev->abs_msk & ((1ULL << ABS_X) | (1ULL << ABS_Y))) {
                 vsf_input_touchscreen_set(&evt.ts_evt,
-                    dev->abs_value[ABS_MT_TRACKING_ID],
+                    dev->absinfo[ABS_MT_TRACKING_ID].value,
                     !!vsf_bitmap_get(&dev->key_bitmap, BTN_TOUCH),
-                    dev->abs_value[ABS_MT_PRESSURE],
-                    dev->abs_value[ABS_X],
-                    dev->abs_value[ABS_Y]);
+                    dev->absinfo[ABS_MT_PRESSURE].value,
+                    dev->absinfo[ABS_X].value,
+                    dev->absinfo[ABS_Y].value);
                 vsf_input_on_touchscreen(&evt.ts_evt);
             }
         }
@@ -161,16 +165,27 @@ void input_event(struct input_dev *dev, unsigned int type, unsigned int code, in
         VSF_LINUX_ASSERT(code < REL_CNT);
         dev->rel_msk |= 1ULL << code;
         orig_value = dev->rel_value[code];
-        dev->rel_value[code] == value;
+        dev->rel_value[code] = value;
     case EV_ABS:
+        if (!dev->absinfo) {
+            break;
+        }
+
         VSF_LINUX_ASSERT(code < ABS_CNT);
         dev->abs_msk |= 1ULL << code;
-        orig_value = dev->abs_value[code];
-        dev->abs_value[code] == value;
+        orig_value = dev->absinfo[code].value;
+        dev->absinfo[code].value = value;
 
         if (dev->notifier.mask & (1 << VSF_INPUT_TYPE_GAMEPAD)) {
             do {
-                // TODO: process all members in vk_input_item_info_t
+                struct input_absinfo *absinfo = &dev->absinfo[code];
+                if ((value >= -absinfo->flat) && (value <= absinfo->flat)) {
+                    value = 0;
+                }
+                if (abs(value - orig_value) <= absinfo->fuzz) {
+                    break;
+                }
+
                 if (ABS_X == code) {
                     evt.gamepad_evt.info.item = GAMEPAD_ID_LX;
                 } else if (ABS_Y == code) {
@@ -211,8 +226,13 @@ void input_event(struct input_dev *dev, unsigned int type, unsigned int code, in
                     break;
                 }
 
-                evt.gamepad_evt.cur.val64 = value;
-                evt.gamepad_evt.pre.val64 = orig_value;
+                if (absinfo->minimum < 0) {
+                    evt.gamepad_evt.info.is_signed = 1;
+                }
+                int_fast8_t bitlen = vsf_msb32(absinfo->maximum - absinfo->minimum + 1);
+                evt.gamepad_evt.info.bitlen = bitlen < 0 ? 0 : bitlen;
+                evt.gamepad_evt.cur.val32 = value;
+                evt.gamepad_evt.pre.val32 = orig_value;
                 vsf_input_on_gamepad(&evt.gamepad_evt);
             } while (0);
         }
@@ -222,10 +242,26 @@ void input_event(struct input_dev *dev, unsigned int type, unsigned int code, in
 
 void input_alloc_absinfo(struct input_dev *dev)
 {
+    if (dev->absinfo) {
+        return;
+    }
+
+    dev->absinfo = kmalloc(ABS_CNT * sizeof(*dev->absinfo), GFP_KERNEL);
 }
 
 void input_set_abs_params(struct input_dev *dev, unsigned int axis, int min, int max, int fuzz, int flat)
 {
+    input_alloc_absinfo(dev);
+    if (!dev->absinfo) {
+        return;
+    }
+
+    struct input_absinfo *absinfo = &dev->absinfo[axis];
+    absinfo->minimum = min;
+    absinfo->maximum = max;
+    absinfo->fuzz = fuzz;
+    absinfo->flat = flat;
+
     if ((ABS_MT_POSITION_X == axis) || (ABS_MT_POSITION_Y == axis)) {
         dev->notifier.mask |= 1 << VSF_INPUT_TYPE_TOUCHSCREEN;
     }
