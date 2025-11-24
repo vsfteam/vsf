@@ -98,6 +98,8 @@ typedef enum vsf_gamepad_id_t {
 
     GAMEPAD_ID_NUM,
     GAMEPAD_ID_USER = GAMEPAD_ID_NUM,
+    GAMEPAD_ID_ANALOG_MIN = GAMEPAD_ID_LX,
+    GAMEPAD_ID_ANALOG_MAX = GAMEPAD_ID_RT,
 } vsf_gamepad_id_t;
 
 typedef struct vk_gamepad_evt_t {
