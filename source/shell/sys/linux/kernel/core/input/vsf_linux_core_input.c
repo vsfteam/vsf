@@ -21,8 +21,10 @@
 
 #if VSF_USE_LINUX == ENABLED && VSF_USE_INPUT == ENABLED
 
+#if VSF_LINUX_USE_DEVFS == ENABLED
 // for vsf_linux_fs_bind_input
-#include <unistd.h>
+#   include <unistd.h>
+#endif
 
 #include <linux/input.h>
 
@@ -67,10 +69,14 @@ void input_free_device(struct input_dev *dev)
 
 int input_register_device(struct input_dev *dev)
 {
+#if VSF_LINUX_USE_DEVFS == ENABLED
     char path[11 + strlen(dev->phys) + 1];
     strcpy(path, "/dev/input/");
     strcat(path, dev->phys);
     return vsf_linux_fs_bind_input(path, &dev->notifier);
+#else
+    return 0;
+#endif
 }
 
 void input_unregister_device(struct input_dev *dev)
