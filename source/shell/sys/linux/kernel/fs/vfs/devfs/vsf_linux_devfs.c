@@ -1461,6 +1461,26 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
             }
         }
         break;
+    case VSF_INPUT_TYPE_GAMEPAD: {
+            vk_gamepad_evt_t *gamepad_evt = (vk_gamepad_evt_t *)evt;
+            input_event.value = gamepad_evt->cur.val32;
+
+            if (gamepad_evt->info.item >= GAMEPAD_ID_ANALOG_MIN && gamepad_evt->info.item <= GAMEPAD_ID_ANALOG_MAX) {
+                switch (gamepad_evt->info.item) {
+                case GAMEPAD_ID_LX:         input_event.code = ABS_X;       break;
+                case GAMEPAD_ID_LY:         input_event.code = ABS_Y;       break;
+                case GAMEPAD_ID_RX:         input_event.code = ABS_RX;      break;
+                case GAMEPAD_ID_RY:         input_event.code = ABS_RY;      break;
+                case GAMEPAD_ID_LT:         input_event.code = ABS_Z;       break;
+                case GAMEPAD_ID_RT:         input_event.code = ABS_RZ;      break;
+                }
+                input_event.type = EV_ABS;
+            } else {
+                input_event.code = BTN_GAMEPAD + gamepad_evt->info.item;
+                input_event.type = EV_KEY;
+            }
+        }
+        break;
     }
 
     vsf_linux_fd_set_status(&input_priv->use_as__vsf_linux_fd_priv_t, POLLIN, vsf_protect_sched());

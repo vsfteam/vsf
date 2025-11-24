@@ -117,6 +117,14 @@ void input_event(struct input_dev *dev, unsigned int type, unsigned int code, in
     case EV_SYN:
         if (dev->notifier.mask & (1 << VSF_INPUT_TYPE_TOUCHSCREEN)) {
             if (dev->abs_msk & ((1ULL << ABS_X) | (1ULL << ABS_Y))) {
+                if (dev->abs_msk & (1 << ABS_MT_PRESSURE)) {
+                    if (dev->absinfo[ABS_MT_PRESSURE].value > 0) {
+                        vsf_bitmap_set(&dev->key_bitmap, BTN_TOUCH);
+                    } else {
+                        vsf_bitmap_clear(&dev->key_bitmap, BTN_TOUCH);
+                    }
+                }
+
                 vsf_input_touchscreen_set(&evt.ts_evt,
                     dev->absinfo[ABS_MT_TRACKING_ID].value,
                     !!vsf_bitmap_get(&dev->key_bitmap, BTN_TOUCH),
