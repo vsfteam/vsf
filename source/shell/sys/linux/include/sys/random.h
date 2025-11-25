@@ -59,6 +59,12 @@ ssize_t getrandom(void *buf, size_t buflen, unsigned int flags);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SYS_RANDOM
 
+static inline void get_random_bytes(void *buf, int nbytes)
+{
+    ssize_t ret = getrandom(buf, nbytes, 0);
+    VSF_LINUX_ASSERT(ret == nbytes);
+}
+
 #ifdef __cplusplus
 }
 #endif
