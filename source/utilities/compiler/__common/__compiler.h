@@ -116,8 +116,8 @@ extern "C" {
                                         __asm__(".equ " #__ALIAS ", " #__ORIGIN)
 
 #   define VSF_CAL_PACKED               __attribute__((__packed__))
-//#   define VSF_CAL_UNALIGNED            __attribute__((__packed__))
-#   undef VSF_CAL_                                                      //! llvm doesn't support this
+//#   define VSF_CAL_UNALIGNED            __attribute__((packed))
+#   undef VSF_CAL_UNALIGNED                                             //! llvm doesn't support this
 #   define VSF_CAL_TRANSPARENT_UNION    __attribute__((__transparent_union__))
 #   define __VSF_CAL_ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
