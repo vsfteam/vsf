@@ -1,0 +1,460 @@
+/*****************************************************************************
+ *   Copyright(C)2009-2022 by VSF Team                                       *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *     http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ ****************************************************************************/
+
+/*============================ INCLUDES ======================================*/
+
+#include "shell/sys/linux/vsf_linux_cfg.h"
+
+#if VSF_USE_LINUX == ENABLED && VSF_USE_MBEDTLS == ENABLED
+
+#include <unistd.h>
+
+#include <linux/crypto.h>
+#include <crypto/internal.h>
+#include <crypto/akcipher.h>
+#include <crypto/hash.h>
+#include <crypto/sha2.h>
+
+#include <psa/crypto.h>
+
+/*============================ MACROS ========================================*/
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
+
+typedef struct psa_key_ctx_t {
+    psa_key_id_t key_id;
+    psa_key_attributes_t attr;
+} psa_key_ctx_t;
+
+typedef struct vsf_linux_crypto_t {
+    vsf_dlist_t alg_list;
+    vsf_dlist_t tmpl_list;
+} vsf_linux_crypto_t;
+
+/*============================ GLOBAL VARIABLES ==============================*/
+
+const struct crypto_type crypto_shash_type = {
+    .type = CRYPTO_ALG_TYPE_HASH,
+    .tfmsize = offsetof(struct crypto_shash, base),
+};
+
+const struct crypto_type crypto_akcipher_type = {
+    .type = CRYPTO_ALG_TYPE_AKCIPHER,
+    .tfmsize = offsetof(struct crypto_akcipher, base),
+};
+
+/*============================ PROTOTYPES ====================================*/
+
+static int __pkcs1pad_create(struct crypto_template *tmpl, struct crypto_alg_tree *arg);
+
+/*============================ LOCAL VARIABLES ===============================*/
+
+static struct shash_alg __sha256_algs[] = {
+    {
+        .base.cra_name              = "sha224",
+        .base.cra_blocksize         = SHA224_BLOCK_SIZE,
+        .base.alg                   = PSA_ALG_SHA_224,
+        .digestsize                 = SHA224_DIGEST_SIZE,
+        .descsize                   = sizeof(psa_hash_operation_t),
+    },
+    {
+        .base.cra_name              = "sha256",
+        .base.cra_blocksize         = SHA256_BLOCK_SIZE,
+        .base.alg                   = PSA_ALG_SHA_256,
+        .digestsize                 = SHA256_DIGEST_SIZE,
+        .descsize                   = sizeof(psa_hash_operation_t),
+    },
+    {
+        .base.cra_name              = "hmac(sha224)",
+        .base.cra_blocksize         = SHA224_BLOCK_SIZE,
+        .base.cra_ctxsize           = sizeof(psa_key_ctx_t),
+        .base.alg                   = PSA_ALG_HMAC(PSA_ALG_SHA_224),
+        .digestsize                 = SHA224_DIGEST_SIZE,
+        .descsize                   = sizeof(psa_mac_operation_t),
+    },
+    {
+        .base.cra_name              = "hmac(sha256)",
+        .base.cra_blocksize         = SHA256_BLOCK_SIZE,
+        .base.cra_ctxsize           = sizeof(psa_key_ctx_t),
+        .base.alg                   = PSA_ALG_HMAC(PSA_ALG_SHA_256),
+        .digestsize                 = SHA256_DIGEST_SIZE,
+        .descsize                   = sizeof(psa_mac_operation_t),
+    },
+};
+
+static struct crypto_template __rsa_pkcs1pad_tmpl = {
+    .name                           = "pkcs1pad",
+    .crate                          = __pkcs1pad_create,
+};
+
+static VSF_CAL_NO_INIT vsf_linux_crypto_t __vsf_linux_crypto;
+
+/*============================ IMPLEMENTATION ================================*/
+
+int crypto_register_alg(struct crypto_alg *alg)
+{
+    if (vsf_dlist_is_in(struct crypto_alg, node, &__vsf_linux_crypto.alg_list, alg)) {
+        return -EEXIST;
+    }
+
+    vsf_dlist_add_to_head(struct crypto_alg, node, &__vsf_linux_crypto.alg_list, alg);
+    return 0;
+}
+
+void crypto_unregister_alg(struct crypto_alg *alg)
+{
+    if (!vsf_dlist_is_in(struct crypto_alg, node, &__vsf_linux_crypto.alg_list, alg)) {
+        return;
+    }
+
+    vsf_dlist_remove(struct crypto_alg, node, &__vsf_linux_crypto.alg_list, alg);
+}
+
+static void __crypto_free_alg_tree(struct crypto_alg_tree *root)
+{
+    if (root->next != NULL) {
+        __crypto_free_alg_tree(root->next);
+        root->next = NULL;
+    }
+    kfree(root);
+}
+
+static const char *__crypto_generate_alg_tree(const char *alg_name, struct crypto_alg_tree **node)
+{
+    const char *tmp = NULL;
+    struct crypto_alg *alg = NULL;
+    __vsf_dlist_foreach_unsafe(struct crypto_alg, node, &__vsf_linux_crypto.alg_list) {
+        if (strstr(alg_name, _->cra_name) == alg_name) {
+            tmp = &alg_name[strlen(_->cra_name)];
+            if ((*tmp == '\0') || (*tmp == ',') || (*tmp == ')')) {
+                alg_name = tmp;
+                alg = _;
+                break;
+            }
+        }
+    }
+    if (alg != NULL) {
+        *node = kzalloc(sizeof(**node), GFP_KERNEL);
+        if (NULL == *node) {
+            return ERR_PTR(-ENOMEM);
+        }
+
+        (*node)->alg = alg;
+        goto parsed;
+    }
+
+    *node = NULL;
+    struct crypto_template *tmpl = NULL;
+    struct crypto_alg_tree *child = NULL;
+    __vsf_dlist_foreach_unsafe(struct crypto_template, node, &__vsf_linux_crypto.tmpl_list) {
+        if (strstr(alg_name, _->name) == alg_name) {
+            const char *tmp = &alg_name[strlen(_->name)];
+            if (*tmp == '(') {
+                tmpl = _;
+                break;
+            }
+        }
+    }
+    if (tmpl != NULL) {
+        tmp = __crypto_generate_alg_tree(++tmp, &child);
+        if (IS_ERR(tmp)) {
+            alg_name = tmp;
+            goto child_err;
+        } else if (*tmp != ')') {
+            alg_name = ERR_PTR(-EINVAL);
+            goto child_err;
+        }
+        tmp++;
+
+        int ret = tmpl->crate(tmpl, child);
+        if (ret) {
+            alg_name = ERR_PTR(ret);
+            goto child_err;
+        }
+        __crypto_free_alg_tree(child);
+        alg_name = __crypto_generate_alg_tree(alg_name, node);
+        if (IS_ERR(alg_name)) {
+            goto err;
+        }
+        return alg_name;
+    }
+
+    return ERR_PTR(-EINVAL);
+
+parsed:
+    if (*alg_name == ',') {
+        alg_name = __crypto_generate_alg_tree(++alg_name, &(*node)->next);
+        if (IS_ERR(alg_name)) {
+            goto err;
+        }
+    }
+    return alg_name;
+child_err:
+    if (child != NULL) {
+        __crypto_free_alg_tree(child);
+    }
+    return alg_name;
+err:
+    if (*node != NULL) {
+        __crypto_free_alg_tree(*node);
+        *node = NULL;
+    }
+    return alg_name;
+}
+
+struct crypto_alg *crypto_find_alg(const char *alg_name, const struct crypto_type *frontend, u32 type, u32 mask)
+{
+    __vsf_dlist_foreach_unsafe(struct crypto_alg, node, &__vsf_linux_crypto.alg_list) {
+        if (!strcmp(alg_name, _->cra_name)) {
+            return _;
+        }
+    }
+
+    struct crypto_alg *alg = NULL;
+    struct crypto_alg_tree *root = NULL;
+    if ((NULL != __crypto_generate_alg_tree(alg_name, &root)) || (NULL == root)) {
+        alg = ERR_PTR(-EINVAL);
+    } else if (root->next != NULL) {
+        alg = ERR_PTR(-EINVAL);
+    } else {
+        alg = root->alg;
+    }
+
+    if (root != NULL) {
+        __crypto_free_alg_tree(root);
+    }
+    return alg;
+}
+
+void *crypto_alloc_tfm(const char *alg_name, const struct crypto_type *frontend, u32 type, u32 mask)
+{
+    struct crypto_alg *alg = crypto_find_alg(alg_name, frontend, type, mask);
+    if (IS_ERR(alg)) {
+        return alg;
+    }
+
+    unsigned int tfmsize = frontend->tfmsize;
+    char *mem = kzalloc(tfmsize + sizeof(struct crypto_tfm) + alg->cra_ctxsize, GFP_KERNEL);
+    if (NULL == mem) {
+         return ERR_PTR(-ENOMEM);
+    }
+
+    struct crypto_tfm *tfm = (struct crypto_tfm *)(mem + tfmsize);
+    tfm ->__crt_alg = alg;
+    return mem;
+}
+
+// TEMPLATE
+
+int crypto_register_template(struct crypto_template *tmpl)
+{
+    if (vsf_dlist_is_in(struct crypto_alg, node, &__vsf_linux_crypto.tmpl_list, tmpl)) {
+        return -EEXIST;
+    }
+
+    vsf_dlist_add_to_head(struct crypto_alg, node, &__vsf_linux_crypto.tmpl_list, tmpl);
+    return 0;
+}
+
+// HASH
+
+int crypto_register_shash(struct shash_alg *alg)
+{
+    return crypto_register_alg(&alg->base);
+}
+
+void crypto_unregister_shash(struct shash_alg *alg)
+{
+    crypto_unregister_alg(&alg->base);
+}
+
+int crypto_register_shashes(struct shash_alg *algs, int count)
+{
+    int i, ret;
+    for (i = 0; i < count; i++) {
+        ret = crypto_register_shash(&algs[i]);
+        if (ret) { goto err; }
+    }
+    return 0;
+
+err:
+    for (--i; i >= 0; --i) {
+        crypto_unregister_shash(&algs[i]);
+    }
+    return ret;
+}
+
+int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key, unsigned int keylen)
+{
+    psa_key_ctx_t *keyctx = (psa_key_ctx_t *)&tfm[1];
+    psa_algorithm_t psa_alg = crypto_shash_alg(tfm)->base.alg;
+    memset(&keyctx->attr, 0, sizeof(keyctx->attr));
+    if (PSA_ALG_IS_HMAC(psa_alg)) {
+        psa_set_key_usage_flags(&keyctx->attr, PSA_KEY_USAGE_SIGN_MESSAGE);
+        psa_set_key_algorithm(&keyctx->attr, psa_alg);
+        psa_set_key_type(&keyctx->attr, PSA_KEY_TYPE_HMAC);
+    }
+    psa_import_key(&keyctx->attr, key, keylen, &keyctx->key_id);
+    return -EOPNOTSUPP;
+}
+
+int crypto_shash_init(struct shash_desc *desc)
+{
+    psa_key_ctx_t *keyctx = (psa_key_ctx_t *)&desc->tfm[1];
+    psa_algorithm_t psa_alg = crypto_shash_alg(desc->tfm)->base.alg;
+    if (PSA_ALG_IS_HMAC(psa_alg)) {
+        psa_mac_operation_t *op = (psa_mac_operation_t *)&desc[1];
+        op->id = 0;
+        if (PSA_SUCCESS == psa_mac_sign_setup(op, keyctx->key_id, psa_alg)) {
+            return 0;
+        }
+    } else if (PSA_ALG_IS_HASH(psa_alg)) {
+        psa_hash_operation_t *op = (psa_hash_operation_t *)&desc[1];
+        op->id = 0;
+        if (PSA_SUCCESS == psa_hash_setup(op, psa_alg)) {
+            return 0;
+        }
+    }
+    return -EOPNOTSUPP;
+}
+
+int crypto_shash_export(struct shash_desc *desc, void *out)
+{
+    psa_algorithm_t psa_alg = crypto_shash_alg(desc->tfm)->base.alg;
+    if (PSA_ALG_IS_HASH(psa_alg)) {
+        psa_hash_operation_t *op = (psa_hash_operation_t *)&desc[1];
+        psa_hash_operation_t *op_out = (psa_hash_operation_t *)out;
+        op_out->id = 0;
+        if (PSA_SUCCESS != psa_hash_clone(op, op_out)) {
+            return -EIO;
+        }
+        return 0;
+    }
+    return -EOPNOTSUPP;
+}
+
+int crypto_shash_import(struct shash_desc *desc, const void *in)
+{
+    psa_algorithm_t psa_alg = crypto_shash_alg(desc->tfm)->base.alg;
+    if (PSA_ALG_IS_HASH(psa_alg)) {
+        psa_hash_operation_t *op = (psa_hash_operation_t *)&desc[1];
+        psa_hash_operation_t *op_in = (psa_hash_operation_t *)in;
+        op->id = 0;
+        if (PSA_SUCCESS != psa_hash_clone(op_in, op)) {
+            return -EIO;
+        }
+        return 0;
+    }
+    return -EOPNOTSUPP;
+}
+
+int crypto_shash_finup(struct shash_desc *desc, const u8 *data, unsigned int len, u8 *out)
+{
+    struct shash_alg *alg = crypto_shash_alg(desc->tfm);
+    psa_algorithm_t psa_alg = alg->base.alg;
+    size_t digestsize_in = alg->digestsize, digestsize_out;
+
+    if (PSA_ALG_IS_HMAC(psa_alg)) {
+        psa_mac_operation_t *op = (psa_mac_operation_t *)&desc[1];
+        if (    (PSA_SUCCESS != psa_mac_update(op, data, len))
+            ||  (PSA_SUCCESS != psa_mac_sign_finish(op, out, digestsize_in, &digestsize_out))) {
+            return -EIO;
+        }
+        return 0;
+    } else if (PSA_ALG_IS_HASH(psa_alg)) {
+        psa_hash_operation_t *op = (psa_hash_operation_t *)&desc[1];
+        if (    (PSA_SUCCESS != psa_hash_update(op, data, len))
+            ||  (PSA_SUCCESS != psa_hash_finish(op, out, digestsize_in, &digestsize_out))) {
+            return -EIO;
+        }
+        return 0;
+    }
+    return -EOPNOTSUPP;
+}
+
+int crypto_shash_update(struct shash_desc *desc, const u8 *data, unsigned int len)
+{
+    psa_algorithm_t psa_alg = crypto_shash_alg(desc->tfm)->base.alg;
+    if (PSA_ALG_IS_HMAC(psa_alg)) {
+        psa_mac_operation_t *op = (psa_mac_operation_t *)&desc[1];
+        if (PSA_SUCCESS != psa_mac_update(op, data, len)) {
+            return -EIO;
+        }
+    } else if (PSA_ALG_IS_HASH(psa_alg)) {
+        psa_hash_operation_t *op = (psa_hash_operation_t *)&desc[1];
+        if (PSA_SUCCESS != psa_hash_update(op, data, len)) {
+            return -EIO;
+        }
+        return 0;
+    }
+    return -EOPNOTSUPP;
+}
+
+int crypto_shash_final(struct shash_desc *desc, u8 *out)
+{
+    struct shash_alg *alg = crypto_shash_alg(desc->tfm);
+    psa_algorithm_t psa_alg = alg->base.alg;
+    size_t digestsize_in = alg->digestsize, digestsize_out;
+
+    if (PSA_ALG_IS_HMAC(psa_alg)) {
+        psa_mac_operation_t *op = (psa_mac_operation_t *)&desc[1];
+        if (PSA_SUCCESS != psa_mac_sign_finish(op, out, digestsize_in, &digestsize_out)) {
+            return -EIO;
+        }
+    } else if (PSA_ALG_IS_HASH(psa_alg)) {
+        psa_hash_operation_t *op = (psa_hash_operation_t *)&desc[1];
+        if (PSA_SUCCESS != psa_hash_finish(op, out, digestsize_in, &digestsize_out)) {
+            return -EIO;
+        }
+        return 0;
+    }
+    return -EOPNOTSUPP;
+}
+
+// akcipher
+
+static int __pkcs1pad_create(struct crypto_template *tmpl, struct crypto_alg_tree *arg)
+{
+    // TODO: create alg
+    return 0;
+}
+
+struct crypto_akcipher *crypto_alloc_akcipher(const char *alg_name, u32 type, u32 mask)
+{
+    return NULL;
+}
+
+
+// vsf_linux
+
+int vsf_linux_crypto_init(void)
+{
+    if (PSA_SUCCESS != psa_crypto_init()) {
+        return -ENOMEM;
+    }
+
+    // register algs
+    vsf_dlist_init(&__vsf_linux_crypto.alg_list);
+    crypto_register_shashes(__sha256_algs, ARRAY_SIZE(__sha256_algs));
+
+    // register templates
+    vsf_dlist_init(&__vsf_linux_crypto.tmpl_list);
+    crypto_register_template(&__rsa_pkcs1pad_tmpl);
+    return 0;
+}
+
+#endif
