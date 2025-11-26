@@ -1,6 +1,7 @@
 #ifndef __VSF_LINUX_CRYPTO_H__
 #define __VSF_LINUX_CRYPTO_H__
 
+#include <linux/completion.h>
 #include <linux/types.h>
 #include <linux/slab.h>
 
@@ -40,6 +41,9 @@ struct crypto_alg {
     unsigned int cra_ctxsize;
     const char *cra_name;
 
+    void (*cra_init)(struct crypto_tfm *tfm);
+    void (*cra_exit)(struct crypto_tfm *tfm);
+
     psa_algorithm_t alg;
 };
 
@@ -61,16 +65,16 @@ struct crypto_tfm {
 };
 
 struct crypto_wait {
+    struct completion completion;
     int err;
 };
-#define DECLARE_CRYPTO_WAIT(_wait)                  struct crypto_wait _wait = { 0 }
+#define DECLARE_CRYPTO_WAIT(_wait)                                              \
+        struct crypto_wait _wait;                                               \
+        init_completion(&_wait.completion)
 
 struct crypto_type;
 void *crypto_alloc_tfm(const char *alg_name, const struct crypto_type *frontend, u32 type, u32 mask);
-static inline void crypto_destroy_tfm(void *mem, struct crypto_tfm *tfm)
-{
-    kfree(mem);
-}
+void crypto_destroy_tfm(void *mem, struct crypto_tfm *tfm);
 
 static inline void *crypto_tfm_ctx(struct crypto_tfm *tfm)
 {
@@ -78,14 +82,13 @@ static inline void *crypto_tfm_ctx(struct crypto_tfm *tfm)
 }
 
 void crypto_req_done(void *req, int err);
-
 static inline int crypto_wait_req(int err, struct crypto_wait *wait)
 {
     switch (err) {
     case -EINPROGRESS:
     case -EBUSY:
-//        wait_for_completion(&wait->completion);
-//        reinit_completion(&wait->completion);
+        wait_for_completion(&wait->completion);
+        reinit_completion(&wait->completion);
         err = wait->err;
         break;
     }

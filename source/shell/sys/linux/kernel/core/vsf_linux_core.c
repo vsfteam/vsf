@@ -27,6 +27,7 @@
 #include <fcntl.h>
 #include <linux/types.h>
 #include <linux/kobject.h>
+#include <linux/completion.h>
 #include <linux/mutex.h>
 #include <linux/slab.h>
 #include <linux/device.h>
@@ -513,6 +514,15 @@ void init_wait_queue_head(struct wait_queue_head *wqh)
 {
     spin_lock_init(&wqh->lock);
     INIT_LIST_HEAD(&wqh->head);
+}
+
+/*******************************************************************************
+* linux/completion.h                                                           *
+*******************************************************************************/
+
+void complete(struct completion *x)
+{
+    vsf_eda_sem_post_isr(&x->sem);
 }
 
 /*******************************************************************************
