@@ -42,7 +42,6 @@
 
 typedef struct psa_key_ctx_t {
     psa_key_id_t key_id;
-    psa_key_attributes_t attr;
 } psa_key_ctx_t;
 
 typedef struct psa_ecdh_ctx_t {
@@ -80,7 +79,7 @@ const struct crypto_type crypto_kpp_type = {
 
 /*============================ PROTOTYPES ====================================*/
 
-static int __pkcs1pad_create(struct crypto_template *tmpl, struct crypto_alg_tree *arg);
+static int __rsa_pkcs1pad_create(struct crypto_template *tmpl, struct crypto_alg_tree *arg);
 static void __psa_free_key_ctx(struct crypto_tfm *tfm);
 
 static void __ecdh_nist_p192_init_tfm(struct crypto_tfm *tfm);
@@ -167,12 +166,22 @@ static struct kpp_alg __kpp_algs[] = {
 
 static struct crypto_template __rsa_pkcs1pad_tmpl = {
     .name                           = "pkcs1pad",
-    .crate                          = __pkcs1pad_create,
+    .crate                          = __rsa_pkcs1pad_create,
 };
 
 static VSF_CAL_NO_INIT vsf_linux_crypto_t __vsf_linux_crypto;
 
 /*============================ IMPLEMENTATION ================================*/
+
+// generic
+
+static void __psa_free_key_ctx(struct crypto_tfm *tfm)
+{
+    psa_key_ctx_t *key = (psa_key_ctx_t *)&tfm[1];
+    psa_destroy_key(key->key_id);
+}
+
+// crypto
 
 int crypto_register_alg(struct crypto_alg *alg)
 {
@@ -296,9 +305,7 @@ struct crypto_alg *crypto_find_alg(const char *alg_name, const struct crypto_typ
     struct crypto_alg *alg = NULL;
     struct crypto_alg_tree *root = NULL;
     const char *remain = __crypto_generate_alg_tree(alg_name, &root);
-    if ((*remain != NULL) || (NULL == root)) {
-        alg = ERR_PTR(-EINVAL);
-    } else if (root->next != NULL) {
+    if ((*remain != '\0') || (NULL == root) || (root->next != NULL)) {
         alg = ERR_PTR(-EINVAL);
     } else {
         alg = root->alg;
@@ -394,24 +401,19 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key, unsigned int ke
 {
     psa_key_ctx_t *keyctx = (psa_key_ctx_t *)&tfm[1];
     psa_algorithm_t psa_alg = crypto_shash_alg(tfm)->base.alg;
-    memset(&keyctx->attr, 0, sizeof(keyctx->attr));
+    psa_key_attributes_t attr = { 0 };
+
     if (PSA_ALG_IS_HMAC(psa_alg)) {
-        psa_set_key_usage_flags(&keyctx->attr, PSA_KEY_USAGE_SIGN_MESSAGE);
-        psa_set_key_algorithm(&keyctx->attr, psa_alg);
-        psa_set_key_type(&keyctx->attr, PSA_KEY_TYPE_HMAC);
+        psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_SIGN_MESSAGE);
+        psa_set_key_algorithm(&attr, psa_alg);
+        psa_set_key_type(&attr, PSA_KEY_TYPE_HMAC);
     } else {
         return -EOPNOTSUPP;
     }
-    if (PSA_SUCCESS != psa_import_key(&keyctx->attr, key, keylen, &keyctx->key_id)) {
+    if (PSA_SUCCESS != psa_import_key(&attr, key, keylen, &keyctx->key_id)) {
         return -EIO;
     }
     return 0;
-}
-
-static void __psa_free_key_ctx(struct crypto_tfm *tfm)
-{
-    psa_key_ctx_t *keyctx = (psa_key_ctx_t *)&tfm[1];
-    psa_destroy_key(keyctx->key_id);
 }
 
 int crypto_shash_init(struct shash_desc *desc)
@@ -555,20 +557,6 @@ err:
     return ret;
 }
 
-int crypto_akcipher_set_pub_key(struct crypto_akcipher *tfm, const void *key, unsigned int keylen)
-{
-    psa_key_ctx_t *keyctx = (psa_key_ctx_t *)&tfm[1];
-    memset(&keyctx->attr, 0, sizeof(keyctx->attr));
-
-    psa_set_key_usage_flags(&keyctx->attr, PSA_KEY_USAGE_VERIFY_HASH | PSA_KEY_USAGE_VERIFY_MESSAGE);
-    psa_set_key_algorithm(&keyctx->attr, PSA_ALG_RSA_PKCS1V15_CRYPT);
-    psa_set_key_type(&keyctx->attr, PSA_KEY_TYPE_RSA_PUBLIC_KEY);
-    if (PSA_SUCCESS != psa_import_key(&keyctx->attr, key, keylen, &keyctx->key_id)) {
-        return -EIO;
-    }
-    return 0;
-}
-
 int crypto_akcipher_encrypt(struct akcipher_request *req)
 {
     struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
@@ -576,17 +564,39 @@ int crypto_akcipher_encrypt(struct akcipher_request *req)
     psa_key_ctx_t *keyctx = (psa_key_ctx_t *)&tfm[1];
     size_t real_size = 0;
 
-    if (PSA_ALG_IS_SIGN(psa_alg)) {
-        if (PSA_SUCCESS != psa_sign_message(keyctx->key_id, psa_alg,
+    if (PSA_ALG_IS_RSA_PKCS1V15_SIGN(psa_alg)) {
+        psa_alg = PSA_ALG_RSA_PKCS1V15_CRYPT;
+        if (PSA_SUCCESS != psa_asymmetric_encrypt(keyctx->key_id, psa_alg,
                             req->src->buf, req->src_len,
+                            NULL, 0,        // no salt, not OAEP
                             req->dst->buf, req->dst_len, &real_size)) {
             return -EIO;
         }
+        return 0;
     }
     return -EOPNOTSUPP;
 }
 
-static int __pkcs1pad_create(struct crypto_template *tmpl, struct crypto_alg_tree *arg)
+static int __rsa_pkcs1pad_set_pub_key(struct crypto_akcipher *tfm, const void *key, unsigned int keylen)
+{
+    psa_key_ctx_t *keyctx = (psa_key_ctx_t *)&tfm[1];
+    psa_key_attributes_t attr = { 0 };
+
+    psa_set_key_usage_flags(&attr, PSA_KEY_USAGE_ENCRYPT);
+    psa_set_key_algorithm(&attr, PSA_ALG_RSA_PKCS1V15_CRYPT);
+    psa_set_key_type(&attr, PSA_KEY_TYPE_RSA_PUBLIC_KEY);
+    if (PSA_SUCCESS != psa_import_key(&attr, key, keylen, &keyctx->key_id)) {
+        return -EIO;
+    }
+    return 0;
+}
+
+static int __rsa_pkcs1pad_set_priv_key(struct crypto_akcipher *tfm, const void *key, unsigned int keylen)
+{
+    return -ENOTSUPP;
+}
+
+static int __rsa_pkcs1pad_create(struct crypto_template *tmpl, struct crypto_alg_tree *arg)
 {
     if (    (NULL == arg) || (NULL == arg->alg) || strcmp(arg->alg->cra_name, "rsa")
         ||  (NULL == arg->next) || (NULL == arg->next->alg) || !PSA_ALG_IS_HASH(arg->next->alg->alg)) {
@@ -608,6 +618,8 @@ static int __pkcs1pad_create(struct crypto_template *tmpl, struct crypto_alg_tre
     alg->base.cra_ctxsize = sizeof(psa_key_ctx_t);
     alg->base.cra_exit = __psa_free_key_ctx;
     alg->base.cra_name = (const char *)name;
+    alg->set_priv_key = __rsa_pkcs1pad_set_priv_key;
+    alg->set_pub_key = __rsa_pkcs1pad_set_pub_key;
     return crypto_register_akcipher(alg);
 }
 

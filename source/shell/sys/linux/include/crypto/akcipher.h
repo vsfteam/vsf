@@ -18,6 +18,8 @@ struct crypto_akcipher {
 };
 
 struct akcipher_alg {
+    int (*set_pub_key)(struct crypto_akcipher *tfm, const void *key, unsigned int keylen);
+    int (*set_priv_key)(struct crypto_akcipher *tfm, const void *key, unsigned int keylen);
     struct crypto_alg base;
 };
 
@@ -47,7 +49,17 @@ static inline struct crypto_akcipher *crypto_akcipher_reqtfm(struct akcipher_req
     return container_of(req->base.tfm, struct crypto_akcipher, base);
 }
 
-int crypto_akcipher_set_pub_key(struct crypto_akcipher *tfm, const void *key, unsigned int keylen);
+static inline int crypto_akcipher_set_pub_key(struct crypto_akcipher *tfm, const void *key, unsigned int keylen)
+{
+    struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
+    return alg->set_pub_key(tfm, key, keylen);
+}
+
+static inline int crypto_akcipher_set_priv_key(struct crypto_akcipher *tfm, const void *key, unsigned int keylen)
+{
+    struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
+    return alg->set_priv_key(tfm, key, keylen);
+}
 
 static inline struct akcipher_request *akcipher_request_alloc(struct crypto_akcipher *tfm, gfp_t gfp)
 {
