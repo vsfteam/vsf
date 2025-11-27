@@ -39,6 +39,8 @@ struct device {
     struct bus_type             *bus;
     struct device_driver        *driver;
     void                        *driver_data;
+
+    struct vsf_dlist_t          devres_head;
 };
 
 static inline struct device * kobj_to_dev(struct kobject *kobj)
@@ -111,6 +113,13 @@ extern void device_initialize(struct device *dev);
 extern int device_add(struct device *dev);
 extern void device_del(struct device *dev);
 
+// devres and devm
+
+typedef void (*dr_release_t)(struct device *dev, void *res);
+
+extern void devres_add(struct device *dev, void *res);
+extern int devres_release_all(struct device *dev);
+
 static inline void * devm_kmalloc(struct device *dev, size_t size, gfp_t gfp)
 {
     return kmalloc(size, gfp);
@@ -130,6 +139,17 @@ static inline void devm_kfree(struct device *dev, const void *p)
 
 extern char * devm_kvasprintf(struct device *dev, gfp_t gfp, const char *fmt, va_list ap);
 extern char * devm_kasprintf(struct device *dev, gfp_t gfp, const char *fmt, ...);
+
+int __devm_add_action(struct device *dev, void (*action)(void *), void *data, const char *name);
+#define devm_add_action(dev, action, data)          __devm_add_action(dev, action, data, #action)
+
+static inline int __devm_add_action_or_reset(struct device *dev, void (*action)(void *), void *data, const char *name)
+{
+    int ret = __devm_add_action(dev, action, data, name);
+    if (ret) { action(data); }
+    return ret;
+}
+#define devm_add_action_or_reset(dev, action, data) __devm_add_action_or_reset(dev, action, data, #action)
 
 #ifdef __cplusplus
 }

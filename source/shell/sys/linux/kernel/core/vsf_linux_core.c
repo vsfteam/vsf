@@ -64,7 +64,7 @@ int kobject_set_name_vargs(struct kobject *kobj, const char *fmt, va_list ap)
         if (NULL == kobj->name) {
             return -ENOMEM;
         }
-        vsnprintf(kobj->name, size, fmt, ap);
+        vsnprintf((char *)kobj->name, size, fmt, ap);
         return 0;
     }
     return -EINVAL;
@@ -594,6 +594,7 @@ void device_del(struct device *dev)
 {
     struct device *parent = dev->parent;
 
+    devres_release_all(dev);
     kobject_del(&dev->kobj);
     put_device(parent);
 }
@@ -667,7 +668,7 @@ void bus_probe_device(struct device *dev)
     } else if (dev->bus) {
         __vsf_dlist_foreach_next_unsafe(vsf_linux_driver_t, node, &__vsf_linux_driver_list) {
             if (driver_match_device(_->driver, dev) > 0) {
-                dev->driver = _->driver;
+                dev->driver = (struct device_driver *)_->driver;
                 driver_probe_device(_->driver, dev);
                 break;
             }
@@ -1055,6 +1056,54 @@ struct power_supply * devm_power_supply_register(struct device *parent,
                 const struct power_supply_config *cfg)
 {
     return NULL;
+}
+
+struct devres {
+    vsf_dlist_node_t node;
+    dr_release_t release;
+    u8 data[];
+};
+
+int devres_release_all(struct device *dev)
+{
+    __vsf_dlist_foreach_next_unsafe(struct devres, node, &dev->devres_head) {
+        vsf_dlist_remove(struct devres, node, &dev->devres_head, _);
+        _->release(dev, _->data);
+        kfree(_);
+    }
+    return 0;
+}
+
+struct action_devres {
+    void *data;
+    void (*action)(void *);
+};
+
+static void devm_action_release(struct device *dev, void *res)
+{
+    struct action_devres *devres = res;
+    devres->action(devres->data);
+}
+
+void devres_add(struct device *dev, void *res)
+{
+    struct devres *dr = container_of(res, struct devres, data);
+    vsf_dlist_add_to_head(struct devres, node, &dev->devres_head, dr);
+}
+
+int __devm_add_action(struct device *dev, void (*action)(void *), void *data, const char *name)
+{
+    struct devres *devres = (struct devres *)kzalloc(sizeof(struct devres) + sizeof(struct action_devres), GFP_KERNEL);
+    if (!devres) {
+        return -ENOMEM;
+    }
+
+    struct action_devres *action_devres = (struct action_devres *)&devres[1];
+    devres->release = devm_action_release;
+    action_devres->action = action;
+    action_devres->data = data;
+    devres_add(dev, devres);
+    return 0;
 }
 
 #endif
