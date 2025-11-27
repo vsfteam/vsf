@@ -127,6 +127,14 @@ static struct shash_alg __sha256_algs[] = {
     },
 };
 
+static struct akcipher_alg __akcipher_algs[] = {
+    {
+        // rsa is just a place holder for parsing alg string
+        .base.cra_name              = "rsa",
+        .base.alg                   = PSA_ALG_VENDOR_FLAG,
+    },
+};
+
 static struct kpp_alg __kpp_algs[] = {
     {
         .base.cra_name              = "ecdh-nist-p192",
@@ -223,7 +231,7 @@ static const char *__crypto_generate_alg_tree(const char *alg_name, struct crypt
     struct crypto_alg_tree *child = NULL;
     __vsf_dlist_foreach_unsafe(struct crypto_template, node, &__vsf_linux_crypto.tmpl_list) {
         if (strstr(alg_name, _->name) == alg_name) {
-            const char *tmp = &alg_name[strlen(_->name)];
+            tmp = &alg_name[strlen(_->name)];
             if (*tmp == '(') {
                 tmpl = _;
                 break;
@@ -287,7 +295,8 @@ struct crypto_alg *crypto_find_alg(const char *alg_name, const struct crypto_typ
 
     struct crypto_alg *alg = NULL;
     struct crypto_alg_tree *root = NULL;
-    if ((NULL != __crypto_generate_alg_tree(alg_name, &root)) || (NULL == root)) {
+    const char *remain = __crypto_generate_alg_tree(alg_name, &root);
+    if ((*remain != NULL) || (NULL == root)) {
         alg = ERR_PTR(-EINVAL);
     } else if (root->next != NULL) {
         alg = ERR_PTR(-EINVAL);
@@ -402,10 +411,7 @@ int crypto_shash_setkey(struct crypto_shash *tfm, const u8 *key, unsigned int ke
 static void __psa_free_key_ctx(struct crypto_tfm *tfm)
 {
     psa_key_ctx_t *keyctx = (psa_key_ctx_t *)&tfm[1];
-    psa_algorithm_t psa_alg = crypto_shash_alg(tfm)->base.alg;
-    if (PSA_ALG_IS_HMAC(psa_alg)) {
-        psa_destroy_key(keyctx->key_id);
-    }
+    psa_destroy_key(keyctx->key_id);
 }
 
 int crypto_shash_init(struct shash_desc *desc)
@@ -528,6 +534,27 @@ int crypto_register_akcipher(struct akcipher_alg *alg)
     return crypto_register_alg(&alg->base);
 }
 
+void crypto_unregister_akcipher(struct akcipher_alg *alg)
+{
+    crypto_unregister_alg(&alg->base);
+}
+
+int crypto_register_akciphers(struct akcipher_alg *algs, int count)
+{
+    int i, ret;
+    for (i = 0; i < count; i++) {
+        ret = crypto_register_akcipher(&algs[i]);
+        if (ret) { goto err; }
+    }
+    return 0;
+
+err:
+    for (--i; i >= 0; --i) {
+        crypto_unregister_akcipher(&algs[i]);
+    }
+    return ret;
+}
+
 int crypto_akcipher_set_pub_key(struct crypto_akcipher *tfm, const void *key, unsigned int keylen)
 {
     psa_key_ctx_t *keyctx = (psa_key_ctx_t *)&tfm[1];
@@ -566,14 +593,14 @@ static int __pkcs1pad_create(struct crypto_template *tmpl, struct crypto_alg_tre
         return -EINVAL;
     }
 
-    size_t namelen = strlen("pkcs1psd(rsa,") + strlen(arg->next->alg->cra_name) + 2 /* ")\0" */;
-    struct akcipher_alg *alg = kzalloc(sizeof(alg) + namelen, GFP_KERNEL);
+    size_t namelen = strlen("pkcs1pad(rsa,") + strlen(arg->next->alg->cra_name) + 2 /* ")\0" */;
+    struct akcipher_alg *alg = kzalloc(sizeof(*alg) + namelen, GFP_KERNEL);
     if (NULL == alg) {
         return -ENOMEM;
     }
 
     char *name = (char *)&alg[1];
-    strcpy(name, "pkcs1psd(rsa,");
+    strcpy(name, "pkcs1pad(rsa,");
     strcat(name, arg->next->alg->cra_name);
     strcat(name, ")");
 
@@ -614,7 +641,6 @@ err:
 
 static int __ecdh_set_secret(struct crypto_kpp *tfm, const void *buf, unsigned int len)
 {
-    psa_ecdh_ctx_t *ctx = (psa_ecdh_ctx_t *)&tfm[1];
     struct ecdh params;
 
     if (crypto_ecdh_decode_key((const char *)buf, len, &params) < 0) {
@@ -658,7 +684,7 @@ static int __ecdh_compute_shared_secret(struct kpp_request *req)
         result = -EIO;
     }
     mbedtls_mpi_free(&z);
-    mbedtls_mpi_free(&Qp);
+    mbedtls_ecp_point_free(&Qp);
     return result;
 }
 
@@ -751,6 +777,7 @@ int vsf_linux_crypto_init(void)
     vsf_dlist_init(&__vsf_linux_crypto.alg_list);
     crypto_register_shashes(__sha256_algs, ARRAY_SIZE(__sha256_algs));
     crypto_register_kpps(__kpp_algs, ARRAY_SIZE(__kpp_algs));
+    crypto_register_akciphers(__akcipher_algs, ARRAY_SIZE(__akcipher_algs));
 
     // register templates
     vsf_dlist_init(&__vsf_linux_crypto.tmpl_list);
