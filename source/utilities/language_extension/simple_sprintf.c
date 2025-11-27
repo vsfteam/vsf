@@ -30,6 +30,9 @@
 #ifndef VSF_SIMPLE_SPRINTF_SUPPORT_IPMAC
 #   define VSF_SIMPLE_SPRINTF_SUPPORT_IPMAC     ENABLED
 #endif
+#ifndef VSF_SIMPLE_SPRINTF_SUPPORT_HEX
+#   define VSF_SIMPLE_SPRINTF_SUPPORT_HEX       ENABLED
+#endif
 
 #if VSF_SIMPLE_SPRINTF_SUPPORT_FLOAT == ENABLED
 #   include <math.h>
@@ -219,22 +222,23 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                 flags.is_upper = 1;
             case 'p':
                 arg.val = (unsigned long long)va_arg(ap, void *);
+                int remain_width = size - realsize + 1;
+                VSF_UNUSED_PARAM(remain_width);
 #if VSF_SIMPLE_SPRINTF_SUPPORT_IPMAC == ENABLED
                 // use width as size, containing 1-byte NULL terminator
-                width = size - realsize + 1;
                 if (format[0] == 'M') {
                     // %pM : printf mac address, XX:XX:XX:XX:XX:XX
                     format++;
                     if (format[0] == 'R') {
                         format++;
-                        radix = snprintf(curpos, width, "%02X:%02X:%02X:%02X:%02X:%02X",
+                        radix = snprintf(curpos, remain_width, "%02X:%02X:%02X:%02X:%02X:%02X",
                             arg.pu8[5], arg.pu8[4], arg.pu8[3], arg.pu8[2], arg.pu8[1], arg.pu8[0]);
                     } else if (format[0] == 'F') {
                         format++;
-                        radix = snprintf(curpos, width, "%02X-%02X-%02X-%02X-%02X-%02X",
+                        radix = snprintf(curpos, remain_width, "%02X-%02X-%02X-%02X-%02X-%02X",
                             arg.pu8[0], arg.pu8[1], arg.pu8[2], arg.pu8[3], arg.pu8[4], arg.pu8[5]);
                     } else {
-                        radix = snprintf(curpos, width, "%02X:%02X:%02X:%02X:%02X:%02X",
+                        radix = snprintf(curpos, remain_width, "%02X:%02X:%02X:%02X:%02X:%02X",
                             arg.pu8[0], arg.pu8[1], arg.pu8[2], arg.pu8[3], arg.pu8[4], arg.pu8[5]);
                     }
                     realsize += radix;
@@ -245,10 +249,10 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     format++;
                     if (format[0] == 'R') {
                         format++;
-                        radix = snprintf(curpos, width, "%02X%02X%02X%02X%02X%02X",
+                        radix = snprintf(curpos, remain_width, "%02X%02X%02X%02X%02X%02X",
                             arg.pu8[5], arg.pu8[4], arg.pu8[3], arg.pu8[2], arg.pu8[1], arg.pu8[0]);
                     } else {
-                        radix = snprintf(curpos, width, "%02X%02X%02X%02X%02X%02X",
+                        radix = snprintf(curpos, remain_width, "%02X%02X%02X%02X%02X%02X",
                             arg.pu8[0], arg.pu8[1], arg.pu8[2], arg.pu8[3], arg.pu8[4], arg.pu8[5]);
                     }
                     realsize += radix;
@@ -259,7 +263,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     if (format[1] == '4') {
                         // %pI4 : printf IPv4, x.x.x.x
                         format += 2;
-                        radix = snprintf(curpos, width, "%d.%d.%d.%d",
+                        radix = snprintf(curpos, remain_width, "%d.%d.%d.%d",
                             arg.pu8[0], arg.pu8[1], arg.pu8[2], arg.pu8[3]);
                         realsize += radix;
                         // even if curpos overflows, realsize will protect it
@@ -268,7 +272,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     } else if (format[1] == '6') {
                         // %pI6 : printf IPv6, xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
                         format += 2;
-                        radix = snprintf(curpos, width, "%02X:%02X:%02X:%02X:%02X:%02X:%02X:%02X",
+                        radix = snprintf(curpos, remain_width, "%04X:%04X:%04X:%04X:%04X:%04X:%04X:%04X",
                             arg.pu16[0], arg.pu16[1], arg.pu16[2], arg.pu16[3],
                             arg.pu16[4], arg.pu16[5], arg.pu16[6], arg.pu16[7]);
                         realsize += radix;
@@ -280,7 +284,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     if (format[1] == '4') {
                         // %pI4 : printf IPv4, x.x.x.x
                         format += 2;
-                        radix = snprintf(curpos, width, "%03d.%03d.%03d.%03d",
+                        radix = snprintf(curpos, remain_width, "%03d.%03d.%03d.%03d",
                             arg.pu8[0], arg.pu8[1], arg.pu8[2], arg.pu8[3]);
                         realsize += radix;
                         // even if curpos overflows, realsize will protect it
@@ -289,7 +293,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                     } else if (format[1] == '6') {
                         // %pI6 : printf IPv6, xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx
                         format += 2;
-                        radix = snprintf(curpos, width, "%02X%02X%02X%02X%02X%02X%02X%02X",
+                        radix = snprintf(curpos, remain_width, "%04X%04X%04X%04X%04X%04X%04X%04X",
                             arg.pu16[0], arg.pu16[1], arg.pu16[2], arg.pu16[3],
                             arg.pu16[4], arg.pu16[5], arg.pu16[6], arg.pu16[7]);
                         realsize += radix;
@@ -298,6 +302,34 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         break;
                     }
                 }
+#endif
+#if VSF_SIMPLE_SPRINTF_SUPPORT_HEX == ENABLED
+                if (format[0] == 'h') {
+                    char div;
+                    if (format[1] == 'D') {
+                        div = '-';
+                    } else if (format[1] == 'C' || format[1] == 'N') {
+                        div = '\0';
+                    } else {
+                        goto not_hex_pointer;
+                    }
+
+                    format += 2;
+                    for (int i = 0; i < width; i++) {
+                        if (remain_width < 0) { remain_width = 0; }
+                        radix = snprintf(curpos, remain_width, "%02X", arg.pu8[i]);
+                        remain_width -= radix;
+                        realsize += radix;
+                        // even if curpos overflows, realsize will protect it
+                        curpos += radix;
+                        if ((div != '\0') && (width - i > 1)) {
+                            EMIT(div);
+                            remain_width--;
+                        }
+                    }
+                    break;
+                }
+            not_hex_pointer:
 #endif
                 flags.is_signed = 0;
                 radix = 16;
