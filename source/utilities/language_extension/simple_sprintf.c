@@ -33,6 +33,9 @@
 #ifndef VSF_SIMPLE_SPRINTF_SUPPORT_HEX
 #   define VSF_SIMPLE_SPRINTF_SUPPORT_HEX       ENABLED
 #endif
+#ifndef VSF_SIMPLE_SPRINTF_SUPPORT_UUID
+#   define VSF_SIMPLE_SPRINTF_SUPPORT_UUID      ENABLED
+#endif
 
 #if VSF_SIMPLE_SPRINTF_SUPPORT_FLOAT == ENABLED
 #   include <math.h>
@@ -304,17 +307,22 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                 }
 #endif
 #if VSF_SIMPLE_SPRINTF_SUPPORT_HEX == ENABLED
-                if (format[0] == 'h') {
+                if (*format == 'h') {
                     char div;
-                    if (format[1] == 'D') {
+                    format++;
+                    if (*format == 'D') {
+                        format++;
                         div = '-';
-                    } else if (format[1] == 'C' || format[1] == 'N') {
+                    } else if (*format == 'C') {
+                        format++;
+                        div = ':';
+                    } else if (*format == 'N') {
+                        format++;
                         div = '\0';
                     } else {
-                        goto not_hex_pointer;
+                        div = ' ';
                     }
 
-                    format += 2;
                     for (int i = 0; i < width; i++) {
                         if (remain_width < 0) { remain_width = 0; }
                         radix = snprintf(curpos, remain_width, "%02X", arg.pu8[i]);
@@ -325,11 +333,49 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
                         if ((div != '\0') && (width - i > 1)) {
                             EMIT(div);
                             remain_width--;
-                        }
+                         }
                     }
                     break;
                 }
-            not_hex_pointer:
+#endif
+#if VSF_SIMPLE_SPRINTF_SUPPORT_UUID == ENABLED
+                if (*format == 'U') {
+                    bool is_upper = false;
+                    bool is_big_endian = true;
+
+                    format++;
+                    if ('b' == tolower(*format)) {
+                        is_big_endian = true;
+                        is_upper = *format < 'a';
+                        format++;
+                    } else if ('l' == tolower(*format)) {
+                        is_big_endian = false;
+                        is_upper = *format < 'a';
+                        format++;
+                    }
+
+                    char *uuid_format;
+                    if (is_upper) {
+                        uuid_format = "%02X%02X%02X%02X-%02X%02X-%02X%02X-%02X%02X-%02X%02X%02X%02X%02X%02X";
+                    } else {
+                        uuid_format = "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x";
+                    }
+
+                    if (is_big_endian) {
+                        radix = snprintf(curpos, remain_width, uuid_format,
+                            arg.pu8[0], arg.pu8[1], arg.pu8[2], arg.pu8[3], arg.pu8[4], arg.pu8[5], arg.pu8[6], arg.pu8[7],
+                            arg.pu8[8], arg.pu8[9], arg.pu8[10], arg.pu8[11], arg.pu8[12], arg.pu8[13], arg.pu8[14], arg.pu8[15]);
+                        realsize += radix;
+                        curpos += radix;
+                    } else {
+                        radix = snprintf(curpos, remain_width, uuid_format,
+                            arg.pu8[3], arg.pu8[2], arg.pu8[1], arg.pu8[0], arg.pu8[5], arg.pu8[4], arg.pu8[7], arg.pu8[6],
+                            arg.pu8[8], arg.pu8[9], arg.pu8[10], arg.pu8[11], arg.pu8[12], arg.pu8[13], arg.pu8[14], arg.pu8[15]);
+                        realsize += radix;
+                        curpos += radix;
+                    }
+                    break;
+                }
 #endif
                 flags.is_signed = 0;
                 radix = 16;
