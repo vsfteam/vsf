@@ -17,7 +17,22 @@ struct crypto_kpp {
 };
 
 struct kpp_alg {
+    int (*set_secret)(struct crypto_kpp *tfm, const void *buffer, unsigned int len);
+    int (*generate_public_key)(struct kpp_request *req);
+    int (*compute_shared_secret)(struct kpp_request *req);
+
     struct crypto_alg base;
+};
+
+enum {
+    CRYPTO_KPP_SECRET_TYPE_UNKNOWN,
+    CRYPTO_KPP_SECRET_TYPE_DH,
+    CRYPTO_KPP_SECRET_TYPE_ECDH,
+};
+
+struct kpp_secret {
+    unsigned short type;
+    unsigned short len;
 };
 
 static inline struct crypto_tfm *crypto_kpp_tfm(struct crypto_kpp *tfm)
@@ -80,17 +95,23 @@ static inline void kpp_request_set_output(struct kpp_request *req, struct scatte
 static inline int crypto_kpp_generate_public_key(struct kpp_request *req)
 {
     struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
+    return crypto_kpp_alg(tfm)->generate_public_key(req);
 }
 
 static inline int crypto_kpp_compute_shared_secret(struct kpp_request *req)
 {
     struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
+    return crypto_kpp_alg(tfm)->compute_shared_secret(req);
 }
 
-extern const struct crypto_type crypto_kpp_type;
 static inline struct crypto_kpp *crypto_alloc_kpp(const char *alg_name, u32 type, u32 mask)
 {
-    return (struct crypto_kpp *)crypto_alloc_tfm(alg_name, &crypto_kpp_type, type, mask);
+    extern const struct crypto_type crypto_kpp_type;
+    struct crypto_kpp *tfm = crypto_alloc_tfm(alg_name, &crypto_kpp_type, type, mask);
+    if (!IS_ERR(tfm)) {
+        tfm->reqsize = sizeof(struct kpp_request);
+    }
+    return tfm;
 }
 
 static inline void crypto_free_kpp(struct crypto_kpp *tfm)
@@ -100,7 +121,7 @@ static inline void crypto_free_kpp(struct crypto_kpp *tfm)
 
 static inline int crypto_kpp_set_secret(struct crypto_kpp *tfm, const void *buffer, unsigned int len)
 {
-    
+    return crypto_kpp_alg(tfm)->set_secret(tfm, buffer, len);
 }
 
 #endif

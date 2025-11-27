@@ -60,9 +60,9 @@ static inline unsigned int crypto_shash_descsize(struct crypto_shash *tfm)
     return crypto_shash_alg(tfm)->descsize;
 }
 
-extern const struct crypto_type crypto_shash_type;
 static inline struct crypto_shash *crypto_alloc_shash(const char *alg_name, u32 type, u32 mask)
 {
+    extern const struct crypto_type crypto_shash_type;
     return (struct crypto_shash *)crypto_alloc_tfm(alg_name, &crypto_shash_type, type, mask);
 }
 

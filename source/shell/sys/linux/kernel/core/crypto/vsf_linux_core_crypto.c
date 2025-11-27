@@ -29,8 +29,12 @@
 #include <crypto/kpp.h>
 #include <crypto/hash.h>
 #include <crypto/sha2.h>
+#include <crypto/ecdh.h>
 
+#include <mbedtls/entropy.h>
+#include <mbedtls/ctr_drbg.h>
 #include <psa/crypto.h>
+#include <mbedtls/ecdh.h>
 
 /*============================ MACROS ========================================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -41,9 +45,20 @@ typedef struct psa_key_ctx_t {
     psa_key_attributes_t attr;
 } psa_key_ctx_t;
 
+typedef struct psa_ecdh_ctx_t {
+    mbedtls_ecp_group_id id;
+    mbedtls_ecp_group grp;
+
+    mbedtls_mpi d;
+    mbedtls_ecp_point Q;
+} psa_ecdh_ctx_t;
+
 typedef struct vsf_linux_crypto_t {
     vsf_dlist_t alg_list;
     vsf_dlist_t tmpl_list;
+
+    mbedtls_entropy_context entropy;
+    mbedtls_ctr_drbg_context ctr_drbg;
 } vsf_linux_crypto_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -67,6 +82,13 @@ const struct crypto_type crypto_kpp_type = {
 
 static int __pkcs1pad_create(struct crypto_template *tmpl, struct crypto_alg_tree *arg);
 static void __psa_free_key_ctx(struct crypto_tfm *tfm);
+
+static void __ecdh_nist_p192_init_tfm(struct crypto_tfm *tfm);
+static void __ecdh_nist_p256_init_tfm(struct crypto_tfm *tfm);
+static void __ecdh_nist_p384_init_tfm(struct crypto_tfm *tfm);
+static int __ecdh_set_secret(struct crypto_kpp *tfm, const void *buf, unsigned int len);
+static int __ecdh_generate_public_key(struct kpp_request *req);
+static int __ecdh_compute_shared_secret(struct kpp_request *req);
 
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -108,21 +130,30 @@ static struct shash_alg __sha256_algs[] = {
 static struct kpp_alg __kpp_algs[] = {
     {
         .base.cra_name              = "ecdh-nist-p192",
-        .base.cra_ctxsize           = sizeof(psa_key_ctx_t),
-//        .base.cra_init              = __ecdh_nist_p192_init_tfm,
+        .base.cra_ctxsize           = sizeof(psa_ecdh_ctx_t),
+        .base.cra_init              = __ecdh_nist_p192_init_tfm,
         .base.alg                   = PSA_ALG_ECDH,
+        .set_secret                 = __ecdh_set_secret,
+        .generate_public_key        = __ecdh_generate_public_key,
+        .compute_shared_secret      = __ecdh_compute_shared_secret,
     },
     {
         .base.cra_name              = "ecdh-nist-p256",
-        .base.cra_ctxsize           = sizeof(psa_key_ctx_t),
-//        .base.cra_init              = __ecdh_nist_p256_init_tfm,
+        .base.cra_ctxsize           = sizeof(psa_ecdh_ctx_t),
+        .base.cra_init              = __ecdh_nist_p256_init_tfm,
         .base.alg                   = PSA_ALG_ECDH,
+        .set_secret                 = __ecdh_set_secret,
+        .generate_public_key        = __ecdh_generate_public_key,
+        .compute_shared_secret      = __ecdh_compute_shared_secret,
     },
     {
         .base.cra_name              = "ecdh-nist-p384",
-        .base.cra_ctxsize           = sizeof(psa_key_ctx_t),
-//        .base.cra_init              = __ecdh_nist_p384_init_tfm,
+        .base.cra_ctxsize           = sizeof(psa_ecdh_ctx_t),
+        .base.cra_init              = __ecdh_nist_p384_init_tfm,
         .base.alg                   = PSA_ALG_ECDH,
+        .set_secret                 = __ecdh_set_secret,
+        .generate_public_key        = __ecdh_generate_public_key,
+        .compute_shared_secret      = __ecdh_compute_shared_secret,
     },
 };
 
@@ -285,6 +316,9 @@ void *crypto_alloc_tfm(const char *alg_name, const struct crypto_type *frontend,
 
     struct crypto_tfm *tfm = (struct crypto_tfm *)(mem + tfmsize);
     tfm ->__crt_alg = alg;
+    if (alg->cra_init != NULL) {
+        alg->cra_init(tfm);
+    }
     return mem;
 }
 
@@ -307,7 +341,7 @@ void crypto_req_done(void *data, int err)
     complete(&wait->completion);
 }
 
-// TEMPLATE
+// template
 
 int crypto_register_template(struct crypto_template *tmpl)
 {
@@ -578,6 +612,133 @@ err:
     return ret;
 }
 
+static int __ecdh_set_secret(struct crypto_kpp *tfm, const void *buf, unsigned int len)
+{
+    psa_ecdh_ctx_t *ctx = (psa_ecdh_ctx_t *)&tfm[1];
+    struct ecdh params;
+
+    if (crypto_ecdh_decode_key((const char *)buf, len, &params) < 0) {
+        return -EINVAL;
+    }
+    if (params.key_size != 0) {
+        return -ENOTSUPP;
+    }
+    return 0;
+}
+
+static int __ecdh_generate_public_key(struct kpp_request *req)
+{
+    struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
+    psa_ecdh_ctx_t *ctx = (psa_ecdh_ctx_t *)&tfm[1];
+    if (mbedtls_ecdh_gen_public(&ctx->grp, &ctx->d, &ctx->Q,
+                mbedtls_ctr_drbg_random, &__vsf_linux_crypto.ctr_drbg)) {
+        return -EIO;
+    }
+    return 0;
+}
+
+static int __ecdh_compute_shared_secret(struct kpp_request *req)
+{
+    struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
+    psa_ecdh_ctx_t *ctx = (psa_ecdh_ctx_t *)&tfm[1];
+    mbedtls_ecp_point Qp;
+    mbedtls_mpi z;
+
+    int result = 0;
+
+    mbedtls_ecp_point_init(&Qp);
+    mbedtls_mpi_init(&z);
+    if (mbedtls_ecp_point_read_binary(&ctx->grp, &Qp, req->src->buf, req->src_len)) {
+        return -ENOMEM;
+    }
+
+    if (    (mbedtls_ecdh_compute_shared(&ctx->grp, &z, &Qp, &ctx->d,
+                    mbedtls_ctr_drbg_random, &__vsf_linux_crypto.ctr_drbg))
+        ||  (mbedtls_mpi_write_binary(&z, req->dst->buf, req->dst_len))) {
+        result = -EIO;
+    }
+    mbedtls_mpi_free(&z);
+    mbedtls_mpi_free(&Qp);
+    return result;
+}
+
+static void __ecdh_nist_p192_init_tfm(struct crypto_tfm *tfm)
+{
+    psa_ecdh_ctx_t *ecdh_ctx = (psa_ecdh_ctx_t *)&tfm[1];
+    mbedtls_ecp_group_load(&ecdh_ctx->grp, MBEDTLS_ECP_DP_SECP192R1);
+}
+
+static void __ecdh_nist_p256_init_tfm(struct crypto_tfm *tfm)
+{
+    psa_ecdh_ctx_t *ecdh_ctx = (psa_ecdh_ctx_t *)&tfm[1];
+    mbedtls_ecp_group_load(&ecdh_ctx->grp, MBEDTLS_ECP_DP_SECP256R1);
+}
+
+static void __ecdh_nist_p384_init_tfm(struct crypto_tfm *tfm)
+{
+    psa_ecdh_ctx_t *ecdh_ctx = (psa_ecdh_ctx_t *)&tfm[1];
+    mbedtls_ecp_group_load(&ecdh_ctx->grp, MBEDTLS_ECP_DP_SECP384R1);
+}
+
+static inline u8 *ecdh_pack_data(void *dst, const void *src, size_t sz)
+{
+    memcpy(dst, src, sz);
+    return dst + sz;
+}
+
+static inline const u8 *ecdh_unpack_data(void *dst, const void *src, size_t sz)
+{
+    memcpy(dst, src, sz);
+    return src + sz;
+}
+
+unsigned int crypto_ecdh_key_len(const struct ecdh *params)
+{
+    return sizeof(struct kpp_secret) + sizeof(params->key_size) + params->key_size;
+}
+
+int crypto_ecdh_encode_key(char *buf, unsigned int len, const struct ecdh *params)
+{
+    if (!buf || (len != crypto_ecdh_key_len(params))) {
+        return -EINVAL;
+    }
+
+    u8 *ptr = (u8 *)buf;
+    struct kpp_secret secret = {
+        .type = CRYPTO_KPP_SECRET_TYPE_ECDH,
+        .len = len
+    };
+
+    ptr = ecdh_pack_data(ptr, &secret, sizeof(secret));
+    ptr = ecdh_pack_data(ptr, &params->key_size, sizeof(params->key_size));
+    ecdh_pack_data(ptr, params->key, params->key_size);
+
+    return 0;
+}
+
+int crypto_ecdh_decode_key(const char *buf, unsigned int len, struct ecdh *params)
+{
+    const u8 *ptr = (u8 *)buf;
+    struct kpp_secret secret;
+
+    if (!buf || len < (sizeof(struct kpp_secret) + sizeof(params->key_size))) {
+        return -EINVAL;
+    }
+
+    ptr = ecdh_unpack_data(&secret, ptr, sizeof(secret));
+    if ((secret.type != CRYPTO_KPP_SECRET_TYPE_ECDH) || (len < secret.len)) {
+        return -EINVAL;
+    }
+
+    ptr = ecdh_unpack_data(&params->key_size, ptr, sizeof(params->key_size));
+    if (secret.len != crypto_ecdh_key_len(params)) {
+        return -EINVAL;
+    }
+
+    params->key = (void *)ptr;
+    return 0;
+}
+
 // vsf_linux
 
 int vsf_linux_crypto_init(void)
@@ -594,6 +755,14 @@ int vsf_linux_crypto_init(void)
     // register templates
     vsf_dlist_init(&__vsf_linux_crypto.tmpl_list);
     crypto_register_template(&__rsa_pkcs1pad_tmpl);
+
+    mbedtls_entropy_init(&__vsf_linux_crypto.entropy);
+    mbedtls_ctr_drbg_init(&__vsf_linux_crypto.ctr_drbg);
+
+    static const unsigned char __custom[] = "vsf_linux_crypto";
+    mbedtls_ctr_drbg_seed(&__vsf_linux_crypto.ctr_drbg,
+            mbedtls_entropy_func, &__vsf_linux_crypto.entropy,
+            __custom, strlen((const char *)__custom));
     return 0;
 }
 

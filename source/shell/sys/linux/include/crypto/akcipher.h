@@ -83,9 +83,9 @@ static inline void crypto_free_akcipher(struct crypto_akcipher *tfm)
     crypto_destroy_tfm(tfm, crypto_akcipher_tfm(tfm));
 }
 
-extern const struct crypto_type crypto_akcipher_type;
 static inline struct crypto_akcipher *crypto_alloc_akcipher(const char *alg_name, u32 type, u32 mask)
 {
+    extern const struct crypto_type crypto_akcipher_type;
     struct crypto_akcipher *tfm = crypto_alloc_tfm(alg_name, &crypto_akcipher_type, type, mask);
     if (!IS_ERR(tfm)) {
         tfm->reqsize = sizeof(struct akcipher_request);
