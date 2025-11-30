@@ -626,6 +626,28 @@ uint8_t libusb_get_port_number(libusb_device *dev)
     return ldev->libusb_dev->dev->index;
 }
 
+int libusb_get_port_numbers(libusb_device *dev, uint8_t *port_numbers, int port_numbers_len)
+{
+    int i = port_numbers_len;
+    if (i <= 0) {
+        return LIBUSB_ERROR_INVALID_PARAM;
+    }
+
+#if VSF_USBH_USE_HUB == ENABLED
+    vsf_linux_libusb_dev_t *ldev = (vsf_linux_libusb_dev_t *)dev;
+    vk_usbh_dev_t *usbh_dev = ldev->libusb_dev->dev;
+
+    while (usbh_dev && (usbh_dev->index != 0)) {
+        if (--i < 0) {
+            return LIBUSB_ERROR_OVERFLOW;
+        }
+        port_numbers[i] = usbh_dev->index;
+        usbh_dev = usbh_dev->dev_parent;
+    }
+#endif
+    return port_numbers_len - i;
+}
+
 libusb_device * libusb_get_parent(libusb_device *dev)
 {
     // hubs are not handled in libusb

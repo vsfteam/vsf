@@ -42,6 +42,7 @@ extern "C" {
 #define libusb_get_device_address                       VSF_LINUX_LIBUSB_WRAPPER(libusb_get_device_address)
 #define libusb_get_bus_number                           VSF_LINUX_LIBUSB_WRAPPER(libusb_get_bus_number)
 #define libusb_get_port_number                          VSF_LINUX_LIBUSB_WRAPPER(libusb_get_port_number)
+#define libusb_get_port_numbers                         VSF_LINUX_LIBUSB_WRAPPER(libusb_get_port_numbers)
 #define libusb_get_parent                               VSF_LINUX_LIBUSB_WRAPPER(libusb_get_parent)
 #define libusb_reset_device                             VSF_LINUX_LIBUSB_WRAPPER(libusb_reset_device)
 #define libusb_clear_halt                               VSF_LINUX_LIBUSB_WRAPPER(libusb_clear_halt)
@@ -496,6 +497,7 @@ typedef struct vsf_linux_libusb_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_get_device_address);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_get_bus_number);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_get_port_number);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_get_port_numbers);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_get_parent);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_release_interface);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(libusb_claim_interface);
@@ -636,6 +638,10 @@ VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_bus_number, uint8_t, libusb_device *dev) 
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_port_number, uint8_t, libusb_device *dev) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_port_number)(dev);
+}
+VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_port_numbers, int, libusb_device *dev, uint8_t *port_numbers, int port_numbers_len) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBUSB_ENTRY(libusb_get_port_numbers)(dev, port_numbers, port_numbers_len);
 }
 VSF_LINUX_APPLET_LIBUSB_IMP(libusb_get_parent, libusb_device *, libusb_device *dev) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -834,6 +840,7 @@ void libusb_close(libusb_device_handle *dev_handle);
 uint8_t libusb_get_device_address(libusb_device *dev);
 uint8_t libusb_get_bus_number(libusb_device *dev);
 uint8_t libusb_get_port_number(libusb_device *dev);
+int libusb_get_port_numbers(libusb_device *dev, uint8_t *port_numbers, int port_numbers_len);
 libusb_device * libusb_get_parent(libusb_device *dev);
 int libusb_release_interface(libusb_device_handle *dev_handle, int interface_number);
 int libusb_claim_interface(libusb_device_handle *dev_handle, int interface_number);
