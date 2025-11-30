@@ -172,7 +172,7 @@ typedef struct vsf_spi_capability_t {
 } vsf_spi_capability_t;
 #endif
 
-#if VSF_SPI_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
+#if VSF_SPI_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
 /** \note Redefining vsf_spi_cfg_t usually requires declaring vsf_spi_t
  *        and vsf_spi_isr_handler_t types and define vsf_spi_isr_t.
  */

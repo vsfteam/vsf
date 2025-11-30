@@ -207,16 +207,28 @@ extern "C" {
 /**
  * \~english
  * @brief In specific hardware driver, we can enable macro
- * VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_BUF_DESC to redefine struct @ref vsf_eth_buf_desc_t.
+ * VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_SEND_BUF to redefine type @ref vsf_eth_send_sg_buf_desc_t.
  *
  * \~chinese
- * @brief 在具体硬件驱动中，我们可以启用宏 VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_BUF_DESC
- * 来重新定义结构体 @ref vsf_eth_sg_buf_t。
+ * @brief 在具体硬件驱动中，我们可以启用宏 VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_SEND_BUF
+ * 来重新定义类型 @ref vsf_eth_send_sg_buf_desc_t。
  */
-#if VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_BUF_DESC == DISABLED
-#    define VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_BUF_DESC DISABLED
+#ifndef VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_SEND_BUF
+#   define VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_SEND_BUF DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief In specific hardware driver, we can enable macro
+ * VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_RECV_BUF to redefine type @ref vsf_eth_recv_sg_buf_desc_t.
+ *
+ * \~chinese
+ * @brief 在具体硬件驱动中，我们可以启用宏 VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_RECV_BUF
+ * 来重新定义类型 @ref vsf_eth_recv_sg_buf_desc_t。
+ */
+#ifndef VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_RECV_BUF
+#   define VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_RECV_BUF DISABLED
+#endif
 
 /**
  * \~english
