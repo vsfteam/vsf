@@ -110,7 +110,7 @@ vsf_class(vk_usbh_hid_teda_t) {
 };
 
 // user callback will need this
-typedef struct vk_usbh_hid_input_t vk_usbh_hid_input_t;
+typedef struct vk_usbh_hid_t vk_usbh_hid_t;
 
 /*============================ GLOBAL VARIABLES ==============================*/
 

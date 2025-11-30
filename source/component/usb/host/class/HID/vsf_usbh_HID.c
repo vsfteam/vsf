@@ -57,7 +57,7 @@ typedef struct usb_hid_descriptor_t {
     usb_hid_class_descriptor_t desc[1];
 } VSF_CAL_PACKED usb_hid_descriptor_t;
 
-struct vk_usbh_hid_input_t {
+struct vk_usbh_hid_t {
     implement(vk_usbh_hid_teda_t)
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
     implement(vk_input_hid_t)
@@ -67,7 +67,7 @@ struct vk_usbh_hid_input_t {
 
 /*============================ LOCAL VARIABLES ===============================*/
 
-static const vk_usbh_dev_id_t __vk_usbh_hid_input_dev_id[] = {
+static const vk_usbh_dev_id_t __vk_usbh_hid_dev_id[] = {
     {
         .match_ifs_class = true,
         .bInterfaceClass = USB_CLASS_HID,
@@ -75,23 +75,23 @@ static const vk_usbh_dev_id_t __vk_usbh_hid_input_dev_id[] = {
 };
 /*============================ PROTOTYPES ====================================*/
 
-static void * __vk_usbh_hid_input_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs);
-static void __vk_usbh_hid_input_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param);
+static void * __vk_usbh_hid_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs);
+static void __vk_usbh_hid_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param);
 
 /*============================ GLOBAL VARIABLES ==============================*/
 
 const vk_usbh_class_drv_t vk_usbh_hid_drv = {
     .name       = "hid",
-    .dev_id_num = dimof(__vk_usbh_hid_input_dev_id),
-    .dev_ids    = __vk_usbh_hid_input_dev_id,
-    .probe      = __vk_usbh_hid_input_probe,
-    .disconnect = __vk_usbh_hid_input_disconnect,
+    .dev_id_num = dimof(__vk_usbh_hid_dev_id),
+    .dev_ids    = __vk_usbh_hid_dev_id,
+    .probe      = __vk_usbh_hid_probe,
+    .disconnect = __vk_usbh_hid_disconnect,
 };
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
 
-static void __vk_usbh_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+static void __vk_usbh_hid_probe_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vk_usbh_hid_teda_t *hid = vsf_container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
     vk_usbh_dev_t *dev = hid->dev;
@@ -177,7 +177,7 @@ void * vk_usbh_hid_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev,
         hid->desc_len = desc_hid->desc[0].wDescriptorLength;
     }
 
-    hid->fn.evthandler = __vk_usbh_hid_evthandler;
+    hid->fn.evthandler = __vk_usbh_hid_probe_evthandler;
     hid->on_terminate = __vk_usbh_hid_on_eda_terminate;
 #ifdef VSF_USBH_HID_CFG_PRIORITY
     vsf_eda_init(&hid->use_as__vsf_eda_t, VSF_USBH_HID_CFG_PRIORITY);
@@ -294,8 +294,8 @@ vsf_err_t __vk_usbh_hid_recv_report_imp(vk_usbh_hid_teda_t *hid, uint8_t *buffer
 
 
 // hid input, which uses vsf_hid
-VSF_CAL_WEAK(vsf_usbh_hid_input_on_desc)
-uint_fast8_t vsf_usbh_hid_input_on_desc(vk_usbh_hid_input_t *hid, uint8_t *desc_buf, uint_fast32_t desc_len)
+VSF_CAL_WEAK(vsf_usbh_hid_on_desc)
+uint_fast8_t vsf_usbh_hid_on_desc(vk_usbh_hid_t *hid, uint8_t *desc_buf, uint_fast32_t desc_len)
 {
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
     return vk_hid_parse_desc(&hid->use_as__vk_input_hid_t, desc_buf, desc_len);
@@ -304,21 +304,21 @@ uint_fast8_t vsf_usbh_hid_input_on_desc(vk_usbh_hid_input_t *hid, uint8_t *desc_
 #endif
 }
 
-VSF_CAL_WEAK(vsf_usbh_hid_input_on_report_input)
-void vsf_usbh_hid_input_on_report_input(vk_usbh_hid_input_t *hid, uint8_t *report, uint_fast32_t len)
+VSF_CAL_WEAK(vsf_usbh_hid_on_report_input)
+void vsf_usbh_hid_on_report_input(vk_usbh_hid_t *hid, uint8_t *report, uint_fast32_t len)
 {
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
     vk_hid_process_input(&hid->use_as__vk_input_hid_t, report, len);
 #endif
 }
 
-VSF_CAL_WEAK(vsf_usbh_hid_input_on_report_output)
-void vsf_usbh_hid_input_on_report_output(vk_usbh_hid_input_t *hid, int_fast16_t status)
+VSF_CAL_WEAK(vsf_usbh_hid_on_report_output)
+void vsf_usbh_hid_on_report_output(vk_usbh_hid_t *hid, int_fast16_t status)
 {
 }
 
-VSF_CAL_WEAK(vsf_usbh_hid_input_on_new)
-bool vsf_usbh_hid_input_on_new(vk_usbh_hid_input_t *hid)
+VSF_CAL_WEAK(vsf_usbh_hid_on_new)
+bool vsf_usbh_hid_on_new(vk_usbh_hid_t *hid)
 {
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
     vk_hid_new_dev(&hid->use_as__vk_input_hid_t);
@@ -326,8 +326,8 @@ bool vsf_usbh_hid_input_on_new(vk_usbh_hid_input_t *hid)
     return true;
 }
 
-VSF_CAL_WEAK(vsf_usbh_hid_input_on_free)
-void vsf_usbh_hid_input_on_free(vk_usbh_hid_input_t *hid)
+VSF_CAL_WEAK(vsf_usbh_hid_on_free)
+void vsf_usbh_hid_on_free(vk_usbh_hid_t *hid)
 {
 #if VSF_USE_INPUT == ENABLED && VSF_INPUT_USE_HID == ENABLED
     vk_hid_free_dev(&hid->use_as__vk_input_hid_t);
@@ -336,7 +336,7 @@ void vsf_usbh_hid_input_on_free(vk_usbh_hid_input_t *hid)
 
 static void __vk_usbh_hid_int_complete(void *param, vk_usbh_hcd_urb_t *urb_hcd)
 {
-    vk_usbh_hid_input_t *hid = param;
+    vk_usbh_hid_t *hid = param;
     vk_usbh_urb_t urb = { .urb_hcd = urb_hcd };
     vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
 
@@ -344,20 +344,20 @@ static void __vk_usbh_hid_int_complete(void *param, vk_usbh_hcd_urb_t *urb_hcd)
         if (URB_OK == vk_usbh_urb_get_status(&urb)) {
             uint_fast32_t len = vk_usbh_urb_get_actual_length(&urb);
             uint8_t *report = vk_usbh_urb_peek_buffer(&urb);
-            vsf_usbh_hid_input_on_report_input(hid, report, len);
+            vsf_usbh_hid_on_report_input(hid, report, len);
         }
 
         if (hid->auto_mode) {
             vk_usbh_hid_recv_report(&hid->use_as__vk_usbh_hid_teda_t, NULL, 0);
         }
     } else {
-        vsf_usbh_hid_input_on_report_output(hid, vk_usbh_urb_get_status(&urb));
+        vsf_usbh_hid_on_report_output(hid, vk_usbh_urb_get_status(&urb));
     }
 }
 
-static void __vk_usbh_hid_input_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
+static void __vk_usbh_hid_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vk_usbh_hid_input_t *hid = vsf_container_of(eda, vk_usbh_hid_input_t, use_as__vsf_eda_t);
+    vk_usbh_hid_t *hid = vsf_container_of(eda, vk_usbh_hid_t, use_as__vsf_eda_t);
 
     switch (evt) {
     case VSF_EVT_INIT: {
@@ -377,7 +377,7 @@ static void __vk_usbh_hid_input_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             desc_len = vk_usbh_urb_get_actual_length(urb);
             __vsf_eda_crit_npb_leave(&ep0->crit);
 
-            max_report_size = vsf_usbh_hid_input_on_desc(hid, desc_buf, desc_len);
+            max_report_size = vsf_usbh_hid_on_desc(hid, desc_buf, desc_len);
             if (0 == max_report_size) {
                 vsf_usbh_free(desc_buf);
                 vk_usbh_remove_interface(hid->usbh, hid->dev, hid->ifs);
@@ -386,7 +386,7 @@ static void __vk_usbh_hid_input_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 
             vsf_usbh_free(desc_buf);
 
-            hid->auto_mode = vsf_usbh_hid_input_on_new(hid);
+            hid->auto_mode = vsf_usbh_hid_on_new(hid);
             if (hid->auto_mode) {
                 vk_usbh_hid_recv_report(&hid->use_as__vk_usbh_hid_teda_t, NULL,
                     max_report_size, __vk_usbh_hid_int_complete);
@@ -396,20 +396,20 @@ static void __vk_usbh_hid_input_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
     }
 }
 
-static void * __vk_usbh_hid_input_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs)
+static void * __vk_usbh_hid_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs)
 {
-    vk_usbh_hid_input_t *hid = vk_usbh_hid_probe(usbh, dev, parser_ifs, sizeof(vk_usbh_hid_input_t), true);
+    vk_usbh_hid_t *hid = vk_usbh_hid_probe(usbh, dev, parser_ifs, sizeof(vk_usbh_hid_t), true);
     if (hid != NULL) {
-        hid->user_evthandler = __vk_usbh_hid_input_evthandler;
+        hid->user_evthandler = __vk_usbh_hid_evthandler;
     }
     return hid;
 }
 
-static void __vk_usbh_hid_input_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
+static void __vk_usbh_hid_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
 {
-    vk_usbh_hid_input_t *hid = param;
+    vk_usbh_hid_t *hid = param;
     vk_usbh_hid_disconnect(&hid->use_as__vk_usbh_hid_teda_t);
-    vsf_usbh_hid_input_on_free(hid);
+    vsf_usbh_hid_on_free(hid);
 }
 
 #endif      // VSF_USE_USB_HOST && VSF_USBH_USE_HID
