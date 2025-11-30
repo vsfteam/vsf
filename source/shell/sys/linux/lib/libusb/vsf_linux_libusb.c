@@ -644,6 +644,9 @@ int libusb_get_port_numbers(libusb_device *dev, uint8_t *port_numbers, int port_
         port_numbers[i] = usbh_dev->index;
         usbh_dev = usbh_dev->dev_parent;
     }
+    if (i < port_numbers_len) {
+        memmove(port_numbers, &port_numbers[i], (size_t)(port_numbers_len - i));
+    }
 #endif
     return port_numbers_len - i;
 }
