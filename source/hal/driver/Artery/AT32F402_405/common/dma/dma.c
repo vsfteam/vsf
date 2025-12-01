@@ -107,11 +107,12 @@ void VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_fini)(
     VSF_HAL_ASSERT(dma_ptr != NULL);
 }
 
-int8_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_request)(
+vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_request)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
     vsf_dma_channel_hint_t *channel_hint_ptr
 ) {
     VSF_HAL_ASSERT(NULL != dma_ptr);
+    VSF_HAL_ASSERT(channel_hint_ptr != NULL);
     int8_t channel;
 
     vsf_protect_t orig = vsf_protect_int();
@@ -119,15 +120,17 @@ int8_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_request)(
         if (channel >= VSF_HW_DMA_CHANNEL_NUM) {
             channel = -1;
         }
-        if (channel > 0) {
+        if (channel >= 0) {
             dma_ptr->channel_mask |= 1 << channel;
         }
     vsf_unprotect_int(orig);
 
-    if (channel > 0) {
+    if (channel >= 0) {
+        channel_hint_ptr->channel = channel;
         NVIC_SetPriority(dma_ptr->channels[channel].irqn, channel_hint_ptr->interrupt_prio);
+        return VSF_ERR_NONE;
     }
-    return channel;
+    return VSF_ERR_FAIL;
 }
 
 void VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_release)(

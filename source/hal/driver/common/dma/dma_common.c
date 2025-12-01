@@ -72,7 +72,7 @@ vsf_dma_capability_t vsf_dma_capability(vsf_dma_t *dma_ptr)
     return dma_ptr->op->capability(dma_ptr);
 }
 
-int8_t vsf_dma_channel_request(vsf_dma_t *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr)
+vsf_err_t vsf_dma_channel_request(vsf_dma_t *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr)
 {
     VSF_HAL_ASSERT(dma_ptr != NULL);
     VSF_HAL_ASSERT(dma_ptr->op != NULL);
