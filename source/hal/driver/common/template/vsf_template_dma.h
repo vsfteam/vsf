@@ -107,10 +107,10 @@ extern "C" {
 
 /**
  * \~english
- * @brief Enable the option to reimplement Channal Hint type configuration in specific hardware drivers
+ * @brief Enable the option to reimplement Channel Hint type configuration in specific hardware drivers
  *
  * \~chinese
- * @brief 启用在特定硬件驱动中重新实现 Channal Hint 类型配置的选项
+ * @brief 启用在特定硬件驱动中重新实现 Channel Hint 类型配置的选项
  */
 #ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT
 #   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT    DISABLED
