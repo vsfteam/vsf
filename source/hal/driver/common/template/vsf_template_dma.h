@@ -453,10 +453,14 @@ typedef struct vsf_dma_cfg_t {
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT == DISABLED
 /**
  * \~english
- * @brief DMA channel hint structure
+ * @brief DMA channel hint structure for channel allocation
+ * @note This structure is used only during channel request phase to provide hints
+ *       for channel allocation. It contains only information needed for channel selection.
  *
  * \~chinese
- * @brief DMA 通道提示结构体
+ * @brief DMA 通道分配提示结构体
+ * @note 此结构体仅在通道请求阶段使用，用于提供通道分配提示。
+ *       它仅包含通道选择所需的信息。
  */
 typedef struct vsf_dma_channel_hint_t {
     //! \~english Specify the DMA channel number. Use negative value (e.g., -1) for automatic allocation.
@@ -469,11 +473,6 @@ typedef struct vsf_dma_channel_hint_t {
     //! \~chinese 外设请求线编号，指定使用DMA服务的外设请求源。
     //! \~chinese （部分芯片会提供外设和请求线的对应表，需根据芯片手册选择正确的请求线编号）。
     uint8_t request_line;
-    //! \~english Interrupt priority for this channel. Use vsf_arch_prio_invalid to use default priority from vsf_dma_cfg_t.
-    //!           Only effective when hardware supports per-channel or per-group interrupt priority configuration.
-    //! \~chinese 此通道的中断优先级。使用 vsf_arch_prio_invalid 表示使用 vsf_dma_cfg_t 中的默认优先级。
-    //!           仅在硬件支持每通道或每组中断独立优先级配置时生效。
-    vsf_arch_prio_t prio;
 } vsf_dma_channel_hint_t;
 #endif
 
@@ -488,6 +487,17 @@ typedef struct vsf_dma_isr_t {
 } vsf_dma_isr_t;
 
 //! dma configuration
+/**
+ * \~english
+ * @brief DMA channel configuration structure for transfer setup
+ * @note This structure contains all configuration needed for DMA transfer operations,
+ *       including transfer mode, interrupt settings, and peripheral indices.
+ *
+ * \~chinese
+ * @brief DMA 通道传输配置结构体
+ * @note 此结构体包含 DMA 传输操作所需的所有配置，
+ *       包括传输模式、中断设置和外设索引。
+ */
 typedef struct vsf_dma_channel_cfg_t {
     //! \~english DMA channel mode, including transfer direction, address increment mode, data width, burst length, priority, etc.
     //! \~english Use VSF_DMA_XXX macros to configure (e.g. VSF_DMA_MEMORY_TO_PERIPHERAL | VSF_DMA_SRC_ADDR_INCREMENT | VSF_DMA_DST_WIDTH_BYTES_4)
@@ -502,6 +512,11 @@ typedef struct vsf_dma_channel_cfg_t {
     //! \~chinese 中断掩码，指定需要启用的中断（例如 VSF_DMA_IRQ_MASK_CPL | VSF_DMA_IRQ_MASK_ERROR）
     //! \~chinese 可以使用按位或操作组合多个中断类型
     vsf_dma_irq_mask_t      irq_mask;
+    //! \~english Interrupt priority for this channel. Use vsf_arch_prio_invalid to use default priority from vsf_dma_cfg_t.
+    //!           Only effective when hardware supports per-channel or per-group interrupt priority configuration.
+    //! \~chinese 此通道的中断优先级。使用 vsf_arch_prio_invalid 表示使用 vsf_dma_cfg_t 中的默认优先级。
+    //!           仅在硬件支持每通道或每组中断独立优先级配置时生效。
+    vsf_arch_prio_t         prio;
     //! \~english Index of the peripheral or memory corresponding to the source address of the DMA
     //! \~english This index is used to identify the source peripheral or memory region in the DMA transfer
     //! \~chinese 与 DMA 源地址对应的外设或内存索引
