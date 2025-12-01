@@ -99,10 +99,10 @@ typedef enum vsf_dma_channel_mode_t {
     VSF_DMA_DST_WIDTH_BYTES_4                   = (2 << 10),
 
     // 12..13: DMA_CxCTRL.CHPL(12..13)
-    VSF_DMA_PRIOPIRY_LOW                        = (0x00 << 12),
-    VSF_DMA_PRIOPIRY_MEDIUM                     = (0x01 << 12),
-    VSF_DMA_PRIOPIRY_HIGH                       = (0x02 << 12),
-    VSF_DMA_PRIOPIRY_VERY_HIGH                  = (0x03 << 12),
+    VSF_DMA_PRIORITY_LOW                        = (0x00 << 12),
+    VSF_DMA_PRIORITY_MEDIUM                     = (0x01 << 12),
+    VSF_DMA_PRIORITY_HIGH                       = (0x02 << 12),
+    VSF_DMA_PRIORITY_VERY_HIGH                  = (0x03 << 12),
 
     // 16..26: vendor specified
 

@@ -163,10 +163,10 @@ typedef enum vsf_dma_channel_mode_t {
     VSF_DMA_DST_BURST_LENGTH_64      = (0x06 << 18),
     VSF_DMA_DST_BURST_LENGTH_128     = (0x07 << 18),
 
-    VSF_DMA_PRIOPIRY_LOW             = (0x00 << 22),
-    VSF_DMA_PRIOPIRY_MEDIUM          = (0x01 << 22),
-    VSF_DMA_PRIOPIRY_HIGH            = (0x02 << 22),
-    VSF_DMA_PRIOPIRY_VERY_HIGH       = (0x03 << 22),
+    VSF_DMA_PRIORITY_LOW             = (0x00 << 22),
+    VSF_DMA_PRIORITY_MEDIUM          = (0x01 << 22),
+    VSF_DMA_PRIORITY_HIGH            = (0x02 << 22),
+    VSF_DMA_PRIORITY_VERY_HIGH       = (0x03 << 22),
 } vsf_dma_channel_mode_t;
 #endif
 
