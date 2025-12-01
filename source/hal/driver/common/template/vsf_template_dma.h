@@ -252,7 +252,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, fini,                               VSF_MCONNECT(__prefix_name, _t) *dma_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, get_configuration,                  VSF_MCONNECT(__prefix_name, _t) *dma_ptr, vsf_dma_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_capability_t,     dma, capability,                         VSF_MCONNECT(__prefix_name, _t) *dma_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, int8_t,                   dma, channel_request,                    VSF_MCONNECT(__prefix_name, _t) *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_request,                    VSF_MCONNECT(__prefix_name, _t) *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, channel_release,                    VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_config,                     VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_get_configuration,          VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr) \
@@ -443,9 +443,11 @@ typedef struct vsf_dma_cfg_t {
  * @brief DMA 通道提示结构体
  */
 typedef struct vsf_dma_channel_hint_t {
-    //! \~english Specify the DMA channel number (some chips have fixed functionality configurations for DMA channels)
-    //! \~chinese 指定具体的DMA通道号（部分芯片中DMA通道具有固定的功能配置）
-    uint8_t channel;
+    //! \~english Specify the DMA channel number. Use negative value (e.g., -1) for automatic allocation.
+    //!           (Some chips have fixed functionality configurations for DMA channels)
+    //! \~chinese 指定具体的DMA通道号。使用负值（如 -1）表示自动分配。
+    //!           （部分芯片中DMA通道具有固定的功能配置）
+    int8_t channel;
     //! \~english Peripheral request line number, specifying the peripheral request source using DMA service.
     //! \~english (Some chips provide a mapping table between peripherals and request lines, refer to chip manual to select the correct request line number).
     //! \~chinese 外设请求线编号，指定使用DMA服务的外设请求源。
@@ -651,16 +653,16 @@ extern vsf_dma_capability_t vsf_dma_capability(vsf_dma_t *dma_ptr);
  \~english
  @brief DMA request a new channel
  @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
- @param[in] channel_hint_ptr: a pointer to DMA channel hint
- @return int8_t: if request was successful, return non-negative channel number, otherwise return error code
+ @param[in,out] channel_hint_ptr: a pointer to DMA channel hint. User should provide appropriate hint information based on actual requirements. If the actually allocated channel or other configuration differs from user's expectation, the function may modify channel_hint_ptr to notify the user of the actual allocation. The allocated channel number will be stored in channel_hint_ptr->channel.
+ @return vsf_err_t: VSF_ERR_NONE if the request was successful, otherwise returns error code
 
  \~chinese
  @brief DMA 请求一个新的通道
  @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
- @param[in] channel_hint_ptr: 指向 DMA 通道提示的指针
- @return int8_t: 如果请求成功返回非负数的通道号，否则返回错误码
+ @param[in,out] channel_hint_ptr: 指向 DMA 通道提示的指针。用户应根据实际情况提供合适的提示信息。如果实际分配的通道或其他配置与用户预期不一致，函数可能会修改 channel_hint_ptr 来通知用户实际分配的结果。分配的通道号将存储在 channel_hint_ptr->channel 中。
+ @return vsf_err_t: 如果请求成功返回 VSF_ERR_NONE，否则返回错误码
  */
-extern int8_t vsf_dma_channel_request(vsf_dma_t *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr);
+extern vsf_err_t vsf_dma_channel_request(vsf_dma_t *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr);
 
 /**
  \~english

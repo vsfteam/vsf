@@ -159,7 +159,7 @@ typedef enum vsf_dma_irq_mask_t {
 
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT == ENABLED
 typedef struct vsf_dma_channel_hint_t {
-    uint8_t                                     channel;
+    int8_t                                      channel;
     uint8_t                                     request_line;
     vsf_arch_prio_t                             interrupt_prio;
 } vsf_dma_channel_hint_t;

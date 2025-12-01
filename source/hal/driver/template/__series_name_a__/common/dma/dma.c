@@ -105,14 +105,17 @@ void VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_fini)(
     VSF_HAL_ASSERT(dma_ptr != NULL);
 }
 
-int8_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_request)(
+vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_request)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
     vsf_dma_channel_hint_t *channel_hint_ptr
 ) {
     VSF_HAL_ASSERT(NULL != dma_ptr);
     // Use channel_hint_ptr to select appropriate channel
-    // For template implementation, just return channel 0
-    return 0;
+    // For template implementation, just assign channel 0 and return success
+    if (channel_hint_ptr != NULL) {
+        channel_hint_ptr->channel = 0;
+    }
+    return VSF_ERR_NONE;
 }
 
 void VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_release)(
