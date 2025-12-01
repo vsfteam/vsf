@@ -160,8 +160,8 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_config)(
     VSF_HAL_ASSERT(dma_ptr != NULL);
     VSF_HAL_ASSERT(channel < VSF_HW_DMA_CHANNEL_NUM);
     VSF_HAL_ASSERT(cfg_ptr != NULL);
-    VSF_HAL_ASSERT(cfg_ptr->dst_idx <= 127);
-    VSF_HAL_ASSERT(cfg_ptr->src_idx <= 127);
+    VSF_HAL_ASSERT(cfg_ptr->dst_request_idx <= 127);
+    VSF_HAL_ASSERT(cfg_ptr->src_request_idx <= 127);
     VSF_HAL_ASSERT(cfg_ptr->sync_reqcnt <= 32);
     VSF_HAL_ASSERT(cfg_ptr->sync_signal <= 127);
 
@@ -175,10 +175,10 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_config)(
     case VSF_DMA_MEMORY_TO_PERIPHERAL:
         mode = ((mode & (1 << 6)) << 1) | ((mode & (1 << 7)) >> 1) | (mode & ~(3 << 6));
         mode = ((mode & (3 << 8)) << 2) | ((mode & (3 << 10)) >> 3) | (mode & ~(15 << 8));
-        mux_channel_reg->muxctrl = cfg_ptr->dst_idx;
+        mux_channel_reg->muxctrl = cfg_ptr->dst_request_idx;
         break;
     case VSF_DMA_PERIPHERAL_TO_MEMORY:
-        mux_channel_reg->muxctrl = cfg_ptr->src_idx;
+        mux_channel_reg->muxctrl = cfg_ptr->src_request_idx;
         break;
     default:
         break;
