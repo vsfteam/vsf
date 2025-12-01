@@ -198,6 +198,7 @@ typedef struct vsf_dma_channel_cfg_t {
     vsf_dma_channel_mode_t  mode;
     vsf_dma_isr_t           isr;
     vsf_dma_irq_mask_t      irq_mask;
+    vsf_arch_prio_t         prio;
     uint8_t                 src_request_idx;
     uint8_t                 dst_request_idx;
 } vsf_dma_channel_cfg_t;

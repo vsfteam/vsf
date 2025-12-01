@@ -161,7 +161,6 @@ typedef enum vsf_dma_irq_mask_t {
 typedef struct vsf_dma_channel_hint_t {
     int8_t                                      channel;
     uint8_t                                     request_line;
-    vsf_arch_prio_t                             interrupt_prio;
 } vsf_dma_channel_hint_t;
 #endif
 
@@ -176,6 +175,7 @@ typedef struct vsf_dma_channel_cfg_t {
     vsf_dma_channel_mode_t  mode;
     vsf_dma_isr_t           isr;
     vsf_dma_irq_mask_t      irq_mask;
+    vsf_arch_prio_t         prio;
     uint8_t                 src_request_idx;
     uint8_t                 dst_request_idx;
 

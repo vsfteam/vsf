@@ -132,6 +132,15 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_config)(
 ) {
     VSF_HAL_ASSERT(dma_ptr != NULL);
 
+    // configure DMA channel according to cfg_ptr->mode, cfg_ptr->isr, etc.
+    // if cfg_ptr->isr.handler_fn != NULL, enable interrupt:
+    //     VSF_HAL_ASSERT(cfg_ptr->prio != vsf_arch_prio_invalid);
+    //     if (cfg_ptr->prio == vsf_arch_prio_invalid) {
+    //         return VSF_ERR_INVALID_PARAMETER;
+    //     }
+    //     NVIC_SetPriority(irqn, cfg_ptr->prio);
+    //     NVIC_EnableIRQ(irqn);
+
     return VSF_ERR_NONE;
 }
 
