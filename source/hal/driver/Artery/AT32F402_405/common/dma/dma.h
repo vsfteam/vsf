@@ -49,23 +49,29 @@ extern "C" {
 // HW
 /*\note hw DMA driver can reimplement following types:
  *      To enable reimplementation, please enable macro below:
+ *          VSF_DMA_CFG_REIMPLEMENT_TYPE_ADDR for vsf_dma_addr_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE for vsf_dma_channel_mode_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_dma_irq_mask_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT for vsf_dma_channel_hint_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG for vsf_dma_channel_cfg_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG for vsf_dma_channel_sg_cfg_t
- *          VSF_DMA_CFG_REIMPLEMENT_TYPE_STATUS for vsf_dma_status_t
+ *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS for vsf_dma_channel_status_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG for vsf_dma_cfg_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_dma_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
 
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE ENABLED
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG  ENABLED
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT ENABLED
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+// vsf_dma_addr_t: must be enabled if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG is enabled
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_ADDR           ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE   ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_IRQ_MASK       ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT   ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG    ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG            ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY     ENABLED
 
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -185,6 +191,48 @@ typedef struct vsf_dma_channel_cfg_t {
     // DMA_MUXCxCTRL.SYNCSEL(24..28)
     uint8_t                 sync_signal;
 } vsf_dma_channel_cfg_t;
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS == ENABLED
+typedef struct vsf_dma_channel_status_t {
+    union {
+        inherit(vsf_peripheral_status_t)
+        struct {
+            uint32_t is_busy : 1;
+        };
+    };
+} vsf_dma_channel_status_t;
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG == ENABLED
+typedef struct vsf_dma_channel_sg_desc_t {
+    vsf_dma_channel_mode_t mode;
+    vsf_dma_addr_t src_address;
+    vsf_dma_addr_t dst_address;
+    uint32_t count;
+    vsf_dma_addr_t next;
+} vsf_dma_channel_sg_desc_t;
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG == ENABLED
+typedef struct vsf_dma_cfg_t {
+    vsf_arch_prio_t prio;
+} vsf_dma_cfg_t;
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED
+typedef struct vsf_dma_capability_t {
+#if VSF_DMA_CFG_INHERIT_HAL_CAPABILITY == ENABLED
+    inherit(vsf_peripheral_capability_t)
+#endif
+    vsf_dma_irq_mask_t irq_mask;
+    uint32_t max_request_count;
+    uint8_t channel_count;
+    vsf_dma_channel_mode_t supported_modes;
+    uint32_t max_transfer_size;
+    uint8_t addr_alignment;
+    uint8_t support_scatter_gather : 1;
+} vsf_dma_capability_t;
 #endif
 
 // HW/IPCore end

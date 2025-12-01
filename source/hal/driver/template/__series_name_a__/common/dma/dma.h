@@ -69,6 +69,7 @@ extern "C" {
 // HW
 /*\note hw DMA driver can reimplement following types:
  *      To enable reimplementation, please enable macro below:
+ *          VSF_DMA_CFG_REIMPLEMENT_TYPE_ADDR for vsf_dma_addr_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE for vsf_dma_channel_mode_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_dma_irq_mask_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT for vsf_dma_channel_hint_t
@@ -81,14 +82,16 @@ extern "C" {
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
 
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE ENABLED
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT ENABLED
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG  ENABLED
+// vsf_dma_addr_t: must be enabled if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG is enabled
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_ADDR           ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE   ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_IRQ_MASK       ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT   ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG    ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS ENABLED
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG      ENABLED
-#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG            ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY     ENABLED
 
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -116,6 +119,10 @@ vsf_class(vsf_${dma_ip}_dma_t) {
 
 
 // HW/IPCore, not for emulated drivers
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_ADDR == ENABLED
+typedef uintptr_t vsf_dma_addr_t;
+#endif
+
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE == ENABLED
 typedef enum vsf_dma_channel_mode_t {
     VSF_DMA_MEMORY_TO_MEMORY        = (0x00 << 0),
