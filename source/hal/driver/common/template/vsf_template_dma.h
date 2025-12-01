@@ -469,6 +469,11 @@ typedef struct vsf_dma_channel_hint_t {
     //! \~chinese 外设请求线编号，指定使用DMA服务的外设请求源。
     //! \~chinese （部分芯片会提供外设和请求线的对应表，需根据芯片手册选择正确的请求线编号）。
     uint8_t request_line;
+    //! \~english Interrupt priority for this channel. Use vsf_arch_prio_invalid to use default priority from vsf_dma_cfg_t.
+    //!           Only effective when hardware supports per-channel or per-group interrupt priority configuration.
+    //! \~chinese 此通道的中断优先级。使用 vsf_arch_prio_invalid 表示使用 vsf_dma_cfg_t 中的默认优先级。
+    //!           仅在硬件支持每通道或每组中断独立优先级配置时生效。
+    vsf_arch_prio_t prio;
 } vsf_dma_channel_hint_t;
 #endif
 
@@ -561,33 +566,59 @@ typedef struct vsf_dma_channel_status_t {
  * @note 此结构体定义了 DMA 硬件支持的特性。
  *       为保证兼容性，重新实现时需保留所有现有成员。
  */
+/**
+ * \~english
+ * @brief DMA capability structure that can be reimplemented in specific HAL drivers
+ * @note This structure defines the features supported by the DMA hardware.
+ *       When reimplementing, all existing members must be preserved for compatibility.
+ *
+ * \~chinese
+ * @brief 可在具体 HAL 驱动中重新实现的 DMA 能力结构体
+ * @note 此结构体定义了 DMA 硬件支持的特性。
+ *       为保证兼容性，重新实现时需保留所有现有成员。
+ */
 typedef struct vsf_dma_capability_t {
 #if VSF_DMA_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
-    vsf_dma_irq_mask_t irq_mask;          //!< \~english Supported interrupt mask bits \~chinese 支持的中断掩码位
 
-    uint32_t max_request_count;          //!< \~english Maximum count per single transfer request \~chinese 单次传输请求的最大计数
-    uint8_t channel_count;                //!< \~english Number of DMA channels \~chinese DMA 通道数量
+    vsf_dma_irq_mask_t irq_mask;               //!< \~english Supported interrupt mask bits \~chinese 支持的中断掩码位
 
-    //! \~english Supported channel modes, use VSF_DMA_XXX_MASK to extract specific capabilities:
-    //!           - VSF_DMA_DIRECTION_MASK: transfer directions
-    //!           - VSF_DMA_SRC_ADDR_MASK / VSF_DMA_DST_ADDR_MASK: address modes
-    //!           - VSF_DMA_SRC_WIDTH_MASK / VSF_DMA_DST_WIDTH_MASK: data widths
-    //!           - VSF_DMA_SRC_BURST_MASK / VSF_DMA_DST_BURST_MASK: burst lengths
-    //!           - VSF_DMA_PRIORITY_MASK: priority levels
-    //! \~chinese 支持的通道模式，使用 VSF_DMA_XXX_MASK 提取特定能力：
-    //!           - VSF_DMA_DIRECTION_MASK: 传输方向
-    //!           - VSF_DMA_SRC_ADDR_MASK / VSF_DMA_DST_ADDR_MASK: 地址模式
-    //!           - VSF_DMA_SRC_WIDTH_MASK / VSF_DMA_DST_WIDTH_MASK: 数据宽度
-    //!           - VSF_DMA_SRC_BURST_MASK / VSF_DMA_DST_BURST_MASK: 突发长度
-    //!           - VSF_DMA_PRIORITY_MASK: 优先级
+    uint32_t max_request_count;                //!< \~english Maximum count per single transfer request \~chinese 单次传输请求的最大计数
+    uint8_t channel_count;                     //!< \~english Number of DMA channels \~chinese DMA 通道数量
+
+    /**
+     * \~english
+     * Number of independent interrupt vectors for DMA.
+     * If irq_count < channel_count, some channels share interrupts.
+     * \~chinese
+     * DMA 的独立中断向量数量。
+     * 如果 irq_count < channel_count，说明部分通道共享中断。
+     */
+    uint8_t irq_count;
+
+    /**
+     * \~english
+     * Supported channel modes, use VSF_DMA_XXX_MASK to extract specific capabilities:
+     *    - VSF_DMA_DIRECTION_MASK: transfer directions
+     *    - VSF_DMA_SRC_ADDR_MASK / VSF_DMA_DST_ADDR_MASK: address modes
+     *    - VSF_DMA_SRC_WIDTH_MASK / VSF_DMA_DST_WIDTH_MASK: data widths
+     *    - VSF_DMA_SRC_BURST_MASK / VSF_DMA_DST_BURST_MASK: burst lengths
+     *    - VSF_DMA_PRIORITY_MASK: priority levels
+     * \~chinese
+     * 支持的通道模式，使用 VSF_DMA_XXX_MASK 提取特定能力：
+     *    - VSF_DMA_DIRECTION_MASK: 传输方向
+     *    - VSF_DMA_SRC_ADDR_MASK / VSF_DMA_DST_ADDR_MASK: 地址模式
+     *    - VSF_DMA_SRC_WIDTH_MASK / VSF_DMA_DST_WIDTH_MASK: 数据宽度
+     *    - VSF_DMA_SRC_BURST_MASK / VSF_DMA_DST_BURST_MASK: 突发长度
+     *    - VSF_DMA_PRIORITY_MASK: 优先级
+     */
     vsf_dma_channel_mode_t supported_modes;
 
-    uint32_t max_transfer_size;          //!< \~english Maximum transfer size in bytes per transfer (0 means no limit) \~chinese 每次传输的最大字节数（0 表示无限制）
-    uint8_t addr_alignment;              //!< \~english Address alignment requirement in bytes (1 means no alignment required) \~chinese 地址对齐要求（字节），1 表示无对齐要求
+    uint32_t max_transfer_size;                //!< \~english Maximum transfer size in bytes per transfer (0 means no limit) \~chinese 每次传输的最大字节数（0 表示无限制）
+    uint8_t addr_alignment;                    //!< \~english Address alignment requirement in bytes (1 means no alignment required) \~chinese 地址对齐要求（字节），1 表示无对齐要求
 
-    uint8_t support_scatter_gather     : 1; //!< \~english Support scatter-gather transfer \~chinese 支持 Scatter-Gather 传输
+    uint8_t support_scatter_gather : 1;        //!< \~english Support scatter-gather transfer \~chinese 支持 Scatter-Gather 传输
 } vsf_dma_capability_t;
 #endif
 
