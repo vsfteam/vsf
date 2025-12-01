@@ -840,16 +840,41 @@ extern vsf_err_t vsf_dma_channel_sg_start(vsf_dma_t *dma_ptr, uint8_t channel);
  * @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
  * @param[in] channel: channel number
  * @return uint32_t: Number of bytes transferred
- * @note: If called after VSF_DMA_IRQ_MASK_CPL interrupt trigger, it should return 0.
- * @note: It is usually called after call vsf_dma_channel_cancel() to get the counter that has been transferred.
+ *
+ * @note Behavior after completion:
+ *       - For normal transfer: Returns 0 after VSF_DMA_IRQ_MASK_CPL interrupt.
+ *       - For scatter-gather transfer: Returns 0 after the entire SG chain completes.
+ *
+ * @note Usage after cancel:
+ *       This function is typically called after vsf_dma_channel_cancel() to get the
+ *       number of bytes that were successfully transferred before cancellation.
+ *
+ * @note Scatter-Gather semantics:
+ *       - Returns the cumulative total of bytes transferred across all descriptors
+ *         in the SG chain, including completed descriptors plus the partial transfer
+ *         of the current (interrupted) descriptor.
+ *       - If cancel occurs exactly at a descriptor boundary, the return value includes
+ *         all bytes from completed descriptors (the current descriptor's transfer
+ *         count would be 0).
  *
  * \~chinese
  * @brief DMA 获取特定通道已经传输的数量
  * @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
  * @param[in] channel: 通道序号
  * @return uint32_t: 已传输的字节数
- * @note: 如果在 VSF_DMA_IRQ_MASK_CPL 中断触发之后调用，它应该返回 0。
- * @note: 它通常在调用 vsf_dma_channel_cancel() 之后调用，用于获取已经传输的数量。
+ *
+ * @note 完成后的行为:
+ *       - 普通传输: 在 VSF_DMA_IRQ_MASK_CPL 中断之后返回 0。
+ *       - Scatter-Gather 传输: 在整个 SG 链完成后返回 0。
+ *
+ * @note 取消后的用法:
+ *       此函数通常在调用 vsf_dma_channel_cancel() 之后调用，用于获取取消前已成功传输的字节数。
+ *
+ * @note Scatter-Gather 语义:
+ *       - 返回整个 SG 链中所有描述符的累计传输字节数，包括已完成的描述符
+ *         加上当前（被中断的）描述符的部分传输量。
+ *       - 如果取消恰好发生在描述符边界上，返回值包含所有已完成描述符的字节数
+ *         （当前描述符的传输计数为 0）。
  */
 extern uint32_t vsf_dma_channel_get_transferred_count(vsf_dma_t *dma_ptr, uint8_t channel);
 
