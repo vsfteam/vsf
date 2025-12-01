@@ -204,11 +204,21 @@ extern "C" {
 /**
  \~english
  @brief DMA scatter-gather configuration macro
+ @note Use macro VSF_DMA_CHANNEL_SG_ARRAY to initialize the vsf_dma_channel_sg_desc_t
+       structure array for better compatibility.
+ @note In specific hardware drivers, the actual array size may be redefined based on
+       the passed __COUNT, e.g., actual array size may be __COUNT+1 (for list termination).
+ @warning Do NOT use sizeof(array)/sizeof(array[0]) to calculate sg_count.
+          Always use the __COUNT value that was passed to this macro, as the actual
+          array size may differ from __COUNT in driver-specific implementations.
 
  \~chinese
  @brief DMA scatter-gather 配置宏
- @note: 使用宏 VSF_DMA_CHANNEL_SG_ARRAY 来初始化 vsf_dma_channel_sg_desc_t 结构体数组以保证兼容性。
- 在特定的硬件驱动中，可以根据传入的 __COUNT 重新指定结构体数组的大小，例如实际数组大小为 __COUNT+1。
+ @note 使用宏 VSF_DMA_CHANNEL_SG_ARRAY 来初始化 vsf_dma_channel_sg_desc_t 结构体数组以保证兼容性。
+ @note 在特定的硬件驱动中，可以根据传入的 __COUNT 重新指定结构体数组的大小，
+       例如实际数组大小为 __COUNT+1（用于链表终止）。
+ @warning 不要使用 sizeof(array)/sizeof(array[0]) 来计算 sg_count。
+          始终使用传递给此宏的 __COUNT 值，因为在特定驱动实现中实际数组大小可能与 __COUNT 不同。
  */
 #ifndef VSF_DMA_CHANNEL_SG_ARRAY
 #   define VSF_DMA_CHANNEL_SG_ARRAY(__NAME, __COUNT, ...)                       \
@@ -220,10 +230,16 @@ extern "C" {
 /**
  \~english
  @brief DMA scatter-gather item configuration macro
+ @note Use macro VSF_DMA_CHANNEL_SG_ITEM to initialize the @ref vsf_dma_channel_sg_desc_t
+       structure for better compatibility.
+ @note The 'next' field is intentionally NOT initialized by this macro - it is reserved
+       for driver use and will be set up by the driver in vsf_dma_channel_sg_config_desc().
 
  \~chinese
  @brief DMA scatter-gather 项配置宏
- @note: 使用宏 VSF_DMA_CHANNEL_SG_ITEM 来初始化 @ref vsf_dma_channel_sg_desc_t 对应的结构体以保证兼容性。
+ @note 使用宏 VSF_DMA_CHANNEL_SG_ITEM 来初始化 @ref vsf_dma_channel_sg_desc_t 对应的结构体以保证兼容性。
+ @note 此宏故意不初始化 'next' 字段 - 该字段保留给驱动使用，
+       将由驱动在 vsf_dma_channel_sg_config_desc() 中设置。
  */
 #ifndef VSF_DMA_CHANNEL_SG_ITEM
 #   define VSF_DMA_CHANNEL_SG_ITEM(__MODE, __SRC_ADDR, __DST_ADDR, __CNT, ...)  \
@@ -513,7 +529,12 @@ typedef struct vsf_dma_channel_sg_desc_t {
     vsf_dma_addr_t src_address;     //!< Source address
     vsf_dma_addr_t dst_address;     //!< Destination address
     uint32_t count;                 //!< Number of bytes to be transferred
-    vsf_dma_addr_t next;            //!< Next descriptor address
+    //! \~english Next descriptor address. Reserved for driver use only - users should NOT
+    //!           initialize this field. The driver will set up the linked list chain internally
+    //!           in vsf_dma_channel_sg_config_desc().
+    //! \~chinese 下一个描述符地址。仅供驱动内部使用 - 用户不应初始化此字段。
+    //!           驱动会在 vsf_dma_channel_sg_config_desc() 内部设置链表链接。
+    vsf_dma_addr_t next;
 } vsf_dma_channel_sg_desc_t;
 #endif
 
@@ -778,6 +799,20 @@ extern vsf_err_t vsf_dma_channel_cancel(vsf_dma_t *dma_ptr, uint8_t channel);
  @param[in] cfg_ptr: a pointer to DMA channel scatter-gather configuration
  @param[in] sg_count: number of scatter-gather configurations
  @return vsf_err_t: VSF_ERR_NONE if the configuration was successful, otherwise returns error code
+ @note The scatter_gather_cfg array should be initialized using the VSF_DMA_CHANNEL_SG_ARRAY macro
+       for better compatibility.
+ @note The scatter_gather_cfg must point to DMA-accessible memory region.
+ @note The caller must ensure scatter_gather_cfg remains valid until the DMA transfer completes.
+ @note The contents of scatter_gather_cfg may be modified by the driver to match the actual
+       hardware descriptor format required by the DMA controller.
+ @note The driver will handle linked list construction internally, including:
+       - Setting up the 'next' pointer for each descriptor
+       - Terminating the list with NULL or hardware-specific end marker
+       Users only need to provide a valid descriptor array with sg_count elements.
+ @note For a specific channel, API vsf_dma_channel_sg_config_desc() and vsf_dma_channel_sg_start()
+       must be used together. API vsf_dma_channel_config() and vsf_dma_channel_start() are paired
+       for use. These two groups of APIs cannot be mixed. Only after the current DMA transfer is
+       completely finished, can you switch to the other group of APIs.
 
  \~chinese
  @brief DMA 通道配置为 scatter-gather 传输
@@ -787,13 +822,17 @@ extern vsf_err_t vsf_dma_channel_cancel(vsf_dma_t *dma_ptr, uint8_t channel);
  @param[in] cfg_ptr: 指向 DMA 通道 scatter-gather 配置的指针
  @param[in] sg_count: scatter-gather 配置的数量
  @return vsf_err_t: 如果配置成功返回 VSF_ERR_NONE，否则返回错误码
- @note: scatter_gather_cfg 指向的结构体应该使用宏 VSF_DMA_CHANNEL_SG_ARRAY 来初始化，以保证更好的兼容性。
- @note: scatter_gather_cfg 指向的结构体需要是可以被 DMA 直接访问的内存区域，
- @note: scatter_gather_cfg 指向的结构体需要调用者确保在 DMA 传输完成之前不会被释放。
- @note: scatter_gather_cfg 指向的结构体的内容可能在配置后被修改成 DMA 实际需要的 Scatter-Gather 描述符结构。
- @note: 对于指定通道，API vsf_dma_channel_sg_config_desc() 和 vsf_dma_channel_sg_start() 必须配合使用。
-        API vsf_dma_channel_config() 和 vsf_dma_channel_start() 配对使用。
-        这两组API不能混用，只有在当前DMA传输完全结束后，才能切换到另一组API使用。
+ @note scatter_gather_cfg 指向的结构体应该使用宏 VSF_DMA_CHANNEL_SG_ARRAY 来初始化，以保证更好的兼容性。
+ @note scatter_gather_cfg 指向的结构体需要是可以被 DMA 直接访问的内存区域。
+ @note scatter_gather_cfg 指向的结构体需要调用者确保在 DMA 传输完成之前不会被释放。
+ @note scatter_gather_cfg 指向的结构体的内容可能在配置后被修改成 DMA 实际需要的 Scatter-Gather 描述符结构。
+ @note 驱动会在内部处理链表的构建，包括：
+       - 为每个描述符设置 'next' 指针
+       - 使用 NULL 或硬件特定的结束标记终止链表
+       用户只需提供包含 sg_count 个元素的有效描述符数组。
+ @note 对于指定通道，API vsf_dma_channel_sg_config_desc() 和 vsf_dma_channel_sg_start() 必须配合使用。
+       API vsf_dma_channel_config() 和 vsf_dma_channel_start() 配对使用。
+       这两组API不能混用，只有在当前DMA传输完全结束后，才能切换到另一组API使用。
  */
 extern vsf_err_t vsf_dma_channel_sg_config_desc(vsf_dma_t *dma_ptr, uint8_t channel, vsf_dma_isr_t isr,
             vsf_dma_channel_sg_desc_t *sg_desc_ptr, uint32_t sg_count);
