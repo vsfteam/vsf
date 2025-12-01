@@ -78,6 +78,10 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 // HW/IPCore, not for emulated drivers
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_ADDR == ENABLED
+typedef uintptr_t vsf_dma_addr_t;
+#endif
+
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE == ENABLED
 typedef enum vsf_dma_channel_mode_t {
     // 4|14: DMA_CxCTRL.DTS(4) | DMA_CxCTRL.M2M(14)
@@ -229,7 +233,7 @@ typedef struct vsf_dma_capability_t {
     uint32_t max_request_count;
     uint8_t channel_count;
     vsf_dma_channel_mode_t supported_modes;
-    uint32_t max_transfer_size;
+    uint32_t max_transfer_count;
     uint8_t addr_alignment;
     uint8_t support_scatter_gather : 1;
 } vsf_dma_capability_t;
