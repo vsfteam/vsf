@@ -120,10 +120,12 @@ extern "C" {
  * \~english
  * @brief Enable the option to reimplement channel configuration type.
  * For compatibility, do not delete members when redefining vsf_dma_channel_cfg_t
+ * The vsf_dma_isr_handler_t and vsf_dma_isr_t types also need to be redefined
  *
  * \~chinese
  * @brief 启用重新实现通道配置类型的选项。
  * 为保证兼容性，重新定义vsf_dma_channel_cfg_t时不要删除成员
+ * 同时也需要重新定义vsf_dma_isr_handler_t和vsf_dma_isr_t类型
  */
 #ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG
 #   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG     DISABLED
@@ -145,12 +147,10 @@ extern "C" {
  * \~english
  * @brief Enable the option to reimplement DMA configuration type.
  * For compatibility, do not delete members when redefining vsf_dma_cfg_t
- * The vsf_dma_isr_handler_t type also needs to be redefined
  *
  * \~chinese
  * @brief 启用重新实现DMA配置类型的选项。
  * 为保证兼容性，重新定义vsf_dma_cfg_t时不要删除成员
- * 同时也需要重新定义vsf_dma_isr_handler_t类型
  */
 #ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG
 #   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG             DISABLED
