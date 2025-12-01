@@ -163,7 +163,7 @@ extern "C" {
  * @brief 启用重新实现DMA通道状态类型的选项。
  */
 #ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS
-#   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS          DISABLED
+#   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS  DISABLED
 #endif
 
 /**
@@ -176,7 +176,7 @@ extern "C" {
  * 为保证兼容性，重新定义vsf_dma_capability_t时不要删除成员
  */
 #ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY
-#   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY     DISABLED
+#   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY      DISABLED
 #endif
 
 /**
@@ -187,7 +187,7 @@ extern "C" {
  * @brief 启用继承HAL能力以重用通用能力定义
  */
 #ifndef VSF_DMA_CFG_INHERIT_HAL_CAPABILITY
-#   define VSF_DMA_CFG_INHERIT_HAL_CAPABILITY            ENABLED
+#   define VSF_DMA_CFG_INHERIT_HAL_CAPABILITY           ENABLED
 #endif
 
 /**
