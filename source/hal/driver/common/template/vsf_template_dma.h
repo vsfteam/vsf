@@ -517,16 +517,20 @@ typedef struct vsf_dma_channel_cfg_t {
     //! \~chinese 此通道的中断优先级。使用 vsf_arch_prio_invalid 表示使用 vsf_dma_cfg_t 中的默认优先级。
     //!           仅在硬件支持每通道或每组中断独立优先级配置时生效。
     vsf_arch_prio_t         prio;
-    //! \~english Index of the peripheral or memory corresponding to the source address of the DMA
-    //! \~english This index is used to identify the source peripheral or memory region in the DMA transfer
-    //! \~chinese 与 DMA 源地址对应的外设或内存索引
-    //! \~chinese 此索引用于标识 DMA 传输中的源外设或内存区域
-    uint8_t                 src_idx;
-    //! \~english Index of the peripheral or memory corresponding to the destination address of the DMA
-    //! \~english This index is used to identify the destination peripheral or memory region in the DMA transfer
-    //! \~chinese 与 DMA 目标地址对应的外设或内存索引
-    //! \~chinese 此索引用于标识 DMA 传输中的目标外设或内存区域
-    uint8_t                 dst_idx;
+    //! \~english DMA peripheral request signal index for source side
+    //! \~english This is the hardware-specific request signal ID used for DMA handshaking
+    //! \~english Only effective when source is a peripheral (ignored for memory source)
+    //! \~chinese DMA 源端外设请求信号索引
+    //! \~chinese 这是用于 DMA 硬件握手的特定请求信号 ID
+    //! \~chinese 仅当源端为外设时有效（内存源时忽略）
+    uint8_t                 src_request_idx;
+    //! \~english DMA peripheral request signal index for destination side
+    //! \~english This is the hardware-specific request signal ID used for DMA handshaking
+    //! \~english Only effective when destination is a peripheral (ignored for memory destination)
+    //! \~chinese DMA 目标端外设请求信号索引
+    //! \~chinese 这是用于 DMA 硬件握手的特定请求信号 ID
+    //! \~chinese 仅当目标端为外设时有效（内存目标时忽略）
+    uint8_t                 dst_request_idx;
 } vsf_dma_channel_cfg_t;
 #endif
 
