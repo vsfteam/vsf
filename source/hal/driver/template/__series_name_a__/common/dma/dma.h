@@ -197,6 +197,7 @@ typedef struct vsf_dma_isr_t {
 typedef struct vsf_dma_channel_cfg_t {
     vsf_dma_channel_mode_t  mode;
     vsf_dma_isr_t           isr;
+    vsf_dma_irq_mask_t      irq_mask;
     uint8_t                 src_idx;
     uint8_t                 dst_idx;
 } vsf_dma_channel_cfg_t;
