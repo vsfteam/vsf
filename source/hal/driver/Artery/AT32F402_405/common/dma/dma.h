@@ -132,8 +132,8 @@ typedef enum vsf_dma_channel_mode_t {
     VSF_DMA_SRC_BURST_LENGTH_8                  = (3 << 23),
     VSF_DMA_SRC_BURST_LENGTH_16                 = (4 << 23),
     VSF_DMA_SRC_BURST_LENGTH_32                 = (5 << 23),
-    VSF_DMA_SRC_BURST_LENGTH_64                 = (5 << 23),
-    VSF_DMA_SRC_BURST_LENGTH_128                = (6 << 23),
+    VSF_DMA_SRC_BURST_LENGTH_64                 = (6 << 23),
+    VSF_DMA_SRC_BURST_LENGTH_128                = (7 << 23),
 
     VSF_DMA_DST_BURST_LENGTH_1                  = (0 << 26),
     VSF_DMA_DST_BURST_LENGTH_2                  = (1 << 26),
@@ -141,8 +141,8 @@ typedef enum vsf_dma_channel_mode_t {
     VSF_DMA_DST_BURST_LENGTH_8                  = (3 << 26),
     VSF_DMA_DST_BURST_LENGTH_16                 = (4 << 26),
     VSF_DMA_DST_BURST_LENGTH_32                 = (5 << 26),
-    VSF_DMA_DST_BURST_LENGTH_64                 = (5 << 26),
-    VSF_DMA_DST_BURST_LENGTH_128                = (6 << 26),
+    VSF_DMA_DST_BURST_LENGTH_64                 = (6 << 26),
+    VSF_DMA_DST_BURST_LENGTH_128                = (7 << 26),
 } vsf_dma_channel_mode_t;
 #endif
 

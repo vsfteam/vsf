@@ -188,7 +188,7 @@ vsf_err_t vsf_real_dma_channel_get_configuration(vsf_real_dma_t *dma_ptr, uint8_
 #   define vsf_remap_dma_channel_get_transferred_count  VSF_MCONNECT(VSF_DMA_CFG_IMP_REMAP_PREFIX, _dma_channel_get_transferred_count)
 #   define vsf_remap_dma_channel_status                 VSF_MCONNECT(VSF_DMA_CFG_IMP_REMAP_PREFIX, _dma_channel_status)
 
-#   define VSF_DMA_CFG_IMP_REMAP_FUNCTIONS                                                            \
+#   define VSF_DMA_CFG_IMP_REMAP_FUNCTIONS                                              \
         vsf_err_t vsf_imp_dma_init(vsf_imp_dma_t *dma_ptr)                              \
         {                                                                               \
             VSF_HAL_ASSERT(dma_ptr != NULL);                                            \
@@ -199,7 +199,8 @@ vsf_err_t vsf_real_dma_channel_get_configuration(vsf_real_dma_t *dma_ptr, uint8_
             VSF_HAL_ASSERT(dma_ptr != NULL);                                            \
             vsf_remap_dma_fini(dma_ptr);                                                \
         }                                                                               \
-        vsf_err_t vsf_imp_dma_get_configuration(vsf_imp_dma_t *dma_ptr, vsf_dma_cfg_t *cfg_ptr) \
+        vsf_err_t vsf_imp_dma_get_configuration(vsf_imp_dma_t *dma_ptr,                 \
+                                                vsf_dma_cfg_t *cfg_ptr)                 \
         {                                                                               \
             VSF_HAL_ASSERT(dma_ptr != NULL);                                            \
             VSF_HAL_ASSERT(cfg_ptr != NULL);                                            \
@@ -226,7 +227,8 @@ vsf_err_t vsf_real_dma_channel_get_configuration(vsf_real_dma_t *dma_ptr, uint8_
             VSF_HAL_ASSERT(dma_ptr != NULL);                                            \
             return vsf_remap_dma_channel_config(dma_ptr, channel, cfg_ptr);             \
         }                                                                               \
-        vsf_err_t vsf_imp_dma_channel_get_configuration(vsf_imp_dma_t *dma_ptr, int8_t channel, \
+        vsf_err_t vsf_imp_dma_channel_get_configuration(vsf_imp_dma_t *dma_ptr,         \
+                                                        int8_t channel,                 \
                                                         vsf_dma_channel_cfg_t *cfg_ptr) \
         {                                                                               \
             VSF_HAL_ASSERT(dma_ptr != NULL);                                            \

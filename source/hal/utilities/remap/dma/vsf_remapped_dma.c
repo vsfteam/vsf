@@ -96,7 +96,7 @@ vsf_err_t vsf_remapped_dma_channel_get_configuration(vsf_remapped_dma_t *dma, ui
 }
 
 vsf_err_t vsf_remapped_dma_channel_start(vsf_remapped_dma_t *dma, uint8_t channel,
-                                         uint32_t src_address, uint32_t dst_address,
+                                         vsf_dma_addr_t src_address, vsf_dma_addr_t dst_address,
                                          uint32_t count)
 {
     VSF_HAL_ASSERT((dma != NULL) && (dma->target != NULL));
