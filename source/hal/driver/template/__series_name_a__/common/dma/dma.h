@@ -243,6 +243,10 @@ typedef struct vsf_dma_capability_t {
     vsf_dma_irq_mask_t irq_mask;
     uint32_t max_request_count;
     uint8_t channel_count;
+    vsf_dma_channel_mode_t supported_modes;
+    uint32_t max_transfer_size;
+    uint8_t addr_alignment;
+    uint8_t support_scatter_gather : 1;
 } vsf_dma_capability_t;
 #endif
 // HW/IPCore end
