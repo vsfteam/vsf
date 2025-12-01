@@ -209,8 +209,8 @@ static bool VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_channel_update)(
 vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_start)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
     uint8_t channel,
-    uint32_t src_address,
-    uint32_t dst_address,
+    vsf_dma_addr_t src_address,
+    vsf_dma_addr_t dst_address,
     uint32_t count
 ) {
     VSF_HAL_ASSERT(dma_ptr != NULL);

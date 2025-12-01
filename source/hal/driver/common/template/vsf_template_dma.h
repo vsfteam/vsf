@@ -94,6 +94,16 @@ extern "C" {
 #   define VSF_DMA_CFG_REIMPLEMENT_TYPE_IRQ_MASK        DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable the option to reimplement DMA address type in specific hardware drivers
+ *
+ * \~chinese
+ * @brief 启用在特定硬件驱动中重新实现 DMA 地址类型的选项
+ */
+#ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_ADDR
+#   define VSF_DMA_CFG_REIMPLEMENT_TYPE_ADDR            DISABLED
+#endif
 
 /**
  * \~english
@@ -102,8 +112,8 @@ extern "C" {
  * \~chinese
  * @brief 启用在特定硬件驱动中重新实现 CFG 类型配置的选项
  */
-#ifndef VSF_DMA_CFG_REIMPLEMENT_CFG_TYPE_CFG
-#   define VSF_DMA_CFG_REIMPLEMENT_CFG_TYPE_CFG         DISABLED
+#ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG
+#   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG         DISABLED
 #endif
 
 /**
@@ -246,7 +256,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, channel_release,                    VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_config,                     VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_get_configuration,          VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_start,                      VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, uint32_t src_address, uint32_t dst_address, uint32_t count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_start,                      VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_addr_t src_address, vsf_dma_addr_t dst_address, uint32_t count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_cancel,                     VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_sg_config_desc,             VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_isr_t isr, vsf_dma_channel_sg_desc_t *scatter_gather_cfg, uint32_t sg_count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_sg_start,                   VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
@@ -254,6 +264,19 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_channel_status_t, dma, channel_status,                     VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel)
 
 /*============================ TYPES =========================================*/
+
+/**
+ * \~english
+ * @brief DMA address type, used for source address, destination address and scatter-gather descriptor address.
+ * @note The default type is uintptr_t.
+ *
+ * \~chinese
+ * @brief DMA 地址类型，用于源地址、目标地址和 scatter-gather 描述符地址。
+ * @note 默认类型为 uintptr_t。
+ */
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_ADDR == DISABLED
+typedef uintptr_t vsf_dma_addr_t;
+#endif
 
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE == DISABLED
 typedef enum vsf_dma_channel_mode_t {
@@ -398,7 +421,7 @@ enum {
 };
 
 
-#if VSF_DMA_CFG_REIMPLEMENT_CFG_TYPE_CFG == DISABLED
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
 /**
  * \~english
  * @brief Configuration structure for DMA.
@@ -468,10 +491,10 @@ typedef struct vsf_dma_channel_cfg_t {
  */
 typedef struct vsf_dma_channel_sg_desc_t {
     vsf_dma_channel_mode_t mode;    //!< DMA channel mode
-    uint32_t src_address;           //!< Source address
-    uint32_t dst_address;           //!< Destination address
+    vsf_dma_addr_t src_address;     //!< Source address
+    vsf_dma_addr_t dst_address;     //!< Destination address
     uint32_t count;                 //!< Number of bytes to be transferred
-    uint32_t next;                  //!< Next descriptor address
+    vsf_dma_addr_t next;            //!< Next descriptor address
 } vsf_dma_channel_sg_desc_t;
 #endif
 
@@ -666,7 +689,7 @@ extern vsf_err_t vsf_dma_channel_get_configuration(vsf_dma_t *dma_ptr, uint8_t c
         API vsf_dma_channel_config() 和 vsf_dma_channel_start() 配对使用。
         这两组API不能混用，只有在当前DMA传输完全结束后，才能切换到另一组API使用。
  */
-extern vsf_err_t vsf_dma_channel_start(vsf_dma_t *dma_ptr, uint8_t channel, uint32_t src_address, uint32_t dst_address, uint32_t count);
+extern vsf_err_t vsf_dma_channel_start(vsf_dma_t *dma_ptr, uint8_t channel, vsf_dma_addr_t src_address, vsf_dma_addr_t dst_address, uint32_t count);
 
 /**
  \~english
