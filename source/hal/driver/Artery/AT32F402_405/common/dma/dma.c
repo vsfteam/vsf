@@ -334,7 +334,7 @@ vsf_dma_capability_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_capability)(
         .max_request_count = 8,
         .channel_count     = 16,
         .supported_modes   = VSF_DMA_MODE_ALL_BITS_MASK,
-        .max_transfer_size = 0,
+        .max_transfer_count = 0,
         .addr_alignment    = 1,
         .support_scatter_gather = 0,
     };

@@ -612,7 +612,7 @@ typedef struct vsf_dma_capability_t {
      */
     vsf_dma_channel_mode_t supported_modes;
 
-    uint32_t max_transfer_size;                //!< \~english Maximum number of data items per transfer (0 means no limit) \~chinese 每次传输的最大数据项数量（0 表示无限制）
+    uint32_t max_transfer_count;               //!< \~english Maximum number of data items per transfer (0 means no limit) \~chinese 每次传输的最大数据项数量（0 表示无限制）
     uint8_t addr_alignment;                    //!< \~english Address alignment requirement in bytes (1 means no alignment required) \~chinese 地址对齐要求（字节），1 表示无对齐要求
 
     uint8_t support_scatter_gather : 1;        //!< \~english Support scatter-gather transfer \~chinese 支持 Scatter-Gather 传输
