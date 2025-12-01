@@ -342,10 +342,10 @@ typedef enum vsf_dma_channel_mode_t {
     VSF_DMA_DST_BURST_LENGTH_128     = (0x07 << 18),
 
     //prio
-    VSF_DMA_PRIOPIRY_LOW             = (0x00 << 22),
-    VSF_DMA_PRIOPIRY_MEDIUM          = (0x01 << 22),
-    VSF_DMA_PRIOPIRY_HIGH            = (0x02 << 22),
-    VSF_DMA_PRIOPIRY_VERY_HIGH       = (0x03 << 22),
+    VSF_DMA_PRIORITY_LOW             = (0x00 << 22),
+    VSF_DMA_PRIORITY_MEDIUM          = (0x01 << 22),
+    VSF_DMA_PRIORITY_HIGH            = (0x02 << 22),
+    VSF_DMA_PRIORITY_VERY_HIGH       = (0x03 << 22),
 
 } vsf_dma_channel_mode_t;
 #endif
@@ -403,11 +403,11 @@ enum {
                                         VSF_DMA_DST_BURST_LENGTH_64  |
                                         VSF_DMA_DST_BURST_LENGTH_128,
 
-    VSF_DMA_PRIOPIRY_COUNT            = 4,
-    VSF_DMA_PRIOPIRY_MASK             = VSF_DMA_PRIOPIRY_LOW       |
-                                        VSF_DMA_PRIOPIRY_MEDIUM    |
-                                        VSF_DMA_PRIOPIRY_HIGH      |
-                                        VSF_DMA_PRIOPIRY_VERY_HIGH,
+    VSF_DMA_PRIORITY_COUNT            = 4,
+    VSF_DMA_PRIORITY_MASK             = VSF_DMA_PRIORITY_LOW       |
+                                        VSF_DMA_PRIORITY_MEDIUM    |
+                                        VSF_DMA_PRIORITY_HIGH      |
+                                        VSF_DMA_PRIORITY_VERY_HIGH,
 
     VSF_DMA_MODE_MASK_COUNT           = 8,
     VSF_DMA_MODE_ALL_BITS_MASK        = VSF_DMA_DIRECTION_MASK  |
@@ -417,7 +417,7 @@ enum {
                                         VSF_DMA_DST_WIDTH_MASK  |
                                         VSF_DMA_SRC_BURST_MASK  |
                                         VSF_DMA_DST_BURST_MASK  |
-                                        VSF_DMA_PRIOPIRY_MASK,
+                                        VSF_DMA_PRIORITY_MASK,
 
 };
 
@@ -575,13 +575,13 @@ typedef struct vsf_dma_capability_t {
     //!           - VSF_DMA_SRC_ADDR_MASK / VSF_DMA_DST_ADDR_MASK: address modes
     //!           - VSF_DMA_SRC_WIDTH_MASK / VSF_DMA_DST_WIDTH_MASK: data widths
     //!           - VSF_DMA_SRC_BURST_MASK / VSF_DMA_DST_BURST_MASK: burst lengths
-    //!           - VSF_DMA_PRIOPIRY_MASK: priority levels
+    //!           - VSF_DMA_PRIORITY_MASK: priority levels
     //! \~chinese 支持的通道模式，使用 VSF_DMA_XXX_MASK 提取特定能力：
     //!           - VSF_DMA_DIRECTION_MASK: 传输方向
     //!           - VSF_DMA_SRC_ADDR_MASK / VSF_DMA_DST_ADDR_MASK: 地址模式
     //!           - VSF_DMA_SRC_WIDTH_MASK / VSF_DMA_DST_WIDTH_MASK: 数据宽度
     //!           - VSF_DMA_SRC_BURST_MASK / VSF_DMA_DST_BURST_MASK: 突发长度
-    //!           - VSF_DMA_PRIOPIRY_MASK: 优先级
+    //!           - VSF_DMA_PRIORITY_MASK: 优先级
     vsf_dma_channel_mode_t supported_modes;
 
     uint32_t max_transfer_size;          //!< \~english Maximum transfer size in bytes per transfer (0 means no limit) \~chinese 每次传输的最大字节数（0 表示无限制）
