@@ -574,17 +574,6 @@ typedef struct vsf_dma_channel_status_t {
  * @note 此结构体定义了 DMA 硬件支持的特性。
  *       为保证兼容性，重新实现时需保留所有现有成员。
  */
-/**
- * \~english
- * @brief DMA capability structure that can be reimplemented in specific HAL drivers
- * @note This structure defines the features supported by the DMA hardware.
- *       When reimplementing, all existing members must be preserved for compatibility.
- *
- * \~chinese
- * @brief 可在具体 HAL 驱动中重新实现的 DMA 能力结构体
- * @note 此结构体定义了 DMA 硬件支持的特性。
- *       为保证兼容性，重新实现时需保留所有现有成员。
- */
 typedef struct vsf_dma_capability_t {
 #if VSF_DMA_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
