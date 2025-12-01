@@ -66,6 +66,18 @@
 #   ifndef VSF_DMA_CFG_CAPABILITY_CHANNEL_COUNT
 #       define VSF_DMA_CFG_CAPABILITY_CHANNEL_COUNT         8
 #   endif
+#   ifndef VSF_DMA_CFG_CAPABILITY_SUPPORTED_MODES
+#       define VSF_DMA_CFG_CAPABILITY_SUPPORTED_MODES       VSF_DMA_MODE_ALL_BITS_MASK
+#   endif
+#   ifndef VSF_DMA_CFG_CAPABILITY_MAX_TRANSFER_SIZE
+#       define VSF_DMA_CFG_CAPABILITY_MAX_TRANSFER_SIZE     0
+#   endif
+#   ifndef VSF_DMA_CFG_CAPABILITY_ADDR_ALIGNMENT
+#       define VSF_DMA_CFG_CAPABILITY_ADDR_ALIGNMENT        1
+#   endif
+#   ifndef VSF_DMA_CFG_CAPABILITY_SUPPORT_SCATTER_GATHER
+#       define VSF_DMA_CFG_CAPABILITY_SUPPORT_SCATTER_GATHER 0
+#   endif
 #endif
 
 /*============================ LOCAL VARIABLES ===============================*/
@@ -78,6 +90,10 @@ vsf_dma_capability_t vsf_real_dma_capability(vsf_real_dma_t *dma_ptr)
         .irq_mask           = VSF_DMA_CFG_CAPABILITY_IRQ_MASK,
         .max_request_count  = VSF_DMA_CFG_CAPABILITY_MAX_REQUEST_COUNT,
         .channel_count      = VSF_DMA_CFG_CAPABILITY_CHANNEL_COUNT,
+        .supported_modes    = VSF_DMA_CFG_CAPABILITY_SUPPORTED_MODES,
+        .max_transfer_size  = VSF_DMA_CFG_CAPABILITY_MAX_TRANSFER_SIZE,
+        .addr_alignment     = VSF_DMA_CFG_CAPABILITY_ADDR_ALIGNMENT,
+        .support_scatter_gather = VSF_DMA_CFG_CAPABILITY_SUPPORT_SCATTER_GATHER,
     };
 
     return dma_capability;
@@ -149,6 +165,10 @@ vsf_err_t vsf_real_dma_channel_get_configuration(vsf_real_dma_t *dma_ptr, uint8_
 #undef VSF_DMA_CFG_CAPABILITY_IRQ_MASK
 #undef VSF_DMA_CFG_CAPABILITY_MAX_REQUEST_COUNT
 #undef VSF_DMA_CFG_CAPABILITY_CHANNEL_COUNT
+#undef VSF_DMA_CFG_CAPABILITY_SUPPORTED_MODES
+#undef VSF_DMA_CFG_CAPABILITY_MAX_TRANSFER_SIZE
+#undef VSF_DMA_CFG_CAPABILITY_ADDR_ALIGNMENT
+#undef VSF_DMA_CFG_CAPABILITY_SUPPORT_SCATTER_GATHER
 #undef vsf_real_dma_t
 #undef vsf_real_dma_capability
 #undef vsf_real_dma_get_configuration
