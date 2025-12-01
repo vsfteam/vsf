@@ -1087,7 +1087,7 @@ static void devm_action_release(struct device *dev, void *res)
 
 void devres_add(struct device *dev, void *res)
 {
-    struct devres *dr = container_of(res, struct devres, data);
+    struct devres *dr = vsf_container_of(res, struct devres, data);
     vsf_dlist_add_to_head(struct devres, node, &dev->devres_head, dr);
 }
 

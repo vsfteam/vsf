@@ -3360,7 +3360,7 @@ int semop(int semid, struct sembuf *sops, size_t nsops)
 #   if VSF_KERNEL_CFG_SUPPORT_CALLBACK_TIMER == ENABLED
 void __hrtimer_on_timer(vsf_callback_timer_t *timer)
 {
-    struct hrtimer *hrtimer = container_of(timer, struct hrtimer, callback_timer);
+    struct hrtimer *hrtimer = vsf_container_of(timer, struct hrtimer, callback_timer);
     if (hrtimer->function != NULL) {
         if (hrtimer->function(hrtimer) == HRTIMER_RESTART) {
             vsf_callback_timer_add_due(timer, hrtimer->due);
