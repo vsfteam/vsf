@@ -107,17 +107,6 @@ extern "C" {
 
 /**
  * \~english
- * @brief Enable the option to reimplement CFG type configuration in specific hardware drivers
- *
- * \~chinese
- * @brief 启用在特定硬件驱动中重新实现 CFG 类型配置的选项
- */
-#ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG
-#   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG         DISABLED
-#endif
-
-/**
- * \~english
  * @brief Enable the option to reimplement Channal Hint type configuration in specific hardware drivers
  *
  * \~chinese
