@@ -552,7 +552,7 @@ typedef struct vsf_dma_channel_sg_desc_t {
     vsf_dma_channel_mode_t mode;    //!< DMA channel mode
     vsf_dma_addr_t src_address;     //!< Source address
     vsf_dma_addr_t dst_address;     //!< Destination address
-    uint32_t count;                 //!< Number of bytes to be transferred
+    uint32_t count;                 //!< Number of data items to be transferred
     //! \~english Next descriptor address. Reserved for driver use only - users should NOT
     //!           initialize this field. The driver will set up the linked list chain internally
     //!           in vsf_dma_channel_sg_config_desc().
@@ -634,7 +634,7 @@ typedef struct vsf_dma_capability_t {
      */
     vsf_dma_channel_mode_t supported_modes;
 
-    uint32_t max_transfer_size;                //!< \~english Maximum transfer size in bytes per transfer (0 means no limit) \~chinese 每次传输的最大字节数（0 表示无限制）
+    uint32_t max_transfer_size;                //!< \~english Maximum number of data items per transfer (0 means no limit) \~chinese 每次传输的最大数据项数量（0 表示无限制）
     uint8_t addr_alignment;                    //!< \~english Address alignment requirement in bytes (1 means no alignment required) \~chinese 地址对齐要求（字节），1 表示无对齐要求
 
     uint8_t support_scatter_gather : 1;        //!< \~english Support scatter-gather transfer \~chinese 支持 Scatter-Gather 传输
@@ -794,7 +794,7 @@ extern vsf_err_t vsf_dma_channel_get_configuration(vsf_dma_t *dma_ptr, uint8_t c
  * @param[in] channel: channel number
  * @param[in] src_address: source address
  * @param[in] dst_address: destination address
- * @param[in] count: counter of data to be transferred (in byte)
+ * @param[in] count: number of data items to be transferred
  * @return vsf_err_t:
  *         - VSF_ERR_NONE if the start request was successful
  *         - VSF_ERR_BUSY if the channel is currently busy with another transfer
@@ -806,7 +806,7 @@ extern vsf_err_t vsf_dma_channel_get_configuration(vsf_dma_t *dma_ptr, uint8_t c
  * @param[in] channel: 通道序号
  * @param[in] src_address: 源地址
  * @param[in] dst_address: 目标地址
- * @param[in] count: 将要传输的数据的字节数
+ * @param[in] count: 将要传输的数据项数量
  * @return vsf_err_t:
  *         - VSF_ERR_NONE 如果开始传输成功
  *         - VSF_ERR_BUSY 如果通道当前正忙于另一个传输
@@ -925,10 +925,10 @@ extern vsf_err_t vsf_dma_channel_sg_start(vsf_dma_t *dma_ptr, uint8_t channel);
 
 /**
  * \~english
- * @brief Get the counter of bytes transferred for a specific DMA channel
+ * @brief Get the count of data items transferred for a specific DMA channel
  * @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
  * @param[in] channel: channel number
- * @return uint32_t: Number of bytes transferred
+ * @return uint32_t: Number of data items transferred
  *
  * @note Behavior after completion:
  *       - For normal transfer: Returns 0 after VSF_DMA_IRQ_MASK_CPL interrupt.
@@ -936,33 +936,33 @@ extern vsf_err_t vsf_dma_channel_sg_start(vsf_dma_t *dma_ptr, uint8_t channel);
  *
  * @note Usage after cancel:
  *       This function is typically called after vsf_dma_channel_cancel() to get the
- *       number of bytes that were successfully transferred before cancellation.
+ *       number of data items that were successfully transferred before cancellation.
  *
  * @note Scatter-Gather semantics:
- *       - Returns the cumulative total of bytes transferred across all descriptors
+ *       - Returns the cumulative total of data items transferred across all descriptors
  *         in the SG chain, including completed descriptors plus the partial transfer
  *         of the current (interrupted) descriptor.
  *       - If cancel occurs exactly at a descriptor boundary, the return value includes
- *         all bytes from completed descriptors (the current descriptor's transfer
+ *         all data items from completed descriptors (the current descriptor's transfer
  *         count would be 0).
  *
  * \~chinese
  * @brief DMA 获取特定通道已经传输的数量
  * @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
  * @param[in] channel: 通道序号
- * @return uint32_t: 已传输的字节数
+ * @return uint32_t: 已传输的数据项数量
  *
  * @note 完成后的行为:
  *       - 普通传输: 在 VSF_DMA_IRQ_MASK_CPL 中断之后返回 0。
  *       - Scatter-Gather 传输: 在整个 SG 链完成后返回 0。
  *
  * @note 取消后的用法:
- *       此函数通常在调用 vsf_dma_channel_cancel() 之后调用，用于获取取消前已成功传输的字节数。
+ *       此函数通常在调用 vsf_dma_channel_cancel() 之后调用，用于获取取消前已成功传输的数据项数量。
  *
  * @note Scatter-Gather 语义:
- *       - 返回整个 SG 链中所有描述符的累计传输字节数，包括已完成的描述符
+ *       - 返回整个 SG 链中所有描述符的累计传输数据项数量，包括已完成的描述符
  *         加上当前（被中断的）描述符的部分传输量。
- *       - 如果取消恰好发生在描述符边界上，返回值包含所有已完成描述符的字节数
+ *       - 如果取消恰好发生在描述符边界上，返回值包含所有已完成描述符的数据项数量
  *         （当前描述符的传输计数为 0）。
  */
 extern uint32_t vsf_dma_channel_get_transferred_count(vsf_dma_t *dma_ptr, uint8_t channel);
