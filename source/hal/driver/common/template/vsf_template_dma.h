@@ -724,7 +724,10 @@ extern vsf_err_t vsf_dma_channel_get_configuration(vsf_dma_t *dma_ptr, uint8_t c
  * @param[in] src_address: source address
  * @param[in] dst_address: destination address
  * @param[in] count: counter of data to be transferred (in byte)
- * @return vsf_err_t: VSF_ERR_NONE if the start request was successful, otherwise returns error code
+ * @return vsf_err_t:
+ *         - VSF_ERR_NONE if the start request was successful
+ *         - VSF_ERR_BUSY if the channel is currently busy with another transfer
+ *         - Other error codes for other failures
  *
  * \~chinese
  * @brief DMA 开始一个通道的传输
@@ -733,10 +736,21 @@ extern vsf_err_t vsf_dma_channel_get_configuration(vsf_dma_t *dma_ptr, uint8_t c
  * @param[in] src_address: 源地址
  * @param[in] dst_address: 目标地址
  * @param[in] count: 将要传输的数据的字节数
- * @return vsf_err_t: 如果开始传输成功返回 VSF_ERR_NONE，否则返回错误码
+ * @return vsf_err_t:
+ *         - VSF_ERR_NONE 如果开始传输成功
+ *         - VSF_ERR_BUSY 如果通道当前正忙于另一个传输
+ *         - 其他错误码表示其他失败情况
  * @note: 对于指定通道，API vsf_dma_channel_sg_config_desc() 和 vsf_dma_channel_sg_start() 必须配合使用。
         API vsf_dma_channel_config() 和 vsf_dma_channel_start() 配对使用。
         这两组API不能混用，只有在当前DMA传输完全结束后，才能切换到另一组API使用。
+ * @note: If the channel is busy, this function returns VSF_ERR_BUSY immediately without modifying the ongoing transfer.
+ *        To wait for the current transfer to complete, applications can:
+ *        - Poll vsf_dma_channel_status() to check if the channel is no longer busy (is_busy == 0)
+ *        - Wait for the transfer completion interrupt (VSF_DMA_IRQ_MASK_CPL) if interrupt is enabled
+ *        如果通道正忙，此函数立即返回 VSF_ERR_BUSY，不会修改正在进行的传输。
+ *        要等待当前传输完成，应用程序可以：
+ *        - 轮询 vsf_dma_channel_status() 检查通道是否不再忙碌（is_busy == 0）
+ *        - 如果启用了中断，等待传输完成中断（VSF_DMA_IRQ_MASK_CPL）
  */
 extern vsf_err_t vsf_dma_channel_start(vsf_dma_t *dma_ptr, uint8_t channel, vsf_dma_addr_t src_address, vsf_dma_addr_t dst_address, uint32_t count);
 
@@ -789,16 +803,34 @@ extern vsf_err_t vsf_dma_channel_sg_config_desc(vsf_dma_t *dma_ptr, uint8_t chan
  @brief Start a DMA scatter-gather transfer
  @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
  @param[in] channel: channel number
- @return vsf_err_t: VSF_ERR_NONE if the start request was successful, otherwise returns error code
+ @return vsf_err_t:
+         - VSF_ERR_NONE if the start request was successful
+         - VSF_ERR_BUSY if the channel is currently busy with another transfer
+         - Other error codes for other failures
+ @note: For a specific channel, API vsf_dma_channel_sg_config_desc() and vsf_dma_channel_sg_start() must be used together.
+        API vsf_dma_channel_config() and vsf_dma_channel_start() are paired for use.
+        These two groups of APIs cannot be mixed. Only after the current DMA transfer is completely finished,
+        can you switch to the other group of APIs.
+ @note: If the channel is busy, this function returns VSF_ERR_BUSY immediately without modifying the ongoing transfer.
+        To wait for the current transfer to complete, applications can:
+        - Poll vsf_dma_channel_status() to check if the channel is no longer busy (is_busy == 0)
+        - Wait for the transfer completion interrupt (VSF_DMA_IRQ_MASK_CPL) if interrupt is enabled
 
  \~chinese
  @brief DMA 开始一个 scatter-gather 传输
  @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
  @param[in] channel: 通道序号
- @return vsf_err_t: 如果开始传输成功返回 VSF_ERR_NONE，否则返回错误码
-  @note: 对于指定通道，API vsf_dma_channel_sg_config_desc() 和 vsf_dma_channel_sg_start() 必须配合使用。
+ @return vsf_err_t:
+         - VSF_ERR_NONE 如果开始传输成功
+         - VSF_ERR_BUSY 如果通道当前正忙于另一个传输
+         - 其他错误码表示其他失败情况
+ @note: 对于指定通道，API vsf_dma_channel_sg_config_desc() 和 vsf_dma_channel_sg_start() 必须配合使用。
         API vsf_dma_channel_config() 和 vsf_dma_channel_start() 配对使用。
         这两组API不能混用，只有在当前DMA传输完全结束后，才能切换到另一组API使用。
+ @note: 如果通道正忙，此函数立即返回 VSF_ERR_BUSY，不会修改正在进行的传输。
+        要等待当前传输完成，应用程序可以：
+        - 轮询 vsf_dma_channel_status() 检查通道是否不再忙碌（is_busy == 0）
+        - 如果启用了中断，等待传输完成中断（VSF_DMA_IRQ_MASK_CPL）
  */
 extern vsf_err_t vsf_dma_channel_sg_start(vsf_dma_t *dma_ptr, uint8_t channel);
 
