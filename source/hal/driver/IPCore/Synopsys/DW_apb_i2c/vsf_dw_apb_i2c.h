@@ -140,9 +140,6 @@ typedef enum vsf_i2c_irq_mask_t {
     // TX_ABRT.ARB_LOST (bit 12)
     VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST    = (0x01ul << 24),
 
-    VSF_I2C_IRQ_MASK_MASTER_ERR                 = (0x01ul << 27),   // virtual, not supported
-    VSF_I2C_IRQ_MASK_SLAVE_ERR                  = (0x01ul << 28),   // virtual, not supported
-
     VSF_DW_APB_I2C_IRQ_MASK_ALL                 = VSF_I2C_IRQ_MASK_MASTER_TX
                                                 | VSF_I2C_IRQ_MASK_MASTER_RX
                                                 | VSF_I2C_IRQ_MASK_MASTER_START_OR_RESTART_DETECT
@@ -162,7 +159,6 @@ typedef enum vsf_i2c_irq_mask_t {
     __VSF_DW_APB_I2C_IRQ_MASK                   = 0x7FF,
     __VSF_DW_APB_I2C_ERROR_MASK                 = VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT
                                                 | VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
-                                                | VSF_I2C_IRQ_MASK_MASTER_ERR
                                                 | VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK,
 } vsf_i2c_irq_mask_t;
 
