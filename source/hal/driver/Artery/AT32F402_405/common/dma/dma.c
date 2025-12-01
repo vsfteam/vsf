@@ -313,7 +313,6 @@ static void VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_irqhandler)(
  *      VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY for dma_capability.
  *          Default implementation will use macros below to initialize capability structure:
  *              VSF_DMA_CFG_CAPABILITY_IRQ_MASK (default: VSF_DMA_IRQ_ALL_BITS_MASK)
- *              VSF_DMA_CFG_CAPABILITY_MAX_REQUEST_COUNT (default: 0xFFFFFFFF)
  *              VSF_DMA_CFG_CAPABILITY_CHANNEL_COUNT (default: 8)
  *      VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION for dma_channel_get_configuration.
  *          Default implementation will assert(false) to indicate the feature is not implemented.
@@ -331,7 +330,6 @@ vsf_dma_capability_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_capability)(
     VSF_HAL_ASSERT(dma_ptr != NULL);
     return (vsf_dma_capability_t) {
         .irq_mask          = 0xff,
-        .max_request_count = 8,
         .channel_count     = 16,
         .supported_modes   = VSF_DMA_MODE_ALL_BITS_MASK,
         .max_transfer_count = 0,

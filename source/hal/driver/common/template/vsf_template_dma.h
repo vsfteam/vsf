@@ -581,7 +581,6 @@ typedef struct vsf_dma_capability_t {
 
     vsf_dma_irq_mask_t irq_mask;               //!< \~english Supported interrupt mask bits \~chinese 支持的中断掩码位
 
-    uint32_t max_request_count;                //!< \~english Maximum count per single transfer request \~chinese 单次传输请求的最大计数
     uint8_t channel_count;                     //!< \~english Number of DMA channels \~chinese DMA 通道数量
 
     /**
