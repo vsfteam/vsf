@@ -127,7 +127,6 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_request)(
 
     if (channel >= 0) {
         channel_hint_ptr->channel = channel;
-        NVIC_SetPriority(dma_ptr->channels[channel].irqn, channel_hint_ptr->interrupt_prio);
         return VSF_ERR_NONE;
     }
     return VSF_ERR_FAIL;
@@ -164,6 +163,10 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_config)(
     VSF_HAL_ASSERT(cfg_ptr->src_request_idx <= 127);
     VSF_HAL_ASSERT(cfg_ptr->sync_reqcnt <= 32);
     VSF_HAL_ASSERT(cfg_ptr->sync_signal <= 127);
+    if (cfg_ptr->prio == vsf_arch_prio_invalid) {
+        VSF_HAL_ASSERT(0);
+        return VSF_ERR_INVALID_PARAMETER;
+    }
 
     dma_type *reg = dma_ptr->reg;
     vsf_hw_dma_channel_reg_t *channel_reg = &((vsf_hw_dma_channel_reg_t *)reg->reserved1)[channel];
@@ -187,6 +190,7 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_config)(
     channel_reg->ctrl = cfg_ptr->mode;
     ch->isr = cfg_ptr->isr;
     if (cfg_ptr->isr.handler_fn != NULL) {
+        NVIC_SetPriority(ch->irqn, cfg_ptr->prio);
         NVIC_EnableIRQ(ch->irqn);
     } else {
         NVIC_DisableIRQ(ch->irqn);
