@@ -466,11 +466,28 @@ typedef struct vsf_dma_isr_t {
 
 //! dma configuration
 typedef struct vsf_dma_channel_cfg_t {
+    //! \~english DMA channel mode, including transfer direction, address increment mode, data width, burst length, priority, etc.
+    //! \~english Use VSF_DMA_XXX macros to configure (e.g. VSF_DMA_MEMORY_TO_PERIPHERAL | VSF_DMA_SRC_ADDR_INCREMENT | VSF_DMA_DST_WIDTH_BYTES_4)
+    //! \~chinese DMA 通道模式，包括传输方向、地址增量模式、数据宽度、突发长度、优先级等
+    //! \~chinese 使用 VSF_DMA_XXX 宏进行配置（例如 VSF_DMA_MEMORY_TO_PERIPHERAL | VSF_DMA_SRC_ADDR_INCREMENT | VSF_DMA_DST_WIDTH_BYTES_4）
     vsf_dma_channel_mode_t  mode;
+    //! \~english Interrupt service routine configuration, including handler function and target pointer
+    //! \~chinese 中断服务例程配置，包括处理函数和目标指针
     vsf_dma_isr_t           isr;
-    //! Index of the peripheral or memory corresponding to the source address of the DMA
+    //! \~english Interrupt mask, indicating which interrupts to enable (e.g. VSF_DMA_IRQ_MASK_CPL | VSF_DMA_IRQ_MASK_ERROR)
+    //! \~english Multiple interrupt types can be combined using bitwise OR operation
+    //! \~chinese 中断掩码，指定需要启用的中断（例如 VSF_DMA_IRQ_MASK_CPL | VSF_DMA_IRQ_MASK_ERROR）
+    //! \~chinese 可以使用按位或操作组合多个中断类型
+    vsf_dma_irq_mask_t      irq_mask;
+    //! \~english Index of the peripheral or memory corresponding to the source address of the DMA
+    //! \~english This index is used to identify the source peripheral or memory region in the DMA transfer
+    //! \~chinese 与 DMA 源地址对应的外设或内存索引
+    //! \~chinese 此索引用于标识 DMA 传输中的源外设或内存区域
     uint8_t                 src_idx;
-    //! Index of the peripheral or memory corresponding to the destination address of the DMA
+    //! \~english Index of the peripheral or memory corresponding to the destination address of the DMA
+    //! \~english This index is used to identify the destination peripheral or memory region in the DMA transfer
+    //! \~chinese 与 DMA 目标地址对应的外设或内存索引
+    //! \~chinese 此索引用于标识 DMA 传输中的目标外设或内存区域
     uint8_t                 dst_idx;
 } vsf_dma_channel_cfg_t;
 #endif
