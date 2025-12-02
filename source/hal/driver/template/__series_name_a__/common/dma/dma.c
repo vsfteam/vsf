@@ -223,6 +223,7 @@ static void VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_irqhandler)(
  *          Default implementation will use macros below to initialize capability structure:
  *              VSF_DMA_CFG_CAPABILITY_IRQ_MASK (default: VSF_DMA_IRQ_ALL_BITS_MASK)
  *              VSF_DMA_CFG_CAPABILITY_CHANNEL_COUNT (default: 8)
+ *              VSF_DMA_CFG_CAPABILITY_MAX_TRANSFER_COUNT (default: 0xFFFFFFFF)
  *      VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION for dma_channel_get_configuration.
  *          Default implementation will assert(false) to indicate the feature is not implemented.
  *      VSF_DMA_CFG_REIMPLEMENT_API_SG_CONFIG_DESC for dma_channel_sg_config_desc.
