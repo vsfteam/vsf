@@ -63,6 +63,9 @@
 #   ifndef VSF_DMA_CFG_CAPABILITY_CHANNEL_COUNT
 #       define VSF_DMA_CFG_CAPABILITY_CHANNEL_COUNT             8
 #   endif
+#   ifndef VSF_DMA_CFG_CAPABILITY_IRQ_COUNT
+#       define VSF_DMA_CFG_CAPABILITY_IRQ_COUNT                 VSF_DMA_CFG_CAPABILITY_CHANNEL_COUNT
+#   endif
 #   ifndef VSF_DMA_CFG_CAPABILITY_SUPPORTED_MODES
 #       define VSF_DMA_CFG_CAPABILITY_SUPPORTED_MODES           VSF_DMA_MODE_ALL_BITS_MASK
 #   endif
@@ -86,6 +89,7 @@ vsf_dma_capability_t vsf_real_dma_capability(vsf_real_dma_t *dma_ptr)
     vsf_dma_capability_t dma_capability = {
         .irq_mask               = VSF_DMA_CFG_CAPABILITY_IRQ_MASK,
         .channel_count          = VSF_DMA_CFG_CAPABILITY_CHANNEL_COUNT,
+        .irq_count              = VSF_DMA_CFG_CAPABILITY_IRQ_COUNT,
         .supported_modes        = VSF_DMA_CFG_CAPABILITY_SUPPORTED_MODES,
         .max_transfer_count     = VSF_DMA_CFG_CAPABILITY_MAX_TRANSFER_COUNT,
         .addr_alignment         = VSF_DMA_CFG_CAPABILITY_ADDR_ALIGNMENT,
@@ -160,6 +164,7 @@ vsf_err_t vsf_real_dma_channel_get_configuration(vsf_real_dma_t *dma_ptr, uint8_
 #undef VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION
 #undef VSF_DMA_CFG_CAPABILITY_IRQ_MASK
 #undef VSF_DMA_CFG_CAPABILITY_CHANNEL_COUNT
+#undef VSF_DMA_CFG_CAPABILITY_IRQ_COUNT
 #undef VSF_DMA_CFG_CAPABILITY_SUPPORTED_MODES
 #undef VSF_DMA_CFG_CAPABILITY_MAX_TRANSFER_COUNT
 #undef VSF_DMA_CFG_CAPABILITY_ADDR_ALIGNMENT
