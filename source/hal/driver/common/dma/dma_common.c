@@ -72,14 +72,14 @@ vsf_dma_capability_t vsf_dma_capability(vsf_dma_t *dma_ptr)
     return dma_ptr->op->capability(dma_ptr);
 }
 
-vsf_err_t vsf_dma_channel_request(vsf_dma_t *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr)
+vsf_err_t vsf_dma_channel_acquire(vsf_dma_t *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr)
 {
     VSF_HAL_ASSERT(dma_ptr != NULL);
     VSF_HAL_ASSERT(dma_ptr->op != NULL);
-    VSF_HAL_ASSERT(dma_ptr->op->channel_request != NULL);
+    VSF_HAL_ASSERT(dma_ptr->op->channel_acquire != NULL);
     VSF_HAL_ASSERT(channel_hint_ptr != NULL);
 
-    return dma_ptr->op->channel_request(dma_ptr, channel_hint_ptr);
+    return dma_ptr->op->channel_acquire(dma_ptr, channel_hint_ptr);
 }
 
 void vsf_dma_channel_release(vsf_dma_t *dma_ptr, uint8_t channel)

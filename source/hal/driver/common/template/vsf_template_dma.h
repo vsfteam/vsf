@@ -208,6 +208,22 @@ extern "C" {
        例如实际数组大小为 __COUNT+1（用于链表终止）。
  @warning 不要使用 sizeof(array)/sizeof(array[0]) 来计算 sg_count。
           始终使用传递给此宏的 __COUNT 值，因为在特定驱动实现中实际数组大小可能与 __COUNT 不同。
+
+ @par Example
+ @code {.c}
+    #define SG_COUNT 3
+    VSF_DMA_CHANNEL_SG_ARRAY(my_sg_desc, SG_COUNT,
+        VSF_DMA_CHANNEL_SG_ITEM(VSF_DMA_MEMORY_TO_MEMORY | VSF_DMA_SRC_ADDR_INCREMENT | VSF_DMA_DST_ADDR_INCREMENT,
+                                (vsf_dma_addr_t)src_buf0, (vsf_dma_addr_t)dst_buf0, 256),
+        VSF_DMA_CHANNEL_SG_ITEM(VSF_DMA_MEMORY_TO_MEMORY | VSF_DMA_SRC_ADDR_INCREMENT | VSF_DMA_DST_ADDR_INCREMENT,
+                                (vsf_dma_addr_t)src_buf1, (vsf_dma_addr_t)dst_buf1, 512),
+        VSF_DMA_CHANNEL_SG_ITEM(VSF_DMA_MEMORY_TO_MEMORY | VSF_DMA_SRC_ADDR_INCREMENT | VSF_DMA_DST_ADDR_INCREMENT,
+                                (vsf_dma_addr_t)src_buf2, (vsf_dma_addr_t)dst_buf2, 128),
+    );
+
+    vsf_dma_channel_sg_config_desc(&vsf_hw_dma0, channel, isr, my_sg_desc, SG_COUNT);
+    vsf_dma_channel_sg_start(&vsf_hw_dma0, channel);
+ @endcode
  */
 #ifndef VSF_DMA_CHANNEL_SG_ARRAY
 #   define VSF_DMA_CHANNEL_SG_ARRAY(__NAME, __COUNT, ...)                       \
@@ -257,7 +273,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, fini,                               VSF_MCONNECT(__prefix_name, _t) *dma_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, get_configuration,                  VSF_MCONNECT(__prefix_name, _t) *dma_ptr, vsf_dma_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_capability_t,     dma, capability,                         VSF_MCONNECT(__prefix_name, _t) *dma_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_request,                    VSF_MCONNECT(__prefix_name, _t) *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_acquire,                    VSF_MCONNECT(__prefix_name, _t) *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                     dma, channel_release,                    VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_config,                     VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_get_configuration,          VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_channel_cfg_t *cfg_ptr) \
@@ -443,7 +459,7 @@ typedef struct vsf_dma_cfg_t {
 /**
  * \~english
  * @brief DMA channel hint structure for channel allocation
- * @note This structure is used only during channel request phase to provide hints
+ * @note This structure is used only during channel acquire phase to provide hints
  *       for channel allocation. It contains only information needed for channel selection.
  *
  * \~chinese
@@ -699,18 +715,18 @@ extern vsf_dma_capability_t vsf_dma_capability(vsf_dma_t *dma_ptr);
 
 /**
  \~english
- @brief DMA request a new channel
+ @brief DMA acquire a new channel
  @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
  @param[in,out] channel_hint_ptr: a pointer to DMA channel hint. User should provide appropriate hint information based on actual requirements. If the actually allocated channel or other configuration differs from user's expectation, the function may modify channel_hint_ptr to notify the user of the actual allocation. The allocated channel number will be stored in channel_hint_ptr->channel.
- @return vsf_err_t: VSF_ERR_NONE if the request was successful, otherwise returns error code
+ @return vsf_err_t: VSF_ERR_NONE if the acquire was successful, otherwise returns error code
 
  \~chinese
- @brief DMA 请求一个新的通道
+ @brief DMA 获取一个新的通道
  @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
  @param[in,out] channel_hint_ptr: 指向 DMA 通道提示的指针。用户应根据实际情况提供合适的提示信息。如果实际分配的通道或其他配置与用户预期不一致，函数可能会修改 channel_hint_ptr 来通知用户实际分配的结果。分配的通道号将存储在 channel_hint_ptr->channel 中。
- @return vsf_err_t: 如果请求成功返回 VSF_ERR_NONE，否则返回错误码
+ @return vsf_err_t: 如果获取成功返回 VSF_ERR_NONE，否则返回错误码
  */
-extern vsf_err_t vsf_dma_channel_request(vsf_dma_t *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr);
+extern vsf_err_t vsf_dma_channel_acquire(vsf_dma_t *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr);
 
 /**
  \~english
@@ -968,7 +984,7 @@ extern vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr, uint8
 #   define vsf_dma_fini(__DMA)                                      VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_fini)((__vsf_dma_t *)(__DMA))
 #   define vsf_dma_get_configuration(__DMA, ...)                    VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_get_configuration)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_capability(__DMA)                                VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_capability)((__vsf_dma_t *)(__DMA))
-#   define vsf_dma_channel_request(__DMA, ...)                      VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_request)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_acquire(__DMA, ...)                      VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_acquire)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_release(__DMA, ...)                      VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_release)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_config(__DMA, ...)                       VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_config)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_get_configuration(__DMA, ...)            VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_get_configuration)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
