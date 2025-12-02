@@ -254,6 +254,7 @@ vsf_dma_capability_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_capability)(
     return (vsf_dma_capability_t) {
         .irq_mask          = 0xff,
         .channel_count     = 16,
+        .irq_count         = 16,
         .supported_modes   = VSF_DMA_MODE_ALL_BITS_MASK,
         .max_transfer_count = 0,
         .addr_alignment    = 1,

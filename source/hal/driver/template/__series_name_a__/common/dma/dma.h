@@ -251,6 +251,7 @@ typedef struct vsf_dma_capability_t {
 #endif
     vsf_dma_irq_mask_t irq_mask;
     uint8_t channel_count;
+    uint8_t irq_count;
     vsf_dma_channel_mode_t supported_modes;
     uint32_t max_transfer_count;
     uint8_t addr_alignment;
