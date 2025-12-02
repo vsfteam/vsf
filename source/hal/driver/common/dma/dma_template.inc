@@ -226,10 +226,11 @@ vsf_err_t vsf_real_dma_channel_get_configuration(vsf_real_dma_t *dma_ptr, uint8_
             VSF_HAL_ASSERT(dma_ptr != NULL);                                            \
             return vsf_remap_dma_capability(dma_ptr);                                   \
         }                                                                               \
-        int8_t vsf_imp_dma_channel_acquire(vsf_imp_dma_t *dma_ptr, void *filter_param)  \
+        vsf_err_t vsf_imp_dma_channel_acquire(vsf_imp_dma_t *dma_ptr,                    \
+                                              vsf_dma_channel_hint_t *channel_hint_ptr) \
         {                                                                               \
             VSF_HAL_ASSERT(dma_ptr != NULL);                                            \
-            return vsf_remap_dma_channel_acquire(dma_ptr, filter_param);                \
+            return vsf_remap_dma_channel_acquire(dma_ptr, channel_hint_ptr);            \
         }                                                                               \
         void vsf_imp_dma_channel_release(vsf_imp_dma_t *dma_ptr, int8_t channel)        \
         {                                                                               \
