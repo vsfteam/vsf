@@ -77,6 +77,7 @@ vsf_err_t vsf_dma_channel_request(vsf_dma_t *dma_ptr, vsf_dma_channel_hint_t *ch
     VSF_HAL_ASSERT(dma_ptr != NULL);
     VSF_HAL_ASSERT(dma_ptr->op != NULL);
     VSF_HAL_ASSERT(dma_ptr->op->channel_request != NULL);
+    VSF_HAL_ASSERT(channel_hint_ptr != NULL);
 
     return dma_ptr->op->channel_request(dma_ptr, channel_hint_ptr);
 }
