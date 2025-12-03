@@ -22,6 +22,7 @@
 #if VSF_USE_LINUX == ENABLED && VSF_USE_MBEDTLS == ENABLED
 
 #include <unistd.h>
+#include <string.h>
 
 #include <linux/crypto.h>
 #include <crypto/internal.h>
@@ -82,6 +83,7 @@ const struct crypto_type crypto_kpp_type = {
 static int __rsa_pkcs1pad_create(struct crypto_template *tmpl, struct crypto_alg_tree *arg);
 static void __psa_free_key_ctx(struct crypto_tfm *tfm);
 
+static void __ecdh_exit_tfm(struct crypto_tfm *tfm);
 static void __ecdh_nist_p192_init_tfm(struct crypto_tfm *tfm);
 static void __ecdh_nist_p256_init_tfm(struct crypto_tfm *tfm);
 static void __ecdh_nist_p384_init_tfm(struct crypto_tfm *tfm);
@@ -139,6 +141,7 @@ static struct kpp_alg __kpp_algs[] = {
         .base.cra_name              = "ecdh-nist-p192",
         .base.cra_ctxsize           = sizeof(psa_ecdh_ctx_t),
         .base.cra_init              = __ecdh_nist_p192_init_tfm,
+        .base.cra_exit              = __ecdh_exit_tfm,
         .base.alg                   = PSA_ALG_ECDH,
         .set_secret                 = __ecdh_set_secret,
         .generate_public_key        = __ecdh_generate_public_key,
@@ -148,6 +151,7 @@ static struct kpp_alg __kpp_algs[] = {
         .base.cra_name              = "ecdh-nist-p256",
         .base.cra_ctxsize           = sizeof(psa_ecdh_ctx_t),
         .base.cra_init              = __ecdh_nist_p256_init_tfm,
+        .base.cra_exit              = __ecdh_exit_tfm,
         .base.alg                   = PSA_ALG_ECDH,
         .set_secret                 = __ecdh_set_secret,
         .generate_public_key        = __ecdh_generate_public_key,
@@ -157,6 +161,7 @@ static struct kpp_alg __kpp_algs[] = {
         .base.cra_name              = "ecdh-nist-p384",
         .base.cra_ctxsize           = sizeof(psa_ecdh_ctx_t),
         .base.cra_init              = __ecdh_nist_p384_init_tfm,
+        .base.cra_exit              = __ecdh_exit_tfm,
         .base.alg                   = PSA_ALG_ECDH,
         .set_secret                 = __ecdh_set_secret,
         .generate_public_key        = __ecdh_generate_public_key,
@@ -305,7 +310,9 @@ struct crypto_alg *crypto_find_alg(const char *alg_name, const struct crypto_typ
     struct crypto_alg *alg = NULL;
     struct crypto_alg_tree *root = NULL;
     const char *remain = __crypto_generate_alg_tree(alg_name, &root);
-    if ((*remain != '\0') || (NULL == root) || (root->next != NULL)) {
+    if (IS_ERR(remain)) {
+        return (struct crypto_alg *)remain;
+    } else if ((*remain != '\0') || (NULL == root) || (root->next != NULL)) {
         alg = ERR_PTR(-EINVAL);
     } else {
         alg = root->alg;
@@ -498,6 +505,7 @@ int crypto_shash_update(struct shash_desc *desc, const u8 *data, unsigned int le
         if (PSA_SUCCESS != psa_mac_update(op, data, len)) {
             return -EIO;
         }
+        return 0;
     } else if (PSA_ALG_IS_HASH(psa_alg)) {
         psa_hash_operation_t *op = (psa_hash_operation_t *)&desc[1];
         if (PSA_SUCCESS != psa_hash_update(op, data, len)) {
@@ -519,6 +527,7 @@ int crypto_shash_final(struct shash_desc *desc, u8 *out)
         if (PSA_SUCCESS != psa_mac_sign_finish(op, out, digestsize_in, &digestsize_out)) {
             return -EIO;
         }
+        return 0;
     } else if (PSA_ALG_IS_HASH(psa_alg)) {
         psa_hash_operation_t *op = (psa_hash_operation_t *)&desc[1];
         if (PSA_SUCCESS != psa_hash_finish(op, out, digestsize_in, &digestsize_out)) {
@@ -620,7 +629,11 @@ static int __rsa_pkcs1pad_create(struct crypto_template *tmpl, struct crypto_alg
     alg->base.cra_name = (const char *)name;
     alg->set_priv_key = __rsa_pkcs1pad_set_priv_key;
     alg->set_pub_key = __rsa_pkcs1pad_set_pub_key;
-    return crypto_register_akcipher(alg);
+    int ret = crypto_register_akcipher(alg);
+    if (ret) {
+        kfree(alg);
+    }
+    return ret;
 }
 
 // kpp
@@ -686,18 +699,41 @@ static int __ecdh_compute_shared_secret(struct kpp_request *req)
 
     mbedtls_ecp_point_init(&Qp);
     mbedtls_mpi_init(&z);
+
     if (mbedtls_ecp_point_read_binary(&ctx->grp, &Qp, req->src->buf, req->src_len)) {
-        return -ENOMEM;
+        result = -ENOMEM;
+        goto out;
     }
 
-    if (    (mbedtls_ecdh_compute_shared(&ctx->grp, &z, &Qp, &ctx->d,
-                    mbedtls_ctr_drbg_random, &__vsf_linux_crypto.ctr_drbg))
-        ||  (mbedtls_mpi_write_binary(&z, req->dst->buf, req->dst_len))) {
+    if (mbedtls_ecdh_compute_shared(&ctx->grp, &z, &Qp, &ctx->d,
+                    mbedtls_ctr_drbg_random, &__vsf_linux_crypto.ctr_drbg)) {
         result = -EIO;
+        goto out;
     }
+
+    size_t needed = mbedtls_mpi_size(&z);
+    if (req->dst_len < needed) {
+        result = -ENOBUFS;
+        goto out;
+    }
+
+    if (mbedtls_mpi_write_binary(&z, req->dst->buf, needed)) {
+        result = -EIO;
+        goto out;
+    }
+
+out:
     mbedtls_mpi_free(&z);
     mbedtls_ecp_point_free(&Qp);
     return result;
+}
+
+static void __ecdh_exit_tfm(struct crypto_tfm *tfm)
+{
+    psa_ecdh_ctx_t *ecdh_ctx = (psa_ecdh_ctx_t *)&tfm[1];
+    mbedtls_mpi_free(&ecdh_ctx->d);
+    mbedtls_ecp_point_free(&ecdh_ctx->Q);
+    mbedtls_ecp_group_free(&ecdh_ctx->grp);
 }
 
 static void __ecdh_nist_p192_init_tfm(struct crypto_tfm *tfm)
@@ -799,9 +835,11 @@ int vsf_linux_crypto_init(void)
     mbedtls_ctr_drbg_init(&__vsf_linux_crypto.ctr_drbg);
 
     static const unsigned char __custom[] = "vsf_linux_crypto";
-    mbedtls_ctr_drbg_seed(&__vsf_linux_crypto.ctr_drbg,
+    if (mbedtls_ctr_drbg_seed(&__vsf_linux_crypto.ctr_drbg,
             mbedtls_entropy_func, &__vsf_linux_crypto.entropy,
-            __custom, strlen((const char *)__custom));
+            __custom, strlen((const char *)__custom))) {
+        return -1;
+    }
     return 0;
 }
 
