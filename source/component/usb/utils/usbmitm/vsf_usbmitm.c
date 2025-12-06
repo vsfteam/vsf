@@ -159,7 +159,7 @@ static vsf_err_t __vsf_usb_mitm_apply_interface(vsf_usb_mitm_t *mitm, struct usb
         case USB_DT_ENDPOINT:
             ep_desc = (struct usb_endpoint_desc_t *)header;
 
-            bool is_in = !!(ep_desc->bEndpointAddress & USB_DIR_MASK);
+            bool is_in = (ep_desc->bEndpointAddress & USB_DIR_MASK) == USB_DIR_IN;
             VSF_ASSERT((ep_desc->bEndpointAddress & 0x0F) != 0);
             uint8_t idx = ((ep_desc->bEndpointAddress & 0x0F) - 1) + (is_in ? 15 : 0);
             vsf_usb_mitm_urb_t *mitm_urb = &mitm->usbh.urb[idx];
@@ -184,6 +184,8 @@ static vsf_err_t __vsf_usb_mitm_apply_interface(vsf_usb_mitm_t *mitm, struct usb
             case USB_ENDPOINT_XFER_BULK:    urb_num = 1;
                                             urb_size = VSF_USB_MITM_CFG_MAX_TRANSFER_SIZE; break;
             }
+
+            VSF_FIFO_INIT(&mitm_urb->ready_fifo);
 
             bool is_to_break = false;
             vk_usbh_urb_t *urb;
@@ -237,7 +239,6 @@ static vsf_err_t __vsf_usb_mitm_apply_interface(vsf_usb_mitm_t *mitm, struct usb
                 break;
             }
 
-            VSF_FIFO_INIT(&mitm_urb->ready_fifo);
             if (!is_in) {
                 for (int i = 0; i < urb_num; i++) {
                     urb = &mitm_urb->usbh_urb[i];
@@ -573,10 +574,7 @@ static void __vsf_usb_mitm_evthadler(vsf_eda_t *eda, vsf_evt_t evt)
             mitm->request.wValue = mitm->usbh.libusb_dev->dev->devnum;
         }
 
-        if (mitm->usbh.is_resetting || mitm->usbh.is_control_requesting) {
-            mitm->is_setup_pending = true;
-        } else if ( ((mitm->request.bRequestType & USB_DIR_MASK) == USB_DIR_OUT)
-                &&  (mitm->request.wLength > 0)) {
+        if (((mitm->request.bRequestType & USB_DIR_MASK) == USB_DIR_OUT) && (mitm->request.wLength > 0)) {
             mitm->usb_dev.ctrl_handler.trans.buffer = vsf_usbh_malloc(mitm->request.wLength);
             mitm->usb_dev.ctrl_handler.trans.size = mitm->request.wLength;
             mitm->usbd.control_trans.mem_save = mitm->usb_dev.ctrl_handler.trans.use_as__vsf_mem_t;
@@ -585,19 +583,23 @@ static void __vsf_usb_mitm_evthadler(vsf_eda_t *eda, vsf_evt_t evt)
                 break;
             }
             vk_usbd_stdreq_data_stage(&mitm->usb_dev);
+        } else if (mitm->usbh.is_resetting || mitm->usbh.is_control_requesting) {
+            mitm->is_setup_pending = true;
         } else if (VSF_ERR_NONE != __vsf_usb_mitm_usbh_control_msg(mitm)) {
             vk_usbd_ep_stall(&mitm->usb_dev, 0);
         }
         break;
     case VSF_EVT_USBD_ON_STATUS_QUERY:
-        if (    ((mitm->request.bRequestType & USB_DIR_MASK) == USB_DIR_OUT)
-            &&  (mitm->request.wLength > 0)) {
+        if (((mitm->request.bRequestType & USB_DIR_MASK) == USB_DIR_OUT) && (mitm->request.wLength > 0)) {
             __vsf_usb_mitm_notify_user(mitm, USB_ON_PREPARE_DATA, &mitm->usb_dev.ctrl_handler.trans);
             vk_usbh_urb_set_buffer(&mitm->usbh.libusb_dev->dev->ep0.urb,
                 mitm->usb_dev.ctrl_handler.trans.buffer, mitm->request.wLength);
             mitm->usb_dev.ctrl_handler.trans.buffer = NULL;
-            if (VSF_ERR_NONE != __vsf_usb_mitm_usbh_control_msg(mitm)) {
-                vsf_trace_error("usbh: fail to submit control msg\n");
+
+            if (mitm->usbh.is_resetting || mitm->usbh.is_control_requesting) {
+                mitm->is_setup_pending = true;
+            } else if (VSF_ERR_NONE != __vsf_usb_mitm_usbh_control_msg(mitm)) {
+                vk_usbd_ep_stall(&mitm->usb_dev, 0);
             }
         } else {
             vk_usbd_stdreq_status_stage(&mitm->usb_dev);
@@ -619,7 +621,7 @@ static void __vsf_usb_mitm_evthadler(vsf_eda_t *eda, vsf_evt_t evt)
     default: {
             uint8_t ep = evt - VSF_EVT_USBD_ON_EP;
             VSF_ASSERT((ep & 0x0F) != 0);
-            uint8_t idx = ((ep & 0x0F) - 1) + ((ep & USB_DIR_MASK) ? 15 : 0);
+            uint8_t idx = ((ep & 0x0F) - 1) + ((ep & USB_DIR_MASK) == USB_DIR_IN ? 15 : 0);
             VSF_ASSERT(mitm->usbd.trans_busy & (1 << idx));
             mitm->usbd.trans_busy &= ~(1 << idx);
             __vsf_usb_mitm_update_ep(mitm, idx);
