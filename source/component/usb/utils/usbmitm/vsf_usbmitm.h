@@ -1,45 +1,123 @@
-/***************************************************************************
- *   Copyright (C) 2009 - 2010 by Simon Qian <SimonQian@SimonQian.com>     *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*****************************************************************************
+ *   Copyright(C)2009-2022 by VSF Team                                       *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *     http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ ****************************************************************************/
 
-#ifndef __VSF_USBMITM_H__
-#define __VSF_USBMITM_H__
+#ifndef __VSF_USB_MITM_H__
+#define __VSF_USB_MITM_H__
 
-extern const vk_usbh_class_drv_t vsf_usbh_usbmitm_drv;
+/*============================ INCLUDES ======================================*/
 
-void usbmitm_init(const i_usb_dc_t *drv, int32_t int_priority);
+#include "component/vsf_component.h"
 
-typedef struct usbmitm_plugin_op_t {
-	void (*parse_config)(uint8_t *data, uint16_t len);
-	void (*on_SETUP)(struct usb_ctrlrequest_t *request, int16_t urb_status, uint8_t *data, uint16_t len);
-	void (*on_IN)(uint8_t ep, int16_t urb_status, uint8_t *data, uint16_t len);
-	void (*on_OUT)(uint8_t ep, int16_t urb_status, uint8_t *data, uint16_t len);
-} usbmitm_plugin_op_t;
+#if     defined(__VSF_USB_MITM_CLASS_IMPLEMENT)
+#   define __VSF_CLASS_IMPLEMENT__
+#   undef __VSF_USB_MITM_CLASS_IMPLEMENT
+#elif   defined(__VSF_USB_MITM_CLASS_INHERIT__)
+#   define __VSF_CLASS_INHERIT__
+#   undef __VSF_USB_MITM_CLASS_INHERIT__
+#endif
 
-typedef struct usbmitm_plugin_t usbmitm_plugin_t;
-struct usbmitm_plugin_t {
-	const usbmitm_plugin_op_t *op;
-	struct usbmitm_plugin_t *next;
+#include "utilities/ooc_class.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/*============================ MACROS ========================================*/
+
+#ifndef VSF_USB_MITM_USBH_PERIODIC_TICKTOCK
+#   define VSF_USB_MITM_USBH_PERIODIC_TICKTOCK          DISABLED
+#endif
+
+#ifdef VSF_USB_MITM_USBH_URB_NUM
+#   error VSF_USB_MITM_USBH_URB_NUM will be defined according to VSF_USB_MITM_USBH_PERIODIC_TICKTOCK
+#endif
+#if VSF_USB_MITM_USBH_PERIODIC_TICKTOCK == ENABLED
+#   define VSF_USB_MITM_USBH_URB_NUM                    2
+#else
+#   define VSF_USB_MITM_USBH_URB_NUM                    1
+#endif
+
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
+
+dcl_vsf_fifo(vsf_usb_mitm_usbh_urb_ready_fifo)
+def_vsf_fifo(vsf_usb_mitm_usbh_urb_ready_fifo, vk_usbh_urb_t *, VSF_USB_MITM_USBH_URB_NUM)
+
+typedef struct vsf_usb_mitm_trans_t {
+    implement(vk_usbd_trans_t);
+    vsf_mem_t mem_save;
+} vsf_usb_mitm_trans_t;
+
+typedef enum vsf_usb_mitm_evt_t {
+    USB_ON_PREPARE_DATA     = VSF_USBD_MAX_EVT + 0,
+} vsf_usb_mitm_evt_t;
+
+typedef struct vsf_usb_mitm_urb_t {
+    vk_usbh_urb_t usbh_urb[VSF_USB_MITM_USBH_URB_NUM];
+    vsf_fifo(vsf_usb_mitm_usbh_urb_ready_fifo) ready_fifo;
+} vsf_usb_mitm_urb_t;
+
+vsf_class(vsf_usb_mitm_t) {
+    protected_member(
+        vk_usbd_dev_t usb_dev;
+        vk_usbh_t usb_host;
+
+        void (*callback)(vsf_usb_mitm_t *mitm, vsf_usb_mitm_evt_t evt, void *param);
+    )
+
+    protected_member(
+        struct usb_ctrlrequest_t request;
+    )
+
+    private_member(
+        vsf_teda_t teda;
+        uint8_t *config_desc[16], *cur_config_desc;
+        uint8_t *ifs_desc_cur[16];
+        bool is_setup_pending;
+
+        struct {
+            vk_usbh_libusb_dev_t *libusb_dev;
+            vk_usbh_class_t libusb;
+#if VSF_USBH_USE_HUB == ENABLED
+            vk_usbh_class_t hub;
+#endif
+
+            vsf_usb_mitm_urb_t urb[2 * 15];
+
+            bool is_resetting;
+            bool is_control_requesting;
+        } usbh;
+        struct {
+            vsf_usb_mitm_trans_t control_trans;
+            vsf_usb_mitm_trans_t trans[2 * 15];
+            uint32_t trans_busy;
+            uint32_t ep_mask;
+            uint8_t address;
+        } usbd;
+    )
 };
 
-extern usbmitm_plugin_t usbmitm_plugin_stdreq;
-extern usbmitm_plugin_t usbmitm_plugin_hid;
-extern usbmitm_plugin_t usbmitm_plugin_msc;
-void usbmitm_register_plugin(usbmitm_plugin_t *plugin);
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ PROTOTYPES ====================================*/
 
-#endif // __VSF_USBMITM_H__
+void vsf_usb_mitm_start(vsf_usb_mitm_t *mitm);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

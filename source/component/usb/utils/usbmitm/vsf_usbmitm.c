@@ -1,321 +1,376 @@
-/***************************************************************************
- *   Copyright (C) 2009 - 2025 by Simon Qian <vsfos@qq.com>                *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
- ***************************************************************************/
+/*****************************************************************************
+ *   Copyright(C)2009-2022 by VSF Team                                       *
+ *                                                                           *
+ *  Licensed under the Apache License, Version 2.0 (the "License");          *
+ *  you may not use this file except in compliance with the License.         *
+ *  You may obtain a copy of the License at                                  *
+ *                                                                           *
+ *     http://www.apache.org/licenses/LICENSE-2.0                            *
+ *                                                                           *
+ *  Unless required by applicable law or agreed to in writing, software      *
+ *  distributed under the License is distributed on an "AS IS" BASIS,        *
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. *
+ *  See the License for the specific language governing permissions and      *
+ *  limitations under the License.                                           *
+ *                                                                           *
+ ****************************************************************************/
 
-#define __VSF_EDA_CLASS_INHERIT__
+/*============================ INCLUDES ======================================*/
+
 #define __VSF_USBH_CLASS_IMPLEMENT_CLASS__
-#include <vsf.h>
-#include <stdarg.h>
-#include <stdio.h>
-
+#define __VSF_USBD_CLASS_INHERIT__
+#define __VSF_EDA_CLASS_INHERIT__
 #include "./vsf_usbmitm.h"
 
-typedef struct usbmitm_urbcb_t {
-    vk_usbh_urb_t urb;
-    uint16_t totalsize;
-    uint16_t curpos;
-    uint8_t ep;
-    uint8_t epsize;
-    uint8_t interval;
-    uint8_t eptype : 3;
-    uint8_t submitted : 1;
-    uint8_t needzlp : 1;
-    uint8_t ep_inited : 1;
-} usbmitm_urbcb_t;
+/*============================ MACROS ========================================*/
 
-typedef struct usbmitm_t {
-    struct {
-        vk_usbh_t *host;
-        vk_usbh_dev_t *dev;
-    } usbh;
+#ifndef VSF_USB_MITM_CFG_MAX_TRANSFER_SIZE
+#   define VSF_USB_MITM_CFG_MAX_TRANSFER_SIZE           1024
+#endif
 
-    struct {
-        struct usb_ctrlrequest_t request;
-        enum {
-            USB_IDLE = 0, USB_SETUP, URB_SUBMITTED, URB_COMPLETED, USB_STATUS,
-        } request_state;
-        vsf_teda_t task;
-        uint8_t dev_address;
-        uint8_t host_address;
-        uint8_t ep0size;
-        uint8_t *config_desc;
-    } usbd;
-    union {
-        struct {
-            usbmitm_urbcb_t in[16];
-            usbmitm_urbcb_t out[16];
-        };
-        usbmitm_urbcb_t all[16 + 16];
-    } urbcb;
-    usbmitm_urbcb_t *pending_urbcb;
-    bool resetting;
-} usbmitm_t;
+/*============================ MACROFIED FUNCTIONS ===========================*/
+/*============================ TYPES =========================================*/
 
-typedef struct usbmitm_cfg_t {
-    struct {
-        const i_usb_dc_t *drv;
-        int32_t int_priority;
-    } usbd;
-    usbmitm_plugin_t *pluginlist;
-} usbmitm_cfg_t;
+enum {
+    VSF_EVT_USBD_ON_RESET           = VSF_EVT_USER + 0,
+    VSF_EVT_USBD_ON_SETUP           = VSF_EVT_USER + 1,
+    VSF_EVT_USBD_ON_STATUS_QUERY    = VSF_EVT_USER + 2,
+    VSF_EVT_USBD_ON_STATUS          = VSF_EVT_USER + 3,
+    VSF_EVT_USBD_ON_EP              = VSF_EVT_USER + 4,
+};
 
-static usbmitm_cfg_t __usbmitm_cfg;
+/*============================ PROTOTYPES ====================================*/
+/*============================ LOCAL VARIABLES ===============================*/
+/*============================ GLOBAL VARIABLES ==============================*/
+/*============================ IMPLEMENTATION ================================*/
 
-#define USBMITM_EVT_RESET               (0x200 + 0x1)
-#define USBMITM_EVT_SETUP               (0x200 + 0x2)
-#define USBMITM_EVT_EPINOUT             (0x200 + 0x10)
-
-#define USBMITM_EVT_EP_MASK             0xF
-#define USBMITM_EVT_DIR_MASK            0x100
-#define USBMITM_EVT_DIR_IN              0x100
-#define USBMITM_EVT_DIR_OUT             0x000
-#define USBMITM_EVT_EVT_MASK            ~USBMITM_EVT_EP_MASK
-#define USBMITM_EVT_EPIN                (USBMITM_EVT_EPINOUT | USBMITM_EVT_DIR_IN)
-#define USBMITM_EVT_EPOUT               (USBMITM_EVT_EPINOUT | USBMITM_EVT_DIR_OUT)
-#define USBMITM_EVT_INEP(ep)            (USBMITM_EVT_EPIN + (ep))
-#define USBMITM_EVT_OUTEP(ep)           (USBMITM_EVT_EPOUT + (ep))
-
-static vsf_err_t __usbmitm_usbd_ep_recv(usbmitm_urbcb_t *urbcb)
+static void __vsf_usb_mitm_libusb_evthandler(void *param, vk_usbh_libusb_dev_t *dev, vk_usbh_libusb_evt_t evt)
 {
-    const i_usb_dc_t *drv = __usbmitm_cfg.usbd.drv;
-    uint16_t cursize = drv->Ep.GetDataSize(urbcb->ep);
-    uint16_t remain = urbcb->totalsize - urbcb->curpos;
-    uint16_t epsize = drv->Ep.GetSize(urbcb->ep);
+    vsf_usb_mitm_t *mitm = param;
 
-    if (remain > 0) {
-        uint8_t *data = (uint8_t *)urbcb->urb.urb_hcd->buffer + urbcb->curpos;
+    switch (evt) {
+    case VSF_USBH_LIBUSB_EVT_ON_ARRIVED:
+        if (NULL == mitm->usbh.libusb_dev) {
+            mitm->usbh.libusb_dev = dev;
+            vk_usbd_connect(&mitm->usb_dev);
+        }
+        break;
+    case VSF_USBH_LIBUSB_EVT_ON_LEFT:
+        if (mitm->usbh.libusb_dev == dev) {
+            vk_usbd_disconnect(&mitm->usb_dev);
+            vk_usbd_fini(&mitm->usb_dev);
 
-        drv->Ep.Transaction.ReadBuffer(urbcb->ep, data, cursize);
-        vsf_trace_info("OUT%d(%d): ", urbcb->ep, cursize);
-        vsf_trace_buffer(VSF_TRACE_INFO, data, cursize);
-        urbcb->curpos += cursize;
-        remain = urbcb->totalsize - urbcb->curpos;
+            for (int i = 0; i < dimof(mitm->config_desc); i++) {
+                if (mitm->config_desc[i] != NULL) {
+                    vsf_heap_free(mitm->config_desc[i]);
+                    mitm->config_desc[i] = NULL;
+                }
+            }
+            mitm->cur_config_desc = NULL;
+        }
+        break;
+    }
+}
+
+static vsf_err_t __vsf_usb_mitm_usbh_control_msg(vsf_usb_mitm_t *mitm)
+{
+    VSF_ASSERT(!mitm->usbh.is_control_requesting);
+    vsf_err_t err = vk_usbh_control_msg(&mitm->usb_host, mitm->usbh.libusb_dev->dev, &mitm->request);
+    if (err != VSF_ERR_NONE) {
+        vsf_trace_error("usbh: fail to submit control message\n");
     } else {
-        if (!cursize) {
-            vsf_trace_info("OUT%d(0): " VSF_TRACE_CFG_LINEEND, urbcb->ep & 0x1F);
-        } else {
-            vsf_trace_error("Data received without prepared buffer" VSF_TRACE_CFG_LINEEND);
-        }
-        return VSF_ERR_NONE;
-    }
-    if ((remain > 0) && (cursize >= epsize)) {
-        drv->Ep.Transaction.EnableOut(urbcb->ep);
-        return VSF_ERR_NOT_READY;
-    }
-    return VSF_ERR_NONE;
-}
-
-static vsf_err_t __usbmitm_usbd_ep_send(usbmitm_urbcb_t *urbcb)
-{
-    const i_usb_dc_t *drv = __usbmitm_cfg.usbd.drv;
-    uint16_t epsize = drv->Ep.GetSize(urbcb->ep);
-    uint16_t remain = urbcb->totalsize - urbcb->curpos;
-    uint16_t cursize = vsf_min(epsize, remain);
-
-    if (cursize) {
-        uint8_t *data = (uint8_t *)urbcb->urb.urb_hcd->buffer + urbcb->curpos;
-
-        vsf_trace_info("IN%d(%d): ", urbcb->ep & 0x1F, cursize);
-        vsf_trace_buffer(VSF_TRACE_INFO, data, cursize, true);
-        drv->Ep.Transaction.WriteBuffer(urbcb->ep, data, cursize);
-        drv->Ep.Transaction.SetDataSize(urbcb->ep, cursize);
-
-        urbcb->curpos += cursize;
-        remain = urbcb->totalsize - urbcb->curpos;
-        if (!remain && (cursize < epsize))
-            urbcb->needzlp = false;
-        return VSF_ERR_NOT_READY;
-    } else if (urbcb->needzlp) {
-        vsf_trace_info("IN%d(0): " VSF_TRACE_CFG_LINEEND, urbcb->ep & 0x1F);
-        urbcb->needzlp = false;
-        drv->Ep.Transaction.SetDataSize(urbcb->ep, 0);
-        return VSF_ERR_NOT_READY;
-    }
-    return VSF_ERR_NONE;
-}
-
-static vsf_err_t __usbmitm_usbh_prepare_urb(usbmitm_t *usbmitm, usbmitm_urbcb_t *urbcb, uint16_t bufsize)
-{
-    if (urbcb->submitted) {
-        return VSF_ERR_FAIL;
-    }
-    if (!vk_usbh_urb_is_alloced(&urbcb->urb)) {
-        vk_usbh_urb_prepare_by_pipe(&urbcb->urb, usbmitm->usbh.dev,
-                __vk_usbh_get_pipe(usbmitm->usbh.dev, urbcb->ep, urbcb->eptype, urbcb->epsize, urbcb->interval));
-        vk_usbh_alloc_urb(usbmitm->usbh.host, usbmitm->usbh.dev, &urbcb->urb);
-        if (!vk_usbh_urb_is_alloced(&urbcb->urb)) {
-            vsf_trace_error("Fail to allocate urb" VSF_TRACE_CFG_LINEEND);
-            return VSF_ERR_FAIL;
-        }
-    }
-    vk_usbh_urb_free_buffer(&urbcb->urb);
-    if (bufsize && !vk_usbh_urb_alloc_buffer(&urbcb->urb, bufsize)) {
-        vsf_trace_error("Fail to allocate transfer buffer" VSF_TRACE_CFG_LINEEND);
-        return VSF_ERR_FAIL;
-    }
-    return VSF_ERR_NONE;
-}
-
-static vsf_err_t usbmitm_usbh_submit_urb(usbmitm_t *usbmitm, usbmitm_urbcb_t *urbcb)
-{
-    vsf_err_t err = VSF_ERR_BUSY;
-    if (!urbcb->submitted) {
-        err = vk_usbh_submit_urb(usbmitm->usbh.host, &urbcb->urb);
-        if (err != VSF_ERR_NONE) {
-            vsf_trace_error("Fail to submit urb" VSF_TRACE_CFG_LINEEND);
-        } else {
-            urbcb->submitted = true;
-        }
+        mitm->usbh.is_control_requesting = true;
     }
     return err;
 }
 
-static void __usbmitm_usbd_setup_patch(usbmitm_t *usbmitm, struct usb_ctrlrequest_t *request)
+static vsf_err_t __vsf_usb_mitm_usbd_ep_recv(vk_usbd_dev_t *dev, vsf_usb_mitm_trans_t *trans)
 {
-    uint8_t type = request->bRequestType & USB_TYPE_MASK;
-    uint8_t recip = request->bRequestType & USB_RECIP_MASK;
+    trans->mem_save.buffer = trans->buffer;
+    trans->mem_save.size = trans->size;
+    return vk_usbd_ep_recv(dev, &trans->use_as__vk_usbd_trans_t);
+}
 
-    if (USB_TYPE_STANDARD == type) {
-        if (USB_RECIP_DEVICE == recip) {
-            switch (request->bRequest) {
-            case USB_REQ_SET_ADDRESS:
-                usbmitm->usbd.dev_address = request->wValue;
-                request->wValue = usbmitm->usbd.host_address;
-                break;
+static vsf_err_t __vsf_usb_mitm_usbd_ep_send(vk_usbd_dev_t *dev, vsf_usb_mitm_trans_t *trans)
+{
+    trans->mem_save.buffer = trans->buffer;
+    trans->mem_save.size = trans->size;
+    return vk_usbd_ep_send(dev, &trans->use_as__vk_usbd_trans_t);
+}
+
+static void __vsf_usb_mitm_notify_user(vsf_usb_mitm_t *mitm, vsf_usb_mitm_evt_t evt, void *param)
+{
+    if (mitm->callback != NULL) {
+        if ((evt == USB_ON_IN) || (evt == USB_ON_OUT) || (evt == USB_ON_PREPARE_DATA)) {
+            vk_usbd_trans_t *trans = param;
+            if (!(trans->ep & 0x7F)) {
+                mitm->usbd.control_trans.use_as__vk_usbd_trans_t = *trans;
+                param = &mitm->usbd.control_trans;
             }
         }
+        mitm->callback(mitm, evt, param);
     }
 }
 
-static void __usbmitm_usbd_setup_process(usbmitm_t *usbmitm, usbmitm_urbcb_t *urbcb)
+vsf_err_t vsf_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *param)
 {
-    const i_usb_dc_t *drv = __usbmitm_cfg.usbd.drv;
-    struct usb_ctrlrequest_t *request = &usbmitm->usbd.request;
-    uint8_t type = request->bRequestType & USB_TYPE_MASK;
-    uint8_t recip = request->bRequestType & USB_RECIP_MASK;
-    uint8_t *data = urbcb->urb.urb_hcd->buffer;
-    uint16_t len = vk_usbh_urb_get_actual_length(&urbcb->urb);
+    vsf_usb_mitm_t *mitm = container_of(dev, vsf_usb_mitm_t, usb_dev);
 
-    usbmitm_plugin_t *plugin = __usbmitm_cfg.pluginlist;
-    while (plugin != NULL) {
-        if (plugin->op->on_SETUP != NULL) {
-            plugin->op->on_SETUP(request, URB_OK, data, len);
+    __vsf_usb_mitm_notify_user(mitm, (vsf_usb_mitm_evt_t)evt, param);
+    switch (evt) {
+    case USB_ON_RESET:
+        vsf_eda_post_evt(&mitm->teda.use_as__vsf_eda_t, VSF_EVT_USBD_ON_RESET);
+        break;
+    case USB_ON_SETUP:
+        mitm->request = *(struct usb_ctrlrequest_t *)param;
+        vsf_eda_post_evt(&mitm->teda.use_as__vsf_eda_t, VSF_EVT_USBD_ON_SETUP);
+        return VSF_ERR_NOT_READY;
+    case USB_ON_STATUS:
+        vsf_eda_post_evt(&mitm->teda.use_as__vsf_eda_t, VSF_EVT_USBD_ON_STATUS);
+        break;
+    case USB_ON_IN:
+    case USB_ON_OUT: {
+            vk_usbd_trans_t *trans = param;
+            if (trans->ep & 0x0F) {
+                vsf_eda_post_evt(&mitm->teda.use_as__vsf_eda_t, VSF_EVT_USBD_ON_EP + trans->ep);
+            }
         }
-        plugin = plugin->next;
+        break;
+    case USB_ON_STATUS_QUERY:
+        vsf_eda_post_evt(&mitm->teda.use_as__vsf_eda_t, VSF_EVT_USBD_ON_STATUS_QUERY);
+        return VSF_ERR_NOT_READY;
     }
+    return VSF_ERR_NONE;
+}
 
-    if (USB_TYPE_STANDARD == type) {
-        if (USB_RECIP_DEVICE == recip) {
-            switch (request->bRequest) {
-            case USB_REQ_SET_ADDRESS:
-                usbmitm->usbh.dev->devnum = usbmitm->usbd.host_address;
-                drv->SetAddress(usbmitm->usbd.dev_address);
-                break;
-            case USB_REQ_GET_DESCRIPTOR:
-                switch ((request->wValue >> 8) & 0xFF) {
-                case USB_DT_DEVICE:
-                    usbmitm->urbcb.in[0].epsize = usbmitm->usbd.ep0size;
-                    usbmitm->urbcb.out[0].epsize = usbmitm->usbd.ep0size;
+#define __usb_desc_next_header(__ptr)                                           \
+    (struct usb_descriptor_header_t *)((uint8_t *)(__ptr) + ((struct usb_descriptor_header_t *)(__ptr))->bLength)
+
+static vsf_err_t __vsf_usb_mitm_apply_interface(vsf_usb_mitm_t *mitm, struct usb_interface_desc_t *ifs_desc, uint8_t *end)
+{
+    struct usb_endpoint_desc_t *ep_desc;
+
+    for (   struct usb_descriptor_header_t *header = __usb_desc_next_header(ifs_desc);
+            (uint8_t *)header < end;
+            header = __usb_desc_next_header(header)) {
+        switch (header->bDescriptorType) {
+        case USB_DT_INTERFACE:
+            return VSF_ERR_NONE;
+        case USB_DT_ENDPOINT:
+            ep_desc = (struct usb_endpoint_desc_t *)header;
+
+            bool is_in = !!(ep_desc->bEndpointAddress & USB_DIR_MASK);
+            VSF_ASSERT((ep_desc->bEndpointAddress & 0x0F) != 0);
+            uint8_t idx = ((ep_desc->bEndpointAddress & 0x0F) - 1) + (is_in ? 15 : 0);
+            vsf_usb_mitm_urb_t *mitm_urb = &mitm->usbh.urb[idx];
+            vsf_usb_mitm_trans_t *mitm_trans = &mitm->usbd.trans[idx];
+
+            uint8_t ep_idx = (ep_desc->bEndpointAddress & 0x0F) + (is_in ? 16 : 0);
+            if (!(mitm->usbd.ep_mask & (1 << ep_idx))) {
+                VSF_USBD_DRV_PREPARE(&mitm->usb_dev);
+                vk_usbd_drv_ep_add(ep_desc->bEndpointAddress,
+                    ep_desc->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK, ep_desc->wMaxPacketSize);
+                mitm->usbd.ep_mask |= 1 << ep_idx;
+                mitm_trans->ep = ep_desc->bEndpointAddress;
+            }
+
+            uint16_t urb_size;
+            uint8_t urb_num;
+            switch (ep_desc->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) {
+            case USB_ENDPOINT_XFER_CONTROL: VSF_ASSERT(false); break;
+            case USB_ENDPOINT_XFER_INT:
+            case USB_ENDPOINT_XFER_ISOC:    urb_num = VSF_USB_MITM_USBH_URB_NUM;
+                                            urb_size = ep_desc->wMaxPacketSize; break;
+            case USB_ENDPOINT_XFER_BULK:    urb_num = 1;
+                                            urb_size = VSF_USB_MITM_CFG_MAX_TRANSFER_SIZE; break;
+            }
+
+            bool is_to_break = false;
+            vk_usbh_urb_t *urb;
+            for (int i = 0; i < urb_num; i++) {
+                urb = &mitm_urb->usbh_urb[i];
+                if (vk_usbh_urb_is_alloced(urb)) {
+                    is_to_break = true;
                     break;
-                case USB_DT_CONFIG:
-                    if (get_unaligned_le16(&data[2]) == len) {
-                        if (usbmitm->usbd.config_desc) {
-                            vsf_heap_free(usbmitm->usbd.config_desc);
-                        }
-                        usbmitm->usbd.config_desc = vsf_heap_malloc(len);
-                        if (!usbmitm->usbd.config_desc) {
+                }
+                vk_usbh_urb_prepare(urb, mitm->usbh.libusb_dev->dev, ep_desc);
+                if (VSF_ERR_NONE != vk_usbh_alloc_urb(&mitm->usb_host, mitm->usbh.libusb_dev->dev, urb)) {
+                    vsf_trace_error("usbh: fail to allocate urb for %s%d\n",
+                            is_in ? "IN" : "OUT", ep_desc->bEndpointAddress & 0x0F);
+                    is_to_break = true;
+                    break;
+                }
+
+                switch (ep_desc->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) {
+                case USB_ENDPOINT_XFER_INT:
+                case USB_ENDPOINT_XFER_ISOC:
+                    urb->urb_hcd->interval = ep_desc->bInterval;
+                    break;
+                }
+
+                if (NULL == vk_usbh_urb_alloc_buffer(urb, urb_size)) {
+                    vsf_trace_error("usbh: fail to allocate urb buffer for %s%d\n",
+                            is_in ? "IN" : "OUT", ep_desc->bEndpointAddress & 0x0F);
+                    is_to_break = true;
+                    break;
+                }
+
+                if (is_in) {
+                    if ((ep_desc->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) == USB_ENDPOINT_XFER_ISOC) {
+                        if (VSF_ERR_NONE != vk_usbh_submit_urb_iso(&mitm->usb_host, urb, 0)) {
+                            vsf_trace_error("usbh: fail to submit urb for %s%d\n",
+                                    is_in ? "IN" : "OUT", ep_desc->bEndpointAddress & 0x0F);
+                            is_to_break = true;
                             break;
                         }
-                        memcpy(usbmitm->usbd.config_desc, data, len);
+                    } else {
+                        if (VSF_ERR_NONE != vk_usbh_submit_urb(&mitm->usb_host, urb)) {
+                            vsf_trace_error("usbh: fail to submit urb for %s%d\n",
+                                    is_in ? "IN" : "OUT", ep_desc->bEndpointAddress & 0x0F);
+                            is_to_break = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (is_to_break) {
+                break;
+            }
 
-                        plugin = __usbmitm_cfg.pluginlist;
-                        while (plugin != NULL) {
-                            if (plugin->op->parse_config != NULL) {
-                                plugin->op->parse_config(data, len);
+            VSF_FIFO_INIT(&mitm_urb->ready_fifo);
+            if (!is_in) {
+                for (int i = 0; i < urb_num; i++) {
+                    urb = &mitm_urb->usbh_urb[i];
+                    VSF_FIFO_PUSH(&mitm_urb->ready_fifo, &urb);
+                }
+                mitm_trans->buffer = vsf_usbh_malloc(urb_size);
+                mitm_trans->size = urb_size;
+                if (VSF_ERR_NONE != __vsf_usb_mitm_usbd_ep_recv(&mitm->usb_dev, mitm_trans)) {
+                    vsf_trace_error("usbd: fail to recv from %s%d\n",
+                            is_in ? "IN" : "OUT", ep_desc->bEndpointAddress & 0x0F);
+                    break;
+                }
+                mitm->usbd.trans_busy |= 1 << idx;
+            }
+            break;
+        }
+    }
+    return VSF_ERR_NONE;
+}
+
+static vsf_err_t __vsf_usb_mitm_apply_config(vsf_usb_mitm_t *mitm, struct usb_config_desc_t *config_desc)
+{
+    uint8_t *end = (uint8_t *)config_desc + config_desc->wTotalLength;
+    struct usb_interface_desc_t *ifs_desc_prev = NULL, *ifs_desc;
+    uint8_t ifs_num = 0xFF, ifs_cnt = 0;
+
+    for (   struct usb_descriptor_header_t *header = __usb_desc_next_header(config_desc);
+            (uint8_t *)header < end;
+            header = __usb_desc_next_header(header)) {
+        switch (header->bDescriptorType) {
+        case USB_DT_INTERFACE:
+            ifs_desc = (struct usb_interface_desc_t *)header;
+            if (0xFF == ifs_num) {
+            update_ifs:
+                ifs_num = ifs_desc->bInterfaceNumber;
+                ifs_desc_prev = ifs_desc;
+                ifs_cnt = 0;
+                break;
+            }
+            if (ifs_num != ifs_desc->bInterfaceNumber) {
+                if (ifs_cnt) {
+                    goto update_ifs;
+                }
+
+                VSF_ASSERT(ifs_desc_prev != NULL);
+                __vsf_usb_mitm_apply_interface(mitm, ifs_desc_prev, end);
+                goto update_ifs;
+            } else if (ifs_num == ifs_desc->bInterfaceNumber) {
+                ifs_cnt++;
+                break;
+            }
+            break;
+        }
+    }
+    // apply the last interface
+    if ((ifs_desc_prev != NULL) && !ifs_cnt) {
+        __vsf_usb_mitm_apply_interface(mitm, ifs_desc_prev, end);
+    }
+    return VSF_ERR_NONE;
+}
+
+static vsf_err_t __vsf_usb_mitm_apply_interface_alt(vsf_usb_mitm_t *mitm, uint8_t ifs, uint8_t alt)
+{
+    struct usb_config_desc_t *config_desc = (struct usb_config_desc_t *)mitm->cur_config_desc;
+    uint8_t *end = (uint8_t *)config_desc + config_desc->wTotalLength;
+    struct usb_interface_desc_t *ifs_desc;
+
+    for (   struct usb_descriptor_header_t *header = __usb_desc_next_header(config_desc);
+            (uint8_t *)header < end;
+            header = __usb_desc_next_header(header)) {
+        switch (header->bDescriptorType) {
+        case USB_DT_INTERFACE:
+            ifs_desc = (struct usb_interface_desc_t *)header;
+            if ((ifs == ifs_desc->bInterfaceNumber) && (alt == ifs_desc->bAlternateSetting)) {
+                return __vsf_usb_mitm_apply_interface(mitm, ifs_desc, end);
+            }
+            break;
+        }
+    }
+    return VSF_ERR_NONE;
+}
+
+static void __vsf_usb_mitm_host_on_stdreq(vsf_usb_mitm_t *mitm, uint8_t *buffer, uint_fast32_t actual_length)
+{
+    if ((mitm->request.bRequestType & USB_TYPE_MASK) == USB_TYPE_STANDARD) {
+        if ((mitm->request.bRequestType & USB_RECIP_MASK) == USB_RECIP_DEVICE) {
+            switch (mitm->request.bRequest) {
+            case USB_REQ_SET_ADDRESS:
+                vk_usbh_update_address(mitm->usbh.libusb_dev->dev, mitm->usbh.libusb_dev->dev->devnum);
+                break;
+            case USB_REQ_GET_DESCRIPTOR:
+                switch (mitm->request.wValue >> 8) {
+                case USB_DT_CONFIG: {
+                        struct usb_config_desc_t *config_desc = (struct usb_config_desc_t *)buffer;
+                        if (    (config_desc->wTotalLength == actual_length)
+                            &&  (mitm->request.wIndex < dimof(mitm->config_desc))) {
+                            mitm->config_desc[mitm->request.wIndex] = vsf_heap_realloc(mitm->config_desc[mitm->request.wIndex], actual_length);
+                            if (NULL == mitm->config_desc[mitm->request.wIndex]) {
+                                vsf_trace_error("usb_mitm: fail to allocate config_desc buffer\n");
+                                break;
                             }
-                            plugin = plugin->next;
+
+                            memcpy(mitm->config_desc[mitm->request.wIndex], config_desc, actual_length);
                         }
                     }
                     break;
                 }
                 break;
             case USB_REQ_SET_CONFIGURATION:
-                if (usbmitm->usbd.config_desc && (request->wValue == usbmitm->usbd.config_desc[5])) {
-                    uint16_t pos = USB_DT_CONFIG_SIZE;
-                    usb_ep_type_t eptype;
-                    uint16_t epsize, epaddr, epindex, epattr, interval;
-                    usbmitm_urbcb_t *urbcb;
-
-                    len = get_unaligned_le16(&usbmitm->usbd.config_desc[2]);
-                    data = usbmitm->usbd.config_desc;
-                    while (len > pos) {
-                        switch (data[pos + 1]) {
-                        case USB_DT_ENDPOINT:
-                            epaddr = data[pos + 2];
-                            epattr = data[pos + 3];
-                            epsize = get_unaligned_le16(&data[pos + 4]);
-                            interval = data[pos + 6];
-                            epindex = epaddr & 0x0F;
-                            switch (epattr & 0x03) {
-                            case 0x00: eptype = USB_EP_TYPE_CONTROL; break;
-                            case 0x01: eptype = USB_EP_TYPE_ISO; break;
-                            case 0x02: eptype = USB_EP_TYPE_BULK; break;
-                            case 0x03: eptype = USB_EP_TYPE_INTERRUPT; break;
-                            }
-
-                            urbcb = (epaddr & 0x80) ?
-                                        &usbmitm->urbcb.in[epindex] :
-                                        &usbmitm->urbcb.out[epindex];
-                            if (urbcb->epsize) {
-                                // already initialized
-                                break;
-                            }
-
-                            urbcb->epsize = epsize;
-                            urbcb->eptype = eptype;
-                            urbcb->interval = interval;
-                            drv->Ep.Add(epaddr, eptype, epsize);
-                            if (epaddr & 0x80) {
-                                if (!__usbmitm_usbh_prepare_urb(usbmitm, urbcb, epsize)) {
-                                    usbmitm_usbh_submit_urb(usbmitm, urbcb);
-                                    urbcb->ep_inited = true;
-                                }
-                            } else {
-                                drv->Ep.Transaction.EnableOut(epindex);
-                            }
-                            break;
-                        }
-                        pos += data[pos];
+                for (int i = 0; i < dimof(mitm->config_desc); i++) {
+                    if (mitm->request.wValue == mitm->config_desc[i][5]) {
+                        mitm->cur_config_desc = mitm->config_desc[i];
+                        break;
                     }
                 }
+
+                if (NULL == mitm->cur_config_desc) {
+                    vsf_trace_error("usb_mitm: fail to get config_desc %d\n", mitm->request.wValue);
+                    break;
+                }
+
+                if (VSF_ERR_NONE != __vsf_usb_mitm_apply_config(mitm, (struct usb_config_desc_t *)mitm->cur_config_desc)) {
+                    vsf_trace_error("usb_mitm: fail to apply config_desc %d\n", mitm->request.wValue);
+                    break;
+                }
                 break;
             }
-        } else if (USB_RECIP_ENDPOINT == recip) {
-            uint8_t ep = request->wIndex & 0xFF;
-            uint8_t epdir = request->wIndex * USB_DIR_MASK;
-
-            switch (request->bRequest) {
-            case USB_REQ_CLEAR_FEATURE:
-                drv->Ep.ClearStall(ep);
-                if (USB_DIR_IN == epdir) {
-                    usbmitm_usbh_submit_urb(usbmitm, &usbmitm->urbcb.in[ep & 0x1F]);
-                } else {
-                    drv->Ep.Transaction.EnableOut(ep);
+        } else if ((mitm->request.bRequestType & USB_RECIP_MASK) == USB_RECIP_INTERFACE) {
+            switch (mitm->request.bRequest) {
+            case USB_REQ_SET_INTERFACE:
+                if (VSF_ERR_NONE != __vsf_usb_mitm_apply_interface_alt(mitm, mitm->request.wIndex, mitm->request.wValue)) {
+                    vsf_trace_error("usb_mitm: fail to apply interface %d alt %d\n", mitm->request.wIndex, mitm->request.wValue);
+                    break;
                 }
                 break;
             }
@@ -323,407 +378,261 @@ static void __usbmitm_usbd_setup_process(usbmitm_t *usbmitm, usbmitm_urbcb_t *ur
     }
 }
 
-static void __usbmitm_usbd_hal_evthandler(void *p, usb_evt_t evt, uint_fast8_t value)
+static void __vsf_usb_mitm_update_ep(vsf_usb_mitm_t *mitm, uint8_t idx)
 {
-    usbmitm_t *usbmitm = p;
-    vsf_eda_t *task = &usbmitm->usbd.task.use_as__vsf_eda_t;
+    vsf_usb_mitm_urb_t *mitm_urb = &mitm->usbh.urb[idx];
+    vsf_usb_mitm_trans_t *mitm_trans = &mitm->usbd.trans[idx];
+    bool is_in = idx >= 15;
 
-    switch (evt) {
-    case USB_ON_RESET:
-        vsf_eda_post_evt(task, USBMITM_EVT_RESET);
-        break;
-    case USB_ON_SETUP:
-        vsf_eda_post_evt(task, USBMITM_EVT_SETUP);
-        break;
-    case USB_ON_IN:
-        vsf_eda_post_evt(task, USBMITM_EVT_INEP(value));
-        break;
-    case USB_ON_OUT:
-        vsf_eda_post_evt(task, USBMITM_EVT_OUTEP(value));
-        break;
-    default:
-        break;
-    }
-}
+    if (    !(mitm->usbd.trans_busy & (1 << idx))
+        &&  (VSF_FIFO_GET_NUMBER(&mitm_urb->ready_fifo) > 0)) {
+        vk_usbh_urb_t *urb;
+        VSF_FIFO_POP(&mitm_urb->ready_fifo, &urb);
 
-static void __usbmitm_usbd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
-{
-    usbmitm_t *usbmitm = vsf_container_of(eda, usbmitm_t, usbd.task);
-    const i_usb_dc_t *drv = __usbmitm_cfg.usbd.drv;
-    struct usb_ctrlrequest_t *request = &usbmitm->usbd.request;
-    bool isin = (request->bRequestType & USB_DIR_MASK) == USB_DIR_IN;
-    usbmitm_urbcb_t *urbcb;
-    uint8_t ep;
+        uint_fast32_t actual_length = vk_usbh_urb_get_actual_length(urb);
+        uint_fast32_t transfer_length = urb->urb_hcd->transfer_length;
+        void *buffer = vk_usbh_urb_take_buffer(urb);
+        vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(urb);
 
-    vk_usbh_hcd_urb_t *hcd_urb;
-    int_fast16_t urb_status;
-    uint_fast32_t actual_length;
-
-    switch (evt) {
-    case VSF_EVT_ENTER:
-    case VSF_EVT_EXIT:
-    case VSF_EVT_FINI:
-        break;
-    case VSF_EVT_INIT:
-        drv->Init(&(usb_dc_cfg_t){
-            .speed = USB_SPEED_FULL,
-            .priority = __usbmitm_cfg.usbd.int_priority,
-            .evthandler = __usbmitm_usbd_hal_evthandler,
-            .param = &usbmitm,
-        });
-        drv->Connect();
-        break;
-    case USBMITM_EVT_RESET:
-        if (!usbmitm->resetting) {
-            usbmitm->resetting = true;
-            vk_usbh_reset_dev(usbmitm->usbh.host, usbmitm->usbh.dev);
-            usbmitm->usbh.dev->devnum = 0;
-            usbmitm->usbd.request_state = USB_IDLE;
-            for (int i = 0; i < dimof(usbmitm->urbcb.all); i++) {
-                usbmitm->urbcb.all[i].submitted = false;
-                usbmitm->urbcb.all[i].ep_inited = false;
-                if (vk_usbh_urb_is_alloced(&usbmitm->urbcb.all[i].urb)) {
-                    vk_usbh_free_urb(usbmitm->usbh.host, &usbmitm->urbcb.all[i].urb);
-                }
+        if (mitm_trans->buffer != NULL) {
+            if (is_in) {
+                vk_usbh_urb_set_buffer(urb, mitm_trans->buffer, transfer_length);
+            } else {
+                vk_usbh_urb_set_buffer(urb, mitm_trans->buffer, mitm_trans->mem_save.size - mitm_trans->size);
             }
-            usbmitm->urbcb.in[0].epsize = usbmitm->urbcb.out[0].epsize = 64;
-            usbmitm->urbcb.in[0].eptype = usbmitm->urbcb.out[0].eptype = USB_EP_TYPE_CONTROL;
-
-            drv->Reset(&(usb_dc_cfg_t){
-                .speed = USB_SPEED_FULL,
-                .priority = __usbmitm_cfg.usbd.int_priority,
-                .evthandler = __usbmitm_usbd_hal_evthandler,
-                .param = &usbmitm,
-            });
-            // config ep0
-            drv->Ep.Add(0 | USB_DIR_OUT, USB_EP_TYPE_CONTROL, usbmitm->urbcb.out[0].epsize);
-            drv->Ep.Add(0 | USB_DIR_IN, USB_EP_TYPE_CONTROL, usbmitm->urbcb.in[0].epsize);
-            drv->SetAddress(0);
-
-            vsf_trace_info("Reset" VSF_TRACE_CFG_LINEEND);
+        } else if (NULL == vk_usbh_urb_alloc_buffer(urb, transfer_length)) {
+            vsf_trace_error("usbh: fail to alloc buffer for urb%d\n", idx);
+            return;
         }
-        // fall through
-    case VSF_EVT_TIMER:
-        if (!vk_usbh_is_dev_resetting(usbmitm->usbh.host, usbmitm->usbh.dev)) {
-            usbmitm->resetting = false;
-            if (usbmitm->pending_urbcb) {
-                usbmitm_usbh_submit_urb(usbmitm, usbmitm->pending_urbcb);
-                usbmitm->usbd.request_state++;
-                usbmitm->pending_urbcb = NULL;
+
+        if (pipe.type == USB_ENDPOINT_XFER_ISOC) {
+            if (VSF_ERR_NONE != vk_usbh_submit_urb_iso(&mitm->usb_host, urb, 0)) {
+                vsf_trace_error("usbh: fail to submit urb%d\n", idx);
+                return;
             }
         } else {
+            if (VSF_ERR_NONE != vk_usbh_submit_urb(&mitm->usb_host, urb)) {
+                vsf_trace_error("usbh: fail to submit urb%d\n", idx);
+                return;
+            }
+        }
+
+        uint16_t urb_size;
+        switch (pipe.type) {
+        case USB_ENDPOINT_XFER_CONTROL: VSF_ASSERT(false); break;
+        case USB_ENDPOINT_XFER_INT:
+        case USB_ENDPOINT_XFER_ISOC:    urb_size = pipe.size; break;
+        case USB_ENDPOINT_XFER_BULK:    urb_size = VSF_USB_MITM_CFG_MAX_TRANSFER_SIZE; break;
+        }
+        mitm_trans->size = is_in ? actual_length : urb_size;
+        mitm_trans->buffer = buffer;
+
+        vsf_err_t err = is_in ?
+                    __vsf_usb_mitm_usbd_ep_send(&mitm->usb_dev, mitm_trans) :
+                    __vsf_usb_mitm_usbd_ep_recv(&mitm->usb_dev, mitm_trans);
+        if (err != VSF_ERR_NONE) {
+            vsf_trace_error("usbd: fail to submit trans%d\n", idx);
+            return;
+        }
+        mitm->usbd.trans_busy |= 1 << idx;
+    }
+}
+
+static void __vsf_usb_mitm_evthadler(vsf_eda_t *eda, vsf_evt_t evt)
+{
+    vsf_usb_mitm_t *mitm = container_of(eda, vsf_usb_mitm_t, teda);
+    vk_usbh_dev_t *usbh_dev = mitm->usbh.libusb_dev->dev;
+
+    switch (evt) {
+    case VSF_EVT_INIT:
+        memset(mitm->config_desc, 0, sizeof(mitm->config_desc));
+        memset(mitm->ifs_desc_cur, 0, sizeof(mitm->ifs_desc_cur));
+        mitm->cur_config_desc = NULL;
+        mitm->is_setup_pending = false;
+        memset(&mitm->usbh, 0, sizeof(mitm->usbh));
+        memset(&mitm->usbd, 0, sizeof(mitm->usbd));
+
+        mitm->usb_dev.ctrl_handler.trans.buffer = NULL;
+        vk_usbd_init(&mitm->usb_dev);
+        vk_usbd_disconnect(&mitm->usb_dev);
+
+        mitm->usbh.libusb.drv = &vk_usbh_libusb_drv;
+        vk_usbh_libusb_set_evthandler(mitm, __vsf_usb_mitm_libusb_evthandler);
+#if VSF_USBH_USE_HUB == ENABLED
+        mitm->usbh.hub.drv = &vk_usbh_hub_drv;
+#endif
+
+        vk_usbh_init(&mitm->usb_host);
+        vk_usbh_register_class(&mitm->usb_host, &mitm->usbh.libusb);
+#if VSF_USBH_USE_HUB == ENABLED
+        vk_usbh_register_class(&mitm->usb_host, &mitm->usbh.hub);
+#endif
+        break;
+    case VSF_EVT_TIMER:
+        if (mitm->usbh.is_resetting) {
+            if (vk_usbh_is_dev_resetting(&mitm->usb_host, usbh_dev)) {
+                vsf_teda_set_timer_ms(10);
+                return;
+            }
+
+            mitm->usbh.is_resetting = false;
+            if (mitm->is_setup_pending) {
+            process_pending_setup:
+                mitm->is_setup_pending = false;
+                if (VSF_ERR_NONE != __vsf_usb_mitm_usbh_control_msg(mitm)) {
+                    vk_usbd_ep_stall(&mitm->usb_dev, 0);
+                }
+            }
+        } else {
+            VSF_ASSERT(false);
+        }
+        break;
+    case VSF_EVT_MESSAGE: {
+            vk_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
+            vk_usbh_pipe_t pipe = vk_usbh_urb_get_pipe(&urb);
+            int_fast16_t status = vk_usbh_urb_get_status(&urb);
+            uint_fast32_t actual_length = vk_usbh_urb_get_actual_length(&urb);
+
+            if (0 == pipe.endpoint) {
+                bool is_out_with_data = ((mitm->request.bRequestType & USB_DIR_MASK) == USB_DIR_OUT)
+                                    &&  (mitm->request.wLength > 0);
+                uint8_t *buffer = vk_usbh_urb_take_buffer(&urb);
+
+                VSF_ASSERT(mitm->usbh.is_control_requesting);
+                mitm->usbh.is_control_requesting = false;
+                if (status != URB_OK) {
+                    vk_usbd_ep_stall(&mitm->usb_dev, 0);
+                    vsf_usbh_free(buffer);
+                } else {
+                    if (!is_out_with_data) {
+                        mitm->usb_dev.ctrl_handler.trans.buffer = buffer;
+                        mitm->usb_dev.ctrl_handler.trans.size = actual_length;
+                        mitm->usbd.control_trans.mem_save = mitm->usb_dev.ctrl_handler.trans.use_as__vsf_mem_t;
+                        __vsf_usb_mitm_notify_user(mitm, USB_ON_PREPARE_DATA, &mitm->usb_dev.ctrl_handler.trans);
+                        __vsf_usb_mitm_host_on_stdreq(mitm, buffer, actual_length);
+                        vk_usbd_stdreq_data_stage(&mitm->usb_dev);
+                    } else {
+                        __vsf_usb_mitm_host_on_stdreq(mitm, buffer, actual_length);
+                        vsf_usbh_free(buffer);
+                        vk_usbd_stdreq_status_stage(&mitm->usb_dev);
+                    }
+                }
+                if (mitm->is_setup_pending) {
+                    goto process_pending_setup;
+                }
+            } else {
+                VSF_ASSERT(pipe.endpoint != 0);
+                uint8_t idx = (pipe.endpoint - 1) + (!!pipe.dir_in1out0 ? 15 : 0);
+                vk_usbh_urb_t *usbh_urb = NULL;
+
+                for (int i = 0; i < VSF_USB_MITM_USBH_URB_NUM; i++) {
+                    if (mitm->usbh.urb[idx].usbh_urb[i].urb_hcd == urb.urb_hcd) {
+                        usbh_urb = &mitm->usbh.urb[idx].usbh_urb[i];
+                        break;
+                    }
+                }
+                VSF_ASSERT(usbh_urb != NULL);
+
+                VSF_FIFO_PUSH(&mitm->usbh.urb[idx].ready_fifo, &usbh_urb);
+                if (URB_OK == status) {
+                    __vsf_usb_mitm_update_ep(mitm, idx);
+                }
+            }
+        }
+        break;
+    case VSF_EVT_USBD_ON_RESET:
+        if (!mitm->usbh.is_resetting) {
+            mitm->usbh.is_resetting = true;
+            vk_usbh_reset_dev(&mitm->usb_host, usbh_dev);
+
+            if (mitm->usb_dev.ctrl_handler.trans.buffer != NULL) {
+                vsf_usbh_free(mitm->usb_dev.ctrl_handler.trans.buffer);
+                mitm->usb_dev.ctrl_handler.trans.buffer = NULL;
+            }
+            for (int i = 0; i < dimof(mitm->usbd.trans); i++) {
+                if (mitm->usbd.trans[i].buffer != NULL) {
+                    vsf_usbh_free(mitm->usbd.trans[i].buffer);
+                    mitm->usbd.trans[i].buffer = NULL;
+                }
+            }
+
+            VSF_USBD_DRV_PREPARE(&mitm->usb_dev);
+            vk_usbd_drv_ep_add(0 | USB_DIR_OUT, USB_EP_TYPE_CONTROL, mitm->usbh.libusb_dev->ep0size);
+            vk_usbd_drv_ep_add(0 | USB_DIR_IN, USB_EP_TYPE_CONTROL, mitm->usbh.libusb_dev->ep0size);
+            mitm->usbd.ep_mask = 0x00010001;
+
             vsf_teda_set_timer_ms(10);
         }
         break;
-    case USBMITM_EVT_SETUP:
-        if (usbmitm->resetting && usbmitm->pending_urbcb) {
-            vsf_trace_info("Setup while resetting" VSF_TRACE_CFG_LINEEND);
-            break;
+    case VSF_EVT_USBD_ON_SETUP:
+        // patch address for SET_ADDRESS request
+        if (    ((mitm->request.bRequestType & USB_TYPE_MASK) == USB_TYPE_STANDARD)
+            &&  ((mitm->request.bRequestType & USB_RECIP_MASK) == USB_RECIP_DEVICE)
+            &&  (mitm->request.bRequest == USB_REQ_SET_ADDRESS)) {
+            mitm->usbd.address = (uint8_t)mitm->request.wValue;
+            mitm->request.wValue = mitm->usbh.libusb_dev->dev->devnum;
         }
-        if (usbmitm->usbd.request_state != USB_IDLE) {
-            vsf_trace_info("Setup sequence error" VSF_TRACE_CFG_LINEEND);
-            break;
-        }
-        drv->GetSetup((uint8_t *)&usbmitm->usbd.request);
 
-        isin = (request->bRequestType & USB_DIR_MASK) == USB_DIR_IN;
-        urbcb = isin ? &usbmitm->urbcb.in[0] : &usbmitm->urbcb.out[0];
-
-        vsf_trace_info("SETUP: ");
-        vsf_trace_buffer(VSF_TRACE_INFO, &usbmitm->usbd.request, sizeof(usbmitm->usbd.request), VSF_TRACE_DF_U8_16_N);
-
-        __usbmitm_usbd_setup_patch(usbmitm, request);
-        if (!__usbmitm_usbh_prepare_urb(usbmitm, urbcb, request->wLength)) {
-            urbcb->urb.urb_hcd->setup_packet = *request;
-            usbmitm->usbd.request_state++;
-            if (isin) {
-                if (usbmitm->resetting) {
-                    usbmitm->pending_urbcb = urbcb;
-                } else {
-                    usbmitm_usbh_submit_urb(usbmitm, urbcb);
-                    usbmitm->usbd.request_state++;
-                }
-            } else {
-                urbcb->curpos = 0;
-                urbcb->totalsize = request->wLength;
-                if (!urbcb->totalsize) {
-                    if (usbmitm->resetting) {
-                        usbmitm->pending_urbcb = urbcb;
-                    } else {
-                        usbmitm_usbh_submit_urb(usbmitm, urbcb);
-                        usbmitm->usbd.request_state++;
-                    }
-                }
-            }
-        } else {
-            vsf_trace_error("Fail to prepare urb" VSF_TRACE_CFG_LINEEND);
-        }
-        break;
-    case VSF_EVT_MESSAGE:
-        hcd_urb = (vk_usbh_hcd_urb_t *)vsf_eda_get_cur_msg();
-        urbcb = hcd_urb->pipe.dir_in1out0 ? usbmitm->urbcb.in : usbmitm->urbcb.out;
-        urbcb += hcd_urb->pipe.endpoint;
-
-        urb_status = vk_usbh_urb_get_status(&urbcb->urb);
-        actual_length = vk_usbh_urb_get_actual_length(&urbcb->urb);
-        urbcb->submitted = false;
-        if (!(urbcb->ep & 0x1F)) {
-            struct usb_ctrlrequest_t *request = &usbmitm->usbd.request;
-            bool isin = (request->bRequestType & USB_DIR_MASK) == USB_DIR_IN;
-
-            usbmitm->usbd.request_state++;
-            if (urb_status == URB_OK) {
-                urbcb->curpos = 0;
-                if (isin) {
-                    uint16_t epsize = drv->Ep.GetSize(urbcb->ep);
-                    urbcb->totalsize = actual_length;
-                    urbcb->needzlp = urbcb->totalsize > epsize;
-                    __usbmitm_usbd_ep_send(urbcb);
-                } else {
-                    usbmitm->usbd.request_state++;
-                    urbcb->totalsize = 0;
-                    urbcb->needzlp = true;
-                    __usbmitm_usbd_ep_send(urbcb);
-                }
-            } else {
-                // urb failed, stall ep0
-                vsf_trace_info("IN0: STALL" VSF_TRACE_CFG_LINEEND);
-                drv->Ep.SetStall(0 | USB_DIR_IN);
-                drv->Ep.SetStall(0 | USB_DIR_OUT);
-                usbmitm->usbd.request_state = USB_IDLE;
-
-                usbmitm_plugin_t *plugin = __usbmitm_cfg.pluginlist;
-                while (plugin != NULL) {
-                    if (plugin->op->on_SETUP != NULL) {
-                        plugin->op->on_SETUP(request, urb_status, NULL, 0);
-                    }
-                    plugin = plugin->next;
-                }
-            }
-        } else {
-            if ((urbcb->ep & USB_DIR_MASK) == USB_DIR_IN) {
-                if (urb_status != URB_OK) {
-                    vsf_trace_info("IN%d: STALL" VSF_TRACE_CFG_LINEEND, urbcb->ep & 0x1F);
-                    drv->Ep.SetStall(urbcb->ep);
-
-                    usbmitm_plugin_t *plugin = __usbmitm_cfg.pluginlist;
-                    while (plugin != NULL) {
-                        if (plugin->op->on_IN != NULL) {
-                            plugin->op->on_IN(urbcb->ep & 0x1F, urb_status, NULL, 0);
-                        }
-                        plugin = plugin->next;
-                    }
-                } else {
-                    urbcb->curpos = 0;
-                    urbcb->totalsize = actual_length;
-                    urbcb->needzlp = urbcb->totalsize < urbcb->urb.urb_hcd->transfer_length;
-                    __usbmitm_usbd_ep_send(urbcb);
-                }
-            } else {
-                if (urb_status == URB_OK) {
-                    drv->Ep.Transaction.EnableOut(urbcb->ep);
-                } else {
-                    vsf_trace_info("OUT%d: STALL" VSF_TRACE_CFG_LINEEND, urbcb->ep & 0x1F);
-                    drv->Ep.SetStall(urbcb->ep);
-
-                    usbmitm_plugin_t *plugin = __usbmitm_cfg.pluginlist;
-                    while (plugin != NULL) {
-                        if (plugin->op->on_OUT != NULL) {
-                            plugin->op->on_OUT(urbcb->ep & 0x1F, urb_status, NULL, 0);
-                        }
-                        plugin = plugin->next;
-                    }
-                }
-            }
-        }
-        break;
-    default:
-        ep = evt & USBMITM_EVT_EP_MASK;
-        evt &= USBMITM_EVT_EVT_MASK;
-        if (usbmitm->resetting && (ep || !usbmitm->pending_urbcb || (evt != USBMITM_EVT_EPOUT))) {
-            vsf_trace_error("Transaction while resetting" VSF_TRACE_CFG_LINEEND);
-            break;
-        } else {
-            switch (evt) {
-            case USBMITM_EVT_EPIN:
-                urbcb = &usbmitm->urbcb.in[ep];
-                if (!ep) {
-                    switch (usbmitm->usbd.request_state) {
-                    case URB_COMPLETED:
-                        // sending reply
-                        if (!isin) {
-                            vsf_trace_error("Setup sequence error" VSF_TRACE_CFG_LINEEND);
-                            break;
-                        }
-                        if (!__usbmitm_usbd_ep_send(urbcb)) {
-                            usbmitm->usbd.request_state++;
-                            drv->Ep.Transaction.EnableOut(0);
-                        }
-                        break;
-                    case USB_STATUS:
-                        // status sent
-                        if (isin) {
-                            vsf_trace_error("Setup sequence error" VSF_TRACE_CFG_LINEEND);
-                            break;
-                        }
-                        urbcb = &usbmitm->urbcb.out[0];
-                        __usbmitm_usbd_setup_process(usbmitm, urbcb);
-                        usbmitm->usbd.request_state = USB_IDLE;
-                        break;
-                    default:
-                        break;
-                    }
-                } else if (!__usbmitm_usbd_ep_send(urbcb)) {
-                    // data sent, submit next urb
-                    usbmitm_plugin_t *plugin = __usbmitm_cfg.pluginlist;
-                    uint8_t *data = urbcb->urb.urb_hcd->buffer;
-                    uint16_t len = vk_usbh_urb_get_actual_length(&urbcb->urb);
-                    while (plugin != NULL) {
-                        if (plugin->op->on_IN != NULL) {
-                            plugin->op->on_IN(urbcb->ep & 0x1F, URB_OK, data, len);
-                        }
-                        plugin = plugin->next;
-                    }
-
-                    usbmitm_usbh_submit_urb(usbmitm, urbcb);
-                }
-                break;
-            case USBMITM_EVT_EPOUT:
-                urbcb = &usbmitm->urbcb.out[ep];
-                if (!ep) {
-                    switch (usbmitm->usbd.request_state) {
-                    case USB_SETUP:
-                        // receiving data
-                        if (isin) {
-                            vsf_trace_error("Setup sequence error" VSF_TRACE_CFG_LINEEND);
-                            break;
-                        }
-                        if (!__usbmitm_usbd_ep_recv(urbcb)) {
-                            if (usbmitm->resetting) {
-                                usbmitm->pending_urbcb = urbcb;
-                            } else {
-                                usbmitm_usbh_submit_urb(usbmitm, urbcb);
-                                usbmitm->usbd.request_state++;
-                            }
-                        }
-                        break;
-                    case USB_STATUS:
-                        // status received
-                        if (!isin) {
-                            vsf_trace_error("Setup sequence error" VSF_TRACE_CFG_LINEEND);
-                            break;
-                        }
-                        urbcb->totalsize = urbcb->curpos = 0;
-                        __usbmitm_usbd_ep_recv(urbcb);
-                        urbcb = &usbmitm->urbcb.in[0];
-                        __usbmitm_usbd_setup_process(usbmitm, urbcb);
-                        usbmitm->usbd.request_state = USB_IDLE;
-                        break;
-                    default:
-                        break;
-                    }
-                } else {
-                    // data received, submit urb
-                    urbcb->curpos = 0;
-                    urbcb->totalsize = drv->Ep.GetDataSize(ep);
-                    if (!__usbmitm_usbh_prepare_urb(usbmitm, urbcb, urbcb->totalsize)) {
-                        __usbmitm_usbd_ep_recv(urbcb);
-
-                        usbmitm_plugin_t *plugin = __usbmitm_cfg.pluginlist;
-                        uint8_t *data = urbcb->urb.urb_hcd->buffer;
-                        uint16_t len = urbcb->totalsize;
-                        while (plugin != NULL) {
-                            if (plugin->op->on_OUT != NULL) {
-                                plugin->op->on_OUT(urbcb->ep & 0x1F, URB_OK, data, len);
-                            }
-                            plugin = plugin->next;
-                        }
-
-                        usbmitm_usbh_submit_urb(usbmitm, urbcb);
-                        urbcb->ep_inited = true;
-                    } else {
-                        vsf_trace_error("Fail to prepare urb" VSF_TRACE_CFG_LINEEND);
-                    }
-                }
+        if (mitm->usbh.is_resetting || mitm->usbh.is_control_requesting) {
+            mitm->is_setup_pending = true;
+        } else if ( ((mitm->request.bRequestType & USB_DIR_MASK) == USB_DIR_OUT)
+                &&  (mitm->request.wLength > 0)) {
+            mitm->usb_dev.ctrl_handler.trans.buffer = vsf_usbh_malloc(mitm->request.wLength);
+            mitm->usb_dev.ctrl_handler.trans.size = mitm->request.wLength;
+            mitm->usbd.control_trans.mem_save = mitm->usb_dev.ctrl_handler.trans.use_as__vsf_mem_t;
+            if (NULL == mitm->usb_dev.ctrl_handler.trans.buffer) {
+                vsf_trace_error("usbd: fail to allocate request buffer\n");
                 break;
             }
+            vk_usbd_stdreq_data_stage(&mitm->usb_dev);
+        } else if (VSF_ERR_NONE != __vsf_usb_mitm_usbh_control_msg(mitm)) {
+            vk_usbd_ep_stall(&mitm->usb_dev, 0);
         }
-    }
-}
-
-static void *__vsf_usbh_usbmitm_probe(vk_usbh_t *usbh, vk_usbh_dev_t *dev, vk_usbh_ifs_parser_t *parser_ifs)
-{
-    usbmitm_t *usbmitm = vsf_usbh_malloc(sizeof(usbmitm_t));
-    if (usbmitm != NULL) {
-        memset(usbmitm, 0, sizeof(*usbmitm));
-
-        usbmitm_urbcb_t *urbcb;
-        for (int i = 0; i < dimof(usbmitm->urbcb.in); i++) {
-            urbcb = &usbmitm->urbcb.in[i];
-            urbcb->ep = i | USB_DIR_IN;
-
-            urbcb = &usbmitm->urbcb.out[i];
-            urbcb->ep = i | USB_DIR_OUT;
-        }
-
-        usbmitm->usbd.host_address = dev->devnum;
-        usbmitm->usbh.host = usbh;
-        usbmitm->usbh.dev = dev;
-        usbmitm->usbd.task.fn.evthandler = __usbmitm_usbd_evthandler;
-        vsf_teda_init(&usbmitm->usbd.task);
-        return usbmitm;
-    }
-    return NULL;
-}
-
-static void __vsf_usbh_usbmitm_disconnect(vk_usbh_t *usbh, vk_usbh_dev_t *dev, void *param)
-{
-    usbmitm_t *usbmitm = param;
-
-    if (usbmitm->usbh.dev == dev) {
-        const i_usb_dc_t *drv = __usbmitm_cfg.usbd.drv;
-
-        for (int i = 0; i < dimof(usbmitm->urbcb.all); i++) {
-            if (vk_usbh_urb_is_alloced(&usbmitm->urbcb.all[i].urb)) {
-                vk_usbh_free_urb(usbh, &usbmitm->urbcb.all[i].urb);
+        break;
+    case VSF_EVT_USBD_ON_STATUS_QUERY:
+        if (    ((mitm->request.bRequestType & USB_DIR_MASK) == USB_DIR_OUT)
+            &&  (mitm->request.wLength > 0)) {
+            __vsf_usb_mitm_notify_user(mitm, USB_ON_PREPARE_DATA, &mitm->usb_dev.ctrl_handler.trans);
+            vk_usbh_urb_set_buffer(&mitm->usbh.libusb_dev->dev->ep0.urb,
+                mitm->usb_dev.ctrl_handler.trans.buffer, mitm->request.wLength);
+            mitm->usb_dev.ctrl_handler.trans.buffer = NULL;
+            if (VSF_ERR_NONE != __vsf_usb_mitm_usbh_control_msg(mitm)) {
+                vsf_trace_error("usbh: fail to submit control msg\n");
             }
+        } else {
+            vk_usbd_stdreq_status_stage(&mitm->usb_dev);
         }
-        if (usbmitm->usbd.config_desc != NULL) {
-            vsf_heap_free(usbmitm->usbd.config_desc);
-            usbmitm->usbd.config_desc = NULL;
+        break;
+    case VSF_EVT_USBD_ON_STATUS:
+        // set address for SET_ADDRESS request
+        if (    ((mitm->request.bRequestType & USB_TYPE_MASK) == USB_TYPE_STANDARD)
+            &&  ((mitm->request.bRequestType & USB_RECIP_MASK) == USB_RECIP_DEVICE)
+            &&  (mitm->request.bRequest == USB_REQ_SET_ADDRESS)) {
+            VSF_USBD_DRV_PREPARE(&mitm->usb_dev);
+            vk_usbd_drv_set_address(mitm->usbd.address);
         }
-        drv->Disconnect();
-        drv->Fini();
-        __vsf_teda_cancel_timer(&usbmitm->usbd.task);
-        vsf_eda_fini(&usbmitm->usbd.task.use_as__vsf_eda_t);
-        usbmitm->usbh.dev = NULL;
+        if (mitm->usb_dev.ctrl_handler.trans.buffer != NULL) {
+            vsf_usbh_free(mitm->usb_dev.ctrl_handler.trans.buffer);
+            mitm->usb_dev.ctrl_handler.trans.buffer = NULL;
+        }
+        break;
+    default: {
+            uint8_t ep = evt - VSF_EVT_USBD_ON_EP;
+            VSF_ASSERT((ep & 0x0F) != 0);
+            uint8_t idx = ((ep & 0x0F) - 1) + ((ep & USB_DIR_MASK) ? 15 : 0);
+            VSF_ASSERT(mitm->usbd.trans_busy & (1 << idx));
+            mitm->usbd.trans_busy &= ~(1 << idx);
+            __vsf_usb_mitm_update_ep(mitm, idx);
+        }
+        break;
     }
 }
 
-static const vk_usbh_dev_id_t __vsf_usbh_usbmitm_devid[] = {
-    {
-        .match_flags = VSF_USBH_MATCH_FLAGS_DEV_LO,
-        .bcdDevice_lo = 0,
-        .bDeviceClass = 1,
-    },
-};
-
-const vk_usbh_class_drv_t vsf_usbh_usbmitm_drv = {
-    .name = "usbmitm",
-    .dev_id_num = dimof(__vsf_usbh_usbmitm_devid),
-    .dev_ids = __vsf_usbh_usbmitm_devid,
-    .probe = __vsf_usbh_usbmitm_probe,
-    .disconnect = __vsf_usbh_usbmitm_disconnect,
-};
-
-void usbmitm_register_plugin(usbmitm_plugin_t *plugin)
+void vsf_usb_mitm_start(vsf_usb_mitm_t *mitm)
 {
-    plugin->next = __usbmitm_cfg.pluginlist;
-    __usbmitm_cfg.pluginlist = plugin;
-}
-
-void usbmitm_init(const i_usb_dc_t *drv, int32_t int_priority)
-{
-    __usbmitm_cfg.usbd.drv = drv;
-    __usbmitm_cfg.usbd.int_priority = int_priority;
+    mitm->teda.fn.evthandler = __vsf_usb_mitm_evthadler;
+#   if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    mitm->teda.on_terminate = NULL;
+#   endif
+    vsf_eda_init((vsf_eda_t *)&mitm->teda, vsf_prio_0);
 }
