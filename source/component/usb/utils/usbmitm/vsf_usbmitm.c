@@ -418,19 +418,23 @@ static void __vsf_usb_mitm_update_ep(vsf_usb_mitm_t *mitm, uint8_t idx)
             }
         }
 
-        uint16_t urb_size;
-        switch (pipe.type) {
-        case USB_ENDPOINT_XFER_CONTROL: VSF_ASSERT(false); break;
-        case USB_ENDPOINT_XFER_INT:
-        case USB_ENDPOINT_XFER_ISOC:    urb_size = pipe.size; break;
-        case USB_ENDPOINT_XFER_BULK:    urb_size = VSF_USB_MITM_CFG_MAX_TRANSFER_SIZE; break;
-        }
-        mitm_trans->size = is_in ? actual_length : urb_size;
         mitm_trans->buffer = buffer;
 
-        vsf_err_t err = is_in ?
-                    __vsf_usb_mitm_usbd_ep_send(&mitm->usb_dev, mitm_trans) :
-                    __vsf_usb_mitm_usbd_ep_recv(&mitm->usb_dev, mitm_trans);
+        vsf_err_t err;
+        if (is_in) {
+            mitm_trans->size = actual_length;
+            err = __vsf_usb_mitm_usbd_ep_send(&mitm->usb_dev, mitm_trans);
+        } else {
+            uint16_t urb_size;
+            switch (pipe.type) {
+            case USB_ENDPOINT_XFER_CONTROL: VSF_ASSERT(false); break;
+            case USB_ENDPOINT_XFER_INT:
+            case USB_ENDPOINT_XFER_ISOC:    urb_size = pipe.size; break;
+            case USB_ENDPOINT_XFER_BULK:    urb_size = VSF_USB_MITM_CFG_MAX_TRANSFER_SIZE; break;
+            }
+            mitm_trans->size = urb_size;
+            err = __vsf_usb_mitm_usbd_ep_recv(&mitm->usb_dev, mitm_trans);
+        }
         if (err != VSF_ERR_NONE) {
             vsf_trace_error("usbd: fail to submit trans%d\n", idx);
             return;

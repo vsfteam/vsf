@@ -38,6 +38,10 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
+#if VSF_USBD_CFG_RAW_MODE != ENABLED
+#   error Please enable VSF_USBD_CFG_RAW_MODE to use usb_mitm
+#endif
+
 #ifndef VSF_USB_MITM_USBH_PERIODIC_TICKTOCK
 #   define VSF_USB_MITM_USBH_PERIODIC_TICKTOCK          DISABLED
 #endif
