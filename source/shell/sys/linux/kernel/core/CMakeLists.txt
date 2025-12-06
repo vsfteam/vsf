@@ -7,4 +7,5 @@ vsf_add_sources(
     input/vsf_linux_core_input.c
     hid/vsf_linux_core_hid.c
     led/vsf_linux_core_led.c
+    crypto/vsf_linux_core_crypto.c
 )
