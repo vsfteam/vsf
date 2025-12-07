@@ -22,6 +22,8 @@
 
 #include "component/vsf_component.h"
 
+#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_CFG_RAW_MODE == ENABLED
+
 #if     defined(__VSF_USB_MITM_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #   undef __VSF_USB_MITM_CLASS_IMPLEMENT
@@ -37,10 +39,6 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
-
-#if VSF_USBD_CFG_RAW_MODE != ENABLED
-#   error Please enable VSF_USBD_CFG_RAW_MODE to use usb_mitm
-#endif
 
 #ifndef VSF_USB_MITM_USBH_PERIODIC_TICKTOCK
 #   define VSF_USB_MITM_USBH_PERIODIC_TICKTOCK          DISABLED
@@ -124,4 +122,5 @@ void vsf_usb_mitm_start(vsf_usb_mitm_t *mitm);
 }
 #endif
 
+#endif
 #endif

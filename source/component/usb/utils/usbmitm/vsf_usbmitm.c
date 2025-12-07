@@ -22,6 +22,8 @@
 #define __VSF_EDA_CLASS_INHERIT__
 #include "./vsf_usbmitm.h"
 
+#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_CFG_RAW_MODE == ENABLED
+
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_USB_MITM_CFG_MAX_TRANSFER_SIZE
@@ -642,3 +644,5 @@ void vsf_usb_mitm_start(vsf_usb_mitm_t *mitm)
 #   endif
     vsf_eda_init((vsf_eda_t *)&mitm->teda, vsf_prio_0);
 }
+
+#endif
