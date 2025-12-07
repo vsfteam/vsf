@@ -43,7 +43,7 @@ static inline struct crypto_tfm *crypto_kpp_tfm(struct crypto_kpp *tfm)
 static inline struct kpp_alg *crypto_kpp_alg(struct crypto_kpp *tfm)
 {
     struct crypto_alg *alg = crypto_kpp_tfm(tfm)->__crt_alg;
-    return container_of(alg, struct kpp_alg, base);
+    return vsf_container_of(alg, struct kpp_alg, base);
 }
 
 static inline unsigned int crypto_kpp_reqsize(struct crypto_kpp *tfm)
@@ -58,7 +58,7 @@ static inline void kpp_request_set_tfm(struct kpp_request *req, struct crypto_kp
 
 static inline struct crypto_kpp *crypto_kpp_reqtfm(struct kpp_request *req)
 {
-    return container_of(req->base.tfm, struct crypto_kpp, base);
+    return vsf_container_of(req->base.tfm, struct crypto_kpp, base);
 }
 
 static inline struct kpp_request *kpp_request_alloc(struct crypto_kpp *tfm, gfp_t gfp)

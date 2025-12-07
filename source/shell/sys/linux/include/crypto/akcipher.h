@@ -31,7 +31,7 @@ static inline struct crypto_tfm *crypto_akcipher_tfm(struct crypto_akcipher *tfm
 static inline struct akcipher_alg *crypto_akcipher_alg(struct crypto_akcipher *tfm)
 {
     struct crypto_alg *alg = crypto_akcipher_tfm(tfm)->__crt_alg;
-    return container_of(alg, struct akcipher_alg, base);
+    return vsf_container_of(alg, struct akcipher_alg, base);
 }
 
 static inline unsigned int crypto_akcipher_reqsize(struct crypto_akcipher *tfm)
@@ -46,7 +46,7 @@ static inline void akcipher_request_set_tfm(struct akcipher_request *req, struct
 
 static inline struct crypto_akcipher *crypto_akcipher_reqtfm(struct akcipher_request *req)
 {
-    return container_of(req->base.tfm, struct crypto_akcipher, base);
+    return vsf_container_of(req->base.tfm, struct crypto_akcipher, base);
 }
 
 static inline int crypto_akcipher_set_pub_key(struct crypto_akcipher *tfm, const void *key, unsigned int keylen)

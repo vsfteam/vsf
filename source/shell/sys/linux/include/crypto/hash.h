@@ -47,7 +47,7 @@ static inline void *crypto_shash_ctx(struct crypto_shash *tfm)
 
 static inline struct shash_alg *__crypto_shash_alg(struct crypto_alg *alg)
 {
-    return container_of(alg, struct shash_alg, base);
+    return vsf_container_of(alg, struct shash_alg, base);
 }
 
 static inline struct shash_alg *crypto_shash_alg(struct crypto_shash *tfm)
