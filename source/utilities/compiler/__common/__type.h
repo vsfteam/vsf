@@ -167,7 +167,7 @@ extern void vsf_trace_assert(const char *expr, const char *file, int line, const
         (__ptr ? vsf_container_of(__ptr, __type, __member) : NULL)
 
 #ifndef VSF_COMPATIBILITY
-#   define VSF_COMPATIBILITY                ENABLED
+#   define VSF_COMPATIBILITY                DISABLED
 #endif
 #if VSF_COMPATIBILITY == ENABLED
 #   ifndef container_of
