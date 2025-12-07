@@ -22,7 +22,8 @@
 
 #include "component/vsf_component.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_CFG_RAW_MODE == ENABLED
+#if     VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_LIBUSB == ENABLED           \
+    &&  VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_CFG_RAW_MODE == ENABLED
 
 #if     defined(__VSF_USB_MITM_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
@@ -74,7 +75,7 @@ typedef struct vsf_usb_mitm_urb_t {
 } vsf_usb_mitm_urb_t;
 
 vsf_class(vsf_usb_mitm_t) {
-    protected_member(
+    public_member(
         vk_usbd_dev_t usb_dev;
         vk_usbh_t usb_host;
 

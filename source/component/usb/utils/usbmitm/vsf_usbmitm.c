@@ -22,7 +22,8 @@
 #define __VSF_EDA_CLASS_INHERIT__
 #include "./vsf_usbmitm.h"
 
-#if VSF_USE_USB_HOST == ENABLED && VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_CFG_RAW_MODE == ENABLED
+#if     VSF_USE_USB_HOST == ENABLED && VSF_USBH_USE_LIBUSB == ENABLED           \
+    &&  VSF_USE_USB_DEVICE == ENABLED && VSF_USBD_CFG_RAW_MODE == ENABLED
 
 /*============================ MACROS ========================================*/
 
@@ -116,7 +117,7 @@ static void __vsf_usb_mitm_notify_user(vsf_usb_mitm_t *mitm, vsf_usb_mitm_evt_t 
 
 vsf_err_t vsf_usbd_notify_user(vk_usbd_dev_t *dev, usb_evt_t evt, void *param)
 {
-    vsf_usb_mitm_t *mitm = container_of(dev, vsf_usb_mitm_t, usb_dev);
+    vsf_usb_mitm_t *mitm = vsf_container_of(dev, vsf_usb_mitm_t, usb_dev);
 
     __vsf_usb_mitm_notify_user(mitm, (vsf_usb_mitm_evt_t)evt, param);
     switch (evt) {
@@ -447,7 +448,7 @@ static void __vsf_usb_mitm_update_ep(vsf_usb_mitm_t *mitm, uint8_t idx)
 
 static void __vsf_usb_mitm_evthadler(vsf_eda_t *eda, vsf_evt_t evt)
 {
-    vsf_usb_mitm_t *mitm = container_of(eda, vsf_usb_mitm_t, teda);
+    vsf_usb_mitm_t *mitm = vsf_container_of(eda, vsf_usb_mitm_t, teda);
     vk_usbh_dev_t *usbh_dev = mitm->usbh.libusb_dev->dev;
 
     switch (evt) {
