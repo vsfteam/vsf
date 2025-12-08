@@ -1104,6 +1104,8 @@ typedef struct vsf_linux_input_priv_t {
             vsf_pool(vsf_linux_input_event_pool) event_pool;
             vsf_linux_input_event_t event_buffer[VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE];
             vsf_slist_queue_t event_queue;
+
+            uint32_t led_status;
         };
         struct {
             implement(vsf_fifo_stream_t)
@@ -1297,90 +1299,108 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
     switch (type) {
     case VSF_INPUT_TYPE_SYNC:
         if (!input_priv->is_extend) {
+        push_sync:
             input_event.code = SYN_REPORT;
             input_event.value = 0;
             input_event.type = EV_SYN;
             __vsf_linux_input_push(input_priv, &input_event);
         }
         break;
-    case VSF_INPUT_TYPE_KEYBOARD:
-#if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
-        if (input_priv->is_extend) {
+    case VSF_INPUT_TYPE_KEYBOARD: {
             bool is_down = vsf_input_keyboard_is_down(evt);
             uint16_t vsf_keycode = vsf_input_keyboard_get_keycode(evt);
-            // max scancode is 6 byte in length
-            uint8_t keybuffer[6], keylen = 0;
+#if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
+            if (input_priv->is_extend) {
+                // max scancode is 6 byte in length
+                uint8_t keybuffer[6], keylen = 0;
 
-            if ((vsf_keycode >= VSF_KB_MODIFIER_START) && (vsf_keycode <= VSF_KB_MODIFIER_END)) {
-                if (is_down) {
-                    input_priv->keyboard.modifiers |= 1 << (vsf_keycode - VSF_KB_MODIFIER_START);
-                } else {
-                    input_priv->keyboard.modifiers &= ~(1 << (vsf_keycode - VSF_KB_MODIFIER_START));
-                }
-            }
-            if (input_priv->keyboard.mode == K_RAW) {
-                // raw mode, send scancode directly
-                keylen = vsf_input_keyboard_get_scancode_from_keycode(vsf_keycode, keybuffer);
-
-                if (!is_down) {
-                    if (keylen > 2) {
-                        // should be pause, which has no keycode for release
-                        keylen = 0;
+                if ((vsf_keycode >= VSF_KB_MODIFIER_START) && (vsf_keycode <= VSF_KB_MODIFIER_END)) {
+                    if (is_down) {
+                        input_priv->keyboard.modifiers |= 1 << (vsf_keycode - VSF_KB_MODIFIER_START);
                     } else {
-                        if (keylen > 1) {
-                            keybuffer[0] = 0x80 | keybuffer[1];
-                        } else {
-                            keybuffer[0] |= 0x80;
-                        }
-                        keylen = 1;
+                        input_priv->keyboard.modifiers &= ~(1 << (vsf_keycode - VSF_KB_MODIFIER_START));
                     }
                 }
-            } else if (input_priv->keyboard.mode == K_MEDIUMRAW) {
-                uint8_t keycode = __vsf_linux_terminal_keyboard_get_keycode(input_priv->keyboard.modifiers, vsf_keycode);
-                keylen = 1;
-                keybuffer[0] = (is_down ? 0 : 0x80) | keycode;
-            } else if (input_priv->keyboard.mode == K_XLATE) {
-                uint8_t keycode = __vsf_linux_terminal_keyboard_get_keycode(input_priv->keyboard.modifiers, vsf_keycode);
-                keylen = __vsf_linux_terminal_keyboard_translate(input_priv->keyboard.modifiers, keycode, keybuffer);
-            } else {
-                vsf_trace_error("keyboard: not supported mode %d\n", input_priv->keyboard.mode);
-                break;
-            }
+                if (input_priv->keyboard.mode == K_RAW) {
+                    // raw mode, send scancode directly
+                    keylen = vsf_input_keyboard_get_scancode_from_keycode(vsf_keycode, keybuffer);
 
-            if (keylen > 0) {
-                uint_fast32_t avail_len = vsf_stream_get_free_size(&input_priv->keyboard.use_as__vsf_stream_t);
-                if (keylen > avail_len) {
-                    vsf_trace_error("keyboard: keyboard rx buffer overflow, please increase VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE\n");
-                    break;
+                    if (!is_down) {
+                        if (keylen > 2) {
+                            // should be pause, which has no keycode for release
+                            keylen = 0;
+                        } else {
+                            if (keylen > 1) {
+                                keybuffer[0] = 0x80 | keybuffer[1];
+                            } else {
+                                keybuffer[0] |= 0x80;
+                            }
+                            keylen = 1;
+                        }
+                    }
+                } else if (input_priv->keyboard.mode == K_MEDIUMRAW) {
+                    uint8_t keycode = __vsf_linux_terminal_keyboard_get_keycode(input_priv->keyboard.modifiers, vsf_keycode);
+                    keylen = 1;
+                    keybuffer[0] = (is_down ? 0 : 0x80) | keycode;
+                } else if (input_priv->keyboard.mode == K_XLATE) {
+                    uint8_t keycode = __vsf_linux_terminal_keyboard_get_keycode(input_priv->keyboard.modifiers, vsf_keycode);
+                    keylen = __vsf_linux_terminal_keyboard_translate(input_priv->keyboard.modifiers, keycode, keybuffer);
                 } else {
-                    vsf_stream_write(&input_priv->keyboard.use_as__vsf_stream_t, keybuffer, keylen);
+                    vsf_trace_error("keyboard: not supported mode %d\n", input_priv->keyboard.mode);
+                    break;
                 }
-            }
 
-            // update led status if necessary
-            if (is_down) {
-                switch (vsf_keycode) {
-                case VSF_KP_NUMLOCK:
-                    input_priv->keyboard.led_status ^= LED_NUML;
-                    break;
-                case VSF_KB_CAPSLOCK:
-                    input_priv->keyboard.led_status ^= LED_CAPSL;
-                    break;
-                case VSF_KB_SCROLLLOCK:
-                    input_priv->keyboard.led_status ^= LED_SCROLLL;
-                    break;
-                default:
-                    break;
+                if (keylen > 0) {
+                    uint_fast32_t avail_len = vsf_stream_get_free_size(&input_priv->keyboard.use_as__vsf_stream_t);
+                    if (keylen > avail_len) {
+                        vsf_trace_error("keyboard: keyboard rx buffer overflow, please increase VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE\n");
+                        break;
+                    } else {
+                        vsf_stream_write(&input_priv->keyboard.use_as__vsf_stream_t, keybuffer, keylen);
+                    }
                 }
-            }
-            __vsf_linux_term_notify_rx(&input_priv->use_as__vsf_linux_term_priv_t);
-        } else
+
+                // update led status if necessary
+                if (is_down) {
+                    switch (vsf_keycode) {
+                    case VSF_KP_NUMLOCK:
+                        input_priv->keyboard.led_status ^= LED_NUML;
+                        break;
+                    case VSF_KB_CAPSLOCK:
+                        input_priv->keyboard.led_status ^= LED_CAPSL;
+                        break;
+                    case VSF_KB_SCROLLLOCK:
+                        input_priv->keyboard.led_status ^= LED_SCROLLL;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                __vsf_linux_term_notify_rx(&input_priv->use_as__vsf_linux_term_priv_t);
+            } else
 #endif
-        {
-            input_event.code = vsf_input_keyboard_get_keycode(evt);
-            input_event.value = vsf_input_keyboard_is_down(evt) ? 1 : 0;
-            input_event.type = EV_KEY;
-            __vsf_linux_input_push(input_priv, &input_event);
+            {
+                if (is_down) {
+                    switch (vsf_keycode) {
+                    case VSF_KP_NUMLOCK:
+                        input_priv->led_status ^= LED_NUML;
+                        break;
+                    case VSF_KB_CAPSLOCK:
+                        input_priv->led_status ^= LED_CAPSL;
+                        break;
+                    case VSF_KB_SCROLLLOCK:
+                        input_priv->led_status ^= LED_SCROLLL;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+
+                input_event.code = vsf_keycode;
+                input_event.value = is_down ? 1 : 0;
+                input_event.type = EV_KEY;
+                __vsf_linux_input_push(input_priv, &input_event);
+            }
         }
         break;
     case VSF_INPUT_TYPE_MOUSE:
@@ -1461,6 +1481,7 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
                 __vsf_linux_input_push(input_priv, &input_event);
                 break;
             }
+            goto push_sync;
         }
         break;
     case VSF_INPUT_TYPE_GAMEPAD: {
@@ -1512,6 +1533,23 @@ static void __vsf_linux_input_init(vsf_linux_fd_t *sfd)
 
 static int __vsf_linux_input_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
+    vsf_linux_input_priv_t *input_priv = (vsf_linux_input_priv_t *)sfd->priv;
+    int input_cmd = cmd & ~(_IOC_SIZEMASK << _IOC_SIZESHIFT);
+    int size = _IOC_SIZE(cmd);
+
+    switch (input_cmd) {
+    case EVIOCGLED(0):
+        if (size > 1) {
+            VSF_LINUX_ASSERT(!input_priv->is_extend);
+            VSF_LINUX_ASSERT(input_priv->notifier.mask & (1 << VSF_INPUT_TYPE_KEYBOARD));
+
+            size = vsf_min(size, sizeof(input_priv->led_status));
+            memcpy((void *)arg, &input_priv->led_status, size);
+        }
+        break;
+    case EVIOCGRAB:
+        return 0;
+    }
     return __vsf_linux_default_fcntl(sfd, cmd, arg);
 }
 
