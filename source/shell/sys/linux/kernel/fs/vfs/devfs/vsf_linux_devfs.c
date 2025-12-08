@@ -97,6 +97,8 @@ extern void __vsf_linux_term_notify_rx(vsf_linux_term_priv_t *priv);
 extern ssize_t __vsf_linux_stream_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
 extern ssize_t __vsf_linux_stream_write(vsf_linux_fd_t *sfd, const void *buf, size_t count);
 
+extern vsf_linux_fd_t * __vsf_linux_fd_get_ex(vsf_linux_process_t *process, int fd);
+
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
@@ -2382,6 +2384,44 @@ static const vsf_linux_fd_op_t __vsf_linux_zero_fdop = {
     .fn_stat            = __vsf_linux_null_stat,
 };
 
+static ssize_t __vsf_linux_tty_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
+{
+    if (sfd->fd != STDIN_FILENO) {
+        return read(STDIN_FILENO, buf, count);
+    } else {
+        vsf_linux_process_t *process = vsf_linux_get_cur_process();
+        VSF_LINUX_ASSERT(process != NULL);
+        vsf_linux_process_t *shell_process = process->shell_process;
+        VSF_LINUX_ASSERT((shell_process != NULL) && (shell_process != process));
+        vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex(shell_process, STDIN_FILENO);
+        VSF_LINUX_ASSERT(sfd != NULL);
+        return __vsf_linux_stream_read(sfd, buf, count);
+    }
+}
+
+static ssize_t __vsf_linux_tty_write(vsf_linux_fd_t *sfd, const void *buf, size_t count)
+{
+    if (sfd->fd != STDOUT_FILENO) {
+        return write(STDOUT_FILENO, buf, count);
+    } else {
+        vsf_linux_process_t *process = vsf_linux_get_cur_process();
+        VSF_LINUX_ASSERT(process != NULL);
+        vsf_linux_process_t *shell_process = process->shell_process;
+        VSF_LINUX_ASSERT((shell_process != NULL) && (shell_process != process));
+        vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex(shell_process, STDOUT_FILENO);
+        VSF_LINUX_ASSERT(sfd != NULL);
+        return __vsf_linux_stream_write(sfd, buf, count);
+    }
+}
+
+static const vsf_linux_fd_op_t __vsf_linux_tty_fdop = {
+    .priv_size          = sizeof(vsf_linux_fs_priv_t),
+    .feature            = VSF_LINUX_FDOP_FEATURE_FS,
+    .fn_read            = __vsf_linux_tty_read,
+    .fn_write           = __vsf_linux_tty_write,
+    .fn_stat            = __vsf_linux_null_stat,
+};
+
 int vsf_linux_devfs_init(void)
 {
     int err = mkdir("/dev", 0);
@@ -2401,6 +2441,13 @@ int vsf_linux_devfs_init(void)
                 NULL, NULL, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
     if (err != 0) {
         fprintf(stderr, "fail to bind /dev/zero\r\n");
+        return err;
+    }
+
+    err = vsf_linux_fs_bind_target_ex("/dev/tty", NULL, &__vsf_linux_tty_fdop,
+                NULL, NULL, VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE, 0);
+    if (err != 0) {
+        fprintf(stderr, "fail to bind /dev/tty\r\n");
         return err;
     }
 
