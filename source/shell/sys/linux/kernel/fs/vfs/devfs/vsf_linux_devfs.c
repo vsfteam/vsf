@@ -1361,13 +1361,13 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
             if (is_down) {
                 switch (vsf_keycode) {
                 case VSF_KP_NUMLOCK:
-                    input_priv->keyboard.led_status ^= LED_NUM;
+                    input_priv->keyboard.led_status ^= LED_NUML;
                     break;
                 case VSF_KB_CAPSLOCK:
-                    input_priv->keyboard.led_status ^= LED_CAP;
+                    input_priv->keyboard.led_status ^= LED_CAPSL;
                     break;
                 case VSF_KB_SCROLLLOCK:
-                    input_priv->keyboard.led_status ^= LED_SCR;
+                    input_priv->keyboard.led_status ^= LED_SCROLLL;
                     break;
                 default:
                     break;
@@ -1688,8 +1688,10 @@ static void __vsf_linux_terminal_keyboard_init(vsf_linux_fd_t *sfd)
 static int __vsf_linux_terminal_keyboard_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
 {
     vsf_linux_input_priv_t *keyboard_priv = (vsf_linux_input_priv_t *)sfd->priv;
+    int input_cmd = cmd & ~(_IOC_SIZEMASK << _IOC_SIZESHIFT);
+    int size = _IOC_SIZE(cmd);
 
-    switch (cmd) {
+    switch (input_cmd) {
     case KDGETMODE:
         *(int *)arg = keyboard_priv->keyboard.text_graphics_mode;
         break;
@@ -1704,6 +1706,12 @@ static int __vsf_linux_terminal_keyboard_fcntl(vsf_linux_fd_t *sfd, int cmd, uin
         break;
     case KDGETLED:
         *(int *)arg = keyboard_priv->keyboard.led_status;
+        break;
+    case EVIOCGLED(0):
+        if (size > 1) {
+            uint8_t *state = (uint8_t *)arg;
+            *state = keyboard_priv->keyboard.led_status;
+        }
         break;
     case KDGKBENT: {
             struct kbentry *entry = (struct kbentry *)arg;
