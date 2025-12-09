@@ -1797,6 +1797,7 @@ typedef struct vsf_linux_fb_priv_t {
 #endif
     uint16_t is_area_set : 1;
     uint16_t is_refreshing : 1;
+    uint16_t is_closing : 1;
     int16_t frame_interval_ms;
     vk_disp_area_t area;
     vsf_trig_t fresh_trigger;
@@ -1822,6 +1823,9 @@ static void __vsf_linux_disp_fresh_task(vsf_eda_t *eda, vsf_evt_t evt)
             fb_priv->eda_pending = NULL;
             vsf_eda_post_evt(eda_pending, VSF_EVT_USER);
         }
+        if (fb_priv->is_closing) {
+            break;
+        }
         // fall through
     case VSF_EVT_INIT:
         if (VSF_ERR_NONE != vsf_eda_trig_wait(&fb_priv->fresh_trigger, vsf_systimer_ms_to_tick(fb_priv->frame_interval_ms))) {
@@ -1831,6 +1835,9 @@ static void __vsf_linux_disp_fresh_task(vsf_eda_t *eda, vsf_evt_t evt)
         // fall through
     case VSF_EVT_TIMER:
     case VSF_EVT_SYNC:
+        if (fb_priv->is_closing) {
+            break;
+        }
         if (VSF_SYNC_PENDING == vsf_eda_sync_get_reason(&fb_priv->fresh_trigger, evt)) {
             break;
         }
@@ -2078,6 +2085,7 @@ static int __vsf_linux_fb_close(vsf_linux_fd_t *sfd)
 
     // wait fresh operation if in progress
     vsf_protect_t orig = vsf_protect_sched();
+    fb_priv->is_closing = true;
     if (fb_priv->is_refreshing) {
         fb_priv->eda_pending = vsf_eda_get_cur();
         vsf_unprotect_sched(orig);
