@@ -2077,7 +2077,6 @@ static int __vsf_linux_fb_close(vsf_linux_fd_t *sfd)
         &&  !fb_priv->is_disp_fb
 #endif
         ) {
-        vsf_eda_fini(&fb_priv->fresh_task.use_as__vsf_eda_t);
         free(fb_priv->front_buffer);
     }
     fb_priv->front_buffer = NULL;
