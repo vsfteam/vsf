@@ -1488,6 +1488,14 @@ VSF_CAL_NO_RETURN void vsf_linux_exit_process(int status, bool _exit)
     }
 #endif
 
+    for (int i = 0; i < dimof(cur_thread->tls); i++) {
+        if ((cur_thread->tls[i].destructor != NULL) && (cur_thread->tls[i].data != NULL)) {
+            cur_thread->tls[i].destructor(cur_thread->tls[i].data);
+            cur_thread->tls[i].destructor = NULL;
+            cur_thread->tls[i].data = NULL;
+        }
+    }
+
     for (int i = 0; i < dimof(process->timers); i++) {
         vsf_callback_timer_remove(&process->timers[i].timer);
     }
@@ -1834,6 +1842,8 @@ void vsf_linux_thread_on_terminate(vsf_linux_thread_t *thread)
     vsf_protect_t orig = vsf_protect_sched();
     vsf_linux_thread_t *thread_pending = thread->thread_pending;
 
+    // vsf_linux_thread_on_terminate will be called in __vsf_eda_on_terminate,
+    //  which is not in linux context, so code below may fail if linux API is called
     for (int i = 0; i < dimof(thread->tls); i++) {
         if ((thread->tls[i].destructor != NULL) && (thread->tls[i].data != NULL)) {
             thread->tls[i].destructor(thread->tls[i].data);
