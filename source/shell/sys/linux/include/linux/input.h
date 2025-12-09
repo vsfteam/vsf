@@ -142,6 +142,7 @@ extern "C" {
 #define KEY_SPACE                   VSF_KB_SPACE
 #define KEY_CAPSLOCK                VSF_KB_CAPSLOCK
 #define KEY_NUMLOCK                 VSF_KP_NUMLOCK
+#define KEY_SCROLLLOCK              VSF_KB_SCROLLLOCK
 #define KEY_F1                      VSF_KB_F1
 #define KEY_F2                      VSF_KB_F2
 #define KEY_F3                      VSF_KB_F3
@@ -216,6 +217,8 @@ extern "C" {
 #define KEY_KPDOT                   VSF_KP_DOT
 #define KEY_KPEQUAL                 VSF_KP_EQUAL
 #define KEY_KPCOMMA                 VSF_KP_COMMA
+#define KEY_KPENTER                 VSF_KP_ENTER
+#define KEY_KPSLASH                 VSF_KP_SLASH
 
 #define KEY_RECORD                  (VSF_KB_USER + 1)
 #define KEY_SETUP                   (VSF_KB_USER + 2)

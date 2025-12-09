@@ -160,6 +160,7 @@ enum {
     VSF_KB_UP               = 82,
     VSF_KP_NUMLOCK          = 83,
     VSF_KP_DIVIDE           = 84,
+    VSF_KP_SLASH            = VSF_KP_DIVIDE,
     VSF_KP_ASTERISK         = 85,
     VSF_KP_MULTIPLY         = VSF_KP_ASTERISK,
     VSF_KP_MINUS            = 86,
