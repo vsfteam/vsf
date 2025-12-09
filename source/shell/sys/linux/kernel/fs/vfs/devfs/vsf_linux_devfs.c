@@ -1793,9 +1793,10 @@ typedef struct vsf_linux_fb_priv_t {
     implement(vsf_linux_fs_priv_t)
     void *front_buffer;
 #if VSF_DISP_USE_FB == ENABLED
-    bool is_disp_fb;
+    uint16_t is_disp_fb : 1;
 #endif
-    bool is_area_set;
+    uint16_t is_area_set : 1;
+    uint16_t is_refreshing : 1;
     int16_t frame_interval_ms;
     vk_disp_area_t area;
     vsf_trig_t fresh_trigger;
@@ -1815,6 +1816,7 @@ static void __vsf_linux_disp_fresh_task(vsf_eda_t *eda, vsf_evt_t evt)
 
     switch (evt) {
     case VSF_EVT_USER:
+        fb_priv->is_refreshing = false;
         if (fb_priv->eda_pending != NULL) {
             vsf_eda_t *eda_pending = fb_priv->eda_pending;
             fb_priv->eda_pending = NULL;
@@ -1833,6 +1835,7 @@ static void __vsf_linux_disp_fresh_task(vsf_eda_t *eda, vsf_evt_t evt)
             break;
         }
 
+        fb_priv->is_refreshing = true;
         if (fb_priv->is_area_set) {
             fb_priv->is_area_set = false;
             vk_disp_refresh(disp, &fb_priv->area, fb_priv->front_buffer);
@@ -2071,6 +2074,19 @@ static ssize_t __vsf_linux_fb_write(vsf_linux_fd_t *sfd, const void *buf, size_t
 static int __vsf_linux_fb_close(vsf_linux_fd_t *sfd)
 {
     vsf_linux_fb_priv_t *fb_priv = (vsf_linux_fb_priv_t *)sfd->priv;
+    VSF_LINUX_ASSERT(NULL == fb_priv->eda_pending);
+
+    // wait fresh operation if in progress
+    vsf_protect_t orig = vsf_protect_sched();
+    if (fb_priv->is_refreshing) {
+        fb_priv->eda_pending = vsf_eda_get_cur();
+        vsf_unprotect_sched(orig);
+        vsf_thread_wfe(VSF_EVT_USER);
+        VSF_LINUX_ASSERT(!fb_priv->is_refreshing);
+    } else {
+        vsf_unprotect_sched(orig);
+    }
+
     vsf_eda_fini(&fb_priv->fresh_task.use_as__vsf_eda_t);
     if (    (fb_priv->front_buffer != NULL)
 #if VSF_DISP_USE_FB == ENABLED
