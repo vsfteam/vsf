@@ -71,23 +71,42 @@ void vsf_linux_tick2timespec(struct timespec *ts, vsf_systimer_tick_t tick)
     ts->tv_nsec = (us % (1000 * 1000)) * 1000;
 }
 
+static inline int64_t __days_from_civil(int64_t y, int64_t m, int64_t d)
+{
+    // convert March-based year/month to algorithmic form
+    y -= m <= 2;
+    const int64_t era = (y >= 0 ? y : y - 399) / 400;
+    const int64_t yoe = y - era * 400;                          // [0, 399]
+    const int64_t mp = m + (m > 2 ? -3 : 9);                    // 0..11
+    const int64_t doy = (153 * mp + 2) / 5 + d - 1;             // [0, 365]
+    const int64_t doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;  // [0, 146096]
+    return era * 146097 + doe - 719468;                         // 719468 = days from 0000-03-01 to 1970-01-01
+}
+
 time_t mktime(struct tm *tm)
 {
-    static const uint16_t __yday_month[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
-    time_t t;
+    if (tm == NULL) {
+        return (time_t)-1;
+    }
+    // basic range checks for month/day (do not normalize here)
+    if (    tm->tm_mon < 0 || tm->tm_mon > 11 || tm->tm_mday < 1 || tm->tm_mday > 31
+        ||  tm->tm_hour < 0 || tm->tm_hour > 23 || tm->tm_min < 0 || tm->tm_min > 59
+        ||  tm->tm_sec < 0 || tm->tm_sec > 60) {
+        return (time_t)-1;
+    }
 
-    // tm_year in struct tm starts from 1900, time_t is calculated from 1970
-    VSF_LINUX_ASSERT(tm->tm_year >= 70);
-    int year = tm->tm_year - 70;
-    int leap_years = year / 4;
-    leap_years -= year / 100;
-    leap_years += (year + 300) / 400;
+    const int64_t year = (int64_t)tm->tm_year + 1900;           // full year
+    const int64_t month = (int64_t)tm->tm_mon + 1;              // 1..12
+    const int64_t day = (int64_t)tm->tm_mday;                   // 1..
 
-    t = year * 365 + leap_years;
-    t += __yday_month[tm->tm_mon] + tm->tm_mday - 1;
-    t *= (time_t)86400;
-    t += (((tm->tm_hour * 60) + tm->tm_min) * 60) + tm->tm_sec;
-    return t;
+    int64_t days = __days_from_civil(year, month, day);
+    int64_t secs = days * 86400 + (int64_t)tm->tm_hour * 3600 + (int64_t)tm->tm_min * 60 + (int64_t)tm->tm_sec;
+
+    // ensure result fits in time_t
+    if ((time_t)secs != secs) {
+        return (time_t)-1;
+    }
+    return (time_t)secs;
 }
 
 time_t time(time_t *t)
