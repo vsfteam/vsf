@@ -1546,7 +1546,7 @@ static int __vsf_linux_input_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg)
             size = vsf_min(size, sizeof(input_priv->led_status));
             memcpy((void *)arg, &input_priv->led_status, size);
         }
-        break;
+        return 0;
     case EVIOCGRAB:
         return 0;
     }
