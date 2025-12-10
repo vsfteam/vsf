@@ -68,6 +68,7 @@ extern "C" {
 #define VSF_ARCH_STACK_PAGE_SIZE        4096
 #define VSF_ARCH_STACK_GUARDIAN_SIZE    4096
 #define VSF_ARCH_PROVIDE_HEAP           ENABLED
+#   define VSF_ARCH_HEAP_HAS_STATISTICS ENABLED
 #define VSF_ARCH_PROVIDE_ARGU           ENABLED
 #define VSF_ARCH_PROVIDE_EXE            ENABLED
 // there will be memory allocation before entering vsf.

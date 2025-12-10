@@ -1262,6 +1262,14 @@ uint_fast32_t vsf_arch_heap_size(void *buffer)
     return mcb->memory_size;
 }
 
+void vsf_arch_heap_statistics(vsf_arch_heap_statistics_t *statistics)
+{
+    HEAP_SUMMARY summary = { .cb = sizeof(summary) };
+    HeapSummary(GetProcessHeap(), 0, &summary);
+    statistics->all_size = summary.cbMaxReserve;
+    statistics->used_size = summary.cbAllocated;
+}
+
 /*----------------------------------------------------------------------------*
  * Execute                                                                    *
  *----------------------------------------------------------------------------*/
