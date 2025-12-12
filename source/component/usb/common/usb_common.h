@@ -78,8 +78,12 @@ typedef enum usb_pid_t {
 
 enum usb_dir_t {
     USB_DIR_MASK                = 0x80,
+#ifndef USB_DIR_OUT
     USB_DIR_OUT                 = 0x00,     /* to device */
+#endif
+#ifndef USB_DIR_IN
     USB_DIR_IN                  = 0x80,     /* to host */
+#endif
 };
 
 typedef struct usb_ctrlrequest_t {
@@ -94,19 +98,42 @@ typedef struct usb_ctrlrequest_t {
 } VSF_CAL_PACKED usb_ctrlrequest_t;
 
 enum usb_req_t {
+#ifndef USB_REQ_GET_STATUS
     USB_REQ_GET_STATUS          = 0x00,
+#endif
+#ifndef USB_REQ_CLEAR_FEATURE
     USB_REQ_CLEAR_FEATURE       = 0x01,
+#endif
+#ifndef USB_REQ_SET_FEATURE
     USB_REQ_SET_FEATURE         = 0x03,
+#endif
+#ifndef USB_REQ_SET_ADDRESS
     USB_REQ_SET_ADDRESS         = 0x05,
+#endif
+#ifndef USB_REQ_GET_DESCRIPTOR
     USB_REQ_GET_DESCRIPTOR      = 0x06,
+#endif
+#ifndef USB_REQ_SET_DESCRIPTOR
     USB_REQ_SET_DESCRIPTOR      = 0x07,
+#endif
+#ifndef USB_REQ_GET_CONFIGURATION
     USB_REQ_GET_CONFIGURATION   = 0x08,
+#endif
+#ifndef USB_REQ_SET_CONFIGURATION
     USB_REQ_SET_CONFIGURATION   = 0x09,
+#endif
+#ifndef USB_REQ_GET_INTERFACE
     USB_REQ_GET_INTERFACE       = 0x0A,
+#endif
+#ifndef USB_REQ_SET_INTERFACE
     USB_REQ_SET_INTERFACE       = 0x0B,
+#endif
+#ifndef USB_REQ_SYNCH_FRAME
     USB_REQ_SYNCH_FRAME         = 0x0C,
+#endif
 };
 
+#ifndef USB_TYPE_MASK
 enum usb_req_type_t {
     USB_TYPE_MASK               = (0x03 << 5),
     USB_TYPE_STANDARD           = (0x00 << 5),
@@ -114,7 +141,9 @@ enum usb_req_type_t {
     USB_TYPE_VENDOR             = (0x02 << 5),
     USB_TYPE_RESERVED           = (0x03 << 5),
 };
+#endif
 
+#ifndef USB_RECIP_MASK
 enum usb_req_recip_t {
     USB_RECIP_MASK              = 0x1F,
     USB_RECIP_DEVICE            = 0x00,
@@ -125,6 +154,7 @@ enum usb_req_recip_t {
     USB_RECIP_PORT              = 0x04,
     USB_RECIP_RPIPE             = 0x05,
 };
+#endif
 
 enum usb_class_t {
     USB_CLASS_PER_INTERFACE     = 0,    /* for DeviceClass */
@@ -149,14 +179,30 @@ enum usb_class_t {
 };
 
 enum usb_desc_type_t {
+#ifndef USB_DT_DEVICE
     USB_DT_DEVICE               = 0x01,
+#endif
+#ifndef USB_DT_CONFIG
     USB_DT_CONFIG               = 0x02,
+#endif
+#ifndef USB_DT_STRING
     USB_DT_STRING               = 0x03,
+#endif
+#ifndef USB_DT_INTERFACE
     USB_DT_INTERFACE            = 0x04,
+#endif
+#ifndef USB_DT_ENDPOINT
     USB_DT_ENDPOINT             = 0x05,
+#endif
+#ifndef USB_DT_DEVICE_QUALIFIER
     USB_DT_DEVICE_QUALIFIER     = 0x06,
+#endif
+#ifndef USB_DT_OTHER_SPEED_CONFIG
     USB_DT_OTHER_SPEED_CONFIG   = 0x07,
+#endif
+#ifndef USB_DT_INTERFACE_POWER
     USB_DT_INTERFACE_POWER      = 0x08,
+#endif
     USB_DT_INTERFACE_ASSOCIATION= 0x0b,
     USB_DT_BOS                  = 0x0f,
     USB_DT_DEVICE_CAPABILITY    = 0x10,
@@ -224,8 +270,12 @@ enum usb_config_desc_att_t {
 };
 
 enum usb_feature_t {
+#ifndef USB_DEVICE_SELF_POWERED
     USB_DEVICE_SELF_POWERED     = 0,            /* (read only) */
+#endif
+#ifndef USB_DEVICE_REMOTE_WAKEUP
     USB_DEVICE_REMOTE_WAKEUP    = 1,            /* dev may initiate wakeup */
+#endif
 };
 
 typedef struct usb_interface_desc_t {
@@ -270,11 +320,24 @@ typedef struct usb_interface_assoc_desc_t {
 
 typedef enum usb_device_speed_t {
     USB_SPEED_UNKNOWN = 0,          /* enumerating */
-    USB_SPEED_LOW, USB_SPEED_FULL,  /* usb 1.1 */
+#ifndef USB_SPEED_LOW
+    USB_SPEED_LOW,                  /* usb 1.1 */
+#endif
+#ifndef USB_SPEED_FULL
+    USB_SPEED_FULL,                 /* usb 1.1 */
+#endif
+#ifndef USB_SPEED_HIGH
     USB_SPEED_HIGH,                 /* usb 2.0 */
+#endif
+#ifndef USB_SPEED_WIRELESS
     USB_SPEED_WIRELESS,             /* wireless (usb 2.5) */
+#endif
+#ifndef USB_SPEED_SUPER
     USB_SPEED_SUPER,                /* usb 3.0 */
+#endif
+#ifndef USB_SPEED_SUPER_PLUS
     USB_SPEED_SUPER_PLUS,           /* usb 3.1 */
+#endif
 } usb_device_speed_t;
 
 enum usb_endpoint_sync_t {
