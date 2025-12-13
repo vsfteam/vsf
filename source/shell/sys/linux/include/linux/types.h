@@ -102,6 +102,11 @@ struct hlist_node {
 
 #define ARRAY_SIZE(__ARR)       dimof(__ARR)
 
+#if VSF_COMPATIBILITY != ENABLED && !defined(container_of)
+//  linux need container_of
+#   define container_of         vsf_container_of
+#endif
+
 // some compiler does not support typeof
 #define roundup(__x, __y) ({                                                    \
     (((__x) + ((__y) - 1)) / (__y)) * (__y);                                    \
