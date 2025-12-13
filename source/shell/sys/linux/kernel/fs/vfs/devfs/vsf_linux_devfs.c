@@ -1116,8 +1116,8 @@ typedef struct vsf_linux_input_priv_t {
                 VSF_LINUX_MOUSE_MODE_EXPLORERPS2,   // NOT SUPPORTED, 8 buttons, x, y
             } mode;
             uint8_t button;
-            uint16_t x, y;
             bool sampled;
+            int16_t x, y;
             float sensitivity;
         } mouse;
 #if VSF_LINUX_USE_TERMINAL_KEYBOARD == ENABLED
@@ -1406,7 +1406,7 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
     case VSF_INPUT_TYPE_MOUSE:
         if (input_priv->is_extend) {
             int8_t mousebuffer[4] = { 0 };
-            uint16_t tmpx, tmpy;
+            int16_t tmpx, tmpy;
             bool valid = false;
 
             switch (vsf_input_mouse_evt_get(evt)) {
@@ -1429,9 +1429,13 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
                 tmpy = vsf_input_mouse_evt_get_y(evt);
                 if (!input_priv->mouse.sampled) {
                     input_priv->mouse.sampled = true;
-                } else {
+                } else if (vsf_input_mouse_is_absolute(evt)) {
                     mousebuffer[1] = tmpx - input_priv->mouse.x;
                     mousebuffer[2] = -(tmpy - input_priv->mouse.y);
+                    valid = true;
+                } else {
+                    mousebuffer[1] = tmpx;
+                    mousebuffer[2] = -tmpy;
                     valid = true;
                 }
                 input_priv->mouse.x = tmpx;
@@ -1456,6 +1460,7 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
                 }
             }
         } else {
+            bool is_absolute = vsf_input_mouse_is_absolute(evt);
             switch (vsf_input_mouse_evt_get(evt)) {
             case VSF_INPUT_MOUSE_EVT_BUTTON:
                 input_event.code = BTN_MOUSE + vsf_input_mouse_evt_button_get(evt);
@@ -1464,12 +1469,12 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
                 __vsf_linux_input_push(input_priv, &input_event);
                 // fall through
             case VSF_INPUT_MOUSE_EVT_MOVE:
-                input_event.code = ABS_X;
+                input_event.code = is_absolute ? ABS_X : REL_X;
                 input_event.value = vsf_input_mouse_evt_get_x(evt);
                 input_event.type = EV_ABS;
                 __vsf_linux_input_push(input_priv, &input_event);
 
-                input_event.code = ABS_Y;
+                input_event.code = is_absolute ? ABS_Y : REL_Y;
                 input_event.value = vsf_input_mouse_evt_get_y(evt);
                 input_event.type = EV_ABS;
                 __vsf_linux_input_push(input_priv, &input_event);

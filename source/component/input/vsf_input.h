@@ -170,6 +170,7 @@ extern void vsf_input_on_sensor(vk_sensor_evt_t *sensor_evt);
 extern void vsf_input_on_touchscreen(vk_touchscreen_evt_t *ts_evt);
 extern void vsf_input_on_gamepad(vk_gamepad_evt_t *gamepad_evt);
 extern void vsf_input_on_keyboard(vk_keyboard_evt_t *keyboard_evt);
+extern void vsf_input_on_mouse(vk_mouse_evt_t *mouse_evt);
 
 extern void vsf_input_on_new_dev(vk_input_type_t type, void *dev);
 extern void vsf_input_on_free_dev(vk_input_type_t type, void *dev);

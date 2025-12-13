@@ -148,8 +148,7 @@ void input_event(struct input_dev *dev, unsigned int type, unsigned int code, in
         }
 
         if ((code >= BTN_MOUSE) && (code <= BTN_MOUSE_MAX)) {
-            // TODO: mouse event in vsf uses absolute position, but linux use relative position
-//            vsf_input_mouse_evt_button_set(&evt.mouse_evt, code - BTN_MOUSE, !!value, 0, 0);
+            vsf_input_mouse_evt_button_set(&evt.mouse_evt, code - BTN_MOUSE, !!value, 0, 0, VSF_INPUT_MOUSE_RELATIVE);
         } else if ((code >= BTN_GAMEPAD) && (code <= BTN_GAMEPAD_MAX)) {
             evt.gamepad_evt.info.item = code - BTN_GAMEPAD;
             evt.gamepad_evt.cur.bit = !!value;
@@ -180,6 +179,20 @@ void input_event(struct input_dev *dev, unsigned int type, unsigned int code, in
         dev->rel_msk |= 1ULL << code;
         orig_value = dev->rel_value[code];
         dev->rel_value[code] = value;
+
+        if (dev->notifier.mask & (1 << VSF_INPUT_TYPE_MOUSE)) {
+            if (REL_X == code) {
+                vsf_input_mouse_evt_move_set(&evt.mouse_evt, value, 0, VSF_INPUT_MOUSE_RELATIVE);
+            } else if (REL_Y == code) {
+                vsf_input_mouse_evt_move_set(&evt.mouse_evt, 0, value, VSF_INPUT_MOUSE_RELATIVE);
+            } else if (REL_WHEEL == code) {
+                vsf_input_mouse_evt_wheel_set(&evt.mouse_evt, 0, value);
+            } else if (REL_HWHEEL == code) {
+                vsf_input_mouse_evt_wheel_set(&evt.mouse_evt, value, 0);
+            }
+            vsf_input_on_mouse(&evt.mouse_evt);
+        }
+        break;
     case EV_ABS:
         if (!dev->absinfo) {
             break;

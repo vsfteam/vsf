@@ -28,29 +28,40 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+#define VSF_INPUT_MOUSE_RELATIVE        1
+#define VSF_INPUT_MOUSE_ABSOLUTE        0
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
-#define vsf_input_mouse_evt_move_set(__evt,__x, __y)                            \
+#define vsf_input_mouse_evt_move_set(__evt,__x, __y, __abs0_rel1)               \
             do {                                                                \
-                (__evt)->id = VSF_INPUT_MOUSE_EVT_MOVE;                         \
+                (__evt)->id = VSF_INPUT_MOUSE_EVT_MOVE | ((__abs0_rel1) << 16); \
                 (__evt)->cur.valu32 = ((__x) | ((__y) << 16));                  \
             } while (0)
 
+// wheel is relative value
 #define vsf_input_mouse_evt_wheel_set(__evt, __x, __y)                          \
             do {                                                                \
-                (__evt)->id = VSF_INPUT_MOUSE_EVT_WHEEL;                        \
+                (__evt)->id = VSF_INPUT_MOUSE_EVT_WHEEL | (1 << 16);            \
                 (__evt)->cur.valu32 = ((__x) | ((__y) << 16));                  \
             } while (0)
 
-#define vsf_input_mouse_evt_button_set(__evt, __button, __is_down, __x, __y)    \
+#define vsf_input_mouse_evt_button_set(__evt, __button, __is_down, __x, __y, __abs0_rel1)\
             do {                                                                \
-                (__evt)->id = VSF_INPUT_MOUSE_EVT_BUTTON | ((__button) << 8) | ((__is_down) << 12);\
+                (__evt)->id =   VSF_INPUT_MOUSE_EVT_BUTTON                      \
+                            |   ((__button) << 8) | ((__is_down) << 12)         \
+                            |   ((__abs0_rel1) << 16);                          \
                 (__evt)->cur.valu32 = ((__x) | ((__y) << 16));                  \
             } while (0)
 
 // result is VSF_INPUT_MOUSE_EVT_(MOVE/BUTTON/WHEEL)
 #define vsf_input_mouse_evt_get(__evt)                                          \
             ((__evt)->id & 0xFF)
+#define vsf_input_mouse_is_relative(__evt)                                       \
+            (!!(((__evt)->id >> 16) & 1))
+#define vsf_input_mouse_is_absolute(__evt)                                       \
+            (!vsf_input_mouse_is_relative(__evt))
 
 // for button events
 #define vsf_input_mouse_evt_button_get(__evt)                                   \

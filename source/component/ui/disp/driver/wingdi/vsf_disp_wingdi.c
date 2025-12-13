@@ -407,10 +407,10 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
         case VSF_INPUT_TYPE_MOUSE:
             switch (mouse_evt) {
             case VSF_INPUT_MOUSE_EVT_BUTTON:
-                vsf_input_mouse_evt_button_set(&evt.mouse_evt, mouse_button, is_down, x, y);
+                vsf_input_mouse_evt_button_set(&evt.mouse_evt, mouse_button, is_down, x, y, VSF_INPUT_MOUSE_ABSOLUTE);
                 break;
             case VSF_INPUT_MOUSE_EVT_MOVE:
-                vsf_input_mouse_evt_move_set(&evt.mouse_evt, x, y);
+                vsf_input_mouse_evt_move_set(&evt.mouse_evt, x, y, VSF_INPUT_MOUSE_ABSOLUTE);
                 break;
             case VSF_INPUT_MOUSE_EVT_WHEEL:
                 vsf_input_mouse_evt_wheel_set(&evt.mouse_evt, wheel_x, wheel_y);
