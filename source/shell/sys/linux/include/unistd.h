@@ -8,6 +8,7 @@
 //#   include "./linux/limits.h"
 #   include "./sys/types.h"
 #   include "./sys/select.h"
+#   include "./linux/bitops.h"
 #   include "./pwd.h"
 
 // avoid compiler.h in vsf.h include c headers
@@ -21,6 +22,7 @@
 //#   include <linux/limits.h>
 #   include <sys/types.h>
 #   include <sys/select.h>
+#   include <linux/bitops.h>
 #   include <pwd.h>
 #endif
 
