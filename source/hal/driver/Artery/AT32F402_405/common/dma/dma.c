@@ -113,6 +113,13 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_acquire)(
 ) {
     VSF_HAL_ASSERT(NULL != dma_ptr);
     VSF_HAL_ASSERT(channel_hint_ptr != NULL);
+
+    // Call adjust_hint to allow application to adjust channel_hint_ptr (e.g., priority) before acquisition
+    vsf_err_t err = VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_acquire_adjust_hint)(dma_ptr, channel_hint_ptr);
+    if (err != VSF_ERR_NONE) {
+        return err;
+    }
+
     int8_t channel;
 
     vsf_protect_t orig = vsf_protect_int();
