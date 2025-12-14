@@ -189,6 +189,7 @@ typedef enum vsf_dma_irq_mask_t {
 typedef struct vsf_dma_channel_hint_t {
     int8_t channel;
     uint8_t request_line;
+    vsf_arch_prio_t prio;
 
     // more vendor specified channel hint can be added here
 } vsf_dma_channel_hint_t;

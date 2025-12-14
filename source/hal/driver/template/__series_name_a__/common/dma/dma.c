@@ -110,6 +110,14 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_acquire)(
     vsf_dma_channel_hint_t *channel_hint_ptr
 ) {
     VSF_HAL_ASSERT(NULL != dma_ptr);
+    VSF_HAL_ASSERT(NULL != channel_hint_ptr);
+
+    // Call adjust_hint to allow application to adjust channel_hint_ptr (e.g., priority) before acquisition
+    vsf_err_t err = VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_acquire_adjust_hint)(dma_ptr, channel_hint_ptr);
+    if (err != VSF_ERR_NONE) {
+        return err;
+    }
+
     // Use channel_hint_ptr to select appropriate channel
     // For template implementation, just assign channel 0 and return success
     if (channel_hint_ptr != NULL) {
@@ -134,11 +142,13 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_config)(
 
     // configure DMA channel according to cfg_ptr->mode, cfg_ptr->isr, etc.
     // if cfg_ptr->isr.handler_fn != NULL, enable interrupt:
-    //     VSF_HAL_ASSERT(cfg_ptr->prio != vsf_arch_prio_invalid);
-    //     if (cfg_ptr->prio == vsf_arch_prio_invalid) {
-    //         return VSF_ERR_INVALID_PARAMETER;
+    //     vsf_arch_prio_t prio = cfg_ptr->prio;
+    //     if (prio == vsf_arch_prio_invalid) {
+    //         // Use default priority from vsf_dma_cfg_t (set during vsf_dma_init())
+    //         // Retrieve default priority from DMA instance configuration
+    //         // prio = dma_ptr->default_prio;  // or get from configuration
     //     }
-    //     NVIC_SetPriority(irqn, cfg_ptr->prio);
+    //     NVIC_SetPriority(irqn, prio);
     //     NVIC_EnableIRQ(irqn);
 
     return VSF_ERR_NONE;

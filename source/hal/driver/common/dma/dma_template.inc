@@ -26,6 +26,8 @@
 #define vsf_real_dma_channel_get_configuration              VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_get_configuration)
 #define vsf_real_dma_channel_sg_config_desc                 VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_sg_config_desc)
 #define vsf_real_dma_channel_sg_start                       VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_sg_start)
+#define vsf_real_dma_channel_acquire_from_all               VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_acquire_from_all)
+#define vsf_real_dma_channel_acquire_adjust_hint            VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_acquire_adjust_hint)
 
 #ifndef VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY
 #   define  VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY          DISABLED
@@ -44,7 +46,13 @@
 #endif
 
 #ifndef VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION
-#   define VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION DISABLED
+#   define VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION    \
+                                                            DISABLED
+#endif
+
+#ifndef VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_ACQUIRE_FROM_ALL
+#   define VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_ACQUIRE_FROM_ALL     \
+                                                            DISABLED
 #endif
 
 #ifdef VSF_DMA_CFG_IMP_REMAP_PREFIX
@@ -157,11 +165,71 @@ vsf_err_t vsf_real_dma_channel_get_configuration(vsf_real_dma_t *dma_ptr, uint8_
 }
 #endif
 
+#ifndef VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_ACQUIRE_ADJUST_HINT
+#   define VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_ACQUIRE_ADJUST_HINT    DISABLED
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_ACQUIRE_ADJUST_HINT == DISABLED
+/**
+ * \~english
+ * @brief Adjust DMA channel hint before channel acquisition (weak implementation)
+ * @param[in] dma_ptr: a pointer to structure @ref vsf_dma_t
+ * @param[in,out] channel_hint_ptr: a pointer to DMA channel hint that can be adjusted
+ * @return vsf_err_t: Returns VSF_ERR_NONE to continue with acquisition
+ * @note This is a weak implementation. Applications can override this function to adjust
+ *       channel_hint_ptr (especially the priority field) before channel acquisition.
+ *       The default implementation does nothing and returns VSF_ERR_NONE.
+ * @note This function is called by @ref vsf_dma_channel_acquire() implementation
+ *       (e.g., in dma.c files) before the actual channel acquisition logic.
+ *
+ * \~chinese
+ * @brief 在通道获取前调整 DMA 通道提示（弱实现）
+ * @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
+ * @param[in,out] channel_hint_ptr: 指向可调整的 DMA 通道提示的指针
+ * @return vsf_err_t: 返回 VSF_ERR_NONE 继续获取通道
+ * @note 这是一个弱实现。应用可以重写此函数来调整 channel_hint_ptr（特别是优先级字段），
+ *       然后再进行实际的通道获取。
+ *       默认实现不做任何操作并返回 VSF_ERR_NONE。
+ * @note 此函数由 @ref vsf_dma_channel_acquire() 的实现（例如在 dma.c 文件中）调用，
+ *       在实际的通道获取逻辑之前调用。
+ */
+VSF_CAL_WEAK(vsf_real_dma_channel_acquire_adjust_hint)
+vsf_err_t vsf_real_dma_channel_acquire_adjust_hint(vsf_real_dma_t *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr)
+{
+    (void)dma_ptr;
+    (void)channel_hint_ptr;
+    // Default implementation: do nothing, continue with acquisition
+    return VSF_ERR_NONE;
+}
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_ACQUIRE_FROM_ALL == DISABLED
+vsf_dma_t * vsf_real_dma_channel_acquire_from_all(vsf_dma_channel_hint_t *channel_hint_ptr)
+{
+    VSF_HAL_ASSERT(channel_hint_ptr != NULL);
+
+#   define require_dma_channel(_idx, _hint_ptr)                                             \
+        if (VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_acquire)(                     \
+            &VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma, _idx), _hint_ptr) == VSF_ERR_NONE) {\
+            return (vsf_dma_t *)&VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma, _idx);          \
+        }
+
+#   define __VSF_HAL_TEMPLATE_MASK                         VSF_MCONNECT(VSF_DMA_CFG_IMP_UPCASE_PREFIX, _DMA_MASK)
+#   define __VSF_HAL_TEMPLATE_MACRO                        require_dma_channel
+#   define __VSF_HAL_TEMPLATE_ARG                          channel_hint_ptr
+#   include "hal/driver/common/template/vsf_template_instance_mask.h"
+
+    return NULL;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_DMA_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION
+#undef VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_ACQUIRE_ADJUST_HINT
+#undef VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_ACQUIRE_FROM_ALL
 #undef VSF_DMA_CFG_CAPABILITY_IRQ_MASK
 #undef VSF_DMA_CFG_CAPABILITY_CHANNEL_COUNT
 #undef VSF_DMA_CFG_CAPABILITY_IRQ_COUNT
@@ -173,6 +241,10 @@ vsf_err_t vsf_real_dma_channel_get_configuration(vsf_real_dma_t *dma_ptr, uint8_
 #undef vsf_real_dma_capability
 #undef vsf_real_dma_get_configuration
 #undef vsf_real_dma_channel_get_configuration
+#undef vsf_real_dma_channel_sg_config_desc
+#undef vsf_real_dma_channel_sg_start
+#undef vsf_real_dma_channel_acquire_from_all
+#undef vsf_real_dma_channel_acquire_adjust_hint
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/

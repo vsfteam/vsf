@@ -446,12 +446,17 @@ enum {
 /**
  * \~english
  * @brief Configuration structure for DMA.
+ * @note The prio field specifies the default interrupt priority for all DMA channels.
+ *       This default priority will be used when channel-specific priority is not specified
+ *       or when channels share the same interrupt.
  *
  * \~chinese
  * @brief DMA 的配置结构体。
+ * @note prio 字段指定所有 DMA 通道的默认中断优先级。
+ *       当未指定通道特定优先级或通道共享同一中断时，将使用此默认优先级。
  */
 typedef struct vsf_dma_cfg_t {
-    vsf_arch_prio_t         prio;
+    vsf_arch_prio_t         prio;   //!< \~english Default interrupt priority for DMA channels \~chinese DMA 通道的默认中断优先级
 } vsf_dma_cfg_t;
 #endif
 
@@ -469,15 +474,37 @@ typedef struct vsf_dma_cfg_t {
  */
 typedef struct vsf_dma_channel_hint_t {
     //! \~english Specify the DMA channel number. Use negative value (e.g., -1) for automatic allocation.
-    //!           (Some chips have fixed functionality configurations for DMA channels)
+    //! \~english (Some chips have fixed functionality configurations for DMA channels)
+    //! \~english Channel allocation modes:
+    //! \~english - Dynamic allocation: Call vsf_dma_channel_acquire() to acquire a channel. Use vsf_dma_channel_release() to free it.
+    //! \~english - Static allocation: For chips where channels are fixed to peripherals, vsf_dma_channel_acquire() is not needed.
+    //! \~english   Channel information (channel number, request line, etc.) is defined in device.h, and priority can be configured via vsf_dma_channel_config().
     //! \~chinese 指定具体的DMA通道号。使用负值（如 -1）表示自动分配。
-    //!           （部分芯片中DMA通道具有固定的功能配置）
+    //! \~chinese （部分芯片中DMA通道具有固定的功能配置）
+    //! \~chinese 通道分配模式：
+    //! \~chinese - 动态分配：调用 vsf_dma_channel_acquire() 获取通道。使用 vsf_dma_channel_release() 释放通道。
+    //! \~chinese - 静态分配：对于通道固定绑定到外设的芯片，不需要调用 vsf_dma_channel_acquire()。
+    //! \~chinese   通道信息（通道号、请求线等）在 device.h 中定义，优先级可以通过 vsf_dma_channel_config() 配置。
     int8_t channel;
     //! \~english Peripheral request line number, specifying the peripheral request source using DMA service.
     //! \~english (Some chips provide a mapping table between peripherals and request lines, refer to chip manual to select the correct request line number).
     //! \~chinese 外设请求线编号，指定使用DMA服务的外设请求源。
     //! \~chinese （部分芯片会提供外设和请求线的对应表，需根据芯片手册选择正确的请求线编号）。
     uint8_t request_line;
+    //! \~english Optional interrupt priority for channel allocation.
+    //! \~english Priority handling behavior:
+    //! \~english - If prio is vsf_arch_prio_invalid: Use default priority from vsf_dma_cfg_t (set during vsf_dma_init()).
+    //! \~english - If prio is valid and DMA supports per-channel independent interrupts: Configure this priority during channel allocation.
+    //! \~english - If prio is valid and multiple channels share the same interrupt: Driver should check if the requested priority matches
+    //! \~english   the existing shared interrupt priority. If matched, allocate a channel from the shared interrupt group.
+    //! \~english   If not matched and no compatible channel is available, return VSF_ERR_NOT_AVAILABLE.
+    //! \~chinese 通道分配的可选中断优先级。
+    //! \~chinese 优先级处理行为：
+    //! \~chinese - 如果 prio 是 vsf_arch_prio_invalid：使用 vsf_dma_cfg_t 中的默认优先级（在 vsf_dma_init() 时设置）。
+    //! \~chinese - 如果 prio 有效且 DMA 支持每通道独立中断：在通道分配时配置此优先级。
+    //! \~chinese - 如果 prio 有效且多个通道共享同一中断：驱动应检查请求的优先级是否与现有共享中断的优先级匹配。
+    //! \~chinese   如果匹配，从共享中断组中分配通道；如果不匹配且没有兼容的通道可用，返回 VSF_ERR_NOT_AVAILABLE。
+    vsf_arch_prio_t         prio;
 } vsf_dma_channel_hint_t;
 #endif
 
@@ -518,9 +545,23 @@ typedef struct vsf_dma_channel_cfg_t {
     //! \~chinese 可以使用按位或操作组合多个中断类型
     vsf_dma_irq_mask_t      irq_mask;
     //! \~english Interrupt priority for this channel. Use vsf_arch_prio_invalid to use default priority from vsf_dma_cfg_t.
-    //!           Only effective when hardware supports per-channel or per-group interrupt priority configuration.
+    //! \~english This field is only effective when hardware supports per-channel independent interrupt priority configuration.
+    //! \~english For chips where multiple channels share the same interrupt, modifying priority in channel_config
+    //!           may affect other channels sharing the same interrupt, and the behavior is implementation-defined.
+    //! \~english If priority was set during channel_acquire, this field can be used to dynamically adjust priority
+    //!           at runtime (only for per-channel independent interrupt scenarios).
+    //! \~english For static allocation (channels fixed to peripherals, channel_acquire() is not needed):
+    //! \~english - Priority can be configured via channel_config() at runtime (if hardware supports dynamic priority adjustment).
+    //! \~english - If priority is not configured via channel_config(), the default priority from vsf_dma_cfg_t will be used.
     //! \~chinese 此通道的中断优先级。使用 vsf_arch_prio_invalid 表示使用 vsf_dma_cfg_t 中的默认优先级。
-    //!           仅在硬件支持每通道或每组中断独立优先级配置时生效。
+    //! \~chinese 此字段仅在硬件支持每通道独立中断优先级配置时生效。
+    //! \~chinese 对于多个通道共享同一中断的芯片，在 channel_config 中修改优先级可能会影响共享同一中断的其他通道，
+    //!           具体行为由实现定义。
+    //! \~chinese 如果优先级在 channel_acquire 时已设置，此字段可用于在运行时动态调整优先级
+    //!           （仅适用于每通道独立中断的场景）。
+    //! \~chinese 对于静态分配（通道固定绑定到外设，不需要调用 channel_acquire()）：
+    //! \~chinese - 优先级可以通过 channel_config() 在运行时配置（如果硬件支持动态优先级调整）。
+    //! \~chinese - 如果未通过 channel_config() 配置优先级，将使用 vsf_dma_cfg_t 中的默认优先级。
     vsf_arch_prio_t         prio;
     //! \~english DMA peripheral request signal index for source side
     //! \~english This is the hardware-specific request signal ID used for DMA handshaking
@@ -537,6 +578,106 @@ typedef struct vsf_dma_channel_cfg_t {
     //! \~chinese 仅当目标端为外设时有效（内存目标时忽略）
     uint8_t                 dst_request_idx;
 } vsf_dma_channel_cfg_t;
+#endif
+
+/*============================ INITIALIZATION MACROS =========================*/
+
+// Helper macro for optional argument with default value
+#ifndef __VSF_DMA_GET_ARG_OR_DEFAULT
+#   define __VSF_DMA_GET_ARG_OR_DEFAULT(__DEFAULT, __ARG, ...) (__ARG)
+#endif
+
+/**
+ * \~english
+ * @brief Initialize vsf_dma_channel_hint_t structure with default values
+ * @param[in] __CHANNEL: Channel number (use negative value for automatic allocation)
+ * @param[in] __REQUEST_LINE: Peripheral request line number
+ * @param[in] ...: Optional interrupt priority. If not provided, defaults to vsf_arch_prio_invalid.
+ * @note Use this macro to ensure proper initialization, especially for vsf_arch_prio_t
+ *       which may have non-zero invalid value (vsf_arch_prio_invalid = -1).
+ * @note If priority is not specified, it will default to vsf_arch_prio_invalid.
+ *
+ * @example
+ * // Automatic channel allocation without priority
+ * vsf_dma_channel_hint_t hint1 = VSF_DMA_CHANNEL_HINT_INIT(-1, 5);
+ *
+ * // Specific channel number without priority
+ * vsf_dma_channel_hint_t hint2 = VSF_DMA_CHANNEL_HINT_INIT(3, 10);
+ *
+ * // Automatic channel allocation with priority
+ * vsf_arch_prio_t test_prio = 2;
+ * vsf_dma_channel_hint_t hint3 = VSF_DMA_CHANNEL_HINT_INIT(-1, 7, test_prio);
+ *
+ * // Specific channel with priority
+ * vsf_dma_channel_hint_t hint4 = VSF_DMA_CHANNEL_HINT_INIT(5, 12, 1);
+ *
+ * \~chinese
+ * @brief 使用默认值初始化 vsf_dma_channel_hint_t 结构体
+ * @param[in] __CHANNEL: 通道号（使用负值表示自动分配）
+ * @param[in] __REQUEST_LINE: 外设请求线编号
+ * @param[in] ...: 可选的中断优先级。如果不提供，默认为 vsf_arch_prio_invalid。
+ * @note 使用此宏确保正确初始化，特别是对于 vsf_arch_prio_t，
+ *       其无效值可能不是 0（vsf_arch_prio_invalid = -1）。
+ * @note 如果未指定优先级，将默认为 vsf_arch_prio_invalid。
+ *
+ * @example
+ * // 自动通道分配，不指定优先级
+ * vsf_dma_channel_hint_t hint1 = VSF_DMA_CHANNEL_HINT_INIT(-1, 5);
+ *
+ * // 指定通道号，不指定优先级
+ * vsf_dma_channel_hint_t hint2 = VSF_DMA_CHANNEL_HINT_INIT(3, 10);
+ *
+ * // 自动通道分配，指定优先级
+ * vsf_arch_prio_t test_prio = 2;
+ * vsf_dma_channel_hint_t hint3 = VSF_DMA_CHANNEL_HINT_INIT(-1, 7, test_prio);
+ *
+ * // 指定通道号，指定优先级
+ * vsf_dma_channel_hint_t hint4 = VSF_DMA_CHANNEL_HINT_INIT(5, 12, 1);
+ */
+#ifndef VSF_DMA_CHANNEL_HINT_INIT
+#   define VSF_DMA_CHANNEL_HINT_INIT(__CHANNEL, __REQUEST_LINE, ...) \
+    { \
+        .channel = (__CHANNEL), \
+        .request_line = (__REQUEST_LINE), \
+        .prio = __VSF_DMA_GET_ARG_OR_DEFAULT(,##__VA_ARGS__, vsf_arch_prio_invalid, vsf_arch_prio_invalid), \
+    }
+#endif
+
+/**
+ * \~english
+ * @brief Initialize vsf_dma_channel_cfg_t structure with default values
+ * @param[in] __MODE: DMA channel mode
+ * @param[in] __ISR: Interrupt service routine configuration
+ * @param[in] __IRQ_MASK: Interrupt mask
+ * @param[in] __SRC_REQ_IDX: Source request index
+ * @param[in] __DST_REQ_IDX: Destination request index
+ * @param[in] ...: Optional interrupt priority. If not provided, defaults to vsf_arch_prio_invalid.
+ * @note Use this macro to ensure proper initialization, especially for vsf_arch_prio_t
+ *       which may have non-zero invalid value (vsf_arch_prio_invalid = -1).
+ * @note If priority is not specified, it will default to vsf_arch_prio_invalid.
+ *
+ * \~chinese
+ * @brief 使用默认值初始化 vsf_dma_channel_cfg_t 结构体
+ * @param[in] __MODE: DMA 通道模式
+ * @param[in] __ISR: 中断服务例程配置
+ * @param[in] __IRQ_MASK: 中断掩码
+ * @param[in] __SRC_REQ_IDX: 源请求索引
+ * @param[in] __DST_REQ_IDX: 目标请求索引
+ * @param[in] ...: 可选的中断优先级。如果不提供，默认为 vsf_arch_prio_invalid。
+ * @note 使用此宏确保正确初始化，特别是对于 vsf_arch_prio_t，
+ *       其无效值可能不是 0（vsf_arch_prio_invalid = -1）。
+ * @note 如果未指定优先级，将默认为 vsf_arch_prio_invalid。
+ */
+#ifndef VSF_DMA_CHANNEL_CFG_INIT
+#   define VSF_DMA_CHANNEL_CFG_INIT(__MODE, __ISR, __IRQ_MASK, __SRC_REQ_IDX, __DST_REQ_IDX, ...) \
+    { \
+        .mode = (__MODE), \
+        .isr = (__ISR), \
+        .irq_mask = (__IRQ_MASK), \
+        .prio = __VSF_DMA_GET_ARG_OR_DEFAULT(,##__VA_ARGS__, vsf_arch_prio_invalid, vsf_arch_prio_invalid), \
+        .src_request_idx = (__SRC_REQ_IDX), \
+        .dst_request_idx = (__DST_REQ_IDX), \
+    }
 #endif
 
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG == DISABLED
@@ -720,11 +861,15 @@ extern vsf_dma_capability_t vsf_dma_capability(vsf_dma_t *dma_ptr);
  @param[in,out] channel_hint_ptr: a pointer to DMA channel hint. User should provide appropriate hint information based on actual requirements. If the actually allocated channel or other configuration differs from user's expectation, the function may modify channel_hint_ptr to notify the user of the actual allocation. The allocated channel number will be stored in channel_hint_ptr->channel.
  @return vsf_err_t: VSF_ERR_NONE if the acquire was successful, otherwise returns error code
 
+ @note For priority handling details, refer to @ref vsf_dma_channel_hint_t documentation.
+
  \~chinese
  @brief DMA 获取一个新的通道
  @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
  @param[in,out] channel_hint_ptr: 指向 DMA 通道提示的指针。用户应根据实际情况提供合适的提示信息。如果实际分配的通道或其他配置与用户预期不一致，函数可能会修改 channel_hint_ptr 来通知用户实际分配的结果。分配的通道号将存储在 channel_hint_ptr->channel 中。
  @return vsf_err_t: 如果获取成功返回 VSF_ERR_NONE，否则返回错误码
+
+ @note 关于优先级处理和通道分配模式的详细信息，请参考 @ref vsf_dma_channel_hint_t 的文档。
  */
 extern vsf_err_t vsf_dma_channel_acquire(vsf_dma_t *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr);
 
@@ -751,12 +896,38 @@ extern void vsf_dma_channel_release(vsf_dma_t *dma_ptr, uint8_t channel);
  @param[in] cfg_ptr: a pointer to DMA channel configuration
  @return vsf_err_t: VSF_ERR_NONE if the configuration was successful, otherwise returns error code
 
+ @note Priority handling:
+       - The cfg_ptr->prio field is only effective when hardware supports per-channel
+         independent interrupt priority configuration.
+       - If cfg_ptr->prio is vsf_arch_prio_invalid, the default priority from vsf_dma_cfg_t
+         (or the priority set during channel_acquire) will be used.
+       - For chips where multiple channels share the same interrupt, modifying priority
+         in channel_config may affect other channels sharing the same interrupt.
+         The behavior in this case is implementation-defined (driver-specific).
+       - For per-channel independent interrupt scenarios, this allows dynamic priority
+         adjustment at runtime.
+       - For static allocation (channels fixed to peripherals):
+         a) Priority can be configured via channel_config() at runtime (if hardware
+            supports dynamic priority adjustment).
+         b) If priority is not configured via channel_config(), the default priority
+            from vsf_dma_cfg_t will be used.
+
  \~chinese
  @brief DMA 通道配置
  @param[in] dma_ptr: 指向结构体 @ref vsf_dma_t 的指针
  @param[in] channel: 通道序号
  @param[in] cfg_ptr: 指向 DMA 通道配置的指针
  @return vsf_err_t: 如果配置成功返回 VSF_ERR_NONE，否则返回错误码
+ @note 优先级处理：
+       - cfg_ptr->prio 字段仅在硬件支持每通道独立中断优先级配置时生效。
+       - 如果 cfg_ptr->prio 是 vsf_arch_prio_invalid，将使用 vsf_dma_cfg_t 中的默认优先级
+         （或在 channel_acquire 时设置的优先级）。
+       - 对于多个通道共享同一中断的芯片，在 channel_config 中修改优先级
+         可能会影响共享同一中断的其他通道。此情况下的行为由实现定义（驱动特定）。
+       - 对于每通道独立中断的场景，这允许在运行时动态调整优先级。
+       - 对于静态分配（通道固定绑定到外设）：
+         a) 优先级可以通过 channel_config() 在运行时配置（如果硬件支持动态优先级调整）。
+         b) 如果未通过 channel_config() 配置优先级，将使用 vsf_dma_cfg_t 中的默认优先级。
  @note: 对于指定通道，API vsf_dma_channel_sg_config_desc() 和 vsf_dma_channel_sg_start() 必须配合使用。
         API vsf_dma_channel_config() 和 vsf_dma_channel_start() 配对使用。
         这两组API不能混用，只有在当前DMA传输完全结束后，才能切换到另一组API使用。
@@ -994,6 +1165,9 @@ extern vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr, uint8
 #   define vsf_dma_channel_cancel(__DMA, ...)                       VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_cancel)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_get_transferred_count(__DMA, ...)        VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_get_transferred_count)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_status(__DMA, ...)                       VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_status)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+
+#   define vsf_dma_channel_acquire_adjust_hint(__DMA, ...)          VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_acquire_adjust_hint)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_channel_acquire_from_all(...)                    VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_acquire_from_all)(##__VA_ARGS__)
 #endif
 /// @endcond
 
