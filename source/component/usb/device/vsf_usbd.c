@@ -974,6 +974,8 @@ void vk_usbd_disconnect(vk_usbd_dev_t *dev)
 {
     VSF_USB_ASSERT(dev != NULL);
     VSF_USBD_DRV_PREPARE(dev);
+
+    __vk_usbd_cfg_fini(dev);
     vk_usbd_drv_disconnect();
 }
 
@@ -1071,7 +1073,7 @@ void vk_usbd_fini(vk_usbd_dev_t *dev)
     VSF_USB_ASSERT(dev != NULL);
     VSF_USBD_DRV_PREPARE(dev);
 
-    vk_usbd_drv_disconnect();
+    vk_usbd_disconnect(dev);
     vk_usbd_drv_fini();
     vsf_usbd_notify_user(dev, (usb_evt_t)USB_ON_FINI, NULL);
 }
