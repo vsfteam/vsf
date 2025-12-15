@@ -242,7 +242,19 @@ extern "C" {
 
 // btn
 
-#define BTN_GAMEPAD                 (VSF_KB_USER + 0x20)
+#define BTN_MISC                    (VSF_KB_USER + 0x20)
+#define BTN_0                       (BTN_MISC + 0)
+#define BTN_1                       (BTN_MISC + 1)
+#define BTN_2                       (BTN_MISC + 2)
+#define BTN_3                       (BTN_MISC + 3)
+#define BTN_4                       (BTN_MISC + 4)
+#define BTN_5                       (BTN_MISC + 5)
+#define BTN_6                       (BTN_MISC + 6)
+#define BTN_7                       (BTN_MISC + 7)
+#define BTN_8                       (BTN_MISC + 8)
+#define BTN_9                       (BTN_MISC + 9)
+
+#define BTN_GAMEPAD                 (BTN_MISC + 0x10)
 #define BTN_DPAD_UP                 (BTN_GAMEPAD | GAMEPAD_ID_L_UP)
 #define BTN_DPAD_DOWN               (BTN_GAMEPAD | GAMEPAD_ID_L_DOWN)
 #define BTN_DPAD_LEFT               (BTN_GAMEPAD | GAMEPAD_ID_L_LEFT)
@@ -283,29 +295,22 @@ extern "C" {
 #define BTN_MIDDLE                  (BTN_MOUSE + VSF_INPUT_MOUSE_BUTTON_MIDDLE)
 #define BTN_MOUSE_MAX               (BTN_MOUSE + 2)
 
-#define BTN_JOYSTICK                (BTN_MOUSE + 0x10)
-#define BTN_TRIGGER                 BTN_JOYSTICK
+#define BTN_JOYSTICK                (BTN_MOUSE + 3)
+#define BTN_TRIGGER                 (BTN_JOYSTICK + 0)
+#define BTN_THUMB                   (BTN_JOYSTICK + 1)
+#define BTN_THUMB2                  (BTN_JOYSTICK + 2)
 
-#define BTN_MISC                    (BTN_JOYSTICK + 0x10)
-#define BTN_0                       (BTN_MISC + 0)
-#define BTN_1                       (BTN_MISC + 1)
-#define BTN_2                       (BTN_MISC + 2)
-#define BTN_3                       (BTN_MISC + 3)
-#define BTN_4                       (BTN_MISC + 4)
-#define BTN_5                       (BTN_MISC + 5)
-#define BTN_6                       (BTN_MISC + 6)
-#define BTN_7                       (BTN_MISC + 7)
-#define BTN_8                       (BTN_MISC + 8)
-#define BTN_9                       (BTN_MISC + 9)
-
-#define __BTN_OTHER                 (BTN_MISC + 0x10)
+#define __BTN_OTHER                 (BTN_JOYSTICK + 0x10)
 #define BTN_DIGI                    (__BTN_OTHER + 0)
 #define BTN_TOOL_PEN                (__BTN_OTHER + 0)
 #define BTN_TOOL_FINGER             (__BTN_OTHER + 5)
 #define BTN_TOUCH                   (__BTN_OTHER + 10)
 #define BTN_STYLUS                  (__BTN_OTHER + 11)
 
-VSF_STATIC_ASSERT(BTN_STYLUS <= VSF_KB_USER_MAX);
+#define KEY_OK                      (__BTN_OTHER + 12)
+#define KEY_ALS_TOGGLE              (__BTN_OTHER + 13)
+
+VSF_STATIC_ASSERT(KEY_ALS_TOGGLE <= VSF_KB_USER_MAX);
 
 #define KEY_MAX                     0x3ff
 #define KEY_CNT                     (KEY_MAX + 1)

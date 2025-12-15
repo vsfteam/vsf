@@ -32,6 +32,7 @@ struct js_event {
 
 #define JSIOCGAXES          _IOR('j', 0x11, __u8)
 #define JSIOCGBUTTONS       _IOR('j', 0x12, __u8)
+#define JSIOCGNAME(len)     _IOC(_IOC_READ, 'j', 0x13, len)
 
 #define JSIOCSAXMAP         _IOW('j', 0x31, __u8[ABS_CNT])
 #define JSIOCGAXMAP         _IOR('j', 0x32, __u8[ABS_CNT])

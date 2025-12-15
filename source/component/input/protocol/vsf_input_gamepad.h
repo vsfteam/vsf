@@ -55,6 +55,9 @@ enum {
 //          L_DOWN                                  R_DOWN
 
 typedef enum vsf_gamepad_id_t {
+    // do not change order
+
+    // buttons in linux joystick driver
     GAMEPAD_ID_DUMMY = 0,
     GAMEPAD_ID_LU,
     GAMEPAD_ID_L_UP = GAMEPAD_ID_LU,
@@ -83,23 +86,25 @@ typedef enum vsf_gamepad_id_t {
     GAMEPAD_ID_MENU_LEFT,
     GAMEPAD_ID_MENU_RIGHT,
     GAMEPAD_ID_MENU_MAIN,
-    GAMEPAD_ID_SPECIAL,
+    GAMEPAD_ID_LT,
+    GAMEPAD_ID_RT,
+    // analogs in linux joystick driver
     GAMEPAD_ID_LX,
     GAMEPAD_ID_LY,
     GAMEPAD_ID_RX,
     GAMEPAD_ID_RY,
-    GAMEPAD_ID_LT,
-    GAMEPAD_ID_RT,
+    // unused in linux joystick driver
     GAMEPAD_ID_DPAD,
     GAMEPAD_ID_PADDLE1,
     GAMEPAD_ID_PADDLE2,
     GAMEPAD_ID_PADDLE3,
     GAMEPAD_ID_PADDLE4,
+    GAMEPAD_ID_SPECIAL,
 
     GAMEPAD_ID_NUM,
     GAMEPAD_ID_USER = GAMEPAD_ID_NUM,
-    GAMEPAD_ID_ANALOG_MIN = GAMEPAD_ID_LX,
-    GAMEPAD_ID_ANALOG_MAX = GAMEPAD_ID_RT,
+    GAMEPAD_ID_ANALOG_MIN = GAMEPAD_ID_LT,
+    GAMEPAD_ID_ANALOG_MAX = GAMEPAD_ID_RY,
 } vsf_gamepad_id_t;
 
 typedef struct vk_gamepad_evt_t {
