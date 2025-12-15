@@ -545,18 +545,22 @@ typedef struct vsf_dma_channel_cfg_t {
     //! \~chinese 可以使用按位或操作组合多个中断类型
     vsf_dma_irq_mask_t      irq_mask;
     //! \~english Interrupt priority for this channel. Use vsf_arch_prio_invalid to use default priority from vsf_dma_cfg_t.
-    //! \~english This field is only effective when hardware supports per-channel independent interrupt priority configuration.
-    //! \~english For chips where multiple channels share the same interrupt, modifying priority in channel_config
-    //!           may affect other channels sharing the same interrupt, and the behavior is implementation-defined.
+    //! \~english The behavior of this field depends on hardware support:
+    //! \~english - For hardware supporting per-channel independent interrupt priority configuration, the field is fully effective
+    //!             and allows independent priority configuration for each channel.
+    //! \~english - For chips where multiple channels share the same interrupt, the field may be effective (driver-dependent),
+    //!             but modifying priority in channel_config may affect other channels sharing the same interrupt,
+    //!             and the behavior is implementation-defined.
     //! \~english If priority was set during channel_acquire, this field can be used to dynamically adjust priority
     //!           at runtime (only for per-channel independent interrupt scenarios).
     //! \~english For static allocation (channels fixed to peripherals, channel_acquire() is not needed):
     //! \~english - Priority can be configured via channel_config() at runtime (if hardware supports dynamic priority adjustment).
     //! \~english - If priority is not configured via channel_config(), the default priority from vsf_dma_cfg_t will be used.
     //! \~chinese 此通道的中断优先级。使用 vsf_arch_prio_invalid 表示使用 vsf_dma_cfg_t 中的默认优先级。
-    //! \~chinese 此字段仅在硬件支持每通道独立中断优先级配置时生效。
-    //! \~chinese 对于多个通道共享同一中断的芯片，在 channel_config 中修改优先级可能会影响共享同一中断的其他通道，
-    //!           具体行为由实现定义。
+    //! \~chinese 此字段的行为取决于硬件支持情况：
+    //! \~chinese - 对于支持每通道独立中断优先级配置的硬件，字段完全有效，可以独立配置每个通道的优先级。
+    //! \~chinese - 对于多个通道共享同一中断的芯片，字段可能有效（取决于驱动实现），
+    //!             但在 channel_config 中修改优先级可能会影响共享同一中断的其他通道，具体行为由实现定义。
     //! \~chinese 如果优先级在 channel_acquire 时已设置，此字段可用于在运行时动态调整优先级
     //!           （仅适用于每通道独立中断的场景）。
     //! \~chinese 对于静态分配（通道固定绑定到外设，不需要调用 channel_acquire()）：
