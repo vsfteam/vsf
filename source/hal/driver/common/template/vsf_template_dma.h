@@ -1166,7 +1166,6 @@ extern vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr, uint8
 #   define vsf_dma_channel_get_transferred_count(__DMA, ...)        VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_get_transferred_count)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_status(__DMA, ...)                       VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_status)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 
-#   define vsf_dma_channel_acquire_adjust_hint(__DMA, ...)          VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_acquire_adjust_hint)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_acquire_from_all(...)                    VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_acquire_from_all)(##__VA_ARGS__)
 #endif
 /// @endcond
