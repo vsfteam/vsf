@@ -223,13 +223,16 @@ enum {
     VSF_KB_RMETA            = VSF_KB_RGUI,
     VSF_KB_MODIFIER_END     = 231,
     VSF_KB_MODIFIER_NUM     = 8,
-    VSF_KB_MODE             = 257,
 
+    // keycodes beyond hut1.2 keyboard/keypad page, but required by SDL_Scancode
+    VSF_KB_MODE             = 257,
     VSF_KB_EJECT            = 281,
     VSF_KB_SLEEP            = 282,
+    // from SDL_SCANCODE_RESERVED to SDL_SCANCODE_COUNT(512) - 1
+    VSF_KB_USER             = 400,
+    VSF_KB_USER_MAX         = 511,
 
-    VSF_KB_USER             = 283,
-
+    // start from SDL_SCANCODE_COUNT(512)
     VSF_KB_EXT              = 0x0200,
     // keycodes with SHIFT pressed
     VSF_KB_EXCLAM           = VSF_KB_1 | VSF_KB_EXT,

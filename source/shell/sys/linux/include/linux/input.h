@@ -240,28 +240,13 @@ extern "C" {
 #define KEY_CHANNELUP               (VSF_KB_USER + 18)
 #define KEY_CHANNELDOWN             (VSF_KB_USER + 19)
 
-#define KEY_MAX                     0x3ff
-#define KEY_CNT                     (KEY_MAX + 1)
-
-// rel
-
-#define REL_X                       0x00
-#define REL_Y                       0x01
-#define REL_Z                       0x02
-#define REL_RX                      0x03
-#define REL_RY                      0x04
-#define REL_RZ                      0x05
-#define REL_HWHEEL                  0x06
-#define REL_DIAL                    0x07
-#define REL_WHEEL                   0x08
-#define REL_MISC                    0x09
-
-#define REL_MAX                     0x0f
-#define REL_CNT                     (REL_MAX + 1)
-
 // btn
 
-#define BTN_GAMEPAD                 0x400
+#define BTN_GAMEPAD                 (VSF_KB_USER + 0x20)
+#define BTN_DPAD_UP                 (BTN_GAMEPAD | GAMEPAD_ID_L_UP)
+#define BTN_DPAD_DOWN               (BTN_GAMEPAD | GAMEPAD_ID_L_DOWN)
+#define BTN_DPAD_LEFT               (BTN_GAMEPAD | GAMEPAD_ID_L_LEFT)
+#define BTN_DPAD_RIGHT              (BTN_GAMEPAD | GAMEPAD_ID_L_RIGHT)
 #define BTN_SOUTH                   (BTN_GAMEPAD | GAMEPAD_ID_R_DOWN)
 #define BTN_A                       BTN_SOUTH
 #define BTN_EAST                    (BTN_GAMEPAD | GAMEPAD_ID_R_RIGHT)
@@ -270,8 +255,10 @@ extern "C" {
 #define BTN_X                       BTN_NORTH
 #define BTN_WEST                    (BTN_GAMEPAD | GAMEPAD_ID_R_LEFT)
 #define BTN_Y                       BTN_WEST
-#define BTN_TL                      (BTN_GAMEPAD | GAMEPAD_ID_LT)
-#define BTN_TR                      (BTN_GAMEPAD | GAMEPAD_ID_RT)
+#define BTN_TL                      (BTN_GAMEPAD | GAMEPAD_ID_LB)
+#define BTN_TR                      (BTN_GAMEPAD | GAMEPAD_ID_RB)
+#define BTN_TL2                     (BTN_GAMEPAD | GAMEPAD_ID_LT)
+#define BTN_TR2                     (BTN_GAMEPAD | GAMEPAD_ID_RT)
 #define BTN_SELECT                  (BTN_GAMEPAD | GAMEPAD_ID_MENU_LEFT)
 #define BTN_MODE                    (BTN_GAMEPAD | GAMEPAD_ID_MENU_MAIN)
 #define BTN_START                   (BTN_GAMEPAD | GAMEPAD_ID_MENU_RIGHT)
@@ -290,20 +277,54 @@ extern "C" {
 #define BTN_TRIGGER_HAPPY10         (BTN_GAMEPAD | (GAMEPAD_ID_USER + 9))
 #define BTN_GAMEPAD_MAX             BTN_TRIGGER_HAPPY10
 
-#define BTN_MOUSE                   0x420
+#define BTN_MOUSE                   (BTN_GAMEPAD + 0x10)
 #define BTN_LEFT                    (BTN_MOUSE + VSF_INPUT_MOUSE_BUTTON_LEFT)
 #define BTN_RIGHT                   (BTN_MOUSE + VSF_INPUT_MOUSE_BUTTON_RIGHT)
 #define BTN_MIDDLE                  (BTN_MOUSE + VSF_INPUT_MOUSE_BUTTON_MIDDLE)
-#define BTN_MOUSE_MAX               0x422
+#define BTN_MOUSE_MAX               (BTN_MOUSE + 2)
 
-#define BTN_JOYSTICK                0x430
+#define BTN_JOYSTICK                (BTN_MOUSE + 0x10)
 #define BTN_TRIGGER                 BTN_JOYSTICK
 
-#define BTN_DIGI                    0x440
-#define BTN_TOOL_PEN                0x440
-#define BTN_TOOL_FINGER             0x445
-#define BTN_TOUCH                   0x44a
-#define BTN_STYLUS                  0x44b
+#define BTN_MISC                    (BTN_JOYSTICK + 0x10)
+#define BTN_0                       (BTN_MISC + 0)
+#define BTN_1                       (BTN_MISC + 1)
+#define BTN_2                       (BTN_MISC + 2)
+#define BTN_3                       (BTN_MISC + 3)
+#define BTN_4                       (BTN_MISC + 4)
+#define BTN_5                       (BTN_MISC + 5)
+#define BTN_6                       (BTN_MISC + 6)
+#define BTN_7                       (BTN_MISC + 7)
+#define BTN_8                       (BTN_MISC + 8)
+#define BTN_9                       (BTN_MISC + 9)
+
+#define __BTN_OTHER                 (BTN_MISC + 0x10)
+#define BTN_DIGI                    (__BTN_OTHER + 0)
+#define BTN_TOOL_PEN                (__BTN_OTHER + 0)
+#define BTN_TOOL_FINGER             (__BTN_OTHER + 5)
+#define BTN_TOUCH                   (__BTN_OTHER + 10)
+#define BTN_STYLUS                  (__BTN_OTHER + 11)
+
+VSF_STATIC_ASSERT(BTN_STYLUS <= VSF_KB_USER_MAX);
+
+#define KEY_MAX                     0x3ff
+#define KEY_CNT                     (KEY_MAX + 1)
+
+// rel
+
+#define REL_X                       0x00
+#define REL_Y                       0x01
+#define REL_Z                       0x02
+#define REL_RX                      0x03
+#define REL_RY                      0x04
+#define REL_RZ                      0x05
+#define REL_HWHEEL                  0x06
+#define REL_DIAL                    0x07
+#define REL_WHEEL                   0x08
+#define REL_MISC                    0x09
+
+#define REL_MAX                     0x0f
+#define REL_CNT                     (REL_MAX + 1)
 
 // abs
 
