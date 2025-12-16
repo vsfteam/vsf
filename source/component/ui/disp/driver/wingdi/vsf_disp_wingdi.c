@@ -29,8 +29,10 @@
 #include "component/input/vsf_input.h"
 
 #include <Windows.h>
+#include <xinput.h>
 
 #pragma comment(lib, "imm32.lib")
+#pragma comment(lib, "XInput.lib")
 
 /*============================ MACROS ========================================*/
 
@@ -242,6 +244,65 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 #endif
 
     switch (msg) {
+    case WM_TIMER: {
+            static XINPUT_STATE prevState;
+            static const vk_input_item_info_t vk_xinput_gamepad_item_info[GAMEPAD_ID_NUM] = {
+                VSF_GAMEPAD_DEF_ITEM_INFO(  L_UP,           0,  1,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO(  L_DOWN,         1,  1,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO(  L_LEFT,         2,  1,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO(  L_RIGHT,        3,  1,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO(  MENU_RIGHT,     4,  1,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO(  MENU_LEFT,      5,  1,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO(  LS,             6,  1,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO(  RS,             7,  1,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO(  LB,             8,  1,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO(  RB,             9,  1,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO(  R_DOWN,         12, 1,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO(  R_RIGHT,        13, 1,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO(  R_LEFT,         14, 1,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO(  R_UP,           15, 1,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(   LT,     16, 8,  false, false),
+                VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(   RT,     24, 8,  false, false),
+                VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(   LX,     32, 16, true,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(   LY,     48, 16, true,  true),
+                VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(   RX,     64, 16, true,  false),
+                VSF_GAMEPAD_DEF_ITEM_INFO_LINEAR(   RY,     80, 16, true,  true),
+            };
+            static bool gamepad_on_new_called[4];
+
+            XINPUT_STATE curState;
+            vk_input_item_info_t *info;
+            vk_input_parser_t parser = {
+                .info = (vk_input_item_info_t *)vk_xinput_gamepad_item_info,
+                .num = dimof(vk_xinput_gamepad_item_info),
+            };
+            for (int i = 0; i < 4; i++) {
+                if ((XInputGetState(i, &curState) == ERROR_SUCCESS) && (curState.dwPacketNumber != prevState.dwPacketNumber)) {
+                    // use different dev for different gamepad
+                    evt.dev = (void *)((uintptr_t)evt.dev + i);
+                    if (!gamepad_on_new_called[i]) {
+                        gamepad_on_new_called[i] = true;
+                        vsf_input_on_new_dev(VSF_INPUT_TYPE_GAMEPAD, evt.dev);
+                    }
+                    do {
+                        info = vk_input_parse(&parser, (uint8_t *)&prevState.Gamepad, (uint8_t *)&curState.Gamepad);
+                        if (curState.Gamepad.wButtons != prevState.Gamepad.wButtons) {
+                            __asm("nop");
+                        }
+                        if (info != NULL) {
+                            evt.gamepad_evt.id = info->item;
+                            evt.gamepad_evt.info = *info;
+                            evt.gamepad_evt.pre = parser.pre;
+                            evt.gamepad_evt.cur = parser.cur;
+                            vsf_input_on_gamepad(&evt.gamepad_evt);
+                        }
+                    } while (info != NULL);
+                    prevState = curState;
+                    vsf_input_on_evt(VSF_INPUT_TYPE_SYNC, &evt.gamepad_evt.use_as__vk_input_evt_t);
+                }
+            }
+        }
+        break;
     case WM_SETCURSOR:
         SetCursor(LoadCursor(NULL, IDC_ARROW));
         return TRUE;
@@ -398,9 +459,6 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
             vsf_input_touchscreen_set(&evt.ts_evt, 0, is_down, pressure, x, y);
             vsf_input_on_touchscreen(&evt.ts_evt);
             break;
-        case VSF_INPUT_TYPE_GAMEPAD:
-            vsf_input_on_gamepad(&evt.gamepad_evt);
-            break;
         case VSF_INPUT_TYPE_KEYBOARD:
             vsf_input_on_keyboard(&evt.keyboard_evt);
             break;
@@ -477,6 +535,9 @@ static void __vk_disp_wingdi_thread(void *arg)
         VSF_UI_ASSERT(false);
         return;
     }
+#if VSF_USE_INPUT == ENABLED
+    SetTimer(__vk_disp_wingdi.hWnd, 1, USER_TIMER_MINIMUM , NULL);
+#endif
 
     // Step 4: Message Handling
     MSG Msg;

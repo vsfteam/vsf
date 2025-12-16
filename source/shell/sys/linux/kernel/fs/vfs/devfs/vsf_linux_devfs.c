@@ -1694,14 +1694,14 @@ static int __vsf_linux_joystick_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t ar
             map[2] = ABS_HAT1X;     // right stick
             map[3] = ABS_HAT1Y;
         }
-        break;
+        return 0;
     case JSIOCGBTNMAP: {
             uint16_t *map = (uint16_t *)arg;
             for (int i = 0; i <= GAMEPAD_ID_RT; i++) {
                 map[i] = BTN_GAMEPAD + i;
             }
         }
-        break;
+        return 0;
     default: {
             int input_cmd = cmd & ~(_IOC_SIZEMASK << _IOC_SIZESHIFT);
             int size = _IOC_SIZE(cmd);
