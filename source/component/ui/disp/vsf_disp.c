@@ -118,6 +118,19 @@ vsf_err_t vk_disp_init(vk_disp_t *pthis)
     return VSF_ERR_NONE;
 }
 
+void vk_disp_fini(vk_disp_t *pthis)
+{
+    VSF_UI_ASSERT(pthis != NULL);
+    const vk_disp_drv_t *drv = pthis->param.drv;
+    VSF_UI_ASSERT(drv != NULL);
+
+    if (drv->fini != NULL) {
+        drv->fini(pthis);
+    } else {
+        vk_disp_on_ready(pthis);
+    }
+}
+
 vsf_err_t vk_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff)
 {
     VSF_UI_ASSERT(pthis != NULL);

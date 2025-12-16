@@ -151,6 +151,7 @@ typedef struct vk_disp_area_t {
 vsf_class(vk_disp_drv_t) {
     protected_member(
         vsf_err_t (*init)(vk_disp_t *pthis);
+        void (*fini)(vk_disp_t *pthis);
         vsf_err_t (*refresh)(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 
         // interfaces for gpu acceleration
@@ -233,6 +234,7 @@ extern const vk_disp_drv_t vk_disp_cvrt_drv;
 /*============================ PROTOTYPES ====================================*/
 
 extern vsf_err_t vk_disp_init(vk_disp_t *pthis);
+extern void vk_disp_fini(vk_disp_t *pthis);
 extern vsf_err_t vk_disp_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 
 #ifdef __VSF_DISP_CLASS_INHERIT__
