@@ -286,9 +286,6 @@ static LRESULT CALLBACK __WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
                     }
                     do {
                         info = vk_input_parse(&parser, (uint8_t *)&prevState.Gamepad, (uint8_t *)&curState.Gamepad);
-                        if (curState.Gamepad.wButtons != prevState.Gamepad.wButtons) {
-                            __asm("nop");
-                        }
                         if (info != NULL) {
                             evt.gamepad_evt.id = info->item;
                             evt.gamepad_evt.info = *info;
