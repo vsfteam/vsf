@@ -1483,9 +1483,13 @@ static void __vsf_linux_input_on_event(vk_input_notifier_t *notifier, vk_input_t
                 if (gamepad_evt->info.item <= GAMEPAD_ID_RT) {
                     event.type = JS_EVENT_BUTTON;
                     event.value = !!gamepad_evt->cur.val8;
-                } else {
+                } else if (gamepad_evt->info.item <= GAMEPAD_ID_RY) {
                     event.type = JS_EVENT_AXIS;
                     event.value = gamepad_evt->cur.val16;
+                    event.number -= GAMEPAD_ID_LX;
+                } else {
+                    // events not supported by linux joystick interface
+                    return;
                 }
                 if (sizeof(event) > avail_len) {
                     vsf_trace_error("joystick: joystick rx buffer overflow, please increase VSF_LINUX_DEVFS_INPUT_CFG_EVENT_POLL_SIZE\n");
