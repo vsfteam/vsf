@@ -207,20 +207,25 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
             case 'u':
                 flags.is_signed = 0;
                 radix = 10;
-                goto print_integer;
+                goto print_integer_prepare;
             case 'i':
             case 'd':
                 flags.is_signed = 1;
                 radix = 10;
+            print_integer_prepare:
+                if (!width && precision) {
+                    width = precision;
+                    flags.has_prefix0 = 1;
+                }
                 goto print_integer;
             case 'b':
                 flags.is_signed = 0;
                 radix = 2;
-                goto print_integer;
+                goto print_integer_prepare;
             case 'o':
                 flags.is_signed = 0;
                 radix = 8;
-                goto print_integer;
+                goto print_integer_prepare;
             case 'P':
                 flags.is_upper = 1;
             case 'p':
@@ -386,7 +391,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap)
             case 'x':
                 flags.is_signed = 0;
                 radix = 16;
-                goto print_integer;
+                goto print_integer_prepare;
 
             // TODO: support %llx etc
             print_integer:
