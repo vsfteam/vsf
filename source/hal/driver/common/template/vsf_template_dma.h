@@ -485,12 +485,12 @@ typedef struct vsf_dma_channel_hint_t {
     //! \~chinese - 动态分配：调用 vsf_dma_channel_acquire() 获取通道。使用 vsf_dma_channel_release() 释放通道。
     //! \~chinese - 静态分配：对于通道固定绑定到外设的芯片，不需要调用 vsf_dma_channel_acquire()。
     //! \~chinese   通道信息（通道号、请求线等）在 device.h 中定义，优先级可以通过 vsf_dma_channel_config() 配置。
-    int8_t channel;
+    int8_t                  channel;
     //! \~english Peripheral request line number, specifying the peripheral request source using DMA service.
     //! \~english (Some chips provide a mapping table between peripherals and request lines, refer to chip manual to select the correct request line number).
     //! \~chinese 外设请求线编号，指定使用DMA服务的外设请求源。
     //! \~chinese （部分芯片会提供外设和请求线的对应表，需根据芯片手册选择正确的请求线编号）。
-    uint8_t request_line;
+    uint8_t                 request_line;
     //! \~english Optional interrupt priority for channel allocation.
     //! \~english Priority handling behavior:
     //! \~english - If prio is vsf_arch_prio_invalid: Use default priority from vsf_dma_cfg_t (set during vsf_dma_init()).
