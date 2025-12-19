@@ -188,7 +188,7 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
                     lfs_stat(lfs, path, &lfsinfo);
                     switch (lfsinfo.type) {
                     case LFS_TYPE_REG:
-                        output_file->attr = VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE;
+                        output_file->attr |= VSF_FILE_ATTR_READ | VSF_FILE_ATTR_WRITE;
 #ifdef LFS_READONLY
                         lfs_file_open(lfs, &output_file->lfs_file, path, LFS_O_RDONLY);
 #else
@@ -197,7 +197,7 @@ static void __vk_lfs_thread(vsf_thread_cb_t *thread)
                         output_file->size = lfs_file_size(lfs, &output_file->lfs_file);
                         break;
                     case LFS_TYPE_DIR:
-                        output_file->attr = VSF_FILE_ATTR_DIRECTORY;
+                        output_file->attr |= VSF_FILE_ATTR_DIRECTORY;
                         lfs_dir_open(lfs, &output_file->lfs_dir, path);
                         break;
                     }
