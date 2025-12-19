@@ -504,6 +504,18 @@ typedef struct vsf_dma_channel_hint_t {
     //! \~chinese - 如果 prio 有效且 DMA 支持每通道独立中断：在通道分配时配置此优先级。
     //! \~chinese - 如果 prio 有效且多个通道共享同一中断：驱动应检查请求的优先级是否与现有共享中断的优先级匹配。
     //! \~chinese   如果匹配，从共享中断组中分配通道；如果不匹配且没有兼容的通道可用，返回 VSF_ERR_NOT_AVAILABLE。
+    //! \~english Priority override order (from highest to lowest priority):
+    //! \~english   1. Priority specified in channel_config() (highest priority, overrides all others)
+    //! \~english   2. Priority specified in channel_acquire() (medium priority)
+    //! \~english   3. Default priority from vsf_dma_cfg_t (lowest priority, used as fallback)
+    //! \~english Note: For static allocation (channels fixed to peripherals), channel_acquire() is not called,
+    //! \~english       so only options 1 and 3 apply.
+    //! \~chinese 优先级覆盖顺序（从高到低）：
+    //! \~chinese   1. 在 channel_config() 中指定的优先级（最高优先级，覆盖所有其他优先级）
+    //! \~chinese   2. 在 channel_acquire() 中指定的优先级（中等优先级）
+    //! \~chinese   3. vsf_dma_cfg_t 中的默认优先级（最低优先级，作为回退选项）
+    //! \~chinese 注意：对于静态分配（通道固定绑定到外设），不调用 channel_acquire()，
+    //! \~chinese       因此只有选项 1 和 3 适用。
     vsf_arch_prio_t         prio;
 } vsf_dma_channel_hint_t;
 #endif
@@ -566,6 +578,16 @@ typedef struct vsf_dma_channel_cfg_t {
     //! \~chinese 对于静态分配（通道固定绑定到外设，不需要调用 channel_acquire()）：
     //! \~chinese - 优先级可以通过 channel_config() 在运行时配置（如果硬件支持动态优先级调整）。
     //! \~chinese - 如果未通过 channel_config() 配置优先级，将使用 vsf_dma_cfg_t 中的默认优先级。
+    //! \~english Priority override scenarios for vsf_dma_channel_cfg_t:
+    //! \~english - Dynamic allocation with priority in acquire and config: config priority overrides acquire priority
+    //! \~english - Dynamic allocation with priority only in acquire: config with vsf_arch_prio_invalid keeps acquire priority
+    //! \~english - Dynamic allocation with priority only in config: uses config priority (if hardware supports per-channel interrupts)
+    //! \~english - Static allocation: only config priority applies (channel_acquire is not called)
+    //! \~chinese vsf_dma_channel_cfg_t 的优先级覆盖场景：
+    //! \~chinese - 动态分配且在 acquire 和 config 中都指定了优先级：config 优先级覆盖 acquire 优先级
+    //! \~chinese - 动态分配且仅在 acquire 中指定了优先级：config 中使用 vsf_arch_prio_invalid 会保留 acquire 优先级
+    //! \~chinese - 动态分配且仅在 config 中指定了优先级：使用 config 优先级（如果硬件支持每通道独立中断）
+    //! \~chinese - 静态分配：只有 config 优先级适用（不调用 channel_acquire）
     vsf_arch_prio_t         prio;
     //! \~english DMA peripheral request signal index for source side
     //! \~english This is the hardware-specific request signal ID used for DMA handshaking
@@ -915,6 +937,10 @@ extern void vsf_dma_channel_release(vsf_dma_t *dma_ptr, uint8_t channel);
             supports dynamic priority adjustment).
          b) If priority is not configured via channel_config(), the default priority
             from vsf_dma_cfg_t will be used.
+       - Priority override order (from highest to lowest priority):
+         1. Priority specified in channel_config() (overrides all previous settings)
+         2. Priority specified in channel_acquire() (preserved if config uses vsf_arch_prio_invalid)
+         3. Default priority from vsf_dma_cfg_t (used as fallback)
 
  \~chinese
  @brief DMA 通道配置
@@ -932,6 +958,14 @@ extern void vsf_dma_channel_release(vsf_dma_t *dma_ptr, uint8_t channel);
        - 对于静态分配（通道固定绑定到外设）：
          a) 优先级可以通过 channel_config() 在运行时配置（如果硬件支持动态优先级调整）。
          b) 如果未通过 channel_config() 配置优先级，将使用 vsf_dma_cfg_t 中的默认优先级。
+       - 优先级覆盖顺序（从高到低）：
+         1. 在 channel_config() 中指定的优先级（覆盖所有之前的设置）
+         2. 在 channel_acquire() 中指定的优先级（如果 config 使用 vsf_arch_prio_invalid 则保留）
+         3. vsf_dma_cfg_t 中的默认优先级（作为回退选项）
+       - 对于共享中断场景，优先级更改可能会影响多个通道。
+         驱动实现应清楚地记录此行为。
+       - 对于静态/动态分配混合系统，静态通道遵循规则 1 和 3，
+         而动态通道遵循所有规则。
  @note: 对于指定通道，API vsf_dma_channel_sg_config_desc() 和 vsf_dma_channel_sg_start() 必须配合使用。
         API vsf_dma_channel_config() 和 vsf_dma_channel_start() 配对使用。
         这两组API不能混用，只有在当前DMA传输完全结束后，才能切换到另一组API使用。
