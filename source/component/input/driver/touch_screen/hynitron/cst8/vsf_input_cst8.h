@@ -87,5 +87,5 @@ extern vsf_err_t vk_input_cst8_init(vk_input_cst8_t *csr8, vsf_arch_prio_t prio)
 }
 #endif
 
-#endif      // VSF_USE_INPUT && VSF_INPUT_USE_HID
-#endif      // __VSF_INPUT_HID_H__
+#endif      // VSF_USE_INPUT && VSF_INPUT_USE_CST8
+#endif      // VSF_USE_INPUT
