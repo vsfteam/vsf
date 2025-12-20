@@ -975,7 +975,9 @@ void vk_usbd_disconnect(vk_usbd_dev_t *dev)
     VSF_USB_ASSERT(dev != NULL);
     VSF_USBD_DRV_PREPARE(dev);
 
+#if VSF_USBD_CFG_RAW_MODE != ENABLED
     __vk_usbd_cfg_fini(dev);
+#endif
     vk_usbd_drv_disconnect();
 }
 
