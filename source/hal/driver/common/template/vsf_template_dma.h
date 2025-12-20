@@ -1184,6 +1184,24 @@ extern uint32_t vsf_dma_channel_get_transferred_count(vsf_dma_t *dma_ptr, uint8_
  */
 extern vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr, uint8_t channel);
 
+///**
+// \~english
+// @brief Acquire a DMA channel from all available DMA instances
+// @param[in,out] channel_hint_ptr: a pointer to DMA channel hint. User should provide appropriate hint information based on actual requirements. If the actually allocated channel or other configuration differs from user's expectation, the function may modify channel_hint_ptr to notify the user of the actual allocation. The allocated channel number will be stored in channel_hint_ptr->channel.
+// @return vsf_dma_t *: pointer to the DMA instance that successfully allocated the channel, or NULL if allocation failed
+// @note Prerequisites: All DMA instances must be homogeneous (isomorphic). Peripherals can acquire channels from any DMA instance, and channels acquired from any DMA instance can be assigned to any peripheral. This function iterates through all available DMA instances and attempts to acquire a channel from each one. It returns the first DMA instance that successfully allocates a channel.
+// @note The VSF_PREFIX prefix of this can be replaced with the actual prefix, e.g. vsf_hw
+//
+// \~chinese
+// @brief 从所有可用的 DMA 实例中获取一个 DMA 通道
+// @param[in,out] channel_hint_ptr: 指向 DMA 通道提示的指针。用户应根据实际情况提供合适的提示信息。如果实际分配的通道或其他配置与用户预期不一致，函数可能会修改 channel_hint_ptr 来通知用户实际分配的结果。分配的通道号将存储在 channel_hint_ptr->channel 中。
+// @return vsf_dma_t *: 成功分配通道的 DMA 实例指针，如果分配失败则返回 NULL
+// @note 前提条件：所有 DMA 实例必须是同构的（功能相同）。外设可以从任意一个 DMA 实例申请通道，并且从任意一个 DMA 实例获取的通道都可以分配给任意一个外设使用。此函数遍历所有可用的 DMA 实例，并尝试从每个实例中获取通道。它返回第一个成功分配通道的 DMA 实例。
+// @note VSF_PREFIX 前缀可以替换成实际的前缀，例如 vsf_hw
+// */
+//extern vsf_dma_t * VSF_PREFIX_dma_channel_acquire_from_all(vsf_dma_channel_hint_t *channel_hint_ptr);
+//
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /// @cond
@@ -1203,8 +1221,6 @@ extern vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr, uint8
 #   define vsf_dma_channel_cancel(__DMA, ...)                       VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_cancel)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_get_transferred_count(__DMA, ...)        VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_get_transferred_count)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_status(__DMA, ...)                       VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_status)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
-
-#   define vsf_dma_channel_acquire_from_all(...)                    VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_acquire_from_all)(##__VA_ARGS__)
 #endif
 /// @endcond
 
