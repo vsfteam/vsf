@@ -56,7 +56,7 @@ static void __vk_input_cst8_eint_isrhandler(void *target_ptr, vsf_gpio_t *gpio_p
                 vsf_gpio_pin_mask_t pin_mask)
 {
     vk_input_cst8_t *cst8 = target_ptr;
-    vsf_gpio_exti_irq_disable(cst8->gpio_int_port, 1 << cst8->gpio_int_pin_idx);
+    vsf_gpio_exti_irq_disable(cst8->gpio_int_port->gpio, 1 << cst8->gpio_int_pin_idx);
     vsf_i2c_regacc(&cst8->regacc, 0, true, cst8->buffer, sizeof(cst8->buffer));
 }
 
@@ -92,11 +92,12 @@ static void __vk_input_cst8_i2c_isrhandler(void *target_ptr, vsf_i2c_t *i2c_ptr,
                 bool is_down = (cst8_evt == CST8_EVT_ON_PRESS) || (cst8_evt == CST8_EVT_ON_MOVE);
                 uint16_t x = ((cst8->xpos_h & 0x0F) << 8) | cst8->xpos_l;
                 uint16_t y = ((cst8->ypos_h & 0x0F) << 8) | cst8->ypos_l;
+
                 vsf_input_touchscreen_set(&ts_evt, 0, is_down, 0, x, y);
                 vsf_input_on_touchscreen(&ts_evt);
             }
         enable_exti:
-            vsf_gpio_exti_irq_enable(cst8->gpio_int_port, 1 << cst8->gpio_int_pin_idx);
+            vsf_gpio_exti_irq_enable(cst8->gpio_int_port->gpio, 1 << cst8->gpio_int_pin_idx);
             break;
         }
     }
@@ -130,7 +131,7 @@ vsf_err_t vk_input_cst8_init(vk_input_cst8_t *cst8, vsf_arch_prio_t prio)
         .prio = cst8->prio,
     });
     cst8->prio = prio;
-    vsf_gpio_exti_irq_disable(cst8->gpio_int_port, 1 << cst8->gpio_int_pin_idx);
+    vsf_gpio_exti_irq_disable(cst8->gpio_int_port->gpio, 1 << cst8->gpio_int_pin_idx);
 
     return vsf_i2c_regacc(&cst8->regacc, CST8_CMD_CHIPID, true, cst8->buffer, 1);
 }
