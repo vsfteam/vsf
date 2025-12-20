@@ -32,7 +32,7 @@
 /*============================ MACROS ========================================*/
 
 #ifndef MIPI_LCD_SPI_ARCH_PRIO
-#   define MIPI_LCD_SPI_ARCH_PRIO                            vsf_arch_prio_1
+#   define MIPI_LCD_SPI_ARCH_PRIO                       vsf_arch_prio_1
 #endif
 
 #ifndef MIPI_LCD_SPI_CFG
@@ -82,6 +82,7 @@ enum {
 /*============================ PROTOTYPES ====================================*/
 
 static vsf_err_t __lcd_init(vk_disp_t *pthis);
+static void __lcd_fini(vk_disp_t *pthis);
 static vsf_err_t __lcd_refresh(vk_disp_t *pthis, vk_disp_area_t *area, void *disp_buff);
 static void __lcd_evthandler(vsf_eda_t *teda, vsf_evt_t evt);
 
@@ -89,6 +90,7 @@ static void __lcd_evthandler(vsf_eda_t *teda, vsf_evt_t evt);
 
 const vk_disp_drv_t vk_disp_drv_mipi_spi_lcd = {
     .init           = __lcd_init,
+    .fini           = __lcd_fini,
     .refresh        = __lcd_refresh,
 };
 
@@ -137,7 +139,7 @@ void vsf_disp_mipi_spi_lcd_io_init(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
 {
 #if VSF_DISP_MIPI_SPI_LCD_USING_VSF_GPIO == ENABLED
     vsf_gpio_cfg_t cfg = {
-        .mode = VSF_GPIO_PULL_UP,
+        .mode = VSF_GPIO_PULL_UP | VSF_GPIO_OUTPUT_PUSH_PULL,
     };
     vsf_gpio_port_config_pins(disp_mipi_spi_lcd->reset.gpio,
                         disp_mipi_spi_lcd->reset.pin_mask,
@@ -232,7 +234,6 @@ static void __mipi_lcd_spi_req_cpl_handler(void *target_ptr,
 static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_spi_lcd_t * disp_mipi_spi_lcd)
 {
     vsf_err_t init_result;
-    fsm_rt_t enable_status;
 
     VSF_UI_ASSERT(disp_mipi_spi_lcd->spi != NULL);
 
@@ -251,10 +252,7 @@ static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_spi_lcd_t * disp_mipi_spi_lcd)
         return init_result;
     }
 
-    do {
-        enable_status = vsf_spi_enable(disp_mipi_spi_lcd->spi);
-    } while (enable_status != fsm_rt_cpl);
-
+    while (fsm_rt_on_going == vsf_spi_enable(disp_mipi_spi_lcd->spi));
     vsf_spi_irq_enable(disp_mipi_spi_lcd->spi, VSF_SPI_IRQ_MASK_CPL);
 
     return VSF_ERR_NONE;
@@ -349,6 +347,7 @@ static void __lcd_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
 static vsf_err_t __lcd_init(vk_disp_t *pthis)
 {
     vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = (vk_disp_mipi_spi_lcd_t *)pthis;
+
     vsf_err_t err;
     VSF_UI_ASSERT(disp_mipi_spi_lcd != NULL);
 
@@ -363,7 +362,30 @@ static vsf_err_t __lcd_init(vk_disp_t *pthis)
     disp_mipi_spi_lcd->teda.on_terminate = NULL;
 #endif
 
-    return vsf_teda_init(&disp_mipi_spi_lcd->teda);
+    err = vsf_teda_init(&disp_mipi_spi_lcd->teda);
+    if (err != VSF_ERR_NONE) {
+        return err;
+    }
+
+    return VSF_ERR_NONE;
+}
+
+static void __lcd_fini(vk_disp_t *pthis)
+{
+    vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = (vk_disp_mipi_spi_lcd_t *)pthis;
+    VSF_UI_ASSERT(disp_mipi_spi_lcd != NULL);
+
+    vsf_spi_irq_disable(disp_mipi_spi_lcd->spi, VSF_SPI_IRQ_MASK_CPL);
+    while (fsm_rt_on_going == vsf_spi_disable(disp_mipi_spi_lcd->spi));
+
+    vsf_spi_fini(disp_mipi_spi_lcd->spi);
+
+    disp_mipi_spi_lcd->teda.fn.evthandler = NULL;
+#if VSF_KERNEL_CFG_EDA_SUPPORT_ON_TERMINATE == ENABLED
+    disp_mipi_spi_lcd->teda.on_terminate = NULL;
+#endif
+
+    vsf_eda_fini(&disp_mipi_spi_lcd->teda.use_as__vsf_eda_t);
 }
 
 static vsf_err_t __lcd_refresh(vk_disp_t *pthis,
