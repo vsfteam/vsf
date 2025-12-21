@@ -103,8 +103,12 @@
 
  /*============================ PROTOTYPES ====================================*/
 
- vsf_err_t vsf_exti_gpio_config_pin(vsf_exti_gpio_t *exti_gpio_ptr, vsf_gpio_pin_mask_t pin_mask,
-     vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr);
+extern vsf_err_t vsf_exti_gpio_config_pin(vsf_exti_gpio_t *exti_gpio_ptr, vsf_gpio_pin_mask_t pin_mask,
+                                          vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr);
+
+extern vsf_err_t vsf_gpio_irq_distributor_pin_config(vsf_gpio_irq_distributor_t *gpio_irq_distributor_ptr,
+                                                     vsf_gpio_pin_mask_t pin_mask,
+                                                     vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr);
 
  /*============================ IMPLEMENTATION ================================*/
 
