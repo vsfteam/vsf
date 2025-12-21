@@ -97,7 +97,7 @@ static inline int crypto_wait_req(int err, struct crypto_wait *wait)
 
 static inline void crypto_free_tfm(struct crypto_tfm *tfm)
 {
-    return crypto_destroy_tfm(tfm, tfm);
+    crypto_destroy_tfm(tfm, tfm);
 }
 
 int vsf_linux_crypto_init(void);
