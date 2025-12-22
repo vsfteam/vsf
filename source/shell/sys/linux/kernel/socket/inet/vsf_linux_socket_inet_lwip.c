@@ -1753,7 +1753,10 @@ static int __vsf_linux_socket_inet_close(vsf_linux_fd_t *sfd)
     }
 
     conn->socket = 0;
-    netconn_prepare_delete(conn);
+    if (ERR_OK != netconn_prepare_delete(conn)) {
+        return -1;
+    }
+    netconn_delete(conn);
     return 0;
 }
 
