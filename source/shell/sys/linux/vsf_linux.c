@@ -1191,12 +1191,6 @@ int vsf_linux_start_thread(vsf_linux_thread_t *thread, vsf_prio_t priority)
     return 0;
 }
 
-static vsf_dlist_t * __vsf_linux_process_heap_get_freelist(vsf_heap_t *heap, uint_fast32_t size)
-{
-    vsf_linux_process_heap_t *process_heap = vsf_container_of(heap, vsf_linux_process_heap_t, heap);
-    return &process_heap->freelist[0];
-}
-
 size_t vsf_linux_process_heap_size(vsf_linux_process_t *process, void *buffer)
 {
     process = vsf_linux_get_real_process(process);
@@ -1322,7 +1316,9 @@ static vsf_linux_process_t * __vsf_linux_create_process(int stack_size, int heap
         if (heap_size > 0) {
             vsf_linux_process_heap_t *process_heap = (vsf_linux_process_heap_t *)((uintptr_t)&process[1] + priv_size);
             memset(process_heap, 0, sizeof(*process_heap));
-            process_heap->heap.get_freelist = __vsf_linux_process_heap_get_freelist;
+            process_heap->heap.freelist = &process_heap->freelist[0];
+            process_heap->heap.freelist_num = dimof(process_heap->freelist);
+            __vsf_heap_init(&process_heap->heap);
             process->heap = &process_heap->heap;
             __vsf_heap_add_buffer(&process_heap->heap, (uint8_t *)&process_heap[1], heap_size);
         }

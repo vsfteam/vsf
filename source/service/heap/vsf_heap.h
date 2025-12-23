@@ -51,6 +51,10 @@ extern "C" {
 
 /*============================ MACROS ========================================*/
 
+#ifndef VSF_HEAP_CFG_TRACE_LEAKAGE
+#   define VSF_HEAP_CFG_TRACE_LEAKAGE       DISABLED
+#endif
+
 #if VSF_ARCH_PROVIDE_HEAP == ENABLED
 #   ifndef VSF_USE_ARCH_HEAP
 #       define VSF_USE_ARCH_HEAP            ENABLED
@@ -125,11 +129,23 @@ typedef struct vsf_heap_statistics_t {
 
 vsf_class(vsf_heap_t) {
     protected_member(
-        vsf_dlist_t * (*get_freelist)(vsf_heap_t *heap, uint_fast32_t size);
+        // get_freelist MUST not return NULL
+        vsf_dlist_t * (*get_freelist)(vsf_heap_t *heap, uint_fast32_t size, bool is_alloc);
+
+        vsf_dlist_t *freelist;
+        uint8_t freelist_num;
     )
 #if VSF_HEAP_CFG_STATISTICS == ENABLED
     private_member(
         vsf_heap_statistics_t statistics;
+    )
+#endif
+#if VSF_HEAP_CFG_TRACE_LEAKAGE == ENABLED
+    private_member(
+        bool locked;
+        uint32_t idx;
+        uint32_t locked_idx;
+        vsf_dlist_t freed_list;
     )
 #endif
 };
@@ -164,6 +180,7 @@ extern const i_heap_t VSF_HEAP;
 /*============================ PROTOTYPES ====================================*/
 
 // heap class
+extern void __vsf_heap_init(vsf_heap_t *heap);
 extern void __vsf_heap_add_buffer(vsf_heap_t *heap, uint8_t *buffer, uint_fast32_t size);
 extern void * __vsf_heap_malloc_aligned(vsf_heap_t *heap, uint_fast32_t size, uint_fast32_t alignment);
 extern void * __vsf_heap_realloc_aligned(vsf_heap_t *heap, void *buffer, uint_fast32_t size, uint_fast32_t alignment);
@@ -171,6 +188,11 @@ extern void __vsf_heap_free(vsf_heap_t *heap, void *buffer);
 extern uint_fast32_t __vsf_heap_size(vsf_heap_t *heap, void *buffer);
 #if VSF_HEAP_CFG_STATISTICS == ENABLED
 extern void __vsf_heap_statistics(vsf_heap_t *heap, vsf_heap_statistics_t *statistics);
+#endif
+#if VSF_HEAP_CFG_TRACE_LEAKAGE == ENABLED
+// if lock, heap will be locked(no previous allocated memory will be freed, and free operation will be saved in mcb)
+// if non-lock, heap will be unlocked, and memory allocated when heap locked will be traced
+extern void __vsf_heap_dump(vsf_heap_t *heap, bool lock);
 #endif
 
 #if VSF_USE_ARCH_HEAP != ENABLED
@@ -197,6 +219,12 @@ extern void vsf_heap_free_imp(void *buffer);
 
 extern void * vsf_heap_calloc(uint_fast32_t n, uint_fast32_t size);
 extern char * vsf_heap_strdup(const char *str);
+
+#if VSF_HEAP_CFG_TRACE_LEAKAGE == ENABLED
+// if lock, heap will be locked(no previous allocated memory will be freed, and free operation will be saved in mcb)
+// if non-lock, heap will be unlocked, and memory allocated when heap locked will be traced
+extern void vsf_heap_dump(bool lock);
+#endif
 
 #endif
 
