@@ -51,21 +51,15 @@ struct __usbh_heap_t {
     implement(vsf_heap_t)
     uint8_t memory[32 * 1024];
     // one more as terminator
-    vsf_dlist_t freelist[2];
+    vsf_dlist_t __freelist[2];
 } static __usbh_heap;
-
-static vsf_dlist_t * __usbh_heap_get_freelist(vsf_heap_t *heap, uint_fast32_t size)
-{
-    return &__usbh_heap.freelist[0];
-}
 
 static void __usbh_heap_init(void)
 {
     memset(&__usbh_heap.use_as__vsf_heap_t, 0, sizeof(__usbh_heap.use_as__vsf_heap_t));
-    for (uint_fast8_t i = 0; i < dimof(__usbh_heap.freelist); i++) {
-        vsf_dlist_init(&__usbh_heap.freelist[i]);
-    }
-    __usbh_heap.get_freelist = __usbh_heap_get_freelist;
+    __usbh_heap.freelist = &__usbh_heap.__freelist[0];
+    __usbh_heap.freelist_num = dimof(__usbh_heap.__freelist);
+    __vsf_heap_init(&__usbh_heap.use_as__vsf_heap_t);
     __vsf_heap_add_buffer(&__usbh_heap.use_as__vsf_heap_t, __usbh_heap.memory, sizeof(__usbh_heap.memory));
 }
 
