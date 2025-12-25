@@ -291,7 +291,9 @@ static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_get_stack(void)
 
 static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_get_lr(void)
 {
-    return __get_LR();
+    register uintptr_t result;
+    __asm__ __volatile__ ("MOV %0, LR" : "=r"(result));
+    return result;
 }
 
 #if VSF_ARCH_USE_THREAD_REG == ENABLED && !defined(__cplusplus)
