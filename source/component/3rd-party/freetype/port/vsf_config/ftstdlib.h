@@ -98,7 +98,7 @@
    *
    */
 
-
+#include <vsf_cfg.h>
 #if VSF_USE_FS == ENABLED && VSF_FS_USE_MEMFS == ENABLED && VSF_FREETYPE_USE_STDIO != ENABLED
 
 #include "component/fs/vsf_fs.h"
