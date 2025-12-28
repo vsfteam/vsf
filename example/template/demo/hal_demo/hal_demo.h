@@ -264,11 +264,7 @@ extern void hal_device_irq_enable(hal_test_t *test);
 extern void hal_evthandler(vsf_eda_t *eda, vsf_evt_t evt);
 extern vsf_err_t hal_test_evthandler(hal_test_t *test, int argc, char *argv[], char c);
 
-#if APP_USE_LINUX_DEMO == ENABLED
-extern int hal_main(hal_demo_t * demo, int argc, char *argv[]);
-#else
-extern int hal_main(hal_demo_t * demo);
-#endif
+extern int hal_main(void);
 
 #endif      // APP_USE_HAL_DEMO == ENABLED
 

@@ -1279,10 +1279,16 @@ extern vsf_spi_capability_t vsf_spi_capability(vsf_spi_t *spi_ptr);
  * @brief Perform FIFO-based data transfer on a SPI instance
  * @param[in,out] spi_ptr: Pointer to SPI instance structure @ref vsf_spi_t
  * @param[in] out_buffer_ptr: Pointer to data to transmit (can be NULL for receive-only)
- * @param[inout] out_offset_ptr: Pointer to transmit buffer offset
+ * @param[inout] out_offset_ptr: Pointer to transmit buffer offset. Must be initialized to 0 before first call
+ *                               if not NULL. The function updates this value to indicate the number of data units
+ *                               that have been transferred.
  * @param[out] in_buffer_ptr: Pointer to buffer for received data (can be NULL for transmit-only)
- * @param[inout] in_offset_ptr: Pointer to receive buffer offset
+ * @param[inout] in_offset_ptr: Pointer to receive buffer offset. Must be initialized to 0 before first call
+ *                              if not NULL. The function updates this value to indicate the number of data units
+ *                              that have been transferred.
  * @param[in] count: Number of data units to transfer (can be 0 for QSPI operations with only command/address phases)
+ * @note This is a non-blocking API. To complete the full data transfer, this function must be called repeatedly
+ *       in a loop until both out_offset_ptr and in_offset_ptr reach the count value.
  * @note Data unit size is determined by the configured data size in SPI mode (@ref vsf_spi_mode_t)
  * @note Buffer size requirements: 4-8 bits = 1 byte, 9-16 bits = 2 bytes, 17-32 bits = 4 bytes per data unit
  * @note In master mode, out_buffer_ptr data is sent through MOSI pin, in_buffer_ptr receives from MISO pin
@@ -1299,10 +1305,14 @@ extern vsf_spi_capability_t vsf_spi_capability(vsf_spi_t *spi_ptr);
  * @brief 在 SPI 实例上执行基于 FIFO 的数据传输
  * @param[in,out] spi_ptr: 指向结构体 @ref vsf_spi_t 的指针
  * @param[in] out_buffer_ptr: 指向要发送数据的缓冲区指针（仅接收时可为 NULL）
- * @param[inout] out_offset_ptr: 指向发送缓冲区偏移的指针
+ * @param[inout] out_offset_ptr: 指向发送缓冲区偏移的指针。如果非 NULL，必须在首次调用前初始化为 0。
+ *                               函数会更新此值以指示已传输的数据单元数。
  * @param[out] in_buffer_ptr: 指向用于接收数据的缓冲区指针（仅发送时可为 NULL）
- * @param[inout] in_offset_ptr: 指向接收缓冲区偏移的指针
+ * @param[inout] in_offset_ptr: 指向接收缓冲区偏移的指针。如果非 NULL，必须在首次调用前初始化为 0。
+ *                               函数会更新此值以指示已传输的数据单元数。
  * @param[in] count: 要传输的数据单元数（对于仅有命令/地址阶段的 QSPI 操作可以为 0）
+ * @note 这是一个非阻塞 API。要完成全部数据传输，必须在循环中持续调用此函数，
+ *       直到 out_offset_ptr 和 in_offset_ptr 都达到 count 值。
  * @note 数据单元大小由 SPI 模式中配置的数据大小决定（@ref vsf_spi_mode_t）
  * @note 缓冲区大小要求：4-8 位 = 1 字节，9-16 位 = 2 字节，17-32 位 = 4 字节每个数据单元
  * @note 在主机模式下，out_buffer_ptr 数据通过 MOSI 引脚发送，in_buffer_ptr 从 MISO 引脚接收

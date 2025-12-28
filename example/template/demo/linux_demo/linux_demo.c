@@ -267,6 +267,10 @@ int vsf_linux_create_fhs(void)
     extern int adc_main(int argc, char *argv[]);
     busybox_bind(VSF_LINUX_CFG_BIN_PATH "/adc-test", adc_main);
 #   endif
+#   if APP_USE_HAL_DMA_DEMO == ENABLED && VSF_HAL_USE_DMA == ENABLED
+    extern int dma_main(int argc, char *argv[]);
+    vsf_linux_fs_bind_executable(VSF_LINUX_CFG_BIN_PATH "/dma-test", dma_main);
+#   endif
 #   if APP_USE_HAL_FLASH_DEMO == ENABLED && VSF_HAL_USE_FLASH == ENABLED
     extern int flash_main(int argc, char *argv[]);
     busybox_bind(VSF_LINUX_CFG_BIN_PATH "/flash-test", flash_main);
