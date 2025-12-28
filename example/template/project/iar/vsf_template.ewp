@@ -7126,7 +7126,7 @@
                 </option>
                 <option>
                     <name>CCPreprocFile</name>
-                    <state>0</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCPreprocComments</name>
@@ -7183,7 +7183,7 @@
                 <option>
                     <name>CCAllowList</name>
                     <version>1</version>
-                    <state>11111110</state>
+                    <state>00000000</state>
                 </option>
                 <option>
                     <name>CCDebugInfo</name>
@@ -7252,6 +7252,10 @@
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\drivers\inc</state>
                     <state>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\vendor\libraries\cmsis\cm4\device_support</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\simple_libc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\include\libusb</state>
+                    <state>$PROJ_DIR$\..\..\..\..\source\shell\sys\linux\kernel\fs\vfs\files\terminfo</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -7267,7 +7271,7 @@
                 </option>
                 <option>
                     <name>CCOptLevel</name>
-                    <state>3</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCOptStrategy</name>
@@ -7276,7 +7280,7 @@
                 </option>
                 <option>
                     <name>CCOptLevelSlave</name>
-                    <state>3</state>
+                    <state>1</state>
                 </option>
                 <option>
                     <name>CCPosIndRopi</name>
@@ -8142,6 +8146,7 @@
                     <configuration>vsf_template_gd32e103</configuration>
                     <configuration>vsf_template_mt071</configuration>
                     <configuration>vsf_template_stm32h743</configuration>
+                    <configuration>vsf_template_at32f405</configuration>
                 </excluded>
                 <group>
                     <name>bt_demo</name>
@@ -8173,6 +8178,20 @@
             </group>
             <group>
                 <name>board</name>
+                <group>
+                    <name>at32f405kcu7-4</name>
+                    <excluded>
+                        <configuration>vsf_template_m484</configuration>
+                        <configuration>vsf_template_f1c100s</configuration>
+                        <configuration>vsf_template_gd32e103</configuration>
+                        <configuration>vsf_template_mt071</configuration>
+                        <configuration>vsf_template_aic8800</configuration>
+                        <configuration>vsf_template_stm32h743</configuration>
+                    </excluded>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\demo\board\at32f405kcu7-4\vsf_bsp.c</name>
+                    </file>
+                </group>
                 <group>
                     <name>embedfire_stm32h743_pro</name>
                     <excluded>
@@ -8484,6 +8503,9 @@
             </group>
             <group>
                 <name>btstack_demo</name>
+                <excluded>
+                    <configuration>vsf_template_at32f405</configuration>
+                </excluded>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\btstack_demo\btstack_application.c</name>
                 </file>
@@ -8584,6 +8606,9 @@
                 <name>hal_demo</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\adc_demo.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\demo\hal_demo\dma_demo.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\demo\hal_demo\flash_demo.c</name>
@@ -16134,6 +16159,15 @@
                         <group>
                             <name>common</name>
                             <group>
+                                <name>dma</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\dma\dma.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\dma\dma.h</name>
+                                </file>
+                            </group>
+                            <group>
                                 <name>exti</name>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\exti\exti.c</name>
@@ -16222,9 +16256,6 @@
                             </group>
                             <group>
                                 <name>vendor</name>
-                                <excluded>
-                                    <configuration>vsf_template_at32f405</configuration>
-                                </excluded>
                                 <group>
                                     <name>libraries</name>
                                     <group>
@@ -16390,6 +16421,18 @@
                                         </group>
                                     </group>
                                 </group>
+                            </group>
+                            <group>
+                                <name>wdt</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\wdt\wdt.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\wdt\wdt.h</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\wdt\wwdt.c</name>
+                                </file>
                             </group>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\at32f402_405_conf.h</name>
@@ -18405,9 +18448,6 @@
                 <name>sys</name>
                 <group>
                     <name>linux</name>
-                    <excluded>
-                        <configuration>vsf_template_at32f405</configuration>
-                    </excluded>
                     <group>
                         <name>app</name>
                         <group>
@@ -18810,9 +18850,6 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\retarget_io.c</name>
-                    <excluded>
-                        <configuration>vsf_template_at32f405</configuration>
-                    </excluded>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\source\utilities\compiler\arm\type.h</name>
