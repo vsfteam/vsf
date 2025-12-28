@@ -27,10 +27,12 @@
 #include "./sdio/vsf_remapped_sdio.h"
 #include "./adc/vsf_remapped_adc.h"
 #include "./dac/vsf_remapped_dac.h"
+#include "./dma/vsf_remapped_dma.h"
 #include "./pwm/vsf_remapped_pwm.h"
 #include "./i2s/vsf_remapped_i2s.h"
 #include "./rtc/vsf_remapped_rtc.h"
 #include "./rng/vsf_remapped_rng.h"
+#include "./wdt/vsf_remapped_wdt.h"
 
 #ifdef __cplusplus
 extern "C" {
