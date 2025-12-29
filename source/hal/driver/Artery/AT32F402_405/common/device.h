@@ -39,8 +39,8 @@
 
 #else
 
-#ifndef __HAL_DEVICE_COMMON_ATTERY_AT32F402_405_H__
-#define __HAL_DEVICE_COMMON_ATTERY_AT32F402_405_H__
+#ifndef __HAL_DEVICE_COMMON_ARTERY_AT32F402_405_H__
+#define __HAL_DEVICE_COMMON_ARTERY_AT32F402_405_H__
 
 /*============================ MACROS ========================================*/
 
@@ -425,7 +425,7 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ PROTOTYPES ====================================*/
 
-#endif      // __HAL_DEVICE_COMMON_ATTERY_AT32F402_405_H__
+#endif      // __HAL_DEVICE_COMMON_ARTERY_AT32F402_405_H__
 #endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
 /* EOF */

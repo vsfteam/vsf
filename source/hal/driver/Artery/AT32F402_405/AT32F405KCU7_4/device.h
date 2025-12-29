@@ -34,8 +34,8 @@
 
 #else
 
-#ifndef __HAL_DEVICE_ATTERY_AT32F405KCU7_4_H__
-#define __HAL_DEVICE_ATTERY_AT32F405KCU7_4_H__
+#ifndef __HAL_DEVICE_ARTERY_AT32F405KCU7_4_H__
+#define __HAL_DEVICE_ARTERY_AT32F405KCU7_4_H__
 
 /*============================ MACROS ========================================*/
 
@@ -109,7 +109,7 @@ VSF_STATIC_ASSERT(VSF_DEV_SWI_NUM == VSF_DEV_COMMON_SWI_NUM + 1);
 /*============================ PROTOTYPES ====================================*/
 
 
-#endif      // __HAL_DEVICE_ATTERY_AT32F405KCU7_4_H__
+#endif      // __HAL_DEVICE_ARTERY_AT32F405KCU7_4_H__
 #endif      // __VSF_HEADER_ONLY_SHOW_ARCH_INFO__
 
 /* EOF */
