@@ -18122,15 +18122,15 @@
 				)
 			)
 		)
-		(property "Value" "1N4148"
-			(at 191.77 25.146 0)
+		(property "Value" "PMEG1030EJ"
+			(at 189.23 24.384 0)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_SOD-523"
+		(property "Footprint" "Diode_SMD:D_SOD-323"
 			(at 191.77 27.94 0)
 			(effects
 				(font
