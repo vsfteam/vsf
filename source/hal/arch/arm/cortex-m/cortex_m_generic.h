@@ -82,12 +82,18 @@ extern "C" {
 
 #if (__ARM_ARCH >= 7) || (__TARGET_ARCH_7_M == 1) || (__TARGET_ARCH_7E_M == 1)
 
+#   if __ARM_ARCH == 7
+#       define __STREX_FAIL         0U
+#   else
+#       define __STREX_FAIL         1U
+#   endif
+
 #   define vsf_atom32_op(__ptr, ...)                                            \
         ({                                                                      \
             int32_t _;                                                          \
             do {                                                                \
                 _ = (int32_t)__LDREXW((volatile uint32_t *)(__ptr));            \
-            } while ((__STREXW((uint32_t)(__VA_ARGS__), (volatile uint32_t *)(__ptr))) != 0U);\
+            } while ((__STREXW((uint32_t)(__VA_ARGS__), (volatile uint32_t *)(__ptr))) != __STREX_FAIL);\
             _;                                                                  \
         })
 
@@ -96,7 +102,7 @@ extern "C" {
             int16_t _;                                                          \
             do {                                                                \
                 _ = (int16_t)__LDREXH((volatile uint16_t *)(__ptr));            \
-            } while ((__STREXH((uint16_t)(__VA_ARGS__), (volatile uint16_t *)(__ptr))) != 0U);\
+            } while ((__STREXH((uint16_t)(__VA_ARGS__), (volatile uint16_t *)(__ptr))) != __STREX_FAIL);\
             _;                                                                  \
         })
 
@@ -105,7 +111,7 @@ extern "C" {
             int8_t _;                                                           \
             do {                                                                \
                 _ = (int8_t)__LDREXB((volatile uint8_t *)(__ptr));              \
-            } while ((__STREXB((uint8_t)(__VA_ARGS__), (volatile uint8_t *)(__ptr))) != 0U);\
+            } while ((__STREXB((uint8_t)(__VA_ARGS__), (volatile uint8_t *)(__ptr))) != __STREX_FAIL);\
             _;                                                                  \
         })
 
@@ -119,7 +125,7 @@ extern "C" {
             vsf_spinlock_t VSF_MACRO_SAFE_NAME(value) = __LDREXW((volatile vsf_spinlock_t *)(__plock));\
             if (VSF_MACRO_SAFE_NAME(value) != 0) {                              \
                 __WFE();                                                        \
-            } else if ((__STREXW(1, (volatile vsf_spinlock_t *)(__plock))) == 0U) {\
+            } else if ((__STREXW(1, (volatile vsf_spinlock_t *)(__plock))) == __STREX_FAIL) {\
                 break;                                                          \
             }                                                                   \
         } while (1)
