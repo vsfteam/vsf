@@ -717,9 +717,6 @@ typedef enum vsf_usart_irq_mask_t {
  * @brief USART 中断和控制标志
  */
 enum {
-#ifndef VSF_USART_IRQ_MASK_RX_IDLE
-    VSF_USART_IRQ_MASK_RX_IDLE              = VSF_USART_IRQ_MASK_RX_TIMEOUT,     //!< \~english RX idle timeout interrupt mask \~chinese RX 空闲超时中断掩码
-#endif
     VSF_USART_IRQ_MASK_TX_FIFO_THRESHOLD    = VSF_USART_IRQ_MASK_TX,            //!< \~english TX FIFO threshold interrupt mask \~chinese TX FIFO 阈值中断掩码
     VSF_USART_IRQ_MASK_RX_FIFO_THRESHOLD    = VSF_USART_IRQ_MASK_RX,            //!< \~english RX FIFO threshold interrupt mask \~chinese RX FIFO 阈值中断掩码
 
