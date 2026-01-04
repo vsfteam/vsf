@@ -581,6 +581,28 @@ vsf_dlist_t * vsf_heap_get_freelist(vsf_heap_t *heap, uint_fast32_t size, bool i
     return &heap->freelist[msb];
 }
 
+bool __vsf_heap_is_free(vsf_heap_t *heap, void *buffer)
+{
+    vsf_protect_t state = __vsf_heap_protect();
+
+    vsf_dlist_t *freelist = &heap->freelist[0];
+    vsf_dlist_t *freelist_last = &heap->freelist[heap->freelist_num - 1];
+    bool found = false;
+
+    while (!found && (freelist <= freelist_last)) {
+        __vsf_dlist_foreach_unsafe(vsf_heap_mcb_t, node, freelist) {
+            if (    (buffer >= (void *)_)
+                &&  (buffer < (void *)((uint8_t *)_ + __vsf_heap_mcb_get_size(_)))) {
+                found = true;
+                break;
+            }
+        }
+    }
+
+    __vsf_heap_unprotect(state);
+    return found;
+}
+
 void __vsf_heap_init(vsf_heap_t *heap)
 {
     if (NULL == heap->get_freelist) {
@@ -1045,6 +1067,16 @@ char * vsf_heap_strdup(const char *str)
         return new_str;
     }
     return NULL;
+}
+
+bool vsf_heap_is_free(void *buffer)
+{
+#   if VSF_ARCH_PROVIDE_HEAP == ENABLED
+    if (!__vsf_heap_is_inited) {
+        VSF_HAL_ASSERT(false);
+    }
+#   endif
+    return __vsf_heap_is_free(&__vsf_heap.use_as__vsf_heap_t, buffer);
 }
 
 #if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
