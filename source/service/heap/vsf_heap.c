@@ -1071,12 +1071,17 @@ char * vsf_heap_strdup(const char *str)
 
 bool vsf_heap_is_free(void *buffer)
 {
+#if VSF_USE_ARCH_HEAP == ENABLED
+    VSF_SERVICE_ASSERT(false);
+    return false;
+#else
 #   if VSF_ARCH_PROVIDE_HEAP == ENABLED
     if (!__vsf_heap_is_inited) {
         VSF_HAL_ASSERT(false);
     }
 #   endif
     return __vsf_heap_is_free(&__vsf_heap.use_as__vsf_heap_t, buffer);
+#endif
 }
 
 #if __IS_COMPILER_LLVM__ || __IS_COMPILER_ARM_COMPILER_6__
