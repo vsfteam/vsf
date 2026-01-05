@@ -597,6 +597,7 @@ bool __vsf_heap_is_free(vsf_heap_t *heap, void *buffer)
                 break;
             }
         }
+        freelist++;
     }
 
     __vsf_heap_unprotect(state);
