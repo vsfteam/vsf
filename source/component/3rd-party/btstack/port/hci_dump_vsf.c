@@ -71,7 +71,7 @@ static void __hcp_dump_vsf_log_packet(uint8_t packet_type, uint8_t in, uint8_t *
         }
         break;
     case LOG_MESSAGE_PACKET:
-        vsf_trace_debug("LOG -- %s\n\r", (char*) packet);
+        vsf_trace_debug("LOG -- %s" VSF_TRACE_CFG_LINEEND, (char*) packet);
         return;
     default:
         return;
@@ -82,6 +82,7 @@ static void __hcp_dump_vsf_log_packet(uint8_t packet_type, uint8_t in, uint8_t *
 static void __hci_dump_vsf_log_message(int log_level, const char * format, va_list argptr)
 {
     vsf_trace_arg(VSF_TRACE_DEBUG, format, argptr);
+    vsf_trace_debug(VSF_TRACE_CFG_LINEEND);
 }
 
 #endif      // VSF_USE_BTSTACK
