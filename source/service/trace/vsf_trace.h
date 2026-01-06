@@ -136,8 +136,8 @@ typedef struct vsf_stream_tx_t vsf_stream_tx_t;
 typedef enum vsf_trace_level_t {
     VSF_TRACE_NONE,
     VSF_TRACE_ERROR,
-    VSF_TRACE_INFO,
     VSF_TRACE_WARNING,
+    VSF_TRACE_INFO,
     VSF_TRACE_DEBUG,
     VSF_TRACE_LEVEL_NUM,
 } vsf_trace_level_t;
