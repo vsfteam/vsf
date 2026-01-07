@@ -35,10 +35,7 @@
 /*============================ TYPES =========================================*/
 
 typedef struct vk_musb_fdrc_hcd_t {
-    vk_musb_fdrc_reg_t *reg;
-#if defined(VSF_MUSB_FDRC_NO_EP_IDX) || defined(VSF_MUSB_FDRC_NO_HWFIFO)
-    vk_musb_fdrc_reg_t __reg;
-#endif
+    vk_musb_fdrc_reg_t reg;
 
     enum vk_musb_fdrc_hcd_state_t {
         MUSB_FDRC_HCD_STATE_WAIT_HOSTMODE,
@@ -177,7 +174,7 @@ static void __vk_musb_fdrc_hcd_free_urb_do(vk_musb_fdrc_hcd_t *musb, vk_usbh_hcd
 // TODO: verify ZLP indicated by urb->transfer_flags with URB_ZERO_PACKET
 static vsf_err_t __vk_musb_fdrc_hcd_urb_fsm(vk_musb_fdrc_hcd_t *musb, vk_usbh_hcd_urb_t *urb)
 {
-    vk_musb_fdrc_reg_t *reg = musb->reg;
+    vk_musb_fdrc_reg_t *reg = &musb->reg;
     vk_musb_fdrc_urb_t *musb_urb = (vk_musb_fdrc_urb_t *)urb->priv;
 
     vk_usbh_pipe_t pipe = urb->pipe;
@@ -388,7 +385,7 @@ static void __vsf_musb_fdrc_hcd_process_ep(vk_musb_fdrc_hcd_t *musb, uint_fast8_
 static void __vk_musb_fdrc_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vk_musb_fdrc_hcd_t *musb = vsf_container_of(eda, vk_musb_fdrc_hcd_t, teda);
-    vk_musb_fdrc_reg_t *reg = musb->reg;
+    vk_musb_fdrc_reg_t *reg = &musb->reg;
 
     switch (evt) {
     case VSF_EVT_INIT:
@@ -473,7 +470,7 @@ static void __vk_musb_fdrc_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 static void __vk_musb_fdrc_hcd_isrhandler(void *param)
 {
     vk_musb_fdrc_hcd_t *musb = param;
-    vk_musb_fdrc_reg_t *reg = musb->reg;
+    vk_musb_fdrc_reg_t *reg = &musb->reg;
 
     uint_fast32_t status = reg->Common->IntrUSB;
     status &= reg->Common->IntrUSBE;
@@ -524,7 +521,7 @@ static vsf_err_t __vk_musb_fdrc_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
     VSF_USB_ASSERT(hcd != NULL);
     if (hcd->priv != NULL) {
         musb = hcd->priv;
-        reg = musb->reg;
+        reg = &musb->reg;
     }
     param = hcd->param;
 
@@ -550,14 +547,11 @@ static vsf_err_t __vk_musb_fdrc_hcd_init_evthandler(vsf_eda_t *eda, vsf_evt_t ev
         {
             vk_musb_fdrc_hc_ip_info_t info;
             param->op->GetInfo(&info.use_as__usb_hc_ip_info_t);
+            musb->reg.info = info.use_as__vk_musb_fdrc_reg_info_t;
 #if defined(VSF_MUSB_FDRC_NO_EP_IDX) || defined(VSF_MUSB_FDRC_NO_HWFIFO)
-            musb->__reg.info = info.use_as__vk_musb_fdrc_reg_info_t;
-            musb->__reg.__cur_ep = 0;
-            musb->reg = &musb->__reg;
-#else
-            musb->reg = info.regbase;
+            musb->reg.__cur_ep = 0;
 #endif
-            reg = musb->reg;
+            reg = &musb->reg;
             vk_musb_fdrc_fifo_init(reg);
             musb->epnum = info.ep_num;
             // ep0 is reserved for control transfer
@@ -605,14 +599,14 @@ static vsf_err_t __vk_musb_fdrc_hcd_resume(vk_usbh_hcd_t *hcd)
 static uint_fast16_t __vk_musb_fdrc_hcd_get_frame_number(vk_usbh_hcd_t *hcd)
 {
     vk_musb_fdrc_hcd_t *musb = hcd->priv;
-    vk_musb_fdrc_reg_t *reg = musb->reg;
+    vk_musb_fdrc_reg_t *reg = &musb->reg;
     return reg->Common->Frame1 + (reg->Common->Frame2 << 8);
 }
 
 static void __vk_musb_fdrc_hcd_free_device(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
     vk_musb_fdrc_hcd_t *musb = hcd->priv;
-    vk_musb_fdrc_reg_t *reg = musb->reg;
+    vk_musb_fdrc_reg_t *reg = &musb->reg;
     uint_fast16_t epmask = (1 << musb->epnum) - 1;
     int_fast8_t idx;
 
@@ -703,11 +697,11 @@ static vsf_err_t __vk_musb_fdrc_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_u
     if (pipe.dir_in1out0) {
         dir_mask = 0x10;
         ep_mask = &musb->ep_in_mask;
-        ep_inten = (uint8_t *)&musb->reg->Common->IntrRx1E;
+        ep_inten = (uint8_t *)&musb->reg.Common->IntrRx1E;
     } else {
         dir_mask = 0x00;
         ep_mask = &musb->ep_out_mask;
-        ep_inten = (uint8_t *)&musb->reg->Common->IntrTx1E;
+        ep_inten = (uint8_t *)&musb->reg.Common->IntrTx1E;
     }
 
     if (0 == pipe.endpoint) {
