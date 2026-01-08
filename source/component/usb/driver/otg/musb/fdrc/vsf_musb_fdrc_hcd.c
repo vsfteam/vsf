@@ -734,7 +734,6 @@ static vsf_err_t __vk_musb_fdrc_hcd_submit_urb(vk_usbh_hcd_t *hcd, vk_usbh_hcd_u
 static vsf_err_t __vk_musb_fdrc_hcd_reset_dev(vk_usbh_hcd_t *hcd, vk_usbh_hcd_dev_t *dev)
 {
     vk_musb_fdrc_hcd_t *musb = hcd->priv;
-    musb->state = MUSB_FDRC_HCD_STATE_WAIT_RESET;
     vsf_eda_post_evt(&musb->teda.use_as__vsf_eda_t, VSF_MUSB_FDRC_HCD_EVT_RESET);
     return VSF_ERR_NONE;
 }
