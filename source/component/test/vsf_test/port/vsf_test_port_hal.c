@@ -22,8 +22,13 @@
 /*============================ MACROS ========================================*/
 
 #if VSF_USE_TEST == ENABLED && VSF_HAL_USE_WDT == ENABLED && VSF_TEST_CFG_HAL_WDT == ENABLED
+
+#include "kernel/vsf_kernel.h"
+#include "hal/vsf_hal.h"
+
+
 #    ifndef VSF_TEST_CFG_HAL_WDT_DEVICE
-#        define VSF_TEST_CFG_HAL_WDT_DEVICE vsf_hw_wdt
+#        define VSF_TEST_CFG_HAL_WDT_DEVICE         vsf_hw_wdt0
 #    endif
 
 #    ifndef VSF_TEST_CFG_HAL_WDT_MODE
@@ -43,11 +48,11 @@ void vsf_test_hal_wdt_init(vsf_test_wdt_t *wdt, uint32_t timeout_ms)
     vsf_wdt_cfg_t cfg = {.mode   = VSF_TEST_CFG_HAL_WDT_MODE,
                          .max_ms = timeout_ms};
 
-    vsf_wdt_init(&VSF_TEST_CFG_HAL_WDT, &cfg)
+    vsf_wdt_init(&VSF_TEST_CFG_HAL_WDT_DEVICE, &cfg);
 }
 
 void vsf_test_hal_wdt_feed(vsf_test_wdt_t *wdt)
 {
-    vsf_wdt_feed(&VSF_TEST_CFG_HAL_WDT);
+    vsf_wdt_feed(&VSF_TEST_CFG_HAL_WDT_DEVICE);
 }
 #endif

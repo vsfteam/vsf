@@ -17,9 +17,12 @@
 
 /*============================ INCLUDES ======================================*/
 
+#ifndef __VSF_TEST_H__
+#   define __VSF_TEST_H__
+
 //! \note do not move this pre-processor statement to other places
-#include "component/vsf_component_cfg.h"
-#include "utilities/vsf_utilities.h"
+#   include "component/vsf_component_cfg.h"
+#   include "utilities/vsf_utilities.h"
 
 /* example:
 
@@ -71,7 +74,7 @@
     // Here is an example of HardFault_Handler in Cortex-M:
     void HardFault_Handler(void)
     {
-        vsf_test_reboot(test, VSF_TEST_RESULT_FAULT_HANDLER_FAIL, __FILE__,
+        vsf_test_reboot(VSF_TEST_RESULT_FAULT_HANDLER_FAIL, __FILE__,
                         __LINE__, __FUNCTION__, "More Info");
     }
 
@@ -87,7 +90,7 @@
         int a = 100;
         int b = 50 + 50;
 
-        VSF_TEST_ASSERT(test, a == b);
+        VSF_TEST_ASSERT(a == b);
     }
 
     // test failed
@@ -96,7 +99,7 @@
         int a = 100;
         int b = 50 + 50;
 
-        VSF_TEST_ASSERT(test, a != b);
+        VSF_TEST_ASSERT(a != b);
     }
 
     // test with watchdog reset
@@ -119,37 +122,45 @@
 
     int main(void)
     {
-        // 5. We support two styles of adding test cases.
+        // 5. Configure and initialize the test framework
+        vsf_test_cfg_t test_cfg = {
+            .wdt = {
+                .internal = {
+                    .init = vsf_test_hal_wdt_init,
+                    .feed = vsf_test_hal_wdt_feed,
+                },
+            },
+            .reboot = {
+                .internal = vsf_arch_reset,
+            },
+            .data = {
+                .init = vsf_test_stdio_data_init,
+                .sync = vsf_test_stdio_data_sync,
+            },
+            .restart_on_done = false,  // Set to true to restart when test completes or errors occur
+        };
+        vsf_test_init(&test_cfg);
+
+        // 6. We support two styles of adding test cases.
         // - The first is the static way. We can use macros to initialize test
         //   cases. It is more RAM efficient.
         // - The second is the dynamic way of adding, which is closer to the
         //   traditional testing framework.
     #if 1
-        static const vsf_test_case_t __test_cases[] = {
-            VSF_TEST_ADD(__test_pass, "test_pass hw_req=none", 0),
-            VSF_TEST_ADD(__test_fail, "test_fail hw_req=none", 0),
-            VSF_TEST_ADD(__test_wdt, "test_wdt hw_req=none", 0),
-            VSF_TEST_ADD(__test_unalign, "test_invalid_address hw_req=none", 0),
-        };
-        vsf_test_init(test, (vsf_test_case_t *)__test_cases,
-                      dimof(__test_cases));
-    #else static vsf_test_case_t __test_cases[10];
-        vsf_test_init(test, __test_cases, dimof(__test_cases));
-        vsf_test_add(test, __test_pass, "test_pass hw_req=none");
-        vsf_test_add(test, __test_fail, "test_fail hw_req=none");
-        vsf_test_add(test, __test_wdt, "test_wdt hw_req=none");
-        vsf_test_add(test, __test_unalign, "test_invalid_address hw_req=none");
+        vsf_test_add(__test_pass, "test_pass hw_req=none");
+        vsf_test_add(__test_fail, "test_fail hw_req=none");
+        vsf_test_add(__test_wdt, "test_wdt hw_req=none");
+        vsf_test_add(__test_unalign, "test_invalid_address hw_req=none");
     #endif
 
-        // 6. Here the test will start running
-        vsf_test_run_tests(test);
+        // 7. Here the test will start running
+        vsf_test_run_tests();
 
         return 0;
     }
 */
 
-#ifndef __VSF_TEST_H__
-#    define __VSF_TEST_H__
+
 
 #    if VSF_USE_TEST == ENABLED
 
@@ -180,59 +191,38 @@
 #            define VSF_TEST_CFG_USE_STDIO_DATA_SYNC DISABLED
 #        endif
 
+//!< Using file interface to save persistent data to assist device
+#        ifndef VSF_TEST_CFG_USE_FILE_DATA_SYNC
+#            define VSF_TEST_CFG_USE_FILE_DATA_SYNC DISABLED
+#        endif
+
+//!< Using appcfg command to save persistent data to assist device
+#        ifndef VSF_TEST_CFG_USE_APPCFG_DATA_SYNC
+#            define VSF_TEST_CFG_USE_APPCFG_DATA_SYNC DISABLED
+#        endif
+
+//!< Enable trace output for test framework
+#        ifndef VSF_TEST_CFG_USE_TRACE
+#            define VSF_TEST_CFG_USE_TRACE ENABLED
+#        endif
+
+//!< Test case array size
+#        ifndef VSF_TEST_CFG_ARRAY_SIZE
+#            define VSF_TEST_CFG_ARRAY_SIZE 100
+#        endif
+
 /*!
-    \def VSF_TEST_ASSERT(__t, __v)
+    \def VSF_TEST_ASSERT(__v)
     \brief Add an assertion to the test case
-    \param __t pointer to @ref vsf_test_t
     \param __v expressions for test conditions
 */
-#        define VSF_TEST_ASSERT(__t, __v)                                      \
+#        define VSF_TEST_ASSERT(__v)                                           \
             do {                                                               \
                 if (!(__v)) {                                                  \
-                    __vsf_test_longjmp(__t, VSF_TEST_RESULT_FAIL, __FILE__,    \
+                    __vsf_test_longjmp(VSF_TEST_RESULT_FAIL, __FILE__,         \
                                        __LINE__, __FUNCTION__, #__v);          \
                 }                                                              \
             } while (0)
-
-/*!
-    \def VSF_TEST_ADD_EX(__FN, __CFG, __TYPE, ...)
-    \brief Initialize to add a test case of any type
-    \param __FN pointer to @ref vsf_test_bool_fn_t or @ref vsf_test_jmp_fn_t
-    \param __CFG qequest string for test cases
-    \param __TYPE type @ref vsf_test_type_t
-    \param ...  More configuration options, such as expect_wdt for whether to
-   expect a watchdog reset or not
-*/
-#        define VSF_TEST_ADD_EX(__FN, __CFG, __TYPE, ...)                      \
-            {.jmp_fn = __FN, .cfg_str = __CFG, .type = __TYPE, __VA_ARGS__}
-
-/*!
-    \def VSF_TEST_ADD_BOOL_FN(__FN, __CFG, __TYPE, ...)
-    \brief Initialize to add a test case of VSF_TEST_TYPE_BOOL_FN type
-    \param __FN pointer to @ref vsf_test_bool_fn_t or @ref vsf_test_jmp_fn_t
-    \param __CFG qequest string for test cases
-    \param ...  More configuration options, such as expect_wdt for whether to
-   expect a watchdog reset or not
-*/
-#        define VSF_TEST_ADD_BOOL_FN(__FN, __CFG, ...)                         \
-            {.jmp_fn  = __FN,                                                  \
-             .cfg_str = __CFG,                                                 \
-             .type    = VSF_TEST_TYPE_BOOL_FN,                                 \
-             __VA_ARGS__}
-
-/*!
-    \def VSF_TEST_ADD(__FN, __CFG, __TYPE, ...)
-    \brief Initialize to add a test case of VSF_TEST_TYPE_LONGJMP_FN type
-    \param __FN pointer to @ref vsf_test_bool_fn_t or @ref vsf_test_jmp_fn_t
-    \param __CFG qequest string for test cases
-    \param ...  More configuration options, such as expect_wdt for whether to
-   expect a watchdog reset or not
-*/
-#        define VSF_TEST_ADD(__FN, __CFG, ...)                                 \
-            {.jmp_fn  = __FN,                                                  \
-             .cfg_str = __CFG,                                                 \
-             .type    = VSF_TEST_TYPE_LONGJMP_FN,                              \
-             __VA_ARGS__}
 
 /*============================ TYPES =========================================*/
 
@@ -388,7 +378,42 @@ typedef struct vsf_test_case_t {
     //! If the result of the test is expected to be a watchdog reset. Then set
     //! this variable to one
     uint8_t expect_wdt;
+
+    //! If the test is expected to trigger an assertion (e.g., null pointer check),
+    //! then set this variable to one. When an assertion is triggered, the test will
+    //! be considered as PASS instead of FAIL.
+    uint8_t expect_assert;
 } vsf_test_case_t;
+
+//! \brief Test framework configuration structure
+typedef struct vsf_test_cfg_t {
+    //! Watchdog configuration
+    struct {
+        //! Internal watchdog configuration
+        vsf_test_wdt_t internal;
+        //! External watchdog configuration
+        vsf_test_wdt_t external;
+    } wdt;
+
+    //! Reboot configuration
+    struct {
+        //! Internal reboot function (chip's internal reset)
+        vsf_test_reboot_t *internal;
+        //! External reboot function (via reset pin or power pin)
+        vsf_test_reboot_t *external;
+    } reboot;
+
+    //! Data persistence configuration
+    struct {
+        //! Data initialization function
+        void (*init)(vsf_test_data_t *data);
+        //! Data synchronization function
+        void (*sync)(vsf_test_data_t *data, vsf_test_data_cmd_t cmd);
+    } data;
+
+    //! Restart from the beginning when test completes or errors occur
+    bool restart_on_done;
+} vsf_test_cfg_t;
 
 typedef struct vsf_test_t {
     //! Without a watchdog, we can still can test.
@@ -427,12 +452,13 @@ typedef struct vsf_test_t {
     jmp_buf *jmp_buf;
 #        endif
 
-    //! Information for each test
-    struct {
-        uint32_t         size;
-        uint32_t         offset;
-        vsf_test_case_t *array;
-    } test_case;
+    //! Restart from the beginning when test completes or errors occur
+    bool restart_on_done;
+
+    //! Test case count (number of test cases added)
+    uint32_t test_case_count;
+    //! Test case array
+    vsf_test_case_t test_case_array[VSF_TEST_CFG_ARRAY_SIZE];
 } vsf_test_t;
 
 /*============================ INCLUDES ======================================*/
@@ -440,51 +466,125 @@ typedef struct vsf_test_t {
 
 /**
  @brief initialize vsf test
- @param[in] test: a pointer to structure @ref vsf_test_t
- @param[in] tc_array: a pointer to array @ref vsf_test_case_t
- @param[in] array_size: size of tc_array
+ @param[in] cfg: a pointer to configuration structure @ref vsf_test_cfg_t
  */
-extern void vsf_test_init(vsf_test_t *test, vsf_test_case_t *tc_array,
-                          uint32_t array_size);
+extern void vsf_test_init(const vsf_test_cfg_t *cfg);
+
+/*============================ API USAGE GUIDE =============================*/
+/**
+ * @brief API Selection Guide
+ *
+ * Choose the appropriate API based on your test case requirements:
+ *
+ * 1. vsf_test_add_simple_case() - Use for simple LONGJMP_FN test cases
+ *    - No watchdog reset expected (expect_wdt=0)
+ *    - No assertion expected (expect_assert=0)
+ *    - Example: vsf_test_add_simple_case(__test_func, "cfg_string");
+ *
+ * 2. vsf_test_add_case() - Use for LONGJMP_FN test cases with watchdog option
+ *    - Can specify expect_wdt
+ *    - No assertion expected (expect_assert=0)
+ *    - Example: vsf_test_add_case(__test_func, "cfg_string", 1);
+ *
+ * 3. vsf_test_add_bool_fn() - Use for simple BOOL_FN test cases
+ *    - No watchdog reset expected (expect_wdt=0)
+ *    - Returns bool instead of using VSF_TEST_ASSERT
+ *    - Example: vsf_test_add_bool_fn(__test_func, "cfg_string");
+ *
+ * 4. vsf_test_add_bool_fn_case() - Use for BOOL_FN test cases with watchdog option
+ *    - Can specify expect_wdt
+ *    - Returns bool instead of using VSF_TEST_ASSERT
+ *    - Example: vsf_test_add_bool_fn_case(__test_func, "cfg_string", 1);
+ *
+ * 5. vsf_test_add_expect_assert_case() - Use when test expects an assertion
+ *    - expect_assert=1 (test passes if assertion occurs)
+ *    - Can specify expect_wdt
+ *    - Example: vsf_test_add_expect_assert_case(__test_func, "cfg_string", 0);
+ *
+ * 6. vsf_test_add_ex_case() - Use for full control over all parameters
+ *    - Can specify type, expect_wdt, and expect_assert
+ *    - Most flexible but more verbose
+ *    - Example: vsf_test_add_ex_case(__test_func, "cfg_string", VSF_TEST_TYPE_LONGJMP_FN, 0, 1);
+ *
+ * 7. vsf_test_add_ex() - Use when you already have a vsf_test_case_t structure
+ *    - For advanced use cases or when building test cases dynamically
+ *    - Example: vsf_test_add_ex(&my_test_case);
+ */
 
 /**
  @brief Add to add a test case of any type
- @param[in] test: a pointer to structure @ref vsf_test_t
  @param[in] test_case: a pointer to array @ref vsf_test_case_t
  @return bool: true if add was successfully, or false
  */
-extern bool vsf_test_add_ex(vsf_test_t *test, vsf_test_case_t *test_case);
+extern bool vsf_test_add_ex(vsf_test_case_t *test_case);
 
 /**
- @brief Add to add a test case of VSF_TEST_TYPE_LONGJMP_FN type
- @param[in] test: a pointer to structure @ref vsf_test_t
+ @brief Add a test case of VSF_TEST_TYPE_LONGJMP_FN type (simplified, expect_wdt=0)
  @param[in] jmp_fn: a pointer to function @ref vsf_test_jmp_fn_t
  @param[in] cfg: a string of request information for the test case
  @return bool: true if add was successfully, or false
  */
-extern bool vsf_test_add(vsf_test_t *test, vsf_test_jmp_fn_t *jmp_fn,
-                         char *cfg);
+extern bool vsf_test_add_simple_case(vsf_test_jmp_fn_t *jmp_fn, char *cfg);
 
 /**
  @brief Add to add a test case of VSF_TEST_TYPE_BOOL_FN type
- @param[in] test: a pointer to structure @ref vsf_test_t
  @param[in] b_fn: a pointer to function @ref vsf_test_bool_fn_t
  @param[in] cfg: a string of request information for the test case
  @return bool: true if add was successfully, or false
  */
-extern bool vsf_test_add_bool_fn(vsf_test_t *test, vsf_test_bool_fn_t *b_fn,
-                                 char *cfg);
+extern bool vsf_test_add_bool_fn(vsf_test_bool_fn_t *b_fn, char *cfg);
+
+/**
+ @brief Add a test case of VSF_TEST_TYPE_LONGJMP_FN type
+ @param[in] fn: pointer to test function
+ @param[in] cfg: request string for test case
+ @param[in] expect_wdt: whether to expect a watchdog reset (default: 0)
+ @return bool: true if add was successfully, or false
+ */
+extern bool vsf_test_add_case(vsf_test_jmp_fn_t *fn, char *cfg, uint8_t expect_wdt);
+
+/**
+ @brief Add a test case of VSF_TEST_TYPE_BOOL_FN type
+ @param[in] fn: pointer to test function
+ @param[in] cfg: request string for test case
+ @param[in] expect_wdt: whether to expect a watchdog reset (default: 0)
+ @return bool: true if add was successfully, or false
+ */
+extern bool vsf_test_add_bool_fn_case(vsf_test_bool_fn_t *fn, char *cfg, uint8_t expect_wdt);
+
+/**
+ @brief Add a test case of any type
+ @param[in] fn: pointer to test function
+ @param[in] cfg: request string for test case
+ @param[in] type: test type @ref vsf_test_type_t
+ @param[in] expect_wdt: whether to expect a watchdog reset (default: 0)
+ @param[in] expect_assert: whether to expect an assertion (default: 0)
+ @return bool: true if add was successfully, or false
+ */
+extern bool vsf_test_add_ex_case(vsf_test_jmp_fn_t *fn, char *cfg,
+                                 vsf_test_type_t type,
+                                 uint8_t expect_wdt,
+                                 uint8_t expect_assert);
+
+/**
+ @brief Add a test case that expects an assertion
+ @param[in] fn: pointer to test function
+ @param[in] cfg: request string for test case
+ @param[in] expect_wdt: whether to expect a watchdog reset (default: 0)
+ @return bool: true if add was successfully, or false
+ */
+extern bool vsf_test_add_expect_assert_case(vsf_test_jmp_fn_t *fn,
+                                            char *cfg,
+                                            uint8_t expect_wdt);
 
 /**
  @brief Run all tests. Should be called after all use cases have been
  initialized.
- @param[in] test: a pointer to structure @ref vsf_test_t
  */
-extern void vsf_test_run_tests(vsf_test_t *test);
+extern void vsf_test_run_tests(void);
 
 /**
  @brief rong jump. the user does not need to directly call this API
- @param[in] test: a pointer to structure @ref vsf_test_t
  @param[in] result: test result,  @ref vsf_test_result_t
  @param[in] file_name: then name of the file where the assertion occurred
  @param[in] line: the line number of the code where the assertion occurred
@@ -494,14 +594,13 @@ extern void vsf_test_run_tests(vsf_test_t *test);
  @note This function will be called when the test case asserts that the
  condition is not satisfied.
  */
-extern void __vsf_test_longjmp(vsf_test_t *test, vsf_test_result_t result,
+extern void __vsf_test_longjmp(vsf_test_result_t result,
                                const char *file_name, uint32_t line,
                                const char *function_name,
                                const char *condition);
 
 /**
  @brief reboot, usually called inside an exception.
- @param[in] test: a pointer to structure @ref vsf_test_t
  @param[in] result: test result,  @ref vsf_test_result_t
  @param[in] file_name: then name of the file where the assertion occurred
  @param[in] line: the line number of the code where the assertion occurred
@@ -509,7 +608,7 @@ extern void __vsf_test_longjmp(vsf_test_t *test, vsf_test_result_t result,
  @param[in] additional_str: provide additional exception information
 
  */
-extern void vsf_test_reboot(vsf_test_t *test, vsf_test_result_t result,
+extern void vsf_test_reboot(vsf_test_result_t result,
                             const char *file_name, uint32_t line,
                             const char *function_name,
                             const char *additional_str);
@@ -521,6 +620,8 @@ extern void vsf_test_reboot(vsf_test_t *test, vsf_test_result_t result,
 
 #        include "./port/vsf_test_port_hal.h"
 #        include "./port/vsf_test_port_stdio.h"
+#        include "./port/vsf_test_port_file.h"
+#        include "./port/vsf_test_port_appcfg.h"
 
 #    endif
 #endif
