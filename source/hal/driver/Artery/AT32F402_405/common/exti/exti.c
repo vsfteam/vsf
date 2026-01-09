@@ -164,6 +164,18 @@ vsf_err_t VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_irq_disable)(
     return VSF_ERR_NONE;
 }
 
+static vsf_exti_channel_mask_t VSF_MCONNECT(__, VSF_EXTI_CFG_IMP_PREFIX, _exti_irq_clear)(
+    VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_t) *exti_ptr,
+    vsf_exti_channel_mask_t channel_mask
+) {
+    VSF_HAL_ASSERT(NULL != exti_ptr);
+
+    exint_type *reg = exti_ptr->reg;
+    vsf_exti_channel_mask_t irq_status = reg->intsts & channel_mask;
+    reg->intsts |= irq_status;
+    return irq_status;
+}
+
 static void VSF_MCONNECT(__, VSF_EXTI_CFG_IMP_PREFIX, _exti_irqhandler)(
     VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_t) *exti_ptr,
     unsigned int irq_idx
@@ -172,12 +184,10 @@ static void VSF_MCONNECT(__, VSF_EXTI_CFG_IMP_PREFIX, _exti_irqhandler)(
     VSF_HAL_ASSERT(irq_idx < dimof(exti_ptr->irq));
 
     VSF_MCONNECT(VSF_EXTI_CFG_IMP_PREFIX, _exti_irq_t) *irq = &exti_ptr->irq[irq_idx];
-    exint_type *reg = exti_ptr->reg;
-    vsf_exti_channel_mask_t irq_status = reg->intsts & irq->channel_mask;
+    vsf_exti_channel_mask_t irq_status = VSF_MCONNECT(__, VSF_EXTI_CFG_IMP_PREFIX, _exti_irq_clear)(exti_ptr, irq->channel_mask);
 
     if ((irq_status != 0) && (irq->handler_fn != NULL)) {
         irq->handler_fn(irq->target_ptr, (vsf_exti_t *)exti_ptr, irq_status);
-        reg->intsts |= irq_status;
     }
 }
 
