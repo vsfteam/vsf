@@ -225,6 +225,41 @@ extern "C" {
 #   define VSF_SPI_CFG_INHERIT_HAL_CAPABILITY            ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable standard optional features support.
+ *
+ * This macro controls the availability of standard optional features in the template.
+ * Standard optional features include:
+ * - Clock polarity and phase options (VSF_SPI_CPOL_*, VSF_SPI_CPHA_*)
+ * - Protocol mode options (VSF_SPI_MOTOROLA_MODE, VSF_SPI_TI_MODE)
+ * - CRC calculation options (VSF_SPI_CRC_*)
+ * - Clock prescaler options (VSF_SPI_CLOCK_PRESCALER_*)
+ * - Extended data line options (VSF_SPI_DATALINE_*)
+ *
+ * @note This macro is for testing purposes only. Users should NOT enable this macro.
+ *       Standard optional features should be implemented directly in hardware drivers
+ *       if the hardware supports them, rather than enabling this macro in the template.
+ *       Enabling this macro may cause compilation errors or unexpected behavior.
+ *
+ * \~chinese
+ * @brief 启用标准可选功能支持。
+ *
+ * 此宏控制模板中标准可选功能的可用性。标准可选功能包括：
+ * - 时钟极性和相位选项（VSF_SPI_CPOL_*, VSF_SPI_CPHA_*）
+ * - 协议模式选项（VSF_SPI_MOTOROLA_MODE, VSF_SPI_TI_MODE）
+ * - CRC 计算选项（VSF_SPI_CRC_*）
+ * - 时钟预分频器选项（VSF_SPI_CLOCK_PRESCALER_*）
+ * - 扩展数据线选项（VSF_SPI_DATALINE_*）
+ *
+ * @note 此宏仅用于测试目的。用户不应启用此宏。
+ *       如果硬件支持标准可选功能，应在硬件驱动中直接实现，而不是在模板中启用此宏。
+ *       启用此宏可能导致编译错误或意外行为。
+ */
+#ifndef __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL
+#   define __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /**
@@ -292,6 +327,34 @@ extern "C" {
  * \~chinese
  * 在特定驱动里，添加可选模式时需要提供一个或者多个枚举选项，还需要提供同名的宏，方便用户在编译时判断是否支持。
  * 如果该特性支持多个选项，那也需要提供对应的 MASK 选项，方便用户在运行时切换到不同的模式。
+ *
+ * Feature Classification:
+ * - Mandatory: VSF_SPI_MASTER, VSF_SPI_SLAVE, VSF_SPI_MSB_FIRST, VSF_SPI_LSB_FIRST,
+ *              VSF_SPI_MODE_0, VSF_SPI_MODE_1, VSF_SPI_MODE_2, VSF_SPI_MODE_3,
+ *              VSF_SPI_CS_SOFTWARE_MODE, VSF_SPI_CS_HARDWARE_MODE,
+ *              VSF_SPI_DATASIZE_8, VSF_SPI_DATASIZE_16, VSF_SPI_DATASIZE_32
+ * - Implementation Required (Hardware Optional): VSF_SPI_DATASIZE_4 to VSF_SPI_DATASIZE_32 (extended data sizes)
+ *                       (Must be implemented in drivers, but hardware support is optional.
+ *                        Use #ifdef macro to check hardware support)
+ * - Standard Optional: VSF_SPI_CPOL_LOW, VSF_SPI_CPOL_HIGH, VSF_SPI_CPHA_LOW, VSF_SPI_CPHA_HIGH,
+ *                      VSF_SPI_MOTOROLA_MODE, VSF_SPI_TI_MODE, VSF_SPI_CRC_*,
+ *                      VSF_SPI_CLOCK_PRESCALER_*, VSF_SPI_DATALINE_*
+ *                      (clock polarity/phase, protocol modes, CRC, clock prescaler, extended data line options)
+ *                      (protected by __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL, should not be enabled)
+ *
+ * \~chinese
+ * 功能分类：
+ * - 必选：VSF_SPI_MASTER, VSF_SPI_SLAVE, VSF_SPI_MSB_FIRST, VSF_SPI_LSB_FIRST,
+ *        VSF_SPI_MODE_0, VSF_SPI_MODE_1, VSF_SPI_MODE_2, VSF_SPI_MODE_3,
+ *        VSF_SPI_CS_SOFTWARE_MODE, VSF_SPI_CS_HARDWARE_MODE,
+ *        VSF_SPI_DATASIZE_8, VSF_SPI_DATASIZE_16, VSF_SPI_DATASIZE_32
+ * - 实现必选（硬件可选）：VSF_SPI_DATASIZE_4 到 VSF_SPI_DATASIZE_32（扩展数据大小）
+ *            （驱动中必须实现，但硬件支持是可选的。使用 #ifdef 宏来判断硬件是否支持）
+ * - 标准可选：VSF_SPI_CPOL_LOW, VSF_SPI_CPOL_HIGH, VSF_SPI_CPHA_LOW, VSF_SPI_CPHA_HIGH,
+ *            VSF_SPI_MOTOROLA_MODE, VSF_SPI_TI_MODE, VSF_SPI_CRC_*,
+ *            VSF_SPI_CLOCK_PRESCALER_*, VSF_SPI_DATALINE_*
+ *            （时钟极性/相位、协议模式、CRC、时钟预分频器、扩展数据线选项）
+ *            （由 __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL 宏保护，不应被开启）
  */
 typedef enum vsf_spi_mode_t {
     // Direction control (bit 0)
@@ -302,18 +365,11 @@ typedef enum vsf_spi_mode_t {
     VSF_SPI_MSB_FIRST               = 0x00ul << 1,  //! \~english Most Significant Bit (MSB) first \~chinese 最高有效位（MSB）优先
     VSF_SPI_LSB_FIRST               = 0x01ul << 1,  //! \~english Least Significant Bit (LSB) first \~chinese 最低有效位（LSB）优先
 
-    // Clock polarity control (bit 2)
-    VSF_SPI_CPOL_LOW                = 0x00ul << 2,  //! \~english Clock polarity: idle state is low \~chinese 时钟极性：空闲状态为低电平
-    VSF_SPI_CPOL_HIGH               = 0x01ul << 2,  //! \~english Clock polarity: idle state is high \~chinese 时钟极性：空闲状态为高电平
-
-    // Clock phase control (bit 3)
-    VSF_SPI_CPHA_LOW                = 0x00ul << 3,  //! \~english Clock phase: sample on first edge \~chinese 时钟相位：第一个边沿采样
-    VSF_SPI_CPHA_HIGH               = 0x01ul << 3,  //! \~english Clock phase: sample on second edge \~chinese 时钟相位：第二个边沿采样
-
-    VSF_SPI_MODE_0                  = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_LOW,     //! \~english Mode 0: CPOL=0 (idle low), CPHA=0 (sample on first edge) \~chinese 模式 0：CPOL=0（空闲低），CPHA=0（第一个边沿采样）
-    VSF_SPI_MODE_1                  = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_HIGH,    //! \~english Mode 1: CPOL=0 (idle low), CPHA=1 (sample on second edge) \~chinese 模式 1：CPOL=0（空闲低），CPHA=1（第二个边沿采样）
-    VSF_SPI_MODE_2                  = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_LOW,     //! \~english Mode 2: CPOL=1 (idle high), CPHA=0 (sample on first edge) \~chinese 模式 2：CPOL=1（空闲高），CPHA=0（第一个边沿采样）
-    VSF_SPI_MODE_3                  = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_HIGH,    //! \~english Mode 3: CPOL=1 (idle high), CPHA=1 (sample on second edge) \~chinese 模式 3：CPOL=1（空闲高），CPHA=1（第二个边沿采样）
+    // SPI mode (bits 2-3: CPOL and CPHA)
+    VSF_SPI_MODE_0                  = 0x00ul << 2,  //! \~english Mode 0: CPOL=0 (idle low), CPHA=0 (sample on first edge) \~chinese 模式 0：CPOL=0（空闲低），CPHA=0（第一个边沿采样）
+    VSF_SPI_MODE_1                  = 0x01ul << 2,  //! \~english Mode 1: CPOL=0 (idle low), CPHA=1 (sample on second edge) \~chinese 模式 1：CPOL=0（空闲低），CPHA=1（第二个边沿采样）
+    VSF_SPI_MODE_2                  = 0x02ul << 2,  //! \~english Mode 2: CPOL=1 (idle high), CPHA=0 (sample on first edge) \~chinese 模式 2：CPOL=1（空闲高），CPHA=0（第一个边沿采样）
+    VSF_SPI_MODE_3                  = 0x03ul << 2,  //! \~english Mode 3: CPOL=1 (idle high), CPHA=1 (sample on second edge) \~chinese 模式 3：CPOL=1（空闲高），CPHA=1（第二个边沿采样）
 
     // Chip select control (bit 4)
     // \~english Software controlled chip select. The user must manually call vsf_spi_cs_active() and vsf_spi_cs_inactive() to control the CS line.
@@ -329,142 +385,56 @@ typedef enum vsf_spi_mode_t {
     VSF_SPI_DATASIZE_8              = 0x00ul << 8,  //! \~english 8-bit data transfer size (requires 1-byte buffer) \~chinese 8 位数据传输大小（需要 1 字节缓冲区）
     VSF_SPI_DATASIZE_16             = 0x01ul << 8,  //! \~english 16-bit data transfer size (requires 2-byte buffer) \~chinese 16 位数据传输大小（需要 2 字节缓冲区）
     VSF_SPI_DATASIZE_32             = 0x02ul << 8,  //! \~english 32-bit data transfer size (requires 4-byte buffer) \~chinese 32 位数据传输大小（需要 4 字节缓冲区）
-    /*
-    //! \~english Optional data size, if the hardware supports more data bits, we can define it inside the specific driver
-    //! \~chinese 可选数据位大小，如果硬件支持更多数据位，我们可以在特定驱动里定义它
-    //! \~english Buffer size requirements: 4-8 bits = 1 byte, 9-16 bits = 2 bytes, 17-32 bits = 4 bytes
-    //! \~chinese 缓冲区大小要求：4-8 位 = 1 字节，9-16 位 = 2 字节，17-32 位 = 4 字节
-    VSF_SPI_DATASIZE_VALUE_OFFSET   = 1,
-    VSF_SPI_DATASIZE_BIT_OFFSET     = 8,
-    VSF_SPI_DATASIZE_4              = ( 4ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 4-bit data (1-byte buffer) \~chinese 4 位数据（1 字节缓冲区）
-    VSF_SPI_DATASIZE_5              = ( 5ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 5-bit data (1-byte buffer) \~chinese 5 位数据（1 字节缓冲区）
-    VSF_SPI_DATASIZE_6              = ( 6ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 6-bit data (1-byte buffer) \~chinese 6 位数据（1 字节缓冲区）
-    VSF_SPI_DATASIZE_7              = ( 7ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 7-bit data (1-byte buffer) \~chinese 7 位数据（1 字节缓冲区）
-    VSF_SPI_DATASIZE_8              = ( 8ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 8-bit data (1-byte buffer) \~chinese 8 位数据（1 字节缓冲区）
-    VSF_SPI_DATASIZE_9              = ( 9ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 9-bit data (2-byte buffer) \~chinese 9 位数据（2 字节缓冲区）
-    VSF_SPI_DATASIZE_10             = (10ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 10-bit data (2-byte buffer) \~chinese 10 位数据（2 字节缓冲区）
-    VSF_SPI_DATASIZE_11             = (11ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 11-bit data (2-byte buffer) \~chinese 11 位数据（2 字节缓冲区）
-    VSF_SPI_DATASIZE_12             = (12ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 12-bit data (2-byte buffer) \~chinese 12 位数据（2 字节缓冲区）
-    VSF_SPI_DATASIZE_13             = (13ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 13-bit data (2-byte buffer) \~chinese 13 位数据（2 字节缓冲区）
-    VSF_SPI_DATASIZE_14             = (14ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 14-bit data (2-byte buffer) \~chinese 14 位数据（2 字节缓冲区）
-    VSF_SPI_DATASIZE_15             = (15ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 15-bit data (2-byte buffer) \~chinese 15 位数据（2 字节缓冲区）
-    VSF_SPI_DATASIZE_16             = (16ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 16-bit data (2-byte buffer) \~chinese 16 位数据（2 字节缓冲区）
-    VSF_SPI_DATASIZE_17             = (17ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 17-bit data (4-byte buffer) \~chinese 17 位数据（4 字节缓冲区）
-    VSF_SPI_DATASIZE_18             = (18ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 18-bit data (4-byte buffer) \~chinese 18 位数据（4 字节缓冲区）
-    VSF_SPI_DATASIZE_19             = (19ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 19-bit data (4-byte buffer) \~chinese 19 位数据（4 字节缓冲区）
-    VSF_SPI_DATASIZE_20             = (20ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 20-bit data (4-byte buffer) \~chinese 20 位数据（4 字节缓冲区）
-    VSF_SPI_DATASIZE_21             = (21ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 21-bit data (4-byte buffer) \~chinese 21 位数据（4 字节缓冲区）
-    VSF_SPI_DATASIZE_22             = (22ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 22-bit data (4-byte buffer) \~chinese 22 位数据（4 字节缓冲区）
-    VSF_SPI_DATASIZE_23             = (23ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 23-bit data (4-byte buffer) \~chinese 23 位数据（4 字节缓冲区）
-    VSF_SPI_DATASIZE_24             = (24ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 24-bit data (4-byte buffer) \~chinese 24 位数据（4 字节缓冲区）
-    VSF_SPI_DATASIZE_25             = (25ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 25-bit data (4-byte buffer) \~chinese 25 位数据（4 字节缓冲区）
-    VSF_SPI_DATASIZE_26             = (26ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 26-bit data (4-byte buffer) \~chinese 26 位数据（4 字节缓冲区）
-    VSF_SPI_DATASIZE_27             = (27ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 27-bit data (4-byte buffer) \~chinese 27 位数据（4 字节缓冲区）
-    VSF_SPI_DATASIZE_28             = (28ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 28-bit data (4-byte buffer) \~chinese 28 位数据（4 字节缓冲区）
-    VSF_SPI_DATASIZE_29             = (29ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 29-bit data (4-byte buffer) \~chinese 29 位数据（4 字节缓冲区）
-    VSF_SPI_DATASIZE_30             = (30ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 30-bit data (4-byte buffer) \~chinese 30 位数据（4 字节缓冲区）
-    VSF_SPI_DATASIZE_31             = (31ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 31-bit data (4-byte buffer) \~chinese 31 位数据（4 字节缓冲区）
-    VSF_SPI_DATASIZE_32             = (32ul - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET,  //! \~english 32-bit data (4-byte buffer) \~chinese 32 位数据（4 字节缓冲区）
-    #define VSF_SPI_DATASIZE_BIT_OFFSET     VSF_SPI_DATASIZE_BIT_OFFSET
-    #define VSF_SPI_DATASIZE_VALUE_OFFSET   VSF_SPI_DATASIZE_VALUE_OFFSET
-    #define VSF_SPI_DATASIZE_4              VSF_SPI_DATASIZE_4
-    #define VSF_SPI_DATASIZE_5              VSF_SPI_DATASIZE_5
-    #define VSF_SPI_DATASIZE_6              VSF_SPI_DATASIZE_6
-    #define VSF_SPI_DATASIZE_7              VSF_SPI_DATASIZE_7
-    #define VSF_SPI_DATASIZE_8              VSF_SPI_DATASIZE_8
-    #define VSF_SPI_DATASIZE_9              VSF_SPI_DATASIZE_9
-    #define VSF_SPI_DATASIZE_10             VSF_SPI_DATASIZE_10
-    #define VSF_SPI_DATASIZE_11             VSF_SPI_DATASIZE_11
-    #define VSF_SPI_DATASIZE_12             VSF_SPI_DATASIZE_12
-    #define VSF_SPI_DATASIZE_13             VSF_SPI_DATASIZE_13
-    #define VSF_SPI_DATASIZE_14             VSF_SPI_DATASIZE_14
-    #define VSF_SPI_DATASIZE_15             VSF_SPI_DATASIZE_15
-    #define VSF_SPI_DATASIZE_16             VSF_SPI_DATASIZE_16
-    #define VSF_SPI_DATASIZE_17             VSF_SPI_DATASIZE_17
-    #define VSF_SPI_DATASIZE_18             VSF_SPI_DATASIZE_18
-    #define VSF_SPI_DATASIZE_19             VSF_SPI_DATASIZE_19
-    #define VSF_SPI_DATASIZE_20             VSF_SPI_DATASIZE_20
-    #define VSF_SPI_DATASIZE_21             VSF_SPI_DATASIZE_21
-    #define VSF_SPI_DATASIZE_22             VSF_SPI_DATASIZE_22
-    #define VSF_SPI_DATASIZE_23             VSF_SPI_DATASIZE_23
-    #define VSF_SPI_DATASIZE_24             VSF_SPI_DATASIZE_24
-    #define VSF_SPI_DATASIZE_25             VSF_SPI_DATASIZE_25
-    #define VSF_SPI_DATASIZE_26             VSF_SPI_DATASIZE_26
-    #define VSF_SPI_DATASIZE_27             VSF_SPI_DATASIZE_27
-    #define VSF_SPI_DATASIZE_28             VSF_SPI_DATASIZE_28
-    #define VSF_SPI_DATASIZE_29             VSF_SPI_DATASIZE_29
-    #define VSF_SPI_DATASIZE_30             VSF_SPI_DATASIZE_30
-    #define VSF_SPI_DATASIZE_31             VSF_SPI_DATASIZE_31
-    #define VSF_SPI_DATASIZE_32             VSF_SPI_DATASIZE_32
-    #define VSF_SPI_DATASIZE_MASK          (  VSF_SPI_DATASIZE_4   \
-                                            | VSF_SPI_DATASIZE_5   \
-                                            | VSF_SPI_DATASIZE_6   \
-                                            | VSF_SPI_DATASIZE_7   \
-                                            | VSF_SPI_DATASIZE_8   \
-                                            | VSF_SPI_DATASIZE_9   \
-                                            | VSF_SPI_DATASIZE_10  \
-                                            | VSF_SPI_DATASIZE_11  \
-                                            | VSF_SPI_DATASIZE_12  \
-                                            | VSF_SPI_DATASIZE_13  \
-                                            | VSF_SPI_DATASIZE_14  \
-                                            | VSF_SPI_DATASIZE_15  \
-                                            | VSF_SPI_DATASIZE_16  \
-                                            | VSF_SPI_DATASIZE_17  \
-                                            | VSF_SPI_DATASIZE_18  \
-                                            | VSF_SPI_DATASIZE_19  \
-                                            | VSF_SPI_DATASIZE_20  \
-                                            | VSF_SPI_DATASIZE_21  \
-                                            | VSF_SPI_DATASIZE_22  \
-                                            | VSF_SPI_DATASIZE_23  \
-                                            | VSF_SPI_DATASIZE_24  \
-                                            | VSF_SPI_DATASIZE_25  \
-                                            | VSF_SPI_DATASIZE_26  \
-                                            | VSF_SPI_DATASIZE_27  \
-                                            | VSF_SPI_DATASIZE_28  \
-                                            | VSF_SPI_DATASIZE_29  \
-                                            | VSF_SPI_DATASIZE_30  \
-                                            | VSF_SPI_DATASIZE_31  \
-                                            | VSF_SPI_DATASIZE_32 )
-    */
 
-    /*
-    //! \~english Optional data line, if the hardware supports more data lines, we can define it inside the specific driver
-    //! \~chinese 可选数据线，如果硬件支持更多数据线，我们可以在特定驱动里定义它
-    VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX    = (0x00ul << 16),    // MOSI+MISO, full-duplex, standard spi
-    VSF_SPI_DATALINE_2_LINE_RX_ONLY        = (0x01ul << 16),    // MOSI+MISO, but rx only (MISO)
-    VSF_SPI_DATALINE_2_LINE_TX_ONLY        = (0x02ul << 16),    // MOSI+MISO, but tx only (MOSI)
-    VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX    = (0x03ul << 16),    // 1 line (MOSI or MISO), half-duplex
-    VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX    = (0x04ul << 16),    // 2 line (MOSI+MISO), half-duplex, dual spi
-    VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX    = (0x05ul << 16),    // 4 line (IO0+IO1+IO2+IO3), half-duplex, quad spi
-    VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX    = (0x06ul << 16),    // 8 line (IO0+IO1+IO2+IO3+IO4+IO5+IO6+IO7), half-duplex, octal spi
-    VSF_SPI_DATALINE_16_LINE_HALF_DUPLEX   = (0x07ul << 16),    // 16 line (IO0+IO1+IO2+IO3+IO4+IO5+IO6+IO7+IO8+IO9+IO10+IO11+IO12+IO13+IO14+IO15), half-duplex, hexadeca spi
-    #define VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX     VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX
-    #define VSF_SPI_DATALINE_2_LINE_RX_ONLY         VSF_SPI_DATALINE_2_LINE_RX_ONLY
-    #define VSF_SPI_DATALINE_2_LINE_TX_ONLY         VSF_SPI_DATALINE_2_LINE_TX_ONLY
-    #define VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX     VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX
-    #define VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX     VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX
-    #define VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX     VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX
-    #define VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX     VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX
-    #define VSF_SPI_DATALINE_16_LINE_HALF_DUPLEX    VSF_SPI_DATALINE_16_LINE_HALF_DUPLEX
-    #define VSF_SPI_DATALINE_MASK                  (  VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX \
-                                                    | VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX \
-                                                    | VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX \
-                                                    | VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX \
-                                                    | VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX \
-                                                    | VSF_SPI_DATALINE_16_LINE_HALF_DUPLEX)
-    */
+    /**
+     * \~english
+     * @brief Standard optional clock polarity and phase options
+     * Note: These are standard optional features. This macro should NOT be enabled in template.
+     * \~chinese
+     * @brief 标准可选时钟极性和相位选项
+     * 注意：这些是标准可选功能。此宏不应在模板中开启。
+     */
+#if __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL
+    // Clock polarity control (bit 2)
+    VSF_SPI_CPOL_LOW                = 0x00ul << 2,  //! \~english Clock polarity: idle state is low \~chinese 时钟极性：空闲状态为低电平
+#   define VSF_SPI_CPOL_LOW         VSF_SPI_CPOL_LOW
+    VSF_SPI_CPOL_HIGH               = 0x01ul << 2,  //! \~english Clock polarity: idle state is high \~chinese 时钟极性：空闲状态为高电平
+#   define VSF_SPI_CPOL_HIGH        VSF_SPI_CPOL_HIGH
 
-    /*
+    // Clock phase control (bit 3)
+    VSF_SPI_CPHA_LOW                = 0x00ul << 3,  //! \~english Clock phase: sample on first edge \~chinese 时钟相位：第一个边沿采样
+#   define VSF_SPI_CPHA_LOW         VSF_SPI_CPHA_LOW
+    VSF_SPI_CPHA_HIGH               = 0x01ul << 3,  //! \~english Clock phase: sample on second edge \~chinese 时钟相位：第二个边沿采样
+#   define VSF_SPI_CPHA_HIGH        VSF_SPI_CPHA_HIGH
+#endif
+
+    /**
+     * \~english
+     * @brief Standard optional protocol mode options
+     * Note: These are standard optional features. This macro should NOT be enabled in template.
+     * \~chinese
+     * @brief 标准可选协议模式选项
+     * 注意：这些是标准可选功能。此宏不应在模板中开启。
+     */
+#if __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL
     //! \~english Optional mode, if the hardware supports more mode like TI mode etc, we can define it inside the specific driver
     //! \~chinese 可选模式，如果硬件支持更多的模式，例如 TI 模式等，我们可以在特定驱动里定义它
     VSF_SPI_MOTOROLA_MODE       = (0x00ul << 20),    //! \~english Motorola SPI: Standard 4-wire SPI protocol \~chinese 摩托罗拉 SPI：标准 4 线 SPI 协议
+#   define VSF_SPI_MOTOROLA_MODE       VSF_SPI_MOTOROLA_MODE
     VSF_SPI_TI_MODE             = (0x01ul << 20),    //! \~english TI SSI: Chip select timing differs from Motorola SPI \~chinese TI SSI：片选时序与摩托罗拉 SPI 不同
-    #define VSF_SPI_MOTOROLA_MODE       VSF_SPI_MOTOROLA_MODE
-    #define VSF_SPI_TI_MODE             VSF_SPI_TI_MODE
-    #define VSF_SPI_MOTOROLA_TI_MASK    (VSF_SPI_MOTOROLA_MODE | VSF_SPI_TI_MODE)
-    */
+#   define VSF_SPI_TI_MODE             VSF_SPI_TI_MODE
+#   define VSF_SPI_MOTOROLA_TI_MASK    (VSF_SPI_MOTOROLA_MODE | VSF_SPI_TI_MODE)
+#endif
 
-    /*
+    /**
+     * \~english
+     * @brief Standard optional CRC calculation support
+     * Note: These are standard optional features. This macro should NOT be enabled in template.
+     * \~chinese
+     * @brief 标准可选 CRC 计算支持
+     * 注意：这些是标准可选功能。此宏不应在模板中开启。
+     */
+#if __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL
     //! \~english
     // @brief Optional CRC calculation support for data integrity
     // @note Hardware CRC calculation is platform-dependent
@@ -474,32 +444,40 @@ typedef enum vsf_spi_mode_t {
     // @note 硬件 CRC 计算依赖于平台
     // @note 当使能时，CRC 将自动计算和验证
     VSF_SPI_CRC_DISABLED        = (0x00ul << 21),    //! \~english CRC calculation disabled (no integrity check) \~chinese CRC 计算禁用（无完整性检查）
+#   define VSF_SPI_CRC_DISABLED        VSF_SPI_CRC_DISABLED
     VSF_SPI_CRC_ENABLED         = (0x01ul << 21),    //! \~english CRC calculation enabled (hardware computes and verifies) \~chinese CRC 计算使能（硬件计算和验证）
-    #define VSF_SPI_CRC_DISABLED        VSF_SPI_CRC_DISABLED
-    #define VSF_SPI_CRC_ENABLED         VSF_SPI_CRC_ENABLED
-    #define VSF_SPI_CRC_MASK            (VSF_SPI_CRC_DISABLED | VSF_SPI_CRC_ENABLED)
-    */
+#   define VSF_SPI_CRC_ENABLED         VSF_SPI_CRC_ENABLED
+#   define VSF_SPI_CRC_MASK            (VSF_SPI_CRC_DISABLED | VSF_SPI_CRC_ENABLED)
+#endif
 
-    /*
+    /**
+     * \~english
+     * @brief Standard optional clock prescaler options
+     * Note: These are standard optional features. This macro should NOT be enabled in template.
+     * \~chinese
+     * @brief 标准可选时钟预分频器选项
+     * 注意：这些是标准可选功能。此宏不应在模板中开启。
+     */
+#if __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL
     //! \~english Optional prescaler, if the hardware supports prescaler, we can define it inside the specific driver
     //! \~chinese 可选 prescaler，如果硬件支持 prescaler，我们可以在特定驱动里定义它
     VSF_SPI_CLOCK_PRESCALER_2    = (0x00ul << 22),    //! \~english Divide system clock by 2 (highest frequency) \~chinese 系统时钟除以 2（最高频率）
+#   define VSF_SPI_CLOCK_PRESCALER_2     VSF_SPI_CLOCK_PRESCALER_2
     VSF_SPI_CLOCK_PRESCALER_4    = (0x01ul << 22),    //! \~english Divide system clock by 4 \~chinese 系统时钟除以 4
+#   define VSF_SPI_CLOCK_PRESCALER_4     VSF_SPI_CLOCK_PRESCALER_4
     VSF_SPI_CLOCK_PRESCALER_8    = (0x02ul << 22),    //! \~english Divide system clock by 8 \~chinese 系统时钟除以 8
+#   define VSF_SPI_CLOCK_PRESCALER_8     VSF_SPI_CLOCK_PRESCALER_8
     VSF_SPI_CLOCK_PRESCALER_16   = (0x03ul << 22),    //! \~english Divide system clock by 16 \~chinese 系统时钟除以 16
+#   define VSF_SPI_CLOCK_PRESCALER_16    VSF_SPI_CLOCK_PRESCALER_16
     VSF_SPI_CLOCK_PRESCALER_32   = (0x04ul << 22),    //! \~english Divide system clock by 32 \~chinese 系统时钟除以 32
+#   define VSF_SPI_CLOCK_PRESCALER_32    VSF_SPI_CLOCK_PRESCALER_32
     VSF_SPI_CLOCK_PRESCALER_64   = (0x05ul << 22),    //! \~english Divide system clock by 64 \~chinese 系统时钟除以 64
+#   define VSF_SPI_CLOCK_PRESCALER_64    VSF_SPI_CLOCK_PRESCALER_64
     VSF_SPI_CLOCK_PRESCALER_128  = (0x06ul << 22),    //! \~english Divide system clock by 128 \~chinese 系统时钟除以 128
+#   define VSF_SPI_CLOCK_PRESCALER_128   VSF_SPI_CLOCK_PRESCALER_128
     VSF_SPI_CLOCK_PRESCALER_256  = (0x07ul << 22),    //! \~english Divide system clock by 256 (lowest frequency) \~chinese 系统时钟除以 256（最低频率）
-    #define VSF_SPI_CLOCK_PRESCALER_2     VSF_SPI_CLOCK_PRESCALER_2
-    #define VSF_SPI_CLOCK_PRESCALER_4     VSF_SPI_CLOCK_PRESCALER_4
-    #define VSF_SPI_CLOCK_PRESCALER_8     VSF_SPI_CLOCK_PRESCALER_8
-    #define VSF_SPI_CLOCK_PRESCALER_16    VSF_SPI_CLOCK_PRESCALER_16
-    #define VSF_SPI_CLOCK_PRESCALER_32    VSF_SPI_CLOCK_PRESCALER_32
-    #define VSF_SPI_CLOCK_PRESCALER_64    VSF_SPI_CLOCK_PRESCALER_64
-    #define VSF_SPI_CLOCK_PRESCALER_128   VSF_SPI_CLOCK_PRESCALER_128
-    #define VSF_SPI_CLOCK_PRESCALER_256   VSF_SPI_CLOCK_PRESCALER_256
-    #define VSF_SPI_CLOCK_PRESCALER_MASK  (  VSF_SPI_CLOCK_PRESCALER_2    \
+#   define VSF_SPI_CLOCK_PRESCALER_256   VSF_SPI_CLOCK_PRESCALER_256
+#   define VSF_SPI_CLOCK_PRESCALER_MASK  (  VSF_SPI_CLOCK_PRESCALER_2    \
                                             | VSF_SPI_CLOCK_PRESCALER_4    \
                                             | VSF_SPI_CLOCK_PRESCALER_8    \
                                             | VSF_SPI_CLOCK_PRESCALER_16   \
@@ -507,7 +485,42 @@ typedef enum vsf_spi_mode_t {
                                             | VSF_SPI_CLOCK_PRESCALER_64   \
                                             | VSF_SPI_CLOCK_PRESCALER_128  \
                                             | VSF_SPI_CLOCK_PRESCALER_256)
-    */
+#endif
+
+    /**
+     * \~english
+     * @brief Standard optional extended data line options
+     * Note: These are standard optional features. This macro should NOT be enabled in template.
+     * \~chinese
+     * @brief 标准可选扩展数据线选项
+     * 注意：这些是标准可选功能。此宏不应在模板中开启。
+     */
+#if __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL
+    //! \~english Optional data line, if the hardware supports more data lines, we can define it inside the specific driver
+    //! \~chinese 可选数据线，如果硬件支持更多数据线，我们可以在特定驱动里定义它
+    VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX    = (0x00ul << 16),    // MOSI+MISO, full-duplex, standard spi
+#   define VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX     VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX
+    VSF_SPI_DATALINE_2_LINE_RX_ONLY        = (0x01ul << 16),    // MOSI+MISO, but rx only (MISO)
+#   define VSF_SPI_DATALINE_2_LINE_RX_ONLY         VSF_SPI_DATALINE_2_LINE_RX_ONLY
+    VSF_SPI_DATALINE_2_LINE_TX_ONLY        = (0x02ul << 16),    // MOSI+MISO, but tx only (MOSI)
+#   define VSF_SPI_DATALINE_2_LINE_TX_ONLY         VSF_SPI_DATALINE_2_LINE_TX_ONLY
+    VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX    = (0x03ul << 16),    // 1 line (MOSI or MISO), half-duplex
+#   define VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX     VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX
+    VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX    = (0x04ul << 16),    // 2 line (MOSI+MISO), half-duplex, dual spi
+#   define VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX     VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX
+    VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX    = (0x05ul << 16),    // 4 line (IO0+IO1+IO2+IO3), half-duplex, quad spi
+#   define VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX     VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX
+    VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX    = (0x06ul << 16),    // 8 line (IO0+IO1+IO2+IO3+IO4+IO5+IO6+IO7), half-duplex, octal spi
+#   define VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX     VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX
+    VSF_SPI_DATALINE_16_LINE_HALF_DUPLEX   = (0x07ul << 16),    // 16 line (IO0+IO1+IO2+IO3+IO4+IO5+IO6+IO7+IO8+IO9+IO10+IO11+IO12+IO13+IO14+IO15), half-duplex, hexadeca spi
+#   define VSF_SPI_DATALINE_16_LINE_HALF_DUPLEX    VSF_SPI_DATALINE_16_LINE_HALF_DUPLEX
+#   define VSF_SPI_DATALINE_MASK                  (  VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX \
+                                                    | VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX \
+                                                    | VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX \
+                                                    | VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX \
+                                                    | VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX \
+                                                    | VSF_SPI_DATALINE_16_LINE_HALF_DUPLEX)
+#endif
 } vsf_spi_mode_t;
 #endif
 
@@ -812,20 +825,66 @@ typedef struct vsf_spi_cfg_t {
  * \~chinese
  * 可选控制命令需要提供一个或多个枚举选项，还需要提供同名的宏，以便用户在运行时判断是否支持。
  * 如果该功能支持多个选项，建议提供相应的 MASK 选项，以便用户在编译时检查支持的功能。
+ *
+ * Feature Classification:
+ * - Mandatory: None (only __VSF_SPI_CTRL_DUMMY is defined by default)
+ * - Standard Optional: VSF_SPI_CTRL_REQUEST_PAUSE, VSF_SPI_CTRL_REQUEST_RESUME,
+ *                      VSF_SPI_CTRL_QSPI_* (Quad SPI control commands)
+ *                      (protected by __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL, should not be enabled)
+ *
+ * \~chinese
+ * 功能分类：
+ * - 必选：无（默认仅定义 __VSF_SPI_CTRL_DUMMY）
+ * - 标准可选：VSF_SPI_CTRL_REQUEST_PAUSE, VSF_SPI_CTRL_REQUEST_RESUME,
+ *            VSF_SPI_CTRL_QSPI_*（四线 SPI 控制命令）
+ *            （由 __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL 宏保护，不应被开启）
  */
 typedef enum vsf_spi_ctrl_t {
-    __VSF_SPI_CTRL_DUMMY = 0,               //! \~english Dummy value for compilation \~chinese 编译占位值
+    //! \~english
+    //! @brief Dummy value for compilation, required when no actual control commands are defined.
+    //! @note This value is needed only when using the template default enum definition
+    //!       (VSF_SPI_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) and all optional control
+    //!       commands are commented out. It ensures the enum has at least one member
+    //!       to avoid compilation errors with some C compilers that don't allow empty enums.
+    //! @note If you enable any control commands below (uncomment them), or if you
+    //!       redefine the enum in a specific hardware driver (VSF_SPI_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED),
+    //!       you can remove this DUMMY value as long as at least one actual command is defined.
+    //! \~chinese
+    //! @brief 编译占位值，当没有定义实际控制命令时需要。
+    //! @note 此值仅在以下情况需要：使用模板默认枚举定义
+    //!       (VSF_SPI_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) 且所有可选控制命令都被注释掉时。
+    //!       它确保枚举至少有一个成员，以避免某些不允许空枚举的 C 编译器报错。
+    //! @note 如果启用了以下任何控制命令（取消注释），或者在特定硬件驱动中重新定义了枚举
+    //!       (VSF_SPI_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED)，只要定义了至少一个实际命令，
+    //!       就可以删除此 DUMMY 值。
+    __VSF_SPI_CTRL_DUMMY = 0,
 
-    /*
+    /**
+     * \~english
+     * @brief Standard optional control commands for pause/resume functionality
+     * Note: These are standard optional features. This macro should NOT be enabled in template.
+     * \~chinese
+     * @brief 标准可选的暂停/恢复控制命令
+     * 注意：这些是标准可选功能。此宏不应在模板中开启。
+     */
+#if __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL
     //! \~english Optional control commands for pause/resume functionality
     //! \~chinese 可选的暂停/恢复控制命令
     VSF_SPI_CTRL_REQUEST_PAUSE  = (0x1ul << 0),    //! \~english Request to pause SPI transfer \~chinese 请求暂停 SPI 传输
     VSF_SPI_CTRL_REQUEST_RESUME = (0x1ul << 1),    //! \~english Request to resume SPI transfer \~chinese 请求恢复 SPI 传输
-    #define VSF_SPI_CTRL_REQUEST_PAUSE VSF_SPI_CTRL_REQUEST_PAUSE
-    #define VSF_SPI_CTRL_REQUEST_RESUME VSF_SPI_CTRL_REQUEST_RESUME
-    */
+#   define VSF_SPI_CTRL_REQUEST_PAUSE VSF_SPI_CTRL_REQUEST_PAUSE
+#   define VSF_SPI_CTRL_REQUEST_RESUME VSF_SPI_CTRL_REQUEST_RESUME
+#endif
 
-    /*
+    /**
+     * \~english
+     * @brief Standard optional control commands for Quad SPI functionality
+     * Note: These are standard optional features. This macro should NOT be enabled in template.
+     * \~chinese
+     * @brief 标准可选的四线 SPI 功能控制命令
+     * 注意：这些是标准可选功能。此宏不应在模板中开启。
+     */
+#if __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL
     //!
     //! \~english
     //! @brief Optional control commands for Quad SPI functionality (template-only, disabled in this header)
@@ -851,8 +910,8 @@ typedef enum vsf_spi_ctrl_t {
     //! \~chinese 禁用四线 SPI 模式并恢复到标准 SPI 操作 (参数: NULL)
     //! \~chinese 注意：这将恢复与标准 SPI 操作的兼容性
     VSF_SPI_CTRL_QSPI_DISABLE                               = 0x01ul,
-    #define VSF_SPI_CTRL_QSPI_ENABLE                        VSF_SPI_CTRL_QSPI_ENABLE
-    #define VSF_SPI_CTRL_QSPI_DISABLE                       VSF_SPI_CTRL_QSPI_DISABLE
+#   define VSF_SPI_CTRL_QSPI_ENABLE                        VSF_SPI_CTRL_QSPI_ENABLE
+#   define VSF_SPI_CTRL_QSPI_DISABLE                       VSF_SPI_CTRL_QSPI_DISABLE
 
     //!
     //! \~english
@@ -901,14 +960,14 @@ typedef enum vsf_spi_ctrl_t {
     //! \~english Get command value (param: uint8_t *)
     //! \~chinese 获取命令值 (参数: uint8_t *)
     VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_VALUE                   = 0x09ul,
-    #define VSF_SPI_CTRL_QSPI_CMD_PHASE_ENABLE              VSF_SPI_CTRL_QSPI_CMD_PHASE_ENABLE
-    #define VSF_SPI_CTRL_QSPI_CMD_PHASE_DISABLE             VSF_SPI_CTRL_QSPI_CMD_PHASE_DISABLE
-    #define VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_SIZE            VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_SIZE
-    #define VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_SIZE            VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_SIZE
-    #define VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_LINE_MODE       VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_LINE_MODE
-    #define VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_LINE_MODE       VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_LINE_MODE
-    #define VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_VALUE           VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_VALUE
-    #define VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_VALUE           VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_VALUE
+#   define VSF_SPI_CTRL_QSPI_CMD_PHASE_ENABLE              VSF_SPI_CTRL_QSPI_CMD_PHASE_ENABLE
+#   define VSF_SPI_CTRL_QSPI_CMD_PHASE_DISABLE             VSF_SPI_CTRL_QSPI_CMD_PHASE_DISABLE
+#   define VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_SIZE            VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_SIZE
+#   define VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_SIZE            VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_SIZE
+#   define VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_LINE_MODE       VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_LINE_MODE
+#   define VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_LINE_MODE       VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_LINE_MODE
+#   define VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_VALUE           VSF_SPI_CTRL_QSPI_CMD_PHASE_SET_VALUE
+#   define VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_VALUE           VSF_SPI_CTRL_QSPI_CMD_PHASE_GET_VALUE
 
     //!
     //! \~english
@@ -950,14 +1009,14 @@ typedef enum vsf_spi_ctrl_t {
     //! \~english Get address value (param: uint32_t *)
     //! \~chinese 获取地址值 (参数: uint32_t *)
     VSF_SPI_CTRL_QSPI_ADDRESS_GET                           = 0x11ul,
-    #define VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_ENABLE          VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_ENABLE
-    #define VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_DISABLE         VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_DISABLE
-    #define VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_SIZE        VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_SIZE
-    #define VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_GET_SIZE        VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_GET_SIZE
-    #define VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_LINE_MODE   VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_LINE_MODE
-    #define VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_GET_LINE_MODE   VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_GET_LINE_MODE
-    #define VSF_SPI_CTRL_QSPI_ADDRESS_SET                   VSF_SPI_CTRL_QSPI_ADDRESS_SET
-    #define VSF_SPI_CTRL_QSPI_ADDRESS_GET                   VSF_SPI_CTRL_QSPI_ADDRESS_GET
+#   define VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_ENABLE          VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_ENABLE
+#   define VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_DISABLE         VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_DISABLE
+#   define VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_SIZE        VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_SIZE
+#   define VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_GET_SIZE        VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_GET_SIZE
+#   define VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_LINE_MODE   VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_SET_LINE_MODE
+#   define VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_GET_LINE_MODE   VSF_SPI_CTRL_QSPI_ADDRESS_PHASE_GET_LINE_MODE
+#   define VSF_SPI_CTRL_QSPI_ADDRESS_SET                   VSF_SPI_CTRL_QSPI_ADDRESS_SET
+#   define VSF_SPI_CTRL_QSPI_ADDRESS_GET                   VSF_SPI_CTRL_QSPI_ADDRESS_GET
 
     //!
     //! \~english
@@ -980,10 +1039,10 @@ typedef enum vsf_spi_ctrl_t {
     //! \~english Get number of dummy cycles (param: uint8_t *)
     //! \~chinese 获取空闲周期数 (参数: uint8_t *)
     VSF_SPI_CTRL_QSPI_DUMMY_PHASE_GET_CYCLES                = 0x1Bul,
-    #define VSF_SPI_CTRL_QSPI_DUMMY_PHASE_ENABLE            VSF_SPI_CTRL_QSPI_DUMMY_PHASE_ENABLE
-    #define VSF_SPI_CTRL_QSPI_DUMMY_PHASE_DISABLE           VSF_SPI_CTRL_QSPI_DUMMY_PHASE_DISABLE
-    #define VSF_SPI_CTRL_QSPI_DUMMY_PHASE_SET_CYCLES        VSF_SPI_CTRL_QSPI_DUMMY_PHASE_SET_CYCLES
-    #define VSF_SPI_CTRL_QSPI_DUMMY_PHASE_GET_CYCLES        VSF_SPI_CTRL_QSPI_DUMMY_PHASE_GET_CYCLES
+#   define VSF_SPI_CTRL_QSPI_DUMMY_PHASE_ENABLE            VSF_SPI_CTRL_QSPI_DUMMY_PHASE_ENABLE
+#   define VSF_SPI_CTRL_QSPI_DUMMY_PHASE_DISABLE           VSF_SPI_CTRL_QSPI_DUMMY_PHASE_DISABLE
+#   define VSF_SPI_CTRL_QSPI_DUMMY_PHASE_SET_CYCLES        VSF_SPI_CTRL_QSPI_DUMMY_PHASE_SET_CYCLES
+#   define VSF_SPI_CTRL_QSPI_DUMMY_PHASE_GET_CYCLES        VSF_SPI_CTRL_QSPI_DUMMY_PHASE_GET_CYCLES
 
     //!
     //! \~english
@@ -1026,12 +1085,12 @@ typedef enum vsf_spi_ctrl_t {
     //!           VSF_SPI_CTRL_QSPI_DATA_PHASE_SINGLE (如果支持)、VSF_SPI_CTRL_QSPI_DATA_PHASE_DUAL (如果支持)
     //!           或 VSF_SPI_CTRL_QSPI_DATA_PHASE_QUAD (如果支持))
     VSF_SPI_CTRL_QSPI_DATA_PHASE_GET_LINE_MODE              = 0x17ul,
-    #define VSF_SPI_CTRL_QSPI_DATA_PHASE_ENABLE             VSF_SPI_CTRL_QSPI_DATA_PHASE_ENABLE
-    #define VSF_SPI_CTRL_QSPI_DATA_PHASE_DISABLE            VSF_SPI_CTRL_QSPI_DATA_PHASE_DISABLE
-    #define VSF_SPI_CTRL_QSPI_DATA_PHASE_SET_SIZE           VSF_SPI_CTRL_QSPI_DATA_PHASE_SET_SIZE
-    #define VSF_SPI_CTRL_QSPI_DATA_PHASE_GET_SIZE           VSF_SPI_CTRL_QSPI_DATA_PHASE_GET_SIZE
-    #define VSF_SPI_CTRL_QSPI_DATA_PHASE_SET_LINE_MODE      VSF_SPI_CTRL_QSPI_DATA_PHASE_SET_LINE_MODE
-    #define VSF_SPI_CTRL_QSPI_DATA_PHASE_GET_LINE_MODE      VSF_SPI_CTRL_QSPI_DATA_PHASE_GET_LINE_MODE
+#   define VSF_SPI_CTRL_QSPI_DATA_PHASE_ENABLE             VSF_SPI_CTRL_QSPI_DATA_PHASE_ENABLE
+#   define VSF_SPI_CTRL_QSPI_DATA_PHASE_DISABLE            VSF_SPI_CTRL_QSPI_DATA_PHASE_DISABLE
+#   define VSF_SPI_CTRL_QSPI_DATA_PHASE_SET_SIZE           VSF_SPI_CTRL_QSPI_DATA_PHASE_SET_SIZE
+#   define VSF_SPI_CTRL_QSPI_DATA_PHASE_GET_SIZE           VSF_SPI_CTRL_QSPI_DATA_PHASE_GET_SIZE
+#   define VSF_SPI_CTRL_QSPI_DATA_PHASE_SET_LINE_MODE      VSF_SPI_CTRL_QSPI_DATA_PHASE_SET_LINE_MODE
+#   define VSF_SPI_CTRL_QSPI_DATA_PHASE_GET_LINE_MODE      VSF_SPI_CTRL_QSPI_DATA_PHASE_GET_LINE_MODE
 
     //! \~english Optional control commands for Quad SPI transfer mode configuration
     //! \~chinese 可选的四线 SPI 传输模式配置控制命令
@@ -1041,9 +1100,9 @@ typedef enum vsf_spi_ctrl_t {
     //! \~english Get current transfer mode (param: uint32_t *)
     //! \~chinese 获取当前传输模式 (参数: uint32_t *)
     VSF_SPI_CTRL_QSPI_TRANSFER_GET_MODE                     = 0x1Dul,
-    #define VSF_SPI_CTRL_QSPI_TRANSFER_SET_MODE             VSF_SPI_CTRL_QSPI_TRANSFER_SET_MODE
-    #define VSF_SPI_CTRL_QSPI_TRANSFER_GET_MODE             VSF_SPI_CTRL_QSPI_TRANSFER_GET_MODE
-    */
+#   define VSF_SPI_CTRL_QSPI_TRANSFER_SET_MODE             VSF_SPI_CTRL_QSPI_TRANSFER_SET_MODE
+#   define VSF_SPI_CTRL_QSPI_TRANSFER_GET_MODE             VSF_SPI_CTRL_QSPI_TRANSFER_GET_MODE
+#endif
 } vsf_spi_ctrl_t;
 #endif
 
@@ -1279,10 +1338,16 @@ extern vsf_spi_capability_t vsf_spi_capability(vsf_spi_t *spi_ptr);
  * @brief Perform FIFO-based data transfer on a SPI instance
  * @param[in,out] spi_ptr: Pointer to SPI instance structure @ref vsf_spi_t
  * @param[in] out_buffer_ptr: Pointer to data to transmit (can be NULL for receive-only)
- * @param[inout] out_offset_ptr: Pointer to transmit buffer offset
+ * @param[inout] out_offset_ptr: Pointer to transmit buffer offset. Must be initialized to 0 before first call
+ *                               if not NULL. The function updates this value to indicate the number of data units
+ *                               that have been transferred.
  * @param[out] in_buffer_ptr: Pointer to buffer for received data (can be NULL for transmit-only)
- * @param[inout] in_offset_ptr: Pointer to receive buffer offset
+ * @param[inout] in_offset_ptr: Pointer to receive buffer offset. Must be initialized to 0 before first call
+ *                              if not NULL. The function updates this value to indicate the number of data units
+ *                              that have been transferred.
  * @param[in] count: Number of data units to transfer (can be 0 for QSPI operations with only command/address phases)
+ * @note This is a non-blocking API. To complete the full data transfer, this function must be called repeatedly
+ *       in a loop until both out_offset_ptr and in_offset_ptr reach the count value.
  * @note Data unit size is determined by the configured data size in SPI mode (@ref vsf_spi_mode_t)
  * @note Buffer size requirements: 4-8 bits = 1 byte, 9-16 bits = 2 bytes, 17-32 bits = 4 bytes per data unit
  * @note In master mode, out_buffer_ptr data is sent through MOSI pin, in_buffer_ptr receives from MISO pin
@@ -1299,10 +1364,14 @@ extern vsf_spi_capability_t vsf_spi_capability(vsf_spi_t *spi_ptr);
  * @brief 在 SPI 实例上执行基于 FIFO 的数据传输
  * @param[in,out] spi_ptr: 指向结构体 @ref vsf_spi_t 的指针
  * @param[in] out_buffer_ptr: 指向要发送数据的缓冲区指针（仅接收时可为 NULL）
- * @param[inout] out_offset_ptr: 指向发送缓冲区偏移的指针
+ * @param[inout] out_offset_ptr: 指向发送缓冲区偏移的指针。如果非 NULL，必须在首次调用前初始化为 0。
+ *                               函数会更新此值以指示已传输的数据单元数。
  * @param[out] in_buffer_ptr: 指向用于接收数据的缓冲区指针（仅发送时可为 NULL）
- * @param[inout] in_offset_ptr: 指向接收缓冲区偏移的指针
+ * @param[inout] in_offset_ptr: 指向接收缓冲区偏移的指针。如果非 NULL，必须在首次调用前初始化为 0。
+ *                               函数会更新此值以指示已传输的数据单元数。
  * @param[in] count: 要传输的数据单元数（对于仅有命令/地址阶段的 QSPI 操作可以为 0）
+ * @note 这是一个非阻塞 API。要完成全部数据传输，必须在循环中持续调用此函数，
+ *       直到 out_offset_ptr 和 in_offset_ptr 都达到 count 值。
  * @note 数据单元大小由 SPI 模式中配置的数据大小决定（@ref vsf_spi_mode_t）
  * @note 缓冲区大小要求：4-8 位 = 1 字节，9-16 位 = 2 字节，17-32 位 = 4 字节每个数据单元
  * @note 在主机模式下，out_buffer_ptr 数据通过 MOSI 引脚发送，in_buffer_ptr 从 MISO 引脚接收

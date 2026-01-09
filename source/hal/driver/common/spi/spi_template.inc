@@ -120,6 +120,12 @@ vsf_spi_irq_mask_t vsf_real_spi_irq_clear(vsf_real_spi_t *spi_ptr, vsf_spi_irq_m
 
 /*============================ MACROS ========================================*/
 
+#undef VSF_SPI_CFG_REIMPLEMENT_TYPE_CAPABILITY
+#undef VSF_SPI_CFG_REIMPLEMENT_TYPE_CFG
+#undef VSF_SPI_CFG_REIMPLEMENT_TYPE_CTRL
+#undef VSF_SPI_CFG_REIMPLEMENT_TYPE_IRQ_MASK
+#undef VSF_SPI_CFG_REIMPLEMENT_TYPE_MODE
+#undef VSF_SPI_CFG_REIMPLEMENT_TYPE_STATUS
 #undef VSF_SPI_CFG_CAPABILITY_SUPPORT_AUTO_CS
 #undef VSF_SPI_CFG_CAPABILITY_SUPPORT_MANUAL_CS
 #undef VSF_SPI_CFG_CAPABILITY_CS_COUNT
@@ -343,6 +349,278 @@ vsf_spi_irq_mask_t vsf_real_spi_irq_clear(vsf_real_spi_t *spi_ptr, vsf_spi_irq_m
 #undef vsf_remap_spi_get_transferred_count
 #undef vsf_remap_spi_ctrl
 #undef vsf_remap_spi_get_configuration
+
+#undef VSF_HAL_TEMPLATE_IMP_NAME
+#undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
+
+/*============================ STATIC ASSERTIONS ==============================*/
+
+/* User-extensible macros for custom mode and IRQ mask values
+ * Users can define these macros before including this template to append
+ * their custom enum values to the uniqueness checks.
+ *
+ * Check modes for custom values:
+ *   VSF_SPI_CFG_MODE_CHECK_UNIQUE - Check mode for custom mode values
+ *     Default: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *   VSF_SPI_CFG_IRQ_MASK_CHECK_UNIQUE - Check mode for custom IRQ mask values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *
+ * Example usage in vendor driver:
+ *   #define VSF_SPI_CUSTOM_MODE_VALUES           MY_CUSTOM_MODE1, MY_CUSTOM_MODE2
+ *   #define VSF_SPI_CFG_MODE_CHECK_UNIQUE        VSF_HAL_CHECK_MODE_LOOSE
+ *   #define VSF_SPI_CUSTOM_IRQ_MASK_VALUES       MY_CUSTOM_IRQ1, MY_CUSTOM_IRQ2
+ *   #define VSF_SPI_CFG_IRQ_MASK_CHECK_UNIQUE    VSF_HAL_CHECK_MODE_STRICT
+ *   #include "hal/driver/common/spi/spi_template.inc"
+ */
+
+
+#ifdef VSF_SPI_CFG_MODE_CHECK_UNIQUE
+/* Default mode lists - can be redefined by users before including this file */
+#ifndef VSF_SPI_CHECK_UNIQUE_DIR_MODES
+#   define VSF_SPI_CHECK_UNIQUE_DIR_MODES \
+        VSF_SPI_MASTER, \
+        VSF_SPI_SLAVE
+#endif
+
+#ifndef VSF_SPI_CHECK_UNIQUE_BIT_ORDER_MODES
+#   define VSF_SPI_CHECK_UNIQUE_BIT_ORDER_MODES \
+        VSF_SPI_MSB_FIRST, \
+        VSF_SPI_LSB_FIRST
+#endif
+
+#ifndef VSF_SPI_CHECK_UNIQUE_MODE_MODES
+#   define VSF_SPI_CHECK_UNIQUE_MODE_MODES \
+        VSF_SPI_MODE_0, \
+        VSF_SPI_MODE_1, \
+        VSF_SPI_MODE_2, \
+        VSF_SPI_MODE_3
+#endif
+
+#ifndef VSF_SPI_CHECK_UNIQUE_CS_MODES
+#   define VSF_SPI_CHECK_UNIQUE_CS_MODES \
+        VSF_SPI_CS_SOFTWARE_MODE, \
+        VSF_SPI_CS_HARDWARE_MODE
+#endif
+
+#ifndef VSF_SPI_CHECK_UNIQUE_DATASIZE_MODES
+#   define VSF_SPI_CHECK_UNIQUE_DATASIZE_MODES \
+        VSF_SPI_DATASIZE_8, \
+        VSF_SPI_DATASIZE_16, \
+        VSF_SPI_DATASIZE_32
+#endif
+
+/* ==================== GROUP INTERNAL UNIQUENESS CHECKS ==================== */
+/* Check uniqueness within each functional group */
+
+/* Check direction mode uniqueness - all direction modes should have different values
+ * Mandatory: VSF_SPI_MASTER, VSF_SPI_SLAVE
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_SPI_CFG_MODE_CHECK_UNIQUE, VSF_SPI_CHECK_UNIQUE_DIR_MODES);
+
+/* Check bit order uniqueness - all bit order modes should have different values
+ * Mandatory: VSF_SPI_MSB_FIRST, VSF_SPI_LSB_FIRST
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_SPI_CFG_MODE_CHECK_UNIQUE, VSF_SPI_CHECK_UNIQUE_BIT_ORDER_MODES);
+
+/* Check SPI mode uniqueness - all SPI modes should have different values
+ * Mandatory: VSF_SPI_MODE_0, VSF_SPI_MODE_1, VSF_SPI_MODE_2, VSF_SPI_MODE_3
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_SPI_CFG_MODE_CHECK_UNIQUE, VSF_SPI_CHECK_UNIQUE_MODE_MODES);
+
+/* Check chip select mode uniqueness - all CS modes should have different values
+ * Mandatory: VSF_SPI_CS_SOFTWARE_MODE, VSF_SPI_CS_HARDWARE_MODE
+ * Implementation Required: VSF_SPI_CS_HARDWARE_INPUT_MODE
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_SPI_CFG_MODE_CHECK_UNIQUE,
+    VSF_SPI_CHECK_UNIQUE_CS_MODES
+#ifdef VSF_SPI_CS_HARDWARE_INPUT_MODE
+    , VSF_SPI_CS_HARDWARE_INPUT_MODE
+#endif
+);
+
+/* Check data size uniqueness - all data size modes should have different values
+ * Mandatory: VSF_SPI_DATASIZE_8, VSF_SPI_DATASIZE_16, VSF_SPI_DATASIZE_32
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_SPI_CFG_MODE_CHECK_UNIQUE, VSF_SPI_CHECK_UNIQUE_DATASIZE_MODES);
+
+#ifdef VSF_SPI_CUSTOM_MODE_VALUES
+/* Check uniqueness among custom mode values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_SPI_CFG_MODE_CHECK_UNIQUE, VSF_SPI_CUSTOM_MODE_VALUES);
+#endif
+
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_SPI_CFG_MODE_CHECK_UNIQUE,
+    /* Mandatory modes - always included */
+    VSF_SPI_MASTER, VSF_SPI_SLAVE,
+    VSF_SPI_MSB_FIRST, VSF_SPI_LSB_FIRST,
+    VSF_SPI_MODE_0, VSF_SPI_MODE_1, VSF_SPI_MODE_2, VSF_SPI_MODE_3,
+    VSF_SPI_CS_SOFTWARE_MODE, VSF_SPI_CS_HARDWARE_MODE,
+    VSF_SPI_DATASIZE_8, VSF_SPI_DATASIZE_16, VSF_SPI_DATASIZE_32
+    /* Implementation Required modes - conditionally included */
+#ifdef VSF_SPI_CS_HARDWARE_INPUT_MODE
+    , VSF_SPI_CS_HARDWARE_INPUT_MODE
+#endif
+    /* Standard Optional modes - only included when __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL is enabled */
+#if __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL
+#ifdef VSF_SPI_CPOL_LOW
+    , VSF_SPI_CPOL_LOW
+#endif
+#ifdef VSF_SPI_CPOL_HIGH
+    , VSF_SPI_CPOL_HIGH
+#endif
+#ifdef VSF_SPI_CPHA_LOW
+    , VSF_SPI_CPHA_LOW
+#endif
+#ifdef VSF_SPI_CPHA_HIGH
+    , VSF_SPI_CPHA_HIGH
+#endif
+#ifdef VSF_SPI_MOTOROLA_MODE
+    , VSF_SPI_MOTOROLA_MODE
+#endif
+#ifdef VSF_SPI_TI_MODE
+    , VSF_SPI_TI_MODE
+#endif
+#ifdef VSF_SPI_CRC_DISABLED
+    , VSF_SPI_CRC_DISABLED
+#endif
+#ifdef VSF_SPI_CRC_ENABLED
+    , VSF_SPI_CRC_ENABLED
+#endif
+#ifdef VSF_SPI_CLOCK_PRESCALER_2
+    , VSF_SPI_CLOCK_PRESCALER_2
+#endif
+#ifdef VSF_SPI_CLOCK_PRESCALER_4
+    , VSF_SPI_CLOCK_PRESCALER_4
+#endif
+#ifdef VSF_SPI_CLOCK_PRESCALER_8
+    , VSF_SPI_CLOCK_PRESCALER_8
+#endif
+#ifdef VSF_SPI_CLOCK_PRESCALER_16
+    , VSF_SPI_CLOCK_PRESCALER_16
+#endif
+#ifdef VSF_SPI_CLOCK_PRESCALER_32
+    , VSF_SPI_CLOCK_PRESCALER_32
+#endif
+#ifdef VSF_SPI_CLOCK_PRESCALER_64
+    , VSF_SPI_CLOCK_PRESCALER_64
+#endif
+#ifdef VSF_SPI_CLOCK_PRESCALER_128
+    , VSF_SPI_CLOCK_PRESCALER_128
+#endif
+#ifdef VSF_SPI_CLOCK_PRESCALER_256
+    , VSF_SPI_CLOCK_PRESCALER_256
+#endif
+#ifdef VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX
+    , VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX
+#endif
+#ifdef VSF_SPI_DATALINE_2_LINE_RX_ONLY
+    , VSF_SPI_DATALINE_2_LINE_RX_ONLY
+#endif
+#ifdef VSF_SPI_DATALINE_2_LINE_TX_ONLY
+    , VSF_SPI_DATALINE_2_LINE_TX_ONLY
+#endif
+#ifdef VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX
+    , VSF_SPI_DATALINE_1_LINE_HALF_DUPLEX
+#endif
+#ifdef VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX
+    , VSF_SPI_DATALINE_2_LINE_HALF_DUPLEX
+#endif
+#ifdef VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX
+    , VSF_SPI_DATALINE_4_LINE_HALF_DUPLEX
+#endif
+#ifdef VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX
+    , VSF_SPI_DATALINE_8_LINE_HALF_DUPLEX
+#endif
+#ifdef VSF_SPI_DATALINE_16_LINE_HALF_DUPLEX
+    , VSF_SPI_DATALINE_16_LINE_HALF_DUPLEX
+#endif
+#endif
+    /* User-defined modes - appended by user configuration */
+#ifdef VSF_SPI_CUSTOM_MODE_VALUES
+    , VSF_SPI_CUSTOM_MODE_VALUES
+#endif
+);
+
+#undef VSF_SPI_CHECK_UNIQUE_DIR_MODES
+#undef VSF_SPI_CHECK_UNIQUE_BIT_ORDER_MODES
+#undef VSF_SPI_CHECK_UNIQUE_MODE_MODES
+#undef VSF_SPI_CHECK_UNIQUE_CS_MODES
+#undef VSF_SPI_CHECK_UNIQUE_DATASIZE_MODES
+#endif  /* VSF_SPI_CFG_MODE_CHECK_UNIQUE */
+
+/* ==================== IRQ MASK UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_SPI_CFG_IRQ_MASK_CHECK_UNIQUE
+
+#ifdef VSF_SPI_CUSTOM_IRQ_MASK_VALUES
+/* Check uniqueness among custom IRQ mask values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_SPI_CFG_IRQ_MASK_CHECK_UNIQUE, VSF_SPI_CUSTOM_IRQ_MASK_VALUES);
+#endif
+
+/* Check uniqueness within vsf_spi_irq_mask_t enum */
+
+/* Check IRQ mask uniqueness - all IRQ mask bits should have different values
+ * Mandatory: VSF_SPI_IRQ_MASK_TX, VSF_SPI_IRQ_MASK_RX,
+ *            VSF_SPI_IRQ_MASK_TX_CPL, VSF_SPI_IRQ_MASK_RX_CPL,
+ *            VSF_SPI_IRQ_MASK_RX_OVERFLOW_ERR
+ * Standard Optional: VSF_SPI_IRQ_MASK_CRC_ERR, VSF_SPI_IRQ_MASK_FRAME_ERR
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_SPI_CFG_IRQ_MASK_CHECK_UNIQUE,
+    /* Mandatory IRQ masks - always included */
+    VSF_SPI_IRQ_MASK_TX,
+    VSF_SPI_IRQ_MASK_RX,
+    VSF_SPI_IRQ_MASK_TX_CPL,
+    VSF_SPI_IRQ_MASK_RX_CPL,
+    VSF_SPI_IRQ_MASK_RX_OVERFLOW_ERR
+    /* Standard Optional IRQ masks - only included when __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL is enabled */
+#if __VSF_SPI_CFG_SUPPORT_STANDARD_OPTIONAL
+#ifdef VSF_SPI_IRQ_MASK_CRC_ERR
+    , VSF_SPI_IRQ_MASK_CRC_ERR
+#endif
+#ifdef VSF_SPI_IRQ_MASK_FRAME_ERR
+    , VSF_SPI_IRQ_MASK_FRAME_ERR
+#endif
+#endif
+    /* User-defined IRQ masks - appended by user configuration */
+#ifdef VSF_SPI_CUSTOM_IRQ_MASK_VALUES
+    , VSF_SPI_CUSTOM_IRQ_MASK_VALUES
+#endif
+);
+#endif  /* VSF_SPI_CFG_IRQ_MASK_CHECK_UNIQUE */
+
+/* ==================== CTRL UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_SPI_CFG_CTRL_CHECK_UNIQUE
+
+#ifdef VSF_SPI_CUSTOM_CTRL_VALUES
+/* Check uniqueness among custom ctrl values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_SPI_CFG_CTRL_CHECK_UNIQUE, VSF_SPI_CUSTOM_CTRL_VALUES);
+#endif
+
+/* Check ctrl uniqueness - all ctrl values should have different values
+ * Placeholder: __VSF_SPI_CTRL_DUMMY
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_SPI_CFG_CTRL_CHECK_UNIQUE,
+    /* Placeholder ctrl - always included */
+    __VSF_SPI_CTRL_DUMMY
+    /* User-defined ctrls - appended by user configuration */
+#ifdef VSF_SPI_CUSTOM_CTRL_VALUES
+    , VSF_SPI_CUSTOM_CTRL_VALUES
+#endif
+);
+#endif  /* VSF_SPI_CFG_CTRL_CHECK_UNIQUE */
+
+#undef VSF_SPI_CFG_MODE_CHECK_UNIQUE
+#undef VSF_SPI_CFG_IRQ_MASK_CHECK_UNIQUE
+#undef VSF_SPI_CFG_CTRL_CHECK_UNIQUE
+#undef VSF_SPI_CUSTOM_MODE_VALUES
+#undef VSF_SPI_CUSTOM_IRQ_MASK_VALUES
+#undef VSF_SPI_CUSTOM_CTRL_VALUES
 
 #endif  /* VSF_HAL_USE_SPI */
 
