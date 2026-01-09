@@ -74,4 +74,35 @@ vsf_pm_capability_t vsf_real_pm_capability(vsf_real_pm_t *pm_ptr)
 #undef VSF_PM_CFG_IMP_DEVICE_PREFIX
 #undef VSF_PM_CFG_IMP_DEVICE_UPCASE_PREFIX
 
+#undef VSF_HAL_TEMPLATE_IMP_NAME
+#undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
+
+/*============================ STATIC ASSERTIONS ==============================*/
+
+/* User-extensible macros for custom mode and IRQ mask values
+ * Users can define these macros before including this template to append
+ * their custom enum values to the uniqueness checks.
+ *
+ * Check modes for custom values:
+ *   VSF_PM_CFG_MODE_CHECK_UNIQUE - Check mode for custom mode values
+ *     Default: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *   VSF_PM_CFG_IRQ_MASK_CHECK_UNIQUE - Check mode for custom IRQ mask values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *
+ * Example usage in vendor driver:
+ *   #define VSF_PM_CUSTOM_MODE_VALUES           MY_CUSTOM_MODE1, MY_CUSTOM_MODE2
+ *   #define VSF_PM_CFG_MODE_CHECK_UNIQUE        VSF_HAL_CHECK_MODE_LOOSE
+ *   #define VSF_PM_CUSTOM_IRQ_MASK_VALUES       MY_CUSTOM_IRQ1, MY_CUSTOM_IRQ2
+ *   #define VSF_PM_CFG_IRQ_MASK_CHECK_UNIQUE    VSF_HAL_CHECK_MODE_STRICT
+ *   #include "hal/driver/common/pm/pm_template.inc"
+ */
+
+
+#undef VSF_PM_CFG_MODE_CHECK_UNIQUE
+#undef VSF_PM_CFG_IRQ_MASK_CHECK_UNIQUE
+#undef VSF_PM_CUSTOM_MODE_VALUES
+#undef VSF_PM_CUSTOM_IRQ_MASK_VALUES
+
 #endif // VSF_HAL_USE_PM == ENABLED
