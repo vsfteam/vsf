@@ -88,6 +88,15 @@ void vsf_timer_irq_disable(vsf_timer_t         *timer_ptr,
     timer_ptr->op->irq_disable(timer_ptr, irq_mask);
 }
 
+vsf_timer_irq_mask_t vsf_timer_irq_clear(vsf_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(timer_ptr != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op != NULL);
+    VSF_HAL_ASSERT(timer_ptr->op->irq_clear != NULL);
+
+    return timer_ptr->op->irq_clear(timer_ptr, irq_mask);
+}
+
 vsf_timer_status_t vsf_timer_status(vsf_timer_t *timer_ptr)
 {
     VSF_HAL_ASSERT(timer_ptr != NULL);
