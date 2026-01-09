@@ -190,6 +190,15 @@ vsf_dma_t * vsf_real_dma_channel_acquire_from_all(vsf_dma_channel_hint_t *channe
 
 /*============================ MACROS ========================================*/
 
+#undef VSF_DMA_CFG_REIMPLEMENT_TYPE_ADDR
+#undef VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY
+#undef VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG
+#undef VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG
+#undef VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_HINT
+#undef VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE
+#undef VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG
+#undef VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS
+#undef VSF_DMA_CFG_REIMPLEMENT_TYPE_IRQ_MASK
 #undef VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_DMA_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION
@@ -380,5 +389,167 @@ vsf_dma_t * vsf_real_dma_channel_acquire_from_all(vsf_dma_channel_hint_t *channe
 #undef vsf_remap_dma_channel_cancel
 #undef vsf_remap_dma_channel_get_transferred_count
 #undef vsf_remap_dma_channel_status
+
+#undef VSF_HAL_TEMPLATE_IMP_NAME
+#undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
+
+/*============================ STATIC ASSERTIONS ==============================*/
+
+/* User-extensible macros for custom mode and IRQ mask values
+ * Users can define these macros before including this template to append
+ * their custom enum values to the uniqueness checks.
+ *
+ * Check modes for custom values:
+ *   VSF_DMA_CFG_MODE_CHECK_UNIQUE - Check mode for custom mode values
+ *     Default: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *   VSF_DMA_CFG_IRQ_MASK_CHECK_UNIQUE - Check mode for custom IRQ mask values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *
+ * Example usage in vendor driver:
+ *   #define VSF_DMA_CUSTOM_MODE_VALUES           MY_CUSTOM_MODE1, MY_CUSTOM_MODE2
+ *   #define VSF_DMA_CFG_MODE_CHECK_UNIQUE        VSF_HAL_CHECK_MODE_LOOSE
+ *   #define VSF_DMA_CUSTOM_IRQ_MASK_VALUES       MY_CUSTOM_IRQ1, MY_CUSTOM_IRQ2
+ *   #define VSF_DMA_CFG_IRQ_MASK_CHECK_UNIQUE    VSF_HAL_CHECK_MODE_STRICT
+ *   #include "hal/driver/common/dma/dma_template.inc"
+ */
+
+
+#ifdef VSF_DMA_CFG_MODE_CHECK_UNIQUE
+/* Default mode lists - can be redefined by users before including this file */
+#ifndef VSF_DMA_CHECK_UNIQUE_DIRECTION_MODES
+#   define VSF_DMA_CHECK_UNIQUE_DIRECTION_MODES \
+        VSF_DMA_MEMORY_TO_MEMORY, \
+        VSF_DMA_MEMORY_TO_PERIPHERAL, \
+        VSF_DMA_PERIPHERAL_TO_MEMORY, \
+        VSF_DMA_PERIPHERAL_TO_PERIPHERAL
+#endif
+
+#ifndef VSF_DMA_CHECK_UNIQUE_SRC_ADDR_MODES
+#   define VSF_DMA_CHECK_UNIQUE_SRC_ADDR_MODES \
+        VSF_DMA_SRC_ADDR_INCREMENT, \
+        VSF_DMA_SRC_ADDR_DECREMENT, \
+        VSF_DMA_SRC_ADDR_NO_CHANGE
+#endif
+
+#ifndef VSF_DMA_CHECK_UNIQUE_DST_ADDR_MODES
+#   define VSF_DMA_CHECK_UNIQUE_DST_ADDR_MODES \
+        VSF_DMA_DST_ADDR_INCREMENT, \
+        VSF_DMA_DST_ADDR_DECREMENT, \
+        VSF_DMA_DST_ADDR_NO_CHANGE
+#endif
+
+#ifndef VSF_DMA_CHECK_UNIQUE_PRIORITY_MODES
+#   define VSF_DMA_CHECK_UNIQUE_PRIORITY_MODES \
+        VSF_DMA_PRIORITY_LOW, \
+        VSF_DMA_PRIORITY_MEDIUM, \
+        VSF_DMA_PRIORITY_HIGH, \
+        VSF_DMA_PRIORITY_VERY_HIGH
+#endif
+
+/* ==================== GROUP INTERNAL UNIQUENESS CHECKS ==================== */
+/* Check uniqueness within each functional group */
+
+/* Check direction mode uniqueness - all direction modes should have different values
+ * Mandatory: VSF_DMA_MEMORY_TO_MEMORY, VSF_DMA_MEMORY_TO_PERIPHERAL,
+ *            VSF_DMA_PERIPHERAL_TO_MEMORY, VSF_DMA_PERIPHERAL_TO_PERIPHERAL
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_DMA_CFG_MODE_CHECK_UNIQUE,
+    VSF_DMA_MEMORY_TO_MEMORY,
+    VSF_DMA_MEMORY_TO_PERIPHERAL,
+    VSF_DMA_PERIPHERAL_TO_MEMORY,
+    VSF_DMA_PERIPHERAL_TO_PERIPHERAL
+);
+
+/* Check source address mode uniqueness - all source address modes should have different values
+ * Mandatory: VSF_DMA_SRC_ADDR_INCREMENT, VSF_DMA_SRC_ADDR_DECREMENT, VSF_DMA_SRC_ADDR_NO_CHANGE
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_DMA_CFG_MODE_CHECK_UNIQUE,
+    VSF_DMA_SRC_ADDR_INCREMENT,
+    VSF_DMA_SRC_ADDR_DECREMENT,
+    VSF_DMA_SRC_ADDR_NO_CHANGE
+);
+
+/* Check destination address mode uniqueness - all destination address modes should have different values
+ * Mandatory: VSF_DMA_DST_ADDR_INCREMENT, VSF_DMA_DST_ADDR_DECREMENT, VSF_DMA_DST_ADDR_NO_CHANGE
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_DMA_CFG_MODE_CHECK_UNIQUE,
+    VSF_DMA_DST_ADDR_INCREMENT,
+    VSF_DMA_DST_ADDR_DECREMENT,
+    VSF_DMA_DST_ADDR_NO_CHANGE
+);
+
+/* Check priority mode uniqueness - all priority modes should have different values
+ * Mandatory: VSF_DMA_PRIORITY_LOW, VSF_DMA_PRIORITY_MEDIUM, VSF_DMA_PRIORITY_HIGH, VSF_DMA_PRIORITY_VERY_HIGH
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_DMA_CFG_MODE_CHECK_UNIQUE,
+    VSF_DMA_PRIORITY_LOW,
+    VSF_DMA_PRIORITY_MEDIUM,
+    VSF_DMA_PRIORITY_HIGH,
+    VSF_DMA_PRIORITY_VERY_HIGH
+);
+
+#ifdef VSF_DMA_CUSTOM_MODE_VALUES
+/* Check uniqueness among custom mode values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_DMA_CFG_MODE_CHECK_UNIQUE, VSF_DMA_CUSTOM_MODE_VALUES);
+#endif
+
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_DMA_CFG_MODE_CHECK_UNIQUE,
+    /* Mandatory modes - always included */
+    VSF_DMA_MEMORY_TO_MEMORY, VSF_DMA_MEMORY_TO_PERIPHERAL,
+    VSF_DMA_PERIPHERAL_TO_MEMORY, VSF_DMA_PERIPHERAL_TO_PERIPHERAL,
+    VSF_DMA_SRC_ADDR_INCREMENT, VSF_DMA_SRC_ADDR_DECREMENT, VSF_DMA_SRC_ADDR_NO_CHANGE,
+    VSF_DMA_DST_ADDR_INCREMENT, VSF_DMA_DST_ADDR_DECREMENT, VSF_DMA_DST_ADDR_NO_CHANGE,
+    VSF_DMA_PRIORITY_LOW, VSF_DMA_PRIORITY_MEDIUM, VSF_DMA_PRIORITY_HIGH, VSF_DMA_PRIORITY_VERY_HIGH
+    /* Implementation Required modes - conditionally included */
+    /* User-defined modes - appended by user configuration */
+#ifdef VSF_DMA_CUSTOM_MODE_VALUES
+    , VSF_DMA_CUSTOM_MODE_VALUES
+#endif
+);
+
+#undef VSF_DMA_CHECK_UNIQUE_DIRECTION_MODES
+#undef VSF_DMA_CHECK_UNIQUE_SRC_ADDR_MODES
+#undef VSF_DMA_CHECK_UNIQUE_DST_ADDR_MODES
+#undef VSF_DMA_CHECK_UNIQUE_PRIORITY_MODES
+#endif  /* VSF_DMA_CFG_MODE_CHECK_UNIQUE */
+
+/* ==================== IRQ MASK UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_DMA_CFG_IRQ_MASK_CHECK_UNIQUE
+
+#ifdef VSF_DMA_CUSTOM_IRQ_MASK_VALUES
+/* Check uniqueness among custom IRQ mask values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_DMA_CFG_IRQ_MASK_CHECK_UNIQUE, VSF_DMA_CUSTOM_IRQ_MASK_VALUES);
+#endif
+
+/* Check uniqueness within vsf_dma_irq_mask_t enum */
+
+/* Check IRQ mask uniqueness - all IRQ mask bits should have different values
+ * Mandatory: VSF_DMA_IRQ_MASK_CPL, VSF_DMA_IRQ_MASK_HALF_CPL, VSF_DMA_IRQ_MASK_ERROR
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_DMA_CFG_IRQ_MASK_CHECK_UNIQUE,
+    /* Mandatory IRQ masks - always included */
+    VSF_DMA_IRQ_MASK_CPL,
+    VSF_DMA_IRQ_MASK_HALF_CPL,
+    VSF_DMA_IRQ_MASK_ERROR
+    /* User-defined IRQ masks - appended by user configuration */
+#ifdef VSF_DMA_CUSTOM_IRQ_MASK_VALUES
+    , VSF_DMA_CUSTOM_IRQ_MASK_VALUES
+#endif
+);
+#endif  /* VSF_DMA_CFG_IRQ_MASK_CHECK_UNIQUE */
+
+#undef VSF_DMA_CFG_MODE_CHECK_UNIQUE
+#undef VSF_DMA_CFG_IRQ_MASK_CHECK_UNIQUE
+#undef VSF_DMA_CUSTOM_MODE_VALUES
+#undef VSF_DMA_CUSTOM_IRQ_MASK_VALUES
 
 #endif  /* VSF_HAL_USE_DMA */

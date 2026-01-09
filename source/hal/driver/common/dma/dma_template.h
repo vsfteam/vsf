@@ -42,6 +42,7 @@
 #endif
 
 #define VSF_HAL_TEMPLATE_DEC_INSTANCE_APIS(__prefix_name)                                       \
+    VSF_DMA_APIS(__prefix_name)                                                                  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_t *, dma, channel_acquire_from_all, vsf_dma_channel_hint_t *channel_hint_ptr)
 
 #include "hal/driver/common/template/vsf_template_instance_declaration.h"
@@ -50,6 +51,7 @@
 #undef VSF_DMA_CFG_DEC_UPCASE_PREFIX
 #undef VSF_DMA_CFG_DEC_DEVICE_PREFIX
 #undef VSF_DMA_CFG_DEC_DEVICE_UPCASE_PREFIX
+#undef VSF_DMA_CFG_DEC_RENAME_DEVICE_PREFIX
 #undef VSF_DMA_CFG_DEC_COUNT_MASK_PREFIX
 #undef VSF_DMA_CFG_DEC_REMAP_PREFIX
 #undef VSF_DMA_CFG_DEC_EXTERN_OP

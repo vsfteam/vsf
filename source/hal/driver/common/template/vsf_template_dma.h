@@ -145,6 +145,33 @@ extern "C" {
 
 /**
  * \~english
+ * @brief Enable standard optional features support.
+ *
+ * This macro controls the availability of standard optional features in the template.
+ * Standard optional features include:
+ * - Channel acquire from all DMA controllers (vsf_dma_channel_acquire_from_all)
+ *
+ * @note This macro is for testing purposes only. Users should NOT enable this macro.
+ *       Standard optional features should be implemented directly in hardware drivers
+ *       if the hardware supports them, rather than enabling this macro in the template.
+ *       Enabling this macro may cause compilation errors or unexpected behavior.
+ *
+ * \~chinese
+ * @brief 启用标准可选功能支持。
+ *
+ * 此宏控制模板中标准可选功能的可用性。标准可选功能包括：
+ * - 从所有 DMA 控制器获取通道（vsf_dma_channel_acquire_from_all）
+ *
+ * @note 此宏仅用于测试目的。用户不应启用此宏。
+ *       如果硬件支持标准可选功能，应在硬件驱动中直接实现，而不是在模板中启用此宏。
+ *       启用此宏可能导致编译错误或意外行为。
+ */
+#ifndef __VSF_DMA_CFG_SUPPORT_STANDARD_OPTIONAL
+#   define __VSF_DMA_CFG_SUPPORT_STANDARD_OPTIONAL DISABLED
+#endif
+
+/**
+ * \~english
  * @brief Enable the option to reimplement DMA configuration type.
  * For compatibility, do not delete members when redefining vsf_dma_cfg_t
  *
@@ -898,6 +925,29 @@ extern vsf_dma_capability_t vsf_dma_capability(vsf_dma_t *dma_ptr);
  @note 关于优先级处理和通道分配模式的详细信息，请参考 @ref vsf_dma_channel_hint_t 的文档。
  */
 extern vsf_err_t vsf_dma_channel_acquire(vsf_dma_t *dma_ptr, vsf_dma_channel_hint_t *channel_hint_ptr);
+
+#if __VSF_DMA_CFG_SUPPORT_STANDARD_OPTIONAL
+/**
+ \~english
+ @brief Acquire a DMA channel from all available DMA controllers
+ @param[in,out] channel_hint_ptr: a pointer to DMA channel hint. User should provide appropriate hint information based on actual requirements. If the actually allocated channel or other configuration differs from user's expectation, the function may modify channel_hint_ptr to notify the user of the actual allocation. The allocated channel number will be stored in channel_hint_ptr->channel.
+ @return vsf_dma_t*: a pointer to the DMA controller that owns the acquired channel, or NULL if no channel is available
+
+ @note This function searches through all available DMA controllers to find a suitable channel.
+       It is a standard optional feature and should NOT be enabled in the template.
+       (protected by __VSF_DMA_CFG_SUPPORT_STANDARD_OPTIONAL, should not be enabled)
+
+ \~chinese
+ @brief 从所有可用的 DMA 控制器中获取一个 DMA 通道
+ @param[in,out] channel_hint_ptr: 指向 DMA 通道提示的指针。用户应根据实际情况提供合适的提示信息。如果实际分配的通道或其他配置与用户预期不一致，函数可能会修改 channel_hint_ptr 来通知用户实际分配的结果。分配的通道号将存储在 channel_hint_ptr->channel 中。
+ @return vsf_dma_t*: 拥有已获取通道的 DMA 控制器的指针，如果没有可用通道则返回 NULL
+
+ @note 此函数在所有可用的 DMA 控制器中搜索以找到合适的通道。
+       这是标准可选功能，不应在模板中启用。
+       （由 __VSF_DMA_CFG_SUPPORT_STANDARD_OPTIONAL 宏保护，不应被开启）
+ */
+extern vsf_dma_t *vsf_dma_channel_acquire_from_all(vsf_dma_channel_hint_t *channel_hint_ptr);
+#endif
 
 /**
  \~english
