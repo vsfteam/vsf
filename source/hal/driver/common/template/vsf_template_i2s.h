@@ -163,6 +163,31 @@ extern "C" {
 #   define VSF_I2S_CFG_INHERIT_HAL_CAPABILITY       ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable standard optional features support.
+ *
+ * This macro controls the availability of standard optional features in the template.
+ * Standard optional features may include additional capability fields or other optional features.
+ *
+ * @note This macro is for testing purposes only. Users should NOT enable this macro.
+ *       Standard optional features should be implemented directly in hardware drivers
+ *       if the hardware supports them, rather than enabling this macro in the template.
+ *       Enabling this macro may cause compilation errors or unexpected behavior.
+ *
+ * \~chinese
+ * @brief 启用标准可选功能支持。
+ *
+ * 此宏控制模板中标准可选功能的可用性。标准可选功能可能包括额外的能力字段或其他可选功能。
+ *
+ * @note 此宏仅用于测试目的。用户不应启用此宏。
+ *       如果硬件支持标准可选功能，应在硬件驱动中直接实现，而不是在模板中启用此宏。
+ *       启用此宏可能导致编译错误或意外行为。
+ */
+#ifndef __VSF_I2S_CFG_SUPPORT_STANDARD_OPTIONAL
+#   define __VSF_I2S_CFG_SUPPORT_STANDARD_OPTIONAL DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /**

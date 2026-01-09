@@ -111,6 +111,11 @@ vsf_err_t vsf_real_i2s_rx_get_configuration(vsf_real_i2s_t *i2s_ptr, vsf_i2s_cfg
 
 /*============================ MACROS ========================================*/
 
+#undef VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY
+#undef VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG
+#undef VSF_I2S_CFG_REIMPLEMENT_TYPE_IRQ_MASK
+#undef VSF_I2S_CFG_REIMPLEMENT_TYPE_MODE
+#undef VSF_I2S_CFG_REIMPLEMENT_TYPE_STATUS
 #undef VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_I2S_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_I2S_CFG_REIMPLEMENT_API_TX_GET_CONFIGURATION
@@ -303,5 +308,189 @@ vsf_err_t vsf_real_i2s_rx_get_configuration(vsf_real_i2s_t *i2s_ptr, vsf_i2s_cfg
 #undef vsf_remap_i2s_rx_get_configuration
 #undef vsf_remap_i2s_rx_start
 #undef vsf_remap_i2s_get_configuration
+
+#undef VSF_HAL_TEMPLATE_IMP_NAME
+#undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
+
+/*============================ STATIC ASSERTIONS ==============================*/
+
+/* User-extensible macros for custom mode and IRQ mask values
+ * Users can define these macros before including this template to append
+ * their custom enum values to the uniqueness checks.
+ *
+ * Check modes for custom values:
+ *   VSF_I2S_CFG_MODE_CHECK_UNIQUE - Check mode for custom mode values
+ *     Default: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *   VSF_I2S_CFG_IRQ_MASK_CHECK_UNIQUE - Check mode for custom IRQ mask values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *
+ * Example usage in vendor driver:
+ *   #define VSF_I2S_CUSTOM_MODE_VALUES           MY_CUSTOM_MODE1, MY_CUSTOM_MODE2
+ *   #define VSF_I2S_CFG_MODE_CHECK_UNIQUE        VSF_HAL_CHECK_MODE_LOOSE
+ *   #define VSF_I2S_CUSTOM_IRQ_MASK_VALUES       MY_CUSTOM_IRQ1, MY_CUSTOM_IRQ2
+ *   #define VSF_I2S_CFG_IRQ_MASK_CHECK_UNIQUE    VSF_HAL_CHECK_MODE_STRICT
+ *   #include "hal/driver/common/i2s/i2s_template.inc"
+ */
+
+
+#ifdef VSF_I2S_CFG_MODE_CHECK_UNIQUE
+/* Default mode lists - can be redefined by users before including this file */
+#ifndef VSF_I2S_CHECK_UNIQUE_MODE_MODES
+#   define VSF_I2S_CHECK_UNIQUE_MODE_MODES \
+        VSF_I2S_MODE_MASTER, \
+        VSF_I2S_MODE_SLAVE
+#endif
+
+#ifndef VSF_I2S_CHECK_UNIQUE_DATA_BITLEN_MODES
+#   define VSF_I2S_CHECK_UNIQUE_DATA_BITLEN_MODES \
+        VSF_I2S_DATA_BITLEN_16, \
+        VSF_I2S_DATA_BITLEN_24, \
+        VSF_I2S_DATA_BITLEN_32
+#endif
+
+#ifndef VSF_I2S_CHECK_UNIQUE_FRAME_BITLEN_MODES
+#   define VSF_I2S_CHECK_UNIQUE_FRAME_BITLEN_MODES \
+        VSF_I2S_FRAME_BITLEN_16, \
+        VSF_I2S_FRAME_BITLEN_24, \
+        VSF_I2S_FRAME_BITLEN_32
+#endif
+
+#ifndef VSF_I2S_CHECK_UNIQUE_STANDARD_MODES
+#   define VSF_I2S_CHECK_UNIQUE_STANDARD_MODES \
+        VSF_I2S_STANDARD_PHILIPS, \
+        VSF_I2S_STANDARD_MSB, \
+        VSF_I2S_STANDARD_LSB
+#endif
+
+/* ==================== GROUP INTERNAL UNIQUENESS CHECKS ==================== */
+/* Check uniqueness within each functional group */
+
+/* Check mode uniqueness - all mode modes should have different values
+ * Mandatory: VSF_I2S_MODE_MASTER, VSF_I2S_MODE_SLAVE
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_I2S_CFG_MODE_CHECK_UNIQUE,
+    VSF_I2S_MODE_MASTER,
+    VSF_I2S_MODE_SLAVE
+);
+
+/* Check data bit length uniqueness - all data bit length modes should have different values
+ * Mandatory: VSF_I2S_DATA_BITLEN_16
+ * Implementation Required: VSF_I2S_DATA_BITLEN_24, VSF_I2S_DATA_BITLEN_32
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_I2S_CFG_MODE_CHECK_UNIQUE,
+    VSF_I2S_DATA_BITLEN_16
+#ifdef VSF_I2S_DATA_BITLEN_24
+    , VSF_I2S_DATA_BITLEN_24
+#endif
+#ifdef VSF_I2S_DATA_BITLEN_32
+    , VSF_I2S_DATA_BITLEN_32
+#endif
+);
+
+/* Check frame bit length uniqueness - all frame bit length modes should have different values
+ * Mandatory: VSF_I2S_FRAME_BITLEN_16
+ * Implementation Required: VSF_I2S_FRAME_BITLEN_24, VSF_I2S_FRAME_BITLEN_32
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_I2S_CFG_MODE_CHECK_UNIQUE,
+    VSF_I2S_FRAME_BITLEN_16
+#ifdef VSF_I2S_FRAME_BITLEN_24
+    , VSF_I2S_FRAME_BITLEN_24
+#endif
+#ifdef VSF_I2S_FRAME_BITLEN_32
+    , VSF_I2S_FRAME_BITLEN_32
+#endif
+);
+
+/* Check standard uniqueness - all standard modes should have different values
+ * Mandatory: VSF_I2S_STANDARD_PHILIPS
+ * Implementation Required: VSF_I2S_STANDARD_MSB, VSF_I2S_STANDARD_LSB
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_I2S_CFG_MODE_CHECK_UNIQUE,
+    VSF_I2S_STANDARD_PHILIPS
+#ifdef VSF_I2S_STANDARD_MSB
+    , VSF_I2S_STANDARD_MSB
+#endif
+#ifdef VSF_I2S_STANDARD_LSB
+    , VSF_I2S_STANDARD_LSB
+#endif
+);
+
+#ifdef VSF_I2S_CUSTOM_MODE_VALUES
+/* Check uniqueness among custom mode values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_I2S_CFG_MODE_CHECK_UNIQUE, VSF_I2S_CUSTOM_MODE_VALUES);
+#endif
+
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_I2S_CFG_MODE_CHECK_UNIQUE,
+    /* Mandatory modes - always included */
+    VSF_I2S_MODE_MASTER, VSF_I2S_MODE_SLAVE,
+    VSF_I2S_DATA_BITLEN_16, VSF_I2S_FRAME_BITLEN_16, VSF_I2S_STANDARD_PHILIPS
+    /* Implementation Required modes - conditionally included */
+#ifdef VSF_I2S_DATA_BITLEN_24
+    , VSF_I2S_DATA_BITLEN_24
+#endif
+#ifdef VSF_I2S_DATA_BITLEN_32
+    , VSF_I2S_DATA_BITLEN_32
+#endif
+#ifdef VSF_I2S_FRAME_BITLEN_24
+    , VSF_I2S_FRAME_BITLEN_24
+#endif
+#ifdef VSF_I2S_FRAME_BITLEN_32
+    , VSF_I2S_FRAME_BITLEN_32
+#endif
+#ifdef VSF_I2S_STANDARD_MSB
+    , VSF_I2S_STANDARD_MSB
+#endif
+#ifdef VSF_I2S_STANDARD_LSB
+    , VSF_I2S_STANDARD_LSB
+#endif
+    /* User-defined modes - appended by user configuration */
+#ifdef VSF_I2S_CUSTOM_MODE_VALUES
+    , VSF_I2S_CUSTOM_MODE_VALUES
+#endif
+);
+
+#undef VSF_I2S_CHECK_UNIQUE_MODE_MODES
+#undef VSF_I2S_CHECK_UNIQUE_DATA_BITLEN_MODES
+#undef VSF_I2S_CHECK_UNIQUE_FRAME_BITLEN_MODES
+#undef VSF_I2S_CHECK_UNIQUE_STANDARD_MODES
+#endif  /* VSF_I2S_CFG_MODE_CHECK_UNIQUE */
+
+/* ==================== IRQ MASK UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_I2S_CFG_IRQ_MASK_CHECK_UNIQUE
+
+#ifdef VSF_I2S_CUSTOM_IRQ_MASK_VALUES
+/* Check uniqueness among custom IRQ mask values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_I2S_CFG_IRQ_MASK_CHECK_UNIQUE, VSF_I2S_CUSTOM_IRQ_MASK_VALUES);
+#endif
+
+/* Check uniqueness within vsf_i2s_irq_mask_t enum */
+
+/* Check IRQ mask uniqueness - all IRQ mask bits should have different values
+ * Mandatory: VSF_I2S_IRQ_MASK_TX_TGL_BUFFER, VSF_I2S_IRQ_MASK_RX_TGL_BUFFER
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_I2S_CFG_IRQ_MASK_CHECK_UNIQUE,
+    /* Mandatory IRQ masks - always included */
+    VSF_I2S_IRQ_MASK_TX_TGL_BUFFER,
+    VSF_I2S_IRQ_MASK_RX_TGL_BUFFER
+    /* User-defined IRQ masks - appended by user configuration */
+#ifdef VSF_I2S_CUSTOM_IRQ_MASK_VALUES
+    , VSF_I2S_CUSTOM_IRQ_MASK_VALUES
+#endif
+);
+#endif  /* VSF_I2S_CFG_IRQ_MASK_CHECK_UNIQUE */
+
+#undef VSF_I2S_CFG_MODE_CHECK_UNIQUE
+#undef VSF_I2S_CFG_IRQ_MASK_CHECK_UNIQUE
+#undef VSF_I2S_CUSTOM_MODE_VALUES
+#undef VSF_I2S_CUSTOM_IRQ_MASK_VALUES
 
 #endif // VSF_HAL_USE_I2S == ENABLED
