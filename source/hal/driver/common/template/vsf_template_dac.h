@@ -188,6 +188,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dac_capability_t, dac, capability,           VSF_MCONNECT(__prefix_name, _t) *dac_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 dac, irq_enable,           VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 dac, irq_disable,          VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dac_irq_mask_t,   dac, irq_clear,            VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request_once, VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_channel_cfg_t *cfg, uint_fast16_t value) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_config,       VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_channel_cfg_t *cfgs_ptr, uint_fast8_t cnt) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request,      VSF_MCONNECT(__prefix_name, _t) *dac_ptr, void *values_ptr, uint_fast32_t cnt)
@@ -443,6 +444,33 @@ extern void vsf_dac_irq_enable(vsf_dac_t *dac_ptr, vsf_dac_irq_mask_t irq_mask);
 extern void vsf_dac_irq_disable(vsf_dac_t *dac_ptr, vsf_dac_irq_mask_t irq_mask);
 
 /**
+ * \~english
+ * @brief Clear interrupt flags of DAC instance and return previous state
+ * @param[in] dac_ptr: a pointer to structure @ref vsf_dac_t
+ * @param[in] irq_mask: one or more values of enum @ref vsf_dac_irq_mask_t to clear
+ * @return vsf_dac_irq_mask_t: the interrupt mask state before clearing (0 if no flags were set)
+ *
+ * @note This function attempts to clear the specified interrupt flags if they are set,
+ *       and returns the state of those flags before clearing. This is useful for
+ *       polling operations and determining if interrupts occurred.
+ *       Note that if interrupts are enabled and an interrupt handler is active,
+ *       the interrupt handler may clear the interrupt flags automatically.
+ *       In such cases, this function will return 0 even if interrupts occurred.
+ *
+ * \~chinese
+ * @brief 清除 DAC 实例的中断标志并返回之前的状态
+ * @param[in] dac_ptr: 指向结构体 @ref vsf_dac_t 的指针
+ * @param[in] irq_mask: 要清除的一个或多个枚举 vsf_dac_irq_mask_t 值的按位或
+ * @return vsf_dac_irq_mask_t: 清除前的中断掩码状态（如果没有标志被设置则返回0）
+ *
+ * @note 此函数尝试清除指定的中断标志（如果它们已设置），并返回清除前这些标志的状态。
+ *       这对于轮询操作和确定是否发生了中断很有用。
+ *       注意：如果中断已启用且中断处理函数处于活动状态，中断处理函数可能会自动清除中断标志。
+ *       在这种情况下，即使发生了中断，此函数也会返回0。
+ */
+extern vsf_dac_irq_mask_t vsf_dac_irq_clear(vsf_dac_t *dac_ptr, vsf_dac_irq_mask_t irq_mask);
+
+/**
  \~english
  @brief Get the status of DAC instance
  @param[in] dac_ptr: a pointer to structure @ref vsf_dac_t
@@ -540,6 +568,7 @@ extern vsf_err_t vsf_dac_channel_request(vsf_dac_t *dac_ptr,
 #   define vsf_dac_capability(__DAC)                VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_capability)           ((__vsf_dac_t *)(__DAC))
 #   define vsf_dac_irq_enable(__DAC, ...)           VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_irq_enable)           ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
 #   define vsf_dac_irq_disable(__DAC, ...)          VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_irq_disable)          ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
+#   define vsf_dac_irq_clear(__DAC, ...)            VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_irq_clear)             ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
 #   define vsf_dac_channel_request_once(__DAC, ...) VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_channel_request_once) ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
 #   define vsf_dac_channel_config(__DAC, ...)       VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_channel_config)       ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
 #   define vsf_dac_channel_request(__DAC, ...)      VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_channel_request)      ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)

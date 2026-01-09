@@ -99,6 +99,15 @@ void vsf_dac_irq_disable(vsf_dac_t *dac_ptr, vsf_dac_irq_mask_t irq_mask)
     dac_ptr->op->irq_disable(dac_ptr, irq_mask);
 }
 
+vsf_dac_irq_mask_t vsf_dac_irq_clear(vsf_dac_t *dac_ptr, vsf_dac_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(dac_ptr != NULL);
+    VSF_HAL_ASSERT(dac_ptr->op != NULL);
+    VSF_HAL_ASSERT(dac_ptr->op->irq_clear != NULL);
+
+    return dac_ptr->op->irq_clear(dac_ptr, irq_mask);
+}
+
 vsf_dac_status_t vsf_dac_status(vsf_dac_t *dac_ptr)
 {
     VSF_HAL_ASSERT(dac_ptr != NULL);
