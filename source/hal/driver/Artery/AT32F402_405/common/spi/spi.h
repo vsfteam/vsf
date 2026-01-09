@@ -77,16 +77,11 @@ typedef enum vsf_spi_mode_t {
     VSF_SPI_MSB_FIRST                           = 0 << 7,
     VSF_SPI_LSB_FIRST                           = 1 << 7,
 
-    // 1: SPI_CTRL1.CLKPOL(1)
-    VSF_SPI_CPOL_LOW                            = 0 << 1,
-    VSF_SPI_CPOL_HIGH                           = 1 << 1,
-    // 0: SPI_CTRL1.CLKPHA(0)
-    VSF_SPI_CPHA_LOW                            = 0 << 0,
-    VSF_SPI_CPHA_HIGH                           = 1 << 0,
-    VSF_SPI_MODE_0                              = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_LOW,
-    VSF_SPI_MODE_1                              = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_HIGH,
-    VSF_SPI_MODE_2                              = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_LOW,
-    VSF_SPI_MODE_3                              = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_HIGH,
+    // SPI mode (bits 0-1: CPHA and CPOL, hardware specific)
+    VSF_SPI_MODE_0                              = 0x00ul,
+    VSF_SPI_MODE_1                              = 0x01ul,
+    VSF_SPI_MODE_2                              = 0x02ul,
+    VSF_SPI_MODE_3                              = 0x03ul,
 
     // 26: virtual
     VSF_SPI_CS_SOFTWARE_MODE                    = 1 << 26,
@@ -120,16 +115,32 @@ typedef enum vsf_spi_mode_t {
     VSF_SPI_CRC_DISABLED                        = 0 << 13,
     VSF_SPI_CRC_ENABLED                         = 1 << 13,
 
+    // Standard Optional: only include these if hardware supports them
+    // 1: SPI_CTRL1.CLKPOL(1)
+    VSF_SPI_CPOL_LOW                            = 0 << 1,
+    #define VSF_SPI_CPOL_LOW                     VSF_SPI_CPOL_LOW
+    VSF_SPI_CPOL_HIGH                           = 1 << 1,
+    #define VSF_SPI_CPOL_HIGH                    VSF_SPI_CPOL_HIGH
+    // 0: SPI_CTRL1.CLKPHA(0)
+    VSF_SPI_CPHA_LOW                            = 0 << 0,
+    #define VSF_SPI_CPHA_LOW                     VSF_SPI_CPHA_LOW
+    VSF_SPI_CPHA_HIGH                           = 1 << 0,
+    #define VSF_SPI_CPHA_HIGH                    VSF_SPI_CPHA_HIGH
+
     // more vendor specified modes can be added here
 
     __VSF_HW_SPI_CTRL1_MASK                     = VSF_SPI_MASTER
                                                 | VSF_SPI_SLAVE
                                                 | VSF_SPI_MSB_FIRST
                                                 | VSF_SPI_LSB_FIRST
+#ifdef VSF_SPI_CPOL_LOW
                                                 | VSF_SPI_CPOL_LOW
                                                 | VSF_SPI_CPOL_HIGH
+#endif
+#ifdef VSF_SPI_CPHA_LOW
                                                 | VSF_SPI_CPHA_LOW
                                                 | VSF_SPI_CPHA_HIGH
+#endif
                                                 | VSF_SPI_DATASIZE_8
                                                 | VSF_SPI_DATASIZE_16
                                                 | VSF_SPI_DATALINE_2_LINE_FULL_DUPLEX
