@@ -23,6 +23,7 @@
 #define vsf_real_adc_t                                          VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t)
 #define vsf_real_adc_capability                                 VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_capability)
 #define vsf_real_adc_get_configuration                          VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_get_configuration)
+#define vsf_real_adc_irq_clear                                  VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_irq_clear)
 
 #ifndef VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY
 #   define  VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
@@ -32,11 +33,17 @@
 #   define VSF_ADC_CFG_REIMPLEMENT_API_GET_CONFIGURATION        DISABLED
 #endif
 
+#ifndef VSF_ADC_CFG_REIMPLEMENT_API_IRQ_CLEAR
+#   define VSF_ADC_CFG_REIMPLEMENT_API_IRQ_CLEAR                DISABLED
+#endif
+
 #ifdef VSF_ADC_CFG_IMP_REMAP_PREFIX
 #   undef VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY
 #   define VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY               ENABLED
 #   undef VSF_ADC_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #   define VSF_ADC_CFG_REIMPLEMENT_API_GET_CONFIGURATION        ENABLED
+#   undef VSF_ADC_CFG_REIMPLEMENT_API_IRQ_CLEAR
+#   define VSF_ADC_CFG_REIMPLEMENT_API_IRQ_CLEAR               ENABLED
 #endif
 
 #if VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -80,10 +87,31 @@ vsf_err_t vsf_real_adc_get_configuration(vsf_real_adc_t *adc_ptr, vsf_adc_cfg_t 
 }
 #endif
 
+#if VSF_ADC_CFG_REIMPLEMENT_API_IRQ_CLEAR == DISABLED
+vsf_adc_irq_mask_t vsf_real_adc_irq_clear(vsf_real_adc_t *adc_ptr, vsf_adc_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(NULL != adc_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return 0;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
+
+#undef VSF_ADC_CFG_REIMPLEMENT_TYPE_MODE
+#undef VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE
+#undef VSF_ADC_CFG_REIMPLEMENT_TYPE_IRQ_MASK
+#undef VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG
+#undef VSF_ADC_CFG_REIMPLEMENT_TYPE_CFG
+#undef VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY
+#undef VSF_ADC_CFG_REIMPLEMENT_TYPE_STATUS
 #undef VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_ADC_CFG_REIMPLEMENT_API_GET_CONFIGURATION
+#undef VSF_ADC_CFG_REIMPLEMENT_API_IRQ_CLEAR
 #undef VSF_ADC_CFG_CAPABILITY_IRQ_MASK
 #undef VSF_ADC_CFG_CAPABILITY_MAX_DATA_BITS
 #undef VSF_ADC_CFG_CAPABILITY_CHANNEL_COUNT
@@ -91,6 +119,7 @@ vsf_err_t vsf_real_adc_get_configuration(vsf_real_adc_t *adc_ptr, vsf_adc_cfg_t 
 #undef vsf_real_adc_t
 #undef vsf_real_adc_capability
 #undef vsf_real_adc_get_configuration
+#undef vsf_real_adc_irq_clear
 
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
@@ -264,5 +293,196 @@ vsf_err_t vsf_real_adc_get_configuration(vsf_real_adc_t *adc_ptr, vsf_adc_cfg_t 
 #undef vsf_remap_adc_channel_config
 #undef vsf_remap_adc_channel_request
 #undef vsf_remap_adc_get_configuration
+
+#undef VSF_HAL_TEMPLATE_IMP_NAME
+#undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
+
+/*============================ STATIC ASSERTIONS ==============================*/
+
+/* User-extensible macros for custom mode and IRQ mask values
+ * Users can define these macros before including this template to append
+ * their custom enum values to the uniqueness checks.
+ *
+ * Check modes for custom values:
+ *   VSF_ADC_CFG_MODE_CHECK_UNIQUE - Check mode for custom mode values
+ *     Default: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *   VSF_ADC_CFG_IRQ_MASK_CHECK_UNIQUE - Check mode for custom IRQ mask values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *
+ * Example usage in vendor driver:
+ *   #define VSF_ADC_CUSTOM_MODE_VALUES           MY_CUSTOM_MODE1, MY_CUSTOM_MODE2
+ *   #define VSF_ADC_CFG_MODE_CHECK_UNIQUE        VSF_HAL_CHECK_MODE_LOOSE
+ *   #define VSF_ADC_CUSTOM_IRQ_MASK_VALUES       MY_CUSTOM_IRQ1, MY_CUSTOM_IRQ2
+ *   #define VSF_ADC_CFG_IRQ_MASK_CHECK_UNIQUE    VSF_HAL_CHECK_MODE_STRICT
+ *   #include "hal/driver/common/adc/adc_template.inc"
+ */
+
+
+#ifdef VSF_ADC_CFG_MODE_CHECK_UNIQUE
+/* Default mode lists - can be redefined by users before including this file */
+#ifndef VSF_ADC_CHECK_UNIQUE_REF_VDD_MODES
+#   define VSF_ADC_CHECK_UNIQUE_REF_VDD_MODES \
+        VSF_ADC_REF_VDD_1, \
+        VSF_ADC_REF_VDD_1_2, \
+        VSF_ADC_REF_VDD_1_3, \
+        VSF_ADC_REF_VDD_1_4
+#endif
+
+#ifndef VSF_ADC_CHECK_UNIQUE_DATA_ALIGN_MODES
+#   define VSF_ADC_CHECK_UNIQUE_DATA_ALIGN_MODES \
+        VSF_ADC_DATA_ALIGN_RIGHT, \
+        VSF_ADC_DATA_ALIGN_LEFT
+#endif
+
+#ifndef VSF_ADC_CHECK_UNIQUE_SCAN_CONV_MODES
+#   define VSF_ADC_CHECK_UNIQUE_SCAN_CONV_MODES \
+        VSF_ADC_SCAN_CONV_SINGLE_MODE, \
+        VSF_ADC_SCAN_CONV_SEQUENCE_MODE
+#endif
+
+#ifndef VSF_ADC_CHECK_UNIQUE_EXTERN_TRIGGER_MODES
+#   define VSF_ADC_CHECK_UNIQUE_EXTERN_TRIGGER_MODES \
+        VSF_ADC_EXTERN_TRIGGER_0, \
+        VSF_ADC_EXTERN_TRIGGER_1, \
+        VSF_ADC_EXTERN_TRIGGER_2
+#endif
+
+/* ==================== GROUP INTERNAL UNIQUENESS CHECKS ==================== */
+/* Check uniqueness within each functional group */
+
+/* Check reference voltage mode uniqueness - all reference voltage modes should have different values
+ * Mandatory: VSF_ADC_REF_VDD_1, VSF_ADC_REF_VDD_1_2, VSF_ADC_REF_VDD_1_3, VSF_ADC_REF_VDD_1_4
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_ADC_CFG_MODE_CHECK_UNIQUE, VSF_ADC_CHECK_UNIQUE_REF_VDD_MODES);
+
+/* Check data alignment uniqueness - all data alignment modes should have different values
+ * Mandatory: VSF_ADC_DATA_ALIGN_RIGHT, VSF_ADC_DATA_ALIGN_LEFT
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_ADC_CFG_MODE_CHECK_UNIQUE, VSF_ADC_CHECK_UNIQUE_DATA_ALIGN_MODES);
+
+/* Check scan conversion mode uniqueness - all scan conversion modes should have different values
+ * Mandatory: VSF_ADC_SCAN_CONV_SINGLE_MODE, VSF_ADC_SCAN_CONV_SEQUENCE_MODE
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_ADC_CFG_MODE_CHECK_UNIQUE, VSF_ADC_CHECK_UNIQUE_SCAN_CONV_MODES);
+
+/* Check external trigger mode uniqueness - all external trigger modes should have different values
+ * Mandatory: VSF_ADC_EXTERN_TRIGGER_0, VSF_ADC_EXTERN_TRIGGER_1, VSF_ADC_EXTERN_TRIGGER_2
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_ADC_CFG_MODE_CHECK_UNIQUE, VSF_ADC_CHECK_UNIQUE_EXTERN_TRIGGER_MODES);
+
+#ifdef VSF_ADC_CUSTOM_MODE_VALUES
+/* Check uniqueness among custom mode values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_ADC_CFG_MODE_CHECK_UNIQUE, VSF_ADC_CUSTOM_MODE_VALUES);
+#endif
+
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_ADC_CFG_MODE_CHECK_UNIQUE,
+    /* Mandatory modes - always included */
+    VSF_ADC_REF_VDD_1, VSF_ADC_REF_VDD_1_2, VSF_ADC_REF_VDD_1_3, VSF_ADC_REF_VDD_1_4,
+    VSF_ADC_DATA_ALIGN_RIGHT, VSF_ADC_DATA_ALIGN_LEFT,
+    VSF_ADC_SCAN_CONV_SINGLE_MODE, VSF_ADC_SCAN_CONV_SEQUENCE_MODE,
+    VSF_ADC_EXTERN_TRIGGER_0, VSF_ADC_EXTERN_TRIGGER_1, VSF_ADC_EXTERN_TRIGGER_2
+    /* User-defined modes - appended by user configuration */
+#ifdef VSF_ADC_CUSTOM_MODE_VALUES
+    , VSF_ADC_CUSTOM_MODE_VALUES
+#endif
+);
+
+#undef VSF_ADC_CHECK_UNIQUE_REF_VDD_MODES
+#undef VSF_ADC_CHECK_UNIQUE_DATA_ALIGN_MODES
+#undef VSF_ADC_CHECK_UNIQUE_SCAN_CONV_MODES
+#undef VSF_ADC_CHECK_UNIQUE_EXTERN_TRIGGER_MODES
+#endif  /* VSF_ADC_CFG_MODE_CHECK_UNIQUE */
+
+/* ==================== CHANNEL MODE UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_ADC_CFG_CHANNEL_MODE_CHECK_UNIQUE
+/* Default channel mode lists - can be redefined by users before including this file */
+#ifndef VSF_ADC_CHECK_UNIQUE_CHANNEL_GAIN_MODES
+#   define VSF_ADC_CHECK_UNIQUE_CHANNEL_GAIN_MODES \
+        VSF_ADC_CHANNEL_GAIN_1_6, \
+        VSF_ADC_CHANNEL_GAIN_1_5, \
+        VSF_ADC_CHANNEL_GAIN_1_4, \
+        VSF_ADC_CHANNEL_GAIN_1_3, \
+        VSF_ADC_CHANNEL_GAIN_1_2, \
+        VSF_ADC_CHANNEL_GAIN_1
+#endif
+
+#ifndef VSF_ADC_CHECK_UNIQUE_CHANNEL_REF_VDD_MODES
+#   define VSF_ADC_CHECK_UNIQUE_CHANNEL_REF_VDD_MODES \
+        VSF_ADC_CHANNEL_REF_VDD_1, \
+        VSF_ADC_CHANNEL_REF_VDD_1_2, \
+        VSF_ADC_CHANNEL_REF_VDD_1_3, \
+        VSF_ADC_CHANNEL_REF_VDD_1_4
+#endif
+
+/* ==================== GROUP INTERNAL UNIQUENESS CHECKS ==================== */
+/* Check uniqueness within each functional group */
+
+/* Check channel gain mode uniqueness - all channel gain modes should have different values
+ * Mandatory: VSF_ADC_CHANNEL_GAIN_1_6, VSF_ADC_CHANNEL_GAIN_1_5, VSF_ADC_CHANNEL_GAIN_1_4,
+ *            VSF_ADC_CHANNEL_GAIN_1_3, VSF_ADC_CHANNEL_GAIN_1_2, VSF_ADC_CHANNEL_GAIN_1
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_ADC_CFG_CHANNEL_MODE_CHECK_UNIQUE, VSF_ADC_CHECK_UNIQUE_CHANNEL_GAIN_MODES);
+
+/* Check channel reference voltage mode uniqueness - all channel reference voltage modes should have different values
+ * Mandatory: VSF_ADC_CHANNEL_REF_VDD_1, VSF_ADC_CHANNEL_REF_VDD_1_2, VSF_ADC_CHANNEL_REF_VDD_1_3, VSF_ADC_CHANNEL_REF_VDD_1_4
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_ADC_CFG_CHANNEL_MODE_CHECK_UNIQUE, VSF_ADC_CHECK_UNIQUE_CHANNEL_REF_VDD_MODES);
+
+#ifdef VSF_ADC_CUSTOM_CHANNEL_MODE_VALUES
+/* Check uniqueness among custom channel mode values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_ADC_CFG_CHANNEL_MODE_CHECK_UNIQUE, VSF_ADC_CUSTOM_CHANNEL_MODE_VALUES);
+#endif
+
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_ADC_CFG_CHANNEL_MODE_CHECK_UNIQUE,
+    /* Mandatory channel modes - always included */
+    VSF_ADC_CHANNEL_GAIN_1_6, VSF_ADC_CHANNEL_GAIN_1_5, VSF_ADC_CHANNEL_GAIN_1_4,
+    VSF_ADC_CHANNEL_GAIN_1_3, VSF_ADC_CHANNEL_GAIN_1_2, VSF_ADC_CHANNEL_GAIN_1,
+    VSF_ADC_CHANNEL_REF_VDD_1, VSF_ADC_CHANNEL_REF_VDD_1_2, VSF_ADC_CHANNEL_REF_VDD_1_3, VSF_ADC_CHANNEL_REF_VDD_1_4
+    /* User-defined channel modes - appended by user configuration */
+#ifdef VSF_ADC_CUSTOM_CHANNEL_MODE_VALUES
+    , VSF_ADC_CUSTOM_CHANNEL_MODE_VALUES
+#endif
+);
+
+#undef VSF_ADC_CHECK_UNIQUE_CHANNEL_GAIN_MODES
+#undef VSF_ADC_CHECK_UNIQUE_CHANNEL_REF_VDD_MODES
+#endif  /* VSF_ADC_CFG_CHANNEL_MODE_CHECK_UNIQUE */
+
+/* ==================== IRQ MASK UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_ADC_CFG_IRQ_MASK_CHECK_UNIQUE
+
+#ifdef VSF_ADC_CUSTOM_IRQ_MASK_VALUES
+/* Check uniqueness among custom IRQ mask values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_ADC_CFG_IRQ_MASK_CHECK_UNIQUE, VSF_ADC_CUSTOM_IRQ_MASK_VALUES);
+#endif
+
+/* Check uniqueness within vsf_adc_irq_mask_t enum */
+
+/* Check IRQ mask uniqueness - all IRQ mask bits should have different values
+ * Mandatory: VSF_ADC_IRQ_MASK_CPL
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_ADC_CFG_IRQ_MASK_CHECK_UNIQUE,
+    /* Mandatory IRQ masks - always included */
+    VSF_ADC_IRQ_MASK_CPL
+    /* User-defined IRQ masks - appended by user configuration */
+#ifdef VSF_ADC_CUSTOM_IRQ_MASK_VALUES
+    , VSF_ADC_CUSTOM_IRQ_MASK_VALUES
+#endif
+);
+#endif  /* VSF_ADC_CFG_IRQ_MASK_CHECK_UNIQUE */
+
+#undef VSF_ADC_CFG_MODE_CHECK_UNIQUE
+#undef VSF_ADC_CFG_CHANNEL_MODE_CHECK_UNIQUE
+#undef VSF_ADC_CFG_IRQ_MASK_CHECK_UNIQUE
+#undef VSF_ADC_CUSTOM_MODE_VALUES
+#undef VSF_ADC_CUSTOM_CHANNEL_MODE_VALUES
+#undef VSF_ADC_CUSTOM_IRQ_MASK_VALUES
 
 #endif  /* VSF_HAL_USE_ADC */
