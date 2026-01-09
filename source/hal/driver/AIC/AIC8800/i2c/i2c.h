@@ -34,7 +34,10 @@ typedef enum vsf_i2c_cmd_t {
     VSF_I2C_CMD_READ            = (0x01ul << 3),
 
     VSF_I2C_CMD_START           = (0x01ul << 0),
+    VSF_I2C_CMD_NO_START        = (0x00ul << 0),
+
     VSF_I2C_CMD_RESTART         = (0x01ul << 21),
+    VSF_I2C_CMD_NO_RESTART      = (0x00ul << 21),
 
     VSF_I2C_CMD_7_BITS          = (0x00ul << 23),
     VSF_I2C_CMD_10_BITS         = (0x01ul << 23),
@@ -44,9 +47,8 @@ typedef enum vsf_i2c_cmd_t {
                                   VSF_I2C_CMD_START |
                                   VSF_I2C_CMD_RESTART,
 
-    VSF_I2C_CMD_NO_START        = (0x01ul << 24),
     VSF_I2C_CMD_STOP            = (0x01ul << 25),
-    VSF_I2C_CMD_NO_STOP_RESTART = (0x01ul << 26),
+    VSF_I2C_CMD_NO_STOP         = (0x00ul << 25),
 } vsf_i2c_cmd_t;
 
 /*============================ INCLUDES ======================================*/
