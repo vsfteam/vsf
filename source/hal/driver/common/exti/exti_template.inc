@@ -27,11 +27,34 @@
 #   define VSF_EXTI_CFG_RETAIN_DEFINED_PREFIX                       DISABLED
 #endif
 
+#ifndef VSF_EXTI_CFG_REIMPLEMENT_API_IRQ_CLEAR
+#   define VSF_EXTI_CFG_REIMPLEMENT_API_IRQ_CLEAR                 DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ IMPLEMENTATION ================================*/
+
+#ifndef VSF_EXTI_CFG_REAL_PREFIX
+#   define VSF_EXTI_CFG_REAL_PREFIX                             VSF_EXTI_CFG_IMP_PREFIX
+#endif
+
+#define vsf_real_exti_t                 VSF_MCONNECT(VSF_EXTI_CFG_REAL_PREFIX, _exti_t)
+#define vsf_real_exti_irq_clear         VSF_MCONNECT(VSF_EXTI_CFG_REAL_PREFIX, _exti_irq_clear)
+
+#if VSF_EXTI_CFG_REIMPLEMENT_API_IRQ_CLEAR == DISABLED
+vsf_exti_channel_mask_t vsf_real_exti_irq_clear(vsf_real_exti_t *exti_ptr, vsf_exti_channel_mask_t channel_mask)
+{
+    VSF_HAL_ASSERT(NULL != exti_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return 0;
+}
+#endif
 /*============================ MACROS ========================================*/
 /*============================ MACROS ========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -76,5 +99,38 @@
 #   undef VSF_EXTI_CFG_IMP_DEVICE_PREFIX
 #   undef VSF_EXTI_CFG_IMP_DEVICE_UPCASE_PREFIX
 #endif
+
+#undef VSF_EXTI_CFG_REIMPLEMENT_API_IRQ_CLEAR
+#undef VSF_EXTI_CFG_REAL_PREFIX
+#undef vsf_real_exti_t
+#undef vsf_real_exti_irq_clear
+
+/*============================ STATIC ASSERTIONS ==============================*/
+
+/* User-extensible macros for custom mode and IRQ mask values
+ * Users can define these macros before including this template to append
+ * their custom enum values to the uniqueness checks.
+ *
+ * Check modes for custom values:
+ *   VSF_EXTI_CFG_MODE_CHECK_UNIQUE - Check mode for custom mode values
+ *     Default: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *   VSF_EXTI_CFG_IRQ_MASK_CHECK_UNIQUE - Check mode for custom IRQ mask values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *
+ * Example usage in vendor driver:
+ *   #define VSF_EXTI_CUSTOM_MODE_VALUES           MY_CUSTOM_MODE1, MY_CUSTOM_MODE2
+ *   #define VSF_EXTI_CFG_MODE_CHECK_UNIQUE        VSF_HAL_CHECK_MODE_LOOSE
+ *   #define VSF_EXTI_CUSTOM_IRQ_MASK_VALUES       MY_CUSTOM_IRQ1, MY_CUSTOM_IRQ2
+ *   #define VSF_EXTI_CFG_IRQ_MASK_CHECK_UNIQUE    VSF_HAL_CHECK_MODE_STRICT
+ *   #include "hal/driver/common/exti/exti_template.inc"
+ */
+
+
+#undef VSF_EXTI_CFG_MODE_CHECK_UNIQUE
+#undef VSF_EXTI_CFG_IRQ_MASK_CHECK_UNIQUE
+#undef VSF_EXTI_CUSTOM_MODE_VALUES
+#undef VSF_EXTI_CUSTOM_IRQ_MASK_VALUES
 
 #endif  /* VSF_HAL_USE_EXTI */
