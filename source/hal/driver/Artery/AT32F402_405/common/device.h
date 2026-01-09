@@ -301,6 +301,8 @@
 #   define VSF_HW_SPI1_EN               VSF_HW_EN_SPI1
 #   define VSF_HW_SPI1_RST              VSF_HW_RST_SPI1
 #   define VSF_HW_SPI1_IRQN             35      // SPI1_IRQn
+#   define VSF_HW_SPI1_TX_DMA_REQUEST   0x0B    // DMAMUX_DMAREQ_ID_SPI1_TX
+#   define VSF_HW_SPI1_RX_DMA_REQUEST   0x0A    // DMAMUX_DMAREQ_ID_SPI1_RX
 #endif
 #if VSF_HW_SPI_MASK & (1 << 2)
 #   define VSF_HW_SPI2_REG              SPI2
@@ -308,6 +310,8 @@
 #   define VSF_HW_SPI2_EN               VSF_HW_EN_SPI2
 #   define VSF_HW_SPI2_RST              VSF_HW_RST_SPI2
 #   define VSF_HW_SPI2_IRQN             36      // SPI2_IRQn
+#   define VSF_HW_SPI2_TX_DMA_REQUEST   0x0D    // DMAMUX_DMAREQ_ID_SPI2_TX
+#   define VSF_HW_SPI2_RX_DMA_REQUEST   0x0C    // DMAMUX_DMAREQ_ID_SPI2_RX
 #endif
 #if VSF_HW_SPI_MASK & (1 << 3)
 #   define VSF_HW_SPI3_REG              SPI3
@@ -315,6 +319,8 @@
 #   define VSF_HW_SPI3_EN               VSF_HW_EN_SPI3
 #   define VSF_HW_SPI3_RST              VSF_HW_RST_SPI3
 #   define VSF_HW_SPI3_IRQN             51      // SPI3_IRQn
+#   define VSF_HW_SPI3_TX_DMA_REQUEST   0x0F    // DMAMUX_DMAREQ_ID_SPI3_TX
+#   define VSF_HW_SPI3_RX_DMA_REQUEST   0x0E    // DMAMUX_DMAREQ_ID_SPI3_RX
 #endif
 
 // I2C: I2C1..I2C3
@@ -353,6 +359,40 @@
 #   define VSF_HW_I2C3_RST              VSF_HW_RST_I2C3
 #   define VSF_HW_I2C3_EVENT_IRQN       72      // I2C3_EVT_IRQn
 #   define VSF_HW_I2C3_ERROR_IRQN       73      // I2C3_ERR_IRQn
+#endif
+
+// WDT: Independent Watchdog
+
+#ifndef VSF_HW_WDT_COUNT
+#   define VSF_HW_WDT_COUNT             1
+#endif
+#ifndef VSF_HW_WDT_MASK
+#   define VSF_HW_WDT_MASK              0x1
+#endif
+
+#if VSF_HW_WDT_MASK & (1 << 0)
+#   define VSF_HW_WDT0_REG              WDT
+#   define VSF_HW_WDT0_TYPE             0   // WDT (Independent Watchdog)
+#   define VSF_HW_WDT0_CLK              VSF_HW_CLK_LICK  // WDT uses LICK (40kHz)
+#   define VSF_HW_WDT0_CLK_FREQ_HZ      40000
+#endif
+
+// WWDT: Window Watchdog (as separate device with device prefix)
+
+#ifndef VSF_HW_WWDT_COUNT
+#   define VSF_HW_WWDT_COUNT            1
+#endif
+#ifndef VSF_HW_WWDT_MASK
+#   define VSF_HW_WWDT_MASK             0x1
+#endif
+
+#if VSF_HW_WWDT_MASK & (1 << 0)
+#   define VSF_HW_WWDT0_REG             WWDT
+#   define VSF_HW_WWDT0_TYPE            1   // WWDT (Window Watchdog)
+#   define VSF_HW_WWDT0_CLK             VSF_HW_CLK_APB1  // WWDT uses APB1 (PCLK1)
+#   define VSF_HW_WWDT0_EN              VSF_HW_EN_WWDT
+#   define VSF_HW_WWDT0_RST             VSF_HW_RST_WWDT
+#   define VSF_HW_WWDT0_IRQN            0   // WWDT has no dedicated IRQ, uses early wakeup interrupt
 #endif
 
 // USB OTG
