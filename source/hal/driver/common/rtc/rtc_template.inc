@@ -193,12 +193,19 @@ vsf_err_t vsf_real_rtc_get_configuration(vsf_real_rtc_t *rtc_ptr, vsf_rtc_cfg_t 
 
 /*============================ MACROS ========================================*/
 
+#undef VSF_RTC_CFG_REIMPLEMENT_TYPE_CAPABILITY
+#undef VSF_RTC_CFG_REIMPLEMENT_TYPE_CFG
+#undef VSF_RTC_CFG_REIMPLEMENT_TYPE_IRQ_MASK
 #undef VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_RTC_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_RTC_CFG_CAPABILITY_T_IRQ_MASK
 #undef vsf_real_rtc_t
 #undef vsf_real_rtc_capability
 #undef vsf_real_rtc_get_configuration
+#undef vsf_real_rtc_get
+#undef vsf_real_rtc_set
+#undef vsf_real_rtc_get_time
+#undef vsf_real_rtc_set_time
 
 /*============================ MACROS ========================================*/
 
@@ -337,6 +344,72 @@ vsf_err_t vsf_real_rtc_get_configuration(vsf_real_rtc_t *rtc_ptr, vsf_rtc_cfg_t 
 #undef vsf_remap_rtc_get_time
 #undef vsf_remap_rtc_set_time
 #undef vsf_remap_rtc_get_configuration
+
+#undef VSF_HAL_TEMPLATE_IMP_NAME
+#undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
+
+/*============================ STATIC ASSERTIONS ==============================*/
+
+/* User-extensible macros for custom mode and IRQ mask values
+ * Users can define these macros before including this template to append
+ * their custom enum values to the uniqueness checks.
+ *
+ * Check modes for custom values:
+ *   VSF_RTC_CFG_MODE_CHECK_UNIQUE - Check mode for custom mode values
+ *     Default: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *   VSF_RTC_CFG_IRQ_MASK_CHECK_UNIQUE - Check mode for custom IRQ mask values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *
+ * Example usage in vendor driver:
+ *   #define VSF_RTC_CUSTOM_MODE_VALUES           MY_CUSTOM_MODE1, MY_CUSTOM_MODE2
+ *   #define VSF_RTC_CFG_MODE_CHECK_UNIQUE        VSF_HAL_CHECK_MODE_LOOSE
+ *   #define VSF_RTC_CUSTOM_IRQ_MASK_VALUES       MY_CUSTOM_IRQ1, MY_CUSTOM_IRQ2
+ *   #define VSF_RTC_CFG_IRQ_MASK_CHECK_UNIQUE    VSF_HAL_CHECK_MODE_STRICT
+ *   #include "hal/driver/common/rtc/rtc_template.inc"
+ */
+
+
+#ifdef VSF_RTC_CFG_MODE_CHECK_UNIQUE
+/* Default mode lists - can be redefined by users before including this file */
+/* Note: RTC typically doesn't have mode enums, but custom modes can be added */
+
+#ifdef VSF_RTC_CUSTOM_MODE_VALUES
+/* Check uniqueness among custom mode values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_RTC_CFG_MODE_CHECK_UNIQUE, VSF_RTC_CUSTOM_MODE_VALUES);
+#endif
+#endif  /* VSF_RTC_CFG_MODE_CHECK_UNIQUE */
+
+/* ==================== IRQ MASK UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_RTC_CFG_IRQ_MASK_CHECK_UNIQUE
+
+#ifdef VSF_RTC_CUSTOM_IRQ_MASK_VALUES
+/* Check uniqueness among custom IRQ mask values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_RTC_CFG_IRQ_MASK_CHECK_UNIQUE, VSF_RTC_CUSTOM_IRQ_MASK_VALUES);
+#endif
+
+/* Check uniqueness within vsf_rtc_irq_mask_t enum */
+
+/* Check IRQ mask uniqueness - all IRQ mask bits should have different values
+ * Mandatory: VSF_RTC_IRQ_MASK_ALARM
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_RTC_CFG_IRQ_MASK_CHECK_UNIQUE,
+    /* Mandatory IRQ masks - always included */
+    VSF_RTC_IRQ_MASK_ALARM
+    /* User-defined IRQ masks - appended by user configuration */
+#ifdef VSF_RTC_CUSTOM_IRQ_MASK_VALUES
+    , VSF_RTC_CUSTOM_IRQ_MASK_VALUES
+#endif
+);
+#endif  /* VSF_RTC_CFG_IRQ_MASK_CHECK_UNIQUE */
+
+#undef VSF_RTC_CFG_MODE_CHECK_UNIQUE
+#undef VSF_RTC_CFG_IRQ_MASK_CHECK_UNIQUE
+#undef VSF_RTC_CUSTOM_MODE_VALUES
+#undef VSF_RTC_CUSTOM_IRQ_MASK_VALUES
 
 #endif  /* VSF_HAL_USE_RTC */
 
