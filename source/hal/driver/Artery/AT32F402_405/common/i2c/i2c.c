@@ -325,8 +325,8 @@ static void VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
 
-    vsf_i2c_irq_mask_t irq_mask = VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_irq_clear)(i2c_ptr, i2c_ptr->irq_mask);
     vsf_i2c_isr_t *isr_ptr = &i2c_ptr->isr;
+    vsf_i2c_irq_mask_t irq_mask = VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_irq_clear)(i2c_ptr, VSF_I2C_IRQ_ALL_BITS_MASK);
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_i2c_t *)i2c_ptr, irq_mask);
     }
