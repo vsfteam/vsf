@@ -89,6 +89,15 @@ void vsf_flash_irq_disable(vsf_flash_t *flash_ptr, vsf_flash_irq_mask_t irq_mask
     flash_ptr->op->irq_disable(flash_ptr, irq_mask);
 }
 
+vsf_flash_irq_mask_t vsf_flash_irq_clear(vsf_flash_t *flash_ptr, vsf_flash_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(flash_ptr != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op != NULL);
+    VSF_HAL_ASSERT(flash_ptr->op->irq_clear != NULL);
+
+    return flash_ptr->op->irq_clear(flash_ptr, irq_mask);
+}
+
 vsf_flash_status_t vsf_flash_status(vsf_flash_t *flash_ptr)
 {
     VSF_HAL_ASSERT(flash_ptr != NULL);
