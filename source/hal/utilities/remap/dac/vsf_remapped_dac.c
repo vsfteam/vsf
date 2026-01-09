@@ -99,6 +99,12 @@ void vsf_remapped_dac_irq_disable(vsf_remapped_dac_t *dac, vsf_dac_irq_mask_t ir
     vsf_dac_irq_disable(dac->target, irq_mask);
 }
 
+vsf_dac_irq_mask_t vsf_remapped_dac_irq_clear(vsf_remapped_dac_t *dac, vsf_dac_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));
+    return vsf_dac_irq_clear(dac->target, irq_mask);
+}
+
 vsf_err_t vsf_remapped_dac_channel_request_once(vsf_remapped_dac_t *dac,
         vsf_dac_channel_cfg_t *channel_cfg, uint_fast16_t value)
 {

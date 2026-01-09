@@ -75,6 +75,12 @@ void vsf_remapped_sdio_irq_disable(vsf_remapped_sdio_t *sdio, vsf_sdio_irq_mask_
     vsf_sdio_irq_disable(sdio->target, irq_mask);
 }
 
+vsf_sdio_irq_mask_t vsf_remapped_sdio_irq_clear(vsf_remapped_sdio_t *sdio, vsf_sdio_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
+    return vsf_sdio_irq_clear(sdio->target, irq_mask);
+}
+
 vsf_sdio_status_t vsf_remapped_sdio_status(vsf_remapped_sdio_t *sdio)
 {
     VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
