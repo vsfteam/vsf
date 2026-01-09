@@ -208,6 +208,12 @@ vsf_usart_irq_mask_t vsf_real_usart_irq_clear(vsf_real_usart_t *usart_ptr, vsf_u
 
 /*============================ MACROS ========================================*/
 
+#undef VSF_USART_CFG_REIMPLEMENT_TYPE_CAPABILITY
+#undef VSF_USART_CFG_REIMPLEMENT_TYPE_CFG
+#undef VSF_USART_CFG_REIMPLEMENT_TYPE_CTRL
+#undef VSF_USART_CFG_REIMPLEMENT_TYPE_IRQ_MASK
+#undef VSF_USART_CFG_REIMPLEMENT_TYPE_MODE
+#undef VSF_USART_CFG_REIMPLEMENT_TYPE_STATUS
 #undef VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_USART_CFG_CAPABILITY_IRQ_MASK
 #undef VSF_USART_CFG_CAPABILITY_MAX_BAUDRATE
@@ -335,22 +341,22 @@ vsf_usart_irq_mask_t vsf_real_usart_irq_clear(vsf_real_usart_t *usart_ptr, vsf_u
             VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
             return vsf_remap_usart_capability(usart_ptr);                                                           \
         }                                                                                                           \
-        uint_fast16_t vsf_imp_usart_rxfifo_get_data_count(vsf_imp_usart_t *usart_ptr)                               \
+        uint_fast32_t vsf_imp_usart_rxfifo_get_data_count(vsf_imp_usart_t *usart_ptr)                               \
         {                                                                                                           \
             VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
             return vsf_remap_usart_rxfifo_get_data_count(usart_ptr);                                                \
         }                                                                                                           \
-        uint_fast16_t vsf_imp_usart_rxfifo_read(vsf_imp_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)  \
+        uint_fast32_t vsf_imp_usart_rxfifo_read(vsf_imp_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)  \
         {                                                                                                           \
             VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
             return vsf_remap_usart_rxfifo_read(usart_ptr, buffer_ptr, count);                                       \
         }                                                                                                           \
-        uint_fast16_t vsf_imp_usart_txfifo_get_free_count(vsf_imp_usart_t *usart_ptr)                               \
+        uint_fast32_t vsf_imp_usart_txfifo_get_free_count(vsf_imp_usart_t *usart_ptr)                               \
         {                                                                                                           \
             VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
             return vsf_remap_usart_txfifo_get_free_count(usart_ptr);                                                \
         }                                                                                                           \
-        uint_fast16_t vsf_imp_usart_txfifo_write(vsf_imp_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count) \
+        uint_fast32_t vsf_imp_usart_txfifo_write(vsf_imp_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count) \
         {                                                                                                           \
             VSF_HAL_ASSERT(usart_ptr != NULL);                                                                      \
             return vsf_remap_usart_txfifo_write(usart_ptr, buffer_ptr, count);                                      \
@@ -480,4 +486,425 @@ vsf_usart_irq_mask_t vsf_real_usart_irq_clear(vsf_real_usart_t *usart_ptr, vsf_u
 #undef vsf_remap_usart_get_configuration
 #undef vsf_remap_usart_tx_send_break
 
+/*============================ STATIC ASSERTIONS ==============================*/
+
+
+/* User-extensible macros for custom mode and IRQ mask values
+ * Users can define these macros before including this template to append
+ * their custom enum values to the uniqueness checks.
+ *
+ * Check modes for custom values:
+ *   VSF_USART_CFG_MODE_CHECK_UNIQUE - Check mode for custom mode values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (no overlapping bits)
+ *   VSF_USART_CFG_IRQ_MASK_CHECK_UNIQUE - Check mode for custom IRQ mask values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (no overlapping bits)
+ *
+ * Example usage in vendor driver:
+ *   #define VSF_USART_CUSTOM_MODE_VALUES           MY_CUSTOM_MODE1, MY_CUSTOM_MODE2
+ *   #define VSF_USART_CFG_MODE_CHECK_UNIQUE        VSF_HAL_CHECK_MODE_LOOSE
+ *   #define VSF_USART_CUSTOM_IRQ_MASK_VALUES       MY_CUSTOM_IRQ1, MY_CUSTOM_IRQ2
+ *   #define VSF_USART_CFG_IRQ_MASK_CHECK_UNIQUE    VSF_HAL_CHECK_MODE_LOOSE
+ *   #include "hal/driver/common/usart/usart_template.inc"
+ */
+
+
+#undef VSF_HAL_TEMPLATE_IMP_NAME
+#undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
+
+#ifdef VSF_USART_CFG_MODE_CHECK_UNIQUE
+/* Default mode lists - can be redefined by users before including this file */
+#ifndef VSF_USART_CHECK_UNIQUE_PARITY_MODES
+#   define VSF_USART_CHECK_UNIQUE_PARITY_MODES \
+        VSF_USART_NO_PARITY, \
+        VSF_USART_EVEN_PARITY, \
+        VSF_USART_ODD_PARITY, \
+        VSF_USART_FORCE_0_PARITY, \
+        VSF_USART_FORCE_1_PARITY
+#endif
+
+#ifndef VSF_USART_CHECK_UNIQUE_STOP_BIT_MODES
+#   define VSF_USART_CHECK_UNIQUE_STOP_BIT_MODES \
+        VSF_USART_1_STOPBIT, \
+        VSF_USART_1_5_STOPBIT, \
+        VSF_USART_0_5_STOPBIT, \
+        VSF_USART_2_STOPBIT
+#endif
+
+#ifndef VSF_USART_CHECK_UNIQUE_DATA_BIT_MODES
+#   define VSF_USART_CHECK_UNIQUE_DATA_BIT_MODES \
+        VSF_USART_5_BIT_LENGTH, \
+        VSF_USART_6_BIT_LENGTH, \
+        VSF_USART_7_BIT_LENGTH, \
+        VSF_USART_8_BIT_LENGTH, \
+        VSF_USART_9_BIT_LENGTH, \
+        VSF_USART_10_BIT_LENGTH
+#endif
+
+#ifndef VSF_USART_CHECK_UNIQUE_HW_CONTROL_MODES
+#   define VSF_USART_CHECK_UNIQUE_HW_CONTROL_MODES \
+        VSF_USART_NO_HWCONTROL, \
+        VSF_USART_RTS_HWCONTROL, \
+        VSF_USART_CTS_HWCONTROL, \
+        VSF_USART_RTS_CTS_HWCONTROL
+#endif
+
+#ifndef VSF_USART_CHECK_UNIQUE_TX_ENABLE_MODES
+#   define VSF_USART_CHECK_UNIQUE_TX_ENABLE_MODES \
+        VSF_USART_TX_ENABLE, \
+        VSF_USART_TX_DISABLE
+#endif
+#ifndef VSF_USART_CHECK_UNIQUE_RX_ENABLE_MODES
+#   define VSF_USART_CHECK_UNIQUE_RX_ENABLE_MODES \
+        VSF_USART_RX_ENABLE, \
+        VSF_USART_RX_DISABLE
+#endif
+
+#ifndef VSF_USART_CHECK_UNIQUE_SYNC_CLOCK_MODES
+#   define VSF_USART_CHECK_UNIQUE_SYNC_CLOCK_MODES \
+        VSF_USART_SYNC_CLOCK_ENABLE, \
+        VSF_USART_SYNC_CLOCK_DISABLE
+#endif
+
+#ifndef VSF_USART_CHECK_UNIQUE_HALF_DUPLEX_MODES
+#   define VSF_USART_CHECK_UNIQUE_HALF_DUPLEX_MODES \
+        VSF_USART_HALF_DUPLEX_DISABLE, \
+        VSF_USART_HALF_DUPLEX_ENABLE
+#endif
+
+#ifndef VSF_USART_CHECK_UNIQUE_TX_FIFO_THRESHOLD_MODES
+#   define VSF_USART_CHECK_UNIQUE_TX_FIFO_THRESHOLD_MODES \
+        VSF_USART_TX_FIFO_THRESHOLD_EMPTY, \
+        VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY, \
+        VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL
+#endif
+
+#ifndef VSF_USART_CHECK_UNIQUE_RX_FIFO_THRESHOLD_MODES
+#   define VSF_USART_CHECK_UNIQUE_RX_FIFO_THRESHOLD_MODES \
+        VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY, \
+        VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL, \
+        VSF_USART_RX_FIFO_THRESHOLD_FULL
+#endif
+
+#ifndef VSF_USART_CHECK_UNIQUE_SYNC_CLOCK_POLARITY_MODES
+#   define VSF_USART_CHECK_UNIQUE_SYNC_CLOCK_POLARITY_MODES \
+        VSF_USART_SYNC_CLOCK_POLARITY_LOW, \
+        VSF_USART_SYNC_CLOCK_POLARITY_HIGH
+#endif
+
+#ifndef VSF_USART_CHECK_UNIQUE_SYNC_CLOCK_PHASE_MODES
+#   define VSF_USART_CHECK_UNIQUE_SYNC_CLOCK_PHASE_MODES \
+        VSF_USART_SYNC_CLOCK_PHASE_1_EDGE, \
+        VSF_USART_SYNC_CLOCK_PHASE_2_EDGE
+#endif
+
+/* ==================== GROUP INTERNAL UNIQUENESS CHECKS ==================== */
+/* Check uniqueness within each functional group */
+
+/* Check parity mode uniqueness - all parity modes should have different values
+ * Mandatory: VSF_USART_NO_PARITY, VSF_USART_EVEN_PARITY, VSF_USART_ODD_PARITY
+ * Implementation Required: VSF_USART_FORCE_0_PARITY, VSF_USART_FORCE_1_PARITY
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_USART_CFG_MODE_CHECK_UNIQUE, VSF_USART_CHECK_UNIQUE_PARITY_MODES);
+
+/* Check stop bit uniqueness - all stop bit modes should have different values
+ * Mandatory: VSF_USART_1_STOPBIT
+ * Implementation Required: VSF_USART_1_5_STOPBIT, VSF_USART_0_5_STOPBIT, VSF_USART_2_STOPBIT
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_USART_CFG_MODE_CHECK_UNIQUE, VSF_USART_CHECK_UNIQUE_STOP_BIT_MODES);
+
+/* Check data bit length uniqueness - all data bit length modes should have different values
+ * Mandatory: VSF_USART_8_BIT_LENGTH
+ * Implementation Required: VSF_USART_5_BIT_LENGTH, VSF_USART_6_BIT_LENGTH, VSF_USART_7_BIT_LENGTH,
+ *                           VSF_USART_9_BIT_LENGTH, VSF_USART_10_BIT_LENGTH
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_USART_CFG_MODE_CHECK_UNIQUE, VSF_USART_CHECK_UNIQUE_DATA_BIT_MODES);
+
+/* Check hardware flow control uniqueness - all hw control modes should have different values
+ * Mandatory: VSF_USART_NO_HWCONTROL
+ * Implementation Required: VSF_USART_RTS_HWCONTROL, VSF_USART_CTS_HWCONTROL, VSF_USART_RTS_CTS_HWCONTROL
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_USART_CFG_MODE_CHECK_UNIQUE, VSF_USART_CHECK_UNIQUE_HW_CONTROL_MODES);
+
+/* Check TX enable/disable uniqueness
+ * Mandatory: VSF_USART_TX_ENABLE
+ * Implementation Required: VSF_USART_TX_DISABLE
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_USART_CFG_MODE_CHECK_UNIQUE, VSF_USART_CHECK_UNIQUE_TX_ENABLE_MODES);
+
+/* Check RX enable/disable uniqueness
+ * Mandatory: VSF_USART_RX_ENABLE
+ * Implementation Required: VSF_USART_RX_DISABLE
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_USART_CFG_MODE_CHECK_UNIQUE, VSF_USART_CHECK_UNIQUE_RX_ENABLE_MODES);
+
+/* Check sync clock enable/disable uniqueness
+ * Mandatory: VSF_USART_SYNC_CLOCK_DISABLE
+ * Implementation Required: VSF_USART_SYNC_CLOCK_ENABLE
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_USART_CFG_MODE_CHECK_UNIQUE, VSF_USART_CHECK_UNIQUE_SYNC_CLOCK_MODES);
+
+/* Check half duplex enable/disable uniqueness
+ * Mandatory: VSF_USART_HALF_DUPLEX_DISABLE
+ * Implementation Required: VSF_USART_HALF_DUPLEX_ENABLE
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_USART_CFG_MODE_CHECK_UNIQUE, VSF_USART_CHECK_UNIQUE_HALF_DUPLEX_MODES);
+
+/* Check TX FIFO threshold uniqueness - all TX FIFO threshold modes should have different values
+ * Mandatory: VSF_USART_TX_FIFO_THRESHOLD_EMPTY
+ * Implementation Required: VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY, VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_USART_CFG_MODE_CHECK_UNIQUE, VSF_USART_CHECK_UNIQUE_TX_FIFO_THRESHOLD_MODES);
+
+/* Check RX FIFO threshold uniqueness - all RX FIFO threshold modes should have different values
+ * Mandatory: VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
+ * Implementation Required: VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL, VSF_USART_RX_FIFO_THRESHOLD_FULL
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_USART_CFG_MODE_CHECK_UNIQUE, VSF_USART_CHECK_UNIQUE_RX_FIFO_THRESHOLD_MODES);
+
+/* Check sync clock polarity uniqueness - Implementation Required */
+#ifdef VSF_USART_SYNC_CLOCK_POLARITY_LOW
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_USART_CFG_MODE_CHECK_UNIQUE, VSF_USART_CHECK_UNIQUE_SYNC_CLOCK_POLARITY_MODES);
+#endif
+
+/* Check sync clock phase uniqueness - Implementation Required */
+#ifdef VSF_USART_SYNC_CLOCK_PHASE_1_EDGE
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_USART_CFG_MODE_CHECK_UNIQUE, VSF_USART_CHECK_UNIQUE_SYNC_CLOCK_PHASE_MODES);
+#endif
+
+#ifdef VSF_USART_CUSTOM_MODE_VALUES
+/* Check uniqueness among custom mode values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_USART_CFG_MODE_CHECK_UNIQUE, VSF_USART_CUSTOM_MODE_VALUES);
+#endif
+
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_USART_CFG_MODE_CHECK_UNIQUE,
+    /* Mandatory modes - always included */
+    VSF_USART_NO_PARITY, VSF_USART_EVEN_PARITY, VSF_USART_ODD_PARITY,
+    VSF_USART_1_STOPBIT, VSF_USART_8_BIT_LENGTH, VSF_USART_NO_HWCONTROL,
+    VSF_USART_TX_ENABLE, VSF_USART_RX_ENABLE, VSF_USART_SYNC_CLOCK_DISABLE,
+    VSF_USART_HALF_DUPLEX_DISABLE, VSF_USART_TX_FIFO_THRESHOLD_EMPTY,
+    VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
+    /* Implementation Required modes - conditionally included */
+#ifdef VSF_USART_FORCE_0_PARITY
+    , VSF_USART_FORCE_0_PARITY
+#endif
+#ifdef VSF_USART_FORCE_1_PARITY
+    , VSF_USART_FORCE_1_PARITY
+#endif
+#ifdef VSF_USART_1_5_STOPBIT
+    , VSF_USART_1_5_STOPBIT
+#endif
+#ifdef VSF_USART_0_5_STOPBIT
+    , VSF_USART_0_5_STOPBIT
+#endif
+#ifdef VSF_USART_2_STOPBIT
+    , VSF_USART_2_STOPBIT
+#endif
+#ifdef VSF_USART_5_BIT_LENGTH
+    , VSF_USART_5_BIT_LENGTH
+#endif
+#ifdef VSF_USART_6_BIT_LENGTH
+    , VSF_USART_6_BIT_LENGTH
+#endif
+#ifdef VSF_USART_7_BIT_LENGTH
+    , VSF_USART_7_BIT_LENGTH
+#endif
+#ifdef VSF_USART_9_BIT_LENGTH
+    , VSF_USART_9_BIT_LENGTH
+#endif
+#ifdef VSF_USART_10_BIT_LENGTH
+    , VSF_USART_10_BIT_LENGTH
+#endif
+#ifdef VSF_USART_RTS_HWCONTROL
+    , VSF_USART_RTS_HWCONTROL
+#endif
+#ifdef VSF_USART_CTS_HWCONTROL
+    , VSF_USART_CTS_HWCONTROL
+#endif
+#ifdef VSF_USART_RTS_CTS_HWCONTROL
+    , VSF_USART_RTS_CTS_HWCONTROL
+#endif
+#ifdef VSF_USART_TX_DISABLE
+    , VSF_USART_TX_DISABLE
+#endif
+#ifdef VSF_USART_RX_DISABLE
+    , VSF_USART_RX_DISABLE
+#endif
+#ifdef VSF_USART_SYNC_CLOCK_ENABLE
+    , VSF_USART_SYNC_CLOCK_ENABLE
+#endif
+#ifdef VSF_USART_HALF_DUPLEX_ENABLE
+    , VSF_USART_HALF_DUPLEX_ENABLE
+#endif
+#ifdef VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY
+    , VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY
+#endif
+#ifdef VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL
+    , VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL
+#endif
+#ifdef VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL
+    , VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL
+#endif
+#ifdef VSF_USART_RX_FIFO_THRESHOLD_FULL
+    , VSF_USART_RX_FIFO_THRESHOLD_FULL
+#endif
+#ifdef VSF_USART_SYNC_CLOCK_POLARITY_LOW
+    , VSF_USART_SYNC_CLOCK_POLARITY_LOW
+#endif
+#ifdef VSF_USART_SYNC_CLOCK_POLARITY_HIGH
+    , VSF_USART_SYNC_CLOCK_POLARITY_HIGH
+#endif
+#ifdef VSF_USART_SYNC_CLOCK_PHASE_1_EDGE
+    , VSF_USART_SYNC_CLOCK_PHASE_1_EDGE
+#endif
+#ifdef VSF_USART_SYNC_CLOCK_PHASE_2_EDGE
+    , VSF_USART_SYNC_CLOCK_PHASE_2_EDGE
+#endif
+    /* Standard Optional modes - only included when __VSF_USART_CFG_SUPPORT_STANDARD_OPTIONAL is enabled */
+#if __VSF_USART_CFG_SUPPORT_STANDARD_OPTIONAL
+#ifdef VSF_USART_SWAP
+    , VSF_USART_SWAP
+#endif
+#ifdef VSF_USART_TX_INVERT
+    , VSF_USART_TX_INVERT
+#endif
+#ifdef VSF_USART_RX_INVERT
+    , VSF_USART_RX_INVERT
+#endif
+#endif
+    /* User-defined modes - appended by user configuration */
+#ifdef VSF_USART_CUSTOM_MODE_VALUES
+    , VSF_USART_CUSTOM_MODE_VALUES
+#endif
+);
+
+#undef VSF_USART_CHECK_UNIQUE_PARITY_MODES
+#undef VSF_USART_CHECK_UNIQUE_STOP_BIT_MODES
+#undef VSF_USART_CHECK_UNIQUE_DATA_BIT_MODES
+#undef VSF_USART_CHECK_UNIQUE_HW_CONTROL_MODES
+#undef VSF_USART_CHECK_UNIQUE_TX_ENABLE_MODES
+#undef VSF_USART_CHECK_UNIQUE_RX_ENABLE_MODES
+#undef VSF_USART_CHECK_UNIQUE_SYNC_CLOCK_MODES
+#undef VSF_USART_CHECK_UNIQUE_HALF_DUPLEX_MODES
+#undef VSF_USART_CHECK_UNIQUE_TX_FIFO_THRESHOLD_MODES
+#undef VSF_USART_CHECK_UNIQUE_RX_FIFO_THRESHOLD_MODES
+#undef VSF_USART_CHECK_UNIQUE_SYNC_CLOCK_POLARITY_MODES
+#undef VSF_USART_CHECK_UNIQUE_SYNC_CLOCK_PHASE_MODES
+#endif  /* VSF_USART_CFG_MODE_CHECK_UNIQUE */
+
+/* ==================== IRQ MASK UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_USART_CFG_IRQ_MASK_CHECK_UNIQUE
+
+#ifdef VSF_USART_CUSTOM_IRQ_MASK_VALUES
+/* Check uniqueness among custom IRQ mask values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_USART_CFG_IRQ_MASK_CHECK_UNIQUE, VSF_USART_CUSTOM_IRQ_MASK_VALUES);
+#endif
+
+/* Check uniqueness within vsf_usart_irq_mask_t enum */
+
+/* Check IRQ mask uniqueness - all IRQ mask bits should have different values
+ * Mandatory: VSF_USART_IRQ_MASK_TX_CPL, VSF_USART_IRQ_MASK_RX_CPL,
+ *            VSF_USART_IRQ_MASK_TX, VSF_USART_IRQ_MASK_RX
+ * Implementation Required: VSF_USART_IRQ_MASK_RX_TIMEOUT, VSF_USART_IRQ_MASK_CTS,
+ *                          VSF_USART_IRQ_MASK_FRAME_ERR, VSF_USART_IRQ_MASK_BREAK_ERR,
+ *                          VSF_USART_IRQ_MASK_PARITY_ERR, VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR,
+ *                          VSF_USART_IRQ_MASK_RX_IDLE
+ * Standard Optional: VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR, VSF_USART_IRQ_MASK_NOISE_ERR
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_USART_CFG_IRQ_MASK_CHECK_UNIQUE,
+    /* Mandatory IRQ masks - always included */
+    VSF_USART_IRQ_MASK_TX_CPL,
+    VSF_USART_IRQ_MASK_RX_CPL,
+    VSF_USART_IRQ_MASK_TX,
+    VSF_USART_IRQ_MASK_RX
+    /* Implementation Required IRQ masks - conditionally included */
+#ifdef VSF_USART_IRQ_MASK_RX_TIMEOUT
+    , VSF_USART_IRQ_MASK_RX_TIMEOUT
+#endif
+#ifdef VSF_USART_IRQ_MASK_CTS
+    , VSF_USART_IRQ_MASK_CTS
+#endif
+#ifdef VSF_USART_IRQ_MASK_FRAME_ERR
+    , VSF_USART_IRQ_MASK_FRAME_ERR
+#endif
+#ifdef VSF_USART_IRQ_MASK_BREAK_ERR
+    , VSF_USART_IRQ_MASK_BREAK_ERR
+#endif
+#ifdef VSF_USART_IRQ_MASK_PARITY_ERR
+    , VSF_USART_IRQ_MASK_PARITY_ERR
+#endif
+#ifdef VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR
+    , VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR
+#endif
+#ifdef VSF_USART_IRQ_MASK_RX_IDLE
+    , VSF_USART_IRQ_MASK_RX_IDLE
+#endif
+#ifdef VSF_USART_IRQ_MASK_TX_IDLE
+    , VSF_USART_IRQ_MASK_TX_IDLE
+#endif
+#ifdef VSF_USART_IRQ_MASK_TX_HALF_CPL
+    , VSF_USART_IRQ_MASK_TX_HALF_CPL
+#endif
+#ifdef VSF_USART_IRQ_MASK_RX_HALF_CPL
+    , VSF_USART_IRQ_MASK_RX_HALF_CPL
+#endif
+#ifdef VSF_USART_IRQ_MASK_CANCEL_TX_CPL
+    , VSF_USART_IRQ_MASK_CANCEL_TX_CPL
+#endif
+#ifdef VSF_USART_IRQ_MASK_CANCEL_RX_CPL
+    , VSF_USART_IRQ_MASK_CANCEL_RX_CPL
+#endif
+    /* Standard Optional IRQ masks - only included when __VSF_USART_CFG_SUPPORT_STANDARD_OPTIONAL is enabled */
+#if __VSF_USART_CFG_SUPPORT_STANDARD_OPTIONAL
+#ifdef VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR
+    , VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR
+#endif
+#ifdef VSF_USART_IRQ_MASK_NOISE_ERR
+    , VSF_USART_IRQ_MASK_NOISE_ERR
+#endif
+#endif
+    /* User-defined IRQ masks - appended by user configuration */
+#ifdef VSF_USART_CUSTOM_IRQ_MASK_VALUES
+    , VSF_USART_CUSTOM_IRQ_MASK_VALUES
+#endif
+);
+#endif  /* VSF_USART_CFG_IRQ_MASK_CHECK_UNIQUE */
+
+/* ==================== CTRL UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_USART_CFG_CTRL_CHECK_UNIQUE
+
+#ifdef VSF_USART_CUSTOM_CTRL_VALUES
+/* Check uniqueness among custom ctrl values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_USART_CFG_CTRL_CHECK_UNIQUE, VSF_USART_CUSTOM_CTRL_VALUES);
+#endif
+
+/* Check ctrl uniqueness - all ctrl values should have different values
+ * Mandatory: VSF_USART_CTRL_SEND_BREAK, VSF_USART_CTRL_SET_BREAK, VSF_USART_CTRL_CLEAR_BREAK
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_USART_CFG_CTRL_CHECK_UNIQUE,
+    /* Mandatory ctrls - always included */
+    VSF_USART_CTRL_SEND_BREAK,
+    VSF_USART_CTRL_SET_BREAK,
+    VSF_USART_CTRL_CLEAR_BREAK
+    /* User-defined ctrls - appended by user configuration */
+#ifdef VSF_USART_CUSTOM_CTRL_VALUES
+    , VSF_USART_CUSTOM_CTRL_VALUES
+#endif
+);
+#endif  /* VSF_USART_CFG_CTRL_CHECK_UNIQUE */
+
+#undef VSF_USART_CFG_MODE_CHECK_UNIQUE
+#undef VSF_USART_CFG_IRQ_MASK_CHECK_UNIQUE
+#undef VSF_USART_CFG_CTRL_CHECK_UNIQUE
+#undef VSF_USART_CUSTOM_MODE_VALUES
+#undef VSF_USART_CUSTOM_IRQ_MASK_VALUES
+#undef VSF_USART_CUSTOM_CTRL_VALUES
+
 #endif  /* VSF_HAL_USE_USART */
+
