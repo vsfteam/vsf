@@ -125,10 +125,13 @@ void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_irq_disable)(
     VSF_HAL_ASSERT(sdio_ptr != NULL);
 }
 
-static vsf_sdio_irq_mask_t VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_irq_mask)(
-    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
+static vsf_sdio_irq_mask_t VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_irq_clear)(
+    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr,
+    vsf_sdio_irq_mask_t irq_mask
 ) {
+    VSF_HAL_ASSERT(NULL != sdio_ptr);
     // implement this function in the device file
+    // This function should clear the specified interrupt flags and return the state before clearing
     VSF_HAL_ASSERT(0);
     return 0;
 }
@@ -146,11 +149,11 @@ static void VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != sdio_ptr);
 
-    vsf_sdio_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_irq_mask)(sdio_ptr);
-    vsf_sdio_status_t sts = VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_status)(sdio_ptr);
-    uint32_t *resp = VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_resp)(sdio_ptr);
     vsf_sdio_isr_t *isr_ptr = &sdio_ptr->isr;
+    vsf_sdio_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_irq_clear)(sdio_ptr, SDIO_IRQ_MASK_HOST_ALL);
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
+        vsf_sdio_status_t sts = VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_status)(sdio_ptr);
+        uint32_t *resp = VSF_MCONNECT(__, VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_resp)(sdio_ptr);
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_sdio_t *)sdio_ptr, irq_mask, sts.req_status, resp);
     }
 }
@@ -232,6 +235,30 @@ vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_request)(
     return VSF_ERR_NONE;
 }
 
+vsf_sdio_irq_mask_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_irq_clear)(
+    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) * sdio_ptr,
+    vsf_sdio_irq_mask_t irq_mask
+) {
+    VSF_HAL_ASSERT(sdio_ptr != NULL);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return 0;
+}
+
+vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_single_voltage)(
+    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) * sdio_ptr,
+    uint8_t bus_width
+) {
+    VSF_HAL_ASSERT(sdio_ptr != NULL);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+
 void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_transact_stop)(
     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
 ) {
@@ -245,8 +272,11 @@ void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_transact_stop)(
  *      Usage of VSF_MCONNECT is not a requirement, but for convenience only,
  */
 
-#define VSF_SDIO_CFG_REIMPLEMENT_API_CAPABILITY         ENABLED
+#define VSF_SDIO_CFG_MODE_CHECK_UNIQUE                 VSF_HAL_CHECK_MODE_LOOSE
+#define VSF_SDIO_CFG_IRQ_MASK_CHECK_UNIQUE             VSF_HAL_CHECK_MODE_STRICT
+#define VSF_SDIO_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
 #define VSF_SDIO_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
+#define VSF_SDIO_CFG_REIMPLEMENT_API_IRQ_CLEAR         ENABLED
 
 // HW
 #define VSF_SDIO_CFG_IMP_LV0(__IDX, __HAL_OP)                                   \

@@ -85,6 +85,10 @@ extern "C" {
 #define VSF_SPI_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
 #define VSF_SPI_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
 #define VSF_SPI_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
+
+#define VSF_SPI_CFG_REIMPLEMENT_MODE_TO_DATA_BITS ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_DATA_BITS_TO_MODE ENABLED
+#define VSF_SPI_CFG_REIMPLEMENT_MODE_TO_BYTES     ENABLED
 // HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -117,19 +121,24 @@ typedef enum vsf_spi_mode_t {
     VSF_SPI_SLAVE                   = 0x01ul << 0,
     VSF_SPI_MSB_FIRST               = 0x00ul << 1,
     VSF_SPI_LSB_FIRST               = 0x01ul << 1,
-    VSF_SPI_CPOL_LOW                = 0x00ul << 2,
-    VSF_SPI_CPOL_HIGH               = 0x01ul << 2,
-    VSF_SPI_CPHA_LOW                = 0x00ul << 2,
-    VSF_SPI_CPHA_HIGH               = 0x01ul << 2,
-    VSF_SPI_MODE_0                  = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_LOW,
-    VSF_SPI_MODE_1                  = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_HIGH,
-    VSF_SPI_MODE_2                  = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_LOW,
-    VSF_SPI_MODE_3                  = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_HIGH,
+
+    // SPI mode (bits 2-3: CPOL and CPHA)
+    VSF_SPI_MODE_0                  = 0x00ul << 2,
+    VSF_SPI_MODE_1                  = 0x01ul << 2,
+    VSF_SPI_MODE_2                  = 0x02ul << 2,
+    VSF_SPI_MODE_3                  = 0x03ul << 2,
+
     VSF_SPI_CS_SOFTWARE_MODE        = 0x00ul << 4,
     VSF_SPI_CS_HARDWARE_MODE        = 0x01ul << 4,
     VSF_SPI_DATASIZE_8              = 0x00ul << 8,
     VSF_SPI_DATASIZE_16             = 0x01ul << 8,
     VSF_SPI_DATASIZE_32             = 0x02ul << 8,
+
+    // Standard Optional: only include these if hardware supports them
+    //VSF_SPI_CPOL_LOW                = 0x00ul << 2,
+    //VSF_SPI_CPOL_HIGH               = 0x01ul << 2,
+    //VSF_SPI_CPHA_LOW                = 0x00ul << 3,
+    //VSF_SPI_CPHA_HIGH               = 0x01ul << 3,
 
     // more vendor specified modes can be added here
 } vsf_spi_mode_t;
@@ -201,6 +210,90 @@ typedef enum vsf_spi_ctrl_t {
 } vsf_spi_ctrl_t;
 #endif
 // HW/IPCore end
+
+/*============================ INLINE FUNCTIONS ==============================*/
+
+#if VSF_SPI_CFG_REIMPLEMENT_MODE_TO_DATA_BITS == ENABLED
+// Ensure VSF_SPI_DATASIZE_MASK and related macros are defined before using them
+// They will be defined in vsf_template_spi.h, but we need them here for the inline function
+// Use macro definitions if template header hasn't been included yet
+#ifndef VSF_SPI_DATASIZE_MASK
+#   define VSF_SPI_DATASIZE_MASK       (VSF_SPI_DATASIZE_8 | VSF_SPI_DATASIZE_16 | VSF_SPI_DATASIZE_32)
+#endif
+#ifndef VSF_SPI_DATASIZE_BIT_OFFSET
+#   define VSF_SPI_DATASIZE_BIT_OFFSET    8
+#endif
+#ifndef VSF_SPI_DATASIZE_VALUE_OFFSET
+#   define VSF_SPI_DATASIZE_VALUE_OFFSET  1
+#endif
+
+/**
+ * \~english
+ * @brief Extract the number of data bits from SPI mode configuration
+ * @param[in] mode: SPI mode value containing data size configuration
+ * @return uint8_t: Number of data bits (4-32) if valid, 0 if mode is invalid
+ * \~chinese
+ * @brief 从 SPI 模式配置中提取数据位数
+ * @param[in] mode: 包含数据大小配置的 SPI 模式值
+ * @return uint8_t: 如果有效则返回数据位数（4-32），如果模式无效则返回 0
+ */
+static inline uint8_t vsf_spi_mode_to_data_bits(vsf_spi_mode_t mode)
+{
+    int bits = (mode & VSF_SPI_DATASIZE_MASK) >> VSF_SPI_DATASIZE_BIT_OFFSET;
+    return bits + VSF_SPI_DATASIZE_VALUE_OFFSET;
+}
+#endif
+
+#if VSF_SPI_CFG_REIMPLEMENT_DATA_BITS_TO_MODE == ENABLED
+// Ensure VSF_SPI_DATASIZE_BIT_OFFSET and VSF_SPI_DATASIZE_VALUE_OFFSET are defined
+#ifndef VSF_SPI_DATASIZE_BIT_OFFSET
+#   define VSF_SPI_DATASIZE_BIT_OFFSET    8
+#endif
+#ifndef VSF_SPI_DATASIZE_VALUE_OFFSET
+#   define VSF_SPI_DATASIZE_VALUE_OFFSET  1
+#endif
+
+/**
+ * \~english
+ * @brief Convert data bits to SPI mode configuration
+ * @param[in] data_bits: Number of data bits (4-32)
+ * @return vsf_spi_mode_t: SPI mode value with data size configuration
+ * \~chinese
+ * @brief 将数据位数转换为 SPI 模式配置
+ * @param[in] data_bits: 数据位数（4-32）
+ * @return vsf_spi_mode_t: 包含数据大小配置的 SPI 模式值
+ */
+static inline vsf_spi_mode_t vsf_spi_data_bits_to_mode(uint8_t data_bits)
+{
+    return (vsf_spi_mode_t)((data_bits - VSF_SPI_DATASIZE_VALUE_OFFSET) << VSF_SPI_DATASIZE_BIT_OFFSET);
+}
+#endif
+
+#if VSF_SPI_CFG_REIMPLEMENT_MODE_TO_BYTES == ENABLED
+/**
+ * \~english
+ * @brief Calculate the number of bytes needed for specified SPI mode
+ * @param[in] mode: SPI mode containing data size configuration
+ * @return uint8_t: Number of bytes (1, 2, or 4) needed to store one data unit
+ * \~chinese
+ * @brief 计算指定 SPI 模式所需的字节数
+ * @param[in] mode: 包含数据大小配置的 SPI 模式
+ * @return uint8_t: 存储一个数据单元所需的字节数（1、2 或 4）
+ */
+static inline uint8_t vsf_spi_mode_to_data_bytes(vsf_spi_mode_t mode)
+{
+    uint8_t bits = vsf_spi_mode_to_data_bits(mode);
+    if (bits == 0) {
+        return 0;   // Error: invalid data bits
+    } else if (bits <= 8) {
+        return 1;
+    } else if (bits <= 16) {
+        return 2;
+    } else {
+        return 4;
+    }
+}
+#endif
 
 /*============================ INCLUDES ======================================*/
 

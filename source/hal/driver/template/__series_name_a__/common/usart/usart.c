@@ -142,7 +142,7 @@ vsf_usart_status_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_status)(
     };
 }
 
-uint_fast16_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_rxfifo_get_data_count)(
+uint_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_rxfifo_get_data_count)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
@@ -152,14 +152,14 @@ uint_fast16_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_rxfifo_get_data_coun
 uint_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_rxfifo_read)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,
     void *buffer_ptr,
-    uint_fast16_t count
+    uint_fast32_t count
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
     VSF_HAL_ASSERT(NULL != buffer_ptr);
     return 0;
 }
 
-uint_fast16_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_txfifo_get_free_count)(
+uint_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_txfifo_get_free_count)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
@@ -169,18 +169,10 @@ uint_fast16_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_txfifo_get_free_coun
 uint_fast32_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_txfifo_write)(
     VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr,
     void *buffer_ptr,
-    uint_fast16_t count
+    uint_fast32_t count
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
     VSF_HAL_ASSERT(NULL != buffer_ptr);
-    return 0;
-}
-
-static vsf_usart_irq_mask_t VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_get_irq_mask)(
-    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t) *usart_ptr
-) {
-    // implement this function in the device file
-    VSF_HAL_ASSERT(0);
     return 0;
 }
 
@@ -189,8 +181,8 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
 
-    vsf_usart_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_get_irq_mask)(usart_ptr);
     vsf_usart_isr_t *isr_ptr = &usart_ptr->isr;
+    vsf_usart_irq_mask_t irq_mask = VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_clear)(usart_ptr, VSF_USART_IRQ_ALL_BITS_MASK);
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_usart_t *)usart_ptr, irq_mask);
     }
@@ -340,6 +332,8 @@ vsf_usart_irq_mask_t VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_clear)(
 
 // HW
 // TODO: add comments about fifo2req
+#define VSF_USART_CFG_MODE_CHECK_UNIQUE                 VSF_HAL_CHECK_MODE_LOOSE
+#define VSF_USART_CFG_IRQ_MASK_CHECK_UNIQUE             VSF_HAL_CHECK_MODE_STRICT
 #define VSF_USART_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_REQUEST           ENABLED
 #define VSF_USART_CFG_REIMPLEMENT_API_CTRL              ENABLED

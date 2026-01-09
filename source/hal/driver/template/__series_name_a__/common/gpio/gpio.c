@@ -171,20 +171,14 @@ vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_get_configuration
     return VSF_ERR_NONE;
 }
 
-static uint32_t VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_get_irq_mask)(
-    VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr
-) {
-    // implement this function in the device file
-    VSF_HAL_ASSERT(0);
-    return 0;
-}
-
-static void VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_clear_irq_flag)(
+vsf_gpio_pin_mask_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_clear)(
     VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
-    uint32_t irq_pin_mask
+    vsf_gpio_pin_mask_t pin_mask
 ) {
+    VSF_HAL_ASSERT(NULL != gpio_ptr);
     // implement this function in the device file
-    VSF_HAL_ASSERT(0);
+    // This function should clear the specified interrupt flags and return the state before clearing
+    return 0;
 }
 
 static void VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_irqhandler)(
@@ -192,15 +186,11 @@ static void VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != gpio_ptr);
 
-    uint32_t irq_pin_mask = VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_get_irq_mask)(gpio_ptr);
-    VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_clear_irq_flag)(gpio_ptr, irq_pin_mask);
-
-    VSF_HAL_ASSERT(NULL != gpio_ptr->irq_cfg.handler_fn);
-    gpio_ptr->irq_cfg.handler_fn(
-        gpio_ptr->irq_cfg.target_ptr,
-        (vsf_gpio_t *)gpio_ptr,
-        irq_pin_mask
-    );
+    vsf_gpio_exti_irq_cfg_t *isr_ptr = &gpio_ptr->irq_cfg;
+    vsf_gpio_pin_mask_t pin_mask = VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_exti_irq_clear)(gpio_ptr, (vsf_gpio_pin_mask_t)~0);
+    if ((pin_mask != 0) && (isr_ptr->handler_fn != NULL)) {
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_gpio_t *)gpio_ptr, pin_mask);
+    }
 }
 
 /*\note Implementation of APIs below is optional, because there is default implementation in gpio_template.inc.
@@ -277,8 +267,11 @@ vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
 
 /*============================ INCLUDES ======================================*/
 
+#define VSF_GPIO_CFG_MODE_CHECK_UNIQUE                      VSF_HAL_CHECK_MODE_LOOSE
+#define VSF_GPIO_CFG_IRQ_MASK_CHECK_UNIQUE                  VSF_HAL_CHECK_MODE_STRICT
 #define VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION  ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_CLEAR         ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER   ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET         ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR       ENABLED

@@ -71,7 +71,7 @@
 #   if VSF_HAL_USE_TIMER == ENABLED
 #       include "../common/timer/timer.h"
 #   endif
-#   if VSF_HAL_USE_TRNG == ENABLED
+#   if VSF_HAL_USE_RNG == ENABLED
 #       include "../common/rng/rng.h"
 #   endif
 #   if VSF_HAL_USE_USART == ENABLED

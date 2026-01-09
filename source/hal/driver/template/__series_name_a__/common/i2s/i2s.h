@@ -159,6 +159,9 @@ typedef enum vsf_i2s_irq_mask_t {
 
 #if VSF_I2S_CFG_REIMPLEMENT_TYPE_STATUS == ENABLED
 typedef struct vsf_i2s_status_t {
+#if VSF_I2S_CFG_INHERIT_HAL_CAPABILITY == ENABLED
+    inherit(vsf_peripheral_capability_t)
+#endif
     union {
         inherit(vsf_peripheral_status_t)
         uint32_t value;

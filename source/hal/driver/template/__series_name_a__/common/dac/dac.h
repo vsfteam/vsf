@@ -112,7 +112,7 @@ vsf_class(vsf_${dac_ip}_dac_t) {
 #if VSF_DAC_CFG_REIMPLEMENT_TYPE_IRQ_MASK == ENABLED
 typedef enum vsf_dac_irq_mask_t {
     VSF_DAC_IRQ_MASK_IDLE = (0x01ul << 0),
-    VSF_DAC_IRQ_MASK_CPL  = (0x1ul << 0),
+    VSF_DAC_IRQ_MASK_CPL  = (0x01ul << 1),
 } vsf_dac_irq_mask_t;
 #endif
 

@@ -125,10 +125,10 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_0_5_STOPBIT               = (0x2ul << 3),
     VSF_USART_2_STOPBIT                 = (0x3ul << 3),
 
-    VSF_USART_5_BIT_LENGTH              = (0x0ul << 5),
-    VSF_USART_6_BIT_LENGTH              = (0x1ul << 5),
-    VSF_USART_7_BIT_LENGTH              = (0x2ul << 5),
-    VSF_USART_8_BIT_LENGTH              = (0x3ul << 5),
+    VSF_USART_8_BIT_LENGTH              = (0x0ul << 5),
+    VSF_USART_5_BIT_LENGTH              = (0x1ul << 5),
+    VSF_USART_6_BIT_LENGTH              = (0x2ul << 5),
+    VSF_USART_7_BIT_LENGTH              = (0x3ul << 5),
     VSF_USART_9_BIT_LENGTH              = (0x4ul << 5),
     VSF_USART_10_BIT_LENGTH             = (0x5ul << 5),
 
@@ -146,25 +146,20 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_SYNC_CLOCK_ENABLE         = (0x0ul << 11),
     VSF_USART_SYNC_CLOCK_DISABLE        = (0x1ul << 11),
 
-    VSF_USART_HALF_DUPLEX_DISABLE       = (0x0ul << 12),
-    VSF_USART_HALF_DUPLEX_ENABLE        = (0x1ul << 12),
+    VSF_USART_HALF_DUPLEX_DISABLE       = (0x0ul << 14),
+    VSF_USART_HALF_DUPLEX_ENABLE        = (0x1ul << 14),
 
-    VSF_USART_TX_FIFO_THRESHOLD_EMPTY   = (0x0ul << 13),
+    VSF_USART_TX_FIFO_THRESHOLD_EMPTY   = (0x0ul << 15),
     VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY
-                                        = (0x1ul << 13),
+                                        = (0x1ul << 15),
     VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL
                                         = (0x2ul << 15),
 
     VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
-                                        = (0x0ul << 15),
+                                        = (0x0ul << 17),
     VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL
-                                        = (0x1ul << 15),
-    VSF_USART_RX_FIFO_THRESHOLD_FULL    = (0x2ul << 15),
-
-    VSF_USART_SYNC_CLOCK_POLARITY_LOW   = (0x0ul << 16),
-    VSF_USART_SYNC_CLOCK_POLARITY_HIGH  = (0x1ul << 16),
-    VSF_USART_SYNC_CLOCK_PHASE_1_EDGE   = (0x0ul << 17),
-    VSF_USART_SYNC_CLOCK_PHASE_2_EDGE   = (0x1ul << 17),
+                                        = (0x1ul << 17),
+    VSF_USART_RX_FIFO_THRESHOLD_FULL    = (0x2ul << 17),
 
     // more vendor specified modes can be added here
 } vsf_usart_mode_t;
@@ -180,30 +175,31 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_TX               = (0x1ul << 2),
     VSF_USART_IRQ_MASK_RX               = (0x1ul << 3),
     VSF_USART_IRQ_MASK_RX_TIMEOUT       = (0x1ul << 4),
+#   define VSF_USART_IRQ_MASK_RX_TIMEOUT VSF_USART_IRQ_MASK_RX_TIMEOUT
 
     // clear to send interrupt
     VSF_USART_IRQ_MASK_CTS              = (0x1ul << 5),
+#   define VSF_USART_IRQ_MASK_CTS VSF_USART_IRQ_MASK_CTS
 
     // Error interrupt
     VSF_USART_IRQ_MASK_FRAME_ERR        = (0x1ul << 6),
-    VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 7),
-    VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 8),
+#   define VSF_USART_IRQ_MASK_FRAME_ERR VSF_USART_IRQ_MASK_FRAME_ERR
+    VSF_USART_IRQ_MASK_BREAK_ERR        = (0x1ul << 7),
+#   define VSF_USART_IRQ_MASK_BREAK_ERR VSF_USART_IRQ_MASK_BREAK_ERR
+    VSF_USART_IRQ_MASK_PARITY_ERR       = (0x1ul << 8),
+#   define VSF_USART_IRQ_MASK_PARITY_ERR VSF_USART_IRQ_MASK_PARITY_ERR
     VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  = (0x1ul << 9),
+#   define VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR
 
-    // only include VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR if hardware supports TX_OVERFLOW_ERR interrupt
+    // RX idle interrupt (Implementation Required, Hardware Optional). If hardware does not support this, VSF_USART_IRQ_MASK_RX_IDLE will be mapped to VSF_USART_IRQ_MASK_RX_TIMEOUT
+    VSF_USART_IRQ_MASK_RX_IDLE          = (0x1ul << 12),
+#   define VSF_USART_IRQ_MASK_RX_IDLE      VSF_USART_IRQ_MASK_RX_IDLE
+
+    // Standard Optional: only include these if hardware supports them
     //VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR  = (0x1ul << 10),
     //#define VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR
-
-    // only include VSF_USART_IRQ_MASK_TX_IDLE if hardware supports TX_IDLE interrupt
     //VSF_USART_IRQ_MASK_TX_IDLE          = (0x1ul << 11),
     //#define VSF_USART_IRQ_MASK_TX_IDLE      VSF_USART_IRQ_MASK_TX_IDLE
-
-    // only include VSF_USART_IRQ_MASK_RX_IDLE if hardware supports configurable RX_IDLE count and RX_IDLE interrupt
-    // or VSF_USART_IRQ_MASK_RX_IDLE will be mapped to VSF_USART_IRQ_MASK_RX_TIMEOUT
-    //VSF_USART_IRQ_MASK_RX_IDLE          = (0x1ul << 12),
-    //#define VSF_USART_IRQ_MASK_RX_IDLE      VSF_USART_IRQ_MASK_RX_IDLE
-
-    // only include VSF_USART_IRQ_MASK_NOISE_ERR if hardware supports NOISE_ERR interrupt
     //VSF_USART_IRQ_MASK_NOISE_ERR        = (0x1UL << 13),
     //#define VSF_USART_IRQ_MASK_NOISE_ERR VSF_USART_IRQ_MASK_NOISE_ERR
 
@@ -260,18 +256,18 @@ typedef void vsf_usart_isr_handler_t(void *target_ptr,
                                      vsf_usart_t *usart_ptr,
                                      vsf_usart_irq_mask_t irq_mask);
 typedef struct vsf_usart_isr_t {
-    vsf_usart_isr_handler_t *handler_fn;
-    void                    *target_ptr;
-    vsf_arch_prio_t         prio;
+    vsf_usart_isr_handler_t *handler_fn;    //!< \~english Interrupt handler function pointer \~chinese 中断处理函数指针
+    void                    *target_ptr;     //!< \~english User target pointer \~chinese 用户目标指针
+    vsf_arch_prio_t         prio;            //!< \~english Interrupt priority \~chinese 中断优先级
 } vsf_usart_isr_t;
 typedef struct vsf_usart_cfg_t {
-    vsf_usart_mode_t        mode;
-    uint32_t                baudrate;
-    uint32_t                rx_timeout;
+    vsf_usart_mode_t        mode;           //!< \~english USART working mode \~chinese USART 工作模式
+    uint32_t                baudrate;       //!< \~english Baudrate in Hz \~chinese 波特率(Hz)
+    uint32_t                rx_timeout;     //!< \~english RX timeout in microseconds \~chinese 接收超时时间(微秒)
 #   ifdef VSF_USART_IRQ_MASK_RX_IDLE
     uint32_t                rx_idle_cnt;
 #   endif
-    vsf_usart_isr_t         isr;
+    vsf_usart_isr_t         isr;            //!< \~english Interrupt configuration \~chinese 中断配置
 
     // more vendor specified cfg can be added here
 } vsf_usart_cfg_t;
@@ -279,32 +275,42 @@ typedef struct vsf_usart_cfg_t {
 
 #if VSF_USART_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED
 typedef struct vsf_usart_capability_t {
-    vsf_usart_irq_mask_t irq_mask;
+#if VSF_USART_CFG_INHERIT_HAL_CAPABILITY == ENABLED
+    inherit(vsf_peripheral_capability_t)
+#endif
+    vsf_usart_irq_mask_t irq_mask;          //!< \~english Supported interrupt mask bits \~chinese 支持的中断掩码位
 
-    uint32_t max_baudrate;
-    uint32_t min_baudrate;
+    uint32_t max_baudrate;                  //!< \~english Maximum supported baudrate (bps) according to current clock configurations \~chinese 当前时钟配置下支持的最大波特率(bps)
+    uint32_t min_baudrate;                  //!< \~english Minimum supported baudrate (bps) according to current clock configurations \~chinese 当前时钟配置下支持的最小波特率(bps)
 
-    uint8_t txfifo_depth;
-    uint8_t rxfifo_depth;
+    uint8_t txfifo_depth;                   //!< \~english TX FIFO depth in data frames (0 means no FIFO) \~chinese TX FIFO 深度(数据帧数，0表示无FIFO)
+    uint8_t rxfifo_depth;                   //!< \~english RX FIFO depth in data frames (0 means no FIFO) \~chinese RX FIFO 深度(数据帧数，0表示无FIFO)
 
-    uint8_t max_data_bits;
-    uint8_t min_data_bits;
+    uint8_t max_data_bits;                  //!< \~english Maximum data bits per frame \~chinese 每帧最大数据位数
+    uint8_t min_data_bits;                  //!< \~english Minimum data bits per frame \~chinese 每帧最小数据位数
 
-    uint8_t support_rx_timeout          : 1;
-    uint8_t support_send_break          : 1;
-    uint8_t support_set_and_clear_break : 1;
-    uint8_t support_sync_clock          : 1;
+    uint8_t support_rx_timeout          : 1;//!< \~english Support receive timeout \~chinese 支持接收超时
+    uint8_t support_send_break          : 1;//!< \~english Support send break \~chinese 支持发送 break 信号
+    uint8_t support_set_and_clear_break : 1;//!< \~english Support set and clear break \~chinese 支持设置和清除 break 信号
+    uint8_t support_sync_clock          : 1;//!< \~english Support Synchronous clock \~chinese 支持同步时钟
 #   ifdef VSF_USART_IRQ_MASK_TX_IDLE
-    uint8_t support_tx_idle             : 1;
+    uint8_t support_tx_idle             : 1;//!< \~english Support TX idle interrupt \~chinese 支持发送空闲中断
 #   endif
 #   ifdef VSF_USART_IRQ_MASK_RX_IDLE
-    uint8_t support_rx_idle             : 1;
+    uint8_t support_rx_idle             : 1;//!< \~english Support RX idle interrupt \~chinese 支持接收空闲中断
 #   endif
 
     // more vendor specified capability can be added here
 } vsf_usart_capability_t;
 #endif
 // HW/IPCore end
+
+/*============================ INLINE FUNCTIONS ==============================*/
+
+/*\note The following break-related functions are defined as static inline in vsf_template_usart.h.
+ *      They will be available when the template header is included.
+ *      No need to redefine them here to avoid conflicts.
+ */
 
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ PROTOTYPES ====================================*/

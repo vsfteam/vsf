@@ -188,33 +188,21 @@ vsf_dma_channel_status_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_statu
     };
 }
 
-static vsf_dma_irq_mask_t VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_get_irq_mask)(
-    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr
-) {
-    // implement this function in the device file
-    VSF_HAL_ASSERT(0);
-    return 0;
-}
-
-static int8_t VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_get_irq_channel)(
-    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr
-) {
-    // implement this function in the device file
-    VSF_HAL_ASSERT(0);
-    return 0;
-}
-
+/**
+ * @brief DMA interrupt handler
+ * @note DMA interrupt handling is device-specific and must be implemented by the device driver.
+ *       The number of channels and interrupt vectors vary significantly across different DMA controllers.
+ *       Some DMA controllers have one interrupt per channel, while others share interrupts across multiple channels.
+ *       Device drivers should implement this function to:
+ *       1. Identify which channel(s) triggered the interrupt
+ *       2. Clear the interrupt flags for the triggered channel(s)
+ *       3. Call the appropriate ISR handler function(s) for the affected channel(s)
+ */
 static void VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_irqhandler)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr
 ) {
-    VSF_HAL_ASSERT(NULL != dma_ptr);
-
-    vsf_dma_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_get_irq_mask)(dma_ptr);
-    int8_t channel = VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_get_irq_channel)(dma_ptr);
-    vsf_dma_isr_t *isr_ptr = &dma_ptr->isr;
-    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_dma_t *)dma_ptr, channel, irq_mask);
-    }
+    // Peripherals should implement their own _dma_irqhandler
+    VSF_HAL_ASSERT(0);
 }
 
 /*\note Implementation of APIs below is optional, because there is default implementation in dma_template.inc.
@@ -311,6 +299,8 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_sg_start)(
  */
 
 // HW
+#define VSF_DMA_CFG_MODE_CHECK_UNIQUE                           VSF_HAL_CHECK_MODE_LOOSE
+#define VSF_DMA_CFG_IRQ_MASK_CHECK_UNIQUE                       VSF_HAL_CHECK_MODE_STRICT
 #define VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY                  ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_API_GET_CONFIGURATION           ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION   ENABLED
