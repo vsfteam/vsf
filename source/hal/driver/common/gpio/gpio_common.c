@@ -215,4 +215,13 @@ vsf_err_t vsf_gpio_exti_irq_disable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pi
     return gpio_ptr->op->exti_irq_disable(gpio_ptr, pin_mask);
 }
 
+vsf_gpio_pin_mask_t vsf_gpio_exti_irq_clear(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
+{
+    VSF_HAL_ASSERT(gpio_ptr != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op != NULL);
+    VSF_HAL_ASSERT(gpio_ptr->op->exti_irq_clear != NULL);
+
+    return gpio_ptr->op->exti_irq_clear(gpio_ptr, pin_mask);
+}
+
 #endif
