@@ -37,9 +37,13 @@ jobs:
     - name: install depends
       run: |
           sudo apt-get update
-          sudo apt-get install -y libsdl2-dev
+          sudo apt-get install -y libsdl2-dev clang libclang-dev python3-clang
       shell: bash
 
     - name: run template validator
       run: |
         python3 ${{github.workspace}}/test/hal_test/hal_test.py
+
+    - name: run template comparison
+      run: |
+        python3 ${{github.workspace}}/script/hal/check/compare_template.py -o output
