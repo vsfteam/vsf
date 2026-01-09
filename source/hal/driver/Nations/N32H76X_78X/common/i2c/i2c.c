@@ -188,10 +188,13 @@ uint_fast16_t VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_slave_get_transferred_co
     return 0;
 }
 
-static vsf_i2c_irq_mask_t VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_get_irq_mask)(
-    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr
+static vsf_i2c_irq_mask_t VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_irq_clear)(
+    VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t) *i2c_ptr,
+    vsf_i2c_irq_mask_t irq_mask
 ) {
+    VSF_HAL_ASSERT(NULL != i2c_ptr);
     // implement this function in the device file
+    // This function should clear the specified interrupt flags and return the state before clearing
     VSF_HAL_ASSERT(0);
     return 0;
 }
@@ -201,8 +204,8 @@ static void VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != i2c_ptr);
 
-    vsf_i2c_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_get_irq_mask)(i2c_ptr);
     vsf_i2c_isr_t *isr_ptr = &i2c_ptr->isr;
+    vsf_i2c_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_I2C_CFG_IMP_PREFIX, _i2c_irq_clear)(i2c_ptr, VSF_I2C_IRQ_ALL_BITS_MASK);
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_i2c_t *)i2c_ptr, irq_mask);
     }
