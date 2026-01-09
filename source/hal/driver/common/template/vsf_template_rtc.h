@@ -193,7 +193,7 @@ typedef enum vsf_rtc_irq_mask_t {
      * @brief 闹钟中断掩码。
      * 当 RTC 时间与配置的闹钟时间匹配时触发。
      */
-    VSF_RTC_IRQ_MASK_ALARM = (1 << 0),
+     VSF_RTC_IRQ_MASK_ALARM = (0x1ul << 0),
 } vsf_rtc_irq_mask_t;
 #endif
 
