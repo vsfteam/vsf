@@ -34,9 +34,14 @@ typedef enum vsf_spi_mode_t {
     VSF_SPI_SLAVE                       = 0x00ul << 11,
     VSF_SPI_MASTER                      = 0x01ul << 11,
 
+    // SPI mode (hardware specific: bits 0-1 and bit 13 for CPOL/CPHA)
+    // Mode 0: CPOL=0, CPHA=0 -> bits[0:1]=11, bit[13]=0
     VSF_SPI_MODE_0                      = ((0x01ul << 0) |(0x01ul << 1) | (0x00ul << 13)),
+    // Mode 1: CPOL=0, CPHA=1 -> bits[0:1]=00, bit[13]=0
     VSF_SPI_MODE_1                      = ((0x00ul << 0) |(0x00ul << 1) | (0x00ul << 13)),
+    // Mode 2: CPOL=1, CPHA=0 -> bits[0:1]=11, bit[13]=1
     VSF_SPI_MODE_2                      = ((0x01ul << 0) |(0x01ul << 1) | (0x01ul << 13)),
+    // Mode 3: CPOL=1, CPHA=1 -> bits[0:1]=00, bit[13]=1
     VSF_SPI_MODE_3                      = ((0x00ul << 0) |(0x00ul << 1) | (0x01ul << 13)),
 
     VSF_SPI_DATASIZE_BIT_OFFSET         = 2,
