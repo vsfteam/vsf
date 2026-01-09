@@ -123,6 +123,8 @@ typedef enum vsf_dma_channel_mode_t {
     VSF_DMA_SYNC_FALLING                        = (1 << 24) | (2 << 25),
     VSF_DMA_SYNC_RISING_AND_FALLING             = (1 << 24) | (3 << 25),
 
+
+
     // NOT SUPPORTED
     VSF_DMA_PERIPHERAL_TO_PERIPHERAL            = (1 << 16),
     VSF_DMA_SRC_ADDR_DECREMENT                  = (1 << 17),
@@ -153,6 +155,30 @@ typedef enum vsf_dma_channel_mode_t {
     VSF_DMA_DST_BURST_LENGTH_32                 = (5 << 26),
     VSF_DMA_DST_BURST_LENGTH_64                 = (6 << 26),
     VSF_DMA_DST_BURST_LENGTH_128                = (7 << 26),
+
+    /*\note DMA_CxCTRL register: control register mask for configuration bits (bits [14:4], excluding interrupt-related bits)
+     *      This mask preserves configuration bits (DTS, PINCM, MIMCM, PWIDTH, MWIDTH, CHPL, M2M)
+     *      while ensuring CHEN bit (bit 0) is cleared
+     *      Note: Interrupt-related bits (bits 1-3, 5) are not included as they are not configured here
+     *      Reference: RM_AT32F402_405_CH_V2.02 Section 9.5.3
+     */
+    VSF_HW_DMA_CTRL_CONFIG_MASK                 = VSF_DMA_MEMORY_TO_MEMORY |
+                                                   VSF_DMA_MEMORY_TO_PERIPHERAL |
+                                                   VSF_DMA_PERIPHERAL_TO_MEMORY |
+                                                   VSF_DMA_SRC_ADDR_INCREMENT |
+                                                   VSF_DMA_SRC_ADDR_NO_CHANGE |
+                                                   VSF_DMA_SRC_WIDTH_BYTE_1 |
+                                                   VSF_DMA_SRC_WIDTH_BYTES_2 |
+                                                   VSF_DMA_SRC_WIDTH_BYTES_4 |
+                                                   VSF_DMA_DST_ADDR_INCREMENT |
+                                                   VSF_DMA_DST_ADDR_NO_CHANGE |
+                                                   VSF_DMA_DST_WIDTH_BYTE_1 |
+                                                   VSF_DMA_DST_WIDTH_BYTES_2 |
+                                                   VSF_DMA_DST_WIDTH_BYTES_4 |
+                                                   VSF_DMA_PRIORITY_LOW |
+                                                   VSF_DMA_PRIORITY_MEDIUM |
+                                                   VSF_DMA_PRIORITY_HIGH |
+                                                   VSF_DMA_PRIORITY_VERY_HIGH,
 } vsf_dma_channel_mode_t;
 #endif
 

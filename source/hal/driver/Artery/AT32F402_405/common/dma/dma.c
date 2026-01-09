@@ -31,6 +31,12 @@
 
 /*============================ MACROS ========================================*/
 
+/*\note DMA_CxDTCNT register: 16-bit transfer count register (bits [15:0])
+ *      Maximum transfer count: 65535 (0xFFFF)
+ *      Reference: RM_AT32F402_405_CH_V2.02 Section 9.5.4
+ */
+#define VSF_HW_DMA_MAX_TRANSFER_COUNT               0xFFFF
+
 /*\note VSF_HW_DMA_CFG_MULTI_CLASS is only for drivers for specified device(hw drivers).
  *      For other drivers, please define VSF_${DMA_IP}_DMA_CFG_MULTI_CLASS in header file.
  */
@@ -50,10 +56,12 @@
 
 typedef struct VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_t) {
     vsf_dma_isr_t                               isr;
+    vsf_dma_irq_mask_t                          enabled_irq_mask;
     uint32_t                                    total_count;
     uint32_t                                    remain_count;
     uint16_t                                    cur_count;
     uint8_t                                     irqn;
+    vsf_dma_channel_mode_t                      mode;  // Store mode for address mapping in _dma_channel_start
 } VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_t);
 
 // HW
@@ -97,7 +105,11 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_init)(
 ) {
     VSF_HAL_ASSERT(NULL != dma_ptr);
     VSF_HAL_ASSERT(NULL != cfg_ptr);
+
+    vsf_hw_peripheral_enable(dma_ptr->en);
+
     dma_ptr->reg->muxsel_bit.tblsel = 1;
+
     return VSF_ERR_NONE;
 }
 
@@ -105,6 +117,8 @@ void VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_fini)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr
 ) {
     VSF_HAL_ASSERT(dma_ptr != NULL);
+
+    vsf_hw_peripheral_disable(dma_ptr->en);
 }
 
 vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_acquire)(
@@ -174,22 +188,40 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_config)(
     dmamux_channel_type *mux_channel_reg = &((dmamux_channel_type *)reg->reserved2)[channel];
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_t) *ch = &dma_ptr->channels[channel];
 
+    channel_reg->ctrl_bit.chen = 0;
+
     vsf_dma_channel_mode_t mode = cfg_ptr->mode;
+
     switch (mode & VSF_DMA_DIRECTION_MASK) {
     case VSF_DMA_MEMORY_TO_PERIPHERAL:
+        // For M2P: swap address increment bits (6<->7) and width bits (8-9<->10-11)
+        // Swap bit 6 and 7: ((mode & (1 << 6)) << 1) | ((mode & (1 << 7)) >> 1)
+        // Swap bits 8-9 and 10-11: ((mode & (3 << 8)) << 2) | ((mode & (3 << 10)) >> 2)
+        // Fix: original code had >> 3, should be >> 2
         mode = ((mode & (1 << 6)) << 1) | ((mode & (1 << 7)) >> 1) | (mode & ~(3 << 6));
-        mode = ((mode & (3 << 8)) << 2) | ((mode & (3 << 10)) >> 3) | (mode & ~(15 << 8));
+        mode = ((mode & (3 << 8)) << 2) | ((mode & (3 << 10)) >> 2) | (mode & ~(15 << 8));
         mux_channel_reg->muxctrl = cfg_ptr->dst_request_idx;
         break;
+
     case VSF_DMA_PERIPHERAL_TO_MEMORY:
         mux_channel_reg->muxctrl = cfg_ptr->src_request_idx;
         break;
+
     default:
         break;
     }
+
+    // Set sync and event generation bits: EVTGEN(9), REQCNT(19..23), SYNCSEL(24..28)
+    // mode bit 17 -> muxctrl bit 9 (EVTGEN)
+    // sync_reqcnt -> muxctrl bits 19-23 (REQCNT)
+    // sync_signal -> muxctrl bits 24-28 (SYNCSEL)
     mux_channel_reg->muxctrl |= ((cfg_ptr->mode >> 16) << 8) | (cfg_ptr->sync_reqcnt << 19) | (cfg_ptr->sync_signal << 24);
-    channel_reg->ctrl = cfg_ptr->mode;
+
+    channel_reg->ctrl = mode | cfg_ptr->irq_mask;
+
     ch->isr = cfg_ptr->isr;
+    ch->enabled_irq_mask = cfg_ptr->irq_mask;
+    ch->mode = mode;
     if (cfg_ptr->isr.handler_fn != NULL) {
         NVIC_SetPriority(ch->irqn, cfg_ptr->prio);
         NVIC_EnableIRQ(ch->irqn);
@@ -205,7 +237,7 @@ static bool VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_channel_update)(
     vsf_hw_dma_channel_reg_t *channel_reg
 ) {
     if (ch->remain_count > 0) {
-        ch->cur_count = vsf_min(ch->remain_count, 0xFFFF);
+        ch->cur_count = vsf_min(ch->remain_count, VSF_HW_DMA_MAX_TRANSFER_COUNT);
         channel_reg->dtcnt = ch->cur_count;
         ch->remain_count -= ch->cur_count;
         channel_reg->ctrl_bit.chen = 1;
@@ -229,16 +261,30 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_start)(
     vsf_hw_dma_channel_reg_t *channel_reg = &((vsf_hw_dma_channel_reg_t *)reg->reserved1)[channel];
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_t) *ch = &dma_ptr->channels[channel];
 
-    ch->total_count = ch->remain_count = count;
-    if (channel_reg->ctrl_bit.dtd) {
-        channel_reg->paddr = src_address;
-        channel_reg->maddr = dst_address;
+    channel_reg->ctrl_bit.chen = 0;
+
+    vsf_dma_channel_mode_t mode = ch->mode;
+    vsf_dma_channel_mode_t direction = mode & VSF_DMA_DIRECTION_MASK;
+    uint32_t paddr, maddr;
+    if (direction == VSF_DMA_MEMORY_TO_PERIPHERAL) {
+        paddr = (uint32_t)dst_address;
+        maddr = (uint32_t)src_address;
+    } else if (direction == VSF_DMA_PERIPHERAL_TO_MEMORY) {
+        paddr = (uint32_t)src_address;
+        maddr = (uint32_t)dst_address;
     } else {
-        channel_reg->maddr = src_address;
-        channel_reg->paddr = dst_address;
+        paddr = (uint32_t)dst_address;
+        maddr = (uint32_t)src_address;
     }
-    reg->clr = 1 << (channel << 2);
+    channel_reg->paddr = paddr;
+    channel_reg->maddr = maddr;
+
+    ch->total_count = ch->remain_count = count;
+
+    reg->clr |= (uint32_t)(0x0F << (channel << 2));
+
     VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_channel_update)(ch, channel_reg);
+
     return VSF_ERR_NONE;
 }
 
@@ -267,7 +313,7 @@ uint32_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_get_transferred_count
     vsf_hw_dma_channel_reg_t *channel_reg = &((vsf_hw_dma_channel_reg_t *)reg->reserved1)[channel];
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_t) *ch = &dma_ptr->channels[channel];
 
-    return ch->total_count - ch->remain_count + (ch->cur_count - channel_reg->dtcnt);
+    return ch->remain_count + (ch->cur_count - channel_reg->dtcnt);
 }
 
 vsf_dma_channel_status_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_status)(
@@ -284,12 +330,21 @@ vsf_dma_channel_status_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_statu
     };
 }
 
-static vsf_dma_irq_mask_t VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_get_irq_mask)(
-    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr
+static vsf_dma_irq_mask_t VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_irq_clear)(
+    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
+    uint8_t channel
 ) {
-    // implement this function in the device file
-    VSF_HAL_ASSERT(0);
-    return 0;
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+    VSF_HAL_ASSERT(channel < VSF_HW_DMA_CHANNEL_NUM);
+
+    dma_type *reg = dma_ptr->reg;
+    uint32_t sts_shift = channel << 2;
+    uint32_t sts_mask = reg->sts >> sts_shift;
+    vsf_dma_irq_mask_t irq_mask = sts_mask & VSF_DMA_IRQ_ALL_BITS_MASK;
+
+    reg->clr = (uint32_t)(0x0F << sts_shift);
+
+    return irq_mask;
 }
 
 static void VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_irqhandler)(
@@ -297,12 +352,51 @@ static void VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_irqhandler)(
     uint8_t channel
 ) {
     VSF_HAL_ASSERT(NULL != dma_ptr);
+    VSF_HAL_ASSERT(channel < VSF_HW_DMA_CHANNEL_NUM);
 
-    vsf_dma_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_get_irq_mask)(dma_ptr);
-//    vsf_dma_isr_t *isr_ptr = &dma_ptr->isr;
-//    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
-//        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_dma_t *)dma_ptr, channel, irq_mask);
-//    }
+    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_t) *ch = &dma_ptr->channels[channel];
+
+    dma_type *reg = dma_ptr->reg;
+    vsf_hw_dma_channel_reg_t *channel_reg = &((vsf_hw_dma_channel_reg_t *)reg->reserved1)[channel];
+
+    if (ch->isr.handler_fn == NULL) {
+        channel_reg->ctrl_bit.fdtien = 0;
+        channel_reg->ctrl_bit.hdtien = 0;
+        channel_reg->ctrl_bit.dterrien = 0;
+        reg->clr |= (uint32_t)(0x0F << (channel << 2));
+        VSF_HAL_ASSERT(0);
+        return;
+    }
+
+    vsf_dma_irq_mask_t hw_irq_mask = VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_irq_clear)(dma_ptr, channel);
+
+    if (hw_irq_mask == 0) {
+        return;
+    }
+
+    vsf_dma_irq_mask_t irq_mask = hw_irq_mask & ch->enabled_irq_mask;
+
+    if (irq_mask & (VSF_DMA_IRQ_MASK_CPL | VSF_DMA_IRQ_MASK_ERROR)) {
+        dma_type *reg = dma_ptr->reg;
+        vsf_hw_dma_channel_reg_t *channel_reg = &((vsf_hw_dma_channel_reg_t *)reg->reserved1)[channel];
+        if (ch->remain_count > 0) {
+            uint16_t transferred = ch->cur_count - channel_reg->dtcnt;
+            if (transferred > ch->remain_count) {
+                transferred = ch->remain_count;
+            }
+            ch->remain_count -= transferred;
+        }
+        if (irq_mask & VSF_DMA_IRQ_MASK_CPL) {
+            ch->remain_count = 0;
+            ch->cur_count = 0;
+        } else if (ch->remain_count > 0) {
+            VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_channel_update)(ch, channel_reg);
+        }
+    }
+
+    if ((irq_mask != 0) && (ch->isr.handler_fn != NULL)) {
+        ch->isr.handler_fn(ch->isr.target_ptr, (vsf_dma_t *)dma_ptr, channel, irq_mask);
+    }
 }
 
 /*\note Implementation of APIs below is optional, because there is default implementation in dma_template.inc.
@@ -331,11 +425,15 @@ vsf_dma_capability_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_capability)(
 ) {
     VSF_HAL_ASSERT(dma_ptr != NULL);
     return (vsf_dma_capability_t) {
-        .irq_mask          = 0xff,
-        .channel_count     = 16,
+        .irq_mask          = VSF_DMA_IRQ_ALL_BITS_MASK,
+        .channel_count     = VSF_HW_DMA_CHANNEL_NUM,
         .irq_count         = VSF_HW_DMA_CHANNEL_NUM,
-        .supported_modes   = VSF_DMA_MODE_ALL_BITS_MASK,
-        .max_transfer_count = 0,
+        .supported_modes   = VSF_DMA_MODE_ALL_BITS_MASK |
+                             VSF_DMA_EVENT |
+                             VSF_DMA_SYNC_RISING |
+                             VSF_DMA_SYNC_FALLING |
+                             VSF_DMA_SYNC_RISING_AND_FALLING,
+        .max_transfer_count = VSF_HW_DMA_MAX_TRANSFER_COUNT,
         .addr_alignment    = 1,
         .support_scatter_gather = 0,
     };
@@ -352,7 +450,7 @@ vsf_dma_capability_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_capability)(
 #define VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY                  ENABLED
 
 #define VSF_DMA_IMP_IRQHANDLER(__CHANNEL_IDX, __DMA_IDX)                        \
-    void VSF_MCONNECT(DMA, __DMA_IDX, _Channel, __CHANNEL_IDX, _IRQHandler)(void)\
+    void VSF_MCONNECT(VSF_HW_INTERRUPT, VSF_MCONNECT(VSF_DMA_CFG_IMP_UPCASE_PREFIX, _DMA, __DMA_IDX, _CHANNEL, __CHANNEL_IDX, _IRQN))(void)\
     {                                                                           \
         uintptr_t ctx = vsf_hal_irq_enter();                                    \
         VSF_MCONNECT(__, VSF_DMA_CFG_IMP_PREFIX, _dma_irqhandler)(              \
@@ -370,9 +468,9 @@ vsf_dma_capability_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_capability)(
     VSF_MREPEAT(VSF_HW_DMA_CHANNEL_NUM, VSF_DMA_IMP_IRQHANDLER, __IDX)          \
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t)                                \
         VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma, __IDX) = {                   \
-        .reg        = VSF_MCONNECT(VSF_DMA_CFG_IMP_UPCASE_PREFIX, _DMA, __IDX, _REG),\
-        .en         = VSF_MCONNECT(VSF_DMA_CFG_IMP_UPCASE_PREFIX, _DMA, __IDX, _EN),\
-        .rst        = VSF_MCONNECT(VSF_DMA_CFG_IMP_UPCASE_PREFIX, _DMA, __IDX, _RST),\
+        .reg   = VSF_MCONNECT(VSF_DMA_CFG_IMP_UPCASE_PREFIX, _DMA, __IDX, _REG),\
+        .en    = VSF_MCONNECT(VSF_DMA_CFG_IMP_UPCASE_PREFIX, _DMA, __IDX, _EN), \
+        .rst   = VSF_MCONNECT(VSF_DMA_CFG_IMP_UPCASE_PREFIX, _DMA, __IDX, _RST),\
         .channels = {                                                           \
             VSF_MREPEAT(VSF_HW_DMA_CHANNEL_NUM, VSF_DMA_IMP_CHANNEL, __IDX)     \
         },                                                                      \
