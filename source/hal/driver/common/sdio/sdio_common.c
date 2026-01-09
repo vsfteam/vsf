@@ -69,6 +69,15 @@ void vsf_sdio_irq_disable(vsf_sdio_t *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)
     sdio_ptr->op->irq_disable(sdio_ptr, irq_mask);
 }
 
+vsf_sdio_irq_mask_t vsf_sdio_irq_clear(vsf_sdio_t *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(sdio_ptr != NULL);
+    VSF_HAL_ASSERT(sdio_ptr->op != NULL);
+    VSF_HAL_ASSERT(sdio_ptr->op->irq_clear != NULL);
+
+    return sdio_ptr->op->irq_clear(sdio_ptr, irq_mask);
+}
+
 vsf_sdio_status_t vsf_sdio_status(vsf_sdio_t *sdio_ptr)
 {
     VSF_HAL_ASSERT(sdio_ptr != NULL);

@@ -485,6 +485,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, get_configuration,    VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_cfg_t *cfg_ptr)         \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  sdio, irq_enable,           VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)    \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                  sdio, irq_disable,          VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)    \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_sdio_irq_mask_t,   sdio, irq_clear,            VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)    \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_sdio_status_t,     sdio, status,               VSF_MCONNECT(__prefix_name, _t) *sdio_ptr)                                  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_sdio_capability_t, sdio, capability,           VSF_MCONNECT(__prefix_name, _t) *sdio_ptr)                                  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, set_clock,            VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, uint32_t clock_hz, bool is_ddr)  \
@@ -965,6 +966,33 @@ extern void vsf_sdio_irq_enable(vsf_sdio_t *sdio_ptr, vsf_sdio_irq_mask_t irq_ma
 extern void vsf_sdio_irq_disable(vsf_sdio_t *sdio_ptr, vsf_sdio_irq_mask_t irq_mask);
 
 /**
+ * \~english
+ * @brief Clear interrupt flags of SDIO instance and return previous state
+ * @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
+ * @param[in] irq_mask: one or more values of enum @ref vsf_sdio_irq_mask_t to clear
+ * @return vsf_sdio_irq_mask_t: the interrupt mask state before clearing (0 if no flags were set)
+ *
+ * @note This function attempts to clear the specified interrupt flags if they are set,
+ *       and returns the state of those flags before clearing. This is useful for
+ *       polling operations and determining if interrupts occurred.
+ *       Note that if interrupts are enabled and an interrupt handler is active,
+ *       the interrupt handler may clear the interrupt flags automatically.
+ *       In such cases, this function will return 0 even if interrupts occurred.
+ *
+ * \~chinese
+ * @brief 清除 SDIO 实例的中断标志并返回之前的状态
+ * @param[in] sdio_ptr: 指向结构体 @ref vsf_sdio_t 的指针
+ * @param[in] irq_mask: 要清除的一个或多个枚举 vsf_sdio_irq_mask_t 值的按位或
+ * @return vsf_sdio_irq_mask_t: 清除前的中断掩码状态（如果没有标志被设置则返回0）
+ *
+ * @note 此函数尝试清除指定的中断标志（如果它们已设置），并返回清除前这些标志的状态。
+ *       这对于轮询操作和确定是否发生了中断很有用。
+ *       注意：如果中断已启用且中断处理函数处于活动状态，中断处理函数可能会自动清除中断标志。
+ *       在这种情况下，即使发生了中断，此函数也会返回0。
+ */
+extern vsf_sdio_irq_mask_t vsf_sdio_irq_clear(vsf_sdio_t *sdio_ptr, vsf_sdio_irq_mask_t irq_mask);
+
+/**
  \~english
  @brief Get the status of sdio instance.
  @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
@@ -1052,6 +1080,17 @@ extern vsf_err_t vsf_sdio_host_request(vsf_sdio_t *sdio_ptr, vsf_sdio_req_t *req
  */
 extern vsf_err_t vsf_sdio_single_voltage(vsf_sdio_t *sdio_ptr, uint8_t bus_width);
 
+/**
+ \~english
+ @brief Stop the host transaction of sdio instance.
+ @param[in] sdio_ptr: a pointer to structure @ref vsf_sdio_t
+
+ \~chinese
+ @brief 停止 sdio 主机传输
+ @param[in] sdio_ptr: 指向结构体 @ref vsf_sdio_t 的指针
+ */
+extern void vsf_sdio_host_transact_stop(vsf_sdio_t *sdio_ptr);
+
 // TODO: add APIs for stream mode
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -1065,6 +1104,7 @@ extern vsf_err_t vsf_sdio_single_voltage(vsf_sdio_t *sdio_ptr, uint8_t bus_width
 #   define vsf_sdio_disable(__SDIO)                 VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_disable)            ((__vsf_sdio_t *)(__SDIO))
 #   define vsf_sdio_irq_enable(__SDIO, ...)         VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_irq_enable)         ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
 #   define vsf_sdio_irq_disable(__SDIO, ...)        VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_irq_disable)        ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_irq_clear(__SDIO, ...)          VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_irq_clear)           ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
 #   define vsf_sdio_status(__SDIO)                  VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_status)             ((__vsf_sdio_t *)(__SDIO))
 #   define vsf_sdio_capability(__SDIO)              VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_capability)         ((__vsf_sdio_t *)(__SDIO))
 #   define vsf_sdio_set_clock(__SDIO, ...)          VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_set_clock)          ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
