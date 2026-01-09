@@ -264,6 +264,32 @@ extern "C" {
 #    define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable standard optional features support.
+ *
+ * This macro controls the availability of standard optional features in the template.
+ * Standard optional features include:
+ * - Ports configuration functions (vsf_gpio_ports_config_pin, vsf_gpio_ports_config_pins)
+ *
+ * @note This macro is for testing purposes only. Users should NOT enable this macro.
+ *       Standard optional features should be implemented directly in hardware drivers
+ *       if the hardware supports them, rather than enabling this macro in the template.
+ *       Enabling this macro may cause compilation errors or unexpected behavior.
+ *
+ * \~chinese
+ * @brief 启用标准可选功能支持。
+ *
+ * 此宏控制模板中标准可选功能的可用性。标准可选功能包括：
+ * - 端口配置函数（vsf_gpio_ports_config_pin, vsf_gpio_ports_config_pins）
+ *
+ * @note 此宏仅用于测试目的。用户不应启用此宏。
+ *       如果硬件支持标准可选功能，应在硬件驱动中直接实现，而不是在模板中启用此宏。
+ *       启用此宏可能导致编译错误或意外行为。
+ */
+#ifndef __VSF_GPIO_CFG_SUPPORT_STANDARD_OPTIONAL
+#   define __VSF_GPIO_CFG_SUPPORT_STANDARD_OPTIONAL DISABLED
+#endif
 
 #ifndef VSF_GPIO_CFG_INHERIT_HAL_CAPABILITY
 #   define VSF_GPIO_CFG_INHERIT_HAL_CAPABILITY       ENABLED
@@ -295,7 +321,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_config,         VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)                              \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_get_configuration, VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_exti_irq_cfg_t *irq_cfg_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_enable,         VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_disable,        VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             gpio, exti_irq_disable,        VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                                      \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_gpio_pin_mask_t,   gpio, exti_irq_clear,           VSF_MCONNECT(__prefix_name, _t) *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
 
 /*============================ TYPES =========================================*/
 
@@ -987,26 +1014,47 @@ extern vsf_err_t vsf_gpio_get_pin_configuration(vsf_gpio_t    *gpio_ptr,
 // @return vsf_err_t: 如果 GPIO 配置成功返回 VSF_ERR_NONE，失败返回负值错误码。
 // @note VSF_PREFIX 前缀可以替换成实际的前缀，例如 vsf_hw
 // */
-//extern vsf_err_t VSF_PREFIX_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
-//                                                   uint_fast8_t              count);
-//
-///**
-// \~english
-// @brief Configure one pin for one or more ports of the gpio instance
-// @param[in] cfg: a pointer to structure @ref vsf_gpio_port_cfg_pin_t
-// @param[in] count: number of struct array vsf_gpio_port_cfg_pin_t
-// @return vsf_err_t: VSF_ERR_NONE if GPIO Configuration Successful, or a negative error code
-// @note The VSF_PREFIX prefix of this can be replaced with the actual prefix, e.g. vsf_hw
-//
-// \~chinese
-// @brief 配置 gpio 的一个或者多个端口的一个引脚
-// @param[in] cfg: 结构体 vsf_gpio_port_cfg_pin_t 的指针，参考 @ref vsf_gpio_port_cfg_pin_t
-// @param[in] count: 结构体数组 vsf_gpio_port_cfg_pin_t 的数量
-// @return vsf_err_t: 如果 GPIO 配置成功返回 VSF_ERR_NONE，失败返回负值错误码。
-// @note VSF_PREFIX 前缀可以替换成实际的前缀，例如 vsf_hw
-// */
-//extern vsf_err_t VSF_PREFIX_gpio_ports_config_pin(vsf_gpio_port_cfg_pin_t *cfg_ptr,
-//                                                  uint_fast8_t              count);
+#if __VSF_GPIO_CFG_SUPPORT_STANDARD_OPTIONAL
+/**
+ \~english
+ @brief Configure one or more pins for one or more ports of the gpio instance
+ @param[in] cfg_ptr: a pointer to structure array @ref vsf_gpio_port_cfg_pins_t
+ @param[in] count: number of struct array vsf_gpio_port_cfg_pins_t
+ @return vsf_err_t: VSF_ERR_NONE if GPIO Configuration Successful, or a negative error code
+ @note This function is a standard optional feature and should NOT be enabled in the template.
+       (protected by __VSF_GPIO_CFG_SUPPORT_STANDARD_OPTIONAL, should not be enabled)
+
+ \~chinese
+ @brief 配置 gpio 的一个或者多个端口和引脚
+ @param[in] cfg_ptr: vsf_gpio_port_cfg_pins_t 结构体数组的指针，参考 @ref vsf_gpio_port_cfg_pins_t
+ @param[in] count: 结构体数组 vsf_gpio_port_cfg_pins_t 的数量
+ @return vsf_err_t: 如果 GPIO 配置成功返回 VSF_ERR_NONE，失败返回负值错误码。
+ @note 这是标准可选功能，不应在模板中启用。
+       （由 __VSF_GPIO_CFG_SUPPORT_STANDARD_OPTIONAL 宏保护，不应被开启）
+ */
+extern vsf_err_t vsf_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
+                                            uint_fast8_t              count);
+
+/**
+ \~english
+ @brief Configure one pin for one or more ports of the gpio instance
+ @param[in] cfg_ptr: a pointer to structure array @ref vsf_gpio_port_cfg_pin_t
+ @param[in] count: number of struct array vsf_gpio_port_cfg_pin_t
+ @return vsf_err_t: VSF_ERR_NONE if GPIO Configuration Successful, or a negative error code
+ @note This function is a standard optional feature and should NOT be enabled in the template.
+       (protected by __VSF_GPIO_CFG_SUPPORT_STANDARD_OPTIONAL, should not be enabled)
+
+ \~chinese
+ @brief 配置 gpio 的一个或者多个端口的一个引脚
+ @param[in] cfg_ptr: 结构体数组 vsf_gpio_port_cfg_pin_t 的指针，参考 @ref vsf_gpio_port_cfg_pin_t
+ @param[in] count: 结构体数组 vsf_gpio_port_cfg_pin_t 的数量
+ @return vsf_err_t: 如果 GPIO 配置成功返回 VSF_ERR_NONE，失败返回负值错误码。
+ @note 这是标准可选功能，不应在模板中启用。
+       （由 __VSF_GPIO_CFG_SUPPORT_STANDARD_OPTIONAL 宏保护，不应被开启）
+ */
+extern vsf_err_t vsf_gpio_ports_config_pin(vsf_gpio_port_cfg_pin_t *cfg_ptr,
+                                           uint_fast8_t              count);
+#endif
 
 
 /**
@@ -1301,6 +1349,33 @@ extern vsf_err_t vsf_gpio_exti_irq_enable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mas
  */
 extern vsf_err_t vsf_gpio_exti_irq_disable(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
 
+/**
+ * \~english
+ * @brief Clear interrupt flags of GPIO EXTI instance and return previous state
+ * @param[in] gpio_ptr: a pointer to structure @ref vsf_gpio_t
+ * @param[in] pin_mask: one or more values of enum @ref vsf_gpio_pin_mask_t to clear
+ * @return vsf_gpio_pin_mask_t: the pin mask state before clearing (0 if no flags were set)
+ *
+ * @note This function attempts to clear the specified interrupt flags if they are set,
+ *       and returns the state of those flags before clearing. This is useful for
+ *       polling operations and determining if interrupts occurred.
+ *       Note that if interrupts are enabled and an interrupt handler is active,
+ *       the interrupt handler may clear the interrupt flags automatically.
+ *       In such cases, this function will return 0 even if interrupts occurred.
+ *
+ * \~chinese
+ * @brief 清除 GPIO EXTI 实例的中断标志并返回之前的状态
+ * @param[in] gpio_ptr: 指向结构体 @ref vsf_gpio_t 的指针
+ * @param[in] pin_mask: 要清除的一个或多个枚举 vsf_gpio_pin_mask_t 值的按位或
+ * @return vsf_gpio_pin_mask_t: 清除前的引脚掩码状态（如果没有标志被设置则返回0）
+ *
+ * @note 此函数尝试清除指定的中断标志（如果它们已设置），并返回清除前这些标志的状态。
+ *       这对于轮询操作和确定是否发生了中断很有用。
+ *       注意：如果中断已启用且中断处理函数处于活动状态，中断处理函数可能会自动清除中断标志。
+ *       在这种情况下，即使发生了中断，此函数也会返回0。
+ */
+extern vsf_gpio_pin_mask_t vsf_gpio_exti_irq_clear(vsf_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask);
+
 /*============================ INLINE FUNCTIONS ==============================*/
 
 static inline uint8_t vsf_gpio_get_port(uint16_t port_pin_index)
@@ -1346,6 +1421,7 @@ static inline vsf_err_t vsf_gpio_port_config_pin(vsf_gpio_t      *gpio_ptr,
 #   define vsf_gpio_exti_irq_get_configuration(__GPIO, ...) VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_get_configuration) ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_exti_irq_enable(__GPIO, ...)        VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_enable)        ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #   define vsf_gpio_exti_irq_disable(__GPIO, ...)       VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_disable)       ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
+#   define vsf_gpio_exti_irq_clear(__GPIO, ...)         VSF_MCONNECT(VSF_GPIO_CFG_PREFIX, _gpio_exti_irq_clear)         ((__vsf_gpio_t *)(__GPIO), ##__VA_ARGS__)
 #endif
 /// @endcond
 

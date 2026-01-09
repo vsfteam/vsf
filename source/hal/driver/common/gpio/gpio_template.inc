@@ -111,6 +111,10 @@
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION  DISABLED
 #endif
 
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_CLEAR
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_CLEAR             DISABLED
+#endif
+
 #ifdef VSF_GPIO_CFG_IMP_REMAP_PREFIX
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_SET_INPUT
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_SET_OUTPUT
@@ -123,6 +127,7 @@
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION
+#   undef VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_CLEAR
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_SET_INPUT               ENABLED
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_SET_OUTPUT              ENABLED
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_SWITCH_DIRECTION        ENABLED
@@ -134,6 +139,7 @@
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER    ENABLED
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY              ENABLED
 #   define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_CLEAR          ENABLED
 #endif
 
 #if VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -171,6 +177,7 @@
 #define vsf_real_gpio_output_and_clear  VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_output_and_clear)
 #define vsf_real_gpio_capability        VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_capability)
 #define vsf_real_gpio_exti_irq_get_configuration VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_exti_irq_get_configuration)
+#define vsf_real_gpio_exti_irq_clear     VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_exti_irq_clear)
 #define vsf_real_gpio_port_config_pin   VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_port_config_pin)
 #define vsf_real_gpio_ports_config_pin  VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_ports_config_pin)
 #define vsf_real_gpio_ports_config_pins VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_ports_config_pins)
@@ -328,6 +335,18 @@ vsf_err_t vsf_real_gpio_exti_irq_get_configuration(vsf_real_gpio_t *gpio_ptr, vs
 }
 #endif
 
+#if VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_CLEAR == DISABLED
+vsf_gpio_pin_mask_t vsf_real_gpio_exti_irq_clear(vsf_real_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)
+{
+    VSF_HAL_ASSERT(NULL != gpio_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return 0;
+}
+#endif
+
 #if VSF_GPIO_CFG_REIMPLEMENT_API_PORTS_CONFIG_PIN == DISABLED
 vsf_err_t vsf_real_gpio_ports_config_pin(vsf_gpio_port_cfg_pin_t *cfg_ptr,
                                          uint_fast8_t             count)
@@ -381,6 +400,10 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 
 /*============================ MACROS ========================================*/
 
+#undef VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY
+#undef VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG
+#undef VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE
+#undef VSF_GPIO_CFG_RETAIN_DEFINED_PREFIX
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_SET_INPUT
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_SET_OUTPUT
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_SWITCH_DIRECTION
@@ -392,6 +415,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION
+#undef VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_CLEAR
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_PORTS_CONFIG_PIN
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_PORTS_CONFIG_PINS
 #undef VSF_GPIO_CFG_CHANGE_DIR_FIRST
@@ -399,10 +423,14 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_SET
 #undef VSF_GPIO_CFG_CAPABILITY_SUPPORT_OUTPUT_AND_CLEAR
 #undef VSF_GPIO_CFG_CAPABILITY_SUPPORT_INTERRUPT
+#undef VSF_GPIO_CFG_CAPABILITY_CAN_READ_IN_GPIO_OUTPUT_MODE
+#undef VSF_GPIO_CFG_CAPABILITY_CAN_READ_IN_ALTERNATE_MODE
 #undef VSF_GPIO_CFG_CAPABILITY_IS_ASYNC
 #undef VSF_GPIO_CFG_CAPABILITY_PIN_COUNT
 #undef VSF_GPIO_CFG_CAPABILITY_PIN_MASK
+#undef vsf_real_gpios
 #undef vsf_real_gpio_t
+#undef vsf_real_gpio_port_config_pins
 #undef vsf_real_gpio_get_pin_configuration
 #undef vsf_real_gpio_read
 #undef vsf_real_gpio_read_output_register
@@ -418,6 +446,10 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef vsf_real_gpio_output_and_clear
 #undef vsf_real_gpio_capability
 #undef vsf_real_gpio_exti_irq_get_configuration
+#undef vsf_real_gpio_exti_irq_clear
+#undef vsf_real_gpio_port_config_pin
+#undef vsf_real_gpio_ports_config_pin
+#undef vsf_real_gpio_ports_config_pins
 
 /*============================ MACROS ========================================*/
 
@@ -445,6 +477,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #   define vsf_origin_gpio_toggle               VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_toggle)
 #   define vsf_origin_gpio_exti_irq_enable      VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_exti_irq_enable)
 #   define vsf_origin_gpio_exti_irq_disable     VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_exti_irq_disable)
+#   define vsf_origin_gpio_exti_irq_clear      VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_exti_irq_clear)
 #   define vsf_origin_gpio_exti_irq_config      VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_exti_irq_config)
 
 #   define vsf_remap_gpio_t                     VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_t)
@@ -466,6 +499,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #   define vsf_remap_gpio_toggle                VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_toggle)
 #   define vsf_remap_gpio_exti_irq_enable       VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_exti_irq_enable)
 #   define vsf_remap_gpio_exti_irq_disable      VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_exti_irq_disable)
+#   define vsf_remap_gpio_exti_irq_clear        VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_exti_irq_clear)
 #   define vsf_remap_gpio_exti_irq_config       VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_exti_irq_config)
 
 #   define VSF_GPIO_CFG_IMP_REMAP_FUNCTIONS                                                                                                 \
@@ -562,6 +596,11 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
             VSF_HAL_ASSERT(gpio_ptr != NULL);                                                                                               \
             return vsf_remap_gpio_exti_irq_disable(gpio_ptr, pin_mask);                                                                     \
         }                                                                                                                                   \
+        vsf_gpio_pin_mask_t vsf_origin_gpio_exti_irq_clear(vsf_origin_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask)                        \
+        {                                                                                                                                   \
+            VSF_HAL_ASSERT(gpio_ptr != NULL);                                                                                               \
+            return vsf_remap_gpio_exti_irq_clear(gpio_ptr, pin_mask);                                                                       \
+        }                                                                                                                                   \
         vsf_err_t vsf_origin_gpio_exti_irq_config(vsf_origin_gpio_t *gpio_ptr, vsf_gpio_exti_irq_cfg_t *cfg)                                \
         {                                                                                                                                   \
             VSF_HAL_ASSERT(gpio_ptr != NULL);                                                                                               \
@@ -642,6 +681,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef vsf_origin_gpio_exti_irq_config
 #undef vsf_origin_gpio_exti_irq_enable
 #undef vsf_origin_gpio_exti_irq_disable
+#undef vsf_origin_gpio_exti_irq_clear
 
 #undef vsf_remap_gpio_t
 #undef vsf_remap_gpio_capability
@@ -663,5 +703,114 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef vsf_remap_gpio_exti_irq_config
 #undef vsf_remap_gpio_exti_irq_enable
 #undef vsf_remap_gpio_exti_irq_disable
+#undef vsf_remap_gpio_exti_irq_clear
+
+#undef VSF_HAL_TEMPLATE_IMP_NAME
+#undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
+
+/*============================ STATIC ASSERTIONS ==============================*/
+
+/* User-extensible macros for custom mode and IRQ mask values
+ * Users can define these macros before including this template to append
+ * their custom enum values to the uniqueness checks.
+ *
+ * Check modes for custom values:
+ *   VSF_GPIO_CFG_MODE_CHECK_UNIQUE - Check mode for custom mode values
+ *     Default: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *   VSF_GPIO_CFG_IRQ_MASK_CHECK_UNIQUE - Check mode for custom IRQ mask values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *
+ * Example usage in vendor driver:
+ *   #define VSF_GPIO_CUSTOM_MODE_VALUES           MY_CUSTOM_MODE1, MY_CUSTOM_MODE2
+ *   #define VSF_GPIO_CFG_MODE_CHECK_UNIQUE        VSF_HAL_CHECK_MODE_LOOSE
+ *   #define VSF_GPIO_CUSTOM_IRQ_MASK_VALUES       MY_CUSTOM_IRQ1, MY_CUSTOM_IRQ2
+ *   #define VSF_GPIO_CFG_IRQ_MASK_CHECK_UNIQUE    VSF_HAL_CHECK_MODE_STRICT
+ *   #include "hal/driver/common/gpio/gpio_template.inc"
+ */
+
+
+#ifdef VSF_GPIO_CFG_MODE_CHECK_UNIQUE
+/* Default mode lists - can be redefined by users before including this file */
+#ifndef VSF_GPIO_CHECK_UNIQUE_DIRECTION_MODES
+#   define VSF_GPIO_CHECK_UNIQUE_DIRECTION_MODES \
+        VSF_GPIO_INPUT, \
+        VSF_GPIO_ANALOG, \
+        VSF_GPIO_OUTPUT_PUSH_PULL, \
+        VSF_GPIO_OUTPUT_OPEN_DRAIN, \
+        VSF_GPIO_EXTI
+#endif
+
+#ifndef VSF_GPIO_CHECK_UNIQUE_PULL_MODES
+#   define VSF_GPIO_CHECK_UNIQUE_PULL_MODES \
+        VSF_GPIO_NO_PULL_UP_DOWN, \
+        VSF_GPIO_PULL_UP, \
+        VSF_GPIO_PULL_DOWN
+#endif
+
+/* ==================== GROUP INTERNAL UNIQUENESS CHECKS ==================== */
+/* Check uniqueness within each functional group */
+
+/* Check direction mode uniqueness - all direction modes should have different values
+ * Mandatory: VSF_GPIO_INPUT, VSF_GPIO_ANALOG, VSF_GPIO_OUTPUT_PUSH_PULL,
+ *            VSF_GPIO_OUTPUT_OPEN_DRAIN, VSF_GPIO_EXTI
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_GPIO_CFG_MODE_CHECK_UNIQUE,
+    VSF_GPIO_INPUT,
+    VSF_GPIO_ANALOG,
+    VSF_GPIO_OUTPUT_PUSH_PULL,
+    VSF_GPIO_OUTPUT_OPEN_DRAIN,
+    VSF_GPIO_EXTI
+);
+
+/* Check pull mode uniqueness - all pull modes should have different values
+ * Mandatory: VSF_GPIO_NO_PULL_UP_DOWN, VSF_GPIO_PULL_UP, VSF_GPIO_PULL_DOWN
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_GPIO_CFG_MODE_CHECK_UNIQUE,
+    VSF_GPIO_NO_PULL_UP_DOWN,
+    VSF_GPIO_PULL_UP,
+    VSF_GPIO_PULL_DOWN
+);
+
+#ifdef VSF_GPIO_CUSTOM_MODE_VALUES
+/* Check uniqueness among custom mode values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_GPIO_CFG_MODE_CHECK_UNIQUE, VSF_GPIO_CUSTOM_MODE_VALUES);
+#endif
+
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_GPIO_CFG_MODE_CHECK_UNIQUE,
+    /* Mandatory modes - always included */
+    VSF_GPIO_INPUT, VSF_GPIO_ANALOG, VSF_GPIO_OUTPUT_PUSH_PULL,
+    VSF_GPIO_OUTPUT_OPEN_DRAIN, VSF_GPIO_EXTI,
+    VSF_GPIO_NO_PULL_UP_DOWN, VSF_GPIO_PULL_UP, VSF_GPIO_PULL_DOWN
+    /* User-defined modes - appended by user configuration */
+#ifdef VSF_GPIO_CUSTOM_MODE_VALUES
+    , VSF_GPIO_CUSTOM_MODE_VALUES
+#endif
+);
+
+#undef VSF_GPIO_CHECK_UNIQUE_DIRECTION_MODES
+#undef VSF_GPIO_CHECK_UNIQUE_PULL_MODES
+#endif  /* VSF_GPIO_CFG_MODE_CHECK_UNIQUE */
+
+/* ==================== IRQ MASK UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_GPIO_CFG_IRQ_MASK_CHECK_UNIQUE
+
+#ifdef VSF_GPIO_CUSTOM_IRQ_MASK_VALUES
+/* Check uniqueness among custom IRQ mask values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_GPIO_CFG_IRQ_MASK_CHECK_UNIQUE, VSF_GPIO_CUSTOM_IRQ_MASK_VALUES);
+#endif
+
+/* Note: GPIO typically doesn't have a standard IRQ mask enum, but custom IRQ masks can be added */
+#endif  /* VSF_GPIO_CFG_IRQ_MASK_CHECK_UNIQUE */
+
+#undef VSF_GPIO_CFG_MODE_CHECK_UNIQUE
+#undef VSF_GPIO_CFG_IRQ_MASK_CHECK_UNIQUE
+#undef VSF_GPIO_CUSTOM_MODE_VALUES
+#undef VSF_GPIO_CUSTOM_IRQ_MASK_VALUES
 
 #endif  /* VSF_HAL_USE_GPIO */
