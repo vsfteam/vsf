@@ -28,6 +28,10 @@
 #   define  VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY                DISABLED
 #endif
 
+#ifndef VSF_TIMER_CFG_REIMPLEMENT_API_IRQ_CLEAR
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_IRQ_CLEAR                DISABLED
+#endif
+
 #ifndef VSF_TIMER_CFG_REIMPLEMENT_API_CTRL
 #   define  VSF_TIMER_CFG_REIMPLEMENT_API_CTRL                      DISABLED
 #endif
@@ -35,6 +39,7 @@
 #ifndef VSF_TIMER_CFG_REIMPLEMENT_API_STATUS
 #   define  VSF_TIMER_CFG_REIMPLEMENT_API_STATUS                    DISABLED
 #endif
+
 
 #ifndef VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL
 #   define  VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL                   DISABLED
@@ -110,6 +115,7 @@
 #define vsf_real_timer_t                        VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t)
 #define vsf_real_timer_capability               VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_capability)
 #define vsf_real_timer_get_configuration      VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_get_configuration)
+#define vsf_real_timer_irq_clear                 VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_irq_clear)
 #define vsf_real_timer_ctrl                     VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_ctrl)
 #define vsf_real_timer_status                   VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_status)
 #define vsf_real_timer_channel_config           VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_config)
@@ -225,8 +231,29 @@ vsf_err_t vsf_real_timer_get_configuration(vsf_real_timer_t *timer_ptr, vsf_time
 }
 #endif
 
+#if VSF_TIMER_CFG_REIMPLEMENT_API_IRQ_CLEAR == DISABLED
+vsf_timer_irq_mask_t vsf_real_timer_irq_clear(vsf_real_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(NULL != timer_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return 0;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
+#undef VSF_TIMER_CFG_REIMPLEMENT_TYPE_CAPABILITY
+#undef VSF_TIMER_CFG_REIMPLEMENT_TYPE_CFG
+#undef VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG
+#undef VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_CTRL
+#undef VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE
+#undef VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_REQUEST
+#undef VSF_TIMER_CFG_REIMPLEMENT_TYPE_CTRL
+#undef VSF_TIMER_CFG_REIMPLEMENT_TYPE_IRQ_MASK
+#undef VSF_TIMER_CFG_REIMPLEMENT_TYPE_STATUS
 #undef VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_TIMER_CFG_CAPABILITY_IRQ_MASK
@@ -236,7 +263,9 @@ vsf_err_t vsf_real_timer_get_configuration(vsf_real_timer_t *timer_ptr, vsf_time
 #undef vsf_real_timer_t
 #undef vsf_real_timer_capability
 #undef vsf_real_timer_get_configuration
+#undef vsf_real_timer_irq_clear
 #undef vsf_real_timer_ctrl
+#undef vsf_real_timer_status
 #undef vsf_real_timer_channel_config
 #undef vsf_real_timer_channel_start
 #undef vsf_real_timer_channel_stop
@@ -256,6 +285,7 @@ vsf_err_t vsf_real_timer_get_configuration(vsf_real_timer_t *timer_ptr, vsf_time
 #   define vsf_imp_timer_capability         VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_capability)
 #   define vsf_imp_timer_irq_enable         VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_irq_enable)
 #   define vsf_imp_timer_irq_disable        VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_irq_disable)
+#   define vsf_imp_timer_irq_clear          VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_irq_clear)
 #   define vsf_imp_timer_channel_config     VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_config)
 #   define vsf_imp_timer_channel_start      VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_start)
 #   define vsf_imp_timer_channel_stop       VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_stop)
@@ -271,6 +301,7 @@ vsf_err_t vsf_real_timer_get_configuration(vsf_real_timer_t *timer_ptr, vsf_time
 #   define vsf_remap_timer_capability       VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_capability)
 #   define vsf_remap_timer_irq_enable       VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_irq_enable)
 #   define vsf_remap_timer_irq_disable      VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_irq_disable)
+#   define vsf_remap_timer_irq_clear        VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_irq_clear)
 #   define vsf_remap_timer_channel_config   VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_channel_config)
 #   define vsf_remap_timer_channel_start    VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_channel_start)
 #   define vsf_remap_timer_channel_stop     VSF_MCONNECT(VSF_TIMER_CFG_IMP_REMAP_PREFIX, _timer_channel_stop)
@@ -308,6 +339,11 @@ vsf_err_t vsf_real_timer_get_configuration(vsf_real_timer_t *timer_ptr, vsf_time
         {                                                                                                             \
             VSF_HAL_ASSERT(timer_ptr != NULL);                                                                        \
             vsf_remap_timer_irq_disable(timer_ptr, irq_mask);                                                         \
+        }                                                                                                             \
+        vsf_timer_irq_mask_t vsf_imp_timer_irq_clear(vsf_imp_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask)        \
+        {                                                                                                             \
+            VSF_HAL_ASSERT(timer_ptr != NULL);                                                                        \
+            return vsf_remap_timer_irq_clear(timer_ptr, irq_mask);                                                     \
         }                                                                                                             \
         vsf_timer_capability_t vsf_imp_timer_capability(vsf_imp_timer_t *timer_ptr)                                   \
         {                                                                                                             \
@@ -416,5 +452,223 @@ vsf_err_t vsf_real_timer_get_configuration(vsf_real_timer_t *timer_ptr, vsf_time
 #undef vsf_remap_timer_channel_ctrl
 #undef vsf_remap_timer_ctrl
 #undef vsf_remap_timer_get_configuration
+
+#undef VSF_HAL_TEMPLATE_IMP_NAME
+#undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
+
+/*============================ STATIC ASSERTIONS ==============================*/
+
+/* User-extensible macros for custom mode and IRQ mask values
+ * Users can define these macros before including this template to append
+ * their custom enum values to the uniqueness checks.
+ *
+ * Check modes for custom values:
+ *   VSF_TIMER_CFG_MODE_CHECK_UNIQUE - Check mode for custom mode values
+ *     Default: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *   VSF_TIMER_CFG_IRQ_MASK_CHECK_UNIQUE - Check mode for custom IRQ mask values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *
+ * Example usage in vendor driver:
+ *   #define VSF_TIMER_CUSTOM_MODE_VALUES           MY_CUSTOM_MODE1, MY_CUSTOM_MODE2
+ *   #define VSF_TIMER_CFG_MODE_CHECK_UNIQUE        VSF_HAL_CHECK_MODE_LOOSE
+ *   #define VSF_TIMER_CUSTOM_IRQ_MASK_VALUES       MY_CUSTOM_IRQ1, MY_CUSTOM_IRQ2
+ *   #define VSF_TIMER_CFG_IRQ_MASK_CHECK_UNIQUE    VSF_HAL_CHECK_MODE_STRICT
+ *   #include "hal/driver/common/timer/timer_template.inc"
+ */
+
+
+#ifdef VSF_TIMER_CFG_MODE_CHECK_UNIQUE
+/* Default mode lists - can be redefined by users before including this file */
+#ifndef VSF_TIMER_CHECK_UNIQUE_CHANNEL_MODE_MODES
+#   define VSF_TIMER_CHECK_UNIQUE_CHANNEL_MODE_MODES \
+        VSF_TIMER_CHANNEL_MODE_BASE
+#endif
+
+#ifndef VSF_TIMER_CHECK_UNIQUE_BASE_COUNTER_MODES
+#   define VSF_TIMER_CHECK_UNIQUE_BASE_COUNTER_MODES \
+        VSF_TIMER_BASE_ONESHOT, \
+        VSF_TIMER_BASE_CONTINUES
+#endif
+
+/* ==================== GROUP INTERNAL UNIQUENESS CHECKS ==================== */
+/* Check uniqueness within each functional group */
+
+/* Check channel mode uniqueness - all channel modes should have different values
+ * Mandatory: VSF_TIMER_CHANNEL_MODE_BASE
+ * Standard Optional: VSF_TIMER_CHANNEL_MODE_PWM, VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE,
+ *                    VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE, VSF_TIMER_CHANNEL_MODE_ENCODER,
+ *                    VSF_TIMER_CHANNEL_MODE_ONE_PULSE, VSF_TIMER_CHANNEL_MODE_HALL_SENSOR
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_TIMER_CFG_MODE_CHECK_UNIQUE,
+    VSF_TIMER_CHANNEL_MODE_BASE
+#if __VSF_TIMER_CFG_SUPPORT_STANDARD_OPTIONAL
+#ifdef VSF_TIMER_CHANNEL_MODE_PWM
+    , VSF_TIMER_CHANNEL_MODE_PWM
+#endif
+#ifdef VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE
+    , VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE
+#endif
+#ifdef VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE
+    , VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE
+#endif
+#ifdef VSF_TIMER_CHANNEL_MODE_ENCODER
+    , VSF_TIMER_CHANNEL_MODE_ENCODER
+#endif
+#ifdef VSF_TIMER_CHANNEL_MODE_ONE_PULSE
+    , VSF_TIMER_CHANNEL_MODE_ONE_PULSE
+#endif
+#ifdef VSF_TIMER_CHANNEL_MODE_HALL_SENSOR
+    , VSF_TIMER_CHANNEL_MODE_HALL_SENSOR
+#endif
+#endif
+);
+
+/* Check base counter mode uniqueness - all base counter modes should have different values
+ * Mandatory: VSF_TIMER_BASE_ONESHOT, VSF_TIMER_BASE_CONTINUES
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_TIMER_CFG_MODE_CHECK_UNIQUE,
+    VSF_TIMER_BASE_ONESHOT,
+    VSF_TIMER_BASE_CONTINUES
+);
+
+#ifdef VSF_TIMER_CUSTOM_MODE_VALUES
+/* Check uniqueness among custom mode values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_TIMER_CFG_MODE_CHECK_UNIQUE, VSF_TIMER_CUSTOM_MODE_VALUES);
+#endif
+
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_TIMER_CFG_MODE_CHECK_UNIQUE,
+    /* Mandatory modes - always included */
+    VSF_TIMER_CHANNEL_MODE_BASE,
+    VSF_TIMER_BASE_ONESHOT, VSF_TIMER_BASE_CONTINUES
+    /* Standard Optional modes - only included when __VSF_TIMER_CFG_SUPPORT_STANDARD_OPTIONAL is enabled */
+#if __VSF_TIMER_CFG_SUPPORT_STANDARD_OPTIONAL
+#ifdef VSF_TIMER_CHANNEL_MODE_PWM
+    , VSF_TIMER_CHANNEL_MODE_PWM
+#endif
+#ifdef VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE
+    , VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE
+#endif
+#ifdef VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE
+    , VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE
+#endif
+#ifdef VSF_TIMER_CHANNEL_MODE_ENCODER
+    , VSF_TIMER_CHANNEL_MODE_ENCODER
+#endif
+#ifdef VSF_TIMER_CHANNEL_MODE_ONE_PULSE
+    , VSF_TIMER_CHANNEL_MODE_ONE_PULSE
+#endif
+#ifdef VSF_TIMER_CHANNEL_MODE_HALL_SENSOR
+    , VSF_TIMER_CHANNEL_MODE_HALL_SENSOR
+#endif
+#ifdef VSF_TIMER_BASE_COUNTER_UP
+    , VSF_TIMER_BASE_COUNTER_UP
+#endif
+#ifdef VSF_TIMER_BASE_COUNTER_DOWN
+    , VSF_TIMER_BASE_COUNTER_DOWN
+#endif
+#ifdef VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED1
+    , VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED1
+#endif
+#ifdef VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED2
+    , VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED2
+#endif
+#ifdef VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED3
+    , VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED3
+#endif
+#endif
+    /* User-defined modes - appended by user configuration */
+#ifdef VSF_TIMER_CUSTOM_MODE_VALUES
+    , VSF_TIMER_CUSTOM_MODE_VALUES
+#endif
+);
+
+#undef VSF_TIMER_CHECK_UNIQUE_CHANNEL_MODE_MODES
+#undef VSF_TIMER_CHECK_UNIQUE_BASE_COUNTER_MODES
+#endif  /* VSF_TIMER_CFG_MODE_CHECK_UNIQUE */
+
+/* ==================== IRQ MASK UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_TIMER_CFG_IRQ_MASK_CHECK_UNIQUE
+
+#ifdef VSF_TIMER_CUSTOM_IRQ_MASK_VALUES
+/* Check uniqueness among custom IRQ mask values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_TIMER_CFG_IRQ_MASK_CHECK_UNIQUE, VSF_TIMER_CUSTOM_IRQ_MASK_VALUES);
+#endif
+
+/* Check uniqueness within vsf_timer_irq_mask_t enum */
+
+/* Check IRQ mask uniqueness - all IRQ mask bits should have different values
+ * Mandatory: VSF_TIMER_IRQ_MASK_OVERFLOW
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_TIMER_CFG_IRQ_MASK_CHECK_UNIQUE,
+    /* Mandatory IRQ masks - always included */
+    VSF_TIMER_IRQ_MASK_OVERFLOW
+    /* User-defined IRQ masks - appended by user configuration */
+#ifdef VSF_TIMER_CUSTOM_IRQ_MASK_VALUES
+    , VSF_TIMER_CUSTOM_IRQ_MASK_VALUES
+#endif
+);
+#endif  /* VSF_TIMER_CFG_IRQ_MASK_CHECK_UNIQUE */
+
+/* ==================== CTRL UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_TIMER_CFG_CTRL_CHECK_UNIQUE
+
+#ifdef VSF_TIMER_CUSTOM_CTRL_VALUES
+/* Check uniqueness among custom ctrl values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_TIMER_CFG_CTRL_CHECK_UNIQUE, VSF_TIMER_CUSTOM_CTRL_VALUES);
+#endif
+
+/* Check ctrl uniqueness - all ctrl values should have different values
+ * Placeholder: __VSF_TIMER_CTRL_DUMMY
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_TIMER_CFG_CTRL_CHECK_UNIQUE,
+    /* Placeholder ctrl - always included */
+    __VSF_TIMER_CTRL_DUMMY
+    /* User-defined ctrls - appended by user configuration */
+#ifdef VSF_TIMER_CUSTOM_CTRL_VALUES
+    , VSF_TIMER_CUSTOM_CTRL_VALUES
+#endif
+);
+#endif  /* VSF_TIMER_CFG_CTRL_CHECK_UNIQUE */
+
+/* ==================== CHANNEL CTRL UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_TIMER_CFG_CHANNEL_CTRL_CHECK_UNIQUE
+
+#ifdef VSF_TIMER_CUSTOM_CHANNEL_CTRL_VALUES
+/* Check uniqueness among custom channel ctrl values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_TIMER_CFG_CHANNEL_CTRL_CHECK_UNIQUE, VSF_TIMER_CUSTOM_CHANNEL_CTRL_VALUES);
+#endif
+
+/* Check channel ctrl uniqueness - all channel ctrl values should have different values
+ * Placeholder: __VSF_TIMER_CHANNEL_CTRL_DUMMY
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_TIMER_CFG_CHANNEL_CTRL_CHECK_UNIQUE,
+    /* Placeholder channel ctrl - always included */
+    __VSF_TIMER_CHANNEL_CTRL_DUMMY
+    /* User-defined channel ctrls - appended by user configuration */
+#ifdef VSF_TIMER_CUSTOM_CHANNEL_CTRL_VALUES
+    , VSF_TIMER_CUSTOM_CHANNEL_CTRL_VALUES
+#endif
+);
+#endif  /* VSF_TIMER_CFG_CHANNEL_CTRL_CHECK_UNIQUE */
+
+#undef VSF_TIMER_CFG_MODE_CHECK_UNIQUE
+#undef VSF_TIMER_CFG_IRQ_MASK_CHECK_UNIQUE
+#undef VSF_TIMER_CFG_CTRL_CHECK_UNIQUE
+#undef VSF_TIMER_CFG_CHANNEL_CTRL_CHECK_UNIQUE
+#undef VSF_TIMER_CUSTOM_MODE_VALUES
+#undef VSF_TIMER_CUSTOM_IRQ_MASK_VALUES
+#undef VSF_TIMER_CUSTOM_CTRL_VALUES
+#undef VSF_TIMER_CUSTOM_CHANNEL_CTRL_VALUES
 
 #endif  /* VSF_HAL_USE_TIEMR */

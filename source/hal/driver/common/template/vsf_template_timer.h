@@ -205,6 +205,43 @@ extern "C" {
 #   define VSF_TIMER_CFG_INHERIT_HAL_CAPABILITY          ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable standard optional features support.
+ *
+ * This macro controls the availability of standard optional features in the template.
+ * Standard optional features include:
+ * - Additional channel modes (VSF_TIMER_CHANNEL_MODE_PWM, VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE, etc.)
+ * - Counter direction modes (VSF_TIMER_BASE_COUNTER_UP, VSF_TIMER_BASE_COUNTER_DOWN, etc.)
+ * - Clock division modes (VSF_TIEMR_BASE_CLOCKDIVISION_DIV_*)
+ * - Output compare modes and polarities
+ * - PWM output polarities
+ * - Input capture polarities and filters
+ *
+ * @note This macro is for testing purposes only. Users should NOT enable this macro.
+ *       Standard optional features should be implemented directly in hardware drivers
+ *       if the hardware supports them, rather than enabling this macro in the template.
+ *       Enabling this macro may cause compilation errors or unexpected behavior.
+ *
+ * \~chinese
+ * @brief 启用标准可选功能支持。
+ *
+ * 此宏控制模板中标准可选功能的可用性。标准可选功能包括：
+ * - 额外的通道模式（VSF_TIMER_CHANNEL_MODE_PWM, VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE 等）
+ * - 计数器方向模式（VSF_TIMER_BASE_COUNTER_UP, VSF_TIMER_BASE_COUNTER_DOWN 等）
+ * - 时钟分频模式（VSF_TIEMR_BASE_CLOCKDIVISION_DIV_*）
+ * - 输出比较模式和极性
+ * - PWM 输出极性
+ * - 输入捕获极性和滤波器
+ *
+ * @note 此宏仅用于测试目的。用户不应启用此宏。
+ *       如果硬件支持标准可选功能，应在硬件驱动中直接实现，而不是在模板中启用此宏。
+ *       启用此宏可能导致编译错误或意外行为。
+ */
+#ifndef __VSF_TIMER_CFG_SUPPORT_STANDARD_OPTIONAL
+#   define __VSF_TIMER_CFG_SUPPORT_STANDARD_OPTIONAL DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /**
@@ -221,6 +258,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,               timer, disable,               VSF_MCONNECT(__prefix_name, _t) *timer_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_enable,            VSF_MCONNECT(__prefix_name, _t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   timer, irq_disable,           VSF_MCONNECT(__prefix_name, _t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_timer_irq_mask_t,  timer, irq_clear,             VSF_MCONNECT(__prefix_name, _t) *timer_ptr, vsf_timer_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_timer_status_t,     timer, status,                VSF_MCONNECT(__prefix_name, _t) *timer_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_timer_capability_t, timer, capability,            VSF_MCONNECT(__prefix_name, _t) *timer_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              timer, set_period,            VSF_MCONNECT(__prefix_name, _t) *timer_ptr, uint32_t period) \
@@ -235,12 +273,47 @@ extern "C" {
 /*============================ TYPES =========================================*/
 
 #if VSF_TIMER_CFG_REIMPLEMENT_TYPE_CHANNEL_MODE == DISABLED
+/**
+ * \~english
+ * @brief Predefined VSF Timer channel modes that can be reimplemented in specific HAL drivers.
+ *
+ * Feature Classification:
+ * - Mandatory: VSF_TIMER_CHANNEL_MODE_BASE, VSF_TIMER_BASE_ONESHOT, VSF_TIMER_BASE_CONTINUES
+ * - Standard Optional: VSF_TIMER_CHANNEL_MODE_PWM, VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE,
+ *                      VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE, VSF_TIMER_CHANNEL_MODE_ENCODER,
+ *                      VSF_TIMER_CHANNEL_MODE_ONE_PULSE, VSF_TIMER_CHANNEL_MODE_HALL_SENSOR,
+ *                      VSF_TIMER_BASE_COUNTER_*, VSF_TIEMR_BASE_CLOCKDIVISION_DIV_*,
+ *                      VSF_TIMER_OUTPUT_COMPARE_*, VSF_TIMER_PWM_OUTPUT_POLARITY_*,
+ *                      VSF_TIMER_INPUT_CAPTURE_*, VSF_TIMER_ENCODER_*
+ *                      (protected by __VSF_TIMER_CFG_SUPPORT_STANDARD_OPTIONAL, should not be enabled)
+ *
+ * \~chinese
+ * @brief 预定义的 VSF Timer 通道模式，可以在特定的 HAL 驱动中重新实现。
+ *
+ * 功能分类：
+ * - 必选：VSF_TIMER_CHANNEL_MODE_BASE, VSF_TIMER_BASE_ONESHOT, VSF_TIMER_BASE_CONTINUES
+ * - 标准可选：VSF_TIMER_CHANNEL_MODE_PWM, VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE,
+ *            VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE, VSF_TIMER_CHANNEL_MODE_ENCODER,
+ *            VSF_TIMER_CHANNEL_MODE_ONE_PULSE, VSF_TIMER_CHANNEL_MODE_HALL_SENSOR,
+ *            VSF_TIMER_BASE_COUNTER_*, VSF_TIEMR_BASE_CLOCKDIVISION_DIV_*,
+ *            VSF_TIMER_OUTPUT_COMPARE_*, VSF_TIMER_PWM_OUTPUT_POLARITY_*,
+ *            VSF_TIMER_INPUT_CAPTURE_*, VSF_TIMER_ENCODER_*
+ *            （由 __VSF_TIMER_CFG_SUPPORT_STANDARD_OPTIONAL 宏保护，不应被开启）
+ */
 typedef enum vsf_timer_channel_mode_t {
     // channel mode : different timer channel may support different mode
     // Base Mode : The timer channel will be used as a base timer
     VSF_TIMER_CHANNEL_MODE_BASE             = (0x00 << 0),
 
-    /*
+    /**
+     * \~english
+     * @brief Standard optional channel modes
+     * Note: These are standard optional features. This macro should NOT be enabled in template.
+     * \~chinese
+     * @brief 标准可选通道模式
+     * 注意：这些是标准可选功能。此宏不应在模板中开启。
+     */
+#if __VSF_TIMER_CFG_SUPPORT_STANDARD_OPTIONAL
     // \~english Some timer may support more mode like PWM, Output Compare etc.
     // \~chinese 有些定时器可能支持更多的模式，如 PWM、输出比较等。
 
@@ -248,7 +321,7 @@ typedef enum vsf_timer_channel_mode_t {
     // PWM output, all channels's period should be the same
     // \~chinese PWM（脉宽调制）模式：定时器通道将用作 PWM 输出，所有通道的周期应该相同
     VSF_TIMER_CHANNEL_MODE_PWM              = (0x01 << 0),
-    #define VSF_TIMER_CHANNEL_MODE_PWM  VSF_TIMER_CHANNEL_MODE_PWM
+#   define VSF_TIMER_CHANNEL_MODE_PWM  VSF_TIMER_CHANNEL_MODE_PWM
 
     // \~english Output Compare Mode: The timer channel will be used as a output compare,
     //           different channels can have different period (change pin level in interrupt)
@@ -257,28 +330,28 @@ typedef enum vsf_timer_channel_mode_t {
     // \~chinese 输出比较模式：定时器通道将用作输出比较，不同通道可以有不同的周期（在中断中改变引脚电平）。
     //           PWM 模式可以看作是输出比较模式的一种特殊情况，即所有通道的周期相同。
     VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE   = (0x02 << 0),
-    #define VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE  VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE
+#   define VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE  VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE
 
     // \~english Input Capture Mode : The timer channel will be used as a input capture
     // \~chinese 输入捕获模式：定时器通道将用作输入捕获
     VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE    = (0x03 << 0),
-    #define VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE  VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE
+#   define VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE  VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE
 
     // \~english Encoder Mode : The timer channel will be used as a encoder
     // \~chinese 编码器模式：定时器通道将用作编码器
     VSF_TIMER_CHANNEL_MODE_ENCODER          = (0x04 << 0),
-    #define VSF_TIMER_CHANNEL_MODE_ENCODER  VSF_TIMER_CHANNEL_MODE_ENCODER
+#   define VSF_TIMER_CHANNEL_MODE_ENCODER  VSF_TIMER_CHANNEL_MODE_ENCODER
 
     // \~english One Pulse Mode : The timer channel will be used as a one pulse mode
     // \~chinese 单脉冲模式：定时器通道将用作单脉冲模式
     VSF_TIMER_CHANNEL_MODE_ONE_PULSE        = (0x05 << 0),
-    #define VSF_TIMER_CHANNEL_MODE_ONE_PULSE  VSF_TIMER_CHANNEL_MODE_ONE_PULSE
+#   define VSF_TIMER_CHANNEL_MODE_ONE_PULSE  VSF_TIMER_CHANNEL_MODE_ONE_PULSE
 
     // \~english Hall Sensor Mode : The timer channel will be used as a hall sensor
     // \~chinese 霍尔传感器模式：定时器通道将用作霍尔传感器
     VSF_TIMER_CHANNEL_MODE_HALL_SENSOR      = (0x06 << 0),
-    #define VSF_TIMER_CHANNEL_MODE_HALL_SENSOR  VSF_TIMER_CHANNEL_MODE_HALL_SENSOR
-    */
+#   define VSF_TIMER_CHANNEL_MODE_HALL_SENSOR  VSF_TIMER_CHANNEL_MODE_HALL_SENSOR
+#endif
 
     /********************************************************************************/
     //! \~english The following mode only valid for VSF_TIMER_CHANNEL_MODE_BASE
@@ -289,124 +362,116 @@ typedef enum vsf_timer_channel_mode_t {
     VSF_TIMER_BASE_ONESHOT                      = (0x00 << 5),
     // Continues : The timer will continue to count after overflow
     VSF_TIMER_BASE_CONTINUES                    = (0x01 << 5),
-    /*
+#if __VSF_TIMER_CFG_SUPPORT_STANDARD_OPTIONAL
     // \~english Some timer may support more counter direction like center-aligned etc.
     //           The following mode only valid for VSF_TIMER_CHANNEL_MODE_BASE
     // \~chinese 有些定时器可能支持更多的计数模式，如中心对齐等。以下模式仅适用于 VSF_TIMER_CHANNEL_MODE_BASE
     VSF_TIMER_BASE_COUNTER_UP                   = (0x00 << 4),
+#   define VSF_TIMER_BASE_COUNTER_UP  VSF_TIMER_BASE_COUNTER_UP
     VSF_TIMER_BASE_COUNTER_DOWN                 = (0x01 << 4),
+#   define VSF_TIMER_BASE_COUNTER_DOWN  VSF_TIMER_BASE_COUNTER_DOWN
     VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED1      = (0x02 << 4),
+#   define VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED1  VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED1
     VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED2      = (0x03 << 4),
+#   define VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED2  VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED2
     VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED3      = (0x04 << 4),
-    #define VSF_TIMER_BASE_COUNTER_UP  VSF_TIMER_BASE_COUNTER_UP
-    #define VSF_TIMER_BASE_COUNTER_DOWN  VSF_TIMER_BASE_COUNTER_DOWN
-    #define VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED1  VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED1
-    #define VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED2  VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED2
-    #define VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED3  VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED3
-    */
+#   define VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED3  VSF_TIMER_BASE_COUNTER_CENTER_ALIGNED3
 
-    /*
     // \~english Some timer may support more clock division like 1, 2, 4 etc.
     // \~chinese 有些定时器可能支持更多的时钟分频，如 1、2、4 等。
     VSF_TIEMR_BASE_CLOCKDIVISION_DIV_1           = (0x00 << 8),
+#   define VSF_TIEMR_BASE_CLOCKDIVISION_DIV_1  VSF_TIEMR_BASE_CLOCKDIVISION_DIV_1
     VSF_TIEMR_BASE_CLOCKDIVISION_DIV_2           = (0x01 << 8),
+#   define VSF_TIEMR_BASE_CLOCKDIVISION_DIV_2  VSF_TIEMR_BASE_CLOCKDIVISION_DIV_2
     VSF_TIEMR_BASE_CLOCKDIVISION_DIV_4           = (0x02 << 8),
-    #define VSF_TIEMR_BASE_CLOCKDIVISION_DIV_1  VSF_TIEMR_BASE_CLOCKDIVISION_DIV_1
-    #define VSF_TIEMR_BASE_CLOCKDIVISION_DIV_2  VSF_TIEMR_BASE_CLOCKDIVISION_DIV_2
-    #define VSF_TIEMR_BASE_CLOCKDIVISION_DIV_4  VSF_TIEMR_BASE_CLOCKDIVISION_DIV_4
-    */
+#   define VSF_TIEMR_BASE_CLOCKDIVISION_DIV_4  VSF_TIEMR_BASE_CLOCKDIVISION_DIV_4
+#endif
 
+#if __VSF_TIMER_CFG_SUPPORT_STANDARD_OPTIONAL
     /********************************************************************************/
-    /*
     // \~english The following mode only valid for VSF_TIMER_CHANNEL_MODE_PWM
     // \~chinese 以下模式仅适用于 VSF_TIMER_CHANNEL_MODE_PWM
     // Output Compare Mode
     VSF_TIMER_OUTPUT_COMPARE_ACTIVE             = (0x00 << 4),
+#   define VSF_TIMER_OUTPUT_COMPARE_ACTIVE  VSF_TIMER_OUTPUT_COMPARE_ACTIVE
     VSF_TIMER_OUTPUT_COMPARE_INACTIVE           = (0x01 << 4),
+#   define VSF_TIMER_OUTPUT_COMPARE_INACTIVE  VSF_TIMER_OUTPUT_COMPARE_INACTIVE
     VSF_TIMER_OUTPUT_COMPARE_TOGGLE             = (0x02 << 4),
+#   define VSF_TIMER_OUTPUT_COMPARE_TOGGLE  VSF_TIMER_OUTPUT_COMPARE_TOGGLE
     VSF_TIMER_OUTPUT_COMPARE_PWM1               = (0x03 << 4),
+#   define VSF_TIMER_OUTPUT_COMPARE_PWM1  VSF_TIMER_OUTPUT_COMPARE_PWM1
     VSF_TIMER_OUTPUT_COMPARE_PWM2               = (0x04 << 4),
+#   define VSF_TIMER_OUTPUT_COMPARE_PWM2  VSF_TIMER_OUTPUT_COMPARE_PWM2
     VSF_TIMER_OUTPUT_COMPARE_FORCED_ACTIVE      = (0x05 << 4),
+#   define VSF_TIMER_OUTPUT_COMPARE_FORCED_ACTIVE  VSF_TIMER_OUTPUT_COMPARE_FORCED_ACTIVE
     VSF_TIMER_OUTPUT_COMPARE_FORCED_INACTIVE    = (0x06 << 4),
-    #define VSF_TIMER_OUTPUT_COMPARE_ACTIVE  VSF_TIMER_OUTPUT_COMPARE_ACTIVE
-    #define VSF_TIMER_OUTPUT_COMPARE_INACTIVE  VSF_TIMER_OUTPUT_COMPARE_INACTIVE
-    #define VSF_TIMER_OUTPUT_COMPARE_TOGGLE  VSF_TIMER_OUTPUT_COMPARE_TOGGLE
-    #define VSF_TIMER_OUTPUT_COMPARE_PWM1  VSF_TIMER_OUTPUT_COMPARE_PWM1
-    #define VSF_TIMER_OUTPUT_COMPARE_PWM2  VSF_TIMER_OUTPUT_COMPARE_PWM2
-    #define VSF_TIMER_OUTPUT_COMPARE_FORCED_ACTIVE  VSF_TIMER_OUTPUT_COMPARE_FORCED_ACTIVE
-    #define VSF_TIMER_OUTPUT_COMPARE_FORCED_INACTIVE  VSF_TIMER_OUTPUT_COMPARE_FORCED_INACTIVE
-    */
+#   define VSF_TIMER_OUTPUT_COMPARE_FORCED_INACTIVE  VSF_TIMER_OUTPUT_COMPARE_FORCED_INACTIVE
 
     /********************************************************************************/
-    /*
     // \~english The following mode only valid for VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE
     // \~chinese 以下模式仅适用于 VSF_TIMER_CHANNEL_MODE_OUTPUT_COMPARE
 
     // \~english Output Compare Polarity and N Polarity
     // \~chinese 输出比较极性和 N 极性
     VSF_TIMER_OUTPUT_COMPARE_POLARITY_HIGH      = (0x00 << 8),
+#   define VSF_TIMER_OUTPUT_COMPARE_POLARITY_HIGH  VSF_TIMER_OUTPUT_COMPARE_POLARITY_HIGH
     VSF_TIMER_OUTPUT_COMPARE_POLARITY_LOW       = (0x01 << 8),
+#   define VSF_TIMER_OUTPUT_COMPARE_POLARITY_LOW   VSF_TIMER_OUTPUT_COMPARE_POLARITY_LOW
     VSF_TIMER_OUTPUT_COMPARE_N_POLARITY_HIGH    = (0x00 << 8),
+#   define VSF_TIMER_OUTPUT_COMPARE_N_POLARITY_HIGH  VSF_TIMER_OUTPUT_COMPARE_N_POLARITY_HIGH
     VSF_TIMER_OUTPUT_COMPARE_N_POLARITY_LOW     = (0x01 << 8),
-    #define VSF_TIMER_OUTPUT_COMPARE_POLARITY_HIGH  VSF_TIMER_OUTPUT_COMPARE_POLARITY_HIGH
-    #define VSF_TIMER_OUTPUT_COMPARE_POLARITY_LOW   VSF_TIMER_OUTPUT_COMPARE_POLARITY_LOW
-    #define VSF_TIMER_OUTPUT_COMPARE_N_POLARITY_HIGH  VSF_TIMER_OUTPUT_COMPARE_N_POLARITY_HIGH
-    #define VSF_TIMER_OUTPUT_COMPARE_N_POLARITY_LOW   VSF_TIMER_OUTPUT_COMPARE_N_POLARITY_LOW
-    */
+#   define VSF_TIMER_OUTPUT_COMPARE_N_POLARITY_LOW   VSF_TIMER_OUTPUT_COMPARE_N_POLARITY_LOW
 
     /********************************************************************************/
-    /*
     // \~english The following mode only valid for VSF_TIMER_CHANNEL_MODE_PWM
     // \~chinese 以下模式仅适用于 VSF_TIMER_CHANNEL_MODE_PWM
 
     // \~english PWM Output Polarity
     // \~chinese PWM 输出极性
     VSF_TIMER_PWM_OUTPUT_POLARITY_HIGH                  = (0x00 << 4),
+#   define VSF_TIMER_PWM_OUTPUT_POLARITY_HIGH  VSF_TIMER_PWM_OUTPUT_POLARITY_HIGH
     VSF_TIMER_PWM_OUTPUT_POLARITY_LOW                   = (0x01 << 4),
-    #define VSF_TIMER_PWM_OUTPUT_POLARITY_HIGH  VSF_TIMER_PWM_OUTPUT_POLARITY_HIGH
-    #define VSF_TIMER_PWM_OUTPUT_POLARITY_LOW   VSF_TIMER_PWM_OUTPUT_POLARITY_LOW
-    */
+#   define VSF_TIMER_PWM_OUTPUT_POLARITY_LOW   VSF_TIMER_PWM_OUTPUT_POLARITY_LOW
 
     /********************************************************************************/
-    /*
     // \~english The following mode only valid for VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE
     // \~chinese 以下模式仅适用于 VSF_TIMER_CHANNEL_MODE_INPUT_CAPTURE
 
     // \~english Input Capture Polarity
     // \~chinese 输入捕获极性
     VSF_TIMER_INPUT_CAPTURE_POLARITY_RISING             = (0x00 << 4),
+#   define VSF_TIMER_INPUT_CAPTURE_POLARITY_RISING  VSF_TIMER_INPUT_CAPTURE_POLARITY_RISING
     VSF_TIMER_INPUT_CAPTURE_POLARITY_FALLING            = (0x01 << 4),
+#   define VSF_TIMER_INPUT_CAPTURE_POLARITY_FALLING  VSF_TIMER_INPUT_CAPTURE_POLARITY_FALLING
     VSF_TIMER_INPUT_CAPTURE_POLARITY_BOTH               = (0x02 << 4),
-    #define VSF_TIMER_INPUT_CAPTURE_POLARITY_RISING  VSF_TIMER_INPUT_CAPTURE_POLARITY_RISING
-    #define VSF_TIMER_INPUT_CAPTURE_POLARITY_FALLING  VSF_TIMER_INPUT_CAPTURE_POLARITY_FALLING
-    #define VSF_TIMER_INPUT_CAPTURE_POLARITY_BOTH  VSF_TIMER_INPUT_CAPTURE_POLARITY_BOTH
+#   define VSF_TIMER_INPUT_CAPTURE_POLARITY_BOTH  VSF_TIMER_INPUT_CAPTURE_POLARITY_BOTH
 
     // \~english Input Capture Filter
     // \~chinese 输入捕获滤波
     VSF_TIMER_INPUT_CAPTURE_FILTER_MASK                 = (0x0F << 4),
     VSF_TIMER_INPUT_CAPTURE_FILTER_OFFSET               = 4,
-    */
+#endif
 
+#if __VSF_TIMER_CFG_SUPPORT_STANDARD_OPTIONAL
     /********************************************************************************/
-    /*
     // \~english The following mode only valid for VSF_TIMER_CHANNEL_MODE_ENCODER
     // \~chinese 以下模式仅适用于 VSF_TIMER_CHANNEL_MODE_ENCODER
 
     // \~english Encoder Mode
     // \~chinese 编码器模式
     VSF_TIMER_ENCODER_CHANNEL_A_POLARITY_RISING         = (0x00 << 4),
+#   define VSF_TIMER_ENCODER_CHANNEL_A_POLARITY_RISING  VSF_TIMER_ENCODER_CHANNEL_A_POLARITY_RISING
     VSF_TIMER_ENCODER_CHANNEL_A_POLARITY_FALLING        = (0x01 << 4),
+#   define VSF_TIMER_ENCODER_CHANNEL_A_POLARITY_FALLING  VSF_TIMER_ENCODER_CHANNEL_A_POLARITY_FALLING
     VSF_TIMER_ENCODER_CHANNEL_A_POLARITY_BOTH           = (0x02 << 4),
+#   define VSF_TIMER_ENCODER_CHANNEL_A_POLARITY_BOTH  VSF_TIMER_ENCODER_CHANNEL_A_POLARITY_BOTH
     VSF_TIMER_ENCODER_CHANNEL_B_POLARITY_RISING         = (0x00 << 6),
+#   define VSF_TIMER_ENCODER_CHANNEL_B_POLARITY_RISING  VSF_TIMER_ENCODER_CHANNEL_B_POLARITY_RISING
     VSF_TIMER_ENCODER_CHANNEL_B_POLARITY_FALLING        = (0x01 << 6),
+#   define VSF_TIMER_ENCODER_CHANNEL_B_POLARITY_FALLING  VSF_TIMER_ENCODER_CHANNEL_B_POLARITY_FALLING
     VSF_TIMER_ENCODER_CHANNEL_B_POLARITY_BOTH           = (0x02 << 6),
-    #define VSF_TIMER_ENCODER_CHANNEL_A_POLARITY_RISING  VSF_TIMER_ENCODER_CHANNEL_A_POLARITY_RISING
-    #define VSF_TIMER_ENCODER_CHANNEL_A_POLARITY_FALLING  VSF_TIMER_ENCODER_CHANNEL_A_POLARITY_FALLING
-    #define VSF_TIMER_ENCODER_CHANNEL_A_POLARITY_BOTH  VSF_TIMER_ENCODER_CHANNEL_A_POLARITY_BOTH
-    #define VSF_TIMER_ENCODER_CHANNEL_B_POLARITY_RISING  VSF_TIMER_ENCODER_CHANNEL_B_POLARITY_RISING
-    #define VSF_TIMER_ENCODER_CHANNEL_B_POLARITY_FALLING  VSF_TIMER_ENCODER_CHANNEL_B_POLARITY_FALLING
-    #define VSF_TIMER_ENCODER_CHANNEL_B_POLARITY_BOTH  VSF_TIMER_ENCODER_CHANNEL_B_POLARITY_BOTH
-    */
+#   define VSF_TIMER_ENCODER_CHANNEL_B_POLARITY_BOTH  VSF_TIMER_ENCODER_CHANNEL_B_POLARITY_BOTH
+#endif
 } vsf_timer_channel_mode_t;
 #endif
 
@@ -532,7 +597,24 @@ typedef struct vsf_timer_channel_cfg_t {
  * 如果它支持多个选项，建议提供对应的 MASK 选项，方便用户在运行时切换到不同的模式。
  */
 typedef enum vsf_timer_ctrl_t {
-    __VSF_TIMER_CTRL_DUMMY = 0,               //!< \~english Dummy value for compilation \~chinese 编译占位值
+    //! \~english
+    //! @brief Dummy value for compilation, required when no actual control commands are defined.
+    //! @note This value is needed only when using the template default enum definition
+    //!       (VSF_TIMER_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) and all optional control
+    //!       commands are commented out. It ensures the enum has at least one member
+    //!       to avoid compilation errors with some C compilers that don't allow empty enums.
+    //! @note If you enable any control commands below (uncomment them), or if you
+    //!       redefine the enum in a specific hardware driver (VSF_TIMER_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED),
+    //!       you can remove this DUMMY value as long as at least one actual command is defined.
+    //! \~chinese
+    //! @brief 编译占位值，当没有定义实际控制命令时需要。
+    //! @note 此值仅在以下情况需要：使用模板默认枚举定义
+    //!       (VSF_TIMER_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) 且所有可选控制命令都被注释掉时。
+    //!       它确保枚举至少有一个成员，以避免某些不允许空枚举的 C 编译器报错。
+    //! @note 如果启用了以下任何控制命令（取消注释），或者在特定硬件驱动中重新定义了枚举
+    //!       (VSF_TIMER_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED)，只要定义了至少一个实际命令，
+    //!       就可以删除此 DUMMY 值。
+    __VSF_TIMER_CTRL_DUMMY = 0,
 } vsf_timer_ctrl_t;
 #endif
 
@@ -726,6 +808,33 @@ extern void vsf_timer_irq_enable(vsf_timer_t *timer_ptr, vsf_timer_irq_mask_t ir
  @return 无
  */
 extern void vsf_timer_irq_disable(vsf_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask);
+
+/**
+ * \~english
+ * @brief Clear interrupt flags of TIMER instance and return previous state
+ * @param[in] timer_ptr: a pointer to structure @ref vsf_timer_t
+ * @param[in] irq_mask: one or more values of enum @ref vsf_timer_irq_mask_t to clear
+ * @return vsf_timer_irq_mask_t: the interrupt mask state before clearing (0 if no flags were set)
+ *
+ * @note This function attempts to clear the specified interrupt flags if they are set,
+ *       and returns the state of those flags before clearing. This is useful for
+ *       polling operations and determining if interrupts occurred.
+ *       Note that if interrupts are enabled and an interrupt handler is active,
+ *       the interrupt handler may clear the interrupt flags automatically.
+ *       In such cases, this function will return 0 even if interrupts occurred.
+ *
+ * \~chinese
+ * @brief 清除 TIMER 实例的中断标志并返回之前的状态
+ * @param[in] timer_ptr: 指向结构体 @ref vsf_timer_t 的指针
+ * @param[in] irq_mask: 要清除的一个或多个枚举 vsf_timer_irq_mask_t 值的按位或
+ * @return vsf_timer_irq_mask_t: 清除前的中断掩码状态（如果没有标志被设置则返回0）
+ *
+ * @note 此函数尝试清除指定的中断标志（如果它们已设置），并返回清除前这些标志的状态。
+ *       这对于轮询操作和确定是否发生了中断很有用。
+ *       注意：如果中断已启用且中断处理函数处于活动状态，中断处理函数可能会自动清除中断标志。
+ *       在这种情况下，即使发生了中断，此函数也会返回0。
+ */
+extern vsf_timer_irq_mask_t vsf_timer_irq_clear(vsf_timer_t *timer_ptr, vsf_timer_irq_mask_t irq_mask);
 
 /**
  \~english
@@ -949,6 +1058,7 @@ extern vsf_err_t vsf_timer_channel_ctrl(vsf_timer_t *timer_ptr, uint8_t channel,
 #   define vsf_timer_get_configuration(__TIME, ...)     VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_get_configuration)    ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
 #   define vsf_timer_irq_enable(__TIME, ...)            VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_enable)           ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
 #   define vsf_timer_irq_disable(__TIME, ...)           VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_disable)          ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
+#   define vsf_timer_irq_clear(__TIME, ...)             VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_irq_clear)            ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
 #   define vsf_timer_set_period(__TIME, ...)            VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_set_period)           ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
 #   define vsf_timer_ctrl(__TIME, ...)                  VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_ctrl)                 ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
 #   define vsf_timer_channel_config(__TIME, ...)        VSF_MCONNECT(VSF_TIMER_CFG_PREFIX, _timer_channel_config)       ((__vsf_timer_t *)(__TIME), ##__VA_ARGS__)
