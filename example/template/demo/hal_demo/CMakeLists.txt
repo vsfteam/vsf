@@ -2,6 +2,7 @@
 
 target_sources(${CMAKE_PROJECT_NAME} PUBLIC
     adc_demo.c
+    dma_demo.c
     flash_demo.c
     gpio_demo.c
     hal_demo.c
