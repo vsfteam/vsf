@@ -220,6 +220,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_adc_capability_t, adc, capability,           VSF_MCONNECT(__prefix_name, _t) *adc_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 adc, irq_enable,           VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 adc, irq_disable,          VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_adc_irq_mask_t,   adc, irq_clear,            VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_request_once, VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_channel_cfg_t *channel_cfg, void *buffer_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_config,       VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_channel_cfg_t *channel_cfgs_ptr, uint32_t channel_cfgs_cnt) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_request,      VSF_MCONNECT(__prefix_name, _t) *adc_ptr, void *buffer_ptr, uint_fast32_t count)
@@ -838,6 +839,33 @@ extern void vsf_adc_irq_enable(vsf_adc_t *adc_ptr, vsf_adc_irq_mask_t irq_mask);
 extern void vsf_adc_irq_disable(vsf_adc_t *adc_ptr, vsf_adc_irq_mask_t irq_mask);
 
 /**
+ * \~english
+ * @brief Clear interrupt flags of ADC instance and return previous state
+ * @param[in] adc_ptr: a pointer to structure @ref vsf_adc_t
+ * @param[in] irq_mask: one or more values of enum @ref vsf_adc_irq_mask_t to clear
+ * @return vsf_adc_irq_mask_t: the interrupt mask state before clearing (0 if no flags were set)
+ *
+ * @note This function attempts to clear the specified interrupt flags if they are set,
+ *       and returns the state of those flags before clearing. This is useful for
+ *       polling operations and determining if interrupts occurred.
+ *       Note that if interrupts are enabled and an interrupt handler is active,
+ *       the interrupt handler may clear the interrupt flags automatically.
+ *       In such cases, this function will return 0 even if interrupts occurred.
+ *
+ * \~chinese
+ * @brief 清除 ADC 实例的中断标志并返回之前的状态
+ * @param[in] adc_ptr: 指向结构体 @ref vsf_adc_t 的指针
+ * @param[in] irq_mask: 要清除的一个或多个枚举 vsf_adc_irq_mask_t 值的按位或
+ * @return vsf_adc_irq_mask_t: 清除前的中断掩码状态（如果没有标志被设置则返回0）
+ *
+ * @note 此函数尝试清除指定的中断标志（如果它们已设置），并返回清除前这些标志的状态。
+ *       这对于轮询操作和确定是否发生了中断很有用。
+ *       注意：如果中断已启用且中断处理函数处于活动状态，中断处理函数可能会自动清除中断标志。
+ *       在这种情况下，即使发生了中断，此函数也会返回0。
+ */
+extern vsf_adc_irq_mask_t vsf_adc_irq_clear(vsf_adc_t *adc_ptr, vsf_adc_irq_mask_t irq_mask);
+
+/**
  \~english
  @brief Get the status of ADC instance
  @param[in] adc_ptr: a pointer to structure @ref vsf_adc_t
@@ -934,6 +962,7 @@ extern vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr,
 #   define vsf_adc_capability(__ADC)                VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_capability)           ((__vsf_adc_t *)(__ADC))
 #   define vsf_adc_irq_enable(__ADC, ...)           VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_irq_enable)           ((__vsf_adc_t *)(__ADC), ##__VA_ARGS__)
 #   define vsf_adc_irq_disable(__ADC, ...)          VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_irq_disable)          ((__vsf_adc_t *)(__ADC), ##__VA_ARGS__)
+#   define vsf_adc_irq_clear(__ADC, ...)            VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_irq_clear)             ((__vsf_adc_t *)(__ADC), ##__VA_ARGS__)
 #   define vsf_adc_channel_request_once(__ADC, ...) VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_channel_request_once) ((__vsf_adc_t *)(__ADC), ##__VA_ARGS__)
 #   define vsf_adc_channel_config(__ADC, ...)       VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_channel_config)       ((__vsf_adc_t *)(__ADC), ##__VA_ARGS__)
 #   define vsf_adc_channel_request(__ADC, ...)      VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_channel_request)      ((__vsf_adc_t *)(__ADC), ##__VA_ARGS__)
