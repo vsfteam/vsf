@@ -38,9 +38,9 @@
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 
-typedef uint_fast16_t vsf_fifo2req_usart_fifo_fn_t(vsf_usart_t *usart_ptr,
+typedef uint_fast32_t vsf_fifo2req_usart_fifo_fn_t(vsf_usart_t *usart_ptr,
                                                    void *buffer_ptr,
-                                                   uint_fast16_t count);
+                                                   uint_fast32_t count);
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -232,7 +232,7 @@ vsf_usart_capability_t vsf_fifo2req_usart_capability(vsf_fifo2req_usart_t *fifo2
     return capability;
 }
 
-uint_fast16_t vsf_fifo2req_usart_rxfifo_get_data_count(vsf_fifo2req_usart_t *fifo2req_usart_ptr)
+uint_fast32_t vsf_fifo2req_usart_rxfifo_get_data_count(vsf_fifo2req_usart_t *fifo2req_usart_ptr)
 {
     VSF_HAL_ASSERT(fifo2req_usart_ptr != NULL);
     VSF_HAL_ASSERT(fifo2req_usart_ptr->usart != NULL);
@@ -240,7 +240,7 @@ uint_fast16_t vsf_fifo2req_usart_rxfifo_get_data_count(vsf_fifo2req_usart_t *fif
     return vsf_usart_rxfifo_get_data_count(fifo2req_usart_ptr->usart);
 }
 
-uint_fast16_t vsf_fifo2req_usart_rxfifo_read(vsf_fifo2req_usart_t *fifo2req_usart_ptr, void *buffer_ptr, uint_fast16_t count)
+uint_fast32_t vsf_fifo2req_usart_rxfifo_read(vsf_fifo2req_usart_t *fifo2req_usart_ptr, void *buffer_ptr, uint_fast32_t count)
 {
     VSF_HAL_ASSERT(fifo2req_usart_ptr != NULL);
     VSF_HAL_ASSERT(fifo2req_usart_ptr->usart != NULL);
@@ -248,7 +248,7 @@ uint_fast16_t vsf_fifo2req_usart_rxfifo_read(vsf_fifo2req_usart_t *fifo2req_usar
     return vsf_usart_rxfifo_read(fifo2req_usart_ptr->usart, buffer_ptr, count);
 }
 
-uint_fast16_t vsf_fifo2req_usart_txfifo_get_free_count(vsf_fifo2req_usart_t *fifo2req_usart_ptr)
+uint_fast32_t vsf_fifo2req_usart_txfifo_get_free_count(vsf_fifo2req_usart_t *fifo2req_usart_ptr)
 {
     VSF_HAL_ASSERT(fifo2req_usart_ptr != NULL);
     VSF_HAL_ASSERT(fifo2req_usart_ptr->usart != NULL);
@@ -256,7 +256,7 @@ uint_fast16_t vsf_fifo2req_usart_txfifo_get_free_count(vsf_fifo2req_usart_t *fif
     return vsf_usart_txfifo_get_free_count(fifo2req_usart_ptr->usart);
 }
 
-uint_fast16_t vsf_fifo2req_usart_txfifo_write(vsf_fifo2req_usart_t *fifo2req_usart_ptr, void *buffer_ptr, uint_fast16_t count)
+uint_fast32_t vsf_fifo2req_usart_txfifo_write(vsf_fifo2req_usart_t *fifo2req_usart_ptr, void *buffer_ptr, uint_fast32_t count)
 {
     VSF_HAL_ASSERT(fifo2req_usart_ptr != NULL);
     VSF_HAL_ASSERT(fifo2req_usart_ptr->usart != NULL);

@@ -215,6 +215,39 @@ extern "C" {
 #   define VSF_USART_CFG_INHERIT_HAL_CAPABILITY      ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable standard optional features support.
+ *
+ * This macro controls the availability of standard optional features in the template.
+ * Standard optional features include:
+ * - Pin swap and signal inversion (VSF_USART_SWAP, VSF_USART_TX_INVERT, VSF_USART_RX_INVERT)
+ * - Request pause/resume control commands (VSF_USART_CTRL_REQUEST_RX_RESUME, etc.)
+ * - Half-duplex control commands (VSF_USART_CTRL_HALF_DUPLEX_ENABLE_TRANSMITTER, etc.)
+ * - Interrupt masks (VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR, VSF_USART_IRQ_MASK_NOISE_ERR)
+ *
+ * @note This macro is for testing purposes only. Users should NOT enable this macro.
+ *       Standard optional features should be implemented directly in hardware drivers
+ *       if the hardware supports them, rather than enabling this macro in the template.
+ *       Enabling this macro may cause compilation errors or unexpected behavior.
+ *
+ * \~chinese
+ * @brief 启用标准可选功能支持。
+ *
+ * 此宏控制模板中标准可选功能的可用性。标准可选功能包括：
+ * - 引脚交换和信号反转（VSF_USART_SWAP, VSF_USART_TX_INVERT, VSF_USART_RX_INVERT）
+ * - 请求暂停/恢复控制命令（VSF_USART_CTRL_REQUEST_RX_RESUME 等）
+ * - 半双工控制命令（VSF_USART_CTRL_HALF_DUPLEX_ENABLE_TRANSMITTER 等）
+ * - 中断掩码（VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR, VSF_USART_IRQ_MASK_NOISE_ERR）
+ *
+ * @note 此宏仅用于测试目的。用户不应启用此宏。
+ *       如果硬件支持标准可选功能，应在硬件驱动中直接实现，而不是在模板中启用此宏。
+ *       启用此宏可能导致编译错误或意外行为。
+ */
+#ifndef __VSF_USART_CFG_SUPPORT_STANDARD_OPTIONAL
+#   define __VSF_USART_CFG_SUPPORT_STANDARD_OPTIONAL DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /**
@@ -295,6 +328,26 @@ extern "C" {
  * - Adding new parity check options requires VSF_USART_PARITY_MASK
  * - Adding new stop bit options requires VSF_USART_STOPBIT_MASK
  *
+ * Feature Classification:
+ * - Mandatory: VSF_USART_NO_PARITY, VSF_USART_EVEN_PARITY, VSF_USART_ODD_PARITY,
+ *              VSF_USART_1_STOPBIT, VSF_USART_8_BIT_LENGTH, VSF_USART_NO_HWCONTROL,
+ *              VSF_USART_TX_ENABLE, VSF_USART_RX_ENABLE, VSF_USART_SYNC_CLOCK_DISABLE,
+ *              VSF_USART_HALF_DUPLEX_DISABLE, VSF_USART_TX_FIFO_THRESHOLD_EMPTY,
+ *              VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
+ * - Implementation Required (Hardware Optional): VSF_USART_FORCE_0_PARITY, VSF_USART_FORCE_1_PARITY,
+ *                       VSF_USART_1_5_STOPBIT, VSF_USART_0_5_STOPBIT, VSF_USART_2_STOPBIT,
+ *                       VSF_USART_5_BIT_LENGTH, VSF_USART_6_BIT_LENGTH, VSF_USART_7_BIT_LENGTH,
+ *                       VSF_USART_9_BIT_LENGTH, VSF_USART_10_BIT_LENGTH,
+ *                       VSF_USART_RTS_HWCONTROL, VSF_USART_CTS_HWCONTROL, VSF_USART_RTS_CTS_HWCONTROL,
+ *                       VSF_USART_TX_DISABLE, VSF_USART_RX_DISABLE, VSF_USART_SYNC_CLOCK_ENABLE,
+ *                       VSF_USART_HALF_DUPLEX_ENABLE, VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY,
+ *                       VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL, VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL,
+ *                       VSF_USART_RX_FIFO_THRESHOLD_FULL
+ *                       (Must be implemented in drivers, but hardware support is optional.
+ *                        Use #ifdef macro to check hardware support)
+ * - Standard Optional: VSF_USART_SWAP, VSF_USART_TX_INVERT, VSF_USART_RX_INVERT
+ *                      (protected by __VSF_USART_CFG_SUPPORT_STANDARD_OPTIONAL, should not be enabled)
+ *
  * \~chinese
  * @brief 预定义的 VSF USART 模式，可以在特定的 HAL 驱动中重新实现。
  * 即使硬件不支持这些功能，但以下的模式必须保留。如果硬件支持更多模式，例如更多的奇偶校验模式、
@@ -308,6 +361,25 @@ extern "C" {
  * - 添加新的 TX FIFO 阈值选项需要定义 VSF_USART_TX_FIFO_THRESHOLD_MASK
  * - 添加新的奇偶校验选项需要定义 VSF_USART_PARITY_MASK
  * - 添加新的停止位选项需要定义 VSF_USART_STOPBIT_MASK
+ *
+ * 功能分类：
+ * - 必选：VSF_USART_NO_PARITY, VSF_USART_EVEN_PARITY, VSF_USART_ODD_PARITY,
+ *        VSF_USART_1_STOPBIT, VSF_USART_8_BIT_LENGTH, VSF_USART_NO_HWCONTROL,
+ *        VSF_USART_TX_ENABLE, VSF_USART_RX_ENABLE, VSF_USART_SYNC_CLOCK_DISABLE,
+ *        VSF_USART_HALF_DUPLEX_DISABLE, VSF_USART_TX_FIFO_THRESHOLD_EMPTY,
+ *        VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
+ * - 实现必选（硬件可选）：VSF_USART_FORCE_0_PARITY, VSF_USART_FORCE_1_PARITY,
+ *            VSF_USART_1_5_STOPBIT, VSF_USART_0_5_STOPBIT, VSF_USART_2_STOPBIT,
+ *            VSF_USART_5_BIT_LENGTH, VSF_USART_6_BIT_LENGTH, VSF_USART_7_BIT_LENGTH,
+ *            VSF_USART_9_BIT_LENGTH, VSF_USART_10_BIT_LENGTH,
+ *            VSF_USART_RTS_HWCONTROL, VSF_USART_CTS_HWCONTROL, VSF_USART_RTS_CTS_HWCONTROL,
+ *            VSF_USART_TX_DISABLE, VSF_USART_RX_DISABLE, VSF_USART_SYNC_CLOCK_ENABLE,
+ *            VSF_USART_HALF_DUPLEX_ENABLE, VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY,
+ *            VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL, VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL,
+ *            VSF_USART_RX_FIFO_THRESHOLD_FULL
+ *            （驱动中必须实现，但硬件支持是可选的。使用 #ifdef 宏来判断硬件是否支持）
+ * - 标准可选：VSF_USART_SWAP, VSF_USART_TX_INVERT, VSF_USART_RX_INVERT
+ *            （由 __VSF_USART_CFG_SUPPORT_STANDARD_OPTIONAL 宏保护，不应被开启）
  */
 typedef enum vsf_usart_mode_t {
     /**
@@ -435,18 +507,23 @@ typedef enum vsf_usart_mode_t {
 
     /**
      * \~english
-     * @brief USART Pin swap and signal inversion configuration options
-     * Note: These options are not defined in the template but can be implemented
-     *       in specific hardware drivers if supported. Hardware drivers should
-     *       define these with the same names and appropriate bit positions.
+     * @brief USART Pin swap and signal inversion configuration options (Standard Optional)
+     * Note: These are standard optional features. Hardware drivers should define these
+     *       with the same names and appropriate bit positions if supported.
+     *       This macro should NOT be enabled in template.
      * \~chinese
-     * @brief USART 引脚交换和信号反转配置选项
-     * 注意：这些选项在模板中未定义，但如果硬件支持，可以在特定的硬件驱动中实现。
-     *       硬件驱动应使用相同的名称和适当的位位置来定义这些选项。
+     * @brief USART 引脚交换和信号反转配置选项（标准可选）
+     * 注意：这些是标准可选功能。如果硬件支持，硬件驱动应使用相同的名称和适当的位位置来定义这些选项。
+     *       此宏不应在模板中开启。
      */
-    // VSF_USART_SWAP                 = (0x1ul << 16), //!< \~english Swap RX and TX pins \~chinese 交换 RX 和 TX 引脚
-    // VSF_USART_TX_INVERT            = (0x1ul << 17), //!< \~english Invert TX pin signal \~chinese 反转 TX 引脚信号
-    // VSF_USART_RX_INVERT            = (0x1ul << 18), //!< \~english Invert RX pin signal \~chinese 反转 RX 引脚信号
+#if __VSF_USART_CFG_SUPPORT_STANDARD_OPTIONAL
+    VSF_USART_SWAP                 = (0x1ul << 16), //!< \~english Swap RX and TX pins \~chinese 交换 RX 和 TX 引脚
+#   define VSF_USART_SWAP VSF_USART_SWAP
+    VSF_USART_TX_INVERT            = (0x1ul << 17), //!< \~english Invert TX pin signal \~chinese 反转 TX 引脚信号
+#   define VSF_USART_TX_INVERT VSF_USART_TX_INVERT
+    VSF_USART_RX_INVERT            = (0x1ul << 18), //!< \~english Invert RX pin signal \~chinese 反转 RX 引脚信号
+#   define VSF_USART_RX_INVERT VSF_USART_RX_INVERT
+#endif
 } vsf_usart_mode_t;
 #endif
 
@@ -548,9 +625,35 @@ enum {
  * \~english
  * @brief USART interrupt mask definitions
  * These interrupts provide status and event notifications for USART operations
+ *
+ * Feature Classification:
+ * - Mandatory: VSF_USART_IRQ_MASK_TX_CPL, VSF_USART_IRQ_MASK_RX_CPL,
+ *              VSF_USART_IRQ_MASK_TX, VSF_USART_IRQ_MASK_RX
+ * - Implementation Required (Hardware Optional): VSF_USART_IRQ_MASK_RX_TIMEOUT, VSF_USART_IRQ_MASK_CTS,
+ *                       VSF_USART_IRQ_MASK_FRAME_ERR, VSF_USART_IRQ_MASK_BREAK_ERR,
+ *                       VSF_USART_IRQ_MASK_PARITY_ERR, VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR,
+ *                       VSF_USART_IRQ_MASK_RX_IDLE
+ *                       (Must be implemented in drivers, but hardware support is optional.
+ *                        Use #ifdef macro to check hardware support)
+ * - Standard Optional: VSF_USART_IRQ_MASK_TX_IDLE, VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR,
+ *                      VSF_USART_IRQ_MASK_NOISE_ERR
+ *                      (protected by __VSF_USART_CFG_SUPPORT_STANDARD_OPTIONAL, should not be enabled)
+ *
  * \~chinese
  * @brief USART 中断掩码定义
  * 这些中断提供 USART 操作的状态和事件通知
+ *
+ * 功能分类：
+ * - 必选：VSF_USART_IRQ_MASK_TX_CPL, VSF_USART_IRQ_MASK_RX_CPL,
+ *        VSF_USART_IRQ_MASK_TX, VSF_USART_IRQ_MASK_RX
+ * - 实现必选（硬件可选）：VSF_USART_IRQ_MASK_RX_TIMEOUT, VSF_USART_IRQ_MASK_CTS,
+ *            VSF_USART_IRQ_MASK_FRAME_ERR, VSF_USART_IRQ_MASK_BREAK_ERR,
+ *            VSF_USART_IRQ_MASK_PARITY_ERR, VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR,
+ *            VSF_USART_IRQ_MASK_RX_IDLE
+ *            （驱动中必须实现，但硬件支持是可选的。使用 #ifdef 宏来判断硬件是否支持）
+ * - 标准可选：VSF_USART_IRQ_MASK_TX_IDLE, VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR,
+ *            VSF_USART_IRQ_MASK_NOISE_ERR
+ *            （由 __VSF_USART_CFG_SUPPORT_STANDARD_OPTIONAL 宏保护，不应被开启）
  */
 typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_TX_CPL           = (0x1ul << 0),  //!< \~english TX complete(for request_tx API, data is written to TX FIFO) interrupt \~chinese 发送完成中断 ( request_tx 完成，所有数据已写入 FIFO )
@@ -661,29 +764,6 @@ typedef enum vsf_usart_irq_mask_t {
     VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR  = (0x1ul << 9),  //!< \~english RX overflow error interrupt \~chinese 接收溢出错误中断
 #   define VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR
 
-
-    /**
-     * \~english
-     * @brief USART TX overflow error interrupt
-     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR in vsf_usart_irq_mask_t and define a MACRO with same name
-     * \~chinese
-     * @brief USART 发送溢出错误中断
-     * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR 并且实现同名宏
-     */
-    VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR  = (0x1ul << 10), //!< \~english TX overflow error interrupt \~chinese 发送溢出错误中断
-#   define VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR
-
-    /**
-     * \~english
-     * @brief USART TX idle interrupt, all data is outputted on the TX line
-     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_TX_IDLE in vsf_usart_irq_mask_t and define a MACRO with same name
-     * \~chinese
-     * @brief USART 发送空闲中断，所有数据已从 TX 脚发送完成
-     * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_TX_IDLE 并且实现同名宏
-     */
-    VSF_USART_IRQ_MASK_TX_IDLE          = (0x1ul << 11), //!< \~english TX idle(all data in fifo in TXed on the bus) interrupt \~chinese 发送空闲中断 (所有数据在总线上发送完成)
-#   define VSF_USART_IRQ_MASK_TX_IDLE   VSF_USART_IRQ_MASK_TX_IDLE
-
     /**
      * \~english
      * @brief USART RX idle interrupt, dedicated and configurable usart clock passed and no data received
@@ -699,14 +779,35 @@ typedef enum vsf_usart_irq_mask_t {
 
     /**
      * \~english
+     * @brief Standard optional interrupt masks
+     * Note: These are standard optional features. This macro should NOT be enabled in template.
+     * \~chinese
+     * @brief 标准可选中断掩码
+     * 注意：这些是标准可选功能。此宏不应在模板中开启。
+     */
+#if __VSF_USART_CFG_SUPPORT_STANDARD_OPTIONAL
+    /**
+     * \~english
+     * @brief USART TX overflow error interrupt
+     * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR in vsf_usart_irq_mask_t and define a MACRO with same name
+     * \~chinese
+     * @brief USART 发送溢出错误中断
+     * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR 并且实现同名宏
+     */
+    VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR  = (0x1ul << 10), //!< \~english TX overflow error interrupt \~chinese 发送溢出错误中断
+#   define VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR
+
+    /**
+     * \~english
      * @brief USART RX noise error interrupt, noise is detected in the received frame
      * Note: If hardware supports this interrupt, implement VSF_USART_IRQ_MASK_NOISE_ERR in vsf_usart_irq_mask_t and define a MACRO with same name
      * \~chinese
      * @brief USART 噪音中断，接收的数据帧中检测到噪音
      * 注意：如果硬件支持此中断，在 vsf_usart_irq_mask_t 中定义 VSF_USART_IRQ_MASK_NOISE_ERR 并且实现同名宏
      */
-    VSF_USART_IRQ_MASK_NOISE_ERR        = (0x1UL << 13)
+    VSF_USART_IRQ_MASK_NOISE_ERR        = (0x1UL << 13), //!< \~english RX noise error interrupt \~chinese 接收噪音错误中断
 #   define VSF_USART_IRQ_MASK_NOISE_ERR VSF_USART_IRQ_MASK_NOISE_ERR
+#endif
 } vsf_usart_irq_mask_t;
 #endif
 
@@ -727,7 +828,11 @@ enum {
 #   ifdef VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR
                                             | VSF_USART_IRQ_MASK_TX_OVERFLOW_ERR
 #   endif
-                                            | VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR,
+                                            | VSF_USART_IRQ_MASK_RX_OVERFLOW_ERR
+#   ifdef VSF_USART_IRQ_MASK_NOISE_ERR
+                                            | VSF_USART_IRQ_MASK_NOISE_ERR
+#   endif
+                                            ,
 #endif
 
 #ifndef VSF_USART_IRQ_ALL_BITS_MASK
@@ -853,9 +958,24 @@ typedef struct vsf_usart_cfg_t {
  * \~english
  * @brief USART control commands
  * Defines the available control operations for USART instances
+ *
+ * Feature Classification:
+ * - Mandatory: VSF_USART_CTRL_SEND_BREAK, VSF_USART_CTRL_SET_BREAK, VSF_USART_CTRL_CLEAR_BREAK
+ * - Standard Optional: VSF_USART_CTRL_REQUEST_RX_RESUME, VSF_USART_CTRL_REQUEST_TX_RESUME,
+ *                      VSF_USART_CTRL_REQUEST_RX_PAUSE, VSF_USART_CTRL_REQUEST_TX_PAUSE,
+ *                      VSF_USART_CTRL_HALF_DUPLEX_ENABLE_TRANSMITTER, VSF_USART_CTRL_HALF_DUPLEX_ENABLE_RECEIVER
+ *                      (protected by __VSF_USART_CFG_SUPPORT_STANDARD_OPTIONAL, should not be enabled)
+ *
  * \~chinese
  * @brief USART 控制命令
  * 定义 USART 实例可用的控制操作
+ *
+ * 功能分类：
+ * - 必选：VSF_USART_CTRL_SEND_BREAK, VSF_USART_CTRL_SET_BREAK, VSF_USART_CTRL_CLEAR_BREAK
+ * - 标准可选：VSF_USART_CTRL_REQUEST_RX_RESUME, VSF_USART_CTRL_REQUEST_TX_RESUME,
+ *            VSF_USART_CTRL_REQUEST_RX_PAUSE, VSF_USART_CTRL_REQUEST_TX_PAUSE,
+ *            VSF_USART_CTRL_HALF_DUPLEX_ENABLE_TRANSMITTER, VSF_USART_CTRL_HALF_DUPLEX_ENABLE_RECEIVER
+ *            （由 __VSF_USART_CFG_SUPPORT_STANDARD_OPTIONAL 宏保护，不应被开启）
  */
 typedef enum vsf_usart_ctrl_t {
     /**
@@ -891,26 +1011,39 @@ typedef enum vsf_usart_ctrl_t {
     VSF_USART_CTRL_CLEAR_BREAK   = (0x01ul << 2),
 #   define VSF_USART_CTRL_CLEAR_BREAK VSF_USART_CTRL_CLEAR_BREAK
 
-    /*
+    /**
+     * \~english
+     * @brief Standard optional control commands for request pause/resume
+     * Note: These are standard optional features. This macro should NOT be enabled in template.
+     * \~chinese
+     * @brief 标准可选的请求暂停/恢复控制命令
+     * 注意：这些是标准可选功能。此宏不应在模板中开启。
+     */
+#if __VSF_USART_CFG_SUPPORT_STANDARD_OPTIONAL
     VSF_USART_CTRL_REQUEST_RX_RESUME                     = (0x1ul << 3),
-    #define VSF_USART_CTRL_REQUEST_RX_RESUME VSF_USART_CTRL_REQUEST_RX_RESUME
+#   define VSF_USART_CTRL_REQUEST_RX_RESUME VSF_USART_CTRL_REQUEST_RX_RESUME
     VSF_USART_CTRL_REQUEST_TX_RESUME                     = (0x1ul << 4),
-    #define VSF_USART_CTRL_REQUEST_TX_RESUME VSF_USART_CTRL_REQUEST_TX_RESUME
+#   define VSF_USART_CTRL_REQUEST_TX_RESUME VSF_USART_CTRL_REQUEST_TX_RESUME
 
     VSF_USART_CTRL_REQUEST_RX_PAUSE                      = (0x1ul << 5),
-    #define VSF_USART_CTRL_REQUEST_RX_PAUSE VSF_USART_CTRL_REQUEST_RX_PAUSE
+#   define VSF_USART_CTRL_REQUEST_RX_PAUSE VSF_USART_CTRL_REQUEST_RX_PAUSE
     VSF_USART_CTRL_REQUEST_TX_PAUSE                      = (0x1ul << 6),
-    #define VSF_USART_CTRL_REQUEST_TX_PAUSE VSF_USART_CTRL_REQUEST_TX_PAUSE
+#   define VSF_USART_CTRL_REQUEST_TX_PAUSE VSF_USART_CTRL_REQUEST_TX_PAUSE
 
+    /**
+     * \~english
+     * @brief Standard optional control commands for half-duplex control
+     * Note: These are standard optional features. This macro should NOT be enabled in template.
+     * \~chinese
+     * @brief 标准可选的半双工控制命令
+     * 注意：这些是标准可选功能。此宏不应在模板中开启。
+     */
     VSF_USART_CTRL_HALF_DUPLEX_ENABLE_TRANSMITTER        = (0x1ul << 7),
-    #define VSF_USART_CTRL_HALF_DUPLEX_ENABLE_TRANSMITTER VSF_USART_CTRL_HALF_DUPLEX_ENABLE_TRANSMITTER
+#   define VSF_USART_CTRL_HALF_DUPLEX_ENABLE_TRANSMITTER VSF_USART_CTRL_HALF_DUPLEX_ENABLE_TRANSMITTER
 
     VSF_USART_CTRL_HALF_DUPLEX_ENABLE_RECEIVER           = (0x1ul << 8),
-    #define VSF_USART_CTRL_HALF_DUPLEX_ENABLE_RECEIVER VSF_USART_CTRL_HALF_DUPLEX_ENABLE_RECEIVER
-    */
-
-    // Ensure compilation passes when there are no commands
-    __VSF_USART_CTRL_DUMMY_MASK     = (0x1ul << 3),
+#   define VSF_USART_CTRL_HALF_DUPLEX_ENABLE_RECEIVER VSF_USART_CTRL_HALF_DUPLEX_ENABLE_RECEIVER
+#endif
 } vsf_usart_ctrl_t;
 #endif
 

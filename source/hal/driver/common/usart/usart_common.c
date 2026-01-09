@@ -126,7 +126,7 @@ vsf_usart_capability_t vsf_usart_capability(vsf_usart_t *usart_ptr)
     return usart_ptr->op->capability(usart_ptr);
 }
 
-uint_fast16_t vsf_usart_rxfifo_get_data_count(vsf_usart_t *usart_ptr)
+uint_fast32_t vsf_usart_rxfifo_get_data_count(vsf_usart_t *usart_ptr)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr->op != NULL);
@@ -135,7 +135,7 @@ uint_fast16_t vsf_usart_rxfifo_get_data_count(vsf_usart_t *usart_ptr)
     return usart_ptr->op->rxfifo_get_data_count(usart_ptr);
 }
 
-uint_fast16_t vsf_usart_rxfifo_read(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
+uint_fast32_t vsf_usart_rxfifo_read(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr->op != NULL);
@@ -144,7 +144,7 @@ uint_fast16_t vsf_usart_rxfifo_read(vsf_usart_t *usart_ptr, void *buffer_ptr, ui
     return usart_ptr->op->rxfifo_read(usart_ptr, buffer_ptr, count);
 }
 
-uint_fast16_t vsf_usart_txfifo_get_free_count(vsf_usart_t *usart_ptr)
+uint_fast32_t vsf_usart_txfifo_get_free_count(vsf_usart_t *usart_ptr)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr->op != NULL);
@@ -153,7 +153,7 @@ uint_fast16_t vsf_usart_txfifo_get_free_count(vsf_usart_t *usart_ptr)
     return usart_ptr->op->txfifo_get_free_count(usart_ptr);
 }
 
-uint_fast16_t vsf_usart_txfifo_write(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast16_t count)
+uint_fast32_t vsf_usart_txfifo_write(vsf_usart_t *usart_ptr, void *buffer_ptr, uint_fast32_t count)
 {
     VSF_HAL_ASSERT(usart_ptr != NULL);
     VSF_HAL_ASSERT(usart_ptr->op != NULL);
