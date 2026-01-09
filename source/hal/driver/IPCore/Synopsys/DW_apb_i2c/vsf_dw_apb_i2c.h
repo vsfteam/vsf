@@ -75,8 +75,13 @@ typedef enum vsf_i2c_cmd_t {
     VSF_I2C_CMD_READ                            = (0x01ul << 8),
 
     VSF_I2C_CMD_START                           = (0x01ul << 16),   // virtual
+    VSF_I2C_CMD_NO_START                        = (0x01ul << 24),
+
     VSF_I2C_CMD_RESTART                         = (0x01ul << 10),
+    VSF_I2C_CMD_NO_RESTART                      = (0x00ul << 10),
+
     VSF_I2C_CMD_STOP                            = (0x01ul << 9),
+    VSF_I2C_CMD_NO_STOP                         = (0x00ul << 9),
 
     VSF_I2C_CMD_7_BITS                          = (0x00ul << 17),
     VSF_I2C_CMD_10_BITS                         = (0x01ul << 17),
@@ -85,9 +90,6 @@ typedef enum vsf_i2c_cmd_t {
                                                 | VSF_I2C_CMD_READ
                                                 | VSF_I2C_CMD_RESTART
                                                 | VSF_I2C_CMD_STOP,
-
-    VSF_I2C_CMD_NO_START                        = (0x01ul << 24),
-    VSF_I2C_CMD_NO_STOP_RESTART                 = (0x01ul << 25),
 } vsf_i2c_cmd_t;
 
 typedef enum vsf_i2c_irq_mask_t {
