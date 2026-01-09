@@ -201,10 +201,13 @@ void VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_get_transferred_count)(
     VSF_HAL_ASSERT(spi_ptr != NULL);
 }
 
-static vsf_spi_irq_mask_t VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_get_irq_mask)(
-    VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr
+static vsf_spi_irq_mask_t VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_irq_clear)(
+    VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t) *spi_ptr,
+    vsf_spi_irq_mask_t irq_mask
 ) {
+    VSF_HAL_ASSERT(NULL != spi_ptr);
     // implement this function in the device file
+    // This function should clear the specified interrupt flags and return the state before clearing
     VSF_HAL_ASSERT(0);
     return 0;
 }
@@ -214,8 +217,8 @@ static void VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != spi_ptr);
 
-    vsf_spi_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_get_irq_mask)(spi_ptr);
     vsf_spi_isr_t *isr_ptr = &spi_ptr->isr;
+    vsf_spi_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_SPI_CFG_IMP_PREFIX, _spi_irq_clear)(spi_ptr, VSF_SPI_IRQ_ALL_BITS_MASK);
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_spi_t *)spi_ptr, irq_mask);
     }
