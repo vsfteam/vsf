@@ -81,19 +81,28 @@ typedef enum vsf_spi_mode_t {
     VSF_SPI_SLAVE                   = 0x01ul << 0,
     VSF_SPI_MSB_FIRST               = 0x00ul << 1,
     VSF_SPI_LSB_FIRST               = 0x01ul << 1,
-    VSF_SPI_CPOL_LOW                = 0x00ul << 2,
-    VSF_SPI_CPOL_HIGH               = 0x01ul << 2,
-    VSF_SPI_CPHA_LOW                = 0x00ul << 2,
-    VSF_SPI_CPHA_HIGH               = 0x01ul << 2,
-    VSF_SPI_MODE_0                  = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_LOW,
-    VSF_SPI_MODE_1                  = VSF_SPI_CPOL_LOW  | VSF_SPI_CPHA_HIGH,
-    VSF_SPI_MODE_2                  = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_LOW,
-    VSF_SPI_MODE_3                  = VSF_SPI_CPOL_HIGH | VSF_SPI_CPHA_HIGH,
+
+    // SPI mode (bits 2-3: CPOL and CPHA)
+    VSF_SPI_MODE_0                  = 0x00ul << 2,
+    VSF_SPI_MODE_1                  = 0x01ul << 2,
+    VSF_SPI_MODE_2                  = 0x02ul << 2,
+    VSF_SPI_MODE_3                  = 0x03ul << 2,
+
     VSF_SPI_CS_SOFTWARE_MODE        = 0x00ul << 4,
     VSF_SPI_CS_HARDWARE_MODE        = 0x01ul << 4,
     VSF_SPI_DATASIZE_8              = 0x00ul << 8,
     VSF_SPI_DATASIZE_16             = 0x01ul << 8,
     VSF_SPI_DATASIZE_32             = 0x02ul << 8,
+
+    // Standard Optional: only include these if hardware supports them
+    VSF_SPI_CPOL_LOW                = 0x00ul << 2,
+    #define VSF_SPI_CPOL_LOW        VSF_SPI_CPOL_LOW
+    VSF_SPI_CPOL_HIGH               = 0x01ul << 2,
+    #define VSF_SPI_CPOL_HIGH       VSF_SPI_CPOL_HIGH
+    VSF_SPI_CPHA_LOW                = 0x00ul << 3,
+    #define VSF_SPI_CPHA_LOW        VSF_SPI_CPHA_LOW
+    VSF_SPI_CPHA_HIGH               = 0x01ul << 3,
+    #define VSF_SPI_CPHA_HIGH       VSF_SPI_CPHA_HIGH
 
     // more vendor specified modes can be added here
 } vsf_spi_mode_t;
