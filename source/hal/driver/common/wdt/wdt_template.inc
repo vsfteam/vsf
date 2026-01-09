@@ -94,6 +94,9 @@ vsf_err_t vsf_real_wdt_get_configuration(vsf_real_wdt_t *wdt_ptr, vsf_wdt_cfg_t 
 
 /*============================ MACROS ========================================*/
 
+#undef VSF_WDT_CFG_REIMPLEMENT_TYPE_CAPABILITY
+#undef VSF_WDT_CFG_REIMPLEMENT_TYPE_CFG
+#undef VSF_WDT_CFG_REIMPLEMENT_TYPE_MODE
 #undef VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_WDT_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_WDT_CFG_CAPABILITY_SUPPORT_EARLY_WAKEUP
@@ -218,4 +221,88 @@ vsf_err_t vsf_real_wdt_get_configuration(vsf_real_wdt_t *wdt_ptr, vsf_wdt_cfg_t 
 #undef vsf_remap_wdt_capability
 #undef vsf_remap_wdt_feed
 #undef vsf_remap_wdt_get_configuration
+
+#undef VSF_HAL_TEMPLATE_IMP_NAME
+#undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
+
+/*============================ STATIC ASSERTIONS ==============================*/
+
+/* User-extensible macros for custom mode and IRQ mask values
+ * Users can define these macros before including this template to append
+ * their custom enum values to the uniqueness checks.
+ *
+ * Check modes for custom values:
+ *   VSF_WDT_CFG_MODE_CHECK_UNIQUE - Check mode for custom mode values
+ *     Default: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *   VSF_WDT_CFG_IRQ_MASK_CHECK_UNIQUE - Check mode for custom IRQ mask values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *
+ * Example usage in vendor driver:
+ *   #define VSF_WDT_CUSTOM_MODE_VALUES           MY_CUSTOM_MODE1, MY_CUSTOM_MODE2
+ *   #define VSF_WDT_CFG_MODE_CHECK_UNIQUE        VSF_HAL_CHECK_MODE_LOOSE
+ *   #define VSF_WDT_CUSTOM_IRQ_MASK_VALUES       MY_CUSTOM_IRQ1, MY_CUSTOM_IRQ2
+ *   #define VSF_WDT_CFG_IRQ_MASK_CHECK_UNIQUE    VSF_HAL_CHECK_MODE_STRICT
+ *   #include "hal/driver/common/wdt/wdt_template.inc"
+ */
+
+
+#ifdef VSF_WDT_CFG_MODE_CHECK_UNIQUE
+/* ==================== GROUP INTERNAL UNIQUENESS CHECKS ==================== */
+/* Check uniqueness within each functional group */
+
+/* Check early wakeup mode uniqueness - all early wakeup modes should have different values
+ * Mandatory: VSF_WDT_MODE_NO_EARLY_WAKEUP, VSF_WDT_MODE_EARLY_WAKEUP
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_WDT_CFG_MODE_CHECK_UNIQUE,
+    VSF_WDT_MODE_NO_EARLY_WAKEUP,
+    VSF_WDT_MODE_EARLY_WAKEUP
+);
+
+/* Check reset mode uniqueness - all reset modes should have different values
+ * Mandatory: VSF_WDT_MODE_RESET_NONE, VSF_WDT_MODE_RESET_CPU, VSF_WDT_MODE_RESET_SOC
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_WDT_CFG_MODE_CHECK_UNIQUE,
+    VSF_WDT_MODE_RESET_NONE,
+    VSF_WDT_MODE_RESET_CPU,
+    VSF_WDT_MODE_RESET_SOC
+);
+
+#ifdef VSF_WDT_CUSTOM_MODE_VALUES
+/* Check uniqueness among custom mode values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_WDT_CFG_MODE_CHECK_UNIQUE, VSF_WDT_CUSTOM_MODE_VALUES);
+#endif
+
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_WDT_CFG_MODE_CHECK_UNIQUE,
+    /* Mandatory modes - always included */
+    VSF_WDT_MODE_NO_EARLY_WAKEUP, VSF_WDT_MODE_EARLY_WAKEUP,
+    VSF_WDT_MODE_RESET_NONE, VSF_WDT_MODE_RESET_CPU, VSF_WDT_MODE_RESET_SOC
+    /* User-defined modes - appended by user configuration */
+#ifdef VSF_WDT_CUSTOM_MODE_VALUES
+    , VSF_WDT_CUSTOM_MODE_VALUES
+#endif
+);
+#endif  /* VSF_WDT_CFG_MODE_CHECK_UNIQUE */
+
+/* ==================== IRQ MASK UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_WDT_CFG_IRQ_MASK_CHECK_UNIQUE
+
+#ifdef VSF_WDT_CUSTOM_IRQ_MASK_VALUES
+/* Check uniqueness among custom IRQ mask values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_WDT_CFG_IRQ_MASK_CHECK_UNIQUE, VSF_WDT_CUSTOM_IRQ_MASK_VALUES);
+#endif
+
+/* Note: WDT typically doesn't have a standard IRQ mask enum, but custom IRQ masks can be added */
+#endif  /* VSF_WDT_CFG_IRQ_MASK_CHECK_UNIQUE */
+
+#undef VSF_WDT_CFG_MODE_CHECK_UNIQUE
+#undef VSF_WDT_CFG_IRQ_MASK_CHECK_UNIQUE
+#undef VSF_WDT_CUSTOM_MODE_VALUES
+#undef VSF_WDT_CUSTOM_IRQ_MASK_VALUES
+
 #endif  /* VSF_HAL_USE_WDT */
