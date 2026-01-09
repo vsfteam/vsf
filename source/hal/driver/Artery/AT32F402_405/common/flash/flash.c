@@ -232,18 +232,29 @@ vsf_flash_status_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_status)(
     };
 }
 
+vsf_flash_irq_mask_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_clear)(
+    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr,
+    vsf_flash_irq_mask_t irq_mask
+) {
+    VSF_HAL_ASSERT(NULL != flash_ptr);
+
+    flash_type *reg = flash_ptr->reg;
+    vsf_flash_irq_mask_t irq_mask_out = reg->sts;
+    reg->sts = irq_mask_out;
+    if (irq_mask_out & (1 << 5)) {
+        irq_mask_out |= 1 << ((flash_ptr->erase0_write1 << 1) + 1);
+    }
+    irq_mask_out &= flash_ptr->irq_mask;
+    return irq_mask_out;
+}
+
 static void VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(
     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr
 ) {
     VSF_HAL_ASSERT(NULL != flash_ptr);
 
     flash_type *reg = flash_ptr->reg;
-    vsf_flash_irq_mask_t irq_mask = reg->sts;
-    reg->sts = irq_mask;
-    if (irq_mask & (1 << 5)) {
-        irq_mask |= 1 << ((flash_ptr->erase0_write1 << 1) + 1);
-    }
-    irq_mask &= flash_ptr->irq_mask;
+    vsf_flash_irq_mask_t irq_mask = VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_clear)(flash_ptr, VSF_FLASH_IRQ_ALL_BITS_MASK);
 
     reg->ctrl &= ~3;
     if (irq_mask & (VSF_FLASH_IRQ_ERASE_ERROR_MASK | VSF_FLASH_IRQ_WRITE_ERROR_MASK)) {
