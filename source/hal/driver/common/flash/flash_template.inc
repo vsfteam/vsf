@@ -197,6 +197,11 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 
 /*============================ MACROS ========================================*/
 
+#undef VSF_FLASH_CFG_REIMPLEMENT_TYPE_CAPABILITY
+#undef VSF_FLASH_CFG_REIMPLEMENT_TYPE_CFG
+#undef VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL
+#undef VSF_FLASH_CFG_REIMPLEMENT_TYPE_IRQ_MASK
+#undef VSF_FLASH_CFG_REIMPLEMENT_TYPE_STATUS
 #undef VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_FLASH_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_FLASH_CFG_REIMPLEMENT_API_CTRL
@@ -232,6 +237,7 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 #   define vsf_imp_flash_status               VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_status)
 #   define vsf_imp_flash_irq_enable           VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_enable)
 #   define vsf_imp_flash_irq_disable          VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_disable)
+#   define vsf_imp_flash_irq_clear            VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_clear)
 #   define vsf_imp_flash_erase_one_sector     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_one_sector)
 #   define vsf_imp_flash_erase_multi_sector   VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_multi_sector)
 #   define vsf_imp_flash_erase                VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_multi_sector)
@@ -254,6 +260,7 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 #   define vsf_remap_flash_status             VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_status)
 #   define vsf_remap_flash_irq_enable         VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_irq_enable)
 #   define vsf_remap_flash_irq_disable        VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_irq_disable)
+#   define vsf_remap_flash_irq_clear          VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_irq_clear)
 #   define vsf_remap_flash_erase_one_sector   VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_erase_one_sector)
 #   define vsf_remap_flash_erase_multi_sector VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_erase_multi_sector)
 #   define vsf_remap_flash_erase              VSF_MCONNECT(VSF_FLASH_CFG_IMP_REMAP_PREFIX, _flash_erase_multi_sector)
@@ -297,6 +304,11 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
         {                                                                                                                                 \
             VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
             vsf_remap_flash_irq_disable((vsf_remap_flash_t *)flash_ptr, irq_mask);                                                        \
+        }                                                                                                                                 \
+        vsf_flash_irq_mask_t vsf_imp_flash_irq_clear(vsf_imp_flash_t *flash_ptr, vsf_flash_irq_mask_t irq_mask)                           \
+        {                                                                                                                                 \
+            VSF_HAL_ASSERT(flash_ptr != NULL);                                                                                            \
+            return vsf_remap_flash_irq_clear((vsf_remap_flash_t *)flash_ptr, irq_mask);                                                   \
         }                                                                                                                                 \
         vsf_flash_status_t vsf_imp_flash_status(vsf_imp_flash_t *flash_ptr)                                                               \
         {                                                                                                                                 \
@@ -398,6 +410,7 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 #undef vsf_imp_flash_status
 #undef vsf_imp_flash_irq_enable
 #undef vsf_imp_flash_irq_disable
+#undef vsf_imp_flash_irq_clear
 #undef vsf_imp_flash_erase_one_sector
 #undef vsf_imp_flash_erase_multi_sector
 #undef vsf_imp_flash_erase
@@ -420,6 +433,7 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 #undef vsf_remap_flash_status
 #undef vsf_remap_flash_irq_enable
 #undef vsf_remap_flash_irq_disable
+#undef vsf_remap_flash_irq_clear
 #undef vsf_remap_flash_erase_one_sector
 #undef vsf_remap_flash_erase_multi_sector
 #undef vsf_remap_flash_erase
@@ -432,5 +446,77 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 #undef vsf_remap_flash_read
 #undef vsf_remap_flash_get_configuration
 #undef vsf_remap_flash_ctrl
+
+#undef VSF_HAL_TEMPLATE_IMP_NAME
+#undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
+
+/*============================ STATIC ASSERTIONS ==============================*/
+
+/* User-extensible macros for custom mode and IRQ mask values
+ * Users can define these macros before including this template to append
+ * their custom enum values to the uniqueness checks.
+ *
+ * Check modes for custom values:
+ *   VSF_FLASH_CFG_MODE_CHECK_UNIQUE - Check mode for custom mode values
+ *     Default: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *   VSF_FLASH_CFG_IRQ_MASK_CHECK_UNIQUE - Check mode for custom IRQ mask values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *
+ * Example usage in vendor driver:
+ *   #define VSF_FLASH_CUSTOM_MODE_VALUES           MY_CUSTOM_MODE1, MY_CUSTOM_MODE2
+ *   #define VSF_FLASH_CFG_MODE_CHECK_UNIQUE        VSF_HAL_CHECK_MODE_LOOSE
+ *   #define VSF_FLASH_CUSTOM_IRQ_MASK_VALUES       MY_CUSTOM_IRQ1, MY_CUSTOM_IRQ2
+ *   #define VSF_FLASH_CFG_IRQ_MASK_CHECK_UNIQUE    VSF_HAL_CHECK_MODE_STRICT
+ *   #include "hal/driver/common/flash/flash_template.inc"
+ */
+
+
+#ifdef VSF_FLASH_CFG_MODE_CHECK_UNIQUE
+/* Default mode lists - can be redefined by users before including this file */
+/* Note: Flash typically doesn't have mode enums, but custom modes can be added */
+
+#ifdef VSF_FLASH_CUSTOM_MODE_VALUES
+/* Check uniqueness among custom mode values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_FLASH_CFG_MODE_CHECK_UNIQUE, VSF_FLASH_CUSTOM_MODE_VALUES);
+#endif
+#endif  /* VSF_FLASH_CFG_MODE_CHECK_UNIQUE */
+
+/* ==================== IRQ MASK UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_FLASH_CFG_IRQ_MASK_CHECK_UNIQUE
+
+#ifdef VSF_FLASH_CUSTOM_IRQ_MASK_VALUES
+/* Check uniqueness among custom IRQ mask values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_FLASH_CFG_IRQ_MASK_CHECK_UNIQUE, VSF_FLASH_CUSTOM_IRQ_MASK_VALUES);
+#endif
+
+/* Check uniqueness within vsf_flash_irq_mask_t enum */
+
+/* Check IRQ mask uniqueness - all IRQ mask bits should have different values
+ * Mandatory: VSF_FLASH_IRQ_ERASE_MASK, VSF_FLASH_IRQ_WRITE_MASK, VSF_FLASH_IRQ_READ_MASK,
+ *            VSF_FLASH_IRQ_ERASE_ERROR_MASK, VSF_FLASH_IRQ_WRITE_ERROR_MASK, VSF_FLASH_IRQ_READ_ERROR_MASK
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_FLASH_CFG_IRQ_MASK_CHECK_UNIQUE,
+    /* Mandatory IRQ masks - always included */
+    VSF_FLASH_IRQ_ERASE_MASK,
+    VSF_FLASH_IRQ_WRITE_MASK,
+    VSF_FLASH_IRQ_READ_MASK,
+    VSF_FLASH_IRQ_ERASE_ERROR_MASK,
+    VSF_FLASH_IRQ_WRITE_ERROR_MASK,
+    VSF_FLASH_IRQ_READ_ERROR_MASK
+    /* User-defined IRQ masks - appended by user configuration */
+#ifdef VSF_FLASH_CUSTOM_IRQ_MASK_VALUES
+    , VSF_FLASH_CUSTOM_IRQ_MASK_VALUES
+#endif
+);
+#endif  /* VSF_FLASH_CFG_IRQ_MASK_CHECK_UNIQUE */
+
+#undef VSF_FLASH_CFG_MODE_CHECK_UNIQUE
+#undef VSF_FLASH_CFG_IRQ_MASK_CHECK_UNIQUE
+#undef VSF_FLASH_CUSTOM_MODE_VALUES
+#undef VSF_FLASH_CUSTOM_IRQ_MASK_VALUES
 
 #endif  /* VSF_HAL_USE_FLASH */

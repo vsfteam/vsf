@@ -178,6 +178,35 @@ extern "C" {
 #   define VSF_FLASH_CFG_REIMPLEMENT_TYPE_CTRL              DISABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable standard optional features support.
+ *
+ * This macro controls the availability of standard optional features in the template.
+ * Standard optional features include:
+ * - Request pause/resume control commands (VSF_FLASH_CTRL_REQUEST_PAUSE, VSF_FLASH_CTRL_REQUEST_RESUME)
+ * - Power management control commands (VSF_FLASH_CTRL_POWER_DOWN, VSF_FLASH_CTRL_POWER_UP)
+ *
+ * @note This macro is for testing purposes only. Users should NOT enable this macro.
+ *       Standard optional features should be implemented directly in hardware drivers
+ *       if the hardware supports them, rather than enabling this macro in the template.
+ *       Enabling this macro may cause compilation errors or unexpected behavior.
+ *
+ * \~chinese
+ * @brief 启用标准可选功能支持。
+ *
+ * 此宏控制模板中标准可选功能的可用性。标准可选功能包括：
+ * - 请求暂停/恢复控制命令（VSF_FLASH_CTRL_REQUEST_PAUSE, VSF_FLASH_CTRL_REQUEST_RESUME）
+ * - 电源管理控制命令（VSF_FLASH_CTRL_POWER_DOWN, VSF_FLASH_CTRL_POWER_UP）
+ *
+ * @note 此宏仅用于测试目的。用户不应启用此宏。
+ *       如果硬件支持标准可选功能，应在硬件驱动中直接实现，而不是在模板中启用此宏。
+ *       启用此宏可能导致编译错误或意外行为。
+ */
+#ifndef __VSF_FLASH_CFG_SUPPORT_STANDARD_OPTIONAL
+#   define __VSF_FLASH_CFG_SUPPORT_STANDARD_OPTIONAL DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define VSF_FLASH_APIS(__prefix_name) \
@@ -190,6 +219,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_flash_capability_t, flash, capability,            VSF_MCONNECT(__prefix_name, _t) *flash_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   flash, irq_enable,            VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                   flash, irq_disable,           VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_flash_irq_mask_t,   flash, irq_clear,              VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, erase_one_sector,      VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_size_t offset_of_bytes) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, erase_multi_sector,    VSF_MCONNECT(__prefix_name, _t) *flash_ptr, vsf_flash_size_t offset_of_bytes, vsf_flash_size_t size_of_bytes) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,              flash, erase_all,             VSF_MCONNECT(__prefix_name, _t) *flash_ptr) \
@@ -308,9 +338,22 @@ typedef struct vsf_flash_capability_t {
  * name to determine if they are supported at runtime. If the feature supports more than
  * one option, it is recommended to provide the corresponding MASK option, so that the
  * user can check for supported features at compile-time.
+ *
+ * Feature Classification:
+ * - Mandatory: None (only __VSF_FLASH_CTRL_DUMMY is defined by default)
+ * - Standard Optional: VSF_FLASH_CTRL_REQUEST_PAUSE, VSF_FLASH_CTRL_REQUEST_RESUME,
+ *                      VSF_FLASH_CTRL_POWER_DOWN, VSF_FLASH_CTRL_POWER_UP
+ *                      (protected by __VSF_FLASH_CFG_SUPPORT_STANDARD_OPTIONAL, should not be enabled)
+ *
  * \~chinese
  * 可选控制命令需要提供一个或多个枚举选项，还需要提供同名的宏，以便用户在运行时判断是否支持。
  * 如果该功能支持多个选项，建议提供相应的 MASK 选项，以便用户在编译时检查支持的功能。
+ *
+ * 功能分类：
+ * - 必选：无（默认仅定义 __VSF_FLASH_CTRL_DUMMY）
+ * - 标准可选：VSF_FLASH_CTRL_REQUEST_PAUSE, VSF_FLASH_CTRL_REQUEST_RESUME,
+ *            VSF_FLASH_CTRL_POWER_DOWN, VSF_FLASH_CTRL_POWER_UP
+ *            （由 __VSF_FLASH_CFG_SUPPORT_STANDARD_OPTIONAL 宏保护，不应被开启）
  */
 typedef enum vsf_flash_ctrl_t {
     //! \~english
@@ -332,23 +375,33 @@ typedef enum vsf_flash_ctrl_t {
     //!       就可以删除此 DUMMY 值。
     __VSF_FLASH_CTRL_DUMMY = 0,
 
-    /*
-    //! \~english Optional control commands for pause/resume functionality
-    //! \~chinese 可选的暂停/恢复控制命令
-    VSF_FLASH_CTRL_REQUEST_PAUSE  = (0x1ul << 0),    //! \~english Request to pause Flash operation \~chinese 请求暂停 Flash 操作
-    VSF_FLASH_CTRL_REQUEST_RESUME = (0x1ul << 1),    //! \~english Request to resume Flash operation \~chinese 请求恢复 Flash 操作
-    #define VSF_FLASH_CTRL_REQUEST_PAUSE VSF_FLASH_CTRL_REQUEST_PAUSE
-    #define VSF_FLASH_CTRL_REQUEST_RESUME VSF_FLASH_CTRL_REQUEST_RESUME
-    */
+    /**
+     * \~english
+     * @brief Standard optional control commands for pause/resume functionality
+     * Note: These are standard optional features. This macro should NOT be enabled in template.
+     * \~chinese
+     * @brief 标准可选的暂停/恢复控制命令
+     * 注意：这些是标准可选功能。此宏不应在模板中开启。
+     */
+#if __VSF_FLASH_CFG_SUPPORT_STANDARD_OPTIONAL
+    VSF_FLASH_CTRL_REQUEST_PAUSE  = (0x1ul << 0),    //!< \~english Request to pause Flash operation \~chinese 请求暂停 Flash 操作
+#   define VSF_FLASH_CTRL_REQUEST_PAUSE VSF_FLASH_CTRL_REQUEST_PAUSE
+    VSF_FLASH_CTRL_REQUEST_RESUME = (0x1ul << 1),    //!< \~english Request to resume Flash operation \~chinese 请求恢复 Flash 操作
+#   define VSF_FLASH_CTRL_REQUEST_RESUME VSF_FLASH_CTRL_REQUEST_RESUME
 
-    /*
-    //! \~english Optional control commands for power management
-    //! \~chinese 可选的电源管理控制命令
-    VSF_FLASH_CTRL_POWER_DOWN    = (0x1ul << 2),    //! \~english Put Flash into power down mode \~chinese 使 Flash 进入掉电模式
-    VSF_FLASH_CTRL_POWER_UP      = (0x1ul << 3),    //! \~english Wake Flash from power down mode \~chinese 从掉电模式唤醒 Flash
-    #define VSF_FLASH_CTRL_POWER_DOWN VSF_FLASH_CTRL_POWER_DOWN
-    #define VSF_FLASH_CTRL_POWER_UP VSF_FLASH_CTRL_POWER_UP
-    */
+    /**
+     * \~english
+     * @brief Standard optional control commands for power management
+     * Note: These are standard optional features. This macro should NOT be enabled in template.
+     * \~chinese
+     * @brief 标准可选的电源管理控制命令
+     * 注意：这些是标准可选功能。此宏不应在模板中开启。
+     */
+    VSF_FLASH_CTRL_POWER_DOWN    = (0x1ul << 2),    //!< \~english Put Flash into power down mode \~chinese 使 Flash 进入掉电模式
+#   define VSF_FLASH_CTRL_POWER_DOWN VSF_FLASH_CTRL_POWER_DOWN
+    VSF_FLASH_CTRL_POWER_UP      = (0x1ul << 3),    //!< \~english Wake Flash from power down mode \~chinese 从掉电模式唤醒 Flash
+#   define VSF_FLASH_CTRL_POWER_UP VSF_FLASH_CTRL_POWER_UP
+#endif
 } vsf_flash_ctrl_t;
 #endif
 
@@ -507,6 +560,33 @@ extern void vsf_flash_irq_enable(vsf_flash_t *flash_ptr, vsf_flash_irq_mask_t ir
  @return 无
  */
 extern void vsf_flash_irq_disable(vsf_flash_t *flash_ptr, vsf_flash_irq_mask_t irq_mask);
+
+/**
+ * \~english
+ * @brief Clear interrupt flags of FLASH instance and return previous state
+ * @param[in] flash_ptr: a pointer to structure @ref vsf_flash_t
+ * @param[in] irq_mask: one or more values of enum @ref vsf_flash_irq_mask_t to clear
+ * @return vsf_flash_irq_mask_t: the interrupt mask state before clearing (0 if no flags were set)
+ *
+ * @note This function attempts to clear the specified interrupt flags if they are set,
+ *       and returns the state of those flags before clearing. This is useful for
+ *       polling operations and determining if interrupts occurred.
+ *       Note that if interrupts are enabled and an interrupt handler is active,
+ *       the interrupt handler may clear the interrupt flags automatically.
+ *       In such cases, this function will return 0 even if interrupts occurred.
+ *
+ * \~chinese
+ * @brief 清除 FLASH 实例的中断标志并返回之前的状态
+ * @param[in] flash_ptr: 指向结构体 @ref vsf_flash_t 的指针
+ * @param[in] irq_mask: 要清除的一个或多个枚举 vsf_flash_irq_mask_t 值的按位或
+ * @return vsf_flash_irq_mask_t: 清除前的中断掩码状态（如果没有标志被设置则返回0）
+ *
+ * @note 此函数尝试清除指定的中断标志（如果它们已设置），并返回清除前这些标志的状态。
+ *       这对于轮询操作和确定是否发生了中断很有用。
+ *       注意：如果中断已启用且中断处理函数处于活动状态，中断处理函数可能会自动清除中断标志。
+ *       在这种情况下，即使发生了中断，此函数也会返回0。
+ */
+extern vsf_flash_irq_mask_t vsf_flash_irq_clear(vsf_flash_t *flash_ptr, vsf_flash_irq_mask_t irq_mask);
 
 /**
  \~english
@@ -690,6 +770,7 @@ extern vsf_err_t vsf_flash_ctrl(vsf_flash_t *flash_ptr, vsf_flash_ctrl_t ctrl, v
 #   define vsf_flash_status(__FLASH)                  VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_status)             ((__vsf_flash_t *)(__FLASH))
 #   define vsf_flash_irq_enable(__FLASH, ...)         VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_irq_enable)         ((__vsf_flash_t *)(__FLASH), ##__VA_ARGS__)
 #   define vsf_flash_irq_disable(__FLASH, ...)        VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_irq_disable)        ((__vsf_flash_t *)(__FLASH), ##__VA_ARGS__)
+#   define vsf_flash_irq_clear(__FLASH, ...)          VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_irq_clear)           ((__vsf_flash_t *)(__FLASH), ##__VA_ARGS__)
 #   define vsf_flash_erase_one_sector(__FLASH, ...)   VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_erase_one_sector)   ((__vsf_flash_t *)(__FLASH), ##__VA_ARGS__)
 #   define vsf_flash_erase_multi_sector(__FLASH, ...) VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_erase_multi_sector) ((__vsf_flash_t *)(__FLASH), ##__VA_ARGS__)
 #   define vsf_flash_erase(__FLASH, ...)              VSF_MCONNECT(VSF_FLASH_CFG_PREFIX, _flash_erase_multi_sector) ((__vsf_flash_t *)(__FLASH), ##__VA_ARGS__)
