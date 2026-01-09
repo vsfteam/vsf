@@ -388,11 +388,10 @@ static void VSF_MCONNECT(__, VSF_USART_CFG_IMP_PREFIX, _usart_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != usart_ptr);
 
-    vsf_usart_irq_mask_t irq_status = VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_clear)(usart_ptr, usart_ptr->irq_enable_mask);
     vsf_usart_isr_t *isr_ptr = &usart_ptr->isr;
-
-    if ((irq_status != 0) && (isr_ptr->handler_fn != NULL)) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_usart_t *)usart_ptr, irq_status);
+    vsf_usart_irq_mask_t irq_mask = VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_clear)(usart_ptr, VSF_USART_IRQ_ALL_BITS_MASK);
+    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_usart_t *)usart_ptr, irq_mask);
     }
 }
 
