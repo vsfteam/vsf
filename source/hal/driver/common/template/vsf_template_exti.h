@@ -169,7 +169,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                exti, trigger,          VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_channel_mask_t channel_mask)                        \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                exti, config_channels,  VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_channel_mask_t channel_mask, vsf_exti_channel_cfg_t * cfg_ptr)\
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                exti, irq_enable,       VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_channel_mask_t channel_mask)                        \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                exti, irq_disable,      VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_channel_mask_t channel_mask)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                exti, irq_disable,      VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_channel_mask_t channel_mask)                        \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_exti_channel_mask_t, exti, irq_clear,        VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_channel_mask_t channel_mask)
 
 /*============================ TYPES =========================================*/
 
@@ -539,6 +540,33 @@ extern vsf_err_t vsf_exti_irq_enable(vsf_exti_t *exti_ptr, vsf_exti_channel_mask
  */
 extern vsf_err_t vsf_exti_irq_disable(vsf_exti_t *exti_ptr, vsf_exti_channel_mask_t channel_mask);
 
+/**
+ * \~english
+ * @brief Clear interrupt flags of EXTI instance and return previous state
+ * @param[in] exti_ptr: a pointer to structure @ref vsf_exti_t
+ * @param[in] channel_mask: one or more values of enum @ref vsf_exti_channel_mask_t to clear
+ * @return vsf_exti_channel_mask_t: the channel mask state before clearing (0 if no flags were set)
+ *
+ * @note This function attempts to clear the specified interrupt flags if they are set,
+ *       and returns the state of those flags before clearing. This is useful for
+ *       polling operations and determining if interrupts occurred.
+ *       Note that if interrupts are enabled and an interrupt handler is active,
+ *       the interrupt handler may clear the interrupt flags automatically.
+ *       In such cases, this function will return 0 even if interrupts occurred.
+ *
+ * \~chinese
+ * @brief 清除 EXTI 实例的中断标志并返回之前的状态
+ * @param[in] exti_ptr: 指向结构体 @ref vsf_exti_t 的指针
+ * @param[in] channel_mask: 要清除的一个或多个枚举 vsf_exti_channel_mask_t 值的按位或
+ * @return vsf_exti_channel_mask_t: 清除前的通道掩码状态（如果没有标志被设置则返回0）
+ *
+ * @note 此函数尝试清除指定的中断标志（如果它们已设置），并返回清除前这些标志的状态。
+ *       这对于轮询操作和确定是否发生了中断很有用。
+ *       注意：如果中断已启用且中断处理函数处于活动状态，中断处理函数可能会自动清除中断标志。
+ *       在这种情况下，即使发生了中断，此函数也会返回0。
+ */
+extern vsf_exti_channel_mask_t vsf_exti_irq_clear(vsf_exti_t *exti_ptr, vsf_exti_channel_mask_t channel_mask);
+
 /*============================ MACROS ========================================*/
 
 /// @cond
@@ -552,6 +580,7 @@ extern vsf_err_t vsf_exti_irq_disable(vsf_exti_t *exti_ptr, vsf_exti_channel_mas
 #   define vsf_exti_config_channels(__EXTI, ...)        VSF_MCONNECT(VSF_EXTI_CFG_PREFIX, _exti_config_channels)        ((__vsf_exti_t *)(__EXTI), ##__VA_ARGS__)
 #   define vsf_exti_irq_enable(__EXTI, ...)             VSF_MCONNECT(VSF_EXTI_CFG_PREFIX, _exti_irq_enable)             ((__vsf_exti_t *)(__EXTI), ##__VA_ARGS__)
 #   define vsf_exti_irq_disable(__EXTI, ...)            VSF_MCONNECT(VSF_EXTI_CFG_PREFIX, _exti_irq_disable)            ((__vsf_exti_t *)(__EXTI), ##__VA_ARGS__)
+#   define vsf_exti_irq_clear(__EXTI, ...)              VSF_MCONNECT(VSF_EXTI_CFG_PREFIX, _exti_irq_clear)              ((__vsf_exti_t *)(__EXTI), ##__VA_ARGS__)
 #endif
 /// @endcond
 
