@@ -87,6 +87,11 @@ vsf_err_t vsf_real_dac_get_configuration(vsf_real_dac_t *dac_ptr, vsf_dac_cfg_t 
 
 /*============================ MACROS ========================================*/
 
+#undef VSF_DAC_CFG_REIMPLEMENT_TYPE_CAPABILITY
+#undef VSF_DAC_CFG_REIMPLEMENT_TYPE_CFG
+#undef VSF_DAC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG
+#undef VSF_DAC_CFG_REIMPLEMENT_TYPE_IRQ_MASK
+#undef VSF_DAC_CFG_REIMPLEMENT_TYPE_STATUS
 #undef VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_DAC_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_DAC_CFG_CAPABILITY_IRQ_MASK
@@ -110,6 +115,7 @@ vsf_err_t vsf_real_dac_get_configuration(vsf_real_dac_t *dac_ptr, vsf_dac_cfg_t 
 #   define vsf_imp_dac_capability(__DAC)                    VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_capability)
 #   define vsf_imp_dac_irq_enable(__DAC, ...)               VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_irq_enable)
 #   define vsf_imp_dac_irq_disable(__DAC, ...)              VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_irq_disable)
+#   define vsf_imp_dac_irq_clear(__DAC, ...)                VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_irq_clear)
 #   define vsf_imp_dac_channel_request_once(__DAC, ...)     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_channel_request_once)
 #   define vsf_imp_dac_channel_config(__DAC, ...)           VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_channel_config)
 #   define vsf_imp_dac_channel_request(__DAC, ...)          VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_channel_request)
@@ -124,6 +130,7 @@ vsf_err_t vsf_real_dac_get_configuration(vsf_real_dac_t *dac_ptr, vsf_dac_cfg_t 
 #   define vsf_remap_dac_capability(__DAC)                  VSF_MCONNECT(VSF_DAC_CFG_IMP_REMAP_PREFIX, _dac_capability)
 #   define vsf_remap_dac_irq_enable(__DAC, ...)             VSF_MCONNECT(VSF_DAC_CFG_IMP_REMAP_PREFIX, _dac_irq_enable)
 #   define vsf_remap_dac_irq_disable(__DAC, ...)            VSF_MCONNECT(VSF_DAC_CFG_IMP_REMAP_PREFIX, _dac_irq_disable)
+#   define vsf_remap_dac_irq_clear(__DAC, ...)              VSF_MCONNECT(VSF_DAC_CFG_IMP_REMAP_PREFIX, _dac_irq_clear)
 #   define vsf_remap_dac_channel_request_once(__DAC, ...)   VSF_MCONNECT(VSF_DAC_CFG_IMP_REMAP_PREFIX, _dac_channel_request_once)
 #   define vsf_remap_dac_channel_config(__DAC, ...)         VSF_MCONNECT(VSF_DAC_CFG_IMP_REMAP_PREFIX, _dac_channel_config)
 #   define vsf_remap_dac_channel_request(__DAC, ...)        VSF_MCONNECT(VSF_DAC_CFG_IMP_REMAP_PREFIX, _dac_channel_request)
@@ -176,6 +183,12 @@ vsf_err_t vsf_real_dac_get_configuration(vsf_real_dac_t *dac_ptr, vsf_dac_cfg_t 
         {                                                                                               \
             VSF_HAL_ASSERT(dac != NULL);                                                                \
             vsf_remap_dac_irq_disable((vsf_remap_dac_t *)dac, irq_mask);                                \
+        }                                                                                               \
+                                                                                                        \
+        vsf_dac_irq_mask_t vsf_imp_dac_irq_clear(vsf_imp_dac_t *dac, vsf_remap_dac_irq_mask_t irq_mask) \
+        {                                                                                               \
+            VSF_HAL_ASSERT(dac != NULL);                                                                \
+            return vsf_remap_dac_irq_clear((vsf_remap_dac_t *)dac, irq_mask);                           \
         }                                                                                               \
                                                                                                         \
         vsf_err_t vsf_imp_dac_channel_request_once(vsf_imp_dac_t *dac,                                  \
@@ -251,6 +264,7 @@ vsf_err_t vsf_real_dac_get_configuration(vsf_real_dac_t *dac_ptr, vsf_dac_cfg_t 
 #undef vsf_imp_dac_capability
 #undef vsf_imp_dac_irq_enable
 #undef vsf_imp_dac_irq_disable
+#undef vsf_imp_dac_irq_clear
 #undef vsf_imp_dac_channel_request_once
 #undef vsf_imp_dac_channel_config
 #undef vsf_imp_dac_channel_request
@@ -265,9 +279,77 @@ vsf_err_t vsf_real_dac_get_configuration(vsf_real_dac_t *dac_ptr, vsf_dac_cfg_t 
 #undef vsf_remap_dac_capability
 #undef vsf_remap_dac_irq_enable
 #undef vsf_remap_dac_irq_disable
+#undef vsf_remap_dac_irq_clear
 #undef vsf_remap_dac_channel_request_once
 #undef vsf_remap_dac_channel_config
 #undef vsf_remap_dac_channel_request
 #undef vsf_remap_dac_get_configuration
+
+#undef VSF_HAL_TEMPLATE_IMP_NAME
+#undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
+
+/*============================ STATIC ASSERTIONS ==============================*/
+
+/* User-extensible macros for custom mode and IRQ mask values
+ * Users can define these macros before including this template to append
+ * their custom enum values to the uniqueness checks.
+ *
+ * Check modes for custom values:
+ *   VSF_DAC_CFG_MODE_CHECK_UNIQUE - Check mode for custom mode values
+ *     Default: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *   VSF_DAC_CFG_IRQ_MASK_CHECK_UNIQUE - Check mode for custom IRQ mask values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *
+ * Example usage in vendor driver:
+ *   #define VSF_DAC_CUSTOM_MODE_VALUES           MY_CUSTOM_MODE1, MY_CUSTOM_MODE2
+ *   #define VSF_DAC_CFG_MODE_CHECK_UNIQUE        VSF_HAL_CHECK_MODE_LOOSE
+ *   #define VSF_DAC_CUSTOM_IRQ_MASK_VALUES       MY_CUSTOM_IRQ1, MY_CUSTOM_IRQ2
+ *   #define VSF_DAC_CFG_IRQ_MASK_CHECK_UNIQUE    VSF_HAL_CHECK_MODE_STRICT
+ *   #include "hal/driver/common/dac/dac_template.inc"
+ */
+
+
+#ifdef VSF_DAC_CFG_MODE_CHECK_UNIQUE
+/* Default mode lists - can be redefined by users before including this file */
+/* Note: DAC typically doesn't have mode enums, but custom modes can be added */
+
+#ifdef VSF_DAC_CUSTOM_MODE_VALUES
+/* Check uniqueness among custom mode values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_DAC_CFG_MODE_CHECK_UNIQUE, VSF_DAC_CUSTOM_MODE_VALUES);
+#endif
+#endif  /* VSF_DAC_CFG_MODE_CHECK_UNIQUE */
+
+/* ==================== IRQ MASK UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_DAC_CFG_IRQ_MASK_CHECK_UNIQUE
+
+#ifdef VSF_DAC_CUSTOM_IRQ_MASK_VALUES
+/* Check uniqueness among custom IRQ mask values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_DAC_CFG_IRQ_MASK_CHECK_UNIQUE, VSF_DAC_CUSTOM_IRQ_MASK_VALUES);
+#endif
+
+/* Check uniqueness within vsf_dac_irq_mask_t enum */
+
+/* Check IRQ mask uniqueness - all IRQ mask bits should have different values
+ * Mandatory: VSF_DAC_IRQ_MASK_IDLE, VSF_DAC_IRQ_MASK_CPL
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_DAC_CFG_IRQ_MASK_CHECK_UNIQUE,
+    /* Mandatory IRQ masks - always included */
+    VSF_DAC_IRQ_MASK_IDLE,
+    VSF_DAC_IRQ_MASK_CPL
+    /* User-defined IRQ masks - appended by user configuration */
+#ifdef VSF_DAC_CUSTOM_IRQ_MASK_VALUES
+    , VSF_DAC_CUSTOM_IRQ_MASK_VALUES
+#endif
+);
+#endif  /* VSF_DAC_CFG_IRQ_MASK_CHECK_UNIQUE */
+
+#undef VSF_DAC_CFG_MODE_CHECK_UNIQUE
+#undef VSF_DAC_CFG_IRQ_MASK_CHECK_UNIQUE
+#undef VSF_DAC_CUSTOM_MODE_VALUES
+#undef VSF_DAC_CUSTOM_IRQ_MASK_VALUES
 
 #endif  /* VSF_HAL_USE_DAC */
