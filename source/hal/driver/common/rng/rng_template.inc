@@ -52,6 +52,7 @@ vsf_rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 
 /*============================ MACROS ========================================*/
 
+#undef VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY
 #undef VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY
 #undef vsf_real_rng_t
 #undef vsf_real_rng_capability
@@ -138,5 +139,58 @@ vsf_rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 #undef vsf_remap_rng_fini
 #undef vsf_remap_rng_capability
 #undef vsf_remap_rng_generate_request
+
+#undef VSF_HAL_TEMPLATE_IMP_NAME
+#undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
+
+/*============================ STATIC ASSERTIONS ==============================*/
+
+/* User-extensible macros for custom mode and IRQ mask values
+ * Users can define these macros before including this template to append
+ * their custom enum values to the uniqueness checks.
+ *
+ * Check modes for custom values:
+ *   VSF_RNG_CFG_MODE_CHECK_UNIQUE - Check mode for custom mode values
+ *     Default: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *   VSF_RNG_CFG_IRQ_MASK_CHECK_UNIQUE - Check mode for custom IRQ mask values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *
+ * Example usage in vendor driver:
+ *   #define VSF_RNG_CUSTOM_MODE_VALUES           MY_CUSTOM_MODE1, MY_CUSTOM_MODE2
+ *   #define VSF_RNG_CFG_MODE_CHECK_UNIQUE        VSF_HAL_CHECK_MODE_LOOSE
+ *   #define VSF_RNG_CUSTOM_IRQ_MASK_VALUES       MY_CUSTOM_IRQ1, MY_CUSTOM_IRQ2
+ *   #define VSF_RNG_CFG_IRQ_MASK_CHECK_UNIQUE    VSF_HAL_CHECK_MODE_STRICT
+ *   #include "hal/driver/common/rng/rng_template.inc"
+ */
+
+
+#ifdef VSF_RNG_CFG_MODE_CHECK_UNIQUE
+/* Default mode lists - can be redefined by users before including this file */
+/* Note: RNG typically doesn't have mode enums, but custom modes can be added */
+
+#ifdef VSF_RNG_CUSTOM_MODE_VALUES
+/* Check uniqueness among custom mode values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_RNG_CFG_MODE_CHECK_UNIQUE, VSF_RNG_CUSTOM_MODE_VALUES);
+#endif
+#endif  /* VSF_RNG_CFG_MODE_CHECK_UNIQUE */
+
+/* ==================== IRQ MASK UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_RNG_CFG_IRQ_MASK_CHECK_UNIQUE
+
+#ifdef VSF_RNG_CUSTOM_IRQ_MASK_VALUES
+/* Check uniqueness among custom IRQ mask values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_RNG_CFG_IRQ_MASK_CHECK_UNIQUE, VSF_RNG_CUSTOM_IRQ_MASK_VALUES);
+#endif
+
+/* Note: RNG typically doesn't have a standard IRQ mask enum, but custom IRQ masks can be added */
+#endif  /* VSF_RNG_CFG_IRQ_MASK_CHECK_UNIQUE */
+
+#undef VSF_RNG_CFG_MODE_CHECK_UNIQUE
+#undef VSF_RNG_CFG_IRQ_MASK_CHECK_UNIQUE
+#undef VSF_RNG_CUSTOM_MODE_VALUES
+#undef VSF_RNG_CUSTOM_IRQ_MASK_VALUES
 
 #endif  /* VSF_HAL_USE_RNG */

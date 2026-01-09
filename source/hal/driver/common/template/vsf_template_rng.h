@@ -91,21 +91,6 @@ extern "C" {
 
 /**
  * \~english
- * @brief Enable macro VSF_RNG_CFG_REIMPLEMENT_TYPE_CFG in specific hardware
- * drivers to redefine struct @ref vsf_rng_cfg_t. For compatibility, members
- * should not be deleted when redefining. The vsf_rng_isr_handler_t type also
- * needs to be redefined.
- * \~chinese
- * @brief 在特定硬件驱动中，可以启用宏 VSF_RNG_CFG_REIMPLEMENT_TYPE_CFG 来
- * 重新定义结构体 @ref vsf_rng_cfg_t。为保证兼容性，重新定义时不应删除成员。
- * 同时需要重新定义类型 vsf_rng_isr_handler_t。
- */
-#ifndef VSF_RNG_CFG_REIMPLEMENT_TYPE_CFG
-#    define VSF_RNG_CFG_REIMPLEMENT_TYPE_CFG DISABLED
-#endif
-
-/**
- * \~english
  * @brief Enable macro VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY in specific
  * hardware drivers to redefine struct @ref vsf_rng_capability_t. For
  * compatibility, members should not be deleted when redefining.
@@ -153,11 +138,13 @@ extern "C" {
 typedef struct vsf_rng_t vsf_rng_t;
 typedef void vsf_rng_on_ready_callback_t(void *param, uint32_t *buffer, uint32_t num);
 
+#if VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
 typedef struct vsf_rng_capability_t {
 #if VSF_RNG_CFG_INHERIT_HAL_CAPABILITY == ENABLED
     inherit(vsf_peripheral_capability_t)
 #endif
 } vsf_rng_capability_t;
+#endif  /* VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY */
 
 typedef struct vsf_rng_op_t {
 /// @cond
