@@ -25,7 +25,7 @@ jobs:
 
     steps:
     - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v1.3
       with:
         vs-version: ${{ matrix.vs-version }}
 
@@ -35,30 +35,30 @@ jobs:
         submodules: true # without recursive
 
     - name: Fixed NPCAP DLL Missing
-      if : ${{ matrix. solution_path == './example/template/project/vc/vsf_template.sln' }}
+      if: ${{ matrix.solution_path == './example/template/project/vc/vsf_template.sln' }}
       run: |
         sed -i '/VSF_NETDRV_USE_WPCAP/s/ENABLED/DISABLED/' example/template/config/vsf_usr_cfg/vsf_usr_cfg_win.h
       shell: bash
 
     - name: Restore NuGet packages
-      working-directory: ${{env.GITHUB_WORKSPACE}}
+      working-directory: ${{github.workspace}}
       run: nuget restore ${{matrix.solution_path}}
 
     - name: Build
-      working-directory: ${{env.GITHUB_WORKSPACE}}
+      working-directory: ${{github.workspace}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: msbuild /m /p:Configuration=${{matrix.build_config}} ${{matrix.solution_path}}
 
     #- name: Prepare Test
-    #  if : ${{ matrix. solution_path == './example/template/project/vc/vsf_template.sln' }}
+    #  if: ${{ matrix.solution_path == './example/template/project/vc/vsf_template.sln' }}
     #  run: |
     #    cp example/template/project/vc/lib/{SDL2/lib/x86/SDL2.dll,libwdi/libwdi.dll} example/template/project/vc/vsf_template_win/Debug
     #    pip install pytest pytest-bdd wexpect-uv simple-hexdump
     #  shell: bash
 
     #- name: Test
-    #  if : ${{ matrix. solution_path == './example/template/project/vc/vsf_template.sln' }}
+    #  if: ${{ matrix.solution_path == './example/template/project/vc/vsf_template.sln' }}
     #  run: |
     #    pytest -m "base or windows-only" --verbose -o log_cli=true --log-cli-level="DEBUG" --vsf_template=${{github.workspace}}\example\template\project\vc\vsf_template_win\Debug\vsf_template_win.exe
     #  working-directory: ${{github.workspace}}/test/pytest
