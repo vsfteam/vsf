@@ -71,6 +71,15 @@
 #   endif
 #endif
 
+#ifndef VSF_HAL_TEMPLATE_IMP_DEVICE_UPCASE_PREFIX
+#   if VSF_HAL_TEMPLATE_IMP_RENAME_DEVICE_PREFIX == ENABLED
+#       define VSF_HAL_TEMPLATE_IMP_DEVICE_UPCASE_PREFIX    VSF_MCONNECT(VSF, VSF_HAL_TEMPLATE_IMP_UPCASE_NAME, _CFG_IMP_DEVICE_UPCASE_PREFIX)
+#   else
+#       define __VSF_HAL_TEMPLATE_IMP_DEVICE_UPCASE_PREFIX  VSF_MCONNECT(VSF, VSF_HAL_TEMPLATE_IMP_UPCASE_NAME, _CFG_IMP_UPCASE_PREFIX)
+#       define VSF_HAL_TEMPLATE_IMP_DEVICE_UPCASE_PREFIX    VSF_MCONNECT(__VSF_HAL_TEMPLATE_IMP_DEVICE_UPCASE_PREFIX, VSF_HAL_TEMPLATE_IMP_UPCASE_NAME)
+#   endif
+#endif
+
 // VSF_HAL_TEMPLATE_IMP_COUNT_MASK_PREFIX -> VSF_SPI_CFG_IMP_COUNT_MASK_PREFIX -> VSF_HW
 #ifndef VSF_HAL_TEMPLATE_IMP_COUNT_MASK_PREFIX
 #   if VSF_HAL_TEMPLATE_IMP_RENAME_DEVICE_PREFIX == ENABLED
@@ -96,7 +105,13 @@ VSF_HAL_CFG_IMP_REMAP_FUNCTIONS
 
 #ifndef VSF_HAL_TEMPLATE_IMP_MULTI_CLASS
 // VSF_HAL_TEMPLATE_IMP_MULTI_CLASS -> VSF_HW_SPI_CFG_MULTI_CLASS
-#   define VSF_HAL_TEMPLATE_IMP_MULTI_CLASS                 VSF_MCONNECT(VSF_HAL_TEMPLATE_IMP_UPCASE_PREFIX, VSF_HAL_TEMPLATE_IMP_UPCASE_NAME, _CFG_MULTI_CLASS)
+#   if VSF_HAL_TEMPLATE_IMP_RENAME_DEVICE_PREFIX == ENABLED
+// When using RENAME_DEVICE_PREFIX, use DEVICE_UPCASE_PREFIX directly (e.g., VSF_HW_WWDT_CFG_MULTI_CLASS)
+#       define VSF_HAL_TEMPLATE_IMP_MULTI_CLASS             VSF_MCONNECT(VSF_HAL_TEMPLATE_IMP_DEVICE_UPCASE_PREFIX, _CFG_MULTI_CLASS)
+#   else
+// Normal case: VSF_HAL_TEMPLATE_IMP_UPCASE_PREFIX + _WDT + _CFG_MULTI_CLASS (e.g., VSF_HW_WDT_CFG_MULTI_CLASS)
+#       define VSF_HAL_TEMPLATE_IMP_MULTI_CLASS             VSF_MCONNECT(VSF_HAL_TEMPLATE_IMP_UPCASE_PREFIX, VSF_HAL_TEMPLATE_IMP_UPCASE_NAME, _CFG_MULTI_CLASS)
+#   endif
 #endif
 
 #if VSF_HAL_TEMPLATE_IMP_MULTI_CLASS == ENABLED
@@ -108,7 +123,7 @@ VSF_HAL_CFG_IMP_REMAP_FUNCTIONS
 // VSF_HAL_TEMPLATE_IMP_OP_VAR -> vsf_hw_spi_op
 #       define VSF_HAL_TEMPLATE_IMP_OP_VAR                  VSF_MCONNECT(VSF_HAL_TEMPLATE_IMP_DEVICE_PREFIX, _op)
 // VSF_HAL_TEMPLATE_IMP_OP -> .vsf_hw_spi.op = & vsf_hw_spi_op
-#       define VSF_HAL_TEMPLATE_IMP_OP                      .VSF_MCONNECT(vsf, VSF_HAL_TEMPLATE_IMP_NAME).op = & VSF_HAL_TEMPLATE_IMP_OP_VAR,
+#       define VSF_HAL_TEMPLATE_IMP_OP                      .VSF_MCONNECT(vsf, VSF_HAL_TEMPLATE_IMP_NAME).op = &VSF_HAL_TEMPLATE_IMP_OP_VAR,
 #   else
 #       ifndef VSF_HAL_TEMPLATE_IMP_EXTERN_OP
 // VSF_HAL_TEMPLATE_IMP_EXTERN_OP -> VSF_SPI_CFG_IMP_EXTERN_OP ->
@@ -124,7 +139,7 @@ VSF_HAL_CFG_IMP_REMAP_FUNCTIONS
 #           define VSF_HAL_TEMPLATE_IMP_OP_ATR
 #       endif
 // VSF_HAL_TEMPLATE_IMP_OP -> .vsf_hw_spi.op = & VSF_HAL_TEMPLATE_IMP_OP_VAR
-#       define VSF_HAL_TEMPLATE_IMP_OP                      .VSF_MCONNECT(vsf, VSF_HAL_TEMPLATE_IMP_NAME).op = & VSF_HAL_TEMPLATE_IMP_OP_VAR,
+#       define VSF_HAL_TEMPLATE_IMP_OP                      .VSF_MCONNECT(vsf, VSF_HAL_TEMPLATE_IMP_NAME).op = &VSF_HAL_TEMPLATE_IMP_OP_VAR,
 
 #       undef __VSF_HAL_TEMPLATE_API
 #       define __VSF_HAL_TEMPLATE_API                       VSF_HAL_TEMPLATE_API_OP
@@ -135,19 +150,29 @@ VSF_HAL_CFG_IMP_REMAP_FUNCTIONS
 #endif
 
 #ifndef VSF_HAL_TEMPLATE_IMP_OP_MACRO
-// VSF_HAL_TEMPLATE_IMP_OP_MACRO -> VSF_SPI_APIS
+// VSF_HAL_TEMPLATE_IMP_OP_MACRO -> VSF_SPI_APIS (example: when used for SPI)
 #   define VSF_HAL_TEMPLATE_IMP_OP_MACRO                    VSF_MCONNECT(VSF, VSF_HAL_TEMPLATE_IMP_UPCASE_NAME, _APIS)
 #endif
 
 /*
-static const vsf_spi_op_t __vsf_hw_spi_op = {
-    .capability =
-        (vsf_spi_capability_t(*)(vsf_spi_t *)) & vsf_hw_spi_capability,
-    .port_config_pins = (vsf_err_t(*)(vsf_spi_t *, uint32_t pin_mask,
-                                      vsf_spi_cfg_t *cfg_ptr)) &
-                        vsf_hw_spi_port_config_pins,
-    ...
-};
+ * Example: When this template is used for SPI, the macro below expands to:
+ * static const vsf_spi_op_t __vsf_hw_spi_op = {
+ *     .init = (vsf_err_t(*)(vsf_spi_t *, vsf_spi_cfg_t *)) & vsf_hw_spi_init,
+ *     .fini = (void(*)(vsf_spi_t *)) & vsf_hw_spi_fini,
+ *     .get_configuration = (vsf_err_t(*)(vsf_spi_t *, vsf_spi_cfg_t *)) & vsf_hw_spi_get_configuration,
+ *     .capability = (vsf_spi_capability_t(*)(vsf_spi_t *)) & vsf_hw_spi_capability,
+ *     .enable = (fsm_rt_t(*)(vsf_spi_t *)) & vsf_hw_spi_enable,
+ *     .disable = (fsm_rt_t(*)(vsf_spi_t *)) & vsf_hw_spi_disable,
+ *     .irq_enable = (void(*)(vsf_spi_t *, vsf_spi_irq_mask_t)) & vsf_hw_spi_irq_enable,
+ *     .irq_disable = (void(*)(vsf_spi_t *, vsf_spi_irq_mask_t)) & vsf_hw_spi_irq_disable,
+ *     .irq_clear = (vsf_spi_irq_mask_t(*)(vsf_spi_t *, vsf_spi_irq_mask_t)) & vsf_hw_spi_irq_clear,
+ *     .status = (vsf_spi_status_t(*)(vsf_spi_t *)) & vsf_hw_spi_status,
+ *     .cs_active = (vsf_err_t(*)(vsf_spi_t *, uint_fast8_t)) & vsf_hw_spi_cs_active,
+ *     .cs_inactive = (vsf_err_t(*)(vsf_spi_t *, uint_fast8_t)) & vsf_hw_spi_cs_inactive,
+ *     .request_transfer = (vsf_err_t(*)(vsf_spi_t *, void *, void *, uint_fast32_t)) & vsf_hw_spi_request_transfer,
+ *     .cancel_transfer = (vsf_err_t(*)(vsf_spi_t *)) & vsf_hw_spi_cancel_transfer,
+ *     ...
+ * };
  */
 VSF_HAL_TEMPLATE_IMP_OP_ATR const VSF_HAL_TEMPLATE_IMP_OP_TYPE VSF_HAL_TEMPLATE_IMP_OP_VAR = {
     VSF_HAL_TEMPLATE_IMP_OP_MACRO(VSF_HAL_TEMPLATE_IMP_DEVICE_PREFIX)

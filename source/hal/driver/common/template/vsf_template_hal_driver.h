@@ -21,6 +21,7 @@
 /*============================ INCLUDES ======================================*/
 
 #include "utilities/vsf_utilities.h"
+#include "vsf_template_static_assert_unique.h"
 
 #ifdef __cplusplus
 extern "C" {

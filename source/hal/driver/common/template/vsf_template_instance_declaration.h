@@ -58,9 +58,12 @@
 #ifndef VSF_HAL_TEMPLATE_DEC_DEVICE_PREFIX
 #   if VSF_HAL_TEMPLATE_DEC_RENAME_DEVICE_PREFIX == ENABLED
 // VSF_HAL_TEMPLATE_DEC_DEVICE_PREFIX -> VSF_SPI_CFG_DEC_DEVICE_PREFIX -> vsf_hw_qspi (for example)
+// This is used when you need different device names (e.g., QSPI vs SPI) with different drivers.
 #       define VSF_HAL_TEMPLATE_DEC_DEVICE_PREFIX           VSF_MCONNECT(VSF, VSF_HAL_TEMPLATE_DEC_UPCASE_NAME, _CFG_DEC_DEVICE_PREFIX)
 #   else
 // VSF_HAL_TEMPLATE_DEC_DEVICE_PREFIX -> VSF_SPI_CFG_DEC_DEVICE_PREFIX -> vsf_hw_spi (default)
+// Default naming pattern (PREFIX + NAME) is used when peripherals share the same driver
+// (e.g., USART/UART can use the same driver implementation with different prefixes).
 #       define VSF_HAL_TEMPLATE_DEC_DEVICE_PREFIX           VSF_MCONNECT(VSF_HAL_TEMPLATE_DEC_PREFIX, VSF_HAL_TEMPLATE_DEC_NAME)
 #   endif
 #endif
@@ -112,19 +115,27 @@ typedef struct VSF_HAL_TEMPLATE_DEC_TYPE VSF_HAL_TEMPLATE_DEC_TYPE;
 #   define VSF_HAL_TEMPLATE_DEC_INSTANCE_APIS               VSF_MCONNECT(VSF, VSF_HAL_TEMPLATE_DEC_UPCASE_NAME, _APIS)
 #endif
 
-// VSF_SPI_APIS uses __VSF_HAL_TEMPLATE_API
+// VSF_SPI_APIS uses __VSF_HAL_TEMPLATE_API (example: when used for SPI)
 #undef __VSF_HAL_TEMPLATE_API
 #define __VSF_HAL_TEMPLATE_API                              VSF_HAL_TEMPLATE_API_EXTERN
 
 /*
-extern vsf_spi_capability_t vsf_hw_spi_capability(vsf_hw_spi_t *spi_ptr);
-extern vsf_err_t vsf_hw_spi_port_config_pins(vsf_hw_spi_t  *spi_ptr,
-                                              uint32_t        pin_mask,
-                                              vsf_spi_cfg_t *cfg_ptr);
-extern void      vsf_hw_spi_set_direction(vsf_hw_spi_t *spi_ptr,
-                                           uint32_t       pin_mask,
-                                           uint32_t       direction_mask);
-...
+ * Example: When this template is used for SPI, the macro below expands to:
+ * extern vsf_err_t vsf_hw_spi_init(vsf_hw_spi_t *spi_ptr, vsf_spi_cfg_t *cfg_ptr);
+ * extern void vsf_hw_spi_fini(vsf_hw_spi_t *spi_ptr);
+ * extern vsf_err_t vsf_hw_spi_get_configuration(vsf_hw_spi_t *spi_ptr, vsf_spi_cfg_t *cfg_ptr);
+ * extern vsf_spi_capability_t vsf_hw_spi_capability(vsf_hw_spi_t *spi_ptr);
+ * extern fsm_rt_t vsf_hw_spi_enable(vsf_hw_spi_t *spi_ptr);
+ * extern fsm_rt_t vsf_hw_spi_disable(vsf_hw_spi_t *spi_ptr);
+ * extern void vsf_hw_spi_irq_enable(vsf_hw_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask);
+ * extern void vsf_hw_spi_irq_disable(vsf_hw_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask);
+ * extern vsf_spi_irq_mask_t vsf_hw_spi_irq_clear(vsf_hw_spi_t *spi_ptr, vsf_spi_irq_mask_t irq_mask);
+ * extern vsf_spi_status_t vsf_hw_spi_status(vsf_hw_spi_t *spi_ptr);
+ * extern vsf_err_t vsf_hw_spi_cs_active(vsf_hw_spi_t *spi_ptr, uint_fast8_t index);
+ * extern vsf_err_t vsf_hw_spi_cs_inactive(vsf_hw_spi_t *spi_ptr, uint_fast8_t index);
+ * extern vsf_err_t vsf_hw_spi_request_transfer(vsf_hw_spi_t *spi_ptr, void *out_buffer_ptr, void *in_buffer_ptr, uint_fast32_t count);
+ * extern vsf_err_t vsf_hw_spi_cancel_transfer(vsf_hw_spi_t *spi_ptr);
+ * ...
  */
 VSF_HAL_TEMPLATE_DEC_INSTANCE_APIS(VSF_HAL_TEMPLATE_DEC_DEVICE_PREFIX)
 
