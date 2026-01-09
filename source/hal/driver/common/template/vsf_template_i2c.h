@@ -451,13 +451,55 @@ typedef enum vsf_i2c_cmd_t {
 
     /**
      * \~english
+     * @brief No start condition command.
+     * Indicates that no START condition should be generated for this transfer.
+     * Used for continuing a transfer without sending a START condition.
+     * This is an optional command and may not be supported by all hardware.
+     * \~chinese
+     * @brief 无起始条件命令。
+     * 指示此传输不应产生起始条件。
+     * 用于在不发送起始条件的情况下继续传输。
+     * 这是一个可选命令，可能不是所有硬件都支持。
+     */
+    VSF_I2C_CMD_NO_START        = (0x00ul << 28),
+
+    /**
+     * \~english
+     * @brief No stop condition command.
+     * Indicates that no STOP condition should be generated for this transfer.
+     * Used for continuing a transfer without sending a STOP condition.
+     * This is an optional command and may not be supported by all hardware.
+     * \~chinese
+     * @brief 无停止条件命令。
+     * 指示此传输不应产生停止条件。
+     * 用于在不发送停止条件的情况下继续传输。
+     * 这是一个可选命令，可能不是所有硬件都支持。
+     */
+    VSF_I2C_CMD_NO_STOP         = (0x00ul << 29),
+
+    /**
+     * \~english
+     * @brief No restart condition command.
+     * Indicates that no RESTART condition should be generated for this transfer.
+     * Used for continuing a transfer without sending a RESTART condition.
+     * This is an optional command and may not be supported by all hardware.
+     * \~chinese
+     * @brief 无重新开始条件命令。
+     * 指示此传输不应产生重新开始条件。
+     * 用于在不发送重新开始条件的情况下继续传输。
+     * 这是一个可选命令，可能不是所有硬件都支持。
+     */
+    VSF_I2C_CMD_NO_RESTART      = (0x00ul << 30),
+
+    /**
+     * \~english
      * @brief 7-bit addressing mode command.
      * Configures the I2C transaction to use 7-bit slave addressing.
      * \~chinese
      * @brief 7 位地址模式命令。
      * 配置 I2C 传输使用 7 位从机寻址。
      */
-    VSF_I2C_CMD_7_BITS          = (0x0ul << 31),
+    VSF_I2C_CMD_7_BITS          = (0x00ul << 31),
 
     /**
      * \~english
@@ -504,16 +546,19 @@ enum {
     /**
      * \~english
      * @brief Combined mask for all I2C command bits.
-     * Includes read/write, start/stop/restart, and address bits masks.
+     * Includes read/write, start/stop/restart, no_start/no_stop/no_restart (optional), and address bits masks.
      * \~chinese
      * @brief I2C 所有命令位的组合掩码。
-     * 包含读写、起始/停止/重新开始和地址位掩码。
+     * 包含读写、起始/停止/重新开始、无起始/无停止/无重新开始（可选）和地址位掩码。
      */
 #ifndef VSF_I2C_CMD_ALL_BITS_MASK
     VSF_I2C_CMD_ALL_BITS_MASK       = VSF_I2C_CMD_RW_MASK
                                     | VSF_I2C_CMD_START
                                     | VSF_I2C_CMD_STOP
                                     | VSF_I2C_CMD_RESTART
+                                    | VSF_I2C_CMD_NO_START
+                                    | VSF_I2C_CMD_NO_STOP
+                                    | VSF_I2C_CMD_NO_RESTART
                                     | VSF_I2C_CMD_BITS_MASK,
 #endif
 };
@@ -716,25 +761,53 @@ typedef enum vsf_i2c_irq_mask_t {
      * 仅在从机模式下有效。
      */
     VSF_I2C_IRQ_MASK_SLAVE_TRANSFER_COMPLETE        = (0x1ul << 12),
-
 } vsf_i2c_irq_mask_t;
 #endif
 
 enum {
+    /**
+     * \~english
+     * @brief Combined master error interrupt mask.
+     * This mask includes all master mode error interrupts:
+     * - VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST: Master loses arbitration in multi-master mode
+     * - VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK: NACK received after sending address
+     * - VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT: NACK received during master transmission
+     * \~chinese
+     * @brief 组合主机错误中断掩码。
+     * 此掩码包含所有主机模式错误中断：
+     * - VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST: 多主机模式下主机失去仲裁
+     * - VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK: 发送地址后收到 NACK
+     * - VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT: 主机传输过程中收到 NACK
+     */
 #ifndef VSF_I2C_IRQ_MASK_MASTER_ERR
     VSF_I2C_IRQ_MASK_MASTER_ERR                     = VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST
                                                     | VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK
-                                                    | VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT,  //!< \~english Combined master error interrupt mask \~chinese 组合主机错误中断掩码
+                                                    | VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT,
 #endif
 
-    // TODO: Add slave error interrupt mask
+    /**
+     * \~english
+     * @brief Combined slave error interrupt mask.
+     * This mask includes all slave mode error interrupts:
+     * \~chinese
+     * @brief 组合从机错误中断掩码。
+     * 此掩码包含所有从机模式错误中断：
+     */
 #ifndef VSF_I2C_IRQ_MASK_SLAVE_ERR
-    VSF_I2C_IRQ_MASK_SLAVE_ERR                      = 0,  //!< \~english Combined slave error interrupt mask \~chinese 组合从机错误中断掩码
+    VSF_I2C_IRQ_MASK_SLAVE_ERR                      = 0,
 #endif
 
+    /**
+     * \~english
+     * @brief Combined error interrupt mask for both master and slave modes.
+     * This mask includes all error interrupts from both master and slave modes.
+     * \~chinese
+     * @brief 主机和从机模式的组合错误中断掩码。
+     * 此掩码包含主机和从机模式的所有错误中断。
+     */
 #ifndef VSF_I2C_IRQ_MASK_ERR
     VSF_I2C_IRQ_MASK_ERR                            = VSF_I2C_IRQ_MASK_MASTER_ERR
-                                                    | VSF_I2C_IRQ_MASK_SLAVE_ERR,     //!< \~english Combined error interrupt mask \~chinese 组合错误中断掩码
+                                                    | VSF_I2C_IRQ_MASK_SLAVE_ERR,
 #endif
 
 #ifndef VSF_I2C_IRQ_ALL_BITS_MASK
@@ -890,16 +963,16 @@ typedef struct vsf_i2c_cfg_t {
     //! \~chinese 工作模式
     vsf_i2c_mode_t mode;
 
-    //! \~english clock frequency in Hz
-    //! \~chinese 时钟频率，单位 Hz
+    //! \~english clock frequency in Hz (in master mode, clock may be stretched by slave)
+    //! \~chinese 时钟频率，单位 Hz（主机模式下，时钟可能被从机延展）
     uint32_t clock_hz;
 
     //! \~english interrupt configuration
     //! \~chinese 中断配置
     vsf_i2c_isr_t isr;
 
-    //! \~english slave address in slave mode
-    //! \~chinese 从机模式下的地址
+    //! \~english slave address in slave mode (address does not include read/write bit)
+    //! \~chinese 从机模式下的地址（地址不包含读写位）
     uint_fast16_t slave_addr;
 } vsf_i2c_cfg_t;
 #endif
@@ -1132,7 +1205,7 @@ extern vsf_i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr);
  * \~english
  * @brief I2C instance as master mode performs a FIFO transfer
  * @param[in,out] i2c_ptr: a pointer to structure @ref vsf_i2c_t
- * @param[in] address: address of I2C transfer
+ * @param[in] address: address of I2C transfer (address does not include read/write bit)
  * @param[in] cmd: I2C command
  * @param[in] count: number of data to transfer
  * @param[in,out] buffer_ptr: I2C transfer buffer (must not be NULL when count is non-zero)
@@ -1149,7 +1222,7 @@ extern vsf_i2c_capability_t vsf_i2c_capability(vsf_i2c_t *i2c_ptr);
  * \~chinese
  * @brief I2C 主机进行一次 FIFO 传输
  * @param[in,out] i2c_ptr: 结构体 @ref vsf_i2c_t 的指针
- * @param[in] address: I2C 传输的地址
+ * @param[in] address: I2C 传输的地址（地址不包含读写位）
  * @param[in] cmd: I2C 命令
  * @param[in] count: 要传输的数据数量
  * @param[in,out] buffer_ptr: I2C 传输缓冲区（当 count 不为 0 时，不能为空指针）
@@ -1199,7 +1272,7 @@ extern uint_fast16_t vsf_i2c_slave_fifo_transfer(vsf_i2c_t *i2c_ptr,
  * \~english
  * @brief I2C instance as master mode requests a transfer
  * @param[in,out] i2c_ptr: a pointer to structure @ref vsf_i2c_t
- * @param[in] address: address of I2C transfer
+ * @param[in] address: address of I2C transfer (address does not include read/write bit)
  * @param[in] cmd: I2C command
  * @param[in] count: number of data to transfer
  * @param[in,out] buffer_ptr: I2C transfer buffer
@@ -1208,7 +1281,7 @@ extern uint_fast16_t vsf_i2c_slave_fifo_transfer(vsf_i2c_t *i2c_ptr,
  * \~chinese
  * @brief I2C 主机请求一次传输
  * @param[in,out] i2c_ptr: 结构体 @ref vsf_i2c_t 的指针
- * @param[in] address: I2C 传输的地址
+ * @param[in] address: I2C 传输的地址（地址不包含读写位）
  * @param[in] cmd: I2C 命令
  * @param[in] count: 要传输的数据数量
  * @param[in,out] buffer_ptr: I2C 传输缓冲区

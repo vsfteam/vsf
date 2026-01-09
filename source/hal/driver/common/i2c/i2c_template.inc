@@ -140,7 +140,15 @@ vsf_i2c_irq_mask_t vsf_real_i2c_irq_clear(vsf_real_i2c_t *i2c_ptr, vsf_i2c_irq_m
 
 /*============================ MACROS ========================================*/
 
+#undef VSF_I2C_CFG_REIMPLEMENT_TYPE_CAPABILITY
+#undef VSF_I2C_CFG_REIMPLEMENT_TYPE_CFG
+#undef VSF_I2C_CFG_REIMPLEMENT_TYPE_CMD
+#undef VSF_I2C_CFG_REIMPLEMENT_TYPE_CTRL
+#undef VSF_I2C_CFG_REIMPLEMENT_TYPE_IRQ_MASK
+#undef VSF_I2C_CFG_REIMPLEMENT_TYPE_MODE
+#undef VSF_I2C_CFG_REIMPLEMENT_TYPE_STATUS
 #undef VSF_I2C_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_I2C_CFG_REIMPLEMENT_API_CTRL
 #undef VSF_I2C_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_I2C_CFG_REIMPLEMENT_API_IRQ_CLEAR
 #undef VSF_I2C_CFG_CAPABILITY_IRQ_MASK
@@ -151,6 +159,7 @@ vsf_i2c_irq_mask_t vsf_real_i2c_irq_clear(vsf_real_i2c_t *i2c_ptr, vsf_i2c_irq_m
 #undef VSF_I2C_CFG_CAPABILITY_MIN_TRANSFER_SIZE
 
 #undef vsf_real_i2c_t
+#undef vsf_real_master_request
 #undef vsf_real_i2c_capability
 #undef vsf_real_i2c_ctrl
 #undef vsf_real_i2c_get_configuration
@@ -338,5 +347,276 @@ vsf_i2c_irq_mask_t vsf_real_i2c_irq_clear(vsf_real_i2c_t *i2c_ptr, vsf_i2c_irq_m
 #undef vsf_remap_i2c_ctrl
 #undef vsf_remap_i2c_get_configuration
 #undef vsf_remap_i2c_irq_clear
+
+#undef VSF_HAL_TEMPLATE_IMP_NAME
+#undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
+
+/*============================ STATIC ASSERTIONS ==============================*/
+
+/* User-extensible macros for custom mode and IRQ mask values
+ * Users can define these macros before including this template to append
+ * their custom enum values to the uniqueness checks.
+ *
+ * Check modes for custom values:
+ *   VSF_I2C_CFG_MODE_CHECK_UNIQUE - Check mode for custom mode values
+ *     Default: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *   VSF_I2C_CFG_IRQ_MASK_CHECK_UNIQUE - Check mode for custom IRQ mask values
+ *     Default: VSF_HAL_CHECK_MODE_STRICT (strict mode, no overlapping bits)
+ *     Can be set to: VSF_HAL_CHECK_MODE_LOOSE (loose mode, no overlapping bits)
+ *
+ * Example usage in vendor driver:
+ *   #define VSF_I2C_CUSTOM_MODE_VALUES           MY_CUSTOM_MODE1, MY_CUSTOM_MODE2
+ *   #define VSF_I2C_CFG_MODE_CHECK_UNIQUE        VSF_HAL_CHECK_MODE_LOOSE
+ *   #define VSF_I2C_CUSTOM_IRQ_MASK_VALUES       MY_CUSTOM_IRQ1, MY_CUSTOM_IRQ2
+ *   #define VSF_I2C_CFG_IRQ_MASK_CHECK_UNIQUE    VSF_HAL_CHECK_MODE_STRICT
+ *   #include "hal/driver/common/i2c/i2c_template.inc"
+ */
+
+
+#ifdef VSF_I2C_CFG_MODE_CHECK_UNIQUE
+/* Default mode lists - can be redefined by users before including this file */
+#ifndef VSF_I2C_CHECK_UNIQUE_MODE_MODES
+#   define VSF_I2C_CHECK_UNIQUE_MODE_MODES \
+        VSF_I2C_MODE_MASTER, \
+        VSF_I2C_MODE_SLAVE
+#endif
+
+#ifndef VSF_I2C_CHECK_UNIQUE_SPEED_MODES
+#   define VSF_I2C_CHECK_UNIQUE_SPEED_MODES \
+        VSF_I2C_SPEED_STANDARD_MODE, \
+        VSF_I2C_SPEED_FAST_MODE, \
+        VSF_I2C_SPEED_FAST_MODE_PLUS, \
+        VSF_I2C_SPEED_HIGH_SPEED_MODE
+#endif
+
+#ifndef VSF_I2C_CHECK_UNIQUE_ADDR_MODES
+#   define VSF_I2C_CHECK_UNIQUE_ADDR_MODES \
+        VSF_I2C_ADDR_7_BITS, \
+        VSF_I2C_ADDR_10_BITS
+#endif
+
+/* ==================== GROUP INTERNAL UNIQUENESS CHECKS ==================== */
+/* Check uniqueness within each functional group */
+
+/* Check mode uniqueness - all mode modes should have different values
+ * Mandatory: VSF_I2C_MODE_MASTER, VSF_I2C_MODE_SLAVE
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_I2C_CFG_MODE_CHECK_UNIQUE,
+    VSF_I2C_MODE_MASTER,
+    VSF_I2C_MODE_SLAVE
+);
+
+/* Check speed mode uniqueness - all speed modes should have different values
+ * Mandatory: VSF_I2C_SPEED_STANDARD_MODE, VSF_I2C_SPEED_FAST_MODE,
+ *            VSF_I2C_SPEED_FAST_MODE_PLUS, VSF_I2C_SPEED_HIGH_SPEED_MODE
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_I2C_CFG_MODE_CHECK_UNIQUE,
+    VSF_I2C_SPEED_STANDARD_MODE,
+    VSF_I2C_SPEED_FAST_MODE,
+    VSF_I2C_SPEED_FAST_MODE_PLUS,
+    VSF_I2C_SPEED_HIGH_SPEED_MODE
+);
+
+/* Check address mode uniqueness - all address modes should have different values
+ * Mandatory: VSF_I2C_ADDR_7_BITS, VSF_I2C_ADDR_10_BITS
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_I2C_CFG_MODE_CHECK_UNIQUE,
+    VSF_I2C_ADDR_7_BITS,
+    VSF_I2C_ADDR_10_BITS
+);
+
+#ifdef VSF_I2C_CUSTOM_MODE_VALUES
+/* Check uniqueness among custom mode values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_I2C_CFG_MODE_CHECK_UNIQUE, VSF_I2C_CUSTOM_MODE_VALUES);
+#endif
+
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_I2C_CFG_MODE_CHECK_UNIQUE,
+    /* Mandatory modes - always included */
+    VSF_I2C_MODE_MASTER, VSF_I2C_MODE_SLAVE,
+    VSF_I2C_SPEED_STANDARD_MODE, VSF_I2C_SPEED_FAST_MODE,
+    VSF_I2C_SPEED_FAST_MODE_PLUS, VSF_I2C_SPEED_HIGH_SPEED_MODE,
+    VSF_I2C_ADDR_7_BITS, VSF_I2C_ADDR_10_BITS
+    /* User-defined modes - appended by user configuration */
+#ifdef VSF_I2C_CUSTOM_MODE_VALUES
+    , VSF_I2C_CUSTOM_MODE_VALUES
+#endif
+);
+
+#undef VSF_I2C_CHECK_UNIQUE_MODE_MODES
+#undef VSF_I2C_CHECK_UNIQUE_SPEED_MODES
+#undef VSF_I2C_CHECK_UNIQUE_ADDR_MODES
+#endif  /* VSF_I2C_CFG_MODE_CHECK_UNIQUE */
+
+/* ==================== CMD UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_I2C_CFG_CMD_CHECK_UNIQUE
+/* Default cmd lists - can be redefined by users before including this file */
+#ifndef VSF_I2C_CHECK_UNIQUE_CMD_RW_MODES
+#   define VSF_I2C_CHECK_UNIQUE_CMD_RW_MODES \
+        VSF_I2C_CMD_WRITE, \
+        VSF_I2C_CMD_READ
+#endif
+
+#ifndef VSF_I2C_CHECK_UNIQUE_CMD_START_STOP_RESTART_MODES
+#   define VSF_I2C_CHECK_UNIQUE_CMD_START_STOP_RESTART_MODES \
+        VSF_I2C_CMD_START, \
+        VSF_I2C_CMD_STOP, \
+        VSF_I2C_CMD_RESTART
+#endif
+
+#ifndef VSF_I2C_CHECK_UNIQUE_CMD_ADDR_MODES
+#   define VSF_I2C_CHECK_UNIQUE_CMD_ADDR_MODES \
+        VSF_I2C_CMD_7_BITS, \
+        VSF_I2C_CMD_10_BITS
+#endif
+
+/* ==================== GROUP INTERNAL UNIQUENESS CHECKS ==================== */
+/* Check uniqueness within each functional group */
+
+/* Check read/write command uniqueness - all read/write commands should have different values
+ * Mandatory: VSF_I2C_CMD_WRITE, VSF_I2C_CMD_READ
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_I2C_CFG_CMD_CHECK_UNIQUE, VSF_I2C_CHECK_UNIQUE_CMD_RW_MODES);
+
+/* Check start/stop/restart command uniqueness - all start/stop/restart commands should have different values
+ * Mandatory: VSF_I2C_CMD_START, VSF_I2C_CMD_STOP, VSF_I2C_CMD_RESTART
+ * Optional: VSF_I2C_CMD_NO_START, VSF_I2C_CMD_NO_STOP, VSF_I2C_CMD_NO_RESTART
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_I2C_CFG_CMD_CHECK_UNIQUE,
+    VSF_I2C_CHECK_UNIQUE_CMD_START_STOP_RESTART_MODES
+#ifdef VSF_I2C_CMD_NO_START
+    , VSF_I2C_CMD_NO_START
+#endif
+#ifdef VSF_I2C_CMD_NO_STOP
+    , VSF_I2C_CMD_NO_STOP
+#endif
+#ifdef VSF_I2C_CMD_NO_RESTART
+    , VSF_I2C_CMD_NO_RESTART
+#endif
+);
+
+/* Check address mode command uniqueness - all address mode commands should have different values
+ * Mandatory: VSF_I2C_CMD_7_BITS, VSF_I2C_CMD_10_BITS
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_I2C_CFG_CMD_CHECK_UNIQUE, VSF_I2C_CHECK_UNIQUE_CMD_ADDR_MODES);
+
+#ifdef VSF_I2C_CUSTOM_CMD_VALUES
+/* Check uniqueness among custom cmd values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_I2C_CFG_CMD_CHECK_UNIQUE, VSF_I2C_CUSTOM_CMD_VALUES);
+#endif
+
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_I2C_CFG_CMD_CHECK_UNIQUE,
+    /* Mandatory commands - always included */
+    VSF_I2C_CMD_WRITE, VSF_I2C_CMD_READ,
+    VSF_I2C_CMD_START, VSF_I2C_CMD_STOP, VSF_I2C_CMD_RESTART,
+    VSF_I2C_CMD_7_BITS, VSF_I2C_CMD_10_BITS
+    /* Optional commands - conditionally included */
+#ifdef VSF_I2C_CMD_NO_START
+    , VSF_I2C_CMD_NO_START
+#endif
+#ifdef VSF_I2C_CMD_NO_STOP
+    , VSF_I2C_CMD_NO_STOP
+#endif
+#ifdef VSF_I2C_CMD_NO_RESTART
+    , VSF_I2C_CMD_NO_RESTART
+#endif
+    /* User-defined commands - appended by user configuration */
+#ifdef VSF_I2C_CUSTOM_CMD_VALUES
+    , VSF_I2C_CUSTOM_CMD_VALUES
+#endif
+);
+
+#undef VSF_I2C_CHECK_UNIQUE_CMD_RW_MODES
+#undef VSF_I2C_CHECK_UNIQUE_CMD_START_STOP_RESTART_MODES
+#undef VSF_I2C_CHECK_UNIQUE_CMD_ADDR_MODES
+#endif  /* VSF_I2C_CFG_CMD_CHECK_UNIQUE */
+
+/* ==================== IRQ MASK UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_I2C_CFG_IRQ_MASK_CHECK_UNIQUE
+
+#ifdef VSF_I2C_CUSTOM_IRQ_MASK_VALUES
+/* Check uniqueness among custom IRQ mask values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_I2C_CFG_IRQ_MASK_CHECK_UNIQUE, VSF_I2C_CUSTOM_IRQ_MASK_VALUES);
+#endif
+
+/* Check uniqueness within vsf_i2c_irq_mask_t enum */
+
+/* Check IRQ mask uniqueness - all IRQ mask bits should have different values
+ * Mandatory: VSF_I2C_IRQ_MASK_MASTER_TX, VSF_I2C_IRQ_MASK_MASTER_RX,
+ *            VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE, VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST,
+ *            VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK, VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT,
+ *            VSF_I2C_IRQ_MASK_MASTER_START_OR_RESTART_DETECT,
+ *            VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT, VSF_I2C_IRQ_MASK_SLAVE_START_OR_RESTART_DETECT,
+ *            VSF_I2C_IRQ_MASK_SLAVE_STOP_DETECT, VSF_I2C_IRQ_MASK_SLAVE_TX,
+ *            VSF_I2C_IRQ_MASK_SLAVE_RX, VSF_I2C_IRQ_MASK_SLAVE_TRANSFER_COMPLETE,
+ *            VSF_I2C_IRQ_MASK_SLAVE_RX_OVERFLOW_ERR
+ * Note: VSF_I2C_IRQ_MASK_MASTER_ERR and VSF_I2C_IRQ_MASK_SLAVE_ERR are combined error masks
+ *       (OR of other error masks) and should not be included in uniqueness checks
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_I2C_CFG_IRQ_MASK_CHECK_UNIQUE,
+    /* Mandatory IRQ masks - always included */
+    VSF_I2C_IRQ_MASK_MASTER_TX,
+    VSF_I2C_IRQ_MASK_MASTER_RX,
+    VSF_I2C_IRQ_MASK_MASTER_TRANSFER_COMPLETE,
+    VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST,
+    VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK,
+    VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT,
+    /* Note: VSF_I2C_IRQ_MASK_MASTER_ERR is excluded - it's a combined mask (OR of above error masks) */
+    VSF_I2C_IRQ_MASK_MASTER_START_OR_RESTART_DETECT,
+    VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT,
+    VSF_I2C_IRQ_MASK_SLAVE_START_OR_RESTART_DETECT,
+    VSF_I2C_IRQ_MASK_SLAVE_STOP_DETECT,
+    VSF_I2C_IRQ_MASK_SLAVE_TX,
+    VSF_I2C_IRQ_MASK_SLAVE_RX,
+    VSF_I2C_IRQ_MASK_SLAVE_TRANSFER_COMPLETE
+    /* Note: VSF_I2C_IRQ_MASK_SLAVE_ERR is excluded - it's a combined mask (OR of above error mask) */
+    /* Implementation Required IRQ masks - conditionally included */
+    /* User-defined IRQ masks - appended by user configuration */
+#ifdef VSF_I2C_CUSTOM_IRQ_MASK_VALUES
+    , VSF_I2C_CUSTOM_IRQ_MASK_VALUES
+#endif
+);
+#endif  /* VSF_I2C_CFG_IRQ_MASK_CHECK_UNIQUE */
+
+/* ==================== CTRL UNIQUENESS CHECKS ==================== */
+
+#ifdef VSF_I2C_CFG_CTRL_CHECK_UNIQUE
+
+#ifdef VSF_I2C_CUSTOM_CTRL_VALUES
+/* Check uniqueness among custom ctrl values using user-specified check mode */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(VSF_I2C_CFG_CTRL_CHECK_UNIQUE, VSF_I2C_CUSTOM_CTRL_VALUES);
+#endif
+
+/* Check ctrl uniqueness - all ctrl values should have different values
+ * Placeholder: __VSF_I2C_CTRL_DUMMP
+ */
+VSF_HAL_CHECK_UNIQUE_CUSTOM(
+    VSF_I2C_CFG_CTRL_CHECK_UNIQUE,
+    /* Placeholder ctrl - always included */
+    __VSF_I2C_CTRL_DUMMP
+    /* User-defined ctrls - appended by user configuration */
+#ifdef VSF_I2C_CUSTOM_CTRL_VALUES
+    , VSF_I2C_CUSTOM_CTRL_VALUES
+#endif
+);
+#endif  /* VSF_I2C_CFG_CTRL_CHECK_UNIQUE */
+
+#undef VSF_I2C_CFG_MODE_CHECK_UNIQUE
+#undef VSF_I2C_CFG_CMD_CHECK_UNIQUE
+#undef VSF_I2C_CFG_IRQ_MASK_CHECK_UNIQUE
+#undef VSF_I2C_CFG_CTRL_CHECK_UNIQUE
+#undef VSF_I2C_CUSTOM_MODE_VALUES
+#undef VSF_I2C_CUSTOM_CMD_VALUES
+#undef VSF_I2C_CUSTOM_IRQ_MASK_VALUES
+#undef VSF_I2C_CUSTOM_CTRL_VALUES
 
 #endif  /* VSF_HAL_USE_I2C */
