@@ -234,11 +234,6 @@ vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_request)(
     return VSF_ERR_NONE;
 }
 
-void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_transact_stop)(
-    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
-) {
-}
-
 /*============================ INCLUDES ======================================*/
 
 #define VSF_SDIO_CFG_REIMPLEMENT_API_CAPABILITY     ENABLED
