@@ -102,8 +102,10 @@ typedef enum vsf_i2c_cmd_t {
     VSF_I2C_CMD_NO_START                        = (0x01ul << 28),
 
     VSF_I2C_CMD_STOP                            = (0x00ul << 29),
+    VSF_I2C_CMD_NO_STOP                         = (0x01ul << 29),
+
     VSF_I2C_CMD_RESTART                         = (0x01ul << 30),
-    VSF_I2C_CMD_NO_STOP_RESTART                 = (0x01ul << 30),
+    VSF_I2C_CMD_NO_RESTART                      = (0x00ul << 30),
 
     VSF_I2C_CMD_7_BITS                          = (0x00ul << 31),
     VSF_I2C_CMD_10_BITS                         = (0x01ul << 31),
