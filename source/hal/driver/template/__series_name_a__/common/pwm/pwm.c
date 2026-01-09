@@ -179,7 +179,9 @@ vsf_pwm_capability_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_capability)(
  */
 
 // HW
-#define VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED
+#define VSF_PWM_CFG_MODE_CHECK_UNIQUE                 VSF_HAL_CHECK_MODE_LOOSE
+#define VSF_PWM_CFG_IRQ_MASK_CHECK_UNIQUE             VSF_HAL_CHECK_MODE_STRICT
+#define VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
 #define VSF_PWM_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #define VSF_PWM_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t)                                \

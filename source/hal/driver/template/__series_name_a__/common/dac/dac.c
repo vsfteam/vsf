@@ -180,21 +180,13 @@ vsf_err_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_channel_request)(
     return VSF_ERR_NONE;
 }
 
-static vsf_dac_irq_mask_t VSF_MCONNECT(__, VSF_DAC_CFG_IMP_PREFIX, _dac_get_irq_mask)(
-    VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr
-) {
-    // implement this function in the device file
-    VSF_HAL_ASSERT(0);
-    return 0;
-}
-
 static void VSF_MCONNECT(__, VSF_DAC_CFG_IMP_PREFIX, _dac_irqhandler)(
     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr
 ) {
     VSF_HAL_ASSERT(NULL != dac_ptr);
 
-    vsf_dac_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_DAC_CFG_IMP_PREFIX, _dac_get_irq_mask)(dac_ptr);
     vsf_dac_isr_t *isr_ptr = &dac_ptr->isr;
+    vsf_dac_irq_mask_t irq_mask = VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_irq_clear)(dac_ptr, VSF_DAC_IRQ_ALL_BITS_MASK);
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_dac_t *)dac_ptr, irq_mask);
     }
@@ -212,7 +204,21 @@ static void VSF_MCONNECT(__, VSF_DAC_CFG_IMP_PREFIX, _dac_irqhandler)(
  *              VSF_DAC_CFG_CAPABILITY_CHANNEL_COUNT (default: 4)
  *      VSF_DAC_CFG_REIMPLEMENT_API_GET_CONFIGURATION for dac_get_configuration.
  *          Default implementation will trigger assertion failure and return VSF_ERR_NOT_SUPPORT.
+ *      VSF_DAC_CFG_REIMPLEMENT_API_IRQ_CLEAR for dac_irq_clear.
+ *          Default implementation will trigger assertion failure and return 0.
  */
+
+vsf_dac_irq_mask_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_irq_clear)(
+    VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr,
+    vsf_dac_irq_mask_t irq_mask
+) {
+    VSF_HAL_ASSERT(NULL != dac_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return 0;
+}
 
 vsf_dac_capability_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_capability)(
     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr
@@ -249,8 +255,11 @@ vsf_err_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_get_configuration)(
  */
 
 // HW
+#define VSF_DAC_CFG_MODE_CHECK_UNIQUE                 VSF_HAL_CHECK_MODE_LOOSE
+#define VSF_DAC_CFG_IRQ_MASK_CHECK_UNIQUE             VSF_HAL_CHECK_MODE_STRICT
 #define VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
 #define VSF_DAC_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
+#define VSF_DAC_CFG_REIMPLEMENT_API_IRQ_CLEAR         ENABLED
 #define VSF_DAC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t)                                \
         VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac, __IDX) = {                   \

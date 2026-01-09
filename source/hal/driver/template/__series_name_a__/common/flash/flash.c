@@ -169,11 +169,15 @@ vsf_flash_status_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_status)(
     };
 }
 
-static vsf_flash_irq_mask_t VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_get_irq_mask)(
-    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr
+vsf_flash_irq_mask_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_clear)(
+    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t) *flash_ptr,
+    vsf_flash_irq_mask_t irq_mask
 ) {
-    // implement this function in the device file
+    VSF_HAL_ASSERT(NULL != flash_ptr);
+
+    // Default implementation: not supported, trigger assertion
     VSF_HAL_ASSERT(0);
+
     return 0;
 }
 
@@ -182,8 +186,8 @@ static void VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != flash_ptr);
 
-    vsf_flash_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_FLASH_CFG_IMP_PREFIX, _flash_get_irq_mask)(flash_ptr);
     vsf_flash_isr_t *isr_ptr = &flash_ptr->isr;
+    vsf_flash_irq_mask_t irq_mask = VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_clear)(flash_ptr, VSF_FLASH_IRQ_ALL_BITS_MASK);
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_flash_t *)flash_ptr, irq_mask);
     }
@@ -263,6 +267,8 @@ vsf_err_t VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_ctrl)(
  */
 
 // only define in source file
+#define VSF_FLASH_CFG_MODE_CHECK_UNIQUE                 VSF_HAL_CHECK_MODE_LOOSE
+#define VSF_FLASH_CFG_IRQ_MASK_CHECK_UNIQUE             VSF_HAL_CHECK_MODE_STRICT
 #define VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
 #define VSF_FLASH_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #define VSF_FLASH_CFG_ERASE_ALL_TEMPLATE                ENABLED

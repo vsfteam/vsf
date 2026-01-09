@@ -27,10 +27,10 @@
  */
 
 // IPCore
-#   define __VSF_HAL_$ {TIMER_IP} _TIMER_CLASS_IMPLEMENT
+#   define __VSF_HAL_${TIMER_IP}_TIMER_CLASS_IMPLEMENT
 // IPCore end
 // HW using ${TIMER_IP} IPCore driver
-#   define __VSF_HAL_$ {TIMER_IP} _TIMER_CLASS_INHERIT__
+#   define __VSF_HAL_${TIMER_IP}_TIMER_CLASS_INHERIT__
 // HW end
 
 #   include "hal/vsf_hal.h"
@@ -136,24 +136,34 @@ void VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_irq_disable)(
     VSF_HAL_ASSERT(timer_ptr != NULL);
 }
 
-static vsf_timer_irq_mask_t VSF_MCONNECT(__, VSF_TIMER_CFG_IMP_PREFIX, _timer_get_irq_mask)(
-    VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t) *timer_ptr
-) {
+vsf_timer_irq_mask_t VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_irq_clear)(
+    VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t) * timer_ptr,
+    vsf_timer_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(timer_ptr != NULL);
     // implement this function in the device file
-    VSF_HAL_ASSERT(0);
+    // This function should clear the specified interrupt flags and return the state before clearing
     return 0;
+}
+
+vsf_timer_status_t VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_status)(
+    VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t) * timer_ptr
+) {
+    VSF_HAL_ASSERT(timer_ptr != NULL);
+    return (vsf_timer_status_t) {
+        .is_busy = false,
+    };
 }
 
 static void VSF_MCONNECT(__, VSF_TIMER_CFG_IMP_PREFIX, _timer_irqhandler)(
     VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t) * timer_ptr)
 {
-    VSF_HAL_ASSERT(NULL != timer_ptr);
+    VSF_HAL_ASSERT(timer_ptr != NULL);
 
-    vsf_timer_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_TIMER_CFG_IMP_PREFIX, _timer_get_irq_mask)(timer_ptr);
-    vsf_timer_isr_t     *isr_ptr  = &timer_ptr->isr;
+    vsf_timer_isr_t *isr_ptr = &timer_ptr->isr;
+    vsf_timer_irq_mask_t irq_mask = VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_irq_clear)(timer_ptr, VSF_TIMER_IRQ_ALL_BITS_MASK);
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_timer_t *)timer_ptr,
-                            irq_mask);
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_timer_t *)timer_ptr, irq_mask);
     }
 }
 
@@ -295,8 +305,11 @@ vsf_err_t VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_ctrl)(
  */
 
 // HW
+#   define VSF_TIMER_CFG_MODE_CHECK_UNIQUE                          VSF_HAL_CHECK_MODE_LOOSE
+#   define VSF_TIMER_CFG_IRQ_MASK_CHECK_UNIQUE                      VSF_HAL_CHECK_MODE_STRICT
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY                 ENABLED
-#define VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION          ENABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_IRQ_CLEAR                  ENABLED
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CTRL                       ENABLED
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_CTRL               ENABLED
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_CONFIG             ENABLED
@@ -304,6 +317,7 @@ vsf_err_t VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_ctrl)(
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_STOP               ENABLED
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_REQUEST_START      ENABLED
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_CHANNEL_REQUEST_STOP       ENABLED
+#   define VSF_TIMER_CFG_REIMPLEMENT_API_STATUS                     ENABLED
 
 #   define VSF_TIMER_CFG_IMP_LV0(__IDX, __HAL_OP)                              \
        VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t)                        \

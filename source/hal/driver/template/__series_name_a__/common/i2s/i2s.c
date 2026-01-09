@@ -165,17 +165,25 @@ vsf_i2s_status_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_status)(
     VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr
 ) {
     VSF_HAL_ASSERT(i2s_ptr != NULL);
-
     return (vsf_i2s_status_t) {
         .value = 0,
     };
 }
 
-static vsf_i2s_irq_mask_t VSF_MCONNECT(__, VSF_I2S_CFG_IMP_PREFIX, _i2s_get_irq_mask)(
+void VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_fini)(
     VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr
 ) {
+    VSF_HAL_ASSERT(i2s_ptr != NULL);
+    // Default implementation: no-op
+}
+
+static vsf_i2s_irq_mask_t VSF_MCONNECT(__, VSF_I2S_CFG_IMP_PREFIX, _i2s_irq_clear)(
+    VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr,
+    vsf_i2s_irq_mask_t irq_mask
+) {
+    VSF_HAL_ASSERT(NULL != i2s_ptr);
     // implement this function in the device file
-    VSF_HAL_ASSERT(0);
+    // This function should clear the specified interrupt flags and return the state before clearing
     return 0;
 }
 
@@ -184,8 +192,8 @@ static void VSF_MCONNECT(__, VSF_I2S_CFG_IMP_PREFIX, _i2s_irqhandler)(
 ) {
     VSF_HAL_ASSERT(NULL != i2s_ptr);
 
-    vsf_i2s_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_I2S_CFG_IMP_PREFIX, _i2s_get_irq_mask)(i2s_ptr);
     vsf_i2s_isr_t *isr_ptr = &i2s_ptr->isr;
+    vsf_i2s_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_I2S_CFG_IMP_PREFIX, _i2s_irq_clear)(i2s_ptr, VSF_I2S_IRQ_ALL_BITS_MASK);
     if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
         isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_i2s_t *)i2s_ptr, irq_mask);
     }
@@ -266,6 +274,8 @@ vsf_i2s_capability_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_capability)(
  */
 
 // HW
+#define VSF_I2S_CFG_MODE_CHECK_UNIQUE                       VSF_HAL_CHECK_MODE_LOOSE
+#define VSF_I2S_CFG_IRQ_MASK_CHECK_UNIQUE                   VSF_HAL_CHECK_MODE_STRICT
 #define VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY              ENABLED
 #define VSF_I2S_CFG_REIMPLEMENT_API_GET_CONFIGURATION       ENABLED
 #define VSF_I2S_CFG_REIMPLEMENT_API_TX_GET_CONFIGURATION    ENABLED

@@ -97,8 +97,8 @@ extern "C" {
 #define VSF_ETH_CFG_REIMPLEMENT_TYPE_BUF_DESC       ENABLED
 #define VSF_ETH_CFG_REIMPLEMENT_TYPE_SEND_BUF_DESC  ENABLED
 #define VSF_ETH_CFG_REIMPLEMENT_TYPE_RECV_BUF_DESC  ENABLED
-#define VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_SEND_BUF   ENABLED
-#define VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_RECV_BUF   ENABLED
+#define VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_SEND_BUF    ENABLED
+#define VSF_ETH_CFG_REIMPLEMENT_TYPE_SG_RECV_BUF    ENABLED
 // HW end
 
 /*============================ ETHROFIED FUNCTIONS ===========================*/
@@ -133,6 +133,8 @@ typedef enum vsf_eth_phy_mode_t {
 
     VSF_ETH_PHY_MODE_DUPLEX_HALF      = 1 << 3,
     VSF_ETH_PHY_MODE_DUPLEX_FULL      = 1 << 4,
+
+    VSF_ETH_PHY_MODE_LINK_UP          = 1 << 5,
 
     // Add more vendor-specific modes here
 } vsf_eth_phy_mode_t;
@@ -233,7 +235,7 @@ typedef enum vsf_eth_buf_mode_t {
 typedef struct vsf_eth_buf_desc_t {
     vsf_eth_buf_mode_t mode;
     void              *payload;
-    uint32_t           size;
+    size_t             len;
 } vsf_eth_buf_desc_t;
 #endif
 

@@ -69,13 +69,11 @@ extern "C" {
 // HW
 /*\note hw RNG driver can reimplement following types:
  *      To enable reimplementation, please enable macro below:
- *          VSF_RNG_CFG_REIMPLEMENT_TYPE_CFG for vsf_rng_cfg_t
  *          VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_rng_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
 
-#define VSF_RNG_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
 #define VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end
 
@@ -97,10 +95,20 @@ vsf_class(vsf_${rng_ip}_rng_t) {
 
     protected_member(
         vsf_${rng_ip}_rng_reg_t *reg;
-        vsf_rng_isr_t           isr;
     )
 };
+// IPCore end
 
+// HW/IPCore, not for emulated drivers
+#if VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY == ENABLED
+typedef struct vsf_rng_capability_t {
+#if VSF_RNG_CFG_INHERIT_HAL_CAPABILITY == ENABLED
+    inherit(vsf_peripheral_capability_t)
+#endif
+} vsf_rng_capability_t;
+#endif
+
+// HW/IPCore end
 
 /*============================ INCLUDES ======================================*/
 

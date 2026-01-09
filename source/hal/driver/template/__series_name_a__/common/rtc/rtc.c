@@ -159,24 +159,11 @@ vsf_err_t VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set_time)(
     return VSF_ERR_NONE;
 }
 
-static vsf_rtc_irq_mask_t VSF_MCONNECT(__, VSF_RTC_CFG_IMP_PREFIX, _rtc_get_irq_mask)(
-    VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t) *rtc_ptr
-) {
-    // implement this function in the device file
-    VSF_HAL_ASSERT(0);
-    return 0;
-}
-
 static void VSF_MCONNECT(__, VSF_RTC_CFG_IMP_PREFIX, _rtc_irqhandler)(
     VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t) *rtc_ptr
 ) {
-    VSF_HAL_ASSERT(NULL != rtc_ptr);
-
-    vsf_rtc_irq_mask_t irq_mask = VSF_MCONNECT(__, VSF_RTC_CFG_IMP_PREFIX, _rtc_get_irq_mask)(rtc_ptr);
-    vsf_rtc_isr_t *isr_ptr = &rtc_ptr->isr;
-    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_rtc_t *)rtc_ptr, irq_mask);
-    }
+    // Peripherals should implement their own _rtc_irqhandler
+    VSF_HAL_ASSERT(0);
 }
 
 /*\note Implementation of APIs below is optional, because there is default implementation in rtc_template.inc.
@@ -224,8 +211,10 @@ vsf_rtc_capability_t VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_capability)(
  */
 
 // HW
-#define VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY             ENABLED
-#define VSF_RTC_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
+#define VSF_RTC_CFG_MODE_CHECK_UNIQUE                       VSF_HAL_CHECK_MODE_LOOSE
+#define VSF_RTC_CFG_IRQ_MASK_CHECK_UNIQUE                   VSF_HAL_CHECK_MODE_STRICT
+#define VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY              ENABLED
+#define VSF_RTC_CFG_REIMPLEMENT_API_GET_CONFIGURATION       ENABLED
 #define VSF_RTC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t)                                \
         VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc, __IDX) = {                   \

@@ -134,12 +134,14 @@ typedef enum vsf_i2c_cmd_t {
     VSF_I2C_CMD_WRITE                           = (0x00ul << 0),
     VSF_I2C_CMD_READ                            = (0x01ul << 0),
 
-    VSF_I2C_CMD_START                           = (0x00ul << 28),
-    VSF_I2C_CMD_NO_START                        = (0x01ul << 28),
+    VSF_I2C_CMD_START                           = (0x01ul << 28),
+    VSF_I2C_CMD_NO_START                        = (0x00ul << 28),
 
-    VSF_I2C_CMD_STOP                            = (0x00ul << 29),
+    VSF_I2C_CMD_STOP                            = (0x01ul << 29),
+    VSF_I2C_CMD_NO_STOP                         = (0x00ul << 29),
+
     VSF_I2C_CMD_RESTART                         = (0x01ul << 30),
-    VSF_I2C_CMD_NO_STOP_RESTART                 = (0x01ul << 30),
+    VSF_I2C_CMD_NO_RESTART                      = (0x00ul << 30),
 
     VSF_I2C_CMD_7_BITS                          = (0x00ul << 31),
     VSF_I2C_CMD_10_BITS                         = (0x01ul << 31),
@@ -156,13 +158,13 @@ typedef enum vsf_i2c_irq_mask_t {
     VSF_I2C_IRQ_MASK_MASTER_ARBITRATION_LOST        = (0x1ul << 3),
     VSF_I2C_IRQ_MASK_MASTER_ADDRESS_NACK            = (0x1ul << 4),
     VSF_I2C_IRQ_MASK_MASTER_TX_NACK_DETECT          = (0x1ul << 5),
-    VSF_I2C_IRQ_MASK_MASTER_START_OR_RESTART_DETECT = (0x1ul << 7),
-    VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT             = (0x1ul << 8),
-    VSF_I2C_IRQ_MASK_SLAVE_START_OR_RESTART_DETECT  = (0x1ul << 9),
-    VSF_I2C_IRQ_MASK_SLAVE_STOP_DETECT              = (0x1ul << 10),
-    VSF_I2C_IRQ_MASK_SLAVE_TX                       = (0x1ul << 11),
-    VSF_I2C_IRQ_MASK_SLAVE_RX                       = (0x1ul << 12),
-    VSF_I2C_IRQ_MASK_SLAVE_TRANSFER_COMPLETE        = (0x1ul << 13),
+    VSF_I2C_IRQ_MASK_MASTER_START_OR_RESTART_DETECT = (0x1ul << 6),
+    VSF_I2C_IRQ_MASK_MASTER_STOP_DETECT             = (0x1ul << 7),
+    VSF_I2C_IRQ_MASK_SLAVE_START_OR_RESTART_DETECT  = (0x1ul << 8),
+    VSF_I2C_IRQ_MASK_SLAVE_STOP_DETECT              = (0x1ul << 9),
+    VSF_I2C_IRQ_MASK_SLAVE_TX                       = (0x1ul << 10),
+    VSF_I2C_IRQ_MASK_SLAVE_RX                       = (0x1ul << 11),
+    VSF_I2C_IRQ_MASK_SLAVE_TRANSFER_COMPLETE        = (0x1ul << 12),
 
     // more vendor specified irq_masks can be added here
 } vsf_i2c_irq_mask_t;

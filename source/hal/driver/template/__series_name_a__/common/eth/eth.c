@@ -243,14 +243,27 @@ vsf_err_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_phy_get_link_status)(
     return VSF_ERR_NONE;
 }
 
+vsf_eth_irq_mask_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_irq_clear)(
+    VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t) *eth_ptr,
+    vsf_eth_irq_mask_t irq_mask
+) {
+    VSF_HAL_ASSERT(NULL != eth_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return 0;
+}
+
 static void VSF_MCONNECT(__, VSF_ETH_CFG_IMP_PREFIX, _eth_irqhandler)(
     VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t) *eth_ptr
 ) {
     VSF_HAL_ASSERT(NULL != eth_ptr);
 
     vsf_eth_isr_t *isr_ptr = &eth_ptr->isr;
-    if (isr_ptr->handler_fn != NULL) {
-        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_eth_t *)eth_ptr, 0);
+    vsf_eth_irq_mask_t irq_mask = VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_irq_clear)(eth_ptr, VSF_ETH_IRQ_MASK_ALL);
+    if ((irq_mask != 0) && (isr_ptr->handler_fn != NULL)) {
+        isr_ptr->handler_fn(isr_ptr->target_ptr, (vsf_eth_t *)eth_ptr, irq_mask);
     }
 }
 
@@ -309,8 +322,11 @@ vsf_eth_capability_t VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_capability)(
  */
 
 // HW
-#define VSF_ETH_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
+#define VSF_ETH_CFG_MODE_CHECK_UNIQUE                 VSF_HAL_CHECK_MODE_LOOSE
+#define VSF_ETH_CFG_IRQ_MASK_CHECK_UNIQUE             VSF_HAL_CHECK_MODE_STRICT
+#define VSF_ETH_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
 #define VSF_ETH_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
+#define VSF_ETH_CFG_REIMPLEMENT_API_IRQ_CLEAR         ENABLED
 #define VSF_ETH_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t)                                \
         VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth, __IDX) = {                   \
