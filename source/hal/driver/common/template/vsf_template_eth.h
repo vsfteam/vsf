@@ -270,6 +270,43 @@ extern "C" {
 #   define VSF_ETH_CFG_INHERIT_HAL_CAPABILITY            ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable standard optional features support.
+ *
+ * This macro controls the availability of standard optional features in the template.
+ * Standard optional features include:
+ * - Address filtering options (VSF_ETH_MODE_UNICAST_FILTER, VSF_ETH_MODE_MULTICAST_FILTER, etc.)
+ * - VLAN support options (VSF_ETH_MODE_VLAN_TAGGING, VSF_ETH_MODE_VLAN_FILTERING, etc.)
+ * - Special frame handling (VSF_ETH_MODE_JUMBO_FRAME, VSF_ETH_MODE_FLOW_CONTROL, etc.)
+ * - QoS and traffic management (VSF_ETH_MODE_PRIORITY_QUEUE, VSF_ETH_MODE_QOS)
+ * - Time synchronization (VSF_ETH_MODE_PTP_TIMESTAMP)
+ * - Advanced hardware acceleration (VSF_ETH_MODE_TCP_SEGMENTATION, VSF_ETH_MODE_LARGE_RECEIVE)
+ *
+ * @note This macro is for testing purposes only. Users should NOT enable this macro.
+ *       Standard optional features should be implemented directly in hardware drivers
+ *       if the hardware supports them, rather than enabling this macro in the template.
+ *       Enabling this macro may cause compilation errors or unexpected behavior.
+ *
+ * \~chinese
+ * @brief 启用标准可选功能支持。
+ *
+ * 此宏控制模板中标准可选功能的可用性。标准可选功能包括：
+ * - 地址过滤选项（VSF_ETH_MODE_UNICAST_FILTER, VSF_ETH_MODE_MULTICAST_FILTER 等）
+ * - VLAN 支持选项（VSF_ETH_MODE_VLAN_TAGGING, VSF_ETH_MODE_VLAN_FILTERING 等）
+ * - 特殊帧处理（VSF_ETH_MODE_JUMBO_FRAME, VSF_ETH_MODE_FLOW_CONTROL 等）
+ * - QoS 和流量管理（VSF_ETH_MODE_PRIORITY_QUEUE, VSF_ETH_MODE_QOS）
+ * - 时间同步（VSF_ETH_MODE_PTP_TIMESTAMP）
+ * - 高级硬件加速（VSF_ETH_MODE_TCP_SEGMENTATION, VSF_ETH_MODE_LARGE_RECEIVE）
+ *
+ * @note 此宏仅用于测试目的。用户不应启用此宏。
+ *       如果硬件支持标准可选功能，应在硬件驱动中直接实现，而不是在模板中启用此宏。
+ *       启用此宏可能导致编译错误或意外行为。
+ */
+#ifndef __VSF_ETH_CFG_SUPPORT_STANDARD_OPTIONAL
+#   define __VSF_ETH_CFG_SUPPORT_STANDARD_OPTIONAL DISABLED
+#endif
+
 /*============================ ETHROFIED FUNCTIONS ===========================*/
 
 /**
@@ -289,6 +326,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             eth, disable,                VSF_MCONNECT(__prefix_name, _t) *eth_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 eth, irq_enable,             VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 eth, irq_disable,            VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_irq_mask_t irq_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_eth_irq_mask_t,   eth, irq_clear,              VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, send_request,           VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_send_buf_desc_t *buf_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, recv_request,           VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_recv_buf_desc_t *buf_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            eth, send_sg_request,        VSF_MCONNECT(__prefix_name, _t) *eth_ptr, vsf_eth_send_sg_buf_desc_t *buf_ptr, uint32_t sg_count) \
@@ -395,110 +433,126 @@ enum {
  * If hardware supports more modes, we can implement them in the hardware driver:
  * - VSF_ETH_MODE_TX_CHECKSUM_OFFLOAD
  * - VSF_ETH_MODE_RX_CHECKSUM_OFFLOAD
+ *
+ * Feature Classification:
+ * - Mandatory: VSF_ETH_MODE_TX_CHECKSUM_OFFLOAD, VSF_ETH_MODE_RX_CHECKSUM_OFFLOAD
+ * - Standard Optional: VSF_ETH_MODE_UNICAST_FILTER, VSF_ETH_MODE_MULTICAST_FILTER,
+ *                      VSF_ETH_MODE_BROADCAST_FILTER, VSF_ETH_MODE_VLAN_*,
+ *                      VSF_ETH_MODE_JUMBO_FRAME, VSF_ETH_MODE_FLOW_CONTROL,
+ *                      VSF_ETH_MODE_PAUSE_FRAME, VSF_ETH_MODE_PRIORITY_QUEUE,
+ *                      VSF_ETH_MODE_QOS, VSF_ETH_MODE_PTP_TIMESTAMP,
+ *                      VSF_ETH_MODE_TCP_SEGMENTATION, VSF_ETH_MODE_LARGE_RECEIVE
+ *                      (protected by __VSF_ETH_CFG_SUPPORT_STANDARD_OPTIONAL, should not be enabled)
+ *
  * \~chinese
  * 以下的模式即使硬件不支持也必须保留，如果硬件支持更多模式，我们可以在硬件驱动里实现它：
  * - VSF_ETH_MODE_TX_CHECKSUM_OFFLOAD
  * - VSF_ETH_MODE_RX_CHECKSUM_OFFLOAD
  *
+ * 功能分类：
+ * - 必选：VSF_ETH_MODE_TX_CHECKSUM_OFFLOAD, VSF_ETH_MODE_RX_CHECKSUM_OFFLOAD
+ * - 标准可选：VSF_ETH_MODE_UNICAST_FILTER, VSF_ETH_MODE_MULTICAST_FILTER,
+ *            VSF_ETH_MODE_BROADCAST_FILTER, VSF_ETH_MODE_VLAN_*,
+ *            VSF_ETH_MODE_JUMBO_FRAME, VSF_ETH_MODE_FLOW_CONTROL,
+ *            VSF_ETH_MODE_PAUSE_FRAME, VSF_ETH_MODE_PRIORITY_QUEUE,
+ *            VSF_ETH_MODE_QOS, VSF_ETH_MODE_PTP_TIMESTAMP,
+ *            VSF_ETH_MODE_TCP_SEGMENTATION, VSF_ETH_MODE_LARGE_RECEIVE
+ *            （由 __VSF_ETH_CFG_SUPPORT_STANDARD_OPTIONAL 宏保护，不应被开启）
  */
 typedef enum vsf_eth_mode_t {
     VSF_ETH_MODE_TX_CHECKSUM_OFFLOAD = 1 << 5, //!< \~english TX checksum offload mode \~chinese 发送校验和卸载模式
     VSF_ETH_MODE_RX_CHECKSUM_OFFLOAD = 1 << 6, //!< \~english RX checksum offload mode \~chinese 接收校验和卸载模式
 
-    /* The following modes are optional and can be enabled by removing the comments.
-     * These modes depend on hardware support and might not be available on all hardware.
-     */
-
+#if __VSF_ETH_CFG_SUPPORT_STANDARD_OPTIONAL
     /* Address Filtering Options
      * ------------------------- */
-    /*
     // \~english Enable filtering of unicast frames not addressed to this station
     // \~chinese 启用单播帧过滤，丢弃不是发往本站的单播帧
     VSF_ETH_MODE_UNICAST_FILTER       = 1 << 7,
+#   define VSF_ETH_MODE_UNICAST_FILTER VSF_ETH_MODE_UNICAST_FILTER
 
     // \~english Enable filtering of multicast frames according to a filter table
     // \~chinese 启用多播帧过滤，根据过滤表过滤多播帧
     VSF_ETH_MODE_MULTICAST_FILTER     = 1 << 8,
+#   define VSF_ETH_MODE_MULTICAST_FILTER VSF_ETH_MODE_MULTICAST_FILTER
 
     // \~english Enable filtering of broadcast frames
     // \~chinese 启用广播帧过滤，可选择是否接收广播帧
     VSF_ETH_MODE_BROADCAST_FILTER     = 1 << 9,
-    */
+#   define VSF_ETH_MODE_BROADCAST_FILTER VSF_ETH_MODE_BROADCAST_FILTER
 
     /* VLAN Support Options
      * --------------------
      * VLAN (Virtual LAN) allows network segmentation at Layer 2
      */
-    /*
     // \~english Enable adding VLAN tags to outgoing frames
     // \~chinese 启用VLAN标签，向外发送的帧添加VLAN标签
     VSF_ETH_MODE_VLAN_TAGGING         = 1 << 10,
+#   define VSF_ETH_MODE_VLAN_TAGGING VSF_ETH_MODE_VLAN_TAGGING
 
     // \~english Enable filtering frames based on VLAN ID
     // \~chinese 启用VLAN标签过滤，根据VLAN ID过滤接收的帧
     VSF_ETH_MODE_VLAN_FILTERING       = 1 << 11,
+#   define VSF_ETH_MODE_VLAN_FILTERING VSF_ETH_MODE_VLAN_FILTERING
 
     // \~english Remove VLAN tags from received frames before passing to upper layer
     // \~chinese 启用VLAN标签剥离，在传递给上层前移除接收帧中的VLAN标签
     VSF_ETH_MODE_VLAN_STRIPPING       = 1 << 12,
+#   define VSF_ETH_MODE_VLAN_STRIPPING VSF_ETH_MODE_VLAN_STRIPPING
 
     // \~english Insert VLAN tags into outgoing frames that don't have them
     // \~chinese 启用VLAN标签插入，向没有VLAN标签的外发帧插入标签
     VSF_ETH_MODE_VLAN_INSERTION       = 1 << 13,
-    */
+#   define VSF_ETH_MODE_VLAN_INSERTION VSF_ETH_MODE_VLAN_INSERTION
 
     /* Special Frame Handling
      * --------------------- */
-    /*
     // \~english Support for frames larger than 1518 bytes (up to 9000 bytes typically)
     // \~chinese 支持巨型帧，允许处理大于1518字节的帧(通常最大可达9000字节)
     VSF_ETH_MODE_JUMBO_FRAME          = 1 << 14,
+#   define VSF_ETH_MODE_JUMBO_FRAME VSF_ETH_MODE_JUMBO_FRAME
 
     // \~english Support IEEE 802.3x flow control mechanism to prevent buffer overflow
     // \~chinese 支持IEEE 802.3x流控制机制，防止缓冲区溢出
     VSF_ETH_MODE_FLOW_CONTROL         = 1 << 15,
+#   define VSF_ETH_MODE_FLOW_CONTROL VSF_ETH_MODE_FLOW_CONTROL
 
     // \~english Support for pause frames which temporarily pause transmission
     // \~chinese 支持暂停帧，可临时暂停传输以控制数据流
     VSF_ETH_MODE_PAUSE_FRAME          = 1 << 16,
-    */
+#   define VSF_ETH_MODE_PAUSE_FRAME VSF_ETH_MODE_PAUSE_FRAME
 
     /* QoS and Traffic Management
      * ------------------------- */
-    /*
     // \~english Support for multiple priority queues for traffic handling
     // \~chinese 支持优先级队列，根据优先级处理不同流量
     VSF_ETH_MODE_PRIORITY_QUEUE       = 1 << 17,
+#   define VSF_ETH_MODE_PRIORITY_QUEUE VSF_ETH_MODE_PRIORITY_QUEUE
 
     // \~english Quality of Service support for traffic differentiation
     // \~chinese 服务质量支持，区分处理不同类型的流量
     VSF_ETH_MODE_QOS                  = 1 << 18,
-    */
+#   define VSF_ETH_MODE_QOS VSF_ETH_MODE_QOS
 
     /* Time Synchronization
      * ------------------- */
-    /*
     // \~english Support for Precision Time Protocol timestamp for accurate timing
     // \~chinese 支持精确时间协议时间戳，用于精确计时
     VSF_ETH_MODE_PTP_TIMESTAMP        = 1 << 19,
-    */
+#   define VSF_ETH_MODE_PTP_TIMESTAMP VSF_ETH_MODE_PTP_TIMESTAMP
 
     /* Advanced Hardware Acceleration
      * ----------------------------- */
-    /*
     // \~english TCP Segmentation Offload - hardware handles TCP segmentation
     // \~chinese TCP分段卸载 - 硬件处理TCP分段，减轻CPU负担
     VSF_ETH_MODE_TCP_SEGMENTATION     = 1 << 20,
+#   define VSF_ETH_MODE_TCP_SEGMENTATION VSF_ETH_MODE_TCP_SEGMENTATION
 
     // \~english Large Receive Offload - hardware combines received TCP segments
     // \~chinese 大型接收卸载 - 硬件合并接收到的TCP分段，减少处理开销
     VSF_ETH_MODE_LARGE_RECEIVE        = 1 << 21,
-    */
-
-    /* These are examples of how to implement optional features.
-     * Hardware drivers can define and implement these as needed.
-     * For each enabled feature, corresponding MASK definitions should be added.
-     */
+#   define VSF_ETH_MODE_LARGE_RECEIVE VSF_ETH_MODE_LARGE_RECEIVE
+#endif
 } vsf_eth_mode_t;
 #endif
 
@@ -833,7 +887,7 @@ extern fsm_rt_t vsf_eth_disable(vsf_eth_t *eth_ptr);
  * @param[in] isr_mask: 中断掩码，参考 @ref vsf_eth_irq_mask_t
  * @note 此函数应在调用 vsf_eth_init() 后调用
  */
-extern void vsf_eth_isr_enable(vsf_eth_t *eth_ptr, vsf_eth_irq_mask_t isr_mask);
+extern void vsf_eth_irq_enable(vsf_eth_t *eth_ptr, vsf_eth_irq_mask_t isr_mask);
 
 /**
  * \~english
@@ -848,7 +902,34 @@ extern void vsf_eth_isr_enable(vsf_eth_t *eth_ptr, vsf_eth_irq_mask_t isr_mask);
  * @param[in] isr_mask: 中断掩码，参考 @ref vsf_eth_irq_mask_t
  * @note 此函数应在调用 vsf_eth_init() 后调用
  */
-extern void vsf_eth_isr_disable(vsf_eth_t *eth_ptr, vsf_eth_irq_mask_t isr_mask);
+extern void vsf_eth_irq_disable(vsf_eth_t *eth_ptr, vsf_eth_irq_mask_t isr_mask);
+
+/**
+ * \~english
+ * @brief Clear interrupt flags of ETH instance and return previous state
+ * @param[in] eth_ptr: a pointer to structure @ref vsf_eth_t
+ * @param[in] irq_mask: one or more values of enum @ref vsf_eth_irq_mask_t to clear
+ * @return vsf_eth_irq_mask_t: the interrupt mask state before clearing (0 if no flags were set)
+ *
+ * @note This function attempts to clear the specified interrupt flags if they are set,
+ *       and returns the state of those flags before clearing. This is useful for
+ *       polling operations and determining if interrupts occurred.
+ *       Note that if interrupts are enabled and an interrupt handler is active,
+ *       the interrupt handler may clear the interrupt flags automatically.
+ *       In such cases, this function will return 0 even if interrupts occurred.
+ *
+ * \~chinese
+ * @brief 清除 ETH 实例的中断标志并返回之前的状态
+ * @param[in] eth_ptr: 指向结构体 @ref vsf_eth_t 的指针
+ * @param[in] irq_mask: 要清除的一个或多个枚举 vsf_eth_irq_mask_t 值的按位或
+ * @return vsf_eth_irq_mask_t: 清除前的中断掩码状态（如果没有标志被设置则返回0）
+ *
+ * @note 此函数尝试清除指定的中断标志（如果它们已设置），并返回清除前这些标志的状态。
+ *       这对于轮询操作和确定是否发生了中断很有用。
+ *       注意：如果中断已启用且中断处理函数处于活动状态，中断处理函数可能会自动清除中断标志。
+ *       在这种情况下，即使发生了中断，此函数也会返回0。
+ */
+extern vsf_eth_irq_mask_t vsf_eth_irq_clear(vsf_eth_t *eth_ptr, vsf_eth_irq_mask_t irq_mask);
 
 /**
  * \~english
@@ -1047,6 +1128,9 @@ extern vsf_err_t vsf_eth_phy_get_link_status(vsf_eth_t *eth_ptr, vsf_eth_phy_mod
 #   define vsf_eth_get_configuration(__ETH, ...)    VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_get_configuration)((__vsf_eth_t *)(__ETH), ##__VA_ARGS__)
 #   define vsf_eth_enable(__ETH)                    VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_enable)((__vsf_eth_t *)(__ETH))
 #   define vsf_eth_disable(__ETH)                   VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_disable)((__vsf_eth_t *)(__ETH))
+#   define vsf_eth_irq_enable(__ETH, ...)           VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_irq_enable)((__vsf_eth_t *)(__ETH), ##__VA_ARGS__)
+#   define vsf_eth_irq_disable(__ETH, ...)          VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_irq_disable)((__vsf_eth_t *)(__ETH), ##__VA_ARGS__)
+#   define vsf_eth_irq_clear(__ETH, ...)            VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_irq_clear)((__vsf_eth_t *)(__ETH), ##__VA_ARGS__)
 #   define vsf_eth_status(__ETH)                    VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_status)((__vsf_eth_t *)(__ETH))
 #   define vsf_eth_capability(__ETH)                VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_capability)((__vsf_eth_t *)(__ETH))
 #   define vsf_eth_send_request(__ETH, ...)         VSF_MCONNECT(VSF_ETH_CFG_PREFIX, _eth_send_request)((__vsf_eth_t *)(__ETH), ##__VA_ARGS__)
