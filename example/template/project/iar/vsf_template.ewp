@@ -16134,6 +16134,15 @@
                         <group>
                             <name>common</name>
                             <group>
+                                <name>dma</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\dma\dma.c</name>
+                                </file>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\dma\dma.h</name>
+                                </file>
+                            </group>
+                            <group>
                                 <name>exti</name>
                                 <file>
                                     <name>$PROJ_DIR$\..\..\..\..\source\hal\driver\Artery\AT32F402_405\common\exti\exti.c</name>
