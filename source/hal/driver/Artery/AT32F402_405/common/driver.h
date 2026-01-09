@@ -36,6 +36,7 @@
 #       include "./exti/exti.h"
 #       include "./spi/spi.h"
 #       include "./usart/usart.h"
+#       include "./wdt/wdt.h"
 #       include "./usb/usb.h"
 
 /*============================ MACROS ========================================*/
@@ -161,6 +162,12 @@
 
 #   define VSF_WDT_CFG_DEC_PREFIX                           vsf_hw
 #   define VSF_WDT_CFG_DEC_UPCASE_PREFIX                    VSF_HW
+#   include "hal/driver/common/wdt/wdt_template.h"
+
+// Optional: Add WWDT with separate device prefix
+#   define VSF_WDT_CFG_DEC_DEVICE_PREFIX                    vsf_hw_wwdt
+#   define VSF_WDT_CFG_DEC_DEVICE_UPCASE_PREFIX             VSF_HW_WWDT
+#   define VSF_WDT_CFG_DEC_RENAME_DEVICE_PREFIX             ENABLED
 #   include "hal/driver/common/wdt/wdt_template.h"
 #endif
 
