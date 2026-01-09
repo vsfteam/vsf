@@ -76,9 +76,12 @@ typedef enum vsf_i2c_cmd_t {
 
     // 13: I2C_CTRL2.GENSTART(13)
     VSF_I2C_CMD_START                                   = (1 << 13),
+    VSF_I2C_CMD_NO_START                                = (0 << 13),
     VSF_I2C_CMD_RESTART                                 = (1 << 13),
+    VSF_I2C_CMD_NO_RESTART                              = (1 << 13),
     // 14: I2C_CTRL2.GENSTOP(14)
     VSF_I2C_CMD_STOP                                    = (1 << 14),
+    VSF_I2C_CMD_NO_STOP                                 = (0 << 14),
 
     // 11: I2C_CTRL2.ADDR10(11)
     VSF_I2C_CMD_7_BITS                                  = (0 << 11),
