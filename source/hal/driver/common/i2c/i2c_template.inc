@@ -70,12 +70,21 @@
 #   endif
 #endif
 
-#define vsf_real_i2c_t                  VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t)
-#define vsf_real_master_request         VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)
-#define vsf_real_i2c_capability         VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)
-#define vsf_real_i2c_ctrl               VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_ctrl)
-#define vsf_real_i2c_get_configuration  VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_get_configuration)
-#define vsf_real_i2c_irq_clear          VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_irq_clear)
+#if defined(VSF_I2C_CFG_IMP_RENAME_DEVICE_PREFIX) && (VSF_I2C_CFG_IMP_RENAME_DEVICE_PREFIX == ENABLED)
+#   define vsf_real_i2c_t                      VSF_MCONNECT(VSF_I2C_CFG_IMP_DEVICE_PREFIX, _t)
+#   define vsf_real_master_request             VSF_MCONNECT(VSF_I2C_CFG_IMP_DEVICE_PREFIX, _master_request)
+#   define vsf_real_i2c_capability             VSF_MCONNECT(VSF_I2C_CFG_IMP_DEVICE_PREFIX, _capability)
+#   define vsf_real_i2c_ctrl                   VSF_MCONNECT(VSF_I2C_CFG_IMP_DEVICE_PREFIX, _ctrl)
+#   define vsf_real_i2c_get_configuration      VSF_MCONNECT(VSF_I2C_CFG_IMP_DEVICE_PREFIX, _get_configuration)
+#   define vsf_real_i2c_irq_clear              VSF_MCONNECT(VSF_I2C_CFG_IMP_DEVICE_PREFIX, _irq_clear)
+#else
+#   define vsf_real_i2c_t                      VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_t)
+#   define vsf_real_master_request             VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_master_request)
+#   define vsf_real_i2c_capability             VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_capability)
+#   define vsf_real_i2c_ctrl                   VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_ctrl)
+#   define vsf_real_i2c_get_configuration      VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_get_configuration)
+#   define vsf_real_i2c_irq_clear              VSF_MCONNECT(VSF_I2C_CFG_IMP_PREFIX, _i2c_irq_clear)
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ LOCAL VARIABLES ===============================*/
