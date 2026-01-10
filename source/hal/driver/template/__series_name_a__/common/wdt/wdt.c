@@ -185,6 +185,16 @@ vsf_err_t VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_get_configuration)(
 
     return VSF_ERR_NONE;
 }
+
+vsf_err_t VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_ctrl)(
+    VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t) *wdt_ptr,
+    vsf_wdt_ctrl_t ctrl,
+    void *param
+) {
+    VSF_HAL_ASSERT(wdt_ptr != NULL);
+
+    return VSF_ERR_NONE;
+}
 // HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -197,6 +207,7 @@ vsf_err_t VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_get_configuration)(
 #define VSF_WDT_CFG_MODE_CHECK_UNIQUE               VSF_HAL_CHECK_MODE_LOOSE
 #define VSF_WDT_CFG_IRQ_MASK_CHECK_UNIQUE           VSF_HAL_CHECK_MODE_STRICT
 #define VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
+#define VSF_WDT_CFG_REIMPLEMENT_API_CTRL            ENABLED
 #define VSF_WDT_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #define VSF_WDT_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t)                                \

@@ -87,5 +87,11 @@ void vsf_remapped_wdt_feed(vsf_remapped_wdt_t *wdt)
     vsf_wdt_feed(wdt->target);
 }
 
+vsf_err_t vsf_remapped_wdt_ctrl(vsf_remapped_wdt_t *wdt, vsf_wdt_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT((wdt != NULL) && (wdt->target != NULL));
+    return vsf_wdt_ctrl(wdt->target, ctrl, param);
+}
+
 #endif
 #endif
