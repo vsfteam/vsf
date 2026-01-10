@@ -167,6 +167,20 @@ extern "C" {
 #   define VSF_DAC_CFG_INHERIT_HAL_CAPABILITY            ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable macro VSF_DAC_CFG_REIMPLEMENT_TYPE_CTRL in specific hardware
+ * drivers to redefine enum @ref vsf_dac_ctrl_t. This allows hardware-specific
+ * control commands to be added to the control enumeration.
+ * \~chinese
+ * @brief 在特定硬件驱动中启用宏 VSF_DAC_CFG_REIMPLEMENT_TYPE_CTRL
+ * 来重新定义枚举 @ref vsf_dac_ctrl_t。这允许在控制枚举中添加特定
+ * 硬件的控制命令。
+ */
+#ifndef VSF_DAC_CFG_REIMPLEMENT_TYPE_CTRL
+#   define VSF_DAC_CFG_REIMPLEMENT_TYPE_CTRL        DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /**
@@ -191,7 +205,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dac_irq_mask_t,   dac, irq_clear,            VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request_once, VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_channel_cfg_t *cfg, uint_fast16_t value) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_config,       VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_channel_cfg_t *cfgs_ptr, uint_fast8_t cnt) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request,      VSF_MCONNECT(__prefix_name, _t) *dac_ptr, void *values_ptr, uint_fast32_t cnt)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, channel_request,      VSF_MCONNECT(__prefix_name, _t) *dac_ptr, void *values_ptr, uint_fast32_t cnt) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            dac, ctrl,                  VSF_MCONNECT(__prefix_name, _t) *dac_ptr, vsf_dac_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
 
@@ -313,6 +328,37 @@ typedef struct vsf_dac_capability_t {
     uint8_t min_resolution_bits;           //!< \~english Minimum resolution bits \~chinese 最小分辨率位数
     uint8_t channel_count;                 //!< \~english Number of channels \~chinese 通道数量
 } vsf_dac_capability_t;
+#endif
+
+#if VSF_DAC_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED
+/**
+ * \~english
+ * @brief DAC control commands for hardware-specific operations
+ * @note These commands provide additional control beyond basic DAC operations
+ * \~chinese
+ * @brief DAC 控制命令，用于硬件特定操作
+ * @note 这些命令提供了基本 DAC 操作之外的额外控制功能
+ */
+typedef enum vsf_dac_ctrl_t {
+    //! \~english
+    //! @brief Dummy value for compilation, required when no actual control commands are defined.
+    //! @note This value is needed only when using the template default enum definition
+    //!       (VSF_DAC_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) and all optional control
+    //!       commands are commented out. It ensures the enum has at least one member
+    //!       to avoid compilation errors with some C compilers that don't allow empty enums.
+    //! @note If you enable any control commands below (uncomment them), or if you
+    //!       redefine the enum in a specific hardware driver (VSF_DAC_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED),
+    //!       you can remove this DUMMY value as long as at least one actual command is defined.
+    //! \~chinese
+    //! @brief 编译占位值，当没有定义实际控制命令时需要。
+    //! @note 此值仅在以下情况需要：使用模板默认枚举定义
+    //!       (VSF_DAC_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) 且所有可选控制命令都被注释掉时。
+    //!       它确保枚举至少有一个成员，以避免某些不允许空枚举的 C 编译器报错。
+    //! @note 如果启用了以下任何控制命令（取消注释），或者在特定硬件驱动中重新定义了枚举
+    //!       (VSF_DAC_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED)，只要定义了至少一个实际命令，
+    //!       就可以删除此 DUMMY 值。
+    __VSF_DAC_CTRL_DUMMY = 0,
+} vsf_dac_ctrl_t;
 #endif
 
 typedef struct vsf_dac_op_t {
@@ -554,6 +600,23 @@ extern vsf_err_t vsf_dac_channel_request(vsf_dac_t *dac_ptr,
                                          void *buffer_ptr,
                                          uint_fast32_t count);
 
+/**
+ * \~english
+ * @brief Calls the specified DAC command
+ * @param[in] dac_ptr: a pointer to structure @ref vsf_dac_t
+ * @param[in] ctrl: DAC control command @ref vsf_dac_ctrl_t
+ * @param[in,out] param: the parameter of the command, its use is determined by the command
+ * @return vsf_err_t: returns VSF_ERR_NONE if successful, or a negative error code
+ *
+ * \~chinese
+ * @brief 调用指定的 DAC 命令
+ * @param[in] dac_ptr: 结构体 @ref vsf_dac_t 的指针
+ * @param[in] ctrl: DAC 控制命令，参考 @ref vsf_dac_ctrl_t
+ * @param[in,out] param: 命令的参数，其用途由命令决定
+ * @return vsf_err_t: 成功返回 VSF_ERR_NONE，否则返回负数
+ */
+extern vsf_err_t vsf_dac_ctrl(vsf_dac_t *dac_ptr, vsf_dac_ctrl_t ctrl, void * param);
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /// @cond
@@ -572,6 +635,7 @@ extern vsf_err_t vsf_dac_channel_request(vsf_dac_t *dac_ptr,
 #   define vsf_dac_channel_request_once(__DAC, ...) VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_channel_request_once) ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
 #   define vsf_dac_channel_config(__DAC, ...)       VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_channel_config)       ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
 #   define vsf_dac_channel_request(__DAC, ...)      VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_channel_request)      ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
+#   define vsf_dac_ctrl(__DAC, ...)                 VSF_MCONNECT(VSF_DAC_CFG_PREFIX, _dac_ctrl)                 ((__vsf_dac_t *)(__DAC), ##__VA_ARGS__)
 #endif
 /// @endcond
 
