@@ -115,6 +115,10 @@ extern "C" {
 #   define VSF_RNG_CFG_INHERIT_HAL_CAPABILITY       ENABLED
 #endif
 
+#ifndef VSF_RNG_CFG_REIMPLEMENT_TYPE_CTRL
+#   define VSF_RNG_CFG_REIMPLEMENT_TYPE_CTRL        DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /**
@@ -131,9 +135,43 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 rng, fini,             VSF_MCONNECT(__prefix_name, _t) *rng_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_rng_capability_t, rng, capability,       VSF_MCONNECT(__prefix_name, _t) *rng_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rng, generate_request, VSF_MCONNECT(__prefix_name, _t) *rng_ptr, \
-                                uint32_t *buffer, uint32_t num, void *param, vsf_rng_on_ready_callback_t * on_ready_cb)
+                                uint32_t *buffer, uint32_t num, void *param, vsf_rng_on_ready_callback_t * on_ready_cb) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rng, ctrl,             VSF_MCONNECT(__prefix_name, _t) *rng_ptr, vsf_rng_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
+
+#if VSF_RNG_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED
+/**
+ * \~english
+ * @brief Predefined VSF RNG control commands that can be reimplemented in specific HAL drivers.
+ * @note Used as the 'ctrl' parameter (second parameter) in vsf_rng_ctrl(vsf_rng_t *rng_ptr, vsf_rng_ctrl_t ctrl, void *param) function
+ * @note The 'param' parameter (third parameter) type depends on the specific control command
+ * \~chinese
+ * @brief 预定义的 VSF RNG 控制命令，可以在特定的 HAL 驱动中重新实现。
+ * @note 作为 vsf_rng_ctrl(vsf_rng_t *rng_ptr, vsf_rng_ctrl_t ctrl, void *param) 函数中的 'ctrl' 参数（第二个参数）
+ * @note 'param' 参数（第三个参数）的类型取决于具体的控制命令
+ */
+typedef enum vsf_rng_ctrl_t {
+    //! \~english
+    //! @brief Dummy value for compilation, required when no actual control commands are defined.
+    //! @note This value is needed only when using the template default enum definition
+    //!       (VSF_RNG_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) and all optional control
+    //!       commands are commented out. It ensures the enum has at least one member
+    //!       to avoid compilation errors with some C compilers that don't allow empty enums.
+    //! @note If you enable any control commands below (uncomment them), or if you
+    //!       redefine the enum in a specific hardware driver (VSF_RNG_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED),
+    //!       you can remove this DUMMY value as long as at least one actual command is defined.
+    //! \~chinese
+    //! @brief 编译占位值，当没有定义实际控制命令时需要。
+    //! @note 此值仅在以下情况需要：使用模板默认枚举定义
+    //!       (VSF_RNG_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) 且所有可选控制命令都被注释掉时。
+    //!       它确保枚举至少有一个成员，以避免某些不允许空枚举的 C 编译器报错。
+    //! @note 如果启用了以下任何控制命令（取消注释），或者在特定硬件驱动中重新定义了枚举
+    //!       (VSF_RNG_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED)，只要定义了至少一个实际命令，
+    //!       就可以删除此 DUMMY 值。
+    __VSF_RNG_CTRL_DUMMY = 0,
+} vsf_rng_ctrl_t;
+#endif
 
 typedef struct vsf_rng_t vsf_rng_t;
 typedef void vsf_rng_on_ready_callback_t(void *param, uint32_t *buffer, uint32_t num);
@@ -230,6 +268,8 @@ extern vsf_rng_capability_t vsf_rng_capability(vsf_rng_t *rng_ptr);
 extern vsf_err_t vsf_rng_generate_request(vsf_rng_t *rng_ptr, uint32_t *buffer, uint32_t num,
                                           void *param, vsf_rng_on_ready_callback_t * on_ready_cb);
 
+extern vsf_err_t vsf_rng_ctrl(vsf_rng_t *rng_ptr, vsf_rng_ctrl_t ctrl, void * param);
+
 /*============================ INCLUDES ======================================*/
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -241,6 +281,7 @@ extern vsf_err_t vsf_rng_generate_request(vsf_rng_t *rng_ptr, uint32_t *buffer, 
 #   define vsf_rng_fini(__RNG)                  VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_fini)             ((__vsf_rng_t *)(__RNG))
 #   define vsf_rng_capability(__RNG)            VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_capability)       ((__vsf_rng_t *)(__RNG))
 #   define vsf_rng_generate_request(__RNG, ...) VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_generate_request) ((__vsf_rng_t *)(__RNG), ##__VA_ARGS__)
+#   define vsf_rng_ctrl(__RNG, ...)             VSF_MCONNECT(VSF_RNG_CFG_PREFIX, _rng_ctrl)             ((__vsf_rng_t *)(__RNG), ##__VA_ARGS__)
 #endif
 /// @endcond
 

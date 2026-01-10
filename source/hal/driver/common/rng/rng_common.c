@@ -71,5 +71,14 @@ vsf_rng_capability_t vsf_rng_capability(vsf_rng_t *rng_ptr)
     return rng_ptr->op->capability(rng_ptr);
 }
 
+vsf_err_t vsf_rng_ctrl(vsf_rng_t *rng_ptr, vsf_rng_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(rng_ptr != NULL);
+    VSF_HAL_ASSERT(rng_ptr->op != NULL);
+    VSF_HAL_ASSERT(rng_ptr->op->ctrl != NULL);
+
+    return rng_ptr->op->ctrl(rng_ptr, ctrl, param);
+}
+
 #endif /* VSF_RNG_CFG_MULTI_CLASS == ENABLED */
 #endif /* VSF_HAL_USE_RNG == ENABLED */

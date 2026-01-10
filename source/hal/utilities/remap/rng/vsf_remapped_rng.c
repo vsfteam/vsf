@@ -70,5 +70,11 @@ vsf_err_t vsf_remapped_rng_generate_request(vsf_remapped_rng_t *rng, uint32_t *b
     return vsf_rng_generate_request(rng->target, buffer, num, param, on_ready_cb);
 }
 
+vsf_err_t vsf_remapped_rng_ctrl(vsf_remapped_rng_t *rng, vsf_rng_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT((rng != NULL) && (rng->target != NULL));
+    return vsf_rng_ctrl(rng->target, ctrl, param);
+}
+
 #endif
 #endif

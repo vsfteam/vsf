@@ -129,6 +129,16 @@ vsf_rng_capability_t VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_capability)(
         0
     };
 }
+
+vsf_err_t VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_ctrl)(
+    VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_t) *rng_ptr,
+    vsf_rng_ctrl_t ctrl,
+    void *param
+) {
+    VSF_HAL_ASSERT(rng_ptr != NULL);
+
+    return VSF_ERR_NONE;
+}
 // HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -141,6 +151,7 @@ vsf_rng_capability_t VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_capability)(
 #define VSF_RNG_CFG_MODE_CHECK_UNIQUE                 VSF_HAL_CHECK_MODE_LOOSE
 #define VSF_RNG_CFG_IRQ_MASK_CHECK_UNIQUE             VSF_HAL_CHECK_MODE_STRICT
 #define VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
+#define VSF_RNG_CFG_REIMPLEMENT_API_CTRL              ENABLED
 #define VSF_RNG_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_t)                                \
         VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng, __IDX) = {                   \

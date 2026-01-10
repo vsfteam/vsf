@@ -69,11 +69,13 @@ extern "C" {
 // HW
 /*\note hw RNG driver can reimplement following types:
  *      To enable reimplementation, please enable macro below:
+ *          VSF_RNG_CFG_REIMPLEMENT_TYPE_CTRL for vsf_rng_ctrl_t
  *          VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_rng_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
 
+#define VSF_RNG_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
 #define VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end
 
@@ -106,6 +108,12 @@ typedef struct vsf_rng_capability_t {
     inherit(vsf_peripheral_capability_t)
 #endif
 } vsf_rng_capability_t;
+#endif
+
+#if VSF_RNG_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
+typedef enum vsf_rng_ctrl_t {
+    __VSF_RNG_CTRL_DUMMY = 0,
+} vsf_rng_ctrl_t;
 #endif
 
 // HW/IPCore end
