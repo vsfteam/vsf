@@ -86,18 +86,33 @@
 #   endif
 #endif
 
-#define vsf_real_usart_t                    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t)
-#define vsf_real_usart_request_rx           VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_request_rx)
-#define vsf_real_usart_cancel_rx            VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cancel_rx)
-#define vsf_real_usart_get_rx_count         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_rx_count)
-#define vsf_real_usart_request_tx           VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_request_tx)
-#define vsf_real_usart_cancel_tx            VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cancel_tx)
-#define vsf_real_usart_get_tx_count         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)
-#define vsf_real_usart_capability           VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
-#define vsf_real_usart_ctrl                 VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_ctrl)
-#define vsf_real_usart_get_configuration    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_configuration)
-#define vsf_real_usart_irq_clear            VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_clear)
-#define vsf_real_usart_tx_send_break        VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_tx_send_break)
+#if defined(VSF_USART_CFG_IMP_RENAME_DEVICE_PREFIX) && (VSF_USART_CFG_IMP_RENAME_DEVICE_PREFIX == ENABLED)
+#   define vsf_real_usart_t                    VSF_MCONNECT(VSF_USART_CFG_IMP_DEVICE_PREFIX, _t)
+#   define vsf_real_usart_request_rx           VSF_MCONNECT(VSF_USART_CFG_IMP_DEVICE_PREFIX, _request_rx)
+#   define vsf_real_usart_cancel_rx            VSF_MCONNECT(VSF_USART_CFG_IMP_DEVICE_PREFIX, _cancel_rx)
+#   define vsf_real_usart_get_rx_count         VSF_MCONNECT(VSF_USART_CFG_IMP_DEVICE_PREFIX, _get_rx_count)
+#   define vsf_real_usart_request_tx           VSF_MCONNECT(VSF_USART_CFG_IMP_DEVICE_PREFIX, _request_tx)
+#   define vsf_real_usart_cancel_tx            VSF_MCONNECT(VSF_USART_CFG_IMP_DEVICE_PREFIX, _cancel_tx)
+#   define vsf_real_usart_get_tx_count         VSF_MCONNECT(VSF_USART_CFG_IMP_DEVICE_PREFIX, _get_tx_count)
+#   define vsf_real_usart_capability           VSF_MCONNECT(VSF_USART_CFG_IMP_DEVICE_PREFIX, _capability)
+#   define vsf_real_usart_ctrl                 VSF_MCONNECT(VSF_USART_CFG_IMP_DEVICE_PREFIX, _ctrl)
+#   define vsf_real_usart_get_configuration    VSF_MCONNECT(VSF_USART_CFG_IMP_DEVICE_PREFIX, _get_configuration)
+#   define vsf_real_usart_irq_clear            VSF_MCONNECT(VSF_USART_CFG_IMP_DEVICE_PREFIX, _irq_clear)
+#   define vsf_real_usart_tx_send_break        VSF_MCONNECT(VSF_USART_CFG_IMP_DEVICE_PREFIX, _tx_send_break)
+#else
+#   define vsf_real_usart_t                    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_t)
+#   define vsf_real_usart_request_rx           VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_request_rx)
+#   define vsf_real_usart_cancel_rx            VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cancel_rx)
+#   define vsf_real_usart_get_rx_count         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_rx_count)
+#   define vsf_real_usart_request_tx           VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_request_tx)
+#   define vsf_real_usart_cancel_tx            VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_cancel_tx)
+#   define vsf_real_usart_get_tx_count         VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_tx_count)
+#   define vsf_real_usart_capability           VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_capability)
+#   define vsf_real_usart_ctrl                 VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_ctrl)
+#   define vsf_real_usart_get_configuration    VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_get_configuration)
+#   define vsf_real_usart_irq_clear            VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_irq_clear)
+#   define vsf_real_usart_tx_send_break        VSF_MCONNECT(VSF_USART_CFG_IMP_PREFIX, _usart_tx_send_break)
+#endif
 
 /*============================ IMPLEMENTATION ================================*/
 
