@@ -77,6 +77,7 @@ extern "C" {
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG for vsf_dma_channel_sg_cfg_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS for vsf_dma_channel_status_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG for vsf_dma_cfg_t
+ *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CTRL for vsf_dma_ctrl_t
  *          VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_dma_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
@@ -91,6 +92,7 @@ extern "C" {
 #define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_SG_CFG ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_TYPE_CHANNEL_STATUS ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_TYPE_CFG            ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_TYPE_CTRL           ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY     ENABLED
 
 
@@ -258,6 +260,12 @@ typedef struct vsf_dma_capability_t {
     uint8_t addr_alignment;
     uint8_t support_scatter_gather : 1;
 } vsf_dma_capability_t;
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
+typedef enum vsf_dma_ctrl_t {
+    __VSF_DMA_CTRL_DUMMY = 0,
+} vsf_dma_ctrl_t;
 #endif
 // HW/IPCore end
 

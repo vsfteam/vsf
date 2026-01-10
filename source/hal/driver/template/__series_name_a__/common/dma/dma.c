@@ -239,6 +239,16 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_get_configuration)(
     return VSF_ERR_NONE;
 }
 
+vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_ctrl)(
+    VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr,
+    vsf_dma_ctrl_t ctrl,
+    void *param
+) {
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+
+    return VSF_ERR_NONE;
+}
+
 vsf_dma_capability_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_capability)(
     VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_t) *dma_ptr
 ) {
@@ -302,6 +312,7 @@ vsf_err_t VSF_MCONNECT(VSF_DMA_CFG_IMP_PREFIX, _dma_channel_sg_start)(
 #define VSF_DMA_CFG_MODE_CHECK_UNIQUE                           VSF_HAL_CHECK_MODE_LOOSE
 #define VSF_DMA_CFG_IRQ_MASK_CHECK_UNIQUE                       VSF_HAL_CHECK_MODE_STRICT
 #define VSF_DMA_CFG_REIMPLEMENT_API_CAPABILITY                  ENABLED
+#define VSF_DMA_CFG_REIMPLEMENT_API_CTRL                        ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_API_GET_CONFIGURATION           ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_API_CHANNEL_GET_CONFIGURATION   ENABLED
 #define VSF_DMA_CFG_REIMPLEMENT_API_SG_CONFIG_DESC              ENABLED

@@ -171,5 +171,14 @@ vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr, uint8_t chan
     return dma_ptr->op->channel_status(dma_ptr, channel);
 }
 
+vsf_err_t vsf_dma_ctrl(vsf_dma_t *dma_ptr, vsf_dma_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(dma_ptr != NULL);
+    VSF_HAL_ASSERT(dma_ptr->op != NULL);
+    VSF_HAL_ASSERT(dma_ptr->op->ctrl != NULL);
+
+    return dma_ptr->op->ctrl(dma_ptr, ctrl, param);
+}
+
 #endif /* VSF_DMA_CFG_MULTI_CLASS == ENABLED */
 #endif /* VSF_HAL_USE_DMA == ENABLED */
