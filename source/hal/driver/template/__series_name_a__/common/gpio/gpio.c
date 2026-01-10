@@ -193,6 +193,16 @@ static void VSF_MCONNECT(__, VSF_GPIO_CFG_IMP_PREFIX, _gpio_irqhandler)(
     }
 }
 
+vsf_err_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_ctrl)(
+    VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_t) *gpio_ptr,
+    vsf_gpio_ctrl_t ctrl,
+    void *param
+) {
+    VSF_HAL_ASSERT(gpio_ptr != NULL);
+
+    return VSF_ERR_NONE;
+}
+
 /*\note Implementation of APIs below is optional, because there is default implementation in gpio_template.inc.
  *      VSF_GPIO_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
  *
@@ -269,6 +279,7 @@ vsf_gpio_capability_t VSF_MCONNECT(VSF_GPIO_CFG_IMP_PREFIX, _gpio_capability)(
 
 #define VSF_GPIO_CFG_MODE_CHECK_UNIQUE                      VSF_HAL_CHECK_MODE_LOOSE
 #define VSF_GPIO_CFG_IRQ_MASK_CHECK_UNIQUE                  VSF_HAL_CHECK_MODE_STRICT
+#define VSF_GPIO_CFG_REIMPLEMENT_API_CTRL                   ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION  ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_CLEAR         ENABLED
