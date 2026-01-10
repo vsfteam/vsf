@@ -111,5 +111,11 @@ vsf_err_t vsf_remapped_sdio_host_request(vsf_remapped_sdio_t *sdio, vsf_sdio_req
     return vsf_sdio_host_request(sdio->target, req);
 }
 
+vsf_err_t vsf_remapped_sdio_ctrl(vsf_remapped_sdio_t *sdio, vsf_sdio_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT((sdio != NULL) && (sdio->target != NULL));
+    return vsf_sdio_ctrl(sdio->target, ctrl, param);
+}
+
 #endif
 #endif
