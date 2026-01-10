@@ -153,5 +153,14 @@ vsf_err_t vsf_dac_channel_request(vsf_dac_t *dac_ptr, void *buffer_ptr, uint_fas
     return dac_ptr->op->channel_request(dac_ptr, buffer_ptr, count);
 }
 
+vsf_err_t vsf_dac_ctrl(vsf_dac_t *dac_ptr, vsf_dac_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(dac_ptr != NULL);
+    VSF_HAL_ASSERT(dac_ptr->op != NULL);
+    VSF_HAL_ASSERT(dac_ptr->op->ctrl != NULL);
+
+    return dac_ptr->op->ctrl(dac_ptr, ctrl, param);
+}
+
 #endif /* VSF_DAC_CFG_MULTI_CLASS == ENABLED */
 #endif /* VSF_HAL_USE_DAC == ENABLED */

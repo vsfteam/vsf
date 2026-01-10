@@ -126,5 +126,11 @@ vsf_err_t vsf_remapped_dac_channel_request(vsf_remapped_dac_t *dac,
     return vsf_dac_channel_request(dac->target, buffer, count);
 }
 
+vsf_err_t vsf_remapped_dac_ctrl(vsf_remapped_dac_t *dac, vsf_dac_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT((dac != NULL) && (dac->target != NULL));
+    return vsf_dac_ctrl(dac->target, ctrl, param);
+}
+
 #endif
 #endif

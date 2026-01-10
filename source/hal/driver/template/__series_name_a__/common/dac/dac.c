@@ -246,6 +246,16 @@ vsf_err_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_get_configuration)(
 
     return VSF_ERR_NONE;
 }
+
+vsf_err_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_ctrl)(
+    VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_t) *dac_ptr,
+    vsf_dac_ctrl_t ctrl,
+    void *param
+) {
+    VSF_HAL_ASSERT(dac_ptr != NULL);
+
+    return VSF_ERR_NONE;
+}
 // HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -258,6 +268,7 @@ vsf_err_t VSF_MCONNECT(VSF_DAC_CFG_IMP_PREFIX, _dac_get_configuration)(
 #define VSF_DAC_CFG_MODE_CHECK_UNIQUE                 VSF_HAL_CHECK_MODE_LOOSE
 #define VSF_DAC_CFG_IRQ_MASK_CHECK_UNIQUE             VSF_HAL_CHECK_MODE_STRICT
 #define VSF_DAC_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
+#define VSF_DAC_CFG_REIMPLEMENT_API_CTRL              ENABLED
 #define VSF_DAC_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #define VSF_DAC_CFG_REIMPLEMENT_API_IRQ_CLEAR         ENABLED
 #define VSF_DAC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
