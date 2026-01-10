@@ -105,5 +105,11 @@ vsf_err_t vsf_remapped_rtc_set_time(vsf_remapped_rtc_t *rtc, vsf_rtc_time_t seco
     return vsf_rtc_set_time(rtc->target, second, millisecond);
 }
 
+vsf_err_t vsf_remapped_rtc_ctrl(vsf_remapped_rtc_t *rtc, vsf_rtc_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT((rtc != NULL) && (rtc->target != NULL));
+    return vsf_rtc_ctrl(rtc->target, ctrl, param);
+}
+
 #endif
 #endif

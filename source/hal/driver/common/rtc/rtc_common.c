@@ -127,6 +127,15 @@ vsf_err_t vsf_rtc_get_configuration(vsf_rtc_t *rtc_ptr, vsf_rtc_cfg_t *cfg_ptr)
     return rtc_ptr->op->get_configuration(rtc_ptr, cfg_ptr);
 }
 
+vsf_err_t vsf_rtc_ctrl(vsf_rtc_t *rtc_ptr, vsf_rtc_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(rtc_ptr != NULL);
+    VSF_HAL_ASSERT(rtc_ptr->op != NULL);
+    VSF_HAL_ASSERT(rtc_ptr->op->ctrl != NULL);
+
+    return rtc_ptr->op->ctrl(rtc_ptr, ctrl, param);
+}
+
 #endif /* VSF_RTC_CFG_MULTI_CLASS == ENABLED */
 
 
