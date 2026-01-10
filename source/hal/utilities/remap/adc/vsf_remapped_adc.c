@@ -126,5 +126,11 @@ vsf_err_t vsf_remapped_adc_channel_request(vsf_remapped_adc_t *adc,
     return vsf_adc_channel_request(adc->target, buffer, count);
 }
 
+vsf_err_t vsf_remapped_adc_ctrl(vsf_remapped_adc_t *adc, vsf_adc_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT((adc != NULL) && (adc->target != NULL));
+    return vsf_adc_ctrl(adc->target, ctrl, param);
+}
+
 #endif
 #endif

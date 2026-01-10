@@ -216,6 +216,16 @@ vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_get_configuration)(
 
     return VSF_ERR_NONE;
 }
+
+vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_ctrl)(
+    VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t) *adc_ptr,
+    vsf_adc_ctrl_t ctrl,
+    void *param
+) {
+    VSF_HAL_ASSERT(adc_ptr != NULL);
+
+    return VSF_ERR_NONE;
+}
 // HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -228,6 +238,7 @@ vsf_err_t VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_get_configuration)(
 #define VSF_ADC_CFG_MODE_CHECK_UNIQUE                 VSF_HAL_CHECK_MODE_LOOSE
 #define VSF_ADC_CFG_IRQ_MASK_CHECK_UNIQUE             VSF_HAL_CHECK_MODE_STRICT
 #define VSF_ADC_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
+#define VSF_ADC_CFG_REIMPLEMENT_API_CTRL              ENABLED
 #define VSF_ADC_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #define VSF_ADC_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_ADC_CFG_IMP_PREFIX, _adc_t)                                \

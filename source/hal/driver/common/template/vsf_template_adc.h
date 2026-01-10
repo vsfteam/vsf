@@ -223,7 +223,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_adc_irq_mask_t,   adc, irq_clear,            VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_irq_mask_t irq_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_request_once, VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_channel_cfg_t *channel_cfg, void *buffer_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_config,       VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_channel_cfg_t *channel_cfgs_ptr, uint32_t channel_cfgs_cnt) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_request,      VSF_MCONNECT(__prefix_name, _t) *adc_ptr, void *buffer_ptr, uint_fast32_t count)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_request,      VSF_MCONNECT(__prefix_name, _t) *adc_ptr, void *buffer_ptr, uint_fast32_t count) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, ctrl,                  VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
 
@@ -710,6 +711,37 @@ typedef struct vsf_adc_capability_t {
 } vsf_adc_capability_t;
 #endif
 
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED
+/**
+ * \~english
+ * @brief ADC control commands for hardware-specific operations
+ * @note These commands provide additional control beyond basic ADC operations
+ * \~chinese
+ * @brief ADC 控制命令，用于硬件特定操作
+ * @note 这些命令提供了基本 ADC 操作之外的额外控制功能
+ */
+typedef enum vsf_adc_ctrl_t {
+    //! \~english
+    //! @brief Dummy value for compilation, required when no actual control commands are defined.
+    //! @note This value is needed only when using the template default enum definition
+    //!       (VSF_ADC_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) and all optional control
+    //!       commands are commented out. It ensures the enum has at least one member
+    //!       to avoid compilation errors with some C compilers that don't allow empty enums.
+    //! @note If you enable any control commands below (uncomment them), or if you
+    //!       redefine the enum in a specific hardware driver (VSF_ADC_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED),
+    //!       you can remove this DUMMY value as long as at least one actual command is defined.
+    //! \~chinese
+    //! @brief 编译占位值，当没有定义实际控制命令时需要。
+    //! @note 此值仅在以下情况需要：使用模板默认枚举定义
+    //!       (VSF_ADC_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) 且所有可选控制命令都被注释掉时。
+    //!       它确保枚举至少有一个成员，以避免某些不允许空枚举的 C 编译器报错。
+    //! @note 如果启用了以下任何控制命令（取消注释），或者在特定硬件驱动中重新定义了枚举
+    //!       (VSF_ADC_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED)，只要定义了至少一个实际命令，
+    //!       就可以删除此 DUMMY 值。
+    __VSF_ADC_CTRL_DUMMY = 0,
+} vsf_adc_ctrl_t;
+#endif
+
 typedef struct vsf_adc_op_t {
 /// @cond
 #undef  __VSF_HAL_TEMPLATE_API
@@ -948,6 +980,30 @@ extern vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr,
                                          void *buffer_ptr,
                                          uint_fast32_t count);
 
+/**
+ * \~english
+ * @brief Execute a control command on an ADC instance
+ * @param[in,out] adc_ptr: pointer to ADC instance structure @ref vsf_adc_t
+ * @param[in] ctrl: Control command from @ref vsf_adc_ctrl_t enumeration
+ * @param[in] param: Command-specific parameter (can be NULL depending on command)
+ * @return vsf_err_t: VSF_ERR_NONE if command executed successfully,
+ *                    VSF_ERR_NOT_SUPPORT if command is not supported,
+ *                    other error codes defined by vsf_err_t for specific failures
+ * @note Available commands and their parameters are hardware-dependent
+ * @note Some commands may not be supported on all hardware platforms
+ * \~chinese
+ * @brief 对 ADC 实例执行控制命令
+ * @param[in,out] adc_ptr: 指向 ADC 实例结构体 @ref vsf_adc_t 的指针
+ * @param[in] ctrl: 控制命令，取值来自 @ref vsf_adc_ctrl_t 枚举
+ * @param[in] param: 命令专用参数（根据命令类型可为 NULL）
+ * @return vsf_err_t: 命令执行成功返回 VSF_ERR_NONE，
+ *                    命令不支持返回 VSF_ERR_NOT_SUPPORT，
+ *                    其他特定失败返回 vsf_err_t 定义的错误码
+ * @note 可用命令及其参数依赖于具体硬件
+ * @note 某些命令可能并非所有硬件平台都支持
+ */
+extern vsf_err_t vsf_adc_ctrl(vsf_adc_t *adc_ptr, vsf_adc_ctrl_t ctrl, void *param);
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /// @cond
@@ -966,6 +1022,7 @@ extern vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr,
 #   define vsf_adc_channel_request_once(__ADC, ...) VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_channel_request_once) ((__vsf_adc_t *)(__ADC), ##__VA_ARGS__)
 #   define vsf_adc_channel_config(__ADC, ...)       VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_channel_config)       ((__vsf_adc_t *)(__ADC), ##__VA_ARGS__)
 #   define vsf_adc_channel_request(__ADC, ...)      VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_channel_request)      ((__vsf_adc_t *)(__ADC), ##__VA_ARGS__)
+#   define vsf_adc_ctrl(__ADC, ...)                 VSF_MCONNECT(VSF_ADC_CFG_PREFIX, _adc_ctrl)                 ((__vsf_adc_t *)(__ADC), ##__VA_ARGS__)
 #endif
 /// @endcond
 
