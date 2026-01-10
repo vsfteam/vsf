@@ -115,5 +115,11 @@ uint32_t vsf_remapped_pwm_get_freq(vsf_remapped_pwm_t *pwm)
     return vsf_pwm_get_freq(pwm->target);
 }
 
+vsf_err_t vsf_remapped_pwm_ctrl(vsf_remapped_pwm_t *pwm, vsf_pwm_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT((pwm != NULL) && (pwm->target != NULL));
+    return vsf_pwm_ctrl(pwm->target, ctrl, param);
+}
+
 #endif
 #endif

@@ -170,6 +170,16 @@ vsf_pwm_capability_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_capability)(
         .min_freq = 100,
     };
 }
+
+vsf_err_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_ctrl)(
+    VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t) *pwm_ptr,
+    vsf_pwm_ctrl_t ctrl,
+    void *param
+) {
+    VSF_HAL_ASSERT(pwm_ptr != NULL);
+
+    return VSF_ERR_NONE;
+}
 // HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -182,6 +192,7 @@ vsf_pwm_capability_t VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_capability)(
 #define VSF_PWM_CFG_MODE_CHECK_UNIQUE                 VSF_HAL_CHECK_MODE_LOOSE
 #define VSF_PWM_CFG_IRQ_MASK_CHECK_UNIQUE             VSF_HAL_CHECK_MODE_STRICT
 #define VSF_PWM_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
+#define VSF_PWM_CFG_REIMPLEMENT_API_CTRL              ENABLED
 #define VSF_PWM_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #define VSF_PWM_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_PWM_CFG_IMP_PREFIX, _pwm_t)                                \

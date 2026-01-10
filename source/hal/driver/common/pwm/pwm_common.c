@@ -108,6 +108,15 @@ vsf_err_t vsf_pwm_get_configuration(vsf_pwm_t *pwm_ptr, vsf_pwm_cfg_t *cfg_ptr)
     return pwm_ptr->op->get_configuration(pwm_ptr, cfg_ptr);
 }
 
+vsf_err_t vsf_pwm_ctrl(vsf_pwm_t *pwm_ptr, vsf_pwm_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(pwm_ptr != NULL);
+    VSF_HAL_ASSERT(pwm_ptr->op != NULL);
+    VSF_HAL_ASSERT(pwm_ptr->op->ctrl != NULL);
+
+    return pwm_ptr->op->ctrl(pwm_ptr, ctrl, param);
+}
+
 #endif /* VSF_PWM_CFG_MULTI_CLASS == ENABLED */
 
 

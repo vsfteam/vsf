@@ -120,6 +120,20 @@ extern "C" {
 #   define VSF_PWM_CFG_INHERIT_HAL_CAPABILITY       ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable macro VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL in specific hardware
+ * drivers to redefine enum @ref vsf_pwm_ctrl_t. This allows hardware-specific
+ * control commands to be added to the control enumeration.
+ * \~chinese
+ * @brief 在特定硬件驱动中启用宏 VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL
+ * 来重新定义枚举 @ref vsf_pwm_ctrl_t。这允许在控制枚举中添加特定
+ * 硬件的控制命令。
+ */
+#ifndef VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL
+#   define VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL        DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /**
@@ -139,7 +153,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,              pwm, disable,              VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_pwm_capability_t,  pwm, capability,           VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)                                                 \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pwm, set,                  VSF_MCONNECT(__prefix_name, _t) *pwm_ptr, uint8_t channel, uint32_t period, uint32_t pulse)\
-    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,              pwm, get_freq,             VSF_MCONNECT(__prefix_name, _t) *pwm_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,              pwm, get_freq,             VSF_MCONNECT(__prefix_name, _t) *pwm_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             pwm, ctrl,                  VSF_MCONNECT(__prefix_name, _t) *pwm_ptr, vsf_pwm_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
 
@@ -211,6 +226,37 @@ typedef struct vsf_pwm_capability_t {
      */
     uint32_t min_freq;
 } vsf_pwm_capability_t;
+#endif
+
+#if VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED
+/**
+ * \~english
+ * @brief PWM control commands for hardware-specific operations
+ * @note These commands provide additional control beyond basic PWM operations
+ * \~chinese
+ * @brief PWM 控制命令，用于硬件特定操作
+ * @note 这些命令提供了基本 PWM 操作之外的额外控制功能
+ */
+typedef enum vsf_pwm_ctrl_t {
+    //! \~english
+    //! @brief Dummy value for compilation, required when no actual control commands are defined.
+    //! @note This value is needed only when using the template default enum definition
+    //!       (VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) and all optional control
+    //!       commands are commented out. It ensures the enum has at least one member
+    //!       to avoid compilation errors with some C compilers that don't allow empty enums.
+    //! @note If you enable any control commands below (uncomment them), or if you
+    //!       redefine the enum in a specific hardware driver (VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED),
+    //!       you can remove this DUMMY value as long as at least one actual command is defined.
+    //! \~chinese
+    //! @brief 编译占位值，当没有定义实际控制命令时需要。
+    //! @note 此值仅在以下情况需要：使用模板默认枚举定义
+    //!       (VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) 且所有可选控制命令都被注释掉时。
+    //!       它确保枚举至少有一个成员，以避免某些不允许空枚举的 C 编译器报错。
+    //! @note 如果启用了以下任何控制命令（取消注释），或者在特定硬件驱动中重新定义了枚举
+    //!       (VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED)，只要定义了至少一个实际命令，
+    //!       就可以删除此 DUMMY 值。
+    __VSF_PWM_CTRL_DUMMY = 0,
+} vsf_pwm_ctrl_t;
 #endif
 
 typedef struct vsf_pwm_t vsf_pwm_t;
@@ -358,6 +404,23 @@ extern vsf_err_t vsf_pwm_set(vsf_pwm_t *pwm_ptr, uint8_t channel,
  @return uint32_t: PWM 时钟频率，单位为赫兹(Hz)
  */
 extern uint32_t vsf_pwm_get_freq(vsf_pwm_t *pwm_ptr);
+
+/**
+ * \~english
+ * @brief Calls the specified PWM command
+ * @param[in] pwm_ptr: a pointer to structure @ref vsf_pwm_t
+ * @param[in] ctrl: PWM control command @ref vsf_pwm_ctrl_t
+ * @param[in,out] param: the parameter of the command, its use is determined by the command
+ * @return vsf_err_t: returns VSF_ERR_NONE if successful, or a negative error code
+ *
+ * \~chinese
+ * @brief 调用指定的 PWM 命令
+ * @param[in] pwm_ptr: 结构体 @ref vsf_pwm_t 的指针
+ * @param[in] ctrl: PWM 控制命令，参考 @ref vsf_pwm_ctrl_t
+ * @param[in,out] param: 命令的参数，其用途由命令决定
+ * @return vsf_err_t: 成功返回 VSF_ERR_NONE，否则返回负数
+ */
+extern vsf_err_t vsf_pwm_ctrl(vsf_pwm_t *pwm_ptr, vsf_pwm_ctrl_t ctrl, void * param);
 
 /**
  \~english
