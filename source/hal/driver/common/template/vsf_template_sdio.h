@@ -208,6 +208,20 @@ extern "C" {
 #   define VSF_SDIO_CFG_INHERIT_HAL_CAPABILITY       ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable macro VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL in specific hardware
+ * drivers to redefine enum @ref vsf_sdio_ctrl_t. This allows hardware-specific
+ * control commands to be added to the control enumeration.
+ * \~chinese
+ * @brief 在特定硬件驱动中启用宏 VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL
+ * 来重新定义枚举 @ref vsf_sdio_ctrl_t。这允许在控制枚举中添加特定
+ * 硬件的控制命令。
+ */
+#ifndef VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL
+#   define VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL        DISABLED
+#endif
+
 /* SD commands                                  type  argument     response */
   /* class 0 */
 /* This is basically the same command as for MMC with some quirks. */
@@ -490,7 +504,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_sdio_capability_t, sdio, capability,           VSF_MCONNECT(__prefix_name, _t) *sdio_ptr)                                  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, set_clock,            VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, uint32_t clock_hz, bool is_ddr)  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, set_bus_width,        VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, uint8_t bus_width)               \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, host_request,         VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_req_t *req)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, host_request,         VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_req_t *req) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, ctrl,                  VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
 
@@ -784,6 +799,37 @@ typedef struct vsf_sdio_capability_t {
     uint16_t data_size_alignment;   // alignment of data size
     bool support_ddr;
 } vsf_sdio_capability_t;
+#endif
+
+#if VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED
+/**
+ * \~english
+ * @brief SDIO control commands for hardware-specific operations
+ * @note These commands provide additional control beyond basic SDIO operations
+ * \~chinese
+ * @brief SDIO 控制命令，用于硬件特定操作
+ * @note 这些命令提供了基本 SDIO 操作之外的额外控制功能
+ */
+typedef enum vsf_sdio_ctrl_t {
+    //! \~english
+    //! @brief Dummy value for compilation, required when no actual control commands are defined.
+    //! @note This value is needed only when using the template default enum definition
+    //!       (VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) and all optional control
+    //!       commands are commented out. It ensures the enum has at least one member
+    //!       to avoid compilation errors with some C compilers that don't allow empty enums.
+    //! @note If you enable any control commands below (uncomment them), or if you
+    //!       redefine the enum in a specific hardware driver (VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED),
+    //!       you can remove this DUMMY value as long as at least one actual command is defined.
+    //! \~chinese
+    //! @brief 编译占位值，当没有定义实际控制命令时需要。
+    //! @note 此值仅在以下情况需要：使用模板默认枚举定义
+    //!       (VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) 且所有可选控制命令都被注释掉时。
+    //!       它确保枚举至少有一个成员，以避免某些不允许空枚举的 C 编译器报错。
+    //! @note 如果启用了以下任何控制命令（取消注释），或者在特定硬件驱动中重新定义了枚举
+    //!       (VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED)，只要定义了至少一个实际命令，
+    //!       就可以删除此 DUMMY 值。
+    __VSF_SDIO_CTRL_DUMMY = 0,
+} vsf_sdio_ctrl_t;
 #endif
 
 #if VSF_SDIO_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
@@ -1091,6 +1137,30 @@ extern vsf_err_t vsf_sdio_single_voltage(vsf_sdio_t *sdio_ptr, uint8_t bus_width
  */
 extern void vsf_sdio_host_transact_stop(vsf_sdio_t *sdio_ptr);
 
+/**
+ * \~english
+ * @brief Execute a control command on an SDIO instance
+ * @param[in,out] sdio_ptr: pointer to SDIO instance structure @ref vsf_sdio_t
+ * @param[in] ctrl: Control command from @ref vsf_sdio_ctrl_t enumeration
+ * @param[in] param: Command-specific parameter (can be NULL depending on command)
+ * @return vsf_err_t: VSF_ERR_NONE if command executed successfully,
+ *                    VSF_ERR_NOT_SUPPORT if command is not supported,
+ *                    other error codes defined by vsf_err_t for specific failures
+ * @note Available commands and their parameters are hardware-dependent
+ * @note Some commands may not be supported on all hardware platforms
+ * \~chinese
+ * @brief 对 SDIO 实例执行控制命令
+ * @param[in,out] sdio_ptr: 指向 SDIO 实例结构体 @ref vsf_sdio_t 的指针
+ * @param[in] ctrl: 控制命令，取值来自 @ref vsf_sdio_ctrl_t 枚举
+ * @param[in] param: 命令专用参数（根据命令类型可为 NULL）
+ * @return vsf_err_t: 命令执行成功返回 VSF_ERR_NONE，
+ *                    命令不支持返回 VSF_ERR_NOT_SUPPORT，
+ *                    其他特定失败返回 vsf_err_t 定义的错误码
+ * @note 可用命令及其参数依赖于具体硬件
+ * @note 某些命令可能并非所有硬件平台都支持
+ */
+extern vsf_err_t vsf_sdio_ctrl(vsf_sdio_t *sdio_ptr, vsf_sdio_ctrl_t ctrl, void *param);
+
 // TODO: add APIs for stream mode
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -1104,12 +1174,13 @@ extern void vsf_sdio_host_transact_stop(vsf_sdio_t *sdio_ptr);
 #   define vsf_sdio_disable(__SDIO)                 VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_disable)            ((__vsf_sdio_t *)(__SDIO))
 #   define vsf_sdio_irq_enable(__SDIO, ...)         VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_irq_enable)         ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
 #   define vsf_sdio_irq_disable(__SDIO, ...)        VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_irq_disable)        ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
-#   define vsf_sdio_irq_clear(__SDIO, ...)          VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_irq_clear)           ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_irq_clear(__SDIO, ...)          VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_irq_clear)          ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
 #   define vsf_sdio_status(__SDIO)                  VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_status)             ((__vsf_sdio_t *)(__SDIO))
 #   define vsf_sdio_capability(__SDIO)              VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_capability)         ((__vsf_sdio_t *)(__SDIO))
 #   define vsf_sdio_set_clock(__SDIO, ...)          VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_set_clock)          ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
 #   define vsf_sdio_set_bus_width(__SDIO, ...)      VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_set_bus_width)      ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
 #   define vsf_sdio_host_request(__SDIO, ...)       VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_host_request)       ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_ctrl(__SDIO, ...)                VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_ctrl)               ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
 #endif
 /// @endcond
 

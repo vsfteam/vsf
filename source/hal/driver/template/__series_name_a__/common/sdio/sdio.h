@@ -75,6 +75,7 @@ extern "C" {
  *          VSF_SDIO_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_sdio_irq_mask_t
  *          VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQSTS for vsf_sdio_reqsts_t
  *          VSF_SDIO_CFG_REIMPLEMENT_TYPE_CFG for vsf_sdio_cfg_t
+ *          VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL for vsf_sdio_ctrl_t
  *          VSF_SDIO_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_sdio_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
@@ -86,6 +87,7 @@ extern "C" {
 #define VSF_SDIO_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
 #define VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQSTS       ENABLED
 #define VSF_SDIO_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
 #define VSF_SDIO_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end
 
@@ -224,6 +226,12 @@ typedef struct vsf_sdio_capability_t {
     uint16_t data_size_alignment;
     bool support_ddr;
 } vsf_sdio_capability_t;
+#endif
+
+#if VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
+typedef enum vsf_sdio_ctrl_t {
+    __VSF_SDIO_CTRL_DUMMY = 0,
+} vsf_sdio_ctrl_t;
 #endif
 // HW/IPCore end
 

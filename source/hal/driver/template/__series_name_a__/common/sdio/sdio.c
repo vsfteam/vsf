@@ -196,6 +196,16 @@ vsf_sdio_status_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_status)(
     };
 }
 
+vsf_err_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_ctrl)(
+    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr,
+    vsf_sdio_ctrl_t ctrl,
+    void *param
+) {
+    VSF_HAL_ASSERT(sdio_ptr != NULL);
+
+    return VSF_ERR_NONE;
+}
+
 vsf_sdio_capability_t VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_capability)(
     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t) *sdio_ptr
 ) {
@@ -275,6 +285,7 @@ void VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_transact_stop)(
 #define VSF_SDIO_CFG_MODE_CHECK_UNIQUE                 VSF_HAL_CHECK_MODE_LOOSE
 #define VSF_SDIO_CFG_IRQ_MASK_CHECK_UNIQUE             VSF_HAL_CHECK_MODE_STRICT
 #define VSF_SDIO_CFG_REIMPLEMENT_API_CAPABILITY        ENABLED
+#define VSF_SDIO_CFG_REIMPLEMENT_API_CTRL              ENABLED
 #define VSF_SDIO_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
 #define VSF_SDIO_CFG_REIMPLEMENT_API_IRQ_CLEAR         ENABLED
 

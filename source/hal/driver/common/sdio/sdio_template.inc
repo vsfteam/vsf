@@ -20,26 +20,41 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define vsf_real_sdio_t                                     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t)
-#define vsf_real_sdio_capability                            VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_capability)
-#define vsf_real_sdio_get_configuration                     VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_configuration)
-#define vsf_real_sdio_irq_clear                             VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_irq_clear)
+#if defined(VSF_SDIO_CFG_IMP_RENAME_DEVICE_PREFIX) && (VSF_SDIO_CFG_IMP_RENAME_DEVICE_PREFIX == ENABLED)
+#   define vsf_real_sdio_t                      VSF_MCONNECT(VSF_SDIO_CFG_IMP_DEVICE_PREFIX, _t)
+#   define vsf_real_sdio_capability             VSF_MCONNECT(VSF_SDIO_CFG_IMP_DEVICE_PREFIX, _capability)
+#   define vsf_real_sdio_ctrl                   VSF_MCONNECT(VSF_SDIO_CFG_IMP_DEVICE_PREFIX, _ctrl)
+#   define vsf_real_sdio_get_configuration      VSF_MCONNECT(VSF_SDIO_CFG_IMP_DEVICE_PREFIX, _get_configuration)
+#   define vsf_real_sdio_irq_clear              VSF_MCONNECT(VSF_SDIO_CFG_IMP_DEVICE_PREFIX, _irq_clear)
+#else
+#   define vsf_real_sdio_t                      VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_t)
+#   define vsf_real_sdio_capability             VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_capability)
+#   define vsf_real_sdio_ctrl                   VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_ctrl)
+#   define vsf_real_sdio_get_configuration      VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_configuration)
+#   define vsf_real_sdio_irq_clear              VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_irq_clear)
+#endif
 
 #ifndef VSF_SDIO_CFG_REIMPLEMENT_API_CAPABILITY
+#   define  VSF_SDIO_CFG_REIMPLEMENT_API_CAPABILITY         DISABLED
+#endif
+
+#ifndef VSF_SDIO_CFG_REIMPLEMENT_API_CTRL
+#   define  VSF_SDIO_CFG_REIMPLEMENT_API_CTRL               DISABLED
+#endif
 
 #ifndef VSF_SDIO_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #   define VSF_SDIO_CFG_REIMPLEMENT_API_GET_CONFIGURATION   DISABLED
 #endif
 
 #ifndef VSF_SDIO_CFG_REIMPLEMENT_API_IRQ_CLEAR
-#   define VSF_SDIO_CFG_REIMPLEMENT_API_IRQ_CLEAR          DISABLED
-#endif
-#   define  VSF_SDIO_CFG_REIMPLEMENT_API_CAPABILITY         DISABLED
+#   define VSF_SDIO_CFG_REIMPLEMENT_API_IRQ_CLEAR           DISABLED
 #endif
 
 #ifdef VSF_SDIO_CFG_IMP_REMAP_PREFIX
 #   undef VSF_SDIO_CFG_REIMPLEMENT_API_CAPABILITY
 #   define VSF_SDIO_CFG_REIMPLEMENT_API_CAPABILITY          ENABLED
+#   undef VSF_SDIO_CFG_REIMPLEMENT_API_CTRL
+#   define VSF_SDIO_CFG_REIMPLEMENT_API_CTRL                ENABLED
 #   undef VSF_SDIO_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #   define VSF_SDIO_CFG_REIMPLEMENT_API_GET_CONFIGURATION   ENABLED
 #   undef VSF_SDIO_CFG_REIMPLEMENT_API_IRQ_CLEAR
@@ -81,6 +96,18 @@ vsf_err_t vsf_real_sdio_get_configuration(vsf_real_sdio_t *sdio_ptr, vsf_sdio_cf
 }
 #endif
 
+#if VSF_SDIO_CFG_REIMPLEMENT_API_CTRL == DISABLED
+vsf_err_t vsf_real_sdio_ctrl(vsf_real_sdio_t *sdio_ptr, vsf_sdio_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(NULL != sdio_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
 #if VSF_SDIO_CFG_REIMPLEMENT_API_IRQ_CLEAR == DISABLED
 vsf_sdio_irq_mask_t vsf_real_sdio_irq_clear(vsf_real_sdio_t *sdio_ptr, vsf_sdio_irq_mask_t irq_mask)
 {
@@ -102,13 +129,16 @@ vsf_sdio_irq_mask_t vsf_real_sdio_irq_clear(vsf_real_sdio_t *sdio_ptr, vsf_sdio_
 #undef VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQOP
 #undef VSF_SDIO_CFG_REIMPLEMENT_TYPE_REQSTS
 #undef VSF_SDIO_CFG_REIMPLEMENT_TYPE_STATUS
+#undef VSF_SDIO_CFG_REIMPLEMENT_TYPE_CTRL
 #undef VSF_SDIO_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_SDIO_CFG_REIMPLEMENT_API_CTRL
 #undef VSF_SDIO_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_SDIO_CFG_REIMPLEMENT_API_IRQ_CLEAR
 #undef VSF_SDIO_CFG_CAPCBILITY_MAX_FREQ_HZ
 #undef VSF_SDIO_CFG_CAPCBILITY_BUS_WIDTH
 #undef vsf_real_sdio_t
 #undef vsf_real_sdio_capability
+#undef vsf_real_sdio_ctrl
 #undef vsf_real_sdio_get_configuration
 #undef vsf_real_sdio_irq_clear
 
@@ -128,7 +158,8 @@ vsf_sdio_irq_mask_t vsf_real_sdio_irq_clear(vsf_real_sdio_t *sdio_ptr, vsf_sdio_
 #   define vsf_imp_sdio_set_clock               VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_set_clock)
 #   define vsf_imp_sdio_set_bus_width           VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_set_bus_width)
 #   define vsf_imp_sdio_host_request            VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_host_request)
-#   define vsf_imp_sdio_get_configuration  VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_configuration)
+#   define vsf_imp_sdio_get_configuration       VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_get_configuration)
+#   define vsf_imp_sdio_ctrl                    VSF_MCONNECT(VSF_SDIO_CFG_IMP_PREFIX, _sdio_ctrl)
 
 #   define vsf_remap_sdio_t                     VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_t)
 #   define vsf_remap_sdio_init                  VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_init)
@@ -142,7 +173,8 @@ vsf_sdio_irq_mask_t vsf_real_sdio_irq_clear(vsf_real_sdio_t *sdio_ptr, vsf_sdio_
 #   define vsf_remap_sdio_set_clock             VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_set_clock)
 #   define vsf_remap_sdio_set_bus_width         VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_set_bus_width)
 #   define vsf_remap_sdio_host_request          VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_host_request)
-#   define vsf_remap_sdio_get_configuration VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_get_configuration)
+#   define vsf_remap_sdio_get_configuration     VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_get_configuration)
+#   define vsf_remap_sdio_ctrl                  VSF_MCONNECT(VSF_SDIO_CFG_IMP_REMAP_PREFIX, _sdio_ctrl)
 
 #   define VSF_SDIO_CFG_IMP_REMAP_FUNCTIONS                                                     \
         vsf_err_t vsf_imp_sdio_init(vsf_imp_sdio_t *sdio_ptr, vsf_sdio_cfg_t *cfg_ptr)          \
@@ -199,6 +231,11 @@ vsf_sdio_irq_mask_t vsf_real_sdio_irq_clear(vsf_real_sdio_t *sdio_ptr, vsf_sdio_
         {                                                                                       \
             VSF_HAL_ASSERT(sdio_ptr != NULL);                                                   \
             return vsf_remap_sdio_get_configuration(sdio_ptr, cfg_ptr);                         \
+        }                                                                                       \
+        vsf_err_t vsf_imp_sdio_ctrl(vsf_imp_sdio_t *sdio_ptr, vsf_sdio_ctrl_t ctrl, void *param)\
+        {                                                                                       \
+            VSF_HAL_ASSERT(sdio_ptr != NULL);                                                   \
+            return vsf_remap_sdio_ctrl(sdio_ptr, ctrl, param);                                  \
         }
 #endif
 
@@ -251,6 +288,7 @@ vsf_sdio_irq_mask_t vsf_real_sdio_irq_clear(vsf_real_sdio_t *sdio_ptr, vsf_sdio_
 #undef vsf_imp_sdio_set_bus_width
 #undef vsf_imp_sdio_host_request
 #undef vsf_imp_sdio_get_configuration
+#undef vsf_imp_sdio_ctrl
 
 #undef vsf_remap_sdio_t
 #undef vsf_remap_sdio_init
@@ -265,6 +303,7 @@ vsf_sdio_irq_mask_t vsf_real_sdio_irq_clear(vsf_real_sdio_t *sdio_ptr, vsf_sdio_
 #undef vsf_remap_sdio_set_bus_width
 #undef vsf_remap_sdio_host_request
 #undef vsf_remap_sdio_get_configuration
+#undef vsf_remap_sdio_ctrl
 
 #undef VSF_HAL_TEMPLATE_IMP_NAME
 #undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME

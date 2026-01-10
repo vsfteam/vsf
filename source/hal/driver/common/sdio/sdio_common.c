@@ -133,4 +133,13 @@ vsf_err_t vsf_sdio_get_configuration(vsf_sdio_t *sdio_ptr, vsf_sdio_cfg_t *cfg_p
     return sdio_ptr->op->get_configuration(sdio_ptr, cfg_ptr);
 }
 
+vsf_err_t vsf_sdio_ctrl(vsf_sdio_t *sdio_ptr, vsf_sdio_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(sdio_ptr != NULL);
+    VSF_HAL_ASSERT(sdio_ptr->op != NULL);
+    VSF_HAL_ASSERT(sdio_ptr->op->ctrl != NULL);
+
+    return sdio_ptr->op->ctrl(sdio_ptr, ctrl, param);
+}
+
 #endif      // VSF_HAL_USE_SDIO && VSF_SDIO_CFG_MULTI_CLASS
