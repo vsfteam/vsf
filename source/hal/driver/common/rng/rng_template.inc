@@ -20,16 +20,29 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define vsf_real_rng_t          VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_t)
-#define vsf_real_rng_capability VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_capability)
+#if defined(VSF_RNG_CFG_IMP_RENAME_DEVICE_PREFIX) && (VSF_RNG_CFG_IMP_RENAME_DEVICE_PREFIX == ENABLED)
+#   define vsf_real_rng_t                      VSF_MCONNECT(VSF_RNG_CFG_IMP_DEVICE_PREFIX, _t)
+#   define vsf_real_rng_capability             VSF_MCONNECT(VSF_RNG_CFG_IMP_DEVICE_PREFIX, _capability)
+#   define vsf_real_rng_ctrl                   VSF_MCONNECT(VSF_RNG_CFG_IMP_DEVICE_PREFIX, _ctrl)
+#else
+#   define vsf_real_rng_t                      VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_t)
+#   define vsf_real_rng_capability             VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_capability)
+#   define vsf_real_rng_ctrl                   VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_ctrl)
+#endif
 
 #ifndef VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY
 #   define  VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
 #endif
 
+#ifndef VSF_RNG_CFG_REIMPLEMENT_API_CTRL
+#   define  VSF_RNG_CFG_REIMPLEMENT_API_CTRL                    DISABLED
+#endif
+
 #ifdef VSF_RNG_CFG_IMP_REMAP_PREFIX
 #   undef VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY
-#   define VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY                ENABLED
+#   define VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY               ENABLED
+#   undef VSF_RNG_CFG_REIMPLEMENT_API_CTRL
+#   define VSF_RNG_CFG_REIMPLEMENT_API_CTRL                     ENABLED
 #endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -50,12 +63,27 @@ vsf_rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 }
 #endif
 
+#if VSF_RNG_CFG_REIMPLEMENT_API_CTRL == DISABLED
+vsf_err_t vsf_real_rng_ctrl(vsf_real_rng_t *rng_ptr, vsf_rng_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(NULL != rng_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
 /*============================ MACROS ========================================*/
 
 #undef VSF_RNG_CFG_REIMPLEMENT_TYPE_CAPABILITY
+#undef VSF_RNG_CFG_REIMPLEMENT_TYPE_CTRL
 #undef VSF_RNG_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_RNG_CFG_REIMPLEMENT_API_CTRL
 #undef vsf_real_rng_t
 #undef vsf_real_rng_capability
+#undef vsf_real_rng_ctrl
 
 /*============================ MACROS ========================================*/
 
@@ -66,12 +94,14 @@ vsf_rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 #   define vsf_imp_rng_fini                 VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_fini)
 #   define vsf_imp_rng_capability           VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_capability)
 #   define vsf_imp_rng_generate_request     VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_generate_request)
+#   define vsf_imp_rng_ctrl                 VSF_MCONNECT(VSF_RNG_CFG_IMP_PREFIX, _rng_ctrl)
 
 #   define vsf_remap_rng_t                  VSF_MCONNECT(VSF_RNG_CFG_IMP_REMAP_PREFIX, _rng_t)
 #   define vsf_remap_rng_init               VSF_MCONNECT(VSF_RNG_CFG_IMP_REMAP_PREFIX, _rng_init)
 #   define vsf_remap_rng_fini               VSF_MCONNECT(VSF_RNG_CFG_IMP_REMAP_PREFIX, _rng_fini)
 #   define vsf_remap_rng_capability         VSF_MCONNECT(VSF_RNG_CFG_IMP_REMAP_PREFIX, _rng_capability)
 #   define vsf_remap_rng_generate_request   VSF_MCONNECT(VSF_RNG_CFG_IMP_REMAP_PREFIX, _rng_generate_request)
+#   define vsf_remap_rng_ctrl               VSF_MCONNECT(VSF_RNG_CFG_IMP_REMAP_PREFIX, _rng_ctrl)
 
 #   define VSF_RNG_CFG_IMP_REMAP_FUNCTIONS                                                                   \
         vsf_err_t vsf_imp_rng_init(vsf_imp_rng_t *rng_ptr)                                     \
@@ -95,6 +125,11 @@ vsf_rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
         {                                                                                      \
             VSF_HAL_ASSERT(rng_ptr != NULL);                                                   \
             return vsf_remap_rng_capability(rng_ptr);                                          \
+        }                                                                                      \
+        vsf_err_t vsf_imp_rng_ctrl(vsf_imp_rng_t *rng_ptr, vsf_rng_ctrl_t ctrl, void *param)   \
+        {                                                                                      \
+            VSF_HAL_ASSERT(rng_ptr != NULL);                                                   \
+            return vsf_remap_rng_ctrl(rng_ptr, ctrl, param);                                   \
         }
 #endif
 
@@ -133,12 +168,14 @@ vsf_rng_capability_t vsf_real_rng_capability(vsf_real_rng_t *rng_ptr)
 #undef vsf_imp_rng_fini
 #undef vsf_imp_rng_capability
 #undef vsf_imp_rng_generate_request
+#undef vsf_imp_rng_ctrl
 
 #undef vsf_remap_rng_t
 #undef vsf_remap_rng_init
 #undef vsf_remap_rng_fini
 #undef vsf_remap_rng_capability
 #undef vsf_remap_rng_generate_request
+#undef vsf_remap_rng_ctrl
 
 #undef VSF_HAL_TEMPLATE_IMP_NAME
 #undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
