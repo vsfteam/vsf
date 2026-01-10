@@ -38,11 +38,26 @@
 /*============================ IMPLEMENTATION ================================*/
 
 #ifndef VSF_EXTI_CFG_REAL_PREFIX
-#   define VSF_EXTI_CFG_REAL_PREFIX                             VSF_EXTI_CFG_IMP_PREFIX
+#   if defined(VSF_EXTI_CFG_IMP_RENAME_DEVICE_PREFIX) && (VSF_EXTI_CFG_IMP_RENAME_DEVICE_PREFIX == ENABLED)
+#       define VSF_EXTI_CFG_REAL_PREFIX         VSF_EXTI_CFG_IMP_DEVICE_PREFIX
+#   else
+#       define VSF_EXTI_CFG_REAL_PREFIX         VSF_EXTI_CFG_IMP_PREFIX
+#   endif
 #endif
 
-#define vsf_real_exti_t                 VSF_MCONNECT(VSF_EXTI_CFG_REAL_PREFIX, _exti_t)
-#define vsf_real_exti_irq_clear         VSF_MCONNECT(VSF_EXTI_CFG_REAL_PREFIX, _exti_irq_clear)
+#if defined(VSF_EXTI_CFG_IMP_RENAME_DEVICE_PREFIX) && (VSF_EXTI_CFG_IMP_RENAME_DEVICE_PREFIX == ENABLED)
+#   define vsf_real_exti_t                      VSF_MCONNECT(VSF_EXTI_CFG_IMP_DEVICE_PREFIX, _t)
+#   define vsf_real_exti_irq_clear              VSF_MCONNECT(VSF_EXTI_CFG_IMP_DEVICE_PREFIX, _irq_clear)
+#   define vsf_real_exti_ctrl                   VSF_MCONNECT(VSF_EXTI_CFG_IMP_DEVICE_PREFIX, _ctrl)
+#else
+#   define vsf_real_exti_t                      VSF_MCONNECT(VSF_EXTI_CFG_REAL_PREFIX, _exti_t)
+#   define vsf_real_exti_irq_clear              VSF_MCONNECT(VSF_EXTI_CFG_REAL_PREFIX, _exti_irq_clear)
+#   define vsf_real_exti_ctrl                   VSF_MCONNECT(VSF_EXTI_CFG_REAL_PREFIX, _exti_ctrl)
+#endif
+
+#ifndef VSF_EXTI_CFG_REIMPLEMENT_API_CTRL
+#   define VSF_EXTI_CFG_REIMPLEMENT_API_CTRL                    DISABLED
+#endif
 
 #if VSF_EXTI_CFG_REIMPLEMENT_API_IRQ_CLEAR == DISABLED
 vsf_exti_channel_mask_t vsf_real_exti_irq_clear(vsf_real_exti_t *exti_ptr, vsf_exti_channel_mask_t channel_mask)
@@ -53,6 +68,18 @@ vsf_exti_channel_mask_t vsf_real_exti_irq_clear(vsf_real_exti_t *exti_ptr, vsf_e
     VSF_HAL_ASSERT(0);
 
     return 0;
+}
+#endif
+
+#if VSF_EXTI_CFG_REIMPLEMENT_API_CTRL == DISABLED
+vsf_err_t vsf_real_exti_ctrl(vsf_real_exti_t *exti_ptr, vsf_exti_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(NULL != exti_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
 }
 #endif
 /*============================ MACROS ========================================*/
@@ -101,9 +128,12 @@ vsf_exti_channel_mask_t vsf_real_exti_irq_clear(vsf_real_exti_t *exti_ptr, vsf_e
 #endif
 
 #undef VSF_EXTI_CFG_REIMPLEMENT_API_IRQ_CLEAR
+#undef VSF_EXTI_CFG_REIMPLEMENT_API_CTRL
+#undef VSF_EXTI_CFG_REIMPLEMENT_TYPE_CTRL
 #undef VSF_EXTI_CFG_REAL_PREFIX
 #undef vsf_real_exti_t
 #undef vsf_real_exti_irq_clear
+#undef vsf_real_exti_ctrl
 
 /*============================ STATIC ASSERTIONS ==============================*/
 
