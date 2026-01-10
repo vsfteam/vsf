@@ -52,6 +52,7 @@ extern "C" {
  *      To enable reimplementation, please enable macro below:
  *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE for vsf_gpio_mode_t
  *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG for vsf_gpio_cfg_t
+ *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_CTRL for vsf_gpio_ctrl_t
  *          VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_gpio_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
@@ -59,6 +60,7 @@ extern "C" {
 
 #define VSF_GPIO_CFG_REIMPLEMENT_TYPE_MODE         ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
 #define VSF_GPIO_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end
 
@@ -134,6 +136,12 @@ typedef struct vsf_gpio_capability_t {
     uint8_t pin_count;
     vsf_gpio_pin_mask_t pin_mask;
 } vsf_gpio_capability_t;
+#endif
+
+#if VSF_GPIO_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
+typedef enum vsf_gpio_ctrl_t {
+    __VSF_GPIO_CTRL_DUMMY = 0,
+} vsf_gpio_ctrl_t;
 #endif
 // HW/IPCore end
 

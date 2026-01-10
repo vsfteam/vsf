@@ -112,7 +112,11 @@
 #endif
 
 #ifndef VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_CLEAR
-#   define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_CLEAR             DISABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_CLEAR              DISABLED
+#endif
+
+#ifndef VSF_GPIO_CFG_REIMPLEMENT_API_CTRL
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_CTRL                        DISABLED
 #endif
 
 #ifdef VSF_GPIO_CFG_IMP_REMAP_PREFIX
@@ -128,59 +132,92 @@
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION
 #   undef VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_CLEAR
-#   define VSF_GPIO_CFG_REIMPLEMENT_API_SET_INPUT               ENABLED
-#   define VSF_GPIO_CFG_REIMPLEMENT_API_SET_OUTPUT              ENABLED
-#   define VSF_GPIO_CFG_REIMPLEMENT_API_SWITCH_DIRECTION        ENABLED
-#   define VSF_GPIO_CFG_REIMPLEMENT_API_SET                     ENABLED
-#   define VSF_GPIO_CFG_REIMPLEMENT_API_CLEAR                   ENABLED
-#   define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET          ENABLED
-#   define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR        ENABLED
-#   define VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION   ENABLED
-#   define VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER    ENABLED
-#   define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY              ENABLED
-#   define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION ENABLED
-#   define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_CLEAR          ENABLED
+#   undef VSF_GPIO_CFG_REIMPLEMENT_API_CTRL
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_SET_INPUT                   ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_SET_OUTPUT                  ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_SWITCH_DIRECTION            ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_SET                         ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_CLEAR                       ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_SET              ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_OUTPUT_AND_CLEAR            ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_GET_PIN_CONFIGURATION       ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_READ_OUTPUT_REGISTER        ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY                  ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION  ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_CLEAR              ENABLED
+#   define VSF_GPIO_CFG_REIMPLEMENT_API_CTRL                        ENABLED
 #endif
 
 #if VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
 #   ifndef VSF_GPIO_CFG_CAPABILITY_IS_ASYNC
-#       define VSF_GPIO_CFG_CAPABILITY_IS_ASYNC                 0
+#       define VSF_GPIO_CFG_CAPABILITY_IS_ASYNC                     0
 #   endif
 
 #   ifndef VSF_GPIO_CFG_CAPABILITY_PIN_COUNT
-#       define VSF_GPIO_CFG_CAPABILITY_PIN_COUNT                32
+#       define VSF_GPIO_CFG_CAPABILITY_PIN_COUNT                    32
 #   endif
 #   ifndef VSF_GPIO_CFG_CAPABILITY_PIN_MASK
-#       define VSF_GPIO_CFG_CAPABILITY_PIN_MASK                 0xFFFFFFFF
+#       define VSF_GPIO_CFG_CAPABILITY_PIN_MASK                     0xFFFFFFFF
 #   endif
 #endif
 
 #ifndef VSF_GPIO_CFG_REAL_PREFIX
-#   define VSF_GPIO_CFG_REAL_PREFIX                             VSF_GPIO_CFG_IMP_PREFIX
+#   if defined(VSF_GPIO_CFG_IMP_RENAME_DEVICE_PREFIX) && (VSF_GPIO_CFG_IMP_RENAME_DEVICE_PREFIX == ENABLED)
+#       define VSF_GPIO_CFG_REAL_PREFIX                             VSF_GPIO_CFG_IMP_DEVICE_PREFIX
+#   else
+#       define VSF_GPIO_CFG_REAL_PREFIX                             VSF_GPIO_CFG_IMP_PREFIX
+#   endif
 #endif
 
-#define vsf_real_gpios                  VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpios)
-#define vsf_real_gpio_t                 VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_t)
-#define vsf_real_gpio_port_config_pins  VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_port_config_pins)
-#define vsf_real_gpio_get_pin_configuration VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_get_pin_configuration)
-#define vsf_real_gpio_read              VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_read)
-#define vsf_real_gpio_read_output_register VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_read_output_register)
-#define vsf_real_gpio_set_input         VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_set_input)
-#define vsf_real_gpio_set_output        VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_set_output)
-#define vsf_real_gpio_get_direction     VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_get_direction)
-#define vsf_real_gpio_set_direction     VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_set_direction)
-#define vsf_real_gpio_switch_direction  VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_switch_direction)
-#define vsf_real_gpio_write             VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_write)
-#define vsf_real_gpio_set               VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_set)
-#define vsf_real_gpio_clear             VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_clear)
-#define vsf_real_gpio_output_and_set    VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_output_and_set)
-#define vsf_real_gpio_output_and_clear  VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_output_and_clear)
-#define vsf_real_gpio_capability        VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_capability)
-#define vsf_real_gpio_exti_irq_get_configuration VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_exti_irq_get_configuration)
-#define vsf_real_gpio_exti_irq_clear     VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_exti_irq_clear)
-#define vsf_real_gpio_port_config_pin   VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_port_config_pin)
-#define vsf_real_gpio_ports_config_pin  VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_ports_config_pin)
-#define vsf_real_gpio_ports_config_pins VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_ports_config_pins)
+#if defined(VSF_GPIO_CFG_IMP_RENAME_DEVICE_PREFIX) && (VSF_GPIO_CFG_IMP_RENAME_DEVICE_PREFIX == ENABLED)
+#   define vsf_real_gpios                              VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, s)
+#   define vsf_real_gpio_t                             VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _t)
+#   define vsf_real_gpio_port_config_pins              VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _port_config_pins)
+#   define vsf_real_gpio_get_pin_configuration         VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _get_pin_configuration)
+#   define vsf_real_gpio_read                          VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _read)
+#   define vsf_real_gpio_read_output_register          VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _read_output_register)
+#   define vsf_real_gpio_set_input                     VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _set_input)
+#   define vsf_real_gpio_set_output                    VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _set_output)
+#   define vsf_real_gpio_get_direction                 VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _get_direction)
+#   define vsf_real_gpio_set_direction                 VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _set_direction)
+#   define vsf_real_gpio_switch_direction              VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _switch_direction)
+#   define vsf_real_gpio_write                         VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _write)
+#   define vsf_real_gpio_set                           VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _set)
+#   define vsf_real_gpio_clear                         VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _clear)
+#   define vsf_real_gpio_output_and_set                VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _output_and_set)
+#   define vsf_real_gpio_output_and_clear              VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _output_and_clear)
+#   define vsf_real_gpio_capability                    VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _capability)
+#   define vsf_real_gpio_exti_irq_get_configuration    VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _exti_irq_get_configuration)
+#   define vsf_real_gpio_exti_irq_clear                VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _exti_irq_clear)
+#   define vsf_real_gpio_ctrl                          VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _ctrl)
+#   define vsf_real_gpio_port_config_pin               VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _port_config_pin)
+#   define vsf_real_gpio_ports_config_pin              VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _ports_config_pin)
+#   define vsf_real_gpio_ports_config_pins             VSF_MCONNECT(VSF_GPIO_CFG_IMP_DEVICE_PREFIX, _ports_config_pins)
+#else
+#   define vsf_real_gpios                              VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpios)
+#   define vsf_real_gpio_t                             VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_t)
+#   define vsf_real_gpio_port_config_pins              VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_port_config_pins)
+#   define vsf_real_gpio_get_pin_configuration         VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_get_pin_configuration)
+#   define vsf_real_gpio_read                          VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_read)
+#   define vsf_real_gpio_read_output_register          VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_read_output_register)
+#   define vsf_real_gpio_set_input                     VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_set_input)
+#   define vsf_real_gpio_set_output                    VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_set_output)
+#   define vsf_real_gpio_get_direction                 VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_get_direction)
+#   define vsf_real_gpio_set_direction                 VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_set_direction)
+#   define vsf_real_gpio_switch_direction              VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_switch_direction)
+#   define vsf_real_gpio_write                         VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_write)
+#   define vsf_real_gpio_set                           VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_set)
+#   define vsf_real_gpio_clear                         VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_clear)
+#   define vsf_real_gpio_output_and_set                VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_output_and_set)
+#   define vsf_real_gpio_output_and_clear              VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_output_and_clear)
+#   define vsf_real_gpio_capability                    VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_capability)
+#   define vsf_real_gpio_exti_irq_get_configuration    VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_exti_irq_get_configuration)
+#   define vsf_real_gpio_exti_irq_clear                VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_exti_irq_clear)
+#   define vsf_real_gpio_ctrl                          VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_ctrl)
+#   define vsf_real_gpio_port_config_pin               VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_port_config_pin)
+#   define vsf_real_gpio_ports_config_pin              VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_ports_config_pin)
+#   define vsf_real_gpio_ports_config_pins             VSF_MCONNECT(VSF_GPIO_CFG_REAL_PREFIX, _gpio_ports_config_pins)
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
@@ -347,6 +384,18 @@ vsf_gpio_pin_mask_t vsf_real_gpio_exti_irq_clear(vsf_real_gpio_t *gpio_ptr, vsf_
 }
 #endif
 
+#if VSF_GPIO_CFG_REIMPLEMENT_API_CTRL == DISABLED
+vsf_err_t vsf_real_gpio_ctrl(vsf_real_gpio_t *gpio_ptr, vsf_gpio_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(NULL != gpio_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
 #if VSF_GPIO_CFG_REIMPLEMENT_API_PORTS_CONFIG_PIN == DISABLED
 vsf_err_t vsf_real_gpio_ports_config_pin(vsf_gpio_port_cfg_pin_t *cfg_ptr,
                                          uint_fast8_t             count)
@@ -416,6 +465,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_GET_CONFIGURATION
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_EXTI_IRQ_CLEAR
+#undef VSF_GPIO_CFG_REIMPLEMENT_API_CTRL
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_PORTS_CONFIG_PIN
 #undef VSF_GPIO_CFG_REIMPLEMENT_API_PORTS_CONFIG_PINS
 #undef VSF_GPIO_CFG_CHANGE_DIR_FIRST
@@ -447,6 +497,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef vsf_real_gpio_capability
 #undef vsf_real_gpio_exti_irq_get_configuration
 #undef vsf_real_gpio_exti_irq_clear
+#undef vsf_real_gpio_ctrl
 #undef vsf_real_gpio_port_config_pin
 #undef vsf_real_gpio_ports_config_pin
 #undef vsf_real_gpio_ports_config_pins
@@ -479,6 +530,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #   define vsf_origin_gpio_exti_irq_disable     VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_exti_irq_disable)
 #   define vsf_origin_gpio_exti_irq_clear      VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_exti_irq_clear)
 #   define vsf_origin_gpio_exti_irq_config      VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_exti_irq_config)
+#   define vsf_origin_gpio_ctrl                 VSF_MCONNECT(VSF_GPIO_CFG_ORIGIN_PREFIX, _gpio_ctrl)
 
 #   define vsf_remap_gpio_t                     VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_t)
 #   define vsf_remap_gpio_capability            VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_capability)
@@ -501,6 +553,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #   define vsf_remap_gpio_exti_irq_disable      VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_exti_irq_disable)
 #   define vsf_remap_gpio_exti_irq_clear        VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_exti_irq_clear)
 #   define vsf_remap_gpio_exti_irq_config       VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_exti_irq_config)
+#   define vsf_remap_gpio_ctrl                  VSF_MCONNECT(VSF_GPIO_CFG_IMP_REMAP_PREFIX, _gpio_ctrl)
 
 #   define VSF_GPIO_CFG_IMP_REMAP_FUNCTIONS                                                                                                 \
         vsf_err_t vsf_origin_gpio_port_config_pins(vsf_origin_gpio_t *gpio_ptr, vsf_gpio_pin_mask_t pin_mask, vsf_gpio_cfg_t *cfg)          \
@@ -605,6 +658,11 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
         {                                                                                                                                   \
             VSF_HAL_ASSERT(gpio_ptr != NULL);                                                                                               \
             return vsf_remap_gpio_exti_irq_config(gpio_ptr, cfg);                                                                           \
+        }                                                                                                                                   \
+        vsf_err_t vsf_origin_gpio_ctrl(vsf_origin_gpio_t *gpio_ptr, vsf_gpio_ctrl_t ctrl, void *param)                                      \
+        {                                                                                                                                   \
+            VSF_HAL_ASSERT(gpio_ptr != NULL);                                                                                               \
+            return vsf_remap_gpio_ctrl(gpio_ptr, ctrl, param);                                                                              \
         }
 #endif
 
@@ -682,6 +740,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef vsf_origin_gpio_exti_irq_enable
 #undef vsf_origin_gpio_exti_irq_disable
 #undef vsf_origin_gpio_exti_irq_clear
+#undef vsf_origin_gpio_ctrl
 
 #undef vsf_remap_gpio_t
 #undef vsf_remap_gpio_capability
@@ -704,6 +763,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef vsf_remap_gpio_exti_irq_enable
 #undef vsf_remap_gpio_exti_irq_disable
 #undef vsf_remap_gpio_exti_irq_clear
+#undef vsf_remap_gpio_ctrl
 
 #undef VSF_HAL_TEMPLATE_IMP_NAME
 #undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME

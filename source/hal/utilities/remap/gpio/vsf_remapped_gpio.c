@@ -171,5 +171,11 @@ vsf_gpio_pin_mask_t vsf_remapped_gpio_exti_irq_clear(vsf_remapped_gpio_t *gpio, 
     return vsf_gpio_exti_irq_clear(gpio->target, pin_mask);
 }
 
+vsf_err_t vsf_remapped_gpio_ctrl(vsf_remapped_gpio_t *gpio, vsf_gpio_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT((gpio != NULL) && (gpio->target != NULL));
+    return vsf_gpio_ctrl(gpio->target, ctrl, param);
+}
+
 #endif
 #endif
