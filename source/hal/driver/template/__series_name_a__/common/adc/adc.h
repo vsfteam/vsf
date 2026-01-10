@@ -75,6 +75,7 @@ extern "C" {
  *          VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG for vsf_adc_channel_cfg_t
  *          VSF_ADC_CFG_REIMPLEMENT_TYPE_CFG for vsf_adc_cfg_t
  *          VSF_ADC_CFG_REIMPLEMENT_TYPE_STATUS for vsf_adc_status_t
+ *          VSF_ADC_CFG_REIMPLEMENT_TYPE_CTRL for vsf_adc_ctrl_t
  *          VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_adc_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
@@ -86,6 +87,7 @@ extern "C" {
 #define VSF_ADC_CFG_REIMPLEMENT_TYPE_CHANNEL_CFG  ENABLED
 #define VSF_ADC_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
 #define VSF_ADC_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
+#define VSF_ADC_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
 #define VSF_ADC_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end
 
@@ -201,6 +203,12 @@ typedef struct vsf_adc_capability_t {
     uint8_t max_data_bits;
     uint8_t channel_count;
 } vsf_adc_capability_t;
+#endif
+
+#if VSF_ADC_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
+typedef enum vsf_adc_ctrl_t {
+    __VSF_ADC_CTRL_DUMMY = 0,
+} vsf_adc_ctrl_t;
 #endif
 // HW/IPCore end
 

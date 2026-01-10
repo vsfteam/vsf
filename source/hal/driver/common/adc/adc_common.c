@@ -153,5 +153,14 @@ vsf_err_t vsf_adc_channel_request(vsf_adc_t *adc_ptr, void *buffer_ptr, uint_fas
     return adc_ptr->op->channel_request(adc_ptr, buffer_ptr, count);
 }
 
+vsf_err_t vsf_adc_ctrl(vsf_adc_t *adc_ptr, vsf_adc_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(adc_ptr != NULL);
+    VSF_HAL_ASSERT(adc_ptr->op != NULL);
+    VSF_HAL_ASSERT(adc_ptr->op->ctrl != NULL);
+
+    return adc_ptr->op->ctrl(adc_ptr, ctrl, param);
+}
+
 #endif /* VSF_ADC_CFG_MULTI_CLASS == ENABLED */
 #endif /* VSF_HAL_USE_ADC == ENABLED */
