@@ -20,11 +20,19 @@
 
 #if VSF_HAL_USE_SPI == ENABLED
 
-#define vsf_real_spi_t                  VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t)
-#define vsf_real_spi_capability         VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_capability)
-#define vsf_real_spi_ctrl               VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_ctrl)
-#define vsf_real_spi_get_configuration  VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_get_configuration)
-#define vsf_real_spi_irq_clear          VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_irq_clear)
+#if defined(VSF_SPI_CFG_IMP_RENAME_DEVICE_PREFIX) && (VSF_SPI_CFG_IMP_RENAME_DEVICE_PREFIX == ENABLED)
+#   define vsf_real_spi_t                      VSF_MCONNECT(VSF_SPI_CFG_IMP_DEVICE_PREFIX, _t)
+#   define vsf_real_spi_capability             VSF_MCONNECT(VSF_SPI_CFG_IMP_DEVICE_PREFIX, _capability)
+#   define vsf_real_spi_ctrl                   VSF_MCONNECT(VSF_SPI_CFG_IMP_DEVICE_PREFIX, _ctrl)
+#   define vsf_real_spi_get_configuration      VSF_MCONNECT(VSF_SPI_CFG_IMP_DEVICE_PREFIX, _get_configuration)
+#   define vsf_real_spi_irq_clear              VSF_MCONNECT(VSF_SPI_CFG_IMP_DEVICE_PREFIX, _irq_clear)
+#else
+#   define vsf_real_spi_t                      VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_t)
+#   define vsf_real_spi_capability             VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_capability)
+#   define vsf_real_spi_ctrl                   VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_ctrl)
+#   define vsf_real_spi_get_configuration      VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_get_configuration)
+#   define vsf_real_spi_irq_clear              VSF_MCONNECT(VSF_SPI_CFG_IMP_PREFIX, _spi_irq_clear)
+#endif
 
 #ifndef VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY
 #   define  VSF_SPI_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
@@ -89,6 +97,11 @@ vsf_spi_capability_t vsf_real_spi_capability(vsf_real_spi_t *spi_ptr)
 #if VSF_SPI_CFG_REIMPLEMENT_API_CTRL == DISABLED
 vsf_err_t vsf_real_spi_ctrl(vsf_real_spi_t *spi_ptr, vsf_spi_ctrl_t ctrl, void *param)
 {
+    VSF_HAL_ASSERT(NULL != spi_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
     return VSF_ERR_NOT_SUPPORT;
 }
 #endif
