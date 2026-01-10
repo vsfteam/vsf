@@ -241,6 +241,17 @@ vsf_wdt_capability_t VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_capability)(
         .max_timeout_ms       = ((0x1000 * 256 * 1000) / WDT_CLK_FREQ_HZ),  // Max timeout with max divider and reload
     };
 }
+
+vsf_err_t VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_ctrl)(
+    VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t) *wdt_ptr,
+    vsf_wdt_ctrl_t ctrl,
+    void *param
+) {
+    VSF_HAL_ASSERT(wdt_ptr != NULL);
+
+    // Default implementation: not supported
+    return VSF_ERR_NOT_SUPPORT;
+}
 // HW end
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
@@ -250,8 +261,9 @@ vsf_wdt_capability_t VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_capability)(
  */
 
 // HW
-#define VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY      ENABLED
-#define VSF_WDT_CFG_REIMPLEMENT_API_GET_CONFIGURATION ENABLED
+#define VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY          ENABLED
+#define VSF_WDT_CFG_REIMPLEMENT_API_GET_CONFIGURATION   ENABLED
+#define VSF_WDT_CFG_REIMPLEMENT_API_CTRL                ENABLED
 #define VSF_WDT_CFG_IMP_LV0(__IDX, __HAL_OP)                                    \
     VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t)                                \
         VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt, __IDX) = {                   \

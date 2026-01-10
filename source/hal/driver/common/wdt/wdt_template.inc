@@ -20,21 +20,35 @@
 /*============================ INCLUDES ======================================*/
 /*============================ MACROS ========================================*/
 
-#define vsf_real_wdt_t                      VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t)
-#define vsf_real_wdt_capability             VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_capability)
-#define vsf_real_wdt_get_configuration      VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_get_configuration)
+#if defined(VSF_WDT_CFG_IMP_RENAME_DEVICE_PREFIX) && (VSF_WDT_CFG_IMP_RENAME_DEVICE_PREFIX == ENABLED)
+#   define vsf_real_wdt_t                      VSF_MCONNECT(VSF_WDT_CFG_IMP_DEVICE_PREFIX, _t)
+#   define vsf_real_wdt_capability             VSF_MCONNECT(VSF_WDT_CFG_IMP_DEVICE_PREFIX, _capability)
+#   define vsf_real_wdt_ctrl                   VSF_MCONNECT(VSF_WDT_CFG_IMP_DEVICE_PREFIX, _ctrl)
+#   define vsf_real_wdt_get_configuration      VSF_MCONNECT(VSF_WDT_CFG_IMP_DEVICE_PREFIX, _get_configuration)
+#else
+#   define vsf_real_wdt_t                      VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t)
+#   define vsf_real_wdt_capability             VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_capability)
+#   define vsf_real_wdt_ctrl                   VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_ctrl)
+#   define vsf_real_wdt_get_configuration      VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_get_configuration)
+#endif
 
 #ifndef VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY
+#   define  VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
+#endif
+
+#ifndef VSF_WDT_CFG_REIMPLEMENT_API_CTRL
+#   define  VSF_WDT_CFG_REIMPLEMENT_API_CTRL                    DISABLED
+#endif
 
 #ifndef VSF_WDT_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #   define VSF_WDT_CFG_REIMPLEMENT_API_GET_CONFIGURATION        DISABLED
-#endif
-#   define  VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
 #endif
 
 #ifdef VSF_WDT_CFG_IMP_REMAP_PREFIX
 #   undef VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY
 #   define VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY               ENABLED
+#   undef VSF_WDT_CFG_REIMPLEMENT_API_CTRL
+#   define VSF_WDT_CFG_REIMPLEMENT_API_CTRL                     ENABLED
 #   undef VSF_WDT_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #   define VSF_WDT_CFG_REIMPLEMENT_API_GET_CONFIGURATION        ENABLED
 #endif
@@ -79,6 +93,18 @@ vsf_wdt_capability_t vsf_real_wdt_capability(vsf_real_wdt_t *wdt_ptr)
 }
 #endif
 
+#if VSF_WDT_CFG_REIMPLEMENT_API_CTRL == DISABLED
+vsf_err_t vsf_real_wdt_ctrl(vsf_real_wdt_t *wdt_ptr, vsf_wdt_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(NULL != wdt_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
 #if VSF_WDT_CFG_REIMPLEMENT_API_GET_CONFIGURATION == DISABLED
 vsf_err_t vsf_real_wdt_get_configuration(vsf_real_wdt_t *wdt_ptr, vsf_wdt_cfg_t *cfg_ptr)
 {
@@ -97,7 +123,9 @@ vsf_err_t vsf_real_wdt_get_configuration(vsf_real_wdt_t *wdt_ptr, vsf_wdt_cfg_t 
 #undef VSF_WDT_CFG_REIMPLEMENT_TYPE_CAPABILITY
 #undef VSF_WDT_CFG_REIMPLEMENT_TYPE_CFG
 #undef VSF_WDT_CFG_REIMPLEMENT_TYPE_MODE
+#undef VSF_WDT_CFG_REIMPLEMENT_TYPE_CTRL
 #undef VSF_WDT_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_WDT_CFG_REIMPLEMENT_API_CTRL
 #undef VSF_WDT_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_WDT_CFG_CAPABILITY_SUPPORT_EARLY_WAKEUP
 #undef VSF_WDT_CFG_CAPABILITY_SUPPORT_RESET_NONE
@@ -108,29 +136,32 @@ vsf_err_t vsf_real_wdt_get_configuration(vsf_real_wdt_t *wdt_ptr, vsf_wdt_cfg_t 
 
 #undef vsf_real_wdt_t
 #undef vsf_real_wdt_capability
+#undef vsf_real_wdt_ctrl
 #undef vsf_real_wdt_get_configuration
 
 /*============================ MACROS ========================================*/
 
 #ifdef VSF_WDT_CFG_IMP_REMAP_PREFIX
 
-#   define vsf_imp_wdt_t            VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t)
-#   define vsf_imp_wdt_init         VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_init)
-#   define vsf_imp_wdt_fini         VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_fini)
-#   define vsf_imp_wdt_enable       VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_enable)
-#   define vsf_imp_wdt_disable      VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_disable)
-#   define vsf_imp_wdt_capability   VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_capability)
-#   define vsf_imp_wdt_feed         VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_feed)
-#   define vsf_imp_wdt_get_configuration  VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_get_configuration)
+#   define vsf_imp_wdt_t                    VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_t)
+#   define vsf_imp_wdt_init                 VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_init)
+#   define vsf_imp_wdt_fini                 VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_fini)
+#   define vsf_imp_wdt_enable               VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_enable)
+#   define vsf_imp_wdt_disable              VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_disable)
+#   define vsf_imp_wdt_capability           VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_capability)
+#   define vsf_imp_wdt_feed                 VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_feed)
+#   define vsf_imp_wdt_get_configuration    VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_get_configuration)
+#   define vsf_imp_wdt_ctrl                 VSF_MCONNECT(VSF_WDT_CFG_IMP_PREFIX, _wdt_ctrl)
 
-#   define vsf_remap_wdt_t          VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_t)
-#   define vsf_remap_wdt_init       VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_init)
-#   define vsf_remap_wdt_fini       VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_fini)
-#   define vsf_remap_wdt_enable     VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_enable)
-#   define vsf_remap_wdt_disable    VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_disable)
-#   define vsf_remap_wdt_capability VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_capability)
-#   define vsf_remap_wdt_feed       VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_feed)
-#   define vsf_remap_wdt_get_configuration VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_get_configuration)
+#   define vsf_remap_wdt_t                  VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_t)
+#   define vsf_remap_wdt_init               VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_init)
+#   define vsf_remap_wdt_fini               VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_fini)
+#   define vsf_remap_wdt_enable             VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_enable)
+#   define vsf_remap_wdt_disable            VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_disable)
+#   define vsf_remap_wdt_capability         VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_capability)
+#   define vsf_remap_wdt_feed               VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_feed)
+#   define vsf_remap_wdt_get_configuration  VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_get_configuration)
+#   define vsf_remap_wdt_ctrl               VSF_MCONNECT(VSF_WDT_CFG_IMP_REMAP_PREFIX, _wdt_ctrl)
 
 #   define VSF_WDT_CFG_IMP_REMAP_FUNCTIONS                                                        \
         vsf_err_t vsf_imp_wdt_init(vsf_imp_wdt_t *wdt_ptr, vsf_wdt_cfg_t *cfg_ptr)  \
@@ -168,6 +199,11 @@ vsf_err_t vsf_real_wdt_get_configuration(vsf_real_wdt_t *wdt_ptr, vsf_wdt_cfg_t 
         {                                                                           \
             VSF_HAL_ASSERT(wdt_ptr != NULL);                                        \
             return vsf_remap_wdt_get_configuration(wdt_ptr, cfg_ptr);               \
+        }                                                                           \
+        vsf_err_t vsf_imp_wdt_ctrl(vsf_imp_wdt_t *wdt_ptr, vsf_wdt_ctrl_t ctrl, void *param) \
+        {                                                                           \
+            VSF_HAL_ASSERT(wdt_ptr != NULL);                                        \
+            return vsf_remap_wdt_ctrl(wdt_ptr, ctrl, param);                        \
         }
 #endif
 
@@ -212,6 +248,7 @@ vsf_err_t vsf_real_wdt_get_configuration(vsf_real_wdt_t *wdt_ptr, vsf_wdt_cfg_t 
 #undef vsf_imp_wdt_capability
 #undef vsf_imp_wdt_feed
 #undef vsf_imp_wdt_get_configuration
+#undef vsf_imp_wdt_ctrl
 
 #undef vsf_remap_wdt_t
 #undef vsf_remap_wdt_init
@@ -221,6 +258,7 @@ vsf_err_t vsf_real_wdt_get_configuration(vsf_real_wdt_t *wdt_ptr, vsf_wdt_cfg_t 
 #undef vsf_remap_wdt_capability
 #undef vsf_remap_wdt_feed
 #undef vsf_remap_wdt_get_configuration
+#undef vsf_remap_wdt_ctrl
 
 #undef VSF_HAL_TEMPLATE_IMP_NAME
 #undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME

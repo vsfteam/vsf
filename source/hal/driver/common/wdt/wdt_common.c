@@ -99,5 +99,14 @@ void vsf_wdt_feed(vsf_wdt_t *wdt_ptr)
     wdt_ptr->op->feed(wdt_ptr);
 }
 
+vsf_err_t vsf_wdt_ctrl(vsf_wdt_t *wdt_ptr, vsf_wdt_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(wdt_ptr != NULL);
+    VSF_HAL_ASSERT(wdt_ptr->op != NULL);
+    VSF_HAL_ASSERT(wdt_ptr->op->ctrl != NULL);
+
+    return wdt_ptr->op->ctrl(wdt_ptr, ctrl, param);
+}
+
 #endif /* VSF_WDT_CFG_MULTI_CLASS == ENABLED */
 #endif /* VSF_HAL_USE_WDT == ENABLED */

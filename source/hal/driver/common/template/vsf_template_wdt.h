@@ -164,6 +164,19 @@ extern "C" {
 #   define VSF_WDT_CFG_INHERIT_HAL_CAPABILITY            ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief In specific hardware driver, enable macro
+ * VSF_WDT_CFG_REIMPLEMENT_TYPE_CTRL to redefine enum
+ * @ref vsf_wdt_ctrl_t.
+ * \~chinese
+ * @brief 在特定硬件驱动中，启用宏 VSF_WDT_CFG_REIMPLEMENT_TYPE_CTRL
+ * 来重新定义枚举 @ref vsf_wdt_ctrl_t。
+ */
+#ifndef VSF_WDT_CFG_REIMPLEMENT_TYPE_CTRL
+#   define VSF_WDT_CFG_REIMPLEMENT_TYPE_CTRL        DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /**
@@ -182,7 +195,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             wdt, enable,      VSF_MCONNECT(__prefix_name, _t) *wdt_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             wdt, disable,     VSF_MCONNECT(__prefix_name, _t) *wdt_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_wdt_capability_t, wdt, capability,  VSF_MCONNECT(__prefix_name, _t) *wdt_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 wdt, feed,        VSF_MCONNECT(__prefix_name, _t) *wdt_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, void,                 wdt, feed,        VSF_MCONNECT(__prefix_name, _t) *wdt_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            wdt, ctrl,        VSF_MCONNECT(__prefix_name, _t) *wdt_ptr, vsf_wdt_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
 
@@ -314,6 +328,57 @@ typedef struct vsf_wdt_cfg_t {
     uint32_t        min_ms; //!< \~english Minimum timeout in milliseconds \~chinese 最小超时时间（毫秒）
     vsf_wdt_isr_t   isr;    //!< \~english WDT interrupt configuration, refer to @ref vsf_wdt_isr_t \~chinese WDT 中断配置，参考 @ref vsf_wdt_isr_t
 } vsf_wdt_cfg_t;
+#endif
+
+#if VSF_WDT_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED
+/**
+ * \~english
+ * @brief Predefined VSF WDT control commands that can be reimplemented in specific HAL drivers.
+ * @note Used as the 'ctrl' parameter (second parameter) in vsf_wdt_ctrl(vsf_wdt_t *wdt_ptr, vsf_wdt_ctrl_t ctrl, void *param) function
+ * @note The 'param' parameter (third parameter) type depends on the specific control command
+ * \~chinese
+ * @brief 预定义的 VSF WDT 控制命令，可以在特定的 HAL 驱动中重新实现。
+ * @note 作为 vsf_wdt_ctrl(vsf_wdt_t *wdt_ptr, vsf_wdt_ctrl_t ctrl, void *param) 函数中的 'ctrl' 参数（第二个参数）
+ * @note 'param' 参数（第三个参数）的类型取决于具体的控制命令
+ *
+ * \~english
+ * Optional control commands require one or more enumeration options and a macro with the same
+ * name to determine if they are supported at runtime. If the feature supports more than
+ * one option, it is recommended to provide the corresponding MASK option, so that the
+ * user can check for supported features at compile-time.
+ *
+ * Feature Classification:
+ * - Mandatory: None (only __VSF_WDT_CTRL_DUMMY is defined by default)
+ * - Standard Optional: None (no standard optional features defined)
+ *
+ * \~chinese
+ * 可选控制命令需要提供一个或多个枚举选项，还需要提供同名的宏，以便用户在运行时判断是否支持。
+ * 如果该功能支持多个选项，建议提供相应的 MASK 选项，以便用户在编译时检查支持的功能。
+ *
+ * 功能分类：
+ * - 必选：无（默认仅定义 __VSF_WDT_CTRL_DUMMY）
+ * - 标准可选：无（未定义标准可选功能）
+ */
+typedef enum vsf_wdt_ctrl_t {
+    //! \~english
+    //! @brief Dummy value for compilation, required when no actual control commands are defined.
+    //! @note This value is needed only when using the template default enum definition
+    //!       (VSF_WDT_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) and all optional control
+    //!       commands are commented out. It ensures the enum has at least one member
+    //!       to avoid compilation errors with some C compilers that don't allow empty enums.
+    //! @note If you enable any control commands below (uncomment them), or if you
+    //!       redefine the enum in a specific hardware driver (VSF_WDT_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED),
+    //!       you can remove this DUMMY value as long as at least one actual command is defined.
+    //! \~chinese
+    //! @brief 编译占位值，当没有定义实际控制命令时需要。
+    //! @note 此值仅在以下情况需要：使用模板默认枚举定义
+    //!       (VSF_WDT_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) 且所有可选控制命令都被注释掉时。
+    //!       它确保枚举至少有一个成员，以避免某些不允许空枚举的 C 编译器报错。
+    //! @note 如果启用了以下任何控制命令（取消注释），或者在特定硬件驱动中重新定义了枚举
+    //!       (VSF_WDT_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED)，只要定义了至少一个实际命令，
+    //!       就可以删除此 DUMMY 值。
+    __VSF_WDT_CTRL_DUMMY = 0,
+} vsf_wdt_ctrl_t;
 #endif
 
 #if VSF_WDT_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
@@ -472,6 +537,8 @@ extern vsf_err_t vsf_wdt_get_configuration(vsf_wdt_t *wdt_ptr, vsf_wdt_cfg_t *cf
  */
 extern void vsf_wdt_feed(vsf_wdt_t *wdt_ptr);
 
+extern vsf_err_t vsf_wdt_ctrl(vsf_wdt_t *wdt_ptr, vsf_wdt_ctrl_t ctrl, void * param);
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /// @cond
@@ -484,6 +551,7 @@ extern void vsf_wdt_feed(vsf_wdt_t *wdt_ptr);
 #   define vsf_wdt_capability(__WDT)        VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_capability)               ((__vsf_wdt_t *)(__WDT))
 #   define vsf_wdt_get_configuration(__WDT, ...) VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_get_configuration)  ((__vsf_wdt_t *)(__WDT), ##__VA_ARGS__)
 #   define vsf_wdt_feed(__WDT, ...)         VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_feed)                     ((__vsf_wdt_t *)(__WDT))
+#   define vsf_wdt_ctrl(__WDT, ...)         VSF_MCONNECT(VSF_WDT_CFG_PREFIX, _wdt_ctrl)                     ((__vsf_wdt_t *)(__WDT), ##__VA_ARGS__)
 #endif
 /// @endcond
 
