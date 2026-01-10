@@ -64,6 +64,7 @@ extern "C" {
  *      To enable reimplementation, please enable macro below:
  *          VSF_RTC_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_rtc_irq_mask_t
  *          VSF_RTC_CFG_REIMPLEMENT_TYPE_CFG for vsf_rtc_cfg_t
+ *          VSF_RTC_CFG_REIMPLEMENT_TYPE_CTRL for vsf_rtc_ctrl_t
  *          VSF_RTC_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_rtc_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
@@ -71,6 +72,7 @@ extern "C" {
 
 #define VSF_RTC_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
 #define VSF_RTC_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_RTC_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
 #define VSF_RTC_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 
 /**
@@ -131,6 +133,12 @@ typedef struct vsf_rtc_capability_t {
 #endif
     vsf_rtc_irq_mask_t irq_mask;
 } vsf_rtc_capability_t;
+#endif
+
+#if VSF_RTC_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
+typedef enum vsf_rtc_ctrl_t {
+    __VSF_RTC_CTRL_DUMMY = 0,
+} vsf_rtc_ctrl_t;
 #endif
 
 // HW/IPCore end

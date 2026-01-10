@@ -149,6 +149,20 @@ extern "C" {
 #   define VSF_RTC_CFG_INHERIT_HAL_CAPABILITY        ENABLED
 #endif
 
+/**
+ * \~english
+ * @brief Enable macro VSF_RTC_CFG_REIMPLEMENT_TYPE_CTRL in specific hardware
+ * drivers to redefine enum @ref vsf_rtc_ctrl_t. This allows hardware-specific
+ * control commands to be added to the control enumeration.
+ * \~chinese
+ * @brief 在特定硬件驱动中启用宏 VSF_RTC_CFG_REIMPLEMENT_TYPE_CTRL
+ * 来重新定义枚举 @ref vsf_rtc_ctrl_t。这允许在控制枚举中添加特定
+ * 硬件的控制命令。
+ */
+#ifndef VSF_RTC_CFG_REIMPLEMENT_TYPE_CTRL
+#   define VSF_RTC_CFG_REIMPLEMENT_TYPE_CTRL        DISABLED
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /**
@@ -171,7 +185,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, get,        VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, vsf_rtc_tm_t *rtc_tm) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, set,        VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, const vsf_rtc_tm_t *rtc_tm) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, get_time,   VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, vsf_rtc_time_t *second_ptr, vsf_rtc_time_t *millisecond_ptr) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, set_time,   VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, vsf_rtc_time_t seconds, vsf_rtc_time_t milliseconds)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, set_time,   VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, vsf_rtc_time_t seconds, vsf_rtc_time_t milliseconds) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, ctrl,        VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, vsf_rtc_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
 
@@ -386,6 +401,37 @@ typedef struct vsf_rtc_capability_t {
 } vsf_rtc_capability_t;
 #endif  /* VSF_RTC_CFG_REIMPLEMENT_TYPE_CAPABILITY */
 
+#if VSF_RTC_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED
+/**
+ * \~english
+ * @brief RTC control commands for hardware-specific operations
+ * @note These commands provide additional control beyond basic RTC operations
+ * \~chinese
+ * @brief RTC 控制命令，用于硬件特定操作
+ * @note 这些命令提供了基本 RTC 操作之外的额外控制功能
+ */
+typedef enum vsf_rtc_ctrl_t {
+    //! \~english
+    //! @brief Dummy value for compilation, required when no actual control commands are defined.
+    //! @note This value is needed only when using the template default enum definition
+    //!       (VSF_RTC_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) and all optional control
+    //!       commands are commented out. It ensures the enum has at least one member
+    //!       to avoid compilation errors with some C compilers that don't allow empty enums.
+    //! @note If you enable any control commands below (uncomment them), or if you
+    //!       redefine the enum in a specific hardware driver (VSF_RTC_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED),
+    //!       you can remove this DUMMY value as long as at least one actual command is defined.
+    //! \~chinese
+    //! @brief 编译占位值，当没有定义实际控制命令时需要。
+    //! @note 此值仅在以下情况需要：使用模板默认枚举定义
+    //!       (VSF_RTC_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) 且所有可选控制命令都被注释掉时。
+    //!       它确保枚举至少有一个成员，以避免某些不允许空枚举的 C 编译器报错。
+    //! @note 如果启用了以下任何控制命令（取消注释），或者在特定硬件驱动中重新定义了枚举
+    //!       (VSF_RTC_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED)，只要定义了至少一个实际命令，
+    //!       就可以删除此 DUMMY 值。
+    __VSF_RTC_CTRL_DUMMY = 0,
+} vsf_rtc_ctrl_t;
+#endif
+
 /**
  * \~english @brief RTC operation function pointer type, used for RTC Multi Class support
  * \~chinese @brief RTC 操作函数指针类型，用于 RTC Multi Class 支持
@@ -571,6 +617,23 @@ extern vsf_err_t vsf_rtc_get_time(vsf_rtc_t *rtc_ptr, vsf_rtc_time_t *second_ptr
  */
 extern vsf_err_t vsf_rtc_set_time(vsf_rtc_t *rtc_ptr, vsf_rtc_time_t seconds, vsf_rtc_time_t milliseconds);
 
+/**
+ * \~english
+ * @brief Calls the specified RTC command
+ * @param[in] rtc_ptr: a pointer to structure @ref vsf_rtc_t
+ * @param[in] ctrl: RTC control command @ref vsf_rtc_ctrl_t
+ * @param[in,out] param: the parameter of the command, its use is determined by the command
+ * @return vsf_err_t: returns VSF_ERR_NONE if successful, or a negative error code
+ *
+ * \~chinese
+ * @brief 调用指定的 RTC 命令
+ * @param[in] rtc_ptr: 结构体 @ref vsf_rtc_t 的指针
+ * @param[in] ctrl: RTC 控制命令，参考 @ref vsf_rtc_ctrl_t
+ * @param[in,out] param: 命令的参数，其用途由命令决定
+ * @return vsf_err_t: 成功返回 VSF_ERR_NONE，否则返回负数
+ */
+extern vsf_err_t vsf_rtc_ctrl(vsf_rtc_t *rtc_ptr, vsf_rtc_ctrl_t ctrl, void * param);
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /// @cond
@@ -585,6 +648,7 @@ extern vsf_err_t vsf_rtc_set_time(vsf_rtc_t *rtc_ptr, vsf_rtc_time_t seconds, vs
 #   define vsf_rtc_set(__RTC, ...)          VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_set)              ((__vsf_rtc_t *)(__RTC), ##__VA_ARGS__)
 #   define vsf_rtc_get_time(__RTC, ...)     VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_get_time)         ((__vsf_rtc_t *)(__RTC), ##__VA_ARGS__)
 #   define vsf_rtc_set_time(__RTC, ...)     VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_set_time)         ((__vsf_rtc_t *)(__RTC), ##__VA_ARGS__)
+#   define vsf_rtc_ctrl(__RTC, ...)         VSF_MCONNECT(VSF_RTC_CFG_PREFIX, _rtc_ctrl)             ((__vsf_rtc_t *)(__RTC), ##__VA_ARGS__)
 #endif
 /// @endcond
 

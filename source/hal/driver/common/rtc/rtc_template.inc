@@ -36,11 +36,17 @@
 #   define  VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
 #endif
 
+#ifndef VSF_RTC_CFG_REIMPLEMENT_API_CTRL
+#   define  VSF_RTC_CFG_REIMPLEMENT_API_CTRL                    DISABLED
+#endif
+
 #ifdef VSF_RTC_CFG_IMP_REMAP_PREFIX
 #   undef VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY
 #   define VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY               ENABLED
 #   undef VSF_RTC_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #   define VSF_RTC_CFG_REIMPLEMENT_API_GET_CONFIGURATION        ENABLED
+#   undef VSF_RTC_CFG_REIMPLEMENT_API_CTRL
+#   define VSF_RTC_CFG_REIMPLEMENT_API_CTRL                     ENABLED
 #endif
 
 #if VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -49,13 +55,25 @@
 #   endif
 #endif
 
-#define vsf_real_rtc_t          VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t)
-#define vsf_real_rtc_capability VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_capability)
-#define vsf_real_rtc_get_configuration      VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_configuration)
-#define vsf_real_rtc_get        VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get)
-#define vsf_real_rtc_set        VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set)
-#define vsf_real_rtc_get_time   VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_time)
-#define vsf_real_rtc_set_time   VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set_time)
+#if defined(VSF_RTC_CFG_IMP_RENAME_DEVICE_PREFIX) && (VSF_RTC_CFG_IMP_RENAME_DEVICE_PREFIX == ENABLED)
+#   define vsf_real_rtc_t                       VSF_MCONNECT(VSF_RTC_CFG_IMP_DEVICE_PREFIX, _t)
+#   define vsf_real_rtc_capability              VSF_MCONNECT(VSF_RTC_CFG_IMP_DEVICE_PREFIX, _capability)
+#   define vsf_real_rtc_ctrl                    VSF_MCONNECT(VSF_RTC_CFG_IMP_DEVICE_PREFIX, _ctrl)
+#   define vsf_real_rtc_get_configuration       VSF_MCONNECT(VSF_RTC_CFG_IMP_DEVICE_PREFIX, _get_configuration)
+#   define vsf_real_rtc_get                     VSF_MCONNECT(VSF_RTC_CFG_IMP_DEVICE_PREFIX, _get)
+#   define vsf_real_rtc_set                     VSF_MCONNECT(VSF_RTC_CFG_IMP_DEVICE_PREFIX, _set)
+#   define vsf_real_rtc_get_time                VSF_MCONNECT(VSF_RTC_CFG_IMP_DEVICE_PREFIX, _get_time)
+#   define vsf_real_rtc_set_time                VSF_MCONNECT(VSF_RTC_CFG_IMP_DEVICE_PREFIX, _set_time)
+#else
+#   define vsf_real_rtc_t                       VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t)
+#   define vsf_real_rtc_capability              VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_capability)
+#   define vsf_real_rtc_ctrl                    VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_ctrl)
+#   define vsf_real_rtc_get_configuration       VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_configuration)
+#   define vsf_real_rtc_get                     VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get)
+#   define vsf_real_rtc_set                     VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set)
+#   define vsf_real_rtc_get_time                VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_time)
+#   define vsf_real_rtc_set_time                VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set_time)
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -111,6 +129,18 @@ vsf_err_t vsf_real_rtc_set(vsf_real_rtc_t *rtc_ptr, const vsf_rtc_tm_t *rtc_tm)
 
     time_t second = mktime(&t);
     return vsf_real_rtc_set_time(rtc_ptr, second,  rtc_tm->tm_ms);
+}
+#endif
+
+#if VSF_RTC_CFG_REIMPLEMENT_API_CTRL == DISABLED
+vsf_err_t vsf_real_rtc_ctrl(vsf_real_rtc_t *rtc_ptr, vsf_rtc_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(NULL != rtc_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return VSF_ERR_NOT_SUPPORT;
 }
 #endif
 
@@ -196,11 +226,14 @@ vsf_err_t vsf_real_rtc_get_configuration(vsf_real_rtc_t *rtc_ptr, vsf_rtc_cfg_t 
 #undef VSF_RTC_CFG_REIMPLEMENT_TYPE_CAPABILITY
 #undef VSF_RTC_CFG_REIMPLEMENT_TYPE_CFG
 #undef VSF_RTC_CFG_REIMPLEMENT_TYPE_IRQ_MASK
+#undef VSF_RTC_CFG_REIMPLEMENT_TYPE_CTRL
 #undef VSF_RTC_CFG_REIMPLEMENT_API_CAPABILITY
+#undef VSF_RTC_CFG_REIMPLEMENT_API_CTRL
 #undef VSF_RTC_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_RTC_CFG_CAPABILITY_T_IRQ_MASK
 #undef vsf_real_rtc_t
 #undef vsf_real_rtc_capability
+#undef vsf_real_rtc_ctrl
 #undef vsf_real_rtc_get_configuration
 #undef vsf_real_rtc_get
 #undef vsf_real_rtc_set
@@ -211,28 +244,30 @@ vsf_err_t vsf_real_rtc_get_configuration(vsf_real_rtc_t *rtc_ptr, vsf_rtc_cfg_t 
 
 #ifdef VSF_RTC_CFG_IMP_REMAP_PREFIX
 
-#   define vsf_imp_rtc_t            VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t)
-#   define vsf_imp_rtc_init         VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_init)
-#   define vsf_imp_rtc_enable       VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_enable)
-#   define vsf_imp_rtc_disable      VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_disable)
-#   define vsf_imp_rtc_capability   VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_capability)
-#   define vsf_imp_rtc_get          VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get)
-#   define vsf_imp_rtc_set          VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set)
-#   define vsf_imp_rtc_get_time     VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_time)
-#   define vsf_imp_rtc_set_time     VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set_time)
+#   define vsf_imp_rtc_t                    VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_t)
+#   define vsf_imp_rtc_init                 VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_init)
+#   define vsf_imp_rtc_enable               VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_enable)
+#   define vsf_imp_rtc_disable              VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_disable)
+#   define vsf_imp_rtc_capability           VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_capability)
+#   define vsf_imp_rtc_get                  VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get)
+#   define vsf_imp_rtc_set                  VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set)
+#   define vsf_imp_rtc_get_time             VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_time)
+#   define vsf_imp_rtc_set_time             VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_set_time)
 #   define vsf_imp_rtc_get_configuration    VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_get_configuration)
+#   define vsf_imp_rtc_ctrl                 VSF_MCONNECT(VSF_RTC_CFG_IMP_PREFIX, _rtc_ctrl)
 
-#   define vsf_remap_rtc_t          VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_t)
-#   define vsf_remap_rtc_init       VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_init)
-#   define vsf_remap_rtc_fini       VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_fini)
-#   define vsf_remap_rtc_enable     VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_enable)
-#   define vsf_remap_rtc_disable    VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_disable)
-#   define vsf_remap_rtc_capability VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_capability)
-#   define vsf_remap_rtc_get        VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_get)
-#   define vsf_remap_rtc_set        VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_set)
-#   define vsf_remap_rtc_get_time   VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_get_time)
-#   define vsf_remap_rtc_set_time   VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_set_time)
+#   define vsf_remap_rtc_t                  VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_t)
+#   define vsf_remap_rtc_init               VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_init)
+#   define vsf_remap_rtc_fini               VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_fini)
+#   define vsf_remap_rtc_enable             VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_enable)
+#   define vsf_remap_rtc_disable            VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_disable)
+#   define vsf_remap_rtc_capability         VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_capability)
+#   define vsf_remap_rtc_get                VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_get)
+#   define vsf_remap_rtc_set                VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_set)
+#   define vsf_remap_rtc_get_time           VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_get_time)
+#   define vsf_remap_rtc_set_time           VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_set_time)
 #   define vsf_remap_rtc_get_configuration  VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_get_configuration)
+#   define vsf_remap_rtc_ctrl               VSF_MCONNECT(VSF_RTC_CFG_IMP_REMAP_PREFIX, _rtc_ctrl)
 
 #   define VSF_RTC_CFG_IMP_REMAP_FUNCTIONS                                                                        \
         vsf_err_t vsf_imp_rtc_init(vsf_imp_rtc_t *rtc_ptr, vsf_rtc_cfg_t *cfg_ptr)            \
@@ -287,6 +322,11 @@ vsf_err_t vsf_real_rtc_get_configuration(vsf_real_rtc_t *rtc_ptr, vsf_rtc_cfg_t 
         {                                                                                     \
             VSF_HAL_ASSERT(rtc_ptr != NULL);                                                  \
             return vsf_remap_rtc_get_configuration(rtc_ptr, cfg_ptr);                         \
+        }                                                                                     \
+        vsf_err_t vsf_imp_rtc_ctrl(vsf_imp_rtc_t *rtc_ptr, vsf_rtc_ctrl_t ctrl, void *param)  \
+        {                                                                                     \
+            VSF_HAL_ASSERT(rtc_ptr != NULL);                                                  \
+            return vsf_remap_rtc_ctrl(rtc_ptr, ctrl, param);                                  \
         }
 #endif
 
@@ -333,6 +373,7 @@ vsf_err_t vsf_real_rtc_get_configuration(vsf_real_rtc_t *rtc_ptr, vsf_rtc_cfg_t 
 #undef vsf_imp_rtc_get_time
 #undef vsf_imp_rtc_set_time
 #undef vsf_imp_rtc_get_configuration
+#undef vsf_imp_rtc_ctrl
 
 #undef vsf_remap_rtc_t
 #undef vsf_remap_rtc_init
@@ -344,6 +385,7 @@ vsf_err_t vsf_real_rtc_get_configuration(vsf_real_rtc_t *rtc_ptr, vsf_rtc_cfg_t 
 #undef vsf_remap_rtc_get_time
 #undef vsf_remap_rtc_set_time
 #undef vsf_remap_rtc_get_configuration
+#undef vsf_remap_rtc_ctrl
 
 #undef VSF_HAL_TEMPLATE_IMP_NAME
 #undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME
