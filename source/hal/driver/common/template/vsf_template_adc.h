@@ -224,7 +224,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_request_once, VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_channel_cfg_t *channel_cfg, void *buffer_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_config,       VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_channel_cfg_t *channel_cfgs_ptr, uint32_t channel_cfgs_cnt) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, channel_request,      VSF_MCONNECT(__prefix_name, _t) *adc_ptr, void *buffer_ptr, uint_fast32_t count) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, ctrl,                  VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_ctrl_t ctrl, void* param)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            adc, ctrl,                 VSF_MCONNECT(__prefix_name, _t) *adc_ptr, vsf_adc_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
 

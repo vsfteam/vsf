@@ -186,7 +186,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, set,        VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, const vsf_rtc_tm_t *rtc_tm) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, get_time,   VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, vsf_rtc_time_t *second_ptr, vsf_rtc_time_t *millisecond_ptr) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, set_time,   VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, vsf_rtc_time_t seconds, vsf_rtc_time_t milliseconds) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, ctrl,        VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, vsf_rtc_ctrl_t ctrl, void* param)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            rtc, ctrl,       VSF_MCONNECT(__prefix_name, _t) *rtc_ptr, vsf_rtc_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
 

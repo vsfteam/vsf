@@ -191,7 +191,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                exti, config_channels,  VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_channel_mask_t channel_mask, vsf_exti_channel_cfg_t * cfg_ptr)\
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                exti, irq_enable,       VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_channel_mask_t channel_mask)                        \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                exti, irq_disable,      VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_channel_mask_t channel_mask)                        \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_exti_channel_mask_t, exti, irq_clear,        VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_channel_mask_t channel_mask) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_exti_channel_mask_t, exti, irq_clear,         VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_channel_mask_t channel_mask) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                exti, ctrl,             VSF_MCONNECT(__prefix_name, _t) *exti_ptr, vsf_exti_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
