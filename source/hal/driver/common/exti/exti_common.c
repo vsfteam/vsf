@@ -113,4 +113,13 @@ vsf_exti_channel_mask_t vsf_exti_irq_clear(vsf_exti_t *exti_ptr, vsf_exti_channe
     return exti_ptr->op->irq_clear(exti_ptr, channel_mask);
 }
 
+vsf_err_t vsf_exti_ctrl(vsf_exti_t *exti_ptr, vsf_exti_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(exti_ptr != NULL);
+    VSF_HAL_ASSERT(exti_ptr->op != NULL);
+    VSF_HAL_ASSERT(exti_ptr->op->ctrl != NULL);
+
+    return exti_ptr->op->ctrl(exti_ptr, ctrl, param);
+}
+
 #endif
