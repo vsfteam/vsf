@@ -323,7 +323,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_sg_start,                   VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,                 dma, channel_get_transferred_count,      VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_channel_status_t, dma, channel_status,                     VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, ctrl,                                VSF_MCONNECT(__prefix_name, _t) *dma_ptr, vsf_dma_ctrl_t ctrl, void* param)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, ctrl,                               VSF_MCONNECT(__prefix_name, _t) *dma_ptr, vsf_dma_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
 

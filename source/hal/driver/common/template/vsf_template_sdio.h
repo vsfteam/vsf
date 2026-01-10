@@ -505,7 +505,7 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, set_clock,            VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, uint32_t clock_hz, bool is_ddr)  \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, set_bus_width,        VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, uint8_t bus_width)               \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, host_request,         VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_req_t *req) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, ctrl,                  VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_ctrl_t ctrl, void* param)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,             sdio, ctrl,                 VSF_MCONNECT(__prefix_name, _t) *sdio_ptr, vsf_sdio_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
 
@@ -1180,7 +1180,7 @@ extern vsf_err_t vsf_sdio_ctrl(vsf_sdio_t *sdio_ptr, vsf_sdio_ctrl_t ctrl, void 
 #   define vsf_sdio_set_clock(__SDIO, ...)          VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_set_clock)          ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
 #   define vsf_sdio_set_bus_width(__SDIO, ...)      VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_set_bus_width)      ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
 #   define vsf_sdio_host_request(__SDIO, ...)       VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_host_request)       ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
-#   define vsf_sdio_ctrl(__SDIO, ...)                VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_ctrl)               ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
+#   define vsf_sdio_ctrl(__SDIO, ...)               VSF_MCONNECT(VSF_SDIO_CFG_PREFIX, _sdio_ctrl)               ((__vsf_sdio_t *)(__SDIO), ##__VA_ARGS__)
 #endif
 /// @endcond
 
