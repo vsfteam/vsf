@@ -73,6 +73,7 @@ extern "C" {
  *          VSF_I2S_CFG_REIMPLEMENT_TYPE_STATUS for vsf_i2s_status_t
  *          VSF_I2S_CFG_REIMPLEMENT_TYPE_IRQ_MASK for vsf_i2s_irq_mask_t
  *          VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG for vsf_i2s_cfg_t
+ *          VSF_I2S_CFG_REIMPLEMENT_TYPE_CTRL for vsf_i2s_ctrl_t
  *          VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_i2s_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
@@ -82,6 +83,7 @@ extern "C" {
 #define VSF_I2S_CFG_REIMPLEMENT_TYPE_STATUS       ENABLED
 #define VSF_I2S_CFG_REIMPLEMENT_TYPE_IRQ_MASK     ENABLED
 #define VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_I2S_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
 #define VSF_I2S_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end
 
@@ -198,6 +200,12 @@ typedef struct vsf_i2s_cfg_t {
     uint8_t channel_num;
     vsf_i2s_isr_t isr;
 } vsf_i2s_cfg_t;
+#endif
+
+#if VSF_I2S_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
+typedef enum vsf_i2s_ctrl_t {
+    __VSF_I2S_CTRL_DUMMY = 0,
+} vsf_i2s_ctrl_t;
 #endif
 // HW/IPCore end
 
