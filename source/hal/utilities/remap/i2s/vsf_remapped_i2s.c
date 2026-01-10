@@ -129,5 +129,11 @@ vsf_i2s_capability_t vsf_remapped_i2s_capability(vsf_remapped_i2s_t *i2s)
     return vsf_i2s_capability(i2s->target);
 }
 
+vsf_err_t vsf_remapped_i2s_ctrl(vsf_remapped_i2s_t *i2s, vsf_i2s_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT((i2s != NULL) && (i2s->target != NULL));
+    return vsf_i2s_ctrl(i2s->target, ctrl, param);
+}
+
 #endif
 #endif

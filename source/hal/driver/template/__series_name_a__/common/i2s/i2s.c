@@ -199,6 +199,16 @@ static void VSF_MCONNECT(__, VSF_I2S_CFG_IMP_PREFIX, _i2s_irqhandler)(
     }
 }
 
+vsf_err_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_ctrl)(
+    VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_t) *i2s_ptr,
+    vsf_i2s_ctrl_t ctrl,
+    void *param
+) {
+    VSF_HAL_ASSERT(i2s_ptr != NULL);
+
+    return VSF_ERR_NONE;
+}
+
 /*\note Implementation of APIs below is optional, because there is default implementation in i2s_template.inc.
  *      VSF_I2S_CFG_REIMPLEMENT_API_XXXX can be defined to ENABLED to re-write the default implementation for better performance.
  *
@@ -277,6 +287,7 @@ vsf_i2s_capability_t VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_capability)(
 #define VSF_I2S_CFG_MODE_CHECK_UNIQUE                       VSF_HAL_CHECK_MODE_LOOSE
 #define VSF_I2S_CFG_IRQ_MASK_CHECK_UNIQUE                   VSF_HAL_CHECK_MODE_STRICT
 #define VSF_I2S_CFG_REIMPLEMENT_API_CAPABILITY              ENABLED
+#define VSF_I2S_CFG_REIMPLEMENT_API_CTRL                    ENABLED
 #define VSF_I2S_CFG_REIMPLEMENT_API_GET_CONFIGURATION       ENABLED
 #define VSF_I2S_CFG_REIMPLEMENT_API_TX_GET_CONFIGURATION    ENABLED
 #define VSF_I2S_CFG_REIMPLEMENT_API_RX_GET_CONFIGURATION    ENABLED

@@ -212,7 +212,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2s, enable,        VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, fsm_rt_t,             i2s, disable,       VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2s_status_t,     i2s, status,        VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)                           \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2s_capability_t, i2s, capability,    VSF_MCONNECT(__prefix_name, _t) *i2s_ptr)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_i2s_capability_t, i2s, capability,    VSF_MCONNECT(__prefix_name, _t) *i2s_ptr) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,            i2s, ctrl,          VSF_MCONNECT(__prefix_name, _t) *i2s_ptr, vsf_i2s_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
 
@@ -301,6 +302,37 @@ typedef struct vsf_i2s_capability_t {
         bool is_dbuffer_supported;
     } i2s_capability;
 } vsf_i2s_capability_t;
+#endif
+
+#if VSF_I2S_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED
+/**
+ * \~english
+ * @brief I2S control commands for hardware-specific operations
+ * @note These commands provide additional control beyond basic I2S operations
+ * \~chinese
+ * @brief I2S 控制命令，用于硬件特定操作
+ * @note 这些命令提供了基本 I2S 操作之外的额外控制功能
+ */
+typedef enum vsf_i2s_ctrl_t {
+    //! \~english
+    //! @brief Dummy value for compilation, required when no actual control commands are defined.
+    //! @note This value is needed only when using the template default enum definition
+    //!       (VSF_I2S_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) and all optional control
+    //!       commands are commented out. It ensures the enum has at least one member
+    //!       to avoid compilation errors with some C compilers that don't allow empty enums.
+    //! @note If you enable any control commands below (uncomment them), or if you
+    //!       redefine the enum in a specific hardware driver (VSF_I2S_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED),
+    //!       you can remove this DUMMY value as long as at least one actual command is defined.
+    //! \~chinese
+    //! @brief 编译占位值，当没有定义实际控制命令时需要。
+    //! @note 此值仅在以下情况需要：使用模板默认枚举定义
+    //!       (VSF_I2S_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) 且所有可选控制命令都被注释掉时。
+    //!       它确保枚举至少有一个成员，以避免某些不允许空枚举的 C 编译器报错。
+    //! @note 如果启用了以下任何控制命令（取消注释），或者在特定硬件驱动中重新定义了枚举
+    //!       (VSF_I2S_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED)，只要定义了至少一个实际命令，
+    //!       就可以删除此 DUMMY 值。
+    __VSF_I2S_CTRL_DUMMY = 0,
+} vsf_i2s_ctrl_t;
 #endif
 
 #if VSF_I2S_CFG_REIMPLEMENT_TYPE_CFG == DISABLED
@@ -620,6 +652,30 @@ extern vsf_i2s_capability_t vsf_i2s_capability(vsf_i2s_t *i2s_ptr);
  */
 extern vsf_err_t vsf_i2s_get_configuration(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr);
 
+/**
+ * \~english
+ * @brief Execute a control command on an I2S instance
+ * @param[in,out] i2s_ptr: pointer to I2S instance structure @ref vsf_i2s_t
+ * @param[in] ctrl: Control command from @ref vsf_i2s_ctrl_t enumeration
+ * @param[in] param: Command-specific parameter (can be NULL depending on command)
+ * @return vsf_err_t: VSF_ERR_NONE if command executed successfully,
+ *                    VSF_ERR_NOT_SUPPORT if command is not supported,
+ *                    other error codes defined by vsf_err_t for specific failures
+ * @note Available commands and their parameters are hardware-dependent
+ * @note Some commands may not be supported on all hardware platforms
+ * \~chinese
+ * @brief 对 I2S 实例执行控制命令
+ * @param[in,out] i2s_ptr: 指向 I2S 实例结构体 @ref vsf_i2s_t 的指针
+ * @param[in] ctrl: 控制命令，取值来自 @ref vsf_i2s_ctrl_t 枚举
+ * @param[in] param: 命令专用参数（根据命令类型可为 NULL）
+ * @return vsf_err_t: 命令执行成功返回 VSF_ERR_NONE，
+ *                    命令不支持返回 VSF_ERR_NOT_SUPPORT，
+ *                    其他特定失败返回 vsf_err_t 定义的错误码
+ * @note 可用命令及其参数依赖于具体硬件
+ * @note 某些命令可能并非所有硬件平台都支持
+ */
+extern vsf_err_t vsf_i2s_ctrl(vsf_i2s_t *i2s_ptr, vsf_i2s_ctrl_t ctrl, void *param);
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /// @cond
@@ -641,6 +697,7 @@ extern vsf_err_t vsf_i2s_get_configuration(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cf
 #   define vsf_i2s_rx_fini(__i2s, ...)      VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_fini)          ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
 #   define vsf_i2s_rx_get_configuration(__i2s, ...) VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_get_configuration) ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
 #   define vsf_i2s_rx_start(__i2s)          VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_rx_start)         ((__vsf_i2s_t *)(__i2s))
+#   define vsf_i2s_ctrl(__i2s, ...)         VSF_MCONNECT(VSF_I2S_CFG_PREFIX, _i2s_ctrl)             ((__vsf_i2s_t *)(__i2s), ##__VA_ARGS__)
 #endif
 /// @endcond
 

@@ -163,5 +163,14 @@ vsf_err_t vsf_i2s_get_configuration(vsf_i2s_t *i2s_ptr, vsf_i2s_cfg_t *cfg_ptr)
     return i2s_ptr->op->get_configuration(i2s_ptr, cfg_ptr);
 }
 
+vsf_err_t vsf_i2s_ctrl(vsf_i2s_t *i2s_ptr, vsf_i2s_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT(i2s_ptr != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op != NULL);
+    VSF_HAL_ASSERT(i2s_ptr->op->ctrl != NULL);
+
+    return i2s_ptr->op->ctrl(i2s_ptr, ctrl, param);
+}
+
 #endif /* VSF_I2S_CFG_MULTI_CLASS == ENABLED */
 #endif /* VSF_HAL_USE_I2S == ENABLED */
