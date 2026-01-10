@@ -20,9 +20,15 @@
 /*============================ INCLUDES ======================================*/
 /*============================ ETHROS ========================================*/
 
-#define vsf_real_eth_t                      VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t)
-#define vsf_real_eth_capability             VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_capability)
-#define vsf_real_eth_get_configuration      VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_get_configuration)
+#if defined(VSF_ETH_CFG_IMP_RENAME_DEVICE_PREFIX) && (VSF_ETH_CFG_IMP_RENAME_DEVICE_PREFIX == ENABLED)
+#   define vsf_real_eth_t                      VSF_MCONNECT(VSF_ETH_CFG_IMP_DEVICE_PREFIX, _t)
+#   define vsf_real_eth_capability             VSF_MCONNECT(VSF_ETH_CFG_IMP_DEVICE_PREFIX, _capability)
+#   define vsf_real_eth_get_configuration      VSF_MCONNECT(VSF_ETH_CFG_IMP_DEVICE_PREFIX, _get_configuration)
+#else
+#   define vsf_real_eth_t                      VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_t)
+#   define vsf_real_eth_capability             VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_capability)
+#   define vsf_real_eth_get_configuration      VSF_MCONNECT(VSF_ETH_CFG_IMP_PREFIX, _eth_get_configuration)
+#endif
 
 #ifndef VSF_ETH_CFG_REIMPLEMENT_API_CAPABILITY
 #   define  VSF_ETH_CFG_REIMPLEMENT_API_CAPABILITY              DISABLED
