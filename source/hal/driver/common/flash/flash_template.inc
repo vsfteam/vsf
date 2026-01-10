@@ -21,17 +21,33 @@
 
 /*============================ MACROS ========================================*/
 
-#define vsf_real_flash_t                                            VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t)
-#define vsf_real_flash_capability                                   VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
-#define vsf_real_flash_get_configuration                            VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_get_configuration)
-#define vsf_real_flash_erase_all                                    VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_all)
-#define vsf_real_flash_erase_one_sector                             VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_one_sector)
-#define vsf_real_flash_erase_multi_sector                           VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_multi_sector)
-#define vsf_real_flash_write_one_sector                             VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_one_sector)
-#define vsf_real_flash_write_multi_sector                           VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)
-#define vsf_real_flash_read_one_sector                              VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_one_sector)
-#define vsf_real_flash_read_multi_sector                            VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)
-#define vsf_real_flash_ctrl                                         VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_ctrl)
+#if defined(VSF_FLASH_CFG_IMP_RENAME_DEVICE_PREFIX) && (VSF_FLASH_CFG_IMP_RENAME_DEVICE_PREFIX == ENABLED)
+#   define vsf_real_flash_t                      VSF_MCONNECT(VSF_FLASH_CFG_IMP_DEVICE_PREFIX, _t)
+#   define vsf_real_flash_capability             VSF_MCONNECT(VSF_FLASH_CFG_IMP_DEVICE_PREFIX, _capability)
+#   define vsf_real_flash_get_configuration      VSF_MCONNECT(VSF_FLASH_CFG_IMP_DEVICE_PREFIX, _get_configuration)
+#   define vsf_real_flash_erase_all              VSF_MCONNECT(VSF_FLASH_CFG_IMP_DEVICE_PREFIX, _erase_all)
+#   define vsf_real_flash_erase_one_sector       VSF_MCONNECT(VSF_FLASH_CFG_IMP_DEVICE_PREFIX, _erase_one_sector)
+#   define vsf_real_flash_erase_multi_sector     VSF_MCONNECT(VSF_FLASH_CFG_IMP_DEVICE_PREFIX, _erase_multi_sector)
+#   define vsf_real_flash_write_one_sector       VSF_MCONNECT(VSF_FLASH_CFG_IMP_DEVICE_PREFIX, _write_one_sector)
+#   define vsf_real_flash_write_multi_sector     VSF_MCONNECT(VSF_FLASH_CFG_IMP_DEVICE_PREFIX, _write_multi_sector)
+#   define vsf_real_flash_read_one_sector        VSF_MCONNECT(VSF_FLASH_CFG_IMP_DEVICE_PREFIX, _read_one_sector)
+#   define vsf_real_flash_read_multi_sector      VSF_MCONNECT(VSF_FLASH_CFG_IMP_DEVICE_PREFIX, _read_multi_sector)
+#   define vsf_real_flash_ctrl                   VSF_MCONNECT(VSF_FLASH_CFG_IMP_DEVICE_PREFIX, _ctrl)
+#   define vsf_real_flash_irq_clear              VSF_MCONNECT(VSF_FLASH_CFG_IMP_DEVICE_PREFIX, _irq_clear)
+#else
+#   define vsf_real_flash_t                      VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_t)
+#   define vsf_real_flash_capability             VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_capability)
+#   define vsf_real_flash_get_configuration      VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_get_configuration)
+#   define vsf_real_flash_erase_all              VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_all)
+#   define vsf_real_flash_erase_one_sector       VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_one_sector)
+#   define vsf_real_flash_erase_multi_sector     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_erase_multi_sector)
+#   define vsf_real_flash_write_one_sector       VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_one_sector)
+#   define vsf_real_flash_write_multi_sector     VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_write_multi_sector)
+#   define vsf_real_flash_read_one_sector        VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_one_sector)
+#   define vsf_real_flash_read_multi_sector      VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_read_multi_sector)
+#   define vsf_real_flash_ctrl                   VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_ctrl)
+#   define vsf_real_flash_irq_clear              VSF_MCONNECT(VSF_FLASH_CFG_IMP_PREFIX, _flash_irq_clear)
+#endif
 
 #ifndef VSF_FLASH_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #   define VSF_FLASH_CFG_REIMPLEMENT_API_GET_CONFIGURATION          DISABLED
@@ -45,6 +61,10 @@
 #   define VSF_FLASH_CFG_REIMPLEMENT_API_CTRL                       DISABLED
 #endif
 
+#ifndef VSF_FLASH_CFG_REIMPLEMENT_API_IRQ_CLEAR
+#   define VSF_FLASH_CFG_REIMPLEMENT_API_IRQ_CLEAR                  DISABLED
+#endif
+
 #ifdef VSF_FLASH_CFG_IMP_REMAP_PREFIX
 #   undef VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY
 #   define VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY                 ENABLED
@@ -52,6 +72,8 @@
 #   define VSF_FLASH_CFG_REIMPLEMENT_API_GET_CONFIGURATION          ENABLED
 #   undef VSF_FLASH_CFG_REIMPLEMENT_API_CTRL
 #   define VSF_FLASH_CFG_REIMPLEMENT_API_CTRL                       ENABLED
+#   undef VSF_FLASH_CFG_REIMPLEMENT_API_IRQ_CLEAR
+#   define VSF_FLASH_CFG_REIMPLEMENT_API_IRQ_CLEAR                  ENABLED
 #endif
 
 #if VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY == DISABLED
@@ -126,6 +148,18 @@ vsf_err_t vsf_real_flash_ctrl(vsf_real_flash_t *flash_ptr, vsf_flash_ctrl_t ctrl
     VSF_HAL_ASSERT(0);
 
     return VSF_ERR_NOT_SUPPORT;
+}
+#endif
+
+#if VSF_FLASH_CFG_REIMPLEMENT_API_IRQ_CLEAR == DISABLED
+vsf_flash_irq_mask_t vsf_real_flash_irq_clear(vsf_real_flash_t *flash_ptr, vsf_flash_irq_mask_t irq_mask)
+{
+    VSF_HAL_ASSERT(NULL != flash_ptr);
+
+    // Default implementation: not supported, trigger assertion
+    VSF_HAL_ASSERT(0);
+
+    return 0;
 }
 #endif
 
@@ -205,6 +239,7 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 #undef VSF_FLASH_CFG_REIMPLEMENT_API_CAPABILITY
 #undef VSF_FLASH_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #undef VSF_FLASH_CFG_REIMPLEMENT_API_CTRL
+#undef VSF_FLASH_CFG_REIMPLEMENT_API_IRQ_CLEAR
 #undef VSF_FLASH_CFG_CAPABILITY_IRQ_MASK
 #undef VSF_FLASH_CFG_CAPABILITY_BASE_ADDRESS
 #undef VSF_FLASH_CFG_CAPABILITY_MAX_SIZE
@@ -224,6 +259,7 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 #undef vsf_real_flash_capability
 #undef vsf_real_flash_get_configuration
 #undef vsf_real_flash_ctrl
+#undef vsf_real_flash_irq_clear
 
 /*============================ MACROS ========================================*/
 
