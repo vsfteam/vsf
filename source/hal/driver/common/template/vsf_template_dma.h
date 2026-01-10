@@ -195,6 +195,19 @@ extern "C" {
 
 /**
  * \~english
+ * @brief In specific hardware driver, enable macro
+ * VSF_DMA_CFG_REIMPLEMENT_TYPE_CTRL to redefine enum
+ * @ref vsf_dma_ctrl_t.
+ * \~chinese
+ * @brief 在特定硬件驱动中，启用宏 VSF_DMA_CFG_REIMPLEMENT_TYPE_CTRL
+ * 来重新定义枚举 @ref vsf_dma_ctrl_t。
+ */
+#ifndef VSF_DMA_CFG_REIMPLEMENT_TYPE_CTRL
+#   define VSF_DMA_CFG_REIMPLEMENT_TYPE_CTRL            DISABLED
+#endif
+
+/**
+ * \~english
  * @brief Enable the option to reimplement capability type.
  * For compatibility, do not delete members when redefining vsf_dma_capability_t
  *
@@ -309,7 +322,8 @@ extern "C" {
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_sg_config_desc,             VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel, vsf_dma_isr_t isr, vsf_dma_channel_sg_desc_t *scatter_gather_cfg, uint32_t sg_count) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, channel_sg_start,                   VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
     __VSF_HAL_TEMPLATE_API(__prefix_name, uint32_t,                 dma, channel_get_transferred_count,      VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
-    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_channel_status_t, dma, channel_status,                     VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel)
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_dma_channel_status_t, dma, channel_status,                     VSF_MCONNECT(__prefix_name, _t) *dma_ptr, uint8_t channel) \
+    __VSF_HAL_TEMPLATE_API(__prefix_name, vsf_err_t,                dma, ctrl,                                VSF_MCONNECT(__prefix_name, _t) *dma_ptr, vsf_dma_ctrl_t ctrl, void* param)
 
 /*============================ TYPES =========================================*/
 
@@ -770,6 +784,57 @@ typedef struct vsf_dma_channel_status_t {
         };
     };
 } vsf_dma_channel_status_t;
+#endif
+
+#if VSF_DMA_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED
+/**
+ * \~english
+ * @brief Predefined VSF DMA control commands that can be reimplemented in specific HAL drivers.
+ * @note Used as the 'ctrl' parameter (second parameter) in vsf_dma_ctrl(vsf_dma_t *dma_ptr, vsf_dma_ctrl_t ctrl, void *param) function
+ * @note The 'param' parameter (third parameter) type depends on the specific control command
+ * \~chinese
+ * @brief 预定义的 VSF DMA 控制命令，可以在特定的 HAL 驱动中重新实现。
+ * @note 作为 vsf_dma_ctrl(vsf_dma_t *dma_ptr, vsf_dma_ctrl_t ctrl, void *param) 函数中的 'ctrl' 参数（第二个参数）
+ * @note 'param' 参数（第三个参数）的类型取决于具体的控制命令
+ *
+ * \~english
+ * Optional control commands require one or more enumeration options and a macro with the same
+ * name to determine if they are supported at runtime. If the feature supports more than
+ * one option, it is recommended to provide the corresponding MASK option, so that the
+ * user can check for supported features at compile-time.
+ *
+ * Feature Classification:
+ * - Mandatory: None (only __VSF_DMA_CTRL_DUMMY is defined by default)
+ * - Standard Optional: None (no standard optional features defined)
+ *
+ * \~chinese
+ * 可选控制命令需要提供一个或多个枚举选项，还需要提供同名的宏，以便用户在运行时判断是否支持。
+ * 如果该功能支持多个选项，建议提供相应的 MASK 选项，以便用户在编译时检查支持的功能。
+ *
+ * 功能分类：
+ * - 必选：无（默认仅定义 __VSF_DMA_CTRL_DUMMY）
+ * - 标准可选：无（未定义标准可选功能）
+ */
+typedef enum vsf_dma_ctrl_t {
+    //! \~english
+    //! @brief Dummy value for compilation, required when no actual control commands are defined.
+    //! @note This value is needed only when using the template default enum definition
+    //!       (VSF_DMA_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) and all optional control
+    //!       commands are commented out. It ensures the enum has at least one member
+    //!       to avoid compilation errors with some C compilers that don't allow empty enums.
+    //! @note If you enable any control commands below (uncomment them), or if you
+    //!       redefine the enum in a specific hardware driver (VSF_DMA_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED),
+    //!       you can remove this DUMMY value as long as at least one actual command is defined.
+    //! \~chinese
+    //! @brief 编译占位值，当没有定义实际控制命令时需要。
+    //! @note 此值仅在以下情况需要：使用模板默认枚举定义
+    //!       (VSF_DMA_CFG_REIMPLEMENT_TYPE_CTRL == DISABLED) 且所有可选控制命令都被注释掉时。
+    //!       它确保枚举至少有一个成员，以避免某些不允许空枚举的 C 编译器报错。
+    //! @note 如果启用了以下任何控制命令（取消注释），或者在特定硬件驱动中重新定义了枚举
+    //!       (VSF_DMA_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED)，只要定义了至少一个实际命令，
+    //!       就可以删除此 DUMMY 值。
+    __VSF_DMA_CTRL_DUMMY = 0,
+} vsf_dma_ctrl_t;
 #endif
 
 #if VSF_DMA_CFG_REIMPLEMENT_TYPE_CAPABILITY == DISABLED
@@ -1234,6 +1299,30 @@ extern uint32_t vsf_dma_channel_get_transferred_count(vsf_dma_t *dma_ptr, uint8_
  */
 extern vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr, uint8_t channel);
 
+/**
+ * \~english
+ * @brief Execute a control command on a DMA instance
+ * @param[in,out] dma_ptr: pointer to DMA instance structure @ref vsf_dma_t
+ * @param[in] ctrl: Control command from @ref vsf_dma_ctrl_t enumeration
+ * @param[in] param: Command-specific parameter (can be NULL depending on command)
+ * @return vsf_err_t: VSF_ERR_NONE if command executed successfully,
+ *                    VSF_ERR_NOT_SUPPORT if command is not supported,
+ *                    other error codes defined by vsf_err_t for specific failures
+ * @note Available commands and their parameters are hardware-dependent
+ * @note Some commands may not be supported on all hardware platforms
+ * \~chinese
+ * @brief 对 DMA 实例执行控制命令
+ * @param[in,out] dma_ptr: 指向 DMA 实例结构体 @ref vsf_dma_t 的指针
+ * @param[in] ctrl: 控制命令，取值来自 @ref vsf_dma_ctrl_t 枚举
+ * @param[in] param: 命令专用参数（根据命令类型可为 NULL）
+ * @return vsf_err_t: 命令执行成功返回 VSF_ERR_NONE，
+ *                    命令不支持返回 VSF_ERR_NOT_SUPPORT，
+ *                    其他特定失败返回 vsf_err_t 定义的错误码
+ * @note 可用命令及其参数依赖于具体硬件
+ * @note 某些命令可能并非所有硬件平台都支持
+ */
+extern vsf_err_t vsf_dma_ctrl(vsf_dma_t *dma_ptr, vsf_dma_ctrl_t ctrl, void * param);
+
 ///**
 // \~english
 // @brief Acquire a DMA channel from all available DMA instances
@@ -1271,6 +1360,7 @@ extern vsf_dma_channel_status_t vsf_dma_channel_status(vsf_dma_t *dma_ptr, uint8
 #   define vsf_dma_channel_cancel(__DMA, ...)                       VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_cancel)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_get_transferred_count(__DMA, ...)        VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_get_transferred_count)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #   define vsf_dma_channel_status(__DMA, ...)                       VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_channel_status)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
+#   define vsf_dma_ctrl(__DMA, ...)                                 VSF_MCONNECT(VSF_DMA_CFG_PREFIX, _dma_ctrl)((__vsf_dma_t *)(__DMA), ##__VA_ARGS__)
 #endif
 /// @endcond
 

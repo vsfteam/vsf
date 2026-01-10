@@ -135,6 +135,11 @@ vsf_dma_channel_status_t vsf_remapped_dma_channel_status(vsf_remapped_dma_t *dma
     return vsf_dma_channel_status(dma->target, channel);
 }
 
+vsf_err_t vsf_remapped_dma_ctrl(vsf_remapped_dma_t *dma, vsf_dma_ctrl_t ctrl, void *param)
+{
+    VSF_HAL_ASSERT((dma != NULL) && (dma->target != NULL));
+    return vsf_dma_ctrl(dma->target, ctrl, param);
+}
 
 #endif
 #endif
