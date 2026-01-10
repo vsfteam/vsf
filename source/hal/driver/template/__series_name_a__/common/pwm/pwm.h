@@ -70,12 +70,14 @@ extern "C" {
 /*\note hw PWM driver can reimplement following types:
  *      To enable reimplementation, please enable macro below:
  *          VSF_PWM_CFG_REIMPLEMENT_TYPE_CFG for vsf_pwm_cfg_t
+ *          VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL for vsf_pwm_ctrl_t
  *          VSF_PWM_CFG_REIMPLEMENT_TYPE_CAPABILITY for vsf_pwm_capability_t
  *      Reimplementation is used for optimization hw/IPCore drivers, reimplement the bit mask according to hw registers.
  *      *** DO NOT reimplement these in emulated drivers. ***
  */
 
 #define VSF_PWM_CFG_REIMPLEMENT_TYPE_CFG          ENABLED
+#define VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL         ENABLED
 #define VSF_PWM_CFG_REIMPLEMENT_TYPE_CAPABILITY   ENABLED
 // HW end
 
@@ -120,6 +122,12 @@ typedef struct vsf_pwm_capability_t {
     uint32_t max_freq;
     uint32_t min_freq;
 } vsf_pwm_capability_t;
+#endif
+
+#if VSF_PWM_CFG_REIMPLEMENT_TYPE_CTRL == ENABLED
+typedef enum vsf_pwm_ctrl_t {
+    __VSF_PWM_CTRL_DUMMY = 0,
+} vsf_pwm_ctrl_t;
 #endif
 // HW/IPCore end
 
