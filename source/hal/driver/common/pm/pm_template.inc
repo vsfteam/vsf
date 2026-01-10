@@ -35,8 +35,13 @@
 #   define VSF_PM_CFG_REIMPLEMENT_API_CAPABILITY                ENABLED
 #endif
 
-#define vsf_real_pm_t          VSF_MCONNECT(VSF_PM_CFG_IMP_PREFIX, _pm_t)
-#define vsf_real_pm_capability VSF_MCONNECT(VSF_PM_CFG_IMP_PREFIX, _pm_capability)
+#if defined(VSF_PM_CFG_IMP_RENAME_DEVICE_PREFIX) && (VSF_PM_CFG_IMP_RENAME_DEVICE_PREFIX == ENABLED)
+#   define vsf_real_pm_t                      VSF_MCONNECT(VSF_PM_CFG_IMP_DEVICE_PREFIX, _t)
+#   define vsf_real_pm_capability             VSF_MCONNECT(VSF_PM_CFG_IMP_DEVICE_PREFIX, _capability)
+#else
+#   define vsf_real_pm_t                      VSF_MCONNECT(VSF_PM_CFG_IMP_PREFIX, _pm_t)
+#   define vsf_real_pm_capability             VSF_MCONNECT(VSF_PM_CFG_IMP_PREFIX, _pm_capability)
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ PROTOTYPES ====================================*/
