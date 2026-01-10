@@ -21,11 +21,11 @@
 /*============================ MACROS ========================================*/
 
 #ifndef VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY
+#   define  VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY                DISABLED
+#endif
 
 #ifndef VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION
 #   define VSF_TIMER_CFG_REIMPLEMENT_API_GET_CONFIGURATION        DISABLED
-#endif
-#   define  VSF_TIMER_CFG_REIMPLEMENT_API_CAPABILITY                DISABLED
 #endif
 
 #ifndef VSF_TIMER_CFG_REIMPLEMENT_API_IRQ_CLEAR
@@ -112,18 +112,33 @@
 /*============================ GLOBAL VARIABLES ==============================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
-#define vsf_real_timer_t                        VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t)
-#define vsf_real_timer_capability               VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_capability)
-#define vsf_real_timer_get_configuration      VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_get_configuration)
-#define vsf_real_timer_irq_clear                 VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_irq_clear)
-#define vsf_real_timer_ctrl                     VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_ctrl)
-#define vsf_real_timer_status                   VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_status)
-#define vsf_real_timer_channel_config           VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_config)
-#define vsf_real_timer_channel_start            VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_start)
-#define vsf_real_timer_channel_stop             VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_stop)
-#define vsf_real_timer_channel_request_start    VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_request_start)
-#define vsf_real_timer_channel_request_stop     VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_request_stop)
-#define vsf_real_timer_channel_ctrl             VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_ctrl)
+#if defined(VSF_TIMER_CFG_IMP_RENAME_DEVICE_PREFIX) && (VSF_TIMER_CFG_IMP_RENAME_DEVICE_PREFIX == ENABLED)
+#   define vsf_real_timer_t                      VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _t)
+#   define vsf_real_timer_capability             VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _capability)
+#   define vsf_real_timer_get_configuration      VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _get_configuration)
+#   define vsf_real_timer_irq_clear              VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _irq_clear)
+#   define vsf_real_timer_ctrl                   VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _ctrl)
+#   define vsf_real_timer_status                 VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _status)
+#   define vsf_real_timer_channel_config         VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _channel_config)
+#   define vsf_real_timer_channel_start          VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _channel_start)
+#   define vsf_real_timer_channel_stop           VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _channel_stop)
+#   define vsf_real_timer_channel_request_start  VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _channel_request_start)
+#   define vsf_real_timer_channel_request_stop   VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _channel_request_stop)
+#   define vsf_real_timer_channel_ctrl           VSF_MCONNECT(VSF_TIMER_CFG_IMP_DEVICE_PREFIX, _channel_ctrl)
+#else
+#   define vsf_real_timer_t                      VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_t)
+#   define vsf_real_timer_capability             VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_capability)
+#   define vsf_real_timer_get_configuration      VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_get_configuration)
+#   define vsf_real_timer_irq_clear              VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_irq_clear)
+#   define vsf_real_timer_ctrl                   VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_ctrl)
+#   define vsf_real_timer_status                 VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_status)
+#   define vsf_real_timer_channel_config         VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_config)
+#   define vsf_real_timer_channel_start          VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_start)
+#   define vsf_real_timer_channel_stop           VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_stop)
+#   define vsf_real_timer_channel_request_start  VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_request_start)
+#   define vsf_real_timer_channel_request_stop   VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_request_stop)
+#   define vsf_real_timer_channel_ctrl           VSF_MCONNECT(VSF_TIMER_CFG_IMP_PREFIX, _timer_channel_ctrl)
+#endif
 
 /*============================ PROTOTYPES ====================================*/
 /*============================ IMPLEMENTATION ================================*/
