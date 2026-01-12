@@ -185,16 +185,16 @@ typedef enum vsf_usart_mode_t {
     VSF_USART_9_BIT_LENGTH                      = (3 << 23),
     VSF_USART_10_BIT_LENGTH                     = (4 << 23),
     // 26..27
-    VSF_USART_TX_FIFO_THRESHOLD_EMPTY           = (0 << 26), //!< \~english TX FIFO empty \~chinese ·¢ËÍ FIFO ¿Õ
+    VSF_USART_TX_FIFO_THRESHOLD_EMPTY           = (0 << 26), //!< \~english TX FIFO empty \~chinese å‘é€ FIFO ç©º
 #define VSF_USART_TX_FIFO_THRESHOLD_EMPTY       VSF_USART_TX_FIFO_THRESHOLD_EMPTY
-    VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY      = (1 << 26), //!< \~english TX FIFO half empty \~chinese ·¢ËÍ FIFO °ë¿Õ
-    VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL        = (2 << 26), //!< \~english TX FIFO not full \~chinese ·¢ËÍ FIFO Î´Âú
+    VSF_USART_TX_FIFO_THRESHOLD_HALF_EMPTY      = (1 << 26), //!< \~english TX FIFO half empty \~chinese å‘é€ FIFO åŠç©º
+    VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL        = (2 << 26), //!< \~english TX FIFO not full \~chinese å‘é€ FIFO æœªæ»¡
 #define VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL    VSF_USART_TX_FIFO_THRESHOLD_NOT_FULL
     // 29..30
-    VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY       = (0 << 29), //!< \~english RX FIFO not empty \~chinese ½ÓÊÕ FIFO ·Ç¿Õ
+    VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY       = (0 << 29), //!< \~english RX FIFO not empty \~chinese æŽ¥æ”¶ FIFO éžç©º
 #define VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY   VSF_USART_RX_FIFO_THRESHOLD_NOT_EMPTY
-    VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL       = (1 << 29), //!< \~english RX FIFO half full \~chinese ½ÓÊÕ FIFO °ëÂú
-    VSF_USART_RX_FIFO_THRESHOLD_FULL            = (2 << 29), //!< \~english RX FIFO full \~chinese ½ÓÊÕ FIFO Âú
+    VSF_USART_RX_FIFO_THRESHOLD_HALF_FULL       = (1 << 29), //!< \~english RX FIFO half full \~chinese æŽ¥æ”¶ FIFO åŠæ»¡
+    VSF_USART_RX_FIFO_THRESHOLD_FULL            = (2 << 29), //!< \~english RX FIFO full \~chinese æŽ¥æ”¶ FIFO æ»¡
 #define VSF_USART_RX_FIFO_THRESHOLD_FULL        VSF_USART_RX_FIFO_THRESHOLD_FULL
     // 31
     VSF_USART_FORCE_0_PARITY                    = (0 << 31),
