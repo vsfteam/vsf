@@ -286,6 +286,7 @@ vsf_eth_irq_mask_t vsf_real_eth_irq_clear(vsf_real_eth_t *eth_ptr, vsf_eth_irq_m
 #undef VSF_ETH_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_ETH_CFG_IMP_LV0
 #undef VSF_ETH_CFG_IMP_REMAP_FUNCTIONS
+#undef VSF_ETH_CFG_IMP_RENAME_DEVICE_PREFIX
 #undef VSF_ETH_CFG_IMP_HAS_OP
 #undef VSF_ETH_CFG_IMP_EXTERN_OP
 

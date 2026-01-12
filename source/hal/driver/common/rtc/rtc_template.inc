@@ -362,6 +362,7 @@ vsf_err_t vsf_real_rtc_get_configuration(vsf_real_rtc_t *rtc_ptr, vsf_rtc_cfg_t 
 #undef VSF_RTC_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_RTC_CFG_IMP_HAS_OP
 #undef VSF_RTC_CFG_IMP_EXTERN_OP
+#undef VSF_RTC_CFG_IMP_RENAME_DEVICE_PREFIX
 
 #undef vsf_imp_rtc_t
 #undef vsf_imp_rtc_init

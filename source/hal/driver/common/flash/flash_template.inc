@@ -436,6 +436,7 @@ vsf_err_t vsf_real_flash_read_one_sector(vsf_real_flash_t *real_flash_ptr, vsf_f
 #undef VSF_FLASH_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_FLASH_CFG_IMP_HAS_OP
 #undef VSF_FLASH_CFG_IMP_EXTERN_OP
+#undef VSF_FLASH_CFG_IMP_RENAME_DEVICE_PREFIX
 
 #undef vsf_imp_flash_t
 #undef vsf_imp_flash_init

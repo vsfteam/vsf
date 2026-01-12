@@ -452,6 +452,7 @@ vsf_usart_irq_mask_t vsf_real_usart_irq_clear(vsf_real_usart_t *usart_ptr, vsf_u
 #undef VSF_USART_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_USART_CFG_IMP_HAS_OP
 #undef VSF_USART_CFG_IMP_EXTERN_OP
+#undef VSF_USART_CFG_IMP_RENAME_DEVICE_PREFIX
 
 #undef vsf_imp_usart_t
 #undef vsf_imp_usart_init

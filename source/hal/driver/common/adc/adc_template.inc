@@ -298,6 +298,7 @@ vsf_adc_irq_mask_t vsf_real_adc_irq_clear(vsf_real_adc_t *adc_ptr, vsf_adc_irq_m
 #undef VSF_ADC_CFG_IMP_DEVICE_PREFIX
 #undef VSF_ADC_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_ADC_CFG_IMP_REMAP_PREFIX
+#undef VSF_ADC_CFG_IMP_RENAME_DEVICE_PREFIX
 #undef VSF_ADC_CFG_IMP_LV0
 #undef VSF_ADC_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_ADC_CFG_IMP_HAS_OP

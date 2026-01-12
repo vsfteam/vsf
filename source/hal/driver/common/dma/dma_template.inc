@@ -397,6 +397,7 @@ vsf_dma_t * vsf_real_dma_channel_acquire_from_all(vsf_dma_channel_hint_t *channe
 #undef VSF_DMA_CFG_IMP_DEVICE_PREFIX
 #undef VSF_DMA_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_DMA_CFG_IMP_LV0
+#undef VSF_DMA_CFG_IMP_RENAME_DEVICE_PREFIX
 #undef VSF_DMA_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_DMA_CFG_IMP_HAS_OP
 #undef VSF_DMA_CFG_IMP_EXTERN_OP

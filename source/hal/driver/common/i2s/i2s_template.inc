@@ -32,8 +32,8 @@
 #   define vsf_real_i2s_capability              VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_capability)
 #   define vsf_real_i2s_ctrl                    VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_ctrl)
 #   define vsf_real_i2s_get_configuration       VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_get_configuration)
-#   define vsf_real_i2s_tx_get_configuration    VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _tx_get_configuration)
-#   define vsf_real_i2s_rx_get_configuration    VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _rx_get_configuration)
+#   define vsf_real_i2s_tx_get_configuration    VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_tx_get_configuration)
+#   define vsf_real_i2s_rx_get_configuration    VSF_MCONNECT(VSF_I2S_CFG_IMP_PREFIX, _i2s_rx_get_configuration)
 #endif
 
 #ifndef VSF_I2S_CFG_REIMPLEMENT_API_GET_CONFIGURATION
@@ -312,6 +312,8 @@ vsf_err_t vsf_real_i2s_ctrl(vsf_real_i2s_t *i2s_ptr, vsf_i2s_ctrl_t ctrl, void *
 #undef VSF_I2S_CFG_IMP_COUNT_MASK_PREFIX
 #undef VSF_I2S_CFG_IMP_LV0
 #undef VSF_I2S_CFG_IMP_REMAP_FUNCTIONS
+#undef VSF_I2S_CFG_IMP_REMAP_PREFIX
+#undef VSF_I2S_CFG_IMP_RENAME_DEVICE_PREFIX
 #undef VSF_I2S_CFG_IMP_HAS_OP
 #undef VSF_I2S_CFG_IMP_EXTERN_OP
 

@@ -287,6 +287,7 @@ vsf_err_t vsf_real_dac_get_configuration(vsf_real_dac_t *dac_ptr, vsf_dac_cfg_t 
 #undef VSF_DAC_CFG_IMP_DEVICE_PREFIX
 #undef VSF_DAC_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_DAC_CFG_IMP_LV0
+#undef VSF_DAC_CFG_IMP_RENAME_DEVICE_PREFIX
 #undef VSF_DAC_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_DAC_CFG_IMP_HAS_OP
 #undef VSF_DAC_CFG_IMP_EXTERN_OP

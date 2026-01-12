@@ -234,6 +234,7 @@ vsf_err_t vsf_real_pwm_get_configuration(vsf_real_pwm_t *pwm_ptr, vsf_pwm_cfg_t 
 #undef VSF_PWM_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_PWM_CFG_IMP_HAS_OP
 #undef VSF_PWM_CFG_IMP_EXTERN_OP
+#undef VSF_PWM_CFG_IMP_RENAME_DEVICE_PREFIX
 
 #undef vsf_imp_pwm_t
 #undef vsf_imp_pwm_init

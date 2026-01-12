@@ -274,6 +274,7 @@ vsf_sdio_irq_mask_t vsf_real_sdio_irq_clear(vsf_real_sdio_t *sdio_ptr, vsf_sdio_
 #undef VSF_SDIO_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_SDIO_CFG_IMP_HAS_OP
 #undef VSF_SDIO_CFG_IMP_EXTERN_OP
+#undef VSF_SDIO_CFG_IMP_RENAME_DEVICE_PREFIX
 
 #undef vsf_imp_sdio_t
 #undef vsf_imp_sdio_init
