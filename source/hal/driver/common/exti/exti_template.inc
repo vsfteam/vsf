@@ -162,5 +162,6 @@ vsf_err_t vsf_real_exti_ctrl(vsf_real_exti_t *exti_ptr, vsf_exti_ctrl_t ctrl, vo
 #undef VSF_EXTI_CFG_IRQ_MASK_CHECK_UNIQUE
 #undef VSF_EXTI_CUSTOM_MODE_VALUES
 #undef VSF_EXTI_CUSTOM_IRQ_MASK_VALUES
+#undef VSF_EXTI_CFG_IMP_RENAME_DEVICE_PREFIX
 
 #endif  /* VSF_HAL_USE_EXTI */

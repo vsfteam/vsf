@@ -326,6 +326,7 @@ vsf_i2c_irq_mask_t vsf_real_i2c_irq_clear(vsf_real_i2c_t *i2c_ptr, vsf_i2c_irq_m
 #undef VSF_I2C_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_I2C_CFG_IMP_HAS_OP
 #undef VSF_I2C_CFG_IMP_EXTERN_OP
+#undef VSF_I2C_CFG_IMP_RENAME_DEVICE_PREFIX
 
 #undef vsf_imp_i2c_t
 #undef vsf_imp_i2c_init

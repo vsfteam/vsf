@@ -718,6 +718,7 @@ vsf_err_t vsf_real_gpio_ports_config_pins(vsf_gpio_port_cfg_pins_t *cfg_ptr,
 #undef VSF_GPIO_CFG_IMP_HAS_OP
 #undef VSF_GPIO_CFG_IMP_EXTERN_OP
 #undef VSF_GPIO_CFG_IMP_REMAP_PREFIX
+#undef VSF_GPIO_CFG_IMP_RENAME_DEVICE_PREFIX
 
 #undef vsf_origin_gpio_t
 #undef vsf_origin_gpio_capability

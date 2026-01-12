@@ -78,6 +78,7 @@ vsf_pm_capability_t vsf_real_pm_capability(vsf_real_pm_t *pm_ptr)
 #undef VSF_PM_CFG_IMP_UPCASE_PREFIX
 #undef VSF_PM_CFG_IMP_DEVICE_PREFIX
 #undef VSF_PM_CFG_IMP_DEVICE_UPCASE_PREFIX
+#undef VSF_PM_CFG_IMP_RENAME_DEVICE_PREFIX
 
 #undef VSF_HAL_TEMPLATE_IMP_NAME
 #undef VSF_HAL_TEMPLATE_IMP_UPCASE_NAME

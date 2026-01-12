@@ -437,6 +437,7 @@ vsf_timer_irq_mask_t vsf_real_timer_irq_clear(vsf_real_timer_t *timer_ptr, vsf_t
 #undef VSF_TIMER_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_TIMER_CFG_IMP_HAS_OP
 #undef VSF_TIMER_CFG_IMP_EXTERN_OP
+#undef VSF_TIMER_CFG_IMP_RENAME_DEVICE_PREFIX
 
 #undef vsf_imp_timer_t
 #undef vsf_imp_timer_init

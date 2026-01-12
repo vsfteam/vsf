@@ -326,6 +326,7 @@ vsf_spi_irq_mask_t vsf_real_spi_irq_clear(vsf_real_spi_t *spi_ptr, vsf_spi_irq_m
 #undef VSF_SPI_CFG_IMP_REMAP_FUNCTIONS
 #undef VSF_SPI_CFG_IMP_HAS_OP
 #undef VSF_SPI_CFG_IMP_EXTERN_OP
+#undef VSF_SPI_CFG_IMP_RENAME_DEVICE_PREFIX
 
 #undef vsf_imp_spi_t
 #undef vsf_imp_spi_init

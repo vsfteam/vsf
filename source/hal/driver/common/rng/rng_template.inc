@@ -162,6 +162,7 @@ vsf_err_t vsf_real_rng_ctrl(vsf_real_rng_t *rng_ptr, vsf_rng_ctrl_t ctrl, void *
 #undef VSF_RNG_CFG_IMP_DEVICE_PREFIX
 #undef VSF_RNG_CFG_IMP_DEVICE_UPCASE_PREFIX
 #undef VSF_RNG_CFG_IMP_LV0
+#undef VSF_RNG_CFG_IMP_RENAME_DEVICE_PREFIX
 
 #undef vsf_imp_rng_t
 #undef vsf_imp_rng_init
