@@ -1985,7 +1985,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 0 0 270)
+			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "26c10011-5fb1-46bd-8d39-4fc1aa77890b")
@@ -1997,7 +1997,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 0 0 270)
+			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "0257e5ac-1bdc-4c7d-b9dc-e3219ef0e338")
@@ -2243,7 +2243,7 @@
 			(uuid "141f5f64-64f1-44d9-b11f-2d1198525aa8")
 		)
 		(embedded_fonts no)
-		(model "D:/vsf/hardware/share/kicad/3dmodels/C492941_SW-SMD_TS-1073A-A2B3-D4.step"
+		(model "${VSF_DIR}/3dmodels/C492941_SW-SMD_TS-1073A-A2B3-D4.step"
 			(offset
 				(xyz 0 0 1.905)
 			)
@@ -2464,15 +2464,15 @@
 			(uuid "ac84f074-1cec-46bc-abdc-dc48e871d7be")
 		)
 		(embedded_fonts no)
-		(model "D:/vsf/hardware/share/kicad/3dmodels/C530628_USB-A-SMD_U-A-24DS-W-1.step"
+		(model "${VSF_DIR}/3dmodels/C530628_USB-A-SMD_U-A-24DS-W-1.step"
 			(offset
-				(xyz 0 10.16 -0.762)
+				(xyz 0 11.2 -0.762)
 			)
 			(scale
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 180)
+				(xyz -0 -0 180)
 			)
 		)
 	)
@@ -4461,7 +4461,7 @@
 			(uuid "790bea34-1d10-49ae-b418-bd162f7a6056")
 		)
 		(embedded_fonts no)
-		(model "${KICAD6_3DMODEL_DIR}/Oscillator.3dshapes/Oscillator_SMD_Abracon_ASE-4Pin_3.2x2.5mm.wrl"
+		(model "${KICAD9_3DMODEL_DIR}/Oscillator.3dshapes/Oscillator_SMD_Abracon_ASE-4Pin_3.2x2.5mm.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -4472,7 +4472,7 @@
 				(xyz 0 0 0)
 			)
 		)
-		(model ":KICAD7_3DMODEL_DIR:Crystal.3dshapes/Crystal_SMD_3225-4Pin_3.2x2.5mm.wrl"
+		(model "${KICAD9_3DMODEL_DIR}/Crystal.3dshapes/Crystal_SMD_3225-4Pin_3.2x2.5mm.step"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -6353,15 +6353,15 @@
 			(uuid "c1e05c64-7220-43d8-a127-039023237ff8")
 		)
 		(embedded_fonts no)
-		(model "${KICAD6_3DMODEL_DIR}/Package_DFN_QFN.3dshapes/QFN-48-1EP_5x5mm_P0.35mm_EP3.7x3.7mm.wrl"
+		(model "${KICAD9_3DMODEL_DIR}/Package_DFN_QFN.3dshapes/QFN-64-1EP_8x8mm_P0.4mm_EP6.5x6.5mm.step"
 			(offset
 				(xyz 0 0 0)
 			)
 			(scale
-				(xyz 1 1 1)
+				(xyz 0.6 0.6 1)
 			)
 			(rotate
-				(xyz 0 0 0)
+				(xyz -0 -0 -0)
 			)
 		)
 	)
@@ -10719,7 +10719,7 @@
 			(uuid "4695131a-12ea-4aad-b878-afa1578f390f")
 		)
 		(embedded_fonts no)
-		(model "D:/vsf/hardware/share/kicad/3dmodels/C492941_SW-SMD_TS-1073A-A2B3-D4.step"
+		(model "${VSF_DIR}/3dmodels/C492941_SW-SMD_TS-1073A-A2B3-D4.step"
 			(offset
 				(xyz 0 0 1.905)
 			)
@@ -14786,7 +14786,7 @@
 			(uuid "58c0c429-827c-41c1-a7cd-7ad7488a3de2")
 		)
 		(embedded_fonts no)
-		(model ":KICAD7_3DMODEL_DIR:Connector_Coaxial.3dshapes/U.FL_Hirose_U.FL-R-SMT-1_Vertical.wrl"
+		(model ":KICAD9_3DMODEL_DIR:Connector_Coaxial.3dshapes/U.FL_Hirose_U.FL-R-SMT-1_Vertical.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -15432,7 +15432,7 @@
 			)
 		)
 		(property "Datasheet" " ~"
-			(at 0 0 270)
+			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "b0e2e27c-72f5-4a1c-88af-8d90b922bc30")
@@ -15444,7 +15444,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 0 0 270)
+			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "077a8679-01d3-4b83-89e6-64373bb80cb2")
@@ -15762,7 +15762,7 @@
 			(uuid "454facbe-157a-406d-a1a4-5bbdac4b478b")
 		)
 		(embedded_fonts no)
-		(model ":KICAD7_3DMODEL_DIR:Connector_Coaxial.3dshapes/U.FL_Hirose_U.FL-R-SMT-1_Vertical.wrl"
+		(model ":KICAD9_3DMODEL_DIR:Connector_Coaxial.3dshapes/U.FL_Hirose_U.FL-R-SMT-1_Vertical.wrl"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -16061,7 +16061,7 @@
 			(uuid "9ba2321c-1b75-4309-8a96-5237a4dd1045")
 		)
 		(embedded_fonts no)
-		(model "D:/vsf/hardware/share/kicad/3dmodels/C492941_SW-SMD_TS-1073A-A2B3-D4.step"
+		(model "${VSF_DIR}/3dmodels/C492941_SW-SMD_TS-1073A-A2B3-D4.step"
 			(offset
 				(xyz 0 0 1.905)
 			)
@@ -20318,7 +20318,7 @@
 			(uuid "0cde78c4-e66f-4ff3-818d-a8ca3c640c62")
 		)
 		(embedded_fonts no)
-		(model "D:/vsf/hardware/share/kicad/3dmodels/TF-SOCKET - short.stp"
+		(model "$(VSF_DIR)/3dmodels/TF-SOCKET - short.stp"
 			(offset
 				(xyz 0 3.81 0)
 			)
@@ -22265,7 +22265,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.usb.org/sites/default/files/documents/usb_type-c.zip"
-			(at 0 0 270)
+			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "60c5b856-07ed-4f73-9f09-f0283ba9f50a")
@@ -22277,7 +22277,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 0 0 270)
+			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "e5dfa7cd-d105-490f-88b4-9dd5183c17bd")
@@ -22522,7 +22522,7 @@
 			(uuid "8393f876-58ea-41dc-a964-99807f694257")
 		)
 		(embedded_fonts no)
-		(model "D:/vsf/hardware/share/kicad/3dmodels/C2906290_USB-C-SMD_SHOU_TYPE-C-16P-CB1.6.step"
+		(model "${VSF_DIR}/3dmodels/C2906290_USB-C-SMD_SHOU_TYPE-C-16P-CB1.6.step"
 			(offset
 				(xyz 0 -1.27 0)
 			)
@@ -24327,7 +24327,7 @@
 			(uuid "902b6cd6-86ff-47a3-84fa-171761413118")
 		)
 		(embedded_fonts no)
-		(model "D:/vsf/hardware/share/kicad/3dmodels/C492941_SW-SMD_TS-1073A-A2B3-D4.step"
+		(model "${VSF_DIR}/3dmodels/C492941_SW-SMD_TS-1073A-A2B3-D4.step"
 			(offset
 				(xyz 0 0 1.905)
 			)
@@ -24370,7 +24370,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.usb.org/sites/default/files/documents/usb_type-c.zip"
-			(at 0 0 270)
+			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "28969324-e134-428e-ac89-5c05aa66cea1")
@@ -24382,7 +24382,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 0 0 270)
+			(at 0 0 90)
 			(layer "F.Fab")
 			(hide yes)
 			(uuid "82d6e5dc-211e-41b2-8317-e60017b6b16e")
@@ -24627,7 +24627,7 @@
 			(uuid "a483fc63-a919-4b9a-b92b-182d7eff7a19")
 		)
 		(embedded_fonts no)
-		(model "D:/vsf/hardware/share/kicad/3dmodels/C2906290_USB-C-SMD_SHOU_TYPE-C-16P-CB1.6.step"
+		(model "${VSF_DIR}/3dmodels/C2906290_USB-C-SMD_SHOU_TYPE-C-16P-CB1.6.step"
 			(offset
 				(xyz 0 -1.27 0)
 			)
