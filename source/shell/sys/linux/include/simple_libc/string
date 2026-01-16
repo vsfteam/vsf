@@ -731,6 +731,26 @@ namespace std {
         {
             return (basic_string<T, Traits, Alloc> &)(array_base<T>::insert(length(), n, c));
         }
+        template<class Iter>
+        basic_string<T, Traits, Alloc> & append(Iter first, Iter last)
+        {
+            // determine distance
+            size_t n = 0;
+            for (Iter it = first; it != last; ++it) {
+                ++n;
+            }
+            if (n == 0) {
+                return *this;
+            }
+
+            resize(length() + n);
+            T *tmp = (T *)c_str() + length() - n;
+            size_t i = 0;
+            for (Iter it = first; it != last; ++it) {
+                tmp[i++] = *it;
+            }
+            return *this;
+        }
         int compare(const basic_string<T, Traits, Alloc> & right) const
         {
             size_t lsize = length(), rsize = right.length();
