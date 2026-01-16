@@ -509,6 +509,18 @@ int wctomb(char *str, wchar_t wchar);
 
 #ifdef __cplusplus
 }
+
+extern "C++" {
+    inline long abs(long const value) throw()
+    {
+        return labs(value);
+    }
+
+    inline long long abs(long long const value) throw()
+    {
+        return llabs(value);
+    }
+}
 #endif
 
 #endif
