@@ -416,4 +416,6 @@ namespace std {
 
     float hypot(float x, float y, float z);
     double hypot(double x, double y, double z);
+
+    using ::signbit;
 }
