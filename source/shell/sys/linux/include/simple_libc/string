@@ -563,6 +563,29 @@ namespace std {
                 str[array_base<T>::length() - 1] = T(0);
             }
         }
+        template <class Iter>
+        basic_string(Iter first, Iter last, const Alloc & alloc = Alloc())
+        {
+            VSF_UNUSED_PARAM(alloc);
+
+            // calculate number of elements in range [first, last)
+            size_t n = 0;
+            for (Iter it = first; it != last; ++it) {
+                ++n;
+            }
+
+            // allocate space for characters plus terminating null
+            array_base<T>::resize(n + 1);
+
+            // copy elements
+            T *dst = (T *)c_str();
+            size_t i = 0;
+            for (Iter it = first; it != last; ++it) {
+                dst[i++] = *it;
+            }
+            // terminating null
+            dst[n] = T(0);
+        }
         explicit basic_string(const Alloc &a)
             : array_base<T>(nullptr, 0) { }
 
@@ -622,6 +645,10 @@ namespace std {
         {
             size_t len = array_base<T>::length();
             return len > 0 ? len - 1 : 0;
+        }
+        size_t max_size() const
+        {
+            return static_cast<size_t>(-1) / sizeof(T);
         }
         bool empty() const
         {

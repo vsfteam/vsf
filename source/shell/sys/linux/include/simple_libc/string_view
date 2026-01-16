@@ -24,8 +24,8 @@ namespace std {
 
         typedef T * iterator;
         typedef const T * const_iterator;
-        typedef std::reverse_iterator<iterator> reverse_iterator;
-        typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+        typedef T * reverse_iterator;
+        typedef const T * const_reverse_iterator;
 
         static const size_t npos = -1;
 
@@ -285,6 +285,17 @@ namespace std {
         {
             const T str[2] = { c, T(0) };
             return find_last_not_of(str, pos);
+        }
+        constexpr void remove_prefix(size_t n)
+        {
+            VSF_ASSERT(__length >= n);
+            __str += n;
+            __length -= n;
+        }
+        constexpr void remove_suffix(size_t n)
+        {
+            VSF_ASSERT(__length >= n);
+            __length -= n;
         }
 
         constexpr basic_string_view<T, Traits> & operator =(const T *s)
