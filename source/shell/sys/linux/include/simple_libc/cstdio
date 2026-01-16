@@ -3,4 +3,5 @@
 namespace std {
     using ::fputs;
     using ::fprintf;
+    using ::FILE;
 }

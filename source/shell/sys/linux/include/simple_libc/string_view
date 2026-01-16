@@ -2,6 +2,7 @@
 #define __SIMPLE_LIBC_STRING_VIEW__
 
 //#include <compare>
+#include <type_traits>
 
 namespace std {
     template <class T, class Traits = char_traits<T>>
@@ -32,6 +33,14 @@ namespace std {
         constexpr basic_string_view(const basic_string_view<T, Traits> &s) : __str(s.cbegin()), __length(s.length()) { }
         constexpr basic_string_view() : __str(nullptr), __length(0) { }
         constexpr basic_string_view(const T *str, size_t num) : __str(str), __length(num) { }
+
+        // construct from any string-like type that provides data()/size()
+        template <typename S, typename = std::enable_if_t<
+            std::is_class<S>::value &&
+            std::is_convertible<decltype(std::declval<const S&>().data()), const T*>::value &&
+            std::is_convertible<decltype(std::declval<const S&>().size()), size_t>::value
+        >>
+        constexpr basic_string_view(const S &s) : __str(s.data()), __length(s.size()) {}
 
         constexpr iterator begin() const
         {
