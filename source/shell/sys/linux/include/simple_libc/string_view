@@ -305,14 +305,6 @@ namespace std {
         {
             return operator ==(str.cbegin());
         }
-        constexpr bool operator !=(const T *str) const
-        {
-            return !operator ==(str);
-        }
-        constexpr bool operator !=(const basic_string_view<T, Traits> &str) const
-        {
-            return !operator ==(str);
-        }
         constexpr bool operator >(const T *str) const
         {
             size_t slen = str != nullptr ? __strlen(str) : 0;

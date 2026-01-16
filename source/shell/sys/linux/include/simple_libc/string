@@ -566,6 +566,11 @@ namespace std {
         explicit basic_string(const Alloc &a)
             : array_base<T>(nullptr, 0) { }
 
+        allocator_type get_allocator() const
+        {
+            return allocator_type();
+        }
+
         const T & back() const
         {
             return array_base<T>::at(length() - 1);
@@ -1010,14 +1015,6 @@ namespace std {
         {
             return operator ==(str.c_str());
         }
-        bool operator !=(const T *str) const
-        {
-            return !operator ==(str);
-        }
-        bool operator !=(const basic_string<T, Traits, Alloc> &str) const
-        {
-            return !operator ==(str);
-        }
         bool operator >(const T *str) const
         {
             size_t slen = str != nullptr ? __strlen(str) : 0;
@@ -1107,6 +1104,31 @@ namespace std {
     typedef basic_string<wchar_t, char_traits<wchar_t>, allocator<wchar_t>> wstring;
     typedef basic_string<char16_t, char_traits<char16_t>, allocator<char16_t>> u16string;
     typedef basic_string<char32_t, char_traits<char32_t>, allocator<char32_t>> u32string;
+
+    // compare
+
+    // Symmetric overload: allow `const T* == basic_string`
+    template <class T, class Traits, class Alloc>
+    bool operator ==(const T* const left, const basic_string<T, Traits, Alloc>& right) noexcept {
+        return right == left;
+    }
+
+    // Provide != overloads so expressions like `string != const char*` and `const char* != string` work
+    template <class T, class Traits, class Alloc>
+    bool operator !=(const basic_string<T, Traits, Alloc>& left, const T* const right) noexcept {
+        return !(left == right);
+    }
+
+    template <class T, class Traits, class Alloc>
+    bool operator !=(const T* const left, const basic_string<T, Traits, Alloc>& right) noexcept {
+        return !(left == right);
+    }
+
+    // string != string
+    template <class T, class Traits, class Alloc>
+    bool operator !=(const basic_string<T, Traits, Alloc>& left, const basic_string<T, Traits, Alloc>& right) noexcept {
+        return !(left == right);
+    }
 
     // to_string
     string to_string(int value);
