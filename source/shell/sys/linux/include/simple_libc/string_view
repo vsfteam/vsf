@@ -49,21 +49,21 @@ namespace std {
         {
             return (const_iterator)end();
         }
-        constexpr iterator rbegin() const
+        constexpr reverse_iterator rbegin() const
         {
-            return __length > 0 ? &__str[__length - 1] : nullptr;
+            return (reverse_iterator)(__length > 0 ? &__str[__length - 1] : nullptr);
         }
-        constexpr iterator rend() const
+        constexpr reverse_iterator rend() const
         {
-            return __length > 0 ? &__str[-1] : nullptr;
+            return (reverse_iterator)(__length > 0 ? &__str[-1] : nullptr);
         }
-        constexpr const_iterator crbegin() const
+        constexpr const_reverse_iterator crbegin() const
         {
-            return (const_iterator)rbegin();
+            return (const_reverse_iterator)rbegin();
         }
-        constexpr const_iterator crend() const
+        constexpr const_reverse_iterator crend() const
         {
-            return (const_iterator)rend();
+            return (const_reverse_iterator)rend();
         }
 
         constexpr bool empty() const
@@ -95,6 +95,10 @@ namespace std {
         {
             return cbegin();
         }
+        // allow implicit conversion to C string pointer for compatibility
+        constexpr operator const T *() const noexcept {
+            return data();
+        }
         constexpr basic_string_view<T, Traits> & assign(const T *str, size_t num)
         {
             __str = str;
@@ -115,7 +119,22 @@ namespace std {
             size_t len = vsf_min(lsize, rsize) + 1;
             return Traits::compare(__str, right.c_str(), len);
         }
-        constexpr basic_string_view<T, Traits> & substr(size_t start = 0, size_t count = npos) const
+        constexpr int compare(size_t pos1, size_t count1, const basic_string_view<T, Traits> &right) const
+        {
+            size_t lsize = length();
+            if (pos1 > lsize) pos1 = lsize;
+            size_t len1 = (count1 == npos) ? (lsize - pos1) : vsf_min(count1, lsize - pos1);
+            size_t len2 = right.length();
+            size_t n = vsf_min(len1, len2);
+            if (n > 0) {
+                int c = Traits::compare(__str + pos1, right.c_str(), n);
+                if (c != 0) return c;
+            }
+            if (len1 < len2) return -1;
+            if (len1 > len2) return 1;
+            return 0;
+        }
+        constexpr basic_string_view<T, Traits> substr(size_t start = 0, size_t count = npos) const
         {
             size_t len = length();
             if (start >= len) {
@@ -126,8 +145,7 @@ namespace std {
             }
 
             const T *sub = cbegin();
-            basic_string_view<T, Traits> *newstr = new basic_string_view<T, Traits>(&sub[start], count + 1);
-            return (*newstr);
+            return basic_string_view<T, Traits>(&sub[start], count);
         }
         constexpr size_t find(const T *str, size_t pos = 0) const
         {
@@ -320,6 +338,31 @@ namespace std {
     typedef basic_string_view<wchar_t, char_traits<wchar_t>> wstring_view;
     typedef basic_string_view<char16_t, char_traits<char16_t>> u16string_view;
     typedef basic_string_view<char32_t, char_traits<char32_t>> u32string_view;
+
+    // hash<string_view>
+    template <class CharT, class Traits>
+    struct hash<basic_string_view<CharT, Traits>> {
+        using argument_type = basic_string_view<CharT, Traits>;
+        using result_type = size_t;
+        result_type operator()(const argument_type & key) const noexcept {
+            // FNV-1a hash over character values (narrowing for wider char types)
+            const CharT *data = key.data();
+            size_t len = key.size();
+            uint64_t hash = 1469598103934665603ULL;
+            for (size_t i = 0; i < len; ++i) {
+                uint64_t v = static_cast<uint64_t>(static_cast<unsigned long long>(data[i]));
+                hash ^= v & 0xffu;
+                hash *= 1099511628211ULL;
+                hash ^= (v >> 8) & 0xffu;
+                hash *= 1099511628211ULL;
+                hash ^= (v >> 16) & 0xffu;
+                hash *= 1099511628211ULL;
+                hash ^= (v >> 24) & 0xffu;
+                hash *= 1099511628211ULL;
+            }
+            return static_cast<result_type>(hash);
+        }
+    };
 }
 
 #endif      // __SIMPLE_LIBC_STRING_VIEW__

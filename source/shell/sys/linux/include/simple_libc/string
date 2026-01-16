@@ -494,6 +494,25 @@ namespace std {
 
         static const size_t npos = -1;
 
+        // generic constructor from string_view-like types (any type with data() and size())
+        template <typename SV,
+            typename = std::enable_if_t<
+                !std::is_convertible<SV, const T *>::value &&
+                std::is_convertible<decltype(std::declval<const SV&>().data()), const T*>::value &&
+                std::is_convertible<decltype(std::declval<const SV&>().size()), size_t>::value
+            >
+        >
+        basic_string(const SV &sv)
+            : array_base<T>(nullptr, sv.size() + 1)
+        {
+            T *dst = (T *)c_str();
+            size_t len = sv.size();
+            if (len > 0) {
+                __memcpy(dst, sv.data(), len);
+            }
+            dst[len] = T(0);
+        }
+
         basic_string(const T *str)
             : array_base<T>(str, nullptr == str ? 0 : __strlen(str) + 1) { }
         basic_string(const basic_string<T, Traits, Alloc> &s)
