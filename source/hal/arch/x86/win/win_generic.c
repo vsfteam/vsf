@@ -1431,11 +1431,22 @@ int _initterm_e(cpp_init_func_t * const first, cpp_init_func_t * const last)
 }
 #endif
 
+#if VSF_USE_LINUX == ENABLED
+#   include <stdio.h>
+#endif
+
 void vsf_arch_cpp_startup(void)
 {
 #if VSF_USE_LINUX == ENABLED
-    int result;
-    for (int i = 0; i < __vsf_cpp_init_cnt; i++) {
+    // fix _iob before call entries in __vsf_cpp_init
+    extern FILE* __acrt_iob_func(unsigned const id);
+    for (int i = 0; i < 3; i++) {
+        FILE *f = __acrt_iob_func(i);
+        VSF_HAL_ASSERT(f != NULL);
+        f->fd = i;
+    }
+
+    for (int i = 0, result = 0; i < __vsf_cpp_init_cnt; i++) {
         result = __vsf_cpp_init[i].func();
         if (__vsf_cpp_init[i].returns_int && (result != 0)) {
             VSF_ASSERT(false);

@@ -156,7 +156,9 @@ namespace std {
                 VSF_ASSERT(__array != nullptr);
             }
             __length = num;
-            __memcpy(__array, arr, __length);
+            if (arr != nullptr) {
+                __memcpy(__array, arr, __length);
+            }
             return (*this);
         }
         array_base<T> & assign(const array_base<T> &arr)
@@ -991,7 +993,12 @@ namespace std {
 
         basic_string<T, Traits, Alloc> & operator =(const T *s)
         {
-            size_t size = (nullptr == s) ? 1 : __strlen(s) + 1;
+            if (nullptr == s) {
+                array_base<T>::clear();
+                return (*this);
+            }
+
+            size_t size = __strlen(s) + 1;
             return (basic_string<T, Traits, Alloc> &)(array_base<T>::assign(s, size));
         }
         basic_string<T, Traits, Alloc> & operator =(const basic_string<T, Traits, Alloc> &s)
