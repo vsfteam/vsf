@@ -1021,29 +1021,17 @@ namespace std {
             size_t arrlen = str != nullptr ? __strlen(str) : 0;
             return (length() == arrlen) && !__memcmp(c_str(), str, arrlen);
         }
-        bool operator ==(const basic_string<T, Traits, Alloc> &str) const
-        {
-            return operator ==(str.c_str());
-        }
         bool operator >(const T *str) const
         {
             size_t slen = str != nullptr ? __strlen(str) : 0;
             size_t arrlen = vsf_min(slen, length());
             return __memcmp(c_str(), str, arrlen + 1) > 0;
         }
-        bool operator >(const basic_string<T, Traits, Alloc> &str) const
-        {
-            return operator >(str.c_str());
-        }
         bool operator <(const T *str) const
         {
             size_t slen = str != nullptr ? __strlen(str) : 0;
             size_t arrlen = vsf_min(slen, length());
             return __memcmp(c_str(), str, arrlen + 1) < 0;
-        }
-        bool operator <(const basic_string<T, Traits, Alloc> &str) const
-        {
-            return operator <(str.c_str());
         }
         T & operator [](size_t pos)
         {
@@ -1116,7 +1104,19 @@ namespace std {
     // compare
 
     template <class T, class Traits, class Alloc>
-    bool operator ==(const T* const left, const basic_string<T, Traits, Alloc>& right) noexcept {
+    bool operator ==(const T * const left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return right == left;
+    }
+    template <class T, class Traits, class Alloc>
+    bool operator ==(const basic_string<T, Traits, Alloc> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return left.operator==(right.c_str());
+    }
+    template <class T, class Traits, class Alloc>
+    bool operator ==(const basic_string<T, Traits, Alloc> &left, const basic_string_view<T, Traits> &right) noexcept {
+        return left.compare(right) == 0;
+    }
+    template <class T, class Traits, class Alloc>
+    bool operator ==(const basic_string_view<T, Traits> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
         return right == left;
     }
 
@@ -1151,76 +1151,6 @@ namespace std {
     bool operator !=(const basic_string<T, Traits, Alloc> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
         return !(left == right);
     }
-
-    template <class T, class Traits, class Alloc>
-    bool operator <(const T * const left, const basic_string<T, Traits, Alloc> &right) noexcept {
-        return right.compare(left) > 0;
-    }
-
-    template <class T, class Traits, class Alloc>
-    bool operator <(const basic_string<T, Traits, Alloc> &left, const T * const right) noexcept {
-        return left.compare(right) < 0;
-    }
-
-    template <class T, class Traits, class Alloc>
-    bool operator <(const basic_string<T, Traits, Alloc> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
-        return left.compare(right) < 0;
-    }
-
-    template <class T, class Traits, class Alloc>
-    bool operator >(const T * const left, const basic_string<T, Traits, Alloc> &right) noexcept {
-        return right.compare(left) < 0;
-    }
-
-    template <class T, class Traits, class Alloc>
-    bool operator >(const basic_string<T, Traits, Alloc> &left, const T * const right) noexcept {
-        return left.compare(right) > 0;
-    }
-
-    template <class T, class Traits, class Alloc>
-    bool operator >(const basic_string<T, Traits, Alloc> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
-        return left.compare(right) > 0;
-    }
-
-    template <class T, class Traits, class Alloc>
-    bool operator <=(const T * const left, const basic_string<T, Traits, Alloc> &right) noexcept {
-        return right.compare(left) >= 0;
-    }
-
-    template <class T, class Traits, class Alloc>
-    bool operator <=(const basic_string<T, Traits, Alloc> &left, const T * const right) noexcept {
-        return left.compare(right) <= 0;
-    }
-
-    template <class T, class Traits, class Alloc>
-    bool operator <=(const basic_string<T, Traits, Alloc> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
-        return left.compare(right) <= 0;
-    }
-
-    template <class T, class Traits, class Alloc>
-    bool operator >=(const T * const left, const basic_string<T, Traits, Alloc> &right) noexcept {
-        return right.compare(left) <= 0;
-    }
-
-    template <class T, class Traits, class Alloc>
-    bool operator >=(const basic_string<T, Traits, Alloc> &left, const T * const right) noexcept {
-        return left.compare(right) >= 0;
-    }
-
-    template <class T, class Traits, class Alloc>
-    bool operator >=(const basic_string<T, Traits, Alloc> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
-        return left.compare(right) >= 0;
-    }
-
-    template <class T, class Traits, class Alloc>
-    bool operator ==(const basic_string<T, Traits, Alloc> &left, const basic_string_view<T, Traits> &right) noexcept {
-        return left.compare(right) == 0;
-    }
-    template <class T, class Traits, class Alloc>
-    bool operator ==(const basic_string_view<T, Traits> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
-        return right == left;
-    }
-
     template <class T, class Traits, class Alloc>
     bool operator !=(const basic_string<T, Traits, Alloc> &left, const basic_string_view<T, Traits> &right) noexcept {
         return !(left == right);
@@ -1231,6 +1161,18 @@ namespace std {
     }
 
     template <class T, class Traits, class Alloc>
+    bool operator <(const T * const left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return right.compare(left) > 0;
+    }
+    template <class T, class Traits, class Alloc>
+    bool operator <(const basic_string<T, Traits, Alloc> &left, const T * const right) noexcept {
+        return left.compare(right) < 0;
+    }
+    template <class T, class Traits, class Alloc>
+    bool operator <(const basic_string<T, Traits, Alloc> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return left.compare(right) < 0;
+    }
+    template <class T, class Traits, class Alloc>
     bool operator <(const basic_string<T, Traits, Alloc> &left, const basic_string_view<T, Traits> &right) noexcept {
         return left.compare(right) < 0;
     }
@@ -1239,6 +1181,18 @@ namespace std {
         return right.compare(left) > 0;
     }
 
+    template <class T, class Traits, class Alloc>
+    bool operator >(const T * const left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return right.compare(left) < 0;
+    }
+    template <class T, class Traits, class Alloc>
+    bool operator >(const basic_string<T, Traits, Alloc> &left, const T * const right) noexcept {
+        return left.compare(right) > 0;
+    }
+    template <class T, class Traits, class Alloc>
+    bool operator >(const basic_string<T, Traits, Alloc> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return left.compare(right) > 0;
+    }
     template <class T, class Traits, class Alloc>
     bool operator >(const basic_string<T, Traits, Alloc> &left, const basic_string_view<T, Traits> &right) noexcept {
         return left.compare(right) > 0;
@@ -1249,6 +1203,18 @@ namespace std {
     }
 
     template <class T, class Traits, class Alloc>
+    bool operator <=(const T * const left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return right.compare(left) >= 0;
+    }
+    template <class T, class Traits, class Alloc>
+    bool operator <=(const basic_string<T, Traits, Alloc> &left, const T * const right) noexcept {
+        return left.compare(right) <= 0;
+    }
+    template <class T, class Traits, class Alloc>
+    bool operator <=(const basic_string<T, Traits, Alloc> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return left.compare(right) <= 0;
+    }
+    template <class T, class Traits, class Alloc>
     bool operator <=(const basic_string<T, Traits, Alloc> &left, const basic_string_view<T, Traits> &right) noexcept {
         return left.compare(right) <= 0;
     }
@@ -1257,6 +1223,18 @@ namespace std {
         return right.compare(left) >= 0;
     }
 
+    template <class T, class Traits, class Alloc>
+    bool operator >=(const T * const left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return right.compare(left) <= 0;
+    }
+    template <class T, class Traits, class Alloc>
+    bool operator >=(const basic_string<T, Traits, Alloc> &left, const T * const right) noexcept {
+        return left.compare(right) >= 0;
+    }
+    template <class T, class Traits, class Alloc>
+    bool operator >=(const basic_string<T, Traits, Alloc> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return left.compare(right) >= 0;
+    }
     template <class T, class Traits, class Alloc>
     bool operator >=(const basic_string<T, Traits, Alloc> &left, const basic_string_view<T, Traits> &right) noexcept {
         return left.compare(right) >= 0;
