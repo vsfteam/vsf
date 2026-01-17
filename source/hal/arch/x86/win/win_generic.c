@@ -1370,7 +1370,7 @@ typedef struct cpp_init_t {
     bool returns_int;
     cpp_init_func_t func;
 } cpp_init_t;
-static cpp_init_t __vsf_cpp_init[128];
+static cpp_init_t __vsf_cpp_init[1024];
 static int __vsf_cpp_init_cnt = 0;
 
 static int __vsf_arch_cpp_init_range(cpp_init_func_t * const start, cpp_init_func_t * const end, bool returns_int)

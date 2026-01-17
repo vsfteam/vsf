@@ -11,11 +11,12 @@ namespace std {
         thread::__impl_base * t = static_cast<thread::__impl_base *>(p);
         thread::__shared_base_type local;
         local.swap(t->__this_ptr);
-        try {
+        // TODO: how to detect if exception is enabled?
+//        try {
             t->__run();
-        } catch (...) {
+//        } catch (...) {
             std::terminate();
-        }
+//        }
         return (void *)0;
     }
 
@@ -40,11 +41,20 @@ namespace std {
     // Copyright (c) Microsoft Corporation.
     // SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 namespace std {
-    FILE* _Xfsopen(_In_z_ const char* filename, _In_ int mode, _In_ int prot) {
+    FILE* _Xfsopen(_In_z_ const char *filename, _In_ int mode, _In_ int prot) {
         static const char* const mods[] = {// fopen mode strings corresponding to valid[i]
             "r", "w", "w", "a", "rb", "wb", "wb", "ab", "r+", "w+", "a+", "r+b", "w+b", "a+b", nullptr};
 
         return fopen(filename, mods[mode]);
+    }
+    FILE* _Xfsopen(_In_z_ const wchar_t *filename, _In_ int mode, _In_ int prot) {
+        static const wchar_t* const mods[] = {// fopen mode strings corresponding to valid[i]
+            L"r", L"w", L"w", L"a", L"rb", L"wb", L"wb", L"ab", L"r+", L"w+", L"a+", L"r+b", L"w+b", L"a+b", nullptr};
+
+        VSF_ASSERT(false);
+        return NULL;
+        // TODO
+        //return _wfopen(filename, mods[mode]);
     }
 
     template <class CharT>
@@ -112,7 +122,11 @@ namespace std {
     }
 
     _CRTIMP2_PURE FILE* __CLRCALL_PURE_OR_CDECL _Fiopen(
-        const char* filename, ios_base::openmode mode, int prot) { // open wide-named file with byte name
+        const char *filename, ios_base::openmode mode, int prot) { // open wide-named file with byte name
+        return _Xfiopen(filename, mode, prot);
+    }
+    _CRTIMP2_PURE FILE* __CLRCALL_PURE_OR_CDECL _Fiopen(
+        const wchar_t *filename, ios_base::openmode mode, int prot) {
         return _Xfiopen(filename, mode, prot);
     }
 }
