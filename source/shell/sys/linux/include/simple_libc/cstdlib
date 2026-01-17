@@ -1,4 +1,31 @@
+#ifndef __SIMPLE_LIBC_CSTDLIB__
+#define __SIMPLE_LIBC_CSTDLIB__
+
+#include <math.h>
 #include <stdlib.h>
+
+inline double abs(double const value) noexcept
+{
+    return fabs(value);
+}
+inline float abs(float const value) noexcept
+{
+    return fabsf(value);
+}
+inline long double abs(long double const value) noexcept
+{
+    return fabsl(value);
+}
+
+inline long abs(long const value)
+{
+    return labs(value);
+}
+
+inline long long abs(long long const value)
+{
+    return llabs(value);
+}
 
 namespace std {
     using ::div_t;
@@ -44,3 +71,5 @@ namespace std {
 
     using ::abort;
 }
+
+#endif      // __SIMPLE_LIBC_CSTDLIB__
