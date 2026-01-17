@@ -21,109 +21,13 @@
 #endif
 
 #include <iosfwd>
+#if __cplusplus > 201703L
+#   include <compare>
+#endif
+
+#include <string_view>
 
 namespace std {
-    template <class T>
-    T * __memcpy(T *dst, const T *src, size_t count)
-    {
-        return (T *)memcpy((void *)dst, (void *)src, count * sizeof(T));
-    }
-
-    template <class T>
-    T * __memmove(T *dst, const T *src, size_t count)
-    {
-        return (T *)memmove((void *)dst, (void *)src, count * sizeof(T));
-    }
-
-    template <class T>
-    // avoid to use memcmp in constexpr function
-    constexpr int __memcmp(const T *str1, const T *str2, size_t count)
-    {
-        while (count-- > 0) {
-            if (*str1 != *str2) {
-                return *str1 > *str2 ? 1 : -1;
-            }
-            str1++;
-            str2++;
-        }
-        return 0;
-    }
-
-    template <class T>
-    T * __memset(T *dst, T t, size_t n)
-    {
-        T *tmp = dst;
-        while (n--) {
-            *tmp++ = t;
-        }
-        return dst;
-    }
-
-    template <class T>
-    constexpr size_t __strlen(const T *str)
-    {
-        size_t result = 0;
-        for (; str[result]; result++);
-        return result;
-    }
-
-    template <class T>
-    T * __strcpy(T *dst, const T *src)
-    {
-        T *result = dst;
-        while ((*dst++ = *src++) != 0);
-        return result;
-    }
-
-    template <class T>
-    constexpr T * __strchr(const T *str, T c)
-    {
-        T ch;
-        while ((ch = *str) != '\0') {
-            if (ch == c) {
-                return (T *)str;
-            }
-            str++;
-        }
-        return nullptr;
-    }
-
-    template <class T>
-    constexpr static T * __strstr(const T *s1, const T *s2)
-    {
-        size_t l1 = 0, l2 = 0;
-        l2 = __strlen(s2);
-        if (!l2) { return (T *)s1; }
-        l1 = __strlen(s1);
-        while (l1 >= l2) {
-            l1--;
-            if (!__memcmp(s1, s2, l2)) {
-                return (T *)s1;
-            }
-            s1++;
-        }
-        return nullptr;
-    }
-
-    template <class T>
-    constexpr static T * __strrstr(const T *start, const T *end, const T *sub)
-    {
-        T *r = nullptr, *p;
-
-        end -= __strlen(sub);
-        if (sub[0] == T(0)) {
-            return (T *)end;
-        }
-        while (1) {
-            p = __strstr(start, sub);
-            if (!p || (p > end)) {
-                return r;
-            }
-            r = p;
-            start = p + 1;
-        }
-    }
-
     template <class T>
     class array_base {
     public:
@@ -179,11 +83,23 @@ namespace std {
         {
             return __array[pos];
         }
+        T & at(size_t pos)
+        {
+            return __array[pos];
+        }
         const T & back() const
         {
             return at(__length);
         }
+        T & back()
+        {
+            return at(__length);
+        }
         const T & front() const
+        {
+            return at(0);
+        }
+        T & front()
         {
             return at(0);
         }
@@ -598,7 +514,15 @@ namespace std {
         {
             return array_base<T>::at(length() - 1);
         }
+        T & back()
+        {
+            return array_base<T>::at(length() - 1);
+        }
         const T & front() const
+        {
+            return array_base<T>::at(0);
+        }
+        T & front()
         {
             return array_base<T>::at(0);
         }
@@ -675,6 +599,10 @@ namespace std {
         const T * data() const
         {
             return array_base<T>::cbegin();
+        }
+        T * data() noexcept
+        {
+            return array_base<T>::begin();
         }
         basic_string<T, Traits, Alloc> & assign(const T *arr, size_t num)
         {
@@ -756,6 +684,27 @@ namespace std {
             size_t lsize = length(), rsize = right.length();
             size_t len = vsf_min(lsize, rsize) + 1;
             return Traits::compare(c_str(), right.c_str(), len);
+        }
+        int compare(const T *s) const
+        {
+            size_t lsize = length();
+            size_t rsize = s != nullptr ? __strlen(s) : 0;
+            size_t len = vsf_min(lsize, rsize) + 1;
+            return Traits::compare(c_str(), s, len);
+        }
+
+        template <typename SV,
+            typename = std::enable_if_t<
+                !std::is_convertible<SV, const T *>::value &&
+                std::is_convertible<decltype(std::declval<const SV&>().data()), const T*>::value &&
+                std::is_convertible<decltype(std::declval<const SV&>().size()), size_t>::value
+            >
+        >
+        int compare(const SV &sv) const
+        {
+            size_t lsize = length(), rsize = sv.size();
+            size_t len = vsf_min(lsize, rsize) + 1;
+            return Traits::compare(c_str(), sv.data(), len);
         }
         int compare(size_t pos1, size_t count1, const T *s) const
         {
@@ -894,6 +843,11 @@ namespace std {
             }
             replace(pos, pos_end - pos, nullptr, 0).begin();
             return c_str() + pos;
+        }
+        void shrink_to_fit()
+        {
+            size_t len = length();
+            array_base<T>::resize(len + 1);
         }
 
         size_t find_first_of(const T *str, size_t pos = 0) const
@@ -1135,17 +1089,15 @@ namespace std {
         return operator <<(ostream, str.c_str());
     }
 
-#ifdef __WIN__
     // hash<string>
     template <class T, class Traits, class Alloc>
     struct hash<basic_string<T, Traits, Alloc>> {
         typedef basic_string<T, Traits, Alloc> argument_type;
         typedef size_t result_type;
         size_t operator()(const basic_string<T, Traits, Alloc> &key) const noexcept {
-            return _Hash_array_representation(key.c_str(), key.size());
+            return static_cast<result_type>(__strhash(key.c_str(), key.size()));
         }
     };
-#endif
 
     typedef basic_string<char, char_traits<char>, allocator<char>> string;
     typedef basic_string<wchar_t, char_traits<wchar_t>, allocator<wchar_t>> wstring;
@@ -1154,28 +1106,101 @@ namespace std {
 
     // compare
 
-    // Symmetric overload: allow `const T* == basic_string`
     template <class T, class Traits, class Alloc>
     bool operator ==(const T* const left, const basic_string<T, Traits, Alloc>& right) noexcept {
         return right == left;
     }
 
-    // Provide != overloads so expressions like `string != const char*` and `const char* != string` work
+#if __cplusplus > 201703L
     template <class T, class Traits, class Alloc>
-    bool operator !=(const basic_string<T, Traits, Alloc>& left, const T* const right) noexcept {
-        return !(left == right);
+    std::strong_ordering operator <=>(const basic_string<T, Traits, Alloc> &left, const basic_string_view<T, Traits> &right) noexcept
+    {
+        return left.compare(right) <=> 0;
     }
 
     template <class T, class Traits, class Alloc>
-    bool operator !=(const T* const left, const basic_string<T, Traits, Alloc>& right) noexcept {
+    std::strong_ordering operator <=>(const basic_string<T, Traits, Alloc> &left, const T * const right) noexcept
+    {
+        return left.compare(right) <=> 0;
+    }
+#else
+    template <class T, class Traits, class Alloc>
+    bool operator !=(const T * const left, const basic_string<T, Traits, Alloc> &right) noexcept {
         return !(left == right);
+    }
+    template <class T, class Traits, class Alloc>
+    bool operator !=(const basic_string<T, Traits, Alloc> &left, const T * const right) noexcept {
+        return !(left == right);
+    }
+    template <class T, class Traits, class Alloc>
+    bool operator !=(const basic_string<T, Traits, Alloc> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return !(left == right);
+    }
+    template <class T, class Traits, class Alloc>
+    bool operator !=(const basic_string<T, Traits, Alloc> &left, const basic_string_view<T, Traits> &right) noexcept {
+        
     }
 
-    // string != string
     template <class T, class Traits, class Alloc>
-    bool operator !=(const basic_string<T, Traits, Alloc>& left, const basic_string<T, Traits, Alloc>& right) noexcept {
-        return !(left == right);
+    bool operator <(const T * const left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return right.compare(left) > 0;
     }
+
+    template <class T, class Traits, class Alloc>
+    bool operator <(const basic_string<T, Traits, Alloc> &left, const T * const right) noexcept {
+        return left.compare(right) < 0;
+    }
+
+    template <class T, class Traits, class Alloc>
+    bool operator <(const basic_string<T, Traits, Alloc> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return left.compare(right) < 0;
+    }
+
+    template <class T, class Traits, class Alloc>
+    bool operator >(const T * const left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return right.compare(left) < 0;
+    }
+
+    template <class T, class Traits, class Alloc>
+    bool operator >(const basic_string<T, Traits, Alloc> &left, const T * const right) noexcept {
+        return left.compare(right) > 0;
+    }
+
+    template <class T, class Traits, class Alloc>
+    bool operator >(const basic_string<T, Traits, Alloc> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return left.compare(right) > 0;
+    }
+
+    template <class T, class Traits, class Alloc>
+    bool operator <=(const T * const left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return right.compare(left) >= 0;
+    }
+
+    template <class T, class Traits, class Alloc>
+    bool operator <=(const basic_string<T, Traits, Alloc> &left, const T * const right) noexcept {
+        return left.compare(right) <= 0;
+    }
+
+    template <class T, class Traits, class Alloc>
+    bool operator <=(const basic_string<T, Traits, Alloc> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return left.compare(right) <= 0;
+    }
+
+    template <class T, class Traits, class Alloc>
+    bool operator >=(const T * const left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return right.compare(left) <= 0;
+    }
+
+    template <class T, class Traits, class Alloc>
+    bool operator >=(const basic_string<T, Traits, Alloc> &left, const T * const right) noexcept {
+        return left.compare(right) >= 0;
+    }
+
+    template <class T, class Traits, class Alloc>
+    bool operator >=(const basic_string<T, Traits, Alloc> &left, const basic_string<T, Traits, Alloc> &right) noexcept {
+        return left.compare(right) >= 0;
+    }
+#endif
 
     // to_string
     string to_string(int value);
@@ -1215,8 +1240,6 @@ namespace std {
     unsigned long long stoull(const string &str, size_t *idx = 0, int base = 10);
     unsigned long long stoull(const wstring &str, size_t *idx = 0, int base = 10);
 }
-
-#include <string_view>
 
 // do not include istream/ostream/ios until tested OK on Windows
 //#include <ios>

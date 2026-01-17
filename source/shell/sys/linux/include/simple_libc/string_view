@@ -1,10 +1,128 @@
 #ifndef __SIMPLE_LIBC_STRING_VIEW__
 #define __SIMPLE_LIBC_STRING_VIEW__
 
-//#include <compare>
+#if __cplusplus > 201703L
+#   include <compare>
+#endif
 #include <type_traits>
 
 namespace std {
+    template <class T>
+    T * __memcpy(T *dst, const T *src, size_t count)
+    {
+        return (T *)memcpy((void *)dst, (void *)src, count * sizeof(T));
+    }
+
+    template <class T>
+    T * __memmove(T *dst, const T *src, size_t count)
+    {
+        return (T *)memmove((void *)dst, (void *)src, count * sizeof(T));
+    }
+
+    template <class T>
+    // avoid to use memcmp in constexpr function
+    constexpr int __memcmp(const T *str1, const T *str2, size_t count)
+    {
+        while (count-- > 0) {
+            if (*str1 != *str2) {
+                return *str1 > *str2 ? 1 : -1;
+            }
+            str1++;
+            str2++;
+        }
+        return 0;
+    }
+
+    template <class T>
+    T * __memset(T *dst, T t, size_t n)
+    {
+        T *tmp = dst;
+        while (n--) {
+            *tmp++ = t;
+        }
+        return dst;
+    }
+
+    template <class T>
+    constexpr size_t __strlen(const T *str)
+    {
+        size_t result = 0;
+        for (; str[result]; result++);
+        return result;
+    }
+
+    template <class T>
+    T * __strcpy(T *dst, const T *src)
+    {
+        T *result = dst;
+        while ((*dst++ = *src++) != 0);
+        return result;
+    }
+
+    template <class T>
+    constexpr T * __strchr(const T *str, T c)
+    {
+        T ch;
+        while ((ch = *str) != '\0') {
+            if (ch == c) {
+                return (T *)str;
+            }
+            str++;
+        }
+        return nullptr;
+    }
+
+    template <class T>
+    constexpr static T * __strstr(const T *s1, const T *s2)
+    {
+        size_t l1 = 0, l2 = 0;
+        l2 = __strlen(s2);
+        if (!l2) { return (T *)s1; }
+        l1 = __strlen(s1);
+        while (l1 >= l2) {
+            l1--;
+            if (!__memcmp(s1, s2, l2)) {
+                return (T *)s1;
+            }
+            s1++;
+        }
+        return nullptr;
+    }
+
+    template <class T>
+    constexpr static T * __strrstr(const T *start, const T *end, const T *sub)
+    {
+        T *r = nullptr, *p;
+
+        end -= __strlen(sub);
+        if (sub[0] == T(0)) {
+            return (T *)end;
+        }
+        while (1) {
+            p = __strstr(start, sub);
+            if (!p || (p > end)) {
+                return r;
+            }
+            r = p;
+            start = p + 1;
+        }
+    }
+
+    template <class T>
+    constexpr uint64_t __strhash(const T *str, size_t len)
+    {
+        uint64_t hash = 14695981039346656037ULL;
+        size_t elem_size = sizeof(T), elem_size_remain = 0;
+        for (size_t i = 0; i < len; i++) {
+            elem_size_remain = elem_size;
+            while (elem_size_remain--) {
+                hash ^= (uint64_t)(uint8_t)(str[i] >> (elem_size_remain * 8));
+                hash *= 1099511628211ULL;
+            }
+        }
+        return hash;
+    }
+
     template <class T, class Traits = char_traits<T>>
     class basic_string_view {
     private:
@@ -357,22 +475,7 @@ namespace std {
         using argument_type = basic_string_view<CharT, Traits>;
         using result_type = size_t;
         result_type operator()(const argument_type & key) const noexcept {
-            // FNV-1a hash over character values (narrowing for wider char types)
-            const CharT *data = key.data();
-            size_t len = key.size();
-            uint64_t hash = 1469598103934665603ULL;
-            for (size_t i = 0; i < len; ++i) {
-                uint64_t v = static_cast<uint64_t>(static_cast<unsigned long long>(data[i]));
-                hash ^= v & 0xffu;
-                hash *= 1099511628211ULL;
-                hash ^= (v >> 8) & 0xffu;
-                hash *= 1099511628211ULL;
-                hash ^= (v >> 16) & 0xffu;
-                hash *= 1099511628211ULL;
-                hash ^= (v >> 24) & 0xffu;
-                hash *= 1099511628211ULL;
-            }
-            return static_cast<result_type>(hash);
+            return static_cast<result_type>(__strhash(key.data(), key.size()));
         }
     };
 }
