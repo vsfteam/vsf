@@ -26,6 +26,7 @@
 #endif
 
 #include <string_view>
+#include <type_traits>
 
 namespace std {
     template <class T>
@@ -410,14 +411,19 @@ namespace std {
 
         static const size_t npos = -1;
 
-        // generic constructor from string_view-like types (any type with data() and size())
-        template <typename SV,
-            typename = std::enable_if_t<
-                !std::is_convertible<SV, const T *>::value &&
-                std::is_convertible<decltype(std::declval<const SV&>().data()), const T*>::value &&
-                std::is_convertible<decltype(std::declval<const SV&>().size()), size_t>::value
-            >
-        >
+    private:
+        typedef basic_string_view<T, Traits> __sv_type;
+
+        template<typename SV, typename R>
+        using _If_sv = typename std::enable_if<
+            std::is_convertible<const SV&, basic_string_view<T, Traits> >::value &&
+            !std::is_convertible<const SV&, const T* >::value &&
+            !std::is_convertible<const SV&, const basic_string<T, Traits, Alloc>* >::value,
+            R>::type;
+
+    public:
+
+        template<typename SV, typename = _If_sv<SV, void>>
         basic_string(const SV &sv)
             : array_base<T>(nullptr, sv.size() + 1)
         {
@@ -660,6 +666,10 @@ namespace std {
             }
             return (*this);
         }
+        basic_string<T, Traits, Alloc> & append(const basic_string<T, Traits, Alloc> &str, size_t pos, size_t count)
+        {
+            return append(str.c_str() + pos, vsf_min(count, str.length() - pos));
+        }
         basic_string<T, Traits, Alloc> & append(const basic_string<T, Traits, Alloc> &str)
         {
             return append(str.c_str());
@@ -702,13 +712,7 @@ namespace std {
             return Traits::compare(c_str(), s, len);
         }
 
-        template <typename SV,
-            typename = std::enable_if_t<
-                !std::is_convertible<SV, const T *>::value &&
-                std::is_convertible<decltype(std::declval<const SV&>().data()), const T*>::value &&
-                std::is_convertible<decltype(std::declval<const SV&>().size()), size_t>::value
-            >
-        >
+        template<typename SV, typename = _If_sv<SV, void>>
         int compare(const SV &sv) const
         {
             size_t lsize = length(), rsize = sv.size();
