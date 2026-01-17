@@ -4,6 +4,7 @@
 #if __cplusplus > 201703L
 #   include <compare>
 #endif
+#include <iosfwd>
 #include <type_traits>
 
 namespace std {
@@ -222,10 +223,10 @@ namespace std {
         {
             return cbegin();
         }
-        // allow implicit conversion to C string pointer for compatibility
-        constexpr operator const T *() const noexcept {
-            return data();
-        }
+        // disallow implicit conversion to C string pointer to avoid overload ambiguity
+//        constexpr explicit operator const T *() const noexcept {
+//            return data();
+//        }
         constexpr basic_string_view<T, Traits> & assign(const T *str, size_t num)
         {
             __str = str;
@@ -478,6 +479,90 @@ namespace std {
             return static_cast<result_type>(__strhash(key.data(), key.size()));
         }
     };
+
+    template <class T, class Traits>
+    bool operator ==(const basic_string_view<T, Traits> &left, const basic_string_view<T, Traits> &right) noexcept {
+        return left.operator==(right);
+    }
+    template <class T, class Traits>
+    bool operator ==(const basic_string_view<T, Traits> &left, const T * const right) noexcept {
+        return left.operator==(right);
+    }
+
+#if __cplusplus > 201703L
+    template <class T, class Traits>
+    std::strong_ordering operator <=>(const basic_string_view<T, Traits> &left, const basic_string_view<T, Traits> &right) noexcept
+    {
+        return left.compare(right) <=> 0;
+    }
+
+    template <class T, class Traits>
+    std::strong_ordering operator <=>(const basic_string_view<T, Traits> &left, const T * const right) noexcept
+    {
+        return left.compare(right) <=> 0;
+    }
+#else
+    template <class T, class Traits>
+    bool operator !=(const basic_string_view<T, Traits> &left, const basic_string_view<T, Traits> &right) noexcept {
+        return !left.operator==(right);
+    }
+    template <class T, class Traits>
+    bool operator !=(const basic_string_view<T, Traits> &left, const T * const right) noexcept {
+        return !left.operator==(right);
+    }
+
+    template <class T, class Traits>
+    bool operator <(const basic_string_view<T, Traits> &left, const basic_string_view<T, Traits> &right) noexcept {
+        return left.compare(right) < 0;
+    }
+    template <class T, class Traits>
+    bool operator <(const basic_string_view<T, Traits> &left, const T * const right) noexcept {
+        return left.compare(right) < 0;
+    }
+
+    template <class T, class Traits>
+    bool operator <=(const basic_string_view<T, Traits> &left, const basic_string_view<T, Traits> &right) noexcept {
+        return left.compare(right) <= 0;
+    }
+    template <class T, class Traits>
+    bool operator <=(const basic_string_view<T, Traits> &left, const T * const right) noexcept {
+        return left.compare(right) <= 0;
+    }
+
+    template <class T, class Traits>
+    bool operator >(const basic_string_view<T, Traits> &left, const basic_string_view<T, Traits> &right) noexcept {
+        return left.compare(right) > 0;
+    }
+    template <class T, class Traits>
+    bool operator >(const basic_string_view<T, Traits> &left, const T * const right) noexcept {
+        return left.compare(right) > 0;
+    }
+
+    template <class T, class Traits>
+    bool operator >=(const basic_string_view<T, Traits> &left, const basic_string_view<T, Traits> &right) noexcept {
+        return left.compare(right) >= 0;
+    }
+    template <class T, class Traits>
+    bool operator >=(const basic_string_view<T, Traits> &left, const T * const right) noexcept {
+        return left.compare(right) >= 0;
+    }
+#endif
+
+    template <class T, class Traits>
+    basic_ostream<T, Traits>& operator<<(basic_ostream<T, Traits> &ostr, const basic_string_view<T, Traits> str) {
+        return ostr.write(str.data(), str.size());
+    }
+
+#ifdef __WIN__
+    // used in microsoft <bitset>
+    template <class T>
+    constexpr bool _Is_implementation_handled_char_like_type = is_arithmetic_v<T> || is_null_pointer_v<T>;
+
+    template <class>
+    constexpr bool _Is_implementation_handled_char_traits = false;
+    template <class T>
+    constexpr bool _Is_implementation_handled_char_traits<char_traits<T>> = _Is_implementation_handled_char_like_type<T>;
+#endif
 }
 
 #endif      // __SIMPLE_LIBC_STRING_VIEW__

@@ -1,6 +1,9 @@
 #include <stdio.h>
 
 namespace std {
+    using ::fwrite;
+    using ::fread;
+    using ::fputc;
     using ::fputs;
     using ::fprintf;
     using ::FILE;

@@ -27,6 +27,7 @@
 
 #include <string_view>
 #include <type_traits>
+#include <iterator>
 
 namespace std {
     template <class T>
@@ -406,13 +407,20 @@ namespace std {
 
         typedef T * iterator;
         typedef const T * const_iterator;
-        typedef std::reverse_iterator<iterator> reverse_iterator;
-        typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+        typedef T * reverse_iterator;
+        typedef const T * const_reverse_iterator;
 
         static const size_t npos = -1;
 
     private:
         typedef basic_string_view<T, Traits> __sv_type;
+
+        // detect whether a type is an iterator (has iterator_category in iterator_traits)
+        template <typename Iter, typename = void>
+        struct __is_iterator : std::false_type {};
+
+        template <typename Iter>
+        struct __is_iterator<Iter, std::void_t<typename std::iterator_traits<Iter>::iterator_category>> : std::true_type {};
 
         template<typename SV, typename R>
         using _If_sv = typename std::enable_if<
@@ -485,7 +493,7 @@ namespace std {
                 str[array_base<T>::length() - 1] = T(0);
             }
         }
-        template <class Iter>
+        template <class Iter, typename = typename std::enable_if<__is_iterator<Iter>::value>::type>
         basic_string(Iter first, Iter last, const Alloc & alloc = Alloc())
         {
             VSF_UNUSED_PARAM(alloc);
@@ -641,6 +649,14 @@ namespace std {
         {
             return assign(str_begin, str_end - str_begin + ((*str_end == T(0)) ? 0 : 1));
         }
+        basic_string<T, Traits, Alloc> & assign(size_t n, T c)
+        {
+            array_base<T>::resize(n + 1);
+            T *str = (T *)c_str();
+            __memset(str, c, n);
+            str[n] = T(0);
+            return (*this);
+        }
         basic_string<T, Traits, Alloc> & append(const T *arr, size_t num)
         {
             if (num > 0) {
@@ -678,7 +694,7 @@ namespace std {
         {
             return (basic_string<T, Traits, Alloc> &)(array_base<T>::insert(length(), n, c));
         }
-        template<class Iter>
+        template<class Iter, typename = typename std::enable_if<__is_iterator<Iter>::value>::type>
         basic_string<T, Traits, Alloc> & append(Iter first, Iter last)
         {
             // determine distance
@@ -1248,6 +1264,29 @@ namespace std {
         return right.compare(left) <= 0;
     }
 #endif
+
+    template <class T, class Traits, class Alloc>
+    basic_istream<T, Traits>& operator>>(basic_istream<T, Traits> &istream, basic_string<T, Traits, Alloc> &str)
+    {
+        str.clear();
+        T c;
+        // skip leading whitespace
+        while (istream.get(c)) {
+            if (!std::isspace(c)) {
+                str.push_back(c);
+                break;
+            }
+        }
+        // read until next whitespace
+        while (istream.get(c)) {
+            if (std::isspace(c)) {
+                istream.unget();
+                break;
+            }
+            str.push_back(c);
+        }
+        return istream;
+    }
 
     // to_string
     string to_string(int value);
