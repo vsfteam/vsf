@@ -526,14 +526,23 @@ namespace std {
         {
             return array_base<T>::at(0);
         }
-        iterator begin() const
+        iterator begin()
         {
             return array_base<T>::begin();
         }
-        iterator end() const
+        const_iterator begin() const
+        {
+            return (const_iterator)array_base<T>::begin();
+        }
+        iterator end()
         {
             iterator it = array_base<T>::end();
             return it != nullptr ? it - 1 : nullptr;
+        }
+        const_iterator end() const
+        {
+            iterator it = array_base<T>::end();
+            return (const_iterator)(it != nullptr ? it - 1 : nullptr);
         }
         const_iterator cbegin() const
         {
