@@ -216,7 +216,7 @@ namespace std {
                 __array = (T *)realloc(__array, newlen * sizeof(T));
                 VSF_ASSERT(__array != nullptr);
             }
-            __memmove(&__array[pos + len], &__array[pos + n], __length - pos - len);
+            __memmove(&__array[pos + n], &__array[pos + len], __length - pos - len);
             __memset(&__array[pos], t, n);
             if (n < len) {
                 __array = (T *)realloc(__array, newlen * sizeof(T));
@@ -1069,6 +1069,10 @@ namespace std {
             return array_base<T>::operator [](pos);
         }
 
+        void clear()
+        {
+            resize(0);
+        }
         void push_back(T c)
         {
             append(1, c);
