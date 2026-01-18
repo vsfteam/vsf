@@ -165,7 +165,7 @@ typedef struct vsf_tgui_list_scrollbar_region_t {
 declare_class(vsf_tgui_list_t)
 
 def_class(vsf_tgui_list_t,
-    which(
+    public_member(
         implement(vsf_tgui_container_t)
         implement(vsf_tgui_v_list_t)
     )

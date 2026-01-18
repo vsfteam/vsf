@@ -184,13 +184,9 @@ extern "C" {
 declare_class(vsf_tgui_panel_t)
 
 def_class(vsf_tgui_panel_t,
-    which(
+    public_member(
         implement(vsf_tgui_root_container_t)
         implement(vsf_tgui_v_panel_t)
-    )
-
-    //! \note make sure vsf_tgui_container_t must be the last member
-    public_member(
         vsf_tgui_text_info_t tTitle;
     )
 

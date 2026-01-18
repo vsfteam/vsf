@@ -106,7 +106,7 @@ typedef struct vsfvm_runtime_func_ctx_t {
 } vsfvm_runtime_func_ctx_t;
 
 vsf_class(vsfvm_thread_t) {
-    which (
+    public_member(
 #if VSF_KERNEL_CFG_EDA_SUPPORT_TIMER == ENABLED
         implement(vsf_teda_t)
 #else

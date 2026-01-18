@@ -563,7 +563,7 @@ end_def_class(vsf_tgui_control_t)
 declare_class(vsf_tgui_container_t)
 
 def_class(vsf_tgui_container_t,
-    which(
+    public_member(
         union {
             inherit(vsf_msgt_container_t)
             implement(vsf_tgui_control_t)
@@ -597,8 +597,8 @@ end_def_class(vsf_tgui_container_t)
 declare_class(vsf_tgui_root_container_t)
 
 def_class(vsf_tgui_root_container_t,
-    which(implement(vsf_tgui_container_t))
     public_member(
+        implement(vsf_tgui_container_t)
         vsf_tgui_t* gui_ptr;
     )
 )

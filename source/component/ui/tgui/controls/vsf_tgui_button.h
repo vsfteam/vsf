@@ -129,12 +129,9 @@ extern "C" {
 declare_class(vsf_tgui_button_t)
 
 def_class(vsf_tgui_button_t,
-    which(
+    public_member(
         implement(vsf_tgui_label_t)
         implement(vsf_tgui_v_button_t)
-    )
-
-    public_member(
         implement_ex(
             struct {
                 uint8_t     bIsCheckButton      : 1;

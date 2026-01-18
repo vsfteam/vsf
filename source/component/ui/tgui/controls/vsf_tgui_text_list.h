@@ -142,7 +142,7 @@ extern "C" {
 declare_class(vsf_tgui_text_list_t)
 
 def_class(vsf_tgui_text_list_t,
-    which(
+    public_member(
         implement(vsf_tgui_container_t)
         implement(vsf_tgui_v_text_list_t)
     )

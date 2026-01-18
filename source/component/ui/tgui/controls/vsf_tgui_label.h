@@ -143,12 +143,9 @@ extern "C" {
 declare_class(vsf_tgui_label_t)
 
 def_class(vsf_tgui_label_t,
-    which(
+    public_member(
         implement(vsf_tgui_control_t)
         implement(vsf_tgui_v_label_t)
-    )
-
-    public_member(
         implement_ex(vsf_tgui_text_info_t, tLabel);
     )
 )
