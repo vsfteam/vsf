@@ -484,7 +484,9 @@ namespace std {
         basic_string(size_t n, T c, const allocator_type &a = allocator_type())
             : array_base<T>(0 == n ? 1 : n + 1)
         {
-            __memset((T *)c_str(), c, n);
+            T *str = (T *)c_str();
+            __memset(str, c, n);
+            str[array_base<T>::length() - 1] = T(0);
         }
         basic_string(initializer_list<T> list)
             : array_base<T>(nullptr, list.size() + 1)
