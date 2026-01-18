@@ -48,13 +48,14 @@ namespace std {
         return fopen(filename, mods[mode]);
     }
     FILE* _Xfsopen(_In_z_ const wchar_t *filename, _In_ int mode, _In_ int prot) {
-        static const wchar_t* const mods[] = {// fopen mode strings corresponding to valid[i]
-            L"r", L"w", L"w", L"a", L"rb", L"wb", L"wb", L"ab", L"r+", L"w+", L"a+", L"r+b", L"w+b", L"a+b", nullptr};
-
-        VSF_ASSERT(false);
-        return NULL;
-        // TODO
-        //return _wfopen(filename, mods[mode]);
+        size_t len = wcstombs(nullptr, filename, 0);
+        if (len == (size_t)-1) {
+            return NULL;
+        }
+        char mbfilename[len + 1];
+        wcstombs(mbfilename, filename, len + 1);
+        mbfilename[len] = '\0';
+        return _Xfsopen(mbfilename, mode, prot);
     }
 
     template <class CharT>
