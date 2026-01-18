@@ -198,14 +198,23 @@ enum {
 
 enum {
     DT_UNKNOWN,
+#define DT_UNKNOWN                  DT_UNKNOWN
     DT_REG,
+#define DT_REG                      DT_REG
     DT_DIR,
+#define DT_DIR                      DT_DIR
     DT_FIFO,
+#define DT_FIFO                     DT_FIFO
     DT_SOCK,
+#define DT_SOCK                     DT_SOCK
     DT_CHR,
+#define DT_CHR                      DT_CHR
     DT_BLK,
+#define DT_BLK                      DT_BLK
     DT_LNK,
+#define DT_LNK                      DT_LNK
     DT_EXE,
+#define DT_EXE                      DT_EXE
 };
 
 enum {
