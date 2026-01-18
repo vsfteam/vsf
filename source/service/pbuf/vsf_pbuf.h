@@ -99,9 +99,9 @@ typedef union vsf_pbuf_capability_t {
 }vsf_pbuf_capability_t;
 
 def_class(vsf_pbuf_t, 
-    which(
+    public_member(
         implement(vsf_slist_node_t)
-    ),
+    )
 
     private_member(
         implement_ex(vsf_pbuf_capability_t, tFeature)

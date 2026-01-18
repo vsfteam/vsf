@@ -68,10 +68,10 @@ typedef struct vsf_stream_fifo_cfg_t {
 
 
 def_class(vsf_stream_fifo_t,
-    which(
+    public_member(
         vsf_stream_tx_t TX;
         vsf_stream_rx_t RX;
-    ),
+    )
     private_member(
         implement(vsf_slist_queue_t)
         union {

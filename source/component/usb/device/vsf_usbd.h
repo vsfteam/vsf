@@ -542,7 +542,7 @@ typedef struct vk_usbd_ep_stream_cfg_t {
 } vk_usbd_ep_stream_cfg_t;
 
 def_class(vk_usbd_ep_stream_t,
-    which(
+    public_member(
         implement(vsf_stream_src_t)
         implement(vsf_stream_usr_t)
     )

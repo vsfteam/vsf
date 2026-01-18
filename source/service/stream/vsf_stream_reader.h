@@ -60,9 +60,9 @@ extern "C" {
 declare_class(vsf_stream_reader_t);
 
 def_class(vsf_stream_reader_t,
-    which(
+    public_member(
         implement(vsf_stream_usr_t)
-    ),
+    )
     private_member(
         vsf_pbuf_t *current_ptr;
         uint16_t    hwOffset;

@@ -835,7 +835,7 @@ vsf_class(vsf_eda_t) {
 //! \name timed eda
 //! @{
 vsf_class(vsf_teda_t)  {
-    which(
+    public_member(
         implement(vsf_eda_t)
     )
     private_member(
@@ -931,7 +931,7 @@ vsf_class(vsf_bmpevt_adapter_t) {
 //! \name bmpevt_adapter_eda
 //! @{
 vsf_class(vsf_bmpevt_adapter_eda_t) {
-    which(
+    public_member(
         implement(vsf_bmpevt_adapter_t)
     )
     private_member(

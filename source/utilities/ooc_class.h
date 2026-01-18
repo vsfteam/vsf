@@ -40,6 +40,10 @@ extern "C" {
 #endif
 
 /*============================ MACROS ========================================*/
+
+// which is too common to be a MACRO
+#undef which
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 #define vsf_declare_class(__name)           dcl_simple_class(__name)
