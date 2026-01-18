@@ -446,29 +446,30 @@ namespace std {
         }
 
         basic_string(const T *str)
-            : array_base<T>(str, nullptr == str ? 0 : __strlen(str) + 1) { }
+            : array_base<T>(str, nullptr == str ? 1 : __strlen(str) + 1)
+        {
+            if (nullptr == str) {
+                *(T *)c_str() = T(0);
+            }
+        }
         basic_string(const basic_string<T, Traits, Alloc> &s)
             : array_base<T>(s) { }
         basic_string(size_t len)
             : array_base<T>(nullptr, len + 1)
         {
-            T *str = (T *)c_str();
-            str[0] = T(0);
+            *(T *)c_str() = T(0);
         }
         basic_string()
             : array_base<T>(nullptr, 1)
         {
-            T *str = (T *)c_str();
-            str[0] = T(0);
+            *(T *)c_str() = T(0);
         }
         basic_string(const T *arr, size_t num)
             : array_base<T>(nullptr, num + 1)
         {
             T *str = (T *)c_str();
             __memcpy(str, arr, num);
-            if (array_base<T>::length() > num) {
-                str[array_base<T>::length() - 1] = T(0);
-            }
+            str[num] = T(0);
         }
         basic_string(const T *str_begin, const T *str_end)
         {
@@ -482,20 +483,19 @@ namespace std {
             }
         }
         basic_string(size_t n, T c, const allocator_type &a = allocator_type())
-            : array_base<T>(0 == n ? 1 : n + 1)
+            : array_base<T>(n + 1)
         {
             T *str = (T *)c_str();
             __memset(str, c, n);
-            str[array_base<T>::length() - 1] = T(0);
+            str[n] = T(0);
         }
         basic_string(initializer_list<T> list)
             : array_base<T>(nullptr, list.size() + 1)
         {
             T *str = (T *)c_str();
-            __memcpy(str, list.begin(), list.size());
-            if (array_base<T>::length() > list.size()) {
-                str[array_base<T>::length() - 1] = T(0);
-            }
+            size_t len = array_base<T>::length() - 1;
+            __memcpy(str, list.begin(), len);
+            str[len] = T(0);
         }
         template <class Iter, typename = typename std::enable_if<__is_iterator<Iter>::value>::type>
         basic_string(Iter first, Iter last, const Alloc & alloc = Alloc())
