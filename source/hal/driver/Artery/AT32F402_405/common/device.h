@@ -418,7 +418,7 @@
             .reg                        = (void *)OTGFS1_BASE,                  \
             .irq                        = VSF_HW_USB_OTG0_IRQN,                 \
             .en                         = VSF_HW_EN_OTGFS1,                     \
-            .phyclk                     = &VSF_HW_CLK_HICK,                     \
+            .phyclk                     = &VSF_HW_CLK_OTGFS1,                   \
             .phyclk_freq_required       = 48 * 1000 * 1000,                     \
             /* vk_dwcotg_hw_info_t */                                           \
                 .buffer_word_size       = 320,                                  \
