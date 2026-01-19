@@ -986,7 +986,7 @@ ssize_t getline(char **lineptr, size_t *n, FILE *f)
 }
 
 #ifdef __WIN__
-int _fseeki64(FILE *f, uint64_t offset, int origin)
+int _fseeki64(FILE *f, int64_t offset, int origin)
 {
     return fseeko64(f, offset, origin);
 }

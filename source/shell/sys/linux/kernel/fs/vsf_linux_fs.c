@@ -374,12 +374,47 @@ static ssize_t __vsf_linux_fs_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
     int32_t rsize;
 
     while (count > 0) {
-        vk_file_read(file, (uint8_t *)buf, count);
-        rsize = (int32_t)vsf_eda_get_return_value();
-        if (rsize < 0) {
-            return result > 0 ? result : EOF;
-        } else if (!rsize) {
-            break;
+#if VSF_LINUX_CFG_FS_CACHE_SIZE > 0
+        if (    (count < VSF_LINUX_CFG_FS_CACHE_THRESHOLD)
+            ||  ((priv->cache_size > 0) && (priv->cache_offset < priv->cache_size))) {
+            if (NULL == priv->cache_buffer) {
+                priv->cache_buffer = vsf_heap_malloc(VSF_LINUX_CFG_FS_CACHE_SIZE);
+                if (NULL == priv->cache_buffer) {
+                    return -1;
+                }
+                priv->cache_size = 0;
+                priv->cache_pos = VSF_LINUX_CFG_FS_CACHE_SIZE;
+            }
+            if ((priv->cache_size == 0) || (priv->cache_offset >= priv->cache_size)) {
+                priv->cache_pos = vk_file_tell(file);
+                vk_file_read(file, priv->cache_buffer, VSF_LINUX_CFG_FS_CACHE_SIZE);
+                rsize = (int32_t)vsf_eda_get_return_value();
+                if (rsize < 0) {
+                    priv->cache_size = 0;
+                    return result > 0 ? result : EOF;
+                } else if (!rsize) {
+                    break;
+                } else {
+                    priv->cache_size = rsize;
+                    priv->cache_offset = 0;
+                    rsize = vsf_min(rsize, count);
+                }
+            } else {
+                uint64_t remain_size = priv->cache_size - priv->cache_offset;
+                rsize = (int32_t)vsf_min(remain_size, count);
+            }
+            memcpy(buf, priv->cache_buffer + priv->cache_offset, rsize);
+            priv->cache_offset += rsize;
+        } else
+#endif
+        {
+            vk_file_read(file, (uint8_t *)buf, count);
+            rsize = (int32_t)vsf_eda_get_return_value();
+            if (rsize < 0) {
+                return result > 0 ? result : EOF;
+            } else if (!rsize) {
+                break;
+            }
         }
 
         count -= rsize;
@@ -416,6 +451,12 @@ static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd)
 {
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
     priv->file->attr &= ~VSF_FILE_ATTR_EXCL;
+#if VSF_LINUX_CFG_FS_CACHE_SIZE > 0
+    if (priv->cache_buffer != NULL) {
+        vsf_heap_free(priv->cache_buffer);
+        priv->cache_buffer = NULL;
+    }
+#endif
     __vsf_linux_fs_close_do(priv->file);
     return 0;
 }
@@ -2128,7 +2169,20 @@ off64_t lseek64(int fd, off64_t offset, int whence)
     }
 
     vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+#if VSF_LINUX_CFG_FS_CACHE_SIZE > 0
+    if (    (whence == SEEK_CUR)
+        &&  (priv->cache_size > 0)
+        &&  (priv->cache_offset < priv->cache_size)
+        &&  (offset + priv->cache_offset >= 0)
+        &&  (offset + priv->cache_offset < priv->cache_size)) {
+        priv->cache_offset += offset;
+        return priv->cache_pos + priv->cache_offset;
+    }
+#endif
     vk_file_seek(priv->file, offset, whence);
+#if VSF_LINUX_CFG_FS_CACHE_SIZE > 0
+    priv->cache_size = 0;
+#endif
     return vk_file_tell(priv->file);
 }
 

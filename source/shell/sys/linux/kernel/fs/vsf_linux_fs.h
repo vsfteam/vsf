@@ -139,6 +139,10 @@ vsf_class(vsf_linux_fd_t) {
 };
 
 #if defined(__VSF_LINUX_FS_CLASS_IMPLEMENT) || defined(__VSF_LINUX_FS_CLASS_INHERIT__)
+#   if VSF_LINUX_CFG_FS_CACHE_SIZE > 0
+VSF_STATIC_ASSERT(VSF_LINUX_CFG_FS_CACHE_SIZE <= ((1 << (sizeof(uint16_t) << 3)) - 1));
+VSF_STATIC_ASSERT(VSF_LINUX_CFG_FS_CACHE_SIZE > VSF_LINUX_CFG_FS_CACHE_THRESHOLD);
+#   endif
 typedef struct vk_file_t vk_file_t;
 typedef struct vsf_linux_fs_priv_t {
     implement(vsf_linux_fd_priv_t)
@@ -148,6 +152,12 @@ typedef struct vsf_linux_fs_priv_t {
         struct dirent dir;
         struct dirent64 dir64;
     };
+#   if VSF_LINUX_CFG_FS_CACHE_SIZE > 0
+    uint8_t *cache_buffer;
+    uint16_t cache_size;
+    uint16_t cache_offset;
+    uint64_t cache_pos;
+#   endif
 } vsf_linux_fs_priv_t;
 
 vsf_dcl_class(vsf_linux_stream_priv_t)
