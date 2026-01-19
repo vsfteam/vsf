@@ -14,7 +14,8 @@ namespace std {
         condition_variable() noexcept {
             pthread_cond_init(&__cond, NULL);
         }
-        ~condition_variable() noexcept;
+        ~condition_variable() noexcept {
+        }
 
         condition_variable(const condition_variable &) = delete;
         condition_variable & operator=(const condition_variable &) = delete;

@@ -369,6 +369,25 @@ const char * sigabbrev_np(int sig);
 
 #ifdef __cplusplus
 }
+
+extern "C++" {
+    inline char * __cdecl strchr(char * const str, int const ch)
+    {
+        return const_cast<char*>(strchr(static_cast<char const*>(str), ch));
+    }
+    inline char * __cdecl strrchr(char * const str, int const ch)
+    {
+        return const_cast<char*>(strrchr(static_cast<char const*>(str), ch));
+    }
+    inline char * __cdecl strstr(char * const haystack, char const * const needle)
+    {
+        return const_cast<char*>(strstr(static_cast<char const*>(haystack), needle));
+    }
+    inline char * __cdecl strpbrk(char * const str, char const * const accept)
+    {
+        return const_cast<char*>(strpbrk(static_cast<char const*>(str), accept));
+    }
+}
 #endif
 
 #if     __IS_COMPILER_LLVM__
