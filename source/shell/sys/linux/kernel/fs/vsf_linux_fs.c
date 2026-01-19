@@ -378,7 +378,7 @@ static ssize_t __vsf_linux_fs_read(vsf_linux_fd_t *sfd, void *buf, size_t count)
         if (    (count < VSF_LINUX_CFG_FS_CACHE_THRESHOLD)
             ||  ((priv->cache_size > 0) && (priv->cache_offset < priv->cache_size))) {
             if (NULL == priv->cache_buffer) {
-                priv->cache_buffer = vsf_heap_malloc(VSF_LINUX_CFG_FS_CACHE_SIZE);
+                priv->cache_buffer = vsf_linux_malloc_res(VSF_LINUX_CFG_FS_CACHE_SIZE);
                 if (NULL == priv->cache_buffer) {
                     return -1;
                 }
@@ -453,7 +453,7 @@ static int __vsf_linux_fs_close(vsf_linux_fd_t *sfd)
     priv->file->attr &= ~VSF_FILE_ATTR_EXCL;
 #if VSF_LINUX_CFG_FS_CACHE_SIZE > 0
     if (priv->cache_buffer != NULL) {
-        vsf_heap_free(priv->cache_buffer);
+        vsf_linux_free_res(priv->cache_buffer);
         priv->cache_buffer = NULL;
     }
 #endif
@@ -2172,11 +2172,16 @@ off64_t lseek64(int fd, off64_t offset, int whence)
 #if VSF_LINUX_CFG_FS_CACHE_SIZE > 0
     if (    (whence == SEEK_CUR)
         &&  (priv->cache_size > 0)
-        &&  (priv->cache_offset < priv->cache_size)
-        &&  (offset + priv->cache_offset >= 0)
-        &&  (offset + priv->cache_offset < priv->cache_size)) {
-        priv->cache_offset += offset;
-        return priv->cache_pos + priv->cache_offset;
+        &&  (priv->cache_offset < priv->cache_size)) {
+
+        if (    (offset + priv->cache_offset >= 0)
+            &&  (offset + priv->cache_offset < priv->cache_size)) {
+
+            priv->cache_offset += offset;
+            return priv->cache_pos + priv->cache_offset;
+        } else {
+            offset -= priv->cache_size - priv->cache_offset;
+        }
     }
 #endif
     vk_file_seek(priv->file, offset, whence);
