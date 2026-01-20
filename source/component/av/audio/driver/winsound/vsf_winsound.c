@@ -224,6 +224,7 @@ static void __vk_winsound_playback_irq_thread(void *arg)
                 orig = vsf_protect_int();
                 if (!playback_ctx->last_datasize) {
                     eda_pending = playback_ctx->eda_pending;
+                    playback_ctx->eda_pending = NULL;
                 }
                 vsf_unprotect_int(orig);
                 if (eda_pending) {
