@@ -8,6 +8,25 @@ namespace std {
     struct try_to_lock_t {};
     struct adopt_lock_t {};
 
+    struct once_flag {
+        constexpr once_flag() noexcept : __has_runned(false) {}
+        once_flag(const once_flag&)            = delete;
+        once_flag& operator=(const once_flag&) = delete;
+        bool __has_runned;
+    };
+    template <class F, class ...Args>
+    void call_once(once_flag& flag, F&& f, Args&&... args)
+    {
+        vsf_protect_t orig = vsf_protect_int();
+        if (!flag.__has_runned) {
+            flag.__has_runned = true;
+            vsf_unprotect_int(orig);
+            std::forward<F>(f)(std::forward<Args>(args)...);
+        } else {
+            vsf_unprotect_int(orig);
+        }
+    }
+
     class mutex {
     public:
         typedef pthread_mutex_t * native_handle_type;
