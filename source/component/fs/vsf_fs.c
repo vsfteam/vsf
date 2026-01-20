@@ -339,7 +339,7 @@ __vsf_component_peda_private_entry(__vk_file_lookup,
     case VSF_EVT_RETURN:
         if ((VSF_ERR_NONE == err) && (*vsf_local.result != NULL)) {
             (*vsf_local.result)->parent = dir;
-            if (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED) {
+            if ((dir->fsop == &vk_vfs_op) && (dir->attr & VSF_VFS_FILE_ATTR_MOUNTED)) {
                 dir = &((vk_fs_info_t *)(((vk_vfs_file_t *)dir)->subfs.data))->root;
             }
             (*vsf_local.result)->fsinfo = dir->fsinfo;
@@ -686,14 +686,18 @@ vsf_err_t vk_fs_sync(vk_file_t *dir)
 vsf_err_t vk_file_open(vk_file_t *dir, const char *name, vk_file_t **file)
 {
     vsf_err_t err;
-#if VSF_FS_REF_TRACE == ENABLED
-    vsf_trace_debug("open %s" VSF_TRACE_CFG_LINEEND, name);
-#endif
     VSF_FS_ASSERT(file != NULL);
 
     if (NULL == dir) {
         dir = &__vk_fs.rootfs.use_as__vk_file_t;
     }
+#if VSF_FS_REF_TRACE == ENABLED
+    if (name != NULL) {
+        vsf_trace_debug("open file %s" VSF_TRACE_CFG_LINEEND, name);
+    } else {
+        vsf_trace_debug("open dir %s" VSF_TRACE_CFG_LINEEND, dir->name);
+    }
+#endif
 
     VSF_FS_ASSERT(  (dir != NULL) && (dir->attr & VSF_FILE_ATTR_DIRECTORY)
                 &&  (dir->fsop != NULL) && (dir->fsop->dop.fn_lookup != NULL));
