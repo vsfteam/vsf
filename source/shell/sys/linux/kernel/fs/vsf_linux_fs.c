@@ -557,7 +557,7 @@ static int __vsf_linux_fs_munmap(vsf_linux_fd_t *sfd, void *buffer)
     else {
         free(buffer);
         if (sfd->is_close_pending_on_munmap) {
-            __vsf_linux_fd_close_ex(NULL, sfd);
+            close(sfd->fd);
         }
     }
     return 0;
