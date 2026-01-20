@@ -159,6 +159,7 @@ static int __vsf_linux_fs_eof(vsf_linux_fd_t *sfd);
 static int __vsf_linux_fs_setsize(vsf_linux_fd_t *sfd, off64_t size);
 static int __vsf_linux_fs_stat(vsf_linux_fd_t *sfd, struct stat *buf);
 static void * __vsf_linux_fs_mmap(vsf_linux_fd_t *sfd, off64_t offset, size_t len, uint_fast32_t feature);
+static int __vsf_linux_fs_munmap(vsf_linux_fd_t *sfd, void *buffer);
 
 static int __vsf_linux_eventfd_fcntl(vsf_linux_fd_t *sfd, int cmd, uintptr_t arg);
 static ssize_t __vsf_linux_eventfd_read(vsf_linux_fd_t *sfd, void *buf, size_t count);
@@ -209,6 +210,7 @@ const vsf_linux_fd_op_t __vsf_linux_fs_fdop = {
     .fn_setsize         = __vsf_linux_fs_setsize,
     .fn_stat            = __vsf_linux_fs_stat,
     .fn_mmap            = __vsf_linux_fs_mmap,
+    .fn_munmap          = __vsf_linux_fs_munmap,
 };
 
 const vsf_linux_fd_op_t __vsf_linux_eventfd_fdop = {
@@ -523,8 +525,42 @@ static void * __vsf_linux_fs_mmap(vsf_linux_fd_t *sfd, off64_t offset, size_t le
             return mem_file->f.buff;
         }
 #endif
+        else {
+            len = vsf_min(len, file->size - offset);
+            void *buffer = malloc(len);
+            if (buffer != NULL) {
+                vk_file_seek(file, offset, VSF_FILE_SEEK_SET);
+                vk_file_read(file, buffer, len);
+                if (vsf_eda_get_return_value() <= 0) {
+                    free(buffer);
+                    buffer = MAP_FAILED;
+                } else {
+                    return buffer;
+                }
+            }
+        }
     }
     return MAP_FAILED;
+}
+
+static int __vsf_linux_fs_munmap(vsf_linux_fd_t *sfd, void *buffer)
+{
+    vsf_linux_fs_priv_t *priv = (vsf_linux_fs_priv_t *)sfd->priv;
+    vk_file_t *file = priv->file;
+
+    if (file->fsop == &vk_vfs_op) {
+    } 
+#if VSF_FS_USE_MEMFS == ENABLED
+    else if (file->fsop == &vk_vfs_op) {
+    }
+#endif
+    else {
+        free(buffer);
+        if (sfd->is_close_pending_on_munmap) {
+            __vsf_linux_fd_close_ex(NULL, sfd);
+        }
+    }
+    return 0;
 }
 
 // eventfd
@@ -1932,6 +1968,11 @@ int __vsf_linux_fd_close_ex(vsf_linux_process_t *process, int fd)
 {
     vsf_linux_fd_t *sfd = __vsf_linux_fd_get_ex(process, fd);
     if (!sfd) { return -1; }
+
+    if (sfd->mmapped_buffer != NULL) {
+        sfd->is_close_pending_on_munmap = true;
+        return 0;
+    }
     return ____vsf_linux_fd_close_ex(process, sfd);
 }
 

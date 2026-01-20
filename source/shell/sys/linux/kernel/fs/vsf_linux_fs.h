@@ -124,6 +124,7 @@ vsf_class(vsf_linux_fd_t) {
     private_member(
         vsf_dlist_node_t fd_node;
         void *mmapped_buffer;
+        bool is_close_pending_on_munmap;
     )
 
     protected_member(

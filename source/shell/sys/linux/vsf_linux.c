@@ -3880,11 +3880,13 @@ int msync(void *addr, size_t len, int flags)
 int munmap(void *addr, size_t len)
 {
     vsf_linux_process_t *cur_process = vsf_linux_get_cur_process();
+    void *mmapped_buffer;
     __vsf_dlist_foreach_unsafe(vsf_linux_fd_t, fd_node, &cur_process->fd_list) {
         if (_->mmapped_buffer == addr) {
-            int ret = NULL == _->op->fn_munmap ? 0 : _->op->fn_munmap(_, _->mmapped_buffer);
+            // fn_munmap may close sfd, so clear mmapped_buffer in sfd first
+            mmapped_buffer = _->mmapped_buffer;
             _->mmapped_buffer = NULL;
-            return ret;
+            return NULL == _->op->fn_munmap ? 0 : _->op->fn_munmap(_, mmapped_buffer);
         }
     }
 
