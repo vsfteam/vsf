@@ -23,8 +23,25 @@
 #define __VSF_HEADER_ONLY_SHOW_COMPILER_INFO__
 #include "utilities/compiler/compiler.h"
 
+// stdint.h on Windows will require _WIN64 for size_t/ptrdiff_t/intptr_t
+// so define them here temporarily, and remove after stdint.h included
+#undef __WIN_TYPES_DEF_MSC_VER
+#if defined(__WIN__) && !defined(_WIN32) && !defined(_WIN64)
+#   define _WIN32           1
+#   ifdef __VSF64__
+#       define _WIN64       1
+#    endif
+#   define __WIN_TYPES_DEF_MSC_VER
+#endif
+
 // for uint8_t, uint16_t, uint32_t, uint64_t
 #include <stdint.h>
+
+#ifdef __WIN_TYPES_DEF_MSC_VER
+#   undef _WIN32
+#   undef _WIN64
+#   undef __WIN_TYPES_DEF_MSC_VER
+#endif
 
 #ifdef __cplusplus
 extern "C" {
