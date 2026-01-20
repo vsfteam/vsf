@@ -898,9 +898,35 @@ void _CrtDumpMemoryLeaks(void){}
 void _CrtSetDbgFlag(void){}
 void _CrtSetDumpClient(void){}
 
+static void *_ptds[32];
+
 void *_malloc_dbg(size_t size, int blockType, const char *filename, int linenumber)
 {
-    return malloc(size);
+#ifndef _DEBUG
+#   error Windows applications can only run in debug mode, see comments below for reason.
+#endif
+    // IMPORTANT: UGLY FIX FOR WINDOWS PTD
+    // Windows ptd will be allocated in per_thread_data.cpp::,
+    //  and freed in per_thread_data.cpp::destroy_fls.
+    // On exiting linux process, per_thread_data.cpp::destroy_fls is not called,
+    //  and the unfreed ptd will be freed in vsf_linux_cleanup_process, and than error
+    //  will be issued in per_thread_data.cpp::destroy_fls to free the ptd again.
+    // Record all ptds here, and skip free in _free_dbg, although this will cause memory leakage.
+    void *result = malloc(size);
+    if (strstr(filename, "per_thread_data.cpp")) {
+        int i = 0;
+        for (; i < dimof(_ptds); i++) {
+            if (_ptds[i] == NULL) {
+                _ptds[i] = result;
+                break;
+            }
+        }
+        if (i >= dimof(_ptds)) {
+            // please increase size of _ptds
+            VSF_LINUX_ASSERT(false);
+        }
+    }
+    return result;
 }
 
 void * _calloc_dbg(size_t num, size_t size, int blockType, const char *filename, int linenumber)
@@ -918,14 +944,22 @@ void * _aligned_malloc_dbg(size_t size, size_t alignment, const char *filename, 
     return aligned_alloc(alignment, size);
 }
 
-void _free_dbg(void *p, int blockType)
+void _aligned_free_dbg(void *p)
 {
+    if (p != NULL) {
+        for (int i = 0; i < dimof(_ptds); i++) {
+            if (_ptds[i] == p) {
+                _ptds[i] = NULL;
+                return;
+            }
+        }
+    }
     free(p);
 }
 
-void _aligned_free_dbg(void *p)
+void _free_dbg(void *p, int blockType)
 {
-    free(p);
+    _aligned_free_dbg(p);
 }
 
 void * _aligned_offset_malloc_dbg(size_t size, size_t alignment, size_t offset, const char *filename, int linenumber)
