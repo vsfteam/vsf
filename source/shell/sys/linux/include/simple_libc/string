@@ -409,8 +409,8 @@ namespace std {
 
         typedef T * iterator;
         typedef const T * const_iterator;
-        typedef T * reverse_iterator;
-        typedef const T * const_reverse_iterator;
+        typedef std::reverse_iterator<iterator> reverse_iterator;
+        typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
         static const size_t npos = -1;
 
@@ -550,42 +550,50 @@ namespace std {
         }
         const_iterator begin() const
         {
-            return (const_iterator)array_base<T>::begin();
+            return array_base<T>::cbegin();
         }
         iterator end()
         {
-            iterator it = array_base<T>::end();
-            return it != nullptr ? it - 1 : nullptr;
+            iterator b = array_base<T>::begin();
+            return b != nullptr ? b + length() : (const_iterator)nullptr;
         }
         const_iterator end() const
         {
-            iterator it = array_base<T>::end();
-            return (const_iterator)(it != nullptr ? it - 1 : nullptr);
+            const_iterator b = array_base<T>::cbegin();
+            return b != nullptr ? b + length() : (const_iterator)nullptr;
         }
         const_iterator cbegin() const
         {
-            return (const_iterator)begin();
+            return array_base<T>::cbegin();
         }
         const_iterator cend() const
         {
-            return (const_iterator)end();
+            const_iterator b = array_base<T>::cbegin();
+            return b != nullptr ? b + length() : (const_iterator)nullptr;
         }
-        iterator rbegin() const
+        reverse_iterator rbegin()
         {
-            iterator it = array_base<T>::rbegin();
-            return it != nullptr ? it - 1 : nullptr;
+            return reverse_iterator(end());
         }
-        iterator rend() const
+        const_reverse_iterator rbegin() const
         {
-            return array_base<T>::rend();
+            return const_reverse_iterator(end());
         }
-        const_iterator crbegin() const
+        reverse_iterator rend()
         {
-            return (const_iterator)rbegin();
+            return reverse_iterator(begin());
         }
-        const_iterator crend() const
+        const_reverse_iterator rend() const
         {
-            return (const_iterator)rend();
+            return const_reverse_iterator(begin());
+        }
+        const_reverse_iterator crbegin() const
+        {
+            return const_reverse_iterator(cend());
+        }
+        const_reverse_iterator crend() const
+        {
+            return const_reverse_iterator(cbegin());
         }
 
         size_t size() const
