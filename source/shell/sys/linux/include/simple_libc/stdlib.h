@@ -71,6 +71,13 @@ extern "C" {
 #   endif
 #endif
 
+#ifdef __WIN__
+extern int ___mb_cur_max_func(void);
+#   define MB_CUR_MAX       ___mb_cur_max_func()
+#else
+#   define MB_CUR_MAX       4       // for UTF8
+#endif
+
 #define EXIT_SUCCESS        0
 #define EXIT_FAILURE        -1
 
