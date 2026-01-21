@@ -1,8 +1,12 @@
 #ifndef __SIMPLE_LIBC_CONDITION_VARIABLE__
 #define __SIMPLE_LIBC_CONDITION_VARIABLE__
 
-#include <pthread.h>
+#include <functional>
 #include <mutex>
+#include <chrono>
+#include <thread>
+
+#include <pthread.h>
 
 namespace std {
     enum class cv_status { no_timeout, timeout };
@@ -26,9 +30,62 @@ namespace std {
         void notify_all() noexcept {
             pthread_cond_broadcast(&__cond);
         }
-        void wait(unique_lock<mutex> & lock) noexcept {
+        void wait(unique_lock<mutex> &lock) noexcept {
             pthread_cond_wait(&__cond, lock.mutex()->native_handle());
         }
+        void wait(unique_lock<mutex> &lock, std::function<bool()> pred) noexcept {
+            while (!pred()) {
+                wait(lock);
+            }
+        }
+
+        template <class Clock, class Duration>
+        cv_status wait_until(unique_lock<mutex> &lock, const chrono::time_point<Clock, Duration> &abs_time) noexcept {
+            timespec ts;
+            auto dur = abs_time.time_since_epoch();
+            auto sec = chrono::duration_cast<chrono::seconds>(dur);
+            auto nsec = chrono::duration_cast<chrono::nanoseconds>(dur - sec);
+            ts.tv_sec = static_cast<time_t>(sec.count());
+            ts.tv_nsec = static_cast<long>(nsec.count());
+            int ret = pthread_cond_timedwait(&__cond, lock.mutex()->native_handle(), &ts);
+            if (ret == ETIMEDOUT) {
+                return cv_status::timeout;
+            }
+            return cv_status::no_timeout;
+        }
+        template <class Clock, class Duration, class Predicate>
+        bool wait_until(unique_lock<mutex> &lock, const chrono::time_point<Clock, Duration> &abs_time, Predicate pred) noexcept {
+            while (!pred()) {
+                if (wait_until(lock, abs_time) == cv_status::timeout) {
+                    return pred();
+                }
+            }
+            return true;
+        }
+
+        template <class Repeat, class Period>
+        cv_status wait_for(unique_lock<mutex> &lock, const chrono::duration<Repeat, Period> &rel_time) noexcept {
+            if (rel_time <= chrono::duration<Repeat, Period>::zero()) {
+                return cv_status::timeout;
+            }
+            return wait_until(lock, __to_absolute_time(rel_time));
+        }
+        template <class Repeat, class Period, class Predicate>
+        cv_status wait_for(unique_lock<mutex> &lock, const chrono::duration<Repeat, Period> &rel_time, Predicate pred) noexcept {
+            return wait_until(lock, __to_absolute_time(rel_time), std::move(pred));
+        }
+
+#ifdef __WIN__
+        // register this object for release at thread exit
+        void _Register(unique_lock<mutex> &lock, int *ready) noexcept {
+            VSF_LINUX_ASSERT(false);
+        }
+
+        // unregister this object for release at thread exit
+        void _Unregister(mutex &mutex) noexcept {
+           VSF_LINUX_ASSERT(false);
+        }
+#endif
     };
 }
 

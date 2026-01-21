@@ -331,9 +331,10 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *f)
     }
 
     ret += pre_read;
-    if (0 == ret) {
-        return EOF;
-    }
+// fread does not return EOF
+//    if (0 == ret) {
+//        return EOF;
+//    }
     return (size_t)(bytes_requested == ret ? nmemb : ret / size);
 }
 

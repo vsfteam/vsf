@@ -7,4 +7,6 @@ namespace std {
     using ::fputs;
     using ::fprintf;
     using ::FILE;
+    using ::remove;
+    using ::rename;
 }
