@@ -555,7 +555,7 @@ namespace std {
         iterator end()
         {
             iterator b = array_base<T>::begin();
-            return b != nullptr ? b + length() : (const_iterator)nullptr;
+            return b != nullptr ? b + length() : (iterator)nullptr;
         }
         const_iterator end() const
         {
