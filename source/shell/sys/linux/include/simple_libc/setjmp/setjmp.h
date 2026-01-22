@@ -8,6 +8,10 @@
 // for ALIGN and stdint.h
 #include "utilities/compiler/compiler.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
 #   if      defined(__CPU_X64__)
 
@@ -77,5 +81,9 @@ void longjmp(jmp_buf env, int val);
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_SETJMP
 
 #undef __SIMPLE_LIBC_SETJMP_VPLT_ONLY__
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
