@@ -437,4 +437,11 @@ void atomic_signal_fence(enum memory_order m)
 {
 }
 
+// strings.h
+
+void bzero(void *mem, size_t size)
+{
+    memset(mem, 0, size);
+}
+
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC
