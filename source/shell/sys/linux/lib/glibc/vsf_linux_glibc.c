@@ -444,4 +444,40 @@ void bzero(void *mem, size_t size)
     memset(mem, 0, size);
 }
 
+int ffs(int i)
+{
+    return (int)vsf_ffs32((uint_fast32_t)i) + 1;
+}
+
+int ffsll(long long int val)
+{
+    int result;
+    union {
+        long long int ll;
+        int u[2];
+    } VSF_CAL_PACKED v;
+    v.ll = val;
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+    result = ffs(v.u[0]);
+    if (result != 0) {
+        return result;
+    }
+    result = ffs(v.u[1]);
+    if (result != 0) {
+        result += sizeof(int);
+    }
+#else
+    result = ffs(v.u[1]);
+    if (result != 0) {
+        return result;
+    }
+    result = ffs(v.u[0]);
+    if (result != 0) {
+        result += sizeof(int);
+    }
+#endif
+    return result;
+}
+
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_SIMPLE_LIBC

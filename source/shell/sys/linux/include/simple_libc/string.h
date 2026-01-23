@@ -277,7 +277,6 @@ VSF_LINUX_APPLET_LIBC_STRING_IMP(sigabbrev_np, const char *, int sig) {
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STRING
 
-int ffs(int i);
 void * memset(void *s, int ch, size_t n);
 size_t strlen(const char *str);
 size_t strnlen(const char *str, size_t maxlen);
