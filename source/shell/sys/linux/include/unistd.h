@@ -218,6 +218,7 @@ enum {
 };
 
 enum {
+    _SC_PHYS_PAGES,
     _SC_PAGESIZE,
     _SC_OPEN_MAX,
     _SC_CLK_TCK,

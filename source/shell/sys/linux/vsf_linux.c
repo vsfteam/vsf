@@ -2490,6 +2490,7 @@ exec_ret_t execle(const char *pathname, const char *arg, ...)
 long sysconf(int name)
 {
     switch (name) {
+    case _SC_PHYS_PAGES:    return 1024 * 1024;
     case _SC_PAGESIZE:      return 256;
     case _SC_OPEN_MAX:      return 65535;
     case _SC_CLK_TCK:       return 100;
@@ -3544,7 +3545,7 @@ static vsf_linux_futex_t * __vsf_linux_futex_get(uint32_t *futex, bool is_to_all
     return linux_futex;
 }
 
-long sys_futex(uint32_t *futex, int futex_op, uint32_t val, uintptr_t val2, uint32_t *futex2, uint32_t val3)
+long vsf_linux_sys_futex(uint32_t *futex, int futex_op, uint32_t val, uintptr_t val2, uint32_t *futex2, uint32_t val3)
 {
     VSF_LINUX_ASSERT(futex != NULL);
     vsf_linux_futex_t *linux_futex;
