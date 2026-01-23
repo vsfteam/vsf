@@ -3545,7 +3545,7 @@ static vsf_linux_futex_t * __vsf_linux_futex_get(uint32_t *futex, bool is_to_all
     return linux_futex;
 }
 
-long vsf_linux_sys_futex(uint32_t *futex, int futex_op, uint32_t val, uintptr_t val2, uint32_t *futex2, uint32_t val3)
+long vsf_linux_sys_futex(uint32_t *futex, int futex_op, uint32_t val, const struct timespec *spec, uint32_t *futex2, uint32_t val3)
 {
     VSF_LINUX_ASSERT(futex != NULL);
     vsf_linux_futex_t *linux_futex;
@@ -3557,7 +3557,7 @@ long vsf_linux_sys_futex(uint32_t *futex, int futex_op, uint32_t val, uintptr_t 
     case FUTEX_WAIT:
         {
             extern vsf_systimer_tick_t vsf_linux_timespec2tick(const struct timespec *ts);
-            timeout_ticks = !val2 ? -1 : vsf_linux_timespec2tick((const struct timespec *)val2);
+            timeout_ticks = !spec ? -1 : vsf_linux_timespec2tick(spec);
         }
         orig = vsf_protect_sched();
         if (*futex != val) {
