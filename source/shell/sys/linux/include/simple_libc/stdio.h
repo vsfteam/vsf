@@ -654,6 +654,8 @@ int vasprintf(char **strp, const char *format, va_list ap);
 
 int vsscanf(const char *str, const char *format, va_list ap);
 int sscanf(const char *str, const char *format, ...);
+int snscanf(const char *str, size_t size, const char *format, ...);
+int vsnscanf(const char *str, size_t size, const char *format, va_list ap);
 
 int remove(const char *filename);
 

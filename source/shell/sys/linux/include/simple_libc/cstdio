@@ -5,8 +5,25 @@ namespace std {
     using ::fread;
     using ::fputc;
     using ::fputs;
-    using ::fprintf;
     using ::FILE;
     using ::remove;
     using ::rename;
+
+    using ::scanf;
+    using ::vscanf;
+    using ::fscanf;
+    using ::vfscanf;
+    using ::sscanf;
+    using ::snscanf;
+    using ::vsscanf;
+    using ::vsnscanf;
+
+    using ::printf;
+    using ::vprintf;
+    using ::fprintf;
+    using ::vfprintf;
+    using ::sprintf;
+    using ::snprintf;
+    using ::vsnprintf;
+    using ::vsnprintf;
 }

@@ -22,6 +22,16 @@
 #undef atomic_fetch_xor_explicit
 
 namespace std {
+    // copied from stdatomic.h
+    enum memory_order {
+        memory_order_relaxed,
+        memory_order_consume,
+        memory_order_acquire,
+        memory_order_release,
+        memory_order_acq_rel,
+        memory_order_seq_cst,
+    };
+
     template<typename T>
     struct atomic_base {
         using value_type = T;
@@ -216,6 +226,13 @@ namespace std {
         T operator=(T val) volatile noexcept {
             return atomic_base<T>::store(val);
         }
+        T operator++(int) noexcept {
+            T tmp;
+            vsf_protect_t orig = vsf_protect_int();
+                tmp = atomic_base<T>::__base++;
+            vsf_unprotect_int(orig);
+            return tmp;
+        }
         T operator++() noexcept {
             T tmp;
             vsf_protect_t orig = vsf_protect_int();
@@ -227,6 +244,13 @@ namespace std {
             T tmp;
             vsf_protect_t orig = vsf_protect_int();
                 tmp = ++atomic_base<T>::__base;
+            vsf_unprotect_int(orig);
+            return tmp;
+        }
+        T operator--(int) noexcept {
+            T tmp;
+            vsf_protect_t orig = vsf_protect_int();
+                tmp = atomic_base<T>::__base--;
             vsf_unprotect_int(orig);
             return tmp;
         }
@@ -419,6 +443,19 @@ namespace std {
         void atomic_thread_fence(memory_order order) noexcept;
         void atomic_signal_fence(memory_order m) noexcept;
     }
+
+    using atomic_bool = atomic<bool>;
+    using atomic_char = atomic<char>;
+    using atomic_schar = atomic<signed char>;
+    using atomic_uchar = atomic<unsigned char>;
+    using atomic_short = atomic<short>;
+    using atomic_ushort = atomic<unsigned short>;
+    using atomic_int = atomic<int>;
+    using atomic_uint = atomic<unsigned int>;
+    using atomic_long = atomic<long>;
+    using atomic_ulong = atomic<unsigned long>;
+    using atomic_llong = atomic<long long>;
+    using atomic_ullong = atomic<unsigned long long>;
 }
 
 #endif
