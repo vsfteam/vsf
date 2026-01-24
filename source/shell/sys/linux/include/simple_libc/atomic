@@ -462,6 +462,26 @@ namespace std {
     using atomic_ulong = atomic<unsigned long>;
     using atomic_llong = atomic<long long>;
     using atomic_ullong = atomic<unsigned long long>;
+
+    struct atomic_flag {
+        bool test_and_set(const memory_order order = memory_order_seq_cst) noexcept {
+            return _storage.exchange(true, order) != 0;
+        }
+        bool test_and_set(const memory_order order = memory_order_seq_cst) volatile noexcept {
+            return _storage.exchange(true, order) != 0;
+        }
+        void clear(const memory_order _Order = memory_order_seq_cst) noexcept {
+            _storage.store(false, _Order);
+        }
+
+        void clear(const memory_order _Order = memory_order_seq_cst) volatile noexcept {
+            _storage.store(false, _Order);
+        }
+
+//        constexpr atomic_flag() noexcept = default;
+
+        atomic<bool> _storage;
+    };
 }
 
 #endif

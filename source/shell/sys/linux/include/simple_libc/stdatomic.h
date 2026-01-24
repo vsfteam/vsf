@@ -63,7 +63,7 @@ enum memory_order {
     memory_order_seq_cst,
 };
 
-#define ATOMIC_VAR_INIT(__VALUE)            (__VALUE)
+#define ATOMIC_VAR_INIT(__VALUE)    (__VALUE)
 
 #define atomic_init(object, value)                                              \
             atomic_store_explicit(object, value, memory_order_relaxed)
@@ -185,6 +185,22 @@ enum memory_order {
             })
 #define atomic_fetch_and(object, operand)                                       \
             atomic_fetch_and_explicit(object, operand, memory_order_seq_cst)
+
+typedef struct {
+    bool value;
+} atomic_flag;
+
+#define ATOMIC_FLAG_INIT            { 0 }
+
+#define atomic_flag_test_and_set_explicit(__ptr, __mode)                        \
+            atomic_exchange_explicit((__ptr), true, __mode)
+#define atomic_flag_test_and_set(__ptr)                                         \
+            atomic_flag_test_and_set_explicit((__ptr), memory_order_seq_cst)
+
+#define atomic_flag_clear_explicit(__ptr, __mode)                               \
+            atomic_store_explicit(__ptr, false, __mode)
+#define atomic_flag_clear(__ptr)                                                \
+            atomic_flag_clear_explicit(__ptr, memory_order_seq_cst)
 
 #ifdef __cplusplus
 }
