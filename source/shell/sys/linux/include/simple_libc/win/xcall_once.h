@@ -1,1 +1,0 @@
-// since vsf has implmeneted call_once, so implement a empty xcall_once.h for Windows

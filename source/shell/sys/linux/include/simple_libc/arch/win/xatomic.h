@@ -1,4 +1,4 @@
-#include "../atomic"
+#include "../../atomic"
 
 // Interlocked intrinsic mapping for _nf/_acq/_rel
 #if defined(_M_CEE_PURE) || (defined(_M_IX86) && !defined(_M_HYBRID_X86_ARM64)) \
