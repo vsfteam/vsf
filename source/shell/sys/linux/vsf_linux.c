@@ -4985,6 +4985,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_sched_vplt_t vsf_linux_sched_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(sched_setparam),
     VSF_APPLET_VPLT_ENTRY_FUNC(sched_setscheduler),
     VSF_APPLET_VPLT_ENTRY_FUNC(sched_yield),
+    VSF_APPLET_VPLT_ENTRY_FUNC(sched_getcpu),
 };
 #endif
 

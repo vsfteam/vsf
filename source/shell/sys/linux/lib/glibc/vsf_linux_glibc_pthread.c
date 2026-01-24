@@ -1153,6 +1153,12 @@ int pthread_getname_np(pthread_t tid, char *name, size_t size)
     return 0;
 }
 
+int pthread_getcpuclockid(pthread_t thread, clockid_t* clockid)
+{
+    *clockid = CLOCK_REALTIME;
+    return 0;
+}
+
 #if VSF_LINUX_APPLET_USE_PTHREAD == ENABLED && !defined(__VSF_APPLET__)
 __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_pthread_vplt_t, 0, 0, true),
@@ -1240,6 +1246,7 @@ __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_barrierattr_setpshared),
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_setname_np),
     VSF_APPLET_VPLT_ENTRY_FUNC(pthread_getname_np),
+    VSF_APPLET_VPLT_ENTRY_FUNC(pthread_getcpuclockid),
 };
 #endif
 

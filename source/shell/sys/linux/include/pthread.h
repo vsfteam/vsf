@@ -109,6 +109,8 @@ extern "C" {
 
 #define pthread_setname_np              VSF_LINUX_WRAPPER(pthread_setname_np)
 #define pthread_getname_np              VSF_LINUX_WRAPPER(pthread_getname_np)
+
+#define pthread_getcpuclockid           VSF_LINUX_WRAPPER(pthread_getcpuclockid)
 #endif
 
 // to use PTHREAD_MUTEX_INITIALIZER, __VSF_EDA_CLASS_INHERIT__ is needed or ooc is disabled
@@ -331,6 +333,7 @@ typedef struct vsf_linux_pthread_vplt_t {
 
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_setname_np);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_getname_np);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(pthread_getcpuclockid);
 } vsf_linux_pthread_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_pthread_vplt_t vsf_linux_pthread_vplt;
@@ -687,6 +690,10 @@ VSF_LINUX_APPLET_PTHREAD_IMP(pthread_getname_np, int, pthread_t thread, char *na
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_getname_np)(thread, name, size);
 }
+VSF_LINUX_APPLET_PTHREAD_IMP(pthread_getcpuclockid, int, pthread_t thread, clockid_t *clockid) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_PTHREAD_ENTRY(pthread_getcpuclockid)(thread, clockid);
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_PTHREAD
 
@@ -783,6 +790,8 @@ int pthread_barrierattr_setpshared(pthread_barrierattr_t *battr, int pshared);
 
 int pthread_setname_np(pthread_t thread, const char *name);
 int pthread_getname_np(pthread_t thread, char *name, size_t size);
+
+int pthread_getcpuclockid(pthread_t thread, clockid_t* clockid);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_PTHREAD
 
