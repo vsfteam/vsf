@@ -20,6 +20,12 @@
 #undef atomic_fetch_or_explicit
 #undef atomic_fetch_xor
 #undef atomic_fetch_xor_explicit
+#undef atomic_exchange
+#undef atomic_exchange_explicit
+#undef atomic_compare_exchange_weak
+#undef atomic_compare_exchange_weak_explicit
+#undef atomic_compare_exchange_strong
+#undef atomic_compare_exchange_strong_explicit
 
 namespace std {
     // copied from stdatomic.h
