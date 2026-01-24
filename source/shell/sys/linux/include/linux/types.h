@@ -5,10 +5,12 @@
 #include "hal/arch/vsf_arch.h"
 #include <sys/types.h>
 #include <linux/err.h>
-#include <linux/minmax.h>
+
+// TODO: linux/types.h includes TOO much, should be minimized for compatibility
+//#include <linux/minmax.h>
+//#include <linux/atomic.h>
 #include <linux/spinlock.h>
 #include <linux/gfp.h>
-#include <linux/atomic.h>
 #include <linux/printk.h>
 #include <linux/bits.h>
 #include <linux/limits.h>
