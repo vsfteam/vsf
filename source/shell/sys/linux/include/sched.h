@@ -21,6 +21,7 @@ extern "C" {
 #define sched_getscheduler          VSF_LINUX_WRAPPER(sched_getscheduler)
 #define sched_setparam              VSF_LINUX_WRAPPER(sched_setparam)
 #define sched_yield                 VSF_LINUX_WRAPPER(sched_yield)
+#define sched_getcpu                VSF_LINUX_WRAPPER(sched_getcpu)
 #endif
 
 enum {
@@ -45,6 +46,7 @@ typedef struct vsf_linux_sched_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sched_setparam);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sched_setscheduler);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sched_yield);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(sched_getcpu);
 } vsf_linux_sched_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_sched_vplt_t vsf_linux_sched_vplt;
@@ -97,6 +99,10 @@ VSF_LINUX_APPLET_SCHED_IMP(sched_yield, int, void) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_SCHED_ENTRY(sched_yield)();
 }
+VSF_LINUX_APPLET_SCHED_IMP(sched_getcpu, int, void) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_SCHED_ENTRY(sched_getcpu)();
+}
 
 #else       // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SCHED
 
@@ -107,6 +113,7 @@ int sched_getscheduler(pid_t pid);
 int sched_setparam(pid_t pid, const struct sched_param *param);
 int sched_setscheduler(pid_t pid, int policy, const struct sched_param *param);
 int sched_yield(void);
+int sched_getcpu(void);
 
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_SCHED
 

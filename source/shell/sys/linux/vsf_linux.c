@@ -3749,6 +3749,11 @@ int sched_yield(void)
     return 0;
 }
 
+int sched_getcpu(void)
+{
+    return 1;
+}
+
 // pty
 
 int openpty(int *amaster, int *aslave, char *name,
