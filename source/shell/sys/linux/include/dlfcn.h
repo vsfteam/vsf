@@ -90,6 +90,9 @@ typedef struct vsf_linux_dynloader_t {
         vsf_loader_t generic;
     } loader;
     vsf_loader_target_t target;
+
+    // vplt is usd for staitc library, and emulate dlopen/dlsym/dlclose
+    void *vplt;
 } vsf_linux_dynloader_t;
 #endif
 

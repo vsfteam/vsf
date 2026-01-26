@@ -4594,64 +4594,75 @@ void vsf_linux_loader_keep_ram(void)
 void * dlopen(const char *pathname, int mode)
 {
 #if VSF_USE_LOADER == ENABLED
-    int fd = open(pathname, 0);
-    if (fd < 0) {
-        return NULL;
-    }
+    vsf_linux_dynloader_t *linux_loader;
 
-    vsf_linux_dynloader_t *linux_loader = calloc(1, sizeof(vsf_linux_dynloader_t));
-    if (NULL == linux_loader) {
-        goto close_and_fail;
-    }
-
-    vk_file_t *file = __vsf_linux_get_fs_ex(NULL, fd);
-    void *file_direct_access;
-    if ((file != NULL) && ((file_direct_access = vk_file_direct_access(file)) != NULL)) {
-        linux_loader->target.object             = (uintptr_t)file_direct_access;
-        linux_loader->target.support_xip        = true;
-        linux_loader->target.fn_read            = vsf_loader_xip_read;
-    } else {
-        linux_loader->target.object             = (uintptr_t)fd;
-        linux_loader->target.support_xip        = false;
-        linux_loader->target.fn_read            = __vsf_linux_loader_fd_read;
-    }
-
-    linux_loader->loader.generic.heap_op    = &vsf_loader_default_heap_op;
-    linux_loader->loader.generic.vplt       = (void *)&vsf_linux_vplt;
-    linux_loader->loader.generic.alloc_vplt = __dlmalloc;
-    linux_loader->loader.generic.free_vplt  = free;
-
-    uint8_t header[16];
-    uint32_t size = vsf_loader_read(&linux_loader->target, 0, header, sizeof(header));
-    linux_loader->loader.generic.op = __vsf_linux_get_applet_loader(header, size);
-    if (NULL == linux_loader->loader.generic.op) {
-        printf("dlopen: unsupported file format\n");
-        goto close_and_fail;
-    }
-
-    vsf_linux_process_t *process = vsf_linux_get_real_process(NULL);
-    VSF_LINUX_ASSERT(process != NULL);
-    process->loader = linux_loader;
-    atexit(__vsf_linux_loader_atexit);
-    if (!vsf_loader_load(&linux_loader->loader.generic, &linux_loader->target)) {
-        vsf_loader_call_init_array(&linux_loader->loader.generic);
+#   if VSF_USE_APPLET == ENABLED && VSF_LINUX_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
+    void *vplt = vsf_vplt_link(NULL, (char *)pathname);
+    if (vplt != NULL) {
+        linux_loader = calloc(1, sizeof(vsf_linux_dynloader_t));
+        linux_loader->vplt = vplt;
         return linux_loader;
     }
+#   endif
 
-close_and_fail:
-    close(fd);
-    return NULL;
-#else
-    return NULL;
+    int fd = open(pathname, 0);
+    if (fd >= 0) {
+        linux_loader = calloc(1, sizeof(vsf_linux_dynloader_t));
+        if (NULL == linux_loader) {
+            goto close_and_fail;
+        }
+
+        vk_file_t *file = __vsf_linux_get_fs_ex(NULL, fd);
+        void *file_direct_access;
+        if ((file != NULL) && ((file_direct_access = vk_file_direct_access(file)) != NULL)) {
+            linux_loader->target.object             = (uintptr_t)file_direct_access;
+            linux_loader->target.support_xip        = true;
+            linux_loader->target.fn_read            = vsf_loader_xip_read;
+        } else {
+            linux_loader->target.object             = (uintptr_t)fd;
+            linux_loader->target.support_xip        = false;
+            linux_loader->target.fn_read            = __vsf_linux_loader_fd_read;
+        }
+
+        linux_loader->loader.generic.heap_op    = &vsf_loader_default_heap_op;
+        linux_loader->loader.generic.vplt       = (void *)&vsf_linux_vplt;
+        linux_loader->loader.generic.alloc_vplt = __dlmalloc;
+        linux_loader->loader.generic.free_vplt  = free;
+
+        uint8_t header[16];
+        uint32_t size = vsf_loader_read(&linux_loader->target, 0, header, sizeof(header));
+        linux_loader->loader.generic.op = __vsf_linux_get_applet_loader(header, size);
+        if (NULL == linux_loader->loader.generic.op) {
+            printf("dlopen: unsupported file format\n");
+            goto close_and_fail;
+        }
+
+        vsf_linux_process_t *process = vsf_linux_get_real_process(NULL);
+        VSF_LINUX_ASSERT(process != NULL);
+        process->loader = linux_loader;
+        atexit(__vsf_linux_loader_atexit);
+        if (!vsf_loader_load(&linux_loader->loader.generic, &linux_loader->target)) {
+            vsf_loader_call_init_array(&linux_loader->loader.generic);
+            return linux_loader;
+        }
+
+    close_and_fail:
+        close(fd);
+        return NULL;
+    }
 #endif
+
+    return NULL;
 }
 
 int dlclose(void *handle)
 {
 #if VSF_USE_LOADER == ENABLED
     vsf_linux_dynloader_t *linux_loader = handle;
-    vsf_loader_call_fini_array(&linux_loader->loader.generic);
-    vsf_loader_cleanup(&linux_loader->loader.generic);
+    if (NULL == linux_loader->vplt) {
+        vsf_loader_call_fini_array(&linux_loader->loader.generic);
+        vsf_loader_cleanup(&linux_loader->loader.generic);
+    }
     free(linux_loader);
     return 0;
 #else
@@ -4670,7 +4681,11 @@ void * dlsym(void *handle, const char *name)
     } else {
 #if VSF_USE_APPLET == ENABLED && VSF_LINUX_USE_APPLET == ENABLED && VSF_APPLET_CFG_LINKABLE == ENABLED
         vsf_linux_dynloader_t *linux_loader = handle;
-        vplt = (void*)linux_loader->loader.generic.vplt_out;
+        if (linux_loader->vplt != NULL) {
+            vplt = linux_loader->vplt;
+        } else {
+            vplt = (void*)linux_loader->loader.generic.vplt_out;
+        }
 #endif
     }
     if (NULL == vplt) {
