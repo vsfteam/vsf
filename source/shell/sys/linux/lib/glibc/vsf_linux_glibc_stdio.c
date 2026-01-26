@@ -136,6 +136,18 @@ int getchar(void)
     return getc(stdin);
 }
 
+FILE * fmemopen(void *buf, size_t size, const char *mode)
+{
+    VSF_LINUX_ASSERT(false);
+    return NULL;
+}
+
+FILE * open_memstream(char **ptr, size_t *size)
+{
+    VSF_LINUX_ASSERT(false);
+    return NULL;
+}
+
 FILE * fopen(const char *filename, const char *mode)
 {
     int flags = 0;

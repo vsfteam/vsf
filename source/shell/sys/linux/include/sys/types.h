@@ -50,6 +50,9 @@ extern "C" {
 #ifndef PATH_MAX
 #   define PATH_MAX         260
 #endif
+#ifndef NAME_MAX
+#   define NAME_MAX         255
+#endif
 
 #if __IS_COMPILER_IAR__
 //! begin of typedef name has already been declared (with same type)

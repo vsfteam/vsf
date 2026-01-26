@@ -201,6 +201,7 @@ typedef struct vsf_linux_libc_stdio_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vdprintf);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(vprintf);
 
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fmemopen);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fopen);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(fdopen);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(freopen);
@@ -367,6 +368,10 @@ VSF_LINUX_APPLET_LIBC_STDIO_IMP(vdprintf, int, int fd, const char *format, va_li
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(vprintf, int, const char *format, va_list ap) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
     return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(vprintf)(format, ap);
+}
+VSF_LINUX_APPLET_LIBC_STDIO_IMP(fmemopen, FILE *, void *buf, size_t size, const char *mode) {
+    VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
+    return VSF_LINUX_APPLET_LIBC_STDIO_ENTRY(fmemopen)(size, buf, mode);
 }
 VSF_LINUX_APPLET_LIBC_STDIO_IMP(fopen, FILE *, const char *filename, const char *mode) {
     VSF_APPLET_VPLT_ENTRY_FUNC_TRACE();
@@ -615,6 +620,7 @@ int vdprintf(int fd, const char *format, va_list ap);
 int fiprintf(FILE *f, const char *format, ...);
 int vprintf(const char *format, va_list ap);
 
+FILE * fmemopen(void *buf, size_t size, const char *mode);
 FILE * fopen(const char *filename, const char *mode);
 FILE * fdopen(int fildes, const char *mode);
 FILE * freopen(const char *filename, const char *mode, FILE *f);
@@ -661,6 +667,8 @@ int remove(const char *filename);
 
 FILE * tmpfile(void);
 char * tmpnam(char *str);
+
+FILE * open_memstream(char **ptr, size_t *size);
 #endif      // __VSF_APPLET__ && VSF_LINUX_APPLET_USE_LIBC_STDIO
 
 // use static inline for unlocked APIs for better compatibility

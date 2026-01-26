@@ -1985,6 +1985,7 @@ static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd,
     char pathname_local[PATH_MAX], pathname_tmp[PATH_MAX], *path_end, *pathname_dir, *cmdname = pathname_tmp;
     int exefd = -1, pathlen, pathname_dir_len;
     uint_fast32_t feature;
+    bool has_feature;
 
     // skip parameters in cmd, leave command name only
     int pos = 0;
@@ -2023,11 +2024,20 @@ static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd,
         try_open:
             exefd = open(pathname, 0);
             if (exefd >= 0) {
-                if (!vsf_linux_fd_get_feature(exefd, &feature) && (feature & VSF_FILE_ATTR_EXECUTE)) {
+                feature = 0;
+                has_feature = !vsf_linux_fd_get_feature(exefd, &feature);
+                if (has_feature && (feature & VSF_FILE_ATTR_DIRECTORY)) {
+                    // can not execute a directory
+                close_exefd_and_fail:
+                    close(exefd);
+                    exefd = -1;
+                } else if (has_feature && (feature & VSF_FILE_ATTR_EXECUTE)) {
                     if (entry != NULL) {
                         vsf_linux_fd_get_target(exefd, (void **)entry);
                     }
                     break;
+                } else if (has_feature && !(feature & VSF_FILE_ATTR_READ)) {
+                    goto close_exefd_and_fail;
                 } else {
 #if VSF_LINUX_USE_APPLET == ENABLED
                     uint8_t head[16];
@@ -2049,8 +2059,7 @@ static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd,
                     }
                     break;
 #else
-                    close(exefd);
-                    exefd = -1;
+                    goto close_exefd_and_fail;
 #endif
                 }
             }
@@ -4539,6 +4548,7 @@ char * nl_langinfo(nl_item item)
 {
     switch (item) {
     case CODESET:   return "ANSI_X3.4-1968";
+    case D_FMT:     return "%m/%d/%Y";
     default:        return NULL;
     }
 }

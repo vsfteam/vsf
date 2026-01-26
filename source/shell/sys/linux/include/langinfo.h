@@ -7,6 +7,7 @@ extern "C" {
 
 typedef enum {
     CODESET = 0,
+    D_FMT,
 } nl_item;
 
 char * nl_langinfo(nl_item item);

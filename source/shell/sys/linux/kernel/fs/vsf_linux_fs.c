@@ -959,10 +959,10 @@ vk_vfs_file_t * __vsf_linux_get_vfs(int fd)
 
 int vsf_linux_fd_get_feature(int fd, uint_fast32_t *feature)
 {
-    vk_vfs_file_t *vfs_file = __vsf_linux_get_vfs(fd);
-    if (vfs_file != NULL) {
+    vk_file_t *file = __vsf_linux_get_fs_ex(NULL, fd);
+    if (file != NULL) {
         if (feature != NULL) {
-            *feature = vfs_file->attr;
+            *feature = file->attr;
         }
         return 0;
     }

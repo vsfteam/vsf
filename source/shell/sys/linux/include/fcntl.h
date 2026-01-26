@@ -43,6 +43,7 @@ extern "C" {
 #define O_SYNC          0x2000
 #define O_ASYNC         0x4000
 #define O_NOFOLLOW      0x8000
+#define O_NOATIME       0x800000
 #define O_LARGEFILE     0
 #define O_BINARY        0
 
