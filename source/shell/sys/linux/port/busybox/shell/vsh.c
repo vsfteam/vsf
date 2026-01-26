@@ -673,6 +673,7 @@ int vsh_run_scripts(const char *scripts)
                 }
             }
         } while (line != NULL);
+        fclose(f);
     }
     return 0;
 }
