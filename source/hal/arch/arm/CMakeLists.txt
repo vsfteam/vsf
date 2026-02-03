@@ -8,6 +8,7 @@ set(ARCH_FOR_cortex-m4            armv7e-m        )
 set(ARCH_FOR_cortex-m7            armv7e-m        )
 set(ARCH_FOR_cortex-m23           armv8-m.base    )
 set(ARCH_FOR_cortex-m33           armv8-m.main+dsp)
+set(ARCH_FOR_cortex-m33f          armv8-m.main+dsp+fp)
 set(ARCH_FOR_cortex-m33+nodsp     armv8-m.main    )
 set(ARCH_FOR_cortex-r4            armv7-r         )
 # TODO support cortex-a
@@ -26,7 +27,7 @@ set(ARCH_SUB_FOR_cortex-r4        cortex-r        )
 
 
 if(ARCH_FOR_${VSF_ARCH_NAME})
-    set(ARCH_FLAG -march=${ARCH_FOR_${VSF_ARCH_NAME}})
+    set(ARCH_FLAG -march=${ARCH_FOR_${VSF_ARCH_NAME}${VSF_ARCH_EXTENSIONS}})
     set(ARCH_SUB ${ARCH_SUB_FOR_${VSF_ARCH_NAME}})
 endif()
 
