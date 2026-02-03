@@ -299,6 +299,11 @@ static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_get_lr(void)
     return result;
 }
 
+// __get_LR maybe not exists in CMSIS_CORE
+#ifndef __get_LR
+#   define __get_LR             vsf_arch_get_lr
+#endif
+
 #if VSF_ARCH_USE_THREAD_REG == ENABLED && !defined(__cplusplus)
 // for c++17, register storage class specifier is not supported
 static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_set_thread_reg(uintptr_t value)

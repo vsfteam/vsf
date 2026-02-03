@@ -37,6 +37,7 @@ if(DEFINED VSF_CONFIG_PATH)
 endif()
 
 if(DEFINED VSF_CMAKE_TARGETS)
+    message(STATUS "using target: ${VSF_CMAKE_TARGETS}")
     include(${VSF_CMAKE_TARGETS})
 else()
     include(${VSF_CMAKE_ROOT}/targets.cmake)
