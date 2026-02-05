@@ -19,7 +19,7 @@
 
 #include "shell/sys/linux/vsf_linux_cfg.h"
 
-#if VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_DRM == ENABLED
+#if VSF_USE_UI == ENABLED && VSF_USE_LINUX == ENABLED && VSF_LINUX_USE_DRM == ENABLED
 
 #define __VSF_LINUX_CLASS_INHERIT__
 #define __VSF_LINUX_FS_CLASS_INHERIT__
