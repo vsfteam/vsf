@@ -1826,28 +1826,12 @@ int vsf_linux_fs_bind_terminal_keyboard(char *path, vsf_linux_terminal_keyboard_
 #endif
 
 #if VSF_USE_UI == ENABLED
-typedef struct vsf_linux_fb_priv_t {
-    implement(vsf_linux_fs_priv_t)
-    void *front_buffer;
-#if VSF_DISP_USE_FB == ENABLED
-    uint16_t is_disp_fb : 1;
-#endif
-    uint16_t is_area_set : 1;
-    uint16_t is_refreshing : 1;
-    uint16_t is_closing : 1;
-    int16_t frame_interval_ms;
-    vk_disp_area_t area;
-    vsf_trig_t fresh_trigger;
-    vsf_teda_t fresh_task;
-    vsf_eda_t *eda_pending;
-} vsf_linux_fb_priv_t;
-
-static void __vsf_linux_disp_on_ready(vk_disp_t *disp)
+void __vsf_linux_disp_on_ready(vk_disp_t *disp)
 {
     vsf_eda_post_evt((vsf_eda_t *)disp->ui_data, VSF_EVT_USER);
 }
 
-static void __vsf_linux_disp_fresh_task(vsf_eda_t *eda, vsf_evt_t evt)
+void __vsf_linux_disp_fresh_task(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vsf_linux_fb_priv_t *fb_priv = vsf_container_of(eda, vsf_linux_fb_priv_t, fresh_task);
     vk_disp_t *disp = (vk_disp_t *)(((vk_vfs_file_t *)(fb_priv->file))->f.param);

@@ -291,8 +291,9 @@ extern int vsf_linux_fs_bind_stream(const char *pathname, vsf_stream_t *stream_r
 }
 #endif
 
-#undef __VSF_LINUX_FS_CLASS_IMPLEMENT
-#undef __VSF_LINUX_FS_CLASS_INHERIT__
+// DO NOT undefine MACROs below, because lower header will check the same MACROs to include necessary codes
+//#undef __VSF_LINUX_FS_CLASS_IMPLEMENT
+//#undef __VSF_LINUX_FS_CLASS_INHERIT__
 
 /*============================ INCLUDES ======================================*/
 

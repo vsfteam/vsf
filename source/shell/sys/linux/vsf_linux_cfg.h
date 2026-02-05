@@ -147,6 +147,10 @@
 #   define VSF_LINUX_USE_TERMINAL_KEYBOARD      ENABLED
 #endif
 
+#ifndef VSF_LINUX_USE_DRM
+#   define VSF_LINUX_USE_DRM                    ENABLED
+#endif
+
 #ifdef __WIN__
 // __VSF_LINUX_LIBC_STDIO_WRAPPER_SNPRINTF MUST be enabled on windows to avoid confliction
 #   define __VSF_LINUX_LIBC_STDIO_WRAPPER_SNPRINTF    ENABLED

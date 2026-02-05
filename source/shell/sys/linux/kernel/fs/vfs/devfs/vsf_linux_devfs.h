@@ -29,6 +29,11 @@
 // for hardware info
 #include "hal/vsf_hal.h"
 
+#if VSF_USE_UI == ENABLED && (defined(__VSF_LINUX_FS_CLASS_IMPLEMENT) || defined(__VSF_LINUX_FS_CLASS_INHERIT__))
+// for vk_disp_area_t
+#   include "component/ui/vsf_ui.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -74,6 +79,29 @@ typedef struct vsf_linux_bthci_t {
 
     void *__priv;
 } vsf_linux_bthci_t;
+#endif
+
+#if VSF_USE_UI == ENABLED && (defined(__VSF_LINUX_FS_CLASS_IMPLEMENT) || defined(__VSF_LINUX_FS_CLASS_INHERIT__))
+typedef struct vsf_linux_fb_priv_t {
+    implement(vsf_linux_fs_priv_t)
+    void *front_buffer;
+#if VSF_DISP_USE_FB == ENABLED
+    uint16_t is_disp_fb : 1;
+#endif
+    uint16_t is_area_set : 1;
+    uint16_t is_refreshing : 1;
+    uint16_t is_closing : 1;
+    uint16_t user_bits0 : 1;
+    uint16_t user_bits1 : 1;
+    uint16_t user_bits2 : 1;
+    uint16_t user_bits3 : 1;
+    uint16_t user_byte : 8;
+    int16_t frame_interval_ms;
+    vk_disp_area_t area;
+    vsf_trig_t fresh_trigger;
+    vsf_teda_t fresh_task;
+    vsf_eda_t *eda_pending;
+} vsf_linux_fb_priv_t;
 #endif
 
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -133,6 +161,10 @@ extern int vsf_linux_devfs_init(void);
 
 #if VSF_USE_USB_DEVICE == ENABLED
 #   include "./usbd/functionfs/vsf_linux_functionfs.h"
+#endif
+
+#if VSF_LINUX_USE_DRM == ENABLED
+#   include "./drm/vsf_linux_drm.h"
 #endif
 
 #endif      // VSF_USE_LINUX && VSF_LINUX_USE_DEVFS
