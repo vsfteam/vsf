@@ -6,3 +6,4 @@ vsf_add_sources(
 
 add_subdirectory(alsa)
 add_subdirectory(usbd)
+add_subdirectory(drm)
