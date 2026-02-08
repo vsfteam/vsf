@@ -169,6 +169,11 @@ vsf_err_t vsf_hal_distbus_gpio_exti_irq_disable(vsf_hal_distbus_gpio_t *gpio, vs
     return VSF_ERR_NOT_SUPPORT;
 }
 
+vsf_gpio_pin_mask_t vsf_hal_distbus_gpio_exti_irq_clear(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask)
+{
+    return 0;
+}
+
 vsf_gpio_pin_mask_t vsf_hal_distbus_gpio_get_direction(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_pin_mask_t pin_mask)
 {
     VSF_HAL_ASSERT(NULL != gpio);
@@ -292,6 +297,11 @@ void vsf_hal_distbus_gpio_output_and_clear(vsf_hal_distbus_gpio_t *gpio, vsf_gpi
     msg->header.addr = VSF_HAL_DISTBUS_GPIO_CMD_OUTPUT_AND_CLEAR;
     param->pin_mask = cpu_to_le32(pin_mask);
     vsf_distbus_send_msg(gpio->distbus, &gpio->service, msg);
+}
+
+vsf_err_t vsf_hal_distbus_gpio_ctrl(vsf_hal_distbus_gpio_t *gpio, vsf_gpio_ctrl_t ctrl, void * param)
+{
+    return VSF_ERR_NOT_SUPPORT;
 }
 
 vsf_gpio_capability_t vsf_hal_distbus_gpio_capability(vsf_hal_distbus_gpio_t *gpio)
