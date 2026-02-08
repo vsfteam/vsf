@@ -3,6 +3,8 @@
 
 #include "service/heap/vsf_heap.h"
 #include <linux/gfp.h>
+// <linux/slab.h> should include <linux/minmax.h>
+#include <linux/minmax.h>
 
 #ifdef __cplusplus
 extern "C" {
