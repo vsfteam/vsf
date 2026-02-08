@@ -326,7 +326,21 @@ vsf_linux_process_t * __vsh_prepare_process(char *cmd, int fd_in, int fd_out)
     next = &cmd[strlen(cmd) - 1];
     while (isspace((int)*next)) { *next-- = '\0'; }
 
-    vsf_linux_process_t *process = vsf_linux_create_process(0, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE, 0);
+    // if VSF_STACK_NO_INHERIT exists in environ, use VSF_STACK_NO_INHERIT as stack size and remove it
+    // else if VSF_STACK_INHERIT exists in environ, use VSF_STACK_INHERIT as stack size
+    // else use 0 as stack size which means use default
+    char *stack_size_str;
+    int stack_size;
+    if ((stack_size_str = getenv("VSF_STACK_NO_INHERIT")) != NULL) {
+        stack_size = strtoul(stack_size_str, NULL, 0);
+        unsetenv("VSF_STACK_NO_INHERIT");
+    } else if ((stack_size_str = getenv("VSF_STACK_INHERIT")) != NULL) {
+        stack_size = strtoul(stack_size_str, NULL, 0);
+    } else {
+        stack_size = 0;
+    }
+
+    vsf_linux_process_t *process = vsf_linux_create_process(stack_size, VSF_LINUX_CFG_PEOCESS_HEAP_SIZE, 0);
     if (NULL == process) { return NULL; }
 
     env[1] = NULL;
