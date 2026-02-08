@@ -309,7 +309,7 @@ struct __vsf_linux_heap_t {
 #ifndef VSF_LINUX_CFG_HEAP_ADDR
     uint8_t memory[VSF_LINUX_CFG_HEAP_SIZE];
 #endif
-    vsf_dlist_t freelist[2];
+    vsf_dlist_t __freelist[2];
 } static __vsf_linux_heap;
 #endif
 
@@ -332,18 +332,16 @@ const vsf_linux_thread_op_t __vsf_linux_main_op = {
 /*============================ IMPLEMENTATION ================================*/
 
 #if VSF_LINUX_CFG_HEAP_SIZE > 0
-static vsf_dlist_t * __vsf_linux_heap_get_freelist(vsf_heap_t *heap, uint_fast32_t size)
-{
-    return &__vsf_linux_heap.freelist[0];
-}
 
 static void __vsf_linux_heap_init(void)
 {
     memset(&__vsf_linux_heap.use_as__vsf_heap_t, 0, sizeof(__vsf_linux_heap.use_as__vsf_heap_t));
-    for (uint_fast8_t i = 0; i < dimof(__vsf_linux_heap.freelist); i++) {
-        vsf_dlist_init(&__vsf_linux_heap.freelist[i]);
+    for (uint_fast8_t i = 0; i < dimof(__vsf_linux_heap.__freelist); i++) {
+        vsf_dlist_init(&__vsf_linux_heap.__freelist[i]);
     }
-    __vsf_linux_heap.get_freelist = __vsf_linux_heap_get_freelist;
+    __vsf_linux_heap.freelist = &__vsf_linux_heap.__freelist[0];
+    __vsf_linux_heap.freelist_num = dimof(__vsf_linux_heap.__freelist);
+    __vsf_heap_init(&__vsf_linux_heap.use_as__vsf_heap_t);
 #ifndef VSF_LINUX_CFG_HEAP_ADDR
     __vsf_heap_add_buffer(&__vsf_linux_heap.use_as__vsf_heap_t, __vsf_linux_heap.memory, VSF_LINUX_CFG_HEAP_SIZE);
 #else
