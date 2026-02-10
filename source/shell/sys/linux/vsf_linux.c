@@ -2029,36 +2029,39 @@ static int __vsf_linux_get_exe_path(char *pathname, int pathname_len, char *cmd,
                 close_exefd_and_fail:
                     close(exefd);
                     exefd = -1;
-                } else if (has_feature && (feature & VSF_FILE_ATTR_EXECUTE)) {
-                    if (entry != NULL) {
-                        vsf_linux_fd_get_target(exefd, (void **)entry);
-                    }
-                    break;
-                } else if (has_feature && !(feature & VSF_FILE_ATTR_READ)) {
-                    goto close_exefd_and_fail;
                 } else {
-#if VSF_LINUX_USE_APPLET == ENABLED
-                    uint8_t head[16];
-                    ssize_t headlen = read(exefd, head, sizeof(head));
-                    lseek(exefd, 0, SEEK_SET);
-                    if (__vsf_linux_get_applet_loader(head, headlen) != NULL) {
-                        if (entry != NULL) {
-                            int __vsf_linux_dynloader_main(int argc, char **argv);
-                            *entry = __vsf_linux_dynloader_main;
-                        }
+                    // executable file with target, target is entry point
+                    if (    (has_feature && (feature & VSF_FILE_ATTR_EXECUTE))
+                        &&  (entry != NULL)
+                        &&  !vsf_linux_fd_get_target(exefd, (void **)entry)) {
                         break;
                     }
+                    // readable file, parse if it's a elf or script
+                    if (has_feature && (feature & VSF_FILE_ATTR_READ)) {
+#if VSF_LINUX_USE_APPLET == ENABLED
+                        uint8_t head[16];
+                        ssize_t headlen = read(exefd, head, sizeof(head));
+                        lseek(exefd, 0, SEEK_SET);
+                        if (__vsf_linux_get_applet_loader(head, headlen) != NULL) {
+                            if (entry != NULL) {
+                                int __vsf_linux_dynloader_main(int argc, char **argv);
+                                *entry = __vsf_linux_dynloader_main;
+                            }
+                            break;
+                        }
 #endif
 #if VSF_LINUX_USE_SCRIPT == ENABLED
-                    // do not check #!, because it's not a must
-                    if (entry != NULL) {
-                        int __vsf_linux_script_main(int argc, char **argv);
-                        *entry = __vsf_linux_script_main;
-                    }
-                    break;
+                        // do not check #!, because it's not a must
+                        if (entry != NULL) {
+                            int __vsf_linux_script_main(int argc, char **argv);
+                            *entry = __vsf_linux_script_main;
+                        }
+                        break;
 #else
-                    goto close_exefd_and_fail;
+                        goto close_exefd_and_fail;
 #endif
+                    }
+                    goto close_exefd_and_fail;
                 }
             }
         }
