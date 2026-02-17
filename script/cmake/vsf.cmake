@@ -157,16 +157,45 @@ else()
     endif()
 
     if(VSF_APPLET_SUFFIX STREQUAL ".bc")
-        # use llvm-link to generate target .bc file
-        set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-            LINKER_LANGUAGE C
-            RULE_LAUNCH_LINK "${CMAKE_COMMAND} -E echo 'Using llvm-link for bitcode merging...'"
-        )
-        
+        # CMake script to link LLVM bitcode files (replaces Python dependency)
+        set(LLVM_LINK_SCRIPT ${CMAKE_BINARY_DIR}/llvm_link_bc.cmake)
+        file(WRITE ${LLVM_LINK_SCRIPT} [=[
+# LLVM bitcode linker script
+# Arguments: LLVM_LINK, OUTPUT, OBJECTS, OBJECTS_FILE
+
+if(NOT OBJECTS)
+    message(FATAL_ERROR "No objects found")
+endif()
+
+# Remove potential surrounding quotes from OBJECTS
+string(REGEX REPLACE "^\"(.*)\"$" "\\1" OBJECTS "${OBJECTS}")
+
+# Convert semicolon-separated list to newline-separated file content
+string(REPLACE ";" "\n" FILE_CONTENT "${OBJECTS}")
+file(WRITE "${OBJECTS_FILE}" "${FILE_CONTENT}\n")
+
+# Execute llvm-link with response file
+execute_process(
+    COMMAND ${LLVM_LINK} -o "${OUTPUT}" "@${OBJECTS_FILE}"
+    RESULT_VARIABLE LINK_RESULT
+)
+
+# Clean up temporary file
+file(REMOVE "${OBJECTS_FILE}")
+
+if(LINK_RESULT)
+    message(FATAL_ERROR "llvm-link failed with error code: ${LINK_RESULT}")
+endif()
+]=])
         add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E echo "Merging bitcode files..."
-            COMMAND ${LLVM_LINK} -o $<TARGET_FILE:${CMAKE_PROJECT_NAME}> $<TARGET_OBJECTS:${CMAKE_PROJECT_NAME}>
-            COMMENT "Linking LLVM bitcode files into ${CMAKE_PROJECT_NAME}.bc"
+            COMMAND ${CMAKE_COMMAND} -E echo "Linking bitcode..."
+            COMMAND ${CMAKE_COMMAND}
+                -DLLVM_LINK=${LLVM_LINK}
+                -DOUTPUT=$<TARGET_FILE:${CMAKE_PROJECT_NAME}>
+                -DOBJECTS=$<TARGET_OBJECTS:${CMAKE_PROJECT_NAME}>
+                -DOBJECTS_FILE=${CMAKE_BINARY_DIR}/${CMAKE_PROJECT_NAME}.bc.files
+                -P ${LLVM_LINK_SCRIPT}
+            COMMENT "Linking LLVM bitcode files"
             VERBATIM
         )
     else()
