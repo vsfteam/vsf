@@ -146,10 +146,33 @@ else()
 #        ${VSF_SRC_PATH}/shell/sys/linux/lib/vsf_linux_applet_lib.c
 #    )
 
-    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-        SUFFIX ".elf"
-    )
-    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
-    )
+    if(VSF_APPLET_SUFFIX)
+        set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+            SUFFIX ${VSF_APPLET_SUFFIX}
+        )
+    else()
+        set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+            SUFFIX ".elf"
+        )
+    endif()
+
+    if(VSF_APPLET_SUFFIX STREQUAL ".bc")
+        # use llvm-link to generate target .bc file
+        set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+            LINKER_LANGUAGE C
+            RULE_LAUNCH_LINK "${CMAKE_COMMAND} -E echo 'Using llvm-link for bitcode merging...'"
+        )
+        
+        add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E echo "Merging bitcode files..."
+            COMMAND ${LLVM_LINK} -o $<TARGET_FILE:${CMAKE_PROJECT_NAME}> $<TARGET_OBJECTS:${CMAKE_PROJECT_NAME}>
+            COMMENT "Linking LLVM bitcode files into ${CMAKE_PROJECT_NAME}.bc"
+            VERBATIM
+        )
+    else()
+        # none bitcode target, show size
+        add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+            COMMAND ${CMAKE_SIZE} $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
+        )
+    endif()
 endif()
