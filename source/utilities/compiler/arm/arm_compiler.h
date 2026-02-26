@@ -135,6 +135,7 @@ extern "C" {
                                         _Pragma(__VSF_STR(weak __ORIGIN=__ALIAS))
 #   define VSF_CAL_PACKED               __attribute__((packed))
 #   define VSF_CAL_UNALIGNED            __packed
+#   define VSF_CAL_NAKED                __naked
 #   define VSF_CAL_TRANSPARENT_UNION    __attribute__((transparent_union))
 #   define __VSF_CAL_ALIGN_OF(...)      __ALIGNOF__(__VA_ARGS__)
 
@@ -160,6 +161,7 @@ extern "C" {
 
 #   define VSF_CAL_PACKED               __attribute__((packed))
 #   define VSF_CAL_UNALIGNED            __packed
+#   define VSF_CAL_NAKED                does AC5 support this?
 #   define VSF_CAL_TRANSPARENT_UNION    __attribute__((transparent_union))
 #   define __VSF_CAL_ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
@@ -183,6 +185,7 @@ extern "C" {
 
 #   define VSF_CAL_PACKED               __attribute__((packed))
 #   define VSF_CAL_UNALIGNED            __unaligned
+#   define VSF_CAL_NAKED                __attribute__((naked))
 #   define VSF_CAL_TRANSPARENT_UNION    __attribute__((transparent_union))
 #   define __VSF_CAL_ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 

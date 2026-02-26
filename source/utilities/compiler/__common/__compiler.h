@@ -118,6 +118,7 @@ extern "C" {
 #   define VSF_CAL_PACKED               __attribute__((__packed__))
 //#   define VSF_CAL_UNALIGNED            __attribute__((packed))
 #   undef VSF_CAL_UNALIGNED                                             //! llvm doesn't support this
+#   define VSF_CAL_NAKED                __attribute__((naked))
 #   define VSF_CAL_TRANSPARENT_UNION    __attribute__((__transparent_union__))
 #   define __VSF_CAL_ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
@@ -148,6 +149,7 @@ extern "C" {
 #   define VSF_CAL_PACKED               __attribute__((packed))
 //#   define VSF_CAL_UNALIGNED            __attribute__((packed))
 #   undef VSF_CAL_UNALIGNED                                             //! gcc doesn't support this
+#   define VSF_CAL_NAKED                __attribute__((naked))
 #   define VSF_CAL_TRANSPARENT_UNION    __attribute__((transparent_union))
 #   define __VSF_CAL_ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
@@ -171,6 +173,7 @@ extern "C" {
 
 #   define VSF_CAL_PACKED               __attribute__((packed))
 #   define VSF_CAL_UNALIGNED            __attribute__((packed))
+#   define VSF_CAL_NAKED                __attribute__((naked))
 #   define VSF_CAL_TRANSPARENT_UNION    __attribute__((transparent_union))
 #   define __VSF_CAL_ALIGN_OF(...)      __alignof__(__VA_ARGS__)
 
