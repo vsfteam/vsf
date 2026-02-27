@@ -323,6 +323,7 @@ static VSF_CAL_ALWAYS_INLINE uintptr_t vsf_arch_get_thread_reg(void)
 
 #if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
 extern void vsf_arch_add_text_region(vsf_arch_text_region_t *region);
+extern void vsf_arch_remove_text_region(vsf_arch_text_region_t *region);
 extern uint_fast16_t vsf_arch_get_callstack(uintptr_t sp, uintptr_t *callstack, uint_fast16_t callstack_num);
 #endif
 

@@ -149,6 +149,10 @@ int vsf_elfloader_arch_link(vsf_elfloader_t *elfloader, char *symname, Elf_Addr 
 
 void vsf_elfloader_cleanup(vsf_elfloader_t *elfloader)
 {
+#if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
+    vsf_arch_remove_text_region(&elfloader->arch_text_region);
+#endif
+
     elfloader->target = NULL;
     vsf_elfloader_arch_fini_plt(elfloader);
     if (elfloader->ram_base != NULL) {
@@ -278,11 +282,6 @@ static bool __vsf_elfloader_is_vaddr_loaded(vsf_elfloader_t *elfloader, Elf_Addr
 
 void * vsf_elfloader_remap(vsf_elfloader_t *elfloader, void *vaddr)
 {
-    if (elfloader->is_got) {
-        // got need no remap
-        return vaddr;
-    }
-
     void * realptr = NULL;
     if (__vsf_elfloader_is_vaddr_loaded(elfloader, (Elf_Addr)vaddr)) {
         realptr = (void *)((uintptr_t)elfloader->ram_base + (uintptr_t)vaddr - elfloader->ram_base_vaddr);
@@ -623,6 +622,14 @@ second_round_for_ram_base:
         elfloader->static_base = (uint8_t *)elfloader->static_base + header.sh_addr - elfloader->ram_base_vaddr;
         elfloader->is_got = true;
     }
+
+#if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
+    if (vsf_elfloader_get_section(elfloader, target, ".text", &header) > 0) {
+        elfloader->arch_text_region.start = (uintptr_t)vsf_elfloader_remap(elfloader, (void *)header.sh_addr);
+        elfloader->arch_text_region.size = header.sh_size;
+        vsf_arch_add_text_region(&elfloader->arch_text_region);
+    }
+#endif
 
     elfloader->entry = elfloader->is_xip ?
                         (void *)(target->object + linfo.entry_offset_in_file)

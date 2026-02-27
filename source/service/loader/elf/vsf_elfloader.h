@@ -49,6 +49,9 @@
 #   include "./elf.h"
 #endif
 
+// for VSF_ARCH_CFG_CALLSTACK_TRACE and vsf_arch_text_region_t
+#include "hal/arch/vsf_arch_abstraction.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -64,6 +67,9 @@ vsf_class(vsf_elfloader_t) {
 
     protected_member(
         void *arch_data;
+#if VSF_ARCH_CFG_CALLSTACK_TRACE == ENABLED
+        vsf_arch_text_region_t arch_text_region;
+#endif
     )
 
     private_member(

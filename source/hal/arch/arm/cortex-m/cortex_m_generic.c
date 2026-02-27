@@ -589,6 +589,18 @@ void vsf_arch_add_text_region(vsf_arch_text_region_t *region)
     text_region->next = region;
 }
 
+void vsf_arch_remove_text_region(vsf_arch_text_region_t *region)
+{
+    vsf_arch_text_region_t *text_region = &__vsf_cm.text_region;
+    while (text_region != NULL) {
+        if (text_region->next == region) {
+            text_region->next = region->next;
+            break;
+        }
+        text_region = text_region->next;
+    }
+}
+
 uint_fast16_t vsf_arch_get_callstack(uintptr_t sp, uintptr_t *callstack, uint_fast16_t callstack_num)
 {
     uint32_t pc;
