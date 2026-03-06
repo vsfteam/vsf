@@ -144,6 +144,11 @@ void vsf_systimer_low_level_int_enable(void)
 #endif
 }
 
+bool vsf_systimer_low_level_check_pending(void)
+{
+    return __vsf_mcs51.tf0;
+}
+
 void vsf_systimer_set_reload_value(vsf_systimer_tick_t tick_cnt)
 {
     __vsf_mcs51.systimer_reload = 0x10000 - tick_cnt;

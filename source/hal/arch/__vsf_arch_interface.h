@@ -98,6 +98,18 @@ extern void vsf_systimer_reset_counter_value(void);
 extern void vsf_systimer_clear_int_pending_bit(void);
 extern vsf_systimer_tick_t vsf_systimer_get_tick_elapsed(void);
 
+/*! \brief check whether a systimer overflow is pending without stopping the timer
+ *!
+ *! \Note  This is a read-only check with no side effects on the timer state.
+ *!        It checks the overflow/interrupt pending flag of the underlying timer
+ *!        hardware without disabling the timer or clearing any flags.
+ *!
+ *! \param none
+ *! \retval true  overflow is pending (timer has wrapped but ISR hasn't run)
+ *! \retval false no overflow is pending
+ */
+extern bool vsf_systimer_low_level_check_pending(void);
+
 /*-------------------------------------------*
  * APIs to be used by target arch            *
  *-------------------------------------------*/

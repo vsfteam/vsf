@@ -210,6 +210,11 @@ void vsf_systimer_low_level_int_enable(void)
     vsf_systick_int_enable();
 }
 
+bool vsf_systimer_low_level_check_pending(void)
+{
+    return !!(SCB->ICSR & SCB_ICSR_PENDSTSET_Msk);
+}
+
 void vsf_systimer_set_reload_value(vsf_systimer_tick_t tick_cnt)
 {
     vsf_systick_set_reload((uint32_t)tick_cnt);

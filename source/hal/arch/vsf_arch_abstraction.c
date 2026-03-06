@@ -642,20 +642,6 @@ static bool __vsf_systimer_disabled(void)
     return pending;
 }
 
-static void __vsf_systimer_set_status(bool status)
-{
-    if (status) {
-        __vsf_systimer_enabled();
-    } else {
-        __vsf_systimer_disabled();
-    }
-}
-
-static bool __vsf_systimer_get_status(void)
-{
-    return __systimer.enabled;
-}
-
 
 
 static vsf_systimer_tick_t __vsf_systimer_update(void)
@@ -679,7 +665,16 @@ static bool __vsf_systimer_set_target(vsf_systimer_tick_t tick_cnt)
     {
         vsf_gint_state_t gint_state = vsf_disable_interrupt();
             __vsf_systimer_disabled();
-            __systimer.base = __systimer.tick;
+
+            /* compensate elapsed time from __vsf_systimer_update() to now.
+             * check pending before clearing it - if overflow happened in between,
+             * we need to add reload to the compensation.
+             */
+            vsf_systimer_tick_t elapsed = vsf_systimer_get_tick_elapsed();
+            if (vsf_systimer_low_level_check_pending()) {
+                elapsed += __systimer.reload;
+            }
+            __systimer.base = __systimer.tick + elapsed;
 
             __systimer.reload = tick_cnt;
             vsf_systimer_set_reload_value(tick_cnt);
@@ -773,40 +768,25 @@ vsf_systimer_tick_t vsf_systimer_get(void)
     {
         vsf_arch_prio_t gint_state = vsf_disable_interrupt();
             ticks = __systimer.base;
-            /* compensate a pending systimer overflow event as the global interrupt
-             * handling is masked
+
+            /* read elapsed first, then check for pending overflow.
+             * the timer is NOT stopped, so it keeps counting throughout.
+             * with interrupts disabled, the ISR cannot update base.
              */
-            bool status = __vsf_systimer_get_status();
-            if (__vsf_systimer_disabled()) {
+            elapsed = vsf_systimer_get_tick_elapsed();
+
+            if (vsf_systimer_low_level_check_pending()) {
+                /* overflow happened but ISR hasn't run (interrupts disabled).
+                 * compensate by adding reload value, and re-read elapsed
+                 * since the counter has wrapped around.
+                 */
                 ticks += __systimer.reload;
+                elapsed = vsf_systimer_get_tick_elapsed();
             }
 
-            /* get the elapsed tick count in the current counting loop */
-            elapsed = vsf_systimer_get_tick_elapsed();
             ticks += elapsed;
-            __vsf_systimer_set_status(status);
 
-            /* in some corner case where the systimer overflow event handler
-             * cannot be handled while the timer keeps running for more than one
-             * rounds, the ticks might be smaller than then previous value
-             */
             if (ticks < __ticks_prev) {
-                /* This patch is used to prevent the output result is not
-                 * monotonically increasing.
-                 *
-                 * Normally, this condition should not occur. But in some rare
-                 * cases, two or more unrelated tasks may submit the same
-                 * delay-request within a very short period of time. It has
-                 * nothing to do with the length of the delay-request, but
-                 * the interval between their submitted requests will the
-                 * SystTick Reload value. When the interval is determine
-                 * extremely small, it may actually occur that the system has
-                 * overflowed many times before the processor responds to the
-                 * SysTick Exception. In this case circumstances, the current
-                 * Tick (i.e. ticks) value may be smaller than the previous
-                 * Tick (i.e __ticks_prev) value.
-                 * This patch is a workaround for this situation.
-                 */
                 ticks = __ticks_prev + 1;
             }
             __ticks_prev = ticks;
