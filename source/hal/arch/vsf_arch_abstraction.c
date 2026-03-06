@@ -664,17 +664,17 @@ static bool __vsf_systimer_set_target(vsf_systimer_tick_t tick_cnt)
 
     {
         vsf_gint_state_t gint_state = vsf_disable_interrupt();
-            __vsf_systimer_disabled();
-
-            /* compensate elapsed time from __vsf_systimer_update() to now.
-             * check pending before clearing it - if overflow happened in between,
-             * we need to add reload to the compensation.
+            /* stop the timer; if an overflow is pending, compensate base.
+             * then absorb the remaining elapsed into base before resetting
+             * the counter, so that no time is lost between the last
+             * vsf_systimer_get() call and the counter reset.
              */
+            bool pending = __vsf_systimer_disabled();
             vsf_systimer_tick_t elapsed = vsf_systimer_get_tick_elapsed();
-            if (vsf_systimer_low_level_check_pending()) {
+            if (pending) {
                 elapsed += __systimer.reload;
             }
-            __systimer.base = __systimer.tick + elapsed;
+            __systimer.base += elapsed;
 
             __systimer.reload = tick_cnt;
             vsf_systimer_set_reload_value(tick_cnt);
@@ -710,7 +710,11 @@ void vsf_systimer_ovf_evt_handler(void)
             __systimer.base += __systimer.reload;
 
             tick = __vsf_systimer_update();
-            __vsf_systimer_disabled();
+            /* Do NOT stop the timer here. Let it keep running so that time is
+             * not lost during kernel event processing. The timer will be
+             * reprogrammed (stopped & restarted) in __vsf_systimer_set_target()
+             * when the kernel calls vsf_systimer_set() for the next due timer.
+             */
         vsf_set_interrupt(gint_state);
     }
 
