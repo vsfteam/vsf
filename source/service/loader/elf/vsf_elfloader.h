@@ -37,6 +37,9 @@
 
 #include <stdint.h>
 
+// for VSF_ARCH_CFG_CALLSTACK_TRACE and vsf_arch_text_region_t
+#include "hal/arch/vsf_arch_abstraction.h"
+
 #if     defined(__VSF_ELFLOADER_CLASS_IMPLEMENT)
 #   define __VSF_CLASS_IMPLEMENT__
 #elif   defined(__VSF_ELFLOADER_CLASS_INHERIT__)
@@ -48,9 +51,6 @@
 #if defined(__VSF_ELFLOADER_CLASS_INHERIT__) || defined(__VSF_ELFLOADER_CLASS_IMPLEMENT)
 #   include "./elf.h"
 #endif
-
-// for VSF_ARCH_CFG_CALLSTACK_TRACE and vsf_arch_text_region_t
-#include "hal/arch/vsf_arch_abstraction.h"
 
 #ifdef __cplusplus
 extern "C" {
