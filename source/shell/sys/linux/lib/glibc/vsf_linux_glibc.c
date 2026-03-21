@@ -80,6 +80,14 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_setjmp_vplt_t vsf_linux_libc_setjmp_vplt =
 #       define __fpclassifyd        __iar_FPclassify
 #       define __fpclassifyf        __iar_FPclassifyf
 #       define __fpclassifyld       __iar_FPclassifyl
+#   else
+#       if defined(__NEWLIB__) || defined(__PICOLIBC__)
+#       else
+#           define __fpclassifyd    __fpclassify
+#       endif
+#       if LDBL_MANT_DIG == DBL_MANT_DIG
+#           define __fpclassifyld   __fpclassifyd
+#       endif
 #   endif
 
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vplt = {
