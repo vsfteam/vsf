@@ -80,9 +80,26 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_setjmp_vplt_t vsf_linux_libc_setjmp_vplt =
 #       define __fpclassifyd        __iar_FPclassify
 #       define __fpclassifyf        __iar_FPclassifyf
 #       define __fpclassifyld       __iar_FPclassifyl
+#   elif defined(__has_builtin) && __has_builtin(__builtin_fpclassify)
+static inline int __fpclassifyf(float x) {
+    return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, x);
+}
+
+static inline int __fpclassifyd(double x) {
+    return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, x);
+}
+
+static inline int __fpclassifyld(long double x) {
+    return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, x);
+}
 #   else
 #       if defined(__NEWLIB__) || defined(__PICOLIBC__)
+//          newlib, picolib: default is __fpclassifyd
+#       elif defined(__GLIBC__)
+//          glibc: default is __fpclassify
+#           define __fpclassifyd    __fpclassify
 #       else
+//          musl, uclibc, bionic: default is __fpclassify
 #           define __fpclassifyd    __fpclassify
 #       endif
 #       if LDBL_MANT_DIG == DBL_MANT_DIG
