@@ -81,17 +81,20 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_setjmp_vplt_t vsf_linux_libc_setjmp_vplt =
 #       define __fpclassifyf        __iar_FPclassifyf
 #       define __fpclassifyld       __iar_FPclassifyl
 #   elif defined(__has_builtin) && __has_builtin(__builtin_fpclassify)
-static inline int __fpclassifyf(float x) {
+static inline int __builtin_fpclassifyf(float x) {
     return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, x);
 }
 
-static inline int __fpclassifyd(double x) {
+static inline int __builtin_fpclassifyd(double x) {
     return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, x);
 }
 
-static inline int __fpclassifyld(long double x) {
+static inline int __builtin_fpclassifyld(long double x) {
     return __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, x);
 }
+#       define __fpclassifyf        __builtin_fpclassifyf
+#       define __fpclassifyd        __builtin_fpclassifyd
+#       define __fpclassifyld       __builtin_fpclassifyld
 #   else
 #       if defined(__NEWLIB__) || defined(__PICOLIBC__)
 //          newlib, picolib: default is __fpclassifyd
