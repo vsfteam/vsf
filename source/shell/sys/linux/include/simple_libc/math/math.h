@@ -199,6 +199,10 @@ typedef struct vsf_linux_libc_math_vplt_t {
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(acosl);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(asinl);
     VSF_APPLET_VPLT_ENTRY_FUNC_DEF(log10l);
+
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__fpclassifyd);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__fpclassifyf);
+    VSF_APPLET_VPLT_ENTRY_FUNC_DEF(__fpclassifyld);
 } vsf_linux_libc_math_vplt_t;
 #   ifndef __VSF_APPLET__
 extern __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vplt;

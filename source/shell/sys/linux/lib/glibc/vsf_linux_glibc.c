@@ -75,6 +75,13 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_setjmp_vplt_t vsf_linux_libc_setjmp_vplt =
 #endif
 
 #if VSF_LINUX_APPLET_USE_LIBC_MATH == ENABLED && !defined(__VSF_APPLET__)
+
+#   if __IS_COMPILER_IAR__
+#       define __fpclassifyd        __iar_FPclassify
+#       define __fpclassifyf        __iar_FPclassifyf
+#       define __fpclassifyld       __iar_FPclassifyl
+#   endif
+
 __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vplt = {
     VSF_APPLET_VPLT_INFO(vsf_linux_libc_math_vplt_t, 0, 0, true),
 
@@ -254,6 +261,19 @@ __VSF_VPLT_DECORATOR__ vsf_linux_libc_math_vplt_t vsf_linux_libc_math_vplt = {
     VSF_APPLET_VPLT_ENTRY_FUNC(acosl),
     VSF_APPLET_VPLT_ENTRY_FUNC(asinl),
 #endif
+
+    .fn___fpclassifyd = {
+        .name = "__fpclassifyd",
+        .ptr = (void *)(__fpclassifyd),
+    },
+    .fn___fpclassifyf = {
+        .name = "__fpclassifyf",
+        .ptr = (void *)(__fpclassifyf),
+    },
+    .fn___fpclassifyld = {
+        .name = "__fpclassifyld",
+        .ptr = (void *)(__fpclassifyld),
+    },
 };
 #endif
 
