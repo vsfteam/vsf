@@ -6584,6 +6584,16 @@
 	)
 	(wire
 		(pts
+			(xy 266.7 54.61) (xy 270.51 54.61)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b58916cf-c890-46b7-b216-3d5c21e0bac9")
+	)
+	(wire
+		(pts
 			(xy 213.36 27.94) (xy 228.6 27.94)
 		)
 		(stroke
@@ -7271,6 +7281,16 @@
 			(justify left bottom)
 		)
 		(uuid "55f35fab-a679-43d1-bf44-6372fca90c2b")
+	)
+	(label "RST"
+		(at 266.7 54.61 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5a13218b-e9ef-4f46-9213-fdb0a83d3585")
 	)
 	(label "USB5V_USART"
 		(at 248.92 29.21 0)
@@ -8345,6 +8365,73 @@
 			(project "vsf_ac6321a"
 				(path "/b1f641fc-4d4b-41df-b1cf-71a1edbad872"
 					(reference "Q4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 262.89 54.61 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "2a037bc2-a0ac-4aab-8c6f-f8a729184e1c")
+		(property "Reference" "R12"
+			(at 262.89 52.578 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "2.2K"
+			(at 262.89 54.61 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+			(at 262.89 52.832 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 262.89 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 262.89 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "74d8e356-1cfc-4cd1-a1d2-1d03e1307eab")
+		)
+		(pin "2"
+			(uuid "29ce817a-1c4c-4608-b39f-90f19d3a948e")
+		)
+		(instances
+			(project "vsf_ac6321a"
+				(path "/b1f641fc-4d4b-41df-b1cf-71a1edbad872"
+					(reference "R12")
 					(unit 1)
 				)
 			)
