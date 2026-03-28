@@ -65,10 +65,7 @@ vsf_class(vk_musb_fdrc_dcd_t) {
     )
 
     private_member(
-        vk_musb_fdrc_reg_t *reg;
-#if defined(VSF_MUSB_FDRC_NO_EP_IDX) || defined(VSF_MUSB_FDRC_NO_HWFIFO)
-        vk_musb_fdrc_reg_t __reg;
-#endif
+        vk_musb_fdrc_reg_t reg;
 
         struct {
             usb_dc_evthandler_t evthandler;
