@@ -514,6 +514,7 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->reset_port != NULL)) {
                 delay_ms = dwcotg_hcd->workaround->reset_port(dwcotg_hcd->workaround_param);
             }
+            vsf_teda_cancel_timer();
             vsf_teda_set_timer_ms(delay_ms);
         } else if (hprt0 & USB_OTG_HPRT_PRST) {
             *reg->host.hprt0 &= ~(USB_OTG_HPRT_PRST | USB_OTG_HPRT_W1C_MASK);
@@ -530,6 +531,7 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->enable_port != NULL)) {
                 delay_ms = dwcotg_hcd->workaround->enable_port(dwcotg_hcd->workaround_param, dwcotg_hcd->speed);
             }
+            vsf_teda_cancel_timer();
             vsf_teda_set_timer_ms(delay_ms);
         } else if (NULL == dwcotg_hcd->dev) {
             // cast-align from gcc
@@ -557,6 +559,7 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->reset_port_prepare != NULL)) {
             uint_fast32_t delay_ms = dwcotg_hcd->workaround->reset_port_prepare(dwcotg_hcd->workaround_param);
             if (delay_ms > 0) {
+                vsf_teda_cancel_timer();
                 vsf_teda_set_timer_ms(delay_ms);
                 break;
             }
