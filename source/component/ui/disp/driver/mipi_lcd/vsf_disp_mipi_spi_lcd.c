@@ -31,25 +31,25 @@
 
 /*============================ MACROS ========================================*/
 
-#ifndef MIPI_LCD_SPI_ARCH_PRIO
-#   define MIPI_LCD_SPI_ARCH_PRIO                       vsf_arch_prio_1
+#ifndef VSF_DISP_MIPI_SPI_LCD_ARCH_PRIO
+#   define VSF_DISP_MIPI_SPI_LCD_ARCH_PRIO              vsf_arch_prio_1
 #endif
 
-#ifndef MIPI_LCD_SPI_CFG
+#ifndef VSF_DISP_MIPI_SPI_LCD_CFG
 #   if VSF_DISP_MIPI_LCD_SPI_MODE == VSF_DISP_MIPI_LCD_SPI_8BITS_MODE
-#       define MIPI_LCD_SPI_CFG_DATA_SIZE               VSF_SPI_DATASIZE_8
+#       define VSF_DISP_MIPI_SPI_LCD_CFG_DATA_SIZE      VSF_SPI_DATASIZE_8
 #   elif VSF_DISP_MIPI_LCD_SPI_MODE == VSF_DISP_MIPI_LCD_SPI_9BITS_MODE
-#       define MIPI_LCD_SPI_CFG_DATA_SIZE               VSF_SPI_DATASIZE_9
+#       define VSF_DISP_MIPI_SPI_LCD_CFG_DATA_SIZE      VSF_SPI_DATASIZE_9
 #   endif
-#   define MIPI_LCD_SPI_CFG     (VSF_SPI_MASTER | VSF_SPI_MODE_3 | VSF_SPI_MSB_FIRST | MIPI_LCD_SPI_CFG_DATA_SIZE | VSF_SPI_CS_SOFTWARE_MODE)
+#   define VSF_DISP_MIPI_SPI_LCD_CFG    (VSF_SPI_MASTER | VSF_SPI_MODE_3 | VSF_SPI_MSB_FIRST | VSF_DISP_MIPI_SPI_LCD_CFG_DATA_SIZE | VSF_SPI_CS_SOFTWARE_MODE)
 #endif
 
-#ifndef MIPI_LCD_RESET_LOW_PULSE_TIME
-#   define MIPI_LCD_RESET_LOW_PULSE_TIME                1       // Reset low pulse width 1ms
+#ifndef VSF_DISP_MIPI_SPI_LCD_RESET_LOW_PULSE_TIME
+#   define VSF_DISP_MIPI_SPI_LCD_RESET_LOW_PULSE_TIME  1       // Reset low pulse width 1ms
 #endif
 
-#ifndef MIPI_LCD_RESET_COMPLETION_TIME
-#   define MIPI_LCD_RESET_COMPLETION_TIME               120     // Reset completion time
+#ifndef VSF_DISP_MIPI_SPI_LCD_RESET_COMPLETION_TIME
+#   define VSF_DISP_MIPI_SPI_LCD_RESET_COMPLETION_TIME  120     // Reset completion time
 #endif
 
 #ifndef VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET
@@ -57,6 +57,25 @@
 #endif
 
 #define __MIPI_LCD_BUFFER_TYPE                          0xFF
+
+#ifndef VSF_DISP_MIPI_SPI_LCD_CFG_TRACE_DEBUG
+#   define VSF_DISP_MIPI_SPI_LCD_CFG_TRACE_DEBUG        DISABLED  /* ENABLED: vsf_trace_debug for seq/init/refresh */
+#endif
+#ifndef VSF_DISP_MIPI_SPI_LCD_CFG_TRACE_ERROR
+#   define VSF_DISP_MIPI_SPI_LCD_CFG_TRACE_ERROR        DISABLED  /* ENABLED: vsf_trace_error for seq/area */
+#endif
+
+#if (VSF_DISP_MIPI_SPI_LCD_CFG_TRACE_DEBUG == ENABLED)
+#   define __vsf_disp_mipi_spi_lcd_trace_debug(...)     vsf_trace_debug(__VA_ARGS__)
+#else
+#   define __vsf_disp_mipi_spi_lcd_trace_debug(...)
+#endif
+
+#if (VSF_DISP_MIPI_SPI_LCD_CFG_TRACE_ERROR == ENABLED)
+#   define __vsf_disp_mipi_spi_lcd_trace_error(...)     vsf_trace_error(__VA_ARGS__)
+#else
+#   define __vsf_disp_mipi_spi_lcd_trace_error(...)
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
@@ -141,12 +160,13 @@ void vsf_disp_mipi_spi_lcd_io_init(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
     vsf_gpio_cfg_t cfg = {
         .mode = VSF_GPIO_PULL_UP | VSF_GPIO_OUTPUT_PUSH_PULL,
     };
+#if VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
     vsf_gpio_port_config_pins(disp_mipi_spi_lcd->reset.gpio,
                         disp_mipi_spi_lcd->reset.pin_mask,
                         &cfg);
     vsf_gpio_set_output(disp_mipi_spi_lcd->reset.gpio,
                         disp_mipi_spi_lcd->reset.pin_mask);
-
+#endif
     vsf_gpio_port_config_pins(disp_mipi_spi_lcd->dcx.gpio,
                         disp_mipi_spi_lcd->dcx.pin_mask,
                         &cfg);
@@ -155,14 +175,37 @@ void vsf_disp_mipi_spi_lcd_io_init(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
 #endif
 }
 
+VSF_CAL_WEAK(vsf_disp_mipi_spi_lcd_cs_active)
+void vsf_disp_mipi_spi_lcd_cs_active(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
+{
+    vsf_spi_cs_active(disp_mipi_spi_lcd->spi, VSF_DISP_MIPI_SPI_LCD_CFG_CS_INDEX);
+}
+
+VSF_CAL_WEAK(vsf_disp_mipi_spi_lcd_cs_inactive)
+void vsf_disp_mipi_spi_lcd_cs_inactive(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
+{
+    vsf_spi_cs_inactive(disp_mipi_spi_lcd->spi, VSF_DISP_MIPI_SPI_LCD_CFG_CS_INDEX);
+}
+
 static bool __lcd_get_next_command(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
 {
     VSF_UI_ASSERT(disp_mipi_spi_lcd != NULL);
 
     const uint8_t *command_seq = disp_mipi_spi_lcd->seq.buf;
     uint16_t cur_cnt = disp_mipi_spi_lcd->seq.cur_cnt;
+    uint16_t max_cnt = disp_mipi_spi_lcd->seq.max_cnt;
 
-    if (cur_cnt >= disp_mipi_spi_lcd->seq.max_cnt) {
+    if (cur_cnt >= max_cnt) {
+        __vsf_disp_mipi_spi_lcd_trace_debug("mipi_lcd seq: cur_cnt=%u >= max_cnt=%u, no more command\r\n",
+                        (unsigned)cur_cnt, (unsigned)max_cnt);
+        return false;
+    }
+
+    /* need at least 2 bytes: cmd + param_size */
+    if (cur_cnt + 2 > max_cnt) {
+        __vsf_disp_mipi_spi_lcd_trace_error("mipi_lcd seq: cur_cnt=%u max_cnt=%u, not enough for cmd+param_size\r\n",
+                        (unsigned)cur_cnt, (unsigned)max_cnt);
+        VSF_UI_ASSERT(false);
         return false;
     }
 
@@ -172,10 +215,38 @@ static bool __lcd_get_next_command(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
     if (disp_mipi_spi_lcd->cmd.param_size != __MIPI_LCD_BUFFER_TYPE) {
         disp_mipi_spi_lcd->cmd.param_buffer  = (disp_mipi_spi_lcd->cmd.param_size == 0) ? NULL : (void *)&command_seq[cur_cnt + 2];
         disp_mipi_spi_lcd->seq.cur_cnt += 2 + disp_mipi_spi_lcd->cmd.param_size;
+        __vsf_disp_mipi_spi_lcd_trace_debug("mipi_lcd seq: cur_cnt=%u cmd=0x%02X param_size=%u next_cur=%u max_cnt=%u\r\n",
+                        (unsigned)cur_cnt, disp_mipi_spi_lcd->cmd.cmd,
+                        (unsigned)disp_mipi_spi_lcd->cmd.param_size,
+                        (unsigned)disp_mipi_spi_lcd->seq.cur_cnt, (unsigned)max_cnt);
+        if (disp_mipi_spi_lcd->seq.cur_cnt > max_cnt) {
+            __vsf_disp_mipi_spi_lcd_trace_error("mipi_lcd seq: next_cur_cnt %u > max_cnt %u (overflow)\r\n",
+                            (unsigned)disp_mipi_spi_lcd->seq.cur_cnt, (unsigned)max_cnt);
+            VSF_UI_ASSERT(false);
+            return false;
+        }
     } else {
+        /* buffer type: need 2 + 4 (size) + 4 (ptr) = 10 bytes */
+        if (cur_cnt + 10 > max_cnt) {
+            __vsf_disp_mipi_spi_lcd_trace_error("mipi_lcd seq: cur_cnt=%u max_cnt=%u, not enough for buffer type (need 10)\r\n",
+                            (unsigned)cur_cnt, (unsigned)max_cnt);
+            VSF_UI_ASSERT(false);
+            return false;
+        }
         disp_mipi_spi_lcd->cmd.param_size    = get_unaligned_cpu32(&command_seq[cur_cnt + 2]);
         disp_mipi_spi_lcd->cmd.param_buffer  = (void *)get_unaligned_cpu32(&command_seq[cur_cnt + 6]);
         disp_mipi_spi_lcd->seq.cur_cnt += 2 + 8;
+        __vsf_disp_mipi_spi_lcd_trace_debug("mipi_lcd seq: cur_cnt=%u cmd=0x%02X buffer_type size=%u ptr=%p next_cur=%u max_cnt=%u\r\n",
+                        (unsigned)cur_cnt, disp_mipi_spi_lcd->cmd.cmd,
+                        (unsigned)disp_mipi_spi_lcd->cmd.param_size,
+                        disp_mipi_spi_lcd->cmd.param_buffer,
+                        (unsigned)disp_mipi_spi_lcd->seq.cur_cnt, (unsigned)max_cnt);
+        if (disp_mipi_spi_lcd->seq.cur_cnt > max_cnt) {
+            __vsf_disp_mipi_spi_lcd_trace_error("mipi_lcd seq: next_cur_cnt %u > max_cnt %u (buffer type overflow)\r\n",
+                            (unsigned)disp_mipi_spi_lcd->seq.cur_cnt, (unsigned)max_cnt);
+            VSF_UI_ASSERT(false);
+            return false;
+        }
     }
 
     return true;
@@ -183,9 +254,12 @@ static bool __lcd_get_next_command(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
 
 static vsf_err_t __lcd_spi_request_cmd(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
 {
-    vsf_spi_cs_active(disp_mipi_spi_lcd->spi, 0);
+    vsf_disp_mipi_spi_lcd_cs_active(disp_mipi_spi_lcd);
     vsf_disp_mipi_spi_lcd_dcx_io_write(disp_mipi_spi_lcd, false);
-    return vsf_spi_request_transfer(disp_mipi_spi_lcd->spi, &disp_mipi_spi_lcd->cmd.cmd, NULL, 1);
+    vsf_err_t err = vsf_spi_request_transfer(disp_mipi_spi_lcd->spi, &disp_mipi_spi_lcd->cmd.cmd, NULL, 1);
+    __vsf_disp_mipi_spi_lcd_trace_debug("mipi_lcd req_cmd: cmd=0x%02X err=%d\r\n",
+                                        disp_mipi_spi_lcd->cmd.cmd, err);
+    return err;
 }
 
 static vsf_err_t __lcd_start_cmdseq(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd,
@@ -195,11 +269,20 @@ static vsf_err_t __lcd_start_cmdseq(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd,
     VSF_UI_ASSERT(disp_mipi_spi_lcd != NULL);
     VSF_UI_ASSERT(NULL == disp_mipi_spi_lcd->seq.buf);
 
+    __vsf_disp_mipi_spi_lcd_trace_debug("mipi_lcd seq start: %s buf=%p max_cnt=%u\r\n",
+                    (buf == disp_mipi_spi_lcd->init_seq) ? "init_seq" : "cmdseq",
+                    (void *)buf, (unsigned)max_cnt);
+
     disp_mipi_spi_lcd->seq.buf = buf;
     disp_mipi_spi_lcd->seq.max_cnt = max_cnt;
     disp_mipi_spi_lcd->seq.cur_cnt = 0;
 
     bool valid = __lcd_get_next_command(disp_mipi_spi_lcd);
+    if (!valid) {
+        __vsf_disp_mipi_spi_lcd_trace_error("mipi_lcd seq start: __lcd_get_next_command failed (buf=%p max_cnt=%u)\r\n",
+                        (void *)buf, (unsigned)max_cnt);
+        VSF_UI_ASSERT(false);
+    }
     VSF_UI_ASSERT(valid);
 
     return __lcd_spi_request_cmd(disp_mipi_spi_lcd);
@@ -211,20 +294,36 @@ static void __mipi_lcd_spi_req_cpl_handler(void *target_ptr,
 {
     if (irq_mask & VSF_SPI_IRQ_MASK_CPL) {
         vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd = (vk_disp_mipi_spi_lcd_t *)target_ptr;
-
+        __vsf_disp_mipi_spi_lcd_trace_debug(
+            "mipi_lcd cpl: spi=%p cmd=0x%02X param_size=%u cur=%u max=%u\r\n",
+            spi_ptr,
+            disp_mipi_spi_lcd->cmd.cmd,
+            (unsigned)disp_mipi_spi_lcd->cmd.param_size,
+            (unsigned)disp_mipi_spi_lcd->seq.cur_cnt,
+            (unsigned)disp_mipi_spi_lcd->seq.max_cnt);
         if (disp_mipi_spi_lcd->cmd.param_size > 0) {
+            uint16_t param_size = disp_mipi_spi_lcd->cmd.param_size;
             vsf_disp_mipi_spi_lcd_dcx_io_write(disp_mipi_spi_lcd, true);
-            vsf_spi_request_transfer(disp_mipi_spi_lcd->spi,
-                                            disp_mipi_spi_lcd->cmd.param_buffer, NULL,
-                                            disp_mipi_spi_lcd->cmd.param_size);
+            vsf_err_t err = vsf_spi_request_transfer(disp_mipi_spi_lcd->spi,
+                                            disp_mipi_spi_lcd->cmd.param_buffer, NULL, param_size);
+            __vsf_disp_mipi_spi_lcd_trace_debug(
+                "mipi_lcd cpl: send params size=%u err=%d\r\n",
+                (unsigned)param_size, err);
             disp_mipi_spi_lcd->cmd.param_size = 0;
         } else {
-            vsf_spi_cs_inactive(disp_mipi_spi_lcd->spi, 0);
-
+            vsf_disp_mipi_spi_lcd_cs_inactive(disp_mipi_spi_lcd);
+            __vsf_disp_mipi_spi_lcd_trace_debug("mipi_lcd cpl: cs_inactive, next command\r\n");
             if (!__lcd_get_next_command(disp_mipi_spi_lcd)) {
+                __vsf_disp_mipi_spi_lcd_trace_debug("mipi_lcd seq: command sequence done, post VSF_EVT_MESSAGE\r\n");
                 disp_mipi_spi_lcd->seq.buf = NULL;
                 vsf_eda_post_evt(&disp_mipi_spi_lcd->teda.use_as__vsf_eda_t, VSF_EVT_MESSAGE);
             } else {
+                __vsf_disp_mipi_spi_lcd_trace_debug(
+                    "mipi_lcd cpl: continue cmd=0x%02X param_size=%u cur=%u/%u\r\n",
+                    disp_mipi_spi_lcd->cmd.cmd,
+                    (unsigned)disp_mipi_spi_lcd->cmd.param_size,
+                    (unsigned)disp_mipi_spi_lcd->seq.cur_cnt,
+                    (unsigned)disp_mipi_spi_lcd->seq.max_cnt);
                 __lcd_spi_request_cmd(disp_mipi_spi_lcd);
             }
         }
@@ -238,12 +337,12 @@ static vsf_err_t __mipi_lcd_spi_init(vk_disp_mipi_spi_lcd_t * disp_mipi_spi_lcd)
     VSF_UI_ASSERT(disp_mipi_spi_lcd->spi != NULL);
 
     vsf_spi_cfg_t spi_cfg = {
-        .mode = MIPI_LCD_SPI_CFG,
+        .mode = VSF_DISP_MIPI_SPI_LCD_CFG,
         .clock_hz = disp_mipi_spi_lcd->clock_hz,
         .isr = {
             .handler_fn = __mipi_lcd_spi_req_cpl_handler,
             .target_ptr = disp_mipi_spi_lcd,
-            .prio = MIPI_LCD_SPI_ARCH_PRIO,
+            .prio = VSF_DISP_MIPI_SPI_LCD_ARCH_PRIO,
         }
     };
 
@@ -272,7 +371,7 @@ static void __lcd_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
 #if VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
         vk_disp_mipi_spi_lcd_hw_reset_io_write(disp_mipi_spi_lcd, false);
         vsf_eda_set_user_value(LCD_STATE_HW_RESET);
-        vsf_teda_set_timer_ms(MIPI_LCD_RESET_LOW_PULSE_TIME);
+        vsf_teda_set_timer_ms(VSF_DISP_MIPI_SPI_LCD_RESET_LOW_PULSE_TIME);
 #else
         vsf_eda_set_user_value(LCD_STATE_EXIT_SLEEP_MODE_DONE);
         __lcd_start_cmdseq(disp_mipi_spi_lcd, __exit_sleep_mode_seq, sizeof(__exit_sleep_mode_seq));
@@ -283,7 +382,7 @@ static void __lcd_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
         switch (state) {
         case LCD_STATE_EXIT_SLEEP_MODE_DONE:
             vsf_eda_set_user_value(LCD_STATE_INIT_SEQ);
-            vsf_teda_set_timer_ms(MIPI_LCD_RESET_COMPLETION_TIME);
+            vsf_teda_set_timer_ms(VSF_DISP_MIPI_SPI_LCD_RESET_COMPLETION_TIME);
             break;
         case LCD_STATE_INIT_SEQ_DONE:
             vsf_eda_set_user_value(LCD_STATE_REFRESH);
@@ -300,17 +399,22 @@ static void __lcd_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
         case LCD_STATE_HW_RESET:
             vk_disp_mipi_spi_lcd_hw_reset_io_write(disp_mipi_spi_lcd, true);
             vsf_eda_set_user_value(LCD_STATE_HW_RESET_DONE);
-            vsf_teda_set_timer_ms(MIPI_LCD_RESET_COMPLETION_TIME);
+            vsf_teda_set_timer_ms(VSF_DISP_MIPI_SPI_LCD_RESET_COMPLETION_TIME);
             break;
         case LCD_STATE_HW_RESET_DONE:
             vsf_eda_set_user_value(LCD_STATE_EXIT_SLEEP_MODE_DONE);
             __lcd_start_cmdseq(disp_mipi_spi_lcd, __exit_sleep_mode_seq, sizeof(__exit_sleep_mode_seq));
             break;
 #endif
-        case LCD_STATE_INIT_SEQ:
+        case LCD_STATE_INIT_SEQ: {
+            const uint8_t *init_seq = disp_mipi_spi_lcd->init_seq;
+            uint16_t init_len = disp_mipi_spi_lcd->init_seq_len;
+            __vsf_disp_mipi_spi_lcd_trace_debug("mipi_lcd init_seq start: init_seq=%p init_seq_len=%u\r\n",
+                            (void *)init_seq, (unsigned)init_len);
             vsf_eda_set_user_value(LCD_STATE_INIT_SEQ_DONE);
-            __lcd_start_cmdseq(disp_mipi_spi_lcd, disp_mipi_spi_lcd->init_seq, disp_mipi_spi_lcd->init_seq_len);
+            __lcd_start_cmdseq(disp_mipi_spi_lcd, init_seq, init_len);
             break;
+        }
         }
         break;
     case VSF_EVT_REFRESH:
@@ -320,10 +424,10 @@ static void __lcd_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
         }
         // fall through
     case VSF_EVT_REFRESHING: {
-            uint16_t x_start = disp_mipi_spi_lcd->area.pos.x;
-            uint16_t x_end   = disp_mipi_spi_lcd->area.pos.x + disp_mipi_spi_lcd->area.size.x - 1;
-            uint16_t y_start = disp_mipi_spi_lcd->area.pos.y;
-            uint16_t y_end   = disp_mipi_spi_lcd->area.pos.y + disp_mipi_spi_lcd->area.size.y - 1;
+            uint16_t x_start = disp_mipi_spi_lcd->area.pos.x + (uint16_t)VSF_DISP_MIPI_SPI_LCD_CFG_X_OFFSET;
+            uint16_t x_end   = disp_mipi_spi_lcd->area.pos.x + disp_mipi_spi_lcd->area.size.x - 1 + (uint16_t)VSF_DISP_MIPI_SPI_LCD_CFG_X_OFFSET;
+            uint16_t y_start = disp_mipi_spi_lcd->area.pos.y + (uint16_t)VSF_DISP_MIPI_SPI_LCD_CFG_Y_OFFSET;
+            uint16_t y_end   = disp_mipi_spi_lcd->area.pos.y + disp_mipi_spi_lcd->area.size.y - 1 + (uint16_t)VSF_DISP_MIPI_SPI_LCD_CFG_Y_OFFSET;
             uint32_t size    = disp_mipi_spi_lcd->area.size.x * disp_mipi_spi_lcd->area.size.y * 2;
             uint32_t address = (uint32_t)disp_mipi_spi_lcd->cur_buffer;
             uint8_t  seq[] = {
@@ -335,6 +439,11 @@ static void __lcd_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
             put_unaligned_cpu32(address, &seq[6 + 6 + 2 + 4]);
 
             memcpy(disp_mipi_spi_lcd->refresh_seq, seq, sizeof(seq));
+
+            __vsf_disp_mipi_spi_lcd_trace_debug("mipi_lcd refresh_seq: len=%u x=[%u,%u] y=[%u,%u] size=%u addr=%p\r\n",
+                            (unsigned)sizeof(disp_mipi_spi_lcd->refresh_seq),
+                            (unsigned)x_start, (unsigned)x_end, (unsigned)y_start, (unsigned)y_end,
+                            (unsigned)size, (void *)address);
 
             __lcd_start_cmdseq(disp_mipi_spi_lcd,
                                  disp_mipi_spi_lcd->refresh_seq,
@@ -397,7 +506,7 @@ static vsf_err_t __lcd_refresh(vk_disp_t *pthis,
 
     if (   (area->pos.x + area->size.x > disp_mipi_spi_lcd->param.width)
         || (area->pos.y + area->size.y > disp_mipi_spi_lcd->param.height)) {
-        vsf_trace_error("disp area [%d,%d], [%d,%d] out of bounds\r\n",
+        __vsf_disp_mipi_spi_lcd_trace_error("disp area [%d,%d], [%d,%d] out of bounds\r\n",
                     area->pos.x, area->pos.y, area->size.x, area->size.y);
         VSF_UI_ASSERT(false);
         return VSF_ERR_INVALID_RANGE;
