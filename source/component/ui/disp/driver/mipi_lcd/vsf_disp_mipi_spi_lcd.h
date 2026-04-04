@@ -59,6 +59,19 @@ extern "C" {
 #   define  VSF_DISP_MIPI_SPI_LCD_SPI_MODE                  VSF_DISP_MIPI_SPI_LCD_SPI_8BITS_MODE
 #endif
 
+/** \brief SPI CS index used by default weak cs_active/cs_inactive (e.g. 0 for NSS0). Override weak functions for GPIO CS. */
+#ifndef VSF_DISP_MIPI_SPI_LCD_CFG_CS_INDEX
+#   define VSF_DISP_MIPI_SPI_LCD_CFG_CS_INDEX               0
+#endif
+
+/** \brief Panel column/row offset for CASET/RASET (e.g. ST7735 80x160: x=26, y=1). Undef = 0. */
+#ifndef VSF_DISP_MIPI_SPI_LCD_CFG_X_OFFSET
+#   define VSF_DISP_MIPI_SPI_LCD_CFG_X_OFFSET               0
+#endif
+#ifndef VSF_DISP_MIPI_SPI_LCD_CFG_Y_OFFSET
+#   define VSF_DISP_MIPI_SPI_LCD_CFG_Y_OFFSET               0
+#endif
+
 #if     (VSF_DISP_MIPI_SPI_LCD_SPI_MODE != VSF_DISP_MIPI_SPI_LCD_SPI_8BITS_MODE)\
     &&  (VSF_DISP_MIPI_SPI_LCD_SPI_MODE != VSF_DISP_MIPI_SPI_LCD_SPI_9BITS_MODE)
 #   error "vsf_disp_mipi_spi_lcd: error spi mode"
@@ -161,7 +174,13 @@ vsf_class(vk_disp_mipi_spi_lcd_t) {
         struct {
             vsf_gpio_t * gpio;
             uint32_t     pin_mask;
-        } reset, dcx;
+        } dcx;
+#if VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
+        struct {
+            vsf_gpio_t * gpio;
+            uint32_t     pin_mask;
+        } reset;
+#endif
 #endif
     )
 
@@ -192,6 +211,13 @@ vsf_class(vk_disp_mipi_spi_lcd_t) {
 extern const vk_disp_drv_t vk_disp_drv_mipi_spi_lcd;
 
 /*============================ PROTOTYPES ====================================*/
+
+/**
+ * \brief Chip-select control (weak, override for GPIO CS or custom index).
+ * Default implementation uses vsf_spi_cs_active/inactive with VSF_DISP_MIPI_SPI_LCD_CFG_CS_INDEX.
+ */
+extern void vsf_disp_mipi_spi_lcd_cs_active(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd);
+extern void vsf_disp_mipi_spi_lcd_cs_inactive(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd);
 
 // return true if TE is not supported, or return false and call vsf_disp_mipi_te_line_ready when TE is ready
 extern bool vsf_disp_mipi_spi_lcd_wait_te_line_ready(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd);
