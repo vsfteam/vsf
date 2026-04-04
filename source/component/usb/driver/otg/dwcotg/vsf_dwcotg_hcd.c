@@ -811,7 +811,7 @@ static uint_fast16_t __vk_dwcotg_hcd_get_frame_number(vk_usbh_hcd_t *hcd)
 {
     vk_dwcotg_hcd_t *dwcotg_hcd = hcd->priv;
     vk_dwcotg_reg_t *reg = &dwcotg_hcd->reg;
-    return reg->host.global_regs->hfnum & 0xFFFF;
+    return reg->host.global_regs->hfnum & 0x7FF;
 }
 
 static vk_usbh_hcd_urb_t * __vk_dwcotg_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
