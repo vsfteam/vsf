@@ -39,6 +39,11 @@ static const vk_usbh_dev_id_t __vk_usbh_nspro_id_table[] = {
         .match_ifs_class = true,
         .bInterfaceClass = USB_CLASS_HID,
     },
+    {
+        VSF_USBH_MATCH_VID_PID(0x0F0D, 0x00C1)
+        .match_ifs_class = true,
+        .bInterfaceClass = USB_CLASS_HID,
+    },
 };
 
 /*============================ PROTOTYPES ====================================*/
@@ -229,29 +234,16 @@ static void __vk_usbh_nspro_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
 {
     vk_usbh_nspro_t *nspro = (vk_usbh_nspro_t *)vsf_container_of(eda, vk_usbh_hid_teda_t, use_as__vsf_teda_t);
 
-    switch (evt) {
-    case VSF_EVT_INIT: {
-            vk_usbh_ep0_t *ep0 = nspro->ep0;
-            vk_usbh_urb_t *urb = &ep0->urb;
+    if (evt == VSF_EVT_INIT) {
+        vk_usbh_ep0_t *ep0 = nspro->ep0;
+        vk_usbh_urb_t *urb = &ep0->urb;
 
-            vk_usbh_urb_free_buffer(urb);
-            vk_usbh_hid_set_idle(nspro, 0, 0);
-        }
-        break;
-    case VSF_EVT_MESSAGE: {
-            vk_usbh_urb_t urb = { .urb_hcd = vsf_eda_get_cur_msg() };
-            vk_usbh_pipe_t pipe;
-
-            pipe = vk_usbh_urb_get_pipe(&urb);
-            if (USB_ENDPOINT_XFER_CONTROL == pipe.type) {
-                nspro->start_state = VSF_USBH_NSPRO_GET_INFO;
-                __vsf_eda_crit_npb_leave(&nspro->dev->ep0.crit);
-                vk_usbh_hid_recv_report(&nspro->use_as__vk_usbh_hid_teda_t, NULL, 64, __vk_usbh_nspro_int_complete);
+        vk_usbh_urb_free_buffer(urb);
+        nspro->start_state = VSF_USBH_NSPRO_GET_INFO;
+        __vsf_eda_crit_npb_leave(&nspro->dev->ep0.crit);
+        vk_usbh_hid_recv_report(&nspro->use_as__vk_usbh_hid_teda_t, NULL, 64, __vk_usbh_nspro_int_complete);
 // no need to send GET_CONNECTION_STATUS command now, controller will send it on startup
-//                __vk_usbh_nspro_send_cmd(nspro, 1);
-            }
-        }
-        break;
+//        __vk_usbh_nspro_send_cmd(nspro, 1);
     }
 }
 
