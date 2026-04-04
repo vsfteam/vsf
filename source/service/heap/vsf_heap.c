@@ -300,8 +300,15 @@ static void * __vsf_heap_mcb_malloc(vsf_heap_t *heap, vsf_heap_mcb_t *mcb,
             unaligned_size = alignment;
             goto fix_alignment;
         } else {
-            // split mcb
+            // split mcb: remove from old freelist (using current/old size),
+            //  update size, then re-add to the correct freelist for the new
+            //  smaller size. Without this, the remainder stays in a freelist
+            //  bucket for its old (larger) size, which causes is_allocated()
+            //  and remove_from_freelist() to target the wrong bucket later,
+            //  leading to cross-freelist pointer corruption and self-loops.
+            __vsf_heap_mcb_remove_from_freelist(heap, mcb);
             temp_size = mcb->linear.next = margin_size >> VSF_HEAP_CFG_MCB_ALIGN_BIT;
+            __vsf_heap_mcb_add_to_freelist(heap, mcb);
         }
 
         __vsf_heap_mcb_init(heap, mcb_new);
