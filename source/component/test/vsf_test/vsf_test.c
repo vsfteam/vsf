@@ -56,6 +56,21 @@
 
 static vsf_test_t __vsf_test;
 
+/*============================ LOCAL FUNCTIONS ===============================*/
+
+static void __vsf_test_data_sync(vsf_test_data_t *data, vsf_test_data_cmd_t cmd)
+{
+    if (data == NULL) {
+        __VSF_TEST_TRACE_ERROR("[TEST] Warning: data is NULL in __vsf_test_data_sync\r\n");
+        return;
+    }
+    if (data->sync == NULL) {
+        __VSF_TEST_TRACE_ERROR("[TEST] Warning: data->sync is NULL in __vsf_test_data_sync (cmd=%u)\r\n", cmd);
+        return;
+    }
+    data->sync(data, cmd);
+}
+
 /*============================ IMPLEMENTATION ================================*/
 
 void vsf_test_init(const vsf_test_cfg_t *cfg)
@@ -237,13 +252,13 @@ void vsf_test_reboot(vsf_test_result_t result,
     __VSF_TEST_TRACE_ERROR("[TEST] Reboot due to error: %s:%u in %s() - %s\r\n",
                           file_name, line, function_name, condition ? condition : "");
 
-    data->sync(data, VSF_TEST_TESTCASE_RESULT_WRITE);
+    __vsf_test_data_sync(data, VSF_TEST_TESTCASE_RESULT_WRITE);
 
     data->status = VSF_TEST_STATUS_IDLE;
-    data->sync(data, VSF_TEST_STATUS_WRITE);
+    __vsf_test_data_sync(data, VSF_TEST_STATUS_WRITE);
 
     data->idx++;
-    data->sync(data, VSF_TEST_TESTCASE_INDEX_WRITE);
+    __vsf_test_data_sync(data, VSF_TEST_TESTCASE_INDEX_WRITE);
 
     if (__vsf_test.reboot.external != NULL) {
         __VSF_TEST_TRACE_INFO("[TEST] Calling external reboot\r\n");
@@ -285,10 +300,10 @@ void vsf_test_run_tests(void)
     // 如果设置了完成时重启，重置索引为0
     if (__vsf_test.restart_on_done) {
         data->idx = 0;
-        data->sync(data, VSF_TEST_TESTCASE_INDEX_WRITE);
+        __vsf_test_data_sync(data, VSF_TEST_TESTCASE_INDEX_WRITE);
         __VSF_TEST_TRACE_INFO("[TEST] Restart on done: starting from test case #0\r\n");
     } else {
-        data->sync(data, VSF_TEST_TESTCASE_INDEX_READ);
+        __vsf_test_data_sync(data, VSF_TEST_TESTCASE_INDEX_READ);
         if (data->idx > 0) {
             __VSF_TEST_TRACE_INFO("[TEST] Resuming from test case #%u\r\n", data->idx);
         }
@@ -298,20 +313,20 @@ void vsf_test_run_tests(void)
         if (data->idx >= __vsf_test.test_case_count) {
             break;
         }
-        data->sync(data, VSF_TEST_TESTCASE_INDEX_WRITE);
+        __vsf_test_data_sync(data, VSF_TEST_TESTCASE_INDEX_WRITE);
         vsf_test_case_t *test_case = &__vsf_test.test_case_array[data->idx];
 
-        data->sync(data, VSF_TEST_STATUS_READ);
+        __vsf_test_data_sync(data, VSF_TEST_STATUS_READ);
         // After powering up, we first check if it was reset before.
         if (data->status != VSF_TEST_STATUS_IDLE) {
             // last testing start and wdt timeout
             __VSF_TEST_TRACE_INFO("[TEST] #%u: WDT timeout detected\r\n", data->idx);
             data->result = test_case->expect_wdt ? VSF_TEST_RESULT_WDT_PASS
                                                  : VSF_TEST_RESULT_WDT_FAIL;
-            data->sync(data, VSF_TEST_TESTCASE_RESULT_WRITE);
+            __vsf_test_data_sync(data, VSF_TEST_TESTCASE_RESULT_WRITE);
 
             data->status = VSF_TEST_STATUS_IDLE;
-            data->sync(data, VSF_TEST_STATUS_WRITE);
+            __vsf_test_data_sync(data, VSF_TEST_STATUS_WRITE);
             data->idx++;
 
             continue;
@@ -326,11 +341,11 @@ void vsf_test_run_tests(void)
 
         if (test_case->cfg_str != NULL) {
             data->request_str = test_case->cfg_str;
-            data->sync(data, VSF_TEST_TESECASE_REQUEST_WRITE);
+            __vsf_test_data_sync(data, VSF_TEST_TESECASE_REQUEST_WRITE);
             if (data->req_continue == VSF_TEST_REQ_NO_SUPPORT) {
                 __VSF_TEST_TRACE_INFO("[TEST] #%u: Not supported, skipping\r\n", data->idx);
                 data->result = VSF_TEST_RESULT_SKIP;
-                data->sync(data, VSF_TEST_TESTCASE_RESULT_WRITE);
+                __vsf_test_data_sync(data, VSF_TEST_TESTCASE_RESULT_WRITE);
                 data->idx++;
                 continue;
             }
@@ -343,7 +358,7 @@ void vsf_test_run_tests(void)
 
         // first test, IDLE -> RUNNING
         data->status = VSF_TEST_STATUS_RUNNING;
-        data->sync(data, VSF_TEST_STATUS_WRITE);
+        __vsf_test_data_sync(data, VSF_TEST_STATUS_WRITE);
 
         // 提取测试用例名称（从 cfg_str 中）
         static char name_buf[64];
@@ -381,9 +396,9 @@ void vsf_test_run_tests(void)
             break;
         }
 
-        data->sync(data, VSF_TEST_TESTCASE_RESULT_WRITE);
+        __vsf_test_data_sync(data, VSF_TEST_TESTCASE_RESULT_WRITE);
         data->status = VSF_TEST_STATUS_IDLE;
-        data->sync(data, VSF_TEST_STATUS_WRITE);
+        __vsf_test_data_sync(data, VSF_TEST_STATUS_WRITE);
         data->idx++;
     }
 
@@ -400,7 +415,7 @@ void vsf_test_run_tests(void)
     for (uint32_t i = 0; i < __vsf_test.test_case_count; i++) {
         // 从持久化存储中读取该测试用例的结果
         data->idx = i;
-        data->sync(data, VSF_TEST_TESTCASE_INDEX_READ);
+        __vsf_test_data_sync(data, VSF_TEST_TESTCASE_INDEX_READ);
 
         // 读取该测试用例的结果（文件存储实现会根据 idx 返回对应的结果）
         vsf_test_result_t result = (vsf_test_result_t)data->result;
@@ -454,7 +469,7 @@ void vsf_test_run_tests(void)
     __VSF_TEST_TRACE_INFO("[TEST] WDT_FAIL:    %u\r\n", wdt_fail_count);
     __VSF_TEST_TRACE_INFO("[TEST] ====================================\r\n");
 
-    data->sync(data, VSF_TEST_DONE);
+    __vsf_test_data_sync(data, VSF_TEST_DONE);
 
     while (1) {
         if (__vsf_test.wdt.internal.feed != NULL) {
