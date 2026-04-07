@@ -123,11 +123,8 @@ VSF全称是Versaloon Software Framework，是一个基于Apache2.0协议的开�
 | lvgl              | source/component/3rd-party/lvgl/raw/lvgl                      | MIT        | https://lvgl.io/                                   |
 | lv_lib_freetype   | source/component/3rd-party/lvgl/extension/lv_lib_freetype/raw | MIT        | https://lvgl.io/                                   |
 | CMSIS             | source/utilities/compiler/arm/3rd-party/CMSIS                 | Apache 2.0 | https://github.com/ARM-software/CMSIS_5            |
-| evm               | source/component/3rd-party/evm/raw                            | Apache 2.0 | https://github.com/scriptiot/evm                   |
-| LingLongGUI       | source/component/3rd-party/LingLongGUI/raw                    | Apache 2.0 | https://gitee.com/gzbkey/LingLongGUI               |
 | PLOOC             | source/utilities/3rd-party/PLOOC/raw                          | Apache 2.0 | https://github.com/GorgonMeducer/PLOOC             |
 | mbedtls           | source/component/3rd-party/mbedtls/raw                        | Apache 2.0 | https://tls.mbed.org/                              |
-| GuiLite           | source/component/3rd-party/GuiLite/raw                        | Apache 2.0 | https://github.com/idea4good/GuiLite               |
 | Segger_RTT        | source/component/3rd-party/segger/raw/RTT                     | segger     | https://wiki.segger.com/RTT                        |
 | Segger_SystemView | source/component/3rd-party/segger/raw/SystemView              | segger     | https://wiki.segger.com/SystemView                 |
 | nuconsole         | source/component/3rd-party/nuconsole/raw                      | nuvoton    | https://www.nuvoton.com.cn/                        |
