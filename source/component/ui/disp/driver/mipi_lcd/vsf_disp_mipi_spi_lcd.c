@@ -36,9 +36,9 @@
 #endif
 
 #ifndef VSF_DISP_MIPI_SPI_LCD_CFG
-#   if VSF_DISP_MIPI_LCD_SPI_MODE == VSF_DISP_MIPI_LCD_SPI_8BITS_MODE
+#   if VSF_DISP_MIPI_SPI_LCD_SPI_MODE == VSF_DISP_MIPI_SPI_LCD_SPI_8BITS_MODE
 #       define VSF_DISP_MIPI_SPI_LCD_CFG_DATA_SIZE      VSF_SPI_DATASIZE_8
-#   elif VSF_DISP_MIPI_LCD_SPI_MODE == VSF_DISP_MIPI_LCD_SPI_9BITS_MODE
+#   elif VSF_DISP_MIPI_SPI_LCD_SPI_MODE == VSF_DISP_MIPI_SPI_LCD_SPI_9BITS_MODE
 #       define VSF_DISP_MIPI_SPI_LCD_CFG_DATA_SIZE      VSF_SPI_DATASIZE_9
 #   endif
 #   define VSF_DISP_MIPI_SPI_LCD_CFG    (VSF_SPI_MASTER | VSF_SPI_MODE_3 | VSF_SPI_MSB_FIRST | VSF_DISP_MIPI_SPI_LCD_CFG_DATA_SIZE | VSF_SPI_CS_SOFTWARE_MODE)
@@ -52,8 +52,8 @@
 #   define VSF_DISP_MIPI_SPI_LCD_RESET_COMPLETION_TIME  120     // Reset completion time
 #endif
 
-#ifndef VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET
-#   define VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET     DISABLED
+#ifndef VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET
+#   define VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET DISABLED
 #endif
 
 #define __MIPI_LCD_BUFFER_TYPE                          0xFF
@@ -87,7 +87,7 @@ enum {
 };
 
 enum {
-#if VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
+#if VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
     LCD_STATE_HW_RESET,
     LCD_STATE_HW_RESET_DONE,
 #endif
@@ -131,7 +131,7 @@ bool vsf_disp_mipi_spi_lcd_wait_te_line_ready(vk_disp_mipi_spi_lcd_t *disp_mipi_
     return true;
 }
 
-#if VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
+#if VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
 VSF_CAL_WEAK(vk_disp_mipi_spi_lcd_hw_reset_io_write)
 void vk_disp_mipi_spi_lcd_hw_reset_io_write(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd, bool level)
 {
@@ -160,7 +160,7 @@ void vsf_disp_mipi_spi_lcd_io_init(vk_disp_mipi_spi_lcd_t *disp_mipi_spi_lcd)
     vsf_gpio_cfg_t cfg = {
         .mode = VSF_GPIO_PULL_UP | VSF_GPIO_OUTPUT_PUSH_PULL,
     };
-#if VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
+#if VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
     vsf_gpio_port_config_pins(disp_mipi_spi_lcd->reset.gpio,
                         disp_mipi_spi_lcd->reset.pin_mask,
                         &cfg);
@@ -368,7 +368,7 @@ static void __lcd_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
 
     switch (evt) {
     case VSF_EVT_INIT:
-#if VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
+#if VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
         vk_disp_mipi_spi_lcd_hw_reset_io_write(disp_mipi_spi_lcd, false);
         vsf_eda_set_user_value(LCD_STATE_HW_RESET);
         vsf_teda_set_timer_ms(VSF_DISP_MIPI_SPI_LCD_RESET_LOW_PULSE_TIME);
@@ -395,7 +395,7 @@ static void __lcd_evthandler(vsf_eda_t *teda, vsf_evt_t evt)
 
     case VSF_EVT_TIMER:
         switch (state) {
-#if VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
+#if VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
         case LCD_STATE_HW_RESET:
             vk_disp_mipi_spi_lcd_hw_reset_io_write(disp_mipi_spi_lcd, true);
             vsf_eda_set_user_value(LCD_STATE_HW_RESET_DONE);

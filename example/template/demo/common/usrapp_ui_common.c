@@ -121,10 +121,12 @@ usrapp_ui_common_t usrapp_ui_common = {
             .color              = APP_DISP_DEMO_COLOR,
         },
         .spi                    = APP_DISP_DEMO_SPI,
+#if VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
         .reset                  = {
             .gpio               = APP_DISP_DEMO_RESET_GPIO,
             .pin_mask           = APP_DISP_DEMO_RESET_PIN_MASK,
         },
+#endif
         .dcx                    = {
             .gpio               = APP_DISP_DEMO_DCX_GPIO,
             .pin_mask           = APP_DISP_DEMO_DCX_PIN_MASK,
