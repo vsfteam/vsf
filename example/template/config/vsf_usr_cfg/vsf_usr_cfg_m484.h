@@ -194,7 +194,7 @@
 #if APP_USE_DISP_DEMO == ENABLED
 #   define VSF_USE_UI                                      ENABLED
 #   define VSF_DISP_USE_MIPI_SPI_LCD                       ENABLED
-#      define VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET     ENABLED
+#      define VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET ENABLED
 
 #      define APP_DISP_DEMO_HEIGHT                         320
 #      define APP_DISP_DEMO_WIDTH                          480

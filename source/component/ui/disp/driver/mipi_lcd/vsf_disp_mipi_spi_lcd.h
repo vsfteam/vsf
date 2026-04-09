@@ -44,6 +44,12 @@ extern "C" {
 #   error "need VSF_HAL_USE_SPI"
 #endif
 
+#if !defined(VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET)                         \
+    &&  defined(VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET)
+#   define VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET                            \
+            VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET
+#endif
+
 #ifndef VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET
 #   define VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET     ENABLED
 #endif
@@ -175,7 +181,7 @@ vsf_class(vk_disp_mipi_spi_lcd_t) {
             vsf_gpio_t * gpio;
             uint32_t     pin_mask;
         } dcx;
-#if VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
+#if VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET == ENABLED
         struct {
             vsf_gpio_t * gpio;
             uint32_t     pin_mask;
