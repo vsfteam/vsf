@@ -44,12 +44,6 @@ extern "C" {
 #   error "need VSF_HAL_USE_SPI"
 #endif
 
-#if !defined(VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET)                         \
-    &&  defined(VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET)
-#   define VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET                            \
-            VSF_DISP_MIPI_LCD_SUPPORT_HARDWARE_RESET
-#endif
-
 #ifndef VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET
 #   define VSF_DISP_MIPI_SPI_LCD_SUPPORT_HARDWARE_RESET     ENABLED
 #endif
@@ -89,71 +83,51 @@ extern "C" {
 
 /**
  \~chinese
- @def VSF_DISP_MIPI_SPI_LCD_INITSEQ(__LCD_SEQ, __PIXEL_FORMAT, __MODE, ...)
- @brief 一个简化 LCD 初始化序列的宏
+ @def VSF_DISP_MIPI_SPI_LCD_INITSEQ(__LCD_SEQ, ...)
+ @brief 一个 LCD SPI 初始化序列拼接宏
  @param[in] __LCD_SEQ: 包含一堆预定义命令的宏, 增加新的 LCD 支持应该定义类似的命令，部分现在提供的预定义命令：
             VSF_DISP_MIPI_SPI_LCD_S6D05A1_BASE, VSF_DISP_MIPI_SPI_LCD_ILI9488_BASE, VSF_DISP_MIPI_SPI_LCD_ILI9341_BASE, ...
 
- @param[in] __PIXEL_FORMAT: LCD 像素位宽，可选值包括： MIPI_PIXEL_FORMAT_BITLEN([3, 8, 12, 16, 18, 24])
-
- @param[in] __MODE: LCD 的颜色和地址顺序，可以使用简化配置宏
-                        MIPI_MODE_X_FLIP, MIPI_MODE_Y_FLIP, MIPI_MODE_RGB, MIPI_MODE_BGR，
-                    也可以使用如下完整命令，需要注意，不是所有 LCD 都支持以下所有配置：
-                        MIPI_DCS_PAGE_ADDRESS_TOP_TO_BOTTOM
-                        MIPI_DCS_PAGE_ADDRESS_BOTTOM_TO_TOP
-                        MIPI_DCS_COLUME_ADDRESS_LEFT_TO_RIGHT
-                        MIPI_DCS_COLUME_ADDRESS_RIGHT_TO_LEFT
-                        MIPI_DCS_PAGE_COLUMN_NORMAL_ORDER
-                        MIPI_DCS_PAGE_COLUMN_REVERSE_ORDER
-                        MIPI_DCS_DEVICE_REFRESH_TOP_TO_BOTTOM
-                        MIPI_DCS_DEVICE_REFRESH_BOTTOM_TO_TOP
-                        MIPI_DCS_DEVICE_REFRESH_RGB
-                        MIPI_DCS_DEVICE_REFRESH_BGR
-                        MIPI_DCS_LCD_REFRESH_LEFT_TO_RIGHT
-                        MIPI_DCS_LCD_REFRESH_RIGHT_TO_LEFT
-                        MIPI_DCS_FLIP_HORIZONTAL_NORMAL
-                        MIPI_DCS_FLIP_HORIZONTAL_FLIPPED
-
- @param[in] 可选参数，有三种方式填充可选参数
-    1. 使用简化命令配置通用寄存器，例如 MIPI_SOFT_RESET, MIPI_ENTER_IDLE, MIPI_EXIT_IDLE, MIPI_EXIT_IDLE, ...
-    2. 使用完整命令配置通用寄存器，每一个通用寄存器都有相应的宏，可以参考头文件 vsf_disp_mip_lcd_dcs.h，例子：
-         MIPI_DCS_CMD_SET_TEAR_SCANLINE(0x10),  // turns on the display module’s Tearing Effect output signal
-                                                // on the TE signal line when the displaymodule reaches line 16
-    3. 使用宏 VSF_DISP_MIPI_LCD_WRITE() to 配置部分 LCD 专有寄存器，例如
-       VSF_DISP_MIPI_LCD_WRITE(0xB1,  2, 0x00, 0x10),   //  for ST7796S, set 0x81 register with 2 byte parameter
+ @param[in] 可选参数: 由调用者自行按需填充初始化命令，顺序不受固定位置参数限制。常见写法包括：
+    1. 使用完整命令配置通用寄存器，例如：
+         MIPI_SET_PIXEL_BITLEN(16)
+         MIPI_SET_ADDRESS_MODE(MIPI_MODE_RGB | MIPI_MODE_X_FLIP)
+         MIPI_DCS_CMD_SET_TEAR_SCANLINE(0x10)
+    2. 使用简化命令配置通用寄存器，例如 MIPI_SOFT_RESET, MIPI_ENTER_IDLE, MIPI_EXIT_IDLE, MIPI_TEAR_PIN_ON, ...
+    3. 使用宏 VSF_DISP_MIPI_LCD_WRITE() 配置部分 LCD 专有寄存器，例如
+       VSF_DISP_MIPI_LCD_WRITE(0xB1,  2, 0x00, 0x10),   // for ST7796S, set 0xB1 register with 2 byte parameter
 
   以下是一些简单的例子：
 
   // ST7789V with RGB565
   VSF_DISP_MIPI_SPI_LCD_INITSEQ(
-    VSF_DISP_MIPI_SPI_LCD_ST7789V_BASE,
-    MIPI_PIXEL_FORMAT_BITLEN(16),
-    MIPI_MODE_RGB
+    VSF_DISP_MIPI_LCD_ST7789V_BASE,
+    MIPI_SET_ADDRESS_MODE(MIPI_MODE_RGB),
+    MIPI_SET_PIXEL_BITLEN(16)
   )
 
   // ST7789V with RGB565, tearing effect line on
   VSF_DISP_MIPI_SPI_LCD_INITSEQ(
-    VSF_DISP_MIPI_SPI_LCD_ST7789V_BASE,
-    MIPI_PIXEL_FORMAT_BITLEN(16),
-    MIPI_MODE_RGB,
+    VSF_DISP_MIPI_LCD_ST7789V_BASE,
+    MIPI_SET_ADDRESS_MODE(MIPI_MODE_RGB),
+    MIPI_SET_PIXEL_BITLEN(16),
     MIPI_TEAR_PIN_ON
   )
 
   // ST7796S with BGR888, X FLIP
   VSF_DISP_MIPI_SPI_LCD_INITSEQ(
-    VSF_DISP_MIPI_SPI_LCD_ST7796S_BASE,
-    MIPI_PIXEL_FORMAT_BITLEN(24),
-    MIPI_MODE_RGB | MIPI_MODE_X_FLIP,
+    VSF_DISP_MIPI_LCD_ST7796S_BASE,
+    MIPI_SET_ADDRESS_MODE(MIPI_MODE_RGB | MIPI_MODE_X_FLIP),
+    MIPI_SET_PIXEL_BITLEN(24),
     // Blanking Porch Control
     VSF_DISP_MIPI_LCD_WRITE(0xB1,  2, 0x00, 0x10),
   )
  */
-#define VSF_DISP_MIPI_SPI_LCD_INITSEQ(__LCD_SEQ, __PIXEL_FORMAT, __MODE, ...)   \
-    VSF_DISP_MIPI_LCD_INITSEQ(__LCD_SEQ,                                        \
-        MIPI_DCS_CMD_SET_ADDRESS_MODE(__MODE),                                  \
-        MIPI_DCS_CMD_SET_PIXEL_FORMAT(__PIXEL_FORMAT),                          \
-        ##__VA_ARGS__                                                           \
+#define VSF_DISP_MIPI_SPI_LCD_INITSEQ(__LCD_SEQ, ...)                            \
+    VSF_DISP_MIPI_LCD_INITSEQ(__LCD_SEQ,                                         \
+        ##__VA_ARGS__                                                            \
     )
+
 
 #define VSF_DISP_MIPI_SPI_LCD_REFRESH_SEQ_LEN                                   \
     (1 + 1 + 4) + (1 + 1 + 4) + (1 + 1 + 4 + 4)
@@ -161,10 +135,9 @@ extern "C" {
 
 // MACROs for specified LCD
 
-#define VSF_DISP_ST7789V_SPI_INITSEQ(__PIXEL_FORMAT, __MODE, ...)               \
-    VSF_DISP_MIPI_SPI_LCD_INITSEQ(VSF_DISP_MIPI_LCD_ST7789V_BASE,               \
-        __PIXEL_FORMAT, __MODE,                                                 \
-        ##__VA_ARGS__                                                           \
+#define VSF_DISP_ST7789V_SPI_INITSEQ(...)                                        \
+    VSF_DISP_MIPI_SPI_LCD_INITSEQ(VSF_DISP_MIPI_LCD_ST7789V_BASE,                \
+        ##__VA_ARGS__                                                            \
     )
 
 /*============================ TYPES =========================================*/

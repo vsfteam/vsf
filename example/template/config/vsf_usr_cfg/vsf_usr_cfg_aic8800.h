@@ -383,8 +383,8 @@ extern void VSF_DEBUG_STREAM_POLL(void);
 #      define APP_DISP_DEMO_MIPI_SPI_LCD_SEQ            {                       \
                 VSF_DISP_MIPI_SPI_LCD_INITSEQ(                                  \
                     VSF_DISP_MIPI_LCD_ST7789V_BASE,                             \
-                    MIPI_PIXEL_FORMAT_BITLEN(16),                               \
-                    MIPI_MODE_RGB                                               \
+                    MIPI_SET_ADDRESS_MODE(MIPI_MODE_RGB),                 \
+                    MIPI_SET_PIXEL_BITLEN(16)  \
                 )}
 #      define APP_DISP_DEMO_CLOCK_HZ                    (60ul * 1000ul * 1000ul)
 #endif

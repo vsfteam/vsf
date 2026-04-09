@@ -352,9 +352,11 @@ extern "C" {
 #define MIPI_MODE_Y_FLIP                                MIPI_DCS_PAGE_ADDRESS_BOTTOM_TO_TOP
 #define MIPI_MODE_RGB                                   MIPI_DCS_DEVICE_REFRESH_RGB
 #define MIPI_MODE_BGR                                   MIPI_DCS_DEVICE_REFRESH_BGR
+#define MIPI_SET_ADDRESS_MODE(__MODE_MASK)              MIPI_DCS_CMD_SET_ADDRESS_MODE(__MODE_MASK)
 // pixel format
 // pixel bitlen in [3, 8, 12, 16, 18, 24]
 #define MIPI_PIXEL_FORMAT_BITLEN(__BITLEN)              MIPI_DCS_PIXEL_FORMAT_DBI_BITS(__BITLEN)
+#define MIPI_SET_PIXEL_BITLEN(__BITLEN)                 MIPI_DCS_CMD_SET_PIXEL_FORMAT(MIPI_PIXEL_FORMAT_BITLEN(__BITLEN))
 // soft reset
 #define MIPI_SOFT_RESET                                 MIPI_DCS_CMD_SOFT_RESET
 // sleep sleep
