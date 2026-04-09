@@ -514,6 +514,7 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->reset_port != NULL)) {
                 delay_ms = dwcotg_hcd->workaround->reset_port(dwcotg_hcd->workaround_param);
             }
+            vsf_teda_cancel_timer();
             vsf_teda_set_timer_ms(delay_ms);
         } else if (hprt0 & USB_OTG_HPRT_PRST) {
             *reg->host.hprt0 &= ~(USB_OTG_HPRT_PRST | USB_OTG_HPRT_W1C_MASK);
@@ -530,6 +531,7 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
             if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->enable_port != NULL)) {
                 delay_ms = dwcotg_hcd->workaround->enable_port(dwcotg_hcd->workaround_param, dwcotg_hcd->speed);
             }
+            vsf_teda_cancel_timer();
             vsf_teda_set_timer_ms(delay_ms);
         } else if (NULL == dwcotg_hcd->dev) {
             // cast-align from gcc
@@ -557,6 +559,7 @@ static void __vk_dwcotg_hcd_evthandler(vsf_eda_t *eda, vsf_evt_t evt)
         if ((dwcotg_hcd->workaround != NULL) && (dwcotg_hcd->workaround->reset_port_prepare != NULL)) {
             uint_fast32_t delay_ms = dwcotg_hcd->workaround->reset_port_prepare(dwcotg_hcd->workaround_param);
             if (delay_ms > 0) {
+                vsf_teda_cancel_timer();
                 vsf_teda_set_timer_ms(delay_ms);
                 break;
             }
@@ -811,7 +814,7 @@ static uint_fast16_t __vk_dwcotg_hcd_get_frame_number(vk_usbh_hcd_t *hcd)
 {
     vk_dwcotg_hcd_t *dwcotg_hcd = hcd->priv;
     vk_dwcotg_reg_t *reg = &dwcotg_hcd->reg;
-    return reg->host.global_regs->hfnum & 0xFFFF;
+    return reg->host.global_regs->hfnum & 0x7FF;
 }
 
 static vk_usbh_hcd_urb_t * __vk_dwcotg_hcd_alloc_urb(vk_usbh_hcd_t *hcd)
@@ -1079,11 +1082,8 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
                 vsf_unprotect_int(orig);
                 break;
             case USB_ENDPOINT_XFER_CONTROL:
-                if (VSF_DWCOTG_HCD_PHASE_SETUP == dwcotg_urb->phase) {
-                    __vk_dwcotg_hcd_urb_fsm(dwcotg_hcd, urb);
-                    break;
-                }
-                goto __reactivate_channel;
+                __vk_dwcotg_hcd_urb_fsm(dwcotg_hcd, urb);
+                return;
             case USB_ENDPOINT_XFER_BULK:
 #if VSF_DWCOTG_HCD_CFG_HS_BULK_IN_NAK_HOLDOFF > 0
                 VSF_USB_ASSERT(urb->pipe.dir_in1out0);
@@ -1203,7 +1203,22 @@ static void __vk_dwcotg_hcd_channel_interrupt(vk_dwcotg_hcd_t *dwcotg_hcd, uint_
     } else if (channel_intsts & USB_OTG_HCINT_NAK) {
         if (    (urb->pipe.type == USB_ENDPOINT_XFER_BULK)
             ||  (urb->pipe.type == USB_ENDPOINT_XFER_CONTROL)) {
-            channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+
+            bool is_out_nak = !urb->pipe.dir_in1out0;
+            if (urb->pipe.type == USB_ENDPOINT_XFER_CONTROL) {
+                if (dwcotg_urb->phase == VSF_DWCOTG_HCD_PHASE_STATUS) {
+                    is_out_nak = urb->pipe.dir_in1out0;
+                } else if (dwcotg_urb->phase == VSF_DWCOTG_HCD_PHASE_SETUP) {
+                    is_out_nak = true;
+                }
+            }
+
+            if (is_out_nak) {
+                channel_regs->hcintmsk &= ~USB_OTG_HCINTMSK_NAKM;
+                __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, channel_idx);
+            } else {
+                channel_regs->hcchar |= USB_OTG_HCCHAR_CHENA;
+            }
         } else {
             channel_regs->hcintmsk &= ~USB_OTG_HCINTMSK_NAKM;
             __vk_dwcotg_hcd_halt_channel(dwcotg_hcd, channel_idx);

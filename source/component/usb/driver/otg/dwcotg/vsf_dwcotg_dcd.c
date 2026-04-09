@@ -216,7 +216,7 @@ uint_fast16_t vk_dwcotg_dcd_get_frame_number(vk_dwcotg_dcd_t *dwcotg_dcd)
     return (dwcotg_dcd->reg.dev.global_regs->dsts & USB_OTG_DSTS_FNSOF) >> 8;
 }
 
-extern uint_fast8_t vk_dwcotg_dcd_get_mframe_number(vk_dwcotg_dcd_t *dwcotg_dcd)
+uint_fast8_t vk_dwcotg_dcd_get_mframe_number(vk_dwcotg_dcd_t *dwcotg_dcd)
 {
     return 0;
 }
