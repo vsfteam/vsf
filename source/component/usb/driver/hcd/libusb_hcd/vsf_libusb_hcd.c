@@ -316,55 +316,69 @@ static int __libusb_parse_config_descriptor(unsigned char *raw_data, int raw_len
 int LIBUSB_CALL libusb_get_config_descriptor_by_value(usb_dev_handle *dev,
     uint8_t bConfigurationValue, struct libusb_config_descriptor **config)
 {
-    struct usb_config_descriptor *src;
-    struct usb_config_descriptor *dst;
-
     if ((dev == NULL) || (config == NULL)) {
         return LIBUSB_ERROR_INVALID_PARAM;
     }
 
-    // Step 1: Read config descriptor header (9 bytes) to get wTotalLength
-    unsigned char desc_header[9];
-    int ret = usb_control_msg(dev,
-            USB_ENDPOINT_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE,
-            USB_REQ_GET_DESCRIPTOR,
-            (USB_DT_CONFIG << 8) | bConfigurationValue,
-            0, desc_header, 9, 1000);
-
-    if (ret < 0) {
-        return ret;
+    // Get number of configurations from device descriptor
+    struct usb_device *udev = usb_device(dev);
+    if (udev == NULL) {
+        return LIBUSB_ERROR_NO_DEVICE;
     }
+    uint8_t num_configs = udev->descriptor.bNumConfigurations;
 
-    // Extract wTotalLength from config descriptor header (bytes 2-3, little-endian)
-    uint16_t wTotalLength = desc_header[2] | (desc_header[3] << 8);
-    if (wTotalLength < 9) {
-        return LIBUSB_ERROR_INVALID_PARAM;  // Invalid descriptor
-    }
+    // USB GET_DESCRIPTOR uses 0-based index, not bConfigurationValue.
+    // Iterate all configs by index and match bConfigurationValue (at offset 5).
+    for (uint8_t idx = 0; idx < num_configs; idx++) {
+        // Step 1: Read config descriptor header (9 bytes)
+        unsigned char desc_header[9];
+        int ret = usb_control_msg(dev,
+                USB_ENDPOINT_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE,
+                USB_REQ_GET_DESCRIPTOR,
+                (USB_DT_CONFIG << 8) | idx,
+                0, desc_header, 9, 1000);
 
-    // Step 2: Allocate buffer for complete descriptor based on actual length
-    unsigned char *desc_buffer = (unsigned char *)vsf_usbh_malloc(wTotalLength);
-    if (desc_buffer == NULL) {
-        return LIBUSB_ERROR_NO_MEM;
-    }
+        if (ret < 9) {
+            continue;
+        }
 
-    // Step 3: Read complete descriptor with actual length
-    ret = libusb_control_transfer(dev,
-            USB_ENDPOINT_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE,
-            USB_REQ_GET_DESCRIPTOR,
-            (USB_DT_CONFIG << 8) | bConfigurationValue,
-            0,
-            desc_buffer, wTotalLength, 1000);
+        // Check bConfigurationValue at offset 5
+        if (desc_header[5] != bConfigurationValue) {
+            continue;
+        }
 
-    if (ret < 0) {
+        // Extract wTotalLength (bytes 2-3, little-endian)
+        uint16_t wTotalLength = desc_header[2] | (desc_header[3] << 8);
+        if (wTotalLength < 9) {
+            return LIBUSB_ERROR_INVALID_PARAM;
+        }
+
+        // Step 2: Allocate buffer for complete descriptor
+        unsigned char *desc_buffer = (unsigned char *)vsf_usbh_malloc(wTotalLength);
+        if (desc_buffer == NULL) {
+            return LIBUSB_ERROR_NO_MEM;
+        }
+
+        // Step 3: Read complete descriptor with actual length
+        ret = usb_control_msg(dev,
+                USB_ENDPOINT_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE,
+                USB_REQ_GET_DESCRIPTOR,
+                (USB_DT_CONFIG << 8) | idx,
+                0,
+                desc_buffer, wTotalLength, 1000);
+
+        if (ret < 9) {
+            vsf_usbh_free(desc_buffer);
+            return LIBUSB_ERROR_IO;
+        }
+
+        // Parse descriptor and create config structure
+        int parse_ret = __libusb_parse_config_descriptor(desc_buffer, ret, (struct usb_config_descriptor **)config);
         vsf_usbh_free(desc_buffer);
-        return ret;
+        return parse_ret;
     }
 
-    // Parse descriptor and create config structure
-    int parse_ret = __libusb_parse_config_descriptor(desc_buffer, ret, (struct usb_config_descriptor **)config);
-    vsf_usbh_free(desc_buffer);
-
-    return parse_ret;
+    return LIBUSB_ERROR_NOT_FOUND;
 }
 
 void LIBUSB_CALL libusb_free_config_descriptor(
@@ -883,6 +897,9 @@ static void __vk_libusb_hcd_urb_thread(void *arg)
 
                 if (    ((USB_RECIP_DEVICE | USB_DIR_OUT) == setup->bRequestType)
                     &&  (USB_REQ_SET_CONFIGURATION == setup->bRequest)) {
+#ifndef LIBUSB_API_VERSION
+                    __vsf_arch_irq_start(irq_thread);
+#endif
                     if (LIBUSB_SUCCESS == libusb_get_config_descriptor_by_value(
                                 // for libusb 0.1, use handle because it's needed to call usb_control_msg
 #ifndef LIBUSB_API_VERSION
@@ -891,12 +908,18 @@ static void __vk_libusb_hcd_urb_thread(void *arg)
                                 libusb_get_device(libusb_dev->handle),
 #endif
                                 setup->wValue, &config_desc)) {
+#ifndef LIBUSB_API_VERSION
+                        __vsf_arch_irq_end(irq_thread, false);
+#endif
                         for (uint8_t i = 0; i < config_desc->bNumInterfaces; i++) {
                             if (libusb_kernel_driver_active(libusb_dev->handle, i)) {
                                 libusb_detach_kernel_driver(libusb_dev->handle, i);
                             }
                         }
                     } else {
+#ifndef LIBUSB_API_VERSION
+                        __vsf_arch_irq_end(irq_thread, false);
+#endif
                         VSF_LINUX_ASSERT(false);
                     }
                 }
@@ -915,6 +938,15 @@ static void __vk_libusb_hcd_urb_thread(void *arg)
 #endif
             if (actual_length < 0) {
                 urb->status = actual_length;
+                if (config_desc != NULL) {
+#ifndef LIBUSB_API_VERSION
+                    __vsf_arch_irq_start(irq_thread);
+#endif
+                    libusb_free_config_descriptor(config_desc);
+#ifndef LIBUSB_API_VERSION
+                    __vsf_arch_irq_end(irq_thread, false);
+#endif
+                }
             } else {
                 urb->status = URB_OK;
                 urb->actual_length = actual_length;
@@ -930,7 +962,13 @@ static void __vk_libusb_hcd_urb_thread(void *arg)
                         for (uint8_t i = 0; i < config_desc->bNumInterfaces; i++) {
                             libusb_claim_interface(libusb_dev->handle, i);
                         }
+#ifndef LIBUSB_API_VERSION
+                        __vsf_arch_irq_start(irq_thread);
+#endif
                         libusb_free_config_descriptor(config_desc);
+#ifndef LIBUSB_API_VERSION
+                        __vsf_arch_irq_end(irq_thread, false);
+#endif
                     }
                 }
             }
