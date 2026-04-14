@@ -542,8 +542,10 @@ void __libusb_irq_end(vsf_arch_irq_thread_t *irq_thread)
     __vsf_arch_irq_end(irq_thread, false);
 }
 
-#define VSF_LIBUSB_DRIVER_TYPE    WDI_LIBUSB0
-#define VSF_LIBUSB_DRIVER_NAME    "libusb0"
+#if defined(__WIN__) && VSF_LIBUSB_CFG_INSTALL_DRIVER == ENABLED
+#   define VSF_LIBUSB_DRIVER_TYPE       WDI_LIBUSB0
+#   define VSF_LIBUSB_DRIVER_NAME       "libusb0"
+#endif
 
 #else       // LIBUSB_API_VERSION defined, libusb 1.0
 
@@ -555,12 +557,14 @@ void __libusb_irq_end(vsf_arch_irq_thread_t *irq_thread)
 {
 }
 
-#define VSF_LIBUSB_DRIVER_TYPE    WDI_WINUSB
-#define VSF_LIBUSB_DRIVER_NAME    "WinUSB"
+#if defined(__WIN__) && VSF_LIBUSB_CFG_INSTALL_DRIVER == ENABLED
+#   define VSF_LIBUSB_DRIVER_TYPE       WDI_WINUSB
+#   define VSF_LIBUSB_DRIVER_NAME       "WinUSB"
+#endif
 
 // Ensure LIBUSB_SPEED_SUPER_PLUS is available for older libusb 1.0 versions
 #ifndef LIBUSB_SPEED_SUPER_PLUS
-#   define LIBUSB_SPEED_SUPER_PLUS    (LIBUSB_SPEED_SUPER + 1)
+#   define LIBUSB_SPEED_SUPER_PLUS      (LIBUSB_SPEED_SUPER + 1)
 #endif
 
 #endif
